@@ -74,10 +74,10 @@ bool csGraphics2DDOSRAW::Initialize (iSystem *pSystem)
   return true;
 }
 
-bool csGraphics2DDOSRAW::Open (const char* Title)
+bool csGraphics2DDOSRAW::Open ()
 {
   if (is_open) return true;
-  if (!csGraphics2D::Open (Title))
+  if (!csGraphics2D::Open ())
     return false;
   PaletteChanged = false;
 

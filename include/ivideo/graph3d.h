@@ -512,7 +512,7 @@ struct csFog
   float blue;
 };
 
-SCF_VERSION (iGraphics3D, 5, 0, 0);
+SCF_VERSION (iGraphics3D, 5, 0, 1);
 
 /**
  * This is the standard 3D graphics interface.
@@ -523,7 +523,7 @@ SCF_VERSION (iGraphics3D, 5, 0, 0);
 struct iGraphics3D : public iBase
 {
   /// Open the 3D graphics display.
-  virtual bool Open (const char *Title) = 0;
+  virtual bool Open () = 0;
   /// Close the 3D graphics display.
   virtual void Close () = 0;
 

@@ -33,6 +33,7 @@
 #include "cssysdef.h"
 #include "cssys/djgpp/djgpp.h"
 #include "isys/system.h"
+#include "iutil/objreg.h"
 #include "inputq.h"
 #include "djkeysys.h"
 #include "djmousys.h"
@@ -135,9 +136,9 @@ void SysSystemDriver::NextFrame ()
   csSystemDriver::NextFrame ();
 }
 
-bool SysSystemDriver::Open (const char *Title)
+bool SysSystemDriver::Open ()
 {
-  if (!csSystemDriver::Open (Title))
+  if (!csSystemDriver::Open ())
     return false;
 
   // Initialize keyboard handler
@@ -147,6 +148,8 @@ bool SysSystemDriver::Open (const char *Title)
   KH.chain (0);
   KeyboardOpened = true;
 
+  iConfigManager* Config = CS_QUERY_REGISTRY (GetObjectRegistry (),
+  	iConfigManager);
   SensivityFactor = Config->GetFloat ("MouseDriver.MouseSensivity", 1.0);
 
   if (MH.install ())

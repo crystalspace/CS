@@ -147,11 +147,11 @@ csGraphics2DSVGALib::~csGraphics2DSVGALib(void)
     EventOutlet->DecRef ();
 }
 
-bool csGraphics2DSVGALib::Open(const char *Title)
+bool csGraphics2DSVGALib::Open()
 {
   if (is_open) return true;
   // Open your graphic interface
-  if (!csGraphics2D::Open (Title))
+  if (!csGraphics2D::Open ())
     return false;
 
   vga_init ();

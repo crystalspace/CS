@@ -19,10 +19,12 @@
 #include "cssysdef.h"
 #include "cssys/system.h"
 #include "csutil/cscolor.h"
+#include "cstool/initapp.h"
 #include "cslight.h"
 #include "iengine/engine.h"
 #include "ivideo/graph2d.h"
 #include "ivideo/graph3d.h"
+#include "ivideo/natwin.h"
 #include "ivideo/txtmgr.h"
 #include "ivideo/texture.h"
 #include "ivideo/material.h"
@@ -139,12 +141,13 @@ bool Lighter::Initialize (int argc, const char* const argv[],
   if (!superclass::Initialize (argc, argv, iConfigName))
     return false;
 
+  csInitializeApplication (this);
   iObjectRegistry* object_reg = GetObjectRegistry ();
   iPluginManager* plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
   iCommandLineParser* cmdline = CS_QUERY_REGISTRY (object_reg,
   	iCommandLineParser);
 
-  iVFS* VFS = CS_QUERY_PLUGIN (plugin_mgr, iVFS);
+  iVFS* VFS = CS_QUERY_REGISTRY (object_reg, iVFS);
   if (!VFS)
   {
     Printf (CS_MSG_FATAL_ERROR, "No iVFS plugin!\n");
@@ -152,21 +155,21 @@ bool Lighter::Initialize (int argc, const char* const argv[],
   }
 
   // Find the pointer to engine plugin
-  engine = CS_QUERY_PLUGIN (plugin_mgr, iEngine);
+  engine = CS_QUERY_REGISTRY (object_reg, iEngine);
   if (!engine)
   {
     Printf (CS_MSG_FATAL_ERROR, "No iEngine plugin!\n");
     abort ();
   }
 
-  loader = CS_QUERY_PLUGIN_ID (plugin_mgr, CS_FUNCID_LVLLOADER, iLoader);
+  loader = CS_QUERY_REGISTRY (object_reg, iLoader);
   if (!loader)
   {
     Printf (CS_MSG_FATAL_ERROR, "No iLoader plugin!\n");
     abort ();
   }
 
-  g3d = CS_QUERY_PLUGIN_ID (plugin_mgr, CS_FUNCID_VIDEO, iGraphics3D);
+  g3d = CS_QUERY_REGISTRY (object_reg, iGraphics3D);
   if (!g3d)
   {
     Printf (CS_MSG_FATAL_ERROR, "No iGraphics3D plugin!\n");
@@ -174,7 +177,10 @@ bool Lighter::Initialize (int argc, const char* const argv[],
   }
 
   // Open the main system. This will open all the previously loaded plug-ins.
-  if (!Open ("Lighter"))
+  g2d = g3d->GetDriver2D ();
+  iNativeWindow* nw = g2d->GetNativeWindow ();
+  if (nw) nw->SetTitle ("Crystal Space Lighting Application");
+  if (!Open ())
   {
     Printf (CS_MSG_FATAL_ERROR, "Error opening system!\n");
     Cleanup ();
@@ -184,7 +190,6 @@ bool Lighter::Initialize (int argc, const char* const argv[],
   // Setup the texture manager.
   iTextureManager* txtmgr = g3d->GetTextureManager ();
   txtmgr->SetVerbose (true);
-  g2d = g3d->GetDriver2D ();
   txtmgr->ResetPalette ();
   color_bg = txtmgr->FindRGB (0, 0, 0);
   color_text = txtmgr->FindRGB (200, 220, 255);

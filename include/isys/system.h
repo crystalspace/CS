@@ -92,11 +92,10 @@ struct iSystem : public iBase
   	const char *iConfigName) = 0;
 
   /**
-   * Open the graphics context (with optional title on titlebar),
-   * mouse and keyboard.
+   * Send cscmdSystemOpen message to all loaded plugins.
    */
-  virtual bool Open (const char *Title) = 0;
-  /// Close the system
+  virtual bool Open () = 0;
+  /// Send cscmdSystemClose message to all loaded plugins. 
   virtual void Close () = 0;
 
   /**

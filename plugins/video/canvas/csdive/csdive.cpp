@@ -177,10 +177,10 @@ bool csGraphics2DOS2DIVE::HandleEvent (iEvent &Event)
   return false;
 }
 
-bool csGraphics2DOS2DIVE::Open (const char *Title)
+bool csGraphics2DOS2DIVE::Open ()
 {
   if (is_open) return true;
-  if (!csGraphics2D::Open (Title))
+  if (!csGraphics2D::Open ())
     return false;
 
   // Set up FGVideoMode
@@ -319,7 +319,7 @@ bool csGraphics2DOS2DIVE::Open (const char *Title)
     PixelFormat, PixelFormat >> 8, PixelFormat >> 16, PixelFormat >> 24);
 
   // Create PM window
-  rq.Parm.CreateWindow.Title = Title;
+  rq.Parm.CreateWindow.Title = win_title;
   if ((rc = PMcall (pmcmdCreateWindow, &rq)) != pmrcOK)
   {
     CsPrintf (CS_MSG_FATAL_ERROR, "Cannot create PM window: no resources bound to driver?\n");

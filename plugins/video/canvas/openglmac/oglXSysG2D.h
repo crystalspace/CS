@@ -10,7 +10,7 @@ class IXOpenGLGraphicsInfo : public iMacGraphicsInfo
 {
     DECLARE_IUNKNOWN()
     ///
-    STDMETHOD(Open)(char* szTitle);
+    STDMETHOD(Open)();
     ///
     STDMETHOD(Close)();
     ///

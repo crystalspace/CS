@@ -21,6 +21,7 @@
 #define CS_SYSDEF_PROVIDE_GETOPT
 #include "cssysdef.h"
 #include "cssys/sysdriv.h"
+#include "cstool/initapp.h"
 #include "ivideo/fontserv.h"
 #include "iutil/objreg.h"
 #include "isys/plugin.h"
@@ -272,6 +273,7 @@ int main (int argc, char* argv[])
     fprintf (stderr, "Initialization error!\n");
     return -1;
   }
+  csInitializeApplication (System);
 
   programname = argv [0];
 

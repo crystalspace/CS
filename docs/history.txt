@@ -1,6 +1,86 @@
 The history order is reversed so that new features are at the top.
 
 25-Jul-2001
+	- Added interfaces iNativeWindowManager and iNativeWindow (in
+	  include/ivideo/natwin.h). In the future these interfaces will
+	  be extended to allow access to the native window system and also
+	  to allow putting canvases (iGraphics2D instances) on native
+	  windows. At this moment iNativeWindowManager only has an Alert()
+	  function which will show a modal alert and iNativeWindow has
+	  SetTitle() with which you can set the title for a native window.
+	- The current implementation of Alert() simply prints a message on
+	  standard output. Canvases should override this for a more useful
+	  alert. The windows system driver has an alert implementation
+	  internally. That should move to the windows canvases.
+	- Fixed g2dtest so the colors are ok now (was broken by the changes
+	  yesterday).
+	- Extended iGraphics2D with GetNativeWindow() to get the native
+	  window corresponding with a canvas.
+	- csGraphics2D will now implement iNativeWindowManager. This is
+	  a temporary measure until we decide to do this redesign (but that
+	  is not for 1.0).
+	- csGraphics2D will now implement iNativeWindow too.
+	- Removed 'Title' parameter from iSystem::Open(). This is obsolete
+	  now. To set the title on your window you need to do:
+	          iNativeWindow* nw = g2d->GetNativeWindow ();
+		  if (nw) nw->SetTitle ("bla");
+	  It is best to do this before iSystem::Open() is called as not
+	  all canvases support changing the title when the window is
+	  already open (in fact, none of the current canvases support
+	  that).
+	- Also removed 'Title' parameter from iGraphics2D::Open() and
+	  iGraphics3D::Open().
+	- The default title for windows is now 'Crystal Space Application'
+	  which is much nicer than 'Dummy title' :-)
+	- Added CS_REPORTER_SEVERITY_DEBUG severity level. This way the
+	  reporter will be able to do debug logging too.
+	- Added various conveniance functions to the iReporter interface:
+	  ReportError, ReportWarning, ReportNotify, ReportBug, and
+	  ReportDebug.
+	- Fixed a bug in reporter plugin. It was returning true in
+	  HandleEvent() for every event. This effectively eats up all
+	  events.
+	- Added new standard reporter listener plugin (plugins/stdrep).
+	  If you load this plugin it will listen to an available
+	  reporter plugin and perform the following actions:
+	    - Warnings will go to output console (if present) or to standard
+	      output.
+	    - Errors will given an Alert through the iNativeWindowManager.
+	      Additionally they will be reported on the console, standard
+	      error, and debug.txt.
+	    - Bugs are handled the same way as errors.
+	    - Debug messages are sent to debug.txt.
+	    - Notify messages go to the output console.
+	  Using the new iStandardReporterListener interface you can have
+	  control on where all messages go.
+	- Removed the specific iReporterListener implementation in
+	  WalkTest and now use the stdrep plugin instead.
+	- Changed the implementation of the iObjectRegistry::Get() in the
+	  system driver. It will now first return the object implementing
+	  the interface with NULL tag. If none such are found it will return
+	  a random one which has a non-NULL tag but still implements
+	  that interface.
+	- Added new csInitializeApplication(). This function will setup
+	  the object registry for the application for most common
+	  global plugins (VFS, G3D, G2D, Reporter, OutputConsole, Engine,
+	  Loader, ...). In addition it will also load the reporter plugin and
+	  the standard reporter listener plugins. After calling this function
+	  you can do CS_QUERY_REGISTRY() to obtain the singleton instances of
+	  above interfaces. The loading of the reporter and reporter
+	  listener are optional (you can disable it by giving false,false
+	  parameters). This function can be found in include/cstool/initapp.h.
+	- Changed most apps to use csInitializeApplication(). Also updated
+	  the tutorials. Also changed most apps to use CS_QUERY_REGISTRY
+	  as much as possible (as opposed to CS_QUERY_PLUGIN or
+	  CS_QUERY_PLUGIN_ID).
+	- Tried to fix the DOS port. Couldn't test if it really works though.
+	- Martin Geisse did the following:
+	    - Added GetIndexByName() to named object vectors. This works like
+	      FindByName() but returns the index of the object.
+	    - Added object merging to iModelData. This can be used to merge
+	      all contained objects into a single one. Animation is not yet
+	      handled correctly.
+	    - Fixed a bug in the crossbuilder.
 	- Eric Sunshine changed the CVS snapshot and documentation generation
 	  scripts so that these resources are now published via the HTTP
 	  protocol only, rather than via both HTTP and FTP.  This was done
@@ -70,6 +150,7 @@ The history order is reversed so that new features are at the top.
 	      factory itself (i.e. /lib/std/sprite1).
 	      Example: spark
 	    - The fourth parameter is a scale factor. Default is 1.
+	- Philip Wyett fixed a VFS plugin load failure in simplept.
 23-Jul-2001
 	- Continued work on the decomposition of the system driver. The
 	  following items were performed:

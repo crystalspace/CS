@@ -201,7 +201,7 @@ bool csGraphics2DOpenGL::Initialize (iSystem *pSystem)
 	return true;
 }
 
-bool csGraphics2DOpenGL::Open(const char *Title)
+bool csGraphics2DOpenGL::Open()
 {
   if (is_open) return true;
 	Str255			theTitle;
@@ -229,8 +229,8 @@ bool csGraphics2DOpenGL::Open(const char *Title)
 	theBounds.right = theBounds.left + Width;
 	theBounds.bottom = theBounds.top + Height;
 
-	strcpy( (char *)&theTitle[1], Title );
-	theTitle[0] = strlen( Title );
+	strcpy( (char *)&theTitle[1], win_title );
+	theTitle[0] = strlen( win_title );
 	mMainWindow = (CWindowPtr)::NewCWindow( nil, &theBounds, theTitle, true, noGrowDocProc, 
 											(WindowPtr) -1, false, 0 );
 
@@ -266,7 +266,7 @@ bool csGraphics2DOpenGL::Open(const char *Title)
 	aglSetDrawable( mGLContext, GetWindowPort(mMainWindow) );
 	aglSetCurrentContext( mGLContext );
 
-	csGraphics2DGLCommon::Open( Title );
+	csGraphics2DGLCommon::Open();
 
 	aglSwapBuffers( mGLContext );
   

@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 1998 by Jorrit Tyberghein
+    Copyright (C) 1998-2001 by Jorrit Tyberghein
     Written by Andrew Zabolotny <bit@eltech.ru>
 
     This library is free software; you can redistribute it and/or
@@ -36,6 +36,8 @@ SCF_IMPLEMENT_IBASE(csGraphics2D)
   SCF_IMPLEMENTS_INTERFACE(iGraphics2D)
   SCF_IMPLEMENTS_EMBEDDED_INTERFACE(iPlugin)
   SCF_IMPLEMENTS_EMBEDDED_INTERFACE(iConfig)
+  SCF_IMPLEMENTS_EMBEDDED_INTERFACE(iNativeWindowManager)
+  SCF_IMPLEMENTS_EMBEDDED_INTERFACE(iNativeWindow)
 SCF_IMPLEMENT_IBASE_END
 
 SCF_IMPLEMENT_EMBEDDED_IBASE (csGraphics2D::eiPlugin)
@@ -46,11 +48,21 @@ SCF_IMPLEMENT_EMBEDDED_IBASE (csGraphics2D::CanvasConfig)
   SCF_IMPLEMENTS_INTERFACE (iConfig)
 SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
+SCF_IMPLEMENT_EMBEDDED_IBASE (csGraphics2D::NativeWindow)
+  SCF_IMPLEMENTS_INTERFACE (iNativeWindow)
+SCF_IMPLEMENT_EMBEDDED_IBASE_END
+
+SCF_IMPLEMENT_EMBEDDED_IBASE (csGraphics2D::NativeWindowManager)
+  SCF_IMPLEMENTS_INTERFACE (iNativeWindowManager)
+SCF_IMPLEMENT_EMBEDDED_IBASE_END
+
 csGraphics2D::csGraphics2D (iBase* parent)
 {
   SCF_CONSTRUCT_IBASE (parent);
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiPlugin);
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiConfig);
+  SCF_CONSTRUCT_EMBEDDED_IBASE (scfiNativeWindow);
+  SCF_CONSTRUCT_EMBEDDED_IBASE (scfiNativeWindowManager);
   Memory = NULL;
   FontServer = NULL;
   LineAddress = NULL;
@@ -60,6 +72,7 @@ csGraphics2D::csGraphics2D (iBase* parent)
   Depth = 16;
   FullScreen = false;
   is_open = false;
+  win_title = csStrNew ("Crystal Space Application");
 }
 
 bool csGraphics2D::Initialize (iSystem* pSystem)
@@ -150,6 +163,7 @@ csGraphics2D::~csGraphics2D ()
     FontServer->DecRef ();
   Close ();
   delete [] Palette;
+  delete [] win_title;
 }
 
 bool csGraphics2D::HandleEvent (iEvent& Event)
@@ -159,7 +173,7 @@ bool csGraphics2D::HandleEvent (iEvent& Event)
     {
       case cscmdSystemOpen:
       {
-        Open ("Dummy title");
+        Open ();
         return true;
       }
       case cscmdSystemClose:
@@ -171,11 +185,10 @@ bool csGraphics2D::HandleEvent (iEvent& Event)
   return false;
 }
 
-bool csGraphics2D::Open (const char *Title)
+bool csGraphics2D::Open ()
 {
   if (is_open) return true;
   is_open = true;
-  (void)Title;
 
   FrameBufferLocked = 0;
 
@@ -673,6 +686,34 @@ iGraphics2D *csGraphics2D::CreateOffScreenCanvas
   csProcTextureSoft2D *tex = new csProcTextureSoft2D (System);
   return tex->CreateOffScreenCanvas (width, height, buffer, alone_hint,
 				     pfmt, palette, pal_size);
+}
+
+void csGraphics2D::AlertV (int type, const char* title, const char* okMsg,
+	const char* msg, va_list arg)
+{
+  (void)type; (void)title; (void)okMsg;
+  vprintf (msg, arg);
+  fflush (stdout);
+}
+
+void csGraphics2D::NativeWindowManager::Alert (int type,
+	const char* title, const char* okMsg, const char* msg, ...)
+{
+  va_list arg;
+  va_start (arg, msg);
+  scfParent->AlertV (type, title, okMsg, msg, arg);
+  va_end (arg);
+}
+
+void csGraphics2D::SetTitle (const char* title)
+{
+  delete[] win_title;
+  win_title = csStrNew (title);
+}
+
+iNativeWindow* csGraphics2D::GetNativeWindow ()
+{
+  return &scfiNativeWindow;
 }
 
 //---------------------------------------------------------------------------

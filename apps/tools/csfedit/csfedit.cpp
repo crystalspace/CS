@@ -21,9 +21,12 @@
 #include "cssysdef.h"
 #include "cssys/sysdriv.h"
 #include "csws/csws.h"
+#include "cstool/initapp.h"
 #include "apps/tools/csfedit/csfedit.h"
 #include "csver.h"
 #include "ivideo/fontserv.h"
+#include "ivideo/graph2d.h"
+#include "ivideo/natwin.h"
 #include "iutil/cfgmgr.h"
 #include "iutil/cmdline.h"
 #include "iutil/objreg.h"
@@ -1534,11 +1537,17 @@ int main (int argc, char* argv[])
   if (!System.Initialize (argc, argv, "/config/cswstest.cfg"))
     return -1;
 
-  if (!System.Open ("Crystal Space Font Editor"))
+  csInitializeApplication (&System);
+  iObjectRegistry* object_reg = System.GetObjectRegistry ();
+  iPluginManager* plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
+  iGraphics3D* g3d = CS_QUERY_REGISTRY (object_reg, iGraphics3D);
+  iNativeWindow* nw = g3d->GetDriver2D ()->GetNativeWindow ();
+  if (nw) nw->SetTitle ("Crystal Space Font Editor");
+
+  if (!System.Open ())
     return -1;
 
   // Look for skin variant from config file
-  iObjectRegistry* object_reg = System.GetObjectRegistry ();
   iCommandLineParser* cmdline = CS_QUERY_REGISTRY (object_reg,
   	iCommandLineParser);
   iConfigManager* cfg = CS_QUERY_REGISTRY (object_reg, iConfigManager);

@@ -457,9 +457,9 @@ SysSystemDriver::~SysSystemDriver ()
   System = NULL;
 }
 
-bool SysSystemDriver::Open (const char *Title)
+bool SysSystemDriver::Open ()
 {
-  if (!csSystemDriver::Open (Title))
+  if (!csSystemDriver::Open ())
     return false;
 
 #ifdef DO_DINPUT_KEYBOARD

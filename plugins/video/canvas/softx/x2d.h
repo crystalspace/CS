@@ -104,7 +104,7 @@ public:
   virtual ~csGraphics2DXLib ();
 
   virtual bool Initialize (iSystem*);
-  virtual bool Open (const char *Title);
+  virtual bool Open ();
   virtual void Close ();
 
   virtual bool BeginDraw () { return (Memory != NULL); }

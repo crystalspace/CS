@@ -277,7 +277,7 @@ void csGraphics2DOpenGL::CalcPixelFormat ()
     SystemFatalError ("DescribePixelFormat failed.");
 }
 
-bool csGraphics2DOpenGL::Open(const char *Title)
+bool csGraphics2DOpenGL::Open()
 {
   if (is_open) return true;
   DEVMODE dmode;
@@ -331,7 +331,7 @@ bool csGraphics2DOpenGL::Open(const char *Title)
   wwidth=Width+2*GetSystemMetrics(SM_CXSIZEFRAME);
   wheight=Height+2*GetSystemMetrics(SM_CYSIZEFRAME)+GetSystemMetrics(SM_CYCAPTION);
 
-  m_hWnd = CreateWindowEx(exStyle, WINDOWCLASSNAME, Title, style,
+  m_hWnd = CreateWindowEx(exStyle, WINDOWCLASSNAME, win_title, style,
 		(GetSystemMetrics(SM_CXSCREEN)-wwidth)/2,
 		(GetSystemMetrics(SM_CYSCREEN)-wheight)/2,
 		wwidth, wheight, NULL, NULL, m_hInstance, NULL );
@@ -349,7 +349,7 @@ bool csGraphics2DOpenGL::Open(const char *Title)
   hGLRC = wglCreateContext(hDC);
   wglMakeCurrent(hDC, hGLRC);
 
-  if (!csGraphics2DGLCommon::Open(Title))
+  if (!csGraphics2DGLCommon::Open())
     return false;
 
   if (Depth == 8)

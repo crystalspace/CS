@@ -216,7 +216,7 @@ bool csGraphics3DOGLCommon::HandleEvent (iEvent& Event)
     {
       case cscmdSystemOpen:
       {
-        Open ("Dummy title");
+        Open ();
         return true;
       }
       case cscmdSystemClose:
@@ -620,11 +620,11 @@ void csGraphics3DOGLCommon::SharedInitialize (csGraphics3DOGLCommon *d)
   m_config_options.do_extra_bright = false;
 }
 
-bool csGraphics3DOGLCommon::NewOpen (const char *Title)
+bool csGraphics3DOGLCommon::NewOpen ()
 {
   CommonOpen ();
 
-  if (!G2D->Open (Title))
+  if (!G2D->Open ())
   {
     SysPrintf (CS_MSG_FATAL_ERROR, "Error opening Graphics2D context.\n");
     // set "not opened" flag

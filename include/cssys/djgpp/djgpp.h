@@ -35,7 +35,7 @@ public:
   virtual void NextFrame ();
 
   /// Open the system
-  virtual bool Open (const char *Title);
+  virtual bool Open ();
   /// Close the system
   virtual void Close ();
 

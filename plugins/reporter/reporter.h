@@ -73,7 +73,7 @@ public:
   {
     SCF_DECLARE_EMBEDDED_IBASE (csReporter);
     virtual bool Initialize (iSystem* p) { return scfParent->Initialize (p); }
-    virtual bool HandleEvent (iEvent&) { return true; }
+    virtual bool HandleEvent (iEvent&) { return false; }
   } scfiPlugin;
 };
 

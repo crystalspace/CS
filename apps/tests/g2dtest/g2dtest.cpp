@@ -26,6 +26,7 @@
 #include "cssys/sysdriv.h"
 #include "csutil/csvector.h"
 #include "csutil/rng.h"
+#include "cstool/initapp.h"
 #include "qint.h"
 
 #include "isys/vfs.h"
@@ -65,6 +66,7 @@ class G2DTestSystemDriver : public SysSystemDriver
 
   // Pixel format
   csPixelFormat pfmt;
+  bool pfmt_init;
   // Timer
   int timer;
   // some handy colors
@@ -114,6 +116,7 @@ G2DTestSystemDriver::G2DTestSystemDriver () : SysSystemDriver ()
   EnterState (stStartup);
   SwitchBB = false;
   font = NULL;
+  pfmt_init = false;
 
   RequestPlugin ("crystalspace.kernel.vfs:VFS");
 }
@@ -157,6 +160,20 @@ void G2DTestSystemDriver::LeaveState ()
 void G2DTestSystemDriver::NextFrame ()
 {
   SysSystemDriver::NextFrame ();
+
+  if (!pfmt_init)
+  {
+    pfmt_init = true;
+    pfmt = *myG2D->GetPixelFormat ();
+    white = MakeColor (255, 255, 255);
+    yellow = MakeColor (255, 255, 0);
+    green = MakeColor (0, 255, 0);
+    red = MakeColor (255, 0, 0);
+    blue = MakeColor (0, 0, 255);
+    gray = MakeColor (128, 128, 128);
+    dsteel = MakeColor (80, 100, 112);
+    black = 0;
+  }
 
   if (state_sptr == 0)
   {
@@ -301,16 +318,6 @@ bool G2DTestSystemDriver::HandleEvent (iEvent &Event)
               for (g = 0; g < 8; g++)
                 for (b = 0; b < 4; b++)
                   myG2D->SetRGB (r * 32 + g * 4 + b, r * 32, g * 32, b * 64);
-
-            pfmt = *myG2D->GetPixelFormat ();
-            white = MakeColor (255, 255, 255);
-            yellow = MakeColor (255, 255, 0);
-            green = MakeColor (0, 255, 0);
-            red = MakeColor (255, 0, 0);
-            blue = MakeColor (0, 0, 255);
-            gray = MakeColor (128, 128, 128);
-            dsteel = MakeColor (80, 100, 112);
-            black = 0;
             break;
           }
         case cscmdContextResize:
@@ -781,6 +788,7 @@ int main (int argc, char *argv[])
     return -1;
   }
 
+  csInitializeApplication (&System);
   iObjectRegistry* object_reg = System.GetObjectRegistry ();
   iPluginManager* plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
   iCommandLineParser* cmdline = CS_QUERY_REGISTRY (object_reg,
@@ -810,7 +818,7 @@ int main (int argc, char *argv[])
     return -1;
   }
 
-  if (!System.Open (APP_TITLE))
+  if (!System.Open ())
   {
     System.Printf (CS_MSG_FATAL_ERROR, "Unable to open graphics context!\n");
     return -1;

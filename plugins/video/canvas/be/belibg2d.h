@@ -43,7 +43,7 @@ public:
   virtual ~csGraphics2DBeLib();
 
   virtual bool Initialize(iSystem*);
-  virtual bool Open(char const* title);
+  virtual bool Open();
   virtual void Close();
   virtual void Print(csRect* area = NULL);
   virtual bool SetMouseCursor(csMouseCursorID);

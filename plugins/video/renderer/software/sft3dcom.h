@@ -63,9 +63,6 @@ protected:
   /// if this is a procedural texture manager
   bool is_for_procedural_textures;
 
-  /// ID/window name of this context
-  const char *title;
-
   /// Z buffer.
   uint32* z_buffer;
   /// Size of Z buffer.
@@ -275,8 +272,8 @@ public:
    */
   void SharedInitialize (csGraphics3DSoftwareCommon *p);
 
-  /// Open a canvas with given title.
-  virtual bool Open (const char *Title);
+  /// Open a canvas.
+  virtual bool Open ();
 
   /// Gathers all that has to be done when opening from scratch.
   bool NewOpen ();

@@ -20,6 +20,7 @@
 #include "cssys/system.h"
 #include "csutil/cscolor.h"
 #include "cstool/csview.h"
+#include "cstool/initapp.h"
 #include "viewmesh.h"
 #include "isys/plugin.h"
 #include "iutil/objreg.h"
@@ -38,6 +39,7 @@
 #include "imesh/sprite3d.h"
 #include "ivideo/graph3d.h"
 #include "ivideo/graph2d.h"
+#include "ivideo/natwin.h"
 #include "ivideo/txtmgr.h"
 #include "ivideo/texture.h"
 #include "ivideo/material.h"
@@ -78,27 +80,28 @@ bool ViewMesh::Initialize (int argc, const char* const argv[],
   if (!superclass::Initialize (argc, argv, iConfigName))
     return false;
 
+  csInitializeApplication (this);
   iObjectRegistry* object_reg = GetObjectRegistry ();
   iPluginManager* plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
   iCommandLineParser* cmdline = CS_QUERY_REGISTRY (object_reg,
   	iCommandLineParser);
 
   // Find the pointer to engine plugin
-  engine = CS_QUERY_PLUGIN (plugin_mgr, iEngine);
+  engine = CS_QUERY_REGISTRY (object_reg, iEngine);
   if (!engine)
   {
     Printf (CS_MSG_FATAL_ERROR, "No iEngine plugin!\n");
     abort ();
   }
 
-  loader = CS_QUERY_PLUGIN_ID (plugin_mgr, CS_FUNCID_LVLLOADER, iLoader);
+  loader = CS_QUERY_REGISTRY (object_reg, iLoader);
   if (!loader)
   {
     Printf (CS_MSG_FATAL_ERROR, "No iLoader plugin!\n");
     abort ();
   }
 
-  g3d = CS_QUERY_PLUGIN_ID (plugin_mgr, CS_FUNCID_VIDEO, iGraphics3D);
+  g3d = CS_QUERY_REGISTRY (object_reg, iGraphics3D);
   if (!g3d)
   {
     Printf (CS_MSG_FATAL_ERROR, "No iGraphics3D plugin!\n");
@@ -106,7 +109,10 @@ bool ViewMesh::Initialize (int argc, const char* const argv[],
   }
 
   // Open the main system. This will open all the previously loaded plug-ins.
-  if (!Open ("View Mesh"))
+  iGraphics2D* g2d = g3d->GetDriver2D ();
+  iNativeWindow* nw = g2d->GetNativeWindow ();
+  if (nw) nw->SetTitle ("View Mesh");
+  if (!Open ())
   {
     Printf (CS_MSG_FATAL_ERROR, "Error opening system!\n");
     Cleanup ();
@@ -213,7 +219,6 @@ bool ViewMesh::Initialize (int argc, const char* const argv[],
   view = new csView (engine, g3d);
   view->GetCamera ()->SetSector (room);
   view->GetCamera ()->GetTransform ().SetOrigin (csVector3 (0, 10, -4));
-  iGraphics2D* g2d = g3d->GetDriver2D ();
   view->SetRectangle (0, 0, g2d->GetWidth (), g2d->GetHeight ());
 
   txtmgr->SetPalette ();

@@ -214,7 +214,7 @@ static const char *visual_class_name (int cls)
    }
 }
 
-bool csGraphics2DGLX::Open(const char *Title)
+bool csGraphics2DGLX::Open()
 {
   if (is_open) return true;
   // We now select the visual here as with a mesa bug it is not possible
@@ -309,7 +309,7 @@ bool csGraphics2DGLX::Open(const char *Title)
   fs_window = XCreateWindow (dpy, root_window, 0, 0, 1, 1,
     0 /*border*/, active_GLVisual->depth, InputOutput, active_GLVisual->visual,
     CWOverrideRedirect | CWBorderPixel | CWColormap, &winattr);
-  XStoreName (dpy, fs_window, Title);
+  XStoreName (dpy, fs_window, win_title);
   XSetWindowBackground (dpy, fs_window, BlackPixel (dpy, screen_num));
 #endif
 
@@ -319,7 +319,7 @@ bool csGraphics2DGLX::Open(const char *Title)
      0 /*border*/, active_GLVisual->depth, InputOutput, active_GLVisual->visual,
     CWBorderPixel | CWColormap, &winattr);
 
-  XStoreName (dpy, wm_window, Title);
+  XStoreName (dpy, wm_window, win_title);
   XSelectInput (dpy, wm_window, FocusChangeMask | KeyPressMask |
   	KeyReleaseMask | StructureNotifyMask);
 
@@ -349,9 +349,9 @@ bool csGraphics2DGLX::Open(const char *Title)
   Atom wm_client_leader = XInternAtom (dpy, "WM_CLIENT_LEADER", False);
   XChangeProperty (dpy, window, wm_client_leader, XA_WINDOW, 32, 
 		   PropModeReplace, (const unsigned char*)&leader_window, 1);
-  XmbSetWMProperties (dpy, window, Title, Title,
+  XmbSetWMProperties (dpy, window, win_title, win_title,
                       NULL, 0, NULL, NULL, NULL);
-  XmbSetWMProperties (dpy, wm_window, Title, Title,
+  XmbSetWMProperties (dpy, wm_window, win_title, win_title,
                       NULL, 0, NULL, NULL, NULL);
 
   XMapWindow (dpy, window);
@@ -404,7 +404,7 @@ bool csGraphics2DGLX::Open(const char *Title)
   glXMakeCurrent (dpy, window, active_GLContext);
 
   // Open your graphic interface
-  if (!csGraphics2DGLCommon::Open (Title))
+  if (!csGraphics2DGLCommon::Open ())
     return false;
 
   if (FullScreen)

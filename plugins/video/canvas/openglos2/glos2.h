@@ -66,7 +66,7 @@ public:
   virtual ~csGraphics2DOS2GL ();
 
   virtual bool Initialize (iSystem *pSystem);
-  virtual bool Open (const char *Title);
+  virtual bool Open ();
   virtual void Close ();
 
   virtual void Print (csRect *area = NULL);

@@ -35,6 +35,7 @@
 #include "csutil/cscolor.h"
 #include "csgeom/textrans.h"
 #include "cstool/csview.h"
+#include "cstool/initapp.h"
 
 #include "isys/vfs.h"
 #include "isys/plugin.h"
@@ -45,6 +46,7 @@
 #include "ivideo/graph2d.h"
 #include "ivideo/txtmgr.h"
 #include "ivideo/fontserv.h"
+#include "ivideo/natwin.h"
 #include "isound/renderer.h"
 #include "isound/handle.h"
 #include "isound/wrapper.h"
@@ -3088,12 +3090,15 @@ int main (int argc, char* argv[])
     fatal_exit (0, false);
   }
 
+  csInitializeApplication (Sys);
   iObjectRegistry* object_reg = Sys->GetObjectRegistry ();
   plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
   iConfigManager* config = CS_QUERY_REGISTRY (object_reg, iConfigManager);
 
   // Open the main system. This will open all the previously loaded plug-ins.
-  if (!Sys->Open ("3D Blocks"))
+  iNativeWindow* nw = Gfx2D->GetNativeWindow ();
+  if (nw) nw->SetTitle ("3D Blocks");
+  if (!Sys->Open ())
   {
     Sys->Printf (CS_MSG_FATAL_ERROR, "Error opening system!\n");
     Cleanup ();

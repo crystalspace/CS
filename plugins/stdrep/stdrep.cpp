@@ -1,0 +1,204 @@
+/*
+    Copyright (C) 2001 by Jorrit Tyberghein
+
+    This library is free software; you can redistribute it and/or
+    modify it under the terms of the GNU Library General Public
+    License as published by the Free Software Foundation; either
+    version 2 of the License, or (at your option) any later version.
+
+    This library is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+    Library General Public License for more details.
+
+    You should have received a copy of the GNU Library General Public
+    License along with this library; if not, write to the Free
+    Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+*/
+
+#include <string.h>
+#define CS_SYSDEF_PROVIDE_PATH
+#include "cssysdef.h"
+#include "csver.h"
+#include "csutil/scf.h"
+#include "csutil/util.h"
+#include "stdrep.h"
+#include "isys/system.h"
+#include "isys/plugin.h"
+#include "iutil/objreg.h"
+#include "ivideo/graph3d.h"
+#include "ivideo/graph2d.h"
+#include "ivideo/natwin.h"
+#include "ivaria/conout.h"
+
+CS_IMPLEMENT_PLUGIN
+
+SCF_IMPLEMENT_FACTORY (csReporterListener)
+
+SCF_EXPORT_CLASS_TABLE (stdrep)
+  SCF_EXPORT_CLASS (csReporterListener, "crystalspace.utilities.stdrep",
+    "Standard Reporter Listener")
+SCF_EXPORT_CLASS_TABLE_END
+
+SCF_IMPLEMENT_IBASE (csReporterListener)
+  SCF_IMPLEMENTS_INTERFACE (iStandardReporterListener)
+  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iPlugin)
+  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iReporterListener)
+SCF_IMPLEMENT_IBASE_END
+
+SCF_IMPLEMENT_EMBEDDED_IBASE (csReporterListener::eiPlugin)
+  SCF_IMPLEMENTS_INTERFACE (iPlugin)
+SCF_IMPLEMENT_EMBEDDED_IBASE_END
+
+SCF_IMPLEMENT_EMBEDDED_IBASE (csReporterListener::ReporterListener)
+  SCF_IMPLEMENTS_INTERFACE (iReporterListener)
+SCF_IMPLEMENT_EMBEDDED_IBASE_END
+
+csReporterListener::csReporterListener (iBase *iParent)
+{
+  SCF_CONSTRUCT_IBASE (iParent);
+  SCF_CONSTRUCT_EMBEDDED_IBASE (scfiPlugin);
+  SCF_CONSTRUCT_EMBEDDED_IBASE (scfiReporterListener);
+  System = NULL;
+  console = NULL;
+  nativewm = NULL;
+  reporter = NULL;
+  debug_file = csStrNew ("debug.txt");
+  SetMessageDestination (
+  	CS_REPORTER_SEVERITY_BUG, false, true, true, true, true);
+  SetMessageDestination (
+  	CS_REPORTER_SEVERITY_ERROR, false, true, true, true, true);
+  SetMessageDestination (
+  	CS_REPORTER_SEVERITY_WARNING, true, false, true, false, false);
+  SetMessageDestination (
+  	CS_REPORTER_SEVERITY_NOTIFY, false, false, true, false, false);
+  SetMessageDestination (
+  	CS_REPORTER_SEVERITY_DEBUG, false, false, false, false, true);
+  RemoveMessages (CS_REPORTER_SEVERITY_BUG, true);
+  RemoveMessages (CS_REPORTER_SEVERITY_ERROR, true);
+  RemoveMessages (CS_REPORTER_SEVERITY_WARNING, true);
+  RemoveMessages (CS_REPORTER_SEVERITY_NOTIFY, true);
+  RemoveMessages (CS_REPORTER_SEVERITY_DEBUG, true);
+  ShowMessageID (CS_REPORTER_SEVERITY_BUG, true);
+  ShowMessageID (CS_REPORTER_SEVERITY_ERROR, true);
+  ShowMessageID (CS_REPORTER_SEVERITY_WARNING, false);
+  ShowMessageID (CS_REPORTER_SEVERITY_NOTIFY, false);
+  ShowMessageID (CS_REPORTER_SEVERITY_DEBUG, true);
+}
+
+csReporterListener::~csReporterListener ()
+{
+  delete[] debug_file;
+  if (reporter) reporter->RemoveReporterListener (&scfiReporterListener);
+}
+
+bool csReporterListener::Initialize (iSystem *system)
+{
+  System = system;
+  return true;
+}
+
+bool csReporterListener::Report (iReporter*, int severity,
+	const char* msgID, const char* description)
+{
+  CS_ASSERT (severity >= 0 && severity <= 4);
+  char msgbuf[4096];
+  if (show_msgid[severity])
+    sprintf (msgbuf, "%s: %s\n", msgID, description);
+  else
+    sprintf (msgbuf, "%s\n", description);
+
+  if (dest_stdout[severity])
+    fputs (msgbuf, stdout);
+  if (dest_stderr[severity])
+    fputs (msgbuf, stderr);
+  if (dest_console[severity] && console)
+    console->PutText (CS_MSG_CONSOLE, msgbuf);
+  if (dest_alert[severity] && nativewm)
+    nativewm->Alert (CS_ALERT_ERROR, "Fatal Error!",
+    	"Ok", msgbuf);
+  if (dest_debug[severity] && debug_file)
+  {
+    static FILE *f = NULL;
+    if (!f)
+      f = fopen (debug_file, "a+");
+    if (f)
+    {
+      fputs (msgbuf, f);
+      fflush (f);
+    }
+  }
+  return msg_remove[severity];
+}
+
+void csReporterListener::SetOutputConsole (iConsoleOutput* console)
+{
+  csReporterListener::console = console;
+}
+
+void csReporterListener::SetNativeWindowManager (iNativeWindowManager* wm)
+{
+  nativewm = wm;
+}
+
+void csReporterListener::SetReporter (iReporter* reporter)
+{
+  if (csReporterListener::reporter)
+    csReporterListener::reporter->RemoveReporterListener (
+    	&scfiReporterListener);
+  csReporterListener::reporter = reporter;
+  if (reporter) reporter->AddReporterListener (&scfiReporterListener);
+}
+
+void csReporterListener::SetDebugFile (const char* filename)
+{
+  delete[] debug_file;
+  debug_file = csStrNew (filename);
+}
+
+void csReporterListener::SetDefaults ()
+{
+  iObjectRegistry* object_reg = System->GetObjectRegistry ();
+  console = CS_QUERY_REGISTRY (object_reg, iConsoleOutput);
+  nativewm = NULL;
+  iGraphics3D* g3d = CS_QUERY_REGISTRY (object_reg, iGraphics3D);
+  if (g3d)
+  {
+    iGraphics2D* g2d = g3d->GetDriver2D ();
+    if (g2d)
+    {
+      nativewm = SCF_QUERY_INTERFACE (g2d, iNativeWindowManager);
+      if (nativewm) nativewm->DecRef ();
+    }
+  }
+  if (reporter) reporter->RemoveReporterListener (&scfiReporterListener);
+  reporter = CS_QUERY_REGISTRY (object_reg, iReporter);
+  if (reporter) reporter->AddReporterListener (&scfiReporterListener);
+  delete[] debug_file;
+  debug_file = csStrNew ("debug.txt");
+}
+
+void csReporterListener::SetMessageDestination (int severity,
+  	bool do_stdout, bool do_stderr, bool do_console,
+	bool do_alert, bool do_debug)
+{
+  CS_ASSERT (severity >= 0 && severity <= 4);
+  dest_stdout[severity] = do_stdout;
+  dest_stderr[severity] = do_stderr;
+  dest_console[severity] = do_console;
+  dest_alert[severity] = do_alert;
+  dest_debug[severity] = do_debug;
+}
+
+void csReporterListener::RemoveMessages (int severity, bool remove)
+{
+  CS_ASSERT (severity >= 0 && severity <= 4);
+  msg_remove[severity] = remove;
+}
+
+void csReporterListener::ShowMessageID (int severity, bool showid)
+{
+  CS_ASSERT (severity >= 0 && severity <= 4);
+  show_msgid[severity] = showid;
+}
+

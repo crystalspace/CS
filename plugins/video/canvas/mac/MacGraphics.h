@@ -35,7 +35,7 @@ public:
 
 					// this is handled in the constuctor
   	virtual bool 		Initialize(iSystem *theSystem);
-  	virtual bool 		Open( const char *Title );
+  	virtual bool 		Open();
   	virtual void 		Close();
 
 	virtual void 		Print( csRect *area = NULL );

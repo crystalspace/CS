@@ -52,7 +52,7 @@ public:
   /// Gets the nCmdShow of the WinMain().
   int GetCmdShow() const;
 
-  virtual bool Open (const char *Title);
+  virtual bool Open ();
   virtual void Close ();
 
   /// Perform extension function

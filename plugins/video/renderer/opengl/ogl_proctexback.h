@@ -41,6 +41,7 @@
 
 class csTextureHandleOpenGL;
 class csTextureProcOpenGL;
+struct iNativeWindow;
 
 class csOpenGLProcBackBuffer : public csGraphics3DOGLCommon
 {
@@ -69,7 +70,7 @@ class csOpenGLProcBackBuffer : public csGraphics3DOGLCommon
   void Prepare (csGraphics3DOGLCommon *g3d, csTextureHandleOpenGL *tex, 
 		csPixelFormat *ipfmt, bool bpersistent);
 
-  virtual bool Open (const char* /*Title*/)
+  virtual bool Open ()
   { return false; }
 
   virtual void Close ();
@@ -100,7 +101,7 @@ class csOpenGLProcBackBuffer2D : public iGraphics2D
 			    csPixelFormat *ipfmt);  
   virtual ~csOpenGLProcBackBuffer2D ();
 
-  virtual bool Open (const char*) { return false; }
+  virtual bool Open () { return false; }
   virtual void Close () {}
 
   virtual void SetClipRect (int nMinX, int nMinY, int nMaxX, int nMaxY)
@@ -206,6 +207,8 @@ class csOpenGLProcBackBuffer2D : public iGraphics2D
   /// Get the active font server (does not do IncRef())
   virtual iFontServer *GetFontServer ()
   { return g2d->GetFontServer (); }
+  /// Get the native window.
+  virtual iNativeWindow* GetNativeWindow () { return NULL; }
 };
 
 #endif // _OGL_PROCTEXBACK_H_

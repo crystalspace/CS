@@ -242,10 +242,9 @@ public:
   virtual bool Initialize (int argc, const char* const argv[], const char *iConfigName);
 
   /**
-   * Open the graphics context (with optional title on titlebar),
-   * mouse and keyboard.
+   * Send cscmdSystemOpen message to all loaded plugins.
    */
-  virtual bool Open (const char *Title);
+  virtual bool Open ();
   /// Close the system
   virtual void Close ();
 

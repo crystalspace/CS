@@ -27,8 +27,10 @@
 #include "iengine/light.h"
 #include "imesh/thing/polygon.h"
 #include "cstool/csview.h"
+#include "cstool/initapp.h"
 #include "ivideo/graph3d.h"
 #include "ivideo/graph2d.h"
+#include "ivideo/natwin.h"
 #include "ivideo/txtmgr.h"
 #include "ivaria/script.h"
 #include "imap/parser.h"
@@ -81,25 +83,26 @@ bool PySimple::Initialize (int argc, const char* const argv[],
   if (!superclass::Initialize (argc, argv, iConfigName))
     return false;
 
+  csInitializeApplication (this);
   iObjectRegistry* object_reg = GetObjectRegistry ();
   iPluginManager* plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
 
   // Find the pointer to engine plugin
-  engine = CS_QUERY_PLUGIN (plugin_mgr, iEngine);
+  engine = CS_QUERY_REGISTRY (object_reg, iEngine);
   if (!engine)
   {
     Printf (CS_MSG_FATAL_ERROR, "No iEngine plugin!\n");
     abort ();
   }
 
-  myG3D = CS_QUERY_PLUGIN_ID(plugin_mgr, CS_FUNCID_VIDEO, iGraphics3D);
+  myG3D = CS_QUERY_REGISTRY (object_reg, iGraphics3D);
   if (!myG3D)
   {
     Printf (CS_MSG_FATAL_ERROR, "No iGraphics3D loader plugin!\n");
     return false;
   }
 
-  LevelLoader = CS_QUERY_PLUGIN_ID (plugin_mgr, CS_FUNCID_LVLLOADER, iLoader);
+  LevelLoader = CS_QUERY_REGISTRY (object_reg, iLoader);
   if (!LevelLoader)
   {
     Printf (CS_MSG_FATAL_ERROR, "No iLoader plugin!\n");
@@ -107,7 +110,9 @@ bool PySimple::Initialize (int argc, const char* const argv[],
   }
 
   // Open the main system. This will open all the previously loaded plug-ins.
-  if (!Open ("Simple Crystal Space Python Application"))
+  iNativeWindow* nw = myG3D->GetDriver2D ()->GetNativeWindow ();
+  if (nw) nw->SetTitle ("Simple Crystal Space Python Application");
+  if (!Open ())
   {
     Printf (CS_MSG_FATAL_ERROR, "Error opening system!\n");
     Cleanup ();

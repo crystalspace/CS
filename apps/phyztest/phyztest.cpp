@@ -21,6 +21,7 @@
 #include "apps/phyztest/phyztest.h"
 
 #include "csengine/engine.h"
+#include "cstool/initapp.h"
 
 #include "iengine/camera.h"
 #include "iengine/engine.h"
@@ -159,32 +160,33 @@ bool Phyztest::Initialize (int argc, const char* const argv[], const char *iConf
   if (!superclass::Initialize (argc, argv, iConfigName))
     return false;
 
+  csInitializeApplication (this);
   iObjectRegistry* object_reg = GetObjectRegistry ();
   iPluginManager* plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
 
   // Find the pointer to engine plugin
-  myG3D = CS_QUERY_PLUGIN_ID (plugin_mgr, CS_FUNCID_VIDEO, iGraphics3D);
+  myG3D = CS_QUERY_REGISTRY (object_reg, iGraphics3D);
   if (!myG3D)
   {
     Printf (CS_MSG_FATAL_ERROR, "No iGraphics3D plugin!\n");
     abort ();
   }
 
-  myG2D = CS_QUERY_PLUGIN (plugin_mgr, iGraphics2D);
+  myG2D = CS_QUERY_REGISTRY (object_reg, iGraphics2D);
   if (!myG2D)
   {
     Printf (CS_MSG_FATAL_ERROR, "No iGraphics2D plugin!\n");
     abort ();
   }
 
-  engine = CS_QUERY_PLUGIN (plugin_mgr, iEngine);
+  engine = CS_QUERY_REGISTRY (object_reg, iEngine);
   if (!engine)
   {
     Printf (CS_MSG_FATAL_ERROR, "No iEngine plugin!\n");
     abort ();
   }
 
-  LevelLoader = CS_QUERY_PLUGIN_ID (plugin_mgr, CS_FUNCID_LVLLOADER, iLoader);
+  LevelLoader = CS_QUERY_REGISTRY (object_reg, iLoader);
   if (!LevelLoader)
   {
     Printf (CS_MSG_FATAL_ERROR, "No iLoader plugin!\n");
@@ -192,7 +194,7 @@ bool Phyztest::Initialize (int argc, const char* const argv[], const char *iConf
   }
 
   // Open the main system. This will open all the previously loaded plug-ins.
-  if (!Open ("Phyztest Crystal Space Application"))
+  if (!Open ())
   {
     Printf (CS_MSG_FATAL_ERROR, "Error opening system!\n");
     Cleanup ();

@@ -27,6 +27,7 @@ class csTextureHandleOpenGL;
 class csTextureProcOpenGL;
 class TxtHandleVector;
 struct iSoftProcTexture;
+struct iNativeWindow;
 
 /**
  * This class implements the functionality required to utilise a software
@@ -104,7 +105,7 @@ class csOpenGLProcSoftware : public iGraphics3D
     void *buffer,
     bool alone_hint);
 
-  virtual bool Open (const char*){ return false; }
+  virtual bool Open (){ return false; }
   virtual void Close () {}
   virtual void SetDimensions (int, int) {}
 
@@ -195,7 +196,7 @@ class csOpenGLProcSoftware2D : public iGraphics2D
 
   virtual ~csOpenGLProcSoftware2D () {};
 
-  virtual bool Open (const char*) { return false; }
+  virtual bool Open () { return false; }
   virtual void Close () {};
 
   virtual void SetClipRect (int nMinX, int nMinY, int nMaxX, int nMaxY)
@@ -319,6 +320,8 @@ class csOpenGLProcSoftware2D : public iGraphics2D
   /// Get the active font server (does not do IncRef())
   virtual iFontServer *GetFontServer ()
   { return g2d->GetFontServer (); }
+  /// Get the native window.
+  virtual iNativeWindow* GetNativeWindow () { return NULL; }
 };
 
 #endif // _OGL_PROCEXSOFT_H_

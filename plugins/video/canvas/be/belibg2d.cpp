@@ -63,10 +63,10 @@ bool csGraphics2DBeLib::Initialize(iSystem* isys)
   return ok;
 }
 
-bool csGraphics2DBeLib::Open(char const* title)
+bool csGraphics2DBeLib::Open()
 {
   if (is_open) return true;
-  bool ok = superclass::Open(title);
+  bool ok = superclass::Open();
   if (ok)
   {
     int const INSET = 32;
@@ -84,7 +84,7 @@ bool csGraphics2DBeLib::Open(char const* title)
     }
 
     view = new CrystView(BRect(0, 0, vw, vh), System, bitmap);
-    window = new CrystWindow(win_rect, title, view, System, this);
+    window = new CrystWindow(win_rect, win_title, view, System, this);
 	
     window->Show();
     if (window->Lock())

@@ -161,7 +161,7 @@ struct iFontServer : public iBase
 
 struct iGraphics2D : public iBase
 {
-  virtual bool Open (const char *Title) = 0;
+  virtual bool Open () = 0;
   virtual void Close () = 0;
   virtual int GetWidth () = 0;
   virtual int GetHeight () = 0;
@@ -217,7 +217,7 @@ struct iHalo : public iBase
 
 struct iGraphics3D:public iBase
 {
-  bool Open (const char *Title);
+  bool Open ();
   void Close ();
   void SetDimensions (int width, int height);
   bool BeginDraw (int DrawFlags);

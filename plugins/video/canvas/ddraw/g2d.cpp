@@ -78,10 +78,10 @@ bool csGraphics2DDDraw3::Initialize (iSystem *pSystem)
   return true;
 }
 
-bool csGraphics2DDDraw3::Open (const char *Title)
+bool csGraphics2DDDraw3::Open ()
 {
   if (is_open) return true;
-  if (!csGraphics2D::Open (Title))
+  if (!csGraphics2D::Open ())
     return false;
 
   // Compute window size/position on desktop
@@ -97,7 +97,7 @@ bool csGraphics2DDDraw3::Open (const char *Title)
   m_rcWindow.bottom = m_rcWindow.top + wheight;
 
   // create the window.
-  m_hWnd = CreateWindow (WINDOWCLASSNAME, Title, 0,
+  m_hWnd = CreateWindow (WINDOWCLASSNAME, win_title, 0,
     m_rcWindow.left, m_rcWindow.top, m_rcWindow.right - m_rcWindow.left,
     m_rcWindow.bottom - m_rcWindow.top, NULL, NULL, m_hInstance, NULL);
   ASSERT (m_hWnd);

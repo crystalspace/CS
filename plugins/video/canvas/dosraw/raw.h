@@ -36,7 +36,7 @@ public:
   virtual ~csGraphics2DDOSRAW ();
 
   virtual bool Initialize (iSystem *pSystem);
-  virtual bool Open (const char* Title);
+  virtual bool Open ();
   virtual void Close (void);
 
   virtual void Print (csRect *area = NULL);

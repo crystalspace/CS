@@ -123,7 +123,7 @@ public:
   virtual bool Initialize (iSystem *iSys);
   bool HandleEvent (iEvent&);
   ///
-  virtual bool Open (const char *Title);
+  virtual bool Open ();
   ///
   virtual void Close ();
 
@@ -316,7 +316,7 @@ public:
   virtual ~csGraphics2DInfinite ();
 
   virtual bool Initialize (iSystem*);
-  virtual bool Open (const char *Title) { return csGraphics2D::Open (Title); }
+  virtual bool Open () { return csGraphics2D::Open (); }
   virtual void Close () { csGraphics2D::Close (); }
 
   virtual bool BeginDraw () { return csGraphics2D::BeginDraw (); }

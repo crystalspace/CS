@@ -341,7 +341,7 @@ bool csGraphics2DMac::Initialize( iSystem* piSystem )
 /*----------------------------------------------------------------
 	Open a window.
 ----------------------------------------------------------------*/
-bool csGraphics2DMac::Open(const char* Title)
+bool csGraphics2DMac::Open()
 {
   if (is_open) return true;
 	Str255			theTitle;
@@ -397,8 +397,8 @@ bool csGraphics2DMac::Open(const char* Title)
 		theBounds.right = theBounds.left + Width;
 		theBounds.bottom = theBounds.top + Height;
 
-		strcpy( (char *)&theTitle[1], Title );
-		theTitle[0] = strlen( Title );
+		strcpy( (char *)&theTitle[1], win_title );
+		theTitle[0] = strlen( win_title );
 		mMainWindow = ::NewCWindow( NULL, &theBounds, theTitle, true, noGrowDocProc, 
 												 (WindowPtr)-1, false, 0 );
 

@@ -50,6 +50,13 @@ struct iReporter;
  */
 #define CS_REPORTER_SEVERITY_NOTIFY 3
 
+/**
+ * Severity level for iReporter: DEBUG severity level.
+ * This is for debugging and it will usually generate an entry
+ * in some log.
+ */
+#define CS_REPORTER_SEVERITY_DEBUG 4
+
 SCF_VERSION (iReporterListener, 0, 0, 1);
 
 /**
@@ -67,7 +74,7 @@ struct iReporterListener : public iBase
   	const char* description) = 0;
 };
 
-SCF_VERSION (iReporter, 0, 0, 2);
+SCF_VERSION (iReporter, 0, 0, 3);
 
 /**
  * This is the interface for the error/message reporter plugin.
@@ -143,6 +150,65 @@ struct iReporter : public iBase
    * Check if the listener is already on the list.
    */
   virtual bool FindReporterListener (iReporterListener* listener) = 0;
+
+  //----------------------------------------------------------------------
+  // Conveniance functions, these are not to be implemented.
+  //----------------------------------------------------------------------
+
+  /**
+   * Report error.
+   */
+  void ReportError (const char* msgId, const char* description, ...)
+  {
+    va_list arg;
+    va_start (arg, description);
+    ReportV (CS_REPORTER_SEVERITY_ERROR, msgId, description, arg);
+    va_end (arg);
+  }
+
+  /**
+   * Report warning.
+   */
+  void ReportWarning (const char* msgId, const char* description, ...)
+  {
+    va_list arg;
+    va_start (arg, description);
+    ReportV (CS_REPORTER_SEVERITY_WARNING, msgId, description, arg);
+    va_end (arg);
+  }
+
+  /**
+   * Report notification.
+   */
+  void ReportNotify (const char* msgId, const char* description, ...)
+  {
+    va_list arg;
+    va_start (arg, description);
+    ReportV (CS_REPORTER_SEVERITY_NOTIFY, msgId, description, arg);
+    va_end (arg);
+  }
+
+  /**
+   * Report bug.
+   */
+  void ReportBug (const char* msgId, const char* description, ...)
+  {
+    va_list arg;
+    va_start (arg, description);
+    ReportV (CS_REPORTER_SEVERITY_BUG, msgId, description, arg);
+    va_end (arg);
+  }
+
+  /**
+   * Report debug.
+   */
+  void ReportDebug (const char* msgId, const char* description, ...)
+  {
+    va_list arg;
+    va_start (arg, description);
+    ReportV (CS_REPORTER_SEVERITY_DEBUG, msgId, description, arg);
+    va_end (arg);
+  }
 };
 
 #endif // __IVARIA_REPORTER_H__

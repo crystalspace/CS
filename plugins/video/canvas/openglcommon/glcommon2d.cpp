@@ -64,14 +64,14 @@ csGraphics2DGLCommon::~csGraphics2DGLCommon ()
     EventOutlet->DecRef ();
 }
 
-bool csGraphics2DGLCommon::Open (const char *Title)
+bool csGraphics2DGLCommon::Open ()
 {
   if (is_open) return true;
   // initialize font cache object
   if (!FontCache)
     FontCache = new GLFontCache (FontServer);
 
-  if (!csGraphics2D::Open (Title))
+  if (!csGraphics2D::Open ())
     return false;
 
   const char *renderer = (const char *)glGetString (GL_RENDERER);

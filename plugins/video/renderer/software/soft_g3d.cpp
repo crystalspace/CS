@@ -83,9 +83,9 @@ bool csGraphics3DSoftware::Initialize (iSystem *iSys)
   return G2D ? true : false;
 }
 
-bool csGraphics3DSoftware::Open (const char *Title)
+bool csGraphics3DSoftware::Open ()
 {
-  if (!csGraphics3DSoftwareCommon::Open (Title) || !NewOpen ())
+  if (!csGraphics3DSoftwareCommon::Open () || !NewOpen ())
     return false;
 
   bool bFullScreen = G2D->GetFullScreen ();

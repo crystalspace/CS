@@ -154,14 +154,14 @@ bool csGraphics2DOS2GL::HandleEvent (iEvent &Event)
   return false;
 }
 
-bool csGraphics2DOS2GL::Open (const char *Title)
+bool csGraphics2DOS2GL::Open ()
 {
   if (is_open) return true;
   PMrq rq;
   u_int rc;
 
   // Create PM window
-  rq.Parm.CreateWindow.Title = Title;
+  rq.Parm.CreateWindow.Title = win_title;
   if ((rc = PMcall (pmcmdCreateWindow, &rq)) != pmrcOK)
   {
     CsPrintf (CS_MSG_FATAL_ERROR, "Cannot create PM window: no resources bound to executable?\n");
@@ -235,7 +235,7 @@ bool csGraphics2DOS2GL::Open (const char *Title)
   UpdatePalette = false;
   AllowCanvasResize (false);
 
-  if (!csGraphics2DGLCommon::Open (Title))
+  if (!csGraphics2DGLCommon::Open ())
     return false;
 
   return true;

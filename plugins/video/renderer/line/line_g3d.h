@@ -101,7 +101,7 @@ public:
   virtual bool Initialize (iSystem *iSys);
   bool HandleEvent (iEvent&);
   ///
-  virtual bool Open (const char *Title);
+  virtual bool Open ();
   ///
   virtual void Close ();
 

@@ -35,7 +35,7 @@ public:
   /// Initialize iPlugin.
   virtual bool Initialize (iSystem*);
   /// Open a canvas.
-  virtual bool Open (const char *Title);
+  virtual bool Open ();
 
   struct eiSoftConfig : public iConfig
   {

@@ -110,8 +110,8 @@ In the source file @file{simple.cpp} we place the following:
 #include "cssys/system.h"
 #include "csutil/cscolor.h"
 #include "cstool/csview.h"
+#include "cstool/initapp.h"
 #include "apps/simple/simple.h"
-#include "isys/plugin.h"
 #include "iutil/objreg.h"
 #include "iengine/sector.h"
 #include "iengine/engine.h"
@@ -161,27 +161,25 @@ bool Simple::Initialize (int argc, const char* const argv[],
   if (!superclass::Initialize (argc, argv, iConfigName))
     return false;
 
+  csInitializeApplication (this);
   iObjectRegistry* object_reg = GetObjectRegistry ();
-  iPluginManager* plugin_mgr =
-    CS_QUERY_REGISTRY (object_reg, iPluginManager);
 
   // Find the pointer to engine plugin
-  engine = CS_QUERY_PLUGIN (plugin_mgr, iEngine);
+  engine = CS_QUERY_REGISTRY (object_reg, iEngine);
   if (!engine)
   @{
     Printf (CS_MSG_FATAL_ERROR, "No iEngine plugin!\n");
     exit (1);
   @}
 
-  loader = CS_QUERY_PLUGIN_ID (plugin_mgr,
-    CS_FUNCID_LVLLOADER, iLoader);
+  loader = CS_QUERY_REGISTRY (object_reg, iLoader);
   if (!loader)
   @{
     Printf (CS_MSG_FATAL_ERROR, "No iLoader plugin!\n");
     abort ();
   @}
 
-  g3d = CS_QUERY_PLUGIN_ID (plugin_mgr, CS_FUNCID_VIDEO, iGraphics3D);
+  g3d = CS_QUERY_REGISTRY (object_reg, iGraphics3D);
   if (!g3d)
   @{
     Printf (CS_MSG_FATAL_ERROR, "No iGraphics3D plugin!\n");
@@ -190,7 +188,7 @@ bool Simple::Initialize (int argc, const char* const argv[],
 
   // Open the main system. This will open all
   // the previously loaded plug-ins.
-  if (!Open ("Simple Crystal Space Application"))
+  if (!Open ())
   @{
     Printf (CS_MSG_FATAL_ERROR, "Error opening system!\n");
     Cleanup ();
@@ -288,9 +286,19 @@ to load plugins (like 3D driver and so on) so we have to do that in the code
 by explicitely calling @code{RequestPlugin()} for all plugins that we
 want.
 
+@samp{csInitializeApplication()} will find and register various global objects
+(like the 3D driver, engine, ...) to the object registry. You must call
+this function so that @code{CS_QUERY_REGISTRY()} will work. In addition this
+function will also set up a reporter (which is used for error and other
+reporting by the rest of the Crystal Space system) and a reporter listener
+which will listen to the reporter and show the messages to the user. It
+is possible to use your own reporter and reporter listener if the default
+ones are not sufficient for your game needs. This can be used (for example)
+to report messages on a graphical console or some other medium.
+
 @samp{Initialize()} retrieves a pointer to the engine via a call to the
-@sc{scf} function @code{CS_QUERY_PLUGIN()} and then ``opens'' the system, which
-basically means that all graphics subsystems are opened (i.e.  a window will
+@sc{scf} function @code{CS_QUERY_REGISTRY()} and then ``opens'' the system,
+which basically means that all plugins are opened (i.e.  a window will
 be opened). All plugins that were specified in the config file or requested
 for with @code{RequestPlugin()} will also be loaded and opened. This function
 can also fail, so again test for this.
@@ -387,7 +395,7 @@ bool Simple::Initialize (int argc, const char* const argv[],
   @dots{}
   // Open the main system. This will open all
   // the previously loaded plug-ins.
-  if (!Open ("Simple Crystal Space Application"))
+  if (!Open ())
     @dots{}
 
   // Setup the texture manager

@@ -1,45 +1,38 @@
 /*
-    Copyright (C) 1998-2000 by Jorrit Tyberghein
-
+    Copyright (C) 1998-2001 by Jorrit Tyberghein
+    csObject library (C) 1999 by Ivan Avramovic <ivan@avramovic.com>
+  
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
     License as published by the Free Software Foundation; either
     version 2 of the License, or (at your option) any later version.
-
+  
     This library is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
     Library General Public License for more details.
-
+  
     You should have received a copy of the GNU Library General Public
     License along with this library; if not, write to the Free
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef GRAPH3D_OPENGL_H
-#define GRAPH3D_OPENGL_H
+#ifndef __CSINITAPP_H__
+#define __CSINITAPP_H__
 
-// GRAPH3D.H
-// csGraphics3DOpenGL OpenGL rasterizer class.
+#include "cstypes.h"
 
-// Concieved by Jorrit Tyberghein and Gary Clark
-// Expanded by Dan Ogles
-// Further expanded by Gary Haussmann
+struct iSystem;
 
-#include "csutil/scf.h"
-#include "ogl_g3dcom.h"
-#include "video/renderer/common/dtmesh.h"
-#include "video/renderer/common/dpmesh.h"
-#include "isys/plugin.h"
-struct iGraphics3D;
+/**
+ * This is a very general function that does a lot of the application
+ * setup for you. It has to be called after system->Initialize() and will
+ * setup various objects in the object registry.
+ */
+extern void csInitializeApplication (iSystem* system,
+	bool use_reporter = true,
+	bool use_reporter_listener = true);
 
-class csGraphics3DOpenGL : public csGraphics3DOGLCommon
-{
-public:
-  csGraphics3DOpenGL (iBase*);
-  virtual ~csGraphics3DOpenGL ();
-  virtual bool Initialize (iSystem*);
-  virtual bool Open();
-};
 
-#endif
+#endif // __CSINITAPP_H__
+

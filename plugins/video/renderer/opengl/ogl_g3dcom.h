@@ -508,7 +508,7 @@ public:
   /// Initialize from the state data of another driver of this type
   void SharedInitialize (csGraphics3DOGLCommon *d);
   /// Common canvas opening method.
-  bool NewOpen (const char *Title);
+  bool NewOpen ();
   /// Open from the state data of another driver of this type
   void SharedOpen (csGraphics3DOGLCommon *d);
   /// Helper function

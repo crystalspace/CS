@@ -81,7 +81,7 @@ bool csGraphics3DOpenGL::Initialize (iSystem* p)
   return NewInitialize ();
 }
 
-bool csGraphics3DOpenGL::Open (const char* p)
+bool csGraphics3DOpenGL::Open ()
 {
-  return NewOpen (p);
+  return NewOpen ();
 }

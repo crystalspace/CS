@@ -1,4 +1,5 @@
 /*
+    Copyright (C) 2001 by Jorrit Tyberghein
     Copyright (C) 1998-2000 by Andrew Zabolotny <bit@eltech.ru>
 
     This library is free software; you can redistribute it and/or
@@ -30,6 +31,7 @@ class csRect;
 struct iImage;
 struct iFontServer;
 struct iFont;
+struct iNativeWindow;
 
 /**
  * Structure describing the pixel format.
@@ -100,7 +102,7 @@ struct csImageArea
   { x = sx; y = sy; w = sw; h = sh; data = NULL; }
 };
 
-SCF_VERSION (iGraphics2D, 2, 0, 0);
+SCF_VERSION (iGraphics2D, 2, 0, 1);
 
 /**
  * This is the interface for 2D renderer. The 2D renderer is responsible
@@ -110,7 +112,7 @@ SCF_VERSION (iGraphics2D, 2, 0, 0);
 struct iGraphics2D : public iBase
 {
   /// Open the device.
-  virtual bool Open (const char *Title) = 0;
+  virtual bool Open () = 0;
 
   /// Close the device.
   virtual void Close () = 0;
@@ -267,6 +269,13 @@ struct iGraphics2D : public iBase
 
   /// Enable/disable canvas resizing
   virtual void AllowCanvasResize (bool iAllow) = 0;
+
+  /**
+   * Get the native window corresponding with this canvas.
+   * If this is an off-screen canvas then this will return NULL.
+   */
+  virtual iNativeWindow* GetNativeWindow () = 0;
 };
 
 #endif // __IVIDEO_GRAPH2D_H__
+

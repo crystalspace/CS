@@ -503,7 +503,7 @@ bool csSystemDriver::Initialize (int argc, const char* const argv[],
   return true;
 }
 
-bool csSystemDriver::Open (const char *Title)
+bool csSystemDriver::Open ()
 {
   Printf (CS_MSG_DEBUG_0F, "*** Opening the drivers now!\n");
 
@@ -1175,13 +1175,20 @@ iBase* csSystemDriver::ObjectRegistry::Get (char const* tag)
 iBase* csSystemDriver::ObjectRegistry::Get (scfInterfaceID id, int version)
 {
   int i;
+  iBase* found_one = NULL;
   for (i = 0 ; i < registry.Length () ; i++)
   {
     iBase* b = (iBase*)registry[i];
     iBase* interf = (iBase*)(b->QueryInterface (id, version));
-    if (interf) { interf->DecRef (); return interf; }
+    if (interf)
+    {
+      interf->DecRef ();
+      char* t = (char*)tags[i];
+      if (!t) return interf;
+      else found_one = interf;
+    }
   }
-  return NULL;
+  return found_one;
 }
 
 //---------------------------------------------------------------------------

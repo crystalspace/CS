@@ -82,7 +82,7 @@ public:
    * you should still print out the 2D driver type (X, Win, etc.) in your
    * subclass code.
    */
-  virtual bool Open (const char *Title);
+  virtual bool Open ();
 
   virtual void Close ();
 

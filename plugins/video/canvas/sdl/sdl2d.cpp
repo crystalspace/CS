@@ -285,12 +285,12 @@ csGraphics2DSDL::~csGraphics2DSDL(void)
       EventOutlet->DecRef ();
 }
 
-bool csGraphics2DSDL::Open(const char *Title)
+bool csGraphics2DSDL::Open()
 {
   if (is_open) return true;
 
   // Open your graphic interface
-  if (!csGraphics2D::Open (Title)) return false;
+  if (!csGraphics2D::Open ()) return false;
 
   if (SDL_Init(SDL_INIT_VIDEO|SDL_INIT_NOPARACHUTE) < 0)
   {
@@ -306,7 +306,7 @@ bool csGraphics2DSDL::Open(const char *Title)
     return false;
   }
 
-  SDL_WM_SetCaption(Title, NULL);
+  SDL_WM_SetCaption(win_title, NULL);
   SDL_EnableKeyRepeat(250, 30);
   SDL_ShowCursor(1);
 

@@ -319,7 +319,7 @@ GetFont(iIndex)
 1.15.  class iGraphics2D
 ------------------------
 
-Open(Title)
+Open()
 
 Close()
 
@@ -409,7 +409,7 @@ Draw(x,y,w,h,iIntensity,iVertices,iVertCount)
 1.17.  class iGraphics3D
 ------------------------
 
-Open(Title)
+Open()
 
 Close()
 

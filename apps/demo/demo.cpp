@@ -23,7 +23,9 @@
 #include "csgeom/path.h"
 #include "cstool/csfxscr.h"
 #include "cstool/csview.h"
+#include "cstool/initapp.h"
 #include "ivideo/graph3d.h"
+#include "ivideo/natwin.h"
 #include "ivideo/fontserv.h"
 #include "ivideo/graph2d.h"
 #include "ivideo/txtmgr.h"
@@ -747,6 +749,7 @@ bool Demo::Initialize (int argc, const char* const argv[],
   if (!superclass::Initialize (argc, argv, iConfigName))
     return false;
 
+  csInitializeApplication (this);
   iObjectRegistry* object_reg = GetObjectRegistry ();
   iPluginManager* plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
 
@@ -759,13 +762,16 @@ bool Demo::Initialize (int argc, const char* const argv[],
     Printf (CS_MSG_FATAL_ERROR, "No engine!\n");
     abort ();
   }
+  object_reg->Register (engine);
   QUERY_PLUG_ID (myG3D, CS_FUNCID_VIDEO, iGraphics3D, "No iGraphics3D plugin !\n");
   QUERY_PLUG (myG2D, iGraphics2D, "No iGraphics2D plugin !\n");
   QUERY_PLUG_ID (myVFS, CS_FUNCID_VFS, iVFS, "No iVFS plugin !\n");
   QUERY_PLUG_ID (myConsole, CS_FUNCID_CONSOLE, iConsoleOutput, "No iConsoleOutput plugin !\n");
 
   // Open the main system. This will open all the previously loaded plug-ins.
-  if (!Open ("The Crystal Space Demo."))
+  iNativeWindow* nw = myG2D->GetNativeWindow ();
+  if (nw) nw->SetTitle ("The Crystal Space Demo.");
+  if (!Open ())
   {
     Printf (CS_MSG_FATAL_ERROR, "Error opening system!\n");
     Cleanup ();

@@ -57,7 +57,7 @@ bool csGraphics2DGLBe::Initialize(iSystem* p)
   return ok;
 }
 
-bool csGraphics2DGLBe::Open(char const* title)
+bool csGraphics2DGLBe::Open()
 {
   if (is_open) return true;
   int const INSET = 32;
@@ -75,7 +75,7 @@ bool csGraphics2DGLBe::Open(char const* title)
   }
 
   view = new CrystGLView(BRect(0, 0, vw, vh), System);
-  window = new CrystGLWindow(win_rect, title, view, System, this);
+  window = new CrystGLWindow(win_rect, win_title, view, System, this);
 
   window->Show();
   if (window->Lock())
@@ -86,7 +86,7 @@ bool csGraphics2DGLBe::Open(char const* title)
   window->Flush();
   System->PerformExtension("BeginUI");
 
-  return superclass::Open(title);
+  return superclass::Open();
 }
 
 void csGraphics2DGLBe::Close()

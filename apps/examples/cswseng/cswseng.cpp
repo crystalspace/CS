@@ -20,9 +20,12 @@
 #include "cssysdef.h"
 #include "cssys/system.h"
 #include "cstool/csview.h"
+#include "cstool/initapp.h"
 #include "csutil/cscolor.h"
 #include "csutil/cmdline.h"
 #include "ivideo/graph3d.h"
+#include "ivideo/graph2d.h"
+#include "ivideo/natwin.h"
 #include "ivideo/txtmgr.h"
 #include "ivaria/conout.h"
 #include "isys/event.h"
@@ -541,6 +544,7 @@ int main (int argc, char* argv[])
   System = &Sys;
 
   iObjectRegistry* object_reg = System->GetObjectRegistry ();
+  iPluginManager* plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
   iCommandLineParser* cmdline = CS_QUERY_REGISTRY (object_reg,
   	iCommandLineParser);
   cmdline->AddOption ("mode", "800x600");
@@ -556,8 +560,13 @@ int main (int argc, char* argv[])
     printf ("System not initialized !\n");
     return -1;
   }    
+  csInitializeApplication (&Sys);
 
-  if (!Sys.Open ("Crystal Space Example: CSWS And Engine"))
+  iGraphics3D* g3d = CS_QUERY_REGISTRY (object_reg, iGraphics3D);
+  iNativeWindow* nw = g3d->GetDriver2D ()->GetNativeWindow ();
+  if (nw) nw->SetTitle ("Crystal Space Example: CSWS And Engine");
+
+  if (!Sys.Open ())
   {
     printf ("Could not open system !\n");
     return -1;

@@ -39,12 +39,14 @@
 #include "cstool/cspixmap.h"
 #include "cstool/csfxscr.h"
 #include "cstool/csview.h"
+#include "cstool/initapp.h"
 #include "csver.h"
 #include "qint.h"
 #include "iutil/cfgmgr.h"
 #include "iutil/cmdline.h"
 #include "ivideo/graph2d.h"
 #include "ivideo/graph3d.h"
+#include "ivideo/natwin.h"
 #include "ivideo/txtmgr.h"
 #include "isound/handle.h"
 #include "isound/source.h"
@@ -56,6 +58,7 @@
 #include "ivaria/collider.h"
 #include "ivaria/perfstat.h"
 #include "ivaria/reporter.h"
+#include "ivaria/stdrep.h"
 #include "imap/parser.h"
 #include "iutil/objreg.h"
 #include "isys/plugin.h"
@@ -205,35 +208,6 @@ WalkTest::~WalkTest ()
   if (perf_stats) perf_stats->DecRef ();
   if (Engine) Engine->DecRef ();
   if (LevelLoader) LevelLoader->DecRef();
-}
-
-struct WalkTestReporterListener : public iReporterListener
-{
-  SCF_DECLARE_IBASE;
-  WalkTestReporterListener () { SCF_CONSTRUCT_IBASE (NULL); }
-  virtual bool Report (iReporter* reporter, int severity, const char* msgId,
-  	const char* description);
-};
-
-SCF_IMPLEMENT_IBASE (WalkTestReporterListener)
-  SCF_IMPLEMENTS_INTERFACE (iReporterListener)
-SCF_IMPLEMENT_IBASE_END
-
-bool WalkTestReporterListener::Report (iReporter* /*reporter*/, int severity,
-	const char* /*msgId*/, const char* description)
-{
-  if (severity == CS_REPORTER_SEVERITY_NOTIFY
-  	|| severity == CS_REPORTER_SEVERITY_WARNING)
-  {
-    int msgType;
-    if (severity == CS_REPORTER_SEVERITY_WARNING)
-      msgType = CS_MSG_WARNING;
-    else
-      msgType = CS_MSG_CONSOLE;
-    Sys->Printf (msgType, "%s\n", description);
-    return true;
-  }
-  return false;
 }
 
 bool WalkTest::CheckErrors ()
@@ -1260,43 +1234,35 @@ bool WalkTest::Initialize (int argc, const char* const argv[],
     return false;
   }
 
+  csInitializeApplication (Sys);
+
   plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
   iConfigManager* cfg = CS_QUERY_REGISTRY (object_reg, iConfigManager);
 
-  myG3D = CS_QUERY_PLUGIN_ID (plugin_mgr, CS_FUNCID_VIDEO, iGraphics3D);
+  myG3D = CS_QUERY_REGISTRY (object_reg, iGraphics3D);
   if (!myG3D)
   {
     Printf (CS_MSG_FATAL_ERROR, "No iGraphics3D plugin!\n");
     return false;
   }
 
-  myG2D = CS_QUERY_PLUGIN (plugin_mgr, iGraphics2D);
+  myG2D = CS_QUERY_REGISTRY (object_reg, iGraphics2D);
   if (!myG2D)
   {
     Printf (CS_MSG_FATAL_ERROR, "No iGraphics2D plugin!\n");
     return false;
   }
 
-  myVFS = CS_QUERY_PLUGIN_ID (plugin_mgr, CS_FUNCID_VFS, iVFS);
+  myVFS = CS_QUERY_REGISTRY (object_reg, iVFS);
   if (!myVFS)
   {
     Printf (CS_MSG_FATAL_ERROR, "No iVFS plugin!\n");
     return false;
   }
 
-  myConsole = CS_QUERY_PLUGIN_ID (plugin_mgr, CS_FUNCID_CONSOLE, iConsoleOutput);
+  myConsole = CS_QUERY_REGISTRY (object_reg, iConsoleOutput);
   mySound = CS_QUERY_PLUGIN_ID (plugin_mgr, CS_FUNCID_SOUND, iSoundRender);
   myMotionMan = CS_QUERY_PLUGIN_ID (plugin_mgr, CS_FUNCID_MOTION, iMotionManager);
-
-  iReporter* reporter = CS_QUERY_PLUGIN_ID (plugin_mgr, CS_FUNCID_REPORTER,
-  	iReporter);
-  if (reporter)
-  {
-    WalkTestReporterListener* listener = new WalkTestReporterListener ();
-    reporter->AddReporterListener (listener);
-    listener->DecRef ();
-    reporter->DecRef ();
-  }
 
   // Some commercials...
   Printf (CS_MSG_INITIALIZATION, "Crystal Space version %s (%s).\n", CS_VERSION, CS_RELEASE_DATE);
@@ -1338,7 +1304,9 @@ bool WalkTest::Initialize (int argc, const char* const argv[],
 #endif
 
   // Start the engine
-  if (!Open ("Crystal Space"))
+  iNativeWindow* nw = Gfx2D->GetNativeWindow ();
+  if (nw) nw->SetTitle ("Crystal Space Standard Test Application");
+  if (!Open ())
   {
     Printf (CS_MSG_FATAL_ERROR, "Error opening system!\n");
     return false;
@@ -1366,7 +1334,7 @@ bool WalkTest::Initialize (int argc, const char* const argv[],
   }
 
   // Find the level loader plugin
-  LevelLoader = CS_QUERY_PLUGIN_ID (plugin_mgr, CS_FUNCID_LVLLOADER, iLoader);
+  LevelLoader = CS_QUERY_REGISTRY (object_reg, iLoader);
   if (!LevelLoader)
   {
     Printf (CS_MSG_FATAL_ERROR, "No level loader plugin!\n");

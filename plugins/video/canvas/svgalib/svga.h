@@ -49,7 +49,7 @@ public:
   csGraphics2DSVGALib (iBase*);
   virtual ~csGraphics2DSVGALib ();
 
-  virtual bool Open (const char *Title);
+  virtual bool Open ();
   virtual void Close ();
   virtual bool Initialize (iSystem*);
 

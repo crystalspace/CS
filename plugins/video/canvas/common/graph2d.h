@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 1998 by Jorrit Tyberghein
+    Copyright (C) 1998-2001 by Jorrit Tyberghein
     Written by Andrew Zabolotny <bit@eltech.ru>
 
     This library is free software; you can redistribute it and/or
@@ -20,9 +20,11 @@
 #ifndef __GRAPH2D_H__
 #define __GRAPH2D_H__
 
+#include <stdarg.h>
 #include "csutil/scf.h"
 #include "ivideo/graph2d.h"
 #include "ivideo/fontserv.h"
+#include "ivideo/natwin.h"
 #include "isys/plugin.h"
 #include "iutil/config.h"
 #include "csutil/cfgacc.h"
@@ -69,6 +71,9 @@ public:
 
   /// The font server
   iFontServer *FontServer;
+
+  /// Pointer to a title.
+  char* win_title;
   
   /// The width, height and depth of visual
   int Width, Height, Depth;
@@ -111,7 +116,7 @@ public:
   virtual bool HandleEvent (iEvent&);
 
   /// (*) Open graphics system (set videomode, open window etc)
-  virtual bool Open (const char *Title);
+  virtual bool Open ();
   /// (*) Close graphics system
   virtual void Close ();
 
@@ -271,6 +276,8 @@ public:
   /// Enable/disable canvas resize
   virtual void AllowCanvasResize (bool /*iAllow*/) { }
 
+  virtual iNativeWindow* GetNativeWindow ();
+
   struct eiPlugin : public iPlugin
   {
     SCF_DECLARE_EMBEDDED_IBASE(csGraphics2D);
@@ -309,6 +316,14 @@ protected:
   /// Return address of a 32-bit pixel
   static unsigned char *GetPixelAt32 (csGraphics2D *This, int x, int y);
 
+  // Virtual Alert function so it can be overridden by subclasses
+  // of csGraphics2D.
+  virtual void AlertV (int type, const char* title, const char* okMsg,
+  	const char* msg, va_list args);
+  // Virtual SetTitle function so it can be overridden by subclasses
+  // of csGraphics2D.
+  virtual void SetTitle (const char* title);
+
   struct CanvasConfig : public iConfig
   {
     SCF_DECLARE_EMBEDDED_IBASE (csGraphics2D);
@@ -317,6 +332,29 @@ protected:
     virtual bool GetOption (int id, csVariant* value);
   } scfiConfig;
   friend struct CanvasConfig;
+
+  struct NativeWindowManager : public iNativeWindowManager
+  {
+    SCF_DECLARE_EMBEDDED_IBASE (csGraphics2D);
+    virtual void Alert (int type, const char* title, const char* okMsg,
+    	const char* msg, ...);
+    virtual void AlertV (int type, const char* title, const char* okMsg,
+    	const char* msg, va_list arg)
+    {
+      scfParent->AlertV (type, title, okMsg, msg, arg);
+    }
+  } scfiNativeWindowManager;
+  friend struct NativeWindowManager;
+
+  struct NativeWindow : public iNativeWindow
+  {
+    SCF_DECLARE_EMBEDDED_IBASE (csGraphics2D);
+    virtual void SetTitle (const char* title)
+    {
+      scfParent->SetTitle (title);
+    }
+  } scfiNativeWindow;
+  friend struct NativeWindow;
 };
 
 #endif // __GRAPH2D_H__

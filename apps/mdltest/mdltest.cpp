@@ -21,6 +21,7 @@
 #include "csutil/cscolor.h"
 #include "cstool/csview.h"
 #include "cstool/mdldata.h"
+#include "cstool/initapp.h"
 #include "mdltest.h"
 #include "iengine/sector.h"
 #include "iengine/engine.h"
@@ -235,27 +236,28 @@ bool Simple::Initialize (int argc, const char* const argv[],
   if (!superclass::Initialize (argc, argv, iConfigName))
     return false;
 
+  csInitializeApplication (this);
   iObjectRegistry* object_reg = GetObjectRegistry ();
   iPluginManager* plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
   iCommandLineParser* cmdline = CS_QUERY_REGISTRY (object_reg,
   	iCommandLineParser);
 
   // Find the pointer to engine plugin
-  engine = CS_QUERY_PLUGIN (plugin_mgr, iEngine);
+  engine = CS_QUERY_REGISTRY (object_reg, iEngine);
   if (!engine)
   {
     Printf (CS_MSG_FATAL_ERROR, "No iEngine plugin!\n");
     abort ();
   }
 
-  loader = CS_QUERY_PLUGIN_ID (plugin_mgr, CS_FUNCID_LVLLOADER, iLoader);
+  loader = CS_QUERY_REGISTRY (object_reg, iLoader);
   if (!loader)
   {
     Printf (CS_MSG_FATAL_ERROR, "No iLoader plugin!\n");
     abort ();
   }
 
-  g3d = CS_QUERY_PLUGIN_ID (plugin_mgr, CS_FUNCID_VIDEO, iGraphics3D);
+  g3d = CS_QUERY_REGISTRY (object_reg, iGraphics3D);
   if (!g3d)
   {
     Printf (CS_MSG_FATAL_ERROR, "No iGraphics3D plugin!\n");
@@ -276,7 +278,7 @@ bool Simple::Initialize (int argc, const char* const argv[],
     abort ();
   }
 
-  vfs = CS_QUERY_PLUGIN_ID (plugin_mgr, "VFS", iVFS);
+  vfs = CS_QUERY_REGISTRY (object_reg, iVFS);
   if (!vfs)
   {
     Printf (CS_MSG_FATAL_ERROR, "No iVFS plugin!\n");
@@ -284,7 +286,7 @@ bool Simple::Initialize (int argc, const char* const argv[],
   }
 
   // Open the main system. This will open all the previously loaded plug-ins.
-  if (!Open ("Simple Crystal Space Application"))
+  if (!Open ())
   {
     Printf (CS_MSG_FATAL_ERROR, "Error opening system!\n");
     Cleanup ();

@@ -87,7 +87,7 @@ public:
   virtual ~csGraphics2DLineXLib ();
 
   virtual bool Initialize (iSystem *pSystem);
-  virtual bool Open (const char *Title);
+  virtual bool Open ();
   virtual void Close ();
 
   virtual bool BeginDraw ();

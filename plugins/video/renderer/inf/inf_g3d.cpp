@@ -140,7 +140,7 @@ bool csGraphics3DInfinite::HandleEvent (iEvent& Event)
     {
       case cscmdSystemOpen:
       {
-        Open ("Dummy title");
+        Open ();
         return true;
       }
       case cscmdSystemClose:
@@ -152,11 +152,11 @@ bool csGraphics3DInfinite::HandleEvent (iEvent& Event)
   return false;
 }
 
-bool csGraphics3DInfinite::Open (const char *Title)
+bool csGraphics3DInfinite::Open ()
 {
   DrawMode = 0;
 
-  if (!G2D->Open (Title))
+  if (!G2D->Open ())
   {
     SysPrintf (CS_MSG_FATAL_ERROR, "Error opening Graphics2D context.\n");
     // set "not opened" flag

@@ -101,7 +101,7 @@ bool csSoftProcTexture3D::Prepare (csTextureManagerSoftware *main_texman,
     if (!G2D) return false;
 
     SharedInitialize (parent_g3d);
-    if (!Open (NULL) || !SharedOpen ())
+    if (!Open () || !SharedOpen ())
       return false;
 
 #ifdef CS_DEBUG
@@ -120,7 +120,7 @@ bool csSoftProcTexture3D::Prepare (csTextureManagerSoftware *main_texman,
         &main_texman->pfmt, parent_tex_mm->GetColorMap (), 256);
 
       SharedInitialize (parent_g3d);
-      if (!Open (NULL) || !SharedOpen ())
+      if (!Open () || !SharedOpen ())
 	return false;
 
 #ifdef CS_DEBUG
@@ -141,7 +141,7 @@ bool csSoftProcTexture3D::Prepare (csTextureManagerSoftware *main_texman,
         // We are the first procedural texture utilising a dedicated 
         // procedural texture manager working in 8bit
         NewInitialize ();
-        if (!Open (NULL) || !NewOpen ())
+        if (!Open () || !NewOpen ())
           return false;
         // Inform each texture manager aboout the other
         texman->SetMainTextureManager (main_texman);
@@ -163,7 +163,7 @@ bool csSoftProcTexture3D::Prepare (csTextureManagerSoftware *main_texman,
       {
         sharing = true;
         SharedInitialize (main_texman->GetFirst8bitProcTexture ());
-        if (!Open (NULL) || !SharedOpen ())
+        if (!Open () || !SharedOpen ())
           return false;
       }
 
@@ -222,14 +222,14 @@ iTextureHandle *csSoftProcTexture3D::CreateOffScreenRenderer
     sharing = true;
     partner = (csGraphics3DSoftwareCommon*)g3d_partner;
     SharedInitialize (partner);
-    if (!Open (NULL) || !SharedOpen ())
+    if (!Open () || !SharedOpen ())
       return NULL;
   }
   else
   {
     sharing = false;
     NewInitialize ();
-    if (!Open (NULL) || !NewOpen ())
+    if (!Open () || !NewOpen ())
       return NULL;
   }
 

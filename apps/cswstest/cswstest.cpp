@@ -26,6 +26,7 @@
 #include "iutil/cfgmgr.h"
 #include "iutil/cmdline.h"
 #include "iutil/objreg.h"
+#include "cstool/initapp.h"
 
 CS_IMPLEMENT_APPLICATION
 
@@ -1005,8 +1006,9 @@ int main (int argc, char* argv[])
 
   if (!System.Initialize (argc, argv, "/config/cswstest.cfg"))
     return -1;
+  csInitializeApplication (&System);
 
-  if (!System.Open ("Crystal Space Windowing System testbed"))
+  if (!System.Open ())
     return -1;
 
   iObjectRegistry* object_reg = System.GetObjectRegistry ();

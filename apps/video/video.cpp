@@ -20,6 +20,7 @@
 #include "cssys/system.h"
 #include "apps/video/video.h"
 #include "csutil/cscolor.h"
+#include "cstool/initapp.h"
 #include "cstool/csview.h"
 #include "ivideo/graph3d.h"
 #include "ivideo/graph2d.h"
@@ -85,11 +86,12 @@ bool Video::Initialize (int argc, const char* const argv[],
   if (!superclass::Initialize (argc, argv, iConfigName))
     return false;
 
+  csInitializeApplication (this);
   object_reg = GetObjectRegistry ();
   plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
 
   // Find the pointer to engine plugin
-  engine = CS_QUERY_PLUGIN (plugin_mgr, iEngine);
+  engine = CS_QUERY_REGISTRY (object_reg, iEngine);
   if (!engine)
   {
     Printf (CS_MSG_FATAL_ERROR, "No iEngine plugin!\n");
@@ -97,14 +99,14 @@ bool Video::Initialize (int argc, const char* const argv[],
   }
 
   // Find the pointer to level loader plugin
-  LevelLoader = CS_QUERY_PLUGIN_ID (plugin_mgr, CS_FUNCID_LVLLOADER, iLoader);
+  LevelLoader = CS_QUERY_REGISTRY (object_reg, CS_FUNCID_LVLLOADER, iLoader);
   if (!LevelLoader)
   {
     Printf (CS_MSG_FATAL_ERROR, "No iLoader plugin!\n");
     abort ();
   }
 
-  myG3D = CS_QUERY_PLUGIN_ID (plugin_mgr, CS_FUNCID_VIDEO, iGraphics3D);
+  myG3D = CS_QUERY_REGISTRY (object_reg, iGraphics3D);
   if (!myG3D)
   {
     Printf (CS_MSG_FATAL_ERROR, "No iGraphics3D plugin!\n");
@@ -112,7 +114,7 @@ bool Video::Initialize (int argc, const char* const argv[],
   }
 
   // Open the main system. This will open all the previously loaded plug-ins.
-  if (!Open ("Video Crystal Space Application"))
+  if (!Open ())
   {
     Printf (CS_MSG_FATAL_ERROR, "Error opening system!\n");
     Cleanup ();

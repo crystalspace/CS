@@ -264,7 +264,7 @@ csGraphics2DXLib::~csGraphics2DXLib(void)
     EventOutlet->DecRef ();
 }
 
-bool csGraphics2DXLib::Open(const char *Title)
+bool csGraphics2DXLib::Open()
 {
   if (is_open) return true;
   CsPrintf (CS_MSG_INITIALIZATION, "Crystal Space X windows driver");
@@ -276,7 +276,7 @@ bool csGraphics2DXLib::Open(const char *Title)
               vinfo.depth, (vclass == PseudoColor) ? "Pseudo" : "True");
 
   // Open your graphic interface
-  if (!csGraphics2D::Open (Title))
+  if (!csGraphics2D::Open ())
     return false;
 
   // Create window
@@ -292,7 +292,7 @@ bool csGraphics2DXLib::Open(const char *Title)
   fs_window = XCreateWindow (dpy, root_window, 0, 0, 1, 1,
     0, vinfo.depth, InputOutput, visual,
     CWOverrideRedirect | CWBorderPixel | (cmap ? CWColormap : 0), &swa);
-  XStoreName (dpy, fs_window, Title);
+  XStoreName (dpy, fs_window, win_title);
   XSetWindowBackground (dpy, fs_window, BlackPixel (dpy, screen_num));
 #endif
   wm_width  = Width;
@@ -301,7 +301,7 @@ bool csGraphics2DXLib::Open(const char *Title)
   wm_window = XCreateWindow (dpy, root_window, 64, 16, wm_width, wm_height, 4,
     vinfo.depth, InputOutput, visual, CWBorderPixel | (cmap ? CWColormap : 0), &swa);
 
-  XStoreName (dpy, wm_window, Title);
+  XStoreName (dpy, wm_window, win_title);
   XSelectInput (dpy, wm_window, FocusChangeMask | KeyPressMask |
     KeyReleaseMask | StructureNotifyMask);
 
@@ -342,9 +342,9 @@ bool csGraphics2DXLib::Open(const char *Title)
   Atom wm_client_leader = XInternAtom (dpy, "WM_CLIENT_LEADER", False);
   XChangeProperty (dpy, window, wm_client_leader, XA_WINDOW, 32,
 		   PropModeReplace, (const unsigned char*)&leader_window, 1);
-  XmbSetWMProperties (dpy, window, Title, Title,
+  XmbSetWMProperties (dpy, window, win_title, win_title,
                       NULL, 0, NULL, NULL, NULL);
-  XmbSetWMProperties (dpy, wm_window, Title, Title,
+  XmbSetWMProperties (dpy, wm_window, win_title, win_title,
                       NULL, 0, NULL, NULL, NULL);
   XMapWindow (dpy, window);
   XMapRaised (dpy, wm_window);

@@ -50,7 +50,7 @@ public:
   virtual ~csGraphics2DSDL ();
 
   virtual bool Initialize (iSystem *pSystem);
-  virtual bool Open (const char *Title);
+  virtual bool Open ();
   virtual void Close ();
 
   /// Necessary to access framebuffer

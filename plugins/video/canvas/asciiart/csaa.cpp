@@ -133,7 +133,7 @@ bool csGraphics2DAA::Initialize (iSystem *pSystem)
   return true;
 }
 
-bool csGraphics2DAA::Open (const char *Title)
+bool csGraphics2DAA::Open ()
 {
   if (is_open) return true;
   context = aa_autoinit (&aa_defparams);
@@ -150,7 +150,7 @@ bool csGraphics2DAA::Open (const char *Title)
 
   aa_hidecursor (context);
 
-  return csGraphics2D::Open (Title);
+  return csGraphics2D::Open ();
 }
 
 void csGraphics2DAA::Close ()

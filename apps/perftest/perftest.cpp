@@ -19,10 +19,13 @@
 
 #include "cssysdef.h"
 #include "cssys/system.h"
+#include "cstool/initapp.h"
 #include "apps/perftest/perftest.h"
 #include "apps/perftest/ptests3d.h"
 #include "apps/perftest/ptests2d.h"
 #include "ivideo/graph3d.h"
+#include "ivideo/graph2d.h"
+#include "ivideo/natwin.h"
 #include "ivideo/txtmgr.h"
 #include "ivaria/conout.h"
 #include "igraphic/imageio.h"
@@ -88,34 +91,41 @@ bool PerfTest::Initialize (int argc, const char* const argv[],
   if (!superclass::Initialize (argc, argv, iConfigName))
     return false;
 
+  csInitializeApplication (this);
+  iObjectRegistry* object_reg = GetObjectRegistry ();
+  iPluginManager* plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
+  iCommandLineParser* cmdline = CS_QUERY_REGISTRY (object_reg,
+  	iCommandLineParser);
+
+  myG3D = CS_QUERY_REGISTRY (object_reg, iGraphics3D);
+  if (!myG3D)
+  {
+    Printf (CS_MSG_FATAL_ERROR, "No iGraphics3D plugin!\n");
+    return false;
+  }
+  iGraphics2D* myG2D = myG3D->GetDriver2D ();
+  iNativeWindow* nw = myG2D->GetNativeWindow ();
+  if (nw) nw->SetTitle ("Crystal Space Graphics Performance Tester");
+
   // Open the main system. This will open all the previously loaded plug-ins.
-  if (!Open ("Crystal Space Graphics Performance Tester"))
+  if (!Open ())
   {
     Printf (CS_MSG_FATAL_ERROR, "Error opening system!\n");
     Cleanup ();
     exit (1);
   }
 
-  iObjectRegistry* object_reg = GetObjectRegistry ();
-  iPluginManager* plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
-  iCommandLineParser* cmdline = CS_QUERY_REGISTRY (object_reg,
-  	iCommandLineParser);
-
   ImageLoader = CS_QUERY_PLUGIN_ID(plugin_mgr, CS_FUNCID_IMGLOADER, iImageIO);
-  if (!ImageLoader) {
+  if (!ImageLoader)
+  {
     Printf (CS_MSG_FATAL_ERROR, "No image loader plugin!\n");
     return false;
   }
 
-  myG3D = CS_QUERY_PLUGIN_ID(plugin_mgr, CS_FUNCID_VIDEO, iGraphics3D);
-  if (!myG3D) {
-    Printf (CS_MSG_FATAL_ERROR, "No iGraphics3D loader plugin!\n");
-    return false;
-  }
-
-  myVFS = CS_QUERY_PLUGIN_ID(plugin_mgr, CS_FUNCID_VFS, iVFS);
-  if (!myVFS) {
-    Printf (CS_MSG_FATAL_ERROR, "No iVFS loader plugin!\n");
+  myVFS = CS_QUERY_REGISTRY (object_reg, iVFS);
+  if (!myVFS)
+  {
+    Printf (CS_MSG_FATAL_ERROR, "No iVFS plugin!\n");
     return false;
   }
 

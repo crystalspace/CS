@@ -272,7 +272,6 @@ csGraphics3DSoftwareCommon::csGraphics3DSoftwareCommon (iBase* parent) :
   Caps.MaxAspectRatio = 32768;
   width = height = -1;
   partner = NULL;
-  title = NULL;
   is_for_procedural_textures = false;
 
   dpfx_valid = false;
@@ -302,7 +301,7 @@ bool csGraphics3DSoftwareCommon::HandleEvent (iEvent& Event)
     {
       case cscmdSystemOpen:
       {
-        Open ("Dummy title");
+        Open ();
         return true;
       }
       case cscmdSystemClose:
@@ -349,9 +348,9 @@ void csGraphics3DSoftwareCommon::SharedInitialize(csGraphics3DSoftwareCommon *p)
 #endif
 }
 
-bool csGraphics3DSoftwareCommon::Open (const char* Title)
+bool csGraphics3DSoftwareCommon::Open ()
 {
-  if (!G2D->Open (Title))
+  if (!G2D->Open ())
   {
     SysPrintf (CS_MSG_FATAL_ERROR, "Error opening Graphics2D context.\n");
     // set "not opened" flag
@@ -383,7 +382,6 @@ bool csGraphics3DSoftwareCommon::Open (const char* Title)
   else
     pixel_shift = 0;
 
-  title = Title;
   DrawMode = 0;
   SetDimensions (G2D->GetWidth (), G2D->GetHeight ());
   z_buf_mode = CS_ZBUF_NONE;
