@@ -41,6 +41,7 @@ public:
   int First;
   int Glyphs;
   int Width;
+  int Baseline;
   int MaxWidth;
   int Height;
   uint8 *FontBitmap;
@@ -53,7 +54,7 @@ public:
 
   /// Create the font object
   csDefaultFont (csDefaultFontServer *parent, const char *name, int first,
-    int glyphs, int width, int height, uint8 *bitmap, uint8 *individualwidth);
+    int glyphs, int width, int height, int baseline, uint8 *bitmap, uint8 *individualwidth);
 
   /// Destroy the font object
   virtual ~csDefaultFont ();

@@ -41,16 +41,17 @@ struct csFontDef
   int Height;
   int First;
   int Glyphs;
+  int Baseline;
   uint8 *FontBitmap;
   uint8 *IndividualWidth;
 };
 
 static csFontDef const FontList [] =
 {
-  { CSFONT_LARGE,	8, 8, 0, 256, font_Police,	width_Police	},
-  { CSFONT_ITALIC,	8, 8, 0, 256, font_Italic,	width_Italic	},
-  { CSFONT_COURIER,	7, 8, 0, 256, font_Courier,	width_Courier	},
-  { CSFONT_SMALL,	4, 6, 0, 256, font_Tiny,	width_Tiny	}
+  { CSFONT_LARGE,	8, 8, 0, 256, 1, font_Police,	width_Police	},
+  { CSFONT_ITALIC,	8, 8, 0, 256, 1, font_Italic,	width_Italic	},
+  { CSFONT_COURIER,	7, 8, 0, 256, 1, font_Courier,	width_Courier	},
+  { CSFONT_SMALL,	4, 6, 0, 256, 1, font_Tiny,	width_Tiny	}
 };
 
 int const FontListCount = sizeof (FontList) / sizeof (csFontDef);
@@ -103,7 +104,7 @@ iFont *csDefaultFontServer::LoadFont (const char *filename)
       if (!strcmp (filename, FontList [i].Name))
         return new csDefaultFont (this, FontList [i].Name,
           FontList [i].First, FontList [i].Glyphs,
-          FontList [i].Width, FontList [i].Height,
+          FontList [i].Width, FontList [i].Height, FontList [i].Baseline,
           FontList [i].FontBitmap, FontList [i].IndividualWidth);
   }
   else
@@ -222,6 +223,8 @@ error:
         fontdef.Width = n;
       else if (!strcmp (kw, "Height"))
         fontdef.Height = n;
+      else if (!strcmp (kw, "Baseline"))
+        fontdef.Baseline = n;
       else if (!strcmp (kw, "First"))
         fontdef.First = n;
       else if (!strcmp (kw, "Glyphs"))
@@ -230,8 +233,8 @@ error:
   }
 
 #if defined(CS_DEBUG)
-  printf("Reading Font %s, width %d, height %d, First %d, %d Glyphs.\n",
-    fontdef.Name, fontdef.Width, fontdef.Height, fontdef.First, fontdef.Glyphs);
+  printf("Reading Font %s, width %d, height %d, baseline %d, First %d, %d Glyphs.\n",
+    fontdef.Name, fontdef.Width, fontdef.Height, fontdef.Baseline, fontdef.First, fontdef.Glyphs);
 #endif
 
   fontdef.IndividualWidth = new uint8 [fontdef.Glyphs];
@@ -248,7 +251,7 @@ error:
 
   fntfile->DecRef ();
   return new csDefaultFont (this, fontdef.Name, fontdef.First, fontdef.Glyphs,
-    fontdef.Width, fontdef.Height, fontdef.FontBitmap, fontdef.IndividualWidth);
+    fontdef.Width, fontdef.Height, fontdef.Baseline, fontdef.FontBitmap, fontdef.IndividualWidth);
 }
 
 
@@ -259,7 +262,7 @@ SCF_IMPLEMENT_IBASE (csDefaultFont)
 SCF_IMPLEMENT_IBASE_END
 
 csDefaultFont::csDefaultFont (csDefaultFontServer *parent, const char *name,
-  int first, int glyphs, int width, int height, uint8 *bitmap,
+  int first, int glyphs, int width, int height, int baseline, uint8 *bitmap,
   uint8 *individualwidth) : DeleteCallbacks (4, 4)
 {
   SCF_CONSTRUCT_IBASE (parent);
@@ -273,6 +276,7 @@ csDefaultFont::csDefaultFont (csDefaultFontServer *parent, const char *name,
   Glyphs = glyphs;
   Width = width;
   Height = height;
+  Baseline = baseline;
   FontBitmap = bitmap;
   IndividualWidth = individualwidth;
   int i;
@@ -346,7 +350,7 @@ bool csDefaultFont::GetGlyphSize (uint8 c, int &oW, int &oH)
   return true;
 }
 
-bool csDefaultFont::GetGlyphSize (uint8 c, int &oW, int &oH, int &, int &, int &)
+bool csDefaultFont::GetGlyphSize (uint8 c, int &oW, int &oH, int &adv, int &left, int &top)
 {
   int chr = int (c) - First;
   if ((chr < 0) || (chr > Glyphs))
@@ -357,6 +361,9 @@ bool csDefaultFont::GetGlyphSize (uint8 c, int &oW, int &oH, int &, int &, int &
 
   oW = IndividualWidth ? IndividualWidth [chr] : Width;
   oH = Height;
+  adv = oW;
+  left = 0;
+  top = Height-Baseline;
   return true;
 }
 
@@ -374,7 +381,7 @@ uint8 *csDefaultFont::GetGlyphBitmap (uint8 c, int &oW, int &oH)
   return GlyphBitmap [chr];
 }
 
-uint8 *csDefaultFont::GetGlyphBitmap (uint8 c, int &oW, int &oH, int &, int &, int &)
+uint8 *csDefaultFont::GetGlyphBitmap (uint8 c, int &oW, int &oH, int &adv, int &left, int &top)
 {
   int chr = int (c) - First;
   if ((chr < 0) || (chr > Glyphs))
@@ -385,6 +392,9 @@ uint8 *csDefaultFont::GetGlyphBitmap (uint8 c, int &oW, int &oH, int &, int &, i
 
   oW = IndividualWidth ? IndividualWidth [chr] : Width;
   oH = Height;
+  adv = oW;
+  left = 0;
+  top = Height-Baseline;
   return GlyphBitmap [chr];
 }
 
@@ -408,7 +418,7 @@ void csDefaultFont::GetDimensions (const char *text, int &oW, int &oH)
   }
 }
 
-void csDefaultFont::GetDimensions (const char *text, int &oW, int &oH, int &)
+void csDefaultFont::GetDimensions (const char *text, int &oW, int &oH, int &desc)
 {
   oH = Height;
   oW = 0;
@@ -426,6 +436,7 @@ void csDefaultFont::GetDimensions (const char *text, int &oW, int &oH, int &)
         oW += IndividualWidth [chr];
     }
   }
+  desc = Baseline;
 }
 
 int csDefaultFont::GetLength (const char *text, int maxwidth)
