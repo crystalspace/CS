@@ -92,8 +92,8 @@ rule ApplicationFromObjects
   }
 
   # construct Clean Targets
-  Clean clean : $(target) ;
-  Clean $(<)clean : $(target) $(>) ;
+  Clean clean : $(target) $(target).txt ;
+  Clean $(<)clean : $(target) $(target).txt $(>) ;
 
   # Invoke Link rule
   NAME on $(target) = $(<) ;

@@ -39,6 +39,9 @@ The history order is reversed so that new features are at the top.
 	      building outside of the CS source tree.
 	    - Fixed bugs in csperl5.mak where it used CEX.CSPERL5 and
 	      CIN.CSPERL5 in some places but CEX.PERL5 and CIN.PERL5 in others.
+	- Eric Sunshine changed the Application rule in application.jam so that
+	  it also ensures that <appname>.txt gets removed at "jam clean" time.
+	  These .txt files are created on Windows when each application runs.
 3-May-2003
 	- Matze changed -Wno-unused-function and -Wno-unused-label flags to
 	  -Wno-unused in aws Jamfile. Seems gcc2.9x doesn't like the first 2
