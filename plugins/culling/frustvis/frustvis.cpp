@@ -286,6 +286,10 @@ void csFrustumVis::UnregisterVisObject (iVisibilityObject* visobj)
 		  (iObjectModelListener*)visobj_wrap);
       kdtree->RemoveObject (visobj_wrap->child);
       visobj->DecRef ();
+#ifdef CS_DEBUG
+      // To easily recognize that the vis wrapper has been deleted:
+      visobj_wrap->frustvis = (csFrustumVis*)0xdeadbeef;
+#endif
       delete visobj_wrap;
       visobj_vector.Delete (i);
       return;
@@ -316,6 +320,7 @@ void csFrustumVis::UpdateObjects ()
 
 void csFrustumVis::UpdateObject (csFrustVisObjectWrapper* visobj_wrap)
 {
+  CS_ASSERT (visobj_wrap->frustvis != (csFrustumVis*)0xdeadbeef);
   iVisibilityObject* visobj = visobj_wrap->visobj;
   iMovable* movable = visobj->GetMovable ();
   csBox3 bbox;

@@ -356,6 +356,10 @@ void csDynaVis::UnregisterVisObject (iVisibilityObject* visobj)
       model_mgr->ReleaseObjectModel (visobj_wrap->model);
       kdtree->RemoveObject (visobj_wrap->child);
       visobj->DecRef ();
+#ifdef CS_DEBUG
+      // To easily recognize that the vis wrapper has been deleted:
+      visobj_wrap->dynavis = (csDynaVis*)0xdeadbeef;
+#endif
       delete visobj_wrap;
       visobj_vector.Delete (i);
       return;
@@ -386,6 +390,7 @@ void csDynaVis::UpdateObjects ()
 
 void csDynaVis::UpdateObject (csVisibilityObjectWrapper* visobj_wrap)
 {
+  CS_ASSERT (visobj_wrap->dynavis != (csDynaVis*)0xdeadbeef);
   iVisibilityObject* visobj = visobj_wrap->visobj;
   iMovable* movable = visobj->GetMovable ();
   model_mgr->CheckObjectModel (visobj_wrap->model, visobj_wrap->mesh);

@@ -187,6 +187,8 @@ void csMovable::RemoveListener (iMovableListener *listener)
 void csMovable::UpdateMove ()
 {
   updatenr++;
+  is_identity = obj.IsIdentity ();
+
   if (object) object->UpdateMove ();
 
   int i = listeners.Length ()-1;
@@ -196,8 +198,6 @@ void csMovable::UpdateMove ()
     ml->MovableChanged (&scfiMovable);
     i--;
   }
-
-  is_identity = obj.IsIdentity ();
 }
 
 csReversibleTransform csMovable::GetFullTransform () const
