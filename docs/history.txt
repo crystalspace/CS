@@ -10,6 +10,17 @@ The history order is reversed so that new features are at the top.
 	  fixed this by adding a manual vfs->Sync().
 	- Optimization in cs2xml so that 'cache' dir is not considered.
 	- Fix a bug in iEngine->SetCacheManager().
+	- Eric Sunshine broke apart the mother-of-all-switch-statements in
+	  cs2xml into smaller functions.  This was necessary for a couple
+	  reasons:
+	    - In optimize mode, some compilers, such as MSVC would take an
+	      enormous amount of time to compile the file (>20 minutes on even
+	      fast machines, we are told).
+	    - There is a limitation with the MacOS/X assembler where it is
+	      unable to deal with such large jump offsets.  The assembler
+	      expects such offsets to fit within 16-bits, but these offsets did
+	      not, and there appears to be no way to instruct the assembler to
+	      use 32-bit offsets.
 16-Sep-2002
 	- Fixed a DecRef() problem with the g2d plugin (ddraw). Please
 	  people! When replacing a normal pointer with a csRef you
