@@ -106,9 +106,12 @@ void csIsoGrid::MoveSprite(iIsoSprite *sprite, const csVector3& oldpos,
     )
   {
     //printf("Sprite moved to new pos\n");
+    // prevent to destruct the sprite when moving
+    sprite->IncRef ();
     iIsoCell *oldcell = GetCell(oldpos);
     if(oldcell) oldcell->RemoveSprite(sprite, oldpos);
     AddSprite(sprite, newpos);
+    sprite->DecRef ();
     return;
   }
   // sprite not any longer in this grid
@@ -122,10 +125,12 @@ void csIsoGrid::MoveSprite(iIsoSprite *sprite, const csVector3& oldpos,
     return;
   }
   //printf("Grid: Sprite moved to new grid\n");
+  sprite->IncRef ();
   iIsoCell *prevcell = GetCell(oldpos);
   if(prevcell) prevcell->RemoveSprite(sprite, oldpos);
   sprite->SetGrid(newgrid);
   newgrid->AddSprite(sprite, newpos);
+  sprite->DecRef ();
 }
 
 void csIsoGrid::Draw(iIsoRenderView *rview)
