@@ -532,7 +532,7 @@ csTicks csMovieRecorder::ClockGetCurrentTicks () const
 void csMovieRecorder::GetKeyCode (const char* keystring, struct keyBinding &key)
 {
   key.shift = key.alt = key.ctrl = false;
-  char* dash = strchr (keystring, '-');
+  char const* dash = strchr (keystring, '-');
   while (dash)
   {
     if (!strncmp (keystring, "shift", int (dash-keystring))) key.shift = true;
