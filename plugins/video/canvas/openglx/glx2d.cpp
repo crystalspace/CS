@@ -361,6 +361,11 @@ bool csGraphics2DGLX::PerformExtensionV (char const* command, va_list args)
     xwin->SetFullScreen (!xwin->GetFullScreen ());
     return true;
   }
+  if (!strcasecmp (command, "setglcontext"))
+  {
+    glXMakeCurrent (dpy, window, active_GLContext);
+    return true;
+  }
   return csGraphics2DGLCommon::PerformExtensionV (command, args);
 }
 

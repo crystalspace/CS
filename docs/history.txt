@@ -12,6 +12,7 @@ chronological order.
 	- res augmented the glwin32 canvas to support an extension 
 	  "setglcontext" which allows it to set it's GL context as the current
 	  (useful if CS is used alongside other GL stuff).
+	- res augmented the glx canvas with "setglcontext" support.
 18-May-2004
 	- Eric Sunshine made the following change to msvcgen.jam:
 	    - Fixed bug in LinkWith where, though Frank changed it to properly
