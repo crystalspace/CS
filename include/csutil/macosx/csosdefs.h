@@ -24,7 +24,6 @@
 #include <sys/param.h>
 #include <sys/select.h>
 #include <sys/stat.h>
-#include <dir.h>
 #include <dirent.h>
 
 #define CS_HAS_POSIX_MMAP
