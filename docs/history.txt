@@ -1,5 +1,10 @@
 The history order is reversed so that new features are at the top.
 
+29-May-2001
+	- Michael Voasse added accessor functions to iCameraPosition for
+	  sector, position upward vector and forward vector.
+	- Philip Wyett fixed Michaels change by adding missing 'const' from
+	  GetSector().
 28-May-2001
 	- Fixed all the plugins makefiles so that they now have an additional
 	  CSUTIL in their link line. This satisfies one-pass linkers after
@@ -32,6 +37,21 @@ The history order is reversed so that new features are at the top.
 	  before going into 2D rendering mode.
 	- Fixed a bug in the common OpenGL canvas handling. It disabled
 	  GL_DITHER without restoring it.
+	- Another optimization: client states (used for glDrawElements())
+	  are now also cached.
+	- Martin Geisse confirmed that the global iSCF pointer is valid for
+	  plugins and CREATE_INSTANCE works from within plugins. Consequently,
+	  the system driver's implementation of iSCF was obsolete and removed.
+	  The global iSCF pointer is now used everywhere, possibly through
+	  the standard SCF macros.
+	- Martin did some further work on SCF:
+	    - Removed some obsolete comments in scf.cpp.
+	    - Fixed a (char*) argument which should be (const char*).
+	    - Added a string set member to csSCF which serves as a registry
+	      for interface names. Added an iSCF method to request a string
+	      from it.
+	- Philip Wyett fixed Erics modifications to conftest. Later he fixed
+	  his fix :-)
 27-May-2001
 	- Philip added CSSYS dependency to gamecore plugin.
 	- Martin Geisse changed the main export function for dynamic
