@@ -196,32 +196,32 @@ void WalkTest::CreateColliders ()
 csCollisionPair our_cd_contact[1000];
 int num_our_cd;
 
-int FindSectors (csVector3 v, csVector3 d, csSector *s, csSector **sa)
+int FindSectors (csVector3 v, csVector3 d, iSector *s, iSector **sa)
 {
   int c = 0;
   // @@@ Avoid this sqrt somehow? i.e. by having it in the objects.
   float size = sqrt (d.x * d.x + d.y * d.y + d.z * d.z);
   //@@@@@@@@@@@
   csEngine* engine = (csEngine*)(Sys->Engine);
-  csSectorIt* it = engine->GetNearbySectors (s, v, size);
+  csSectorIt* it = engine->GetNearbySectors (s->GetPrivateObject (), v, size);
   csSector* sector;
   while ((sector = it->Fetch ()) != NULL)
   {
-    sa[c++] = sector;
+    sa[c++] = &(sector->scfiSector);
     if (c >= MAXSECTORSOCCUPIED) break;
   }
   delete it;
   return c;
 }
 
-int CollisionDetect (csCollider *c, csSector* sp, csTransform *cdt)
+int CollisionDetect (csCollider *c, iSector* sp, csTransform *cdt)
 {
   int hit = 0;
   int i;
 
   // Check collision with this sector.
   Sys->collide_system->ResetCollisionPairs ();
-  if (c->Collide (*sp, cdt)) hit++;
+  if (c->Collide (sp->QueryObject (), cdt)) hit++;
   csCollisionPair* CD_contact = Sys->collide_system->GetCollisionPairs ();
 
   for (i=0 ; i<Sys->collide_system->GetNumCollisionPairs () ; i++)
@@ -233,9 +233,9 @@ int CollisionDetect (csCollider *c, csSector* sp, csTransform *cdt)
   // Check collision with the meshes in this sector.
   for (i = 0 ; i < sp->GetMeshCount () ; i++)
   {
-    csMeshWrapper* tp = sp->GetMesh (i);
+    iMeshWrapper* tp = sp->GetMesh (i);
     Sys->collide_system->ResetCollisionPairs ();
-    if (c->Collide (*tp, cdt, &tp->GetMovable ().GetTransform ())) hit++;
+    if (c->Collide (tp->QueryObject (), cdt, &tp->GetMovable ()->GetTransform ())) hit++;
 
     CD_contact = Sys->collide_system->GetCollisionPairs ();
     for (int j=0 ; j<Sys->collide_system->GetNumCollisionPairs () ; j++)
@@ -257,9 +257,9 @@ void DoGravity (csVector3& pos, csVector3& vel)
   csMatrix3 m;
   csOrthoTransform test (m, new_pos);
 
-  csSector *n[MAXSECTORSOCCUPIED];
+  iSector *n[MAXSECTORSOCCUPIED];
   int num_sectors = FindSectors (new_pos, 4.0f*Sys->body_radius,
-    Sys->view->GetCamera()->GetSector()->GetPrivateObject (), n);
+    Sys->view->GetCamera()->GetSector(), n);
 
   num_our_cd = 0;
   Sys->collide_system->SetOneHitOnly (false);
@@ -276,8 +276,8 @@ void DoGravity (csVector3& pos, csVector3& vel)
       int i;
       for (i = 0 ; i < n[k]->GetTerrainCount () ; i++)
       {
-	      csTerrainWrapper* terrain = n[k]->GetTerrain( i );
-	      hits += terrain->CollisionDetect( &test );
+	      iTerrainWrapper* terrain = n[k]->GetTerrain( i );
+	      hits += terrain->GetPrivateObject ()->CollisionDetect( &test );
       }
     }
   }
@@ -310,7 +310,7 @@ void DoGravity (csVector3& pos, csVector3& vel)
     test = csOrthoTransform (csMatrix3(), new_pos);
 
     num_sectors = FindSectors (new_pos, 4.0f*Sys->legs_radius, 
-		Sys->view->GetCamera()->GetSector()->GetPrivateObject (), n);
+		Sys->view->GetCamera()->GetSector(), n);
 
     num_our_cd = 0;
     Sys->collide_system->SetOneHitOnly (false);

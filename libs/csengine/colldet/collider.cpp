@@ -69,6 +69,17 @@ bool csCollider::Collide (csObject& otherObject,
     return false;
 }
 
+bool csCollider::Collide (iObject* otherObject,
+                          csTransform* pThisTransform,
+                          csTransform* pOtherTransform) 
+{
+  csCollider *pOtherCollider = GetCollider (otherObject);
+  if (pOtherCollider)
+    return Collide (*pOtherCollider, pThisTransform, pOtherTransform);
+  else
+    return false;
+}
+
 bool csCollider::Collide (csCollider& otherCollider, 
                           csTransform* pTransform1, 
                           csTransform* pTransform2)

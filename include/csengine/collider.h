@@ -79,6 +79,10 @@ public:
   bool Collide (csObject& otherObject,
                         csTransform* pThisTransform = NULL,
                         csTransform* pOtherTransform = NULL);
+  /// Similar to Collide for csCollider. Calls GetCollider for otherCollider.
+  bool Collide (iObject* otherObject,
+                        csTransform* pThisTransform = NULL,
+                        csTransform* pOtherTransform = NULL);
 
   /**
    * If object has a child of type csCollider it is returned. Otherwise 0
