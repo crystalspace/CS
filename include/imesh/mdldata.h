@@ -122,6 +122,66 @@ struct iModelDataMaterial : public iBase
 };
 
 
+SCF_VERSION (iModelDataVertices, 0, 0, 1);
+
+/// A set of vertex positions. 
+struct iModelDataVertices : public iBase
+{
+  /// Query the iObject for this vertex set
+  virtual iObject* QueryObject () = 0;
+  
+  /// Return the number of contained vertices
+  virtual int GetVertexCount () const = 0;
+  /// Return the coordinates of a vertex
+  virtual const csVector3 &GetVertex (int n) const = 0;
+  /// Set the coordinates of a vertex
+  virtual void SetVertex (int n, const csVector3 &v) = 0;
+  /// Add a vertex
+  virtual void AddVertex (const csVector3 &v) = 0;
+};
+
+
+SCF_VERSION (iModelDataAction, 0, 0, 1);
+
+/**
+ * An action. This is mainly a list of key frames. Note that the key frames
+ * are not added as sub-objects, but instead they are added directly through
+ * the iModelDataAction interface. The reason is that together with every
+ * frame a time value has to be stored. The idea of time values is the
+ * following: Every frame comes with the point in time when the frame *ends*,
+ * measured in seconds. For example, if your frames last 100msec, 200msec,
+ * 50msec and 250msec, the time values are: 0.1, 0.3, 0.35, 0.6. As this is
+ * the ending time for each frame, the last time value has three meanings:
+ * <ul><li> It is the end of the whole action
+ * <li> It is the length of the action
+ * <li> It wraps around to the time value 0.0
+ * </ul>
+ * Note that the frames are automatically sorted by time. <p>
+ *
+ * There are different types of frames. One could imagine vertex states,
+ * skeleton states and transformation states (or other types?). Currently
+ * only vertex states (iModelDataVertices) are used.
+ */
+struct iModelDataAction : public iBase
+{
+  /// Query the iObject for this action
+  virtual iObject* QueryObject () = 0;
+  
+  /// Return the number of key frames
+  virtual int GetFrameCount () const = 0;
+  /// Get the time value for a frame
+  virtual float GetTime (int Frame) const = 0;
+  /// Get the state information for a frame
+  virtual iObject *GetState (int Frame) const = 0;
+  /// Set the time value for a frame
+  virtual void SetTime (int Frame, float NewTime) = 0;
+  /// Set the state information for a frame
+  virtual void SetState (int Frame, iObject *State) = 0;
+  /// Add a frame
+  virtual void AddFrame (float Time, iObject *State) = 0;
+};
+
+
 SCF_VERSION (iModelDataPolygon, 0, 0, 1);
 
 /**
@@ -169,7 +229,7 @@ struct iModelDataPolygon : public iBase
 };
 
 
-SCF_VERSION (iModelDataObject, 0, 0, 1);
+SCF_VERSION (iModelDataObject, 0, 1, 0);
 
 /**
  * One object in the scene. This structure is intended for solid objects, i.e.
@@ -183,14 +243,10 @@ struct iModelDataObject : public iBase
   /// Query the iObject for the model data
   virtual iObject* QueryObject () = 0;
 
-  /// Return the number of vertices in the object
-  virtual int GetVertexCount () const = 0;
-  /// Return the coordinates of a vertex
-  virtual const csVector3 &GetVertex (int n) const = 0;
-  /// Set the coordinates of a vertex
-  virtual void SetVertex (int n, const csVector3 &v) = 0;
-  /// Add a vertex
-  virtual void AddVertex (const csVector3 &v) = 0;
+  /// Return the default vertex set
+  virtual iModelDataVertices* GetDefaultVertices () const = 0;
+  /// Set the default vertex set
+  virtual void SetDefaultVertices (iModelDataVertices*) = 0;
 };
 
 

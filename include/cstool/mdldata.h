@@ -22,6 +22,7 @@
 #include "imesh/mdldata.h"
 #include "csutil/garray.h"
 #include "csutil/csobject.h"
+#include "csutil/typedvec.h"
 
 #define DECLARE_ACCESSOR_METHODS(type,name)				\
   type Get##name () const;						\
@@ -64,6 +65,54 @@
     if (o) return o;							\
   SCF_IMPLEMENT_EMBEDDED_IBASE_QUERY_END;
 
+CS_DECLARE_TYPED_IBASE_VECTOR (csObjectVector, iObject);
+
+//----------------------------------------------------------------------------
+
+class csModelDataVertices : public iModelDataVertices
+{
+private:
+  DECLARE_GROWING_ARRAY (Vertices, csVector3);
+
+public:
+  SCF_DECLARE_IBASE;
+  DECLARE_OBJECT_INTERFACE;
+
+  /// constructor
+  csModelDataVertices ();
+  /// Destructor
+  virtual ~csModelDataVertices() {}
+
+  DECLARE_ARRAY_INTERFACE (const csVector3 &, Vertex);
+};
+
+class csModelDataAction : public iModelDataAction
+{
+private:
+  DECLARE_GROWING_ARRAY (Times, float);
+  csObjectVector States;
+
+public:
+  SCF_DECLARE_IBASE;
+  DECLARE_OBJECT_INTERFACE;
+
+  /// Constructor
+  csModelDataAction ();
+  
+  /// Return the number of key frames
+  virtual int GetFrameCount () const;
+  /// Get the time value for a frame
+  virtual float GetTime (int Frame) const;
+  /// Get the state information for a frame
+  virtual iObject *GetState (int Frame) const;
+  /// Set the time value for a frame
+  virtual void SetTime (int Frame, float NewTime);
+  /// Set the state information for a frame
+  virtual void SetState (int Frame, iObject *State);
+  /// Add a frame
+  virtual void AddFrame (float Time, iObject *State);
+};
+
 class csModelDataPolygon : public iModelDataPolygon
 {
 private:
@@ -99,17 +148,18 @@ public:
 class csModelDataObject : public iModelDataObject
 {
 private:
-  DECLARE_GROWING_ARRAY (Vertices, csVector3);
+  iModelDataVertices *DefaultVertices;
 
 public:
   SCF_DECLARE_IBASE;
   DECLARE_OBJECT_INTERFACE;
-  DECLARE_ARRAY_INTERFACE (const csVector3&, Vertex);
 
   /// Constructor
   csModelDataObject ();
   /// Destructor
-  virtual ~csModelDataObject() {}
+  virtual ~csModelDataObject();
+
+  DECLARE_ACCESSOR_METHODS (iModelDataVertices*, DefaultVertices);
 };
 
 class csModelDataCamera : public iModelDataCamera

@@ -56,14 +56,17 @@ void Simple::ImportModel (iThingState *fState, iMaterialWrapper *DefaultMaterial
 
   iModelDataObject *Object = new csModelDataObject ();
   Model->QueryObject ()->ObjAdd (Object->QueryObject ());
-  Object->AddVertex (csVector3 (-5, -5, -5));
-  Object->AddVertex (csVector3 (-5, -5, +5));
-  Object->AddVertex (csVector3 (+5, -5, +5));
-  Object->AddVertex (csVector3 (+5, -5, -5));
-  Object->AddVertex (csVector3 (-5, +5, -5));
-  Object->AddVertex (csVector3 (-5, +5, +5));
-  Object->AddVertex (csVector3 (+5, +5, +5));
-  Object->AddVertex (csVector3 (+5, +5, -5));
+  iModelDataVertices *Vertices = new csModelDataVertices ();
+  Object->SetDefaultVertices (Vertices);
+
+  Vertices->AddVertex (csVector3 (-5, -5, -5));
+  Vertices->AddVertex (csVector3 (-5, -5, +5));
+  Vertices->AddVertex (csVector3 (+5, -5, +5));
+  Vertices->AddVertex (csVector3 (+5, -5, -5));
+  Vertices->AddVertex (csVector3 (-5, +5, -5));
+  Vertices->AddVertex (csVector3 (-5, +5, +5));
+  Vertices->AddVertex (csVector3 (+5, +5, +5));
+  Vertices->AddVertex (csVector3 (+5, +5, -5));
 
   iModelDataPolygon *Polygon = new csModelDataPolygon ();
   Object->QueryObject ()->ObjAdd (Polygon->QueryObject ());

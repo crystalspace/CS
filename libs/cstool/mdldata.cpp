@@ -59,6 +59,85 @@
 SCF_DECLARE_FAST_INTERFACE (iModelDataTexture);
 SCF_DECLARE_FAST_INTERFACE (iModelDataMaterial);
 
+/*** csModelDataVertices ***/
+
+SCF_IMPLEMENT_IBASE (csModelDataVertices)
+  SCF_IMPLEMENTS_INTERFACE (iModelDataVertices)
+  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iObject)
+SCF_IMPLEMENT_IBASE_END
+
+IMPLEMENT_OBJECT_INTERFACE (csModelDataVertices);
+
+IMPLEMENT_ARRAY_INTERFACE (csModelDataVertices,
+	const csVector3 &, Vertex, Vertices);
+
+csModelDataVertices::csModelDataVertices ()
+{
+  SCF_CONSTRUCT_IBASE (NULL);
+  SCF_CONSTRUCT_EMBEDDED_IBASE (scfiObject);
+}
+
+/*** csModelDataAction ***/
+
+SCF_IMPLEMENT_IBASE (csModelDataAction)
+  SCF_IMPLEMENTS_INTERFACE (iModelDataAction)
+  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iObject)
+SCF_IMPLEMENT_IBASE_END
+
+IMPLEMENT_OBJECT_INTERFACE (csModelDataAction);
+
+csModelDataAction::csModelDataAction ()
+{
+  SCF_CONSTRUCT_IBASE (NULL);
+  SCF_CONSTRUCT_EMBEDDED_IBASE (scfiObject);
+}
+  
+int csModelDataAction::GetFrameCount () const
+{
+  return Times.Length ();
+}
+
+float csModelDataAction::GetTime (int Frame) const
+{
+  return Times[Frame];
+}
+
+iObject *csModelDataAction::GetState (int Frame) const
+{
+  return States.Get (Frame);
+}
+
+void csModelDataAction::SetTime (int Frame, float NewTime)
+{
+  // save the object
+  iObject *obj = States.Get (Frame);
+  obj->IncRef ();
+
+  // remove it from the vectors
+  Times.Delete (Frame);
+  States.Delete (Frame);
+
+  // add it again with the new time value
+  AddFrame (NewTime, obj);
+
+  // release it
+  obj->DecRef ();
+}
+
+void csModelDataAction::SetState (int Frame, iObject *State)
+{
+  States.Replace (Frame, State);
+}
+
+void csModelDataAction::AddFrame (float Time, iObject *State)
+{
+  int i;
+  for (i=0; i<Times.Length (); i++)
+    if (Times.Get (i) > Time) break;
+  Times.Insert (i, Time);
+  States.Insert (i, State);
+}
+
 /*** csModelDataPolygon ***/
 
 SCF_IMPLEMENT_IBASE (csModelDataPolygon)
@@ -110,7 +189,8 @@ IMPLEMENT_ARRAY_INTERFACE_NONUM (csModelDataPolygon,
 	const csVector2 &, TextureCoords, TextureCoords);
 IMPLEMENT_ARRAY_INTERFACE_NONUM (csModelDataPolygon,
 	const csColor &, Color, Colors);
-IMPLEMENT_ACCESSOR_METHOD_REF (csModelDataPolygon, iModelDataMaterial *, Material);
+IMPLEMENT_ACCESSOR_METHOD_REF (csModelDataPolygon,
+	iModelDataMaterial *, Material);
 
 /*** csModelDataObject ***/
 
@@ -121,13 +201,19 @@ SCF_IMPLEMENT_IBASE_END
 
 IMPLEMENT_OBJECT_INTERFACE (csModelDataObject);
 
-IMPLEMENT_ARRAY_INTERFACE (csModelDataObject,
-	const csVector3 &, Vertex, Vertices);
+IMPLEMENT_ACCESSOR_METHOD_REF (csModelDataObject,
+	iModelDataVertices *, DefaultVertices);
 
 csModelDataObject::csModelDataObject ()
 {
   SCF_CONSTRUCT_IBASE (NULL);
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiObject);
+  DefaultVertices = NULL;
+}
+
+csModelDataObject::~csModelDataObject ()
+{
+  SCF_DEC_REF (DefaultVertices);
 }
 
 /*** csModelDataCamera ***/

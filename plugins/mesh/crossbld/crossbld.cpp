@@ -91,8 +91,9 @@ bool csCrossBuilder::BuildThing (iModelData *Data, iThingState *tgt,
     return false;
 
   // copy the vertices
-  for (i=0; i<Object->GetVertexCount (); i++)
-    tgt->CreateVertex (Object->GetVertex (i));
+  iModelDataVertices *Vertices = Object->GetDefaultVertices ();
+  for (i=0; i<Vertices->GetVertexCount (); i++)
+    tgt->CreateVertex (Vertices->GetVertex (i));
 
   // copy the polygons
   iObjectIterator *it = Object->QueryObject ()->GetIterator ();
@@ -118,9 +119,9 @@ bool csCrossBuilder::BuildThing (iModelData *Data, iThingState *tgt,
     
     // copy texture transformation
     ThingPoly->SetTextureSpace (
-      Object->GetVertex(Polygon->GetVertex(0)), Polygon->GetTextureCoords(0),
-      Object->GetVertex(Polygon->GetVertex(1)), Polygon->GetTextureCoords(1),
-      Object->GetVertex(Polygon->GetVertex(2)), Polygon->GetTextureCoords(2));
+      Vertices->GetVertex(Polygon->GetVertex(0)), Polygon->GetTextureCoords(0),
+      Vertices->GetVertex(Polygon->GetVertex(1)), Polygon->GetTextureCoords(1),
+      Vertices->GetVertex(Polygon->GetVertex(2)), Polygon->GetTextureCoords(2));
 
     it->Next ();
   }

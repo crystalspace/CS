@@ -294,6 +294,10 @@ bool csModelConverter3ds::LoadMeshObjectData( iModelDataObject *pDataObject, Lib
   /***  Load up vertices and texels  ***/
 int numVertices, i;
 
+  // create the default vertex set
+  iModelDataVertices *Vertices = new csModelDataVertices ();
+  pDataObject->SetDefaultVertices (Vertices);
+
   // get the number of vertices in the current mesh
   numVertices = p3dsMesh->points;
 
@@ -310,7 +314,7 @@ csVector3 vertex;
     xyz = pCurPoint->pos;
     vertex = csVector3( xyz[0], xyz[1], xyz[2] );
       /// Add a vertex
-    pDataObject->AddVertex( vertex );
+    Vertices->AddVertex( vertex );
     pCurPoint++;
   }
 

@@ -66,6 +66,12 @@
       SetLength (length + 1, iGrowStep);				\
       memcpy (root + length - 1, &val, sizeof (ga_type));		\
     }									\
+    void Insert (int pos, const ga_type &val, int iGrowStep = 8)	\
+    {									\
+      SetLength (length + 1, iGrowStep);				\
+      memmove (root + pos + 1, root + pos, sizeof (ga_type) * (length - pos - 1)); \
+      memcpy (root + pos, &val, sizeof (ga_type));			\
+    }									\
     Extra								\
   }
 
