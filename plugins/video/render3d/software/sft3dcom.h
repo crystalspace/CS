@@ -182,6 +182,7 @@ public:
   /// DrawPolygonFX flag.
   uint mixmode;
   float morph_factor;
+*/
   /**
   * Vertex buffers. Note that all vertex buffers used here MUST
   * have the same number of vertices.

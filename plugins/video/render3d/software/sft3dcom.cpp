@@ -1543,7 +1543,7 @@ void csSoftwareGraphics3DCommon::DrawPolygonFlat (G3DPolygonDPF& poly)
   if (dbg_current_polygon >= dbg_max_polygons_to_draw-1)
     return;
 
-  iPolygonTexture *tex = 0;
+  //  iPolygonTexture *tex = 0;
   iLightMap *lm = 0;
 /*  if (do_lighting)
   {
@@ -2961,52 +2961,52 @@ void csSoftwareGraphics3DCommon::DrawPolygonFX (G3DPolygonDPFX& poly)
 	  R.fv = 0;
 
         leave = false;
-	R.fy = QRound (poly.vertices [R.fv].y);
+	R.fy = QRound (poly.vertices [(int)R.fv].y);
 	if (sy <= R.fy)
 	  continue;
 
-        float dyR = poly.vertices [R.sv].y - poly.vertices [R.fv].y;
+        float dyR = poly.vertices [(int)R.sv].y - poly.vertices [(int)R.fv].y;
         if (dyR)
         {
           float inv_dyR = 1 / dyR;
-          R.x = QInt16 (poly.vertices [R.sv].x);
+          R.x = QInt16 (poly.vertices [(int)R.sv].x);
           R.dxdy = QInt16 (
-            (poly.vertices [R.fv].x - poly.vertices [R.sv].x) * inv_dyR);
-          R.dzdy = QInt24 ((iz [R.fv] - iz [R.sv]) * inv_dyR);
+            (poly.vertices [(int)R.fv].x - poly.vertices [(int)R.sv].x) * inv_dyR);
+          R.dzdy = QInt24 ((iz [(int)R.fv] - iz [(int)R.sv]) * inv_dyR);
           if (pqinfo.textured)
           {
-            R.dudy = QInt16 ((uu [R.fv] - uu [R.sv]) * inv_dyR);
-            R.dvdy = QInt16 ((vv [R.fv] - vv [R.sv]) * inv_dyR);
+            R.dudy = QInt16 ((uu [(int)R.fv] - uu [(int)R.sv]) * inv_dyR);
+            R.dvdy = QInt16 ((vv [(int)R.fv] - vv [(int)R.sv]) * inv_dyR);
           }
           if (pqinfo.mixmode & CS_FX_GOURAUD)
           {
-            R.drdy = QRound ((rr [R.fv] - rr [R.sv]) * inv_dyR);
-            R.dgdy = QRound ((gg [R.fv] - gg [R.sv]) * inv_dyR);
-            R.dbdy = QRound ((bb [R.fv] - bb [R.sv]) * inv_dyR);
+            R.drdy = QRound ((rr [(int)R.fv] - rr [(int)R.sv]) * inv_dyR);
+            R.dgdy = QRound ((gg [(int)R.fv] - gg [(int)R.sv]) * inv_dyR);
+            R.dbdy = QRound ((bb [(int)R.fv] - bb [(int)R.sv]) * inv_dyR);
           }
 
           // horizontal pixel correction
           float deltaX = (R.dxdy * 1/65536.) *
-            (poly.vertices [R.sv].y - (float (sy) - 0.5));
+            (poly.vertices [(int)R.sv].y - (float (sy) - 0.5));
           R.x += QInt16 (deltaX);
 
           // apply sub-pixel accuracy factor
           float Factor;
-          if (poly.vertices [R.fv].x != poly.vertices [R.sv].x)
-            Factor = deltaX / (poly.vertices [R.fv].x - poly.vertices [R.sv].x);
+          if (poly.vertices [(int)R.fv].x != poly.vertices [(int)R.sv].x)
+            Factor = deltaX / (poly.vertices [(int)R.fv].x - poly.vertices [(int)R.sv].x);
           else
             Factor = 0;
           if (pqinfo.textured)
           {
-            R.u = QInt16 (uu [R.sv] + (uu [R.fv] - uu [R.sv]) * Factor);
-            R.v = QInt16 (vv [R.sv] + (vv [R.fv] - vv [R.sv]) * Factor);
+            R.u = QInt16 (uu [(int)R.sv] + (uu [(int)R.fv] - uu [(int)R.sv]) * Factor);
+            R.v = QInt16 (vv [(int)R.sv] + (vv [(int)R.fv] - vv [(int)R.sv]) * Factor);
           }
-          R.z = QInt24 (iz [R.sv] + (iz [R.fv] - iz [R.sv]) * Factor);
+          R.z = QInt24 (iz [(int)R.sv] + (iz [(int)R.fv] - iz [(int)R.sv]) * Factor);
           if (pqinfo.mixmode & CS_FX_GOURAUD)
           {
-            R.r = QRound (rr [R.sv] + (rr [R.fv] - rr [R.sv]) * Factor);
-            R.g = QRound (gg [R.sv] + (gg [R.fv] - gg [R.sv]) * Factor);
-            R.b = QRound (bb [R.sv] + (bb [R.fv] - bb [R.sv]) * Factor);
+            R.r = QRound (rr [(int)R.sv] + (rr [(int)R.fv] - rr [(int)R.sv]) * Factor);
+            R.g = QRound (gg [(int)R.sv] + (gg [(int)R.fv] - gg [(int)R.sv]) * Factor);
+            R.b = QRound (bb [(int)R.sv] + (bb [(int)R.fv] - bb [(int)R.sv]) * Factor);
           }
         } /* endif */
       } /* endif */
@@ -3019,52 +3019,52 @@ void csSoftwareGraphics3DCommon::DrawPolygonFX (G3DPolygonDPFX& poly)
 	  L.fv = poly.num - 1;
 
         leave = false;
-	L.fy = QRound (poly.vertices [L.fv].y);
+	L.fy = QRound (poly.vertices [(int)L.fv].y);
 	if (sy <= L.fy)
 	  continue;
 
-        float dyL = poly.vertices [L.sv].y - poly.vertices [L.fv].y;
+        float dyL = poly.vertices [(int)L.sv].y - poly.vertices [(int)L.fv].y;
         if (dyL)
         {
           float inv_dyL = 1 / dyL;
-          L.x = QInt16 (poly.vertices [L.sv].x);
+          L.x = QInt16 (poly.vertices [(int)L.sv].x);
           L.dxdy = QInt16 (
-            (poly.vertices [L.fv].x - poly.vertices [L.sv].x) * inv_dyL);
-          L.dzdy = QInt24 ((iz [L.fv] - iz [L.sv]) * inv_dyL);
+            (poly.vertices [(int)L.fv].x - poly.vertices [(int)L.sv].x) * inv_dyL);
+          L.dzdy = QInt24 ((iz [(int)L.fv] - iz [(int)L.sv]) * inv_dyL);
           if (pqinfo.textured)
           {
-            L.dudy = QInt16 ((uu [L.fv] - uu [L.sv]) * inv_dyL);
-            L.dvdy = QInt16 ((vv [L.fv] - vv [L.sv]) * inv_dyL);
+            L.dudy = QInt16 ((uu [(int)L.fv] - uu [(int)L.sv]) * inv_dyL);
+            L.dvdy = QInt16 ((vv [(int)L.fv] - vv [(int)L.sv]) * inv_dyL);
           }
           if (pqinfo.mixmode & CS_FX_GOURAUD)
           {
-            L.drdy = QRound ((rr [L.fv] - rr [L.sv]) * inv_dyL);
-            L.dgdy = QRound ((gg [L.fv] - gg [L.sv]) * inv_dyL);
-            L.dbdy = QRound ((bb [L.fv] - bb [L.sv]) * inv_dyL);
+            L.drdy = QRound ((rr [(int)L.fv] - rr [(int)L.sv]) * inv_dyL);
+            L.dgdy = QRound ((gg [(int)L.fv] - gg [(int)L.sv]) * inv_dyL);
+            L.dbdy = QRound ((bb [(int)L.fv] - bb [(int)L.sv]) * inv_dyL);
           }
 
           // horizontal pixel correction
           float deltaX = (L.dxdy * 1/65536.) *
-            (poly.vertices [L.sv].y - (float (sy) - 0.5));
+            (poly.vertices [(int)L.sv].y - (float (sy) - 0.5));
           L.x += QInt16 (deltaX);
 
           // apply sub-pixel accuracy factor
           float Factor;
-          if (poly.vertices [L.fv].x != poly.vertices [L.sv].x)
-            Factor = deltaX / (poly.vertices [L.fv].x - poly.vertices [L.sv].x);
+          if (poly.vertices [(int)L.fv].x != poly.vertices [(int)L.sv].x)
+            Factor = deltaX / (poly.vertices [(int)L.fv].x - poly.vertices [(int)L.sv].x);
           else
             Factor = 0;
           if (pqinfo.textured)
           {
-            L.u = QInt16 (uu [L.sv] + (uu [L.fv] - uu [L.sv]) * Factor);
-            L.v = QInt16 (vv [L.sv] + (vv [L.fv] - vv [L.sv]) * Factor);
+            L.u = QInt16 (uu [(int)L.sv] + (uu [(int)L.fv] - uu [(int)L.sv]) * Factor);
+            L.v = QInt16 (vv [(int)L.sv] + (vv [(int)L.fv] - vv [(int)L.sv]) * Factor);
           }
-          L.z = QInt24 (iz [L.sv] + (iz [L.fv] - iz [L.sv]) * Factor);
+          L.z = QInt24 (iz [(int)L.sv] + (iz [(int)L.fv] - iz [(int)L.sv]) * Factor);
           if (pqinfo.mixmode & CS_FX_GOURAUD)
           {
-            L.r = QRound (rr [L.sv] + (rr [L.fv] - rr [L.sv]) * Factor);
-            L.g = QRound (gg [L.sv] + (gg [L.fv] - gg [L.sv]) * Factor);
-            L.b = QRound (bb [L.sv] + (bb [L.fv] - bb [L.sv]) * Factor);
+            L.r = QRound (rr [(int)L.sv] + (rr [(int)L.fv] - rr [(int)L.sv]) * Factor);
+            L.g = QRound (gg [(int)L.sv] + (gg [(int)L.fv] - gg [(int)L.sv]) * Factor);
+            L.b = QRound (bb [(int)L.sv] + (bb [(int)L.fv] - bb [(int)L.sv]) * Factor);
           }
         } /* endif */
       } /* endif */
@@ -4197,7 +4197,7 @@ void csSoftwareGraphics3DCommon::DrawMesh (csRenderMesh* mesh)
     return;
   }
 
-  int i;
+  unsigned int i;
 
   if (!z_verts)
   {
@@ -4222,7 +4222,8 @@ void csSoftwareGraphics3DCommon::DrawMesh (csRenderMesh* mesh)
   //SetObjectToCamera (&mesh->object2camera);
   z_buf_mode = CS_ZBUF_USE;
 
-  const int numBuffers = sizeof (activebuffers) / sizeof (iRenderBuffer*);
+  const unsigned int numBuffers =
+    sizeof (activebuffers) / sizeof (iRenderBuffer*);
   void* locks[numBuffers];
   for (i=0; i<numBuffers; ++i)
   {
@@ -4245,7 +4246,7 @@ void csSoftwareGraphics3DCommon::DrawMesh (csRenderMesh* mesh)
   // in the generic implementation. This is a todo...
   
   // Make sure we don't process too many vertices;
-  int num_vertices = 0;
+  unsigned int num_vertices = 0;
   for (i = mesh->indexstart; i<mesh->indexend; ++i)
   {
     if (indices[i]+1>num_vertices)
@@ -4253,7 +4254,7 @@ void csSoftwareGraphics3DCommon::DrawMesh (csRenderMesh* mesh)
   }
 
   // Update work tables.
-  if (num_vertices > tr_verts->Capacity ())
+  if (num_vertices > (unsigned int)tr_verts->Capacity ())
   {
     tr_verts->SetCapacity (num_vertices);
     z_verts->SetCapacity (num_vertices);
