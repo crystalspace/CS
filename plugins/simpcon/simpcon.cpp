@@ -226,6 +226,7 @@ void csSimpleConsole::PutText (int iMode, const char *iText)
   int len;
   char *dst;
   const char *src;
+  char c;
 
   if (iText == 0 || *iText == 0)
     goto Done;
@@ -233,7 +234,7 @@ void csSimpleConsole::PutText (int iMode, const char *iText)
   len = strlen (Line [LineNumber]);
   dst = Line [LineNumber] + len;
   src = iText;
-  for (char c = *src; c != '\0'; c = *++src)
+  for (c = *src; c != '\0'; c = *++src)
   {
     if (ClearInput)
     {
