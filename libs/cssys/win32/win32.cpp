@@ -192,8 +192,12 @@ static inline bool AddToPathEnv (char *dir, char **pathEnv)
   return false;
 }
 
+typedef void (WINAPI * LPFNSETDLLDIRECTORYA)(LPCSTR lpPathName);
+
 bool csPlatformStartup(iObjectRegistry* r)
 {
+  csPluginPaths* pluginpaths = csGetPluginPaths (__argv[0]);
+
   /*
     When it isn't already in the PATH environment,
     the CS directory will be put there in front of all
@@ -202,20 +206,55 @@ bool csPlatformStartup(iObjectRegistry* r)
     which reside in the CS directory can be found by the
     OS even if the application is somewhere else.
    */
+  bool needPATHpatch = true;
 
-  char* pathEnv = csStrNew (getenv("PATH"));
-  bool pathChanged = false;
-
-  csPluginPaths* pluginpaths = csGetPluginPaths (__argv[0]);
-  for (int i = 0; i < pluginpaths->GetCount(); i++)
+  /*
+    WinXP SP 1 has a nice function that does exactly that: setting
+    a number of search paths for DLLs. However, it's WinXP SP 1+,
+    so we have to check if it's available, and if not, patch the PATH
+    env var.
+   */
+  HMODULE hKernel32 = LoadLibrary ("kernel32.dll");
+  if (hKernel32 != 0)
   {
-    // @@@ deal with path recursion here?
-    if (AddToPathEnv ((*pluginpaths)[i].path, &pathEnv)) pathChanged = true;
+    LPFNSETDLLDIRECTORYA SetDllDirectoryA =
+      (LPFNSETDLLDIRECTORYA)GetProcAddress (hKernel32, "SetDllDirectoryA");
+
+    if (SetDllDirectoryA)
+    {
+      csString path;
+
+      for (int i = 0; i < pluginpaths->GetCount(); i++)
+      {
+	if (((*pluginpaths)[i].path != 0) && (*((*pluginpaths)[i].path) != 0))
+	{
+	  path << (*pluginpaths)[i].path;
+	  path << ';';
+	}
+      }
+
+      if (path.Length () > 0) SetDllDirectoryA (path.GetData ());
+      needPATHpatch = false;
+    }
+    FreeLibrary (hKernel32);
   }
+
+  if (needPATHpatch)
+  {
+    char* pathEnv = csStrNew (getenv("PATH"));
+    bool pathChanged = false;
+
+    for (int i = 0; i < pluginpaths->GetCount(); i++)
+    {
+      // @@@ deal with path recursion here?
+      if (AddToPathEnv ((*pluginpaths)[i].path, &pathEnv)) pathChanged = true;
+    }
+    if (pathChanged) SetEnvironmentVariable ("PATH", pathEnv);
+    delete[] pathEnv;
+  }
+
   delete pluginpaths;
 
-  if (pathChanged) SetEnvironmentVariable ("PATH", pathEnv);
-  delete[] pathEnv;
 
   Win32Assistant* a = new Win32Assistant(r);
   bool ok = r->Register (static_cast<iWin32Assistant*>(a), "iWin32Assistant");

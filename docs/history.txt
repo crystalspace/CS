@@ -68,6 +68,13 @@ chronological order.
 	      now. Note 1: The generic RS has been updated, but is still 
 	      rather unoptimized. Note 2: The stencil RS hasn't been updated 
 	      yet.
+	- res removed cssys/general/printf.cpp from the VC libcssys source
+	  file list. Win32 has it's own csPrintf() etc.
+	- res added support for the "SetDllDirectory()" API on Win32. It 
+	  provides pretty much the functionality that the PATH patching 
+	  already, but a bit cleaner. It is only supported by very recent 
+	  Windowses, tho, and if not present, PATH is still patched like 
+	  before.
 29-Aug-2003
 	- renej added support for using CS from Java. SWIG is needed since
 	  no generated files are in the CVS repository. Building is done
