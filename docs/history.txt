@@ -14,6 +14,11 @@ chronological order.
 	- Eric Sunshine eliminated compilation warning in glshader_fvp.cpp.
 	- Eric Sunshine fixed bug in csString::FindLast() prototype where the
 	  incoming pos argument defaulted to 0 but should have defaulted to -1.
+	- Jorrit added iThingFactoryState->SetPolygonVertexIndices() to set
+	  all indices of a polygon at once.
+	- Jorrit did an optimization to thing so that vertex indices are now
+	  stored in a more optimal way. Used csBlockAllocator for this. This
+	  also affects csPolygonRenderData which is used by new renderer.
 	- Eric Sunshine eliminated numerous memory leaks in
 	  libs/cssys/defaultsconfig.mm, the MacOS/X-specific iConfigFile
 	  implementation which utilizes Cocoa's NSUserDefaults for storing

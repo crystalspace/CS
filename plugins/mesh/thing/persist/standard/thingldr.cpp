@@ -25,6 +25,7 @@
 #include "csutil/cscolor.h"
 #include "csutil/csstring.h"
 #include "csutil/scfstr.h"
+#include "csutil/garray.h"
 #include "iutil/vfs.h"
 #include "iutil/document.h"
 #include "iutil/object.h"
@@ -452,6 +453,7 @@ bool csThingLoader::ParsePoly3d (
 
   int set_colldet = 0; // If 1 then set, if -1 then reset, else default.
   int set_viscull = 0; // If 1 then set, if -1 then reset, else default.
+  csDirtyAccessArray<int> vertices_to_add;
 
   // For portals.
   csRef<iDocumentNode> portal_node;
@@ -529,7 +531,8 @@ bool csThingLoader::ParsePoly3d (
         break;
       case XMLTOKEN_V:
         {
-	  int* vts = thing_fact_state->GetPolygonVertexIndices (CS_POLYINDEX_LAST);
+	  int* vts = thing_fact_state->GetPolygonVertexIndices (
+	  	CS_POLYINDEX_LAST);
 	  int vt_idx = child->GetContentsValueAsInt ();
 	  bool ignore = false;
 	  int cnt = thing_fact_state->GetPolygonVertexCount (CS_POLYINDEX_LAST);
@@ -544,7 +547,7 @@ bool csThingLoader::ParsePoly3d (
 	    }
 	  }
 	  if (!ignore)
-	    thing_fact_state->AddPolygonVertex (CS_POLYRANGE_LAST, vt_idx+vt_offset);
+	    vertices_to_add.Push (vt_idx+vt_offset);
         }
         break;
       case XMLTOKEN_SHADING:
@@ -552,7 +555,8 @@ bool csThingLoader::ParsePoly3d (
 	  bool shading;
 	  if (!synldr->ParseBool (child, shading, true))
 	    return false;
-	  thing_fact_state->SetPolygonTextureMappingEnabled (CS_POLYRANGE_LAST, shading);
+	  thing_fact_state->SetPolygonTextureMappingEnabled (CS_POLYRANGE_LAST,
+	  	shading);
 	}
         break;
       case XMLTOKEN_ALPHA:
@@ -572,7 +576,7 @@ bool csThingLoader::ParsePoly3d (
     }
   }
 
-  if (thing_fact_state->GetPolygonVertexCount (CS_POLYINDEX_LAST) < 3)
+  if (vertices_to_add.Length () < 3)
   {
     synldr->ReportError ("crystalspace.thingldr.polygon", node,
       "Polygon '%s' contains just %d vertices!",
@@ -580,6 +584,9 @@ bool csThingLoader::ParsePoly3d (
       thing_fact_state->GetPolygonVertexCount (CS_POLYINDEX_LAST));
     return false;
   }
+
+  thing_fact_state->SetPolygonVertexIndices (CS_POLYRANGE_LAST,
+  	vertices_to_add.Length (), vertices_to_add.GetArray ());
 
   mat = thing_fact_state->GetPolygonMaterial (CS_POLYINDEX_LAST);
   csRef<iMaterialEngine> mateng = SCF_QUERY_INTERFACE (mat->GetMaterial (),

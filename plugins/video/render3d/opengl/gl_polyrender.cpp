@@ -83,7 +83,7 @@ void csGLPolygonRenderer::PrepareBuffers (uint& indexStart, uint& indexEnd)
     {
       csPolygonRenderData* poly = polys[i];
 
-      int pvc = poly->vertices.GetVertexCount ();
+      int pvc = poly->num_vertices;
 
       num_verts += pvc;
       num_indices += (pvc - 2) * 3;
@@ -174,12 +174,11 @@ void csGLPolygonRenderer::PrepareBuffers (uint& indexStart, uint& indexEnd)
 
       // First, fill the normal/texel/vertex buffers.
       csVector3* obj_verts = *(static_data->p_obj_verts);
-      int j, vc = static_data->vertices.GetVertexCount();
+      int j, vc = static_data->num_vertices;
       for (j = 0; j < vc; j++)
       {
 	//int vidx = *poly_indices++;
-        const csVector3& vertex = obj_verts[
-		static_data->vertices.GetVertex (j)];
+        const csVector3& vertex = obj_verts[static_data->vertices[j]];
         *vertices++ = vertex;
 /*	*vertices++ = obj_verts[vidx];
 	@@@ FIXME

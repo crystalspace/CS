@@ -188,9 +188,20 @@ public:
   void Reset ();
 
   /**
+   * Set the number of vertices. This will properly reallocate the vertices
+   * table into the right block allocator.
+   */
+  void SetNumVertices (int count);
+
+  /**
    * Add a vertex from the container (polygonset) to the polygon.
    */
   int AddVertex (int v);
+
+  /**
+   * Set a vertex from the container (polygonset) to the polygon.
+   */
+  void SetVertex (int idx, int v);
 
   /**
    * Add a vertex to the polygon (and containing thing).
@@ -200,6 +211,11 @@ public:
    * efficiency.
    */
   int AddVertex (const csVector3& v);
+
+  /**
+   * Set a vertex to the polygon (and containing thing).
+   */
+  void SetVertex (int idx, const csVector3& v);
 
   /**
    * Add a vertex to the polygon (and containing thing).
@@ -274,19 +290,14 @@ public:
   }
 
   /**
-   * Get the vertices.
-   */
-  csPolyIndexed& GetVertices () { return polygon_data.vertices; }
-
-  /**
    * Get number of vertices.
    */
-  int GetVertexCount () { return polygon_data.vertices.GetVertexCount (); }
+  int GetVertexCount () { return polygon_data.num_vertices; }
 
   /**
    * Get vertex index table.
    */
-  int* GetVertexIndices () { return polygon_data.vertices.GetVertexIndices (); }
+  int* GetVertexIndices () { return polygon_data.vertices; }
 
   /**
    * 'idx' is a local index into the vertices table of the polygon.
@@ -294,7 +305,7 @@ public:
    * a reference to the vertex in object-space is returned.
    */
   const csVector3& Vobj (int idx) const
-  { return thing_static->Vobj (polygon_data.vertices.GetVertexIndices ()[idx]); }
+  { return thing_static->Vobj (polygon_data.vertices[idx]); }
 
   /**
    * Set the material for this polygon.
@@ -488,7 +499,7 @@ public:
   iMaterialHandle *GetMaterialHandle ();
 
   /// Make a clone of this static polygon.
-  csPolygon3DStatic* Clone ();
+  csPolygon3DStatic* Clone (csThingStatic* new_parent);
 };
 
 /**
@@ -632,7 +643,7 @@ public:
   const csVector3& Vwor (int idx) const
   {
     return thing->Vwor (
-    	static_data->polygon_data.vertices.GetVertexIndices ()[idx]);
+    	static_data->polygon_data.vertices[idx]);
   }
 
   /**

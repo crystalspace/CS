@@ -4098,7 +4098,7 @@ void csSoftwareGraphics3DCommon::DrawPolysMesh (csRenderMesh* mesh)
     const csReversibleTransform& object2camera = mesh->object2camera;
     csPolygonRenderData* spoly = polyRender->polys[i];
 
-    int numVerts = spoly->vertices.GetVertexCount ();
+    int numVerts = spoly->num_vertices;
     CS_ALLOC_STACK_ARRAY(csVector3, camVerts, numVerts);
 
     int v;
@@ -4106,8 +4106,7 @@ void csSoftwareGraphics3DCommon::DrawPolysMesh (csRenderMesh* mesh)
     csVector3* obj_verts = *(spoly->p_obj_verts);
     for (v = 0; v < numVerts; v++)
     {
-      camVerts[v] = object2camera.Other2This (obj_verts[
-      	spoly->vertices.GetVertex (v)]);
+      camVerts[v] = object2camera.Other2This (obj_verts[spoly->vertices[v]]);
       if (camVerts[v].z >= 0)
       {
 	cnt_vis++;

@@ -710,9 +710,8 @@ void csThingStatic::CompressVertices ()
   for (i = 0; i < static_polygons.Length (); i++)
   {
     csPolygon3DStatic *p = static_polygons.Get (i);
-    csPolyIndexed &pi = p->GetVertices ();
-    int *idx = pi.GetVertexIndices ();
-    for (j = 0; j < pi.GetVertexCount (); j++) idx[j] = vt[idx[j]].new_idx;
+    int *idx = p->GetVertexIndices ();
+    for (j = 0; j < p->GetVertexCount (); j++) idx[j] = vt[idx[j]].new_idx;
   }
 
   delete[] vt;
@@ -732,9 +731,8 @@ void csThingStatic::RemoveUnusedVertices ()
   for (i = 0; i < static_polygons.Length (); i++)
   {
     csPolygon3DStatic *p = static_polygons.Get (i);
-    csPolyIndexed &pi = p->GetVertices ();
-    int *idx = pi.GetVertexIndices ();
-    for (j = 0; j < pi.GetVertexCount (); j++) used[idx[j]] = true;
+    int *idx = p->GetVertexIndices ();
+    for (j = 0; j < p->GetVertexCount (); j++) used[idx[j]] = true;
   }
 
   // Count relevant values.
@@ -777,9 +775,8 @@ void csThingStatic::RemoveUnusedVertices ()
   for (i = 0; i < static_polygons.Length (); i++)
   {
     csPolygon3DStatic *p = static_polygons.Get (i);
-    csPolyIndexed &pi = p->GetVertices ();
-    int *idx = pi.GetVertexIndices ();
-    for (j = 0; j < pi.GetVertexCount (); j++) idx[j] = relocate[idx[j]];
+    int *idx = p->GetVertexIndices ();
+    for (j = 0; j < p->GetVertexCount (); j++) idx[j] = relocate[idx[j]];
   }
 
   delete[] relocate;
@@ -926,8 +923,7 @@ csPtr<csThingStatic> csThingStatic::Clone ()
   int i;
   for (i = 0 ; i < static_polygons.Length () ; i++)
   {
-    csPolygon3DStatic* p = static_polygons.Get (i)->Clone ();
-    p->SetParent (clone);
+    csPolygon3DStatic* p = static_polygons.Get (i)->Clone (clone);
     clone->static_polygons.Push (p);
   }
 
@@ -1254,9 +1250,10 @@ int csThingStatic::AddTriangle (const csVector3& v1, const csVector3& v2,
 {
   int idx = AddEmptyPolygon ();
   csPolygon3DStatic* sp = static_polygons[idx];
-  sp->AddVertex (v1);
-  sp->AddVertex (v2);
-  sp->AddVertex (v3);
+  sp->SetNumVertices (3);
+  sp->SetVertex (0, v1);
+  sp->SetVertex (1, v2);
+  sp->SetVertex (2, v3);
   last_range.Set (idx);
   sp->SetTextureSpace (v1, v2, 1);
   return idx;
@@ -1267,10 +1264,11 @@ int csThingStatic::AddQuad (const csVector3& v1, const csVector3& v2,
 {
   int idx = AddEmptyPolygon ();
   csPolygon3DStatic* sp = static_polygons[idx];
-  sp->AddVertex (v1);
-  sp->AddVertex (v2);
-  sp->AddVertex (v3);
-  sp->AddVertex (v4);
+  sp->SetNumVertices (4);
+  sp->SetVertex (0, v1);
+  sp->SetVertex (1, v2);
+  sp->SetVertex (2, v3);
+  sp->SetVertex (3, v4);
   last_range.Set (idx);
   sp->SetTextureSpace (v1, v2, 1);
   return idx;
@@ -1280,10 +1278,11 @@ int csThingStatic::AddPolygon (csVector3* vertices, int num)
 {
   int idx = AddEmptyPolygon ();
   csPolygon3DStatic* sp = static_polygons[idx];
+  sp->SetNumVertices (num);
   int i;
   for (i = 0 ; i < num ; i++)
   {
-    sp->AddVertex (vertices[i]);
+    sp->SetVertex (i, vertices[i]);
   }
   last_range.Set (idx);
   sp->SetTextureSpace (vertices[0], vertices[1], 1);
@@ -1294,13 +1293,14 @@ int csThingStatic::AddPolygon (int num, ...)
 {
   int idx = AddEmptyPolygon ();
   csPolygon3DStatic* sp = static_polygons[idx];
+  sp->SetNumVertices (num);
   va_list arg;
   va_start (arg, num);
   int i;
   for (i = 0 ; i < num ; i++)
   {
     int v = va_arg (arg, int);
-    sp->AddVertex (v);
+    sp->SetVertex (i, v);
   }
   va_end (arg);
   last_range.Set (idx);
@@ -1438,12 +1438,28 @@ void csThingStatic::AddPolygonVertex (const csPolygonRange& range, int vt)
     static_polygons[i]->AddVertex (vt);
 }
 
+void csThingStatic::SetPolygonVertexIndices (const csPolygonRange& range,
+  	int num, int* indices)
+{
+  int i, start, end;
+  int j;
+  GetRealRange (range, start, end);
+  for (i = start ; i <= end ; i++)
+  {
+    csPolygon3DStatic* sp = static_polygons[i];
+    sp->SetNumVertices (num);
+    for (j = 0 ; j < num ; j++)
+      sp->SetVertex (j, indices[j]);
+  }
+}
+
 int csThingStatic::GetPolygonVertexCount (int polygon_idx)
 {
   return static_polygons[GetRealIndex (polygon_idx)]->GetVertexCount ();
 }
 
-const csVector3& csThingStatic::GetPolygonVertex (int polygon_idx, int vertex_idx)
+const csVector3& csThingStatic::GetPolygonVertex (int polygon_idx,
+	int vertex_idx)
 {
   return static_polygons[GetRealIndex (polygon_idx)]->Vobj (vertex_idx);
 }
@@ -2140,7 +2156,7 @@ void csThing::PreparePolygonBuffer ()
       int v;
       for (v = 0; v < spoly->GetVertexCount (); v++)
       {
-	const int vnum = spoly->GetVertices ().GetVertex (v);
+	const int vnum = spoly->GetVertexIndices ()[v];
 	verts.Push (vnum);
       }
 
@@ -2170,7 +2186,7 @@ void csThing::PreparePolygonBuffer ()
       int v;
       for (v = 0; v < spoly->GetVertexCount (); v++)
       {
-	const int vnum = spoly->GetVertices ().GetVertex (v);
+	const int vnum = spoly->GetVertexIndices ()[v];
 	verts.Push (vnum);
       }
 
@@ -2296,9 +2312,9 @@ void csThing::AppendShadows (
     frust = list->AddShadow (
         origin,
         (void *)p,
-        sp->GetVertices ().GetVertexCount (),
+        sp->GetVertexCount (),
         pl);
-    for (j = 0; j < sp->GetVertices ().GetVertexCount (); j++)
+    for (j = 0; j < sp->GetVertexCount (); j++)
       frust->GetVertex (j).Set (p->Vwor (j) - origin);
   }
 }
@@ -2695,8 +2711,8 @@ void csThing::Merge (csThing *other)
   {
     //csPolygon3D *p = other->GetPolygon3D (i);
     csPolygon3DStatic *sp = other->static_data->GetPolygon3DStatic (i);
-    int *idx = sp->GetVertices ().GetVertexIndices ();
-    for (j = 0; j < sp->GetVertices ().GetVertexCount (); j++)
+    int *idx = sp->GetVertexIndices ();
+    for (j = 0; j < sp->GetVertexCount (); j++)
       idx[j] = merge_vertices[idx[j]];
     static_data->AddPolygon (sp);
     other->polygons[i] = 0;
@@ -2929,7 +2945,9 @@ csThingObjectType::csThingObjectType (iBase *pParent) :
 	blk_lightmapmapping (2000),
 	blk_texturemapping (2000),
 	blk_polytex (2000),
-	blk_lightmap (2000)
+	blk_lightmap (2000),
+	blk_polidx3 (1000),
+	blk_polidx4 (2000)
 {
   SCF_CONSTRUCT_IBASE (pParent);
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiComponent);
@@ -2938,11 +2956,19 @@ csThingObjectType::csThingObjectType (iBase *pParent) :
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiDebugHelper);
   lightpatch_pool = 0;
   do_verbose = false;
+  blk_polidx5 = 0;
+  blk_polidx6 = 0;
+  blk_polidx20 = 0;
+  blk_polidx60 = 0;
 }
 
 csThingObjectType::~csThingObjectType ()
 {
   delete lightpatch_pool;
+  delete blk_polidx5;
+  delete blk_polidx6;
+  delete blk_polidx20;
+  delete blk_polidx60;
 }
 
 bool csThingObjectType::Initialize (iObjectRegistry *object_reg)

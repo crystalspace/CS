@@ -63,7 +63,7 @@ static engine3d_VectorArray *VectorArray = 0;
 
 //---------------------------------------------------------------------------
 
-csPolygon3DStatic::csPolygon3DStatic () : polygon_data (4)
+csPolygon3DStatic::csPolygon3DStatic ()
 {
   VectorArray = GetStaticVectorArray();
   thing_static = 0;
@@ -74,6 +74,8 @@ csPolygon3DStatic::csPolygon3DStatic () : polygon_data (4)
 
   mapping = 0;
   polygon_data.tmapping = 0;
+  polygon_data.num_vertices = 0;
+  polygon_data.vertices = 0;
 
   flags.SetAll (CS_POLY_LIGHTING | CS_POLY_COLLDET | CS_POLY_VISCULL);
 
@@ -90,17 +92,95 @@ csPolygon3DStatic::~csPolygon3DStatic ()
   VectorArray->DecRef ();
 }
 
-csPolygon3DStatic* csPolygon3DStatic::Clone ()
+void csPolygon3DStatic::SetNumVertices (int count)
 {
-  csPolygon3DStatic* clone = thing_static->thing_type
-    ->blk_polygon3dstatic.Alloc ();
+  int old_count = polygon_data.num_vertices;
+  if (old_count == count) return;
+
+  int* old_data = polygon_data.vertices;
+  polygon_data.num_vertices = count;
+  csThingObjectType* t = thing_static->thing_type;
+  switch (count)
+  {
+    case 0:
+      polygon_data.vertices = 0;
+      break;
+    case 1:
+    case 2:
+    case 3:
+      if (old_count < 1 || old_count > 3)
+        polygon_data.vertices = t->blk_polidx3.Alloc ()->ar;
+      polygon_data.vertices = t->blk_polidx3.Alloc ()->ar;
+      break;
+    case 4:
+      polygon_data.vertices = t->blk_polidx4.Alloc ()->ar;
+      break;
+    case 5:
+      if (!t->blk_polidx5)
+        t->blk_polidx5 = new csBlockAllocator<intar5> (500);
+      polygon_data.vertices = t->blk_polidx5->Alloc ()->ar;
+      break;
+    case 6:
+      if (!t->blk_polidx6)
+        t->blk_polidx6 = new csBlockAllocator<intar6> (500);
+      polygon_data.vertices = t->blk_polidx6->Alloc ()->ar;
+      break;
+    default:
+      if (count <= 20)
+      {
+        if (!t->blk_polidx20)
+          t->blk_polidx20 = new csBlockAllocator<intar20> (300);
+        polygon_data.vertices = t->blk_polidx20->Alloc ()->ar;
+      }
+      else
+      {
+        if (!t->blk_polidx60)
+          t->blk_polidx60 = new csBlockAllocator<intar60> (300);
+        polygon_data.vertices = t->blk_polidx60->Alloc ()->ar;
+      }
+      break;
+  }
+
+  if (old_data)
+  {
+    int minsize = MIN (count, old_count);
+    memcpy (polygon_data.vertices, old_data, sizeof (int) * minsize);
+    switch (old_count)
+    {
+      case 1:
+      case 2:
+      case 3:
+        if (count < 1 || count > 3)
+          t->blk_polidx3.Free ((intar3*)old_data);
+	break;
+      case 4: t->blk_polidx4.Free ((intar4*)old_data); break;
+      case 5: t->blk_polidx5->Free ((intar5*)old_data); break;
+      case 6: t->blk_polidx6->Free ((intar6*)old_data); break;
+      default:
+        if (old_count <= 20)
+          t->blk_polidx20->Free ((intar20*)old_data);
+	else
+          t->blk_polidx60->Free ((intar60*)old_data);
+	break;
+    }
+  }
+}
+
+csPolygon3DStatic* csPolygon3DStatic::Clone (csThingStatic* new_parent)
+{
+  csThingObjectType* t = thing_static->thing_type;
+  csPolygon3DStatic* clone = t->blk_polygon3dstatic.Alloc ();
+  clone->SetParent (new_parent);
   clone->SetMaterial (material);
   clone->SetName (name);
-  clone->polygon_data.vertices = polygon_data.vertices;
+  clone->SetNumVertices (polygon_data.num_vertices);
+  memcpy (clone->polygon_data.vertices, polygon_data.vertices,
+  	sizeof (int) * polygon_data.num_vertices);
+
   clone->polygon_data.plane_obj = polygon_data.plane_obj;
   if (mapping)
   {
-    clone->mapping = thing_static->thing_type->blk_lightmapmapping.Alloc ();
+    clone->mapping = t->blk_lightmapmapping.Alloc ();
     clone->mapping->w = mapping->w;
     clone->mapping->h = mapping->h;
     clone->mapping->w_orig = mapping->w_orig;
@@ -111,8 +191,7 @@ csPolygon3DStatic* csPolygon3DStatic::Clone ()
   }
   if (polygon_data.tmapping)
   {
-    clone->polygon_data.tmapping = thing_static->thing_type
-    	->blk_texturemapping.Alloc ();
+    clone->polygon_data.tmapping = t->blk_texturemapping.Alloc ();
     clone->polygon_data.tmapping->m_obj2tex = polygon_data.tmapping->m_obj2tex;
     clone->polygon_data.tmapping->v_obj2tex = polygon_data.tmapping->v_obj2tex;
     clone->polygon_data.tmapping->fdu = polygon_data.tmapping->fdu;
@@ -275,7 +354,7 @@ void csPolygon3DStatic::EnableTextureMapping (bool enable)
 
 void csPolygon3DStatic::Reset ()
 {
-  polygon_data.vertices.MakeEmpty ();
+  SetNumVertices (0);
 }
 
 bool csPolygon3DStatic::Overlaps (csPolygon3DStatic *overlapped)
@@ -293,12 +372,12 @@ bool csPolygon3DStatic::Overlaps (csPolygon3DStatic *overlapped)
   csPlane3 &this_plane = polygon_data.plane_obj;
   csPlane3 &test_plane = totest->polygon_data.plane_obj;
   int i;
-  for (i = 0; i < totest->polygon_data.vertices.GetVertexCount (); i++)
+  for (i = 0; i < totest->polygon_data.num_vertices; i++)
   {
     if (this_plane.Classify (totest->Vobj (i)) >= SMALL_EPSILON)
     {
       int j;
-      for (j = 0; j < polygon_data.vertices.GetVertexCount (); j++)
+      for (j = 0; j < polygon_data.num_vertices; j++)
       {
         if (test_plane.Classify (Vobj (j)) <= SMALL_EPSILON)
         {
@@ -338,7 +417,7 @@ int csPolygon3DStatic::Classify (const csPlane3 &pl)
   int i;
   int front = 0, back = 0;
 
-  for (i = 0; i < GetVertices ().GetVertexCount (); i++)
+  for (i = 0; i < polygon_data.num_vertices; i++)
   {
     float dot = pl.Classify (Vobj (i));
     if (ABS (dot) < EPSILON) dot = 0;
@@ -358,7 +437,7 @@ int csPolygon3DStatic::ClassifyX (float x)
   int i;
   int front = 0, back = 0;
 
-  for (i = 0; i < GetVertices ().GetVertexCount (); i++)
+  for (i = 0; i < polygon_data.num_vertices; i++)
   {
     float xx = Vobj (i).x - x;
     if (xx < -EPSILON)
@@ -378,7 +457,7 @@ int csPolygon3DStatic::ClassifyY (float y)
   int i;
   int front = 0, back = 0;
 
-  for (i = 0; i < GetVertices ().GetVertexCount (); i++)
+  for (i = 0; i < polygon_data.num_vertices; i++)
   {
     float yy = Vobj (i).y - y;
     if (yy < -EPSILON)
@@ -398,7 +477,7 @@ int csPolygon3DStatic::ClassifyZ (float z)
   int i;
   int front = 0, back = 0;
 
-  for (i = 0; i < GetVertices ().GetVertexCount (); i++)
+  for (i = 0; i < polygon_data.num_vertices; i++)
   {
     float zz = Vobj (i).z - z;
     if (zz < -EPSILON)
@@ -453,7 +532,7 @@ bool csPolygon3DStatic::CreateBoundingTextureBox ()
 
   int i;
   csVector3 v1, v2;
-  for (i = 0; i < GetVertices ().GetVertexCount (); i++)
+  for (i = 0; i < polygon_data.num_vertices; i++)
   {
     v1 = Vobj (i);                  // Coordinates of vertex in object space.
     v1 -= polygon_data.tmapping->v_obj2tex;
@@ -551,7 +630,7 @@ float csPolygon3DStatic::GetArea ()
 
   // triangulize the polygon, triangles are (0,1,2), (0,2,3), (0,3,4), etc..
   int i;
-  for (i = 0; i < polygon_data.vertices.GetVertexCount () - 2; i++)
+  for (i = 0; i < polygon_data.num_vertices - 2; i++)
     area += ABS (csMath3::Area3 (Vobj (0), Vobj (i + 1), Vobj (i + 2)));
   return area / 2.0f;
 }
@@ -708,6 +787,12 @@ void csPolygon3DStatic::SetTextureSpace (
     len2);
 }
 
+void csPolygon3DStatic::SetVertex (int idx, int v)
+{
+  plane_obj_need_update = true;
+  polygon_data.vertices[idx] = v;
+}
+
 int csPolygon3DStatic::AddVertex (int v)
 {
   plane_obj_need_update = true;
@@ -727,8 +812,9 @@ int csPolygon3DStatic::AddVertex (int v)
     return 0;
   }
 
-  polygon_data.vertices.AddVertex (v);
-  return polygon_data.vertices.GetVertexCount () - 1;
+  SetNumVertices (polygon_data.num_vertices+1);
+  polygon_data.vertices[polygon_data.num_vertices-1] = v;
+  return polygon_data.num_vertices - 1;
 }
 
 int csPolygon3DStatic::AddVertex (const csVector3 &v)
@@ -736,6 +822,12 @@ int csPolygon3DStatic::AddVertex (const csVector3 &v)
   int i = thing_static->AddVertex (v);
   AddVertex (i);
   return i;
+}
+
+void csPolygon3DStatic::SetVertex (int idx, const csVector3 &v)
+{
+  int i = thing_static->AddVertex (v);
+  SetVertex (idx, i);
 }
 
 int csPolygon3DStatic::AddVertex (float x, float y, float z)
@@ -753,8 +845,8 @@ void csPolygon3DStatic::PlaneNormal (float *yz, float *zx, float *xy)
   int i, i1;
   float x1, y1, z1, x, y, z;
 
-  i1 = GetVertices ().GetVertexCount () - 1;
-  for (i = 0; i < GetVertices ().GetVertexCount (); i++)
+  i1 = polygon_data.num_vertices - 1;
+  for (i = 0; i < polygon_data.num_vertices; i++)
   {
     x = Vobj (i).x;
     y = Vobj (i).y;
@@ -790,8 +882,8 @@ bool csPolygon3DStatic::PointOnPolygon (const csVector3 &v)
   // Check if 'v' is on the same side of all edges.
   int i, i1;
   bool neg = false, pos = false;
-  i1 = GetVertices ().GetVertexCount () - 1;
-  for (i = 0; i < GetVertices ().GetVertexCount (); i++)
+  i1 = polygon_data.num_vertices - 1;
+  for (i = 0; i < polygon_data.num_vertices; i++)
   {
     float ar = csMath3::Area3 (v, Vobj (i1), Vobj (i));
     if (ar < 0)
@@ -829,8 +921,8 @@ bool csPolygon3DStatic::IntersectRay (const csVector3 &start,
   relend -= start;
 
   int i, i1;
-  i1 = GetVertices ().GetVertexCount () - 1;
-  for (i = 0; i < GetVertices ().GetVertexCount (); i++)
+  i1 = polygon_data.num_vertices - 1;
+  for (i = 0; i < polygon_data.num_vertices; i++)
   {
     csMath3::CalcNormal (normal, start, Vobj (i1), Vobj (i));
     if ((relend * normal) > 0) return false;
@@ -869,8 +961,8 @@ bool csPolygon3DStatic::IntersectRayNoBackFace (
   relend -= start;
 
   int i, i1;
-  i1 = GetVertices ().GetVertexCount () - 1;
-  for (i = 0; i < GetVertices ().GetVertexCount (); i++)
+  i1 = polygon_data.num_vertices - 1;
+  for (i = 0; i < polygon_data.num_vertices; i++)
   {
     csMath3::CalcNormal (normal, start, Vobj (i1), Vobj (i));
     if (dot1 > 0)
@@ -1372,7 +1464,7 @@ void csPolygon3D::CalculateLightingDynamic (iFrustumView *lview,
 
   bool fill_lightmap = true;
 
-  num_vertices = static_data->GetVertices ().GetVertexCount ();
+  num_vertices = static_data->polygon_data.num_vertices;
   if (num_vertices > VectorArray->Length ())
     VectorArray->SetLength (num_vertices);
   poly = VectorArray->GetArray ();

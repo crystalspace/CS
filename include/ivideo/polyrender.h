@@ -31,7 +31,6 @@
 #include "csgeom/plane3.h"
 #include "csgeom/matrix3.h"
 #include "csgeom/vector3.h"
-#include "csgeom/polyidx.h"
 
 struct iRenderBufferSource;
 
@@ -45,18 +44,14 @@ struct csPolygonRenderData
   csPlane3 plane_obj;
   /// Texture mapping information.
   csPolyTextureMapping* tmapping;
-  /**
-   * Number of vertices in this polygon.
-   * Warning! This structure should be considered read-only for the
-   * renderer!
-   */
-  csPolyIndexed vertices;
+  /// Number of vertices in this polygon.
+  int num_vertices;
+  /// Pointer to vertex indices.
+  int* vertices;
   /**
    * Double pointer to the array of vertices in object space.
    */
   csVector3** p_obj_verts;
-
-  csPolygonRenderData (int start_size) : vertices (start_size) { }
 };
 
 

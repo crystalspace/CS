@@ -463,6 +463,8 @@ public:
   virtual void AddPolygonVertex (const csPolygonRange& range,
   	const csVector3& vt);
   virtual void AddPolygonVertex (const csPolygonRange& range, int vt);
+  virtual void SetPolygonVertexIndices (const csPolygonRange& range,
+  	int num, int* indices);
   virtual int GetPolygonVertexCount (int polygon_idx);
   virtual const csVector3& GetPolygonVertex (int polygon_idx, int vertex_idx);
   virtual int* GetPolygonVertexIndices (int polygon_idx);
@@ -1146,6 +1148,14 @@ public:
   friend struct MeshObject;
 };
 
+struct intar2 { int ar[2]; };
+struct intar3 { int ar[3]; };
+struct intar4 { int ar[4]; };
+struct intar5 { int ar[5]; };
+struct intar6 { int ar[6]; };
+struct intar20 { int ar[20]; };
+struct intar60 { int ar[60]; };
+
 /**
  * Thing type. This is the plugin you have to use to create instances
  * of csThing.
@@ -1173,6 +1183,12 @@ public:
   csBlockAllocator<csPolyTextureMapping> blk_texturemapping;
   csBlockAllocator<csPolyTexture> blk_polytex;
   csBlockAllocator<csLightMap> blk_lightmap;
+  csBlockAllocator<intar3> blk_polidx3;
+  csBlockAllocator<intar4> blk_polidx4;
+  csBlockAllocator<intar5>* blk_polidx5;
+  csBlockAllocator<intar6>* blk_polidx6;
+  csBlockAllocator<intar20>* blk_polidx20;
+  csBlockAllocator<intar60>* blk_polidx60;
 
   int maxLightmapW, maxLightmapH;
 public:

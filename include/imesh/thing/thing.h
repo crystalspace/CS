@@ -341,6 +341,16 @@ struct iThingFactoryState : public iBase
   virtual void AddPolygonVertex (const csPolygonRange& range, int vt) = 0;
 
   /**
+   * Set the given polygon index table for all polygons in the given range.
+   * It is more optimal to call this routine as opposed to calling
+   * AddPolygonVertex() all the time.
+   * \param range is one of the #CS_POLYRANGE defines to specify a polygon
+   * range.
+   */
+  virtual void SetPolygonVertexIndices (const csPolygonRange& range,
+  	int num, int* indices) = 0;
+
+  /**
    * Get number of vertices for polygon.
    * \param polygon_idx is a polygon index or #CS_POLYINDEX_LAST for last
    * created polygon.
@@ -352,7 +362,8 @@ struct iThingFactoryState : public iBase
    * \param polygon_idx is a polygon index or #CS_POLYINDEX_LAST for last
    * created polygon.
    */
-  virtual const csVector3& GetPolygonVertex (int polygon_idx, int vertex_idx) = 0;
+  virtual const csVector3& GetPolygonVertex (int polygon_idx,
+  	int vertex_idx) = 0;
 
   /**
    * Get table with vertex indices from polygon.
@@ -488,7 +499,8 @@ struct iThingFactoryState : public iBase
    * \param range is one of the #CS_POLYRANGE defines to specify a polygon
    * range.
    */
-  virtual void ResetPolygonFlags (const csPolygonRange& range, uint32 flags) = 0;
+  virtual void ResetPolygonFlags (const csPolygonRange& range,
+  	uint32 flags) = 0;
 
   /**
    * Get the flags of the specified polygon.
