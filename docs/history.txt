@@ -33,6 +33,8 @@ The history order has been reversed so that new features are at the top.
 	  CFLAGS.DDG was not being employed in all cases.
 	- Eric Sunshine fixed a potential #include problem in pol2d.h which was
 	  reported by Navdeep S. Tinna <nst7@cs.columbia.edu>.
+	- Eric Sunshine added `autoexec.cfg' to CFG.WALKTEST in walktest.mak.
+	  This ensures that it will get installed with `make install'.
 6-Mar-2001
 	- Changed the following functions to work in object space instead
 	  of world space:
