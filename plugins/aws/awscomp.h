@@ -106,7 +106,7 @@ public:
      * it will assume control of the child and not IncRef.  The difference is that, if owner is false the
      * child component will NOT be destroyed on destruction of this component, or on call of RemoveChild().
      */
-    virtual void AddChild(awsComponent *child, bool owner=true);
+    virtual void AddChild(awsComponent*, bool owner);
 
     /** Removes a child from this component.  Important!! The child will be destroyed automatically if owner
      *  was true when you called AddChild().
