@@ -1,5 +1,5 @@
 #ifndef __AWS_COMPONENT_H__
-# define __AWS_COMPONENT_H__
+#define __AWS_COMPONENT_H__
 
 /**************************************************************************
     Copyright (C) 2000-2001 by Christopher Nelson
@@ -235,9 +235,16 @@ public:
 
 
   /** 
-      *  Uses the current layout to update the location/size of all children
-      */
+   *  Uses the current layout to update the location/size of all children
+   */
   virtual void LayoutChildren ();
+
+  /** 
+   *  Adds a component to the layout, mostly used for custom components or
+   * programmatic component creation.
+   */
+  virtual void AddToLayout(iAwsComponent* cmp,awsComponentNode* settings);
+
 
   /// Returns the redraw tag
   unsigned int RedrawTag();

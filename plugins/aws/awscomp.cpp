@@ -585,6 +585,12 @@ void awsComponent::LayoutChildren ()
   if (Layout ()) Layout ()->LayoutComponents ();
 }
 
+void awsComponent::AddToLayout(iAwsComponent* cmp,awsComponentNode* settings)
+{
+   if (Layout())
+     Layout()->AddComponent(cmp, settings);
+}
+
 iAwsComponent* awsComponent::Window()
 {
 	iAwsComponent* cur = this;
