@@ -19,8 +19,10 @@
 #include <freetype.h>
 
 #include "cssysdef.h"
-#include "csutil/inifile.h"
 #include "csutil/csstrvec.h"
+#include "csutil/csstring.h"
+#include "icfgnew.h"
+#include "ivfs.h"
 #include "freefont.h"
 
 IMPLEMENT_FACTORY (csFreeTypeServer)
@@ -38,14 +40,14 @@ IMPLEMENT_IBASE_END
 csFreeTypeServer::csFreeTypeServer (iBase *pParent)
 {
   CONSTRUCT_IBASE (pParent);
-  ftini = NULL;
+  ftconfig = NULL;
   VFS = NULL;
 }
 
 csFreeTypeServer::~csFreeTypeServer ()
 {
   if (VFS) VFS->DecRef ();
-  if (ftini) ftini->DecRef ();
+  if (ftconfig) ftconfig->DecRef ();
   if (System) System->DecRef ();
 }
 
@@ -61,19 +63,21 @@ bool csFreeTypeServer::Initialize (iSystem *Sys)
   }
 
   VFS = QUERY_PLUGIN_ID (System, CS_FUNCID_VFS, iVFS);
-  ftini = System->CreateConfig ("config/freetype.cfg");
-  if (ftini)
+  ftconfig = System->CreateConfigNew ("config/freetype.cfg");
+  if (ftconfig)
   {
-    defaultSize = ftini->GetInt ("Default", "size", 10);
-    platformID = ftini->GetInt ("Default", "platformid", 3);
-    encodingID = ftini->GetInt ("Default", "encodingid", 1);
+    defaultSize = ftconfig->GetInt ("Freetype.Settings.Size", 10);
+    platformID = ftconfig->GetInt ("Freetype.Settings.PlatformID", 3);
+    encodingID = ftconfig->GetInt ("Freetype.Settings.EncodingID", 1);
 
-    fontset = ftini->GetStr ("Default", "fontset", NULL);
+    fontset = ftconfig->GetStr ("Freetype.Settings.FontSet", NULL);
 
-    iConfigDataIterator *fontenum = ftini->EnumData (fontset);
+    csString s;
+    s << fontset << '.';
+    iConfigIterator *fontenum = ftconfig->Enumerate (s);
     while (fontenum->Next ())
-      if (fontenum->GetKey () [0] == '*')
-        LoadFont (fontenum->GetKey ());
+      if (fontenum->GetKey (true) [0] == '*')
+        LoadFont (fontenum->GetKey (true));
     fontenum->DecRef ();
   }
   else
@@ -90,9 +94,11 @@ bool csFreeTypeServer::Initialize (iSystem *Sys)
 iFont *csFreeTypeServer::LoadFont (const char *filename)
 {
   // First of all look for an alias in config file
-  if (ftini && fontset)
+  if (ftconfig && fontset)
   {
-    const char *s = ftini->GetStr (fontset, filename, NULL);
+    csString Keyname;
+    Keyname << fontset << '.' << filename;
+    const char *s = ftconfig->GetStr (Keyname, NULL);
     if (s) filename = s;
   }
   // Okay, now convert the VFS path into a real path

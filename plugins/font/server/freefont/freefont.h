@@ -190,7 +190,7 @@ public:
   TT_UShort platformID, encodingID;
   int defaultSize;
   iSystem *System;
-  iConfigFile *ftini;
+  iConfigFileNew *ftconfig;
   iVFS *VFS;
   const char *fontset;
 
