@@ -29,38 +29,14 @@ endif # ifeq ($(MAKESECTION),roottargets)
 #------------------------------------------------------------- postdefines ---#
 ifeq ($(MAKESECTION),postdefines)
 
-ifneq (,$(strip $(LIBS.OPENGL.SYSTEM)))
-  LIB.GLRENDER3D.LOCAL += $(LIBS.OPENGL.SYSTEM)
-else
-  ifeq ($(X11.AVAILABLE),yes)
-    CFLAGS.GLRENDER3D += $(X_CFLAGS)
-    LIB.GLRENDER3D.LOCAL += $(X_LIBS) -lXext -lX11 $(X_EXTRA_LIBS)
-  endif
-
-  ifeq ($(USE_MESA),1)
-    ifdef MESA_PATH
-      CFLAGS.GLRENDER3D += -I$(MESA_PATH)/include
-      LIB.GLRENDER3D.LOCAL += -L$(MESA_PATH)/lib
-    endif
-    LIB.GLRENDER3D.LOCAL += -lMesaGL
-  else
-    ifdef OPENGL_PATH
-      CFLAGS.GLRENDER3D += -I$(OPENGL_PATH)/include
-      LIB.GLRENDER3D.LOCAL += -L$(OPENGL_PATH)/lib
-    endif
-    LIB.GLRENDER3D.LOCAL += -lGL
-  endif
-endif
-
 ifeq ($(USE_PLUGINS),yes)
   GLRENDER3D = $(OUTDLL)/glrender3d$(DLL)
   LIB.GLRENDER3D = $(foreach d,$(DEP.GLRENDER3D),$($d.LIB))
-  LIB.GLRENDER3D.SPECIAL = $(LIB.GLRENDER3D.LOCAL)
   TO_INSTALL.DYNAMIC_LIBS += $(GLRENDER3D)
 else
   GLRENDER3D = $(OUT)/$(LIB_PREFIX)glrender3d$(LIB)
   DEP.EXE += $(GLRENDER3D)
-  LIBS.EXE += $(LIB.GLRENDER3D.LOCAL)
+  LIBS.EXE += $(GL.LFLAGS)
   SCF.STATIC += glrender3d
   TO_INSTALL.STATIC_LIBS += $(GLRENDER3D)
 endif
@@ -71,7 +47,8 @@ SRC.GLRENDER3D = $(wildcard plugins/video/render3d/opengl/*.cpp) \
   plugins/video/render3d/common/txtmgr.cpp
 OBJ.GLRENDER3D = $(addprefix $(OUT)/,$(notdir $(SRC.GLRENDER3D:.cpp=$O)))
 DEP.GLRENDER3D = CSGEOM CSUTIL CSSYS CSUTIL CSGFX
-CFG.GLRENDER3D = data/config/render3d/render3d.cfg data/config/render3d/opengl.cfg
+CFG.GLRENDER3D = \
+  data/config/render3d/render3d.cfg data/config/render3d/opengl.cfg
 
 TO_INSTALL.CONFIG += $(CFG.GLRENDER3D)
 
@@ -88,17 +65,16 @@ ifeq ($(MAKESECTION),targets)
 
 .PHONY: glrender3d glrender3dclean
 
-# Chain rules
 clean: glrender3dclean
 
 glrender3d: $(OUTDIRS) $(GLRENDER3D)
 
 $(OUT)/%$O: plugins/video/render3d/opengl/%.cpp
-	$(DO.COMPILE.CPP) $(CFLAGS.PIXEL_LAYOUT) $(CFLAGS.GLRENDER3D)
+	$(DO.COMPILE.CPP) $(CFLAGS.PIXEL_LAYOUT) $(GL.CFLAGS)
 
 $(GLRENDER3D): $(OBJ.GLRENDER3D) $(LIB.GLRENDER3D)
 	$(DO.PLUGIN.PREAMBLE) \
-	$(DO.PLUGIN.CORE) $(LIB.GLRENDER3D.SPECIAL) \
+	$(DO.PLUGIN.CORE) $(GL.LFLAGS) \
 	$(DO.PLUGIN.POSTAMBLE)
 
 glrender3dclean:
@@ -108,7 +84,7 @@ ifdef DO_DEPEND
 dep: $(OUTOS)/glrender3d.dep
 $(OUTOS)/glrender3d.dep: $(SRC.GLRENDER3D)
 	$(DO.DEP1) \
-	-DGL_VERSION_1_1 $(CFLAGS.PIXEL_LAYOUT) $(CFLAGS.GLRENDER3D) \
+	-DGL_VERSION_1_1 $(CFLAGS.PIXEL_LAYOUT) $(GL.CFLAGS) \
 	$(DO.DEP2)
 else
 -include $(OUTOS)/glrender3d.dep

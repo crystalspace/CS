@@ -31,8 +31,10 @@ endif # ifeq ($(MAKESECTION),roottargets)
 #----------------------------------------------------------------- defines ---#
 ifeq ($(MAKESECTION),defines)
 
-MACOSX.SOURCE_GLOSX2D_PATHS = plugins/video/canvas/macosx/opengl plugins/video/canvas/macosx/common
-MACOSX.HEADER_GLOSX2D_PATHS = $(addprefix $(CFLAGS.I),$(MACOSX.SOURCE_GLOSX2D_PATHS))
+MACOSX.SOURCE_GLOSX2D_PATHS = \
+  plugins/video/canvas/macosx/opengl plugins/video/canvas/macosx/common
+MACOSX.HEADER_GLOSX2D_PATHS = \
+  $(addprefix $(CFLAGS.I),$(MACOSX.SOURCE_GLOSX2D_PATHS))
 
 # Only add header search paths if actually building this plug-in or if
 # USE_PLUGINS=no, in which case this module might be built as the dependency
@@ -71,10 +73,6 @@ OBJ.GLOSX2D = $(addprefix $(OUT)/, \
   $(notdir $(subst .cpp,$O,$(SRC.GLOSX2D:.m=$O))))
 DEP.GLOSX2D = CSSYS CSUTIL
 
-# Define constants to indicate where OpenGL headers/framework are
-CFLAGS.GLOSX2D = -DCS_OPENGL_PATH=OpenGL
-LIB.GLOSX2D.OPENGL = $(LIBS.OPENGL.SYSTEM)
-
 endif # ifeq ($(MAKESECTION),postdefines)
 
 #----------------------------------------------------------------- targets ---#
@@ -86,21 +84,22 @@ glosx2d: $(OUTDIRS) $(GLOSX2D)
 
 # Rule to make common OpenGL source
 $(OUT)/%$O: plugins/video/canvas/openglcommon/%.cpp
-	$(DO.COMPILE.CPP) $(CFLAGS.GLOSX2D)
+	$(DO.COMPILE.CPP) $(GL.CFLAGS)
 
 # Rules to make OSX sources
 $(OUT)/%$O: plugins/video/canvas/macosx/opengl/%.cpp
-	$(DO.COMPILE.CPP) $(CFLAGS.GLOSX2D)
+	$(DO.COMPILE.CPP) $(GL.CFLAGS)
 
 $(OUT)/%$O: plugins/video/canvas/macosx/opengl/%.m
-	$(DO.COMPILE.C) $(CFLAGS.GLOSX2D)
+	$(DO.COMPILE.C) $(GL.CFLAGS)
 
 $(OUT)/%$O: plugins/video/canvas/macosx/opengl/%.mm
-	$(DO.COMPILE.MM) $(CFLAGS.GLOSX2D)
+	$(DO.COMPILE.MM) $(GL.CFLAGS)
 
 $(GLOSX2D): $(OBJ.GLOSX2D) $(LIB.GLOSX2D)
-	$(DO.PLUGIN.PREAMBLE) $(DO.PLUGIN.CORE) $(LIB.GLOSX2D.OPENGL) $(DO.PLUGIN.POSTAMBLE)
-
+	$(DO.PLUGIN.PREAMBLE) \
+	$(DO.PLUGIN.CORE) $(GL.LFLAGS) \
+	$(DO.PLUGIN.POSTAMBLE)
 
 clean: glosx2dclean
 glosx2dclean:
@@ -109,11 +108,9 @@ glosx2dclean:
 ifdef DO_DEPEND
 dep: $(OUTOS)/glosx2d.dep
 $(OUTOS)/glosx2d.dep: $(SRC.GLOSX2D)
-	$(DO.DEP1) $(CFLAGS.GLOSX2D) $(MACOSX.HEADER_GLOSX2D_PATHS) $(DO.DEP2)
+	$(DO.DEP1) $(GL.CFLAGS) $(MACOSX.HEADER_GLOSX2D_PATHS) $(DO.DEP2)
 else
 -include $(OUTOS)/glosx2d.dep
 endif
 
 endif # ifeq ($(MAKESECTION),targets)
-
-

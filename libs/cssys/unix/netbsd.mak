@@ -11,7 +11,7 @@ PLUGINS+=sound/renderer/software sound/driver/oss
 ifeq ($(X11.AVAILABLE),yes)
   PLUGINS+=video/canvas/softx
   PLUGINS+=video/canvas/linex
-  ifneq (,$(OPENGL_PATH))
+  ifeq ($(GL.AVAILABLE),yes)
     PLUGINS+=video/renderer/opengl video/canvas/openglx
   endif
 

@@ -104,9 +104,9 @@ CFLAGS.GENERAL = \
 CFLAGS.PIXEL_LAYOUT = -DCS_24BIT_PIXEL_LAYOUT=CS_24BIT_PIXEL_ARGB
 
 # OpenGL support.
-CFLAGS.GL3D = -DCS_OPENGL_PATH=OpenGL
-CFLAGS.GLRENDER3D = $(CFLAGS.GL3D)
-LIBS.OPENGL.SYSTEM = -framework OpenGL
+GL.AVAILABLE = yes
+GL.CFLAGS = -DCS_OPENGL_PATH=OpenGL
+GL.LFLAGS = -framework OpenGL
 
 # Flags for the compiler which are used when optimizing.
 CFLAGS.optimize = -O3

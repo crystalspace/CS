@@ -12,10 +12,16 @@
 #	Functions for reporting progress to users.
 #
 # EXPORTS
-#    OPENGL_PATH
+#    GL.AVAILABLE
+#	Makefile variable emitted to the standard output stream.  Value is
+#	"yes" if OpenGL SDK is present and usable, otherwise the variable is
+#	not set.
+#    GL.CFLAGS
 #	Makefile variable emitted to the standard output stream.  Value is the
-#	base path of the OpenGL installation, otherwise the variable is not
-#	set.
+#	compiler flags required for OpenGL.
+#    GL.LFLAGS
+#	Makefile variable emitted to the standard output stream.  Value is the
+#	linker flags required for OpenGL.
 #    CSGL_EXT_STATIC_ASSERTION
 #	Makefile variable emitted to the standard output stream.  Value is
 #	"yes" if OpenGL extensions are _not_ supported, otherwise the variable
@@ -29,27 +35,49 @@ precondition '${X11_OK} -eq 0 -o ${X11_OK} -eq 1'
 
 msg_checking "for OpenGL"
 
-OPENGL_PATH=''
+GL_OK=1
 if [ -d /usr/local/include/GL ]; then
-  OPENGL_PATH="/usr/local/include"
+  OPENGL_HPATH="/usr/local/include"
+  OPENGL_LPATH="/usr/local/lib"
 elif [ -d /usr/include/GL ]; then
-  OPENGL_PATH="/usr/include"
+  OPENGL_HPATH="/usr/include"
+  OPENGL_LPATH="/usr/lib"
 elif [ -d /usr/openwin/include/GL ]; then
-  OPENGL_PATH="/usr/openwin/include"
+  OPENGL_HPATH="/usr/openwin/include"
+  OPENGL_LPATH="/usr/openwin/lib"
 elif [ ${X11_OK} -eq 1 -a -d ${X11_PATH}/include/GL ]; then
-  OPENGL_PATH="${X11_PATH}/include"
+  OPENGL_HPATH="${X11_PATH}/include"
+  OPENGL_LPATH="${X11_PATH}/lib"
+else
+  OPENGL_HPATH=''
+  OPENGL_LPATH=''
+  GL_OK=0
 fi
 
-if [ -n "${OPENGL_PATH}" ]; then
-  echo "OPENGL_PATH = ${OPENGL_PATH}"
-  msg_result "${OPENGL_PATH}"
+if [ ${GL_OK} -eq 1 ]; then
+  echo << EOGL
+GL.AVAILABLE = yes
+GL.CFLAGS = $(X_CFLAGS) -I${OPENGL_HPATH}
+GL.LFLAGS = $(X_PRE_LIBS) $(X_LIBS) -lXext -lX11 $(X_EXTRA_LIBS)
+GL.LFLAGS += -L${OPENGL_LPATH}
+ifneq ($(USE_MESA),1)
+  GL.LFLAGS += -lGL
+else
+  GL.LFLAGS += -lMesaGL
+  ifdef MESA_PATH
+    GL.CFLAGS += -I$(MESA_PATH)/include
+    GL.LFLAGS += -I$(MESA_PATH)/lib
+  endif
+endif
+EOGL
+  msg_result "${OPENGL_HPATH}"
 else
   msg_result "no"
 fi
 
 # Determine if OpenGL extensions are supported.
 
-if [ -n "${OPENGL_PATH}" ]; then
+if [ ${GL_OK} -eq 1 ]; then
   msg_checking "for OpenGL extensions"
 
   cat << EOF > gltest.cpp
@@ -62,7 +90,7 @@ if [ -n "${OPENGL_PATH}" ]; then
   }
 EOF
 
-  ${CXX} -c gltest.cpp -I${OPENGL_PATH} 2>/dev/null
+  ${CXX} -c gltest.cpp -I${OPENGL_HPATH} 2>/dev/null
   if [ $? -eq 0 ]; then
     msg_result "yes"
   else

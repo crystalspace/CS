@@ -29,34 +29,14 @@ endif # ifeq ($(MAKESECTION),roottargets)
 #------------------------------------------------------------- postdefines ---#
 ifeq ($(MAKESECTION),postdefines)
 
-# Local CFLAGS and libraries
-LIB.GLX2D.SYSTEM += $(X_PRE_LIBS) $(X_LIBS) -lXext -lX11 $(X11_EXTRA_LIBS)
-CFLAGS.GLX2D += $(X_CFLAGS)
-
-ifeq ($(USE_MESA),1)
-  ifdef MESA_PATH
-    CFLAGS.GLX2D += -I$(MESA_PATH)/include
-    LIB.GLX2D.SYSTEM += -L$(MESA_PATH)/lib
-  endif
-  LIB.GLX2D.SYSTEM += -lMesaGL -lMesaGLU
-else
-  ifdef OPENGL_PATH
-    CFLAGS.GLX2D += -I$(OPENGL_PATH)/include
-    LIB.GLX2D.SYSTEM += -L$(OPENGL_PATH)/lib
-  endif
-  LIB.GLX2D.SYSTEM += -lGL
-endif
-
-# The 2D GLX driver
 ifeq ($(USE_PLUGINS),yes)
   GLX2D = $(OUTDLL)/glx2d$(DLL)
   LIB.GLX2D = $(foreach d,$(DEP.GLX2D),$($d.LIB))
-  LIB.GLX2D.SPECIAL = $(LIB.GLX2D.SYSTEM)
   TO_INSTALL.DYNAMIC_LIBS += $(GLX2D)
 else
   GLX2D = $(OUT)/$(LIB_PREFIX)glx2d$(LIB)
   DEP.EXE += $(GLX2D)
-  LIBS.EXE += $(LIB.GLX2D.SYSTEM)
+  LIBS.EXE += $(GL.LFLAGS)
   SCF.STATIC += glx2d
   TO_INSTALL.STATIC_LIBS += $(GLX2D)
 endif
@@ -78,13 +58,13 @@ ifeq ($(MAKESECTION),targets)
 glx2d: $(OUTDIRS) $(GLX2D)
 
 $(OUT)/%$O: plugins/video/canvas/openglx/%.cpp
-	$(DO.COMPILE.CPP) $(CFLAGS.GLX2D)
+	$(DO.COMPILE.CPP) $(GL.CFLAGS)
 
 $(OUT)/%$O: plugins/video/canvas/openglcommon/%.cpp
-	$(DO.COMPILE.CPP) $(CFLAGS.GLX2D)
+	$(DO.COMPILE.CPP) $(GL.CFLAGS)
 
 $(GLX2D): $(OBJ.GLX2D) $(LIB.GLX2D)
-	$(DO.PLUGIN) $(LIB.GLX2D.SPECIAL)
+	$(DO.PLUGIN) $(GL.LFLAGS)
 
 clean: glx2dclean
 glx2dclean:
@@ -93,7 +73,7 @@ glx2dclean:
 ifdef DO_DEPEND
 dep: $(OUTOS)/glx2d.dep
 $(OUTOS)/glx2d.dep: $(SRC.GLX2D)
-	$(DO.DEP1) $(CFLAGS.GLX2D) $(DO.DEP2)
+	$(DO.DEP1) $(GL.CFLAGS) $(DO.DEP2)
 else
 -include $(OUTOS)/glx2d.dep
 endif

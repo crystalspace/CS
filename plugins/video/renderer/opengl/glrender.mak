@@ -29,38 +29,14 @@ endif # ifeq ($(MAKESECTION),roottargets)
 #------------------------------------------------------------- postdefines ---#
 ifeq ($(MAKESECTION),postdefines)
 
-ifneq (,$(strip $(LIBS.OPENGL.SYSTEM)))
-  LIB.GL3D.LOCAL += $(LIBS.OPENGL.SYSTEM)
-else
-  ifeq ($(X11.AVAILABLE),yes)
-    CFLAGS.GL3D += $(X_CFLAGS)
-    LIB.GL3D.LOCAL += $(X_PRE_LIBS) $(X_LIBS) -lXext -lX11 $(X_EXTRA_LIBS)
-  endif
-
-  ifeq ($(USE_MESA),1)
-    ifdef MESA_PATH
-      CFLAGS.GL3D += -I$(MESA_PATH)/include
-      LIB.GL3D.LOCAL += -L$(MESA_PATH)/lib
-    endif
-    LIB.GL3D.LOCAL += -lMesaGL
-  else
-    ifdef OPENGL_PATH
-      CFLAGS.GL3D += -I$(OPENGL_PATH)/include
-      LIB.GL3D.LOCAL += -L$(OPENGL_PATH)/lib
-    endif
-    LIB.GL3D.LOCAL += -lGL
-  endif
-endif
-
 ifeq ($(USE_PLUGINS),yes)
   GL3D = $(OUTDLL)/gl3d$(DLL)
   LIB.GL3D = $(foreach d,$(DEP.GL3D),$($d.LIB))
-  LIB.GL3D.SPECIAL = $(LIB.GL3D.LOCAL)
   TO_INSTALL.DYNAMIC_LIBS += $(GL3D)
 else
   GL3D = $(OUT)/$(LIB_PREFIX)gl3d$(LIB)
   DEP.EXE += $(GL3D)
-  LIBS.EXE += $(LIB.GL3D.LOCAL)
+  LIBS.EXE += $(GL.LFLAGS)
   SCF.STATIC += gl3d
   TO_INSTALL.STATIC_LIBS += $(GL3D)
 endif
@@ -103,11 +79,11 @@ clean: gl3dclean
 gl3d: $(OUTDIRS) $(GL3D)
 
 $(OUT)/%$O: plugins/video/renderer/opengl/%.cpp
-	$(DO.COMPILE.CPP) $(CFLAGS.PIXEL_LAYOUT) $(CFLAGS.GL3D)
+	$(DO.COMPILE.CPP) $(CFLAGS.PIXEL_LAYOUT) $(GL.CFLAGS)
 
 $(GL3D): $(OBJ.GL3D) $(LIB.GL3D)
 	$(DO.PLUGIN.PREAMBLE) \
-	$(DO.PLUGIN.CORE) $(LIB.GL3D.SPECIAL) \
+	$(DO.PLUGIN.CORE) $(GL.LFLAGS) \
 	$(DO.PLUGIN.POSTAMBLE)
 
 gl3dclean:
@@ -117,7 +93,7 @@ ifdef DO_DEPEND
 dep: $(OUTOS)/gl3d.dep
 $(OUTOS)/gl3d.dep: $(SRC.GL3D)
 	$(DO.DEP1) \
-	-DGL_VERSION_1_1 $(CFLAGS.PIXEL_LAYOUT) $(CFLAGS.GL3D) \
+	-DGL_VERSION_1_1 $(CFLAGS.PIXEL_LAYOUT) $(GL.CFLAGS) \
 	$(DO.DEP2)
 else
 -include $(OUTOS)/gl3d.dep

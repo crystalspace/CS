@@ -7,7 +7,7 @@ DESCRIPTION.OS.irix = Irix
 
 ifeq ($(X11.AVAILABLE),yes)
   PLUGINS+=video/canvas/softx
-  ifneq (,$(OPENGL_PATH))
+  ifeq ($(GL.AVAILABLE),yes)
     PLUGINS+=video/renderer/opengl video/canvas/openglx
    endif
 

@@ -12,9 +12,8 @@ PLUGINS += video/canvas/ddraw8
 #PLUGINS.DYNAMIC +=video/format/avi
 #PLUGINS.DYNAMIC +=video/format/codecs/opendivx
 
-# If you have the following line uncommented make sure one
-# LIBS.OPENGL.SYSTEM is set below or you have a custom
-# opengl dll installed as GL.dll (e.g. MESA)
+# If you have the following line uncommented make sure that
+# GL.LFLAGS and optionally GL.CFLAGS are set.
 PLUGINS += video/canvas/openglwin video/renderer/opengl
 
 # Uncomment the line below to build the sound driver
@@ -58,11 +57,11 @@ LIBS.EXE= $(LFLAGS.L)/usr/lib/w32api $(LFLAGS.l)gdi32 $(LIBS.SYSTEM) \
   $(LFLAGS.l)shell32 
 
 # OpenGL settings for use with OpenGL Drivers...untested
-#SGI OPENGL SDK v1.1.1 for Win32
-#LIBS.OPENGL.SYSTEM = $(LFLAGS.l)opengl $(LFLAGS.l)glut
+# SGI OPENGL SDK v1.1.1 for Win32
+#GL.LFLAGS = $(LFLAGS.l)opengl
 
 # MS OpenGL
-LIBS.OPENGL.SYSTEM=$(LFLAGS.l)opengl32 $(LFLAGS.l)glut32
+GL.LFLAGS = $(LFLAGS.l)opengl32
 
 # Socket library
 LIBS.SOCKET.SYSTEM=$(LFLAGS.l)wsock32

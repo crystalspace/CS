@@ -1,5 +1,13 @@
 The history order is reversed so that new features are at the top.
 
+2-Jan-2003
+	- Eric Sunshine changed the OpenGL-related configuration script and
+	  makefiles so that it is now the responsibility of the configuration
+	  script to figure out the appropriate compiler and linker flags,
+	  rather than having this complicated logic replicated in every
+	  OpenGL-related makefile.  chkogl.sh now publishes the makefile
+	  variables GL.AVAILABLE, GL.CFLAGS, and GL.LFLAGS; it no longer
+	  publishes OPENGL_PATH.
 1-Jan-2003
 	- Eric Sunshine merged cygwin.mak into win32gcc.mak.  Now there is a
 	  single makefile configuration target for Cygwin and Mingw users.

@@ -29,23 +29,14 @@ endif # ifeq ($(MAKESECTION),roottargets)
 #------------------------------------------------------------- postdefines ---#
 ifeq ($(MAKESECTION),postdefines)
 
-CFLAGS.GLWIN32 +=
-
-ifndef LIBS.OPENGL.SYSTEM
-  LIB.GLWIN32.SYSTEM = -lGL
-else
-  LIB.GLWIN32.SYSTEM = $(LIBS.OPENGL.SYSTEM)
-endif
-
 ifeq ($(USE_PLUGINS),yes)
   GLWIN32 = $(OUTDLL)/glwin32$(DLL)
   LIB.GLWIN32 = $(foreach d,$(DEP.GLWIN32),$($d.LIB))
-  LIB.GLWIN32.SPECIAL = $(LIB.GLWIN32.SYSTEM)
   TO_INSTALL.DYNAMIC_LIBS += $(GLWIN32)
 else
   GLWIN32 = $(OUT)/$(LIB_PREFIX)glwin32$(LIB)
   DEP.EXE += $(GLWIN32)
-  LIBS.EXE += $(LIB.GLWIN32.SYSTEM)
+  LIBS.EXE += $(GL.LFLAGS)
   SCF.STATIC += glwin32
   TO_INSTALL.STATIC_LIBS += $(GLWIN32)
 endif
@@ -72,13 +63,13 @@ ifeq ($(MAKESECTION),targets)
 glwin32: $(OUTDIRS) $(GLWIN32)
 
 $(OUT)/%$O: plugins/video/canvas/openglwin/%.cpp
-	$(DO.COMPILE.CPP) $(CFLAGS.GLWIN32)
+	$(DO.COMPILE.CPP) $(GL.CFLAGS)
 
 $(OUT)/%$O: plugins/video/canvas/openglcommon/%.cpp
-	$(DO.COMPILE.CPP) $(CFLAGS.GLWIN32)
+	$(DO.COMPILE.CPP) $(GL.CFLAGS)
 
 $(GLWIN32): $(OBJ.GLWIN32) $(LIB.GLWIN32)
-	$(DO.PLUGIN) $(LIB.GLWIN32.SPECIAL)
+	$(DO.PLUGIN) $(GL.LFLAGS)
 
 clean: glwin32clean
 glwin32clean:
@@ -87,7 +78,7 @@ glwin32clean:
 ifdef DO_DEPEND
 depend: $(OUTOS)/glwin32.dep
 $(OUTOS)/glwin32.dep: $(SRC.GLWIN32)
-	$(DO.DEP) $(CFLAGS.GLWIN32)
+	$(DO.DEP) $(GL.CFLAGS)
 else
 -include $(OUTOS)/glwin32.dep
 endif
