@@ -1,5 +1,5 @@
 @c -*-texinfo-*-
-@node Console_Boolean
+@node Console_Boolean, Console_Value, Console_General, Console
 @subsubsection Boolean commands
 
 Boolean commands have either an @code{on} or @code{off} state. When you just

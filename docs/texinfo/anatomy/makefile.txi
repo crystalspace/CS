@@ -1,5 +1,5 @@
 @c -*-texinfo-*-
-@node Makefile Structure
+@node Makefile Structure, csPhyzik, Directory Structure, Anatomy
 @section Structure of the Makefile
 @cindex Makefile
 
@@ -23,7 +23,13 @@ documents if you do not understand something. The following text supposes you
 are familiar with GNU Make extensions; with at least basic features if not with
 all.
 
-@node overall makefile structure
+@menu
+* overall makefile structure:: The overall structure
+* Makefile nariable names:: Variable naming conventions
+* makefile output directory:: The output directory
+@end menu
+
+@node overall makefile structure, Makefile nariable names, Makefile Structure, Makefile Structure
 @subsection The overall structure
 
 The makefile system was designed to be very modular. This means that there
@@ -208,7 +214,7 @@ do not understand something, feel free to look through submakefiles that can
 be found in any major directory of Crystal Space source tree.
 
 
-@node Makefile nariable names
+@node Makefile nariable names, makefile output directory, overall makefile structure, Makefile Structure
 @subsection Variable naming conventions
 
 For maximal flexibility (the makefile system should be usable by any compiler
@@ -375,7 +381,7 @@ convention. If the target is a static library, it is typically named
 @samp{NAME.LIB}; if it is a dynamic library, it is called @samp{NAME.DLL}; if
 it is an executable, the variable is typically named @samp{NAME.EXE}.
 
-@node makefile output directory
+@node makefile output directory, , Makefile nariable names, Makefile Structure
 @subsection The output directory
 
 To avoid filling directory structure with temporary and intermediate files,

@@ -1,11 +1,17 @@
 @c -*-texinfo-*-
-@node Tutorials
+@node Tutorials, Concepts, Applications, Top
 @chapter Tutorials
 @cindex Tutorials
 
 This chapter contains various tutorial to help you quickly familiarize
 yourself with the various aspects of the Crystal Space development
 environment.
+
+@menu
+* Tutorial_Introduction:: Developing a Crystal Space Application
+* Tutorial_Simple:: A @code{Simple} Tutorial
+* Tutorial_CrystalClear:: A @code{CrystalClear} Tutorial
+@end menu
 
 @imports{tutorial,intro.txi}
 @imports{tutorial,simple.txi}

@@ -1,5 +1,5 @@
 @c -*-texinfo-*-
-@node Tutorial_Simple
+@node Tutorial_Simple, Tutorial_CrystalClear, Tutorial_Introduction, Tutorials
 @section A @code{Simple} Tutorial
 @cindex Tutorial, @code{Simple}
 @cindex @code{Simple}, Tutorial
@@ -12,7 +12,16 @@ application uses inheritance to create a subclass of the system
 dependent main class @samp{SysSystemDriver} but you don't need to do it
 like this.
 
-@node Engine Basic Usage
+@menu
+* Engine Basic Usage:: Basic Usage of the Engine
+* Making System Driver:: Making the System Driver
+* Quitting Sample Application:: Quitting the Application
+* Creating the World:: Creating The World
+* Camera:: The Camera
+* Moving Around::
+@end menu
+
+@node Engine Basic Usage, Making System Driver, Tutorial_Simple, Tutorial_Simple
 @subsection Basic Usage of the Engine
 
 When you downloaded the Crystal Space package it contains an
@@ -33,7 +42,7 @@ Crystal Space also has a reference manual. If you downloaded the
 @emph{csapi} package the you should have it and this link may work to get
 you to the reference.
 
-@node Making System Driver
+@node Making System Driver, Quitting Sample Application, Engine Basic Usage, Tutorial_Simple
 @subsection Making the System Driver
 @cindex Tutorial System Driver
 @cindex System Driver, Tutorial
@@ -234,7 +243,7 @@ where the application really starts running and interacting with the
 user. This call returns as soon as an exit message was received by
 the system at which point we cleanup() everything.
 
-@node Quitting Sample Application
+@node Quitting Sample Application, Creating the World, Making System Driver, Tutorial_Simple
 @subsection Quitting the Application
 @cindex Tutorial Key Capture
 @cindex Key Capture, Tutorial
@@ -270,7 +279,7 @@ bool Simple::HandleEvent (csEvent &Event)
 @}
 @end example
 
-@node Creating the World
+@node Creating the World, Camera, Quitting Sample Application, Tutorial_Simple
 @subsection Creating The World
 @cindex Tutorial The World
 @cindex World, Tutorial
@@ -457,7 +466,7 @@ would compile and run this application you would still see a black
 screen. Why? Because we have not created a camera through which you
 can see.
 
-@node Camera
+@node Camera, Moving Around, Creating the World, Tutorial_Simple
 @subsection The Camera
 @cindex Tutorial Camera
 @cindex Camera, Tutorial
@@ -576,7 +585,7 @@ Compile and run this example. For the first time you should see
 something. A solid wall!! Congratulations, you have created your
 first almost useful Crystal Space application :-)
 
-@node Moving Around
+@node Moving Around, , Camera, Tutorial_Simple
 @subsection Moving Around
 @cindex Tutorial Movement
 @cindex Movement, Tutorial

@@ -1,5 +1,5 @@
 @c -*-texinfo-*-
-@node Drivers
+@node Drivers, , PlugIns, Plug-In Drivers
 @section Drivers
 @cindex Drivers
 

@@ -1,5 +1,5 @@
 @c -*-texinfo-*-
-@node Console
+@node Console, Walktest_Config, Walktest_Keyboard, Walktest
 @subsection The Console
 @cindex Console
 
@@ -25,6 +25,13 @@ will expect commands to be organized alphabetically, or functionally.  Rather
 than grouping commands by their treatment of arguments, we should provide an
 overview of argument treatment prior to listing commands.
 @end quotation
+
+@menu
+* Console_General:: General commands
+* Console_Boolean:: Boolean commands
+* Console_Value:: Value commands
+* Console_MultiChoice:: Multi-choice commands
+@end menu
 
 @importss{apps,walktest,general.txi}
 @importss{apps,walktest,boolean.txi}

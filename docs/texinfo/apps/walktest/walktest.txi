@@ -1,14 +1,19 @@
 @c -*-texinfo-*-
-@emph{Broken}.
-@node Walktest
+@node Walktest, Blocks, Applications, Applications
 @section Walktest
-@cindex Applications,Walktest
+@cindex Applications, Walktest
 
 This is the quintessential test application for the project, and the
 application most likely to be up-to-date any time a change is
 made to any part of the project.  Developers probably should not use
 this application as a guide for developing their own programs, as
-it's not the best example in clean coding.
+it is not the best example in clean coding.
+
+@menu
+* Walktest_Keyboard:: Keyboard Interface
+* Console:: The Console
+* Walktest_Config:: Keyboard Configuration
+@end menu
 
 @importss{apps,walktest,keys.txi}
 @importss{apps,walktest,console.txi}

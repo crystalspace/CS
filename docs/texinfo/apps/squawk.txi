@@ -1,5 +1,5 @@
 @c -*-texinfo-*-
-@node Squawk
+@node Squawk, Vsh, Shooter, Applications
 @section Squawk
 
 Created by Seth Galbraith (@email{sgalbrai@@krl.org}), also known as
@@ -10,7 +10,15 @@ Some programming by Jorrit Tyberghein and Eric Sunshine
 MDL models and PNG textures Copyright 1999 by Ulrich Galbraith
 @email{ugalbrai@@krl.org}.
 
-@node Squawk About
+@menu
+* Squawk About:: What it's about
+* Squawk Controls:: Controls
+* Squawk Bugs:: Known Bugs
+* Squawk History:: History
+* Squawk Todo:: Things remaining to be done
+@end menu
+
+@node Squawk About, Squawk Controls, Squawk, Squawk
 @subsection What it's about
 
 I'm making a multiplayer action role-playing game. Currently this application
@@ -27,7 +35,7 @@ sky box / environment map / background
 animated 3d characters
 @end itemize
 
-@node Squawk Controls
+@node Squawk Controls, Squawk Bugs, Squawk About, Squawk
 @subsection Controls
 
 Run @samp{squawk.exe -help} to see command line options
@@ -156,7 +164,7 @@ look up and right
 look down and right
 @end table
 
-@node Squawk Bugs
+@node Squawk Bugs, Squawk History, Squawk Controls, Squawk
 @subsection Known Bugs
 
 @itemize @bullet
@@ -167,10 +175,17 @@ Edges of sky box polygons visible because of sloppy texture alignment code.
 Sprite polygons vanish when they cross the view plane.
 @end itemize
 
-@node Squawk History
+@node Squawk History, Squawk Todo, Squawk Bugs, Squawk
 @subsection History
 
-For developments after September 1999 @xref{History}.
+@iftex
+Developments after September 1999 are listed in the standard Crystal Space
+history log.
+@end iftex
+@ifnottex
+Developments after September 1999 are listed in the Crystal Space history
+log, @ref{History}.
+@end ifnottex
 
 @table @emph
 @item September 29, 1999 Seth Galbraith and Eric Sunshine
@@ -378,7 +393,7 @@ version 5
 @end itemize
 @end table
 
-@node Squawk Todo
+@node Squawk Todo, , Squawk History, Squawk
 @subsection Things remaining to be done
 
 Controls:

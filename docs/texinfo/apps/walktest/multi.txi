@@ -1,5 +1,5 @@
 @c -*-texinfo-*-
-@node Console_MultiChoice
+@node Console_MultiChoice, , Console_Value, Console
 @subsubsection Multi-choice commands
 
 A multi-choice command has one or more possible values. Typing the command

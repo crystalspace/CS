@@ -1,5 +1,5 @@
 @c -*-texinfo-*-
-@node Directory Structure
+@node Directory Structure, Makefile Structure, Library List, Anatomy
 @section Directory Structure
 
 @emph{NOTE} : This section is outdated. Only the description of the
@@ -12,7 +12,12 @@ downloaded the files for a specific port like Linux or Win32.
 
 Documentation written by Thomas Hieber (@email{thieber@@gmx.net}).
 
-@node Source Tree
+@menu
+* Source Tree:: The Source Tree
+* Dependencies::
+@end menu
+
+@node Source Tree, Dependencies, Directory Structure, Directory Structure
 @subsection The Source Tree
 
 Crystal Space consists of the following directories:
@@ -485,7 +490,7 @@ Replacement for getopt (missing on some systems)
 @end table
 @end table
 
-@node Dependencies
+@node Dependencies, , Source Tree, Directory Structure
 @subsection Dependencies
 
 To make sure, some parts of Crystal Space can be used by themselfes, there is

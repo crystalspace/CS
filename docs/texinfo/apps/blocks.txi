@@ -1,5 +1,5 @@
 @c -*-texinfo-*-
-@node Blocks
+@node Blocks, CCtest, Walktest, Applications
 @section Blocks
 
 Blocks is a small 3D Tetris type game being developed by Jorrit Tyberghein

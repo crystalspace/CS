@@ -1,5 +1,5 @@
 @c -*-texinfo-*-
-@node Concepts
+@node Concepts, Anatomy, Tutorials, Top
 @chapter Concepts
 @cindex Concepts
 
@@ -37,6 +37,11 @@ Collision Detection
 @item
 Miscallenous notes requiring classification.  (Jorrit's @dfn{brain dump}.)
 @end itemize
+
+@menu
+* Visibility Culling:: Visibility Culling In Detail
+* 3D Sprites::
+@end menu
 
 @imports{concepts,viscull.txi}
 @imports{concepts,3dsprite.txi}

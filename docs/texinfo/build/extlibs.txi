@@ -1,5 +1,5 @@
 @c -*-texinfo-*-
-@node External Libraries
+@node External Libraries, OSSpecific, Requirements, Building
 @section External Libraries
 
 Crystal Space relies upon several external, and publically available
@@ -18,9 +18,10 @@ Many computer systems come with these libraries pre-installed.
 If the libraries are not already available on your system, then see the
 following sections for information about how to obtain them.
 
-@node ZLib
-@subsection zlib
-@cindex Libraries,zlib
+@subheading zlib
+@cindex zlib
+@cindex Libraries, zlib
+@cindex Compression library, zlib
 
 Crystal Space relies upon the @code{zlib} library for reading ZIP files.
 You can download @code{zlib} from:
@@ -35,9 +36,10 @@ that the makefile will be able to find it (more on this later).
 
 Read the compilation instructions included with @code{zlib} and compile it.
 
-@node LibPNG
-@subsection libpng
-@cindex Libraries,libpng
+@subheading libpng
+@cindex libpng
+@cindex Libraries, libpng
+@cindex PNG library
 
 Crystal Space relies upon the @code{libpng} library for reading PNG graphic
 files.  You can download @code{libpng} from:
@@ -52,9 +54,10 @@ that the makefile will be able to find it (more on this later).
 
 Read the compilation instructions included with @code{libpng} and compile it.
 
-@node LibJPEG
-@subsection libjpeg
-@cindex Libraries,libjpeg
+@subheading libjpeg
+@cindex libjpeg
+@cindex Libraries, libjpeg
+@cindex JPEG library
 
 Crystal Space relies upon the @code{libjpeg} library for reading JPEG graphic
 files.  You can download @code{libjpeg} from:

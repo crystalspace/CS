@@ -1,5 +1,5 @@
 @c -*-texinfo-*-
-@node Authors
+@node Authors, Contributors, Genesis, CS Introduction
 @section Documentation Authors & Contributors
 
 Documentation for the Crystal Space project has been written and edited by

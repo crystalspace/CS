@@ -7,21 +7,75 @@ The history order has been reversed so that new features are at the top.
 	  is a new 'explosion' command and when you fire the missile it
 	  will explode with a particle system :-)
 	- Wouter decreased particle size in explosion. That looks nicer.
-	- Norman Kramer removed a lot of unused variables in the glide
-	  code.
+	- Norman Kramer removed a lot of unused variables in the glide code.
 	- Norman changed glide so that single TMU system do use the whole
 	  TMU mem available.
+	- Eric Sunshine completed Phase Four of Eric's Big Documentation
+	  Overhaul(tm).
+	    - Added all of the standard Texinfo boilerplate material which was
+	      missing from the Crystal Space manual.  This includes the
+	      copyright notice, version and edition information, document
+	      summary, copying permissions, title page, "top" node, and master
+	      Info @menu.  This is the first time that the manual is truly a
+	      valid Texinfo document.
+	    - Added a new appendix named "History".  This will appear in the
+	      online conversions (Info and HTML) but not in the printed
+	      manual.  The contents of the current history.txt and history.old
+	      files will eventually be incorporated into this appendix.
+	    - Added a Concepts Index to the manual.
+	    - Added version.txi which contains version and edition information
+	      and last updated time stamp.  Whenever a new version of Crystal
+	      Space is released, the VERSION and EDITION variables in this
+	      file should be updated.  VERSION should contain the version
+	      number of the Crystal Space release.  EDITION should contain the
+	      edition number of the manual (which is usually related to the
+	      version number, but may also be independent of it if the project
+	      and documentation change at different rates).  Whenever a change
+	      of significance is made to the manual, itself, the UPDATED date
+	      and EDITION number should be adjusted appropriately.
+	    - Added cpyright.txi which contains all of the copyright notices
+	      used in the manual.
+	    - Created a custom tool (CS/bin/nodefix.pl) which repairs broken
+	      and out-of-date @node lines and @menu blocks throughout an
+	      entire Texinfo source hierarchy.  This tool can be used to
+	      generate completely valid Texinfo @node and @menu entries in a
+	      single operation, thus freeing the documentation writer from
+	      having to manually perform this mundane chore.
+	    - Added a new makefile target named "repairdoc" which runs the new
+	      nodefix.pl script to repair all @node and @menu entries.
+	      Documentation writers may want to invoke the "repairdoc" target
+	      after making changes to Texinfo documentation to ensure @node
+	      and @menu integrity.
+	    - Renamed the docconv.pl script to docproc.pl and modified it to
+	      automatically invoke nodefix.pl to repair broken @node and @menu
+	      entries prior to performing the Texinfo to HTML conversion.
+	    - Texinfo @node and @menu entries are now automatically repaired
+	      within the CVS repository every six hours (four times per day)
+	    - Added @menu blocks in appropriate places throughout the Texinfo
+	      source files to act as navigational aids in HTML and Info
+	      formats.
+	    - Upgraded CS/bin/texi2html from version 1.60 to version 1.61.
+	      This upgrade fixes eight or nine additional bugs which I had
+	      reported to the script's maintainer, in addition to the half
+	      dozen bugs I reported for earlier releases.  Unfortunately,
+	      version 1.61 introduces several new bugs (which I have also
+	      reported to the maintainer).
+	    - Fixed several bugs in texi2html 1.61, myself, pending a response
+	      from the script's maintainer.
+	    - Documentation-related targets now reside in their own section
+	      within the makefile "help" message.
 6-Apr-2000
-	- Eric Sunshine did the following:
-	    - Fixed several Texinfo mark-up errors in cctest.txi. Slight
-	      structural reorganization. Rewrapped source Texinfo to fit
+	- Eric Sunshine made the following changes:
+	    - Fixed several Texinfo mark-up errors in cctest.txi.  Slight
+	      structural reorganization.  Rewrapped source Texinfo to fit
 	      within 80-columns.
-	    - Fixed a significant number of Texinfo mark-up errors and
-	      related problems in 3dsprite.txi.  Added much missing mark-up.
-	      Renamed nodes to ensure uniqueness within entire manual.
-	    - Removed all of the binary crud from these EPS files which was
-	      inserted by the image conversion application which Seth used.
-	      Now the images are viewable on NeXT.
+	    - Fixed a significant number of Texinfo mark-up errors and related
+	      problems in 3dsprite.txi.  Added much missing mark-up.  Renamed
+	      nodes to ensure uniqueness within entire manual.
+	    - Removed all of the binary crud from the EPS files which Seth
+	      added to the Texinfo documentation, and which was inserted by
+	      the image conversion application which he used.  Now the images
+	      are viewable on NeXT.
 	- Andrew Zabolotny fixed/optimized the new INI file saving code.
 	- Created new file apps/walktest/walkdbg.cpp which will eventually
 	  contain all debugging code from WalkTest.

@@ -1,5 +1,5 @@
 @c -*-texinfo-*-
-@node GCC Windows
+@node GCC Windows, Amiga, MS-DOS, OSSpecific
 @subsection GCC for Windows
 
 Written and maintained by Seth Galbraith (@email{sgalbrai@@krl.org}).
@@ -11,7 +11,12 @@ some Windows header files containing non-standard code used by Microsoft.
 If you're interested in helping out with this project, contact me or one of
 the other Crystal Space developers.
 
-@node Win GCC Files
+@menu
+* Win GCC Files:: Files you will need
+* Win GCC Installation:: Installation
+@end menu
+
+@node Win GCC Files, Win GCC Installation, GCC Windows, GCC Windows
 @subsubsection Files you will need
 
 @table @emph
@@ -26,7 +31,7 @@ pub/cygwin/latest/full.exe}
 @uref{ftp://ftp.linuxgames.com/crystal/nasm/nasm-0.98e-bin-w32.zip}
 @end table
 
-@node Win GCC Installation
+@node Win GCC Installation, , Win GCC Files, GCC Windows
 @subsubsection Installation
 
 @itemize @bullet

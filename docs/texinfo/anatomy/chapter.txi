@@ -1,5 +1,5 @@
 @c -*-texinfo-*-
-@node Anatomy
+@node Anatomy, Plug-In Drivers, Concepts, Top
 @chapter Project Anatomy
 @cindex Anatomy
 
@@ -37,6 +37,15 @@ Geometry Library (@code{csgeom})
 @anchor{csUtil}
 Utility Library (@code{csutil})
 @end itemize
+
+@menu
+* Library List:: Quick Overview of Modules and Libraries
+* Directory Structure::
+* Makefile Structure:: Structure of the Makefile
+* csPhyzik:: csPhyziks Library @code{csphyzik}
+* SCF:: Crystal Space Shared Class Facility (@sc{scf})
+* Platform_Details:: Platform-Specific Details
+@end menu
 
 @imports{anatomy,liblist.txi}
 @imports{anatomy,dirhier.txi}

@@ -1,5 +1,5 @@
 @c -*-texinfo-*-
-@node CrystalClear
+@node CrystalClear, csPython, PlugIns, PlugIns
 @subsection CrystalClear
 @cindex CrystalClear
 @cindex Crystal Clear
@@ -45,7 +45,12 @@ More code is on the way, just be patient.  Or if you don't want to be
 patient, look at the layers specification on the CrystalClear homepage and
 start implementing the plugins for it, or help with existing plugins.
 
-@node CrystalClear structure
+@menu
+* CrystalClear structure:: Structure of CrystalClear
+* CrystalClear Entity Structure:: Structure of CrystalClear Entity Library (csclearlib)
+@end menu
+
+@node CrystalClear structure, CrystalClear Entity Structure, CrystalClear, CrystalClear
 @subsubsection Structure of CrystalClear
 
 @emph{Layer 0:  Crystal Space Engine}
@@ -130,7 +135,7 @@ Entity implementations since they will need direct access to the engine which
 the plugins won't have.  An Entity library is available for providing a default
 version of the implementations.
 
-@node CrystalClear Entity Structure
+@node CrystalClear Entity Structure, , CrystalClear structure, CrystalClear
 @subsubsection Structure of CrystalClear Entity Library (csclearlib)
 
 Here's a quick over view of the CrystalClear Entity hierarchy.  The tree 

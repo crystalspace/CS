@@ -1,5 +1,5 @@
 @c -*-texinfo-*-
-@node BeOS details
+@node BeOS details, , OS2 details, Platform_Details
 @subsection Detailed information for BeOS
 
 This is the description of the BeOS port internals.
@@ -8,7 +8,16 @@ Written by David Huen(@email{smh1008@@cus.cam.ac.uk}) @*
 Heavily amended by Eric Sunshine (@email{sunshine@@sunshineco.com})
 1999/10/27 (on account of his major overhaul and re-engineering of the port).
 
-@node BeOS details Introduction
+@menu
+* BeOS details Introduction:: Introduction
+* BeOS system driver:: Description of the BeOS SysSystemDriver
+* BeOS Operation of SysSystemDriver:: Operation of SysSystemDriver
+* Description of BeOS 2D Graphics Driver::
+* Operation of BeOS 2D Graphics Driver::
+* BeOS Bug List and To-Do Items:: Bug List and To-Do Items
+@end menu
+
+@node BeOS details Introduction, BeOS system driver, BeOS details, BeOS details
 @subsubsection Introduction
 
 I have expended many hours on working out how CrystalSpace works in BeOS with
@@ -27,7 +36,7 @@ the other ports as well.
 This document serves as an aide-memoire for myself on BeOS CS and I will be
 periodically releasing updates to it.
 
-@node BeOS system driver
+@node BeOS system driver, BeOS Operation of SysSystemDriver, BeOS details Introduction, BeOS details
 @subsubsection Description of the BeOS SysSystemDriver
 
 CrystalSpace-based applications are derived from a single class of type
@@ -62,7 +71,7 @@ access all methods exported by the @code{ISystem} interface. The high level
 @code{SysSystemDriver} can be queried and controlled via the @file{driver}
 pointer.
 
-@node BeOS Operation of SysSystemDriver
+@node BeOS Operation of SysSystemDriver, Description of BeOS 2D Graphics Driver, BeOS system driver, BeOS details
 @subsubsection Operation of SysSystemDriver
 
 This description follows the execution of walktest.
@@ -93,13 +102,13 @@ entirely. @code{NextFrame()} is a method in @code{SysSystemDriver}, though it
 is overridden in walktest. @code{Walktest::NextFrame} does all the stuff
 needed to setup and draw the next frame.
 
-@node Description of BeOS 2D Graphics Driver
+@node Description of BeOS 2D Graphics Driver, Operation of BeOS 2D Graphics Driver, BeOS Operation of SysSystemDriver, BeOS details
 @subsubsection Description of BeOS 2D Graphics Driver
 
 The BeOS-specific 2D Graphics class is @code{csGraphics2DBeLib} and it is
 derived from the general 2D graphics class csGraphics2D.
 
-@node Operation of BeOS 2D Graphics Driver
+@node Operation of BeOS 2D Graphics Driver, BeOS Bug List and To-Do Items, Description of BeOS 2D Graphics Driver, BeOS details
 @subsubsection Operation of BeOS 2D Graphics Driver
 
 During system initialisation in @code{csSystemDriver::Initialize()} an
@@ -151,7 +160,7 @@ static: @samp{unsigned char* csGraphics2D::Memory = NULL;}
 The @code{Print()} method displays the bitmap by locking the window, blitting
 the @code{BBitmap} to the @code{CrystView}, then unlocking the window.
 
-@node BeOS Bug List and To-Do Items
+@node BeOS Bug List and To-Do Items, , Operation of BeOS 2D Graphics Driver, BeOS details
 @subsubsection Bug List and To-Do Items
 
 This is the list of BeOS-specific bugs compiled by Eric Sunshine

@@ -1,5 +1,5 @@
 @c -*-texinfo-*-
-@node Config_World
+@node Config_World, Config_VideoDriver, Config_Plugins, Config_Common
 @subsubsection @code{[World]} section
 
 The @code{[World]} section contains options for the engine.

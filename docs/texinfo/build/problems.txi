@@ -1,5 +1,5 @@
 @c -*-texinfo-*-
-@node Problems
+@node Problems, Quick Start, OSSpecific, Building
 @section Known platform specific bugs and problems
 
 These problems are both relevant for compiling and running.

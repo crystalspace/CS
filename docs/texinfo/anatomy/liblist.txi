@@ -1,5 +1,5 @@
 @c -*-texinfo-*-
-@node Library List
+@node Library List, Directory Structure, Anatomy, Anatomy
 @section Quick Overview of Modules and Libraries
 @cindex Module List
 @cindex Library List

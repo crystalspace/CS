@@ -1,12 +1,17 @@
 @c -*-texinfo-*-
-@node OS/2
+@node OS/2, Macintosh, NeXT, OSSpecific
 @subsection OS/2
 @cindex OS/2
 
 The OS/2 port of Crystal Space was created, and is maintained by
 @email{bit@@eltech.ru, Andrew Zabolotny}.
 
-@node OS2 prereq
+@menu
+* OS2 prereq:: Pre-requisites
+* OS2 compile:: Compiling the libraries
+@end menu
+
+@node OS2 prereq, OS2 compile, OS/2, OS/2
 @subsubsection Pre-requisites
 
 Currently Crystal Space compiles under OS/2 only with GNU C/C++ compiler.
@@ -53,7 +58,7 @@ For example, you can look for them at:
 @uref{ftp://ftp.uu.net/graphics/png/src}@code{/lpng???.zip} @*
 @uref{ftp://ftp.uu.net/graphics/jpeg}@code{/jpegsrc.???.tar.gz}
 
-@node OS2 compile
+@node OS2 compile, , OS2 prereq, OS/2
 @subsubsection Compiling the libraries
 
 You will need to pre-compile at least Z-lib prior to compiling

@@ -1,5 +1,5 @@
 @c -*-texinfo-*-
-@node Walktest_Keyboard
+@node Walktest_Keyboard, Console, Walktest, Walktest
 @subsection Keyboard Interface
 @cindex Walktest Keys
 @cindex Keyboard Control, Walktest
@@ -28,7 +28,7 @@ Move up or down.
 @item @key{ALT}-@key{LEFT}, @key{ALT}-@key{RIGHT}
 Strafe left or right.
 
-@item @key{PGUP}, @key{PGDN}
+@item @key{PAGE-UP}, @key{PAGE-DOWN}
 Rotate upwards or downwards.
 
 @item 3
@@ -154,10 +154,10 @@ Delete the last created dynamic light.
 Delete all dynamic lights.
 
 @item 2
-...BROKEN...
+@emph{Broken}.
 
 @item @key{SHIFT}-2
-...BROKEN...
+@emph{Broken}.
 
 @item @key{F1}
 (X version only) Used when simulating a 15/16-bit display on an 8-bit

@@ -1,5 +1,5 @@
 @c -*-texinfo-*-
-@node OS2 details
+@node OS2 details, BeOS details, NeXT details, Platform_Details
 @subsection Detailed information for OS/2
 
 The OS/2 port of CrystalSpace has a number of specific features that should
@@ -7,7 +7,15 @@ be mentioned, so that you can better understand sourcecode and/or make
 modifications, if you need them. If you do, you should make them available
 to the public, as stated by the LGPL. @xref{License}.
 
-@node OS2 DIVE
+@menu
+* OS2 DIVE:: DIVE
+* OS2 DIVE features:: DIVE features
+* OS2 Mouse and Kbd:: Mouse and keyboard
+* OS2 Crashes:: Mysterious crashes
+* OS2 Contributors:: Contributors
+@end menu
+
+@node OS2 DIVE, OS2 DIVE features, OS2 details, OS2 details
 @subsubsection DIVE
 
 The current implementation requires DIVE, so the application is compiled as a
@@ -42,7 +50,7 @@ be rescaled to the maximum possible integer factor such that window won't be
 larger than screen. For example, a 320x200 window in 1152x864 resolution will
 be automatically rescaled at startup to 960x600.
 
-@node OS2 DIVE features
+@node OS2 DIVE features, OS2 Mouse and Kbd, OS2 DIVE, OS2 details
 @subsubsection DIVE features
 
 Here is a short list of implementation features related to DIVE:
@@ -159,7 +167,7 @@ disabled the @samp{Enable EnDIVE in 16bpp and 32bpp} checkbox in the Matrox
 settings notebook. This is a real performance killer! (fps drops twice on my
 Matrox II AGP, for example!)
 
-@node OS2 Mouse and Kbd
+@node OS2 Mouse and Kbd, OS2 Crashes, OS2 DIVE features, OS2 details
 @subsubsection Mouse and keyboard
 
 I was too lazy to intercept system event queue, so code generates all
@@ -198,7 +206,7 @@ as 2D sprites. This is slower but more precise. Theoretically
 pointer from @samp{native} CrystalSpace textures, but I was too lazy for
 this.
 
-@node OS2 Crashes
+@node OS2 Crashes, OS2 Contributors, OS2 Mouse and Kbd, OS2 details
 @subsubsection Mysterious crashes
 
 If you just compiled WALKTEST or MAZED or some other executable (or even
@@ -213,7 +221,7 @@ using @samp{set GCCLOAD}). So you should either recompile everything with
 @code{-Zsys}, or recompile everything with @code{-Zcrtdll}, or do a
 @samp{emxload -q} before running such executables.
 
-@node OS2 Contributors
+@node OS2 Contributors, , OS2 Crashes, OS2 details
 @subsubsection Contributors
 
 For the moment, there is only one contributor :-) If you have any

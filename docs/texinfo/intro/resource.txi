@@ -1,5 +1,5 @@
 @c -*-texinfo-*-
-@node WhereToGet
+@node WhereToGet, Mailing Lists, Feature List, CS Introduction
 @section Where To Get Crystal Space
 
 The Crystal Space home page.  This page contains the latest development and
@@ -17,7 +17,7 @@ Crystal Space Homepage: @uref{http://crystal.linuxgames.com}
 If you want to keep in touch with the latest development of CS you can try to
 access the CVS server.  Have a look at the above page to see how this works.
 
-@node Mailing Lists
+@node Mailing Lists, Texture Archive, WhereToGet, CS Introduction
 @section Mailing Lists
 @cindex Mailing Lists
 
@@ -47,8 +47,8 @@ the instructions there. To unsubscribe goto the same page and follow the
 instructions for unsubscribing.
 
 
-@node Texture Archive
-@section The Texture Archive
+@node Texture Archive, Feedback, Mailing Lists, CS Introduction
+@section Texture Archive
 
 A Crystal Space texture archive is maintained at
 @uref{http://server.empathy.com/crystal}.

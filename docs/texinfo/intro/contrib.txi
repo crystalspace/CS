@@ -1,5 +1,5 @@
 @c -*-texinfo-*-
-@node Contributors
+@node Contributors, License, Authors, CS Introduction
 @section Crystal Space Contributors
 @cindex Contributors
 

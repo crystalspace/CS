@@ -1,5 +1,5 @@
 @c -*-texinfo-*-
-@node MS-DOS
+@node MS-DOS, GCC Windows, BeOS, OSSpecific
 @subsection MS-DOS
 @cindex MS-DOS
 
@@ -9,7 +9,14 @@ The DJGPP port of Crystal Space for MS-DOS is maintained by
 If you want to compile and use Crystal Space for DOS using the DJGPP compiler
 (@uref{http://www.delorie.com/djgpp}), you're reading the right document.
 
-@node MSDOS files
+@menu
+* MSDOS files:: Files you will need
+* MSDOS Install:: Installation
+* MSDOS Allegro:: Allegro
+* MSDOS Bugs:: Bugs
+@end menu
+
+@node MSDOS files, MSDOS Install, MS-DOS, MS-DOS
 @subsubsection Files you will need
 
 You should use the Crystal Space makefile system to compile Crystal Space.
@@ -69,7 +76,7 @@ These are needed if the @samp{original} libraries don't work.
 @uref{ftp://ftp.linuxgames.com/crystal/nasm/nasm-0.98e-bin-dos.zip}
 @end table
 
-@node MSDOS Install
+@node MSDOS Install, MSDOS Allegro, MSDOS files, MS-DOS
 @subsubsection Installation
 
 @itemize @bullet
@@ -99,7 +106,7 @@ Now just CD to your Crystal Space directory, run make and follow the
 instructions.
 @end itemize
 
-@node MSDOS Allegro
+@node MSDOS Allegro, MSDOS Bugs, MSDOS Install, MS-DOS
 @subsubsection Allegro
 
 If you use Allegro graphics library (and want to use it in Crystal Space),
@@ -112,7 +119,7 @@ USE_ALLEGRO = yes
 
 to config.mak (after configuring as usual).
 
-@node MSDOS Bugs
+@node MSDOS Bugs, , MSDOS Allegro, MS-DOS
 @subsubsection Bugs
 
 The compiled libraries didn't work for me, so I made my own. You can download

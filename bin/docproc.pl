@@ -4,30 +4,36 @@
 #    Automated Texinfo to HTML Conversion and CVS Update Script
 #    Copyright (C) 2000 by Eric Sunshine <sunshine@sunshineco.com>
 #
-#    This library is free software; you can redistribute it and/or
-#    modify it under the terms of the GNU Library General Public
-#    License as published by the Free Software Foundation; either
-#    version 2 of the License, or (at your option) any later version.
+#    This program is free software; you can redistribute it and/or modify
+#    it under the terms of the GNU General Public License as published by
+#    the Free Software Foundation; either version 2 of the License, or
+#    (at your option) any later version.
 #
-#    This library is distributed in the hope that it will be useful,
+#    This program is distributed in the hope that it will be useful,
 #    but WITHOUT ANY WARRANTY; without even the implied warranty of
-#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-#    Library General Public License for more details.
+#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#    GNU General Public License for more details.
 #
-#    You should have received a copy of the GNU Library General Public
-#    License along with this library; if not, write to the Free
-#    Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+#    You should have received a copy of the GNU General Public License
+#    along with this program; if not, write to the Free Software
+#    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 #
 #==============================================================================
 #------------------------------------------------------------------------------
-# docconv.pl
+# docproc.pl
 #
-#    A tool for generating HTML format documentation from Texinfo sources and
-#    committing the converted documentation to a CVS repository.  This script
-#    takes special care to invoke the appropriate CVS commands to add new
-#    files and directories to the repository, and to remove obsolete files.
-#    It also correctly handles binary files (such as images) by committing
-#    them to the repository with the "-kb" CVS flag.
+#    A tool for automatically processing documentation and committing changes
+#    to the CVS repository in which the documentation resides.  This tool
+#    performs several tasks:
+#
+#        - Repairs broken @node directives and @menu blocks.
+#        - Converts Texinfo documentation to HTML format.
+#        - Commits all changes to the CVS repository.
+#
+#    This script takes special care to invoke the appropriate CVS commands to
+#    add new files and directories to the repository, and to remove obsolete
+#    files.  It also correctly handles binary files (such as images) by
+#    committing them to the repository with the "-kb" CVS flag.
 #
 #    Typically this script is run via the 'cron' daemon.  See the cron(8),
 #    crontab(1), and crontab(8) man pages for information specific to cron.
@@ -38,7 +44,7 @@
 #        3 1 * * * $HOME/bin/docconv.pl
 #
 #    The script makes no attempt to perform any sort of CVS authentication.
-#    Currently, it is the client's responibility to authenticate with the CVS
+#    Currently, it is the client's responsibility to authenticate with the CVS
 #    server if necessary.  For :pserver: access the easiest way to work around
 #    this limitation is to login to the CVS server one time manually using the
 #    appropriate identity.  Once logged in successfully, the authentication
@@ -49,18 +55,30 @@
 #    access to the repository.
 #
 # To-Do List
-#    - Possibly perform some ancillary tasks such as generating archives of
+#    * Generalize into a "job" processing mechanism.  Each job should reside
+#      within its own source file.  There can be jobs to check out files from
+#      CVS, run the various 'make' commands (make platform, make htmldoc,
+#      make repairdoc, etc.), and perform the comparision and commit of
+#      generated files.
+#    * Possibly perform some ancillary tasks such as generating archives of
 #      the converted documentation available in various formats (.tgz, .zip,
 #      etc.) as well as making the documentation available online to browsers.
-#    - Generalize further in order to support addition format conversions.
 #
 #------------------------------------------------------------------------------
 use Carp;
 use File::Copy;
 use File::Find;
 use File::Path;
+use Getopt::Long;
 use POSIX 'tmpnam';
 use strict;
+$Getopt::Long::ignorecase = 0;
+
+my $PROG_NAME = 'docproc.pl';
+my $PROG_VERSION = '1.1';
+my $AUTHOR_NAME = 'Eric Sunshine';
+my $AUTHOR_EMAIL = 'sunshine@sunshineco.com';
+my $COPYRIGHT = "Copyright (C) 2000 by $AUTHOR_NAME <$AUTHOR_EMAIL>";
 
 #------------------------------------------------------------------------------
 # Configuration Section
@@ -78,27 +96,42 @@ use strict;
 #    OLD_HTML_DIR - Relative path to existing HTML directory hierarchy within
 #        the CVS repository.
 #    NEW_HTML_DIR - Relative path to newly generated HTML directory hierarchy.
+#    TEXINFO_DIR - Relative path to Texinfo source directory hierarchy.
 #    PLATFORM - An essentially arbitrary platform name for the makefile
 #        configuration step.  The rules for building the documentation do not
-#        actually care about the platform, but the makefile architecture 
+#        actually care about the platform, but the makefile architecture
 #        expects the makefiles to have been configured before a makefile
 #        target can be invoked.
-#    LOG_MESSAGE = The log message for CVS transactions.
+#    LOG_MESSAGE_HTML = Log message for CVS transactions for HTML conversion.
+#    LOG_MESSAGE_REPAIR = Log message for CVS transactions for repaired
+#        document files.
 #------------------------------------------------------------------------------
 
-$ENV{"CVS_RSH"} = "ssh";
-my $CVSUSER = "sunshine";
+$ENV{'CVS_RSH'} = 'ssh';
+my $CVSUSER = 'sunshine';
 my $CVSROOT = "$CVSUSER\@cvs1:/cvsroot/crystal";
-my $CVS_SOURCES = "CS/bin CS/docs CS/libs/cssys/unix CS/mk CS/Makefile";
-my $FAKE_DIRS = "CS/include";
-my $OLD_HTML_DIR = "docs/html";
-my $NEW_HTML_DIR = "out/docs/html";
-my $PLATFORM = "linux";
-my $LOG_MESSAGE = "Automated Texinfo to HTML conversion.";
+my $CVS_SOURCES = 'CS/bin CS/docs CS/libs/cssys/unix CS/mk CS/Makefile';
+my $FAKE_DIRS = 'CS/include';
+my $OLD_HTML_DIR = 'docs/html';
+my $NEW_HTML_DIR = 'out/docs/html';
+my $TEXINFO_DIR = 'docs/texinfo';
+my $PLATFORM = 'linux';
+my $LOG_MESSAGE_HTML = 'Automated Texinfo to HTML conversion.';
+my $LOG_MESSAGE_REPAIR = 'Automated Texinfo \@node and \@menu repair.';
 
+#------------------------------------------------------------------------------
+# Internal configuration.
+#------------------------------------------------------------------------------
 my $DEBUG = undef;
 my $CONV_DIR = tmpnam();
 my $CAPTURED_OUTPUT;
+my $MAKE = 'make';
+
+my @SCRIPT_OPTIONS = (
+    'debug!' => \$DEBUG,
+    'help'   => \&option_help,
+    '<>'     => \&option_error
+);
 
 #------------------------------------------------------------------------------
 # Terminate abnormally and print a textual representation of "errno".
@@ -131,8 +164,7 @@ sub change_directory {
 # Copy a file.
 #------------------------------------------------------------------------------
 sub copy_file {
-    my $src = shift;
-    my $dst = shift;
+    my ($src, $dst) = @_;
     copy($src, $dst) or expire("copy($src,$dst)");
 }
 
@@ -199,7 +231,7 @@ sub cvs_add {
     if (-d $src) {
 	print "Adding directory: $file\n";
 	create_directory($dst);
-	run_command("cvs -Q add -m \"$LOG_MESSAGE\" $dst") if !$DEBUG;
+	run_command("cvs -Q add -m \"$LOG_MESSAGE_HTML\" $dst") if !$DEBUG;
     }
     else {
 	my $isbin = -B $src;
@@ -239,16 +271,25 @@ sub cvs_checkout {
 #------------------------------------------------------------------------------
 sub cvs_update {
     print "Modification summary:\n" .
-	run_command("cvs -q update $OLD_HTML_DIR");
+	run_command("cvs -q update $TEXINFO_DIR $OLD_HTML_DIR");
 }
 
 #------------------------------------------------------------------------------
-# Commit the converted files to the CVS repository.  The 'cvs' command is
-# smart enough to only commit the files which have actually changed.
+# Commit files to the CVS repository.  The 'cvs' command is smart enough to
+# only commit files which have actually changed.
+#------------------------------------------------------------------------------
+sub cvs_commit_files {
+    my ($files, $message) = @_;
+    run_command("cvs -Q commit -m \"$message\" $files") if !$DEBUG;
+}
+
+#------------------------------------------------------------------------------
+# Commit repaired and converted files to the CVS repository.
 #------------------------------------------------------------------------------
 sub cvs_commit {
     print "Committing changes.\n";
-    run_command("cvs -Q commit -m \"$LOG_MESSAGE\" $OLD_HTML_DIR") if !$DEBUG;
+    cvs_commit_files($TEXINFO_DIR,  $LOG_MESSAGE_REPAIR);
+    cvs_commit_files($OLD_HTML_DIR, $LOG_MESSAGE_HTML  );
 }
 
 #------------------------------------------------------------------------------
@@ -269,17 +310,18 @@ sub extract_docs {
 }
 
 #------------------------------------------------------------------------------
-# Perform the Texinfo to HTML conversion.  Currently this is done by running
-# the conversion target from the makefile.  Note that this target only works
-# if the makefile system has been configured for a particular platform, thus
-# we perform that step first.  It is also possible to perform the conversion
-# by running the conversion program manually, but for now the 'makefile'
-# approach is used.
+# Perform the Texinfo repair and HTML conversion.  This is accomplished by
+# invoking the appropriate makefile targets.  Note that the documentation
+# related targets only work if the makefile system has been configured for a
+# particular platform, thus that step must be perform first.
 #------------------------------------------------------------------------------
 sub build_docs {
+    print "Configuring documentation.\n";
+    run_command("$MAKE $PLATFORM");
+    print "Repairing documentation.\n";
+    run_command("$MAKE repairdoc");
     print "Building HTML documentation.\n";
-    run_command("make $PLATFORM");
-    run_command("make htmldoc");
+    run_command("$MAKE htmldoc");
 }
 
 #------------------------------------------------------------------------------
@@ -342,10 +384,10 @@ sub time_now {
 }
 
 #------------------------------------------------------------------------------
-# Perform the complete conversion process.
+# Perform the complete documentation repair and conversion process.
 #------------------------------------------------------------------------------
-sub run_conversion {
-    print "BEGIN: " . time_now() . "\n";
+sub process_docs {
+    print "$PROG_NAME version $PROG_VERSION\nBEGIN: " . time_now() . "\n";
     create_transient($CONV_DIR);
     extract_docs();
     change_directory("CS");
@@ -369,15 +411,19 @@ sub dump_captured {
 #------------------------------------------------------------------------------
 sub print_usage {
     my $stream = shift;
-    $stream = \*STDOUT if !$stream;
+    $stream = \*STDOUT unless $stream;
     print $stream <<EOT;
-Converts Texinfo documentation to HTML and updates the CVS repository with
+$PROG_NAME version $PROG_VERSION
+$COPYRIGHT
+
+Repairs out-of-date and broken \@node directives and \@menu blocks, then
+converts Texinfo documentation to HTML and updates the CVS repository with
 the results.
 
-Usage: $0 [options]
+Usage: $PROG_NAME [options]
 
-The options are:
-    --debug  Perform the conversion but do not modify the CVS repository.
+Options:
+    --debug  Process the documentation but do not modify the CVS repository.
     --help   Print this usage message.
 EOT
 }
@@ -386,22 +432,17 @@ EOT
 # Process command-line options.
 #------------------------------------------------------------------------------
 sub process_options {
-    my $opts = shift;
-    while (@$opts) {
-	$_ = shift(@$opts);
-	if (/^--?d(ebug)?$/) { $DEBUG=1; print "Debugging enabled.\n"; next; }
-	if (/^--?h(elp)?$/)  { print_usage(\*STDOUT); exit(0); }
-	else {
-	    print STDERR "Unknown option: $_\n\n";
-	    print_usage(\*STDERR);
-	    exit(1);
-	}
-    }
+    GetOptions(@SCRIPT_OPTIONS) or print("\n"), option_abort();
+    print "Debugging enabled.\n" if $DEBUG;
 }
+
+sub option_help  { print_usage(\*STDOUT); exit(0); }
+sub option_abort { print_usage(\*STDERR); exit(1); }
+sub option_error { print STDERR "Unknown option: @_\n\n"; option_abort(); }
 
 #------------------------------------------------------------------------------
 # Run the conversion.
 #------------------------------------------------------------------------------
-process_options(\@ARGV);
-run_conversion();
+process_options();
+process_docs();
 dump_captured();

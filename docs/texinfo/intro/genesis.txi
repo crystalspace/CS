@@ -1,5 +1,5 @@
 @c -*-texinfo-*-
-@node Genesis
+@node Genesis, Authors, Feedback, CS Introduction
 @section Genesis of Crystal Space
 @cindex Genesis
 

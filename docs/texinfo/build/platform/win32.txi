@@ -1,5 +1,5 @@
 @c -*-texinfo-*-
-@node Win32
+@node Win32, NeXT, Unix, OSSpecific
 @subsection Windows
 @cindex Windows
 
@@ -8,7 +8,14 @@ The Windows port of Crystal Space is maintained by
 variety of Windows installations and optional technologies such as DirectInput,
 DirectX, and Direct3D.
 
-@node Quickstart
+@menu
+* Quickstart::
+* Workspace::
+* Win32 FAQ:: FAQ
+* Win32 own apps:: Creating own applications
+@end menu
+
+@node Quickstart, Workspace, Win32, Win32
 @subsubsection Quickstart
 
 To compile Crystal Space, you'll have to perform the following steps:
@@ -61,7 +68,7 @@ explorer and call walktest.
 Enjoy :-)
 @end itemize
 
-@node Workspace
+@node Workspace, Win32 FAQ, Quickstart, Win32
 @subsubsection Workspace
 
 The Crystal Space workspace is divided into several projects. They
@@ -180,7 +187,7 @@ A simple 3D tetris clone.
 A simple first person shooter demo. (using csgame)
 @end table
 
-@node Win32 FAQ
+@node Win32 FAQ, Win32 own apps, Workspace, Win32
 @subsubsection FAQ
 
 @itemize @bullet
@@ -367,7 +374,7 @@ a personal reply. @xref{Mailing Lists}.
 @end table
 @end itemize
 
-@node Win32 own apps
+@node Win32 own apps, , Win32 FAQ, Win32
 @subsubsection Creating own applications
 
 After being able to compile and run, many people want to start creating their

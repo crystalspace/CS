@@ -1,5 +1,5 @@
 @c -*-texinfo-*-
-@node Writing Documentation
+@node Writing Documentation, Coding Style, Contributing, Contributing
 @section Writing Documentation
 @cindex Writing Documentation
 @cindex Documentation, Writing

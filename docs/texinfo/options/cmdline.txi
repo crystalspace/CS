@@ -1,5 +1,5 @@
 @c -*-texinfo-*-
-@node Common Command Line Options
+@node Common Command Line Options, Configuration File, Options, Options
 @section Common Command Line Options
 @cindex Common Command Line Options
 @cindex Command Line Options

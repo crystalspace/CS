@@ -1,5 +1,5 @@
 @c -*-texinfo-*-
-@node Config_VideoDriver
+@node Config_VideoDriver, Config_Lighting, Config_World, Config_Common
 @subsubsection @code{[VideoDriver]} section
 
 @table @code

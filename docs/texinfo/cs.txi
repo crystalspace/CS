@@ -1,29 +1,131 @@
 @c -*-texinfo-*-
+@c %**start of header
 @setfilename cs
-@settitle Crystal Space
+@import{version.txi}
+@settitle Crystal Space @value{VERSION}
+@setchapternewpage odd
+@finalout
+@c %**end of header
 
-@node Top, , (dir), (dir)
+@dircategory Crystal Space
+@direntry
+* CrystalSpace: (cs). Crystal Space 3D Engine.
+@end direntry
 
-@center @strong{Crystal Space}
+@ifinfo
+This file documents Crystal Space, an open-source 3D engine.  It provides
+both usage instructions and informative technical discussions.
 
-This is the Crystal Space Manual.
+This manual, edition @value{EDITION}, is for Crystal Space version
+@value{VERSION}, and was last updated on @value{UPDATED}.
 
-@emph{FIXME}: Create a proper title page.
+@import{cpyright.txi}
+
+Permission is granted to make and distribute verbatim copies of
+this manual provided the copyright notice and this permission notice
+are preserved on all copies.
+
+@ignore
+Permission is granted to process this file through TeX and print the
+results, provided the printed document carries copying permission
+notice identical to this one except for the removal of this paragraph
+(this paragraph not being relevant to the printed manual).
+
+@end ignore
+Permission is granted to copy and distribute modified versions of this
+manual under the conditions for verbatim copying, provided that the entire
+resulting derived work is distributed under the terms of a permission
+notice identical to this one.
+
+Permission is granted to copy and distribute translations of this manual
+into another language, under the above conditions for modified versions,
+except that this permission notice may be stated in a translation approved
+by the copyright holders.
+@end ifinfo
+
+@titlepage
+@title Crystal Space
+@subtitle Open-Source 3D Engine Documentation
+@subtitle Edition @value{EDITION} for Crystal Space @value{VERSION}
+@subtitle Last updated @value{UPDATED}
+@author Jorrit Tyberghein
+@author Andrew Zabolotny
+@author Eric Sunshine
+@author Thomas Hieber
+@author Michael Dale Long
+@author Michael Ewert
+@author Seth Galbraith
+
+@page
+@vskip 0pt plus 1filll
+@import{cpyright.txi}
+
+This manual, edition @value{EDITION}, is for Crystal Space version
+@value{VERSION}, and was last updated on @value{UPDATED}.
+
+Permission is granted to make and distribute verbatim copies of
+this manual provided the copyright notice and this permission notice
+are preserved on all copies.
+
+Permission is granted to copy and distribute modified versions of this
+manual under the conditions for verbatim copying, provided that the entire
+resulting derived work is distributed under the terms of a permission
+notice identical to this one.
+
+Permission is granted to copy and distribute translations of this manual
+into another language, under the above conditions for modified versions,
+except that this permission notice may be stated in a translation approved
+by the copyright holders.
+@end titlepage
+
+@shortcontents
+@contents
+
+@ifnottex
+@node Top, CS Introduction, , (dir)
+@top Crystal Space
+
+@html
+<center><h1>Crystal Space</h1></center><p>
+@end html
+
+Crystal Space is an open-source 3D engine.  It can be used for a variety of
+3D visualization tasks.  Many people will probably be interested in using
+Crystal Space as the basis of a 3D game, for which it is well suited.
+
+This document includes usage instructions, conceptual material, and detailed
+technical information.
+
+This is edition @value{EDITION} of the Crystal Space manual for Crystal Space
+version @value{VERSION}, last updated @value{UPDATED}.
+
+@ifinfo
+@menu
+* CS Introduction:: Introduction
+* Building:: Configure, Build, and Install
+* Options::
+* Applications::
+* Tutorials::
+* Concepts::
+* Anatomy:: Project Anatomy
+* Plug-In Drivers:: Plug-In Modules and Drivers
+* Contributing:: Contributing to Crystal Space
+* FAQ:: Frequently Asked Questions (FAQ)
+* Todo:: To-Do List
+* History::
+* Index::
+@end menu
+@end ifinfo
 
 @html
 For a list of available topics, see the
 <a href="cs_ovr.htm">quick overview</a>, or the full
 <a href="cs_toc.htm">table of contents</a>.
+<p><hr size=1>
 @end html
 
-@quotation
-@anchor{History}
-@emph{Missing}: This paragraph acts as an anchor for missing cross-references
-to documentation which has not yet been written.  Please ignore this text.
-@end quotation
-
-@shortcontents
-@contents
+@import{cpyright.txi}
+@end ifnottex
 
 @imports{intro,chapter.txi}
 @imports{build,chapter.txi}
@@ -35,3 +137,8 @@ to documentation which has not yet been written.  Please ignore this text.
 @imports{plugins,chapter.txi}
 @imports{contrib,chapter.txi}
 @imports{appendix,appendix.txi}
+
+@node Index, , History, Top
+@unnumbered Index
+
+@printindex cp

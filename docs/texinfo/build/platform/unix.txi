@@ -1,5 +1,5 @@
 @c -*-texinfo-*-
-@node Unix
+@node Unix, Win32, OSSpecific, OSSpecific
 @subsection Unix
 @cindex Unix
 
@@ -19,7 +19,14 @@ By default Crystal Space assumes that your server supports SHM. It will
 automatically auto-detect if your server doesn't support it. So you can
 safely leave it enabled.
 
-@node Unix Editing the Makefile
+@menu
+* Unix Editing the Makefile:: Editing the Makefile
+* Unix Compiling:: Compiling on Unix
+* Unix Other2d3d:: Compiling with other 3D and 2D drivers
+* Unix WhereOBJ:: Where are the Object Files?
+@end menu
+
+@node Unix Editing the Makefile, Unix Compiling, Unix, Unix
 @subsubsection Editing the Makefile
 
 The file @file{user.mak} (which you can find in @file{CS/mk}) is normally
@@ -59,7 +66,7 @@ a memory debugger which is in Crystal Space. Use only if you know
 what you are doing.
 @end table
 
-@node Unix Compiling
+@node Unix Compiling, Unix Other2d3d, Unix Editing the Makefile, Unix
 @subsubsection Compiling on Unix
 
 The makefiles require GNU make, which is typically named @file{make} on most
@@ -122,7 +129,7 @@ This step is not needed when @code{USE_SHARED_PLUGINS=no} is specified.
 
 Now you can run the executable @file{walktest}.
 
-@node Unix Other2d3d
+@node Unix Other2d3d, Unix WhereOBJ, Unix Compiling, Unix
 @subsubsection Compiling with other 3D and 2D drivers
 
 The makefiles are normally configured only for the software renderer
@@ -160,7 +167,7 @@ the @samp{VideoDriver} setting. Or else you can run Crystal Space as follows:
 walktest -video=opengl
 @end example
 
-@node Unix WhereOBJ
+@node Unix WhereOBJ, , Unix Other2d3d, Unix
 @subsubsection  Where are the Object Files?
 
 The build process places all object files and libraries in the directory

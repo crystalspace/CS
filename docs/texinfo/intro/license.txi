@@ -1,5 +1,5 @@
 @c -*-texinfo-*-
-@node License
+@node License, , Contributors, CS Introduction
 @section Gnu Library General Public License
 @cindex License
 

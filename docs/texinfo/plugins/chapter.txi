@@ -1,5 +1,5 @@
 @c -*-texinfo-*-
-@node Plug-In Drivers
+@node Plug-In Drivers, Contributing, Anatomy, Top
 @chapter Plug-In Modules and Drivers
 @cindex Plug-In Modules and Drivers
 @cindex Modules, Plug-In
@@ -20,6 +20,11 @@ that which is used by all other plug-in modules.
 
 The mechansim by which communication is carried out with plug-in modules
 and drivers is known as @sc{scf}.  @xref{SCF}.
+
+@menu
+* PlugIns:: Plug-In Modules
+* Drivers::
+@end menu
 
 @imports{plugins,plugins.txi}
 @imports{plugins,drivers.txi}

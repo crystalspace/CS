@@ -1,5 +1,5 @@
 @c -*-texinfo-*-
-@node Config_Console
+@node Config_Console, , Config_Lighting, Config_Common
 @subsubsection @code{[SimpleConsole]} section
 
 This section defines configuration options for the Simple Console

@@ -1,5 +1,5 @@
 @c -*-texinfo-*-
-@node Building
+@node Building, Options, CS Introduction, Top
 @chapter Configure, Build, and Install
 @cindex Configuration
 @cindex Building
@@ -11,6 +11,14 @@ and ends with detailed instructions for each supported platform.
 
 If you are eager to try out the package after building it successfully, then
 read the Quick Start section.  @xref{Quick Start}.
+
+@menu
+* Requirements::
+* External Libraries::
+* OSSpecific:: Platform Specific Instructions
+* Problems:: Known platform specific bugs and problems
+* Quick Start::
+@end menu
 
 @imports{build,sysreq.txi}
 @imports{build,extlibs.txi}

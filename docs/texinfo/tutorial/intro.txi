@@ -1,5 +1,5 @@
 @c -*-texinfo-*-
-@node Tutorial_Introduction
+@node Tutorial_Introduction, Tutorial_Simple, Tutorials, Tutorials
 @section Developing a Crystal Space Application
 
 Crystal Space is a package of components and libraries which can all be useful

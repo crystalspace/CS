@@ -1,5 +1,5 @@
 @c -*-texinfo-*-
-@node Macintosh
+@node Macintosh, BeOS, OS/2, OSSpecific
 @subsection Macintosh
 @cindex Macintosh
 
@@ -11,12 +11,17 @@ You will need the following to compile Crystal Space :
 @itemize @bullet
 @item
 Compiler: Metrowerks CodeWarrior Pro 4 or later.
-
 @item
 Include Files: Universal Includes 3.2 from Apple
 @end itemize
 
-@node MAC getting ready
+@menu
+* MAC getting ready:: Getting ready to develop
+* MAC projects:: Working with the Crystal Space projects
+* MAC FAQ:: Frequently Asked Questions
+@end menu
+
+@node MAC getting ready, MAC projects, Macintosh, Macintosh
 @subsubsection Getting ready to develop
 
 If you are going to build the Open GL Renderer you need to download the
@@ -38,7 +43,7 @@ manufacturer of your Voodoo-based Macintosh accelerator card. You will need
 to place a copy of your driver (library) into the LIB folder in order to
 build your projects.
 
-@node MAC projects
+@node MAC projects, MAC FAQ, MAC getting ready, Macintosh
 @subsubsection Working with the Crystal Space projects
 
 There are 22 Crystal Space projects in the mwcw folder:
@@ -152,7 +157,7 @@ Make sure the world file @file{flarge.zip} is in the data folder.
 You're all set to run the application.
 @end itemize
 
-@node MAC FAQ
+@node MAC FAQ, , MAC projects, Macintosh
 @subsubsection Frequently Asked Questions
 
 @table @samp

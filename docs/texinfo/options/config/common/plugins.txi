@@ -1,5 +1,5 @@
 @c -*-texinfo-*-
-@node Config_Plugins
+@node Config_Plugins, Config_World, Config_Common, Config_Common
 @subsubsection @code{[PlugIns]} section
 
 This section tells the program which plug-in modules to load.  These lines 

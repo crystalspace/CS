@@ -1,5 +1,5 @@
 @c -*-texinfo-*-
-@node HowToRead
+@node HowToRead, Current Status, CS Introduction, CS Introduction
 @section How To Read This Manual
 
 This manual has been written by numerous volunteers, and as such,
@@ -15,10 +15,16 @@ time user of CrystalSpace, may want to read it in order from front to back,
 as it has been organized to be most useful to the new user when perused in
 that order.
 
-If you have used CrystalSpace before, check the history to find out what's
-new. @xref{History}.
+@iftex
+If you have used CrystalSpace before, check the standard Crystal Space history
+log to find out what's new.
+@end iftex
+@ifnottex
+If you have used CrystalSpace before, check the history log to find out what's
+new.  @xref{History}.
+@end ifnottex
 
-@node Current Status
+@node Current Status, UsingForProject, HowToRead, CS Introduction
 @section Current Status
 
 Important Note! Crystal Space is still in beta.  This means that there are
@@ -33,7 +39,7 @@ but things could certainly be better.
 We also have a very active developers team working to make it as useable as
 possible.  We are are getting there :-)
 
-@node UsingForProject
+@node UsingForProject, Feature List, Current Status, CS Introduction
 @section Using Crystal Space For Your Project
 
 What if you want to use Crystal Space in your project?

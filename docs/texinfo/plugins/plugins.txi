@@ -1,5 +1,5 @@
 @c -*-texinfo-*-
-@node PlugIns
+@node PlugIns, Drivers, Plug-In Drivers, Plug-In Drivers
 @section Plug-In Modules
 @cindex Plug-In Modules
 
@@ -10,9 +10,14 @@ modify Crystal Space itself.
 This section provides a list of plug-in modules which are bundled with Crystal
 Space.
 
+@menu
+* CrystalClear::
+* csPython::
+@end menu
+
 @imports{plugins,csclear.txi}
 
-@node csPython
+@node csPython, , CrystalClear, PlugIns
 @subsection csPython
 @cindex csPython
 @cindex Python

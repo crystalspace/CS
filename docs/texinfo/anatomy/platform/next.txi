@@ -1,5 +1,5 @@
 @c -*-texinfo-*-
-@node NeXT details
+@node NeXT details, OS2 details, Platform_Details, Platform_Details
 @subsection Detailed Information for NeXT
 
 This document contains comprehensive and detailed implementation information
@@ -35,7 +35,18 @@ A future version of the MacOS/X Server port may make use of the new public
 API for direct frame-buffer access provided by the @code{NSDirectBitmap},
 @code{NSDirectPalette}, and @code{NSDirectScreen} classes.
 
-@node NeXT Dirs
+@menu
+* NeXT Dirs:: Directories
+* NeXT Files:: Files
+* NeXT Run-Loop:: Run-Loop
+* NeXT Video Optimization:: Video Optimization
+* NeXT Frame Buffer Processing:: Frame Buffer Processing
+* NeXT Future Plans:: Future Plans
+* NeXT Bugs:: Bugs
+* NeXT History:: History for the NeXT port
+@end menu
+
+@node NeXT Dirs, NeXT Files, NeXT details, NeXT details
 @subsubsection Directories
 
 The root components of this port of Crystal Space are in the directories
@@ -81,7 +92,7 @@ files specific to the NextStep port reside in
 platforms reside in @file{CS/libs/cs2d/next/shared}.
 @end itemize
 
-@node NeXT Files
+@node NeXT Files, NeXT Run-Loop, NeXT Dirs, NeXT details
 @subsubsection Files
 
 This port of Crystal Space makes use of a number of platform-specific
@@ -209,7 +220,7 @@ A concrete subclass of @code{NeXTFrameBuffer} which can convert Crystal
 Space @code{RGB:888} to NeXT @code{RGBA:8888}.
 @end table
 
-@node NeXT Run-Loop
+@node NeXT Run-Loop, NeXT Video Optimization, NeXT Files, NeXT details
 @subsubsection Run-Loop
 
 The design of Crystal Space assumes that the programmer has full control over
@@ -268,7 +279,7 @@ framework. The current design is geared more toward outmoded command-line
 environments, such as DOS or Unix, where the program can simply take control
 of the entire environment without regard to other outside factors.
 
-@node NeXT Video Optimization
+@node NeXT Video Optimization, NeXT Frame Buffer Processing, NeXT Run-Loop, NeXT details
 @subsubsection Video Optimization
 
 Unlike programs on some other platforms, OpenStep and NextStep applications
@@ -390,7 +401,7 @@ hardware use either 12- or 24-bit RGB frame buffers so the actual impact of
 this limitation may not be particularly severe.
 
 
-@node NeXT Frame Buffer Processing
+@node NeXT Frame Buffer Processing, NeXT Future Plans, NeXT Video Optimization, NeXT details
 @subsubsection Frame Buffer Processing
 
 With few exceptions, most MacOS/X Server, OpenStep, and NextStep
@@ -495,7 +506,7 @@ image data, looks up its corresponding @code{RGBA:4444} value in the
 translation table and outputs that color. This technique is both simple and
 generally efficient.
 
-@node NeXT Future Plans
+@node NeXT Future Plans, NeXT Bugs, NeXT Frame Buffer Processing, NeXT details
 @subsubsection Future Plans
 
 This is a list of items which are planned for future releases of this
@@ -531,7 +542,7 @@ placed at the tail of the event queue, it will not smother out user events.
 Possibly implement sound support.
 @end itemize
 
-@node NeXT Bugs
+@node NeXT Bugs, NeXT History, NeXT Future Plans, NeXT details
 @subsubsection Bugs
 
 This is a list of known problems with the current release of this project:
@@ -552,7 +563,7 @@ distinct keyboard / hardware combinations that NextStep runs on, and it
 would be necessary to hard-code scan-codes for each one.
 @end itemize
 
-@node NeXT History
+@node NeXT History, , NeXT Bugs, NeXT details
 @subsubsection History for the NeXT port
 
 @table @asis

@@ -1,5 +1,5 @@
 @c -*-texinfo-*-
-@node CCtest
+@node CCtest, CSWStest, Blocks, Applications
 @section CCtest
 @cindex Applications, CCtest
 

@@ -1,5 +1,5 @@
 @c -*-texinfo-*-
-@node CVS Guide
+@node CVS Guide, Porting, Coding Style, Contributing
 @section CVS Etiquette Guidelines
 
 Since Crystal Space has enough developers to warrant the use of CVS to manage

@@ -32,8 +32,10 @@ APPHELP = \
   echo $"The following Crystal Space applications can be built:$"
 LIBHELP = \
   echo $"The following Crystal Space libraries can be built:$"
+DOCHELP = \
+  echo $"The following Crystal Space documentation targets can be invoked:$"
 define PSEUDOHELP
-  echo $"The following pseudo targets can be built:$"
+  echo $"The following pseudo targets can be invoked:$"
   echo $"  make apps         Make all applications$"
   echo $"  make libs         Make all static libraries$"
   echo $"  make plugins      Make all plug-in modules including drivers$"
@@ -78,7 +80,8 @@ else
 MAKESECTION=rootdefines
 include mk/subs.mak
 
-help: banner showconfig driverhelp pluginhelp libhelp apphelp pseudohelp
+help: banner showconfig driverhelp pluginhelp libhelp apphelp dochelp \
+  pseudohelp
 
 depend:
 	@$(MAKE) --no-print-directory -f mk/cs.mak $@ DO_DEPEND=yes
@@ -113,6 +116,10 @@ libhelp:
 
 apphelp:
 	@$(APPHELP)
+	@echo $(SEPARATOR)
+
+dochelp:
+	@$(DOCHELP)
 	@echo $(SEPARATOR)
 
 pseudohelp:

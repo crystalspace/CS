@@ -1,5 +1,5 @@
 @c -*-texinfo-*-
-@node csPhyzik
+@node csPhyzik, SCF, Makefile Structure, Anatomy
 @section csPhyziks Library @code{csphyzik}
 @cindex Phyziks
 @cindex csphyzik
@@ -35,7 +35,18 @@ for the state of your body.  Then you would request the new position from
 the engine via a pointer to your body.  That value would be used that to
 update the position of the object that represents your body in the renderer.
 
-@node csPhyzik World
+@menu
+* csPhyzik World:: The World
+* csPhyzik Bodies:: Bodies
+* csPhyzik Forces:: Forces
+* csPhyzik Articulated Bodies:: Articulated Bodies
+* csPhyzik Impulses:: Impulses
+* csPhyzik Solvers:: Solvers
+* csPhyzik Evolve-Collide-Update Loop:: Evolve-Collide-Update Loop
+* csPhyzik ODE Solvers:: ODE Solvers
+@end menu
+
+@node csPhyzik World, csPhyzik Bodies, csPhyzik, csPhyzik
 @subsection The World
 
 There is a convenient header file that includes all the other headers you
@@ -68,7 +79,7 @@ phyz_world.evolve( time_start, time_end );
 
 Now the rigid body we added should have been moved by the gravity force.
 
-@node csPhyzik Bodies
+@node csPhyzik Bodies, csPhyzik Forces, csPhyzik World, csPhyzik
 @subsection Bodies
 
 The inheritance heirarchy for bodies looks something like this:
@@ -127,7 +138,7 @@ Angular velocity is specified by a vector that points in the direction of the
 axis of rotation. The magnitude of that vector determines how fast it
 rotates.
 
-@node csPhyzik Forces
+@node csPhyzik Forces, csPhyzik Articulated Bodies, csPhyzik Bodies, csPhyzik
 @subsection Forces
 
 There are many types of forces that can be used. More are easy to add as
@@ -154,7 +165,7 @@ rb2->add_force( sf );
 Simple forces would be something like a rocket engine or other kind of force
 that only acts on one body.
 
-@node csPhyzik Articulated Bodies
+@node csPhyzik Articulated Bodies, csPhyzik Impulses, csPhyzik Forces, csPhyzik
 @subsection Articulated Bodies
 
 An articulated body is a rigid body that can have one or more other rigid
@@ -184,7 +195,7 @@ It is possible to define your own joints from @code{ctJoint}. You can then
 overload the @code{get_actuator_magnitude()} method to implement a joint with
 a motor that will exert whatever force you like at that joint.
 
-@node csPhyzik Impulses
+@node csPhyzik Impulses, csPhyzik Solvers, csPhyzik Articulated Bodies, csPhyzik
 @subsection Impulses
 
 An impulse is a large force applied over a very short time
@@ -196,7 +207,7 @@ rb->apply_impulse( vector_direction_of_impulse_with_magnitude,
                    vector_location_of_impulse_in_world_coords );
 @end example
 
-@node csPhyzik Solvers
+@node csPhyzik Solvers, csPhyzik Evolve-Collide-Update Loop, csPhyzik Impulses, csPhyzik
 @subsection Solvers
 
 Every object has a solver that represents the algorithm used
@@ -204,7 +215,7 @@ to help calulate it's change in state each time-step.  A
 ctPhysicalEntity or any of it's sub-classes can change what
 solver it uses at any time.
 
-@node csPhyzik Evolve-Collide-Update Loop
+@node csPhyzik Evolve-Collide-Update Loop, csPhyzik ODE Solvers, csPhyzik Solvers, csPhyzik
 @subsection Evolve-Collide-Update Loop
 
 This section will outline a good strategy for your main loop using the
@@ -262,7 +273,7 @@ minimum collision distance. This can be quite a time-consuming process.
 The collision response code does not currently support multiple points of
 simultaneous collision on one object.
 
-@node csPhyzik ODE Solvers
+@node csPhyzik ODE Solvers, , csPhyzik Evolve-Collide-Update Loop, csPhyzik
 @subsection ODE Solvers
 
 The Ordinary Differential Equation solver. @code{ctWorld} starts out with a

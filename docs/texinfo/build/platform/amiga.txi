@@ -1,10 +1,10 @@
 @c -*-texinfo-*-
-@node Amiga
+@node Amiga, , GCC Windows, OSSpecific
 @subsection Amiga
 @cindex Amiga
 
 @strong{WARNING} The Amiga port of Crystal Space is extremely out of date
-and completely broken.  It has been maintained as part of the standard
+and entirely broken.  It has been included as part of the standard
 distribution in the hope that someone with Amiga experience will step forward
 to repair and maintain it.
 

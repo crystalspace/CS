@@ -1,5 +1,5 @@
 @c -*-texinfo-*-
-@node Console_Value
+@node Console_Value, Console_MultiChoice, Console_Boolean, Console
 @subsubsection Value commands
 
 A value command has some value associated with it. Typing the command without

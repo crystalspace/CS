@@ -1,5 +1,5 @@
 @c -*-texinfo-*-
-@node BeOS
+@node BeOS, MS-DOS, Macintosh, OSSpecific
 @subsection BeOS
 @cindex BeOS
 
@@ -50,7 +50,13 @@ make libjpeg.a
 Other required libraries, zlib and libpng are already present on BeOS 4.5,
 so there is no need to manually install them.
 
-@node BeOS settings
+@menu
+* BeOS settings::
+* BeOS Program settings:: Program settings
+* BeOS testing:: Testing
+@end menu
+
+@node BeOS settings, BeOS Program settings, BeOS, BeOS
 @subsubsection BeOS settings
 
 You set up the compilation environment by going into the @file{CS/} directory
@@ -107,7 +113,7 @@ Finally, to build the example applications:
 make apps
 @end example
 
-@node BeOS Program settings
+@node BeOS Program settings, BeOS testing, BeOS settings, BeOS
 @subsubsection Program settings
 
 You will need to have a world file to do anything.  I suggest downloading
@@ -121,7 +127,7 @@ WORLDFILE=flarge
 The rest of the settings are mostly self evident and can often be overridden
 at the command line.
 
-@node BeOS testing
+@node BeOS testing, , BeOS Program settings, BeOS
 @subsubsection Testing
 
 You may want to switch to a different workspace and set the screen resolution

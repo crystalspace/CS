@@ -1,5 +1,5 @@
 @c -*-texinfo-*-
-@node NeXT
+@node NeXT, OS/2, Win32, OSSpecific
 @subsection NeXT
 @cindex NeXT
 @cindex NextStep
@@ -13,7 +13,17 @@ Crystal Space was ported to MacOS/X Server, OpenStep, and NextStep by Eric
 Sunshine in February of 1999.  If you have questions or comments about this
 port, please contact me at: Eric Sunshine (@email{sunshine@@sunshineco.com}).
 
-@node NeXT Binary-only version
+@menu
+* NeXT Binary-only version::
+* NeXT GNU make:: GNU make
+* NeXT Packages:: Packages
+* NeXT Architectures:: Architectures
+* NeXT Supporting Libs:: Supporting Libraries
+* NeXT Building:: Building
+* NeXT using CS:: Using Crystal Space
+@end menu
+
+@node NeXT Binary-only version, NeXT GNU make, NeXT, NeXT
 @subsubsection NeXT Binary-only version
 
 These paragraphs only apply if you got the binary-only version for MacOS/X,
@@ -68,7 +78,7 @@ MetaBalls, MazeD, and Blocks can be run with the following commands:
 % ./blocks
 @end example
 
-@node NeXT GNU make
+@node NeXT GNU make, NeXT Packages, NeXT Binary-only version, NeXT
 @subsubsection GNU make
 
 Building Crystal Space requires GNU's @file{make} utility.  NextStep does not
@@ -140,7 +150,7 @@ you should probably rename the installed executable to @file{gnumake} rather
 than the default name, @file{make}.  The remaining instructions in this
 document assume that it is installed as @file{gnumake}.
 
-@node NeXT Packages
+@node NeXT Packages, NeXT Architectures, NeXT GNU make, NeXT
 @subsubsection Packages
 
 Once you have obtained the latest Crystal Space source code package and its
@@ -182,7 +192,7 @@ placed in the @file{CS/data} directory.  For example:
 % mv large.zip CS/data/large.zip
 @end example
 
-@node NeXT Architectures
+@node NeXT Architectures, NeXT Supporting Libs, NeXT Packages, NeXT
 @subsubsection Architectures
 
 This project may be built for any of the architectures which are supported by
@@ -232,7 +242,7 @@ make libjpeg.a CC="cc -arch i386 -arch m68k -arch sparc"
 If CC is not specified then the library is compiled for the hardware on which
 it is being built.
 
-@node NeXT Supporting Libs
+@node NeXT Supporting Libs, NeXT Building, NeXT Architectures, NeXT
 @subsubsection Supporting Libraries
 
 Before building Crystal Space, it is necessary to build the supporting
@@ -258,7 +268,7 @@ this feature, then omit the @code{CC="..."} directive altogether.
 % make libjpeg.a CC="cc -arch i386 -arch m68k -arch sparc -arch hppa"
 @end example
 
-@node NeXT Building
+@node NeXT Building, NeXT using CS, NeXT Supporting Libs, NeXT
 @subsubsection Building
 
 The Crystal Space project consists of a number of components and example
@@ -315,7 +325,7 @@ build these programs type:
 % gnumake blks  # Builds blocks, the 3D-Tetris style game
 @end example
 
-@node NeXT using CS
+@node NeXT using CS, , NeXT Building, NeXT
 @subsubsection Using Crystal Space
 
 Ensure that the file @file{standard.zip} is in the top-level CS directory.

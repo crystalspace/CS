@@ -1,5 +1,5 @@
 @c -*-texinfo-*-
-@node CS Introduction
+@node CS Introduction, Building, Top, Top
 @chapter Introduction
 @cindex Introduction
 
@@ -19,6 +19,21 @@ itself remains free.
 Please read the FAQ if you have a question.  If you don't find the answer
 there you can always E-Mail the mailing lists. @xref{FAQ}, or
 @ref{Mailing Lists}.
+
+@menu
+* HowToRead:: How To Read This Manual
+* Current Status::
+* UsingForProject:: Using Crystal Space For Your Project
+* Feature List::
+* WhereToGet:: Where To Get Crystal Space
+* Mailing Lists::
+* Texture Archive::
+* Feedback:: Feedback and Bug Reporting
+* Genesis:: Genesis of Crystal Space
+* Authors:: Documentation Authors & Contributors
+* Contributors:: Crystal Space Contributors
+* License:: Gnu Library General Public License
+@end menu
 
 @imports{intro,foreword.txi}
 @imports{intro,features.txi}

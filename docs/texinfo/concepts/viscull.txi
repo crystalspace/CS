@@ -1,5 +1,5 @@
 @c -*-texinfo-*-
-@node Visibility Culling
+@node Visibility Culling, 3D Sprites, Concepts, Concepts
 @section Visibility Culling In Detail
 @cindex Visibility Culling
 @cindex Culling, Visibility
@@ -11,7 +11,18 @@ only represents of the ideal implementation which lives in my head right
 now and which I'm planning to implement in the near future. Parts of the
 system are implemented though.
 
-@node VIS sectors and portals
+@menu
+* VIS sectors and portals:: Sectors and Portals
+* VIS entities:: Entities
+* VIS sector structure:: Sector Structure
+* VIS visibility culling:: Visibility Culling
+* VIS view frustrum culling:: View Frustrum Culling
+* VIS portal/sector visibility:: Portal/sector Visibility
+* VIS in sector visibility:: In-sector Visibility
+* VIS PVS:: Potentially Visible Set (PVS)
+@end menu
+
+@node VIS sectors and portals, VIS entities, Visibility Culling, Visibility Culling
 @subsection Sectors and Portals
 @cindex portals
 @cindex sectors
@@ -37,7 +48,7 @@ is all visibility testing that ignores portal boundaries and we have
 portal/sector visibility which controls what you can see through a
 portal. Discussing both will be the main focus of this document later.
 
-@node VIS entities
+@node VIS entities, VIS sector structure, VIS sectors and portals, Visibility Culling
 @subsection Entities
 
 But first lets discuss the type of entities that CS supports.
@@ -73,7 +84,7 @@ A terrain surface is a large entity that can be in a sector.
 It is not a detail object (obviously). Handling of terrain and visibility
 is not ready yet. We need to do more work on this part.
 
-@node VIS sector structure
+@node VIS sector structure, VIS visibility culling, VIS entities, Visibility Culling
 @subsection Sector Structure
 
 In this subsection we go deeper into the structure of a sector.
@@ -147,7 +158,7 @@ So at the end you get a large octree with many mini-BSP trees at the
 leaves of the octree. This combined structure provides everything that
 CS needs for efficient visibility culling.
 
-@node VIS visibility culling
+@node VIS visibility culling, VIS view frustrum culling, VIS sector structure, Visibility Culling
 @subsection Visibility Culling
 
 Ok, here it comes. Given the above structure with sectors, entities,
@@ -189,7 +200,7 @@ added to the octree if there is one.
 
 @end table
 
-@node VIS view frustrum culling
+@node VIS view frustrum culling, VIS portal/sector visibility, VIS visibility culling, Visibility Culling
 @subsection View Frustrum Culling
 @cindex view frustrum
 
@@ -198,7 +209,7 @@ do it right now (see the following section about portal/sector visibility
 for the reason) but there are some areas where we should certainly do
 this. Detail objects are one example.
 
-@node VIS portal/sector visibility
+@node VIS portal/sector visibility, VIS in sector visibility, VIS view frustrum culling, Visibility Culling
 @subsection Portal/sector Visibility
 
 Portal/sector visibility is based on 2D clipping. The 2D projected
@@ -251,7 +262,7 @@ because that enables good culling of other portals. Culling portals
 is valuable because culling a portal means that the entire sector behind
 that portal is also culled.
 
-@node VIS in sector visibility
+@node VIS in sector visibility, VIS PVS, VIS portal/sector visibility, Visibility Culling
 @subsection In-sector Visibility
 @cindex c-buffer
 
@@ -350,7 +361,7 @@ So again, there is much room for experimentation to see what approach
 works best. It may be that we will have to make things configurable
 depending on the selected hardware.
 
-@node VIS PVS
+@node VIS PVS, , VIS in sector visibility, Visibility Culling
 @subsection Potentially Visible Set (PVS)
 @cindex PVS
 @cindex Potentially Visible Set

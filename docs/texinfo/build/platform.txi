@@ -1,5 +1,5 @@
 @c -*-texinfo-*-
-@node OSSpecific
+@node OSSpecific, Problems, External Libraries, Building
 @section Platform Specific Instructions
 
 When working with Crystal Space, always keep in mind, that this is a
@@ -15,6 +15,18 @@ worked around. @xref{Mailing Lists}.
 For some ports there is an additional document called
 @samp{Detailed information for @dots{}}. This document explains the inner
 structure of the port to those who want to contribute code for that port.
+
+@menu
+* Unix::
+* Win32:: Windows
+* NeXT::
+* OS/2::
+* Macintosh::
+* BeOS::
+* MS-DOS::
+* GCC Windows:: GCC for Windows
+* Amiga::
+@end menu
 
 @importss{build,platform,unix.txi}
 @importss{build,platform,win32.txi}

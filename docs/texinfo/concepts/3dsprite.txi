@@ -1,25 +1,22 @@
 @c -*-texinfo-*-
-@node 3D Sprites
+@node 3D Sprites, , Visibility Culling, Concepts
 @section 3D Sprites
 @cindex 3D Sprites
 
-@dfn{3D Sprites} are triangle-based models which can be animated by a skeleton
+3D @dfn{sprites} are triangle-based models which can be animated by a skeleton
 or pre-calculated vertex animations.  This type of model is well suited for
 detailed models which are not easily represented as heightmapped terrain or
 smooth curves.
 
-@itemize @bullet
-@item
-@ref{3D Sprites Example 1}
-@item
-@ref{3D Sprites Example 2}
-@item
-@ref{3D Sprites Example 3}
-@item
-@ref{3D Sprites Example 4}
-@end itemize
+@menu
+* 3D Sprites Example 1:: A Simple 3D Sprite
+* 3D Sprites Example 2:: Texturing
+* 3D Sprites Example 3:: Shading Problems
+* 3D Sprites Example 4:: A Solution
+* 3D Sprites Optimizations:: Optimizations
+@end menu
 
-@node 3D Sprites Example 1
+@node 3D Sprites Example 1, 3D Sprites Example 2, 3D Sprites, 3D Sprites
 @subsection A Simple 3D Sprite
 
 Let us consider a simple 3D sprite---a 24 sided prism meant to look like a
@@ -71,7 +68,7 @@ Third Vertex Index
 @end itemize
 @end itemize
 
-@node 3D Sprites Example 2
+@node 3D Sprites Example 2, 3D Sprites Example 3, 3D Sprites Example 1, 3D Sprites
 @subsection Texturing
 
 Our next challenge is texturing the sprite .  To apply a two dimensional
@@ -97,7 +94,7 @@ because we need more texture coordinates.  We will address this issue
 (@pxref{3D Sprites Example 4}), but first we have to deal with some shading
 problems (@pxref{3D Sprites Example 3}).
 
-@node 3D Sprites Example 3
+@node 3D Sprites Example 3, 3D Sprites Example 4, 3D Sprites Example 2, 3D Sprites
 @subsection Shading Problems
 
 Seperating the ends of the cylinder sprite for texturing (@pxref{3D Sprites
@@ -126,7 +123,7 @@ We are stuck with an unwanted edge or a difficult texturing job until we
 can find a way to connect vertex normals without connecting skin vertices
 (@pxref{3D Sprites Example 4}).
 
-@node 3D Sprites Example 4
+@node 3D Sprites Example 4, 3D Sprites Optimizations, 3D Sprites Example 3, 3D Sprites
 @subsection A Solution
 
 Splitting vertices for texturing (@pxref{3D Sprites Example 2}), has a few
@@ -238,7 +235,7 @@ which do not touch are sometimes identical and can be merged. (Care should
 be taken not to merge identical normals which will not be attatched to the
 same bone for skeletal animation.)
 
-@node 3D Sprites Optimizations
+@node 3D Sprites Optimizations, , 3D Sprites Example 4, 3D Sprites
 @subsection Optimizations
 
 @c -+----1----+----2----+----3----+----4----+----5----+----6----+----7----+

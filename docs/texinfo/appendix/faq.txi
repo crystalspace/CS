@@ -1,5 +1,5 @@
 @c -*-texinfo-*-
-@node FAQ
+@node FAQ, Todo, Contributing, Top
 @appendix Frequently Asked Questions (FAQ)
 @cindex Frequently Asked Questions
 @cindex FAQ

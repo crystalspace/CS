@@ -36,6 +36,7 @@ DESCRIPTION.htmldoc = documentation as HTML
 DESCRIPTION.dvidoc = documentation as DVI
 DESCRIPTION.psdoc = documentation as PostScript
 DESCRIPTION.infodoc = documentation as Info
+DESCRIPTION.repairdoc = Texinfo @node and @menu directives
 # For 'cleandoc' target
 DESCRIPTION.doc = generated documentation
 
@@ -43,13 +44,14 @@ DESCRIPTION.doc = generated documentation
 ifeq ($(MAKESECTION),rootdefines)
 
 # Library-specific help commands
-PSEUDOHELP += \
+DOCHELP += \
   $(NEWLINE)echo $"  make devdoc       Make the $(DESCRIPTION.devdoc)$" \
   $(NEWLINE)echo $"  make apidoc       Make the $(DESCRIPTION.apidoc)$" \
   $(NEWLINE)echo $"  make htmldoc      Make the $(DESCRIPTION.htmldoc)$" \
   $(NEWLINE)echo $"  make dvidoc       Make the $(DESCRIPTION.dvidoc)$" \
   $(NEWLINE)echo $"  make psdoc        Make the $(DESCRIPTION.psdoc)$" \
   $(NEWLINE)echo $"  make infodoc      Make the $(DESCRIPTION.infodoc)$" \
+  $(NEWLINE)echo $"  make repairdoc    Repair $(DESCRIPTION.repairdoc)$" \
   $(NEWLINE)echo $"  make cleandoc     Clean all $(DESCRIPTION.doc)$"
 
 endif # ifeq ($(MAKESECTION),rootdefines)
@@ -57,10 +59,17 @@ endif # ifeq ($(MAKESECTION),rootdefines)
 #------------------------------------------------------------- roottargets ---#
 ifeq ($(MAKESECTION),roottargets)
 
-.PHONY: devdoc apidoc htmldoc dvidoc psdoc infodoc cleandoc
+.PHONY: devdoc apidoc htmldoc dvidoc psdoc infodoc repairdoc cleandoc
 
 devdoc apidoc htmldoc dvidoc psdoc infodoc:
 	$(MAKE_TARGET)
+
+repairdoc:
+	@echo $(SEPARATOR)
+	@echo $"  Repairing $(DESCRIPTION.$@)$"
+	@echo $(SEPARATOR)
+	@$(MAKE) --no-print-directory -f mk/cs.mak $@
+
 cleandoc:
 	$(MAKE_CLEAN)
 
@@ -70,6 +79,7 @@ endif # ifeq ($(MAKESECTION),roottargets)
 ifeq ($(MAKESECTION),postdefines)
 
 PERL = perl
+NODEFIX = bin/nodefix.pl
 TEXI2HTML = bin/texi2html
 TEXI2HTMLINIT = bin/texi2html.init
 TEXI2DVI = texi2dvi
@@ -162,7 +172,7 @@ endif # ifeq ($(MAKESECTION),postdefines)
 #----------------------------------------------------------------- targets ---#
 ifeq ($(MAKESECTION),targets)
 
-.PHONY: devdoc apidoc htmldoc dvidoc psdoc infodoc cleandoc
+.PHONY: devdoc apidoc htmldoc dvidoc psdoc infodoc repairdoc cleandoc
 .PHONY: do-htmldoc do-dvidoc do-infodoc
 
 clean: cleandoc
@@ -300,6 +310,10 @@ infodoc: \
   do-infodoc \
   $(OUT.DOC.INFO).ZAPSOURCE \
   $(OUT.DOC.INFO)/txt.ZAPIMAGES
+
+# Repair out-of-date and broken @node and @menu directives in Texinfo source.
+repairdoc:
+	$(PERL) $(NODEFIX) --include-dir=$(CSMANUAL_DIR) $(CSMANUAL_FILE)
 
 # Remove all target documentation directories.
 cleandoc:

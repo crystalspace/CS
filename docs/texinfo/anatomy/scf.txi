@@ -1,4 +1,4 @@
-@node SCF
+@node SCF, Platform_Details, csPhyzik, Anatomy
 @section Crystal Space Shared Class Facility (@sc{scf})
 @cindex @sc{scf}, Shared Class Facility
 @cindex Shared Class Facility (@sc{scf})
@@ -15,7 +15,18 @@ through a @sc{com} or @sc{corba} request broker, although currently there are
 only two minimal configurations supported: using shared libraries and using
 static linkage (for platforms that don't have shared library support).
 
-@node @sc{scf} how it works
+@menu
+* SCF how it works:: How it works
+* SCF usage:: @sc{scf} library usage
+* SCF classes implementing multiple interfaces:: Classes implementing multiple interfaces
+* SCF Interface versions:: @sc{scf} Interface versions
+* SCF Client side:: Client side
+* SCF Example:: Example
+* SCF Advanced techniques:: Advanced techniques
+* SCF author:: The author
+@end menu
+
+@node SCF how it works, SCF usage, SCF, SCF
 @subsection How it works
 
 This paragraph contains technical details about @sc{scf}.  If you're not
@@ -146,7 +157,7 @@ Of course, you don't have to do all this stuff manually with current @sc{scf}
 implementation.  The @sc{scf} library provides a number of macros and
 functions that almost hides the implementation details from end-user.
 
-@node @sc{scf} usage
+@node SCF usage, SCF classes implementing multiple interfaces, SCF how it works, SCF
 @subsection @sc{scf} library usage
 
 The only include file you need in both your client and server modules is
@@ -237,7 +248,7 @@ constructor, this macro will initialize @code{scfRefCount} to zero and
 any class should receive at least one argument (@code{iBase *}) which should
 then be passed to @code{CONSTRUCT_IBASE} macro.
 
-@node @sc{scf} classes implementing multiple interfaces
+@node SCF classes implementing multiple interfaces, SCF Interface versions, SCF usage, SCF
 @subsection Classes implementing multiple interfaces
 
 Sometimes we will want one object to implement several interfaces.  For
@@ -248,7 +259,12 @@ inheritance and through embedding a object that implements another interface
 within the @samp{carrier} object.  To simplify the following text we'll refer
 them as @samp{multiple interface} and @samp{embedded interface} methods.
 
-@node @sc{scf} multiple interfacing
+@menu
+* SCF multiple interfacing:: Multiple interfacing
+* SCF Embedded interfaces:: Embedded interfaces
+@end menu
+
+@node SCF multiple interfacing, SCF Embedded interfaces, SCF classes implementing multiple interfaces, SCF classes implementing multiple interfaces
 @subsubsection Multiple interfacing
 
 You can declare a class to inherit from several interfaces at once.  This is
@@ -277,7 +293,7 @@ IMPLEMENT_IBASE (MyGraphics3D)
 IMPLEMENT_IBASE_END
 @end example
 
-@node @sc{scf} Embedded interfaces
+@node SCF Embedded interfaces, , SCF multiple interfacing, SCF classes implementing multiple interfaces
 @subsubsection Embedded interfaces
 
 Other way to implement several interfaces in one object is to embed another
@@ -359,7 +375,7 @@ constructor (in fact, it can not have a constructor at all) since all work
 needed to initialize @code{iBase} fields is done in carrier object's
 constructor.
 
-@node @sc{scf} Interface versions
+@node SCF Interface versions, SCF Client side, SCF classes implementing multiple interfaces, SCF
 @subsection @sc{scf} Interface versions
 
 Unlike @sc{com}, @sc{scf} supports interface versions.  That is, a shared
@@ -412,7 +428,7 @@ struct MyGraphics3D : public iBase
 @}
 @end example
 
-@node @sc{scf} Client side
+@node SCF Client side, SCF Example, SCF Interface versions, SCF
 @subsection Client side
 
 Now let's explain how to use all this mess from client side.  First, we should
@@ -459,7 +475,7 @@ if (!halo)
 @}
 @end example
 
-@node @sc{scf} Example
+@node SCF Example, SCF Advanced techniques, SCF Client side, SCF
 @subsection Example
 
 Here is a completely working example.  It implements an shared class that has
@@ -636,14 +652,14 @@ Alternatively, you can register classes at run time. This way:
 scfRegisterClass ("csDog", "libDog.dll");
 @end example
 
-@node @sc{scf} Advanced techniques
+@node SCF Advanced techniques, SCF author, SCF Example, SCF
 @subsection Advanced techniques
 
 @sc{scf} library implements some things that you will need if you're an
 @emph{advanced guy} type man (I'm personally not one :-).  Here I will
 describe them in details.
 
-@node @sc{scf} dynamic class registration
+@node SCF dynamic class registration, SCF Non-registered classes, SCF Advanced techniques, SCF Advanced techniques
 @subsubsection Dynamic class registration
 
 You can register and deregister @sc{scf} classes at run time.  You can even
@@ -675,7 +691,7 @@ function:
 extern bool scfUnregisterClass (char *iClassID);
 @end example
 
-@node @sc{scf} Non-registered classes
+@node SCF Non-registered classes, , SCF dynamic class registration, SCF Advanced techniques
 @subsubsection Non-registered classes
 
 Sometimes you don't want to register your classes with the @sc{scf} kernel.
@@ -698,7 +714,7 @@ Embedded interfaces don't have the habbit of deleting themselves when their
 reference count reaches zero.  In this case you should take care and delete
 your object manually.
 
-@node @sc{scf} author
+@node SCF author, , SCF Advanced techniques, SCF
 @subsection The author
 
 Original @sc{scf} design & concept by Andrew Zabolotny, 1999

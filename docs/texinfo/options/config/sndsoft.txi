@@ -1,5 +1,5 @@
 @c -*-texinfo-*-
-@node Config_SoundDriver
+@node Config_SoundDriver, , Config_Soft3D_TextureManager, Configuration File
 @subsection @code{[SoundDriver]} section
 
 This section describes configuration options which affect the software sound

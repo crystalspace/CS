@@ -1,5 +1,5 @@
 @c -*-texinfo-*-
-@node Console_General
+@node Console_General, Console_Boolean, Console, Console
 @subsubsection General commands
 
 General commands, in contrast to other commands, DO something instead of

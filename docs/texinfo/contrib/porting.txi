@@ -1,5 +1,5 @@
 @c -*-texinfo-*-
-@node Porting
+@node Porting, , CVS Guide, Contributing
 @section Porting to a New Platorm
 @cindex Porting
 
