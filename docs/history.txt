@@ -15,6 +15,8 @@ chronological order.
 	  now stored in a csArray<csPolygon3D> instead of a
 	  csArray<csPolygon3D*>. This saves memory and also makes polygon
 	  handling a bit faster.
+	- Jorrit made the rapid plugin a bit more optimal (memory usage) by
+	  using indexed triangles instead of triangles containing vectors.
 19-Feb-2004
 	- res made the following changes:
 	    - A few minor cosmetic changes.

@@ -79,11 +79,6 @@ csPolyTexture::~csPolyTexture ()
   delete shadow_bitmap;
 }
 
-//iMaterialHandle *csPolyTexture::GetMaterialHandle ()
-//{
-  //return polygon->GetStaticPoly ()->GetMaterialHandle ();
-//}
-
 void csPolyTexture::SetLightMap (csLightMap *lightmap)
 {
   lm = lightmap;

@@ -43,6 +43,9 @@ private:
   /// The internal collision object.
   csCdModel* m_pCollisionModel;
 
+  /// Array of vertices.
+  csVector3* vertices;
+
   /// Get top level bounding box.
   const csCdBBox* GetBbox () const;
 
@@ -58,7 +61,8 @@ private:
 
   /// Recursively test collisions of bounding boxes.
   static int CollideRecursive (csCdBBox *b1, csCdBBox *b2,
-  	const csMatrix3& R, const csVector3& T);
+  	const csMatrix3& R, const csVector3& T,
+	csVector3* vertices1, csVector3* vertices2);
 
   /**
    * Statistics, to allow early bailout.

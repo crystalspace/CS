@@ -70,7 +70,7 @@
 struct csCdTriangle
 {
   /// The three edges of the triangle
-  csVector3 p1, p2, p3;
+  int p1, p2, p3;
 };
 
 /**
@@ -109,13 +109,14 @@ protected:
     * that each Bounding Box contains _exactly_ one Triangle in
     * m_pTriangle!
     */
-  static bool TrianglesHaveContact (csCdBBox* pBox1, csCdBBox* pBox2);
+  static bool TrianglesHaveContact (csCdBBox* pBox1, csCdBBox* pBox2,
+  	csVector3* vertices1, csVector3* vertices2);
 
   /**
     * Assign a Triangle to this Bounding box. This will make this
     * Bounding Box into a leaf.
     */
-  bool SetLeaf(csCdTriangle* pTriangle);
+  bool SetLeaf(csCdTriangle* pTriangle, csVector3* vertices);
 
   /**
     * Build a tree structure of Bounding Boxes. TriangleIndices is an array
@@ -127,7 +128,8 @@ protected:
     * and over again and then passed recursively in two halfs to the same
     * routine again and again, until there are only leafes left.
     */
-  bool BuildBBoxTree(int*          TriangleIndices,
+  bool BuildBBoxTree(csVector3*    vertices,
+  		     int*          TriangleIndices,
                      int           NumTriangles,
                      csCdTriangle* Triangles,
                      csCdBBox*&    pBoxPool);
@@ -188,7 +190,7 @@ protected:
   //------------------------
 
   /// Build a tree of bounding boxes from the given Triangles
-  bool BuildHierarchy();
+  bool BuildHierarchy(csVector3* vertices);
 
 public:
 
@@ -201,9 +203,7 @@ public:
   csCdBBox* GetTopLevelBox() {return &m_pBoxes[0];}
 
   /// Add a triangle to the model
-  bool AddTriangle (const csVector3& p1,
-                    const csVector3& p2,
-                    const csVector3& p3);
+  bool AddTriangle (int p1, int p2, int p3);
 };
 
 /***************************************************************************/

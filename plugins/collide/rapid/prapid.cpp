@@ -110,6 +110,7 @@ csRapidCollider::csRapidCollider (iPolygonMesh* mesh)
   CD_contact = GetCD_contact ();
   GetMR ();
   GetMT ();
+  vertices = 0;
   GeometryInitialize (mesh);
 }
 
@@ -127,7 +128,10 @@ void csRapidCollider::GeometryInitialize (iPolygonMesh* mesh)
   int i;
   int tri_count = mesh->GetTriangleCount ();
   // first, count the number of triangles polyset contains
-  csVector3* vertices = mesh->GetVertices ();
+  csVector3* mesh_vertices = mesh->GetVertices ();
+  delete[] vertices;
+  vertices = new csVector3[mesh->GetVertexCount ()];
+  memcpy (vertices, mesh_vertices, sizeof (csVector3)*mesh->GetVertexCount ());
   csTriangle* triangles = mesh->GetTriangles ();
 
   csBox3 object_bbox;
@@ -144,11 +148,9 @@ void csRapidCollider::GeometryInitialize (iPolygonMesh* mesh)
       object_bbox.AddBoundingVertex (vertices[p.a]);
       object_bbox.AddBoundingVertex (vertices[p.b]);
       object_bbox.AddBoundingVertex (vertices[p.c]);
-      m_pCollisionModel->AddTriangle (vertices[p.a],
-                                      vertices[p.b],
-                                      vertices[p.c]);
+      m_pCollisionModel->AddTriangle (p.a, p.b, p.c);
     }
-    m_pCollisionModel->BuildHierarchy ();
+    m_pCollisionModel->BuildHierarchy (vertices);
   }
 
   float dx = object_bbox.MaxX () - object_bbox.MinX ();
@@ -167,6 +169,8 @@ csRapidCollider::~csRapidCollider ()
   }
 
   CD_contact->DecRef ();
+  delete[] vertices;
+
   SCF_DESTRUCT_IBASE ();
 }
 
@@ -240,7 +244,7 @@ bool csRapidCollider::Collide (csRapidCollider &otherCollider,
   csRapidCollider::trianglesTested = 0;
   csRapidCollider::boxesTested = 0;
   // make the call
-  if (CollideRecursive (b1, b2, R, T))
+  if (CollideRecursive (b1, b2, R, T, vertices, pRAPIDCollider2->vertices))
   {
     // Error.
   }
@@ -556,8 +560,9 @@ int coplanar_tri_tri (const csVector3& N,
   return 0;
 }
 
-int tri_contact(const csVector3 &V0, const csVector3 &V1, const csVector3 &V2,
-                const csVector3 &U0, const csVector3 &U1, const csVector3 &U2)
+static int tri_contact(
+	const csVector3 &V0, const csVector3 &V1, const csVector3 &V2,
+	const csVector3 &U0, const csVector3 &U1, const csVector3 &U2)
 {
   csVector3 E1, E2;
   csVector3 N1, N2;
@@ -751,7 +756,8 @@ bool tri_contact (csVector3 P1, csVector3 P2, csVector3 P3,
 }
 */
 
-int add_collision (csCdTriangle *tr1, csCdTriangle *tr2)
+static int add_collision (csCdTriangle *tr1, csCdTriangle *tr2,
+	csVector3* vertices1, csVector3* vertices2)
 {
   int limit = CD_contact->Length ();
   if (csRapidCollider::numHits >= limit)
@@ -762,12 +768,12 @@ int add_collision (csCdTriangle *tr1, csCdTriangle *tr2)
     CD_contact->SetLength (limit + 16);
   }
   
-  (*CD_contact) [csRapidCollider::numHits].a1 = tr1->p1;
-  (*CD_contact) [csRapidCollider::numHits].b1 = tr1->p2;
-  (*CD_contact) [csRapidCollider::numHits].c1 = tr1->p3;
-  (*CD_contact) [csRapidCollider::numHits].a2 = tr2->p1;
-  (*CD_contact) [csRapidCollider::numHits].b2 = tr2->p2;
-  (*CD_contact) [csRapidCollider::numHits].c2 = tr2->p3;
+  (*CD_contact) [csRapidCollider::numHits].a1 = vertices1[tr1->p1];
+  (*CD_contact) [csRapidCollider::numHits].b1 = vertices1[tr1->p2];
+  (*CD_contact) [csRapidCollider::numHits].c1 = vertices1[tr1->p3];
+  (*CD_contact) [csRapidCollider::numHits].a2 = vertices2[tr2->p1];
+  (*CD_contact) [csRapidCollider::numHits].b2 = vertices2[tr2->p2];
+  (*CD_contact) [csRapidCollider::numHits].c2 = vertices2[tr2->p3];
   csRapidCollider::numHits++;
 
   return false;
@@ -902,7 +908,8 @@ int obb_disjoint (const csMatrix3& B, const csVector3& T,
 
 
 int csRapidCollider::CollideRecursive (csCdBBox *b1, csCdBBox *b2,
-	const csMatrix3& R, const csVector3& T)
+	const csMatrix3& R, const csVector3& T,
+	csVector3* vertices1, csVector3* vertices2)
 {
   int rc;      // return codes
   if (csRapidCollider::firstHit && (csRapidCollider::numHits > 0))
@@ -925,7 +932,7 @@ int csRapidCollider::CollideRecursive (csCdBBox *b1, csCdBBox *b2,
 
     // this will pass along any OUT_OF_MEMORY return codes which
     // may be generated.
-    return csCdBBox::TrianglesHaveContact(b1, b2);
+    return csCdBBox::TrianglesHaveContact(b1, b2, vertices1, vertices2);
   }
 
   csMatrix3 cR;
@@ -949,14 +956,16 @@ int csRapidCollider::CollideRecursive (csCdBBox *b1, csCdBBox *b2,
     cR = rot_transp * R;
     cT = rot_transp * (T - b1->m_pChild1->m_Translation);
 
-    if ((rc = CollideRecursive (b1->m_pChild1, b2, cR, cT)) != false)
+    if ((rc = CollideRecursive (b1->m_pChild1, b2, cR, cT,
+    	vertices1, vertices2)) != false)
       return rc;
 
     rot_transp = b1->m_pChild0->m_Rotation.GetTranspose ();
     cR = rot_transp * R;
     cT = rot_transp * (T - b1->m_pChild0->m_Translation);
 
-    if ((rc = CollideRecursive (b1->m_pChild0, b2, cR, cT)) != false)
+    if ((rc = CollideRecursive (b1->m_pChild0, b2, cR, cT,
+    	vertices1, vertices2)) != false)
       return rc;
   }
   else
@@ -967,13 +976,15 @@ int csRapidCollider::CollideRecursive (csCdBBox *b1, csCdBBox *b2,
     cR = R * b2->m_pChild1->m_Rotation;
     cT = ( R * b2->m_pChild1->m_Translation) + T;
 
-    if ((rc = CollideRecursive (b1, b2->m_pChild1, cR, cT)) != false)
+    if ((rc = CollideRecursive (b1, b2->m_pChild1, cR, cT,
+    	vertices1, vertices2)) != false)
       return rc;
 
     cR = R * b2->m_pChild0->m_Rotation;
     cT = ( R * b2->m_pChild0->m_Translation) + T;
 
-    if ((rc = CollideRecursive (b1, b2->m_pChild0, cR, cT)) != false)
+    if ((rc = CollideRecursive (b1, b2->m_pChild0, cR, cT,
+    	vertices1, vertices2)) != false)
       return rc;
   }
 
@@ -996,7 +1007,8 @@ int csRapidCollider::Report (csRapidCollider **id1, csRapidCollider **id2)
   return 1;
 }
 
-bool csCdBBox::TrianglesHaveContact(csCdBBox *pBox1, csCdBBox *pBox2)
+bool csCdBBox::TrianglesHaveContact(csCdBBox *pBox1, csCdBBox *pBox2,
+	csVector3* vertices1, csVector3* vertices2)
 {
   // assume just one triangle in each box.
 
@@ -1008,24 +1020,28 @@ bool csCdBBox::TrianglesHaveContact(csCdBBox *pBox1, csCdBBox *pBox2)
   int rc;  // return code
 
   csVector3 i1 =
-    ((*csRapidCollider::mR * pBox1->m_pTriangle->p1) + *csRapidCollider::mT);
+    ((*csRapidCollider::mR * vertices1[pBox1->m_pTriangle->p1])
+    	+ *csRapidCollider::mT);
   csVector3 i2 =
-    ((*csRapidCollider::mR * pBox1->m_pTriangle->p2) + *csRapidCollider::mT);
+    ((*csRapidCollider::mR * vertices1[pBox1->m_pTriangle->p2])
+    	+ *csRapidCollider::mT);
   csVector3 i3 =
-    ((*csRapidCollider::mR * pBox1->m_pTriangle->p3) + *csRapidCollider::mT);
+    ((*csRapidCollider::mR * vertices1[pBox1->m_pTriangle->p3])
+    	+ *csRapidCollider::mT);
 
   csRapidCollider::trianglesTested++;
 
   bool f = ::tri_contact(i1, i2, i3,
-                         pBox2->m_pTriangle->p1,
-                         pBox2->m_pTriangle->p2,
-                         pBox2->m_pTriangle->p3);
+                         vertices2[pBox2->m_pTriangle->p1],
+                         vertices2[pBox2->m_pTriangle->p2],
+                         vertices2[pBox2->m_pTriangle->p3]);
 
   if (f)
   {
     // add_collision may be unable to allocate enough memory,
     // so be prepared to pass along an OUT_OF_MEMORY return code.
-    if ((rc = add_collision(pBox1->m_pTriangle, pBox2->m_pTriangle)) != false)
+    if ((rc = add_collision (pBox1->m_pTriangle, pBox2->m_pTriangle,
+    	vertices1, vertices2)) != false)
       return rc;
   }
 

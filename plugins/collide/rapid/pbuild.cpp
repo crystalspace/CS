@@ -48,8 +48,7 @@ csCdModel::~csCdModel ()
   delete [] m_pTriangles;
 }
 
-bool csCdModel::AddTriangle (const csVector3 &p1, const csVector3 &p2,
-  const csVector3 &p3)
+bool csCdModel::AddTriangle (int p1, int p2, int p3)
 {
   // first make sure that we haven't filled up our allocation.
   if (m_NumTriangles >= m_NumTrianglesAllocated)
@@ -75,7 +74,7 @@ bool csCdModel::AddTriangle (const csVector3 &p1, const csVector3 &p2,
  *
  * <or>, <ax>, and <mp> are model space coordinates.
  */
-bool csCdModel::BuildHierarchy ()
+bool csCdModel::BuildHierarchy (csVector3* vertices)
 {
   // Delete the boxes if they're already allocated.
   delete [] m_pBoxes;
@@ -165,7 +164,8 @@ bool csCdModel::BuildHierarchy ()
 
   // do the build
   csCdBBox *pool = m_pBoxes + 1;
-  if (!m_pBoxes[0].BuildBBoxTree(t, m_NumTriangles, m_pTriangles, pool))
+  if (!m_pBoxes[0].BuildBBoxTree(vertices, t, m_NumTriangles,
+  	m_pTriangles, pool))
   {
     delete [] m_pBoxes;
     m_pBoxes = 0;
@@ -184,6 +184,7 @@ bool csCdModel::BuildHierarchy ()
 }
 
 bool csCdBBox::BuildBBoxTree (
+	csVector3* vertices,
 	int* TriangleIndices,
 	int NumTriangles,
 	csCdTriangle* Triangles,
@@ -198,7 +199,7 @@ bool csCdBBox::BuildBBoxTree (
   // will be constructed and placed in the parent's CS.
 
   if (NumTriangles == 1)
-    return SetLeaf(&Triangles[TriangleIndices[0]]);
+    return SetLeaf(&Triangles[TriangleIndices[0]], vertices);
 
   // walk along the triangles for the box, and do the following:
   //   1. collect the max and min of the vertices along the axes of <or>.
@@ -220,7 +221,8 @@ bool csCdBBox::BuildBBoxTree (
   _M1.clear ();
   _M2.clear ();
 
-  csVector3 c = m_Rotation.GetTranspose () * Triangles [TriangleIndices[0]].p1;
+  csVector3 c = m_Rotation.GetTranspose ()
+  	* vertices[Triangles [TriangleIndices[0]].p1];
   csVector3 minval = c, maxval = c;
 
   int i;
@@ -229,13 +231,13 @@ bool csCdBBox::BuildBBoxTree (
     int CurrentTriangleIndex = TriangleIndices[i];
     csCdTriangle *ptr = &Triangles[CurrentTriangleIndex];
 
-    c = m_Rotation.GetTranspose () * ptr->p1;
+    c = m_Rotation.GetTranspose () * vertices[ptr->p1];
     csMath3::SetMinMax (c, minval, maxval);
 
-    c = m_Rotation.GetTranspose () * ptr->p2;
+    c = m_Rotation.GetTranspose () * vertices[ptr->p2];
     csMath3::SetMinMax (c, minval, maxval);
 
-    c = m_Rotation.GetTranspose () * ptr->p3;
+    c = m_Rotation.GetTranspose () * vertices[ptr->p3];
     csMath3::SetMinMax (c, minval, maxval);
 
     // grab the mean point of the in'th triangle, project
@@ -313,7 +315,7 @@ bool csCdBBox::BuildBBoxTree (
     }
 
     m_pChild0->m_Rotation = tR;
-    if (!m_pChild0->BuildBBoxTree (TriangleIndices, n1,
+    if (!m_pChild0->BuildBBoxTree (vertices, TriangleIndices, n1,
                                      Triangles, box_pool))
     {
       return false;
@@ -321,7 +323,7 @@ bool csCdBBox::BuildBBoxTree (
   }
   else
   {
-    if (!m_pChild0->SetLeaf(&Triangles[TriangleIndices[0]]))
+    if (!m_pChild0->SetLeaf(&Triangles[TriangleIndices[0]], vertices))
       return false;
   }
 
@@ -344,15 +346,15 @@ bool csCdBBox::BuildBBoxTree (
     }
 
     m_pChild1->m_Rotation = m_Rotation;
-    if (!m_pChild1->BuildBBoxTree(TriangleIndices + n1, NumTriangles - n1,
-                                    Triangles, box_pool))
+    if (!m_pChild1->BuildBBoxTree(vertices, TriangleIndices + n1,
+    	NumTriangles - n1, Triangles, box_pool))
     {
       return false;
     }
   }
   else
   {
-    if (!m_pChild1->SetLeaf(&Triangles[TriangleIndices[n1]]))
+    if (!m_pChild1->SetLeaf(&Triangles[TriangleIndices[n1]], vertices))
       return false;
   }
 
@@ -365,7 +367,7 @@ bool csCdBBox::BuildBBoxTree (
   return true;
 }
 
-bool csCdBBox::SetLeaf(csCdTriangle* pTriangle)
+bool csCdBBox::SetLeaf(csCdTriangle* pTriangle, csVector3* vertices)
 {
   // For a single triangle, orientation is easily determined.
   // The major axis is parallel to the longest edge.
@@ -381,13 +383,13 @@ bool csCdBBox::SetLeaf(csCdTriangle* pTriangle)
   // Find the major axis: parallel to the longest edge.
   // First compute the squared-lengths of each edge
 
-  csVector3 u12 = pTriangle->p1 - pTriangle->p2;
+  csVector3 u12 = vertices[pTriangle->p1] - vertices[pTriangle->p2];
   float d12 = u12 * u12;
 
-  csVector3 u23 = pTriangle->p2 - pTriangle->p3;
+  csVector3 u23 = vertices[pTriangle->p2] - vertices[pTriangle->p3];
   float d23 = u23 * u23;
 
-  csVector3 u31 = pTriangle->p3 - pTriangle->p1;
+  csVector3 u31 = vertices[pTriangle->p3] - vertices[pTriangle->p1];
   float d31 = u31 * u31;
 
   // Find the edge of longest squared-length, normalize it to
@@ -438,13 +440,13 @@ bool csCdBBox::SetLeaf(csCdTriangle* pTriangle)
   // Now compute the maximum and minimum extents of each vertex
   // along each of the box axes.  From this we will compute the
   // box center and box dimensions.
-  csVector3 c = m_Rotation.GetTranspose () * pTriangle->p1;
+  csVector3 c = m_Rotation.GetTranspose () * vertices[pTriangle->p1];
   csVector3 minval = c, maxval = c;
 
-  c = m_Rotation.GetTranspose () * pTriangle->p2;
+  c = m_Rotation.GetTranspose () * vertices[pTriangle->p2];
   csMath3::SetMinMax (c, minval, maxval);
 
-  c = m_Rotation.GetTranspose () * pTriangle->p3;
+  c = m_Rotation.GetTranspose () * vertices[pTriangle->p3];
   csMath3::SetMinMax (c, minval, maxval);
 
   // With the max and min data, determine the center point and dimensions
