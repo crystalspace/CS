@@ -13,6 +13,11 @@ Short-term cleanups that need to be done:
 	- Check the dependencies of libraries/COM objects and try to find
 	  includes that don't belong there (like from csengine).
 
+28-Sep-1999
+	- Csparser detects duplicate vertex indices in polygons and ignores
+	  them (while given a warning at the same time).
+	- Fixed dynamic lights so that they work with BSP/octree split
+	  polygons.
 27-Sep-1999
 	- Fixed bug in splitting of BSP polygons. It could happen that
 	  polygons were split to polygons with only one vertex. This bug
@@ -27,6 +32,10 @@ Short-term cleanups that need to be done:
 	- Eric Sunshine applied the final tweaks to Andrew's changes from
 	  24-Sep-1999 which actually allows the renderer to work correctly in
 	  24-bit RGBA mode on big-endian hardware.
+	- Andrew Zabolotny is back to MazeD. He has started a major rewrite
+	  of MazeD. It is now not compilable.
+	- Andrew also added 'const' to many arguments that should be
+	  const.
 26-Sep-1999
 	- Continued work on lighting using octree. It is already working
 	  reasonably well but there are still a few bugs. I also haven't
@@ -36,6 +45,9 @@ Short-term cleanups that need to be done:
 	- Initial work on implementing lighting using octree.
 	- Progress bar for lighting is now based on number of lights instead
 	  of sectors. Makes more sense.
+	- Nathaniel Saint Martin moved sound config stuff out of cryst.cfg
+	  and into sndsoft.cfg and wodrv.cfg. Other changes to sound
+	  as well.
 24-Sep-1999
 	- Andrew Zabolotny fixed some problems with the 3D software renderer
 	  which affected 24-bit mode on big-endian machines which use RGBA
