@@ -33,6 +33,7 @@
 #include "igraphic/imageio.h"
 #include "iutil/objreg.h"
 #include "iutil/vfs.h"
+#include "iutil/cache.h"
 
 struct PrsHeightMapData : public iGenerateImageFunction
 {
@@ -391,46 +392,61 @@ bool csLoader::ParseHeightgen (iLoaderContext* ldr_context, iDocumentNode* node)
 
 	  int startx = child->GetAttributeValueAsInt ("x");
 	  int starty = child->GetAttributeValueAsInt ("y");
-          const char* cachedir = child->GetAttributeValue ("cachedir");
-          csString name = cachedir;
-          // we are not sure that cachedir ends in a '/', but this
-          // is a useful feature, as it allows a custom prefix to the
-          // files in the cache.
-          name += "terrain_";
-          name += child->GetAttributeValue ("name");
-          name += ".png";
-          //iImage *img = 0;
+          csRef<iCacheManager> cache = Engine?Engine->GetCacheManager():0;
+          const char* cache_type = "gentex";
+          const char* cache_scope = child->GetAttributeValue ("name");
+          uint32 cache_id = 0;
+          
+          csString cache_enable = child->GetAttributeValue ("cache");
           csRef<iImage> img;
-          if(cachedir && VFS->Exists(name)) {
-            // try to load
-            img = LoadImage(name, CS_IMGFMT_INVALID);
+          csRef<iImageIO> imageio (CS_QUERY_REGISTRY (object_reg, iImageIO));
+
+          // get from cache
+          if(Engine && cache_enable == "yes")
+          {
+            csRef<iDataBuffer> data = cache->ReadCache(cache_type,
+                cache_scope, cache_id);
+            if(data && !imageio)
+            {
+	      ReportError ("crystalspace.maploader.parse.heightgen",
+	       "Cannot convert cached image - no imageIO.");
+            }
+            if(data && imageio)
+            {
+              img = imageio->Load ((uint8*)data->GetData(),
+                  data->GetSize(), Engine->GetTextureFormat());
+            }
           }
-          if(!img) {
+
+          // or, generate and cache
+          if(!img) 
+          {
 	    img = gen->Generate (totalw, totalh, startx*mw, starty*mh,
 	      partw, parth);
-            if(cachedir) { // save terrain image in cache location.
-              csRef<iImageIO> imageio (CS_QUERY_REGISTRY (object_reg, 
-                iImageIO));
-              if(!imageio) {
-	        ReportError ("crystalspace.maploader.parse.heightgen",
-	          "Cannot get imageIO.");
-	        return false;
-              }
+            if(!imageio) 
+            {
+	      ReportError ("crystalspace.maploader.parse.heightgen",
+	        "Cannot cache image, no imageIO.");
+            }
+            if(imageio && Engine && cache_enable == "yes")
+            {
               csRef<iDataBuffer> db (imageio->Save (img, "image/png",
                   "progressive"));
-              if(!db) {
+              if(!db) 
+              {
 	        ReportError ("crystalspace.maploader.parse.heightgen",
-	          "Cannot convert to imagebuffer.");
-	        return false;
+	          "Cache Failed: Cannot convert to imagebuffer.");
               }
-              bool sv = VFS->WriteFile (name, (const char*)db->GetData (),
-                db->GetSize ());
-              if(!sv) {
+              if(!cache->CacheData((void*)db->GetData(), db->GetSize(),
+                  cache_type, cache_scope, cache_id))
+              {
 	        ReportError ("crystalspace.maploader.parse.heightgen",
-	          "Could not save terrain cache file %s.", (const char*)name);
+	          "Cache Failed: cannot save data in cache.");
               }
             }
           }
+
+          // add texture
 	  csRef<iTextureHandle> TexHandle (G3D->GetTextureManager ()
 	  	->RegisterTexture (img, CS_TEXTURE_3D));
 	  if (!TexHandle)

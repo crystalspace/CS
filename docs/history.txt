@@ -6,6 +6,10 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+10-Nov-2003
+	- Wouter fixed up the terrain texture caching to use the 
+	  CacheManager. Instead of a cachedir, put cache="yes" to
+	  use caching.
 9-Nov-2003
 	- Rhad added functions to handle reversing some operations with
 	  particle emitters.  These take care of some simple situations where
