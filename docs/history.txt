@@ -6,6 +6,11 @@ The history order is reversed so that new features are at the top.
 	  displayed when lighting is actually being calculated.
 	- Removed some totally useles init message in the parser with regards
 	  to lightmap cell size.
+	- Eric Sunshine made the following changes to the documentation:
+	    - Fixed a slew of Texinfo mark-up problems in dirhier.txi and
+	      apimod19.txi.
+	    - Performed clean-up and unification of the new material added to
+	      apimod19.txi.
 18-Jun-2001
 	- Fixed a bug in the region checking code from the loader.
 	- Renamed csCollider to csColliderWrapper and moved it from csengine

@@ -268,8 +268,9 @@ of events (useful for demos for example).
 Crystal Space application. Just load the plugin and it works.
 
 @item CS/plugins/collide/rapid
-This is the @sc{RAPID} collision detection plugin. In the future we may
-have other collision detection plugins in the @file{collide} directory.
+This is the @sc{rapid} collision detection plugin. In the future we may
+have other collision detection plugins in the @file{CS/plugins/collide}
+directory.
 
 @item CS/plugins/engine/3d
 If you want to use the engine as a plugin then this directory contains
