@@ -55,19 +55,19 @@ following construct:
 
 @example
 <renderpriorities>
-  <priority name="sky"
+  <priority name="sky">
     <level>1</level>
     <sort>NONE</sort>
   </priority>
-  <priority name="wall"
+  <priority name="wall">
     <level>2</level>
     <sort>NONE</sort>
   </priority>
-  <priority name="object"
+  <priority name="object">
     <level>3</level>
     <sort>NONE</sort>
   </priority>
-  <priority name="alpha"
+  <priority name="alpha">
     <level>4</level>
     <sort>BACK2FRONT</sort>
   </priority>
