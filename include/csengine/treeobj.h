@@ -24,7 +24,7 @@
 #include "csengine/polyint.h"
 
 class csObject;
-class csPolygonStub;
+class csPolygonStubPool;
 class csPolygonInt;
 class csPolyTreeObject;
 class csPolygonTreeNode;
@@ -38,6 +38,7 @@ class csPolygonStub
 {
   friend class csPolyTreeObject;
   friend class csPolygonTreeNode;
+  friend class csPolygonStubPool;
 
 private:
   // Linked list in every tree node.
@@ -50,12 +51,21 @@ private:
   csPolygonTreeNode* node;
   // List of polygons.
   csPolygonIntArray polygons;
+  // Reference counter. This ref counter is managed by the
+  // csPolygonStubPool.
+  int ref_count;
 
 public:
   ///
-  csPolygonStub () : object (NULL), node (NULL) { }
+  csPolygonStub () : next_tree (NULL), prev_tree (NULL), next_obj (NULL),
+  	prev_obj (NULL), object (NULL), node (NULL), ref_count (1) { }
   ///
   ~csPolygonStub ();
+
+  // Increment the ref counter.
+  void IncRef () { ref_count++; }
+  // Decrement the ref counter.
+  void DecRef () { if (ref_count <= 0) CRASH; ref_count--; }
 
   /// Get access to the list of polygons in this stub.
   csPolygonIntArray& GetPolygonArray () { return polygons; }
@@ -66,10 +76,10 @@ public:
   /// Unlink this stub from all lists.
   void RemoveStub ();
 
+  /// Set parent object for this stub.
+  void SetObject (csPolyTreeObject* obj) { object = obj; }
   /// Get parent object for this stub.
   csPolyTreeObject* GetObject () { return object; }
-  /// Get parent node for this stub.
-  csPolygonTreeNode* GetNode () { return node; }
 };
 
 /**
@@ -96,78 +106,25 @@ public:
   csPolygonStubPool () : alloced (NULL), freed (NULL) { }
 
   /// Destroy pool and all objects in the pool.
-  ~csPolygonStubPool ()
-  {
-    while (alloced)
-    {
-      PoolObj* n = alloced->next;
-      CHK (delete alloced->ps);
-      CHK (delete alloced);
-      alloced = n;
-    }
-    while (freed)
-    {
-      PoolObj* n = freed->next;
-      CHK (delete freed->ps);
-      CHK (delete freed);
-      freed = n;
-    }
-  }
-
-  /// Allocate a new object in the pool.
-  csPolygonStub* Alloc ()
-  {
-    PoolObj* pnew;
-    if (freed)
-    {
-      pnew = freed;
-      freed = freed->next;
-    }
-    else
-    {
-      CHK (pnew = new PoolObj ());
-      CHK (pnew->ps = new csPolygonStub ());
-    }
-    pnew->next = alloced;
-    alloced = pnew;
-    return pnew->ps;
-  }
+  ~csPolygonStubPool ();
 
   /**
-   * Free an object and put it back in the pool.
+   * Allocate a new object in the pool.
+   * The object is initialized to empty (no polygons).
+   */
+  csPolygonStub* Alloc ();
+
+  /**
+   * Free an object and put it back in the pool. This function will
+   * call DecRef on the stub and only free it for real if the ref
+   * counter reaches zero.
    * Note that it is only legal to free objects which were allocated
    * from the pool.
    */
-  void Free (csPolygonStub* ps)
-  {
-    ps->RemoveStub ();
-    if (alloced)
-    {
-      PoolObj* po = alloced;
-      alloced = alloced->next;
-      po->ps = ps;
-      po->next = freed;
-      freed = po;
-    }
-    else
-    {
-      // Cannot happen!
-    }
-  }
+  void Free (csPolygonStub* ps);
 
   /// Dump some information about this pool.
-  void Dump ()
-  {
-    int cnt;
-    cnt = 0;
-    PoolObj* po = alloced;
-    while (po) { cnt++; po = po->next; }
-    printf ("PolyStub pool: %d allocated, ", cnt);
-    cnt = 0;
-    po = freed;
-    while (po) { cnt++; po = po->next; }
-    printf ("%d freed.\n", cnt);
-  }
+  void Dump ();
 };
 
 /**
@@ -182,6 +139,7 @@ class csPolyTreeObject
 private:
   /// Owner (original dynamic object).
   csObject* owner;
+
   /**
    * A linked list for all polygons stubs that are added
    * to the tree. These stubs represents sets of polygons
@@ -219,66 +177,57 @@ public:
   virtual csPolygonStub* GetBaseStub () = 0;
 
   /**
+   * Remove polygons from a polygon stub. This is a virtual
+   * function because in general the framework cannot know how
+   * the polygons need to be freed (i.e. is a pool used? reference
+   * counter? ...).
+   */
+  virtual void RemovePolygons (csPolygonStub* stub) = 0;
+
+  /**
    * Split the given stub with a plane and return
    * three new stubs (all on the plane, in front, or
    * back of the plane). This is a pure virtual function that will
    * have to be implemented by a subclass.<p>
    *
    * Note that this function is responsible for freeing 'stub' itself
-   * if needed. Also stub_on, stub_front, and stub_back can be NULL
-   * in which case there simply is no stub for that particular case.<p>
+   * if needed. Also this function can return NULL for stub_on, stub_front,
+   * and stub_back in which case there simply is no stub for that
+   * particular case.<p>
    *
-   * Other note. This function should also correctly account for
+   * Other note. This function will also correctly account for
    * the case where the given stub_on pointer is NULL. In that case
    * the tree is not interested in the polygons on the plane and those
-   * polygons should be distributed to either stub_front or stub_back.
+   * polygons will be distributed to stub_front.
    */
-  virtual void SplitWithPlane (csPolygonStub* stub,
+  void SplitWithPlane (csPolygonStub* stub,
   	csPolygonStub** stub_on, csPolygonStub** stub_front,
 	csPolygonStub** stub_back,
-	const csPlane& plane) = 0;
+	const csPlane& plane);
 
   /**
    * Split the given stub with an X plane.
-   * The default implementation will just call
-   * SplitWithPlane() but it is recommended to implement a more
-   * efficient version here.
    */
-  virtual void SplitWithPlaneX (csPolygonStub* stub,
+  void SplitWithPlaneX (csPolygonStub* stub,
   	csPolygonStub** stub_on, csPolygonStub** stub_front,
 	csPolygonStub** stub_back,
-	float x)
-  {
-    SplitWithPlane (stub, stub_on, stub_front, stub_back, csPlane (1, 0, 0, -x));
-  }
+	float x);
 
   /**
    * Split the given stub with an Y plane.
-   * The default implementation will just call
-   * SplitWithPlane() but it is recommended to implement a more
-   * efficient version here.
    */
-  virtual void SplitWithPlaneY (csPolygonStub* stub,
+  void SplitWithPlaneY (csPolygonStub* stub,
   	csPolygonStub** stub_on, csPolygonStub** stub_front,
 	csPolygonStub** stub_back,
-	float y)
-  {
-    SplitWithPlane (stub, stub_on, stub_front, stub_back, csPlane (0, 1, 0, -y));
-  }
+	float y);
 
   /**
    * Split the given stub with an Z plane.
-   * The default implementation will just call
-   * SplitWithPlane() but it is recommended to implement a more
-   * efficient version here.
    */
-  virtual void SplitWithPlaneZ (csPolygonStub* stub,
+  void SplitWithPlaneZ (csPolygonStub* stub,
   	csPolygonStub** stub_on, csPolygonStub** stub_front,
 	csPolygonStub** stub_back,
-	float z)
-  {
-    SplitWithPlane (stub, stub_on, stub_front, stub_back, csPlane (0, 0, 1, -z));
-  }
+	float z);
 
   /**
    * Unlink a stub from the stub list.
@@ -286,6 +235,11 @@ public:
    * is really on the list!
    */
   void UnlinkStub (csPolygonStub* ps);
+
+  /**
+   * Link a stub to the stub list.
+   */
+  void LinkStub (csPolygonStub* ps);
 };
 
 #endif /*TREEOBJ_H*/

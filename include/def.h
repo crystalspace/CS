@@ -182,4 +182,7 @@
 //#define SMALL_Z .1
 #define SMALL_Z .01
 
+// This macro causes a crash. Can be useful for debugging.
+#define CRASH { int* a=0; *a = 1; }
+
 #endif // __DEF_H__

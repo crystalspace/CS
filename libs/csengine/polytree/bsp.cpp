@@ -387,6 +387,23 @@ void csBspTree::BuildDynamic (csBspNode* node, csPolygonInt** polygons, int num)
 void csBspTree::ProcessTodo (csBspNode* node)
 {
   csPolygonStub* stub;
+  if (!node->front && !node->back)
+  {
+    // This node has no children. Currently we just add
+    // this stub to the stub of this node then. This is not entirely
+    // correct because the current stub may not be convex. However,
+    // since the stub system is going to be used for visibility testing
+    // and not for perfect rendering I don't think this is a major
+    // problem. @@@
+    while (node->todo_stubs)
+    {
+      stub = node->todo_stubs;
+      node->UnlinkStub (stub);	// Unlink from todo list.
+      node->LinkStub (stub);	// Relink to normal list.
+    }
+    return;
+  }
+
   while (node->todo_stubs)
   {
     stub = node->todo_stubs;
@@ -397,9 +414,17 @@ void csBspTree::ProcessTodo (csBspNode* node)
     // Link the stub with the polygons on this splitter plane to the current node.
     if (stub_on) node->LinkStub (stub_on);	// Relink to normal list.
     // Link the stub with polygons in front to the todo list of the front node.
-    if (stub_front) node->front->LinkStubTodo (stub_front);
+    if (stub_front)
+      if (node->front)
+        node->front->LinkStubTodo (stub_front);
+      else
+        node->LinkStub (stub_front);	// @@@ We should create node->front!
     // Link the stub with back polygons to the todo list of the back node.
-    if (stub_back) node->back->LinkStubTodo (stub_back);
+    if (stub_back)
+      if (node->back)
+        node->back->LinkStubTodo (stub_back);
+      else
+        node->LinkStub (stub_back);	// @@@ We should create node->back!
   }
 }
 

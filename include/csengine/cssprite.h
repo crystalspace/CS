@@ -24,6 +24,7 @@
 #include "csgeom/box.h"
 #include "csobject/nobjvec.h"
 #include "csengine/polyint.h"
+#include "csengine/bspbbox.h"
 #include "csengine/rview.h"
 #include "csengine/cscolor.h"
 #include "csengine/texture.h"
@@ -312,6 +313,9 @@ private:
   /// Points to Actor class which "owns" this sprite.
   csObject* myOwner;
 
+  /// Bounding box for polygon trees.
+  csPolyTreeBBox bbox;
+
   /// Set the size of internally used tables
   static void UpdateWorkTables (int max_size);
 
@@ -387,10 +391,10 @@ private:
   /// The current action.
   csSpriteAction* cur_action;
 
-  /// The last frame time action
+  /// The last frame time action.
   time_t last_time;
 
-  /// animation tweening ratio:  next frame / this frame
+  /// Animation tweening ratio:  next frame / this frame.
   float tween_ratio;
 
   ///
@@ -435,6 +439,12 @@ private:
    * calculates the distance once (with the center of the sprite).
    */
   void UpdateLightingLQ (csLight** lights, int num_lights, csVector3* object_vertices);
+  
+  /**
+   * Update the bounding box for the polygon tree
+   * algorithm.
+   */
+  void UpdatePolyTreeBBox ();
 
 public:
   ///
@@ -450,6 +460,9 @@ public:
 
   /// Get the skeleton state for this sprite.
   csSkeletonState* GetSkeletonState () { return skeleton_state; }
+
+  /// Get the bounding box object for the polygon tree.
+  csPolyTreeBBox& GetBBoxObject () { return bbox; }
 
   /// force a new texture skin other than default
   void SetTexture (const char* name, csTextureList* textures);
@@ -559,12 +572,6 @@ public:
   void Transform (csMatrix3& matrix);
 
   /**
-   * Calculate a bounding box for this sprite in world space and add
-   * the resulting polygons to the given container.
-   */
-  void AddBoundingPolygons (csBspContainer* container);
-
-  /**
    * Fill the static mesh with the current sprite
    * for a given LOD level.
    */
@@ -635,6 +642,7 @@ public:
   void SetFrame (int f)
   {
     if (cur_action && f < cur_action->GetNumFrames ()) cur_frame = f;
+    UpdatePolyTreeBBox ();
   }
 
   /**

@@ -551,21 +551,16 @@ void csSector::Draw (csRenderView& rview)
     // pool would be ideal.
     if (static_thing && do_things)
     {
-      // Add all bounding boxes for all sprites to the BSP tree dynamically.
-      // @@@ Avoid memory allocation?
-      csBspContainer* spr_container = NULL;
+      // Mark all sprites as invisible and clear the camera transformation
+      // for their bounding boxes.
       if (sprites.Length () > 0)
       {
-        CHK (spr_container = new csBspContainer ());
         for (i = 0 ; i < sprites.Length () ; i++)
         {
           csSprite3D* sp3d = (csSprite3D*)sprites[i];
 	  sp3d->MarkInvisible ();
-	  sp3d->AddBoundingPolygons (spr_container);
+	  sp3d->GetBBoxObject ().ClearTransform ();
         }
-	static_tree->AddDynamicPolygons (spr_container->GetPolygons (),
-          spr_container->GetNumPolygons ());
-	spr_container->World2Camera (rview);
       }
 
       CHK (poly_queue = new csPolygon2DQueue (polygons.Length ()+
@@ -576,10 +571,6 @@ void csSector::Draw (csRenderView& rview)
 
       if (sprites.Length () > 0)
       {
-        // Clean up the dynamically added BSP polygons.
-	static_tree->RemoveDynamicPolygons ();
-        CHK (delete spr_container);
-
 	// Push all visible sprites in a queue.
 	// @@@ Avoid memory allocation?
 	CHK (sprite_queue = new csSprite3D* [sprites.Length ()]);
@@ -886,6 +877,7 @@ void* CalculateLightingPolygonsFB (csSector*,
   static int frust_cnt = 50;
   for (i = 0 ; i < num ; i++)
   {
+    if (polygon[i]->GetType () != 1) continue;
     p = (csPolygon3D*)polygon[i];
 
     csVector3 poly[50];	// @@@ HARDCODED! BAD!

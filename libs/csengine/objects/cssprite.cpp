@@ -330,7 +330,7 @@ static DECLARE_GROWING_ARRAY (visible, bool)
 /// The list of lights that hit the sprite
 static DECLARE_GROWING_ARRAY (light_worktable, csLight*)
 
-csSprite3D::csSprite3D () : csObject ()
+csSprite3D::csSprite3D () : csObject (), bbox (this)
 {
   v_obj2world.x = 0;
   v_obj2world.y = 0;
@@ -379,12 +379,14 @@ void csSprite3D::SetMove (float x, float y, float z)
   v_obj2world.x = -x;
   v_obj2world.y = -y;
   v_obj2world.z = -z;
+  UpdatePolyTreeBBox ();
 }
 
 void csSprite3D::SetTransform (const csMatrix3& matrix)
 {
   m_obj2world = matrix;
   m_world2obj = m_obj2world.GetInverse ();
+  UpdatePolyTreeBBox ();
 }
 
 void csSprite3D::Move (float dx, float dy, float dz)
@@ -392,6 +394,7 @@ void csSprite3D::Move (float dx, float dy, float dz)
   v_obj2world.x += dx;
   v_obj2world.y += dy;
   v_obj2world.z += dz;
+  UpdatePolyTreeBBox ();
 }
 
 bool csSprite3D::MoveTo (const csVector3 &move_to)
@@ -416,6 +419,7 @@ bool csSprite3D::MoveTo (const csVector3 &move_to)
     v_obj2world.y=move_to.y;//new_pos.y;
     v_obj2world.z=move_to.z;//new_pos.z;*/
     v_obj2world=-new_pos;
+    UpdatePolyTreeBBox ();
     return true;
   }
   else
@@ -430,6 +434,7 @@ void csSprite3D::Transform (csMatrix3& matrix)
   m *= m_obj2world;
   m_obj2world = m;
   m_world2obj = m_obj2world.GetInverse ();
+  UpdatePolyTreeBBox ();
 }
 
 void csSprite3D::SetTemplate (csSpriteTemplate* tmpl)
@@ -555,8 +560,25 @@ void csSprite3D::UpdateDeferedLighting ()
   }
 }
 
-void csSprite3D::AddBoundingPolygons (csBspContainer* container)
+void csSprite3D::UpdatePolyTreeBBox ()
 {
+  bbox.RemoveFromTree ();
+
+  // If we are not in a sector which has a polygon tree
+  // then we don't really update. We should consider if this is
+  // a good idea. Do we only want this object updated when we
+  // want to use it in a polygon tree? It is certainly more
+  // efficient to do it this way when the sprite is currently
+  // moving in normal convex sectors.
+  int i;
+  csPolygonTree* tree = NULL;
+  for (i = 0 ; i < sectors.Length () ; i++)
+  {
+    tree = ((csSector*)sectors[i])->GetStaticTree ();
+    if (tree) break;
+  }
+  if (!tree) return;
+
   csBox3 b;
   if (skeleton_state)
   {
@@ -575,7 +597,7 @@ void csSprite3D::AddBoundingPolygons (csBspContainer* container)
 
   // Add the eight corner points of the bounding box to the container.
   // Transform from object to world space here.
-  csVector3Array& va = container->GetVertices ();
+  csVector3Array& va = bbox.GetVertices ();
   int pt_xyz = va.AddVertex (trans.Other2This (csVector3 (b.MinX (), b.MinY (), b.MinZ ())));
   int pt_Xyz = va.AddVertex (trans.Other2This (csVector3 (b.MaxX (), b.MinY (), b.MinZ ())));
   int pt_xYz = va.AddVertex (trans.Other2This (csVector3 (b.MinX (), b.MaxY (), b.MinZ ())));
@@ -585,8 +607,8 @@ void csSprite3D::AddBoundingPolygons (csBspContainer* container)
   int pt_xYZ = va.AddVertex (trans.Other2This (csVector3 (b.MinX (), b.MaxY (), b.MaxZ ())));
   int pt_XYZ = va.AddVertex (trans.Other2This (csVector3 (b.MaxX (), b.MaxY (), b.MaxZ ())));
 
-  CHK (poly = new csBspPolygon ());
-  container->AddPolygon (poly);
+  poly = (csBspPolygon*)csBspPolygon::poly_pool.Alloc ();
+  bbox.AddPolygon (poly);
   poly->SetOriginator (this);
   poly->GetPolygon ().AddVertex (pt_xYz);
   poly->GetPolygon ().AddVertex (pt_XYz);
@@ -595,8 +617,8 @@ void csSprite3D::AddBoundingPolygons (csBspContainer* container)
   poly->SetPolyPlane (csPlane (0, 0, 1, -b.MinZ ()));
   poly->Transform (trans);
 
-  CHK (poly = new csBspPolygon ());
-  container->AddPolygon (poly);
+  poly = (csBspPolygon*)csBspPolygon::poly_pool.Alloc ();
+  bbox.AddPolygon (poly);
   poly->SetOriginator (this);
   poly->GetPolygon ().AddVertex (pt_XYz);
   poly->GetPolygon ().AddVertex (pt_XYZ);
@@ -605,8 +627,8 @@ void csSprite3D::AddBoundingPolygons (csBspContainer* container)
   poly->SetPolyPlane (csPlane (-1, 0, 0, b.MaxX ()));
   poly->Transform (trans);
 
-  CHK (poly = new csBspPolygon ());
-  container->AddPolygon (poly);
+  poly = (csBspPolygon*)csBspPolygon::poly_pool.Alloc ();
+  bbox.AddPolygon (poly);
   poly->SetOriginator (this);
   poly->GetPolygon ().AddVertex (pt_XYZ);
   poly->GetPolygon ().AddVertex (pt_xYZ);
@@ -615,8 +637,8 @@ void csSprite3D::AddBoundingPolygons (csBspContainer* container)
   poly->SetPolyPlane (csPlane (0, 0, -1, b.MaxZ ()));
   poly->Transform (trans);
 
-  CHK (poly = new csBspPolygon ());
-  container->AddPolygon (poly);
+  poly = (csBspPolygon*)csBspPolygon::poly_pool.Alloc ();
+  bbox.AddPolygon (poly);
   poly->SetOriginator (this);
   poly->GetPolygon ().AddVertex (pt_xYZ);
   poly->GetPolygon ().AddVertex (pt_xYz);
@@ -625,8 +647,8 @@ void csSprite3D::AddBoundingPolygons (csBspContainer* container)
   poly->SetPolyPlane (csPlane (1, 0, 0, -b.MinX ()));
   poly->Transform (trans);
 
-  CHK (poly = new csBspPolygon ());
-  container->AddPolygon (poly);
+  poly = (csBspPolygon*)csBspPolygon::poly_pool.Alloc ();
+  bbox.AddPolygon (poly);
   poly->SetOriginator (this);
   poly->GetPolygon ().AddVertex (pt_xYZ);
   poly->GetPolygon ().AddVertex (pt_XYZ);
@@ -635,8 +657,8 @@ void csSprite3D::AddBoundingPolygons (csBspContainer* container)
   poly->SetPolyPlane (csPlane (0, -1, 0, b.MaxY ()));
   poly->Transform (trans);
 
-  CHK (poly = new csBspPolygon ());
-  container->AddPolygon (poly);
+  poly = (csBspPolygon*)csBspPolygon::poly_pool.Alloc ();
+  bbox.AddPolygon (poly);
   poly->SetOriginator (this);
   poly->GetPolygon ().AddVertex (pt_xyz);
   poly->GetPolygon ().AddVertex (pt_Xyz);
@@ -644,6 +666,19 @@ void csSprite3D::AddBoundingPolygons (csBspContainer* container)
   poly->GetPolygon ().AddVertex (pt_xyZ);
   poly->SetPolyPlane (csPlane (0, 1, 0, -b.MinY ()));
   poly->Transform (trans);
+
+  // Here we need to insert in trees where this sprite lives.
+  for (i = 0 ; i < sectors.Length () ; i++)
+  {
+    tree = ((csSector*)sectors[i])->GetStaticTree ();
+    if (tree)
+    {
+      // Temporarily increase reference to prevent free.
+      bbox.GetBaseStub ()->IncRef ();
+      tree->AddObject (&bbox);
+      bbox.GetBaseStub ()->DecRef ();
+    }
+  }
 }
 
 void csSprite3D::GetObjectBoundingBox (csBox3& obox)
@@ -1075,10 +1110,12 @@ void csSprite3D::MoveToSector (csSector* s)
   RemoveFromSectors ();
   sectors.Push (s);
   s->sprites.Push (this);
+  UpdatePolyTreeBBox ();
 }
 
 void csSprite3D::RemoveFromSectors ()
 {
+  bbox.RemoveFromTree ();
   while (sectors.Length () > 0)
   {
     csSector* ss = (csSector*)sectors.Pop ();
@@ -1284,3 +1321,4 @@ void csSprite3D::AddDynamicLight (csLightHitsSprite* lp)
   dynamiclights = lp;
   lp->sprite = this;
 }
+

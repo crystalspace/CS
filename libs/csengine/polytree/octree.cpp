@@ -153,6 +153,19 @@ void csOctree::RemoveDynamicPolygons ()
 void csOctree::ProcessTodo (csOctreeNode* node)
 {
   csPolygonStub* stub;
+
+  if (node->GetMiniBsp ())
+  {
+    csBspTree* bsp = node->GetMiniBsp ();
+    while (node->todo_stubs)
+    {
+      stub = node->todo_stubs;
+      node->UnlinkStub (stub);	// Unlink from todo list.
+      bsp->AddStubTodo (stub);
+    }
+    return;
+  }
+
   const csVector3& center = node->GetCenter ();
   while (node->todo_stubs)
   {
@@ -164,18 +177,18 @@ void csOctree::ProcessTodo (csOctreeNode* node)
     if (xf)
     {
       csPolygonStub* xfyf, * xfyb;
-      pto->SplitWithPlaneX (xf, NULL, &xfyf, &xfyb, center.y);
+      pto->SplitWithPlaneY (xf, NULL, &xfyf, &xfyb, center.y);
       if (xfyf)
       {
         csPolygonStub* xfyfzf, * xfyfzb;
-        pto->SplitWithPlaneX (xfyf, NULL, &xfyfzf, &xfyfzb, center.z);
+        pto->SplitWithPlaneZ (xfyf, NULL, &xfyfzf, &xfyfzb, center.z);
 	if (xfyfzf) node->children[OCTREE_FFF]->LinkStubTodo (xfyfzf);
 	if (xfyfzb) node->children[OCTREE_FFB]->LinkStubTodo (xfyfzb);
       }
       if (xfyb)
       {
         csPolygonStub* xfybzf, * xfybzb;
-        pto->SplitWithPlaneX (xfyb, NULL, &xfybzf, &xfybzb, center.z);
+        pto->SplitWithPlaneZ (xfyb, NULL, &xfybzf, &xfybzb, center.z);
 	if (xfybzf) node->children[OCTREE_FBF]->LinkStubTodo (xfybzf);
 	if (xfybzb) node->children[OCTREE_FBB]->LinkStubTodo (xfybzb);
       }
@@ -183,18 +196,18 @@ void csOctree::ProcessTodo (csOctreeNode* node)
     if (xb)
     {
       csPolygonStub* xbyf, * xbyb;
-      pto->SplitWithPlaneX (xb, NULL, &xbyf, &xbyb, center.y);
+      pto->SplitWithPlaneY (xb, NULL, &xbyf, &xbyb, center.y);
       if (xbyf)
       {
         csPolygonStub* xbyfzf, * xbyfzb;
-        pto->SplitWithPlaneX (xbyf, NULL, &xbyfzf, &xbyfzb, center.z);
+        pto->SplitWithPlaneZ (xbyf, NULL, &xbyfzf, &xbyfzb, center.z);
 	if (xbyfzf) node->children[OCTREE_BFF]->LinkStubTodo (xbyfzf);
 	if (xbyfzb) node->children[OCTREE_BFB]->LinkStubTodo (xbyfzb);
       }
       if (xbyb)
       {
         csPolygonStub* xbybzf, * xbybzb;
-        pto->SplitWithPlaneX (xbyb, NULL, &xbybzf, &xbybzb, center.z);
+        pto->SplitWithPlaneZ (xbyb, NULL, &xbybzf, &xbybzb, center.z);
 	if (xbybzf) node->children[OCTREE_BBF]->LinkStubTodo (xbybzf);
 	if (xbybzb) node->children[OCTREE_BBB]->LinkStubTodo (xbybzb);
       }
@@ -430,6 +443,8 @@ void* csOctree::Back2Front (csOctreeNode* node, const csVector3& pos,
 {
   if (!node) return NULL;
 
+  ProcessTodo (node);
+
   if (node->GetMiniBsp ())
     return node->GetMiniBsp ()->Back2Front (pos, func, data, cullfunc, culldata);
 
@@ -465,6 +480,8 @@ void* csOctree::Front2Back (csOctreeNode* node, const csVector3& pos,
 	void* culldata)
 {
   if (!node) return NULL;
+
+  ProcessTodo (node);
 
   if (node->GetMiniBsp ())
     return node->GetMiniBsp ()->Front2Back (pos, func, data, cullfunc, culldata);

@@ -24,6 +24,31 @@
 
 //---------------------------------------------------------------------------
 
+csBspPolygonFactory csBspPolygon::poly_fact;
+csPolygonIntPool csBspPolygon::poly_pool (&poly_fact);
+
+csPolygonInt* csBspPolygonFactory::Create ()
+{
+  CHK (csBspPolygon* pol = new csBspPolygon ());
+  return (csPolygonInt*)pol;
+}
+
+//---------------------------------------------------------------------------
+
+void csBspPolygon::Dump ()
+{
+  int i, j;
+  csVector3Array& verts = parent->GetVertices ();
+  csVector3Array& cverts = parent->GetCameraVertices ();
+  for (i = 0 ; i < polygon.GetNumVertices () ; i++)
+  {
+    j=polygon[i];
+    printf("  vt %d:(%f,%f,%f) cam:(%f,%f,%f)\n", i, verts[j].x,
+	verts[j].y, verts[j].z, cverts[j].x, cverts[j].y,
+	cverts[j].z);
+  }
+}
+
 int csBspPolygon::Classify (const csPlane& pl)
 {
   if (GetPolyPlane () == &pl) return POL_SAME_PLANE;
@@ -100,8 +125,8 @@ int csBspPolygon::ClassifyZ (float z)
 void csBspPolygon::SplitWithPlane (csPolygonInt** poly1, csPolygonInt** poly2,
 				  const csPlane& split_plane)
 {
-  CHK (csBspPolygon* np1 = new csBspPolygon ());
-  CHK (csBspPolygon* np2 = new csBspPolygon ());
+  csBspPolygon* np1 = (csBspPolygon*)poly_pool.Alloc ();
+  csBspPolygon* np2 = (csBspPolygon*)poly_pool.Alloc ();
   *poly1 = (csPolygonInt*)np1; // Front
   *poly2 = (csPolygonInt*)np2; // Back
   csPolyIndexed& polygon1 = np1->GetPolygon ();
@@ -112,8 +137,8 @@ void csBspPolygon::SplitWithPlane (csPolygonInt** poly1, csPolygonInt** poly2,
   np2->SetPolyPlane (plane);
   np1->SetOriginator (GetOriginator ());
   np2->SetOriginator (GetOriginator ());
-  GetParent ()->AddPolygon (np1);
-  GetParent ()->AddPolygon (np2);
+  np1->SetParent (GetParent ());
+  np2->SetParent (GetParent ());
 
   csVector3 ptB;
   float sideA, sideB;
@@ -153,6 +178,225 @@ void csBspPolygon::SplitWithPlane (csPolygonInt** poly1, csPolygonInt** poly2,
 	// plane. This is a simple ray-plane intersection.
 	csVector3 v = ptB; v -= ptA;
 	float sect = - split_plane.Classify (ptA) / ( split_plane.GetNormal () * v );
+	v *= sect; v += ptA;
+	idx = GetParent ()->GetVertices ().AddVertexSmart (v);
+	polygon1.AddVertex (idx);
+	polygon2.AddVertex (idx);
+      }
+      polygon1.AddVertex (polygon[i]);	// Add ptB
+    }
+    else
+    {
+      polygon1.AddVertex (polygon[i]);	// ptB
+      polygon2.AddVertex (polygon[i]);	// ptB
+    }
+    ptA = ptB;
+    sideA = sideB;
+  }
+}
+
+void csBspPolygon::SplitWithPlaneX (csPolygonInt** poly1, csPolygonInt** poly2,
+				  float x)
+{
+  csBspPolygon* np1 = (csBspPolygon*)poly_pool.Alloc ();
+  csBspPolygon* np2 = (csBspPolygon*)poly_pool.Alloc ();
+  *poly1 = (csPolygonInt*)np1; // Front
+  *poly2 = (csPolygonInt*)np2; // Back
+  csPolyIndexed& polygon1 = np1->GetPolygon ();
+  csPolyIndexed& polygon2 = np2->GetPolygon ();
+  polygon1.MakeEmpty ();
+  polygon2.MakeEmpty ();
+  np1->SetPolyPlane (plane);
+  np2->SetPolyPlane (plane);
+  np1->SetOriginator (GetOriginator ());
+  np2->SetOriginator (GetOriginator ());
+  np1->SetParent (GetParent ());
+  np2->SetParent (GetParent ());
+
+  csVector3 ptB;
+  float sideA, sideB;
+  csVector3 ptA = GetParent ()->GetVertices ().GetVertices ()
+  	[polygon[polygon.GetNumVertices () - 1]];
+  sideA = ptA.x - x;
+  if (ABS (sideA) < SMALL_EPSILON) sideA = 0;
+  int idx;
+
+  for (int i = -1 ; ++i < polygon.GetNumVertices () ; )
+  {
+    ptB = GetParent ()->GetVertices ().GetVertices ()[polygon[i]];
+    sideB = ptB.x - x;
+    if (ABS (sideB) < SMALL_EPSILON) sideB = 0;
+    if (sideB > 0)
+    {
+      if (sideA < 0)
+      {
+	// Compute the intersection point of the line
+	// from point A to point B with the partition
+	// plane. This is a simple ray-plane intersection.
+	csVector3 v = ptB; v -= ptA;
+	float sect = - (ptA.x - x) / v.x ;
+	v *= sect; v += ptA;
+	idx = GetParent ()->GetVertices ().AddVertexSmart (v);
+	polygon1.AddVertex (idx);
+	polygon2.AddVertex (idx);
+      }
+      polygon2.AddVertex (polygon[i]);	// Add ptB
+    }
+    else if (sideB < 0)
+    {
+      if (sideA > 0)
+      {
+	// Compute the intersection point of the line
+	// from point A to point B with the partition
+	// plane. This is a simple ray-plane intersection.
+	csVector3 v = ptB; v -= ptA;
+	float sect = - (ptA.x - x) / v.x;
+	v *= sect; v += ptA;
+	idx = GetParent ()->GetVertices ().AddVertexSmart (v);
+	polygon1.AddVertex (idx);
+	polygon2.AddVertex (idx);
+      }
+      polygon1.AddVertex (polygon[i]);	// Add ptB
+    }
+    else
+    {
+      polygon1.AddVertex (polygon[i]);	// ptB
+      polygon2.AddVertex (polygon[i]);	// ptB
+    }
+    ptA = ptB;
+    sideA = sideB;
+  }
+}
+
+void csBspPolygon::SplitWithPlaneY (csPolygonInt** poly1, csPolygonInt** poly2,
+				  float y)
+{
+  csBspPolygon* np1 = (csBspPolygon*)poly_pool.Alloc ();
+  csBspPolygon* np2 = (csBspPolygon*)poly_pool.Alloc ();
+  *poly1 = (csPolygonInt*)np1; // Front
+  *poly2 = (csPolygonInt*)np2; // Back
+  csPolyIndexed& polygon1 = np1->GetPolygon ();
+  csPolyIndexed& polygon2 = np2->GetPolygon ();
+  polygon1.MakeEmpty ();
+  polygon2.MakeEmpty ();
+  np1->SetPolyPlane (plane);
+  np2->SetPolyPlane (plane);
+  np1->SetOriginator (GetOriginator ());
+  np2->SetOriginator (GetOriginator ());
+  np1->SetParent (GetParent ());
+  np2->SetParent (GetParent ());
+
+  csVector3 ptB;
+  float sideA, sideB;
+  csVector3 ptA = GetParent ()->GetVertices ().GetVertices ()
+  	[polygon[polygon.GetNumVertices () - 1]];
+  sideA = ptA.y - y;
+  if (ABS (sideA) < SMALL_EPSILON) sideA = 0;
+  int idx;
+
+  for (int i = -1 ; ++i < polygon.GetNumVertices () ; )
+  {
+    ptB = GetParent ()->GetVertices ().GetVertices ()[polygon[i]];
+    sideB = ptB.y - y;
+    if (ABS (sideB) < SMALL_EPSILON) sideB = 0;
+    if (sideB > 0)
+    {
+      if (sideA < 0)
+      {
+	// Compute the intersection point of the line
+	// from point A to point B with the partition
+	// plane. This is a simple ray-plane intersection.
+	csVector3 v = ptB; v -= ptA;
+	float sect = - (ptA.y - y) / v.y ;
+	v *= sect; v += ptA;
+	idx = GetParent ()->GetVertices ().AddVertexSmart (v);
+	polygon1.AddVertex (idx);
+	polygon2.AddVertex (idx);
+      }
+      polygon2.AddVertex (polygon[i]);	// Add ptB
+    }
+    else if (sideB < 0)
+    {
+      if (sideA > 0)
+      {
+	// Compute the intersection point of the line
+	// from point A to point B with the partition
+	// plane. This is a simple ray-plane intersection.
+	csVector3 v = ptB; v -= ptA;
+	float sect = - (ptA.y - y) / v.y;
+	v *= sect; v += ptA;
+	idx = GetParent ()->GetVertices ().AddVertexSmart (v);
+	polygon1.AddVertex (idx);
+	polygon2.AddVertex (idx);
+      }
+      polygon1.AddVertex (polygon[i]);	// Add ptB
+    }
+    else
+    {
+      polygon1.AddVertex (polygon[i]);	// ptB
+      polygon2.AddVertex (polygon[i]);	// ptB
+    }
+    ptA = ptB;
+    sideA = sideB;
+  }
+}
+
+void csBspPolygon::SplitWithPlaneZ (csPolygonInt** poly1, csPolygonInt** poly2,
+				  float z)
+{
+  csBspPolygon* np1 = (csBspPolygon*)poly_pool.Alloc ();
+  csBspPolygon* np2 = (csBspPolygon*)poly_pool.Alloc ();
+  *poly1 = (csPolygonInt*)np1; // Front
+  *poly2 = (csPolygonInt*)np2; // Back
+  csPolyIndexed& polygon1 = np1->GetPolygon ();
+  csPolyIndexed& polygon2 = np2->GetPolygon ();
+  polygon1.MakeEmpty ();
+  polygon2.MakeEmpty ();
+  np1->SetPolyPlane (plane);
+  np2->SetPolyPlane (plane);
+  np1->SetOriginator (GetOriginator ());
+  np2->SetOriginator (GetOriginator ());
+  np1->SetParent (GetParent ());
+  np2->SetParent (GetParent ());
+
+  csVector3 ptB;
+  float sideA, sideB;
+  csVector3 ptA = GetParent ()->GetVertices ().GetVertices ()
+  	[polygon[polygon.GetNumVertices () - 1]];
+  sideA = ptA.z - z;
+  if (ABS (sideA) < SMALL_EPSILON) sideA = 0;
+  int idx;
+
+  for (int i = -1 ; ++i < polygon.GetNumVertices () ; )
+  {
+    ptB = GetParent ()->GetVertices ().GetVertices ()[polygon[i]];
+    sideB = ptB.z - z;
+    if (ABS (sideB) < SMALL_EPSILON) sideB = 0;
+    if (sideB > 0)
+    {
+      if (sideA < 0)
+      {
+	// Compute the intersection point of the line
+	// from point A to point B with the partition
+	// plane. This is a simple ray-plane intersection.
+	csVector3 v = ptB; v -= ptA;
+	float sect = - (ptA.z - z) / v.z ;
+	v *= sect; v += ptA;
+	idx = GetParent ()->GetVertices ().AddVertexSmart (v);
+	polygon1.AddVertex (idx);
+	polygon2.AddVertex (idx);
+      }
+      polygon2.AddVertex (polygon[i]);	// Add ptB
+    }
+    else if (sideB < 0)
+    {
+      if (sideA > 0)
+      {
+	// Compute the intersection point of the line
+	// from point A to point B with the partition
+	// plane. This is a simple ray-plane intersection.
+	csVector3 v = ptB; v -= ptA;
+	float sect = - (ptA.z - z) / v.z;
 	v *= sect; v += ptA;
 	idx = GetParent ()->GetVertices ().AddVertexSmart (v);
 	polygon1.AddVertex (idx);
@@ -499,12 +743,37 @@ bool csBspPolygon::DoPerspective (const csTransform& trans,
 
 //---------------------------------------------------------------------------
 
-void csBspContainer::World2Camera (const csTransform& trans)
+csPolyTreeBBox::csPolyTreeBBox (csObject* owner) : csPolyTreeObject (owner)
+{
+  base_stub = csPolyTreeObject::stub_pool.Alloc ();
+  base_stub->IncRef (); // Make sure this object is locked.
+  base_stub->SetObject (this);
+  is_cam_transf = false;
+}
+
+csPolyTreeBBox::~csPolyTreeBBox ()
+{
+  if (base_stub) csPolyTreeObject::stub_pool.Free (base_stub);
+}
+
+void csPolyTreeBBox::World2Camera (const csTransform& trans)
 {
   int i;
   cam_vertices.MakeRoom (vertices.GetNumVertices ());
   for (i = 0 ; i < vertices.GetNumVertices () ; i++)
     cam_vertices[i] = trans.Other2This (vertices[i]);
+  is_cam_transf = true;
+}
+
+void csPolyTreeBBox::RemovePolygons (csPolygonStub* stub)
+{
+  int i;
+  csPolygonInt** polygons = stub->GetPolygons ();
+  for (i = 0 ; i < stub->GetNumPolygons () ; i++)
+  {
+    csBspPolygon* poly = (csBspPolygon*)polygons[i];
+    csBspPolygon::poly_pool.Free (poly);
+  }
 }
 
 //---------------------------------------------------------------------------

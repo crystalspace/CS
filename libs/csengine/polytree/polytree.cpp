@@ -46,18 +46,22 @@ void csPolygonTreeNode::UnlinkStub (csPolygonStub* ps)
 
 void csPolygonTreeNode::LinkStubTodo (csPolygonStub* ps)
 {
+  if (ps->node) return;
   ps->next_tree = todo_stubs;
   ps->prev_tree = NULL;
   if (todo_stubs) todo_stubs->prev_tree = ps;
   todo_stubs = ps;
+  ps->node = this;
 }
 
 void csPolygonTreeNode::LinkStub (csPolygonStub* ps)
 {
+  if (ps->node) return;
   ps->next_tree = first_stub;
   ps->prev_tree = NULL;
   if (first_stub) first_stub->prev_tree = ps;
   first_stub = ps;
+  ps->node = this;
 }
 
 void* csPolygonTreeNode::TraverseObjects (csSector* sector, 

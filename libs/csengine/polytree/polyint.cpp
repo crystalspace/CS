@@ -34,15 +34,15 @@ void csPolygonIntArray::AddPolygon (csPolygonInt* poly)
 {
   if (!polygons)
   {
-    max = 3;
+    max = 6;
     CHK (polygons = new csPolygonInt* [max]);
   }
 
   if (num >= max)
   {
-    CHK (csPolygonInt** pp = new csPolygonInt* [max+2]);
+    CHK (csPolygonInt** pp = new csPolygonInt* [max+3]);
     memcpy (pp, polygons, sizeof (csPolygonInt*)*max);
-    max += 2;
+    max += 3;
     CHK (delete [] polygons);
     polygons = pp;
   }

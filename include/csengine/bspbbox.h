@@ -25,9 +25,19 @@
 #include "csgeom/transfrm.h"
 #include "csengine/polyint.h"
 #include "csengine/pol2d.h"
+#include "csengine/treeobj.h"
 #include "csobject/csobject.h"
 
-class csBspContainer;
+class csPolyTreeBBox;
+
+/**
+ * A factor for creating instances of csBspPolygon.
+ */
+class csBspPolygonFactory : public csPolygonIntFactory
+{
+  /// Create a csBspPolygon.
+  virtual csPolygonInt* Create ();
+};
 
 /**
  * This class represents a polygon which can be inserted dynamically
@@ -37,25 +47,40 @@ class csBspContainer;
  */
 class csBspPolygon : public csPolygonInt
 {
+  friend class csBspPolygonFactory;
+
 private:
   /// The 3D polygon.
   csPolyIndexed polygon;
   /// The plane.
   csPlane plane;
   /// The parent.
-  csBspContainer* parent;
+  csPolyTreeBBox* parent;
   /// The original object for which this polygon is a bounding box polygon.
   csObject* originator;
+
+public:
+  /// A factory for csBspPolygon.
+  static csBspPolygonFactory poly_fact;
+  /// A pool of csBspPolygon.
+  static csPolygonIntPool poly_pool;
+
+  /// Debug.
+  void Dump();
+
+private:
+  /// Constructor is private to prevent allocation by non-factory.
+  csBspPolygon () { }
 
 public:
   /// Destructor.
   virtual ~csBspPolygon () { }
 
   /// Get the parent container.
-  csBspContainer* GetParent () { return parent; }
+  csPolyTreeBBox* GetParent () { return parent; }
 
   /// Set the parent container.
-  void SetParent (csBspContainer* par) { parent = par; }
+  void SetParent (csPolyTreeBBox* par) { parent = par; }
 
   /**
    * Get the original object for which this polygon is a bounding box polygon.
@@ -99,17 +124,20 @@ public:
   void SplitWithPlane (csPolygonInt** front, csPolygonInt** back,
   	const csPlane& split_plane);
 
-  /// Return 2 to indicate it is a bsp polygon.
-  int GetType () { return 2; }
+  /// Split this polygon to the x-plane.
+  void SplitWithPlaneX (csPolygonInt** front, csPolygonInt** back, float x);
+
+  /// Split this polygon to the y-plane.
+  void SplitWithPlaneY (csPolygonInt** front, csPolygonInt** back, float y);
+
+  /// Split this polygon to the z-plane.
+  void SplitWithPlaneZ (csPolygonInt** front, csPolygonInt** back, float z);
+
+  /// Return 3 to indicate it is a bsp polygon.
+  int GetType () { return 3; }
 
   /// Transform the plane of this polygon.
   void Transform (const csTransform& trans);
-
-  /**
-   * Transform the plane of this polygon from world to
-   * camera space.
-   */
-  void World2Camera (const csTransform& trans);
 
   /**
    * Clip this polygon to the Z plane and if portal_plane is given also
@@ -132,7 +160,7 @@ public:
 /**
  * A container for a bunch of BSP polygons.
  */
-class csBspContainer
+class csPolyTreeBBox : public csPolyTreeObject
 {
 private:
   /// Array of vertices.
@@ -141,13 +169,25 @@ private:
   csVector3Array cam_vertices;
 
   /// All polygons.
-  csPolygonIntArray polygons;
+  csPolygonStub* base_stub;
+
+  /**
+   * If true then this object is transformed to camera space.
+   * i.e. cam_vertices will be valid.
+   */
+  bool is_cam_transf;
 
 public:
   /// Constructor.
-  csBspContainer () { }
+  csPolyTreeBBox (csObject* owner);
   /// Destructor.
-  ~csBspContainer () { }
+  virtual ~csPolyTreeBBox ();
+
+  /// Get the base set of polygons.
+  virtual csPolygonStub* GetBaseStub () { return base_stub; }
+
+  /// Remove polygons from a stub.
+  virtual void RemovePolygons (csPolygonStub* stub);
 
   /// Get vector array for this container.
   csVector3Array& GetVertices () { return vertices; }
@@ -158,21 +198,30 @@ public:
   /// Add a polygon to this container.
   void AddPolygon (csPolygonInt* poly)
   {
-    polygons.AddPolygon (poly);
+    base_stub->GetPolygonArray ().AddPolygon (poly);
     ((csBspPolygon*)poly)->SetParent (this);
   }
 
   /// Get the number of polygons in this polygonset.
-  int GetNumPolygons () { return polygons.GetNumPolygons (); }
+  int GetNumPolygons () { return base_stub->GetNumPolygons (); }
 
   /// Get the specified polygon from this set.
-  csPolygonInt* GetPolygon (int idx) { return polygons.GetPolygon (idx); }
+  csPolygonInt* GetPolygon (int idx)
+  {
+    return base_stub->GetPolygonArray ().GetPolygon (idx);
+  }
 
   /// Get the array of polygons.
-  csPolygonInt** GetPolygons () { return polygons.GetPolygons (); }
+  csPolygonInt** GetPolygons () { return base_stub->GetPolygons (); }
 
   /// Transform the vertices of this container from world to camera.
   void World2Camera (const csTransform& trans);
+
+  /// Return true if this object is already transformed to camera space.
+  bool IsTransformed () { return is_cam_transf; }
+
+  /// Clear camera transformation.
+  void ClearTransform () { is_cam_transf = false; }
 };
 
 #endif /*BSPBBOX_H*/

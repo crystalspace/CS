@@ -183,6 +183,14 @@ public:
    */
   void AddObject (csPolyTreeObject* obj);
 
+  /**
+   * Add a polygon stub to the todo list of the tree.
+   */
+  void AddStubTodo (csPolygonStub* stub)
+  {
+    root->LinkStubTodo (stub);
+  }
+
   /// Traverse the tree from back to front starting at the root and 'pos'.
   virtual void* Back2Front (const csVector3& pos, csTreeVisitFunc* func,
   	void* data, csTreeCullFunc* cullfunc = NULL, void* culldata = NULL) = 0;

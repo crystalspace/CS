@@ -27,7 +27,7 @@
 #define POL_BACK 2
 #define POL_SPLIT_NEEDED 3
 
-class csPolygonInt;
+class csPolygonIntPool;
 
 /**
  * This class indicates what methods a class should use in order
@@ -41,7 +41,33 @@ class csPolygonInt;
  */
 class csPolygonInt
 {
+  friend class csPolygonIntPool;
+
+private:
+  // Reference counter.
+  int ref_count;
+
 public:
+  /// Constructor. Init ref counter to 1.
+  csPolygonInt () { ref_count = 1; }
+
+  /**
+   * Increase the reference counter in this csPolygonInt.
+   */
+  void IncRefCount () { ref_count++; }
+
+  /**
+   * Decrease the reference counter. This function returns
+   * false as soon as the reference counter reaches zero.
+   * The object is NOT deleted automatically in that case.
+   */
+  bool DecRefCount () { ref_count--; return ref_count > 0; }
+
+  /**
+   * Return false if object is not referenced.
+   */
+  bool IsReferenced () { return ref_count > 0; }
+
   /**
    * Return the plane of this polygon.
    */
@@ -189,6 +215,126 @@ public:
    * current number of polygons.
    */
   void SetNumPolygons (int n) { num = n; }
+};
+
+/**
+ * An abstract factory class to create specific instances of csPolygonInt.
+ * To create a real factory you need to subclass this factory.
+ * In addition to creation this factory also manages the reference
+ * counter.
+ */
+class csPolygonIntFactory
+{
+public:
+  /// Create a csPolygonInt.
+  virtual csPolygonInt* Create () = 0;
+};
+
+/**
+ * This is an object pool which holds objects of type
+ * csPolygonInt. You can ask new instances from this pool.
+ * If needed it will allocate one for you but ideally it can
+ * give you one which was allocated earlier.
+ */
+class csPolygonIntPool
+{
+private:
+  struct PoolObj
+  {
+    PoolObj* next;
+    csPolygonInt* pi;
+  };
+  /// List of allocated polygons.
+  PoolObj* alloced;
+  /// List of previously allocated, but now unused polygons.
+  PoolObj* freed;
+  /// Factory to create new polygons.
+  csPolygonIntFactory* poly_fact;
+
+public:
+  /// Create an empty pool.
+  csPolygonIntPool (csPolygonIntFactory* fact) : alloced (NULL),
+  	freed (NULL), poly_fact (fact) { }
+
+  /// Destroy pool and all objects in the pool.
+  ~csPolygonIntPool ()
+  {
+    while (alloced)
+    {
+      PoolObj* n = alloced->next;
+      //CHK (delete alloced->pi); @@@ This free is not valid!
+      // We should use a ref count on the pool itself so that we
+      // now when all objects in the pool are freed and the
+      // 'alloced' list will be empty.
+      CHK (delete alloced);
+      alloced = n;
+    }
+    while (freed)
+    {
+      PoolObj* n = freed->next;
+      if (!freed->pi->DecRefCount ()) CHKB (delete freed->pi);
+      CHK (delete freed);
+      freed = n;
+    }
+  }
+
+  /**
+   * Allocate a new object in the pool.
+   */
+  csPolygonInt* Alloc ()
+  {
+    PoolObj* pnew;
+    if (freed)
+    {
+      pnew = freed;
+      freed = freed->next;
+    }
+    else
+    {
+      CHK (pnew = new PoolObj ());
+      pnew->pi = poly_fact->Create ();
+    }
+    pnew->next = alloced;
+    alloced = pnew;
+    pnew->pi->ref_count = 1;
+    return pnew->pi;
+  }
+
+  /**
+   * Free an object and put it back in the pool.
+   * Note that it is only legal to free objects which were allocated
+   * from the pool.
+   */
+  void Free (csPolygonInt* pi)
+  {
+    if (pi->DecRefCount ()) return;
+    if (alloced)
+    {
+      PoolObj* po = alloced;
+      alloced = alloced->next;
+      po->pi = pi;
+      po->next = freed;
+      freed = po;
+    }
+    else
+    {
+      // Cannot happen!
+    }
+  }
+
+  /// Dump some information about this pool.
+  void Dump ()
+  {
+    int cnt;
+    cnt = 0;
+    PoolObj* po = alloced;
+    while (po) { cnt++; po = po->next; }
+    printf ("PolyInt pool: %d allocated, ", cnt);
+    cnt = 0;
+    po = freed;
+    while (po) { cnt++; po = po->next; }
+    printf ("%d freed.\n", cnt);
+  }
 };
 
 #endif /*POLYINT_H*/

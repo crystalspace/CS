@@ -12,7 +12,74 @@ Short-term cleanups that need to be done:
 	- Check the dependencies of libraries/COM objects and try to find
 	  includes that don't belong there (like from csengine).
 
+25-Jan-2000
+	- Major update to the csConsole plugin from Michael Dale Long.
+	  He added csConsoleInput, cursor functionality, implemented
+	  proper redraw rectangle support and support for testing most
+	  console functions is integrated into cctest.
+	- Did some extra cleaning up of the new dynamic object code
+	  (for polygon trees). Seems to be working properly now.
+24-Jan-2000
+	- Noah L. Gibbs fixed Normalize() method in csQuaternion.
+	- Noah also got rigid bodies pretty much working in his demo code,
+	  checking in new fixes and features.
+	- Fixed several bugs in new system to add dynamic objects to
+	  polygon trees. It is nearly working correctly for sprites now.
+	- Andrew Zabolotny commited some changes:
+	   - Improvements to MazeD:
+		- added texture library dialog (Ctrl+L)
+		- "Window" menu has been split into "View" and "Window".
+	   - Improvements to software 3D renderer:
+		- mixmode is now history (always true_rgb) for compatibility
+		  with hardware renderers (also less dead code).
+		- improved much palette computation algorithm for 8-bit
+		  modes (even maze.zip doesnt look THAT bad anymore :-)
+		- todo: fix texture cache problem, fix truecolor modes
+		  to not depend on the 256-color palette, switch truecolor
+		  modes to "one palette per texture" mode (i.e. "private").
+	- Andrew also added a 'palette on/off' command to the console.
+	- Update to VC project files from Thomas Hieber.
+22-Jan-2000
+	- Gary Haussmann checked in a fix from Thomas Skoldenborg to
+	  prevent 3Dfx/Mesa drivers from dying horribly upon exiting the
+	  program. The problem was that glXDestroyContext was not being
+	  called.
+21-Jan-2000
+	- Michael Dale continued his work on the autoconf system
+	  in CS.
+	- Andrew Zabolotny updated inline assembly in software renderer
+	  so that it is gcc 2.95 compatible.
+	- Andrew also fixed the makefiles so that the define NO_ASSEMBLER
+	  when compiling with MODE != optimize.
+	- Thomas Hieber added some changes to the Direct3D port contribued
+	  by simonb@telisphere.com. He added multitexturing support and
+	  render state caching (more efficient render state changes).
+	  The multipass code has been removed. This will be rewritten
+	  later. So lightmaps will currently not appear on hardware without
+	  multitexturing.
+	- simonb@telisphere.com also fixed the detection code for windowed
+	  mode.
+	- Thomas Hieber adjusted project files for network demo provided
+	  by Eric Wigforss <ewigforss@novametrix.com>, I did some
+	  adjustments too, to make debug and release mode consistent.
+20-Jan-2000
+	- Michael Dale started adding an 'autoconf' system to CS. He
+	  started his work with the csgeom library.
+	- Thomas Hieber updated Windows documentation.
+	- Changes to csphyzik from Noah L. Gibbs.
+19-Jan-2000
+	- Noah L. Gibbs added Normalize() method to csQuaternion.
+	- Continued work on adding objects in polygon trees. Started
+	  converting the old dynamic polygon concept for sprites to
+	  the new way.
+	- Thomas Hieber fixed Map2CS so that curves are now the right
+	  format.
+	- Michael Ewert fixed a problem in the csphyzik library.
+	- Robert Bate made a change to the Mac port so that the mac event
+	  is dispatched to the right code if it is not handled by the 2d
+	  driver. The Mac projects are also brought up-to-date again.
 18-Jan-2000
+	- Further work on objects in polygon trees.
 	- Michael Dale Long did a major update to the csconsole plugin.
 	  iConsole and csConsole are finished for the time being. Updated
 	  csSimpleConsole to be compatible with the new interface. Added
@@ -24,6 +91,13 @@ Short-term cleanups that need to be done:
 	  There were some problems since CS may not generate enough
 	  mipmaps to "fully populated" the mipmaps, from an OpenGL point
 	  of view.
+	- Further work on Map2CS by Thomas Hieber. He removed WriteKeys
+	  from CIWorld and moved it to CCSWorld. This method is indeed
+	  specific and should not need to be overridden in other export
+	  formats.
+	- Thomas also added 'phyztest' to the VC project files and made
+	  some adjustments to it.
+	- Robert Bate did some adjustments to the Mac project files.
 17-Jan-2000
 	- Eric Sunshine fixed a couple termination-time crashers in the BeOS
 	  2D drivers which resulted from invalid calls to virtual functions

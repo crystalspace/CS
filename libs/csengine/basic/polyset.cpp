@@ -471,7 +471,7 @@ void* csPolygonSet::TestQueuePolygonArray (csPolygonInt** polygon, int num,
   
   for (i = 0 ; i < num ; i++)
   {
-    if (polygon[i]->GetType () == 2)
+    if (polygon[i]->GetType () == 3)
     {
       // We're dealing with a csBspPolygon.
       csBspPolygon* bsppol = (csBspPolygon*)polygon[i];
@@ -481,6 +481,13 @@ void* csPolygonSet::TestQueuePolygonArray (csPolygonInt** polygon, int num,
       // to do any of the other processing for this polygon.
       if (!sp3d->IsVisible ())
       {
+        if (!sp3d->GetBBoxObject ().IsTransformed ())
+	{
+	  // The bbox of this sprite has not yet been transformed
+	  // to camera space.
+	  sp3d->GetBBoxObject ().World2Camera (*d);
+	}
+
         // Transform it to screen space and perform clipping to Z plane.
         // Then test against the c-buffer to see if it is visible.
         clip = (csPolygon2D*)(render_pool->Alloc ());
