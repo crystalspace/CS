@@ -159,7 +159,9 @@ public:
   /**
    * Get an entire file at once. You should delete[] returned data
    * after usage. This is more effective than opening files and reading
-   * the file in blocks.
+   * the file in blocks.  Note that the returned buffer is always null-
+   * terminated (so that it can be conveniently used with string functions)
+   * but the extra null-terminator is not counted as part of the returned size.
    */
   virtual char *ReadFile (const char *FileName, size_t &Size);
   /// Write an entire file in one pass.
