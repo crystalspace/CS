@@ -46,12 +46,12 @@ CS_IMPLEMENT_PLUGIN
 SCF_IMPLEMENT_FACTORY (csGLShader_FIXED)
 
 SCF_IMPLEMENT_IBASE(csGLShader_FIXED)
-SCF_IMPLEMENTS_INTERFACE(iShaderProgramPlugin)
-SCF_IMPLEMENTS_EMBEDDED_INTERFACE(iComponent)
+  SCF_IMPLEMENTS_INTERFACE(iShaderProgramPlugin)
+  SCF_IMPLEMENTS_EMBEDDED_INTERFACE(iComponent)
 SCF_IMPLEMENT_IBASE_END
 
 SCF_IMPLEMENT_EMBEDDED_IBASE (csGLShader_FIXED::eiComponent)
-SCF_IMPLEMENTS_INTERFACE (iComponent)
+  SCF_IMPLEMENTS_INTERFACE (iComponent)
 SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 
@@ -109,7 +109,8 @@ void csGLShader_FIXED::Open()
     return;
 
   csRef<iGraphics3D> r = CS_QUERY_REGISTRY(object_reg, iGraphics3D);
-  csRef<iShaderRenderInterface> sri = SCF_QUERY_INTERFACE(r, iShaderRenderInterface);
+  csRef<iShaderRenderInterface> sri = SCF_QUERY_INTERFACE(r,
+  	iShaderRenderInterface);
 
   r->GetDriver2D()->PerformExtension ("getextmanager", &ext);
 
@@ -123,29 +124,17 @@ void csGLShader_FIXED::Open()
 #ifdef FUNNY_TEXTURE_UNIT_COUNT
   const char* descr = 0;
   if (texUnits <= 0)
-  {
     descr = "unbelievable";
-  }
   else if (texUnits <= 2)
-  {
     descr = "puny";
-  }
   else if (texUnits <= 4)
-  {
     descr = "moderate";
-  }
   else if (texUnits <= 6)
-  {
     descr = "acceptable";
-  }
   else if (texUnits <= 8)
-  {
     descr = "whopping";
-  }
   else 
-  {
     descr = "unseen before";
-  }
   Report (CS_REPORTER_SEVERITY_NOTIFY, "Texture units: %s %d", descr, texUnits);
 #else
   Report (CS_REPORTER_SEVERITY_NOTIFY, "Texture units: %d", texUnits);

@@ -36,7 +36,6 @@ public:
   csGLShader_ARB (iBase *parent);
   virtual ~csGLShader_ARB ();
 
-
   
   ////////////////////////////////////////////////////////////////////
   //                      iShaderProgramPlugin

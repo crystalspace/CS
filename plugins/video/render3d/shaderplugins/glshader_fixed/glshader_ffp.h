@@ -110,12 +110,20 @@ private:
       texnum = -1;
       doTexture = false;
 
-      colorsource[0] = GL_PREVIOUS_ARB; colorsource[1] = GL_TEXTURE; colorsource[2] = -1;
-      colormod[0] = GL_SRC_COLOR; colormod[1] = GL_SRC_COLOR; colormod[2] = GL_SRC_COLOR;
+      colorsource[0] = GL_PREVIOUS_ARB;
+      colorsource[1] = GL_TEXTURE;
+      colorsource[2] = -1;
+      colormod[0] = GL_SRC_COLOR;
+      colormod[1] = GL_SRC_COLOR;
+      colormod[2] = GL_SRC_COLOR;
       colorp = GL_MODULATE;
 
-      alphasource[0] = GL_PREVIOUS_ARB; alphasource[1] = GL_TEXTURE; alphasource[2] = -1;
-      alphamod[0] = GL_SRC_ALPHA; alphamod[1] = GL_SRC_ALPHA; alphamod[2] = GL_SRC_ALPHA;
+      alphasource[0] = GL_PREVIOUS_ARB;
+      alphasource[1] = GL_TEXTURE;
+      alphasource[2] = -1;
+      alphamod[0] = GL_SRC_ALPHA;
+      alphamod[1] = GL_SRC_ALPHA;
+      alphamod[2] = GL_SRC_ALPHA;
       alphap = GL_MODULATE;
 
       scale_rgb = 1.0f;
@@ -135,6 +143,7 @@ private:
   
   bool LoadLayer(mtexlayer* layer, iDocumentNode* node);
   bool LoadEnvironment(mtexlayer* layer, iDocumentNode* node);
+
 public:
   SCF_DECLARE_IBASE;
 
@@ -183,13 +192,15 @@ public:
   virtual void AddChild(iShaderBranch *b) {}
   virtual void AddVariable(csShaderVariable* variable) {}
   virtual csShaderVariable* GetVariable(csStringID s)
-    { return symtab->GetSymbol(s); }
+  { return symtab->GetSymbol(s); }
   virtual csSymbolTable* GetSymbolTable() { return symtab; }
-  virtual csSymbolTable* GetSymbolTable(int i) {
+  virtual csSymbolTable* GetSymbolTable(int i)
+  {
     if (symtabs.Length () <= i) symtabs.SetLength (i + 1, csSymbolTable ());
     return symtabs[i];
   }
-  virtual void SelectSymbolTable(int i) {
+  virtual void SelectSymbolTable(int i)
+  {
     if (symtabs.Length () <= i) symtabs.SetLength (i + 1, csSymbolTable ());
     symtab = symtabs[i];
   }
@@ -203,7 +214,10 @@ public:
   /// Loads from a document-node
   virtual bool Load(iDocumentNode* node);
 
-  /// Prepares the shaderprogram for usage. Must be called before the shader is assigned to a material
+  /**
+   * Prepares the shaderprogram for usage. Must be called before the shader
+   * is assigned to a material.
+   */
   virtual bool Prepare();
 };
 

@@ -40,7 +40,7 @@ Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "softshader_vp.h"
 
 SCF_IMPLEMENT_IBASE(csSoftShader_VP)
-SCF_IMPLEMENTS_INTERFACE(iShaderProgram)
+  SCF_IMPLEMENTS_INTERFACE(iShaderProgram)
 SCF_IMPLEMENT_IBASE_END
 
 void csSoftShader_VP::Activate(iShaderPass* current, csRenderMesh* mesh)
@@ -100,8 +100,8 @@ bool csSoftShader_VP::Load(iDocumentNode* program)
       csStringID id = xmltokens.Request (value);
       switch(id)
       {
-      default:
-        return false;
+        default:
+          return false;
       }
     }
   }

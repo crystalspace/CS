@@ -184,8 +184,8 @@ bool csShaderGLAVP::Load(iDataBuffer* program)
   const char* error = doc->Parse (program);
   if (error != 0)
   { 
-    csReport( object_reg, CS_REPORTER_SEVERITY_ERROR, "crystalspace.graphics3d.shader.glarb",
-      "XML error '%s'!", error);
+    csReport( object_reg, CS_REPORTER_SEVERITY_ERROR,
+    	"crystalspace.graphics3d.shader.glarb", "XML error '%s'!", error);
     return false;
   }
   return Load(doc->GetRoot());
@@ -198,15 +198,16 @@ bool csShaderGLAVP::Load(iDocumentNode* program)
 
   BuildTokenHash();
 
-  csRef<iShaderManager> shadermgr = CS_QUERY_REGISTRY(object_reg, iShaderManager);
+  csRef<iShaderManager> shadermgr = CS_QUERY_REGISTRY(object_reg,
+  	iShaderManager);
   csRef<iStringSet> strings = CS_QUERY_REGISTRY_TAG_INTERFACE (
-    object_reg, "crystalspace.renderer.stringset", iStringSet);
+	object_reg, "crystalspace.renderer.stringset", iStringSet);
 
   csRef<iDocumentNode> variablesnode = program->GetNode("arbvp");
-  if(variablesnode)
+  if (variablesnode)
   {
     csRef<iDocumentNodeIterator> it = variablesnode->GetNodes ();
-    while(it->HasNext())
+    while (it->HasNext())
     {
       csRef<iDocumentNode> child = it->Next();
       if(child->GetType() != CS_NODE_ELEMENT) continue;
@@ -214,64 +215,61 @@ bool csShaderGLAVP::Load(iDocumentNode* program)
       csStringID id = xmltokens.Request (value);
       switch(id)
       {
-      case XMLTOKEN_PROGRAM:
-        {
+        case XMLTOKEN_PROGRAM:
           //save for later loading
           programstring = csStrNew (child->GetContentsValue ());
-        }
-        break;
-      case XMLTOKEN_DESCRIPTION:
-	{
+          break;
+        case XMLTOKEN_DESCRIPTION:
 	  description = csStrNew (child->GetContentsValue ());
-	}
-	break;
-      case XMLTOKEN_DECLARE:
-        {
-          //create a new variable
-          csRef<csShaderVariable> var = 
-            shadermgr->CreateVariable (
-            strings->Request(child->GetAttributeValue ("name")));
-
-          // @@@ Will leak! Should do proper refcounting.
-          var->IncRef ();
-
-          csStringID idtype = xmltokens.Request( child->GetAttributeValue("type") );
-          var->SetType( (csShaderVariable::VariableType) idtype);
-          switch(idtype)
+	  break;
+        case XMLTOKEN_DECLARE:
           {
-          case csShaderVariable::INT:
-            var->SetValue( child->GetAttributeValueAsInt("default") );
-            break;
-          case csShaderVariable::FLOAT:
-            var->SetValue( child->GetAttributeValueAsFloat("default") );
-            break;
-          case csShaderVariable::STRING:
-            var->SetValue(new scfString( child->GetAttributeValue("default")) );
-            break;
-          case csShaderVariable::VECTOR3:
-            const char* def = child->GetAttributeValue("default");
-            csVector3 v;
-            sscanf(def, "%f,%f,%f", &v.x, &v.y, &v.z);
-            var->SetValue( v );
-            break;
+            //create a new variable
+            csRef<csShaderVariable> var = shadermgr->CreateVariable (
+              strings->Request(child->GetAttributeValue ("name")));
+
+            // @@@ Will leak! Should do proper refcounting.
+            var->IncRef ();
+
+            csStringID idtype = xmltokens.Request (
+	    	child->GetAttributeValue("type") );
+            var->SetType ((csShaderVariable::VariableType) idtype);
+            switch(idtype)
+            {
+              case csShaderVariable::INT:
+                var->SetValue (child->GetAttributeValueAsInt ("default"));
+                break;
+              case csShaderVariable::FLOAT:
+                var->SetValue (child->GetAttributeValueAsFloat ("default"));
+                break;
+              case csShaderVariable::STRING:
+                var->SetValue(new scfString (child->GetAttributeValue (
+			"default")));
+                break;
+              case csShaderVariable::VECTOR3:
+                const char* def = child->GetAttributeValue("default");
+                csVector3 v;
+                sscanf(def, "%f,%f,%f", &v.x, &v.y, &v.z);
+                var->SetValue( v );
+                break;
+            }
+            AddVariable (var);
           }
-          AddVariable (var);
-        }
-        break;
-      case XMLTOKEN_VARIABLEMAP:
-        {
-          variablemap.Push (variablemapentry ());
-          int i = variablemap.Length ()-1;
+          break;
+        case XMLTOKEN_VARIABLEMAP:
+          {
+            variablemap.Push (variablemapentry ());
+            int i = variablemap.Length ()-1;
 
-          variablemap[i].name = strings->Request (
-            child->GetAttributeValue("variable"));
+            variablemap[i].name = strings->Request (
+              child->GetAttributeValue("variable"));
 
-          variablemap[i].registernum = 
-            child->GetAttributeValueAsInt("register");
-        }
-        break;
-      default:
-        return false;
+            variablemap[i].registernum = 
+              child->GetAttributeValueAsInt("register");
+          }
+          break;
+        default:
+          return false;
       }
     }
   }

@@ -45,12 +45,12 @@ CS_IMPLEMENT_PLUGIN
 SCF_IMPLEMENT_FACTORY (csGLShader_ARB)
 
 SCF_IMPLEMENT_IBASE(csGLShader_ARB)
-SCF_IMPLEMENTS_INTERFACE(iShaderProgramPlugin)
-SCF_IMPLEMENTS_EMBEDDED_INTERFACE(iComponent)
+  SCF_IMPLEMENTS_INTERFACE(iShaderProgramPlugin)
+  SCF_IMPLEMENTS_EMBEDDED_INTERFACE(iComponent)
 SCF_IMPLEMENT_IBASE_END
 
 SCF_IMPLEMENT_EMBEDDED_IBASE (csGLShader_ARB::eiComponent)
-SCF_IMPLEMENTS_INTERFACE (iComponent)
+  SCF_IMPLEMENTS_INTERFACE (iComponent)
 SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 
@@ -81,8 +81,8 @@ bool csGLShader_ARB::SupportType(const char* type)
 
 csPtr<iShaderProgram> csGLShader_ARB::CreateProgram(const char* type)
 {
-  if( strcasecmp(type, "gl_arb_vp") == 0)
-    return csPtr<iShaderProgram>(new csShaderGLAVP(object_reg, ext));
+  if (strcasecmp(type, "gl_arb_vp") == 0)
+    return csPtr<iShaderProgram> (new csShaderGLAVP(object_reg, ext));
   else
     return 0;
 }
@@ -93,13 +93,15 @@ void csGLShader_ARB::Open()
     return;
 
   csRef<iGraphics3D> r = CS_QUERY_REGISTRY(object_reg,iGraphics3D);
-  csRef<iShaderRenderInterface> sri = SCF_QUERY_INTERFACE(r, iShaderRenderInterface);
+  csRef<iShaderRenderInterface> sri = SCF_QUERY_INTERFACE(r,
+	iShaderRenderInterface);
 
   csRef<iFactory> f = SCF_QUERY_INTERFACE (r, iFactory);
   if (f != 0 && strcmp ("crystalspace.graphics3d.opengl", 
-    f->QueryClassID ()) == 0)
+	f->QueryClassID ()) == 0)
     enable = true;
-  else return;
+  else
+    return;
 
   r->GetDriver2D()->PerformExtension ("getextmanager", &ext);
   ext->InitGL_ARB_vertex_program ();

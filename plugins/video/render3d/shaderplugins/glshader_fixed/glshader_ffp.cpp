@@ -133,14 +133,14 @@ bool csGLShaderFFP::Load(iDocumentNode* node)
       csStringID id = xmltokens.Request (value);
       switch(id)
       {
-      case XMLTOKEN_LAYER:
-        {
-          mtexlayer* ml = new mtexlayer();
-          if(!LoadLayer(ml, child))
-            return false;
-          texlayers.Push (*ml);
-        }
-        break;
+        case XMLTOKEN_LAYER:
+          {
+            mtexlayer* ml = new mtexlayer();
+            if(!LoadLayer(ml, child))
+              return false;
+            texlayers.Push (*ml);
+          }
+          break;
       }
     } 
   }
@@ -161,82 +161,88 @@ bool csGLShaderFFP::LoadLayer(mtexlayer* layer, iDocumentNode* node)
     csStringID id = xmltokens.Request(child->GetValue());
     switch (id)
     {
-    case XMLTOKEN_COLORSOURCE:
-      {
-        int num = child->GetAttributeValueAsInt("num");
-
-        if(num < 0 || num > 3 )
-          continue;
-
-        const char* str = child->GetAttributeValue("source");
-        if (str)
+      case XMLTOKEN_COLORSOURCE:
         {
-          int i = xmltokens.Request(str);
-          if(i == GL_PRIMARY_COLOR_ARB||i == GL_TEXTURE||i == GL_CONSTANT_ARB||i==GL_PREVIOUS_ARB)
+          int num = child->GetAttributeValueAsInt("num");
+
+          if(num < 0 || num > 3 ) continue;
+
+          const char* str = child->GetAttributeValue("source");
+          if (str)
           {
-            layer->colorsource[num] = i;
+            int i = xmltokens.Request(str);
+            if(i == GL_PRIMARY_COLOR_ARB||i == GL_TEXTURE
+	    	||i == GL_CONSTANT_ARB||i==GL_PREVIOUS_ARB)
+            {
+              layer->colorsource[num] = i;
+            }
+            else
+            {
+              SyntaxService->Report ("crystalspace.graphics3d.shader.fixed",
+                CS_REPORTER_SEVERITY_WARNING,
+                child, "Invalid color source: %s", str);
+            }
           }
-          else
+
+          str = child->GetAttributeValue("modifier");
+          if (str)
           {
-            SyntaxService->Report ("crystalspace.graphics3d.shader.fixed",
-              CS_REPORTER_SEVERITY_WARNING,
-              child, "Invalid color source: %s", str);
+            int m = xmltokens.Request(str);
+            if(m == GL_SRC_COLOR ||m == GL_ONE_MINUS_SRC_COLOR
+	    	||m == GL_SRC_ALPHA||m == GL_ONE_MINUS_SRC_ALPHA)
+            {
+              layer->colormod[num] = m;
+            }
+            else
+            {
+              SyntaxService->Report ("crystalspace.graphics3d.shader.fixed",
+                CS_REPORTER_SEVERITY_WARNING,
+                child, "Invalid color modifier: %s", str);
+            }
           }
         }
-
-        str = child->GetAttributeValue("modifier");
-        if (str)
+        break;
+      case XMLTOKEN_ALPHASOURCE:
         {
-          int m = xmltokens.Request(str);
-          if(m == GL_SRC_COLOR ||m == GL_ONE_MINUS_SRC_COLOR||m == GL_SRC_ALPHA||m == GL_ONE_MINUS_SRC_ALPHA)
-          {
-            layer->colormod[num] = m;
-          }
-          else
-          {
-            SyntaxService->Report ("crystalspace.graphics3d.shader.fixed",
-              CS_REPORTER_SEVERITY_WARNING,
-              child, "Invalid color modifier: %s", str);
-          }
+          int num = child->GetAttributeValueAsInt("num");
+
+          if(num < 0 || num > 3 )
+            continue;
+
+          int i = xmltokens.Request(child->GetAttributeValue("source"));
+          if(i == GL_PRIMARY_COLOR_ARB||i == GL_TEXTURE
+	  	||i == GL_CONSTANT_ARB||i==GL_PREVIOUS_ARB)
+            layer->alphasource[num] = i;
+
+          int m = xmltokens.Request(child->GetAttributeValue("modifier"));
+          if(m == GL_SRC_ALPHA||m == GL_ONE_MINUS_SRC_ALPHA)
+            layer->alphamod[num] = m;
         }
-      }
-      break;
-    case XMLTOKEN_ALPHASOURCE:
-      {
-        int num = child->GetAttributeValueAsInt("num");
-
-        if(num < 0 || num > 3 )
-          continue;
-
-        int i = xmltokens.Request(child->GetAttributeValue("source"));
-        if(i == GL_PRIMARY_COLOR_ARB||i == GL_TEXTURE||i == GL_CONSTANT_ARB||i==GL_PREVIOUS_ARB)
-          layer->alphasource[num] = i;
-
-        int m = xmltokens.Request(child->GetAttributeValue("modifier"));
-        if(m == GL_SRC_ALPHA||m == GL_ONE_MINUS_SRC_ALPHA)
-          layer->alphamod[num] = m;
-      }
-      break;
-    case XMLTOKEN_COLOROP:
-      {
-        int o = xmltokens.Request(child->GetAttributeValue("operation"));
-        if(o == GL_REPLACE|| o == GL_MODULATE||o == GL_ADD||o == GL_ADD_SIGNED_ARB||
-          o == GL_INTERPOLATE_ARB||o == GL_SUBTRACT_ARB||o == GL_DOT3_RGB_ARB||o == GL_DOT3_RGBA_ARB)
-          layer->colorp = o;
-        if(child->GetAttribute("scale") != 0)
-          layer->scale_rgb = child->GetAttributeValueAsFloat ("scale");
-      }
-      break;
-    case XMLTOKEN_ALPHAOP:
-      {
-        int o = xmltokens.Request(child->GetAttributeValue("operation"));
-        if(o == GL_REPLACE|| o == GL_MODULATE||o == GL_ADD||o == GL_ADD_SIGNED_ARB||
-          o == GL_INTERPOLATE_ARB||o == GL_SUBTRACT_ARB||o == GL_DOT3_RGB_ARB||o == GL_DOT3_RGBA_ARB)
-          layer->alphap = o;
-        if(child->GetAttribute("scale") != 0)
-          layer->scale_alpha = child->GetAttributeValueAsFloat ("scale");
-      }
-      break;
+        break;
+      case XMLTOKEN_COLOROP:
+        {
+          int o = xmltokens.Request(child->GetAttributeValue("operation"));
+          if(o == GL_REPLACE|| o == GL_MODULATE||o == GL_ADD
+	  	||o == GL_ADD_SIGNED_ARB|| o == GL_INTERPOLATE_ARB
+		||o == GL_SUBTRACT_ARB||o == GL_DOT3_RGB_ARB
+		||o == GL_DOT3_RGBA_ARB)
+            layer->colorp = o;
+          if(child->GetAttribute("scale") != 0)
+            layer->scale_rgb = child->GetAttributeValueAsFloat ("scale");
+        }
+        break;
+      case XMLTOKEN_ALPHAOP:
+        {
+          int o = xmltokens.Request(child->GetAttributeValue("operation"));
+          if(o == GL_REPLACE|| o == GL_MODULATE||o == GL_ADD
+	  	||o == GL_ADD_SIGNED_ARB|| o == GL_INTERPOLATE_ARB
+		||o == GL_SUBTRACT_ARB||o == GL_DOT3_RGB_ARB
+		||o == GL_DOT3_RGBA_ARB)
+            layer->alphap = o;
+          if(child->GetAttribute("scale") != 0)
+            layer->scale_alpha = child->GetAttributeValueAsFloat ("scale");
+        }
+        break;
     }
   }
   return true;
@@ -302,9 +308,11 @@ void csGLShaderFFP::Activate(iShaderPass* current, csRenderMesh* mesh)
         glTexEnvi(GL_TEXTURE_ENV, GL_OPERAND2_RGB_ARB, layer->colormod[2]);
       }
 
-      if( (layer->colorp != GL_DOT3_RGB_ARB) && (layer->colorp  != GL_DOT3_RGBA_ARB))
+      if( (layer->colorp != GL_DOT3_RGB_ARB)
+      		&& (layer->colorp  != GL_DOT3_RGBA_ARB))
         glTexEnvi(GL_TEXTURE_ENV, GL_COMBINE_RGB_ARB, layer->colorp );
-      else if (ext->CS_GL_ARB_texture_env_dot3 || ext->CS_GL_EXT_texture_env_dot3)
+      else if (ext->CS_GL_ARB_texture_env_dot3
+      		|| ext->CS_GL_EXT_texture_env_dot3)
         glTexEnvi(GL_TEXTURE_ENV, GL_COMBINE_RGB_ARB, layer->colorp );
 
       glTexEnvf(GL_TEXTURE_ENV, GL_RGB_SCALE_ARB, layer->scale_rgb);
@@ -319,9 +327,11 @@ void csGLShaderFFP::Activate(iShaderPass* current, csRenderMesh* mesh)
         glTexEnvi(GL_TEXTURE_ENV, GL_OPERAND2_ALPHA_ARB, layer->alphamod[2]);
       }
 
-      if( (layer->colorp != GL_DOT3_RGB_ARB) && (layer->colorp  != GL_DOT3_RGBA_ARB))
+      if( (layer->colorp != GL_DOT3_RGB_ARB)
+      		&& (layer->colorp  != GL_DOT3_RGBA_ARB))
         glTexEnvi(GL_TEXTURE_ENV, GL_COMBINE_ALPHA_ARB, layer->alphap);
-      else if (ext->CS_GL_ARB_texture_env_dot3 || ext->CS_GL_EXT_texture_env_dot3)
+      else if (ext->CS_GL_ARB_texture_env_dot3
+      		|| ext->CS_GL_EXT_texture_env_dot3)
         glTexEnvi(GL_TEXTURE_ENV, GL_COMBINE_ALPHA_ARB, layer->alphap);
 
       glTexEnvf(GL_TEXTURE_ENV, GL_ALPHA_SCALE, layer->scale_alpha);

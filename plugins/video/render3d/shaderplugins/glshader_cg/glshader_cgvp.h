@@ -87,8 +87,7 @@ public:
   }
   virtual ~csShaderGLCGVP ()
   {
-    if (programstring) 
-      delete programstring;
+    delete programstring;
     if (program)
       cgDestroyProgram (program);
   }
@@ -116,16 +115,18 @@ public:
   virtual void AddChild(iShaderBranch *b) {}
   virtual void AddVariable(csShaderVariable* variable) {}
   virtual csShaderVariable* GetVariable(csStringID s)
-    { 
-      return symtab->GetSymbol(s); 
-    }
+  { 
+    return symtab->GetSymbol(s); 
+  }
   virtual csSymbolTable* GetSymbolTable() { return symtab; }
-  virtual csSymbolTable* GetSymbolTable(int i) {
+  virtual csSymbolTable* GetSymbolTable(int i)
+  {
     if (symtabs.Length () <= i) 
       symtabs.SetLength (i + 1, csSymbolTable ());
     return symtabs[i];
   }
-  virtual void SelectSymbolTable(int i) {
+  virtual void SelectSymbolTable(int i)
+  {
     if (symtabs.Length () <= i) 
       symtabs.SetLength (i + 1, csSymbolTable ());
     symtab = symtabs[i];
@@ -140,7 +141,10 @@ public:
   /// Loads from a document-node
   virtual bool Load(iDocumentNode* node);
 
-  /// Prepares the shaderprogram for usage. Must be called before the shader is assigned to a material
+  /**
+   * Prepares the shaderprogram for usage. Must be called before the shader
+   * is assigned to a material.
+   */
   virtual bool Prepare();
 };
 

@@ -43,7 +43,7 @@ Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "glshader_fvp.h"
 
 SCF_IMPLEMENT_IBASE(csGLShaderFVP)
-SCF_IMPLEMENTS_INTERFACE(iShaderProgram)
+  SCF_IMPLEMENTS_INTERFACE(iShaderProgram)
 SCF_IMPLEMENT_IBASE_END
 
 void csGLShaderFVP::Activate(iShaderPass* current, csRenderMesh* mesh)
@@ -72,7 +72,9 @@ void csGLShaderFVP::Activate(iShaderPass* current, csRenderMesh* mesh)
         csVector4 v;
         var->GetValue (v);
         glLightfv (GL_LIGHT0+l, GL_POSITION, (float*)&v);
-      } else {
+      }
+      else
+      {
         csVector4 v (0);
         glLightfv (GL_LIGHT0+l, GL_POSITION, (float*)&v);
       }
@@ -83,7 +85,9 @@ void csGLShaderFVP::Activate(iShaderPass* current, csRenderMesh* mesh)
         csVector4 v;
         var->GetValue (v);
         glLightfv (GL_LIGHT0+l, GL_DIFFUSE, (float*)&v);
-      } else {
+      }
+      else
+      {
         csVector4 v (0);
         glLightfv (GL_LIGHT0+l, GL_DIFFUSE, (float*)&v);
       }
@@ -94,7 +98,9 @@ void csGLShaderFVP::Activate(iShaderPass* current, csRenderMesh* mesh)
         csVector4 v;
         var->GetValue (v);
         glLightfv (GL_LIGHT0+l, GL_SPECULAR, (float*)&v);
-      } else {
+      }
+      else
+      {
         csVector4 v (0);
         glLightfv (GL_LIGHT0+l, GL_SPECULAR, (float*)&v);
       }
@@ -107,7 +113,9 @@ void csGLShaderFVP::Activate(iShaderPass* current, csRenderMesh* mesh)
         glLightf (GL_LIGHT0+l, GL_CONSTANT_ATTENUATION, v.x);
         glLightf (GL_LIGHT0+l, GL_LINEAR_ATTENUATION, v.y);
         glLightf (GL_LIGHT0+l, GL_QUADRATIC_ATTENUATION, v.z);
-      } else {
+      }
+      else
+      {
         csVector4 v (1, 0, 0, 0);
         glLightf (GL_LIGHT0+l, GL_CONSTANT_ATTENUATION, v.x);
         glLightf (GL_LIGHT0+l, GL_LINEAR_ATTENUATION, v.y);
@@ -192,9 +200,10 @@ bool csGLShaderFVP::Load(iDocumentNode* program)
 
   BuildTokenHash();
 
-  csRef<iShaderManager> shadermgr = CS_QUERY_REGISTRY(object_reg, iShaderManager);
+  csRef<iShaderManager> shadermgr = CS_QUERY_REGISTRY(
+  	object_reg, iShaderManager);
   csRef<iStringSet> strings = CS_QUERY_REGISTRY_TAG_INTERFACE (
-    object_reg, "crystalspace.renderer.stringset", iStringSet);
+	object_reg, "crystalspace.renderer.stringset", iStringSet);
 
   csRef<iDocumentNode> variablesnode = program->GetNode("fixedvp");
   if(variablesnode)
@@ -209,118 +218,120 @@ bool csGLShaderFVP::Load(iDocumentNode* program)
       switch(id)
       {
       /*case XMLTOKEN_PROGRAM:
-        {
-          //save for later loading
-          programstring = new char[strlen(child->GetContentsValue())+1];
-          strcpy(programstring, child->GetContentsValue());
-        }
+          {
+            //save for later loading
+            programstring = new char[strlen(child->GetContentsValue())+1];
+            strcpy(programstring, child->GetContentsValue());
+          }
           break;
-      case XMLTOKEN_DECLARE:
-        {
-          //create a new variable
-          csRef<csShaderVariable> var = 
-            shadermgr->CreateVariable (
-            strings->Request(child->GetAttributeValue ("name")));
-
-          // @@@ Will leak! Should do proper refcounting.
-          var->IncRef ();
-
-          csStringID idtype = xmltokens.Request( child->GetAttributeValue("type") );
-          idtype -= 100;
-          var->SetType( (csShaderVariable::VariableType) idtype);
-          switch(idtype)
+        case XMLTOKEN_DECLARE:
           {
-          case csShaderVariable::INT:
-            var->SetValue( child->GetAttributeValueAsInt("default") );
-            break;
-          case csShaderVariable::FLOAT:
-            var->SetValue( child->GetAttributeValueAsFloat("default") );
-            break;
-          case csShaderVariable::STRING:
-            var->SetValue(new scfString( child->GetAttributeValue("default")) );
-            break;
-          case csShaderVariable::VECTOR3:
-            const char* def = child->GetAttributeValue("default");
-            csVector3 v;
-            sscanf(def, "%f,%f,%f", &v.x, &v.y, &v.z);
-            var->SetValue( v );
-            break;
+            //create a new variable
+            csRef<csShaderVariable> var = shadermgr->CreateVariable (
+              strings->Request(child->GetAttributeValue ("name")));
+
+            // @@@ Will leak! Should do proper refcounting.
+            var->IncRef ();
+
+            csStringID idtype = xmltokens.Request (
+	    	child->GetAttributeValue("type") );
+            idtype -= 100;
+            var->SetType( (csShaderVariable::VariableType) idtype);
+            switch(idtype)
+            {
+              case csShaderVariable::INT:
+                var->SetValue( child->GetAttributeValueAsInt("default") );
+                break;
+              case csShaderVariable::FLOAT:
+                var->SetValue( child->GetAttributeValueAsFloat("default") );
+                break;
+              case csShaderVariable::STRING:
+                var->SetValue(new scfString (
+			child->GetAttributeValue("default")) );
+                break;
+              case csShaderVariable::VECTOR3:
+                const char* def = child->GetAttributeValue("default");
+                csVector3 v;
+                sscanf(def, "%f,%f,%f", &v.x, &v.y, &v.z);
+                var->SetValue( v );
+                break;
+            }
+            AddVariable (var);
           }
-          AddVariable (var);
-        }
-        break;
-      case XMLTOKEN_VARIABLEMAP:
-        {
-          variablemap.Push (variablemapentry ());
-          int i = variablemap.Length ()-1;
-
-          variablemap[i].name = strings->Request (
-            child->GetAttributeValue("variable"));
-
-          variablemap[i].registernum = 
-            child->GetAttributeValueAsInt("register");
-        }
-        break;*/
-      case XMLTOKEN_LIGHT:
-        {
-          do_lighting = true;
-          lights.Push (lightingentry ());
-          int i = lights.Length ()-1;
-
-          const char* str;
-
-          lights[i].lightnum = child->GetAttributeValueAsInt("num");
-
-          if (str = child->GetAttributeValue("position"))
-            lights[i].positionvar = strings->Request (str);
-          else
+          break;
+        case XMLTOKEN_VARIABLEMAP:
           {
-            char buf[40];
-            sprintf (buf, "STANDARD_LIGHT_%d_POSITION", lights[i].lightnum);
-            lights[i].positionvar = strings->Request (buf);
-          }
+            variablemap.Push (variablemapentry ());
+            int i = variablemap.Length ()-1;
 
-          if (str = child->GetAttributeValue("diffuse"))
-            lights[i].diffusevar = strings->Request (str);
-          else
-          {
-            char buf[40];
-            sprintf (buf, "STANDARD_LIGHT_%d_DIFFUSE", lights[i].lightnum);
-            lights[i].diffusevar = strings->Request (buf);
-          }
+            variablemap[i].name = strings->Request (
+              child->GetAttributeValue("variable"));
 
-          if (str = child->GetAttributeValue("specular"))
-            lights[i].specularvar = strings->Request (str);
-          else
-          {
-            char buf[40];
-            sprintf (buf, "STANDARD_LIGHT_%d_SPECULAR", lights[i].lightnum);
-            lights[i].specularvar = strings->Request (buf);
+            variablemap[i].registernum = 
+              child->GetAttributeValueAsInt("register");
           }
+          break;*/
+        case XMLTOKEN_LIGHT:
+          {
+            do_lighting = true;
+            lights.Push (lightingentry ());
+            int i = lights.Length ()-1;
 
-          if (str = child->GetAttributeValue("attenuation"))
-            lights[i].attenuationvar = strings->Request (str);
-          else
-          {
-            char buf[40];
-            sprintf (buf, "STANDARD_LIGHT_%d_ATTENUATION", lights[i].lightnum);
-            lights[i].attenuationvar = strings->Request (buf);
+            const char* str;
+
+            lights[i].lightnum = child->GetAttributeValueAsInt("num");
+
+            if (str = child->GetAttributeValue("position"))
+              lights[i].positionvar = strings->Request (str);
+            else
+            {
+              char buf[40];
+              sprintf (buf, "STANDARD_LIGHT_%d_POSITION", lights[i].lightnum);
+              lights[i].positionvar = strings->Request (buf);
+            }
+
+            if (str = child->GetAttributeValue("diffuse"))
+              lights[i].diffusevar = strings->Request (str);
+            else
+            {
+              char buf[40];
+              sprintf (buf, "STANDARD_LIGHT_%d_DIFFUSE", lights[i].lightnum);
+              lights[i].diffusevar = strings->Request (buf);
+            }
+
+            if (str = child->GetAttributeValue("specular"))
+              lights[i].specularvar = strings->Request (str);
+            else
+            {
+              char buf[40];
+              sprintf (buf, "STANDARD_LIGHT_%d_SPECULAR", lights[i].lightnum);
+              lights[i].specularvar = strings->Request (buf);
+            }
+
+            if (str = child->GetAttributeValue("attenuation"))
+              lights[i].attenuationvar = strings->Request (str);
+            else
+            {
+              char buf[40];
+              sprintf (buf, "STANDARD_LIGHT_%d_ATTENUATION",
+	      	lights[i].lightnum);
+              lights[i].attenuationvar = strings->Request (buf);
+            }
           }
-        }
-        break;
-      case XMLTOKEN_AMBIENT:
-        {
-          const char* str;
-          if (str = child->GetAttributeValue("color"))
-            ambientvar = strings->Request (str);
-          else
-            ambientvar = strings->Request ("STANDARD_LIGHT_AMBIENT");
+          break;
+        case XMLTOKEN_AMBIENT:
+          {
+            const char* str;
+            if (str = child->GetAttributeValue("color"))
+              ambientvar = strings->Request (str);
+            else
+              ambientvar = strings->Request ("STANDARD_LIGHT_AMBIENT");
           
-          do_lighting = true;
-        }
-        break;
-      default:
-        break;
+            do_lighting = true;
+          }
+          break;
+        default:
+          break;
         //return false;
       }
     }
