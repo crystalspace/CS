@@ -60,7 +60,7 @@ int main(int argc, char *argv[])
   if (strcasecmp(argv[1],"server") == 0)
   {
 	  role = 0;
-  }
+  } 
   if (strcasecmp(argv[1],"client") == 0)
   {
 	  role = 1;
@@ -115,11 +115,11 @@ int main(int argc, char *argv[])
 	  return 0;
   }
 
-  if (role == 0) 
+  if (proto == CS_NET_SOCKET_TYPE_TCP) 
   {
-	printf("server running tcp on port %d.\n",port);
+	printf("%s running tcp on port %d.\n", (role ? "client" : "server"), port);
   } else {
-	printf("server running udp on port %d.\n",port);
+	printf("%s running udp on port %d.\n", (role ? "client" : "server"), port);
   }
   
   csInitializer::InitializeSCF();
