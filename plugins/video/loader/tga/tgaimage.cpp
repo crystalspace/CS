@@ -33,6 +33,8 @@
 
 #include "cssysdef.h"
 #include "tgaimage.h"
+#include "csgfx/rgbpixel.h"
+#include "csutil/databuf.h"
 
 IMPLEMENT_IBASE (csTGAImageIO)
   IMPLEMENTS_INTERFACE (iImageIO)
@@ -44,64 +46,6 @@ IMPLEMENT_FACTORY (csTGAImageIO);
 EXPORT_CLASS_TABLE (cstgaimg)
   EXPORT_CLASS (csTGAImageIO, "crystalspace.graphic.image.io.tga", "CrystalSpace TGA image format I/O plugin")
 EXPORT_CLASS_TABLE_END
-
-static iImageIO::FileFormatDescription formatlist[6] = 
-{
-  {"image/tga", "Map", CS_IMAGEIO_LOAD},
-  {"image/tga", "RGB", CS_IMAGEIO_LOAD},
-  {"image/tga", "Mono", CS_IMAGEIO_LOAD},
-  {"image/tga", "RLEMap", CS_IMAGEIO_LOAD},
-  {"image/tga", "RLERGB", CS_IMAGEIO_LOAD},
-  {"image/tga", "RLEMono", CS_IMAGEIO_LOAD}
-};
-
-csTGAImageIO::csTGAImageIO (iBase *pParent)
-{
-  CONSTRUCT_IBASE (pParent);
-  formats.Push (&formatlist[0]);
-  formats.Push (&formatlist[1]);
-  formats.Push (&formatlist[2]);
-  formats.Push (&formatlist[3]);
-  formats.Push (&formatlist[4]);
-  formats.Push (&formatlist[5]);
-}
-
-bool csTGAImageIO::Initialize (iSystem *)
-{
-  return true;
-}
-
-const csVector& csTGAImageIO::GetDescription ()
-{
-  return formats;
-}
-
-iImage *csTGAImageIO::Load (UByte* iBuffer, ULong iSize, int iFormat)
-{
-  ImageTgaFile* i = new ImageTgaFile (iFormat);
-  if (i && !i->Load (iBuffer, iSize))
-  {
-     delete i ;
-    return NULL;
-  }
-  return i;    
-}
-
-void csTGAImageIO::SetDithering (bool)
-{
-}
-
-iDataBuffer *csTGAImageIO::Save (iImage *, iImageIO::FileFormatDescription *)
-{
-  return NULL;
-}
-
-iDataBuffer *csTGAImageIO::Save (iImage *, const char *)
-{
-  return NULL;
-}
-
-//---------------------------------------------------------------------------
 
 /* Header definition. */
 struct TGAheader
@@ -143,6 +87,9 @@ typedef char ImageIDField[256];
 
 #define MAXCOLORS 16384
 
+#define CSTGA_ID "Made with CrystalSpace, see http://crystal.linuxgames.com"
+#define TGA_MIME "image/tga"
+
 static int mapped, rlencoded;
 
 static csRGBpixel ColorMap[MAXCOLORS];
@@ -151,6 +98,149 @@ static int RLE_count = 0, RLE_flag = 0;
 static void readtga (UByte*& ptr, struct TGAheader* tgaP);
 static void get_map_entry (UByte*& ptr, csRGBpixel* Value, int Size, bool alpha);
 static void get_pixel (UByte*& ptr, csRGBpixel* dest, int Size, bool alpha);
+
+
+static iImageIO::FileFormatDescription formatlist[6] = 
+{
+  {TGA_MIME, "Map", CS_IMAGEIO_LOAD},
+  {TGA_MIME, "RGB", CS_IMAGEIO_LOAD},
+  {TGA_MIME, "Mono", CS_IMAGEIO_LOAD},
+  {TGA_MIME, "RLEMap", CS_IMAGEIO_LOAD},
+  {TGA_MIME, "RLERGB", CS_IMAGEIO_LOAD},
+  {TGA_MIME, "RLEMono", CS_IMAGEIO_LOAD}
+};
+
+csTGAImageIO::csTGAImageIO (iBase *pParent)
+{
+  CONSTRUCT_IBASE (pParent);
+  formats.Push (&formatlist[0]);
+  formats.Push (&formatlist[1]);
+  formats.Push (&formatlist[2]);
+  formats.Push (&formatlist[3]);
+  formats.Push (&formatlist[4]);
+  formats.Push (&formatlist[5]);
+}
+
+bool csTGAImageIO::Initialize (iSystem *)
+{
+  return true;
+}
+
+const csVector& csTGAImageIO::GetDescription ()
+{
+  return formats;
+}
+
+iImage *csTGAImageIO::Load (UByte* iBuffer, ULong iSize, int iFormat)
+{
+  ImageTgaFile* i = new ImageTgaFile (iFormat);
+  if (i && !i->Load (iBuffer, iSize))
+  {
+     delete i ;
+    return NULL;
+  }
+  return i;    
+}
+
+void csTGAImageIO::SetDithering (bool)
+{
+}
+
+iDataBuffer *csTGAImageIO::Save (iImage *Image, iImageIO::FileFormatDescription *)
+{
+  if (!Image || !Image->GetImageData ())
+    return NULL;
+
+  int format = Image->GetFormat ();
+  bool palette = false;
+
+  switch (format & CS_IMGFMT_MASK)
+  {
+  case CS_IMGFMT_PALETTED8:
+    palette = true;
+  case CS_IMGFMT_TRUECOLOR:
+    break;
+  default:
+    return NULL;
+  };
+
+  if (palette && !Image->GetPalette ())
+    return NULL;
+
+  // fill header
+  TGAheader hdr;
+  int w = Image->GetWidth ();
+  int h = Image->GetHeight ();
+
+  hdr.IDLength  = strlen (CSTGA_ID);
+  hdr.CoMapType = (palette ? 1 : 0);
+  hdr.ImgType = (palette ? TGA_Map : TGA_RGB);
+  hdr.Index_lo = hdr.Index_hi = 0;
+  hdr.Length_lo = 0;
+  hdr.Length_hi = (palette ? 1 : 0);
+  hdr.CoSize = (palette ? 24 : 0);
+  hdr.X_org_lo = hdr.X_org_hi = 0;
+  hdr.Y_org_lo = hdr.Y_org_hi = 0;
+  hdr.Width_lo = (w%256);
+  hdr.Width_hi = (w/256);
+  hdr.Height_lo = h%256;
+  hdr.Height_hi = h/256;
+  hdr.PixelSize = (palette ? 8 : 24);
+  hdr.AttBits = 0;
+  hdr.Rsrvd = 0;
+  hdr.OrgBit = 0;
+  hdr.IntrLve = TGA_IL_None;
+
+
+  size_t size = w*h*hdr.PixelSize/8 + MAXCOLORS * hdr.CoSize / 8 + sizeof (TGAheader) + hdr.IDLength;
+
+  csDataBuffer *db = new csDataBuffer (size);
+
+  unsigned char *p = (unsigned char*)db->GetData ();
+
+  memcpy (p, &hdr, sizeof(TGAheader));
+  p += sizeof(TGAheader);
+
+  memcpy (p, CSTGA_ID, hdr.IDLength);
+  p += hdr.IDLength;
+
+  if (palette)
+  {
+    csRGBpixel *pal = Image->GetPalette ();
+    for (int i= 0; i < 256; i++)
+    {
+      csRGBcolor color = pal[i];
+      memcpy (p, &color, sizeof (csRGBcolor));
+      p += sizeof (csRGBcolor);
+    }
+
+    unsigned char *data = (unsigned char *)Image->GetImageData ();
+    memcpy (p, data, w*h*hdr.PixelSize/8);
+  }
+  else
+  {
+    csRGBpixel *pixel = (csRGBpixel *)Image->GetImageData ();
+    for (int y=h-1; y >= 0; y--)
+      for (int x=0; x < w; x++)
+      {
+	unsigned char *c = (unsigned char *)&pixel[y*w+x];
+	*p++ = *(c+2);
+	*p++ = *(c+1);
+	*p++ = *c;
+      }
+  }
+
+  return db;
+}
+
+iDataBuffer *csTGAImageIO::Save (iImage *Image, const char *mime)
+{
+  if (!strcasecmp (mime, TGA_MIME))
+    return Save (Image, (iImageIO::FileFormatDescription *)NULL);
+  return NULL;
+}
+
+//---------------------------------------------------------------------------
 
 bool ImageTgaFile::Load (UByte* iBuffer, ULong iSize)
 {
