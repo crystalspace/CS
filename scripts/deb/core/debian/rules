@@ -140,7 +140,7 @@ clean:
 	rm -f build-arch-stamp build-indep-stamp configure-stamp
 
 	# Add here commands to clean up after the build process.
-	-cd $(CURDIR)/CS; $(MAKE) distclean
+	[ -f $(CURDIR)/CS/Makefile ] && (cd $(CURDIR)/CS; $(MAKE) distclean) || true
 
 	dh_clean
 

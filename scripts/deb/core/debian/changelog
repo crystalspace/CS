@@ -1,3 +1,9 @@
+crystalspace (0.98-20040623-2) unstable; urgency=low
+
+  * Corrected make disclean that was making fail most autobuild 
+
+ -- Christian Bayle <bayle@debian.org>  Thu, 24 Jun 2004 23:01:26 +0200
+
 crystalspace (0.98-20040623-1) unstable; urgency=low
 
   * New Upstream, should close FTBFS or at least change the way it fails,
