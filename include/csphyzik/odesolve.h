@@ -25,14 +25,15 @@ public:
   
 protected:
 
-	virtual void ode_realloc(int new_size) = 0;
+  virtual void ode_realloc(int new_size);
 	unsigned int state_size;  // limit of ~65,000 right now
 	real *dy;  //the derivatives
 	real *Iy;
 };
 
 
-// Runga-Kutta
+// Runga-Kutta order 4
+// pretty standard dynamics ODE solver.  Good stability/speed trade-off
 // NOTE: don't derive any classes from this one
 class OdeRungaKutta4 : public OdeSolver
 {
@@ -52,6 +53,34 @@ private:
 	real *k2;
 	real *k3;
 	real *k4;
+
+};
+
+
+// the fastest and least stable ODE-solver.
+// not recomended unless you REALLY need the speed.
+// use mid-point instead if you need speed. 
+class OdeEuler : public OdeSolver
+{
+public:
+
+	OdeEuler();
+
+	void calc_step(real y0[], real y1[], unsigned int len, real t0, real t1, dydt_function dydt);
+
+};
+
+
+// If you need speed and don't have many forces more complicated than gravity
+// or propulsion this is a good one to use.  Better than euler, but not as
+// stable as runga-kutta ( much faster though ). 
+class OdeMidPoint : public OdeSolver
+{
+public:
+
+	OdeMidPoint();
+
+	void calc_step(real y0[], real y1[], unsigned int len, real t0, real t1, dydt_function dydt);
 
 };
 
