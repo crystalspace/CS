@@ -140,7 +140,8 @@ bool awsWindow::Setup (iAws *_wmgr, awsComponentNode *settings)
   awsComponentNode closeinfo(new scfString("Close Button"), 
     new scfString("Command Button"));
   closeinfo.Add(new awsIntKey(new scfString("Style"), awsCmdButton::fsNormal));
-  closeinfo.Add(new awsStringKey(new scfString("Image"), close_button_txt));
+  closeinfo.Add(new awsIntKey(new scfString("IconAlign"), awsCmdButton::iconLeft));
+  closeinfo.Add(new awsStringKey(new scfString("Icon"), close_button_txt));
   close_button.SetFlag(AWSF_CMP_NON_CLIENT);
   close_button.Create(WindowManager(), this, &closeinfo);
   close_button.ResizeTo(closep);
@@ -162,7 +163,8 @@ bool awsWindow::Setup (iAws *_wmgr, awsComponentNode *settings)
   awsComponentNode zoominfo(new scfString("Zoom Button"), 
     new scfString("Command Button"));
   zoominfo.Add(new awsIntKey(new scfString("Style"), awsCmdButton::fsNormal));
-  zoominfo.Add(new awsStringKey(new scfString("Image"), zoom_button_txt));
+  zoominfo.Add(new awsIntKey(new scfString("IconAlign"), awsCmdButton::iconLeft));
+  zoominfo.Add(new awsStringKey(new scfString("Icon"), zoom_button_txt));
   zoom_button.SetFlag(AWSF_CMP_NON_CLIENT);
   zoom_button.Create(WindowManager(), this, &zoominfo);
   zoom_button.ResizeTo(zoomp);
@@ -185,7 +187,9 @@ bool awsWindow::Setup (iAws *_wmgr, awsComponentNode *settings)
   awsComponentNode mininfo(new scfString("Min Button"), 
     new scfString("Command Button"));
   mininfo.Add(new awsIntKey(new scfString("Style"), awsCmdButton::fsNormal));
-  mininfo.Add(new awsStringKey(new scfString("Image"), min_button_txt));
+  mininfo.Add(new awsIntKey(new scfString("IconAlign"), awsCmdButton::iconLeft));
+  mininfo.Add(new awsStringKey(new scfString("Icon"), min_button_txt));
+
   min_button.SetFlag(AWSF_CMP_NON_CLIENT);
   min_button.Create(WindowManager(), this, &mininfo);
   min_button.ResizeTo(minp);
