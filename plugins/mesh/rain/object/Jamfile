@@ -5,6 +5,6 @@ Description rain : "Rain mesh object plugin" ;
 Plugin rain
 	: [ Wildcard *.cpp *.h ]
 ;
-LinkWith rain : partgen cstool csgfx csgeom csutil ;
+LinkWith rain : csplugincommon cstool csgfx csgeom csutil ;
 
 CompileGroups rain :  meshes ;

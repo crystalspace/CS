@@ -19,7 +19,7 @@
 #ifndef __CS_RAIN_H__
 #define __CS_RAIN_H__
 
-#include "plugins/mesh/partgen/particle.h"
+#include "csplugincommon/particlesys/particle.h"
 #include "imesh/rain.h"
 
 /**

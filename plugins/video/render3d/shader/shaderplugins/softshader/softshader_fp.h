@@ -23,7 +23,7 @@ Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "ivideo/shader/shader.h"
 #include "csutil/strhash.h"
 #include "csgfx/shadervarcontext.h"
-#include "../../common/shaderplugin.h"
+#include "csplugincommon/shader/shaderplugin.h"
 
 class csSoftShader_FP : public iShaderProgram
 {

@@ -15,13 +15,13 @@
 #define __CS_CGDRIVER2D_H__
 
 
-#include "plugins/video/canvas/macosx/common/OSXDriver2D.h"
+#include "csplugincommon/macosx/OSXDriver2D.h"
 
 
 #if defined(__cplusplus)
 
 #include "csutil/macosx/OSXAssistant.h"
-#include "plugins/video/canvas/common/graph2d.h"
+#include "csplugincommon/canvas/graph2d.h"
 
 #include <CoreFoundation/CoreFoundation.h>
 

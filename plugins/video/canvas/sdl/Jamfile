@@ -4,7 +4,7 @@ if $(SDL.AVAILABLE) = "yes"
 {
 Description sdl2d : "SDL 2D driver" ;
 Plugin sdl2d : [ Wildcard *.cpp *.h ] ;
-LinkWith sdl2d : canvascommon csgeom csutil ;
+LinkWith sdl2d : csplugincommon csgeom csutil ;
 ExternalLibs sdl2d : SDL ;
 CompileGroups sdl2d : canvases ;
 }

@@ -29,8 +29,8 @@
 #include "iengine/rendersteps/irenderstep.h"
 #include "ivideo/shader/shader.h"
 
-#include "../common/basesteptype.h"
-#include "../common/basesteploader.h"
+#include "csplugincommon/renderstep/basesteptype.h"
+#include "csplugincommon/renderstep/basesteploader.h"
 
 class csFullScreenQuadRSType : public csBaseRenderStepType
 {

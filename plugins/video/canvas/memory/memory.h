@@ -24,7 +24,7 @@
 #define __CS_MEMORY_H__
 
 #include "csutil/scf.h"
-#include "plugins/video/canvas/common/graph2d.h"
+#include "csplugincommon/canvas/graph2d.h"
 #include "ivideo/gfxmem.h"
 
 #if THREAD_SUPPORT

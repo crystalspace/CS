@@ -19,7 +19,7 @@
 #ifndef __CS_SNDLSTNOPENAL_H__
 #define __CS_SNDLSTNOPENAL_H__
 
-#include "../common/slstn.h"
+#include "csplugincommon/soundrenderer/slstn.h"
 
 class csSoundRenderOpenAL;
 

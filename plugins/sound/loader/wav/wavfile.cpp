@@ -26,8 +26,8 @@
 #include "isound/loader.h"
 #include "iutil/eventh.h"
 #include "iutil/comp.h"
-#include "../common/soundraw.h"
-#include "../common/sndload.h"
+#include "csplugincommon/soundloader/soundraw.h"
+#include "csplugincommon/soundloader/sndload.h"
 
 CS_IMPLEMENT_PLUGIN
 

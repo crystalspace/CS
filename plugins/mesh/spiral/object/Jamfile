@@ -5,7 +5,7 @@ Description spiral : "Spiral mesh object plugin" ;
 Plugin spiral
 	: [ Wildcard *.cpp *.h ]
 ;
-LinkWith spiral : partgen cstool csgeom csutil ;
+LinkWith spiral : csplugincommon cstool csgeom csutil ;
 
 CompileGroups spiral :  meshes ;
 

@@ -22,8 +22,8 @@
 #include <windows.h>
 #include <ddraw.h>
 #include "csutil/scf.h"
-#include "plugins/video/canvas/common/graph2d.h"
-#include "plugins/video/canvas/win32canvascommon/customcursor.h"
+#include "csplugincommon/canvas/graph2d.h"
+#include "csplugincommon/win32/customcursor.h"
 
 /// Windows version.
 class csGraphics2DDDraw3 : public csGraphics2D

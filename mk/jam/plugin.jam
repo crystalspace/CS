@@ -63,13 +63,13 @@ rule Plugin
   if ! $(NO_STATIC_LINKING)
   {
     SubVariant static ;
-    local staticreginfoobject = [ BuildStaticRegFile $(<) ] ;
+    local statictarget = $(<)_static ;
+    local staticreginfoobject = [ BuildStaticRegFile $(<) : $(statictarget) ] ;
     
-    Library $(<)_static : $(>) $(staticreginfoobject) : $(3) independent noinstall nohelp notest ;
-    SEARCH on $(<)_static += $(LOCATE_TARGET) ;
-    ExtraObjects $(<)_static : $(staticreginfoobject) : inheritcflags ;
-    CFlags $(<)_static : [ FDefines CS_STATIC_LINKED ] : nostatic ;
-    LFlags $(<)_static : $(LINKLIBS) : nostatic ;
+    Library $(statictarget) : $(>) $(staticreginfoobject) : $(3) independent noinstall nohelp notest ;
+    SEARCH on $(statictarget) += $(LOCATE_TARGET) ;
+    CFlags $(statictarget) : [ FDefines CS_STATIC_LINKED ] : nostatic ;
+    LFlags $(statictarget) : $(LINKLIBS) : nostatic ;
     
     SubVariant ;
   }

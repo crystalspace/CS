@@ -4,7 +4,7 @@ if $(CG.AVAILABLE) = "yes"
 {
 Description glshader_cg : "CG shader" ;
 Plugin glshader_cg : [ Wildcard *.cpp *.h ] ;
-LinkWith glshader_cg : shaderplugincommon csgeom csgfx csutil ;
+LinkWith glshader_cg : csplugincommon csgeom csgfx csutil ;
 ExternalLibs glshader_cg : CG ;
 CompileGroups glshader_cg : shaders renderers renderall ;
 }

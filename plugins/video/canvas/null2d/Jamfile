@@ -5,7 +5,7 @@ Description null2d : "null 2D driver" ;
 Plugin null2d
 	: [ Wildcard *.cpp *.h ]
 ;
-LinkWith null2d : canvascommon csgeom csutil ;
+LinkWith null2d : csplugincommon csgeom csutil ;
 
 CompileGroups null2d :  canvases ;
 

@@ -5,7 +5,7 @@ Description sndaiff : "aiff sound loader" ;
 Plugin sndaiff
 	: [ Wildcard *.cpp *.h ]
 ;
-LinkWith sndaiff : soundloadercommon csutil ;
+LinkWith sndaiff : csplugincommon csutil ;
 
 CompileGroups sndaiff :  soundloaders ;
 

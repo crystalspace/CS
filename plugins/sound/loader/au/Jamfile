@@ -5,7 +5,7 @@ Description sndau : "au sound loader" ;
 Plugin sndau
 	: [ Wildcard *.cpp *.h ]
 ;
-LinkWith sndau : soundloadercommon csutil ;
+LinkWith sndau : csplugincommon csutil ;
 
 CompileGroups sndau :  soundloaders ;
 

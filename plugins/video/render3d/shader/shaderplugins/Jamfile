@@ -1,8 +1,5 @@
 SubDir TOP plugins video render3d shader shaderplugins ;
 
-# Jam rules are order-sensitive; Library targets must appear before Plugin.
-SubInclude TOP plugins video render3d shader shaderplugins common ;
-
 SubInclude TOP plugins video render3d shader shaderplugins glshader_arb ;
 SubInclude TOP plugins video render3d shader shaderplugins glshader_cg ;
 SubInclude TOP plugins video render3d shader shaderplugins glshader_fixed ;

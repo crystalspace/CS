@@ -1,0 +1,13 @@
+SubDir TOP libs csplugincommon directx ;
+
+if $(DIRECTX.AVAILABLE) = "yes"
+{
+Description csplugincommon_dx : "common plugin classes library (DirectX-specific)" ;
+
+Library csplugincommon_dx : 
+  [ Wildcard *.cpp *.h ] 
+  [ Wildcard [ ConcatDirs $(DOTDOT) $(DOTDOT) include csplugincommon directx ] : *.h ]
+  : shared ;
+LinkWith csplugincommon_dx : csplugincommon csgfx csutil ;
+ExternalLibs csplugincommon_dx : DIRECTX ;
+}

@@ -30,7 +30,7 @@
 #include "iutil/document.h"
 #include "iutil/strset.h"
 #include "iutil/objreg.h"
-#include "../../common/shaderplugin.h"
+#include "csplugincommon/shader/shaderplugin.h"
 
 #include "expparser.h"
 #include "docwrap.h"

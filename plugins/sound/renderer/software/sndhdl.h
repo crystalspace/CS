@@ -19,7 +19,7 @@
 #ifndef __CS_SNDHDLSOFTWARE_H__
 #define __CS_SNDHDLSOFTWARE_H__
 
-#include "../common/shdl.h"
+#include "csplugincommon/soundrenderer/shdl.h"
 
 class csSoundRenderSoftware;
 

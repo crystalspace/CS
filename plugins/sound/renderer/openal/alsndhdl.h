@@ -20,7 +20,7 @@
 #define __CS_SNDHDLOPENAL_H__
 
 #include "csutil/thread.h"
-#include "../common/shdl.h"
+#include "csplugincommon/soundrenderer/shdl.h"
 
 class csSoundRenderOpenAL;
 class csSoundHandleOpenAL : public csSoundHandle

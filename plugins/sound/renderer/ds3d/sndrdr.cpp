@@ -30,7 +30,6 @@
 #include "iutil/virtclk.h"
 #include "ivaria/reporter.h"
 
-#define INITGUID
 #include "sndrdr.h"
 #include "sndlstn.h"
 #include "sndsrc.h"

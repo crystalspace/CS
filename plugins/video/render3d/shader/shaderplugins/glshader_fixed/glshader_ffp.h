@@ -25,8 +25,8 @@
 #include "csutil/leakguard.h"
 #include "csgfx/shadervar.h"
 #include "imap/services.h"
-#include "../../common/shaderplugin.h"
-#include "../common/shaderprogram.h"
+#include "csplugincommon/shader/shaderplugin.h"
+#include "csplugincommon/shader/shaderprogram.h"
 
 class csGLShader_FIXED;
 

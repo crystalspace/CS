@@ -6,7 +6,7 @@
 //  Copyright (c) 2001 Matt Reda. All rights reserved.
 //
 
-#import "plugins/video/canvas/macosx/common/OSXDelegate2D.h"
+#import "csplugincommon/macosx/OSXDelegate2D.h"
 
 
 // Create a small category for NSOpenGLContext to give access to the CGL context

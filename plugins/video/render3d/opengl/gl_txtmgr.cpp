@@ -34,9 +34,9 @@
 #include "iutil/cfgfile.h"
 #include "igraphic/image.h"
 #include "ivaria/reporter.h"
-#include "../common/txtmgr.h"
+#include "csplugincommon/render3d/txtmgr.h"
 
-#include "plugins/video/canvas/openglcommon/glextmanager.h"
+#include "csplugincommon/opengl/glextmanager.h"
 
 #include "gl_txtmgr.h"
 

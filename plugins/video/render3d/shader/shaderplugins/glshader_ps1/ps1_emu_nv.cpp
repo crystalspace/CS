@@ -37,7 +37,7 @@ Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "ivideo/shader/shader.h"
 //#include "ivideo/shader/shadervar.h"
 
-#include "plugins/video/canvas/openglcommon/glextmanager.h"
+#include "csplugincommon/opengl/glextmanager.h"
 
 #include "glshader_ps1.h"
 #include "ps1_emu_nv.h"

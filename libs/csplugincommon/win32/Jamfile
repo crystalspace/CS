@@ -1,0 +1,12 @@
+SubDir TOP libs csplugincommon win32 ;
+
+if $(TARGET.OS) = "WIN32"
+{
+Description csplugincommon_w32 : "common plugin classes library (win32-specific)" ;
+
+Library csplugincommon_w32 : 
+  [ Wildcard *.cpp *.h ] 
+  [ Wildcard [ ConcatDirs $(DOTDOT) $(DOTDOT) include csplugincommon win32 ] : *.h ]
+  : shared ;
+LinkWith csplugincommon_w32 : csplugincommon csgfx csutil ;
+}

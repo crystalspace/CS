@@ -2,5 +2,5 @@ SubDir TOP plugins engine renderloop shadow stencil2 ;
 
 Description rendstep_stencil2 : "stencil2 render loop steps" ;
 Plugin rendstep_stencil2 : [ Wildcard *.cpp *.h ] ;
-LinkWith rendstep_stencil2 : renderstepcommon csgfx csgeom csutil ;
+LinkWith rendstep_stencil2 : csplugincommon csgfx csgeom csutil ;
 CompileGroups rendstep_stencil2 : renderall ;

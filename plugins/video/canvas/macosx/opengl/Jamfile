@@ -4,7 +4,7 @@ if $(TARGET.OS) = "MACOS_X" && $(GL.AVAILABLE) = "yes"
 {
 Description glosx2d : "MacOS/X OpenGL 2D driver" ;
 Plugin glosx2d : [ Wildcard *.c *.cc *.cpp *.C *.m *.mm *.M *.h ] ;
-LinkWith glosx2d : canvascommon openglcommon osxcanvascommon csgeom csutil ;
+LinkWith glosx2d : csplugincommon csplugincommon_ogl csplugincommon_osx csgeom csutil ;
 ExternalLibs glosx2d : GL ;
 CompileGroups glosx2d : canvases openglcanvas ;
 }

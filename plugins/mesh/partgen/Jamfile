@@ -1,8 +1,0 @@
-SubDir TOP plugins mesh partgen ;
-
-Library partgen
-	: [ Wildcard *.cpp *.h ]
-	: noinstall
-;
-LibDepends partgen : cstool csgfx csgeom csutil ;
-

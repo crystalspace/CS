@@ -23,7 +23,7 @@
 #include "csgeom/box.h"
 #include "csutil/cscolor.h"
 #include "csutil/refarr.h"
-#include "plugins/mesh/partgen/partgen.h"
+#include "csplugincommon/particlesys/partgen.h"
 #include "imesh/spiral.h"
 #include "iutil/eventh.h"
 #include "iutil/comp.h"

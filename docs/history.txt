@@ -6,6 +6,12 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+23-Feb-2005
+	- res moved the code from the various "common" libraries into a
+	  library "csplugincommon" (and libraries with Win32, OpenGL and
+	  DirectX specific code) to facilitate the creation of 3rd party 
+	  plugins (they can use the same base classes etc. as CS does) and
+	  future static linking of external projects.
 22-Feb-2005
 	- Eric Sunshine disabled CS_IEEE_DOUBLE_FORMAT for 64-bit Intel style
 	  platforms. This works around problem where csQint() failed on such

@@ -20,8 +20,8 @@ Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #ifndef __GLSHADER_AFP_H__
 #define __GLSHADER_AFP_H__
 
-#include "../../common/shaderplugin.h"
-#include "../common/shaderprogram.h"
+#include "csplugincommon/shader/shaderplugin.h"
+#include "csplugincommon/shader/shaderprogram.h"
 #include "csgfx/shadervarcontext.h"
 #include "ivideo/shader/shader.h"
 #include "csutil/strhash.h"

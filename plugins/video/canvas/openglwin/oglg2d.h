@@ -21,10 +21,10 @@
 
 #include <GL/gl.h>
 #include "csutil/scf.h"
-#include "plugins/video/canvas/common/graph2d.h"
-#include "plugins/video/canvas/openglcommon/glcommon2d.h"
-#include "plugins/video/canvas/openglcommon/iogl.h"
-#include "plugins/video/canvas/win32canvascommon/customcursor.h"
+#include "csplugincommon/canvas/graph2d.h"
+#include "csplugincommon/opengl/glcommon2d.h"
+#include "csplugincommon/opengl/iogl.h"
+#include "csplugincommon/win32/customcursor.h"
 
 #include "detectdriver.h"
 

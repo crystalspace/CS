@@ -2,5 +2,5 @@ SubDir TOP plugins engine renderloop stdsteps ;
 
 Description rendstep_std : "standard render loop steps" ;
 Plugin rendstep_std : [ Wildcard *.cpp *.h ] ;
-LinkWith rendstep_std : renderstepcommon csgeom csutil csgfx cstool ;
+LinkWith rendstep_std : csplugincommon csgeom csutil csgfx cstool ;
 CompileGroups rendstep_std : renderall ;

@@ -1,8 +1,5 @@
 SubDir TOP plugins sound loader ;
 
-# Jam rules are order-sensitive; Library targets must appear before Plugin.
-SubInclude TOP plugins sound loader common ;
-
 SubInclude TOP plugins sound loader aiff ;
 SubInclude TOP plugins sound loader au ;
 SubInclude TOP plugins sound loader iff ;

@@ -1,7 +1,0 @@
-SubDir TOP plugins sound loader common ;
-
-Library soundloadercommon
-	: [ Wildcard *.cpp *.h ]
-	: noinstall
-;
-LibDepends soundloadercommon : cstool csgfx csgeom csutil ;

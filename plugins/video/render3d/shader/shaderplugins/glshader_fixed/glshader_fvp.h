@@ -25,8 +25,8 @@
 #include "csutil/weakref.h"
 #include "csutil/strhash.h"
 #include "csutil/leakguard.h"
-#include "../../common/shaderplugin.h"
-#include "../common/shaderprogram.h"
+#include "csplugincommon/shader/shaderplugin.h"
+#include "csplugincommon/shader/shaderprogram.h"
 
 class csGLShader_FIXED;
 

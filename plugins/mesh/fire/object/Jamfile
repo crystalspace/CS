@@ -5,6 +5,6 @@ Description fire : "Fire mesh object plugin" ;
 Plugin fire
 	: [ Wildcard *.cpp *.h ]
 ;
-LinkWith fire : partgen cstool csgeom csutil ;
+LinkWith fire : csplugincommon cstool csgeom csutil ;
 
 CompileGroups fire :  meshes ;

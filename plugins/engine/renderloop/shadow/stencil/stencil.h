@@ -38,9 +38,9 @@
 #include "csutil/dirtyaccessarray.h"
 #include "csutil/weakref.h"
 #include "csgfx/shadervarcontext.h"
-#include "../../common/basesteptype.h"
-#include "../../common/basesteploader.h"
-#include "../../common/parserenderstep.h"
+#include "csplugincommon/renderstep/basesteptype.h"
+#include "csplugincommon/renderstep/basesteploader.h"
+#include "csplugincommon/renderstep/parserenderstep.h"
 
 class csStencilShadowStep;
 class csStencilShadowType;

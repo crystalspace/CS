@@ -19,7 +19,7 @@ Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #ifndef __GLSHADER_PS1_ATI_H__
 #define __GLSHADER_PS1_ATI_H__
 
-#include "../../common/shaderplugin.h"
+#include "csplugincommon/shader/shaderplugin.h"
 #include "ivideo/shader/shader.h"
 #include "csutil/strhash.h"
 #include "ps1_emu_common.h"

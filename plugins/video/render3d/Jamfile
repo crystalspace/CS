@@ -1,8 +1,5 @@
 SubDir TOP plugins video render3d ;
 
-# Jam rules are order-sensitive; Library targets must appear before Plugin.
-SubInclude TOP plugins video render3d common ;
-
 SubInclude TOP plugins video render3d opengl ;
 SubInclude TOP plugins video render3d software ;
 SubInclude TOP plugins video render3d shader ;

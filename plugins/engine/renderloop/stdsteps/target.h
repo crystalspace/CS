@@ -29,9 +29,9 @@
 #include "iengine/rendersteps/irenderstep.h"
 #include "ivideo/shader/shader.h"
 
-#include "../common/basesteptype.h"
-#include "../common/basesteploader.h"
-#include "../common/parserenderstep.h"
+#include "csplugincommon/renderstep/basesteptype.h"
+#include "csplugincommon/renderstep/basesteploader.h"
+#include "csplugincommon/renderstep/parserenderstep.h"
 
 class csTargetRSType : public csBaseRenderStepType
 {

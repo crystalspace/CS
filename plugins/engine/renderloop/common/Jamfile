@@ -1,7 +1,0 @@
-SubDir TOP plugins engine renderloop common ;
-
-Library renderstepcommon
-	: [ Wildcard *.cpp *.h ]
-	: noinstall
-;
-LibDepends renderstepcommon : cstool csgfx csgeom csutil ;

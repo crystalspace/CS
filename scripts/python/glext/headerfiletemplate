@@ -118,7 +118,7 @@ typedef unsigned int GLhandleARB;
 #include "iutil/objreg.h"
 #include "iutil/verbositymanager.h"
 #include "ivaria/reporter.h"
-#include "plugins/video/canvas/openglcommon/iogl.h"
+#include "iogl.h"
 #include "ivideo/graph2d.h"
 #include "csutil/cfgacc.h"
 

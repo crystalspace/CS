@@ -38,8 +38,8 @@ Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "ivideo/rndbuf.h"
 #include "ivideo/shader/shader.h"
 
-#include "plugins/video/canvas/openglcommon/glextmanager.h"
-#include "plugins/video/canvas/openglcommon/glstates.h"
+#include "csplugincommon/opengl/glextmanager.h"
+#include "csplugincommon/opengl/glstates.h"
 
 #include "glshader_ffp.h"
 #include "glshader_fixed.h"

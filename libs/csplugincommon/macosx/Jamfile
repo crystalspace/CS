@@ -1,0 +1,12 @@
+SubDir TOP libs csplugincommon macosx ;
+
+if $(TARGET.OS) = MACOS_X
+{
+Description csplugincommon_osx : "common plugin classes library (MacOS/X-specific)" ;
+
+Library csplugincommon_osx : 
+  [ Wildcard *.cpp *.h ] 
+  [ Wildcard [ ConcatDirs $(DOTDOT) $(DOTDOT) include csplugincommon macosx ] : *.h ]
+  : shared ;
+LinkWith csplugincommon_osx : csplugincommon csgfx csutil ;
+}

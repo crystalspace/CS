@@ -8,3 +8,4 @@ SubInclude TOP libs csgeom ;
 SubInclude TOP libs csgfx ;
 SubInclude TOP libs cstool ;
 SubInclude TOP libs csws ;
+SubInclude TOP libs csplugincommon ;

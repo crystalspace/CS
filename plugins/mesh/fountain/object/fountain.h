@@ -24,7 +24,7 @@
 #include "csgeom/box.h"
 #include "csutil/cscolor.h"
 #include "csutil/refarr.h"
-#include "plugins/mesh/partgen/particle.h"
+#include "csplugincommon/particlesys/particle.h"
 #include "imesh/fountain.h"
 #include "iutil/eventh.h"
 #include "iutil/comp.h"

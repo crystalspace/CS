@@ -13,7 +13,7 @@
 
 #if defined(__cplusplus)
 
-#include "plugins/video/canvas/macosx/common/OSXDelegate2D.h"
+#include "csplugincommon/macosx/OSXDelegate2D.h"
 
 #define DEL2D_FUNC(ret, func) __private_extern__ "C" ret OSXDelegate2D_##func
 

@@ -37,7 +37,7 @@
 #include "ivaria/reporter.h"
 
 #include "srdrcom.h"
-#include "../common/slstn.h"
+#include "csplugincommon/soundrenderer/slstn.h"
 #include "srdrsrc.h"
 #include "sndhdl.h"
 

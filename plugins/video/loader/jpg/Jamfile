@@ -4,7 +4,7 @@ if $(JPEG.AVAILABLE) = "yes"
 {
 Description csjpgimg : "jpg image loader" ;
 Plugin csjpgimg : [ Wildcard *.cpp *.h ] ;
-LinkWith csjpgimg : imageloadercommon csgfx csutil ;
+LinkWith csjpgimg : csplugincommon csgfx csutil ;
 ExternalLibs csjpgimg : JPEG ;
 CompileGroups csjpgimg : imageloaders ;
 }

@@ -21,7 +21,7 @@
 #define __CS_SDL2D_H__
 
 #include "csutil/scf.h"
-#include "plugins/video/canvas/common/graph2d.h"
+#include "csplugincommon/canvas/graph2d.h"
 #include "iutil/event.h"
 
 #include <SDL.h>

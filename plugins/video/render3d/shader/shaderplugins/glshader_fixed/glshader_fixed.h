@@ -21,7 +21,7 @@ Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #define __GLSHADER_FIXED_H__
 
 #include "ivideo/shader/shader.h"
-#include "../../common/shaderplugin.h"
+#include "csplugincommon/shader/shaderplugin.h"
 #include "iutil/comp.h"
 #include "csutil/leakguard.h"
 

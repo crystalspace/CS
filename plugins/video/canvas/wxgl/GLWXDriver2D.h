@@ -20,8 +20,8 @@
 #define __CS_GLWX2D_H__
 
 #include "csutil/scf.h"
-#include "plugins/video/canvas/openglcommon/glcommon2d.h"
-#include "plugins/video/canvas/openglcommon/iogl.h"
+#include "csplugincommon/opengl/glcommon2d.h"
+#include "csplugincommon/opengl/iogl.h"
 #include "ivideo/wxwin.h"
 #include "wx/glcanvas.h"
 

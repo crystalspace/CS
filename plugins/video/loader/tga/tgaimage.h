@@ -24,7 +24,7 @@
 #include "iutil/eventh.h"
 #include "iutil/comp.h"
 #include "iutil/databuff.h"
-#include "../common/commonimagefile.h"
+#include "csplugincommon/imageloader/commonimagefile.h"
 
 /**
  * The TGA image file format loader.

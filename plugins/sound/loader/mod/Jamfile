@@ -4,7 +4,7 @@ if $(MIKMOD.AVAILABLE) = "yes" || [ Property build : progjen ]
 {
 Description sndiff : "iff sound loader" ;
 Plugin sndmod : [ Wildcard *.cpp *.h ] ;
-LinkWith sndmod : soundloadercommon csutil ;
+LinkWith sndmod : csplugincommon csutil ;
 ExternalLibs sndmod : MIKMOD ;
 CompileGroups sndmod : soundloaders ;
 }

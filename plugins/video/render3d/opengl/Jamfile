@@ -4,7 +4,7 @@ if $(GL.AVAILABLE) = "yes"
 {
 Description gl3d : "3D OpenGL renderer" ;
 Plugin gl3d : [ Wildcard *.cpp *.h ] ;
-LinkWith gl3d : render3dcommon csgeom csgfx csutil cstool ;
+LinkWith gl3d : csplugincommon csgeom csgfx csutil cstool ;
 ExternalLibs gl3d : GL ;
 CompileGroups gl3d : renderers renderall ;
 

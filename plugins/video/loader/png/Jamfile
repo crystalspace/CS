@@ -4,7 +4,7 @@ if $(PNG.AVAILABLE) = "yes"
 {
 Description cspngimg : "png image loader" ;
 Plugin cspngimg : [ Wildcard *.cpp *.h ] ;
-LinkWith cspngimg : imageloadercommon csgfx csutil ;
+LinkWith cspngimg : csplugincommon csgfx csutil ;
 ExternalLibs cspngimg : PNG ;
 CompileGroups cspngimg : imageloaders ;
 }

@@ -1,7 +1,0 @@
-SubDir TOP plugins video canvas win32canvascommon ;
-
-if $(TARGET.OS) = "WIN32"
-{
-Library win32canvascommon : [ Wildcard *.cpp *.h ] : noinstall ;
-LibDepends win32canvascommon : csgfx csutil ;
-}

@@ -4,7 +4,7 @@ if $(WX.AVAILABLE) = "yes" && $(GL.AVAILABLE) = "yes"
 {
 Description wxgl : "wxWidgets OpenGL 2D driver" ;
 Plugin wxgl : [ Wildcard *.c *.cc *.cpp *.C *.m *.mm *.M *.h ] ;
-LinkWith wxgl : canvascommon openglcommon csgeom csutil ;
+LinkWith wxgl : csplugincommon csplugincommon_ogl csgeom csutil ;
 ExternalLibs wxgl : WX GL ;
 CompileGroups wxgl : canvases openglcanvas ;
 }

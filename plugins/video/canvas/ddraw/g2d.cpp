@@ -28,11 +28,10 @@
 #include "csutil/win32/win32.h"
 #include "iutil/cmdline.h"
 
-#define INITGUID
-#include "plugins/video/canvas/directxcommon/directdetection.h"
+#include "csplugincommon/directx/directdetection.h"
 
 #include "csutil/win32/wintools.h"
-#include "plugins/video/canvas/common/softfontcache.h"
+#include "csplugincommon/canvas/softfontcache.h"
 
 #include "g2d.h"
 

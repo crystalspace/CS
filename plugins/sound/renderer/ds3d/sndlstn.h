@@ -21,7 +21,7 @@
 #ifndef __CS_SOUNDLISTENERDS3D_H__
 #define __CS_SOUNDLISTENERDS3D_H__
 
-#include "../common/slstn.h"
+#include "csplugincommon/soundrenderer/slstn.h"
 
 class csSoundRenderDS3D;
 

@@ -20,7 +20,7 @@ Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #define __GLSHADER_PS1_H__
 
 #include "iutil/comp.h"
-#include "../../common/shaderplugin.h"
+#include "csplugincommon/shader/shaderplugin.h"
 #include "ivideo/shader/shader.h"
 
 class csGLExtensionManager;

@@ -4,7 +4,7 @@ if $(GL.AVAILABLE) = "yes"
 {
 Description glshader_arb : "ARB vp/fp shader" ;
 Plugin glshader_arb : [ Wildcard *.cpp *.h ] ;
-LinkWith glshader_arb : shaderplugincommon csgeom csgfx csutil ;
+LinkWith glshader_arb : csplugincommon csgeom csgfx csutil ;
 ExternalLibs glshader_arb : GL ;
 CompileGroups glshader_arb : shaders renderers renderall ;
 }

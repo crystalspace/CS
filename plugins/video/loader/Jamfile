@@ -1,6 +1,5 @@
 SubDir TOP plugins video loader ;
 
-SubInclude TOP plugins video loader common ;
 SubInclude TOP plugins video loader bmp ;
 SubInclude TOP plugins video loader dds ;
 SubInclude TOP plugins video loader gif ;

@@ -18,7 +18,7 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#include "plugins/video/render3d/common/pixfmt.h"
+#include "csplugincommon/render3d/pixfmt.h"
 
 // Depending on the Colorformat, we define different masks and shiftvalues
 // to get the accrding values for rgb; R,G,B stands for Red, Green and Blue,

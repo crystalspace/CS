@@ -59,10 +59,10 @@
 #include "gl_txtmgr.h"
 #include "gl_polyrender.h"
 
-#include "plugins/video/canvas/openglcommon/glextmanager.h"
+#include "csplugincommon/opengl/glextmanager.h"
 
-#include "../common/txtmgr.h"
-#include "../common/normalizationcube.h"
+#include "csplugincommon/render3d/txtmgr.h"
+#include "csplugincommon/render3d/normalizationcube.h"
 
 #define BYTE_TO_FLOAT(x) ((x) * (1.0 / 255.0))
 

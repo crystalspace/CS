@@ -53,7 +53,7 @@
 #include "ivideo/shader/shader.h"
 #include "ivaria/bugplug.h"
 
-#include "plugins/video/canvas/openglcommon/glstates.h"
+#include "csplugincommon/opengl/glstates.h"
 #include "gl_renderbuffer.h"
 class csGLTextureHandle;
 class csGLTextureManager;

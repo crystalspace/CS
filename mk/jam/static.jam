@@ -21,6 +21,7 @@
 
 rule BuildStaticRegFile
 {
+  local statictarget = $(>) ;
   # prepare source files
   local sources = [ DoObjectGrist _cs_static_reg.cpp ] ;
   local object = [ CompileObject $(sources) ] ;
@@ -39,11 +40,14 @@ rule BuildStaticRegFile
   
   GenerateStaticPluginBoilerplate $(sources) ;
   GenerateStaticPluginRegistration $(sources) : $(metalist) ;
+  Clean $(statictarget)clean : $(sources) ; 
+  Clean $(statictarget)clean : $(object) ; 
   return $(object) ;
 }
 
 rule BuildStaticUseFile
 {
+  local statictarget = $(>) ;
   # prepare source files
   local sources = [ DoObjectGrist _cs_static_use.cpp ] ;
   local object = [ CompileObject $(sources) ] ;
@@ -62,6 +66,8 @@ rule BuildStaticUseFile
   
   GenerateStaticPluginBoilerplate $(sources) ;
   GenerateStaticPluginInstantiation $(sources) : $(metalist) ;
+  Clean $(statictarget)clean : $(sources) ; 
+  Clean $(statictarget)clean : $(object) ; 
   return $(object) ;
 }
 
@@ -90,7 +96,7 @@ rule LinkStaticPlugins
   NEEDLIBS on $($(<)_TARGET) += $(libs) ;
 
   # construct initialization sourcefile
-  local staticobject = [ BuildStaticUseFile $(>) ] ;
+  local staticobject = [ BuildStaticUseFile $(>) : $(<) ] ;
   ExtraObjects $(<) : $(staticobject) : inheritcflags ;
 }
 

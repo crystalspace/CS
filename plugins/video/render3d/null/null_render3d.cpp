@@ -35,7 +35,7 @@
 #include "csqint.h"
 #include "null_render3d.h"
 
-#include "../common/normalizationcube.h"
+#include "csplugincommon/render3d/normalizationcube.h"
 
 CS_IMPLEMENT_PLUGIN
 

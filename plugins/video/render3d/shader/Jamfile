@@ -1,7 +1,4 @@
-SubDir TOP plugins video render3d shader;
-
-# Jam rules are order-sensitive; Library targets must appear before Plugin.
-SubInclude TOP plugins video render3d shader common ;
+SubDir TOP plugins video render3d shader ;
 
 SubInclude TOP plugins video render3d shader shadermgr ;
 SubInclude TOP plugins video render3d shader shaderplugins ;

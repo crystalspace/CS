@@ -24,7 +24,7 @@
 #include "csutil/debug.h"
 #include "csutil/hashr.h"
 #include "csgeom/csrect.h"
-#include "plugins/video/render3d/common/txtmgr.h"
+#include "csplugincommon/render3d/txtmgr.h"
 #include "igraphic/image.h"
 #include "ivideo/graph2d.h"
 

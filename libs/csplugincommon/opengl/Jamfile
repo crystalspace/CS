@@ -1,0 +1,13 @@
+SubDir TOP libs csplugincommon opengl ;
+
+if $(GL.AVAILABLE) = "yes"
+{
+Description csplugincommon_ogl : "common plugin classes library (OpenGL-specific)" ;
+
+Library csplugincommon_ogl : 
+  [ Wildcard *.cpp *.h ] 
+  [ Wildcard [ ConcatDirs $(DOTDOT) $(DOTDOT) include csplugincommon opengl ] : *.h ]
+  : shared ;
+LinkWith csplugincommon_ogl : csplugincommon csgfx csutil ;
+ExternalLibs csplugincommon_ogl : GL ;
+}

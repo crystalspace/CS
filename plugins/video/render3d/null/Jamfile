@@ -2,7 +2,7 @@ SubDir TOP plugins video render3d null ;
 
 Description null3d : "3D null (do-nothing) renderer" ;
 Plugin null3d : [ Wildcard *.cpp *.h ] ;
-LinkWith null3d : render3dcommon cstool csgfx csgeom csutil ;
+LinkWith null3d : csplugincommon cstool csgfx csgeom csutil ;
 CompileGroups null3d : renderers renderall ;
 
 # Historic alias.

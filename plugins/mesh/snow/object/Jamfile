@@ -5,7 +5,7 @@ Description snow : "Snow mesh object plugin" ;
 Plugin snow
 	: [ Wildcard *.cpp *.h ]
 ;
-LinkWith snow : partgen cstool csgeom csutil ;
+LinkWith snow : csplugincommon cstool csgeom csutil ;
 
 CompileGroups snow :  meshes ;
 

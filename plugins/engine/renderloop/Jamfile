@@ -1,8 +1,5 @@
 SubDir TOP plugins engine renderloop ;
 
-# Jam rules are order-sensitive; Library targets must appear before Plugin.
-SubInclude TOP plugins engine renderloop common ;
-
 SubInclude TOP plugins engine renderloop loader ;
 SubInclude TOP plugins engine renderloop stdsteps ;
 SubInclude TOP plugins engine renderloop shadow ;

@@ -1,7 +1,0 @@
-SubDir TOP plugins video canvas macosx common ;
-
-if $(TARGET.OS) = MACOS_X
-{
-Library osxcanvascommon : [ Wildcard *.cpp *.m *.h ] : noinstall ;
-LibDepends osxcanvascommon : cstool csgfx csgeom csutil ;
-}

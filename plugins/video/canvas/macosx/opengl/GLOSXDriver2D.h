@@ -10,15 +10,15 @@
 #ifndef __CS_GLOSXDRIVER2D_H__
 #define __CS_GLOSXDRIVER2D_H__
 
-#include "plugins/video/canvas/macosx/common/OSXDriver2D.h"
+#include "csplugincommon/macosx/OSXDriver2D.h"
 
 
 #if defined(__cplusplus)
 
 #include "csutil/macosx/OSXAssistant.h"
 #include "csutil/scf.h"
-#include "plugins/video/canvas/openglcommon/glcommon2d.h"
-#include "plugins/video/canvas/openglcommon/iogl.h"
+#include "csplugincommon/opengl/glcommon2d.h"
+#include "csplugincommon/opengl/iogl.h"
 
 #include "OSXDelegate2D_OpenGL.h"
 

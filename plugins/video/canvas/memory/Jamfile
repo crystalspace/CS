@@ -2,5 +2,5 @@ SubDir TOP plugins video canvas memory ;
 
 Description memory2d : "memory-only 2D canvas" ;
 Plugin memory2d	: [ Wildcard *.cpp *.h ] ;
-LinkWith memory2d : canvascommon csutil ;
+LinkWith memory2d : csplugincommon csutil ;
 CompileGroups memory2d : canvases ;

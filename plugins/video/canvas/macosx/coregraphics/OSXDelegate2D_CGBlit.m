@@ -6,7 +6,7 @@
 //  Copyright (c) 2001 Matt Reda. All rights reserved.
 //
 
-#import "plugins/video/canvas/macosx/common/OSXDelegate2D.h"
+#import "csplugincommon/macosx/OSXDelegate2D.h"
 
 
 // Initialized on first use, destroyed at program termination

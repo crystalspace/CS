@@ -1,7 +1,0 @@
-SubDir TOP plugins video loader common ;
-
-Library imageloadercommon
-	: [ Wildcard *.cpp *.h ]
-	: noinstall ;
-
-LibDepends imageloadercommon : csgfx csutil ;

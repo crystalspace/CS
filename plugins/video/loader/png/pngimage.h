@@ -25,7 +25,7 @@
 #include "iutil/eventh.h"
 #include "iutil/comp.h"
 #include "iutil/databuff.h"
-#include "../common/commonimagefile.h"
+#include "csplugincommon/imageloader/commonimagefile.h"
 
 /**
  * The PNG image file format loader.

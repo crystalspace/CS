@@ -4,6 +4,6 @@ if $(TARGET.OS) = "MACOS_X"
 {
 Description cgdriver2d : "MacOS/X CoreGraphics 2D driver" ;
 Plugin cgdriver2d : [ Wildcard *.cpp *.m *.h ] ;
-LinkWith cgdriver2d : canvascommon osxcanvascommon csutil ;
+LinkWith cgdriver2d : csplugincommon csplugincommon_osx csutil ;
 CompileGroups cgdriver2d : canvases softcanvas ;
 }

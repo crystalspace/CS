@@ -3,30 +3,29 @@ SubDir TOP plugins video canvas xwindow ;
 if $(X11.AVAILABLE) = "yes"
 {
   local XWIN_XALERT = ;
-
-  SubInclude TOP plugins video canvas xwindow xalert_null ;
+  local XWIN_EXTERN = ;
 
   if $(XAW.AVAILABLE) = "yes"
   {
-    SubInclude TOP plugins video canvas xwindow xalert_xaw ;
-    XWIN_XALERT = xalert_xaw ;
+    XWIN_XALERT = [ Wildcard xalert_xaw : *.cpp *.h ] ;
+    XWIN_EXTERN = XAW ;
   }
   else
   {
-    XWIN_XALERT = xalert_null ;
+    XWIN_XALERT = [ Wildcard xalert_null : *.cpp *.h ] ;
   }
 
   Description xwin : "X Window Plugin" ;
-  Plugin xwin : [ Wildcard *.cpp *.h ] ;
-  LinkWith xwin : $(XWIN_XALERT) canvascommon csgeom csutil ;
+  Plugin xwin : [ Wildcard *.cpp *.h ] $(XWIN_XALERT) ;
+  LinkWith xwin : csplugincommon csgeom csutil ;
   CompileGroups xwin : canvases softcanvas ;
   if $(XFREE86VM.AVAILABLE) = "yes"
   {
     CFlags xwin : [ FDefines XFREE86VM ] ;
-    ExternalLibs xwin : XFREE86VM ;
+    ExternalLibs xwin : $(XWIN_EXTERN) XFREE86VM ;
   }
   else
   {
-    ExternalLibs xwin : X11 ;
+    ExternalLibs xwin : $(XWIN_EXTERN) X11 ;
   }
 }

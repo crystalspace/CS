@@ -28,7 +28,7 @@
 #include "iutil/plugin.h"
 #include "imap/reader.h"
 
-#include "../common/parserenderstep.h"
+#include "csplugincommon/renderstep/parserenderstep.h"
 
 class csRenderLoopLoader : public iComponent, public iLoaderPlugin
 {

@@ -24,7 +24,7 @@
 #include "csgeom/transfrm.h"
 #include "csutil/cscolor.h"
 #include "csutil/refarr.h"
-#include "plugins/mesh/partgen/partgen.h"
+#include "csplugincommon/particlesys/partgen.h"
 #include "imesh/emit.h"
 #include "iutil/eventh.h"
 #include "iutil/comp.h"

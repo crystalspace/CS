@@ -1,7 +1,0 @@
-
-SubDir TOP plugins video canvas xwindow xalert_xaw ;
-
-Library xalert_xaw
-	: [ Wildcard *.cpp *.h *.c ]
-	: noinstall ;
-ExternalLibs xalert_xaw : XAW ;

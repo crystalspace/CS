@@ -20,7 +20,7 @@
 #define __CS_SNDHDLDS3D_H__
 
 #include "csutil/thread.h"
-#include "../common/shdl.h"
+#include "csplugincommon/soundrenderer/shdl.h"
 
 class csSoundRenderDS3D;
 
