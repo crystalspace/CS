@@ -15,6 +15,9 @@ The history order has been reversed so that new features are at the top.
 	  renderers is now controlled by user.mak since they are platform-
 	  independent.  They are no longer controlled by platform-dependent
 	  makefiles.
+	- Eric Sunshine eliminated a few compilation warnings in wscs3d, and
+	  a linking problem on NextStep caused by (unnecessarily) including
+	  the simple.h header.
 27-Jun-2000
 	- Samuel Humphreys fixed dtsimple:
 	    - Fixed the portal...it was the gouraud shading which broke it,
