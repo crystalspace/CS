@@ -104,7 +104,7 @@
 				SubSystem="[% subsys %]"
 [% END %]
 [% MACRO linker_appcon GET linker_app(1) %]
-[% MACRO linker_appgui GET linker_app(2) %]
+[% MACRO linker_appgui GET linker_app(1) %]
 
 [% MACRO linker_plugin BLOCK -%]
 [% linker_common -%]

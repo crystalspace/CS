@@ -6,6 +6,14 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+18-Sep-2004
+	- Eric Sunshine changed the executable subsystem type in the MSVC
+	  project files for GUI applications from "windows" to "console". This
+	  should allow stdout and stderr to go to the terminal window from
+	  which the user started the program (allowing the output to be
+	  captures, if necessary), rather than opening a new console window and
+	  dumping the output there. This matches the subsystem setting for GUI
+	  executables in the old msvcgen templates.
 17-Sep-2004
 	- Eric Sunshine fixed a couple methods in odedynam which were returning
 	  a value despite being declared as returning void. Reported by Brendon
