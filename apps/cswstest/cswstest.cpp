@@ -1008,11 +1008,11 @@ CSWS_SKIN_DECLARE_DEFAULT (DefaultSkin);
  */
 int main (int argc, char* argv[])
 {
-  SysSystemDriver System;
+  SysSystemDriver *System = new SysSystemDriver;
 
-  if (!System.Initialize (argc, argv, "/config/cswstest.cfg"))
+  if (!System->Initialize (argc, argv, "/config/cswstest.cfg"))
     return -1;
-  iObjectRegistry* object_reg = System.GetObjectRegistry ();
+  iObjectRegistry* object_reg = System->GetObjectRegistry ();
   
   if (!csInitializeApplication (object_reg))
   {
@@ -1020,8 +1020,11 @@ int main (int argc, char* argv[])
     return -1;
   }
 
-  if (!System.Open ())
+  if (!System->Open ())
+  {
+    delete System;
     return -1;
+  }
 
   iCommandLineParser* cmdline = CS_QUERY_REGISTRY (object_reg,
   	iCommandLineParser);
@@ -1033,10 +1036,12 @@ int main (int argc, char* argv[])
     DefaultSkin.Prefix = config->GetStr ("CSWS.Skin.Variant", NULL);
 
   // Create our application object
-  csWsTest app (object_reg, DefaultSkin);
+  csWsTest *app = new csWsTest (object_reg, DefaultSkin);
 
-  if (app.Initialize ())
-    System.Loop ();
+  if (app->Initialize ())
+    System->Loop ();
 
+  delete app;
+  delete System;
   return 0;
 }

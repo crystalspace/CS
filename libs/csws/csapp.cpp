@@ -146,6 +146,9 @@ csApp::~csApp ()
     delete mi;
   }
 
+  iEventQueue *eq = CS_QUERY_REGISTRY (object_reg, iEventQueue);
+  if (eq)
+    eq->RemoveListener (scfiPlugin);
   plugin_mgr->UnloadPlugin (scfiPlugin);
 
   // Delete all children prior to shutting down the system
