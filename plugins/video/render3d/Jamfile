@@ -1,6 +1,8 @@
 SubDir TOP plugins video render3d ;
 
+# Jam rules are order-sensitive; Library targets must appear before Plugin.
 SubInclude TOP plugins video render3d common ;
+
 if $(USE_NEW_RENDERER) = "yes"
 {
   SubInclude TOP plugins video render3d opengl ;

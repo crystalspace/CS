@@ -4,4 +4,4 @@ Library soundloadercommon
 	: [ Wildcard *.cpp *.h ]
 	: noinstall
 ;
-
+LibDepends soundloadercommon : cstool csgfx csgeom csutil ;

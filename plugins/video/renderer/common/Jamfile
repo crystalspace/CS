@@ -4,4 +4,4 @@ Library renderercommon
 	: [ Wildcard *.cpp *.h ]
 	: noinstall
 ;
-
+LibDepends renderercommon : cstool csgfx csgeom csutil ;

@@ -6,9 +6,17 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
-01-Mar-2004
+1-Mar-2004
 	- res augmented the Win32 canvas to allow retrieval/setting of the
 	  window rectangle (via PerformExtension()).
+	- Eric Sunshine added missing LibDepends rule invocations to the
+	  various "common" library Jamfiles throughout the project.  This
+	  should fix the problem where "static" linking failed because the
+	  libraries appeared in the wrong order in the emitted link command.
+	  Also added explicit documentation to various Jamfiles stating that
+	  the Jam rules are presently (and unfortunately) order-sensitive, such
+	  that Jam must see LibDepends invocations before it sees associated
+	  LinkWith invocations.
 29-Feb-2004
 	- Eric Sunshine augmented the configure.ac Python check so that it can
 	  detect a working Python installation on MacOS/X despite the fact that

@@ -1,6 +1,8 @@
 SubDir TOP plugins sound renderer ;
 
+# Jam rules are order-sensitive; Library targets must appear before Plugin.
 SubInclude TOP plugins sound renderer common ;
+
 SubInclude TOP plugins sound renderer arts ;
 SubInclude TOP plugins sound renderer ds3d ;
 SubInclude TOP plugins sound renderer eax ;
