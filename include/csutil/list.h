@@ -29,7 +29,7 @@ template <class T>
 class csList
 {
 protected:
-  /* 
+  /**
    * Template which describs the data stored in the linked list
    * For example a list of ints uses csListElement<int>
    */
@@ -60,7 +60,7 @@ public:
     : head(0), tail(0)
   {}
 
-  /// Copyconstructor
+  /// Copy constructor
   csList(const csList &other);
 
   /// Destructor
@@ -71,73 +71,91 @@ public:
   class Iterator
   {
   public:
+    /// Constructor
     Iterator() : ptr(0)
     { }
+    /// Copy Constructor
     Iterator(const Iterator& other)
     { ptr = other.ptr; }
+    /// Another Copy Constructor
     Iterator(const csList<T> &list, bool reverse = false) 
     {
-      reversed=reverse;
-      if(reverse) ptr = list.tail;
+      reversed = reverse;
+      if (reverse) ptr = list.tail;
       else ptr = list.head;
     }
+    /// Assignment operator
     const Iterator& operator= (const Iterator& other)
     { ptr = other.ptr; return *this; }
-
+    /// Test if the Iterator is set to a valid element.
     bool HasCurrent() const
     { return ptr != 0; }
+    /// Test if there is a next element.
     bool HasNext() const
     { return ptr && ptr->next; }
+    /// Test if there is a previous element.
     bool HasPrevious() const
     { return ptr && ptr->prev; }
+    /// Test if the Iterator is set to the first element.
     bool IsFirst() const
     { return ptr && ptr->prev == 0; }
+    /// Test if the Iterator is set to the last element.
     bool IsLast() const
     { return ptr && ptr->next == 0; }
+    /// Test if the iterator is reversed.
     bool IsReverse() const
     { return reversed; }
 
+    /// Cast operator.
     operator T*() const
     { return &ptr->data; }
+    /// Dereference operator (*).
     T &operator *() const
     { return ptr->data; }
+    /// Dereference operator (->).
     T *operator->() const
     { return &ptr->data; }
 
-    /// Sets iterator to an invalid element
-    inline void Clear ()
+    /// Set iterator to non-existent element. HasCurrent() will return false.
+    void Clear ()
     {
       ptr = 0;
     }
-
-    inline T* Next ()
+    /// Advance to next element and return it.
+    T* Next ()
     {
       ptr = ptr->next;
       return *this;
     }
-
-    inline Iterator& operator++()
+    /// Backup to previous element and return it.
+    T* Prev()
+    { 
+      ptr = ptr->prev;
+      return *this;
+    }
+    /// Advance to next element and return it.
+    Iterator& operator++()
     { 
       ptr = ptr->next;
       return *this;
     }
-    inline Iterator& operator--()
+    /// Backup to previous element and return it.
+    Iterator& operator--()
     { 
       ptr = ptr->prev;
       return *this;
     }
   protected:
     friend class csList;
-    Iterator (csListElement* element)
-      : ptr(element)
-    { }
+    Iterator (csListElement* element) : ptr(element)
+    {}
 
   private:
     csListElement* ptr;
     bool reversed;
   };
 
-  /// Assignment, swallow copy
+  /// Assignment, shallow copy
   csList &operator=(const csList& other);
 
   /// Add an item first in list. Copy T into the listdata
@@ -145,6 +163,12 @@ public:
   
   /// Add an item last in list. Copy T into the listdata
   Iterator PushBack (const T & item);
+
+  /// Insert an item before the item the iterator is set to
+  void InsertBefore(Iterator &it, const T & item);
+
+  /// Insert an item after the item the iterator is set to
+  void InsertAfter(Iterator &it, const T & item);
 
   /// Remove specific item by iterator
   void Delete (Iterator &it);
@@ -164,7 +188,6 @@ public:
   {
     if (!head)
       return false;
-
     Delete (head);
     return true;
   }
@@ -174,7 +197,6 @@ public:
   {
     if (!tail)
       return false;
-    
     Delete (tail);
     return true;
   }
@@ -185,8 +207,8 @@ private:
 };
 
 /// Deep copy of list
-template <class T> csList<T>::csList(const csList<T> &other)
-  : head(0), tail(0)
+template <class T>
+inline csList<T>::csList(const csList<T> &other) : head(0), tail(0)
 {
   csListElement* e = other.head;
   while( e != 0)
@@ -196,26 +218,25 @@ template <class T> csList<T>::csList(const csList<T> &other)
   }
 }
 
-/// assignment, eraes and deep-copy
-template <class T> csList<T>& csList<T>::operator =(const csList<T> &other)
+/// Assignment, erase and deep-copy
+template <class T>
+inline csList<T>& csList<T>::operator= (const csList<T> &other)
 {
   DeleteAll ();
-
   csListElement* e = other.head;
-  while( e != 0)
+  while(e != 0)
   {
     PushBack (e->data);
     e = e->next;
   }
-
   return *this;
 }
 
-/// delete all elements, do not touche the raw data
-template <class T> void csList<T>::DeleteAll ()
+/// Delete all elements, do not touche the raw data
+template <class T>
+inline void csList<T>::DeleteAll ()
 {
   csListElement *cur = head, *next = 0;
-  
   while(cur != 0)
   {
     next = cur->next;
@@ -225,9 +246,9 @@ template <class T> void csList<T>::DeleteAll ()
   head = tail = 0;
 }
 
-/// add one item last in the list
-template <class T> typename csList<T>::Iterator csList<T>::PushBack (
-	const T& item)
+/// Add one item last in the list
+template <class T>
+inline typename csList<T>::Iterator csList<T>::PushBack (const T& item)
 {
   csListElement* el = new csListElement (item, 0, tail);
   if (tail)
@@ -235,13 +256,12 @@ template <class T> typename csList<T>::Iterator csList<T>::PushBack (
   else
     head = el;
   tail = el;
-  
   return Iterator(el);
 }
 
-/// add one item first in the list
-template <class T> typename csList<T>::Iterator csList<T>::PushFront (
-	const T& item)
+/// Add one item first in the list
+template <class T>
+inline typename csList<T>::Iterator csList<T>::PushFront (const T& item)
 {
   csListElement* el = new csListElement (item, head, 0);
   if (head)
@@ -249,15 +269,41 @@ template <class T> typename csList<T>::Iterator csList<T>::PushFront (
   else
     tail = el;
   head = el;
-  
   return Iterator (el);
 }
 
-
-template <class T> void csList<T>::Delete (Iterator &it)
+template <class T>
+inline void csList<T>::InsertBefore (Iterator &it, const T& item)
 {
   csListElement* el = it.ptr;
+  csListElement* next = el->next;
+  csListElement* prev = el;
+  csListElement* newEl = new csListElement (item, next, prev);
+  if (!next) // this is the last element
+    tail = newEl;
+  else
+    el->next->prev = newEl;
+  el->next = newEl;
+}
 
+template <class T>
+inline void csList<T>::InsertAfter (Iterator &it, const T& item)
+{
+  csListElement* el = it.ptr;
+  csListElement* next = el;
+  csListElement* prev = el->prev;
+  csListElement* newEl = new csListElement (item, next, prev);
+  if (!prev) // this is the first element
+    head = newEl;
+  else
+    el->prev->next = newEl;
+  el->prev = newEl;
+}
+
+template <class T>
+inline void csList<T>::Delete (Iterator &it)
+{
+  csListElement* el = it.ptr;
   if (!el)
     return;
 
@@ -270,7 +316,8 @@ template <class T> void csList<T>::Delete (Iterator &it)
   Delete(el);
 }
 
-template <class T> void csList<T>::Delete (csListElement *el)
+template <class T>
+inline void csList<T>::Delete (csListElement *el)
 {
   CS_ASSERT(el);
 

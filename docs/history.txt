@@ -28,6 +28,12 @@ chronological order.
 	  platform-specific csGetPluginMetadata() implementations for non-CS
 	  shared libraries (.so, .dll, etc.) if they happened to reside in the
 	  same directories as CS plugins.
+	- Eric Sunshine applied a patch to csList<> from Bjorn Hansen
+	  <holomorph@users.sourceforge.net> which added methods
+	  csList::Iterator::Prev(), InsertBefore() and InsertAfter(), as
+	  well as a little bit of additional Doxygen documentation.  Eric
+	  also fixed several other problems, such as numerous missing
+	  inline keywords, and performed additional documentation cleanup.
 17-Sep-2003
 	- Eric Sunshine documented cssys+csutil merge in apimod98.txi.
 	- Eric Sunshine documented csHash<> and csSet<> in apimod98.txi.
