@@ -21,7 +21,7 @@
 #define __CS_CSVIEW_H__
 
 #include "csextern.h"
-
+#include "igeom/clip2d.h"
 #include "ivaria/view.h"
 
 class csPoly2D;
