@@ -64,8 +64,7 @@ bool csPrefixConfig::SaveNow(const char *Filename, iVFS *vfs) const
 
   // first load the existing config file to preserve the user
   // configuration of other applications
-  if (!cfg.Load(Filename, vfs))
-    return false;
+  cfg.Load(Filename, vfs);
 
   // copy all options for the current user
   iConfigIterator *it = ((iConfigFileNew*)this)->Enumerate();

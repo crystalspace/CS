@@ -392,6 +392,13 @@ protected:
    */
   virtual void SetSystemDefaults (iConfigManager *config);
 
+  /**
+   * Open the user-specific configuration domain. The default is the file
+   * CS/data/config/user.cfg. This function is called at least twice, with
+   * different ID strings. This *must* be supported!
+   */
+  virtual iConfigFileNew *OpenUserConfig(const char *ApplicationID);
+
 public:
   DECLARE_IBASE;
 

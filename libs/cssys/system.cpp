@@ -27,6 +27,7 @@
 #include "cssys/sysdriv.h"
 #include "cssys/csinput.h"
 #include "cssys/csshlib.h"
+#include "csutil/prfxcfg.h"
 #include "csutil/csrect.h"
 #include "csutil/util.h"
 #include "csutil/inifile.h"
@@ -336,13 +337,16 @@ csSystemDriver::~csSystemDriver ()
   if (G2D) G2D->DecRef ();
   if (G3D) G3D->DecRef ();
   if (VFS) VFS->DecRef ();
-  if (Config) Config->DecRef ();
   if (MotionMan) MotionMan->DecRef();
 
   // Free all plugins
   PlugIns.DeleteAll ();
   // Free the system event outlet
   EventOutlets.DeleteAll ();
+
+  // this must happen *after* the plug-ins are deleted, because most plug-ins
+  // de-register their config file at destruction time
+  if (Config) Config->DecRef ();
 
   scfFinish ();
 }
@@ -377,16 +381,40 @@ bool csSystemDriver::Initialize (int argc, const char* const argv[],
   // this early is that both the application configuration file and the
   // configuration file for other plugins may (and almost always do) reside on
   // a VFS volume.
-  csConfigFile *DynamicConfig = new csConfigFile();
-  Config = new csConfigManager(DynamicConfig);
-  Config->SetDynamicDomainPriority(ConfigPriorityApplication);
+
+  // we first create an empty application config file, so we can create the
+  // config manager at all. Then we load the VFS. After that, all config files
+  // can be loaded. At the end, we make the user-and-application-specific
+  // config file the dynamic one.
+
+  iConfigFileNew *cfg = new csConfigFile();
+  Config = new csConfigManager(cfg);
+  Config->SetDomainPriority(cfg, ConfigPriorityApplication);
   VFS = LOAD_PLUGIN (this, "crystalspace.kernel.vfs", CS_FUNCID_VFS, iVFS);
 
   // Initialize application configuration file
   if (iConfigName)
-    if (!DynamicConfig->Load (iConfigName, VFS))
+    if (!cfg->Load (iConfigName, VFS))
       Printf (MSG_WARNING,
 	"WARNING: Failed to load configuration file `%s'\n", iConfigName);
+
+  // look if the user-specific config domain should be used
+  {
+    csConfigAccess cfgacc(this, "/config/system.cfg");
+    if (Config->GetBool("System.UserConfig", true))
+    {
+      // open the user-specific, application-neutral config domain
+      cfg = OpenUserConfig("Global");
+      Config->AddDomain(cfg, ConfigPriorityUserGlobal);
+      cfg->DecRef();
+
+      // open the user-and-application-specific config domain
+      cfg = OpenUserConfig(Config->GetStr("System.ApplicationID", "Noname"));
+      Config->AddDomain(cfg, ConfigPriorityUserApp);
+      Config->SetDynamicDomain(cfg);
+      cfg->DecRef();
+    }
+  }
   
   // Collect all options from command line
   CollectOptions (argc, argv);
@@ -696,6 +724,14 @@ void csSystemDriver::SetSystemDefaults (iConfigManager *Config)
   Mouse.SetDoubleClickTime (
     Config->GetInt ("MouseDriver.DoubleClickTime", 300),
     Config->GetInt ("MouseDriver.DoubleClickDist", 2));
+}
+
+iConfigFileNew *csSystemDriver::OpenUserConfig(const char *ApplicationID)
+{
+  // the default implementation does not make a difference between different
+  // users. It always uses /config/user.cfg, with the application ID as prefix.
+
+  return new csPrefixConfig("/config/user.cfg", VFS, ApplicationID);
 }
 
 void csSystemDriver::Help (iConfig* Config)

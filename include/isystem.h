@@ -295,10 +295,16 @@ struct iSystem : public iBase
   /// Default priority values (you may use other values if you want)
   enum
   {
+    // plug-in priority
     ConfigPriorityPlugIn        = iConfigManager::PriorityVeryLow,
+    // application priority
     ConfigPriorityApplication   = iConfigManager::PriorityLow,
-    ConfigPriorityUser          = iConfigManager::PriorityMedium,
-    ConfigPriorityCmdLine       = iConfigManager::PriorityHigh
+    // user priority (application-neutral)
+    ConfigPriorityUserGlobal    = iConfigManager::PriorityMedium,
+    // user priority (application-specific)
+    ConfigPriorityUserApp       = iConfigManager::PriorityHigh,
+    // command-line priority
+    ConfigPriorityCmdLine       = iConfigManager::PriorityVeryHigh
   };
   /// Get the system configuration file: this does NOT IncRef the object
   virtual iConfigManager *GetConfig () = 0;
