@@ -2,15 +2,15 @@
 @node map2cs Tutorial Step 2, map2cs Tutorial Step 3, map2cs Tutorial Step 1, map2cs Tutorial
 @subsection Step 2: Configuring Worldcraft
 
-Configuring Worldcraft sometimes is a pain.  But there is one consolation:
-Configuring Worldcraft for use with Half-Life isn't easy either.
+Configuring WorldCraft sometimes is a pain.  But there is one consolation:
+Configuring WorldCraft for use with Half-Life isn't any either.
 
 @itemize @bullet
 @item
-Extract the texture pack(s) which you have downloaded.  Put the extracted
-@file{.wad} files into a directory on the same drive, as you have stored
-worldcraft.  (You can choose any directory.  I will assume, you are using
-@file{e:\cryst\wads} further on.
+Extract the texture pack(s) which you have downloaded. Put the extracted
+@file{.wad} file into a directory on the same drive, as you have stored
+WorldCraft. (You can choose any directory. We will assume, you are using
+@file{D:\Crystal\Wads} further on.
 
 @item
 Just after you started Worldcraft for the first time, you will be prompted
@@ -19,11 +19,7 @@ that dialog, you can call it again via the @emph{Tools/Options} menu item.)
 @end itemize
 
 @ifnotinfo
-These are the settings I use.  I have marked points, where I think the setting
-is important with a circle, though, feel free to experiment yourself with
-these settings if you want.  You might get compiling and running the compiled
-map automated by using the proper settings in the ``Build Programs'' tab.  I
-prefer to call these tools using a batch, but that is a matter of taste.
+These following are the settings we use.
 
 @noindent
 The ``General'' settings tab.
@@ -38,15 +34,13 @@ The ``2D views'' settings tab.
 @noindent
 The ``3D views'' settings tab.
 
-Enable ``Hardware Acceleration'' if your graphics card supports it.
-
 @picturess{tutorial,map2cs,wcconf3}
 
 @noindent
 The ``Textures'' settings tab.
 
 In the ``Texture Files'' list, add the @file{.wad} files which you will be
-using.  (For instance, @file{e:\cryst\wads\cstex_1.wad} from our example.)
+using.  (For instance, @file{D:\Crystal\Wads\cstex_1.wad} from our example.)
 
 @picturess{tutorial,map2cs,wcconf4}
 
@@ -58,10 +52,7 @@ following table:
 @multitable @columnfractions .25 .75
 @item @emph{Field} @tab @emph{Value}
 @item Configuration @tab Crystal Space
-@item Game Data Files @tab @file{e:\cryst\worldcraft\halflife.fgd}
-@item Game Directory @tab @file{e:\cryst\bin}
-@item RMF Directory @tab @file{e:\cryst\maps}
-@item Palette File @tab @file{e:\cryst\worldcraft\wc.pal}
+@item Game Data Files @tab @file{D:\Crystal\WorldCraft\halflife.fgd}
 @end multitable
 @end quotation
 
@@ -74,10 +65,10 @@ The ``Build Programs'' settings tab.
 @end ifnotinfo
 
 @ifinfo
-These are the settings I use, though feel free to experiment yourself with
-these settings if you want.  You might get compiling and running the compiled
-map automated by using the proper settings in the ``Build Programs'' tab.  I
-prefer to call these tools using a batch, but that is a matter of taste.
+These are the settings we use, though feel free to experiment yourself with
+these settings if you wish. To get yur maps compiled and running We
+prefer to call these tools using a batch file, which you shall be shown later
+in this tutorial.
 
 These settings are all contained within tabs on the @emph{Configure
 Worldcraft} dialog box.
@@ -92,7 +83,7 @@ Enable ``Hardware Acceleration'' if your graphics card supports it.
 ``Textures'' tab.
 
 In the ``Texture Files'' list, add the @file{.wad} files
-which you will be using.  (For instance, @file{e:\cryst\wads\cstex_1.wad} from
+which you will be using.  (For instance, @file{D:\Crystal\Wads\cstex_1.wad} from
 our example.)
 
 @item
@@ -103,10 +94,6 @@ Fill in the fields based upon the following table:
 @multitable @columnfractions .25 .75
 @item @emph{Field} @tab @emph{Value}
 @item Configuration @tab Crystal Space
-@item Game Data Files @tab @file{e:\cryst\worldcraft\halflife.fgd}
-@item Game Directory @tab @file{e:\cryst\bin}
-@item RMF Directory @tab @file{e:\cryst\maps}
-@item Palette File @tab @file{e:\cryst\worldcraft\wc.pal}
 @end multitable
 @end itemize
 @end ifinfo

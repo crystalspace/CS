@@ -6,8 +6,8 @@ Save that map as @file{mymap.rmf} in the @file{maps} directory.  Now invoke
 the @emph{File/Export to Map} menu item and accept the default name
 (@samp{mymap.map}).
 
-From the command-line, go to the @file{e:\cryst\bin} directory and call
-@samp{run mymap}.  After a few seconds you should see Crystal Space starting
+From the command-line, go to the @file{D:\Crystal} directory and call
+@samp{LevBuild.bat mymap}.  After a few seconds you should see Crystal Space starting
 up, and then it should display your new room in 3D.
 
 @ifnotinfo

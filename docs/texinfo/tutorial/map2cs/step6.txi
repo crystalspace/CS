@@ -62,4 +62,4 @@ resides within the source code distribution of Crystal Space (but it is
 likely to move to a more suitable location in the future).  The file can
 be found here:
 
-@file{CS/apps/map2cs/support/maps/tutorial/tut1.map}
+@file{D:\Crystal\CS\apps\map2cs\support\maps\tutorial\tut1.map}

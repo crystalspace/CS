@@ -3,15 +3,16 @@
 @subsection Step 3: Configuring @file{map2cs}
 
 @file{map2cs} is configured by a special configuration file called
-@file{map2cs.cfg}.  If you need support for multiple configurations, you can
-use several configuration files, but for now we will restrict ourselfes to
-just one file.  Open up @file{map2cs.cfg} in you favourite editor and edit it,
-so it looks like the following template:
+@file{map2cs.cfg}, located within the 'D:\Crystal\CS\data\config\' directory.
+If you need support for multiple configurations, you can use several configuration
+files, but for now we will restrict ourselves to just one file.  Open
+up @file{map2cs.cfg} in you favourite editor and edit it, so it looks like the
+following template:
 
 @example
 [texturesettings]
 defaulttexture = a_4hewn
-wad1 = e:\cryst\wads\cstex_1.wad
+wad1 = D:\Crystal\Wads\cstex_1.wad
 
 [general]
 scaling = 0.025
@@ -26,19 +27,19 @@ more wads, you need to add them as @file{wad2}, @file{wad3} and so on.  If you
 have Quake3-style texture files, you can add them by @file{pk1=@dots{}},
 @file{pk2=@dots{}}, and so on.
 
-For convenience, Windows and @sc{dos} users may want to create a batch file to
-compile and run a map.  (It may be supplied with the tools you downloaded.)
-The batch file should be stored as @file{e:\cryst\bin\run.bat} and contain the
-following commands:
+Now Windows and @sc{dos} users need to create a batch file to compile and run
+a map. The batch file should be stored as @file{D:\Crystal\LevBuild.bat}
+and contain the following commands:
 
 @example
+cd CS
 map2cs ..\maps\%1.map data\%1.zip
 walktest %1
 @end example
 
 From the command-line (the @sc{ms-dos} prompt for Windows and @sc{dos} users)
-change to the directory @file{e:\cryst\bin}.  Type @samp{run sample}.  Now, if
-everything is properly installed and you have a file @file{sample.map} in your
+change to the directory @file{D:\Crystal}.  Type @samp{LevBuild.bat yourmapsname}.  Now, if
+everything is properly installed and you have a file @file{yourmapsname.map} in your
 @file{maps} directory (if you have downloaded the binary Crystal Space
 distribution for map making, you have), then you should see the following
 output:
@@ -46,16 +47,15 @@ output:
 @example
 map2cs, Copyright (C) 1999 by Thomas Hieber
 
-Reading map `..\maps\sample.map'
+Reading map `..\Maps\yourmapsname.map'
 Map contains:
 6 Entities
 26 Brushes
 118 Unique planes
-Writing world `data\sample.zip'
+Writing world `data\yourmapsname.zip'
 done.
 @end example
 
 Right after that, a new window should appear, that contains the Crystal Space
 startup console with lots of text in it.  After some time, you should have
-loaded you first self-compiled map.  True, it is not looking very good, but I
-really had no good ideas when making it.
+loaded you first self-compiled map.
