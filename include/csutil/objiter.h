@@ -65,15 +65,16 @@ public:
   /// Move forward
   iBase* Next()
   {
+    iBase* cur = CurrentTypedObject;
     FetchObject ();
-    return CurrentTypedObject;
+    return cur;
   }
   /// Reset the iterator to the beginning
-  void Reset() { iter->Reset (); }
+  void Reset () { iter->Reset (); FetchObject (); }
   /// Get the parent object
   iObject *GetParentObj() const { return iter->GetParentObj (); }
   /// Check if we have any children of requested type
-  bool HasNext () const { return iter->HasNext (); }
+  bool HasNext () const { return CurrentTypedObject != 0; }
   /// Find the object with the given name
   iBase* FindName (const char* name);
 };

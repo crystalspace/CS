@@ -39,6 +39,8 @@ chronological order.
 	- Jorrit renamed csGrowingArray to csDirtyAccessArray.
 	- Jorrit updated the documentation with regards to the csGrowingArray
 	  change.
+	- Jorrit fixed a bug in the csTypedObjectIterator class. It would
+	  often return 0 in the Next() method even if there were more objects.
 10-Aug-2003
 	- Peter Amstutz added a check to "scan.cpp" of the software
 	  renderer so that it would not defer a null pointer (and hence crash)

@@ -22,6 +22,7 @@
 csTypedObjectIterator::csTypedObjectIterator (iObject *Parent)
 {
   iter = Parent->GetIterator ();
+  FetchObject ();
 }
 
 csTypedObjectIterator::~csTypedObjectIterator ()
