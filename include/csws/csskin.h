@@ -29,6 +29,8 @@ class csComponent;
 class csButton;
 class csWindow;
 class csDialog;
+class csListBox;
+class csListBoxItem;
 class csBackground;
 
 /**
@@ -263,6 +265,9 @@ public:
   /// Get the identifier of the component this skin slice is for
   virtual const char *GetName ()
   { return "Listbox"; }
+  
+  /// Suggest the optimal size of the button, given an already filled object
+  virtual void SuggestSize (csListBox &This, int &w, int &h) = 0;
 };
 
 /**
@@ -276,6 +281,20 @@ public:
   /// Get the identifier of the component this skin slice is for
   virtual const char *GetName ()
   { return "ListboxItem"; }
+};
+
+
+/**
+ * This class defines the interface for a scrollbar skin slice.
+ * Every skin slice that is meant for scrollbars should inherit
+ * from this interface.
+ */
+class csScrollBarSkin : public csSkinSlice
+{
+public:
+  /// Get the identifier of the component this skin slice is for
+  virtual const char *GetName ()
+  { return "ScrollBar"; }
 };
 
 /**

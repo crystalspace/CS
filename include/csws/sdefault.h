@@ -25,6 +25,7 @@
 
 #define SKIN_DECLARE_DEFAULT(var)	\
   SKIN_DECLARE (my##var##Type, csSkin);	\
+    SKIN_SLICE (DefaultScrollBar);		\
     SKIN_SLICE (DefaultButton);		\
     SKIN_SLICE (DefaultWindow);		\
     SKIN_SLICE (DefaultDialog);		\
@@ -150,7 +151,7 @@ public:
 };
 
 /**
- * This is the default skin for listboxe items
+ * This is the default skin for listbox items
  */
 class csDefaultListBoxItemSkin : public csListBoxItemSkin
 {
@@ -159,5 +160,16 @@ public:
   virtual void Draw (csComponent &iComp);
 };
 
+
+/**
+ * This is the default skin for scroll bars
+ */
+ class csDefaultScrollBarSkin : public csScrollBarSkin 
+ {
+ public:
+   /// Draw the component we are responsible for
+   virtual void Draw(csComponent &iComp);
+ };
+ 
 
 #endif // __SDEFAULT_H__

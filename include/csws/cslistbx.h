@@ -213,6 +213,10 @@ public:
   void SetOffset (int ihOffset)
   { hOffset = ihOffset; Invalidate (); }
   
+  /// Get the name of the skip slice for this component
+  virtual char *GetSkinName ()
+  { return "ListboxItem"; }
+  
   /**
    * Accessor functions for public variables.
    */
@@ -320,6 +324,9 @@ public:
   /// Resize child items on parent window resize
   virtual bool SetRect (int xmin, int ymin, int xmax, int ymax);
 
+  /// Get the recommended size from the slice.
+  void SuggestSize (int &w, int &h);
+
   /**
    * For each listbox item call a function with a optional arg
    * Function returns the first child on which func returnes 'true'
@@ -347,6 +354,10 @@ public:
  
  /// Set the frame's alpha
  void SetAlpha(uint8 iAlpha);
+ 
+ /// Get the name of the skip slice for this component
+ virtual char *GetSkinName ()
+ { return "Listbox"; }
     
  /**
   * Accessors for private member variables
