@@ -953,8 +953,22 @@ void Win32Assistant::DisableConsole ()
     console_window = false;
   }
 
-  freopen("debug.txt", "a", stderr);
-  freopen("debug.txt", "a", stdout);
+  char apppath[MAX_PATH];
+
+  GetModuleFileName (0, apppath, sizeof(apppath));
+
+  char *dot = strrchr (apppath, '.');
+  if (dot) 
+  {
+    strcpy (dot, ".txt");
+  }
+  else
+  {
+    strcat (apppath, ".txt");
+  }
+
+  freopen(apppath, "a", stderr);
+  freopen(apppath, "a", stdout);
   FreeConsole();
 
   struct tm *now;
