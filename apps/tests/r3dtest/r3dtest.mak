@@ -1,3 +1,4 @@
+ifeq ($(findstring render3d, $(PLUGINS)),render3d)
 # Application description
 DESCRIPTION.r3dtest = Test of new renderer
 
@@ -67,3 +68,4 @@ else
 endif
 
 endif # ifeq ($(MAKESECTION),targets)
+endif # ifeq ($(findstring render3d, $(PLUGINS)),render3d)
