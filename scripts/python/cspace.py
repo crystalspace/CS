@@ -2695,6 +2695,7 @@ class iAws(iBase):
     def GetObjectRegistry(*args): return _cspace.iAws_GetObjectRegistry(*args)
     def AllWindowsHidden(*args): return _cspace.iAws_AllWindowsHidden(*args)
     def ComponentIsInTransition(*args): return _cspace.iAws_ComponentIsInTransition(*args)
+    def ComponentDestroyed(*args): return _cspace.iAws_ComponentDestroyed(*args)
     def __del__(self, destroy=_cspace.delete_iAws):
         try:
             if self.thisown: destroy(self)
@@ -5515,6 +5516,9 @@ class iSpriteCal3DState(iBase):
     def SetMaterial(*args): return _cspace.iSpriteCal3DState_SetMaterial(*args)
     def SetTimeFactor(*args): return _cspace.iSpriteCal3DState_SetTimeFactor(*args)
     def GetTimeFactor(*args): return _cspace.iSpriteCal3DState_GetTimeFactor(*args)
+    def GetAnimationTime(*args): return _cspace.iSpriteCal3DState_GetAnimationTime(*args)
+    def GetAnimationDuration(*args): return _cspace.iSpriteCal3DState_GetAnimationDuration(*args)
+    def SetAnimationTime(*args): return _cspace.iSpriteCal3DState_SetAnimationTime(*args)
     def __del__(self, destroy=_cspace.delete_iSpriteCal3DState):
         try:
             if self.thisown: destroy(self)
