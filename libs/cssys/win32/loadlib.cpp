@@ -113,7 +113,13 @@ void* csGetLibrarySymbol(csLibraryHandle Handle, const char* Name)
 
 bool csUnloadLibrary (csLibraryHandle Handle)
 {
+#if defined(CS_EXTENSIVE_MEMDEBUG) && defined(COMP_VC)
+  // why not? - because the source file information
+  // for would leaked objects get lost
+  return true;
+#else
   return FreeLibrary ((HMODULE)Handle)!=0;
+#endif
 }
 
 void csPrintLibraryError (const char *iModule)
