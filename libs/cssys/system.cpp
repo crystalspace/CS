@@ -788,7 +788,7 @@ bool csSystemDriver::CallOnEvents (iPlugIn *iObject, unsigned int iEventMask)
 
 void csSystemDriver::Print (int mode, const char *string)
 {
-  Printf (mode, string);
+  Printf (mode, "%s", string);
 }
 
 time_t csSystemDriver::GetTime ()

@@ -22,6 +22,9 @@ Short-term cleanups that need to be done:
 	  performed a real SCF conversion on the Win32 port.  (Note, however,
 	  that Eric is unable to test the conversion, so someone else will
 	  have to do so.)
+	- Eric Sunshine fixed a bug introduced into csSystemDriver::Print()
+	  during the SCF conversion which caused Print() to generate garbage
+	  if the printed string contained percent "%" characters.
 9-Nov-1999
 	- Eric Sunshine removed many, many obsolete COM references from
 	  documentation and source code comments.
