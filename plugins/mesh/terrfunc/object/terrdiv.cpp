@@ -20,11 +20,13 @@
 #include "csgeom/math2d.h"
 #include "csgeom/math3d.h"
 #include "terrdiv.h"
+#include "qsqrt.h"
 
 //-------------- csTerrainQuadDiv ------------------------------
 csTerrainQuadDiv::csTerrainQuadDiv(int depth)
 {
   parent = NULL;
+  parentplace = 0;
   int i;
   for(i=0; i<4; i++)
   {
@@ -43,6 +45,7 @@ csTerrainQuadDiv::csTerrainQuadDiv(int depth)
     {
       children[i] = new csTerrainQuadDiv(depth-1);
       children[i]->parent = this;
+      children[i]->parentplace = i;
     }
 
     /// connect direct neighbors:
@@ -81,6 +84,84 @@ csTerrainQuadDiv::~csTerrainQuadDiv()
     delete children[i];
 }
 
+
+void csTerrainQuadDiv::SetNeighbor(int dir, csTerrainQuadDiv *neigh)
+{
+  neighbors[dir] = neigh;
+  if(!IsLeaf())
+  {
+    /// call 2 children only
+    int c1=0, c2=0;
+    switch(dir)
+    {
+      case CS_QUAD_TOP: c1=CS_QUAD_TOPLEFT; c2=CS_QUAD_TOPRIGHT; break;
+      case CS_QUAD_RIGHT: c1=CS_QUAD_TOPRIGHT; c2=CS_QUAD_BOTRIGHT; break;
+      case CS_QUAD_BOT: c1=CS_QUAD_BOTLEFT; c2=CS_QUAD_BOTRIGHT; break;
+      case CS_QUAD_LEFT: c1=CS_QUAD_TOPLEFT; c2=CS_QUAD_BOTLEFT; break;
+    }
+    children[c1]->SetNeighbor(dir, neigh);
+    children[c2]->SetNeighbor(dir, neigh);
+  }
+}
+
+csTerrainQuadDiv* csTerrainQuadDiv::GetNeighbor(int dir)
+{
+  if(neighbors[dir]) return neighbors[dir];
+  /// find & cache it;
+  if(!parent) return NULL;
+
+  /// perhaps neighbor is sibling?
+  int pchild = -1;
+  if((dir==CS_QUAD_TOP) && (parentplace==CS_QUAD_BOTLEFT))
+    pchild = CS_QUAD_TOPLEFT;
+  if((dir==CS_QUAD_TOP) && (parentplace==CS_QUAD_BOTRIGHT))
+    pchild = CS_QUAD_TOPRIGHT;
+  if((dir==CS_QUAD_BOT) && (parentplace==CS_QUAD_TOPLEFT))
+    pchild = CS_QUAD_BOTLEFT;
+  if((dir==CS_QUAD_BOT) && (parentplace==CS_QUAD_TOPRIGHT))
+    pchild = CS_QUAD_BOTRIGHT;
+  if((dir==CS_QUAD_LEFT) && (parentplace==CS_QUAD_TOPRIGHT))
+    pchild = CS_QUAD_TOPLEFT;
+  if((dir==CS_QUAD_LEFT) && (parentplace==CS_QUAD_BOTRIGHT))
+    pchild = CS_QUAD_BOTLEFT;
+  if((dir==CS_QUAD_RIGHT) && (parentplace==CS_QUAD_TOPLEFT))
+    pchild = CS_QUAD_TOPRIGHT;
+  if((dir==CS_QUAD_RIGHT) && (parentplace==CS_QUAD_BOTLEFT))
+    pchild = CS_QUAD_BOTRIGHT;
+  if(pchild != -1)
+  {
+    /// get it and cache
+    neighbors[dir] = parent->children[pchild];
+    return neighbors[dir];
+  }
+
+  /// it is a child of a neighbor of parent, get parent neighbor
+  csTerrainQuadDiv *parneigh = parent->GetNeighbor(dir);
+  if(!parneigh) return NULL;
+
+  if((dir==CS_QUAD_LEFT) && (parentplace==CS_QUAD_BOTLEFT))
+    pchild = CS_QUAD_BOTRIGHT;
+  if((dir==CS_QUAD_LEFT) && (parentplace==CS_QUAD_TOPLEFT))
+    pchild = CS_QUAD_TOPRIGHT;
+  if((dir==CS_QUAD_RIGHT) && (parentplace==CS_QUAD_BOTRIGHT))
+    pchild = CS_QUAD_BOTLEFT;
+  if((dir==CS_QUAD_RIGHT) && (parentplace==CS_QUAD_TOPRIGHT))
+    pchild = CS_QUAD_TOPLEFT;
+  if((dir==CS_QUAD_TOP) && (parentplace==CS_QUAD_TOPRIGHT))
+    pchild = CS_QUAD_BOTRIGHT;
+  if((dir==CS_QUAD_TOP) && (parentplace==CS_QUAD_TOPLEFT))
+    pchild = CS_QUAD_BOTLEFT;
+  if((dir==CS_QUAD_BOT) && (parentplace==CS_QUAD_BOTRIGHT))
+    pchild = CS_QUAD_TOPRIGHT;
+  if((dir==CS_QUAD_BOT) && (parentplace==CS_QUAD_BOTLEFT))
+    pchild = CS_QUAD_TOPLEFT;
+
+  CS_ASSERT(pchild != -1);
+  /// get it and cache
+  neighbors[dir] = parneigh->children[pchild];
+  return neighbors[dir];
+}
+
 void csTerrainQuadDiv::ComputeDmax(iTerrainHeightFunction* height_func,
     float minx, float miny, float maxx, float maxy)
 {
@@ -91,17 +172,23 @@ void csTerrainQuadDiv::ComputeDmax(iTerrainHeightFunction* height_func,
   /// first establish min/max height
   if(IsLeaf())
   {
-    dmax = 0;
     min_height = height_func->GetHeight (midx, midy);
     max_height = min_height;
     h = height_func->GetHeight (minx, miny);
     if(h>max_height) max_height=h; if(h<min_height) min_height=h;
     h = height_func->GetHeight (minx, maxy);
+    float h_bl = h; /// keep 
     if(h>max_height) max_height=h; if(h<min_height) min_height=h;
     h = height_func->GetHeight (maxx, miny);
+    float h_tr = h; /// keep 
     if(h>max_height) max_height=h; if(h<min_height) min_height=h;
     h = height_func->GetHeight (maxx, maxy);
     if(h>max_height) max_height=h; if(h<min_height) min_height=h;
+
+    /// compute dmax , also for leaves to get more accurate dmax up
+    float h_pol = (h_tr+h_bl)*0.5; // interpolated
+    h = height_func->GetHeight (midx, midy);
+    dmax = ABS(h_pol - h);
   }
   else
   {
@@ -130,7 +217,6 @@ void csTerrainQuadDiv::ComputeDmax(iTerrainHeightFunction* height_func,
     float interpol_h = (height_tr+height_bl)*0.5;
     dmax = ABS(interpol_h - h);
     /// make sure dmax >= MAX(children dmax);
-    /// this also takes children heightchanges into account
     for(i=0; i<4; i++)
     {
       if(children[i]->GetDmax() > dmax)
@@ -144,6 +230,38 @@ void csTerrainQuadDiv::ComputeLOD(int framenum, const csVector3& campos,
 {
   float midx = (minx+maxx)*0.5f;
   float midy = (miny+maxy)*0.5f;
+
+  /// compute visible error
+  /// which is heightchange / distance * cameraslant
+  float e = dmax;
+  /// if camera in quad: dist = 0;
+  float dist = 0;
+  if( (campos.x < minx) || (campos.x > maxx) || (campos.z < miny)
+    || (campos.z > maxy))
+    dist = qisqrt( (campos.x-midx)*(campos.x-midx) + 
+      (campos.z-midy)*(campos.z-midy) );
+  e *= dist;
+  /// if camera in quad, camslant = 1 (full length is visible)
+  float camslant = 1.0;
+  if(campos.y > max_height) camslant = 1.0 / (1.+ campos.y - max_height);
+  if(campos.y < min_height) camslant = 1.0 / (1.+ min_height - campos.y);
+  e *= camslant;
+
+  /// can this quad be displayed?
+  bool OK = true;
+  float maxerror = 1./200.;
+  if(e > maxerror) OK = false;
+
+  if(OK) return; // no need to divide
+
+  /// debug prints
+  if(1)
+  {
+    float sizex = maxx-minx;
+    float sizey = maxy-miny;
+    printf("LOD %gx%g dmax is %f, error is %f.\n", 
+      sizex, sizey, dmax, e);
+  }
   if(!IsLeaf())
   {
     /// subdivide this quad

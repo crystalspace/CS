@@ -41,6 +41,8 @@ class csTerrainQuadDiv
 {
   /// parent node? (if any)
   csTerrainQuadDiv *parent;
+  /// place in parent node (cs_quad_topleft, etc..)
+  int parentplace;
   /// children (all NULL - no children)
   csTerrainQuadDiv *children[4];
   /// direct neighbors (some can be NULL if you like)
@@ -57,8 +59,16 @@ class csTerrainQuadDiv
 public:
   /// create tree of certain depth (0 = create leaf node).
   csTerrainQuadDiv(int depth);
-  /// and destroy subtree
+  /// and destroy subtree  (please remove it from neighbors, set NULL)
   ~csTerrainQuadDiv();
+
+  /// Add/Remove a neighbor from the tree - give direction and ptr(can be NULL)
+  void SetNeighbor(int dir, csTerrainQuadDiv *neigh);
+  /** 
+   * Get neighbor for a direction (will look it up if NULL is cached)
+   * NULL means no neighbor (of same size) in that direction.
+  */
+  csTerrainQuadDiv* GetNeighbor(int dir);
 
   /// is this quad a leaf node? (nodes always have four or zero children)
   bool IsLeaf() const {return children[0] == NULL;}

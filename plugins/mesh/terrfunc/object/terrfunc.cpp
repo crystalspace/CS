@@ -243,6 +243,7 @@ void csTerrBlock::Draw(iRenderView *rview, bool clip_portal, bool clip_plane,
 
   m.mesh.num_triangles = m.triangles.Length();
   m.mesh.triangles = m.triangles.GetArray();
+  printf("terrfuncdiv: %d triangles\n", m.mesh.num_triangles);
 
   CS_ASSERT(m.mesh.buffers[0]);
   CS_ASSERT(!m.mesh.buffers[0]->IsLocked ());
