@@ -198,8 +198,6 @@ csSprite3D* add_sprite (char* tname, char* sname, csSector* where, csVector3 con
 //===========================================================================
 // Demo particle system.
 //===========================================================================
-csParticleSystem* global_ps = NULL;
-
 void add_particles (csSector* sector, const csVector3& center, char* txtname)
 {
   // First check if the texture exists.
@@ -211,11 +209,11 @@ void add_particles (csSector* sector, const csVector3& center, char* txtname)
   }
 
   CHK (csParSysExplosion* exp = new csParSysExplosion (20,
-  	center, csVector3 (0, 0, 0), txt));
+  	center, csVector3 (0, 0, 0), txt, .6, .8, 2.));
   exp->MoveToSector (sector);
   exp->SetSelfDestruct (3000);
   exp->SetMixmodes (CS_FX_SETALPHA (0.75));
-  global_ps = exp;
+  exp->AddLight (Sys->world, sector, 1000);
 }
 
 //===========================================================================
