@@ -9,6 +9,37 @@ The history order is reversed so that new features are at the top.
 	  (i.e. iconify for example). Currently only the XWindow canvas
 	  will actually send these!
 	- Disabled default building of LUA for mingw port.
+	- Added FindMaterial(), FindTexture(), FindSector(), FindCollection(),
+	  FindCameraPosition(), FindMeshObject(), and FindMeshFactory()
+	  to iEngine. All these functions have two parameters: the
+	  name to look for and a flag which indicates if the search
+	  should be restricted to current region (default false). The name
+	  can take two forms: either it is a simple name of the object in
+	  which case it will work as explained above, or else it uses
+	  the form 'regionname/objectname'. In that case it will ignore
+	  the extra flag and look for the object in the specified region.
+	- The loader now uses FindMaterial() and FindTexture() from above
+	  so you can now specify materials with the form 'region/matname'
+	  if you want.
+	- Portal loading now works differently. Previously it worked by
+	  creating dummy sectors for every portal. These dummy sectors would
+	  then later be resolved after the loading pass. This was a bit
+	  clumsy and has been a source of bugs in the past. So I changed this
+	  with a callback on the portal that is called when a sector is
+	  missing. So this means that all portals are by default null-portals
+	  unless it is a portal to a sector that was already defined
+	  previously. The null-portal will have a callback associated with
+	  it that will try to find the destination sector as soon as the
+	  portal is first used. This means that worlds that have portal
+	  to non-existing sectors will now work except that the portal itself
+	  will not be operational (a texture will show).
+	- Removed the ugly ResolvePortalSectors() function in the parser.
+	  This is no longer needed with the technique above.
+	- It is now possible to use the 'regionname/sectorname' notation
+	  with the PORTAL command too. So you can specify portals to sectors
+	  from other regions.
+	- Added iLoader::ResolveCurrentRegionOnly() function to return the
+	  current value of the ResolveCurrentRegion flag in the loader.
 20-Feb-2002
 	- Added SetMaximumSectorVisit() and GetMaximumSectorVisit() functions
 	  to iPortal. With this you can control how many times the same
@@ -1787,7 +1818,7 @@ The history order is reversed so that new features are at the top.
 	- Small cosmetic change to csEngine::SelectRegion().
 	- Added iLoader::FindMaterial() and iLoader::FindSector(). These
 	  functions are relevant while busy loading a world. They correctly
-	  take account of the value of ResolveOnlyRegion which is given
+	  take account of the value of ResolveCurrentRegion which is given
 	  to iLoader::LoadMapFile().
 	- Modified the functions in the syntax loader services to correctly
 	  use the new functions in iLoader. This makes region loading useful

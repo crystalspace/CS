@@ -191,34 +191,30 @@ void csLoader::ReportNotify (const char* description, ...)
   va_end (arg);
 }
 
-iMaterialWrapper *csLoader::FindMaterial (const char *iName)
+iMaterialWrapper *csLoader::FindMaterial (const char* name)
 {
-  iMaterialWrapper* mat;
-  if (ResolveOnlyRegion && Engine->GetCurrentRegion ())
-    mat = Engine->GetCurrentRegion ()->FindMaterial (iName);
-  else
-    mat = Engine->GetMaterialList ()->FindByName (iName);
+  iMaterialWrapper* mat = Engine->FindMaterial (name, ResolveOnlyRegion);
   if (mat)
     return mat;
 
-  iTextureWrapper* tex;
-  if (ResolveOnlyRegion && Engine->GetCurrentRegion ())
-    tex = Engine->GetCurrentRegion ()->FindTexture (iName);
-  else
-    tex = Engine->GetTextureList ()->FindByName (iName);
+  iTextureWrapper* tex = Engine->FindTexture (name, ResolveOnlyRegion);
   if (tex)
   {
     // Add a default material with the same name as the texture
     iMaterial* material = Engine->CreateBaseMaterial (tex);
     iMaterialWrapper *mat = Engine->GetMaterialList ()->NewMaterial (material);
-    mat->QueryObject()->SetName (iName);
+    // First we have to extract the optional region name from the name:
+    char* n = strchr (name, '/');
+    if (!n) n = (char*)name;
+    else n++;
+    mat->QueryObject()->SetName (n);
     material->DecRef ();
     return mat;
   }
 
   ReportError (
     "crystalspace.maploader.find.material",
-    "Could not find material named '%s'!", iName);
+    "Could not find material named '%s'!", name);
   return NULL;
 }
 
@@ -226,63 +222,7 @@ iMaterialWrapper *csLoader::FindMaterial (const char *iName)
 
 iSector* csLoader::FindSector (const char* name)
 {
-  if (ResolveOnlyRegion && Engine->GetCurrentRegion ())
-  {
-    // We can't use iRegion::FindSector() here because that routine
-    // also returns sectors that are added to the region but not linked
-    // to the engine. Here we need to find sectors that are linked to the
-    // engine AND are in a region. Otherwise we risk finding the dummy
-    // sectors that are created during the loading process.
-    iRegion* reg = Engine->GetCurrentRegion ();
-    iSectorList* sl = Engine->GetSectors ();
-    for (int i = 0 ; i < sl->GetCount () ; i++)
-    {
-      iSector* s = sl->Get (i);
-      if (!strcmp (s->QueryObject ()->GetName (), name))
-      {
-        if (reg->IsInRegion (s->QueryObject ()))
-          return s;
-      }
-    }
-    return NULL;
-  }
-  else
-    return Engine->GetSectors ()->FindByName (name);
-}
-
-bool csLoader::ResolvePortalSectors (iThingState *th)
-{
-  int i;
-  for (i=0;  i < th->GetPolygonCount ();  i++)
-  {
-    iPolygon3D* p = th->GetPolygon (i);
-    if (p && p->GetPortal ())
-    {
-      iPortal *portal = p->GetPortal ();
-      iSector *stmp = portal->GetSector ();
-      // First we check if this sector already has some meshes.
-      // If so then this is not a sector we have to resolve.
-      // This test is here to make this code a little more robust.
-      if (stmp->GetMeshes ()->GetCount () > 0) continue;
-      iSector* snew = FindSector (stmp->QueryObject ()->GetName ());
-      if (!snew)
-      {
-	ReportError (
-	  "crystalspace.maploader.load.portals",
-	  "Sector '%s' not found for portal in polygon '%s/%s'!",
-          stmp->QueryObject ()->GetName (),
-          p->QueryObject ()->GetObjectParent ()->GetName (),
-          p->QueryObject ()->GetName ());
-        return false;
-      }
-      portal->SetSector (snew);
-      // This DecRef() is safe since we know this is supposed to be a dummy
-      // sector. So there will only be one reference to that sector (from
-      // this portal).
-      stmp->DecRef();
-    }
-  }
-  return true;
+  return Engine->FindSector (name, ResolveOnlyRegion);
 }
 
 bool csLoader::LoadMap (char* buf)
@@ -433,39 +373,6 @@ bool csLoader::LoadMap (char* buf)
     {
       TokenError ("a map");
       return false;
-    }
-  }
-
-  int i,j;
-  for (i=0; i<Engine->GetSectors ()->GetCount(); i++)
-  {
-    iSector *Sector = Engine->GetSectors ()->Get (i);
-    if (ResolveOnlyRegion)
-    {
-      // This test avoids redoing sectors that are not in this region.
-      // @@@ But it would be better if we could even limit this loop
-      // to the sectors that were loaded here.
-      iRegion* region = Engine->GetCurrentRegion ();
-      if (region && !region->IsInRegion (Sector->QueryObject ()))
-      {
-        continue;
-      }
-    }
-    iMeshList* ml = Sector->GetMeshes ();
-    for (j=0 ; j < ml->GetCount () ; j++)
-    {
-      iMeshWrapper *Mesh = ml->Get (j);
-      if (Mesh)
-      {
-        iThingState* Thing = SCF_QUERY_INTERFACE_SAFE (
-		Mesh->GetMeshObject(), iThingState);
-        if (Thing)
-        {
-          bool rc = ResolvePortalSectors (Thing);
-	  Thing->DecRef ();
-	  if (!rc) return false;
-        }
-      }
     }
   }
 

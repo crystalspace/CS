@@ -429,6 +429,15 @@ private:
    */
   void ControlMeshes ();
 
+  /**
+   * Split a name into optional 'region/name' format.
+   * This function returns the pointer to the real name of the object.
+   * The *region variable will contain the region is one is given.
+   * If a region was given but none could be found this function returns
+   * NULL (this is an error).
+   */
+  char* SplitRegionName (const char* name, iRegion** region);
+
 public:
   /**
    * The current camera for drawing the world.
@@ -1005,6 +1014,21 @@ public:
   virtual void SetAmbientLight (const csColor &c);
   /// Return the amount of ambient light
   virtual void GetAmbientLight (csColor &c) const;
+
+  virtual iMaterialWrapper* FindMaterial (const char* name,
+	bool ResolveOnlyRegion = false);
+  virtual iTextureWrapper* FindTexture (const char* name,
+	bool ResolveOnlyRegion = false);
+  virtual iSector* FindSector (const char* name,
+	bool ResolveOnlyRegion = false);
+  virtual iMeshWrapper* FindMeshObject (const char* name,
+	bool ResolveOnlyRegion = false);
+  virtual iMeshFactoryWrapper* FindMeshFactory (const char* name,
+	bool ResolveOnlyRegion = false);
+  virtual iCameraPosition* FindCameraPosition (const char* name,
+	bool ResolveOnlyRegion = false);
+  virtual iCollection* FindCollection (const char* name,
+	bool ResolveOnlyRegion = false);
 
   //--------------------- iConfig interface implementation --------------------
 

@@ -1867,6 +1867,137 @@ void csEngine::ControlMeshes ()
   }
 }
 
+char* csEngine::SplitRegionName (const char* name, iRegion** region)
+{
+  *region = NULL;
+  char* p = strchr (name, '/');
+  if (!p) return (char*)name;
+  *p = 0;
+  *region = regions.FindByName (name);
+  *p = '/';
+  if (!*region) return NULL;
+  return p+1;
+}
+
+iMaterialWrapper* csEngine::FindMaterial (const char* name,
+	bool ResolveOnlyRegion)
+{
+  iRegion* region;
+  char* n = SplitRegionName (name, &region);
+  if (!n) return NULL;
+
+  iMaterialWrapper* mat;
+  if (region)
+    mat = region->FindMaterial (n);
+  else if (ResolveOnlyRegion && GetCurrentRegion ())
+    mat = GetCurrentRegion ()->FindMaterial (n);
+  else
+    mat = GetMaterialList ()->FindByName (n);
+  return mat;
+}
+
+iTextureWrapper* csEngine::FindTexture (const char* name,
+	bool ResolveOnlyRegion)
+{
+  iRegion* region;
+  char* n = SplitRegionName (name, &region);
+  if (!n) return NULL;
+
+  iTextureWrapper* txt;
+  if (region)
+    txt = region->FindTexture (n);
+  else if (ResolveOnlyRegion && GetCurrentRegion ())
+    txt = GetCurrentRegion ()->FindTexture (n);
+  else
+    txt = GetTextureList ()->FindByName (n);
+  return txt;
+}
+
+iSector* csEngine::FindSector (const char* name,
+	bool ResolveOnlyRegion)
+{
+  iRegion* region;
+  char* n = SplitRegionName (name, &region);
+  if (!n) return NULL;
+
+  iSector* sect;
+  if (region)
+    sect = region->FindSector (n);
+  else if (ResolveOnlyRegion && GetCurrentRegion ())
+    sect = GetCurrentRegion ()->FindSector (n);
+  else
+    sect = GetSectors ()->FindByName (n);
+  return sect;
+}
+
+iMeshWrapper* csEngine::FindMeshObject (const char* name,
+	bool ResolveOnlyRegion)
+{
+  iRegion* region;
+  char* n = SplitRegionName (name, &region);
+  if (!n) return NULL;
+
+  iMeshWrapper* mesh;
+  if (region)
+    mesh = region->FindMeshObject (n);
+  else if (ResolveOnlyRegion && GetCurrentRegion ())
+    mesh = GetCurrentRegion ()->FindMeshObject (n);
+  else
+    mesh = GetMeshes ()->FindByName (n);
+  return mesh;
+}
+
+iMeshFactoryWrapper* csEngine::FindMeshFactory (const char* name,
+	bool ResolveOnlyRegion)
+{
+  iRegion* region;
+  char* n = SplitRegionName (name, &region);
+  if (!n) return NULL;
+
+  iMeshFactoryWrapper* fact;
+  if (region)
+    fact = region->FindMeshFactory (n);
+  else if (ResolveOnlyRegion && GetCurrentRegion ())
+    fact = GetCurrentRegion ()->FindMeshFactory (n);
+  else
+    fact = GetMeshFactories ()->FindByName (n);
+  return fact;
+}
+
+iCameraPosition* csEngine::FindCameraPosition (const char* name,
+	bool ResolveOnlyRegion)
+{
+  iRegion* region;
+  char* n = SplitRegionName (name, &region);
+  if (!n) return NULL;
+
+  iCameraPosition* campos;
+  if (region)
+    campos = region->FindCameraPosition (n);
+  else if (ResolveOnlyRegion && GetCurrentRegion ())
+    campos = GetCurrentRegion ()->FindCameraPosition (n);
+  else
+    campos = GetCameraPositions ()->FindByName (n);
+  return campos;
+}
+
+iCollection* csEngine::FindCollection (const char* name,
+	bool ResolveOnlyRegion)
+{
+  iRegion* region;
+  char* n = SplitRegionName (name, &region);
+  if (!n) return NULL;
+
+  iCollection* col;
+  if (region)
+    col = region->FindCollection (n);
+  else if (ResolveOnlyRegion && GetCurrentRegion ())
+    col = GetCurrentRegion ()->FindCollection (n);
+  else
+    col = GetCollections ()->FindByName (n);
+  return col;
+}
+
 void csEngine::ReadConfig (iConfigFile *Config)
 {
   csLightMap::SetLightCellSize (

@@ -21,8 +21,9 @@
 
 
 /**
- * This component provides services for other loaders to easily parse properties of
- * standard CS world syntax. This implementation will parse the textual representation.
+ * This component provides services for other loaders to easily parse
+ * properties of standard CS world syntax. This implementation will parse
+ * the textual representation.
  */
 
 #include "imap/services.h"
@@ -33,6 +34,7 @@ struct iObjectRegistry;
 struct iPolygon3D;
 struct iThingState;
 struct iEngine;
+struct iSector;
 struct iMaterialWrapper;
 struct iReporter;
 struct iLoader;
@@ -51,6 +53,7 @@ protected:
   void OptimizePolygon (iPolygon3D *p);
 
   iMaterialWrapper* FindMaterial (iEngine* engine, const char* name);
+  iSector* FindSector (iEngine* engine, const char* name);
 
 public:
 

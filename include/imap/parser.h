@@ -46,7 +46,7 @@ struct iSoundWrapper;
 #define CS_LOADER_NOTRANSFORM	0x00000004
 
 
-SCF_VERSION (iLoader, 0, 0, 3);
+SCF_VERSION (iLoader, 0, 0, 4);
 
 /**
  * This interface represents the map loader.
@@ -127,6 +127,12 @@ struct iLoader : public iBase
    * given to LoadMapFile() above.
    */
   virtual iSector* FindSector (const char *iName) = 0;
+
+  /**
+   * Return true if the loader is currently initialized for finding
+   * objects in current region only.
+   */
+  virtual bool ResolveCurrentRegionOnly () const = 0;
 };
 
 #endif // __IMAP_PARSER_H__

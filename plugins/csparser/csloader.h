@@ -121,6 +121,8 @@ private:
 
   /// Find a sector (in engine or region).
   virtual iSector* FindSector (const char* name);
+  /// Get ResolveOnlyRegion flag.
+  virtual bool ResolveCurrentRegionOnly () const { return ResolveOnlyRegion; }
 
   /// Parse a matrix definition
   bool ParseMatrix (char* buf, csMatrix3 &m);
@@ -168,9 +170,6 @@ private:
   csGenerateImageValue* ParseHeightgenValue (char* buf);
   /// Parse and load a height texture
   bool ParseHeightgen (char* buf);
-
-  /// Resolve the portals of a thing
-  bool ResolvePortalSectors (iThingState *Mesh);
 
   /**
    * Load a LOD control object.
