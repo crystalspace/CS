@@ -844,7 +844,7 @@ A project file is generated when --project is specified.  The type of project
 represented by the project file is selected using the --template option.  The
 template can be one of "appgui", "appcon", "plugin", "library", or "group";
 which represent a GUI application, a console application, a dynamic link
-library (DLL), a static library (LIB), or an group project, respectively.  The
+library (DLL), a static library (LIB), or a group project, respectively.  The
 "group" project type is used for creating pseudo-dependency targets within a
 workspace but does not actually generate any resources.
 
