@@ -437,11 +437,11 @@ public:
 public:
     /// Called by internal code to add a parsed out tree of window components.
     void AddWindowDef(awsComponentNode *win)
-    { win_defs.AddItem(win); n_win_defs++; }
+    { if (!win) return; win_defs.AddItem(win); n_win_defs++; }
 
     /// Called by internal code to add a parsed out tree of skin defintions.
     void AddSkinDef(awsSkinNode *skin)
-    { skin_defs.AddItem(skin); n_skin_defs++; }
+    { if (!skin) return; skin_defs.AddItem(skin); n_skin_defs++; }
 
 public:
     /// Sets the value of a color in the global AWS palette.
