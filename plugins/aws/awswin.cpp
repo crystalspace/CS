@@ -56,7 +56,8 @@ awsWindow::awsWindow () :
   sink(this),
   is_minimized(false),
   popup(0),
-  menu(0)
+  menu(0),
+  window_focused_child(NULL)
 {
   // Window start off hidden.
   SetFlag (AWSF_CMP_HIDDEN);
@@ -220,7 +221,6 @@ bool awsWindow::Setup (iAws *_wmgr, iAwsComponentNode *settings)
   if(~frame_options & foMin)
     min_button.Hide();
 
-
   return true;
 }
 
@@ -301,12 +301,29 @@ bool awsWindow::Execute (const char *action, iAwsParmList* parmlist)
 void awsWindow::Show ()
 {
   awsPanel::Show ();
+
+  // Focusing last focused window child
+  iAwsComponent *comp = GetFocusedChild ();
+
+  if(!comp)
+   comp = GetFirstFocusableChild(this);
+
+  if(comp)
+  {
+    WindowManager ()->SetFocusedComponent (comp);
+    comp->SetFocus();
+  }
+
   Broadcast (sWindowShown);
 }
 
 void awsWindow::Hide ()
 {
   awsPanel::Hide ();
+
+  // Save last focused component
+  SetFocusedChild (WindowManager ()->GetFocusedComponent());
+
   Broadcast (sWindowHidden);
 }
 
@@ -366,12 +383,19 @@ awsMenuBar* awsWindow::GetMenu() { return menu; }
 
 void awsWindow::OnRaise ()
 {
+  iAwsComponent *comp = GetFocusedChild ();
+  if(comp)
+  {
+     WindowManager ()->SetFocusedComponent (comp);
+     comp->SetFocus();
+  }
   Broadcast (sWindowRaised);
   return ;
 }
 
 void awsWindow::OnLower ()
 {
+  SetFocusedChild(WindowManager()->GetFocusedComponent());
   Broadcast (sWindowLowered);
   return ;
 }
@@ -624,6 +648,16 @@ void awsWindow::Resize(int width, int height)
 	// change size
 	awsComponent::Resize(width, height);
 
+}
+
+iAwsComponent *awsWindow::GetFocusedChild ()
+{
+  return window_focused_child;
+}
+
+void awsWindow::SetFocusedChild (iAwsComponent *comp)
+{
+  window_focused_child = comp;
 }
 
 csRect awsWindow::getPreferredSize ()

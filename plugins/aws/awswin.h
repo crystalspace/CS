@@ -90,6 +90,11 @@ private:
   /// a menu currently showing
   awsMenuBar* menu;
 
+  /// Holds focused child on window 
+  /** We have to focus the child when window raises
+      */
+  iAwsComponent* window_focused_child;
+
 protected:
 
   /// Returns true if this is the topmost window
@@ -104,6 +109,12 @@ protected:
 
   /// Resizes the window and all associated items
   virtual void Resize(int width, int height);
+
+  /// Returns focused component on this window
+  iAwsComponent *GetFocusedChild();
+
+  /// Set focused component on this window
+  void SetFocusedChild(iAwsComponent *comp);
 
 public:
   static const unsigned long sWindowRaised;
