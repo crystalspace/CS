@@ -112,12 +112,12 @@ csMovable::csMovable ()
 
 csMovable::~csMovable ()
 {
-  int i = listeners.Length ()-1;
-  while (i >= 0)
+  size_t i = listeners.Length ();
+  while (i > 0)
   {
+    i--;
     iMovableListener *ml = listeners[i];
     ml->MovableDestroyed (&scfiMovable);
-    i--;
   }
   SCF_DESTRUCT_EMBEDDED_IBASE (scfiMovable);
   SCF_DESTRUCT_IBASE ();
@@ -180,12 +180,12 @@ void csMovable::UpdateMove ()
 
   if (object) object->UpdateMove ();
 
-  int i = listeners.Length ()-1;
-  while (i >= 0)
+  size_t i = listeners.Length ();
+  while (i > 0)
   {
+    i--;
     iMovableListener *ml = listeners[i];
     ml->MovableChanged (&scfiMovable);
-    i--;
   }
 }
 

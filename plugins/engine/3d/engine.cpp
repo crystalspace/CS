@@ -2686,7 +2686,6 @@ void csEngine::GetNearbyMeshList (iSector* sector,
               // Also handle objects in the destination sector unless
               // it is a warping sector.
               portal->CompleteSector (0);
-              CS_ASSERT (portal != 0);
               if (sector != portal->GetSector () && portal->GetSector ())
               {
                 size_t l;
