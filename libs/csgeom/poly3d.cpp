@@ -283,7 +283,8 @@ void csPoly3D::CutToPlane (const csPlane3& split_plane)
   sideA = split_plane.Classify (ptA);
   if (ABS (sideA) < SMALL_EPSILON) sideA = 0;
 
-  for (int i = -1 ; ++i < old.num_vertices ; )
+  int i;
+  for (i = -1 ; ++i < old.num_vertices ; )
   {
     ptB = old.vertices[i];
     sideB = split_plane.Classify (ptB);
@@ -336,7 +337,8 @@ void csPoly3D::SplitWithPlaneX (csPoly3D& poly1, csPoly3D& poly2,
   sideA = ptA.x - x;
   if (ABS (sideA) < SMALL_EPSILON) sideA = 0;
 
-  for (int i = -1 ; ++i < num_vertices ; )
+  int i;
+  for (i = -1 ; ++i < num_vertices ; )
   {
     ptB = vertices[i];
     sideB = ptB.x - x;
@@ -393,7 +395,8 @@ void csPoly3D::SplitWithPlaneY (csPoly3D& poly1, csPoly3D& poly2,
   sideA = ptA.y - y;
   if (ABS (sideA) < SMALL_EPSILON) sideA = 0;
 
-  for (int i = -1 ; ++i < num_vertices ; )
+  int i;
+  for (i = -1 ; ++i < num_vertices ; )
   {
     ptB = vertices[i];
     sideB = ptB.y - y;
@@ -450,7 +453,8 @@ void csPoly3D::SplitWithPlaneZ (csPoly3D& poly1, csPoly3D& poly2,
   sideA = ptA.z - z;
   if (ABS (sideA) < SMALL_EPSILON) sideA = 0;
 
-  for (int i = -1 ; ++i < num_vertices ; )
+  int i;
+  for (i = -1 ; ++i < num_vertices ; )
   {
     ptB = vertices[i];
     sideB = ptB.z - z;
@@ -554,7 +558,8 @@ float csPoly3D::GetSignedArea () const
 {
   float area = 0.0;
   // triangulize the polygon, triangles are (0,1,2), (0,2,3), (0,3,4), etc..
-  for (int i=0 ; i < num_vertices-2 ; i++)
+  int i;
+  for (i = 0 ; i < num_vertices-2 ; i++)
     area += csMath3::Area3 ( vertices[0], vertices[i+1], vertices[i+2] );
   return area / 2.0;
 }

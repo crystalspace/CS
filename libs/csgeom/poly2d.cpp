@@ -495,7 +495,8 @@ float csPoly2D::GetSignedArea ()
 {
   float area = 0.0;
   // triangulize the polygon, triangles are (0,1,2), (0,2,3), (0,3,4), etc..
-  for (int i=0 ; i < GetVertexCount()-2 ; i++)
+  int i;
+  for (i = 0 ; i < GetVertexCount()-2 ; i++)
     area += csMath2::Area2 ( vertices[0], vertices[i+1], vertices[i+2] );
   return area / 2.0;
 }

@@ -29,7 +29,8 @@ static float __calc_area (int n, csVector2 *p)
 {
   float area = 0;
 
-  for (int i = 0; i < n; i++)
+  int i;
+  for (i = 0; i < n; i++)
   {
     int j = (i != n - 1) ? i + 1 : 0;
     area += (p [i].y + p [j].y) * (p [i].x - p [j].x);
@@ -78,9 +79,15 @@ void __poly_fill (csVector2 *iVertices, int iVertexCount)
     if (DrawBox)
       DrawBox (Grid.xmin, Grid.ymin, width, height, Arg);
     else
-      for (int i = 0 ; i < height; i++)
-        for (int j = 0 ; j < width; j++)
+	{
+	  int i;
+      for (i = 0 ; i < height; i++)
+	  {
+		int j;
+        for (j = 0 ; j < width; j++)
           PutPixel (Grid.xmin + j, Grid.ymin + i, 1.0, Arg);
+	  }
+	}
     return;
   }
 
@@ -195,7 +202,8 @@ void csAntialiasedPolyFill (csVector2 *iVertices, int iVertexCount,
 
   // Find the bounding box first
   Grid.Set (999999, 999999, -999999, -999999);
-  for (int i = 0; i < iVertexCount; i++)
+  int i;
+  for (i = 0; i < iVertexCount; i++)
   {
     int x = QInt (iVertices [i].x);
     int y = QInt (iVertices [i].y);

@@ -90,7 +90,8 @@ UByte csBoxClipper::Clip (csVector2 *InPolygon, int InCount,
 
   OutCount = OutV;
   BoundingBox.StartBoundingBox (OutPolygon [0]);
-  for (int i = 1; i < OutCount; i++)
+  int i;
+  for (i = 1; i < OutCount; i++)
     BoundingBox.AddBoundingVertexSmart (OutPolygon [i]);
   return Clipped ? CS_CLIP_CLIPPED : CS_CLIP_INSIDE;
 }
@@ -221,7 +222,8 @@ UByte csPolygonClipper::Clip (csVector2 *InPolygon, int InCount,
   if (rc != CS_CLIP_OUTSIDE)
   {
     BoundingBox.StartBoundingBox (OutPolygon [0]);
-    for (int i = 1; i < OutCount; i++)
+	int i;
+    for (i = 1; i < OutCount; i++)
       BoundingBox.AddBoundingVertexSmart (OutPolygon [i]);
   }
   return rc;
