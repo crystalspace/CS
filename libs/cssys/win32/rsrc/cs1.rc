@@ -1,1 +1,12 @@
+// If you ever plan to make your own .rc files...
+//  1. put quotes around the icon files.
+//  2. put a newline at the end of the file.
+//
+// ...the .rc merge script will thank you!
+// 
+// More notes on the script:
+//  - currently only translates paths for ICONs.
+//  - will probably choke if icon is not in an
+//    external file.
+
 1 ICON "cs1.ico"
