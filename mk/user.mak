@@ -53,6 +53,7 @@ PLUGINS += video/loader/dds
 PLUGINS += video/loader/bmp
 PLUGINS += video/loader/tga
 PLUGINS += video/effects
+PLUGINS += video/cursor
 PLUGINS += sound/loader/mplex
 PLUGINS += sound/loader/au
 PLUGINS += sound/loader/aiff

@@ -33,6 +33,7 @@
 #include "iutil/objreg.h"
 #include "ivaria/reporter.h"
 #include "video/canvas/common/scancode.h"
+#include "igraphic/image.h"
 
 // Define this if you want keyboard-grabbing behavior enabled.  For now it is
 // disabled by default.  In the future, we should probably provide an API for
@@ -110,7 +111,10 @@ csXWindow::~csXWindow ()
       q->RemoveListener (scfiEventHandler);
     scfiEventHandler->DecRef ();
   }
+
   delete [] win_title;
+  cachedCursors.DeleteAll ();
+
   SCF_DESTRUCT_EMBEDDED_IBASE (scfiComponent);
   SCF_DESTRUCT_IBASE();
 }
@@ -775,4 +779,75 @@ bool csXWindow::SetMouseCursor (csMouseCursorID iShape)
     XDefineCursor (dpy, ctx_win, EmptyMouseCursor);
     return (iShape == csmcNone);
   } /* endif */
+}
+
+bool csXWindow::SetMouseCursor (iImage *image, csRGBcolor keycolor,
+                                int hotspot_x, int hotspot_y,
+                                csRGBcolor fg, csRGBcolor bg)
+{
+  if (!image) return false;
+
+  // Check for cached cursor - we can only cache images with a name
+  if (image->GetName())
+  {
+    Cursor cur = cachedCursors.Get(image->GetName());
+    if (cur) 
+    {
+      XDefineCursor (dpy, ctx_win, cur);
+      return true;
+    }
+  }
+
+  // Get image info
+  csRGBpixel *pix = (csRGBpixel *) image->GetImageData ();
+  int numpixels = image->GetWidth() * image->GetHeight();
+  int numbytes = (int) ceil (numpixels / 8.0);
+
+  // Data for X functions
+  unsigned char source[numbytes], mask[numbytes];
+  memset (source, 0, numbytes);
+  memset (mask, 0, numbytes);
+
+  // In X we must have a monochrome pointer.  So we take all blacks and
+  // initialise their bit to 0 and all non-blacks and initialise their bit to
+  // 1.  At the same time, we create a mask array based on the keycolor provided
+  for (int i = 0; i < numpixels; i++)
+  {
+    // Calculate current array index and the bit in the char
+    int byte = (int) floor (i / 8.0);
+    int bit = i % 8;
+
+    // Set the appropriate bit in the source and mask bitmaps
+    if (pix[i].red || pix[i].green || pix[i].blue) source[byte] |= (1 << bit);
+    if (pix[i] != keycolor) mask[byte] |= (1 << bit);
+  }
+
+  // Create Xwindow compatible Pixmaps
+  Pixmap srcPixmap = XCreatePixmapFromBitmapData (dpy, ctx_win, (char *) source,
+                                image->GetWidth(), image->GetHeight(), 1, 0, 1);
+  Pixmap maskPixmap = XCreatePixmapFromBitmapData (dpy, ctx_win, (char *) mask,
+                                image->GetWidth(), image->GetHeight(), 1, 0, 1);
+
+  // Create foreground color.  X colors are 16 bit so we must scale them to
+  // keep relative values
+  XColor xfg; 
+  xfg.red = fg.red * 257; xfg.green = fg.green * 257; xfg.blue = fg.blue * 257;
+
+  // Create foreground color.  X colors are 16 bit so we must scale them to
+  // keep relative values
+  XColor xbg; 
+  xbg.red = bg.red * 257; xbg.green = bg.green * 257; xbg.blue = bg.blue * 257;
+    
+  // Create XWindow mouse cursor
+  Cursor mouseCursor = XCreatePixmapCursor (dpy, srcPixmap, maskPixmap, 
+                                            &xfg, &xbg, hotspot_x, hotspot_y);
+  
+  // Select the cursor
+  XDefineCursor (dpy, ctx_win, mouseCursor);
+
+  // Cache a pointer to the cursor (will it will be deleted in the destructor?)
+  if (image->GetName())
+    cachedCursors.Put (image->GetName(), mouseCursor);
+
+  return true;
 }

@@ -22,6 +22,8 @@
 
 #include <stdarg.h>
 #include "csutil/scf.h"
+#include "csutil/hash.h"
+#include "csutil/hashhandlers.h"
 #include "iutil/eventh.h"
 #include "iutil/comp.h"
 #include "iutil/event.h"
@@ -81,6 +83,8 @@ class csXWindow : public iXWindow, public iEventPlug
   Cursor EmptyMouseCursor;
   /// A empty pixmap
   Pixmap EmptyPixmap;
+  /// List of image-based cursors
+  csHash<Cursor, csStrKey, csConstCharHashKeyHandler> cachedCursors;
   //------------------------------------------------------------
 
   void Report (int severity, const char* msg, ...);
@@ -126,6 +130,10 @@ public:
   // Should be in the window manager
   virtual bool SetMousePosition (int x, int y);
   virtual bool SetMouseCursor (csMouseCursorID iShape);
+
+  virtual bool SetMouseCursor (iImage *image, csRGBcolor keycolor, 
+                               int hotspot_x, int hotspot_y,
+                               csRGBcolor fg, csRGBcolor bg);
 
   struct eiComponent : public iComponent
   {

@@ -975,6 +975,12 @@ bool csGraphics2D::SetMouseCursor (csMouseCursorID iShape)
   return (iShape == csmcArrow);
 }
 
+bool csGraphics2D::SetMouseCursor (iImage *, csRGBcolor, int, int, 
+                                   csRGBcolor, csRGBcolor)
+{
+  return false;
+}
+
 
 /**
  * A nice observation about the properties of the human eye:

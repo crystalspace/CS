@@ -117,6 +117,12 @@ public:
   virtual bool SetMouseCursor (csMouseCursorID iShape)
   { return xwin->SetMouseCursor (iShape); }
 
+  /// Set mouse cursor shape
+  // should be the window manager
+  virtual bool SetMouseCursor (iImage *image, csRGBcolor keycolor, int x, int y,
+                                               csRGBcolor fg, csRGBcolor bg)
+  { return xwin->SetMouseCursor (image, keycolor, x, y, fg, bg); }
+
   //------------------------ iEventPlug interface ---------------------------//
 
   virtual unsigned GetPotentiallyConflictingEvents ()

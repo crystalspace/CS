@@ -333,6 +333,18 @@ public:
    */
   virtual bool SetMouseCursor (csMouseCursorID iShape);
 
+  /**
+   * Set mouse cursor using an image.  If the operation is unsupported, 
+   * return 'false' otherwise return 'true'.
+   * On some platforms there is only monochrome pointers available.  In this
+   * all black colors in the image will become the value of 'bg' and all 
+   * non-black colors will become 'fg'
+   */
+  virtual bool SetMouseCursor (iImage *image, csRGBcolor keycolor, 
+                               int hotspot_x = 0, int hotspot_y = 0,
+                               csRGBcolor fg = csRGBcolor(255,255,255),
+                               csRGBcolor bg = csRGBcolor(0,0,0));
+
   struct eiComponent : public iComponent
   {
     SCF_DECLARE_EMBEDDED_IBASE(csGraphics2D);

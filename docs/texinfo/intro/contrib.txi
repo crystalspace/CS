@@ -1285,6 +1285,12 @@ Leandro Ezequiel Lovisolo (@email{lovisolo@@datafull.com})
 
 Leandro contributed the @file{crystal.fgd} definition file for Worldcraft.  He
 also made a few updates to the map2cs tutorial.
+
+@item
+Neil Mosafi (@email{nmosafi@@totalise.co.uk})
+
+Neil contributed a custom cursor plugin which allows use of arbitary
+@samp{iImage}s as mouse cursors.
 @end itemize
 
 @noindent

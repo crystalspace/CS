@@ -1,0 +1,16 @@
+<?xml version="1.0"?>
+<!-- cscursor.csplugin -->
+<plugin>
+  <scf>
+    <classes>
+      <class>
+        <name>crystalspace.graphic.cursor</name>
+        <implementation>csCursor</implementation>
+        <description>Custom cursor selector</description>
+        <requires>
+          <class>crystalspace.graphics2d.</class>
+        </requires>
+      </class>
+    </classes>
+  </scf>
+</plugin>
