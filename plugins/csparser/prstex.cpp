@@ -22,7 +22,7 @@
 #include "csutil/parser.h"
 #include "csloader.h"
 #include "csutil/scanstr.h"
-#include "iutil/xml.h"
+#include "iutil/document.h"
 #include "cstool/proctex.h"
 #include "cstool/prdots.h"
 #include "cstool/prfire.h"

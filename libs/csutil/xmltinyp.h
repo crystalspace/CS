@@ -19,7 +19,7 @@
 #ifndef __CSUTIL_XMLTINYPRIV_H__
 #define __CSUTIL_XMLTINYPRIV_H__
 
-#include "iutil/xml.h"
+#include "iutil/document.h"
 #include "csutil/tinyxml.h"
 
 /**

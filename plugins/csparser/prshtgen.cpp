@@ -21,7 +21,7 @@
 #include "csloader.h"
 #include "csutil/parser.h"
 #include "csutil/scanstr.h"
-#include "iutil/xml.h"
+#include "iutil/document.h"
 #include "csgfx/rgbpixel.h"
 #include "cstool/gentrtex.h"
 #include "ivideo/graph3d.h"

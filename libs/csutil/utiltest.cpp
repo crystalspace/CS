@@ -21,7 +21,7 @@
 #include "qsqrt.h"
 #include "csutil/utiltest.h"
 #include "csutil/xmltiny.h"
-#include "iutil/xml.h"
+#include "iutil/document.h"
 #include "csutil/scfstr.h"
 
 SCF_IMPLEMENT_IBASE (csUtilDebugHelper)

@@ -25,7 +25,7 @@
 #include "csutil/cscolor.h"
 #include "csutil/csstring.h"
 #include "iutil/vfs.h"
-#include "iutil/xml.h"
+#include "iutil/document.h"
 #include "iutil/object.h"
 #include "iutil/objreg.h"
 #include "iutil/eventh.h"

@@ -19,7 +19,7 @@
 #ifndef __CSUTIL_XMLTINY_H__
 #define __CSUTIL_XMLTINY_H__
 
-#include "iutil/xml.h"
+#include "iutil/document.h"
 
 /**
  * This is an SCF compatible wrapper for the TinyXml parser in csutil.

@@ -25,7 +25,7 @@
 #include "csutil/scanstr.h"
 #include "csutil/util.h"
 #include "csutil/scfstr.h"
-#include "iutil/xml.h"
+#include "iutil/document.h"
 #include "csgeom/matrix3.h"
 #include "csgeom/vector3.h"
 #include "csgeom/vector2.h"

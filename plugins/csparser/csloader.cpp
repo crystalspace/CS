@@ -34,7 +34,7 @@
 #include "csloader.h"
 
 #include "iutil/databuff.h"
-#include "iutil/xml.h"
+#include "iutil/document.h"
 #include "imap/reader.h"
 #include "imap/ldrctxt.h"
 #include "imesh/lighting.h"
