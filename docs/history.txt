@@ -1,13 +1,18 @@
 The history order has been reversed so that new features are at the top.
 
+26-Feb-2001
+	- Eric Sunshine moved specification of the special EAX sound libraries
+	  from mk/msvcgen/plugin.tpl to sndeax.mak.
+	- Eric Sunshine added extra clarification to the various discussions of
+	  scfreg to further indicate that its use is entirely optional.
 25-Feb-2001
 	- Added csVertexArrayPool, csPooledVertexArrayPool, and
-	  csDefaultVertexArrayPool. These will be used for pooled
-	  vertex arrays.
+	  csDefaultVertexArrayPool.  These will be used for pooled vertex
+	  arrays.
 23-Feb-2001
-	- Started work on a big change to the way that things control movement. The
-	  CS_ENTITY_MOVEABLE flag is gone. Instead there are now three
-	  options. But they don't work yet.
+	- Started work on a big change to the way that things control movement.
+	  The CS_ENTITY_MOVEABLE flag is gone.  Instead there are now three
+	  options.  But they don't work yet.
 	- Added csThing::SetMovingOption()/GetMovingOption().
 	- Added csThing::WorUpdate().
 22-Feb-2001

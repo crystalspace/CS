@@ -95,8 +95,10 @@ software renderer, a 2D driver, and some network drivers.  If you selected
 @code{USE_PLUGINS=no} then only the executable is generated and the drivers are
 contained in that executable.
 
-If you selected @code{USE_PLUGINS=yes} then you may need to register the
-drivers with the SCF system.  This generally only needs to be done once.  The
+@strong{Optional}: @emph{Only perform this step if you are developing a brand
+new plug-in module or changing the SCF identification of an existing one.}  If
+you selected @code{USE_PLUGINS=yes} then you may need to register the drivers
+with the SCF system.  This generally only needs to be done once.  The
 registration information is maintained in the file @file{scf.cfg}.  However,
 typically this file is already up-to-date, so usually you can skip this step
 altogether.  Only perform this step if the system is unable to locate the

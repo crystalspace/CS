@@ -132,8 +132,11 @@ placed in the src directory.
 @item
 Open MakeShared.mcp in CodeWarrior and make it.
 @item
-Switch back to the finder, select all of the files that end in @file{.shlb} in
-the src folder and drop them on the scfreg application.
+This step is optional.  If you find that a plugin module is not properly
+registered with SCF, then you may try registering it with the scfreg
+application.  To do this, switch back to the finder, select all of the files
+that end in @file{.shlb} in the src folder and drop them on the scfreg
+application.
 @item
 Choose an application to build.  I generally start with walktest.  Make it.
 @item
