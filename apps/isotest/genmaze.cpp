@@ -94,7 +94,7 @@ void csGenMaze::GenOrder(int order[4], int direction)
   CS_ASSERT( direction >= 0 && direction < 4);
   bool done[4];
   int i;
-  for(int i=0; i<4; i++) done[i] = false;
+  for(i=0; i<4; i++) done[i] = false;
   i=0;
   if( float(rand()+1)/RAND_MAX < straightness)
   {
