@@ -783,7 +783,7 @@ bool csEvent::Print(int32 level)
             || (object->type == attribute::tag_int64))
           {
             IndentLevel(level); printf (" Value: %lld\n",
-	      (long long)object->Integer);
+	      (int64)object->Integer);
           }
           if ((object->type == attribute::tag_uint8)
             || (object->type == attribute::tag_uint16)
@@ -791,7 +791,7 @@ bool csEvent::Print(int32 level)
             || (object->type == attribute::tag_uint64))
           {
             IndentLevel(level); printf (" Value: %lld\n",
-              (long long)object->Unsigned);
+              (uint64)object->Unsigned);
           }
           
           if ((object->type == attribute::tag_float)
