@@ -193,8 +193,13 @@ void WalkTest::SetSystemDefaults (iConfigManager *Config)
   const char *val;
   if (!(val = GetNameCL ()))
     val = Config->GetStr ("Walktest.Settings.WorldFile");
-  sprintf (map_dir, "/lev/%s", val);
 
+  // if an absolute path is given, copy it. Otherwise prepend "/lev/".
+  if (val[0] == '/')
+    strcpy (map_dir, val);
+  else
+    sprintf (map_dir, "/lev/%s", val);
+  
   if (GetOptionCL ("clear"))
   {
     do_clear = true;
