@@ -407,7 +407,7 @@ bool cspFileDialog::BuildAndSetPath ()
    	&& (buff [sl - 1] != '/')
       	&& (buff [sl - 1] != pathsep))
       buff [sl++] = pathsep;
-    strncpy (&buff [sl], tmp, MAXPATHLEN - sl);
+    strncpy (&buff [sl], tmp, maxlen - sl);
     cur = cur->prev;
     delete[] tmp;
   } /* endwhile */
