@@ -127,6 +127,7 @@ private:
   static csStringID shadow_normal_name; 
   static csStringID shadow_index_name;
 
+  bool enableShadows;
   csRefArray<iLightRenderStep> steps;
 
   csArray<iMeshWrapper*> shadowMeshes;

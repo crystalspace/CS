@@ -140,6 +140,11 @@ private:
   bool broken_stencil;		// Stencil clipping is broken and avoided.
   bool do_near_plane;
   csPlane3 near_plane;
+  bool stencil_clipping_available;
+  GLuint stencil_clip_mask;
+  GLuint stencil_clip_value;
+  GLuint stencil_shadow_mask;
+  //GLuint stencil_shadow_value;
 
   bool shadow_stencil_enabled;
   bool clipping_stencil_enabled;

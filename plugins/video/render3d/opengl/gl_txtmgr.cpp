@@ -619,6 +619,7 @@ bool csGLTextureHandle::transform (iImageVector *ImageVector, csGLTexture *tex)
     case GL_BLUE: i++;  // Fall thru
     case GL_GREEN: i++;  // Fall thru
     case GL_RED:
+      texelbytes = 1;
       image_data = new uint8 [n * d];
       for (j=0; j < d; j++)
       {
@@ -630,6 +631,7 @@ bool csGLTextureHandle::transform (iImageVector *ImageVector, csGLTexture *tex)
       }
       break;
     case GL_INTENSITY:
+      texelbytes = 1;
       image_data = new uint8 [n*d];
       for (j=0; j < d; j++)
       {
@@ -639,6 +641,7 @@ bool csGLTextureHandle::transform (iImageVector *ImageVector, csGLTexture *tex)
       }
       break;
     case GL_LUMINANCE:
+      texelbytes = 1;
       image_data = new uint8 [n*d];
       for (j=0; j < d; j++)
       {
@@ -648,6 +651,7 @@ bool csGLTextureHandle::transform (iImageVector *ImageVector, csGLTexture *tex)
       }
       break;
     case GL_LUMINANCE_ALPHA:
+      texelbytes = 2;
       image_data = new uint8 [n*2*d];
       for (j=0; j < d; j++)
       {
@@ -664,6 +668,7 @@ bool csGLTextureHandle::transform (iImageVector *ImageVector, csGLTexture *tex)
       {
         case GL_UNSIGNED_BYTE:
 	  nCompo = csGLTextureManager::glformats[formatidx].components;
+	  texelbytes = nCompo;
 	  h = image_data = new uint8 [n*nCompo*d];
           for (j=0; j<d; j++)
           {
@@ -673,6 +678,7 @@ bool csGLTextureHandle::transform (iImageVector *ImageVector, csGLTexture *tex)
           }
 	  break;
         case GL_UNSIGNED_BYTE_3_3_2:
+	  texelbytes = 1;
 	  h = image_data = new uint8 [n*d];
           for (j=0; j < d; j++)
           {
@@ -684,6 +690,7 @@ bool csGLTextureHandle::transform (iImageVector *ImageVector, csGLTexture *tex)
 	  break;
         case GL_UNSIGNED_SHORT_4_4_4_4:
 	  {
+	    texelbytes = 2;
 	    image_data = new uint8 [n*2*d];
 	    unsigned short *ush = (unsigned short *)image_data;
             for (j=0; j < d; j++)
@@ -699,6 +706,7 @@ bool csGLTextureHandle::transform (iImageVector *ImageVector, csGLTexture *tex)
 	  break;
         case GL_UNSIGNED_SHORT_5_5_5_1:
 	  {
+	    texelbytes = 2;
 	    image_data = new uint8 [n*2*d];
 	    unsigned short *ush = (unsigned short *)image_data;
             for (j=0; j < d; j++)
@@ -714,6 +722,7 @@ bool csGLTextureHandle::transform (iImageVector *ImageVector, csGLTexture *tex)
 	  break;
         case GL_UNSIGNED_SHORT_5_6_5:
 	  {
+	    texelbytes = 2;
 	    image_data = new uint8 [n*2*d];
 	    unsigned short *ush = (unsigned short *)image_data;
             for (j=0; j < d; j++)

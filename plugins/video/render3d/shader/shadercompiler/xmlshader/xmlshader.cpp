@@ -347,6 +347,11 @@ csPtr<csXMLShader> csXMLShaderCompiler::CompileTechnique (
   return csPtr<csXMLShader> (newShader);
 }
 
+static inline bool IsDestalphaMixmode (uint mode)
+{
+  return (mode == CS_FX_DESTALPHAADD);
+}
+
 bool csXMLShaderCompiler::LoadPass (iDocumentNode *node, 
 				    csXMLShader::shaderPass *pass)
 {
@@ -407,6 +412,14 @@ bool csXMLShaderCompiler::LoadPass (iDocumentNode *node,
       uint mm;
       if (synldr->ParseMixmode (nodeMixMode, mm, true))
 	pass->mixMode = mm;
+    }
+
+    const csGraphics3DCaps* caps = g3d->GetCaps();
+    if (IsDestalphaMixmode (pass->mixMode) && !caps->DestinationAlpha)
+    {
+      if (do_verbose)
+        SetFailReason ("destination alpha not supported by renderer");
+      return false;
     }
 
     csRef<iDocumentNode> nodeAlphaMode = node->GetNode ("alphamode");

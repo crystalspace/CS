@@ -423,8 +423,8 @@ void csGLGraphics3D::SetupStencil ()
     statecache->GetColorMask (wmRed, wmGreen, wmBlue, wmAlpha);
     statecache->SetColorMask (false, false, false, false);
 
-    statecache->SetStencilMask (128);
-    statecache->SetStencilFunc (GL_ALWAYS, 128, 128);
+    statecache->SetStencilMask (stencil_clip_mask);
+    statecache->SetStencilFunc (GL_ALWAYS, stencil_clip_value, stencil_clip_mask);
     statecache->SetStencilOp (GL_REPLACE, GL_REPLACE, GL_REPLACE);
     glBegin (GL_TRIANGLE_FAN);
       glVertex2f ( 1, -1);
@@ -433,7 +433,7 @@ void csGLGraphics3D::SetupStencil ()
       glVertex2f ( 1,  1);
     glEnd ();
 
-    statecache->SetStencilFunc (GL_ALWAYS, 0, 128);
+    statecache->SetStencilFunc (GL_ALWAYS, 0, stencil_clip_mask);
 
     glBegin (GL_TRIANGLE_FAN);
     int i;
@@ -610,7 +610,7 @@ void csGLGraphics3D::SetupClipper (int clip_portal,
       clip_with_stencil = true;
     else if (clipper && (clipper->GetVertexCount () > 6-reserved_planes))
     {
-      if (broken_stencil)
+      if (broken_stencil || !stencil_clipping_available)
       {
         // If the stencil is broken we will clip with planes
 	// even if we don't have enough planes. We will just
@@ -853,6 +853,12 @@ bool csGLGraphics3D::Open ()
     else
       Report (CS_REPORTER_SEVERITY_NOTIFY, "Point sprites are NOT supported.");
 
+  {
+    int abits;
+    glGetIntegerv (GL_ALPHA_BITS, &abits);
+    rendercaps.DestinationAlpha = abits > 0;
+  }
+
   // check for support of VBO
   use_hw_render_buffers = ext->CS_GL_ARB_vertex_buffer_object;
   if (verbose)
@@ -860,6 +866,22 @@ bool csGLGraphics3D::Open ()
       Report (CS_REPORTER_SEVERITY_NOTIFY, "VBO is supported.");
     else
       Report (CS_REPORTER_SEVERITY_NOTIFY, "VBO is NOT supported.");
+
+  stencil_shadow_mask = 127;
+  {
+    int sbits;
+    glGetIntegerv (GL_STENCIL_BITS, &sbits);
+
+    stencil_clipping_available = sbits > 0;
+    if (stencil_clipping_available)
+      stencil_clip_value = stencil_clip_mask = 1 << (sbits - 1);
+    else
+      stencil_clip_value = stencil_clip_mask = 0;
+    if ((rendercaps.StencilShadows = (sbits > 1)))
+    {
+      stencil_shadow_mask = (1 << (sbits - 1)) - 1;
+    }
+  }
 
   stencil_threshold = config->GetInt ("Video.OpenGL.StencilThreshold", 500);
   broken_stencil = false;
@@ -871,6 +893,8 @@ bool csGLGraphics3D::Open ()
   if (verbose)
     if (broken_stencil)
       Report (CS_REPORTER_SEVERITY_NOTIFY, "Stencil clipping is broken!");
+    else if (!stencil_clipping_available)
+      Report (CS_REPORTER_SEVERITY_NOTIFY, "Stencil clipping is not available");
     else
     {
       if (stencil_threshold >= 0)
@@ -947,7 +971,7 @@ bool csGLGraphics3D::Open ()
   statecache->Enable_GL_CULL_FACE ();
   statecache->SetCullFace (GL_FRONT);
 
-  statecache->SetStencilMask (127);
+  statecache->SetStencilMask (stencil_shadow_mask);
 
   // Set up texture LOD bias.
   if (ext->CS_GL_EXT_texture_lod_bias)
@@ -1189,12 +1213,14 @@ bool csGLGraphics3D::BeginDraw (int drawflags)
 
   if (drawflags & CSDRAW_CLEARZBUFFER)
   {
+    const GLbitfield stencilFlag = 
+      stencil_clipping_available ? GL_STENCIL_BUFFER_BIT : 0;
     statecache->SetDepthMask (GL_TRUE);
     if (drawflags & CSDRAW_CLEARSCREEN)
-      glClear (GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT
+      glClear (GL_DEPTH_BUFFER_BIT | stencilFlag
       	| GL_COLOR_BUFFER_BIT);
     else
-      glClear (GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
+      glClear (GL_DEPTH_BUFFER_BIT | stencilFlag);
   }
   else if (drawflags & CSDRAW_CLEARSCREEN)
     glClear (GL_COLOR_BUFFER_BIT);
@@ -1803,12 +1829,12 @@ void csGLGraphics3D::DrawMesh (const csCoreRenderMesh* mymesh,
   int clip_mask, clip_value;
   if (clipportal_floating)
   {
-    clip_mask = 128;
-    clip_value = 128;
+    clip_mask = stencil_clip_mask;
+    clip_value = stencil_clip_value;
   }
   else if (clipping_stencil_enabled)
   {
-    clip_mask = 128;
+    clip_mask = stencil_clip_mask;
     clip_value = 0;
   }
   else
@@ -1837,7 +1863,7 @@ void csGLGraphics3D::DrawMesh (const csCoreRenderMesh* mymesh,
       break;
     case CS_SHADOW_VOLUME_USE:
       statecache->SetStencilOp (GL_KEEP, GL_KEEP, GL_KEEP);
-      statecache->SetStencilFunc (GL_EQUAL, clip_value, 127 | clip_mask);
+      statecache->SetStencilFunc (GL_EQUAL, clip_value, stencil_shadow_mask | clip_mask);
       break;
     default:
       if (clip_mask)
@@ -2178,8 +2204,8 @@ void csGLGraphics3D::SetupClipPortals ()
 
   // First set up the stencil area.
   statecache->Enable_GL_STENCIL_TEST ();
-  statecache->SetStencilMask (128);
-  statecache->SetStencilFunc (GL_ALWAYS, 128, 128);
+  statecache->SetStencilMask (stencil_clip_mask);
+  statecache->SetStencilFunc (GL_ALWAYS, stencil_clip_value, stencil_clip_mask);
   statecache->SetStencilOp (GL_ZERO, GL_ZERO, GL_REPLACE);
 
   GLboolean wmRed, wmGreen, wmBlue, wmAlpha;
@@ -2197,7 +2223,7 @@ void csGLGraphics3D::SetupClipPortals ()
   Draw2DPolygon (cp->poly, cp->num_poly, cp->normal);
 
   // Use the stencil area.
-  statecache->SetStencilFunc (GL_EQUAL, 128, 128);
+  statecache->SetStencilFunc (GL_EQUAL, stencil_clip_value, stencil_clip_mask);
   statecache->SetStencilOp (GL_KEEP, GL_KEEP, GL_KEEP);
 
   // First clear the z-buffer here.

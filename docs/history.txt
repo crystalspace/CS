@@ -23,6 +23,15 @@ chronological order.
 	- res fixed csSCF::ClassRegistered() returning always "true".
 	- res changed the mixmode of the terrain_fixed_splatting shader to a
 	  sufficient <add /> instead of <destalphaadd />.
+	- res added renderer caps for destination alpha and stencil shadow
+	  support.
+	- res augmented xmlshader to reject techniques that use destination
+	  alpha when the renderer doesn't support it.
+	- res augmented the stencil shadow plugin to not draw shadows when the
+	  renderer doesn't support them.
+	- res fixed cube map texture uploading on display modes <= 16bpp; an
+	  incorrect size was calculated, causing wrong data to be sent to GL
+	  and eventually a crash.
 1-Jul-2004
 	- Eric Sunshine augmented "jam install" so that CS/data/cube and
 	  CS/data/flarge/mosaic-detail.dds are also installed.

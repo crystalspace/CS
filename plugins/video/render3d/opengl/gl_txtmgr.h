@@ -113,6 +113,7 @@ private:
 public:
   int bpp;
   int formatidx;
+  int texelbytes;
   int orig_width, orig_height;
   csArray<csGLTexture*> vTex;
   csRef<csGLGraphics3D> G3D;

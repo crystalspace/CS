@@ -386,9 +386,10 @@ void csGLTextureCache::Load (csTxtCacheData *d, bool reload)
       // >>= 3 == /= 8 ... turning bits per pixel int bytes per pixel
       // componentcount
 
-      int compcount = csGLTextureManager::glformats[txt_mm->formatidx]
-      	.components;
-      int cursize = togl->get_width() * togl->get_height () * compcount;
+      //int compcount = csGLTextureManager::glformats[txt_mm->formatidx]
+      	//.components;
+      int cursize = togl->get_width() * togl->get_height () * 
+	togl->Parent->texelbytes;
 
       uint8 *data = togl->image_data;
 

@@ -416,6 +416,7 @@ csStencilShadowStep::csStencilShadowStep (csStencilShadowType* type) :
   SCF_CONSTRUCT_IBASE (0);
   csStencilShadowStep::type = type;
   shadowDrawVisCallback.parent = this;
+  enableShadows = false;
 }
 
 csStencilShadowStep::~csStencilShadowStep ()
@@ -453,6 +454,13 @@ bool csStencilShadowStep::Initialize (iObjectRegistry* objreg)
   if (shadow_index_name == csInvalidStringID)
     shadow_index_name = strings->Request ("indices");
 
+  const csGraphics3DCaps* caps = g3d->GetCaps();
+  enableShadows = caps->StencilShadows;
+  if (!enableShadows)
+  {
+    Report (CS_REPORTER_SEVERITY_NOTIFY, 
+      "Renderer does not support stencil shadows");
+  }
   return true;
 }
 
@@ -548,7 +556,7 @@ void csStencilShadowStep::Perform (iRenderView* rview, iSector* sector,
 	iLight* light, csShaderVarStack &stacks)
 {
   iShader* shadow;
-  if ((shadow = type->GetShadow ()) == 0)
+  if (!enableShadows || ((shadow = type->GetShadow ()) == 0))
   {
     for (size_t i = 0; i < steps.Length (); i++)
     {

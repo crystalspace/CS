@@ -388,7 +388,22 @@ struct csGraphics3DCaps
   G3D_FOGMETHOD fog;
   bool NeedsPO2Maps;
   int MaxAspectRatio;
+
+  // The following caps are only used by NR
+
+  /**
+   * Whether point sprites are supported. If \a true, geometry of the type
+   * CS_MESHTYPE_POINT_SPRITES can be drawn.
+   */
   bool SupportsPointSprites;
+  /**
+   * Mixmodes utilizing destination alpha are properly supported.
+   */
+  bool DestinationAlpha;
+  /**
+   * Enough stencil bits for stencil shadows are available.
+   */
+  bool StencilShadows;
 };
 
 //===========================================================================
