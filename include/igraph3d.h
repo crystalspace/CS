@@ -182,7 +182,8 @@ typedef enum
   FX_Multiply2,
   FX_Add,
   FX_Copy,
-  FX_Alpha
+  FX_Alpha,
+  FX_Transparent
 } DPFXMixMode;
 
 
@@ -377,6 +378,20 @@ public:
    * Warning! After calling this function you are not allowed to do
    * any calls to the 3D rasterizer other than DrawPolygonFX() and
    * FinishPolygonFX().
+   *
+   * Warning! Do not rely on this method to handle Color keying under
+   * all circumstances. Color Keying will only work reliable in Mixmodes
+   * FX_Copy, FX_Add and FX_Transparent. When using FX_Multiply
+   * and FX_Multiply2, it depends very much on the driver if it works or
+   * not. For example the RivaTNT Detonator 0.48 driver can display 
+   * Multiply with color keying, while newer versions can't. They will 
+   * then not display anything at all. It is always safer to use a texture
+   * where transparent sections are white or 50% gray if you want to achieve
+   * transparent sections in Multiply, Multiply2.
+   * There are also some drivers (which I would consider buggy...), that won't
+   * display FX_Alpha correctly with Color Keying. I can't provide a valid 
+   * workaround for that except using FX_Multiplay and FX_Add, to manually
+   * create the image, but that would be very expensive.
    * 
    * parameters:
    * handle:  The texture handle as returned by ITextureManager.
@@ -399,9 +414,7 @@ public:
 
   /**
    * Draw a polygon with special effects. This is the most rich and slowest
-   * variant of DrawPolygonXxx. In future, we should try to use a common 
-   * interface for all Polygon drawing. For now, you will have to use 
-   * this method, if you need advanced possibilities.
+   * variant of DrawPolygonXxx. (If you use these features) 
    */
   STDMETHOD (DrawPolygonFX)    (G3DPolygonDPFX& poly) PURE;
 
