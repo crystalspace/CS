@@ -1,6 +1,8 @@
 he history order is reversed so that new features are at the top.
 
 14-Jan-2002
+	- Fixed a bug in the OpenGL renderer which 'res' introduced
+	  by forgetting to test if txt_mm is non-NULL in FlushDrawPolygon().
 	- Eric Sunshine committed the following changes on behalf of Matthew
 	  Reda <mreda@mac.com>:
 	    - Augmented csosdefs.h, macosx.mak, NeXTFrameBuffer32.cpp,

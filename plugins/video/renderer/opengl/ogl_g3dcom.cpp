@@ -1783,7 +1783,7 @@ void csGraphics3DOGLCommon::FlushDrawPolygon ()
 
   queue.Reset ();
 
-  if (txt_mm->GetKeyColor())
+  if (txt_mm && txt_mm->GetKeyColor())
   {
     glDisable (GL_ALPHA_TEST);
   }
