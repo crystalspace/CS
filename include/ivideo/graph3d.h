@@ -98,7 +98,6 @@ struct csPixelFormat;
 #define CS_FX_TILING       0x02000000 
 /// alpha = 0..FF (opaque..transparent)
 #define CS_FX_MASK_ALPHA   0x000000FF 
-/** @} */
 
 /// Macro for setting of alpha bits into mixmode (alpha between 0 and 1).
 #define CS_FX_SETALPHA(alpha) \
@@ -106,6 +105,7 @@ struct csPixelFormat;
 /// Macro for setting of alpha bits into mixmode (alpha between 0 and 255).
 #define CS_FX_SETALPHA_INT(alpha) \
   (CS_FX_ALPHA | uint (alpha & CS_FX_MASK_ALPHA))
+/** @} */
 
 /// Vertex Structure for use with G3DPolygonDPQ
 class G3DTexturedVertex : public csVector2
@@ -222,8 +222,7 @@ struct G3DPolygonDP : public G3DPolygonDFP
 /// Structure containing all info needed by DrawPolygonFlat (DPF)
 typedef G3DPolygonDP G3DPolygonDPF;
 
-/**\ Z-buffer modes
- */
+/// Z-buffer modes
 enum csZBufMode
 {
   // values below are sometimes used as bit masks, so don't change them!
