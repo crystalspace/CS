@@ -190,6 +190,40 @@ inline void csVector::QuickSort (int Mode)
 }
 
 /**
+ * This is a helper macro for typed vectors. It defines all methods that are
+ * valid for usual typed vectors and typed SCF vectors. This basically
+ * excludes all methods where objects would have to be IncRef'ed or DecRef'ed
+ * in SCF vectors, all methods that have a 'DeleteIt' parameter for
+ * usual typed vectors, and methods that return 'insecure' references. <p>
+ */
+#define DECLARE_TYPED_VECTOR_HELPER(NAME,TYPE)				\
+    inline NAME (int ilimit = 16, int ithreshold = 16) :		\
+      csVector (ilimit, ithreshold) {}					\
+    virtual ~NAME ()							\
+    { DeleteAll (); }							\
+    inline void SetLength (int n)					\
+    { csVector::SetLength(n); }						\
+    inline int Length () const						\
+    { return count; }							\
+    inline int Limit () const						\
+    { return limit; }							\
+    inline void Exchange (int n1, int n2)				\
+    { csVector::Exchange (n1, n2); }					\
+    inline void QuickSort (int Left, int Right, int Mode = 0)		\
+    { csVector::QuickSort (Left, Right, Mode); }			\
+    inline void QuickSort (int Mode = 0)				\
+    { csVector::QuickSort (Mode); }					\
+    inline int Find (TYPE *which) const					\
+    { return csVector::Find ((csSome)which); }				\
+    inline int FindKey (csConstSome Key, int Mode = 0) const		\
+    { return csVector::FindKey (Key, Mode); }				\
+    inline int FindSortedKey (csConstSome Key, int Mode = 0) const	\
+    { return csVector::FindSortedKey (Key, Mode); }			\
+    inline TYPE *Pop ()							\
+    { return (TYPE *)csVector::Pop(); }
+
+
+/**
  * Declares a new vector type NAME as a subclass of csVector. Elements of
  * this vector are of type TYPE. The elements are automatically delete'd
  * on either Delete() or DeleteAll() or upon vector destruction. This macro
@@ -214,10 +248,7 @@ inline void csVector::QuickSort (int Mode)
     { return csVector::Delete (n, FreeIt); }				\
     inline void DeleteAll (bool FreeThem = true)			\
     { csVector::DeleteAll (FreeThem); }					\
-    inline NAME (int ilimit = 16, int ithreshold = 16) :		\
-      csVector (ilimit, ithreshold) {}					\
-    virtual ~NAME ()							\
-    { DeleteAll (); }							\
+    DECLARE_TYPED_VECTOR_HELPER (NAME, TYPE)				\
     inline TYPE *& operator [] (int n)					\
     { return (TYPE *&)csVector::operator [] (n); }			\
     inline TYPE *& operator [] (int n) const				\
@@ -226,33 +257,12 @@ inline void csVector::QuickSort (int Mode)
     { return (TYPE *&)csVector::Get(n); }				\
     inline int Push (TYPE *what)					\
     { return csVector::Push((csSome)what); }				\
-    inline TYPE *Pop ()							\
-    { return (TYPE *)csVector::Pop(); }					\
     inline bool Insert (int n, TYPE *Item)				\
     { return csVector::Insert (n, (csSome)Item); }			\
-    inline int InsertSorted (TYPE *Item, int *oEqual = NULL,		\
-	int Mode = 0)							\
+    inline int InsertSorted (TYPE *Item, int *oEqual = NULL, int Mode = 0) \
     { return csVector::InsertSorted ((csSome)Item, oEqual, Mode); }	\
-    inline int Find (TYPE *which) const					\
-    { return csVector::Find ((csSome)which); }				\
     inline bool Replace (int n, TYPE *what, bool FreePrevious = true)	\
     { return csVector::Replace(n, (csSome)what, FreePrevious); }	\
-    inline void SetLength (int n)					\
-    { csVector::SetLength(n); }						\
-    inline int Length () const						\
-    { return count; }							\
-    inline int Limit () const						\
-    { return limit; }							\
-    inline void Exchange (int n1, int n2)				\
-    { csVector::Exchange (n1, n2); }					\
-    inline void QuickSort (int Left, int Right, int Mode = 0)		\
-    { csVector::QuickSort (Left, Right, Mode); }			\
-    inline void QuickSort (int Mode = 0)				\
-    { csVector::QuickSort (Mode); }					\
-    inline int FindKey (csConstSome Key, int Mode = 0) const		\
-    { return csVector::FindKey (Key, Mode); }				\
-    inline int FindSortedKey (csConstSome Key, int Mode = 0) const	\
-    { return csVector::FindSortedKey (Key, Mode); }			\
     inline bool FreeTypedItem (TYPE *OBJ) {
 
 #define END_TYPED_VECTOR_EXT(TYPE)					\
@@ -277,5 +287,38 @@ inline void csVector::QuickSort (int Mode)
   BEGIN_TYPED_VECTOR_EXT (NAME,TYPE,obj)				\
     return true;							\
   END_TYPED_VECTOR_EXT (TYPE)
+
+/**
+ * This is a special version of typed vectors that contain SCF objects. The
+ * vector will correctly IncRef all added objects and DecRef all removed
+ * objects. There is only one exeption: The Pop() function does not DecRef
+ * the object, so you should do that yourself. The reason is that at the time
+ * you call Pop(), you do usually not have a pointer to the object, so you can
+ * not IncRef() it before.
+ */
+#define DECLARE_TYPED_SCF_VECTOR(NAME,TYPE)				\
+  class NAME : private csVector						\
+  {									\
+  public:								\
+    inline bool Delete (int n)						\
+    { return csVector::Delete (n, true); }				\
+    inline void DeleteAll ()						\
+    { csVector::DeleteAll (true); }					\
+    DECLARE_TYPED_VECTOR_HELPER (NAME, TYPE)				\
+    inline TYPE *operator [] (int n) const				\
+    { return (TYPE *)csVector::operator [] (n); }			\
+    inline TYPE *Get (int n) const					\
+    { return (TYPE *)csVector::Get(n); }				\
+    inline int Push (TYPE *what)					\
+    { what->IncRef (); return csVector::Push((csSome)what); }		\
+    inline bool Insert (int n, TYPE *Item)				\
+    { Item->IncRef (); return csVector::Insert (n, (csSome)Item); }	\
+    inline int InsertSorted (TYPE *Item, int *oEqual = NULL, int Mode = 0) \
+    { Item->IncRef (); return csVector::InsertSorted ((csSome)Item, oEqual, Mode); } \
+    inline bool Replace (int n, TYPE *what)				\
+    { what->IncRef (); return csVector::Replace(n, (csSome)what, true); \
+    virtual bool FreeItem (csSome Item)					\
+    { ((TYPE *)Item)->DecRef (); return true;}				\
+  }
 
 #endif // __CSVECTOR_H__
