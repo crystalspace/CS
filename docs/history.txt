@@ -1,6 +1,23 @@
 The history order is reversed so that new features are at the top.
 
 3-May-2001
+	- Wouter Wijngaards did the following:
+	  added a class that can generate iImages for terrain textures on
+	  the fly. It is untested for the moment. You give some layers to it.
+	  Each layer has a height where it is predominantly visible. Each
+	  layers texture will show when the heightmaps is near that height.
+	  In between the textures are blended.  You can also give layer
+	  offset and scale. The textures are scaled up using trilinear
+	  interpolation.
+	  You can use this by creating the class. Then set the height
+	  function to use. Then add some layers. Then generate parts of the
+	  terrain texture, as iImages.
+	- Philip Wyett removed the Direct3D and related Direct Draw plugins
+	  from the win32 build process. This affects both mingw and
+	  MSVC ports.
+	- Philip Wyett changed Win32 OpenGL2D canvas from using a
+	  standard popup window. to using a complete and correct caption
+	  window with full system menu support.
 	- Martin Geisse removed a few warnings in stars and OpenGL.
 	- Changed the do_clip parameter in G3DTriangleMesh to clip_portal
 	  and clip_plane.
