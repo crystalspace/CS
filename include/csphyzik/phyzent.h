@@ -95,9 +95,11 @@ public:
   // collision routines
   // resolve collision with a body.  warning: original cont may be modified
   virtual void resolve_collision( ctCollidingContact *cont );
-  // can use this to impart and impulse to this object.
-  virtual void apply_impulse( ctVector3 impulse_point,
-			      ctVector3 impulse_vector );
+
+  /// can use this to impart and impulse to this object.
+  /// impulse_point is vector from center of body to point of collision in 
+  /// world coordinates.  impulse_vector is in world coords
+  virtual void apply_impulse( ctVector3 impulse_point, ctVector3 impulse_vector );
   virtual real get_impulse_m(){ return DEFAULT_ENTITY_MASS; }
   virtual ctMatrix3 get_impulse_I_inv() {
     return ctMatrix3( 1.0/get_impulse_m() );
