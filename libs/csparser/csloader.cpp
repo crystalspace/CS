@@ -2339,6 +2339,7 @@ void csLoader::txt_process (char *name, char* buf, const char* prefix)
   csColor transp (0, 0, 0);
   bool do_transp = false;
   int flags = 0;
+  int not_flags = 0;
 
   while ((cmd = csGetCommand (&buf, commands, &params)) > 0)
   {
@@ -2346,11 +2347,11 @@ void csLoader::txt_process (char *name, char* buf, const char* prefix)
     {
       case TOKEN_TEX2D:
         flags |= CS_TEXTURE_2D;
-	flags &= ~CS_TEXTURE_3D;
+	not_flags |= CS_TEXTURE_3D;
         break;
       case TOKEN_TEX3D:
         flags |= CS_TEXTURE_3D;
-	flags &= ~CS_TEXTURE_2D;
+	not_flags |= CS_TEXTURE_2D;
         break;
       case TOKEN_TEX2D3D:
         flags |= CS_TEXTURE_2D | CS_TEXTURE_3D;
@@ -2407,6 +2408,7 @@ void csLoader::txt_process (char *name, char* buf, const char* prefix)
 
   csTextureHandle *tex = World->GetTextures ()->NewTexture (image);
   tex->flags |= flags;
+  tex->flags &= ~not_flags;
   if (prefix)
   {
     char *prefixedname = new char [strlen (name) + strlen (prefix) + 2];
