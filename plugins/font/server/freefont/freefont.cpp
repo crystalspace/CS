@@ -62,6 +62,7 @@ bool csFreeTypeRender::Initialize (iSystem *pSystem)
     int i;
     for (i=0; i<vFonts.Length(); i++ ){
       pSystem->Printf (MSG_INITIALIZATION, "Load font %s\n",(const char*)vFonts[i]);
+      
       LoadFont ((const char*)vFonts[i], ftini->GetStr (p, (const char*)vFonts[i]));
     }
     succ = (vFonts.Length() == 0 || fonts.Length() > 0 );

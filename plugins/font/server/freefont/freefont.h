@@ -54,9 +54,9 @@ class csFreeTypeRender : public iFontRender
       { 
 	for(int i=0; i<cache.Length(); i++){
 	  for(int j=0; j<256; j++) delete [] cache.Get(i)->outlines[j].Bitmap;
-	  TT_Close_Face (face);
 	  delete cache.Get (i);
 	}
+	TT_Close_Face (face);
       }
 
     FTDef* GetFontDef (int size){ int i=cache.FindKey ((csConstSome)size); return (i==-1?NULL:cache.Get (i));}
