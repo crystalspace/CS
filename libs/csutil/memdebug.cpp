@@ -520,6 +520,63 @@ void operator delete[] (void* p)
 
 #elif 0	// COMP_VC
 //========================================================================
+// This alternative branch allows for checking allocated memory amounts.
+//========================================================================
+
+#ifdef CS_EXTENSIVE_MEMDEBUG_IMPLEMENT
+#undef new
+static size_t alloc_total = 0;
+static size_t alloc_cnt = 0;
+void* operator new (size_t s, void* filename, int line)
+{
+  alloc_total += s;
+  alloc_cnt++;
+  uint32* rc = (uint32*)malloc (s+8);
+  *rc++ = 0xdeadbeef;
+  *rc++ = s;
+  printf ("+ %p %d %d %s\n", &alloc_total, alloc_total, alloc_cnt, filename);
+  fflush (stdout);
+  return (void*)rc;
+}
+void* operator new[] (size_t s, void* filename, int line)
+{
+  alloc_total += s;
+  alloc_cnt++;
+  uint32* rc = (uint32*)malloc (s+8);
+  *rc++ = 0xdeadbeef;
+  *rc++ = s;
+  printf ("+ %p %d %d %s\n", &alloc_total, alloc_total, alloc_cnt, filename);
+  fflush (stdout);
+  return (void*)rc;
+}
+void operator delete (void* p)
+{
+  if (p)
+  {
+    uint32* rc = ((uint32*)p)-2;
+    CS_ASSERT (*rc == 0xdeadbeef);
+    alloc_total -= rc[1];
+    alloc_cnt--;
+    free ((void*)rc);
+    printf ("- %p %d %d\n", &alloc_total, alloc_total, alloc_cnt);
+  }
+}
+void operator delete[] (void* p)
+{
+  if (p)
+  {
+    uint32* rc = ((uint32*)p)-2;
+    CS_ASSERT (*rc == 0xdeadbeef);
+    alloc_total -= rc[1];
+    alloc_cnt--;
+    free ((void*)rc);
+    printf ("- %p %d %d\n", &alloc_total, alloc_total, alloc_cnt);
+  }
+}
+#endif	// CS_EXTENSIVE_MEMDEBUG_IMPLEMENT
+
+#elif 0	// COMP_VC
+//========================================================================
 // This alternative branch allows for dumping all memory allocations.
 //========================================================================
 
