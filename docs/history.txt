@@ -15,6 +15,9 @@ chronological order.
 	  scaled to fit po2 sizes.
 	- Jorrit fixed a bug in the loader. It wouldn't parse <keepimage/>
 	  correctly.
+	- Jorrit fixed the software renderer so that it now scales the image
+	  to power of two dimension at Prepare time and not at register time.
+	  That way it works more like the OpenGL renderer.
 25-Nov-2003
 	- Eric Sunshine removed the ugly, semi-private, legacy name_VERSION and
 	  name_scfGetID() API which SCF_VERSION() created for each declared

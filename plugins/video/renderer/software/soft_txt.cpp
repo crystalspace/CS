@@ -42,8 +42,6 @@ csTextureHandleSoftware::csTextureHandleSoftware (
 	: csTextureHandle (image, flags)
 {
   pal2glob = 0;
-  if (flags & CS_TEXTURE_3D)
-    AdjustSizePo2 ();
   (this->texman = texman)->IncRef ();
   use_332_palette = false;
   update_number = ~0;
@@ -269,6 +267,8 @@ void csTextureHandleSoftware::remap_texture ()
 
 void csTextureHandleSoftware::Prepare ()
 {
+  if (flags & CS_TEXTURE_3D)
+    AdjustSizePo2 ();
   CreateMipmaps ();
   remap_texture ();
 }
