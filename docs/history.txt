@@ -8,6 +8,8 @@ The history order is reversed so that new features are at the top.
 	  simple tutorial to the 'Tutorial Introduction' chapter.
 	- Eric Sunshine fixed a bug in cs-config.temppost.  Was interpolating
 	  $@ instead of ${id_rest}.
+	- Eric Sunshine fixed variable interpolation for older Bourne shells in
+	  cs-config.temppost.
 20-Nov-2001
 	- Small fix in csObject::SetName() with relation to the debugging
 	  graph.
