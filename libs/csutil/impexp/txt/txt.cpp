@@ -5,8 +5,8 @@
 
 
     Based on IVCON - converts various 3D graphics file
-	Author: John Burkardt - used with permission
-	CS adaption and conversion to C++ classes  Bruce Williams
+    Author: John Burkardt - used with permission
+    CS adaption and conversion to C++ classes  Bruce Williams
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -24,6 +24,7 @@
 */
 
 
+#include "sysdef.h"
 #include "csutil/impexp/impexp.h"
 
 // converter.cpp: implementation of the converter class.
