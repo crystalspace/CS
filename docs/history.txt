@@ -10,7 +10,8 @@ chronological order.
 	- Jorrit changed 'userobject' in csKDTree to a csRef<iBase>.
 	- Eric Sunshine increased robustness of CS_STATIC_VARIABLE_CLEANUP by
 	  making it operate gracefully if invoked multiple times; rather than
-	  simply crashing.
+	  simply crashing.  Also fixed it so that it does not realloc() a null
+	  pointer since doing so is not portable.
 4-Mar-2004
 	- Eric Sunshine renamed the CS Java bindings package to
 	  com.crystalspace (was net.sourceforge.crystal).
