@@ -135,9 +135,9 @@ void add_particles_rain (csSector* sector, char* matname, int num, float speed)
     bbox.AddBoundingVertexSmart (pset->Vwor (pset_bbox->i8));
 
     // @@@ Memory leak on factories!
-    iMeshObjectType* type = QUERY_PLUGIN_CLASS (System, "crystalspace.meshobj.rain",
+    iMeshObjectType* type = QUERY_PLUGIN_CLASS (System, "crystalspace.mesh.object.rain",
       	  "MeshObj", iMeshObjectType);
-    if (!type) type = LOAD_PLUGIN (System, "crystalspace.meshobj.rain",
+    if (!type) type = LOAD_PLUGIN (System, "crystalspace.mesh.object.rain",
       	  "MeshObj", iMeshObjectType);
     iMeshObjectFactory* factory = type->NewFactory ();
     iMeshObject* mesh = factory->NewInstance ();
@@ -210,9 +210,9 @@ void add_particles_snow (csSector* sector, char* matname, int num, float speed)
     bbox.AddBoundingVertexSmart (pset->Vwor (pset_bbox->i8));
 
     // @@@ Memory leak on factories!
-    iMeshObjectType* type = QUERY_PLUGIN_CLASS (System, "crystalspace.meshobj.snow",
+    iMeshObjectType* type = QUERY_PLUGIN_CLASS (System, "crystalspace.mesh.object.snow",
       	  "MeshObj", iMeshObjectType);
-    if (!type) type = LOAD_PLUGIN (System, "crystalspace.meshobj.snow",
+    if (!type) type = LOAD_PLUGIN (System, "crystalspace.mesh.object.snow",
       	  "MeshObj", iMeshObjectType);
     iMeshObjectFactory* factory = type->NewFactory ();
     iMeshObject* mesh = factory->NewInstance ();
@@ -252,9 +252,9 @@ void add_particles_fire (csSector* sector, char* matname, int num,
   }
 
   // @@@ Memory leak on factories!
-  iMeshObjectType* type = QUERY_PLUGIN_CLASS (System, "crystalspace.meshobj.fire",
+  iMeshObjectType* type = QUERY_PLUGIN_CLASS (System, "crystalspace.mesh.object.fire",
       	"MeshObj", iMeshObjectType);
-  if (!type) type = LOAD_PLUGIN (System, "crystalspace.meshobj.fire",
+  if (!type) type = LOAD_PLUGIN (System, "crystalspace.mesh.object.fire",
       	"MeshObj", iMeshObjectType);
   iMeshObjectFactory* factory = type->NewFactory ();
   iMeshObject* mesh = factory->NewInstance ();
@@ -293,9 +293,9 @@ void add_particles_fountain (csSector* sector, char* matname, int num,
   }
 
   // @@@ Memory leak on factories!
-  iMeshObjectType* type = QUERY_PLUGIN_CLASS (System, "crystalspace.meshobj.fountain",
+  iMeshObjectType* type = QUERY_PLUGIN_CLASS (System, "crystalspace.mesh.object.fountain",
       	"MeshObj", iMeshObjectType);
-  if (!type) type = LOAD_PLUGIN (System, "crystalspace.meshobj.fountain",
+  if (!type) type = LOAD_PLUGIN (System, "crystalspace.mesh.object.fountain",
       	"MeshObj", iMeshObjectType);
   iMeshObjectFactory* factory = type->NewFactory ();
   iMeshObject* mesh = factory->NewInstance ();
@@ -337,9 +337,9 @@ void add_particles_explosion (csSector* sector, const csVector3& center, char* m
   }
 
   // @@@ Memory leak on factories!
-  iMeshObjectType* type = QUERY_PLUGIN_CLASS (System, "crystalspace.meshobj.explo",
+  iMeshObjectType* type = QUERY_PLUGIN_CLASS (System, "crystalspace.mesh.object.explosion",
       	"MeshObj", iMeshObjectType);
-  if (!type) type = LOAD_PLUGIN (System, "crystalspace.meshobj.explo",
+  if (!type) type = LOAD_PLUGIN (System, "crystalspace.mesh.object.explosion",
       	"MeshObj", iMeshObjectType);
   iMeshObjectFactory* factory = type->NewFactory ();
   iMeshObject* mesh = factory->NewInstance ();
@@ -386,9 +386,9 @@ void add_particles_spiral (csSector* sector, const csVector3& bottom, char* matn
   }
 
   // @@@ Memory leak on factories!
-  iMeshObjectType* type = QUERY_PLUGIN_CLASS (System, "crystalspace.meshobj.spiral",
+  iMeshObjectType* type = QUERY_PLUGIN_CLASS (System, "crystalspace.mesh.object.spiral",
       	"MeshObj", iMeshObjectType);
-  if (!type) type = LOAD_PLUGIN (System, "crystalspace.meshobj.spiral",
+  if (!type) type = LOAD_PLUGIN (System, "crystalspace.mesh.object.spiral",
       	"MeshObj", iMeshObjectType);
   iMeshObjectFactory* factory = type->NewFactory ();
   iMeshObject* mesh = factory->NewInstance ();

@@ -18,21 +18,21 @@
 # as shared libraries. Please think twice before adding anything to PLUGINS;
 # in most cases you will want to add to PLUGINS.DYNAMIC.
 
-PLUGINS += video/renderer video/canvas
+PLUGINS += video/renderer video/canvas  # Do not remove this line.
 PLUGINS += filesys/vfs
 PLUGINS += simpcon
-PLUGINS += font/server/csfont 
 PLUGINS += colldet/rapid
-PLUGINS += meshobj/cube meshldr/cube
-PLUGINS += meshobj/spr2d meshldr/spr2d
-PLUGINS += meshobj/fountain meshldr/fountain
-PLUGINS += meshobj/explo meshldr/explo
-PLUGINS += meshobj/fire meshldr/fire
-PLUGINS += meshobj/snow meshldr/snow
-PLUGINS += meshobj/rain meshldr/rain
-PLUGINS += meshobj/spiral meshldr/spiral
-PLUGINS += meshobj/ball meshldr/ball
 PLUGINS += perfstat
+PLUGINS += font/server/csfont 
+PLUGINS += mesh/object/cube     mesh/loader/cube
+PLUGINS += mesh/object/spr2d    mesh/loader/spr2d
+PLUGINS += mesh/object/fountain mesh/loader/fountain
+PLUGINS += mesh/object/explo    mesh/loader/explo
+PLUGINS += mesh/object/fire     mesh/loader/fire
+PLUGINS += mesh/object/snow     mesh/loader/snow
+PLUGINS += mesh/object/rain     mesh/loader/rain
+PLUGINS += mesh/object/spiral   mesh/loader/spiral
+PLUGINS += mesh/object/ball     mesh/loader/ball
 PLUGINS.DYNAMIC += video/renderer/line video/renderer/null video/renderer/inf
 PLUGINS.DYNAMIC += sound/loader
 PLUGINS.DYNAMIC += cscon

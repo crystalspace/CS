@@ -2,6 +2,21 @@ The history order has been reversed so that new features are at the top.
 
 11-Jan-2001
 	- Wyatt Miler updated the Macintosh project files.
+	- Eric Sunshine made the following changes to the project:
+	    - Renamed the following project directories:
+		CS/plugins/meshldr --> CS/plugins/mesh/loader
+		CS/plugins/meshobj --> CS/plugins/mesh/object
+	    - Renamed the following SCF class names, prefixes, and suffixes:
+		crystalspace.meshldr --> crystalspace.mesh.loader
+		crystalspace.meshldr.ZZZfact
+		                     --> crystalspace.mesh.loader.factory.ZZZ
+		crystalspace.meshobj --> crystalspace.mesh.object
+		crystalspace...explo --> crystalspace...explosion
+		crystalspace...fount --> crystalspace...fountain
+		crystalspace...spr2d --> crystalspace...sprite.2d
+	    - Fixed all makefiles, source files, header files, documentation,
+	      and `world' files to account for the directory and SCF class name
+	      changes.
 10-Jan-2001
 	- Martin Geisse fixed some minor naming and comment flaws in
 	  the idungeon interface file.
@@ -9,7 +24,8 @@ The history order has been reversed so that new features are at the top.
 	  section and added a FAQ entry.
 	- Martin also committed a patch to win32.cpp from Ed Halley.
 	- Martin added some information to the procedural texture docs and
-	  added better explanation of the Print() function of the 2d and 3d gfx driver.
+	  added better explanation of the Print() function of the 2D and 3D
+	  video driver.
 	- Eric Sunshine fixed a typo in win32.txi and made several other minor
 	  changes.
 	- Eric Sunshine changed the file extension on the HTML files in the

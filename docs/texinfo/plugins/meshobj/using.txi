@@ -34,14 +34,14 @@ fountain):
 
 @example
 MESHOBJ 'fountainFactory' (
-  PLUGIN ('crystalspace.meshldr.fountfact')
+  PLUGIN ('crystalspace.mesh.loader.factory.fountain')
   PARAMS ()
 )
 @end example
 
 This will use the @dfn{mesh object loader} plug-in which is identified by the
-@sc{scf} name @samp{crystalspace.meshldr.fountfact} to load a factory (type
-@samp{iMeshObjectFactory}) and register it with the engine.  There are no
+@sc{scf} name mentioned by the @code{PLUGIN()} statement to load a factory
+(type @samp{iMeshObjectFactory}) and register it with the engine.  There are no
 parameters for the fountain's Mesh Object Factory so that's why the
 @samp{PARAMS} block is empty.  But you still have to specify it.  Other mesh
 object factories may accept parameters.
@@ -56,7 +56,7 @@ statement, within the definition of a room or sector, like this:
 
 @example
 MESHOBJ 'fountain' (
-  PLUGIN ('crystalspace.meshldr.fount')
+  PLUGIN ('crystalspace.mesh.loader.fountain')
   PARAMS (
     FACTORY ('fountainFactory')
     NUMBER (300)
@@ -77,7 +77,7 @@ MESHOBJ 'fountain' (
 @end example
 
 This code fragment uses the loader plug-in named
-@samp{crystalspace.meshldr.fount} to load a Mesh Object (type
+@samp{crystalspace.mesh.loader.fountain} to load a Mesh Object (type
 @samp{iMeshObject}) and register it with the engine (while placing it in the
 current sector).  In this case there are many parameters.  The first parameter
 should always be the name of the factory.  This is true for all Mesh Objects
@@ -145,10 +145,10 @@ void Initialize ()
   @dots{}
   // Get the ball mesh object plug-in.
   ball_type = QUERY_PLUGIN_CLASS (this,
-    "crystalspace.meshobj.ball", "MeshObj", iMeshObjectType);
+    "crystalspace.mesh.object.ball", "MeshObj", iMeshObjectType);
   if (!ball_type)
     ball_type = LOAD_PLUGIN (this,
-      "crystalspace.meshobj.ball", "MeshObj", iMeshObjectType);
+      "crystalspace.mesh.object.ball", "MeshObj", iMeshObjectType);
   if (!ball_type)
     Printf (MSG_WARNING, "No ball type plug-in found!\n");
   ball_factory = ball_type->NewFactory ();
