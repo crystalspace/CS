@@ -1827,6 +1827,15 @@
         <params />
     </meshfact>
     <sector name="room">
+    <!-- TESTING
+        <portal name="northA">
+            <v x="-2" y="3" z="2" />
+            <v x="1" y="3" z="2" />
+            <v x="1" y="-1" z="2" />
+            <v x="-2" y="-1" z="2" />
+	    <sector>test2</sector>
+	</portal>
+    -->
         <meshobj name="walls">
             <plugin>thing</plugin>
             <params>
