@@ -13,6 +13,9 @@ Short-term cleanups that need to be done:
 	  includes that don't belong there (like from csengine).
 
 21-Feb-2000
+	- Martin Geisse submitted more Texinfo conversions of the LaTeX files
+	  from newdoc.  These files still need a lot of work, but it is a
+	  start.
 	- Further sprites changes from Seth Galbraith. He changed
 	  3 pointers in csFrame into 2 ints.
 	- Eric Sunshine slightly reworked ImagePngFile::Load() load for the
@@ -26,6 +29,19 @@ Short-term cleanups that need to be done:
 	  crashes in some cases.
 	- Some small cleanup/changes to csTerrain and terrain engine.
 	- WalkTest now deletes csView at exit.
+	- Eric Sunshine made several improvements to the introduction to the
+	  tutorial (though it still needs more work and clean up):
+	    - Added a lot of missing mark-up.
+	    - Improved formatting.
+	    - Corrected errors.
+	    - Eliminated obsolete references to COM.
+	- Justin Miller <dyad@fuse.net> submitted a first stab at an update to
+	  the tutorial to reflect the current state of Simple and CS.  Code
+	  is now up to date, but discussion is still lagging behind and
+	  inaccurate.  Needs more work.
+	- Eric Sunshine performed a very quick conversion from LaTeX to
+	  Texinfo on the tutorial update which Justin submitted, but much
+	  mark-up is still missing and formatting needs work.
 	- Fixed bug with adding of dynamic objects to octree. Now sprites
 	  should work well in levels containing STATBSP statement. They
 	  were broken for some time.
