@@ -1081,7 +1081,7 @@ void csThingStatic::FillRenderMeshes (
 
     rm->mixmode = mixmode; 
     iMaterialWrapper* material = pg.material;
-    for (int m = 0; m < repMaterials.Length(); m++)
+    for (size_t m = 0; m < repMaterials.Length(); m++)
     {
       if (repMaterials[m].old_mat == material)
       {
