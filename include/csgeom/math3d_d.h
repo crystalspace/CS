@@ -187,6 +187,9 @@ public:
   /// Returns the norm of this vector.
   double Norm () const;
 
+  /// Returns the norm of this vector.
+  double SquaredNorm () const;
+
   /**
    * Returns the unit vector in the direction of this vector.
    * Attempting to normalize a zero-vector will result in a divide by

@@ -28,6 +28,11 @@ double csDVector3::Norm () const
   return sqrt (x * x + y * y + z * z);
 }
 
+double csDVector3::SquaredNorm () const
+{
+  return x * x + y * y + z * z;
+}
+
 void csDVector3::Normalize ()
 {
   double len;
