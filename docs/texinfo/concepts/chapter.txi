@@ -19,10 +19,6 @@ resides in LaTeX format.
 @item
 Octree
 @item
-Texture Cache
-@item
-Texture Mapping
-@item
 Lighting
 @item
 Defining a World
@@ -36,6 +32,8 @@ Collision Detection
 * Rendering Loop::
 * Visibility Culling:: Visibility Culling In Detail
 * 3D Sprites::
+* Texture Cache::
+* Texture Mapping::
 * Misc Notes:: Miscallenous notes requiring classification (Jorrit's Brain Dump)
 @end menu
 
@@ -44,4 +42,6 @@ Collision Detection
 @imports{concepts,rdrloop.txi}
 @imports{concepts,viscull.txi}
 @imports{concepts,3dsprite.txi}
+@imports{concepts,tcache.txi}
+@imports{concepts,texmap.txi}
 @imports{concepts,miscnote.txi}

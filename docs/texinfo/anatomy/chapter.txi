@@ -14,23 +14,11 @@ resides in LaTeX format.
 @item
 Format of @emph{World} File
 @item
-@anchor{CSWS}
-Crystal Space Windowing System (@sc{csws})
-@item
 Importing Foreign Models
 @item
 Memory Debugger
 @item
 Scripting
-@item
-@anchor{csGame}
-Game Library (@code{csgame})
-@item
-@anchor{csGeom}
-Geometry Library (@code{csgeom})
-@item
-@anchor{csUtil}
-Utility Library (@code{csutil})
 @end itemize
 
 @menu
@@ -38,7 +26,6 @@ Utility Library (@code{csutil})
 * Dependencies::
 * Directory Hierarchy::
 * Makefile How-To::
-* csPhyziks:: csPhyziks Library (@code{csphyzik})
 * SCF:: Shared Class Facility (@sc{scf})
 * VFS:: Virtual File System (@sc{vfs})
 * Platform Details:: Platform-Specific Details
@@ -48,7 +35,6 @@ Utility Library (@code{csutil})
 @imports{anatomy,depend.txi}
 @imports{anatomy,dirhier.txi}
 @imports{anatomy,makefile.txi}
-@imports{anatomy,phyziks.txi}
 @imports{anatomy,scf.txi}
 @imports{anatomy,vfs.txi}
 @importss{anatomy,platform,details.txi}

@@ -104,6 +104,7 @@ version @value{VERSION}, last updated @value{UPDATED}.
 * Tutorials::
 * Concepts::
 * Anatomy:: Project Anatomy
+* Libraries::
 * Plug-In Drivers:: Plug-In Modules and Drivers
 * Contributing:: Contributing to Crystal Space
 * FAQ:: Frequently Asked Questions (@sc{faq})
@@ -131,6 +132,7 @@ For a list of available topics, see the
 @imports{tutorial,chapter.txi}
 @imports{concepts,chapter.txi}
 @imports{anatomy,chapter.txi}
+@imports{libs,chapter.txi}
 @imports{plugins,chapter.txi}
 @imports{contrib,chapter.txi}
 @imports{appendix,appendix.txi}
