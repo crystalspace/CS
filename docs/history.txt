@@ -6,6 +6,10 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+5-Sep-2003
+	- Peter Amstutz added more comments to the AttachCollider*
+	  methods in varia/dynamics.h and changed the default
+	  softness from .316 to .01
 4-Sep-2003
 	- Peter Amstutz fixed the csPolyTexture destructor (part of
 	  the thing plugin) to not try to deallocate the lightmap 

@@ -49,7 +49,7 @@ struct iDynamics : public iBase
 {
   /// Create a rigid body and add it to the simulation
   virtual csPtr<iDynamicSystem> CreateSystem () = 0;
-  
+
   /// Create a rigid body and add it to the simulation
   virtual void RemoveSystem (iDynamicSystem* system) = 0;
 
@@ -112,28 +112,86 @@ struct iDynamicSystem : public iBase
   /// Get the default move callback.
   virtual iDynamicsMoveCallback* GetDefaultMoveCallback () = 0;
 
-  /// Attaches a static collider mesh to world
+  /** Attaches a static collider mesh to world
+   * \param mesh the mesh to use for collision detection
+   * \param trans a hard transform to apply to the mesh
+   * \param friction how much friction this body has,
+   * ranges from 0 (no friction) to infinity (perfect friction)
+   * \param elasticity the "bouncyness" of this object, from 0
+   * (no bounce) to 1 (maximum bouncyness)
+   * \param softness how "squishy" this object is, in the range
+   * 0...1; small values (range of 0.00001 to 0.01) give
+   * reasonably stiff collision contacts, larger values
+   * are more "mushy"
+   */
   virtual bool AttachColliderMesh (iMeshWrapper* mesh,
-  	const csOrthoTransform& trans, float friction,
-	float elasticity, float softness = 0.316f) = 0;
+    const csOrthoTransform& trans, float friction,
+    float elasticity, float softness = 0.01f) = 0;
 
-  /// Attaches a static collider cylinder to world
+  /** Attaches a static collider cylinder to world (oriented along it's Z axis)
+   * \param length the cylinder length along the axis
+   * \param radius the cylinder radius
+   * \param trans a hard transform to apply to the mesh
+   * \param friction how much friction this body has,
+   * ranges from 0 (no friction) to infinity (perfect friction)
+   * \param elasticity the "bouncyness" of this object, from 0
+   * (no bounce) to 1 (maximum bouncyness)
+   * \param softness how "squishy" this object is, in the range
+   * 0...1; small values (range of 0.00001 to 0.01) give
+   * reasonably stiff collision contacts, larger values
+   * are more "mushy"
+   */
   virtual bool AttachColliderCylinder (float length, float radius,
-  	const csOrthoTransform& trans, float friction,
-	float elasticity, float softness = 0.316f) = 0;
+    const csOrthoTransform& trans, float friction,
+    float elasticity, float softness = 0.01f) = 0;
 
-  /// Attaches a static collider box to world
+  /** Attaches a static collider box to world
+   * \param size the box size along each axis
+   * \param trans a hard transform to apply to the mesh
+   * \param friction how much friction this body has,
+   * ranges from 0 (no friction) to infinity (perfect friction)
+   * \param elasticity the "bouncyness" of this object, from 0
+   * (no bounce) to 1 (maximum bouncyness)
+   * \param softness how "squishy" this object is, in the range
+   * 0...1; small values (range of 0.00001 to 0.01) give
+   * reasonably stiff collision contacts, larger values
+   * are more "mushy"
+   */
   virtual bool AttachColliderBox (const csVector3 &size,
-  	const csOrthoTransform& trans, float friction,
-	float elasticity, float softness = 0.316f) = 0;
+    const csOrthoTransform& trans, float friction,
+    float elasticity, float softness = 0.01f) = 0;
 
-  /// Attaches a static collider sphere to world
+  /** Attaches a static collider sphere to world
+   * \param radius the radius of the sphere
+   * \param offset a translation of the sphere's center
+   * from the default (0,0,0)
+   * \param trans a hard transform to apply to the mesh
+   * \param friction how much friction this body has,
+   * ranges from 0 (no friction) to infinity (perfect friction)
+   * \param elasticity the "bouncyness" of this object, from 0
+   * (no bounce) to 1 (maximum bouncyness)
+   * \param softness how "squishy" this object is, in the range
+   * 0...1; small values (range of 0.00001 to 0.01) give
+   * reasonably stiff collision contacts, larger values
+   * are more "mushy"
+   */
   virtual bool AttachColliderSphere (float radius, const csVector3 &offset,
-  	float friction, float elasticity, float softness = 0.316f) = 0;
+    float friction, float elasticity, float softness = 0.01f) = 0;
 
-  /// Attaches a static collider plane to world
+  /** Attaches a static collider plane to world
+   * \param plane describes the plane to added
+   * \param trans a hard transform to apply to the mesh
+   * \param friction how much friction this body has,
+   * ranges from 0 (no friction) to infinity (perfect friction)
+   * \param elasticity the "bouncyness" of this object, from 0
+   * (no bounce) to 1 (maximum bouncyness)
+   * \param softness how "squishy" this object is, in the range
+   * 0...1; small values (range of 0.00001 to 0.01) give
+   * reasonably stiff collision contacts, larger values
+   * are more "mushy"
+   */
   virtual bool AttachColliderPlane (const csPlane3 &plane, float friction,
-	float elasticity, float softness = 0.316f) = 0;
+    float elasticity, float softness = 0.01f) = 0;
 };
 
 SCF_VERSION (iDynamicsMoveCallback, 0, 0, 1);
@@ -164,7 +222,7 @@ SCF_VERSION (iBodyGroup, 0, 0, 1);
 /**
  * Body Group is a collection of bodies which don't collide with
  * each other.  This can speed up processing by manually avoiding
- * certain collisions.  For instance if you have a car built of 
+ * certain collisions.  For instance if you have a car built of
  * many different bodies.  The bodies can be collected into a group
  * and the car will be treated as a single object.
  */
@@ -190,7 +248,7 @@ struct iRigidBody : public iBase
 {
   /// returns the underlying object
   virtual iObject *QueryObject (void) = 0;
-  /** 
+  /**
    * Makes a body stop reacting dynamically.  This is especially useful
    * for environmental objects.  It will also increase speed in some cases
    * by ignoring all physics for that body
@@ -204,25 +262,89 @@ struct iRigidBody : public iBase
   /// Returns which group a body belongs to
   virtual csRef<iBodyGroup> GetGroup (void) = 0;
 
-  /// Add a collider with a associated friction coefficient
+    /** Add a collider with a associated friction coefficient
+   * \param trans a hard transform to apply to the mesh
+   * \param friction how much friction this body has,
+   * ranges from 0 (no friction) to infinity (perfect friction)
+   * \param density the density of this rigid body (used to calculate
+   * mass based on collider volume)
+   * \param elasticity the "bouncyness" of this object, from 0
+   * (no bounce) to 1 (maximum bouncyness)
+   * \param softness how "squishy" this object is, in the range
+   * 0...1; small values (range of 0.00001 to 0.01) give
+   * reasonably stiff collision contacts, larger values
+   * are more "mushy"
+   */
   virtual bool AttachColliderMesh (iMeshWrapper* mesh,
-  	const csOrthoTransform& trans, float friction, float density,
-	float elasticity, float softness = 0.316f) = 0;
-  /// Cylinder orientated along its local z axis
+    const csOrthoTransform& trans, float friction, float density,
+    float elasticity, float softness = 0.01f) = 0;
+
+    /** Cylinder orientated along its local z axis
+   * \param trans a hard transform to apply to the mesh
+   * \param friction how much friction this body has,
+   * ranges from 0 (no friction) to infinity (perfect friction)
+   * \param density the density of this rigid body (used to calculate
+   * mass based on collider volume)
+   * \param elasticity the "bouncyness" of this object, from 0
+   * (no bounce) to 1 (maximum bouncyness)
+   * \param softness how "squishy" this object is, in the range
+   * 0...1; small values (range of 0.00001 to 0.01) give
+   * reasonably stiff collision contacts, larger values
+   * are more "mushy"
+   */
   virtual bool AttachColliderCylinder (float length, float radius,
-  	const csOrthoTransform& trans, float friction, float density,
-	float elasticity, float softness = 0.316f) = 0;
-  /// Add a collider box with given properties
+    const csOrthoTransform& trans, float friction, float density,
+    float elasticity, float softness = 0.01f) = 0;
+
+    /** Add a collider box with given properties
+   * \param trans a hard transform to apply to the mesh
+   * \param friction how much friction this body has,
+   * ranges from 0 (no friction) to infinity (perfect friction)
+   * \param density the density of this rigid body (used to calculate
+   * mass based on collider volume)
+   * \param elasticity the "bouncyness" of this object, from 0
+   * (no bounce) to 1 (maximum bouncyness)
+   * \param softness how "squishy" this object is, in the range
+   * 0...1; small values (range of 0.00001 to 0.01) give
+   * reasonably stiff collision contacts, larger values
+   * are more "mushy"
+   */
   virtual bool AttachColliderBox (const csVector3 &size,
-  	const csOrthoTransform& trans, float friction, float density,
-	float elasticity, float softness = 0.316f) = 0;
-  /// Add a collider sphere with given properties
+    const csOrthoTransform& trans, float friction, float density,
+    float elasticity, float softness = 0.01f) = 0;
+
+    /** Add a collider sphere with given properties
+   * \param trans a hard transform to apply to the mesh
+   * \param friction how much friction this body has,
+   * ranges from 0 (no friction) to infinity (perfect friction)
+   * \param density the density of this rigid body (used to calculate
+   * mass based on collider volume)
+   * \param elasticity the "bouncyness" of this object, from 0
+   * (no bounce) to 1 (maximum bouncyness)
+   * \param softness how "squishy" this object is, in the range
+   * 0...1; small values (range of 0.00001 to 0.01) give
+   * reasonably stiff collision contacts, larger values
+   * are more "mushy"
+   */
   virtual bool AttachColliderSphere (float radius, const csVector3 &offset,
-  	float friction, float density, float elasticity,
-	float softness = 0.316f) = 0;
-  /// Add a collider plane with given properties
+    float friction, float density, float elasticity,
+    float softness = 0.01f) = 0;
+
+    /** Add a collider plane with given properties
+   * \param trans a hard transform to apply to the mesh
+   * \param friction how much friction this body has,
+   * ranges from 0 (no friction) to infinity (perfect friction)
+   * \param density the density of this rigid body (used to calculate
+   * mass based on collider volume)
+   * \param elasticity the "bouncyness" of this object, from 0
+   * (no bounce) to 1 (maximum bouncyness)
+   * \param softness how "squishy" this object is, in the range
+   * 0...1; small values (range of 0.00001 to 0.01) give
+   * reasonably stiff collision contacts, larger values
+   * are more "mushy"
+   */
   virtual bool AttachColliderPlane (const csPlane3 &plane, float friction,
-    float density, float elasticity, float softness = 0.316f) = 0;
+    float density, float elasticity, float softness = 0.01f) = 0;
 
   /// Set the position
   virtual void SetPosition (const csVector3& trans) = 0;
@@ -247,7 +369,7 @@ struct iRigidBody : public iBase
 
   /// Set the physic properties
   virtual void SetProperties (float mass, const csVector3& center,
-  	const csMatrix3& inertia) = 0;
+    const csMatrix3& inertia) = 0;
   /// Get the physic properties. 0 parameters are ignored
   virtual void GetProperties (float* mass, csVector3* center,
     csMatrix3* inertia) = 0;
@@ -255,7 +377,7 @@ struct iRigidBody : public iBase
   virtual void AdjustTotalMass (float targetmass) = 0;
 
   /// Add a force (world space) (active for one timestep)
-  virtual void AddForce	(const csVector3& force) = 0;
+  virtual void AddForce (const csVector3& force) = 0;
   /// Add a torque (world space) (active for one timestep)
   virtual void AddTorque (const csVector3& force) = 0;
   /// Add a force (local space) (active for one timestep)
@@ -278,13 +400,13 @@ struct iRigidBody : public iBase
    * (active for one timestep)
    */
   virtual void AddRelForceAtPos (const csVector3& force,
-  	const csVector3& pos) = 0;
+    const csVector3& pos) = 0;
   /**
    * Add a force (local space) at a specific position (loacl space)
    * (active for one timestep)
    */
   virtual void AddRelForceAtRelPos (const csVector3& force,
-  	const csVector3& pos) = 0;
+    const csVector3& pos) = 0;
 
   /// Get total force (world space)
   virtual const csVector3 GetForce () const = 0;
@@ -333,10 +455,10 @@ struct iRigidBody : public iBase
 SCF_VERSION (iJoint, 0, 0, 1);
 
 /**
- * This is the interface for a joint.  It works by constraining 
- * the relative motion between the two bodies it attaches.  For 
+ * This is the interface for a joint.  It works by constraining
+ * the relative motion between the two bodies it attaches.  For
  * instance if all motion in along the local X axis is constrained
- * then the bodies will stay motionless relative to each other 
+ * then the bodies will stay motionless relative to each other
  * along an x axis rotated and positioned by the Joint's transform.
  */
 struct iJoint : public iBase
@@ -346,17 +468,17 @@ struct iJoint : public iBase
   /// Get an attached body (valid values for body are 0 and 1)
   virtual csRef<iRigidBody> GetAttachedBody (int body) = 0;
   /**
-   * Set the local transformation of the joint.  This transform 
-   * sets the position of the constraining axes in the world 
+   * Set the local transformation of the joint.  This transform
+   * sets the position of the constraining axes in the world
    * not relative to the attached bodies.
    */
   virtual void SetTransform (const csOrthoTransform &trans) = 0;
   /// Get the local transformation of the joint
   virtual csOrthoTransform GetTransform () = 0;
   /**
-   * Sets the translation constraints on the 3 axes.  If true is 
+   * Sets the translation constraints on the 3 axes.  If true is
    * passed for an axis the Joint will constrain all motion along
-   * that axis.  If false is passed in then all motion along that 
+   * that axis.  If false is passed in then all motion along that
    * axis free, but bounded by the minimum and maximum distance
    * if set.
    */
