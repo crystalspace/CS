@@ -10312,6 +10312,7 @@ package cspace::iShaderVariableContext;
 *GetShaderVariables = *cspacec::iShaderVariableContext_GetShaderVariables;
 *PushVariables = *cspacec::iShaderVariableContext_PushVariables;
 *PopVariables = *cspacec::iShaderVariableContext_PopVariables;
+*IsEmpty = *cspacec::iShaderVariableContext_IsEmpty;
 sub DESTROY {
     return unless $_[0]->isa('HASH');
     my $self = tied(%{$_[0]});
@@ -10677,54 +10678,6 @@ sub ACQUIRE {
 }
 
 
-############# Class : cspace::csTextureLayer ##############
-
-package cspace::csTextureLayer;
-@ISA = qw( cspace );
-%OWNER = ();
-%ITERATORS = ();
-*swig_txt_handle_get = *cspacec::csTextureLayer_txt_handle_get;
-*swig_txt_handle_set = *cspacec::csTextureLayer_txt_handle_set;
-*swig_mode_get = *cspacec::csTextureLayer_mode_get;
-*swig_mode_set = *cspacec::csTextureLayer_mode_set;
-*swig_uscale_get = *cspacec::csTextureLayer_uscale_get;
-*swig_uscale_set = *cspacec::csTextureLayer_uscale_set;
-*swig_vscale_get = *cspacec::csTextureLayer_vscale_get;
-*swig_vscale_set = *cspacec::csTextureLayer_vscale_set;
-*swig_ushift_get = *cspacec::csTextureLayer_ushift_get;
-*swig_ushift_set = *cspacec::csTextureLayer_ushift_set;
-*swig_vshift_get = *cspacec::csTextureLayer_vshift_get;
-*swig_vshift_set = *cspacec::csTextureLayer_vshift_set;
-sub new {
-    my $pkg = shift;
-    my $self = cspacec::new_csTextureLayer(@_);
-    bless $self, $pkg if defined($self);
-}
-
-sub DESTROY {
-    return unless $_[0]->isa('HASH');
-    my $self = tied(%{$_[0]});
-    return unless defined $self;
-    delete $ITERATORS{$self};
-    if (exists $OWNER{$self}) {
-        cspacec::delete_csTextureLayer($self);
-        delete $OWNER{$self};
-    }
-}
-
-sub DISOWN {
-    my $self = shift;
-    my $ptr = tied(%$self);
-    delete $OWNER{$ptr};
-}
-
-sub ACQUIRE {
-    my $self = shift;
-    my $ptr = tied(%$self);
-    $OWNER{$ptr} = 1;
-}
-
-
 ############# Class : cspace::iMaterial ##############
 
 package cspace::iMaterial;
@@ -10735,8 +10688,6 @@ package cspace::iMaterial;
 *GetShader = *cspacec::iMaterial_GetShader;
 *GetShaders = *cspacec::iMaterial_GetShaders;
 *GetTexture = *cspacec::iMaterial_GetTexture;
-*GetTextureLayerCount = *cspacec::iMaterial_GetTextureLayerCount;
-*GetTextureLayer = *cspacec::iMaterial_GetTextureLayer;
 *GetFlatColor = *cspacec::iMaterial_GetFlatColor;
 *SetFlatColor = *cspacec::iMaterial_SetFlatColor;
 *GetReflection = *cspacec::iMaterial_GetReflection;
@@ -13233,10 +13184,6 @@ sub CS_MATERIAL_VARNAME_AMBIENT () { $cspacec::CS_MATERIAL_VARNAME_AMBIENT }
 sub CS_MATERIAL_VARNAME_REFLECTION () { $cspacec::CS_MATERIAL_VARNAME_REFLECTION }
 sub CS_MATERIAL_VARNAME_FLATCOLOR () { $cspacec::CS_MATERIAL_VARNAME_FLATCOLOR }
 sub CS_MATERIAL_TEXTURE_DIFFUSE () { $cspacec::CS_MATERIAL_TEXTURE_DIFFUSE }
-sub CS_MATERIAL_TEXTURE_LAYER1 () { $cspacec::CS_MATERIAL_TEXTURE_LAYER1 }
-sub CS_MATERIAL_TEXTURE_LAYER2 () { $cspacec::CS_MATERIAL_TEXTURE_LAYER2 }
-sub CS_MATERIAL_TEXTURE_LAYER3 () { $cspacec::CS_MATERIAL_TEXTURE_LAYER3 }
-sub CS_MATERIAL_TEXTURE_LAYER4 () { $cspacec::CS_MATERIAL_TEXTURE_LAYER4 }
 sub CS_POS_BY_FRAME () { $cspacec::CS_POS_BY_FRAME }
 sub CS_POS_BY_TIME () { $cspacec::CS_POS_BY_TIME }
 sub CS_DECODE_SPAN () { $cspacec::CS_DECODE_SPAN }
