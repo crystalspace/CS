@@ -48,6 +48,9 @@ chronological order.
 	  which borks the help message.
 	- Jorrit fixed the copy constructor and the constructor with T*
 	  from csWeakRef. Apparently they were completely broken.
+	- Wouter fixed awstxtbox, changing a iString* to csRef<iString>,
+	  which stops awstut from crashing when typing a password.
+	  Still, it's fishy that iString::Clone and Slice return a csRef<>.
 15-Oct-2003
 	- Eric Sunshine fixed a bug in RemoveDups from helper.jam.  It was
 	  trying to dereference a variable using an 8-bit character instead of

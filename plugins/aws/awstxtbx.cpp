@@ -328,7 +328,7 @@ void awsTextBox::OnDraw (csRect /*clip*/)
   if (text && text->Length ())
   {
     int tw, th, tx, ty, mcc;
-    iString *saved = 0;
+    csRef<iString> saved = 0;
 
     if (should_mask && maskchar)
     {
@@ -376,10 +376,9 @@ void awsTextBox::OnDraw (csRect /*clip*/)
 
       if (should_mask && maskchar && saved)
       {
-    text->Clear ();
-    text->Append (saved);
-    saved->Clear ();
-    saved->DecRef ();
+        text->Clear ();
+        text->Append (saved);
+        saved->Clear ();
       }
 
     if (has_focus && blink)
