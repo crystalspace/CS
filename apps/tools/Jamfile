@@ -10,3 +10,5 @@ SubInclude TOP apps tools partedit ;
 SubInclude TOP apps tools picview ;
 SubInclude TOP apps tools viewmesh ;
 SubInclude TOP apps tools vsh ;
+SubInclude TOP apps tools pvscalc ;
+
