@@ -19,6 +19,7 @@ Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
 #include "cssysdef.h"
 
+#include "csgeom/polyclip.h"
 #include "csgeom/transfrm.h"
 
 #include "csutil/objreg.h"
@@ -241,6 +242,15 @@ csZBufMode csGLRender3D::GetZModePass2 (csZBufMode mode)
   return mode;
 }
 
+
+void csGLRender3D::SetMirrorMode (bool mirror)
+{
+  if (mirror)
+    statecache->SetCullFace (GL_BACK);
+  else
+    statecache->SetCullFace (GL_FRONT);
+}
+
 void csGLRender3D::CalculateFrustum ()
 {
   if (frustum_valid) return;
@@ -264,6 +274,11 @@ void csGLRender3D::CalculateFrustum ()
 
 void csGLRender3D::SetupStencil ()
 {
+  if (stencil_initialized)
+    return;
+  
+  stencil_initialized = true;
+
   if (clipper)
   {
     glMatrixMode (GL_PROJECTION);
@@ -274,11 +289,13 @@ void csGLRender3D::SetupStencil ()
     glLoadIdentity ();
     // First set up the stencil area.
     statecache->EnableState (GL_STENCIL_TEST);
-    if (stencilclipnum == 0)
+    
+    stencilclipnum++;
+    if (stencilclipnum>255)
     {
       glClearStencil (0);
       glClear (GL_STENCIL_BUFFER_BIT);
-      stencilclipnum++;
+      stencilclipnum = 1;
     }
     statecache->SetStencilFunc (GL_ALWAYS, stencilclipnum, -1);
     statecache->SetStencilOp (GL_REPLACE, GL_REPLACE, GL_REPLACE);
@@ -286,7 +303,7 @@ void csGLRender3D::SetupStencil ()
     csVector2* v = clipper->GetClipPoly ();
     glColor4f (0, 0, 0, 0);
     statecache->SetShadeModel (GL_FLAT);
-    SetZMode (CS_ZBUF_NONE);
+    SetZMode (CS_ZBUF_FILL);
     statecache->DisableState (GL_TEXTURE_2D);
     glColorMask (GL_FALSE, GL_FALSE, GL_FALSE, GL_FALSE);
     glBegin (GL_TRIANGLE_FAN);
@@ -303,22 +320,33 @@ void csGLRender3D::SetupStencil ()
   }
 }
 
-void csGLRender3D::SetupClipPlanes (bool add_near_clip,
-                                    bool add_z_clip)
+int csGLRender3D::SetupClipPlanes (bool add_clipper,
+                                   bool add_near_clip,
+                                   bool add_z_clip)
 {
+  /*add_near_clip = false;
+  add_z_clip = false;*/
+  /*if (clipplane_initialized)
+    return;
+  
+  clipplane_initialized = true;*/
+
+  glMatrixMode (GL_MODELVIEW);
+  glPushMatrix ();
+  glLoadIdentity ();
+
+  int i = 0;
+  GLdouble plane_eq[4];
+
   // This routine assumes the hardware planes can handle the
   // required number of planes from the clipper.
-  if (clipper)
+  if (clipper && add_clipper)
   {
     CalculateFrustum ();
     csPlane3 pl;
-    GLdouble plane_eq[4];
-    int i, i1;
+    int i1;
     i1 = frustum.GetVertexCount ()-1;
 
-    glMatrixMode (GL_MODELVIEW);
-    glPushMatrix ();
-    glLoadIdentity ();
     for (i = 0 ; i < frustum.GetVertexCount () ; i++)
     {
       pl.Set (csVector3 (0), frustum[i], frustum[i1]);
@@ -345,18 +373,17 @@ void csGLRender3D::SetupClipPlanes (bool add_near_clip,
       plane_eq[2] = 1;
       plane_eq[3] = -.001;
       glClipPlane ((GLenum)(GL_CLIP_PLANE0+i), plane_eq);
+      i++;
     }
-    glPopMatrix ();
   }
+  glPopMatrix ();
+  return i;
 }
 
 void csGLRender3D::SetupClipper (int clip_portal,
                                  int clip_plane,
                                  int clip_z_plane)
 {
-  if (clipperinitialized)
-    return;
-
   stencil_enabled = false;
   clip_planes_enabled = false;
 
@@ -405,7 +432,6 @@ void csGLRender3D::SetupClipper (int clip_portal,
     case CS_CLIPPER_TOPLEVEL: clip_modes = clip_outer; break;
     default: clip_modes = clip_optional;
     }
-
     // Go through all the modes and select the first one that is appropriate.
     for (int i = 0 ; i < 3 ; i++)
     {
@@ -417,7 +443,7 @@ void csGLRender3D::SetupClipper (int clip_portal,
       // number of hardware planes minus one (for the view plane).
       if ((c == 'p' || c == 'P') &&
         clipper->GetVertexCount ()
-        >= 6-reserved_planes)
+        > 6-reserved_planes)
         continue;
       how_clip = c;
       break;
@@ -479,17 +505,15 @@ void csGLRender3D::SetupClipper (int clip_portal,
     statecache->EnableState (GL_STENCIL_TEST);
     statecache->SetStencilFunc (GL_EQUAL, stencilclipnum, stencilclipnum);
     statecache->SetStencilOp (GL_KEEP, GL_KEEP, GL_KEEP);
-    stencilclipnum++;
-    if (stencilclipnum>255)
-      stencilclipnum = 0;
   }
-  else if (how_clip == 'p')
+
+  int planes = SetupClipPlanes (how_clip == 'p', 
+    do_near_plane && clip_plane != CS_CLIP_NOT,
+    clip_z_plane != CS_CLIP_NOT);
+  if (planes>0)
   {
     clip_planes_enabled = true;
-    CalculateFrustum ();
-    SetupClipPlanes (do_near_plane && clip_plane != CS_CLIP_NOT,
-      clip_z_plane != CS_CLIP_NOT);
-    for (int i = 0; i < frustum.GetVertexCount ()+reserved_planes; i++)
+    for (int i = 0; i < planes; i++)
       statecache->EnableState ((GLenum)(GL_CLIP_PLANE0+i));
   }
 }
@@ -645,7 +669,7 @@ bool csGLRender3D::BeginDraw (int drawflags)
   }
   if (drawflags & CSDRAW_2DGRAPHICS)
   {
-    SetZMode(CS_ZBUF_NONE);
+    SetZMode (CS_ZBUF_NONE);
     return G2D->BeginDraw ();
   }
 
@@ -655,6 +679,8 @@ bool csGLRender3D::BeginDraw (int drawflags)
 
 void csGLRender3D::FinishDraw ()
 {
+  SetMirrorMode (false);
+
   if (current_drawflags & (CSDRAW_2DGRAPHICS | CSDRAW_3DGRAPHICS))
     G2D->FinishDraw ();
   current_drawflags = 0;
@@ -785,11 +811,7 @@ void csGLRender3D::SetObjectToCamera(csReversibleTransform* wvmatrix)
   glTranslatef (-translation.x, -translation.y, -translation.z);
 }
 
-void csGLRender3D::DrawMesh(csRenderMesh* mymesh,
-                            csZBufMode z_buf_mode,
-                            int clip_portal,
-                            int clip_plane,
-                            int clip_z_plane)
+void csGLRender3D::DrawMesh(csRenderMesh* mymesh)
 {
   csRef<iStreamSource> source = mymesh->GetStreamSource ();
   csRef<iRenderBuffer> vertexbuf =
@@ -802,9 +824,13 @@ void csGLRender3D::DrawMesh(csRenderMesh* mymesh,
   if (!vertexbuf)
     return;
 
-  SetupClipper (clip_portal, clip_plane, clip_z_plane);
+  SetupClipper (mymesh->clip_portal, 
+                mymesh->clip_plane, 
+                mymesh->clip_z_plane);
   
-  SetZMode (z_buf_mode);
+  SetZMode (mymesh->z_buf_mode);
+
+  SetMirrorMode (mymesh->do_mirror);
 
   csRef<iMaterialHandle> mathandle;
   if (mymesh->GetMaterialWrapper ())
@@ -863,15 +889,17 @@ void csGLRender3D::DrawMesh(csRenderMesh* mymesh,
     stencil_enabled = false;
     statecache->DisableState (GL_STENCIL_TEST);
   }
-
 }
 
 void csGLRender3D::SetClipper (iClipper2D* clipper, int cliptype)
 {
+  //clipper = new csBoxClipper (10, 10, 200, 200);
   csGLRender3D::clipper = clipper;
   if (!clipper) cliptype = CS_CLIPPER_NONE;
   csGLRender3D::cliptype = cliptype;
-  clipperinitialized = false;
+  clipplane_initialized = false;
+  stencil_initialized = false;
+  frustum_valid = false;
 }
 
 

@@ -26,6 +26,8 @@
 #include "cstool/initapp.h"
 #include "iengine/camera.h"
 #include "iengine/engine.h"
+#include "iengine/mesh.h"
+#include "iengine/movable.h"
 #include "iengine/sector.h"
 #include "igeom/clip2d.h"
 #include "iutil/eventq.h"
@@ -49,6 +51,7 @@
 #include "ivideo/render3d.h"
 #include "ivideo/rndbuf.h"
 #include "imesh/terrfunc.h"
+#include "ilight/testlt.h"
 
 /*#include "csengine/material.h"
 #include "csengine/texture.h"*/
@@ -171,43 +174,30 @@ void R3DTest::SetupFrame ()
   static int timeaccum = 0;
   framecount++;
   timeaccum += elapsed_time;
-  if ((framecount % 10) == 0)
+  if ((framecount % 60) == 0)
   {
-    FPS = 10000.0/(float)timeaccum;
+    FPS = 60000.0/(float)timeaccum;
     timeaccum = 0;
   }
 
 
-  char text[1024];
-
-  iFontServer* fntsvr = r3d->GetDriver2D ()->GetFontServer ();
-  CS_ASSERT (fntsvr != NULL);
-  csRef<iFont> fnt (fntsvr->GetFont (0));
-  if (fnt == NULL)
-  {
-    fnt = fntsvr->LoadFont (CSFONT_COURIER);
-  }
-
   if (kbd->GetKeyState (CSKEY_RIGHT))
-    view->GetCamera ()->GetTransform ().RotateThis (CS_VEC_ROT_RIGHT, speed);
+    view->GetCamera ()->GetTransform ().RotateOther (CS_VEC_ROT_RIGHT, speed * 5.0);
   if (kbd->GetKeyState (CSKEY_LEFT))
-    view->GetCamera ()->GetTransform ().RotateThis (CS_VEC_ROT_LEFT, speed);
+    view->GetCamera ()->GetTransform ().RotateOther (CS_VEC_ROT_LEFT, speed * 5.0);
+  if (kbd->GetKeyState (CSKEY_PGUP))
+    view->GetCamera ()->GetTransform ().RotateThis (CS_VEC_TILT_UP, speed * 5.0);
+  if (kbd->GetKeyState (CSKEY_PGDN))
+    view->GetCamera ()->GetTransform ().RotateThis (CS_VEC_TILT_DOWN, speed * 5.0);
+
   if (kbd->GetKeyState (CSKEY_UP))
-    view->GetCamera ()->Move (CS_VEC_FORWARD);
+    view->GetCamera ()->Move (CS_VEC_FORWARD * speed * 50.0);
   if (kbd->GetKeyState (CSKEY_DOWN))
-    view->GetCamera ()->Move (CS_VEC_BACKWARD);
-
-  r3d->SetRenderTarget (matwrap->GetMaterial ()->GetTexture (), true);
-
-  // Tell 3D driver we're going to display 3D things.
-  if (!r3d->BeginDraw (CSDRAW_2DGRAPHICS))
-    return;
-
-  sprintf (text, "Le SetRenderTargette iz workeeng!");
-  r3d->GetDriver2D ()->Write (fnt, 10, 10, 0x00FF00FF, -1, text);
-
-  r3d->FinishDraw ();
-  r3d->SetRenderTarget (NULL);
+    view->GetCamera ()->Move (CS_VEC_BACKWARD * speed * 50.0);
+  if (kbd->GetKeyState (CSKEY_HOME))
+    view->GetCamera ()->Move (CS_VEC_UP * speed * 50.0);
+  if (kbd->GetKeyState (CSKEY_END))
+    view->GetCamera ()->Move (CS_VEC_DOWN * speed * 50.0);
 
   r3d->SetPerspectiveAspect (r3d->GetDriver2D ()->GetHeight ());
   r3d->SetPerspectiveCenter (r3d->GetDriver2D ()->GetWidth ()/2,
@@ -243,7 +233,15 @@ void R3DTest::SetupFrame ()
   trans.SetOrigin (csVector3 (0,0,5));
   trans = trans.GetInverse ();
   r3d->SetObjectToCamera (&trans);
-  r3d->DrawMesh (&mesh, CS_ZBUF_NONE, CS_CLIP_TOPLEVEL, CS_CLIP_NOT, CS_CLIP_NOT);
+  mesh.clip_plane = CS_CLIP_NOT;
+  mesh.clip_z_plane = CS_CLIP_NOT;
+  mesh.clip_portal = CS_CLIP_NOT;
+  mesh.z_buf_mode = CS_ZBUF_NONE;
+  mesh.do_mirror = false;
+  r3d->DrawMesh (&mesh);
+
+  /*light->GetMovable ()->SetPosition (csVector3 (0, 1+sin(a*4.0), sin(a*2.0)*4));
+  light->GetMovable ()->UpdateMove ();*/
 
   // Tell the camera to render into the frame buffer.
   //view->Draw ();
@@ -255,6 +253,14 @@ void R3DTest::SetupFrame ()
   if (!r3d->BeginDraw (CSDRAW_2DGRAPHICS))
     return;
 
+  iFontServer* fntsvr = r3d->GetDriver2D ()->GetFontServer ();
+  CS_ASSERT (fntsvr != NULL);
+  csRef<iFont> fnt (fntsvr->GetFont (0));
+  if (fnt == NULL)
+  {
+    fnt = fntsvr->LoadFont (CSFONT_COURIER);
+  }
+  char text[1024];
   sprintf (text, "Ah, it iz le test!      Le FPS c'est cyrrentlee %d, frame %d", FPS, framecount);
   r3d->GetDriver2D ()->Write (fnt, 10, 50, 0x00FF00FF, -1, text);
   r3d->FinishDraw ();
@@ -402,21 +408,54 @@ bool R3DTest::Initialize ()
   }
   matwrap = engine->GetMaterialList ()->FindByName ("portal");
 
-  /*// Just disregard this. It's for testing. /Anders Stenberg
-  vfs->Mount ("/level", "./data/newersky.zip");
-  vfs->ChDir ("/level");
-  loader->LoadMapFile ("world", false);*/
+  // Just disregard this. It's for testing. /Anders Stenberg
+  //vfs->Mount ("/level", "./data/r3dtest.zip");
+  //vfs->ChDir ("/level");
+  /*vfs->ChDir ("/this/data/r3dtest");
+  loader->LoadMapFile ("world.xml", false);*/
 
   csRef<iSector> room = engine->CreateSector ("room");
   //csRef<iSector> room = engine->FindSector ("room");
 
+  /*light = engine->CreateMeshWrapper (
+    "crystalspace.mesh.object.testlight", 
+    "testlight", 
+    room, 
+    csVector3 (0, 1, 1));
+
+  csRef<iTestLightState> lightstate = SCF_QUERY_INTERFACE (
+    light->GetMeshObject (),
+    iTestLightState);
+
+  lightstate->SetRange (1.0);*/
+
   view = csPtr<iView> (new csView (engine, r3d));
   view->GetCamera ()->SetSector (room);
-  view->GetCamera ()->GetTransform ().SetOrigin (csVector3 (0, 5, -3));
+  view->GetCamera ()->GetTransform ().SetOrigin (csVector3 (0, 1.8, 0));
   csRef<iGraphics2D> g2d = r3d->GetDriver2D ();
   view->SetRectangle (0, 0, g2d->GetWidth (), g2d->GetHeight ());
 
   engine->Prepare ();
+
+  iFontServer* fntsvr = r3d->GetDriver2D ()->GetFontServer ();
+  CS_ASSERT (fntsvr != NULL);
+  csRef<iFont> fnt (fntsvr->GetFont (0));
+  if (fnt == NULL)
+  {
+    fnt = fntsvr->LoadFont (CSFONT_COURIER);
+  }
+  char text[1024];
+  r3d->SetRenderTarget (matwrap->GetMaterial ()->GetTexture (), true);
+
+  // Tell 3D driver we're going to display 3D things.
+  if (!r3d->BeginDraw (CSDRAW_2DGRAPHICS))
+    return false;
+
+  sprintf (text, "Le SetRenderTargette iz workeeng!");
+  r3d->GetDriver2D ()->Write (fnt, 10, 10, 0x00FF00FF, -1, text);
+
+  r3d->FinishDraw ();
+  r3d->SetRenderTarget (NULL);
 
   return true;
 }

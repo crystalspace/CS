@@ -22,6 +22,7 @@
 
 #include "csutil/strset.h"
 
+#include "ivideo/render3d.h"
 #include "iengine/material.h"
 
 class csVector3;
@@ -133,6 +134,22 @@ public:
     SPECIAL_BILLBOARD = 1,
     SPECIAL_ZFILL = 2
   } specialattributes;
+
+  /// Z mode to use
+  csZBufMode z_buf_mode;
+
+  /// Clipping parameter
+  int clip_portal;
+  
+  /// Clipping parameter
+  int clip_plane;
+  
+  /// Clipping parameter
+  int clip_z_plane;
+
+  /// Mirror mode
+  bool do_mirror;
+
 
   /// Set buffer source
   virtual void SetStreamSource (iStreamSource* streamsource)

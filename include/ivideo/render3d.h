@@ -26,6 +26,7 @@
 class csRect;
 class csReversibleTransform;
 class csStringSet;
+class csPlane3;
 
 
 class csRenderMesh;
@@ -202,11 +203,7 @@ struct iRender3D : public iBase
   virtual void Print (csRect* area) = 0;
 
   /// Drawroutine. Only way to draw stuff
-  virtual void DrawMesh (csRenderMesh* mymesh,
-    csZBufMode z_buf_mode,
-    int clip_portal,
-    int clip_plane,
-    int clip_z_plane) = 0;
+  virtual void DrawMesh (csRenderMesh* mymesh) = 0;
 
   /**
    * Set optional clipper to use. If clipper == null

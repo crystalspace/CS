@@ -125,7 +125,8 @@ class csGLRender3D : public iRender3D
   char clip_outer[3];
   csRef<iClipper2D> clipper;
   int cliptype;
-  bool clipperinitialized;
+  bool stencil_initialized;
+  bool clipplane_initialized;
 
   /// Current render target.
   csRef<iTextureHandle> render_target;
@@ -151,11 +152,15 @@ class csGLRender3D : public iRender3D
   
   csZBufMode GetZModePass2 (csZBufMode mode);
 
+  void SetMirrorMode (bool mirror);
+
   void CalculateFrustum ();
 
   void SetupStencil ();
 
-  void SetupClipPlanes (bool add_near_clip, bool add_z_clip);
+  int SetupClipPlanes (bool add_clipper, 
+    bool add_near_clip, 
+    bool add_z_clip);
 
   void SetupClipper (int clip_portal, int clip_plane, int clip_z_plane);
 
@@ -258,22 +263,17 @@ public:
     return render_target;
   }
 
-
   /// Begin drawing in the renderer
   bool BeginDraw (int drawflags);
 
   /// Indicate that drawing is finished
-  void FinishDraw( );
+  void FinishDraw ();
 
   /// Do backbuffer printing
   void Print (csRect* area);
 
   /// Drawroutine. Only way to draw stuff
-  void DrawMesh (csRenderMesh* mymesh,
-    csZBufMode z_buf_mode,
-    int clip_portal,
-    int clip_plane,
-    int clip_z_plane);
+  void DrawMesh (csRenderMesh* mymesh);
 
   /**
    * Set optional clipper to use. If clipper == null

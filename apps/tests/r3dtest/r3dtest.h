@@ -41,6 +41,7 @@ private:
   csRef<iRender3D> r3d;
   csRef<iView> view;
   csRef<iKeyboardDriver> kbd;
+  csRef<iMeshWrapper> light;
 
   csRef<iVFS> vfs;
   csRef<iVirtualClock> vc;
