@@ -460,5 +460,44 @@ int csVector3Array::AddVertexSmart (float x, float y, float z)
   return num_vertices-1;
 }
 
+csVector3 csPoly3D::ComputeNormal ()
+{
+  float ayz = 0;
+  float azx = 0;
+  float axy = 0;
+  int i, i1;
+  float x1, y1, z1, x, y, z;
+
+  i1 = GetNumVertices ()-1;
+  for (i = 0 ; i < GetNumVertices () ; i++)
+  {
+    x = vertices[i].x;
+    y = vertices[i].y;
+    z = vertices[i].z;
+    x1 = vertices[i1].x;
+    y1 = vertices[i1].y;
+    z1 = vertices[i1].z;
+    ayz += (z1+z) * (y-y1);
+    azx += (x1+x) * (z-z1);
+    axy += (y1+y) * (x-x1);
+    i1 = i;
+  }
+
+  float d = sqrt (ayz*ayz + azx*azx + axy*axy);
+
+  if (d < SMALL_EPSILON) d = SMALL_EPSILON;
+
+  return csVector3 (ayz / d, azx / d, axy / d);
+}
+
+csPlane3 csPoly3D::ComputePlane ()
+{
+  float D;
+  csVector3 pl = ComputeNormal ();
+  D = -pl.x*vertices[0].x - pl.y*vertices[0].y - pl.z*vertices[0].z;
+  return csPlane3 (pl, D);
+}
+
+
 //---------------------------------------------------------------------------
 

@@ -5,6 +5,15 @@ The history order has been reversed so that new features are at the top.
 	- Various small changes to csTerrain to help Alex integrate his
 	  engine again.
 	- Frank O'Connor fixed Win32 release build.
+	- Andrew Zabolotny added int8, uint8, int16, uint16, int32,
+	  uint32 types. They are supposed to replace UShort, ULong and so
+	  on in the future.
+	- Fixed cstypes.h to remove the unportable #ifdef __32BIT__.
+	- Some improvements to PVS statistics for debugging it better.
+	- Changed csBox3::Adjacent() to return the side of the box that
+	  it is adjacent with.
+	- PVS now also works for adjacent nodes. If two nodes are adjacent
+	  then the solid mask on the border will be checked.
 	- Eric Sunshine eliminated some compilation warnings in the terrain
 	  library.
 	- Eric Sunshine added a brand new section to the detailed "anatomy"

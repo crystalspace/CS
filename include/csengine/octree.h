@@ -297,6 +297,11 @@ public:
    * if there are no more polygons.
    */
   bool NextSolidPolygon (void* vspit, csPoly3D& poly);
+
+  /**
+   * If done with the iterator clean it up.
+   */
+  void CleanupSolidPolygonIterator (void* vspit);
 };
 
 /**
@@ -355,6 +360,15 @@ private:
   /**
    * Help function for BoxCanSeeOccludee.
    */
+  void CalculatePolygonShadowArea (
+	const csBox3& occludee_box,
+	csPoly3D& poly, const csPlane3& poly_plane,
+	csPoly2D& result_poly,
+	int plane_nr, float plane_pos);
+
+  /**
+   * Help function for BoxCanSeeOccludee.
+   */
   bool CalculatePolygonShadow (
 	const csVector3& corner,
 	csPoly3D& cur_poly,
@@ -387,6 +401,13 @@ private:
   	const csVector2& scale, const csVector2& shift,
 	int plane_nr, float plane_pos);
 
+  /**
+   * Help function for BoxCanSeeOccludee.
+   */
+  void BoxOccludeeShadowSolidBoundaries (csOctreeNode* occluder,
+	const csBox3& occludee_box,
+    	csCBuffer* cbuffer, const csVector2& scale, const csVector2& shift,
+	int plane_nr, float plane_pos);
   /**
    * Help function for BoxCanSeeOccludee.
    * If 'do_polygons' is true then this function will also call

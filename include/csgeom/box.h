@@ -353,6 +353,15 @@ public:
   csBox2 GetSide (int side) const;
 
   /**
+   * Static function to get the 'other' side (i.e. BOX_SIDE_X
+   * to BOX_SIDE_x, ...).
+   */
+  static int OtherSide (int side)
+  {
+    return side ^ 1;
+  }
+
+  /**
    * Return every edge (segment) of this bounding box
    * from 0 to 11. The returned edge is undefined for any
    * other index.
@@ -516,11 +525,11 @@ public:
 
   /**
    * Test if this box is adjacent to the other one.
+   * Return -1 if not adjacent or else any of the BOX_SIDE_???
+   * flags to indicate the side of this box that the other
+   * box is adjacent with.
    */
-  bool Adjacent (const csBox3& other) const
-  {
-    return AdjacentX (other) || AdjacentY (other) || AdjacentZ (other);
-  }
+  int Adjacent (const csBox3& other) const;
 
   /**
    * Get a convex outline (not a polygon unless projected to 2D)

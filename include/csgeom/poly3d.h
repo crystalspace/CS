@@ -225,6 +225,12 @@ public:
 
   /// Split this polygon to the z-plane.
   void SplitWithPlaneZ (csPoly3D& front, csPoly3D& back, float z) const;
+
+  /// Compute the normal of this polygon.
+  csVector3 ComputeNormal ();
+
+  /// Compute the plane of this polygon.
+  csPlane3 ComputePlane ();
 };
 
 /**

@@ -316,6 +316,26 @@ bool csBox3::AdjacentZ (const csBox3& other) const
   return false;
 }
 
+int csBox3::Adjacent (const csBox3& other) const
+{
+  if (AdjacentX (other))
+  {
+    if (other.MaxX () > MaxX ()) return BOX_SIDE_X;
+    else return BOX_SIDE_x;
+  }
+  if (AdjacentY (other))
+  {
+    if (other.MaxY () > MaxY ()) return BOX_SIDE_Y;
+    else return BOX_SIDE_y;
+  }
+  if (AdjacentZ (other))
+  {
+    if (other.MaxZ () > MaxZ ()) return BOX_SIDE_Z;
+    else return BOX_SIDE_z;
+  }
+  return -1;
+}
+
 void csBox3::GetConvexOutline (const csVector3& pos,
 	csVector3* ar, int& num_array) const
 {

@@ -801,9 +801,6 @@ int csPolygon3D::AddVertex (float x, float y, float z)
   return i;
 }
 
-
-enum InFlag { IN_P, IN_Q, IN_UNKNOWN };
-
 void csPolygon3D::PlaneNormal (float* yz, float* zx, float* xy)
 {
   float ayz = 0;
