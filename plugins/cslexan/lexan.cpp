@@ -317,7 +317,7 @@ csLexicalAnalyzer::Exec(iRegExp &re)
     }  // end modifier op
 
     // special handling for NOP's with OP_MATCH
-    if (opts & 3 !=0 && op_is_nop)
+    if ((opts & 3) != 0 && op_is_nop)
     {
       // if there was an OP_MATCH, but it failed to continue, pop the execution state stack
       if (!extended_match)
