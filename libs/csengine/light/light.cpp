@@ -61,6 +61,8 @@ csLight::csLight (float x, float y, float z, float d,
 
 csLight::~csLight ()
 {
+  if (in_halo_queue)
+    csWorld::current_world->RemoveHalo (this);
 }
 
 float csLight::GetBrightnessAtDistance (float d)
