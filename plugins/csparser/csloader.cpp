@@ -543,60 +543,31 @@ void csLoader::ReportWarning (const char* id, iDocumentNode* node, const char* d
 }
 //---------------------------------------------------------------------------
 
-// XML: temporary code to detect if we have an XML file. If that's
-// the case then we will use the XML parsers. Returns false on failure
-// to parse XML.
-bool csLoader::TestXml (const char* file, iFile* buf,
+bool csLoader::LoadStructuredDoc (const char* file, iFile* buf,
 	csRef<iDocument>& doc)
 {
-  // @@@ Move to some better place
-  csRef<iDocumentSystem> xml (
+  csRef<iDocumentSystem> docsys (
       CS_QUERY_REGISTRY (object_reg, iDocumentSystem));
-  if (!xml) xml = csPtr<iDocumentSystem> (new csTinyDocumentSystem ());
-  doc = xml->CreateDocument ();
+  if (!docsys) docsys = csPtr<iDocumentSystem> (new csTinyDocumentSystem ());
+  doc = docsys->CreateDocument ();
   const char* error = doc->Parse (buf);
   if (error != 0)
   {
     ReportError (
-	    "crystalspace.maploader.parse.xml",
+	    "crystalspace.maploader.parse.plugin",
 	    "Document system error for file '%s': %s!", file, error);
     doc = 0;
     return false;
   }
-
-/*
-  const char* b = **buf;
-  while (*b == ' ' || *b == '\n' || *b == '\t') b++;
-  if (*b == '<')
-  {
-    // XML.
-    // First try to find out if there is an iDocumentSystem registered in the
-    // object registry. If that's the case we will use that. Otherwise
-    // we'll use tinyxml.
-    csRef<iDocumentSystem> xml (
-    	CS_QUERY_REGISTRY (object_reg, iDocumentSystem));
-    if (!xml) xml = csPtr<iDocumentSystem> (new csTinyDocumentSystem ());
-    doc = xml->CreateDocument ();
-    const char* error = doc->Parse (buf);
-    if (error != 0)
-    {
-      ReportError (
-	      "crystalspace.maploader.parse.xml",
-    	      "XML error '%s' for file '%s'!", file, error);
-      doc = 0;
-      return false;
-    }
-  }
-*/
   return true;
 }
 
-csPtr<iBase> csLoader::TestXmlPlugParse (iLoaderContext* ldr_context,
+csPtr<iBase> csLoader::LoadStructuredMap (iLoaderContext* ldr_context,
 	iLoaderPlugin* plug, iFile* buf,
   	iBase* context, const char* fname)
 {
   csRef<iDocument> doc;
-  bool er = TestXml (fname, buf, doc);
+  bool er = LoadStructuredDoc (fname, buf, doc);
   if (!er) return 0;
   if (doc)
   {
@@ -613,9 +584,8 @@ csPtr<iBase> csLoader::TestXmlPlugParse (iLoaderContext* ldr_context,
   }
   else
   {
-    ReportError ("crystalspace.maploader", 
-	    "Please convert your models to XML using cs2xml (file '%s')!",
-	    fname);
+    ReportError ("crystalspace.maploader.load.plugin",
+	    "File does not appear to be a structured map file (%s)!", fname);
     return 0;
   }
 }
@@ -649,7 +619,7 @@ bool csLoader::LoadMapFile (const char* file, bool clearEngine,
     Engine->ResetWorldSpecificSettings();
 
   csRef<iDocument> doc;
-  bool er = TestXml (file, buf, doc);
+  bool er = LoadStructuredDoc (file, buf, doc);
 
   if (!er) return false;
   if (doc)
@@ -658,8 +628,8 @@ bool csLoader::LoadMapFile (const char* file, bool clearEngine,
   }
   else
   {
-    ReportError ("crystalspace.maploader", 
-	    "Please convert your map to XML using cs2xml (file '%s')!", file);
+    ReportError ("crystalspace.maploader.parse.plugin", 
+      "File does not appear to be a structured map file (%s)!", file);
     return false;
   }
 
@@ -685,7 +655,7 @@ bool csLoader::LoadLibraryFile (const char* fname, iRegion* region,
 	new StdLoaderContext (Engine, region, curRegOnly, this, false));
 
   csRef<iDocument> doc;
-  bool er = TestXml (fname, buf, doc);
+  bool er = LoadStructuredDoc (fname, buf, doc);
   if (!er) return false;
   if (doc)
   {
@@ -693,8 +663,8 @@ bool csLoader::LoadLibraryFile (const char* fname, iRegion* region,
   }
   else
   {
-    ReportError ("crystalspace.maploader",
-      "Please convert your library to XML using cs2xml (file '%s')!", fname);
+    ReportError ("crystalspace.maploader.parse.plugin",
+      "File does not appear to be a structure map library (%s)!", fname);
     return false;
   }
 }
@@ -727,7 +697,7 @@ csPtr<iMeshFactoryWrapper> csLoader::LoadMeshObjectFactory (const char* fname)
   }
 
   csRef<iDocument> doc;
-  bool er = TestXml (fname, databuff, doc);
+  bool er = LoadStructuredDoc (fname, databuff, doc);
   if (!er) return 0;
   if (doc)
   {
@@ -757,9 +727,8 @@ csPtr<iMeshFactoryWrapper> csLoader::LoadMeshObjectFactory (const char* fname)
   }
   else
   {
-    ReportError ("crystalspace.maploader",
-      "Please convert your mesh factory to XML using cs2xml (file '%s')!",
-      fname);
+    ReportError ("crystalspace.maploader.parse.plugin",
+      "File does not appear to be a structured mesh factory (%s)!", fname);
     return 0;
   }
   return 0;
@@ -785,7 +754,7 @@ csPtr<iMeshWrapper> csLoader::LoadMeshObject (const char* fname)
   }
 
   csRef<iDocument> doc;
-  bool er = TestXml (fname, databuff, doc);
+  bool er = LoadStructuredDoc (fname, databuff, doc);
   if (!er) return 0;
   if (doc)
   {
@@ -811,9 +780,8 @@ csPtr<iMeshWrapper> csLoader::LoadMeshObject (const char* fname)
   }
   else
   {
-    ReportError ("crystalspace.maploader",
-	    "Please convert your mesh object to XML using cs2xml (file '%s')!",
-	    fname);
+    ReportError ("crystalspace.maploader.parse.plugin",
+      "File does not appear to be a structured mesh object (%s)!", fname);
     return 0;
   }
   return csPtr<iMeshWrapper> (mesh);
@@ -2038,7 +2006,7 @@ bool csLoader::LoadMeshObjectFactory (iLoaderContext* ldr_context,
 	  // to append information to the already loaded factory.
 	  csRef<iBase> mof;
 	  if (plug)
-	    mof = TestXmlPlugParse (ldr_context,
+	    mof = LoadStructuredMap (ldr_context,
 	    	plug, buf, stemp->GetMeshObjectFactory (),
 	    	child->GetContentsValue ());
 	  else
@@ -3094,7 +3062,7 @@ bool csLoader::LoadMeshObject (iLoaderContext* ldr_context,
 	    goto error;
 	  }
 	  csRef<iDocument> doc;
-	  bool er = TestXml (fname, buf, doc);
+	  bool er = LoadStructuredDoc (fname, buf, doc);
 	  if (!er)
 	  {
             SyntaxService->ReportError (
@@ -3194,7 +3162,7 @@ bool csLoader::LoadMeshObject (iLoaderContext* ldr_context,
 	  }
 	  csRef<iBase> mo;
 	  if (plug)
-	    mo = TestXmlPlugParse (ldr_context, plug, buf, mesh, fname);
+	    mo = LoadStructuredMap (ldr_context, plug, buf, mesh, fname);
 	  else
 	  {
 	    csRef<iDataBuffer> dbuf = VFS->ReadFile (fname);
@@ -3422,7 +3390,7 @@ bool csLoader::LoadAddOn (iLoaderContext* ldr_context,
 	    bool rc;
 	    if (plug)
 	    {
-	      csRef<iBase> ret (TestXmlPlugParse (ldr_context,
+	      csRef<iBase> ret (LoadStructuredMap (ldr_context,
 	    	  plug, buf, 0, fname));
 	      rc = (ret != 0);
 	    }

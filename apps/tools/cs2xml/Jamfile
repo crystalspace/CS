@@ -1,5 +1,0 @@
-SubDir TOP apps tools cs2xml ;
-
-Description cs2xml : "World To XML Convertor" ;
-Application cs2xml : [ Wildcard *.cpp *.h ] : console ;
-LinkWith cs2xml : csgeom csgfx cstool csutil ;

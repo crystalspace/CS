@@ -13,7 +13,7 @@ cat <<-FIN
 <!doctype refentry PUBLIC "-//OASIS//DTD DocBook V4.1//EN" [
 
   <!ENTITY dhfirstname "<firstname>Christian</firstname>">
-  <!ENTITY dhsurname   "<surname>BAYLE</surname>">
+  <!ENTITY dhsurname   "<surname>Bayle</surname>">
   <!-- Please adjust the date whenever revising the manpage. -->
   <!ENTITY dhdate      "<date>$DATE</date>">
   <!ENTITY dhsection   "<manvolnum>$SECTION</manvolnum>">
@@ -233,7 +233,7 @@ do
 					2>/dev/null \
 					> $CURDIR/debian/man/$bin.sgml.$SECTION
 					;;
-				cs-config|mdl2spr|3ds2lev|makedep|csfgen|map2cs|cspicview|nettut|unittest|phystut|cs2xml|levtool|maya2spr|milk2spr|python.cex)
+				cs-config|mdl2spr|3ds2lev|makedep|csfgen|map2cs|cspicview|nettut|unittest|phystut|levtool|maya2spr|milk2spr|python.cex)
 					export TYPE="Not standart"
 					echo "Not yet documented" > $CURDIR/debian/man/$bin.txt
 					gensgml $CURDIR/debian/man/$bin.txt \

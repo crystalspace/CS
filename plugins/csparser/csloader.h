@@ -645,18 +645,17 @@ private:
   //========================================================================
 
   /**
-   * XML: temporary function to detect if we have an XML file. If that's
-   * the case then we will use the XML parsers. Returns false on failure
-   * to parse XML.
+   * Try loading file as a structured document via iDocumentSystem.
+   * \return False on failure.
    */
-  bool TestXml (const char* file, iFile* buf, csRef<iDocument>& doc);
+  bool LoadStructuredDoc (const char* file, iFile* buf, csRef<iDocument>& doc);
 
   /**
-   * XML: temporary function that checks if a given data buffer is actually
-   * XML and will call the XML Parse function in that case. Otherwise it
-   * will call the old style Parse function.
+   * Try loading the file as a structured document.
+   * \return True if the documented loaded and appears to be a map file,
+   *   otherwise false.
    */
-  csPtr<iBase> TestXmlPlugParse (iLoaderContext* ldr_context,
+  csPtr<iBase> LoadStructuredMap (iLoaderContext* ldr_context,
   	iLoaderPlugin* plug, iFile* buf,
   	iBase* context, const char* fname);
 

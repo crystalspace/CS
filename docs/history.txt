@@ -90,6 +90,7 @@ chronological order.
 	    cloth       --> CLOTH_OBSOLETE
 	    clothldr    --> CLOTH_OBSOLETE
 	    cocoa2d     --> COCOA2D_OBSOLETE
+	    cs2xml      --> CS2XML_OBSOLETE
 	    demosky     --> DEMOSKY_OBSOLETE
 	    demosky2    --> DEMOSKY_OBSOLETE
 	    simplecloth --> CLOTH_OBSOLETE

@@ -143,11 +143,11 @@ clean:
 
 	dh_clean
 
-DEVBIN=map2cs mdl2spr vsh cs-config 3ds2lev cs2xml csfgen cslight maya2spr md32spr milk2spr python.cex tbconvert
+DEVBIN=map2cs mdl2spr vsh cs-config 3ds2lev csfgen cslight maya2spr md32spr milk2spr python.cex tbconvert
 
 install: install-indep install-arch
 install-indep:
-	
+
 	dh_testdir
 	dh_testroot
 	dh_clean -k -i
@@ -182,7 +182,7 @@ install-arch:
 	$(CURDIR)/debian/tmp/usr/lib/crystalspace/scripts/python/cssh.py
 	chmod +x \
 	$(CURDIR)/debian/tmp/usr/lib/crystalspace/scripts/python/pysimp.py
-	
+
 	# Move to respect Debian Policy
 
 	# dev binaries in /usr/bin
