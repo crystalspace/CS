@@ -19,6 +19,12 @@ The history order has been reversed so that new features are at the top.
 	  corrupted converted Quake 2 models.  The conversion process was
 	  essentially throwing away valid vertex coordinates and substituting
 	  incorrect coordinates in their stead.
+	- Eric Sunshine eliminated the very annoying behavior of csSimpleInput
+	  where it would erase the console's input line when the user pressed
+	  Return.  The result was that after pressing Return, the user could
+	  not see what had been typed.  Now the input line is preserved.
+	- Eric Sunshine fixed a bug in csSimpleInput where it would corrupt
+	  memory when Delete was pressed at the end of the input line.
 20-Mar-2001:
 	- Philip Wyett altered his email address in the docs.
 	- Wouter Wijngaards added the following methods to explosion

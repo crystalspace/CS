@@ -78,12 +78,18 @@ bool csSimpleInput::HandleEvent (iEvent &Event)
       switch (Event.Key.Code)
       {
         case CSKEY_UP:
-          if (HistoryPos > 0) HistoryPos--; else HistoryPos = History.Length () - 1;
+          if (HistoryPos > 0)
+	    HistoryPos--;
+	  else
+	    HistoryPos = History.Length () - 1;
           strcpy (line, History.Get (HistoryPos));
           CursorPos = strlen (line);
           break;
         case CSKEY_DOWN:
-          if (HistoryPos < History.Length () - 1) HistoryPos++; else HistoryPos = 0;
+          if (HistoryPos < History.Length () - 1)
+	    HistoryPos++;
+	  else
+	    HistoryPos = 0;
           strcpy (line, History.Get (HistoryPos));
           CursorPos = strlen (line);
           break;
@@ -106,6 +112,7 @@ bool csSimpleInput::HandleEvent (iEvent &Event)
           InsertMode = !InsertMode;
           break;
         case CSKEY_ENTER:
+	  Console->PutText(MSG_CONSOLE, "\n");
           if (Callback)
             Callback (CallbackData, line);
           if (line [0])
@@ -121,13 +128,21 @@ bool csSimpleInput::HandleEvent (iEvent &Event)
           {
             CursorPos--;
             int sl = strlen (line);
-            memmove (line + CursorPos, line + CursorPos + 1, sl - CursorPos + 1);
+	    if (CursorPos + 1 == sl)
+	      line[CursorPos] = '\0';
+	    else
+              memmove(line + CursorPos, line + CursorPos + 1,
+	        sl - CursorPos + 1);
           }
           break;
         case CSKEY_DEL:
           {
             int sl = strlen (line);
-            memmove (line + CursorPos, line + CursorPos + 1, sl - CursorPos + 1);
+	    if (CursorPos + 1 == sl)
+	      line[CursorPos] = '\0';
+	    else if (CursorPos < sl)
+              memmove(
+	        line + CursorPos, line + CursorPos + 1, sl - CursorPos + 1);
           }
           break;
         case CSKEY_PGUP:
@@ -145,8 +160,9 @@ bool csSimpleInput::HandleEvent (iEvent &Event)
           {
             int sl = strlen (line);
             if (InsertMode && CursorPos < sl)
-              memmove (line + CursorPos + 1, line + CursorPos, sl - CursorPos + 1);
-            bool needeol = (line [CursorPos] == 0);
+              memmove(line + CursorPos + 1, line + CursorPos,
+	        sl - CursorPos + 1);
+            bool needeol = (line [CursorPos] == '\0');
             line [CursorPos++] = Event.Key.Char;
             if (needeol) line [CursorPos] = '\0';
           }
@@ -213,9 +229,9 @@ void csSimpleInput::SetPrompt (const char *iPrompt)
 void csSimpleInput::Refresh ()
 {
   if (!Console || !Console->GetVisible ()) return;
+  Console->PutText (MSG_CONSOLE, "\r");
   Console->PutText (MSG_CONSOLE, Prompt);
   Console->PutText (MSG_CONSOLE, line);
-  Console->PutText (MSG_CONSOLE, "\r");
   Console->SetCursorPos (PromptLen + CursorPos);
   if (InsertMode)
     Console->SetCursorStyle (csConInsertCursor);
