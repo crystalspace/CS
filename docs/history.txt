@@ -134,6 +134,7 @@ The history order is reversed so that new features are at the top.
 	  vice versa.
 	- Fixed the csParseInputDef and csGetInputDesc so that they now
 	  return bool on success/failure of conversion.
+	- Richard Uren added a new loader for the isometric engine.
 4-Mar-2002
 	- Fixed the tutorials in the docs so that they are up-to-date with
 	  regards to changes that happened a long time ago in csInitializer.
@@ -994,7 +995,7 @@ The history order is reversed so that new features are at the top.
 	    - Simplified the cache system slightly, which removed one
 	      additional indirection. This should result in a slightly faster
 	      implementation.
-	    - Modified the code lsightly to include LookupIndex right inside
+	    - Modified the code slightly to include LookupIndex right inside
 	      GetPointer. This will probably increase it's chances of being
 	      inlined, and remove an additional function setup/teardown even
 	      if it doesn't.
@@ -2011,7 +2012,7 @@ The history order is reversed so that new features are at the top.
 	  compiler is looking there by default but some external tools like
 	  libtool didn't).
 	- Philip Wyett commented out wrong plugin. Fixed.
-	- Philipo also changed MAXPATHLEN to CS_MAXPATHLEN to eliminate
+	- Philip also changed MAXPATHLEN to CS_MAXPATHLEN to eliminate
 	  a warning under the Cygwin Windows port of CS. This change
 	  is done blind into some CS ports, so sorry in advance if this
 	  causes any problems.
@@ -3565,7 +3566,7 @@ The history order is reversed so that new features are at the top.
 	- Wouter Wijngaards made a new portal in the flarge basement so it
 	  is easier to get out the basement again.
 17-Oct-2001
-	- M Voase did the following
+	- Michael Voase did the following
 	  - Small typo fix to data/walktest.cfg. This just fixes up
 	    the PerfStats loading problem, but doesnt fix the fact
 	    that the plugin was taking the name tag from the walktest
@@ -3600,7 +3601,7 @@ The history order is reversed so that new features are at the top.
 	  behaviour of memdebug.cpp when using plugins.
 	  Added /usr/include to the include path to fix a makedep problem
 	  (makedep doesn't search in /usr/include).
-	- Michael Voasse moved water and fire proctex in flarge down to the
+	- Michael Voase moved water and fire proctex in flarge down to the
 	  basement.
 	- Christopher Nelson did the following:
 	    - Updated AWS to fix some virtual inlines that might be causing
@@ -5017,7 +5018,7 @@ Re-enabled use of cs_snprintf as all seems to be well again.
 	    - The Include method, which is now slightly less optimal because
 	      I couldn't get chop edge intersection to work consistently.
 	    - A few items here and there related to accuracy.
-       - Christopher also did the following:
+	- Christopher also did the following:
 	    - Along with the fixes to csRectRegion, I made a few changes 
 	      to the redraw code which will hopefully eliminate droppings.
 	      I realize that there are a few cases where this still occurs,
@@ -7028,7 +7029,7 @@ Re-enabled use of cs_snprintf as all seems to be well again.
 	- Eric Sunshine eliminated a compilation warning about unused variable
 	  in mdltool.cpp.  (In fact, this particular variable was being
 	  shadowed by another variable in another scope.)
-	- Michael Voasse did the following:
+	- Michael Voase did the following:
 	    - Texture manager: Implement DecRef() FreeTypedItem() in
 	      csMatVector, this corrects a memory leak in csMatVector and
 	      with some minor corrections to all video driver, permits the
@@ -7160,7 +7161,7 @@ Re-enabled use of cs_snprintf as all seems to be well again.
 	  cssys/system.h from cssys/general/printf.cpp.
 	- Eric Sunshine fixed a bug in csStaticArray::ReAlloc() where it was
 	  applying delete[] to a void pointer, which is an illegal operation.
-	- Michael Voasse writes the following (NOTE!! this comment has
+	- Michael Voase writes the following (NOTE!! this comment has
 	  been proven to be untrue later):
 	  txtmgr.cpp: Removed bogus bug flag from the texture manager. The bug
 	  that I am seeing is due to more brain dead behaviour of my system.
@@ -7489,7 +7490,7 @@ Re-enabled use of cs_snprintf as all seems to be well again.
 	  no longer shine on exits of neighboring rooms. This looks bad, so
 	  I reduced the radius.
 20-Jul-2001
-	- Michael Voasse did the following:
+	- Michael Voase did the following:
 	    - pttex.cpp: Bug hunting. if EngineProcTex::Animate(),
 	      changed reference to csSector to iSector. Squashes bug
 	      in bot cam. Changed reference from csMeshFactoryWrapper
@@ -7600,7 +7601,7 @@ Re-enabled use of cs_snprintf as all seems to be well again.
 	- Martin Geisse enabled both the sprite and the thing conversion of
 	  the generated model in mdltest with different position.
 	- Martin also fixed a memory leak in csSectorList.
-	- Michael Voasse did the following:
+	- Michael Voase did the following:
 	    - terrfunc.cpp: improved current hit beam ready for HitBeam()
 	      rewrite. I have rewritten the while loop to be a for loop.
 	      This has improved performance reasonably. The movement of
@@ -7667,7 +7668,7 @@ Re-enabled use of cs_snprintf as all seems to be well again.
 	  regarding undefined csCoverageMatrix.
 	- Eric Sunshine eliminated compilation warning from radiosity.cpp
 	  regarding variable `visibility' being used uninitialized.
-	- Michael Voasse did the following:
+	- Michael Voase did the following:
 	    - polytext.cpp: hid the overloaded *PutPixel and *DrawBox
 	      by prepending underbars to the overloaded methods. Adapts
 	      polytext to egcs 2.91.66 brain death.
@@ -7683,7 +7684,7 @@ Re-enabled use of cs_snprintf as all seems to be well again.
 	- In an effort to eliminate the big iso engine bug I added
 	  some asserts.
 	- Wouter Wijngaards fixed another bug in iso engine.
-	- Michael Voasse removed two debugging messages in software renderer.
+	- Michael Voase removed two debugging messages in software renderer.
 	- Philip Wyett moved struct RGB to be public in class awsRGBKey.
 	- Philip Wyett updated his mail address in the docs to:
 	      philipwyett@dsl.pipex.com
@@ -7807,7 +7808,7 @@ Re-enabled use of cs_snprintf as all seems to be well again.
 	  lighting specific stuff.
 	- Philip Wyett removed following piece of old glide stuff.
 	  #define CS_GLIDE_2D_DRIVER "crystalspace.graphics2d.glidewin"
-	- Michael Voasse did the following:
+	- Michael Voase did the following:
 	      - simplept: Changed this tutorial to use the inbuilt water
 	        procedural texture.
 	      - walktest: Very slight change to walktest to clip the 2d
@@ -7818,18 +7819,18 @@ Re-enabled use of cs_snprintf as all seems to be well again.
 	      - sprite3d: Modified HitBeamObject() to do a full scan of a
 	        mesh. This now returns the first intersecting triangle in a
 		mesh. This is slower, but at least it is closer to correct.
-	- Later Michael Voasse reverted his changes to simplept.
+	- Later Michael Voase reverted his changes to simplept.
 14-Jul-2001
 	- Fixed pseudo-dynamic lighting again (broke it yesterday).
 	- Continued work on new lighting system.
-	- Philip Wyett Added:
+	- Philip Wyett added:
 		#pragma inline_depth (255)
 		#pragma inline_recursion (on)
 		#pragma auto_inline (on)
 	  to win32/csosdefs.h. This works round MS's default implementation
 	  of the "inline" keyword in MSVC and makes the compiler do a true
 	  "inline" when we ask for "inline".
-	- Michael Voasse did the following:
+	- Michael Voase did the following:
 	    - Graph2D: Fixed procedural texture clip problem (introduced by
 	      my last patch). DrawPixeln() now checks upto and including the
 	      bouding box values.
@@ -7851,7 +7852,7 @@ Re-enabled use of cs_snprintf as all seems to be well again.
 	- Continued working on the new lighting system. It is almost
 	  starting to work now. But the last straw is always the most
 	  difficult one :-) It is still not enabled by default.
-	- Michael Voasse did the following:
+	- Michael Voase did the following:
 	    - Bugplug: Added NULL assignment to poly ( line 274 ).
 	      This was allowing bugplug to use an unassigned Polygon3D
 	      pointer.
@@ -7966,7 +7967,7 @@ Re-enabled use of cs_snprintf as all seems to be well again.
 	  color keys.
 	- Philip Wyett fixed some struct vs. class mismatches in AWS header.
 10-Jul-2001
-	- Michael Voasse did the following:
+	- Michael Voase did the following:
 	    - Next installment on terrfunc, this patch adds some bound
 	      checking to HitBeamObject(), this should stop once and for all
 	      the current infinite loop problems. Also prevents out of
@@ -8072,7 +8073,7 @@ Re-enabled use of cs_snprintf as all seems to be well again.
 	  the engine render into it (and by this it should finally replace
 	  the unmaintained ptlab application). Currently there is still a
 	  crasher at shutdown for opengl.
-	- Michael Voasse did the following:
+	- Michael Voase did the following:
 	    - Improved HitBeamObject() somewhat in terrfunc. I have fixed
 	      the endless loop situation so that it doesn't hang the engine
 	      when used in certain circumstances. It should be fairly acurate
@@ -8185,7 +8186,7 @@ Re-enabled use of cs_snprintf as all seems to be well again.
 5-Jul-2001
 	- Removed Glide renderer and canvases due to lack of
 	  maintenance. It was not functional either.
-	- Michael Voasse writes:
+	- Michael Voase writes:
 	    - In the ongoing quest to implement HitBeam() in all
   	      mesh objects, todays victim is terrfunc. Unfortunately,
   	      I have been slightly side-tracked into correcting bugs
@@ -8260,7 +8261,7 @@ Re-enabled use of cs_snprintf as all seems to be well again.
 	      yet reference-counted correctly).
 	    - Fixed the impexp multiplexer and POV importer to compile again
 	      and added both to the build process.
-	- Michael Voasse did the following:
+	- Michael Voase did the following:
 	    - In the ongoing quest to implement HitBeam() in all
 	      mesh objects, todays victim is terrfunc. Included
 	      is the first draft for HitBeamObject(), several
@@ -8512,7 +8513,7 @@ Re-enabled use of cs_snprintf as all seems to be well again.
 	  Apple/NeXT system driver and AppKit-based 2D driver.
 	- Eric Sunshine eliminated several compilation warnings from
 	  cmdline.cpp and cmdline.h.
-	- Michael Voasse made the following changes:
+	- Michael Voase made the following changes:
 	    - In the ongoing quest to implement HitBeam() in all mesh objects,
   	      todays victims are cube and surface.  Both should now respond to
   	      bugplug and show their bounding boxen and radii.  I have
@@ -8826,7 +8827,7 @@ Re-enabled use of cs_snprintf as all seems to be well again.
 	  for building with MSVC and Parasoft Insure++ runtime debugger.
 	- Philip fixed some bad returns from void functions in terrain
 	  plugin.
-	- Michael Voasse did the following:
+	- Michael Voase did the following:
 	    - First installment in the HitBeamObject() updates. First victim
 	      is ball. *WARNING* I have reset the size of the ball back to its
 	      correct value. What was being declared as a RADIUS, was in fact,
@@ -8944,7 +8945,7 @@ Re-enabled use of cs_snprintf as all seems to be well again.
 	- Wouter Wijngaards added a randomly generated maze to isotest
 	  application.
 	- Philip Wyett fixed a small compile problem in iso engine.
-	- Michael Voasse implemented radius calculation on metaball,
+	- Michael Voase implemented radius calculation on metaball,
 	  'borrowed' HitBeamObject code from sprite3d and fixed shape
 	  number update.
 25-Jun-2001
@@ -9006,7 +9007,7 @@ Re-enabled use of cs_snprintf as all seems to be well again.
 	    - Added a definition of OPENGL_2D_DRIVER to next/csosdefs.h.
 	- Eric Sunshine fixed ogl_halo.cpp so that it no longer unnecessarily
 	  includes <windows.h>.
-	- Michael Voasse added half of the animation documentation. He
+	- Michael Voase added half of the animation documentation. He
 	  added the links accidentally during his last commit, so he added
 	  what he had completed so far.
 	- Michael also added SetVertices() methods to Sprite3d, modified
@@ -9335,7 +9336,7 @@ Re-enabled use of cs_snprintf as all seems to be well again.
 	- Worked on apimod19.txi.  Also updated dirhier.txi to add the sequence
 	  plugin.
 	- Philip Wyett fixed the video app after Jorrit's changes.
-	- Michael Voasse shifted the tesselator from MetaBall to csgeom. It
+	- Michael Voase shifted the tesselator from MetaBall to csgeom. It
 	  is a general purpose utility that better serves CS in the geometry
 	  library. Performance has been checked and a slight speedup has
 	  been noticed in metagen, however, no significant improvement has
@@ -9426,7 +9427,7 @@ Re-enabled use of cs_snprintf as all seems to be well again.
 	  previous rects into bucket zero, and then uses bucket zero for all
 	  subsequent updates.  This eliminates overdraw in the sinplest way,
 	  without making the algorithm overly complex.
-	- Michael Voasse added a new metagen mesh object plugin.
+	- Michael Voase added a new metagen mesh object plugin.
 	- Martin Geisse applied some major changes to the initial model
 	  converter interface:
 	    - All model data components now implement iObject
@@ -10115,7 +10116,7 @@ Re-enabled use of cs_snprintf as all seems to be well again.
 	    - Soundsources parent is the originating soundhandle instead of
 	      soundrender: this prevents circular dependency with
 	      IncRef/DecRef.
-	- Michael Voasse did the following:
+	- Michael Voase did the following:
 	    - Normalized metaball default rendering area to be symmetrical
 	      on all axes.
 	    - The metaballs should now render around (0,0,0) where you place
@@ -10297,7 +10298,7 @@ Re-enabled use of cs_snprintf as all seems to be well again.
 	- Eric Sunshine implemented iGraphics2D::SetMouseCursor() in the OpenGL
 	  and Glide BeOS drivers.  (This method was already implemented in the
 	  software driver.)
-	- Michael Voasse did the following:
+	- Michael Voase did the following:
 	    - Moved metaball to a mesh object.
 	    - Added meta ball loader.
 	    - Modified metasys to suit new meta ball.
@@ -10544,7 +10545,7 @@ Re-enabled use of cs_snprintf as all seems to be well again.
 	- Wouter added csgeom to the linex2d canvas, to fix csRect reference.
 	- Philip Wyett started adding the new Direct Draw 8 plugin (not
 	  Direct3D yet!).
-	- Michael Voasse did some more work on motion manager.
+	- Michael Voase did some more work on motion manager.
 	- Eric Sunshine eliminated a couple compilation warnings in isoview.cpp
 	  regarding assignment of float to integer.
 	- Eric Sunshine eliminated several compilation errors from metasys.cpp.
@@ -10628,14 +10629,14 @@ Re-enabled use of cs_snprintf as all seems to be well again.
 	    csEngine* engine = (csEngine*)Engine;
 	- Philip also modified video app to use iThingState and brought
 	  into line with Jorrits changes.
-	- Michael Voasse fixed a couple of additional bugs in motion
+	- Michael Voase fixed a couple of additional bugs in motion
 	  manager. Changed csAppliedFrameVector from TYPED_VECTOR to
 	  TYPED_VECTOR_NODELETE. Note, motion manager now throws a compiler
 	  warning, however it is due to the NODELETE typed vector. I could
 	  fix csVector, but I would need to clear it with Jorrit first since
 	  CS is HEAVILY dependent on csVector. If I break it, there will be a
 	  lot of pieces to keep 8).
-	- Michael Voasse did more bug stomping in motion manager. Removed
+	- Michael Voase did more bug stomping in motion manager. Removed
 	  reverse flag, its now handled by setting a negative rate. Recoded
 	  UpdateAppliedMotion() to actually *work*. Removed the total time
 	  from ACTIONSET. Total time is now taken as the last frame time as

@@ -37,6 +37,12 @@ David enhanced the @sc{dos} port made by Murat.  He added C++ classes and
 @file{scan.cpp}.
 
 @item
+Brendan Burns (@email{bburns@@genet.cs.umass.edu})
+
+Brendan worked on a memory canvas which can render to a memory buffer instead
+of a window.
+
+@item
 Nathaniel Saint Martin (@email{noote@@bigfoot.com})
 
 Nathaniel is a very eager Crystal Space fan.  He even has his own web page
@@ -432,6 +438,11 @@ Gert wrote the Linux drivers for the sound system and he also converted the
 OpenGL ports.
 
 @item
+Michael O'Shea
+
+Michael found a bug in iLoader::LoadMeshObject.
+
+@item
 Michael Dale Long (@email{mlong@@custom.net})
 
 Michael helped fix the Glide port and contributed lots of other small fixes.
@@ -472,6 +483,15 @@ Mattias provided a patch with a cleaner handling of the X11 visual and window
 creation.
 
 @item
+Matze Braun (@email{matze@@braunis.di})
+Matze  did various changes, fixes
+and enhancements to CS (too many to list). Some of the more important ones are: 
+cs-config scripting facility, documentation annotation system, several
+bug fixes, enhancements and fixes to Map2CS, new null canvas for the null3d
+renderer, cygwin port, viewmesh enhancements, VFS support for csFileDialog,
+@dots{}
+
+@item
 Serguei ``Snaar'' Narojnyi (@email{snaar@@idirect.ca})
 
 Serguei added the first integrated networking code to Crystal Space.  His code
@@ -499,11 +519,57 @@ soundserver that comes with the aRts system (see www.arts-project.org). Norman
 added an export script for Blender. He added texture coordinate animation to
 2d sprites. He worked on the video file streamer. Norman also added the
 (unused) @code{csCrystalBall} culler and the fancy console plugin.
+In addition he has also worked a lot on the OpenGL renderer (mostly support
+for extensions). Lately Norman worked on AWS and a convertor from QT to AWS.
+Norman also added several sound related modules like ogg.
 
 @item
 Nicholas Francis (@email{nicholasfrancis@@iname.com})
 
 Nicholas made a few contributions to MazeD.
+
+@item
+Christian Bayle (@email{christian.bayle@@rd.francetelecom.com})
+
+Christian Bayle contributed scripts to make a Debian package for CS.
+
+@item
+Tobias Brueckner (@email{tobias.brueckner@@gmx.net})
+
+Tobias fixed several bugs in the OpenGL renderer, the engine, and the
+terrain renderer.
+
+@item
+Markus Korth (@email{mkorth@@military.de})
+
+Markus fixed a bug with @file{unixconf.sh}.
+
+@item
+Michael Voase (@email{mvoase@midcoast.com.au})
+
+Michael did various things in CS: changes to walktest, a lot of work on mesh
+objects (hitbeam, bounding boxes, @dots{}), lots of bug fixes, a lot of work
+on improving memory management for the texture managers, fixing memory
+leaks, work on csObject, @dots{} 
+
+@item
+Richard Uren (@email{richard@@starport.net})
+
+Richard made several changes and fixes to the isometric engine and also
+contributed a loader for it.
+
+@item
+Patrick McFarland (@email{unknown@@panax.com})
+
+Patrick rewrote the autoconf macro from scratch.
+
+@item
+Jorge Acereda (@email{al004046@@anubis.uji.es})
+
+Jorge did several things in CS: FreeBSD/NetBSD port, fixing MD2 importer so
+that it recognizes actions, fixing mdl2spr, fixing 3ds2lev, fixes to the
+engine, some memory leak fixes, dlopen fixes, bug fix in Blocks, some other
+smaller changes.
 
 @item
 Eric Sunshine (@email{sunshine@@sunshineco.com})
@@ -679,7 +745,20 @@ wrote an Unreal map to Crystal Space convertor.  Brandon also added project
 files for Borland 4. Brandon also worked on the Playstation2 port. He
 improved @code{csQuaternion} a lot. Brandon also added @sc{cssh} (Crystal
 Space Shell). He added the (now non-existant) @file{newdoc} directory with
-LaTeX documentation.
+LaTeX documentation. Later Brandon worked on a cal3d convertor for Crystal Space
+and a motion manager plugin.
+
+@item
+Toni Gonzalez (@email{e3445510@@est.fib.upc.es})
+
+Toni implemented a faster version of DrawPolygonMesh() for OpenGL. He also
+fixed some bugs in 3ds2lev. Toni additionally did some modifications on map2cs
+and walktest to support generic mesh placing.
+
+@item
+Chen Puning (@email{chenpuning@@hotmail.com})
+
+Chen fixed a bug in the engine with regards to @code{GetScreenBoundingBox()}.
 
 @item
 Wyatt Miler (@email{wmiler@@milertronics.com})
@@ -715,6 +794,23 @@ Void (@email{glitia@@texnet.ro})
 
 Mr. Void did some work on Blocks to make it playable again.  He also fixed a
 considerable number of bugs and other problems.
+
+@item
+res (@email{resqu@@gmx.ch})
+
+res did various things to CS: documentation changes, OpenGL and canvas
+related fixes, fixes on procedural textures, lots of other small changes,
+Windows Help files for CS, default image when texture cannot be found,
+fixes to AWS, fixes to image loaders, vfs enhancements, mouse pointer
+support in Windows canvases, @dots{}
+
+@item
+Peter Amstutz (@email{tetron@@student.umass.edu})
+
+Peter gave us a patch which speeds up loading of 3D sprites a lot.
+In addition it also speeds up CS in general a little. Peter also worked
+together with Brendan Burns on the memory canvas. Also added two canvas
+related broadcast events. Peter also sent in a few smaller patches.
 
 @item
 Peter Donald (@email{donaldp@@lion.cs.latrobe.edu.au})
@@ -768,6 +864,11 @@ changed many applications to use the engine as a plug-in and added the
 @file{simplept} application. He added ``fast interfaces'' to @sc{scf}. Martin
 also completely rewrote the ``Software'' and ``DirectSound'' sound renderes
 and modified the world file loader and the image loader to work as plug-ins.
+
+@item
+Jonathan Hudson (@email{nathanoj@@realmail.2ndmail.com})
+
+Jonathan implemented visibility testing for particle systems.
 
 @item
 Daniel Fannar Gudbjartsson (@email{dfg@@decode.is})
@@ -877,6 +978,7 @@ Philip has done (and is doing) a great job maintaining the Windows ports,
 both the @sc{msvc} one and the @sc{gcc} one and also the documentation for
 the ports. He also creates installable packages for Windows from time to time
 and helps with maintenance in general.
+In general he did lots of small fixes in CS.
 
 @item
 Justin Miller (@email{dyad@@fuse.net})
@@ -885,10 +987,11 @@ Justin added @code{csString::Format()}. He also contributed to the
 documentation and sent a few fixes.
 
 @item
-Luca Pancallo
+Luca Pancallo (@email{lpancallo@@ptc.com})
 
 Luca extended the @sc{ase} importer in impexp and added a Crystal Space sprite
-exporter.  He also sent a patch for @file{mdl2spr}.
+exporter.  He also sent a patch for @file{mdl2spr} and made various fixes
+on @code{3ds2lev}.
 
 @item
 Mike Bond (@email{mbond@@cox.rr.com})
@@ -945,6 +1048,12 @@ a mesh object plugin and added a blobby texture for them. He wrote the
 motion manager and contributed a shuttle model for ``csdemo''. 
 
 @item
+Oktal
+
+Oktal added new functions to parse input (keyboard, mouse, joystick)
+into ascii form and vice versa.
+
+@item
 Sebastian Duell (@email{wastel7@@gmx.de})
 
 Sebastian contributed a Blender export script.
@@ -954,7 +1063,14 @@ Christopher Nelson (@email{paradox@@BBHC.ORG})
 
 Christopher wrote a remake of the windowing system (@sc{csws}), called
 @sc{aws}. He also added the @file{cslexan} plugin (lexical analyzer). Before
-he started work on the @sc{aws}, he contributed to @sc{csws}.
+he started work on the @sc{aws}, he contributed to @sc{csws}. Christopher
+also created the @sc{terrbig} terrain engine.
+Christopher also worked on a platform independent memory mapper.
+
+@item
+Jonathan Tarbox (@email{jtarbox@@sbcglobal.net})
+
+Jonathan updated the BeOS port in Crystal Space.
 
 @item
 Andreas Hoefler
@@ -962,7 +1078,7 @@ Andreas Hoefler
 Andreas rewrote and cleaned up the @sc{wav} loader.
 
 @item
-Richard D. Shank
+Richard D. Shank (@email{rdscrystalspace@@rhinogames.com})
 
 Richard added the @sc{3ds} model importer. He also moved the old terrain
 engine to a plug-in.
@@ -978,6 +1094,8 @@ Matt Reda (@email{mreda@@mac.com})
 Matt contributed an OpenGL driver, a CoreGraphics driver, and a CoreAudio
 driver for the MacOS/X port of Crystal Space.  The addition of these drivers
 makes Crystal Space a viable option for game development on Macintosh.
+Matt also worked a bit on the isometric engine and added a split-view
+option to WalkTest.
 @end itemize
 
 @noindent

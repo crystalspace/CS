@@ -14,8 +14,6 @@ can be given:
 	- **: bug or feature has been fixed or implemented.
 
 Bugs to fix:
-	[**] Fix the problem with adding -lutil for more recent
-	     versions of python. This should be automatic and not manual.
 	[V]  Investigate if LOD for sprites is still working.
 	[S]  Investigate if there are any more memory leaks after
 	     unloading a level and if so fix them.
@@ -23,16 +21,6 @@ Bugs to fix:
 	     CS. To enable this just edit include/csutil/debug.h and
 	     remove the comment ('//') right before the define of
 	     CS_USE_GRAPHDEBUG. Then recompile.
-	[**] Shoot a missile in hole in flarge. The walls of the hole
-	     become lit ok then but revert to full bright after missile
-	     particles have disappeared. Only with OpenGL.
-	[**] Fade effect no longer works in OpenGL (visible in csdemo and
-	     F5 key in walktest). May be related to the fact that a material
-	     without texture is used and this has recently changed.
-	[**] It seems that pseudo-dynamic lighting is not working
-	     correctly. In flarge you can see that near the stairs
-	     some polygons are not updated when the dynamic light
-	     changes intensity/color.
 	[V]  Investigate various visible artifacts in the mazedex
 	     level. It appears that most of these have to do with the
 	     halos and only appear with OpenGL. One artifact appears
@@ -40,9 +28,6 @@ Bugs to fix:
 	     if you look into the reflecting table.
 	[V]  Static lighting no longer goes through space-warping
 	     portals.
-	[**] Investigate if PlaceMesh() works correctly. I suspect it
-	     doesn't. May be related to bug [Bug 471637].
-	[**] Bug with models seen through portals [Bug 471638].
 	[V]  One of the halos in flarge seems to disappear in some cases
 	     with OpenGL.
 	[V]  Walktest + newsky: it appears that there are some visibility
@@ -57,13 +42,6 @@ Bugs to fix:
 	     This is not hard. Harder will be the fact that the lighting
 	     system has changed. It now works with the shadow bitmaps.
 	     [Bug 429283]
-	[**] In isometric engine (isotest) + OpenGL some of the mesh
-	     objects (like the particle systems) are clipped wrong to the
-	     floor.
-	     This is a very hard bug. We have been hunting this bug for
-	     ages. Z-buffer accuracy problems have been suspected but this
-	     is probably not right because the problem arises on cards
-	     with 32-bit Z-buffer too.
 	[F]  Gouraud shaded polygons are not supported well: you can only
 	     define triangles that are gouraud shaded and not polygons in
 	     general.
@@ -71,8 +49,6 @@ Bugs to fix:
 	     perfectly now. However there are cases when texture mapping
 	     is wrong.
 	     [Bug 202768]
-	[**] Lighting is not cached for gouraud shaded polygons.
-	     [Bug 202780]
 	[V]  Investigate if skeletal sprites work nicely with the
 	     visibility culling system.
 	     Major problem is that calculating a bounding box for a skeletal
@@ -111,21 +87,6 @@ Bugs to fix:
 	     Also this may require a big change in the software renderer...
 	     Rather complicated bug. But an important one to fix.
 	     [Bug 405964]
-	[**] Problem with keycolor + zbuffer:
-	     When a texture with keycolor transparency is rendered the
-	     software and hardware renderers currently behave differently.
-	     With software the z-buffer is only updated at those positions
-	     where the texture is actually drawn. This is very nice of
-	     course since that means you can essentially draw the keycolor
-	     texture using Z-buffer and objects drawn behind it will be correct.
-	     However this doesn't work with hardware. With hardware the
-	     Z-buffer is updated for the entire polygon regardsless of the
-	     key-color value.
-	     I'm not sure if it is actually possible to do otherwise with
-	     hardware. If not then the engine will have to solve this by
-	     sorting such polygons from back to front in relation to other
-	     objects in the same sector.
-	     [Bug 409067]
 	[V]  The software renderer implementation of DrawTriangleMesh
 	     is still missing a few clipping features. In general it would
 	     be nice to investigate the use of the OpenGL clipping routines
@@ -153,14 +114,50 @@ Bugs to fix:
 	        Mount ("this/is/a/dir$/", "/lib/whatever");
 	     i.e. the last '/' has to be preceeded with '$'. This needs
 	     to be fixed.
+	[**] Fix the problem with adding -lutil for more recent
+	     versions of python. This should be automatic and not manual.
+	[**] Shoot a missile in hole in flarge. The walls of the hole
+	     become lit ok then but revert to full bright after missile
+	     particles have disappeared. Only with OpenGL.
+	[**] Fade effect no longer works in OpenGL (visible in csdemo and
+	     F5 key in walktest). May be related to the fact that a material
+	     without texture is used and this has recently changed.
+	[**] It seems that pseudo-dynamic lighting is not working
+	     correctly. In flarge you can see that near the stairs
+	     some polygons are not updated when the dynamic light
+	     changes intensity/color.
+	[**] Investigate if PlaceMesh() works correctly. I suspect it
+	     doesn't. May be related to bug [Bug 471637].
+	[**] Bug with models seen through portals [Bug 471638].
+	[**] In isometric engine (isotest) + OpenGL some of the mesh
+	     objects (like the particle systems) are clipped wrong to the
+	     floor.
+	     This is a very hard bug. We have been hunting this bug for
+	     ages. Z-buffer accuracy problems have been suspected but this
+	     is probably not right because the problem arises on cards
+	     with 32-bit Z-buffer too.
+	[**] Lighting is not cached for gouraud shaded polygons.
+	     [Bug 202780]
+	[**] Problem with keycolor + zbuffer:
+	     When a texture with keycolor transparency is rendered the
+	     software and hardware renderers currently behave differently.
+	     With software the z-buffer is only updated at those positions
+	     where the texture is actually drawn. This is very nice of
+	     course since that means you can essentially draw the keycolor
+	     texture using Z-buffer and objects drawn behind it will be correct.
+	     However this doesn't work with hardware. With hardware the
+	     Z-buffer is updated for the entire polygon regardsless of the
+	     key-color value.
+	     I'm not sure if it is actually possible to do otherwise with
+	     hardware. If not then the engine will have to solve this by
+	     sorting such polygons from back to front in relation to other
+	     objects in the same sector.
+	     [Bug 409067]
 
 API and Small Feature Additions:
 	[F]  Translate point on polygon to texture space/object space
 	     coordinates (for selection). This is useful for Quark++.
 	[F]  Ability to close portals in map loader.
-	[**] Automatic generation of lightmap cache names using MD5
-	     checksum of geometry. This is important for dynamic
-	     loading/reloading of worlds.
 	[F]  Support iPolygonMesh (for collision detection) in more
 	     mesh objects (like ball, cube, ...).
 	[V]  Support lighting of a thing mesh for lights in multiple
@@ -168,6 +165,9 @@ API and Small Feature Additions:
 	     iSector->ShineLights (iMeshWrapper).
 	[F]  Change key code and virtual key in keyboard event to use
 	     unicode.
+	[**] Automatic generation of lightmap cache names using MD5
+	     checksum of geometry. This is important for dynamic
+	     loading/reloading of worlds.
 	[**] Add iCamera::SetFarPlane().
 
 Global Additions and Stuff:
