@@ -150,6 +150,11 @@ Siu-Hang (@email{shor@@cse.cuhk.edu.hk})
 
 Siu-Hang wrote one of several tutorials for MazeD, the Crystal Space map
 editor.
+
+@item
+Desmond Fletcher (@email{desmond.fletcher@usm.edu}}
+
+Desmond has updated map2cs documentation adding new classnames and keys.
 @end itemize
 
 If we have forgotten anyone or missed a contribution, we sincerely apologize.
