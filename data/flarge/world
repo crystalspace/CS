@@ -24,6 +24,7 @@ WORLD (
     TEXTURE 'flare_spark3' (FILE (/lib/stdtex/flare_picir.jpg))
     TEXTURE 'flare_spark4' (FILE (/lib/stdtex/flare_grcir.jpg))
     TEXTURE 'flare_spark5' (FILE (/lib/stdtex/flare_pink.jpg))
+    TEXTURE 'blobby.jpg' (FILE (/lib/stdtex/blobby.jpg))
     PROCTEX 'fire' (TYPE (FIRE))
     PROCTEX 'water' (TYPE (WATER))
     PROCTEX 'dots' (TYPE (DOTS))
@@ -65,6 +66,7 @@ WORLD (
     MATERIAL 'yellow' (TEXTURE ('yellow.gif'))
     MATERIAL 'sky' (TEXTURE ('sky.gif'))
     MATERIAL 'misty' (TEXTURE ('misty.gif'))
+    MATERIAL 'blobby' (TEXTURE ('blobby.jpg'))
   )
   RENDERPRIORITIES (
     PRIORITY 'sky' (1,NONE)
@@ -83,6 +85,8 @@ WORLD (
     PLUGIN 'spr2d' ('crystalspace.mesh.loader.sprite.2d')
     PLUGIN 'cubeFact' ('crystalspace.mesh.loader.factory.cube')
     PLUGIN 'cube' ('crystalspace.mesh.loader.cube')
+    PLUGIN 'metafact' ('crystalspace.mesh.loader.factory.metaball')
+    PLUGIN 'metablob' ('crystalspace.mesh.loader.metaball')
   )
 
   ADDON (
@@ -763,7 +767,10 @@ WORLD (
     POLYGON 't11' (VERTICES (22,23,47,46)) POLYGON 't12' (VERTICES (23,12,36,47))
     )
   )
-
+  MESHFACT 'metablobfact' (
+    PLUGIN('metafact')
+    PARAMS()
+  )
   SECTOR 'room' (
     MESHOBJ 'walls' (
     PLUGIN ('thing')
@@ -7759,6 +7766,7 @@ WORLD (
     )
     )
     )
+    LIGHT (6,-15,38:20,.1,.2,.9,0)
   )
   SECTOR 'kamer2d' (
     MESHOBJ 'walls' (
@@ -7819,6 +7827,7 @@ WORLD (
     )
     )
     )
+    LIGHT (7,-15,-11:10,.9,.2,.1,0)
   )
   SECTOR 'kamer2r' (
     MESHOBJ 'walls' (
@@ -7879,7 +7888,25 @@ WORLD (
     )
     )
     )
-    LIGHT (19,-15,13.5:10,.9,.7,.7,0)
+
+    LIGHT (19,-17,13.5:80,.2,.9,.1,0)
+    MESHOBJ 'meta' (
+      PLUGIN('metablob')
+      PARAMS(
+        FACTORY('metablobfact')
+        MATERIAL('blobby')
+	 LIGHTING(true)
+	 ISO_LEVEL (0.3)
+	 CHARGE(2.5)
+	 NUMBER(3)
+	 RATE(0.2)
+	 TRUE_MAP(false)
+	 TEX_SCALE(1)
+	 MIXMODE(ALPHA(0.61))
+      )
+      MOVE(V(19,-17,13.5) MATRIX(SCALE(0.1,0.1,0.1)))
+      ZTEST()
+    )
   )
   SECTOR 'kamer2l' (
     MESHOBJ 'walls' (

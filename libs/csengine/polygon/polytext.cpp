@@ -786,28 +786,28 @@ csShadowBitmap::csShadowBitmap (int lm_w, int lm_h, int quality,
 void csShadowBitmap::LightPutPixel (int x, int y, float area, void *arg)
 {
   csShadowBitmap* sb = (csShadowBitmap*)arg;
-  sb->LightPutPixel (x, y, area);
+  sb->_LightPutPixel (x, y, area);
 }
 
 void csShadowBitmap::LightDrawBox (int x, int y, int w, int h, void *arg)
 {
   csShadowBitmap* sb = (csShadowBitmap*)arg;
-  sb->LightDrawBox (x, y, w, h);
+  sb->_LightDrawBox (x, y, w, h);
 }
 
 void csShadowBitmap::ShadowPutPixel (int x, int y, float area, void *arg)
 {
   csShadowBitmap* sb = (csShadowBitmap*)arg;
-  sb->ShadowPutPixel (x, y, area);
+  sb->_ShadowPutPixel (x, y, area);
 }
 
 void csShadowBitmap::ShadowDrawBox (int x, int y, int w, int h, void *arg)
 {
   csShadowBitmap* sb = (csShadowBitmap*)arg;
-  sb->ShadowDrawBox (x, y, w, h);
+  sb->_ShadowDrawBox (x, y, w, h);
 }
 
-void csShadowBitmap::LightPutPixel (int x, int y, float area)
+void csShadowBitmap::_LightPutPixel (int x, int y, float area)
 {
   if (x >= sb_w || y >= sb_h || x < 0 || y < 0) return;
   if (area < .2) return;
@@ -820,7 +820,7 @@ void csShadowBitmap::LightPutPixel (int x, int y, float area)
   }
 }
 
-void csShadowBitmap::LightDrawBox (int x, int y, int w, int h)
+void csShadowBitmap::_LightDrawBox (int x, int y, int w, int h)
 {
   if (cnt_unlit == 0) return;
   if (x+w <= 0 || y+h <= 0 || x >= sb_w || y >= sb_h) return;
@@ -851,7 +851,7 @@ void csShadowBitmap::LightDrawBox (int x, int y, int w, int h)
   }
 }
 
-void csShadowBitmap::ShadowPutPixel (int x, int y, float area)
+void csShadowBitmap::_ShadowPutPixel (int x, int y, float area)
 {
   if (x >= sb_w || y >= sb_h || x < 0 || y < 0) return;
   if (area < .2) return;
@@ -864,7 +864,7 @@ void csShadowBitmap::ShadowPutPixel (int x, int y, float area)
   }
 }
 
-void csShadowBitmap::ShadowDrawBox (int x, int y, int w, int h)
+void csShadowBitmap::_ShadowDrawBox (int x, int y, int w, int h)
 {
   if (cnt_unshadowed == 0) return;
   if (x+w <= 0 || y+h <= 0 || x >= sb_w || y >= sb_h) return;

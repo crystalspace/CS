@@ -142,10 +142,10 @@ private:
   static void LightDrawBox (int x, int y, int w, int h, void *arg);
   static void ShadowPutPixel (int x, int y, float area, void *arg);
   static void ShadowDrawBox (int x, int y, int w, int h, void *arg);
-  void LightPutPixel (int x, int y, float area);
-  void LightDrawBox (int x, int y, int w, int h);
-  void ShadowPutPixel (int x, int y, float area);
-  void ShadowDrawBox (int x, int y, int w, int h);
+  void _LightPutPixel (int x, int y, float area);
+  void _LightDrawBox (int x, int y, int w, int h);
+  void _ShadowPutPixel (int x, int y, float area);
+  void _ShadowDrawBox (int x, int y, int w, int h);
 
 public:
   /**
