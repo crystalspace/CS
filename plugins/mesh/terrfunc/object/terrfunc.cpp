@@ -2012,7 +2012,7 @@ bool csTerrFuncObject::HitBeamObject (const csVector3& start,
 {
 
   csSegment3 seg (start, end);
-  csVector3 st;
+  csVector3 st = start;
 // Box walk. Not really fast as the name suggests. It works by stepping its way forward
 // through the terrain field. This is to be complemented yet with another routine which
 // will pick through the individual cells in each block.
