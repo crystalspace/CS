@@ -67,7 +67,7 @@ The history order is reversed so that new features are at the top.
 	    than the old stuff, and has to be activated by uncommenting a line
 	    in renderloop.h.
 	- res fixed a compile error he introduced in ogl_txtmgr.cpp earlier.
-	- Eric Sunshine removed the now obsolete SCF references for null and
+	- Eric Sunshine removed the now obsolete SCF references for line and
 	  infinite renderers from scf.cfg.  Also fixed problem where entry for
 	  sndoal plugin was commented out.
 18-May-2003
