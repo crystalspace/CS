@@ -7794,6 +7794,38 @@ typedef GLvoid (csAPIENTRY* csGLGETBUFFERSUBDATAARB) (GLenum target, GLsizei off
 typedef GLvoid (csAPIENTRY* csGLGETBUFFERPOINTERVARB) (GLenum target, GLenum pname, GLvoid** params);
 typedef GLvoid (csAPIENTRY* csGLGETBUFFERPARAMETERIVARB) (GLenum target, GLenum pname, GLint* params);
 
+// GL_ATI_separate_stencil
+#ifndef GL_STENCIL_BACK_FUNC_ATI
+#define GL_STENCIL_BACK_FUNC_ATI                                     0x8800
+#endif
+
+#ifndef GL_STENCIL_BACK_FAIL_ATI
+#define GL_STENCIL_BACK_FAIL_ATI                                     0x8801
+#endif
+
+#ifndef GL_STENCIL_BACK_PASS_DEPTH_FAIL_ATI
+#define GL_STENCIL_BACK_PASS_DEPTH_FAIL_ATI                          0x8802
+#endif
+
+#ifndef GL_STENCIL_BACK_PASS_DEPTH_PASS_ATI
+#define GL_STENCIL_BACK_PASS_DEPTH_PASS_ATI                          0x8803
+#endif
+
+
+typedef GLvoid (csAPIENTRY* csGLSTENCILOPSEPARATEATI) (GLenum face, GLenum sfail, GLenum dpfail, GLenum dppass);
+typedef GLvoid (csAPIENTRY* csGLSTENCILFUNCSEPARATEATI) (GLenum frontfunc, GLenum backfunc, GLint ref, GLuint mask);
+
+// GL_EXT_stencil_two_side
+#ifndef GL_STENCIL_TEST_TWO_SIDE_EXT
+#define GL_STENCIL_TEST_TWO_SIDE_EXT                                 0x8910
+#endif
+
+#ifndef GL_ACTIVE_STENCIL_FACE_EXT
+#define GL_ACTIVE_STENCIL_FACE_EXT                                   0x8910
+#endif
+
+
+
 
 
 // end of definitions
@@ -7809,7 +7841,7 @@ typedef GLvoid (csAPIENTRY* csGLGETBUFFERPARAMETERIVARB) (GLenum target, GLenum 
       if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", \
         REPORT_MISSING_ENTRIES)) \
       { \
-        Report ("Failed to retrieve %s", #nameNC); \
+        Report (msgExtRetrieveFail, #nameNC); \
       } \
       allclear &= funcTest;
 
@@ -7819,16 +7851,16 @@ typedef GLvoid (csAPIENTRY* csGLGETBUFFERPARAMETERIVARB) (GLenum target, GLenum 
         CS_##nameNC &= config->GetBool (cfgkey, true); \
         if (CS_##nameNC) \
         { \
-          Report (exttype " Extension '%s' found and used.", ext); \
+          Report (msgExtFoundAndUsed, exttype, ext); \
         } \
         else \
         { \
-          Report (exttype " Extension '%s' found, but not used.", ext); \
+          Report (msgExtFoundAndNotUsed, exttype, ext); \
         } \
       } \
       else \
       { \
-        Report (exttype " Extension '%s' failed to initialize.", ext); \
+        Report (msgExtInitFail, exttype, ext); \
       } 
 
 struct csGLExtensionManager
@@ -7839,6 +7871,11 @@ private:
   iOpenGLInterface* gl;
   
   const char* extstrGL;
+  const char* msgExtRetrieveFail;
+  const char* msgExtFoundAndUsed;
+  const char* msgExtFoundAndNotUsed;
+  const char* msgExtInitFail;
+  const char* msgExtNotFound;
 #ifdef __WIN32__
   const char* extstrWGL;
   
@@ -7883,7 +7920,7 @@ public:
     // Low priority so canvas/renderer cfgs may override the settings
     config.AddConfig (object_reg, "/config/glext.cfg", true,
       iConfigManager::ConfigPriorityPlugin - 1);
-  }
+}
   
   void Open () 
   { 
@@ -11901,6 +11938,20 @@ public:
   #endif
 
 
+  // GL_ATI_separate_stencil
+  #ifndef GLSTENCILOPSEPARATEATI_DECL
+  #define GLSTENCILOPSEPARATEATI_DECL
+  csGLSTENCILOPSEPARATEATI glStencilOpSeparateATI;
+  #endif
+
+  #ifndef GLSTENCILFUNCSEPARATEATI_DECL
+  #define GLSTENCILFUNCSEPARATEATI_DECL
+  csGLSTENCILFUNCSEPARATEATI glStencilFuncSeparateATI;
+  #endif
+
+
+  // GL_EXT_stencil_two_side
+
 
 
   // end of functions
@@ -12054,6 +12105,8 @@ public:
   bool CS_GL_NV_primitive_restart;
   bool CS_GL_NV_vertex_program2;
   bool CS_GL_ARB_vertex_buffer_object;
+  bool CS_GL_ATI_separate_stencil;
+  bool CS_GL_EXT_stencil_two_side;
 
 private:
   bool tested_CS_GL_version_1_2;
@@ -12205,6 +12258,8 @@ private:
   bool tested_CS_GL_NV_primitive_restart;
   bool tested_CS_GL_NV_vertex_program2;
   bool tested_CS_GL_ARB_vertex_buffer_object;
+  bool tested_CS_GL_ATI_separate_stencil;
+  bool tested_CS_GL_EXT_stencil_two_side;
 
 public:
   void Reset ()
@@ -12512,11 +12567,21 @@ public:
     tested_CS_GL_NV_vertex_program2 = false;
     CS_GL_ARB_vertex_buffer_object = false;
     tested_CS_GL_ARB_vertex_buffer_object = false;
+    CS_GL_ATI_separate_stencil = false;
+    tested_CS_GL_ATI_separate_stencil = false;
+    CS_GL_EXT_stencil_two_side = false;
+    tested_CS_GL_EXT_stencil_two_side = false;
 
   }
   
   csGLExtensionManager () : object_reg (0)
   {
+    msgExtRetrieveFail = "Failed to retrieve %s";
+    msgExtFoundAndUsed = "%s Extension '%s' found and used.";
+    msgExtFoundAndNotUsed = "%s Extension '%s' found, but not used.";
+    msgExtInitFail = "%s Extension '%s' failed to initialize.";
+    msgExtNotFound = "%s Extension '%s' not found.";
+    
     Reset ();
   }
   
@@ -12544,7 +12609,7 @@ public:
     }
     else
     {
-      Report ("GL Extension '%s' not found.", ext);
+      Report (msgExtNotFound, "GL", ext);
     }
   }
   
@@ -12614,7 +12679,7 @@ public:
     }
     else
     {
-      Report ("GL Extension '%s' not found.", ext);
+      Report (msgExtNotFound, "GL", ext);
     }
   }
   
@@ -12672,7 +12737,7 @@ public:
     }
     else
     {
-      Report ("GL Extension '%s' not found.", ext);
+      Report (msgExtNotFound, "GL", ext);
     }
   }
   
@@ -12730,7 +12795,7 @@ public:
     }
     else
     {
-      Report ("GL Extension '%s' not found.", ext);
+      Report (msgExtNotFound, "GL", ext);
     }
   }
   
@@ -12758,7 +12823,7 @@ public:
     }
     else
     {
-      Report ("GL Extension '%s' not found.", ext);
+      Report (msgExtNotFound, "GL", ext);
     }
   }
   
@@ -12783,7 +12848,7 @@ public:
     }
     else
     {
-      Report ("GL Extension '%s' not found.", ext);
+      Report (msgExtNotFound, "GL", ext);
     }
   }
   
@@ -12807,7 +12872,7 @@ public:
     }
     else
     {
-      Report ("GL Extension '%s' not found.", ext);
+      Report (msgExtNotFound, "GL", ext);
     }
   }
   
@@ -12833,7 +12898,7 @@ public:
     }
     else
     {
-      Report ("WGL Extension '%s' not found.", ext);
+      Report (msgExtNotFound, "WGL", ext);
     }
   }
 #endif
@@ -12864,7 +12929,7 @@ public:
     }
     else
     {
-      Report ("WGL Extension '%s' not found.", ext);
+      Report (msgExtNotFound, "WGL", ext);
     }
   }
 #endif
@@ -12889,7 +12954,7 @@ public:
     }
     else
     {
-      Report ("GL Extension '%s' not found.", ext);
+      Report (msgExtNotFound, "GL", ext);
     }
   }
   
@@ -12913,7 +12978,7 @@ public:
     }
     else
     {
-      Report ("GL Extension '%s' not found.", ext);
+      Report (msgExtNotFound, "GL", ext);
     }
   }
   
@@ -12939,7 +13004,7 @@ public:
     }
     else
     {
-      Report ("GL Extension '%s' not found.", ext);
+      Report (msgExtNotFound, "GL", ext);
     }
   }
   
@@ -12963,7 +13028,7 @@ public:
     }
     else
     {
-      Report ("GL Extension '%s' not found.", ext);
+      Report (msgExtNotFound, "GL", ext);
     }
   }
   
@@ -12987,7 +13052,7 @@ public:
     }
     else
     {
-      Report ("GL Extension '%s' not found.", ext);
+      Report (msgExtNotFound, "GL", ext);
     }
   }
   
@@ -13011,7 +13076,7 @@ public:
     }
     else
     {
-      Report ("GL Extension '%s' not found.", ext);
+      Report (msgExtNotFound, "GL", ext);
     }
   }
   
@@ -13042,7 +13107,7 @@ public:
     }
     else
     {
-      Report ("GL Extension '%s' not found.", ext);
+      Report (msgExtNotFound, "GL", ext);
     }
   }
   
@@ -13066,7 +13131,7 @@ public:
     }
     else
     {
-      Report ("GL Extension '%s' not found.", ext);
+      Report (msgExtNotFound, "GL", ext);
     }
   }
   
@@ -13090,7 +13155,7 @@ public:
     }
     else
     {
-      Report ("GL Extension '%s' not found.", ext);
+      Report (msgExtNotFound, "GL", ext);
     }
   }
   
@@ -13114,7 +13179,7 @@ public:
     }
     else
     {
-      Report ("GL Extension '%s' not found.", ext);
+      Report (msgExtNotFound, "GL", ext);
     }
   }
   
@@ -13138,7 +13203,7 @@ public:
     }
     else
     {
-      Report ("GL Extension '%s' not found.", ext);
+      Report (msgExtNotFound, "GL", ext);
     }
   }
   
@@ -13173,7 +13238,7 @@ public:
     }
     else
     {
-      Report ("GL Extension '%s' not found.", ext);
+      Report (msgExtNotFound, "GL", ext);
     }
   }
   
@@ -13259,7 +13324,7 @@ public:
     }
     else
     {
-      Report ("GL Extension '%s' not found.", ext);
+      Report (msgExtNotFound, "GL", ext);
     }
   }
   
@@ -13299,7 +13364,7 @@ public:
     }
     else
     {
-      Report ("GL Extension '%s' not found.", ext);
+      Report (msgExtNotFound, "GL", ext);
     }
   }
   
@@ -13323,7 +13388,7 @@ public:
     }
     else
     {
-      Report ("GL Extension '%s' not found.", ext);
+      Report (msgExtNotFound, "GL", ext);
     }
   }
   
@@ -13347,7 +13412,7 @@ public:
     }
     else
     {
-      Report ("GL Extension '%s' not found.", ext);
+      Report (msgExtNotFound, "GL", ext);
     }
   }
   
@@ -13371,7 +13436,7 @@ public:
     }
     else
     {
-      Report ("GL Extension '%s' not found.", ext);
+      Report (msgExtNotFound, "GL", ext);
     }
   }
   
@@ -13396,7 +13461,7 @@ public:
     }
     else
     {
-      Report ("GL Extension '%s' not found.", ext);
+      Report (msgExtNotFound, "GL", ext);
     }
   }
   
@@ -13421,7 +13486,7 @@ public:
     }
     else
     {
-      Report ("GL Extension '%s' not found.", ext);
+      Report (msgExtNotFound, "GL", ext);
     }
   }
   
@@ -13445,7 +13510,7 @@ public:
     }
     else
     {
-      Report ("GL Extension '%s' not found.", ext);
+      Report (msgExtNotFound, "GL", ext);
     }
   }
   
@@ -13470,7 +13535,7 @@ public:
     }
     else
     {
-      Report ("GL Extension '%s' not found.", ext);
+      Report (msgExtNotFound, "GL", ext);
     }
   }
   
@@ -13494,7 +13559,7 @@ public:
     }
     else
     {
-      Report ("GL Extension '%s' not found.", ext);
+      Report (msgExtNotFound, "GL", ext);
     }
   }
   
@@ -13518,7 +13583,7 @@ public:
     }
     else
     {
-      Report ("GL Extension '%s' not found.", ext);
+      Report (msgExtNotFound, "GL", ext);
     }
   }
   
@@ -13544,7 +13609,7 @@ public:
     }
     else
     {
-      Report ("GL Extension '%s' not found.", ext);
+      Report (msgExtNotFound, "GL", ext);
     }
   }
   
@@ -13570,7 +13635,7 @@ public:
     }
     else
     {
-      Report ("GL Extension '%s' not found.", ext);
+      Report (msgExtNotFound, "GL", ext);
     }
   }
   
@@ -13607,7 +13672,7 @@ public:
     }
     else
     {
-      Report ("GL Extension '%s' not found.", ext);
+      Report (msgExtNotFound, "GL", ext);
     }
   }
   
@@ -13636,7 +13701,7 @@ public:
     }
     else
     {
-      Report ("GL Extension '%s' not found.", ext);
+      Report (msgExtNotFound, "GL", ext);
     }
   }
   
@@ -13670,7 +13735,7 @@ public:
     }
     else
     {
-      Report ("GL Extension '%s' not found.", ext);
+      Report (msgExtNotFound, "GL", ext);
     }
   }
   
@@ -13696,7 +13761,7 @@ public:
     }
     else
     {
-      Report ("GL Extension '%s' not found.", ext);
+      Report (msgExtNotFound, "GL", ext);
     }
   }
   
@@ -13720,7 +13785,7 @@ public:
     }
     else
     {
-      Report ("GL Extension '%s' not found.", ext);
+      Report (msgExtNotFound, "GL", ext);
     }
   }
   
@@ -13749,7 +13814,7 @@ public:
     }
     else
     {
-      Report ("GL Extension '%s' not found.", ext);
+      Report (msgExtNotFound, "GL", ext);
     }
   }
   
@@ -13775,7 +13840,7 @@ public:
     }
     else
     {
-      Report ("GL Extension '%s' not found.", ext);
+      Report (msgExtNotFound, "GL", ext);
     }
   }
   
@@ -13800,7 +13865,7 @@ public:
     }
     else
     {
-      Report ("GL Extension '%s' not found.", ext);
+      Report (msgExtNotFound, "GL", ext);
     }
   }
   
@@ -13841,7 +13906,7 @@ public:
     }
     else
     {
-      Report ("GL Extension '%s' not found.", ext);
+      Report (msgExtNotFound, "GL", ext);
     }
   }
   
@@ -13865,7 +13930,7 @@ public:
     }
     else
     {
-      Report ("GL Extension '%s' not found.", ext);
+      Report (msgExtNotFound, "GL", ext);
     }
   }
   
@@ -13889,7 +13954,7 @@ public:
     }
     else
     {
-      Report ("GL Extension '%s' not found.", ext);
+      Report (msgExtNotFound, "GL", ext);
     }
   }
   
@@ -13913,7 +13978,7 @@ public:
     }
     else
     {
-      Report ("GL Extension '%s' not found.", ext);
+      Report (msgExtNotFound, "GL", ext);
     }
   }
   
@@ -13938,7 +14003,7 @@ public:
     }
     else
     {
-      Report ("GL Extension '%s' not found.", ext);
+      Report (msgExtNotFound, "GL", ext);
     }
   }
   
@@ -13962,7 +14027,7 @@ public:
     }
     else
     {
-      Report ("GL Extension '%s' not found.", ext);
+      Report (msgExtNotFound, "GL", ext);
     }
   }
   
@@ -13989,7 +14054,7 @@ public:
     }
     else
     {
-      Report ("GL Extension '%s' not found.", ext);
+      Report (msgExtNotFound, "GL", ext);
     }
   }
   
@@ -14014,7 +14079,7 @@ public:
     }
     else
     {
-      Report ("GL Extension '%s' not found.", ext);
+      Report (msgExtNotFound, "GL", ext);
     }
   }
   
@@ -14038,7 +14103,7 @@ public:
     }
     else
     {
-      Report ("GL Extension '%s' not found.", ext);
+      Report (msgExtNotFound, "GL", ext);
     }
   }
   
@@ -14062,7 +14127,7 @@ public:
     }
     else
     {
-      Report ("GL Extension '%s' not found.", ext);
+      Report (msgExtNotFound, "GL", ext);
     }
   }
   
@@ -14086,7 +14151,7 @@ public:
     }
     else
     {
-      Report ("GL Extension '%s' not found.", ext);
+      Report (msgExtNotFound, "GL", ext);
     }
   }
   
@@ -14110,7 +14175,7 @@ public:
     }
     else
     {
-      Report ("GL Extension '%s' not found.", ext);
+      Report (msgExtNotFound, "GL", ext);
     }
   }
   
@@ -14134,7 +14199,7 @@ public:
     }
     else
     {
-      Report ("GL Extension '%s' not found.", ext);
+      Report (msgExtNotFound, "GL", ext);
     }
   }
   
@@ -14158,7 +14223,7 @@ public:
     }
     else
     {
-      Report ("GL Extension '%s' not found.", ext);
+      Report (msgExtNotFound, "GL", ext);
     }
   }
   
@@ -14188,7 +14253,7 @@ public:
     }
     else
     {
-      Report ("GL Extension '%s' not found.", ext);
+      Report (msgExtNotFound, "GL", ext);
     }
   }
   
@@ -14221,7 +14286,7 @@ public:
     }
     else
     {
-      Report ("GL Extension '%s' not found.", ext);
+      Report (msgExtNotFound, "GL", ext);
     }
   }
   
@@ -14287,7 +14352,7 @@ public:
     }
     else
     {
-      Report ("GL Extension '%s' not found.", ext);
+      Report (msgExtNotFound, "GL", ext);
     }
   }
   
@@ -14314,7 +14379,7 @@ public:
     }
     else
     {
-      Report ("GL Extension '%s' not found.", ext);
+      Report (msgExtNotFound, "GL", ext);
     }
   }
   
@@ -14338,7 +14403,7 @@ public:
     }
     else
     {
-      Report ("GL Extension '%s' not found.", ext);
+      Report (msgExtNotFound, "GL", ext);
     }
   }
   
@@ -14362,7 +14427,7 @@ public:
     }
     else
     {
-      Report ("GL Extension '%s' not found.", ext);
+      Report (msgExtNotFound, "GL", ext);
     }
   }
   
@@ -14386,7 +14451,7 @@ public:
     }
     else
     {
-      Report ("GL Extension '%s' not found.", ext);
+      Report (msgExtNotFound, "GL", ext);
     }
   }
   
@@ -14410,7 +14475,7 @@ public:
     }
     else
     {
-      Report ("GL Extension '%s' not found.", ext);
+      Report (msgExtNotFound, "GL", ext);
     }
   }
   
@@ -14443,7 +14508,7 @@ public:
     }
     else
     {
-      Report ("GL Extension '%s' not found.", ext);
+      Report (msgExtNotFound, "GL", ext);
     }
   }
   
@@ -14474,7 +14539,7 @@ public:
     }
     else
     {
-      Report ("GL Extension '%s' not found.", ext);
+      Report (msgExtNotFound, "GL", ext);
     }
   }
   
@@ -14498,7 +14563,7 @@ public:
     }
     else
     {
-      Report ("GL Extension '%s' not found.", ext);
+      Report (msgExtNotFound, "GL", ext);
     }
   }
   
@@ -14522,7 +14587,7 @@ public:
     }
     else
     {
-      Report ("GL Extension '%s' not found.", ext);
+      Report (msgExtNotFound, "GL", ext);
     }
   }
   
@@ -14546,7 +14611,7 @@ public:
     }
     else
     {
-      Report ("GL Extension '%s' not found.", ext);
+      Report (msgExtNotFound, "GL", ext);
     }
   }
   
@@ -14577,7 +14642,7 @@ public:
     }
     else
     {
-      Report ("GL Extension '%s' not found.", ext);
+      Report (msgExtNotFound, "GL", ext);
     }
   }
   
@@ -14601,7 +14666,7 @@ public:
     }
     else
     {
-      Report ("GL Extension '%s' not found.", ext);
+      Report (msgExtNotFound, "GL", ext);
     }
   }
   
@@ -14627,7 +14692,7 @@ public:
     }
     else
     {
-      Report ("GL Extension '%s' not found.", ext);
+      Report (msgExtNotFound, "GL", ext);
     }
   }
   
@@ -14664,7 +14729,7 @@ public:
     }
     else
     {
-      Report ("GL Extension '%s' not found.", ext);
+      Report (msgExtNotFound, "GL", ext);
     }
   }
   
@@ -14690,7 +14755,7 @@ public:
     }
     else
     {
-      Report ("GL Extension '%s' not found.", ext);
+      Report (msgExtNotFound, "GL", ext);
     }
   }
   
@@ -14714,7 +14779,7 @@ public:
     }
     else
     {
-      Report ("GL Extension '%s' not found.", ext);
+      Report (msgExtNotFound, "GL", ext);
     }
   }
   
@@ -14738,7 +14803,7 @@ public:
     }
     else
     {
-      Report ("GL Extension '%s' not found.", ext);
+      Report (msgExtNotFound, "GL", ext);
     }
   }
   
@@ -14762,7 +14827,7 @@ public:
     }
     else
     {
-      Report ("GL Extension '%s' not found.", ext);
+      Report (msgExtNotFound, "GL", ext);
     }
   }
   
@@ -14786,7 +14851,7 @@ public:
     }
     else
     {
-      Report ("GL Extension '%s' not found.", ext);
+      Report (msgExtNotFound, "GL", ext);
     }
   }
   
@@ -14810,7 +14875,7 @@ public:
     }
     else
     {
-      Report ("GL Extension '%s' not found.", ext);
+      Report (msgExtNotFound, "GL", ext);
     }
   }
   
@@ -14834,7 +14899,7 @@ public:
     }
     else
     {
-      Report ("GL Extension '%s' not found.", ext);
+      Report (msgExtNotFound, "GL", ext);
     }
   }
   
@@ -14858,7 +14923,7 @@ public:
     }
     else
     {
-      Report ("GL Extension '%s' not found.", ext);
+      Report (msgExtNotFound, "GL", ext);
     }
   }
   
@@ -14882,7 +14947,7 @@ public:
     }
     else
     {
-      Report ("GL Extension '%s' not found.", ext);
+      Report (msgExtNotFound, "GL", ext);
     }
   }
   
@@ -14910,7 +14975,7 @@ public:
     }
     else
     {
-      Report ("GL Extension '%s' not found.", ext);
+      Report (msgExtNotFound, "GL", ext);
     }
   }
   
@@ -14934,7 +14999,7 @@ public:
     }
     else
     {
-      Report ("GL Extension '%s' not found.", ext);
+      Report (msgExtNotFound, "GL", ext);
     }
   }
   
@@ -15020,7 +15085,7 @@ public:
     }
     else
     {
-      Report ("GL Extension '%s' not found.", ext);
+      Report (msgExtNotFound, "GL", ext);
     }
   }
   
@@ -15044,7 +15109,7 @@ public:
     }
     else
     {
-      Report ("GL Extension '%s' not found.", ext);
+      Report (msgExtNotFound, "GL", ext);
     }
   }
   
@@ -15071,7 +15136,7 @@ public:
     }
     else
     {
-      Report ("GL Extension '%s' not found.", ext);
+      Report (msgExtNotFound, "GL", ext);
     }
   }
   
@@ -15099,7 +15164,7 @@ public:
     }
     else
     {
-      Report ("GL Extension '%s' not found.", ext);
+      Report (msgExtNotFound, "GL", ext);
     }
   }
   
@@ -15137,7 +15202,7 @@ public:
     }
     else
     {
-      Report ("GL Extension '%s' not found.", ext);
+      Report (msgExtNotFound, "GL", ext);
     }
   }
   
@@ -15163,7 +15228,7 @@ public:
     }
     else
     {
-      Report ("GL Extension '%s' not found.", ext);
+      Report (msgExtNotFound, "GL", ext);
     }
   }
   
@@ -15187,7 +15252,7 @@ public:
     }
     else
     {
-      Report ("GL Extension '%s' not found.", ext);
+      Report (msgExtNotFound, "GL", ext);
     }
   }
   
@@ -15223,7 +15288,7 @@ public:
     }
     else
     {
-      Report ("GL Extension '%s' not found.", ext);
+      Report (msgExtNotFound, "GL", ext);
     }
   }
   
@@ -15250,7 +15315,7 @@ public:
     }
     else
     {
-      Report ("GL Extension '%s' not found.", ext);
+      Report (msgExtNotFound, "GL", ext);
     }
   }
   
@@ -15319,7 +15384,7 @@ public:
     }
     else
     {
-      Report ("GL Extension '%s' not found.", ext);
+      Report (msgExtNotFound, "GL", ext);
     }
   }
   
@@ -15349,7 +15414,7 @@ public:
     }
     else
     {
-      Report ("WGL Extension '%s' not found.", ext);
+      Report (msgExtNotFound, "WGL", ext);
     }
   }
 #endif
@@ -15380,7 +15445,7 @@ public:
     }
     else
     {
-      Report ("WGL Extension '%s' not found.", ext);
+      Report (msgExtNotFound, "WGL", ext);
     }
   }
 #endif
@@ -15411,7 +15476,7 @@ public:
     }
     else
     {
-      Report ("WGL Extension '%s' not found.", ext);
+      Report (msgExtNotFound, "WGL", ext);
     }
   }
 #endif
@@ -15436,7 +15501,7 @@ public:
     }
     else
     {
-      Report ("GL Extension '%s' not found.", ext);
+      Report (msgExtNotFound, "GL", ext);
     }
   }
   
@@ -15460,7 +15525,7 @@ public:
     }
     else
     {
-      Report ("GL Extension '%s' not found.", ext);
+      Report (msgExtNotFound, "GL", ext);
     }
   }
   
@@ -15486,7 +15551,7 @@ public:
     }
     else
     {
-      Report ("GL Extension '%s' not found.", ext);
+      Report (msgExtNotFound, "GL", ext);
     }
   }
   
@@ -15510,7 +15575,7 @@ public:
     }
     else
     {
-      Report ("GL Extension '%s' not found.", ext);
+      Report (msgExtNotFound, "GL", ext);
     }
   }
   
@@ -15534,7 +15599,7 @@ public:
     }
     else
     {
-      Report ("GL Extension '%s' not found.", ext);
+      Report (msgExtNotFound, "GL", ext);
     }
   }
   
@@ -15565,7 +15630,7 @@ public:
     }
     else
     {
-      Report ("GL Extension '%s' not found.", ext);
+      Report (msgExtNotFound, "GL", ext);
     }
   }
   
@@ -15590,7 +15655,7 @@ public:
     }
     else
     {
-      Report ("GL Extension '%s' not found.", ext);
+      Report (msgExtNotFound, "GL", ext);
     }
   }
   
@@ -15638,7 +15703,7 @@ public:
     }
     else
     {
-      Report ("GL Extension '%s' not found.", ext);
+      Report (msgExtNotFound, "GL", ext);
     }
   }
   
@@ -15662,7 +15727,7 @@ public:
     }
     else
     {
-      Report ("GL Extension '%s' not found.", ext);
+      Report (msgExtNotFound, "GL", ext);
     }
   }
   
@@ -15686,7 +15751,7 @@ public:
     }
     else
     {
-      Report ("GL Extension '%s' not found.", ext);
+      Report (msgExtNotFound, "GL", ext);
     }
   }
   
@@ -15710,7 +15775,7 @@ public:
     }
     else
     {
-      Report ("GL Extension '%s' not found.", ext);
+      Report (msgExtNotFound, "GL", ext);
     }
   }
   
@@ -15734,7 +15799,7 @@ public:
     }
     else
     {
-      Report ("GL Extension '%s' not found.", ext);
+      Report (msgExtNotFound, "GL", ext);
     }
   }
   
@@ -15760,7 +15825,7 @@ public:
     }
     else
     {
-      Report ("GL Extension '%s' not found.", ext);
+      Report (msgExtNotFound, "GL", ext);
     }
   }
   
@@ -15788,7 +15853,7 @@ public:
     }
     else
     {
-      Report ("GL Extension '%s' not found.", ext);
+      Report (msgExtNotFound, "GL", ext);
     }
   }
   
@@ -15812,7 +15877,7 @@ public:
     }
     else
     {
-      Report ("GL Extension '%s' not found.", ext);
+      Report (msgExtNotFound, "GL", ext);
     }
   }
   
@@ -15837,7 +15902,7 @@ public:
     }
     else
     {
-      Report ("GL Extension '%s' not found.", ext);
+      Report (msgExtNotFound, "GL", ext);
     }
   }
   
@@ -15861,7 +15926,7 @@ public:
     }
     else
     {
-      Report ("GL Extension '%s' not found.", ext);
+      Report (msgExtNotFound, "GL", ext);
     }
   }
   
@@ -15885,7 +15950,7 @@ public:
     }
     else
     {
-      Report ("GL Extension '%s' not found.", ext);
+      Report (msgExtNotFound, "GL", ext);
     }
   }
   
@@ -15909,7 +15974,7 @@ public:
     }
     else
     {
-      Report ("GL Extension '%s' not found.", ext);
+      Report (msgExtNotFound, "GL", ext);
     }
   }
   
@@ -15933,7 +15998,7 @@ public:
     }
     else
     {
-      Report ("GL Extension '%s' not found.", ext);
+      Report (msgExtNotFound, "GL", ext);
     }
   }
   
@@ -15957,7 +16022,7 @@ public:
     }
     else
     {
-      Report ("GL Extension '%s' not found.", ext);
+      Report (msgExtNotFound, "GL", ext);
     }
   }
   
@@ -15981,7 +16046,7 @@ public:
     }
     else
     {
-      Report ("GL Extension '%s' not found.", ext);
+      Report (msgExtNotFound, "GL", ext);
     }
   }
   
@@ -16005,7 +16070,7 @@ public:
     }
     else
     {
-      Report ("GL Extension '%s' not found.", ext);
+      Report (msgExtNotFound, "GL", ext);
     }
   }
   
@@ -16036,7 +16101,7 @@ public:
     }
     else
     {
-      Report ("GL Extension '%s' not found.", ext);
+      Report (msgExtNotFound, "GL", ext);
     }
   }
   
@@ -16060,7 +16125,7 @@ public:
     }
     else
     {
-      Report ("GL Extension '%s' not found.", ext);
+      Report (msgExtNotFound, "GL", ext);
     }
   }
   
@@ -16124,7 +16189,7 @@ public:
     }
     else
     {
-      Report ("GL Extension '%s' not found.", ext);
+      Report (msgExtNotFound, "GL", ext);
     }
   }
   
@@ -16167,7 +16232,7 @@ public:
     }
     else
     {
-      Report ("GL Extension '%s' not found.", ext);
+      Report (msgExtNotFound, "GL", ext);
     }
   }
   
@@ -16191,7 +16256,7 @@ public:
     }
     else
     {
-      Report ("GL Extension '%s' not found.", ext);
+      Report (msgExtNotFound, "GL", ext);
     }
   }
   
@@ -16215,7 +16280,7 @@ public:
     }
     else
     {
-      Report ("GL Extension '%s' not found.", ext);
+      Report (msgExtNotFound, "GL", ext);
     }
   }
   
@@ -16244,7 +16309,7 @@ public:
     }
     else
     {
-      Report ("GL Extension '%s' not found.", ext);
+      Report (msgExtNotFound, "GL", ext);
     }
   }
   
@@ -16276,7 +16341,7 @@ public:
     }
     else
     {
-      Report ("GL Extension '%s' not found.", ext);
+      Report (msgExtNotFound, "GL", ext);
     }
   }
   
@@ -16304,7 +16369,7 @@ public:
     }
     else
     {
-      Report ("GL Extension '%s' not found.", ext);
+      Report (msgExtNotFound, "GL", ext);
     }
   }
   
@@ -16331,7 +16396,7 @@ public:
     }
     else
     {
-      Report ("GL Extension '%s' not found.", ext);
+      Report (msgExtNotFound, "GL", ext);
     }
   }
   
@@ -16360,7 +16425,7 @@ public:
     }
     else
     {
-      Report ("WGL Extension '%s' not found.", ext);
+      Report (msgExtNotFound, "WGL", ext);
     }
   }
 #endif
@@ -16389,7 +16454,7 @@ public:
     }
     else
     {
-      Report ("WGL Extension '%s' not found.", ext);
+      Report (msgExtNotFound, "WGL", ext);
     }
   }
 #endif
@@ -16421,7 +16486,7 @@ public:
     }
     else
     {
-      Report ("WGL Extension '%s' not found.", ext);
+      Report (msgExtNotFound, "WGL", ext);
     }
   }
 #endif
@@ -16450,7 +16515,7 @@ public:
     }
     else
     {
-      Report ("WGL Extension '%s' not found.", ext);
+      Report (msgExtNotFound, "WGL", ext);
     }
   }
 #endif
@@ -16480,7 +16545,7 @@ public:
     }
     else
     {
-      Report ("WGL Extension '%s' not found.", ext);
+      Report (msgExtNotFound, "WGL", ext);
     }
   }
 #endif
@@ -16508,7 +16573,7 @@ public:
     }
     else
     {
-      Report ("WGL Extension '%s' not found.", ext);
+      Report (msgExtNotFound, "WGL", ext);
     }
   }
 #endif
@@ -16537,7 +16602,7 @@ public:
     }
     else
     {
-      Report ("WGL Extension '%s' not found.", ext);
+      Report (msgExtNotFound, "WGL", ext);
     }
   }
 #endif
@@ -16569,7 +16634,7 @@ public:
     }
     else
     {
-      Report ("WGL Extension '%s' not found.", ext);
+      Report (msgExtNotFound, "WGL", ext);
     }
   }
 #endif
@@ -16599,7 +16664,7 @@ public:
     }
     else
     {
-      Report ("WGL Extension '%s' not found.", ext);
+      Report (msgExtNotFound, "WGL", ext);
     }
   }
 #endif
@@ -16628,7 +16693,7 @@ public:
     }
     else
     {
-      Report ("WGL Extension '%s' not found.", ext);
+      Report (msgExtNotFound, "WGL", ext);
     }
   }
 #endif
@@ -16659,7 +16724,7 @@ public:
     }
     else
     {
-      Report ("WGL Extension '%s' not found.", ext);
+      Report (msgExtNotFound, "WGL", ext);
     }
   }
 #endif
@@ -16698,7 +16763,7 @@ public:
     }
     else
     {
-      Report ("WGL Extension '%s' not found.", ext);
+      Report (msgExtNotFound, "WGL", ext);
     }
   }
 #endif
@@ -16728,7 +16793,7 @@ public:
     }
     else
     {
-      Report ("GL Extension '%s' not found.", ext);
+      Report (msgExtNotFound, "GL", ext);
     }
   }
   
@@ -16757,7 +16822,7 @@ public:
     }
     else
     {
-      Report ("GL Extension '%s' not found.", ext);
+      Report (msgExtNotFound, "GL", ext);
     }
   }
   
@@ -16781,7 +16846,7 @@ public:
     }
     else
     {
-      Report ("GL Extension '%s' not found.", ext);
+      Report (msgExtNotFound, "GL", ext);
     }
   }
   
@@ -16815,7 +16880,7 @@ public:
     }
     else
     {
-      Report ("GL Extension '%s' not found.", ext);
+      Report (msgExtNotFound, "GL", ext);
     }
   }
   
@@ -16841,7 +16906,7 @@ public:
     }
     else
     {
-      Report ("GL Extension '%s' not found.", ext);
+      Report (msgExtNotFound, "GL", ext);
     }
   }
   
@@ -16865,7 +16930,7 @@ public:
     }
     else
     {
-      Report ("GL Extension '%s' not found.", ext);
+      Report (msgExtNotFound, "GL", ext);
     }
   }
   
@@ -16900,7 +16965,58 @@ public:
     }
     else
     {
-      Report ("GL Extension '%s' not found.", ext);
+      Report (msgExtNotFound, "GL", ext);
+    }
+  }
+  
+  void InitGL_ATI_separate_stencil ()
+  {
+    if (tested_CS_GL_ATI_separate_stencil) return;
+    tested_CS_GL_ATI_separate_stencil = true;
+    const char* ext = "GL_ATI_separate_stencil";
+    char cfgkey[26 + 23 + 1];
+    sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
+    
+    CS_GL_ATI_separate_stencil = (strstr (extstrGL, ext) != 0);
+
+    bool allclear, funcTest;
+    (void)funcTest; // shut up "variable unused" warnings
+    if (CS_GL_ATI_separate_stencil)
+    {
+      allclear = true;
+      EXTMGR_FUNC_INIT(glStencilOpSeparateATI, GLSTENCILOPSEPARATEATI);
+      EXTMGR_FUNC_INIT(glStencilFuncSeparateATI, GLSTENCILFUNCSEPARATEATI);
+
+      EXTMGR_REPORT_INIT_RESULT("GL", GL_ATI_separate_stencil)
+    }
+    else
+    {
+      Report (msgExtNotFound, "GL", ext);
+    }
+  }
+  
+  void InitGL_EXT_stencil_two_side ()
+  {
+    if (tested_CS_GL_EXT_stencil_two_side) return;
+    tested_CS_GL_EXT_stencil_two_side = true;
+    const char* ext = "GL_EXT_stencil_two_side";
+    char cfgkey[26 + 23 + 1];
+    sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
+    
+    CS_GL_EXT_stencil_two_side = (strstr (extstrGL, ext) != 0);
+
+    bool allclear, funcTest;
+    (void)funcTest; // shut up "variable unused" warnings
+    if (CS_GL_EXT_stencil_two_side)
+    {
+      allclear = true;
+      EXTMGR_FUNC_INIT(glActiveStencilFaceEXT, GLACTIVESTENCILFACEEXT);
+
+      EXTMGR_REPORT_INIT_RESULT("GL", GL_EXT_stencil_two_side)
+    }
+    else
+    {
+      Report (msgExtNotFound, "GL", ext);
     }
   }
   

@@ -19,6 +19,9 @@ chronological order.
 	  to glrender3d.
 	- Jorrit added stenciltest level to CVS. This is for the new
 	  renderer.
+	- res added the ATI_separate_stencil and EXT_stencil_two_side 
+	  extensions to the GL extension manager and made some other small
+	  tweaks in the ext manager.
 3-Sep-2003
 	- Peter Amstutz changed nullmesh to properly initialize it's
 	  bounding box to a legal (albeit extremely small) value.

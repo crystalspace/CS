@@ -18,7 +18,7 @@
     }
     else
     {
-      Report ("WGL Extension '%%s' not found.", ext);
+      Report (msgExtNotFound, "WGL", ext);
     }
   }
 #endif

@@ -119,7 +119,7 @@
       if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", \
         REPORT_MISSING_ENTRIES)) \
       { \
-        Report ("Failed to retrieve %%s", #nameNC); \
+        Report (msgExtRetrieveFail, #nameNC); \
       } \
       allclear &= funcTest;
 
@@ -129,16 +129,16 @@
         CS_##nameNC &= config->GetBool (cfgkey, true); \
         if (CS_##nameNC) \
         { \
-          Report (exttype " Extension '%%s' found and used.", ext); \
+          Report (msgExtFoundAndUsed, exttype, ext); \
         } \
         else \
         { \
-          Report (exttype " Extension '%%s' found, but not used.", ext); \
+          Report (msgExtFoundAndNotUsed, exttype, ext); \
         } \
       } \
       else \
       { \
-        Report (exttype " Extension '%%s' failed to initialize.", ext); \
+        Report (msgExtInitFail, exttype, ext); \
       } 
 
 struct csGLExtensionManager
@@ -149,6 +149,11 @@ private:
   iOpenGLInterface* gl;
   
   const char* extstrGL;
+  const char* msgExtRetrieveFail;
+  const char* msgExtFoundAndUsed;
+  const char* msgExtFoundAndNotUsed;
+  const char* msgExtInitFail;
+  const char* msgExtNotFound;
 #ifdef __WIN32__
   const char* extstrWGL;
   
@@ -193,7 +198,7 @@ public:
     // Low priority so canvas/renderer cfgs may override the settings
     config.AddConfig (object_reg, "/config/glext.cfg", true,
       iConfigManager::ConfigPriorityPlugin - 1);
-  }
+}
   
   void Open () 
   { 
@@ -222,6 +227,12 @@ public:
   
   csGLExtensionManager () : object_reg (0)
   {
+    msgExtRetrieveFail = "Failed to retrieve %%s";
+    msgExtFoundAndUsed = "%%s Extension '%%s' found and used.";
+    msgExtFoundAndNotUsed = "%%s Extension '%%s' found, but not used.";
+    msgExtInitFail = "%%s Extension '%%s' failed to initialize.";
+    msgExtNotFound = "%%s Extension '%%s' not found.";
+    
     Reset ();
   }
   

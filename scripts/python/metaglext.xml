@@ -5751,4 +5751,29 @@
       <arg name="params" type="GLint" const="false" pointer="true" />
     </function>
   </extension>
+  <extension name="GL_ATI_separate_stencil" type="GL">
+    <token name="GL_STENCIL_BACK_FUNC_ATI" value="0x8800" />
+    <token name="GL_STENCIL_BACK_FAIL_ATI" value="0x8801" />
+    <token name="GL_STENCIL_BACK_PASS_DEPTH_FAIL_ATI" value="0x8802" />
+    <token name="GL_STENCIL_BACK_PASS_DEPTH_PASS_ATI" value="0x8803" />
+    <function name="glStencilOpSeparateATI" return="GLvoid" pointer="false">
+      <arg name="face" type="GLenum" const="false" pointer="false" />
+      <arg name="sfail" type="GLenum" const="false" pointer="false" />
+      <arg name="dpfail" type="GLenum" const="false" pointer="false" />
+      <arg name="dppass" type="GLenum" const="false" pointer="false" />
+    </function>
+    <function name="glStencilFuncSeparateATI" return="GLvoid" pointer="false">
+      <arg name="frontfunc" type="GLenum" const="false" pointer="false" />
+      <arg name="backfunc" type="GLenum" const="false" pointer="false" />
+      <arg name="ref" type="GLint" const="false" pointer="false" />
+      <arg name="mask" type="GLuint" const="false" pointer="false" />
+    </function>
+  </extension>
+  <extension name="GL_EXT_stencil_two_side" type="GL">
+    <token name="GL_STENCIL_TEST_TWO_SIDE_EXT" value="0x8910" />
+    <token name="GL_ACTIVE_STENCIL_FACE_EXT" value="0x8910" />
+    <function name="glActiveStencilFaceEXT" return="GLvoid" pointer="false">
+      <arg name="face" type="GLenum" const="false" pointer="false" />
+    </function>
+  </extension>
 </extensionlist>

@@ -17,7 +17,7 @@
     }
     else
     {
-      Report ("GL Extension '%%s' not found.", ext);
+      Report (msgExtNotFound, "GL", ext);
     }
   }
   
