@@ -12,6 +12,7 @@
 #include "ivaria/view.h"
 #include "iengine/engine.h"
 #include "iengine/camera.h"
+#include "aws/aws3dfrm.h"
 
 // makes sure this header file stays consistent with the project.
 #include "iaws/awsecomp.h"
@@ -27,9 +28,6 @@ const unsigned long awsWindow::sWindowClosed = 0x5;
 const unsigned long awsWindow::sWindowZoomed = 0x6;
 const unsigned long awsWindow::sWindowMinimized = 0x7;
 
-const int awsWindow:: fsNormal = 0x0;
-const int awsWindow:: fsToolbar = 0x1;
-const int awsWindow:: fsBitmap = 0x2;
 
 const int awsWindow:: foControl = 0x1;
 const int awsWindow:: foZoom = 0x2;
@@ -39,6 +37,9 @@ const int awsWindow:: foTitle = 0x10;
 const int awsWindow:: foGrip = 0x20;
 const int awsWindow:: foRoundBorder = 0x0;
 const int awsWindow:: foBeveledBorder = 0x40;
+const int awsWindow:: foNoBorder = 0x80;
+
+
 
 const int grip_size = 16;
 
@@ -46,136 +47,167 @@ const int grip_size = 16;
 const bool DEBUG_WINDOW_EVENTS = false;
 
 awsWindow::awsWindow () :
-  above(NULL),
-  below(NULL),
-  min_button(NULL),
-  max_button(NULL),
-  close_button(NULL),
-  btxt(NULL),
-  otxt(NULL),
-  frame_style(fsNormal),
+  sink(this),
   frame_options(foControl | foZoom | foClose | foTitle | foGrip | foRoundBorder),
   title(NULL),
-  bkg_alpha(0),
-  ovl_alpha(0),
   resizing_mode(false),
   moving_mode(false),
-  minp(50, 5, 50 + 13, 5 + 11),
-  maxp(34, 5, 34 + 13, 5 + 11),
-  closep(18, 5, 18 + 13, 5 + 11),
-  min_down(false),
-  max_down(false),
-  close_down(false),
-  is_zoomed(false),
   is_minimized(false),
-  todraw_dirty(true),
-  view(NULL)
+  popup(NULL),
+  menu(NULL)
 {
-  SCF_CONSTRUCT_IBASE (NULL);
-
   // Window start off hidden.
   SetFlag (AWSF_CMP_HIDDEN);
+  SetFlag (AWSF_CMP_WINDOW);
+  SetFlag (AWSF_CMP_TOP_SELECT);
 }
 
 awsWindow::~awsWindow ()
 {
 }
 
-void awsWindow::SetWindowAbove (iAwsWindow *win)
-{
-  above = win;
-}
-
-void awsWindow::SetWindowBelow (iAwsWindow *win)
-{
-  below = win;
-}
 
 bool awsWindow::Setup (iAws *_wmgr, awsComponentNode *settings)
 {
-  if (!comp.Setup (_wmgr, settings)) return false;
-  if (Layout ()) Layout ()->SetOwner (this);
+  style = fsNormal;
+
+  if (!awsPanel::Setup (_wmgr, settings)) return false;
+  if (Layout ()) Layout ()->SetOwner (GetComponent());
 
   iAwsPrefManager *pm = WindowManager ()->GetPrefMgr ();
 
-  // Link into the current window hierarchy, at the top.
-  if (WindowManager ()->GetTopWindow () == NULL)
-  {
-    WindowManager ()->SetTopWindow (this);
-  }
-  else
-  {
-    LinkAbove (WindowManager ()->GetTopWindow ());
-    WindowManager ()->SetTopWindow (this);
-  }
-
-  if ((min_button = pm->GetTexture ("WindowMin")) == NULL)
-    printf ("aws-debug: No WindowMin texture found.\n");
-
-  if ((max_button = pm->GetTexture ("WindowZoom")) == NULL)
-    printf ("aws-debug: No WindowZoom texture found.\n");
-
-  if ((close_button = pm->GetTexture ("WindowClose")) == NULL)
-    printf ("aws-debug: No WindowClose texture found.\n");
-
-  btxt = pm->GetTexture ("Texture");
-
-  pm->GetInt (settings, "Style", frame_style);
   pm->GetInt (settings, "Options", frame_options);
   pm->GetString (settings, "Title", title);
+  pm->LookupIntKey ("TitleBarHeight", title_bar_height);
 
-  pm->LookupRectKey ("WindowMinAt", minp);
-  pm->LookupRectKey ("WindowZoomAt", maxp);
-  pm->LookupRectKey ("WindowCloseAt", closep);
-  pm->LookupIntKey ("OverlayTextureAlpha", alpha_level);
+  unsigned char red, green, blue;
+  if(pm->LookupRGBKey ("TitleBarTextColor", red, green, blue))
+	  title_text_color = pm->FindColor(red, green, blue);
+  else
+	  title_text_color = pm->GetColor(AC_TEXTFORE);
 
-  if (frame_style == fsBitmap)
+  // setup the colors for the title bar
+
+  for(int i = 0; i < 12; i++) title_color[i] = 128;
+
+  pm->LookupRGBKey("ActiveTitleBarColor1", title_color[0], title_color[1], title_color[2]);
+  if(!pm->LookupRGBKey("ActiveTitleBarColor2", title_color[3], title_color[4], title_color[5]))
   {
-    iString *tn1 = NULL, *tn2 = NULL;
-
-    pm->GetString (settings, "BitmapBackground", tn1);
-    pm->GetString (settings, "BitmapOverlay", tn2);
-
-    if (tn1) btxt = pm->GetTexture (tn1->GetData (), tn1->GetData ());
-    if (tn2) otxt = pm->GetTexture (tn2->GetData (), tn2->GetData ());
-
-    pm->GetInt(settings, "BackgroundAlpha", bkg_alpha);
-    pm->GetInt(settings, "OverlayAlpha", ovl_alpha);
-
-    bm_bkgsub.Set (0, 0, 0, 0);
-    if (!pm->GetRect (settings, "BackgroundSubrect", bm_bkgsub))
-      if (btxt)
-        btxt->GetOriginalDimensions (bm_bkgsub.xmax, bm_bkgsub.ymax);
-
-    bm_ovlsub.Set (0, 0, 0, 0);
-    if (!pm->GetRect (settings, "OverlaySubrect", bm_ovlsub))
-      if (otxt)
-        otxt->GetOriginalDimensions (bm_ovlsub.xmax, bm_ovlsub.ymax);
-
+	  title_color[3] = title_color[0];
+	  title_color[4] = title_color[1];
+	  title_color[5] = title_color[2];
   }
 
-  // Arrange control rects
-  minp.xmin = Frame ().xmax - minp.xmin;
-  minp.xmax = Frame ().xmax - minp.xmax;
-  minp.ymin = Frame ().ymin + minp.ymin;
-  minp.ymax = Frame ().ymin + minp.ymax;
+  pm->LookupRGBKey("InactiveTitleBarColor1", title_color[6], title_color[7], title_color[8]);
+  if(!pm->LookupRGBKey("InactiveTitleBarColor2", title_color[9], title_color[10], title_color[11]))
+  {
+	  title_color[9] = title_color[6];
+	  title_color[10] = title_color[7];
+	  title_color[11] = title_color[8];
+  }
 
-  maxp.xmin = Frame ().xmax - maxp.xmin;
-  maxp.xmax = Frame ().xmax - maxp.xmax;
-  maxp.ymin = Frame ().ymin + maxp.ymin;
-  maxp.ymax = Frame ().ymin + maxp.ymax;
+  // setup title bar height and offset
 
+  int tw, th;
+
+    // Get the size of the text
+  WindowManager ()->GetPrefMgr ()->GetDefaultFont ()->GetMaxSize (tw, th);
+  // Get a good offset
+  title_offset = th >> 1;
+  // Increase the textheight just a bit to have more room in the title bar
+  th += title_offset;
+  // Set the height of the title bar
+  title_bar_height = MAX(th + 3, title_bar_height);
+
+
+  // register triggers with our sink
+  sink.RegisterTrigger("Close", &OnCloseClick);
+  sink.RegisterTrigger("Zoom", &OnZoomClick);
+  sink.RegisterTrigger("Min", &OnMinClick);
+
+
+  // setup the control buttons
+  iString* close_button_txt;
+  pm->LookupStringKey("WindowClose", close_button_txt);
+  
+  csRect closep(18, 5, 18 + 13, 5 + 11);
+  pm->LookupRectKey ("WindowCloseAt", closep);
   closep.xmin = Frame ().xmax - closep.xmin;
   closep.xmax = Frame ().xmax - closep.xmax;
   closep.ymin = Frame ().ymin + closep.ymin;
   closep.ymax = Frame ().ymin + closep.ymax;
+  
+  awsComponentNode closeinfo(new scfString("Close Button"), 
+    new scfString("Command Button"));
+  closeinfo.Add(new awsIntKey(new scfString("Style"), awsCmdButton::fsNormal));
+  closeinfo.Add(new awsStringKey(new scfString("Image"), close_button_txt));
+  close_button.SetFlag(AWSF_CMP_NON_CLIENT);
+  close_button.Create(WindowManager(), this, &closeinfo);
+  close_button.ResizeTo(closep);
+  
+  slot_close.Connect(&close_button, awsCmdButton::signalClicked, 
+    &sink, sink.GetTriggerID("Close"));
+  
+  
+  iString* zoom_button_txt;
+  pm->LookupStringKey("WindowZoom", zoom_button_txt);
+  
+  csRect zoomp(34, 5, 34 + 13, 5 + 11);
+  pm->LookupRectKey ("WindowZoomAt", zoomp);
+  zoomp.xmin = Frame ().xmax - zoomp.xmin;
+  zoomp.xmax = Frame ().xmax - zoomp.xmax;
+  zoomp.ymin = Frame ().ymin + zoomp.ymin;
+  zoomp.ymax = Frame ().ymin + zoomp.ymax;
+  
+  awsComponentNode zoominfo(new scfString("Zoom Button"), 
+    new scfString("Command Button"));
+  zoominfo.Add(new awsIntKey(new scfString("Style"), awsCmdButton::fsNormal));
+  zoominfo.Add(new awsStringKey(new scfString("Image"), zoom_button_txt));
+  zoom_button.SetFlag(AWSF_CMP_NON_CLIENT);
+  zoom_button.Create(WindowManager(), this, &zoominfo);
+  zoom_button.ResizeTo(zoomp);
+  
+  slot_zoom.Connect(&zoom_button, awsCmdButton::signalClicked, 
+    &sink, sink.GetTriggerID("Zoom"));
+  
+  
+  
+  iString* min_button_txt;
+  pm->LookupStringKey("WindowMin", min_button_txt);
+  
+  csRect minp(50, 5, 50 + 13, 5 + 11);
+  pm->LookupRectKey ("WindowMinAt", minp);
+  minp.xmin = Frame ().xmax - minp.xmin;
+  minp.xmax = Frame ().xmax - minp.xmax;
+  minp.ymin = Frame ().ymin + minp.ymin;
+  minp.ymax = Frame ().ymin + minp.ymax;
+  
+  awsComponentNode mininfo(new scfString("Min Button"), 
+    new scfString("Command Button"));
+  mininfo.Add(new awsIntKey(new scfString("Style"), awsCmdButton::fsNormal));
+  mininfo.Add(new awsStringKey(new scfString("Image"), min_button_txt));
+  min_button.SetFlag(AWSF_CMP_NON_CLIENT);
+  min_button.Create(WindowManager(), this, &mininfo);
+  min_button.ResizeTo(minp);
+  
+  slot_min.Connect(&min_button, awsCmdButton::signalClicked, 
+    &sink, sink.GetTriggerID("Min"));
+  
+  // Hide any of the undesired controls
+  if(~frame_options & foClose)
+    close_button.Hide();
+  else if(~frame_options & foZoom)
+    zoom_button.Hide();
+  else if(~frame_options & foMin)
+    min_button.Hide();
+
 
   return true;
 }
 
 bool awsWindow::GetProperty (char *name, void **parm)
 {
-  if (comp.GetProperty (name, parm)) return true;
+  if (awsComponent::GetProperty (name, parm)) return true;
 
   if (strcmp ("Title", name) == 0)
   {
@@ -187,13 +219,28 @@ bool awsWindow::GetProperty (char *name, void **parm)
     *parm = (void *)s;
     return true;
   }
+  else if( strcmp("Active", name) == 0)
+  {
+    *parm = (void*) IsActiveWindow();
+    return true;
+  }
+  else if( strcmp("PopupMenu", name) == 0)
+  {
+    *parm = popup;
+    return true;
+  }
+  else if( strcmp("Menu", name) == 0)
+  {
+    *parm = menu;
+    return true;
+  }
 
   return false;
 }
 
 bool awsWindow::SetProperty (char *name, void *parm)
 {
-  if (comp.SetProperty (name, parm)) return true;
+  if (awsComponent::SetProperty (name, parm)) return true;
 
   if (strcmp ("Title", name) == 0)
   {
@@ -209,103 +256,82 @@ bool awsWindow::SetProperty (char *name, void *parm)
 
     return true;
   }
+  else if(strcmp("PopupMenu", name) == 0)
+  {
+    if(popup) popup->DecRef();
+    popup = (awsPopupMenu*) parm;
+    if(popup) popup->IncRef();
+    return true;
+  }
+  else if(strcmp("Menu", name) == 0)
+  {
+    SetMenu((awsMenuBar*)parm);
+    return true;
+  }
 
   return false;
 }
 
 bool awsWindow::Execute (char *action, iAwsParmList &parmlist)
 {
-  if (comp.Execute (action, parmlist)) return true;
+  if (awsComponent::Execute (action, parmlist)) return true;
 
   return false;
 }
 
-iAwsComponent *awsWindow::GetComponent ()
+bool awsWindow::IsActiveWindow()
 {
-  return this;
-}
-
-void awsWindow::SetRedrawTag (unsigned int tag)
-{
-  redraw_tag = tag;
-}
-
-void awsWindow::Unlink ()
-{
-  // If there's someone below us, set their above to our above.
-  if (below) below->SetWindowAbove (above);
-
-  // If there's someone above us, then set their below to our below
-  if (above)
-    above->SetWindowBelow (below);
-  else
-  {
-    /*  This means that we're the top level window, and we're going away.  We need to tell the window manager to
-     * set the new top window. */
-    if (below) WindowManager ()->SetTopWindow (below);
-  }
-}
-
-void awsWindow::LinkAbove (iAwsWindow *win)
-{
-  if (win)
-  {
-    above = win->WindowAbove ();
-    win->SetWindowAbove (this);
-
-    below = win;
-  }
-}
-
-void awsWindow::LinkBelow (iAwsWindow *win)
-{
-  if (win)
-  {
-    above = win;
-
-    below = win->WindowBelow ();
-    win->SetWindowBelow (this);
-  }
-}
-
-void awsWindow::Raise ()
-{
-  // Only raise if we're not already the top
-  if (above != NULL)
-  {
-    // Get us out of the window hierarchy
-    Unlink ();
-
-    // Put us back into the window hierachy at the top.
-    if (WindowManager ()->GetTopWindow ())
+  // check to see if there are any sibbling windows above this one
+    iAwsComponent* cmp = ComponentAbove();
+    while(cmp)
     {
-      WindowManager ()->Mark (WindowManager ()->GetTopWindow ()->Frame ());
-      LinkAbove (WindowManager ()->GetTopWindow ());
+      if(cmp->Flags() & AWSF_CMP_WINDOW)
+        return false;
+      cmp = cmp->ComponentAbove();
     }
 
-    WindowManager ()->SetTopWindow (this);
-    WindowManager ()->Mark (Frame ());
-  }
+    // check to see if our Parent window is active, if we have one
+    if(Parent())
+    {
+      bool active = false;
+      Parent()->Window()->GetProperty("Active", (void**) &active);
+      return active;
+    }
+
+    return true;
 }
 
-void awsWindow::Lower ()
+
+void awsWindow::SetMenu(awsMenuBar* _menu)
 {
-  // Only lower if we're not already the bottom
-  if (below != NULL)
+  if(menu)
   {
-    iAwsWindow *next = below;
+    menu->DecRef();
+    RemoveChild(menu);
+    Invalidate();
+  }
+  menu = _menu;
+  if(menu)
+  {
+    menu->IncRef();
+    AddChild(menu);
+    menu->SetFlag(AWSF_CMP_NON_CLIENT);
 
-    // Get us out of the window hierachy.
-    Unlink ();
+    csRect insets = frame_drawer.GetInsets(style);
+    if(frame_options & foTitle)
+      insets.ymin += title_bar_height;
 
-    // Put us back in one level lower.
-    LinkBelow (next);
+    menu->MoveTo(Frame().xmin + insets.xmin, Frame().ymin + insets.ymin);
+    menu->Resize(Frame().Width() - insets.xmin - insets.xmax, menu->Frame().Height());
+    menu->Show();
 
-    // If we were the top window, fix it
-    if (WindowManager ()->GetTopWindow () == this)
-      WindowManager ()->SetTopWindow (next);
+    Invalidate();
   }
 }
+
+awsMenuBar* awsWindow::GetMenu() { return menu; }
+
+
 
 void awsWindow::OnRaise ()
 {
@@ -321,44 +347,23 @@ void awsWindow::OnLower ()
 
 bool awsWindow::OnMouseDown (int button, int x, int y)
 {
-  (void)button;
-
-  if (!(frame_style & fsBitmap))
+  if(button == 2 && popup)
   {
-    if (DEBUG_WINDOW_EVENTS)
-      printf (
-        "mousedown: x=%d, y=%d, fx=%d, fy=%d\n",
-        x,
-        y,
-        Frame ().xmax,
-        Frame ().ymax);
+    popup->MoveTo(x,y);
+    popup->Show();
+    popup->Raise();
+    popup->TrackMouse();
+  }
 
-    // check controls first
-    if ((frame_options & foMin) && minp.Contains (x, y))
-    {
-      min_down = true;
-      Invalidate ();
-      return true;
-    }
+  if(style == fsBitmap || style == fsNone || style == fsFlat)
+    return false;
 
-    if ((frame_options & foZoom) && maxp.Contains (x, y))
-    {
-      max_down = true;
-      Invalidate ();
-      return true;
-    }
+  if (IsMaximized()) return false;
 
-    if ((frame_options & foClose) && closep.Contains (x, y))
-    {
-      close_down = true;
-      Invalidate ();
-      return true;
-    }
+  down_x = x;
+  down_y = y;
 
-    ////////// NOTE!! Past this point is where all events that are not allowed to happen while zoomed go!!
-    if (is_zoomed) return false;
-
-    ///// Check for resizing
+  ///// Check for resizing
     if (
       (frame_options & foGrip) &&
       x < Frame ().xmax &&
@@ -366,17 +371,10 @@ bool awsWindow::OnMouseDown (int button, int x, int y)
       y < Frame ().ymax &&
       y > Frame ().ymax - grip_size)
     {
+      orig_x = Frame().Width();
+      orig_y = Frame().Height();
       resizing_mode = true;
       WindowManager ()->CaptureMouse (this);
-      WindowManager ()->Mark (Frame ());
-
-      // Erase the old frame if it needs it
-      if (WindowManager ()->GetFlags () & AWSF_AlwaysEraseWindows)
-        WindowManager ()->Erase (Frame ());
-
-      if (DEBUG_WINDOW_EVENTS)
-        printf ("aws-debug: Window resize mode=true\n");
-
       return true;
     }
 
@@ -384,7 +382,7 @@ bool awsWindow::OnMouseDown (int button, int x, int y)
     else if (
           // Move using titlebar if it's a normal window
             (
-              (frame_style == fsNormal && !(frame_options & foBeveledBorder)) &&
+              (style == fsNormal && !(frame_options & foBeveledBorder)) &&
               (
                 x < Frame ().xmax &&
                 x > Frame ().xmin &&
@@ -394,148 +392,27 @@ bool awsWindow::OnMouseDown (int button, int x, int y)
               )
             ) ||
           // Move using whole window frame if it's not
-            (frame_style != fsNormal || (frame_options & foBeveledBorder)))
+            (style != fsNormal || (frame_options & foBeveledBorder)))
     {
+      orig_x = Frame().xmin;
+      orig_y = Frame().ymin;
       moving_mode = true;
       WindowManager ()->CaptureMouse (this);
-      last_x = x;
-      last_y = y;
-
-      // Erase the old frame if it needs it
-      if (WindowManager ()->GetFlags () & AWSF_AlwaysEraseWindows)
-      {
-        csRect r (Frame ());
-
-        r.Outset (5);
-        WindowManager ()->Erase (r);
-      }
-
-      if (DEBUG_WINDOW_EVENTS)
-        printf ("aws-debug: Window move mode=true\n");
-
       return true;
     }
-  }
-
-  return false;
+    return false;
 }
 
 bool awsWindow::OnMouseUp (int button, int x, int y)
 {
   (void)button;
 
-  if (max_down && (frame_options & foZoom) && maxp.Contains (x, y))
-  {
-    max_down = false;
-
-    csRect insets;
-
-    if (Layout ()) insets = getInsets ();
-
-    // Zoom/de-zoom window
-    if (is_zoomed)
-    {
-      int delta_x = unzoomed_frame.xmax -
-        Frame ().xmax, delta_y = unzoomed_frame.ymin;
-      is_zoomed = false;
-
-      if (WindowManager ()->GetFlags () & AWSF_AlwaysEraseWindows)
-        WindowManager ()->Erase (Frame ());
-
-      // Fix controls
-      minp.Move (delta_x, delta_y);
-      maxp.Move (delta_x, delta_y);
-      closep.Move (delta_x, delta_y);
-
-      // Fix frame
-      Frame ().Set (unzoomed_frame);
-
-      if (Layout ()) RecursiveLayoutChildren (this, false);
-
-      // Fix kids
-      MoveChildren (unzoomed_frame.xmin + insets.xmin, delta_y + insets.ymin);
-
-      // Fix redraw zone
-      todraw_dirty = true;
-    }
-    else
-    {
-      is_zoomed = true;
-      unzoomed_frame.Set (Frame ());
-
-      Frame ().xmin = Frame ().ymin = 0;
-      Frame ().xmax = WindowManager ()->G2D ()->GetWidth ();
-      Frame ().ymax = WindowManager ()->G2D ()->GetHeight ();
-
-      int delta_x = Frame ().xmax -
-        unzoomed_frame.xmax, delta_y = -unzoomed_frame.ymin;
-
-      // Fix controls
-      minp.Move (delta_x, delta_y);
-      maxp.Move (delta_x, delta_y);
-      closep.Move (delta_x, delta_y);
-
-      if (Layout ())
-      {
-        RecursiveLayoutChildren (this, false);
-        MoveChildren (insets.xmin, insets.ymin);
-      }
-      else
-        // Fix kids
-        MoveChildren (-unzoomed_frame.xmin, delta_y);
-
-      // Fix redraw zone
-      todraw_dirty = true;
-    }
-
-    Invalidate ();
-    WindowManager ()->InvalidateUpdateStore ();
-    Broadcast (sWindowZoomed);
-    return true;
-  }
-
-  if (close_down && (frame_options & foClose) && closep.Contains (x, y))
-  {
-    Broadcast (sWindowClosed);
-  }
-
-  if (min_down && (frame_options & foMin) && minp.Contains (x, y))
-  {
-    Broadcast (sWindowMinimized);
-  }
-
-  if (min_down || max_down || close_down)
-  {
-    min_down = false;
-    max_down = false;
-    close_down = false;
-    Invalidate ();
-    return true;
-  }
-
-  if (resizing_mode)
+  if (resizing_mode || moving_mode)
   {
     resizing_mode = false;
-    WindowManager ()->ReleaseMouse ();
-    WindowManager ()->Mark (Frame ());
-
-    // Fix redraw zone
-    todraw_dirty = true;
-
-    if (DEBUG_WINDOW_EVENTS)
-      printf ("aws-debug: Window resize mode=false\n");
-
-    return true;
-  }
-  else if (moving_mode)
-  {
     moving_mode = false;
     WindowManager ()->ReleaseMouse ();
-
-    // Fix redraw zone
-    todraw_dirty = true;
-
-    if (DEBUG_WINDOW_EVENTS) printf ("aws-debug: Window move mode=false\n");
+    return true;
   }
 
   return false;
@@ -543,1039 +420,264 @@ bool awsWindow::OnMouseUp (int button, int x, int y)
 
 bool awsWindow::OnMouseMove (int button, int x, int y)
 {
+  awsComponent::OnMouseMove(button, x, y);
   (void)button;
 
   if (resizing_mode)
-  {
-    //bool marked=false;
-    if (x < Frame ().xmax || y < Frame ().ymax)
-    {
-      if (WindowManager ()->GetFlags () & AWSF_AlwaysEraseWindows)
-        WindowManager ()->Erase (Frame ());
-    }
-
-    int delta_x, old_x = Frame ().xmax;
-
-    Frame ().xmax = x;
-    Frame ().ymax = y;
-
-    if (Frame ().xmax - Frame ().xmin < grip_size << 1)
-      Frame ().xmax = Frame ().xmin + (grip_size << 1);
-
-    if (Frame ().ymax - Frame ().ymin < grip_size << 1)
-      Frame ().ymax = Frame ().ymin + (grip_size << 1);
-
-    if (Frame ().xmax > WindowManager ()->G2D ()->GetWidth ())
-      Frame ().xmax = WindowManager ()->G2D ()->GetWidth ();
-
-    if (Frame ().ymax > WindowManager ()->G2D ()->GetHeight ())
-      Frame ().ymax = WindowManager ()->G2D ()->GetHeight ();
-
-    delta_x = Frame ().xmax - old_x;
-
-    minp.Move (delta_x, 0);
-    maxp.Move (delta_x, 0);
-    closep.Move (delta_x, 0);
-
-    //if (!marked)
-    WindowManager ()->Mark (Frame ());
-
-    // Fix update zones
-    WindowManager ()->InvalidateUpdateStore ();
-
-    if (Layout ())
-    {
-      csRect r (this->getInsets ());
-      RecursiveLayoutChildren (this, false);
-      MoveChildren (Frame ().xmin + r.xmin, Frame ().ymin + r.ymin);
-    }
-
-    // Fix internal redraw zone
-    todraw_dirty = true;
-  }
+    Resize(orig_x + x - down_x, orig_y + y - down_y); 
   else if (moving_mode)
-  {
-    int delta_x = x - last_x;
-    int delta_y = y - last_y;
+    MoveTo(orig_x + x - down_x, orig_y + y - down_y);
 
-    csRect dirty1 (Frame ());
-
-    dirty1.Outset (2);
-
-    last_x = x;
-    last_y = y;
-
-    if (delta_x + Frame ().xmin < 0)
-      delta_x = -Frame ().xmin;
-    else if (delta_x + Frame ().xmax > WindowManager ()->G2D ()->GetWidth ())
-      delta_x = WindowManager ()->G2D ()->GetWidth () - Frame ().xmax;
-
-    if (delta_y + Frame ().ymin < 0)
-      delta_y = -Frame ().ymin;
-    else if (delta_y + Frame ().ymax > WindowManager ()->G2D ()->GetHeight ())
-      delta_y = WindowManager ()->G2D ()->GetHeight () - Frame ().ymax;
-
-    // Move frame
-    Frame ().xmin += delta_x;
-    Frame ().ymin += delta_y;
-    Frame ().xmax += delta_x;
-    Frame ().ymax += delta_y;
-
-    minp.Move (delta_x, delta_y);
-    maxp.Move (delta_x, delta_y);
-    closep.Move (delta_x, delta_y);
-
-    // Move children
-    MoveChildren (delta_x, delta_y);
-
-    //if (DEBUG_WINDOW_EVENTS)
-
-    //printf("aws-debug: deltas for move: %d, %d\n", delta_x, delta_y);
-
-    // Erase the old frame if it needs it
-    if (WindowManager ()->GetFlags () & AWSF_AlwaysEraseWindows)
-      WindowManager ()->Erase (dirty1);
-
-    // Mark changed pos
-    WindowManager ()->Mark (Frame ());
-    WindowManager ()->InvalidateUpdateStore ();
-    todraw_dirty = true;
-  }
-
-  return false;
-}
-
-void awsWindow::OnResized ()
-{
-  return ;
-}
-
-bool awsWindow::HandleEvent (iEvent &Event)
-{
-  switch (Event.Type)
-  {
-    case csevMouseMove:
-      return OnMouseMove (Event.Mouse.Button, Event.Mouse.x, Event.Mouse.y);
-
-    case csevMouseUp:
-      return OnMouseUp (Event.Mouse.Button, Event.Mouse.x, Event.Mouse.y);
-
-    case csevMouseDown:
-      return OnMouseDown (Event.Mouse.Button, Event.Mouse.x, Event.Mouse.y);
-
-    case csevMouseClick:
-      return OnMouseClick (Event.Mouse.Button, Event.Mouse.x, Event.Mouse.y);
-
-    case csevMouseEnter:
-      return OnMouseEnter ();
-
-    case csevMouseExit:
-      return OnMouseExit ();
-
-    case csevKeyDown:
-      return OnKeypress (Event.Key.Char, Event.Key.Modifiers);
-
-    case csevFrameStart:
-      return OnFrame ();
-  }
-
-  return false;
-}
-
-void awsWindow::OnAdded ()
-{
-  return ;
-}
-
-bool awsWindow::OnFrame ()
-{
-  if (view)
-  {
-    WindowManager ()->Mark (Frame ());
-    return true;
-  }
-
-  return false;
-}
-
-bool awsWindow::OnMouseExit ()
-{
-  return false;
-}
-
-bool awsWindow::OnMouseEnter ()
-{
-  return false;
-}
-
-bool awsWindow::OnMouseClick (int, int, int)
-{
-  return false;
-}
-
-bool awsWindow::OnMouseDoubleClick (int, int, int)
-{
-  return false;
-}
-
-bool awsWindow::OnKeypress (int, int)
-{
-  return false;
-}
-
-bool awsWindow::OnLostFocus ()
-{
-  return false;
-}
-
-bool awsWindow::OnGainFocus ()
-{
   return false;
 }
 
 void awsWindow::OnDraw (csRect clip)
 {
   iGraphics2D *g2d = WindowManager ()->G2D ();
-  iGraphics3D *g3d = WindowManager ()->G3D ();
 
-  awsClipper clipper (g3d, g2d);
+ 
 
-  /******************************************
-   * When drawing the window, we have to take
-   *  certain things into account.  First, the
-   *  frame type defines a number of differences.
-   *  Second, some normal behaviors may be turned
-   *  off, and thus we wouldn't want to draw those.
-   *  Finally, the type of window also describes
-   *  what kind of borders and title windows we draw.
-   **************************************************/
-  int hi = WindowManager ()->GetPrefMgr ()->GetColor (AC_HIGHLIGHT);
-  int hi2 = WindowManager ()->GetPrefMgr ()->GetColor (AC_HIGHLIGHT2);
-  int lo = WindowManager ()->GetPrefMgr ()->GetColor (AC_SHADOW);
-  int lo2 = WindowManager ()->GetPrefMgr ()->GetColor (AC_SHADOW2);
-  int fill = WindowManager ()->GetPrefMgr ()->GetColor (AC_FILL);
-  int black = WindowManager ()->GetPrefMgr ()->GetColor (AC_BLACK);
-
-  //int white = WindowManager()->GetPrefMgr()->GetColor(AC_WHITE);
-  int tw, th, toff;
-  int i;
-
-  clipper.SetClipRect (clip);
-
-  if (todraw_dirty)
+  awsPanel::OnDraw(clip);
+  if(style == fsNormal)
   {
-    todraw_dirty = false;
-
-    todraw.makeEmpty ();
-    todraw.Include (Frame ());
-
-    for (i = 0; i < GetChildCount (); ++i)
-    {
-      if (!(GetChildAt (i)->Flags () & AWSF_CMP_ALWAYSERASE))
-        todraw.Exclude (GetChildAt (i)->Frame ());
-    }
+    csRect r = Frame();
+    csRect insets = frame_drawer.GetInsets(fsNormal);
+    r.xmin += insets.xmin;
+    r.ymin += insets.ymin 
+      + (frame_options & foTitle ? title_bar_height : 0)
+      + (menu ? menu->Frame().Height() : 0);
+    r.xmax -= insets.xmax;
+    r.ymax -= insets.ymax;
+    csRectRegion reg;
+    reg.makeEmpty();
+    if(!r.IsEmpty())
+      frame_drawer.Draw(r, fsSunken, Frame(), Frame(), &reg);
   }
 
-  iGraphics3D *og3d = NULL;
 
-  if (view)
+  if (frame_options & foTitle)
   {
-    og3d = view->GetContext ();
-    view->SetContext (g3d);
+	  const int step = 6;
+      
+	  csRect title_frame = Frame();
+      csRect insets = frame_drawer.GetInsets(style);
+	  title_frame.xmin += insets.xmin;
+	  title_frame.ymin += insets.ymin;
+	  title_frame.xmax -= insets.xmax;
+	  title_frame.ymax = title_frame.ymin + title_bar_height;
 
-    view->SetRectangle (
-        Frame ().xmin,
-        g3d->GetHeight () - Frame ().Height () - Frame ().ymin,
-        Frame ().Width (),
-        Frame ().Height ());
-    view->GetCamera ()->SetPerspectiveCenter (
-        Frame ().xmin + (Frame ().Width () >> 1),
-        (g3d->GetHeight () - Frame ().Height () - Frame ().ymin) +
-          (Frame ().Height () >> 1));
-    view->GetCamera ()->SetFOV (
-        view->GetCamera ()->GetFOV (),
-        Frame ().Width ());
-  }
-
-  // Get the size of the text
-  WindowManager ()->GetPrefMgr ()->GetDefaultFont ()->GetMaxSize (tw, th);
-
-  // Get a good offset
-  toff = th >> 1;
-
-  // Increase the textheight just a bit to have more room in the title bar
-  th += toff;
-
-  // Set the height of the title bar
-  title_bar_height = th + 3;
-
-  // Get the texture size, if there is one.
-
-  switch (frame_style)
-  {
-    case fsNormal:
-      // Draw the solid fill (or texture)
-      if (frame_options & foBeveledBorder)
+      // if the title is active
+      if (IsActiveWindow())
       {
-        if (view)
-        {
-          g3d->BeginDraw (
-              view->GetEngine ()->GetBeginDrawFlags () | CSDRAW_3DGRAPHICS);
-          view->Draw ();
-          g3d->BeginDraw (CSDRAW_2DGRAPHICS);
-        }   //  end if view
-        else
-        {
-          for (i = 0; i < todraw.Count (); ++i)
-          {
-            csRect r (todraw.RectAt (i));
-
-            if (btxt == NULL)
-              clipper.DrawBox (r.xmin, r.ymin, r.Width (), r.Height (), fill);
-            else
-            {
-              clipper.DrawPixmap (
-                  btxt,
-                  r.xmin,
-                  r.ymin,
-                  r.Width (),
-                  r.Height (),
-                  r.xmin - Frame ().xmin,
-                  r.ymin - Frame ().ymin,
-                  r.Width (),
-                  r.Height (),
-                  0);
-            }
-          } // end for i in todraw
-        }   // end if engine view
-
-        // Draw a beveled border, fill-hi on top and left, black-shadow on bot and right
-        clipper.DrawLine (
-            Frame ().xmin,
-            Frame ().ymin,
-            Frame ().xmax,
-            Frame ().ymin,
-            fill);
-        clipper.DrawLine (
-            Frame ().xmin + 1,
-            Frame ().ymin + 1,
-            Frame ().xmax - 1,
-            Frame ().ymin + 1,
-            hi);
-
-        clipper.DrawLine (
-            Frame ().xmin,
-            Frame ().ymin + 1,
-            Frame ().xmin,
-            Frame ().ymax,
-            fill);
-        clipper.DrawLine (
-            Frame ().xmin + 1,
-            Frame ().ymin + 2,
-            Frame ().xmin + 1,
-            Frame ().ymax - 1,
-            hi);
-
-        clipper.DrawLine (
-            Frame ().xmin,
-            Frame ().ymax,
-            Frame ().xmax,
-            Frame ().ymax,
-            black);
-        clipper.DrawLine (
-            Frame ().xmin + 1,
-            Frame ().ymax - 1,
-            Frame ().xmax - 1,
-            Frame ().ymax - 1,
-            lo);
-
-        clipper.DrawLine (
-            Frame ().xmax,
-            Frame ().ymin,
-            Frame ().xmax,
-            Frame ().ymax - 1,
-            black);
-        clipper.DrawLine (
-            Frame ().xmax - 1,
-            Frame ().ymin + 1,
-            Frame ().xmax - 1,
-            Frame ().ymax - 2,
-            lo);
-      }
-      else
-      {
-        int topleft[10] = { fill, hi, hi2, fill, fill, fill, lo2, lo, black };
-        int botright[10] = { black, lo, lo2, fill, fill, fill, hi2, hi, fill };
-        int titleback;
-        const int step = 6;
-
-        if (view)
-        {
-          g3d->BeginDraw (
-              view->GetEngine ()->GetBeginDrawFlags () | CSDRAW_3DGRAPHICS);
-          view->Draw ();
-          g3d->BeginDraw (CSDRAW_2DGRAPHICS);
-        }   //  end if view
-        else
-        {
-          for (i = 0; i < todraw.Count (); ++i)
-          {
-            csRect r (todraw.RectAt (i));
-
-            if (btxt == NULL)
-              g2d->DrawBox (r.xmin, r.ymin, r.Width (), r.Height (), fill);
-            else
-            {
-              g3d->DrawPixmap (
-                  btxt,
-                  r.xmin,
-                  r.ymin,
-                  r.Width (),
-                  r.Height (),
-                  r.xmin - Frame ().xmin,
-                  r.ymin - Frame ().ymin,
-                  r.Width (),
-                  r.Height (),
-                  0);
-            }
-          }
-        }   // end if view
-        if (frame_options & foTitle)
-        {
-          // start with even border
-          for (i = 0; i < step; ++i)
-          {
-            clipper.DrawLine (
-                Frame ().xmin + i,
-                Frame ().ymin + i,
-                Frame ().xmax - i,
-                Frame ().ymin + i,
-                topleft[i]);
-            clipper.DrawLine (
-                Frame ().xmin + i,
-                Frame ().ymin + i,
-                Frame ().xmin + i,
-                Frame ().ymax - i,
-                topleft[i]);
-            clipper.DrawLine (
-                Frame ().xmin + i,
-                Frame ().ymax - i,
-                Frame ().xmax - i,
-                Frame ().ymax - i,
-                botright[i]);
-            clipper.DrawLine (
-                Frame ().xmax - i,
-                Frame ().ymin + i,
-                Frame ().xmax - i,
-                Frame ().ymax - i,
-                botright[i]);
-          }
-
-          // now add some more fill for the title bar
-          if (WindowManager ()->GetTopWindow () == this)
-            titleback = hi;
-          else
-            titleback = fill;
-
-          for (i = step; i < step + th - 1; ++i)
-            clipper.DrawLine (
-                Frame ().xmin + step,
-                Frame ().ymin + i,
-                Frame ().xmax - step + 1,
-                Frame ().ymin + i,
-                titleback);
-
-          // finish with an offset top
-          for (i = step; i < 9; ++i)
-          {
-            clipper.DrawLine (
-                Frame ().xmin + i,
-                Frame ().ymin + i + th - 1,
-                Frame ().xmax - i,
-                Frame ().ymin + i + th - 1,
-                topleft[i]);
-            clipper.DrawLine (
-                Frame ().xmin + i,
-                Frame ().ymin + i + th - 1,
-                Frame ().xmin + i,
-                Frame ().ymax - i,
-                topleft[i]);
-            clipper.DrawLine (
-                Frame ().xmin + i,
-                Frame ().ymax - i,
-                Frame ().xmax - i,
-                Frame ().ymax - i,
-                botright[i]);
-            clipper.DrawLine (
-                Frame ().xmax - i,
-                Frame ().ymin + i + th - 1,
-                Frame ().xmax - i,
-                Frame ().ymax - i,
-                botright[i]);
-          }
-
-          if (title)
-          {
-            int mcc = WindowManager ()->GetPrefMgr ()->GetDefaultFont ()
-              ->GetLength (title->GetData (), Frame ().Width () - 15);
-
-            scfString tmp (title->GetData ());
-            tmp.Truncate (mcc);
-
-            // now draw the title
-            g2d->Write (
-                WindowManager ()->GetPrefMgr ()->GetDefaultFont (),
-                Frame ().xmin + 10,
-                Frame ().ymin + (step >> 1) + toff,
-                WindowManager ()->GetPrefMgr ()->GetColor (AC_TEXTFORE),
-                -1,
-                tmp.GetData ());
-          }
-        }   // end if title bar
-        else
-        {
-          // create even border all the way around
-          for (i = 0; i < 9; ++i)
-          {
-            clipper.DrawLine (
-                Frame ().xmin + i,
-                Frame ().ymin + i,
-                Frame ().xmax - i,
-                Frame ().ymin + i,
-                topleft[i]);
-            clipper.DrawLine (
-                Frame ().xmin + i,
-                Frame ().ymin + i,
-                Frame ().xmin + i,
-                Frame ().ymax - i,
-                topleft[i]);
-            clipper.DrawLine (
-                Frame ().xmin + i,
-                Frame ().ymax - i,
-                Frame ().xmax - i,
-                Frame ().ymax - i,
-                botright[i]);
-            clipper.DrawLine (
-                Frame ().xmax - i,
-                Frame ().ymin + i,
-                Frame ().xmax - i,
-                Frame ().ymax - i,
-                botright[i]);
-          }
-        }   // end else not title
-        if (frame_options & foGrip)
-        {
-          //int   x,y;
-          clipper.DrawBox (
-              Frame ().xmax - grip_size + 2,
-              Frame ().ymax - grip_size + 2,
-              grip_size - 4,
-              grip_size - 4,
-              fill);
-          clipper.DrawLine (
-              Frame ().xmax - grip_size,
-              Frame ().ymax - grip_size + 1,
-              Frame ().xmax - 7,
-              Frame ().ymax - grip_size + 1,
-              hi2);
-          clipper.DrawLine (
-              Frame ().xmax - grip_size + 1,
-              Frame ().ymax - grip_size,
-              Frame ().xmax - grip_size + 1,
-              Frame ().ymax - 7,
-              hi2);
-          clipper.DrawLine (
-              Frame ().xmax - grip_size,
-              Frame ().ymax - grip_size,
-              Frame ().xmax - 6,
-              Frame ().ymax - grip_size,
-              hi);
-          clipper.DrawLine (
-              Frame ().xmax - grip_size,
-              Frame ().ymax - grip_size,
-              Frame ().xmax - grip_size,
-              Frame ().ymax - 6,
-              hi);
-
-          /*for(x=Frame().xmax-grip_size+4; x<Frame().xmax-4; x+=2)
-          for(y=Frame().ymax-grip_size+4; y<Frame().ymax-4; y+=2)
-          {
-            if (resizing_mode)
-            {
-             g2d->DrawPixel(x+1,y+1,hi2);
-             g2d->DrawPixel(x,y,lo2);
-            }
-            else
-            {
-             g2d->DrawPixel(x+1,y+1,lo2);
-             g2d->DrawPixel(x,y,hi2);
-            }
-          }*/
-          if (btxt)
-          {
-            clipper.DrawPixmap (
-                btxt,
-                Frame ().xmax - grip_size,
-                Frame ().ymax - grip_size,
-                7,
-                7,
-                Frame ().xmax - grip_size - Frame ().xmin,
-                Frame ().ymax - grip_size - Frame ().ymin,
-                7,
-                7,
-                alpha_level);
-          }
-        }
-
-        // Overlay the global texture (if there is one) on the frame
-        if (btxt)
-        {
-          clipper.DrawPixmap (
-              btxt,
-              Frame ().xmin,
-              Frame ().ymin,
-              Frame ().Width (),
-              title_bar_height + 5,
-              Frame ().xmin - Frame ().xmin,
-              Frame ().ymin - Frame ().ymin,
-              Frame ().Width (),
-              title_bar_height + 5,
-              alpha_level);
-
-          clipper.DrawPixmap (
-              btxt,
-              Frame ().xmin,
-              Frame ().ymin + title_bar_height + 5,
-              9,
-              Frame ().Height (),
-              Frame ().xmin - Frame ().xmin,
-              Frame ().ymin + title_bar_height + 5 - Frame ().ymin,
-              9,
-              Frame ().Height (),
-              alpha_level);
-
-          clipper.DrawPixmap (
-              btxt,
-              Frame ().xmax - 9,
-              Frame ().ymin + title_bar_height + 5,
-              9,
-              Frame ().Height () - title_bar_height + 5,
-              Frame ().xmax - 9 - Frame ().xmin,
-              Frame ().ymin + title_bar_height + 5 - Frame ().ymin,
-              9,
-              Frame ().Height () - title_bar_height + 5,
-              alpha_level);
-
-          clipper.DrawPixmap (
-              btxt,
-              Frame ().xmin + 9,
-              Frame ().ymax - 9,
-              Frame ().Width () - 18,
-              9,
-              Frame ().xmin + 9 - Frame ().xmin,
-              Frame ().ymax - 9 - Frame ().ymin,
-              Frame ().Width () - 18,
-              9,
-              alpha_level);
-        }
-
-        // Draw min/max/close buttons
-        int mtw, mth, mxtw, mxth, ctw, cth;
-
-        min_button->GetOriginalDimensions (mtw, mth);
-        max_button->GetOriginalDimensions (mxtw, mxth);
-        close_button->GetOriginalDimensions (ctw, cth);
-
-        if (frame_options & foMin)
-        {
-          g3d->DrawPixmap (
-              min_button,
-              minp.xmin + min_down,
-              minp.ymin + min_down,
-              mtw,
-              mth,
-              0,
-              0,
-              mtw,
-              mth,
-              0);
-          if (min_down)
-            Draw3DRect (g2d, minp, lo2, hi2);
-          else
-            Draw3DRect (g2d, minp, hi2, lo2);
-        }
-
-        if (frame_options & foZoom)
-        {
-          g3d->DrawPixmap (
-              max_button,
-              maxp.xmin + max_down,
-              maxp.ymin + max_down,
-              mxtw,
-              mth,
-              0,
-              0,
-              mxtw,
-              mxth,
-              0);
-          if (max_down)
-            Draw3DRect (g2d, maxp, lo2, hi2);
-          else
-            Draw3DRect (g2d, maxp, hi2, lo2);
-        }
-
-        if (frame_options & foClose)
-        {
-          g3d->DrawPixmap (
-              close_button,
-              closep.xmin + close_down,
-              closep.ymin + close_down,
-              ctw,
-              cth,
-              0,
-              0,
-              ctw,
-              cth,
-              0);
-          if (close_down)
-            Draw3DRect (g2d, closep, lo2, hi2);
-          else
-            Draw3DRect (g2d, closep, hi2, lo2);
-        }
-      }
-      break;
-
-    case fsBitmap:
-      if (btxt != NULL)
-      {
-        clipper.DrawPixmap (
-                            btxt,
-                            Frame ().xmin,
-                            Frame ().ymin,
-                            Frame ().Width (),
-                            Frame ().Height (),
-                            bm_bkgsub.xmin,
-                            bm_bkgsub.ymin,
-                            bm_bkgsub.Width (),
-                            bm_bkgsub.Height (),
-                            bkg_alpha);
-      }
-      if (view)
-      {
-        g3d->BeginDraw (
-            view->GetEngine ()->GetBeginDrawFlags () | CSDRAW_3DGRAPHICS);
-        view->Draw ();
-        g3d->BeginDraw (CSDRAW_2DGRAPHICS);
-      }     //  end if view
-      if (otxt != NULL)
-      {
-        clipper.DrawPixmap (
-            otxt,
-            Frame ().xmin,
-            Frame ().ymin,
-            Frame ().Width (),
-            Frame ().Height (),
-            bm_ovlsub.xmin,
-            bm_ovlsub.ymin,
-            bm_ovlsub.Width (),
-            bm_ovlsub.Height (),
-            ovl_alpha);
+		  DrawGradient(title_frame, title_color[0], title_color[1], title_color[2],
+			                        title_color[3], title_color[4], title_color[5]);
 	  }
+	  else
+      {
+          DrawGradient(title_frame, title_color[6], title_color[7], title_color[8],
+			                        title_color[9], title_color[10], title_color[11]);
+      }
+      
+      if (title)
+      {
+        // find how far to the right can we write
+		// the title bar
+        int right_border = ClientFrame().xmax;
+        if(frame_options & foMin)
+			right_border = MIN(min_button.Frame().xmin, right_border);
+		if(frame_options & foZoom)
+            right_border = MIN(zoom_button.Frame().xmin, right_border);
+		if(frame_options & foClose)
+			right_border = MIN(close_button.Frame().xmin, right_border);
 
-      break;
 
-    default:
-      break;
-  }
 
-  if (view)
+        int mcc = WindowManager ()->GetPrefMgr ()->GetDefaultFont ()
+          ->GetLength (title->GetData (), right_border - ClientFrame().xmin - 10);
+        
+        scfString tmp (title->GetData ());
+        tmp.Truncate (mcc);
+		
+		if(mcc < title->Length())
+		{
+		  // set the last 3 characters to ...
+		  for(int i = MAX(0, (int)tmp.Length() - 3); i < tmp.Length(); i++)
+			  tmp.SetAt(i, '.');
+		}
+        
+        // now draw the title
+        g2d->Write (
+          WindowManager ()->GetPrefMgr ()->GetDefaultFont (),
+          ClientFrame ().xmin + 5,
+          Frame ().ymin + (step >> 1) + title_offset,
+          title_text_color,
+          -1,
+          tmp.GetData ());
+      }
+  }   // end if title bar
+		
+}
+
+void awsWindow::DrawGradient(csRect frame, unsigned char r1, unsigned char g1, unsigned char b1,
+							 unsigned char r2, unsigned char g2, unsigned char b2)
+{
+	iGraphics2D *g2d = WindowManager()->G2D();
+    iAwsPrefManager *pm = WindowManager()->GetPrefMgr();
+
+	float r_step, g_step, b_step;
+    r_step = (float)(r2 - r1) / frame.Width();
+	g_step = (float)(g2 - g1) / frame.Width();
+	b_step = (float)(b2 - b1) / frame.Width();
+
+	for(int i = 0; i < frame.Width(); i++)
+	{
+		int color = pm->FindColor(r1 + (unsigned char)(i*r_step),
+			                      g1 + (unsigned char)(i*g_step),
+								  b1 + (unsigned char)(i*b_step));
+		g2d->DrawLine(frame.xmin + i, frame.ymin, frame.xmin + i, frame.ymax, color);
+	}
+}
+
+void awsWindow::SetOptions(int o)
+{
+	frame_options = o;
+}
+
+void awsWindow::Resize(int width, int height)
+{
+	// don't shrink too far
+  csRect insets = frame_drawer.GetInsets(style);
+  if(frame_options & foTitle) insets.ymin += title_bar_height;
+  int min_height = insets.ymin + insets.ymax;
+	
+	int right_border = ClientFrame().xmax;
+        if(frame_options & foMin)
+			right_border = MIN(min_button.Frame().xmin, right_border);
+		if(frame_options & foZoom)
+            right_border = MIN(zoom_button.Frame().xmin, right_border);
+		if(frame_options & foClose)
+			right_border = MIN(close_button.Frame().xmin, right_border);
+	int min_width = (Frame().xmax - right_border) + insets.xmin; 
+
+
+
+	width = MAX(width, min_width);
+	height = MAX(height, min_height);
+
+  int delta_x = width - Frame().Width();
+  min_button.Move(delta_x, 0);
+  zoom_button.Move(delta_x, 0);
+  close_button.Move(delta_x, 0);
+
+  // resize the menu bar
+  
+  if(menu)
   {
-    view->SetContext (og3d);
-  }
-}
-
-void awsWindow::Draw3DRect (iGraphics2D *g2d, csRect &f, int hi, int lo)
-{
-  g2d->DrawLine (f.xmin, f.ymin, f.xmax, f.ymin, hi);
-  g2d->DrawLine (f.xmin, f.ymin, f.xmin, f.ymax, hi);
-  g2d->DrawLine (f.xmin, f.ymax, f.xmax, f.ymax, lo);
-  g2d->DrawLine (f.xmax, f.ymin, f.xmax, f.ymax, lo);
-}
-
-void awsWindow::Invalidate ()
-{
-  comp.Invalidate ();
-}
-
-void awsWindow::Invalidate (csRect area)
-{
-  comp.Invalidate (area);
-}
-
-csRect &awsWindow::Frame ()
-{
-  return comp.Frame ();
-}
-
-bool awsWindow::Overlaps (csRect &r)
-{
-  return comp.Overlaps (r);
-}
-
-bool awsWindow::isHidden ()
-{
-  return comp.isHidden ();
-}
-
-bool awsWindow::isDeaf ()
-{
-  return comp.isDeaf ();
-}
-
-void awsWindow::Hide ()
-{
-  comp.Hide ();
-  WindowManager ()->InvalidateUpdateStore ();
-}
-
-void awsWindow::Show ()
-{
-  comp.Show ();
-  WindowManager ()->InvalidateUpdateStore ();
-}
-
-void awsWindow::SetDeaf (bool bDeaf)
-{
-  comp.SetDeaf (bDeaf);
-}
-
-
-unsigned long awsWindow::GetID ()
-{
-  return comp.GetID ();
-}
-
-void awsWindow::SetID (unsigned long _id)
-{
-  comp.SetID (_id);
-}
-
-void awsWindow::SetFlag (unsigned int flag)
-{
-  comp.SetFlag (flag);
-}
-
-void awsWindow::ClearFlag (unsigned int flag)
-{
-  comp.ClearFlag (flag);
-}
-
-unsigned int awsWindow::Flags ()
-{
-  return comp.Flags ();
-}
-
-void awsWindow::Move(int delta_x, int delta_y)
-{
-   csRect dirty1 (Frame ());
-
-   dirty1.Outset (2);
-
-  /*if (delta_x + Frame ().xmin < 0)
-     delta_x = -Frame ().xmin;
-  else if (delta_x + Frame ().xmax > WindowManager ()->G2D ()->GetWidth ())
-     delta_x = WindowManager ()->G2D ()->GetWidth () - Frame ().xmax;
-
-  if (delta_y + Frame ().ymin < 0)
-    delta_y = -Frame ().ymin;
-  else if (delta_y + Frame ().ymax > WindowManager ()->G2D ()->GetHeight ())
-    delta_y = WindowManager ()->G2D ()->GetHeight () - Frame ().ymax;*/
-
-  Frame().Move(delta_x, delta_y);
-  comp.MoveChildren(delta_x, delta_y);
-  minp.Move (delta_x, delta_y);
-  maxp.Move (delta_x, delta_y);
-  closep.Move (delta_x, delta_y);
-
-  if (WindowManager ()->GetFlags () & AWSF_AlwaysEraseWindows)
-      WindowManager ()->Erase (dirty1);
-
-    // Mark changed pos
-    WindowManager ()->Mark (Frame ());
-    WindowManager ()->InvalidateUpdateStore ();
-    todraw_dirty = true;
-}
-
-void awsWindow::MoveChildren (int delta_x, int delta_y)
-{
-  comp.MoveChildren (delta_x, delta_y);
-}
-
-void awsWindow::AddChild (iAwsComponent *child, bool owner = true)
-{
-  todraw_dirty = true;
-  comp.AddChild (child, owner);
-}
-
-void awsWindow::RemoveChild (iAwsComponent *child)
-{
-  todraw_dirty = true;
-  comp.RemoveChild (child);
-}
-
-int awsWindow::GetChildCount ()
-{
-  return comp.GetChildCount ();
-}
-
-iAwsComponent *awsWindow::GetChildAt (int i)
-{
-  return comp.GetChildAt (i);
-}
-
-bool awsWindow::HasChildren ()
-{
-  return comp.HasChildren ();
-}
-
-iAwsComponent *awsWindow::DoFindChild(iAwsComponent *parent, unsigned id)
-{
-  if (!parent->HasChildren ()) return NULL;
-
-  int i;
-  for (i = 0; i < parent->GetChildCount (); ++i)
-  {
-    iAwsComponent *child = parent->GetChildAt (i);
-
-    // if this child matches, good.
-    if (child->GetID() == id)
-      return child;
-
-    // otherwise, check this child
-    if ((child=DoFindChild(child, id))!=NULL)
-      return child;
+    insets = frame_drawer.GetInsets(style);
+    menu->SizeToFitVert();
+    menu->Resize(width - insets.xmin - insets.xmax, 
+      MIN(menu->Frame().Height(), height - min_height));
   }
 
-  return NULL;
-}
+	// change size
+	awsComponent::Resize(width, height);
 
-iAwsComponent *awsWindow::FindChild(char *name)
-{
-  unsigned id = WindowManager()->GetPrefMgr()->NameToId(name);
-
-  return DoFindChild(this, id);
-}
-
-iAwsWindow *awsWindow::Window ()
-{
-  return comp.Window ();
-}
-
-iAwsComponent *awsWindow::Parent ()
-{
-  return comp.Parent ();
-}
-
-void awsWindow::SetWindow (iAwsWindow *win)
-{
-  comp.SetWindow (win);
-}
-
-void awsWindow::SetParent (iAwsComponent *parent)
-{
-  comp.SetParent (parent);
-}
-
-bool awsWindow::RegisterSlot (iAwsSlot *slot, unsigned long signal)
-{
-  return comp.RegisterSlot (slot, signal);
-}
-
-bool awsWindow::UnregisterSlot (iAwsSlot *slot, unsigned long signal)
-{
-  return comp.UnregisterSlot (slot, signal);
-}
-
-void awsWindow::Broadcast (unsigned long signal)
-{
-  comp.Broadcast (signal);
-}
-
-void awsWindow::SetEngineView (iView *_view)
-{
-  view = _view;
-}
-
-iView *awsWindow::GetEngineView ()
-{
-  return view;
 }
 
 csRect awsWindow::getPreferredSize ()
 {
-  //csRect r = this->getInsets();
-
-  //return csRect(0,0,comp.Frame().Width() - 50/*(r.xmin+r.xmax)*/, comp.Frame().Height()-(r.ymin+r.ymax));
   return getMinimumSize ();
 }
 
 csRect awsWindow::getMinimumSize ()
 {
-  csRect r = this->getInsets ();
-  return csRect (0, 0, comp.Frame ().Width (), comp.Frame ().Height ());
+  return csRect(0,0, Frame().Width(), Frame().Height());
 }
 
 csRect awsWindow::getInsets ()
 {
-  switch (frame_style)
+  csRect r = awsPanel::getInsets();
+  if(frame_options & foTitle)
+    r.ymin += title_bar_height;
+  if(menu)
+    r.ymin += menu->Frame().Height();
+  if(style == fsNormal)
   {
-    case fsBitmap:
-      return csRect (0, 0, 0, 0);
-    default:
-      if (frame_options & foBeveledBorder)
-        return csRect (2, 2, 2, 2);
-      else
-        return csRect (9, 20, 9, 9);
+    csRect more_insets = frame_drawer.GetInsets(fsSunken);
+    r.xmin += more_insets.xmin;
+    r.ymin += more_insets.ymin;
+    r.xmax += more_insets.xmax;
+    r.ymax += more_insets.ymax;
   }
+
+  return r;
 }
 
-awsLayoutManager *awsWindow::Layout ()
+bool awsWindow::IsMoving()
 {
-  return comp.Layout ();
+  return moving_mode;
 }
 
-void awsWindow::SetLayout (awsLayoutManager *l)
+void awsWindow::OnCloseClick(void *p, iAwsSource *source)
 {
-  comp.SetLayout (l);
+  ((iAwsComponent*)p)->Broadcast(sWindowClosed);
 }
 
-void awsWindow::RecursiveLayoutChildren (iAwsComponent *cmp, bool /*move_kids*/)
+void awsWindow::OnZoomClick(void *p, iAwsSource *source)
 {
-  if (cmp->Layout ()) cmp->Layout ()->LayoutComponents ();
-  if (!cmp->HasChildren ()) return ;
-
-  int i;
-  for (i = 0; i < cmp->GetChildCount (); ++i)
-  {
-    iAwsComponent *child = cmp->GetChildAt (i);
-
-    RecursiveLayoutChildren (child, cmp->Layout()==0);
-  }
+  iAwsComponent* comp = (iAwsComponent*)p;
+  if(comp->IsMaximized())
+    comp->UnMaximize();
+  else
+    comp->Maximize();
 }
 
-bool awsWindow::Register (iAws *mgr)
+void awsWindow::OnMinClick(void *p, iAwsSource *source)
 {
-  if (mgr)
-  {
-    iAwsPrefManager *pm = mgr->GetPrefMgr ();
-    pm->RegisterConstant ("signalWindowRaised", awsWindow::sWindowRaised);
-    pm->RegisterConstant ("signalWindowLowered", awsWindow::sWindowLowered);
-    pm->RegisterConstant ("signalWindowShown", awsWindow::sWindowShown);
-    pm->RegisterConstant ("signalWindowHidden", awsWindow::sWindowHidden);
-    pm->RegisterConstant ("signalWindowClosed", awsWindow::sWindowClosed);
-    pm->RegisterConstant ("signalWindowZoomed", awsWindow::sWindowZoomed);
-    pm->RegisterConstant ("signalWindowMinimized", awsWindow::sWindowMinimized);
-    return true;
-  }
-  return false;
+  ((iAwsComponent*)p)->Broadcast(sWindowMinimized);
 }
+
+
+/* ---------------------------- Window Factory ----------------------------- */
+
+awsWindowFactory::awsWindowFactory(iAws* wmgr) :
+awsComponentFactory(wmgr)
+{
+  Register ("Window");
+  // for back compatibilty we also register under "Default"
+  Register("Default");
+
+  iAwsPrefManager *pm = wmgr->GetPrefMgr ();
+  pm->RegisterConstant ("signalWindowRaised", awsWindow::sWindowRaised);
+  pm->RegisterConstant ("signalWindowLowered", awsWindow::sWindowLowered);
+  pm->RegisterConstant ("signalWindowShown", awsWindow::sWindowShown);
+  pm->RegisterConstant ("signalWindowHidden", awsWindow::sWindowHidden);
+  pm->RegisterConstant ("signalWindowClosed", awsWindow::sWindowClosed);
+  pm->RegisterConstant ("signalWindowZoomed", awsWindow::sWindowZoomed);
+  pm->RegisterConstant ("signalWindowMinimized", awsWindow::sWindowMinimized);
+
+  RegisterConstant ("wfsNormal", awsWindow::fsNormal);
+  RegisterConstant ("wfsBitmap", awsWindow::fsBitmap);
+  RegisterConstant ("wfsNone", awsWindow::fsNone);
+  RegisterConstant ("wfoControl", awsWindow::foControl);
+  RegisterConstant ("wfoZoom", awsWindow::foZoom);
+  RegisterConstant ("wfoMin", awsWindow::foMin);
+  RegisterConstant ("wfoClose", awsWindow::foClose);
+  RegisterConstant ("wfoTitle", awsWindow::foTitle);
+  RegisterConstant ("wfoGrip", awsWindow::foGrip);
+  RegisterConstant ("wfoRoundBorder", awsWindow::foRoundBorder);
+  RegisterConstant ("wfoBeveledBorder", awsWindow::foBeveledBorder);
+
+
+}
+
+awsWindowFactory::~awsWindowFactory()
+{
+}
+
+iAwsComponent* awsWindowFactory::Create()
+{
+	return (new awsWindow())->GetComponent();
+}
+
+

@@ -10,9 +10,11 @@ class awsLayoutManager
 {
 protected:
   iAwsComponent *owner;
+  iAwsPrefManager* pm;
 public:
-  awsLayoutManager (iAwsComponent *_owner) :
-  owner(_owner)
+  awsLayoutManager (iAwsComponent *_owner, awsComponentNode* settings, iAwsPrefManager* _pm) :
+  owner(_owner),
+  pm(_pm)
   {
   };
   virtual ~awsLayoutManager ()  { };
@@ -24,14 +26,12 @@ public:
     */
   virtual void SetOwner (iAwsComponent *_owner) { owner = _owner; }
 
-  /** Adds a component to the layout, returning it's actual rect.  This function needs
-    *  to get some more info from the key node, so that is passed in as well as the
-    *  preference manager to decode the information.
+  /** Adds a component to the layout, returning it's actual rect. 
     */
-  virtual csRect AddComponent (
-                  iAwsPrefManager *pm,
-                  awsComponentNode *settings,
-                  iAwsComponent *cmp) = 0;
+  virtual csRect AddComponent (iAwsComponent *cmp, awsComponentNode* settings) = 0;
+
+  /// Removes a component from the layout
+  virtual void RemoveComponent(iAwsComponent* cmp) {}
 
   /// Lays out components properly
   virtual void LayoutComponents () = 0;

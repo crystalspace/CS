@@ -14,7 +14,9 @@ const int awsRadButton:: alignRight = 0x1;
 const int awsRadButton:: alignCenter = 0x2;
 
 const int awsRadButton:: signalClicked   = 0x1;
+
 const int awsRadButton:: signalTurnedOff = 0x2;
+
 const int awsRadButton:: signalTurnedOn  = 0x3;
 
 awsRadButton::awsRadButton () :
@@ -106,11 +108,17 @@ bool awsRadButton::SetProperty (char *name, void *parm)
 
     return true;
   }
+
   else if (strcmp ("State", name) == 0)
+
   {
+
    
+
     is_on = *(bool *)parm;
+
     return true;
+
   }
 
   return false;
@@ -122,13 +130,12 @@ void awsRadButton::ClearGroup ()
 
   Event.Type = csevGroupOff;
 
-  int i;
-  for (i = 0; i < Parent ()->GetChildCount (); ++i)
+  for (iAwsComponent* cmp = Parent()->GetTopChild(); cmp; cmp = cmp->ComponentBelow())
   {
-    iAwsComponent *cmp = Parent ()->GetChildAt (i);
-
     if (cmp && cmp != this) cmp->HandleEvent (Event);
   }
+
+
 
   Broadcast (signalTurnedOn);
 }
@@ -142,7 +149,9 @@ bool awsRadButton::HandleEvent (iEvent &Event)
     case csevGroupOff:
       if (is_on)
       {
+
 		Broadcast (signalTurnedOff);
+
 		Broadcast (signalClicked);
         is_on = false;
         Invalidate ();
@@ -268,7 +277,8 @@ void awsRadButton::OnDraw (csRect /*clip*/)
         WindowManager ()->GetPrefMgr ()->GetColor (AC_TEXTFORE),
         -1,
         tmp.GetData ());
-  }
+  
+	}
 }
 
 bool awsRadButton::OnMouseDown (int, int, int)
@@ -352,7 +362,9 @@ awsRadButtonFactory::awsRadButtonFactory (
   RegisterConstant ("rbAlignLeft", awsRadButton::alignLeft);
   RegisterConstant ("rbAlignRight", awsRadButton::alignRight);
   RegisterConstant ("signalRadButtonClicked", awsRadButton::signalClicked);
+
   RegisterConstant ("signalRadButtonTurnedOff", awsRadButton::signalTurnedOff);
+
   RegisterConstant ("signalRadButtonTurnedOn", awsRadButton::signalTurnedOn);
 }
 

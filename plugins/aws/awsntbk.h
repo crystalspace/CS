@@ -20,7 +20,9 @@
 */
 
 #include "awscomp.h"
+#include "awsPanel.h"
 #include "awscmdbt.h"
+#include "awsTabCtrl.h"
 
 class awsSliderButton;
 
@@ -291,16 +293,11 @@ public:
 };
 
 class awsNotebook :
-  public awsComponent
+  public awsPanel
 {
  protected:
 
  protected:
-  /// Holds the texture handle for the background
-  iTextureHandle *tex;
-
-  // hold frame style
-  int frame_style;
   
   // button bar location
   int bb_location;
@@ -312,16 +309,13 @@ class awsNotebook :
   int maxheight;
 
   // our sink
-  awsSink *sink;
+  awsSink sink;
 
-  // our button bar
-  awsNotebookButtonBar *bb;
+  // our slot
+  awsSlot slot;
 
-  // alpha_level
-  int alpha_level;
-
-  // calculate position and style of tabs
-  void DoLayout ();
+  // our tab control
+  awsTabCtrl tab_ctrl;
 
 public:
   awsNotebook ();
@@ -360,7 +354,11 @@ public:
   /// Triggered when the component needs to draw
   virtual void OnDraw (csRect clip);
 
-  virtual void AddChild (iAwsComponent *child, bool has_layout=false);
+  virtual void AddChild (iAwsComponent *child);
+
+  static void OnActivateTab(void* param, iAwsSource* src);
+  static void OnDeactivateTab(void* param, iAwsSource* src);
+
 };
 
 class awsNotebookFactory :

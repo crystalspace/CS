@@ -5,6 +5,7 @@
 # include "awslayot.h"
 # include "awsgbc.h"
 # include "csutil/hashmap.h"
+# include "awscomp.h"
 
 /** GridBag layout ala Java AWT/Swing.  It tries to stay as close as possible 
  * to the original within the limits of AWS's grammar.
@@ -150,17 +151,18 @@ private:
 
   /// length of rowWeights
   int rowWeightsLength;
+
+  /// the components that are in this layout
+  awsComponentVector comps;
+
 public:
   /** Constructs a gridbag layout.  Note that columns and rows have a fixed
 	 * percentage size that does not change.
 	 */
-  awsGridBagLayout (iAwsComponent *o);
+  awsGridBagLayout (iAwsComponent *o, awsComponentNode* settings, iAwsPrefManager *pm);
 
   /** Adds a component into this GridBagLayout */
-  virtual csRect AddComponent (
-                  iAwsPrefManager *pm,
-                  awsComponentNode *settings,
-                  iAwsComponent *cmp);
+  virtual csRect AddComponent (iAwsComponent *cmp, awsComponentNode* settings);
 
   /** Lays out components properly */
   virtual void LayoutComponents ();

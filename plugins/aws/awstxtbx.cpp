@@ -14,7 +14,9 @@ const int awsTextBox:: fsNormal = 0x0;
 const int awsTextBox:: fsBitmap = 0x1;
 const int awsTextBox:: signalChanged = 0x1;
 const int awsTextBox:: signalLostFocus = 0x2;
+
 const int awsTextBox:: signalEnterPressed = 0x3;
+
 const int awsTextBox:: signalTabPressed = 0x4;
 
 static iAwsSink *textbox_sink = 0;
@@ -79,7 +81,7 @@ bool awsTextBox::Setup (iAws *_wmgr, awsComponentNode *settings)
     textbox_sink = WindowManager ()->GetSinkMgr ()->CreateSink (NULL);
     textbox_sink->RegisterTrigger ("Blink", &BlinkCursor);
   }
-    
+
   blink_timer = new awsTimer (WindowManager ()->GetObjectRegistry (), this);
   blink_timer->SetTimer (350);
   blink_timer->Start ();
@@ -89,7 +91,7 @@ bool awsTextBox::Setup (iAws *_wmgr, awsComponentNode *settings)
       awsTimer::signalTick,
       textbox_sink,
       textbox_sink->GetTriggerID ("Blink"));
-  
+
   ////////////////
   iAwsPrefManager *pm = WindowManager ()->GetPrefMgr ();
 
@@ -438,13 +440,21 @@ bool awsTextBox::OnKeypress (int key, int modifiers)
   (void)modifiers;
 
   switch (key)
+
   {
+
     case CSKEY_ENTER:
+
         Broadcast (signalEnterPressed);
+
         break;
+
     case CSKEY_TAB:
+
         Broadcast (signalTabPressed);
+
         break;
+
 
   
     case CSKEY_BACKSPACE:
@@ -509,7 +519,9 @@ awsTextBoxFactory::awsTextBoxFactory (iAws *wmgr) :
 
   RegisterConstant ("signalTextBoxChanged", awsTextBox::signalChanged);
   RegisterConstant ("signalTextBoxLostFocus", awsTextBox::signalLostFocus);
+
   RegisterConstant ("signalEnterKeyPressed", awsTextBox::signalChanged);
+
   RegisterConstant ("signalTabKeyPressed", awsTextBox::signalLostFocus);
 }
 

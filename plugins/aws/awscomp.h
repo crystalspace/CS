@@ -45,19 +45,29 @@ class awsCanvas;
 *            SetTexture(pm->GetPixmapFor(texturename));
 *
 *
+*
+*       
 *                                                                                                                         *
 **************************************************************************************************************************/
 class awsComponent :
   public iAwsComponent
 {
+protected:
+
   /// The stored handle to the window manager, in case a component needs it.
   iAws *wmgr;
 
-  /// The stored handle to the window
-  iAwsWindow *win;
-
   /// The stored handle to the parent
   iAwsComponent *parent;
+
+  /// The top child component
+  iAwsComponent* top_child;
+
+  /// The sibling below this one
+  iAwsComponent* below;
+
+  /// The sibling above this one
+  iAwsComponent* above;
 
   /// The layout manager for this component (if one exists)
   awsLayoutManager *layout;
@@ -65,8 +75,11 @@ class awsComponent :
   /// The rectangle marking the frame of this component
   csRect frame;
 
-  /// This points to a vector if this component has children
-  csBasicVector *children;
+  /// The stored un-zoomed frame size when the component is maximized
+  csRect unzoomed_frame;
+
+  /// True if the component is maximized
+  bool is_zoomed;
 
   /// Every component will have a name, which is translated to an id
   unsigned long id;
@@ -76,6 +89,13 @@ class awsComponent :
 
   /// Embedded awsSource
   awsSource signalsrc;
+
+
+  /** Contains the redraw tag.  This tag changes everytime we redraw the window system, but only once per frame.
+      we use it to keep track of which windows have been redrawn and which haven't.
+     */
+  unsigned int redraw_tag;
+
 public:
   SCF_DECLARE_IBASE;
 
@@ -94,6 +114,19 @@ public:
   /// Returns component that this belongs to.
   virtual iAwsComponent *GetComponent ();
 public:
+
+  /** This function takes care of the creation tasks required to prepare this
+    * component for use. If you create a component via the window manager's creation functions
+    * then you should not call this, the window manager has done it for you. If you create
+    * components programatically then you are encouraged to call this func to make setup
+    * easier. For component developers, you should not need to override Create but 
+    * rather do your setup work in Setup. 
+    *
+    * If it returns false then the component was not able to initialize properly and
+    * shouldn't be used.
+    **/
+  virtual bool Create(iAws* mgr, iAwsComponent* parent, awsComponentNode* settings);
+
   /**
      *  This is the function that components use to set themselves up.  All components MUST implement this function.
      *  You should also call awsComponent::Setup() so that it can perform some default initialization work.
@@ -116,10 +149,16 @@ public:
   virtual void Invalidate ();
 
   /// Invalidation routine: allow component to be redrawn, but only part of it
+  /// IMPORTANT: a csRect does not include the lines y = ymax and x = xmax
+  /// so adjust your rect accordingly
   virtual void Invalidate (csRect area);
 
   /// Get this component's frame
-  virtual csRect &Frame ();
+  /// IMPORTANT: same as above, no drawing on the lines y = ymax and x = xmax
+  virtual csRect Frame ();
+
+  /// Get this component's client area
+  virtual csRect ClientFrame();
 
   /// Returns the named TYPE of the component, like "Radio Button", etc.
   virtual char *Type ();
@@ -139,6 +178,9 @@ public:
   /// Returns the state of the hidden flag
   virtual bool isHidden ();
 
+  /// Returns true if this component is maximized
+  virtual bool IsMaximized();
+
   /// Hides a component
   virtual void Hide ();
 
@@ -157,22 +199,60 @@ public:
   /// Set's the unique id of this component. Note: only to be used by window manager.
   virtual void SetID (unsigned long _id);
 
-  /// Recursively moves children (and all nested children) by relative amount given.
-  virtual void MoveChildren (int delta_x, int delta_y);
+  /// Gets a child awsComponent by name, returns NULL on failure.
+  virtual iAwsComponent *FindChild(char *name);
+
+  /// Returns the highet child (if any) whose frame contains (x,y).
+  virtual iAwsComponent *ChildAt(int x, int y);
+
+  /// Moves this component and all its children
+  virtual void Move(int delta_x, int delta_y);
+
+  /// Moves this component and all its children to the absolute coordinates
+  virtual void MoveTo(int x, int y);
+
+  /// Resizes the component and any nested children
+  virtual void Resize(int width, int height);
+
+  /// Resizes the component and any nested children
+  virtual void ResizeTo(csRect newFrame);
+
+  /// Maximize the component
+  virtual void Maximize();
+
+  /// Return the component to its un-maximized size
+  virtual void UnMaximize();
+
+  /// Moves this component above a sibling
+  virtual void SetAbove(iAwsComponent* comp);
+
+  /// Moves this component below a sibling
+  virtual void SetBelow(iAwsComponent* comp);
+
+  /// Moves this component above all its siblings
+  virtual void Raise();
+
+  /// Moves this component below all its siblings
+  virtual void Lower();
+
 
   /** 
-      *  Recursively resizes all children.  That is, it informs them that there has been
-      * a resize event and that they need to do something if there is anything to be done.
-      * This is where layouts or any other sort of stickiness take hold.
+      *  Uses the current layout to update the location/size of all children
       */
-  virtual void ResizeChildren ();
+  virtual void LayoutChildren ();
+
+  /// Returns the redraw tag
+  unsigned int RedrawTag();
+
+  /// Sets the redraw tag
+  void SetRedrawTag(unsigned int tag);
+
 public:
   /** Adds a child into this component.  It's frame should be respective this component, not absolute.
      * This component can grab a reference to the child and dispose of it when it destructs, unless you
-     * call RemoveChild() beforehand.  If has_layout is true then the child will not be 
-     * reframed during adding.
+     * call RemoveChild() beforehand.  
      */
-  virtual void AddChild (iAwsComponent *child, bool has_layout = false);
+  virtual void AddChild (iAwsComponent *child);
 
   /** Removes a child from this component.  Important!! The child will be destroyed automatically if owner
      *  was true when you called AddChild().
@@ -183,27 +263,38 @@ public:
   virtual int GetChildCount ();
 
   /// Get's a specific child
-  virtual iAwsComponent *GetChildAt (int i);
+  virtual iAwsComponent *GetTopChild ();
+
+  /// Returns the sibling above this one
+  virtual iAwsComponent *ComponentAbove ();
+
+  /// Returns the sibling below this one
+  virtual iAwsComponent *ComponentBelow ();
+
+  /// Sets the sibling above this one
+  virtual void SetComponentAbove (iAwsComponent* above);
+
+  /// Sets the sibling below this one
+  virtual void SetComponentBelow (iAwsComponent* below);
 
   /// Returns true if this component has children
   virtual bool HasChildren ();
+
 
   /** Get's this components idea of the window manager.
       * Should be used internally by the component ONLY,
       * or by embedding classes. */
   virtual iAws *WindowManager ();
 
-  /// Get's the window that this component resides in.
-  virtual iAwsWindow *Window ();
-
   /// Get's the parent component of this component;
   virtual iAwsComponent *Parent ();
 
+  /// Returns the lowest-level ancestor (starting with this component itself)
+  /// which either has the window flag set or is top level
+  virtual iAwsComponent *Window();
+
   /// Sets the layout manager for this component.
   virtual awsLayoutManager *Layout ();
-
-  /// Sets the window that this component resides in.
-  virtual void SetWindow (iAwsWindow *win);
 
   /// Sets the parent component of this component;
   virtual void SetParent (iAwsComponent *parent);
@@ -219,6 +310,10 @@ public:
 
   /// Gets the inset amounts that are need to fit components properly.
   virtual csRect getInsets ();
+
+  /// Triggered when a component is resized
+  virtual void OnResized ();
+
 public:
   /// Triggered when the component needs to draw
   virtual void OnDraw (csRect clip);
@@ -259,8 +354,44 @@ public:
   /// Triggered when a child is added to the parent (triggered on the child)
   virtual void OnAdded ();
 
-  /// Triggered when a component is resized by the layout manager.
-  virtual void OnResized ();
+  /// Triggered when a child moves or resizes
+  virtual void OnChildMoved ();
+
+  /// Triggered when the Raise function is called
+  virtual void OnRaise();
+
+  /// Triggered when the Lower function is called
+  virtual void OnLower();
+
+  /// Triggered when a child is shown
+  virtual void OnChildShow();
+
+  /// Triggered when a child is hidden
+  virtual void OnChildHide();
+
+
+protected:
+
+  /// Recursively moves children (and all nested children) by relative amount given.
+  virtual void MoveChildren (int delta_x, int delta_y);
+
+  /// Unlinks this window from the window hierarchy.
+  void Unlink ();
+
+  /// Links this window in above the passed in component.  
+  /// This component must be unlinked!
+  void LinkAbove (iAwsComponent *comp);
+
+  /// Links this component in below the passed in component.
+  /// This component must be unlinked!
+  void LinkBelow (iAwsComponent *comp);
+
+  /// Sets the top child
+  virtual void SetTopChild(iAwsComponent* comp);
+
+  /// Performs the work of actually finding a child
+  iAwsComponent *DoFindChild(unsigned id);
+
 };
 
 class awsComponentFactory :
@@ -288,4 +419,16 @@ public:
   /// Registers constants for the parser so that we can construct right.
   void RegisterConstant (char *name, int value);
 };
+
+class awsComponentVector : public csVector
+{
+public:
+  iAwsComponent *Get(int idx) const; 
+  int Push (iAwsComponent* comp); 
+};
+
 #endif
+
+
+
+

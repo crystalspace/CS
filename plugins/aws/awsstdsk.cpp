@@ -26,17 +26,22 @@ void awsStandardSink::Show (void *sink, iAwsSource *source)
 void awsStandardSink::HideWindow (void *sink, iAwsSource *source)
 {
   sink = (awsStandardSink *)sink;
-
   iAwsComponent *c = source->GetComponent ();
+  c->Window()->Hide ();
+}
 
-  if (strcmp (c->Type (), "Window") == 0)
-  {
-    c->Hide ();
-  }
-  else
-  {
-    if (c->Window ()) c->Window ()->Hide ();
-  }
+void awsStandardSink::MaximizeWindow (void *sink, iAwsSource *source)
+{
+  sink = (awsStandardSink *)sink;
+  iAwsComponent *c = source->GetComponent ();
+  c->Window ()->Maximize ();
+}
+
+void awsStandardSink::UnMaximizeWindow (void *sink, iAwsSource *source)
+{
+  sink = (awsStandardSink *)sink;
+  iAwsComponent *c = source->GetComponent ();
+  c->Window ()->UnMaximize ();
 }
 
 void awsStandardSink::WindowSlideOutLeft (void *_sink, iAwsSource *source)
@@ -44,20 +49,12 @@ void awsStandardSink::WindowSlideOutLeft (void *_sink, iAwsSource *source)
   awsStandardSink *sink = (awsStandardSink *)_sink;
 
   iAwsComponent *c = source->GetComponent ();
-  iAwsWindow    *win=NULL;
+  iAwsComponent *win = c->Window();
 
-  if (strcmp (c->Type (), "Window") == 0)
-  {
+  if (c == win)
     return;
-  }
   else
-  {
-    if (c->Window ()) win=c->Window ();
-    else return;
-
     sink->wmgr->CreateTransition(win, AWS_TRANSITION_SLIDE_OUT_LEFT, 0.05);
-
-  }
 }
 
 void awsStandardSink::WindowSlideOutRight (void *_sink, iAwsSource *source)
@@ -65,20 +62,12 @@ void awsStandardSink::WindowSlideOutRight (void *_sink, iAwsSource *source)
    awsStandardSink *sink = (awsStandardSink *)_sink;
 
   iAwsComponent *c = source->GetComponent ();
-  iAwsWindow    *win=NULL;
+  iAwsComponent *win = c->Window();
 
-  if (strcmp (c->Type (), "Window") == 0)
-  {
+  if (c == win)
     return;
-  }
   else
-  {
-    if (c->Window ()) win=c->Window ();
-    else return;
-
     sink->wmgr->CreateTransition(win, AWS_TRANSITION_SLIDE_OUT_RIGHT, 0.05);
-
-  }
 }
 
 void awsStandardSink::WindowSlideOutUp (void *_sink, iAwsSource *source)
@@ -86,20 +75,12 @@ void awsStandardSink::WindowSlideOutUp (void *_sink, iAwsSource *source)
    awsStandardSink *sink = (awsStandardSink *)_sink;
 
   iAwsComponent *c = source->GetComponent ();
-  iAwsWindow    *win=NULL;
+  iAwsComponent *win = c->Window();
 
-  if (strcmp (c->Type (), "Window") == 0)
-  {
+  if (c == win)
     return;
-  }
   else
-  {
-    if (c->Window ()) win=c->Window ();
-    else return;
-
     sink->wmgr->CreateTransition(win, AWS_TRANSITION_SLIDE_OUT_UP, 0.05);
-
-  }
 }
 
 void awsStandardSink::WindowSlideOutDown (void *_sink, iAwsSource *source)
@@ -107,20 +88,12 @@ void awsStandardSink::WindowSlideOutDown (void *_sink, iAwsSource *source)
    awsStandardSink *sink = (awsStandardSink *)_sink;
 
   iAwsComponent *c = source->GetComponent ();
-  iAwsWindow    *win=NULL;
+  iAwsComponent *win = c->Window();
 
-  if (strcmp (c->Type (), "Window") == 0)
-  {
+  if (c == win)
     return;
-  }
   else
-  {
-    if (c->Window ()) win=c->Window ();
-    else return;
-
     sink->wmgr->CreateTransition(win, AWS_TRANSITION_SLIDE_OUT_DOWN, 0.05);
-
-  }
 }
 
 
@@ -144,6 +117,8 @@ awsStandardSink::awsStandardSink (iAws *_wmgr) :
   RegisterTrigger ("SlideOutRight", WindowSlideOutRight);
   RegisterTrigger ("SlideOutUp", WindowSlideOutUp);
   RegisterTrigger ("SlideOutDown", WindowSlideOutDown);
+  RegisterTrigger ("MaximizeWindow", MaximizeWindow);
+  RegisterTrigger ("UnMaximizeWindow", UnMaximizeWindow);
 }
 
 awsStandardSink::~awsStandardSink ()

@@ -91,7 +91,8 @@ void awsClipper::DrawPixmap (
   tx += (sr.xmin - sx);
   ty += (sr.ymin - sy);
 
-  g3d->DrawPixmap (
+  if(th > 0 && tw > 0)
+    g3d->DrawPixmap (
       hTex,
       sr.xmin,
       sr.ymin,

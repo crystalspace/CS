@@ -21,9 +21,11 @@
 #include "csutil/inpnames.h"
 #include "ivideo/fontserv.h"
 #include "ivideo/graph2d.h"
+#include "ivideo/graph3d.h"
 #include "iutil/event.h"
 #include "awsmled.h"
 #include "aws3dfrm.h"
+#include "iaws/awsparm.h"
 
 const int awsMultiLineEdit::MARK_ROWWRAP = 1;
 const int awsMultiLineEdit::MARK_ROW = 2;
@@ -539,8 +541,12 @@ void awsMultiLineEdit::OnDraw (csRect)
     break;
   default:
   case meNormal:
-    aws3DFrame ().Draw (WindowManager (), Window (), Frame (), 
-                      style & frameMask, img, alpha_level);
+      aws3DFrame frame3d;
+      frame3d.Setup(WindowManager(),img, alpha_level);
+  frame3d.Draw (
+      Frame (),
+      style & styleMask,
+      Window()->Frame());
     g2d->DrawBox (f.xmin, f.ymin, f.Width (), f.Height (), dfill);
     if (img)
       g3d->DrawPixmap (img, f.xmin, f.ymin, f.Width (), f.Height (), 

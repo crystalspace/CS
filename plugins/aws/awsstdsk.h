@@ -25,6 +25,12 @@ class awsStandardSink :
   /// Hides the window that the source component belongs to
   static void HideWindow (void *sink, iAwsSource *source);
 
+  /// Maximizes the window that the source component belongs to
+  static void MaximizeWindow (void* sink, iAwsSource *source);
+
+  /// UnMaximizes the window that the source component belongs to
+  static void UnMaximizeWindow (void* sink, iAwsSource *source);
+
   /// Invalidates the source component
   static void Invalidate (void *sink, iAwsSource *source);
 

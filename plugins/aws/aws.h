@@ -34,6 +34,7 @@
 
 const int awsNumRectBuckets = 32;
 
+
 /**
  *
  *  This is the alternate windowing system plugin.  It defines a simple, lightweight alternative to the current CSWS
@@ -43,6 +44,9 @@ const int awsNumRectBuckets = 32;
 class awsManager :
   public iAws
 {
+
+private:
+
   /// Handle to the preference manager.
   iAwsPrefManager *prefmgr;
 
@@ -78,10 +82,10 @@ class awsManager :
    */
   csRect frame;
 
-  /// The current top window
-  iAwsWindow *top;
+  /// The current top component
+  iAwsComponent *top;
 
-  /// The current component that the mouse was in.
+  /// The current component that the mouse is in.
   iAwsComponent *mouse_in;
 
   /// The current component that has keyboard focus.
@@ -136,7 +140,7 @@ class awsManager :
     float morph_step;
 
     /// The window we're dealing with
-    iAwsWindow *win;
+    iAwsComponent *win;
 
     /// The type of transition
     unsigned transition_type;
@@ -172,20 +176,27 @@ public:
   /// Find a component factory
   virtual iAwsComponentFactory *FindComponentFactory (char *name);
 
+
+
   /// Create an embeddable component from a component name.
+
   virtual iAwsComponent *CreateEmbeddableComponentFrom(char *name);
 
+
   /// Get the top window
-  virtual iAwsWindow *GetTopWindow ();
+  virtual iAwsComponent *GetTopComponent ();
 
   /// Set the top window
-  virtual void SetTopWindow (iAwsWindow *_top);
+  virtual void SetTopComponent (iAwsComponent *_top);
+
+  /// Returns the lowest-level visible component (if any) at the screen coordinates
+  virtual iAwsComponent* ComponentAt(int x, int y);
 
   /// Returns true if part of this window is inside the dirty zones
-  virtual bool WindowIsDirty (iAwsWindow *win);
+  virtual bool ComponentIsDirty (iAwsComponent *win);
 
   /// Returns true if window is in transition
-  virtual bool WindowIsInTransition(iAwsWindow *win, bool perform_transition=false);
+  virtual bool ComponentIsInTransition(iAwsComponent *win, bool perform_transition=false);
  
   /// Causes the current view of the window system to be drawn to the given graphics device.
   virtual void Print (iGraphics3D *g3d, uint8 Alpha = 0);
@@ -194,16 +205,16 @@ public:
   virtual void Redraw ();
 
   /// Mark a section of the screen dirty
-  virtual void Mark (csRect &rect);
+  virtual void Mark (const csRect &rect);
 
   /// Mark a section of the screen clean.
-  virtual void Unmark (csRect &rect);
+  virtual void Unmark (const csRect &rect);
 
   /// Erase a section of the screen next round (only useful if AlwaysEraseWindows flag is set)
-  virtual void Erase (csRect &rect);
+  virtual void Erase (const csRect &rect);
 
   /// Mask off a section that has been marked to erase.  This part won't be erased.
-  virtual void MaskEraser (csRect &rect);
+  virtual void MaskEraser (const csRect &rect);
 
   /// Tell the system to rebuild the update store
   virtual void InvalidateUpdateStore ();
@@ -213,29 +224,43 @@ public:
 
   /// Release the mouse events to go where they normally would.
   virtual void ReleaseMouse ();
+
 protected:
+
   /// Redraws a window only if it has areas in the dirtyarea
-  void RedrawWindow (iAwsWindow *win, csRect &dirtyarea);
+  void RedrawWindow (iAwsComponent *comp, csRect dirtyarea);
 
-  /// Redraws all children recursively, but only if they have an part in dirty area
-  void RecursiveDrawChildren (iAwsComponent *cmp, csRect &dirtyarea);
+  /// Redraws all children recursively, but only if they have a part in the dirty area
+  void RecursiveDrawChildren (iAwsComponent *cmp, csRect dirtyarea);
 
-  /// Recursively broadcasts events to children, but only if they deserve it.
-  bool RecursiveBroadcastToChildren (iAwsComponent *cmp, iEvent &event);
+  /// Raises all components starting from cmp and working towards the root
+  /// that have AWSF_CMP_TOP_SELECT set
+  void RaiseComponents(iAwsComponent* cmp);
 
-  /// Recursively updates the layouts starting at the top and working down.
-  void RecursiveLayoutChildren (iAwsComponent *comp, bool move_kids);
+  /** This moves mouse focus to cmp. 
+    * We assure that every parent entered and exited traversing from
+    * mouse_in to cmp will receive enter/exit messages
+    * This function returns true if focus reaches cmp and false if not. ( this can
+    * happen when some component captures the mouse in response to losing focus )
+    */
+  bool ChangeMouseFocus(iAwsComponent *cmp, iEvent &Event);
 
-  /// Handles MouseEnter/Exit message when broadcasting component events.
-  bool CheckFocus (iAwsComponent *cmp, iEvent &Event);
+  /** Dispatches MouseEnter/Exit for focus change if necessary.
+    * Returns true if cmp is now focused, false if not. ( this can
+    * happen when some component captures the mouse in response to
+    * losing focus )
+    */
+  bool ChangeMouseFocusHelper (iAwsComponent *cmp, iEvent &Event);
 
-  /// Dispatches MouseEnter/Exit and Got/LostFocus messages for focus change.
-  void PerformFocusChange (iAwsComponent *cmp, iEvent &Event);
+  /// Changes keyboard focus to cmp if necessary
+  void ChangeKeyboardFocus(iAwsComponent* cmp, iEvent &Event);
 
-  /// Recursively creates child components and adds them into a parent.  Used internally.
+  /// Returns the first common parent of cmp1 and cmp2
+  iAwsComponent* FindCommonParent(iAwsComponent* cmp1, iAwsComponent* cmp2);
+
+  /// Recursively creates child components and adds them into a parent.  
   void CreateChildrenFromDef (
         iAws *wmgr,
-        iAwsWindow *win,
         iAwsComponent *parent,
         awsComponentNode *settings);
 
@@ -250,7 +275,7 @@ protected:
 
 public:
   /// Instantiates a window based on a window definition.
-  virtual iAwsWindow *CreateWindowFrom (char *defname);
+  virtual iAwsComponent *CreateWindowFrom (char *defname);
 
   /// Creates a new embeddable component
   virtual iAwsComponent *CreateEmbeddableComponent ();
@@ -259,10 +284,10 @@ public:
   virtual iAwsParmList *CreateParmList ();
 
   /// Creates and enables a transition for a window
-  virtual void CreateTransition(iAwsWindow *win, unsigned transition_type, float step_size=0.1);
+  virtual void CreateTransition(iAwsComponent *win, unsigned transition_type, float step_size=0.1);
 
   /// Creates and enables a transition for a window
-  virtual void CreateTransitionEx(iAwsWindow *win, unsigned transition_type, float step_size, csRect &user);
+  virtual void CreateTransitionEx(iAwsComponent *win, unsigned transition_type, float step_size, csRect &user);
 
 public:
   /// Set the contexts however you want

@@ -13,13 +13,6 @@
 
 #include <stdio.h>
 
-const int awsListBox:: fsBump = 0x0;
-const int awsListBox:: fsSimple = 0x1;
-const int awsListBox:: fsRaised = 0x2;
-const int awsListBox:: fsSunken = 0x3;
-const int awsListBox:: fsFlat = 0x4;
-const int awsListBox:: fsNone = 0x5;
-
 const int awsListBox:: ctList = 0x0;
 const int awsListBox:: ctTree = 0x1;
 
@@ -94,14 +87,11 @@ awsListBox::awsListBox () :
   mouse_is_over(false),
   is_switch(false),
   was_down(false),
-  bkg(NULL),
   highlight(NULL),
   tree_collapsed(NULL),
   tree_expanded(NULL),
   tree_hline(NULL),
   tree_vline(NULL),
-  frame_style(0),
-  alpha_level(92),
   hi_alpha_level(128),
   control_type(0),
   ncolumns(1),
@@ -137,15 +127,12 @@ bool awsListBox::Setup (iAws *_wmgr, awsComponentNode *settings)
   int border = 3;
   int min = 0, max = 0, change = 1, bigchange = 1;
 
-  if (!awsComponent::Setup (_wmgr, settings)) return false;
+  if (!awsPanel::Setup (_wmgr, settings)) return false;
 
   iAwsPrefManager *pm = WindowManager ()->GetPrefMgr ();
 
-  pm->LookupIntKey ("OverlayTextureAlpha", alpha_level);  // global get
   pm->LookupIntKey ("ScrollBarHeight", sb_h);
   pm->LookupIntKey ("ScrollBarWidth", sb_w);
-  pm->GetInt (settings, "Style", frame_style);
-  pm->GetInt (settings, "Alpha", alpha_level);            // local overrides, if present.
   pm->GetInt (settings, "HiAlpha", hi_alpha_level);
   pm->GetInt (settings, "Columns", ncolumns);
   pm->GetInt (settings, "Type", control_type);
@@ -163,18 +150,13 @@ bool awsListBox::Setup (iAws *_wmgr, awsComponentNode *settings)
   pm->GetString (settings, "Background", tn1);
   pm->GetString (settings, "Highlight", tn2);
 
-  switch (frame_style)
-  {
-    case fsBump:    border = 5; break;
-    case fsSimple:  border = 1; break;
-  }
+  if(style == fsBump) border = 5;
+  else if(style == fsSimple) border = 1;
 
   rows.SetSortCol (sortcol);
 
   if (tn1)
     bkg = pm->GetTexture (tn1->GetData (), tn1->GetData ());
-  else
-    bkg = pm->GetTexture ("Texture");
 
   if (tn2) highlight = pm->GetTexture (tn2->GetData (), tn2->GetData ());
 
@@ -225,7 +207,6 @@ bool awsListBox::Setup (iAws *_wmgr, awsComponentNode *settings)
 
   sbinfo.AddIntKey (new scfString ("Orientation"), awsScrollBar::sboVertical);
 
-  scrollbar->SetWindow (Window ());
   scrollbar->SetParent (this);
   scrollbar->Setup (_wmgr, sbinfo.GetThisNode ());
 
@@ -252,14 +233,14 @@ bool awsListBox::Setup (iAws *_wmgr, awsComponentNode *settings)
 
 bool awsListBox::GetProperty (char *name, void **parm)
 {
-  if (awsComponent::GetProperty (name, parm)) return true;
+  if (awsPanel::GetProperty (name, parm)) return true;
 
   return false;
 }
 
 bool awsListBox::SetProperty (char *name, void *parm)
 {
-  if (awsComponent::SetProperty (name, parm)) return true;
+  if (awsPanel::SetProperty (name, parm)) return true;
 
   return false;
 }
@@ -617,7 +598,7 @@ void awsListBox::ClearList (void *owner, iAwsParmList &)
 
 bool awsListBox::Execute (char *action, iAwsParmList &parmlist)
 {
-  if (awsComponent::Execute (action, parmlist)) return true;
+  if (awsPanel::Execute (action, parmlist)) return true;
 
   actions.Execute (action, this, parmlist);
 
@@ -630,12 +611,11 @@ void awsListBox::ClearGroup ()
 
   Event.Type = csevGroupOff;
 
-  int i;
-  for (i = 0; i < Parent ()->GetChildCount (); ++i)
+  iAwsComponent* cmp = Parent()->GetTopChild();
+  while(cmp)
   {
-    iAwsComponent *cmp = Parent ()->GetChildAt (i);
-
     if (cmp && cmp != this) cmp->HandleEvent (Event);
+	cmp = cmp->ComponentBelow();
   }
 }
 
@@ -702,7 +682,7 @@ void awsListBox::ClearHotspots ()
 
 bool awsListBox::HandleEvent (iEvent &Event)
 {
-  if (awsComponent::HandleEvent (Event)) return true;
+  if (awsPanel::HandleEvent (Event)) return true;
 
   switch (Event.Type)
   {
@@ -752,8 +732,11 @@ bool awsListBox::IsLastChild (awsListRow *row)
   }
 }
 
-void awsListBox::OnDraw (csRect /*clip*/)
+void awsListBox::OnDraw (csRect clip)
 {
+
+  awsPanel::OnDraw(clip);
+
   iGraphics2D *g2d = WindowManager ()->G2D ();
 
   //iGraphics3D *g3d = WindowManager()->G3D();
@@ -768,21 +751,9 @@ void awsListBox::OnDraw (csRect /*clip*/)
 
   ClearHotspots ();
 
-  aws3DFrame frame3d;
 
-  frame3d.Draw (
-      WindowManager (),
-      Window (),
-      Frame (),
-      frame_style,
-      bkg,
-      alpha_level);
-
-  switch (frame_style)
-  {
-    case fsBump:    border = 5; break;
-    case fsSimple:  border = 1; break;
-  }
+  if(style == fsBump) border = 5;
+  else if(style == fsSimple) border = 1;
 
   int starty = Frame ().ymin + border;
   int startx = Frame ().xmin + border;
@@ -933,7 +904,7 @@ void awsListBox::OnDraw (csRect /*clip*/)
     }   // end while draw items recursively
     scrollbar->SetProperty ("PageSize", &drawable_count);
 
-  }     // end if there are any rows to draw
+  }   // end if there are any rows to draw
 }
 
 bool awsListBox::DrawItemsRecursively (
@@ -1440,21 +1411,21 @@ bool awsListBox::OnGainFocus ()
 
 void awsListBox::OnAdded ()
 {
-  AddChild (scrollbar, (Parent ()->Layout () != NULL));
+  AddChild (scrollbar);
 }
 
 void awsListBox::OnResized ()
 {
   int w = scrollbar->Frame ().Width (); //, h = scrollbar->Frame ().Width ();
 
-  scrollbar->Frame ().SetPos (Frame ().xmax - w - 1, Frame ().ymin + 2);
-  scrollbar->Frame ().xmax = Frame ().xmax - 1;
-  scrollbar->Frame ().ymax = Frame ().ymax - 2;
-
-  scrollbar->OnResized ();
+  csRect newFrame;
+  newFrame.SetPos(Frame ().xmax - w - 1, Frame ().ymin + 2);
+  newFrame.xmax = Frame ().xmax - 1;
+  newFrame.ymax = Frame ().ymax - 2;
+  scrollbar->ResizeTo(newFrame);
 }
 
-/************************************* Command Button Factory ****************/
+/************************************* List Box Factory ****************/
 
 awsListBoxFactory::awsListBoxFactory (iAws *wmgr) :
   awsComponentFactory(wmgr)

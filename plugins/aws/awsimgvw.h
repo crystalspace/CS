@@ -36,6 +36,12 @@ class awsImageView :
  iTextureHandle *img1; // via Texture
  iTextureHandle *img2; // via Image
 
+  /// true if we should draw a solid color instead
+  bool draw_color;
+
+  /// the color to draw if draw_color is true
+  int color;
+
   /// Flags for frame style.
   int frame_style;
 
@@ -81,6 +87,10 @@ public:
 
   /// Sets properties
   bool SetProperty (char *name, void *parm);
+
+  void SetColor(int color);
+
+  int GetColor();
 
   /// Returns the named TYPE of the component, like "Radio Button", etc.
   virtual char *Type ();

@@ -89,21 +89,6 @@ bool awsPrefManager::Setup (iObjectRegistry *obj_reg)
   vfs = CS_QUERY_REGISTRY (obj_reg, iVFS);
   if (!vfs) return false;
 
-  /* We setup the window's registered constants here, because windows are
-   * special components, and do not obey the normal construction rules.
-   */
-  RegisterConstant ("wfsNormal", 0x0);
-  RegisterConstant ("wfsToolbar", 0x1);
-  RegisterConstant ("wfsBitmap", 0x2);
-  RegisterConstant ("wfoControl", 0x1);
-  RegisterConstant ("wfoZoom", 0x2);
-  RegisterConstant ("wfoMin", 0x4);
-  RegisterConstant ("wfoClose", 0x8);
-  RegisterConstant ("wfoTitle", 0x10);
-  RegisterConstant ("wfoGrip", 0x20);
-  RegisterConstant ("wfoRoundBorder", 0x0);
-  RegisterConstant ("wfoBeveledBorder", 0x40);
-
   return true;
 }
 
@@ -226,6 +211,8 @@ void awsPrefManager::SetupPalette ()
       (green > GRADIENT_STEP ? green - GRADIENT_STEP : 0),
       (blue > GRADIENT_STEP ? blue - GRADIENT_STEP : 0));
 
+
+
   LookupRGBKey ("TextForeColor", red, green, blue);
   sys_colors[AC_TEXTFORE] = txtmgr->FindRGB (red, green, blue);
 
@@ -234,6 +221,16 @@ void awsPrefManager::SetupPalette ()
 
   LookupRGBKey ("TextDisabledColor", red, green, blue);
   sys_colors[AC_TEXTDISABLED] = txtmgr->FindRGB (red, green, blue);
+
+  if(LookupRGBKey ("TextSelectedForeColor", red, green, blue))
+    sys_colors[AC_SELECTTEXTFORE] = txtmgr->FindRGB (red, green, blue);
+  else
+    sys_colors[AC_SELECTTEXTFORE] = sys_colors[AC_TEXTBACK];
+
+  if(LookupRGBKey ("TextSelectedBackColor", red, green, blue))
+    sys_colors[AC_SELECTTEXTBACK] = txtmgr->FindRGB (red, green, blue);
+  else
+    sys_colors[AC_SELECTTEXTBACK] = sys_colors[AC_TEXTFORE];
 
   LookupRGBKey ("ButtonTextColor", red, green, blue);
   sys_colors[AC_BUTTONTEXT] = txtmgr->FindRGB (red, green, blue);
@@ -248,6 +245,12 @@ void awsPrefManager::SetupPalette ()
   sys_colors[AC_RED] = txtmgr->FindRGB (128, 0, 0);
   sys_colors[AC_GREEN] = txtmgr->FindRGB (0, 128, 0);
   sys_colors[AC_BLUE] = txtmgr->FindRGB (0, 0, 128);
+
+
+  if(LookupRGBKey ("BackgroundColor", red, green, blue))
+	  sys_colors[AC_BACKFILL] = txtmgr->FindRGB(red, green, blue);
+  else
+	  sys_colors[AC_BACKFILL] = sys_colors[AC_FILL];
 
   printf ("aws-debug: finished palette setup.\n");
 }

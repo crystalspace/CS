@@ -18,10 +18,10 @@
     License along with this library; if not, write to the Free
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 *****************************************************************************/
-# include "awscomp.h"
+# include "awsPanel.h"
 
 class awsCmdButton :
-  public awsComponent
+  public awsPanel
 {
 protected:
   /// True when button is down, false if up
@@ -36,16 +36,10 @@ protected:
   /// True if button was down, and button is in switch mode (toggle=yes)
   bool was_down;
 
-  /** Multipurpose: holds the texture and image bitmaps for normal and toolbar buttons, also
+  /** Multipurpose: holds the image bitmaps for normal and toolbar buttons, also
     * holds the normal, highlighted, and clicked images for bitmap buttons.
     */
   iTextureHandle *tex[3];
-
-  /// Flags for frame style.
-  int frame_style;
-
-  /// Alpha level for this component
-  int alpha_level;
 
   /// Icon position
  int icon_align;
@@ -57,17 +51,6 @@ protected:
 public:
   awsCmdButton ();
   virtual ~awsCmdButton ();
-
-  /******* Frame Styles **********************/
-
-  /// A "normal" button.  Is textured if there is a background texture.
-  static const int fsNormal;
-
-  /// A toolbar button.  Cannot have text, only an image.
-  static const int fsToolbar;
-
-  /// A button entirely drawn from bitmap images.  Must specify normal, focused and clicked.
-  static const int fsBitmap;
 
   /******* Icon Positions *******************/
   static const int iconLeft;

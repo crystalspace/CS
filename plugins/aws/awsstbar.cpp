@@ -124,13 +124,11 @@ void awsStatusBar::OnDraw (csRect /*clip*/)
 
   aws3DFrame frame3d;
 
+  frame3d.Setup(WindowManager(),bkg, alpha_level);
   frame3d.Draw (
-      WindowManager (),
-      Window (),
       Frame (),
       frame_style,
-      bkg,
-      alpha_level);
+      Window()->Frame());
 
   if (status==0.0) return;
 

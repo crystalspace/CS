@@ -136,8 +136,8 @@ awsGridBagLayout::GridBagLayoutInfo *
 
   return i;
 }
-awsGridBagLayout::awsGridBagLayout (iAwsComponent *o) :
-  awsLayoutManager(o),
+awsGridBagLayout::awsGridBagLayout (iAwsComponent *o, awsComponentNode* settings, iAwsPrefManager* pm ) :
+  awsLayoutManager(o, settings, pm),
   layoutInfo(NULL),
   columnWidths(NULL),
   columnWidthsLength(0),
@@ -156,9 +156,8 @@ void awsGridBagLayout::LayoutComponents ()
 }
 
 csRect awsGridBagLayout::AddComponent (
-  iAwsPrefManager *pm,
-  awsComponentNode *settings,
-  iAwsComponent *cmp)
+  iAwsComponent *cmp,
+  awsComponentNode *settings)
 {
   awsGridBagConstraints c;
 
@@ -180,6 +179,8 @@ csRect awsGridBagLayout::AddComponent (
   c.weighty = wy / 100.0;
 
   setConstraints (cmp, c);
+
+  comps.Push(cmp);
 
   return csRect (0, 0, 0, 0);
 }
@@ -359,9 +360,9 @@ awsGridBagLayout::GridBagLayoutInfo * awsGridBagLayout::GetLayoutInfo
   memset(xMax, 0, sizeof (int) * MAXGRIDSIZE);
   memset(yMax, 0, sizeof (int) * MAXGRIDSIZE);
 
-  for (compindex = 0; compindex < parent->GetChildCount(); ++compindex)
+  for (compindex = 0; compindex < comps.Length(); ++compindex)
   {
-    cmp = parent->GetChildAt(compindex);
+    cmp = comps.Get(compindex);
 
     if (cmp->isHidden()) continue;
 
@@ -462,9 +463,9 @@ awsGridBagLayout::GridBagLayoutInfo * awsGridBagLayout::GetLayoutInfo
   memset(xMax, 0, sizeof (int) * MAXGRIDSIZE);
   memset(yMax, 0, sizeof (int) * MAXGRIDSIZE);
 
-  for (compindex = 0; compindex < parent->GetChildCount(); compindex++)
+  for (compindex = 0; compindex < comps.Length(); compindex++)
   {
-    cmp = parent->GetChildAt(compindex);
+    cmp = comps.Get(compindex);
 
     if (cmp->isHidden()) continue;
 
@@ -570,9 +571,9 @@ awsGridBagLayout::GridBagLayoutInfo * awsGridBagLayout::GetLayoutInfo
 
   for (i = 1; i != MAXINT; i = nextSize, nextSize = MAXINT)
   {
-    for (compindex = 0; compindex < parent->GetChildCount(); ++compindex)
+    for (compindex = 0; compindex < comps.Length(); ++compindex)
     {
-      cmp = parent->GetChildAt(compindex);
+      cmp = comps.Get(compindex);
 
       if (cmp->isHidden()) continue;
 
@@ -918,9 +919,9 @@ void awsGridBagLayout::ArrangeGrid (iAwsComponent *parent)
   info->startx = diffw / 2 + insets.xmin;
   info->starty = diffh / 2 + insets.ymin;
 
-  for (compindex = 0; compindex < parent->GetChildCount (); ++compindex)
+  for (compindex = 0; compindex < comps.Length (); ++compindex)
   {
-    cmp = parent->GetChildAt (compindex);
+    cmp = comps.Get (compindex);
     if (cmp->isHidden ()) continue;
 
     constraints = lookupConstraints (cmp);
@@ -958,7 +959,7 @@ void awsGridBagLayout::ArrangeGrid (iAwsComponent *parent)
        */
     if ((r.Width () <= 0) || (r.Height () <= 0))
     {
-      cmp->Frame ().MakeEmpty ();
+      cmp->ResizeTo(r);
       cmp->SetFlag(AWSF_CMP_INVISIBLE);
     }
     else
@@ -970,8 +971,9 @@ void awsGridBagLayout::ArrangeGrid (iAwsComponent *parent)
         cmp->Frame ().Height () != r.Height ())
       {
 	cmp->ClearFlag(AWSF_CMP_INVISIBLE);
-        cmp->Frame ().Set (r);
-        cmp->OnResized ();
+        cmp->ResizeTo (r);
+        cmp->Move(owner->ClientFrame().xmin, owner->ClientFrame().ymin);
+        //cmp->OnResized ();
       }
     }
   }

@@ -18,26 +18,17 @@
     License along with this library; if not, write to the Free
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 *****************************************************************************/
-#include "awscomp.h"
+#include "awsPanel.h"
 #include "awstimer.h"
 
 class awsBarChart :
-  public awsComponent
+  public awsPanel
 {
-  /// Flags for frame style.
-  int frame_style;
-
   /// Flag for inner frame style.
   int inner_frame_style;
 
   /// Flags for chart options.
   int chart_options;
-
-  /// Alpha level for this component
-  int alpha_level;
-
-  /// Handle for texture background
-  iTextureHandle *bkg;
 
   /// Caption text for this component
   iString *caption;
@@ -77,26 +68,6 @@ class awsBarChart :
 public:
   awsBarChart ();
   virtual ~awsBarChart();
-
-  /******* Frame Styles **********************/
-
-  /// A frame that's a bump
-  static const int fsBump;
-
-  /// A simple frame
-  static const int fsSimple;
-
-  /// A frame that looks like a sunk button
-  static const int fsSunken;
-
-  /// A frame that looks like a raised button
-  static const int fsRaised;
-
-  /// A frame that looks flat
-  static const int fsFlat;
-
-  /// no frame at all
-  static const int fsNone;
 
   /******* Chart Options **********************/
   
@@ -144,9 +115,6 @@ public:
 
   /// Returns the named TYPE of the component, like "Radio Button", etc.
   virtual char *Type ();
-
-  /// Gets the insets of the frame depending on what style it's in.
-  virtual csRect getInsets();
 
 public:
 

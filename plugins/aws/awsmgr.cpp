@@ -4,6 +4,10 @@
  *  when we figure out why the clipping mechanisms in the sofware and opengl don't work like one
  *  would expect.
  *
+ *  Clipping works properly now at least in software mode -- Noah
+ *  There are also now 3 new tests in the g2dtest app which can help test
+ *  clipping on other canvases.
+ *
  */
 #include "cssysdef.h"
 #include "iutil/plugin.h"
@@ -35,8 +39,12 @@
 #include "awsscrbr.h"
 #include "awsbarct.h"
 #include "awsstbar.h"
+#include "awsEngineView.h"
+#include "awsControlBar.h"
+#include "awsMenu.h"
 #include "awsimgvw.h"
 #include "awsmled.h"
+
 
 #include "awscmpt.h"
 #include "awscscr.h"
@@ -101,15 +109,6 @@ awsManager::~awsManager ()
     delete (awsComponentFactoryMap *)p;
     component_factories.RemoveItem ();
   }
-
-  iAwsWindow *next, *curwin = top;
-  while (curwin)
-  {
-    next = curwin->WindowBelow ();
-    curwin->DecRef ();
-    curwin = next;
-  }
-
 }
 
 bool awsManager::Initialize (iObjectRegistry *object_reg)
@@ -226,23 +225,34 @@ iAwsComponentFactory *awsManager::FindComponentFactory (char *name)
   return NULL;
 }
 
+
 iAwsComponent *awsManager::CreateEmbeddableComponentFrom(char *name)
+
 {
+
 	iAwsComponentFactory *factory = FindComponentFactory(name);
 
+
+
     // If we have a factory for this component, then create it and set it up.
+
     if (factory)
+
 		return factory->Create ();
 
+
+
 	return NULL;
+
 }
 
-iAwsWindow *awsManager::GetTopWindow ()
+
+iAwsComponent *awsManager::GetTopComponent ()
 {
   return top;
 }
 
-void awsManager::SetTopWindow (iAwsWindow *_top)
+void awsManager::SetTopComponent (iAwsComponent *_top)
 {
   top = _top;
 }
@@ -267,7 +277,7 @@ void awsManager::SetCanvas (iAwsCanvas *newCanvas)
     prefmgr->SetTextureManager (ptG3D->GetTextureManager ());
     prefmgr->SetFontServer (ptG2D->GetFontServer ());
 
-    frame.Set (0, 0, ptG2D->GetWidth () - 1, ptG2D->GetHeight () - 1);
+    frame.Set (0, 0, ptG2D->GetWidth (), ptG2D->GetHeight ());
 
     Mark (frame);
   }
@@ -332,7 +342,7 @@ iAwsCanvas *awsManager::CreateCustomCanvas (
   return canvas;
 }
 
-void awsManager::CreateTransition(iAwsWindow *win, unsigned transition_type, float step_size)
+void awsManager::CreateTransition(iAwsComponent *win, unsigned transition_type, float step_size)
 {
   if (win==NULL) return;
 
@@ -397,7 +407,7 @@ void awsManager::CreateTransition(iAwsWindow *win, unsigned transition_type, flo
   
 }
 
-void awsManager::CreateTransitionEx(iAwsWindow *win, unsigned transition_type, float step_size, csRect &user)
+void awsManager::CreateTransitionEx(iAwsComponent *win, unsigned transition_type, float step_size, csRect &user)
 {
   if (win==NULL) return;
 
@@ -511,23 +521,46 @@ awsManager::PerformTransition(awsWindowTransition *t)
   return true;
 }
 
+iAwsComponent* awsManager::ComponentAt(int x, int y)
+{
+	for(iAwsComponent* cur = GetTopComponent(); cur; cur = cur->ComponentBelow())
+	{
+		// find the top level component which contains the point
+		iAwsComponent* child = cur->ChildAt(x,y);
+		if(cur->isHidden()) continue;
+		if(child)
+		{
+			// then iterate down the tree until a child no longer contains
+		    // the point
+			iAwsComponent* temp;
+			while( (temp = child->ChildAt(x,y)))
+				child = temp;
+			return child;
+		}
+		else if(cur->Frame().Contains(x,y))
+			return cur;
+	}
+	return NULL;
+}
+	
 
-void awsManager::Mark (csRect &rect)
+
+void awsManager::Mark (const csRect &rect)
 {
   dirty.Include (rect);
 }
 
-void awsManager::Unmark (csRect &rect)
+void awsManager::Unmark (const csRect &rect)
 {
   dirty.Exclude (rect);
 }
 
-void awsManager::Erase (csRect &rect)
+void awsManager::Erase (const csRect &rect)
 {
   erase.Include (rect);
 }
 
-void awsManager::MaskEraser (csRect &rect)
+void awsManager::MaskEraser (const csRect &rect)
 {
   erase.Exclude (rect);
 }
@@ -537,7 +570,7 @@ void awsManager::InvalidateUpdateStore ()
   updatestore_dirty = true;
 }
 
-bool awsManager::WindowIsDirty (iAwsWindow *win)
+bool awsManager::ComponentIsDirty (iAwsComponent *win)
 {
   int i;
 
@@ -549,7 +582,7 @@ bool awsManager::WindowIsDirty (iAwsWindow *win)
   return false;
 }
 
-bool awsManager::WindowIsInTransition(iAwsWindow *win, bool perform_transition)
+bool awsManager::ComponentIsInTransition(iAwsComponent *win, bool perform_transition)
 {
   int i;
 
@@ -573,20 +606,20 @@ void awsManager::UpdateStore ()
 {
   if (updatestore_dirty)
   {
-    iAwsWindow *curwin = top;
+    iAwsComponent *cur = top;
 
     updatestore.makeEmpty ();
 
     // Get all frames into the store.
-    while (curwin)
+    while (cur)
     {
-      if (!curwin->isHidden ())
+      if (!cur->isHidden ())
       {
-        csRect r (curwin->Frame ());
+        csRect r (cur->Frame ());
         updatestore.Include (r);
       }
 
-      curwin = curwin->WindowBelow ();
+      cur = cur->ComponentBelow ();
     }
 
     updatestore_dirty = false;
@@ -643,21 +676,21 @@ void awsManager::Print (iGraphics3D *g3d, uint8 Alpha)
 void awsManager::Redraw ()
 {
   static unsigned redraw_tag = 1;
-  // @@@ is nowhere referenced so i disabled it (if its reenabled it has to be 
-  // rewritten using the CS static var handling macros - norman
-  //  static csRect bounds (frame); 
 
   int erasefill = GetPrefMgr ()->GetColor (AC_TRANSPARENT);
   int i;
 
-  iAwsWindow *curwin = top, *oldwin = 0;
+  iAwsComponent *curwin = top, *oldwin = 0;
 
   redraw_tag++;
 
   csRect clip (frame);
 
+  CS_ASSERT(frame.xmax <= ptG2D->GetWidth() && frame.ymax <= ptG2D->GetHeight());
+
   ptG3D->BeginDraw (CSDRAW_2DGRAPHICS);
-  ptG2D->SetClipRect (0, 0, ptG2D->GetWidth () - 1, ptG2D->GetHeight () - 1);
+  ptG2D->SetClipRect (frame.xmin, frame.ymin,
+                      frame.xmax, frame.ymax);
 
   // Broadcast frame events.
   while (curwin)
@@ -669,7 +702,7 @@ void awsManager::Redraw ()
       curwin->HandleEvent (Event);
     }
 
-    curwin = curwin->WindowBelow ();
+    curwin = curwin->ComponentBelow ();
   }
 
   // check to see if there is anything to redraw.
@@ -679,11 +712,7 @@ void awsManager::Redraw ()
      )
 
     return ;
-  else
-  {
-    dirty.ClipTo (clip);
-    erase.ClipTo (clip);
-  }
+
 
   /******* The following code is only executed if there is something to redraw *************/
   curwin = top;
@@ -692,8 +721,8 @@ void awsManager::Redraw ()
   while (curwin)
   {
     if (
-        (   WindowIsInTransition(curwin, true) /* MUST COME BEFORE OTHERS! */
-         || WindowIsDirty (curwin) 
+        (   ComponentIsInTransition(curwin, true) /* MUST COME BEFORE OTHERS! */
+         || ComponentIsDirty (curwin) 
          || (flags & AWSF_AlwaysRedrawWindows) 
         )
 
@@ -701,12 +730,15 @@ void awsManager::Redraw ()
        )
     {
       curwin->SetRedrawTag (redraw_tag);
-      if (flags & AWSF_AlwaysRedrawWindows) Mark (curwin->Frame ());
+      if (flags & AWSF_AlwaysRedrawWindows) curwin->Invalidate();
     }
 
     oldwin = curwin;
-    curwin = curwin->WindowBelow ();
+    curwin = curwin->ComponentBelow ();
   }
+
+    dirty.ClipTo (clip);
+    erase.ClipTo (clip);
 
   /*  At this point in time, oldwin points to the bottom most window.  That means that we take curwin, set it
    * equal to oldwin, and then follow the chain up to the top, redrawing on the way.  This makes sure that we
@@ -735,49 +767,47 @@ void awsManager::Redraw ()
       for (i = 0; i < dirty.Count (); ++i)
       {
         csRect dr (dirty.RectAt (i));
+        dr.Intersect(curwin->Frame());
+        cr.Union (dr);
+      }
 
-        if (DEBUG_MANAGER)
-          printf ("aws-debug: consider rect:%d of %d\n", i, dirty.Count ());
-
-        if (dr.Intersects (curwin->Frame ())) cr.Union (dr);
-      }       // end gather all dirty rects that touch this window.
-
-      // Get the intersection between the window and the clip rect.
+      // cr is now the smallest possible rect that
+      // contains all the dirty area over the window
       RedrawWindow (curwin, cr);
     }         // end if this window is dirty
-    curwin = curwin->WindowAbove ();
+    curwin = curwin->ComponentAbove ();
   }           // end iterate all windows
 
   //int i;
 
   // Debug code: draw boxes around dirty regions
 
-  /*for(i=0; i<dirty.Count(); ++i)
+  /* for(i=0; i<dirty.Count(); ++i)
   {
          csRect dr(dirty.RectAt(i));
          ptG2D->DrawLine(dr.xmin, dr.ymin, dr.xmax, dr.ymin, GetPrefMgr()->GetColor(AC_WHITE));
          ptG2D->DrawLine(dr.xmin, dr.ymin, dr.xmin, dr.ymax, GetPrefMgr()->GetColor(AC_WHITE));
          ptG2D->DrawLine(dr.xmin, dr.ymax, dr.xmax, dr.ymax, GetPrefMgr()->GetColor(AC_WHITE));
          ptG2D->DrawLine(dr.xmax, dr.ymin, dr.xmax, dr.ymax, GetPrefMgr()->GetColor(AC_WHITE));
-  }*/
+  } */
+
+
+  // Clear clipping bounds when done.
+  ptG2D->SetClipRect (0, 0, ptG2D->GetWidth (), ptG2D->GetHeight ());
 
   // This draws all of the erasure areas.
   if (flags & AWSF_AlwaysEraseWindows)
   {
-    awsClipper clipper (ptG3D, ptG2D);
-    clipper.SetClipRect (clip);
-
-    for (i = 0; i < dirty.Count (); ++i) erase.Exclude (dirty.RectAt (i));
+    UpdateStore();
+    for(i = 0; i < updatestore.Count(); i++)
+      MaskEraser(updatestore.RectAt(i));
 
     for (i = 0; i < erase.Count (); ++i)
     {
       csRect r (erase.RectAt (i));
-      clipper.DrawBox (r.xmin, r.ymin, r.Width (), r.Height (), erasefill);
+      G2D()->DrawBox (r.xmin, r.ymin, r.Width (), r.Height (), erasefill);
     }
   }
-
-  // Clear clipping bounds when done.
-  ptG2D->SetClipRect (0, 0, ptG2D->GetWidth (), ptG2D->GetHeight ());
 
   // This only needs to happen when drawing to the default context.
   ptG3D->FinishDraw ();
@@ -788,44 +818,39 @@ void awsManager::Redraw ()
   // done with the redraw!
 }
 
-void awsManager::RedrawWindow (iAwsWindow *win, csRect &dirtyarea)
+void awsManager::RedrawWindow (iAwsComponent *win, csRect clip)
 {
+  // precondition: clip is contained inside the the window frame and 
+  // also inside the canvas drawing area
+
   if (DEBUG_MANAGER) printf ("aws-debug: start drawing window.\n");
 
-  /// See if this window intersects with this dirty area
-  if (!dirtyarea.Intersects (win->Frame ())) return ;
+  ptG2D->SetClipRect(clip.xmin, clip.ymin, clip.xmax, clip.ymax);
 
-  /// Draw the window first.
+  // tell window frame to draw
+  win->OnDraw (clip); 
 
-  //csRect clip(win->Frame());
-  //
-  //  /// Clip the window to it's intersection with the dirty rectangle
-
-  //clip.Intersect(csRect(0,0,G2D()->GetWidth(), G2D()->GetHeight()));
-
-  //ptG2D->SetClipRect(clip.xmin, clip.ymin, clip.xmax, clip.ymax);
-  //
-  //  /// Tell the window to draw
-  win->OnDraw (win->Frame ());
-
-  /// Now draw all of it's children
-  RecursiveDrawChildren (win, dirtyarea);
+  /// Draw the children
+  RecursiveDrawChildren (win, clip);
 
   if (DEBUG_MANAGER) printf ("aws-debug: finished drawing window.\n");
 }
 
-void awsManager::RecursiveDrawChildren (iAwsComponent *cmp, csRect &dirtyarea)
+void awsManager::RecursiveDrawChildren (iAwsComponent *cmp, csRect clip)
 {
-  int i;
   iAwsComponent *child;
 
   if (DEBUG_MANAGER) printf ("aws-debug: start drawing children.\n");
 
-  for (i = 0; i < cmp->GetChildCount (); ++i)
-  {
-    child = cmp->GetChildAt (i);
+  if(!cmp->HasChildren()) return;
 
-    // Do not draw the child if it's hidden of invisible.
+  for(child = cmp->GetTopChild(); child->ComponentBelow();
+      child = child->ComponentBelow());
+
+  for (; child ; child = child->ComponentAbove())
+  {
+
+    // Do not draw the child if it's hidden or invisible.
     if (child->isHidden() ||
         child->Flags() & AWSF_CMP_INVISIBLE)
 	continue;
@@ -833,21 +858,24 @@ void awsManager::RecursiveDrawChildren (iAwsComponent *cmp, csRect &dirtyarea)
     if (DEBUG_MANAGER)
       printf ("aws-debug: entered draw children loop for %p.\n", child);
 
-    // Check to see if this component even needs redrawing.
+    csRect child_clip(child->Frame());
 
-    //if (!dirtyarea.Intersects(child->Frame()))
+	  child_clip.Intersect (clip);
 
-    //continue;
-    csRect clip (child->Frame ());
-    clip.Intersect (dirtyarea);
+    if(! (child->Flags() & AWSF_CMP_NON_CLIENT))
+      child_clip.Intersect (cmp->ClientFrame());
 
-    //ptG2D->SetClipRect(clip.xmin, clip.ymin, clip.xmax, clip.ymax);
+	if(child_clip.IsEmpty()) // there is nothing to draw
+		continue;
+
+	// enforce the clipping
+    ptG2D->SetClipRect(child_clip.xmin, child_clip.ymin, 
+                       child_clip.xmax, child_clip.ymax);
 
     // Draw the child
-    child->OnDraw (clip);
+    child->OnDraw (child_clip);
 
-    // If it has children, draw them
-    if (child->HasChildren ()) RecursiveDrawChildren (child, dirtyarea);
+	RecursiveDrawChildren (child, child_clip);
   }           // End for
   if (DEBUG_MANAGER) printf ("aws-debug: finished drawing children.\n");
 }
@@ -857,54 +885,44 @@ iAwsParmList *awsManager::CreateParmList ()
   return new awsParmList;
 }
 
-iAwsWindow *awsManager::CreateWindowFrom (char *defname)
+iAwsComponent *awsManager::CreateWindowFrom (char *defname)
 {
   if (DEBUG_MANAGER)
     printf ("aws-debug: Searching for window def \"%s\"\n", defname);
 
   // Find the window definition
-  awsComponentNode *winnode = GetPrefMgr ()->FindWindowDef (defname);
+  awsComponentNode *cmpnode = GetPrefMgr ()->FindWindowDef (defname);
 
   if (DEBUG_MANAGER)
     printf (
       "aws-debug: Window definition was %s\n",
-      (winnode ? "found." : "not found."));
+      (cmpnode ? "found." : "not found."));
 
   // If we couldn't find it, abort
-  if (winnode == NULL) return NULL;
+  if (cmpnode == NULL) return NULL;
 
-  // Create a new window
-  iAwsWindow *win = new awsWindow ();
+  // Create a new component
+  iAwsComponentFactory *factory = FindComponentFactory (
+          cmpnode->ComponentTypeName ()->GetData ());
 
-  // Setup the name of the window
-  win->SetID (winnode->Name ());
+  // If we do not have a factory, abort construction
+  if (!factory) return NULL;
+  iAwsComponent *comp = factory->Create ();
 
-  // Tell the window to set itself up
-  win->Setup (this, winnode);
+  // Setup the component
+  if(!comp->Create(this, NULL, cmpnode))
+    return NULL;
 
   /* Now recurse through all of the child nodes, creating them and setting them
   up.  Nodes are created via their factory functions.  If a factory cannot be
   found, then that node and all of it's children are ignored. */
-  CreateChildrenFromDef (this, win, win, winnode);
+  CreateChildrenFromDef (this, comp, cmpnode);
 
-  // If window has layout, then layout children.
-  if (win->Layout ())
-  {
-    csRect r = win->getInsets ();
-    r.xmin += win->Frame ().xmin;
-    r.ymin += win->Frame ().ymin;
-    RecursiveLayoutChildren (win, false);
-    win->MoveChildren (r.xmin, r.ymin);
-  }
-  else
-    RecursiveLayoutChildren (win, true);
-
-  return win;
+  return comp;
 }
 
 void awsManager::CreateChildrenFromDef (
   iAws *wmgr,
-  iAwsWindow *win,
   iAwsComponent *parent,
   awsComponentNode *settings)
 {
@@ -926,26 +944,12 @@ void awsManager::CreateChildrenFromDef (
       {
         iAwsComponent *comp = factory->Create ();
 
-        // Setup the name of the component
-        comp->SetID (comp_node->Name ());
+        // sets up the component for use
+        // returns true if all went well
+        if(comp->Create(wmgr, parent, comp_node))
 
-        // Setup window and parent of component
-        comp->SetWindow (win);
-        comp->SetParent (parent);
-
-        // Prepare the component, and add it into it's parent
-        comp->Setup (wmgr, comp_node);
-        parent->AddChild (comp, (parent->Layout () != NULL));
-
-        // Set it up in the parent's layout manager, if there is one.
-        if (parent->Layout ())
-          parent->Layout ()->AddComponent (
-              wmgr->GetPrefMgr (),
-              comp_node,
-              comp);
-
-        // Process all subcomponents of this component.
-        CreateChildrenFromDef (wmgr, win, comp, comp_node);
+          // Process all subcomponents of this component.
+          CreateChildrenFromDef (wmgr, comp, comp_node);
       }
     }
     else if (key->Type () == KEY_CONNECTIONMAP)
@@ -962,42 +966,29 @@ void awsManager::CreateChildrenFromDef (
       }       // end for count of connections
 
       //  Now that we've processed the connection map, we use a trick and send out
-
       // a creation signal for the component.  Note that we can't do this until the
-
       // connection map has been created, or the signal won't go anywhere!
       parent->Broadcast (0xefffffff);
     }         // end else
   }           // end for count of keys
+
+  parent->LayoutChildren();
+
 }
 
-void awsManager::RecursiveLayoutChildren (iAwsComponent *comp, bool /*move_kids*/)
-{
-  if (comp->Layout ()) comp->Layout ()->LayoutComponents ();
-  if (!comp->HasChildren ()) return ;
-
-  int i;
-  for (i = 0; i < comp->GetChildCount (); ++i)
-  {
-    iAwsComponent *child = comp->GetChildAt (i);
-
-    RecursiveLayoutChildren (child, comp->Layout()!=NULL);
-  }
-
-  if (comp->Layout())
-      comp->MoveChildren(comp->Frame().xmin, comp->Frame().ymin);
-}
 
 void awsManager::CaptureMouse (iAwsComponent *comp)
 {
+  printf("Mouse captured\n");
   mouse_captured = true;
-  if (comp == NULL) comp = GetTopWindow ();
+  if (comp == NULL) comp = GetTopComponent ();
 
   mouse_focus = comp;
 }
 
 void awsManager::ReleaseMouse ()
 {
+  printf("Mouse released\n");
   mouse_captured = false;
   mouse_focus = NULL;
 }
@@ -1007,162 +998,159 @@ bool awsManager::HandleEvent (iEvent &Event)
   // Find out what kind of event it is
   switch (Event.Type)
   {
-    case csevMouseMove:
-    case csevMouseUp:
-    case csevMouseDown:
-    case csevMouseClick:
-      // Find out which top most window contains the pointer.
-      if (GetTopWindow ())
-      {
-        // If the mouse is locked into the top window, keep it there
-        if (mouse_captured && mouse_focus)
-        {
-          //        if (RecursiveBroadcastToChildren(mouse_focus, Event)) return true;
-
-          //        else return mouse_focus->HandleEvent(Event);
-          return mouse_focus->HandleEvent (Event);
-        }     // end mouse captured
-        else
-        {
-          // If the top window still contains the mouse, it stays on top
-          if (
-            !GetTopWindow ()->isDeaf () &&
-            !GetTopWindow ()->isHidden () &&
-            GetTopWindow ()->Frame ().Contains (Event.Mouse.x, Event.Mouse.y))
-          {
-            if (RecursiveBroadcastToChildren (GetTopWindow (), Event))
-              return true;
-            else
-            {
-              PerformFocusChange (GetTopWindow (), Event);
-              return GetTopWindow ()->HandleEvent (Event);
-            }
-          }   // end if topmost window contains it
-          else
-          {
-            // Find the window that DOES contain the mouse.
-            iAwsWindow *win = GetTopWindow ();
-
-            // Skip the top 'cause we already checked it.
-            if (win) win = win->WindowBelow ();
-
-            while (win)
-            {
-              // If the window contains the mouse, it becomes new top.
-              if (
-                !win->isDeaf () &&
-                !win->isHidden () &&
-                win->Frame ().Contains (Event.Mouse.x, Event.Mouse.y))
-              {
-                win->Raise ();
-                if (RecursiveBroadcastToChildren (win, Event))
-                  return true;
-                else
-                {
-                  PerformFocusChange (win, Event);
-                  return win->HandleEvent (Event);
-                }
-              }
-              else
-                win = win->WindowBelow ();
-            } // end while iterating windows
-          }   // end else check all other windows
-        }     // end else mouse is not captured
-      }       // end if there is a top window
-      break;
-
-    case csevKeyDown:
-      // if (GetTopWindow())
-
-      // {
-
-      //   if (RecursiveBroadcastToChildren(GetTopWindow(), Event)) return true;
-
-      //   else return GetTopWindow()->HandleEvent(Event);
-
-      // }
-      if (keyb_focus) keyb_focus->HandleEvent (Event);
-
-      break;
-  }
-
-  return false;
-}
-
-bool awsManager::RecursiveBroadcastToChildren (
-  iAwsComponent *cmp,
-  iEvent &Event)
-{
-  if (!cmp->isDeaf ())
-  {
-    int i;
-    iAwsComponent *child;
-
-    for (i = 0; i < cmp->GetChildCount (); ++i)
+    
+  case csevMouseMove:
+  case csevMouseUp:
+  case csevMouseClick:
+  case csevMouseDown:
     {
-      child = cmp->GetChildAt (i);
+      // If the mouse is locked keep it there
+      if (mouse_captured && mouse_focus)
+        if(mouse_focus->HandleEvent (Event)) return true;
 
-      // If it has children, broadcast to them (depth-first recursion)
-      if (child->HasChildren ())
-        if (RecursiveBroadcastToChildren (child, Event)) return true;
-      if (!child->isDeaf () && CheckFocus (child, Event)) return true;
-    }           // End for
-  }
+      // Find out which component contains the pointer.
+      iAwsComponent* comp = ComponentAt(Event.Mouse.x, Event.Mouse.y);
+      
+      // if the mouse is still captured just stop
+      if (mouse_captured && mouse_focus)
+        return false;
+      
+      // check to see if focus needs updating
+      // if that succeeds then the keyboard might need focusing too
+      if(ChangeMouseFocus(comp, Event))
+        ChangeKeyboardFocus(comp, Event);
+      
+      // its possible that some component captured the mouse
+      // in response to losing mouse focus. If that occured then we
+      // give that component a chance to handle the event
+      // rather than the component curently containing the mouse
+      if(mouse_captured && mouse_focus)
+        return mouse_focus->HandleEvent(Event);
+      
+      // move up the chain of components to find the first one that can handle
+      // the event. 
+      while(comp && !(comp->Flags() & AWSF_CMP_DEAF) &&  !comp->HandleEvent(Event))
+        comp = comp->Parent();
+      
+      // if we haven't reached the top then some component handled it
+      if(comp) return true;
+    }
+    break;
+  
+  case csevKeyDown:
+    if (keyb_focus) keyb_focus->HandleEvent (Event);
+    
+    break;
+}
+
   return false;
 }
 
-bool awsManager::CheckFocus (iAwsComponent *cmp, iEvent &Event)
+
+iAwsComponent* awsManager::FindCommonParent(iAwsComponent* cmp1, iAwsComponent* cmp2)
 {
-  switch (Event.Type)
+  iAwsComponent* testParent1 = cmp1;
+  iAwsComponent* testParent2 = cmp2;
+
+  while(testParent1)
   {
-    case csevMouseMove:
-    case csevMouseUp:
-    case csevMouseDown:
-    case csevMouseClick:
-      // Only give to child if it contains the mouse.
-      if (cmp->Frame ().Contains (Event.Mouse.x, Event.Mouse.y))
-      {
-        PerformFocusChange (cmp, Event);
-        return cmp->HandleEvent (Event);
-      }
-      break;
+    while(testParent2)
+    {
+      if(testParent1 == testParent2)
+        return testParent1;
+      testParent2 = testParent2->Parent();
+    }
+    testParent2 = cmp2;
+    testParent1 = testParent1->Parent();
+  }
 
-    case csevKeyDown:
-      if (cmp->HandleEvent (Event)) return true;
+  return NULL;
+}
 
-      break;
-  }           // End switch
+// note, if this is too slow common_parent could be calculated once and then
+// passed and updated as necessary. Unless component trees get really deep though
+// I don't think it matters so I left it this way because its slightly clearer.
+
+bool awsManager::ChangeMouseFocus(iAwsComponent *cmp, iEvent &Event)
+{
+  iAwsComponent* common_parent = FindCommonParent(mouse_in, cmp);
+  
+  if(mouse_in == cmp)
+    return ChangeMouseFocusHelper(cmp, Event);
+  else if(common_parent == mouse_in)
+  {
+    if(ChangeMouseFocus(cmp->Parent(), Event))   // get focus to the parent
+      return ChangeMouseFocusHelper(cmp, Event); // then get it to cmp
+  }
+  else
+  {
+    if(ChangeMouseFocusHelper(mouse_in->Parent(),Event)) // get focus to mouse_in's parent
+      return ChangeMouseFocus(cmp, Event);               // get it the rest of the way
+    else
+      return false;
+  }
+  // can't get here but compiler seems to complain
+  // if I don't have it
   return false;
 }
 
-void awsManager::PerformFocusChange (iAwsComponent *cmp, iEvent &Event)
+
+
+bool awsManager::ChangeMouseFocusHelper(iAwsComponent *cmp, iEvent &Event)
 {
-  // Create a new event for MouseExit and MouseEnter
+  // Reusing this event, save the orignal type
   uint8 et = Event.Type;
-
-  if (mouse_in == cmp) return ;
-
-  //printf("focus %x (%s)-> %x (%s)\n", mouse_in, (mouse_in ? mouse_in->Type() : "None"), cmp, cmp->Type());
-  if (mouse_in)
+  if(mouse_in != cmp)
   {
-    Event.Type = csevMouseExit;
-    mouse_in->HandleEvent (Event);
+    if (mouse_in)
+    {
+      Event.Type = csevMouseExit;
+      mouse_in->HandleEvent (Event);
+    }
+    
+    // A component might respond to a mouseExit event by 
+    // capturing the mouse. If so we leave mouse_in with its
+    // current ref. Then when the component releases the mouse
+    // it will again receive the mouseExit as if the mouse never
+    // left.
+    if(mouse_captured && mouse_focus)
+    {
+      Event.Type = et;
+      return false;
+    }
+    
+    mouse_in = cmp;
+    
+    if(mouse_in)
+    {
+      Event.Type = csevMouseEnter;
+      mouse_in->HandleEvent (Event);
+    }
+    
+    Event.Type = et;
   }
+  
+  // do we need to raise the focused component?
+  
+  if(et == csevMouseDown)
+    RaiseComponents(cmp);
+  else if( flags & AWSF_RaiseOnMouseOver &&
+    (et == csevMouseMove || et == csevMouseUp || et == csevMouseClick))
+    RaiseComponents(cmp);
+  return true;
+}
 
-  mouse_in = cmp;
 
-  Event.Type = csevMouseEnter;
-  mouse_in->HandleEvent (Event);
-
-  Event.Type = et;
+void awsManager::ChangeKeyboardFocus(iAwsComponent *cmp, iEvent &Event)
+{
+  // Reusing this event, save the orignal type
+	uint8 et = Event.Type;
 
   if (et == csevMouseDown)
   {
     if (keyb_focus != cmp)
     {
       // Create a new event for Got/Lost Focus messages
-      et = Event.Type;
-
       if (keyb_focus)
       {
         Event.Type = csevLostFocus;
@@ -1170,11 +1158,24 @@ void awsManager::PerformFocusChange (iAwsComponent *cmp, iEvent &Event)
       }
 
       keyb_focus = cmp;
-      Event.Type = csevGainFocus;
-      keyb_focus->HandleEvent (Event);
-
+      if(keyb_focus)
+      {
+        Event.Type = csevGainFocus;
+        keyb_focus->HandleEvent (Event);
+      }
       Event.Type = et;
     }
+  }
+}
+
+
+
+void awsManager::RaiseComponents(iAwsComponent* comp)
+{
+  while(comp)
+  {
+	 if(comp->Flags() & AWSF_CMP_TOP_SELECT) comp->Raise();
+	 comp = comp->Parent();
   }
 }
 
@@ -1195,13 +1196,17 @@ void awsManager::RegisterCommonComponents ()
   (void)new awsNotebookFactory (this);
   (void)new awsNotebookPageFactory (this);
   (void)new awsNotebookButtonFactory (this);
+  (void)new awsWindowFactory (this);
+  (void)new awsEngineViewFactory(this);
   (void)new awsImageViewFactory (this);
   (void)new awsMultiLineEditFactory (this);
+  (void)new awsControlBarFactory(this);
+  (void)new awsPopupMenuFactory(this);
+  (void)new awsMenuEntryFactory(this);
+  (void)new awsMenuBarFactory(this);
+  (void)new awsMenuBarEntryFactory(this);
   
   RegisterComponentFactory (new awsComponentFactory (this), "awsComponent");
-
-  // window constants
-  (void)awsWindow::Register (this);
 
   // Standard sink
   GetSinkMgr ()->RegisterSink ("awsStandardSink", new awsStandardSink (this));
@@ -1213,6 +1218,9 @@ void awsManager::RegisterCommonComponents ()
   GetPrefMgr ()->RegisterConstant ("No", 0);
 
   GetPrefMgr ()->RegisterConstant ("signalComponentCreated", 0xefffffff);
+
+  GetPrefMgr ()->RegisterConstant ("mouseOver", 1);
+  GetPrefMgr ()->RegisterConstant ("mouseClick", 2);
 
   // Layout constants
   GetPrefMgr ()->RegisterConstant ("gbcRelative", -1);
@@ -1241,13 +1249,13 @@ void awsManager::RegisterCommonComponents ()
 
 bool awsManager::AllWindowsHidden ()
 {
-  iAwsWindow *curwin = top;
+  iAwsComponent *curwin = top;
 
   while (curwin)
   {
     if (!curwin->isHidden ()) return false;
 
-    curwin = curwin->WindowBelow ();
+    curwin = curwin->ComponentBelow ();
   }
 
   return true;

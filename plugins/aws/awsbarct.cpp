@@ -8,15 +8,9 @@
 #include "iutil/evdefs.h"
 #include "csutil/snprintf.h"
 #include "aws3dfrm.h"
+#include "iaws/awsparm.h"
 
 #include <stdio.h>
-
-const int awsBarChart:: fsBump = 0x0;
-const int awsBarChart:: fsSimple = 0x1;
-const int awsBarChart:: fsRaised = 0x2;
-const int awsBarChart:: fsSunken = 0x3;
-const int awsBarChart:: fsFlat = 0x4;
-const int awsBarChart:: fsNone = 0x5;
 
 const int awsBarChart:: coRolling=0x1;
 const int awsBarChart:: coRollLeft=0x0;
@@ -43,11 +37,8 @@ static void DriveTimer (void *, iAwsSource *source)
 }
 
 awsBarChart::awsBarChart () :
-  frame_style(0),
-  inner_frame_style(fsNone),
+inner_frame_style(fsNone),
   chart_options(0),
-  alpha_level(96),
-  bkg(NULL),
   caption(NULL),
   yText(NULL),
   xText(NULL),
@@ -80,7 +71,10 @@ char *awsBarChart::Type ()
 
 bool awsBarChart::Setup (iAws *_wmgr, awsComponentNode *settings)
 {
-  if (!awsComponent::Setup (_wmgr, settings)) return false;
+  // set some defaults before panel setup
+  bkg_alpha = 96;
+  style = fsBump;
+  if (!awsPanel::Setup (_wmgr, settings)) return false;
 
 
   iAwsPrefManager *pm = WindowManager ()->GetPrefMgr ();
@@ -88,8 +82,6 @@ bool awsBarChart::Setup (iAws *_wmgr, awsComponentNode *settings)
   unsigned char r=0, g=0, b=0;
   int timer_interval=1000;
 
-  pm->LookupIntKey ("OverlayTextureAlpha", alpha_level);
-  pm->GetInt (settings, "Style", frame_style);
   pm->GetInt (settings, "InnerStyle", inner_frame_style);
   pm->GetInt (settings, "Options", chart_options);
   pm->GetInt (settings, "MaxItems", max_items);
@@ -101,8 +93,6 @@ bool awsBarChart::Setup (iAws *_wmgr, awsComponentNode *settings)
   pm->LookupRGBKey("ChartBarColor", r, g, b);
 
   bar_color = pm->FindColor(r,g,b);
-
-  bkg = pm->GetTexture ("Texture");
 
   if (chart_options & coRolling)
   {
@@ -222,22 +212,15 @@ bool awsBarChart::Execute (char *action, iAwsParmList &parmlist)
   return false;
 }
 
-void awsBarChart::OnDraw (csRect /*clip*/)
+void awsBarChart::OnDraw (csRect clip)
 {
+  // draws the frame and background
+  awsPanel::OnDraw(clip);
+
   iGraphics2D *g2d = WindowManager ()->G2D ();
 
   csRect insets;
   csRect inner_frame(Frame());
-
-  aws3DFrame frame3d;
-
-  frame3d.Draw (
-      WindowManager (),
-      Window (),
-      Frame (),
-      frame_style,
-      bkg,
-      alpha_level);
 
   // Get the normal inset for this item.
   insets=getInsets();
@@ -356,14 +339,6 @@ void awsBarChart::OnDraw (csRect /*clip*/)
     inner_frame.xmin+=2;
   }
 
-   frame3d.Draw (
-      WindowManager (),
-      Window (),
-      inner_frame,
-      inner_frame_style,
-      bkg,
-      alpha_level);
-
   // Setup some variables
   int bw = inner_frame.Width() /  (max_items==0 ? count_items : max_items);
   int bh = inner_frame.Height() / (max_items==0 ? count_items : max_items);
@@ -452,27 +427,6 @@ bool awsBarChart::OnLostFocus ()
 bool awsBarChart::OnGainFocus ()
 {
   return false;
-}
-
-csRect awsBarChart::getInsets()
-{
-  switch(frame_style)
-  {
-  case fsBump:
-    return csRect(4,4,4,4);
-
-  case fsFlat:
-  case fsSimple:
-    return csRect(1,1,1,1);
-
-  case fsRaised:
-  case fsSunken:
-    return csRect(2,2,2,2);
-  
-  case fsNone:
-  default:
-    return csRect(0,0,0,0);
-  }
 }
 
 

@@ -24,43 +24,21 @@
 # include "csgeom/csrect.h"
 # include "csgeom/csrectrg.h"
 # include "awscomp.h"
+# include "awsPanel.h"
+# include "awscmdbt.h"
+# include "awsMenu.h"
 
 /***************************************************************************************************************************
-*   This file details the interface of awsWindow components.  Windows, while they are just normal components, have some    *
-* special properties that most other components will not have.  For example, windows are moveable, hideable, maximizeable, *
+*   This file details the interface of awsWindow awsComponents.  Windows, while they are just normal awsComponents, have some    *
+* special properties that most other awsComponents will not have.  For example, windows are moveable, hideable, maximizeable, *
 * windows can be minimized, closed, and they can sit on top of or below other windows.  Windows, while being peers, also   *
 * have a depth ordering that is implicit in their hierarchy.                                                               *
 *                                                                                                                          *
 ***************************************************************************************************************************/
-class awsWindow :
-  public iAwsWindow
+class awsWindow : 
+  public awsPanel
 {
 private:
-  /// Pointer to the window above this one.  Is null if there isn't one.
-  iAwsWindow *above;
-
-  /// Pointer to the window below this one.  Is null if there isn't one.
-  iAwsWindow *below;
-
-  /// Unlinks this window from the window hierarchy.
-  void Unlink ();
-
-  /// Links this window in above the passed in window.  This window must be unlinked!
-  void LinkAbove (iAwsWindow *win);
-
-  /// Links this window in below the passed in window.  This window must be unlinked!
-  void LinkBelow (iAwsWindow *win);
-
-  /// Texture handles for buttons
-  iTextureHandle *min_button, *max_button, *close_button, *btxt, *otxt;
-private:
-  /** Contains the redraw tag.  This tag changes everytime we redraw the window system, but only once per frame.
-      we use it to keep track of which windows have been redrawn and which haven't.
-     */
-  unsigned int redraw_tag;
-
-  /// The frame style of the window
-  int frame_style;
 
   /// Individual frame options
   int frame_options;
@@ -68,20 +46,27 @@ private:
   /// The size of the title bar as of last draw
   int title_bar_height;
 
+  /// The title text offset
+  int title_offset;
+
   /// The title
   iString *title;
 
-  /// The last values for x and y so that we can create deltas for moving
-  int last_x, last_y;
+  /// the title bar text color
+  int title_text_color;
 
-  /// The alpha level for the overlay of the global texture
-  int alpha_level;
+  /// Active and inactive title bar colors
+  /// They are stored as rgb triples in order active1, active2, inactive1, inactive2
+  /// because there doesn't seem to be a way to convert from pallete
+  /// back to rgb we have to store the rgb values
+  unsigned char title_color[12];
 
-  /// The alpha level for the background bitmap
-  int bkg_alpha;
+  /// The position where the mouse went down
+  int down_x, down_y;
 
-  /// The alpha level for the overlay bitmap
-  int ovl_alpha;
+  /// multi-purpose: stores the original coordinates of Frame().xmin, Frame().ymin while moving
+  /// or stores the original width and height while resizing
+  int orig_x, orig_y;
 
   /// True if we are currently resizing
   bool resizing_mode;
@@ -89,129 +74,37 @@ private:
   /// True if we are currently moving
   bool moving_mode;
 
-  /// Points for placement of controls, offset from top, right of window.
-  csRect minp, maxp, closep;
+  /// control buttons
+  awsCmdButton min_button, zoom_button, close_button;
 
-  /// These are true if the control buttons that we're using are down, else false
-  bool min_down, max_down, close_down;
+  /// slots and a sink for getting events from the buttons
+  awsSlot slot_min, slot_zoom, slot_close;
+  awsSink sink;
 
   /// True if the window is in one of these various states
-  bool is_zoomed, is_minimized;
+  bool is_minimized;
 
-  /// True if the child exclusion region needs to be updated
-  bool todraw_dirty;
+  /// a popup menu we can show when right clicked
+  awsPopupMenu* popup;
 
-  /// The frame cache for storing frame state while the window is zoomed.
-  csRect unzoomed_frame;
+  /// a menu currently showing
+  awsMenuBar* menu;
 
-  /// The frame cache for storing frame state while the window is zoomed.
-  csRect bm_bkgsub, bm_ovlsub;
+protected:
 
-  /// Embedded component
-  awsComponent comp;
+  /// Returns true if this is the topmost window
+  bool IsActiveWindow();
 
-  /// Child region excluder, optimizes drawing of windows.
-  csRectRegion todraw;
 
-  /// The engine view to draw, if this is not NULL it overrides all other settings.
-  iView *view;
-private:
-  void Draw3DRect (iGraphics2D *g2d, csRect &f, int hi, int lo);
+  void DrawGradient(csRect frame, unsigned char r1, unsigned char g1, unsigned char b1,
+	                              unsigned char r2, unsigned char g2, unsigned char b2);
 
-  /// Get's this components idea of the window manager.  Should be used internally by the component ONLY.
-  iAws *WindowManager ()  { return comp.WindowManager (); }
+  /// Sets the option flags
+  virtual void SetOptions(int frame_options);
 
-  /// Get's the window that this component resides in.
-  virtual iAwsWindow *Window ();
+  /// Resizes the window and all associated items
+  virtual void Resize(int width, int height);
 
-  /// Get's the parent component of this component;
-  virtual iAwsComponent *Parent ();
-
-  /// Sets the window that this component resides in.
-  virtual void SetWindow (iAwsWindow *win);
-
-  /// Sets the parent component of this component;
-  virtual void SetParent (iAwsComponent *parent);
-
-  /// Lays out children.
-  void RecursiveLayoutChildren (iAwsComponent *cmp, bool move_kids=false);
-
-  /// Performs the work of actually finding a child
-  iAwsComponent *DoFindChild(iAwsComponent *parent, unsigned id);
-
-  ////////////// Component declarations for embedded wrappers ///////////////////////////////
-  //
-  //    /// Invalidation routine: allow the component to be redrawn when you call this
-  virtual void Invalidate ();
-
-  /// Invalidation routine: allow component to be redrawn, but only part of it
-  virtual void Invalidate (csRect area);
-
-  /// Get this component's frame
-  virtual csRect &Frame ();
-
-  /// Returns true if this window overlaps the given rect.
-  virtual bool Overlaps (csRect &r);
-
-  /// Returns the state of the hidden flag
-  virtual bool isHidden ();
-
-  /// Hides a component
-  virtual void Hide ();
-
-  /// Shows a component
-  virtual void Show ();
-
-  /// Returns the state of the DEAF flag
-  virtual bool isDeaf ();
-
-  /// set component deaf or "undeaf"
-  virtual void SetDeaf (bool bDeaf);
-
-  /// Sets the flag (can handle multiple simultaneous sets)
-  virtual void SetFlag (unsigned int flag);
-
-  /// Clears the flag (can handle multiple simultaneous clears)
-  virtual void ClearFlag (unsigned int flag);
-
-  /// Returns the current state of the flags
-  virtual unsigned int Flags ();
-
-  /// Get's the unique id of this component.
-  virtual unsigned long GetID ();
-
-  /// Set's the unique id of this component. Note: only to be used by window manager.
-  virtual void SetID (unsigned long _id);
-
-  /// Moves the window and all associated items (including children)
-  virtual void Move(int delta_x, int delta_y);
-
-  /// Recursively moves children (and all nested children) by relative amount given.
-  virtual void MoveChildren (int delta_x, int delta_y);
-
-  /// Adds a child
-  virtual void AddChild (iAwsComponent *child, bool owner);
-
-  /// Removes a child
-  virtual void RemoveChild (iAwsComponent *child);
-
-  /// Get's the number of children
-  virtual int GetChildCount ();
-
-  /// Get's a specific child
-  virtual iAwsComponent *GetChildAt (int i);
-
-  /// Returns true if this component has children
-  virtual bool HasChildren ();
-
-  /// Event dispatcher, demultiplexes events and sends them off to the proper event handler
-  virtual bool HandleEvent (iEvent &Event);
-
-  /// Gets the layout manager for this window.
-  awsLayoutManager *Layout ();
-
-  /// Sets the layout manager for this window
-  void SetLayout (awsLayoutManager *l);
 public:
   static const unsigned long sWindowRaised;
   static const unsigned long sWindowLowered;
@@ -220,17 +113,6 @@ public:
   static const unsigned long sWindowClosed;
   static const unsigned long sWindowZoomed;
   static const unsigned long sWindowMinimized;
-
-  /******* Frame Styles **********************/
-
-  /// A normal frame that may have a title bar, buttons, 3d border, and a grip.
-  static const int fsNormal;
-
-  /// A frame with only a 3d border.  No controls or decorations allowed.
-  static const int fsToolbar;
-
-  /// A frame drawn with the background and overlay elements.  Nothing else is drawn.
-  static const int fsBitmap;
 
   /******* Frame Options **********************/
 
@@ -258,55 +140,22 @@ public:
   /// Should draw beveled border
   static const int foBeveledBorder;
 
-  SCF_DECLARE_IBASE;
+  /// Should draw no border
+  static const int foNoBorder;
 
-  /// This is a component of type window
+  SCF_DECLARE_IBASE_EXT(awsComponent);
+
+  /// This is a awsComponent of type window
   virtual char *Type () { return "Window"; }
 
-  /// Sets the value of the redraw tag
-  virtual void SetRedrawTag (unsigned int tag);
-
-  /// Gets the value of the redraw tag
-  virtual unsigned int RedrawTag () { return redraw_tag; }
 public:
   /// Constructs window class, clear some variables to defaults
   awsWindow ();
 
   /// empty deconstructor
   virtual ~awsWindow ();
+
 public:
-  /// Registers a slot for a signal
-  virtual bool RegisterSlot (iAwsSlot *slot, unsigned long signal);
-
-  /// Unregisters a slot for a signal.
-  virtual bool UnregisterSlot (iAwsSlot *slot, unsigned long signal);
-
-  /// Broadcasts a signal to all slots that are interested.
-  virtual void Broadcast (unsigned long signal);
-
-  /// Get's component
-  iAwsComponent *GetComponent ();
-
-  /// register signals and constants
-  static bool Register (iAws *mgr);
-public:
-  /// Raises a window to the top.
-  virtual void Raise ();
-
-  /// Lowers a window to the bottom.
-  virtual void Lower ();
-
-  /// Get's the window above this one, NULL if there is none.
-  virtual iAwsWindow *WindowAbove ()  { return above; }
-
-  /// Get's the window below this one, NULL if there is none.
-  virtual iAwsWindow *WindowBelow ()  { return below; }
-
-  /// Set's the window above this one
-  virtual void SetWindowAbove (iAwsWindow *win);
-
-  /// Set's the window below this one
-  virtual void SetWindowBelow (iAwsWindow *win);
 
   /// Does some additional setup for windows, including linking into the window hierarchy.
   virtual bool Setup (iAws *_wmgr, awsComponentNode *settings);
@@ -320,23 +169,26 @@ public:
   /// Executes scriptable actions for this window
   bool Execute (char *action, iAwsParmList &parmlist);
 
-  /// Sets the engine view for this window
-  virtual void SetEngineView (iView *_view);
-
-  /// Gets the engine view for this window
-  virtual iView *GetEngineView ();
-
-  /// Gets the preferred size of the component
+  /// Gets the preferred size of the awsComponent
   virtual csRect getPreferredSize ();
 
-  /// Gets the minimum size that the component can be
+  /// Gets the minimum size that the awsComponent can be
   virtual csRect getMinimumSize ();
 
-  /// Gets the inset amounts that are need to fit components properly.
+  /// Gets the inset amounts that are need to fit awsComponents properly.
   virtual csRect getInsets ();
 
-  /// Gets a child component by name, returns NULL on failure.
-  virtual iAwsComponent *FindChild(char *name);
+  /// Returns true if the window is in the process of moving
+  virtual bool IsMoving();
+
+  virtual void SetMenu(awsMenuBar* menu);
+  virtual awsMenuBar* GetMenu();
+
+public:
+  static void OnCloseClick(void* p, iAwsSource* source);
+  static void OnZoomClick(void* p, iAwsSource* source);
+  static void OnMinClick(void* p, iAwsSource* source);
+
 public:
   /// Event triggered when a window is about to be raised
   virtual void OnRaise ();
@@ -344,7 +196,7 @@ public:
   /// Event triggered when a window is about to be lowered
   virtual void OnLower ();
 
-  /// Triggered when the component needs to draw
+  /// Triggered when the awsComponent needs to draw
   virtual void OnDraw (csRect clip);
 
   /// Triggered when the user presses a mouse button down
@@ -355,35 +207,16 @@ public:
 
   /// Triggered when the user moves the mouse
   virtual bool OnMouseMove (int button, int x, int y);
-
-  /// Triggered when the user clicks the mouse
-  virtual bool OnMouseClick (int button, int x, int y);
-
-  /// Triggered when the user double clicks the mouse
-  virtual bool OnMouseDoubleClick (int button, int x, int y);
-
-  /// Triggered when this component loses mouse focus
-  virtual bool OnMouseExit ();
-
-  /// Triggered when this component gains mouse focus
-  virtual bool OnMouseEnter ();
-
-  /// Triggered when the user presses a key
-  virtual bool OnKeypress (int key, int modifiers);
-
-  /// Triggered when the keyboard focus is lost
-  virtual bool OnLostFocus ();
-
-  /// Triggered when the keyboard focus is gained
-  virtual bool OnGainFocus ();
-
-  /// Triggered at the beginning of each frame
-  virtual bool OnFrame ();
-
-  /// Triggered when a child is added to the parent (triggered on the child)
-  virtual void OnAdded ();
-
-  /// Triggered when a component is resized by the layout manager.
-  virtual void OnResized ();
 };
+
+
+class awsWindowFactory : awsComponentFactory
+{
+public:
+	awsWindowFactory(iAws *wmgr);
+	~awsWindowFactory();
+
+	iAwsComponent* Create();
+};
+
 #endif

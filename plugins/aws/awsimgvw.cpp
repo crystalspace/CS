@@ -36,7 +36,9 @@ awsImageView::awsImageView () :
   img1(NULL),
   img2(NULL),
   frame_style(0),
-  alpha_level(92)
+  alpha_level(92),
+  draw_color(false),
+  color(-1)
 {
 }
 
@@ -65,13 +67,39 @@ bool awsImageView::Setup (iAws *_wmgr, awsComponentNode *settings)
   {
     unsigned char r=0,g=0,b=0;
     pm->GetRGB (settings, "KeyColor", r, g, b);
-    img1 = pm->GetTexture (file->GetData (), file->GetData (), r, g, b);
+    img1 = pm->GetTexture (file->GetData (), file->GetData ());
   }
 
   img2 = pm->GetTexture ("Texture");
 
+
+  unsigned char r,g,b;
+  if(pm->GetRGB(settings, "Color", r, g, b))
+  {
+	  draw_color = true;
+	  color = pm->FindColor(r,g,b);
+  }
+
+
   return true;
 }
+
+
+void awsImageView::SetColor(int color_index)
+{
+	if(color_index >= 0)
+	{
+		draw_color = true;
+		color = color_index;
+	}
+	else
+	{
+		draw_color = false;
+		color = -1;
+	}
+}
+
+int awsImageView::GetColor() { return color; }
 
 bool awsImageView::GetProperty (char *name, void **parm)
 {
@@ -83,6 +111,11 @@ bool awsImageView::GetProperty (char *name, void **parm)
 bool awsImageView::SetProperty (char *name, void *parm)
 {
   if (awsComponent::SetProperty (name, parm)) return true;
+  if (strcmp(name, "Color")==0)
+  {
+	color = (int)parm;
+	return true;
+  }
 
   return false;
 }
@@ -91,13 +124,21 @@ void awsImageView::OnDraw (csRect /*clip*/)
 {
   aws3DFrame frame3d;
 
+    frame3d.Setup(WindowManager(),img2, 255);
   frame3d.Draw (
-      WindowManager (),
-      Window (),
       Frame (),
       frame_style & frameMask,
-      img2,
-      255);
+      Window()->Frame());
+
+  if(draw_color)
+  {
+	  WindowManager ()->G2D()->DrawBox(ClientFrame().xmin,
+	                                   ClientFrame().ymin,
+									   ClientFrame().Width(),
+									   ClientFrame().Height(),
+                                       color);
+      return;
+  }
 
   // now draw the image
   iTextureHandle *img = (img1 ? img1 : img2);

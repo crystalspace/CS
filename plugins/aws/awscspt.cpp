@@ -104,6 +104,8 @@ void awsSingleProctexCanvas::Show (
   iGraphics3D *g3d,
   uint8 Alpha)
 {
+  if(area->IsEmpty()) return;
+
   int w =
     (
       (!g3d) ||

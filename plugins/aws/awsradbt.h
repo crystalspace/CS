@@ -69,10 +69,16 @@ public:
   /// An up and down motion for the button
   static const int signalClicked;
 
+
+
   /// When this button is turned on.
+
   static const int signalTurnedOn;
 
+
+
   /// When this button is turned off.
+
   static const int signalTurnedOff;
 public:
   /// Get's the texture handle and the title, plus style if there is one.

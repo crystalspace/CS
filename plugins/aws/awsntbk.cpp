@@ -27,21 +27,16 @@ const int awsNotebook::fsFlat = 4;
 const int awsNotebook::fsNone = 5;
 
 awsNotebook::awsNotebook () :
-  tex(NULL),
-  frame_style(0),
   bb_location(nbTop),
   bb_style(nbSlide),
   maxheight (0),
-  bb(NULL),
-  alpha_level(92)
+  sink(this)
 {
   SetFlag (AWSF_CMP_ALWAYSERASE);
 }
 
 awsNotebook::~awsNotebook ()
-{
-  SCF_DEC_REF (sink);
-}
+{}
 
 char *awsNotebook::Type ()
 {
@@ -50,20 +45,15 @@ char *awsNotebook::Type ()
 
 bool awsNotebook::Setup (iAws *_wmgr, awsComponentNode *settings)
 {
-  if (!awsComponent::Setup (_wmgr, settings)) return false;
+  if (!awsPanel::Setup (_wmgr, settings)) return false;
 
   iAwsPrefManager *pm = WindowManager ()->GetPrefMgr ();
 
-  pm->LookupIntKey ("OverlayTextureAlpha", alpha_level);  // global get
-  pm->GetInt (settings, "Alpha", alpha_level);            // local overrides, if present.
-  pm->GetInt (settings, "Style", frame_style);
   pm->GetInt (settings, "Location", bb_location);
   pm->GetInt (settings, "Mode", bb_style);
 
-  tex = pm->GetTexture ("Texture");
-
-  sink = new awsSink (this);
-  bb = new awsNotebookButtonBar;
+  sink.RegisterTrigger("ActivateTab", &OnActivateTab);
+  sink.RegisterTrigger("DeactivateTab", &OnDeactivateTab);
 
   awsKeyFactory info;
 
@@ -71,22 +61,19 @@ bool awsNotebook::Setup (iAws *_wmgr, awsComponentNode *settings)
 
   csRect r(0, 0, Frame().Width (), 20);
 
-  bb->SetWindow (Window ());
-  bb->SetParent (this);
-  bb->Frame () = r;
-  awsComponent::AddChild (bb);
-  bb->Setup (_wmgr, info.GetThisNode ());
-  bb->SetTopBottom (bb_location == awsNotebook::nbTop);
+  tab_ctrl.SetParent (this);
+  tab_ctrl.Setup (_wmgr, info.GetThisNode ());
+  tab_ctrl.ResizeTo(r);
+  tab_ctrl.SetFlag(AWSF_CMP_NON_CLIENT);
+  awsComponent::AddChild (&tab_ctrl);
+  tab_ctrl.SetTopBottom (bb_location == awsNotebook::nbTop);
   return true;
 }
 
 bool awsNotebook::GetProperty (char *name, void **parm)
 {
-  if (awsComponent::GetProperty (name, parm)) return true;
+  if (awsPanel::GetProperty (name, parm)) return true;
 
-  if (strcmp ("Style", name) == 0)
-    *parm = (void *) &frame_style;
-  else
   if (strcmp ("Location", name) == 0)
     *parm = (void *) &bb_location;
   else
@@ -100,29 +87,9 @@ bool awsNotebook::GetProperty (char *name, void **parm)
 
 bool awsNotebook::SetProperty (char *name, void *parm)
 {
-  if (awsComponent::SetProperty (name, parm)) return true;
+  if (awsPanel::SetProperty (name, parm)) return true;
 
-  if (strcmp ("Style", name) == 0)
-  {
-    int h = *(int *)parm;
-    switch (h)
-    {
-    case fsBump:
-    case fsSimple:
-    case fsRaised:
-    case fsSunken:
-    case fsFlat:
-    case fsNone:
-      if (h != frame_style)
-      {
-        frame_style = h;
-        Invalidate ();
-      }
-      return true;
-    }
-    return false;
-  }
-  else if (strcmp ("Location", name) == 0)
+  if (strcmp ("Location", name) == 0)
   {
     int h = *(int *)parm;
     if (h == awsNotebook::nbTop || h == awsNotebook::nbBottom)
@@ -130,7 +97,7 @@ bool awsNotebook::SetProperty (char *name, void *parm)
       if (bb_location != h)
       {
         bb_location = h;
-        bb->SetTopBottom (h == awsNotebook::nbTop);
+        tab_ctrl.SetTopBottom (h == awsNotebook::nbTop);
         Invalidate ();
       }
       return true;
@@ -145,7 +112,6 @@ bool awsNotebook::SetProperty (char *name, void *parm)
       if ( h != bb_style)
       {
         bb_style = h;
-        DoLayout ();
         Invalidate ();
       }
       return true;
@@ -156,28 +122,51 @@ bool awsNotebook::SetProperty (char *name, void *parm)
   return false;
 }
 
-void awsNotebook::DoLayout ()
-{
-}
-
 void awsNotebook::OnDraw (csRect )
 {
-  aws3DFrame frame3d;
 
   csRect f (Frame ());
   if (bb_location == nbTop)
-    f.ymin += bb->Frame ().Height ();
+    f.ymin += tab_ctrl.Frame ().Height ();
   else
-    f.ymax -= bb->Frame ().Height ();
-  frame3d.Draw(WindowManager(), Window(), f, frame_style, tex, alpha_level);
+    f.ymax -= tab_ctrl.Frame ().Height ();
+  
+  frame_drawer.Draw (
+      f,
+      style,
+      Window()->Frame());
 }
 
-void awsNotebook::AddChild (iAwsComponent *child, bool has_layout)
+void awsNotebook::AddChild (iAwsComponent *child)
 {
-  child->Frame ().Set (0, bb->Frame ().Height ()+2, Frame ().Width (), Frame ().Height ());
-  awsComponent::AddChild (child, has_layout);
+  child->ResizeTo (csRect(0, tab_ctrl.Frame ().Height ()+2, 
+	                      Frame ().Width (), Frame ().Height ()));
+  child->Hide();
+  awsComponent::AddChild (child);
 
-  bb->Add (child);
+  iString *str = NULL;
+  child->GetProperty ("Caption", (csSome*)&str);
+  iAwsSource* src = tab_ctrl.AddTab (str, (void*)child);
+
+  // hook up the source so we receive the signals
+  slot.Connect(src, awsTab::signalActivateTab, &sink, sink.GetTriggerID("ActivateTab"));
+  slot.Connect(src, awsTab::signalDeactivateTab, &sink, sink.GetTriggerID("DeactivateTab"));
+}
+
+void awsNotebook::OnActivateTab(void* param, iAwsSource* src)
+{
+  iAwsComponent* child;
+  src->GetComponent()->GetProperty("User Param", (void**)&child);
+  child->Show();
+  ((awsNotebook*)param)->Invalidate();
+}
+
+void awsNotebook::OnDeactivateTab(void* param, iAwsSource* src)
+{
+  iAwsComponent* child;
+  src->GetComponent()->GetProperty("User Param", (void**)&child);
+  child->Hide();
+  ((awsNotebook*)param)->Invalidate();
 }
 
 awsNotebookFactory::awsNotebookFactory (
@@ -400,7 +389,7 @@ void awsNotebookButton::GetClientRect (csRect &pf)
 void awsNotebookButton::OnDraw (csRect)
 {
   int tw=0, th=0, tx, ty, itx=0, ity=0;
-  int c_xmin, c_ymin, c_xmax, c_ymax;
+  csRect oldClip;
 
   iGraphics2D *g2d = WindowManager ()->G2D ();
   iGraphics3D *g3d = WindowManager ()->G3D ();
@@ -408,7 +397,8 @@ void awsNotebookButton::OnDraw (csRect)
   csRect pf;
   GetClientRect (pf);
 
-  g2d->GetClipRect (c_xmin, c_ymin, c_xmax, c_ymax);
+  g2d->GetClipRect(oldClip.xmin, oldClip.ymin, oldClip.xmax, oldClip.ymax);
+  pf.Intersect(oldClip);
   g2d->SetClipRect (pf.xmin, pf.ymin, pf.xmax, pf.ymax);
 
   iAwsPrefManager *pm = WindowManager ()->GetPrefMgr ();
@@ -513,8 +503,6 @@ void awsNotebookButton::OnDraw (csRect)
                 pm->GetColor (AC_TEXTFORE), -1, caption->GetData ());
 
   }
-
-  g2d->SetClipRect (c_xmin, c_ymin, c_xmax, c_ymax);
 
 }
 
@@ -718,9 +706,6 @@ bool awsNotebookButtonBar::Setup (iAws *_wmgr, awsComponentNode *settings)
   r.Move (HandleSize+1, 0);
   nextinfo.AddRectKey (new scfString ("Frame"), r);
 
-  prev->SetWindow (Window ());
-  next->SetWindow (Window ());
-
   prev->SetParent (this);
   next->SetParent (this);
 
@@ -782,23 +767,25 @@ void awsNotebookButtonBar::DoLayout ()
   {
     r.ymin = cr.ymax - r.Height ();
     r.ymax = cr.ymax;
+	// should this be -= or just = ???
+	// Noah
     cr.ymax -= (r.ymin+1);
   }
 
-  Frame () = r;
+  ResizeTo(r);
 
   for (i=first-1; i >=0 ; i--)
   {
     awsNotebookButton *btn = vTabs.Get (i)->button;
-    csRect &br =  btn->Frame ();
+    csRect br =  btn->Frame ();
     btn->Hide ();
     r.xmax = r.xmin - 1;
     r.xmin = r.xmax - br.Width ();
-    br = r;
+    btn->ResizeTo(r);
     btn->SetTop (is_top);
-    csRect o = vTabs.Get (i)->comp->Frame ();
-    vTabs.Get (i)->comp->Frame () = cr;
-    vTabs.Get (i)->comp->MoveChildren (cr.xmin - o.xmin, cr.ymin - o.ymin);
+    //csRect o = vTabs.Get (i)->comp->Frame ();
+    vTabs.Get (i)->comp->ResizeTo(cr);
+    //vTabs.Get (i)->comp->MoveChildren (cr.xmin - o.xmin, cr.ymin - o.ymin);
   }
 
   r = Frame ();
@@ -806,15 +793,17 @@ void awsNotebookButtonBar::DoLayout ()
   for (i=MAX(first,0); i < vTabs.Length (); i++)
   {
     awsNotebookButton *btn = vTabs.Get (i)->button;
-    csRect &br =  btn->Frame ();
+    csRect br =  btn->Frame ();
     r.xmax = r.xmin + br.Width ();
-    br = r;
+    btn->ResizeTo(r);
+	br = r;
     r.xmin = r.xmax+1;
     x += br.Width ();
     btn->SetTop (is_top);
-    csRect o = vTabs.Get (i)->comp->Frame ();
-    vTabs.Get (i)->comp->Frame () = cr;
-    vTabs.Get (i)->comp->MoveChildren (cr.xmin - o.xmin, cr.ymin - o.ymin);
+    //csRect o = vTabs.Get (i)->comp->Frame ();
+	vTabs.Get(i)->comp->ResizeTo(cr);
+    //vTabs.Get (i)->comp->Frame () = cr;
+    //vTabs.Get (i)->comp->MoveChildren (cr.xmin - o.xmin, cr.ymin - o.ymin);
   }
 
   if (x > Frame ().Width ())
@@ -823,10 +812,10 @@ void awsNotebookButtonBar::DoLayout ()
     r.xmin = r.xmax - 2*HandleSize-1;
     r.ymin = r.ymax - HandleSize;
     r.xmax = r.xmin + HandleSize;
-    prev->Frame () = r;
+    prev->ResizeTo(r);
     prev->Show ();
     r.Move (HandleSize+1,0);
-    next->Frame () = r;
+    next->ResizeTo(r);
     next->Show ();
   }
   else
@@ -879,7 +868,6 @@ bool awsNotebookButtonBar::Add (iAwsComponent *comp)
       btninfo.AddIntKey (new scfString ("IconAlign"), *iconalign);
   }
 
-  btn->SetWindow (Window ());
   btn->SetParent (this);
   btn->Setup (WindowManager (), btninfo.GetThisNode ());
   btn->SetProperty ("Caption", str);
@@ -890,9 +878,10 @@ bool awsNotebookButtonBar::Add (iAwsComponent *comp)
   if (r.Height () > Frame ().Height())
   {
     int delta = r.Height () - Frame ().Height ();
-    Frame ().ymax +=delta;
+    Resize(Frame().Width(), Frame().Height() + delta);
   }
-  btn->Frame () = r;
+  //btn->Frame () = r;
+  btn->ResizeTo(r);
 
   if (last>0)
   {
@@ -917,7 +906,9 @@ bool awsNotebookButtonBar::Add (iAwsComponent *comp)
   awsSlot *slot = new awsSlot;
   slot->Connect (btn, awsNotebookButton::signalActivateTab, sink, sink->GetTriggerID ("ActivateTab"));
   vTabs.Push (btn, slot, comp, sink);
-  comp->Frame ().ymin = Frame ().ymax+1;
+  //csRect newFrame(Frame());
+  //newFrame.ymin = newFrame.ymax+1;
+  //ResizeTo(newFrame);
   DoLayout ();
 
   btn->Invalidate ();
@@ -960,7 +951,7 @@ void awsNotebookButtonBar::OnDraw (csRect)
 
   int dark = pm->GetColor (AC_SHADOW);
   
-  const csRect &r = Frame();
+  csRect r = Frame();
 
   int y = (is_top ? r.ymax : r.ymin);
 
@@ -997,12 +988,12 @@ void awsNotebookButtonBar::ScrollLeft ()
     for (int i=0; i < vTabs.Length (); i++)
     {
       awsNotebookButton *btn = vTabs.Get (i)->button;
-      csRect &f = btn->Frame ();
-      f.Move (-xdelta,0);
-      if (f.xmin >= Frame ().xmax || f.xmax <= Frame ().xmin)
-        btn->Hide ();
-      else
-        btn->Show ();
+      csRect f = btn->Frame ();
+      btn->Move (-xdelta,0);
+      //if (f.xmin >= Frame ().xmax || f.xmax <= Frame ().xmin)
+      //  btn->Hide ();
+      //else
+      //  btn->Show ();
     }
     first++;
     vTabs.Get (first)->button->SetFirst (true);
@@ -1018,12 +1009,12 @@ void awsNotebookButtonBar::ScrollRight ()
     for (int i=0; i < vTabs.Length (); i++)
     {
       awsNotebookButton *btn = vTabs.Get (i)->button;
-      csRect &f = btn->Frame ();
-      f.Move (xdelta,0);
-      if (f.xmin >= Frame ().xmax || f.xmax <= Frame ().xmin)
-        btn->Hide ();
-      else
-        btn->Show ();
+      csRect f = btn->Frame ();
+      btn->Move (xdelta,0);
+      //if (f.xmin >= Frame ().xmax || f.xmax <= Frame ().xmin)
+      //  btn->Hide ();
+      //else
+      //  btn->Show ();
     }
     first--;
     vTabs.Get (first)->button->SetFirst (true);

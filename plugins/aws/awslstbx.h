@@ -18,7 +18,7 @@
     License along with this library; if not, write to the Free
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 *****************************************************************************/
-# include "awscomp.h"
+# include "awsPanel.h"
 # include "awsitmv.h"
 # include "awsscr.h"
 # include "awsscrbr.h"
@@ -119,7 +119,7 @@ struct awsListHotspot
 
 /// The actual listbox control that puts all this stuff together.
 class awsListBox :
-  public awsComponent
+  public awsPanel
 {
   /// True when button is down, false if up
   bool is_down;
@@ -134,7 +134,7 @@ class awsListBox :
   bool was_down;
 
   /// Holds the background texture (either the global one, or an overridden one
-  iTextureHandle *bkg;
+  //iTextureHandle *bkg;
 
   /// Holds the highlight overlay texture
   iTextureHandle *highlight;
@@ -166,10 +166,10 @@ class awsListBox :
   //////////////////////////////////////////
   //
   //   /// Flags for frame style.
-  int frame_style;
+  //int frame_style;
 
   /// Alpha level for this component
-  int alpha_level;
+  //int alpha_level;
 
   /// Alpha level for highlight bitmap.
   int hi_alpha_level;
@@ -290,26 +290,6 @@ protected:
 public:
   awsListBox ();
   virtual ~awsListBox ();
-
-  /******* Frame Styles **********************/
-
-  /// A bumpy frame, like Group Frame
-  static const int fsBump;
-
-  /// A sunken frame
-  static const int fsSunken;
-
-  /// A raised frame
-  static const int fsRaised;
-
-  /// A simple frame
-  static const int fsSimple;
-
-  /// A flat frame
-  static const int fsFlat;
-
-  /// No frame is drawn
-  static const int fsNone;
 
   /******* Control Types **********************/
 

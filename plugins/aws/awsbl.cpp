@@ -3,11 +3,10 @@
 #include "iaws/aws.h"
 #include "iaws/awsdefs.h"
 
-awsBorderLayout::awsBorderLayout (iAwsComponent *owner, 
-				  iAwsPrefManager *pm,
-				  awsComponentNode *settings):
+awsBorderLayout::awsBorderLayout (iAwsComponent *owner, awsComponentNode* settings,
+				  iAwsPrefManager *pm):
 
-	    awsLayoutManager(owner), 
+	    awsLayoutManager(owner, settings, pm), 
 	    hGap(0), vGap(0)
 
 { 
@@ -19,10 +18,7 @@ awsBorderLayout::awsBorderLayout (iAwsComponent *owner,
 };
 
 
-csRect awsBorderLayout::AddComponent (
-                  iAwsPrefManager *pm,
-                  awsComponentNode *settings,
-                  iAwsComponent *cmp)
+csRect awsBorderLayout::AddComponent (iAwsComponent *cmp, awsComponentNode* settings)
 {
   int d;
 
@@ -65,13 +61,13 @@ void awsBorderLayout::LayoutComponents ()
     cmp=components[GBS_NORTH];
 
     csRect cr = cmp->getPreferredSize();
+	csRect newFrame;
 
-    cmp->Frame().xmin=r.xmin+i.xmin;
-    cmp->Frame().ymin=r.ymin+i.ymin;
-    cmp->Frame().xmax=r.xmax-i.xmax;
-    cmp->Frame().ymax=cmp->Frame().ymin+cr.ymax;
-
-    cmp->OnResized();
+    newFrame.xmin=r.xmin+i.xmin;
+    newFrame.ymin=r.ymin+i.ymin;
+    newFrame.xmax=r.xmax-i.xmax;
+    newFrame.ymax=cmp->Frame().ymin+cr.ymax;
+	cmp->ResizeTo(newFrame);
 
     if (cmp->Frame().Width()<=0 || cmp->Frame().Height()<=0)
       cmp->SetFlag(AWSF_CMP_INVISIBLE);
@@ -85,13 +81,13 @@ void awsBorderLayout::LayoutComponents ()
     cmp=components[GBS_SOUTH];
 
     csRect cr = cmp->getPreferredSize();
+	csRect newFrame;
 
-    cmp->Frame().xmin=r.xmin+i.xmin;
-    cmp->Frame().ymin=r.ymax-i.ymax-cr.ymax;
-    cmp->Frame().xmax=r.xmax-i.xmax;
-    cmp->Frame().ymax=r.ymax-i.ymax;
-
-    cmp->OnResized();
+    newFrame.xmin=r.xmin+i.xmin;
+    newFrame.ymin=r.ymax-i.ymax-cr.ymax;
+    newFrame.xmax=r.xmax-i.xmax;
+    newFrame.ymax=r.ymax-i.ymax;
+	cmp->ResizeTo(newFrame);
 
     if (cmp->Frame().Width()<=0 || cmp->Frame().Height()<=0)
       cmp->SetFlag(AWSF_CMP_INVISIBLE);
@@ -105,13 +101,13 @@ void awsBorderLayout::LayoutComponents ()
     cmp=components[GBS_EAST];
 
     csRect cr = cmp->getPreferredSize();
+    csRect newFrame;
 
-    cmp->Frame().xmin=r.xmin+i.xmin;
-    cmp->Frame().ymin=r.ymin+i.ymin+(has_north ? components[GBS_NORTH]->Frame().Height() + vGap : 0);
-    cmp->Frame().xmax=r.xmin+r.xmin+i.xmin+cr.xmax;
-    cmp->Frame().ymax=r.ymax-i.ymax-(has_south ? components[GBS_SOUTH]->Frame().Height() + vGap : 0);
-
-    cmp->OnResized();
+    newFrame.xmin=r.xmin+i.xmin;
+    newFrame.ymin=r.ymin+i.ymin+(has_north ? components[GBS_NORTH]->Frame().Height() + vGap : 0);
+    newFrame.xmax=r.xmin+i.xmin+cr.xmax;
+    newFrame.ymax=r.ymax-i.ymax-(has_south ? components[GBS_SOUTH]->Frame().Height() + vGap : 0);
+	cmp->ResizeTo(newFrame);
 
     if (cmp->Frame().Width()<=0 || cmp->Frame().Height()<=0)
       cmp->SetFlag(AWSF_CMP_INVISIBLE);
@@ -125,13 +121,14 @@ void awsBorderLayout::LayoutComponents ()
     cmp=components[GBS_WEST];
 
     csRect cr = cmp->getPreferredSize();
+	csRect newFrame;
 
-    cmp->Frame().xmin=r.xmax-i.xmax-cr.xmax;
-    cmp->Frame().ymin=r.ymin+i.ymin+(has_north ? components[GBS_NORTH]->Frame().Height() + vGap : 0);
-    cmp->Frame().xmax=r.xmax-i.xmax;
-    cmp->Frame().ymax=r.ymax-i.ymax-(has_south ? components[GBS_SOUTH]->Frame().Height() + vGap: 0);
+    newFrame.xmin=r.xmax-i.xmax-cr.xmax;
+    newFrame.ymin=r.ymin+i.ymin+(has_north ? components[GBS_NORTH]->Frame().Height() + vGap : 0);
+    newFrame.xmax=r.xmax-i.xmax;
+    newFrame.ymax=r.ymax-i.ymax-(has_south ? components[GBS_SOUTH]->Frame().Height() + vGap: 0);
+	cmp->ResizeTo(newFrame);
 
-    cmp->OnResized();
 
     if (cmp->Frame().Width()<=0 || cmp->Frame().Height()<=0)
       cmp->SetFlag(AWSF_CMP_INVISIBLE);
@@ -144,13 +141,13 @@ void awsBorderLayout::LayoutComponents ()
     cmp=components[GBS_CENTER];
 
     csRect cr = cmp->getPreferredSize();
+    csRect newFrame;
 
-    cmp->Frame().xmin=r.xmin+i.xmin + (has_east ? components[GBS_EAST]->Frame().Width() + hGap : 0);
-    cmp->Frame().ymin=r.ymin+i.ymin + (has_north ? components[GBS_NORTH]->Frame().Height() + vGap : 0);
-    cmp->Frame().xmax=r.xmax-i.xmax - (has_west ? components[GBS_WEST]->Frame().Width() + hGap : 0);
-    cmp->Frame().ymax=r.ymax-i.ymax - (has_south ? components[GBS_SOUTH]->Frame().Height() + vGap : 0);
-
-    cmp->OnResized();
+    newFrame.xmin=r.xmin+i.xmin + (has_east ? components[GBS_EAST]->Frame().Width() + hGap : 0);
+    newFrame.ymin=r.ymin+i.ymin + (has_north ? components[GBS_NORTH]->Frame().Height() + vGap : 0);
+    newFrame.xmax=r.xmax-i.xmax - (has_west ? components[GBS_WEST]->Frame().Width() + hGap : 0);
+    newFrame.ymax=r.ymax-i.ymax - (has_south ? components[GBS_SOUTH]->Frame().Height() + vGap : 0);
+	cmp->ResizeTo(newFrame);
 
     if (cmp->Frame().Width()<=0 || cmp->Frame().Height()<=0)
       cmp->SetFlag(AWSF_CMP_INVISIBLE);

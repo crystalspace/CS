@@ -18,14 +18,14 @@
     License along with this library; if not, write to the Free
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 *****************************************************************************/
-# include "awscomp.h"
+# include "awsPanel.h"
 # include "awscmdbt.h"
 # include "awstimer.h"
 
 class awsSliderButton;
 
 class awsScrollBar :
-  public awsComponent
+  public awsPanel
 {
   /// True when button is down, false if up
   bool is_down;
@@ -36,9 +36,6 @@ class awsScrollBar :
   /// True if button was down, and button is in switch mode (toggle=yes)
   bool was_down;
 
-  /// Holds the texture handle for the background
-  iTextureHandle *tex;
-
   /// Holds the texture handle for the dec arrow
   iTextureHandle *decimg;
 
@@ -47,9 +44,6 @@ class awsScrollBar :
 
   /// Flags for frame style.
   int orientation;
-
-  /// Alpha level for this component
-  int alpha_level;
 
   /// Button for up or left
   awsSliderButton *decVal;

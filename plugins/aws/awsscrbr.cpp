@@ -20,9 +20,7 @@ awsScrollBar::awsScrollBar () :
   is_down(false),
   mouse_is_over(false),
   was_down(false),
-  tex(NULL),
   orientation(0),
-  alpha_level(92),
   decVal(NULL),
   incVal(NULL),
   knob(NULL),
@@ -39,13 +37,12 @@ awsScrollBar::awsScrollBar () :
   value_delta(0.1),
   value_page_delta(0.25)
 {
-  SetFlag (AWSF_CMP_ALWAYSERASE);
+  //SetFlag (AWSF_CMP_ALWAYSERASE);
   captured = false;
 }
 
 awsScrollBar::~awsScrollBar ()
 {
-  if (captured) WindowManager ()->ReleaseMouse ();
   if (dec_slot)
     dec_slot->Disconnect (
         decVal,
@@ -71,6 +68,9 @@ awsScrollBar::~awsScrollBar ()
         sink,
         sink->GetTriggerID ("TickTock"));
 
+  SCF_DEC_REF (incVal);
+  SCF_DEC_REF (decVal);
+  SCF_DEC_REF (knob);
   SCF_DEC_REF (sink);
   SCF_DEC_REF (inc_slot);
   SCF_DEC_REF (dec_slot);
@@ -78,6 +78,7 @@ awsScrollBar::~awsScrollBar ()
   SCF_DEC_REF (tick_slot);
   SCF_DEC_REF (timer);
 
+  if (captured) WindowManager ()->ReleaseMouse ();
 }
 
 char *awsScrollBar::Type ()
@@ -87,13 +88,11 @@ char *awsScrollBar::Type ()
 
 bool awsScrollBar::Setup (iAws *_wmgr, awsComponentNode *settings)
 {
-  if (!awsComponent::Setup (_wmgr, settings)) return false;
+  if (!awsPanel::Setup (_wmgr, settings)) return false;
 
   iAwsPrefManager *pm = WindowManager ()->GetPrefMgr ();
 
-  pm->LookupIntKey ("OverlayTextureAlpha", alpha_level);  // global get
   pm->GetInt (settings, "Orientation", orientation);
-  pm->GetInt (settings, "Alpha", alpha_level);            // local overrides, if present.
   int h = (int)min;
   h = (int)min;
   pm->GetInt (settings, "Min", h);
@@ -107,8 +106,6 @@ bool awsScrollBar::Setup (iAws *_wmgr, awsComponentNode *settings)
   h = (int)amntvis;
   pm->GetInt (settings, "PageSize", h);
   amntvis = (float)h;
-
-  tex = pm->GetTexture ("Texture");
 
   // Setup embedded buttons
   incVal = new awsSliderButton;
@@ -128,9 +125,9 @@ bool awsScrollBar::Setup (iAws *_wmgr, awsComponentNode *settings)
       new scfString ("knob"),
       new scfString ("Slider Button"));
 
-  decinfo.AddIntKey (new scfString ("Style"), awsCmdButton::fsToolbar);
-  incinfo.AddIntKey (new scfString ("Style"), awsCmdButton::fsToolbar);
-  knobinfo.AddIntKey (new scfString ("Style"), awsCmdButton::fsToolbar);
+  decinfo.AddIntKey (new scfString ("Style"), awsCmdButton::fsNormal);
+  incinfo.AddIntKey (new scfString ("Style"), awsCmdButton::fsNormal);
+  knobinfo.AddIntKey (new scfString ("Style"), awsCmdButton::fsNormal);
 
   switch (orientation)
   {
@@ -203,9 +200,7 @@ bool awsScrollBar::Setup (iAws *_wmgr, awsComponentNode *settings)
       break;
   } // end switch framestyle
 
-  decVal->SetWindow (Window ());
-  incVal->SetWindow (Window ());
-  knob->SetWindow (Window ());
+  //  DEBUG_BREAK;
 
   decVal->SetParent (this);
   incVal->SetParent (this);
@@ -218,12 +213,14 @@ bool awsScrollBar::Setup (iAws *_wmgr, awsComponentNode *settings)
   decVal->SetProperty ("Image", decimg);
   incVal->SetProperty ("Image", incimg);
 
+
   csTicks t = (csTicks) 10;
   incVal->SetProperty ("TicksPerSecond", (void *) &t);
   decVal->SetProperty ("TicksPerSecond", (void *) &t);
   knob->SetProperty ("TicksPerSecond", (void *) &t);
 
   sink = new awsSink (this);
+
   sink->RegisterTrigger ("DecValue", &DecClicked);
   sink->RegisterTrigger ("IncValue", &IncClicked);
   sink->RegisterTrigger ("TickTock", &TickTock);
@@ -461,9 +458,10 @@ void awsScrollBar::DecClicked (void *sk, iAwsSource *)
   sb->Invalidate ();
 }
 
-void awsScrollBar::OnDraw (csRect /*clip*/)
+void awsScrollBar::OnDraw (csRect clip)
 {
-  aws3DFrame frame3d;
+
+
   int height = 10, width = 10;
 
   csRect f (Frame ());
@@ -525,9 +523,9 @@ void awsScrollBar::OnDraw (csRect /*clip*/)
       f.xmax = incVal->Frame ().xmin - 1;
   }
 
-  knob->Frame () = f;
+  knob->ResizeTo(f);
 
-  //  frame3d.Draw(WindowManager(), Window(), f, aws3DFrame::fsRaised, tex, alpha_level);
+  awsPanel::OnDraw(clip);
 }
 
 bool awsScrollBar::OnMouseDown (int btn, int x, int y)
@@ -655,11 +653,9 @@ void awsScrollBar::OnResized ()
   int h = incVal->Frame ().Height ();
   int w = incVal->Frame ().Width ();
 
-  decVal->Frame ().SetPos (Frame ().xmax - w, Frame ().ymin);
-  incVal->Frame ().SetPos (Frame ().xmax - w, Frame ().ymax - h);
+  decVal->MoveTo(Frame ().xmax - w, Frame ().ymin);
+  incVal->MoveTo(Frame ().xmax - w, Frame ().ymax - h);
 
-  incVal->Frame ().SetSize (w, h);
-  decVal->Frame ().SetSize (w, h);
 }
 
 /************************************* Command Button Factory ****************/

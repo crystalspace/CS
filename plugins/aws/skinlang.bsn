@@ -103,16 +103,24 @@ connection_item_list: connection_item
 component_item: TOKEN_ATTR ':' TOKEN_STR                                        { kcont[klevel].Add(new awsStringKey(new scfString($1), new scfString($3)));         }
 	      | TOKEN_ATTR ':' exp                                              { kcont[klevel].Add(new awsIntKey(new scfString($1), $3));                           }
 	      | TOKEN_ATTR ':' exp ',' exp ',' exp                              { kcont[klevel].Add(new awsRGBKey(new scfString($1), $3, $5, $7));                   }
-              | TOKEN_ATTR ':' '(' exp ',' exp ')' '-' '(' exp ',' exp ')'      { kcont[klevel].Add(new awsRectKey(new scfString($1), csRect($4, $6, $10, $12)));    }
-			  | TOKEN_CONNECT													{ ++klevel; /* go down a level (mid-action rule) */ }
+          | TOKEN_ATTR ':' '(' exp ',' exp ')' '-' '(' exp ',' exp ')'      { kcont[klevel].Add(new awsRectKey(new scfString($1), csRect($4, $6, $10, $12)));    }
+		  | TOKEN_CONNECT													{ ++klevel; /* go down a level (mid-action rule) */ }
 				     '{' connection_item_list '}'						        { awsConnectionNode *cn = new awsConnectionNode();
 																				  ((awsKeyContainer*)cn)->Consume(&(kcont[klevel]));
 																				  --klevel;
 																				  kcont[klevel].Add(cn);
 																				}
-			  | TOKEN_COMPONENT TOKEN_STR TOKEN_IS TOKEN_STR
+		  | TOKEN_COMPONENT TOKEN_STR TOKEN_IS TOKEN_STR
 					 '{'														{ ++klevel; /* go down a level (mid-action rule) */ }
 					  component_item_list '}'									{ awsComponentNode *cn = new awsComponentNode(new scfString($2), new scfString($4));
+																				  ((awsKeyContainer*)cn)->Consume(&(kcont[klevel]));
+																				  --klevel;  /* go up a level in recursion */
+																				  kcont[klevel].Add(cn);
+																				}
+
+		   | TOKEN_WINDOW TOKEN_STR 
+					 '{'														{ ++klevel; /* go down a level (mid-action rule) */ }
+					  component_item_list '}'									{ awsComponentNode *cn = new awsComponentNode(new scfString($2), new scfString("Window"));
 																				  ((awsKeyContainer*)cn)->Consume(&(kcont[klevel]));
 																				  --klevel;  /* go up a level in recursion */
 																				  kcont[klevel].Add(cn);

@@ -104,11 +104,17 @@ bool awsCheckBox::SetProperty (char *name, void *parm)
 
     return true;
   }
+
   else if (strcmp ("State", name) == 0)
+
   {
+
    
+
     is_on = *(bool *)parm;
+
     return true;
+
   }
 
   return false;

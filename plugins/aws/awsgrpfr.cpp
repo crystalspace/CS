@@ -10,19 +10,9 @@
 
 #include <stdio.h>
 
-const int awsGroupFrame:: fsBump = 0x0;
-const int awsGroupFrame:: fsSimple = 0x1;
-const int awsGroupFrame:: fsRaised = 0x2;
-const int awsGroupFrame:: fsSunken = 0x3;
-const int awsGroupFrame:: fsFlat = 0x4;
-const int awsGroupFrame:: fsNone = 0x5;
-
 const int awsGroupFrame:: signalClicked = 0x1;
 
 awsGroupFrame::awsGroupFrame () :
-  frame_style(0),
-  alpha_level(96),
-  bkg(NULL),
   caption(NULL)
 {
 }
@@ -38,22 +28,18 @@ char *awsGroupFrame::Type ()
 
 bool awsGroupFrame::Setup (iAws *_wmgr, awsComponentNode *settings)
 {
-  if (!awsComponent::Setup (_wmgr, settings)) return false;
+  if (!awsPanel::Setup (_wmgr, settings)) return false;
 
   iAwsPrefManager *pm = WindowManager ()->GetPrefMgr ();
 
-  pm->LookupIntKey ("OverlayTextureAlpha", alpha_level);
-  pm->GetInt (settings, "Style", frame_style);
   pm->GetString (settings, "Caption", caption);
-
-  bkg = pm->GetTexture ("Texture");
 
   return true;
 }
 
 bool awsGroupFrame::GetProperty (char *name, void **parm)
 {
-  if (awsComponent::GetProperty (name, parm)) return true;
+  if (awsPanel::GetProperty (name, parm)) return true;
 
   if (strcmp ("Caption", name) == 0)
   {
@@ -71,7 +57,7 @@ bool awsGroupFrame::GetProperty (char *name, void **parm)
 
 bool awsGroupFrame::SetProperty (char *name, void *parm)
 {
-  if (awsComponent::SetProperty (name, parm)) return true;
+  if (awsPanel::SetProperty (name, parm)) return true;
 
   if (strcmp ("Caption", name) == 0)
   {
@@ -96,19 +82,11 @@ bool awsGroupFrame::SetProperty (char *name, void *parm)
   return false;
 }
 
-void awsGroupFrame::OnDraw (csRect /*clip*/)
+void awsGroupFrame::OnDraw (csRect clip)
 {
+  awsPanel::OnDraw(clip);
+
   iGraphics2D *g2d = WindowManager ()->G2D ();
-
-  aws3DFrame frame3d;
-
-  frame3d.Draw (
-      WindowManager (),
-      Window (),
-      Frame (),
-      frame_style,
-      bkg,
-      alpha_level);
 
   // Draw the caption, if there is one
   if (caption)
@@ -136,76 +114,6 @@ void awsGroupFrame::OnDraw (csRect /*clip*/)
   }
 }
 
-bool awsGroupFrame::OnMouseDown (int, int, int)
-{
-  return false;
-}
-
-bool awsGroupFrame::OnMouseUp (int, int, int)
-{
-  return false;
-}
-
-bool awsGroupFrame::OnMouseMove (int, int, int)
-{
-  return false;
-}
-
-bool awsGroupFrame::OnMouseClick (int, int, int)
-{
-  return false;
-}
-
-bool awsGroupFrame::OnMouseDoubleClick (int, int, int)
-{
-  return false;
-}
-
-bool awsGroupFrame::OnMouseExit ()
-{
-  return false;
-}
-
-bool awsGroupFrame::OnMouseEnter ()
-{
-  return false;
-}
-
-bool awsGroupFrame::OnKeypress (int, int)
-{
-  return false;
-}
-
-bool awsGroupFrame::OnLostFocus ()
-{
-  return false;
-}
-
-bool awsGroupFrame::OnGainFocus ()
-{
-  return false;
-}
-
-csRect awsGroupFrame::getInsets()
-{
-  switch(frame_style)
-  {
-  case fsBump:
-    return csRect(4,4,4,4);
-
-  case fsFlat:
-  case fsSimple:
-    return csRect(1,1,1,1);
-
-  case fsRaised:
-  case fsSunken:
-    return csRect(2,2,2,2);
-  
-  case fsNone:
-  default:
-    return csRect(0,0,0,0);
-  }
-}
 
 /************************************* Command Button Factory ****************/
 
@@ -214,13 +122,6 @@ awsGroupFrameFactory::awsGroupFrameFactory (
     awsComponentFactory(wmgr)
 {
   Register ("Group Frame");
-  RegisterConstant ("gfsBump", awsGroupFrame::fsBump);
-  RegisterConstant ("gfsSimple", awsGroupFrame::fsSimple);
-  RegisterConstant ("gfsSunken", awsGroupFrame::fsSunken);
-  RegisterConstant ("gfsRaised", awsGroupFrame::fsRaised);
-  RegisterConstant ("gfsFlat", awsGroupFrame::fsFlat);
-  RegisterConstant ("gfsNone", awsGroupFrame::fsNone);
-
   RegisterConstant ("signalGroupFrameClicked", awsGroupFrame::signalClicked);
 }
 
