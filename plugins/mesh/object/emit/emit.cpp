@@ -818,6 +818,10 @@ IMPLEMENT_IBASE (csEmitMeshObjectFactory)
   IMPLEMENTS_EMBEDDED_INTERFACE (iEmitFactoryState)
 IMPLEMENT_IBASE_END
 
+IMPLEMENT_EMBEDDED_IBASE (csEmitMeshObjectFactory::EmitFactoryState)
+  IMPLEMENTS_INTERFACE (iEmitFactoryState)
+IMPLEMENT_EMBEDDED_IBASE_END
+
 csEmitMeshObjectFactory::csEmitMeshObjectFactory (iBase *pParent, iSystem* system)
 {
   CONSTRUCT_IBASE (pParent);
