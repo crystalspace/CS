@@ -31,6 +31,10 @@ chronological order.
 	  that it agrees with the new simple1 tutorial which is now based upon
 	  csApplicationFramework. Also updated out-of-date material in
 	  sprcal3d.txi and corrected a number of errors.
+	- Eric Sunshine fixed oversight in 4-Nov-2004 change to 'install_data'
+	  where it neglected to install config.sub, config.guess, and
+	  install-sh into ${datadir}/build/autoconf. These are needed by
+	  jamtemplate.
 19-Nov-2004
 	- PK fixed the mesh attaching to sockets in viewmesh by adding
 	  sprite->GetMovable()->UpdateMove() to ViewMesh::AttachMeshToSocket.
