@@ -79,6 +79,8 @@ chronological order.
 	      This can be done either with a config setting 
 	      "Engine.RenderLoop.Default" or a "-renderloop=X" command line
 	      parameter. In both cases, the full VFS name must be specified.
+	    - Removed "ALTERNATE_RENDERLOOP" #define from engine. Using 
+	      renderloops is default now.
 	    - Added two renderloops in data/shader.
 	    - Changed csHash<> so all 'key' parameters are now const refs.
 	    - Added a 'csHashReversible<>' which is analogue to 
