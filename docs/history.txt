@@ -6,6 +6,9 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+19-Aug-2003
+	- Jorrit fixed a bug in the new optimization in odedynamics where
+	  the transform of the object was ignored.
 18-Aug-2003
 	- Jorrit fixed a bug with destruction of hierarchical factories.
 	  The problem was that it was trying to remove objects from

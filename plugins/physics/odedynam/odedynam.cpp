@@ -543,19 +543,13 @@ int csODEDynamics::CollideMeshSphere (dGeomID mesh, dGeomID sphere, int flags,
 
   int outcount = 0;
 
-#if 1
   csPolygonTree* tree = mi->tree;
   csArray<int> polyidx;
-  tree->IntersectSphere (polyidx, center, rad*rad);
+  tree->IntersectSphere (polyidx, mesht.Other2This (center), rad*rad);
   tree->RemoveDoubles (polyidx);
   for (int i = 0; i < polyidx.Length () && outcount < N; i ++)
   {
     csMeshedPolygon& poly = polygon_list[polyidx[i]];
-#else
-  for (int i = 0; i < p->GetPolygonCount() && outcount < N; i ++)
-  {
-    csMeshedPolygon& poly = polygon_list[i];
-#endif
     csPlane3 plane(vertex_table[poly.vertices[0]] / mesht,
       vertex_table[poly.vertices[1]] / mesht,
       vertex_table[poly.vertices[2]] / mesht);
