@@ -26,8 +26,6 @@ endif # ifeq ($(MAKESECTION),roottargets)
 #------------------------------------------------------------- postdefines ---#
 ifeq ($(MAKESECTION),postdefines)
 
-MNG.LFLAGS += $(MNG.LFLAGS) $(ZLIB.LFLAGS) $(JPEG.LFLAGS)
-
 ifeq ($(USE_PLUGINS),yes)
   CSJNGIMG = $(OUTDLL)/csjngimg$(DLL)
   LIB.CSJNGIMG = $(foreach d,$(DEP.CSJNGIMG),$($d.LIB))
