@@ -3,6 +3,10 @@ http://crystal.sourceforge.net/
 
 The history order is reversed so that new features are at the top.
 
+27-Apr-2003
+	- Philip Wyett fixed the DDS plugin compilation under MSVC,
+	  by replacing struct with static (don't ask) and giving the
+	  the array an element size.
 26-Apr-2003
 	- Norman Kraemer added a swig.jam file for custom swig rules and
 	  used the new power to rebuild the cs_pyth.cpp from cspace.i if

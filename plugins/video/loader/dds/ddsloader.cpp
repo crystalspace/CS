@@ -23,7 +23,7 @@
 
 #define DDS_MIME "image/dds"
 
-struct iImageIO::FileFormatDescription formatlist[] =
+static iImageIO::FileFormatDescription formatlist[1] =
 {
   {DDS_MIME, "RGBA", CS_IMAGEIO_LOAD}
 };
@@ -34,7 +34,8 @@ csDDSImageIO::csDDSImageIO (iBase* parent)
 
   int formatcount =
     sizeof(formatlist)/sizeof(iImageIO::FileFormatDescription);
-  for (int i=0; i < formatcount; i++)
+  int i;
+  for (i=0; i < formatcount; i++)
     formats.Push (&formatlist[i]);
 }
 
@@ -115,7 +116,8 @@ bool csDDSImageFile::Load (dds::Loader* loader)
   convert_rgba ((csRGBpixel*) img);
 
   mipmapcount = loader->GetMipmapCount ();
-  for (int i=0;i<mipmapcount;i++)
+  int i;
+  for (i=0;i<mipmapcount;i++)
   {
     uint8* img = loader->LoadMipmap(i);
     if (!img)
@@ -159,4 +161,3 @@ SCF_EXPORT_CLASS_TABLE (csddsimg)
   SCF_EXPORT_CLASS (csDDSImageIO, "crystalspace.graphic.image.io.dds",
       "DDS image format I/O plugin")
 SCF_EXPORT_CLASS_TABLE_END
-
