@@ -178,12 +178,7 @@ bool NeXTProxy2D::open( char const* title )
 	bitsPerSample:frame_buffer->bits_per_sample()];
     [window setContentView:view];
 
-    NSSize const s = [[NSScreen mainScreen] frame].size; // Center window.
-    NSRect const frame = [window frame];
-    [window setFrameOrigin:
-	NSMakePoint(int((s.width  - frame.size.width ) / 2),
-		    int((s.height - frame.size.height) / 2))];
-
+    [window center];
     [window makeFirstResponder:view];
     [window makeKeyAndOrderFront:0];
     [[NSApp delegate] registerAnimationWindow:window];	// *NOTE*

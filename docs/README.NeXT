@@ -3,7 +3,7 @@
 
     This document was written by Eric Sunshine <sunshine@sunshineco.com>
     Copyright (C)1999 by Eric Sunshine
-    1999/09/03
+    1999/09/13
 
     Also see INSTALL.NeXT for installation details.
 ===============================================================================
@@ -538,7 +538,12 @@ efficient.
 ---------------
 This is a list of items which are planned for future releases of this project.
 
-    o Use -[NSWindow center] to center window instead of computing it manually.
+    o Possibly only flush only part of the frame buffer to the display in
+      csGraphics2D::Print() rather than the entire frame buffer.  Be careful,
+      though.  The current technique of flushing the entire frame buffer takes
+      advantage of out-of-line data in Mach messages, so it is very fast.  I
+      do not know if this same form of fast transport will be used if only a
+      portion of the bitmap is drawn.
     o Re-write event handling so that it no longer relies on a timer to drive
       animation.  The problem with using the timer is that (1) it places an
       upper limit on the frame rate, and (2) on slow machines it can fire
@@ -588,6 +593,9 @@ This is a list of known problems with the current release of this project.
 
 10. History
 -----------
+1999/09/13 (15r000+CVS)
+    Now uses -[NSWindow center] to center window instead of doing so manually.
+
 1999/08/06 (14r000+CVS)
     Added "simulated depth" support via the VideoDriver/SIMULATE_DEPTH
         configuration option and the -simdepth command line argument.  This

@@ -176,11 +176,7 @@ bool NeXTProxy2D::open( char const* title )
 	bitsPerSample:frame_buffer->bits_per_sample()];
     [[window setContentView:view] free];
 
-    NXSize s; [NXApp getScreenSize:&s];	// Center window on-screen.
-    NXRect frame; [window getFrame:&frame];
-    [window moveTo:int((s.width  - frame.size.width)  / 2) :
-		   int((s.height - frame.size.height) / 2)];
-
+    [window center];
     [window makeFirstResponder:view];
     [window makeKeyAndOrderFront:0];
     [[NXApp delegate] registerAnimationWindow:window];	// *NOTE*
