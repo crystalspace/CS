@@ -4,6 +4,7 @@ http://crystal.sourceforge.net/
 The history order is reversed so that new features are at the top.
 
 16-Apr-2003
+	- Micah fixed some typos in the movie recorder HOWTO
 	- Matze did the following changes to the jambuild:
 	    - Added workarounds to make the system working with boostjam.
 	    - Completely reworked the documentation rules.

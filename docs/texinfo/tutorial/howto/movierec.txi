@@ -63,7 +63,7 @@ This creates an AVI file using ffmpeg's mpeg4 codec. See mencoder's manpage for 
 
 @subsubheading Configuring the movie recorder
 
-The movie recorder reads a configuration frile from @samp{data/config/movierecorder.cfg} if
-it exists. This file lets you change the recording and pause hotkeys, the filenames, and
+The movie recorder reads its configuration from @samp{data/config/movierecorder.cfg} if
+the file exists. This lets you change the recording and pause hotkeys, the filenames, and
 compression settings. See the comments in the default @samp{movierecorder.cfg} for a
 description of each item.
