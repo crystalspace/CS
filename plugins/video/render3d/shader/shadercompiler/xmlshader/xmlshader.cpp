@@ -942,8 +942,8 @@ csPtr<iShader> csXMLShaderCompiler::CompileShader (iDocumentNode *templ,
 	Report (CS_REPORTER_SEVERITY_NOTIFY,
 	  "Shader '%s': Technique with priority %d fails. Reason: %s.",
 	  shader->GetName(), tk.priority, tech->GetFailReason());
-	delete tech;
       }
+      delete tech;
     }
   }
 

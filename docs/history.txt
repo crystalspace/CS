@@ -8,6 +8,8 @@ chronological order.
 
 23-Aug-2004
 	- Jorrit added lots more leak guards.
+	- Jorrit fixed a leak in xmlshader where a failing technique was
+	  only deleted in case -verbose commandline option was given.
 22-Aug-2004
 	- Jorrit fixed a leak in spr3d. Everytime an spr3d was created
 	  it couldn't be removed again.
