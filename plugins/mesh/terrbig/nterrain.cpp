@@ -520,7 +520,7 @@ bool csBigTerrainObject::ConvertImageToMapFile (iFile *input,
   if (image->GetWidth () != image->GetHeight ()) {
     image->Rescale (image->GetWidth (), image->GetWidth ());
   }
-  FILE *hmfp = fopen (hm, "w");
+  FILE *hmfp = fopen (hm, "wb");
   if (!hmfp) {
     csReport (object_reg, CS_REPORTER_SEVERITY_ERROR, 
     	"crystalspace.mesh.object.terrbig", 
