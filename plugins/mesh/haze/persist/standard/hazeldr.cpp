@@ -296,6 +296,8 @@ bool csHazeFactorySaver::Initialize (iObjectRegistry* object_reg)
   return true;
 }
 
+#if 0
+
 #define MAXLINE 100 /* max number of chars per line... */
 
 /// write hull to string
@@ -324,6 +326,8 @@ static void WriteHull(csString& str, iHazeHull *hull)
   }
   printf ("Unknown hazehull type, cannot writedown!\n");
 }
+
+#endif
 
 void csHazeFactorySaver::WriteDown (iBase*, iFile*)
 {
