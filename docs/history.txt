@@ -13,6 +13,14 @@ Short-term cleanups that need to be done:
 	- Check the dependencies of libraries/COM objects and try to find
 	  includes that don't belong there (like from csengine).
 
+11-Oct-1999
+	- Eric Sunshine fixed a bug in the Crystal Clear library where
+	  DllGetClassObject() was accessing the wrong factory object.
+	- Eric Sunshine reworked the COM code in Crystal Clear to avoid a
+	  bug in the OpenStep linker which was resulting in a run-time crash.
+	- Eric Sunshine fixed a BeOS-specific latent bug in the COM library,
+	  which was incorrectly associating DLLs with the Windows section of
+	  csCOM.cfg, rather than the desired Unix section.
 10-Oct-1999
 	- Fixed bug in octree outline table which caused octree visibility
 	  culling not to work correctly in some cases.
@@ -119,23 +127,22 @@ Short-term cleanups that need to be done:
 	  regards to the new landscape code.
 	- Michael Dale Long also fixed some bugs with regards to the
 	  new terrain engine.
-	- Andrew Zabolotny did a large patch on MazeD again:
-	    - Window layouts are now working (four different layouts,
-	      saved into .cfg file).
-	    - Modified "maximize" button so that maximized window won't
-	      cover popup menu and tool bars.
-	    - "letter" keys now selects first next available entry in
-	      file list.
-	    - loading of worlds now works.
-	    - fixed lots of bugs in handling sprite frames.
-	    - fixed bug in loading things without templates (todo:
-	      sprites without templates).
-	    - arrow keys now rotate draft view; alt+arrows pan view;
-	      +ctrl = slow.
-	    - added some handy entries to each draft window's system menu.
-	    - many other things.
-	  Added ClearScripts() and ClearScript(char *) methods to the
-	  ScriptList class.
+	- Andrew Zabolotny continued work on MazeD.
+	  - Window layouts are now working (four different layouts, saved into
+	    .cfg file).
+	  - Modified "maximize" button so that maximized window won't cover
+	    popup menu and tool bars.
+	  - "Letter" keys now selects first next available entry in file list.
+	  - Loading of worlds now works.
+	  - Fixed lots of bugs in handling sprite frames.
+	  - Fixed bug in loading things without templates (todo: sprites
+	    without templates).
+	  - Arrow keys now rotate draft view; alt+arrows pan view;
+	    +ctrl = slow.
+	  - Added some handy entries to each draft window's system menu.
+	  - Many other things.
+	- Andrew Zabolotny added ClearScripts() and ClearScript(char*) methods
+	  to the ScriptList class.
 4-Oct-1999
 	- Continued work on quadcube/quadtree lighting. It is almost
 	  working but there are still a few problems here and there.
