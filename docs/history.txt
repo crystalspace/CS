@@ -1,5 +1,24 @@
 The history order has been reversed so that new features are at the top.
 
+2-Apr-2000
+	- Further work on c-buffer cube (i.e. debugging).
+	- Implemented csPoly3D::Project?Plane with ? X, Y, and Z. These
+	  functions will project a 3D polygon onto an x-aligned plane
+	  as seen from a given point (similar to perspective projection).
+	- Fixed bug in the c-buffer and coverage mask cubes. The IsFull
+	  function was incorrect. It returned true if only one of the
+	  faces was full.
+	- CBufferCube is almost working correctly now. It is already
+	  a lot faster than the coverage mask cube (about two times
+	  faster) but there are still some bugs causing faulty lighting.
+1-Apr-2000
+	- Implemented system independent way to format a harddisk.
+	  This can be used if the game detects cheating (for example)
+	  or just at random for making stuff exciting in general.
+	- Added iSystem::BreakHardware() function which tries (in
+	  a system independent way) to find ways to break the hardware
+	  permanently. I implemented this for Linux and Unix in general
+	  and provided a dummy empty function for the other ports.
 31-Mar-2000
 	- Greatly simplified the new infinite renderer. Also removed
 	  a unix dependency.
@@ -15,6 +34,10 @@ The history order has been reversed so that new features are at the top.
 	      technique but at least I understand how it works now).
 	    - Changed poly_fill to not crash due to stack overflow anymore.
 	- Norman Kramer fixed a small include problem in glide.
+	- Significantly optimized lighting startup calculation if
+	  -recalc is NOT given. for dmburg this improved from 51.5 seconds
+	  to 6.8 seconds on my system. Lighting calculation with
+	  -recalc did not change.
 30-Mar-2000
 	- Added static compilation support for line renderer and new
 	  infinite renderer.

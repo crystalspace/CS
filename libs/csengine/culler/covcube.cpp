@@ -157,13 +157,13 @@ void csCovcube::MakeEmpty ()
 
 bool csCovcube::IsFull ()
 {
-  if (trees[0]->IsFull ()) return true;
-  if (trees[1]->IsFull ()) return true;
-  if (trees[2]->IsFull ()) return true;
-  if (trees[3]->IsFull ()) return true;
-  if (trees[4]->IsFull ()) return true;
-  if (trees[5]->IsFull ()) return true;
-  return false;
+  if (!trees[0]->IsFull ()) return false;
+  if (!trees[1]->IsFull ()) return false;
+  if (!trees[2]->IsFull ()) return false;
+  if (!trees[3]->IsFull ()) return false;
+  if (!trees[4]->IsFull ()) return false;
+  if (!trees[5]->IsFull ()) return false;
+  return true;
 }
 
 bool csCovcube::InsertPolygon (csVector3* verts, int num_verts)

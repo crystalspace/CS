@@ -89,21 +89,21 @@ bool csCBufferPersp::DoPerspective (csVector3* verts, int num_verts,
 }
 
 bool csCBufferPersp::InsertPolygon (csVector3* verts, int num_verts,
-	csClipper* /*clipper*/)
+	csClipper* clipper)
 {
   static csPolygon2D persp;
   if (!DoPerspective (verts, num_verts, persp)) return false;
-  //if (clipper && !persp.ClipAgainst (clipper)) return false;
+  if (clipper && !persp.ClipAgainst (clipper)) return false;
   return csCBuffer::InsertPolygon (persp.GetVertices (),
   	persp.GetNumVertices ());
 }
 
 bool csCBufferPersp::TestPolygon (csVector3* verts, int num_verts,
-	csClipper* /*clipper*/)
+	csClipper* clipper)
 {
   static csPolygon2D persp;
   if (!DoPerspective (verts, num_verts, persp)) return false;
-  //if (clipper && !persp.ClipAgainst (clipper)) return false;
+  if (clipper && !persp.ClipAgainst (clipper)) return false;
   return csCBuffer::TestPolygon (persp.GetVertices (),
   	persp.GetNumVertices ());
 }
@@ -118,6 +118,8 @@ csCBufferCube::csCBufferCube (int dim)
   CHK (trees[3] = new csCBufferPersp (0, dim-1, dim));
   CHK (trees[4] = new csCBufferPersp (0, dim-1, dim));
   CHK (trees[5] = new csCBufferPersp (0, dim-1, dim));
+  csBox b (0, 0, dim, dim);
+  CHK (clipper = new csBoxClipper (b));
 }
 
 csCBufferCube::~csCBufferCube ()
@@ -128,6 +130,7 @@ csCBufferCube::~csCBufferCube ()
   CHK (delete trees[3]);
   CHK (delete trees[4]);
   CHK (delete trees[5]);
+  CHK (delete clipper);
 }
 
 void csCBufferCube::MakeEmpty ()
@@ -142,13 +145,13 @@ void csCBufferCube::MakeEmpty ()
 
 bool csCBufferCube::IsFull ()
 {
-  if (trees[0]->IsFull ()) return true;
-  if (trees[1]->IsFull ()) return true;
-  if (trees[2]->IsFull ()) return true;
-  if (trees[3]->IsFull ()) return true;
-  if (trees[4]->IsFull ()) return true;
-  if (trees[5]->IsFull ()) return true;
-  return false;
+  if (!trees[0]->IsFull ()) return false;
+  if (!trees[1]->IsFull ()) return false;
+  if (!trees[2]->IsFull ()) return false;
+  if (!trees[3]->IsFull ()) return false;
+  if (!trees[4]->IsFull ()) return false;
+  if (!trees[5]->IsFull ()) return false;
+  return true;
 }
 
 bool csCBufferCube::InsertPolygon (csVector3* verts, int num_verts)
@@ -159,7 +162,7 @@ bool csCBufferCube::InsertPolygon (csVector3* verts, int num_verts)
 
   // -> Z
   if (!trees[0]->IsFull ())
-    rc1 = trees[0]->InsertPolygon (verts, num_verts);
+    rc1 = trees[0]->InsertPolygon (verts, num_verts, clipper);
   else
     rc1 = false;
 
@@ -172,7 +175,7 @@ bool csCBufferCube::InsertPolygon (csVector3* verts, int num_verts)
       cam[i].y = verts[i].y;
       cam[i].z = -verts[i].z;
     }
-    rc2 = trees[1]->InsertPolygon (cam, num_verts);
+    rc2 = trees[1]->InsertPolygon (cam, num_verts, clipper);
   }
   else
     rc2 = false;
@@ -186,7 +189,7 @@ bool csCBufferCube::InsertPolygon (csVector3* verts, int num_verts)
       cam[i].y = verts[i].y;
       cam[i].z = -verts[i].x;
     }
-    rc3 = trees[2]->InsertPolygon (cam, num_verts);
+    rc3 = trees[2]->InsertPolygon (cam, num_verts, clipper);
   }
   else
     rc3 = false;
@@ -200,7 +203,7 @@ bool csCBufferCube::InsertPolygon (csVector3* verts, int num_verts)
       cam[i].y = verts[i].y;
       cam[i].z = verts[i].x;
     }
-    rc4 = trees[3]->InsertPolygon (cam, num_verts);
+    rc4 = trees[3]->InsertPolygon (cam, num_verts, clipper);
   }
   else
     rc4 = false;
@@ -214,7 +217,7 @@ bool csCBufferCube::InsertPolygon (csVector3* verts, int num_verts)
       cam[i].y = verts[i].z;
       cam[i].z = -verts[i].y;
     }
-    rc5 = trees[4]->InsertPolygon (cam, num_verts);
+    rc5 = trees[4]->InsertPolygon (cam, num_verts, clipper);
   }
   else
     rc5 = false;
@@ -228,7 +231,7 @@ bool csCBufferCube::InsertPolygon (csVector3* verts, int num_verts)
       cam[i].y = -verts[i].z;
       cam[i].z = verts[i].y;
     }
-    rc6 = trees[5]->InsertPolygon (cam, num_verts);
+    rc6 = trees[5]->InsertPolygon (cam, num_verts, clipper);
   }
   else
     rc6 = false;
@@ -243,7 +246,7 @@ bool csCBufferCube::TestPolygon (csVector3* verts, int num_verts)
 
   // -> Z
   if (!trees[0]->IsFull ())
-    if (trees[0]->TestPolygon (verts, num_verts)) return true;
+    if (trees[0]->TestPolygon (verts, num_verts, clipper)) return true;
 
   // -> -Z
   if (!trees[1]->IsFull ())
@@ -254,7 +257,7 @@ bool csCBufferCube::TestPolygon (csVector3* verts, int num_verts)
       cam[i].y = verts[i].y;
       cam[i].z = -verts[i].z;
     }
-    if (trees[1]->TestPolygon (cam, num_verts)) return true;
+    if (trees[1]->TestPolygon (cam, num_verts, clipper)) return true;
   }
 
   // -> X
@@ -266,7 +269,7 @@ bool csCBufferCube::TestPolygon (csVector3* verts, int num_verts)
       cam[i].y = verts[i].y;
       cam[i].z = -verts[i].x;
     }
-    if (trees[2]->TestPolygon (cam, num_verts)) return true;
+    if (trees[2]->TestPolygon (cam, num_verts, clipper)) return true;
   }
 
   // -> -X
@@ -278,7 +281,7 @@ bool csCBufferCube::TestPolygon (csVector3* verts, int num_verts)
       cam[i].y = verts[i].y;
       cam[i].z = verts[i].x;
     }
-    if (trees[3]->TestPolygon (cam, num_verts)) return true;
+    if (trees[3]->TestPolygon (cam, num_verts, clipper)) return true;
   }
 
   // -> Y
@@ -290,7 +293,7 @@ bool csCBufferCube::TestPolygon (csVector3* verts, int num_verts)
       cam[i].y = verts[i].z;
       cam[i].z = -verts[i].y;
     }
-    if (trees[4]->TestPolygon (cam, num_verts)) return true;
+    if (trees[4]->TestPolygon (cam, num_verts, clipper)) return true;
   }
 
   // -> -Y
@@ -302,7 +305,7 @@ bool csCBufferCube::TestPolygon (csVector3* verts, int num_verts)
       cam[i].y = -verts[i].z;
       cam[i].z = verts[i].y;
     }
-    if (trees[5]->TestPolygon (cam, num_verts)) return true;
+    if (trees[5]->TestPolygon (cam, num_verts, clipper)) return true;
   }
 
   return false;

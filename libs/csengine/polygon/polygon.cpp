@@ -1588,16 +1588,22 @@ void csPolygon3D::CalculateLighting (csLightView* lview)
       // well.
       // FillLightMap() will use this information and
       // csPortal::CalculateLighting() will also use it!!
-      csPlane poly_plane = *GetPolyPlane ();
-      // First translate plane to center of frustrum.
-      poly_plane.DD += poly_plane.norm * center;
-      poly_plane.Invert ();
-      if (MarkRelevantShadowFrustrums (new_lview, poly_plane))
+      bool do_fill = true;
+      po = GetPortal ();
+      csLightMapped* lmi = GetLightMapInfo ();
+      if (po || new_lview.dynamic || (lmi && !lmi->lightmap_up_to_date))
+      {
+        csPlane poly_plane = *GetPolyPlane ();
+        // First translate plane to center of frustrum.
+        poly_plane.DD += poly_plane.norm * center;
+        poly_plane.Invert ();
+        do_fill = MarkRelevantShadowFrustrums (new_lview, poly_plane);
+      }
+      if (do_fill)
       {
         // Update the lightmap given light and shadow frustrums in new_lview.
         FillLightMap (new_lview);
 
-        po = GetPortal ();
         if (po)
           po->CalculateLighting (new_lview);
         else if (!new_lview.dynamic && csSector::do_radiosity)

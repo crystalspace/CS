@@ -18,6 +18,7 @@
 
 #include "sysdef.h"
 #include "csgeom/poly3d.h"
+#include "csgeom/poly2d.h"
 
 csPoly3D::csPoly3D (int start_size)
 {
@@ -87,6 +88,57 @@ int csPoly3D::AddVertex (float x, float y, float z)
   vertices[num_vertices].z = z;
   num_vertices++;
   return num_vertices-1;
+}
+
+void csPoly3D::ProjectXPlane (const csVector3& point, float plane_x,
+	csPoly2D* poly2d)
+{
+  poly2d->SetNumVertices (0);
+  csVector2 p;
+  csVector3 v;
+  float x_dist = plane_x - point.x;
+  int i;
+  for (i = 0 ; i < num_vertices ; i++)
+  {
+    v = vertices[i]-point;
+    p.x = x_dist * v.y / v.x;
+    p.y = x_dist * v.z / v.x;
+    poly2d->AddVertex (p);
+  }
+}
+
+void csPoly3D::ProjectYPlane (const csVector3& point, float plane_y,
+	csPoly2D* poly2d)
+{
+  poly2d->SetNumVertices (0);
+  csVector2 p;
+  csVector3 v;
+  float y_dist = plane_y - point.y;
+  int i;
+  for (i = 0 ; i < num_vertices ; i++)
+  {
+    v = vertices[i]-point;
+    p.x = y_dist * v.x / v.y;
+    p.y = y_dist * v.z / v.y;
+    poly2d->AddVertex (p);
+  }
+}
+
+void csPoly3D::ProjectZPlane (const csVector3& point, float plane_z,
+	csPoly2D* poly2d)
+{
+  poly2d->SetNumVertices (0);
+  csVector2 p;
+  csVector3 v;
+  float z_dist = plane_z - point.z;
+  int i;
+  for (i = 0 ; i < num_vertices ; i++)
+  {
+    v = vertices[i]-point;
+    p.x = z_dist * v.x / v.z;
+    p.y = z_dist * v.y / v.z;
+    poly2d->AddVertex (p);
+  }
 }
 
 //---------------------------------------------------------------------------

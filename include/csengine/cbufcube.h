@@ -23,6 +23,7 @@ class csClipper;
 
 #include "csengine/cbuffer.h"
 #include "csengine/pol2d.h"
+#include "csgeom/polyclip.h"
 
 /**
  * Subclass of csCBuffer which adds perspective correction
@@ -60,6 +61,8 @@ class csCBufferCube
 private:
   /// The six c-buffers.
   csCBufferPersp* trees[6];
+  /// A box clipper to clip all the 2D polygons with.
+  csBoxClipper* clipper;
 
 public:
   /// Make the cube for the box.

@@ -22,6 +22,7 @@
 #include "csgeom/math3d.h"
 
 class Dumper;
+class csPoly2D;
 
 /**
  * The following class represents a general 3D polygon.
@@ -131,6 +132,33 @@ public:
    */
   void SetVertices (csVector3 *v, int num)
   { memcpy (vertices, v, (num_vertices = num) * sizeof (csVector3)); }
+
+  /**
+   * Project this polygon onto a X plane as seen from some
+   * point in space. Fills the given 2D polygon with the projection
+   * on the plane. This function assumes that there actually is
+   * a projection.
+   */
+  void ProjectXPlane (const csVector3& point, float plane_x,
+  	csPoly2D* poly2d);
+
+  /**
+   * Project this polygon onto a Y plane as seen from some
+   * point in space. Fills the given 2D polygon with the projection
+   * on the plane. This function assumes that there actually is
+   * a projection.
+   */
+  void ProjectYPlane (const csVector3& point, float plane_y,
+  	csPoly2D* poly2d);
+
+  /**
+   * Project this polygon onto a Z plane as seen from some
+   * point in space. Fills the given 2D polygon with the projection
+   * on the plane. This function assumes that there actually is
+   * a projection.
+   */
+  void ProjectZPlane (const csVector3& point, float plane_z,
+  	csPoly2D* poly2d);
 };
 
 /**
