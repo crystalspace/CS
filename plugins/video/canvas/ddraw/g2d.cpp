@@ -351,31 +351,42 @@ bool csGraphics2DDDraw3::Open(char *Title)
 {
   if (!csGraphics2D::Open (Title))
     return false;
-  
+
   DDSURFACEDESC ddsd;
   DDSCAPS ddscaps;
   HRESULT ddrval;
   
-  // create the window.
-  DWORD exStyle = 0;
-  DWORD style = WS_POPUP;
-  if (!FullScreen)
-    style |= WS_CAPTION;
+  ASSERT(Title);
+  if (*Title == '\x01')
+  {
+    //Having a title, that starts with '\x01' hast a special meaning. It means, we 
+    //will attach to an existing window, rather than creating an own window.
+    m_hWnd     = (HWND)(atol(Title+1));
+    FullScreen = FALSE;
+  }
+  else
+  {
+    // create the window.
+    DWORD exStyle = 0;
+    DWORD style = WS_POPUP;
+    if (!FullScreen)
+      style |= WS_CAPTION;
   
-  int wwidth,wheight;
-  wwidth=Width+2*GetSystemMetrics(SM_CXSIZEFRAME);
-  wheight=Height+2*GetSystemMetrics(SM_CYSIZEFRAME)+GetSystemMetrics(SM_CYCAPTION);
+    int wwidth,wheight;
+    wwidth=Width+2*GetSystemMetrics(SM_CXSIZEFRAME);
+    wheight=Height+2*GetSystemMetrics(SM_CYSIZEFRAME)+GetSystemMetrics(SM_CYCAPTION);
   
-  m_hWnd = CreateWindowEx(exStyle, NAME, Title, style,
-                        (GetSystemMetrics(SM_CXSCREEN)-wwidth)/2,
-                          (GetSystemMetrics(SM_CYSCREEN)-wheight)/2,
-                          wwidth, wheight, NULL, NULL, m_hInstance, NULL );
-  if( !m_hWnd )
-    sys_fatalerror("Cannot create CrystalSpace window", GetLastError());
+    m_hWnd = CreateWindowEx(exStyle, NAME, Title, style,
+                          (GetSystemMetrics(SM_CXSCREEN)-wwidth)/2,
+                            (GetSystemMetrics(SM_CYSCREEN)-wheight)/2,
+                            wwidth, wheight, NULL, NULL, m_hInstance, NULL );
+    if( !m_hWnd )
+      sys_fatalerror("Cannot create CrystalSpace window", GetLastError());
   
-  ShowWindow( m_hWnd, m_nCmdShow );
-  UpdateWindow( m_hWnd );
-  SetFocus( m_hWnd );
+    ShowWindow( m_hWnd, m_nCmdShow );
+    UpdateWindow( m_hWnd );
+    SetFocus( m_hWnd );
+  }
   
   Memory=NULL;
   
