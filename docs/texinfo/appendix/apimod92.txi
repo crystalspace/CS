@@ -28,6 +28,13 @@ materials (i.e. @code{DecRef()}).
 The functions @code{iRegion::Find@dots{}()} will no longer increase
 the reference count of the returned objects.
 
+@subheading GetThingState
+@cindex @code{iEngine::GetThingState()}
+
+@code{iEngine::GetThingState()} has not been removed but this function
+is now deprecated. It is recommended that you get the @code{iMeshObjectType}
+for the thing mesh objects the usual way (i.e. by loading the plugin).
+
 @subheading iThingState
 @cindex @code{iThingState}
 

@@ -36,6 +36,7 @@ struct iEngine;
 struct iMaterialWrapper;
 struct iReporter;
 struct iLoader;
+struct iMeshObjectType;
 
 class csTextSyntaxService : public iSyntaxService
 {
@@ -44,6 +45,7 @@ protected:
   int num;
   csString text;
   iObjectRegistry* object_reg;
+  iMeshObjectType* thing_type;
   iReporter* reporter;
 
   void OptimizePolygon (iPolygon3D *p);

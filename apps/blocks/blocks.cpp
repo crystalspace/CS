@@ -333,6 +333,7 @@ Blocks::Blocks ()
   myVFS = NULL;
   myNetDrv = NULL;
   backsound = NULL;
+  thing_type = NULL;
 
   full_rotate_x = create_rotate_x (HALF_PI);
   full_rotate_y = create_rotate_y (HALF_PI);
@@ -418,6 +419,7 @@ Blocks::~Blocks ()
   if (vrast_tmpl) vrast_tmpl->DecRef ();
   if (pillar_tmpl) pillar_tmpl->DecRef ();
   if (dynlight) dynlight->DecRef ();
+  if (thing_type) thing_type->DecRef ();
   if (engine)
   {
     engine->DeleteAll ();
@@ -3223,7 +3225,18 @@ int main (int argc, char* argv[])
     return -1;
   }
 
-  Sys->thing_type = Sys->engine->GetThingType ();
+  iPluginManager* plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
+  Sys->thing_type = CS_QUERY_PLUGIN_CLASS (plugin_mgr,
+  	"crystalspace.mesh.object.thing", iMeshObjectType);
+  if (!Sys->thing_type)
+    Sys->thing_type = CS_LOAD_PLUGIN (plugin_mgr,
+    	"crystalspace.mesh.object.thing", iMeshObjectType);
+  plugin_mgr->DecRef ();
+  if (!Sys->thing_type)
+  {
+    Sys->Report (CS_REPORTER_SEVERITY_ERROR, "No thing mesh plugin!");
+    return -1;
+  }
 
   QUERY_REG (Sys->myVFS, iVFS, "No iVFS plugin!");
   Sys->myNetDrv = CS_QUERY_REGISTRY (object_reg, iNetworkDriver);

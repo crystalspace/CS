@@ -31,6 +31,8 @@
 #include "cstool/cspixmap.h"
 #include "ivaria/collider.h"
 #include "iengine/movable.h"
+#include "iutil/objreg.h"
+#include "iutil/plugin.h"
 
 extern WalkTest *Sys;
 
@@ -69,7 +71,14 @@ void WalkTest::CreateColliders ()
 {
   iPolygon3D *p;
   iPolygonMesh* mesh;
-  iMeshObjectFactory* thing_fact = Engine->GetThingType ()->NewFactory ();
+  iPluginManager* plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
+  iMeshObjectType* ThingType = CS_QUERY_PLUGIN_CLASS (plugin_mgr,
+  	"crystalspace.mesh.object.thing", iMeshObjectType);
+  if (!ThingType)
+    ThingType = CS_LOAD_PLUGIN (plugin_mgr,
+    	"crystalspace.mesh.object.thing", iMeshObjectType);
+
+  iMeshObjectFactory* thing_fact = ThingType->NewFactory ();
   iMeshObject* mesh_obj = SCF_QUERY_INTERFACE (thing_fact, iMeshObject);
   thing_fact->DecRef ();
   plbody = Engine->CreateMeshWrapper (mesh_obj, "Player's Body");
@@ -122,7 +131,8 @@ void WalkTest::CreateColliders ()
   mesh->DecRef ();
   thing_state->DecRef ();
 
-  thing_fact = Engine->GetThingType ()-> NewFactory ();
+  thing_fact = ThingType-> NewFactory ();
+  ThingType->DecRef ();
   mesh_obj = SCF_QUERY_INTERFACE (thing_fact, iMeshObject);
   thing_fact->DecRef ();
   pllegs = Engine->CreateMeshWrapper (mesh_obj, "Player's Legs");

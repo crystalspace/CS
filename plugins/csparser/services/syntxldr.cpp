@@ -39,6 +39,7 @@
 #include "imesh/thing/polygon.h"
 #include "imesh/object.h"
 #include "iutil/object.h"
+#include "iutil/plugin.h"
 #include "ivaria/reporter.h"
 #include "imap/parser.h"
 
@@ -141,11 +142,13 @@ csTextSyntaxService::csTextSyntaxService (iBase *parent)
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiComponent);
 
   reporter = NULL;
+  thing_type = NULL;
 }
 
 csTextSyntaxService::~csTextSyntaxService ()
 {
   SCF_DEC_REF (reporter);
+  SCF_DEC_REF (thing_type);
 }
 
 bool csTextSyntaxService::Initialize (iObjectRegistry* object_reg)
@@ -646,8 +649,22 @@ bool csTextSyntaxService::ParsePoly3d (
   char *params;
 
   iMaterialWrapper* mat = NULL;
+
+  if (!thing_type)
+  {
+    iPluginManager* plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
+    CS_ASSERT (plugin_mgr != NULL);
+    thing_type = CS_QUERY_PLUGIN_CLASS (plugin_mgr,
+  	  "crystalspace.mesh.object.thing", iMeshObjectType);
+    if (!thing_type)
+      thing_type = CS_LOAD_PLUGIN (plugin_mgr,
+    	  "crystalspace.mesh.object.thing", iMeshObjectType);
+    plugin_mgr->DecRef ();
+  }
+
+  CS_ASSERT (thing_type != NULL);
   iThingEnvironment* te =
-    SCF_QUERY_INTERFACE (engine->GetThingType (), iThingEnvironment);
+    SCF_QUERY_INTERFACE (thing_type, iThingEnvironment);
 
   UInt texspec = 0;
   int tx_uv_i1 = 0;

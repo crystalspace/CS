@@ -464,8 +464,21 @@ bool Simple::Initialize (int argc, const char* const argv[],
 //  Model->RegisterTextures (engine->GetTextureList ());
 //  Model->RegisterMaterials (engine->GetMaterialList ());
 
-  iMeshObjectType *ThingType = engine->GetThingType ();
+  iPluginManager* plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
+  iMeshObjectType* ThingType = CS_QUERY_PLUGIN_CLASS (plugin_mgr,
+  	"crystalspace.mesh.object.thing", iMeshObjectType);
+  if (!ThingType)
+    ThingType = CS_LOAD_PLUGIN (plugin_mgr,
+    	"crystalspace.mesh.object.thing", iMeshObjectType);
+  plugin_mgr->DecRef ();
+  if (!ThingType)
+  {
+    Report (CS_REPORTER_SEVERITY_ERROR, "No thing mesh plugin!");
+    exit (1);
+  }
+
   iMeshObjectFactory *ThingFactory = ThingType->NewFactory ();
+  ThingType->DecRef ();
 
   iThingState *fState =
 	SCF_QUERY_INTERFACE (ThingFactory, iThingState);

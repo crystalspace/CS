@@ -143,7 +143,16 @@ iPolygon3D* HugeRoom::create_polygon (iThingState* thing_state,
 
 static iMeshWrapper* CreateMeshWrapper (const char* name)
 {
-  iMeshObjectFactory* thing_fact = Sys->Engine->GetThingType ()->NewFactory ();
+  iPluginManager* plugin_mgr = CS_QUERY_REGISTRY (Sys->object_reg,
+  	iPluginManager);
+  iMeshObjectType* ThingType = CS_QUERY_PLUGIN_CLASS (plugin_mgr,
+  	"crystalspace.mesh.object.thing", iMeshObjectType);
+  if (!ThingType)
+    ThingType = CS_LOAD_PLUGIN (plugin_mgr,
+    	"crystalspace.mesh.object.thing", iMeshObjectType);
+  plugin_mgr->DecRef ();
+  iMeshObjectFactory* thing_fact = ThingType->NewFactory ();
+  ThingType->DecRef ();
   iMeshObject* mesh_obj = SCF_QUERY_INTERFACE (thing_fact, iMeshObject);
   thing_fact->DecRef ();
   iMeshWrapper* mesh_wrap = Sys->Engine->CreateMeshWrapper (mesh_obj, name);

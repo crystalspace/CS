@@ -65,6 +65,7 @@
 #include "iutil/objreg.h"
 #include "iutil/csinput.h"
 #include "iutil/virtclk.h"
+#include "iutil/plugin.h"
 #include "csutil/cmdhelp.h"
 
 //------------------------------------------------- We need the 3D engine -----
@@ -140,8 +141,21 @@ bool BumpTest::InitProcDemo ()
   matBump = prBump->Initialize (object_reg, engine, txtmgr, "bumps");
   prBump->PrepareAnim ();
 
-  iMeshObjectType* thing_type = engine->GetThingType ();
+  iPluginManager* plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
+  iMeshObjectType* thing_type = CS_QUERY_PLUGIN_CLASS (plugin_mgr,
+  	"crystalspace.mesh.object.thing", iMeshObjectType);
+  if (!thing_type)
+    thing_type = CS_LOAD_PLUGIN (plugin_mgr,
+    	"crystalspace.mesh.object.thing", iMeshObjectType);
+  plugin_mgr->DecRef ();
+  if (!thing_type)
+  {
+    Report (CS_REPORTER_SEVERITY_ERROR, "No thing mesh plugin!");
+    return false;
+  }
+
   iMeshObjectFactory* thing_fact = thing_type->NewFactory ();
+  thing_type->DecRef ();
   iMeshObject* thing_obj = SCF_QUERY_INTERFACE (thing_fact, iMeshObject);
   thing_fact->DecRef ();
 

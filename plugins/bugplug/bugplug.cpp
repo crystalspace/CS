@@ -69,6 +69,9 @@ SCF_EXPORT_CLASS_TABLE_END
 
 SCF_IMPLEMENT_IBASE (csBugPlug)
   SCF_IMPLEMENTS_INTERFACE (iComponent)
+SCF_IMPLEMENT_IBASE_END
+
+SCF_IMPLEMENT_IBASE (csBugPlug::EventHandler)
   SCF_IMPLEMENTS_INTERFACE (iEventHandler)
 SCF_IMPLEMENT_IBASE_END
 
@@ -110,6 +113,7 @@ csBugPlug::csBugPlug (iBase *iParent)
   shadow = new csShadow ();
   spider_hunting = false;
   selected_mesh = NULL;
+  scfiEventHandler = NULL;
   shadow->SetShadowMesh (selected_mesh);
 }
 
@@ -137,16 +141,31 @@ csBugPlug::~csBugPlug ()
     delete mappings;
     mappings = n;
   }
+  if (scfiEventHandler)
+  {
+    iEventQueue* q = CS_QUERY_REGISTRY (object_reg, iEventQueue);
+    if (q)
+    {
+      q->RemoveListener (scfiEventHandler);
+      q->DecRef ();
+    }
+    scfiEventHandler->DecRef ();
+  }
 }
 
 bool csBugPlug::Initialize (iObjectRegistry *object_reg)
 {
   csBugPlug::object_reg = object_reg;
+  if (!scfiEventHandler)
+  {
+    scfiEventHandler = new EventHandler (this);
+  }
   plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
   iEventQueue* q = CS_QUERY_REGISTRY (object_reg, iEventQueue);
   if (q != 0)
   {
-    q->RegisterListener (this, CSMASK_Nothing|CSMASK_KeyUp|CSMASK_KeyDown|
+    q->RegisterListener (scfiEventHandler,
+    	CSMASK_Nothing|CSMASK_KeyUp|CSMASK_KeyDown|
   	CSMASK_MouseUp|CSMASK_MouseDown);
     q->DecRef ();
   }

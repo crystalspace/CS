@@ -2,6 +2,22 @@ The history order is reversed so that new features are at the top.
 
 4-Dec-2001
 	- Enabled aws in user.mak.
+	- Created a dummy thing object plugin. This plugin allows applications
+	  to use things just like any other mesh object (i.e. load the plugin
+	  implementing iMeshObjectType and then do NewFactory() from that).
+	  Previously applications had to use engine->GetThingType().
+	  Note that since things are still implemented inside the engine
+	  this dummy plugin actually does little more than redirect
+	  NewFactory() calls to engine->GetThingType(). So
+	  engine->GetThingType() cannot be removed yet.
+	  The use of engine->GetThingType() is now deprecated (noted this
+	  in the apimod doc).
+	- Removed most usages of GetThingType() in the engine. Only the
+	  engine itself and everything related to things now use
+	  GetThingType().
+	- Modified bugplug so that it now has an event handler as a seperate
+	  object instead of putting the event handler in the bugplug
+	  plugin itself. This avoids a circular reference.
 3-Dec-2001
 	- Toni Asco' Gonzalez fixed the 3ds loader so that it now correctly
 	  supports normal and texture mapping information.

@@ -112,7 +112,7 @@ struct csKeyMap
  * Debugger plugin. Loading this plugin is sufficient to get debugging
  * functionality in your application.
  */
-class csBugPlug : public iComponent, public iEventHandler
+class csBugPlug : public iComponent
 {
 private:
   iObjectRegistry *object_reg;
@@ -245,7 +245,28 @@ public:
   ///
   virtual bool Initialize (iObjectRegistry *object_reg);
   /// This is set to receive the once per frame nothing  event
-  virtual bool HandleEvent (iEvent &event);
+  bool HandleEvent (iEvent &event);
+
+  // This is not an embedded interface in order to avoid
+  // a circular reference between this registered event handler
+  // and the parent object.
+  class EventHandler : public iEventHandler
+  {
+  private:
+    csBugPlug* parent;
+  public:
+    EventHandler (csBugPlug* parent)
+    {
+      SCF_CONSTRUCT_IBASE (NULL);
+      EventHandler::parent = parent;
+    }
+    virtual ~EventHandler () { }
+    SCF_DECLARE_IBASE;
+    virtual bool HandleEvent (iEvent& ev)
+    {
+      return parent->HandleEvent (ev);
+    }
+  } *scfiEventHandler;
 };
 
 #endif // __CS_BUGPLUG_H__
