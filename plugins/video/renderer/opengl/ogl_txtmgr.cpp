@@ -612,9 +612,8 @@ void csTextureHandleOpenGL::CreateMipmaps ()
     //  printf ("meancolor\n");
     ComputeMeanColor (vTex[nTex]->get_width (), vTex[nTex]->get_height (), 
 		      (csRGBpixel *)prevImage->GetImageData ());
-    //prevImage->DecRef ();
-    // the above DecRef() caused errors when using software renderer proctexes.
-    // @@@ causes not DecRef'ing it a leak?
+
+    prevImage->DecRef ();
   }
   else
     ComputeMeanColor (vTex[0]->get_width (), vTex[0]->get_height (),
