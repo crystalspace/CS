@@ -45,6 +45,7 @@ for each given day, however, are in normal (ascending) chronological order.
 	    - Replaced 'layers' in haze with csPDelArray<csHazeLayer>.
 	    - Replaced 'particles' in csParticleSystem with
 	      csRefArray<iParticle>.
+      - res removed csVector from the Win32 WaveOut plugin.
 29-Jul-2003
 	- Jorrit made scfStringArray actually work by adding the needed
 	  SCF_CONSTRUCT stuff.

@@ -21,7 +21,6 @@
 #include "cssysdef.h"
 #include "cssys/sysfunc.h"
 #include <stdio.h>
-#include <mmsystem.h>
 
 #include "csutil/scf.h"
 #include "isound/renderer.h"
@@ -199,13 +198,6 @@ bool csSoundDriverWaveOut::IsStereo() {return Stereo;}
 bool csSoundDriverWaveOut::IsHandleVoidSound() {return false;}
 int csSoundDriverWaveOut::GetFrequency() {return Frequency;}
 
-typedef struct {
-  csSoundDriverWaveOut *Driver;
-  HGLOBAL DataHandle;
-  unsigned char *Data;
-  LPWAVEHDR WaveHeader;
-} SoundBlock;
-
 bool csSoundDriverWaveOut::HandleEvent(iEvent &e)
 {
   //Report (CS_REPORTER_SEVERITY_NOTIFY, "handleevent: %d", Playback);
@@ -215,7 +207,7 @@ bool csSoundDriverWaveOut::HandleEvent(iEvent &e)
     // Delete all queued blocks
     while (BlocksToDelete.Length())
     {
-      SoundBlock *Block = (SoundBlock*)BlocksToDelete.Pop();
+      SoundBlock *Block = BlocksToDelete.Pop();
       MMRESULT res;
       res = waveOutUnprepareHeader(WaveOut, Block->WaveHeader,sizeof(WAVEHDR));
       CheckError("waveOutUnprepareHeader", res);

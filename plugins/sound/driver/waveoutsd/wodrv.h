@@ -22,10 +22,13 @@
 #define __CS_WODRV_H__
 
 #include "csutil/scf.h"
+#include "csutil/array.h"
 #include "csutil/cfgacc.h"
 #include "isound/driver.h"
 #include "iutil/eventh.h"
 #include "iutil/comp.h"
+
+#include <mmsystem.h>
 
 class csSoundDriverWaveOut : public iSoundDriver
 {
@@ -71,6 +74,14 @@ public:
   } * scfiEventHandler;
 
 protected:
+  struct SoundBlock 
+  {
+    csSoundDriverWaveOut *Driver;
+    HGLOBAL DataHandle;
+    unsigned char *Data;
+    LPWAVEHDR WaveHeader;
+  };
+
   // system driver
   iObjectRegistry *object_reg;
 
@@ -96,7 +107,7 @@ protected:
   // number of sound blocks to write
   volatile int NumSoundBlocksToWrite;
   // list of blocks to delete
-  csVector BlocksToDelete;
+  csArray<SoundBlock*> BlocksToDelete;
   // has playback already started?
   volatile int Playback;
   // when the same error occurs multiple times, we just show the first
