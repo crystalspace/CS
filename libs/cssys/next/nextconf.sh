@@ -17,8 +17,13 @@ BIN_DIR=bin
 . ${BIN_DIR}/comptest.sh
 
 # We also compile Objective-C and Objective-C++.
+msg_checking "for Objective-C compiler"
 echo "OBJC = ${CC} -c"
+msg_result "${CC}"
+
+msg_checking "for Objective-C++ compiler"
 echo "OBJCXX = ${CXX} -c"
+msg_result "${CXX}"
 
 # Check for tools.
 . ${BIN_DIR}/chktools.sh
