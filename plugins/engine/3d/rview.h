@@ -77,6 +77,9 @@ private:
   static void TestSphereFrustum (csRenderContext* frust,
     const csVector3& center, float radius, bool& inside, bool& outside);
 
+  static void TestSphereFrustumWorld (csRenderContext* frust,
+    const csVector3& center, float radius, bool& inside, bool& outside);
+
 public:
   ///
   csRenderView ();
@@ -213,6 +216,18 @@ public:
    */
   void ResetFogInfo () { ctxt->added_fog_info = false; }
 
+  /**
+   * Check if the given bounding sphere (in camera and world space coordinates)
+   * is visibile in this render view. If the sphere is visible this
+   * function will also initialize the clip_plane, clip_z_plane, and
+   * clip_portal fields which can be used for DrawTriangleMesh or
+   * DrawPolygonMesh.
+   */
+  bool ClipBSphere (
+	const csSphere &cam_sphere,
+	const csSphere &world_sphere,
+	int& clip_portal, int& clip_plane, int& clip_z_plane);
+
   SCF_DECLARE_IBASE;
 
   /// Get the current render context.
@@ -289,9 +304,6 @@ public:
   virtual void CalculateClipSettings (uint32 frustum_mask,
     int &clip_portal, int &clip_plane, int &clip_z_plane);
 
-  virtual bool ClipBSphere (const csReversibleTransform& o2c,
-    const csSphere& sphere, int& clip_portal, int& clip_plane,
-    int& clip_z_plane, csVector3& camera_origin);
   virtual bool ClipBBox (const csBox2& sbox, const csBox3& cbox,
         int& clip_portal, int& clip_plane, int& clip_z_plane);
   virtual bool ClipBBox (const csBox3& cbox,

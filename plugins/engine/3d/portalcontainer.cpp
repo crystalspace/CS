@@ -144,51 +144,13 @@ csPortalContainer::~csPortalContainer ()
 csRenderMesh** csPortalContainer::GetRenderMeshes (int& num,
 	iRenderView* rview, iMovable* movable, uint32 frustum_mask)
 {
-  Prepare ();
-
-  iCamera* camera = rview->GetCamera ();
-  const csMovable& cmovable = meshwrapper->GetCsMovable ();
-  const csReversibleTransform& camtrans = camera->GetTransform ();
-  const csReversibleTransform& movtrans = cmovable.GetFullTransform ();
-
-  if (movable_nr != cmovable.GetUpdateNumber ())
-    ObjectToWorld (cmovable, movtrans);
-
-  csSphere sphere;
-  sphere.SetCenter (object_bbox.GetCenter ());
-  sphere.SetRadius (max_object_radius);
   csReversibleTransform tr_o2c;
-  tr_o2c = camtrans;
-  if (!movable->IsFullTransformIdentity ())
-    tr_o2c /= movtrans;
   csVector3 camera_origin;
-
-  if (movable_identity)
+  if (!ExtraVisTest (rview, tr_o2c, camera_origin))
   {
-    if (!rview->ClipBSphere (tr_o2c, sphere, clip_portal,
-      clip_plane, clip_z_plane, camera_origin))
-    {
-      num = 0;
-      return 0;
-    }
+    num = 0;
+    return 0;
   }
-  else
-  {
-    if (!rview->ClipBSphere (tr_o2c, sphere, clip_portal,
-      clip_plane, clip_z_plane, camera_origin))
-    {
-      num = 0;
-      return 0;
-    }
-  }
-
-  //csReversibleTransform tr_o2c = camtrans;
-  //if (!movable->IsFullTransformIdentity ())
-    //tr_o2c /= movtrans;
-  //csVector3 camera_origin = tr_o2c.GetT2OTranslation ();
-
-  //rview->CalculateClipSettings (frustum_mask, clip_portal, clip_plane,
-  	//clip_z_plane);
 
   // first, check if we have any usable mesh.
   if (lastMeshPtr->inUse == true)
@@ -923,41 +885,49 @@ void csPortalContainer::CastShadows (iMovable* movable, iFrustumView* fview)
 
 //--------------------- For iMeshObject ------------------------------//
 
-bool csPortalContainer::DrawTest (iRenderView* rview, iMovable*,
-	uint32)
+bool csPortalContainer::ExtraVisTest (iRenderView* rview,
+	csReversibleTransform& tr_o2c, csVector3& camera_origin)
 {
   Prepare ();
 
+  csRenderView* csrview = (csRenderView*)rview;
   iCamera* camera = rview->GetCamera ();
   const csReversibleTransform& camtrans = camera->GetTransform ();
   const csMovable& cmovable = meshwrapper->GetCsMovable ();
-  const csReversibleTransform& movtrans = cmovable.GetFullTransform ();
-
   if (movable_nr != cmovable.GetUpdateNumber ())
+  {
+    const csReversibleTransform& movtrans = cmovable.GetFullTransform ();
     ObjectToWorld (cmovable, movtrans);
+  }
 
-  csSphere sphere;
+  csSphere sphere, world_sphere;
   sphere.SetCenter (object_bbox.GetCenter ());
   sphere.SetRadius (max_object_radius);
-  csVector3 camera_origin;
-  if (movable_identity)
+
+  tr_o2c = camtrans;
+  if (!movable_identity)
   {
-    if (!rview->ClipBSphere (camtrans, sphere, clip_portal,
-        clip_plane, clip_z_plane, camera_origin))
-      return false;
+    const csReversibleTransform& movtrans = cmovable.GetFullTransform ();
+    tr_o2c /= movtrans;
+    world_sphere = movtrans.This2Other (sphere);
   }
   else
   {
-    csReversibleTransform tr_o2c = camtrans;
-    tr_o2c /= movtrans;
-    if (!rview->ClipBSphere (tr_o2c, sphere, clip_portal,
-        clip_plane, clip_z_plane, camera_origin))
-      return false;
+    world_sphere = sphere;
   }
+  csSphere cam_sphere = tr_o2c.Other2This (sphere);
+  camera_origin = cam_sphere.GetCenter ();
 
-  //rview->CalculateClipSettings (frustum_mask,
-  	//clip_portal, clip_plane, clip_z_plane);
-  return true;
+  return csrview->ClipBSphere (cam_sphere, world_sphere, clip_portal,
+      clip_plane, clip_z_plane);
+}
+
+bool csPortalContainer::DrawTest (iRenderView* rview, iMovable*,
+	uint32)
+{
+  csReversibleTransform tr_o2c;
+  csVector3 camera_origin;
+  return ExtraVisTest (rview, tr_o2c, camera_origin);
 }
 
 bool csPortalContainer::Draw (iRenderView* rview, iMovable* movable,

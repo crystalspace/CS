@@ -144,7 +144,6 @@ private:
   csDirtyAccessArray<csVector3> camera_vertices;
   csArray<csPlane3> camera_planes;
 
-  // Probably only for old renderer: clip data between DrawTest->Draw. @@@OR@@@
   int clip_portal, clip_plane, clip_z_plane;
 
   // Drawing stuff...
@@ -162,6 +161,9 @@ private:
 
   csFlags flags;
   csMeshWrapper* meshwrapper;
+
+  bool ExtraVisTest (iRenderView* rview, csReversibleTransform& tr_o2c,
+  	csVector3& camera_origin);
 
 protected:
   /**
