@@ -9,7 +9,9 @@ Clean distclean :
     config.h
     config.log
     config.status
+    config.status.lineno
     config.cache
+    configure.lineno
     Jamconfig
     Jamfile ;
 CleanDir distclean :
