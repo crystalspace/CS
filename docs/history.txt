@@ -6,26 +6,7 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
-8-Dec-2004
-	- Eric Sunshine removed obsolete warning from Doxygen documentation for
-	  iEventOutlet::Post() which warned that only events returned by
-	  CreateEvent() were valid as input to Post().  This requirement was
-	  eliminated on 9-Feb-2004 when Eric re-wrote all of the highly nasty
-	  code in csEvent which made the dangerous assumption that the incoming
-	  iEvent was actually a csEvent.
-	- Keith Fulton added support for new animation callback system in cal3d.
-	  See viewmesh.cpp for very simple example of how to use this.  Here is
-	  a quick description of how the callback system works in cal3d:
-		Added animation callbacks to cal3d.  The CoreAnimation keeps the 
-		master list of callbacks for itself.  The Animation keeps last-
-		called times for each animation for itself.  The Mixer is 
-		responsible for causing the Animation to check for which of its 
-		callbacks must be called.  There are two callbacks defined--one 
-		for continuous calling during anim playback and one on completion 
-		of the animation.  The callbacks take the CalModel in question,
-		which they can use to getUserData in order to get their own 
-		application-specific data about which entity the callback is 
-		referring to.
+10-Dec-2004
 	- res made the following changes:
 	    - Fixed (or worked around in rare cases) uses of non-const
 	      csString::GetData().
@@ -35,16 +16,46 @@ chronological order.
 	    - Marked some deprecated methods with above macro.
 	    - Changed csRenderMeshHolderSingle to use a block allocator instead
 	      of new/delete for allocated rendermeshes.
-	    - Fixed typos in csgeom/box.h.
-	    - Added a paragraph to the API mods section about the iEvent
-	      Find() to Retrieve() renaming a while back.
+	    - Fixed comment typos in csgeom/box.h.
+	    - Added a paragraph to apimod100.txi regarding the iEvent::Find()
+	      to Retrieve() renaming a while back.
 	    - Fixed invalid use of CSTOOL_EXPORTS macro in stdpt plugin.
 	    - Made the Python glue reside in a shared lib for some more space
 	      efficiency. The glue code generates object code of significant
 	      size which can be shared between the Py module and plugin.
-	    - Updated cs-win32libs link.
+	    - Updated cs-win32libs URLs in documentation.
 	    - Fixed viewmesh to compile with memory debugging or mem tracker
 	      enabled.
+	- Eric Sunshine updated cal3d check in configure.ac so that it also
+	  works correctly with the latest drastic API changes to cal3d
+	  (i.e. removal of the create() and destroy() methods from many of the
+	  classes).
+	- Eric Sunshine updated the "sufficiently recent" cal3d check in
+	  configure.ac to demand the very latest CVS version of cal3d since
+	  these changes are needed by Keith's 9-Dec-2004 enhancements to
+	  sprcal3d.
+9-Dec-2004
+	- Keith Fulton added support for new animation callback system in
+	  cal3d.  See viewmesh.cpp for very simple example of how to use this.
+	  Here is a quick description of how the callback system works in
+	  cal3d:
+	    Added animation callbacks to cal3d.  The CoreAnimation keeps the
+	    master list of callbacks for itself.  The Animation keeps last-
+	    called times for each animation for itself.  The Mixer is
+	    responsible for causing the Animation to check for which of its
+	    callbacks must be called.  There are two callbacks defined--one for
+	    continuous calling during anim playback and one on completion of
+	    the animation.  The callbacks take the CalModel in question, which
+	    they can use to getUserData in order to get their own
+	    application-specific data about which entity the callback is
+	    referring to.
+8-Dec-2004
+	- Eric Sunshine removed obsolete warning from Doxygen documentation for
+	  iEventOutlet::Post() which warned that only events returned by
+	  CreateEvent() were valid as input to Post().  This requirement was
+	  eliminated on 9-Feb-2004 when Eric re-wrote all of the highly nasty
+	  code in csEvent which made the dangerous assumption that the incoming
+	  iEvent was actually a csEvent.
 7-Dec-2004
 	- Eric Sunshine added new Autoconf macros CS_CHECK_PROG(),
 	  CS_CHECK_PROGS(), CS_CHECK_TOOL(), CS_CHECK_TOOLS(), CS_PATH_PROG(),

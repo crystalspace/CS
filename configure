@@ -35517,7 +35517,7 @@ cat >>conftest.$ac_ext <<_ACEOF
 int
 main ()
 {
-CalModel m; m.create(0); m.destroy();
+CalModel* m = 0; m->getMixer();
   ;
   return 0;
 }
@@ -35668,7 +35668,7 @@ cat >>conftest.$ac_ext <<_ACEOF
 int
 main ()
 {
-CalModel m; m.create(0); m.destroy();
+CalModel* m = 0; m->getMixer();
   ;
   return 0;
 }
@@ -35841,7 +35841,7 @@ cat >>conftest.$ac_ext <<_ACEOF
 int
 main ()
 {
-CalCoreModel m; m.addAnimationName("",0);
+CalAnimation* a = 0; a->completeCallbacks((CalModel*)0)
   ;
   return 0;
 }
@@ -35992,7 +35992,7 @@ cat >>conftest.$ac_ext <<_ACEOF
 int
 main ()
 {
-CalCoreModel m; m.addAnimationName("",0);
+CalAnimation* a = 0; a->completeCallbacks((CalModel*)0)
   ;
   return 0;
 }
