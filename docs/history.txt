@@ -9,6 +9,11 @@ chronological order.
 18-Jun-2004
 	- Eric Sunshine added a bunch of missing 'const' directives to csSpline
 	  and its subclasses.
+	- Eric Sunshined fixed bug in csGetPluginPaths()
+	  (csutil/generic/pluginpaths.cpp).  "jam install" places plugin
+	  modules in $prefix/lib/crystal, but csGetPluginPaths() was never
+	  referencing that location, so SCF would not find those installed
+	  plugins.
 17-Jun-2004
 	- Jorrit changed g3d->ClosePortal() to also have a new use_zfill_portal
 	  flag. When this flag is set the renderer will zfill the portal area.
