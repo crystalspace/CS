@@ -64,14 +64,12 @@ struct iRenderBuffer : public iBase
   /**
    * Type of lock
    * CS_BUF_LOCK_NORMAL: Just get a point to the buffer, nothing special
-   * CS_BUF_LOCK_DISCARD: Get a buffer to use just this frame/rendering
    * CS_BUF_LOCK_RENDER: Special lock only to be used by renderer
    */
   typedef enum _CS_BUFFER_LOCK_TYPE
   {
     CS_BUF_LOCK_NOLOCK,
     CS_BUF_LOCK_NORMAL,
-    CS_BUF_LOCK_DISCARD,
     CS_BUF_LOCK_RENDER
   } CS_BUFFER_LOCK_TYPE;
 
@@ -84,6 +82,11 @@ struct iRenderBuffer : public iBase
   /// Releases the buffer. After this all writing to the buffer is illegal
   virtual void Release() = 0;
 
+  /// Returns wheter the buffer is discarded or not
+  virtual bool IsDiscarded() = 0;
+
+  /// Set if buffer can be discarded or not
+  virtual void CanDiscard(bool value) = 0;
 
   /// Get type of buffer (where it's located)
   virtual CS_RENDERBUFFER_TYPE GetBufferType() = 0;
