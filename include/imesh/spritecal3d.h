@@ -424,9 +424,11 @@ struct iSpriteCal3DState : public iBase
                              float delayOut) = 0;
 
   /**
-   * This function searches all actions specified as type TRAVEL, and uses
-   * their preferred velocities to create a set of blended animations which
-   * will equate in velocity to the specified parm "vel".  The calling program
+   * This function searches all actions specified as type TRAVEL for actions 
+   * with a base velocity matching "vel", and blends them into a travel action.
+   * If no animation is found with a base animation that exactly matches "vel" 
+   * It selects animations with an appropriate velocity range and blends them 
+   * to create the travel animation.  The calling program
    * is still responsible for actually moving the sprite.
    */
   virtual bool SetVelocity(float vel,csRandomGen *rng=0) = 0;

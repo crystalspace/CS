@@ -2200,6 +2200,8 @@ bool csSpriteCal3DMeshObject::SetVelocity(float vel,csRandomGen *rng)
     vel = -vel;
 
   is_idling = false;
+  // first look for animations with a base velocity that exactly matches
+  bool found_match = false;
   for (i=0; i<count; i++)
   {
     if (factory->anims[i]->type == iSpriteCal3DState::C3D_ANIM_TYPE_TRAVEL)
@@ -2207,27 +2209,40 @@ bool csSpriteCal3DMeshObject::SetVelocity(float vel,csRandomGen *rng)
       if (vel < factory->anims[i]->min_velocity ||
           vel > factory->anims[i]->max_velocity)
     	continue;
-
-      float pct,vel_diff;
       if (vel == factory->anims[i]->base_velocity)
-	      pct = 1;
-      else if (vel < factory->anims[i]->base_velocity)
       {
-    	vel_diff = factory->anims[i]->base_velocity
-		- factory->anims[i]->min_velocity;
-	pct = 1 - (vel - factory->anims[i]->min_velocity) / vel_diff;
+        AddAnimCycle(i,1,0);
+        found_match = true;
+      }
+    }
+  }
+  if (found_match)
+    return true;
+   
+  /* since no exact matches were found, look for animations with a min to max velocity range that
+      this velocity falls in and blend those animations based on how close thier base velocity matches */
+  for (i=0; i<count; i++)
+  {
+    float pct,vel_diff;
+    if (factory->anims[i]->type == iSpriteCal3DState::C3D_ANIM_TYPE_TRAVEL)
+    {
+      if (vel < factory->anims[i]->min_velocity ||
+          vel > factory->anims[i]->max_velocity)
+    	continue;
+      if (vel < factory->anims[i]->base_velocity)
+      {
+        vel_diff = 
+            factory->anims[i]->base_velocity - factory->anims[i]->min_velocity;
+        pct = (vel - factory->anims[i]->min_velocity) / vel_diff;
       }
       else
       {
-    	vel_diff = factory->anims[i]->max_velocity
-		- factory->anims[i]->base_velocity;
-	pct = (factory->anims[i]->max_velocity - vel) / vel_diff;
+        vel_diff = 
+            factory->anims[i]->max_velocity - factory->anims[i]->base_velocity;
+        pct = (factory->anims[i]->max_velocity - vel) / vel_diff;
       }
       AddAnimCycle(i,pct,0);
-//      printf("  Adding %s weight=%1.2f\n",factory->anims[i]->name.GetData(),pct);
-
-      if (pct == 1)
-    	break;
+//     printf("  Adding %s weight=%1.2f\n",factory->anims[i]->name.GetData(),pct);
     }
   }
   if (reversed)
