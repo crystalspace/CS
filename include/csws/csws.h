@@ -27,7 +27,6 @@
  *   |--[ csRect ]			// Rectangle
  *   |--[ csVector ]            	// Vector of some objects (FreeItem = NOP)
  *   |    |--[ csStrVector ]    	// Vector of strings (FreeItem = delete[])
- *   |    +--[ csObjVector ]    	// ... csBase heirs (FreeItem = delete (csBase *))
  *   |--[ csGraphicsPipeline ]  	// Deferred drawing pipeline
  *   +--[ csComponent ]         	// Windowing System component
  *        |--[ csMouse ]		// Mouse cursor
@@ -66,7 +65,6 @@ class csBase;
 class csRect;
 class csVector;
 class csStrVector;
-class csObjVector;
 class csEventQueue;
 class csGraphicsPipeline;
 class csComponent;
@@ -104,7 +102,6 @@ struct iEvent;
 #include "csutil/csbase.h"		// Base class
 #include "csutil/csvector.h"		// Vector of objects
 #include "csutil/csstrvec.h"		// Vector of string objects
-#include "csutil/csobjvec.h"		// Vector of csBase heirs
 #include "cssys/csevent.h"		// Event class
 #include "cssys/cseventq.h"		// Event Queue class
 #include "cssys/csinput.h"		// Keyboard codes

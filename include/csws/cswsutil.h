@@ -65,7 +65,7 @@ protected:
 
 /// Compute the biggest union of a set of adjanced rectangles
 /// (i.e. rectangles do not overlap and can have adjanced edges).
-extern void RectUnion (csObjVector &rect, csRect &result);
+extern void RectUnion (cswsRectVector &rect, csRect &result);
 
 /// Find a bitmap definition in one of CSWS.CFG bitmap arrays
 extern void ParseConfigBitmap (csApp *app, const char *prefix,

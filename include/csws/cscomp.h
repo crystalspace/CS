@@ -32,6 +32,9 @@ class csApp;
 class csSkin;
 class csSkinSlice;
 
+// this is where we store all the csRect for calculating visible areas and clipping in
+DECLARE_TYPED_VECTOR (cswsRectVector, csRect);
+
 /**
  * Component state flags.<p>
  * The component state is an (at least) 32-bit integer, which contains
@@ -357,7 +360,7 @@ protected:
   /// An array of 'clip children', i.e. components which are clipped inside our bounds
   csVector clipchildren;
   /// This field is used to cache current clipping region during every Redraw()
-  static csObjVector visregion;
+  static cswsRectVector visregion;
 
 public:
   /// The focused child window
@@ -790,10 +793,10 @@ protected:
    * uncovered by other windows. Initial rectangles are in local coordinates,
    * final rectangles are in global coordinates.
    */
-  void Clip (csObjVector &rect, csComponent *last, bool forchild = false);
+  void Clip (cswsRectVector &rect, csComponent *last, bool forchild = false);
 
   /// Clip the rectangle set against given child
-  void ClipChild (csObjVector &rect, csComponent *child);
+  void ClipChild (cswsRectVector &rect, csComponent *child);
 
   /**
    * Perform fast clipping by using the pre-cached visible region
@@ -801,7 +804,7 @@ protected:
    * any drawing operation that happens outside the Draw() method
    * is effectively clipped away.
    */
-  void FastClip (csObjVector &rect);
+  void FastClip (cswsRectVector &rect);
 
   /**
    * Prepare a label. Search for '~' in iLabel, and copy text without '~'
