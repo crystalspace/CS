@@ -136,8 +136,12 @@ typedef int bool_int;
 
 #define	NDIG	80
 
+#ifndef ULONG_MAX
 #define ULONG_MAX (unsigned long)0xffffffffl
+#endif
+#ifndef LONG_MAX
 #define LONG_MAX (signed long)0xefffffffl
+#endif
 
 
 // Moved here by CN from apache header
