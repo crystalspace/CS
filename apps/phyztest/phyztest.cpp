@@ -532,7 +532,7 @@ void Phyztest::SetupFrame ()
       	->FindByName ("box");
       if (!tmpl)
       {     
-	Report (CS_REPORTER_SEVERITY_NOTIFY, "couldn't load template 'bot'");
+	Report (CS_REPORTER_SEVERITY_NOTIFY, "couldn't load template 'box'");
 	return;
       }
 
