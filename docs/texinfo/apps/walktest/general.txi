@@ -255,4 +255,8 @@ Clear all pseudo-dynamic lights in the world to black.
 
 @item setlight
 Set the color for the selected pseudo-dynamic light to r,g,b.
+
+@item db_osolid
+Debug command to create things from all solid space node boundaries for
+the octree.
 @end table
