@@ -164,7 +164,140 @@ void csGLTextureCache::Load (csTxtCacheData *d, bool reload)
   iTextureHandle *txt_handle = (iTextureHandle *)d->Source;
   csGLTextureHandle *txt_mm = (csGLTextureHandle *)
     txt_handle->GetPrivateObject ();
+  
+  if (reload)
+  {
+    if(txt_mm->target == iTextureHandle::CS_TEX_IMG_1D)
+      glBindTexture (GL_TEXTURE_1D, d->Handle);
+    else if(txt_mm->target == iTextureHandle::CS_TEX_IMG_2D)
+      glBindTexture (GL_TEXTURE_2D, d->Handle);
+    else if(txt_mm->target == iTextureHandle::CS_TEX_IMG_3D)
+      glBindTexture (GL_TEXTURE_3D, d->Handle);
+    else if(txt_mm->target == iTextureHandle::CS_TEX_IMG_CUBEMAP)
+      glBindTexture (GL_TEXTURE_CUBE_MAP_ARB, d->Handle);
 
+  }
+  else
+  {
+    GLuint texturehandle;
+    glGenTextures (1, &texturehandle);
+
+    d->Handle = texturehandle;
+
+    if(txt_mm->target == iTextureHandle::CS_TEX_IMG_1D)
+    {
+      glBindTexture (GL_TEXTURE_1D, d->Handle);
+      glTexParameteri (GL_TEXTURE_1D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+    }
+    else if(txt_mm->target == iTextureHandle::CS_TEX_IMG_2D)
+    {
+      glBindTexture (GL_TEXTURE_2D, d->Handle);
+      glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+      glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+    }
+    else if(txt_mm->target == iTextureHandle::CS_TEX_IMG_3D)
+    {
+      glBindTexture (GL_TEXTURE_3D, d->Handle);
+      glTexParameteri (GL_TEXTURE_3D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+      glTexParameteri (GL_TEXTURE_3D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+      glTexParameteri (GL_TEXTURE_3D, GL_TEXTURE_WRAP_R, GL_REPEAT);
+    }
+    else if(txt_mm->target == iTextureHandle::CS_TEX_IMG_CUBEMAP)
+    {
+      glBindTexture (GL_TEXTURE_CUBE_MAP_ARB, d->Handle);
+      // Are following lines actually useful ??
+      glTexParameteri (GL_TEXTURE_CUBE_MAP_ARB, GL_TEXTURE_WRAP_S, GL_REPEAT);
+      glTexParameteri (GL_TEXTURE_CUBE_MAP_ARB, GL_TEXTURE_WRAP_T, GL_REPEAT);
+      glTexParameteri (GL_TEXTURE_CUBE_MAP_ARB, GL_TEXTURE_WRAP_R, GL_REPEAT);
+    }
+
+   
+  }
+
+  for (int i=0; i < txt_mm->vTex.Length (); i++)
+  {
+    csGLTexture *togl = txt_mm->vTex[i];
+    if (togl->compressed == GL_FALSE)
+    {
+      if(txt_mm->target == iTextureHandle::CS_TEX_IMG_1D)
+      {
+        glTexImage1D (GL_TEXTURE_1D, 
+                      i,
+                      txt_mm->TargetFormat (),
+                      togl->get_width (),
+                      0,
+                      txt_mm->SourceFormat (),
+                      txt_mm->SourceType (),
+                      togl->image_data);
+      }
+      else if(txt_mm->target == iTextureHandle::CS_TEX_IMG_2D)
+      {
+        glTexImage2D (GL_TEXTURE_2D, 
+                      i, 
+                      txt_mm->TargetFormat (),
+                      togl->get_width (), 
+                      togl->get_height (),
+                      0, 
+                      txt_mm->SourceFormat (), 
+                      txt_mm->SourceType (), 
+                      togl->image_data);
+      }
+      else if(txt_mm->target == iTextureHandle::CS_TEX_IMG_3D)
+      {
+        R3D->ext.glTexImage3D (GL_TEXTURE_3D, 
+                      i,
+                      txt_mm->TargetFormat (),
+                      togl->get_width (),
+                      togl->get_height (),
+                      togl->get_depth (),
+                      0,
+                      txt_mm->SourceFormat (),
+                      txt_mm->SourceType (),
+                      togl->image_data);
+      }
+      else if(txt_mm->target == iTextureHandle::CS_TEX_IMG_CUBEMAP)
+      {
+        // TODO: load cubemaps into GL texture 
+
+        // >>= 3 == /= 8 ... turning bits per pixel int bytes per pixel
+        // componentcount
+
+        int compcount = txt_mm->bpp >> 3;
+        int cursize = togl->get_width() * togl->get_height () * compcount;
+
+        uint8 *data = togl->image_data;
+
+        int j;
+        for(j = 0; j < 6; j++)
+        {
+          glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + j,
+                        j,
+                        txt_mm->TargetFormat (),
+                        togl->get_width (),
+                        togl->get_height(),
+                        0,
+                        txt_mm->SourceFormat (),
+                        txt_mm->SourceType (),
+                        data);
+
+          data += cursize;
+        }
+
+        
+      }
+
+      
+    }
+    else
+    {
+      R3D->ext.glCompressedTexImage2DARB (
+        GL_TEXTURE_2D, i, (GLenum)togl->internalFormat,
+        togl->get_width (), togl->get_height (), 0,
+        togl->size, togl->image_data);
+    }
+  
+  }
+/*
   if (reload)
   {
     glBindTexture (GL_TEXTURE_2D, d->Handle);
@@ -208,6 +341,8 @@ void csGLTextureCache::Load (csTxtCacheData *d, bool reload)
         GL_TEXTURE_2D, i, (GLenum)togl->internalFormat,
   togl->get_width (), togl->get_height (), 0,
   togl->size, togl->image_data);
+  
   }
+  */
 }
 
