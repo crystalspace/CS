@@ -27,7 +27,7 @@
 
 IMPLEMENT_COMPOSITE_UNKNOWN( csPolygonSet, PolygonSet )
 
-STDMETHODIMP IPolygonSet::GetName(char** szName)
+STDMETHODIMP IPolygonSet::GetName(const char** szName)
 {
     METHOD_PROLOGUE( csPolygonSet, PolygonSet );
     *szName = csNameObject::GetName(*pThis);
@@ -36,7 +36,7 @@ STDMETHODIMP IPolygonSet::GetName(char** szName)
 
 IMPLEMENT_COMPOSITE_UNKNOWN( csPolygon3D, Polygon3D )
 
-STDMETHODIMP IPolygon3D::GetName(char** szName)
+STDMETHODIMP IPolygon3D::GetName(const char** szName)
 {
     METHOD_PROLOGUE( csPolygon3D, Polygon3D );
     *szName = csNameObject::GetName(*pThis);
@@ -202,3 +202,4 @@ STDMETHODIMP IPolygonTexture::GetTextureBox( float& fMinU, float& fMinV, float& 
 
 	return S_OK;
 }
+

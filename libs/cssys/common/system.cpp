@@ -728,7 +728,7 @@ void csSystemDriver::Printf (int mode, const char* str, ...)
 
     case MSG_TICKER:
     {
-      static print_work_counter=0;
+      static int print_work_counter=0;
 
       if(!strcasecmp(buf,"begin"))
         print_work_counter=1;
