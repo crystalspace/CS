@@ -7,6 +7,7 @@ individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
 3-Dec-2004
+        - res added a missing 0 check to the GL halo cleaning code.
 	- Jorrit removed the GetValueNames() from iKeyValuePair again as it
 	  is illegal to return a csArray directly in an SCF interface (due
 	  to inter-plugin memory management issues).
@@ -20,6 +21,8 @@ chronological order.
 	- Squee changed GetShades() in csGradientShades to return a reference.
 	- Jorrit added support for loading library files to viewmesh. In
 	  that case the first mesh factory in that library will be shown.
+        - res fixed the or_lighting shader to respect the alpha of the vertex
+          colors again.
 2-Dec-2004
 	- Eric Sunshine fixed the various extension checks in glextmanager.h so
 	  that they won't crash if glGetString(GL_EXTENSIONS) and/or
