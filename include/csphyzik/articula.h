@@ -95,7 +95,7 @@ public:
 	ctInverseKinematics *install_IK_solver();
 
 	// propagates velocities from base link to ends of articulated bodies
-	// also calculates R_fg and r_fg
+	// also calculates T_fg and r_fg
 	void compute_link_velocities();
 
 	// calculate relative frame of reference from parent
@@ -105,7 +105,7 @@ public:
 
 	friend class ctFeatherstoneAlgorithm;
 	friend class ctInverseKinematics;
-
+  friend class ctJoint;
 protected:
 
 	ctRigidBody *handle;	// rigid body for the root of this articulated body
@@ -117,7 +117,7 @@ protected:
 	// work variables
 
 	// calculated in compute_link_velocities
-	ctMatrix3 R_fg; // coord transfrom matrix, not rotation, from inboard link
+	ctMatrix3 T_fg; // coord transfrom matrix, not rotation, from inboard link
 					// frame to this frame
 	ctVector3 r_fg; // vector from center of inboard frame to this frame in this
 					// frame's coords
