@@ -19,6 +19,8 @@ chronological order.
 	- Jorrit also removed metaball and metagen since both use
 	  csTesselator. They can be revived if someone can provide an
 	  alternative algorithm to do tesselation.
+	- Eric Sunshine eliminated signed versus unsigned compilation warning
+	  from impnames.cpp.
 19-Oct-2003
 	- res fixed a bug in the OR polygon buffers: when two polygons 
 	  subsequently passed into AddPolygon() would have different lightmaps,

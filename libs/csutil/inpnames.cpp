@@ -244,7 +244,7 @@ static const char* GetModifierStr (int num, int type)
 {
   for (csKeyModDef* md = KeyModifiers; md->key != 0; md++)
   {
-    if (md->code == CSKEY_MODIFIER (num, type))
+    if (md->code == (utf32_char)CSKEY_MODIFIER (num, type))
     {
       return md->key;
     }
