@@ -7,6 +7,12 @@ The history order has been reversed so that new features are at the top.
 	  project.
 	- Eric Sunshine worked around a NextStep compiler shortcoming where it
 	  failed to grok subclasses of csFrustumView::CleanupAction.
+	- Eric Sunshine fixed a nasty bug where VFS was being created and
+	  destroyed twice in applications which requested VFS explicitly with
+	  RequestPlugin().  In addition to other problems caused by double
+	  instantiation, this had the particularly undesirable effect of
+	  creating and destroying VFS's global ArchiveCache twice, thus
+	  resulting in a crash on some platforms.
 31-May-2000
 	- Added a new allegro canvas driver from Burton Radonsxi
 	  <loth@pacificcoast.net>.  This allegro driver is developed on Linux

@@ -250,11 +250,11 @@ public:
 
 private:
   // Find a file either on disk or in archive - in this node only
-  bool FindFile (const char *Suffix, char *RealPath, csArchive *&Archive) const;
+  bool FindFile (const char *Suffix, char *RealPath, csArchive *&) const;
 };
 
 // The global archive cache
-static VfsArchiveCache *ArchiveCache;
+static VfsArchiveCache *ArchiveCache = NULL;
 
 // -------------------------------------------------------------- csFile --- //
 
@@ -551,7 +551,7 @@ ArchiveFile::ArchiveFile (int Mode, VfsNode *ParentNode, int RIndex,
   }
   else if ((Mode & VFS_FILE_MODE) == VFS_FILE_WRITE)
   {
-    if ((fh = Archive->NewFile (NameSuffix, 0, !(Mode & VFS_FILE_UNCOMPRESSED))))
+    if ((fh = Archive->NewFile(NameSuffix,0,!(Mode & VFS_FILE_UNCOMPRESSED))))
     {
       Error = VFS_STATUS_OK;
       Archive->Writing++;
@@ -1078,6 +1078,7 @@ csVFS::csVFS (iBase *iParent) : dirstack (8, 8)
   cnode = NULL;
   cnsufx [0] = 0;
   config = NULL;
+  CS_ASSERT (ArchiveCache == NULL);
   ArchiveCache = new VfsArchiveCache ();
 }
 
@@ -1085,7 +1086,9 @@ csVFS::~csVFS ()
 {
   delete config;
   delete [] cwd;
+  CS_ASSERT (ArchiveCache != NULL);
   delete ArchiveCache;
+  ArchiveCache = NULL;
   if (System) System->DecRef ();
 }
 

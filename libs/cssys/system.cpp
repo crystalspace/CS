@@ -427,9 +427,6 @@ bool csSystemDriver::Initialize (int argc, const char* const argv[], const char 
   for (n = 0; n < ConfigList.Length (); n++)
   {
     const char *funcID = ConfigList.Get (n);
-    // If plugin is VFS then skip if already loaded earlier
-    if (VFS && strcmp (funcID, CS_FUNCID_VFS) == 0)
-      continue;
     // If -video was used to override 3D driver, then respect it.
     if (g3d_override && strcmp (funcID, CS_FUNCID_VIDEO) == 0)
       continue;
@@ -445,7 +442,13 @@ bool csSystemDriver::Initialize (int argc, const char* const argv[], const char 
 
   // Load all plugins
   for (n = 0; n < PluginList.Length (); n++)
-    LoadPlugIn (PluginList.Get (n).ClassID, PluginList.Get (n).FuncID, NULL, 0);
+  {
+    const csPluginLoadRec& r = PluginList.Get(n);
+    // If plugin is VFS then skip if already loaded earlier.
+    if (VFS && strcmp (r.FuncID, CS_FUNCID_VFS) == 0)
+      continue;
+    LoadPlugIn (r.ClassID, r.FuncID, NULL, 0);
+  }
 
   // See if user wants help
   if ((val = GetOptionCL ("help")))
