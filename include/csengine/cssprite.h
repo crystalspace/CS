@@ -288,7 +288,7 @@ public:
   /// Get the texture handle.
   ITextureHandle* GetTextureHandle () const { return cstxt->GetTextureHandle (); }
   /// Set the texture used for this sprite
-  void SetTexture (csTextureList* textures, char *texname);
+  void SetTexture (csTextureList* textures, const char *texname);
 
   CSOBJTYPE;
 };
@@ -450,7 +450,7 @@ public:
   csSkeletonState* GetSkeletonState () { return skeleton_state; }
 
   /// force a new texture skin other than default
-  void SetTexture (char * name, csTextureList* textures);
+  void SetTexture (const char* name, csTextureList* textures);
 
   /// Mark this sprite as visible.
   void MarkVisible () { is_visible = true; }

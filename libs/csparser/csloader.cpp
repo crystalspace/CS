@@ -1631,7 +1631,7 @@ csCurve* csLoader::load_bezier (char* polyname, csWorld* w, char* buf,
 
 //---------------------------------------------------------------------------
 
-ImageFile* csLoader::load_image (char* name, csWorld* w)
+ImageFile* csLoader::load_image (const char* name, csWorld* w)
 {
   (void) w;
   size_t size;
@@ -1667,7 +1667,7 @@ void csLoader::txt_process (char *name, char* buf, csTextureList* textures, csWo
   TOKEN_TABLE_END
 
   long cmd;
-  char *filename = name;
+  const char *filename = name;
   char *params;
   csColor transp;
   bool do_transp = false;
@@ -3460,7 +3460,7 @@ void csLoader::skydome_process (csSector& sector, char* name, char* buf,
 
 //---------------------------------------------------------------------------
 
-csSoundDataObject* csLoader::load_sound(char* name, char* filename, csWorld* w)
+csSoundDataObject* csLoader::load_sound(char* name, const char* filename, csWorld* w)
 {
   (void) w;
 
@@ -3639,7 +3639,7 @@ bool csLoader::LoadWorld (csWorld* world, LanguageLayer* layer, char* buf)
   return true;
 }
 
-bool csLoader::LoadWorldFile (csWorld* world, LanguageLayer* layer, char* file)
+bool csLoader::LoadWorldFile (csWorld* world, LanguageLayer* layer, const char* file)
 {
   world->StartWorld ();
   LoadStat::Init ();
@@ -3794,7 +3794,7 @@ bool csLoader::LoadLibrary (csWorld* world, char* buf)
   return true;
 }
 
-bool csLoader::LoadLibraryFile (csWorld* world, char* fname)
+bool csLoader::LoadLibraryFile (csWorld* world, const char* fname)
 {
   size_t size;
   char *buf = VFS->ReadFile (fname, size);
@@ -3811,7 +3811,7 @@ bool csLoader::LoadLibraryFile (csWorld* world, char* fname)
   return retcode;
 }
 
-csTextureHandle* csLoader::LoadTexture (csWorld* world, char* name, char* fname)
+csTextureHandle* csLoader::LoadTexture (csWorld* world, const char* name, const char* fname)
 {
   ImageFile *image = load_image (fname, world);
   csTextureHandle *tm = world->GetTextures ()->NewTexture (image);
@@ -3846,7 +3846,7 @@ bool csLoader::LoadSounds (csWorld* world, char* buf)
     {
       case TOKEN_SOUND:
         {
-          char* filename = name;
+          const char* filename = name;
 	  char* maybename;
           cmd = csGetCommand (&params, options, &maybename);
 	  if (cmd == TOKEN_FILE)

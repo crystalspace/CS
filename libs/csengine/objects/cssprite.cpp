@@ -267,7 +267,7 @@ csSpriteAction* csSpriteTemplate::AddAction ()
   return a;
 }
 
-void csSpriteTemplate::SetTexture (csTextureList* textures, char *texname)
+void csSpriteTemplate::SetTexture (csTextureList* textures, const char *texname)
 {
   if (!textures)
   {
@@ -393,7 +393,7 @@ void csSprite3D::SetTemplate (csSpriteTemplate* tmpl)
   if (tmpl->GetSkeleton ()) skeleton_state = (csSkeletonState*)tmpl->GetSkeleton ()->CreateState ();
 }
 
-void csSprite3D::SetTexture (char * name, csTextureList* textures)
+void csSprite3D::SetTexture (const char* name, csTextureList* textures)
 {
   force_otherskin = true;
   csTextureHandle* texture = textures->GetTextureMM (name);

@@ -111,7 +111,7 @@ public:
         CLights* default_lightx, csSector* sec, csPolygonSet* parent);
 
   ///
-  static ImageFile* load_image(char* name, csWorld* w);
+  static ImageFile* load_image(const char* name, csWorld* w);
   ///
   static void txt_process (char *name, char* buf, csTextureList* textures, csWorld *world);
   ///
@@ -139,13 +139,13 @@ public:
   static void load_light (char* name, char* buf);
 
   ///
-  static csSoundDataObject* load_sound (char* name, char* filename, csWorld* w);
+  static csSoundDataObject* load_sound (char* name, const char* filename, csWorld* w);
 
   /// Load data into a world.
   static bool LoadWorld (csWorld* world, LanguageLayer* layer, char* buf);
 
   /// Load file into a world.
-  static bool LoadWorldFile (csWorld* world, LanguageLayer* layer, char* filename);
+  static bool LoadWorldFile (csWorld* world, LanguageLayer* layer, const char* filename);
 
   /**
    * Load a library into given world.<p>
@@ -155,7 +155,7 @@ public:
   static bool LoadLibrary (csWorld* world, char* buf);
 
   /// Load library from a VFS file
-  static bool LoadLibraryFile (csWorld* world, char* filename);
+  static bool LoadLibraryFile (csWorld* world, const char* filename);
 
   /**
    * Load all the texture descriptions from the world
@@ -167,7 +167,7 @@ public:
    * Load a texture and add it to the world.
    * The texture will be registered for 3d use only.
    */
-  static csTextureHandle* LoadTexture (csWorld* world, char* name, char* fname);
+  static csTextureHandle* LoadTexture (csWorld* world, const char* name, const char* fname);
 
   /**
    * Load sounds from a SOUNDS(...) argument.
