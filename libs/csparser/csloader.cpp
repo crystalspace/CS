@@ -2698,7 +2698,7 @@ defaulthalo:
     if (cmd == CS_PARSERR_TOKENNOTFOUND)
     {
       TokenError ("a light");
-      return false;
+      return NULL;
     }
   }
 
