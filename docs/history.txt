@@ -1,5 +1,15 @@
 The history order is reversed so that new features are at the top.
 
+19-Jul-2002
+	- Got a new tutorial from Hariharan Bhasker. This tutorial
+	  shows how to use the csPath class in csgeom to smoothly move
+	  an object along a path. This class is also used in csdemo
+	  to achieve the smooth movements of the ships in the space
+	  demo. In addition to the position of the object, the forward
+	  and up vectors are also interpolated by csPath. The tree
+	  resulting vectors can then be used with SetOrigin() and
+	  LookAt(). The tutorial is also speed independent so that
+	  the object will move at the same speed on all hardware.
 18-Jul-2002
 	- Steven Geens fixed a bad bug in the RAPID collision detection
 	  plugin. It now seems to work properly in all cases regardless
@@ -9,7 +19,7 @@ The history order is reversed so that new features are at the top.
 	- Added iTerrFuncState::GetHeightFunction() and GetNormalFunction()
 	  so that you can retrieve the functions used by the landscape
 	  engine.
-height_func17-Jul-2002
+17-Jul-2002
 	- Added unittest for RAPID plugin. Extended unittest app so that it
 	  calls this unittest. This test now fails but I don't know why.
 	  Some help would be helpful here.

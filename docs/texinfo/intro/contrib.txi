@@ -87,11 +87,18 @@ obsolete.
 
 @uref{http://www.helsinki.fi/~jxsaarin/crystalspace/}
 
+@item Hariharan Bhasker (@email{hbhasker@@in.ibm.com})
+
+Hariharan wrote the pathtut tutorial in CS. This tutorial shows how
+to use the @code{csPath} class to smoothly move an object along some
+path.
+
 @item
 Steven Geens (@email{old_belge@@hotmail.com})
 
 Steven made a MilkShape to CS sprite convertor which also supports
-skeletal animation.
+skeletal animation. Steven also fixed a very bad bug in the collision
+detection system.
 
 @item
 Steve Israelson (@email{pfhorte@@rogers.wave.ca})
