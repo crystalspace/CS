@@ -22,6 +22,8 @@
 //#include <iostream.h> 
 
 #include "csterr/ddg.h"
+#include "types.h"
+
 /**
  * Basic string class, supports streaming to output.
  */

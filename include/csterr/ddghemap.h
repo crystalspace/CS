@@ -20,6 +20,8 @@
 #define _ddgHeightMap_Class_
 
 #include "csterr/ddg.h"
+#include "types.h"
+
 /**
  * A 16bit heightmap object which can be read from terragen file.
  * Also includes the ability to generate noise based maps.
