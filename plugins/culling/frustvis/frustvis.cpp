@@ -187,7 +187,11 @@ bool csFrustumVis::Initialize (iObjectRegistry *object_reg)
 
   delete kdtree;
 
+#ifndef CS_USE_NEW_RENDERER
   csRef<iGraphics3D> g3d (CS_QUERY_REGISTRY (object_reg, iGraphics3D));
+#else
+  csRef<iGraphics3D> g3d (CS_QUERY_REGISTRY (object_reg, iRender3D));
+#endif // CS_USE_NEW_RENDERER
   if (g3d)
   {
     scr_width = g3d->GetWidth ();
