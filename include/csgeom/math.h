@@ -28,8 +28,8 @@
 /**
  * Returns bigger of a and b. If they are equal, a or b can be returned.
  */
-template<typename T>
-T csMax (const T& a, const T& b)
+template<class T>
+const T& csMax (const T& a, const T& b)
 {
   if (a >= b) return a;
   return b;
@@ -38,8 +38,8 @@ T csMax (const T& a, const T& b)
 /**
  * Returns smaller of a and b. If they are equal, a or b can be returned.
  */
-template<typename T>
-T csMin (const T& a, const T& b)
+template<class T>
+const T& csMin (const T& a, const T& b)
 {
   if (a < b) return a;
   return b;
@@ -49,7 +49,7 @@ T csMin (const T& a, const T& b)
 /**
  * Clamp a between max and min.
  */
-template<typename T>
+template<class T>
 T csClamp (const T& a, T max, T min)
 {
   return csMin (csMax (a, min), max);
@@ -58,7 +58,7 @@ T csClamp (const T& a, T max, T min)
 /**
  * Preforms a smooth interpolation of a on range min to max
  */
-template<typename T>
+template<class T>
 T csSmoothStep (const T& a, T max, T min)
 {
   T tmp;
@@ -68,7 +68,7 @@ T csSmoothStep (const T& a, T max, T min)
     tmp = max;
   else
   {
-    a = (a - min)/(max-min);
+    a = (a - min) / (max-min);
     tmp = a*a * (3.0 - 2.0*a);
   }
   return tmp;
@@ -77,12 +77,11 @@ T csSmoothStep (const T& a, T max, T min)
 /**
  * Returns the square of the argument
  */
-template<typename T>
+template<class T>
 T csSquare (const T& x)
 {
   return x * x;
 }
-
 
 /** @} */
 

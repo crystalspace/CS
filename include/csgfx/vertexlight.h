@@ -23,15 +23,14 @@
 #include "csgeom/vector3.h"
 #include "iengine/light.h"
 
-
 // Attenuation functors
 
 /**
  * No attenuation. 
  */
-struct NoAttenuation
+struct CS_CSGFX_EXPORT csNoAttenuation
 {
-  NoAttenuation (iLight *light)
+  csNoAttenuation (iLight *light)
   {}
 
   CS_FORCEINLINE void operator() (float distance, float &dp) const
@@ -42,9 +41,9 @@ struct NoAttenuation
  * Linear attenuation.
  * Out = in * (1 - distance/radius)
  */
-struct LinearAttenuation
+struct CS_CSGFX_EXPORT csLinearAttenuation
 {
-  LinearAttenuation (iLight *light)
+  csLinearAttenuation (iLight *light)
   {
     invrad = 1/light->GetAttenuationConstants ().x;
   }
@@ -61,9 +60,9 @@ struct LinearAttenuation
  * Inverse linear attenuation.
  * Out = in * / distance
  */
-struct InverseAttenuation
+struct CS_CSGFX_EXPORT csInverseAttenuation
 {
-  InverseAttenuation (iLight *light)
+  csInverseAttenuation (iLight *light)
   {}
 
   CS_FORCEINLINE void operator() (float distance, float& dp) const
@@ -77,9 +76,9 @@ struct InverseAttenuation
  * Inverse quadratic attenuation.
  * Out = in * / distance^2
  */
-struct RealisticAttenuation
+struct CS_CSGFX_EXPORT csRealisticAttenuation
 {
-  RealisticAttenuation (iLight *light)
+  csRealisticAttenuation (iLight *light)
   {}
 
   CS_FORCEINLINE void operator() (float distance, float& dp) const
@@ -92,9 +91,9 @@ struct RealisticAttenuation
  * Constant, Linear, Quadratic attenuation
  * Out = in /(const + distance*lin + distance^2*quad)
  */
-struct CLQAttenuation
+struct CS_CSGFX_EXPORT csCLQAttenuation
 {
-  CLQAttenuation (iLight *light)
+  csCLQAttenuation (iLight *light)
     : attnVec (light->GetAttenuationConstants ())
   {}
 
@@ -111,11 +110,12 @@ struct CLQAttenuation
  * Template parameters:
  *   AttenuationProc - Functor for attenuation
  */
-template<typename AttenuationProc>
-class PointLightProc
+template<class AttenuationProc>
+class csPointLightProc
 {
 public:
-  PointLightProc (iLight *light, iMovable *objectMovable, float blackLimit = 0.0001f)
+  csPointLightProc (iLight *light, iMovable *objectMovable,
+    float blackLimit = 0.0001f)
     : attn (light), nullColor (0.0f, 0.0f, 0.0f), blackLimit (blackLimit)
   {
     csReversibleTransform objT = objectMovable->GetFullTransform ();
@@ -123,7 +123,8 @@ public:
     lightCol = light->GetColor ();
   }
 
-  CS_FORCEINLINE csColor ProcessVertex (const csVector3 &v,const csVector3 &n) const
+  CS_FORCEINLINE
+  csColor ProcessVertex (const csVector3 &v,const csVector3 &n) const
   {
     //compute gouraud shading..
     csVector3 direction = v-lightPos;
@@ -150,22 +151,25 @@ private:
  * Template parameters:
  *   AttenuationProc - Functor for attenuation
  */
-template<typename AttenuationProc>
-class DirectionalLightProc
+template<class AttenuationProc>
+class csDirectionalLightProc
 {
 public:
-  DirectionalLightProc (iLight *light, iMovable *objectMovable, float blackLimit = 0.0001f)
+  csDirectionalLightProc (iLight *light, iMovable *objectMovable,
+    float blackLimit = 0.0001f)
     : attn (light), nullColor (0.0f, 0.0f, 0.0f), blackLimit (blackLimit)
   {
     csReversibleTransform objT = objectMovable->GetFullTransform ();
     csReversibleTransform lightT = light->GetMovable ()->GetFullTransform ();
     lightPos = objT.Other2This (lightT.GetOrigin ());
-    lightDir = objT.Other2ThisRelative (lightT.This2OtherRelative (light->GetDirection ()));
+    lightDir = objT.Other2ThisRelative (lightT.This2OtherRelative (
+      light->GetDirection ()));
     lightDir = lightDir.Unit ();
     lightCol = light->GetColor ();
   }
 
-  CS_FORCEINLINE csColor ProcessVertex (const csVector3 &v,const csVector3 &n) const
+  CS_FORCEINLINE
+  csColor ProcessVertex (const csVector3 &v,const csVector3 &n) const
   {
     //compute gouraud shading..
     float dp = lightDir*n;
@@ -193,24 +197,27 @@ private:
 * Template parameters:
 *   AttenuationProc - Functor for attenuation
 */
-template<typename AttenuationProc>
-class SpotLightProc
+template<class AttenuationProc>
+class csSpotLightProc
 {
 public:
-  SpotLightProc (iLight *light, iMovable *objectMovable, float blackLimit = 0.0001f)
+  csSpotLightProc (iLight *light, iMovable *objectMovable,
+    float blackLimit = 0.0001f)
     : attn (light), nullColor (0.0f, 0.0f, 0.0f), blackLimit (blackLimit)
   {
     csReversibleTransform objT = objectMovable->GetFullTransform ();
     csReversibleTransform lightT = light->GetMovable ()->GetFullTransform ();
     lightPos = objT.Other2This (lightT.GetOrigin ());
-    lightDir = objT.Other2ThisRelative (lightT.This2OtherRelative (light->GetDirection ()));
+    lightDir = objT.Other2ThisRelative (lightT.This2OtherRelative (
+      light->GetDirection ()));
     lightDir = lightDir.Unit ();
 
     lightCol = light->GetColor ();
     light->GetSpotLightFalloff (falloffInner, falloffOuter);
   }
 
-  CS_FORCEINLINE csColor ProcessVertex (const csVector3 &v,const csVector3 &n) const
+  CS_FORCEINLINE
+  csColor ProcessVertex (const csVector3 &v,const csVector3 &n) const
   {
     csVector3 direction = (v-lightPos).Unit ();
 
@@ -218,7 +225,8 @@ public:
     float dp = direction*n;
     if (dp > blackLimit)
     {
-      float cosfact = csSmoothStep (-(direction*lightDir), falloffOuter, falloffInner);
+      float cosfact =
+	csSmoothStep (-(direction*lightDir), falloffOuter, falloffInner);
       if (cosfact > 0)
       {
         attn (distance, dp);
@@ -238,12 +246,12 @@ private:
   float falloffInner, falloffOuter;
 };
 
-template<typename LightProc, typename VertexType = csVector3, 
-  typename ColorType = csColor>
-class VertexLightCalculator
+template<class LightProc, class VertexType = csVector3,
+  class ColorType = csColor>
+class csVertexLightCalculator
 {
 public:
-  VertexLightCalculator ()
+  csVertexLightCalculator ()
   {
   }
 

@@ -36,6 +36,7 @@
 #include "csgfx/shaderexp.h"
 #include "csgfx/shadervar.h"
 #include "csgfx/shadervarcontext.h"
+#include "csgfx/vertexlight.h"
 #include "csgfx/xorpat.h"
 #endif /* __CSGFX_H__ */
 

@@ -28,6 +28,7 @@
 #include "csgeom/fastsqrt.h"
 #include "csgeom/frustum.h"
 #include "csgeom/kdtree.h"
+#include "csgeom/math.h"
 #include "csgeom/math2d.h"
 #include "csgeom/math3d.h"
 #include "csgeom/math3d_d.h"

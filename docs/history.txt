@@ -23,6 +23,24 @@ chronological order.
 	  problems in material recently added to the CS manual.
 	- Eric Sunshine cleaned up and re-wrote portions of the new Dev-CPP
 	  HOWTO.
+	- Eric Sunshine replaced 'typename' in template arguments with 'class'
+	  in some recently added templates in order to support slightly older
+	  compilers. CS fakes up a 'typename' keyword, but it is meant to be
+	  used only to pacify modern compilers which complain about ambiguous
+	  type names within templates; not for declaration of template
+	  arguments.
+	- Eric Sunshine renamed the following recently added classes in order
+	  to avoid global namespace pollution:
+	    CLQAttenuation        --> csCLQAttenuation
+	    DirectionalLightProc  --> csDirectionalLightProc
+	    InverseAttenuation    --> csInverseAttenuation
+	    LinearAttenuation     --> csLinearAttenuation
+	    PointLightProc        --> csPointLightProc
+	    RealisticAttenuation  --> csRealisticAttenuation
+	    SpotLightProc         --> csSpotLightProc
+	    VertexLightCalculator --> csVertexLightCalculator
+	- Eric Sunshine added a bunch of missing CS_CSGFX_EXPORT directives to
+	  classes in csgfx/vertexlight.h.
 24-Feb-2005
 	- Jorrit fixed edge drawing by the OpenGL renderer by using
 	  glPolygonMode(GL_BACK,GL_LINE) instead of the way it was currently
