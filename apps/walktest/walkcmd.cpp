@@ -946,6 +946,53 @@ void WalkTest::ParseKeyCmds (iObject* src)
       if (always)
 	Sys->busy_entities.Push (rotobj);
     }
+    else if (!strcmp (kp->GetKey (), "entity_WavePortal"))
+    {
+      iMeshWrapper* wrap = SCF_QUERY_INTERFACE_FAST (src, iMeshWrapper);
+      if (wrap)
+      {
+        iThingState* thing = SCF_QUERY_INTERFACE_FAST (
+		wrap->GetMeshObject (), iThingState);
+	if (thing)
+	{
+	  char polyname[255];
+	  int xyz;
+	  float max_angle, speed;
+	  csScanStr (kp->GetValue (), "%s,%d,%f,%f",
+	  	polyname, &xyz, &max_angle, &speed);
+
+	  iPolygon3D* p = thing->GetPolygon (polyname);
+	  if (!p)
+	  {
+	    Sys->Report (CS_REPORTER_SEVERITY_WARNING,
+	    	"Cannot find a polygon named '%s'!", polyname);
+	  }
+	  else
+	  {
+	    iPortal* po = p->GetPortal ();
+	    if (!po)
+	    {
+	      Sys->Report (CS_REPORTER_SEVERITY_WARNING,
+	    	"This polygon '%s' has no portal!", polyname);
+	    }
+	    else
+	    {
+	      csAnimatedPortal* anportal = new csAnimatedPortal (po,
+	      	xyz, max_angle, speed);
+	      src->ObjAdd (anportal);
+	      Sys->busy_entities.Push (anportal);
+	    }
+	  }
+	  thing->DecRef ();
+	}
+	else
+	{
+	  Sys->Report (CS_REPORTER_SEVERITY_WARNING,
+	  	"This mesh object is not a thing!");
+	}
+        wrap->DecRef ();
+      }
+    }
     else if (!strcmp (kp->GetKey (), "entity_Light"))
     {
       iMeshWrapper *wrap = SCF_QUERY_INTERFACE_FAST (src, iMeshWrapper);

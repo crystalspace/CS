@@ -96,6 +96,7 @@ CS_TOKEN_DEF_START
   CS_TOKEN_DEF (COLORS)
   CS_TOKEN_DEF (COLLDET)
   CS_TOKEN_DEF (COSFACT)
+  CS_TOKEN_DEF (MAXVISIT)
   CS_TOKEN_DEF (MIXMODE)
   CS_TOKEN_DEF (LEN)
   CS_TOKEN_DEF (V)
@@ -542,7 +543,8 @@ bool csTextSyntaxService::ParseTexture (
 }
 
 bool csTextSyntaxService::ParseWarp (
-	char *buf, csVector &flags, bool &mirror,
+	char *buf, csVector &flags, bool &mirror, bool &warp,
+	int& msv,
 	csMatrix3 &m, csVector3 &before, csVector3 &after)
 {
 
@@ -552,10 +554,10 @@ bool csTextSyntaxService::ParseWarp (
     CS_TOKEN_TABLE (W)
     CS_TOKEN_TABLE (MIRROR)
     CS_TOKEN_TABLE (STATIC)
+    CS_TOKEN_TABLE (MAXVISIT)
     CS_TOKEN_TABLE (ZFILL)
     CS_TOKEN_TABLE (CLIP)
   CS_TOKEN_TABLE_END
-
 
   char *params, *name;
   long cmd;
@@ -570,18 +572,24 @@ bool csTextSyntaxService::ParseWarp (
     }
     switch (cmd)
     {
+    case CS_TOKEN_MAXVISIT:
+      csScanStr (params, "%d", &msv);
+      break;
     case CS_TOKEN_MATRIX:
       ParseMatrix (params, m);
       mirror = false;
+      warp = true;
       break;
     case CS_TOKEN_V:
       ParseVector (params, before);
       after = before;
       mirror = false;
+      warp = true;
       break;
     case CS_TOKEN_W:
       ParseVector (params, after);
       mirror = false;
+      warp = true;
       break;
     case CS_TOKEN_MIRROR:
       mirror = true;
@@ -755,8 +763,11 @@ bool csTextSyntaxService::ParsePoly3d (
           csVector3 v_w_before (0, 0, 0);
           csVector3 v_w_after (0, 0, 0);
 	  csVector flags;
+	  bool do_warp = false;
+	  int msv = -1;
 
-	  if (ParseWarp (params, flags, do_mirror, m_w, v_w_before, v_w_after))
+	  if (ParseWarp (params, flags, do_mirror, do_warp, msv,
+	      m_w, v_w_before, v_w_after))
 	  {
 	    for (int i = 0; i < flags.Length (); i++)
 	      poly3d->GetPortal ()->GetFlags ().Set ((uint)flags.Get (i));
@@ -765,8 +776,13 @@ bool csTextSyntaxService::ParsePoly3d (
 	    {
 	      if (!set_colldet) set_colldet = 1;
 	    }
-	    else
+	    else if (do_warp)
 	      poly3d->GetPortal ()->SetWarp (m_w, v_w_before, v_w_after);
+
+	    if (msv != -1)
+	    {
+	      poly3d->GetPortal ()->SetMaximumSectorVisit (msv);
+	    }
 	  }
 	  else
 	  {

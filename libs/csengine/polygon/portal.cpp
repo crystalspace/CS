@@ -51,12 +51,12 @@ csPortal::csPortal ()
   sector = NULL;
   sector_cb = NULL;
   portal_cb = NULL;
+  max_sector_visit = 5;
 }
 
 csPortal::~csPortal ()
 {
   // Before destruction the destination of the portal needs to be
-
   // set to NULL.
   CS_ASSERT (sector == NULL);
   if (filter_texture) filter_texture->DecRef ();
@@ -183,15 +183,10 @@ void csPortal::SetWarp (
   warp_obj = csTransform (m_w.GetInverse (), v_w_after - m_w * v_w_before);
 
   // If the three colunms of the transformation matrix are taken
-
   // as vectors, V1, V2, and V3, then V1 x V2 = ( + or - ) V3.
-
   // The result is positive for non-mirroring transforms, and
-
   // negative for mirroring transforms.  Thus, (V1 x V2) * V3
-
   // will equal +1 or -1, depending on whether the transform is
-
   // mirroring.
   csMatrix3 m = warp_obj.GetO2T ();
   flags.SetBool (
@@ -245,11 +240,8 @@ csVector3 csPortal::Warp (const csVector3 &pos) const
 void csPortal::WarpSpace (csReversibleTransform &t, bool &mirror) const
 {
   // warp_wor is a world -> warp space transformation.
-
   // t is a world -> camera space transformation.
-
   // Set t to equal a warp -> camera space transformation by
-
   // reversing warp and then applying the old t.
   t /= warp_wor;
   if (flags.Check (CS_PORTAL_MIRROR)) mirror = !mirror;
@@ -261,7 +253,8 @@ bool csPortal::Draw (
   iRenderView *rview)
 {
   if (!CompleteSector (rview)) return false;
-  if (sector->GetPrivateObject ()->draw_busy >= 5) return false;
+  if (sector->GetPrivateObject ()->draw_busy >= max_sector_visit)
+    return false;
 
   Stats::portals_drawn++;
   if (!new_clipper->GetVertexCount ()) return false;
@@ -336,7 +329,8 @@ csPolygon3D *csPortal::HitBeam (
   csVector3 &isect)
 {
   if (!CompleteSector (NULL)) return NULL;
-  if (sector->GetPrivateObject ()->draw_busy >= 5) return NULL;
+  if (sector->GetPrivateObject ()->draw_busy >= max_sector_visit)
+    return NULL;
   if (flags.Check (CS_PORTAL_WARP))
   {
     csVector3 new_start = warp_wor.Other2This (start);
@@ -360,7 +354,8 @@ csMeshWrapper *csPortal::HitBeam (
   csPolygon3D **polygonPtr)
 {
   if (!CompleteSector (NULL)) return NULL;
-  if (sector->GetPrivateObject ()->draw_busy >= 5) return NULL;
+  if (sector->GetPrivateObject ()->draw_busy >= max_sector_visit)
+    return NULL;
   if (flags.Check (CS_PORTAL_WARP))
   {
     csVector3 new_start = warp_wor.Other2This (start);
@@ -412,13 +407,12 @@ void csPortal::CheckFrustum (iFrustumView *lview, int alpha)
       new_ctxt->SetMirrored (!old_ctxt->IsMirrored ());
     new_ctxt->GetLightFrustum ()->SetMirrored (new_ctxt->IsMirrored ());
 
-    // Transform all shadow frustums. First make a copy.
-
-    // Note that we only copy the relevant shadow frustums.
-
-    // We know that csPolygon3D::CalculateLighting() called
-
-    // csPolygon3D::MarkRelevantShadowFrustums() some time before
+    /*
+     * Transform all shadow frustums. First make a copy.
+     * Note that we only copy the relevant shadow frustums.
+     * We know that csPolygon3D::CalculateLighting() called
+     * csPolygon3D::MarkRelevantShadowFrustums() some time before
+     */
 
     // calling this function so the 'relevant' flags are still valid.
     iShadowBlock *slist = old_ctxt->GetShadows ()->GetFirstShadowBlock ();

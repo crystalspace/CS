@@ -1,5 +1,21 @@
 The history order is reversed so that new features are at the top.
 
+20-Feb-2002
+	- Added SetMaximumSectorVisit() and GetMaximumSectorVisit() functions
+	  to iPortal. With this you can control how many times the same
+	  portal can visit the same sector during one recursion level. This
+	  is mainly useful for space warping portals that warp back in
+	  space so that the portal can be seen from the portal itself :-)
+	  By default this limit is set to 5.
+	- Added MAXVISIT keyword that you can use inside a WARP() statement
+	  for a polygon. This will call SetMaximumSectorVisit().
+	- Added new 'entity_WavePortal' command for WalkTest. With this
+	  command you can let a space warping portal 'wave' a little bit.
+	  flarge contains an example of an infinite room with waving
+	  portals. This is only a small illustration of what space warping
+	  can do. It is not an example of nice code :-)
+	  It also demonstrates a bug where the distance polygons are
+	  drawing wrong for some reason.
 19-Feb-2002
 	- Toni Asco' Gonzalez implemented a faster version of DrawPolygonMesh()
 	  for OpenGL. This code is still experimental but it seems to work.

@@ -158,3 +158,85 @@ void csLightObject::NextFrame (float elapsed_time)
 
 //--------------------------------------------------------------------------
 
+struct AnimPortalCallback : public iPortalCallback
+{
+  AnimPortalCallback ();
+  csAnimatedPortal* animportal;
+  SCF_DECLARE_IBASE;
+  virtual bool Traverse (iPortal* portal, iBase* context);
+};
+
+SCF_IMPLEMENT_IBASE (AnimPortalCallback)
+  SCF_IMPLEMENTS_INTERFACE (iPortalCallback)
+SCF_IMPLEMENT_IBASE_END
+
+AnimPortalCallback::AnimPortalCallback ()
+{
+  SCF_CONSTRUCT_IBASE (NULL);
+}
+
+bool AnimPortalCallback::Traverse (iPortal* portal, iBase* context)
+{
+  animportal->visible = true;
+}
+
+csAnimatedPortal::csAnimatedPortal (iPortal* p,
+	int xyz, float max_angle, float speed)
+{
+  portal = p;
+  AnimPortalCallback* cb = new AnimPortalCallback ();
+  cb->animportal = this;
+  portal->SetPortalCallback (cb);
+  cb->DecRef ();
+  csAnimatedPortal::xyz = xyz;
+  csAnimatedPortal::max_angle = max_angle;
+  csAnimatedPortal::speed = speed;
+  orig_trans = portal->GetWarp ();
+  cur_angle = 0;
+  cur_dir = 1;
+  visible = false;
+}
+
+void csAnimatedPortal::Activate ()
+{
+  // Push ourselves on to the busy list if we're not already there.
+  int idx = Sys->busy_entities.Find (this);
+  if (idx != -1) Sys->busy_entities.Delete (idx);
+  Sys->busy_entities.Push (this);
+}
+
+void csAnimatedPortal::NextFrame (float elapsed_time)
+{
+  if (!visible) return;
+  visible = false;
+
+  if (cur_dir == 1)
+  {
+    cur_angle += elapsed_time/speed;
+    if (cur_angle > max_angle) { cur_angle = max_angle; cur_dir = -1; }
+  }
+  else
+  {
+    cur_angle -= elapsed_time/speed;
+    if (cur_angle < -max_angle) { cur_angle = -max_angle; cur_dir = 1; }
+  }
+
+  csReversibleTransform trans = orig_trans;
+  switch (xyz)
+  {
+    case 1:
+      trans *= csTransform (csXRotMatrix3 (cur_angle), csVector3 (0));
+      break;
+    case 2:
+      trans *= csTransform (csYRotMatrix3 (cur_angle), csVector3 (0));
+      break;
+    case 3:
+      trans *= csTransform (csZRotMatrix3 (cur_angle), csVector3 (0));
+      break;
+  }
+  portal->SetWarp (trans);
+}
+
+
+//--------------------------------------------------------------------------
+

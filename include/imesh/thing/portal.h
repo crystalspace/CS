@@ -117,6 +117,16 @@ struct iPortal : public iReference
   virtual csFlags& GetFlags () = 0;
 
   /**
+   * Set the number of times that this portal will allow for watching
+   * the same portal. By default this is 5 which means that in one
+   * recursion level this portal will visit every sector at maximum
+   * 5 times.
+   */
+  virtual void SetMaximumSectorVisit (int msv) = 0;
+  /// Get the maximum sector visit.
+  virtual int GetMaximumSectorVisit () const = 0;
+
+  /**
    * Set the portal callback. This will call IncRef() on the callback
    * (and possible DecRef() on the old callback). So make sure you
    * call DecRef() to release your own reference.

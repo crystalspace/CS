@@ -1319,9 +1319,7 @@ void csThing::DrawOnePolygon (
   if (d->AddedFogInfo ())
   {
     // If fog info was added then we are dealing with vertex fog and
-
     // the current sector has fog. This means we have to complete the
-
     // fog_info structure with the plane of the current polygon.
     d->GetFirstFogInfo ()->outgoing_plane = p->GetPlane ()->GetCameraPlane ();
   }
@@ -1337,11 +1335,8 @@ void csThing::DrawOnePolygon (
     bool is_this_fog = d->GetThisSector ()->HasFog ();
 
     // If there is filtering (alpha mapping or something like that) we need
-
     // to keep the texture plane so that it can be drawn after the sector has
-
     // been drawn. The texture plane needs to be kept because this polygon
-
     // may be rendered again (through mirrors) possibly overwriting the plane.
     csPolyPlane *keep_plane = NULL;
 
@@ -1355,13 +1350,9 @@ void csThing::DrawOnePolygon (
     }
 
     // Before we draw through the portal we see if we are rendering
-
     // for an object that uses a static tree (i.e. c-buffer). If that is
-
     // the case we clear the c-buffer for the portal shape. We can safely
-
     // do this because the c-buffer algo for this sector has finished
-
     // anyway.
     if (
       p->GetParent ()->GetStaticTree () &&
@@ -1379,9 +1370,7 @@ void csThing::DrawOnePolygon (
     }
 
     // Draw through the portal. If this fails we draw the original polygon
-
     // instead. Drawing through a portal can fail because we have reached
-
     // the maximum number that a sector is drawn (for mirrors).
     if (po->Draw (poly, p, d))
     {
@@ -1449,9 +1438,7 @@ void csThing::DrawPolygonArray (
     if (p->ClipToPlane (pclip_plane, camtrans.GetOrigin (), verts, num_verts))  //@@@Pool for verts?
     {
       // The far plane is defined negative. So if the polygon is entirely
-
       // in front of the far plane it is not visible. Otherwise we will render
-
       // it.
       if (
         !plclip ||
@@ -1508,9 +1495,7 @@ void csThing::PreparePolygonBuffer ()
   int i;
 
   //-----
-
   // First collect all material wrappers and polygons.
-
   //-----
   MatPol *matpol = new MatPol[polygons.Length ()];
   for (i = 0; i < polygons.Length (); i++)
@@ -1520,20 +1505,14 @@ void csThing::PreparePolygonBuffer ()
   }
 
   //-----
-
   // Sort on material.
-
   //-----
   qsort (matpol, polygons.Length (), sizeof (MatPol), compare_material);
 
   //-----
-
   // Now count all different materials we have and add them to the polygon
-
   // buffer. Also update the matpol structure with the index in the
-
   // material table.
-
   //-----
   polybuf->AddMaterial (matpol[0].mat->GetMaterialHandle ());
   matpol[0].mat_index = 0;
@@ -1553,9 +1532,7 @@ void csThing::PreparePolygonBuffer ()
   }
 
   //-----
-
   // Update our local material wrapper table.
-
   //-----
   polybuf_materials = new iMaterialWrapper *[polybuf_material_count];
   polybuf_materials[0] = matpol[0].mat;
@@ -1570,9 +1547,7 @@ void csThing::PreparePolygonBuffer ()
   }
 
   //-----
-
   // Now add the polygons to the polygon buffer sorted by material.
-
   //-----
   for (i = 0; i < polygons.Length (); i++)
   {

@@ -55,6 +55,8 @@ protected:
   iPortalCallback* sector_cb;
   /// Callback for traversing to a portal.
   iPortalCallback* portal_cb;
+  /// Maximum number of time a single sector will be visited by this portal.
+  int max_sector_visit;
 
   /**
    * A portal will change the intensity/color of the light that passes
@@ -93,6 +95,18 @@ public:
 
   /// Set portal flags (see CS_PORTAL_XXX values)
   csFlags& GetFlags ();
+
+  /// Set the maximum sector visit.
+  void SetMaximumSectorVisit (int msv)
+  {
+    max_sector_visit = msv;
+  }
+
+  /// Get the maximum sector visit.
+  int GetMaximumSectorVisit () const
+  {
+    return max_sector_visit;
+  }
 
   /// Set the portal callback.
   void SetPortalCallback (iPortalCallback* cb);
@@ -229,6 +243,14 @@ public:
     virtual iSector* GetSector () const { return scfParent->GetSector (); }
     virtual void SetSector (iSector* s) { scfParent->SetSector (s); }
     virtual csFlags& GetFlags () { return scfParent->GetFlags (); }
+    virtual void SetMaximumSectorVisit (int msv)
+    {
+      scfParent->SetMaximumSectorVisit (msv);
+    }
+    virtual int GetMaximumSectorVisit () const
+    {
+      return scfParent->GetMaximumSectorVisit ();
+    }
     virtual void SetPortalCallback (iPortalCallback* cb)
     {
       scfParent->SetPortalCallback (cb);

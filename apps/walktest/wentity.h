@@ -21,12 +21,14 @@
 
 #include "csutil/dataobj.h"
 #include "csgeom/vector3.h"
+#include "csgeom/transfrm.h"
 #include "csutil/cscolor.h"
 #include "csutil/csvector.h"
 
 struct iLight;
 struct iMeshWrapper;
 struct iMovable;
+struct iPortal;
 
 SCF_VERSION (csWalkEntity, 0, 0, 1);
 
@@ -144,6 +146,37 @@ public:
 
   /// Set total time to take for animation.
   void SetTotalTime (float t) { act_time = t; }
+
+  /// Activate this entity.
+  virtual void Activate ();
+
+  /// Handle next frame.
+  virtual void NextFrame (float elapsed_time);
+};
+
+/**
+ * An object controlling an animating portal.
+ */
+class csAnimatedPortal : public csWalkEntity
+{
+private:
+  iPortal* portal;
+  csVector3 center;
+  csVector3 to;
+  csReversibleTransform orig_trans;
+  float cur_angle;
+  float max_angle;
+  float speed;
+  int xyz;
+  int cur_dir;
+
+public:
+  bool visible;
+
+public:
+  /// Create this object.
+  csAnimatedPortal (iPortal* p,
+	int xyz, float max_angle, float speed);
 
   /// Activate this entity.
   virtual void Activate ();

@@ -35,7 +35,7 @@ struct iThingState;
 #define CSTEX_V2 4  // vector2 is given in texture description
 #define CSTEX_UV_SHIFT 8 // explicit (u,v) <-> vertex mapping is given in texture description
 
-SCF_VERSION (iSyntaxService, 0, 0, 2);
+SCF_VERSION (iSyntaxService, 0, 0, 3);
 
 /**
  * This component provides services for other loaders to easily parse
@@ -99,6 +99,7 @@ struct iSyntaxService : public iBase
    * flags: contains all flags found in the description.
    */
   virtual  bool ParseWarp (char *buf, csVector &flags, bool &mirror,
+  			   bool& warp, int& msv,
 			   csMatrix3 &m, csVector3 &before,
 			   csVector3 &after) = 0;
 

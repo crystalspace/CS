@@ -502,237 +502,125 @@ int compare_z_thing (const void *p1, const void *p2)
 }
 #endif
 
-// @@@ THE NOTES BELOW ARE MOSTLY OBSOLETE NOW. I DON'T REMOVE THEM
-
-// BECAUSE THERE IS STILL A GRAIN OF USEFUL INFORMATION IN THEM.
-
-//
-
-// Some notes about drawing here. These notes are the start for
-
-// a rethinking about how rendering objects in one sector actually
-
-// should happen. Note that the current implementation actually
-
-// implements very little of the things discussed here. Currently
-
-// the entities are just rendered one after the other which can cause
-
-// some problems.
-
-//
-
-// There are a few issues here:
-
-//
-
-// 1. Z-buffering/Z-filling.
-
-// Some objects/entities are more efficiently rendered back
-
-// to front using Z-filling instead of Z-buffering. In some cases
-
-// Z-filling is also required because rendering a sector starts
-
-// with an uninitialized Z-buffer (CS normally doesn't clear the
-
-// Z buffer every frame). In some cases it might be more optimal
-
-// to use Z buffering in any case (to avoid sorting back to front)
-
-// (for hardware 3D) so we would like to have the option to clear
-
-// the Z buffer every frame and use Z-buffering.
-
-//
-
-// 2. Alpha transparency.
-
-// Some entities have alpha transparency. Alpha transparent surfaces
-
-// actually need to be sorted back to front to render correctly.
-
-// Also before rendering an alpha surface all objects behind it should
-
-// already be rendered.
-
-//
-
-// 3. Floating portals.
-
-// Floating portals also take some special consideration. First
-
-// of all the assume a new intialize of the Z buffer for the 2D
-
-// area of the portal in question. This is ok if the first entities
-
-// that are rendered through the portal use Z-fill and cover the
-
-// entire portal (this is the case if you use sector walls for
-
-// example). If Z-fill cannot be used for the portal then an
-
-// extra initial pass would have to clear the Z buffer for the portal
-
-// area in 2D. Also geometry needs to be clipped in 3D if you have
-
-// a floating portal. The reason is that the Z buffer information
-
-// outside of the floating portal may actually contain information
-
-// further than the contents of the portal. This would cause entities
-
-// visible inside the portal to be rendered as if they are in the
-
-// parent sector too.
-
-// After rendering through a floating portal, the floating portal
-
-// itself needs to be covered by the Z-buffer. i.e. we need to make
-
-// sure that the Z-buffer thinks the portal is a regular polygon.
-
-// This is to make sure that meshes or other entities rendered
-
-// afterwards will not get rendered INSIDE the portal contents.
-
-//
-
-// Here is a list of all the entities that we can draw in a sector:
-
-//
-
-// 1. Sector walls.
-
-// Sectors are always convex. So sectors walls are ideal for rendering
-
-// first through Z-fill.
-
-//
-
-// 2. Static things in octree.
-
-// In some cases all static things are collected into one big
-
-// octree with mini-bsp trees. This structure ensures that we can
-
-// actually easily sort polygon back to front or front to back if
-
-// needed. This structure can also easily be rendered using Z-fill.
-
-// The c-buffer/coverage mask tree can also be used to detect
-
-// visibility before rendering. This pushes visible polygons into
-
-// a queue. There is the issue here that it should be possible
-
-// to ignore the mini-bsp trees and only use the octree information.
-
-// This can be done on hardware where Z-buffering is fast. This
-
-// of course implies either the use of a Z-filled sector or else
-
-// a clear of the Z buffer every frame.
-
-// A related issue is when there are portals between the polygons.
-
-// Those portals need to be handled as floating portals (i.e. geometry
-
-// needs to be clipped in 3D) because the Z buffer information
-
-// will not be correct. If rendering the visible octree polygons
-
-// back to front then rendering through the portals presents no
-
-// other difficulties.
-
-//
-
-// 3. Terrain triangles.
-
-// The terrain engine generates a set of triangles. These triangles
-
-// can easily be sorted back to front so they are also suitable for
-
-// Z-fill rendering. However, this conflicts with the use of the
-
-// static octree. You cannot use Z-fill for both because that could
-
-// cause wrong rendering. Using Z-buffer for one of them might be
-
-// expensive but the only solution. Here there is also the issue
-
-// if it isn't possible to combine visibility algorithms for landscape
-
-// and octree stuff. i.e. cull octree nodes if occluded by a part
-
-// of the landscape.
-
-//
-
-// 4. 3D Sprites.
-
-// Sprites are entities that need to be rendered using the Z-buffer
-
-// because the triangles cannot easily be sorted.
-
-//
-
-// 5. Dynamic things.
-
-// Things that are not part of the static octree are handled much
-
-// like normal 3D sprites. The most important exception is when
-
-// such a thing has a floating portal. In this case all the normal
-
-// floating portal issues are valid. However, there are is an important
-
-// issue here: if you are rendering a floating portal that is BEHIND
-
-// an already rendered entity then there is a problem. The contents
-
-// of the portal may actually use Z-fill and thus would overrender
-
-// the entity in front. One obvious solution is to sort ALL entities
-
-// to make sure that everything is rendered back to front. That's of
-
-// course not always efficient and easy to do. Also it is not possible
-
-// in all cases to do it 100% correct (i.e. complex sprites with
-
-// skeletal animation and so on). The ideal solution would be to have
-
-// a way to clear the Z-buffer for an invisible polygon but only
-
-// where the polygon itself is visible according to the old Z-buffer
-
-// values. This is possible with software but I'm currently unsure
-
-// about hardware. With such a routine you could draw the floating
-
-// portal at any time you want. First you clear the Z-buffer for the
-
-// visible area. Then you force Z-buffer use for the contents inside
-
-// (i.e. everything normally rendered using Z-fill will use Z-buffer
-
-// instead), then you render. Finally you update the Z-buffer with
-
-// the Z-value of the polygon to make it 'hard'.
-
-//
-
-// If we can treat floating portals this way then we can in fact
-
-// consider them as normal polygons that behave correctly for the
-
-// Z buffer. Aside from the fact that they clip geometry in 3D
-
-// that passes through the portal. Note that 3D sprites don't
-
-// currently support 3D geometry clipping yet.
+/*
+ * @@@ THE NOTES BELOW ARE MOSTLY OBSOLETE NOW. I DON'T REMOVE THEM
+ *
+ * BECAUSE THERE IS STILL A GRAIN OF USEFUL INFORMATION IN THEM.
+ *
+ * Some notes about drawing here. These notes are the start for
+ * a rethinking about how rendering objects in one sector actually
+ * should happen. Note that the current implementation actually
+ * implements very little of the things discussed here. Currently
+ * the entities are just rendered one after the other which can cause
+ * some problems.
+ *
+ * There are a few issues here:
+ *
+ * 1. Z-buffering/Z-filling.
+ * Some objects/entities are more efficiently rendered back
+ * to front using Z-filling instead of Z-buffering. In some cases
+ * Z-filling is also required because rendering a sector starts
+ * with an uninitialized Z-buffer (CS normally doesn't clear the
+ * Z buffer every frame). In some cases it might be more optimal
+ * to use Z buffering in any case (to avoid sorting back to front)
+ * (for hardware 3D) so we would like to have the option to clear
+ * the Z buffer every frame and use Z-buffering.
+ *
+ * 2. Alpha transparency.
+ * Some entities have alpha transparency. Alpha transparent surfaces
+ * actually need to be sorted back to front to render correctly.
+ * Also before rendering an alpha surface all objects behind it should
+ * already be rendered.
+ *
+ * 3. Floating portals.
+ * Floating portals also take some special consideration. First
+ * of all the assume a new intialize of the Z buffer for the 2D
+ * area of the portal in question. This is ok if the first entities
+ * that are rendered through the portal use Z-fill and cover the
+ * entire portal (this is the case if you use sector walls for
+ * example). If Z-fill cannot be used for the portal then an
+ * extra initial pass would have to clear the Z buffer for the portal
+ * area in 2D. Also geometry needs to be clipped in 3D if you have
+ * a floating portal. The reason is that the Z buffer information
+ * outside of the floating portal may actually contain information
+ * further than the contents of the portal. This would cause entities
+ * visible inside the portal to be rendered as if they are in the
+ * parent sector too.
+ * After rendering through a floating portal, the floating portal
+ * itself needs to be covered by the Z-buffer. i.e. we need to make
+ * sure that the Z-buffer thinks the portal is a regular polygon.
+ * This is to make sure that meshes or other entities rendered
+ * afterwards will not get rendered INSIDE the portal contents.
+ *
+ * Here is a list of all the entities that we can draw in a sector:
+ *
+ * 1. Sector walls.
+ * Sectors are always convex. So sectors walls are ideal for rendering
+ * first through Z-fill.
+ *
+ * 2. Static things in octree.
+ * In some cases all static things are collected into one big
+ * octree with mini-bsp trees. This structure ensures that we can
+ * actually easily sort polygon back to front or front to back if
+ * needed. This structure can also easily be rendered using Z-fill.
+ * The c-buffer/coverage mask tree can also be used to detect
+ * visibility before rendering. This pushes visible polygons into
+ * a queue. There is the issue here that it should be possible
+ * to ignore the mini-bsp trees and only use the octree information.
+ * This can be done on hardware where Z-buffering is fast. This
+ * of course implies either the use of a Z-filled sector or else
+ * a clear of the Z buffer every frame.
+ * A related issue is when there are portals between the polygons.
+ * Those portals need to be handled as floating portals (i.e. geometry
+ * needs to be clipped in 3D) because the Z buffer information
+ * will not be correct. If rendering the visible octree polygons
+ * back to front then rendering through the portals presents no
+ * other difficulties.
+ *
+ * 3. Terrain triangles.
+ * The terrain engine generates a set of triangles. These triangles
+ * can easily be sorted back to front so they are also suitable for
+ * Z-fill rendering. However, this conflicts with the use of the
+ * static octree. You cannot use Z-fill for both because that could
+ * cause wrong rendering. Using Z-buffer for one of them might be
+ * expensive but the only solution. Here there is also the issue
+ * if it isn't possible to combine visibility algorithms for landscape
+ * and octree stuff. i.e. cull octree nodes if occluded by a part
+ * of the landscape.
+ *
+ * 4. 3D Sprites.
+ * Sprites are entities that need to be rendered using the Z-buffer
+ * because the triangles cannot easily be sorted.
+ *
+ * 5. Dynamic things.
+ * Things that are not part of the static octree are handled much
+ * like normal 3D sprites. The most important exception is when
+ * such a thing has a floating portal. In this case all the normal
+ * floating portal issues are valid. However, there are is an important
+ * issue here: if you are rendering a floating portal that is BEHIND
+ * an already rendered entity then there is a problem. The contents
+ * of the portal may actually use Z-fill and thus would overrender
+ * the entity in front. One obvious solution is to sort ALL entities
+ * to make sure that everything is rendered back to front. That's of
+ * course not always efficient and easy to do. Also it is not possible
+ * in all cases to do it 100% correct (i.e. complex sprites with
+ * skeletal animation and so on). The ideal solution would be to have
+ * a way to clear the Z-buffer for an invisible polygon but only
+ * where the polygon itself is visible according to the old Z-buffer
+ * values. This is possible with software but I'm currently unsure
+ * about hardware. With such a routine you could draw the floating
+ * portal at any time you want. First you clear the Z-buffer for the
+ * visible area. Then you force Z-buffer use for the contents inside
+ * (i.e. everything normally rendered using Z-fill will use Z-buffer
+ * instead), then you render. Finally you update the Z-buffer with
+ * the Z-value of the polygon to make it 'hard'.
+ *
+ * If we can treat floating portals this way then we can in fact
+ * consider them as normal polygons that behave correctly for the
+ * Z buffer. Aside from the fact that they clip geometry in 3D
+ * that passes through the portal. Note that 3D sprites don't
+ * currently support 3D geometry clipping yet.
+ */
 void csSector::Draw (iRenderView *rview)
 {
   draw_busy++;
@@ -780,29 +668,20 @@ void csSector::Draw (iRenderView *rview)
   if (rview->AddedFogInfo ())
     rview->GetFirstFogInfo ()->has_outgoing_plane = false;
 
-  // Draw meshes.
-
-  // To correctly support meshes in multiple sectors we only draw a
-
-  // mesh if the mesh is not in the sector we came from. If the
-
-  // mesh is also present in the previous sector then we will still
-
-  // draw it in any of the following cases:
-
-  //    - the previous sector has fog
-
-  //    - the portal we just came through has alpha transparency
-
-  //    - the portal is a portal on a thing (i.e. a floating portal)
-
-  //    - the portal does space warping
-
-  // In those cases we draw the mesh anyway. @@@ Note that we should
-
-  // draw it clipped (in 3D) to the portal polygon. This is currently not
-
-  // done.
+  /*
+   * Draw meshes.
+   * To correctly support meshes in multiple sectors we only draw a
+   * mesh if the mesh is not in the sector we came from. If the
+   * mesh is also present in the previous sector then we will still
+   * draw it in any of the following cases:
+   *    - the previous sector has fog
+   *    - the portal we just came through has alpha transparency
+   *    - the portal is a portal on a thing (i.e. a floating portal)
+   *    - the portal does space warping
+   * In those cases we draw the mesh anyway. @@@ Note that we should
+   * draw it clipped (in 3D) to the portal polygon. This is currently not
+   * done.
+   */
   if (meshes.Length () > 0)
   {
     // if we use a culler, visible objects are marked now
@@ -942,23 +821,17 @@ csObject **csSector::GetVisibleObjects (iFrustumView *lview, int &num_objects)
       csBox3 bbox;
       sp->GetWorldBoundingBox (bbox);
 
-      // Here we do a quick test to see if the bounding box is visible in
-
-      // in the frustum. This test is not complete in the sense that it will
-
-      // say that some bounding boxes are visible even if they are not. But
-
-      // it is correct in the sense that if it says a bounding box
-
-      // is invisible, then it certainly is invisible.
-
-      //
-
-      // It works by taking all vertices of the bounding box. If
-
-      // ALL of them are on the outside of the same plane from the
-
-      // frustum then the object is certainly not visible.
+      /*
+       * Here we do a quick test to see if the bounding box is visible in
+       * in the frustum. This test is not complete in the sense that it will
+       * say that some bounding boxes are visible even if they are not. But
+       * it is correct in the sense that if it says a bounding box
+       * is invisible, then it certainly is invisible.
+       *
+       * It works by taking all vertices of the bounding box. If
+       * ALL of them are on the outside of the same plane from the
+       * frustum then the object is certainly not visible.
+       */
       vis = true;
       i1 = lf->GetVertexCount () - 1;
       for (i = 0; i < lf->GetVertexCount (); i1 = i, i++)
@@ -991,11 +864,11 @@ csObject **csSector::GetVisibleObjects (iFrustumView *lview, int &num_objects)
 
       if (vis && lf->GetBackPlane ())
       {
-        // If still visible then we can also check the back plane.
-
-        // @@@ NOTE THIS IS UNTESTED CODE. LIGHT_FRUSTUMS CURRENTLY DON'T
-
-        // HAVE A BACK PLANE YET.
+        /*
+	 * If still visible then we can also check the back plane.
+         * @@@ NOTE THIS IS UNTESTED CODE. LIGHT_FRUSTUMS CURRENTLY DON'T
+         * HAVE A BACK PLANE YET.
+	 */
         if (
           !csMath3::Visible (
               bbox.GetCorner (0) - c,
@@ -1064,31 +937,30 @@ void csSector::RealCheckFrustum (iFrustumView *lview)
   }
   else
   {
-    // Here we have no octree so we know the sector polygons are
-
-    // convex. First find all objects that are visible in the frustum.
+    /*
+     * Here we have no octree so we know the sector polygons are
+     * convex. First find all objects that are visible in the frustum.
+     */
     int num_visible_objects;
     csObject **visible_objects = GetVisibleObjects (
         lview,
         num_visible_objects);
 
-    // Append the shadows for these objects to the shadow list.
-
-    // This list is appended to the one given in 'lview'. After
-
-    // returning, the list in 'lview' will be restored.
+    /*
+     * Append the shadows for these objects to the shadow list.
+     * This list is appended to the one given in 'lview'. After
+     * returning, the list in 'lview' will be restored.
+     */
     if (lview->ThingShadowsEnabled ())
     {
       for (i = 0; i < num_visible_objects; i++)
       {
         // @@@ unify with other mesh objects as soon as possible
-
         // @@@ Also use shadow caster interface to append shadows!
         csObject *o = visible_objects[i];
         csMeshWrapper *mesh = (csMeshWrapper *)o;
 
         // @@@ should not be known in engine.
-
         // @@@ UGLY
         iThingState *ithing = SCF_QUERY_INTERFACE_FAST (
             mesh->GetMeshObject (),
@@ -1112,13 +984,11 @@ void csSector::RealCheckFrustum (iFrustumView *lview)
     for (i = 0; i < num_visible_objects; i++)
     {
       // @@@ unify with other mesh objects as soon as possible
-
       // @@@ Use shadow receiver interface!!!
       csObject *o = visible_objects[i];
       csMeshWrapper *mesh = (csMeshWrapper *)o;
 
       // @@@ should not be known in engine.
-
       // @@@ UGLY
       iThingState *ithing = SCF_QUERY_INTERFACE_FAST (
           mesh->GetMeshObject (),
@@ -1138,9 +1008,7 @@ void csSector::RealCheckFrustum (iFrustumView *lview)
   }
 
   // Restore the shadow list in 'lview' and then delete
-
   // all the shadow frustums that were added in this recursion
-
   // level.
   while (shadows->GetLastShadowBlock () != previous_last)
   {
@@ -1258,7 +1126,6 @@ void csSector::ReferencedObject::RemoveReference (iReference *ref)
   int i;
 
   // We scan backwards because we know that the code to remove all
-
   // refs to a sector will also scan backwards. So this is more efficient.
   for (i = scfParent->references.Length () - 1; i >= 0; i--)
   {

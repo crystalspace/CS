@@ -75,6 +75,7 @@ public:
 	char *plane, const char *polyname);
 
   virtual  bool ParseWarp (char *buf, csVector &flags, bool &mirror,
+  			   bool& warp, int& msv,
 			   csMatrix3 &m, csVector3 &before, csVector3 &after);
 
   virtual bool ParsePoly3d (iEngine* engine, iPolygon3D* poly3d, char* buf,
