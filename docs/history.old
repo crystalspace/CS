@@ -5997,6 +5997,13 @@ This history is "historical".  See "history.txt" for more recent entries.
 	  Note that the 2D drawing is not affected by this. The copy from
 	  the internal frame to the real window is done when 3D graphics
 	  drawing has ended (before 2D drawing starts).
+        - Eric Sunshine updated the MacOS/X Server, OpenStep, and NextStep
+	  makefiles to work properly with Andrew's recent makefile system
+	  changes.  There were a few errors, including a couple crashers, as
+	  well as a few aesthetic problems.  Most of the errors stemmed from
+	  the fact that the common next.mak makefile now gets included multiple
+	  times, whereas previously it was only ever included once.  Also made
+	  a few simplifications.
         - Eric Sunshine added a "platforms" target to the makefile.  This
           allows the user to see the list of platforms for which Crystal Space
           can be configured.  This list used to be available via "make help"
