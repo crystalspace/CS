@@ -128,7 +128,6 @@ void csConfigNode::SetStr(const char *s)
 
 void csConfigNode::SetInt(int n)
 {
-  if (Data) delete[] Data;
   char output [32];
   sprintf (output, "%d", n);
   SetStr (output);
@@ -136,7 +135,6 @@ void csConfigNode::SetInt(int n)
 
 void csConfigNode::SetFloat(float f)
 {
-  if (Data) delete[] Data;
   char output [64];
   sprintf (output, "%g", f);
   SetStr (output);
@@ -144,7 +142,6 @@ void csConfigNode::SetFloat(float f)
 
 void csConfigNode::SetBool(bool b)
 {
-  if (Data) delete[] Data;
   SetStr(b ? "true" : "false");
 }
 

@@ -9,6 +9,9 @@ The history order has been reversed so that new features are at the top.
 	  SetFloat(), and SetBool() methods would not actually set the key
 	  of a newly created node if the value being set was 0, 0.0, or false,
 	  respectively.
+	- Eric Sunshine fixed a bug in csConfigFile where the SetInt(),
+	  SetFloat(), and SetBool() methods were applying `delete[]' to the
+	  Data value twice.
 28-Jan-2001
 	- Eric Sunshine fixed a crasher in PTLab where it was trying to
 	  access a texture (cslogo.gif) which it had never loaded.
