@@ -100,6 +100,11 @@ public:
   bool In (const csVector3& v);
 
   /**
+   * Test if a vector is inside the given polygon.
+   */
+  static bool In (csVector3* poly, int num_poly, const csVector3& v);
+
+  /**
    * Make room for at least the specified number of vertices.
    */
   void MakeRoom (int new_max);

@@ -56,6 +56,18 @@ bool csPoly3D::In (const csVector3& v)
   return true;
 }
 
+bool csPoly3D::In (csVector3* poly, int num_poly, const csVector3& v)
+{
+  int i, i1;
+  i1 = num_poly-1;
+  for (i = 0 ; i < num_poly ; i++)
+  {
+    if (csMath3::WhichSide3D (v, poly[i1], poly[i]) < 0) return false;
+    i1 = i;
+  }
+  return true;
+}
+
 void csPoly3D::MakeRoom (int new_max)
 {
   if (new_max <= max_vertices) return;

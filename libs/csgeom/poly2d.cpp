@@ -67,6 +67,18 @@ bool csPoly2D::In (const csVector2& v)
   return true;
 }
 
+bool csPoly2D::In (csVector2* poly, int num_poly, const csVector2& v)
+{
+  int i, i1;
+  i1 = num_poly-1;
+  for (i = 0 ; i < num_poly ; i++)
+  {
+    if (csMath2::WhichSide2D (v, poly[i1], poly[i]) < 0) return false;
+    i1 = i;
+  }
+  return true;
+}
+
 void csPoly2D::MakeRoom (int new_max)
 {
   if (new_max <= max_vertices) return;

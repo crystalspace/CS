@@ -320,10 +320,10 @@ csPolygonClipper::~csPolygonClipper ()
 int csPolygonClipper::ClassifyBox (csBox* box)
 {
   if (!ClipBox.Overlap (*box)) return -1;
-  if (!ClipPoly2D->In (box->GetCorner (0))) return 0;
-  if (!ClipPoly2D->In (box->GetCorner (1))) return 0;
-  if (!ClipPoly2D->In (box->GetCorner (2))) return 0;
-  if (!ClipPoly2D->In (box->GetCorner (3))) return 0;
+  if (!csPoly2D::In (ClipPoly, ClipPolyVertices, box->GetCorner (0))) return 0;
+  if (!csPoly2D::In (ClipPoly, ClipPolyVertices, box->GetCorner (1))) return 0;
+  if (!csPoly2D::In (ClipPoly, ClipPolyVertices, box->GetCorner (2))) return 0;
+  if (!csPoly2D::In (ClipPoly, ClipPolyVertices, box->GetCorner (3))) return 0;
   return 1;
 }
 
