@@ -116,7 +116,7 @@ bool csConsoleInput::HandleEvent(csEvent &event)
 
 }
 
-const csString *csConsoleInput::GetInput(int line = -1) const
+const csString *csConsoleInput::GetInput(int line) const
 {
   bool dummy;
 
