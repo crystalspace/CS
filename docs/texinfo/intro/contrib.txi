@@ -397,7 +397,7 @@ Michael Dale Long (@email{mlong@@custom.net})
 Michael helped fix the Glide port and contributed some other small fixes.  He
 is also the author of the Crystal Clear project which is now included in
 Crystal Space.  Crystal Clear serves as a game layer on top of Crystal Space.
-Michal also wrote the default version of DrawPolygonMesh.
+Michael also wrote the default version of DrawPolygonMesh().
 
 @item
 Gary Haussmann (@email{g.haussmann@@worldnet.att.net})
@@ -429,7 +429,7 @@ Mattias provided a patch with a cleaner handling of the X11 visual and window
 creation.
 
 @item
-Serguei "Snaar" Narojnyi (@email{snaar@@idirect.ca})
+Serguei ``Snaar'' Narojnyi (@email{snaar@@idirect.ca})
 
 Serguei added the first integrated networking code to Crystal Space.  His code
 uses the @sc{com} subsystem so it can easily be extended for system-dependent
@@ -615,7 +615,7 @@ Peter Donald (@email{donaldp@@lion.cs.latrobe.edu.au})
 Peter fixed the sound drivers for @sc{scf}.
 
 @item
-Noah "angelbob" L. Gibbs (@email{archiver@@db.geocrawler.com})
+Noah ``angelbob'' L. Gibbs (@email{angelbob@@users.sourceforge.net})
 
 Noah worked with Michael Ewert on the @file{csPhyzik} library.
 
@@ -699,26 +699,25 @@ files.
 @item
 Samuel Humphreys (@email{samuelh@@ntlworld.com})
 
-Samuel did some fixes on the sprites and patched the X drivers so that
-resizing windows works correctly.
-Samuel also added a procedural texture system to Crystal Space.  With
-this system it is possible to render on textures procedurally and use
-that texture on a polygon as usual.
+Samuel submitted some fixes for sprites and patched the X drivers so that
+resizing windows works.  Samuel also added a procedural texture system to
+Crystal Space.  With this system it is possible to render on textures
+procedurally and use that texture on a polygon as usual.
 
 @item
 Thomas Riemer (@email{triemer@@apt4g.a3nyc.com})
 
-Thomas contributed new networking code and NSTP.<p>
+Thomas contributed a new ``network manager'' and @sc{nstp}.
 
 @item
 Chris Bruner (@email{cbruner@@ionline.net})
 
-Chris did several fixes for the Borland compile.
+Chris submitted several fixes for the Borland compile.
 
 @item
 Burton Radonsxi (@email{loth@@pacificcoast.net})
 
-Burton added a new allegro canvas.
+Burton added a new Allegro canvas.
 
 @item
 Travis McIntosh (@email{Travis.McIntosh@@student.oc.edu})
