@@ -580,6 +580,7 @@ void csSprite3D::Draw (csRenderView& rview)
   // Clipped polygon (assume it cannot have more than 64 vertices)
   G3DPolygonDPFX poly;
   memset (&poly, 0, sizeof(poly));
+  poly.inv_aspect = csCamera::inv_aspect;
 
   // The triangle in question
   csVector2 triangle [3];
@@ -654,7 +655,11 @@ void csSprite3D::Draw (csRenderView& rview)
 
       // Draw resulting polygon
       if (!rview.callback)
+      {
+	extern void CalculateFogPolygon (csRenderView* rview, G3DPolygonDPFX& poly);
+	CalculateFogPolygon (&rview, poly);
         rview.g3d->DrawPolygonFX (poly);
+      }
       else
         rview.callback (&rview, CALLBACK_POLYGONQ, (void*)&poly);
     }

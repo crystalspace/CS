@@ -225,6 +225,7 @@ void csThing::DrawCurves (csRenderView& rview, bool use_z_buf)
     G3DPolygonDPFX poly;
     memset (&poly, 0, sizeof(poly));
     poly.txt_handle = c->GetTextureHandle ();
+    poly.inv_aspect = csCamera::inv_aspect;
     if (poly.txt_handle == NULL)
     {
       CsPrintf (MSG_STDOUT, "Warning! Curve without texture!\n");
@@ -318,7 +319,11 @@ void csThing::DrawCurves (csRenderView& rview, bool use_z_buf)
 
   	// Draw resulting polygon
 	if (!rview.callback)
+	{
+	  extern void CalculateFogPolygon (csRenderView* rview, G3DPolygonDPFX& poly);
+	  CalculateFogPolygon (&rview, poly);
   	  rview.g3d->DrawPolygonFX (poly);
+	}
 	else
           rview.callback (&rview, CALLBACK_POLYGONQ, (void*)&poly);
       }
