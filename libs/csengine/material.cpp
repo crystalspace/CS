@@ -19,9 +19,10 @@
 
 #include "cssysdef.h"
 #include "csengine/material.h"
-#include "csengine/texture.h"
 #include "csengine/engine.h"
 #include "ivideo/txtmgr.h"
+#include "ivideo/texture.h"
+#include "iengine/texture.h"
 
 IMPLEMENT_IBASE (csMaterial)
   IMPLEMENTS_INTERFACE (iMaterial)

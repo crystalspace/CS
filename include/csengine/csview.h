@@ -20,17 +20,10 @@
 #ifndef __CS_CSVIEW_H__
 #define __CS_CSVIEW_H__
 
-#include "csutil/csbase.h"
-#include "csgeom/math2d.h"
-#include "csgeom/box.h"
 #include "iengine/view.h"
 
 class csPolygon2D;
-class csClipper;
-struct iCamera;
-struct iEngine;
-struct iGraphics3D;
-struct iCamera;
+class csBox2;
 
 /**
  * The csView class encapsulates the top-level Crystal Space
@@ -40,7 +33,7 @@ class csView : public iView
 {
 private:
   /// the engine
-  iEngine *Engine;
+  iEngine* Engine;
   /// rendering context
   iGraphics3D* G3D;
   /// context size at the time the clipper was created
@@ -50,11 +43,11 @@ private:
   iCamera* Camera;
 
   /// Rect clipping region (NULL if this is a polygon-based clipper)
-  csBox2 *RectView;
+  csBox2* RectView;
   /// Poly clipping region (NULL if this is a rectangular clipper)
-  csPolygon2D *PolyView;
+  csPoly2D* PolyView;
   /// The prepared clipper
-  csClipper* Clipper;
+  iClipper2D* Clipper;
 
   /// Rescale the clipper to deal with a context resize
   void UpdateView ();
@@ -91,11 +84,10 @@ public:
 
   /// Update the Clipper. This is usually called from Draw.
   virtual void UpdateClipper();
+  /// Return the clipper.
+  virtual iClipper2D* GetClipper ();
   /// Draw 3D world as seen from the camera.
   virtual void Draw ();
-
-  /// Return the clipper.
-  csClipper* GetClipper ();
 
   DECLARE_IBASE;
 };

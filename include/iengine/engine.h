@@ -56,6 +56,8 @@ struct iCurveTemplate;
 struct iObject;
 struct iCollection;
 struct iDataBuffer;
+struct iCamera;
+struct iRenderView;
 
 /**
  * Flag for GetNearbyLights().
@@ -127,8 +129,11 @@ struct iDataBuffer;
  */
 #define CS_CULLER_COVTREE 2
 
+/// A callback function for csEngine::DrawFunc().
+typedef void (csDrawFunc) (iRenderView* rview, int type, void* entity);
 
-SCF_VERSION (iEngine, 0, 1, 24);
+
+SCF_VERSION (iEngine, 0, 1, 25);
 
 /**
  * This interface is the main interface to the 3D engine.
@@ -509,6 +514,28 @@ struct iEngine : public iPlugIn
    * Advance the frames of all objects given the current time.
    */
   virtual void NextFrame (cs_time current_time) = 0;
+
+  /**
+   * Draw the 3D world given a camera and a clipper. Note that
+   * in order to be able to draw using the given 3D driver
+   * all textures must have been registered to that driver (using
+   * Prepare()). Note that you need to call Prepare() again if
+   * you switch to another 3D driver.
+   */
+  virtual void Draw (iCamera* c, iClipper2D* clipper) = 0;
+
+  /**
+   * This function is similar to Draw. It will do all the stuff
+   * that Draw would do except for one important thing: it will
+   * not draw anything. Instead it will call a callback function for
+   * every entity that it was planning to draw. This allows you to show
+   * or draw debugging information (2D egdes for example).
+   */
+  virtual void DrawFunc (iCamera* c, iClipper2D* clipper,
+    csDrawFunc* callback, void* callback_data = NULL) = 0;
+
+  /// Set the drawing context
+  virtual void SetContext (iGraphics3D*) = 0;
 };
 
 #endif // __IENGINE_ENGINE_H__

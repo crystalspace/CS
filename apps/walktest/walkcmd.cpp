@@ -911,8 +911,9 @@ bool CommandHandler (const char *cmd, const char *arg)
     extern int dump_visible_indent;
     dump_visible_indent = 0;
     Sys->Printf (MSG_DEBUG_0, "====================================================================\n");
-    extern void dump_visible (csRenderView* rview, int type, void* entity);
-    Sys->view->GetEngine ()->GetCsEngine ()->DrawFunc (Sys->view->GetCamera ()->GetPrivateObject (), Sys->view->GetClipper (), dump_visible);
+    extern void dump_visible (iRenderView* rview, int type, void* entity);
+    Sys->view->GetEngine ()->DrawFunc (Sys->view->GetCamera (),
+      Sys->view->GetClipper (), dump_visible);
     Sys->Printf (MSG_DEBUG_0, "====================================================================\n");
   }
   else if (!strcasecmp (cmd, "bind"))

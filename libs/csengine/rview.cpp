@@ -51,7 +51,7 @@ csRenderView::csRenderView (iCamera* c) :
   ctxt->icamera = c;
 }
 
-csRenderView::csRenderView (iCamera* c, csClipper* v, iGraphics3D* ig3d,
+csRenderView::csRenderView (iCamera* c, iClipper2D* v, iGraphics3D* ig3d,
     	iGraphics2D* ig2d) :
     ctxt (NULL), iengine (NULL), g3d (ig3d), g2d (ig2d),
     callback (NULL), callback_data (NULL)
@@ -61,7 +61,7 @@ csRenderView::csRenderView (iCamera* c, csClipper* v, iGraphics3D* ig3d,
   memset (ctxt, 0, sizeof (csRenderContext));
   c->IncRef ();
   ctxt->icamera = c;
-  ctxt->iview = QUERY_INTERFACE (v, iClipper2D);
+  ctxt->iview = v;
 }
 
 csRenderView::~csRenderView ()

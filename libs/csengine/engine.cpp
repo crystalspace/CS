@@ -1246,7 +1246,7 @@ void csEngine::StartEngine ()
   Clear ();
 }
 
-void csEngine::StartDraw (csCamera* c, csClipper* view, csRenderView& rview)
+void csEngine::StartDraw (csCamera* c, iClipper2D* view, csRenderView& rview)
 {
   Stats::polygons_considered = 0;
   Stats::polygons_drawn = 0;
@@ -1310,10 +1310,10 @@ void csEngine::StartDraw (csCamera* c, csClipper* view, csRenderView& rview)
   cur_process_polygons = 0;
 }
 
-void csEngine::Draw (csCamera* c, csClipper* view)
+void csEngine::Draw (iCamera* c, iClipper2D* view)
 {
-  csRenderView rview (&c->scfiCamera, view, G3D, G2D);
-  StartDraw (c, view, rview);
+  csRenderView rview (c, view, G3D, G2D);
+  StartDraw (c->GetPrivateObject (), view, rview);
   rview.SetCallback (NULL, NULL);
 
   // First initialize G3D with the right clipper.
@@ -1321,7 +1321,7 @@ void csEngine::Draw (csCamera* c, csClipper* view)
   G3D->ResetNearPlane ();
   G3D->SetPerspectiveAspect (c->GetFOV ());
   
-  csSector* s = c->GetSector ();
+  csSector* s = c->GetSector ()->GetPrivateObject ();
   s->Draw (&rview);
 
   // draw all halos on the screen
@@ -1334,11 +1334,11 @@ void csEngine::Draw (csCamera* c, csClipper* view)
   G3D->SetClipper (NULL, CS_CLIPPER_NONE);
 }
 
-void csEngine::DrawFunc (csCamera* c, csClipper* view,
+void csEngine::DrawFunc (iCamera* c, iClipper2D* view,
   csDrawFunc* callback, void* callback_data)
 {
-  csRenderView rview (&c->scfiCamera, view, G3D, G2D);
-  StartDraw (c, view, rview);
+  csRenderView rview (c, view, G3D, G2D);
+  StartDraw (c->GetPrivateObject (), view, rview);
 
   rview.SetCallback (callback, callback_data);
 
@@ -1347,7 +1347,7 @@ void csEngine::DrawFunc (csCamera* c, csClipper* view,
   G3D->ResetNearPlane ();
   G3D->SetPerspectiveAspect (c->GetFOV ());
 
-  csSector* s = c->GetSector ();
+  csSector* s = c->GetSector ()->GetPrivateObject ();
   s->Draw (&rview);
 
   G3D->SetClipper (NULL, false);
@@ -2640,7 +2640,7 @@ void csEngine::SetContext (iGraphics3D* g3d)
 
 iClipper2D* csEngine::GetTopLevelClipper ()
 {
-  return (iClipper2D*)top_clipper;
+  return top_clipper;
 }
 
 //-------------------End-Multi-Context-Support--------------------------------

@@ -127,12 +127,6 @@ void csPoly2D::UpdateBoundingBox ()
     bbox.AddBoundingVertex (vertices[i]);
 }
 
-bool csPoly2D::ClipAgainst (csClipper *view)
-{
-  MakeRoom (num_vertices + view->GetNumVertices () + 1);
-  return view->ClipInPlace (vertices, num_vertices, bbox);
-}
-
 bool csPoly2D::ClipAgainst (iClipper2D *view)
 {
   MakeRoom (num_vertices + view->GetNumVertices () + 1);

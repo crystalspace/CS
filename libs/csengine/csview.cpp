@@ -18,14 +18,14 @@
 */
 
 #include "cssysdef.h"
+#include "qint.h"
 #include "csgeom/polyclip.h"
+#include "csgeom/poly2d.h"
 #include "csengine/csview.h"
-#include "csengine/engine.h"
-#include "csengine/pol2d.h"
 #include "csengine/camera.h"
 #include "ivideo/graph3d.h"
 #include "iengine/sector.h"
-#include "qint.h"
+#include "iengine/engine.h"
 
 IMPLEMENT_IBASE (csView)
   IMPLEMENTS_INTERFACE (iView)
@@ -120,7 +120,7 @@ void csView::ClearView ()
 void csView::AddViewVertex (int x, int y)
 {
   if (!PolyView)
-    PolyView = new csPolygon2D ();
+    PolyView = new csPoly2D ();
   PolyView->AddVertex (x, y);
 
   delete Clipper; Clipper = NULL;
@@ -168,8 +168,8 @@ void csView::Draw ()
   G3D->SetPerspectiveCenter ( (int)Camera->GetShiftX (), 
 			      (int)Camera->GetShiftY () );
 
-  Engine->GetCsEngine ()->SetContext (G3D);
-  Engine->GetCsEngine ()->Draw (Camera->GetPrivateObject (), Clipper);
+  Engine->SetContext (G3D);
+  Engine->Draw (Camera, Clipper);
 }
 
 void csView::UpdateClipper ()
@@ -209,8 +209,9 @@ void csView::RestrictClipperToScreen ()
   }
 }
 
-csClipper* csView::GetClipper ()
+iClipper2D* csView::GetClipper ()
 {
+  UpdateClipper ();
   return Clipper;
 }
 

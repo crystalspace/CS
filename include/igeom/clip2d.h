@@ -59,7 +59,7 @@ struct csVertexStatus
 
 /*
  * The following are possible values for csVertexStatus.Type field.
- * The csVertexStatus is used by csClipper:Clip() routine which is
+ * The csVertexStatus is used by iClipper2D:Clip() routine which is
  * able to output a status structure corresponding to each output vertex.
  * This information is usually used to clip other information associated
  * with polygon vertices (i.e. z, u, v and such).

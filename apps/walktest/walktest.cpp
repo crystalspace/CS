@@ -498,15 +498,15 @@ void WalkTest::DrawFrameDebug ()
     extern void DrawPalette ();
     DrawPalette ();
   }
-  extern void draw_edges (csRenderView*, int, void*);
+  extern void draw_edges (iRenderView*, int, void*);
   if (do_edges)
   {
-    view->GetEngine ()->GetCsEngine ()->DrawFunc (view->GetCamera ()->
-      GetPrivateObject (), view->GetClipper (), draw_edges);
+    view->GetEngine ()->DrawFunc (view->GetCamera (),
+      view->GetClipper (), draw_edges);
   }
   if (selected_polygon || selected_light)
-    view->GetEngine ()->GetCsEngine ()->DrawFunc (view->GetCamera ()->
-      GetPrivateObject (), view->GetClipper (), draw_edges, (void*)1);
+    view->GetEngine ()->DrawFunc (view->GetCamera (),
+      view->GetClipper (), draw_edges, (void*)1);
   if (do_light_frust && selected_light)
   {
     extern void show_frustum (csFrustumView*, int, void*);

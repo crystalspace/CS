@@ -29,7 +29,6 @@ class csMatrix3;
 class csVector3;
 class csLight;
 class csFrustumView;
-class csClipper;
 struct csFog;
 struct iGraphics3D;
 struct iGraphics2D;

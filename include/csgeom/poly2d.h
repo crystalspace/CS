@@ -22,7 +22,6 @@
 #include "csgeom/math2d.h"
 #include "csgeom/box.h"
 
-class csClipper;
 class Dumper;
 struct iClipper2D;
 
@@ -167,16 +166,6 @@ public:
 
   /// Get the bounding box (in 2D space) for this polygon.
   csBox2& GetBoundingBox () { return bbox; }
-
-  /**
-   * Clipping routines. They return false if the resulting polygon is not
-   * visible for some reason.
-   * Note that these routines must not be called if the polygon is not visible.
-   * These routines will not check that.
-   * Note that these routines will put the resulting clipped 2D polygon
-   * in place of the original 2D polygon.
-   */
-  bool ClipAgainst (csClipper* view);
 
   /**
    * Clipping routines. They return false if the resulting polygon is not

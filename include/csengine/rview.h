@@ -24,20 +24,17 @@
 #include "csengine/camera.h"
 #include "csutil/csvector.h"
 #include "iengine/rview.h"
+#include "iengine/engine.h"
 
 class csMatrix3;
 class csVector3;
 class csRenderView;
-class csClipper;
 struct csFog;
 struct iGraphics3D;
 struct iGraphics2D;
 struct iPolygon3D;
 struct iSector;
 struct iClipper2D;
-
-/// A callback function for csEngine::DrawFunc().
-typedef void (csDrawFunc) (csRenderView* rview, int type, void* entity);
 
 /**
  * Flags for the callbacks called via csEngine::DrawFunc() or
@@ -113,7 +110,7 @@ public:
   ///
   csRenderView (iCamera* c);
   ///
-  csRenderView (iCamera* c, csClipper* v, iGraphics3D* ig3d,
+  csRenderView (iCamera* c, iClipper2D* v, iGraphics3D* ig3d,
     iGraphics2D* ig2d);
 
   virtual ~csRenderView ();

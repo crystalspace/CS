@@ -27,7 +27,6 @@
 
 class csPolygon3D;
 class csPolyPlane;
-class csClipper;
 struct iRenderView;
 struct iGraphics2D;
 struct iGraphics3D;

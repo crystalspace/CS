@@ -639,9 +639,10 @@ void WalkTest::MouseClick2Handler(iEvent &Event)
   coord_check_vector.x = Event.Mouse.x;
   coord_check_vector.y = FRAME_HEIGHT-Event.Mouse.y;
   extern bool check_light;
-  extern void select_object (csRenderView* rview, int type, void* entity);
+  extern void select_object (iRenderView* rview, int type, void* entity);
   check_light = true;
-  view->GetEngine ()->GetCsEngine ()->DrawFunc (view->GetCamera ()->GetPrivateObject (), view->GetClipper (), select_object);
+  view->GetEngine ()->DrawFunc (view->GetCamera (),
+    view->GetClipper (), select_object);
 }
 
 // right mouse button

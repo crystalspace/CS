@@ -27,6 +27,7 @@ SCF_VERSION (iView, 0, 1, 0);
 struct iCamera;
 struct iEngine;
 struct iGraphics3D;
+struct iClipper2D;
 
 /**
  * The iView class encapsulates the top-level Crystal Space
@@ -59,7 +60,9 @@ struct iView : public iBase
   virtual void RestrictClipperToScreen () = 0;
 
   /// Update the Clipper. This is usually called from Draw.
-  virtual void UpdateClipper() = 0;
+  virtual void UpdateClipper () = 0;
+  /// Return the current clipper. This function may call UpdateClipper ().
+  virtual iClipper2D* GetClipper () = 0;
   /// Draw 3D world as seen from the camera.
   virtual void Draw () = 0;
 };

@@ -45,7 +45,6 @@ class csCamera;
 class csCollection;
 class csStatLight;
 class csDynLight;
-class csClipper;
 class csCovcube;
 class csCBufferCube;
 class csEngine;
@@ -65,6 +64,7 @@ struct iMaterialWrapper;
 struct iRegion;
 struct iLight;
 struct iImageIO;
+struct iClipper2D;
 
 DECLARE_OBJECT_TYPE (iEngine)
 DECLARE_OBJECT_TYPE (csEngine)
@@ -521,7 +521,7 @@ private:
   /**
    * Setup for starting a Draw or DrawFunc.
    */
-  void StartDraw (csCamera* c, csClipper* view, csRenderView& rview);
+  void StartDraw (csCamera* c, iClipper2D* view, csRenderView& rview);
 
   /**
    * Find some object (given a name) which is both in a region
@@ -539,7 +539,7 @@ public:
   /**
    * The top-level clipper we are currently using for drawing.
    */
-  csClipper* top_clipper;
+  iClipper2D* top_clipper;
 
 public:
   /**
@@ -923,7 +923,7 @@ public:
    * Prepare()). Note that you need to call Prepare() again if
    * you switch to another 3D driver.
    */
-  void Draw (csCamera* c, csClipper* clipper);
+  virtual void Draw (iCamera* c, iClipper2D* clipper);
 
   /**
    * This function is similar to Draw. It will do all the stuff
@@ -932,7 +932,7 @@ public:
    * every entity that it was planning to draw. This allows you to show
    * or draw debugging information (2D egdes for example).
    */
-  void DrawFunc (csCamera* c, csClipper* clipper,
+  virtual void DrawFunc (iCamera* c, iClipper2D* clipper,
     csDrawFunc* callback, void* callback_data = NULL);
 
   /**
@@ -1237,7 +1237,7 @@ public:
   //----------------Begin-Multi-Context-Support------------------------------
 
   /// Point engine to rendering context
-  void SetContext (iGraphics3D* g3d);
+  virtual void SetContext (iGraphics3D* g3d);
 
 private:
   /// Resizes frame width and height dependent data members

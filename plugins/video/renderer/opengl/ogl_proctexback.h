@@ -41,7 +41,6 @@
 
 class csTextureHandleOpenGL;
 class csTextureProcOpenGL;
-class csClipper;
 
 class csOpenGLProcBackBuffer : public csGraphics3DOGLCommon
 {

@@ -33,7 +33,6 @@
 #include "ivideo/halo.h"
 #include "isys/plugin.h"
 
-class csClipper;
 struct iGraphics2D;
 struct iConfigFile;
 

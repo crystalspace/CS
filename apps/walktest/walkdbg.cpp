@@ -133,7 +133,7 @@ bool check_poly;
 bool check_light;
 csVector2 coord_check_vector;
 
-void select_object (csRenderView* rview, int type, void* entity)
+void select_object (iRenderView* rview, int type, void* entity)
 {
 #if 0
 //@@@@@@@@@@@@@
@@ -369,7 +369,7 @@ static void WalkDbgDrawMesh (G3DTriangleMesh& mesh, iGraphics3D* g3d,
 // Callback for DrawFunc() to show an outline for all polygons and lights.
 // If callback_data in 'rview' is not NULL then we only show outline for
 // selected light and/or polygon.
-void draw_edges (csRenderView* rview, int type, void* entity)
+void draw_edges (iRenderView* rview, int type, void* entity)
 {
 #if 0
 //@@@@@@@@@@@@
@@ -483,7 +483,7 @@ void draw_map (csRenderView* /*rview*/, int type, void* entity)
 // that is currently visible. This is useful to debug clipping errors
 // and other visual errors.
 int dump_visible_indent = 0;
-void dump_visible (csRenderView* /*rview*/, int type, void* entity)
+void dump_visible (iRenderView* /*rview*/, int type, void* entity)
 {
   int i;
   char indent_spaces[255];
@@ -953,7 +953,7 @@ static db_frust dbf;
 
 // Callback for DrawFunc() to show an outline for all polygons that
 // are in the dbf queue.
-void draw_frust_edges (csRenderView* rview, int type, void* entity)
+void draw_frust_edges (iRenderView* rview, int type, void* entity)
 {
   iTextureManager* txtmgr = Gfx3D->GetTextureManager ();
   int col = txtmgr->FindRGB (0, 0, 255);
@@ -1005,7 +1005,7 @@ void ShowCheckFrustum (csView* view,
   ctxt->SetLightFrustum (new csFrustum (pos));
   ctxt->GetLightFrustum ()->MakeInfinite ();
   room->CheckFrustum ((iFrustumView*)&lview);
-  view->GetEngine ()->GetCsEngine ()->DrawFunc (view->GetCamera ()->
-    GetPrivateObject (), view->GetClipper (), draw_frust_edges);
+  view->GetEngine ()->DrawFunc (view->GetCamera (),
+    view->GetClipper (), draw_frust_edges);
 }
 

@@ -31,7 +31,6 @@
 #include "ivideo/halo.h"
 #include "isys/plugin.h"
 
-class csClipper;
 class csReversibleTransform;
 struct iGraphics2D;
 struct iConfigFile;

@@ -31,7 +31,6 @@
 #include "ivideo/graph2d.h"
 #include "ivideo/graph3d.h"
 
-class csClipper;
 class csTextureCacheSoftware;
 struct iConfigFile;
 
