@@ -887,22 +887,76 @@ void csSector::DrawShadow (iRenderView* rview, iLight* light)
   int number = 0;
   //test if light is in front of or behind camera
   bool lightBehindCamera = false;
-  const csVector3 camPlaneZ = rview->GetCamera ()->GetTransform ().GetO2T ().Row3 ();
-  const csVector3 camPos = rview->GetCamera ()->GetTransform().GetOrigin ();
+  csReversibleTransform ct = rview->GetCamera ()->GetTransform ();
+  const csVector3 camPlaneZ = ct.GetT2O().Row3 ();
+  const csVector3 camPos = ct.GetOrigin ();
   const csVector3 lightPos = light->GetCenter ();
   csVector3 v = lightPos - camPos;
+  
 
   if (camPlaneZ*v < 0)
     lightBehindCamera = true;
 
   // mark those objects where we are in the shadow-volume
-  csRef<iVisibilityObjectIterator> objCameraInShadow = culler->IntersectSegment (
+  //test , in order,center, upper left, upper right, lower left and lower right
+  //corner of camera
+  
+  float top, bottom, left, right;
+  rview->GetFrustum (left, right, bottom, top);
+
+  left*=2;right*=2;bottom*=2;top*=2;
+
+  csRef<iVisibilityObjectIterator> objTestCent = culler->IntersectSegment (
     camPos, lightPos);
-  while (!objCameraInShadow->IsFinished() )
+  while (!objTestCent->IsFinished() )
   {
-    iMeshWrapper *sp = objCameraInShadow->GetObject() ->GetMeshWrapper ();
+    iMeshWrapper *sp = objTestCent->GetObject() ->GetMeshWrapper ();
     sp->GetMeshObject ()->EnableShadowCaps ();
-    objCameraInShadow->Next();
+    objTestCent->Next();
+  }
+
+  csVector3 camPosUL = ct.This2Other ( csVector3 (left,top,0));
+  csVector3 lightPosUL = ct.This2OtherRelative ( csVector3 (-0.1,0.1,0)) + lightPos;
+  csRef<iVisibilityObjectIterator> objTestUL = culler->IntersectSegment (
+    camPosUL, lightPosUL);
+  while (!objTestUL->IsFinished() )
+  {
+    iMeshWrapper *sp = objTestUL->GetObject() ->GetMeshWrapper ();
+    sp->GetMeshObject ()->EnableShadowCaps ();
+    objTestUL->Next();
+  }
+
+  csVector3 camPosUR = ct.This2Other ( csVector3 (right,top,0));
+  csVector3 lightPosUR = ct.This2OtherRelative ( csVector3 (0.1,0.1,0)) + lightPos;
+  csRef<iVisibilityObjectIterator> objTestUR = culler->IntersectSegment (
+    camPosUR, lightPosUR);
+  while (!objTestUR->IsFinished() )
+  {
+    iMeshWrapper *sp = objTestUR->GetObject() ->GetMeshWrapper ();
+    sp->GetMeshObject ()->EnableShadowCaps ();
+    objTestUR->Next();
+  }
+
+  csVector3 camPosLL = ct.This2Other ( csVector3 (left,bottom,0));
+  csVector3 lightPosLL = ct.This2OtherRelative ( csVector3 (-0.1,-0.1,0)) + lightPos;
+  csRef<iVisibilityObjectIterator> objTestLL = culler->IntersectSegment (
+    camPosLL, lightPosLL);
+  while (!objTestLL->IsFinished() )
+  {
+    iMeshWrapper *sp = objTestLL->GetObject() ->GetMeshWrapper ();
+    sp->GetMeshObject ()->EnableShadowCaps ();
+    objTestLL->Next();
+  }
+
+  csVector3 camPosLR = ct.This2Other ( csVector3 (right,bottom,0));
+  csVector3 lightPosLR = ct.This2OtherRelative ( csVector3 (0.1,-0.1,0)) + lightPos;
+  csRef<iVisibilityObjectIterator> objTestLR = culler->IntersectSegment (
+    camPosLR, lightPosLR);
+  while (!objTestLR->IsFinished() )
+  {
+    iMeshWrapper *sp = objTestLR->GetObject() ->GetMeshWrapper ();
+    sp->GetMeshObject ()->EnableShadowCaps ();
+    objTestLR->Next();
   }
 
   //cull against the boundingsphere of the light
@@ -940,19 +994,47 @@ void csSector::DrawShadow (iRenderView* rview, iLight* light)
         if (!(camPlaneZ*v < -maxRadius))
         {
           sp->DrawShadow (rview, light); //mesh is infront of the light, draw the shadow
-        }
+          }
       }
     }
     objInLight->Next ();
   }
 
   //disable the reverses
-  objCameraInShadow->Reset ();
-  while (!objCameraInShadow->IsFinished() )
+  objTestCent->Reset ();
+  while (!objTestCent->IsFinished() )
   {
-    iMeshWrapper *sp = objCameraInShadow->GetObject() ->GetMeshWrapper ();
+    iMeshWrapper *sp = objTestCent->GetObject() ->GetMeshWrapper ();
     sp->GetMeshObject ()->DisableShadowCaps ();
-    objCameraInShadow->Next();
+    objTestCent->Next();
+  }  
+  objTestUL->Reset ();
+  while (!objTestUR->IsFinished() )
+  {
+    iMeshWrapper *sp = objTestUL->GetObject() ->GetMeshWrapper ();
+    sp->GetMeshObject ()->DisableShadowCaps ();
+    objTestUL->Next();
+  }
+  objTestUR->Reset ();
+  while (!objTestUR->IsFinished() )
+  {
+    iMeshWrapper *sp = objTestUR->GetObject() ->GetMeshWrapper ();
+    sp->GetMeshObject ()->DisableShadowCaps ();
+    objTestUR->Next();
+  }
+  objTestLL->Reset ();
+  while (!objTestLL->IsFinished() )
+  {
+    iMeshWrapper *sp = objTestLL->GetObject() ->GetMeshWrapper ();
+    sp->GetMeshObject ()->DisableShadowCaps ();
+    objTestLL->Next();
+  }
+  objTestLR->Reset ();
+  while (!objTestLR->IsFinished() )
+  {
+    iMeshWrapper *sp = objTestLR->GetObject() ->GetMeshWrapper ();
+    sp->GetMeshObject ()->DisableShadowCaps ();
+    objTestLR->Next();
   }
   //printf ("%x - %d\n",(int)light, number);
 }
