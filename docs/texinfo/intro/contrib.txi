@@ -182,7 +182,11 @@ faster (but he forgot to rename it to @code{find_rgb_slow_somewhat_faster()}.
 Anders Stenberg
 
 Anders added the ODE based dynamics plugin to CS.
-He also worked on the new advanced OpenGL renderer.
+He also wrote the effectsystem which is the first integration of more advanced
+OpenGL features into Crystal Space.
+Anders was also one of the initiators and main contributors to the new advanced
+rendering systems.
+
 
 @item
 Tor Andersson (@email{d97ta@@efd.lth.se})
@@ -460,8 +464,10 @@ design discussions for that.
 @item
 Marten Svanfeldt (@email{developer@@svanfeldt.com})
 
-Marten helped work on the new OpenGL renderer. He developed the effect
-system for the old renderer and the shader system for the new one.
+Marten added support for vertex-programs to the old OpenGL renderer.
+He was also one of the initiators to the new advanced OpenGL renderer and 
+wrote large part of the interface. He have also written parts of the renderer
+itself and the shadersystem.
 
 @item
 Xavier Hosxe (@email{xhosxe@@cyrano.com})
@@ -1010,6 +1016,8 @@ Daniel Duhprey (@email{duhprey@@yahoo.com})
 
 Daniel made the csOBB class in Crystal Space (Oriented Bounding Box).
 He also made the terrbig plugin and helped develop the ODE dynamics library.
+He have also made a great deal of work on the new rendering system, and
+especially the shadowsystem.
 
 @item
 Desmond Fletcher (@email{desmond.fletcher@@usm.edu})
