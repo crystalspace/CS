@@ -33,15 +33,15 @@ AC_ARG_ENABLE(cel-test, AC_HELP_STRING([--disable-cel-test], [Do not try to comp
 no_cel=no
 
 if test -z "$CELPREFIX"; then
-    AC_CHECK_PROGS(CELCONFIG, cel-config, "")
+    CS_CHECK_PROGS(CELCONFIG, cel-config, "")
     if test -z "$CELCONFIG"; then
-        AC_CHECK_PROGS(CELCONFIG, cel-config, "", $CEL)
+        CS_CHECK_PROGS(CELCONFIG, cel-config, "", $CEL)
         if test -n "$CELCONFIG"; then
             CELCONFIG="$CEL/cel-config"
         fi
     fi
 else
-    AC_CHECK_PROGS(CELCONFIG, cel-config, "", $CELPREFIX/bin)
+    CS_CHECK_PROGS(CELCONFIG, cel-config, "", $CELPREFIX/bin)
     if test -n "$CELCONFIG"; then
         CELCONFIG="$CELPREFIX/bin/cel-config"
     fi

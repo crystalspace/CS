@@ -6,6 +6,16 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+7-Dec-2004
+	- Eric Sunshine added new Autoconf macros CS_CHECK_PROG(),
+	  CS_CHECK_PROGS(), CS_CHECK_TOOL(), CS_CHECK_TOOLS(), CS_PATH_PROG(),
+	  CS_PATH_PROGS(), and CS_PATH_TOOL() in checkprog.m4. These are simple
+	  wrappers which, in addition to invoking the corresponding Autoconf
+	  macros (whose prefix is `AC_'), augment the search path to include a
+	  list of directories likely to contain tools and commands, but which
+	  might not be mentioned in the user's PATH. The default list of extra
+	  directories searched includes /usr/local/bin and /sw/bin (where Fink
+	  on MacOS/X installs programs).
 6-Dec-2004
 	- Eric Sunshine changed the Library, ConstructLibraryTarget, and
 	  ConstructLibraryLinkTarget rules in library.jam so that they forcibly

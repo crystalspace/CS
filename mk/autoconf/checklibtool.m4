@@ -37,20 +37,20 @@ AC_DEFUN([CS_CHECK_LIBTOOL],
 m4_define([cs_lt_path_gnu],
     [/sw/bin$PATH_SEPARATOR/usr/local/bin$PATH_SEPARATOR$PATH])
 AS_IF([test -z "$LIBTOOL"],
-    [AC_CHECK_TOOLS([LIBTOOL_TEST], [libtool glibtool gnulibtool], [],
+    [CS_CHECK_TOOLS([LIBTOOL_TEST], [libtool glibtool gnulibtool], [],
 	[cs_lt_path_gnu])
     AS_IF([test -n "$LIBTOOL_TEST"],
-	[AC_PATH_PROG([LIBTOOL_PATH], [$LIBTOOL_TEST], [], [cs_lt_path_gnu])
+	[CS_PATH_PROG([LIBTOOL_PATH], [$LIBTOOL_TEST], [], [cs_lt_path_gnu])
 	CS_LIBTOOL_CLASSIFY([$LIBTOOL_PATH],
 	    [LIBTOOL="$LIBTOOL_PATH"],
 	    [AS_IF([test -z "$APPLE_LIBTOOL"], [APPLE_LIBTOOL="$LIBTOOL_PATH"])
-	    AC_CHECK_TOOLS([LIBTOOL], [glibtool gnulibtool])])])])
+	    CS_CHECK_TOOLS([LIBTOOL], [glibtool gnulibtool])])])])
 AC_SUBST([LIBTOOL])
 
 # Apple: Ensure that Apple libtool will be found before GNU libtool from Fink.
 m4_define([cs_lt_path_apple],[/bin$PATH_SEPARATOR/usr/bin$PATH_SEPARATOR$PATH])
 AS_IF([test -z "$APPLE_LIBTOOL"],
-    [AC_PATH_PROG([CS_LT_APPLE], [libtool], [], [cs_lt_path_apple])
+    [CS_PATH_PROG([CS_LT_APPLE], [libtool], [], [cs_lt_path_apple])
     CS_LIBTOOL_CLASSIFY([$CS_LT_APPLE], [],
 	[APPLE_LIBTOOL="$CS_LT_APPLE"])])
 AC_SUBST([APPLE_LIBTOOL])])

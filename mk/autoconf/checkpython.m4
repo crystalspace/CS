@@ -49,7 +49,7 @@ AC_DEFUN([CS_CHECK_PYTHON],
     AS_IF([test -z "$with_python"],
 	[with_python=m4_if([$1], [without], [no], [yes])])
 
-    AC_CHECK_PROGS([PYTHON], [python])
+    CS_CHECK_PROGS([PYTHON], [python])
     AC_SUBST([PYTHON])
 
     AS_IF([test -n "$PYTHON" && test "$with_python" != no],

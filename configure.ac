@@ -55,47 +55,47 @@ CS_HEADER_PROPERTY([CS_COMPILER_NAME],
 AC_PROG_RANLIB
 CS_EMIT_BUILD_PROPERTY([RANLIB], [$RANLIB], [], [], [], [Y])
 
-AC_CHECK_TOOLS([DLLTOOL], [dlltool])
+CS_CHECK_TOOLS([DLLTOOL], [dlltool])
 CS_EMIT_BUILD_PROPERTY([CMD.DLLTOOL], [$DLLTOOL])
 
-AC_CHECK_TOOLS([DLLWRAP], [dllwrap])
+CS_CHECK_TOOLS([DLLWRAP], [dllwrap])
 CS_EMIT_BUILD_PROPERTY([CMD.DLLWRAP], [$DLLWRAP])
 
-AC_CHECK_TOOLS([WINDRES], [windres])
+CS_CHECK_TOOLS([WINDRES], [windres])
 CS_EMIT_BUILD_PROPERTY([CMD.WINDRES], [$WINDRES])
 
-AC_CHECK_TOOLS([OBJCOPY], [objcopy])
+CS_CHECK_TOOLS([OBJCOPY], [objcopy])
 AS_IF([test -n "$OBJCOPY"],
     [CS_EMIT_BUILD_PROPERTY([OBJCOPY.AVAILABLE], [yes])
     CS_EMIT_BUILD_PROPERTY([CMD.OBJCOPY], [$OBJCOPY])])
 
-AC_CHECK_PROGS([FLEX], [flex])
+CS_CHECK_PROGS([FLEX], [flex])
 CS_EMIT_BUILD_PROPERTY([CMD.FLEX], [$FLEX])
 
-AC_CHECK_PROGS([BISON], [bison])
+CS_CHECK_PROGS([BISON], [bison])
 AS_IF([test -n "$BISON"],
     [CS_CHECK_PROG_VERSION([bison], [$BISON --version], [1.35], [9.9],
 	[CS_EMIT_BUILD_PROPERTY([CMD.BISON], [$BISON])])])
 
-AC_CHECK_PROGS([DOXYGEN], [doxygen])
+CS_CHECK_PROGS([DOXYGEN], [doxygen])
 CS_EMIT_BUILD_PROPERTY([CMD.DOXYGEN], [$DOXYGEN])
 
-AC_CHECK_PROGS([TEXI2DVI], [texi2dvi])
+CS_CHECK_PROGS([TEXI2DVI], [texi2dvi])
 CS_EMIT_BUILD_PROPERTY([CMD.TEXI2DVI], [$TEXI2DVI])
 
-AC_CHECK_PROGS([DVIPS], [dvips])
+CS_CHECK_PROGS([DVIPS], [dvips])
 CS_EMIT_BUILD_PROPERTY([CMD.DVIPS], [$DVIPS])
 
-AC_CHECK_PROGS([DVIPDF], [dvipdf])
+CS_CHECK_PROGS([DVIPDF], [dvipdf])
 CS_EMIT_BUILD_PROPERTY([CMD.DVIPDF], [$DVIPDF])
 
-AC_CHECK_PROGS([MAKEINFO], [makeinfo])
+CS_CHECK_PROGS([MAKEINFO], [makeinfo])
 CS_EMIT_BUILD_PROPERTY([CMD.MAKEINFO], [$MAKEINFO])
 
-AC_CHECK_PROGS([INSTALL], [install])
+CS_CHECK_PROGS([INSTALL], [install])
 CS_EMIT_BUILD_PROPERTY([INSTALL], [$INSTALL])
 
-AC_CHECK_PROGS([SWIG], [swig])
+CS_CHECK_PROGS([SWIG], [swig])
 AS_IF([test -n "$SWIG"],
     [CS_CHECK_PROG_VERSION([swig], [$SWIG -version 2>&1], [1.3.20],
 	[9.9|.9], [CS_EMIT_BUILD_PROPERTY([CMD.SWIG], [$SWIG])])])
@@ -131,7 +131,7 @@ CS_EMIT_BUILD_PROPERTY([CMD.MKDIRS], [$MKDIRS])
 #------------------------------------------------------------------------------
 m4_define([cs_jam_local_exe], [jam$EXEEXT])
 
-AC_PATH_PROGS([JAM], [jam], [], [$PATH$PATH_SEPARATOR.])
+CS_PATH_PROGS([JAM], [jam], [], [$PATH$PATH_SEPARATOR.])
 AS_IF([test -n "$JAM"],
     [CS_CHECK_PROG_VERSION([jam], ["$JAM" -v 2>&1], [2.4], [9.9|.9],
 	[cs_prog_jam_okay=yes], [cs_prog_jam_okay=no])],
@@ -141,7 +141,7 @@ AS_IF([test $cs_prog_jam_okay != yes],
     [JAM=./cs_jam_local_exe CS_NEED_LOCAL_JAM=yes])
 CS_EMIT_BUILD_PROPERTY([JAM], [$JAM])
 
-AC_CHECK_PROGS([MAKE], [gnumake gmake make])
+CS_CHECK_PROGS([MAKE], [gnumake gmake make])
 
 
 
@@ -152,7 +152,7 @@ AC_CHECK_PROGS([MAKE], [gnumake gmake make])
 # users.  It saves users the bother of having to install these packages
 # manually one at a time.
 #------------------------------------------------------------------------------
-AC_CHECK_TOOLS([CSLIBS_CONFIG], [cslibs-config])
+CS_CHECK_TOOLS([CSLIBS_CONFIG], [cslibs-config])
 AS_IF([test $ac_compiler_gnu = yes],
     [cs_cv_cslibs_compiler="--compiler gcc-`$CXX -dumpversion`"])
 AC_CACHE_CHECK([for cslibs package], [cs_cv_cslibs],
@@ -176,7 +176,7 @@ AS_IF([test $cs_cv_cslibs = yes],
 #------------------------------------------------------------------------------
 # Check for NASM and extensions (such as %xdefine) which we require.
 #------------------------------------------------------------------------------
-AC_CHECK_TOOLS([NASM], [nasmw nasm])
+CS_CHECK_TOOLS([NASM], [nasmw nasm])
 AS_IF([test -n "$NASM"],
     [AC_CACHE_CHECK([if nasm is sufficiently recent], [cs_cv_prog_nasm_ok],
 	[echo "%xdefine TEST" > conftest.asm
@@ -354,7 +354,7 @@ CS_HEADER_PROPERTY([CS_PLATFORM_NAME],
 # required to embed Perl.  Also determine if the glue file can be created with
 # ExtUtils::Embed or if it must be created manually.
 #------------------------------------------------------------------------------
-AC_CHECK_PROGS([PERL], [perl5 perl])
+CS_CHECK_PROGS([PERL], [perl5 perl])
 CS_EMIT_BUILD_PROPERTY([PERL5], [$PERL])
 CS_EMIT_BUILD_PROPERTY([PERL], [$PERL])
 CS_EMIT_BUILD_PROPERTY([CMD.PERL5], [$PERL])
@@ -478,11 +478,11 @@ JAVA_HOME=CS_PATH_NORMALIZE([$JAVA_HOME])
 
 AS_IF([test -z "$JAVA" && test -n "$JAVACMD"],
     [JAVA=CS_PATH_NORMALIZE([$JAVACMD])])
-AC_PATH_PROGS([JAVA], [java], [],
+CS_PATH_PROGS([JAVA], [java], [],
     [$JAVA_HOME/bin$PATH_SEPARATOR$JAVA_HOME/jre/bin$PATH_SEPARATOR$PATH])
 CS_EMIT_BUILD_PROPERTY([JAVA], [$JAVA])
 
-AC_PATH_PROGS([JAVAC], [javac], [],
+CS_PATH_PROGS([JAVAC], [javac], [],
     [$JAVA_HOME/bin$PATH_SEPARATOR$JAVA_HOME/jre/bin$PATH_SEPARATOR$PATH])
 CS_EMIT_BUILD_PROPERTY([JAVAC], [$JAVAC])
 
@@ -500,7 +500,7 @@ AS_IF([test "$with_java" != no && test -n "$JAVAC" && test -n "$JAVA"],
         CS_CREATE_TUPLE([$cs_java_cflags],[$cs_java_lflags],[$cs_java_libs])],
 	[], [CS_EMIT_BUILD_RESULT([cs_cv_java], [JAVA])])])
 
-AC_PATH_PROGS([ANT], [ant], [], [$PATH$PATH_SEPARATOR$ANT_HOME/bin])
+CS_PATH_PROGS([ANT], [ant], [], [$PATH$PATH_SEPARATOR$ANT_HOME/bin])
 CS_EMIT_BUILD_PROPERTY([ANT], [$ANT])
 
 
@@ -1550,7 +1550,7 @@ AS_IF([test "$with_vos" != no],
 # try the result of --libs and --gl-libs together; if that fails, then we try
 # only --libs augmented with the results of our own OpenGL checks.
 #------------------------------------------------------------------------------
-AC_CHECK_TOOLS([WXCONFIG], [wx-config])
+CS_CHECK_TOOLS([WXCONFIG], [wx-config])
 
 AC_CACHE_CHECK([for wxWidgets], [cs_cv_wxwidgets],
     [AS_IF([test -n "$WXCONFIG"],
@@ -1636,7 +1636,7 @@ CS_CHECK_BUILD([for Linux joystick API], [cs_cv_sys_linux_joystick],
 #------------------------------------------------------------------------------
 # Check for Cg shader package.
 #------------------------------------------------------------------------------
-AC_CHECK_PROGS([CGC], [cgc])
+CS_CHECK_PROGS([CGC], [cgc])
 CS_EMIT_BUILD_PROPERTY([CGC], [$CGC])
 
 AC_DEFUN([CS_CHECK_LIBCG],
@@ -1776,7 +1776,7 @@ AS_IF([test -n "$PERL"],
 	    [$PERL -M'Template 2.11' -MTemplate::Plugin -e 0 1>&2])],
 	    [cs_cv_perl_tt2=yes],
 	    [cs_cv_perl_tt2=no])])
-    AC_PATH_PROGS([TTREE], [ttree])
+    CS_PATH_PROGS([TTREE], [ttree])
     AS_IF([test $cs_cv_perl_tt2 = yes && test -n "$TTREE"],
 	[CS_EMIT_BUILD_PROPERTY([TTREE], [$TTREE])])])
 

@@ -2949,7 +2949,14 @@ cs_build_prop_val="$RANLIB"
 fi
 
 
-if test -n "$ac_tool_prefix"; then
+
+    if test "$cs_prog_path_prepared" != yes; then
+  cs_prog_path_prepared=yes
+	PATH="$PATH$PATH_SEPARATOR/usr/local/bin$PATH_SEPARATOR/sw/bin"
+	export PATH
+fi
+
+    if test -n "$ac_tool_prefix"; then
   for ac_prog in dlltool
   do
     # Extract the first word of "$ac_tool_prefix$ac_prog", so it can be a program name with args.
@@ -3043,7 +3050,14 @@ cs_build_prop_val="$DLLTOOL"
 fi
 
 
-if test -n "$ac_tool_prefix"; then
+
+    if test "$cs_prog_path_prepared" != yes; then
+  cs_prog_path_prepared=yes
+	PATH="$PATH$PATH_SEPARATOR/usr/local/bin$PATH_SEPARATOR/sw/bin"
+	export PATH
+fi
+
+    if test -n "$ac_tool_prefix"; then
   for ac_prog in dllwrap
   do
     # Extract the first word of "$ac_tool_prefix$ac_prog", so it can be a program name with args.
@@ -3137,7 +3151,14 @@ cs_build_prop_val="$DLLWRAP"
 fi
 
 
-if test -n "$ac_tool_prefix"; then
+
+    if test "$cs_prog_path_prepared" != yes; then
+  cs_prog_path_prepared=yes
+	PATH="$PATH$PATH_SEPARATOR/usr/local/bin$PATH_SEPARATOR/sw/bin"
+	export PATH
+fi
+
+    if test -n "$ac_tool_prefix"; then
   for ac_prog in windres
   do
     # Extract the first word of "$ac_tool_prefix$ac_prog", so it can be a program name with args.
@@ -3231,7 +3252,14 @@ cs_build_prop_val="$WINDRES"
 fi
 
 
-if test -n "$ac_tool_prefix"; then
+
+    if test "$cs_prog_path_prepared" != yes; then
+  cs_prog_path_prepared=yes
+	PATH="$PATH$PATH_SEPARATOR/usr/local/bin$PATH_SEPARATOR/sw/bin"
+	export PATH
+fi
+
+    if test -n "$ac_tool_prefix"; then
   for ac_prog in objcopy
   do
     # Extract the first word of "$ac_tool_prefix$ac_prog", so it can be a program name with args.
@@ -3335,7 +3363,14 @@ fi
 fi
 
 
-for ac_prog in flex
+
+    if test "$cs_prog_path_prepared" != yes; then
+  cs_prog_path_prepared=yes
+	PATH="$PATH$PATH_SEPARATOR/usr/local/bin$PATH_SEPARATOR/sw/bin"
+	export PATH
+fi
+
+    for ac_prog in flex
 do
   # Extract the first word of "$ac_prog", so it can be a program name with args.
 set dummy $ac_prog; ac_word=$2
@@ -3383,7 +3418,14 @@ cs_build_prop_val="$FLEX"
 fi
 
 
-for ac_prog in bison
+
+    if test "$cs_prog_path_prepared" != yes; then
+  cs_prog_path_prepared=yes
+	PATH="$PATH$PATH_SEPARATOR/usr/local/bin$PATH_SEPARATOR/sw/bin"
+	export PATH
+fi
+
+    for ac_prog in bison
 do
   # Extract the first word of "$ac_prog", so it can be a program name with args.
 set dummy $ac_prog; ac_word=$2
@@ -3489,7 +3531,14 @@ fi
 fi
 
 
-for ac_prog in doxygen
+
+    if test "$cs_prog_path_prepared" != yes; then
+  cs_prog_path_prepared=yes
+	PATH="$PATH$PATH_SEPARATOR/usr/local/bin$PATH_SEPARATOR/sw/bin"
+	export PATH
+fi
+
+    for ac_prog in doxygen
 do
   # Extract the first word of "$ac_prog", so it can be a program name with args.
 set dummy $ac_prog; ac_word=$2
@@ -3537,7 +3586,14 @@ cs_build_prop_val="$DOXYGEN"
 fi
 
 
-for ac_prog in texi2dvi
+
+    if test "$cs_prog_path_prepared" != yes; then
+  cs_prog_path_prepared=yes
+	PATH="$PATH$PATH_SEPARATOR/usr/local/bin$PATH_SEPARATOR/sw/bin"
+	export PATH
+fi
+
+    for ac_prog in texi2dvi
 do
   # Extract the first word of "$ac_prog", so it can be a program name with args.
 set dummy $ac_prog; ac_word=$2
@@ -3585,7 +3641,14 @@ cs_build_prop_val="$TEXI2DVI"
 fi
 
 
-for ac_prog in dvips
+
+    if test "$cs_prog_path_prepared" != yes; then
+  cs_prog_path_prepared=yes
+	PATH="$PATH$PATH_SEPARATOR/usr/local/bin$PATH_SEPARATOR/sw/bin"
+	export PATH
+fi
+
+    for ac_prog in dvips
 do
   # Extract the first word of "$ac_prog", so it can be a program name with args.
 set dummy $ac_prog; ac_word=$2
@@ -3633,7 +3696,14 @@ cs_build_prop_val="$DVIPS"
 fi
 
 
-for ac_prog in dvipdf
+
+    if test "$cs_prog_path_prepared" != yes; then
+  cs_prog_path_prepared=yes
+	PATH="$PATH$PATH_SEPARATOR/usr/local/bin$PATH_SEPARATOR/sw/bin"
+	export PATH
+fi
+
+    for ac_prog in dvipdf
 do
   # Extract the first word of "$ac_prog", so it can be a program name with args.
 set dummy $ac_prog; ac_word=$2
@@ -3681,7 +3751,14 @@ cs_build_prop_val="$DVIPDF"
 fi
 
 
-for ac_prog in makeinfo
+
+    if test "$cs_prog_path_prepared" != yes; then
+  cs_prog_path_prepared=yes
+	PATH="$PATH$PATH_SEPARATOR/usr/local/bin$PATH_SEPARATOR/sw/bin"
+	export PATH
+fi
+
+    for ac_prog in makeinfo
 do
   # Extract the first word of "$ac_prog", so it can be a program name with args.
 set dummy $ac_prog; ac_word=$2
@@ -3729,7 +3806,14 @@ cs_build_prop_val="$MAKEINFO"
 fi
 
 
-for ac_prog in install
+
+    if test "$cs_prog_path_prepared" != yes; then
+  cs_prog_path_prepared=yes
+	PATH="$PATH$PATH_SEPARATOR/usr/local/bin$PATH_SEPARATOR/sw/bin"
+	export PATH
+fi
+
+    for ac_prog in install
 do
   # Extract the first word of "$ac_prog", so it can be a program name with args.
 set dummy $ac_prog; ac_word=$2
@@ -3777,7 +3861,14 @@ cs_build_prop_val="$INSTALL"
 fi
 
 
-for ac_prog in swig
+
+    if test "$cs_prog_path_prepared" != yes; then
+  cs_prog_path_prepared=yes
+	PATH="$PATH$PATH_SEPARATOR/usr/local/bin$PATH_SEPARATOR/sw/bin"
+	export PATH
+fi
+
+    for ac_prog in swig
 do
   # Extract the first word of "$ac_prog", so it can be a program name with args.
 set dummy $ac_prog; ac_word=$2
@@ -3898,7 +3989,14 @@ fi
 # GNU: Search for libtool before glibtool since Fink version is likely newer.
 
 if test -z "$LIBTOOL"; then
-  if test -n "$ac_tool_prefix"; then
+
+    if test "$cs_prog_path_prepared" != yes; then
+  cs_prog_path_prepared=yes
+	PATH="$PATH$PATH_SEPARATOR/usr/local/bin$PATH_SEPARATOR/sw/bin"
+	export PATH
+fi
+
+    if test -n "$ac_tool_prefix"; then
   for ac_prog in libtool glibtool gnulibtool
   do
     # Extract the first word of "$ac_tool_prefix$ac_prog", so it can be a program name with args.
@@ -3912,7 +4010,7 @@ else
   ac_cv_prog_LIBTOOL_TEST="$LIBTOOL_TEST" # Let the user override the test.
 else
 as_save_IFS=$IFS; IFS=$PATH_SEPARATOR
-for as_dir in /sw/bin$PATH_SEPARATOR/usr/local/bin$PATH_SEPARATOR$PATH
+for as_dir in     /sw/bin$PATH_SEPARATOR/usr/local/bin$PATH_SEPARATOR$PATH$PATH_SEPARATOR/usr/local/bin$PATH_SEPARATOR/sw/bin
 do
   IFS=$as_save_IFS
   test -z "$as_dir" && as_dir=.
@@ -3954,7 +4052,7 @@ else
   ac_cv_prog_ac_ct_LIBTOOL_TEST="$ac_ct_LIBTOOL_TEST" # Let the user override the test.
 else
 as_save_IFS=$IFS; IFS=$PATH_SEPARATOR
-for as_dir in /sw/bin$PATH_SEPARATOR/usr/local/bin$PATH_SEPARATOR$PATH
+for as_dir in     /sw/bin$PATH_SEPARATOR/usr/local/bin$PATH_SEPARATOR$PATH$PATH_SEPARATOR/usr/local/bin$PATH_SEPARATOR/sw/bin
 do
   IFS=$as_save_IFS
   test -z "$as_dir" && as_dir=.
@@ -3985,7 +4083,14 @@ done
 fi
 
     if test -n "$LIBTOOL_TEST"; then
-  # Extract the first word of "$LIBTOOL_TEST", so it can be a program name with args.
+
+    if test "$cs_prog_path_prepared" != yes; then
+  cs_prog_path_prepared=yes
+	PATH="$PATH$PATH_SEPARATOR/usr/local/bin$PATH_SEPARATOR/sw/bin"
+	export PATH
+fi
+
+    # Extract the first word of "$LIBTOOL_TEST", so it can be a program name with args.
 set dummy $LIBTOOL_TEST; ac_word=$2
 echo "$as_me:$LINENO: checking for $ac_word" >&5
 echo $ECHO_N "checking for $ac_word... $ECHO_C" >&6
@@ -3998,7 +4103,7 @@ else
   ;;
   *)
   as_save_IFS=$IFS; IFS=$PATH_SEPARATOR
-for as_dir in /sw/bin$PATH_SEPARATOR/usr/local/bin$PATH_SEPARATOR$PATH
+for as_dir in     /sw/bin$PATH_SEPARATOR/usr/local/bin$PATH_SEPARATOR$PATH$PATH_SEPARATOR/usr/local/bin$PATH_SEPARATOR/sw/bin
 do
   IFS=$as_save_IFS
   test -z "$as_dir" && as_dir=.
@@ -4042,7 +4147,14 @@ echo "${ECHO_T}apple" >&6
   APPLE_LIBTOOL="$LIBTOOL_PATH"
 fi
 
-	    if test -n "$ac_tool_prefix"; then
+
+    if test "$cs_prog_path_prepared" != yes; then
+  cs_prog_path_prepared=yes
+	PATH="$PATH$PATH_SEPARATOR/usr/local/bin$PATH_SEPARATOR/sw/bin"
+	export PATH
+fi
+
+    if test -n "$ac_tool_prefix"; then
   for ac_prog in glibtool gnulibtool
   do
     # Extract the first word of "$ac_tool_prefix$ac_prog", so it can be a program name with args.
@@ -4141,7 +4253,14 @@ fi
 # Apple: Ensure that Apple libtool will be found before GNU libtool from Fink.
 
 if test -z "$APPLE_LIBTOOL"; then
-  # Extract the first word of "libtool", so it can be a program name with args.
+
+    if test "$cs_prog_path_prepared" != yes; then
+  cs_prog_path_prepared=yes
+	PATH="$PATH$PATH_SEPARATOR/usr/local/bin$PATH_SEPARATOR/sw/bin"
+	export PATH
+fi
+
+    # Extract the first word of "libtool", so it can be a program name with args.
 set dummy libtool; ac_word=$2
 echo "$as_me:$LINENO: checking for $ac_word" >&5
 echo $ECHO_N "checking for $ac_word... $ECHO_C" >&6
@@ -4154,7 +4273,7 @@ else
   ;;
   *)
   as_save_IFS=$IFS; IFS=$PATH_SEPARATOR
-for as_dir in /bin$PATH_SEPARATOR/usr/bin$PATH_SEPARATOR$PATH
+for as_dir in     /bin$PATH_SEPARATOR/usr/bin$PATH_SEPARATOR$PATH$PATH_SEPARATOR/usr/local/bin$PATH_SEPARATOR/sw/bin
 do
   IFS=$as_save_IFS
   test -z "$as_dir" && as_dir=.
@@ -4344,7 +4463,14 @@ fi
 #------------------------------------------------------------------------------
 
 
-for ac_prog in jam
+
+    if test "$cs_prog_path_prepared" != yes; then
+  cs_prog_path_prepared=yes
+	PATH="$PATH$PATH_SEPARATOR/usr/local/bin$PATH_SEPARATOR/sw/bin"
+	export PATH
+fi
+
+    for ac_prog in jam
 do
   # Extract the first word of "$ac_prog", so it can be a program name with args.
 set dummy $ac_prog; ac_word=$2
@@ -4359,7 +4485,7 @@ else
   ;;
   *)
   as_save_IFS=$IFS; IFS=$PATH_SEPARATOR
-for as_dir in $PATH$PATH_SEPARATOR.
+for as_dir in     $PATH$PATH_SEPARATOR.$PATH_SEPARATOR/usr/local/bin$PATH_SEPARATOR/sw/bin
 do
   IFS=$as_save_IFS
   test -z "$as_dir" && as_dir=.
@@ -4474,7 +4600,14 @@ cs_build_prop_val="$JAM"
 fi
 
 
-for ac_prog in gnumake gmake make
+
+    if test "$cs_prog_path_prepared" != yes; then
+  cs_prog_path_prepared=yes
+	PATH="$PATH$PATH_SEPARATOR/usr/local/bin$PATH_SEPARATOR/sw/bin"
+	export PATH
+fi
+
+    for ac_prog in gnumake gmake make
 do
   # Extract the first word of "$ac_prog", so it can be a program name with args.
 set dummy $ac_prog; ac_word=$2
@@ -4524,7 +4657,14 @@ done
 # users.  It saves users the bother of having to install these packages
 # manually one at a time.
 #------------------------------------------------------------------------------
-if test -n "$ac_tool_prefix"; then
+
+    if test "$cs_prog_path_prepared" != yes; then
+  cs_prog_path_prepared=yes
+	PATH="$PATH$PATH_SEPARATOR/usr/local/bin$PATH_SEPARATOR/sw/bin"
+	export PATH
+fi
+
+    if test -n "$ac_tool_prefix"; then
   for ac_prog in cslibs-config
   do
     # Extract the first word of "$ac_tool_prefix$ac_prog", so it can be a program name with args.
@@ -4656,7 +4796,14 @@ fi
 #------------------------------------------------------------------------------
 # Check for NASM and extensions (such as %xdefine) which we require.
 #------------------------------------------------------------------------------
-if test -n "$ac_tool_prefix"; then
+
+    if test "$cs_prog_path_prepared" != yes; then
+  cs_prog_path_prepared=yes
+	PATH="$PATH$PATH_SEPARATOR/usr/local/bin$PATH_SEPARATOR/sw/bin"
+	export PATH
+fi
+
+    if test -n "$ac_tool_prefix"; then
   for ac_prog in nasmw nasm
   do
     # Extract the first word of "$ac_tool_prefix$ac_prog", so it can be a program name with args.
@@ -6950,7 +7097,14 @@ cs_header_text="${cs_header_text}#define CS_PLATFORM_NAME \"$cs_host_os_normaliz
 # required to embed Perl.  Also determine if the glue file can be created with
 # ExtUtils::Embed or if it must be created manually.
 #------------------------------------------------------------------------------
-for ac_prog in perl5 perl
+
+    if test "$cs_prog_path_prepared" != yes; then
+  cs_prog_path_prepared=yes
+	PATH="$PATH$PATH_SEPARATOR/usr/local/bin$PATH_SEPARATOR/sw/bin"
+	export PATH
+fi
+
+    for ac_prog in perl5 perl
 do
   # Extract the first word of "$ac_prog", so it can be a program name with args.
 set dummy $ac_prog; ac_word=$2
@@ -7583,6 +7737,13 @@ fi;
 fi
 
 
+
+    if test "$cs_prog_path_prepared" != yes; then
+  cs_prog_path_prepared=yes
+	PATH="$PATH$PATH_SEPARATOR/usr/local/bin$PATH_SEPARATOR/sw/bin"
+	export PATH
+fi
+
     for ac_prog in python
 do
   # Extract the first word of "$ac_prog", so it can be a program name with args.
@@ -8093,7 +8254,14 @@ if test -z "$JAVA" && test -n "$JAVACMD"; then
   JAVA=`echo "x$JAVACMD" | tr '\\\\' '/' | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
 fi
 
-for ac_prog in java
+
+    if test "$cs_prog_path_prepared" != yes; then
+  cs_prog_path_prepared=yes
+	PATH="$PATH$PATH_SEPARATOR/usr/local/bin$PATH_SEPARATOR/sw/bin"
+	export PATH
+fi
+
+    for ac_prog in java
 do
   # Extract the first word of "$ac_prog", so it can be a program name with args.
 set dummy $ac_prog; ac_word=$2
@@ -8108,7 +8276,7 @@ else
   ;;
   *)
   as_save_IFS=$IFS; IFS=$PATH_SEPARATOR
-for as_dir in $JAVA_HOME/bin$PATH_SEPARATOR$JAVA_HOME/jre/bin$PATH_SEPARATOR$PATH
+for as_dir in     $JAVA_HOME/bin$PATH_SEPARATOR$JAVA_HOME/jre/bin$PATH_SEPARATOR$PATH$PATH_SEPARATOR/usr/local/bin$PATH_SEPARATOR/sw/bin
 do
   IFS=$as_save_IFS
   test -z "$as_dir" && as_dir=.
@@ -8145,7 +8313,14 @@ cs_build_prop_val="$JAVA"
 fi
 
 
-for ac_prog in javac
+
+    if test "$cs_prog_path_prepared" != yes; then
+  cs_prog_path_prepared=yes
+	PATH="$PATH$PATH_SEPARATOR/usr/local/bin$PATH_SEPARATOR/sw/bin"
+	export PATH
+fi
+
+    for ac_prog in javac
 do
   # Extract the first word of "$ac_prog", so it can be a program name with args.
 set dummy $ac_prog; ac_word=$2
@@ -8160,7 +8335,7 @@ else
   ;;
   *)
   as_save_IFS=$IFS; IFS=$PATH_SEPARATOR
-for as_dir in $JAVA_HOME/bin$PATH_SEPARATOR$JAVA_HOME/jre/bin$PATH_SEPARATOR$PATH
+for as_dir in     $JAVA_HOME/bin$PATH_SEPARATOR$JAVA_HOME/jre/bin$PATH_SEPARATOR$PATH$PATH_SEPARATOR/usr/local/bin$PATH_SEPARATOR/sw/bin
 do
   IFS=$as_save_IFS
   test -z "$as_dir" && as_dir=.
@@ -8612,7 +8787,14 @@ fi
 fi
 
 
-for ac_prog in ant
+
+    if test "$cs_prog_path_prepared" != yes; then
+  cs_prog_path_prepared=yes
+	PATH="$PATH$PATH_SEPARATOR/usr/local/bin$PATH_SEPARATOR/sw/bin"
+	export PATH
+fi
+
+    for ac_prog in ant
 do
   # Extract the first word of "$ac_prog", so it can be a program name with args.
 set dummy $ac_prog; ac_word=$2
@@ -8627,7 +8809,7 @@ else
   ;;
   *)
   as_save_IFS=$IFS; IFS=$PATH_SEPARATOR
-for as_dir in $PATH$PATH_SEPARATOR$ANT_HOME/bin
+for as_dir in     $PATH$PATH_SEPARATOR$ANT_HOME/bin$PATH_SEPARATOR/usr/local/bin$PATH_SEPARATOR/sw/bin
 do
   IFS=$as_save_IFS
   test -z "$as_dir" && as_dir=.
@@ -17125,7 +17307,14 @@ fi
 	cs_check_lib_flags=''
 	if test $with_libXxf86vm = yes; then
   if test "$cs_prog_pkg_config_checked" != yes; then
-  if test -n "$ac_tool_prefix"; then
+
+    if test "$cs_prog_path_prepared" != yes; then
+  cs_prog_path_prepared=yes
+	PATH="$PATH$PATH_SEPARATOR/usr/local/bin$PATH_SEPARATOR/sw/bin"
+	export PATH
+fi
+
+    if test -n "$ac_tool_prefix"; then
   for ac_prog in pkg-config
   do
     # Extract the first word of "$ac_tool_prefix$ac_prog", so it can be a program name with args.
@@ -17266,7 +17455,14 @@ fi
 
 fi
 
-		if test -n "$ac_tool_prefix"; then
+
+    if test "$cs_prog_path_prepared" != yes; then
+  cs_prog_path_prepared=yes
+	PATH="$PATH$PATH_SEPARATOR/usr/local/bin$PATH_SEPARATOR/sw/bin"
+	export PATH
+fi
+
+    if test -n "$ac_tool_prefix"; then
   for ac_prog in Xxf86vm-config
   do
     # Extract the first word of "$ac_tool_prefix$ac_prog", so it can be a program name with args.
@@ -21052,7 +21248,14 @@ fi
 	cs_check_lib_flags=''
 	if test $with_libz = yes; then
   if test "$cs_prog_pkg_config_checked" != yes; then
-  if test -n "$ac_tool_prefix"; then
+
+    if test "$cs_prog_path_prepared" != yes; then
+  cs_prog_path_prepared=yes
+	PATH="$PATH$PATH_SEPARATOR/usr/local/bin$PATH_SEPARATOR/sw/bin"
+	export PATH
+fi
+
+    if test -n "$ac_tool_prefix"; then
   for ac_prog in pkg-config
   do
     # Extract the first word of "$ac_tool_prefix$ac_prog", so it can be a program name with args.
@@ -21193,7 +21396,14 @@ fi
 
 fi
 
-		if test -n "$ac_tool_prefix"; then
+
+    if test "$cs_prog_path_prepared" != yes; then
+  cs_prog_path_prepared=yes
+	PATH="$PATH$PATH_SEPARATOR/usr/local/bin$PATH_SEPARATOR/sw/bin"
+	export PATH
+fi
+
+    if test -n "$ac_tool_prefix"; then
   for ac_prog in z-config
   do
     # Extract the first word of "$ac_tool_prefix$ac_prog", so it can be a program name with args.
@@ -21311,7 +21521,14 @@ fi
 fi
 
 		if test "$cs_prog_pkg_config_checked" != yes; then
-  if test -n "$ac_tool_prefix"; then
+
+    if test "$cs_prog_path_prepared" != yes; then
+  cs_prog_path_prepared=yes
+	PATH="$PATH$PATH_SEPARATOR/usr/local/bin$PATH_SEPARATOR/sw/bin"
+	export PATH
+fi
+
+    if test -n "$ac_tool_prefix"; then
   for ac_prog in pkg-config
   do
     # Extract the first word of "$ac_tool_prefix$ac_prog", so it can be a program name with args.
@@ -21452,7 +21669,14 @@ fi
 
 fi
 
-		if test -n "$ac_tool_prefix"; then
+
+    if test "$cs_prog_path_prepared" != yes; then
+  cs_prog_path_prepared=yes
+	PATH="$PATH$PATH_SEPARATOR/usr/local/bin$PATH_SEPARATOR/sw/bin"
+	export PATH
+fi
+
+    if test -n "$ac_tool_prefix"; then
   for ac_prog in zlib-config
   do
     # Extract the first word of "$ac_tool_prefix$ac_prog", so it can be a program name with args.
@@ -22173,7 +22397,14 @@ fi
 	cs_check_lib_flags=''
 	if test $with_libpng = yes; then
   if test "$cs_prog_pkg_config_checked" != yes; then
-  if test -n "$ac_tool_prefix"; then
+
+    if test "$cs_prog_path_prepared" != yes; then
+  cs_prog_path_prepared=yes
+	PATH="$PATH$PATH_SEPARATOR/usr/local/bin$PATH_SEPARATOR/sw/bin"
+	export PATH
+fi
+
+    if test -n "$ac_tool_prefix"; then
   for ac_prog in pkg-config
   do
     # Extract the first word of "$ac_tool_prefix$ac_prog", so it can be a program name with args.
@@ -22314,7 +22545,14 @@ fi
 
 fi
 
-		if test -n "$ac_tool_prefix"; then
+
+    if test "$cs_prog_path_prepared" != yes; then
+  cs_prog_path_prepared=yes
+	PATH="$PATH$PATH_SEPARATOR/usr/local/bin$PATH_SEPARATOR/sw/bin"
+	export PATH
+fi
+
+    if test -n "$ac_tool_prefix"; then
   for ac_prog in png-config
   do
     # Extract the first word of "$ac_tool_prefix$ac_prog", so it can be a program name with args.
@@ -22432,7 +22670,14 @@ fi
 fi
 
 		if test "$cs_prog_pkg_config_checked" != yes; then
-  if test -n "$ac_tool_prefix"; then
+
+    if test "$cs_prog_path_prepared" != yes; then
+  cs_prog_path_prepared=yes
+	PATH="$PATH$PATH_SEPARATOR/usr/local/bin$PATH_SEPARATOR/sw/bin"
+	export PATH
+fi
+
+    if test -n "$ac_tool_prefix"; then
   for ac_prog in pkg-config
   do
     # Extract the first word of "$ac_tool_prefix$ac_prog", so it can be a program name with args.
@@ -22573,7 +22818,14 @@ fi
 
 fi
 
-		if test -n "$ac_tool_prefix"; then
+
+    if test "$cs_prog_path_prepared" != yes; then
+  cs_prog_path_prepared=yes
+	PATH="$PATH$PATH_SEPARATOR/usr/local/bin$PATH_SEPARATOR/sw/bin"
+	export PATH
+fi
+
+    if test -n "$ac_tool_prefix"; then
   for ac_prog in libpng-config
   do
     # Extract the first word of "$ac_tool_prefix$ac_prog", so it can be a program name with args.
@@ -23291,7 +23543,14 @@ fi
 	cs_check_lib_flags=''
 	if test $with_libjpeg = yes; then
   if test "$cs_prog_pkg_config_checked" != yes; then
-  if test -n "$ac_tool_prefix"; then
+
+    if test "$cs_prog_path_prepared" != yes; then
+  cs_prog_path_prepared=yes
+	PATH="$PATH$PATH_SEPARATOR/usr/local/bin$PATH_SEPARATOR/sw/bin"
+	export PATH
+fi
+
+    if test -n "$ac_tool_prefix"; then
   for ac_prog in pkg-config
   do
     # Extract the first word of "$ac_tool_prefix$ac_prog", so it can be a program name with args.
@@ -23432,7 +23691,14 @@ fi
 
 fi
 
-		if test -n "$ac_tool_prefix"; then
+
+    if test "$cs_prog_path_prepared" != yes; then
+  cs_prog_path_prepared=yes
+	PATH="$PATH$PATH_SEPARATOR/usr/local/bin$PATH_SEPARATOR/sw/bin"
+	export PATH
+fi
+
+    if test -n "$ac_tool_prefix"; then
   for ac_prog in jpeg-config
   do
     # Extract the first word of "$ac_tool_prefix$ac_prog", so it can be a program name with args.
@@ -23550,7 +23816,14 @@ fi
 fi
 
 		if test "$cs_prog_pkg_config_checked" != yes; then
-  if test -n "$ac_tool_prefix"; then
+
+    if test "$cs_prog_path_prepared" != yes; then
+  cs_prog_path_prepared=yes
+	PATH="$PATH$PATH_SEPARATOR/usr/local/bin$PATH_SEPARATOR/sw/bin"
+	export PATH
+fi
+
+    if test -n "$ac_tool_prefix"; then
   for ac_prog in pkg-config
   do
     # Extract the first word of "$ac_tool_prefix$ac_prog", so it can be a program name with args.
@@ -23691,7 +23964,14 @@ fi
 
 fi
 
-		if test -n "$ac_tool_prefix"; then
+
+    if test "$cs_prog_path_prepared" != yes; then
+  cs_prog_path_prepared=yes
+	PATH="$PATH$PATH_SEPARATOR/usr/local/bin$PATH_SEPARATOR/sw/bin"
+	export PATH
+fi
+
+    if test -n "$ac_tool_prefix"; then
   for ac_prog in libjpeg-config
   do
     # Extract the first word of "$ac_tool_prefix$ac_prog", so it can be a program name with args.
@@ -24413,7 +24693,14 @@ fi
 	cs_check_lib_flags=''
 	if test $with_liblcms = yes; then
   if test "$cs_prog_pkg_config_checked" != yes; then
-  if test -n "$ac_tool_prefix"; then
+
+    if test "$cs_prog_path_prepared" != yes; then
+  cs_prog_path_prepared=yes
+	PATH="$PATH$PATH_SEPARATOR/usr/local/bin$PATH_SEPARATOR/sw/bin"
+	export PATH
+fi
+
+    if test -n "$ac_tool_prefix"; then
   for ac_prog in pkg-config
   do
     # Extract the first word of "$ac_tool_prefix$ac_prog", so it can be a program name with args.
@@ -24554,7 +24841,14 @@ fi
 
 fi
 
-		if test -n "$ac_tool_prefix"; then
+
+    if test "$cs_prog_path_prepared" != yes; then
+  cs_prog_path_prepared=yes
+	PATH="$PATH$PATH_SEPARATOR/usr/local/bin$PATH_SEPARATOR/sw/bin"
+	export PATH
+fi
+
+    if test -n "$ac_tool_prefix"; then
   for ac_prog in lcms-config
   do
     # Extract the first word of "$ac_tool_prefix$ac_prog", so it can be a program name with args.
@@ -25134,7 +25428,14 @@ fi
 	cs_check_lib_flags=''
 	if test $with_libmng = yes; then
   if test "$cs_prog_pkg_config_checked" != yes; then
-  if test -n "$ac_tool_prefix"; then
+
+    if test "$cs_prog_path_prepared" != yes; then
+  cs_prog_path_prepared=yes
+	PATH="$PATH$PATH_SEPARATOR/usr/local/bin$PATH_SEPARATOR/sw/bin"
+	export PATH
+fi
+
+    if test -n "$ac_tool_prefix"; then
   for ac_prog in pkg-config
   do
     # Extract the first word of "$ac_tool_prefix$ac_prog", so it can be a program name with args.
@@ -25275,7 +25576,14 @@ fi
 
 fi
 
-		if test -n "$ac_tool_prefix"; then
+
+    if test "$cs_prog_path_prepared" != yes; then
+  cs_prog_path_prepared=yes
+	PATH="$PATH$PATH_SEPARATOR/usr/local/bin$PATH_SEPARATOR/sw/bin"
+	export PATH
+fi
+
+    if test -n "$ac_tool_prefix"; then
   for ac_prog in mng-config
   do
     # Extract the first word of "$ac_tool_prefix$ac_prog", so it can be a program name with args.
@@ -25393,7 +25701,14 @@ fi
 fi
 
 		if test "$cs_prog_pkg_config_checked" != yes; then
-  if test -n "$ac_tool_prefix"; then
+
+    if test "$cs_prog_path_prepared" != yes; then
+  cs_prog_path_prepared=yes
+	PATH="$PATH$PATH_SEPARATOR/usr/local/bin$PATH_SEPARATOR/sw/bin"
+	export PATH
+fi
+
+    if test -n "$ac_tool_prefix"; then
   for ac_prog in pkg-config
   do
     # Extract the first word of "$ac_tool_prefix$ac_prog", so it can be a program name with args.
@@ -25534,7 +25849,14 @@ fi
 
 fi
 
-		if test -n "$ac_tool_prefix"; then
+
+    if test "$cs_prog_path_prepared" != yes; then
+  cs_prog_path_prepared=yes
+	PATH="$PATH$PATH_SEPARATOR/usr/local/bin$PATH_SEPARATOR/sw/bin"
+	export PATH
+fi
+
+    if test -n "$ac_tool_prefix"; then
   for ac_prog in libmng-config
   do
     # Extract the first word of "$ac_tool_prefix$ac_prog", so it can be a program name with args.
@@ -26250,7 +26572,14 @@ fi
 	cs_check_lib_flags=''
 	if test $with_libmikmod = yes; then
   if test "$cs_prog_pkg_config_checked" != yes; then
-  if test -n "$ac_tool_prefix"; then
+
+    if test "$cs_prog_path_prepared" != yes; then
+  cs_prog_path_prepared=yes
+	PATH="$PATH$PATH_SEPARATOR/usr/local/bin$PATH_SEPARATOR/sw/bin"
+	export PATH
+fi
+
+    if test -n "$ac_tool_prefix"; then
   for ac_prog in pkg-config
   do
     # Extract the first word of "$ac_tool_prefix$ac_prog", so it can be a program name with args.
@@ -26391,7 +26720,14 @@ fi
 
 fi
 
-		if test -n "$ac_tool_prefix"; then
+
+    if test "$cs_prog_path_prepared" != yes; then
+  cs_prog_path_prepared=yes
+	PATH="$PATH$PATH_SEPARATOR/usr/local/bin$PATH_SEPARATOR/sw/bin"
+	export PATH
+fi
+
+    if test -n "$ac_tool_prefix"; then
   for ac_prog in mikmod-config
   do
     # Extract the first word of "$ac_tool_prefix$ac_prog", so it can be a program name with args.
@@ -27003,7 +27339,14 @@ fi
 	cs_check_lib_flags=''
 	if test $with_libogg = yes; then
   if test "$cs_prog_pkg_config_checked" != yes; then
-  if test -n "$ac_tool_prefix"; then
+
+    if test "$cs_prog_path_prepared" != yes; then
+  cs_prog_path_prepared=yes
+	PATH="$PATH$PATH_SEPARATOR/usr/local/bin$PATH_SEPARATOR/sw/bin"
+	export PATH
+fi
+
+    if test -n "$ac_tool_prefix"; then
   for ac_prog in pkg-config
   do
     # Extract the first word of "$ac_tool_prefix$ac_prog", so it can be a program name with args.
@@ -27144,7 +27487,14 @@ fi
 
 fi
 
-		if test -n "$ac_tool_prefix"; then
+
+    if test "$cs_prog_path_prepared" != yes; then
+  cs_prog_path_prepared=yes
+	PATH="$PATH$PATH_SEPARATOR/usr/local/bin$PATH_SEPARATOR/sw/bin"
+	export PATH
+fi
+
+    if test -n "$ac_tool_prefix"; then
   for ac_prog in ogg-config
   do
     # Extract the first word of "$ac_tool_prefix$ac_prog", so it can be a program name with args.
@@ -27751,7 +28101,14 @@ fi
 	cs_check_lib_flags=''
 	if test $with_libvorbis = yes; then
   if test "$cs_prog_pkg_config_checked" != yes; then
-  if test -n "$ac_tool_prefix"; then
+
+    if test "$cs_prog_path_prepared" != yes; then
+  cs_prog_path_prepared=yes
+	PATH="$PATH$PATH_SEPARATOR/usr/local/bin$PATH_SEPARATOR/sw/bin"
+	export PATH
+fi
+
+    if test -n "$ac_tool_prefix"; then
   for ac_prog in pkg-config
   do
     # Extract the first word of "$ac_tool_prefix$ac_prog", so it can be a program name with args.
@@ -27892,7 +28249,14 @@ fi
 
 fi
 
-		if test -n "$ac_tool_prefix"; then
+
+    if test "$cs_prog_path_prepared" != yes; then
+  cs_prog_path_prepared=yes
+	PATH="$PATH$PATH_SEPARATOR/usr/local/bin$PATH_SEPARATOR/sw/bin"
+	export PATH
+fi
+
+    if test -n "$ac_tool_prefix"; then
   for ac_prog in vorbis-config
   do
     # Extract the first word of "$ac_tool_prefix$ac_prog", so it can be a program name with args.
@@ -28501,7 +28865,14 @@ fi
 	cs_check_lib_flags=''
 	if test $with_libvorbisfile = yes; then
   if test "$cs_prog_pkg_config_checked" != yes; then
-  if test -n "$ac_tool_prefix"; then
+
+    if test "$cs_prog_path_prepared" != yes; then
+  cs_prog_path_prepared=yes
+	PATH="$PATH$PATH_SEPARATOR/usr/local/bin$PATH_SEPARATOR/sw/bin"
+	export PATH
+fi
+
+    if test -n "$ac_tool_prefix"; then
   for ac_prog in pkg-config
   do
     # Extract the first word of "$ac_tool_prefix$ac_prog", so it can be a program name with args.
@@ -28642,7 +29013,14 @@ fi
 
 fi
 
-		if test -n "$ac_tool_prefix"; then
+
+    if test "$cs_prog_path_prepared" != yes; then
+  cs_prog_path_prepared=yes
+	PATH="$PATH$PATH_SEPARATOR/usr/local/bin$PATH_SEPARATOR/sw/bin"
+	export PATH
+fi
+
+    if test -n "$ac_tool_prefix"; then
   for ac_prog in vorbisfile-config
   do
     # Extract the first word of "$ac_tool_prefix$ac_prog", so it can be a program name with args.
@@ -29262,7 +29640,14 @@ fi
 	cs_check_lib_flags=''
 	if test $with_lib3ds = yes; then
   if test "$cs_prog_pkg_config_checked" != yes; then
-  if test -n "$ac_tool_prefix"; then
+
+    if test "$cs_prog_path_prepared" != yes; then
+  cs_prog_path_prepared=yes
+	PATH="$PATH$PATH_SEPARATOR/usr/local/bin$PATH_SEPARATOR/sw/bin"
+	export PATH
+fi
+
+    if test -n "$ac_tool_prefix"; then
   for ac_prog in pkg-config
   do
     # Extract the first word of "$ac_tool_prefix$ac_prog", so it can be a program name with args.
@@ -29403,7 +29788,14 @@ fi
 
 fi
 
-		if test -n "$ac_tool_prefix"; then
+
+    if test "$cs_prog_path_prepared" != yes; then
+  cs_prog_path_prepared=yes
+	PATH="$PATH$PATH_SEPARATOR/usr/local/bin$PATH_SEPARATOR/sw/bin"
+	export PATH
+fi
+
+    if test -n "$ac_tool_prefix"; then
   for ac_prog in 3ds-config
   do
     # Extract the first word of "$ac_tool_prefix$ac_prog", so it can be a program name with args.
@@ -29521,7 +29913,14 @@ fi
 fi
 
 		if test "$cs_prog_pkg_config_checked" != yes; then
-  if test -n "$ac_tool_prefix"; then
+
+    if test "$cs_prog_path_prepared" != yes; then
+  cs_prog_path_prepared=yes
+	PATH="$PATH$PATH_SEPARATOR/usr/local/bin$PATH_SEPARATOR/sw/bin"
+	export PATH
+fi
+
+    if test -n "$ac_tool_prefix"; then
   for ac_prog in pkg-config
   do
     # Extract the first word of "$ac_tool_prefix$ac_prog", so it can be a program name with args.
@@ -29662,7 +30061,14 @@ fi
 
 fi
 
-		if test -n "$ac_tool_prefix"; then
+
+    if test "$cs_prog_path_prepared" != yes; then
+  cs_prog_path_prepared=yes
+	PATH="$PATH$PATH_SEPARATOR/usr/local/bin$PATH_SEPARATOR/sw/bin"
+	export PATH
+fi
+
+    if test -n "$ac_tool_prefix"; then
   for ac_prog in lib3ds-120-config
   do
     # Extract the first word of "$ac_tool_prefix$ac_prog", so it can be a program name with args.
@@ -30698,7 +31104,14 @@ fi
 	cs_check_lib_flags=''
 	if test $with_libode = yes; then
   if test "$cs_prog_pkg_config_checked" != yes; then
-  if test -n "$ac_tool_prefix"; then
+
+    if test "$cs_prog_path_prepared" != yes; then
+  cs_prog_path_prepared=yes
+	PATH="$PATH$PATH_SEPARATOR/usr/local/bin$PATH_SEPARATOR/sw/bin"
+	export PATH
+fi
+
+    if test -n "$ac_tool_prefix"; then
   for ac_prog in pkg-config
   do
     # Extract the first word of "$ac_tool_prefix$ac_prog", so it can be a program name with args.
@@ -30839,7 +31252,14 @@ fi
 
 fi
 
-		if test -n "$ac_tool_prefix"; then
+
+    if test "$cs_prog_path_prepared" != yes; then
+  cs_prog_path_prepared=yes
+	PATH="$PATH$PATH_SEPARATOR/usr/local/bin$PATH_SEPARATOR/sw/bin"
+	export PATH
+fi
+
+    if test -n "$ac_tool_prefix"; then
   for ac_prog in ode-config
   do
     # Extract the first word of "$ac_tool_prefix$ac_prog", so it can be a program name with args.
@@ -32809,7 +33229,14 @@ fi
 	cs_check_lib_flags=''
 	if test $with_libfreetype2 = yes; then
   if test "$cs_prog_pkg_config_checked" != yes; then
-  if test -n "$ac_tool_prefix"; then
+
+    if test "$cs_prog_path_prepared" != yes; then
+  cs_prog_path_prepared=yes
+	PATH="$PATH$PATH_SEPARATOR/usr/local/bin$PATH_SEPARATOR/sw/bin"
+	export PATH
+fi
+
+    if test -n "$ac_tool_prefix"; then
   for ac_prog in pkg-config
   do
     # Extract the first word of "$ac_tool_prefix$ac_prog", so it can be a program name with args.
@@ -32950,7 +33377,14 @@ fi
 
 fi
 
-		if test -n "$ac_tool_prefix"; then
+
+    if test "$cs_prog_path_prepared" != yes; then
+  cs_prog_path_prepared=yes
+	PATH="$PATH$PATH_SEPARATOR/usr/local/bin$PATH_SEPARATOR/sw/bin"
+	export PATH
+fi
+
+    if test -n "$ac_tool_prefix"; then
   for ac_prog in freetype2-config
   do
     # Extract the first word of "$ac_tool_prefix$ac_prog", so it can be a program name with args.
@@ -33068,7 +33502,14 @@ fi
 fi
 
 		if test "$cs_prog_pkg_config_checked" != yes; then
-  if test -n "$ac_tool_prefix"; then
+
+    if test "$cs_prog_path_prepared" != yes; then
+  cs_prog_path_prepared=yes
+	PATH="$PATH$PATH_SEPARATOR/usr/local/bin$PATH_SEPARATOR/sw/bin"
+	export PATH
+fi
+
+    if test -n "$ac_tool_prefix"; then
   for ac_prog in pkg-config
   do
     # Extract the first word of "$ac_tool_prefix$ac_prog", so it can be a program name with args.
@@ -33209,7 +33650,14 @@ fi
 
 fi
 
-		if test -n "$ac_tool_prefix"; then
+
+    if test "$cs_prog_path_prepared" != yes; then
+  cs_prog_path_prepared=yes
+	PATH="$PATH$PATH_SEPARATOR/usr/local/bin$PATH_SEPARATOR/sw/bin"
+	export PATH
+fi
+
+    if test -n "$ac_tool_prefix"; then
   for ac_prog in freetype-config
   do
     # Extract the first word of "$ac_tool_prefix$ac_prog", so it can be a program name with args.
@@ -34436,7 +34884,14 @@ fi
 	cs_check_lib_flags=''
 	if test $with_libcal3d = yes; then
   if test "$cs_prog_pkg_config_checked" != yes; then
-  if test -n "$ac_tool_prefix"; then
+
+    if test "$cs_prog_path_prepared" != yes; then
+  cs_prog_path_prepared=yes
+	PATH="$PATH$PATH_SEPARATOR/usr/local/bin$PATH_SEPARATOR/sw/bin"
+	export PATH
+fi
+
+    if test -n "$ac_tool_prefix"; then
   for ac_prog in pkg-config
   do
     # Extract the first word of "$ac_tool_prefix$ac_prog", so it can be a program name with args.
@@ -34577,7 +35032,14 @@ fi
 
 fi
 
-		if test -n "$ac_tool_prefix"; then
+
+    if test "$cs_prog_path_prepared" != yes; then
+  cs_prog_path_prepared=yes
+	PATH="$PATH$PATH_SEPARATOR/usr/local/bin$PATH_SEPARATOR/sw/bin"
+	export PATH
+fi
+
+    if test -n "$ac_tool_prefix"; then
   for ac_prog in cal3d-config
   do
     # Extract the first word of "$ac_tool_prefix$ac_prog", so it can be a program name with args.
@@ -35504,7 +35966,14 @@ fi
 	cs_check_lib_flags=''
 	if test $with_libsdl = yes; then
   if test "$cs_prog_pkg_config_checked" != yes; then
-  if test -n "$ac_tool_prefix"; then
+
+    if test "$cs_prog_path_prepared" != yes; then
+  cs_prog_path_prepared=yes
+	PATH="$PATH$PATH_SEPARATOR/usr/local/bin$PATH_SEPARATOR/sw/bin"
+	export PATH
+fi
+
+    if test -n "$ac_tool_prefix"; then
   for ac_prog in pkg-config
   do
     # Extract the first word of "$ac_tool_prefix$ac_prog", so it can be a program name with args.
@@ -35645,7 +36114,14 @@ fi
 
 fi
 
-		if test -n "$ac_tool_prefix"; then
+
+    if test "$cs_prog_path_prepared" != yes; then
+  cs_prog_path_prepared=yes
+	PATH="$PATH$PATH_SEPARATOR/usr/local/bin$PATH_SEPARATOR/sw/bin"
+	export PATH
+fi
+
+    if test -n "$ac_tool_prefix"; then
   for ac_prog in sdl-config
   do
     # Extract the first word of "$ac_tool_prefix$ac_prog", so it can be a program name with args.
@@ -36574,7 +37050,14 @@ fi
 fi
 
 if test "$cs_prog_pkg_config_checked" != yes; then
-  if test -n "$ac_tool_prefix"; then
+
+    if test "$cs_prog_path_prepared" != yes; then
+  cs_prog_path_prepared=yes
+	PATH="$PATH$PATH_SEPARATOR/usr/local/bin$PATH_SEPARATOR/sw/bin"
+	export PATH
+fi
+
+    if test -n "$ac_tool_prefix"; then
   for ac_prog in pkg-config
   do
     # Extract the first word of "$ac_tool_prefix$ac_prog", so it can be a program name with args.
@@ -36759,7 +37242,14 @@ fi
 # try the result of --libs and --gl-libs together; if that fails, then we try
 # only --libs augmented with the results of our own OpenGL checks.
 #------------------------------------------------------------------------------
-if test -n "$ac_tool_prefix"; then
+
+    if test "$cs_prog_path_prepared" != yes; then
+  cs_prog_path_prepared=yes
+	PATH="$PATH$PATH_SEPARATOR/usr/local/bin$PATH_SEPARATOR/sw/bin"
+	export PATH
+fi
+
+    if test -n "$ac_tool_prefix"; then
   for ac_prog in wx-config
   do
     # Extract the first word of "$ac_tool_prefix$ac_prog", so it can be a program name with args.
@@ -37939,7 +38429,14 @@ fi
 #------------------------------------------------------------------------------
 # Check for Cg shader package.
 #------------------------------------------------------------------------------
-for ac_prog in cgc
+
+    if test "$cs_prog_path_prepared" != yes; then
+  cs_prog_path_prepared=yes
+	PATH="$PATH$PATH_SEPARATOR/usr/local/bin$PATH_SEPARATOR/sw/bin"
+	export PATH
+fi
+
+    for ac_prog in cgc
 do
   # Extract the first word of "$ac_prog", so it can be a program name with args.
 set dummy $ac_prog; ac_word=$2
@@ -38015,7 +38512,14 @@ fi
 	cs_check_lib_flags=''
 	if test $with_libCg = yes; then
   if test "$cs_prog_pkg_config_checked" != yes; then
-  if test -n "$ac_tool_prefix"; then
+
+    if test "$cs_prog_path_prepared" != yes; then
+  cs_prog_path_prepared=yes
+	PATH="$PATH$PATH_SEPARATOR/usr/local/bin$PATH_SEPARATOR/sw/bin"
+	export PATH
+fi
+
+    if test -n "$ac_tool_prefix"; then
   for ac_prog in pkg-config
   do
     # Extract the first word of "$ac_tool_prefix$ac_prog", so it can be a program name with args.
@@ -38156,7 +38660,14 @@ fi
 
 fi
 
-		if test -n "$ac_tool_prefix"; then
+
+    if test "$cs_prog_path_prepared" != yes; then
+  cs_prog_path_prepared=yes
+	PATH="$PATH$PATH_SEPARATOR/usr/local/bin$PATH_SEPARATOR/sw/bin"
+	export PATH
+fi
+
+    if test -n "$ac_tool_prefix"; then
   for ac_prog in Cg-config
   do
     # Extract the first word of "$ac_tool_prefix$ac_prog", so it can be a program name with args.
@@ -38274,7 +38785,14 @@ fi
 fi
 
 		if test "$cs_prog_pkg_config_checked" != yes; then
-  if test -n "$ac_tool_prefix"; then
+
+    if test "$cs_prog_path_prepared" != yes; then
+  cs_prog_path_prepared=yes
+	PATH="$PATH$PATH_SEPARATOR/usr/local/bin$PATH_SEPARATOR/sw/bin"
+	export PATH
+fi
+
+    if test -n "$ac_tool_prefix"; then
   for ac_prog in pkg-config
   do
     # Extract the first word of "$ac_tool_prefix$ac_prog", so it can be a program name with args.
@@ -38415,7 +38933,14 @@ fi
 
 fi
 
-		if test -n "$ac_tool_prefix"; then
+
+    if test "$cs_prog_path_prepared" != yes; then
+  cs_prog_path_prepared=yes
+	PATH="$PATH$PATH_SEPARATOR/usr/local/bin$PATH_SEPARATOR/sw/bin"
+	export PATH
+fi
+
+    if test -n "$ac_tool_prefix"; then
   for ac_prog in cg-config
   do
     # Extract the first word of "$ac_tool_prefix$ac_prog", so it can be a program name with args.
@@ -38533,7 +39058,14 @@ fi
 fi
 
 		if test "$cs_prog_pkg_config_checked" != yes; then
-  if test -n "$ac_tool_prefix"; then
+
+    if test "$cs_prog_path_prepared" != yes; then
+  cs_prog_path_prepared=yes
+	PATH="$PATH$PATH_SEPARATOR/usr/local/bin$PATH_SEPARATOR/sw/bin"
+	export PATH
+fi
+
+    if test -n "$ac_tool_prefix"; then
   for ac_prog in pkg-config
   do
     # Extract the first word of "$ac_tool_prefix$ac_prog", so it can be a program name with args.
@@ -38674,7 +39206,14 @@ fi
 
 fi
 
-		if test -n "$ac_tool_prefix"; then
+
+    if test "$cs_prog_path_prepared" != yes; then
+  cs_prog_path_prepared=yes
+	PATH="$PATH$PATH_SEPARATOR/usr/local/bin$PATH_SEPARATOR/sw/bin"
+	export PATH
+fi
+
+    if test -n "$ac_tool_prefix"; then
   for ac_prog in CG-config
   do
     # Extract the first word of "$ac_tool_prefix$ac_prog", so it can be a program name with args.
@@ -39784,7 +40323,14 @@ fi
 	cs_check_lib_flags=''
 	if test $with_libCgGL = yes; then
   if test "$cs_prog_pkg_config_checked" != yes; then
-  if test -n "$ac_tool_prefix"; then
+
+    if test "$cs_prog_path_prepared" != yes; then
+  cs_prog_path_prepared=yes
+	PATH="$PATH$PATH_SEPARATOR/usr/local/bin$PATH_SEPARATOR/sw/bin"
+	export PATH
+fi
+
+    if test -n "$ac_tool_prefix"; then
   for ac_prog in pkg-config
   do
     # Extract the first word of "$ac_tool_prefix$ac_prog", so it can be a program name with args.
@@ -39925,7 +40471,14 @@ fi
 
 fi
 
-		if test -n "$ac_tool_prefix"; then
+
+    if test "$cs_prog_path_prepared" != yes; then
+  cs_prog_path_prepared=yes
+	PATH="$PATH$PATH_SEPARATOR/usr/local/bin$PATH_SEPARATOR/sw/bin"
+	export PATH
+fi
+
+    if test -n "$ac_tool_prefix"; then
   for ac_prog in CgGL-config
   do
     # Extract the first word of "$ac_tool_prefix$ac_prog", so it can be a program name with args.
@@ -40043,7 +40596,14 @@ fi
 fi
 
 		if test "$cs_prog_pkg_config_checked" != yes; then
-  if test -n "$ac_tool_prefix"; then
+
+    if test "$cs_prog_path_prepared" != yes; then
+  cs_prog_path_prepared=yes
+	PATH="$PATH$PATH_SEPARATOR/usr/local/bin$PATH_SEPARATOR/sw/bin"
+	export PATH
+fi
+
+    if test -n "$ac_tool_prefix"; then
   for ac_prog in pkg-config
   do
     # Extract the first word of "$ac_tool_prefix$ac_prog", so it can be a program name with args.
@@ -40184,7 +40744,14 @@ fi
 
 fi
 
-		if test -n "$ac_tool_prefix"; then
+
+    if test "$cs_prog_path_prepared" != yes; then
+  cs_prog_path_prepared=yes
+	PATH="$PATH$PATH_SEPARATOR/usr/local/bin$PATH_SEPARATOR/sw/bin"
+	export PATH
+fi
+
+    if test -n "$ac_tool_prefix"; then
   for ac_prog in cggl-config
   do
     # Extract the first word of "$ac_tool_prefix$ac_prog", so it can be a program name with args.
@@ -40302,7 +40869,14 @@ fi
 fi
 
 		if test "$cs_prog_pkg_config_checked" != yes; then
-  if test -n "$ac_tool_prefix"; then
+
+    if test "$cs_prog_path_prepared" != yes; then
+  cs_prog_path_prepared=yes
+	PATH="$PATH$PATH_SEPARATOR/usr/local/bin$PATH_SEPARATOR/sw/bin"
+	export PATH
+fi
+
+    if test -n "$ac_tool_prefix"; then
   for ac_prog in pkg-config
   do
     # Extract the first word of "$ac_tool_prefix$ac_prog", so it can be a program name with args.
@@ -40443,7 +41017,14 @@ fi
 
 fi
 
-		if test -n "$ac_tool_prefix"; then
+
+    if test "$cs_prog_path_prepared" != yes; then
+  cs_prog_path_prepared=yes
+	PATH="$PATH$PATH_SEPARATOR/usr/local/bin$PATH_SEPARATOR/sw/bin"
+	export PATH
+fi
+
+    if test -n "$ac_tool_prefix"; then
   for ac_prog in cgGL-config
   do
     # Extract the first word of "$ac_tool_prefix$ac_prog", so it can be a program name with args.
@@ -40561,7 +41142,14 @@ fi
 fi
 
 		if test "$cs_prog_pkg_config_checked" != yes; then
-  if test -n "$ac_tool_prefix"; then
+
+    if test "$cs_prog_path_prepared" != yes; then
+  cs_prog_path_prepared=yes
+	PATH="$PATH$PATH_SEPARATOR/usr/local/bin$PATH_SEPARATOR/sw/bin"
+	export PATH
+fi
+
+    if test -n "$ac_tool_prefix"; then
   for ac_prog in pkg-config
   do
     # Extract the first word of "$ac_tool_prefix$ac_prog", so it can be a program name with args.
@@ -40702,7 +41290,14 @@ fi
 
 fi
 
-		if test -n "$ac_tool_prefix"; then
+
+    if test "$cs_prog_path_prepared" != yes; then
+  cs_prog_path_prepared=yes
+	PATH="$PATH$PATH_SEPARATOR/usr/local/bin$PATH_SEPARATOR/sw/bin"
+	export PATH
+fi
+
+    if test -n "$ac_tool_prefix"; then
   for ac_prog in CGGL-config
   do
     # Extract the first word of "$ac_tool_prefix$ac_prog", so it can be a program name with args.
@@ -40820,7 +41415,14 @@ fi
 fi
 
 		if test "$cs_prog_pkg_config_checked" != yes; then
-  if test -n "$ac_tool_prefix"; then
+
+    if test "$cs_prog_path_prepared" != yes; then
+  cs_prog_path_prepared=yes
+	PATH="$PATH$PATH_SEPARATOR/usr/local/bin$PATH_SEPARATOR/sw/bin"
+	export PATH
+fi
+
+    if test -n "$ac_tool_prefix"; then
   for ac_prog in pkg-config
   do
     # Extract the first word of "$ac_tool_prefix$ac_prog", so it can be a program name with args.
@@ -40961,7 +41563,14 @@ fi
 
 fi
 
-		if test -n "$ac_tool_prefix"; then
+
+    if test "$cs_prog_path_prepared" != yes; then
+  cs_prog_path_prepared=yes
+	PATH="$PATH$PATH_SEPARATOR/usr/local/bin$PATH_SEPARATOR/sw/bin"
+	export PATH
+fi
+
+    if test -n "$ac_tool_prefix"; then
   for ac_prog in Cg-config
   do
     # Extract the first word of "$ac_tool_prefix$ac_prog", so it can be a program name with args.
@@ -41079,7 +41688,14 @@ fi
 fi
 
 		if test "$cs_prog_pkg_config_checked" != yes; then
-  if test -n "$ac_tool_prefix"; then
+
+    if test "$cs_prog_path_prepared" != yes; then
+  cs_prog_path_prepared=yes
+	PATH="$PATH$PATH_SEPARATOR/usr/local/bin$PATH_SEPARATOR/sw/bin"
+	export PATH
+fi
+
+    if test -n "$ac_tool_prefix"; then
   for ac_prog in pkg-config
   do
     # Extract the first word of "$ac_tool_prefix$ac_prog", so it can be a program name with args.
@@ -41220,7 +41836,14 @@ fi
 
 fi
 
-		if test -n "$ac_tool_prefix"; then
+
+    if test "$cs_prog_path_prepared" != yes; then
+  cs_prog_path_prepared=yes
+	PATH="$PATH$PATH_SEPARATOR/usr/local/bin$PATH_SEPARATOR/sw/bin"
+	export PATH
+fi
+
+    if test -n "$ac_tool_prefix"; then
   for ac_prog in cg-config
   do
     # Extract the first word of "$ac_tool_prefix$ac_prog", so it can be a program name with args.
@@ -41338,7 +41961,14 @@ fi
 fi
 
 		if test "$cs_prog_pkg_config_checked" != yes; then
-  if test -n "$ac_tool_prefix"; then
+
+    if test "$cs_prog_path_prepared" != yes; then
+  cs_prog_path_prepared=yes
+	PATH="$PATH$PATH_SEPARATOR/usr/local/bin$PATH_SEPARATOR/sw/bin"
+	export PATH
+fi
+
+    if test -n "$ac_tool_prefix"; then
   for ac_prog in pkg-config
   do
     # Extract the first word of "$ac_tool_prefix$ac_prog", so it can be a program name with args.
@@ -41479,7 +42109,14 @@ fi
 
 fi
 
-		if test -n "$ac_tool_prefix"; then
+
+    if test "$cs_prog_path_prepared" != yes; then
+  cs_prog_path_prepared=yes
+	PATH="$PATH$PATH_SEPARATOR/usr/local/bin$PATH_SEPARATOR/sw/bin"
+	export PATH
+fi
+
+    if test -n "$ac_tool_prefix"; then
   for ac_prog in CG-config
   do
     # Extract the first word of "$ac_tool_prefix$ac_prog", so it can be a program name with args.
@@ -43171,7 +43808,14 @@ fi
 	cs_check_lib_flags=''
 	if test $with_libasound = yes; then
   if test "$cs_prog_pkg_config_checked" != yes; then
-  if test -n "$ac_tool_prefix"; then
+
+    if test "$cs_prog_path_prepared" != yes; then
+  cs_prog_path_prepared=yes
+	PATH="$PATH$PATH_SEPARATOR/usr/local/bin$PATH_SEPARATOR/sw/bin"
+	export PATH
+fi
+
+    if test -n "$ac_tool_prefix"; then
   for ac_prog in pkg-config
   do
     # Extract the first word of "$ac_tool_prefix$ac_prog", so it can be a program name with args.
@@ -43312,7 +43956,14 @@ fi
 
 fi
 
-		if test -n "$ac_tool_prefix"; then
+
+    if test "$cs_prog_path_prepared" != yes; then
+  cs_prog_path_prepared=yes
+	PATH="$PATH$PATH_SEPARATOR/usr/local/bin$PATH_SEPARATOR/sw/bin"
+	export PATH
+fi
+
+    if test -n "$ac_tool_prefix"; then
   for ac_prog in asound-config
   do
     # Extract the first word of "$ac_tool_prefix$ac_prog", so it can be a program name with args.
@@ -44927,7 +45578,14 @@ fi
 	cs_check_lib_flags=''
 	if test $with_libaa = yes; then
   if test "$cs_prog_pkg_config_checked" != yes; then
-  if test -n "$ac_tool_prefix"; then
+
+    if test "$cs_prog_path_prepared" != yes; then
+  cs_prog_path_prepared=yes
+	PATH="$PATH$PATH_SEPARATOR/usr/local/bin$PATH_SEPARATOR/sw/bin"
+	export PATH
+fi
+
+    if test -n "$ac_tool_prefix"; then
   for ac_prog in pkg-config
   do
     # Extract the first word of "$ac_tool_prefix$ac_prog", so it can be a program name with args.
@@ -45068,7 +45726,14 @@ fi
 
 fi
 
-		if test -n "$ac_tool_prefix"; then
+
+    if test "$cs_prog_path_prepared" != yes; then
+  cs_prog_path_prepared=yes
+	PATH="$PATH$PATH_SEPARATOR/usr/local/bin$PATH_SEPARATOR/sw/bin"
+	export PATH
+fi
+
+    if test -n "$ac_tool_prefix"; then
   for ac_prog in aa-config
   do
     # Extract the first word of "$ac_tool_prefix$ac_prog", so it can be a program name with args.
@@ -45186,7 +45851,14 @@ fi
 fi
 
 		if test "$cs_prog_pkg_config_checked" != yes; then
-  if test -n "$ac_tool_prefix"; then
+
+    if test "$cs_prog_path_prepared" != yes; then
+  cs_prog_path_prepared=yes
+	PATH="$PATH$PATH_SEPARATOR/usr/local/bin$PATH_SEPARATOR/sw/bin"
+	export PATH
+fi
+
+    if test -n "$ac_tool_prefix"; then
   for ac_prog in pkg-config
   do
     # Extract the first word of "$ac_tool_prefix$ac_prog", so it can be a program name with args.
@@ -45327,7 +45999,14 @@ fi
 
 fi
 
-		if test -n "$ac_tool_prefix"; then
+
+    if test "$cs_prog_path_prepared" != yes; then
+  cs_prog_path_prepared=yes
+	PATH="$PATH$PATH_SEPARATOR/usr/local/bin$PATH_SEPARATOR/sw/bin"
+	export PATH
+fi
+
+    if test -n "$ac_tool_prefix"; then
   for ac_prog in aalib-config
   do
     # Extract the first word of "$ac_tool_prefix$ac_prog", so it can be a program name with args.
@@ -46372,6 +47051,13 @@ fi
 fi
 echo "$as_me:$LINENO: result: $cs_cv_perl_tt2" >&5
 echo "${ECHO_T}$cs_cv_perl_tt2" >&6
+
+    if test "$cs_prog_path_prepared" != yes; then
+  cs_prog_path_prepared=yes
+	PATH="$PATH$PATH_SEPARATOR/usr/local/bin$PATH_SEPARATOR/sw/bin"
+	export PATH
+fi
+
     for ac_prog in ttree
 do
   # Extract the first word of "$ac_prog", so it can be a program name with args.
@@ -51103,7 +51789,14 @@ fi
 	cs_check_lib_flags=''
 	if test $with_libbfd = yes; then
   if test "$cs_prog_pkg_config_checked" != yes; then
-  if test -n "$ac_tool_prefix"; then
+
+    if test "$cs_prog_path_prepared" != yes; then
+  cs_prog_path_prepared=yes
+	PATH="$PATH$PATH_SEPARATOR/usr/local/bin$PATH_SEPARATOR/sw/bin"
+	export PATH
+fi
+
+    if test -n "$ac_tool_prefix"; then
   for ac_prog in pkg-config
   do
     # Extract the first word of "$ac_tool_prefix$ac_prog", so it can be a program name with args.
@@ -51244,7 +51937,14 @@ fi
 
 fi
 
-		if test -n "$ac_tool_prefix"; then
+
+    if test "$cs_prog_path_prepared" != yes; then
+  cs_prog_path_prepared=yes
+	PATH="$PATH$PATH_SEPARATOR/usr/local/bin$PATH_SEPARATOR/sw/bin"
+	export PATH
+fi
+
+    if test -n "$ac_tool_prefix"; then
   for ac_prog in bfd-config
   do
     # Extract the first word of "$ac_tool_prefix$ac_prog", so it can be a program name with args.

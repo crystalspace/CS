@@ -158,7 +158,7 @@ AC_DEFUN([CS_CHECK_LIB_WITH],
 m4_define([CS_PKG_CONFIG_MIN], [0.9.0])
 AC_DEFUN([CS_CHECK_PKG_CONFIG],
     [AS_IF([test "$cs_prog_pkg_config_checked" != yes],
-	[AC_CHECK_TOOLS([PKG_CONFIG], [pkg-config])
+	[CS_CHECK_TOOLS([PKG_CONFIG], [pkg-config])
 	_CS_CHECK_PKG_CONFIG_PREPARE_PATH
 	cs_prog_pkg_config_checked=yes])
     AS_IF([test -z "$cs_cv_prog_pkg_config_ok"],
@@ -204,7 +204,7 @@ AC_DEFUN([_CS_CLPCF_CVAR], [AS_TR_SH([cs_cv_prog_pkg_config_$1])])
 #	list of tuples stored in the shell variable VARIABLE.
 #------------------------------------------------------------------------------
 AC_DEFUN([_CS_CHECK_LIB_CONFIG_FLAGS],
-    [AC_CHECK_TOOLS(_CS_CLCF_SHVAR([$2]), [$2-config])
+    [CS_CHECK_TOOLS(_CS_CLCF_SHVAR([$2]), [$2-config])
     AS_IF([test -n "$_CS_CLCF_SHVAR([$2])"],
 	[AS_IF([test -z "$_CS_CLCF_CVAR([$2])"],
 	    [AS_IF([$_CS_CLCF_SHVAR([$2]) --cflags --libs >/dev/null 2>&1],
