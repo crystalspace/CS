@@ -1,6 +1,6 @@
 SubDir TOP plugins video loader jng ;
 
-if $(MNG.AVAILABLE) = "yes" 
+if $(MNG.AVAILABLE) = "yes"
 {
 Plugin csjngimg
 	: [ Wildcard *.cpp *.h ]

@@ -5,6 +5,35 @@ Application walktest
 ;
 LinkWith walktest : csengine csgeom csgfx cssys cstool csutil ;
 
+CompileGroups walktest : walkall ;
+CompileGroups vfs : walkall ;
+CompileGroups gl3d : walkall ;
+#CompileGroups softcanvas : walkall ;
+#CompileGroups openglcanvas : walkall ;
+CompileGroups effects : walkall ;
+CompileGroups csfont : walkall ;
+CompileGroups csconin : walkall ;
+CompileGroups simpcon : walkall ;
+CompileGroups rapid : walkall ;
+CompileGroups meshes : walkall ; 
+CompileGroups cssynldr : walkall ; 
+CompileGroups imgplex : walkall ; 
+CompileGroups csgifimg : walkall ;
+CompileGroups csjpgimg : walkall ;
+CompileGroups cspngimg : walkall ;
+CompileGroups csbmpimg : walkall ;
+CompileGroups reporter : walkall ;
+CompileGroups stdrep : walkall ;
+CompileGroups csparser : walkall ;
+CompileGroups frustvis : walkall ;
+CompileGroups dynavis : walkall ;
+CompileGroups bugplug : walkall ;
+CompileGroups sequence : walkall ;
+CompileGroups engseq : walkall ;
+CompileGroups xmlread : walkall ;
+CompileGroups xmlread : walkall ;
+CompileGroups ptanimimg : walkall ;
+
 SubVariant static ;
 Application walktest_static
 	: [ Wildcard *.cpp *.h ]

@@ -35,10 +35,6 @@ include $(jamrulesdir)/docs.jam ;
 
 include $(jamrulesdir)/options.jam ;
 
-# leave msvcgen as last element because it overrides some of teh earlier
-# defined rules
-include $(jamrulesdir)/msvcgen.jam ;
-
 # Include OS specific rules
 switch $(TARGET.OS)
 {
@@ -52,4 +48,9 @@ case * :
   echo "WARNING: TARGET.OS not defined. Using unix" ;
   include $(jamrulesdir)/unix.jam ;
 }
+
+# leave msvcgen as last element because it overrides some of the earlier
+# defined rules (it needs to be after the OS-specific rules as well because
+# it overrides some Win32 rules)
+include $(jamrulesdir)/msvcgen.jam ;
 

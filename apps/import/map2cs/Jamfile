@@ -5,6 +5,7 @@ Application map2cs
 	: console
 ;
 LinkWith map2cs : csgeom csgfx cssys cstool csutil ;
+ExternalLibs map2cs : ZLIB ;
 
 Help map2cs : "Quake map conversion tool" ;
 

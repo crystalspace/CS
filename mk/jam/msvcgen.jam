@@ -77,7 +77,7 @@ else
 # Override some rules
 
 
-## MavcProject target : sources : type : target-with-ext
+## MsvcProject target : sources : type : target-with-ext
 rule MsvcProject
 {
   local resource msvcname target fragments fragroot files i ;
@@ -168,7 +168,7 @@ rule MsvcProject
 
 rule Application
 {
-  _Options $(<) : $(3) ;
+#  _Options $(<) : $(3) ;
 
   local projtype ;
   if $(CONSOLEAPP_$(<)) = "yes"
@@ -241,6 +241,18 @@ rule LFlags
   LFLAGS on $($(<)_TARGET) += $(>) ;
 }
 
+rule ExternalLibs
+{
+  local i ;
+  
+  for i in $(>)
+  {
+    CFlags $(<) : $($(i).CFLAGS) ;
+    LFlags $(<) : $($(i).LFLAGS) ;
+    MsvcExternalLibrary $(<) : $($(i).MSVCLIBS) ;
+  }
+}
+
 rule MSVCWorkspace
 {
   local target ;
@@ -253,6 +265,17 @@ rule MSVCWorkspace
   MsvcWorkspaceGen $(target) : $(3) ;
 
   RmTemps $(target) : $(>) ;
+}
+
+rule Win32Resource
+{
+    local target = $($(<)_TARGET) ;
+    
+    # only add 1 resource object per target
+    if ! $($(<)_HASWIN32RESOURCE)
+    {
+	$(<)_HASWIN32RESOURCE = yes ;
+    }
 }
 
 #----------------------------------------------------------------------------
@@ -294,6 +317,7 @@ actions together MsvcWorkspaceGen
 
 actions ResourceGen
 {
+# @@@ Possible to use MakeVersionRc / MakeMetadataRc targets from win32.jam?
   $(MKVERRES) '$(<:S=.rctmp)' '$($(NAME)_help)' $(TOP)/include/csver.h
   $(MERGERES) '$(<)' '$(TOP)' '../..' '$(<:S=.rctmp)' '$($(NAME)_WIN32RESOURCE)'
   $(RM) $(<:S=.rctmp)

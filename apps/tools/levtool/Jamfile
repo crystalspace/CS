@@ -7,5 +7,3 @@ Application levtool
 LinkWith levtool : csgeom csgfx cssys cstool csutil ;
 
 Help levtool : "Crystal Space Level Tool" ;
-
-Win32Resource levtool : $(TOP)/libs/cssys/win32/rsrc/cs1.rc ;

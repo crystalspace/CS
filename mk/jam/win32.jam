@@ -11,7 +11,10 @@ PLUGIN.LFLAGS += -mwindows -mconsole ;
 WINDRES.FLAGS = --use-temp-file ;
 
 WAVEOUT.AVAILABLE = yes ;
-WAVEOUT.LFLAGS = -ldsound -lwinmm ;
+if ! $(MSVCGEN_CONFIG)
+{
+WAVEOUT.LFLAGS = -lwinmm ;
+}
 
 #----------------------------------------------------------------------------
 # resource handling

@@ -7,7 +7,6 @@ Plugin ddraw2d
 ;
 LinkWith ddraw2d : directxcommon canvascommon cssys csutil ;
 ExternalLibs ddraw2d :  DIRECTX ;
-#MsvcExternalLibrary ddraw2d : ddraw.lib ;
 
 Help ddraw2d : "Crystal Space DirectDraw 2D driver" ;
 CompileGroups ddraw2d :  drivers2d ;
