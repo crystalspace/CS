@@ -210,6 +210,7 @@ csWorld::csWorld (iBase *iParent) : csObject (), start_vec (0, 0, 0)
   quadtree = NULL;
   quadcube = NULL;
   covtree = NULL;
+  covtree_lut = NULL;
   current_camera = NULL;
   current_world = this;
 
