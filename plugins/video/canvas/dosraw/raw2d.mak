@@ -45,7 +45,7 @@ endif
 INC.RAW2D = $(wildcard plugins/video/canvas/dosraw/*.h   $(INC.COMMON.DRV2D))
 SRC.RAW2D = $(wildcard plugins/video/canvas/dosraw/*.cpp $(SRC.COMMON.DRV2D))
 OBJ.RAW2D = $(addprefix $(OUT),$(notdir $(SRC.RAW2D:.cpp=$O)))
-DEP.RAW2D = CSUTIL
+DEP.RAW2D = CSGEOM CSUTIL CSSYS
 
 endif # ifeq ($(MAKESECTION),postdefines)
 
