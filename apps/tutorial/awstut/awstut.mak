@@ -28,12 +28,13 @@ endif # ifeq ($(MAKESECTION),roottargets)
 #------------------------------------------------------------- postdefines ---#
 ifeq ($(MAKESECTION),postdefines)
 
-vpath %.cpp apps/tutorial/awstut apps/support
 
 AWSTUT.EXE = awstut$(EXE)
-INC.AWSTUT = $(wildcard apps/tutorial/awstut/*.h)
-SRC.AWSTUT = $(wildcard apps/tutorial/awstut/*.cpp)
-OBJ.AWSTUT = $(addprefix $(OUT)/,$(notdir $(SRC.AWSTUT:.cpp=$O)))
+DIR.AWSTUT = apps/tutorial/awstut
+OUT.AWSTUT = $(OUT)/$(DIR.AWSTUT)
+INC.AWSTUT = $(wildcard $(DIR.AWSTUT)/*.h )
+SRC.AWSTUT = $(wildcard $(DIR.AWSTUT)/*.cpp )
+OBJ.AWSTUT = $(addprefix $(OUT.AWSTUT)/,$(notdir $(SRC.AWSTUT:.cpp=$O)))
 DEP.AWSTUT = CSTOOL CSUTIL CSSYS CSUTIL CSGEOM CSGFX
 LIB.AWSTUT = $(foreach d,$(DEP.AWSTUT),$($d.LIB))
 CFG.AWSTUT = data/config/awstut.cfg
@@ -50,24 +51,34 @@ endif # ifeq ($(MAKESECTION),postdefines)
 #----------------------------------------------------------------- targets ---#
 ifeq ($(MAKESECTION),targets)
 
-.PHONY: build.awstut awstutclean
+.PHONY: build.awstut awstutclean awstutcleandep
 
 all: $(AWSTUT.EXE)
-build.awstut: $(OUTDIRS) $(AWSTUT.EXE)
+build.awstut: $(OUT.AWSTUT) $(AWSTUT.EXE)
 clean: awstutclean
+
+$(OUT.AWSTUT)/%$O: $(DIR.AWSTUT)/%.cpp
+	$(DO.COMPILE.CPP)
 
 $(AWSTUT.EXE): $(DEP.EXE) $(OBJ.AWSTUT) $(LIB.AWSTUT)
 	$(DO.LINK.EXE)
 
+$(OUT.AWSTUT):
+	$(MKDIRS)
+
 awstutclean:
 	-$(RMDIR) $(AWSTUT.EXE) $(OBJ.AWSTUT)
 
+cleandep: awstutcleandep
+awstutcleandep:
+	-$(RM) $(OUT.AWSTUT)/awstut.dep
+
 ifdef DO_DEPEND
-dep: $(OUTOS)/awstut.dep
-$(OUTOS)/awstut.dep: $(SRC.AWSTUT)
-	$(DO.DEP)
+dep: $(OUT.AWSTUT) $(OUT.AWSTUT)/awstut.dep
+$(OUT.AWSTUT)/awstut.dep: $(SRC.AWSTUT)
+	$(DO.DEPEND)
 else
--include $(OUTOS)/awstut.dep
+-include $(OUT.AWSTUT)/awstut.dep
 endif
 
 endif # ifeq ($(MAKESECTION),targets)

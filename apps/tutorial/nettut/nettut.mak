@@ -26,12 +26,13 @@ endif # ifeq ($(MAKESECTION),roottargets)
 #------------------------------------------------------------- postdefines ---#
 ifeq ($(MAKESECTION),postdefines)
 
-vpath %.cpp apps/tutorial/nettut
 
 NETTUT.EXE = nettut$(EXE.CONSOLE)
-INC.NETTUT = $(wildcard apps/tutorial/nettut/*.h)
-SRC.NETTUT = $(wildcard apps/tutorial/nettut/*.cpp)
-OBJ.NETTUT = $(addprefix $(OUT)/,$(notdir $(SRC.NETTUT:.cpp=$O)))
+DIR.NETTUT = apps/tutorial/nettut
+OUT.NETTUT = $(OUT)/$(DIR.NETTUT)
+INC.NETTUT = $(wildcard $(DIR.NETTUT)/*.h )
+SRC.NETTUT = $(wildcard $(DIR.NETTUT)/*.cpp )
+OBJ.NETTUT = $(addprefix $(OUT.NETTUT)/,$(notdir $(SRC.NETTUT:.cpp=$O)))
 DEP.NETTUT = CSTOOL CSGFX CSUTIL CSSYS CSGEOM CSUTIL CSSYS
 LIB.NETTUT = $(foreach d,$(DEP.NETTUT),$($d.LIB))
 
@@ -46,24 +47,34 @@ endif # ifeq ($(MAKESECTION),postdefines)
 #----------------------------------------------------------------- targets ---#
 ifeq ($(MAKESECTION),targets)
 
-.PHONY: build.nettut nettutclean
+.PHONY: build.nettut nettutclean nettutcleandep
 
 all: $(NETTUT.EXE)
-build.nettut: $(OUTDIRS) $(NETTUT.EXE)
+build.nettut: $(OUT.NETTUT) $(NETTUT.EXE)
 clean: nettutclean
+
+$(OUT.NETTUT)/%$O: $(DIR.NETTUT)/%.cpp
+	$(DO.COMPILE.CPP)
 
 $(NETTUT.EXE): $(DEP.EXE) $(OBJ.NETTUT) $(LIB.NETTUT)
 	$(DO.LINK.CONSOLE.EXE)
 
+$(OUT.NETTUT):
+	$(MKDIRS)
+
 nettutclean:
 	-$(RMDIR) $(NETTUT.EXE) $(OBJ.NETTUT)
 
+cleandep: nettutcleandep
+nettutcleandep:
+	-$(RM) $(OUT.NETTUT)/nettut.dep
+
 ifdef DO_DEPEND
-dep: $(OUTOS)/nettut.dep
-$(OUTOS)/nettut.dep: $(SRC.NETTUT)
-	$(DO.DEP)
+dep: $(OUT.NETTUT) $(OUT.NETTUT)/nettut.dep
+$(OUT.NETTUT)/nettut.dep: $(SRC.NETTUT)
+	$(DO.DEPEND)
 else
--include $(OUTOS)/nettut.dep
+-include $(OUT.NETTUT)/nettut.dep
 endif
 
 endif # ifeq ($(MAKESECTION),targets)

@@ -25,12 +25,13 @@ endif # ifeq ($(MAKESECTION),roottargets)
 #------------------------------------------------------------- postdefines ---#
 ifeq ($(MAKESECTION),postdefines)
 
-vpath %.cpp apps/tools/cs2xml
 
 CS2XML.EXE = cs2xml$(EXE.CONSOLE)
-INC.CS2XML = $(wildcard apps/tools/cs2xml/*.h)
-SRC.CS2XML = $(wildcard apps/tools/cs2xml/*.cpp)
-OBJ.CS2XML = $(addprefix $(OUT)/,$(notdir $(SRC.CS2XML:.cpp=$O)))
+DIR.CS2XML = apps/tools/cs2xml
+OUT.CS2XML = $(OUT)/$(DIR.CS2XML)
+INC.CS2XML = $(wildcard $(DIR.CS2XML)/*.h )
+SRC.CS2XML = $(wildcard $(DIR.CS2XML)/*.cpp )
+OBJ.CS2XML = $(addprefix $(OUT.CS2XML)/,$(notdir $(SRC.CS2XML:.cpp=$O)))
 DEP.CS2XML = CSTOOL CSGEOM CSTOOL CSGFX CSSYS CSUTIL CSSYS
 LIB.CS2XML = $(foreach d,$(DEP.CS2XML),$($d.LIB))
 
@@ -45,24 +46,34 @@ endif # ifeq ($(MAKESECTION),postdefines)
 #----------------------------------------------------------------- targets ---#
 ifeq ($(MAKESECTION),targets)
 
-.PHONY: build.cs2xml cs2xmlclean
+.PHONY: build.cs2xml cs2xmlclean cs2xmlcleandep
 
 all: $(CS2XML.EXE)
-build.cs2xml: $(OUTDIRS) $(CS2XML.EXE)
+build.cs2xml: $(OUT.CS2XML) $(CS2XML.EXE)
 clean: cs2xmlclean
+
+$(OUT.CS2XML)/%$O: $(DIR.CS2XML)/%.cpp
+	$(DO.COMPILE.CPP)
 
 $(CS2XML.EXE): $(DEP.EXE) $(OBJ.CS2XML) $(LIB.CS2XML)
 	$(DO.LINK.CONSOLE.EXE)
 
+$(OUT.CS2XML):
+	$(MKDIRS)
+
 cs2xmlclean:
 	-$(RMDIR) $(CS2XML.EXE) $(OBJ.CS2XML)
 
+cleandep: cs2xmlcleandep
+cs2xmlcleandep:
+	-$(RM) $(OUT.CS2XML)/cs2xml.dep
+
 ifdef DO_DEPEND
-dep: $(OUTOS)/cs2xml.dep
-$(OUTOS)/cs2xml.dep: $(SRC.CS2XML)
-	$(DO.DEP)
+dep: $(OUT.CS2XML) $(OUT.CS2XML)/cs2xml.dep
+$(OUT.CS2XML)/cs2xml.dep: $(SRC.CS2XML)
+	$(DO.DEPEND)
 else
--include $(OUTOS)/cs2xml.dep
+-include $(OUT.CS2XML)/cs2xml.dep
 endif
 
 endif # ifeq ($(MAKESECTION),targets)

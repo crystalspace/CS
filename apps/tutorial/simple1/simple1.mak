@@ -26,12 +26,13 @@ endif # ifeq ($(MAKESECTION),roottargets)
 #------------------------------------------------------------- postdefines ---#
 ifeq ($(MAKESECTION),postdefines)
 
-vpath %.cpp apps/tutorial/simple1
 
 SIMPLE1.EXE = simple1$(EXE)
-INC.SIMPLE1 = $(wildcard apps/tutorial/simple1/*.h)
-SRC.SIMPLE1 = $(wildcard apps/tutorial/simple1/*.cpp)
-OBJ.SIMPLE1 = $(addprefix $(OUT)/,$(notdir $(SRC.SIMPLE1:.cpp=$O)))
+DIR.SIMPLE1 = apps/tutorial/simple1
+OUT.SIMPLE1 = $(OUT)/$(DIR.SIMPLE1)
+INC.SIMPLE1 = $(wildcard $(DIR.SIMPLE1)/*.h )
+SRC.SIMPLE1 = $(wildcard $(DIR.SIMPLE1)/*.cpp )
+OBJ.SIMPLE1 = $(addprefix $(OUT.SIMPLE1)/,$(notdir $(SRC.SIMPLE1:.cpp=$O)))
 DEP.SIMPLE1 = CSTOOL CSGFX CSUTIL CSSYS CSGEOM CSUTIL CSSYS
 LIB.SIMPLE1 = $(foreach d,$(DEP.SIMPLE1),$($d.LIB))
 
@@ -46,24 +47,34 @@ endif # ifeq ($(MAKESECTION),postdefines)
 #----------------------------------------------------------------- targets ---#
 ifeq ($(MAKESECTION),targets)
 
-.PHONY: build.simple1 simple1clean
+.PHONY: build.simple1 simple1clean simple1cleandep
 
 all: $(SIMPLE1.EXE)
-build.simple1: $(OUTDIRS) $(SIMPLE1.EXE)
+build.simple1: $(OUT.SIMPLE1) $(SIMPLE1.EXE)
 clean: simple1clean
+
+$(OUT.SIMPLE1)/%$O: $(DIR.SIMPLE1)/%.cpp
+	$(DO.COMPILE.CPP)
 
 $(SIMPLE1.EXE): $(DEP.EXE) $(OBJ.SIMPLE1) $(LIB.SIMPLE1)
 	$(DO.LINK.EXE)
 
+$(OUT.SIMPLE1):
+	$(MKDIRS)
+
 simple1clean:
 	-$(RMDIR) $(SIMPLE1.EXE) $(OBJ.SIMPLE1)
 
+cleandep: simple1cleandep
+simple1cleandep:
+	-$(RM) $(OUT.SIMPLE1)/simple1.dep
+
 ifdef DO_DEPEND
-dep: $(OUTOS)/simple1.dep
-$(OUTOS)/simple1.dep: $(SRC.SIMPLE1)
-	$(DO.DEP)
+dep: $(OUT.SIMPLE1) $(OUT.SIMPLE1)/simple1.dep
+$(OUT.SIMPLE1)/simple1.dep: $(SRC.SIMPLE1)
+	$(DO.DEPEND)
 else
--include $(OUTOS)/simple1.dep
+-include $(OUT.SIMPLE1)/simple1.dep
 endif
 
 endif # ifeq ($(MAKESECTION),targets)

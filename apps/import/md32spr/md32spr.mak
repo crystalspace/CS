@@ -26,12 +26,13 @@ endif # ifeq ($(MAKESECTION),roottargets)
 #------------------------------------------------------------- postdefines ---#
 ifeq ($(MAKESECTION),postdefines)
 
-vpath %.cpp apps/import/md32spr
 
 MD32SPR.EXE = md32spr$(EXE.CONSOLE)
-INC.MD32SPR = $(wildcard apps/import/md32spr/*.h)
-SRC.MD32SPR = $(wildcard apps/import/md32spr/*.cpp)
-OBJ.MD32SPR = $(addprefix $(OUT)/,$(notdir $(SRC.MD32SPR:.cpp=$O)))
+DIR.MD32SPR = apps/import/md32spr
+OUT.MD32SPR = $(OUT)/$(DIR.MD32SPR)
+INC.MD32SPR = $(wildcard $(DIR.MD32SPR)/*.h )
+SRC.MD32SPR = $(wildcard $(DIR.MD32SPR)/*.cpp )
+OBJ.MD32SPR = $(addprefix $(OUT.MD32SPR)/,$(notdir $(SRC.MD32SPR:.cpp=$O)))
 DEP.MD32SPR = CSTOOL CSGEOM CSTOOL CSGFX CSSYS CSSYS CSUTIL
 LIB.MD32SPR = $(foreach d,$(DEP.MD32SPR),$($d.LIB))
 
@@ -47,24 +48,34 @@ endif # ifeq ($(MAKESECTION),postdefines)
 #----------------------------------------------------------------- targets ---#
 ifeq ($(MAKESECTION),targets)
 
-.PHONY: build.md32spr md32sprclean
+.PHONY: build.md32spr md32sprclean md32sprcleandep
 
 all: $(MD32SPR.EXE)
-build.md32spr: $(OUTDIRS) $(MD32SPR.EXE)
+build.md32spr: $(OUT.MD32SPR) $(MD32SPR.EXE)
 clean: md32sprclean
+
+$(OUT.MD32SPR)/%$O: $(DIR.MD32SPR)/%.cpp
+	$(DO.COMPILE.CPP)
 
 $(MD32SPR.EXE): $(OBJ.MD32SPR) $(LIB.MD32SPR)
 	$(DO.LINK.CONSOLE.EXE) $(ZLIB.LFLAGS)
 
+$(OUT.MD32SPR):
+	$(MKDIRS)
+
 md32sprclean:
 	-$(RMDIR) $(MD32SPR.EXE) $(OBJ.MD32SPR)
 
+cleandep: md32sprcleandep
+md32sprcleandep:
+	-$(RM) $(OUT.MD32SPR)/md32spr.dep
+
 ifdef DO_DEPEND
-dep: $(OUTOS)/md32spr.dep
-$(OUTOS)/md32spr.dep: $(SRC.MD32SPR)
-	$(DO.DEP1) $(ZLIB.CFLAGS) $(DO.DEP2)
+dep: $(OUT.MD32SPR) $(OUT.MD32SPR)/md32spr.dep
+$(OUT.MD32SPR)/md32spr.dep: $(SRC.MD32SPR)
+	$(DO.DEPEND)
 else
--include $(OUTOS)/md32spr.dep
+-include $(OUT.MD32SPR)/md32spr.dep
 endif
 
 endif # ifeq ($(MAKESECTION),targets)

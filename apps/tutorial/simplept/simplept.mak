@@ -26,12 +26,13 @@ endif # ifeq ($(MAKESECTION),roottargets)
 #------------------------------------------------------------- postdefines ---#
 ifeq ($(MAKESECTION),postdefines)
 
-vpath %.cpp apps/tutorial/simplept
 
 SIMPLEPT.EXE = simplept$(EXE)
-INC.SIMPLEPT = $(wildcard apps/tutorial/simplept/*.h)
-SRC.SIMPLEPT = $(wildcard apps/tutorial/simplept/*.cpp)
-OBJ.SIMPLEPT = $(addprefix $(OUT)/,$(notdir $(SRC.SIMPLEPT:.cpp=$O)))
+DIR.SIMPLEPT = apps/tutorial/simplept
+OUT.SIMPLEPT = $(OUT)/$(DIR.SIMPLEPT)
+INC.SIMPLEPT = $(wildcard $(DIR.SIMPLEPT)/*.h )
+SRC.SIMPLEPT = $(wildcard $(DIR.SIMPLEPT)/*.cpp )
+OBJ.SIMPLEPT = $(addprefix $(OUT.SIMPLEPT)/,$(notdir $(SRC.SIMPLEPT:.cpp=$O)))
 DEP.SIMPLEPT = CSTOOL CSGFX CSUTIL CSSYS CSGEOM CSUTIL
 LIB.SIMPLEPT = $(foreach d,$(DEP.SIMPLEPT),$($d.LIB))
 
@@ -46,24 +47,34 @@ endif # ifeq ($(MAKESECTION),postdefines)
 #----------------------------------------------------------------- targets ---#
 ifeq ($(MAKESECTION),targets)
 
-.PHONY: build.simplept simpleptclean
+.PHONY: build.simplept simpleptclean simpleptcleandep
 
 all: $(SIMPLEPT.EXE)
-build.simplept: $(OUTDIRS) $(SIMPLEPT.EXE)
+build.simplept: $(OUT.SIMPLEPT) $(SIMPLEPT.EXE)
 clean: simpleptclean
+
+$(OUT.SIMPLEPT)/%$O: $(DIR.SIMPLEPT)/%.cpp
+	$(DO.COMPILE.CPP)
 
 $(SIMPLEPT.EXE): $(DEP.EXE) $(OBJ.SIMPLEPT) $(LIB.SIMPLEPT)
 	$(DO.LINK.EXE)
 
+$(OUT.SIMPLEPT):
+	$(MKDIRS)
+
 simpleptclean:
 	-$(RMDIR) $(SIMPLEPT.EXE) $(OBJ.SIMPLEPT)
 
+cleandep: simpleptcleandep
+simpleptcleandep:
+	-$(RM) $(OUT.SIMPLEPT)/simplept.dep
+
 ifdef DO_DEPEND
-dep: $(OUTOS)/simplept.dep
-$(OUTOS)/simplept.dep: $(SRC.SIMPLEPT)
-	$(DO.DEP)
+dep: $(OUT.SIMPLEPT) $(OUT.SIMPLEPT)/simplept.dep
+$(OUT.SIMPLEPT)/simplept.dep: $(SRC.SIMPLEPT)
+	$(DO.DEPEND)
 else
--include $(OUTOS)/simplept.dep
+-include $(OUT.SIMPLEPT)/simplept.dep
 endif
 
 endif # ifeq ($(MAKESECTION),targets)

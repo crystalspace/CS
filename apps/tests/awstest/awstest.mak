@@ -28,12 +28,13 @@ endif # ifeq ($(MAKESECTION),roottargets)
 #------------------------------------------------------------- postdefines ---#
 ifeq ($(MAKESECTION),postdefines)
 
-vpath %.cpp apps/tests/awstest apps/support
 
 AWSTEST.EXE = awstest$(EXE)
-INC.AWSTEST = $(wildcard apps/tests/awstest/*.h)
-SRC.AWSTEST = $(wildcard apps/tests/awstest/*.cpp)
-OBJ.AWSTEST = $(addprefix $(OUT)/,$(notdir $(SRC.AWSTEST:.cpp=$O)))
+DIR.AWSTEST = apps/tests/awstest
+OUT.AWSTEST = $(OUT)/$(DIR.AWSTEST)
+INC.AWSTEST = $(wildcard $(DIR.AWSTEST)/*.h )
+SRC.AWSTEST = $(wildcard $(DIR.AWSTEST)/*.cpp )
+OBJ.AWSTEST = $(addprefix $(OUT.AWSTEST)/,$(notdir $(SRC.AWSTEST:.cpp=$O)))
 DEP.AWSTEST = CSTOOL CSUTIL CSSYS CSUTIL CSGEOM CSGFX
 LIB.AWSTEST = $(foreach d,$(DEP.AWSTEST),$($d.LIB))
 CFG.AWSTEST = data/config/awstest.cfg
@@ -50,24 +51,34 @@ endif # ifeq ($(MAKESECTION),postdefines)
 #----------------------------------------------------------------- targets ---#
 ifeq ($(MAKESECTION),targets)
 
-.PHONY: build.awstest awstestclean
+.PHONY: build.awstest awstestclean awstestcleandep
 
 all: $(AWSTEST.EXE)
-build.awstest: $(OUTDIRS) $(AWSTEST.EXE)
+build.awstest: $(OUT.AWSTEST) $(AWSTEST.EXE)
 clean: awstestclean
+
+$(OUT.AWSTEST)/%$O: $(DIR.AWSTEST)/%.cpp
+	$(DO.COMPILE.CPP)
 
 $(AWSTEST.EXE): $(DEP.EXE) $(OBJ.AWSTEST) $(LIB.AWSTEST)
 	$(DO.LINK.EXE)
 
+$(OUT.AWSTEST):
+	$(MKDIRS)
+
 awstestclean:
 	-$(RMDIR) $(AWSTEST.EXE) $(OBJ.AWSTEST)
 
+cleandep: awstestcleandep
+awstestcleandep:
+	-$(RM) $(OUT.AWSTEST)/awstest.dep
+
 ifdef DO_DEPEND
-dep: $(OUTOS)/awstest.dep
-$(OUTOS)/awstest.dep: $(SRC.AWSTEST)
-	$(DO.DEP)
+dep: $(OUT.AWSTEST) $(OUT.AWSTEST)/awstest.dep
+$(OUT.AWSTEST)/awstest.dep: $(SRC.AWSTEST)
+	$(DO.DEPEND)
 else
--include $(OUTOS)/awstest.dep
+-include $(OUT.AWSTEST)/awstest.dep
 endif
 
 endif # ifeq ($(MAKESECTION),targets)

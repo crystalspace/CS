@@ -26,12 +26,13 @@ endif # ifeq ($(MAKESECTION),roottargets)
 #------------------------------------------------------------- postdefines ---#
 ifeq ($(MAKESECTION),postdefines)
 
-vpath %.cpp apps/tutorial/tbtut
 
 TBTUT.EXE = tbtut$(EXE)
-INC.TBTUT = $(wildcard apps/tutorial/tbtut/*.h)
-SRC.TBTUT = $(wildcard apps/tutorial/tbtut/*.cpp)
-OBJ.TBTUT = $(addprefix $(OUT)/,$(notdir $(SRC.TBTUT:.cpp=$O)))
+DIR.TBTUT = apps/tutorial/tbtut
+OUT.TBTUT = $(OUT)/$(DIR.TBTUT)
+INC.TBTUT = $(wildcard $(DIR.TBTUT)/*.h )
+SRC.TBTUT = $(wildcard $(DIR.TBTUT)/*.cpp )
+OBJ.TBTUT = $(addprefix $(OUT.TBTUT)/,$(notdir $(SRC.TBTUT:.cpp=$O)))
 DEP.TBTUT = CSTOOL CSGFX CSUTIL CSSYS CSGEOM CSUTIL CSSYS
 LIB.TBTUT = $(foreach d,$(DEP.TBTUT),$($d.LIB))
 
@@ -46,24 +47,34 @@ endif # ifeq ($(MAKESECTION),postdefines)
 #----------------------------------------------------------------- targets ---#
 ifeq ($(MAKESECTION),targets)
 
-.PHONY: build.tbtut tbtutclean
+.PHONY: build.tbtut tbtutclean tbtutcleandep
 
 all: $(TBTUT.EXE)
-build.tbtut: $(OUTDIRS) $(TBTUT.EXE)
+build.tbtut: $(OUT.TBTUT) $(TBTUT.EXE)
 clean: tbtutclean
+
+$(OUT.TBTUT)/%$O: $(DIR.TBTUT)/%.cpp
+	$(DO.COMPILE.CPP)
 
 $(TBTUT.EXE): $(DEP.EXE) $(OBJ.TBTUT) $(LIB.TBTUT)
 	$(DO.LINK.EXE)
 
+$(OUT.TBTUT):
+	$(MKDIRS)
+
 tbtutclean:
 	-$(RMDIR) $(TBTUT.EXE) $(OBJ.TBTUT)
 
+cleandep: tbtutcleandep
+tbtutcleandep:
+	-$(RM) $(OUT.TBTUT)/tbtut.dep
+
 ifdef DO_DEPEND
-dep: $(OUTOS)/tbtut.dep
-$(OUTOS)/tbtut.dep: $(SRC.TBTUT)
-	$(DO.DEP)
+dep: $(OUT.TBTUT) $(OUT.TBTUT)/tbtut.dep
+$(OUT.TBTUT)/tbtut.dep: $(SRC.TBTUT)
+	$(DO.DEPEND)
 else
--include $(OUTOS)/tbtut.dep
+-include $(OUT.TBTUT)/tbtut.dep
 endif
 
 endif # ifeq ($(MAKESECTION),targets)

@@ -26,12 +26,13 @@ endif # ifeq ($(MAKESECTION),roottargets)
 #------------------------------------------------------------- postdefines ---#
 ifeq ($(MAKESECTION),postdefines)
 
-vpath %.cpp apps/tests/gfxtst
 
 GFXTEST.EXE = gfxtest$(EXE.CONSOLE)
+DIR.GFXTEST = apps/tests/gfxtst
+OUT.GFXTEST = $(OUT)/$(DIR.GFXTEST)
 INC.GFXTEST =
 SRC.GFXTEST = apps/tests/gfxtst/gfxtest.cpp
-OBJ.GFXTEST = $(addprefix $(OUT)/,$(notdir $(SRC.GFXTEST:.cpp=$O)))
+OBJ.GFXTEST = $(addprefix $(OUT.GFXTEST)/,$(notdir $(SRC.GFXTEST:.cpp=$O)))
 DEP.GFXTEST = CSGFX CSTOOL CSUTIL CSGEOM CSSYS
 LIB.GFXTEST = $(foreach d,$(DEP.GFXTEST),$($d.LIB))
 
@@ -46,24 +47,34 @@ endif # ifeq ($(MAKESECTION),postdefines)
 #----------------------------------------------------------------- targets ---#
 ifeq ($(MAKESECTION),targets)
 
-.PHONY: build.gfxtest gfxtestclean
+.PHONY: build.gfxtest gfxtestclean gfxtestcleandep
 
 all: $(GFXTEST.EXE)
-build.gfxtest: $(OUTDIRS) $(GFXTEST.EXE)
+build.gfxtest: $(OUT.GFXTEST) $(GFXTEST.EXE)
 clean: gfxtestclean
+
+$(OUT.GFXTEST)/%$O: $(DIR.GFXTEST)/%.cpp
+	$(DO.COMPILE.CPP)
 
 $(GFXTEST.EXE): $(DEP.EXE) $(OBJ.GFXTEST) $(LIB.GFXTEST)
 	$(DO.LINK.CONSOLE.EXE)
 
+$(OUT.GFXTEST):
+	$(MKDIRS)
+
 gfxtestclean:
 	-$(RMDIR) $(GFXTEST.EXE) $(OBJ.GFXTEST)
 
+cleandep: gfxtestcleandep
+gfxtestcleandep:
+	-$(RM) $(OUT.GFXTEST)/gfxtest.dep
+
 ifdef DO_DEPEND
-dep: $(OUTOS)/gfxtest.dep
-$(OUTOS)/gfxtest.dep: $(SRC.GFXTEST)
-	$(DO.DEP)
+dep: $(OUT.GFXTEST) $(OUT.GFXTEST)/gfxtest.dep
+$(OUT.GFXTEST)/gfxtest.dep: $(SRC.GFXTEST)
+	$(DO.DEPEND)
 else
--include $(OUTOS)/gfxtest.dep
+-include $(OUT.GFXTEST)/gfxtest.dep
 endif
 
 endif # ifeq ($(MAKESECTION),targets)

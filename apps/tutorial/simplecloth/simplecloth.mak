@@ -26,12 +26,13 @@ endif # ifeq ($(MAKESECTION),roottargets)
 #------------------------------------------------------------- postdefines ---#
 ifeq ($(MAKESECTION),postdefines)
 
-vpath %.cpp apps/tutorial/simplecloth
 
 SIMPLECLOTH.EXE = simplecloth$(EXE)
-INC.SIMPLECLOTH = $(wildcard apps/tutorial/simplecloth/*.h)
-SRC.SIMPLECLOTH = $(wildcard apps/tutorial/simplecloth/*.cpp)
-OBJ.SIMPLECLOTH = $(addprefix $(OUT)/,$(notdir $(SRC.SIMPLECLOTH:.cpp=$O)))
+DIR.SIMPLECLOTH = apps/tutorial/simplecloth
+OUT.SIMPLECLOTH = $(OUT)/$(DIR.SIMPLECLOTH)
+INC.SIMPLECLOTH = $(wildcard $(DIR.SIMPLECLOTH)/*.h )
+SRC.SIMPLECLOTH = $(wildcard $(DIR.SIMPLECLOTH)/*.cpp )
+OBJ.SIMPLECLOTH = $(addprefix $(OUT.SIMPLECLOTH)/,$(notdir $(SRC.SIMPLECLOTH:.cpp=$O)))
 DEP.SIMPLECLOTH = CSTOOL CSGFX CSUTIL CSSYS CSGEOM CSUTIL CSSYS
 LIB.SIMPLECLOTH = $(foreach d,$(DEP.SIMPLECLOTH),$($d.LIB))
 
@@ -46,24 +47,34 @@ endif # ifeq ($(MAKESECTION),postdefines)
 #----------------------------------------------------------------- targets ---#
 ifeq ($(MAKESECTION),targets)
 
-.PHONY: build.simplecloth simpleclothclean
+.PHONY: build.simplecloth simpleclothclean simpleclothcleandep
 
 all: $(SIMPLECLOTH.EXE)
-build.simplecloth: $(OUTDIRS) $(SIMPLECLOTH.EXE)
+build.simplecloth: $(OUT.SIMPLECLOTH) $(SIMPLECLOTH.EXE)
 clean: simpleclothclean
+
+$(OUT.SIMPLECLOTH)/%$O: $(DIR.SIMPLECLOTH)/%.cpp
+	$(DO.COMPILE.CPP)
 
 $(SIMPLECLOTH.EXE): $(DEP.EXE) $(OBJ.SIMPLECLOTH) $(LIB.SIMPLECLOTH)
 	$(DO.LINK.EXE)
 
+$(OUT.SIMPLECLOTH):
+	$(MKDIRS)
+
 simpleclothclean:
 	-$(RMDIR) $(SIMPLECLOTH.EXE) $(OBJ.SIMPLECLOTH)
 
+cleandep: simpleclothcleandep
+simpleclothcleandep:
+	-$(RM) $(OUT.SIMPLECLOTH)/simplecloth.dep
+
 ifdef DO_DEPEND
-dep: $(OUTOS)/simplecloth.dep
-$(OUTOS)/simplecloth.dep: $(SRC.SIMPLECLOTH)
-	$(DO.DEP)
+dep: $(OUT.SIMPLECLOTH) $(OUT.SIMPLECLOTH)/simplecloth.dep
+$(OUT.SIMPLECLOTH)/simplecloth.dep: $(SRC.SIMPLECLOTH)
+	$(DO.DEPEND)
 else
--include $(OUTOS)/simplecloth.dep
+-include $(OUT.SIMPLECLOTH)/simplecloth.dep
 endif
 
 endif # ifeq ($(MAKESECTION),targets)

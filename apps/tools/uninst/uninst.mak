@@ -25,12 +25,13 @@ endif # ifeq ($(MAKESECTION),roottargets)
 #------------------------------------------------------------- postdefines ---#
 ifeq ($(MAKESECTION),postdefines)
 
-vpath %.cpp apps/tools/uninst
 
 UNINST.EXE = uninst$(EXE.CONSOLE)
+DIR.UNINST = apps/tools/uninst
+OUT.UNINST = $(OUT)/$(DIR.UNINST)
 INC.UNINST =
 SRC.UNINST = apps/tools/uninst/uninst.cpp
-OBJ.UNINST = $(addprefix $(OUT)/,$(notdir $(SRC.UNINST:.cpp=$O)))
+OBJ.UNINST = $(addprefix $(OUT.UNINST)/,$(notdir $(SRC.UNINST:.cpp=$O)))
 DEP.UNINST =
 LIB.UNINST =
 
@@ -46,24 +47,34 @@ endif # ifeq ($(MAKESECTION),postdefines)
 #----------------------------------------------------------------- targets ---#
 ifeq ($(MAKESECTION),targets)
 
-.PHONY: build.uninst uninstclean
+.PHONY: build.uninst uninstclean uninstcleandep
 
 all apps: uninst
-build.uninst: $(OUTDIRS) $(UNINST.EXE)
+build.uninst: $(OUT.UNINST) $(UNINST.EXE)
 clean: uninstclean
+
+$(OUT.UNINST)/%$O: $(DIR.UNINST)/%.cpp
+	$(DO.COMPILE.CPP)
 
 $(UNINST.EXE): $(OBJ.UNINST) $(LIB.UNINST)
 	$(DO.LINK.CONSOLE.EXE)
 
+$(OUT.UNINST):
+	$(MKDIRS)
+
 uninstclean:
 	-$(RMDIR) $(UNINST.EXE) $(OBJ.UNINST)
 
+cleandep: uninstcleandep
+uninstcleandep:
+	-$(RM) $(OUT.UNINST)/uninst.dep
+
 ifdef DO_DEPEND
-dep: $(OUTOS)/uninst.dep
-$(OUTOS)/uninst.dep: $(SRC.UNINST)
-	$(DO.DEP)
+dep: $(OUT.UNINST) $(OUT.UNINST)/uninst.dep
+$(OUT.UNINST)/uninst.dep: $(SRC.UNINST)
+	$(DO.DEPEND)
 else
--include $(OUTOS)/uninst.dep
+-include $(OUT.UNINST)/uninst.dep
 endif
 
 endif # ifeq ($(MAKESECTION),targets)

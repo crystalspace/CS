@@ -28,12 +28,13 @@ endif # ifeq ($(MAKESECTION),roottargets)
 #------------------------------------------------------------- postdefines ---#
 ifeq ($(MAKESECTION),postdefines)
 
-vpath %.cpp apps/tools/scfreg
 
 SCFREG.EXE = scfreg$(EXE.CONSOLE)
+DIR.SCFREG = apps/tools/scfreg
+OUT.SCFREG = $(OUT)/$(DIR.SCFREG)
 INC.SCFREG =
 SRC.SCFREG = apps/tools/scfreg/scfreg.cpp
-OBJ.SCFREG = $(addprefix $(OUT)/,$(notdir $(SRC.SCFREG:.cpp=$O)))
+OBJ.SCFREG = $(addprefix $(OUT.SCFREG)/,$(notdir $(SRC.SCFREG:.cpp=$O)))
 DEP.SCFREG = CSSYS CSUTIL CSGEOM
 LIB.SCFREG = $(foreach d,$(DEP.SCFREG),$($d.LIB))
 
@@ -48,24 +49,34 @@ endif # ifeq ($(MAKESECTION),postdefines)
 #----------------------------------------------------------------- targets ---#
 ifeq ($(MAKESECTION),targets)
 
-.PHONY: build.scfreg scfregclean
+.PHONY: build.scfreg scfregclean scfregcleandep
 
 all: $(SCFREG.EXE)
-build.scfreg: $(OUTDIRS) $(SCFREG.EXE)
+build.scfreg: $(OUT.SCFREG) $(SCFREG.EXE)
 clean: scfregclean
+
+$(OUT.SCFREG)/%$O: $(DIR.SCFREG)/%.cpp
+	$(DO.COMPILE.CPP)
 
 $(SCFREG.EXE): $(OBJ.SCFREG) $(LIB.SCFREG)
 	$(DO.LINK.CONSOLE.EXE)
 
+$(OUT.SCFREG):
+	$(MKDIRS)
+
 scfregclean:
 	-$(RMDIR) $(SCFREG.EXE) $(OBJ.SCFREG)
 
+cleandep: scfregcleandep
+scfregcleandep:
+	-$(RM) $(OUT.SCFREG)/scfreg.dep
+
 ifdef DO_DEPEND
-dep: $(OUTOS)/scfreg.dep
-$(OUTOS)/scfreg.dep: $(SRC.SCFREG)
-	$(DO.DEP)
+dep: $(OUT.SCFREG) $(OUT.SCFREG)/scfreg.dep
+$(OUT.SCFREG)/scfreg.dep: $(SRC.SCFREG)
+	$(DO.DEPEND)
 else
--include $(OUTOS)/scfreg.dep
+-include $(OUT.SCFREG)/scfreg.dep
 endif
 
 endif # ifeq ($(MAKESECTION),targets)

@@ -26,12 +26,13 @@ endif # ifeq ($(MAKESECTION),roottargets)
 #------------------------------------------------------------- postdefines ---#
 ifeq ($(MAKESECTION),postdefines)
 
-vpath %.cpp apps/import/milk2spr
 
 MILK2SPR.EXE = milk2spr$(EXE.CONSOLE)
-INC.MILK2SPR = $(wildcard apps/import/milk2spr/*.h)
-SRC.MILK2SPR = $(wildcard apps/import/milk2spr/*.cpp)
-OBJ.MILK2SPR = $(addprefix $(OUT)/,$(notdir $(SRC.MILK2SPR:.cpp=$O)))
+DIR.MILK2SPR = apps/import/milk2spr
+OUT.MILK2SPR = $(OUT)/$(DIR.MILK2SPR)
+INC.MILK2SPR = $(wildcard $(DIR.MILK2SPR)/*.h )
+SRC.MILK2SPR = $(wildcard $(DIR.MILK2SPR)/*.cpp )
+OBJ.MILK2SPR = $(addprefix $(OUT.MILK2SPR)/,$(notdir $(SRC.MILK2SPR:.cpp=$O)))
 DEP.MILK2SPR = CSGFX CSUTIL CSSYS CSUTIL CSGEOM
 LIB.MILK2SPR = $(foreach d,$(DEP.MILK2SPR),$($d.LIB))
 
@@ -46,24 +47,34 @@ endif # ifeq ($(MAKESECTION),postdefines)
 #----------------------------------------------------------------- targets ---#
 ifeq ($(MAKESECTION),targets)
 
-.PHONY: build.milk2spr milk2sprclean
+.PHONY: build.milk2spr milk2sprclean milk2sprcleandep
 
 all: $(MILK2SPR.EXE)
-build.milk2spr: $(OUTDIRS) $(MILK2SPR.EXE)
+build.milk2spr: $(OUT.MILK2SPR) $(MILK2SPR.EXE)
 clean: milk2sprclean
+
+$(OUT.MILK2SPR)/%$O: $(DIR.MILK2SPR)/%.cpp
+	$(DO.COMPILE.CPP)
 
 $(MILK2SPR.EXE): $(OBJ.MILK2SPR) $(LIB.MILK2SPR)
 	$(DO.LINK.CONSOLE.EXE)
 
+$(OUT.MILK2SPR):
+	$(MKDIRS)
+
 milk2sprclean:
 	-$(RMDIR) $(MILK2SPR.EXE) $(OBJ.MILK2SPR)
 
+cleandep: milk2sprcleandep
+milk2sprcleandep:
+	-$(RM) $(OUT.MILK2SPR)/milk2spr.dep
+
 ifdef DO_DEPEND
-dep: $(OUTOS)/milk2spr.dep
-$(OUTOS)/milk2spr.dep: $(SRC.MILK2SPR)
-	$(DO.DEP)
+dep: $(OUT.MILK2SPR) $(OUT.MILK2SPR)/milk2spr.dep
+$(OUT.MILK2SPR)/milk2spr.dep: $(SRC.MILK2SPR)
+	$(DO.DEPEND)
 else
--include $(OUTOS)/milk2spr.dep
+-include $(OUT.MILK2SPR)/milk2spr.dep
 endif
 
 endif # ifeq ($(MAKESECTION),targets)

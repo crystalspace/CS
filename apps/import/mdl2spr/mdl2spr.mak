@@ -26,12 +26,13 @@ endif # ifeq ($(MAKESECTION),roottargets)
 #------------------------------------------------------------- postdefines ---#
 ifeq ($(MAKESECTION),postdefines)
 
-vpath %.cpp apps/import/mdl2spr
 
 MDL2SPR.EXE = mdl2spr$(EXE.CONSOLE)
-INC.MDL2SPR = $(wildcard apps/import/mdl2spr/*.h)
-SRC.MDL2SPR = $(wildcard apps/import/mdl2spr/*.cpp)
-OBJ.MDL2SPR = $(addprefix $(OUT)/,$(notdir $(SRC.MDL2SPR:.cpp=$O)))
+DIR.MDL2SPR = apps/import/mdl2spr
+OUT.MDL2SPR = $(OUT)/$(DIR.MDL2SPR)
+INC.MDL2SPR = $(wildcard $(DIR.MDL2SPR)/*.h )
+SRC.MDL2SPR = $(wildcard $(DIR.MDL2SPR)/*.cpp )
+OBJ.MDL2SPR = $(addprefix $(OUT.MDL2SPR)/,$(notdir $(SRC.MDL2SPR:.cpp=$O)))
 DEP.MDL2SPR = CSGFX CSUTIL CSSYS CSUTIL CSGEOM
 LIB.MDL2SPR = $(foreach d,$(DEP.MDL2SPR),$($d.LIB))
 
@@ -46,24 +47,34 @@ endif # ifeq ($(MAKESECTION),postdefines)
 #----------------------------------------------------------------- targets ---#
 ifeq ($(MAKESECTION),targets)
 
-.PHONY: build.mdl2spr mdl2sprclean
+.PHONY: build.mdl2spr mdl2sprclean mdl2sprcleandep
 
 all: $(MDL2SPR.EXE)
-build.mdl2spr: $(OUTDIRS) $(MDL2SPR.EXE)
+build.mdl2spr: $(OUT.MDL2SPR) $(MDL2SPR.EXE)
 clean: mdl2sprclean
+
+$(OUT.MDL2SPR)/%$O: $(DIR.MDL2SPR)/%.cpp
+	$(DO.COMPILE.CPP)
 
 $(MDL2SPR.EXE): $(OBJ.MDL2SPR) $(LIB.MDL2SPR)
 	$(DO.LINK.CONSOLE.EXE)
 
+$(OUT.MDL2SPR):
+	$(MKDIRS)
+
 mdl2sprclean:
 	-$(RMDIR) $(MDL2SPR.EXE) $(OBJ.MDL2SPR)
 
+cleandep: mdl2sprcleandep
+mdl2sprcleandep:
+	-$(RM) $(OUT.MDL2SPR)/mdl2spr.dep
+
 ifdef DO_DEPEND
-dep: $(OUTOS)/mdl2spr.dep
-$(OUTOS)/mdl2spr.dep: $(SRC.MDL2SPR)
-	$(DO.DEP)
+dep: $(OUT.MDL2SPR) $(OUT.MDL2SPR)/mdl2spr.dep
+$(OUT.MDL2SPR)/mdl2spr.dep: $(SRC.MDL2SPR)
+	$(DO.DEPEND)
 else
--include $(OUTOS)/mdl2spr.dep
+-include $(OUT.MDL2SPR)/mdl2spr.dep
 endif
 
 endif # ifeq ($(MAKESECTION),targets)

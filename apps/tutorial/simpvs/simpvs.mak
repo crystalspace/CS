@@ -26,12 +26,13 @@ endif # ifeq ($(MAKESECTION),roottargets)
 #------------------------------------------------------------- postdefines ---#
 ifeq ($(MAKESECTION),postdefines)
 
-vpath %.cpp apps/tutorial/simpvs
 
 SIMPVS.EXE = simpvs$(EXE)
-INC.SIMPVS = $(wildcard apps/tutorial/simpvs/*.h)
-SRC.SIMPVS = $(wildcard apps/tutorial/simpvs/*.cpp)
-OBJ.SIMPVS = $(addprefix $(OUT)/,$(notdir $(SRC.SIMPVS:.cpp=$O)))
+DIR.SIMPVS = apps/tutorial/simpvs
+OUT.SIMPVS = $(OUT)/$(DIR.SIMPVS)
+INC.SIMPVS = $(wildcard $(DIR.SIMPVS)/*.h )
+SRC.SIMPVS = $(wildcard $(DIR.SIMPVS)/*.cpp )
+OBJ.SIMPVS = $(addprefix $(OUT.SIMPVS)/,$(notdir $(SRC.SIMPVS:.cpp=$O)))
 DEP.SIMPVS = CSTOOL CSGFX CSUTIL CSSYS CSGEOM CSUTIL CSSYS
 LIB.SIMPVS = $(foreach d,$(DEP.SIMPVS),$($d.LIB))
 
@@ -46,24 +47,34 @@ endif # ifeq ($(MAKESECTION),postdefines)
 #----------------------------------------------------------------- targets ---#
 ifeq ($(MAKESECTION),targets)
 
-.PHONY: build.simpvs simpvsclean
+.PHONY: build.simpvs simpvsclean simpvscleandep
 
 all: $(SIMPVS.EXE)
-build.simpvs: $(OUTDIRS) $(SIMPVS.EXE)
+build.simpvs: $(OUT.SIMPVS) $(SIMPVS.EXE)
 clean: simpvsclean
+
+$(OUT.SIMPVS)/%$O: $(DIR.SIMPVS)/%.cpp
+	$(DO.COMPILE.CPP)
 
 $(SIMPVS.EXE): $(DEP.EXE) $(OBJ.SIMPVS) $(LIB.SIMPVS)
 	$(DO.LINK.EXE)
 
+$(OUT.SIMPVS):
+	$(MKDIRS)
+
 simpvsclean:
 	-$(RMDIR) $(SIMPVS.EXE) $(OBJ.SIMPVS)
 
+cleandep: simpvscleandep
+simpvscleandep:
+	-$(RM) $(OUT.SIMPVS)/simpvs.dep
+
 ifdef DO_DEPEND
-dep: $(OUTOS)/simpvs.dep
-$(OUTOS)/simpvs.dep: $(SRC.SIMPVS)
-	$(DO.DEP)
+dep: $(OUT.SIMPVS) $(OUT.SIMPVS)/simpvs.dep
+$(OUT.SIMPVS)/simpvs.dep: $(SRC.SIMPVS)
+	$(DO.DEPEND)
 else
--include $(OUTOS)/simpvs.dep
+-include $(OUT.SIMPVS)/simpvs.dep
 endif
 
 endif # ifeq ($(MAKESECTION),targets)

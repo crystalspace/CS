@@ -25,12 +25,13 @@ endif # ifeq ($(MAKESECTION),roottargets)
 #------------------------------------------------------------- postdefines ---#
 ifeq ($(MAKESECTION),postdefines)
 
-vpath %.cpp apps/tools/picview
 
 PICVIEW.EXE = picview$(EXE)
-INC.PICVIEW = $(wildcard apps/tools/picview/*.h)
-SRC.PICVIEW = $(wildcard apps/tools/picview/*.cpp)
-OBJ.PICVIEW = $(addprefix $(OUT)/,$(notdir $(SRC.PICVIEW:.cpp=$O)))
+DIR.PICVIEW = apps/tools/picview
+OUT.PICVIEW = $(OUT)/$(DIR.PICVIEW)
+INC.PICVIEW = $(wildcard $(DIR.PICVIEW)/*.h )
+SRC.PICVIEW = $(wildcard $(DIR.PICVIEW)/*.cpp )
+OBJ.PICVIEW = $(addprefix $(OUT.PICVIEW)/,$(notdir $(SRC.PICVIEW:.cpp=$O)))
 DEP.PICVIEW = \
   CSWS CSTOOL CSTOOL CSGFX CSUTIL CSSYS CSGEOM CSUTIL
 LIB.PICVIEW = $(foreach d,$(DEP.PICVIEW),$($d.LIB))
@@ -47,24 +48,34 @@ endif # ifeq ($(MAKESECTION),postdefines)
 #----------------------------------------------------------------- targets ---#
 ifeq ($(MAKESECTION),targets)
 
-.PHONY: build.picview picviewclean
+.PHONY: build.picview picviewclean picviewcleandep
 
 all: $(PICVIEW.EXE)
-build.picview: $(OUTDIRS) $(PICVIEW.EXE)
+build.picview: $(OUT.PICVIEW) $(PICVIEW.EXE)
 clean: picviewclean
+
+$(OUT.PICVIEW)/%$O: $(DIR.PICVIEW)/%.cpp
+	$(DO.COMPILE.CPP)
 
 $(PICVIEW.EXE): $(DEP.EXE) $(OBJ.PICVIEW) $(LIB.PICVIEW)
 	$(DO.LINK.EXE)
 
+$(OUT.PICVIEW):
+	$(MKDIRS)
+
 picviewclean:
 	-$(RMDIR) $(PICVIEW.EXE) $(OBJ.PICVIEW)
 
+cleandep: picviewcleandep
+picviewcleandep:
+	-$(RM) $(OUT.PICVIEW)/picview.dep
+
 ifdef DO_DEPEND
-dep: $(OUTOS)/picview.dep
-$(OUTOS)/picview.dep: $(SRC.PICVIEW)
-	$(DO.DEP)
+dep: $(OUT.PICVIEW) $(OUT.PICVIEW)/picview.dep
+$(OUT.PICVIEW)/picview.dep: $(SRC.PICVIEW)
+	$(DO.DEPEND)
 else
--include $(OUTOS)/picview.dep
+-include $(OUT.PICVIEW)/picview.dep
 endif
 
 endif # ifeq ($(MAKESECTION),targets)

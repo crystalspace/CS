@@ -25,12 +25,13 @@ endif # ifeq ($(MAKESECTION),roottargets)
 #------------------------------------------------------------- postdefines ---#
 ifeq ($(MAKESECTION),postdefines)
 
-vpath %.cpp apps/tools/levtool
 
 LEVTOOL.EXE = levtool$(EXE.CONSOLE)
-INC.LEVTOOL = $(wildcard apps/tools/levtool/*.h)
-SRC.LEVTOOL = $(wildcard apps/tools/levtool/*.cpp)
-OBJ.LEVTOOL = $(addprefix $(OUT)/,$(notdir $(SRC.LEVTOOL:.cpp=$O)))
+DIR.LEVTOOL = apps/tools/levtool
+OUT.LEVTOOL = $(OUT)/$(DIR.LEVTOOL)
+INC.LEVTOOL = $(wildcard $(DIR.LEVTOOL)/*.h )
+SRC.LEVTOOL = $(wildcard $(DIR.LEVTOOL)/*.cpp )
+OBJ.LEVTOOL = $(addprefix $(OUT.LEVTOOL)/,$(notdir $(SRC.LEVTOOL:.cpp=$O)))
 DEP.LEVTOOL = CSTOOL CSGEOM CSTOOL CSGFX CSSYS CSUTIL CSSYS
 LIB.LEVTOOL = $(foreach d,$(DEP.LEVTOOL),$($d.LIB))
 
@@ -47,24 +48,34 @@ endif # ifeq ($(MAKESECTION),postdefines)
 #----------------------------------------------------------------- targets ---#
 ifeq ($(MAKESECTION),targets)
 
-.PHONY: build.levtool levtoolclean
+.PHONY: build.levtool levtoolclean levtoolcleandep
 
 all: $(LEVTOOL.EXE)
-build.levtool: $(OUTDIRS) $(LEVTOOL.EXE)
+build.levtool: $(OUT.LEVTOOL) $(LEVTOOL.EXE)
 clean: levtoolclean
+
+$(OUT.LEVTOOL)/%$O: $(DIR.LEVTOOL)/%.cpp
+	$(DO.COMPILE.CPP)
 
 $(LEVTOOL.EXE): $(DEP.EXE) $(OBJ.LEVTOOL) $(LIB.LEVTOOL)
 	$(DO.LINK.CONSOLE.EXE)
 
+$(OUT.LEVTOOL):
+	$(MKDIRS)
+
 levtoolclean:
 	-$(RMDIR) $(LEVTOOL.EXE) $(OBJ.LEVTOOL)
 
+cleandep: levtoolcleandep
+levtoolcleandep:
+	-$(RM) $(OUT.LEVTOOL)/levtool.dep
+
 ifdef DO_DEPEND
-dep: $(OUTOS)/levtool.dep
-$(OUTOS)/levtool.dep: $(SRC.LEVTOOL)
-	$(DO.DEP)
+dep: $(OUT.LEVTOOL) $(OUT.LEVTOOL)/levtool.dep
+$(OUT.LEVTOOL)/levtool.dep: $(SRC.LEVTOOL)
+	$(DO.DEPEND)
 else
--include $(OUTOS)/levtool.dep
+-include $(OUT.LEVTOOL)/levtool.dep
 endif
 
 endif # ifeq ($(MAKESECTION),targets)

@@ -26,12 +26,13 @@ endif # ifeq ($(MAKESECTION),roottargets)
 #------------------------------------------------------------- postdefines ---#
 ifeq ($(MAKESECTION),postdefines)
 
-vpath %.cpp apps/tools/vsh
 
 VSH.EXE = vsh$(EXE.CONSOLE)
+DIR.VSH = apps/tools/vsh
+OUT.VSH = $(OUT)/$(DIR.VSH)
 INC.VSH =
 SRC.VSH = apps/tools/vsh/vsh.cpp
-OBJ.VSH = $(addprefix $(OUT)/,$(notdir $(SRC.VSH:.cpp=$O)))
+OBJ.VSH = $(addprefix $(OUT.VSH)/,$(notdir $(SRC.VSH:.cpp=$O)))
 DEP.VSH = CSUTIL CSGFX CSTOOL CSSYS CSUTIL CSSYS CSGEOM
 LIB.VSH = $(foreach d,$(DEP.VSH),$($d.LIB))
 
@@ -46,24 +47,34 @@ endif # ifeq ($(MAKESECTION),postdefines)
 #----------------------------------------------------------------- targets ---#
 ifeq ($(MAKESECTION),targets)
 
-.PHONY: build.vsh vshclean
+.PHONY: build.vsh vshclean vshcleandep
 
 all: $(VSH.EXE)
-build.vsh: $(OUTDIRS) $(VSH.EXE)
+build.vsh: $(OUT.VSH) $(VSH.EXE)
 clean: vshclean
+
+$(OUT.VSH)/%$O: $(DIR.VSH)/%.cpp
+	$(DO.COMPILE.CPP)
 
 $(VSH.EXE): $(DEP.EXE) $(OBJ.VSH) $(LIB.VSH)
 	$(DO.LINK.CONSOLE.EXE)
 
+$(OUT.VSH):
+	$(MKDIRS)
+
 vshclean:
 	-$(RMDIR) $(VSH.EXE) $(OBJ.VSH)
 
+cleandep: vshcleandep
+vshcleandep:
+	-$(RM) $(OUT.VSH)/vsh.dep
+
 ifdef DO_DEPEND
-dep: $(OUTOS)/vsh.dep
-$(OUTOS)/vsh.dep: $(SRC.VSH)
-	$(DO.DEP)
+dep: $(OUT.VSH) $(OUT.VSH)/vsh.dep
+$(OUT.VSH)/vsh.dep: $(SRC.VSH)
+	$(DO.DEPEND)
 else
--include $(OUTOS)/vsh.dep
+-include $(OUT.VSH)/vsh.dep
 endif
 
 endif # ifeq ($(MAKESECTION),targets)

@@ -28,12 +28,13 @@ endif # ifeq ($(MAKESECTION),roottargets)
 #------------------------------------------------------------- postdefines ---#
 ifeq ($(MAKESECTION),postdefines)
 
-vpath %.cpp apps/tools/csfgen
 
 CSFGEN.EXE = csfgen$(EXE.CONSOLE)
-INC.CSFGEN = $(wildcard apps/tools/csfgen/*.h)
-SRC.CSFGEN = $(wildcard apps/tools/csfgen/*.cpp)
-OBJ.CSFGEN = $(addprefix $(OUT)/,$(notdir $(SRC.CSFGEN:.cpp=$O)))
+DIR.CSFGEN = apps/tools/csfgen
+OUT.CSFGEN = $(OUT)/$(DIR.CSFGEN)
+INC.CSFGEN = $(wildcard $(DIR.CSFGEN)/*.h )
+SRC.CSFGEN = $(wildcard $(DIR.CSFGEN)/*.cpp )
+OBJ.CSFGEN = $(addprefix $(OUT.CSFGEN)/,$(notdir $(SRC.CSFGEN:.cpp=$O)))
 DEP.CSFGEN = CSTOOL CSUTIL CSSYS CSGEOM CSUTIL CSGFX
 LIB.CSFGEN = $(foreach d,$(DEP.CSFGEN),$($d.LIB))
 
@@ -48,24 +49,34 @@ endif # ifeq ($(MAKESECTION),postdefines)
 #----------------------------------------------------------------- targets ---#
 ifeq ($(MAKESECTION),targets)
 
-.PHONY: build.csfgen csfgenclean
+.PHONY: build.csfgen csfgenclean csfgencleandep
 
 all: $(CSFGEN.EXE)
-build.csfgen: $(OUTDIRS) $(CSFGEN.EXE)
+build.csfgen: $(OUT.CSFGEN) $(CSFGEN.EXE)
 clean: csfgenclean
+
+$(OUT.CSFGEN)/%$O: $(DIR.CSFGEN)/%.cpp
+	$(DO.COMPILE.CPP)
 
 $(CSFGEN.EXE): $(OBJ.CSFGEN) $(LIB.CSFGEN)
 	$(DO.LINK.CONSOLE.EXE)
 
+$(OUT.CSFGEN):
+	$(MKDIRS)
+
 csfgenclean:
 	-$(RMDIR) $(CSFGEN.EXE) $(OBJ.CSFGEN)
 
+cleandep: csfgencleandep
+csfgencleandep:
+	-$(RM) $(OUT.CSFGEN)/csfgen.dep
+
 ifdef DO_DEPEND
-dep: $(OUTOS)/csfgen.dep
-$(OUTOS)/csfgen.dep: $(SRC.CSFGEN)
-	$(DO.DEP)
+dep: $(OUT.CSFGEN) $(OUT.CSFGEN)/csfgen.dep
+$(OUT.CSFGEN)/csfgen.dep: $(SRC.CSFGEN)
+	$(DO.DEPEND)
 else
--include $(OUTOS)/csfgen.dep
+-include $(OUT.CSFGEN)/csfgen.dep
 endif
 
 endif # ifeq ($(MAKESECTION),targets)

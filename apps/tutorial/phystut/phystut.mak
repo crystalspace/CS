@@ -26,12 +26,13 @@ endif # ifeq ($(MAKESECTION),roottargets)
 #------------------------------------------------------------- postdefines ---#
 ifeq ($(MAKESECTION),postdefines)
 
-vpath %.cpp apps/tutorial/phystut
 
 PHYSTUT.EXE = phystut$(EXE)
-INC.PHYSTUT = $(wildcard apps/tutorial/phystut/*.h)
-SRC.PHYSTUT = $(wildcard apps/tutorial/phystut/*.cpp)
-OBJ.PHYSTUT = $(addprefix $(OUT)/,$(notdir $(SRC.PHYSTUT:.cpp=$O)))
+DIR.PHYSTUT = apps/tutorial/phystut
+OUT.PHYSTUT = $(OUT)/$(DIR.PHYSTUT)
+INC.PHYSTUT = $(wildcard $(DIR.PHYSTUT)/*.h )
+SRC.PHYSTUT = $(wildcard $(DIR.PHYSTUT)/*.cpp )
+OBJ.PHYSTUT = $(addprefix $(OUT.PHYSTUT)/,$(notdir $(SRC.PHYSTUT:.cpp=$O)))
 DEP.PHYSTUT = CSTOOL CSGFX CSUTIL CSSYS CSGEOM CSUTIL CSSYS
 LIB.PHYSTUT = $(foreach d,$(DEP.PHYSTUT),$($d.LIB))
 
@@ -46,24 +47,34 @@ endif # ifeq ($(MAKESECTION),postdefines)
 #----------------------------------------------------------------- targets ---#
 ifeq ($(MAKESECTION),targets)
 
-.PHONY: build.phystut phystutclean
+.PHONY: build.phystut phystutclean phystutcleandep
 
 all: $(PHYSTUT.EXE)
-build.phystut: $(OUTDIRS) $(PHYSTUT.EXE)
+build.phystut: $(OUT.PHYSTUT) $(PHYSTUT.EXE)
 clean: phystutclean
+
+$(OUT.PHYSTUT)/%$O: $(DIR.PHYSTUT)/%.cpp
+	$(DO.COMPILE.CPP)
 
 $(PHYSTUT.EXE): $(DEP.EXE) $(OBJ.PHYSTUT) $(LIB.PHYSTUT)
 	$(DO.LINK.EXE)
 
+$(OUT.PHYSTUT):
+	$(MKDIRS)
+
 phystutclean:
 	-$(RMDIR) $(PHYSTUT.EXE) $(OBJ.PHYSTUT)
 
+cleandep: phystutcleandep
+phystutcleandep:
+	-$(RM) $(OUT.PHYSTUT)/phystut.dep
+
 ifdef DO_DEPEND
-dep: $(OUTOS)/phys.dep
-$(OUTOS)/phys.dep: $(SRC.PHYSTUT)
-	$(DO.DEP)
+dep: $(OUT.PHYSTUT) $(OUT.PHYSTUT)/phystut.dep
+$(OUT.PHYSTUT)/phystut.dep: $(SRC.PHYSTUT)
+	$(DO.DEPEND)
 else
--include $(OUTOS)/phys.dep
+-include $(OUT.PHYSTUT)/phystut.dep
 endif
 
 endif # ifeq ($(MAKESECTION),targets)

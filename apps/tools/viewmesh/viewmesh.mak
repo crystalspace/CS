@@ -26,12 +26,13 @@ endif # ifeq ($(MAKESECTION),roottargets)
 #------------------------------------------------------------- postdefines ---#
 ifeq ($(MAKESECTION),postdefines)
 
-vpath %.cpp apps/tools/viewmesh
 
 VIEWMESH.EXE = viewmesh$(EXE)
-INC.VIEWMESH = $(wildcard apps/tools/viewmesh/*.h)
-SRC.VIEWMESH = $(wildcard apps/tools/viewmesh/*.cpp)
-OBJ.VIEWMESH = $(addprefix $(OUT)/,$(notdir $(SRC.VIEWMESH:.cpp=$O)))
+DIR.VIEWMESH = apps/tools/viewmesh
+OUT.VIEWMESH = $(OUT)/$(DIR.VIEWMESH)
+INC.VIEWMESH = $(wildcard $(DIR.VIEWMESH)/*.h )
+SRC.VIEWMESH = $(wildcard $(DIR.VIEWMESH)/*.cpp )
+OBJ.VIEWMESH = $(addprefix $(OUT.VIEWMESH)/,$(notdir $(SRC.VIEWMESH:.cpp=$O)))
 DEP.VIEWMESH = CSWS CSTOOL CSGFX CSUTIL CSSYS CSGEOM CSUTIL
 LIB.VIEWMESH = $(foreach d,$(DEP.VIEWMESH),$($d.LIB))
 
@@ -46,24 +47,34 @@ endif # ifeq ($(MAKESECTION),postdefines)
 #----------------------------------------------------------------- targets ---#
 ifeq ($(MAKESECTION),targets)
 
-.PHONY: build.viewmesh viewmeshclean
+.PHONY: build.viewmesh viewmeshclean viewmeshcleandep
 
 all: $(VIEWMESH.EXE)
-build.viewmesh: $(OUTDIRS) $(VIEWMESH.EXE)
+build.viewmesh: $(OUT.VIEWMESH) $(VIEWMESH.EXE)
 clean: viewmeshclean
+
+$(OUT.VIEWMESH)/%$O: $(DIR.VIEWMESH)/%.cpp
+	$(DO.COMPILE.CPP)
 
 $(VIEWMESH.EXE): $(DEP.EXE) $(OBJ.VIEWMESH) $(LIB.VIEWMESH)
 	$(DO.LINK.EXE)
 
+$(OUT.VIEWMESH):
+	$(MKDIRS)
+
 viewmeshclean:
 	-$(RMDIR) $(VIEWMESH.EXE) $(OBJ.VIEWMESH)
 
+cleandep: viewmeshcleandep
+viewmeshcleandep:
+	-$(RM) $(OUT.VIEWMESH)/viewmesh.dep
+
 ifdef DO_DEPEND
-dep: $(OUTOS)/viewmesh.dep
-$(OUTOS)/viewmesh.dep: $(SRC.VIEWMESH)
-	$(DO.DEP)
+dep: $(OUT.VIEWMESH) $(OUT.VIEWMESH)/viewmesh.dep
+$(OUT.VIEWMESH)/viewmesh.dep: $(SRC.VIEWMESH)
+	$(DO.DEPEND)
 else
--include $(OUTOS)/viewmesh.dep
+-include $(OUT.VIEWMESH)/viewmesh.dep
 endif
 
 endif # ifeq ($(MAKESECTION),targets)

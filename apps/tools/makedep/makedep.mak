@@ -25,12 +25,13 @@ endif # ifeq ($(MAKESECTION),roottargets)
 #------------------------------------------------------------- postdefines ---#
 ifeq ($(MAKESECTION),postdefines)
 
-vpath %.cpp apps/tools/makedep
 
 MAKEDEP.EXE=makedep$(EXE.CONSOLE)
-INC.MAKEDEP = $(wildcard apps/tools/makedep/*.h)
-SRC.MAKEDEP = $(wildcard apps/tools/makedep/*.cpp)
-OBJ.MAKEDEP = $(addprefix $(OUT)/,$(notdir $(SRC.MAKEDEP:.cpp=$O)))
+DIR.MAKEDEP = apps/tools/makedep
+OUT.MAKEDEP = $(OUT)/$(DIR.MAKEDEP)
+INC.MAKEDEP = $(wildcard $(DIR.MAKEDEP)/*.h )
+SRC.MAKEDEP = $(wildcard $(DIR.MAKEDEP)/*.cpp )
+OBJ.MAKEDEP = $(addprefix $(OUT.MAKEDEP)/,$(notdir $(SRC.MAKEDEP:.cpp=$O)))
 DEP.MAKEDEP =
 LIB.MAKEDEP = $(foreach d,$(DEP.MAKEDEP),$($d.LIB))
 
@@ -45,11 +46,14 @@ endif # ifeq ($(MAKESECTION),postdefines)
 #----------------------------------------------------------------- targets ---#
 ifeq ($(MAKESECTION),targets)
 
-.PHONY: build.makedep makedepclean
+.PHONY: build.makedep makedepclean makedepcleandep
 
 all: $(MAKEDEP.EXE)
-build.makedep: $(OUTDIRS) $(MAKEDEP.EXE)
+build.makedep: $(OUT.MAKEDEP) $(MAKEDEP.EXE)
 clean: makedepclean
+
+$(OUT.MAKEDEP)/%$O: $(DIR.MAKEDEP)/%.cpp
+	$(DO.COMPILE.CPP)
 
 $(OUT)/main$O: apps/tools/makedep/main.cpp
 	$(DO.COMPILE.CPP) $(CFLAGS.MAKEDEP)
@@ -57,15 +61,22 @@ $(OUT)/main$O: apps/tools/makedep/main.cpp
 $(MAKEDEP.EXE): $(OBJ.MAKEDEP) $(LIB.MAKEDEP)
 	$(DO.LINK.CONSOLE.EXE)
 
+$(OUT.MAKEDEP):
+	$(MKDIRS)
+
 makedepclean:
 	-$(RMDIR) $(MAKEDEP.EXE) $(OBJ.MAKEDEP)
 
+cleandep: makedepcleandep
+makedepcleandep:
+	-$(RM) $(OUT.MAKEDEP)/makedep.dep
+
 ifdef DO_DEPEND
-dep: $(OUTOS)/makedep.dep
-$(OUTOS)/makedep.dep: $(SRC.MAKEDEP)
-	$(DO.DEP)
+dep: $(OUT.MAKEDEP) $(OUT.MAKEDEP)/makedep.dep
+$(OUT.MAKEDEP)/makedep.dep: $(SRC.MAKEDEP)
+	$(DO.DEPEND)
 else
--include $(OUTOS)/makedep.dep
+-include $(OUT.MAKEDEP)/makedep.dep
 endif
 
 endif # ifeq ($(MAKESECTION),targets)

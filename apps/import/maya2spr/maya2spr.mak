@@ -26,12 +26,13 @@ endif # ifeq ($(MAKESECTION),roottargets)
 #------------------------------------------------------------- postdefines ---#
 ifeq ($(MAKESECTION),postdefines)
 
-vpath %.cpp apps/import/maya2spr
 
 MAYA2SPR.EXE = maya2spr$(EXE.CONSOLE)
-INC.MAYA2SPR = $(wildcard apps/import/maya2spr/*.h)
-SRC.MAYA2SPR = $(wildcard apps/import/maya2spr/*.cpp)
-OBJ.MAYA2SPR = $(addprefix $(OUT)/,$(notdir $(SRC.MAYA2SPR:.cpp=$O)))
+DIR.MAYA2SPR = apps/import/maya2spr
+OUT.MAYA2SPR = $(OUT)/$(DIR.MAYA2SPR)
+INC.MAYA2SPR = $(wildcard $(DIR.MAYA2SPR)/*.h )
+SRC.MAYA2SPR = $(wildcard $(DIR.MAYA2SPR)/*.cpp )
+OBJ.MAYA2SPR = $(addprefix $(OUT.MAYA2SPR)/,$(notdir $(SRC.MAYA2SPR:.cpp=$O)))
 DEP.MAYA2SPR = CSGFX CSUTIL CSSYS CSUTIL CSGEOM
 LIB.MAYA2SPR = $(foreach d,$(DEP.MAYA2SPR),$($d.LIB))
 
@@ -46,24 +47,34 @@ endif # ifeq ($(MAKESECTION),postdefines)
 #----------------------------------------------------------------- targets ---#
 ifeq ($(MAKESECTION),targets)
 
-.PHONY: build.maya2spr maya2sprclean
+.PHONY: build.maya2spr maya2sprclean maya2sprcleandep
 
 all: $(MAYA2SPR.EXE)
-build.maya2spr: $(OUTDIRS) $(MAYA2SPR.EXE)
+build.maya2spr: $(OUT.MAYA2SPR) $(MAYA2SPR.EXE)
 clean: maya2sprclean
+
+$(OUT.MAYA2SPR)/%$O: $(DIR.MAYA2SPR)/%.cpp
+	$(DO.COMPILE.CPP)
 
 $(MAYA2SPR.EXE): $(OBJ.MAYA2SPR) $(LIB.MAYA2SPR)
 	$(DO.LINK.CONSOLE.EXE)
 
+$(OUT.MAYA2SPR):
+	$(MKDIRS)
+
 maya2sprclean:
 	-$(RMDIR) $(MAYA2SPR.EXE) $(OBJ.MAYA2SPR)
 
+cleandep: maya2sprcleandep
+maya2sprcleandep:
+	-$(RM) $(OUT.MAYA2SPR)/maya2spr.dep
+
 ifdef DO_DEPEND
-dep: $(OUTOS)/maya2spr.dep
-$(OUTOS)/maya2spr.dep: $(SRC.MAYA2SPR)
-	$(DO.DEP)
+dep: $(OUT.MAYA2SPR) $(OUT.MAYA2SPR)/maya2spr.dep
+$(OUT.MAYA2SPR)/maya2spr.dep: $(SRC.MAYA2SPR)
+	$(DO.DEPEND)
 else
--include $(OUTOS)/maya2spr.dep
+-include $(OUT.MAYA2SPR)/maya2spr.dep
 endif
 
 endif # ifeq ($(MAKESECTION),targets)

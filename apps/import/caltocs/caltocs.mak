@@ -27,11 +27,12 @@ endif # ifeq ($(MAKESECTION),roottargets)
 #------------------------------------------------------------- postdefines ---#
 ifeq ($(MAKESECTION),postdefines)
 
-vpath %.cpp apps/import/caltocs
 
 CALTOCS.EXE = caltocs$(EXE.CONSOLE)
-SRC.CALTOCS = $(wildcard apps/import/caltocs/*.cpp)
-OBJ.CALTOCS = $(addprefix $(OUT)/,$(notdir $(SRC.CALTOCS:.cpp=$O)))
+DIR.CALTOCS = apps/import/caltocs
+OUT.CALTOCS = $(OUT)/$(DIR.CALTOCS)
+SRC.CALTOCS = $(wildcard $(DIR.CALTOCS)/*.cpp )
+OBJ.CALTOCS = $(addprefix $(OUT.CALTOCS)/,$(notdir $(SRC.CALTOCS:.cpp=$O)))
 DEP.CALTOCS = CSSYS CSUTIL
 
 TO_INSTALL.EXE    += $(CALTOCS.EXE)
@@ -46,24 +47,34 @@ endif # ifeq ($(MAKESECTION),postdefines)
 #----------------------------------------------------------------- targets ---#
 ifeq ($(MAKESECTION),targets)
 
-.PHONY: build.caltocs caltocsclean
+.PHONY: build.caltocs caltocsclean caltocscleandep
 
 all: $(CALTOCS.EXE)
-build.caltocs: $(OUTDIRS) $(CALTOCS.EXE)
+build.caltocs: $(OUT.CALTOCS) $(CALTOCS.EXE)
 clean: caltocsclean
+
+$(OUT.CALTOCS)/%$O: $(DIR.CALTOCS)/%.cpp
+	$(DO.COMPILE.CPP)
 
 $(CALTOCS.EXE): $(OBJ.CALTOCS)
 	$(DO.LINK.CONSOLE.EXE) -lcal3d -lstdc++
 
+$(OUT.CALTOCS):
+	$(MKDIRS)
+
 caltocsclean:
 	-$(RMDIR) $(CALTOCS.EXE) $(OBJ.CALTOCS)
 
+cleandep: caltocscleandep
+caltocscleandep:
+	-$(RM) $(OUT.CALTOCS)/caltocs.dep
+
 ifdef DO_DEPEND
-dep: $(OUTOS)/caltocs.dep
-$(OUTOS)/caltocs.dep: $(SRC.CALTOCS)
-	$(DO.DEP)
+dep: $(OUT.CALTOCS) $(OUT.CALTOCS)/caltocs.dep
+$(OUT.CALTOCS)/caltocs.dep: $(SRC.CALTOCS)
+	$(DO.DEPEND)
 else
--include $(OUTOS)/caltocs.dep
+-include $(OUT.CALTOCS)/caltocs.dep
 endif
 
 endif # ifeq ($(MAKESECTION),targets)

@@ -28,12 +28,13 @@ endif # ifeq ($(MAKESECTION),roottargets)
 #------------------------------------------------------------- postdefines ---#
 ifeq ($(MAKESECTION),postdefines)
 
-vpath %.cpp apps/tests/mottest apps/support
 
 MOTTEST.EXE = mottest$(EXE)
-INC.MOTTEST = $(wildcard apps/tests/mottest/*.h)
-SRC.MOTTEST = $(wildcard apps/tests/mottest/*.cpp)
-OBJ.MOTTEST = $(addprefix $(OUT)/,$(notdir $(SRC.MOTTEST:.cpp=$O)))
+DIR.MOTTEST = apps/tests/mottest
+OUT.MOTTEST = $(OUT)/$(DIR.MOTTEST)
+INC.MOTTEST = $(wildcard $(DIR.MOTTEST)/*.h )
+SRC.MOTTEST = $(wildcard $(DIR.MOTTEST)/*.cpp )
+OBJ.MOTTEST = $(addprefix $(OUT.MOTTEST)/,$(notdir $(SRC.MOTTEST:.cpp=$O)))
 DEP.MOTTEST = CSTOOL CSUTIL CSSYS CSUTIL CSGEOM CSGFX
 LIB.MOTTEST = $(foreach d,$(DEP.MOTTEST),$($d.LIB))
 #CFG.MOTTEST = data/config/mottest.cfg
@@ -50,24 +51,34 @@ endif # ifeq ($(MAKESECTION),postdefines)
 #----------------------------------------------------------------- targets ---#
 ifeq ($(MAKESECTION),targets)
 
-.PHONY: build.mottest mottestclean
+.PHONY: build.mottest mottestclean mottestcleandep
 
 all: $(MOTTEST.EXE)
-build.mottest: $(OUTDIRS) $(MOTTEST.EXE)
+build.mottest: $(OUT.MOTTEST) $(MOTTEST.EXE)
 clean: mottestclean
+
+$(OUT.MOTTEST)/%$O: $(DIR.MOTTEST)/%.cpp
+	$(DO.COMPILE.CPP)
 
 $(MOTTEST.EXE): $(DEP.EXE) $(OBJ.MOTTEST) $(LIB.MOTTEST)
 	$(DO.LINK.EXE)
 
+$(OUT.MOTTEST):
+	$(MKDIRS)
+
 mottestclean:
 	-$(RMDIR) $(MOTTEST.EXE) $(OBJ.MOTTEST)
 
+cleandep: mottestcleandep
+mottestcleandep:
+	-$(RM) $(OUT.MOTTEST)/mottest.dep
+
 ifdef DO_DEPEND
-dep: $(OUTOS)/mottest.dep
-$(OUTOS)/mottest.dep: $(SRC.MOTTEST)
-	$(DO.DEP)
+dep: $(OUT.MOTTEST) $(OUT.MOTTEST)/mottest.dep
+$(OUT.MOTTEST)/mottest.dep: $(SRC.MOTTEST)
+	$(DO.DEPEND)
 else
--include $(OUTOS)/mottest.dep
+-include $(OUT.MOTTEST)/mottest.dep
 endif
 
 endif # ifeq ($(MAKESECTION),targets)
