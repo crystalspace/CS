@@ -152,7 +152,7 @@ public:
   { return (xmin == ixmin) && (ymin == iymin) &&
            (xmax == ixmax) && (ymax == iymax); }
   /// Same but compare with another csRect
-  inline bool Equal (csRect &other) const
+  inline bool Equal (const csRect &other) const
   { return Equal (other.xmin, other.ymin, other.xmax, other.ymax); }
 
   /// Normalize a rectangle such that xmin <= xmax and ymin <= ymax.
