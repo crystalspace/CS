@@ -135,7 +135,7 @@ bool csAVIStreamAudio::LoadCodec (UByte *pInitData, ULong nInitDataLen,
     char cn[128];
     sprintf (cn, "crystalspace.audio.codec.avi.%s", strdesc.codec);
     // try open this class
-    pCodec = (iAVICodec*)pSCF->scfCreateInstance (cn, "iAVICodec", 0);
+    pCodec = (iAVICodec*)pSCF->CreateInstance (cn, "iAVICodec", 0);
     pSCF->DecRef ();
     if (pCodec)
     {

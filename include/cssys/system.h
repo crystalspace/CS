@@ -21,7 +21,6 @@
 
 #include <stdio.h>
 
-#include "csutil/scf.h"
 #include "csutil/util.h"
 #include "csutil/csstrvec.h"
 #include "csutil/csobjvec.h"
@@ -490,33 +489,6 @@ public:
   virtual bool ReplaceOptionCL (const char *iName, const char *iValue, int iIndex = 0);
   /// Replace the Nth command-line name with a new value
   virtual bool ReplaceNameCL (const char *iValue, int iIndex = 0);
-
-  /****************************** iSCF interface ******************************/
-
-  class csSCF : public iSCF
-  {
-  public:
-    DECLARE_EMBEDDED_IBASE (csSystemDriver);
-
-    /// Wrapper for scfClassRegistered ()
-    virtual bool scfClassRegistered (const char *iClassID);
-    /// Wrapper for scfCreateInstance ()
-    virtual void *scfCreateInstance (const char *iClassID, const char *iInterfaceID,
-      int iVersion);
-    /// Wrapper for scfGetClassDescription ()
-    virtual const char *scfGetClassDescription (const char *iClassID);
-    /// Wrapper for scfGetClassDependencies ()
-    virtual const char *scfGetClassDependencies (const char *iClassID);
-    /// Wrapper for scfRegisterClass ()
-    virtual bool scfRegisterClass (const char *iClassID, const char *iLibraryName,
-      const char *Dependencies = NULL);
-    /// Wrapper for scfRegisterStaticClass ()
-    virtual bool scfRegisterStaticClass (scfClassInfo *iClassInfo);
-    /// Wrapper for scfRegisterClassList ()
-    virtual bool scfRegisterClassList (scfClassInfo *iClassInfo);
-    /// Wrapper for scfUnregisterClass ()
-    virtual bool scfUnregisterClass (char *iClassID);
-  } scfiSCF;
 };
 
 // CrystalSpace global variables

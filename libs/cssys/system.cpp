@@ -178,7 +178,7 @@ bool csPluginList::Sort (csSystemDriver *iSys)
   memset (matrix, 0, len * len * sizeof (bool));
   for (row = 0; row < len; row++)
   {
-    const char *dep = scfGetClassDependencies (Get (row).ClassID);
+    const char *dep = iSCF::SCF->GetClassDependencies (Get (row).ClassID);
     while (dep && *dep)
     {
       char tmp [100];
@@ -281,14 +281,13 @@ bool csPluginList::RecurseSort (csSystemDriver *iSys, int row, char *order,
 
 IMPLEMENT_IBASE (csSystemDriver)
   IMPLEMENTS_INTERFACE (iSystem)
-  IMPLEMENTS_EMBEDDED_INTERFACE (iSCF)
+  IMPLEMENTS_INTERFACE_COMMON (iSCF, iSCF::SCF)
 IMPLEMENT_IBASE_END
 
 csSystemDriver::csSystemDriver () : PlugIns (8, 8), EventQueue (),
   OptionList (16, 16), CommandLine (16, 16), CommandLineNames (16, 16)
 {
   CONSTRUCT_IBASE (NULL);
-  CONSTRUCT_EMBEDDED_IBASE (scfiSCF);
 
   Keyboard.SetSystemDriver (this);
   Mouse.SetSystemDriver    (this);
@@ -346,7 +345,7 @@ csSystemDriver::~csSystemDriver ()
   // de-register their config file at destruction time
   if (Config) Config->DecRef ();
 
-  scfFinish ();
+  iSCF::SCF->Finish ();
 }
 
 bool csSystemDriver::Initialize (int argc, const char* const argv[],
@@ -789,7 +788,8 @@ void csSystemDriver::Help ()
     iConfig *Config = QUERY_INTERFACE (plugin->PlugIn, iConfig);
     if (Config)
     {
-      Printf (MSG_STDOUT, "Options for %s:\n", scfGetClassDescription (plugin->ClassID));
+      Printf (MSG_STDOUT, "Options for %s:\n",
+        iSCF::SCF->GetClassDescription (plugin->ClassID));
       Help (Config);
       Config->DecRef ();
     }

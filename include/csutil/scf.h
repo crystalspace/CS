@@ -367,7 +367,8 @@ SCF_EXPORTED_NAME(LibraryName,_GetClassTable)()				\
   {									\
   public:								\
     __##LibraryName##_Init ()						\
-    { scfRegisterClassList (LibraryName##_GetClassTable ()); }		\
+    { if (!iSCF::SCF) scfInitialize ();					\
+      iSCF::SCF->RegisterClassList (LibraryName##_GetClassTable ()); }	\
   } __##LibraryName##_dummy;
 
 /**
@@ -390,7 +391,8 @@ SCF_EXPORTED_NAME(LibraryName,_GetClassTable)()				\
   {									\
   public:								\
     __##Class##_Init ()							\
-    { scfRegisterStaticClass (&Class##_ClassInfo); }			\
+    { if (!iSCF::SCF) scfInitialize ();					\
+      iSCF::SCF->RegisterStaticClass (&Class##_ClassInfo); }		\
   } __##Class##_dummy;
 
 //--------------------------------------------- Class factory interface -----//
@@ -433,7 +435,7 @@ struct iConfigFile;
  * This is a simple wrapper around scfCreateInstance.
  */
 #define CREATE_INSTANCE(ClassID,Interface)				\
-  (Interface *)scfCreateInstance (ClassID, #Interface, VERSION_##Interface)
+  (Interface *)iSCF::SCF->CreateInstance (ClassID, #Interface, VERSION_##Interface)
 
 /**
  * Shortcut macro to query given interface from given object.
@@ -460,96 +462,6 @@ struct iConfigFile;
 extern void scfInitialize (iConfigFile *iConfig = 0);
 
 /**
- * This function should be called to finish working with SCF.
- * (this won't free shared objects but they couldn't be used anymore
- * because this will do a forced free of all loaded shared libraries)
- */
-extern void scfFinish ();
-
-/**
- * Check whenever the class is present in SCF registry.
- * You can use this function to check whenever a class instance creation
- * failed because the class is not present at all in the class registry,
- * or it just doesn't support the requested interface.
- */
-extern bool scfClassRegistered (const char *iClassID);
-
-/**
- * Create an instance of a class that supports given interface.
- * The function returns NULL either if such a class ID is not found in
- * class registry, or a object of given class does not support given
- * interface or supports an incompatible version of given interface.
- * If you want to make a difference between these error conditions,
- * you can check whenever such a class exists using scfClassRegistered()
- * function.
- * <p>
- * If you specify NULL as iInterfaceID, you'll receive a pointer to the
- * basic interface, no matter what it is. <b>The reference count will be zero
- * thus you should increment it yourself if you use this approach.</b>
- * You can treat the pointer returned just as an iBase*, not more.
- * If you need more, do QueryInterface() on received pointer (this will also
- * increment the reference counter).
- */
-extern void *scfCreateInstance (const char *iClassID, const char *iInterfaceID,
-  int iVersion);
-
-/**
- * Query the description of a class.
- * NOTE: At least one instance of this class should exist, or the class
- * should be a static class. Otherwise the function will return NULL
- */
-extern const char *scfGetClassDescription (const char *iClassID);
-
-/**
- * Query the dependency list for a class.
- * The format of dependency string is implementation-specific, SCF itself
- * does not make any assumptions about the format of the string.
- */
-extern const char *scfGetClassDependencies (const char *iClassID);
-
-/**
- * Unload all unused shared libraries (also called inside scfCreateInstance).
- * If you want to be sure that all unused shared libraries are unloaded,
- * call this function. It is automatically invoked inside scfCreateInstance(),
- * thus it is called from time to time if you constantly create new objects.
- */
-extern void scfUnloadUnusedModules ();
-
-/**
- * Register a single dynamic class (implemented in a shared library).
- * This function tells SCF kernel that a specific class is implemented within
- * a specific shared library. There can be multiple classes within a single
- * shared library. You also can provide an application-specific dependency
- * list.
- */
-extern bool scfRegisterClass (const char *iClassID, const char *iLibraryName,
-  const char *Dependencies = NULL);
-
-/**
- * Register a single static class (that is, implemented in SCF client module).
- * This function is similar to scfRegisterClass but is intended to be used
- * with statically linked classes (that is, not located in a shared library)
- */
-extern bool scfRegisterStaticClass (scfClassInfo *iClassInfo);
-
-/**
- * Register a set of static classes (used with static linking).
- * If you design a SCF module that contains a number of SCF classes, and you
- * want that module to be usable when using either static and dynamic linkage,
- * you can use scfRegisterClassList (or the SCF_REGISTER_STATIC_LIBRARY macro)
- * to register the export class table with the SCF kernel.
- */
-extern bool scfRegisterClassList (scfClassInfo *iClassInfo);
-
-/**
- * This function should be called to deregister a class at run-time.
- * By calling this function you will remove the description of a class,
- * no matter whenever it is statically or dynamically linked, from the
- * SCF registry.
- */
-extern bool scfUnregisterClass (char *iClassID);
-
-/**
  * This function checks whenever an interface is compatible with given version.
  * SCF uses the following comparison criteria: if the major version numbers
  * are equal and required minor and micro version is less or equal than target
@@ -571,24 +483,104 @@ SCF_VERSION (iSCF, 0, 0, 1);
  */
 struct iSCF : public iBase
 {
-  /// Wrapper for scfClassRegistered ()
-  virtual bool scfClassRegistered (const char *iClassID) = 0;
-  /// Wrapper for scfCreateInstance ()
-  virtual void *scfCreateInstance (const char *iClassID,
-    const char *iInterfaceID, int iVersion) = 0;
-  /// Wrapper for scfGetClassDescription ()
-  virtual const char *scfGetClassDescription (const char *iClassID) = 0;
-  /// Wrapper for scfGetClassDependencies ()
-  virtual const char *scfGetClassDependencies (const char *iClassID) = 0;
-  /// Wrapper for scfRegisterClass ()
-  virtual bool scfRegisterClass (const char *iClassID,
-    const char *iLibraryName, const char *Dependencies = NULL) = 0;
-  /// Wrapper for scfRegisterStaticClass ()
-  virtual bool scfRegisterStaticClass (scfClassInfo *iClassInfo) = 0;
-  /// Wrapper for scfRegisterClassList ()
-  virtual bool scfRegisterClassList (scfClassInfo *iClassInfo) = 0;
-  /// Wrapper for scfUnregisterClass ()
-  virtual bool scfUnregisterClass (char *iClassID) = 0;
+  /// This is the global instance of iSCF
+  static iSCF *SCF;
+
+  /**
+   * Read additional class descriptions from the given config file. This does
+   * the same as additional calls to scfInitialize ().
+   */
+  virtual void RegisterConfigClassList (iConfigFile *Config) = 0;
+
+  /**
+   * Check whenever the class is present in SCF registry.
+   * You can use this function to check whenever a class instance creation
+   * failed because the class is not present at all in the class registry,
+   * or it just doesn't support the requested interface.
+   */
+  virtual bool ClassRegistered (const char *iClassID) = 0;
+
+  /**
+   * Create an instance of a class that supports given interface.
+   * The function returns NULL either if such a class ID is not found in
+   * class registry, or a object of given class does not support given
+   * interface or supports an incompatible version of given interface.
+   * If you want to make a difference between these error conditions,
+   * you can check whenever such a class exists using scfClassRegistered()
+   * function.
+   * <p>
+   * If you specify NULL as iInterfaceID, you'll receive a pointer to the
+   * basic interface, no matter what it is. <b>The reference count will be zero
+   * thus you should increment it yourself if you use this approach.</b>
+   * You can treat the pointer returned just as an iBase*, not more.
+   * If you need more, do QueryInterface() on received pointer (this will also
+   * increment the reference counter).
+   */
+  virtual void *CreateInstance (const char *iClassID,
+	const char *iInterfaceID, int iVersion) = 0;
+
+  /**
+   * Query the description of a class.
+   * NOTE: At least one instance of this class should exist, or the class
+   * should be a static class. Otherwise the function will return NULL
+   */
+  virtual const char *GetClassDescription (const char *iClassID) = 0;
+
+  /**
+   * Query the dependency list for a class.
+   * The format of dependency string is implementation-specific, SCF itself
+   * does not make any assumptions about the format of the string.
+   */
+  virtual const char *GetClassDependencies (const char *iClassID) = 0;
+
+  /**
+   * Unload all unused shared libraries (also called inside scfCreateInstance).
+   * If you want to be sure that all unused shared libraries are unloaded,
+   * call this function. It is automatically invoked inside scfCreateInstance(),
+   * thus it is called from time to time if you constantly create new objects.
+   */
+  virtual void UnloadUnusedModules () = 0;
+  
+  /**
+   * Register a single dynamic class (implemented in a shared library).
+   * This function tells SCF kernel that a specific class is implemented within
+   * a specific shared library. There can be multiple classes within a single
+   * shared library. You also can provide an application-specific dependency
+   * list.
+   */
+  virtual bool RegisterClass (const char *iClassID,
+	const char *iLibraryName, const char *Dependencies = NULL) = 0;
+
+  /**
+   * Register a single static class (that is, implemented in SCF client module).
+   * This function is similar to scfRegisterClass but is intended to be used
+   * with statically linked classes (that is, not located in a shared library)
+   */
+  virtual bool RegisterStaticClass (scfClassInfo *iClassInfo) = 0;
+
+  /**
+   * Register a set of static classes (used with static linking).
+   * If you design a SCF module that contains a number of SCF classes, and you
+   * want that module to be usable when using either static and dynamic linkage,
+   * you can use scfRegisterClassList (or the SCF_REGISTER_STATIC_LIBRARY macro)
+   * to register the export class table with the SCF kernel.
+   */
+  virtual bool RegisterClassList (scfClassInfo *iClassInfo) = 0;
+
+  /**
+   * This function should be called to deregister a class at run-time.
+   * By calling this function you will remove the description of a class,
+   * no matter whenever it is statically or dynamically linked, from the
+   * SCF registry.
+   */
+  virtual bool UnregisterClass (char *iClassID) = 0;
+
+  /**
+   * This function should be called to finish working with SCF.
+   * (this won't free shared objects but they couldn't be used anymore
+   * because this will do a forced free of all loaded shared libraries).
+   */
+  virtual void Finish () = 0;
 };
 
 //-------------------------------------------- System-dependent defines -----//

@@ -83,8 +83,8 @@ int main(int argc, char *argv[])
 #else
   // Don't use a .cfg file, instead manually register classes
   scfInitialize (NULL);
-  scfRegisterClass ("test.dog", "dog");
-  scfRegisterClass ("test.worm", "worm");
+  iSCF::SCF->RegisterClass ("test.dog", "dog");
+  iSCF::SCF->RegisterClass ("test.worm", "worm");
 #endif
 
   iDog *dog = CREATE_INSTANCE ("test.dog", iDog);
@@ -156,6 +156,6 @@ int main(int argc, char *argv[])
 
     frog->DecRef ();
   }
-  scfFinish ();
+  iSCF::SCF->Finish ();
   return 0;
 }

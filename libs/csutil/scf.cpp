@@ -330,7 +330,19 @@ static scfClassRegistry *ClassRegistry = NULL;
 // If this bool is true, we should sort the registery
 static bool SortClassRegistry = false;
 
-void scfInitialize (iConfigFile *iConfig)
+// @@@ Temporary list of all scf functions
+void scfFinish ();
+bool scfClassRegistered (const char *);
+void *scfCreateInstance (const char *, const char *, int);
+const char *scfGetClassDescription (const char *);
+const char *scfGetClassDependencies (const char *);
+void scfUnloadUnusedModules ();
+bool scfRegisterClass (const char *, const char *, const char * = NULL);
+bool scfRegisterStaticClass (scfClassInfo *);
+bool scfRegisterClassList (scfClassInfo *);
+bool scfUnregisterClass (char *);
+
+void scfInitializePrivate (iConfigFile *iConfig)
 {
   if (!ClassRegistry)
     ClassRegistry = new scfClassRegistry ();
@@ -498,4 +510,83 @@ const char *scfGetClassDependencies (const char *iClassID)
 bool scfClassRegistered (const char *iClassID)
 {
   return (ClassRegistry->FindKey (iClassID) >= 0);
+}
+
+/// --------------------------------------------------------------------------
+
+/// This is our private instance of csSCF
+static class csSCF *PrivateSCF = NULL;
+/// This is the public instance
+iSCF *iSCF::SCF = NULL;
+
+/// This class manages all SCF functionality
+class csSCF : public iSCF
+{
+public:
+  DECLARE_IBASE;
+
+  /// constructor
+  csSCF ()
+  { scfInitializePrivate (NULL); SCF = PrivateSCF = this;}
+  /// destructor
+  ~csSCF ()
+  { scfFinish (); SCF = PrivateSCF = NULL; }
+
+  /// Read config file
+  virtual void RegisterConfigClassList (iConfigFile *cfg)
+  { scfInitializePrivate (cfg); }
+
+  /// Wrapper for scfClassRegistered ()
+  virtual bool ClassRegistered (const char *iClassID)
+  { return scfClassRegistered (iClassID); }
+
+  /// Wrapper for scfCreateInstance ()
+  virtual void *CreateInstance (const char *iClassID,
+    const char *iInterfaceID, int iVersion)
+  { return scfCreateInstance (iClassID, iInterfaceID, iVersion); }
+
+  /// Wrapper for scfGetClassDescription ()
+  virtual const char *GetClassDescription (const char *iClassID)
+  { return scfGetClassDescription (iClassID); }
+
+  /// Wrapper for scfGetClassDependencies ()
+  virtual const char *GetClassDependencies (const char *iClassID)
+  { return scfGetClassDependencies (iClassID); }
+
+  /// Wrapper for scfRegisterClass ()
+  virtual bool RegisterClass (const char *iClassID,
+    const char *iLibraryName, const char *Dependencies = NULL)
+  { return scfRegisterClass (iClassID, iLibraryName, Dependencies); }
+
+  /// Wrapper for scfRegisterStaticClass ()
+  virtual bool RegisterStaticClass (scfClassInfo *iClassInfo)
+  { return scfRegisterStaticClass (iClassInfo); }
+
+  /// Wrapper for scfRegisterClassList ()
+  virtual bool RegisterClassList (scfClassInfo *iClassInfo)
+  { return scfRegisterClassList (iClassInfo); }
+
+  /// Wrapper for scfUnregisterClass ()
+  virtual bool UnregisterClass (char *iClassID)
+  { return scfUnregisterClass (iClassID); }
+
+  /// Wrapper for scfUnloadUnusedModules
+  virtual void UnloadUnusedModules ()
+  { scfUnloadUnusedModules (); }
+
+  /// Wrapper for scfFinish ()
+  virtual void Finish ()
+  { scfFinish (); }
+};
+
+IMPLEMENT_IBASE (csSCF);
+  IMPLEMENTS_INTERFACE (iSCF);
+IMPLEMENT_IBASE_END;
+
+void scfInitialize (iConfigFile *iConfig)
+{
+  if (!PrivateSCF)
+    PrivateSCF = new csSCF ();
+  if (iConfig)
+    PrivateSCF->RegisterConfigClassList (iConfig);
 }
