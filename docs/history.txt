@@ -8,6 +8,8 @@ The history order is reversed so that new features are at the top.
 	  conversion of (int*) to (GLint*) in glcommon2d.cpp.
 	- Eric Sunshine fixed bug in csconf.mak where its TO_INSTALL.ROOT was
 	  referring to the obsolete scripts/cs-config/crystal.m4.
+	- Eric Sunshine fixed bug in walktest/Jamfile where walktest_static
+	  target neglected to use the "noinstall" option.
 25-May-2003
 	- Jorrit optimized ball->HitBeamObject() considerably by moving an
 	  expensive operation out the inner loop. Same optimization for
