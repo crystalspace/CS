@@ -12,6 +12,12 @@ The history order has been reversed so that new features are at the top.
 	  if you changed parameters like ambient and so on. For changes
 	  of ambient to have effect you now have to do '-relight' or
 	  '-recalc' explicitelly.
+	- Norman Kramer included missing ievent.h to csclear.
+	- Norman fixed the OpenGL renderer with fog. There was one bit
+	  that wasn't properly stored with glPushAttrib. This causes
+	  crashes on the voodoo3 and very likely also the big crash
+	  that I have on the GeForce (to be checked).
+	- Norman fixed csclear.cfg for the right console.
 22-Aug-2000
 	- Got a small patch from Rene Dudfield with new console command
 	  (for WalkTest) 'listactions', and a new sprite name argument
