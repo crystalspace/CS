@@ -359,7 +359,7 @@
 #    if defined (PROC_INTEL)
 #      if defined (COMP_GCC)
 #        define DEBUG_BREAK	asm ("int $3")
-#      elif
+#      else
 #        define DEBUG_BREAK	_asm int 3
 #      endif
 #    else
@@ -367,14 +367,18 @@
 #    endif
 #  endif
 #  if !defined (CS_ASSERT)
-#    include <stdio.h>
-#    define CS_ASSERT(x)						\
-       if (!(x))							\
-       {								\
-         fprintf (stderr, __FILE__ ":%d: failed assertion `" #x "'\n",	\
+#    if defined (COMP_VC)
+#      define  CS_ASSERT(x) assert(x)
+#    else
+#      include <stdio.h>
+#      define CS_ASSERT(x)						\
+         if (!(x))							\
+         {								\
+           fprintf (stderr, __FILE__ ":%d: failed assertion '" #x "'\n",	\
            int(__LINE__));						\
-         DEBUG_BREAK;							\
-       }
+           DEBUG_BREAK;							\
+         }
+#    endif
 #  endif
 #else
 #  undef DEBUG_BREAK
