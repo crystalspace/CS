@@ -276,6 +276,9 @@ class csTextureManagerSoftware : public csTextureManager
 private:
   int num_red, num_green, num_blue;
 
+  /// Did we initialized?
+  bool initialized;
+
   /// True if truecolor mode is enabled.
   bool truecolor;
 
@@ -398,8 +401,8 @@ public:
   ///
   STDMETHODIMP FreeImages ();
   ///
-  STDMETHODIMP ReserveColor (int r, int g, int b, bool privcolor);
-  ///
+  STDMETHODIMP ReserveColor (int r, int g, int b);
+  /// Really allocate the palette on the system.
   STDMETHODIMP AllocPalette ();
 
   /// Create a new texture.
@@ -454,11 +457,6 @@ public:
    * Compute the light tables using the previously compute palette.
    */
   void compute_light_tables ();
-
-  /**
-   * Really allocate the palette on the system.
-   */
-  void alloc_palette ();
 
   /**
    * Get the palette.

@@ -126,7 +126,7 @@ public:
   ///
   STDMETHODIMP FreeImages ();
   ///
-  STDMETHODIMP ReserveColor (int r, int g, int b, bool privcolor);
+  STDMETHODIMP ReserveColor (int r, int g, int b);
   ///
   STDMETHODIMP AllocPalette ();
 

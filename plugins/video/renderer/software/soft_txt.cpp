@@ -28,47 +28,35 @@
 #include "iimage.h"
 #include "lightdef.h"
 
-#if defined(COMP_MWERKS) && defined(PROC_POWERPC)
-#if ! __option( global_optimizer )
-#pragma global_optimizer on
-#endif
-#endif
-
 #define RESERVED_COLOR(c) ((c == 0) || (c == 255))
 
-//---------------------------------------------------------------------------
+#define CLIP_RGB \
+  if (r < 0) r = 0; else if (r > 255) r = 255; \
+  if (g < 0) g = 0; else if (g > 255) g = 255; \
+  if (b < 0) b = 0; else if (b > 255) b = 255;
 
 TxtCmapPrivate::TxtCmapPrivate ()
 {
-  int i;
-  for (i = 0 ; i < 256 ; i++)
-  {
-    alloc[i] = false;
-    rgb_values[(i<<2)+0] = 0;
-    rgb_values[(i<<2)+1] = 0;
-    rgb_values[(i<<2)+2] = 0;
-    rgb_values[(i<<2)+3] = 0;
-    priv_to_global[i] = 0;
-  }
+  memset (alloc, sizeof (alloc), 0);
+  memset (rgb_values, sizeof (rgb_values), 0);
+  memset (priv_to_global, sizeof (priv_to_global), 0);
 }
 
 int TxtCmapPrivate::find_rgb (int r, int g, int b)
 {
-  if (r>255) r=255; else if (r<0) r=0;
-  if (g>255) g=255; else if (g<0) g=0;
-  if (b>255) b=255; else if (b<0) b=0;
+  CLIP_RGB;
 
   int i, min, mindist;
-  mindist = 1000L*256*256;
+  mindist = 1000L * 256 * 256;
   min = -1;
   register int red, green, blue, dist;
-  for (i = 1 ; i < 256 ; i++) // Color 0 is not used, it is reserved for transparency
-    if (alloc[i])
+  for (i = 1; i < 256; i++)		// Color 0 is reserved for transparency
+    if (alloc [i])
     {
-      red = r - rgb_values[(i<<2)+0];
-      green = g - rgb_values[(i<<2)+1];
-      blue = b - rgb_values[(i<<2)+2];
-      dist = (299*red*red) + (587*green*green) + (114*blue*blue);
+      red = r - rgb_values [(i << 2) + 0];
+      green = g - rgb_values [(i << 2) + 1];
+      blue = b - rgb_values [(i << 2) + 2];
+      dist = (299 * red * red) + (587 * green * green) + (114 * blue * blue);
       if (dist == 0) return i;
       if (dist < mindist) { mindist = dist; min = i; }
     }
@@ -77,13 +65,9 @@ int TxtCmapPrivate::find_rgb (int r, int g, int b)
 
 int TxtCmapPrivate::alloc_rgb (int r, int g, int b, int dist)
 {
-  int d, j;
-  if (r < 0) r = 0; else if (r > 255) r = 255;
-  if (g < 0) g = 0; else if (g > 255) g = 255;
-  if (b < 0) b = 0; else if (b > 255) b = 255;
+  CLIP_RGB;
 
-  d = 0;
-  int i = find_rgb (r, g, b);
+  int d = 0, i = find_rgb (r, g, b);
   if (i != -1)
   {
     d = 299*(r-rgb_values[(i<<2)+0])*(r-rgb_values[(i<<2)+0])+
@@ -92,13 +76,13 @@ int TxtCmapPrivate::alloc_rgb (int r, int g, int b, int dist)
   }
   if (i == -1 || d > dist)
   {
-    for (j = 1 ; j < 256 ; j++) // Color 0 is not used, reserved for transparency
-      if (!alloc[j])
+    for (int j = 1; j < 256; j++) // Color 0 is not used, reserved for transparency
+      if (!alloc [j])
       {
         alloc[j] = true;
-        rgb_values[(j<<2)+0] = r;
-        rgb_values[(j<<2)+1] = g;
-        rgb_values[(j<<2)+2] = b;
+        rgb_values [(j << 2) + 0] = r;
+        rgb_values [(j << 2) + 1] = g;
+        rgb_values [(j << 2) + 2] = b;
         return j;
       }
     return i; // We couldn't allocate a new color, return best fit
@@ -335,10 +319,11 @@ void csTextureMMSoftware::remap_palette_private (csTextureManagerSoftware* new_p
 UShort csTextureManagerSoftware::alpha_mask;
 
 csTextureManagerSoftware::csTextureManagerSoftware (ISystem* piSystem, IGraphics2D* piG2D) :
-	csTextureManager (piSystem, piG2D)
+  csTextureManager (piSystem, piG2D)
 {
   txtMode = TXT_GLOBAL;
   force_txtMode = -1;
+  initialized = false;
 }
 
 void csTextureManagerSoftware::InitSystem ()
@@ -508,7 +493,8 @@ void csTextureManagerSoftware::read_config ()
     force_txtMode = TXT_24BIT;
   }
 
-  if (force_txtMode != -1) txtMode = force_txtMode;
+  if (force_txtMode != -1)
+    txtMode = force_txtMode;
   else
   {
     char buf[100];
@@ -658,21 +644,13 @@ ULong csTextureManagerSoftware::encode_rgb (int r, int g, int b)
 
 int csTextureManagerSoftware::find_rgb (int r, int g, int b)
 {
-  //GAC Now use lookup table
-  if (r>255) r=255; else if (r<0) r=0;
-  if (g>255) g=255; else if (g<0) g=0;
-  if (b>255) b=255; else if (b<0) b=0;
-
+  CLIP_RGB;
   return lt_palette_table[encode_rgb (r, g, b)];
 }
 
 int csTextureManagerSoftware::find_color (int r, int g, int b)
 {
-  //GAC Now use lookup table
-  if (r>255) r=255; else if (r<0) r=0;
-  if (g>255) g=255; else if (g<0) g=0;
-  if (b>255) b=255; else if (b<0) b=0;
-
+  CLIP_RGB;
   if (truecolor)
     return encode_rgb (r, g, b);
   else
@@ -681,19 +659,13 @@ int csTextureManagerSoftware::find_color (int r, int g, int b)
 
 ULong csTextureManagerSoftware::encode_rgb_safe (int r, int g, int b)
 {
-  //GAC Now use lookup table
-  if (r>255) r=255; else if (r<0) r=0;
-  if (g>255) g=255; else if (g<0) g=0;
-  if (b>255) b=255; else if (b<0) b=0;
-
+  CLIP_RGB;
   return encode_rgb (r, g, b);
 }
 
 int csTextureManagerSoftware::find_rgb_slow (int r, int g, int b)
 {
-  if (r>255) r=255; else if (r<0) r=0;
-  if (g>255) g=255; else if (g<0) g=0;
-  if (b>255) b=255; else if (b<0) b=0;
+  CLIP_RGB;
 
   int i, min, mindist;
   mindist = 1000L*256*256;
@@ -714,28 +686,24 @@ int csTextureManagerSoftware::find_rgb_slow (int r, int g, int b)
 
 int csTextureManagerSoftware::alloc_rgb (int r, int g, int b, int dist)
 {
-  int d, j;
-  if (r < 0) r = 0; else if (r > 255) r = 255;
-  if (g < 0) g = 0; else if (g > 255) g = 255;
-  if (b < 0) b = 0; else if (b > 255) b = 255;
+  CLIP_RGB;
 
-  d = 0;
-  int i = find_rgb_slow (r, g, b);
+  int d = 0, i = find_rgb_slow (r, g, b);
   if (i != -1)
   {
-    d = 299*(r-pal[i].red)*(r-pal[i].red)+
-      587*(g-pal[i].green)*(g-pal[i].green)+
-      114*(b-pal[i].blue)*(b-pal[i].blue);
+    d = 299 * (r - pal [i].red) * (r - pal [i].red) +
+        587 * (g - pal [i].green) * (g - pal [i].green) +
+        114 * (b - pal [i].blue) * (b - pal [i].blue);
   }
   if (i == -1 || d > dist)
   {
-    for (j = 1 ; j < 255 ; j++) // Exclude color 0 and 255
+    for (int j = 1 ; j < 255 ; j++) // Exclude color 0 and 255
       if (!alloc[j])
       {
-        alloc[j] = true;
-        pal[j].red = r;
-        pal[j].green = g;
-        pal[j].blue = b;
+        alloc [j] = true;
+        pal [j].red = r;
+        pal [j].green = g;
+        pal [j].blue = b;
         return j;
       }
     return i; // We couldn't allocate a new color, return best fit
@@ -810,9 +778,6 @@ void csTextureManagerSoftware::compute_palette ()
 
   if (verbose) SysPrintf (MSG_INITIALIZATION, "Computing palette...\n");
 
-  for (i = 1 ; i < 255 ; i++)
-    alloc[i] = false;
-
   // First compute the usage of all colors of all textures.
   // These usage lists will be sorted so that the most frequently
   // used color of each textures is put first.
@@ -861,24 +826,6 @@ void csTextureManagerSoftware::compute_palette ()
   // Remap all textures according to the new colormap.
   for (i = 0 ; i < textures.Length () ; i++)
     ((csTextureMMSoftware*)textures[i])->remap_texture (this);
-
-  black_color = 0;
-  if (truecolor)
-  {
-    white_color = encode_rgb (255, 255, 255);
-    red_color = encode_rgb (255, 0, 0);
-    blue_color = encode_rgb (0, 0, 255);
-    yellow_color = encode_rgb (255, 255, 0);
-    green_color = encode_rgb (0, 255, 0);
-  }
-  else
-  {
-    white_color = 255;
-    red_color = find_rgb (255, 0, 0);
-    blue_color = find_rgb (0, 0, 255);
-    yellow_color = find_rgb (255, 255, 0);
-    green_color = find_rgb (0, 255, 0);
-  }
 
   if (verbose) SysPrintf (MSG_INITIALIZATION, "DONE\n");
 }
@@ -1136,39 +1083,6 @@ void csTextureManagerSoftware::compute_light_tables ()
     SysPrintf (MSG_INITIALIZATION, "DONE\n");
 }
 
-void csTextureManagerSoftware::alloc_palette ()
-{
-  int i;
-  int r, g, b;
-  for (i = 0 ; i < 256 ; i++)
-    if (alloc[i])
-    {
-      r = GAMMA (pal[i].red); if (r < 0) r = 0; else if (r > 255) r = 255;
-      g = GAMMA (pal[i].green); if (g < 0) g = 0; else if (g > 255) g = 255;
-      b = GAMMA (pal[i].blue); if (b < 0) b = 0; else if (b > 255) b = 255;
-      m_piG2D->SetRGB (i, r, g, b);
-    }
-
-  if (truecolor)
-  {
-    red_color = encode_rgb (255, 0, 0);
-    blue_color = encode_rgb (0, 0, 255);
-    yellow_color = encode_rgb (255, 255, 0);
-    green_color = encode_rgb (0, 255, 0);
-    white_color = encode_rgb (255, 255, 255);
-    black_color = 0;
-  }
-  else
-  {
-    red_color = find_rgb_slow (255, 0, 0);
-    blue_color = find_rgb_slow (0, 0, 255);
-    yellow_color = find_rgb_slow (255, 255, 0);
-    green_color = find_rgb_slow (0, 255, 0);
-    white_color = 255;
-    black_color = 0;
-  }
-}
-
 STDMETHODIMP csTextureManagerSoftware::Initialize ()
 {
   // By allocating black at 0 and white at 255 we are compatible with
@@ -1188,17 +1102,19 @@ STDMETHODIMP csTextureManagerSoftware::Initialize ()
   // even with lighting added.
   memset (alloc, 0, sizeof (alloc));
   memset (pal, 0, sizeof (pal));
-  alloc[0] = true;
-  pal[0].red = 0;
-  pal[0].green = 0;
-  pal[0].blue = 0;
-  alloc[255] = true;
-  pal[255].red = 255;
-  pal[255].green = 255;
-  pal[255].blue = 255;
+  alloc [0] = true;
+  pal [0].red = 0;
+  pal [0].green = 0;
+  pal [0].blue = 0;
+  alloc [255] = true;
+  pal [255].red = 255;
+  pal [255].green = 255;
+  pal [255].blue = 255;
 
   clear ();
   read_config ();
+
+  initialized = true;
 
   return S_OK;
 }
@@ -1206,6 +1122,14 @@ STDMETHODIMP csTextureManagerSoftware::Initialize ()
 STDMETHODIMP csTextureManagerSoftware::Prepare ()
 {
   int i;
+
+  // Check: we have to call Initialize() before Prepare()
+  if (!initialized)
+  {
+    SysPrintf (MSG_FATAL_ERROR, "TextureManager::Initialize() should be called before TextureManager::Prepare()");
+    abort ();
+  }
+  initialized = false;
 
   CHK (delete factory_3d); factory_3d = NULL;
   CHK (delete factory_2d); factory_2d = NULL;
@@ -1287,7 +1211,7 @@ STDMETHODIMP csTextureManagerSoftware::FreeImages ()
   return S_OK;
 }
 
-STDMETHODIMP csTextureManagerSoftware::ReserveColor (int r, int g, int b, bool /*privcolor*/)
+STDMETHODIMP csTextureManagerSoftware::ReserveColor (int r, int g, int b)
 {
   alloc_rgb (r, g, b, 0);
   return S_OK;
@@ -1295,11 +1219,34 @@ STDMETHODIMP csTextureManagerSoftware::ReserveColor (int r, int g, int b, bool /
 
 STDMETHODIMP csTextureManagerSoftware::AllocPalette ()
 {
-  alloc_palette ();
+  int i;
+  int r, g, b;
+  for (i = 0 ; i < 256 ; i++)
+    if (alloc[i])
+    {
+      r = GAMMA (pal[i].red);
+      g = GAMMA (pal[i].green);
+      b = GAMMA (pal[i].blue);
+      CLIP_RGB;
+      m_piG2D->SetRGB (i, r, g, b);
+    }
+
+  if (truecolor)
+  {
+    red_color = encode_rgb (255, 0, 0);
+    blue_color = encode_rgb (0, 0, 255);
+    yellow_color = encode_rgb (255, 255, 0);
+    green_color = encode_rgb (0, 255, 0);
+    white_color = encode_rgb (255, 255, 255);
+  }
+  else
+  {
+    red_color = find_rgb_slow (255, 0, 0);
+    blue_color = find_rgb_slow (0, 0, 255);
+    yellow_color = find_rgb_slow (255, 255, 0);
+    green_color = find_rgb_slow (0, 255, 0);
+    white_color = 255;
+  }
+  black_color = 0;
   return S_OK;
 }
-
-//---------------------------------------------------------------------------
-#if defined(COMP_MWERKS) && defined(PROC_POWERPC)
-#pragma global_optimizer reset
-#endif

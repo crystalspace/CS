@@ -181,7 +181,6 @@ csGraphics3DSoftware::csGraphics3DSoftware (ISystem* piSystem) : m_piG2D(NULL)
   char *sz2DDriver = SOFTWARE_2D_DRIVER;        // "crystalspace.graphics2d.xxx"
   IGraphics2DFactory* piFactory = NULL;
   tcache = NULL;
-  txtmgr = NULL;
 
   m_piSystem = piSystem;
 

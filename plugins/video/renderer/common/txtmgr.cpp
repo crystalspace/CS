@@ -544,7 +544,6 @@ Filter3x3 csTextureManager::blend_filter =
   16
 };
 
-
 csTextureManager::csTextureManager (ISystem* piSystem, IGraphics2D* piG2D)
 {
   m_piSystem = piSystem;

@@ -422,10 +422,11 @@ protected:
   /// Pixel format.
   csPixelFormat pfmt;
 
+  ///
   int red_color;
+  int blue_color;
   int yellow_color;
   int green_color;
-  int blue_color;
   int white_color;
   int black_color;
 

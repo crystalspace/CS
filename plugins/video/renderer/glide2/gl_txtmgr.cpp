@@ -451,7 +451,7 @@ STDMETHODIMP csTextureManagerGlide::FreeImages ()
   return S_OK;
 }
 
-STDMETHODIMP csTextureManagerGlide::ReserveColor (int /*r*/, int /*g*/, int /*b*/, bool /*privcolor*/)
+STDMETHODIMP csTextureManagerGlide::ReserveColor (int /*r*/, int /*g*/, int /*b*/)
 {
   return S_OK;
 }

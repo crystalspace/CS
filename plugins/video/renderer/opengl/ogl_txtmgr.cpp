@@ -386,7 +386,7 @@ STDMETHODIMP csTextureManagerOpenGL::FreeImages ()
   return S_OK;
 }
 
-STDMETHODIMP csTextureManagerOpenGL::ReserveColor (int /*r*/, int /*g*/, int /*b*/, bool /*privcolor*/)
+STDMETHODIMP csTextureManagerOpenGL::ReserveColor (int /*r*/, int /*g*/, int /*b*/)
 {
   return S_OK;
 }

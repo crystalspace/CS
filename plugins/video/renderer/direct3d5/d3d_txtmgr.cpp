@@ -385,7 +385,7 @@ STDMETHODIMP csTextureManagerDirect3D::FreeImages ()
   return S_OK;
 }
 
-STDMETHODIMP csTextureManagerDirect3D::ReserveColor (int /*r*/, int /*g*/, int /*b*/, bool /*privcolor*/)
+STDMETHODIMP csTextureManagerDirect3D::ReserveColor (int /*r*/, int /*g*/, int /*b*/)
 {
   return S_OK;
 }
