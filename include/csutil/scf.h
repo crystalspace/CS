@@ -62,6 +62,13 @@ struct iBase
   virtual void *QueryInterface (const char *iInterfaceID, int iVersion) = 0;
 };
 
+/// This macro should make use of IncRef() safer
+#define INC_REF(ptr) {if (ptr) {ptr->IncRef();}}
+
+/// This macro should make use of DecRef() safer
+#define DEC_REF(ptr) {if (ptr) {ptr->DecRef();}}
+
+
 /**
  * This macro should be embedded into any SCF-capable class definition
  * to declare the minimal functionality required by iBase interface.
