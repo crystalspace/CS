@@ -18955,7 +18955,7 @@ Re-enabled use of cs_snprintf as all seems to be well again.
 	  There are two kinds of clipping: portal clipping (clipping to the
 	  boundaries of the last portal we went through) and portalplane
 	  clipping (clipping to the plane of the portal itself). Both are
-	  handled separatelly.
+	  handled separately.
 	  There are three cases for both portal clipping as portalplane
 	  clipping (these are set in the fields clip_portal and clip_plane):
 	  	- No clipping required (CS_CLIP_NOT): in this case the
@@ -23158,7 +23158,7 @@ Re-enabled use of cs_snprintf as all seems to be well again.
 	- Modified WalkTest so that it will also recognize the children
 	  of csMeshWrapper and parse the KEY statements for them.
 	- Changed iCubeMeshObject to make it more general. You can now
-	  specify the sizes for x, y, and z separatelly. So the cube does
+	  specify the sizes for x, y, and z separately. So the cube does
 	  not have to be a cube anymore :-)
 	- Also added shift values so that you can shift the (0,0,0) point
 	  of the cube to another place.

@@ -82,7 +82,7 @@ and a flattened cylinder is sometimes difficult to texture.  Either the sides
 will be curved or the ends will be flattened.
 
 We probably want to texture the sides as a single rectangular area and
-each end as a rough circle.  So we Separate the ends from the sides.  This
+each end as a rough circle.  So we separate the ends from the sides.  This
 doubles the number of vertices.  Cutting one edge of the sides so it can be
 unwrapped adds two more vertices.
 

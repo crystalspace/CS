@@ -8,10 +8,11 @@ chronological order.
 
 2-Nov-2003
 	- Eric Sunshine performed project-wide spelling corrections:
-	    seperate   --> separate
-	    seperated  --> separated
-	    seperately --> separately
-	    seperation --> separation
+	    seperate    --> separate
+	    seperated   --> separated
+	    seperately  --> separately
+	    seperatelly --> separately
+	    seperation  --> separation
 1-Nov-2003
 	- Jorrit fixed a problem in Dynavis where history culling would
 	  invalidate the frustum mask that is used for hierarchical frustum

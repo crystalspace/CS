@@ -62,7 +62,7 @@ public:
    * Warning: the result of this function when 'p' is exactly on the plane
    * 0-v1-v2 is undefined. It should return 0 but it will not often do that
    * due to numerical inaccuracies. So you should probably test for this
-   * case separatelly.
+   * case separately.
    */
   static int WhichSide3D (const csVector3& p,
                           const csVector3& v1, const csVector3& v2)

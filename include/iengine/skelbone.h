@@ -33,7 +33,7 @@ SCF_VERSION (iSkeletonBone, 0, 0, 2);
 
 /**
  * A bone in the skeleton system. This is a separate interface
- * because it is used by the motion manager separatelly and it is
+ * because it is used by the motion manager separately and it is
  * possible that other skeletal systems also implement iSkeletonBone
  * (without having to implement iSkeletonConnectionState).
  */
