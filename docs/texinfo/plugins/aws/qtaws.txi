@@ -108,14 +108,26 @@ c:signalClicked,mySink::OnClick,signalBreak,
 
 If you coded your own @sc{aws} control you can still use QT to layout the control (at least the common parameters 
 like size and position). For this to work simply choose one of the supported controls and use it as a placeholder.
-Additionally set the @strong{tooltip/comment} property of that control to the name of your control class.
+Additionally you use the  token identifier 't' in the @strong{whatsThis} property of that control to name of your control class.
 
 Example:
 
 I have created my own push button control. The name of the control class is awsMyFancyPushButtonControl. Since it uses
 all the properties of the standard @sc{aws} command button i cleverly use the QPushButton as my placeholder and set all
 the properties i need and QPushButton already offers like size, position, button text and others. Additionally i set the
-@strong{tooltip/comment} to awsMyFancyPushButtonControl. This will result in:
+t token identifier in property @strong{whatsThis} to awsMyFancyPushButtonControl.
+
+@itemize
+@item class type token
+@itemize
+@item token identifier: t
+@item token text: the name of your class
+@item example:
+@example
+t:awsMyFancyPushButtonControl
+@end example
+
+This will be translated into
 
 @example
 component "hitmehard" is "awsMyFancyPushButtonControl"
@@ -124,3 +136,7 @@ component "hitmehard" is "awsMyFancyPushButtonControl"
   Caption: "update"
 @}
 @end example
+@end itemize
+@end itemize
+
+
