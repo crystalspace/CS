@@ -216,7 +216,7 @@ PLUGIN.POSTFLAGS=-mwindows -mconsole
 ifneq (,$(findstring command,$(SHELL))$(findstring COMMAND,$(SHELL))$(findstring cmd,$(SHELL))$(findstring CMD,$(SHELL)))
   DLLWRAPWRAP = bash libs/cssys/win32/dllwrapwrap.sh
 else
-  DLLWRAPWRAP = libs/cssys/win32/dllwrapwrap.sh
+  DLLWRAPWRAP = $(SHELL) libs/cssys/win32/dllwrapwrap.sh
 endif
 
 DO.SHARED.PLUGIN.CORE = \
