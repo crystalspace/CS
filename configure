@@ -14012,6 +14012,7 @@ ac_compiler_gnu=$ac_cv_c_compiler_gnu
 #	appropriate TARGET and TARGET_MAKEFILE makefile variables, and OS_FOO
 #	header define.
 #------------------------------------------------------------------------------
+cs_host_os_normalized=''
 
 
 
@@ -14043,6 +14044,7 @@ echo "${ECHO_T}no (assume MacOS/X)" >&6
 	cs_host_target=macosx
 	cs_host_makefile=libs/cssys/macosx/macosx.mak
 	cs_host_family=unix
+	cs_host_os_normalized='MacOS/X'
 	cs_header_text="${cs_header_text}#define OS_MACOSX
 "
 	cs_header_text="${cs_header_text}#define OS_MACOSX_PLUGIN_DIR \\\"components/\\\"
@@ -14085,19 +14087,31 @@ echo "${ECHO_T}$cs_cv_prog_objcxx" >&6
 	    ;;
     esac
 
+case $cs_host_family in
+    windows)
+	cs_header_text="${cs_header_text}#define OS_WIN32
+"
+	if test -z "$cs_host_os_normalized"; then
+  cs_host_os_normalized='Win32'
+fi
+
+	;;
+    unix)
+	cs_header_text="${cs_header_text}#define OS_UNIX
+"
+	if test -z "$cs_host_os_normalized"; then
+  cs_host_os_normalized='Unix'
+fi
+
+	;;
+esac
+
 cs_makefile_text="${cs_makefile_text}TARGET = $cs_host_target
 "
 cs_makefile_text="${cs_makefile_text}TARGET_MAKEFILE = $cs_host_makefile
 "
-cs_header_text="${cs_header_text}#define CS_PLATFORM_NAME \\\"$host_os\\\"
+cs_header_text="${cs_header_text}#define CS_PLATFORM_NAME \\\"$cs_host_os_normalized\\\"
 "
-
-case $cs_host_family in
-    windows) cs_header_text="${cs_header_text}#define OS_WIN32
-" ;;
-    unix) cs_header_text="${cs_header_text}#define OS_UNIX
-" ;;
-esac
 
 
 

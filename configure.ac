@@ -1342,6 +1342,7 @@ AC_LANG_POP([C])
 #	appropriate TARGET and TARGET_MAKEFILE makefile variables, and OS_FOO
 #	header define.
 #------------------------------------------------------------------------------
+cs_host_os_normalized=''
 AC_DEFUN([CS_CHECK_HOST],
     [AC_REQUIRE([AC_CANONICAL_HOST])
     case $host_os in
@@ -1378,6 +1379,7 @@ AC_DEFUN([_CS_CHECK_HOST_DARWIN],
 	cs_host_target=macosx
 	cs_host_makefile=libs/cssys/macosx/macosx.mak
 	cs_host_family=unix
+	cs_host_os_normalized='MacOS/X'
 	CS_HEADER_PROPERTY([OS_MACOSX])
 	CS_HEADER_PROPERTY([OS_MACOSX_PLUGIN_DIR],[CS_ESCAPE(["components/"])])
 	CS_MAKEFILE_PROPERTY([MACOSX.PLUGIN_DIR], [components])
@@ -1393,14 +1395,23 @@ AC_DEFUN([_CS_CHECK_HOST_DARWIN],
 
 CS_CHECK_HOST
 
+case $cs_host_family in
+    windows)
+	CS_HEADER_PROPERTY([OS_WIN32])
+	AS_IF([test -z "$cs_host_os_normalized"],
+	    [cs_host_os_normalized='Win32'])
+	;;
+    unix)
+	CS_HEADER_PROPERTY([OS_UNIX])
+	AS_IF([test -z "$cs_host_os_normalized"],
+	    [cs_host_os_normalized='Unix'])
+	;;
+esac
+
 CS_MAKEFILE_PROPERTY([TARGET], [$cs_host_target])
 CS_MAKEFILE_PROPERTY([TARGET_MAKEFILE], [$cs_host_makefile])
-CS_HEADER_PROPERTY([CS_PLATFORM_NAME],[CS_ESCAPE(["])$host_os[]CS_ESCAPE(["])])
-
-case $cs_host_family in
-    windows) CS_HEADER_PROPERTY([OS_WIN32]) ;;
-    unix) CS_HEADER_PROPERTY([OS_UNIX]) ;;
-esac
+CS_HEADER_PROPERTY([CS_PLATFORM_NAME],
+    [CS_ESCAPE(["])$cs_host_os_normalized[]CS_ESCAPE(["])])
 
 
 
