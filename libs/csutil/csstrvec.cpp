@@ -1,6 +1,6 @@
 /*
-    Crystal Space Windowing System: string vector class
-    Copyright (C) 1998,1999 by Andrew Zabolotny <bit@eltech.ru>
+    Crystal Space: string vector class
+    Copyright (C) 1998,1999,2000 by Andrew Zabolotny <bit@eltech.ru>
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -34,12 +34,16 @@ csStrVector::~csStrVector ()
 
 int csStrVector::Compare (csSome Item1, csSome Item2, int Mode) const
 {
-  (void)Mode;
-  return strcmp ((char *)Item1, (char *)Item2);
+  if (Mode == CASE_INSENSITIVE)
+    return strcasecmp ((const char*)Item1, (const char*)Item2);
+  else
+    return strcmp ((const char*)Item1, (const char*)Item2);
 }
 
 int csStrVector::CompareKey (csSome Item, csConstSome Key, int Mode) const
 {
-  (void)Mode;
-  return strcmp ((char *)Item, (char *)Key);
+  if (Mode == CASE_INSENSITIVE)
+    return strcasecmp ((const char*)Item, (const char*)Key);
+  else
+    return strcmp ((const char*)Item, (const char*)Key);
 }

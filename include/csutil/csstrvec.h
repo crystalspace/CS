@@ -1,6 +1,6 @@
 /*
-    Crystal Space Windowing System: string vector class
-    Copyright (C) 1998,1999 by Andrew Zabolotny <bit@eltech.ru>
+    Crystal Space: string vector class
+    Copyright (C) 1998,1999,2000 by Andrew Zabolotny <bit@eltech.ru>
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -17,8 +17,8 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __CSSTRVEC_H__
-#define __CSSTRVEC_H__
+#ifndef __CS_CSSTRVEC_H__
+#define __CS_CSSTRVEC_H__
 
 #include "csutil/csvector.h"
 
@@ -30,6 +30,13 @@
 class csStrVector : public csVector
 {
 public:
+  /**
+   * Use these values as the Mode argument of QuickSort(), Compare(), and
+   * CompareKey() in order to control case sensitivity during sorting and
+   * comparison.  (See csVector for a description of QuickSort()).
+   */
+  enum { CASE_SENSITIVE, CASE_INSENSITIVE };
+
   /// Constructor just passes control to csVector's
   csStrVector (int ilimit = 64, int ithreshold = 64) :
    csVector (ilimit, ithreshold) {}
@@ -51,4 +58,4 @@ public:
   { return (char *)csVector::Get (n); }
 };
 
-#endif // __CSSTRVEC_H__
+#endif // __CS_CSSTRVEC_H__
