@@ -34,7 +34,7 @@ There are already a few projects starting to use CS. Crystal Space is also
 not fully optimized yet. Performance is adequate provided you have a Pentium
 but things could certainly be better.
 
-We also have a very active developers team working to make it as useable as
+We also have a very active list of developers working to make Crystal Space as useable as
 possible.  We are are getting there :-)
 
 @node UsingForProject, Feature List, Current Status, CS Introduction
