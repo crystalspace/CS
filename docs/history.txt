@@ -35,17 +35,16 @@ chronological order.
           ODE needs number of tris * 3 to build the mesh data.
         - Mike Handverger added some notes in phystut regarding mesh colliders.
 4-Feb-2005
-	- Erotoman added new genmesh animation control plugin for skeletal animations
-	  Here are some features that plugin brings:
-		- ragdoll physics
-		- smooth blending between animations
-		- free bone control
-		- face animations and mimics
-		- various combinations between ragdoll, script animation and
-		  free bone rotation
-	- Erotoman added simple mesh in flarge level that demonstrates
-	  scripted skeletal animation.
-
+	- Erotoman added new genmesh animation control plugin for skeletal
+	  animations Here are some features that plugin brings:
+	    - ragdoll physics
+	    - smooth blending between animations
+	    - free bone control
+	    - face animations and mimics
+	    - various combinations between ragdoll, script animation and
+	      free bone rotation
+	- Erotoman added simple mesh in flarge level that demonstrates scripted
+	  skeletal animation.
 3-Feb-2005
 	- res added background loading for images. Doesn't work right yet and
 	  is still disabled.
