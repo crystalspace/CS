@@ -15,6 +15,11 @@ Short-term cleanups that need to be done:
 
 21-Dec-1999
 	- Change to build.pl and cssh.py from Brandon Ehle.
+	- Changes to MazeD from Andrew Zabolotny.
+	- Finally found the remaining bugs in the coverage mask tree
+	  implementation. I think the time is coming close that I can
+	  actually start benchmarking and optimizing the thing (which
+	  will be needed).
 20-Dec-1999
 	- Thomas also added support for resizing textures to power of
 	  two coordinates in the engine.

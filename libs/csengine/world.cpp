@@ -792,6 +792,11 @@ stop_processing = false;
   //@@@@@@@@@@@@
   covtree->MakeInvalid ();
     covtree->MakeEmpty ();
+    csVector2 verts[50];	// @@@ BAD! Hardcoded!
+    int i, num;
+    num = view->GetNumVertices ();
+    for (i = 0 ; i < num ; i++) verts[num-i-1] = view->GetVertex (i);
+    covtree->UpdatePolygonInverted (verts, num);
   }
 
   csSector* s = c->GetSector ();

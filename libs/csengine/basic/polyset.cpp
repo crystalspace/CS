@@ -582,7 +582,7 @@ if (stop_processing) return (void*)1;
             visible = c_buffer->InsertPolygon (clip->GetVertices (),
 		  clip->GetNumVertices ());
 	//@@@@@@@@@
-	if (covtree) covtree->TestConsistency ();
+	//if (covtree) covtree->TestConsistency ();
         }
       }
       if (visible)

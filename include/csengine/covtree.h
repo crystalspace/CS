@@ -57,6 +57,13 @@ public:
   virtual ~csCoverageMaskTree ();
 
   /**
+   * Initialize the coverage mask tree with an inverted
+   * polygon. This can be used after MakeEmpty() to set
+   * the coverage mask tree to the view frustrum.
+   */
+  void UpdatePolygonInverted (csVector2* verts, int num_verts);
+
+  /**
    * Insert a polygon into the coverage mask tree.
    * Return true if the tree was modified (i.e. if parts of the
    * polygon were visible.

@@ -76,12 +76,21 @@ public:
 #   endif
   }
 
-  /// Copy a coverage mask.
+  /// Copy a mask.
   void Copy (const csCovMask& mask)
   {
     in = mask.in;
 #   if defined(CS_CM_8x8)
       in2 = mask.in2;
+#   endif
+  }
+
+  /// Invert a mask.
+  void Invert ()
+  {
+    in = ~in;
+#   if defined(CS_CM_8x8)
+      in2 = ~in2;
 #   endif
   }
 
@@ -164,11 +173,10 @@ public:
 
   /**
    * Return true if this mask is partial.
-   * For a csCovMask this is always false.
    */
   bool IsPartial () const
   {
-    return false;
+    return !(IsFull () || IsEmpty ());
   }
 
   /**
@@ -256,6 +264,16 @@ public:
     out = mask.out;
 #   if defined(CS_CM_8x8)
       out2 = mask.out2;
+#   endif
+  }
+
+  /// Invert a coverage mask.
+  void Invert ()
+  {
+    csMask s;
+    s = in; in = out; out = s;
+#   if defined(CS_CM_8x8)
+      s = in2; in2 = out2; out2 = s;
 #   endif
   }
 
@@ -348,7 +366,7 @@ public:
    */
   bool IsPartial () const
   {
-    return (!IsFull ()) && (!IsEmpty ());
+    return !(IsFull () || IsEmpty ());
   }
 
   /**

@@ -533,7 +533,7 @@ void WalkTest::DrawFrame (time_t elapsed_time, time_t current_time)
       if (covtree)
       {
         Gfx2D->Clear (0);
-#	if 0
+#	if 1
 	extern csPolygon2D debug_poly2d;
 	covtree->GfxDump (Gfx2D, covtree_level);
 	debug_poly2d.Draw (Gfx2D, 0xf800);

@@ -80,6 +80,15 @@ public:
   	int hor_offs, int ver_offs);
 
   /**
+   * This function is similar to UpdatePolygon() but it
+   * inverts the polygon mask first. So it has the effect
+   * of updating for the inverted polygon.
+   */
+  bool UpdatePolygonInverted (csVector2* poly, int num_verts,
+  	float* dxdy, float* dydx,
+  	int hor_offs, int ver_offs);
+
+  /**
    * Test if a polygon is not empty for the given area on the
    * coverage mask tree without actually looking at the contents
    * of the tree. This is useful for testing polygon in empty
@@ -170,6 +179,14 @@ public:
   	float* dxdy, float* dydx,
   	int hor_offs, int ver_offs);
 
+  /**
+   * This function is similar to UpdatePolygon() but it
+   * inverts the polygon mask first. So it has the effect
+   * of updating for the inverted polygon.
+   */
+  bool UpdatePolygonInverted (csVector2* poly, int num_verts,
+  	float* dxdy, float* dydx,
+  	int hor_offs, int ver_offs);
   /**
    * Test if a polygon is not empty for the given area on the
    * coverage mask tree without actually looking at the contents

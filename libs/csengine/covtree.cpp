@@ -34,6 +34,182 @@ csCovMaskLUT* lut;
 #define PARTIAL(imsk,omsk) ((imsk & 1) == 0 && (omsk & 1) == 0)
 
 template <class Child>
+bool csCovTreeNode<Child>::TestPolygonNotEmpty (csVector2* poly, int num_poly,
+  	float* dxdy, float* dydx,
+	int hor_offs, int ver_offs) const
+{
+  csCovMaskTriage pol_mask = lut->GetTriageMask (poly, num_poly, dxdy, dydx,
+  	hor_offs, ver_offs, GetHorizontalSize (), GetVerticalSize ());
+
+  // Trivial case. If polygon mask is empty then nothing remains to be done.
+  if (pol_mask.IsEmpty ()) return false;
+
+  // Trivial case. If polygon mask is full we are visible.
+  if (pol_mask.IsFull ()) return true;
+
+  // Test all bits.
+  csMask traverse;
+  int bits, idx, col, row, new_hor_offs, new_ver_offs;
+
+  // First we compute the case where this function
+  // will return true (ignoring the children that need to be traversed).
+  // This case is where there is a bit in the 'in' mask that is true.
+  if (pol_mask.in) return true;
+# if defined(CS_CM_8x8)
+  if (pol_mask.in2) return true;
+# endif
+
+  // For every bit where the polygon mask is partial we have to
+  // traverse to the corresponding child to see if we have visibility
+  // or not. We put the bit-mask for this case in 'traverse'.
+  // Since we already know that 'in' has no bits set to 1 (previous test)
+  // we need only look at 'out'.
+  traverse = ~pol_mask.out;
+
+  idx = 0;		// Index for computing column/row in mask.
+# if defined(CS_CM_8x8)
+  bool looped = false;
+again:
+# endif
+  if (traverse)
+  {
+    bits = CS_CM_MASKBITS;
+    while (bits > 0)
+    {
+      if (traverse & 1)
+      {
+        col = idx & CS_CM_HORMASK;
+        row = idx >> CS_CM_HORSHIFT;
+        new_hor_offs = hor_offs + col * Child::GetHorizontalSize ();
+        new_ver_offs = ver_offs + row * Child::GetVerticalSize ();
+        if (children[idx].TestPolygonNotEmpty (poly, num_poly, dxdy, dydx,
+		new_hor_offs, new_ver_offs))
+	  return true;
+      }
+
+      // Go to next bit.
+      traverse >>= 1;
+      bits--;
+      idx++;
+    }
+  }
+
+# if defined(CS_CM_8x8)
+  if (!looped)
+  {
+    traverse = ~pol_mask.out2;
+    idx = CS_CM_MASKBITS;
+    looped = true;
+    goto again;
+  }
+# endif
+
+  return false;
+}
+
+template <class Child>
+bool csCovTreeNode<Child>::TestPolygon (csVector2* poly, int num_poly,
+  	float* dxdy, float* dydx,
+	int hor_offs, int ver_offs) const
+{
+  // Trivial case. If this mask is full then nothing remains to be done.
+  if (IsFull ()) return false;
+
+  // If this mask is empty then we cannot depend on the state of the
+  // children being ok. So we call TestPolygonNotEmpty() which will test
+  // if the polygon is actually there in this mask part (while ignoring
+  // the tree which is empty anyway).
+  if (IsEmpty ()) return TestPolygonNotEmpty (poly, num_poly, dxdy, dydx,
+  	hor_offs, ver_offs);
+
+  csCovMaskTriage pol_mask = lut->GetTriageMask (poly, num_poly, dxdy, dydx,
+  	hor_offs, ver_offs, GetHorizontalSize (), GetVerticalSize ());
+
+  // Trivial case. If polygon mask is empty then nothing remains to be done.
+  if (pol_mask.IsEmpty ()) return false;
+
+  // Trivial case. If polygon mask is full we are visible.
+  if (pol_mask.IsFull ()) return true;
+
+  // Test all bits.
+  csMask traverse, traverse_empty;
+  int bits, idx, col, row, new_hor_offs, new_ver_offs;
+
+  // First we compute the case where this function
+  // will return true (ignoring the children that need to be traversed).
+  // This case is where there exists a bit in this mask that is empty
+  // or partial and the corresponding bit in the polygon mask is full.
+  if (~((~pol_mask.in) | pol_mask.out | in)) return true;
+# if defined(CS_CM_8x8)
+  if (~((~pol_mask.in2) | pol_mask.out2 | in2)) return true;
+# endif
+
+  // For every bit where this mask is empty and the
+  // corresponding bit in the polygon mask is partial we have to
+  // continue testing the polygon for the empty sub-tree of
+  // the corresponding child.
+  traverse_empty = ~(pol_mask.in | pol_mask.out | in | ~out);
+
+  // For every bit where this mask is partial and the
+  // corresponding bit in the polygon mask is also partial we have to
+  // traverse to the corresponding child to see if we have visibility
+  // or not. We put the bit-mask for this case in 'traverse'.
+  traverse = ~(pol_mask.in | pol_mask.out | in | out);
+
+  idx = 0;		// Index for computing column/row in mask.
+# if defined(CS_CM_8x8)
+  bool looped = false;
+again:
+# endif
+  if (traverse || traverse_empty)
+  {
+    bits = CS_CM_MASKBITS;
+    while (bits > 0)
+    {
+      if (traverse_empty & 1)
+      {
+        col = idx & CS_CM_HORMASK;
+        row = idx >> CS_CM_HORSHIFT;
+        new_hor_offs = hor_offs + col * Child::GetHorizontalSize ();
+        new_ver_offs = ver_offs + row * Child::GetVerticalSize ();
+        if (children[idx].TestPolygonNotEmpty (poly, num_poly, dxdy, dydx,
+		new_hor_offs, new_ver_offs))
+	  return true;
+      }
+      if (traverse & 1)
+      {
+        col = idx & CS_CM_HORMASK;
+        row = idx >> CS_CM_HORSHIFT;
+        new_hor_offs = hor_offs + col * Child::GetHorizontalSize ();
+        new_ver_offs = ver_offs + row * Child::GetVerticalSize ();
+        if (children[idx].TestPolygon (poly, num_poly, dxdy, dydx,
+		new_hor_offs, new_ver_offs))
+	  return true;
+      }
+
+      // Go to next bit.
+      traverse >>= 1;
+      traverse_empty >>= 1;
+      bits--;
+      idx++;
+    }
+  }
+
+# if defined(CS_CM_8x8)
+  if (!looped)
+  {
+    traverse_empty = ~(pol_mask.in2 | pol_mask.out2 | in2 | ~out2);
+    traverse = ~(pol_mask.in2 | pol_mask.out2 | in2 | out2);
+    idx = CS_CM_MASKBITS;
+    looped = true;
+    goto again;
+  }
+# endif
+
+  return false;
+}
+
+template <class Child>
 bool csCovTreeNode<Child>::UpdatePolygon (csVector2* poly, int num_poly,
   	float* dxdy, float* dydx,
 	int hor_offs, int ver_offs)
@@ -163,61 +339,77 @@ again:
 }
 
 template <class Child>
-bool csCovTreeNode<Child>::TestPolygonNotEmpty (csVector2* poly, int num_poly,
+bool csCovTreeNode<Child>::UpdatePolygonInverted (csVector2* poly, int num_poly,
   	float* dxdy, float* dydx,
-	int hor_offs, int ver_offs) const
+	int hor_offs, int ver_offs)
 {
-  csCovMaskTriage pol_mask = lut->GetTriageMask (poly, num_poly, dxdy, dydx,
-  	hor_offs, ver_offs, GetHorizontalSize (), GetVerticalSize ());
+  // Copy polygon mask to this one.
+  Copy (lut->GetTriageMask (poly, num_poly, dxdy, dydx,
+  	hor_offs, ver_offs, GetHorizontalSize (), GetVerticalSize ()));
+  
+  // Invert this mask.
+  Invert ();
 
-  // Trivial case. If polygon mask is empty then nothing remains to be done.
-  if (pol_mask.IsEmpty ()) return false;
+  // Trivial case. If mask is empty then nothing remains to be done.
+  if (IsEmpty ()) return false;
 
-  // Trivial case. If polygon mask is full we are visible.
-  if (pol_mask.IsFull ()) return true;
+  // Trivial case. If mask is full then we can simply return true
+  // and nothing remains to be done.
+  if (IsFull ()) return true;
 
-  // Test all bits.
-  csMask traverse;
-  int bits, idx, col, row, new_hor_offs, new_ver_offs;
+  // Compute a combined mask of in and out so that we can
+  // quickly discover all partial childs.
+  csMask partial = ~(in | out);
 
-  // First we compute the case where this function
-  // will return true (ignoring the children that need to be traversed).
-  // This case is where there is a bit in the 'in' mask that is true.
-  if (pol_mask.in) return true;
-# if defined(CS_CM_8x8)
-  if (pol_mask.in2) return true;
-# endif
+  // Mask for setting this mask to inside for all children that
+  // are full after traversing.
+  csMask setinside = 0;
 
-  // For every bit where the polygon mask is partial we have to
-  // traverse to the corresponding child to see if we have visibility
-  // or not. We put the bit-mask for this case in 'traverse'.
-  // Since we already know that 'in' has no bits set to 1 (previous test)
-  // we need only look at 'out'.
-  traverse = ~pol_mask.out;
+  // Mask for setting this mask to outside for all children that
+  // are empty after traversing.
+  csMask setoutside = 0;
 
-  idx = 0;		// Index for computing column/row in mask.
+  int bits;
+  int idx = 0;		// Index for computing column/row in mask.
+  int col, row, new_hor_offs, new_ver_offs;
+
+  bool modified = false;
+
 # if defined(CS_CM_8x8)
   bool looped = false;
 again:
-# endif
-  if (traverse)
+#endif
+  if (partial)
   {
     bits = CS_CM_MASKBITS;
     while (bits > 0)
     {
-      if (traverse & 1)
+      // If partial then we traverse to the child to update that.
+      if (partial & 1)
       {
+        // Partial. Update child.
         col = idx & CS_CM_HORMASK;
         row = idx >> CS_CM_HORSHIFT;
         new_hor_offs = hor_offs + col * Child::GetHorizontalSize ();
         new_ver_offs = ver_offs + row * Child::GetVerticalSize ();
-        if (children[idx].TestPolygonNotEmpty (poly, num_poly, dxdy, dydx,
+	if (children[idx].UpdatePolygonInverted (poly, num_poly, dxdy, dydx,
 		new_hor_offs, new_ver_offs))
-	  return true;
+	{
+	  if (children[idx].IsFull ())
+	    setinside |= 1 << (CS_CM_MASKBITS-bits);
+	  modified = true;
+	}
+	else
+	{
+	  // If no modification then it is possible that child
+	  // is empty.
+	  if (children[idx].IsEmpty ())
+	    setoutside |= 1 << (CS_CM_MASKBITS-bits);
+	}
       }
 
       // Go to next bit.
-      traverse >>= 1;
+      partial >>= 1;
       bits--;
       idx++;
     }
@@ -226,99 +418,58 @@ again:
 # if defined(CS_CM_8x8)
   if (!looped)
   {
-    traverse = ~pol_mask.out2;
+    if (setinside != 0)
+    {
+      // Set 'inside' mode for all bits in 'setinside'.
+      in |= setinside;
+      out &= ~setinside;
+    }
+    if (setoutside != 0)
+    {
+      // Set 'outside' mode for all bits in 'setoutside'.
+      in &= ~setoutside;
+      out |= setoutside;
+    }
+    partial = ~(in2 | out2);
+    setinside = 0;
+    setoutside = 0;
     idx = CS_CM_MASKBITS;
     looped = true;
     goto again;
   }
-# endif
-
-  return false;
-}
-
-template <class Child>
-bool csCovTreeNode<Child>::TestPolygon (csVector2* poly, int num_poly,
-  	float* dxdy, float* dydx,
-	int hor_offs, int ver_offs) const
-{
-  // Trivial case. If this mask is full then nothing remains to be done.
-  if (IsFull ()) return false;
-
-  // If this mask is empty then we cannot depend on the state of the
-  // children being ok. So we call TestPolygonNotEmpty() which will test
-  // if the polygon is actually there in this mask part (while ignoring
-  // the tree which is empty anyway).
-  if (IsEmpty ()) return TestPolygonNotEmpty (poly, num_poly, dxdy, dydx,
-  	hor_offs, ver_offs);
-
-  csCovMaskTriage pol_mask = lut->GetTriageMask (poly, num_poly, dxdy, dydx,
-  	hor_offs, ver_offs, GetHorizontalSize (), GetVerticalSize ());
-
-  // Trivial case. If polygon mask is empty then nothing remains to be done.
-  if (pol_mask.IsEmpty ()) return false;
-
-  // Trivial case. If polygon mask is full we are visible.
-  if (pol_mask.IsFull ()) return true;
-
-  // Test all bits.
-  csMask traverse;
-  int bits, idx, col, row, new_hor_offs, new_ver_offs;
-
-  // First we compute the case where this function
-  // will return true (ignoring the children that need to be traversed).
-  // This case is where there exists a bit in this mask that is empty
-  // or partial and the corresponding bit in the polygon mask is full.
-  if (~((~pol_mask.in) | pol_mask.out | in)) return true;
-# if defined(CS_CM_8x8)
-  if (~((~pol_mask.in2) | pol_mask.out2 | in2)) return true;
-# endif
-
-  // For every bit where this mask is empty or partial and the
-  // corresponding bit in the polygon mask is partial we have to
-  // traverse to the corresponding child to see if we have visibility
-  // or not. We put the bit-mask for this case in 'traverse'.
-  traverse = ~(pol_mask.in | pol_mask.out | in);
-
-  idx = 0;		// Index for computing column/row in mask.
-# if defined(CS_CM_8x8)
-  bool looped = false;
-again:
-# endif
-  if (traverse)
+  else
   {
-    bits = CS_CM_MASKBITS;
-    while (bits > 0)
+    if (setinside != 0)
     {
-      if (traverse & 1)
-      {
-        col = idx & CS_CM_HORMASK;
-        row = idx >> CS_CM_HORSHIFT;
-        new_hor_offs = hor_offs + col * Child::GetHorizontalSize ();
-        new_ver_offs = ver_offs + row * Child::GetVerticalSize ();
-        if (children[idx].TestPolygon (poly, num_poly, dxdy, dydx,
-		new_hor_offs, new_ver_offs))
-	  return true;
-      }
-
-      // Go to next bit.
-      traverse >>= 1;
-      bits--;
-      idx++;
+      // Set 'inside' mode for all bits in 'setinside'.
+      in2 |= setinside;
+      out2 &= ~setinside;
+    }
+    if (setoutside != 0)
+    {
+      // Set 'outside' mode for all bits in 'setoutside'.
+      in2 &= ~setoutside;
+      out2 |= setoutside;
     }
   }
-
-# if defined(CS_CM_8x8)
-  if (!looped)
+# else
+  if (setinside != 0)
   {
-    traverse = ~(pol_mask.in2 | pol_mask.out2 | in2);
-    idx = CS_CM_MASKBITS;
-    looped = true;
-    goto again;
+    // Set 'inside' mode for all bits in 'setinside'.
+    in |= setinside;
+    out &= ~setinside;
+  }
+  if (setoutside != 0)
+  {
+    // Set 'outside' mode for all bits in 'setoutside'.
+    in &= ~setoutside;
+    out |= setoutside;
   }
 # endif
 
-  return false;
+  return modified;
 }
+
 
 template <class Child>
 bool csCovTreeNode<Child>::InsertPolygon (csVector2* poly, int num_poly,
@@ -669,6 +820,20 @@ bool csCovTreeNode0::UpdatePolygon (csVector2* poly, int num_poly,
   return true;
 }
 
+bool csCovTreeNode0::UpdatePolygonInverted (csVector2* poly, int num_poly,
+  	float* dxdy, float* dydx,
+	int hor_offs, int ver_offs)
+{
+  Copy (lut->GetMask (poly, num_poly, dxdy, dydx,
+  	hor_offs, ver_offs, GetHorizontalSize (), GetVerticalSize ()));
+  Invert ();
+
+  // Trivial case. If mask is empty then nothing remains to be done.
+  if (IsEmpty ()) return false;
+
+  return true;
+}
+
 bool csCovTreeNode0::TestPolygonNotEmpty (csVector2* poly, int num_poly,
   	float* dxdy, float* dydx,
 	int hor_offs, int ver_offs) const
@@ -834,6 +999,40 @@ csCoverageMaskTree::~csCoverageMaskTree ()
 # else
   CHK (delete (csCovTreeNode4*)tree);
 # endif
+}
+
+void csCoverageMaskTree::UpdatePolygonInverted (csVector2* verts, int num_verts)
+{
+  // @@@ Configurable!
+# if defined(CS_CM_8x8)
+  csCovTreeNode3* tree3 = (csCovTreeNode3*)tree;
+# else
+  csCovTreeNode4* tree3 = (csCovTreeNode4*)tree;
+# endif
+
+  float dxdy[100], dydx[100];	// @@@ HARDCODED BAD!
+  int i, i1;
+  i1 = num_verts-1;
+  // @@@ Can we somehow combine the next divides with the
+  // perspective correction divides that are done earlier?
+  for (i = 0 ; i < num_verts ; i++)
+  {
+    float dx = verts[i].x - verts[i1].x;
+    float dy = verts[i].y - verts[i1].y;
+dy=-dy;
+    if (dy >= 0 && dy < SMALL_EPSILON) dy = SMALL_EPSILON;
+    else if (dy <= 0 && dy > -SMALL_EPSILON) dy = -SMALL_EPSILON;
+    dxdy[i1] = dx / dy;
+    dy = verts[i].y - verts[i1].y;
+dy=-dy;
+    if (dx >= 0 && dx < SMALL_EPSILON) dx = SMALL_EPSILON;
+    else if (dx <= 0 && dx > -SMALL_EPSILON) dx = -SMALL_EPSILON;
+    dydx[i1] = dy / dx;
+    i1 = i;
+  }
+
+  ::lut = lut;
+  tree3->UpdatePolygonInverted (verts, num_verts, dxdy, dydx, 0, 0);
 }
 
 bool csCoverageMaskTree::InsertPolygon (csVector2* verts, int num_verts,
