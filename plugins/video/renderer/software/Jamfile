@@ -4,7 +4,6 @@ if $(CMD.NASM) && $(TARGET.PROCESSOR) = "X86"
 {
   SearchSubdir i386 ;
   ASMFILES = [ Wildcard i386 : *.asm *.cpp *.h ] ;
-  ASFLAGS on $(ASMFILES) += -DOS=$(TARGET.OS) -DPROC=$(TARGET.PROCessor) -DCOMP=$(COMPILER.TYPE) ;
 }
 else
 {
