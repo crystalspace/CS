@@ -1,5 +1,8 @@
 The history order is reversed so that new features are at the top.
 
+8-Jul-2001
+	- Fixed a bug in the destructor of the emit particle system
+	  which could cause crashes at exit.
 6-Jul-2001
 	- Fixed a bug in Blocks with the vertical raster lines. Some of
 	  them were visible from the wrong side.

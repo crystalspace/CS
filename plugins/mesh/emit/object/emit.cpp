@@ -592,7 +592,7 @@ csEmitMeshObject::~csEmitMeshObject()
   {
     np = p->next;
     delete p;
-    p = p->next;
+    p = np;
   }
 }
 
