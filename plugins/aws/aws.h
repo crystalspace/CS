@@ -176,12 +176,8 @@ public:
   /// Find a component factory
   virtual iAwsComponentFactory *FindComponentFactory (char *name);
 
-
-
   /// Create an embeddable component from a component name.
-
   virtual iAwsComponent *CreateEmbeddableComponentFrom(char *name);
-
 
   /// Get the top window
   virtual iAwsComponent *GetTopComponent ();
