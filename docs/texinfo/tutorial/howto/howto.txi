@@ -21,6 +21,7 @@ code.
 * HOWTO Level Loading:: Loading a Level
 * HOWTO Pixmaps:: Loading Images for Pixmaps
 * HOWTO Render Priorities:: Render Priorities and Objects in Sectors
+* HOWTO Creating an external CS app:: Creating an external CS application
 * HOWTO Creating an external MSVC CS app:: Creating an external MSVC CS application
 @end menu
 
@@ -32,5 +33,6 @@ code.
 @importss{tutorial,howto,levload.txi}
 @importss{tutorial,howto,pixmap.txi}
 @importss{tutorial,howto,rendpri.txi}
+@importss{tutorial,howto,project.txi}
 @importsss{tutorial,howto,msvcproj,msvcproj.txi}
 

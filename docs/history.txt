@@ -18,6 +18,9 @@ The history order is reversed so that new features are at the top.
 	  as a template for a project that uses Crystal Space. It has to
 	  be used together with cs-config. I'm planning a howto for this
 	  very soon now.
+	- Added a new howto which explains how to use Crystal Space in
+	  an external application using the new cs-config script that Matze
+	  added.
 22-Oct-2001
 	- Fixed a bug in the 'addghost' console command. It would fail
 	  if you used it more than once.
