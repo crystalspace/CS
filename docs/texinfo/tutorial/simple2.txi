@@ -1,5 +1,5 @@
 @c -*-texinfo-*-
-@node Tutorial Simple 2, Simple Tutorial, Tutorial Introduction, Tutorials
+@node Tutorial Simple 2, map2cs Tutorial, Tutorial Simple, Tutorials
 @section Simple Tutorial 2
 @cindex Tutorial, Simple, Sprite, VFS, Texture
 @cindex Simple Tutorial 2
@@ -35,9 +35,9 @@ a texture named 'spark'. So we'll have to load that texture as well. This
 can also be found in @file{standard.zip} at the path @file{/lib/std/spark.png}.
 
 @menu
-* Simple Loading Texture:: Loading a Texture
-* Simple Loading Sprite Template:: Loading the Sprite Template
-* Simple Creating Sprite:: Creating the Sprite
+* Simple Loading Texture:: Loading a Texture in Memory
+* Simple Loading Sprite Template:: Loading a Sprite Template in Memory
+* Simple Creating Sprite:: Creating a Sprite from a Template
 @end menu
 
 @node Simple Loading Texture, Simple Loading Sprite Template, Tutorial Simple 2, Tutorial Simple 2

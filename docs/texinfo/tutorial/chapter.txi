@@ -9,8 +9,8 @@ environment.
 
 @menu
 * Tutorial Introduction:: Developing a Crystal Space Application
-* Tutorial Simple:: Simple Tutorial (Starting a World)
-* Tutorial Simple 2:: Simple Tutorial (VFS, Adding a Sprite)
+* Tutorial Simple:: Simple Tutorial
+* Tutorial Simple 2:: Simple Tutorial 2
 * map2cs Tutorial:: @code{map2cs} Tutorial
 * Tutorial CrystalClear:: A CrystalClear Tutorial
 @end menu

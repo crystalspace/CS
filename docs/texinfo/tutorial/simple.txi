@@ -1,5 +1,5 @@
 @c -*-texinfo-*-
-@node Tutorial Simple, Simple Tutorial 2, Tutorial Introduction, Tutorials
+@node Tutorial Simple, Tutorial Simple 2, Tutorial Introduction, Tutorials
 @section Simple Tutorial
 @cindex Tutorial, Simple
 @cindex Simple Tutorial
