@@ -36,6 +36,9 @@ The history order is reversed so that new features are at the top.
       than NSMenuItem*.
     - Andrew Craig added a NULL check in the Thing plugin where it was trying 
       to use a SuperlightMap object that the null renderer does not create.
+    - Andreas Busch fixed 686 processor family reporting in new and old
+      software renderer for higher processors like P4 (e.g. family 15,
+      which resulted in "1586 CPU detected" message).
 22-Jul-2003
         - Philip Wyett fixed inconsistent swig -I flag in make build and
       aligning it with jam build.  cs_pyth.cpp will now be identical
