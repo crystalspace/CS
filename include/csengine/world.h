@@ -266,9 +266,7 @@ private:
   csQuadcube* quadcube;
 
   ///
-  void ShineLights ();
-  ///
-  void CreateLightMaps (IGraphics3D* g3d);
+  void ShineLights (IGraphics3D* g3d);
 
 public:
   /**

@@ -200,7 +200,7 @@ csWorld::csWorld () : csObject (), start_vec (0, 0, 0)
 
   csVector3 min_qbox (-10, -10, -10);
   csVector3 max_qbox (10, 10, 10);
-  CHK (quadcube = new csQuadcube (min_qbox, max_qbox, 5)); //@@@ SET HIGHER
+  CHK (quadcube = new csQuadcube (min_qbox, max_qbox, 8));
 
   CHK (render_pol2d_pool = new csPoly2DPool (csPolygon2DFactory::SharedFactory()));
   CHK (lightpatch_pool = new csLightPatchPool ());
@@ -412,10 +412,7 @@ bool csWorld::Prepare (IGraphics3D* g3d)
 
   // Prepare lightmaps if we have any sectors
   if (sectors.Length ())
-  {
-    ShineLights ();
-    CreateLightMaps (g3d);
-  }
+    ShineLights (g3d);
 
   if (!SUCCEEDED (g3d->QueryInterface(IID_IHaloRasterizer, (void**)&piHR)))
     piHR = NULL;
@@ -423,7 +420,7 @@ bool csWorld::Prepare (IGraphics3D* g3d)
   return true;
 }
 
-void csWorld::ShineLights ()
+void csWorld::ShineLights (IGraphics3D* g3d)
 {
   tr_manager.NewFrame ();
 
@@ -576,7 +573,7 @@ void csWorld::ShineLights ()
   }
 
   meter.SetTotal (light_count);
-  CsPrintf(MSG_INITIALIZATION, "\nShining lights (%d lights):\n  ", light_count);
+  CsPrintf (MSG_INITIALIZATION, "\nShining lights (%d lights):\n  ", light_count);
   lit->Restart ();
   while ((l = lit->Fetch ()) != NULL)
   {
@@ -588,7 +585,7 @@ void csWorld::ShineLights ()
   // and remap all lightmaps.
   if (csPolygon3D::do_lightmap_highqual && csPolygon3D::do_force_recalc)
   {
-    CsPrintf(MSG_INITIALIZATION, "\nScaling lightmaps (%d maps):\n  ", polygon_count);
+    CsPrintf (MSG_INITIALIZATION, "\nScaling lightmaps (%d maps):\n  ", polygon_count);
     csPolygon3D::def_mipmap_size *= 2;
     meter.SetTotal (polygon_count);
     pit->Restart ();
@@ -600,33 +597,32 @@ void csWorld::ShineLights ()
   }
 
   meter.SetTotal (num_sectors);
-  CsPrintf(MSG_INITIALIZATION, "\nCaching lightmaps (%d sectors):\n  ", num_sectors);
+  CsPrintf (MSG_INITIALIZATION, "\nCaching lightmaps (%d sectors):\n  ", num_sectors);
   for (sn = 0; sn < num_sectors ; sn++)
   {
     csSector* s = (csSector*)sectors[sn];
     s->CacheLightMaps ();
     meter.Step();
   }
-  CsPrintf (MSG_INITIALIZATION,"\n");
+
+  CsPrintf (MSG_INITIALIZATION, "\nPreparing lightmaps (%d maps):\n  ", polygon_count);
+  meter.SetTotal (polygon_count);
+  pit->Restart ();
+  while ((p = pit->Fetch ()) != NULL)
+  {
+    p->CreateLightMaps (g3d);
+    meter.Step();
+  }
 
   csPolygonSet::current_light_frame_number++;
 
+  CsPrintf (MSG_INITIALIZATION, "\nUpdating VFS...\n");
   if (!VFS->Sync ())
     CsPrintf (MSG_WARNING, "WARNING: error updating lighttable cache!\n");
+  CsPrintf (MSG_INITIALIZATION, "DONE!\n");
 
   CHK (delete pit);
   CHK (delete lit);
-}
-
-void csWorld::CreateLightMaps (IGraphics3D* g3d)
-{
-  int sn = sectors.Length ();
-  while (sn > 0)
-  {
-    sn--;
-    csSector* s = (csSector*)sectors[sn];
-    s->CreateLightMaps (g3d);
-  }
 }
 
 void csWorld::StartWorld ()
