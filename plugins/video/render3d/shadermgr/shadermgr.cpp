@@ -783,7 +783,8 @@ bool csShaderTechnique::Load(iDocumentNode* node)
         {
           csRef<iShaderPass> pass = CreatePass();
           pass->Load(child);
-          passes->Push(pass);
+		  // CreatePass already pushes this
+          // passes->Push(pass);
         }
         break;
       }
