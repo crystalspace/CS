@@ -185,7 +185,6 @@ void csTriangleArrayPolygonBuffer::Clear ()
 void csTriangleArrayPolygonBuffer::AddPolygon (int num_verts,
 	int* verts,
 	csPolyTextureMapping* tmapping,
-	csPolyLightMapMapping* mapping,
 	/*csVector2* texcoords,
 	csVector2* lmcoords,*/
 	const csPlane3& poly_normal,
@@ -244,7 +243,7 @@ void csTriangleArrayPolygonBuffer::AddPolygon (int num_verts,
   csTransform obj2tex (m_obj2tex, v_obj2tex);
 
   csTransform tex2lm;
-  if (mapping && lm)
+  if (lm)
   {
     struct csPolyLMCoords
     {

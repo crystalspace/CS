@@ -85,7 +85,6 @@ void csPolArrayPolygonBuffer::MarkLightmapsDirty()
 void csPolArrayPolygonBuffer::AddPolygon (int num_verts,
 				  	  int* verts,
 					  csPolyTextureMapping* texmap,
-					  csPolyLightMapMapping* lmap,
 					  const csPlane3& poly_normal,
 					  int mat_index,
 					  iRendererLightmap* lm)
@@ -108,7 +107,6 @@ void csPolArrayPolygonBuffer::AddPolygon (int num_verts,
   //pol.t_obj2tex = t_obj2tex;
   //pol.t_obj2lm = t_obj2lm;
   pol.texmap = texmap;
-  pol.lmap = lmap;
   pol.normal = poly_normal;
   pol.mat_index = mat_index;
   pol.rlm = lm;

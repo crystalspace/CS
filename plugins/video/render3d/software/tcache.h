@@ -139,9 +139,7 @@ protected:
   csSoftwareTextureManager *texman;
 
 public:
-  void (csSoftwareTextureCache::*create_lighted_texture)
-                        (
-			 csPolyLightMapMapping* mapping,
+  void (csSoftwareTextureCache::*create_lighted_texture) (
 			 csPolyTextureMapping* tmapping,
 			 csSoftRendererLightmap* rlm, 
 			 SoftwareCachedTexture *ct,
@@ -150,7 +148,6 @@ public:
 		         float u_min, float v_min, float u_max, float v_max);
 
   void create_lighted_texture_8 (
-				 csPolyLightMapMapping* mapping,
 				 csPolyTextureMapping* tmapping,
 				 csSoftRendererLightmap* rlm, 
 				 SoftwareCachedTexture *ct,
@@ -160,7 +157,6 @@ public:
 				 float u_max, float v_max);
 
   void create_lighted_texture_555(
-				  csPolyLightMapMapping* mapping,
 				  csPolyTextureMapping* tmapping,
 				  csSoftRendererLightmap* rlm, 
 				  SoftwareCachedTexture *ct,
@@ -170,7 +166,6 @@ public:
 				  float u_max, float v_max);
 
   void create_lighted_texture_565(
-				  csPolyLightMapMapping* mapping,
 				  csPolyTextureMapping* tmapping,
 				  csSoftRendererLightmap* rlm, 
 				  SoftwareCachedTexture *ct,
@@ -180,7 +175,6 @@ public:
 				  float u_max, float v_max);
 
   void create_lighted_texture_888(
-				  csPolyLightMapMapping* mapping,
 				  csPolyTextureMapping* tmapping,
 				  csSoftRendererLightmap* rlm, 
 				  SoftwareCachedTexture *ct,
@@ -213,7 +207,6 @@ public:
    * least used texture is discarded.
    */
   SoftwareCachedTexture *cache_texture (int MipMap,      
-    csPolyLightMapMapping* mapping,
     csPolyTextureMapping* tmapping,
     csSoftRendererLightmap* rlm,
     iTextureHandle* itexh);
@@ -231,7 +224,6 @@ public:
    * will be recomputed.
    */
   void fill_texture (int MipMap,
-		     csPolyLightMapMapping* mapping,
 		     csPolyTextureMapping* tmapping,
 		     csSoftRendererLightmap* rlm, 
                      csSoftwareTextureHandle *tex_mm,

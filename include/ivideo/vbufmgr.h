@@ -40,7 +40,6 @@ class csColor;
 class csTransform;
 struct iMaterialHandle;
 struct csPolyTextureMapping;
-struct csPolyLightMapMapping;
 
 SCF_VERSION (iVertexBuffer, 0, 1, 1);
 
@@ -167,7 +166,6 @@ struct iPolygonBuffer : public iBase
   virtual void AddPolygon (int num_verts,
 	int* verts,
 	csPolyTextureMapping* texmap,
-	csPolyLightMapMapping* lmap,
 	const csPlane3& poly_normal,
 	int mat_index,
 	iRendererLightmap* lm) = 0;

@@ -34,10 +34,12 @@ csShadowMap::csShadowMap ()
 {
   Light = 0;
   max_shadow = 255;  // use worst case until calc'd
+  array = 0;
 }
 
 csShadowMap::~csShadowMap ()
 {
+  delete[] array;
 }
 
 void csShadowMap::Alloc (iLight *l, int w, int h)
@@ -46,17 +48,15 @@ void csShadowMap::Alloc (iLight *l, int w, int h)
 
   int lw = csLightMap::CalcLightMapWidth (w);
   int lh = csLightMap::CalcLightMapHeight (h);
-  csShadowMapHelper::SetLength (lw * lh);
-  memset (GetArray (), 0, Length ());
+  array = new unsigned char[lw * lh];
+  memset (array, 0, lw*lh);
 }
 
-void csShadowMap::CalcMaxShadow()
+void csShadowMap::CalcMaxShadow (long lmsize)
 {
   max_shadow=0;
-  int len = Length ();
-  for (int i=0; i<len; i++)
-      if (GetArray()[i] > max_shadow)
-          max_shadow = GetArray()[i];
+  for (int i=0; i<lmsize; i++)
+    if (array[i] > max_shadow) max_shadow = array[i];
 }
 
 //---------------------------------------------------------------------------
@@ -67,8 +67,10 @@ int csLightMap::default_lightmap_cell_size = 16;
 csLightMap::csLightMap ()
 {
   first_smap = 0;
-  mean_recalc = true;
-  max_static_color_values.Set(255,255,255);  // use slowest safest method by default
+  // Use slowest safest method by default.
+  max_static_color_values.Set (255,255,255);
+  static_lm = 0;
+  real_lm = 0;
 }
 
 csLightMap::~csLightMap ()
@@ -80,8 +82,8 @@ csLightMap::~csLightMap ()
     first_smap = smap;
   }
 
-  static_lm.DeleteAll ();
-  real_lm.DeleteAll ();
+  delete[] static_lm;
+  delete[] real_lm;
 }
 
 void csLightMap::SetLightCellSize (int size)
@@ -137,19 +139,19 @@ csShadowMap *csLightMap::FindShadowMap (iLight *light)
 
 void csLightMap::SetSize (int w, int h)
 {
-  rwidth = lwidth = csLightMap::CalcLightMapWidth (w);
-  rheight = lheight = csLightMap::CalcLightMapHeight (h);
-  lm_size = lwidth * lheight;
+  lwidth = csLightMap::CalcLightMapWidth (w);
+  lheight = csLightMap::CalcLightMapHeight (h);
 }
 
 void csLightMap::Alloc (int w, int h, int r, int g, int b)
 {
   SetSize (w, h);
-  static_lm.DeleteAll ();
-  real_lm.DeleteAll ();
+  delete[] static_lm;
+  delete[] real_lm;
 
-  static_lm.SetLength (lm_size);
-  real_lm.SetLength (lm_size);
+  long lm_size = lwidth * lheight;
+  static_lm = new csRGBpixel [lm_size];
+  real_lm = new csRGBpixel [lm_size];
 
   csRGBpixel def (r, g, b);
 
@@ -196,6 +198,7 @@ const char* csLightMap::ReadFromCache (
   csThing* parent = poly->GetParent ();
 
   SetSize (w, h);
+  long lm_size = lwidth * lheight;
 
   strcpy (pswanted.header, LMMAGIC);
   if (poly)
@@ -294,11 +297,11 @@ const char* csLightMap::ReadFromCache (
   //-------------------------------
   // The cached item is valid.
   //-------------------------------
-  static_lm.DeleteAll ();
-  static_lm.SetLength (lm_size);
+  delete[] static_lm;
+  static_lm = new csRGBpixel[lm_size];
 
   int n = lm_size;
-  char *lm_ptr = (char*)static_lm.GetArray ();
+  char *lm_ptr = (char*)static_lm;
   while (--n >= 0) 
   {
     if (file->Read ((char*)lm_ptr, 3) != 3)
@@ -364,10 +367,10 @@ const char* csLightMap::ReadFromCache (
 
       il->AddAffectedLightingInfo (li);
 
-      if ((long) file->Read ((char*)(smap->GetArray ()), lm_size) != lm_size)
+      if ((long) file->Read ((char*)(smap->array), lm_size) != lm_size)
         return "File too short while reading pseudo-dynamic lightmap data!";
       size -= lm_size;
-      smap->CalcMaxShadow ();
+      smap->CalcMaxShadow (lm_size);
     }
     else
     {
@@ -410,6 +413,7 @@ void csLightMap::Cache (
   if (file->Write ("lmpn", 4) != 4)
     return;
 
+  long lm_size = lwidth * lheight;
   ps.lm_size = convert_endian ((int32)lm_size);
   ps.lm_cnt = 111;          // Dummy!
   ps.lm_cnt = convert_endian (ps.lm_cnt);
@@ -420,7 +424,7 @@ void csLightMap::Cache (
   file->Write ((char*)&ps, sizeof (ps));
 
   int n = lm_size;
-  char* lm_ptr = (char*)static_lm.GetArray ();
+  char* lm_ptr = (char*)static_lm;
   while (--n >= 0) 
   {
     file->Write (lm_ptr, 3);
@@ -460,12 +464,12 @@ void csLightMap::Cache (
     while (smap)
     {
       iLight *light = smap->Light;
-      if (smap->GetArray ())
+      if (smap->array)
       {
         LightSave ls;
 	memcpy (ls.light_id, light->GetLightID (), sizeof (LightSave));
         file->Write ((char *) &ls.light_id, sizeof (LightSave));
-        file->Write ((char *)(smap->GetArray ()), lm_size);
+        file->Write ((char *)(smap->array), lm_size);
       }
 
       smap = smap->next;
@@ -485,9 +489,9 @@ bool csLightMap::UpdateRealLightMap (float dyn_ambient_r,
 {
   if (!dyn_dirty) return false;
 
-  mean_recalc = true;
-
   csRGBpixel temp_max_color_values = max_static_color_values;
+
+  long lm_size = lwidth * lheight;
 
   //---
   // First copy the static lightmap to the real lightmap.
@@ -530,7 +534,7 @@ bool csLightMap::UpdateRealLightMap (float dyn_ambient_r,
     }
   }
   else
-    memcpy (real_lm.GetArray (), static_lm.GetArray (), 4 * lm_size);
+    memcpy (real_lm, static_lm, 4 * lm_size);
 
   //---
   // Then add all pseudo-dynamic lights.
@@ -548,12 +552,12 @@ bool csLightMap::UpdateRealLightMap (float dyn_ambient_r,
     // Color mode.
     do
     {
-      map = real_lm.GetArray ();
+      map = real_lm;
       light = smap->Light;
       red = light->GetColor ().red;
       green = light->GetColor ().green;
       blue = light->GetColor ().blue;
-      p = smap->GetArray ();
+      p = smap->array;
       last_p = p + lm_size;
 
       int tm_r = temp_max_color_values.red   + QInt (smap->max_shadow * red);
@@ -614,7 +618,8 @@ void csLightMap::CalcMaxStatic()
 {
   max_static_color_values.Set(0,0,0);
 
-  csRGBpixel *map = static_lm.GetArray ();
+  csRGBpixel *map = static_lm;
+  long lm_size = lwidth * lheight;
   for (int i = 0; i < lm_size; i++)
   {
     if (max_static_color_values.red < map->red)
@@ -627,125 +632,8 @@ void csLightMap::CalcMaxStatic()
   }
 }
 
-void csLightMap::CalcMeanLighting ()
+void csLightMap::ConvertFor3dDriver (int)
 {
-  int i;
-  int mer, meg, meb;
-  mer = 0;
-  meg = 0;
-  meb = 0;
-
-  csRGBpixel *map = real_lm.GetArray ();
-  for (i = 0; i < lm_size; i++)
-  {
-    mer += map->red;
-    meg += map->green;
-    meb += map->blue;
-    map++;
-  }
-
-  mean_color.red = mer / lm_size;
-  mean_color.green = meg / lm_size;
-  mean_color.blue = meb / lm_size;
 }
 
-// Only works for expanding a map.
-static void ResizeMap2 (
-  csRGBpixel *old_map,
-  int oldw,
-  int oldh,
-  csRGBpixel *new_map,
-  int neww,
-  int
 
-  /*newh*/ )
-{
-  int row;
-  for (row = 0; row < oldh; row++)
-    memcpy (new_map + neww * row * 4, old_map + oldw * row * 4, oldw * 4);
-}
-
-// Only works for expanding a map.
-static void ResizeMap (
-  unsigned char *old_map,
-  int oldw,
-  int oldh,
-  unsigned char *new_map,
-  int neww,
-  int
-
-  /*newh*/ )
-{
-  int row;
-  for (row = 0; row < oldh; row++)
-    memcpy (new_map + neww * row, old_map + oldw * row, oldw);
-}
-
-void csLightMap::ConvertFor3dDriver (bool requirePO2, int maxAspect)
-{
-  if (!requirePO2) return ; // Nothing to do.
-  int oldw = lwidth, oldh = lheight;
-
-  lwidth = csFindNearestPowerOf2 (lwidth);
-  lheight = csFindNearestPowerOf2 (lheight);
-
-  while (lwidth / lheight > maxAspect) lheight += lheight;
-  while (lheight / lwidth > maxAspect) lwidth += lwidth;
-  if (oldw == lwidth && oldh == lheight) return ; // Already ok, nothing to do.
-
-  // Move the old data to o_stat and o_real.
-  csRGBMap o_stat, o_real;
-  static_lm.TransferTo (o_stat);
-  real_lm.TransferTo (o_real);
-
-  lm_size = lwidth * lheight;
-
-  // Allocate new data and transform old to new.
-  static_lm.SetLength (lm_size);
-  ResizeMap2 (
-    o_stat.GetArray (),
-    oldw,
-    oldh,
-    static_lm.GetArray (),
-    lwidth,
-    lheight);
-
-  real_lm.SetLength (lm_size);
-  ResizeMap2 (
-    o_real.GetArray (),
-    oldw,
-    oldh,
-    real_lm.GetArray (),
-    lwidth,
-    lheight);
-
-  // Convert all shadowmaps.
-  csShadowMap *smap = first_smap;
-  while (smap)
-  {
-    unsigned char *old_map = new unsigned char[smap->Length ()];
-    memcpy (old_map, smap->GetArray (), smap->Length ());
-    ResizeMap (old_map, oldw, oldh, smap->GetArray (), lwidth, lheight);
-    delete[] old_map;
-    smap = smap->next;
-  }
-}
-
-csRGBpixel *csLightMap::GetMapData ()
-{
-  return GetRealMap ().GetArray ();
-}
-
-void csLightMap::GetMeanLighting (int &r, int &g, int &b)
-{ 
-  if (mean_recalc)
-  {
-    UpdateRealLightMap (0, 0, 0, false);
-    CalcMeanLighting ();
-    mean_recalc = false;
-  }
-
-  r = mean_color.red; 
-  g = mean_color.green; 
-  b = mean_color.blue; 
-}

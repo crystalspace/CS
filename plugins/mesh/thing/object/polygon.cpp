@@ -71,7 +71,6 @@ csPolygon3DStatic::csPolygon3DStatic ()
   material = 0;
   name = 0;
 
-  mapping = 0;
   polygon_data.tmapping = 0;
   polygon_data.num_vertices = 0;
   polygon_data.vertices = 0;
@@ -86,7 +85,6 @@ csPolygon3DStatic::~csPolygon3DStatic ()
   SetNumVertices (0);	// Clear vertices.
   delete[] name;
 
-  thing_static->thing_type->blk_lightmapmapping.Free (mapping);
   thing_static->thing_type->blk_texturemapping.Free (polygon_data.tmapping);
 
   VectorArray->DecRef ();
@@ -178,17 +176,6 @@ csPolygon3DStatic* csPolygon3DStatic::Clone (csThingStatic* new_parent)
   	sizeof (int) * polygon_data.num_vertices);
 
   clone->polygon_data.plane_obj = polygon_data.plane_obj;
-  if (mapping)
-  {
-    clone->mapping = t->blk_lightmapmapping.Alloc ();
-    clone->mapping->w = mapping->w;
-    clone->mapping->h = mapping->h;
-    clone->mapping->w_orig = mapping->w_orig;
-  }
-  else
-  {
-    clone->mapping = 0;
-  }
   if (polygon_data.tmapping)
   {
     clone->polygon_data.tmapping = t->blk_texturemapping.Alloc ();
@@ -203,6 +190,9 @@ csPolygon3DStatic* csPolygon3DStatic::Clone (csThingStatic* new_parent)
     clone->polygon_data.tmapping->Fmax_u = polygon_data.tmapping->Fmax_u;
     clone->polygon_data.tmapping->Fmax_v = polygon_data.tmapping->Fmax_v;
     clone->polygon_data.tmapping->shf_u = polygon_data.tmapping->shf_u;
+    clone->polygon_data.tmapping->w = polygon_data.tmapping->w;
+    clone->polygon_data.tmapping->h = polygon_data.tmapping->h;
+    clone->polygon_data.tmapping->w_orig = polygon_data.tmapping->w_orig;
   }
   else
   {
@@ -325,20 +315,17 @@ void csPolygon3DStatic::SetParent (csThingStatic *thing_static)
 
 void csPolygon3DStatic::EnableTextureMapping (bool enable)
 {
-  if (enable && mapping != 0) return;
-  if (!enable && mapping == 0) return;
+  if (enable && polygon_data.tmapping != 0) return;
+  if (!enable && polygon_data.tmapping == 0) return;
 
   if (thing_static) thing_static->scfiObjectModel.ShapeChanged ();
   if (enable)
   {
-    mapping = thing_static->thing_type->blk_lightmapmapping.Alloc ();
     polygon_data.tmapping = thing_static->thing_type
     	->blk_texturemapping.Alloc ();
   }
   else
   {
-    thing_static->thing_type->blk_lightmapmapping.Free (mapping);
-    mapping = 0;
     thing_static->thing_type->blk_texturemapping.Free (polygon_data.tmapping);
     polygon_data.tmapping = 0;
   }
@@ -512,9 +499,6 @@ void csPolygon3DStatic::HardTransform (const csReversibleTransform &t)
 bool csPolygon3DStatic::CreateBoundingTextureBox ()
 {
   bool rc = true;
-  if (!mapping)
-    mapping = thing_static->thing_type->blk_lightmapmapping.Alloc ();
-
   // First we compute the bounding box in 2D texture space (uv-space).
   float min_u = 1000000000.;
   float min_v = 1000000000.;
@@ -557,14 +541,14 @@ bool csPolygon3DStatic::CreateBoundingTextureBox ()
   int Imax_u = QRound (max_u * ww);
   int Imax_v = QRound (max_v * hh);
 
-  mapping->h = Imax_v - polygon_data.tmapping->Imin_v;
-  mapping->w_orig = Imax_u - polygon_data.tmapping->Imin_u;
-  mapping->w = 1;
+  polygon_data.tmapping->h = Imax_v - polygon_data.tmapping->Imin_v;
+  polygon_data.tmapping->w_orig = Imax_u - polygon_data.tmapping->Imin_u;
+  polygon_data.tmapping->w = 1;
   polygon_data.tmapping->shf_u = 0;
   while (true)
   {
-    if (mapping->w_orig <= mapping->w) break;
-    mapping->w <<= 1;
+    if (polygon_data.tmapping->w_orig <= polygon_data.tmapping->w) break;
+    polygon_data.tmapping->w <<= 1;
     polygon_data.tmapping->shf_u++;
   }
 
@@ -600,8 +584,8 @@ bool csPolygon3DStatic::Finish ()
 
   if (flags.Check (CS_POLY_LIGHTING))
   {
-    int lmw = csLightMap::CalcLightMapWidth (mapping->w_orig);
-    int lmh = csLightMap::CalcLightMapHeight (mapping->h);
+    int lmw = csLightMap::CalcLightMapWidth (polygon_data.tmapping->w_orig);
+    int lmh = csLightMap::CalcLightMapHeight (polygon_data.tmapping->h);
     int max_lmw, max_lmh;
     thing_static->thing_type->engine->GetMaxLightmapSize (max_lmw, max_lmh);
     if ((lmw > max_lmw) || (lmh > max_lmh))
@@ -1089,10 +1073,6 @@ void csPolygon3D::RefreshFromStaticData ()
   {
     txt_info = static_data->thing_static->thing_type->blk_polytex.Alloc ();
     txt_info->SetTextureMapping (static_data->GetTextureMapping ());
-    txt_info->SetLightMapMapping (static_data->GetLightMapMapping ());
-    //@@@@@@@@@@@@@@@
-    //txt_info->m_world2tex = static_data->GetTextureMapping ()->m_obj2tex;
-    //txt_info->v_world2tex = static_data->GetTextureMapping ()->v_obj2tex;
   }
   plane_wor = static_data->GetObjectPlane ();
 }
@@ -1122,11 +1102,6 @@ void csPolygon3D::ObjectToWorld (
   // it is a good thing to avoid calling csThing::Transform() to often.
   // So normally it should not be a problem.
   plane_wor.Normalize ();
-
-  //@@@@@@@@@@@@@@@@@@@@@@@@@@@
-  //if (txt_info) txt_info->ObjectToWorld (
-    //static_data->polygon_data.tmapping->m_obj2tex,
-    //static_data->polygon_data.tmapping->v_obj2tex, t);
 }
 
 #define TEXW(t) ((t)->w_orig)
@@ -1148,14 +1123,15 @@ void csPolygon3D::Finish ()
 
       csColor ambient;
       thing->GetStaticData ()->thing_type->engine->GetAmbientLight (ambient);
-      lm->Alloc (static_data->mapping->w_orig, static_data->mapping->h,
+      lm->Alloc (static_data->polygon_data.tmapping->w_orig,
+      	static_data->polygon_data.tmapping->h,
           int(ambient.red * 255.0f),
           int(ambient.green * 255.0f),
           int(ambient.blue * 255.0f));
 
 #ifndef CS_USE_NEW_RENDERER
       csThingObjectType* thing_type = thing->GetStaticData ()->thing_type;
-      if (!thing_type->G3D->IsLightmapOK (lm->GetRealWidth(), lm->GetRealHeight(),
+      if (!thing_type->G3D->IsLightmapOK (lm->GetWidth(), lm->GetHeight(),
 	lm->lightcell_size))
       {
         thing_type->Notify ("Renderer can't handle lightmap "
@@ -1220,8 +1196,8 @@ const char* csPolygon3D::ReadFromCache (iFile* file)
     if (txt_info->lm == 0) return 0;
     const char* error = txt_info->lm->ReadFromCache (
           file,
-          static_data->mapping->w_orig,
-          static_data->mapping->h,
+          static_data->polygon_data.tmapping->w_orig,
+          static_data->polygon_data.tmapping->h,
           this,
     thing->GetStaticData ()->thing_type->engine);
     if (error != 0)
@@ -1256,7 +1232,6 @@ void csPolygon3D::PrepareLighting ()
   if (!txt_info || !txt_info->lm) return ;
   txt_info->lm->ConvertToMixingMode ();
   txt_info->lm->ConvertFor3dDriver (
-      thing->GetStaticData ()->thing_type->engine->GetLightmapsRequirePO2 (),
       thing->GetStaticData ()->thing_type->engine->GetMaxLightmapAspectRatio ());
 }
 

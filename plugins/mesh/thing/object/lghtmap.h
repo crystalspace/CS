@@ -20,7 +20,6 @@
 #define __CS_LIGHTMAP_H__
 
 #include "csutil/scf.h"
-#include "csutil/garray.h"
 #include "csgfx/rgbpixel.h"
 
 class csPolyTexture;
@@ -33,21 +32,19 @@ struct iCacheManager;
 struct iFile;
 struct iEngine;
 
-typedef csDirtyAccessArray<csRGBpixel> csRGBMap;
-typedef csDirtyAccessArray<unsigned char> csShadowMapHelper;
-
 /// Shadow map.
-class csShadowMap : public csShadowMapHelper
+class csShadowMap
 {
 public:
   iLight *Light;
   csShadowMap *next;
   unsigned char max_shadow;
+  unsigned char* array;
 
   csShadowMap ();
   ~csShadowMap ();
   void Alloc (iLight *l, int w, int h);
-  void CalcMaxShadow();
+  void CalcMaxShadow (long lm_size);
 };
 
 /**
@@ -63,7 +60,7 @@ private:
    * A color lightmap containing all static lighting information
    * for the static lights (no pseudo-dynamic lights are here).
    */
-  csRGBMap static_lm;
+  csRGBpixel* static_lm;
 
   /**
    * Stores the maximum r, g, b values for the static_lm array above.
@@ -77,7 +74,7 @@ private:
    * contain extra lighting information obtained from all the
    * pseudo-dynamic shadowmaps and also the true dynamic lights.
    */
-  csRGBMap real_lm;
+  csRGBpixel* real_lm;
 
   /**
    * Linked list of shadow-maps (for the pseudo-dynamic lights).
@@ -85,21 +82,8 @@ private:
    */
   csShadowMap* first_smap;
 
-  /// Size of the lightmap.
-  long lm_size;
-
-  /// LightMap dims (possibly po2 depending on used 3D driver).
+  /// LightMap dimensions.
   int lwidth, lheight;
-  /// Original lightmap dims (non-po2 possibly).
-  int rwidth, rheight;
-
-  /**
-   * Mean lighting value of this lightmap.
-   */
-  csRGBpixel mean_color;
-
-  /// need recalculation of mean color?
-  bool mean_recalc;
 
   /// Calculate and save max_static_color_values after static_lm is loaded.
   void CalcMaxStatic ();
@@ -145,9 +129,9 @@ public:
                            bool dyn_dirty);
 
   ///
-  csRGBMap& GetStaticMap () { return static_lm; }
+  csRGBpixel* GetStaticMap () { return static_lm; }
   ///
-  csRGBMap& GetRealMap () { return real_lm; }
+  csRGBpixel* GetRealMap () { return real_lm; }
 
   /**
    * Allocate the lightmap. 'w' and 'h' are the size of the
@@ -200,7 +184,7 @@ public:
   /**
    * Convert the lightmaps to a 3D driver dependent size.
    */
-  void ConvertFor3dDriver (bool requirePO2, int maxAspect = 32767);
+  void ConvertFor3dDriver (int maxAspect = 32767);
 
   /**
    * Set the size of one lightmap cell (default = 16).
@@ -209,31 +193,14 @@ public:
    */
   static void SetLightCellSize (int size);
 
-  /**
-   * Calculate the mean color of csRGBpixel array.
-   * Used by GetMeanLighting().
-   */
-  void CalcMeanLighting ();
-
   ///
-  csRGBpixel *GetMapData ();
+  csRGBpixel *GetMapData () { return real_lm; }
   ///
   int GetWidth () const { return lwidth; }
   ///
   int GetHeight () const { return lheight; }
-  ///
-  int GetRealWidth () const { return rwidth; }
-  ///
-  int GetRealHeight () const { return rheight; }
-  /** 
-   * calculate (if needed) and return mean lightmap color
-   * Note: won't include true dynamic lights
-   * until RecalculateDynamicLights() of the owning
-   * csPolyTexture is called
-   */
-  void GetMeanLighting (int &r, int &g, int &b);
   /// Get size of one lightmap
-  long GetSize () const { return lm_size; }
+  //long GetSize () const { return lm_size; }
 };
 
 #endif // __CS_LIGHTMAP_H__

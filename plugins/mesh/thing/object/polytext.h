@@ -248,7 +248,6 @@ private:
 
   /// How to map the lightmap on the polygon.
   //csLightMapMapping* mapping;
-  csPolyLightMapMapping* mapping;
   csPolyTextureMapping* tmapping;
   csRef<iRendererLightmap> rlm;
 
@@ -281,7 +280,6 @@ public:
   ~csPolyTexture ();
 
   void SetTextureMapping (csPolyTextureMapping* mapping);
-  void SetLightMapMapping (csPolyLightMapMapping* mapping);
   void SetRendererLightmap (iRendererLightmap* rlm);
 
   /**

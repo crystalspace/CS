@@ -211,7 +211,6 @@ void DefaultDrawPolygonMesh (G3DPolygonMesh& mesh, iGraphics3D *piG3D,
     	< polbuf->GetMaterialCount ());
     poly.mat_handle = polbuf->GetMaterial (pol.mat_index);
   
-    poly.lmap = pol.lmap;
     poly.texmap = pol.texmap;
     poly.rlm = pol.rlm;
 

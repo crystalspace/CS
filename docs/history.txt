@@ -28,6 +28,21 @@ chronological order.
 	    - Generally upgraded MacOS/X build instructions.
 	    - Eliminated some obsolete engine and lighting options from
 	      documentation and configuration files.
+	- Jorrit removed csPolyLightMapMapping and merged it with
+	  csPolyTextureMapping. This saves some memory again.
+	- Jorrit eliminated mean lightmap color. This saves another 20 bytes
+	  per polygon.
+	- Jorrit eliminated the iEngine->GetLightmapsRequirePO2() function.
+	  None of the renderers require PO2 lightmaps so this functionality
+	  can be removed entirely. Also removed the equivalent config option
+	  from opengl.cfg.
+	- Jorrit eliminated the po2 scaling option from lightmaps. This
+	  saves another 8 bytes per polygon.
+	- Jorrit eliminated the lmsize field in lightmaps, saving another
+	  4 bytes per polygon.
+	- Jorrit eliminated another 12 bytes per polygon and then another
+	  12 bytes for every polygon and pseudo-dynamic light that affects
+	  the polygon.
 13-Oct-2003
 	- Eric Sunshine eliminated several compilation warnings from Walktest.
 	- Jorrit fixed phystut for the latest polygon changes.

@@ -229,7 +229,6 @@ csGraphics3DOGLCommon::csGraphics3DOGLCommon (iBase* parent):
   Caps.maxTexHeight = -1;
   Caps.maxTexWidth = -1;
   Caps.fog = G3DFOGMETHOD_VERTEX;
-  Caps.NeedsPO2Maps = false;
   Caps.MaxAspectRatio = 32768;
   GLCaps.need_screen_clipping = false;
   GLCaps.use_stencil = false;
@@ -888,7 +887,6 @@ bool csGraphics3DOGLCommon::NewOpen ()
   Caps.maxTexHeight = mts;
   Caps.maxTexWidth = mts;
   Caps.fog = G3DFOGMETHOD_VERTEX;
-  Caps.NeedsPO2Maps = config->GetBool("Video.OpenGL.Caps.NeedsPO2Maps", false);
   Caps.MaxAspectRatio = config->GetInt("Video.OpenGL.Caps.MaxAspectRatio",
     32768);
   GLCaps.use_stencil = config->GetBool ("Video.OpenGL.Caps.Stencil", false);

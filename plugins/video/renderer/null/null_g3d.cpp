@@ -70,7 +70,6 @@ csGraphics3DNull::csGraphics3DNull (iBase *iParent)
   Caps.maxTexHeight = 1024;
   Caps.maxTexWidth = 1024;
   Caps.fog = G3DFOGMETHOD_NONE;
-  Caps.NeedsPO2Maps = false;
   Caps.MaxAspectRatio = 32768;
 }
 

@@ -607,26 +607,20 @@ struct iEngine : public iBase
    * this are not lit.  
    * \param w lightmap width 
    * \param h lightmap height
-   * \see GetLightmapsRequirePO2()
    */
   virtual void SetMaxLightmapSize(int w, int h) = 0;
 
   /** Retrieve maximum lightmap size.
    * \param w lightmap width
    * \param h lightmap height
-   * \see GetLightmapsRequirePO2()
   */
   virtual void GetMaxLightmapSize(int& w, int& h) = 0;
 
   /** Retrieve default maximum lightmap size.  
    * \param w lightmap width
    * \param h lightmap height
-   * \see GetLightmapsRequirePO2()
   */
   virtual void GetDefaultMaxLightmapSize(int& w, int& h) = 0;
-
-  /// Get a boolean which indicates if power of two lightmaps are required.
-  virtual bool GetLightmapsRequirePO2 () const = 0;
 
   /// Get the maximum aspect ratio for lightmaps.
   virtual int GetMaxLightmapAspectRatio () const = 0;

@@ -861,10 +861,8 @@ bool csEngine::HandleEvent (iEvent &Event)
 #ifndef CS_USE_NEW_RENDERER
             const csGraphics3DCaps *caps = G3D->GetCaps ();
             fogmethod = caps->fog;
-            NeedPO2Maps = caps->NeedsPO2Maps;
             MaxAspectRatio = caps->MaxAspectRatio;
 #else
-            NeedPO2Maps = false;
             MaxAspectRatio = 4096;
 	    ShaderManager = CS_QUERY_REGISTRY(object_reg, iShaderManager);
 	    if (!ShaderManager)
@@ -886,7 +884,6 @@ bool csEngine::HandleEvent (iEvent &Event)
 #ifndef CS_USE_NEW_RENDERER
             fogmethod = G3DFOGMETHOD_NONE;
 #endif // CS_USE_NEW_RENDERER
-            NeedPO2Maps = false;
             MaxAspectRatio = 4096;
             frame_width = 640;
             frame_height = 480;

@@ -1182,7 +1182,6 @@ public:
    */
   csBlockAllocator<csPolygon3D> blk_polygon3d;
   csBlockAllocator<csPolygon3DStatic> blk_polygon3dstatic;
-  csBlockAllocator<csPolyLightMapMapping> blk_lightmapmapping;
   csBlockAllocator<csPolyTextureMapping> blk_texturemapping;
   csBlockAllocator<csPolyTexture> blk_polytex;
   csBlockAllocator<csLightMap> blk_lightmap;

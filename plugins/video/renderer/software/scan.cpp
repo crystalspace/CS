@@ -176,8 +176,7 @@ void csScan_Finalize ()
 }
 
 void csScan_InitDraw (int MipMap, csGraphics3DSoftwareCommon* g3d,
-  csPolyTextureMapping* tmapping,
-  csPolyLightMapMapping* mapping, csSoftRendererLightmap* rlm,
+  csPolyTextureMapping* tmapping, csSoftRendererLightmap* rlm,
   csTextureHandleSoftware* texture,
   csTextureSoftware *untxt)
 {
@@ -204,12 +203,16 @@ void csScan_InitDraw (int MipMap, csGraphics3DSoftwareCommon* g3d,
   }
   else
     Scan.bitmap2 = 0;
-  if(mapping) {
-      Scan.tw2 = mapping->GetWidth () >> MipMap;
-      Scan.th2 = mapping->GetHeight () >> MipMap;
-  } else {
-      Scan.tw2 = 0;
-      Scan.th2 = 0;
+
+  if (rlm)
+  {
+    Scan.tw2 = tmapping->GetWidth () >> MipMap;
+    Scan.th2 = tmapping->GetHeight () >> MipMap;
+  }
+  else
+  {
+    Scan.tw2 = 0;
+    Scan.th2 = 0;
   }
   Scan.min_u = (tmapping->GetIMinU () >> MipMap) << 16;
   Scan.min_v = (tmapping->GetIMinV () >> MipMap) << 16;

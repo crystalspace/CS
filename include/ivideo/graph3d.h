@@ -57,7 +57,6 @@ struct iRendererLightmap;
 struct csRGBpixel;
 struct csPixelFormat;
 struct csPolyTextureMapping;
-struct csPolyLightMapMapping;
 struct iRenderBuffer;
 struct iRenderBufferManager;
 struct iLightingManager;
@@ -443,7 +442,6 @@ struct G3DPolygonDP : public G3DPolygonDFP
 
   /// Handle to lighted textures (texture + lightmap)
   csPolyTextureMapping* texmap;
-  csPolyLightMapMapping* lmap;
   iRendererLightmap* rlm;
   
   /// Draw fullbright?

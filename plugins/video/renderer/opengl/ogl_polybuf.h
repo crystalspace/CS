@@ -173,7 +173,6 @@ public:
   virtual void AddPolygon (int num_verts,
 	int* verts,
 	csPolyTextureMapping* texmap,
-	csPolyLightMapMapping* lmap,
 	/*csVector2* texcoords,
 	csVector2* lmcoords,*/
 	const csPlane3& poly_normal,

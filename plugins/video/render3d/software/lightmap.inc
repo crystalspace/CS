@@ -38,10 +38,10 @@
     to classify them and introduce a notation for intermediate variable
     that will (I hope) ease the understanding:
 
-	- csPolyLightMapMapping and csPolyTextureMapping are the objects
-	  that are in charge for containing all parameters related to a single
-	  mipmap level on a Polygon3D. The variables that contain values
-	  related to these structures will have the "pt" prefix.
+	- csPolyTextureMapping is the object that is in charge for containing
+	  all parameters related to a single mipmap level on a Polygon3D. The
+	  variables that contain values related to this structure will have
+	  the "pt" prefix.
 	- The lightmap is the object that is in charge for containing all
 	  lighting information for the polygon. Basically it contains
 	  three lightmaps: red, green an blue, each cell of the lightmap
@@ -59,8 +59,7 @@
 
 #include "pixtype.inc"
 
-void LM_NAME (csPolyLightMapMapping* mapping,
-	      csPolyTextureMapping* tmapping,
+void LM_NAME (csPolyTextureMapping* tmapping,
 	      csSoftRendererLightmap* rlm, 
 	      SoftwareCachedTexture *ct,
 	      csSoftwareTextureHandle *texmm, csSoftwareTextureManager *texman,
@@ -75,8 +74,6 @@ void LM_NAME (csPolyLightMapMapping* mapping,
 
   //int pt_cell_size = pt->GetLightCellSize () >> mipmap; // from iRendererLightMap
   int pt_cell_size = rlm->lightCellSize >> mipmap; 
-  
-  //const csLightMapMapping& mapping = pt->GetMapping ();
   
   if (!pt_cell_size)
   {
@@ -122,7 +119,7 @@ void LM_NAME (csPolyLightMapMapping* mapping,
 	if (min_lu >= max_lu) return;
 	if (min_lv >= max_lv) return;
 
-	int max_lu2 = ((mapping->GetOriginalWidth () + mipmap_delta) >> mipmap);
+	int max_lu2 = ((tmapping->GetOriginalWidth () + mipmap_delta) >> mipmap);
 	if (max_lu > max_lu2) max_lu = max_lu2;
 
 	int max_lv2 = (rlm->rect.Height ()) >> pt_cell_shift;
@@ -192,7 +189,7 @@ void LM_NAME (csPolyLightMapMapping* mapping,
 	int pt_cell_shift = rlm->lightCellShift - mipmap;
 	int pt_shfw = tmapping->GetShiftU () - mipmap;
 	int pt_w = 1 << pt_shfw;
-	int pt_h = (mapping->GetHeight () + mipmap_delta) >> mipmap;
+	int pt_h = (tmapping->GetHeight () + mipmap_delta) >> mipmap;
 
 	int lm_w = rlm->rect.Width (); //lm->GetWidth ();
 	csRGBpixel *lm_data = rlm->data; //lm->GetMapData ();
@@ -237,7 +234,7 @@ void LM_NAME (csPolyLightMapMapping* mapping,
 	if (min_lu >= max_lu) return;
 	if (min_lv >= max_lv) return;
 
-	int max_lu2 = ((((mapping->GetOriginalWidth () + mipmap_delta)
+	int max_lu2 = ((((tmapping->GetOriginalWidth () + mipmap_delta)
 		>> mipmap) + pt_cell_size - 1) >> pt_cell_shift);
 	if (max_lu > max_lu2) max_lu = max_lu2;
 

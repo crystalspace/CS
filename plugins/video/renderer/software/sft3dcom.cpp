@@ -271,7 +271,6 @@ csGraphics3DSoftwareCommon::csGraphics3DSoftwareCommon (iBase* parent)
   Caps.maxTexHeight = 1024;
   Caps.maxTexWidth = 1024;
   Caps.fog = G3DFOGMETHOD_ZBUFFER;
-  Caps.NeedsPO2Maps = false;
   Caps.MaxAspectRatio = 32768;
   width = height = -1;
   partner = 0;
@@ -1819,7 +1818,6 @@ void csGraphics3DSoftwareCommon::DrawPolygon (G3DPolygonDP& poly)
         + Q2 * poly.cam2tex.v_cam2tex->y
         + Q3 * poly.cam2tex.v_cam2tex->z);
 
-  csPolyLightMapMapping* mapping = poly.lmap; //tex->GetMapping ();
   csTextureHandleSoftware *tex_mm =
     (csTextureHandleSoftware *)poly.mat_handle->GetTexture ()
     	->GetPrivateObject ();
@@ -1952,13 +1950,13 @@ void csGraphics3DSoftwareCommon::DrawPolygon (G3DPolygonDP& poly)
   	mipmap);
 
   // Check if polygon has a lightmap (i.e. if it is lighted)
-  bool has_lightmap = srlm && !poly.do_fullbright && do_lighting && mapping;
+  bool has_lightmap = srlm && !poly.do_fullbright && do_lighting;
   if (has_lightmap)
   {
     // If there is a lightmap we check if the size of the lighted
     // texture would not exceed MAX_LIGHTMAP_SIZE pixels. In that case we
     // revert to unlighted texture mapping.
-    long size = mapping->GetWidth () * mapping->GetHeight ();
+    long size = tmapping->GetWidth () * tmapping->GetHeight ();
     if (size > MAX_LIGHTMAP_SIZE) has_lightmap = false;
   }
 
@@ -2120,10 +2118,10 @@ void csGraphics3DSoftwareCommon::DrawPolygon (G3DPolygonDP& poly)
 #undef CHECK
     }
 texr_done:
-    tcache->fill_texture (mipmap, mapping, tmapping, srlm, 
+    tcache->fill_texture (mipmap, tmapping, srlm, 
       /*tex, */tex_mm, u_min, v_min, u_max, v_max);
   }
-  csScan_InitDraw (mipmap, this, tmapping, mapping, srlm, tex_mm, txt_unl);
+  csScan_InitDraw (mipmap, this, tmapping, srlm, tex_mm, txt_unl);
 
   // Select the right scanline drawing function.
   bool tex_keycolor = tex_mm->GetKeyColor ();

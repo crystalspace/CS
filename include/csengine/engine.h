@@ -319,8 +319,6 @@ public:
   csRef<iCacheManager> cache_mgr;
   /// The fog mode this G3D implements
   G3D_FOGMETHOD fogmethod;
-  /// Does the 3D driver require power-of-two lightmaps?
-  bool NeedPO2Maps;
   /// Maximum texture aspect ratio
   int MaxAspectRatio;
   /// The list of all regions currently loaded.
@@ -712,7 +710,6 @@ public:
   /// Return the default amount of ambient light
   virtual void GetDefaultAmbientLight (csColor &c) const;
 
-  virtual bool GetLightmapsRequirePO2 () const { return NeedPO2Maps; }
   virtual int GetMaxLightmapAspectRatio () const { return MaxAspectRatio; }
   
   virtual csPtr<iFrustumView> CreateFrustumView ();

@@ -99,13 +99,6 @@ private:
   iMaterialWrapper* material;
 
   /**
-   * How to map the lightmap on the polygon.
-   * Warning! Objects of this type are allocated on
-   * csThingObjectType->blk_lightmapmapping.
-   */
-  csPolyLightMapMapping* mapping;
-
-  /**
    * Return twice the signed area of the polygon in world space coordinates
    * using the yz, zx, and xy components.  In effect this calculates the
    * (P,Q,R) or the plane normal of the polygon.
@@ -172,12 +165,11 @@ public:
    * Enable or disable texture mapping.
    */
   void EnableTextureMapping (bool enabled);
-  bool IsTextureMappingEnabled () const { return mapping != 0; }
+  bool IsTextureMappingEnabled () const { return polygon_data.tmapping != 0; }
 
   /**
    * Get the lightmap mapping information.
    */
-  csPolyLightMapMapping* GetLightMapMapping () const { return mapping; }
   csPolyTextureMapping* GetTextureMapping () const
   {
     return polygon_data.tmapping;

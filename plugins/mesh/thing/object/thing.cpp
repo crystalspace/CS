@@ -337,7 +337,7 @@ void csThingStatic::PrepareLMLayout ()
       polysSorted.Put (mat, lp);
     }
 
-    csPolyLightMapMapping* lm = sp->GetLightMapMapping ();
+    csPolyTextureMapping* lm = sp->GetTextureMapping ();
     if ((lm != 0) && (sp->flags.Check (CS_POLY_LIGHTING)))
     {
       lp->numLitPolys++;
@@ -412,8 +412,8 @@ static int CompareStaticPolys (int const& i1, int const& i2)
 {
   csPolygon3DStatic* const poly1 = (*static_poly_array)[i1];
   csPolygon3DStatic* const poly2 = (*static_poly_array)[i2];
-  csPolyLightMapMapping* lm1 = poly1->GetLightMapMapping ();
-  csPolyLightMapMapping* lm2 = poly2->GetLightMapMapping ();
+  csPolyTextureMapping* lm1 = poly1->GetTextureMapping ();
+  csPolyTextureMapping* lm2 = poly2->GetTextureMapping ();
 
   int maxdim1, mindim1, maxdim2, mindim2;
 
@@ -471,7 +471,7 @@ void csThingStatic::DistributePolyLMs (
     int polyIdx  = inputPolys.polys[i];
     csPolygon3DStatic* sp = static_polygons[polyIdx];
 
-    csPolyLightMapMapping* lm = sp->GetLightMapMapping ();
+    csPolyTextureMapping* lm = sp->GetTextureMapping ();
     if ((lm == 0) || (!sp->flags.Check (CS_POLY_LIGHTING)))
     {
       rejectedPolys->polys.Push (polyIdx);
@@ -532,7 +532,7 @@ void csThingStatic::DistributePolyLMs (
 	int polyIdx = inputQueues[curQueue].polys.Pop ();
 	csPolygon3DStatic* sp = static_polygons[polyIdx];
 
-	csPolyLightMapMapping* lm = sp->GetLightMapMapping ();
+	csPolyTextureMapping* lm = sp->GetTextureMapping ();
 
 	int lmw = (csLightMap::CalcLightMapWidth (lm->GetOriginalWidth ())
 		+ LM_BORDER);
@@ -2150,7 +2150,6 @@ void csThing::PreparePolygonBuffer ()
 
       csPolygon3D *poly = litPolys[i]->polys[j];
       csPolygon3DStatic *spoly = poly->GetStaticData ();
-      csPolyLightMapMapping *mapping = spoly->GetLightMapMapping ();
       csPolyTextureMapping *tmapping = spoly->GetTextureMapping ();
 
       int v;
@@ -2161,8 +2160,7 @@ void csThing::PreparePolygonBuffer ()
       }
 
       polybuf->AddPolygon (spoly->GetVertexCount (), verts.GetArray (), 
-	tmapping, mapping, 
-	spoly->GetObjectPlane (), 
+	tmapping, spoly->GetObjectPlane (), 
 	mi, litPolys[i]->lightmaps[j]);
     }
   }
@@ -2191,7 +2189,7 @@ void csThing::PreparePolygonBuffer ()
       }
 
       polybuf->AddPolygon (spoly->GetVertexCount (), verts.GetArray (), 
-	tmapping, 0, spoly->GetObjectPlane (), 
+	tmapping, spoly->GetObjectPlane (), 
 	mi, 0);
     }
   }
@@ -3006,7 +3004,6 @@ SCF_IMPLEMENT_FACTORY (csThingObjectType)
 csThingObjectType::csThingObjectType (iBase *pParent) :
 	blk_polygon3d (2000),
 	blk_polygon3dstatic (2000),
-	blk_lightmapmapping (2000),
 	blk_texturemapping (2000),
 	blk_polytex (2000),
 	blk_lightmap (2000),

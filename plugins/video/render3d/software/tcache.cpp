@@ -144,7 +144,7 @@ void csSoftwareTextureCache::uncache_texture (int MipMap, iTextureHandle *itexh)
 }
 
 SoftwareCachedTexture *csSoftwareTextureCache::cache_texture (
-  int MipMap, csPolyLightMapMapping* mapping, csPolyTextureMapping* tmapping,
+  int MipMap, csPolyTextureMapping* tmapping,
   csSoftRendererLightmap* rlm, iTextureHandle* itexh)
 {
 //  SoftwareCachedTexture *cached_texture =
@@ -196,9 +196,8 @@ SoftwareCachedTexture *csSoftwareTextureCache::cache_texture (
     // Texture is not in the cache.
     int lightmap_size = /*pt->GetLightMap ()->GetSize ()*/
       rlm->rect.Width () * rlm->rect.Height () * sizeof (uint32);
-    //const csPolyLightMapMapping& mapping = *(srlm->GetMapping ()); //pt->GetMapping ();
-    int bitmap_w = (mapping->GetWidth () >> MipMap);
-    int bitmap_h = ((mapping->GetHeight () + (1 << MipMap) - 1) >> MipMap);
+    int bitmap_w = (tmapping->GetWidth () >> MipMap);
+    int bitmap_h = ((tmapping->GetHeight () + (1 << MipMap) - 1) >> MipMap);
     int bitmap_size = lightmap_size + bytes_per_texel * bitmap_w
     	* (H_MARGIN * 2 + bitmap_h);
 
@@ -285,7 +284,6 @@ SoftwareCachedTexture *csSoftwareTextureCache::cache_texture (
 }
 
 void csSoftwareTextureCache::fill_texture (int MipMap,
-					   csPolyLightMapMapping* mapping,
 					   csPolyTextureMapping* tmapping,
 					   csSoftRendererLightmap* rlm,
                                            csSoftwareTextureHandle *tex_mm, 
@@ -293,11 +291,11 @@ void csSoftwareTextureCache::fill_texture (int MipMap,
 					   float u_max, float v_max)
 {
   // Now cache the texture
-  SoftwareCachedTexture *cached_texture = cache_texture (MipMap, mapping, 
+  SoftwareCachedTexture *cached_texture = cache_texture (MipMap,
     tmapping, rlm, tex_mm);
 
   // Compute the rectangle on the lighted texture, if it is dirty
-  (this->*create_lighted_texture) (/*pt, */mapping, tmapping, rlm, 
+  (this->*create_lighted_texture) (tmapping, rlm, 
     cached_texture, tex_mm, texman, u_min, v_min, u_max, v_max);
 }
 

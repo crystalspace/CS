@@ -25,14 +25,13 @@
 #include "csgeom/matrix3.h"
 
 struct iMaterialHandle;
-struct csPolyLightMapMapping;
 struct csPolyTextureMapping;
 
 class csVector3;
 class csMatrix3;
 
 /**
- * This structure holds mapping information to map the texture on
+ * This structure holds mapping information to map the texture and lightmap on
  * a polygon.
  */
 struct csPolyTextureMapping
@@ -42,7 +41,6 @@ struct csPolyTextureMapping
   /// Translation from object to texture space.
   csVector3 v_obj2tex;
 
-  // @@@ some entries really rather belong to csPolyLightMapMapping.
   float fdu, fdv;
 
   /**
@@ -83,34 +81,15 @@ struct csPolyTextureMapping
   float GetFDU () const { return fdu; }
   /// Get the v-value of the textures bounding box' lower left corner.
   float GetFDV () const { return fdv; }
-};
 
-/**
- * This structure holds mapping information to map the lightmap on
- * a polygon.
- */
-struct csPolyLightMapMapping
-{
-  /*
-   * New texture data with lighting added. This is an untiled texture
-   * so it is more efficient to draw. This texture data is allocated
-   * and maintained by the texture cache. If a PolyTexture is in the
-   * cache it will be allocated, otherwise it won't.
-   */
-
-  /// Width of lighted texture ('w' is a power of 2).
+  /// Width of lit texture ('w' is a power of 2).
   int w; //@@@ renderer specific
 
-  /// Height of lighted texture.
+  /// Height of lit texture.
   int h; //@@@ renderer specific 
 
   /// Original width (may not be a power of 2) (w_orig <= w).
   int w_orig;  //@@@ renderer specific
-  
-  /// Light cell size
-  //int lightCellSize;
-  /// Light cell shift
-  //int lightCellShift;
 
   /// Get width of lit texture (power of 2).
   int GetWidth () const { return w; }

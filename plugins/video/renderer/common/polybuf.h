@@ -36,7 +36,6 @@ public:
   //csTransform t_obj2lm;
   int mat_index;
   csPolyTextureMapping* texmap;
-  csPolyLightMapMapping* lmap;
   iRendererLightmap* rlm;
 };
 
@@ -89,7 +88,6 @@ public:
 	//csVector2* texcoords,
 	//csVector2* lmcoords,
 	csPolyTextureMapping* texmap,
-	csPolyLightMapMapping* lmap,
 	const csPlane3& poly_normal,
 	int mat_index,
 	iRendererLightmap* lm);
