@@ -451,6 +451,8 @@ STDMETHODIMP csNetworkDriverSockets::KillAll()
 
 STDMETHODIMP csNetworkDriverSockets::Accept(DWORD dwLID/*listening socket*/, DWORD *lpdwID/*server socket*/, CS_NET_ADDRESS *lpCSNetAddress/*out*/)
 {
+        (void) lpCSNetAddress; //Is needed to remove a warning about unused variables - Thomas Hieber 07/07/1999
+
 	if(!SocksReady)
 	{
 		dwLastError = CS_NET_DRV_ERR_NOT_INITIALIZED;
