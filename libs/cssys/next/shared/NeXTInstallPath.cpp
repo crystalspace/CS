@@ -34,7 +34,7 @@
 bool csGetInstallPath(char* buff, size_t sz)
 {
   bool ok = false;
-  if (path != 0 && sz > 0)
+  if (buff != 0 && sz > 0)
   {
     ok = true;
     if (!NeXTGetInstallPath(buff, sz, PATH_SEPARATOR))
