@@ -48,10 +48,8 @@ MSVC.PLUGINS.REQUIRED =         \
   sound/renderer/ds3d           \
   sound/renderer/software       \
   video/canvas/ddraw            \
-  video/canvas/ddraw61          \
   video/canvas/openglwin        \
   video/format/avi              \
   video/format/codecs/opendivx  \
   video/format/codecs/rle       \
-  video/renderer/direct3d61     \
   video/renderer/opengl
