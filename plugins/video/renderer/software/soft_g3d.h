@@ -74,8 +74,7 @@ private:
 };
 
 ///
-class csGraphics3DSoftware : public IGraphics3D,
-                             public IHaloRasterizer
+class csGraphics3DSoftware : public IGraphics3D
 {
 private:
   /// Z buffer for software renderer only. Hardware rendering uses own Z buffer.
@@ -230,6 +229,9 @@ public:
    * the bluriness a little.
    */
   bool ilace_fastmove;
+
+  // An experimental filter feature.
+  static int filter_bf;
 
   ///
   csGraphics3DSoftware (ISystem* piSystem);
@@ -389,16 +391,20 @@ public:
 
   ////// IHaloRasterizer Methods ////
 
-  /// Create a halo of the specified color. This must be destroyed using DestroyHalo.
-  STDMETHODIMP CreateHalo(float r, float g, float b, HALOINFO* pRetVal);
-  /// Destroy the halo.
-  STDMETHODIMP DestroyHalo(HALOINFO haloInfo);
+  class XHaloRasterizer : public IHaloRasterizer
+  {
+    DECLARE_IUNKNOWN()
+    /// Create a halo of the specified color. This must be destroyed using DestroyHalo.
+    STDMETHODIMP CreateHalo(float r, float g, float b, HALOINFO* pRetVal);
+    /// Destroy the halo.
+    STDMETHODIMP DestroyHalo(HALOINFO haloInfo);
 
-  /// Draw the halo given a center point and an intensity.
-  STDMETHODIMP DrawHalo(csVector3* pCenter, float fIntensity, HALOINFO haloInfo);
+    /// Draw the halo given a center point and an intensity.
+    STDMETHODIMP DrawHalo(csVector3* pCenter, float fIntensity, HALOINFO haloInfo);
 
-  /// Test to see if a halo would be visible (but don't attempt to draw it)
-  STDMETHODIMP TestHalo(csVector3* pCenter);
+    /// Test to see if a halo would be visible (but don't attempt to draw it)
+    STDMETHODIMP TestHalo(csVector3* pCenter);
+  };
 
   /// Our internal representation of halos.
   struct csG3DSoftwareHaloInfo
@@ -455,6 +461,7 @@ public:
 
   DECLARE_IUNKNOWN ()
   DECLARE_INTERFACE_TABLE (csGraphics3DSoftware)
+  DECLARE_COMPOSITE_INTERFACE_EMBEDDED(HaloRasterizer)
 
   /// the COM composite interface for IConfig.
   DECLARE_COMPOSITE_INTERFACE (XConfig3DSoft)

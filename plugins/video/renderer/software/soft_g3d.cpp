@@ -40,6 +40,8 @@
 #  include "cs3d/software/i386/cpuid.h"
 #endif
 
+int csGraphics3DSoftware::filter_bf = 1;
+
 //-------------------------- The indices into arrays of scanline routines ------
 
 /*
@@ -113,11 +115,7 @@ IMPLEMENT_UNKNOWN (csGraphics3DSoftware)
 
 BEGIN_INTERFACE_TABLE (csGraphics3DSoftware)
     IMPLEMENTS_INTERFACE (IGraphics3D)
-#if defined(OS_NEXT) && defined(PROC_SPARC)
-// FIXME: NextStep multiple-inheritance compiler crasher [sparc]
-#else
-    IMPLEMENTS_INTERFACE (IHaloRasterizer)
-#endif
+    IMPLEMENTS_COMPOSITE_INTERFACE (HaloRasterizer)
     IMPLEMENTS_COMPOSITE_INTERFACE_EX (IConfig, XConfig3DSoft)
 END_INTERFACE_TABLE ()
 
@@ -132,7 +130,7 @@ const INTERFACE_ENTRY *csGraphics3DSoftware::GetInterfaceTable ()
   InterfaceTable[0].dwData = BASE_OFFSET(csGraphics3DSoftware, IGraphics3D);
   InterfaceTable[1].pIID = &IID_IHaloRasterizer;
   InterfaceTable[1].pfnFinder = ENTRY_IS_OFFSET;
-  InterfaceTable[1].dwData = BASE_OFFSET(csGraphics3DSoftware, IHaloRasterizer);
+  InterfaceTable[1].dwData = COMPOSITE_OFFSET(csGraphics3DSoftware, IHaloRasterizer, IHaloRasterizer, m_xHaloRasterizer);
   InterfaceTable[2].pIID = &IID_IConfig;
   InterfaceTable[2].pfnFinder = ENTRY_IS_OFFSET;
   InterfaceTable[2].dwData = COMPOSITE_OFFSET(csGraphics3DSoftware, IConfig, IXConfig3DSoft, m_xXConfig3DSoft);
@@ -1557,7 +1555,6 @@ STDMETHODIMP csGraphics3DSoftware::DrawPolygon (G3DPolygonDP& poly)
         // Select the right filter depending if we are drawing an odd or even line.
         // This is only used by draw_scanline_map_filt_zfil currently and is still
         // experimental.
-        extern int filter_bf;
         if (sy & 1) filter_bf = 3; else filter_bf = 1;
 
         // do not draw the rightmost pixel - it will be covered
@@ -2765,10 +2762,14 @@ void csGraphics3DSoftware::SysPrintf (int mode, char* szMsg, ...)
 
 // IHaloRasterizer Implementation //
 
+IMPLEMENT_COMPOSITE_UNKNOWN_AS_EMBEDDED(csGraphics3DSoftware, HaloRasterizer);
+
 // NOTE!!! This only works in 16-bit mode!!!
-STDMETHODIMP csGraphics3DSoftware::DrawHalo(csVector3* pCenter, float fIntensity, HALOINFO haloInfo)
+STDMETHODIMP csGraphics3DSoftware::XHaloRasterizer::DrawHalo(csVector3* pCenter, float fIntensity, HALOINFO haloInfo)
 {
-  if (pfmt.PixelBytes != 2)
+  METHOD_PROLOGUE(csGraphics3DSoftware, HaloRasterizer)
+
+  if (pThis->pfmt.PixelBytes != 2)
     return S_FALSE;
 
   int izz = QInt24 (1.0f / pCenter->z);
@@ -2777,13 +2778,14 @@ STDMETHODIMP csGraphics3DSoftware::DrawHalo(csVector3* pCenter, float fIntensity
   if (haloInfo == NULL)
     return E_INVALIDARG;
 
-  int hdiv3 = height / 3;
+  int hdiv3 = pThis->height / 3;
 
-  if (pCenter->x > width || pCenter->x < 0 || pCenter->y > height || pCenter->y < 0 )
+  if (pCenter->x > pThis->width  || pCenter->x < 0 ||
+      pCenter->y > pThis->height || pCenter->y < 0 )
     hRes=S_FALSE;
   else
   {
-    unsigned long zb = z_buffer[(int)pCenter->x + (width * (int)pCenter->y)];
+    unsigned long zb = pThis->z_buffer[(int)pCenter->x + (pThis->width * (int)pCenter->y)];
 
     // first, do a z-test to make sure the halo is visible
     if (izz < (int)zb)
@@ -2794,8 +2796,8 @@ STDMETHODIMP csGraphics3DSoftware::DrawHalo(csVector3* pCenter, float fIntensity
   unsigned short* pBuffer = ((csG3DSoftwareHaloInfo*)haloInfo)->pbuf;
   unsigned char* pAlphaBuffer = ((csG3DSoftwareHaloInfo*)haloInfo)->palpha;
 
-  int nx = QInt(pCenter->x) - (hdiv3 >> 1),
-      ny = QInt(pCenter->y) - (hdiv3 >> 1);
+  int nx = QInt(pCenter->x) - (hdiv3 >> 1);
+  int ny = QInt(pCenter->y) - (hdiv3 >> 1);
 
   int x, y;
   int hh = hdiv3, hw = hdiv3;
@@ -2803,7 +2805,7 @@ STDMETHODIMP csGraphics3DSoftware::DrawHalo(csVector3* pCenter, float fIntensity
   if (fIntensity <= 0.0f)
     return S_FALSE;
 
-  if (nx >= width || ny >= height)
+  if (nx >= pThis->width || ny >= pThis->height)
     return S_FALSE;
 
   if (nx < 0)
@@ -2818,11 +2820,11 @@ STDMETHODIMP csGraphics3DSoftware::DrawHalo(csVector3* pCenter, float fIntensity
     ny = 0;
   }
 
-  if (nx + hw > width)
-    hw -= (nx + hw) - width;
+  if (nx + hw > pThis->width)
+    hw -= (nx + hw) - pThis->width;
 
-  if (ny + hh > height)
-    hh -= (ny + hh) - height;
+  if (ny + hh > pThis->height)
+    hh -= (ny + hh) - pThis->height;
 
   int startx = nx - (QInt(pCenter->x) - (hdiv3 >> 1)),
       starty = ny - (QInt(pCenter->y) - (hdiv3 >> 1));
@@ -2831,7 +2833,7 @@ STDMETHODIMP csGraphics3DSoftware::DrawHalo(csVector3* pCenter, float fIntensity
       br2, bg2, bb2;
 
   int red_shift, green_mask;
-  if (pfmt.GreenBits == 5)
+  if (pThis->pfmt.GreenBits == 5)
   {
     red_shift = 10;
     green_mask = 0x1f;
@@ -2850,8 +2852,8 @@ STDMETHODIMP csGraphics3DSoftware::DrawHalo(csVector3* pCenter, float fIntensity
     unsigned short* pBufY;
     unsigned char* pAlphaBufY;
 
-    //m_piG2D->GetPixelAt(nx, ny + y, (unsigned char**)&pScreen);
-    pScreen = (unsigned short*)(line_table[ny+y] + (nx << pixel_shift));
+    //pThis->m_piG2D->GetPixelAt(nx, ny + y, (unsigned char**)&pScreen);
+    pScreen = (unsigned short*)(pThis->line_table[ny+y] + (nx << pThis->pixel_shift));
     pBufY = &pBuffer[startx + (hdiv3 * (starty + y))];
     pAlphaBufY = &pAlphaBuffer[startx + (hdiv3 * (starty + y))];
 
@@ -2883,10 +2885,12 @@ STDMETHODIMP csGraphics3DSoftware::DrawHalo(csVector3* pCenter, float fIntensity
   return hRes;
 }
 
-STDMETHODIMP csGraphics3DSoftware::CreateHalo(float r, float g, float b, HALOINFO* pRetVal)
+STDMETHODIMP csGraphics3DSoftware::XHaloRasterizer::CreateHalo(float r, float g, float b, HALOINFO* pRetVal)
 {
-  m_piG2D->AddRef();
-  csHaloDrawer halo (this, m_piG2D, r, g, b);
+  METHOD_PROLOGUE(csGraphics3DSoftware, HaloRasterizer)
+
+  pThis->m_piG2D->AddRef();
+  csGraphics3DSoftware::csHaloDrawer halo (pThis, pThis->m_piG2D, r, g, b);
 
   CHK (csG3DSoftwareHaloInfo* retval = new csG3DSoftwareHaloInfo());
 
@@ -2898,7 +2902,7 @@ STDMETHODIMP csGraphics3DSoftware::CreateHalo(float r, float g, float b, HALOINF
   return S_OK;
 }
 
-STDMETHODIMP csGraphics3DSoftware::DestroyHalo(HALOINFO haloInfo)
+STDMETHODIMP csGraphics3DSoftware::XHaloRasterizer::DestroyHalo(HALOINFO haloInfo)
 {
   CHK (delete [] ((csG3DSoftwareHaloInfo*)haloInfo)->pbuf);
   CHK (delete [] ((csG3DSoftwareHaloInfo*)haloInfo)->palpha);
@@ -2907,14 +2911,17 @@ STDMETHODIMP csGraphics3DSoftware::DestroyHalo(HALOINFO haloInfo)
   return S_OK;
 }
 
-STDMETHODIMP csGraphics3DSoftware::TestHalo (csVector3* pCenter)
+STDMETHODIMP csGraphics3DSoftware::XHaloRasterizer::TestHalo (csVector3* pCenter)
 {
+  METHOD_PROLOGUE(csGraphics3DSoftware, HaloRasterizer)
+
   int izz = QInt24 (1.0f / pCenter->z);
 
-  if (pCenter->x > width || pCenter->x < 0 || pCenter->y > height || pCenter->y < 0  )
+  if (pCenter->x > pThis->width  || pCenter->x < 0 ||
+      pCenter->y > pThis->height || pCenter->y < 0  )
     return S_FALSE;
 
-  unsigned long zb = z_buffer[(int)pCenter->x + (width * (int)pCenter->y)];
+  unsigned long zb = pThis->z_buffer[(int)pCenter->x + (pThis->width * (int)pCenter->y)];
 
   if (izz < (int)zb)
     return S_FALSE;
