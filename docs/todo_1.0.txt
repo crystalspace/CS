@@ -25,6 +25,9 @@ Bugs to fix:
 	     Note by Jorrit: DrawPolygonMesh seems to help a lot.
 	     Unfortunatelly this function is still buggy (fog is not implemented
 	     and some transparency effects don't seem to be working).
+	[F]  Re-implement locking in csEventQueue using csMutex rather than the
+	     fallible spin-lock which is presently in use.  Ditto for
+	     csEventCord.
 	[**] CAMERA entity bug and vis culling causes bizarre HOM effects and
 	     disappearing/reappearing stars in csdemo.  Also probably affects
 	     other programs and maps, in which sudden and drastic pops in
