@@ -1796,7 +1796,6 @@ sub DESTROY {
 *ProjectYPlane = *cspacec::csPoly3D_ProjectYPlane;
 *ProjectZPlane = *cspacec::csPoly3D_ProjectZPlane;
 *ProjectAxisPlane = *cspacec::csPoly3D_ProjectAxisPlane;
-*ClassifyPolygon = *cspacec::csPoly3D_ClassifyPolygon;
 *Classify = *cspacec::csPoly3D_Classify;
 *ClassifyX = *cspacec::csPoly3D_ClassifyX;
 *ClassifyY = *cspacec::csPoly3D_ClassifyY;
