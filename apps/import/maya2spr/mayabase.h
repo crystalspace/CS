@@ -30,7 +30,7 @@
 
 typedef float scalar_t;       // Scalar value,
 
-class Animation;
+struct Animation;
 
 class MayaModel
 {
