@@ -142,9 +142,9 @@ chronological order.
 	    template<typename T> struct A {...};'
 	  For the other case, where `typename' is used to qualify a typename
 	  within a template itself, we now fake up a `typename_qualifier'
-	  keyword which is defined as nothing for compilers which do provide
-	  `typename', and as `typename' for compilers which do support it.
-	  Usage example:
+	  keyword which is defined as nothing for compilers which do not
+	  provide `typename', and as `typename' for compilers which do support
+	  it.  Usage example:
 	    template<typename T> struct A {
 	      typedef int B;
 	      typename_qualifier A::B var;
