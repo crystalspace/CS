@@ -398,11 +398,13 @@ awsTest::Initialize(int argc, const char* const argv[], const char *iConfigName)
   iAwsWindow *test = aws->CreateWindowFrom("Splash");
   iAwsWindow *test2 = aws->CreateWindowFrom("Another");
   iAwsWindow *test3 = aws->CreateWindowFrom("Engine View");
+  iAwsWindow *test4 = aws->CreateWindowFrom("Layout Test");
 
   test3->SetEngineView(wview);
 
   if (test)  test->Show();
   if (test3) test3->Show();
+  if (test4) test4->Show();
 
   //if (test2) test2->Show();
   s->SetTestWin(test2);
