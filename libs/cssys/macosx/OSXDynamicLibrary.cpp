@@ -30,6 +30,7 @@
 #include "cssysdef.h"
 #include "cssys/csshlib.h"
 #include "cssys/sysfunc.h"
+#include "csutil/csvector.h"
 #include "csutil/util.h"
 #include "OSXLoadLibrary.h"
 #include <sys/param.h>
