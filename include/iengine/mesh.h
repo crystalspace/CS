@@ -344,7 +344,11 @@ struct iMeshWrapper : public iBase
    * <li>#CS_ENTITY_DETAIL: this is a detail object. Again this is a hint
    *     for the engine to render this object differently. Currently not used.
    * <li>#CS_ENTITY_CAMERA: entity will always be centered around the camera.
-   * <li>#CS_ENTITY_INVISIBLE: entity is invisible.
+   * <li>#CS_ENTITY_INVISIBLEMESH: entity is not rendered. 
+   * <li>#CS_ENTITY_NOHITBEAM: this entity will not be considered by HitBeam() 
+   *     calls.
+   * <li>#CS_ENTITY_INVISIBLE: means that either CS_ENTITY_INVISIBLEMESH and 
+   *     CS_ENTITY_NOHITBEAM are set.
    * <li>#CS_ENTITY_NOSHADOWS: cast no shadows.
    * <li>#CS_ENTITY_NOLIGHTING: do not light this object.
    * </ul>

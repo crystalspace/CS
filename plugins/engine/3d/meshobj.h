@@ -726,7 +726,7 @@ public:
     }
     virtual void SetFlagsRecursive (uint32 mask, uint32 value)
     {
-      return scfParent->SetFlagsRecursive (mask, value);
+      scfParent->SetFlagsRecursive (mask, value);
     }
     virtual void SetZBufMode (csZBufMode mode)
     {

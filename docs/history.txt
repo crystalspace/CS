@@ -13,6 +13,10 @@ chronological order.
 	- Jorrit fixed a memory leak in genmesh with new renderer. Please
 	  don't use embedded interfaces for SharedVariableAccessor since that
 	  will cause a circular reference.
+	- Luca has fixed a tiny error in the engine plugin. The error was 
+	  returning a value in a function whose return value is void. He 
+	  also updated the doxygen's comment for the iMeshWrapper::GetFlags() 
+	  method.
 9-Apr-2004
 	- Jorrit added iMeshWrapper->SetZBufModeRecursive(),
 	  SetFlagsRecursive(), and SetRenderPriorityRecursive(). These
