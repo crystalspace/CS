@@ -23,8 +23,8 @@
 #include "cstypes.h"
 #include "csutil/scf.h"
 
-class iTerrainWrapper;
 class csSector;
+struct iTerrainWrapper;
 struct iThing;
 struct iStatLight;
 struct iVisibilityCuller;
