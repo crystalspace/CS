@@ -364,8 +364,8 @@ void csConsoleInput::Refresh ()
 {
   if (!Console || !Console->GetVisible ()) return;
   Console->PutText ("\r");
-  Console->PutText (Prompt);
-  Console->PutText (line);
+  Console->PutText ("%s", Prompt);
+  Console->PutText ("%s", line.GetData ());
   Console->SetCursorPos (PromptLen + vCursorPos);
   if (InsertMode)
     Console->SetCursorStyle (csConInsertCursor);

@@ -6,6 +6,10 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+11-Aug-2004
+	- Oktal fixed a problem in the console input plugin where a '%' sign
+	  in the input would cause problems because of iConsoleOutput::PutText's
+	  printf-style format string.
 1-Aug-2004
 	- Eric Sunshine made csBaseEventHandler::HandleEvent() protected rather
 	  than private. This makes it possible for subclasses to deal with
