@@ -1193,13 +1193,13 @@ awsWindow::GetEngineView()
 csRect 
 awsWindow::getPreferredSize()
 {
-  return comp.Frame();
+  return csRect(0,0,comp.Frame().Width(), comp.Frame().Height());
 }
  
 csRect 
 awsWindow::getMinimumSize()
 {
-  return comp.Frame();
+  return  csRect(0,0,comp.Frame().Width(), comp.Frame().Height());
 }
 
 awsLayoutManager *

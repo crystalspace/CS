@@ -345,7 +345,7 @@ awsCmdButton::getMinimumSize()
   }
 
 
-  return csRect(0,0,tw+6+(tw>>1),th+6+(th>>2));
+  return csRect(0,0,tw+6+(tw>>2),th+6+(th>>1));
 }
 
 bool

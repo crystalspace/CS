@@ -20,7 +20,7 @@ max(int i, int j)
 /////////////////////////////////////////////////////////////////////////////////
 
 awsGridBagConstraints::awsGridBagConstraints():
-	gridx(GBS_RELATIVE),
+    gridx(GBS_RELATIVE),
     gridy(GBS_RELATIVE),
     gridwidth(1),
     gridheight(1),
@@ -28,7 +28,7 @@ awsGridBagConstraints::awsGridBagConstraints():
     weighty(0),
     anchor(GBS_CENTER),
     fill(GBS_NONE),
-	insets(0, 0, 0, 0),
+    insets(0, 0, 0, 0),
     ipadx(0),
     ipady(0)
 {
@@ -67,12 +67,17 @@ awsGridBagConstraints::Clone()
 
 /////////////////////////////////////////////////////////////////////////////////////////
 
-awsGridBagLayout::GridBagLayoutInfo::GridBagLayoutInfo()
+awsGridBagLayout::GridBagLayoutInfo::GridBagLayoutInfo():width(0), height(0), startx(0), starty(0)
 {
   minWidth= new int[awsGridBagLayout::MAXGRIDSIZE];		
   minHeight = new int[awsGridBagLayout::MAXGRIDSIZE];		
   weightX = new double[awsGridBagLayout::MAXGRIDSIZE];
   weightY = new double[awsGridBagLayout::MAXGRIDSIZE];
+
+  memset(minWidth, 0, sizeof(int) * awsGridBagLayout::MAXGRIDSIZE);
+  memset(minHeight, 0, sizeof(int) * awsGridBagLayout::MAXGRIDSIZE);
+  memset(weightX, 0, sizeof(double) * awsGridBagLayout::MAXGRIDSIZE);
+  memset(weightY, 0, sizeof(double) * awsGridBagLayout::MAXGRIDSIZE);
 }
 
 awsGridBagLayout::GridBagLayoutInfo::~GridBagLayoutInfo()
@@ -793,7 +798,7 @@ awsGridBagLayout::ArrangeGrid(iAwsComponent *parent)
     iAwsComponent *cmp;
     int compindex;
     awsGridBagConstraints *constraints;
-    csRect insets;
+    csRect insets(0,0,0,0);
     csRect d;
     csRect r;
     int i, diffw, diffh;
@@ -815,23 +820,25 @@ awsGridBagLayout::ArrangeGrid(iAwsComponent *parent)
      * Pass #1: scan all the children to figure out the total amount
      * of space needed.
      */
-
+    
     info = GetLayoutInfo(parent, PREFERREDSIZE);
     d = GetMinSize(parent, info);
 
     if (parent->Frame().Width() < d.Width() || 
         parent->Frame().Height() < d.Height()) 
-    {
+    {      
+      if (info) delete info;
+
       info = GetLayoutInfo(parent, MINSIZE);
       d = GetMinSize(parent, info);
     }
-
+       
     if (layoutInfo) delete layoutInfo;
         
     layoutInfo = info;
     
     r.xmax= d.xmax;
-    r.ymax = d.xmax;
+    r.ymax = d.ymax;
     
     /*
      * If the current dimensions of the window don't match the desired
@@ -884,7 +891,7 @@ awsGridBagLayout::ArrangeGrid(iAwsComponent *parent)
     }
     
     /*
-     * Now do the actual layout of the slaves using the layout information
+     * Now do the actual layout of the children using the layout information
      * that has been collected.
      */
 
