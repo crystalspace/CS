@@ -3,6 +3,9 @@ http://crystal.sourceforge.net/
 
 The history order is reversed so that new features are at the top.
 
+1-Apr-2003
+	- Reverted dllwrap change to win32gcc.mak from 4 days ago since
+	  it prevents debug symbols from being present in plugins.
 31-Mar-2003
 	- Fixed a very old clipping bug with individual polygon drawing
 	  in the thing plugin in case there is rendering through a portal
