@@ -2204,9 +2204,9 @@ void csGraphics3DDirect3DDx6::CloseFogObject (CS_ID /*id*/)
 {
 }
 
-void csGraphics3DDirect3DDx6::DrawPixmap (iTextureHandle *hTex,
-  int sx, int sy, int sw, int sh,
-  int tx, int ty, int tw, int th)
+void csGraphics3DDirect3DDx6::DrawPixmap (iTextureHandle* /*hTex*/,
+  int /*sx*/, int /*sy*/, int /*sw*/, int /*sh*/,
+  int /*tx*/, int /*ty*/, int /*tw*/, int /*th*/)
 {
   // not implemented yet :-)
   // Thomas, I really beg pardon for all this mess with DrawSprite,

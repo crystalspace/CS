@@ -812,7 +812,7 @@ void csOctree::MarkVisibleFromPVS (const csVector3& pos)
 #define PLANE_Z 2
 
 void csOctree::BoxOccludeeShadowPolygons (const csBox3& box,
-	const csBox3& occludee,
+	const csBox3& /*occludee*/,
 	csPolygonInt** polygons, int num_polygons,
 	csCBuffer* cbuffer, const csVector2& scale, const csVector2& shift,
 	int plane_nr, float plane_pos)
