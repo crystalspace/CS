@@ -15,7 +15,6 @@ environment.
 * Tutorial Simple Map:: Simple Tutorial 3: Map Loading
 * map2cs Tutorial:: @code{map2cs} Tutorial
 * md32spr Tutorial:: @code{md32spr} Tutorial
-* caltocs Tutorial:: @code{caltocs} Tutorial
 * WinCVS Tutorial::
 * HOWTO::
 @end menu
@@ -26,6 +25,5 @@ environment.
 @imports{tutorial,simpmap.txi}
 @importss{tutorial,map2cs,map2cs.txi}
 @imports{tutorial,md32spr.txi}
-@imports{tutorial,caltocs.txi}
 @importss{tutorial,wincvs,wincvs.txi}
 @importss{tutorial,howto,howto.txi}

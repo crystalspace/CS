@@ -36,6 +36,9 @@ chronological order.
 	- Eric Sunshine updated some out of date documentation in the user
 	  manual; corrected some Texinfo mark-up errors; and eliminated a TeX
 	  `underfull hbox' warning.
+	- Eric Sunshine removed `caltocs' tutorial since the associated program
+	  was removed some time back.  Perhaps, in the future, someone might
+	  want to update this tutorial to explain use of sprcal3d plugin.
 3-Feb-2004
 	- Eric Sunshine fixed syntax error in aws.mak introduced yesterday
 	  which manifested when running 'msvcgen' targets.

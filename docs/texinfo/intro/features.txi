@@ -17,7 +17,7 @@ system is listed here it does not necessarily mean that it is 100% supported:
 
 @itemize @bullet
 @item
-Windows (Windows 9x/NT/ME/2000/XP)
+Windows (Windows 9x/@sc{nt}/@sc{me}/2000/@sc{xp})
 
 @item
 Unix (Linux, FreeBSD, etc.)
@@ -31,7 +31,7 @@ Here are some of just some of Crystal Space's features in no particular order.
 Whenever there is some documentation on the subject this is marked after
 the feature. The most useful documentation comes first.
 
-@c this used to be listed by library and plug-in, but I found that organization
+@c This used to be listed by library and plug-in, but I found that organization
 @c redundant after looking at some other sections of the documentation,
 @c namely the directory hierarchy section
 
@@ -39,21 +39,21 @@ the feature. The most useful documentation comes first.
 @item
 Geometric utility library with handy classes such as 2D and 3D vectors,
 matrices, transforms, quaternions, kdtree, axis aligned and oriented bounding
-box routines, rectangle subdivision, @dots{}. @xref{csGeom}.
+box routines, rectangle subdivision, etc. @xref{csGeom}.
 
 @item
 General utility library with stuff like templated arrays, smart pointer,
 hashmap, object registry, plugin manager, radix sort, bit array, optimized
-allocators, strings, @dots{}. @xref{csUtil}.
+allocators, strings, etc. @xref{csUtil}.
 
 @item
 Higher level tool library containing things like some example procedural
 textures (plasma, fire, and water), full screen effects, collider support,
-texture generation tools, @dots{}.
+texture generation tools, etc.
 
 @item
 Graphics library with simple utilities to do mipmapping, color quantization,
-calculation of color gradients, simple bumpmapping, @dots{}.
+calculation of color gradients, simple bumpmapping, etc.
 
 @item
 2D and 3D polygons
@@ -95,19 +95,20 @@ Animated 3D models (3D sprites). @xref{Animation}.
 2D animations.
 
 @item
-MD3 to Crystal Space convertor. @xref{md32spr Tutorial}.
+Quake @sc{md3} and @sc{mdl} to Crystal Space convertor.  @xref{md32spr
+Tutorial}.
 
 @item
-CAL3D to Crystal Space exporter. @xref{caltocs Tutorial}.
+The @file{sprcal3d} plugin is able to load Cal3D models.
 
 @item
 Crystal Space native windowing system. @xref{AWS}, @xref{CSWS}.
 
 @item
-2D canvases (OpenGL, DirectDraw, X11, CoreGraphics, Cocoa, null, memory, line)
+2D canvases (OpenGL, DirectDraw, X11, CoreGraphics, Cocoa, null, memory)
 
 @item
-3D renderers (OpenGL, software, null, line). @xref{Graphics Drivers}.
+3D renderers (OpenGL, software, null). @xref{Graphics Drivers}.
 
 @item
 Playing @sc{avi} streams (@sc{rle}, DivX 4, OpenDivX) on a texture.
@@ -120,9 +121,7 @@ Various image loaders (@sc{bmp}, @sc{gif}, @sc{jpg}, @sc{png}, @sc{sgi},
 Portals and sectors. @xref{Portal Engine}.
 
 @item
-Lighting: static, pseudo-dynamic, dynamic, halos, shadows, radiosity.@*
-
-@noindent
+Lighting: static, pseudo-dynamic, dynamic, halos, shadows, radiosity.
 @xref{Lighting}. @xref{HOWTO Pseudo DynLight}.
 
 @item
@@ -185,14 +184,14 @@ Powerful sequence manager to control movement, animation and other
 features in a world. @xref{Sequence Manager}.
 
 @item
-Bitmapped and vector fonts (freefont). @xref{HOWTO Use custom font}.
+Bitmapped and vector fonts (FreeFont). @xref{HOWTO Use custom font}.
 
 @item
 Map file loader and converters. @xref{XML File Format},
 @xref{Tutorial Simple Map}, @xref{Old Map File Format}.
 
 @item
-Scripting engine (python, perl, ...). @xref{Scripting Languages}.
+Scripting bindings (Python, Perl, Java). @xref{Scripting Languages}.
 
 @item
 Skeletal animation. @xref{MeshObject Spr3D}.
@@ -206,4 +205,3 @@ Movie Recording plugin. @xref{HOWTO Recording Movies}.
 @item
 Debugging system
 @end itemize
-

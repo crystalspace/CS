@@ -1,5 +1,5 @@
 @c -*-texinfo-*-
-@node md32spr Tutorial, caltocs Tutorial, map2cs Tutorial, Tutorials
+@node md32spr Tutorial, WinCVS Tutorial, map2cs Tutorial, Tutorials
 @section @code{md32spr} Tutorial
 @cindex Tutorial, Sprite (@code{md32spr})
 @cindex @code{md32spr} Tutorial
