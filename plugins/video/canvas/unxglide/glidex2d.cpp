@@ -291,7 +291,7 @@ bool csGraphics2DGlideX::SetMouseCursor (csMouseCursorID iShape)
 
 bool csGraphics2DGlideX::SetMousePosition (int x, int y)
 {
-  mx=y; my=y;
+  mx=x; my=y; if (mxold==-1) { mxold=y; myold=y; }
   XWarpPointer (dpy, None, window, 0, 0, 0, 0, x, y);
   return true;    
 }
