@@ -625,6 +625,7 @@ void csHazeMeshObject::UpdateLighting (iLight** lights, int num_lights,
   g3dpoly->var [i].component = v1 + t * (v2 - v1); \
 }
 
+#ifndef CS_USE_NEW_RENDERER
 static void PreparePolygonFX2 (G3DPolygonDPFX* g3dpoly,
   csVector2* clipped_verts, int num_vertices, csVertexStatus* clipped_vtstats,
   int orig_num_vertices, bool gouraud)
@@ -717,6 +718,7 @@ static void PreparePolygonFX2 (G3DPolygonDPFX* g3dpoly,
     }
   }
 }
+#endif
 
 #undef INTERPOLATE
 #undef INTERPOLATE1
@@ -763,6 +765,7 @@ void csHazeMeshObject::ComputeHullOutline(iHazeHull *hull, float layer_scale,
 bool csHazeMeshObject::Draw (iRenderView* rview, iMovable* movable,
 	csZBufMode mode)
 {
+#ifndef CS_USE_NEW_RENDERER
   int i;
   if (!material)
   {
@@ -954,6 +957,7 @@ bool csHazeMeshObject::Draw (iRenderView* rview, iMovable* movable,
   delete[] layer_pts;
   delete[] layer_uvs;
 
+#endif
   return true;
 }
 
@@ -1020,6 +1024,7 @@ void csHazeMeshObject::ProjectO2S(csReversibleTransform& tr_o2c, float fov,
 void csHazeMeshObject::DrawPoly(iRenderView *rview, iGraphics3D *g3d,
   iMaterialHandle *mat, int num, const csVector3* pts, const csVector2* uvs)
 {
+#ifndef CS_USE_NEW_RENDERER
   g3dpolyfx.use_fog = false;
   g3dpolyfx.num = num;
   g3dpolyfx.mat_handle = mat;
@@ -1057,7 +1062,7 @@ void csHazeMeshObject::DrawPoly(iRenderView *rview, iGraphics3D *g3d,
   rview->CalculateFogPolygon (g3dpolyfx);
   g3dpolyfx.mixmode = MixMode; // | CS_FX_GOURAUD;
   g3d->DrawPolygonFX (g3dpolyfx);
-
+#endif
 }
 
 void csHazeMeshObject::GetObjectBoundingBox (csBox3& retbbox, int /*type*/)

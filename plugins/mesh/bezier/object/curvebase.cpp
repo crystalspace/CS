@@ -82,9 +82,7 @@ csCurveTesselated::csCurveTesselated (int num_v, int num_t)
   ControlPoints = new csVector2[num_v];
   Colors = new csColor[num_v];
   NumTriangles = num_t;
-#ifndef CS_USE_NEW_RENDERER
   Triangles = new csTriangle[num_t];
-#endif // CS_USE_NEW_RENDERER
   ColorsValid = false;
 }
 
@@ -94,9 +92,7 @@ csCurveTesselated::~csCurveTesselated ()
   delete[] TextureCoords;
   delete[] ControlPoints;
   delete[] Colors;
-#ifndef CS_USE_NEW_RENDERER
   delete[] Triangles;
-#endif // CS_USE_NEW_RENDERER
 }
 
 void csCurveTesselated::UpdateColors (csCurveLightMap *LightMap)
@@ -113,7 +109,6 @@ void csCurveTesselated::UpdateColors (csCurveLightMap *LightMap)
   int lm_height = LightMap->GetWidth ();
 
   int j;
-#ifndef CS_USE_NEW_RENDERER
   for (j = 0; j < GetTriangleCount (); j++)
   {
     csTriangle &ct = Triangles[j];
@@ -138,7 +133,6 @@ void csCurveTesselated::UpdateColors (csCurveLightMap *LightMap)
     Colors[ct.c].green = ((float)map[lm_idx].green) / 256.0f;
     Colors[ct.c].blue = ((float)map[lm_idx].blue) / 256.0f;
   }
-#endif // CS_USE_NEW_RENDERER
 
   ColorsValid = true;
 }
@@ -341,7 +335,11 @@ void csCurve::ShineDynLight (csBezierLightPatch *lp)
       }
 
       d = csSquaredDist::PointPoint (center, pos);
+#ifdef CS_USE_NEW_RENDERER
+      if (d >= light->QueryLight ()->GetInfluenceRadiusSq ()) continue;
+#else
       if (d >= light->QueryLight ()->GetSquaredRadius ()) continue;
+#endif
       d = qsqrt (d);
       normal = uv2Normal[uv];
 
@@ -505,7 +503,11 @@ void csCurve::CalculateLightingStatic (iFrustumView *lview, bool vis)
       pos = uv2World[uv];
 
       d = csSquaredDist::PointPoint (center, pos);
+#ifdef CS_USE_NEW_RENDERER
+      if (d >= l->GetInfluenceRadiusSq ()) continue;
+#else
       if (d >= l->GetSquaredRadius ()) continue;
+#endif
       d = qsqrt (d);
 
       normal = uv2Normal[uv];
@@ -722,7 +724,6 @@ float csCurve::GetArea ()
   csCurveTesselated *ct = Tesselate (10000);
 
   csVector3 *vertex = ct->GetVertices ();
-#ifndef CS_USE_NEW_RENDERER
   csTriangle t;
 
   // loop through all of our triangles and sum thier areas
@@ -732,7 +733,6 @@ float csCurve::GetArea ()
     t = ct->GetTriangle (i);
     area += ABS (csMath3::Area3 (vertex[t.a], vertex[t.b], vertex[t.c]));
   }
-#endif // CS_USE_NEW_RENDERER
 
   return area / 2.0f;
 }
@@ -932,7 +932,6 @@ csCurveTesselated *csBezierCurve::Tesselate (int res)
     }
   }
 
-#ifndef CS_USE_NEW_RENDERER
   for (i = 0; i < res; i++)
   {
     for (j = 0; j < res; j++)
@@ -955,7 +954,6 @@ csCurveTesselated *csBezierCurve::Tesselate (int res)
       down.c = bl;
     }
   }
-#endif // CS_USE_NEW_RENDERER
 
   return previous_tesselation;
 }

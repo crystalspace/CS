@@ -271,8 +271,10 @@ private:
   bool lighting;
 
 public:
+#ifndef CS_USE_NEW_RENDERER
   /// Polygon.
   G3DPolygonDPFX g3dpolyfx;
+#endif
 
 public:
   /// Constructor.

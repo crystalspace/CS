@@ -7,4 +7,15 @@ Things that need to be done in new renderer:
 	  related conditions.
 	- Make csShader a csObject so it can be supported in regions.
 	  Also add iRegion->PrepareShaders().
-
+	- Meshes remaining to be ported:
+		- spr2d (and the particle systems)
+		- rain
+		- haze
+		- beziermesh
+		- lightning
+		- cloth
+		- terrfunc (disabled from jam build!)
+		- terrbig (disabled from jam build!)
+		- bcterr
+		- sprcal3d
+		- stars

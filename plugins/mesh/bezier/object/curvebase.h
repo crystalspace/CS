@@ -59,10 +59,8 @@ private:
   csVector2* ControlPoints;
   // Colors for the vertices.
   csColor* Colors;
-#ifndef CS_USE_NEW_RENDERER
   // Triangles.
   csTriangle* Triangles;
-#endif // CS_USE_NEW_RENDERER
 
   // Number of vertices
   int NumVertices;
@@ -92,12 +90,10 @@ public:
   inline csVector2* GetControlPoints ();
   /// Return the array of vertex colors
   inline csColor* GetColors ();
-#ifndef CS_USE_NEW_RENDERER
   /// Return the array of triangles
   inline csTriangle* GetTriangles ();
   /// Return a single triangle @@@ why?
   inline csTriangle& GetTriangle (int i);
-#endif // CS_USE_NEW_RENDERER
   /// Return true if the colors table is valid.
   inline bool AreColorsValid () const;
 
@@ -410,12 +406,10 @@ inline csVector2* csCurveTesselated::GetControlPoints ()
 { return ControlPoints; }
 inline csColor* csCurveTesselated::GetColors ()
 { return Colors; }
-#ifndef CS_USE_NEW_RENDERER
 inline csTriangle* csCurveTesselated::GetTriangles ()
 { return Triangles; }
 inline csTriangle& csCurveTesselated::GetTriangle (int i)
 { return Triangles[i]; }
-#endif // CS_USE_NEW_RENDERER
 inline bool csCurveTesselated::AreColorsValid () const
 { return ColorsValid; }
 

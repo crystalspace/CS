@@ -957,7 +957,9 @@ bool csBezierMesh::DrawTest (iRenderView *rview, iMovable *movable)
 
 bool csBezierMesh::Draw (iRenderView *rview, iMovable *movable, csZBufMode zMode)
 {
+#ifndef CS_USE_NEW_RENDERER
   DrawCurves (rview, movable, zMode);
+#endif
   return true;                                  // @@@@ RETURN correct vis info
 }
 

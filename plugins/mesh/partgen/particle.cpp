@@ -187,6 +187,7 @@ void csNewParticleSystem::UpdateLighting (iLight** lights, int num,
 bool csNewParticleSystem::Draw (iRenderView* rview, iMovable* mov,
 	csZBufMode mode)
 {
+#ifndef CS_USE_NEW_RENDERER
   // some generic setup
   if (VisCallback) VisCallback->BeforeDrawing (this, rview);
   iGraphics3D* g3d = rview->GetGraphics3D ();
@@ -331,6 +332,7 @@ bool csNewParticleSystem::Draw (iRenderView* rview, iMovable* mov,
   g3d->DrawTriangleMesh (trimesh);
   vbufmgr->UnlockBuffer (vbuf);
 
+#endif
   return true;
 }
 

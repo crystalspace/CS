@@ -104,11 +104,6 @@ public:
     return 0;
   }
 
-#ifdef CS_USE_NEW_RENDERER
-  virtual void EnableShadowCaps () = 0;
-  virtual void DisableShadowCaps () = 0;
-#endif
-
   /**
    * See imesh/object.h for sepcification. The default implementation
    * does nothing.
@@ -122,17 +117,6 @@ public:
    */
   virtual bool Draw (iRenderView* rview, iMovable* movable,
   	csZBufMode zbufMode) = 0;
-
-#ifdef CS_USE_NEW_RENDERER
-  virtual bool DrawZ (iRenderView* rview, iMovable* movable,
-  	csZBufMode zbufMode) = 0;
-
-  virtual bool DrawShadow (iRenderView* rview, iMovable* movable,
-  	csZBufMode zbufMode, iLight *light) = 0;
-
-  virtual bool DrawLight (iRenderView* rview, iMovable* movable,
-  	csZBufMode zbufMode, iLight *light) = 0;
-#endif // CS_USE_NEW_RENDERER
 
   /**
    * See imesh/object.h for sepcification. This function is handled

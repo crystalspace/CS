@@ -33,10 +33,30 @@ chronological order.
 	      - Moved G3D_FOGMETHOD to common part of graph3d.h.
 	      - Moved all new renderer specific methods in iMeshWrapper
 	        to old renderer branch.
+	      - Bugplug spider and shadow now work.
 	      - Started work on documenting the API changes for the new
 	        renderer that are relevant for user applications.
 	- Jorrit added a docs/todo_newrenderer.txt which should contain
 	  all stuff that needs to be done for new renderer (in detail).
+	- Jorrit made sure that the following mesh objects now compile
+	  (although they will probably not work):
+	      - Beziermesh: re-enabled all the csTriangle stuff. No idea
+	        why that was removed and fixed some other things.
+		Also changed light->GetSquaredDistance() to
+		GetInfluenceRadiusSq().
+	      - All particle systems now compile (except rain).
+	      - Haze mesh compiles.
+	      - Null mesh loader compiles although I had to put a lot of
+	        NR specific code in comments. Apparently the null mesh loader
+		has once worked with NR. Now it will not work anymore. No
+		idea how to fix.
+	      - Removed some NR specific stuff from csMeshObject which wasn't
+	        used and appeared to be left-overs from the past. This fixes
+		the rain particle system.
+	      - spr2d now compiles.
+	      - stars now compiles.
+	      - Disabled terrfunc and terrbig from the Jam build with
+	        new renderer enabled. There are a bit harder to fix right.
 28-Aug-2003
 	- Jorrit fixed the x2d plugin so it actually reports an error if the
 	  'xwin' plugin cannot be found.

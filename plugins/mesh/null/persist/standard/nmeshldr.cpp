@@ -139,7 +139,8 @@ bool csNullFactoryLoader::ParseRenderBuffer(iDocumentNode *node,
   const char *comptype = node->GetAttributeValue("type");
   const char *name = node->GetAttributeValue("name");
   int compcount = node->GetAttributeValueAsInt("compcount");
-  int length = state->GetVertexCount();
+  //@@@ Jorrit: why is this here? int length = state->GetVertexCount();
+  int length = 0;
   
   if(strcmp(comptype, "float") == 0)
   {
@@ -166,8 +167,8 @@ bool csNullFactoryLoader::ParseRenderBuffer(iDocumentNode *node,
       }
     };
 
-    state->AddRenderBuffer(name, CS_BUFCOMP_FLOAT, compcount);
-    state->SetRenderBuffer(name, floatarray);
+    //@@@ Jorrit: doesn't compile!!! state->AddRenderBuffer(name, CS_BUFCOMP_FLOAT, compcount);
+    //@@@state->SetRenderBuffer(name, floatarray);
     delete[] floatarray;
   }
   if(strcmp(comptype, "int") == 0)
@@ -195,8 +196,8 @@ bool csNullFactoryLoader::ParseRenderBuffer(iDocumentNode *node,
       }
     };
 
-    state->AddRenderBuffer(name, CS_BUFCOMP_INT, compcount);
-    state->SetRenderBuffer(name, intarray);
+    //@@@ Jorrit: state->AddRenderBuffer(name, CS_BUFCOMP_INT, compcount);
+    //@@@ Jorrit: state->SetRenderBuffer(name, intarray);
     delete[] intarray;
   }
   else if(strcmp(comptype, "short") == 0)
@@ -225,8 +226,8 @@ bool csNullFactoryLoader::ParseRenderBuffer(iDocumentNode *node,
       }
     };
 
-    state->AddRenderBuffer(name, CS_BUFCOMP_SHORT, compcount);
-    state->SetRenderBuffer(name, (int*)shortarray);
+    //@@@ state->AddRenderBuffer(name, CS_BUFCOMP_SHORT, compcount);
+    //@@@ state->SetRenderBuffer(name, (int*)shortarray);
     delete[] shortarray;
   }
   else if(strcmp(comptype, "byte") == 0)
@@ -255,8 +256,8 @@ bool csNullFactoryLoader::ParseRenderBuffer(iDocumentNode *node,
       }
     };
 
-    state->AddRenderBuffer(name, CS_BUFCOMP_BYTE, compcount);
-    state->SetRenderBuffer(name, (int*)bytearray);
+    //@@@ Jorrit: state->AddRenderBuffer(name, CS_BUFCOMP_BYTE, compcount);
+    //@@@ Jorrit: state->SetRenderBuffer(name, (int*)bytearray);
   
     delete[] bytearray;
   }

@@ -198,7 +198,9 @@ private:
   uint32 current_features;
 
   /// Polygon.
+#ifndef CS_USE_NEW_RENDERER
   G3DPolygonDPFX g3dpolyfx;
+#endif
 
   /// bbox in object space
   csBox3 bbox;

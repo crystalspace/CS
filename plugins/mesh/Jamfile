@@ -24,6 +24,11 @@ SubInclude TOP plugins mesh spr2d ;
 SubInclude TOP plugins mesh spr3d ;
 SubInclude TOP plugins mesh sprcal3d ;
 SubInclude TOP plugins mesh stars ;
-SubInclude TOP plugins mesh terrbig ;
-SubInclude TOP plugins mesh terrfunc ;
 SubInclude TOP plugins mesh thing ;
+
+if $(USE_NEW_RENDERER) = "no"
+{
+  SubInclude TOP plugins mesh terrbig ;
+  SubInclude TOP plugins mesh terrfunc ;
+}
+

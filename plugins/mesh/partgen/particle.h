@@ -70,8 +70,10 @@ protected:
   /// the mesh factory (should be an empty frame)
   iMeshObjectFactory *Factory;
 
+#ifndef CS_USE_NEW_RENDERER
   /// The vertex buffer.
   csRef<iVertexBuffer> vbuf;
+#endif
 
   /// currently allocated amount of storage for particles
   int StorageCount;
