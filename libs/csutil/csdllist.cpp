@@ -172,7 +172,10 @@ void * csDLinkList::GetFirstItem()
 
 void * csDLinkList::PeekFirstItem()
    {
-   return firstItem->theObject;
+     if (!firstItem)
+       return NULL;
+       
+     return firstItem->theObject;
    }
 
 
