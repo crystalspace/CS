@@ -9,6 +9,9 @@ The history order has been reversed so that new features are at the top.
 	  cstreend.h where unlinkable code is generated when an inline method
 	  calls a second inline before the compiler has seen a declaration of
 	  the second method.
+	- Eric Sunshine implemented support for CSKEY_PADPLUS, CSKEY_PADMINUS,
+	  CSKEY_PADMULT, and CSKEY_PADDIV in the NextStep port.  Andrew
+	  recently added these constants to csevent.h.
 25-Jun-2000
 	- New tree control in CSWS from Norman Kramer.
 	- Did an experiment for speeding up OpenGL by putting the setup

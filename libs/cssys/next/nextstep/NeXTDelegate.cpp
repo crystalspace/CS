@@ -59,6 +59,10 @@ enum
     K_KP_END		= '1',		// ascii-set, numeric-pad mask
     K_KP_INSERT		= '0',		// ascii-set, numeric-pad mask
     K_KP_DELETE		= '.',		// ascii-set, numeric-pad mask
+    K_KP_MULTIPLY	= '*',		// ascii-set, numeric-pad mask
+    K_KP_DIVIDE		= '/',		// ascii-set, numeric-pad mask
+    K_KP_PLUS		= '+',		// ascii-set, numeric-pad mask
+    K_KP_MINUS		= '-',		// symbol-set, numeric-pad mask
     K_KP_ENTER		= 0x03,		// 254-set
     K_ED_PAGE_UP	= 0x30,		// 254-set
     K_ED_PAGE_DOWN	= 0x31,		// 254-set
@@ -368,16 +372,12 @@ static void timer_handler( DPSTimedEntry, double, void* data )
     int k = 0;
     switch (c)
 	{
-	case K_LEFT:         k = CSKEY_LEFT;  break;
-	case K_RIGHT:        k = CSKEY_RIGHT; break;
-	case K_UP:           k = CSKEY_UP;    break;
-	case K_DOWN:         k = CSKEY_DOWN;  break;
-	case K_ED_PAGE_UP:   k = CSKEY_PGUP;  break;
-	case K_ED_PAGE_DOWN: k = CSKEY_PGDN;  break;
-	case K_ED_HOME:      k = CSKEY_HOME;  break;
-	case K_ED_END:       k = CSKEY_END;   break;
-	case K_ED_INSERT:    k = CSKEY_INS;   break;
-	case K_ED_DELETE:    k = CSKEY_DEL;   break;
+	case K_ED_PAGE_UP:   k = CSKEY_PGUP;     break;
+	case K_ED_PAGE_DOWN: k = CSKEY_PGDN;     break;
+	case K_ED_HOME:      k = CSKEY_HOME;     break;
+	case K_ED_END:       k = CSKEY_END;      break;
+	case K_ED_INSERT:    k = CSKEY_INS;      break;
+	case K_ED_DELETE:    k = CSKEY_DEL;      break;
 	}
     return k;
     }
@@ -412,18 +412,26 @@ static void timer_handler( DPSTimedEntry, double, void* data )
     int k = 0;
     switch (c)
 	{
-	case K_KP_CENTER:    k = CSKEY_CENTER; break;
-	case K_KP_LEFT:      k = CSKEY_LEFT;   break;
-	case K_KP_UP:        k = CSKEY_UP;     break;
-	case K_KP_RIGHT:     k = CSKEY_RIGHT;  break;
-	case K_KP_DOWN:      k = CSKEY_DOWN;   break;
-	case K_KP_PAGE_UP:   k = CSKEY_PGUP;   break;
-	case K_KP_PAGE_DOWN: k = CSKEY_PGDN;   break;
-	case K_KP_HOME:      k = CSKEY_HOME;   break;
-	case K_KP_END:       k = CSKEY_END;    break;
-	case K_KP_INSERT:    k = CSKEY_INS;    break;
-	case K_KP_DELETE:    k = CSKEY_DEL;    break;
-	case K_KP_ENTER:     k = CSKEY_ENTER;  break;
+	case K_LEFT:         k = CSKEY_LEFT;     break;
+	case K_RIGHT:        k = CSKEY_RIGHT;    break;
+	case K_UP:           k = CSKEY_UP;       break;
+	case K_DOWN:         k = CSKEY_DOWN;     break;
+	case K_KP_CENTER:    k = CSKEY_CENTER;   break;
+	case K_KP_LEFT:      k = CSKEY_LEFT;     break;
+	case K_KP_UP:        k = CSKEY_UP;       break;
+	case K_KP_RIGHT:     k = CSKEY_RIGHT;    break;
+	case K_KP_DOWN:      k = CSKEY_DOWN;     break;
+	case K_KP_PAGE_UP:   k = CSKEY_PGUP;     break;
+	case K_KP_PAGE_DOWN: k = CSKEY_PGDN;     break;
+	case K_KP_HOME:      k = CSKEY_HOME;     break;
+	case K_KP_END:       k = CSKEY_END;      break;
+	case K_KP_INSERT:    k = CSKEY_INS;      break;
+	case K_KP_DELETE:    k = CSKEY_DEL;      break;
+	case K_KP_MULTIPLY:  k = CSKEY_PADMULT;  break;
+	case K_KP_DIVIDE:    k = CSKEY_DEL;      break;
+	case K_KP_PLUS:      k = CSKEY_PADPLUS;  break;
+	case K_KP_MINUS:     k = CSKEY_PADMINUS; break;
+	case K_KP_ENTER:     k = CSKEY_PADDIV;   break;
 	};
     return k;
     }
@@ -438,10 +446,10 @@ static void timer_handler( DPSTimedEntry, double, void* data )
     if ((p->flags & NX_COMMANDMASK) == 0)
 	{
 	int const c = p->data.key.charCode;
-	if (p->data.key.charSet != NX_ASCIISET)
-	    k = [self classifyOtherSet:c];
-	else if ((p->flags & NX_NUMERICPADMASK) != 0)
+	if ((p->flags & NX_NUMERICPADMASK) != 0)
 	    k = [self classifyKeypad:c];
+	else if (p->data.key.charSet != NX_ASCIISET)
+	    k = [self classifyOtherSet:c];
 	else
 	    k = [self classifyAsciiSet:c];
 	}
