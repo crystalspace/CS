@@ -143,6 +143,11 @@ public:
   STR_APPEND(double, %g, 64)
 #undef STR_APPEND
 
+#if !defined(DO_FAKE_BOOL)
+  /// Append a boolean (as a number -- 1 or 0) to this string
+  csString &Append (bool b) { return Append (b ? "1" : "0"); }
+#endif
+
   /// Replace contents of this string with the contents of another
   csString &Replace (const csString &iStr, size_t iCount = (size_t)-1)
   {
@@ -230,6 +235,9 @@ public:
   STR_APPEND(unsigned long)
   STR_APPEND(float)
   STR_APPEND(double)
+#if !defined(DO_FAKE_BOOL)
+  STR_APPEND(bool)
+#endif
 #undef STR_APPEND
 
   /// Concatenate two strings and return a third one
@@ -272,6 +280,9 @@ STR_SHIFT(long);
 STR_SHIFT(unsigned long)
 STR_SHIFT(float)
 STR_SHIFT(double)
+#if !defined(DO_FAKE_BOOL)
+STR_SHIFT(bool)
+#endif
 #undef STR_SHIFT
 
 #endif // __CS_CSSTRING_H__

@@ -23,6 +23,8 @@ The history order has been reversed so that new features are at the top.
 	  filesystem.
 	- Eric Sunshine fixed a lot more 'const' problems throughout the
 	  project.  Most of these involved changing (char*) to (const char*).
+	- Eric Sunshine added 'bool' variations of the Append() method, and
+	  operator+= and operator<< to csString.
 7-May-2000
 	- More work on PVS. Still not working properly though.
 	- Started working on saving and loading of octree and PVS.
