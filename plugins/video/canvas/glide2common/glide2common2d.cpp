@@ -341,7 +341,18 @@ float csGraphics2DGlideCommon::GetZBuffValue (int x, int y)
   float val=0.0;
   if (succ)
   {
-    val = *((float*)( (unsigned char*)(lfbInfo.lfbPtr) + y*lfbInfo.strideInBytes + x + x));
+    FxU32 *ptr;
+    FxU16 wfloat;
+
+    ptr = (FxU32*)lfbInfo.lfbPtr;
+    ptr += (y*lfbInfo.strideInBytes + x + x)>>2;
+    if ( x&1 ) 
+      wfloat = *ptr&0xffff;
+    else
+      wfloat = *ptr>>16;
+    
+    int xx = (wfloat << 11) + (127 << 23);
+    memcpy( &val, &xx, 4 );
     GlideLib_grLfbUnlock ( GR_LFB_READ_ONLY | GR_LFB_NOIDLE, GR_BUFFER_AUXBUFFER);
   }
   else
