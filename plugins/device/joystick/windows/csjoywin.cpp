@@ -21,10 +21,10 @@
 #include "ivaria/reporter.h"
 #include "csutil/util.h"
 #include "csutil/csstring.h"
+#define INITGUID
 #include <windows.h>
 
 // using DirectInput -- included from csjoywin.h
-#define INITGUID
 #include "csjoywin.h"
 
 #include "cssys/win32/wintools.h"
@@ -128,7 +128,7 @@ BOOL CALLBACK DIEnumDevicesCallback(
   LPVOID pvRef  )
 {
   csWindowsJoystick* po;
-  (LPVOID)po = pvRef;
+  po = (csWindowsJoystick*) pvRef;
   po->CreateDevice (lpddi);
   return DIENUM_CONTINUE;
 }
