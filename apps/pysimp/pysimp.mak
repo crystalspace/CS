@@ -1,3 +1,6 @@
+# Plug-in module only valid if module is listed in PLUGINS.
+ifneq (,$(findstring cspython,$(PLUGINS)))
+
 # Application description
 DESCRIPTION.pysimple = Crystal Space Python simple example
 
@@ -60,3 +63,5 @@ else
 endif
 
 endif # ifeq ($(MAKESECTION),targets)
+
+endif # ifneq (,$(findstring cspython,$(PLUGINS)))
