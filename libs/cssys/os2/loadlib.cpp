@@ -18,9 +18,10 @@
   Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
+#include "sysdef.h"
+
 #ifdef NO_COM_SUPPORT
 
-#include "sysdef.h"
 #include "cscom/com.h"
 
 typedef unsigned long HMODULE;

@@ -16,10 +16,11 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
+#include "sysdef.h"
+
 #ifdef NO_COM_SUPPORT
 
 #include <windows.h>
-#include "sysdef.h"
 #include "cscom/com.h"
 
 CS_HLIBRARY SysLoadLibrary (char* szLibName)

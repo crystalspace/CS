@@ -17,11 +17,12 @@
   Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
+#include "sysdef.h"
+
 #ifdef NO_COM_SUPPORT
 
 #include <stdio.h>
 #include <stdlib.h>
-#include "sysdef.h"
 #include "cscom/com.h"
 
 #include <kernel/image.h>
