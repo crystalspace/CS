@@ -230,7 +230,8 @@ csGraphics2DOpenGL::csGraphics2DOpenGL (iBase *iParent) :
                    m_nGraphicsReady (true),
                    m_hWnd (NULL),
                    m_bPalettized (false),
-                   m_bPaletteChanged (false)
+                   m_bPaletteChanged (false),
+		   modeSwitched (true)
 {
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiOpenGLInterface);
 }
@@ -282,6 +283,7 @@ bool csGraphics2DOpenGL::Initialize (iObjectRegistry *object_reg)
 
   m_nDepthBits = config->GetInt ("Video.OpenGL.DepthBits", 32);
   m_nDisplayFrequency = config->GetInt ("Video.DisplayFrequency", 0);
+  vsync = config->GetBool ("Video.VSync", false);
 
   return true;
 }
@@ -355,9 +357,7 @@ bool csGraphics2DOpenGL::Open ()
   // create the window.
   if (FullScreen)
   {
-    ChangeDisplaySettings (NULL, 0);
-
-    SwitchDisplayMode ();
+    SwitchDisplayMode (true);
   }
 
   m_bActivated = true;
@@ -426,9 +426,10 @@ bool csGraphics2DOpenGL::Open ()
 
   if (HasWGL_EXT_swap_control)
   {
-    wglSwapIntervalEXT (0);
+    wglSwapIntervalEXT (vsync?1:0);
     Report (CS_REPORTER_SEVERITY_NOTIFY,
-      "VSYNC is disabled.");
+      "VSync is %s.", 
+      (wglGetSwapIntervalEXT()==0)?"disabled":"enabled");
   }
 
   return true;
@@ -438,7 +439,7 @@ bool csGraphics2DOpenGL::RestoreDisplayMode ()
 {
   if (is_open)
   {
-    ChangeDisplaySettings (NULL, 0);
+    if (FullScreen) SwitchDisplayMode (false);
     is_open = false;
     return true;
   }
@@ -590,7 +591,7 @@ void csGraphics2DOpenGL::Activate (bool activated)
     m_bActivated = activated;
     if (m_bActivated)
     {
-      SwitchDisplayMode ();
+      SwitchDisplayMode (true);
       ShowWindow (m_hWnd, SW_SHOWNORMAL);
       SetWindowPos (m_hWnd, CS_WINDOW_Z_ORDER, 0, 0, Width, Height, 0);
     }
@@ -599,63 +600,99 @@ void csGraphics2DOpenGL::Activate (bool activated)
       ShowWindow (m_hWnd, SW_SHOWMINIMIZED);
       SetWindowPos (m_hWnd, HWND_NOTOPMOST, 0, 0, 0, 0, SWP_NOMOVE |
         SWP_NOSIZE | SWP_NOACTIVATE);
-      ChangeDisplaySettings (NULL, 0);
+      SwitchDisplayMode (false);
     }
   }
 }
 
-void csGraphics2DOpenGL::SwitchDisplayMode ()
+void csGraphics2DOpenGL::SwitchDisplayMode (bool userMode)
 {
-  DEVMODE dmode;
-	ZeroMemory (&dmode, sizeof(dmode));
-	dmode.dmSize = sizeof (DEVMODE);
-	dmode.dmDriverExtra = 0;
-  EnumDisplaySettings (NULL, ENUM_CURRENT_SETTINGS, &dmode);
-  dmode.dmBitsPerPel = Depth;
-  dmode.dmPelsWidth = Width;
-  dmode.dmPelsHeight = Height;
-  if (m_nDisplayFrequency) dmode.dmDisplayFrequency = m_nDisplayFrequency;
-  dmode.dmFields = DM_BITSPERPEL | DM_PELSWIDTH | DM_PELSHEIGHT | DM_DISPLAYFREQUENCY;
-  
-	LONG ti;
-  if ((ti = ChangeDisplaySettings(&dmode, CDS_FULLSCREEN)) != DISP_CHANGE_SUCCESSFUL)
+  if (userMode)
   {
-    // maybe just the monitor frequency is not supported.
-    // so try without setting it
-    dmode.dmFields = DM_BITSPERPEL | DM_PELSWIDTH | DM_PELSHEIGHT;
-    ti = ChangeDisplaySettings(&dmode, CDS_FULLSCREEN);
-  }
-  if (ti != DISP_CHANGE_SUCCESSFUL)
-  {
-    //The cases below need error handling, as they are errors.
-    switch (ti)
+    // set the default display mode
+    if (modeSwitched)
     {
-      case DISP_CHANGE_RESTART:
-        //computer must restart for mode to work.
-        Report (CS_REPORTER_SEVERITY_WARNING,
-          "gl2d error: must restart for display change.");
-        break;
-      case DISP_CHANGE_BADFLAGS:
-        //Bad Flag settings
-        Report (CS_REPORTER_SEVERITY_WARNING,
-	      "gl2d error: display change bad flags.");
-        break;
-      case DISP_CHANGE_FAILED:
-        //Failure to display
-        Report (CS_REPORTER_SEVERITY_WARNING,
-          "gl2d error: display change failed.");
-        break;
-      case DISP_CHANGE_NOTUPDATED:
-        //No Reg Write Error
-        Report (CS_REPORTER_SEVERITY_WARNING,
-          "gl2d error: display change could not write registry.");
-        break;
-      default:
-        //Unknown Error
-        Report (CS_REPORTER_SEVERITY_WARNING,
-          "gl2d error: display change gave unknown error.");
-        break;
+      // just do something when the mode was actually switched.
+      ChangeDisplaySettings (NULL, 0);
+      modeSwitched = false;
     }
+  }
+  else
+  {
+    modeSwitched = false;
+    // set the user-requested display mode
+    DEVMODE curdmode, dmode;
+    ZeroMemory (&curdmode, sizeof(curdmode));
+    curdmode.dmSize = sizeof (DEVMODE);
+    curdmode.dmDriverExtra = 0;
+    EnumDisplaySettings (NULL, ENUM_CURRENT_SETTINGS, &curdmode);
+    memcpy (&dmode, &curdmode, sizeof (DEVMODE));
+
+    // check if we already are in the desired display mode
+    if (((int)curdmode.dmBitsPerPel == Depth) &&
+      ((int)curdmode.dmPelsWidth == Width) &&
+      ((int)curdmode.dmPelsHeight == Height) &&
+      (!m_nDisplayFrequency || (dmode.dmDisplayFrequency == m_nDisplayFrequency)))
+    {
+      // no action necessary
+      return;
+    }
+    dmode.dmBitsPerPel = Depth;
+    dmode.dmPelsWidth = Width;
+    dmode.dmPelsHeight = Height;
+    if (m_nDisplayFrequency) dmode.dmDisplayFrequency = m_nDisplayFrequency;
+    dmode.dmFields = DM_BITSPERPEL | DM_PELSWIDTH | DM_PELSHEIGHT | DM_DISPLAYFREQUENCY;
+    
+    LONG ti;
+    if ((ti = ChangeDisplaySettings(&dmode, CDS_FULLSCREEN)) != DISP_CHANGE_SUCCESSFUL)
+    {
+      // maybe just the monitor frequency is not supported.
+      // so try without setting it.
+      // but first check resolution/depth w/o refresh rate
+      if (((int)curdmode.dmBitsPerPel == Depth) &&
+	((int)curdmode.dmPelsWidth == Width) &&
+	((int)curdmode.dmPelsHeight == Height))
+      {
+	// no action necessary
+	return;
+      }
+      dmode.dmFields = DM_BITSPERPEL | DM_PELSWIDTH | DM_PELSHEIGHT;
+      ti = ChangeDisplaySettings(&dmode, CDS_FULLSCREEN);
+    }
+    if (ti != DISP_CHANGE_SUCCESSFUL)
+    {
+      //The cases below need error handling, as they are errors.
+      switch (ti)
+      {
+	case DISP_CHANGE_RESTART:
+	  //computer must restart for mode to work.
+	  Report (CS_REPORTER_SEVERITY_WARNING,
+	    "gl2d error: must restart for display change.");
+	  break;
+	case DISP_CHANGE_BADFLAGS:
+	  //Bad Flag settings
+	  Report (CS_REPORTER_SEVERITY_WARNING,
+		"gl2d error: display change bad flags.");
+	  break;
+	case DISP_CHANGE_FAILED:
+	  //Failure to display
+	  Report (CS_REPORTER_SEVERITY_WARNING,
+	    "gl2d error: display change failed.");
+	  break;
+	case DISP_CHANGE_NOTUPDATED:
+	  //No Reg Write Error
+	  Report (CS_REPORTER_SEVERITY_WARNING,
+	    "gl2d error: display change could not write registry.");
+	  break;
+	default:
+	  //Unknown Error
+	  Report (CS_REPORTER_SEVERITY_WARNING,
+	    "gl2d error: display change gave unknown error.");
+	  break;
+      }
+    }
+    else
+      modeSwitched = true;
   }
 }
 

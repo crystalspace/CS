@@ -696,8 +696,6 @@ bool Win32Assistant::HandleEvent (iEvent& e)
   }
   else if (e.Command.Code == cscmdSystemClose)
   {
-    ChangeDisplaySettings (NULL, 0);
-
 #   ifdef DO_DINPUT_KEYBOARD
     if (m_hEvent)
     {

@@ -99,7 +99,9 @@ protected:
   bool m_bHardwareCursor;
 
   int m_nDepthBits;
-  int m_nDisplayFrequency;
+  uint m_nDisplayFrequency;
+  /// VSYNC enabled?
+  bool vsync;
 
   // Old window procedure (the one in win32.cpp)
   WNDPROC m_OldWndProc;
@@ -109,9 +111,13 @@ protected:
 
   bool m_bActivated;
 
+  /// Window is de-/activated. Perform stuff like modeswitches.
   void Activate (bool activate);
-  // Setup fullscreen display mode
-  void SwitchDisplayMode ();
+
+  /// true if the screen mode was actually changed
+  bool modeSwitched;
+  /// Setup/leave fullscreen display mode
+  void SwitchDisplayMode (bool userMode);
 
   /**
    * try to get wglGetExtensionsStringARB() and retrieve the extensions 
