@@ -166,13 +166,10 @@ static void TerrTri(void *userdata, const csVector3& zt1,
   {
     float l;
     l = dat->terr->dirlight * dat->terr->quad_normal->GetNormal(t1.x,t1.z);
-    l=1;
     if(l>0) res1 += dat->terr->dirlight_color * l;
     l = dat->terr->dirlight * dat->terr->quad_normal->GetNormal(t2.x,t2.z);
-    l=1;
     if(l>0) res2 += dat->terr->dirlight_color * l;
     l = dat->terr->dirlight * dat->terr->quad_normal->GetNormal(t3.x,t3.z);
-    l=1;
     if(l>0) res3 += dat->terr->dirlight_color * l;
   }
   dat->colors.Push(res1);
@@ -1687,8 +1684,10 @@ bool csTerrFuncObject::Draw (iRenderView* rview, iMovable* /*movable*/,
 	      qdnf->scy = 1.;
 	      qdnf->offx = 0.;
 	      qdnf->offy = 0.;
-              qdnf->inv_totx = .5 / float (1+blockxy*gridx);
-              qdnf->inv_toty = .5 / float (1+blockxy*gridy);
+              qdnf->inv_totx = .5 / float (1+blockxy*gridx) * 
+	        (scale.x * float (blockxy));
+              qdnf->inv_toty = .5 / float (1+blockxy*gridy) * 
+	        (scale.z * float (blockxy));
 	    }
 	    quad_normal = qdnf;
 	  }
