@@ -39,7 +39,7 @@ iImage* csCreateXORPatternImage(int width, int height, int recdepth)
   {
     for (y=0; y<width; y++)
     {
-      byte value = ((x & coordmask) ^ (y & coordmask));
+      unsigned char value = ((x & coordmask) ^ (y & coordmask));
       pixel->red = pixel->green = pixel->blue =
       	(value << shlpixel) + ((value >> valueshr) * valueadd);
       pixel++;
