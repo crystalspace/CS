@@ -26,7 +26,7 @@ int awsListRowVector::Compare (csSome Item1, csSome Item2, int
   awsListRow *r2 = (awsListRow *)Item2;
 
   if (r1->cols[sortcol].text && r2->cols[sortcol].text)
-    return r1->cols[sortcol].text->Compare (r2->cols[sortcol].text);
+    return strcmp (r1->cols[sortcol].text->GetData (), r2->cols[sortcol].text->GetData ());
   else if (r1->cols[sortcol].text)
     return 1;
   else if (r2->cols[sortcol].text)
@@ -45,7 +45,7 @@ int awsListRowVector::CompareKey (
   awsListRow *r1 = (awsListRow *)Item;
 
   if (r1->cols[sortcol].text)
-    return r1->cols[sortcol].text->Compare ((iString *)Key);
+    return strcmp (r1->cols[sortcol].text->GetData (), ((iString *)Key)->GetData ());
   else
     return -1;
 }

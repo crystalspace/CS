@@ -341,9 +341,9 @@ void awsListBox::MapVisibleItems (
 
 static int DoFindItem (awsListRowVector *v, iString *text, bool with_delete)
 {
-  int i = v->Find (text);
+  int i = v->FindKey (text);
 
-  if (i)
+  if (i>=0)
   {
     if (with_delete) v->Delete (i, true);
 
@@ -355,8 +355,7 @@ static int DoFindItem (awsListRowVector *v, iString *text, bool with_delete)
     for (i = 0; i < v->Length (); ++i)
     {
       awsListRow *r = (awsListRow *) ((*v)[i]);
-      if (
-        r->children &&
+      if (r->children &&
         (j = DoFindItem (r->children, text, with_delete)) >= 0)
       {
         if (with_delete) r->children->Delete (j, true);
@@ -462,15 +461,28 @@ void awsListBox::DeleteItem (void *owner, iAwsParmList &parmlist)
 {
   awsListBox *lb = (awsListBox *)owner;
 
-  int i;
+  int i, selidx = -1;
   iString *str = NULL;
 
   // Try and find out what they're searching for
   if (!parmlist.GetString ("text", &str))
     if (!parmlist.GetString ("id", &str)) return ;
 
-  i = DoFindItem (&lb->rows, str, true);
+  if (lb->sel)
+    selidx = lb->rows.Find (lb->sel);
 
+  i = DoFindItem (&lb->rows, str, true);
+  if (i == selidx && selidx > -1)
+  {
+    if (selidx >= lb->rows.Length ())
+      selidx = lb->rows.Length ()-1;
+    if (selidx > -1)
+      lb->sel = (awsListRow*) lb->rows[selidx];
+    else
+      lb->sel = NULL;
+    lb->Broadcast (awsListBox::signalSelected);
+    lb->Invalidate ();
+  }
   // Pass back the result, in case they want it
   parmlist.AddInt ("result", (int)i);
 
@@ -480,65 +492,69 @@ void awsListBox::DeleteItem (void *owner, iAwsParmList &parmlist)
 void awsListBox::GetSelectedItem (void *owner, iAwsParmList &parmlist)
 {
   awsListBox *lb = (awsListBox *)owner;
-  int i;
-  char buf[50];
 
-  //bool state[lb->ncolumns];
-  bool *state = new bool[lb->ncolumns];
-
-  //iString *str[lb->ncolumns];
-  iString **str = new iString *[lb->ncolumns];
-
-  //bool usedt[lb->ncolumns], useds[lb->ncolumns];
-  bool *usedt = new bool[lb->ncolumns];
-  bool *useds = new bool[lb->ncolumns];
-
-  for (i = 0; i < lb->ncolumns; ++i)
+  if (lb->sel)
   {
-    usedt[i] = false;
-    useds[i] = false;
-  }
+    int i;
+    char buf[50];
 
-  // check if they want the text or state or what. then return those in the parmlist
-  for (i = 0; i < lb->ncolumns; ++i)
-  {
-    cs_snprintf (buf, 50, "text%d", i);
-    if (parmlist.GetString (buf, &str[i]))
+    //bool state[lb->ncolumns];
+    bool *state = new bool[lb->ncolumns];
+
+    //iString *str[lb->ncolumns];
+    iString **str = new iString *[lb->ncolumns];
+
+    //bool usedt[lb->ncolumns], useds[lb->ncolumns];
+    bool *usedt = new bool[lb->ncolumns];
+    bool *useds = new bool[lb->ncolumns];
+
+    for (i = 0; i < lb->ncolumns; ++i)
     {
-      str[i] = lb->sel->cols[i].text;
-      usedt[i] = true;
+      usedt[i] = false;
+      useds[i] = false;
     }
 
-    cs_snprintf (buf, 50, "state%d", i);
-    if (parmlist.GetBool (buf, &state[i]))
-    {
-      state[i] = lb->sel->cols[i].state;
-      useds[i] = true;
-    }
-  }
-
-  parmlist.Clear ();
-
-  // return parmlist
-  for (i = 0; i < lb->ncolumns; ++i)
-  {
-    if (usedt[i])
+    // check if they want the text or state or what. then return those in the parmlist
+    for (i = 0; i < lb->ncolumns; ++i)
     {
       cs_snprintf (buf, 50, "text%d", i);
-      parmlist.AddString (buf, str[i]);
-    }
+      if (parmlist.GetString (buf, &str[i]))
+      {
+        str[i] = lb->sel->cols[i].text;
+        usedt[i] = true;
+      }
 
-    if (useds[i])
-    {
       cs_snprintf (buf, 50, "state%d", i);
-      parmlist.AddBool (buf, state[i]);
+      if (parmlist.GetBool (buf, &state[i]))
+      {
+        state[i] = lb->sel->cols[i].state;
+        useds[i] = true;
+      }
     }
-  }
 
-  delete state;
-  delete str;
-  delete useds;
-  delete usedt;
+    parmlist.Clear ();
+
+    // return parmlist
+    for (i = 0; i < lb->ncolumns; ++i)
+    {
+      if (usedt[i])
+      {
+        cs_snprintf (buf, 50, "text%d", i);
+        parmlist.AddString (buf, str[i]);
+      }
+
+      if (useds[i])
+      {
+        cs_snprintf (buf, 50, "state%d", i);
+        parmlist.AddBool (buf, state[i]);
+      }
+    }
+
+    delete state;
+    delete str;
+    delete useds;
+    delete usedt;
+  }
 }
 
 void awsListBox::ClearList (void *owner, iAwsParmList &)
