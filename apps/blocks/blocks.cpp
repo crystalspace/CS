@@ -1257,9 +1257,7 @@ void Blocks::HandleDemoKey (int key, bool /*shift*/, bool /*alt*/, bool /*ctrl*/
 	  screen = SCREEN_KEYCONFIG;
 	  initscreen = true;
 	  break;
-	case MENU_NOVICE:
-        case MENU_AVERAGE:
-        case MENU_EXPERT:
+	case MENU_STARTGAME:
 	  screen = SCREEN_GAME;
 	  initscreen = true;
 	  break;
@@ -1681,8 +1679,8 @@ void Blocks::InitTextures ()
   csLoader::LoadTexture (Sys->world, "menu_4x4", "p4x4.gif");
   csLoader::LoadTexture (Sys->world, "menu_5x5", "p5x5.gif");
   csLoader::LoadTexture (Sys->world, "menu_6x6", "p6x6.gif");
-  csLoader::LoadTexture (Sys->world, "menu_board", "board.gif");
   csLoader::LoadTexture (Sys->world, "menu_keyconfig", "keys.gif");
+  csLoader::LoadTexture (Sys->world, "menu_start", "start.gif");
 }
 
 void Blocks::DrawMenu (int menu)
@@ -2002,6 +2000,7 @@ void Blocks::InitDemoRoom ()
   CreateMenuEntry ("menu_novice", MENU_NOVICE);
   CreateMenuEntry ("menu_average", MENU_AVERAGE);
   CreateMenuEntry ("menu_expert", MENU_EXPERT);
+  CreateMenuEntry ("menu_start", MENU_STARTGAME);
   CreateMenuEntry ("menu_high", MENU_HIGHSCORES);
   CreateMenuEntry ("menu_high", MENU_SETUP);	// Unused!
   CreateMenuEntry ("menu_quit", MENU_QUIT);
@@ -2055,6 +2054,7 @@ void Blocks::StartDemo ()
 void Blocks::InitMainMenu ()
 {
   InitMenu ();
+  AddMenuItem (MENU_STARTGAME, false);
   AddMenuItem (MENU_NOVICE+diff_level, true);
   AddMenuItem (MENU_3X3+new_zone_dim-3, true);
   AddMenuItem (MENU_KEYCONFIG, false);

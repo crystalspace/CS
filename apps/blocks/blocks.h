@@ -121,7 +121,8 @@ enum BlShapeType
 #define MENU_5X5 8
 #define MENU_6X6 9
 #define MENU_KEYCONFIG 10
-#define MENU_TOTAL 11	// Total number of menu entries in system.
+#define MENU_STARTGAME 11
+#define MENU_TOTAL 12	// Total number of menu entries in system.
 
 #define MAX_MENUS 20	// Maximum number of menus visible at same time.
 
