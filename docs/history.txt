@@ -46,6 +46,8 @@ The history order is reversed so that new features are at the top.
 	  cases they were also undesirable.
 	- Eric Sunshine reverted Philip's change to sllex.cpp because it broke
 	  compilation on all platforms other than Visual-C++.
+	- Eric Sunshine eliminated a compilation warning about member
+	  initialization occurring in wrong order in keyval.cpp.
 14-Jun-2001
 	- Made the terrain visibility checker more efficient and more robust.
 	  The calculation of the extent works completely different now and

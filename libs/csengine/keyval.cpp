@@ -75,7 +75,7 @@ IMPLEMENT_EMBEDDED_IBASE (csMapNode::MapNode)
   IMPLEMENTS_INTERFACE (iMapNode)
 IMPLEMENT_EMBEDDED_IBASE_END
 
-csMapNode::csMapNode (const char* Name) : m_Position (0, 0, 0), m_pSector (NULL)
+csMapNode::csMapNode (const char* Name) : m_pSector(NULL), m_Position(0, 0, 0)
 {
   CONSTRUCT_IBASE (NULL);
   CONSTRUCT_EMBEDDED_IBASE (scfiMapNode);
