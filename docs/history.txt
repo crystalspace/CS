@@ -27,6 +27,16 @@ chronological order.
 	- Jorrit migrated csMaterial::GetTexture() to old renderer.
 	- Jorrit reverted the change that shader variables don't support
 	  iTextureHandle. Apparently this is needed for fog.
+	- Jorrit re-introduced the notion of attenunation type to the
+	  new renderer. In addition to the four standard ones there is
+	  now also CS_ATTN_CLQ which is how the new renderer prefers it.
+	  Also made the api more similar between new renderer and old
+	  renderer. The old renderer now also supports CS_ATTN_CLQ with
+	  the attenuation vector. On the new renderer, when attenuation
+	  values different from CS_ATTN_CLQ are used with the new renderer,
+	  the engine will still calculate the attenuation vector from that
+	  so you can be sure that on the new renderer GetAttenuationVector()
+	  will always work.
 	- res made the following changes:
 	    - Fixed shadow volume generation. The problem was that the 
 	      "light position" shader var wasn't properly propagated to the

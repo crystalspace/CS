@@ -63,12 +63,13 @@ struct iFlareHalo;
 
 /** \name Attenuation modes
  * Attenuation controls how the brightness of a light fades with distance.
- * There are four attenuation formulas:
+ * There are five attenuation formulas:
  * <ul>
  *   <li> no attenuation = light * 1
  *   <li> linear attenuation = light * (radius - distance) / radius
  *   <li> inverse attenuation = light * (radius / distance)
  *   <li> realistic attenuation = light * (radius^2 / distance^2)
+ *   <li> using clq attenuation vector (prefered for lighting with new renderer)
  * </ul>
  * @{ */
 /// no attenuation: light * 1
@@ -79,6 +80,8 @@ struct iFlareHalo;
 #define CS_ATTN_INVERSE   2
 /// realistic attenuation: light * (radius^2 / distance^2)
 #define CS_ATTN_REALISTIC 3
+/// using clq attenuation 
+#define CS_ATTN_CLQ 4
 /** @} */
 
 SCF_VERSION (iLightCallback, 0, 2, 0);
@@ -186,6 +189,7 @@ struct iLight : public iBase
   virtual float GetInverseRadius () = 0;
   /// Set the radius
   virtual void SetRadius (float r) = 0;
+#endif
 
   /// Return current attenuation mode.
   virtual int GetAttenuation () = 0;
@@ -197,38 +201,23 @@ struct iLight : public iBase
    * <li>#CS_ATTN_LINEAR: light * (radius - distance) / radius
    * <li>#CS_ATTN_INVERSE: light * (radius / distance)
    * <li>#CS_ATTN_REALISTIC: light * (radius^2 / distance^2)
+   * <li>#CS_ATTN_CLQ: use attenuation vector
    * </ul>
    */
   virtual void SetAttenuation (int a) = 0;
 
-#else
   /**
   * Set attenuation vector 
   * csVector3(constant, linear, quadric)
   * FIXME: examples
   */
-  virtual void SetAttenuationVector(csVector3 attenv) = 0;
+  virtual void SetAttenuationVector (const csVector3& attenv) = 0;
 
   /**
   * Get attenuation vector
   * csVector3(constant, linear, quadric)
   */
   virtual const csVector3 &GetAttenuationVector() = 0;
-
-  /** 
-   * Get the influence radius of the light
-   */
-  virtual float GetInfluenceRadius () = 0;
-
-  /** 
-   * Get the squared influence radius of the light.
-   */
-  virtual float GetInfluenceRadiusSq () = 0;
-  
-  /**
-   * Override the influence radius.
-   */
-  virtual void SetInfluenceRadius (float radius) = 0;
 
   /**
    * Calculate the attenuation vector for a given attenuation type.
@@ -249,7 +238,24 @@ struct iLight : public iBase
    * \li Might fail when \p brightness <= 0.
    */
   virtual bool GetDistanceForBrightness (float brightness, float& distance) = 0;
+
+#ifdef CS_USE_NEW_RENDERER
+  /** 
+   * Get the influence radius of the light
+   */
+  virtual float GetInfluenceRadius () = 0;
+
+  /** 
+   * Get the squared influence radius of the light.
+   */
+  virtual float GetInfluenceRadiusSq () = 0;
+  
+  /**
+   * Override the influence radius.
+   */
+  virtual void SetInfluenceRadius (float radius) = 0;
 #endif
+
   /// Create a cross halo for this light.
   virtual iCrossHalo* CreateCrossHalo (float intensity, float cross) = 0;
   /// Create a nova halo for this light.

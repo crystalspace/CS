@@ -72,14 +72,14 @@ csLight::csLight (
   halo = 0;
 
 #ifndef CS_USE_NEW_RENDERER
-  dist = d;
-  sqdist = d * d;
-  inv_dist = 1 / d;
-
   attenuation = CS_ATTN_LINEAR;
+  influenceRadius = d;
+  influenceRadiusSq = d * d;
+  inv_dist = 1 / d;
 #else
-  //attenuationvec = csVector3(1,0,0); //default lightattenuation is kc = 1, kl=0,kq=0
+  attenuation = CS_ATTN_CLQ;
   attenuationvec = csVector3(0, 1/d, 0); // inverse linear falloff
+  //attenuationvec = csVector3(1,0,0); //default lightattenuation is kc = 1, kl=0,kq=0
   CalculateInfluenceRadius ();
 #endif
 }
@@ -121,7 +121,7 @@ const char* csLight::GenerateUniqueID ()
   l = convert_endian ((int32)QInt ((center.z * 1000)+.5));
   mf.Write ((char*)&l, 4);
 #ifndef CS_USE_NEW_RENDERER
-  l = convert_endian ((int32)QInt ((dist * 1000)+.5));
+  l = convert_endian ((int32)QInt ((influenceRadius * 1000)+.5));
   mf.Write ((char*)&l, 4);
 #else
   l = convert_endian ((int32)QInt ((attenuationvec.x * 1000)+.5));
@@ -148,19 +148,17 @@ void csLight::SetHalo (csHalo *Halo)
 
 float csLight::GetBrightnessAtDistance (float d)
 {
-#ifndef CS_USE_NEW_RENDERER
   switch (attenuation)
   {
     case CS_ATTN_NONE:      return 1;
     case CS_ATTN_LINEAR:    return 1 - d * inv_dist;
     case CS_ATTN_INVERSE:   return 1 / d;
     case CS_ATTN_REALISTIC: return 1 / (d * d);
+    case CS_ATTN_CLQ:
+	return (attenuationvec * csVector3 (1, d, d*d));
   }
 
   return 0;
-#else
-  return (attenuationvec * csVector3 (1, d, d*d));
-#endif
 }
 
 void csLight::SetCenter (const csVector3 &pos)
@@ -201,9 +199,9 @@ void csLight::SetRadius (float radius)
     cb->OnRadiusChange (&scfiLight, radius);
     i--;
   }
-  dist = radius;
-  sqdist = dist*dist;
-  inv_dist = 1 / dist;
+  influenceRadius = radius;
+  influenceRadiusSq = radius*radius;
+  inv_dist = 1 / radius;
   lightnr++;
 
 }
@@ -223,16 +221,15 @@ void csLight::SetColor (const csColor& col)
   lightnr++;
 }
 
-#ifndef CS_USE_NEW_RENDERER
 void csLight::SetAttenuation (int a)
 {
+  CalculateAttenuationVector (a, influenceRadius, 1.0);
   attenuation = a;
 }
 
-#else
-
-void csLight::SetAttenuationVector(csVector3 attenv)
+void csLight::SetAttenuationVector(const csVector3& attenv)
 {
+  attenuation = CS_ATTN_CLQ;
   attenuationvec.Set (attenv);
   
 /*  if (attenuationvec.x < 0)
@@ -242,7 +239,9 @@ void csLight::SetAttenuationVector(csVector3 attenv)
   if (attenuationvec.z < 0)
     attenuationvec.z = 0;*/
 
+#ifdef CS_USE_NEW_RENDERER
   influenceValid = false;
+#endif
 }
 
 const csVector3 &csLight::GetAttenuationVector()
@@ -250,6 +249,7 @@ const csVector3 &csLight::GetAttenuationVector()
   return attenuationvec;
 }
 
+#ifdef CS_USE_NEW_RENDERER
 float csLight::GetInfluenceRadius ()
 {
   if (!influenceValid)
@@ -271,8 +271,23 @@ void csLight::SetInfluenceRadius (float radius)
     influenceRadius = radius;
     influenceRadiusSq = radius*radius;
     influenceValid = true;
+    int oldatt = attenuation;
+    CalculateAttenuationVector (attenuation, radius, 1.0);
+    attenuation = oldatt;
   }
 }
+
+void csLight::CalculateInfluenceRadius ()
+{
+  float y = 0.28*color.red + 0.59*color.green + 0.13*color.blue;
+  float radius;
+  if (!GetDistanceForBrightness (1 / (y * influenceIntensityFraction), radius))
+    // can't determine distance
+    radius = 100000000;
+  SetInfluenceRadius (radius);
+}
+
+#endif
 
 void csLight::CalculateAttenuationVector (int atttype, float radius,
   float brightness)
@@ -281,16 +296,19 @@ void csLight::CalculateAttenuationVector (int atttype, float radius,
     brightness = EPSILON;
   switch (atttype)
   {
-  case CS_ATTN_NONE:
-    SetAttenuationVector (csVector3 (1, 0, 0));
-    return;
-  case CS_ATTN_LINEAR:
-  case CS_ATTN_INVERSE:
-    SetAttenuationVector (csVector3 (0, 1 / (brightness * radius), 0));
-    return;
-  case CS_ATTN_REALISTIC:
-    SetAttenuationVector (csVector3 (0, 0, 1 / (brightness * radius * radius)));
-    return;
+    case CS_ATTN_NONE:
+      SetAttenuationVector (csVector3 (1, 0, 0));
+      return;
+    case CS_ATTN_LINEAR:
+    case CS_ATTN_INVERSE:
+      SetAttenuationVector (csVector3 (0, 1 / (brightness * radius), 0));
+      return;
+    case CS_ATTN_REALISTIC:
+      SetAttenuationVector (
+      	csVector3 (0, 0, 1 / (brightness * radius * radius)));
+      return;
+    case CS_ATTN_CLQ:
+      return;
   }
 }
 
@@ -346,18 +364,6 @@ bool csLight::GetDistanceForBrightness (float brightness, float& distance)
     return true;
   }
 }
-
-void csLight::CalculateInfluenceRadius ()
-{
-  float y = 0.28*color.red + 0.59*color.green + 0.13*color.blue;
-  float radius;
-  if (!GetDistanceForBrightness (1 / (y * influenceIntensityFraction), radius))
-    // can't determine distance
-    radius = 100000000;
-  SetInfluenceRadius (radius);
-}
-
-#endif
 
 iCrossHalo *csLight::Light::CreateCrossHalo (float intensity, float cross)
 {

@@ -65,17 +65,8 @@ protected:
   /// The associated halo (if not 0)
   csHalo *halo;
 
-#ifndef CS_USE_NEW_RENDERER
-  /// Radius of light.
-  float dist;
-  /// Squared radius of light.
-  float sqdist;
-  /// Inverse radius of light.
-  float inv_dist;
   /// Attenuation type
   int attenuation;
-
-#else
   /// Attenuation vector in the format x=kc, y=kl, z=kq
   csVector3 attenuationvec;
 
@@ -84,6 +75,10 @@ protected:
   /// Squared influence radius
   float influenceRadiusSq; 
 
+#ifndef CS_USE_NEW_RENDERER
+  /// Inverse radius of light.
+  float inv_dist;
+#else
   /// Is the influence radius valid?
   bool influenceValid;
 
@@ -188,12 +183,12 @@ public:
   /**
    * Get the radius.
    */
-  float GetRadius () const { return dist; }
+  float GetRadius () const { return influenceRadius; }
 
   /**
    * Get the squared radius.
    */
-  float GetSquaredRadius () const { return sqdist; }
+  float GetSquaredRadius () const { return influenceRadiusSq; }
 
   /**
    * Get the inverse radius.
@@ -230,7 +225,6 @@ public:
    */
   void SetHalo (csHalo *Halo);
 
-#ifndef CS_USE_NEW_RENDERER
   /**
    * Get the light's attenuation type
    */
@@ -241,12 +235,11 @@ public:
    */
   void SetAttenuation (int a); 
 
-#else
   /**
   * Set attenuation vector 
   * csVector3(constant, linear, quadric)
   */
-  void SetAttenuationVector (csVector3 pattenv);
+  void SetAttenuationVector (const csVector3& pattenv);
 
   /**
   * Get attenuation vector
@@ -254,6 +247,7 @@ public:
   */
   const csVector3 &GetAttenuationVector();
 
+#ifdef CS_USE_NEW_RENDERER
   /** 
    * Get the influence radius of the light
    */
@@ -268,6 +262,7 @@ public:
    * Override the influence radius.
    */
   void SetInfluenceRadius (float radius);
+#endif
 
   /**
    * Calculate the attenuation vector for a given attenuation type.
@@ -287,7 +282,6 @@ public:
    * \li Might fail when \p brightness <= 0.
    */
   bool GetDistanceForBrightness (float brightness, float& distance);
-#endif
 
   /**
    * Get the brightness of a light at a given distance.
@@ -339,31 +333,28 @@ public:
     virtual float GetSquaredRadius () { return scfParent->GetSquaredRadius (); }
     virtual float GetInverseRadius () { return scfParent->GetInverseRadius (); }
     virtual void SetRadius (float r) { scfParent->SetRadius (r); }
+#else
+    virtual float GetInfluenceRadius () { return scfParent->GetInfluenceRadius(); }
+    virtual float GetInfluenceRadiusSq () { return scfParent->GetInfluenceRadiusSq(); }
+    virtual void SetInfluenceRadius (float radius) { scfParent->SetInfluenceRadius (radius); }
 #endif
     virtual const csColor& GetColor () { return scfParent->GetColor (); }
     virtual void SetColor (const csColor& col) { scfParent->SetColor (col); }
     virtual bool IsDynamic () const { return scfParent->IsDynamic (); }
-#ifndef CS_USE_NEW_RENDERER
     virtual int GetAttenuation () { return scfParent->GetAttenuation (); }
     virtual void SetAttenuation (int a) { scfParent->SetAttenuation (a); }
-#endif
     virtual float GetBrightnessAtDistance (float d)
     {
       return scfParent->GetBrightnessAtDistance (d);
     }
-#ifdef CS_USE_NEW_RENDERER
-    virtual void SetAttenuationVector(csVector3 attenv) 
+    virtual void SetAttenuationVector(const csVector3& attenv) 
     { scfParent->SetAttenuationVector(attenv); }
     virtual const csVector3 &GetAttenuationVector() { return scfParent->GetAttenuationVector(); }
-    virtual float GetInfluenceRadius () { return scfParent->GetInfluenceRadius(); }
-    virtual float GetInfluenceRadiusSq () { return scfParent->GetInfluenceRadiusSq(); }
-    virtual void SetInfluenceRadius (float radius) { scfParent->SetInfluenceRadius (radius); }
     virtual void CalculateAttenuationVector (int atttype, float radius,
       float brightness) { return scfParent->CalculateAttenuationVector 
         (atttype, radius, brightness); }
     virtual bool GetDistanceForBrightness (float brightness, float& distance)
     { return scfParent->GetDistanceForBrightness (brightness, distance); }
-#endif
     virtual iCrossHalo* CreateCrossHalo (float intensity, float cross);
     virtual iNovaHalo* CreateNovaHalo (int seed, int num_spokes,
     float roundness);

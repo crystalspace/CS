@@ -3317,13 +3317,15 @@ iStatLight* csLoader::ParseStatlight (iLoaderContext* ldr_context,
 
   csVector3 pos;
 
-#ifdef CS_USE_NEW_RENDERER
   csVector3 attenvec (0, 0, 0);
   float distbright = 1;
+#ifdef CS_USE_NEW_RENDERER
   float influenceRadius = 0;
   bool influenceOverride = false;
-#endif
+  int attenuation = CS_ATTN_CLQ;
+#else
   int attenuation = CS_ATTN_LINEAR;
+#endif
   float dist = 0;
 
   csColor color;
@@ -3381,13 +3383,11 @@ iStatLight* csLoader::ParseStatlight (iLoaderContext* ldr_context,
       case XMLTOKEN_RADIUS:
 	{
 	  dist = child->GetContentsValueAsFloat ();
-  #ifdef CS_USE_NEW_RENDERER
 	  csRef<iDocumentAttribute> attr;
 	  if (attr = child->GetAttribute ("brightness"))
 	  {
 	    distbright = attr->GetValueAsFloat();
 	  }
-  #endif
 	}
         break;
       case XMLTOKEN_CENTER:
@@ -3546,42 +3546,49 @@ iStatLight* csLoader::ParseStatlight (iLoaderContext* ldr_context,
 	  const char* att = child->GetContentsValue();
 	  if (att)
 	  {
-	    if (!strcasecmp (att, "none")     ) attenuation = CS_ATTN_NONE;
-	    else if (!strcasecmp (att, "linear")   ) attenuation = CS_ATTN_LINEAR;
-	    else if (!strcasecmp (att, "inverse")  ) attenuation = CS_ATTN_INVERSE;
-	    else if (!strcasecmp (att, "realistic")) attenuation = CS_ATTN_REALISTIC;
+	    if (!strcasecmp (att, "none"))
+	      attenuation = CS_ATTN_NONE;
+	    else if (!strcasecmp (att, "linear"))
+	      attenuation = CS_ATTN_LINEAR;
+	    else if (!strcasecmp (att, "inverse"))
+	      attenuation = CS_ATTN_INVERSE;
+	    else if (!strcasecmp (att, "realistic"))
+	      attenuation = CS_ATTN_REALISTIC;
+	    else if (!strcasecmp (att, "clq"))
+	      attenuation = CS_ATTN_CLQ;
 	    else
 	    {
 	      SyntaxService->ReportBadToken (child);
 	      return 0;
 	    }
-#ifdef CS_USE_NEW_RENDERER
 	  }
 	  else
 	  {
-	    attenvec.x = child->GetAttributeValueAsFloat ("c");
-	    attenvec.y = child->GetAttributeValueAsFloat ("l");
-	    attenvec.z = child->GetAttributeValueAsFloat ("q");
-#endif
+	    attenuation = CS_ATTN_CLQ;
 	  }
+
+	  attenvec.x = child->GetAttributeValueAsFloat ("c");
+	  attenvec.y = child->GetAttributeValueAsFloat ("l");
+	  attenvec.z = child->GetAttributeValueAsFloat ("q");
 	}
 	break;
-      #ifdef CS_USE_NEW_RENDERER
+#ifdef CS_USE_NEW_RENDERER
       case XMLTOKEN_INFLUENCERADIUS:
 	{
 	  influenceRadius = child->GetContentsValueAsFloat();
 	  influenceOverride = true;
 	}
 	break;
+#endif // CS_USE_NEW_RENDERER
       case XMLTOKEN_ATTENUATIONVECTOR:
         {
 	  //@@@ should be scrapped in favor of specification via
 	  // "attenuation".
           if (!SyntaxService->ParseVector (child, attenvec))
 	    return 0;
+	  attenuation = CS_ATTN_CLQ;
         }
         break;
-      #endif // CS_USE_NEW_RENDERER
       default:
 	SyntaxService->ReportBadToken (child);
 	return 0;
@@ -3639,18 +3646,20 @@ iStatLight* csLoader::ParseStatlight (iLoaderContext* ldr_context,
       }
       break;
   }
-#ifndef CS_USE_NEW_RENDERER
   l->QueryLight ()->SetAttenuation (attenuation);
-#else
-  if (attenvec.IsZero())
+  if (attenuation == CS_ATTN_CLQ)
   {
-    l->QueryLight ()->CalculateAttenuationVector 
-      (attenuation, dist, distbright);
+    if (attenvec.IsZero())
+    {
+      l->QueryLight ()->CalculateAttenuationVector 
+        (attenuation, dist, distbright);
+    }
+    else
+    {
+      l->QueryLight ()->SetAttenuationVector (attenvec);
+    }
   }
-  else
-  {
-    l->QueryLight ()->SetAttenuationVector (attenvec);
-  }
+#ifdef CS_USE_NEW_RENDERER
   if (influenceOverride)
     l->QueryLight()->SetInfluenceRadius (influenceRadius);
 #endif
