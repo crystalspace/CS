@@ -433,7 +433,6 @@ void csMeshWrapper::DrawIntFull (iRenderView *rview)
     // If we have static lod we only draw the children for the right LOD level.
     float distance = qsqrt (GetSquaredDistance (rview));
     float lod = static_lod->GetLODValue (distance);
-    printf ("distance=%g lod=%g\n", distance, lod); fflush (stdout);
     csArray<iMeshWrapper*>& meshes = static_lod->GetMeshesForLOD (lod);
     for (i = 0 ; i < meshes.Length () ; i++)
     {
