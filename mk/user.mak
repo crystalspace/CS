@@ -107,7 +107,7 @@ PLUGINS.DYNAMIC += aws
 #PLUGINS.DYNAMIC += sound/loader/mod
 #PLUGINS.DYNAMIC += physics/odedynam
 PLUGINS.DYNAMIC += video/render3d/opengl
-PLUGINS.DYNAMIC += sound/renderer/openal
+#PLUGINS.DYNAMIC += sound/renderer/openal
 
 #-----------------------------------------------------------------------------
 # Static Settings            *** TAKE NOTE ***
