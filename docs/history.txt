@@ -9,6 +9,8 @@ The history order is reversed so that new features are at the top.
 	- Reinstated patch from Greg Block on lightmap loading. Apparently
 	  there must have been another issue preventing proper lightmap
 	  loading.
+	- Rewrote 'smooth' option for things. The routine to calculate normals
+	  is faster, uses less memory, and should be more correct now.
 15-Mar-2003
 	- Greg Block fixed lightmap loading and saving on
 	  non-Intel-endian systems.

@@ -45,6 +45,7 @@
 #include "csutil/hashmap.h"
 #include "csutil/debug.h"
 #include "csutil/csmd5.h"
+#include "csutil/array.h"
 #include "ivideo/txtmgr.h"
 #include "ivideo/vbufmgr.h"
 #include "ivideo/texture.h"
@@ -171,7 +172,6 @@ csThing::csThing (iBase *parent, csThingObjectType* thing_type) :
 
   current_lod = 1;
   current_features = 0;
-  thing_edges_valid = false;
 
   curves_transf_ok = false;
 
@@ -208,7 +208,6 @@ csThing::~csThing ()
 
   polygons.DeleteAll ();          // delete prior to portal_poly array !
   if (portal_polygons.Length ()) portal_polygons.DeleteAll ();
-  CleanupThingEdgeTable ();
 
   delete [] obj_normals;
 }
@@ -302,28 +301,6 @@ void csThing::DynamicLightDisconnect (iDynLight* dynlight)
 void csThing::StaticLightChanged (iStatLight* /*statlight*/)
 {
   MarkLightmapsDirty ();
-}
-
-void csThing::CleanupThingEdgeTable ()
-{
-  int i;
-  for (i = 0; i < thing_edges.Length (); i++)
-  {
-    csThingEdge &te = thing_edges[i];
-    delete[] te.polygon_indices;
-  }
-
-  thing_edges.SetLength (0);
-  thing_edges_valid = false;
-}
-
-void csThing::ComputeThingEdgeTable ()
-{
-  if (thing_edges_valid) return ;
-  CleanupThingEdgeTable ();
-
-  //@@@
-  thing_edges_valid = true;
 }
 
 void csThing::SetMovingOption (int opt)
@@ -431,88 +408,54 @@ void csThing::UpdateTransformation (const csTransform &c, long cam_cameranr)
 }
 
 
-void csThing::SetSmoothingFlag(bool smooth)
+void csThing::SetSmoothingFlag (bool smooth)
 {
   smoothed = smooth;
 }
 
-void csThing::CalculateNormals()
+struct PolygonsForVertex
+{
+  csArray<int> poly_indices;
+};
+
+void csThing::CalculateNormals ()
 {
   int polyCount = polygons.Length();
-  int i, j, k;
-  int* vertIndices;
+  int i, j;
 
   delete[] obj_normals;
   obj_normals = new csVector3[num_vertices];
-	csVector3** normals = new csVector3*[num_vertices];
 
-  for(i = 0; i < num_vertices; i++)
+  // First build a table so that we can find all polygons that connect
+  // to a vertex easily.
+  PolygonsForVertex* pvv = new PolygonsForVertex[num_vertices];
+  for (i = 0 ; i < polyCount ; i++)
   {
-    normals[i] = new csVector3[polyCount];
-    obj_normals[i].x = obj_normals[i].y = obj_normals[i].z = 0.0;
-    for (j = 0; j< polyCount; j++)
-      normals[i][j] = obj_normals[i];
-  }
-
-
-  // Get all the normals of a vertex affected by all the polygons
-  for(j = 0; j < polyCount; j++)
-  {
-    csPolygon3D* p = polygons.Get(j);
-    vertIndices = p->GetVertexIndices();
-    csVector3 normal = p->GetPolyPlane ().Normal();
-
-    // Add the normal to all the vertexs of the polygon
-    int vertCount = p->GetVertexCount();
-    for(k = 0; k < vertCount; k++)
+    csPolygon3D* p = polygons.Get (i);
+    int* vtidx = p->GetVertexIndices ();
+    for (j = 0 ; j < p->GetVertexCount () ; j++)
     {
-      normals[vertIndices[k]][j] = normal;
+      CS_ASSERT (vtidx[j] >= 0 && vtidx[j] < num_vertices);
+      pvv[vtidx[j]].poly_indices.Push (i);
     }
   }
 
-  // Remove the repeated normals
-  float absolut;
-  for (i = 0; i < num_vertices; i++)
+  // Now calculate normals.
+  for (i = 0 ; i < num_vertices ; i++)
   {
-    for(j = 0; j < polyCount-1; j++)
+    csVector3 n (0);
+    for (j = 0 ; j < pvv[i].poly_indices.Length () ; j++)
     {
-      csVector3 normalAct = normals[i][j];
-      // Search in the rest of the normals
-      absolut = fabs(normalAct.x) + fabs(normalAct.y) + fabs(normalAct.z);
-      if ( absolut > 0.5  )
-      {
-	for (k=j+1; k< polyCount; k++)
-	{
-	  // If the normals are the same, remove the new one
-	  csVector3 normalZero = normalAct - normals[i][k];
-	  absolut = fabs(normalZero.x) + fabs(normalZero.y)
-	  	+ fabs(normalZero.z);
-	  if (absolut < 0.1)
-	  {
-	    normals[i][k].x = normals[i][k].y = normals[i][k].z = 0.0;
-	  }
-	}
-      }
+      csPolygon3D* p = polygons.Get (pvv[i].poly_indices[j]);
+      const csVector3& normal = p->GetPolyPlane ().Normal();
+      n += normal;
     }
+    float norm = n.Norm ();
+    if (norm) n /= norm;
+    obj_normals[i] = n;
   }
 
-
-  for(i = 0; i < num_vertices; i++)
-  {
-    for(j = 0; j < polyCount; j++)
-    {
-      obj_normals[i] += normals[i][j];
-    }
-    obj_normals[i].Normalize();
-
-    csVector3 v = Vwor(i);
-    csVector3 normalPerfecta (-v.x, -v.y+20.0, -v.z);
-    normalPerfecta.Normalize ();
-  }
-
-  for(i = 0; i < num_vertices; i++)
-    delete [] normals[i];
-  delete [] normals;
+  delete[] pvv;
 }
 
 void csThing::Prepare ()
@@ -548,6 +491,7 @@ void csThing::Prepare ()
     p = polygons.Get (i);
     p->Finish ();
   }
+
   FireListeners ();
 }
 
@@ -992,12 +936,10 @@ void csThing::InvalidateThing ()
 
   delete[] polybuf_materials;
   polybuf_materials = NULL;
-  thing_edges_valid = false;
   prepared = false;
   obj_bbox_valid = false;
   delete bbox;
   bbox = NULL;
-  CleanupThingEdgeTable ();
 
   shapenr++;
   scfiPolygonMeshLOD.Cleanup ();

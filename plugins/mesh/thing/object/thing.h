@@ -80,17 +80,6 @@ struct csThingBBox
 };
 
 /**
- * This struct represents a line along which polygons are attached.
- * These polygons don't have to be adjacent but they usually are.
- * A thing has a list of these edges.
- */
-struct csThingEdge
-{
-  int num_polygons;
-  int* polygon_indices;
-};
-
-/**
  * A helper class for iPolygonMesh implementations used by csThing.
  */
 class PolyMeshHelper : public iPolygonMesh
@@ -261,11 +250,6 @@ private:
   iMaterialWrapper** polybuf_materials;
   int polybuf_material_count;
 
-  /// A vector with all edges in this thing.
-  csGrowingArray<csThingEdge> thing_edges;
-  /// If false then thing_edges is not valid and needs to be recalculated.
-  bool thing_edges_valid;
-
   /// The array of curves forming the outside of the set
   csCurvesArray curves;
   /**
@@ -408,12 +392,6 @@ private:
    * is used.
    */
   void UpdateCurveTransform ();
-
-  /// Cleanup the thing edge table.
-  void CleanupThingEdgeTable ();
-
-  /// Compute table of thing edges if needed.
-  void ComputeThingEdgeTable ();
 
   /// Generate a cachename based on geometry.
   char* GenerateCacheName ();  
