@@ -1,4 +1,8 @@
 <world>
+    <plugins>
+        <plugin name="plasma">crystalspace.texture.loader.plasma</plugin>
+        <plugin name="fireTexLoader">crystalspace.texture.loader.fire</plugin>
+    </plugins>
     <textures>
         <texture name="abstract_a032.jpg">
             <file>/lib/stdtex/bricks.jpg</file>
@@ -39,9 +43,13 @@
         <texture name="hazebasic">
             <file>/lib/stdtex/hazebasic.png</file>
         </texture>
-        <proctex name="plasma">
+        <texture name="plasma">
             <type>plasma</type>
-        </proctex>
+        </texture>
+	<texture name="flamelet">
+	    <!--<type>fireTexLoader</type>-->
+	    <file>/lib/std/raindrop.png</file>
+	</texture>
     </textures>
     <materials>
         <material name="wood">
@@ -82,6 +90,12 @@
         </material>
         <material name="hazebasic">
             <texture>hazebasic</texture>
+        </material>
+        <material name="plasma">
+            <texture>plasma</texture>
+        </material>
+        <material name="flamelet">
+            <texture>flamelet</texture>
         </material>
     </materials>
     <plugins>
@@ -1130,7 +1144,7 @@
                     <add />
                 </mixmode>
                 <number>200</number>
-                <material>raindrop</material>
+                <material>flamelet</material>
                 <originbox>
                     <min x="-2" y="0" z="-2" />
                     <max x="2" y="0" z="2" />
