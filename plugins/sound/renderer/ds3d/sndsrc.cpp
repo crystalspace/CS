@@ -176,7 +176,7 @@ csVector3 csSoundSourceDS3D::GetVelocity()
 
 void csSoundSourceDS3D::SetVolume(float vol)
 {
-  long dsvol = DSBVOLUME_MIN + (DSBVOLUME_MAX-DSBVOLUME_MIN)*vol;
+  long dsvol = (long)(DSBVOLUME_MIN + (DSBVOLUME_MAX-DSBVOLUME_MIN)*vol);
   if (Renderer->AudioRenderer && Buffer2D) Buffer2D->SetVolume(dsvol);
 }
 
@@ -283,7 +283,8 @@ void csSoundSourceDS3D::Stop()
 
 void csSoundSourceDS3D::SetFrequencyFactor(float factor) 
 {
-  if (Renderer->AudioRenderer && Buffer2D)  Buffer2D->SetFrequency(BaseFrequency * factor);
+  if (Renderer->AudioRenderer && Buffer2D)
+    Buffer2D->SetFrequency((long)(BaseFrequency * factor));
 }
 
 float csSoundSourceDS3D::GetFrequencyFactor() {

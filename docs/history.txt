@@ -19,6 +19,8 @@ The history order is reversed so that new features are at the top.
 	  should only have re-generated the Swig output file.  Worse, when
 	  attempting to build the .dll, it was using `ar', rather than
 	  gcc/dllwrap.
+	- Eric Sunshine eliminated several compilation warnings from
+	  DirectSound 3D renderer.
 25-Jun-2003
 	- Oktal manually applied a patch to cssocket that was intended for
 	  ensocket, submitted by Ladislav Foldyna.

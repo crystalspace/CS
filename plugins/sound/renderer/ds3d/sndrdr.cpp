@@ -213,9 +213,9 @@ void csSoundRenderDS3D::Close()
 void csSoundRenderDS3D::SetVolume(float vol)
 {
   if (!Listener) return;
-  long dsvol = DSBVOLUME_MIN + (DSBVOLUME_MAX-DSBVOLUME_MIN)*vol;
+  long dsvol = (long)(DSBVOLUME_MIN + (DSBVOLUME_MAX-DSBVOLUME_MIN)*vol);
   mutex_Listener->LockWait();
-  int a = Listener->PrimaryBuffer->SetVolume(dsvol);
+  Listener->PrimaryBuffer->SetVolume(dsvol);
   mutex_Listener->Release();
 }
 
@@ -224,7 +224,7 @@ float csSoundRenderDS3D::GetVolume()
   if (!Listener) return 0;
   long dsvol;
   mutex_Listener->LockWait();
-  int a = Listener->PrimaryBuffer->GetVolume(&dsvol);
+  Listener->PrimaryBuffer->GetVolume(&dsvol);
   mutex_Listener->Release();
   return (float)(dsvol-DSBVOLUME_MIN)/(float)(DSBVOLUME_MAX-DSBVOLUME_MIN);
 }

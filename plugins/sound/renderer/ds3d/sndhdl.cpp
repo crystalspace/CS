@@ -30,7 +30,7 @@ csSoundHandleDS3D::csSoundHandleDS3D(csRef<csSoundRenderDS3D> srdr, csRef<iSound
   buffer=0;  
 
   NumSamples = Data->IsStatic() ? Data->GetStaticSampleCount() :
-  (((float)(Data->GetFormat()->Freq)) * BufferLengthSeconds);
+  (long)(Data->GetFormat()->Freq * BufferLengthSeconds);
 
   buffer_length=(NumSamples* Data->GetFormat()->Bits * Data->GetFormat()->Channels)/8;
   if (LocalBuffer)
