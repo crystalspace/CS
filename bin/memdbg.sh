@@ -106,20 +106,20 @@ case `uname` in
 	Linux* | Solaris*)
 		find CXXFILT c++filt
 		findgnu OBJDUMP objdump
-		filter="awk -f bin/memdbg-elf.awk"
+		filter="$AWK -f bin/memdbg-elf.awk"
 		dumpsym="$OBJDUMP --stabs"
 		;;
 	OS/2 | OS2*)
 		find CXXFILT c++filt
 		findgnu NM nm
-		filter="awk -f bin/memdbg.awk"
+		filter="$AWK -f bin/memdbg.awk"
 		dumpsym="$NM -anf sysv"
 		;;
 	*)
 		# This is supposed to be the most working method
 		CXXFILT=cat
 		findgnu OBJDUMP objdump
-		filter="awk -f bin/memdbg-d.awk"
+		filter="$AWK -f bin/memdbg-d.awk"
 		dumpsym="$OBJDUMP --debugging"
 		;;
 esac
