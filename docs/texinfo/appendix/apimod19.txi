@@ -6,9 +6,113 @@
 This section documents the major changes between versions 0.18 and 0.19 of of
 Crystal Space.
 
-@subheading @code{csObject}, @sc{rtti}, @sc{scf}
+@subheading @sc{scf}
 
-@@@@@@TODO
+The set of @sc{scf} functions has been removed, except @code{scfInitialize}.
+The latter creates a global instance of the @code{iSCF} interface which can
+be accessed as @code{iSCF::SCF}. All other functions should be called
+through this object. This change makes it possible to call @sc{scf} functions
+from within dynamic libraries (i.e. from plugins), which was not possible
+before. The only thing that is still not allowed is to use the
+@code{SCF_REGISTER_STATIC_???} macros in dynamic libraries.
+
+@sc{scf} now associates a so-called @dfn{Interface ID Number} with every
+interface name. You can get the number for an interface by calling
+@samp{iSCF::SCF->GetInterfaceID ("iInterface")}. It is currently not possible
+to get the interface name for a given number, but this should not be needed
+anyway (see below).
+
+@code{iBase::QueryInterface()} now takes the interface ID as its parameter
+instead of the interface name. This makes a lot of optimization possible,
+because interfaces can be compared using simple integer comparison instead
+of string comparison. You will not see anything of this because the
+@code{SCF_QUERY_INTERFACE()} macro shields it from you. As a result, your
+program should not require any changes.
+
+However, you can increase performance a lot by using two new macros which
+have been introduced: Place @code{SCF_DECLARE_FAST_INTERFACE} somewhere at
+top-level in your source files (or in one of your header files). For every
+interface you do this you can now use @code{SCF_QUERY_INTERFACE_FAST}. The
+advantage of this is performance. The disadvantage is that you have to use
+@code{SCF_DECLARE_FAST_INTERFACE} and that the name of the interface must
+be hard-coded (e.g. you cannot use @code{SCF_QUERY_INTERFACE_FAST} if the
+name of the interface is given to your function as a parameter).
+
+Three other changes have been done to @sc{scf}. Firstly, it is now possible
+to get a list of registered classes using @code{iSCF::SCF->QueryClassList()}.
+Secondly, it is possible to get the reference count of an object. This may
+only be used for debugging! Thirdly, the macros used to implement
+@code{iBase} functions have been split up. For example,
+@code{SCF_IMPLEMENT_IBASE} is now simply
+@example
+SCF_IMPLEMENT_IBASE_INCREF
+SCF_IMPLEMENT_IBASE_DECREF
+SCF_IMPLEMENT_IBASE_QUERY
+@end example
+This makes it easier to replace single functions.
+
+@subheading @code{csObject}, @sc{rtti}
+
+The pseudo-@sc{rtti} system has been removed from @code{csObject}. Instead,
+@sc{scf} functions should be used to identify an object's type. You should
+therefore change your old code
+@example
+csObject *obj = ...
+if (obj->Type == csMyClass::Type)
+{
+  csMyClass *a = (csMyClass*) obj;
+  ...
+}
+@end example
+to
+@example
+csObject *obj = ...
+iMyInterface *a = SCF_QUERY_INTERFACE (obj, iMyInterface);
+if (a)
+{
+  ...
+}
+@end example
+
+To increase performance, you should use @code{SCF_QUERY_INTERFACE_FAST}.
+
+A result of this change is that child object iterators cannot easily iterate
+over objects of a certain type anymore. To achieve the same effect, you
+should create an iterator for all children and then use
+@code{SCF_QUERY_INTERFACE} to test if an object implements a certain
+interface.
+
+Note that if you don't want to create proper interfaces for all your classes,
+it is very well possible to query the class itself instead of an interface.
+Assuming that @code{csMyClass} is just a set of values, and you don't want to
+create an interface with accessor functions for it. Then you put
+@code{SCF_DECLARE_IBASE_EXT} into the class as usual (note the @samp{EXT}
+version of the macro because it extends the interface list of
+@code{csObject}). In addition, you must set a version number for the class
+using @samp{SCF_VERSION (csMyClass, ?, ?, ?)}. The interface list then looks
+like this:
+@example
+IMPLEMENT_IBASE (csMyClass)
+  IMPLEMENTS_INTERFACE (csMyClass)
+IMPLEMENT_IBASE_END
+@end example
+Using this you can use @samp{SCF_QUERY_INTERFACE (object, csMyClass)}, i.e.
+use the class without an interface.
+
+Another change is that @code{csObject} stores its children as @code{iObject}
+pointers now. It does not deal with csObject pointers any longer. All
+children are correctly reference-counted. Also, all objects keep a pointer to
+their ``parent'' object. How this pointer is used is left to you. The pointer
+is not reference-counted to avoid circular referencing. Consequently, the
+classes @code{csPObject} and @code{csObjNoDel} and the member function
+@code{ObjRelease} have been removed.
+
+This usually means that after calling @code{ObjAdd}, you have to call
+@code{DecRef} on the added child because you don't want to use the
+reference anymore. Of course, this only applies if you possess a valid
+reference. Similarly, if you want to unlink the object from its parent
+without deleting it (i.e. whereever you used @code{ObjRelease} before), you
+should now call @code{IncRef} on the child before removing it from its parent.
 
 @subheading Platform Portability Encapsulation
 
