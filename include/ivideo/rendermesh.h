@@ -108,7 +108,7 @@ public:
   unsigned int indexend;
 
   /// Source to get buffers from
-  iRenderBufferSource* buffersource;
+  //iRenderBufferSource* buffersource;
 
   /// Material used for this mesh
   //iMaterialHandle* mathandle;

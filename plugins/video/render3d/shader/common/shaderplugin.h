@@ -27,7 +27,7 @@ SCF_VERSION(iShaderProgram, 0,2,0);
  * A helper for shaders that which to use the general plugins.
  * This is the main program plugin interface
  */
-struct iShaderProgram : public iBase, public iShaderVariableContext
+struct iShaderProgram : public iShaderVariableContext
 {
   /// Sets this program to be the one used when rendering
   virtual void Activate() = 0;

@@ -73,6 +73,8 @@ public:
   /// Constructor
   csShaderVariable (csStringID name);
 
+  csShaderVariable& operator= (const csShaderVariable& copyFrom);
+
   /// Get type of data stored
   VariableType GetType() const { return Type; }
   /// Set type (calling this after SetValue will cause undefined behaviour)
@@ -268,14 +270,15 @@ public:
       Name (csInvalidStringID), userData (0), shaderVariable(0), realLocation(0)
   {}
 
-  csShaderVariableProxy (csStringID name, int ud, csShaderVariable **realplace=0) :
+  csShaderVariableProxy (csStringID name, void* ud, 
+    csRef<csShaderVariable>* realplace = 0) :
       Name (name), userData(ud), shaderVariable(0), realLocation(realplace)
   {}
         
   csStringID Name;
   csShaderVariable *shaderVariable;
-  csShaderVariable **realLocation;
-  int userData;
+  csRef<csShaderVariable>* realLocation;
+  void* userData;
 };
 
 

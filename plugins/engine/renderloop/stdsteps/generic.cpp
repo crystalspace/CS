@@ -170,14 +170,16 @@ void csGenericRenderStep::RenderMeshes (iGraphics3D* g3d,
   csArray<iShaderVariableContext*> dynDomain;
   
 
-  iShaderTechnique *tech = shader->GetBestTechnique ();
+  //iShaderTechnique *tech = shader->GetBestTechnique ();
 
-  if (tech == 0) return;
+  //if (tech == 0) return;
 
-  for (int p=0; p<tech->GetPassCount (); p++)
+  int numPasses = shader->GetNumberOfPasses ();
+  for (int p=0; p < numPasses; p++)
   {
-    iShaderPass *pass = tech->GetPass (p);
-    pass->Activate (0);
+    //iShaderPass *pass = tech->GetPass (p);
+    //pass->Activate (0);
+    shader->ActivatePass (p);
 
     int j;
     for (j = 0; j < num; j++)
@@ -188,19 +190,22 @@ void csGenericRenderStep::RenderMeshes (iGraphics3D* g3d,
 
       //shader->SelectMaterial (mesh->material->GetMaterial ());
 
-      pass->SetupState (mesh, dynDomain);
+      //pass->SetupState (mesh, dynDomain);
+      shader->SetupPass (mesh, dynDomain);
 
-      uint mixsave = mesh->mixmode;
+      /*uint mixsave = mesh->mixmode;
       uint mixmode = pass->GetMixmodeOverride ();
       if (mixmode != 0)
-        mesh->mixmode = mixmode;
+        mesh->mixmode = mixmode;*/
 
       g3d->DrawMesh (mesh);
-      mesh->mixmode = mixsave;
+      //mesh->mixmode = mixsave;
 
-      pass->ResetState ();
+      //pass->ResetState ();
+      shader->TeardownPass ();
     }
-    pass->Deactivate ();
+    //pass->Deactivate ();
+    shader->DeactivatePass ();
   }
 }
 

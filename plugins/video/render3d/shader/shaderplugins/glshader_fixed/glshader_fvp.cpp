@@ -41,10 +41,22 @@ Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "video/canvas/openglcommon/glextmanager.h"
 
 #include "glshader_fvp.h"
+#include "glshader_fixed.h"
 
 SCF_IMPLEMENT_IBASE(csGLShaderFVP)
   SCF_IMPLEMENTS_INTERFACE(iShaderProgram)
 SCF_IMPLEMENT_IBASE_END
+
+csGLShaderFVP::csGLShaderFVP (csGLShader_FIXED* shaderPlug)
+{
+  validProgram = true;
+  SCF_CONSTRUCT_IBASE (0);
+  csGLShaderFVP::shaderPlug = shaderPlug;
+  csGLShaderFVP::object_reg = shaderPlug->object_reg;
+
+  environment = ENVIRON_NONE;
+  g3d = CS_QUERY_REGISTRY (object_reg, iGraphics3D);
+}
 
 void csGLShaderFVP::Activate ()
 {
@@ -161,7 +173,7 @@ void csGLShaderFVP::SetupState (csRenderMesh *mesh,
     glDisable (GL_COLOR_MATERIAL);
   }
 
-  if (environment == ENVIRON_REFLECT_CUBE && ext->CS_GL_ARB_texture_cube_map)
+  if (environment == ENVIRON_REFLECT_CUBE)
   {
     //setup for environmental cubemapping
     glTexGeni(GL_S,GL_TEXTURE_GEN_MODE,GL_REFLECTION_MAP_ARB);
@@ -212,7 +224,7 @@ void csGLShaderFVP::ResetState ()
     glDisable (GL_LIGHTING);
   }
 
-  if (environment == ENVIRON_REFLECT_CUBE && ext->CS_GL_ARB_texture_cube_map)
+  if (environment == ENVIRON_REFLECT_CUBE)
   {
     glDisable(GL_TEXTURE_GEN_S);
     glDisable(GL_TEXTURE_GEN_T);
@@ -333,7 +345,7 @@ bool csGLShaderFVP::Load(iDocumentNode* program)
               {
                 if ((str = child->GetAttributeValue ("mapping")))
                 {
-                  if (!strcasecmp(str, "cube") && ext->CS_GL_ARB_texture_cube_map)
+                  if (!strcasecmp(str, "cube"))
                   {
                     environment = ENVIRON_REFLECT_CUBE;
                   }
@@ -354,9 +366,15 @@ bool csGLShaderFVP::Load(iDocumentNode* program)
 
 bool csGLShaderFVP::Compile(csArray<iShaderVariableContext*> &staticdomains)
 {
+  shaderPlug->Open ();
+
   //go through the lights and get direct refs (if we can)
   dynamicVars.Empty ();
   int i, j;
+
+  if ((environment == ENVIRON_REFLECT_CUBE) &&
+    !shaderPlug->ext->CS_GL_ARB_texture_cube_map)
+    return false;
 
   ambientVarRef = svContextHelper.GetVariable (ambientvar);
   if (!ambientVarRef)
@@ -369,7 +387,7 @@ bool csGLShaderFVP::Compile(csArray<iShaderVariableContext*> &staticdomains)
   }
   if (!ambientVarRef)
     dynamicVars.InsertSorted (csShaderVariableProxy(ambientvar, 
-    (int)&ambientVarRef));
+    (void*)&ambientVarRef));
 
   for (i = 0; i < lights.Length (); i++)
   {
@@ -386,7 +404,7 @@ bool csGLShaderFVP::Compile(csArray<iShaderVariableContext*> &staticdomains)
     }
     if(!ent.positionVarRef)
       ent.dynVars.InsertSorted (csShaderVariableProxy(ent.positionvar, 
-      (int)&ent.positionVarRef));
+      (void*)&ent.positionVarRef));
 
     ent.diffuseVarRef = svContextHelper.GetVariable (ent.diffusevar);
     if(!ent.diffuseVarRef)
@@ -399,7 +417,7 @@ bool csGLShaderFVP::Compile(csArray<iShaderVariableContext*> &staticdomains)
     }
     if(!ent.diffuseVarRef)
       ent.dynVars.InsertSorted (csShaderVariableProxy(ent.diffusevar, 
-      (int)&ent.diffuseVarRef));
+      (void*)&ent.diffuseVarRef));
 
     ent.specularVarRef = svContextHelper.GetVariable (ent.specularvar);
     if(!ent.specularVarRef)
@@ -412,7 +430,7 @@ bool csGLShaderFVP::Compile(csArray<iShaderVariableContext*> &staticdomains)
     }
     if(!ent.specularVarRef)
       ent.dynVars.InsertSorted (csShaderVariableProxy(ent.specularvar, 
-      (int)&ent.specularVarRef));
+      (void*)&ent.specularVarRef));
 
     ent.attenuationVarRef = svContextHelper.GetVariable (ent.attenuationvar);
     if(!ent.attenuationVarRef)
@@ -425,7 +443,7 @@ bool csGLShaderFVP::Compile(csArray<iShaderVariableContext*> &staticdomains)
     }
     if(!ent.attenuationVarRef)
       ent.dynVars.InsertSorted (csShaderVariableProxy(ent.attenuationvar, 
-      (int)&ent.attenuationVarRef));
+      (void*)&ent.attenuationVarRef));
   }
 
   return true;

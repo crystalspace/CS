@@ -33,7 +33,7 @@ class csXMLShader : public iShader
 public:
   SCF_DECLARE_IBASE;
 
-  csXMLShader ();
+  csXMLShader (iGraphics3D* g3d);
   virtual ~csXMLShader();
 
   /// Retrieve name of shader
@@ -95,7 +95,17 @@ private:
 
   struct shaderPass : public iShaderVariableContext
   {
-    virtual ~shaderPass () { }
+    SCF_DECLARE_IBASE;
+
+    shaderPass () 
+    { 
+      SCF_CONSTRUCT_IBASE (0);
+    }
+
+    virtual ~shaderPass () 
+    { 
+      SCF_DESTRUCT_IBASE();
+    }
 
     /// Get a named variable from this context
     virtual csShaderVariable* GetVariable (csStringID name) const
@@ -124,13 +134,16 @@ private:
     //buffer mappings
     csStringID bufferID[STREAMMAX];
     csRef<csShaderVariable> bufferRef[STREAMMAX];
+    csVertexAttrib vertexattributes[STREAMMAX];
     bool bufferGeneric[STREAMMAX];
+    int bufferCount;
 
     //texture mappings
     csStringID textureID[TEXTUREMAX];
     csRef<csShaderVariable> textureRef[TEXTUREMAX];
     csRef<csShaderVariable> autoAlphaTexRef;
-    unsigned int textureCount;
+    int textureUnits[TEXTUREMAX];
+    int textureCount;
 
     //programs
     csRef<iShaderProgram> vp;
@@ -153,12 +166,12 @@ private:
   //optimization stuff
   static iRenderBuffer* last_buffers[shaderPass::STREAMMAX*2];
   static iRenderBuffer* clear_buffers[shaderPass::STREAMMAX*2];
-  static csVertexAttrib vertexattributes[shaderPass::STREAMMAX*2];
+  //static csVertexAttrib vertexattributes[shaderPass::STREAMMAX*2];
   static int lastBufferCount;
 
   static iTextureHandle* last_textures[shaderPass::TEXTUREMAX];
   static iTextureHandle* clear_textures[shaderPass::TEXTUREMAX];
-  static int textureUnits[shaderPass::TEXTUREMAX];
+  //static int textureUnits[shaderPass::TEXTUREMAX];
   static int lastTexturesCount;
 
   //keep this so we can reset in deactivate
@@ -243,6 +256,7 @@ private:
   //Standard vars
   csRef<iObjectRegistry> objectreg;
   csRef<iStringSet> strings;
+  csRef<iGraphics3D> g3d;
 };
 
 #endif

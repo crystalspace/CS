@@ -22,6 +22,7 @@ Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
 #include "ivideo/shader/shader.h"
 #include "../../common/shaderplugin.h"
+#include "iutil/comp.h"
 
 class csGLShader_FIXED : public iShaderProgramPlugin
 {
@@ -30,11 +31,16 @@ public:
   csRef<iObjectRegistry> object_reg;
   csConfigAccess config;
 
+  bool isOpen;
+
   bool enable;
   GLint texUnits;
 
   void Report (int severity, const char* msg, ...);
 public:
+  /// One-time initialization stuff
+  void Open();
+
   SCF_DECLARE_IBASE;
   
   csGLShader_FIXED (iBase *parent);
@@ -49,7 +55,7 @@ public:
 
   virtual bool SupportType(const char* type);
 
-  virtual void Open();
+  //virtual void Open();
 
 
   ////////////////////////////////////////////////////////////////////

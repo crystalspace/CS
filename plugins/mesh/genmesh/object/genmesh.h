@@ -41,6 +41,7 @@
 #include "ivideo/rndbuf.h"
 #include "ivideo/rendermesh.h"
 #include "cstool/anonrndbuf.h"
+#include "csgfx/shadervarcontext.h"
 
 struct iMaterialWrapper;
 struct iObjectRegistry;
@@ -82,6 +83,7 @@ private:
 #ifdef CS_USE_NEW_RENDERER
   csRenderMesh mesh;
   csRenderMesh* meshPtr;
+  csShaderVariableContext* dynDomain;
   csRef<iGraphics3D> g3d;
 
   csReversibleTransform tr_o2c;
@@ -236,7 +238,7 @@ public:
   virtual iBase* GetLogicalParent () const { return logparent; }
 #ifdef CS_USE_NEW_RENDERER
 
-  iRenderBuffer *GetRenderBuffer (csStringID name);
+  /*iRenderBuffer *GetRenderBuffer (csStringID name);
   //------------------------- iStreamSource implementation ----------------
   class BufferSource : public iRenderBufferSource 
   {
@@ -244,7 +246,7 @@ public:
     iRenderBuffer *GetRenderBuffer (csStringID name)
 	{ return scfParent->GetRenderBuffer (name); }
   } scfiRenderBufferSource;
-  friend class BufferSource;
+  friend class BufferSource;*/
 
 #endif
 
@@ -438,8 +440,6 @@ private:
   csRef<iRenderBuffer> color_buffer;
   csRef<iRenderBuffer> index_buffer;
 
-  csStringID vertex_name, texel_name, normal_name, color_name, index_name;
-
   csAnonRenderBufferManager anon_buffers;
   /*csRefArray<iRenderBuffer> anon_buffers;
   csDirtyAccessArray<csStringID> anon_names;
@@ -487,6 +487,9 @@ private:
 #endif
 
 public:
+  static csStringID vertex_name, texel_name, normal_name, color_name, 
+    index_name;
+
   iObjectRegistry* object_reg;
   iBase* logparent;
   csGenmeshMeshObjectType* genmesh_type;
@@ -568,14 +571,15 @@ public:
   }
 #else
   iRenderBuffer *GetRenderBuffer (csStringID name);
+  bool UpdateRenderBuffers ();
   //------------------------- iRenderBufferSource implementation ----------------
-  class BufferSource : public iRenderBufferSource 
+  /*class BufferSource : public iRenderBufferSource 
   {
     SCF_DECLARE_EMBEDDED_IBASE (csGenmeshMeshObjectFactory);
     iRenderBuffer *GetRenderBuffer (csStringID name)
 	{ return scfParent->GetRenderBuffer (name); }
   } scfiRenderBufferSource;
-  friend class BufferSource;
+  friend class BufferSource;*/
 #endif
 
   //------------------------ iMeshObjectFactory implementation --------------

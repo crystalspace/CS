@@ -35,6 +35,48 @@ csShaderVariable::csShaderVariable (csStringID name) : csRefCount (),
 {
 }
 
+csShaderVariable& csShaderVariable::operator= (
+  const csShaderVariable& copyFrom)
+{
+  switch (copyFrom.Type)
+  {
+    case INT:
+      {
+	SetValue (copyFrom.Int);
+      }
+      break;
+    case STRING:
+      {
+	SetValue (copyFrom.String);
+      }
+      break;
+    case TEXTURE:
+      {
+	if (copyFrom.TextureWrapValue != 0)
+	  SetValue (copyFrom.TextureWrapValue);
+	else
+	  SetValue (copyFrom.TextureHandValue);
+      }
+      break;
+    case RENDERBUFFER:
+      {
+	SetValue (copyFrom.RenderBuffer);
+      }
+      break;
+    case FLOAT:
+    case COLOR:
+    case VECTOR2:
+    case VECTOR3:
+    case VECTOR4:
+      {
+	csVector4 v; 
+	copyFrom.GetValue (v); SetValue (v);
+	Type = copyFrom.Type;
+      }
+      break;
+  }
+  return *this;
+}
 
 int csShaderVariableProxyList::InsertSorted (csShaderVariableProxy item)
 {
@@ -53,6 +95,6 @@ void csShaderVariableProxyList::PrepareFill ()
   {
     csShaderVariableProxy *cur = (csShaderVariableProxy*)&it.Next();
     cur->shaderVariable = 0;
-    *cur->realLocation = 0;
+    if (cur->realLocation) *cur->realLocation = 0;
   }
 }

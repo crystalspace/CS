@@ -40,11 +40,13 @@ struct iShaderRenderInterface;
 struct iShader;
 struct iShaderCompiler;
 
+SCF_VERSION (iShaderVariableContext, 0, 0, 1);
+
 /**
  * This is a baseclass for all interfaces which provides shadervariables
  * both dynamically and static
  */
-struct iShaderVariableContext
+struct iShaderVariableContext : public iBase
 {
   /// Add a variable to this context
   virtual void AddVariable (csShaderVariable *variable) = 0;
@@ -57,6 +59,36 @@ struct iShaderVariableContext
 
   /// Fill a csShaderVariableList. Return number of variables filled
   virtual unsigned int FillVariableList (csShaderVariableProxyList *list) const = 0;
+
+  /**
+   * Like GetVariable(), but it also adds it if doesn't exist already.
+   */
+  csShaderVariable* GetVariableAdd (csStringID name)
+  {
+    csShaderVariable* sv;
+    sv = GetVariable (name);
+    if (sv == 0)
+    {
+      sv = new csShaderVariable (name);
+      AddVariable (sv);
+    }
+    return sv;
+  }
+
+  /**
+   * Like GetVariable(), but it also adds it if doesn't exist already.
+   */
+  csShaderVariable* GetVariableRecursiveAdd (csStringID name)
+  {
+    csShaderVariable* sv;
+    sv = GetVariableRecursive (name);
+    if (sv == 0)
+    {
+      sv = new csShaderVariable (name);
+      AddVariable (sv);
+    }
+    return sv;
+  }
 };
 
 SCF_VERSION (iShaderManager, 0, 1, 0);
@@ -64,7 +96,7 @@ SCF_VERSION (iShaderManager, 0, 1, 0);
 /**
  * A manager for all shaders. Will only be one at a given time
  */
-struct iShaderManager : public iBase, public iShaderVariableContext
+struct iShaderManager : public iShaderVariableContext
 {
   /// Register a shader to the shadermanager. Compiler should register all shaders
   virtual void RegisterShader(iShader* shader) = 0;
@@ -94,7 +126,7 @@ SCF_VERSION (iShader, 0,0,2);
  * Specific shader. Can/will be either render-specific or general
  * The shader in this form is "compiled" and cannot be modified
  */
-struct iShader : public iBase, public iShaderVariableContext
+struct iShader : public iShaderVariableContext
 {
   /// Retrieve name of shader
   virtual const char* GetName() = 0;

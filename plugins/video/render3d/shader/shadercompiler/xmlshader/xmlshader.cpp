@@ -37,6 +37,10 @@ SCF_IMPLEMENT_IBASE(csXMLShader)
   SCF_IMPLEMENTS_INTERFACE(iShader)
 SCF_IMPLEMENT_IBASE_END
 
+SCF_IMPLEMENT_IBASE(csXMLShader::shaderPass)
+  SCF_IMPLEMENTS_INTERFACE(iShaderVariableContext)
+SCF_IMPLEMENT_IBASE_END
+
 csXMLShaderCompiler::csXMLShaderCompiler(iBase* parent)
 {
   SCF_CONSTRUCT_IBASE(parent);
@@ -59,6 +63,8 @@ bool csXMLShaderCompiler::Initialize (iObjectRegistry* object_reg)
     strings = csPtr<iStringSet> (new csScfStringSet ());
     object_reg->Register (strings, "crystalspace.renderer.stringset");
   }
+
+  g3d = CS_QUERY_REGISTRY (object_reg, iGraphics3D);
 
   return true;
 }
@@ -134,7 +140,7 @@ csXMLShader* csXMLShaderCompiler::CompileTechnique (iDocumentNode *node,
     xmltokens.Request (node->GetValue())!=XMLTOKEN_TECHNIQUE)
     return 0;
 
-  csXMLShader* newShader = new csXMLShader();
+  csXMLShader* newShader = new csXMLShader (g3d);
 
   //count passes
   newShader->passesCount = 0;
@@ -220,6 +226,7 @@ bool csXMLShaderCompiler::LoadPass(iDocumentNode *node, csXMLShader::shaderPass 
   //if we got this far, load buffermappings
   csRef<iDocumentNodeIterator> it;
   it = node->GetNodes(xmltokens.Request (XMLTOKEN_BUFFERMAPPING));
+  pass->bufferCount = 0;
   while(it->HasNext ())
   {
     csRef<iDocumentNode> mapping = it->Next ();
@@ -293,29 +300,59 @@ bool csXMLShaderCompiler::LoadPass(iDocumentNode *node, csXMLShader::shaderPass 
     {
       int a = CS_VATTRIB_IS_SPECIFIC (attrib) ? 
 	attrib - CS_VATTRIB_SPECIFIC_FIRST : attrib;
-      pass->bufferID[a] = strings->Request (mapping->GetAttributeValue ("buffer")); //MUST HAVE STRINGS
+      csStringID varID = strings->Request (mapping->GetAttributeValue ("buffer"));
+      pass->bufferID[a] = varID; //MUST HAVE STRINGS
       pass->bufferGeneric[a] = CS_VATTRIB_IS_GENERIC (attrib);
 
       csShaderVariable *varRef=0;
+      //csRef<csShaderVariable>& varRef = pass->bufferRef[a];
       varRef = pass->GetVariableRecursive(pass->bufferID[a]);
 
       if(!varRef)
         varRef = pass->owner->GetVariableRecursive(pass->bufferID[a]);
 
-      pass->bufferRef[a] = varRef; //FETCH REF IF IT EXSISTS AT THIS POINT
+      //pass->bufferRef[a] = varRef; //FETCH REF IF IT EXSISTS AT THIS POINT
+      if (!varRef)
+      {
+	pass->dynamicVariables.InsertSorted (csShaderVariableProxy (varID, 
+	  0, &pass->bufferRef[pass->bufferCount]));
+      }
+      pass->vertexattributes[pass->bufferCount] = attrib;
+      pass->bufferCount++;
+      //pass->bufferCount = MAX (pass->bufferCount, a + 1);
     }
   }
 
   //get texturemappings
-  it = node->GetNodes(xmltokens.Request (XMLTOKEN_TEXTUREMAPPING));
+  pass->textureCount = 0;
+  it = node->GetNodes (xmltokens.Request (XMLTOKEN_TEXTUREMAPPING));
   while(it->HasNext ())
   {
     csRef<iDocumentNode> mapping = it->Next ();
-    if (mapping->GetType ()!=CS_NODE_ELEMENT) continue;
-    if (mapping->GetAttribute("name") && mapping->GetAttribute ("unit"))
+    if (mapping->GetType() != CS_NODE_ELEMENT) continue;
+    if (mapping->GetAttribute ("name") && mapping->GetAttribute ("unit"))
     {
-      pass->textureID[mapping->GetAttributeValueAsInt ("unit")] = 
-        strings->Request (mapping->GetAttributeValue ("name"));
+      const int texUnit = mapping->GetAttributeValueAsInt ("unit");
+      csStringID varID = strings->Request (mapping->GetAttributeValue ("name"));
+      pass->textureID[texUnit] = varID;
+      pass->textureUnits[pass->textureCount] = texUnit;
+
+      csShaderVariable *varRef=0;
+      //csRef<csShaderVariable>& varRef = pass->bufferRef[a];
+      varRef = pass->GetVariableRecursive (varID);
+
+      if(!varRef)
+        varRef = pass->owner->GetVariableRecursive(varID);
+
+      //pass->bufferRef[a] = varRef; //FETCH REF IF IT EXSISTS AT THIS POINT
+      if (!varRef)
+      {
+	pass->dynamicVariables.InsertSorted (csShaderVariableProxy (varID, 
+	  0, &pass->textureRef[pass->textureCount]));
+      }
+
+      //pass->textureCount = MAX(pass->textureCount, texUnit + 1);
+      pass->textureCount++;
     }
   }
 
@@ -389,6 +426,7 @@ csPtr<iShaderProgram> csXMLShaderCompiler::LoadProgram (
   }
 
   program = plg->CreateProgram (node->GetAttributeValue("type"));
+  program->Load (node);
 
   csArray<iShaderVariableContext*> staticDomains;
   staticDomains.Push (pass);
@@ -432,17 +470,20 @@ bool csXMLShaderCompiler::IsTemplateToCompiler(iDocumentNode *templ)
 
 iRenderBuffer* csXMLShader::last_buffers[shaderPass::STREAMMAX*2];
 iRenderBuffer* csXMLShader::clear_buffers[shaderPass::STREAMMAX*2];
-csVertexAttrib csXMLShader::vertexattributes[shaderPass::STREAMMAX*2];
+//csVertexAttrib csXMLShader::vertexattributes[shaderPass::STREAMMAX*2];
 int csXMLShader::lastBufferCount;
 
 iTextureHandle* csXMLShader::last_textures[shaderPass::TEXTUREMAX];
 iTextureHandle* csXMLShader::clear_textures[shaderPass::TEXTUREMAX];
-int csXMLShader::textureUnits[shaderPass::TEXTUREMAX];
+//int csXMLShader::textureUnits[shaderPass::TEXTUREMAX];
 int csXMLShader::lastTexturesCount;
 
-csXMLShader::csXMLShader () : passes(NULL), passesCount(0), currentPass(~0)
+csXMLShader::csXMLShader (iGraphics3D* g3d) : passes(NULL), passesCount(0), 
+  currentPass(~0)
 {
   SCF_CONSTRUCT_IBASE(0);
+
+  csXMLShader::g3d = g3d;
 }
 
 csXMLShader::~csXMLShader ()
@@ -470,12 +511,15 @@ bool csXMLShader::DeactivatePass ()
 {
   if(currentPass>=passesCount)
     return false;
+  shaderPass *thispass = &passes[currentPass];
   currentPass = ~0;
 
-  g3d->SetBufferState(vertexattributes, clear_buffers, lastBufferCount);
+  g3d->SetBufferState(thispass->vertexattributes, clear_buffers, 
+    lastBufferCount);
   lastBufferCount=0;
 
-  g3d->SetTextureState(textureUnits, clear_textures, lastTexturesCount);
+  g3d->SetTextureState(thispass->textureUnits, clear_textures, 
+    lastTexturesCount);
   lastTexturesCount=0;
   
   g3d->SetWriteMask (orig_wmRed, orig_wmGreen, orig_wmBlue, orig_wmAlpha);
@@ -503,23 +547,44 @@ bool csXMLShader::SetupPass (csRenderMesh *mesh,
     if (varsFilled>=thispass->dynamicVariables.Length ())
       break;
   }
+  
+  /*for(i = 0; i < thispass->dynamicVariables.Length (); i++)
+  {
+    *((csRef<csShaderVariable>*)thispass->dynamicVariables.Get(i).userData) = 
+      thispass->dynamicVariables.Get(i).shaderVariable;
+    thispass->dynamicVariables.Get(i).shaderVariable = 0;
+  }*/
 
   //now map our buffers. all refs should be set
-  for(i=0;i<lastBufferCount;i++)
+  for (i = 0; i < thispass->bufferCount; i++)
   {
-    thispass->bufferRef[i]->GetValue(last_buffers[i]);
+    if (thispass->bufferRef[i])
+      thispass->bufferRef[i]->GetValue(last_buffers[i]);
+    else
+      last_buffers[i] = 0;
   }
-  g3d->SetBufferState (vertexattributes, last_buffers, lastBufferCount);
+  g3d->SetBufferState (thispass->vertexattributes, last_buffers, 
+    thispass->bufferCount);
+  lastBufferCount = thispass->bufferCount;
 
   //and the textures
-  for(i=0;i<(int)thispass->textureCount;i++)
+  for(i = 0; i < thispass->textureCount; i++)
   {
-    thispass->textureRef[i]->GetValue(last_textures[i]);
+    if (thispass->textureRef[i])
+      thispass->textureRef[i]->GetValue(last_textures[i]);
+    else
+      last_textures[i] = 0;
   }
-  g3d->SetTextureState (textureUnits, last_textures, thispass->textureCount);
+  g3d->SetTextureState (thispass->textureUnits, last_textures, 
+    thispass->textureCount);
+  lastTexturesCount = thispass->textureCount;
 
   g3d->SetWriteMask (thispass->wmRed, thispass->wmGreen, thispass->wmBlue,
     thispass->wmAlpha);
+
+  // @@@ FIXME: Get those from shader file
+  mesh->mixmode = CS_FX_COPY; 
+  mesh->alphaType = csAlphaMode::alphaSmooth;
 
   if(thispass->vp) thispass->vp->SetupState (mesh, dynamicDomains);
   if(thispass->fp) thispass->fp->SetupState (mesh, dynamicDomains);

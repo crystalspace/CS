@@ -59,7 +59,6 @@ csGLShaderFFP::csGLShaderFFP(csGLShader_FIXED* shaderPlug)
 
   csGLShaderFFP::shaderPlug = shaderPlug;
   object_reg = shaderPlug->object_reg;
-  ext = shaderPlug->ext;
   programstring = 0;
   validProgram = true;
 
@@ -256,6 +255,9 @@ bool csGLShaderFFP::LoadLayer(mtexlayer* layer, iDocumentNode* node)
 
 bool csGLShaderFFP::Compile(csArray<iShaderVariableContext*> &staticDomains)
 {
+  shaderPlug->Open ();
+  ext = shaderPlug->ext;
+
   maxlayers = shaderPlug->texUnits;
 
   //get a statecache
@@ -272,12 +274,30 @@ bool csGLShaderFFP::Compile(csArray<iShaderVariableContext*> &staticDomains)
   if (texlayers.Length () > maxlayers)
     return false;
 
+  for(int i = 0; i < texlayers.Length(); ++i)
+  {
+    mtexlayer* layer = &texlayers[i];
+    if (((layer->colorp == GL_DOT3_RGB_ARB) || 
+      (layer->colorp == GL_DOT3_RGBA_ARB)) && 
+      !(ext->CS_GL_ARB_texture_env_dot3 || ext->CS_GL_EXT_texture_env_dot3))
+      return false;
+    if (((layer->alphap == GL_DOT3_RGB_ARB) || 
+      (layer->alphap == GL_DOT3_RGBA_ARB)) && 
+      !(ext->CS_GL_ARB_texture_env_dot3 || ext->CS_GL_EXT_texture_env_dot3))
+      return false;
+
+    /*
+     @@@ Check for features that require texture_env_combine,
+	 and reject if such are used, but ARB_t_e_c isn't present.
+     */
+  }
+
   return true;
 }
 
 void csGLShaderFFP::Activate ()
 {
-  for(int i = 0; i < MIN(maxlayers, texlayers.Length()); ++i)
+  for(int i = 0; i < texlayers.Length(); ++i)
   {
     mtexlayer* layer = &texlayers[i];
     ext->glActiveTextureARB(GL_TEXTURE0_ARB + i);
@@ -299,12 +319,7 @@ void csGLShaderFFP::Activate ()
         glTexEnvi(GL_TEXTURE_ENV, GL_OPERAND2_RGB_ARB, layer->colormod[2]);
       }
 
-      if( (layer->colorp != GL_DOT3_RGB_ARB)
-      		&& (layer->colorp  != GL_DOT3_RGBA_ARB))
-        glTexEnvi(GL_TEXTURE_ENV, GL_COMBINE_RGB_ARB, layer->colorp );
-      else if (ext->CS_GL_ARB_texture_env_dot3
-      		|| ext->CS_GL_EXT_texture_env_dot3)
-        glTexEnvi(GL_TEXTURE_ENV, GL_COMBINE_RGB_ARB, layer->colorp );
+      glTexEnvi(GL_TEXTURE_ENV, GL_COMBINE_RGB_ARB, layer->colorp );
 
       glTexEnvf(GL_TEXTURE_ENV, GL_RGB_SCALE_ARB, layer->scale_rgb);
 
@@ -318,12 +333,7 @@ void csGLShaderFFP::Activate ()
         glTexEnvi(GL_TEXTURE_ENV, GL_OPERAND2_ALPHA_ARB, layer->alphamod[2]);
       }
 
-      if( (layer->colorp != GL_DOT3_RGB_ARB)
-      		&& (layer->colorp  != GL_DOT3_RGBA_ARB))
-        glTexEnvi(GL_TEXTURE_ENV, GL_COMBINE_ALPHA_ARB, layer->alphap);
-      else if (ext->CS_GL_ARB_texture_env_dot3
-      		|| ext->CS_GL_EXT_texture_env_dot3)
-        glTexEnvi(GL_TEXTURE_ENV, GL_COMBINE_ALPHA_ARB, layer->alphap);
+      glTexEnvi(GL_TEXTURE_ENV, GL_COMBINE_ALPHA_ARB, layer->alphap);
 
       glTexEnvf(GL_TEXTURE_ENV, GL_ALPHA_SCALE, layer->scale_alpha);
     }

@@ -25,10 +25,13 @@
 #include "csutil/strhash.h"
 #include "../../common/shaderplugin.h"
 
+class csGLShader_FIXED;
+
 class csGLShaderFVP : public iShaderProgram
 {
 private:
   csRef<iGraphics3D> g3d;
+  csGLShader_FIXED* shaderPlug;
 
   enum
   {
@@ -72,7 +75,6 @@ private:
 
   ENVMODE environment;
 
-  csGLExtensionManager* ext;
   csRef<iObjectRegistry> object_reg;
 
   csStringHash xmltokens;
@@ -86,16 +88,7 @@ private:
 public:
   SCF_DECLARE_IBASE;
 
-  csGLShaderFVP(iObjectRegistry* object_reg, csGLExtensionManager* ext)
-  {
-    validProgram = true;
-    SCF_CONSTRUCT_IBASE (0);
-    this->object_reg = object_reg;
-    this->ext = ext;
-  
-    environment = ENVIRON_NONE;
-    g3d = CS_QUERY_REGISTRY (object_reg, iGraphics3D);
-  }
+  csGLShaderFVP (csGLShader_FIXED* shaderPlug);
   virtual ~csGLShaderFVP ()
   {
   }

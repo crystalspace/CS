@@ -63,6 +63,7 @@ csGLShader_FIXED::csGLShader_FIXED(iBase* parent)
 
   enable = false;
   texUnits = 0;
+  isOpen = false;
 }
 
 csGLShader_FIXED::~csGLShader_FIXED()
@@ -96,9 +97,9 @@ bool csGLShader_FIXED::SupportType(const char* type)
 csPtr<iShaderProgram> csGLShader_FIXED::CreateProgram(const char* type)
 {
   if( strcasecmp(type, "gl_fixed_fp") == 0)
-    return csPtr<iShaderProgram>(new csGLShaderFFP(this));
+    return csPtr<iShaderProgram>(new csGLShaderFFP (this));
   else if( strcasecmp(type, "gl_fixed_vp") == 0)
-    return csPtr<iShaderProgram>(new csGLShaderFVP(object_reg, ext));
+    return csPtr<iShaderProgram>(new csGLShaderFVP (this));
   else
     return 0;
 }
@@ -109,6 +110,7 @@ void csGLShader_FIXED::Open()
 {
   if(!object_reg)
     return;
+  if (isOpen) return;
 
   config.AddConfig (object_reg, "/config/glshader_fixed.cfg");
 
@@ -167,6 +169,8 @@ void csGLShader_FIXED::Open()
       texUnits = useTextureUnits;
     }
   }
+
+  isOpen = true;
 }
 
 ////////////////////////////////////////////////////////////////////

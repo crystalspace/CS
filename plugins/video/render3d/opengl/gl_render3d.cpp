@@ -1606,6 +1606,15 @@ void csGLGraphics3D::DrawMesh (csRenderMesh* mymesh)
   SetObjectToCamera (&mymesh->object2camera);
   //SetObjectToCamera (mymesh->transform);
 
+  CS_ASSERT(mymesh->dynDomain);
+  csShaderVariable* indexBufSV = mymesh->dynDomain->GetVariable (string_indices);
+  CS_ASSERT(indexBufSV);
+  iRenderBuffer* iIndexbuf = 0;
+  indexBufSV->GetValue (iIndexbuf);
+  CS_ASSERT(iIndexbuf);
+  csGLRenderBuffer* indexbuf = (csGLRenderBuffer*)iIndexbuf;
+    //(csGLRenderBuffer*)indexBufSV->  source->GetRenderBuffer (string_indices);
+
   GLenum primitivetype;
   switch (mymesh->meshtype)
   {
@@ -1675,11 +1684,11 @@ void csGLGraphics3D::DrawMesh (csRenderMesh* mymesh)
 
   statecache->SetShadeModel (GL_SMOOTH);
 
-  iRenderBufferSource* source = mymesh->buffersource;
+  /*iRenderBufferSource* source = mymesh->buffersource;
   csGLRenderBuffer* indexbuf =
     (csGLRenderBuffer*)source->GetRenderBuffer (string_indices);
   if (!indexbuf)
-    return;
+    return;*/
 
   //indexbuf->Lock(CS_BUF_LOCK_RENDER);
   void* bufData = indexbuf->RenderLock (CS_GLBUF_RENDERLOCK_ELEMENTS);
