@@ -182,7 +182,7 @@ static inline int dist_nowritequeue ()
 bool csDynaVis::do_cull_frustum = true;
 int csDynaVis::do_cull_coverage = COVERAGE_OUTLINE;
 bool csDynaVis::do_cull_history = true;
-bool csDynaVis::do_cull_writequeue = true;
+bool csDynaVis::do_cull_writequeue = false;//@@@@@@@@@@@ TEMPORARY
 bool csDynaVis::do_cull_ignoresmall = false;
 bool csDynaVis::do_cull_clampoccluder = false;
 bool csDynaVis::do_cull_vpt = true;
@@ -351,11 +351,6 @@ void csDynaVis::RegisterVisObject (iVisibilityObject* visobj)
   else
     visobj_wrap->hint_closed = false;
 
-  visobj_wrap->hint_badoccluder = visobj->GetCullerFlags ().Check (
-  	CS_CULLER_HINT_BADOCCLUDER);
-  visobj_wrap->hint_goodoccluder = visobj->GetCullerFlags ().Check (
-  	CS_CULLER_HINT_GOODOCCLUDER);
-
   visobj_wrap->use_outline_filler = (visobj_wrap->hint_closed
   	|| visobj_wrap->model->CanUseOutlineFiller ())
 	&& !visobj_wrap->hint_goodoccluder;
@@ -364,6 +359,13 @@ void csDynaVis::RegisterVisObject (iVisibilityObject* visobj)
   {
     visobj_wrap->hint_badoccluder = true;
     visobj_wrap->hint_goodoccluder = false;
+  }
+  else
+  {
+    visobj_wrap->hint_badoccluder = visobj->GetCullerFlags ().Check (
+  	CS_CULLER_HINT_BADOCCLUDER);
+    visobj_wrap->hint_goodoccluder = visobj->GetCullerFlags ().Check (
+  	CS_CULLER_HINT_GOODOCCLUDER);
   }
 
   visobj_vector.Push (visobj_wrap);
@@ -432,6 +434,13 @@ void csDynaVis::UpdateObject (csVisibilityObjectWrapper* visobj_wrap)
   {
     visobj_wrap->hint_badoccluder = true;
     visobj_wrap->hint_goodoccluder = false;
+  }
+  else
+  {
+    visobj_wrap->hint_badoccluder = visobj->GetCullerFlags ().Check (
+  	CS_CULLER_HINT_BADOCCLUDER);
+    visobj_wrap->hint_goodoccluder = visobj->GetCullerFlags ().Check (
+  	CS_CULLER_HINT_GOODOCCLUDER);
   }
 
   csBox3 bbox;
@@ -1503,7 +1512,7 @@ bool csDynaVis::VisTest (iRenderView* rview,
   data.rview = rview;
   data.dynavis = this;
   data.viscallback = viscallback;
-  kdtree->Front2Back(data.pos, VisTest_Front2Back, (void*)&data, frustum_mask);
+  kdtree->Front2Back (data.pos, VisTest_Front2Back, (void*)&data, frustum_mask);
 
   do_state_dump = false;
 

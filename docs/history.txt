@@ -36,6 +36,14 @@ chronological order.
 	  vertex buffer switches. This requires mesh plugins to supply an
 	  ID for geometry to be effective, which currently only genmesh
 	  and thing (through polygonmesh) is augmented to do.
+	- Jorrit fixed a BIG BIG bug in Dynavis which had the effect that
+	  Dynavis would do nearly all the work needed to cull objects but
+	  nothing would be culled. This bug was introduced 19-Feb.
+	- Jorrit temporarily disabled the write queue in Dynavis since it
+	  now seems to cause a lot of overhead. To be investigated!
+	  This might be related to nodes which don't get culled if the
+	  write queue is enabled. This can possibly be solved by letting
+	  the nodes respect the write queue too.
 	- Eric Sunshine changed SCF_QUERY_INTERFACE(context, iMeshWrapper) in
 	  csThingLoader::Parse() to use SCF_QUERY_INTERFACE_SAFE() since
 	  `context' might be null.  Reported by Atis Elsts <atisel@inbox.lv>.
