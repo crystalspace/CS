@@ -459,22 +459,20 @@ csRectRegion::Exclude(csRect &nrect)
       fragmentRect(r1, r2, MODE_EXCLUDE);
      
     } // end for
-
-    // Check and see if we have fragments to consider
-    /*for(i=0; i<FRAGMENT_BUFFER_SIZE; ++i)
-    {
-      if (!(fragment[i].IsEmpty()))
-      {
-        rect.Set(fragment[i]);
-        fragment[i].MakeEmpty();
-        no_fragments=false;
-        break;
-      }
-    }*/
-
-  //} while(!no_fragments);
-
 }
 
+void
+csRectRegion::ClipTo(csRect &clip)
+{
+  int i;
+
+  for(i = 0; i < region_count; i++)
+  { 
+    region[i].Intersect(clip);
+
+    if (region[i].IsEmpty())
+      deleteRect(i);
+  }
+}
 
 
