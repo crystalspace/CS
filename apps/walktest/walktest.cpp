@@ -1243,6 +1243,7 @@ bool WalkTest::Initialize (int argc, const char* const argv[],
     Report (CS_REPORTER_SEVERITY_ERROR, "No iGraphics3D plugin!");
     return false;
   }
+  myG3D->IncRef ();
 
   myG2D = CS_QUERY_REGISTRY (object_reg, iGraphics2D);
   if (!myG2D)
@@ -1250,6 +1251,7 @@ bool WalkTest::Initialize (int argc, const char* const argv[],
     Report (CS_REPORTER_SEVERITY_ERROR, "No iGraphics2D plugin!");
     return false;
   }
+  myG2D->IncRef ();
 
   myVFS = CS_QUERY_REGISTRY (object_reg, iVFS);
   if (!myVFS)
@@ -1257,6 +1259,7 @@ bool WalkTest::Initialize (int argc, const char* const argv[],
     Report (CS_REPORTER_SEVERITY_ERROR, "No iVFS plugin!");
     return false;
   }
+  myVFS->IncRef ();
 
   kbd = CS_QUERY_REGISTRY (object_reg, iKeyboardDriver);
   if (!kbd)
@@ -1267,6 +1270,8 @@ bool WalkTest::Initialize (int argc, const char* const argv[],
   kbd->IncRef();
 
   myConsole = CS_QUERY_REGISTRY (object_reg, iConsoleOutput);
+  if (myConsole) 
+    myConsole->IncRef ();
   mySound = CS_QUERY_PLUGIN_ID (plugin_mgr, CS_FUNCID_SOUND, iSoundRender);
   myMotionMan = CS_QUERY_PLUGIN_ID (plugin_mgr, CS_FUNCID_MOTION, iMotionManager);
 
@@ -1338,6 +1343,7 @@ bool WalkTest::Initialize (int argc, const char* const argv[],
     Report (CS_REPORTER_SEVERITY_ERROR, "No level loader plugin!");
     return false;
   }
+  LevelLoader->IncRef ();
 
   // Find the model converter plugin
   ModelConverter = CS_QUERY_PLUGIN (plugin_mgr, iModelConverter);
