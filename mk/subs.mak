@@ -32,11 +32,18 @@ ifneq ($(APPLICATION_SUBMAKEFILES),)
   include $(APPLICATION_SUBMAKEFILES)
 endif
 
-ifeq ($(SUBAPPLICATION_SUBMAKEFILES),)
-  SUBAPPLICATION_SUBMAKEFILES=$(wildcard apps/*/*/*.mak)
+ifeq ($(TESTS_SUBMAKEFILES),)
+  TESTS_SUBMAKEFILES=$(wildcard apps/tests/*/*.mak)
 endif
-ifneq ($(SUBAPPLICATION_SUBMAKEFILES),)
-  include $(SUBAPPLICATION_SUBMAKEFILES)
+ifneq ($(TESTS_SUBMAKEFILES),)
+  include $(TESTS_SUBMAKEFILES)
+endif
+
+ifeq ($(TUTORIAL_SUBMAKEFILES),)
+  TUTORIAL_SUBMAKEFILES=$(wildcard apps/tutorial/*/*.mak)
+endif
+ifneq ($(TUTORIAL_SUBMAKEFILES),)
+  include $(TUTORIAL_SUBMAKEFILES)
 endif
 
 ifeq ($(COMPOSITE_SUBMAKEFILES),)
