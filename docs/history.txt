@@ -25,18 +25,22 @@ chronological order.
 	  automatically converted to Set(csVector3(0)). Now with the new
 	  Set(float*) the wrong Set got called. Fixed this by adding an
 	  explicit Set(float).
-	- Keith added functionality to Sprcal3d.  Now when you set an action
-	  in sprcal3d, it remembers this and clears it explicitly when a new
-	  animation is set.  If the action has completed and has already been 
-	  removed this has no effect, but if the action is still in progress
-	  then the new animation will play accurately.  This is particularly
-	  important for autolock actions which stay on the last frame
-	  indefinitely.  YOU NEED CAL3D CVS AS OF 6/28 TO BUILD THIS.
-	- Also, now on initial creation of the cal3d model, the bbox is
-	  calculated using frame 0 of anim 0 as the base instead of the meshes
-	  as loaded.  This is because most of the time 3d modelers model
-	  characters with their arms straight out instead of at their sides,
-	  which makes collider creation very wrong.
+	- Keith Fulton added functionality to sprcal3d.  Now when you set an
+	  action in sprcal3d, it remembers this and clears it explicitly when a
+	  new animation is set.  If the action has completed and has already
+	  been removed this has no effect, but if the action is still in
+	  progress then the new animation will play accurately.  This is
+	  particularly important for autolock actions which stay on the last
+	  frame indefinitely.  YOU NEED CAL3D CVS AS OF 2004/06/28 TO BUILD
+	  THIS.
+	- Keith Fulton changed sprcal3d so that, now on initial creation of the
+	  cal3d model, the bbox is calculated using frame 0 of anim 0 as the
+	  base instead of the meshes as loaded.  This is because most of the
+	  time 3d modelers model characters with their arms straight out
+	  instead of at their sides, which makes collider creation very wrong.
+	- Eric Sunshine upgraded cal3d check in configure.ac so that it demands
+	  at least the 2004/06/28 version of Cal3D since this is required by
+	  Keith's changes to sprcal3d.
 27-Jun-2004
 	- res worked around a possible VC7 64bit warning in 
 	  csIntegralHashKeyHandler<>.
@@ -585,10 +589,10 @@ chronological order.
 	  in the <move>. This is not allowed by CS.
 	- res fixed a copy'n'paste error in the DDS loader.
 	- Jorrit and MatzeB fixed a bug in OPCODE which only occurs in optimize
-	  mode and using X86 processor. The problem is again an aliasing problem
-	  between different types on the same memory address. This is not
-	  guaranteed to work in C++. This fixes a falling through the floor
-	  problem in walktest.
+	  mode and using X86 processor.  The problem is again an aliasing
+	  problem between different types on the same memory address.  This is
+	  not guaranteed to work in C++.  This fixes a falling through the
+	  floor problem in walktest.
 	- Eric Sunshine made the following changes to msvcgen:
 	    - Added --set option to msvcgen.pl which allows clients to
 	      create their own template interoplation variables. For example,
@@ -795,8 +799,9 @@ chronological order.
 	  draws text with background more efficiently (via some GL blend mode
 	  setup instead of using quads to create a background).
 26-May-2004
-	- Keith fixed bug in HitBeam code which assumed that all meshes for
-	  a sprcal3d were attached to the model instance.  This is not required.
+	- Keith Fulton fixed bug in HitBeam code which assumed that all meshes
+	  for a sprcal3d were attached to the model instance.  This is not
+	  required.
 25-May-2004
 	- Eric Sunshine updated references to the SourceForge CVS server in the
 	  user manual from cvs.crystal.sourceforge.net to cvs.sourceforge.net
@@ -819,8 +824,8 @@ chronological order.
 	  needed and they cause entire polygons to be removed if such a test
 	  succeeds. This could cause severe render errors when using the
 	  software renderer.
-	- Keith added functions to sprcal3d to set animations by index number
-	  instead of only by name.
+	- Keith Fulton added functions to sprcal3d to set animations by index
+	  number instead of only by name.
 24-May-2004
 	- Jorrit added a proper copy constructor to csHashMapReversible.
 	  Without that copy constructor doing a copy of such a hashmap
@@ -936,10 +941,10 @@ chronological order.
 	  Previously, it was a dependency only of 'install', which meant that
 	  it got built only at installation time (unless the user built it
 	  explicitly).
-	- Jorrit removed DeleteNext() from the iterators in csHash. These
-	  functions could not compile (the 'hash' that is given to the iterators
-	  is const so it cannot be modified) and since nobody seems to be
-	  needing them (they are broken anyway).
+	- Jorrit removed DeleteNext() from the iterators in csHash.  These
+	  functions could not compile (the 'hash' that is given to the
+	  iterators is const so it cannot be modified) and since nobody seems
+	  to be needing them (they are broken anyway).
 	- Eric Sunshine fixed bug in Jam build system where .csplugin file (if
 	  not embedded) was being installed by 'install_plugin' and 'install'
 	  even if Plugin rule had been invoked with "noinstall" option.
