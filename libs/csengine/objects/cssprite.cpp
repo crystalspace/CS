@@ -529,6 +529,7 @@ void csSprite3D::Draw (csRenderView& rview)
 
   // The triangle in question
   csVector2 triangle [3];
+  csVector2 clipped_triangle [10];	//@@@BAD HARCODED!
   rview.g3d->SetRenderState (G3DRENDERSTATE_ZBUFFERTESTENABLE, true);
   rview.g3d->SetRenderState (G3DRENDERSTATE_ZBUFFERFILLENABLE, true);
 
@@ -540,6 +541,9 @@ void csSprite3D::Draw (csRenderView& rview)
   if (!rview.callback)
     rview.g3d->StartPolygonQuick (poly.txt_handle, vertex_colors != NULL);
 
+  // Get this field from the current view for conveniance.
+  bool mirror = rview.IsMirrored ();
+
   // Draw all triangles.
   for (i = 0 ; i < m->GetNumTriangles () ; i++)
   {
@@ -549,44 +553,50 @@ void csSprite3D::Draw (csRenderView& rview)
     if (visible[a] && visible[b] && visible[c])
     {
       //-----
-      // Do backface culling.
+      // Do backface culling. Note that this depends on the
+      // mirroring of the current view.
       //-----
-      if (csMath2::Area2 (persp [a].x, persp [a].y,
-                          persp [b].x, persp [b].y,
-                          persp [c].x, persp [c].y) >= 0)
-        continue;
+      float area = csMath2::Area2 (persp [a].x, persp [a].y,
+                          	   persp [b].x, persp [b].y,
+                          	   persp [c].x, persp [c].y);
+      if (mirror)
+      {
+        if (area <= 0) continue;
+      }
+      else
+        if (area >= 0) continue;
 
-      triangle [0] = persp[a];
+      triangle [mirror ? 2 : 0] = persp[a];
       triangle [1] = persp[b];
-      triangle [2] = persp[c];
-      // Clip triangle
+      triangle [mirror ? 0 : 2] = persp[c];
+      // Clip triangle. Note that the clipper doesn't care about the
+      // orientation of the triangle vertices. It works just as well in
+      // mirrored mode.
       int rescount;
-      csVector2 *cpoly = rview.view->Clip (triangle, 3, rescount);
-      if (!cpoly) continue;
+      if (!rview.view->Clip (triangle, clipped_triangle, 3, rescount)) continue;
 
       poly.num = rescount;
       int trivert [3] = { a, b, c };
-      int j;
+      int j, idx, dir;
+      // If mirroring we store the vertices in the other direction.
+      if (mirror) { idx = 2; dir = -1; }
+      else { idx = 0; dir = 1; }
       for (j = 0; j < 3; j++)
       {
-        poly.vertices [j].z = 1 / tr_frame->GetVertex (trivert [j]).z;
-        poly.vertices [j].u = tr_frame->GetTexel (trivert [j]).x;
-        poly.vertices [j].v = tr_frame->GetTexel (trivert [j]).y;
+        poly.vertices [idx].z = 1 / tr_frame->GetVertex (trivert [j]).z;
+        poly.vertices [idx].u = tr_frame->GetTexel (trivert [j]).x;
+        poly.vertices [idx].v = tr_frame->GetTexel (trivert [j]).y;
         if (vertex_colors)
         {
-          poly.vertices [j].r = vertex_colors[trivert[j]].red;
-          poly.vertices [j].g = vertex_colors[trivert[j]].green;
-          poly.vertices [j].b = vertex_colors[trivert[j]].blue;
+          poly.vertices [idx].r = vertex_colors[trivert[j]].red;
+          poly.vertices [idx].g = vertex_colors[trivert[j]].green;
+          poly.vertices [idx].b = vertex_colors[trivert[j]].blue;
         }
+	idx += dir;
       }
-      for (j = 0; j < rescount; j++)
-      {
-         poly.vertices [j].sx = cpoly [j].x;
-         poly.vertices [j].sy = cpoly [j].y;
-      }
-      CHK (delete[] cpoly);
+      PreparePolygonQuick (&poly, clipped_triangle, rescount, (csVector2 *)triangle,
+      	vertex_colors != NULL);
 
-      PreparePolygonQuick (&poly, (csVector2 *)triangle, vertex_colors != NULL);
       // Draw resulting polygon
       if (!rview.callback)
         rview.g3d->DrawPolygonQuick (poly);

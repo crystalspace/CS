@@ -1164,6 +1164,8 @@ void csPolygon3D::FillLightmap (csLightView& lview)
     if (lview.dynamic)
     {
       // Currently not yet supported. @@@
+      // Support for this requires something similar to the static and the
+      // real lightmap so that we can store static gouraud shaded stuff seperatelly.
       return;
     }
     else
@@ -1539,16 +1541,24 @@ void csPolygon2D::Draw (IGraphics2D* g2d, int col)
 
 //---------------------------------------------------------------------------
 
-void PreparePolygonQuick (G3DPolygonDPQ* g3dpoly, csVector2* orig_triangle, bool gouraud)
+void PreparePolygonQuick (G3DPolygonDPQ* g3dpoly, csVector2* clipped_verts, int num_vertices,
+	csVector2* orig_triangle, bool gouraud)
 {
-  if (g3dpoly->num == 3)
+  // 'was_clipped' will be true if the triangle was clipped.
+  // This is the case if rescount != 3 (because we then don't have
+  // a triangle) or else if any of the clipped vertices is different.
+  bool was_clipped = num_vertices != 3;
+  int j;
+  for (j = 0; j < num_vertices; j++)
   {
-    // Trivial case. The polygon is still a triangle.
-    // @@@ HERE WE NEED TO FIND A TEST to see if the triangle is still the original
-    // unclipped triangle.
-    //return;
+    g3dpoly->vertices [j].sx = clipped_verts [j].x;
+    g3dpoly->vertices [j].sy = clipped_verts [j].y;
+    if (!was_clipped && clipped_verts[j] != orig_triangle[j]) was_clipped = true;
   }
 
+  // If it was not clipped we don't have to do anything.
+  if (!was_clipped) return;
+								        
   // first we copy the first three texture coordinates to a local buffer
   // to avoid that they are overwritten when interpolating.
   G3DTexturedVertex tritexcoords[3];
@@ -1573,7 +1583,6 @@ void PreparePolygonQuick (G3DPolygonDPQ* g3dpoly, csVector2* orig_triangle, bool
     else
       top = 2;
 
-  int j;
   int _vbl, _vbr;
   if (top <= 0) _vbl = 2; else _vbl = top - 1;
   if (top >= 2) _vbr = 0; else _vbr = top + 1;
@@ -1678,7 +1687,7 @@ void PreparePolygonQuick (G3DPolygonDPQ* g3dpoly, csVector2* orig_triangle, bool
 //---------------------------------------------------------------------------
 
 void csPolygon2D::DrawFilled (IGraphics3D* g3d, csPolygon3D* poly, csPolyPlane* plane, bool mirror,
-	bool use_z_buf, csVector2* orig_triangle)
+	bool use_z_buf)
 {
   int i;
   bool debug = false;
@@ -1697,6 +1706,7 @@ void csPolygon2D::DrawFilled (IGraphics3D* g3d, csPolygon3D* poly, csPolyPlane* 
   if (poly->GetUVCoords () || poly->CheckFlags (CS_POLY_FLATSHADING))
   {
     G3DPolygonDPQ g3dpoly;
+    csVector2 orig_triangle[3];
 
     memset (&g3dpoly, 0, sizeof (g3dpoly));
     g3dpoly.num = num_vertices;
@@ -1710,9 +1720,27 @@ void csPolygon2D::DrawFilled (IGraphics3D* g3d, csPolygon3D* poly, csPolyPlane* 
     if (poly->CheckFlags (CS_POLY_FLATSHADING)) g3dpoly.txt_handle = NULL;
 
     // We are going to use DrawPolygonQuick.
-    g3dpoly.vertices[0].z = 1. / poly->Vcam (0).z;
-    g3dpoly.vertices[1].z = 1. / poly->Vcam (1).z;
-    g3dpoly.vertices[2].z = 1. / poly->Vcam (2).z;
+    // Here we have to do a little messy thing because PreparePolygonQuick()
+    // still requires the original triangle that was valid before clipping.
+    float iz;
+    iz = 1. / poly->Vcam (0).z;
+    g3dpoly.vertices[0].z = iz;
+    iz *= csCamera::aspect;
+    orig_triangle[0].x = poly->Vcam (0).x * iz + csWorld::shift_x;
+    orig_triangle[0].y = poly->Vcam (0).y * iz + csWorld::shift_y;
+
+    iz = 1. / poly->Vcam (1).z;
+    g3dpoly.vertices[1].z = iz;
+    iz *= csCamera::aspect;
+    orig_triangle[1].x = poly->Vcam (1).x * iz + csWorld::shift_x;
+    orig_triangle[1].y = poly->Vcam (1).y * iz + csWorld::shift_y;
+
+    iz = 1. / poly->Vcam (2).z;
+    g3dpoly.vertices[2].z = iz;
+    iz *= csCamera::aspect;
+    orig_triangle[2].x = poly->Vcam (2).x * iz + csWorld::shift_x;
+    orig_triangle[2].y = poly->Vcam (2).y * iz + csWorld::shift_y;
+
     if (g3dpoly.txt_handle)
     {
       g3dpoly.vertices[0].u = poly->GetUVCoords ()[0].x;
@@ -1734,12 +1762,7 @@ void csPolygon2D::DrawFilled (IGraphics3D* g3d, csPolygon3D* poly, csPolyPlane* 
       g3dpoly.vertices[2].g = po_colors[2].green;
       g3dpoly.vertices[2].b = po_colors[2].blue;
     }
-    for (i = 0 ; i < num_vertices ; i++)
-    {
-      g3dpoly.vertices[i].sx = vertices[i].x;
-      g3dpoly.vertices[i].sy = vertices[i].y;
-    }
-    PreparePolygonQuick (&g3dpoly, orig_triangle, po_colors != NULL);
+    PreparePolygonQuick (&g3dpoly, vertices, num_vertices, orig_triangle, po_colors != NULL);
     g3d->StartPolygonQuick (g3dpoly.txt_handle, po_colors != NULL);
     g3d->DrawPolygonQuick (g3dpoly);
     g3d->FinishPolygonQuick ();

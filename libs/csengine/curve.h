@@ -38,10 +38,6 @@ class csCurveVertex
 public:
   /// Object space coordinates.
   csVector3 object_coord;
-  /// World space coordinates.
-  csVector3 world_coord;
-  /// Camera space coordinates.
-  csVector3 camera_coord;
   /// Texture coordinates.
   csVector2 txt_coord;
   /// Original control points.

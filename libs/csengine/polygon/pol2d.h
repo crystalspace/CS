@@ -179,8 +179,8 @@ public:
    * space).
    * 'poly' is only used for debugging. The plane and vertices are not used.
    */
-  void DrawFilled (IGraphics3D* g3d, csPolygon3D* poly, csPolyPlane* plane, bool mirror, bool use_z_buf = false,
-  	csVector2* orig_triangle = NULL);
+  void DrawFilled (IGraphics3D* g3d, csPolygon3D* poly, csPolyPlane* plane,
+  	bool mirror, bool use_z_buf = false);
 
   /**
    * Add this polygon as a back or front polygon of a fog object.
@@ -195,6 +195,7 @@ struct G3DPolygonDPQ;
  * Prepare a filled in G3DPolygonDPQ structure for drawing via
  * g3d->DrawPolygonQuick.
  */
-extern void PreparePolygonQuick (G3DPolygonDPQ* g3dpoly, csVector2 *orig_triangle, bool gouraud);
+extern void PreparePolygonQuick (G3DPolygonDPQ* g3dpoly, csVector2* clipped_poly,
+	int num_vertices, csVector2 *orig_triangle, bool gouraud);
 
 #endif /*POL2D_H*/

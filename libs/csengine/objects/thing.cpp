@@ -175,13 +175,24 @@ void csThing::DrawCurves (csRenderView& rview, bool use_z_buf)
     res=1000; // some big tesselation value...
 
   // Variables for drawing curves.
-  csVector3* varr[3];
   csVector2* texes[3];
   int control_x[3];
   int control_y[3];
-  csVector2 persp[3];
+  csVector2* persp;
+  float* z_array;
+  csVector2 triangle[3];
+  csVector2 clipped_triangle[10];	//@@@BAD HARDCODED!
+  csVector3 coord;
   UByte* mapR=NULL, * mapG=NULL, * mapB=NULL;
   int lm_width=0, lm_height=0;
+
+  // Get this field from the current view for conveniance.
+  bool mirror = rview.IsMirrored ();
+
+  // Create the combined transform of object to camera by
+  // combining object to world and world to camera.
+  csReversibleTransform obj_cam = rview;
+  obj_cam /= obj;
 
   // Loop over all curves
   csCurve* c;
@@ -192,13 +203,20 @@ void csThing::DrawCurves (csRenderView& rview, bool use_z_buf)
     csCurveTesselated* tess = c->Tesselate (res);
 
     // First I transform all tesselated vertices from object to
-    // world space and then from world to camera space. @@@ NOTE!
-    // These transformations should be combined for better efficiency!
+    // world space and then from world to camera space.
+    CHK (persp = new csVector2 [tess->GetNumVertices ()]);
+    CHK (z_array = new float [tess->GetNumVertices ()]);
     for (j = 0 ;  j < tess->GetNumVertices () ; j++)
     {
       csCurveVertex& cv = tess->GetVertex (j);
-      cv.world_coord = obj.This2Other (cv.object_coord);
-      cv.camera_coord = rview.Other2This (cv.world_coord);
+      coord = obj_cam.Other2This (cv.object_coord);
+      if (coord.z >= SMALL_Z)
+      {
+    	float iz = csCamera::aspect/coord.z;
+        persp[j].x = coord.x * iz + csWorld::shift_x;
+        persp[j].y = coord.y * iz + csWorld::shift_y;
+      }
+      z_array[j] = coord.z;
     }
 
     // Clipped polygon (assume it cannot have more than 64 vertices)
@@ -232,82 +250,72 @@ void csThing::DrawCurves (csRenderView& rview, bool use_z_buf)
     {
       csCurveTriangle& ct = tess->GetTriangle (j);
 
-      // Transform all vertices from camera space to perspective
-      // correct coords
+      bool visible = z_array [ct.i1] >= SMALL_Z &&
+      		     z_array [ct.i2] >= SMALL_Z &&
+      		     z_array [ct.i3] >= SMALL_Z;
 
-      varr[0] = &tess->GetVertex (ct.i1).camera_coord;
-      varr[1] = &tess->GetVertex (ct.i2).camera_coord;
-      varr[2] = &tess->GetVertex (ct.i3).camera_coord;
-
-      texes[0] = &tess->GetVertex (ct.i1).txt_coord;
-      texes[1] = &tess->GetVertex (ct.i2).txt_coord;
-      texes[2] = &tess->GetVertex (ct.i3).txt_coord;
-
-      if (gouraud)
-      {
-        control_x[0] = QInt (tess->GetVertex (ct.i1).control.x * lm_width);
-        control_y[0] = QInt (tess->GetVertex (ct.i1).control.y * lm_height);
-        control_x[1] = QInt (tess->GetVertex (ct.i2).control.x * lm_width);
-        control_y[1] = QInt (tess->GetVertex (ct.i2).control.y * lm_height);
-        control_x[2] = QInt (tess->GetVertex (ct.i3).control.x * lm_width);
-        control_y[2] = QInt (tess->GetVertex (ct.i3).control.y * lm_height);
-      }
-
-      bool visible = true;
-      int k;
-      for (k = 0 ; k < 3 ; k++)
-        if (varr[k]->z >= SMALL_Z)
-        {
-    	  float iz = csCamera::aspect/varr[k]->z;
-    	  persp[k].x = varr[k]->x * iz + csWorld::shift_x;
-    	  persp[k].y = varr[k]->y * iz + csWorld::shift_y;
-  	}
-        else
-    	  visible = false;
-
-      // Draw all triangles.
       if (visible)
       {
   	//-----
-  	// Do backface culling.
+  	// Do backface culling. Note that this depends on mirroring
+	// of the current view.
   	//-----
-  	if (csMath2::Area2 (persp [0].x, persp [0].y,
-          	persp [1].x, persp [1].y,
-          	persp [2].x, persp [2].y) >= 0)
-    	  continue;
+  	float area = csMath2::Area2 (persp [ct.i1].x, persp [ct.i1].y,
+          		 	     persp [ct.i2].x, persp [ct.i2].y,
+          		 	     persp [ct.i3].x, persp [ct.i3].y);
+
+	if (mirror)
+	{
+          if (area <= 0) continue;
+	}
+	else
+          if (area >= 0) continue;
+
+        triangle[mirror ? 2 : 0] = persp[ct.i1];
+        triangle[1] = persp[ct.i2];
+        triangle[mirror ? 0 : 2] = persp[ct.i3];
 
   	// Clip triangle
   	int rescount;
-  	csVector2 *cpoly = rview.view->Clip (persp, 3, rescount);
-  	if (!cpoly) continue;
+  	if (!rview.view->Clip (triangle, clipped_triangle, 3, rescount)) continue;
+
+        texes[0] = &tess->GetVertex (ct.i1).txt_coord;
+        texes[1] = &tess->GetVertex (ct.i2).txt_coord;
+        texes[2] = &tess->GetVertex (ct.i3).txt_coord;
+
+        if (gouraud)
+        {
+          control_x[0] = QInt (tess->GetVertex (ct.i1).control.x * lm_width);
+          control_y[0] = QInt (tess->GetVertex (ct.i1).control.y * lm_height);
+          control_x[1] = QInt (tess->GetVertex (ct.i2).control.x * lm_width);
+          control_y[1] = QInt (tess->GetVertex (ct.i2).control.y * lm_height);
+          control_x[2] = QInt (tess->GetVertex (ct.i3).control.x * lm_width);
+          control_y[2] = QInt (tess->GetVertex (ct.i3).control.y * lm_height);
+        }
 
   	poly.num = rescount;
-  	int j;
+        int trivert [3] = { ct.i1, ct.i2, ct.i3 };
+        int j, idx, dir;
+        // If mirroring we store the vertices in the other direction.
+        if (mirror) { idx = 2; dir = -1; }
+        else { idx = 0; dir = 1; }
   	for (j = 0; j < 3; j++)
   	{
-    	  if (varr[j]->z > 0.0001)
-      	    poly.vertices [j].z = 1 / varr[j]->z;
-    	  poly.vertices [j].u = texes[j]->x;
-    	  poly.vertices [j].v = texes[j]->y;
+      	  poly.vertices [idx].z = 1 / z_array[trivert [j]];
+    	  poly.vertices [idx].u = texes[j]->x;
+    	  poly.vertices [idx].v = texes[j]->y;
     	  if (gouraud)
     	  {
       	    int lm_idx = control_y[j]*(lm_width+2) + control_x[j];
-      	    //@@@ NOT EFFICIENT!
-      	    poly.vertices[j].r = ((float)mapR[lm_idx])/256.;
-      	    poly.vertices[j].g = ((float)mapG[lm_idx])/256.;
-      	    poly.vertices[j].b = ((float)mapB[lm_idx])/256.;
+      	    poly.vertices[idx].r = ((float)mapR[lm_idx])/256.;
+      	    poly.vertices[idx].g = ((float)mapG[lm_idx])/256.;
+      	    poly.vertices[idx].b = ((float)mapB[lm_idx])/256.;
     	  }
+	  idx += dir;
   	}
 
-  	for (j = 0; j < rescount; j++)
-  	{
-    	  poly.vertices [j].sx = cpoly [j].x;
-    	  poly.vertices [j].sy = cpoly [j].y;
-  	}
-  	CHK (delete[] cpoly);
+        PreparePolygonQuick (&poly, clipped_triangle, rescount, (csVector2 *)triangle, gouraud);
 
-  	//poly.pi_triangle = ; //DPQFIX
-        PreparePolygonQuick (&poly, (csVector2 *)persp, gouraud);
   	// Draw resulting polygon
 	if (!rview.callback)
   	  rview.g3d->DrawPolygonQuick (poly);
@@ -317,6 +325,9 @@ void csThing::DrawCurves (csRenderView& rview, bool use_z_buf)
     }
     if (!rview.callback)
       rview.g3d->FinishPolygonQuick ();
+
+    CHK (delete [] persp);
+    CHK (delete [] z_array);
   }
 }
 

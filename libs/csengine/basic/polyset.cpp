@@ -343,7 +343,7 @@ void csPolygonSet::TranslateVector (csVector3& trans)
     cam_verts[i] = wor_verts[i]-trans;
 }
 
-#if 0
+#if 1
 bool csPolygonSet::TransformWorld2Cam (csCamera& c)
 {
   int i;
@@ -437,31 +437,12 @@ void csPolygonSet::DrawPolygonArray (csPolygonInt** polygon, int num, csRenderVi
   
   for (i = 0 ; i < num ; i++)
   {
-    csVector2 orig_triangle[3];
     p = (csPolygon3D*)polygon[i];
-    if (p->GetUVCoords () || p->CheckFlags (CS_POLY_FLATSHADING))
-    {
-      //@@@ NOT OPTIMAL AT ALL!
-      //@@@@@@@@
-      float iz;
-      if (p->Vcam (0).z) iz = csCamera::aspect/p->Vcam (0).z;
-      else iz = 1000000.;
-      orig_triangle[0].x = p->Vcam (0).x * iz + csWorld::shift_x;
-      orig_triangle[0].y = p->Vcam (0).y * iz + csWorld::shift_y;
-      if (p->Vcam (1).z) iz = csCamera::aspect/p->Vcam (1).z;
-      else iz = 1000000.;
-      orig_triangle[1].x = p->Vcam (1).x * iz + csWorld::shift_x;
-      orig_triangle[1].y = p->Vcam (1).y * iz + csWorld::shift_y;
-      if (p->Vcam (2).z) iz = csCamera::aspect/p->Vcam (2).z;
-      else iz = 1000000.;
-      orig_triangle[2].x = p->Vcam (2).x * iz + csWorld::shift_x;
-      orig_triangle[2].y = p->Vcam (2).y * iz + csWorld::shift_y;
-    }
-
     if ( !p->dont_draw &&
          p->ClipToPlane (d->do_clip_plane ? &d->clip_plane : (csPlane*)NULL, d->GetOrigin (),
 	 	verts, num_verts) && 
-         p->DoPerspective (*d, verts, num_verts, &csPolygon2D::clipped, orig_triangle, d->IsMirrored ())  &&
+         p->DoPerspective (*d, verts, num_verts, &csPolygon2D::clipped,
+	 	NULL/*orig_triangle*/, d->IsMirrored ())  &&
          csPolygon2D::clipped.ClipAgainst (d->view) )
     {
       if (d->callback)
@@ -512,14 +493,14 @@ void csPolygonSet::DrawPolygonArray (csPolygonInt** polygon, int num, csRenderVi
 	  {
 	    if (filtered)
 	      keep_clipped->DrawFilled (d->g3d, p, keep_plane, d->IsMirrored (),
-		  use_z_buf, orig_triangle);
+		  use_z_buf);
 	    if (is_this_fog) keep_clipped->AddFogPolygon (d->g3d, p, keep_plane, d->IsMirrored (),
 		  sector->GetID (), CS_FOG_BACK);
 	  }
         }
         else if (!d->callback)
 	  csPolygon2D::clipped.DrawFilled (d->g3d, p, p->GetPlane (), d->IsMirrored (),
-		use_z_buf, orig_triangle);
+		use_z_buf);
               
         // Cleanup.
         if (keep_clipped)
@@ -530,7 +511,7 @@ void csPolygonSet::DrawPolygonArray (csPolygonInt** polygon, int num, csRenderVi
       }
       else if (!d->callback)
         csPolygon2D::clipped.DrawFilled (d->g3d, p, p->GetPlane (), d->IsMirrored (),
-      	  use_z_buf, orig_triangle);
+      	  use_z_buf);
     }
   }
 }
