@@ -82,7 +82,7 @@ public:
 public:
 
   /// Create a model object given number of triangles
-  CD_model::CD_model (int n_triangles);
+  CD_model (int n_triangles);
 
   /// Add a triangle to the model
   int AddTriangle (int id, const csVector3 &p1, const csVector3 &p2, const csVector3 &p3);
