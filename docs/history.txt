@@ -6,6 +6,12 @@ The history order is reversed so that new features are at the top.
 24-Jun-2003
 	- Oktal added an iGraphicsMemory interface with which to access
 	  the csGraphicsMemory plugin.
+	- Oktal finished off the new renderer shader variable system,
+	  including factoring out the variable-related API calls from all
+	  the shader-related interfaces into a single interface which they
+	  all now inherit from.
+	  It should now be ready for use, and I leave that to
+	  Anders and Marten :-)
 23-Jun-2003
         - Boyan did the following in AWS:
           - Added iAwsComponent->GetFirstFocusableChild

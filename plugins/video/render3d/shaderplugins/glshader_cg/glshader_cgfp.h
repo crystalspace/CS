@@ -49,6 +49,8 @@ private:
     int namehash;
     CGparameter parameter;
   };
+  csArray<csSymbolTable> symtabs;
+  csSymbolTable *symtab;
 
   struct texturemapentry
   {
@@ -118,29 +120,18 @@ public:
 
   virtual void ResetState () {}
 
-  /* Propertybag - get property, return false if no such property found
-   * Which properties there is is implementation specific
-   */
-  virtual bool GetProperty(const char* name, iString* string) {return false;};
-  virtual bool GetProperty(const char* name, int* string) {return false;};
-  virtual bool GetProperty(const char* name, csVector3* string) {return false;};
-//  virtual bool GetProperty(const char* name, csVector4* string) {};
-
-  /* Propertybag - set property.
-   * Which properties there is is implementation specific
-   */
-  virtual bool SetProperty(const char* name, iString* string) {return false;};
-  virtual bool SetProperty(const char* name, int* string) {return false;};
-  virtual bool SetProperty(const char* name, csVector3* string) {return false;};
-//  virtual bool SetProperty(const char* name, csVector4* string) {return false;};
-
-  /// Add a variable to this context
+  virtual void AddChild(iShaderBranch *c)
+    { symtab->AddChild(c->GetSymbolTable()); }
   virtual bool AddVariable(iShaderVariable* variable) 
-    { /*do not allow externals to add variables*/ return false; };
-  /// Get variable
-  virtual iShaderVariable* GetVariable(int namehash);
-  /// Get all variable stringnames added to this context (used when creatingthem)
-  virtual csBasicVector GetAllVariableNames(); 
+    { return false; } // Don't allow externals to add variables
+  virtual iShaderVariable* GetVariable(csStringID name)
+    { return (iShaderVariable *) symtab->GetSymbol(name); }
+  virtual csSymbolTable* GetSymbolTable()
+    { return symtab; }
+  virtual void SelectSymbolTable(int index) {
+    if (symtabs.Length() < index) symtabs.SetLength(index + 1);
+    symtab = & symtabs[index];
+  }
 
   /// Check if valid
   virtual bool IsValid() { return validProgram;} 

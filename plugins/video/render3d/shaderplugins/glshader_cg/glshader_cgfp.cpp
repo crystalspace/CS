@@ -259,31 +259,6 @@ bool csShaderGLCGFP::Prepare()
   return true;
 }
 
-
-csBasicVector csShaderGLCGFP::GetAllVariableNames()
-{
-  csBasicVector res;
-
-  csGlobalHashIterator c( &variables);
-  while(c.HasNext())
-  {
-    res.PushSmart( (void*)((iShaderVariable*)c.Next())->GetName());
-  }
-  return res;
-}
-
-iShaderVariable* csShaderGLCGFP::GetVariable(int namehash)
-{
-  csHashIterator c(&variables, namehash);
-
-  if(c.HasNext())
-  {
-    return (iShaderVariable*)c.Next();
-  }
-
-  return 0;
-}
-
 csPtr<iString> csShaderGLCGFP::GetProgramID()
 {
   csMD5::Digest d = csMD5::Encode(programstring);

@@ -116,18 +116,9 @@ csShaderWrapper::~csShaderWrapper ()
 {
 }
 
-iShader* csShaderWrapper::GetShader()
-{
-  return shader;
-}
-
 void csShaderWrapper::SelectMaterial(iMaterial* mat)
 {
-}
-
-csSymbolTable* csShaderWrapper::GetSymbolTable()
-{
-  return &symtab;
+  
 }
 
 //=================== csShaderManager ================//
@@ -248,11 +239,6 @@ csBasicVector csShaderManager::GetAllVariableNames() const
   }
 
   return vReturnValue;
-}
-
-csSymbolTable* csShaderManager::GetSymbolTable()
-{
-  return 0;
 }
 
 bool csShaderManager::HandleEvent(iEvent& event)
@@ -428,11 +414,6 @@ csBasicVector csShader::GetAllVariableNames() const
   }
 
   return vReturnValue;
-}
-
-csSymbolTable* csShader::GetSymbolTable()
-{
-  return 0;
 }
 
 //technique-related
@@ -1013,11 +994,6 @@ bool csShaderPass::Prepare()
   return true;
 }
 
-csSymbolTable* csShaderPass::GetSymbolTable()
-{
-  return 0;
-}
-
 //================= csShaderTechnique ============//
 csShaderTechnique::csShaderTechnique(csShader* owner, iObjectRegistry* reg)
 {
@@ -1118,11 +1094,6 @@ bool csShaderTechnique::Prepare()
       return false;
   }
   return true;
-}
-
-csSymbolTable* csShaderTechnique::GetSymbolTable()
-{
-  return 0;
 }
 
 bool csShaderTechnique::AddVariable(iShaderVariable* variable)
