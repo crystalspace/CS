@@ -189,7 +189,8 @@ AC_CHECK_PROGS([FLEXBIN], [flex])
 AS_IF([test -n "$FLEXBIN"], [CS_BUILD_PROPERTY([FLEXBIN], [$FLEXBIN])])
 
 AC_CHECK_PROGS([BISONBIN], [bison])
-AS_IF([test -n "$BISONBIN"], [AC_CHECK_BISON([1.35], [CS_BUILD_PROPERTY([BISONBIN], [$BISONBIN])])])
+AS_IF([test -n "$BISONBIN"],
+    [AC_CHECK_BISON([1.35], [CS_BUILD_PROPERTY([BISONBIN], [$BISONBIN])])])
 
 AC_CHECK_PROGS([DOXYGEN], [doxygen])
 AS_IF([test -n "$DOXYGEN"], [CS_BUILD_PROPERTY([CMD.DOXYGEN], [$DOXYGEN])])
@@ -1265,7 +1266,7 @@ AC_DEFUN([_CS_CHECK_HOST_DARWIN],
     # If user explicitly requested --with-x, then assume Darwin+XFree86; else
     # assume MacOS/X.
     AC_MSG_CHECKING([for --with-x])
-    AS_IF([test $with_x = yes],
+    AS_IF([test x$with_x = xyes],
 	[AC_MSG_RESULT([yes (assume Darwin)])
 	cs_host_target=unix
 	cs_host_makefile=libs/cssys/unix/unix.mak

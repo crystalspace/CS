@@ -4,6 +4,19 @@ http://crystal.sourceforge.net/
 The history order is reversed so that new features are at the top.
 
 24-Apr-2003
+	- Eric Sunshine made the following changes:
+	    - Improved robustness of --with-x check for Darwin/Macintosh, since
+	      $with_x suddenly started evaluating to nothing on Wyatt's
+	      machine, which caused the expression `test $with_x = yes' to
+	      fail with a syntax error.
+	    - Changed bison.m4 so that it no longer abuses the user.  We do not
+	      need to abuse the user just because an optional tool is missing
+	      or has the wrong version number.
+	    - Rewrote the sed extraction expressions in bison.m4 for a couple
+	      reasons.  First, they crashed and burned horribly on MacOS/X.
+	      Second, they were using non-portable features which are not
+	      present in older sed implementations.
+24-Apr-2003
 	- Fixed a compile error in lview.h.
 	- Fixed another compile error in bezier mesh.
 	- Greatly optimized the CS hashmap. Now it is several factors faster
@@ -25,11 +38,12 @@ The history order is reversed so that new features are at the top.
 	  bucket size in hash map has been reduced to 53 elements.
 	- Philip Wyett initialized counters to zero at decleration. This
 	  fixes compilation warning(s) and possibility of arbitary values.
-	    - Eliminated struct vs. class warning under MSVC in maya2spr.
-	- Norman Kraemer added a m4 script to find out about bison's version
-	- He also added a call to AC_CHECK_BISON in configure.ac to ensure
-	  only for bison 1.35 and above config vars will be emitted for make
-	  and jam configuration
+	- Philip Wyett eliminated struct vs. class warning under MSVC in
+	  maya2spr.
+	- Norman Kraemer added a m4 script to find out about Bison's version.
+	  He also added a call to AC_CHECK_BISON in configure.ac to ensure that
+	  build variables will only be emitted for make and jam for Bison 1.35
+	  and better.
 	- Matze added a MakeLocate jamrule for jam version 2.4. This avoids
 	  the "bla depends on itself" warnings.
 23-Apr-2003
