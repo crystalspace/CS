@@ -39,6 +39,7 @@ struct iEffectDefinition;
 struct iTextureHandle;
 struct csRGBpixel;
 struct csRGBcolor;
+struct iShader;
 
 /**
  * This structure represents an extra texture
@@ -67,6 +68,19 @@ SCF_VERSION (iMaterial, 0, 0, 6);
  */
 struct iMaterial : public iBase
 {
+#ifdef CS_USE_NEW_RENDERER
+  /**
+   * Set accosiated shader
+   */
+  virtual void SetShader (iShader* shader) = 0;
+
+  /**
+   * Get accosiated shader
+   */
+  virtual iShader* GetShader () = 0;
+
+#endif
+
   /**
    * Set the material's effect.
    */

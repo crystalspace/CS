@@ -98,6 +98,19 @@ iEffectDefinition *csMaterial::GetEffect ()
   return effect;
 }
 
+#ifdef CS_USE_NEW_RENDERER
+void csMaterial::SetShader (iShader* shd)
+{
+  shader = shd;
+}
+
+iShader* csMaterial::GetShader()
+{
+  return shader;
+}
+
+#endif
+
 iTextureHandle *csMaterial::GetTexture ()
 {
   return texture ? texture->GetTextureHandle () : NULL;
