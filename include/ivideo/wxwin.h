@@ -19,6 +19,8 @@
 #ifndef _CS_IVIDEO_WXWIN_H_
 #define _CS_IVIDEO_WXWIN_H_
 
+#include "csutil/scf.h"
+
 // wxWidgets boilerplate.
 #ifndef _WX_WXH__
 #include <wx/wxprec.h>
@@ -32,7 +34,7 @@
 
 SCF_VERSION(iWxWindow, 0, 0, 0);
 
-struct iWxWindow : public iBase 
+struct iWxWindow : public iBase
 {
   virtual void SetParent(wxWindow* parent) = 0;
   virtual wxWindow* GetWindow() = 0;
