@@ -38,7 +38,8 @@ SCF_IMPLEMENT_IBASE_END
 awsWindow::awsWindow():above(NULL), below(NULL), 
   frame_style(fsNormal), 
   frame_options(foControl | foZoom | foMin | foClose | foTitle | foGrip | foRoundBorder),
-  resizing_mode(false), moving_mode(false)
+  resizing_mode(false), moving_mode(false),
+  min_button(NULL), max_button(NULL), close_button(NULL)
 {
 
 }
@@ -53,6 +54,8 @@ awsWindow::Setup(iAws *_wmgr, awsComponentNode *settings)
 {
   if (!awsComponent::Setup(_wmgr, settings)) return false;
 
+  iAwsPrefs *pm = WindowManager()->GetPrefMgr();
+  
   // Link into the current window hierarchy, at the top.
   if (WindowManager()->GetTopWindow()==NULL)
   {
@@ -63,6 +66,17 @@ awsWindow::Setup(iAws *_wmgr, awsComponentNode *settings)
     LinkAbove(WindowManager()->GetTopWindow());
     WindowManager()->SetTopWindow(this);
   }
+    
+  if ((min_button=pm->GetTexture("WindowMin"))==NULL)
+    printf("aws-debug: No WindowMin texture found.\n");
+
+  if ((max_button=pm->GetTexture("WindowZoom"))==NULL)
+    printf("aws-debug: No WindowZoom texture found.\n");
+
+  if ((close_button=pm->GetTexture("WindowClose"))==NULL)
+    printf("aws-debug: No WindowClose texture found.\n");
+
+  printf("aws-debug: texture for min_button is: %p\n", min_button); 
 
   return true;
 }
@@ -353,7 +367,7 @@ void
 awsWindow::OnDraw(csRect clip)
 {
   iGraphics2D *g2d = WindowManager()->G2D();
-//iGraphics3D *g3d = WindowManager()->G3D();
+  iGraphics3D *g3d = WindowManager()->G3D();
 
   /******************************************
    * When drawing the window, we have to take 
@@ -495,6 +509,10 @@ awsWindow::OnDraw(csRect clip)
           }
 
       }
+
+
+      // Draw min/max/close buttons
+      //g3d->DrawPixmap(min_button, Frame().xmin+4, Frame().ymin+4, 16, 16, 0,0, 16, 16, 0);
       
     } 
     break;

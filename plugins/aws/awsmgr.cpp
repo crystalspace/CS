@@ -11,6 +11,9 @@
 #include "ivaria/reporter.h"
 #include <stdio.h>
 
+const int proctex_width=512;
+const int proctex_height=512; 
+
 awsManager::awsComponentFactoryMap::~awsComponentFactoryMap ()
 {
   factory->DecRef ();
@@ -156,7 +159,7 @@ awsManager::SetDefaultContext(iEngine* engine, iTextureManager* txtmgr)
 {
   if (!DefaultContextInitialized)
   {
-    canvas.SetSize(512, 512);
+    canvas.SetSize(proctex_width, proctex_height);
     canvas.SetKeyColor(255,0,255);
     if (!canvas.Initialize(object_reg, engine, txtmgr, "awsCanvas"))
       printf("aws-debug: SetDefaultContext failed to initialize the memory canvas.\n");
@@ -292,14 +295,14 @@ void
 awsManager::Redraw()
 {
    static unsigned redraw_tag = 0;
-   static csRect bounds(0,0,512,512);
+   static csRect bounds(0,0,proctex_width,proctex_height);
    int    erasefill = GetPrefMgr()->GetColor(AC_TRANSPARENT);
 
    redraw_tag++;
    
    ptG3D->BeginDraw(CSDRAW_2DGRAPHICS);
    
-   //ptG2D->SetClipRect(0,0,512,512);
+   //ptG2D->SetClipRect(0,0,proctex_width, proctex_width);
 
    if (redraw_tag%2) ptG2D->DrawBox( 0,  0,25, 25, GetPrefMgr()->GetColor(AC_SHADOW));
    else              ptG2D->DrawBox( 0,  0,25, 25, GetPrefMgr()->GetColor(AC_HIGHLIGHT));
@@ -311,7 +314,7 @@ awsManager::Redraw()
    /******* The following code is only executed if there is something to redraw *************/
    
    //if (updatestore_dirty && UsingDefaultContext)
-     //ptG2D->DrawBox(0,0,512,480,erasefill);
+     //ptG2D->DrawBox(0,0, proctex_width,proctex_height,erasefill);
 
 
    awsWindow *curwin=top, *oldwin = 0;
@@ -640,8 +643,8 @@ awsManager::RecursiveBroadcastToChildren(awsComponent *cmp, iEvent &Event)
 
 awsManager::awsCanvas::awsCanvas ()
 {
-  mat_w=512;
-  mat_h=512;
+  mat_w=proctex_width;
+  mat_h=proctex_height;
   
   texFlags = CS_TEXTURE_2D | CS_TEXTURE_PROC;
    

@@ -49,6 +49,9 @@ private:
     /// Links this window in below the passed in window.  This window must be unlinked!
     void LinkBelow(awsWindow *win);
 
+    /// Texture handles for buttons
+    iTextureHandle *min_button, *max_button, *close_button;
+
 private:
     /** Contains the redraw tag.  This tag changes everytime we redraw the window system, but only once per frame.
       we use it to keep track of which windows have been redrawn and which haven't.

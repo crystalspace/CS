@@ -117,7 +117,7 @@ awsTextureManager::GetTexturebyID(unsigned long id, char *filename, bool replace
   {
     awsTexture *awstxt = (awsTexture *)textures[i];
 
-    if (DEBUG_GETTEX) printf("aws-debug: (%s) texture is: %p\n", __FILE__, awstxt);
+    if (DEBUG_GETTEX) printf("aws-debug: (%s) texture is: %p\n", __FILE__, awstxt->tex);
 
     if (awstxt && id == awstxt->id) 
     {
@@ -128,6 +128,7 @@ awsTextureManager::GetTexturebyID(unsigned long id, char *filename, bool replace
     }
   }
   
+  if (!txtfound && filename == NULL) return NULL;
   if (!txtfound) awstxt=NULL;
 
  /*  If we have arrived here, then we know that the texture does not exist in the cache.
@@ -171,15 +172,16 @@ awsTextureManager::GetTexturebyID(unsigned long id, char *filename, bool replace
     return NULL;
   }
 
-  //ifile->SetName(name);
-
  /*  At this point, we have loaded the file from the disk, and all we're doing now is creating
   * a texture handle to the image.  The texture handle is necessary to draw a pixmap with 
   * iGraphics3D::DrawPixmap()
   */
   
   if (awstxt==NULL)
+  {
     awstxt = new awsTexture;
+    memset(awstxt, 0, sizeof(awsTexture));
+  }
   else
   {
     awstxt->img->DecRef();

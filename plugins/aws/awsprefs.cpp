@@ -113,7 +113,7 @@ awsPrefManager::GetTexture(char *name, char *filename)
 {
 
  if (awstxtmgr)
-   return awstxtmgr->GetTexture(name, filename);
+   return awstxtmgr->GetTexture(name, filename, false);
  else 
    return NULL;
  
