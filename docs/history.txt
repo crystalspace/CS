@@ -43,6 +43,8 @@ chronological order.
 	  with T equal to char*. Sidenote: changing the Push() to this:
 		int Push (const T& what)
 	  didn't help.
+	- Jorrit merged csArrayBase with csArray so that only csArray
+	  remains.
 6-Aug-2003
 	- Jorrit fixed a compile error in freefnt2 font server related to the
 	  csRefArray->csArray change.
