@@ -22,7 +22,7 @@
 #include "sysdef.h"
 #include "cscom/com.h"
 #include "css/cssint.h"
-#include "css/intrface.h"
+#include "csengine/intrface.h"
 
 #ifdef OS_WIN32
 #define STATIC_EXTENSION ".lib"
