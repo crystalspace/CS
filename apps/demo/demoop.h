@@ -54,7 +54,7 @@ public:
 class TestOp : public StandardOp
 {
 public:
-  virtual void Do (csTime dt);
+  virtual void Do (csTicks dt);
 };
 
 /**
@@ -64,15 +64,15 @@ class FadeOp : public StandardOp
 {
 private:
   float start_fade, end_fade;
-  csTime total_fade_time;
+  csTicks total_fade_time;
 
 public:
-  FadeOp (float sf, float ef, csTime tft) :
+  FadeOp (float sf, float ef, csTicks tft) :
   	start_fade (sf), end_fade (ef), total_fade_time (tft)
   {
   }
 
-  virtual void Do (csTime dt);
+  virtual void Do (csTicks dt);
 };
 
 /**
@@ -81,14 +81,14 @@ public:
 class RotatePartOp : public StandardOp
 {
 private:
-  csTime total_rotate_time;
+  csTicks total_rotate_time;
   float angle_speed;
   iMeshWrapper* mesh;
 
 public:
-  RotatePartOp (const char* meshname, csTime total, float aspeed);
+  RotatePartOp (const char* meshname, csTicks total, float aspeed);
 
-  virtual void Do (csTime dt);
+  virtual void Do (csTicks dt);
 };
 
 /**
@@ -103,7 +103,7 @@ private:
 
 public:
   SetupMeshOp (const char* meshName, const char* sectName, const csVector3& p);
-  virtual void Do (csTime dt);
+  virtual void Do (csTicks dt);
 };
 
 /**
@@ -116,7 +116,7 @@ private:
 
 public:
   ShowMeshOp (const char* meshName);
-  virtual void Do (csTime dt);
+  virtual void Do (csTicks dt);
 };
 
 /**
@@ -129,7 +129,7 @@ private:
 
 public:
   HideMeshOp (const char* meshName);
-  virtual void Do (csTime dt);
+  virtual void Do (csTicks dt);
 };
 
 /**
@@ -143,7 +143,7 @@ private:
 
 public:
   AttachOp (const char* meshName, const char* pathName);
-  virtual void Do (csTime dt);
+  virtual void Do (csTicks dt);
 };
 
 /**
@@ -154,11 +154,11 @@ class PathOp : public StandardOp
 private:
   iMeshWrapper* mesh;
   csNamedPath* path;
-  csTime total_path_time;
+  csTicks total_path_time;
 
 public:
-  PathOp (csTime t, const char* meshName, const char* pathName);
-  virtual void Do (csTime dt);
+  PathOp (csTicks t, const char* meshName, const char* pathName);
+  virtual void Do (csTicks dt);
 };
 
 #endif // DEMOOP_H

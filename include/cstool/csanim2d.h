@@ -48,23 +48,23 @@ public:
   inline int GetFrameCount() const
     {return Frames.Length();}
   /// get total length of animation (all delays added together)
-  inline csTime GetLength() const
-    {return (GetFrameCount()==0)?0:(csTime)FinishTimes.Get(GetFrameCount()-1);}
+  inline csTicks GetLength() const
+    {return (GetFrameCount()==0)?0:(csTicks)FinishTimes.Get(GetFrameCount()-1);}
   /// add a frame. (giving the length of this frame)
-  inline void AddFrame(csTime Delay, csPixmap *s)
+  inline void AddFrame(csTicks Delay, csPixmap *s)
     {FinishTimes.Push((csSome)(GetLength() + Delay)); Frames.Push(s);}
   /// add a frame (giving the length of this frame)
-  inline void AddFrame(csTime Delay, iTextureHandle *Tex)
+  inline void AddFrame(csTicks Delay, iTextureHandle *Tex)
     {AddFrame(Delay, new csSimplePixmap(Tex));}
   /// add a frame (giving the length of this frame)
-  inline void AddFrame(csTime Delay, iTextureHandle *Tex, int x, int y, int w, int h)
+  inline void AddFrame(csTicks Delay, iTextureHandle *Tex, int x, int y, int w, int h)
     {AddFrame(Delay, new csSimplePixmap(Tex, x, y, w, h));}
 
   /// get a frame by number
   inline csPixmap *GetFrame(int n) const
     {return (csPixmap*)(Frames.Get(n));}
   /// get a frame by time
-  csPixmap *GetFrameByTime(csTime Time);
+  csPixmap *GetFrameByTime(csTicks Time);
 
   /// create an instance of this animation
   csAnimatedPixmap *CreateInstance();
@@ -87,11 +87,11 @@ public:
     uint8 Alpha = 0);
   virtual void DrawTiled (iGraphics3D* g3d, int sx, int sy, int sw, int sh,
     int orgx, int orgy, uint8 Alpha = 0);
-  virtual void Advance(csTime ElapsedTime);
+  virtual void Advance(csTicks ElapsedTime);
 
 private:
   csAnimationTemplate *Template;
-  csTime CurrentTime;
+  csTicks CurrentTime;
   csPixmap *CurrentFrame;
 };
 

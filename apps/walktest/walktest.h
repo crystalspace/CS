@@ -409,10 +409,10 @@ public:
   ///
   virtual void NextFrame ();
   ///
-  void PrepareFrame (csTime elapsed_time, csTime current_time);
+  void PrepareFrame (csTicks elapsed_time, csTicks current_time);
 
   /// Move bots, particle systems, players, etc. for each frame.
-  virtual void MoveSystems (csTime elapsed_time, csTime current_time);
+  virtual void MoveSystems (csTicks elapsed_time, csTicks current_time);
 
   /**
    * Draw a frame in map mode.
@@ -447,15 +447,15 @@ public:
    * Draw everything for a frame. This includes 3D graphics
    * and everything related to 2D drawing as well (console, debugging, ...).
    */
-  virtual void DrawFrame (csTime elapsed_time, csTime current_time);
+  virtual void DrawFrame (csTicks elapsed_time, csTicks current_time);
   /// Draws 3D objects to screen
-  virtual void DrawFrame3D (int drawflags, csTime current_time);
+  virtual void DrawFrame3D (int drawflags, csTicks current_time);
   /// Draws 2D objects to screen
   virtual void DrawFrame2D (void);
   /// Draw 3D fullscreen effects.
-  virtual void DrawFullScreenFX3D (csTime elapsed_time, csTime current_time);
+  virtual void DrawFullScreenFX3D (csTicks elapsed_time, csTicks current_time);
   /// Draw 2D fullscreen effects.
-  virtual void DrawFullScreenFX2D (csTime elapsed_time, csTime current_time);
+  virtual void DrawFullScreenFX2D (csTicks elapsed_time, csTicks current_time);
 
   /// Load all the graphics libraries needed
   virtual void LoadLibraryData(void);

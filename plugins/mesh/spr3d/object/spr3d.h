@@ -904,7 +904,7 @@ private:
   csSpriteAction2* cur_action;
 
   /// The last frame time action.
-  csTime last_time;
+  csTicks last_time;
 
   /// Animation tweening ratio:  next frame / this frame.
   float tween_ratio;
@@ -1069,7 +1069,7 @@ public:
   /**
    * Go to the next frame depending on the current time in milliseconds.
    */
-  bool OldNextFrame (csTime current_time, bool onestep = false,
+  bool OldNextFrame (csTicks current_time, bool onestep = false,
     bool stoptoend = false);
 
   /**
@@ -1169,7 +1169,7 @@ public:
   }
   virtual void GetObjectBoundingBox (csBox3& bbox, int type = CS_BBOX_NORMAL);
   virtual void GetRadius (csVector3& rad, csVector3 &cent);
-  virtual void NextFrame (csTime current_time)
+  virtual void NextFrame (csTicks current_time)
   {
     OldNextFrame (current_time);
   }

@@ -121,7 +121,7 @@ void csProcPlasma::MakePalette (int max)
   }
 }
 
-void csProcPlasma::Animate (csTime current_time)
+void csProcPlasma::Animate (csTicks current_time)
 {
   (void)current_time;
   int x,y;

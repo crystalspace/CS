@@ -65,7 +65,7 @@ protected:
   // The current time the previous time the callback was called.
   // This is used to detect if the callback is called multiple times
   // in one frame.
-  csTime last_cur_time;
+  csTicks last_cur_time;
 
 private:
   static void ProcCallback (iTextureWrapper* txt, void* data);
@@ -130,7 +130,7 @@ public:
    * Animate this texture. Subclasses of csProcTexture must implement
    * this to implement some kind of animation on the procedural texture.
    */
-  virtual void Animate (csTime current_time) = 0;
+  virtual void Animate (csTicks current_time) = 0;
 
   /// Get the texture corresponding with this procedural texture.
   iTextureWrapper* GetTextureWrapper () { return tex; }

@@ -122,7 +122,7 @@ void DemoSequenceLoader::LoadSequence (char* buf, iSequence* seq)
   char* name;
   long cmd;
   char* params;
-  csTime cur_time = 0;
+  csTicks cur_time = 0;
 
   while ((cmd = csGetObject (&buf, commands, &name, &params)) > 0)
   {
@@ -137,10 +137,10 @@ void DemoSequenceLoader::LoadSequence (char* buf, iSequence* seq)
       case CS_TOKEN_ROTPART:
       {
         char meshName[100];
-	csTime t;
+	csTicks t;
 	float angle_speed;
 	csScanStr (params, "%d,%s,%f", &t, meshName, &angle_speed);
-	t = csTime (float (t) * SPEED_FACTOR);
+	t = csTicks (float (t) * SPEED_FACTOR);
         RotatePartOp* op = new RotatePartOp (meshName, t, angle_speed);
 	seq->AddOperation (cur_time, op);
 	op->DecRef ();
@@ -192,9 +192,9 @@ void DemoSequenceLoader::LoadSequence (char* buf, iSequence* seq)
       {
         char meshName[100];
 	char pathName[100];
-	csTime t;
+	csTicks t;
 	csScanStr (params, "%d,%s,%s", &t, meshName, pathName);
-	t = csTime (float (t) * SPEED_FACTOR);
+	t = csTicks (float (t) * SPEED_FACTOR);
 	char* name = meshName;
 	if (!strcmp ("camera", meshName)) name = NULL;
         PathOp* op = new PathOp (t, name, pathName);
@@ -212,9 +212,9 @@ void DemoSequenceLoader::LoadSequence (char* buf, iSequence* seq)
       case CS_TOKEN_FADE:
       {
 	float start, end;
-	csTime t;
+	csTicks t;
 	csScanStr (params, "%d,%f,%f,%d", &t, &start, &end);
-	t = csTime (float (t) * SPEED_FACTOR);
+	t = csTicks (float (t) * SPEED_FACTOR);
         FadeOp* op = new FadeOp (start, end, t);
 	seq->AddOperation (cur_time, op);
 	op->DecRef ();
@@ -222,9 +222,9 @@ void DemoSequenceLoader::LoadSequence (char* buf, iSequence* seq)
       }
       case CS_TOKEN_DELAY:
       {
-	csTime delay;
+	csTicks delay;
         csScanStr (params, "%d", &delay);
-	delay = csTime (float (delay) * SPEED_FACTOR);
+	delay = csTicks (float (delay) * SPEED_FACTOR);
 	cur_time += delay;
 	break;
       }

@@ -127,7 +127,7 @@ public:
   virtual void GetObjectBoundingBox (csBox3& bbox, int type = CS_BBOX_NORMAL);
   virtual void GetRadius (csVector3& rad, csVector3& cent) 
 	{ rad = max_radius; cent = box.GetCenter(); }
-  virtual void NextFrame (csTime /*current_time*/) { }
+  virtual void NextFrame (csTicks /*current_time*/) { }
   virtual bool WantToDie () const { return false; }
   virtual void HardTransform (const csReversibleTransform&) { }
   virtual bool SupportsHardTransform () const { return false; }

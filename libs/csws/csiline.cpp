@@ -40,7 +40,7 @@ csInputLine::csInputLine (csComponent *iParent, int iMaxLen,
   SetText (NULL);
   FrameStyle = iFrameStyle;
   SetPalette (CSPAL_INPUTLINE);
-  timer = new csTimer (this, CURSOR_FLASHING_INTERVAL);
+  timer = new csTicksr (this, CURSOR_FLASHING_INTERVAL);
 }
 
 void csInputLine::SetText (const char *iText)

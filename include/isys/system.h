@@ -34,7 +34,7 @@ struct iConfigFile;
 struct iConfigManager;
 
 
-SCF_VERSION (iSystem, 7, 0, 0);
+SCF_VERSION (iSystem, 8, 0, 0);
 
 /**
  * This interface serves as a way for plug-ins to query Crystal Space about
@@ -82,9 +82,6 @@ struct iSystem : public iBase
 
   //------------------------------ Miscellaneous -----------------------------//
 
-  /// Get the time in milliseconds.
-  virtual csTime GetTime () = 0;
-
   /**
    * Execute a system-dependent extension.<p>
    * Sometimes we need just one extra function in system-dependent system
@@ -126,7 +123,7 @@ struct iSystem : public iBase
    * to NextFrame(). The time is updated once at the beginning of every
    * NextFrame(), thus you may call this function as much as you wish.
    */
-  virtual void GetElapsedTime (csTime &oElapsedTime, csTime &oCurrentTime) = 0;
+  virtual void GetElapsedTime (csTicks &oElapsedTime, csTicks &oCurrentTime) = 0;
 
   /**
    * This function will freeze your application for given number of 1/1000

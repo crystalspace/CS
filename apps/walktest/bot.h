@@ -56,7 +56,7 @@ public:
   virtual ~Bot ();
 
   /// Time-base move.
-  void move (csTime elapsed_time);
+  void move (csTicks elapsed_time);
 
   /// Set movement vector.
   void set_bot_move (const csVector3& v);

@@ -79,7 +79,7 @@ void csSoundHandle::ResetStream()
     Data->ResetStreamed();
 }
 
-void csSoundHandle::Update_Time(csTime Time)
+void csSoundHandle::Update_Time(csTicks Time)
 {
   if (!ActiveStream) return;
   UpdateCount (Time * Data->GetFormat()->Freq / 1000);

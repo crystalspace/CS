@@ -325,7 +325,7 @@ bool DemoSky::Initialize (int argc, const char* const argv[],
 void DemoSky::NextFrame ()
 {
   SysSystemDriver::NextFrame ();
-  csTime elapsed_time, current_time;
+  csTicks elapsed_time, current_time;
   GetElapsedTime (elapsed_time, current_time);
 
   flock->Update(elapsed_time);
@@ -377,7 +377,7 @@ bool DemoSky::HandleEvent (iEvent &Event)
   if ((Event.Type == csevKeyDown) && (Event.Key.Code == 't'))
   {
     /// toggle animation
-    sky->SetAnimated( !sky->GetAnimated(), GetTime());
+    sky->SetAnimated( !sky->GetAnimated(), csGetTicks ());
     return true;
   }
 
@@ -470,7 +470,7 @@ static void Clamp( float &val, float max)
   else if(val<-max) val=-max;
 }
 
-void Flock::Update(csTime elapsed)
+void Flock::Update(csTicks elapsed)
 {
   float dt = float(elapsed)*0.001; /// delta t in seconds
   /// move focus

@@ -613,7 +613,7 @@ void csHazeMeshObject::HardTransform (const csReversibleTransform& t)
   //@@@ TODO
 }
 
-void csHazeMeshObject::NextFrame (csTime /*current_time*/)
+void csHazeMeshObject::NextFrame (csTicks /*current_time*/)
 {
   // nothing
 }

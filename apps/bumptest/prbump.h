@@ -81,7 +81,7 @@ public:
     int numlight, iLight **lights);
 
   /// Draw the next frame.
-  virtual void Animate (csTime current_time);
+  virtual void Animate (csTicks current_time);
 };
 
 #endif // __PROCBUMPTEX_H__

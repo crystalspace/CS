@@ -69,7 +69,7 @@ bool csProcSkyTexture::PrepareAnim ()
 }
 
 
-void csProcSkyTexture::Animate (csTime current_time)
+void csProcSkyTexture::Animate (csTicks current_time)
 {
   sky->DrawToTexture(this, current_time);
 }
@@ -139,7 +139,7 @@ csProcSky::~csProcSky()
 }
 
 
-void csProcSky::SetAnimated(bool anim, csTime current_time)
+void csProcSky::SetAnimated(bool anim, csTicks current_time)
 {
   animated = anim;
   if(animated && (current_time != 0)) {
@@ -477,7 +477,7 @@ uint8 csProcSky::GetCloudVal(int x, int y)
   return (uint8)res;
 }
 
-void csProcSky::DrawToTexture(csProcSkyTexture *skytex, csTime current_time)
+void csProcSky::DrawToTexture(csProcSkyTexture *skytex, csTicks current_time)
 {
   int i;
   csVector3 txtorig, txtu, txtv;

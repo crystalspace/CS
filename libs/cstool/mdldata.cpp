@@ -702,7 +702,8 @@ void csModelData::MergeObjects (bool MultiTexture)
     iModelDataObject *obj = OldObjects.Pop ();
 
     // look if we can merge this object with an existing one
-    for (int i=0; i<NewObjects.Length (); i++)
+    int i;
+    for (i=0; i<NewObjects.Length (); i++)
     {
       iModelDataObject *obj2 = NewObjects.Get (i);
       if ((MultiTexture || !CheckMaterialConflict (obj, obj2)) &&

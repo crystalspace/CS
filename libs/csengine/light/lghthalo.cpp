@@ -189,7 +189,7 @@ bool csLightHalo::IsVisible(csEngine const& Engine, csVector3& v)
 }
 
 
-bool csLightHalo::ComputeNewIntensity(csTime ElapsedTime, float& hintensity,
+bool csLightHalo::ComputeNewIntensity(csTicks ElapsedTime, float& hintensity,
   bool halo_vis)
 {
   if (ElapsedTime > 1000)
@@ -223,7 +223,7 @@ bool csLightHalo::ComputeNewIntensity(csTime ElapsedTime, float& hintensity,
 
 
 
-bool csLightHalo::Process (csTime ElapsedTime, const csEngine &Engine)
+bool csLightHalo::Process (csTicks ElapsedTime, const csEngine &Engine)
 {
   // Whenever the center of halo (the light) is directly visible
   bool halo_vis = false;
@@ -290,7 +290,7 @@ csLightFlareHalo::~csLightFlareHalo()
 }
 
 
-bool csLightFlareHalo::Process (csTime elapsed_time, csEngine const& engine)
+bool csLightFlareHalo::Process (csTicks elapsed_time, csEngine const& engine)
 {
   // Whenever the center of halo (the light) is directly visible
   bool halo_vis = false;

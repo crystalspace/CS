@@ -142,7 +142,7 @@ bool csSoundRenderSoftware::Open()
     getFrequency(), (is16Bits())?16:8, (isStereo())?"Stereo":"Mono");
   Report (CS_REPORTER_SEVERITY_NOTIFY, "  Volume: %g", Volume);
 
-  csTime et, ct;
+  csTicks et, ct;
   System->GetElapsedTime(et, ct);
   LastTime = ct;
 

@@ -63,9 +63,9 @@ void csProcDots::MakePalette (int max)
     palette[i] = ptTxtMgr->FindRGB (GetRandom (255), GetRandom (255), GetRandom (255));
 }
 
-void csProcDots::Animate (csTime current_time)
+void csProcDots::Animate (csTicks current_time)
 {
-  csTime elapsed = 0;
+  csTicks elapsed = 0;
   if (last_cur_time != 0)
   {
     elapsed = current_time-last_cur_time;
@@ -74,7 +74,7 @@ void csProcDots::Animate (csTime current_time)
   last_cur_time = current_time;
 
   if (!ptG3D->BeginDraw (CSDRAW_2DGRAPHICS)) return;
-  csTime i;
+  csTicks i;
   for (i = 0 ; i < elapsed / 10 ; i++)
     ptG2D->DrawPixel (GetRandom (mat_w), GetRandom (mat_h), palette[GetRandom (255)]);
   ptG3D->FinishDraw ();

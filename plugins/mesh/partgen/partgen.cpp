@@ -193,7 +193,7 @@ void csParticleSystem::Rotate (float angle)
 }
 
 
-void csParticleSystem::Update (csTime elapsed_time)
+void csParticleSystem::Update (csTicks elapsed_time)
 {
   if (self_destruct)
   {
@@ -306,7 +306,7 @@ csNewtonianParticleSystem::~csNewtonianParticleSystem ()
 }
 
 
-void csNewtonianParticleSystem::Update (csTime elapsed_time)
+void csNewtonianParticleSystem::Update (csTicks elapsed_time)
 {
   csVector3 move;
   csParticleSystem::Update (elapsed_time);

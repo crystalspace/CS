@@ -255,7 +255,7 @@ void csMeshWrapper::DrawInt (iRenderView* rview)
     }
     else
     {
-      csTime lt = csEngine::current_engine->GetLastAnimationTime ();
+      csTicks lt = csEngine::current_engine->GetLastAnimationTime ();
       if (lt != 0)
       {
         if (lt != last_anim_time)

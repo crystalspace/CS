@@ -431,7 +431,7 @@ awsManager::awsCanvas::~awsCanvas ()
 }
  
 void 
-awsManager::awsCanvas::Animate (csTime current_time)
+awsManager::awsCanvas::Animate (csTicks current_time)
 {
 }
 

@@ -1019,7 +1019,7 @@ public:
     }
     virtual void GetRadius ( csVector3& rad, csVector3& cent) 
 	  { scfParent->GetRadius (rad,cent); }
-    virtual void NextFrame (csTime /*current_time*/) { }
+    virtual void NextFrame (csTicks /*current_time*/) { }
     virtual bool WantToDie () const { return false; }
     virtual void HardTransform (const csReversibleTransform& t)
     {

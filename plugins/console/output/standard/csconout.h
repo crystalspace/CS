@@ -179,7 +179,7 @@ private:
   csRect size, invalid;
   int cursor, cx, cy;
   iFont *font;
-  csTime flash_time, flash_interval;
+  csTicks flash_time, flash_interval;
   bool cursor_visible;
   bool clear_input;
   bool auto_update;

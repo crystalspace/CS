@@ -48,7 +48,7 @@ struct iEvent : public iBase
   uchar Category;		// Event cathegory (unused by CSWS)
   uchar SubCategory;		// Even finer granularity
   uchar Flags;			// Miscelaneous event flags
-  csTime Time;			// Time when the event occured
+  csTicks Time;			// Time when the event occured
   union
   {
     struct

@@ -89,7 +89,7 @@ csRainMeshObject::~csRainMeshObject()
 }
 
 
-void csRainMeshObject::Update (csTime elapsed_time)
+void csRainMeshObject::Update (csTicks elapsed_time)
 {
   SetupObject ();
   csParticleSystem::Update (elapsed_time);

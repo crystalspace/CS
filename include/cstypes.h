@@ -78,7 +78,7 @@ typedef unsigned int uint;
 typedef unsigned long ulong;
 
 // Time in milli (1/1000) seconds
-typedef unsigned int csTime;
+typedef unsigned int csTicks;
 
 // A pointer to something
 typedef void *csSome;

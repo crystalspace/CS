@@ -102,7 +102,7 @@ bool ceEngineView::HandleEvent (iEvent &Event)
     case csevBroadcast:
       if (Event.Command.Code == cscmdPreProcess)
       {
-        csTime elapsed_time, current_time;
+        csTicks elapsed_time, current_time;
         System->GetElapsedTime (elapsed_time, current_time);
 
         // Now rotate the camera according to keyboard state

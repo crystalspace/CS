@@ -101,7 +101,7 @@ public:
   ///
   ~Flock();
   /// call each frame to move birds
-  void Update(csTime elapsed_time);
+  void Update(csTicks elapsed_time);
 };
 
 #endif // DEMOSKY_H

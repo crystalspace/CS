@@ -79,7 +79,7 @@ csSpiralMeshObject::~csSpiralMeshObject()
 {
 }
 
-void csSpiralMeshObject::Update (csTime elapsed_time)
+void csSpiralMeshObject::Update (csTicks elapsed_time)
 {
   SetupObject ();
   int i;

@@ -72,7 +72,7 @@ public:
   virtual bool PrepareAnim ();
 
   /// Draw the next frame.
-  virtual void Animate (csTime current_time);
+  virtual void Animate (csTicks current_time);
 
   /// set single flame mode with halfflamewidth or disable single flame.
   void SetSingleFlame(bool enable, int halfflame)

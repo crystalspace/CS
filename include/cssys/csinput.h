@@ -96,7 +96,7 @@ class csMouseDriver
   /// The system driver
   csSystemDriver *System;
   /// Last "mouse down" event time
-  csTime LastClickTime;
+  csTicks LastClickTime;
   /// Last "mouse down" event button
   int LastClickButton;
   /// Last "mouse down" event position
@@ -106,7 +106,7 @@ class csMouseDriver
   /// Mouse buttons state
   bool Button [CS_MAX_MOUSE_BUTTONS];
   /// Mouse double click max interval in 1/1000 seconds
-  static csTime DoubleClickTime;
+  static csTicks DoubleClickTime;
   /// Mouse double click max distance
   static size_t DoubleClickDist;
 

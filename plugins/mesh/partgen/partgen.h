@@ -52,7 +52,7 @@ protected:
   csVector particles;
   /// Self destruct and when.
   bool self_destruct;
-  csTime time_to_live; // msec
+  csTicks time_to_live; // msec
   /// If this system should be deleted.
   bool to_delete;
   /// Color of all particles.
@@ -80,7 +80,7 @@ protected:
   /// Pointer to a mesh object factory for 2D sprites.
   iMeshObjectFactory* spr_factory;
   /// Previous time.
-  csTime prev_time;
+  csTicks prev_time;
   long shapenr;
   float current_lod;
   uint32 current_features;
@@ -139,14 +139,14 @@ public:
     bool lighted);
 
   /// Set selfdestruct mode on, and msec to live.
-  inline void SetSelfDestruct (csTime t) 
+  inline void SetSelfDestruct (csTicks t) 
   { self_destruct=true; time_to_live = t; };
   /// system will no longer self destruct
   inline void UnSetSelfDestruct () { self_destruct=false; }
   /// returns whether the system will self destruct
   inline bool GetSelfDestruct () const { return self_destruct; }
   /// if the system will self destruct, returns the time to live in msec.
-  inline csTime GetTimeToLive () const { return time_to_live; }
+  inline csTicks GetTimeToLive () const { return time_to_live; }
 
   /// Whether this system should be deleted when possible.
   inline void SetDelete (bool b) { to_delete = b; }
@@ -214,7 +214,7 @@ public:
    * this member function will set to_delete if self_destruct is
    * enabled and time is up.
    */
-  virtual void Update (csTime elapsed_time);
+  virtual void Update (csTicks elapsed_time);
 
   //------------------------ iMeshObject implementation ------------------------
   SCF_DECLARE_IBASE;
@@ -242,9 +242,9 @@ public:
   }
   virtual void GetRadius (csVector3& rad, csVector3& cent) 
 	{ rad = radius; cent = bbox.GetCenter(); }
-  virtual void NextFrame (csTime current_time)
+  virtual void NextFrame (csTicks current_time)
   {
-    csTime elaps = 0;
+    csTicks elaps = 0;
     if (prev_time != 0) elaps = current_time-prev_time;
     prev_time = current_time;
     Update (elaps);
@@ -347,7 +347,7 @@ public:
     { 
       return scfParent->GetChangeAlpha(factor); 
     }
-    virtual void SetSelfDestruct (csTime t)
+    virtual void SetSelfDestruct (csTicks t)
     {
       scfParent->SetSelfDestruct (t);
     }
@@ -379,7 +379,7 @@ public:
   void SetCount (int max);
 
   /// Moves the particles depending on their acceleration and speed.
-  virtual void Update (csTime elapsed_time);
+  virtual void Update (csTicks elapsed_time);
 
   /// Get a particles speed. speeds are in metres/second.
   csVector3& GetSpeed (int idx) const { return part_speed[idx]; }

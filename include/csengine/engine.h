@@ -452,7 +452,7 @@ private:
    * global speed of the engine as this means that invisible particle
    * systems will now not be updated anymore until they are really visible.
   */
-  csTime nextframe_pending;
+  csTicks nextframe_pending;
 
 private:
   /**
@@ -653,7 +653,7 @@ public:
   /**
    * Get the last animation time.
    */
-  csTime GetLastAnimationTime () const { return nextframe_pending; }
+  csTicks GetLastAnimationTime () const { return nextframe_pending; }
 
   /**
    * Initialize the culler.

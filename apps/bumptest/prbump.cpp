@@ -117,7 +117,7 @@ void csProcBump::MakePalette (int max)
 }
 
 
-void csProcBump::Animate (csTime current_time)
+void csProcBump::Animate (csTicks current_time)
 {
   (void)current_time;
   // nothing to do

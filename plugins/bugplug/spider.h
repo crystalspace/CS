@@ -89,7 +89,7 @@ public:
     rad.Set(200000, 200000, 200000);
 	cent.Set(0,0,0);
   }
-  virtual void NextFrame (csTime) { }
+  virtual void NextFrame (csTicks) { }
   virtual bool WantToDie () const { return false; }
   virtual void HardTransform (const csReversibleTransform&) { }
   virtual bool SupportsHardTransform () const { return false; }

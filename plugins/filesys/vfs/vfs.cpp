@@ -27,6 +27,7 @@
 #define CS_SYSDEF_PROVIDE_MKDIR
 #define CS_SYSDEF_PROVIDE_UNLINK
 #include "cssysdef.h"
+#include "cssys/system.h"
 #include "vfs.h"
 #include "csutil/archive.h"
 #include "csutil/util.h"
@@ -131,7 +132,7 @@ public:
 
   void UpdateTime ()
   {
-    LastUseTime = System->GetTime ();
+    LastUseTime = csGetTicks ();
   }
   void IncRef ()
   {
@@ -147,7 +148,7 @@ public:
   bool CheckUp ()
   {
     return (RefCount == 0) &&
-      (System->GetTime () - LastUseTime > VFS_KEEP_UNUSED_ARCHIVE_TIME);
+      (csGetTicks () - LastUseTime > VFS_KEEP_UNUSED_ARCHIVE_TIME);
   }
   VfsArchive (const char *filename, iSystem *iSys) : csArchive (filename)
   {

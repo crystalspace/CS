@@ -16,6 +16,7 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 #include "cssysdef.h"
+#include "cssys/system.h"
 #include "qint.h"
 #include "csutil/scf.h"
 #include "ivaria/pmeter.h"
@@ -1024,8 +1025,8 @@ void csEngine::ShineLights (iRegion* iregion, iProgressMeter* meter)
     if (do_relight && meter) meter->Step();
   }
 
-  csTime start, stop;
-  start = System->GetTime ();
+  csTicks start, stop;
+  start = csGetTicks ();
   if (do_relight)
   {
     Report ("Shining lights (%d lights).", light_count);
@@ -1043,14 +1044,14 @@ void csEngine::ShineLights (iRegion* iregion, iProgressMeter* meter)
     ((csStatLight*)l)->CalculateLighting ();
     if (do_relight && meter) meter->Step();
   }
-  stop = System->GetTime ();
+  stop = csGetTicks ();
   if (do_relight)
     Report ("Time taken: %.4f seconds.", (float)(stop-start)/1000.);
 
   // Render radiosity
   if (use_new_radiosity && do_relight)
   {
-    start = System->GetTime ();
+    start = csGetTicks ();
     csRadiosity *rad = new csRadiosity (this, meter);
     if (do_rad_debug)
     {
@@ -1061,7 +1062,7 @@ void csEngine::ShineLights (iRegion* iregion, iProgressMeter* meter)
       rad->DoRadiosity();
       delete rad;
     }
-    stop = System->GetTime ();
+    stop = csGetTicks ();
     if (do_relight)
       Report ("Time taken: %.4f seconds.", (float)(stop-start)/1000.);
   }
@@ -1196,7 +1197,7 @@ void csEngine::Draw (iCamera* c, iClipper2D* view)
   s->Draw (&rview);
 
   // draw all halos on the screen
-  csTime Elapsed, Current;
+  csTicks Elapsed, Current;
   System->GetElapsedTime (Elapsed, Current);
   for (int halo = halos.Length () - 1; halo >= 0; halo--)
     if (!halos.Get (halo)->Process (Elapsed, *this))
@@ -1353,7 +1354,7 @@ void csEngine::RemoveDynLight (csDynLight* dyn)
 
 void csEngine::ControlMeshes ()
 {
-  csTime elapsed_time, current_time;
+  csTicks elapsed_time, current_time;
   System->GetElapsedTime (elapsed_time, current_time);
 
   nextframe_pending = current_time;

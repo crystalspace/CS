@@ -54,7 +54,7 @@ public:
   virtual bool PrepareAnim ();
 
   /// Draw the next frame.
-  virtual void Animate (csTime current_time);
+  virtual void Animate (csTicks current_time);
 
   /// methods for the Sky parent - get the g2d
   iGraphics2D* GetG2D() const {return ptG2D;}
@@ -138,7 +138,7 @@ class csProcSky {
    */
   uint8 *startoctaves, *endoctaves;
   /// the previous time of animated frame
-  csTime old_time;
+  csTicks old_time;
   /// current wind 'position', of the origin of the clouds
   csVector2 windpos;
   /// direction and speed of wind
@@ -179,7 +179,7 @@ public:
   ~csProcSky();
 
   /// do a nextframe like drawing update
-  void DrawToTexture(csProcSkyTexture *skytex, csTime current_time);
+  void DrawToTexture(csProcSkyTexture *skytex, csTicks current_time);
 
   /// Make intersection point cache in a texture
   void MakeIntersectCache(csProcSkyTexture *skytex);
@@ -192,7 +192,7 @@ public:
 
      current_time has no meaning when disabling the animation.
   */
-  void SetAnimated(bool anim=true, csTime current_time=0);
+  void SetAnimated(bool anim=true, csTicks current_time=0);
   /// See if the prsky is animated
   bool GetAnimated() const {return animated;}
   /// get first sky texture with this sky

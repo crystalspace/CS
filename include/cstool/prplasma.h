@@ -60,7 +60,7 @@ public:
   virtual bool PrepareAnim ();
 
   /// Draw the next frame.
-  virtual void Animate (csTime current_time);
+  virtual void Animate (csTicks current_time);
 };
 
 #endif // __PROCPLASMATEX_H__

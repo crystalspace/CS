@@ -20,7 +20,7 @@
 #include <libc.h>
 #include <sys/time.h>
 
-csTime csGetTicks()
+csTicks csGetTicks()
 {
   struct timezone z = { 0, 0 };
   struct timeval r;

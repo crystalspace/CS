@@ -19,6 +19,7 @@
 #include <string.h>
 #define CS_SYSDEF_PROVIDE_PATH
 #include "cssysdef.h"
+#include "cssys/system.h"
 #include "csver.h"
 #include "csutil/scf.h"
 #include "perfstat.h"
@@ -104,7 +105,7 @@ bool csPerfStats::HandleEvent (iEvent &event)
   {
     frame_count++;
 
-    csTime current_time = System->GetTime ();
+    csTicks current_time = csGetTicks ();
 
     if (!frame_start)
     {
@@ -112,11 +113,11 @@ bool csPerfStats::HandleEvent (iEvent &event)
       frame_count = 0;
     }
 
-    csTime elapsed_time = current_time - frame_start;
+    csTicks elapsed_time = current_time - frame_start;
 
     AccumulateTotals (current_time - frame_start);
     float new_fps = -1;
-    if (elapsed_time > csTime (resolution))
+    if (elapsed_time > csTicks (resolution))
     {
       frame->fps = new_fps = frame_count ?
         frame_count * 1000.0f / elapsed_time :
@@ -148,7 +149,7 @@ bool csPerfStats::Pause (bool pause)
   paused = pause;
   if (!paused && ret)
   {
-    frame_start = System->GetTime ();
+    frame_start = csGetTicks ();
     frame_count = 0;
   }
   return ret;
@@ -174,13 +175,13 @@ void csPerfStats::ResetStats ()
 void csPerfStats::SetResolution (int iMilSecs)
 { 
   resolution = iMilSecs;
-  frame_start = System->GetTime ();
+  frame_start = csGetTicks ();
   frame_count = 0;
   if (sub_section)
     sub_section->SetResolution (iMilSecs);
 }
 
-void csPerfStats::SubsectionNextFrame (csTime elapsed_time, float fps)
+void csPerfStats::SubsectionNextFrame (csTicks elapsed_time, float fps)
 {
   AccumulateTotals (elapsed_time);
   if (fps != -1)
@@ -193,7 +194,7 @@ void csPerfStats::SubsectionNextFrame (csTime elapsed_time, float fps)
 }
 
 
-void csPerfStats::AccumulateTotals (csTime elapsed_time)
+void csPerfStats::AccumulateTotals (csTicks elapsed_time)
 {
   frame_num++;
 #ifdef CS_DEBUG

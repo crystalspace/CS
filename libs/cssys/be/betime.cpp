@@ -29,7 +29,7 @@
 // incorporated, then it will be much more difficult to link a simple console
 // application.
 //-----------------------------------------------------------------------------
-csTime csGetTicks ()
+csTicks csGetTicks ()
 {
   return system_time() / 1000;
 }

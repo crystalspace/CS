@@ -72,7 +72,7 @@ struct iParticleState : public iBase
   /// see if change alpha is enabled, and get the value if so.
   virtual bool GetChangeAlpha (float& factor) const = 0;
   /// Set selfdestruct mode on, and msec to live.
-  virtual void SetSelfDestruct (csTime t) = 0;
+  virtual void SetSelfDestruct (csTicks t) = 0;
   /// System will no longer self destruct.
   virtual void UnSetSelfDestruct () = 0;
 

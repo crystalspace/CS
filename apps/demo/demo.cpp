@@ -905,7 +905,7 @@ void Demo::ShowMessage (const char* msg, ...)
   va_start (arg, msg);
   vsprintf (message, msg, arg);
   va_end (arg);
-  message_timer = GetTime () + 1500;
+  message_timer = csGetTicks () + 1500;
 }
 
 void Demo::ShowError (const char* msg, ...)
@@ -915,13 +915,13 @@ void Demo::ShowError (const char* msg, ...)
   va_start (arg, msg);
   vsprintf (message, msg, arg);
   va_end (arg);
-  message_timer = GetTime () + 1500;
+  message_timer = csGetTicks () + 1500;
 }
 
 void Demo::NextFrame ()
 {
   superclass::NextFrame ();
-  csTime elapsed_time, current_time;
+  csTicks elapsed_time, current_time;
   GetElapsedTime (elapsed_time, current_time);
 
   // since no time has passed, the animated screen image stays the same.
@@ -952,14 +952,14 @@ void Demo::NextFrame ()
     seqmgr->ControlPaths (view->GetCamera (), elapsed_time);
   else if (map_enabled == MAP_EDIT_FORWARD)
   {
-    csTime debug_time;
-    csTime start, total;
+    csTicks debug_time;
+    csTicks start, total;
     csNamedPath* np = seqmgr->GetSelectedPath (map_selpath, start, total);
     if (np)
     {
       float r = np->GetTimeValue (map_selpoint);
       np->Calculate (r);
-      debug_time = csTime (start + total * r);
+      debug_time = csTicks (start + total * r);
     }
     else
       debug_time = 0;	// Not possible!
@@ -1055,7 +1055,7 @@ void Demo::DrawEditInfo ()
   int dim = myG2D->GetHeight ()-10;
   myG2D->DrawBox (dim+5, 0, myG2D->GetWidth ()-dim-5,
   	myG2D->GetHeight (), col_white);
-  csTime start, total;
+  csTicks start, total;
   csNamedPath* np = seqmgr->GetSelectedPath (map_selpath, start, total);
   if (np)
   {
@@ -1073,7 +1073,7 @@ void Demo::DrawEditInfo ()
     GfxWrite (ww, hh, col_black, col_white, "U(%.2g,%.2g,%.2g)",
     	up.x, up.y, up.z); hh += fh;
     float t = np->GetTimeValue (map_selpoint);
-    csTime tms = int (t*total);
+    csTicks tms = int (t*total);
     GfxWrite (ww, hh, col_black, col_white, "tot time %d ms", total); hh += fh;
     GfxWrite (ww, hh, col_black, col_white, "rel time %d ms", tms); hh += fh;
     GfxWrite (ww, hh, col_black, col_white, "Left Path Info:"); hh += fh;
@@ -1085,7 +1085,7 @@ void Demo::DrawEditInfo ()
       float t1 = np->GetTimeValue (map_selpoint-1);
       float dr = t-t1;
       float speed = fabs (dr) / d;
-      csTime tms1 = int (t1*total);
+      csTicks tms1 = int (t1*total);
       GfxWrite (ww+20, hh, col_black, col_white, "len %g", d); hh += fh;
       GfxWrite (ww+20, hh, col_black, col_white, "dr %g", dr); hh += fh;
       GfxWrite (ww+20, hh, col_black, col_white, "speed %g", speed); hh += fh;
@@ -1101,7 +1101,7 @@ void Demo::DrawEditInfo ()
       float dr = t1-t;
       float d = qsqrt (csSquaredDist::PointPoint (v, v1));
       float speed = fabs (dr) / d;
-      csTime tms1 = int (t1*total);
+      csTicks tms1 = int (t1*total);
       GfxWrite (ww+20, hh, col_black, col_white, "len %g", d); hh += fh;
       GfxWrite (ww+20, hh, col_black, col_white, "dr %g", dr); hh += fh;
       GfxWrite (ww+20, hh, col_black, col_white, "speed %g", speed); hh += fh;
@@ -1118,7 +1118,7 @@ bool Demo::HandleEvent (iEvent &Event)
 
   if (Event.Type == csevKeyDown)
   {
-    csTime elapsed_time, current_time;
+    csTicks elapsed_time, current_time;
     GetElapsedTime (elapsed_time, current_time);
     bool shift = (Event.Key.Modifiers & CSMASK_SHIFT) != 0;
     bool alt = (Event.Key.Modifiers & CSMASK_ALT) != 0;
@@ -1671,13 +1671,13 @@ bool Demo::HandleEvent (iEvent &Event)
           seqmgr->TimeWarp (20);
 	  break;
         case ',':
-          seqmgr->TimeWarp ((csTime)-20);
+          seqmgr->TimeWarp ((csTicks)-20);
 	  break;
         case '>':
           seqmgr->TimeWarp (2500);
 	  break;
         case '<':
-          seqmgr->TimeWarp ((csTime)-2500, true);
+          seqmgr->TimeWarp ((csTicks)-2500, true);
 	  break;
         case '/':
           seqmgr->TimeWarp (0, true);

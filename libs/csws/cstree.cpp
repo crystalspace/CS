@@ -527,7 +527,7 @@ csTreeBox::csTreeBox (csComponent *iParent, int iStyle,
   active = NULL;
   hscroll = vscroll = NULL;
   clipview = NULL; // See ::Insert
-  timer = new csTimer (this, MOUSE_SCROLL_INTERVAL);
+  timer = new csTicksr (this, MOUSE_SCROLL_INTERVAL);
   clipview = new csTreeView (this);
   SetStyle (TreeStyle = iStyle, FrameStyle = iFrameStyle);
 

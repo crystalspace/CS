@@ -17,6 +17,7 @@
 */
 
 #include "cssysdef.h"
+#include "cssys/system.h"
 #include "motion.h"
 #include "isys/system.h"
 #include "csgeom/transfrm.h"
@@ -430,7 +431,7 @@ void csMotionManager::UpdateAppliedFrame(csAppliedFrame *fr)
 }
 
 //TODO Azverkan support frame interpolation & make looping optional
-bool csMotionManager::UpdateAppliedMotion(csAppliedMotion *am, csTime elapsedtime)
+bool csMotionManager::UpdateAppliedMotion(csAppliedMotion *am, csTicks elapsedtime)
 {
 #ifdef MOTION_DEBUG
   printf("Updating motion on Loop: %d, Sweep: %d, Rate: %f\n",
@@ -505,7 +506,7 @@ bool csMotionManager::UpdateAppliedMotion(csAppliedMotion *am, csTime elapsedtim
 
 void csMotionManager::UpdateAll()
 {
-  csTime newtime = iSys->GetTime();
+  csTicks newtime = csGetTicks ();
   UpdateAll( newtime );
 }
 
@@ -515,7 +516,7 @@ void csMotionManager::UpdateAll( int time )
   printf("Update all: time %d numskels %d\n",time,skels.Length());
 #endif
   if (oldtime == 0) oldtime = time;
-  csTime elapsed_time = time - oldtime;
+  csTicks elapsed_time = time - oldtime;
   oldtime = time;
   int size = skels.Length();
   int i;

@@ -508,7 +508,7 @@ void csApp::StartFrame ()
     FinishFrame ();
   InFrame = true;
 
-  csTime elapsed_time;
+  csTicks elapsed_time;
   System->GetElapsedTime (elapsed_time, CurrentTime);
 
   GfxPpl.StartFrame (Mouse);

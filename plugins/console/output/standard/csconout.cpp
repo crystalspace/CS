@@ -20,6 +20,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "cssysdef.h"
+#include "cssys/system.h"
 #include "csconout.h"
 #include "conbuff.h"
 #include "ivaria/conout.h"
@@ -107,7 +108,7 @@ bool csConsoleOutput::Initialize (iSystem *system)
   // Create the backbuffer (4096 lines max)
   buffer = new csConsoleBuffer (4096, (size.Height() / (fh + 2)));
   // Initialize flash_time for flashing cursors
-  flash_time = System->GetTime ();
+  flash_time = csGetTicks ();
 
   // We want to see broadcast events
   System->CallOnEvents (&scfiPlugin, CSMASK_Broadcast);
@@ -302,7 +303,7 @@ void csConsoleOutput::Draw2D (csRect *area)
   // Test for a change in the flash state
   if (flash_interval > 0)
   {
-    csTime cur_time = System->GetTime ();
+    csTicks cur_time = csGetTicks ();
     if (cur_time > flash_time + flash_interval || cur_time < flash_time)
     {
       cursor_visible = !cursor_visible;
@@ -554,7 +555,7 @@ bool csConsoleOutput::PerformExtensionV (const char *iCommand, va_list args)
 {
   bool rc = true;
   if (!strcmp (iCommand, "FlashTime"))
-    flash_interval = va_arg (args, csTime);
+    flash_interval = va_arg (args, csTicks);
   else if (!strcmp (iCommand, "GetPos"))
   {
     int *x = va_arg (args, int *);

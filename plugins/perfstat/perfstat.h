@@ -117,7 +117,7 @@ protected:
   FrameEntry *frame;
 
   /// self explanatory
-  csTime total_time;
+  csTicks total_time;
   int frame_num;
   float lowest_fps;
   float highest_fps;
@@ -130,13 +130,13 @@ protected:
 /*  int total_polygons_drawn; */
 /*  int total_portals_drawn; */
 
-  csTime frame_start;
+  csTicks frame_start;
   int frame_count;
 
   // Convenience functions.
-  void AccumulateTotals (csTime elapsed_time);
+  void AccumulateTotals (csTicks elapsed_time);
   void CalculateFpsStats ();
-  void SubsectionNextFrame (csTime elapsed_time, float fps);
+  void SubsectionNextFrame (csTicks elapsed_time, float fps);
   void SaveStats ();
   void WriteSummaryStats ();
   void WriteMainHeader ();

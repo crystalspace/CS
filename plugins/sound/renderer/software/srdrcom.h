@@ -104,7 +104,7 @@ public:
   float Volume;
 
   // previous time the sound handles were updated
-  csTime LastTime;
+  csTicks LastTime;
 
   struct eiPlugin : public iPlugin
   {

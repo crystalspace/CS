@@ -106,7 +106,7 @@ class csScrollBar : public csComponent
   /// The scroll buttons and the scroller
   csButton *topleft, *botright, *scroller;
   /// The repeat timer
-  csTimer *timer;
+  csTicksr *timer;
   /// Active button ID
   int active_button;
   /// true if scroll bar is horizontal

@@ -125,7 +125,7 @@ public:
   void Add (const char* txt, const char* entry, void* userdata);
   void ReplaceSelected (const char* txt, const char* entry, void* userdata);
   void HilightSelected (bool sel) { hisel = sel; }
-  void Draw (csTime elapsed_time);
+  void Draw (csTicks elapsed_time);
   int GetSelected () { return selected; }
   void* GetSelectedData ();
   char* GetSelectedText ();
@@ -400,18 +400,18 @@ public:
 
   // Handle all time dependent movement of the game and menu.
   // This function will call some of the Handle... routines below.
-  void HandleMovement (csTime elapsed_time);
+  void HandleMovement (csTicks elapsed_time);
   // Is called when we are in transition mode instead of HandleMovement()
   // (this happens when a plane is moving down).
-  void HandleTransition (csTime elapsed_time);
+  void HandleTransition (csTicks elapsed_time);
   // Handle the movement of the camera.
   void HandleCameraMovement ();
   // Handle movement for the startup screen.
-  void HandleStartupMovement (csTime elapsed_time);
+  void HandleStartupMovement (csTicks elapsed_time);
   // Handle movement for the game screen.
-  void HandleGameMovement (csTime elapsed_time);
+  void HandleGameMovement (csTicks elapsed_time);
   // Handle lowering of planes.
-  void HandleLoweringPlanes (csTime elapsed_time);
+  void HandleLoweringPlanes (csTicks elapsed_time);
 
   // Conveniance functions.
   csMatrix3 create_rotate_x (float angle);

@@ -225,7 +225,7 @@ csListBox::csListBox (csComponent *iParent, int iStyle,
     default:
       return;
   } /* endswitch */
-  firstvisible = first = new csTimer (this, MOUSE_SCROLL_INTERVAL);
+  firstvisible = first = new csTicksr (this, MOUSE_SCROLL_INTERVAL);
   if (iStyle & CSLBS_HSCROLL)
     hscroll = new csScrollBar (this, sbsty);
   else

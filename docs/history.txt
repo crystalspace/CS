@@ -1,5 +1,10 @@
 The history order is reversed so that new features are at the top.
 
+30-Jul-2001
+	- Renamed csTime to csTicks and removed iSystem::GetTime().
+	  Now use the global csGetTicks() instead.
+	- Fixed a 'for (int i')' construction in mdldata.cpp so it compiles
+	  on linux.
 29-Jul-2001
 	- Eric Sunshine renamed csGetClicks() to csGetTicks().
 	- Eric Sunshine eliminated the now unnecessary inclusion of

@@ -18,6 +18,7 @@
 
 #define CS_SYSDEF_PROVIDE_ALLOCA
 #include "cssysdef.h"
+#include "cssys/system.h"
 #include "isomesh.h"
 #include "csutil/scf.h"
 #include "ivideo/graph3d.h"
@@ -271,7 +272,7 @@ void csIsoMeshSprite::Draw(iIsoRenderView *rview)
     //position.z);
 
   /// update animation
-  mesh->NextFrame(rview->GetView()->GetEngine()->GetSystem()->GetTime());
+  mesh->NextFrame(csGetTicks ());
 
   //iGraphics3D* g3d = rview->GetG3D ();
   iIsoView* view = rview->GetView ();

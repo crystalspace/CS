@@ -17,6 +17,7 @@
 */
 
 #include "cssysdef.h"
+#include "cssys/system.h"
 #include "spr3d.h"
 #include "csgeom/polyclip.h"
 #include "csutil/garray.h"
@@ -1154,10 +1155,10 @@ void csSprite3DMeshObject::InitSprite ()
 
   if (!cur_action) { SetFrame (0); cur_action = factory->GetFirstAction (); }
 
-  last_time = factory->System->GetTime ();
+  last_time = csGetTicks ();
 }
 
-bool csSprite3DMeshObject::OldNextFrame (csTime current_time, bool onestep, bool stoptoend)
+bool csSprite3DMeshObject::OldNextFrame (csTicks current_time, bool onestep, bool stoptoend)
 {
   bool ret = false;
 

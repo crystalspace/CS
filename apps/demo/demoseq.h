@@ -61,8 +61,8 @@ class PathForMesh
 public:
   csNamedPath* path;
   iMeshWrapper* mesh;	// If NULL this path controls a camera.
-  csTime total_path_time;
-  csTime start_path_time;
+  csTicks total_path_time;
+  csTicks start_path_time;
 };
 
 /**
@@ -73,8 +73,8 @@ class MeshRotation
 public:
   iMeshWrapper* mesh;
   iParticle* particle;
-  csTime total_time;
-  csTime start_time;
+  csTicks total_time;
+  csTicks start_time;
   float angle_speed;
 };
 
@@ -92,7 +92,7 @@ private:
   iSequence* main_sequence;
   bool suspended;
   bool suspend_one_frame;
-  csTime main_start_time;
+  csTicks main_start_time;
   int num_frames;
 
   //=====
@@ -102,8 +102,8 @@ private:
   float start_fade;
   float end_fade;
   float fade_value;	// Current fade value.
-  csTime total_fade_time;
-  csTime start_fade_time;
+  csTicks total_fade_time;
+  csTicks start_fade_time;
 
   //=====
   // For path handling.
@@ -145,7 +145,7 @@ public:
    * Time warp. If restart==true we restart the sequence manager
    * when we go backwards in time.
    */
-  void TimeWarp (csTime dt, bool restart = false);
+  void TimeWarp (csTicks dt, bool restart = false);
 
   /**
    * Initialize the sequence manager and setup all sequences
@@ -170,14 +170,14 @@ public:
    * Control all paths (including the one for the camera).
    * This should be called from within NextFrame().
    */
-  void ControlPaths (iCamera* camera, csTime elapsed_time);
+  void ControlPaths (iCamera* camera, csTicks elapsed_time);
 
   /**
    * Correctly position all objects (including the camera)
    * while in suspended mode. The 'debug_time' will be used
    * to calculate where all objects are.
    */
-  void DebugPositionObjects (iCamera* camera, csTime debug_time);
+  void DebugPositionObjects (iCamera* camera, csTicks debug_time);
 
   /**
    * For debugging, draw all active paths on screen. Draw the
@@ -195,8 +195,8 @@ public:
   /**
    * Get the start and total time for the selected path.
    */
-  csNamedPath* GetSelectedPath (const char* hilight, csTime& start,
-  	csTime& total);
+  csNamedPath* GetSelectedPath (const char* hilight, csTicks& start,
+  	csTicks& total);
 
   /**
    * Select first path.
@@ -222,19 +222,19 @@ public:
    * Start a rotating particle effect.
    */
   void SetupRotatePart (iMeshWrapper* mesh, float angle_speed,
-  	csTime total_rotate_time, csTime already_elapsed);
+  	csTicks total_rotate_time, csTicks already_elapsed);
   /**
    * Start a fade effect.
    */
   void SetupFade (float start_fade, float end_fade,
-  	csTime total_fade_time, csTime already_elapsed);
+  	csTicks total_fade_time, csTicks already_elapsed);
 
   /**
    * Setup a path. If mesh == NULL we are setting up a path for the camera.
    */
   void SetupPath (csNamedPath* path, iMeshWrapper* mesh,
-  	csTime total_path_time,
-  	csTime already_elapsed);
+  	csTicks total_path_time,
+  	csTicks already_elapsed);
 
   /**
    * See if some path is already running. If so then replace the object

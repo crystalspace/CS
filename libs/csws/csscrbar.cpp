@@ -78,7 +78,7 @@ csScrollBar::csScrollBar (csComponent *iParent, csScrollBarFrameStyle iFrameStyl
   botright->id = SCROLL_DR;
 
   // create repeat timer
-  timer = new csTimer (this, SCROLL_REPEAT_INTERVAL);
+  timer = new csTicksr (this, SCROLL_REPEAT_INTERVAL);
   
   ApplySkin (GetSkin ());
 }

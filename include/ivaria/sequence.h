@@ -39,7 +39,7 @@ struct iSequenceOperation : public iBase
    * was called one second late. This latency can happen because the
    * sequence manager only kicks in every frame and frame rate can be low.
    */
-  virtual void Do (csTime dt) = 0;
+  virtual void Do (csTicks dt) = 0;
 };
 
 SCF_VERSION (iSequenceCondition, 0, 0, 1);
@@ -58,7 +58,7 @@ struct iSequenceCondition : public iBase
    * was called one second late. This latency can happen because the
    * sequence manager only kicks in every frame and frame rate can be low.
    */
-  virtual bool Condition (csTime dt) = 0;
+  virtual bool Condition (csTicks dt) = 0;
 };
 
 SCF_VERSION (iSequence, 0, 0, 1);
@@ -75,27 +75,27 @@ struct iSequence : public iBase
    * Add an operation to this sequence. This function will call IncRef()
    * on the operation.
    */
-  virtual void AddOperation (csTime time, iSequenceOperation* operation) = 0;
+  virtual void AddOperation (csTicks time, iSequenceOperation* operation) = 0;
 
   /**
    * Add a standard operation to execute another sequence. This function
    * will call IncRef() on the sequence.
    */
-  virtual void AddRunSequence (csTime time, iSequence* sequence) = 0;
+  virtual void AddRunSequence (csTicks time, iSequence* sequence) = 0;
 
   /**
    * Add a standard operation to perform a condition and execute the right
    * sequence depending on the result. This function will call
    * IncRef() on the condition and sequences.
    */
-  virtual void AddCondition (csTime time, iSequenceCondition* condition,
+  virtual void AddCondition (csTicks time, iSequenceCondition* condition,
   	iSequence* trueSequence, iSequence* falseSequence) = 0;
 
   /**
    * Perform the sequence for as long as the condition is valid.
    * This function will call IncRef() on the condition and sequence.
    */
-  virtual void AddLoop (csTime time, iSequenceCondition* condition,
+  virtual void AddLoop (csTicks time, iSequenceCondition* condition,
   	iSequence* sequence) = 0;
 
   /**
@@ -164,14 +164,14 @@ struct iSequenceManager : public iBase
    * past but operations that used to be there before are already deleted
    * and will not be executed again.
    */
-  virtual void TimeWarp (csTime time, bool skip) = 0;
+  virtual void TimeWarp (csTicks time, bool skip) = 0;
 
   /**
    * Get the current time for the sequence manager. This is not
    * directly related to the real current time.
    * Suspending the sequence manager will also freeze this time.
    */
-  virtual csTime GetMainTime () = 0;
+  virtual csTicks GetMainTime () = 0;
 
   /**
    * Create a new empty sequence. This sequence is not attached to the
@@ -187,7 +187,7 @@ struct iSequenceManager : public iBase
    * You can also remove the sequence (with DecRef()) immediatelly after
    * running it.
    */
-  virtual void RunSequence (csTime time, iSequence* sequence) = 0;
+  virtual void RunSequence (csTicks time, iSequence* sequence) = 0;
 };
 
 #endif // __IVARIA_SEQUENCE_H__

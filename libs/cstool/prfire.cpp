@@ -143,7 +143,7 @@ void csProcFire::MakePalette (int max)
 }
 
 
-void csProcFire::Animate (csTime /*current_time*/)
+void csProcFire::Animate (csTicks /*current_time*/)
 {
   int i;
 

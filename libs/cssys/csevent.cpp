@@ -30,7 +30,7 @@ csEvent::csEvent ()
   SCF_CONSTRUCT_IBASE (NULL);
 }
 
-csEvent::csEvent (csTime iTime, int eType, int kCode, int kChar, int kModifiers)
+csEvent::csEvent (csTicks iTime, int eType, int kCode, int kChar, int kModifiers)
 {
   SCF_CONSTRUCT_IBASE (NULL);
   Time = iTime;
@@ -41,7 +41,7 @@ csEvent::csEvent (csTime iTime, int eType, int kCode, int kChar, int kModifiers)
   Key.Modifiers = kModifiers;
 }
 
-csEvent::csEvent (csTime iTime, int eType, int mx, int my,
+csEvent::csEvent (csTicks iTime, int eType, int mx, int my,
   int mButton, int mModifiers)
 {
   SCF_CONSTRUCT_IBASE (NULL);
@@ -54,7 +54,7 @@ csEvent::csEvent (csTime iTime, int eType, int mx, int my,
   Mouse.Modifiers = mModifiers;
 }
 
-csEvent::csEvent (csTime iTime, int eType, int jn, int jx, int jy,
+csEvent::csEvent (csTicks iTime, int eType, int jn, int jx, int jy,
   int jButton, int jModifiers)
 {
   SCF_CONSTRUCT_IBASE (NULL);
@@ -68,7 +68,7 @@ csEvent::csEvent (csTime iTime, int eType, int jn, int jx, int jy,
   Joystick.Modifiers = jModifiers;
 }
 
-csEvent::csEvent (csTime iTime, int eType, int cCode, void *cInfo)
+csEvent::csEvent (csTicks iTime, int eType, int cCode, void *cInfo)
 {
   SCF_CONSTRUCT_IBASE (NULL);
   Time = iTime;

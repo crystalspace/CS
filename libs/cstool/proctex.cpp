@@ -71,7 +71,7 @@ SCF_IMPLEMENT_IBASE_END
 void ProcCallback::UseTexture (iTextureWrapper*)
 {
   pt->PrepareAnim ();
-  csTime elapsed_time, current_time;
+  csTicks elapsed_time, current_time;
   pt->sys->GetElapsedTime (elapsed_time, current_time);
   if (pt->last_cur_time == current_time) return;
   pt->Animate (current_time);

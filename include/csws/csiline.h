@@ -36,7 +36,7 @@ enum csInputLineFrameStyle
 /// Default input line maximal field length
 #define CSIL_DEFAULTLENGTH		256
 
-class csTimer;
+class csTicksr;
 
 /**
  * The Input Line class implements a rectangular are where user can
@@ -69,7 +69,7 @@ class csInputLine : public csComponent
   /// Top-Left corner of text
   int textx, texty;
   /// The timer used for cursor flashing
-  csTimer *timer;
+  csTicksr *timer;
 
 public:
   /// Create input line object

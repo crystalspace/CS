@@ -82,10 +82,10 @@ class csGraphics3DInfinite : public iGraphics3D
   int num_drawtrianglemesh;
   int num_drawpolymesh;
   bool in_mesh;
-  csTime total_3d_time;
-  csTime total_2d_time;
-  csTime total_none_time;
-  csTime total_time;
+  csTicks total_3d_time;
+  csTicks total_2d_time;
+  csTicks total_none_time;
+  csTicks total_time;
 
   /// Test for overdraw.
   bool do_overdraw;

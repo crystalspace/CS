@@ -48,7 +48,7 @@ void Bot::set_bot_move (const csVector3& v)
   GetMovable ().UpdateMove ();
 }
 
-void Bot::move (csTime elapsed_time)
+void Bot::move (csTicks elapsed_time)
 {
   csOrthoTransform old_pos (GetMovable ().GetTransform ().GetO2T (), follow);
   csVector3 rd = (8.*(float)elapsed_time)/1000. * d;

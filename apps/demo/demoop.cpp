@@ -46,13 +46,13 @@ SCF_IMPLEMENT_IBASE_END
 
 //-----------------------------------------------------------------------------
 
-void FadeOp::Do (csTime dt)
+void FadeOp::Do (csTicks dt)
 {
   DemoSequenceManager::demoseq->SetupFade (start_fade,
   	end_fade, total_fade_time, dt);
 }
 
-RotatePartOp::RotatePartOp (const char* meshName, csTime total,
+RotatePartOp::RotatePartOp (const char* meshName, csTicks total,
 	float aspeed) : total_rotate_time (total), angle_speed (aspeed)
 {
   mesh = DemoSequenceManager::demo->engine->FindMeshWrapper (meshName);
@@ -64,7 +64,7 @@ RotatePartOp::RotatePartOp (const char* meshName, csTime total,
   }
 }
 
-void RotatePartOp::Do (csTime dt)
+void RotatePartOp::Do (csTicks dt)
 {
   DemoSequenceManager::demoseq->SetupRotatePart (mesh, angle_speed,
   	total_rotate_time, dt);
@@ -93,12 +93,12 @@ AttachOp::AttachOp (const char* meshName, const char* pathName)
   }
 }
 
-void AttachOp::Do (csTime /*dt*/)
+void AttachOp::Do (csTicks /*dt*/)
 {
   DemoSequenceManager::demoseq->ReplacePathObject (path, mesh);
 }
 
-PathOp::PathOp (csTime t, const char* meshName, const char* pathName)
+PathOp::PathOp (csTicks t, const char* meshName, const char* pathName)
 {
   total_path_time = t;
   if (meshName)
@@ -122,7 +122,7 @@ PathOp::PathOp (csTime t, const char* meshName, const char* pathName)
   }
 }
 
-void PathOp::Do (csTime dt)
+void PathOp::Do (csTicks dt)
 {
   DemoSequenceManager::demoseq->SetupPath (path, mesh,
   	total_path_time, dt);
@@ -148,7 +148,7 @@ SetupMeshOp::SetupMeshOp (const char* meshName, const char* sectName,
   }
 }
 
-void SetupMeshOp::Do (csTime /*dt*/)
+void SetupMeshOp::Do (csTicks /*dt*/)
 {
   if (mesh)
   {
@@ -171,7 +171,7 @@ ShowMeshOp::ShowMeshOp (const char* meshName)
   }
 }
 
-void ShowMeshOp::Do (csTime /*dt*/)
+void ShowMeshOp::Do (csTicks /*dt*/)
 {
   if (mesh)
   {
@@ -191,7 +191,7 @@ HideMeshOp::HideMeshOp (const char* meshName)
   }
 }
 
-void HideMeshOp::Do (csTime /*dt*/)
+void HideMeshOp::Do (csTicks /*dt*/)
 {
   if (mesh)
   {
@@ -199,7 +199,7 @@ void HideMeshOp::Do (csTime /*dt*/)
   }
 }
 
-void TestOp::Do (csTime dt)
+void TestOp::Do (csTicks dt)
 {
   printf ("dt=%ld fps=%g\n", (long)dt,
   	DemoSequenceManager::demoseq->GetFPS ()); fflush (stdout);

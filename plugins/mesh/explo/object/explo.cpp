@@ -108,7 +108,7 @@ csExploMeshObject::~csExploMeshObject()
 }
 
 
-void csExploMeshObject::Update (csTime elapsed_time)
+void csExploMeshObject::Update (csTicks elapsed_time)
 {
   SetupObject ();
   csNewtonianParticleSystem::Update (elapsed_time);
@@ -130,7 +130,7 @@ void csExploMeshObject::Update (csTime elapsed_time)
   ilight->SetColor (newcol);
 }
 
-void csExploMeshObject::AddLight (iEngine *engine, iSector *sec, csTime fade)
+void csExploMeshObject::AddLight (iEngine *engine, iSector *sec, csTicks fade)
 {
   if (has_light) return;
   light_engine = engine;

@@ -35,16 +35,16 @@ public:
   csEvent ();
 
   /// Create a keyboard event object
-  csEvent (csTime eTime, int eType, int kCode, int kChar, int kModifiers);
+  csEvent (csTicks eTime, int eType, int kCode, int kChar, int kModifiers);
 
   /// Create a mouse event object
-  csEvent (csTime eTime, int eType, int mx, int my, int mButton, int mModifiers);
+  csEvent (csTicks eTime, int eType, int mx, int my, int mButton, int mModifiers);
 
   /// Create a joystick event object
-  csEvent (csTime eTime, int eType, int jn, int jx, int jy, int jButton, int jModifiers);
+  csEvent (csTicks eTime, int eType, int jn, int jx, int jy, int jButton, int jModifiers);
 
   /// Create a command event object
-  csEvent (csTime eTime, int eType, int cCode, void *cInfo = NULL);
+  csEvent (csTicks eTime, int eType, int cCode, void *cInfo = NULL);
 
   /// Destructor
   virtual ~csEvent ();

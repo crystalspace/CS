@@ -19,6 +19,7 @@
 #include <stdarg.h>
 
 #include "cssysdef.h"
+#include "cssys/system.h"
 #include "qint.h"
 #include "csgeom/math2d.h"
 #include "csgeom/math3d.h"
@@ -240,19 +241,19 @@ void csGraphics3DInfinite::SetClipper (iClipper2D* clip, int cliptype)
 
 long csGraphics3DInfinite::GetAccurateTime ()
 {
-  return System->GetTime ();
+  return csGetTicks ();
 }
 
-static csTime start2d = 0;
-static csTime start3d = 0;
-static csTime startnone = 0;
-static csTime startfirst = 0;
+static csTicks start2d = 0;
+static csTicks start3d = 0;
+static csTicks startnone = 0;
+static csTicks startfirst = 0;
 
 bool csGraphics3DInfinite::BeginDraw (int DrawFlags)
 {
   if (startfirst == 0) startfirst = GetAccurateTime ();
 
-  csTime endnone = GetAccurateTime ();
+  csTicks endnone = GetAccurateTime ();
   if (startnone != 0)
   {
     total_none_time += endnone-startnone;
@@ -265,7 +266,7 @@ bool csGraphics3DInfinite::BeginDraw (int DrawFlags)
   }
   else if (!(DrawFlags & CSDRAW_3DGRAPHICS) && (DrawMode & CSDRAW_3DGRAPHICS))
   {
-    csTime end3d = GetAccurateTime ();
+    csTicks end3d = GetAccurateTime ();
     total_3d_time += end3d-start3d;
   }
 
@@ -275,7 +276,7 @@ bool csGraphics3DInfinite::BeginDraw (int DrawFlags)
   }
   else if (!(DrawFlags & CSDRAW_2DGRAPHICS) && (DrawMode & CSDRAW_2DGRAPHICS))
   {
-    csTime end2d = GetAccurateTime ();
+    csTicks end2d = GetAccurateTime ();
     total_2d_time += end2d-start2d;
   }
 

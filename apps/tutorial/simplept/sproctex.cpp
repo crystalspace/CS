@@ -75,7 +75,7 @@ bool csEngineProcTex::Initialize (iGraphics3D *g3d, iEngine *engine,
   return true;
 }
 
-void csEngineProcTex::Update (csTime CurrentTime)
+void csEngineProcTex::Update (csTicks CurrentTime)
 {
   // move the camera
   csVector3 Position (-0.5, 0, 3 + sin (CurrentTime / 1000.0)*3);

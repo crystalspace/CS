@@ -60,7 +60,7 @@ public:
   virtual bool PrepareAnim ();
 
   /// Draw the next frame.
-  virtual void Animate (csTime current_time);
+  virtual void Animate (csTicks current_time);
 
   /// Make a puddle in the water (as if a raindrop) center, radius, strength.
   void MakePuddle (int sx, int sy, int rad, int val);

@@ -321,7 +321,7 @@ void WalkTest::NextFrame ()
   // The following will fetch all events from queue and handle them
   SysSystemDriver::NextFrame ();
 
-  csTime elapsed_time, current_time;
+  csTicks elapsed_time, current_time;
   GetElapsedTime (elapsed_time, current_time);
 
   if (perf_stats) timeFPS = perf_stats->GetFPS ();
@@ -363,7 +363,7 @@ void WalkTest::NextFrame ()
 }
 
 
-void WalkTest::MoveSystems (csTime elapsed_time, csTime current_time)
+void WalkTest::MoveSystems (csTicks elapsed_time, csTicks current_time)
 {
   // First move the sky.
   if (anim_sky)
@@ -437,7 +437,7 @@ void WalkTest::MoveSystems (csTime elapsed_time, csTime current_time)
   if (do_bots)
   {
     static long first_time = -1;
-    static csTime next_bot_at;
+    static csTicks next_bot_at;
     if (first_time == -1)
     {
       first_time = current_time;
@@ -488,7 +488,7 @@ void WalkTest::MoveSystems (csTime elapsed_time, csTime current_time)
     }
   }
 
-  extern void move_bots (csTime);
+  extern void move_bots (csTicks);
   move_bots (elapsed_time);
 
   if (move_forward)
@@ -606,8 +606,8 @@ void WalkTest::DrawFrameConsole ()
   }
 }
 
-void WalkTest::DrawFullScreenFX2D (csTime /*elapsed_time*/,
-	csTime current_time)
+void WalkTest::DrawFullScreenFX2D (csTicks /*elapsed_time*/,
+	csTicks current_time)
 {
   if (do_fs_inter)
   {
@@ -618,8 +618,8 @@ void WalkTest::DrawFullScreenFX2D (csTime /*elapsed_time*/,
   }
 }
 
-void WalkTest::DrawFullScreenFX3D (csTime /*elapsed_time*/,
-	csTime current_time)
+void WalkTest::DrawFullScreenFX3D (csTicks /*elapsed_time*/,
+	csTicks current_time)
 {
   if (do_fs_fadeout)
   {
@@ -684,7 +684,7 @@ void WalkTest::DrawFullScreenFX3D (csTime /*elapsed_time*/,
   }
 }
 
-void WalkTest::DrawFrame3D (int drawflags, csTime /*current_time*/)
+void WalkTest::DrawFrame3D (int drawflags, csTicks /*current_time*/)
 {
   // Tell Gfx3D we're going to display 3D things
   if (!Gfx3D->BeginDraw (Engine->GetBeginDrawFlags () | drawflags
@@ -845,7 +845,7 @@ void WalkTest::DrawFrameMap ()
 #endif
 }
 
-void WalkTest::DrawFrame (csTime elapsed_time, csTime current_time)
+void WalkTest::DrawFrame (csTicks elapsed_time, csTicks current_time)
 {
   if (!myConsole || !myConsole->GetVisible ())
   {
@@ -950,11 +950,11 @@ void WalkTest::DrawFrame (csTime elapsed_time, csTime current_time)
 }
 
 int cnt = 1;
-csTime time0 = (csTime)-1;
+csTicks time0 = (csTicks)-1;
 
-void WalkTest::PrepareFrame (csTime elapsed_time, csTime current_time)
+void WalkTest::PrepareFrame (csTicks elapsed_time, csTicks current_time)
 {
-  static csTime prev_time = 0;
+  static csTicks prev_time = 0;
   if (prev_time == 0) prev_time = csGetTicks () - 10;
 
   // If the time interval is too big, limit to something reasonable
@@ -1031,7 +1031,7 @@ void WalkTest::PrepareFrame (csTime elapsed_time, csTime current_time)
 void perf_test (int num)
 {
   Sys->busy_perf_test = true;
-  csTime t1, t2, t;
+  csTicks t1, t2, t;
   Sys->Report (CS_REPORTER_SEVERITY_NOTIFY, "Performance test busy...");
   t = t1 = csGetTicks ();
   int i;
@@ -1046,7 +1046,7 @@ void perf_test (int num)
   Sys->Report (CS_REPORTER_SEVERITY_DEBUG, "%f secs to render %d frames: %f fps",
         (float)(t2-t1)/1000., num, 100000./(float)(t2-t1));
   cnt = 1;
-  time0 = (csTime)-1;
+  time0 = (csTicks)-1;
   Sys->busy_perf_test = false;
 }
 
@@ -1545,7 +1545,7 @@ bool WalkTest::Initialize (int argc, const char* const argv[],
   }
 
   // Wait one second before starting.
-  csTime t = csGetTicks ()+1000;
+  csTicks t = csGetTicks ()+1000;
   while (csGetTicks () < t) ;
 
   // Allocate the palette as calculated by the texture manager.

@@ -22,6 +22,7 @@
 #include <string.h>
 
 #include "cssysdef.h"
+#include "cssys/system.h"
 #include "simpcon.h"
 #include "csutil/util.h"
 #include "csgeom/csrect.h"
@@ -148,8 +149,8 @@ bool csSimpleConsole::Initialize (iSystem *iSys)
   SetBufferSize ((FrameHeight / i) - 2);
   SetLineMessages (Config->GetInt ("SimpleConsole.LineMax", 4));
 
-  LineTime = System->GetTime ();
-  CursorTime = System->GetTime ();
+  LineTime = csGetTicks ();
+  CursorTime = csGetTicks ();
 
   // We want to see broadcast events
   System->CallOnEvents (&scfiPlugin, CSMASK_Broadcast);
@@ -239,7 +240,7 @@ void csSimpleConsole::PutMessage (bool advance, const char *iText)
   strncpy (LineMessage [LineMessageNumber], iText, SIZE_LINE - 1);
   LinesChanged [LineMessageNumber] = true;
 
-  LineTime = System->GetTime () + 4000;
+  LineTime = csGetTicks () + 4000;
   if (advance)
     LineMessageNumber++;
 }
@@ -342,7 +343,7 @@ void csSimpleConsole::Clear (bool)
 void csSimpleConsole::Draw2D (csRect* area)
 {
   int i;
-  csTime CurrentTime = System->GetTime ();
+  csTicks CurrentTime = csGetTicks ();
 
 #define WRITE(x,y,fc,bc,s,changed)				\
   {								\
@@ -392,7 +393,7 @@ void csSimpleConsole::Draw2D (csRect* area)
           LineMessageNumber--;
         LineMessage [LineMessageMax - 1][0] = '\0';
         LinesChanged [LineMessageMax - 1] = true;
-        LineTime = System->GetTime () + 4000;
+        LineTime = csGetTicks () + 4000;
       }
       for (i = 0; i < LineMessageMax; i++)
       {
@@ -407,7 +408,7 @@ void csSimpleConsole::Draw2D (csRect* area)
       if (CurrentTime > CursorTime)
       {
         CursorState = !CursorState;
-        CursorTime = System->GetTime () + 333;
+        CursorTime = csGetTicks () + 333;
       }
 
       char cursor [2];

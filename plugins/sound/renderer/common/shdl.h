@@ -42,7 +42,7 @@ public:
   // release the sound data
   void ReleaseSoundData();
   // update the sound handle
-  void Update_Time(csTime ElapsedTime);
+  void Update_Time(csTicks ElapsedTime);
   void UpdateCount(long NumSamples);
   // implementation-specific update method
   virtual void vUpdate(void *buf, long NumSamples) = 0;

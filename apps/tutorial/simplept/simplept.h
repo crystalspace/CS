@@ -64,7 +64,7 @@ public:
   ~csEngineProcTex ();
 
   bool Initialize (iGraphics3D *g3d, iEngine *engine, iVFS *vfs, iLoader *ldr);
-  void Update (csTime CurrentTime);
+  void Update (csTicks CurrentTime);
   inline iTextureHandle *GetTextureHandle ()
     { return TexHandle; }
 };

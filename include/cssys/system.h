@@ -205,7 +205,7 @@ private:
   void QueryOptions (iPlugin *iObject);
 
   // Elapsed time between last two frames and absolute time in milliseconds
-  csTime ElapsedTime, CurrentTime;
+  csTicks ElapsedTime, CurrentTime;
   
 private:
   /// The Virtual File System object
@@ -343,8 +343,6 @@ public:
   /// Get the object registry.
   virtual iObjectRegistry* GetObjectRegistry () { return &scfiObjectRegistry; }
 
-  /// Get the time in milliseconds.
-  virtual csTime GetTime ();
   /**
    * Execute a system-dependent extension command.  This is implemented as a
    * thin wrapper over PerformExtensionV().
@@ -360,9 +358,9 @@ public:
   /// Suspend the engine's virtual-time clock.
   virtual void SuspendVirtualTimeClock() {}
   /// Resume the engine's virtual-time clock.
-  virtual void ResumeVirtualTimeClock() { CurrentTime = csTime(-1); }
+  virtual void ResumeVirtualTimeClock() { CurrentTime = csTicks(-1); }
   /// Query the elapsed time between last frames and absolute time.
-  virtual void GetElapsedTime (csTime &oElapsedTime, csTime &oCurrentTime)
+  virtual void GetElapsedTime (csTicks &oElapsedTime, csTicks &oCurrentTime)
   { oElapsedTime = ElapsedTime; oCurrentTime = CurrentTime; }
   /// Get the installation path.
   virtual bool GetInstallPath (char *oInstallPath, size_t iBufferSize);
@@ -477,6 +475,6 @@ extern int csPrintf (const char* str, ...);
 extern int csPrintfV (const char* str, va_list arg);
 
 // Get the time.
-extern csTime csGetTicks ();
+extern csTicks csGetTicks ();
 
 #endif // __CS_SYSTEM_H__

@@ -72,7 +72,7 @@ void csKeyboardDriver::DoKey (int iKey, int iChar, bool iDown)
       iChar = (iKey >= 32 && iKey <= 255) ? iKey : 0;
   }
 
-  System->EventQueue.Put (new csEvent (System->GetTime (),
+  System->EventQueue.Put (new csEvent (csGetTicks (),
     iDown ? csevKeyDown : csevKeyUp, iKey, iChar, smask));
 }
 
@@ -90,7 +90,7 @@ bool csKeyboardDriver::GetKeyState (int iKey)
 
 //--//--//--//--//--//--//--//--//--//--//--//--//--//--> Mouse driver <--//--/
 
-csTime csMouseDriver::DoubleClickTime;
+csTicks csMouseDriver::DoubleClickTime;
 size_t csMouseDriver::DoubleClickDist;
 
 csMouseDriver::csMouseDriver (csSystemDriver *system)
@@ -122,7 +122,7 @@ void csMouseDriver::DoButton (int button, bool down, int x, int y)
 
   Button [button - 1] = down;
 
-  csTime evtime = System->GetTime ();
+  csTicks evtime = csGetTicks ();
   System->EventQueue.Put (new csEvent (evtime,
     down ? csevMouseDown : csevMouseUp, x, y, button, smask));
 
@@ -158,7 +158,7 @@ void csMouseDriver::DoMotion (int x, int y)
     LastX = x;
     LastY = y;
 
-    System->EventQueue.Put (new csEvent (System->GetTime (), csevMouseMove,
+    System->EventQueue.Put (new csEvent (csGetTicks (), csevMouseMove,
       x, y, 0, smask));
   }
 }
@@ -204,7 +204,7 @@ void csJoystickDriver::DoButton (int number, int button, bool down,
             | (System->GetKeyState (CSKEY_CTRL)  ? CSMASK_CTRL  : 0);
 
   Button [number - 1] [button - 1] = down;
-  System->EventQueue.Put (new csEvent (System->GetTime (),
+  System->EventQueue.Put (new csEvent (csGetTicks (),
     down ? csevJoystickDown : csevJoystickUp, number, x, y, button, smask));
 }
 
@@ -222,7 +222,7 @@ void csJoystickDriver::DoMotion (int number, int x, int y)
     LastX [number - 1] = x;
     LastY [number - 1] = y;
 
-    System->EventQueue.Put (new csEvent (System->GetTime (), csevJoystickMove,
+    System->EventQueue.Put (new csEvent (csGetTicks (), csevJoystickMove,
       number, x, y, 0, smask));
   }
 }

@@ -92,7 +92,7 @@ class awsManager : public iAws
         virtual ~awsCanvas ();
 
         /// This is actually not used ever.  The window manager doesn't "animate", and only refreshes the canvas when needed.
-        virtual void Animate (csTime current_time);
+        virtual void Animate (csTicks current_time);
 
         /// Get the iGraphics2D interface so that components can use it.
         iGraphics2D *G2D() 

@@ -209,7 +209,7 @@ int csFireMeshObject::FindOldest ()
   return ret;
 }
 
-void csFireMeshObject::Update (csTime elapsed_time)
+void csFireMeshObject::Update (csTicks elapsed_time)
 {
   SetupObject ();
   csParticleSystem::Update (elapsed_time);

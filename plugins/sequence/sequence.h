@@ -29,7 +29,7 @@ struct iSystem;
 struct csSequenceOp
 {
   csSequenceOp* next, * prev;
-  csTime time;
+  csTicks time;
   iSequenceOperation* operation;
 
   csSequenceOp () : operation (NULL) { }
@@ -76,7 +76,7 @@ public:
     {
       seq->IncRef ();
     }
-    virtual void Do (csTime dt);
+    virtual void Do (csTicks dt);
   };
 
   //=====
@@ -105,7 +105,7 @@ public:
       falseSeq->IncRef ();
       cond->IncRef ();
     }
-    virtual void Do (csTime dt);
+    virtual void Do (csTicks dt);
   };
 
   //=====
@@ -129,7 +129,7 @@ public:
       seq->IncRef ();
       cond->IncRef ();
     }
-    virtual void Do (csTime dt);
+    virtual void Do (csTicks dt);
   };
 
 public:
@@ -141,11 +141,11 @@ public:
   csSequenceOp* GetFirstSequence () { return first; }
   void DeleteFirstSequence ();
 
-  virtual void AddOperation (csTime time, iSequenceOperation* operation);
-  virtual void AddRunSequence (csTime time, iSequence* sequence);
-  virtual void AddCondition (csTime time, iSequenceCondition* condition,
+  virtual void AddOperation (csTicks time, iSequenceOperation* operation);
+  virtual void AddRunSequence (csTicks time, iSequence* sequence);
+  virtual void AddCondition (csTicks time, iSequenceCondition* condition,
   	iSequence* trueSequence, iSequence* falseSequence);
-  virtual void AddLoop (csTime time, iSequenceCondition* condition,
+  virtual void AddLoop (csTicks time, iSequenceCondition* condition,
   	iSequence* sequence);
   virtual void Clear ();
   virtual bool IsEmpty () { return first == NULL; }
@@ -161,12 +161,12 @@ private:
   csSequence* main_sequence;
 
   // The previous time.
-  csTime previous_time;
+  csTicks previous_time;
   bool previous_time_valid;
 
   // This is the current time for the sequence manager.
   // This is the main ticker that keeps the entire system running.
-  csTime main_time;
+  csTicks main_time;
 
   // If true the sequence manager is suspended
   bool suspended;
@@ -186,10 +186,10 @@ public:
   virtual void Suspend ();
   virtual bool IsSuspended () { return suspended; }
   virtual void Resume ();
-  virtual void TimeWarp (csTime time, bool skip);
-  virtual csTime GetMainTime () { return main_time; }
+  virtual void TimeWarp (csTicks time, bool skip);
+  virtual csTicks GetMainTime () { return main_time; }
   virtual iSequence* NewSequence ();
-  virtual void RunSequence (csTime time, iSequence* sequence);
+  virtual void RunSequence (csTicks time, iSequence* sequence);
 
   struct eiPlugin : public iPlugin
   {

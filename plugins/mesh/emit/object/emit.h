@@ -310,7 +310,7 @@ public:
   { n = drop_sides; radius = drop_radius;}
 
   /// Update the particle system.
-  virtual void Update (csTime elapsed_time);
+  virtual void Update (csTicks elapsed_time);
 
   /// For iMeshObject.
   virtual void HardTransform (const csReversibleTransform& t);

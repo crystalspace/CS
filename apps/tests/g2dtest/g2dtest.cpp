@@ -652,7 +652,7 @@ void G2DTestSystemDriver::DrawLinePerf ()
   sx += 20; sw -= 40;
   sy += 30; sh -= 40;
   csRandomGen rng (csGetTicks ());
-  csTime start_time = csGetTicks (), delta_time;
+  csTicks start_time = csGetTicks (), delta_time;
   float pix_count = 0;
   do
   {
@@ -707,7 +707,7 @@ void G2DTestSystemDriver::DrawTextTest ()
   sx += 20; sw -= 40 + tw;
   sy += 10; sh -= 20 + th;
   csRandomGen rng (csGetTicks ());
-  csTime start_time = csGetTicks (), delta_time;
+  csTicks start_time = csGetTicks (), delta_time;
   int char_count = 0;
   do
   {
@@ -757,7 +757,7 @@ void G2DTestSystemDriver::DrawTextTest2 ()
   sx += 20; sw -= 40 + tw;
   sy += 10; sh -= 20 + th;
   csRandomGen rng (csGetTicks ());
-  csTime start_time = csGetTicks (), delta_time;
+  csTicks start_time = csGetTicks (), delta_time;
   int char_count = 0;
   do
   {

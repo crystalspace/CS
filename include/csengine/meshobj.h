@@ -75,7 +75,7 @@ protected:
    * with the value returned by engine->GetLastAnimationTime() to see
    * if we need to call meshobj->NextFrame() again.
   */
-  csTime last_anim_time;
+  csTicks last_anim_time;
 
   /**
    * Flag which is set to true when the object is visible.

@@ -66,7 +66,7 @@ public:
   csVector ActiveSources;
   csVector SoundHandles;
   csConfigAccess Config;
-  csTime LastTime;
+  csTicks LastTime;
 
   struct eiPlugin : public iPlugin
   {

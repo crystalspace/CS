@@ -74,9 +74,9 @@ class csHintManager : public csVector
   /// The application
   csApp *app;
   /// Last time when the mouse has been moved
-  csTime time;
+  csTicks time;
   /// The timeout
-  csTime timeout;
+  csTicks timeout;
   /// Font for hints
   iFont *font;
   /// Font size
@@ -102,7 +102,7 @@ public:
   /// Examine a mouse event
   void HandleEvent (iEvent &Event);
   /// Set hints timeout
-  void SetTimeout (csTime iTimeout)
+  void SetTimeout (csTicks iTimeout)
   { timeout = iTimeout; }
   /// Set the font and font size for hints
   void SetFont (iFont *iNewFont, int iSize);

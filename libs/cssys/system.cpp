@@ -326,7 +326,7 @@ csSystemDriver::csSystemDriver () : Plugins (8, 8), EventQueue (),
 
   debug_level = 0;
   Shutdown = false;
-  CurrentTime = csTime (-1);
+  CurrentTime = csTicks (-1);
 
   scfiObjectRegistry.Register (&scfiPluginManager, "PluginManager");
   iCommandLineParser* cmdline = new csCommandLineParser ();
@@ -549,8 +549,8 @@ void csSystemDriver::NextFrame ()
   int i;
 
   // Update elapsed time first
-  csTime cur_time = csGetTicks ();
-  ElapsedTime = (CurrentTime == csTime (-1)) ? 0 : cur_time - CurrentTime;
+  csTicks cur_time = csGetTicks ();
+  ElapsedTime = (CurrentTime == csTicks (-1)) ? 0 : cur_time - CurrentTime;
   CurrentTime = cur_time;
 
   // See if any plugin wants to be called every frame
@@ -791,11 +791,6 @@ void csSystemDriver::RequestPlugin (const char *iPluginName)
 }
 
 //--------------------------------- iSystem interface for csSystemDriver -----//
-
-csTime csSystemDriver::GetTime ()
-{
-  return csGetTicks ();
-}
 
 bool csSystemDriver::GetInstallPath (char *oInstallPath, size_t iBufferSize)
 {

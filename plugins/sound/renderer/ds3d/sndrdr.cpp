@@ -133,7 +133,7 @@ bool csSoundRenderDS3D::Open()
 	"crystalspace.sound.ds3d",
     	"  Volume: %g\n", GetVolume());
 
-  csTime et, ct;
+  csTicks et, ct;
   System->GetElapsedTime(et, ct);
   LastTime = ct;
   
@@ -203,9 +203,9 @@ iSoundListener *csSoundRenderDS3D::GetListener()
 void csSoundRenderDS3D::Update()
 {
   int i;
-  csTime et, ct;
+  csTicks et, ct;
   System->GetElapsedTime(et, ct);
-  csTime ETime = ct - LastTime;
+  csTicks ETime = ct - LastTime;
   LastTime = ct;
 
   Listener->Prepare();
