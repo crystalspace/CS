@@ -10,6 +10,11 @@ The history order is reversed so that new features are at the top.
 	- Eric Sunshine eliminated a compilation warning in ensocket driver.
 	- Eric Sunshine fixed a compilation error in glstates.h which occurred
 	  when CS_USE_NEW_RENDERER was not defined.
+	- Eric Sunshine moved -lstdc++ to DO.PLUGIN.POSTAMBLE in win32gcc.mak.
+	  This ensures that this library will appear after any other special
+	  libraries a module might require.  This fixes a problem with the
+	  odedynam plugin not linking following the earlier work around to get
+	  dllwrap working on Win9x and WinME.
 27-Feb-2003
 	- res fixed the "shifted alpha map" bug in the software renderer.
 	- Marten Svanfeldt once again fiddled with the light/shadow culling. 

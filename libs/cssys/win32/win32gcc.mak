@@ -155,8 +155,10 @@ DO.SHARED.PLUGIN.PREAMBLE += \
 # </cs-config>
 DO.SHARED.PLUGIN.CORE = \
   $(LINK.PLUGIN) $(LFLAGS.DLL) $(LFLAGS.@) $(^^) \
-    $(OUT)/$(@:$(DLL)=-rsrc.o) $(L^) $(LIBS) $(LFLAGS) \
-    -mwindows -lstdc++
+    $(OUT)/$(@:$(DLL)=-rsrc.o) $(L^) $(LIBS) $(LFLAGS)
+# <cs-config>
+DO.PLUGIN.POSTAMBLE = -mwindows -lstdc++
+# </cs-config>
 
 # Commenting out the following line will make the -noconsole option work
 # but the only way to redirect output will be WITH -noconsole (wacky :-)
