@@ -79,19 +79,22 @@ void Simple::SetupFrame ()
   // Now rotate the camera according to keyboard state
   const float speed = elapsed_time / 1000.0;
 
-  iCamera* c = view->GetCamera();
   if (kbd->GetKeyState (CSKEY_RIGHT))
-    c->GetTransform ().RotateThis (CS_VEC_ROT_RIGHT, speed);
+      view->GetCamera()->GetTransform().RotateThis (CS_VEC_ROT_RIGHT, speed);
   if (kbd->GetKeyState (CSKEY_LEFT))
-    c->GetTransform ().RotateThis (CS_VEC_ROT_LEFT, speed);
+      view->GetCamera()->GetTransform().RotateThis (CS_VEC_ROT_LEFT, speed);
   if (kbd->GetKeyState (CSKEY_PGUP))
-    c->GetTransform ().RotateThis (CS_VEC_TILT_UP, speed);
+      view->GetCamera()->GetTransform().RotateThis (CS_VEC_TILT_UP, speed);
   if (kbd->GetKeyState (CSKEY_PGDN))
-    c->GetTransform ().RotateThis (CS_VEC_TILT_DOWN, speed);
-  if (kbd->GetKeyState (CSKEY_UP))
-    c->Move (CS_VEC_FORWARD * 5 * speed);
-  if (kbd->GetKeyState (CSKEY_DOWN))
-    c->Move (CS_VEC_BACKWARD * 5 * speed);
+      view->GetCamera()->GetTransform().RotateThis (CS_VEC_TILT_DOWN, speed);
+  if (kbd->GetKeyState (CSKEY_UP)) {
+      //avatar->GetMovable()->MovePosition(avatar->GetMovable()->GetTransform() * CS_VEC_FORWARD * 5 * speed);
+      avatarbody->SetLinearVelocity (view->GetCamera()->GetTransform().GetT2O () * csVector3 (0, 0, 5));
+  }
+  if (kbd->GetKeyState (CSKEY_DOWN)) {
+      //avatar->GetMovable()->MovePosition(avatar->GetMovable()->GetTransform() * CS_VEC_BACKWARD * 5 * speed);
+      avatarbody->SetLinearVelocity (view->GetCamera()->GetTransform().GetT2O () * csVector3 (0, 0, -5));
+  }
 
   // Take small steps.
   const float maxStep = .01;
@@ -106,6 +109,9 @@ void Simple::SetupFrame ()
     ta = tb;
     tb = speed;
   }
+
+  view->GetCamera()->GetTransform().SetOrigin(avatar->GetMovable()->GetTransform().GetOrigin());
+  //avatar->GetMovable()->SetTransform(view->GetCamera()->GetTransform());
 
   // Tell 3D driver we're going to display 3D things.
   if (!g3d->BeginDraw (engine->GetBeginDrawFlags () | CSDRAW_3DGRAPHICS))
@@ -420,6 +426,27 @@ bool Simple::Initialize ()
 
   CreateWalls (csVector3 (5));
 
+  // Use the camera transform.
+  const csOrthoTransform& tc = view->GetCamera ()->GetTransform ();
+
+  // Create the avatar.
+  avatar = engine->CreateMeshWrapper (boxFact, "box", room);
+  avatar->DeferUpdateLighting (CS_NLIGHT_STATIC|CS_NLIGHT_DYNAMIC, 10);
+
+  // Create a body and attach the mesh.
+  avatarbody = dynSys->CreateBody ();
+  avatarbody->SetProperties (1, csVector3 (0), csMatrix3 ());
+  avatarbody->SetPosition (tc.GetOrigin ());
+  avatarbody->AttachMesh (avatar);
+
+  // Create and attach a box collider.
+  const csMatrix3 tmm;
+  const csVector3 tvv (0);
+  csOrthoTransform tt (tmm, tvv);
+  csVector3 size (.4, .8, .4); // This should be the same size as the mesh.
+  avatarbody->AttachColliderBox (size, tt, 10, 1, .8);
+  //avatarbody->AttachColliderSphere (1.5, csVector3 (0), 10, 1, .8);
+
   return true;
 }
 
@@ -527,7 +554,7 @@ iRigidBody* Simple::CreateWalls (const csVector3& radius)
   csRef<iThingState> walls_state ( SCF_QUERY_INTERFACE (walls->GetMeshObject (), iThingState));
 
   for(int i = 0; i < walls_state->GetPolygonCount(); i++) {
-      rb->AttachColliderPlane(walls_state->GetPolygon(i)->GetObjectPlane(), 0, 0, 0);
+      rb->AttachColliderPlane(walls_state->GetPolygon(i)->GetObjectPlane(), 10, 0, 0);
   }
 
   return rb;

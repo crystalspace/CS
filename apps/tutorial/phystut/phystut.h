@@ -67,6 +67,8 @@ private:
   iJoint* CreateJointed (void);
   iRigidBody* CreateWalls (const csVector3& radius);
   csRef<iMeshWrapper> walls;
+  csRef<iMeshWrapper> avatar;
+  csRef<iRigidBody> avatarbody;
 
 public:
   Simple (iObjectRegistry *obj);
