@@ -10,9 +10,8 @@ problems at once. Or else implement it ad hoc again.
 DIFFICULTY: moderate to hard
 
 PROBLEM: No fog in hardware accelerated renderers.
-SOLUTION: Either we need the solution with layered fog. Denis already
-sent me code for that but I found no time to integrate it yet. Paul G
-Allen is also working on fog in OpenGL.
+SOLUTION: Currently Jorrit is working on vertex based fog. It is not
+ready yet but it is probably the best way.
 DIFFICULTY: moderate to hard
 
 PROBLEM: When standing VERY close to the portal engine sometimes draw it

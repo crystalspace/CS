@@ -74,6 +74,19 @@ Short-term cleanups that need to be done:
 	  compiler, where it would crash with an "internal compiler error" in
 	  soft_txt.cpp any time find_rgb_map() was called.  A simple textual
 	  reorganization of the file cured the problem.
+	- Andrew Zabolotny made some fixes on the software renderer
+	  (including the file he forgot yesterday). He also fixed 16-bit
+	  unlighted texture drawer.
+	- Fog in OpenGL almost works perfectly now. There are still two
+	  problems: there is a problem with the thickness calculation in
+	  relation to polygons which are oriented sideways from the
+	  camera. I'm not sure what is happening here. You'll see the
+	  effect soon enough. The other problem is that currently only
+	  one layer of fog will work correctly.
+	- Jorrit fixed the hardware 3D renderers so that gouraud shading works
+	  again.
+	- I changed the behaviour of csIntersect3::Plane() a bit.
+	- A few changes to docs.
 26-Jul-1999
 	- Andrew made changes to DrawPolygonFX() (one argument instead of
 	  three). He fixed a number of small bugs and adjusted the prototype.
