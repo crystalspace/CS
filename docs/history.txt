@@ -7,14 +7,14 @@ individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
 12-Dec-2003
-	- res added a 'console control handler' for Win32. It handles proper
-	  shutdown of the app in case the 'Close' button on the console 
-	  window is pressed, the user logs off or the system shuts down.
-        - James Thompson extended swig wraper to provide overloaded 
-          iAws::SetupCanvas (iGraphics2D *g2d=0, iGraphics3D *g3d=0)
-          The default C++ usage of SetupCanvas expects a NULL pointer 
-          to an iAwsCanvas.  The swig wrappers won't allow a NULL/0 to be used.
-	- Eric Sunshine changed confgure.ac to check for a usable FreeType2
+	- res added a 'console control handler' for Win32.  It handles proper
+          shutdown of the app in case the 'Close' button on the console window
+          is pressed, the user logs off or the system shuts down.
+        - James Thompson extended swig wraper to provide overloaded
+          iAws::SetupCanvas (iGraphics2D *g2d=0, iGraphics3D *g3d=0) The
+          default C++ usage of SetupCanvas expects a NULL pointer to an
+          iAwsCanvas.  The swig wrappers won't allow a NULL/0 to be used.
+	- Eric Sunshine changed configure.ac to check for a usable FreeType2
 	  installation by testing for features actually required by Crystal
 	  Space, rather than simply checking the library's version number since
 	  the version number check was unreliable.  (For instance, one might
@@ -30,6 +30,14 @@ chronological order.
 	  This causes the Carbon.h check to fail when performed by the
 	  preprocessor since __APPLE__ and __GNUC__ are not defined.  By only
 	  performing the check via the compiler, we side-step this issue.
+	- Eric Sunshine applied a very ugly hack to the existing very ugly hack
+	  in csperl5.mak to prevent it from trying to link the non-existent
+	  cspace-rsrc.o into the generated cspace.dll Perl extension module.
+	  (The correct solution, which we should apply in the future, is to use
+	  Perl's own extension building facility to build this extension,
+	  instead of trying to coerce the CS makefile system into doing so;
+	  just as cspython utilizes Python's distutils to build the Python
+	  extension module.)
 11-Dec-2003
 	- Philipp Aumayr fixed a bug in AWS where a masked textbox raised an
 	  assert if the input was reactivated by clicking on the far right of
@@ -87,7 +95,7 @@ chronological order.
 	  emits a more aesthetically pleasing answer.
 	- Duhprey commited a patch from Leandro Motta Barros to expose some
 	  ode specific parameters for joints (Done via iODEJointState)
-	- Duhprey commited a patch from Troy Chard for motor and bounce 
+	- Duhprey commited a patch from Troy Chard for motor and bounce
 	  parameters on joints.
 	- Eric Sunshine committed a new custom cursor plugin from Neil Mosafi
 	  <nmosafi@totalise.co.uk> which allows use of arbitary iImages as
@@ -164,9 +172,9 @@ chronological order.
 3-Dec-2003
 	- res changed the csKeyEventHelper to accept 'const iEvent*' arguments.
 	  Also changed the iEvent->Find() methods to be 'const'.
-	- jamest Modifed swig wrapper to support iSector::HitBeamPortals(),  
-	  also added csBox* to the swig wrapper.  
-	- jamest commented out the setScale() function in sprcal3d 
+	- jamest Modifed swig wrapper to support iSector::HitBeamPortals(),
+	  also added csBox* to the swig wrapper.
+	- jamest commented out the setScale() function in sprcal3d
 	  so plugin would build until setScale() makes it into cal3d
 	  cvs
 2-Dec-2003

@@ -184,12 +184,14 @@ $(SWIG.PERL5.O): $(SWIG.PERL5.CPP)
 
 # @@@ Kludge: We omit PREAMBLE and POSTAMBLE since we don't want metadata.
 # The more correct way to do this is to invoke Perl's own extension building
-# facility.  (This is especially true since the ugly sans-PREAMBLE/POSTAMBLE
+# facility.  This is especially true since the ugly sans-PREAMBLE/POSTAMBLE
 # hack is bound to fail on any number of platforms since platform-specific
 # build rules are not guaranteed to split metadata embedding off into the
-# PREAMBLE/POSTAMBLE macros.)
+# PREAMBLE/POSTAMBLE macros.  In fact, this already fails on Windows, since
+# DO.SHARED.PLUGIN.CORE on Windows tries linking with a cspace-rsrc.o file
+# which does not exist.
 $(SWIG.PERL5.DLL): $(SWIG.PERL5.O) $(LIB.CSPERL5)
-	$(DO.SHARED.PLUGIN.CORE) $(PERL5.LFLAGS)
+	$(filter-out %-rsrc$O,$(DO.SHARED.PLUGIN.CORE)) $(PERL5.LFLAGS)
 
 $(SWIG.PERL5.INSTALLPM): $(SWIG.PERL5.PM.IN)
 	$(RM) $@
