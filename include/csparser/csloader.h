@@ -27,6 +27,8 @@
 #include "csutil/util.h"
 #include "csgeom/quaterni.h"
 
+class csGenerateImageTexture;
+class csGenerateImageValue;
 struct csRGBcolor;
 
 struct iImageIO;
@@ -113,6 +115,10 @@ class csLoader : public iLoader
 
   /// Parse and load a single texture
   void txt_process (char *name, char* buf);
+  /// For heightgen.
+  csGenerateImageTexture* heightgen_txt_process (char* buf);
+  /// For heightgen.
+  csGenerateImageValue* heightgen_value_process (char* buf);
   /// Parse and load a height texture
   void heightgen_process (char* buf);
   /// Parse and load a single material

@@ -26,16 +26,16 @@
 
 
 
-//-- csGenerateTerrainImageTextureBlend ----------------------------------
-csGenerateTerrainImageTextureBlend::csGenerateTerrainImageTextureBlend()
+//-- csGenerateImageTextureBlend ----------------------------------
+csGenerateImageTextureBlend::csGenerateImageTextureBlend()
 {
   layers = 0;
   valuefunc = 0;
 }
 
-csGenerateTerrainImageTextureBlend::~csGenerateTerrainImageTextureBlend()
+csGenerateImageTextureBlend::~csGenerateImageTextureBlend()
 {
-  csGenerateTerrainImageLayer *p = layers, *np =0;
+  csGenerateImageLayer *p = layers, *np =0;
   while(p)
   {
     np = p->next;
@@ -45,11 +45,11 @@ csGenerateTerrainImageTextureBlend::~csGenerateTerrainImageTextureBlend()
   }
 }
 
-void csGenerateTerrainImageTextureBlend::AddLayer(float value, 
-  csGenerateTerrainImageTexture *tex)
+void csGenerateImageTextureBlend::AddLayer(float value, 
+  csGenerateImageTexture *tex)
 {
   /// find a spot
-  csGenerateTerrainImageLayer *p = layers, *prevp = 0;
+  csGenerateImageLayer *p = layers, *prevp = 0;
   while(p && (p->value < value))
   {
     prevp = p;
@@ -58,12 +58,12 @@ void csGenerateTerrainImageTextureBlend::AddLayer(float value,
   /// check value
   if(p && (p->value == value))
   {
-    printf("csGenerateTerrainImageTextureBlend Error: "
+    printf("csGenerateImageTextureBlend Error: "
       "encountered duplicate value %g. Ignoring.\n", value);
     return;
   }
   /// create new
-  csGenerateTerrainImageLayer *part = new csGenerateTerrainImageLayer;
+  csGenerateImageLayer *part = new csGenerateImageLayer;
   part->next = 0;
   part->value = value;
   part->tex = tex;
@@ -88,13 +88,13 @@ void csGenerateTerrainImageTextureBlend::AddLayer(float value,
   }
 }
 
-void csGenerateTerrainImageTextureBlend::GetColor(csColor &col, 
+void csGenerateImageTextureBlend::GetColor(csColor &col, 
   float x, float y)
 {
   /// get height
   float value = valuefunc->GetValue(x, y);
   /// find closest layers (below <), (above >=)
-  csGenerateTerrainImageLayer *below = 0, *above = 0;
+  csGenerateImageLayer *below = 0, *above = 0;
   above = layers;
   while(above && (above->value < value))
   {
@@ -107,7 +107,7 @@ void csGenerateTerrainImageTextureBlend::GetColor(csColor &col,
   csColor abovecol, belowcol;
   if(!below && !above)
   {
-    col.Set(128, 128, 128);
+    col.Set(.5, .5, .5);
     return;
   }
   if(!below)
@@ -135,20 +135,20 @@ void csGenerateTerrainImageTextureBlend::GetColor(csColor &col,
   //printf("col = %g %g %g\n", col.red, col.green, col.blue);
 }
 
-//---- csGenerateTerrainImageTextureSingle ----------------------------
-csGenerateTerrainImageTextureSingle::~csGenerateTerrainImageTextureSingle()
+//---- csGenerateImageTextureSingle ----------------------------
+csGenerateImageTextureSingle::~csGenerateImageTextureSingle()
 {
   if(image) image->DecRef();
 }
 
 
-void csGenerateTerrainImageTextureSingle::SetImage(iImage *im)
+void csGenerateImageTextureSingle::SetImage(iImage *im)
 {
   image = im;
   if(image) image->IncRef();
 }
 
-void csGenerateTerrainImageTextureSingle::GetImagePixel(
+void csGenerateImageTextureSingle::GetImagePixel(
   iImage *image, int x, int y, csRGBpixel& res)
 {
   int r, g, b;
@@ -177,7 +177,7 @@ void csGenerateTerrainImageTextureSingle::GetImagePixel(
 }
 
 
-void csGenerateTerrainImageTextureSingle::ComputeLayerColor(
+void csGenerateImageTextureSingle::ComputeLayerColor(
   const csVector2& pos, csColor& col)
 {
   csVector2 imagepos = pos - offset;
@@ -224,10 +224,10 @@ void csGenerateTerrainImageTextureSingle::ComputeLayerColor(
 
   // return trilinear interpolated value
   //printf("layercol = %g %g %g\n", col.red, col.green, col.blue);
-  //col *= 1./255.;
+  col *= 1./255.;
 }
 
-void csGenerateTerrainImageTextureSingle::GetColor(csColor &col, 
+void csGenerateImageTextureSingle::GetColor(csColor &col, 
   float x, float y)
 {
   ComputeLayerColor(csVector2(x,y), col);
@@ -236,21 +236,21 @@ void csGenerateTerrainImageTextureSingle::GetColor(csColor &col,
 
 
 
-//----------- csGenerateTerrainImage --------------------------------------
+//----------- csGenerateImage --------------------------------------
 
-csGenerateTerrainImage::csGenerateTerrainImage()
+csGenerateImage::csGenerateImage()
 {
   //baselist = 0;
   //heightfunc = 0;
   tex = 0;
 }
 
-csGenerateTerrainImage::~csGenerateTerrainImage()
+csGenerateImage::~csGenerateImage()
 {
   if(tex) delete tex;
 }
 
-iImage *csGenerateTerrainImage::Generate(int totalw, int totalh, 
+iImage *csGenerateImage::Generate(int totalw, int totalh, 
   int startx, int starty, int partw, int parth)
 {
   csImageMemory *csim = new csImageMemory(partw, parth);
@@ -272,7 +272,7 @@ iImage *csGenerateTerrainImage::Generate(int totalw, int totalh,
     {
       /// compute color
       tex->GetColor(col, pos.x, pos.y);
-      pix.Set(QInt(col.red),QInt(col.green),QInt(col.blue));
+      pix.Set(QInt(col.red*255),QInt(col.green*255),QInt(col.blue*255));
       //if(x==0)printf("Set pixel %3d, %3d to %3d %3d %3d\n", x, y, 
         //col.red, col.green, col.blue);
       /// set pixel
@@ -286,13 +286,13 @@ iImage *csGenerateTerrainImage::Generate(int totalw, int totalh,
 }
 
 
-//------------------ csGenerateTerrainImageValueFunc -----------------
-csGenerateTerrainImageValueFuncTex::~csGenerateTerrainImageValueFuncTex()
+//------------------ csGenerateImageValueFunc -----------------
+csGenerateImageValueFuncTex::~csGenerateImageValueFuncTex()
 {
   if(tex) delete tex;
 }
 
-float csGenerateTerrainImageValueFuncTex::GetValue(float x, float y)
+float csGenerateImageValueFuncTex::GetValue(float x, float y)
 {
   csColor col;
   tex->GetColor(col, x, y);

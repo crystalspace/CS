@@ -17,6 +17,9 @@ The history order is reversed so that new features are at the top.
 	- Removed a bunch of code in OpenGL lightmap handling which used
 	  to be needed but now I can't see a difference in visual output.
 	  The code is between #if 0/#endif so I can revert if needed.
+	- Implemented a lot of new functionality from the new texture
+	  generation tool. Will write some documentation on this later.
+	  A new version of newsky.zip is required!
 16-May-2001
 	- Philip Wyett did a quick update to eliminate 3000 compiler warnings.
 	  Pragma'ed C4291 out, for time being, will come back to this.

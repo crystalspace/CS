@@ -107,10 +107,12 @@ CS_TOKEN_DEF_START
   CS_TOKEN_DEF (AMBIENT)
   CS_TOKEN_DEF (ATTENUATION)
   CS_TOKEN_DEF (BACK2FRONT)
+  CS_TOKEN_DEF (BLEND)
   CS_TOKEN_DEF (CAMERA)
   CS_TOKEN_DEF (CENTER)
   CS_TOKEN_DEF (COLLECTION)
   CS_TOKEN_DEF (COLOR)
+  CS_TOKEN_DEF (CONSTANT)
   CS_TOKEN_DEF (CONVEX)
   CS_TOKEN_DEF (COPY)
   CS_TOKEN_DEF (CULLER)
@@ -124,8 +126,10 @@ CS_TOKEN_DEF_START
   CS_TOKEN_DEF (FOR_2D)
   CS_TOKEN_DEF (FOR_3D)
   CS_TOKEN_DEF (FRAME)
+  CS_TOKEN_DEF (GENERATE)
   CS_TOKEN_DEF (HALO)
   CS_TOKEN_DEF (HARDMOVE)
+  CS_TOKEN_DEF (HEIGHT)
   CS_TOKEN_DEF (HEIGHTGEN)
   CS_TOKEN_DEF (HEIGHTMAP)
   CS_TOKEN_DEF (IDENTITY)
@@ -170,7 +174,10 @@ CS_TOKEN_DEF_START
   CS_TOKEN_DEF (SCALE_Z)
   CS_TOKEN_DEF (SECTOR)
   CS_TOKEN_DEF (SHIFT)
+  CS_TOKEN_DEF (SINGLE)
   CS_TOKEN_DEF (SIZE)
+  CS_TOKEN_DEF (SLOPE)
+  CS_TOKEN_DEF (SOLID)
   CS_TOKEN_DEF (SOUND)
   CS_TOKEN_DEF (SOUNDS)
   CS_TOKEN_DEF (START)
@@ -181,6 +188,7 @@ CS_TOKEN_DEF_START
   CS_TOKEN_DEF (TRANSPARENT)
   CS_TOKEN_DEF (MAT_SET)
   CS_TOKEN_DEF (V)
+  CS_TOKEN_DEF (VALUE)
   CS_TOKEN_DEF (WORLD)
   CS_TOKEN_DEF (ZFILL)
   CS_TOKEN_DEF (ZNONE)
@@ -792,11 +800,223 @@ static float HeightMapFunc (void* data, float x, float y)
   return col * hm->hscale + hm->hshift;
 }
 
+static float SlopeMapFunc (void* data, float x, float y)
+{
+  float mx = x-.01; if (mx < 0) mx = 0;
+  float px = x+.01; if (px > 1) px = 1;
+  float dhdx = HeightMapFunc (data, px, y) - HeightMapFunc (data, mx, y);
+  dhdx /= .02;
+  float my = y-.01; if (my < 0) my = 0;
+  float py = y+.01; if (py > 1) py = 1;
+  float dhdy = HeightMapFunc (data, x, py) - HeightMapFunc (data, x, my);
+  dhdy /= .02;
+  //printf ("x=%g y=%g slope=%g\n", x, y, (dhdx+dhdy)/2); fflush (stdout);
+  return fabs ((dhdx+dhdy)/2.);
+}
+
+csGenerateImageValue* csLoader::heightgen_value_process (char* buf)
+{
+  CS_TOKEN_TABLE_START (commands)
+    CS_TOKEN_TABLE (CONSTANT)
+    CS_TOKEN_TABLE (HEIGHTMAP)
+    CS_TOKEN_TABLE (SLOPE)
+    CS_TOKEN_TABLE (TEXTURE)
+  CS_TOKEN_TABLE_END
+
+  long cmd;
+  char *params;
+  char* name;
+  csGenerateImageValue* v = NULL;
+
+  if ((cmd = csGetObject (&buf, commands, &name, &params)) > 0)
+  {
+    switch (cmd)
+    {
+      case CS_TOKEN_CONSTANT:
+        {
+	  csGenerateImageValueFuncConst* vt =
+	  	new csGenerateImageValueFuncConst ();
+	  ScanStr (params, "%f", &(vt->constant));
+	  v = vt;
+	}
+	break;
+      case CS_TOKEN_HEIGHTMAP:
+        {
+	  csGenerateImageValueFunc* vf = new csGenerateImageValueFunc ();
+	  char heightmap[255];
+	  float hscale, hshift;
+          ScanStr (params, "%s,%f,%f", &heightmap, &hscale, &hshift);
+	  iImage* img = LoadImage (heightmap, CS_IMGFMT_TRUECOLOR);
+	  HeightMapData* data = new HeightMapData ();	// @@@ Memory leak!!!
+  	  data->im = img;
+  	  data->iw = img->GetWidth ();
+  	  data->ih = img->GetHeight ();
+  	  data->w = float (data->iw);
+  	  data->h = float (data->ih);
+  	  data->p = (csRGBpixel*)(img->GetImageData ());
+  	  data->hscale = hscale;
+  	  data->hshift = hshift;
+  	  vf->heightfunc = HeightMapFunc;
+	  vf->userdata = (void*)data;
+	  v = vf;
+	}
+	break;
+      case CS_TOKEN_SLOPE:
+        {
+	  csGenerateImageValueFunc* vf = new csGenerateImageValueFunc ();
+	  char heightmap[255];
+	  float hscale, hshift;
+          ScanStr (params, "%s,%f,%f", &heightmap, &hscale, &hshift);
+	  iImage* img = LoadImage (heightmap, CS_IMGFMT_TRUECOLOR);
+	  HeightMapData* data = new HeightMapData ();	// @@@ Memory leak!!!
+  	  data->im = img;
+  	  data->iw = img->GetWidth ();
+  	  data->ih = img->GetHeight ();
+  	  data->w = float (data->iw);
+  	  data->h = float (data->ih);
+  	  data->p = (csRGBpixel*)(img->GetImageData ());
+  	  data->hscale = hscale;
+  	  data->hshift = hshift;
+  	  vf->heightfunc = SlopeMapFunc;
+	  vf->userdata = (void*)data;
+	  v = vf;
+	}
+	break;
+      case CS_TOKEN_TEXTURE:
+	{
+	  csGenerateImageValueFuncTex* vf = new csGenerateImageValueFuncTex ();
+	  vf->tex = heightgen_txt_process (params);
+	  v = vf;
+	}
+	break;
+    }
+  }
+  if (!v)
+  {
+    System->Printf (MSG_FATAL_ERROR, "Problem with value specification!\n");
+  }
+  return v;
+}
+
+csGenerateImageTexture* csLoader::heightgen_txt_process (char* buf)
+{
+  CS_TOKEN_TABLE_START (commands)
+    CS_TOKEN_TABLE (SOLID)
+    CS_TOKEN_TABLE (SINGLE)
+    CS_TOKEN_TABLE (BLEND)
+  CS_TOKEN_TABLE_END
+
+  CS_TOKEN_TABLE_START (blend_commands)
+    CS_TOKEN_TABLE (VALUE)
+    CS_TOKEN_TABLE (LAYER)
+  CS_TOKEN_TABLE_END
+
+  CS_TOKEN_TABLE_START (layer_commands)
+    CS_TOKEN_TABLE (HEIGHT)
+    CS_TOKEN_TABLE (TEXTURE)
+  CS_TOKEN_TABLE_END
+
+  long cmd;
+  char *params;
+  char* name;
+  csGenerateImageTexture* t = NULL;
+
+  if ((cmd = csGetObject (&buf, commands, &name, &params)) > 0)
+  {
+    switch (cmd)
+    {
+      case CS_TOKEN_SOLID:
+        {
+	  csGenerateImageTextureSolid* ts = new csGenerateImageTextureSolid ();
+	  csColor col;
+	  ScanStr (params, "%f,%f,%f", &col.red, &col.green, &col.blue);
+	  ts->color = col;
+	  t = ts;
+	}
+	break;
+      case CS_TOKEN_SINGLE:
+        {
+	  char imagename[255];
+	  csVector2 scale, offset;
+          ScanStr (params, "%s,%f,%f,%f,%f",
+		imagename, &scale.x, &scale.y,
+		&offset.x, &offset.y);
+	  iImage* img = LoadImage (imagename, CS_IMGFMT_TRUECOLOR);
+	  csGenerateImageTextureSingle* ts =
+	  	new csGenerateImageTextureSingle ();
+	  ts->SetImage (img);
+	  ts->scale = scale;
+	  ts->offset = offset;
+	  t = ts;
+	}
+	break;
+      case CS_TOKEN_BLEND:
+        {
+	  csGenerateImageTextureBlend* tb = new csGenerateImageTextureBlend ();
+	  char* xname;
+	  char* params2;
+	  while ((cmd = csGetObject (&params, blend_commands,
+	  	&xname, &params2)) > 0)
+	  {
+	    switch (cmd)
+	    {
+	      case CS_TOKEN_VALUE:
+	        tb->valuefunc = heightgen_value_process (params2);
+		if (!tb->valuefunc)
+		{
+		  System->Printf (MSG_FATAL_ERROR,
+		  	"Problem with returned value!\n");
+		  return NULL;
+		}
+	        break;
+	      case CS_TOKEN_LAYER:
+	        {
+		  float height = 0;
+		  csGenerateImageTexture* txt = NULL;
+	  	  char* yname;
+	  	  char* params3;
+	  	  while ((cmd = csGetObject (&params2, layer_commands,
+	  		  &yname, &params3)) > 0)
+	  	  {
+	    	    switch (cmd)
+	    	    {
+	      	      case CS_TOKEN_TEXTURE:
+	        	txt = heightgen_txt_process (params3);
+			if (!tb->valuefunc)
+			{
+			  System->Printf (MSG_FATAL_ERROR,
+			    "Problem with returned texture!\n");
+			  return NULL;
+			}
+	        	break;
+	      	      case CS_TOKEN_HEIGHT:
+		        ScanStr (params3, "%f", &height);
+	        	break;
+	    	    }
+		  }
+		  tb->AddLayer (height, txt);
+	  	}
+	        break;
+	    }
+	  }
+	  t = tb;
+	}
+	break;
+    }
+  }
+  if (!t)
+  {
+    System->Printf (MSG_FATAL_ERROR, "Problem with texture specification!\n");
+  }
+  return t;
+}
+
 void csLoader::heightgen_process (char* buf)
 {
   CS_TOKEN_TABLE_START (commands)
-    CS_TOKEN_TABLE (HEIGHTMAP)
-    CS_TOKEN_TABLE (LAYER)
+    //CS_TOKEN_TABLE (HEIGHTMAP)
+    //CS_TOKEN_TABLE (LAYER)
+    CS_TOKEN_TABLE (GENERATE)
     CS_TOKEN_TABLE (TEXTURE)
     CS_TOKEN_TABLE (SIZE)
     CS_TOKEN_TABLE (PARTSIZE)
@@ -809,11 +1029,7 @@ void csLoader::heightgen_process (char* buf)
   int totalw = 256, totalh = 256;
   int partw = 64, parth = 64;
   int mw = 1, mh = 1;
-  csGenerateTerrainImage* gen = new csGenerateTerrainImage ();
-  csGenerateTerrainImageTextureBlend* tb =
-  	new csGenerateTerrainImageTextureBlend ();
-  gen->SetTexture (tb);
-  HeightMapData* data = NULL;
+  csGenerateImage* gen = new csGenerateImage ();
 
   while ((cmd = csGetObject (&buf, commands, &name, &params)) > 0)
   {
@@ -828,6 +1044,13 @@ void csLoader::heightgen_process (char* buf)
       case CS_TOKEN_PARTSIZE:
 	ScanStr (params, "%d,%d", &partw, &parth);
 	break;
+      case CS_TOKEN_TEXTURE:
+        {
+          csGenerateImageTexture* txt = heightgen_txt_process (params);
+          gen->SetTexture (txt);
+	}
+	break;
+#if 0
       case CS_TOKEN_HEIGHTMAP:
         {
 	  char heightmap[255];
@@ -868,7 +1091,8 @@ void csLoader::heightgen_process (char* buf)
 	  img->DecRef ();
 	}
         break;
-      case CS_TOKEN_TEXTURE:
+#endif
+      case CS_TOKEN_GENERATE:
         {
 	  int startx, starty;
 	  ScanStr (params, "%d,%d", &startx, &starty);
@@ -888,11 +1112,12 @@ void csLoader::heightgen_process (char* buf)
   }
 
   delete gen;
-  if (data)
-  {
-    data->im->DecRef ();
-    delete data;
-  }
+  //@@@ Memory leak!
+  //if (data)
+  //{
+    //data->im->DecRef ();
+    //delete data;
+  //}
 
   if (cmd == CS_PARSERR_TOKENNOTFOUND)
   {
