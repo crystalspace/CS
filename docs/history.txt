@@ -6,6 +6,9 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+24-Sep-2004
+	- Jorrit moved csProcAnimated to cstool so that it is easier to
+	  use animated textures from code.
 23-Sep-2004
 	- Eric Sunshine augmented configure.ac so that it is no longer a fatal
 	  error for zlib to be missing since that made it unnecessarily

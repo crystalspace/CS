@@ -17,8 +17,8 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __CS_PTANIMIMG_H__
-#define __CS_PTANIMIMG_H__
+#ifndef __CS_PROCTXTANIM_H__
+#define __CS_PROCTXTANIM_H__
 
 #include "csutil/scf.h"
 #include "iutil/comp.h"
@@ -27,27 +27,25 @@
 #include "igraphic/image.h"
 #include "igraphic/animimg.h"
 #include "cstool/proctex.h"
-#include "cstool/proctxtanim.h"
 
-class csProcTexture;
-
-class csAnimateProctexLoader : public iLoaderPlugin, public iComponent  
+/**
+ * A procedural texture for animated images.
+ */
+class csProcAnimated : public csProcTexture
 {
-protected:
-  iObjectRegistry* object_reg;
+private:
+  csRef<iImage> image;
+  csRef<iAnimatedImage> animation;
 
-  void Report (int severity, iDocumentNode* node, const char* msg, ...);
+  csTicks last_time;
 public:
-  SCF_DECLARE_IBASE;
+  csProcAnimated (iImage* img);
+  virtual ~csProcAnimated ();
 
-  csAnimateProctexLoader (iBase *p);
-  virtual ~csAnimateProctexLoader ();
+  virtual bool PrepareAnim ();
 
-  virtual bool Initialize(iObjectRegistry *object_reg);
-
-  virtual csPtr<iBase> Parse (iDocumentNode* node, iLoaderContext* ldr_context,
-  	iBase* context);
-};  
+  virtual void Animate (csTicks current_time);
+};
 
 #endif
 
