@@ -1346,9 +1346,9 @@ void csShadowBitmap::UpdateLightMap (
     // ==> Linear interpolation between vertexs
     float AllDistance = qsqrt (
       csSquaredDist::PointPoint(seg.Start (), seg.End()));
-    float factorA = 1.0 - (qsqrt (csSquaredDist::PointPoint (
+    float factorA = 1.0f - (qsqrt (csSquaredDist::PointPoint (
       seg.Start (),nearest) ) / AllDistance);
-    float factorB = 1.0 - (qsqrt (csSquaredDist::PointPoint
+    float factorB = 1.0f - (qsqrt (csSquaredDist::PointPoint
       (seg.End (),nearest) ) / AllDistance);
     nearestNormals[act] = factorA * normals[vertexs[act]]
       + factorB * normals[vertexs[((act+1)%vCount)]];
@@ -1528,9 +1528,9 @@ bool csShadowBitmap::UpdateShadowMap (
     // ==> Linear interpolation between vertexs
     float AllDistance = qsqrt (csSquaredDist::PointPoint
       (segments[act].Start (),segments[act].End()));
-    float factorA = 1.0 - (qsqrt (csSquaredDist::PointPoint
+    float factorA = 1.0f - (qsqrt (csSquaredDist::PointPoint
       (segments[act].Start (),nearest[act]) ) / AllDistance);
-    float factorB = 1.0 - (qsqrt (csSquaredDist::PointPoint
+    float factorB = 1.0f - (qsqrt (csSquaredDist::PointPoint
       (segments[act].End (),nearest[act]) ) / AllDistance);
     nearestNormals[act] = factorA * normals[vertexs[act]]
       + factorB * normals[vertexs[((act+1)%vCount)]];
