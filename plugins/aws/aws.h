@@ -19,21 +19,21 @@
 #ifndef __CS_AWS_H__
 #define __CS_AWS_H__
 
-# include "iaws/aws.h"
-# include "iaws/awsparm.h"
-# include "iaws/awscnvs.h"
-# include "iutil/eventh.h"
-# include "iutil/comp.h"
-# include "csutil/array.h"
-# include "csutil/array.h"
-# include "csgeom/csrect.h"
-# include "csgeom/csrectrg.h"
-# include "cstool/proctex.h"
-# include "ivideo/graph2d.h"
-# include "ivideo/graph3d.h"
-# include "igraphic/imageio.h"
-# include "awscomp.h"
-# include "awswin.h"
+#include "iaws/aws.h"
+#include "iaws/awsparm.h"
+#include "iaws/awscnvs.h"
+#include "iutil/eventh.h"
+#include "iutil/comp.h"
+#include "csutil/array.h"
+#include "csutil/array.h"
+#include "csgeom/csrect.h"
+#include "csgeom/csrectrg.h"
+#include "cstool/proctex.h"
+#include "ivideo/graph2d.h"
+#include "ivideo/graph3d.h"
+#include "igraphic/imageio.h"
+#include "awscomp.h"
+#include "awswin.h"
 
 /**
  * This is the alternate windowing system plugin.  It defines a simple,
@@ -43,26 +43,26 @@
  */
 
 /**
- * Defines a transition
+ * Defines a transition.
  */
 struct awsWindowTransition
 {
-  /// The rect we start with
+  /// The rect we start with.
   csRect start;
 
-  /// The rect we end with
+  /// The rect we end with.
   csRect end;
 
-  /// The time when this transition began
+  /// The time when this transition began.
   csTicks start_time;
 
-  /// How long the transition is to take
+  /// How long the transition is to take.
   csTicks morph_duration;
 
-  /// The window we're dealing with
+  /// The window we're dealing with.
   iAwsComponent *win;
 
-  /// The type of transition
+  /// The type of transition.
   unsigned transition_type;
 };
 
@@ -72,7 +72,7 @@ private:
   /// Handle to the preference manager.
   csRef<iAwsPrefManager> prefmgr;
 
-  /// Handle to the sink manager
+  /// Handle to the sink manager.
   csRef<iAwsSinkManager> sinkmgr;
 
   /**
@@ -108,7 +108,7 @@ private:
    */
   csRect frame;
 
-  /// The current top component
+  /// The current top component.
   iAwsComponent *top;
 
   /// The current component that the mouse is in.
@@ -117,7 +117,10 @@ private:
   /// The current component that has keyboard focus.
   iAwsComponent *keyb_focus;
 
-  /// The current component that has mouse focus locked, if there is one, 0 otherwise.
+  /**
+   * The current component that has mouse focus locked, if there is
+   * one, 0 otherwise.
+   */
   iAwsComponent *mouse_focus;
 
   /// The focused component, 0 otherwise.
@@ -126,23 +129,23 @@ private:
   /// The current modal dialog, 0 if otherwise.
   iAwsComponent *modal_dialog;
 
-  /// True if mouse events are locked into the top window
+  /// True if mouse events are locked into the top window.
   bool mouse_captured;
 
-  /// The 2d graphics context
+  /// The 2d graphics context.
   iGraphics2D *ptG2D;
 
-  /// The 3d graphics context
+  /// The 3d graphics context.
   iGraphics3D *ptG3D;
 
   /// The object registry pointer, needed at odd times.
   iObjectRegistry *object_reg;
 
-  /// canvas instantiation
+  /// Canvas instantiation.
   csRef<iAwsCanvas> canvas;
 
   /**
-   * Defines the mapping between a factory and it's interned name.  Used for
+   * Defines the mapping between a factory and it's interned name. Used for
    * window template instantiation.
    */
   struct awsComponentFactoryMap
@@ -158,10 +161,10 @@ private:
   /// Contains the list of factory to ID mappings.
   csArray<awsComponentFactoryMap> component_factories;
 
-  /// Contains the list of windows in transition
+  /// Contains the list of windows in transition.
   csArray<awsWindowTransition*> transitions;
 
-  /// Mode flags for the engine
+  /// Mode flags for the engine.
   unsigned int flags;
 public:
   SCF_DECLARE_IBASE;
@@ -171,75 +174,90 @@ public:
 
   bool Initialize (iObjectRegistry *sys);
 
-  /// Get a pointer to the preference manager
+  /// Get a pointer to the preference manager.
   virtual iAwsPrefManager *GetPrefMgr ();
 
-  /// Get a pointer to the sink manager
+  /// Get a pointer to the sink manager.
   virtual iAwsSinkManager *GetSinkMgr ();
 
-  /// Set the preference manager used by the window system
+  /// Set the preference manager used by the window system.
   virtual void SetPrefMgr (iAwsPrefManager *pmgr);
 
-  /// Register a component factory
+  /// Register a component factory.
   virtual void RegisterComponentFactory (
     iAwsComponentFactory *factory,
     const char *name);
 
-  /// Find a component factory
+  /// Find a component factory.
   virtual iAwsComponentFactory *FindComponentFactory (const char *name);
 
   /// Create an embeddable component from a component name.
   virtual iAwsComponent *CreateEmbeddableComponentFrom (const char *name);
 
-  /// Get the top window
+  /// Get the top window.
   virtual iAwsComponent *GetTopComponent ();
 
-  /// Set the top window
+  /// Set the top window.
   virtual void SetTopComponent (iAwsComponent *_top);
 
-  /// Get the focused component
+  /// Get the focused component.
   virtual iAwsComponent *GetFocusedComponent ();
 
-  /// Get the component with the keyboard focus
+  /// Get the component with the keyboard focus.
   virtual iAwsComponent *GetKeyboardFocusedComponent ();
 
-  /// Set the focused component
+  /// Set the focused component.
   virtual void SetFocusedComponent (iAwsComponent *_focused);
 
-  /// Returns the lowest-level visible component (if any) at the screen coordinates
+  /**
+   * Returns the lowest-level visible component (if any) at the
+   * screen coordinates.
+   */
   virtual iAwsComponent* ComponentAt (int x, int y);
 
-  /// Returns true if part of this window is inside the dirty zones
+  /// Returns true if part of this window is inside the dirty zones.
   virtual bool ComponentIsDirty (iAwsComponent *win);
 
-  /// Returns true if window is in transition
+  /// Returns true if window is in transition.
   virtual bool ComponentIsInTransition (iAwsComponent *win);
 
   /// Returns true if the mouse is inside any of the top-level components.
   virtual bool MouseInComponent (int x, int y);
- 
-  /// Causes the current view of the window system to be drawn to the given graphics device.
+
+  /**
+   * Causes the current view of the window system to be drawn to
+   * the given graphics device.
+   */
   virtual void Print (iGraphics3D *g3d, uint8 Alpha = 0);
 
   /// Redraw whatever portions of the screen need it.
   virtual void Redraw ();
 
-  /// Mark a section of the screen dirty
+  /// Mark a section of the screen dirty.
   virtual void Mark (const csRect &rect);
 
   /// Mark a section of the screen clean.
   virtual void Unmark (const csRect &rect);
 
-  /// Erase a section of the screen next round (only useful if AlwaysEraseWindows flag is set)
+  /**
+   * Erase a section of the screen next round (only useful if
+   * AlwaysEraseWindows flag is set).
+   */
   virtual void Erase (const csRect &rect);
 
-  /// Mask off a section that has been marked to erase.  This part won't be erased.
+  /**
+   * Mask off a section that has been marked to erase. This
+   * part won't be erased.
+   */
   virtual void MaskEraser (const csRect &rect);
 
-  /// Tell the system to rebuild the update store
+  /// Tell the system to rebuild the update store.
   virtual void InvalidateUpdateStore ();
 
-  /// Capture all mouse events until release is called, no matter where the mouse is
+  /**
+   * Capture all mouse events until release is called, no matter
+   * where the mouse is.
+   */
   virtual void CaptureMouse (iAwsComponent *comp);
 
   /// Release the mouse events to go where they normally would.
@@ -251,14 +269,19 @@ public:
   /// Set no active modal dialogs.
   virtual void UnSetModal ();
 protected:
-  /// Redraws a window only if it has areas in the dirtyarea
+  /// Redraws a window only if it has areas in the dirtyarea.
   void RedrawWindow (iAwsComponent *comp, csRect dirtyarea);
 
-  /// Redraws all children recursively, but only if they have a part in the dirty area
+  /**
+   * Redraws all children recursively, but only if they have a part
+   * in the dirty area.
+   */
   void RecursiveDrawChildren (iAwsComponent *cmp, csRect dirtyarea);
 
-  /// Raises all components starting from cmp and working towards the root
-  /// that have AWSF_CMP_TOP_SELECT set
+  /**
+   * Raises all components starting from cmp and working towards the root
+   * that have AWSF_CMP_TOP_SELECT set.
+   */
   void RaiseComponents (iAwsComponent* cmp);
 
   /**
@@ -278,10 +301,10 @@ protected:
    */
   bool ChangeMouseFocusHelper (iAwsComponent *cmp, iEvent &Event);
 
-  /// Changes keyboard focus to cmp if necessary
+  /// Changes keyboard focus to cmp if necessary.
   void ChangeKeyboardFocus (iAwsComponent* cmp, iEvent &Event);
 
-  /// Returns the first common parent of cmp1 and cmp2
+  /// Returns the first common parent of cmp1 and cmp2.
   iAwsComponent* FindCommonParent (iAwsComponent* cmp1, iAwsComponent* cmp2);
 
   /// Recursively creates child components and adds them into a parent.  
@@ -305,33 +328,40 @@ public:
   /// Instantiates a window based on a window definition.
   virtual iAwsComponent *CreateWindowFrom (const char *defname);
 
-  /// Creates a new embeddable component
+  /// Creates a new embeddable component.
   virtual iAwsComponent *CreateEmbeddableComponent ();
 
-  /// Creates a new parameter list
+  /// Creates a new parameter list.
   virtual iAwsParmList *CreateParmList ();
 
-  /// Creates and enables a transition for a window
-  virtual void CreateTransition (iAwsComponent *win, unsigned transition_type,
-    csTicks duration=250);
+  /// Creates and enables a transition for a window.
+  virtual void CreateTransition (
+    iAwsComponent *win,
+    unsigned transition_type,
+    csTicks duration = 250);
 
-  /// Creates and enables a transition for a window
-  virtual void CreateTransitionEx (iAwsComponent *win, unsigned transition_type,
-    csTicks duration, csRect &user);
+  /// Creates and enables a transition for a window.
+  virtual void CreateTransitionEx (
+    iAwsComponent *win,
+    unsigned transition_type,
+    csTicks duration,
+    csRect &user);
 
-  /// Set the contexts however you want
-  virtual bool SetupCanvas (iAwsCanvas *newCanvas, iGraphics2D *g2d = 0,
+  /// Set the contexts however you want.
+  virtual bool SetupCanvas (
+    iAwsCanvas *newCanvas,
+    iGraphics2D *g2d = 0,
     iGraphics3D *g3d = 0);
 
-  /// Get the current context
+  /// Get the current context.
   virtual iAwsCanvas *GetCanvas ();
 
-  /// Create a default canvas, covering the whole screen
+  /// Create a default canvas, covering the whole screen.
   /*virtual iAwsCanvas *CreateDefaultCanvas (
       iEngine *engine,
       iTextureManager *txtmgr);*/
 
-  /// Create a default canvas, just a single proctex
+  /// Create a default canvas, just a single proctex.
   /*virtual iAwsCanvas *CreateDefaultCanvas (
       iEngine *engine,
       iTextureManager *txtmgr,
@@ -339,7 +369,7 @@ public:
       int height,
       const char *name);*/
 
-  /// Create a canvas that uses custom graphics devices (e.g. the screen)
+  /// Create a canvas that uses custom graphics devices (e.g. the screen).
   //virtual iAwsCanvas *CreateCustomCanvas (iGraphics2D *g2d, iGraphics3D *g3d);
 
   /// Get the iGraphics2D interface so that components can use it.
@@ -351,19 +381,19 @@ public:
   /// Get the iObjectRegistry interface so that components can use it.
   virtual iObjectRegistry *GetObjectRegistry ();
 
-  /// Dispatches events to the proper components
+  /// Dispatches events to the proper components.
   virtual bool HandleEvent (iEvent &);
 
-  /// Sets one or more flags for different operating modes
+  /// Sets one or more flags for different operating modes.
   virtual void SetFlag (unsigned int flags);
 
-  /// Clears one or more flags for different operating modes
+  /// Clears one or more flags for different operating modes.
   virtual void ClearFlag (unsigned int flags);
 
-  /// Returns the current flags
+  /// Returns the current flags.
   virtual unsigned int GetFlags ();
 
-  /// Returns true if all windows are presently hidden
+  /// Returns true if all windows are presently hidden.
   bool AllWindowsHidden ();
 
   struct eiComponent : public iComponent
