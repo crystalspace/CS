@@ -5956,8 +5956,8 @@ int
 main ()
 {
 pthread_t tid;
-		    pthread_create(&tid, 0, worker, 0);
 		    sem_t sem;
+		    pthread_create(&tid, 0, worker, 0);
 		    sem_init(&sem, 0, 0);
 		    sem_destroy(&sem);
   ;
@@ -6118,8 +6118,8 @@ int
 main ()
 {
 pthread_t tid;
-		    pthread_create(&tid, 0, worker, 0);
 		    sem_t sem;
+		    pthread_create(&tid, 0, worker, 0);
 		    sem_init(&sem, 0, 0);
 		    sem_destroy(&sem);
   ;

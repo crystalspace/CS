@@ -55,8 +55,8 @@ AC_DEFUN([CS_CHECK_PTHREAD],
 		    #include <semaphore.h>
 		    void* worker(void* p) { (void)p; return p; }]],
 		    [pthread_t tid;
-		    pthread_create(&tid, 0, worker, 0);
 		    sem_t sem;
+		    pthread_create(&tid, 0, worker, 0);
 		    sem_init(&sem, 0, 0);
 		    sem_destroy(&sem);])],
 		[cs_pthread_flags])

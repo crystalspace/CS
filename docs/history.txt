@@ -6,6 +6,11 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+12-Nov-2004
+	- Eric Sunshine fixed pthread check in checkpthread.m4 so that it works
+	  correctly with pre-C99 compilers. Previously, it was mixing variable
+	  declarations and code, which is illegal under older compilers.
+	  (bug #1064990)
 11-Nov-2004
 	- Eric Sunshine augmented configure.ac/cstypes.h so that they also
 	  consult <inttypes.h> (in addition to <stdint.h>) when checking for
