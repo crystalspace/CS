@@ -33,6 +33,7 @@
 #include "vosobject3d.h"
 #include <vos/metaobjects/a3dl/a3dl.hh>
 
+using namespace VUtil;
 using namespace VOS;
 
 SCF_IMPLEMENT_IBASE (csVosObject3D)
@@ -43,11 +44,11 @@ SCF_IMPLEMENT_IBASE_END
 
 /// csVosObject3D ///
 
-csVosObject3D::csVosObject3D(A3DL::Object3D* obj3d, VOS::RefCounted* rc)
+csVosObject3D::csVosObject3D(A3DL::Object3D* obj3d, VUtil::RefCounted* rc)
 {
   if(rc) {
-	rc->acquire();
-	object3d.assign(obj3d, false);
+  rc->acquire();
+  object3d.assign(obj3d, false);
   } else object3d.assign(obj3d, true);
 
   SCF_CONSTRUCT_IBASE (0);
@@ -81,7 +82,7 @@ void csVosObject3D::SetCollider (iRigidBody *col)
   collider = col;
 }
 
-VOS::vRef<VOS::Vobject> csVosObject3D::GetVobject()
+vRef<VOS::Vobject> csVosObject3D::GetVobject()
 {
   return object3d;
 }

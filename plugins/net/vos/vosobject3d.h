@@ -43,12 +43,12 @@ class csVosObject3D : public csObject,
 private:
   csRef<iMeshWrapper> meshwrapper;
   csRef<iRigidBody> collider;
-  VOS::vRef<A3DL::Object3D> object3d;
+  VUtil::vRef<A3DL::Object3D> object3d;
 
 public:
   SCF_DECLARE_IBASE;
 
-  csVosObject3D(A3DL::Object3D* obj3d, VOS::RefCounted* rc);
+  csVosObject3D(A3DL::Object3D* obj3d, VUtil::RefCounted* rc);
   virtual ~csVosObject3D();
 
   virtual csRef<iMeshWrapper> GetMeshWrapper();
@@ -59,7 +59,7 @@ public:
 
   void SetCollider (iRigidBody *col);
 
-  virtual VOS::vRef<VOS::Vobject> GetVobject();
+  virtual VUtil::vRef<VOS::Vobject> GetVobject();
 
   virtual void Execute (csOrthoTransform &t);
   virtual void Execute (iMeshWrapper *mesh, csOrthoTransform &t);
@@ -86,7 +86,7 @@ public:
 
   // Set up the object
   virtual void Setup(csVosA3DL* vosa3dl, csVosSector* sect);
-  VOS::Task* GetSetupTask(csVosA3DL* vosa3dl, csVosSector* sect);
+  VUtil::Task* GetSetupTask(csVosA3DL* vosa3dl, csVosSector* sect);
 
   csRef<csVosObject3D> GetCSinterface();
 

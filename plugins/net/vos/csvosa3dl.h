@@ -25,7 +25,7 @@
 #define _CSA3DL_H_
 
 #include <vos/vos/site.hh>
-#include <vos/vos/taskqueue.hh>
+#include <vos/vutil/taskqueue.hh>
 
 #include "inetwork/vosa3dl.h"
 #include "inetwork/vosapi.h"
@@ -47,11 +47,11 @@
 
 
 /** Use this macro to query the object registry, loading a plugin if needed.
-    If an object with a given interface exists in an object registry, 
+    If an object with a given interface exists in an object registry,
     get that object from the registry. If the registry query fails,
     try to load a plugin and get the interface from there. If that succeeds,
     the interface is added to the registry for future use.
-    
+
     Example use:
 @code
     csRef<iDynamics> dynamicSystem;
@@ -61,10 +61,10 @@
         @param obj          csRef to hold object
         @param Interface    The interface class to find
         @param object_reg   Your object registry
-        @param scfID        The SCF identifier string for the implementation to load from a plugin. 
+        @param scfID        The SCF identifier string for the implementation to load from a plugin.
         @param interfaceClassName   The interface class name as a string; this
                             is used as a "tag" in the object registry. For
-                            example, if Interface is iDynamics, this string 
+                            example, if Interface is iDynamics, this string
                             should be "iDynamics".
     @todo This probably ought to be made more thread-safe by locking the
             object registry if possible.
@@ -97,15 +97,15 @@ private:
 
   iObjectRegistry *objreg;
 
-  VOS::vRef<VOS::Site> localsite;
+  VUtil::vRef<VOS::Site> localsite;
 
   int relightCounter;
   boost::mutex relightCounterMutex;
- 
+
 public:
   SCF_DECLARE_IBASE;
 
-  VOS::SynchronizedQueue<VOS::Task*> mainThreadTasks;
+  VUtil::SynchronizedQueue<VUtil::Task*> mainThreadTasks;
 
   csVosA3DL (iBase *);
   virtual ~csVosA3DL();
@@ -124,7 +124,7 @@ public:
     return dynsys;
   }
 
-  virtual VOS::vRef<VOS::Vobject> GetVobject();
+  virtual VUtil::vRef<VOS::Vobject> GetVobject();
 
   void incrementRelightCounter();
   void decrementRelightCounter();

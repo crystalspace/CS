@@ -41,7 +41,7 @@ private:
   csRef<iEngine> engine;
   csRef<iSector> sector;
   csVosA3DL* vosa3dl;
-  VOS::vRef<csMetaSector> sectorvobj;
+  VUtil::vRef<csMetaSector> sectorvobj;
 
   csSet <iVosObject3D *> loadedObjects;
 
@@ -61,7 +61,7 @@ public:
   virtual void Load();
   virtual csRef<iSector> GetSector();
 
-  virtual VOS::vRef<VOS::Vobject> GetVobject();
+  virtual VUtil::vRef<VOS::Vobject> GetVobject();
 
   virtual const csSet<iVosObject3D*> &GetObject3Ds();
 

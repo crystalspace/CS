@@ -31,6 +31,7 @@
 #include "voscube.h"
 #include "vosmaterial.h"
 
+using namespace VUtil;
 using namespace VOS;
 
 class ConstructCubeTask : public Task

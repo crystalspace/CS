@@ -26,6 +26,7 @@
 #include "iengine/engine.h"
 #include "iengine/light.h"
 
+using namespace VUtil;
 using namespace VOS;
 
 class ConstructLightTask : public Task

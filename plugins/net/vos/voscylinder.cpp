@@ -31,6 +31,7 @@
 #include "voscylinder.h"
 #include "vosmaterial.h"
 
+using namespace VUtil;
 using namespace VOS;
 
 class ConstructCylinderTask : public Task

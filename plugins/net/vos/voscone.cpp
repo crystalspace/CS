@@ -31,6 +31,7 @@
 #include "voscone.h"
 #include "vosmaterial.h"
 
+using namespace VUtil;
 using namespace VOS;
 
 class ConstructConeTask : public Task

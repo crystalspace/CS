@@ -37,6 +37,7 @@
 csRef<iMaterialWrapper> csMetaMaterial::checkerboard;
 iObjectRegistry* csMetaMaterial::object_reg;
 
+using namespace VUtil;
 using namespace VOS;
 
 class ConstructMaterialTask : public Task

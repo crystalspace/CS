@@ -39,6 +39,7 @@
 
 #include <vos/metaobjects/a3dl/a3dl.hh>
 
+using namespace VUtil;
 using namespace VOS;
 using namespace A3DL;
 
@@ -173,7 +174,7 @@ bool csVosA3DL::Initialize (iObjectRegistry *o)
   csMetaMaterial::object_reg = objreg;
 
   eventq = CS_QUERY_REGISTRY (objreg, iEventQueue);
-  if (! eventq) 
+  if (! eventq)
   {
     LOG("csVosA3DL", 1, "Error initializing: no event queue in registry!");
     return false;
@@ -217,7 +218,7 @@ bool csVosA3DL::HandleEvent (iEvent &ev)
 }
 
 
-VOS::vRef<Vobject> csVosA3DL::GetVobject()
+vRef<Vobject> csVosA3DL::GetVobject()
 {
   return localsite;
 }

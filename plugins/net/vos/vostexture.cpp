@@ -37,6 +37,7 @@
 
 #include "vostexture.h"
 
+using namespace VUtil;
 using namespace VOS;
 
 class ConstructTextureTask : public Task

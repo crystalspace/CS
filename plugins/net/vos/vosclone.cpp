@@ -29,6 +29,7 @@
 #include "vosclone.h"
 #include "vosmaterial.h"
 
+using namespace VUtil;
 using namespace VOS;
 
 class ConstructCloneTask : public Task

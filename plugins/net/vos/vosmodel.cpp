@@ -37,6 +37,7 @@
 #include "vosmodel.h"
 #include "vosmaterial.h"
 
+using namespace VUtil;
 using namespace VOS;
 
 class ConstructModelTask : public Task

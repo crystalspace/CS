@@ -39,6 +39,7 @@
 #include "vosbillboard.h"
 #include "vosmaterial.h"
 
+using namespace VUtil;
 using namespace VOS;
 
 class ConstructBillboardTask : public Task

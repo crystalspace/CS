@@ -38,6 +38,7 @@
 #include "vospolygonmesh.h"
 #include "vosmaterial.h"
 
+using namespace VUtil;
 using namespace VOS;
 
 class ConstructPolygonMeshTask : public Task

@@ -31,6 +31,7 @@
 
 #include <vos/metaobjects/misc/search.hh>
 
+using namespace VUtil;
 using namespace VOS;
 
 SCF_IMPLEMENT_IBASE (csVosSector)
@@ -137,10 +138,10 @@ void LoadObjectTask::doTask()
       else
       {
         LOG("LoadObjectTask", 3, "Object already setup, setting sector");
-		if( wrapper->GetMovable()->GetSectors()->Find(sector->GetSector()) < 0) {
-			wrapper->GetMovable()->GetSectors()->Add(sector->GetSector());
-			wrapper->GetMovable()->UpdateMove();
-		}
+    if( wrapper->GetMovable()->GetSectors()->Find(sector->GetSector()) < 0) {
+      wrapper->GetMovable()->GetSectors()->Add(sector->GetSector());
+      wrapper->GetMovable()->UpdateMove();
+    }
       }
     }
   }
@@ -222,7 +223,7 @@ void LoadSectorTask::doTask()
         rs->sendMessage(mb);
     }
 
-	LOG("csVosSector", 2, "Starting search");
+  LOG("csVosSector", 2, "Starting search");
 
     rs->search(sector->GetVobject(), "sector", 0,
                        "rule sector\n"
@@ -256,7 +257,7 @@ void LoadSectorTask::doTask()
                        "do acquire and parent-listen and extrap-property-listen to this object\n"
                        );
 
-	LOG("csVosSector", 2, "Search completed");
+  LOG("csVosSector", 2, "Search completed");
   }
 
   sector->GetVobject()->addChildListener (sector);
@@ -302,7 +303,7 @@ void csVosSector::removeObject3D (iVosObject3D *obj)
 void csVosSector::Load()
 {
   if(! didLoad) {
-	didLoad = true;
+  didLoad = true;
     waitingForChildren = sectorvobj->numChildren();
     TaskQueue::defaultTQ().addTask(new LoadSectorTask(vosa3dl, this));
   }
@@ -370,7 +371,7 @@ void csVosSector::notifyChildRemoved (VobjectEvent &event)
 
 void csVosSector::notifyChildReplaced (VobjectEvent &event)
 {
-	if((*event.getNewChild()) == (*event.getOldChild())) return;
+  if((*event.getNewChild()) == (*event.getOldChild())) return;
   LOG("csVosSector", 3, "notifyChildReplaced");
   notifyChildRemoved(event);
   notifyChildInserted(event);
@@ -381,7 +382,7 @@ csRef<iSector> csVosSector::GetSector()
   return sector;
 }
 
-VOS::vRef<VOS::Vobject> csVosSector::GetVobject()
+vRef<VOS::Vobject> csVosSector::GetVobject()
 {
   return sectorvobj;
 }
@@ -390,12 +391,12 @@ VOS::vRef<VOS::Vobject> csVosSector::GetVobject()
 /// csMetaSector ///
 
 csMetaSector::csMetaSector(VOS::VobjectBase* superobject)
-	: A3DL::Sector(superobject)
+  : A3DL::Sector(superobject)
 {
 }
 
 VOS::MetaObject* csMetaSector::new_csMetaSector(VOS::VobjectBase* superobject,
-									  const std::string& type)
+                    const std::string& type)
 {
-	return new csMetaSector(superobject);
+  return new csMetaSector(superobject);
 }
