@@ -3,15 +3,16 @@
 @subsection Windows - Using @sc{msvc}++ Compiler
 @cindex Windows, Building
 
-@emph{Originally written by Dan Ogles, @email{dogles@@peachtree.com}; updated
-by Nathaniel ``Noote'' Saint Martin, @email{noote@@bigfoot.com} and Thomas
-Hieber, @email{thieber@@gmx.net}; currently maintained by Frank O'Connor,
-@email{frank@@oconnors.org}.  Last updated 18 June 2000.}
+@emph{Originally written by Dan Ogles @email{dogles@@peachtree.com}
 
-This Windows port of Crystal Space is currently maintained by Frank O'Connor,
-@email{frank@@oconnors.org}.  Crystal Space supports a wide variety of Windows
-installations and optional technologies such as DirectInput, DirectX, and
-Direct3D.
+Updated by Nathaniel ``Noote'' Saint Martin, @email{noote@@bigfoot.com}, Thomas
+Hieber, @email{thieber@@gmx.net}, Frank O'Connor, @email{frank@@oconnors.org};
+Philip Wyett @email{philip.wyett@@lineone.net}.
+
+Last updated Feb 13, 2001.}
+
+The Windows port of Crystal Space is currently maintained by Philip Wyett,
+@email{philip.wyett@@lineone.net}.
 
 @menu
 * Win32 General:: General Information
