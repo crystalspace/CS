@@ -56,6 +56,12 @@ enum csStaticStyle
 #define CSSTA_BOTTOM		0x00000004
 /// Center text vertically (default)
 #define CSSTA_VCENTER		0x00000008
+/// Text wrap mask
+#define CSSTA_WRAPMASK		0x00000030
+/// Wrap text on word boundaries
+#define CSSTA_WORDWRAP		0x00000010
+/// Wrap text on character boundaries
+#define CSSTA_CHARWRAP		0x00000020
 
 /// Static control class messages
 enum
