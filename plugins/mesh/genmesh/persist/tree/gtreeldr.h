@@ -50,6 +50,7 @@ private:
   csConstructionGeometry* cg_straighttrunk;
   csConstructionGeometry* cg_shrinktrunk;
   csConstructionGeometry* cg_tip;
+  csConstructionGeometry* cg_debug4;
   csConstructionGeometry* cg_branch;
   csConstructionGeometry* cg_smallbranch;
 
@@ -66,6 +67,7 @@ private:
 	float bot_radius, float top_radius, float height);
   void GenerateBranch (csConstructionGeometry* co,
 	float bot_radius, float top_radius, float height);
+  void GenerateDebug4 (csConstructionGeometry* co);
   void GenerateSmallBranch (csConstructionGeometry* co,
 	float bot_radius, float top_radius, float height);
 

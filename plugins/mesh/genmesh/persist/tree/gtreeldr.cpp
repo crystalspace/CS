@@ -177,8 +177,7 @@ public:
 
   virtual int GetRotation (int)
   {
-    return 1;
-    //return (rand () >> 3) % 6;
+    return (rand () >> 3) % 6;
   }
 };
 
@@ -204,6 +203,7 @@ csGeneralTreeFactoryLoader::csGeneralTreeFactoryLoader (iBase* pParent)
   cg_straighttrunk = NULL;
   cg_shrinktrunk = NULL;
   cg_tip = NULL;
+  cg_debug4 = NULL;
   cg_branch = NULL;
   cg_smallbranch = NULL;
 }
@@ -225,6 +225,7 @@ csGeneralTreeFactoryLoader::~csGeneralTreeFactoryLoader ()
   delete cg_straighttrunk;
   delete cg_shrinktrunk;
   delete cg_tip;
+  delete cg_debug4;
   delete cg_branch;
   delete cg_smallbranch;
 }
@@ -394,6 +395,48 @@ void csGeneralTreeFactoryLoader::GenerateBranch (csConstructionGeometry* co,
   co->AddConnector (ocon);
 }
 
+void csGeneralTreeFactoryLoader::GenerateDebug4 (csConstructionGeometry* co)
+{
+  int j;
+  csVector3 vt[200];
+  csTriangle tri[200];
+  csReversibleTransform transform;
+  csMatrix3 m;
+  int vtidx[100];
+
+  j = 0;
+  vt[j++].Set (-.1, 0, .1);
+  vt[j++].Set (.1, 0, .1);
+  vt[j++].Set (.1, 0, -.1);
+  vt[j++].Set (-.1, 0, -.1);
+  vt[j++].Set (-.1, 1, .1);
+  vt[j++].Set (.1, 1, .1);
+  vt[j++].Set (.1, 1, -.1);
+  vt[j++].Set (-.1, 1, -.1);
+  co->SetVertices (j, 4, vt);
+  j = 0;
+  tri[j].a = 0; tri[j].b = 4; tri[j].c = 7; j++;
+  tri[j].a = 0; tri[j].b = 7; tri[j].c = 3; j++;
+  tri[j].a = 3; tri[j].b = 7; tri[j].c = 6; j++;
+  tri[j].a = 3; tri[j].b = 6; tri[j].c = 2; j++;
+  tri[j].a = 2; tri[j].b = 6; tri[j].c = 5; j++;
+  tri[j].a = 2; tri[j].b = 5; tri[j].c = 1; j++;
+  tri[j].a = 1; tri[j].b = 5; tri[j].c = 4; j++;
+  tri[j].a = 1; tri[j].b = 4; tri[j].c = 0; j++;
+  co->SetTriangles (j, tri);
+
+  transform.SetO2TTranslation (csVector3 (0, -1, 0));
+  m.Identity ();
+  transform.SetO2T (m);
+  j = 0;
+  vtidx[j++] = 4;
+  vtidx[j++] = 5;
+  vtidx[j++] = 6;
+  vtidx[j++] = 7;
+  csOutputConnector* ocon = new csOutputConnector (j, vtidx, transform);
+  co->AddConnector (ocon);
+}
+
 void csGeneralTreeFactoryLoader::GenerateSmallBranch (
 	csConstructionGeometry* co,
 	float brad, float trad, float height)
@@ -519,6 +562,7 @@ bool csGeneralTreeFactoryLoader::Initialize (iObjectRegistry* object_reg)
   cg_straighttrunk = new csConstructionGeometry ();
   cg_shrinktrunk = new csConstructionGeometry ();
   cg_tip = new csConstructionGeometry ();
+  cg_debug4 = new csConstructionGeometry ();
   cg_branch = new csConstructionGeometry ();
   cg_smallbranch = new csConstructionGeometry ();
 
@@ -554,6 +598,11 @@ bool csGeneralTreeFactoryLoader::Initialize (iObjectRegistry* object_reg)
   cg_tip->SetTriangles (j, tri);
 
   //---------
+  // An object for testing. Has four connection points instead of six.
+  //---------
+  GenerateDebug4 (cg_debug4);
+
+  //---------
   // A branch.
   //---------
   GenerateBranch (cg_branch, 1, 1, .15);
@@ -563,16 +612,19 @@ bool csGeneralTreeFactoryLoader::Initialize (iObjectRegistry* object_reg)
   // Rules.
   //---------
 
+#if 0
+  co_tree = new csConstructionObject (cg_debug4);
+  co_tree->AddRule (new csDepthRule (co_tree, NULL, 3));
+#elif 0
   co_tree = new csConstructionObject (cg_straighttrunk);
   co_branch1 = new csConstructionObject (cg_branch);
-  co_branch2 = new csConstructionObject (cg_branch);
-  co_tree->AddRule (new csStraightRule (co_branch1));
-  co_branch1->AddRule (new csStraightRule (co_branch2));
-  co_branch1->AddRule (new csStraightRule (NULL));
-  co_branch2->AddRule (new csStraightRule (NULL));
-  co_branch2->AddRule (new csStraightRule (NULL));
+  co_sidebranch = new csConstructionObject (cg_straighttrunk);
 
-#if 0
+  co_tree->AddRule (new csStraightRule (co_branch1));
+  co_branch1->AddRule (new csStraightRule (co_sidebranch));
+  co_branch1->AddRule (new csStraightRule (co_sidebranch));
+  co_sidebranch->AddRule (new csDepthRule (co_sidebranch, NULL, 4));
+#else 1
   co_tree = new csConstructionObject (cg_straighttrunk);
   co_branch1 = new csConstructionObject (cg_branch);
   co_branch2 = new csConstructionObject (cg_branch);
@@ -650,6 +702,22 @@ iBase* csGeneralTreeFactoryLoader::Parse (const char* string,
 
   csConstruction* construction = new csConstruction ();
   csVector3 vertices[6];
+#if 0
+  int j = 0;
+  vertices[j++].Set (-.1, 0, .1);
+  vertices[j++].Set (.1, 0, .1);
+  vertices[j++].Set (.1, 0, -.1);
+  vertices[j++].Set (-.1, 0, -.1);
+  construction->SetupInitialVertices (4, vertices);
+  int vtidx[6];
+  j = 0;
+  vtidx[j++] = 0;
+  vtidx[j++] = 1;
+  vtidx[j++] = 2;
+  vtidx[j++] = 3;
+  construction->AddConstructionObject (0, csReversibleTransform (),
+  	4, vtidx, 0, co_tree);
+#else
   int j = 0;
   vertices[j++].Set (-.1, 0, 0);
   vertices[j++].Set (-.03, 0, .07);
@@ -668,6 +736,7 @@ iBase* csGeneralTreeFactoryLoader::Parse (const char* string,
   vtidx[j++] = 5;
   construction->AddConstructionObject (0, csReversibleTransform (),
   	6, vtidx, 0, co_tree);
+#endif
 printf ("tri:%d vt:%d\n", construction->GetTriangleCount (),
 		construction->GetVertexCount ());
 
@@ -886,7 +955,7 @@ bool csConstruction::AddConstructionObject (int depth,
     new_g2o = &rotation;
     csYRotMatrix3 rot_matrix (-PI*2*float (rotate_connection_points)
     		/ float (num_connection_points));
-    rotation = csTransform (rot_matrix, csVector3 (0)) * g2o;
+    rotation = g2o * csTransform (rot_matrix, csVector3 (0));
   }
 
   // Add all vertices except for the initial connection points.
