@@ -186,17 +186,13 @@
       #define calloc(num, size)	_calloc_dbg ((num), (size), _NORMAL_BLOCK, __FILE__, __LINE__)
 
       // heap consistency check is on by default, leave it
-      #define CS_DEBUG_MSVC_INIT_GOOP \
+      #define CS_WIN32_MSVC_DEBUG_GOOP \
         _CrtSetDbgFlag (_CrtSetDbgFlag (_CRTDBG_REPORT_FLAG) | _CRTDBG_LEAK_CHECK_DF)
-      // check for leaks on exit
-      #define CS_DEBUG_MSVC_EXIT_GOOP 
     #else
       // turn heap consistency check off
-      #define CS_DEBUG_MSVC_INIT_GOOP \
+      #define CS_WIN32_MSVC_DEBUG_GOOP \
         _CrtSetDbgFlag ((_CrtSetDbgFlag (_CRTDBG_REPORT_FLAG) & ~_CRTDBG_ALLOC_MEM_DF) | \
 	  _CRTDBG_LEAK_CHECK_DF)
-      // check for leaks on exit
-      #define CS_DEBUG_MSVC_EXIT_GOOP 
     #endif
   #endif
 
@@ -206,12 +202,8 @@
   #define VERIFY_RESULT(expression, result) expression
 #endif
 
-#ifndef CS_DEBUG_MSVC_INIT_GOOP 
-  #define CS_DEBUG_MSVC_INIT_GOOP 
-#endif
-
-#ifndef CS_DEBUG_MSVC_EXIT_GOOP 
-  #define CS_DEBUG_MSVC_EXIT_GOOP 
+#ifdef CS_WIN32_MSVC_DEBUG_GOOP
+  #define CS_INITIALIZE_PLATFORM_APPLICATION CS_WIN32_MSVC_DEBUG_GOOP
 #endif
 
 #ifdef CS_SYSDEF_PROVIDE_HARDWARE_MMIO
@@ -480,9 +472,7 @@ static inline void* fast_mem_copy (void *dest, const void *src, int count)
 #define csSW_SHOWNORMAL 1
 
 #ifdef __CYGWIN32__
-#define CS_IMPLEMENT_PLATFORM_APPLICATION \
-HINSTANCE ModuleHandle = 0; \
-int ApplicationShow = csSW_SHOWNORMAL;
+#define CS_IMPLEMENT_PLATFORM_APPLICATION
 #else
 
 #if defined(COMP_BC)
@@ -497,30 +487,19 @@ int ApplicationShow = csSW_SHOWNORMAL;
  if the EXE is compiled as a GUI app,
  a WinMain is needed. But if compiled
  as a console app it's not used but main() is
- instead. To have our MSVC debug goop for both
- provide versions which call the stuff and
- redirect to the 'real' main().
+ instead. 
  */
 
 #define CS_IMPLEMENT_PLATFORM_APPLICATION \
-int _cs_main (int argc, char* argv[]); \
+int main (int argc, char* argv[]); \
 int WINAPI WinMain (HINSTANCE hApp, HINSTANCE prev, LPSTR cmd, int show) \
 { \
-  (void)hApp; \
-  (void)show; \
-  (void)prev; \
-  (void)cmd; \
-  CS_DEBUG_MSVC_INIT_GOOP; \
-  int ret = _cs_main(CS_WIN32_ARGC, CS_WIN32_ARGV); \
-  CS_DEBUG_MSVC_EXIT_GOOP; \
+  (void)hApp; (void)show; (void)prev; (void)cmd; \
+  int ret = main(CS_WIN32_ARGC, CS_WIN32_ARGV); \
   return ret; \
 }
 
 #endif
-
-// the main() is actually in win32.cpp
-
-#define main _cs_main
 
 #if !defined(CS_STATIC_LINKED)
 

@@ -1181,15 +1181,3 @@ void Win32Assistant::AlertV (HWND window, int type, const char* title,
   }
 }
 
-//@@@ somewhat ugly.
-extern int _cs_main (int argc, char* argv[]);
-
-#undef main
-
-int main (int argc, char* argv[]) 
-{ 
-  CS_DEBUG_MSVC_INIT_GOOP; 
-  int ret = _cs_main(argc, argv); 
-  CS_DEBUG_MSVC_EXIT_GOOP; 
-  return ret; 
-}

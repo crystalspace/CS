@@ -5,6 +5,19 @@ The history order is reversed so that new features are at the top.
 
 9-Jun-2003
 	- Jorrit made a new csStringArray class.
+	- res made the following changes:
+	    - Added a macro CS_INITIALIZE_PLATFORM_APPLICATION which is 
+	      intended to placed near the very start of an application. It is
+	      supposed to contain platform-specific initialization stuff, 
+	      though it's currently only used for MSVC-specific debug flag 
+	      tweaks.
+	    - CS_INITIALIZE_PLATFORM_APPLICATION is now employed in
+	      csInitializer::InitializeSCF().
+	    - csInitializer::SetupConfigManager() now attempts to create
+	      a platform-specific configuration instance for the user
+	      configuration. Falls back to old user.cfg mechanism if
+	      csGetPlatformConfig() returns 0.
+	    - 
 8-Jun-2003
 	- Eric Sunshine fixed problems in csInitializer::CloseApplication() and
 	  csInitializer::DestroyApplication() where they threw assertion

@@ -133,6 +133,8 @@ static void ScanScfDir (const char* dir)
 
 bool csInitializer::InitializeSCF ()
 {
+  CS_INITIALIZE_PLATFORM_APPLICATION;
+
   scfInitialize();
 
 #ifndef CS_STATIC_LINKED
@@ -268,7 +270,7 @@ bool csInitializer::SetupConfigManager (
   }
 
   csRef<iConfigManager> Config (CS_QUERY_REGISTRY (r, iConfigManager));
-  iConfigFile* cfg = Config->GetDynamicDomain ();
+  csRef<iConfigFile> cfg = Config->GetDynamicDomain ();
   Config->SetDomainPriority (cfg, iConfigManager::ConfigPriorityApplication);
 
   // Initialize application configuration file
@@ -282,18 +284,24 @@ bool csInitializer::SetupConfigManager (
     if (cfgacc->GetBool ("System.UserConfig", true))
     {
       // Open the user-specific, application-neutral config domain.
-      cfg = new csPrefixConfig ("/config/user.cfg", VFS, "Global",
-        "User.Global");
+      cfg = csGetPlatformConfig ("CrystalSpace.Global");
+      if (!cfg)
+      {
+	cfg = new csPrefixConfig ("/config/user.cfg", VFS, "Global",
+	  "User.Global");
+      }
       Config->AddDomain (cfg, iConfigManager::ConfigPriorityUserGlobal);
-      cfg->DecRef ();
 
       // Open the user-and-application-specific config domain.
-      cfg = new csPrefixConfig ("/config/user.cfg", VFS,
-        cfgacc->GetStr ("System.ApplicationID", AppID),
-        "User.Application");
+      const char* appid = cfgacc->GetStr ("System.ApplicationID", AppID);
+      cfg = csGetPlatformConfig (appid);
+      if (!cfg)
+      {
+        cfg = new csPrefixConfig ("/config/user.cfg", VFS,
+          appid, "User.Application");
+      }
       Config->AddDomain (cfg, iConfigManager::ConfigPriorityUserApp);
       Config->SetDynamicDomain (cfg);
-      cfg->DecRef ();
     }
   }
 
