@@ -309,12 +309,9 @@ void csGraphics2DMac::Initialize()
 	} else {
 		/*
 		 *	The 8 bit pixel data was filled in by csGraphics2D
-		 *	so all we need to do is make an empty color table.
+		 *	so all we need to do is get the default 8 bit color table.
 		 */
-		mColorTable = (CTabHandle)::NewHandleClear( sizeof(ColorSpec) * 256 + 8 );
-		(*mColorTable)->ctSeed = ::GetCTSeed();
-		(*mColorTable)->ctFlags = 0;
-		(*mColorTable)->ctSize = 255;
+		mColorTable = GetCTable( 72 );
 	}
 
 	if ( mDrawSprocketsEnabled ) {
@@ -480,7 +477,7 @@ void csGraphics2DMac::SetRGB(int i, int r, int g, int b)
 	if ( mDrawSprocketsEnabled ) {
 		DSpContext_SetCLUTEntries( mDisplayContext,  &theColor, i, i );
 	} else {
-		if ( mOffscreen ) {
+		if ( mDoubleBuffering ) {
 			theCTable = (**(mOffscreen->portPixMap)).pmTable;
 			(*theCTable)->ctTable[i].value = i;
 			(*theCTable)->ctTable[i].rgb = theColor.rgb;
@@ -489,7 +486,6 @@ void csGraphics2DMac::SetRGB(int i, int r, int g, int b)
 			(*theCTable)->ctTable[i].value = i;
 			(*theCTable)->ctTable[i].rgb = theColor.rgb;
 		}
-		CTabChanged( theCTable );
 
 		if ( mMainPalette ) {
 			SetEntryColor( mMainPalette, i, &theColor.rgb );
@@ -547,10 +543,8 @@ bool csGraphics2DMac::BeginDraw()
 			Memory = (unsigned char*)::GetPixBaseAddr(mOffscreen->portPixMap);
 			mGetBufferAddress = false;
 		}
-
-		mPaletteChanged = false;
 	} else {
-		if ( mOffscreen )
+		if ( mDoubleBuffering )
 			::SetGWorld( mOffscreen, NULL );
 		else
 			::SetGWorld( (GWorldPtr)mMainWindow, NULL );
@@ -636,7 +630,7 @@ void csGraphics2DMac::Clear( int color )
 	RGBColor	theColor;
 	Rect		theRect;
 
-	if ( mOffscreen )
+	if ( mDoubleBuffering )
 		::SetGWorld( mOffscreen, NULL );
 	else
 		::SetGWorld( (GWorldPtr)mMainWindow, NULL );
@@ -694,6 +688,11 @@ bool csGraphics2DMac::DoubleBuffer(bool Enable)
 			for (i = 0, theOffset = 0; i < Height; i++, theOffset += theRowBytes )
 				LineAddress[i] = theOffset;
 		}
+	} else {
+		/*
+		 *	Since we are doing drawsprockets, make sure double buffering on.
+		 */
+		mDoubleBuffering = true;
 	}
 
 	return true;
@@ -781,7 +780,7 @@ void csGraphics2DMac::UpdateWindow( WindowPtr inWindow, bool *updated )
 
 		::BeginUpdate( (WindowPtr)mMainWindow );
 
-		if ( ! mDoubleBuffering ) {
+		if ( mDoubleBuffering ) {
 			::CopyBits((BitMap*)*mPixMap, &((WindowPtr)mMainWindow)->portBits,
 					&mOffscreen->portRect, &mOffscreen->portRect,
 					srcCopy, NULL );
@@ -896,20 +895,15 @@ void csGraphics2DMac::SetColorPalette( void )
 		if ( mPaletteChanged ) {
 			::GetGWorld( &mSavedPort, &mSavedGDHandle );
 
-			if ( mOffscreen ) {
+			if ( mDoubleBuffering ) {
 				theCTable = (**(mOffscreen->portPixMap)).pmTable;
-
-				::SetGWorld( (GWorldPtr)mOffscreen, NULL );
-				::CTabChanged( theCTable );
 			} else {
 				theCTable = (**(mMainWindow->portPixMap)).pmTable;
-
-				::SetGWorld( (GWorldPtr)mMainWindow, NULL );
-				::CTabChanged( theCTable );
 			}
 
+			CTabChanged( theCTable );
+
 			::SetGWorld( (GWorldPtr)mMainWindow, NULL );
-			::SelectWindow( (WindowPtr)mMainWindow );
 			::ActivatePalette( (WindowPtr)mMainWindow );
 
 			mPaletteChanged = false;

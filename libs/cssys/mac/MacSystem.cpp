@@ -291,13 +291,11 @@ void SysSystemDriver::Loop(void)
 #endif
 
 		if ( WaitNextEvent( everyEvent, &anEvent, 1, NULL ) ) {
-//			if ( ! SIOUXHandleOneEvent( &anEvent )) {
-				outEventWasProcessed = false;
-				if (( driverNeedsEvent ) && ( piG2D ))
-					piG2D->HandleEvent( &anEvent, &outEventWasProcessed);
-				if ( ! outEventWasProcessed )
-					DispatchEvent( current_time, &anEvent, piG2D );
-//			}
+			outEventWasProcessed = false;
+			if (( driverNeedsEvent ) && ( piG2D ))
+				piG2D->HandleEvent( &anEvent, &outEventWasProcessed);
+			if ( ! outEventWasProcessed )
+				DispatchEvent( current_time, &anEvent, piG2D );
 		} else {
 			Point	theMouse;
 			bool	isIn = false;
