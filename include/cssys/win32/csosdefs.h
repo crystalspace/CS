@@ -41,6 +41,7 @@
 // So many things require this. IF you have an issue with something defined
 // in it then undef that def here.
 #include <windows.h>
+#include <malloc.h>
 #undef min
 #undef max
 #undef GetCurrentTime

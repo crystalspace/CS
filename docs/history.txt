@@ -175,6 +175,12 @@ The history order has been reversed so that new features are at the top.
 	    - Fixed several problem spots in csConfigFile::LoadFromBuffer()
 	      where it could assign the wrong comment as the "end-of-file"
 	      comment.
+	- Philip Wyett changed dnp_tab.cpp to include malloc.h on Windows.
+	- Eric Sunshine reverted Philip's change to dnp_tab.cpp and solved the
+	  missing malloc.h problem in a different fashion.  The problem with
+	  Philip's change was that his #if test was not well formed, and he
+	  also forgot to apply the change to CS/support/gnu/bison.sim, from
+	  which dnp_tab.cpp is built.
 28-Jan-2001
 	- Eric Sunshine fixed a crasher in PTLab where it was trying to
 	  access a texture (cslogo.gif) which it had never loaded.
