@@ -6,12 +6,7 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
-26-Jan-2005
-	- Eric Sunshine fixed more boundary-condition bugs in csMouseDriver and
-	  csJoystickDriver.
-	- Eric Sunshined committed an enhancement from C. J. Collier
-	  <cjcollier@colliertech.org> to csutil/t/objreg.t which adds tests for
-	  iObjectRegistry::Get().
+27-Jan-2005
 	- Marten rewrote the VBO support. It now uses a fixed cache and only 
 	  a few VBO-allocated buffers together with a slot-cache algorithm.
 	  It still needs some work, but it should work for most conditions.
@@ -24,6 +19,12 @@ chronological order.
 	  compressed textures, as opposed to the previous way were the image
 	  was uncompressed and later recompressed by the GL driver.
 	- res added csGetBigEndianLong() and relatives.
+26-Jan-2005
+	- Eric Sunshine fixed more boundary-condition bugs in csMouseDriver and
+	  csJoystickDriver.
+	- Eric Sunshined committed an enhancement from C. J. Collier
+	  <cjcollier@colliertech.org> to csutil/t/objreg.t which adds tests for
+	  iObjectRegistry::Get().
 25-Jan-2005
 	- Jorrit fixed a bug that could come up in case you are relighting
 	  several maps at the same time and a certain polygon was affected
