@@ -31,7 +31,7 @@ Bugs to fix:
 	     0.5 and 1.5 fps (on my computer) when facing into the room (not at
 	     a blank wall) and stays low until the light is removed (shift-1).
 	     (optimize mode)
-	[S]  Using software renderer, go to the room in flarge with the spinning
+	[**] Using software renderer, go to the room in flarge with the spinning
 	     blocks and rings.  Add a light with shift-L.  The software
 	     renderer immediately crashes while trying to dereference a null
 	     pointer.  (optimize mode)
@@ -98,9 +98,10 @@ Bugs to fix:
 	     xwindows and glx2d canvas. As Jorrit says probably the test and
 	     not the canvas is broken as clipping semantics changed recently.
 	[S]  cs2xml crashes when trying to convert castle.zip.  (optimize mode)
+	     (note by Jorrit: cannot reproduce).
 	[O]  levtool fails to convert castle.zip (after it has been converted
 		with cs2xml)
-	[S] unittest crashes and/or hangs:
+	[S]  unittest crashes and/or hangs:
 		./unittest -video=software
 		...
 		plugins/culling/dynavis/tcovbuf.cpp:707:
@@ -122,12 +123,12 @@ Bugs to fix:
 	[S]  The frame around the fancy console looks strange.
 	[S]  Line drawing in software renderer is not stable (overwriting
 	     memory).  This shows with BugPlug and also with AWS in some cases.
-	[O]  Add the ability to get different kinds of polygon meshes from
+	[**] Add the ability to get different kinds of polygon meshes from
 	     objects: lower-lod version for culling, version for collision
 	     detection, version for lighting (casting shadows), ...
 	[O]  Mark polygons as being visible, used for shadow casting, used for
 	     culling, used for collision detection, ... (more general system).
-	[O]  Remove old octree based culler when Dynavis is ok and levtool can
+	[**] Remove old octree based culler when Dynavis is ok and levtool can
 	     convert to Dynavis levels.
 	[O]  Implement splatting in Dynavis.
 	[O]  Implement 3-bit outline renderer in Dynavis.
@@ -144,7 +145,7 @@ Bugs to fix:
 	     OpenGL alone) and this occurs if you look into the reflecting
 	     table.
 	[V]  Static lighting no longer goes through space-warping portals.
-	[V]  One of the halos in flarge seems to disappear in some cases with
+	[**] One of the halos in flarge seems to disappear in some cases with
 	     OpenGL.
 	[V]  Walktest + newsky: it appears that there are some visibility
 	     culling problems in some rare cases.  Solution: try to find a spot
@@ -185,7 +186,7 @@ Bugs to fix:
 	     vertices that are connected to triangles that have vertices from
 	     other limbs.
 	     [Bug 493454]
-	[V]  Mesh objects outside the global bounding box of an infinite sector
+	[**] Mesh objects outside the global bounding box of an infinite sector
 	     will not be visible.  There is a work-around for this bug which is
 	     why this bug is not that bad.  You can easily add small dummy
 	     geometry very far away to make the bounding box work.  Problem is
@@ -205,7 +206,7 @@ Bugs to fix:
 	     you clear the background every frame you can easily notice gaps
 	     between polygons.
 	     [Bug 430601]
-	[V] Investigate bugs related to the walktest 'portal' command and to
+	[V]  Investigate bugs related to the walktest 'portal' command and to
 	     portals in general.  (For example: [Bug 473597]) There also seem
 	     to be several clipping bugs still.
 	[F]  When mounting a real directory on a VFS path you need to do:

@@ -562,7 +562,8 @@ void csCurve::CalculateLightingDynamic (iFrustumView *lview)
   // We are working for a dynamic light. In this case we create
   // a light patch for this polygon.
   csLightPatch *lp = thing_type->lightpatch_pool->Alloc ();
-
+  csRef<iShadowBlock> sb = lview->CreateShadowBlock ();
+  lp->SetShadowBlock (sb);
   AddLightPatch (lp);
 
   iLight* l = lpi->GetLight ();

@@ -5,6 +5,8 @@ The history order is reversed so that new features are at the top.
 	- Fixed effects plugin so it compiles again.
 	- Fixed an initialization error with the new mesh_tri_normals
 	  in genmesh.
+	- Fixed bug in dynamic lighting of curves. Hitting 'L' in walktest
+	  would trigger the bug if the donut in the street was visible.
 22-Jan-2003
 	- Made iEngine->CreateDynLight() a bit more efficient by avoiding
 	  the SCF_QUERY_INTERFACE.
