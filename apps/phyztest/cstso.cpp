@@ -125,7 +125,7 @@ csRigidSpaceTimeObj *sto;
 }
 
 
-real csRigidSpaceTimeObj::collision_check( csWorld *space )
+real csRigidSpaceTimeObj::collision_check( csWorld* /*space*/ )
 {
 csCollider *coli;
 //csSprite3D *sprt;
@@ -266,7 +266,7 @@ collision_pair *CD_contact = NULL;
 }
 
 
-void csRigidSpaceTimeObj::collision_response( csWorld *space )
+void csRigidSpaceTimeObj::collision_response( csWorld* /*space*/ )
 {
 csRigidSpaceTimeObj *sto;
 
