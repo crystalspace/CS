@@ -1,7 +1,7 @@
 Description of BeOS port internals
 ==================================
 Written by David Huen(smh1008@cus.cam.ac.uk)
-Heavily amended by Eric Sunshine (sunshine@sunshineco.com) 1999/08/30
+Heavily amended by Eric Sunshine (sunshine@sunshineco.com) 1999/10/27
 (on account of his major overhaul and re-engineering of the port).
 
 Contents
@@ -96,6 +96,7 @@ The Print() method displays the bitmap by locking the window, blitting the BBitm
 ========================================
 This is the list of BeOS-specific bugs compiled by Eric Sunshine <sunshine@sunshineco.com>.  These bugs are being actively eradicated.
 
+- Remove double-buffering support.  It serves no meaningful purpose in this windowed environment, and is a waste of memory.
 - Add full-screen support.  Be careful about the resolution, since CS can use any arbitrary window dimension.
 - Application should be able to redraw rendering window when BeOS asks for a redraw even if CS is busy (that is, not pushing out a continuous stream of frames).  There are already cases where this is needed, and will be very important when a pause feature is added.
 - Pause when not foreground application.  Make sure that screen redraws correctly even when paused.
