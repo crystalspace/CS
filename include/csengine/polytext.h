@@ -170,9 +170,9 @@ public:
     int width, height;
 
     csCoverageMatrix (int w, int h)
-    { coverage = (float *)calloc ((width = w) * (height = h), sizeof (float)); }
+    { coverage = new float [ (width = w) * (height = h)]; memset (coverage, 0, w*h*sizeof(float)); }
     ~csCoverageMatrix ()
-    { free (coverage); }
+    { delete[]coverage; }
   };
 
   /// Get the coverage matrix for the associated lightmap

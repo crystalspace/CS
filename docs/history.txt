@@ -24,6 +24,9 @@ The history order has been reversed so that new features are at the top.
 	  It will also catch mismatches in new[]/delete[] and new/delete.
 	- Fixed a bug in radiosity. It was calling 'delete' on an array
 	  allocated with 'new[]'.
+	- Changed calloc/free in polytext.h (csCoverageMatrix) to
+	  new[]/delete[] in order to help debugging it (memory debugger
+	  only works on C++ memory allocators).
 10-May-2000
 	- Michael Dale Long did a major update for CrystalClear.  A lot of
 	  work has been done on iActor.  The main thing was adding multiple
