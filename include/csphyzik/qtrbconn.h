@@ -18,34 +18,28 @@
 
 */
 
-#ifndef CTQUATERNION_H
-#define CTQUATERNION_H
+#ifndef QUATRIGIDBODYCONNECTOR_H
+#define QUATRIGIDBODYCONNECTOR_H
 
+#include "csphyzik/phyztype.h"
+#include "csphyzik/entity.h"
+#include "csphyzik/ctquat.h"
 #include "csgeom/quaterni.h"
-#include "csphyzik/ctvector.h"
-#include "csphyzik/ctmatrix.h"
+#include "csphyzik/point.h"
 
-class ctQuaternion : public csQuaternion {
+class ctQuatRigidBody;
+
+class ctQuatRigidBodyConnector : public ctPointObj {
+  ctQuatRigidBody *rigid;
+  ctVector3        r;     // Offset from center of mass
  public:
-  ctQuaternion(real r, real x, real y, real z) : csQuaternion(r, x, y, z) {}
-  ctQuaternion(ctVector3 x) : csQuaternion(csVector3(x[0], x[1], x[2])) {}
-  ctQuaternion(csQuaternion q) : csQuaternion(q.r, q.x, q.y, q.z) {}
-  ctQuaternion() {}
-  ~ctQuaternion() {}
+  ctQuatRigidBodyConnector(ctQuatRigidBody *rb, ctVector3 offset);
+  ~ctQuatRigidBodyConnector() {}
 
-  ctMatrix3 to_matrix();
-  void      from_matrix(ctMatrix3& M);
+  ctVector3 pos();
+  ctVector3 vel();
 
-  // Just like the other Rotate, but with ctVector3, not csVector3
-  ctVector3 Rotate(ctVector3 pt) {
-    ctQuaternion p(pt);
-    ctQuaternion qConj(r, -x, -y, -z);
-
-    p = ctQuaternion(*this * p);
-    p *= qConj;
-    return ctVector3(p.x, p.y, p.z);
-  }
+  void apply_force(ctVector3 F);
 };
 
-#endif // CTQUATERNION_H
-
+#endif // QUATRIGIDBODYCONNECTOR_H
