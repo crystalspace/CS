@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 1999 by Eric Sunshine <sunshine@sunshineco.com>
+    Copyright (C) 1999,2000 by Eric Sunshine <sunshine@sunshineco.com>
     Writen by Eric Sunshine <sunshine@sunshineco.com>
 
     This library is free software; you can redistribute it and/or
@@ -21,34 +21,54 @@
 #include "csengine/world.h"
 #include "csengine/cspmeter.h"
 
-csProgressMeter::csProgressMeter(int n) :
-  type(MSG_INITIALIZATION), total(n), current(0), anchor(0) {}
+csProgressMeter::csProgressMeter(iSystem* s, int n, int t) : sys(s), type(t),
+  granularity(10), tick_scale(2), total(n), current(0), anchor(0) {}
 
 void csProgressMeter::Step()
 {
   if (current < total)
   {
-    // In actuality meter displays only 50 units, but prints 0% - 100%.
     current++;
-    int const extent = 50 * current / total;
-    if (anchor <= extent)
+    int const units = (current == total ? 100 :
+      (((100 * current) / total) / granularity) * granularity);
+    int const extent = units / tick_scale;
+    if (anchor < extent)
     {
-      char buff [256]; // Batch the update here before sending to CsPrintf().
+      char buff [256]; // Batch the update here before emitting it.
+      char const* safety_margin = buff + sizeof(buff) - 5;
       char* p = buff;
-      for (int i = anchor; i <= extent; i++)
+      for (int i = anchor + 1; i <= extent && p < safety_margin; i++)
       {
-        if (i % 5 != 0)
+        if (i % (10 / tick_scale) != 0)
 	  *p++ = '.';
 	else
 	{
           int n;
-	  sprintf (p, "%d%%%n", i * 2, &n );
+	  sprintf(p, "%d%%%n", i * tick_scale, &n );
 	  p += n;
 	}
       }
       *p = '\0';
-      CsPrintf (type, "%s", buff);
-      anchor = extent + 1;
+      sys->Printf(type, "%s", buff);
+      anchor = extent;
     }
   }
+}
+
+void csProgressMeter::Restart()
+{
+  Reset();
+  sys->Printf(type, "0%%");
+}
+
+void csProgressMeter::SetGranularity(int n)
+{
+  if (n >= 1 && n <= 100)
+    granularity = n;
+}
+
+void csProgressMeter::SetTickScale(int n)
+{
+  if (n >= 1 && n <= 100)
+    tick_scale = n;
 }

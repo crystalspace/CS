@@ -12,27 +12,44 @@ Short-term cleanups that need to be done:
 	- Check the dependencies of libraries/COM objects and try to find
 	  includes that don't belong there (like from csengine).
 
+30-Mar-2000
+	- Eric Sunshine made the following changes to csProgressMeter:
+	    - Added a "refresh granularity" setting which allows the client to
+	      configure how often the meter is refreshed.  The default is 10,
+	      which means that the meter will refresh every 10%, or at most 10
+	      times.
+	    - Added a "tick scale" setting which allows the client to control
+	      the number of units which a single tick mark represents.
+	      Default is 2, which means that the meter is represented by a
+	      total of 50 tick marks.
+	    - Added a Restart() method which both resets the meter and prints
+	      the initial tick mark ("0%").
+	    - Meter is now displayed via iSystem::Printf() rather than
+	      CsPrintf() which means that it is no longer unnecessarily bound
+	      to the csEngine library.  An iSystem pointer is passed to the
+	      constructor at creation time.
+	    - Documented all public methods with Doc++ style comments.
+	    - Now explicitly prevents overflow of its refresh buffer.
 29-Mar-2000
 	- Fixed a bug in yesterdays bugfix on CompressShadowFrustrums.
 	- Fixed a bug which caused sectors using STATBSP to work wrong when
 	  the sector has less than 150 polygons.
 	- More work on visibility doc. The first draft is now finished.
 	- Andrew Zabolotny did the following changes:
-	    - Fixed a few things in MazeD. All polygons are now
-	      unnamed by default, unless you give them a name.
-	    - Made Home/End go to top/bottom of lists (Ctrl+PgUp/Dn workso
-	      too - like before). To go horizontally to begin/end use
+	    - Fixed a few things in MazeD.  All polygons are now unnamed by
+	      default, unless you give them a name.
+	    - Made Home/End go to top/bottom of lists (Ctrl+PgUp/Dn workso too
+	      - like before).  To go horizontally to begin/end use
 	      Ctrl+Home/Ctrl+End.
 	    - Fixed some minor bugs in MazeD.
-	    - Fixed the polygon clipper to not give divide overflows
-	      anymore.
+	    - Fixed the polygon clipper to not give divide overflows anymore.
 	    - Changed QInt back (seems working).
 	    - Added X11/gpm/slang libs for Unix when compiling aalib 2D driver.
 	- Michael Dale Long did the following changes:
 	    - Fixed some bugs that popped up when DECLARE_TYPED_VECTOR was
-	      changed to delete it's items. It resulted in some better
-	      data management but broke some assumptions made when writing
-	      the code originally.
+	      changed to delete it's items.  It resulted in some better data
+	      management but broke some assumptions made when writing the code
+	      originally.
 	    - Added the first three chapters of a tutorial for adding
 	      CrystalClear functionality to Simple.
 	- Eric Sunshine reverted Norman Kramer's change to the image loaders
@@ -42,15 +59,16 @@ Short-term cleanups that need to be done:
 	  relying upon global objects with constructors in plug-in modules.
 	  There is no guarantee that such constructors will be invoked on all
 	  platforms which support CS, thus they should be avoided.
-	- Eric Sunshine worked around several compilation problems on OpenStep.
+	- Eric Sunshine worked around several compilation problems on
+	  OpenStep.
 28-Mar-2000
 	- Added csColor+= operator to add colors.
 	- Fixed bug in loader of new mixmode parameter (for sprites).
 	  MULTIPLY2 was not correctly parsed.
-	- Added new LIGHTING(yes/no) keyword for 2D sprites to enable
-	  or disable lighting. The COLORS keyword no longer disables
-	  lighting by default. Instead it allows you to define extra
-	  colors to add to lighting (if lighting is enabled).
+	- Added new LIGHTING(yes/no) keyword for 2D sprites to enable or
+	  disable lighting.  The COLORS keyword no longer disables lighting by
+	  default.  Instead it allows you to define extra colors to add to
+	  lighting (if lighting is enabled).
 	- Eric Sunshine removed numerous, extremely outdated makefile support
 	  files from CS/mk and subdirectories.  These files were generally
 	  three to six months out of date (which is very significant in
@@ -60,19 +78,19 @@ Short-term cleanups that need to be done:
 	  PORT_BYTESEX_BIG_ENDIAN usage with CS_BIG_ENDIAN.
 	- Andrew Zabolotny did the following changes:
 	    - Fixed unlighted polygon saving in MazeD.
-	    - Temporarily replaced QInt(x) with just int(x) so that we
-	      can find out whenever the -recalc problems reported by Jorrito
-	      are related to QInt.
+	    - Temporarily replaced QInt(x) with just int(x) so that we can
+	      find out whenever the -recalc problems reported by Jorrit are
+	      related to QInt.
 	    - Resolved some memory leaks in cssprite.cpp.
-	- Fixed a bug which prevented lighting to work properly when
-	  using multiple STATBSP levels connected through portals.
-	  This bug was documented actually in the source code :-)
+	- Fixed a bug which prevented lighting to work properly when using
+	  multiple STATBSP levels connected through portals.  This bug was
+	  documented actually in the source code :-)
 	  (CompressShadowFrustrums).
 	- Eric Sunshine fixed several compilation warnings and errors
 	  throughout the project.
 	- Started document on visibility (not finished right now).
-	- Robert Bate did some fixes for Codewarrior and updated the
-	  Mac project files.
+	- Robert Bate did some fixes for Codewarrior and updated the Mac
+	  project files.
 27-Mar-2000
 	- W.C.A. Wijngaards <wouterw@cs.vu.nl> made a small fix to line
 	  renderer.
