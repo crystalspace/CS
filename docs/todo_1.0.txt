@@ -120,6 +120,9 @@ Bugs to fix:
 		 * - specify hostname only if you are using client mode.
 	[S]  NetMantest or the netmanager plugin leaks
 	[S]  There are still numerous unreleased instances of SCF classes.
+	     Update: When talking about walktest this only true in the
+		    flarge map. Problem is probably the hirarchical mesh
+		    factory there.
 	[S]  The frame around the fancy console looks strange.
 	[S]  Line drawing in software renderer is not stable (overwriting
 	     memory).  This shows with BugPlug and also with AWS in some cases.
