@@ -602,6 +602,7 @@ csEngine::~csEngine ()
   if (ImageLoader) ImageLoader->DecRef();
   if (VFS) VFS->DecRef ();
   if (Reporter) Reporter->DecRef ();
+  thing_type->DecRef ();
   delete materials;
   delete textures;
   delete render_pol2d_pool;
@@ -755,11 +756,26 @@ void csEngine::DeleteAll ()
   if (G3D) G3D->ClearCache ();
   halos.DeleteAll ();
   collections.DeleteAll ();
+  int i;
+  // @@ instead of simply calling DeleteAll() we do this loop, because:
+  // if a mesh is not held by anything outside the engine, it will get 
+  // destructed (RefCounter hits 0 and destructor is called). Unfortunatly
+  // upon destruction the meshobject checks if it is still in a meshlist. 
+  // But this is even more unfortunately true, since the entry is removed
+  // from the meshlist vector after the DecRef/Destruction happens.
+  // With the loop below we simply make sure that the mesh is not destructed
+  // while removing from the meshlist. ... norman
+  for (i=GetMeshes ()->GetMeshCount ()-1; i >= 0; i--)
+  {
+    iMeshWrapper *imw = GetMeshes ()->GetMesh (i);
+    imw->IncRef ();
+    GetMeshes ()->RemoveMesh (imw);
+    imw->DecRef ();
+  }
   meshes.DeleteAll ();
   mesh_factories.DeleteAll ();
 
 // @@@ I suppose the loop below is no longer needed?
-  int i;
   for (i = 0 ; i < sectors.Length () ; i++)
   {
     csSector* sect = sectors[i]->GetPrivateObject ();
