@@ -192,6 +192,8 @@ WalkTest::WalkTest () :
   debug_box1.Set (csVector3 (-1, -1, -1), csVector3 (1, 1, 1));
   debug_box2.Set (csVector3 (2, 2, 2), csVector3 (3, 3, 3));
   do_show_debug_boxes = false;
+
+  canvas_exposed = true;
 }
 
 WalkTest::~WalkTest ()
@@ -380,7 +382,10 @@ void WalkTest::SetupFrame ()
 
   MoveSystems (elapsed_time, current_time);
   PrepareFrame (elapsed_time, current_time);
-  DrawFrame (elapsed_time, current_time);
+  if (canvas_exposed)
+    DrawFrame (elapsed_time, current_time);
+  else
+    csSleep(150); // lower cpu usage
 
   // Execute one line from the script.
   if (!busy_perf_test)

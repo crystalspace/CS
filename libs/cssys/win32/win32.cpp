@@ -850,6 +850,40 @@ long WINAPI Win32Assistant::WindowProc (HWND hWnd, UINT message,
       }
       return TRUE;
     }
+    case WM_SIZE:
+    {
+      if (GLOBAL_ASSISTANT != 0)
+      {
+	if ( (wParam == SIZE_MAXIMIZED) || (wParam == SIZE_RESTORED) )
+	{
+          iEventOutlet* outlet = GLOBAL_ASSISTANT->GetEventOutlet();
+	  outlet->Broadcast (cscmdCanvasExposed, NULL);
+	} 
+	else if (wParam == SIZE_MINIMIZED) 
+	{
+          iEventOutlet* outlet = GLOBAL_ASSISTANT->GetEventOutlet();
+	  outlet->Broadcast (cscmdCanvasHidden, NULL);
+	}
+      }
+      return TRUE;
+    }
+    case WM_SHOWWINDOW:
+    {
+      if (GLOBAL_ASSISTANT != 0)
+      {
+	if (wParam)
+	{
+          iEventOutlet* outlet = GLOBAL_ASSISTANT->GetEventOutlet();
+	  outlet->Broadcast (cscmdCanvasExposed, NULL);
+	} 
+	else
+	{
+          iEventOutlet* outlet = GLOBAL_ASSISTANT->GetEventOutlet();
+	  outlet->Broadcast (cscmdCanvasHidden, NULL);
+	}
+      }
+      break;
+    }
   }
   return DefWindowProc (hWnd, message, wParam, lParam);
 }

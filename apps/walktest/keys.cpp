@@ -700,6 +700,22 @@ bool WalkTest::WalkHandleEvent (iEvent &Event)
 	  wf->GetCamera ()->SetPerspectiveCenter (FRAME_WIDTH/2, FRAME_HEIGHT/2);
 	break;
       }
+      else if (Event.Command.Code == cscmdCanvasHidden)
+      {
+	canvas_exposed = false;
+      #ifdef CS_DEBUG
+	Report (CS_REPORTER_SEVERITY_NOTIFY, "canvas hidden");
+      #endif
+	break;
+      }
+      else if (Event.Command.Code == cscmdCanvasExposed)
+      {
+	canvas_exposed = true;
+      #ifdef CS_DEBUG
+	Report (CS_REPORTER_SEVERITY_NOTIFY, "canvas exposed");
+      #endif
+	break;
+      }
     }
     case csevKeyDown:
     case csevKeyUp:

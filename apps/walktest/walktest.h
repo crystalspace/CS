@@ -380,6 +380,8 @@ public:
   /// The font we'll use for writing
   iFont *Font;
 
+  /// is actually anything visible on the canvas?
+  bool canvas_exposed;
 public:
   ///
   WalkTest ();
