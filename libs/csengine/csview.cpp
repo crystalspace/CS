@@ -110,7 +110,7 @@ void csView::UpdateView ()
     int OutCount;
     csBoxClipper bc (0., 0., 
 		     (float)G3D->GetWidth (), (float)G3D->GetHeight());
-    csVector2 TempPoly [InCount + 5];
+    csVector2 *TempPoly = new csVector2[InCount + 5];
     UByte rc = bc.Clip (pview->GetVertices (), InCount , TempPoly, OutCount);
     if (rc != CS_CLIP_OUTSIDE)
     {
@@ -118,6 +118,7 @@ void csView::UpdateView ()
       pview->SetVertices (&(TempPoly[0]), OutCount);
       pview->UpdateBoundingBox ();
     } 
+    delete [] TempPoly;
   } 
   else if (bview)
   {
