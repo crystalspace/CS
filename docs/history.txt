@@ -37,6 +37,11 @@ The history order is reversed so that new features are at the top.
 	  seem less like an error message.
 	- Eric Sunshine updated the Apple/NeXT build instructions to reflect
 	  present day conditions.
+	- Eric Sunshine updated the "external libraries" section in the
+	  documentation.
+	- Eric Sunshine updated the "internal implementation detail"
+	  documentation for the Apple/NeXT ports to reflect present day
+	  conditions.
 17-Sep-2002
 	- Clarified some iMovable Doxygen comments.
 	- Fixed a serious bug in the csRef assignment operator for

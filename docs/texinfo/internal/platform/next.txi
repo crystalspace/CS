@@ -6,7 +6,7 @@
 @end macro
 
 @node NeXT Details, OS2 Details, Platform Details, Platform Details
-@subsection MacOS/X, MacOS/X Server 1.0, OpenStep, NextStep
+@subsection MacOS/X, MacOS/X Server 1.0 (Rhapsody), OpenStep, NextStep
 @cindex @sc{n}e@sc{xt} Details
 @cindex MacOS/X Details
 @cindex MacOS/X Server Details
@@ -14,13 +14,15 @@
 @cindex NextStep Details
 
 @emph{Written by Eric Sunshine, @email{sunshine@@sunshineco.com}.  Copyright
-@copyright{} 1999, 2000, 2001 by Eric Sunshine.  Last updated
-23 October 2001.}
+@copyright{} 1999, 2000, 2001, 2002 by Eric Sunshine.  Last updated
+18 September 2002.}
 
-Crystal Space was ported to MacOS/X Server, OpenStep, and NextStep by Eric
-Sunshine in February of 1999 and has been continuously maintained and updated
-ever since.  If you have questions or comments about this port, please contact
-Eric Sunshine at @email{sunshine@@sunshineco.com}.
+Crystal Space was ported to MacOS/X, MacOS/X Server 1.0 (Rhapsody), OpenStep,
+and NextStep by Eric Sunshine.  If you have questions or comments about this
+port, please contact Eric Sunshine at @email{sunshine@@sunshineco.com}.  Matt
+Reda added MacOS/X-specific OpenGL, CoreGraphics, and CoreAudio drivers to the
+MacOS/X port.  If you have questions or comments about these drivers, please
+contact Matt Reda at @email{mreda@@mac.com} or Eric Sunshine.
 
 This section contains comprehensive and detailed implementation information
 about the MacOS/X, MacOS/X Server 1.0 (Rhapsody), OpenStep 4.2, and NextStep
@@ -46,15 +48,15 @@ discussion of this facility see the compilation instructions,
 @ref{NeXT Architectures}.
 
 This implementation makes use of public AppKit @sc{api} (also known as
-@dfn{Cocoa} in Apple parlance) to interface with the display server for all
-animation and event handling.  It does not make use of any private
-undocumented, or unsupported @sc{api}.
+@dfn{Cocoa}) to interface with the display server for all animation and event
+handling.  It does not make use of any private undocumented, or unsupported
+@sc{api}.
 
 As a consequence of the high-level nature of this @sc{api} and certain
-restrictions upon pixel format, the AppKit-based 2D driver for Crystal Space
-may not be as fast as a driver written atop a lower-level facility.  For better
-video performance, both an OpenGL driver and a CoreGraphics driver are planned
-for MacOS/X some time in the future.
+restrictions upon pixel format, the pure AppKit-based 2D driver for Crystal
+Space may not be as fast as a driver written atop a lower-level facility.  With
+MacOS/X, however, drivers are available for OpenGL and CoreGraphics, both of
+which improve rendering speed.  This is especialy true of the OpenGL driver.
 
 @menu
 * NeXT Directories:: Directories
@@ -76,15 +78,17 @@ directory hierarchies:
 
 @itemize @bullet
 @item @code{CS/libs/cssys/next}
+@item @code{CS/plugins/sound/driver/coreaudio}
+@item @code{CS/plugins/video/canvas/macosx}
 @item @code{CS/plugins/video/canvas/next}
 @end itemize
 
 @noindent
-Relative to each directory, in platform-specific subdirectories, are the the
-files comprising the associated MacOS/X, MacOS/X Server 1.0 (Rhapsody),
-OpenStep, and NextStep components.  The directories @file{CS/libs/cssys/next}
-and @file{CS/plugins/video/canvas/next} may contain the following
-subdirectories.
+Within two of these directories are platform-specific subdirectories,
+containing files and resources comprising the associated MacOS/X, MacOS/X
+Server 1.0 (Rhapsody), OpenStep, and NextStep components.  The directories
+@file{CS/libs/cssys/next} and @file{CS/plugins/video/canvas/next} may contain
+the following subdirectories.
 
 @quotation
 @multitable @columnfractions .12 .88
@@ -103,7 +107,7 @@ subdirectories.
 @end multitable
 @end quotation
 
-Functionally, this port is comprised of two distinct platform-specific modules:
+Functionally, this port is comprised of two types of platform-specific modules:
 
 @itemize @bullet
 @item
@@ -115,12 +119,16 @@ files specific to the NextStep port reside in
 reside in @file{CS/libs/cssys/next/shared}.
 
 @item
-The AppKit-based plug-in module which provides 2D graphics capability into
-which Crystal Space renders its images.  These files and resources are located
-in platform-specific subdirectories of @file{CS/plugins/video/canvas/next}.
-For instance, files specific to the NextStep port reside in
+The platform-specific audio and video driver modules.  The files and resources
+comprising the AppKit-based plug-in module which provides 2D graphics
+capability into which Crystal Space renders its images are located in
+platform-specific subdirectories of @file{CS/plugins/video/canvas/next}.  For
+instance, files specific to the NextStep port reside in
 @file{CS/plugins/video/canvas/next/nextstep}, whereas files common to all
-platforms reside in @file{CS/plugins/video/canvas/next/shared}.
+platforms reside in @file{CS/plugins/video/canvas/next/shared}.  The MacOS/X
+OpenGL and CoreGraphics files are located in
+@file{CS/plugins/video/canvas/macosx}, and the CoreAudio files reside in
+@file{CS/plugins/sound/driver/coreaudio}.
 @end itemize
 
 @node NeXT Files, NeXT Run-Loop, NeXT Directories, NeXT Details
@@ -146,9 +154,18 @@ for each target platform.
 @end multitable
 @end quotation
 
-An additional makefile, @file{CS/plugins/video/canvas/next/next2d.mak}, is also
-common to all Apple/@NeXT{} platforms and controls the build process for the
-AppKit-based 2D display driver.
+There are additional makefiles for each platform-specific driver:
+
+@itemize @bullet
+@item
+@file{CS/plugins/sound/driver/coreaudio/casnddrv.mak}
+@item
+@file{CS/plugins/video/canvas/macosx/coregraphics/cgdriver2d.mak}
+@item
+@file{CS/plugins/video/canvas/macosx/opengl/glosx2d.mak}
+@item
+@file{CS/plugins/video/canvas/next/next2d.mak}
+@end itemize
 
 The core components provide low-level, platform-specific functionality which
 Crystal Space requires.  This includes interfaces to the underlying operating
@@ -321,10 +338,8 @@ some other mechanism.
 @cindex @sc{n}e@sc{xt} Video Optimization
 
 This section describes video optionization techniques which have been
-implemented for the high-level AppKit-based 2D driver, which is the only
-Apple/@NeXT{} graphics driver currently available for Crystal Space.
-Lower-level CoreGraphics and OpenGL drivers are planned for MacOS/X at some
-time in the future.
+implemented for the high-level AppKit-based 2D driver.  This discussion does
+not pertain to the MacOS/X OpenGL or CoreGraphics drivers.
 
 Unlike programs on some other platforms, OpenStep and NextStep applications do
 not have direct access to the display hardware (except via the highly private
@@ -333,16 +348,17 @@ not have direct access to the display hardware (except via the highly private
 @samp{NSDirectPalette}, and @samp{NSDirectScreen} classes which were presumably
 intended to allow lower-level access to the display hardware, however their
 interfaces were never fully developed.  With the advent of MacOS/X, Apple has
-introduced the CoreGraphics and OpenGL @sc{api}s which should provide much
-better video performance than that which was available in previous incarnations
-of the Apple/@NeXT{} platforms.
+introduced the CoreGraphics and OpenGL @sc{api}s which provides much better
+video performance than that which was available in previous incarnations of the
+Apple/@NeXT{} platforms.
 
-Under MacOS/X, MacOS/X Server 1.0 (Rhapsody) OpenStep, and NextStep, all
-drawing to the display is performed by a separate program called the
-@dfn{WindowServer}.  Whenever an applications needs to draw to the screen, it
-actually sends drawing commands across an @sc{ipc} connection to the
-WindowServer, and the WindowServer performs the drawing on the application's
-behalf.  This negatively impacts video performance in essentially three ways.
+With the high-level AppKit-based driver, under MacOS/X, MacOS/X Server 1.0
+(Rhapsody) OpenStep, and NextStep, all drawing to the display is performed by a
+separate program called the @dfn{WindowServer}.  Whenever an applications needs
+to draw to the screen, it actually sends drawing commands across an @sc{ipc}
+connection to the WindowServer, and the WindowServer performs the drawing on
+the application's behalf.  This negatively impacts video performance in
+essentially three ways.
 
 @itemize @bullet
 @item
@@ -417,7 +433,7 @@ Many of these optimizations are actually geared toward traditional @NeXT{}
 (@code{m68k}) hardware and may not be as effective on other platforms such as
 Intel.  In some cases using these optimizations on original @NeXT{} hardware,
 can result in a very dramatic improvement in video performance.  In all cases,
-it is presumed that the WindowServer has been optimized to perform well on each
+it is hoped that the WindowServer has been optimized to perform well on each
 platform when presented with data meeting these prerequisites.  Therefore
 following these guidelines seems sensible even for non-@NeXT{} hardware.
 
@@ -459,6 +475,10 @@ impact of this limitation may not be particularly severe.
 @subsubsection Frame Buffer
 @cindex @sc{n}e@sc{xt} Frame Buffer
 
+This section describes the frame buffer format managed by the low-level
+AppKit-based 2D driver and the manner in which the pixel data is manipulated.
+This discussion does not pertain to the MacOS/X OpenGL or CoreGraphics drivers.
+
 With few exceptions, most MacOS/X, MacOS/X Server 1.0 (Rhapsody), OpenStep, and
 NextStep installations are configured for @dfn{true-color} rather than
 palettized color.  However, true-color is rather relative in the case of the
@@ -499,7 +519,8 @@ concern.  This is unfortunate since it means that the AppKit-based 2D driver
 must, itself, massage the data into a format suitable to the AppKit and the
 WindowServer.  This can be a time consuming operation.
 
-Crystal Space is unable to produce the proper image format for several reasons.
+Crystal Space's software renderer is unable to produce the proper image format
+for several reasons.
 
 @itemize @bullet
 @item
@@ -597,13 +618,15 @@ reasonably efficient.
 @subsubsection Dynamic Linking
 @cindex @sc{n}e@sc{xt} Dynamic Linking
 
-On MacOS/X, MacOS/X Server 1.0 (Rhapsody), OpenStep, and NextStep, symbol
-management within plug-in modules (also known as @dfn{dynamically loaded
-libraries}) is handled differently than on most other platforms and operating
-systems.  On most platforms, symbols are private to a plug-in module unless
-explicitly exported.  On the Apple/@NeXT{} platforms all symbols are public by
-default.  This difference of symbolic semantics can have detrimental
-side-effects.
+On MacOS/X Server 1.0 (Rhapsody), OpenStep, and NextStep, symbol management
+within plug-in modules (also known as @dfn{dynamically loaded libraries}) is
+handled differently than on most other platforms and operating systems.  On
+most platforms, symbols are private to a plug-in module unless explicitly
+exported.  On the Apple/@NeXT{} platforms all symbols are public by default.
+As of MacOS/X 1.1, symbols in plugin modules are private by default, however
+with earlier incarnations of MacOS/X, as with the other Apple/@NeXT{}
+platforms, symbols were public by default.  This difference of symbolic
+semantics can have detrimental side-effects.
 
 On other platforms, plug-in modules are themselves linked against any required
 static libraries in order to satisfy external symbolic references.  On MacOS/X,
@@ -759,12 +782,6 @@ This is a list of items which are planned for future releases of this project:
 
 @itemize @bullet
 @item
-Write an OpenGL canvas for the MacOS/X port.
-
-@item
-Write a CoreGraphics canvas for the MacOS/X port.
-
-@item
 Rewrite @samp{next2d} canvas image sizing computation so that the image's
 row-bytes value is always multiple of 16.  This is necessary for best video
 performance according to the @cite{NextStep 3.0 WindowServer Release Notes}.
@@ -797,9 +814,6 @@ Create native AppKit cursors for @sc{csws} cursors.
 Write an Apple/@NeXT{} @samp{line} canvas which utilizes @samp{NSBezierPath} on
 MacOS/X and MacOS/X Server 1.0 (Rhapsody), and which utilizes PostScript
 primitives on OpenStep and NextStep.
-
-@item
-Implement sound support.
 @end itemize
 
 @cindex @sc{n}e@sc{xt} Bugs
