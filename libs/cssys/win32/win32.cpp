@@ -52,12 +52,9 @@ extern HINSTANCE ModuleHandle;
 bool ApplicationActive = true;
 int ApplicationShow;
 
-extern void cleanup();
-
 void sys_fatalerror(char *s)
 {
   MessageBox(NULL, s, "Fatal Error", MB_OK | MB_ICONSTOP);
-  cleanup ();
   exit (1);
 }
 
