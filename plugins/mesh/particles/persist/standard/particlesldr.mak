@@ -5,7 +5,7 @@ ifeq ($(MAKESECTION),rootdefines)
 
 # Driver-specific help commands
 PLUGINHELP += \
-  $(NEWLINE)echo $"  make particlesldr  Make the $(DESCRIPTION.particlesldr)$"
+  $(NEWLINE)echo $"  make particlesldr Make the $(DESCRIPTION.particlesldr)$"
 
 endif # ifeq ($(MAKESECTION),rootdefines)
 
