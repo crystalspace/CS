@@ -24,8 +24,8 @@
  */
 
 #include "isound/data.h"
-#include "vorbis/codec.h"
-#include "vorbis/vorbisfile.h"
+#include <vorbis/codec.h>
+#include <vorbis/vorbisfile.h>
 
 class csOggSoundData : public iSoundData
 {
