@@ -59,7 +59,7 @@ vpath %.cpp plugins/csstdldr
 
 .PHONY: stdldr stdldrclean
 
-all: $(STDLDR.LIB)
+all: $(STDLDR)
 stdldr: $(OUTDIRS) $(STDLDR)
 clean: stdldrclean
 
