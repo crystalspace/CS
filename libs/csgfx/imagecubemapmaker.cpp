@@ -30,11 +30,14 @@ SCF_IMPLEMENT_IBASE_END
 
 csImageCubeMapMaker::csImageCubeMapMaker() : csImageBase(), manualName (false)
 {
+  SCF_CONSTRUCT_IBASE(0);
 }
 
 csImageCubeMapMaker::csImageCubeMapMaker (iImage* source) 
   : csImageBase(), manualName (false)
 {
+  SCF_CONSTRUCT_IBASE(0);
+
   if (source != 0)
   {
     for (uint i = 0; i < source->HasSubImages() + 1; i++)
@@ -48,6 +51,8 @@ csImageCubeMapMaker::csImageCubeMapMaker (iImage* posX, iImage* negX,
 					  iImage* posZ, iImage* negZ) 
   : csImageBase(), manualName (false)
 {
+  SCF_CONSTRUCT_IBASE(0);
+
   cubeImages[0] = posX;
   cubeImages[1] = negX;
   cubeImages[2] = posY;
@@ -55,6 +60,11 @@ csImageCubeMapMaker::csImageCubeMapMaker (iImage* posX, iImage* negX,
   cubeImages[4] = posZ;
   cubeImages[5] = negZ;
   UpdateName();
+}
+
+csImageCubeMapMaker::~csImageCubeMapMaker ()
+{
+  SCF_DESTRUCT_IBASE();
 }
 
 void csImageCubeMapMaker::CheckImage (int index)

@@ -17,8 +17,15 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __CS_CANVAS_COMMON_CURSORCONVERT_H__
-#define __CS_CANVAS_COMMON_CURSORCONVERT_H__
+#ifndef __CS_CSPLUGINCOMMON_CANVAS_CURSORCONVERT_H__
+#define __CS_CSPLUGINCOMMON_CANVAS_CURSORCONVERT_H__
+
+/**
+ * \addtogroup plugincommon
+ * @{ */
+
+/**\file
+ */
 
 #include "csextern.h"
 #include "csgfx/rgbpixel.h"
@@ -27,6 +34,10 @@
 struct iImage;
 class csImageMemory;
 
+/**
+ * Helper class to convert images into data formats suitable for
+ * mouse cursor creation on various platforms and toolkits.
+ */
 class CS_CSPLUGINCOMMON_EXPORT csCursorConverter
 {
   static bool InternalConvertTo1bpp (iImage* image, 
@@ -34,8 +45,6 @@ class CS_CSPLUGINCOMMON_EXPORT csCursorConverter
     const csRGBcolor forecolor, const csRGBcolor backcolor, 
     csRGBpixel keycolor, bool XbitOrder);
 public:
-  //static bool ConvertTo1bpp (iImage* image, uint8*& bitmap, uint8*& mask,
-  //  const csRGBcolor* keycolor = 0);
   /**
    * Convert an image to 1bpp, computing an appropriate bitmap (by dithering
    * to the given foreground and background colors) and mask (from the optionally 
@@ -44,6 +53,10 @@ public:
   static bool ConvertTo1bpp (iImage* image, uint8*& bitmap, uint8*& mask,
     const csRGBcolor forecolor, const csRGBcolor backcolor, 
     const csRGBcolor* keycolor = 0, bool XbitOrder = false);
+  /**
+   * Convert an image to 8bpp, computing an appropriate palette and sets
+   * pixels matching the (optional) keycolor to 0.
+   */
   static bool ConvertTo8bpp (iImage* image, uint8*& pixels, 
     csRGBpixel*& palette, const csRGBcolor* keycolor = 0);
   /**
@@ -51,7 +64,13 @@ public:
    * with \p replaceColor.
    */
   static void StripAlphaFromRGBA (iImage* image, csRGBpixel replaceColor);
+  /**
+   * Remove the alpha from an image by replacing the transparent parts
+   * with index 0.
+   */
   static void StripAlphaFromPal8 (csImageMemory* image);
 };
 
-#endif // __CS_CANVAS_COMMON_CURSORCONVERT_H__
+/** @} */
+
+#endif // __CS_CSPLUGINCOMMON_CANVAS_CURSORCONVERT_H__

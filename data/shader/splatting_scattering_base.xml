@@ -27,6 +27,18 @@
     <shadervar name="inscattering term" type="vector3">0.3, 0.3, 0.3</shadervar>
   </shadervars>
 
+  <?if vars."tex normal"?>
+    <technique priority="300">
+      <pass>
+	<mixmode><copy/></mixmode>
+	<vp plugin="glarb" file="/shader/scattering.avp" />
+	<texture destination="unit 0" name="tex diffuse" />
+	<texture destination="unit 1" name="tex normal" />
+	<fp plugin="glarb" file="/shader/scattering_base.afp" />
+      </pass>
+    </technique>
+  <?endif?>
+
   <technique priority="200">
     <pass>
       <mixmode><copy/></mixmode>

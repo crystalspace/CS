@@ -59,6 +59,8 @@ public:
   csImageCubeMapMaker (iImage* posX, iImage* negX, iImage* posY, 
     iImage* negY, iImage* posZ, iImage* negZ);
 
+  virtual ~csImageCubeMapMaker();
+
   virtual const void *GetImageData ();
   virtual int GetWidth () const;
   virtual int GetHeight () const;

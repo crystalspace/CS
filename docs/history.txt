@@ -45,6 +45,9 @@ chronological order.
 	    - The `sed' expression was broken and failed to filter out a
 	      literal "-g" despite the fact that "-g" is one of the problematic
 	      flags.
+	- res added a normal to the base texture of the 'terrain' level.
+	- res fixed csImageCubeMapMaker and csImageVolumeMaker not invoking
+	  SCF_CONSTRUCT_IBASE()/SCF_DESTRUCT_IBASE().
 22-Feb-2005
 	- Eric Sunshine disabled CS_IEEE_DOUBLE_FORMAT for 64-bit Intel style
 	  platforms. This works around problem where csQint() failed on such

@@ -57,6 +57,10 @@
  */
  
 /**
+ * \defgroup appframe Application Framework
+ */
+ 
+/**
  * \defgroup aws AWS
  * @{ */
 
@@ -79,8 +83,34 @@
 /** @} */
  
 /**
- * \defgroup appframe Application Framework
+ * \defgroup plugincommon common plugin classes
  */
+ 
+/**
+ * \defgroup engine3d Crystal Space 3D Engine
+ * @{ */
+
+	/**
+	 * \defgroup engine3d_light Lighting
+	 */
+ 
+	/**
+	 * \defgroup engine3d_meshes Mesh support
+	 */
+ 
+	/**
+	 * \defgroup engine3d_textures Textures & Materials
+	 */
+ 
+	/**
+	 * \defgroup engine3d_views Views & Cameras
+	 */
+ 
+	/**
+	 * \defgroup engine3d_vis Visibility
+	 */
+	 
+/** @} */
  
 /**
  * \defgroup csws Crystal Space Windowing System
@@ -188,32 +218,6 @@
 	 * \defgroup csws_stddlg Standard dialogs
 	 */
  
-/** @} */
- 
-/**
- * \defgroup engine3d Crystal Space 3D Engine
- * @{ */
-
-	/**
-	 * \defgroup engine3d_light Lighting
-	 */
- 
-	/**
-	 * \defgroup engine3d_meshes Mesh support
-	 */
- 
-	/**
-	 * \defgroup engine3d_textures Textures & Materials
-	 */
- 
-	/**
-	 * \defgroup engine3d_views Views & Cameras
-	 */
- 
-	/**
-	 * \defgroup engine3d_vis Visibility
-	 */
-	 
 /** @} */
  
 /**

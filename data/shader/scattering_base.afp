@@ -1,0 +1,54 @@
+<arbfp>
+  <description>fragment program for terrain base map w/ scattering</description>
+   
+  <variablemap variable="STANDARD_LIGHT_0_DIFFUSE" destination="register 1"/>
+      
+<program>
+    <![CDATA[
+!!ARBfp1.0
+
+PARAM light0color 	= program.local[1];
+
+ATTRIB iTex0		= fragment.texcoord[0];
+ATTRIB iLightDir	= fragment.texcoord[1];
+ATTRIB iLodBlend	= fragment.texcoord[2];
+ATTRIB iCol0		= fragment.color;
+# Outputs
+OUTPUT oCol 		= result.color;
+
+TEMP eyevects;
+TEMP rgb, normal, height, temp, bump, total;
+TEMP light0tsvec;
+TEMP newtexcoord;
+
+
+TEMP normalizedEyeVector;
+TEMP heightVal;
+
+# get texture data
+TEX rgb, iTex0, texture[0], 2D;
+TEX normal, iTex0, texture[1], 2D;
+
+# Transform normal to CS space
+SWZ normal, normal, x, z, y, w;
+
+# remove scale and bias from the normal map
+MAD normal, normal, 2.0, -1.0;
+
+# normal dot lightdir
+DP3 bump, normal, iLightDir;
+
+# add light0 color
+MUL_SAT total, bump, light0color;
+
+# multiply by regular texture map color
+MUL_SAT temp, rgb, total;
+
+# add scattering
+MAD oCol, temp, iLodBlend, iCol0;
+
+END
+]]>
+  </program>
+</arbfp>
+

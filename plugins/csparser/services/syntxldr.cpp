@@ -31,6 +31,7 @@
 #include "csgeom/vector2.h"
 #include "csgeom/transfrm.h"
 #include "csgfx/gradient.h"
+#include "csgfx/renderbuffer.h"
 #include "csgfx/shadervar.h"
 #include "cstool/keyval.h"
 #include "ivideo/graph3d.h"
@@ -1121,6 +1122,11 @@ bool csTextSyntaxService::WriteKey (iDocumentNode *node, iKeyValuePair *keyvalue
     node->SetAttribute (name, keyvalue->GetValue (name));
   }
   return true;
+}
+
+csRef<iRenderBuffer> csTextSyntaxService::ParseRenderBuffer (iDocumentNode* node)
+{
+  return 0;
 }
 
 void csTextSyntaxService::ReportError (const char* msgid,

@@ -34,6 +34,8 @@
 
 /**
  * Base class for iImage implementations. Cannot be instantiated itself.
+ * \remark SCF_CONSTRUCT_IBASE()/SCF_DESTRUCT_IBASE() invokation has to
+ *  be done by descendants!
  */
 class csImageBase : public iImage
 {

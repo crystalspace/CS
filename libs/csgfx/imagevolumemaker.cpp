@@ -34,11 +34,14 @@ csImageVolumeMaker::csImageVolumeMaker (int format, int width, int height)
   : csImageBase(), manualName (false), Width (width), Height (height), Depth (0),
   Format (format), data (0), palette (0), alpha (0)
 {
+  SCF_CONSTRUCT_IBASE(0);
 }
 
 csImageVolumeMaker::csImageVolumeMaker (iImage* source)
   : csImageBase(), manualName (false)
 {
+  SCF_CONSTRUCT_IBASE(0);
+
   Format = source->GetFormat();
   Width = source->GetWidth();
   Height = source->GetHeight();
@@ -89,6 +92,8 @@ csImageVolumeMaker::~csImageVolumeMaker()
   }
   delete[] palette;
   delete[] alpha;
+
+  SCF_DESTRUCT_IBASE();
 }
 
 void csImageVolumeMaker::AppendPending ()

@@ -33,8 +33,12 @@
       <file>/lev/terrain/grassDOT3.png</file>
       <class>normalmap</class>
     </texture>
-    <texture name="materialmap_base.png">
+    <texture name="basemap">
       <file>/lev/terrain/materialmap_base.png</file>
+    </texture>
+    <texture name="base_normalmap">
+      <file>/lev/terrain/normalmap.png</file>
+      <class>normalmap</class>
     </texture>
   </textures>
 
@@ -52,7 +56,8 @@
       <shader type="ambient">sky_scattering</shader>
     </material>
     <material name="Base">
-      <texture>materialmap_base.png</texture>
+      <texture>basemap</texture>
+      <shadervar name="tex normal" type="texture">base_normalmap</shadervar>
       <!-- <shader type="ambient">splatting_scattering_base</shader> -->
       <shader type="ambient">splatting_scattering_base</shader>
     </material>

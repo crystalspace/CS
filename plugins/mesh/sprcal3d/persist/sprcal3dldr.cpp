@@ -435,6 +435,17 @@ csPtr<iBase> csSpriteCal3DFactoryLoader::Parse (iDocumentNode* node,
       }
     case XMLTOKEN_MATERIAL:
       {
+#ifdef CS_DEBUG
+	static bool styleReminder = true;
+	if (styleReminder)
+	{
+	  synldr->Report (crystalspace.mesh.loader.factory.sprite.cal3d, 
+	    CS_REPORTER_SEVERITY_NOTIFY, child, 
+	    "Material definitions in meshes is not considered good style, "
+	    "if you need to define a mesh and material at the same time use "
+	    "libraries.");
+	}
+#endif
         const char *file = child->GetAttributeValue("file");
         const char *matName = child->GetAttributeValue("name");
         if (!LoadMaterialTag(newspr,child,ldr_context,file, matName))

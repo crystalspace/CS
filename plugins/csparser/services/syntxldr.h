@@ -99,6 +99,8 @@ public:
   virtual bool ParseKey (iDocumentNode* node, iKeyValuePair* &keyvalue);
   virtual bool WriteKey (iDocumentNode* node, iKeyValuePair* keyvalue);
 
+  virtual csRef<iRenderBuffer> ParseRenderBuffer (iDocumentNode* node);
+
   virtual void ReportError (const char* msgid, iDocumentNode* errornode,
 	const char* msg, ...);
   virtual void ReportBadToken (iDocumentNode* badtokennode);

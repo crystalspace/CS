@@ -9,6 +9,12 @@
   <variablemap variable="hg" destination="register 7" />
   <variablemap variable="inscattering term" destination="register 8" />
   <variablemap variable="mat reflection" destination="register 9" />
+  
+  <?if vars."tex normal"?>
+    <!-- some things only needed by when using the PPL base map -->
+    <variablemap variable="texture lod distance" destination="register 6"/>
+  <?endif?>
+  
   <program>
     <![CDATA[
       !!ARBvp1.0
@@ -41,8 +47,16 @@
       # Output information
       OUTPUT oPos		= result.position;
       OUTPUT oCol0		= result.color;
+      ATTRIB iTex0		= vertex.texcoord[0];
       OUTPUT oTex0		= result.texcoord[0];
-      
+    ]]>
+    <?if vars."tex normal"?>
+      PARAM loddist             = program.local[6];
+      OUTPUT oLightDir		= result.texcoord[1];
+      OUTPUT oLodBlend		= result.texcoord[2];
+      TEMP lodblend;
+    <?endif?>
+    <![CDATA[
       # Temporaries
       TEMP worldPos;
       TEMP objLight;
@@ -56,8 +70,8 @@
       TEMP extinction;
       TEMP inscatter;
       
-      MOV oTex0, ones;
-
+      MOV oTex0, iTex0;
+      
       ###
       # transform positon to perspective space
       DP4 oPos.x, mvp[0], iPos;
@@ -91,6 +105,15 @@
       ADD objEye, objEye, -iPos;
       DP3 objEye.w, objEye, objEye;
       RSQ objEye.w, objEye.w;
+    ]]>
+    <?if vars."tex normal"?>
+      MUL lodblend, objEye.w, loddist;
+      RCP lodblend.x, lodblend.x;
+      MIN lodblend.x, lodblend.x, eyePos.w;
+      MOV oLightDir, objLight;
+      MOV oLodBlend, lodblend.xxxx;
+    <?endif?>
+    <![CDATA[
       RCP theta.z, objEye.w;
       MUL objEye, objEye, objEye.w;
       
