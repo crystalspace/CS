@@ -26,7 +26,7 @@ litConfigParser::litConfigParser (Lighter* lighter, iObjectRegistry* object_reg)
 {
   litConfigParser::lighter = lighter;
   litConfigParser::object_reg = object_reg;
-  init_token_table (xmltokens);
+  InitTokenTable (xmltokens);
 }
 
 csRef<iDocumentNode> litConfigParser::FindChildNode (iDocumentNode* node)

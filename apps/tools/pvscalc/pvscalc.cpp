@@ -139,7 +139,7 @@ PVSCalcSector::PVSCalcSector (PVSCalc* parent, iSector* sector, iPVSCuller* pvs)
   // Minimum size for kdtree nodes.
   minsize_specified = false;
 
-  init_token_table (xmltokens);
+  InitTokenTable (xmltokens);
 }
 
 PVSCalcSector::~PVSCalcSector ()

@@ -12,6 +12,7 @@ chronological order.
 	- res changed csparser to use the token table mechanism.
 	- res added the ability to attach shader vars to mesh objects.
 	- res unbotched some string splitting code.
+	- Vincent fixed remaing init_token_table calls to InitTokenTable.
 18-Feb-2005
 	- Jorrit worked further on PVSCalc:
 	    - Some small fixes on kdtree building.
