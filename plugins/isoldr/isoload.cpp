@@ -165,7 +165,7 @@ StdIsoLoaderContext::~StdIsoLoaderContext ()
 {
 }
 
-iSector* StdIsoLoaderContext::FindSector (const char* name)
+iSector* StdIsoLoaderContext::FindSector (const char* /*name*/)
 {
   return NULL;
 }
@@ -180,7 +180,7 @@ iMeshFactoryWrapper* StdIsoLoaderContext::FindMeshFactory (const char* name)
   return Engine->GetMeshFactories ()->FindByName(name);
 }
 
-iMeshWrapper* StdIsoLoaderContext::FindMeshObject (const char* name)
+iMeshWrapper* StdIsoLoaderContext::FindMeshObject (const char* /*name*/)
 {
   return NULL;
 }
@@ -429,7 +429,7 @@ bool csIsoLoader::LoadMap (char* buf)
   return true;
 }
 
-bool csIsoLoader::ParseStart (char* buf, const char* prefix)
+bool csIsoLoader::ParseStart (char* buf, const char* /*prefix*/)
 {
   CS_TOKEN_TABLE_START(commands)
     CS_TOKEN_TABLE (POSITION)
@@ -463,7 +463,7 @@ bool csIsoLoader::ParseStart (char* buf, const char* prefix)
   return true;
 }
 
-bool csIsoLoader::ParsePluginList(char* buf, const char* prefix)
+bool csIsoLoader::ParsePluginList(char* buf, const char* /*prefix*/)
 {
   CS_TOKEN_TABLE_START (commands)
     CS_TOKEN_TABLE (PLUGIN)
@@ -498,7 +498,7 @@ bool csIsoLoader::ParsePluginList(char* buf, const char* prefix)
   return true;
 }
 
-bool csIsoLoader::ParseGridList (char* buf, const char* prefix)
+bool csIsoLoader::ParseGridList (char* buf, const char* /*prefix*/)
 {
   CS_TOKEN_TABLE_START (commands)
     CS_TOKEN_TABLE (GRID)
@@ -530,7 +530,7 @@ bool csIsoLoader::ParseGridList (char* buf, const char* prefix)
   return true;
 }
 
-bool csIsoLoader::ParseGrid (char* buf, const char* prefix)
+bool csIsoLoader::ParseGrid (char* buf, const char* /*prefix*/)
 {
   CS_TOKEN_TABLE_START (commands)
     CS_TOKEN_TABLE (SIZE)
@@ -607,7 +607,7 @@ bool csIsoLoader::ParseGrid (char* buf, const char* prefix)
   return true;
 }
 
-bool csIsoLoader::ParseLight (char* buf, const char* prefix)
+bool csIsoLoader::ParseLight (char* buf, const char* /*prefix*/)
 {
   CS_TOKEN_TABLE_START (commands)
     CS_TOKEN_TABLE (ATTENUATION)
@@ -683,7 +683,7 @@ bool csIsoLoader::ParseLight (char* buf, const char* prefix)
 }
 
 
-bool csIsoLoader::ParseTile2D (char* buf, const char* prefix)
+bool csIsoLoader::ParseTile2D (char* buf, const char* /*prefix*/)
 {
   CS_TOKEN_TABLE_START (commands)
     CS_TOKEN_TABLE (START)
@@ -865,7 +865,7 @@ bool csIsoLoader::ParseTile2D (char* buf, const char* prefix)
   return true;
 }
 
-bool csIsoLoader::ParseMaterialList (char* buf, const char* prefix)
+bool csIsoLoader::ParseMaterialList (char* buf, const char* /*prefix*/)
 {
   if (!Engine) return false;
 
@@ -1026,7 +1026,7 @@ bool csIsoLoader::ParseMeshObject (char* buf, const char* prefix)
   char* tag = "crystalspace.iso.loader.parsemeshobject"; 
   char* params;
   char* name;
-  char str[255]; str[0] = NULL;
+  char str[255]; str[0] = '\0';
   long cmd;
 
   iMeshObject* meshobj = NULL;
