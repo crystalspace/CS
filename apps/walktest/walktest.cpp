@@ -54,12 +54,13 @@
 #include "itxtmgr.h"
 #include "isndrdr.h"
 
-
 #if defined(OS_DOS) || defined(OS_WIN32) || defined (OS_OS2)
 #  include <io.h>
 #elif defined(OS_UNIX)
 #  include <unistd.h>
 #endif
+
+#include "debug/fpu80x86.h"	// for debugging numerical instabilities
 
 WalkTest *Sys;
 converter *ImportExport;
@@ -434,33 +435,6 @@ void stop_demo ()
 }
 
 
-/*---------------------------------------------------------------------*
- * Test code for enabling FPU exceptions (experimental)
- *---------------------------------------------------------------------*/
-
-#if 0
-unsigned int _control87(unsigned int newcw, unsigned int mask)
-{
-  int oldcw;
-  asm
-  (
-        "       fclex                   \n"     // clear exceptions
-        "       fstcw   %0              \n"     // oldcw = FPU control word
-        "       movl    %2,%%eax        \n"     // eax = mask
-        "       notl    %%eax           \n"     // eax = ~eax
-        "       movzwl  %%ax,%%eax      \n"     // eax &= 0xffff
-        "       andl    %0,%%eax        \n"     // eax &= oldcw;
-        "       movl    %2,%%ecx        \n"     // ecx = mask
-        "       andl    %1,%%ecx        \n"     // ecx &= newcw
-        "       orl     %%ecx,%%eax     \n"     // eax |= ecx
-        "       movl    %%eax,%0        \n"     // oldcw = eax
-        "       fldcw   %0              \n"     // load FPU control word
-        : : "m" (oldcw), "g" (newcw), "g" (mask) : "eax", "ecx"
-  );
-  return oldcw;
-}
-#endif
-
 #if 0
 
 void TestFrustrum ()
@@ -498,22 +472,16 @@ void TestFrustrum ()
 
 #endif
 
-
 /*---------------------------------------------------------------------*
  * Main function
  *---------------------------------------------------------------------*/
 int main (int argc, char* argv[])
 {
-  //printf ("Initial control word: %04x\n", _control87 (0, 0));
-  //_control87 (0x32, 0x3f);
-
   srand (time (NULL));
 
   // Create our main class which is the driver for WalkTest.
   CHK (Sys = new WalkTest ());
 
-
- 
   // Open our configuration file and read the configuration values
   // specific for WalkTest.
   //@@@Config should belong to WalkTest.
@@ -553,6 +521,11 @@ int main (int argc, char* argv[])
     cleanup ();
     fatal_exit (0, false);
   }
+
+  // enable all kinds of useful exceptions on a x86
+  // note that we can't do it above since at least on OS/2 each dynamic
+  // library on loading/initialization resets the control word to default
+//_control87 (0x32, 0x3f);
 
   // Open the main system. This will open all the previously loaded
   // COM drivers.
