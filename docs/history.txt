@@ -26,6 +26,7 @@ The history order is reversed so that new features are at the top.
 	- Matze disabled csperl5 Jamfile, until it is fixed, but I don't want to
 	  mess around here without having a working example (a working
 	  makefile).
+        - JTarbox updated the event object from csVector to csArray<>
 28-Apr-2003
 	- Matze fixed vfs.cfg generation when doing jam install.
 	- Eric Sunshine made the following changes to the cspython build

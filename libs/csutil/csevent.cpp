@@ -21,6 +21,7 @@
 #include "cssysdef.h"
 #include "csutil/csevent.h"
 #include "csutil/cseventq.h"
+#include "csutil/array.h"
 #include "csutil/memfile.h"
 
 SCF_IMPLEMENT_IBASE (csEvent)
@@ -187,13 +188,13 @@ bool csEvent::Add(const char *name, int8 v)
 {
   attribute *object = new attribute(attribute::tag_int8);
   object->Integer = v;
-  csVector *v1 = (csVector *) attributes.Get(csHashCompute(name));
+  csArray<attribute *> *v1 = (csArray<attribute *> *) attributes.Get(csHashCompute(name));
   if (!v1) 
   {
-    v1 = new csVector();
+    v1 = new csArray<attribute *>;
     attributes.Put(name, (csHashObject) v1);
   }
-  v1->Push((void*) object);
+  v1->Push(object);
   count++;
   return true;
 }
@@ -202,13 +203,13 @@ bool csEvent::Add(const char *name, uint8 v)
 {
   attribute *object = new attribute(attribute::tag_uint8);
   object->Unsigned = v;
-  csVector *v1 = (csVector *) attributes.Get(csHashCompute(name));
+  csArray<attribute *> *v1 = (csArray<attribute *> *) attributes.Get(csHashCompute(name));
   if (!v1) 
   {
-    v1 = new csVector();
+    v1 = new csArray<attribute *>;
     attributes.Put(name, (csHashObject) v1);
   }
-  v1->Push((void*) object);
+  v1->Push(object);
   count++;
   return true;
 }
@@ -217,13 +218,13 @@ bool csEvent::Add(const char *name, int16 v)
 {
   attribute *object = new attribute(attribute::tag_int16);
   object->Integer = v;
-  csVector *v1 = (csVector *) attributes.Get(csHashCompute(name));
+  csArray<attribute *> *v1 = (csArray<attribute *> *) attributes.Get(csHashCompute(name));
   if (!v1) 
   {
-    v1 = new csVector();
+    v1 = new csArray<attribute *>;
     attributes.Put(name, (csHashObject) v1);
   }
-  v1->Push((void*) object);
+  v1->Push(object);
   count++;
   return true;
 }
@@ -232,13 +233,13 @@ bool csEvent::Add(const char *name, uint16 v)
 {
   attribute *object = new attribute(attribute::tag_uint16);
   object->Unsigned = v;
-  csVector *v1 = (csVector *) attributes.Get(csHashCompute(name));
+  csArray<attribute *> *v1 = (csArray<attribute *> *) attributes.Get(csHashCompute(name));
   if (!v1) 
   {
-    v1 = new csVector();
+    v1 = new csArray<attribute *>;
     attributes.Put(name, (csHashObject) v1);
   }
-  v1->Push((void*) object);
+  v1->Push(object);
   count++;
   return true;
 }
@@ -255,13 +256,13 @@ bool csEvent::Add(const char *name, int32 v, bool force_boolean)
   {
     object->Integer = v;
   }
-  csVector *v1 = (csVector *) attributes.Get(csHashCompute(name));
+  csArray<attribute *> *v1 = (csArray<attribute *> *) attributes.Get(csHashCompute(name));
   if (!v1) 
   {
-    v1 = new csVector();
+    v1 = new csArray<attribute *>;
     attributes.Put(name, (csHashObject) v1);
   }
-  v1->Push((void*) object);
+  v1->Push(object);
   count++;
   return true;
 }
@@ -270,13 +271,13 @@ bool csEvent::Add(const char *name, uint32 v)
 {
   attribute *object = new attribute(attribute::tag_uint32);
   object->Unsigned = v;
-  csVector *v1 = (csVector *) attributes.Get(csHashCompute(name));
+  csArray<attribute *> *v1 = (csArray<attribute *> *) attributes.Get(csHashCompute(name));
   if (!v1) 
   {
-    v1 = new csVector();
+    v1 = new csArray<attribute *>;
     attributes.Put(name, (csHashObject) v1);
   }
-  v1->Push((void*) object);
+  v1->Push(object);
   count++;
   return true;
 }
@@ -285,13 +286,13 @@ bool csEvent::Add(const char *name, int64 v)
 {
   attribute *object = new attribute(attribute::tag_int64);
   object->Integer = v;
-  csVector *v1 = (csVector *) attributes.Get(csHashCompute(name));
+  csArray<attribute *> *v1 = (csArray<attribute *> *) attributes.Get(csHashCompute(name));
   if (!v1) 
   {
-    v1 = new csVector();
+    v1 = new csArray<attribute *>;
     attributes.Put(name, (csHashObject) v1);
   }
-  v1->Push((void*) object);
+  v1->Push(object);
   count++;
   return true;
 }
@@ -300,13 +301,13 @@ bool csEvent::Add(const char *name, uint64 v)
 {
   attribute *object = new attribute(attribute::tag_uint64);
   object->Unsigned = v;
-  csVector *v1 = (csVector *) attributes.Get(csHashCompute(name));
+  csArray<attribute *> *v1 = (csArray<attribute *> *) attributes.Get(csHashCompute(name));
   if (!v1) 
   {
-    v1 = new csVector();
+    v1 = new csArray<attribute *>;
     attributes.Put(name, (csHashObject) v1);
   }
-  v1->Push((void*) object);
+  v1->Push(object);
   count++;
   return true;
 }
@@ -315,13 +316,13 @@ bool csEvent::Add(const char *name, float v)
 {
   attribute *object = new attribute(attribute::tag_float);
   object->Double = v;
-  csVector *v1 = (csVector *) attributes.Get(csHashCompute(name));
+  csArray<attribute *> *v1 = (csArray<attribute *> *) attributes.Get(csHashCompute(name));
   if (!v1) 
   {
-    v1 = new csVector();
+    v1 = new csArray<attribute *>;
     attributes.Put(name, (csHashObject) v1);
   }
-  v1->Push((void*) object);
+  v1->Push(object);
   count++;
   return true;
 }
@@ -330,13 +331,13 @@ bool csEvent::Add(const char *name, double v)
 {
   attribute *object = new attribute(attribute::tag_double);
   object->Double = v;
-  csVector *v1 = (csVector *) attributes.Get(csHashCompute(name));
+  csArray<attribute *> *v1 = (csArray<attribute *> *) attributes.Get(csHashCompute(name));
   if (!v1) 
   {
-    v1 = new csVector();
+    v1 = new csArray<attribute *>;
     attributes.Put(name, (csHashObject) v1);
   }
-  v1->Push((void*) object);
+  v1->Push(object);
   count++;
   return true;
 }
@@ -355,13 +356,13 @@ bool csEvent::Add(const char *name, bool v, bool force_boolean)
   {
     object->Bool = v;
   }
-  csVector *v1 = (csVector *) attributes.Get(csHashCompute(name));
+  csArray<attribute *> *v1 = (csArray<attribute *> *) attributes.Get(csHashCompute(name));
   if (!v1) 
   {
-    v1 = new csVector();
+    v1 = new csArray<attribute *>;
     attributes.Put(name, (csHashObject) v1);
   }
-  v1->Push((void*) object);
+  v1->Push(object);
   count++;
   return true;
 }
@@ -374,13 +375,13 @@ bool csEvent::Add(const char *name, char *v)
   object->length = strlen(v);
   object->String = new char[(object->length+1)];
   strcpy(object->String, v);
-  csVector *v1 = (csVector *) attributes.Get(csHashCompute(name));
+  csArray<attribute *> *v1 = (csArray<attribute *> *) attributes.Get(csHashCompute(name));
   if (!v1) 
   {
-    v1 = new csVector();
+    v1 = new csArray<attribute *>;
     attributes.Put(name, (csHashObject) v1);
   }
-  v1->Push((void*) object);
+  v1->Push(object);
   count++;
   return true;
 }
@@ -390,13 +391,13 @@ bool csEvent::Add(const char *name, void *v, uint32 size)
   attribute *object = new attribute(attribute::tag_databuffer);
   object->String = (char *)v;
   object->length = size;
-  csVector *v1 = (csVector *) attributes.Get(csHashCompute(name));
+  csArray<attribute *> *v1 = (csArray<attribute *> *) attributes.Get(csHashCompute(name));
   if (!v1) 
   {
-    v1 = new csVector();
+    v1 = new csArray<attribute *>;
     attributes.Put(name, (csHashObject) v1);
   }
-  v1->Push((void*) object);
+  v1->Push(object);
   count++;
   return true;
 }
@@ -428,13 +429,13 @@ bool csEvent::Add(const char *name, iEvent *v)
       {
         object->Event->Add("_parent", this);
       }
-      csVector *v1 = (csVector *) attributes.Get(csHashCompute(name));
+      csArray<attribute *> *v1 = (csArray<attribute *> *) attributes.Get(csHashCompute(name));
       if (!v1) 
       {
-        v1 = new csVector();
+        v1 = new csArray<attribute *>;
         attributes.Put(name, (csHashObject) v1);
       }
-      v1->Push((void*) object);
+      v1->Push(object);
       count++;
       return true;
     }
@@ -444,7 +445,7 @@ bool csEvent::Add(const char *name, iEvent *v)
 
 bool csEvent::Find(const char *name, int8 &v, int index)
 {
-  csVector *v1 = (csVector *) attributes.Get(csHashCompute(name));
+  csArray<attribute *> *v1 = (csArray<attribute *> *) attributes.Get(csHashCompute(name));
   if (v1)
   {
     attribute *object = (attribute *) v1->Get(index);
@@ -459,7 +460,7 @@ bool csEvent::Find(const char *name, int8 &v, int index)
   
 bool csEvent::Find(const char *name, uint8 &v, int index)
 {
-  csVector *v1 = (csVector *) attributes.Get(csHashCompute(name));
+  csArray<attribute *> *v1 = (csArray<attribute *> *) attributes.Get(csHashCompute(name));
   if (v1)
   {
     attribute *object = (attribute *) v1->Get(index);
@@ -474,7 +475,7 @@ bool csEvent::Find(const char *name, uint8 &v, int index)
   
 bool csEvent::Find(const char *name, int16 &v, int index)
 {
-  csVector *v1 = (csVector *) attributes.Get(csHashCompute(name));
+  csArray<attribute *> *v1 = (csArray<attribute *> *) attributes.Get(csHashCompute(name));
   if (v1)
   {
     attribute *object = (attribute *) v1->Get(index);
@@ -489,7 +490,7 @@ bool csEvent::Find(const char *name, int16 &v, int index)
   
 bool csEvent::Find(const char *name, uint16 &v, int index)
 {
-  csVector *v1 = (csVector *) attributes.Get(csHashCompute(name));
+  csArray<attribute *> *v1 = (csArray<attribute *> *) attributes.Get(csHashCompute(name));
   if (v1)
   {
     attribute *object = (attribute *) v1->Get(index);
@@ -504,7 +505,7 @@ bool csEvent::Find(const char *name, uint16 &v, int index)
 
 bool csEvent::Find(const char *name, int32 &v, int index)
 {
-  csVector *v1 = (csVector *) attributes.Get(csHashCompute(name));
+  csArray<attribute *> *v1 = (csArray<attribute *> *) attributes.Get(csHashCompute(name));
   if (v1)
   {
     attribute *object = (attribute *) v1->Get(index);
@@ -519,7 +520,7 @@ bool csEvent::Find(const char *name, int32 &v, int index)
   
 bool csEvent::Find(const char *name, uint32 &v, int index)
 {
-  csVector *v1 = (csVector *) attributes.Get(csHashCompute(name));
+  csArray<attribute *> *v1 = (csArray<attribute *> *) attributes.Get(csHashCompute(name));
   if (v1)
   {
     attribute *object = (attribute *) v1->Get(index);
@@ -534,7 +535,7 @@ bool csEvent::Find(const char *name, uint32 &v, int index)
 
 bool csEvent::Find(const char *name, int64 &v, int index)
 {
-  csVector *v1 = (csVector *) attributes.Get(csHashCompute(name));
+  csArray<attribute *> *v1 = (csArray<attribute *> *) attributes.Get(csHashCompute(name));
   if (v1)
   {
     attribute *object = (attribute *) v1->Get(index);
@@ -549,7 +550,7 @@ bool csEvent::Find(const char *name, int64 &v, int index)
   
 bool csEvent::Find(const char *name, uint64 &v, int index)
 {
-  csVector *v1 = (csVector *) attributes.Get(csHashCompute(name));
+  csArray<attribute *> *v1 = (csArray<attribute *> *) attributes.Get(csHashCompute(name));
   if (v1)
   {
     attribute *object = (attribute *) v1->Get(index);
@@ -564,7 +565,7 @@ bool csEvent::Find(const char *name, uint64 &v, int index)
   
 bool csEvent::Find(const char *name, float &v, int index)
 {
-  csVector *v1 = (csVector *) attributes.Get(csHashCompute(name));
+  csArray<attribute *> *v1 = (csArray<attribute *> *) attributes.Get(csHashCompute(name));
   if (v1)
   {
     attribute *object = (attribute *) v1->Get(index);
@@ -579,7 +580,7 @@ bool csEvent::Find(const char *name, float &v, int index)
 
 bool csEvent::Find(const char *name, double &v, int index)
 {
-  csVector *v1 = (csVector *) attributes.Get(csHashCompute(name));
+  csArray<attribute *> *v1 = (csArray<attribute *> *) attributes.Get(csHashCompute(name));
   if (v1)
   {
     attribute *object = (attribute *) v1->Get(index);
@@ -594,7 +595,7 @@ bool csEvent::Find(const char *name, double &v, int index)
 
 bool csEvent::Find(const char *name, char **v, int index)
 {
-  csVector *v1 = (csVector *) attributes.Get(csHashCompute(name));
+  csArray<attribute *> *v1 = (csArray<attribute *> *) attributes.Get(csHashCompute(name));
   if (v1)
   {
     attribute *object = (attribute *) v1->Get(index);
@@ -609,7 +610,7 @@ bool csEvent::Find(const char *name, char **v, int index)
 
 bool csEvent::Find(const char *name, void **v, uint32 &size, int index)
 {
-  csVector *v1 = (csVector *) attributes.Get(csHashCompute(name));
+  csArray<attribute *> *v1 = (csArray<attribute *> *) attributes.Get(csHashCompute(name));
   if (v1)
   {
     attribute *object = (attribute *) v1->Get(index);
@@ -627,7 +628,7 @@ bool csEvent::Find(const char *name, void **v, uint32 &size, int index)
 
 bool csEvent::Find(const char *name, bool &v, int index)
 {
-  csVector *v1 = (csVector *) attributes.Get(csHashCompute(name));
+  csArray<attribute *> *v1 = (csArray<attribute *> *) attributes.Get(csHashCompute(name));
   if (v1)
   {
     attribute *object = (attribute *) v1->Get(index);
@@ -644,7 +645,7 @@ bool csEvent::Find(const char *name, bool &v, int index)
 
 bool csEvent::Find(const char *name, iEvent **v, int index)
 {
-  csVector *v1 = (csVector *) attributes.Get(csHashCompute(name));
+  csArray<attribute *> *v1 = (csArray<attribute *> *) attributes.Get(csHashCompute(name));
   if (v1)
   {
     attribute *object = (attribute *) v1->Get(index);
@@ -662,7 +663,7 @@ bool csEvent::Remove(const char *name, int index)
   if (index == -1)
   {
     // remove all in the vector, and remove the vector from the hashmap
-    csVector *v = (csVector *) attributes.Get(csHashCompute(name));
+    csArray<attribute *> *v = (csArray<attribute *> *) attributes.Get(csHashCompute(name));
     if (v)
     {
       attribute *object = NULL;
@@ -691,7 +692,7 @@ bool csEvent::Remove(const char *name, int index)
   {
     // remove only the listed index from the vector, if it's the only one 
     // in the vector, remove the vector from the hashmap
-    csVector *v = (csVector *) attributes.Get(csHashCompute(name));
+    csArray<attribute *> *v = (csArray<attribute *> *) attributes.Get(csHashCompute(name));
     if (v)
     {
       attribute *object = (attribute *) v->Get(index);
@@ -720,7 +721,7 @@ bool csEvent::RemoveAll()
   csGlobalHashIteratorReversible iter(&attributes);
   while (iter.HasNext())
   {
-    csVector *v = (csVector *) iter.Next();
+    csArray<attribute *> *v = (csArray<attribute *> *) iter.Next();
     if (strcmp("_parent", iter.GetKey()) != 0)
     {
       if (v)
@@ -756,7 +757,7 @@ bool csEvent::Print(int32 level)
   csGlobalHashIteratorReversible iter(&attributes);
   while (iter.HasNext())
   {
-    csVector *v = (csVector *) iter.Next();
+    csArray<attribute *> *v = (csArray<attribute *> *) iter.Next();
     if (v)
     {
       attribute *object = NULL;
@@ -845,7 +846,7 @@ uint32 csEvent::FlattenSizeCrystal()
 
   while (iter.HasNext())
   {
-    csVector *v = (csVector *) iter.Next();
+    csArray<attribute *> *v = (csArray<attribute *> *) iter.Next();
     if (v)
     {
       attribute *object = NULL;
@@ -1031,7 +1032,7 @@ bool csEvent::FlattenCrystal(char * buffer)
    
   while (iter.HasNext())
   {
-    csVector *v = (csVector *) iter.Next();
+    csArray<attribute *> *v = (csArray<attribute *> *) iter.Next();
     if (v)
     {
       attribute *object = NULL;
