@@ -569,6 +569,10 @@ void csThing::MergeTemplate (csThingTemplate* tpl,
       if (pt->UseGouraud ())
         gs->EnableGouraud (true);
     }
+    if (pt->UseFlatColor ()){
+      p->SetFlatColor( pt->GetFlatColor().red, pt->GetFlatColor().green, pt->GetFlatColor().blue);
+    }
+    
     p->SetTextureSpace (pt->GetTextureMatrix (), pt->GetTextureVector ());
   }
 
