@@ -1,7 +1,7 @@
 The history order is reversed so that new features are at the top.
 
 27-Feb-2003
-  - Philip Wyett imported Matze's Cygwin socket changes from main CVS. 
+	- Philip Wyett imported Matze's Cygwin socket changes from main CVS. 
 26-Feb-2003
 	- Christian Bayle added some missing dependancy to enable to compile
 	  libs as shared
