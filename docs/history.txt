@@ -32,6 +32,15 @@ The history order has been reversed so that new features are at the top.
 	  resulted in method implementations which looped infinitely, such as
 	  "csSector::IncRef() { csSector::IncRef(); }".  Now properly passes
 	  in csPolygonSet as the parent class.
+	- Eric Sunshine fixed the help message formatting in several recently
+	  added makefiles.  He also fixed several makefiles which were recently
+	  moved from CS/lib to CS/plugins to use PLUGINHELP rather than
+	  DRIVERHELP.
+	- Eric Sunshine fixed the STATIC_SCF define in several makefiles.
+	- Eric Sunshine renamed the "Protocol" instance variable in
+	  csSystemDriver to "NetProtocol" in order to better reflect its true
+	  meaning.  This also works around a name clash with the Objective-C
+	  class "Protocol".
 27-Apr-2000
 	- Frank O'Connor updated VC project files for NetComm and
 	  the scfTutor apps (zoo, dog, worm).
