@@ -3915,8 +3915,7 @@ void csLoader::terrain_process (csSector& sector, char* name, char* buf)
 
 //---------------------------------------------------------------------------
 
-csSoundDataObject* csLoader::load_sound(char* name, const char* filename)
-{
+iSoundData* csLoader::LoadSoundData(const char* filename) {
   /* @@@ get the needed plugin interfaces:
    * when moving the loader to a plug-in, this should be done
    * at initialization, and pointers shouldn't be DecRef'ed here.
@@ -3964,9 +3963,23 @@ csSoundDataObject* csLoader::load_sound(char* name, const char* filename)
     return NULL;
   }
 
+  return Sound;
+}
+
+
+csSoundDataObject *csLoader::LoadSoundObject (csWorld* world,
+  char* name, const char* fname) {
+
+  World=world;
+  /* load the sound data */
+  iSoundData *Sound = LoadSoundData(fname);
+
   /* build wrapper object */
   csSoundDataObject* sndobj = new csSoundDataObject (Sound);
   sndobj->SetName (name);
+
+  /* add it to the world */
+// @@@ world->GetSounds()->Add(sndobj);
 
   return sndobj;
 }
@@ -4444,7 +4457,7 @@ bool csLoader::LoadSounds (char* buf)
         iSoundData *snd = csSoundDataObject::GetSound (*World, name);
         if (!snd)
         {
-          csSoundDataObject *s = load_sound (name, filename);
+          csSoundDataObject *s = LoadSoundObject(World, name, filename);
           if (s)
           {
             World->ObjAdd(s);

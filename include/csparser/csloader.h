@@ -29,6 +29,7 @@ struct csRGBcolor;
 struct Color;
 struct iMotion;
 struct iMotionAnim;
+struct iSoundData;
 class csTextureWrapper;
 class csMaterialWrapper;
 class csSkeletonLimb;
@@ -133,9 +134,6 @@ class csLoader
   /// Parse a sector definition and return a new object
   static csSector* load_sector (char* secname, char* buf);
 
-  /// Load a sound and return a new object
-  static csSoundDataObject* load_sound (char* name, const char* filename);
-
   /// Load a skeleton part.
   static bool LoadSkeleton (csSkeletonLimb* limb, char* buf, bool is_connection);
 
@@ -233,6 +231,13 @@ public:
   /// Load a image and return an iImage object
   static iImage* LoadImage (const char* name)
   { return load_image (name); }
+
+  /// Load a sound and return an iSoundData object
+  static iSoundData *LoadSoundData (const char *filename);
+
+  /// Load a sound and add it to the world
+  static csSoundDataObject *LoadSoundObject (csWorld* world, char* name,
+    const char* fname);
 
   /// Set loader mode (see CS_LOADER_XXX flags above)
   static void SetMode (int iFlags);
