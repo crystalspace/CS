@@ -118,12 +118,8 @@ struct iNetworkManager : public iPlugIn
 
   virtual void SetPollCounter(int counter) = 0;
 
-  virtual int StartServer(int csNetPort) =0;
-  virtual int StartAllServers() =0;
-
   virtual void Update() = 0;
   virtual bool HandleEvent()= 0;
-
 
   virtual int StopAllConnections() = 0;
   virtual int StopAllServers() =0;
@@ -136,7 +132,6 @@ struct iNetworkManager : public iPlugIn
   virtual void NetControl(int NetPort, int len, char *msg)=0;
 
   virtual void Reset() =0;
-  virtual void Refresh () = 0;
   
   virtual int SendMsg(int csNetPort, int len, char *msg) =0;
   virtual int SendMsg(int csNetPort, char *hostname, int len, char *msg)=0;
@@ -153,8 +148,6 @@ struct iNetworkManager : public iPlugIn
 
   // iPlugIn interface.
   virtual bool Initialize (iSystem*) = 0;
-  virtual void CleanInit() = 0; 
-  virtual void CleanPort(int csNetPort) = 0;
   virtual bool Open () = 0;
   virtual bool Close () = 0;
 
