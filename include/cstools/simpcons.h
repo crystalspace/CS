@@ -131,8 +131,18 @@ public:
   virtual void CacheColors(iTextureManager *txtmgr) { SetupColors(txtmgr); }
   virtual void GetForeground(int &red, int &green, int &blue) const { red = console_fg_r; green = console_fg_g; blue = console_fg_b; }
   virtual void SetForeground(int red, int green, int blue) { console_fg_r = red; console_fg_g = green; console_fg_b = blue; }
-  virtual void GetBackground(int &red, int &green, int &blue, int &alpha) const  { red = console_bg_r; green = console_bg_g; blue = console_bg_b; alpha = console_transparent_bg; }
-  virtual void SetBackground(int red, int green, int blue, int alpha = 0)  { console_bg_r = red; console_bg_g = green; console_bg_b = blue;  console_transparent_bg = alpha; }
+  virtual void GetBackground(int &red, int &green, int &blue) const  { red = console_bg_r; green = console_bg_g; blue = console_bg_b; }
+  virtual void SetBackground(int red, int green, int blue)  { console_bg_r = red; console_bg_g = green; console_bg_b = blue; }
+  virtual void GetPosition(int &, int &, int &, int &) const { /* Not supported */ }
+  virtual void SetPosition(int, int, int = -1, int = -1) { /* Not supported */ }
+  virtual void Invalidate(csRect &) { /* Not supported */ }
+  virtual bool GetTransparency() const { return console_transparent_bg; }
+  virtual void SetTransparency(bool trans) { console_transparent_bg = trans; }
+  virtual int GetFontID() const { return console_font; }
+  virtual void SetFontID(int FontID) { console_font = FontID; }
+  virtual int GetTopLine() const { /* Not supported */ return -1; }
+  virtual void ScrollTo(int, bool = true) { /* Not supported */ }
+
 private:
   /// Time left until messages will scroll up
   time_t LineTime;

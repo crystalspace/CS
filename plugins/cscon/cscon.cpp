@@ -26,148 +26,153 @@
 #include "itxtmgr.h"
 #include "csutil/csrect.h"
 #include "csutil/scf.h"
+#include "csutil/csstring.h"
 #include "cscon.h"
+#include "conbuffr.h"
 
 csConsole::csConsole(iBase *base)
 {
   CONSTRUCT_IBASE(base);
   fg_rgb.red = fg_rgb.green = fg_rgb.blue = 255;    // Foreground defaults to white
   bg_rgb.red = bg_rgb.green = bg_rgb.blue = 0;    // Background defaults to black
-  bg_alpha = 0; // Background defaults to no transparency
+  transparent = false;  // Default to no transparency
+  do_snap = true;      // Default to snapping
 }
 
 csConsole::~csConsole()
 {
+  //@@@ This is disabled due to a bug in some implementations of iSystem
   //if(piSystem)
   //piSystem->DecRef();
   if(piG2D)
     piG2D->DecRef();
+  delete buffer;
 }
 
 bool csConsole::Initialize(iSystem *system)
 {
   piSystem = system;
   piG2D = QUERY_PLUGIN(piSystem, iGraphics2D);
-  active = false;
-  buffer = NULL;
-  // Set the maximum backbuffer (4096 lines)
-  SetBufferSize(4096);
-  Clear();
+  if(!piG2D)
+    return false;
+  // Initialize the display rectangle to the entire display
+  size.Set(0, 0, piG2D->GetWidth() - 1, piG2D->GetHeight() - 1);
+  invalid.Set(size); // Invalidate the entire console
+  font = piG2D->GetFontID();
+  // Create the backbuffer (4096 lines max)
+  buffer = new csConsoleBuffer(4096, (size.Height() / (piG2D->GetTextHeight(font) + 2)));
   // Initialize ourselves with the system and return true if all is well
-  return ((piG2D != NULL) && (piSystem->RegisterDriver("iConsole", this)));
+  return piSystem->RegisterDriver("iConsole", this);
 }
 
 void csConsole::Show()
 {
-  active = true;
+  /***DEPRECATED***/
 }
 
 void csConsole::Hide()
 {
-  active = false;
-  piG2D->ClearAll(0);
+  /***DEPRECATED***/
 }
 
 bool csConsole::IsActive() const
 {
-  return active;
+  /***DEPRECATED***/
+  return true;
 }
 
 void csConsole::Clear()
 {
-  int i;
-
-  for(i = 0; i<maxlines; i++) {
-    if(buffer[i]) {
-      delete buffer[i];
-      buffer[i] = NULL;
-    }
-  }
-
-  // Reset the line and top line
-  line = topline = 0;
+  buffer->Clear();
 }
 
 void csConsole::SetBufferSize(int lines)
 {
-  if(buffer) {
-    Clear();
-    delete buffer;
-  }
-
-  // Set the new maximum size
-  maxlines = lines;
-  buffer = new csString*[maxlines];
-  Clear();
-}
-
-void csConsole::IncLine()
-{
-  line++;
-  if(line>=maxlines)
-    line = 0;
-
-  // Clear the current line
-  if(buffer[line]) {
-    delete buffer[line];
-    buffer[line] = NULL;
-  }
-
-  if(line==topline) {
-    topline++;
-    if(topline>=maxlines)
-      topline = 0;
-  }
+  buffer->SetLength(lines);
 }
 
 void csConsole::PutText(const char *text)
 {
-  // Add string to buffer
   int i;
 
+  // Scan the string for escape characters
   for(i = 0; text[i]!=0; i++) {
     switch(text[i]) {
     case '\n':
-      IncLine();
+      buffer->NewLine(do_snap);
       break;
     default:
-      if(!buffer[line])
-	buffer[line] = new csString();
-      buffer[line]->Append(text[i]);
+      csString *curline = buffer->WriteLine();
+      curline->Append(text[i]);
       break;
     }
   }
 }
 
-void csConsole::Draw(csRect * = NULL)
+void csConsole::Draw(csRect *area)
 {
-  int i, pos;
+  int i, height, oldfont;
+  csRect line, oldrgn;
+  const csString *text;
+  bool dirty;
 
-  // Display the console, if active
-  if(active) {
-    piG2D->BeginDraw();
+  // Save old clipping region and assign the console clipping region
+  piG2D->GetClipRect(oldrgn.xmin, oldrgn.ymin, oldrgn.xmax, oldrgn.ymax);
+  piG2D->SetClipRect(size.xmin, size.ymin, size.xmax, size.ymax);
+
+  // Save the old font and set it to the requested font
+  oldfont = piG2D->GetFontID();
+  piG2D->SetFontID(font);
+
+  // If we're not transparent, clear the background
+  if(!transparent)
     piG2D->Clear(bg);
-    i=topline;
-    pos = 0;
-    while (i!=line) {
-      // Prevent blank lines from killing us
-      if(buffer[i]&&(!buffer[i]->IsEmpty()))
-	piG2D->Write(1, pos * piG2D->GetTextHeight(piG2D->GetFontID()), fg, -1, buffer[i]->GetData());
-      i++;
-      pos++;
-      if(i>=maxlines)
-	i=0;
+
+  // Calculate the height of the text
+  height = (piG2D->GetTextHeight(font) + 2);
+
+  // Print all lines on the current page
+  for (i=0; i<buffer->GetPageSize(); i++) {
+
+    // Retrieve the line from the buffer and it's dirty flag
+    text = buffer->GetLine(i, dirty);
+
+    // A NULL line indicates it's the last printed line on the page
+    if(text==NULL)
+      break;
+
+    // Calculate the rectangle of this line
+    line.Set(size.xmin, (i * height) + size.ymin, size.xmax, (i * height) + size.ymin + height);
+
+    // See if the line changed or if the line intersects with the invalid area
+    if(dirty||line.Intersects(invalid)) {
+      // If area is a valid pointer, add this line's rectangle to it
+      if(area)
+	area->Union(line);
+      // Write the line
+      piG2D->Write(1 + size.xmin, (i * height) + size.ymin, fg, -1, text->GetData());
     }
-    // Prevent blank lines from killing us
-    if(buffer[line]&&(!buffer[line]->IsEmpty()))
-      piG2D->Write(1, pos * piG2D->GetTextHeight(piG2D->GetFontID()), fg, -1, buffer[line]->GetData());
-    piG2D->FinishDraw();
-    piG2D->Print(NULL);
+
   }
+
+  // Restore the original clipping region
+  piG2D->SetClipRect(oldrgn.xmin, oldrgn.ymin, oldrgn.xmax, oldrgn.ymax);
+
+  // Include the invalid area of the console as part of the update
+  if(area&&(!invalid.IsEmpty()))
+    area->Union(invalid);
+
+  // No more invalid area
+  invalid.MakeEmpty();
+
+  // Restore the original font
+  piG2D->SetFontID(oldfont);
+
 }
 
 void csConsole::CacheColors(iTextureManager* txtmgr)
 {
+  // Update the colors from the texture manager
   fg = txtmgr->FindRGB(fg_rgb.red, fg_rgb.green, fg_rgb.blue);
   bg = txtmgr->FindRGB(bg_rgb.red, bg_rgb.green, bg_rgb.blue);
 }
@@ -182,16 +187,107 @@ void csConsole::SetForeground(int red, int green, int blue)
   fg_rgb.red = red; fg_rgb.green = green; fg_rgb.blue = blue;
 }
 
-void csConsole::GetBackground(int &red, int &green, int &blue, int &alpha) const
+void csConsole::GetBackground(int &red, int &green, int &blue) const
 {
   red = bg_rgb.red; green = bg_rgb.green; blue = bg_rgb.blue;
-  alpha = bg_alpha;
 }
 
-void csConsole::SetBackground(int red, int green, int blue, int alpha = 0)
+void csConsole::SetBackground(int red, int green, int blue)
 {
   bg_rgb.red = red; bg_rgb.green = green; bg_rgb.blue = blue;
-  bg_alpha = alpha;
+}
+
+void csConsole::GetPosition(int &x, int &y, int &width, int &height) const
+{
+  x = size.xmin;
+  y = size.ymin;
+  width = size.Width();
+  height = size.Height();
+}
+
+void csConsole::SetPosition(int x, int y, int width, int height)
+{
+  if(x>=0)
+    size.xmin = x;
+  if(y>=0)
+    size.ymin = y;
+  if(width>=0)
+    size.xmax = size.xmin + width;
+  if(height>=0)
+    size.ymax = size.ymin + height;
+
+  // Make sure we don't go off the current screen
+  if(size.xmax>=piG2D->GetWidth())
+    size.xmax = piG2D->GetWidth() - 1;
+  if(size.ymax>=piG2D->GetHeight())
+    size.ymax = piG2D->GetHeight() - 1;
+  
+  // Calculate the number of lines on the console
+  buffer->SetPageSize(size.Height() / (piG2D->GetTextHeight(font) + 2));
+
+  // Invalidate the entire new area of the console
+  invalid.Set(size); 
+
+}
+
+void csConsole::Invalidate(csRect &area)
+{
+  // Make sure we only update within our rectangle, otherwise 2D driver may crash!
+  csRect console(size);
+  console.Intersect(area);
+  if(!console.IsEmpty())
+    invalid.Union(console);
+}
+
+bool csConsole::GetTransparency() const
+{
+  return transparent;
+}
+
+void csConsole::SetTransparency(bool trans)
+{
+  transparent = trans;
+}
+
+int csConsole::GetFontID() const
+{
+  return font;
+}
+
+void csConsole::SetFontID(int FontID)
+{
+  font = FontID;
+
+  // Calculate the number of lines on the console with the new font
+  buffer->SetPageSize(size.Height() / (piG2D->GetTextHeight(font) + 2));
+
+}
+
+int csConsole::GetTopLine() const
+{
+  return buffer->GetTopLine();
+}
+
+void csConsole::ScrollTo(int top, bool snap)
+{
+  switch(top) {
+  case csConPageUp:
+    buffer->SetTopLine(buffer->GetTopLine() - buffer->GetPageSize());
+    break;
+  case csConPageDown:
+    buffer->SetTopLine(buffer->GetTopLine() + buffer->GetPageSize());
+    break;
+  case csConVeryTop:
+    buffer->SetTopLine(0);
+    break;
+  case csConVeryBottom:
+    buffer->SetTopLine(buffer->GetCurLine() - buffer->GetPageSize());
+    break;
+  default:
+    buffer->SetTopLine(top);
+    break;
+  }
+  do_snap = snap;
 }
 
 IMPLEMENT_IBASE(csConsole)

@@ -21,12 +21,11 @@
 
 #include "iconsole.h"
 #include "csutil/scf.h"
-#include "csutil/csstring.h"
-#include "csgeom/math3d.h"
+#include "csutil/csrect.h"
 
 struct iGraphics2D;
 struct iTextureManager;
-class csRect;
+class csConsoleBuffer;
 
 class csConsole : public iConsole
 {
@@ -35,8 +34,11 @@ public:
   csConsole(iBase *base);
   virtual ~csConsole();
   virtual bool Initialize(iSystem *);
+  /***DEPRECATED***/
   virtual void Show();
+  /***DEPRECATED***/
   virtual void Hide();
+  /***DEPRECATED***/
   virtual bool IsActive() const;
   virtual void Clear();
   virtual void PutText(const char *text);
@@ -45,31 +47,37 @@ public:
   virtual void CacheColors(iTextureManager *txtmgr);
   virtual void GetForeground(int &red, int &green, int &blue) const;
   virtual void SetForeground(int red, int green, int blue);
-  virtual void GetBackground(int &red, int &green, int &blue, int &alpha) const;
-  virtual void SetBackground(int red, int green, int blue, int alpha = 0);
+  virtual void GetBackground(int &red, int &green, int &blue) const;
+  virtual void SetBackground(int red, int green, int blue);
+  virtual void GetPosition(int &x, int &y, int &width, int &height) const;
+  virtual void SetPosition(int x, int y, int width = -1, int height = -1);
+  virtual void Invalidate(csRect &area);
+  virtual bool GetTransparency() const;
+  virtual void SetTransparency(bool trans);
+  virtual int GetFontID() const;
+  virtual void SetFontID(int FontID);
+  virtual int GetTopLine() const;
+  virtual void ScrollTo(int topline, bool snap = true);
 
 protected:
-  bool active;
-  csString **buffer; // Line buffer array
-  int line; // Current line in the buffer;
-  int topline, maxlines; // Top and Maximum lines in buffer
+  csConsoleBuffer *buffer;
+  bool transparent, do_snap;
   iGraphics2D *piG2D;
   iSystem *piSystem;
+  csRect size, invalid;
+  int font;
 
-  typedef struct Color {
+  typedef struct {
     int red;
     int green;
     int blue;
-  } structColor;
+  } Color;
 
   //  Foreground and background colors
   Color fg_rgb;
   Color bg_rgb;
-  // The texture manager codes for the colors, and the background alpha field
-  int fg, bg, bg_alpha;
-
-  // Increments to the next column/line, and accounts for various limits
-  void IncLine();
+  // The texture manager codes for the colors
+  int fg, bg;
 
 };
 

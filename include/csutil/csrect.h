@@ -136,10 +136,10 @@ public:
   { xmin += dX; xmax += dX; ymin += dY; ymax += dY; }
 
   /// Return the width of rectangle.
-  inline int Width () { return xmax - xmin; }
+  inline int Width () const { return xmax - xmin; }
 
   /// Return the height of rectangle.
-  inline int Height () { return ymax - ymin; }
+  inline int Height () const { return ymax - ymin; }
 
   /// Return true if a point lies within rectangle bounds.
   inline bool Contains (int x, int y)

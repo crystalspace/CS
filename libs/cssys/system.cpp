@@ -745,7 +745,7 @@ void csSystemDriver::DemoWrite (const char* buf)
 {
   if (Console)
   {
-    bool const ok2d = (!!G2D && G2D->BeginDraw());
+    bool const ok2d = ((G2D!=NULL) && G2D->BeginDraw());
     if (ok2d)
       G2D->Clear (0);
 
