@@ -33,6 +33,7 @@
 #include "csengine/tranman.h"
 #include "csengine/triangle.h"
 #include "igraph3d.h"
+#include "iparticl.h"
 
 class Dumper;
 class csTextureList;
@@ -341,7 +342,7 @@ typedef void (csSpriteCallback2) (csSprite3D* spr, csRenderView* rview, csObject
 /**
  * The base class for all types of sprites.
  */
-class csSprite : public csObject
+class csSprite : public csObject, public iParticle
 {
   friend class Dumper;
 
@@ -520,6 +521,7 @@ public:
    */
   virtual void MovePosition (const csVector3& delta) = 0;
 
+  DECLARE_IBASE;
   CSOBJTYPE;
 };
 
@@ -632,6 +634,19 @@ public:
 
   /// force a new texture skin other than default
   void SetTexture (const char* name, csTextureList* textures);
+
+  /// Scale the sprite by scaling the diagonal of the transform
+  virtual void ScaleBy(float factor);
+
+  /// Rotate the sprite in some way, angle in radians.
+  /// currently first z-rotates angle then x-rotates angle.
+  virtual void Rotate(float angle);
+
+  /// Set color for all vertices
+  virtual void SetColor(const csColor& col);
+
+  /// Add color to all vertices
+  virtual void AddColor(const csColor& col);
 
   /**
    * Set a color for a vertex.

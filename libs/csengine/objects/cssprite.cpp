@@ -32,6 +32,7 @@
 #include "csgeom/fastsqrt.h"
 #include "csutil/garray.h"
 #include "igraph3d.h"
+#include "iparticl.h"
 
 
 //--------------------------------------------------------------------------
@@ -645,9 +646,13 @@ int csSpriteTemplate::MergeTexels ()
 //=============================================================================
 
 IMPLEMENT_CSOBJTYPE (csSprite, csObject)
+IMPLEMENT_IBASE (csSprite)
+  IMPLEMENTS_INTERFACE(iParticle)
+IMPLEMENT_IBASE_END
 
 csSprite::csSprite () : csObject (), bbox (NULL)
 {
+  CONSTRUCT_IBASE (NULL);
   bbox.SetOwner (this);
   dynamiclights = NULL;
   MixMode = CS_FX_COPY;
@@ -860,6 +865,40 @@ void csSprite3D::SetTexture (const char* name, csTextureList* textures)
   }
   cstxt = texture;
 }
+
+
+void csSprite3D::ScaleBy (float factor)
+{
+  csMatrix3 trans = m_obj2world; // this is the one to change
+  trans.m11 *= factor;
+  trans.m22 *= factor;
+  trans.m33 *= factor;
+  SetTransform(trans);
+}
+
+
+void csSprite3D::Rotate(float angle)
+{
+  csZRotMatrix3 rotz(angle);
+  Transform(rotz);
+  csXRotMatrix3 rotx(angle);
+  Transform(rotx);
+}
+
+
+void csSprite3D::SetColor (const csColor& col)
+{
+  for(int i=0; i<tpl->GetNumTexels(); i++)
+    SetVertexColor(i, col);
+}
+
+
+void csSprite3D::AddColor (const csColor& col)
+{
+  for(int i=0; i<tpl->GetNumTexels(); i++)
+    AddVertexColor(i, col);
+}
+
 
 void csSprite3D::SetVertexColor (int i, const csColor& col)
 {

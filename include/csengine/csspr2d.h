@@ -118,12 +118,12 @@ public:
   /**
    * Scale the vertices of the sprite by factor.
    */
-  void ScaleBy (float factor);
+  virtual void ScaleBy (float factor);
 
   /**
    * Rotate the vertices of the sprite by angle, angle in radians.
    */
-  void Rotate (float angle);
+  virtual void Rotate (float angle);
 
   /**
    * Shift the vertices of the sprite by delta x and y.
@@ -140,12 +140,12 @@ public:
   /**
    * Set the color of the sprite for all vertices
    */
-  void SetColor(const csColor& col);
+  virtual void SetColor(const csColor& col);
 
   /** 
    * Add a color to all vertices init_color.
    */
-  void AddColor(const csColor&col);
+  virtual void AddColor(const csColor&col);
 
   /**
    * Light sprite according to the given array of lights (i.e.
