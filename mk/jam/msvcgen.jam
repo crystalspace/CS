@@ -382,9 +382,16 @@ if $(MSVCGEN_CONFIG_FILES)
   }
 }
 
-PERL ?= perl ;
-TTREE ?= ttree ;
-RUN_TTREE ?= $(PERL) "\"$(TTREE)\"" ;
+if $(TTREE)
+{
+  PERL ?= perl ;
+  RUN_TTREE ?= $(PERL) "\"$(TTREE)\"" ;
+}
+else
+{
+  TTREE ?= ttree ;
+  RUN_TTREE ?= $(TTREE) ;
+}
 
 # Implementation note: The --strip-root directives are order-sensitive when the
 # build directory is the same as the source directory, in which case TOP is "."
