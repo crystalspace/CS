@@ -31,6 +31,11 @@ The history order is reversed so that new features are at the top.
 	- Eric Sunshine added CSUTIL to the DEP.NEXT2D dependency list in
 	  next2d.mak so that the `next2d' plugin can be loaded by scfreg.
 	  Without this dependency, the csConfigAccess class was unresolved.
+	- Eric Sunshine fixed bug in scftutor which prevented the `dog' and
+	  `worm' plugins from loading.  When Philip changed the names of the
+	  associated plugins from `Dog' and `Worm' to `dog' and `worm' in the
+	  makefile, he forgot to change the SCF module names in dog.cpp and
+	  worm.cpp.
 23-May-2001
 	- Added 'virtual' before the csView destructor and also fixed a
 	  warning in the csView constructor.

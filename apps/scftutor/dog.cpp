@@ -86,6 +86,6 @@ void csDog::csName::SetName (char *iName)
 
 IMPLEMENT_FACTORY (csDog)
 
-EXPORT_CLASS_TABLE (Dog)
+EXPORT_CLASS_TABLE (dog)
   EXPORT_CLASS (csDog, "test.dog", "A Dog that barfs")
 EXPORT_CLASS_TABLE_END

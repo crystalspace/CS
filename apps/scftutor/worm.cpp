@@ -72,6 +72,6 @@ iWorm *csWorm::Split (int iLen1, int iLen2)
 
 IMPLEMENT_FACTORY (csWorm)
 
-EXPORT_CLASS_TABLE (Worm)
+EXPORT_CLASS_TABLE (worm)
   EXPORT_CLASS (csWorm, "test.worm", "A Worm that crawls")
 EXPORT_CLASS_TABLE_END

@@ -21,8 +21,8 @@
 
 // for the case we're using static linking ...
 #ifdef CS_STATIC_LINKED
-  REGISTER_STATIC_LIBRARY (Dog)
-  REGISTER_STATIC_LIBRARY (Worm)
+  REGISTER_STATIC_LIBRARY (dog)
+  REGISTER_STATIC_LIBRARY (worm)
 #endif
 
 // frog is always statically linked
@@ -83,8 +83,8 @@ int main(int argc, char *argv[])
 #else
   // Don't use a .cfg file, instead manually register classes
   scfInitialize (NULL);
-  scfRegisterClass ("test.dog", "Dog");
-  scfRegisterClass ("test.worm", "Worm");
+  scfRegisterClass ("test.dog", "dog");
+  scfRegisterClass ("test.worm", "worm");
 #endif
 
   iDog *dog = CREATE_INSTANCE ("test.dog", iDog);
