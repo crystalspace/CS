@@ -50,6 +50,9 @@ chronological order.
 	  a subclass of csArray<csRef<T> > in order to provide a more efficient
 	  Push(T*) that avoids the extra IncRef() that happens with
 	  csArray<csRef<T> >.
+	- Jorrit made csRefArray a subclass of csArray (using
+	  csArray<csRef<T> >). This greatly cleans up a lot of code and
+	  also improves speed.
 	- res further worked on the Jam msvcgen. Now, metadata is added to the
 	  generated .rc file as well. 
 	- res worked around the makedep compile problems on MinGW: in case a
