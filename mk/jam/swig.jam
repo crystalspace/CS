@@ -2,10 +2,23 @@
 # Rules for swig
 #============================================================================
 
-SED ?= sed ;
-
 if $(CMD.SWIG)
 {
+  SED ?= sed ;
+
+  # The sed commands/script with which the generated Swig file will be
+  # post-processed.  We filter out CVS `Header' keywords in order to prevent
+  # CVS from thinking that the file has changed simply because the Header
+  # information is different.  This is especially important when the
+  # Swig-generated files are created/updated by an automated script.  Further,
+  # we define the sed script here rather than inline in the Swig action in
+  # order to prevent accidental expansion of the `Header' keyword in this
+  # script (swig.jam) itself, since it is likely that the command in the Swig
+  # action will have additonal dollar signs following the sed commands; and CVS
+  # will replace everything between the two dollar signs with the `Header'
+  # information.
+  SWIG.SED_SCRIPT = "'/\$Header:/d'" ;
+
   ## Swig cppfile : swigfile
   rule Swig
   {
@@ -20,7 +33,7 @@ if $(CMD.SWIG)
   actions Swig
   {
     $(CMD.SWIG) $(SWIG.FLAGS) -o $(<) $(>)
-    $(SED) '/\$Header$(<) > $(<).sed
+    $(SED) $(SWIG.SED_SCRIPT) < $(<) > $(<).sed
     $(RM) $(<)
     $(MV) $(<).sed $(<)
   }

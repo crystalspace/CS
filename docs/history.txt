@@ -15,6 +15,10 @@ chronological order.
 	  dysfunctional.
 	- Luca fixed a compilation error in plugins/mesh/bcterr/object/bcterr.h
 	  due to recent changes to the iTerrFuncState interface.
+	- Eric Sunshine worked around problem where CVS `Header' keyword in sed
+	  expression in swig.jam was accidentally being expanded in swig.jam
+	  itself.  This keyword needs to appear verbatim in the sed expression;
+	  not in expanded form.
 10-Nov-2003
 	- Jorrit removed the blend2cs script from CS. It is made obsolete
 	  by the blend2cs project http://projects.blender.org/projects/blend2cs/
