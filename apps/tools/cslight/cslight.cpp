@@ -329,9 +329,7 @@ bool Lighter::Initialize (int argc, const char* const argv[],
   iFontServer* fntsvr = g2d->GetFontServer ();
   if (fntsvr)
   {
-    font = fntsvr->GetFont (0);
-    if (font == 0)
-      font = fntsvr->LoadFont (CSFONT_COURIER);
+    font = fntsvr->LoadFont (CSFONT_COURIER);
   }
   else
     font = 0;

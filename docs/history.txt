@@ -24,6 +24,7 @@ chronological order.
 	  --plugin=), rather than only the final component of the name.  Also
 	  fixed some typographical, grammatical, and Texinfo mark-up problems;
 	  as well as TeX `hbox' warnings.
+	- res updated cslight and g2dtest for his recent font changes.
 9-Mar-2004
 	- Wouter clarified a comment on iLightingInfo::InitializeDefault().
 	- Reed added "relight" command to Walktest.

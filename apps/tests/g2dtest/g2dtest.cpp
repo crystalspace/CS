@@ -121,7 +121,7 @@ public:
   bool HandleEvent (iEvent &Event);
 
 private:
-  csPtr<iFont> GetFont (const char *fontID);
+  csPtr<iFont> GetFont (const char *fontID, int size = 10);
   void SetFont (iFont* font);
 
   void EnterState (appState newstate, int arg = 0);
@@ -197,11 +197,11 @@ G2DTestSystemDriver::~G2DTestSystemDriver ()
 {
   if (EventOutlet != 0)
     EventOutlet->DecRef();
-  font = NULL;
-  fontItalic = NULL;
-  fontCourier = NULL;
-  fontLarge = NULL;
-  fontSmall = NULL;
+  font = 0;
+  fontItalic = 0;
+  fontCourier = 0;
+  fontLarge = 0;
+  fontSmall = 0;
   csInitializer::DestroyApplication (object_reg);
 }
 
@@ -532,10 +532,10 @@ int G2DTestSystemDriver::MakeColor (int r, int g, int b)
   return ((r >> 5) << 5) | ((g >> 5) << 2) | (b >> 6);
 }
 
-csPtr<iFont> G2DTestSystemDriver::GetFont (const char *fontID)
+csPtr<iFont> G2DTestSystemDriver::GetFont (const char *fontID, int size)
 {
   iFontServer *fs = myG2D->GetFontServer ();
-  return (fs->LoadFont (fontID));
+  return (fs->LoadFont (fontID, size));
 }
 
 void G2DTestSystemDriver::SetFont (iFont* font)
@@ -574,7 +574,8 @@ void G2DTestSystemDriver::WriteCentered (int mode, int dy, int fg, int bg,
       break;
   }
 
-  myG2D->Write (font, x, y, fg, bg, text);
+  myG2D->Write (font, x, y + fh - font->GetDescent(), fg, bg, text, 
+    CS_WRITE_BASELINE);
 }
 
 void G2DTestSystemDriver::WriteCenteredWrapped (int mode, int dy, int &h, 
@@ -614,6 +615,7 @@ void G2DTestSystemDriver::WriteCenteredWrapped (int mode, int dy, int &h,
 
   // break text so that it completely fits onto the screen.
   int lw = -sW;
+  int maxLH = fH;
   char* line = csStrNew (text);
   char* p = line;
   csString drawLine;
@@ -622,34 +624,29 @@ void G2DTestSystemDriver::WriteCenteredWrapped (int mode, int dy, int &h,
   {
     char* space = strchr (p, ' ');
     if (space != 0)
-    {
       *space = 0;
-      int tW, tH;
-      font->GetDimensions (p, tW, tH);
-      if (lw + tW + sW >= w)
-      {
-	WriteCentered (1, y + h, fg, bg, (drawLine.GetData ()) + 1);
-	drawLine.Clear ();
-	drawLine << " " << p;
-	p = space + 1;
-	lw = 0;
-	h += fH;
-      }
-      else
-      {
-	lw += tW + sW;
-	drawLine << " " << p;
-	p = space + 1;
-      }
+    int tW, tH;
+    font->GetDimensions (p, tW, tH);
+    if (lw + tW + sW >= w)
+    {
+      WriteCentered (1, y + h, fg, bg, (drawLine.GetData ()) + 1);
+      drawLine.Clear ();
+      drawLine << ' ' << p;
+      //p = space + 1;
+      lw = 0;
+      h += maxLH;
+      maxLH = MAX(fH, tH);
     }
     else
     {
-      drawLine << " " << p;
-      WriteCentered (1, y + h, fg, bg, (drawLine.GetData ()) + 1);
-      h += fH;
-      p = 0;
+      lw += tW + sW;
+      drawLine << ' ' << p;
+      maxLH = MAX(maxLH, tH);
     }
+    if (space != 0) p = space + 1; else p = 0;
   }
+  WriteCentered (1, y + h, fg, bg, (drawLine.GetData ()) + 1);
+  h += maxLH;
   delete[] line;
 }
 
@@ -908,23 +905,22 @@ void G2DTestSystemDriver::DrawFreetypeTest ()
   int i = 0;
   while (fontFaces[i] != 0)
   {
-    int fW, fH;
-    csRef<iFont> font = GetFont (fontFaces[i]);
-    if (font)
+    csString str;
+    int j = 0;
+    while (fontSizes[j] != 0)
     {
-      SetFont (font);
-      csString str;
-      int j = 0;
-      while (fontSizes[j] != 0)
+      int fW, fH;
+      csRef<iFont> font = GetFont (fontFaces[i], fontSizes[j]);
+      if (font)
       {
+	SetFont (font);
 	str.Clear ();
         str << fontFaces[i] << ", Size " << fontSizes[j];
-	font->SetSize (fontSizes[j]);
         WriteCentered (0, y, yellow, -1, str.GetData ());
         font->GetDimensions (str.GetData (), fW, fH);
         y += fH + 4;
-	j++;
       }
+      j++;
     }
     i++;
   }
@@ -1529,7 +1525,7 @@ int main (int argc, char *argv[])
 	"Unable to load canvas driver!");
     return -1;
   }
-
+    
   if (!csInitializer::OpenApplication (object_reg))
   {
     csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
