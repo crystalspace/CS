@@ -20,6 +20,8 @@
 #ifndef __CS_CSSTRING_H__
 #define __CS_CSSTRING_H__
 
+#include <stdarg.h>
+
 #define STR_FATAL(s) \
 { \
   printf s; \
@@ -218,8 +220,10 @@ public:
   /// Calls Trim() and collapses internal whitespace to a single space.
   csString &Collapse();
 
-  /// Format like sprintf. Very fast.
-  /// Warning! No bounds checking or resizing is performed!
+  /**
+   * Format like sprintf. Very fast.
+   * Warning! No bounds checking or resizing is performed!
+   */
   csString &Format (const char *format, ...)
   {
     va_list args;
