@@ -766,7 +766,6 @@
         </meshobj>
         <meshobj name="emit3">
             <priority>alpha</priority>
-            <key name="entity_Rotate" value="0,10,0,true" />
             <plugin>emit</plugin>
             <ztest />
             <move>
@@ -791,6 +790,12 @@
                 <startaccel>
                     <emitfixed x="0" y="0" z="0" />
                 </startaccel>
+		<fieldspeed>
+		  <emitcylindertangent p="0.3" q="0.4">
+			<min x="0" y="-1" z="0" />
+			<max x="0" y="3" z="0" />
+		  </emitcylindertangent>
+		</fieldspeed>
                 <aging>
                     <color red="0" green="0.4" blue="0.8" />
                     <time>0</time>

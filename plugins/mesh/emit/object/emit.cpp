@@ -602,7 +602,8 @@ bool csEmitMeshObject::Draw (iRenderView* rview, iMovable* movable,
   static csCompPartArray *cpa = GetStaticCompPartArray ();
 
   // detect if back to front is needed.
-  if(MixMode & CS_FX_ADD)
+  // or if containerbox is used
+  if(MixMode & CS_FX_ADD && !has_container_box)
     return csParticleSystem::Draw(rview, movable, mode);
 
   // draw back to front
