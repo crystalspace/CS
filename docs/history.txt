@@ -14,6 +14,45 @@ Short-term cleanups that need to be done:
 	  includes that don't belong there (like from csengine).
 
 6-Aug-1999
+	- Wrote an object pool design pattern class for 2D polygons. They
+	  are used instead of the global 'clipped' variable which caused
+	  nothing but trouble. This is cleaner, more efficient (even for
+	  memory) and MUCH easier to program with. The underlying problem
+	  is that I'd like to use several 2D polygons at the same time but
+	  I don't want to allocate/deallocate them every time they
+	  are used. The object pool can do that. There are other places in
+	  CS where this object pool could be useful. That's for the future.
+	- Added new 'cbuffer' command to WalkTest that you can use to experiment
+	  with the new c-buffer mode. It is disabled by default. Jorrit also
+	  added a key binding for 'cbuffer toggle' on key 'd'.
+	- The c-buffer system works fairly well right now. The current
+	  implementation is written specifically with hardware acceleration in
+	  mind. It works best for hardware accelerated renderers. But even so
+	  the software renderer can achieve a lot of benefit as well. But for
+	  the software renderer we can get even more gain by including the
+	  c-buffer in the actual rendering instead of only occlusion culling.
+	  Also for the future.
+	  Note that there are still a few bugs in the current c-buffer handling
+	  (for example in the handling of space warping portals).
+	- The new c-buffer system only gives benefits in sectors where you
+	  have a static bsp (STATBSP() option in sector) and a number of
+	  non-moving things which are then merged in that static bsp. Only
+	  in this case do you gain anything.
+	- Provided a temporary fix so that collisoin detection works if a static
+	  thing is used (BSP for non-moving things in a sector). I'm not sure
+	  why it didn't work before. This needs more investigation.
+	- Because of the need to use STATBSP() more (an option which is not used
+	  in any of the current levels) Jorrit noticed a few shortcomings of
+	  the STATBSP implementation. The most important one being that gouraud
+	  shaded polygons are not handled well. After a little thinking Jorrit
+	  decided that it is best to rewrite BSP handling a bit. The current
+	  way is too clumsy. Ok, let's start...
+	- Added a new class csPolygonBsp. This is a proxy polygon class
+	  which will be used in the new BSP trees. A csPolygonBsp is basicly
+	  just a collection of vertices and a pointer back to the original
+	  polygon. The BSP tree builder will operator on csPolygonBsp
+	  instances and split them. The original csPolygon3D objects are
+	  unmodified.
 	- Eric Sunshine added a "simulated depth" option (-simdepth and
 	  VideoDriver/SIMULATE_DEPTH) to the MacOS/X Server, OpenStep, and
 	  NextStep ports.

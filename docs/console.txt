@@ -596,3 +596,9 @@ Action:  This command takes the current view and dumps information for the
 	 rendered and how they are clipped. This is useful for debugging
 	 purposes. The output comes into 'debug.txt'.
 
+Command: cbuffer
+Type:    boolean command
+Action:  Toggle c-buffer rendering on/off. In some levels (especially levels
+         with many non-moving things) enabling the c-buffer for the engine can
+	 improve performance considerably. By default it is off (currently).
+
