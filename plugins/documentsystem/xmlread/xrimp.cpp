@@ -39,56 +39,16 @@ SCF_IMPLEMENT_IBASE_END
 csXmlReadDocumentSystem::csXmlReadDocumentSystem ()
 {
   SCF_CONSTRUCT_IBASE (NULL);
-  pool = NULL;
 }
 
 csXmlReadDocumentSystem::~csXmlReadDocumentSystem ()
 {
-  while (pool)
-  {
-    csXmlReadNode* n = pool->next_pool;
-    // The 'sys' member in pool should be NULL here.
-    delete pool;
-    pool = n;
-  }
 }
 
 csRef<iDocument> csXmlReadDocumentSystem::CreateDocument ()
 {
   csRef<iDocument> doc (csPtr<iDocument> (new csXmlReadDocument (this)));
   return doc;
-}
-
-csXmlReadNode* csXmlReadDocumentSystem::Alloc ()
-{
-  if (pool)
-  {
-    csXmlReadNode* n = pool;
-    pool = n->next_pool;
-    n->scfRefCount = 1;
-    n->sys = this;	// Incref.
-    return n;
-  }
-  else
-  {
-    csXmlReadNode* n = new csXmlReadNode (this);
-    return n;
-  }
-}
-
-csXmlReadNode* csXmlReadDocumentSystem::Alloc (TrDocumentNode* node,
-	bool use_contents_value)
-{
-  csXmlReadNode* n = Alloc ();
-  n->SetTiNode (node, use_contents_value);
-  return n;
-}
-
-void csXmlReadDocumentSystem::Free (csXmlReadNode* n)
-{
-  n->next_pool = pool;
-  pool = n;
-  n->sys = 0;	// Free ref.
 }
 
 //------------------------------------------------------------------------
@@ -141,11 +101,11 @@ SCF_IMPLEMENT_IBASE (csXmlReadNodeIterator)
 SCF_IMPLEMENT_IBASE_END
 
 csXmlReadNodeIterator::csXmlReadNodeIterator (
-	csXmlReadDocumentSystem* sys, TrDocumentNodeChildren* parent,
+	csXmlReadDocument* doc, TrDocumentNodeChildren* parent,
 	const char* value)
 {
   SCF_CONSTRUCT_IBASE (NULL);
-  csXmlReadNodeIterator::sys = sys;
+  csXmlReadNodeIterator::doc = doc;
   csXmlReadNodeIterator::parent = parent;
   csXmlReadNodeIterator::value = value ? csStrNew (value) : NULL;
   use_contents_value = false;
@@ -177,13 +137,13 @@ csRef<iDocumentNode> csXmlReadNodeIterator::Next ()
   csRef<iDocumentNode> node;
   if (use_contents_value)
   {
-    node = csPtr<iDocumentNode> (sys->Alloc (current, true));
+    node = csPtr<iDocumentNode> (doc->Alloc (current, true));
     use_contents_value = false;
     current = parent->FirstChild ();
   }
   else if (current != NULL)
   {
-    node = csPtr<iDocumentNode> (sys->Alloc (current, false));
+    node = csPtr<iDocumentNode> (doc->Alloc (current, false));
     if (value)
       current = current->NextSibling (value);
     else
@@ -207,7 +167,7 @@ void csXmlReadNode::DecRef ()
   if (scfRefCount <= 0)
   {
     if (scfParent) scfParent->DecRef ();
-    sys->Free (this);
+    doc->Free (this);
   }
 }
 SCF_IMPLEMENT_IBASE_GETREFCOUNT(csXmlReadNode)
@@ -215,12 +175,12 @@ SCF_IMPLEMENT_IBASE_QUERY(csXmlReadNode)
   SCF_IMPLEMENTS_INTERFACE (iDocumentNode)
 SCF_IMPLEMENT_IBASE_END
 
-csXmlReadNode::csXmlReadNode (csXmlReadDocumentSystem* sys)
+csXmlReadNode::csXmlReadNode (csXmlReadDocument* doc)
 {
   SCF_CONSTRUCT_IBASE (NULL);
   node = NULL;
   node_children = NULL;
-  csXmlReadNode::sys = sys;	// Increase reference.
+  csXmlReadNode::doc = doc;	// Increase reference.
 }
 
 csXmlReadNode::~csXmlReadNode ()
@@ -239,7 +199,7 @@ csRef<iDocumentNode> csXmlReadNode::GetParent ()
   else
   {
     if (!node->Parent ()) return child;
-    child = csPtr<iDocumentNode> (sys->Alloc (node->Parent (), false));
+    child = csPtr<iDocumentNode> (doc->Alloc (node->Parent (), false));
     return child;
   }
 }
@@ -284,7 +244,7 @@ csRef<iDocumentNodeIterator> csXmlReadNode::GetNodes ()
 {
   csRef<iDocumentNodeIterator> it;
   it = csPtr<iDocumentNodeIterator> (new csXmlReadNodeIterator (
-  	sys, use_contents_value ? NULL : node_children, NULL));
+  	doc, use_contents_value ? NULL : node_children, NULL));
   return it;
 }
 
@@ -292,7 +252,7 @@ csRef<iDocumentNodeIterator> csXmlReadNode::GetNodes (const char* value)
 {
   csRef<iDocumentNodeIterator> it;
   it = csPtr<iDocumentNodeIterator> (new csXmlReadNodeIterator (
-  	sys, use_contents_value ? NULL : node_children, value));
+  	doc, use_contents_value ? NULL : node_children, value));
   return it;
 }
 
@@ -302,7 +262,7 @@ csRef<iDocumentNode> csXmlReadNode::GetNode (const char* value)
   csRef<iDocumentNode> child;
   TrDocumentNode* c = node_children->FirstChild (value);
   if (!c) return child;
-  child = csPtr<iDocumentNode> (sys->Alloc (c, false));
+  child = csPtr<iDocumentNode> (doc->Alloc (c, false));
   return child;
 }
 
@@ -416,17 +376,26 @@ csXmlReadDocument::csXmlReadDocument (csXmlReadDocumentSystem* sys)
 {
   SCF_CONSTRUCT_IBASE (NULL);
   csXmlReadDocument::sys = sys;	// Increase ref.
+  pool = NULL;
 }
 
 csXmlReadDocument::~csXmlReadDocument ()
 {
   Clear ();
+  while (pool)
+  {
+    csXmlReadNode* n = pool->next_pool;
+    // The 'sys' member in pool should be NULL here.
+    delete pool;
+    pool = n;
+  }
 }
 
 void csXmlReadDocument::Clear ()
 {
   if (!root) return;
-  TrDocument* doc = (TrDocument*)(((csXmlReadNode*)(iDocumentNode*)root)->GetTiNode ());
+  TrDocument* doc = (TrDocument*)(((csXmlReadNode*)(iDocumentNode*)root)
+  	->GetTiNode ());
   delete doc;
   root = 0;
 }
@@ -435,7 +404,7 @@ csRef<iDocumentNode> csXmlReadDocument::CreateRoot (char* buf)
 {
   Clear ();
   TrDocument* doc = new TrDocument (buf);
-  root = csPtr<iDocumentNode> (sys->Alloc (doc, false));
+  root = csPtr<iDocumentNode> (Alloc (doc, false));
   return root;
 }
 
@@ -443,7 +412,7 @@ csRef<iDocumentNode> csXmlReadDocument::CreateRoot ()
 {
   Clear ();
   TrDocument* doc = new TrDocument ();
-  root = csPtr<iDocumentNode> (sys->Alloc (doc, false));
+  root = csPtr<iDocumentNode> (Alloc (doc, false));
   return root;
 }
 
@@ -505,6 +474,38 @@ const char* csXmlReadDocument::ParseInPlace (char* buf)
   if (doc->Error ())
     return doc->ErrorDesc ();
   return NULL;
+}
+
+csXmlReadNode* csXmlReadDocument::Alloc ()
+{
+  if (pool)
+  {
+    csXmlReadNode* n = pool;
+    pool = n->next_pool;
+    n->scfRefCount = 1;
+    n->doc = this;	// Incref.
+    return n;
+  }
+  else
+  {
+    csXmlReadNode* n = new csXmlReadNode (this);
+    return n;
+  }
+}
+
+csXmlReadNode* csXmlReadDocument::Alloc (TrDocumentNode* node,
+	bool use_contents_value)
+{
+  csXmlReadNode* n = Alloc ();
+  n->SetTiNode (node, use_contents_value);
+  return n;
+}
+
+void csXmlReadDocument::Free (csXmlReadNode* n)
+{
+  n->next_pool = pool;
+  pool = n;
+  n->doc = 0;	// Free ref.
 }
 
 //------------------------------------------------------------------------

@@ -24,6 +24,14 @@ The history order is reversed so that new features are at the top.
 	- Removed all broken implementations of the WriteDown() functions
 	  in the mesh savers. These need to be reimplemented using
 	  XML.
+	- Made the TinyXML parser thread-safe by moving the node pool from
+	  document system to the document itself (i.e. a pool per document).
+	  Note that this is only thread-safe when using different documents
+	  for different threads. Don't use the same document in different
+	  threads! Also VFS itself is not yet thread-safe. So the parsing
+	  and writing functions on iDocument that use either iFile or
+	  iVFS are not safe!
+	- The XMLRead parser has been made thread-safe in the same way.
 17-Apr-2003
 	- Fixed a bug in the common polygon buffer implementation where it
 	  was incrementing the ref count on poly_texture without testing if

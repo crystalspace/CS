@@ -29,10 +29,6 @@ class TiDocumentNode;
  */
 class csTinyDocumentSystem : public iDocumentSystem
 {
-private:
-  friend struct csTinyXmlNode;
-  csTinyXmlNode* pool;
-
 public:
   csTinyDocumentSystem ();
   virtual ~csTinyDocumentSystem ();
@@ -40,13 +36,6 @@ public:
   SCF_DECLARE_IBASE;
 
   virtual csRef<iDocument> CreateDocument ();
-
-  /// Internal function: don't use!
-  csTinyXmlNode* Alloc ();
-  /// Internal function: don't use!
-  csTinyXmlNode* Alloc (TiDocumentNode*);
-  /// Internal function: don't use!
-  void Free (csTinyXmlNode* n);
 };
 
 #endif // __CS_UTIL_XMLTINY_H__

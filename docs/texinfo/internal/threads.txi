@@ -4,7 +4,7 @@
 @cindex Threads
 
 @noindent
-@emph{Written by Jorrit Tyberghein, @email{bit@@eltech.ru}.}
+@emph{Written by Jorrit Tyberghein.}
 
 The Crystal Space project as such is not thread-safe. So when using
 threads in combination with Crystal Space you have to be careful. However,
@@ -26,6 +26,13 @@ The plugin manager is safe. So macros like @code{CS_LOAD_PLUGIN},
 The object registry is safe. So macros like @code{CS_QUERY_REGISTRY}
 are safe. The @code{iObjectRegistryIterator} takes a copy of the data
 over which it iterates so it will not even lock.
+
+@item
+The TinyXML and XMLRead parsers are thread safe in the sense that it is ok
+to create and work on seperate documents in seperate threads. However it
+is NOT ok to work on the same document in different threads. Also @sc{vfs}
+itself is not thread safe yet so avoid the @code{iDocument->Parse()} and
+@code{iDocument->Write()} calls that use @code{iFile} and/or @code{iVFS}.
 
 @end itemize
 

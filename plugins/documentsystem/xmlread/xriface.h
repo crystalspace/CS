@@ -29,10 +29,6 @@ class TrDocumentNode;
  */
 class csXmlReadDocumentSystem : public iDocumentSystem
 {
-private:
-  friend struct csXmlReadNode;
-  csXmlReadNode* pool;
-
 public:
   csXmlReadDocumentSystem ();
   virtual ~csXmlReadDocumentSystem ();
@@ -40,13 +36,6 @@ public:
   SCF_DECLARE_IBASE;
 
   virtual csRef<iDocument> CreateDocument ();
-
-  /// Internal function: don't use!
-  csXmlReadNode* Alloc ();
-  /// Internal function: don't use!
-  csXmlReadNode* Alloc (TrDocumentNode*, bool use_contents_value);
-  /// Internal function: don't use!
-  void Free (csXmlReadNode* n);
 };
 
 #endif // __CS_XRIFACE_H__

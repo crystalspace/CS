@@ -22,6 +22,8 @@
 #include "iutil/document.h"
 #include "xr.h"
 
+class csXmlReadDocument;
+
 /**
  * This is an SCF compatible wrapper for an attribute iterator.
  */
@@ -104,14 +106,14 @@ public:
 struct csXmlReadNodeIterator : public iDocumentNodeIterator
 {
 private:
-  csXmlReadDocumentSystem* sys;
+  csXmlReadDocument* doc;
   TrDocumentNode* current;
   bool use_contents_value;
   TrDocumentNodeChildren* parent;
   char* value;
 
 public:
-  csXmlReadNodeIterator (csXmlReadDocumentSystem* sys,
+  csXmlReadNodeIterator (csXmlReadDocument* doc,
 	TrDocumentNodeChildren* parent, const char* value);
   virtual ~csXmlReadNodeIterator () { delete[] value; }
 
@@ -127,16 +129,16 @@ public:
 struct csXmlReadNode : public iDocumentNode
 {
 private:
-  friend class csXmlReadDocumentSystem;
+  friend class csXmlReadDocument;
   TrDocumentNode* node;
   bool use_contents_value;	// Optimization: use GetContentsValue().
   TrDocumentNodeChildren* node_children;
-  // We keep a reference to 'sys' to avoid it being cleaned up too early.
-  // We need 'sys' for the pool.
-  csRef<csXmlReadDocumentSystem> sys;
+  // We keep a reference to 'doc' to avoid it being cleaned up too early.
+  // We need 'doc' for the pool.
+  csRef<csXmlReadDocument> doc;
   csXmlReadNode* next_pool;	// Next element in pool.
 
-  csXmlReadNode (csXmlReadDocumentSystem* sys);
+  csXmlReadNode (csXmlReadDocument* doc);
 
   TrDocumentAttribute* GetAttributeInternal (const char* name);
 
@@ -196,6 +198,9 @@ private:
   // We keep a reference to 'sys' to avoid it being cleaned up too early.
   csRef<csXmlReadDocumentSystem> sys;
 
+  friend struct csXmlReadNode;
+  csXmlReadNode* pool;
+
 public:
   csXmlReadDocument (csXmlReadDocumentSystem* sys);
   virtual ~csXmlReadDocument ();
@@ -204,6 +209,13 @@ public:
 
   virtual void Clear ();
   virtual csRef<iDocumentNode> CreateRoot ();
+
+  /// Internal function: don't use!
+  csXmlReadNode* Alloc ();
+  /// Internal function: don't use!
+  csXmlReadNode* Alloc (TrDocumentNode*, bool use_contents_value);
+  /// Internal function: don't use!
+  void Free (csXmlReadNode* n);
 
   virtual csRef<iDocumentNode> GetRoot ();
   virtual const char* Parse (iFile* file);

@@ -237,7 +237,8 @@ public:
   virtual csRef<iDocumentAttribute> Next ();
 };
 
-struct csBdAttr : public bdNodeAttribute {
+struct csBdAttr : public bdNodeAttribute
+{
 public:
   // fields below only exist in modified attrs!
   /// name

@@ -22,6 +22,8 @@
 #include "iutil/document.h"
 #include "tinyxml.h"
 
+class csTinyXmlDocument;
+
 /**
  * This is an SCF compatible wrapper for an attribute iterator.
  */
@@ -121,13 +123,13 @@ public:
 struct csTinyXmlNodeIterator : public iDocumentNodeIterator
 {
 private:
-  csTinyDocumentSystem* sys;
+  csTinyXmlDocument* doc;
   TiDocumentNode* current;
   TiDocumentNodeChildren* parent;
   char* value;
 
 public:
-  csTinyXmlNodeIterator (csTinyDocumentSystem* sys,
+  csTinyXmlNodeIterator (csTinyXmlDocument* doc,
 	TiDocumentNodeChildren* parent, const char* value);
   virtual ~csTinyXmlNodeIterator () { delete[] value; }
 
@@ -143,15 +145,15 @@ public:
 struct csTinyXmlNode : public iDocumentNode
 {
 private:
-  friend class csTinyDocumentSystem;
+  friend class csTinyXmlDocument;
   TiDocumentNode* node;
   TiDocumentNodeChildren* node_children;
-  // We keep a reference to 'sys' to avoid it being cleaned up too early.
-  // We need 'sys' for the pool.
-  csRef<csTinyDocumentSystem> sys;
+  // We keep a reference to 'doc' to avoid it being cleaned up too early.
+  // We need 'doc' for the pool.
+  csRef<csTinyXmlDocument> doc;
   csTinyXmlNode* next_pool;	// Next element in pool.
 
-  csTinyXmlNode (csTinyDocumentSystem* sys);
+  csTinyXmlNode (csTinyXmlDocument* doc);
 
   TiDocumentAttribute* GetAttributeInternal (const char* name);
 
@@ -210,9 +212,18 @@ private:
   // We keep a reference to 'sys' to avoid it being cleaned up too early.
   csRef<csTinyDocumentSystem> sys;
 
+  csTinyXmlNode* pool;
+
 public:
   csTinyXmlDocument (csTinyDocumentSystem* sys);
   virtual ~csTinyXmlDocument ();
+
+  /// Internal function: don't use!
+  csTinyXmlNode* Alloc ();
+  /// Internal function: don't use!
+  csTinyXmlNode* Alloc (TiDocumentNode*);
+  /// Internal function: don't use!
+  void Free (csTinyXmlNode* n);
 
   SCF_DECLARE_IBASE;
 
