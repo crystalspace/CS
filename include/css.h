@@ -216,6 +216,7 @@
 #include "csgeom/polyedge.h"
 #include "csgeom/polyidx.h"
 #include "csgeom/polypool.h"
+#include "csgeom/polymesh.h"
 #include "csgeom/quaterni.h"
 #include "csgeom/segment.h"
 #include "csgeom/sphere.h"

@@ -31,6 +31,7 @@ chronological order.
 	  Previously it performed the check regardless, which could result in
 	  -lbfd appearing in the link statement even when embedding was
 	  disabled.
+	- Wouter added csgeom/polymesh to include/css.h.
 27-Sep-2003
 	- Eric Sunshine made minor clarifications to the "SCF Changes" section
 	  of the "Release Notes 0.96 to 0.98" appendix in the user manual.
