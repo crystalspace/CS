@@ -37,6 +37,7 @@
 #include "imesh/thing/thing.h"
 #include "imesh/thing/polygon.h"
 #include "imesh/thing/portal.h"
+#include "csengine/material.h"
 
 // Option variable: render portals?
 bool csSector:: do_portals = true;
@@ -748,18 +749,9 @@ void csSector::Draw (iRenderView *rview)
     r3d->EnableZOffset ();
     DrawZ (rview);
     r3d->DisableZOffset ();
+
     for (i = alllights.GetCount () - 1; i >= 0; i--) 
     {
-      csColor color = alllights.Get (i)->GetColor ();
-      float radius = alllights.Get (i)->GetRadius ();
-      radius *= radius;
-      r3d->SetObjectToCamera (&rview->GetCamera ()->GetTransform ());
-      r3d->SetLightParameter (0, CS_LIGHTPARAM_POSITION,
-      	alllights.Get (i)->GetCenter ());
-      r3d->SetLightParameter (0, CS_LIGHTPARAM_DIFFUSE,
-      	csVector3 (color.red, color.green, color.blue));
-      r3d->SetLightParameter (0, CS_LIGHTPARAM_ATTENUATION,
-      	csVector3 (0, 0, radius));
       r3d->DisableColorWrite ();
       r3d->SetShadowState (CS_SHADOW_VOLUME_BEGIN);
       DrawShadow (rview, alllights.Get (i));
@@ -768,6 +760,7 @@ void csSector::Draw (iRenderView *rview)
       DrawLight (rview, alllights.Get(i));
       r3d->SetShadowState (CS_SHADOW_VOLUME_FINISH);
     }
+    
 
 #endif
   }
@@ -879,6 +872,31 @@ void csSector::DrawLight (iRenderView* rview, iLight* light)
     iMeshWrapper *sp = objects[i];
     if (sp)
     {
+      csColor color = light->GetColor ();
+      float radius = light->GetRadius ();
+      radius *= radius;
+      float diffuse, specular, ambient;
+      csRGBpixel matcolor;
+
+      sp->GetMeshObject()->GetMaterialWrapper()->GetMaterial()->GetReflection (diffuse,ambient, specular);
+      sp->GetMeshObject()->GetMaterialWrapper()->GetMaterial()->GetFlatColor(matcolor, false);
+      color.red *= (matcolor.red/255);
+      color.green *= (matcolor.green/255);
+      color.blue *= (matcolor.blue/255);
+
+      r3d->SetObjectToCamera (&rview->GetCamera ()->GetTransform ());
+      //set the light-parameters
+      r3d->SetLightParameter (0, CS_LIGHTPARAM_POSITION,
+      	light->GetCenter ());
+      //set this to be lightcolor * diffuse material
+      r3d->SetLightParameter (0, CS_LIGHTPARAM_DIFFUSE,
+      	csVector3 (color.red, color.green, color.blue)*diffuse);
+      r3d->SetLightParameter (0, CS_LIGHTPARAM_SPECULAR,
+        csVector3 (color.red, color.green, color.blue)*specular);
+
+      r3d->SetLightParameter (0, CS_LIGHTPARAM_ATTENUATION,
+      	csVector3 (1,0,1/radius));
+      
       sp->DrawLight (rview, light);
     }
   }

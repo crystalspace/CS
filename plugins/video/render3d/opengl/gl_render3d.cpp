@@ -23,6 +23,7 @@ Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
 #include "csgeom/polyclip.h"
 #include "csgeom/transfrm.h"
+#include "csgeom/vector4.h"
 
 #include "csutil/objreg.h"
 #include "csutil/ref.h"
@@ -701,6 +702,25 @@ bool csGLRender3D::Open ()
     object_reg->Register( shadermgr, "iShaderManager");
   }
 
+  // setup or standard-variables for lighting
+  //position
+  shvar_light_0_pos = shadermgr->CreateVariable("STANDARD_LIGHT_0_POSITION");
+  shvar_light_0_pos->SetType(iShaderVariable::VECTOR4);
+  shadermgr->AddVariable(shvar_light_0_pos);
+  
+  shvar_light_0_diffuse = shadermgr->CreateVariable("STANDARD_LIGHT_0_DIFFUSE");
+  shvar_light_0_diffuse->SetType(iShaderVariable::VECTOR4);
+  shadermgr->AddVariable(shvar_light_0_diffuse);
+  
+  shvar_light_0_specular = shadermgr->CreateVariable("STANDARD_LIGHT_0_SPECULAR");
+  shvar_light_0_specular->SetType(iShaderVariable::VECTOR4);
+  shadermgr->AddVariable(shvar_light_0_specular);
+
+  shvar_light_0_attenuation = shadermgr->CreateVariable("STANDARD_LIGHT_0_ATTENUATION");
+  shvar_light_0_attenuation->SetType(iShaderVariable::VECTOR4);
+  shadermgr->AddVariable(shvar_light_0_attenuation);
+
+
   csRef<iOpenGLInterface> gl = SCF_QUERY_INTERFACE (G2D, iOpenGLInterface);
   ext.InitExtensions (gl);
 
@@ -1244,26 +1264,21 @@ void csGLRender3D::SetClipper (iClipper2D* clipper, int cliptype)
 
 void csGLRender3D::SetLightParameter (int i, int param, csVector3 value)
 {
-  GLfloat f[4];
-  f[0] = value.x;
-  f[1] = value.y;
-  f[2] = value.z;
-  f[3] = 1;
+  if(i != 0) return; //not implemented any other light than first yet
   switch (param)
   {
   case CS_LIGHTPARAM_POSITION:
-    glLightfv (GL_LIGHT0+i, GL_POSITION, f);
+    value *= object2camera;
+    shvar_light_0_pos->SetValue(csVector4(value));
     break;
   case CS_LIGHTPARAM_DIFFUSE:
-    glLightfv (GL_LIGHT0+i, GL_DIFFUSE, f);
+    shvar_light_0_diffuse->SetValue(csVector4(value));
     break;
   case CS_LIGHTPARAM_SPECULAR:
-    glLightfv (GL_LIGHT0+i, GL_SPECULAR, f);
+    shvar_light_0_specular->SetValue(csVector4(value));
     break;
   case CS_LIGHTPARAM_ATTENUATION:
-    glLightfv (GL_LIGHT0+i, GL_CONSTANT_ATTENUATION, f);
-    glLightfv (GL_LIGHT0+i, GL_LINEAR_ATTENUATION, f+1);
-    glLightfv (GL_LIGHT0+i, GL_QUADRATIC_ATTENUATION, f+2);
+    shvar_light_0_attenuation->SetValue(csVector4(value));
     break;
   }
 }

@@ -1,8 +1,8 @@
 <arbvp>
-<declare name="multiplyer" type="float" default="0.8"/>
-<declare name="color" type="vector3" default="0,1,0.4"/>
-<variablemap variable="multiplyer" register="5"/>
-<variablemap variable="STANDARD_TIME" register="0"/>
+<variablemap variable="STANDARD_LIGHT_0_POSITION" register="0"/>
+<variablemap variable="STANDARD_LIGHT_0_DIFFUSE" register="1"/>
+<variablemap variable="STANDARD_LIGHT_0_SPECULAR" register="2"/>
+<variablemap variable="STANDARD_LIGHT_0_ATTENUATION" register="3"/>
 <streammap stream="vertices" attribute="0" />
 <streammap stream="colors" attribute="1" />
 <streammap stream="normals" attribute="2" />
@@ -16,15 +16,13 @@
 #Parameter definition
 PARAM mv[4]	     = { state.matrix.modelview };
 PARAM mvi[4]	 = { state.matrix.modelview.invtrans };
-PARAM p[4]	     = { state.matrix.projection };
-PARAM color		 = program.local[4];
-PARAM multiple	 = program.local[5];
-PARAM time       = program.local[0];
-PARAM lightPos   = state.light[0].position;
-PARAM lightColor = state.light[0].diffuse;
-PARAM lightAtten = state.light[0].attenuation;
-PARAM testcolor  = { 1, 0, 0, 1 };
-PARAM testvector = { 0, 0.5, 0, 1 };
+PARAM mvp[4]	     = { state.matrix.mvp };
+PARAM lightPos   = program.local[0];
+PARAM lightDiffuse = program.local[1];
+PARAM lightSpecular = program.local[2];
+#PARAM lightSpecular = { 1, 1, 1, 1};
+PARAM lightAttenuation = program.local[3];
+#PARAM lightAttenuation = { 1, 0, 0.01, 0 };
 # Per vertex inputs
 ATTRIB iPos		= vertex.attrib[0];
 ATTRIB iCol0	= vertex.attrib[1];
@@ -35,17 +33,30 @@ OUTPUT oPos		= result.position;
 OUTPUT oCol0	= result.color;
 OUTPUT oTex0	= result.texcoord;
 # Temporaries
-TEMP tempPos;
-TEMP tempColor;
+TEMP eyeVertex;
 TEMP eyeNormal;
-TEMP lightDir;
-TEMP lightDist;
+TEMP normalEyeToVertex;
+TEMP vertToLight;
+TEMP temp;
+TEMP lightAtnFinal;
+TEMP lightFactors;
+TEMP halfVector;
+TEMP lightConsts;
 
-#Transform vertex
-DP4 tempPos.x, mv[0], iPos;
-DP4 tempPos.y, mv[1], iPos;
-DP4 tempPos.z, mv[2], iPos;
-DP4 tempPos.w, mv[3], iPos;
+#Transform vertex to viewspace
+DP4 oPos.x, mvp[0], iPos;
+DP4 oPos.y, mvp[1], iPos;
+DP4 oPos.z, mvp[2], iPos;
+DP4 oPos.w, mvp[3], iPos;
+
+#Just pass on texture-coordinate
+MOV oTex0, iTex0;
+
+#Transform position to eye
+DP4 eyeVertex.x, mv[0], iPos;
+DP4 eyeVertex.y, mv[1], iPos;
+DP4 eyeVertex.z, mv[2], iPos;
+DP4 eyeVertex.w, mv[3], iPos;
 
 #Transform normal
 DP4 eyeNormal.x, mvi[0], iNorm;
@@ -53,28 +64,55 @@ DP4 eyeNormal.y, mvi[1], iNorm;
 DP4 eyeNormal.z, mvi[2], iNorm;
 DP4 eyeNormal.w, mvi[3], iNorm;
 
-#Just pass on texture-coordinate
-MOV oTex0, iTex0;
+#normalize the normal
+DP3 eyeNormal.w, eyeNormal, eyeNormal;
+RSQ eyeNormal.w, eyeNormal.w;
+MUL eyeNormal, eyeNormal, eyeNormal.w;
 
-#Fix colors
-SUB lightDir, lightPos, tempPos;
-#Normalize the lightDir
-DP3 lightDist.x, lightDir, lightDir;
-RSQ lightDist.y, lightDist.x;
-MUL lightDir.xyz, lightDist.y, lightDir;
+#Create normEyeToVertex (normalized eye to vertex vector)
+DP3 normalEyeToVertex.w, eyeVertex, eyeVertex;
+RSQ normalEyeToVertex.w, normalEyeToVertex.w;
+MUL normalEyeToVertex, -eyeVertex, normalEyeToVertex.w;
 
-DP3 tempColor, lightDir, eyeNormal;
-RCP lightDist.x, lightDist.x;
-MUL lightDist.x, lightDist.x, lightAtten.z;
-MUL tempColor, tempColor, lightDist.x;
 
-MUL oCol0, tempColor, lightColor;
- 
+#Calculate halfector
+ADD halfVector, normalEyeToVertex, vertToLight;
+#normalize it
+DP3 halfVector.w, halfVector, halfVector;
+RSQ halfVector.w, halfVector.w;
+MUL halfVector, halfVector, halfVector.w;
 
-DP4 oPos.x, p[0], tempPos;
-DP4 oPos.y, p[1], tempPos;
-DP4 oPos.z, p[2], tempPos;
-DP4 oPos.w, p[3], tempPos;
+
+#calculate vector from vertex to light in eye-space
+ADD vertToLight, lightPos, -eyeVertex;
+DP3 temp.w, vertToLight, vertToLight;
+RSQ vertToLight.w, temp.w;
+#Normalize vertex to light vector
+MUL vertToLight, vertToLight, vertToLight.w;
+
+
+#calculate attenuation
+DST temp, temp.wwww, vertToLight.wwww;  # (1, d, d*d, 1/d)
+DP3 temp.w, temp, lightAttenuation;     # (a0 + a1*d + a2*d2)
+RCP lightAtnFinal.w, temp.w;              # 1 / (a0 + a1*d + a2*d2)
+
+
+#Dot normal with lightvector (vertex to light)
+#diffuse lighting
+DP3 lightFactors.x, eyeNormal, vertToLight;
+#dot normal with half-vector
+DP3 lightFactors.yz, halfVector, eyeNormal;
+
+#calculate lighting
+LIT lightConsts, lightFactors;
+
+#scale by attenuation
+MUL lightConsts, lightConsts, lightAtnFinal.w;
+
+#accumulate color
+MUL temp, lightConsts.y, lightDiffuse;
+MAD oCol0.xyz, lightConsts.z, lightSpecular, temp;
+MOV oCol0.w, lightDiffuse.w;
 
 END
 ]]>

@@ -121,6 +121,12 @@ private:
 
   csConfigAccess config;
 
+  /// Light standard variables
+  csRef<iShaderVariable> shvar_light_0_pos;
+  csRef<iShaderVariable> shvar_light_0_diffuse;
+  csRef<iShaderVariable> shvar_light_0_specular;
+  csRef<iShaderVariable> shvar_light_0_attenuation;
+
 
   bool do_near_plane;
   csPlane3 near_plane;
