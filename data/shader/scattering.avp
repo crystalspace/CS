@@ -21,7 +21,7 @@
       PARAM mvp[4]		= { state.matrix.mvp };
       PARAM ones		= { 1, 1, 1, 0 };
       PARAM log_2_e		= { 1.4427, 1.4427, 1.4427, 1.4427 };
-      PARAM lightIntensity      = { 80, 80, 80, 0 };
+      PARAM lightIntensity      = { 100, 100, 100, 0 };
       PARAM lightPos		= program.local[0];
       PARAM lightDiffuse 	= program.local[1];
       # Several constant specified by the program (scattering factors)

@@ -1,5 +1,5 @@
 <shader type="xmlshader" name="splatting_bump">
-  <technique priority="50">
+  <technique priority="200">
     <pass>
       <mixmode><srcalphaadd/></mixmode>
       <buffer name="vertices" destination="attribute 0" />
@@ -39,6 +39,60 @@
       </fp>
     </pass>
   </technique>
+
+  <technique priority="100">
+    <pass>
+      <mixmode><copy/></mixmode>
+      <writemask r="false" g="false" b="false" a="true"/>
+      <buffer name="vertices" destination="attribute 0" />
+      <buffer name="normals" destination="attribute 2" />
+      <buffer name="texture coordinates" destination="attribute 3" />
+      <buffer name="tangents" destination="attribute 4" />
+      <buffer name="binormals" destination="attribute 5" />
+      <vp plugin="glarb" file="/shader/bump_ppl_diffuse_a.avp" />
+      <texture destination="unit 0" name="standardtex normalization map" />
+      <texture destination="unit 1" name="tex normal" />
+      <fp plugin="glfixed">
+        <fixedfp>
+          <layer> 
+            <colorsource num="0" source="texture" modifier="color"/>
+            <coloroperation operation="replace"/>
+          </layer>
+          <layer>
+            <colorsource num="0" source="previous layer" modifier="color"/>
+            <colorsource num="1" source="texture" modifier="color"/>
+            <coloroperation operation="dot3 alpha"/>
+          </layer>
+        </fixedfp>
+      </fp>
+    </pass>
+    <pass>
+      <mixmode><destalphaadd/></mixmode>
+      <buffer name="vertices" destination="attribute 0" />
+      <buffer name="normals" destination="attribute 2" />
+      <buffer name="texture coordinates" destination="attribute 3" />
+      <buffer name="tangents" destination="attribute 4" />
+      <buffer name="binormals" destination="attribute 5" />
+      <vp plugin="glarb" file="/shader/splatting_bump_b.avp" />
+      <texture destination="unit 0" name="tex diffuse"/>
+      <texture destination="unit 1" name="splat alpha map"/>
+      <fp plugin="glfixed">
+        <fixedfp>
+          <layer>
+            <colorsource num="0" source="primary color" modifier="color"/>
+            <colorsource num="1" source="texture" modifier="color"/> 
+            <coloroperation operation="modulate"/>
+          </layer>
+          <layer>
+            <colorsource num="0" source="previous layer" modifier="color"/>
+	    <colorsource num="1" source="texture" modifier="color"/>
+            <coloroperation operation="modulate"/>
+          </layer>
+        </fixedfp>
+      </fp>
+    </pass>
+  </technique>
+
   <!-- this technique drops the bumpmapping and lighting, for compatibility -->
   <!-- with 2 texture unit hardware -->
   <technique priority="10">

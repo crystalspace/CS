@@ -26,7 +26,7 @@
       PARAM lightAttenuation 	= program.local[4];
       PARAM eyePos	 	= { 0, 0, 0, 1};
       PARAM down		= { 0, 0, 1, 0};
-      PARAM lightIntensity	= { 80, 80, 80, 0 };
+      PARAM lightIntensity	= { 100, 100, 100, 0 };
       PARAM log_2_e		= { 1.4427, 1.4427, 1.4427, 1.4427 };
       PARAM terrain_reflectance = { 0.0138, 0.0113, 0.008, 0 };
 
@@ -65,15 +65,7 @@
       DP4 oPos.z, mvp[2], iPos;
       DP4 oPos.w, mvp[3], iPos;
 
-      #Uncompress the normal and compute Tang and Binorm
-      MOV norm, iNorm.xyyw;
-      MUL norm, norm, norm;
-      ADD norm.y, eyePos.w, -norm.x;
-      ADD norm.y, norm.y, -norm.z;
-      # norm = x^2, y^2, z^2;
-      DP3 norm.w, norm, norm;
-      RSQ norm.w, norm.w;
-      MUL norm, norm, norm.w;
+      MOV norm, iNorm;
       
       XPD tang, down, norm;
       DP3 tang.w, tang, tang;
@@ -125,8 +117,8 @@
       RSQ objEye.w, objEye.w;
       MUL lodblend, objEye.w, loddist;
       RCP lodblend.x, lodblend.x;
+      MIN lodblend.x, lodblend.x, eyePos.w;
       ADD lodblend.x, eyePos.w, -lodblend.x;
-      MAX lodblend.x, lodblend.x, eyePos.x;
       RCP theta.z, objEye.w;
 
       ###

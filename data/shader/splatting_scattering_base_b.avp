@@ -37,12 +37,9 @@ ATTRIB iNorm		= vertex.attrib[1];
 ATTRIB iTex0		= vertex.attrib[2];
 # Outputs
 OUTPUT oPos		= result.position;
-OUTPUT oLightDir	= result.texcoord[0];
-OUTPUT oNormal		= result.texcoord[1];
-OUTPUT oSplat		= result.texcoord[2];
+OUTPUT oSplat		= result.texcoord[0];
 OUTPUT oCol0		= result.color;
 # Temporaries
-TEMP objLight;
 TEMP objEye;
 TEMP lodblend;
 TEMP theta;
@@ -54,13 +51,6 @@ DP4 oPos.y, mvp[1], iPos;
 DP4 oPos.z, mvp[2], iPos;
 DP4 oPos.w, mvp[3], iPos;
 
-DP4 objLight.x, mvi[0], lightPos;
-DP4 objLight.y, mvi[1], lightPos;
-DP4 objLight.z, mvi[2], lightPos;
-DP4 objLight.w, mvi[3], lightPos;
-
-ADD oLightDir, objLight, -iPos;
-MOV oNormal, iNorm;
 MUL oSplat, splatscale, iTex0;
 
 DP4 objEye.x, mvi[0], eyePos;
