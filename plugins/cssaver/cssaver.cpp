@@ -419,12 +419,8 @@ bool csSaver::SaveSectorMeshes(iMeshList *meshList, iDocumentNode *parent)
                                                          iPortalContainer);
     if (portal) 
     {
-
-      //Create the Tag for the Portal
-      csRef<iDocumentNode> meshNode = CreateNode(parent, "portal");
-
       for (int i=0; i<portal->GetPortalCount(); i++)
-        if (!SavePortals(portal->GetPortal(i), meshNode)) return false;
+        if (!SavePortals(portal->GetPortal(i), parent)) return false;
 
       continue;
     }
@@ -492,14 +488,17 @@ bool csSaver::SavePortals(iPortal *portal, iDocumentNode *parent)
 {
   portal->CompleteSector(0);
 
+  //Create the Tag for the Portal
+  csRef<iDocumentNode> portalNode = CreateNode(parent, "portal");
+
   const char* portalname = portal->GetName();
   if (portalname && *portalname) 
-    parent->SetAttribute("name", portalname);
+    portalNode->SetAttribute("name", portalname);
 
   //Write the vertex tags
   for (int vertidx = 0; vertidx < portal->GetVertexIndicesCount(); vertidx++)
   {
-    csRef<iDocumentNode> vertNode = CreateNode(parent, "v");
+    csRef<iDocumentNode> vertNode = CreateNode(portalNode, "v");
     int vertexidx = portal->GetVertexIndices()[vertidx];
     csVector3 vertex = portal->GetVertices()[vertexidx];
     vertNode->SetAttributeAsFloat("x", vertex.x);
@@ -511,7 +510,7 @@ bool csSaver::SavePortals(iPortal *portal, iDocumentNode *parent)
   iSector* sector = portal->GetSector();
   if (sector)
   {
-    csRef<iDocumentNode> sectorNode = CreateNode(parent, "sector");
+    csRef<iDocumentNode> sectorNode = CreateNode(portalNode, "sector");
     const char* name = sector->QueryObject()->GetName();
     if (name && *name) sectorNode->CreateNodeBefore(CS_NODE_TEXT)->SetValue(name);
   }
