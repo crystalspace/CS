@@ -9488,6 +9488,8 @@ package cspace::csSimpleRenderMesh;
 *swig_z_buf_mode_set = *cspacec::csSimpleRenderMesh_z_buf_mode_set;
 *swig_mixmode_get = *cspacec::csSimpleRenderMesh_mixmode_get;
 *swig_mixmode_set = *cspacec::csSimpleRenderMesh_mixmode_set;
+*swig_object2camera_get = *cspacec::csSimpleRenderMesh_object2camera_get;
+*swig_object2camera_set = *cspacec::csSimpleRenderMesh_object2camera_set;
 sub new {
     my $pkg = shift;
     my $self = cspacec::new_csSimpleRenderMesh(@_);
@@ -12977,6 +12979,7 @@ sub CS_MESHTYPE_POINT_SPRITES () { $cspacec::CS_MESHTYPE_POINT_SPRITES }
 sub CS_MESHTYPE_LINES () { $cspacec::CS_MESHTYPE_LINES }
 sub CS_MESHTYPE_LINESTRIP () { $cspacec::CS_MESHTYPE_LINESTRIP }
 sub CS_MESHTYPE_POLYGON () { $cspacec::CS_MESHTYPE_POLYGON }
+sub csSimpleMeshScreenspace () { $cspacec::csSimpleMeshScreenspace }
 sub CS_WRITE_BASELINE () { $cspacec::CS_WRITE_BASELINE }
 sub CS_WRITE_NOANTIALIAS () { $cspacec::CS_WRITE_NOANTIALIAS }
 sub csmcNone () { $cspacec::csmcNone }
