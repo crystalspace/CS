@@ -16,9 +16,7 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 #include <stdio.h>
-//extern "C" {
 #include "Python.h"
-//}
 #include "cssysdef.h"
 #include "cssys/sysfunc.h"
 #include "cspython.h"
@@ -62,7 +60,10 @@ csPython::~csPython()
 }
 
 extern "C" {
-  extern void SWIG_MakePtr(char *_c, const void *_ptr, char *type);
+  struct swig_type_info;
+  extern PyObject * SWIG_NewPointerObj(void *, swig_type_info *, int own);
+  extern swig_type_info * SWIG_TypeQuery(const char *);
+  extern void init_cspace();
 }
 
 bool csPython::Initialize(iObjectRegistry* object_reg)
@@ -71,6 +72,7 @@ bool csPython::Initialize(iObjectRegistry* object_reg)
 
   Py_SetProgramName("Crystal Space -- Python");
   Py_Initialize();
+
   InitPytocs();
 
   char path[256];
@@ -81,18 +83,13 @@ bool csPython::Initialize(iObjectRegistry* object_reg)
   csString cmd;
   cmd << "sys.path.append('" << path << "scripts/python/')";
   if (!RunText (cmd)) return false;
-#if 0 // Enable this to send python script prints to the crystal space console.
-  if (!LoadModule ("cshelper")) return false;
-#endif
   if (!LoadModule ("pdb")) return false;
-  if (!LoadModule ("cspacec")) return false;
   if (!LoadModule ("cspace")) return false;
 
   Mode = CS_REPORTER_SEVERITY_NOTIFY;
 
   // Store the object registry pointer in 'cspace.object_reg'.
-  Store("cspace.object_reg_ptr", object_reg, (void*)"_iObjectRegistry_p");
-  RunText("cspace.object_reg=cspace.iObjectRegistryPtr(cspace.object_reg_ptr)");
+  Store("cspace.object_reg", object_reg, (void *) "iObjectRegistry *");
 
   return true;
 }
@@ -118,12 +115,17 @@ bool csPython::RunText(const char* Text)
 
 bool csPython::Store(const char* name, void* data, void* tag)
 {
-  char command[256];
-  char sysPtr[100];
-  SWIG_MakePtr (sysPtr, data, (char*)tag);
-  sprintf (command, "%s=\"%s\"", name, sysPtr);
-  RunText (command);
-
+  swig_type_info * ti = SWIG_TypeQuery((char*)tag);
+  PyObject * obj = SWIG_NewPointerObj(data, ti, 0);
+  char mod_name[strlen(name)];
+  strcpy(mod_name, name);
+  char * var_name = strrchr(mod_name, '.');
+  if(!var_name)
+    return false;
+  *var_name = 0;
+  ++var_name;
+  PyObject * module = PyImport_ImportModule(mod_name);
+  PyModule_AddObject(module, (char*)var_name, obj);
   return true;
 }
 

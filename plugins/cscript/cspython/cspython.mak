@@ -18,9 +18,11 @@ endif # ifeq ($(MAKESECTION),rootdefines)
 ifeq ($(MAKESECTION),roottargets)
 
 .PHONY: cspython cspythonclean cspythonswig
-all plugins: cspython
+all plugins: cspython cspymod
 
 cspython:
+	$(MAKE_TARGET) MAKE_DLL=yes
+cspymod:
 	$(MAKE_TARGET) MAKE_DLL=yes
 cspythonclean:
 	$(MAKE_CLEAN)
@@ -47,9 +49,14 @@ else
   TO_INSTALL.STATIC_LIBS += $(CSPYTHON)
 endif
 
+CSPYMOD = scripts/python/_cspace$(DLL)
+LIB.CSPYMOD = $(LIB.CSPYTHON)
+LIB.CSPYMOD.LOCAL = $(LIB.CSPYTHON.LOCAL)
+TO_INSTALL.DYNAMIC_LIBS += $(CSPYMOD)
+
 TO_INSTALL.EXE += python.cex
 
-SWIG.INTERFACE = include/ivaria/cs.i
+SWIG.INTERFACE = include/ivaria/cspace.i
 SWIG.CSPYTHON = plugins/cscript/cspython/cs_pyth.cpp
 SWIG.CSPYTHON.OBJ = $(addprefix $(OUT)/,$(notdir $(SWIG.CSPYTHON:.cpp=$O)))
 
@@ -57,9 +64,14 @@ TRASH.CSPYTHON = $(wildcard $(addprefix scripts/python/,*.pyc *.pyo))
 
 INC.CSPYTHON = $(wildcard plugins/cscript/cspython/*.h)
 SRC.CSPYTHON = \
-  $(sort $(wildcard plugins/cscript/cspython/*.cpp) $(SWIG.CSPYTHON))
-OBJ.CSPYTHON = $(addprefix $(OUT)/,$(notdir $(SRC.CSPYTHON:.cpp=$O)))
-DEP.CSPYTHON = CSGEOM CSSYS CSUTIL CSSYS CSUTIL
+  $(filter-out plugins/cscript/cspython/cspymod.cpp, $(sort $(wildcard plugins/cscript/cspython/*.cpp) $(SWIG.CSPYTHON)))
+OBJ.CSPYTHON = $(addprefix $(OUT)/, $(notdir $(SRC.CSPYTHON:.cpp=$O)))
+DEP.CSPYTHON = CSTOOL CSGEOM CSSYS CSUTIL CSSYS CSUTIL
+
+INC.CSPYMOD =
+SRC.CSPYMOD = cspymod.cpp $(SWIG.CSPYTHON)
+OBJ.CSPYMOD = $(addprefix $(OUT)/, $(notdir $(SRC.CSPYMOD:.cpp=$O)))
+DEP.CSPYMOD = $(DEP.CSPYTHON)
 
 MSVC.DSP += CSPYTHON
 DSP.CSPYTHON.NAME = cspython
@@ -74,8 +86,9 @@ ifeq ($(MAKESECTION),targets)
 
 .PHONY: cspython cspythonclean cspythonswig csjavaswigclean
 
-all: $(CSPYTHON.LIB)
+all: $(CSPYTHON.LIB) $(CSPYMOD.LIB)
 cspython: $(OUTDIRS) $(CSPYTHON) python.cex
+cspymod: $(CSPYMOD) python.cex
 clean: cspythonclean
 
 $(SWIG.CSPYTHON.OBJ): $(SWIG.CSPYTHON)
@@ -92,7 +105,7 @@ ifeq (,$(SWIGBIN))
 endif
 
 $(SWIG.CSPYTHON): $(SWIG.INTERFACE)
-	$(SWIGBIN) -python -c++ -docstring -dascii -Sbefore -shadow -Iinclude/ -o $(SWIG.CSPYTHON) $(SWIG.INTERFACE)
+	$(SWIGBIN) -python -c++ -shadow -Iinclude/ -o $(SWIG.CSPYTHON) $(SWIG.INTERFACE)
 	$(MV) plugins/cscript/cspython/cspace.py scripts/python/
 
 python.cex: plugins/cscript/cspython/python.cin
@@ -110,13 +123,18 @@ $(CSPYTHON): $(OBJ.CSPYTHON) $(LIB.CSPYTHON)
 	$(DO.PLUGIN.CORE) $(LIB.CSPYTHON.LOCAL) \
 	$(DO.PLUGIN.POSTAMBLE)
 
+$(CSPYMOD): $(OBJ.CSPYMOD) $(LIB.CSPYMOD)
+	$(DO.PLUGIN.PREAMBLE) \
+	$(DO.PLUGIN.CORE) $(LIB.CSPYMOD.LOCAL) \
+	$(DO.PLUGIN.POSTAMBLE)
+
 cspythonclean:
 	-$(RM) $(CSPYTHON) $(OBJ.CSPYTHON) $(TRASH.CSPYTHON) python.cex
 
 cspythonswig: cspythonswigclean cspython
 
 cspythonswigclean:
-	-$(RM) $(CSPYTHON) $(SWIG.CSPYTHON) $(OUT)/cs_pyth.cpp
+	-$(RM) $(CSPYTHON) $(CSPYMOD) $(SWIG.CSPYTHON) $(OUT)/cs_pyth.cpp
 
 ifdef DO_DEPEND
 dep: $(OUTOS)/cspython.dep

@@ -75,7 +75,7 @@ csOPCODECollideSystem::csOPCODECollideSystem (iBase *pParent)
   TreeCollider.SetFullBoxBoxTest (false);
   TreeCollider.SetFullPrimBoxTest (false);
   // TreeCollider.SetFullPrimPrimTest (true);
-  TreeCollider.SetTemporalCoherence (false);
+  TreeCollider.SetTemporalCoherence (true);
   N_pairs = 0;
   pairs = NULL;
 }
@@ -277,8 +277,9 @@ void csOPCODECollideSystem::ResetCollisionPairs ()
   }
 }
 
-void csOPCODECollideSystem::SetOneHitOnly (bool) 
+void csOPCODECollideSystem::SetOneHitOnly (bool on) 
 {
+  TreeCollider.SetFirstContact (on);
 }
 
 /**
@@ -289,7 +290,7 @@ void csOPCODECollideSystem::SetOneHitOnly (bool)
 */
 bool csOPCODECollideSystem::GetOneHitOnly () 
 {
-  return false;
+  return TreeCollider.FirstContactEnabled ();
 }
 
 /**

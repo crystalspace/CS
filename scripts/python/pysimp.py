@@ -1,18 +1,20 @@
-#!/usr/bin/env python
+#!/usr/bin/env python2
 
 import types, string, re
 
 try:
 	from cspace import *
 except:
-    	print "WARNING: Failed to import module cspace"
+	print "WARNING: Failed to import module cspace"
+	import traceback
+	traceback.print_exc()
 
 def CreateRoom(matname):
 	print 'Start creating polygons from Python script...'
-	engine = object_reg.Query_iEngine()
+	engine = CS_QUERY_REGISTRY(object_reg, iEngine)
 	room = engine.GetSectors().FindByName("room")
 	walls = engine.CreateSectorWallsMesh(room,"walls")
-	thingstate = walls.GetMeshObject().Query_iThingState()
+	thingstate = SCF_QUERY_INTERFACE(walls.GetMeshObject(), iThingState)
 	material=engine.GetMaterialList().FindByName(matname)
 
 	poly=thingstate.CreatePolygon('floor')

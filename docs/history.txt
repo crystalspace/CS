@@ -1,5 +1,13 @@
 The history order is reversed so that new features are at the top.
 
+5-Jan-2002
+	- Applied a patch from Rene Jager (renej.frog@yucom.be) which does
+	  the following:
+	    - Added include/ivaria/cspace.i which is a SWIG 1.3 version of
+	      include/ivaria/cs.i (which is for SWIG 1.1).
+	    - Made the Python plugin SWIG 1.3 compatible.
+	    - A few fixes on the OPCODE plugin so that it works a lot better
+	      now (almost as good as the RAPID plugin).
 4-Jan-2002
 	- Andreas Busch removed duplicate #include lines from various
 	  source files and correcty named the multiple-include-protection

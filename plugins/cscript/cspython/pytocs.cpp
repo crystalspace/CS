@@ -57,13 +57,13 @@ PyMethodDef PytocsMethods[]={
   {NULL, NULL, 0, ""}
 };
 
-extern "C" void initcspacec();
+extern "C" void init_cspace();
 
 //TODO temporary
 
 void InitPytocs() {
   Py_InitModule("pytocs", PytocsMethods);
-  initcspacec();
+  init_cspace();
 //TODO temporary
 }
 

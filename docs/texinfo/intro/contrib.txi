@@ -29,6 +29,12 @@ Keith added the ability for rain drops to do collision detection with
 the surrounding.
 
 @item
+Rene Jager (@email{renej.frog@@yucom.be})
+
+Rene did some modifications for SWIG 1.3 support in the python plugin.
+Rene also fixed the OPCODE plugin.
+
+@item
 Mendrak (@email{mendrak@@worldnet.att.net})
 
 Mendrak added @code{MountRoot()} to VFS and also extended standard font
