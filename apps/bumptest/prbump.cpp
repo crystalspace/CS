@@ -40,6 +40,7 @@ csProcBump::csProcBump () : csProcTexture()
   palette = NULL;
   mat_w = 256;
   mat_h = 256;
+  fastdhdx = fastdhdy = NULL;
 
   texFlags = CS_TEXTURE_3D | CS_TEXTURE_PROC | CS_TEXTURE_NOMIPMAPS
     ;//| CS_TEXTURE_PROC_ALONE_HINT;
@@ -52,6 +53,7 @@ csProcBump::csProcBump (iImage *map) : csProcTexture()
   palette = NULL;
   mat_w = map->GetWidth();
   mat_h = map->GetHeight();
+  fastdhdx = fastdhdy = NULL;
 
   texFlags = CS_TEXTURE_3D | CS_TEXTURE_PROC | CS_TEXTURE_NOMIPMAPS
     ;//| CS_TEXTURE_PROC_ALONE_HINT;
@@ -60,6 +62,8 @@ csProcBump::csProcBump (iImage *map) : csProcTexture()
 csProcBump::~csProcBump ()
 {
   delete[] palette;
+  delete[] fastdhdx;
+  delete[] fastdhdy;
 }
 
 bool csProcBump::PrepareAnim ()
@@ -210,5 +214,92 @@ csVector3 csProcBump::GetNormal(int x, int y, const csVector3& mainnormal,
   res -= xdir * dhdx * (1./64.);
   res -= ydir * dhdy * (1./64.);
   return res.Unit();
+}
+
+
+void csProcBump::SetupFast()
+{
+  /// this texture must be the same size as the bumpmap
+  int x, y;
+  int w = mat_w, h = mat_h;
+  int size = mat_w*mat_h;
+  fastdhdx = new unsigned char [size];
+  fastdhdy = new unsigned char [size];
+  unsigned char *dhdx = fastdhdx;
+  unsigned char *dhdy = fastdhdy;
+  for (y=0; y<mat_h; y++)
+    for (x=0; x<mat_w;x++)
+    {
+      *dhdx++ = (GetHeight((x+1)%w,y) - GetHeight((x+w-1)%w,y))/2 + 128;
+      *dhdy++ = (GetHeight(x,(y+1)%h) - GetHeight(x,(y+h-1)%h))/2 + 128;
+    }
+}
+
+void csProcBump::RecalcFast(const csVector3& center, const csVector3& normal, 
+    const csVector3& xdir, const csVector3& ydir,
+    int numlight, iLight **lights)
+{
+  int l,i,x,y;
+  // precalc fast lookup tables for slopes
+  if(!fastdhdx) SetupFast();
+  // precalc some tables for the current situation
+  // perturbation for the dhdx+128 values
+  short dxval[256];
+  short dyval[256];
+  // the maximum number of lights that will affect a bumpmapoverlay.
+#define MAXBUMPLIGHTS 10
+  if(numlight > MAXBUMPLIGHTS) numlight = MAXBUMPLIGHTS;
+  csVector3 lightdirs[MAXBUMPLIGHTS];
+  float totallightat = 0.0;
+
+  for(l=0; l<numlight; l++)
+  {
+    lightdirs[l] = (lights[l]->GetCenter() - center).Unit();
+    totallightat +=  lightdirs[l] * normal;
+  }
+
+  csVector3 add = xdir * (1./64.);
+  csVector3 pixnormal;
+  float resval;
+  for(i=0; i<256; i++)
+  {
+    pixnormal = normal - add * (i-128);
+    pixnormal.Normalize();
+    resval = 0.0;
+    for(l=0; l<numlight; l++)
+        resval += (lightdirs[l] * pixnormal);
+    dxval[i] = QInt((resval-totallightat)*128.);
+  }
+  add = ydir * (1./64.);
+  for(i=0; i<256; i++)
+  {
+    pixnormal = normal - add * (i-128);
+    pixnormal.Normalize();
+    resval = 0.0;
+    for(l=0; l<numlight; l++)
+        resval += (lightdirs[l] * pixnormal);
+    dyval[i] = QInt((resval-totallightat)*128.) + 128;
+    // 128 is added to dyval, but not to dxval.
+    // so that the result of dxval+dyval is a dx + dy + 128 value.
+  }
+
+  /// draw texture
+  if (!ptG3D->BeginDraw (CSDRAW_2DGRAPHICS))
+    return;
+  i=0;
+  for (y=0; y<mat_h; y++)
+    for (x=0; x<mat_w;x++)
+    {
+      /// scale -1 .. +1 to 0 .. 256 and clip to edges.
+      //int col = QInt((dxval[fastdhdx[i]] + dyval[fastdhdy[i]]) * 128.) + 128;
+      short col = dxval[fastdhdx[i]] + dyval[fastdhdy[i]];
+      if(col < 0) col=0;
+      else if(col > 255) col=255;
+      /// palettesize must be 256 (FindRGB(col,col,col) should work too)
+      ptG2D->DrawPixel (x, y, palette[col] );
+      i++;
+    }
+  ptG3D->FinishDraw ();
+  ptG3D->Print (NULL);
 }
 

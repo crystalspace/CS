@@ -42,6 +42,9 @@ private:
   int palsize;
   /// the bumpmap
   iImage *bumpmap;
+
+  /// bumpmap representation for RecalcFast (slopevalues are +128)
+  unsigned char *fastdhdx, *fastdhdy;
   
   /// make my palette, max nr of colours
   void MakePalette (int max);
@@ -67,6 +70,12 @@ public:
   void SetBumpMap(iImage *m) {bumpmap = m;}
   /// calc an array of lights
   void Recalc(const csVector3& center, const csVector3& normal, 
+    const csVector3& xdir, const csVector3& ydir,
+    int numlight, iLight **lights);
+  /// Setup the faster computation
+  void SetupFast();
+  /// calc an array of lights, using a faster computation
+  void RecalcFast(const csVector3& center, const csVector3& normal, 
     const csVector3& xdir, const csVector3& ydir,
     int numlight, iLight **lights);
 

@@ -464,6 +464,7 @@ void BumpTest::NextFrame ()
   SysSystemDriver::NextFrame ();
   cs_time elapsed_time, current_time;
   GetElapsedTime (elapsed_time, current_time);
+  //printf("elapsed_time %d\n", (int)elapsed_time);
 
   // Now rotate the camera according to keyboard state
   float speed = (elapsed_time / 1000.) * (0.03 * 20);
@@ -508,7 +509,8 @@ void BumpTest::NextFrame ()
   csVector3 ydir(0,-1,0);
   iLight *l = bumplight;
 
-  prBump->Recalc(center, normal, xdir, ydir, 1, &l);
+  //prBump->Recalc(center, normal, xdir, ydir, 1, &l);
+  prBump->RecalcFast(center, normal, xdir, ydir, 1, &l);
 
   // Tell 3D driver we're going to display 3D things.
   if (!G3D->BeginDraw (engine->GetBeginDrawFlags () | CSDRAW_3DGRAPHICS))
