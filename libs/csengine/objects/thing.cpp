@@ -354,6 +354,14 @@ void csThing::DrawCurves (csRenderView& rview, bool use_z_buf)
 	    vtr = vbr;
 	    vbr = (vbr + 3 - 1) % 3;
 	  }
+          else
+          {
+            // The last two vertices of the triangle have the same height.
+	    // @@@ I think we should interpolate by 'x' here but this fix at
+	    // least eliminates most errors.
+            vtl = vbl;
+            vbl = (vbl + 1) % 3;
+          }
 
 	  // Now interpolate Z,U,V by Y
 	  float tL = persp [vbl].y - persp [vtl].y;
