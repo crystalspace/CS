@@ -28,5 +28,6 @@ if $(PYTHON.AVAILABLE) = "yes"
   Plugin cspython : $(target) cspython.h cspython.cpp pytocs.h pytocs.cpp ;
   LinkWith cspython : cstool csgfx csgeom csutil ;
   ExternalLibs cspython : PYTHON ;
-  CFlags cspython : -DSWIG_GLOBAL $(COMPILER.C++FLAGS.WARNING.NO_UNUSED) ;
+  CFlags cspython :
+    [ FDefines SWIG_GLOBAL ] $(COMPILER.C++FLAGS.WARNING.NO_UNUSED) ;
 }

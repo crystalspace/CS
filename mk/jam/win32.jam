@@ -27,8 +27,8 @@ CMD.DLLWRAP ?= dllwrap ;
 USE_DLLWRAP ?= no ;
 
 NASM.FLAGS += -f win32 -DEXTERNC_UNDERSCORE ;
-CCFLAGS += -pipe -I/usr/include/directx ;
-C++FLAGS += -pipe -I/usr/include/directx ;
+CCFLAGS += -pipe [ FIncludes /usr/include/directx ] ;
+C++FLAGS += -pipe [ FIncludes /usr/include/directx ] ;
 LINKLIBS += -L/usr/lib/w32api -lgdi32 -lshell32 ;
 PLUGIN.LFLAGS += -mwindows -mconsole ;
 WINDRES.FLAGS = --use-temp-file ;

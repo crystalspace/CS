@@ -8,7 +8,7 @@ LinkWith xwin : canvascommon csgeom csutil ;
 CompileGroups xwin : drivers2d softcanvas ;
 if $(XFREE86VM.AVAILABLE) = "yes"
 {
-  CFlags xwin : -DXFREE86VM ;
+  CFlags xwin : [ FDefines XFREE86VM ] ;
   ExternalLibs xwin : XFREE86VM ;
 }
 else

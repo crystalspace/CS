@@ -68,5 +68,5 @@ Library csutil :
   [ Wildcard [ ConcatDirs $(DOTDOT) $(DOTDOT) include csutil unix ] : *.h ] ;
 
 CFlags csutil :
-  -DCS_CONFIGDIR='\"$(appconfdir)\"' 
-  -DCS_PLUGINDIR='\"$(plugindir)\"' ;
+  [ FDefines CS_CONFIGDIR='\"$(appconfdir)\"' ]
+  [ FDefines CS_PLUGINDIR='\"$(plugindir)\"'  ] ;

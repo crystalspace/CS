@@ -48,6 +48,9 @@ chronological order.
 	    - Renamed the msvcgen6 and msvcgen7 targets to msvc6gen and
 	      msvc7gen, respectively.  Also added mvsc6clean and msvc7clean
 	      targets.
+	- Eric Sunshine fixed several Jamfiles throughout the project to
+	  utilize the portable FDefines and FIncludes rules instead of
+	  harcoding -D and -I.
 19-Apr-2004
 	- Eric Sunshine added LGPL license notice to the .m4 and .jam files.
 	- Jorrit fixed a bug in iEngine->CreatePortalContainer(). If there
@@ -319,7 +322,7 @@ chronological order.
 	  tested but never filled. So totally useless.
 	- Jorrit changed the chunklod mesh object (NR terrain engine) so that
 	  it now returns an accurate bbox instead of the previous bbox
-	  that was WAAY too big. It now uses the bbox of the root quad.
+	  that was WAY too big. It now uses the bbox of the root quad.
 	  Also fixed GetRadius() to use this bbox.
 	- Jorrit fixed nullmesh so it properly implements iNullMeshState
 	  now.
