@@ -50,6 +50,10 @@
 #include "ilghtmap.h"
 #include "igraph2d.h"
 
+#ifdef _MSC_VER
+// get rid of evil annoying "variable may be used without having been init'ed"
+#pragma warning(disable : 4701)
+#endif
 
 /***** File-scope variables *****/
 
@@ -61,23 +65,69 @@ static const DWORD D3DFVF_TLVERTEX2 = (D3DFVF_XYZRHW | D3DFVF_DIFFUSE | D3DFVF_S
 
 struct D3DTLVERTEX2
 {
-	float sx, sy, sz;
-	float rhw;
-	D3DCOLOR color;
-	D3DCOLOR specular;
-	union
-	{
-		float tu;
-		float tu1;
-	};
-	union
-	{
-		float tv;
-		float tv1;
-	};
-	float tu2;
-	float tv2;
+    float sx, sy, sz;
+    float rhw;
+    D3DCOLOR color;
+    D3DCOLOR specular;
+    union
+    {
+        float tu;
+        float tu1;
+    };
+    union
+    {
+        float tv;
+        float tv1;
+    };
+    float tu2;
+    float tv2;
 };
+
+//
+// lame Utils
+//
+
+#ifdef PROC_INTEL
+// This will only work for positive values.
+// float cmp greater
+inline bool FLOATCMPG(float a, float b)
+{
+  unsigned int A = *((unsigned int *) &a);
+  unsigned int B = *((unsigned int *) &b);
+
+  if (A > B)
+    return true;
+
+  return false;
+}
+
+// float cmp less
+inline bool FLOATCMPL(float a, float b)
+{
+  unsigned int A = *((unsigned int *) &a);
+  unsigned int B = *((unsigned int *) &b);
+
+  if (A < B)
+    return true;
+
+  return false;
+}
+
+#else
+#define FLOATCMPG(a, b) (a > b)
+#define FLOATCMPL(a, b) (a < b)
+#endif
+
+#define CLAMP(a, b) (a = (FLOATCMPG(a, b) ? b : a))
+#define CLAMPG(a, b) CLAMP(a, b)
+#define CLAMPL(a, b) (a = (FLOATCMPL(a, b) ? b : a))
+
+#define D3DRGB_(r, g, b) \
+    (0xff000000L | ( (QInt(((r) * 255))) << 16) | ((QInt(((g) * 255))) << 8) | QInt(((b) * 255)))
+#define D3DRGBA_(r, g, b, a) \
+    (   ((QInt(((a) * 255))) << 24) | ((QInt(((r) * 255))) << 16) \
+    |   ((QInt(((g) * 255))) << 8) | QInt(((b) * 255)) \
+    )
 
 /* ************************************************************** 
 csGraphics3DDirect3DDx61 Class Definition
@@ -91,8 +141,6 @@ DDSURFACEDESC2 csGraphics3DDirect3DDx6::m_ddsdTextureSurfDesc = { 0 };
 DDSURFACEDESC2 csGraphics3DDirect3DDx6::m_ddsdLightmapSurfDesc = { 0 };
 // have to work on the HALO-support ... will not be easy ... shit MS
 DDSURFACEDESC2 csGraphics3DDirect3DDx6::m_ddsdHaloSurfDesc = { 0 };
-
-int csStateCacheDirect3DDx6::s_Count = 0;
 
 //
 // Interface table definition
@@ -289,7 +337,7 @@ bool csGraphics3DDirect3DDx6::Initialize (iSystem *iSys)
 
   use16BitTexture = config->GetYesNo("Direct3DDX6","USE_16BIT_TEXTURE", false);
   if (use16BitTexture)
-    use32BitTexture = config->GetYesNo("Direct3DDX6","EXTEND_32BIT_TEXTURE", false);
+    use32BitTexture = config->GetYesNo("Direct3DDX6","EXTEND_32BIT_TEXTURE", false);  
 
   return true;
 }
@@ -344,7 +392,7 @@ bool csGraphics3DDirect3DDx6::Open(const char* Title)
   hRes = m_lpDD4->QueryInterface(IID_IDirectDraw4, (LPVOID*)&lpDD4);
   if ( FAILED(hRes) )
     return false;
-  	
+    
   memset(&ddsCaps, 0, sizeof(ddsCaps));
 
   ddsCaps.dwCaps = DDSCAPS_TEXTURE;
@@ -565,7 +613,7 @@ bool csGraphics3DDirect3DDx6::Open(const char* Title)
         SysPrintf (MSG_INITIALIZATION, " Using 32-bit lightmap format.\n");
     }
   }
- 
+
   // set Halo effect configuration
   if (m_pDirectDevice->GetAlphaBlendHalo() && !config->GetYesNo("Direct3DDX6","DISABLE_HALO", false))
     m_bHaloEffect = true;
@@ -729,14 +777,21 @@ bool csGraphics3DDirect3DDx6::Open(const char* Title)
   if (FAILED(hRes))
     return false;
 
+  ConfigureRendering();
   // init render state cache
   m_States.Initialize(m_lpd3dDevice2, m_piSystem);
-  
+  // the buffer size could be potentially tweaked for better performance
+  m_VertexCache.Initialize(m_lpd3dDevice2, 32);
+  // set to false if we want to revert on "older" PolygonFX (supports fogging)
+  m_bBatchPolygonFX = true;
+
   return true;
 }
 
 void csGraphics3DDirect3DDx6::Close()
 {
+  m_VertexCache.ShutDown();
+
   ClearCache();
   
   FINAL_RELEASE(m_lpd3dBackMat);
@@ -746,6 +801,203 @@ void csGraphics3DDirect3DDx6::Close()
   FINAL_RELEASE(m_lpd3dViewport);
   FINAL_RELEASE(m_lpD3D);
 }
+
+// TODO/FIXME : - implement some of this into DirectDetection
+//        - add user settings control
+//        - maybe keep render state tables as static and only
+//          only store settings as index into table
+// This makes obsolete alot of initialization done in ::Open()
+void csGraphics3DDirect3DDx6::ConfigureRendering()
+{  
+  LPD3DDEVICEDESC lpD3dDeviceDesc = m_pDirectDevice->GetDesc3D();
+
+  // single pass multitexturing detection
+  if (lpD3dDeviceDesc->wMaxSimultaneousTextures >= 2)
+    m_bMultiTexture = true;
+  else
+    m_bMultiTexture = false;
+
+  // start up with minimum settings
+  m_bRenderTransparent = false;
+  m_bRenderLightmap = false;
+
+  // set filters  
+  m_lpd3dDevice2->SetTextureStageState(0, D3DTSS_MAGFILTER, D3DTFG_POINT);
+  m_lpd3dDevice2->SetTextureStageState(0, D3DTSS_MINFILTER, D3DTFG_POINT);
+  m_lpd3dDevice2->SetTextureStageState(0, D3DTSS_MINFILTER, D3DTFG_POINT);
+
+  if (lpD3dDeviceDesc->dpcTriCaps.dwTextureFilterCaps & D3DPTFILTERCAPS_MAGFLINEAR)
+    m_lpd3dDevice2->SetTextureStageState(0, D3DTSS_MAGFILTER, D3DTFG_LINEAR);
+
+  if (lpD3dDeviceDesc->dpcTriCaps.dwTextureFilterCaps & D3DPTFILTERCAPS_MINFLINEAR)
+    m_lpd3dDevice2->SetTextureStageState(0, D3DTSS_MINFILTER, D3DTFG_LINEAR);
+
+  if (lpD3dDeviceDesc->dpcTriCaps.dwTextureFilterCaps & D3DPTFILTERCAPS_MIPFLINEAR)
+    m_lpd3dDevice2->SetTextureStageState(0, D3DTSS_MINFILTER, D3DTFG_LINEAR);
+
+  // FIXME : DX documentation states that some hardware only support
+  //       D3DTOP_SELECTARG1 for the first stage, strange
+  m_lpd3dDevice2->SetTextureStageState(0, D3DTSS_COLOROP, D3DTOP_MODULATE);
+  m_lpd3dDevice2->SetTextureStageState(0, D3DTSS_COLORARG1, D3DTA_TEXTURE);
+  m_lpd3dDevice2->SetTextureStageState(0, D3DTSS_COLORARG2, D3DTA_DIFFUSE);
+  m_lpd3dDevice2->SetTextureStageState(0, D3DTSS_ALPHAOP, D3DTOP_SELECTARG2);
+  m_lpd3dDevice2->SetTextureStageState(0, D3DTSS_ALPHAARG2, D3DTA_DIFFUSE);
+
+  m_lpd3dDevice2->SetTextureStageState(0, D3DTSS_TEXCOORDINDEX, 0);
+  m_lpd3dDevice2->SetTextureStageState(1, D3DTSS_TEXCOORDINDEX, 1);
+
+  m_lpd3dDevice2->SetTextureStageState(0, D3DTSS_ADDRESS, D3DTADDRESS_WRAP);
+  m_lpd3dDevice2->SetTextureStageState(1, D3DTSS_ADDRESS, D3DTADDRESS_CLAMP);
+
+  //  Dest*Alpha + (srcTex*srcLightmap)*InvAlpha
+  //  (Dest*Alpha + srcTex*InvAlpha)*srcLightmap
+
+    //.dpcTriCaps
+  if (m_bMultiTexture)
+  {
+    bool FoundGoodTextureOp = false;
+
+    // set default states for multitexturing
+
+    // more filters
+    m_lpd3dDevice2->SetTextureStageState(1, D3DTSS_MAGFILTER, D3DTFG_POINT);
+    m_lpd3dDevice2->SetTextureStageState(1, D3DTSS_MINFILTER, D3DTFG_POINT);
+    m_lpd3dDevice2->SetTextureStageState(1, D3DTSS_MIPFILTER, D3DTFG_POINT);
+
+    if (lpD3dDeviceDesc->dpcTriCaps.dwTextureFilterCaps & D3DPTFILTERCAPS_MAGFLINEAR)
+      m_lpd3dDevice2->SetTextureStageState(1, D3DTSS_MAGFILTER, D3DTFG_LINEAR);
+
+    if (lpD3dDeviceDesc->dpcTriCaps.dwTextureFilterCaps & D3DPTFILTERCAPS_MINFLINEAR)
+      m_lpd3dDevice2->SetTextureStageState(1, D3DTSS_MAGFILTER, D3DTFG_LINEAR);
+
+    if (lpD3dDeviceDesc->dpcTriCaps.dwTextureFilterCaps & D3DPTFILTERCAPS_MIPFLINEAR) 
+      m_lpd3dDevice2->SetTextureStageState(1, D3DTSS_MAGFILTER, D3DTFG_LINEAR);
+
+    m_lpd3dDevice2->SetTextureStageState(1, D3DTSS_COLORARG1, D3DTA_TEXTURE);
+    m_lpd3dDevice2->SetTextureStageState(1, D3DTSS_COLORARG2, D3DTA_CURRENT);
+    m_lpd3dDevice2->SetTextureStageState(1, D3DTSS_ALPHAOP, D3DTOP_SELECTARG2);
+    m_lpd3dDevice2->SetTextureStageState(1, D3DTSS_ALPHAARG2, D3DTA_DIFFUSE);
+
+    struct _TexOpList {
+    DWORD Flag;
+    D3DTEXTUREOP Op;
+    } TexOpList [] = {D3DTEXOPCAPS_MODULATE2X,  D3DTOP_MODULATE2X,
+              D3DTEXOPCAPS_MODULATE,  D3DTOP_MODULATE,
+              D3DTEXOPCAPS_ADDSIGNED, D3DTOP_ADDSIGNED2X,
+              D3DTEXOPCAPS_ADD,     D3DTOP_ADD,
+    };
+
+    m_LightmapTextureOp = D3DTOP_DISABLE;
+
+    // NOTE : Im not too sure what's the proper way of validating
+    //        this stuff, maybe Im doing something wrong.
+
+    for (int i = 0; i < sizeof(TexOpList)/sizeof(_TexOpList); i++)
+    {
+      if (lpD3dDeviceDesc->dwTextureOpCaps & TexOpList[i].Flag)
+      {
+        m_lpd3dDevice2->SetTextureStageState(1, D3DTSS_COLOROP, TexOpList[i].Op);
+
+        DWORD NumPass;
+        HRESULT hResult = m_lpd3dDevice2->ValidateDevice(&NumPass);
+
+        switch (hResult)
+        {
+          case D3D_OK :
+            FoundGoodTextureOp = true;
+          break;
+          case DDERR_INVALIDOBJECT :
+          case DDERR_INVALIDPARAMS :
+          case D3DERR_TOOMANYOPERATIONS :
+          case D3DERR_UNSUPPORTEDALPHAARG :
+          case D3DERR_UNSUPPORTEDALPHAOPERATION :
+          case D3DERR_UNSUPPORTEDCOLORARG :
+          case D3DERR_UNSUPPORTEDCOLOROPERATION :
+          break;
+
+          // none of this should be happening ...
+          // except maybe conflicting texture filter
+          case D3DERR_CONFLICTINGTEXTUREFILTER :
+          case D3DERR_CONFLICTINGTEXTUREPALETTE :
+          case D3DERR_UNSUPPORTEDFACTORVALUE :
+          case D3DERR_UNSUPPORTEDTEXTUREFILTER :
+          case D3DERR_WRONGTEXTUREFORMAT :
+          default :
+          break;
+        }
+
+        if (FoundGoodTextureOp)
+        {
+          m_bRenderLightmap = true;
+          m_LightmapTextureOp = TexOpList[i].Op;
+          break;
+        }
+
+      } // end of if(Flag)
+    } // end of for()
+
+    if (!FoundGoodTextureOp)
+    {
+      SysPrintf(MSG_INITIALIZATION, "WARNING : Cant find any decent lightmap TextureOp for stage1\n");
+      // fall back upon lame multipass
+      m_bMultiTexture = false;
+    }
+
+    m_lpd3dDevice2->SetTextureStageState(1, D3DTSS_COLOROP, m_LightmapTextureOp);
+    } // end of if (m_bMultiTexture)
+
+  // Multipass'ing
+  if (!m_bMultiTexture)
+  {
+    m_lpd3dDevice2->SetTextureStageState(1, D3DTSS_COLOROP, D3DTOP_DISABLE);
+
+    struct _BlendList {
+      DWORD SrcFlag, DstFlag;
+      D3DBLEND Src, Dst;
+    } BlendList[] = {{D3DPBLENDCAPS_DESTCOLOR, D3DPBLENDCAPS_SRCCOLOR,  D3DBLEND_DESTCOLOR, D3DBLEND_SRCCOLOR},
+             {D3DPBLENDCAPS_DESTCOLOR, D3DPBLENDCAPS_ZERO,    D3DBLEND_DESTCOLOR, D3DBLEND_ZERO},
+             {D3DPBLENDCAPS_ONE, D3DPBLENDCAPS_ONE,       D3DBLEND_ONE, D3DBLEND_ONE},
+             {D3DPBLENDCAPS_ONE, D3DPBLENDCAPS_SRCCOLOR,    D3DBLEND_ONE, D3DBLEND_SRCCOLOR},
+             };
+
+    for (int i = 0; i < sizeof(BlendList)/sizeof(_BlendList); i++)
+    {
+      if ((lpD3dDeviceDesc->dpcTriCaps.dwSrcBlendCaps & BlendList[i].SrcFlag) &&
+        (lpD3dDeviceDesc->dpcTriCaps.dwDestBlendCaps & BlendList[i].DstFlag))
+      {
+        m_bRenderLightmap = true;
+        m_LightmapSrcBlend = BlendList[i].Src;
+        m_LightmapDstBlend = BlendList[i].Dst;
+        break;
+      }
+    }
+
+  } // end of if (!m_bMultiTexture)
+
+//--- transparency settings ---
+
+  // hum, this code looks familiar eh
+  struct _TransList {
+    DWORD SrcFlag, DstFlag;
+    D3DBLEND Src, Dst;
+  } TransList[] = {{D3DPBLENDCAPS_INVSRCALPHA, D3DPBLENDCAPS_SRCALPHA, D3DBLEND_INVSRCALPHA, D3DBLEND_SRCALPHA},
+                   {D3DPBLENDCAPS_SRCALPHA, D3DPBLENDCAPS_INVSRCALPHA, D3DBLEND_SRCALPHA, D3DBLEND_INVSRCALPHA},
+                   };
+  // TODO : store translucency type
+  for (int i = 0; i < sizeof(TransList)/sizeof(_TransList); i++)
+  {
+    if ((lpD3dDeviceDesc->dpcTriCaps.dwSrcBlendCaps & TransList[i].SrcFlag) &&
+        (lpD3dDeviceDesc->dpcTriCaps.dwDestBlendCaps & TransList[i].DstFlag))
+    {
+      m_bRenderTransparent = true;
+
+      m_TransSrcBlend = TransList[i].Src;
+      m_TransDstBlend = TransList[i].Dst;
+      break;
+    }
+  }
+
+} // end of void csGraphics3DDirect3DDx6::ConfigureRendering()
 
 void csGraphics3DDirect3DDx6::SetDimensions(int nWidth, int nHeight)
 {
@@ -861,12 +1113,12 @@ void csGraphics3DDirect3DDx6::SetZBufMode(G3DZBufMode mode)
   if (mode == CS_ZBUF_TEST)
     VERIFY_RESULT( m_lpd3dDevice2->SetRenderState(D3DRENDERSTATE_ZWRITEENABLE, FALSE), DD_OK );
   else
-    VERIFY_RESULT( m_lpd3dDevice2->SetRenderState(D3DRENDERSTATE_ZWRITEENABLE, TRUE), DD_OK );    
+    VERIFY_RESULT( m_lpd3dDevice2->SetRenderState(D3DRENDERSTATE_ZWRITEENABLE, TRUE), DD_OK );
   
   if (mode == CS_ZBUF_FILL)      // write-only
-    VERIFY_RESULT( m_lpd3dDevice2->SetRenderState(D3DRENDERSTATE_ZFUNC, D3DCMP_ALWAYS), DD_OK );
+  m_States.SetZFunc(D3DCMP_ALWAYS);
   else 
-    VERIFY_RESULT( m_lpd3dDevice2->SetRenderState(D3DRENDERSTATE_ZFUNC, D3DCMP_LESSEQUAL), DD_OK );
+    m_States.SetZFunc(D3DCMP_LESSEQUAL);
 }
 
 
@@ -967,9 +1219,7 @@ void csGraphics3DDirect3DDx6::SetupPolygon( G3DPolygonDP& poly, float& J1, float
   }
 }
 
-#define MULTITEXTURE
-
-void csGraphics3DDirect3DDx6::DrawPolygon (G3DPolygonDP& poly)
+void csGraphics3DDirect3DDx6::MultitextureDrawPolygon(G3DPolygonDP & poly)
 {
   ASSERT( m_lpd3dDevice2 );
 
@@ -982,21 +1232,24 @@ void csGraphics3DDirect3DDx6::DrawPolygon (G3DPolygonDP& poly)
   float J1, J2, J3, K1, K2, K3;
   float M, N, O;
   int i;
-  
+
   csHighColorCacheData* pTexCache   = NULL;
   csHighColorCacheData* pLightCache = NULL;
   D3DTLVERTEX2 vx;
-  
+
   float z;
-  
+
   if (poly.num < 3) 
     return;
-  
+
   // set up the geometry.
   SetupPolygon( poly, J1, J2, J3, K1, K2, K3, M, N, O );
 
   poly_alpha = poly.alpha;
-  bTransparent = poly_alpha>0 ? true : false;
+  if ((poly_alpha > 0) && m_bRenderTransparent)
+    bTransparent = true;
+  else
+    bTransparent = false;
 
   //Mipmapping is done for us by DirectX, so we will always select the texture with
   //the highest resolution.
@@ -1011,13 +1264,13 @@ void csGraphics3DDirect3DDx6::DrawPolygon (G3DPolygonDP& poly)
   // retrieve the texture from the cache by handle.
   csTextureMMDirect3D* txt_mm = (csTextureMMDirect3D*)poly.txt_handle->GetPrivateObject ();
   pTexCache = txt_mm->GetHighColorCacheData ();
-  
+
   bColorKeyed = txt_mm->GetTransparent ();
- 
+
   // retrieve the lightmap from the cache.
   iLightMap* piLM = pTex->GetLightMap ();
-  
-  if ( piLM )
+
+  if ( piLM  && m_bRenderLightmap)
   {
     pLightCache = piLM->GetHighColorCache ();
     if (!pLightCache)
@@ -1029,35 +1282,15 @@ void csGraphics3DDirect3DDx6::DrawPolygon (G3DPolygonDP& poly)
   {
     bLightmapExists=false;
   }
-  
+
   if(m_iTypeLightmap == 0)
     bLightmapExists = false;
-
-  if( bLightmapExists )
-  {
-    switch( m_iTypeLightmap )
-    {
-    case 1:    
-//      VERIFY_RESULT(m_lpd3dDevice2->SetRenderState(D3DRENDERSTATE_SRCBLEND,  D3DBLEND_DESTCOLOR), DD_OK );
-//		m_States.SetSrcBlend(D3DBLEND_DESTCOLOR);
-//      VERIFY_RESULT(m_lpd3dDevice2->SetRenderState(D3DRENDERSTATE_DESTBLEND, D3DBLEND_SRCCOLOR), DD_OK );
-//		m_States.SetDstBlend(D3DBLEND_SRCCOLOR);
-      break;
-      
-    case 2:
-//      VERIFY_RESULT(m_lpd3dDevice2->SetRenderState(D3DRENDERSTATE_SRCBLEND,  D3DBLEND_SRCALPHA), DD_OK );
-//        m_States.SetSrcBlend(D3DBLEND_SRCALPHA);
-//      VERIFY_RESULT(m_lpd3dDevice2->SetRenderState(D3DRENDERSTATE_DESTBLEND, D3DBLEND_SRCCOLOR), DD_OK );
-//        m_States.SetDstBlend(D3DBLEND_SRCCOLOR);
-      break;
-    }
-  }
 
   if ( bTransparent )
   {
     m_States.SetAlphaBlendEnable(true);
-    m_States.SetDstBlend(D3DBLEND_SRCALPHA);
-    m_States.SetSrcBlend(D3DBLEND_INVSRCALPHA);
+    m_States.SetDstBlend(m_TransDstBlend);
+    m_States.SetSrcBlend(m_TransSrcBlend);
   }
   else
   {
@@ -1099,7 +1332,7 @@ void csGraphics3DDirect3DDx6::DrawPolygon (G3DPolygonDP& poly)
     lightmap_scale_v = scale_v / (lightmap_high_v - lightmap_low_v);
 
     m_States.SetTexture(1, ((D3DLightCache_Data *)pLightCache->pData)->lptex);
-	m_States.SetStageState(1, D3DTSS_COLOROP, D3DTOP_MODULATE2X);
+    m_States.SetStageState(1, D3DTSS_COLOROP, m_LightmapTextureOp);
   }
   else
   {
@@ -1108,20 +1341,18 @@ void csGraphics3DDirect3DDx6::DrawPolygon (G3DPolygonDP& poly)
 
   D3DCOLOR vertex_color;
 
-  if (bTransparent && bLightmapExists)
+  if (bTransparent)
   {
-    vertex_color = D3DRGBA(1.0f, 1.0f, 1.0f, (float)poly_alpha * (1.0f / 100.0f));
+    vertex_color = RGBA_MAKE(0xFF, 0xFF, 0xFF, QInt(poly_alpha * (255.0f / 100.0f)));
   }
   else
   {
-    if(m_iTypeLightmap == 2)
-      vertex_color = (D3DCOLOR) D3DRGBA(1.0f, 1.0f, 1.0f, 1.0f);
-    else
-      vertex_color = D3DRGB(1.0f, 1.0f, 1.0f);
+  // TODO : turn off color component interpolation if no transparency
+    vertex_color = RGBA_MAKE(0xFF, 0xFF, 0xFF, 0xFF);
   }
 
   VERIFY_RESULT(m_lpd3dDevice2->Begin(D3DPT_TRIANGLEFAN, D3DFVF_TLVERTEX2,
-				D3DDP_DONOTUPDATEEXTENTS), DD_OK);  
+                D3DDP_DONOTUPDATEEXTENTS), DD_OK);  
 
   // render texture-mapped poly
   for (i=0; i < poly.num; i++)
@@ -1139,10 +1370,10 @@ void csGraphics3DDirect3DDx6::DrawPolygon (G3DPolygonDP& poly)
 
     vx.sz = z*(float)SCALE_FACTOR;
 
-    if(vx.sz>0.9999)
-      vx.sz=0.9999;
+      if(vx.sz>0.9999)
+        vx.sz=0.9999;
 
-	vx.color = vertex_color;
+    vx.color = vertex_color;
     vx.rhw = one_over_sz;
 
     vx.specular = 0;
@@ -1160,86 +1391,305 @@ void csGraphics3DDirect3DDx6::DrawPolygon (G3DPolygonDP& poly)
 
   m_lpd3dDevice2->End(0);
 
-  // reset render states.
   // If there is vertex fog then we apply that last.
   if (poly.use_fog)
   {
     m_States.SetAlphaBlendEnable(true);
-    VERIFY_RESULT(m_lpd3dDevice2->SetRenderState(D3DRENDERSTATE_ZFUNC, D3DCMP_LESSEQUAL), DD_OK);
-	m_States.SetDstBlend(D3DBLEND_SRCALPHA);
-	m_States.SetSrcBlend(D3DBLEND_INVSRCALPHA);
-	m_States.SetTexture(0, NULL);
+    m_States.SetZFunc(D3DCMP_LESSEQUAL);
+    m_States.SetDstBlend(D3DBLEND_SRCALPHA);
+    m_States.SetSrcBlend(D3DBLEND_INVSRCALPHA);
+    m_States.SetTexture(0, NULL);
     m_States.SetStageState(1, D3DTSS_COLOROP, D3DTOP_DISABLE);
 
     VERIFY_RESULT(m_lpd3dDevice2->Begin(D3DPT_TRIANGLEFAN, D3DFVF_TLVERTEX, D3DDP_DONOTUPDATEEXTENTS), DD_OK);
 
     for (i=0; i<poly.num; i++)
     {
-	  D3DTLVERTEX vx;
+      D3DTLVERTEX vx;
       float sx = poly.vertices[i].sx - m_nHalfWidth;
       float sy = poly.vertices[i].sy - m_nHalfHeight;
+      float one_over_sz = (M * sx + N * sy + O);
 
-      z = 1.0f  / (M*sx + N*sy + O);
-      
+      z = 1.0f  / one_over_sz;
+
       vx.sx = poly.vertices[i].sx;
       vx.sy = m_nHeight-poly.vertices[i].sy;
       vx.sz = z*(float)SCALE_FACTOR;
 
-      if(vx.sz>0.9999)
-        vx.sz=0.9999;
+//      if(vx.sz>0.9999)
+//        vx.sz=0.9999;
 
-      vx.rhw = 1/z;
-      
-      float I = 1.0f-poly.fog_info[i].intensity;
+      vx.rhw = one_over_sz;
 
-      if (I<0.01f) I=0.01f; //Workaround for a bug, at least in the RivaTNT drivers.
+    float I = poly.fog_info[i].intensity;
+    CLAMPG(I, 1.0f);
+    I = 1.0f - I;
 
       float r = poly.fog_info[i].r > 1.0f ? 1.0f : poly.fog_info[i].r;
       float g = poly.fog_info[i].g > 1.0f ? 1.0f : poly.fog_info[i].g;
       float b = poly.fog_info[i].b > 1.0f ? 1.0f : poly.fog_info[i].b;
 
-      vx.color    = D3DRGBA(r, g, b, I);
+      vx.color    = D3DRGBA_(r, g, b, I);
+
       vx.specular = 0;
 
       VERIFY_RESULT(m_lpd3dDevice2->Vertex( &vx ), DD_OK);
     }
     VERIFY_RESULT(m_lpd3dDevice2->End(0), DD_OK);
   }
+} // end of ::MultitextureDrawPolygon
+
+
+// TODO : Vertex fogging should be implemented through the specular component,
+//      no need for an additional pass.
+void csGraphics3DDirect3DDx6::DrawPolygon (G3DPolygonDP& poly)
+{
+  ASSERT( m_lpd3dDevice2 );
+
+  if (m_bMultiTexture)
+  {
+  MultitextureDrawPolygon(poly);
+  return;
+  }
+
+  bool bLightmapExists = true,
+  bColorKeyed = false,
+  bTransparent;
+  
+  int  poly_alpha;
+  
+  float J1, J2, J3, K1, K2, K3;
+  float M, N, O;
+  int i;
+
+  csHighColorCacheData* pTexCache   = NULL;
+  csHighColorCacheData* pLightCache = NULL;
+  // NOTE : is it better to have this as a class member?
+  //    or use d3d vertex buffers
+  D3DTLVERTEX vx[100];
+
+  float z;
+
+  if (poly.num < 3) 
+    return;
+
+  // set up the geometry.
+  SetupPolygon( poly, J1, J2, J3, K1, K2, K3, M, N, O );
+
+  poly_alpha = poly.alpha;
+  if ((poly_alpha > 0) && m_bRenderTransparent)
+    bTransparent = true;
+  else
+    bTransparent = false;
+
+  //Mipmapping is done for us by DirectX, so we will always select the texture with
+  //the highest resolution.
+  iPolygonTexture *pTex = poly.poly_texture[0];
+
+  if (!pTex)
+    return;
+
+  // cache the texture and initialize rasterization.
+  CacheTexture (pTex);
+
+  // retrieve the texture from the cache by handle.
+  csTextureMMDirect3D* txt_mm = (csTextureMMDirect3D*)poly.txt_handle->GetPrivateObject ();
+  pTexCache = txt_mm->GetHighColorCacheData ();
+
+  bColorKeyed = txt_mm->GetTransparent ();
+
+  // retrieve the lightmap from the cache.
+  iLightMap* piLM = pTex->GetLightMap ();
+
+  if ( piLM  && m_bRenderLightmap)
+  {
+    pLightCache = piLM->GetHighColorCache ();
+    if (!pLightCache)
+    {
+      bLightmapExists = false;
+    }
+  }
+  else
+  {
+    bLightmapExists=false;
+  }
+
+  if(m_iTypeLightmap == 0)
+    bLightmapExists = false;
+
+  if ( bTransparent )
+  {
+    m_States.SetAlphaBlendEnable(true);
+    m_States.SetDstBlend(m_TransDstBlend);
+    m_States.SetSrcBlend(m_TransSrcBlend);
+  }
+  else
+  {
+    m_States.SetAlphaBlendEnable(false);
+  }
+
+  if ( bColorKeyed )
+  {
+    m_States.SetColorKeyEnable(true);
+  }
+  else
+  {
+    m_States.SetColorKeyEnable(false);
+  }
+
+  D3DTextureCache_Data *pD3D_texcache = (D3DTextureCache_Data *)pTexCache->pData;
+
+  m_States.SetTexture(0, pD3D_texcache->lptex);
+
+  D3DCOLOR vertex_color;
+
+//  if (bTransparent && bLightmapExists)
+  if (bTransparent)
+  {
+    vertex_color = D3DRGBA_(1.0f, 1.0f, 1.0f, (float)poly_alpha * (1.0f / 100.0f));
+  }
+  else
+  {
+    vertex_color = D3DRGBA_(1.0f, 1.0f, 1.0f, 1.0f);
+  }
+
+  m_States.SetTextureAddress(D3DTADDRESS_WRAP);
+
+  // render texture-mapped poly
+  for (i=0; i < poly.num; i++)
+  {
+    float sx = poly.vertices[i].sx - m_nHalfWidth;
+    float sy = poly.vertices[i].sy - m_nHalfHeight;
+    float u_over_sz = (J1 * sx + J2 * sy + J3);
+    float v_over_sz = (K1 * sx + K2 * sy + K3);
+    float one_over_sz = (M * sx + N * sy + O);
+
+    z = 1.0f  / one_over_sz;
+
+    vx[i].sx = poly.vertices[i].sx;
+    vx[i].sy = m_nHeight-poly.vertices[i].sy;
+
+    vx[i].sz = z*(float)SCALE_FACTOR;
+
+    vx[i].color = vertex_color;
+    vx[i].rhw = one_over_sz;
+
+    vx[i].specular = 0;
+    vx[i].tu = u_over_sz * z;
+    vx[i].tv = v_over_sz * z;
+  }
+
+  VERIFY_RESULT(m_lpd3dDevice2->DrawPrimitive(D3DPT_TRIANGLEFAN, D3DFVF_TLVERTEX,
+                        vx, i, D3DDP_DONOTUPDATEEXTENTS), DD_OK);
+
+//----
+
+  if (bLightmapExists)
+  {
+    // set blending modes
+    m_States.SetAlphaBlendEnable(true);
+    m_States.SetSrcBlend(m_LightmapSrcBlend);
+    m_States.SetDstBlend(m_LightmapDstBlend);
+    m_States.SetTextureAddress(D3DTADDRESS_CLAMP);
+
+    float lightmap_scale_u, lightmap_scale_v;
+    float lightmap_low_u, lightmap_low_v;
+
+    // set lightmap stuff
+    iLightMap *thelightmap = pTex->GetLightMap ();
+
+    int lmwidth = thelightmap->GetWidth ();
+    int lmrealwidth = thelightmap->GetRealWidth ();
+    int lmheight = thelightmap->GetHeight ();
+    int lmrealheight = thelightmap->GetRealHeight ();
+    float scale_u = (float)(lmrealwidth-1) / (float)lmwidth;
+    float scale_v = (float)(lmrealheight-1) / (float)lmheight;
+
+    float lightmap_high_u, lightmap_high_v;
+    pTex->GetTextureBox(lightmap_low_u,lightmap_low_v,
+                       lightmap_high_u,lightmap_high_v);
+
+    lightmap_scale_u = scale_u / (lightmap_high_u - lightmap_low_u), 
+    lightmap_scale_v = scale_v / (lightmap_high_v - lightmap_low_v);
+
+    m_States.SetTexture(0, ((D3DLightCache_Data *)pLightCache->pData)->lptex);
+
+    for (i=0; i < poly.num; i++)
+    {
+      vx[i].tu = (vx[i].tu - lightmap_low_u) * lightmap_scale_u;
+      vx[i].tv = (vx[i].tv - lightmap_low_v) * lightmap_scale_v;
+    }
+
+    VERIFY_RESULT(m_lpd3dDevice2->DrawPrimitive(D3DPT_TRIANGLEFAN, D3DFVF_TLVERTEX,
+                          vx, i, D3DDP_DONOTUPDATEEXTENTS), DD_OK);
+  } // end of if (bLightmapExists )
+
+//----
+
+  // reset render states.
+  // If there is vertex fog then we apply that last.
+  if (poly.use_fog)
+  {
+    m_States.SetAlphaBlendEnable(true);
+    m_States.SetZFunc(D3DCMP_LESSEQUAL);
+    m_States.SetDstBlend(D3DBLEND_SRCALPHA);
+    m_States.SetSrcBlend(D3DBLEND_INVSRCALPHA);
+    m_States.SetTexture(0, NULL);
+
+    for (i=0; i<poly.num; i++)
+    {
+    float I = poly.fog_info[i].intensity;
+    CLAMPG(I, 1.0f);
+    I = 1.0f - I;      
+
+      float r = poly.fog_info[i].r > 1.0f ? 1.0f : poly.fog_info[i].r;
+      float g = poly.fog_info[i].g > 1.0f ? 1.0f : poly.fog_info[i].g;
+      float b = poly.fog_info[i].b > 1.0f ? 1.0f : poly.fog_info[i].b;
+
+      vx[i].color = D3DRGBA_(r, g, b, I);
+    }
+
+  VERIFY_RESULT(m_lpd3dDevice2->DrawPrimitive(D3DPT_TRIANGLEFAN, D3DFVF_TLVERTEX,
+                        vx, i, D3DDP_DONOTUPDATEEXTENTS), DD_OK);
+  }
 
 }  // end of DrawPolygon()
 
 void csGraphics3DDirect3DDx6::StartPolygonFX (iTextureHandle* handle, UInt mode)
 {
-  float alpha = float (mode & CS_FX_MASK_ALPHA) / 255.;
-  m_gouraud = rstate_gouraud && ((mode & CS_FX_GOURAUD) != 0);
+  m_gouraud = ((mode & CS_FX_GOURAUD) != 0);
   m_mixmode = mode;
-  m_alpha   = alpha;
+  m_alpha = float (mode & CS_FX_MASK_ALPHA) * (1.0f / 255);
 
-  csTextureMMDirect3D* txt_mm = (csTextureMMDirect3D*)handle->GetPrivateObject ();
+//  m_lpd3dDevice2->SetRenderState(D3DRENDERSTATE_SPECULARENABLE, true);
 
-  m_pTextureCache->Add (handle);
+  csHighColorCacheData* pTexData;
+  if (handle)
+  {
+    csTextureMMDirect3D* txt_mm = (csTextureMMDirect3D*)handle->GetPrivateObject ();
+    m_pTextureCache->Add (handle);
 
-  csHighColorCacheData* pTexData = txt_mm->GetHighColorCacheData ();
-
-  if (txt_mm->GetTransparent ())
-    m_States.SetColorKeyEnable(true);
+  pTexData = txt_mm->GetHighColorCacheData ();
+  m_textured = true;
+  }
   else
-    m_States.SetColorKeyEnable(false);
+  {
+  m_textured = false;
+  }
 
-  if ((mode & CS_FX_MASK_MIXMODE) != CS_FX_COPY)
-    m_States.SetAlphaBlendEnable(true);
-  else
-    m_States.SetAlphaBlendEnable(false);
+  // PolygonFXs dont use multitexturing
+  m_States.SetStageState(1, D3DTSS_COLOROP, D3DTOP_DISABLE);
 
-  //Note: In all explanations of Mixing:
-  //Color: resulting color
-  //SRC:   Color of the texel (content of the texture to be drawn)
-  //DEST:  Color of the pixel on screen
-  //Alpha: Alpha value of the polygon
+  // Note: In all explanations of Mixing:
+  // Color: resulting color
+  // SRC:   Color of the texel (content of the texture to be drawn)
+  // DEST:  Color of the pixel on screen
+  // Alpha: Alpha value of the polygon
+  bool enable_blending = true;
   switch (mode & CS_FX_MASK_MIXMODE)
   {
     case CS_FX_MULTIPLY:
-      //Color = SRC * DEST +   0 * SRC = DEST * SRC
+      // Color = SRC * DEST +   0 * SRC = DEST * SRC
       m_alpha = 0.0f;
       m_States.SetDstBlend(D3DBLEND_SRCCOLOR);
       m_States.SetSrcBlend(D3DBLEND_ZERO);
@@ -1247,18 +1697,18 @@ void csGraphics3DDirect3DDx6::StartPolygonFX (iTextureHandle* handle, UInt mode)
     case CS_FX_MULTIPLY2:
       //Color = SRC * DEST + DEST * SRC = 2 * DEST * SRC
       m_alpha = 0.0f;
-	  m_States.SetDstBlend(D3DBLEND_SRCCOLOR);
-	  m_States.SetSrcBlend(D3DBLEND_DESTCOLOR);
+      m_States.SetDstBlend(D3DBLEND_SRCCOLOR);
+      m_States.SetSrcBlend(D3DBLEND_DESTCOLOR);
       break;
     case CS_FX_ADD:
       //Color = 1 * DEST + 1 * SRC = DEST + SRC
       m_alpha = 0.0f;
-	  m_States.SetDstBlend(D3DBLEND_ONE);
-	  m_States.SetSrcBlend(D3DBLEND_ONE);
+      m_States.SetDstBlend(D3DBLEND_ONE);
+      m_States.SetSrcBlend(D3DBLEND_ONE);
       break;
     case CS_FX_ALPHA:
       //Color = Alpha * DEST + (1-Alpha) * SRC 
-	  m_States.SetDstBlend(D3DBLEND_SRCALPHA);
+      m_States.SetDstBlend(D3DBLEND_SRCALPHA);
       m_States.SetSrcBlend(D3DBLEND_INVSRCALPHA);
       break;
     case CS_FX_TRANSPARENT:
@@ -1270,11 +1720,15 @@ void csGraphics3DDirect3DDx6::StartPolygonFX (iTextureHandle* handle, UInt mode)
     default:
       //Color = 0 * DEST + 1 * SRC = SRC
       m_alpha = 0.0f;
-	  m_States.SetDstBlend(D3DBLEND_ZERO);
-	  m_States.SetSrcBlend(D3DBLEND_ONE);
-	  m_States.SetStageState(1, D3DTSS_COLOROP, D3DTOP_DISABLE);
+      m_States.SetDstBlend(D3DBLEND_ZERO);
+      m_States.SetSrcBlend(D3DBLEND_ONE);
       break;
   }
+
+  if (m_textured)
+    m_States.SetTexture(0, ((D3DTextureCache_Data *)pTexData->pData)->lptex);
+  else
+    m_States.SetTexture(0, NULL);
 
   if (m_alpha == 0.0f && (m_mixmode & CS_FX_MASK_MIXMODE) == CS_FX_ALPHA)
   {
@@ -1284,27 +1738,49 @@ void csGraphics3DDirect3DDx6::StartPolygonFX (iTextureHandle* handle, UInt mode)
     m_alpha = 0.01f; 
   }
 
-  m_States.SetTexture(0, ((D3DTextureCache_Data *)pTexData->pData)->lptex);
-}
+  m_ialpha = QInt(m_alpha * 255.0f);
+} // end of StartPolygonFX()
 
 void csGraphics3DDirect3DDx6::FinishPolygonFX()
 {
-  m_States.SetAlphaBlendEnable(false);
-
-  m_States.SetColorKeyEnable(false);
-
-  m_States.SetDstBlend(D3DBLEND_ZERO);
-
-  m_States.SetSrcBlend(D3DBLEND_ONE);
+  if (m_bBatchPolygonFX)
+    BatchFinishPolygonFX();
 }
 
+//
+// vertex coloring : range [0..2]
+// 0 = no intensity, 1 = normal intensity, 2 = double intensity,
+// but d3d cant "OverModulate", clamp anything outside of [0..1],
+// we could try to counter balance this with a specular component
+//
 void csGraphics3DDirect3DDx6::DrawPolygonFX(G3DPolygonDPFX& poly)
 {
+  if (m_bBatchPolygonFX)
+  {
+    BatchDrawPolygonFX(poly);
+    return;
+  }
+
   int i;
   D3DTLVERTEX vx;
+  D3DCOLOR FlatColor;
+
+  float flat_r = 1., flat_g = 1., flat_b = 1.;
+  if (!m_textured)
+  {
+    flat_r = poly.flat_color_r; 
+    flat_g = poly.flat_color_g;
+    flat_b = poly.flat_color_b;
+  CLAMP(flat_r, 1.0f);
+  CLAMP(flat_g, 1.0f);
+  CLAMP(flat_b, 1.0f);
+
+    if (!m_gouraud)
+    FlatColor = D3DRGBA_(flat_r, flat_g, flat_b, m_alpha);
+  }
 
   VERIFY_RESULT( m_lpd3dDevice2->Begin(D3DPT_TRIANGLEFAN, D3DFVF_TLVERTEX, D3DDP_DONOTUPDATEEXTENTS), DD_OK );
-  
+
   for(i=0; i<poly.num; i++)
   {
     vx.sx = poly.vertices[i].sx;
@@ -1312,13 +1788,37 @@ void csGraphics3DDirect3DDx6::DrawPolygonFX(G3DPolygonDPFX& poly)
     vx.sz = SCALE_FACTOR / poly.vertices[i].z;
     vx.rhw = poly.vertices[i].z;
     if (m_gouraud)
-      vx.color = D3DRGBA(poly.vertices[i].r, poly.vertices[i].g, poly.vertices[i].b, m_alpha);
+  {
+    float r, g, b;
+    r = poly.vertices[i].r;
+    CLAMP(r, 1.0f);
+    g = poly.vertices[i].g;
+    CLAMP(g, 1.0f);
+    b = poly.vertices[i].b;
+    CLAMP(b, 1.0f);
+      vx.color = D3DRGBA_(r, g, b, m_alpha);
+  }
     else
-      vx.color = D3DRGBA(1.0f, 1.0f, 1.0f, m_alpha);
-    vx.specular = D3DRGB(0.0, 0.0, 0.0);
+  {
+    if (!m_textured)
+      vx.color = FlatColor;
+      else
+    {
+      float r, g, b;
+      r = flat_r * poly.vertices[i].r;
+      CLAMP(r, 1.0f);
+      g = flat_r * poly.vertices[i].g;
+      CLAMP(g, 1.0f);
+      b = flat_r * poly.vertices[i].b;
+      CLAMP(b, 1.0f);
+        vx.color = D3DRGBA_(r, g, b, m_alpha);
+    }
+  }
+
+  vx.specular = RGBA_MAKE(0, 0, 0, 0);
     vx.tu = poly.vertices[i].u;
     vx.tv = poly.vertices[i].v;
-    
+
     VERIFY_RESULT(m_lpd3dDevice2->Vertex( &vx ), DD_OK);
   }
 
@@ -1332,23 +1832,17 @@ void csGraphics3DDirect3DDx6::DrawPolygonFX(G3DPolygonDPFX& poly)
     // should first do all non-fogged triangles and then in one
     // go all fogged triangles?
 
-    DWORD OldAlpha;
-    DWORD OldZFunc;
-    DWORD OldDestBlend;
-    DWORD OldSrcBlend;
-    IDirect3DTexture2 * p_oldTexture = NULL;
+    m_States.PushAlphaBlendEnable();
+    m_States.PushZFunc();
+    m_States.PushDstBlend();
+    m_States.PushSrcBlend();
+    m_States.PushTexture(0);
 
-    VERIFY_RESULT(m_lpd3dDevice2->GetRenderState(D3DRENDERSTATE_ALPHABLENDENABLE, &OldAlpha),     DD_OK);
-    VERIFY_RESULT(m_lpd3dDevice2->GetRenderState(D3DRENDERSTATE_ZFUNC,            &OldZFunc),     DD_OK);
-    VERIFY_RESULT(m_lpd3dDevice2->GetRenderState(D3DRENDERSTATE_DESTBLEND,        &OldDestBlend), DD_OK); 
-    VERIFY_RESULT(m_lpd3dDevice2->GetRenderState(D3DRENDERSTATE_SRCBLEND,         &OldSrcBlend),  DD_OK);
-    VERIFY_RESULT(m_lpd3dDevice2->GetTexture(0, &p_oldTexture), DD_OK);
-   
-	m_States.SetAlphaBlendEnable(true);
-    VERIFY_RESULT(m_lpd3dDevice2->SetRenderState(D3DRENDERSTATE_ZFUNC,            D3DCMP_LESSEQUAL), DD_OK);
-	m_States.SetDstBlend(D3DBLEND_SRCALPHA);
-	m_States.SetSrcBlend(D3DBLEND_INVSRCALPHA);
-	m_States.SetTexture(0, NULL);
+    m_States.SetAlphaBlendEnable(true);
+    m_States.SetZFunc(D3DCMP_LESSEQUAL);
+    m_States.SetDstBlend(D3DBLEND_SRCALPHA);
+    m_States.SetSrcBlend(D3DBLEND_INVSRCALPHA);
+    m_States.SetTexture(0, NULL);
 
     VERIFY_RESULT( m_lpd3dDevice2->Begin(D3DPT_TRIANGLEFAN, D3DFVF_TLVERTEX, D3DDP_DONOTUPDATEEXTENTS), DD_OK );
   
@@ -1359,17 +1853,17 @@ void csGraphics3DDirect3DDx6::DrawPolygonFX(G3DPolygonDPFX& poly)
       vx.sz = SCALE_FACTOR / poly.vertices[i].z;
       vx.rhw = poly.vertices[i].z;
 
-      float I = 1.0f-poly.fog_info[i].intensity;
-
-      if (I<0.01f) I=0.01f; //Workaround for a bug, at least in the RivaTNT drivers.
+    float I = poly.fog_info[i].intensity;
+    CLAMPG(I, 1.0f);
+    I = 1.0f - I;      
 
       float r = poly.fog_info[i].r > 1.0f ? 1.0f : poly.fog_info[i].r;
       float g = poly.fog_info[i].g > 1.0f ? 1.0f : poly.fog_info[i].g;
       float b = poly.fog_info[i].b > 1.0f ? 1.0f : poly.fog_info[i].b;
 
-      vx.color    = D3DRGBA(r, g, b, I);
+      vx.color    = D3DRGBA_(r, g, b, I);
 
-      vx.specular = D3DRGB(0.0, 0.0, 0.0);
+      vx.specular = RGBA_MAKE(0, 0, 0, 0);
       vx.tu = poly.vertices[i].u;
       vx.tv = poly.vertices[i].v;
     
@@ -1378,13 +1872,160 @@ void csGraphics3DDirect3DDx6::DrawPolygonFX(G3DPolygonDPFX& poly)
 
     VERIFY_RESULT( m_lpd3dDevice2->End(0), DD_OK );
 
-	m_States.SetAlphaBlendEnable(OldAlpha);
-    VERIFY_RESULT(m_lpd3dDevice2->SetRenderState(D3DRENDERSTATE_ZFUNC,            OldZFunc),     DD_OK);
-	m_States.SetDstBlend((enum _D3DBLEND) OldDestBlend);
-    m_States.SetSrcBlend((enum _D3DBLEND) OldSrcBlend);
-	m_States.SetTexture(0, p_oldTexture);
-    if (p_oldTexture != NULL) p_oldTexture->Release();
+  m_States.PopAlphaBlendEnable();
+  m_States.PopZFunc();
+  m_States.PopDstBlend();
+  m_States.PopSrcBlend();
+  m_States.PopTexture(0);
   }
+}
+
+void csGraphics3DDirect3DDx6::BatchStartPolygonFX(iTextureHandle*, UInt)
+{
+}
+
+void csGraphics3DDirect3DDx6::BatchFinishPolygonFX()
+{
+  m_VertexCache.EmptyBuffer();
+}
+
+void csGraphics3DDirect3DDx6::BatchDrawPolygonFX(G3DPolygonDPFX& poly)
+{
+  int i;
+  D3DTLVERTEX vx[2];
+  D3DCOLOR FlatColor;
+
+  float flat_r = 1., flat_g = 1., flat_b = 1.;
+  if (!m_textured)
+  {
+    flat_r = poly.flat_color_r; 
+    flat_g = poly.flat_color_g;
+    flat_b = poly.flat_color_b;
+    CLAMP(flat_r, 1.0f);
+    CLAMP(flat_g, 1.0f);
+    CLAMP(flat_b, 1.0f);
+
+    if (!m_gouraud)
+    FlatColor = D3DRGBA_(flat_r, flat_g, flat_b, m_alpha);
+  }
+
+//-- make base vertex
+  vx[0].sx = poly.vertices[0].sx;
+  vx[0].sy = m_nHeight-poly.vertices[0].sy;
+  vx[0].sz = SCALE_FACTOR / poly.vertices[0].z;
+  vx[0].rhw = poly.vertices[0].z;
+  if (m_gouraud)
+  {
+    float r, g, b;
+    r = poly.vertices[0].r;
+    CLAMP(r, 1.0f);
+    g = poly.vertices[0].g;
+    CLAMP(g, 1.0f);
+    b = poly.vertices[0].b;
+    CLAMP(b, 1.0f);
+    vx[0].color = D3DRGBA_(r, g, b, m_alpha);
+  }
+  else
+  {
+    if (!m_textured)
+      vx[0].color = FlatColor;
+    else
+    {
+      float r, g, b;
+      r = flat_r * poly.vertices[0].r;
+      CLAMP(r, 1.0f);
+      g = flat_r * poly.vertices[0].g;
+      CLAMP(g, 1.0f);
+      b = flat_r * poly.vertices[0].b;
+      CLAMP(b, 1.0f);
+      vx[0].color = D3DRGBA_(r, g, b, m_alpha);
+    }
+  }
+  vx[0].specular = RGBA_MAKE(0, 0, 0, 0);
+  vx[0].tu = poly.vertices[0].u;
+  vx[0].tv = poly.vertices[0].v;
+//-- make "last" vertex
+  vx[1].sx = poly.vertices[1].sx;
+  vx[1].sy = m_nHeight-poly.vertices[1].sy;
+  vx[1].sz = SCALE_FACTOR / poly.vertices[1].z;
+  vx[1].rhw = poly.vertices[1].z;
+  if (m_gouraud)
+  {
+    float r, g, b;
+    r = poly.vertices[1].r;
+    CLAMP(r, 1.0f);
+    g = poly.vertices[1].g;
+    CLAMP(g, 1.0f);
+    b = poly.vertices[1].b;
+    CLAMP(b, 1.0f);
+    vx[1].color = D3DRGBA_(r, g, b, m_alpha);
+  }
+  else
+  {
+    if (!m_textured)
+      vx[1].color = FlatColor;
+    else
+    {
+      float r, g, b;
+      r = flat_r * poly.vertices[1].r;
+      CLAMP(r, 1.0f);
+      g = flat_r * poly.vertices[1].g;
+      CLAMP(g, 1.0f);
+      b = flat_r * poly.vertices[1].b;
+      CLAMP(b, 1.0f);
+      vx[1].color = D3DRGBA_(r, g, b, m_alpha);
+    }
+  }
+  vx[1].specular = RGBA_MAKE(0, 0, 0, 0);
+  vx[1].tu = poly.vertices[1].u;
+  vx[1].tv = poly.vertices[1].v;
+//-- process polygons
+  for(i=2; i<poly.num; i++)
+  {
+    D3DTLVERTEX * V = m_VertexCache.AddPolygon();
+    V[0] = vx[0];
+    V[1] = vx[1];
+
+    vx[1].sx = poly.vertices[i].sx;
+    vx[1].sy = m_nHeight-poly.vertices[i].sy;
+    vx[1].sz = SCALE_FACTOR / poly.vertices[i].z;
+    vx[1].rhw = poly.vertices[i].z;
+    if (m_gouraud)
+    {
+      float r, g, b;
+      r = poly.vertices[i].r;
+      CLAMP(r, 1.0f);
+      g = poly.vertices[i].g;
+      CLAMP(g, 1.0f);
+      b = poly.vertices[i].b;
+      CLAMP(b, 1.0f);
+      vx[1].color = D3DRGBA_(r, g, b, m_alpha);
+    }
+    else
+    {
+      if (!m_textured)
+        vx[1].color = FlatColor;
+      else
+      {
+        float r, g, b;
+        r = flat_r * poly.vertices[i].r;
+        CLAMP(r, 1.0f);
+        g = flat_r * poly.vertices[i].g;
+        CLAMP(g, 1.0f);
+        b = flat_r * poly.vertices[i].b;
+        CLAMP(b, 1.0f);
+        vx[1].color = D3DRGBA_(r, g, b, m_alpha);
+      }
+    }
+
+    vx[1].specular = RGBA_MAKE(50, 50, 50, 0);
+    vx[1].tu = poly.vertices[i].u;
+    vx[1].tv = poly.vertices[i].v;
+
+    V[2] = vx[1];
+  }
+
+  // TODO/FIXME : implemente fog
 }
 
 void csGraphics3DDirect3DDx6::GetCaps(G3D_CAPS *caps)
@@ -1443,9 +2084,9 @@ bool csGraphics3DDirect3DDx6::SetRenderState(G3D_RENDERSTATEOPTION option, long 
     
     case G3DRENDERSTATE_ZBUFFERTESTENABLE:
       if (value)
-        VERIFY_RESULT(m_lpd3dDevice2->SetRenderState(D3DRENDERSTATE_ZFUNC, D3DCMP_LESSEQUAL), DD_OK);
+        m_States.SetZFunc(D3DCMP_LESSEQUAL);
       else
-        VERIFY_RESULT(m_lpd3dDevice2->SetRenderState(D3DRENDERSTATE_ZFUNC, D3DCMP_ALWAYS), DD_OK);
+        m_States.SetZFunc(D3DCMP_ALWAYS);
       break;
     
     case G3DRENDERSTATE_ZBUFFERFILLENABLE:
