@@ -1,5 +1,6 @@
 /*
     Copyright (C) 2000 by Jorrit Tyberghein
+    Copyright (C) 2001 by W.C.A. Wijngaards
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -28,6 +29,11 @@
 #include "imesh/sprite2d.h"
 #include "ivideo/graph3d.h"
 #include "qint.h"
+#include "iutil/strvec.h"
+#include "csutil/util.h"
+#include "iobject/object.h"
+#include "iengine/material.h"
+#include "csengine/material.h"
 
 CS_TOKEN_DEF_START
   CS_TOKEN_DEF (ADD)
@@ -52,19 +58,35 @@ IMPLEMENT_IBASE (csSprite2DFactoryLoader)
   IMPLEMENTS_INTERFACE (iPlugIn)
 IMPLEMENT_IBASE_END
 
+IMPLEMENT_IBASE (csSprite2DFactorySaver)
+  IMPLEMENTS_INTERFACE (iSaverPlugIn)
+  IMPLEMENTS_INTERFACE (iPlugIn)
+IMPLEMENT_IBASE_END
+
 IMPLEMENT_IBASE (csSprite2DLoader)
   IMPLEMENTS_INTERFACE (iLoaderPlugIn)
   IMPLEMENTS_INTERFACE (iPlugIn)
 IMPLEMENT_IBASE_END
 
+IMPLEMENT_IBASE (csSprite2DSaver)
+  IMPLEMENTS_INTERFACE (iSaverPlugIn)
+  IMPLEMENTS_INTERFACE (iPlugIn)
+IMPLEMENT_IBASE_END
+
 IMPLEMENT_FACTORY (csSprite2DFactoryLoader)
+IMPLEMENT_FACTORY (csSprite2DFactorySaver)
 IMPLEMENT_FACTORY (csSprite2DLoader)
+IMPLEMENT_FACTORY (csSprite2DSaver)
 
 EXPORT_CLASS_TABLE (spr2dldr)
   EXPORT_CLASS (csSprite2DFactoryLoader, "crystalspace.mesh.loader.factory.sprite.2d",
     "Crystal Space Sprite2D Mesh Factory Loader")
+  EXPORT_CLASS (csSprite2DFactorySaver, "crystalspace.mesh.saver.factory.sprite.2d",
+    "Crystal Space Sprite2D Mesh Factory Saver")
   EXPORT_CLASS (csSprite2DLoader, "crystalspace.mesh.loader.sprite.2d",
     "Crystal Space Sprite2D Mesh Loader")
+  EXPORT_CLASS (csSprite2DSaver, "crystalspace.mesh.saver.sprite.2d",
+    "Crystal Space Sprite2D Mesh Saver")
 EXPORT_CLASS_TABLE_END
 
 csSprite2DFactoryLoader::csSprite2DFactoryLoader (iBase* pParent)
@@ -200,6 +222,59 @@ iBase* csSprite2DFactoryLoader::Parse (const char* string, iEngine* engine)
   return fact;
 }
 
+//---------------------------------------------------------------------------
+csSprite2DFactorySaver::csSprite2DFactorySaver (iBase* pParent)
+{
+  CONSTRUCT_IBASE (pParent);
+}
+
+csSprite2DFactorySaver::~csSprite2DFactorySaver ()
+{
+}
+
+bool csSprite2DFactorySaver::Initialize (iSystem* system)
+{
+  sys = system;
+  return true;
+}
+
+#define MAXLINE 100 /* max number of chars per line... */
+
+static void WriteMixmode(iStrVector *str, UInt mixmode)
+{
+  str->Push(strnew("  MIXMODE ("));
+  if(mixmode&CS_FX_COPY) str->Push(strnew(" COPY ()"));
+  if(mixmode&CS_FX_ADD) str->Push(strnew(" ADD ()"));
+  if(mixmode&CS_FX_MULTIPLY) str->Push(strnew(" MULTIPLY ()"));
+  if(mixmode&CS_FX_MULTIPLY2) str->Push(strnew(" MULTIPLY2 ()"));
+  if(mixmode&CS_FX_KEYCOLOR) str->Push(strnew(" KEYCOLOR ()"));
+  if(mixmode&CS_FX_TRANSPARENT) str->Push(strnew(" TRANSPARENT ()"));
+  if(mixmode&CS_FX_ALPHA) {
+    char buf[MAXLINE];
+    sprintf(buf, "ALPHA (%g)", float(mixmode&CS_FX_MASK_ALPHA)/255.);
+    str->Push(strnew(buf));
+  }
+  str->Push(strnew(")"));
+}
+
+void csSprite2DFactorySaver::WriteDown (iBase* obj, iStrVector * str,
+  iEngine* /*engine*/)
+{
+  iSprite2DFactoryState *state = QUERY_INTERFACE (obj, iSprite2DFactoryState);
+  char buf[MAXLINE];
+
+  sprintf(buf, "MATERIAL (%s)\n", state->GetMaterialWrapper()->
+    GetPrivateObject()->GetName());
+  str->Push(strnew(buf));
+  if(state->GetMixMode() != CS_FX_COPY)
+  {
+    WriteMixmode(str, state->GetMixMode());
+  }
+  sprintf(buf, "LIGHTING (%s)\n", state->HasLighting()?"true":"false");
+  str->Push(strnew(buf));
+
+  state->DecRef();
+}
 //---------------------------------------------------------------------------
 
 csSprite2DLoader::csSprite2DLoader (iBase* pParent)
@@ -342,4 +417,76 @@ iBase* csSprite2DLoader::Parse (const char* string, iEngine* engine)
 
 //---------------------------------------------------------------------------
 
+csSprite2DSaver::csSprite2DSaver (iBase* pParent)
+{
+  CONSTRUCT_IBASE (pParent);
+}
 
+csSprite2DSaver::~csSprite2DSaver ()
+{
+}
+
+bool csSprite2DSaver::Initialize (iSystem* system)
+{
+  sys = system;
+  return true;
+}
+
+void csSprite2DSaver::WriteDown (iBase* obj, iStrVector *str,
+  iEngine* /*engine*/)
+{
+  iFactory *fact = QUERY_INTERFACE (this, iFactory);
+  iSprite2DState *state = QUERY_INTERFACE (obj, iSprite2DState);
+  char buf[MAXLINE];
+  char name[MAXLINE];
+
+  csFindReplace(name, fact->QueryDescription (), "Saver", "Loader", MAXLINE);
+  sprintf(buf, "FACTORY ('%s')\n", name);
+  str->Push(strnew(buf));
+
+  sprintf(buf, "MATERIAL (%s)\n", state->GetMaterialWrapper()->
+    GetPrivateObject()->GetName());
+  str->Push(strnew(buf));
+  sprintf(buf, "LIGHTING (%s)\n", state->HasLighting()?"true":"false");
+  str->Push(strnew(buf));
+  if(state->GetMixMode() != CS_FX_COPY)
+  {
+    WriteMixmode(str, state->GetMixMode());
+  }
+
+  csColoredVertices& vs = state->GetVertices();
+  int i;
+  str->Push(strnew("VERTICES("));
+  for(i=0; vs.Length(); i++)
+  {
+    sprintf(buf, "%g,%g%s", vs[i].pos.x, vs[i].pos.y,
+      (i==vs.Length())?"":", ");
+    str->Push(strnew(buf));
+  }
+  str->Push(strnew(")\n"));
+
+  str->Push(strnew("UV("));
+  for(i=0; vs.Length(); i++)
+  {
+    sprintf(buf, "%g,%g%s", vs[i].u, vs[i].v, (i==vs.Length())?"":", ");
+    str->Push(strnew(buf));
+  }
+  str->Push(strnew(")\n"));
+
+  str->Push(strnew("COLORS("));
+  for(i=0; vs.Length(); i++)
+  {
+    sprintf(buf, "%g,%g,%g%s", vs[i].color_init.red, vs[i].color_init.green,
+      vs[i].color_init.blue, (i==vs.Length())?"":", ");
+    str->Push(strnew(buf));
+  }
+  str->Push(strnew(")\n"));
+
+  fact->DecRef();
+  state->DecRef();
+}
+
+//---------------------------------------------------------------------------
+
+
+//---------------------------------------------------------------------------
