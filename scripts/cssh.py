@@ -34,10 +34,14 @@ class csShell:
 		print 'Loading',
 		for x in UserImports:
 			print x,
-			if(x[0]=='*'):
-			  exec 'from '+x[1:]+' import *' in self.UserGlobals, self.UserLocals
-			else:
-			  exec 'import '+x in self.UserGlobals, self.UserLocals
+			try:
+				if(x[0]=='*'):
+					exec 'from '+x[1:]+' import *' in self.UserGlobals, self.UserLocals
+				else:
+					exec 'import '+x in self.UserGlobals, self.UserLocals
+			except ImportError, e:
+				print
+				print e
 		print
 
 	def Handle(self, Command):
