@@ -49,6 +49,7 @@ The history order is reversed so that new features are at the top.
 	- Matze fixed a bug in viewmesh where the scaling variable was not
 	  initialized. (Finally, you don't need to search for your 1 pixel
 	  model anymore.)
+	- Eric Sunshine eliminated compilation warnings in AWS.
 24-May-2003
 	- Jorrit fixed a bug in GetObjectBoundingBox() of 2D sprites. This
 	  could cause culling errors of those sprites.
