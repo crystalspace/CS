@@ -18,8 +18,7 @@ will find a reference to it from within the instructions in this section.
 
 @menu
 * Unix::
-* Win32:: Windows - Using @sc{msvc}++ Compiler
-* Mingw:: Windows - Using Mingw Compiler
+* Win32::
 * NeXT:: MacOS/X, MacOS/X Server 1.0, OpenStep, NextStep
 * MacOS/9::
 * OS2:: @sc{os}/2
@@ -28,8 +27,7 @@ will find a reference to it from within the instructions in this section.
 @end menu
 
 @importss{build,platform,unix.txi}
-@importss{build,platform,win32/win32.txi}
-@importss{build,platform,win32/win32gcc.txi}
+@importss{build,platform,win32.txi}
 @importss{build,platform,next.txi}
 @importss{build,platform,mac.txi}
 @importss{build,platform,os2.txi}
