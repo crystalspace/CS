@@ -86,7 +86,7 @@ void csDDGTerrainObject::LoadHeightMap( const char *pName )
   if ( !pVFS->Exists( pHeightmapName ) )
   {
     pSystem->Printf( MSG_FATAL_ERROR, "Error locating height field: %s\n", pHeightmapName );
-    fatal_exit (0, false);
+    exit (0);
   }
 
   // read the data from the file
@@ -94,7 +94,7 @@ void csDDGTerrainObject::LoadHeightMap( const char *pName )
   if ( !pMapData )
   {
     pSystem->Printf(MSG_FATAL_ERROR, "Error loading height field: %s\n", pHeightmapName );
-    fatal_exit (0, false);
+    exit (0);
   }
 
   // now convert the map data into a heightmap
@@ -104,7 +104,7 @@ void csDDGTerrainObject::LoadHeightMap( const char *pName )
   if ( !heightMap )
   {
     pSystem->Printf(MSG_FATAL_ERROR, "Error converting height field: %s\n", pHeightmapName );
-    fatal_exit (0, false);
+    exit (0);
   }
 
   pMapData->DecRef ();
@@ -173,7 +173,7 @@ void csDDGTerrainObject::InitMaterials( void )
   if (!mesh)
   {
     pSystem->Printf(MSG_FATAL_ERROR, "Heightfield needs to be loaded before materials" );
-    fatal_exit (0, false);
+    exit (0);
   }
 
   int num_mat = GetNumMaterials();
