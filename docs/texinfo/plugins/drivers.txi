@@ -30,11 +30,13 @@ OpenGL 2D XLib Driver).
 @emph{Sound Driver} (component: sound/driver) System dependent sound
 drivers.  There are currently drivers for Macintosh, @sc{oss}
 (Linux), and Windows.
+A better description of the sound system can be found at @ref{Sound System}.
 
 @item
 @emph{Sound Renderer} (component: sound/renderer) System dependent sound
 renderers.  There are currently renderers for a3d, ds3d, eax, and
 software.
+A better description of the sound system can be found at @ref{Sound System}.
 
 @item
 @emph{Network Driver} (component: net/driver) System dependent network
@@ -44,3 +46,5 @@ drivers.  There is currently only a sockets driver.
 @emph{Network Manager} (component: net/manager) System dependent network
 managers.  There is currently only a simple manager.
 @end itemize
+
+@imports{plugins,sound.txi}

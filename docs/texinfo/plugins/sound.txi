@@ -1,0 +1,232 @@
+@c -*-texinfo-*-
+@node Sound System
+@subsection Sound System
+@cindex Sound System
+
+Version 0.03 (22 sept 1999) by NooTe (aka Nathaniel Saint Martin)
+
+@email{noote@@bigfoot.com}
+@uref{http://www.bigfoot.com/~noote}
+
+@node Sound_OS
+@subsubsection supported operating systems
+
+The CS sound system supports these OSes :
+
+@itemize @bullet
+@item
+I have made a win32 driver using waveOut functions (standard win32 api). I
+have done Aureal3D 2.0, DirectSound3D (DX5), EAX 2.0 and Software renderer
+too !
+
+@item
+Gert Steenssens (@email{gsteenss@eps.agfa.be}) has made the linux driver
+(OSS).
+
+@item
+Someone (sorry I don't know, please give me your name) has done the MacIntosh
+driver
+@end itemize
+
+@node Sound_FF
+@subsubsection supported file formats
+
+The following file formats are supported :
+
+@itemize @bullet
+@item
+sun standard @file{.au} (or @file{.snd}), 8 and 16 bit PCM, 8 bit G.711 u-Law
+(no-compressed)
+
+@item
+microsoft @file{.wav}, 8 and 16 bit PCM
+
+@item
+amiga @file{.8svx}/@file{.iff}, 8 bit PCM
+
+@item
+mac @file{.aiff}, 8 and 16 bit PCM
+
+@item
+I'm searching about other usual file format (@uref{http://www.wotsit.org}
+don't handle or give (good) information about mac @file{.aiff} format).
+
+@item
+Does some one know about @emph{Fibonacci-Delta encoding} compression in
+@file{.8svx}/@file{.iff} format ? Or about G.721 a-Law ADPCM compression ?
+@end itemize
+
+@node Sound_Architecture
+@subsubsection How does it work ?
+
+Sound System architecture is a bit like Graphics System. There are different
+sound renderers and low-level driver access for the software renderer. Sound
+renderer enable 2d buffer (@code{iSoundBuffer}) and 3d buffer
+(@code{iSoundSource}). Attached with renderer (@code{iSoundRender}) there're
+the listener (basicly the ears of the view/player) (@code{iSoundListener})
+for the 3d mode. Ok you haven't understand this, so i resume. Here is the SCF
+architecture :
+
+@table @code
+@item iSoundRender
+this mix, calculate@dots{} all @code{ISoundBuffer})
+
+@item iSoundDriver
+only used by software renderer, this is the low-level access to sound OS
+
+@item iSoundBuffer
+this is the played sound, we can create this with a @code{csSoundData}
+
+@item iSoundSource
+the 3d sound emmitter control)<br>
+
+@item iSoundListener
+The 3d listener
+@end table
+
+Some samples better than words (hum, I hope ;)) :
+
+@example
+// The sound data object
+csSoundData *sounddata;
+// I load a sound file
+sounddata = csSoundDataObject::GetSound(pWorld, "beep.wav"); 
+// I create a 2d sound buffer;</p>
+iSoundBuffer *soundbuffer;
+piSystem->piSoundRender->CreateSoundBuffer(&soundbuffer, sounddata);
+// I play the sound... not really complicated ?
+soundbuffer->Play();
+// I stop this sound... hum, simple...
+soundbuffer->Stop();
+
+// And now, playing with 3d ! (a bit more complicated)
+
+// The 3d source object
+iSoundSource *source;
+
+// There are two methodes to create a 3d source : directly from ISoundRender
+// or from an iSoundBuffer
+piSystem->piSoundRender->CreateSource(&source, sounddata);
+// or...
+soundbuffer->CreateSource->(&source);
+@end example
+
+@node Sound_Config
+@subsubsection How to configure sound system
+
+In your configuration file (e.g. @file{cryst.cfg}) you might have a
+@code{[SoundDriver]} section else make it :-) like this :
+
+@example
+[SoundDriver]
+; MAX_CHANNELS set the maximum of channels we can mix
+MAX_CHANNELS=16
+; FREQUENCY set frequency supported by sound device (44100, 22050, 11025...)
+FREQUENCY=11025
+; 16BITS set if sound device may use 16 bits (if it supported)
+16BITS=false
+; STEREO enable stereo on sound device (if it supported) (for a 3d sound it
+; can be necessary)
+STEREO=true
+; Active sound driver
+ACTIVE=true
+; Set general volume [0..1]
+; If you put -1 or a value inferior to 0, current device volume is kept.
+VOLUME=-1
+@end example
+
+These variable mean:
+
+@table @code
+@item MAX_CHANNELS
+The maximum of channels you can mix (only for software mixing, for a hardware
+multi voice, it the sound card whose fix this) (more is this value, more it
+can take cpu).
+
+@item FREQUENCY
+The sample frequency for playing (more is this value, more it can take cpu),
+this value can be fixed by hardware limit, verify it from your
+manual/driver/manufacturer).
+
+@item 16BITS
+Use 16 bits instead of 8 bits playing (depends on your sound card
+capabilities)
+
+@item STEREO
+Use stereo output. This one depends on your sound card too. It can be
+useful for 3d sound.
+
+@item ACTIVE
+Set this one to true to activate your sound driver. Otherwise you won't hear
+anything.
+
+@item VOLUME
+A software or hardware value, from 0 (empty) to 1 (full), it depends on your
+sound card and/or driver.
+@end table
+
+@node Sound_WaveOut
+@subsubsection waveOut win32 driver configuration
+
+The waveOut win32 driver has its own configuration in addition to general
+sound driver configuration:
+
+@example
+[SoundDriver.waveOut]
+; CALLBACK can be 'function' or 'thread'
+CALLBACK=thread
+; THREAD_PRIORITY can be 'lowest', 'normal' or 'highest'
+THREAD_PRIORITY=highest
+; number of refresh in a second
+REFRESH=10
+@end example
+
+These variables mean:
+
+@table @code
+@item CALLBACK
+Method have two choice : @samp{thread} or @samp{function}. Thread method
+starts a process whose fill sound data when it receive order (by waveOut).
+Function callback @samp{block} program for filling sound data, the call of
+function is done by waveOut but if us fps (Frame Per Second) is low or system
+idle is very low, calls to function can't be done (it unstable). I preconize
+thread method, (theorically) independent of main process idle.
+
+@item THREAD_PRIORITY
+Only for thread method, it set the priority of thread : @samp{lowest} mean
+that sound thread have a lowest priority than main process, @samp{normal} is
+equal priority for main process and sound thread, and @samp{highest} mean
+that thread priority is higher than main process! Better is @samp{highest}
+but it might not work in full screen some time (maybe a little bug from me).
+
+@item REFRESH
+The time of refresh of sound data, a @samp{10} value means refresh sound data
+10 times per second. But here, a warning (erh, it's stay an experimental
+stuff yet ;-)), if you get an fps inferior to this refresh value, it can
+crash for function callback or cut sound for thread method !
+@end itemize
+
+@node Sound_Problems
+@subsubsection Problems
+
+If you have problems with the sound output, check this :
+
+@itemize @bullet
+@item
+Are you sure to have a sound card ? :-)
+
+@item
+Are you sure that sound card is supported by your OS?
+
+@item
+Are you sure CrystalSpace has a sound driver for your OS?
+
+@item
+See @file{debug.txt}, if return a error from sound driver, try an other
+configuration by changing @code{FREQUENCY}, @code{STEREO}, @code{16 BITS},
+@code{VOLUME} and check if @code{ACTIVE} is @samp{on}/@samp{true}/@samp{1}
+
+@item
+Well, maybe it's a bug ?
+@end itemize
+
