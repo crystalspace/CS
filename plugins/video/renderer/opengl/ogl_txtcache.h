@@ -90,7 +90,7 @@ protected:
   int bpp;
 
   ///
-  virtual void Load (csGLCacheData *d) = 0;
+  virtual void Load (csGLCacheData *d, bool reload = false) = 0;
   ///
   void Unload (csGLCacheData *d);
 };
@@ -115,7 +115,7 @@ public:
 
 protected:
   ///
-  virtual void Load (csGLCacheData *d);
+  virtual void Load (csGLCacheData *d, bool reload = false);
 };
 
 ///
@@ -129,7 +129,7 @@ public:
 
 protected:
   ///
-  virtual void Load (csGLCacheData *d);
+  virtual void Load (csGLCacheData *d, bool reload = false);
 };
 
 #endif // __GL_TEXTURECACHE_H__

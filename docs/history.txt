@@ -3,6 +3,10 @@ The history order is reversed so that new features are at the top.
 18-May-2001
 	- Since the new lightmap format seems to work well I removed the
 	  optional support for the old format.
+	- Did yet another optimization in the OpenGL renderer. When dynamic
+	  lighting modifies a lightmap no new texture will be generated but
+	  instead the old cached lightmap state will be reused (using
+	  glTexSubImage2D).
 17-May-2001
 	- Fixed Blocks so it compiles again.
 	- Did an experimental optimization. CS will now keep the lightmap
