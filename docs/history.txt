@@ -1,5 +1,10 @@
 The history order is reversed so that new features are at the top.
 
+22-Feb-2003
+  - Philip Wyett removed multiple declerations of csTextureHandleOpenGL,
+    iTextureHandle and csTxtCacheData from 'FlushDrawPolygon ()'.
+    Philip Wyett also performed some variable decleration moves to within
+    the scope they are used. Also performed a minor code cleanups.  
 21-Feb-2003
   	- Andrew Craig changed iEngine->GetNearbyObjects() to take a bool
           parameter crossPortals. If you want to limit the search to the
