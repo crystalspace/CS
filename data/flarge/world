@@ -22935,6 +22935,7 @@
 	    <fadefog sector="kamer2l" red="0" green="0" blue="1" density="0.02"
 	    	duration="1000" />
 	    <delay time="1000" />
+	    <!-- @@@ Circular reference!!! Causes leak -->
 	    <run sequence="fogloop" />
 	</sequence>
 
@@ -23188,6 +23189,7 @@
 	    <delay time="10000" />
 	    <move mesh="floorplate" duration="10000" x="0" y="10" z="0" />
 	    <delay time="10000" />
+	    /* @@@ Circular reference!!! Causes leak */
 	    <run sequence="movebox" />
 	-->
 	</sequence>
@@ -23263,6 +23265,7 @@
 		<v x="0" y="4" z="0" />
 	    </rotate>
 	    <delay time="6000" />
+	    <!-- @@@ Circular reference!!! Causes leak -->
 	    <run sequence="openbox" />
 	</sequence>
 
