@@ -13,6 +13,8 @@ The history order is reversed so that new features are at the top.
 	  for indented printing.
 	- Added temporary debugging code to csOBB to help find a problem
 	  there.
+	- Found the reason for the csOBB bug but not the correct fix yet.
+	  Working around the bug right now seems to work reasonably well.
 23-Jun-2002
 	- Added csIntersect3::BoxSphere() function which tests intersection
 	  between a box and a sphere.
