@@ -5,10 +5,6 @@
 @cindex csphyzik
 @cindex Libraries, csphyzik
 
-@strong{Warning}: This documentation may be out of date.  Merge it with the
-existing @sc{html} document @file{csphyzik.htm} if necessary and then remove
-@file{csphyzik.htm}.
-
 The csPhyziks library is a dynamics modeling and simulation engine.  The
 core of the engine is a numerical integrator that solves the equations of
 motion for given bodies.  Different types of bodies will have different
@@ -41,7 +37,6 @@ update the position of the object that represents your body in the renderer.
 
 @node csPhyzik World
 @subsection The World
-The World
 
 There is a convenient header file that includes all the other headers you
 will probably need.
@@ -76,22 +71,22 @@ Now the rigid body we added should have been moved by the gravity force.
 @node csPhyzik Bodies
 @subsection Bodies
 
-The inheritance heiarchy for bodies looks something like this:
+The inheritance heirarchy for bodies looks something like this:
 
 @example
 ctPhysicalEntity        a body with position and velocity. any body 
 |                       inheriting from this can be added to a world.
 |
-|-- ctWorld
++-- ctWorld
 |
-|-- ctArticulatedBody   a body that in composed of a number of rigidbodies
++-- ctArticulatedBody   a body that in composed of a number of rigidbodies
 |                       connected via joints
 |
 +-- ctDynamicEntity     a body that has mass 
-|   |
-|   |-- ctSoftBody      (not implemented) 
-|
-|-- ctRigidBody         a rigid body with rotational state and an inertia
+    |
+    +-- ctSoftBody      (not implemented) 
+    |
+    +-- ctRigidBody     a rigid body with rotational state and an inertia
                         tensor
 @end example
 
@@ -181,14 +176,13 @@ ctVector3 joint_action( 0,0,1 );    // line of action for this joint
 ab_parent->link_revolute( ab_child, joint_offset_parent_to_child, joint_offset_ctop, joint_action ); 
 @end example
 
-Now when evolved the articulated body will move in a dynamically
-correct manner in response to any external and internal forces (if
-the featherstone solver is used).
+Now when evolved the articulated body will move in a dynamically correct
+manner in response to any external and internal forces (if the featherstone
+solver is used).
 
-It is possible to define your own joints from @code{ctJoint}. You can
-then overload the @code{get_actuator_magnitude()} method to implement
-a joint with a motor that will exert whatever force you like at
-that joint.
+It is possible to define your own joints from @code{ctJoint}. You can then
+overload the @code{get_actuator_magnitude()} method to implement a joint with
+a motor that will exert whatever force you like at that joint.
 
 @node csPhyzik Impulses
 @subsection Impulses
@@ -213,19 +207,17 @@ solver it uses at any time.
 @node csPhyzik Evolve-Collide-Update Loop
 @subsection Evolve-Collide-Update Loop
 
-This section will outline a good strategy for your main loop
-using the csphyziks library. The simplest way to evolve you
-system from time t_start to t_end is like so:
+This section will outline a good strategy for your main loop using the
+csphyziks library. The simplest way to evolve you system from time t_start to
+t_end is like so:
 
-The goal is to evolve the phyziks engine, then figure out if
-any thing crashed into anything else, deal with those collisions
-and finally update the data structures representing your objects
-for the renderer.  Minimum csphyzik data you need to keep around
-on your end of things are 1) a ctWorld object and 2) a pointer
-to each ctPhysicalEntity class ( or a more useful sub-class like
-ctRigidBody ) that you have instansiated and has some meaning to
-the rest of your program.  Here is a simple evolve-collide-upate
-cycle.
+The goal is to evolve the phyziks engine, then figure out if any thing
+crashed into anything else, deal with those collisions and finally update the
+data structures representing your objects for the renderer. Minimum csphyzik
+data you need to keep around on your end of things are 1) a ctWorld object
+and 2) a pointer to each ctPhysicalEntity class ( or a more useful sub-class
+like ctRigidBody ) that you have instansiated and has some meaning to the
+rest of your program. Here is a simple evolve-collide-upate cycle.
 @example
 phyz_world.evolve( t_start, t_end ); 
 loop through all your game entities 

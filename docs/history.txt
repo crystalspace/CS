@@ -30,6 +30,7 @@ Short-term cleanups that need to be done:
 	      constructor at creation time.
 	    - Documented all public methods with Doc++ style comments.
 	    - Now explicitly prevents overflow of its refresh buffer.
+	- Martin Geisse contributed a small update to the documenation.
 29-Mar-2000
 	- Fixed a bug in yesterdays bugfix on CompressShadowFrustrums.
 	- Fixed a bug which caused sectors using STATBSP to work wrong when

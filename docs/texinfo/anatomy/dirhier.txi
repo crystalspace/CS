@@ -117,9 +117,7 @@ Directory containing testdata for the built in converter classes.
 
 @item CS/docs
 Various docs concerning Crystal Space are here. Though not complete, they
-will answer a lot of questions. @emph{WARNING:} The docs are currently
-converted to texinfo format, so you will not find everything here. Look at
-CS/TXIDOCS instead.
+will answer a lot of questions.
 
 @item CS/include
 Here are the headers that can be used from other modules. The path for the

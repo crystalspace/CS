@@ -481,6 +481,11 @@ properly exit when the window is closed by the window manager.
 Martin Geisse (@email{Hellwig.Geisse@@mni.fh-giessen.de}) converted many of
 the Crystal Space text and LaTeX documents to Texinfo format and began
 construction of Texinfo version of the CS manual.
+
+@item
+Brad Davis (@email{jbdavis@@uswest.net}) used to host and maintain the master
+CVS repository for the project. However, the project now resides at
+SourceForge (@uref{http://www.sourceforge.net/}).
 @end itemize
 
 Many thanks also for the people at GrimmWare(@uref{http://www.grimmware.com})
