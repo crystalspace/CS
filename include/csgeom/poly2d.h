@@ -116,6 +116,11 @@ public:
   void MakeRoom (int new_max);
 
   /**
+   * Set the number of vertices.
+   */
+  void SetNumVertices (int n) { MakeRoom (n); num_vertices = n; }
+
+  /**
    * Add a vertex (2D) to the polygon.
    * Return index of added vertex.
    */

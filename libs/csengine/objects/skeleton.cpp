@@ -90,16 +90,16 @@ void csSkeletonLimb::RemapVertices (int* mapping)
   }
 }
 
-void csSkeletonLimb::ComputeBoundingBox (csVec3Vector* source)
+void csSkeletonLimb::ComputeBoundingBox (csPoly3D* source)
 {
   if (num_vertices)
   {
 
-    box.StartBoundingBox (source->Get(vertices[0]));
+    box.StartBoundingBox ((*source)[vertices[0]]);
     int i;
     for (i = 1 ; i < num_vertices ; i++)
     {
-      box.AddBoundingVertexSmart (source->Get(vertices[i]));
+      box.AddBoundingVertexSmart ((*source)[vertices[i]]);
     }
   }
 

@@ -27,6 +27,7 @@
 #include "csengine/cssprite.h"
 
 class csSkeletonLimbState;
+class csPoly3D;
 
 /**
  * A limb in a skeletal system. The Crystal Space skeletal system
@@ -91,7 +92,7 @@ public:
   /**
    * Compute the object space bounding box for this limb.
    */
-  void ComputeBoundingBox (csVec3Vector* source);
+  void ComputeBoundingBox (csPoly3D* source);
 };
 
 /**

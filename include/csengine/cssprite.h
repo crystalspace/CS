@@ -21,6 +21,8 @@
 
 #include "csgeom/math3d.h"
 #include "csgeom/math2d.h"
+#include "csgeom/poly2d.h"
+#include "csgeom/poly3d.h"
 #include "csgeom/box.h"
 #include "csobject/nobjvec.h"
 #include "csengine/polyint.h"
@@ -42,29 +44,15 @@ class csSprite3D;
 class csBspContainer;
 struct iTextureHandle;
 
-class csVec3Vector : public csVector
-{
-public:
-  csVec3Vector (int ilimit = 8, int ithreshold = 8) : csVector (ilimit, ithreshold) { }
-  csVector3& Get (int index) { return (csVector3&)csVector::Get (index); }
-};
-
-class csVec2Vector : public csVector
-{
-public:
-  csVec2Vector (int ilimit = 8, int ithreshold = 8) : csVector (ilimit, ithreshold) { }
-  csVector2& Get (int index) { return (csVector2&)csVector::Get (index); }
-};
-
 /**
  * A frame for 3D sprite animation.
  */
 class csFrame : public csBase
 {
 private:
-  csVec3Vector* vertices;
-  csVec2Vector* texels;
-  csVec3Vector* normals;
+  csPoly3D* vertices;
+  csPoly2D* texels;
+  csPoly3D* normals;
   char* name;
 
   /// Bounding box in object space for this frame.
@@ -77,23 +65,23 @@ public:
   virtual ~csFrame ();
 
   /// should only be used by csSpriteTemplate class
-  csVector3& GetFrameVertex (int i) { return vertices->Get(i); }
+  csVector3& GetFrameVertex (int i) { return (*vertices)[i]; }
   ///
-  void SetVertices (csVec3Vector * v) { vertices = v; }
+  void SetVertices (csPoly3D* v) { vertices = v; }
   ///
-  csVec3Vector * GetVertices () { return vertices; }
+  csPoly3D * GetVertices () { return vertices; }
 
   /// should only be used by csSpriteTemplate class
-  csVector2& GetFrameTexel (int i) { return texels->Get(i); }
+  csVector2& GetFrameTexel (int i) { return (*texels)[i]; }
   ///
-  void SetTexels (csVec2Vector * t) { texels = t; }
+  void SetTexels (csPoly2D * t) { texels = t; }
   ///
-  csVec2Vector * GetTexels () { return texels; }
+  csPoly2D * GetTexels () { return texels; }
 
   /// should only be used by csSpriteTemplate class
-  csVector3& GetFrameNormal (int i) { return normals->Get(i); }
+  csVector3& GetFrameNormal (int i) { return (*normals)[i]; }
   ///
-  void SetNormals (csVec3Vector * n) { normals = n;}
+  void SetNormals (csPoly3D * n) { normals = n;}
 
   ///
   void SetName (char * n);
@@ -245,19 +233,19 @@ public:
   void AddVertex () { AddVertices (1); }
 
   /// Query the number of texels.
-  int GetNumTexels   () { return ((csVec2Vector*)(texels.Get(0)))->Length (); }
+  int GetNumTexels () { return ((csPoly2D*)(texels.Get(0)))->GetNumVertices (); }
   ///
   csVector2& GetTexel (csFrame* frame, int vertex)
     { return frame->GetFrameTexel(vertex); }
 
   /// Query the number of vertices.
-  int GetNumVertices () { return ((csVec3Vector*)(vertices.Get(0)))->Length (); }
+  int GetNumVertices () { return ((csPoly3D*)(vertices.Get(0)))->GetNumVertices (); }
   /// 
   csVector3& GetVertex (csFrame* frame, int vertex)
     { return frame->GetFrameVertex(texel_to_vertex[vertex]); }
 
   /// Query the number of normals.
-  int GetNumNormals  () { return ((csVec3Vector*)(normals.Get(0)))->Length (); }
+  int GetNumNormals () { return ((csPoly3D*)(normals.Get(0)))->GetNumVertices (); }
   ///
   csVector3& GetNormal (csFrame* frame, int vertex)
     { return frame->GetFrameNormal(texel_to_normal[vertex]); }

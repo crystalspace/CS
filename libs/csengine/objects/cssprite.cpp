@@ -65,10 +65,10 @@ void csFrame::SetName (char * n)
 void csFrame::ComputeBoundingBox (int num_vertices)
 {
   int i;
-  box.StartBoundingBox (vertices->Get(0));
+  box.StartBoundingBox ((*vertices)[0]);
   for (i = 1 ; i < num_vertices ; i++)
   {
-    box.AddBoundingVertexSmart (vertices->Get(i));
+    box.AddBoundingVertexSmart ((*vertices)[i]);
   }
 }
 
@@ -173,12 +173,9 @@ void csSpriteTemplate::AddVertices (int num)
 
   for (frame = 0; frame < frames.Length(); frame++)
   {
-    for (vertex = 0; vertex < num; vertex++)
-    {
-      ((csVec3Vector*)(normals  .Get(frame))) -> Push (new csVector3);
-      ((csVec2Vector*)(texels   .Get(frame))) -> Push (new csVector2);
-      ((csVec3Vector*)(vertices .Get(frame))) -> Push (new csVector3);
-    }
+    ((csPoly3D*)(normals.Get (frame)))->SetNumVertices (GetNumNormals ()+num);
+    ((csPoly2D*)(texels.Get (frame)))->SetNumVertices (GetNumTexels ()+num);
+    ((csPoly3D*)(vertices.Get (frame)))->SetNumVertices (GetNumVertices ()+num);
   }
 }
 
@@ -216,7 +213,7 @@ void csSpriteTemplate::GenerateLOD ()
   int i;
 
   //@@@ turn this into a parameter or member variable?
-  csFrame* lod_base_frame = GetFrame(0);
+  csFrame* lod_base_frame = GetFrame (0);
 
   CHK (csVector3* v = new csVector3[GetNumTexels()]);
   for (i = 0; i < GetNumTexels(); i++)
@@ -285,25 +282,25 @@ void csSpriteTemplate::ComputeBoundingBox ()
 csFrame* csSpriteTemplate::AddFrame ()
 {
   CHK (csFrame* fr = new csFrame ());
-  CHK (csVec3Vector* nr = new csVec3Vector ());
-  CHK (csVec2Vector* tx = new csVec2Vector ());
-  CHK (csVec3Vector* vr = new csVec3Vector ());
+  CHK (csPoly3D* nr = new csPoly3D ());
+  CHK (csPoly2D* tx = new csPoly2D ());
+  CHK (csPoly3D* vr = new csPoly3D ());
 
   if (frames.Length() > 0)
   {
-    nr -> SetLength (GetNumNormals  ());
-    tx -> SetLength (GetNumTexels   ());
-    vr -> SetLength (GetNumVertices ());
+    nr->SetNumVertices (GetNumNormals  ());
+    tx->SetNumVertices (GetNumTexels   ());
+    vr->SetNumVertices (GetNumVertices ());
   }
 
-  frames.Push   (fr);
-  normals.Push  (nr);
-  texels.Push   (tx);
+  frames.Push (fr);
+  normals.Push (nr);
+  texels.Push (tx);
   vertices.Push (vr);
 
-  fr -> SetNormals  (nr);
-  fr -> SetTexels   (tx);
-  fr -> SetVertices (vr);
+  fr->SetNormals (nr);
+  fr->SetTexels (tx);
+  fr->SetVertices (vr);
   
   return fr;
 }
@@ -536,7 +533,7 @@ int csSpriteTemplate::MergeTexels ()
 
   // start a count and a list of unique texel maps
   int unique_texel_map_count;
-  CHK (csVec2Vector** unique_texel_maps = new csVec2Vector* [frames.Length()]);
+  CHK (csPoly2D** unique_texel_maps = new csPoly2D* [frames.Length()]);
 
   // add the first frame to the unique texel map list
   unique_texel_maps [0] = GetFrame(0)->GetTexels();
@@ -545,7 +542,7 @@ int csSpriteTemplate::MergeTexels ()
   // FOR each frame
   for (int frame = 1;  frame < frames.Length(); frame ++)
   {
-    csVec2Vector * tx = GetFrame(frame)->GetTexels();
+    csPoly2D* tx = GetFrame (frame)->GetTexels();
     bool unique = true;
 
     // FOR each unique texel map
@@ -562,7 +559,7 @@ int csSpriteTemplate::MergeTexels ()
       bool same = true;
       for (int v = 0; v < GetNumTexels(); v ++)
       {
-        if (tx->Get(v) != unique_texel_maps[map]->Get(v))
+        if ((*tx)[v] != (*unique_texel_maps[map])[v])
         {
           same = false;
           break;

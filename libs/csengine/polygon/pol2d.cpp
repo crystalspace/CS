@@ -653,6 +653,11 @@ void csPolygon2D::DrawFilled (csRenderView* rview, csPolygon3D* poly,
     g3dpoly.num = num_vertices;
     g3dpoly.txt_handle = poly->GetTextureHandle ();
     g3dpoly.inv_aspect = rview->inv_aspect;
+    float r, g, b;
+    g3dpoly.txt_handle->GetMeanColor (r, g, b);
+    g3dpoly.flat_color_r = r;
+    g3dpoly.flat_color_g = g;
+    g3dpoly.flat_color_b = b;
 
     // We are going to use DrawPolygon.
     if (mirror)
