@@ -1,16 +1,21 @@
 #!/bin/sh
-# This script prepares CS documentation to work with the usercomment.php script
+# This script prepares CS documentation for online publication by adding
+# user-annotation capability.
 
-EFED=bin/efed.pl
+EFED=perl bin/efed.pl
 
 DIRS="out/docs/pubapi/ out/docs/html/"
 
-for i in $DIRS; do
-	if test -d $i; then
-		echo "Converting to php in $i..."
-		$EFED -d -r "s:html:php:" -e "s/\.html/\.php/g" -e "s/href *= *\"(?!http\:\/\/)([^\"]*)\.html([^\"]*)\"/href=\"\$1.php\$2\"/gi" -e "s:<title>(.*)</title>:<title>\$1</title><?php \\\$theme=\"\$1\"; ?>:i" -e "s:</body>:<?php require(\"annotate.php\"); ?></body>:i" $i
-
-		cp docs/support/phpdocs/*.php $i
-	fi
+for d in $DIRS; do
+  if test -d $d; then
+    echo "Preparing $d for annotation capability."
+    $EFED -d \
+      -r "html=php" \
+      -e "s/\.html/\.php/g" \
+      -e "s/href *= *\"(?!http\:\/\/)([^\"]*)\.html([^\"]*)\"/href=\"\$1.php\$2\"/gi" \
+      -e "s:<title>(.*)</title>:<title>\$1</title><?php \\\$theme=\"\$1\"; ?>:i" \
+      -e "s:</body>:<?php require(\"annotate.php\"); ?></body>:i" \
+      $i
+    cp docs/support/annotate/*.php $i
+  fi
 done
-echo ok
