@@ -299,7 +299,7 @@ public:
     }
 
     /// Move the iterator back to the first element.
-    void Return () { element = -1; Seek (); }
+    void Return () { element = 0; Seek (); }
   };
   friend class csHash<T, K, KeyHandler>::Iterator;
 
