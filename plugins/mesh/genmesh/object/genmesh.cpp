@@ -53,7 +53,9 @@
 
 CS_LEAKGUARD_IMPLEMENT (csGenmeshMeshObject)
 CS_LEAKGUARD_IMPLEMENT (csGenmeshMeshObjectFactory)
+#ifdef CS_USE_NEW_RENDERER
 CS_LEAKGUARD_IMPLEMENT (csGenmeshMeshObject::eiShaderVariableAccessor)
+#endif
 
 CS_IMPLEMENT_PLUGIN
 

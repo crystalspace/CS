@@ -765,7 +765,7 @@ void TiXmlUnknown::Print( iString* cfile, int depth ) const
 {
   for ( int i=0; i<depth; i++ )
     StrPrintf ( cfile, "    " );
-  StrPrintf ( cfile, "%s", value.c_str() );
+  StrPrintf ( cfile, "<%s>", value.c_str() );
 }
 
 TiDocumentNode* TiXmlUnknown::Clone(TiDocument* document) const

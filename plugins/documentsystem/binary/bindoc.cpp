@@ -1192,6 +1192,9 @@ csRef<iDocumentNode> csBinaryDocNode::CreateNodeBefore (csDocumentNodeType type,
       case CS_NODE_TEXT:
 	newType = BD_NODE_TYPE_TEXT;
 	break;
+      case CS_NODE_UNKNOWN:
+	newType = BD_NODE_TYPE_UNKNOWN;
+	break;
 
       default:
 	return 0;

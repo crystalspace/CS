@@ -6,6 +6,15 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+26-Aug-2004
+	- res changed the TinyXML unknown element writer to write the value
+	  not verbatim but inside pointy brackets (a tag like "<?foo ?>" in a 
+	  file will result in an 'UNKNOWN' element with the value "?foo ?").
+	- res fixed the binary document system to also create nodes of type
+	  UNKNOWN.
+	- res silenced the warning 4345 on VC7.1.
+	- res made some OR compile fixes (leak guards for NR-only embedded
+	  classes).
 25-Aug-2004
 	- Jorrit fixed spr3d so that it will forcibly recalculate normals
 	  (cached) if -recalc cmdline option is given.
