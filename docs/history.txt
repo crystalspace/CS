@@ -10,6 +10,12 @@ chronological order.
 	- res changed the Win32 GL canvas to only employ the WGL pixel format
 	  check if really needed (e.g. multisampling was requested), otherwise
 	  the GDI method is used.
+	- Squee added better alpha color support to iGraphics2D and all
+	  canvases. This means FindRGB() now optionally accepts an alpha
+	  value.
+	- Squee improved the Win32 OpenGL canvas SetFullscreen() and
+	  Resize() functions to more properly toggle/resize when called
+	  by an app after the canvas is open
 11-Oct-2004
 	- Jorrit generalized the csTriangleMeshLOD class and related
 	  so that you can now generate LOD using different cost
