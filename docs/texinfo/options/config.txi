@@ -72,7 +72,7 @@ It is stored in a platform-dependent manner. For more information
 defined in the user-neutral, application-specific config file (e.g.
 @file{walktest.cfg}).
 
-It is strongly recommended that an application ID always has the shape 
+It is strongly recommended that an application identifier always has the form 
 @samp{<Producer>.<ProductName>}. If the application is a tool that is only 
 meaningful if used together with CrystalSpace, or if you think your name is 
 not worthy enough to be used in such an exposed place as the 

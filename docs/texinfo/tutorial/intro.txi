@@ -33,10 +33,10 @@ This manual uses the term @dfn{module} for both libraries and plug-ins when
 the distinction between the two is not important.
 
 A plug-in module is similar to a library, but has some advantages over a
-library.  All plug-ins can be accessed in a common fashion.  They have a
-@emph{very} clear interface, and they can provide this interface even if they
-are extracted to a DLL.  So they are the better solution as long as speed is
-not the dictator of all decisions as in the math library (access to plug-in
+library.  All plug-ins can be accessed in a common fashion.  They have a pure
+interface, and they can provide this interface even if they are extracted to a
+dynamic load library.  So, they are the better solution as long as speed is not
+the dictator of all decisions as in the math library (access to plug-in
 functions uses virtual methods).  The main difference between the interface of
 a library and a plug-in is that a library may use @sc{scf}, the Shared Class
 Facility (@pxref{SCF}), and C++ classes; plug-ins may only use @sc{scf}.
@@ -45,11 +45,11 @@ Facility (@pxref{SCF}), and C++ classes; plug-ins may only use @sc{scf}.
 @item
 What is @sc{scf}?
 
-The main @sc{scf} object is the @emph{Interface}.  An interface is the
+The main @sc{scf} object is the @dfn{interface}.  An interface is the
 solution to strictly decouple the public methods of an object from their
 implementation.  You only get a pointer to an abstract class with only virtual
 methods, called the interface, so your program doesn't know about the actual
-object behind the pointer.  This object is called an @emph{Implementation} of
+object behind the pointer.  This object is called an @dfn{implementation} of
 the interface.  You as the user of Crystal Space will call functions that
 create the actual object, but only return the interface.  After that you can
 use the interface like a C++ object.  When you don't need it anymore, don't
@@ -110,33 +110,41 @@ access to the functions of the plug-in.
 @item
 How can I register the plug-in library?
 
-@dfn{Registering} means to tell @sc{scf} the name of the plug-in that was
-given to it by its author, and a class or a dynamic library to associate it
-with. For example, to use the software graphics driver you must tell @sc{scf}
-that the plug-in with the name @samp{crystalspace.graphics3d.software} can be
-found in @file{soft3d.dll} or @file{soft3d.so}. Actually the extension will
-be added automatically, so you just have to use @file{soft3d} as the name of
-the library. You can find examples for this in @file{scf.cfg}.
+@dfn{Registering} means to tell @sc{scf} the name of the plug-in that was given
+to it by its author, and a class or a dynamic library to associate it with.
+Plugin libraries can contain multiple @sc{scf} classes.  For example, to use
+the software graphics renderer @sc{scf} must know that the @sc{scf} class
+@samp{crystalspace.graphics3d.software} can be found in @file{soft3d.dll}
+(Windows) or @file{soft3d.so} (Unix).  @sc{scf} determines dynamically which
+plugin libraries contain which @sc{scf} classes by consulting metainformation
+associated with each plugin.  Depending upon the platform, the associated
+metainformation may be bundled into the plugin itself, or it might exist in a
+separate file with a @file{.csplugin} extension alongside the plugin module.
 
-How you must register a library depends on whether it is a static library or
-a dynamic library (@file{.dll} or @file{.so}). For a static library, put this
-line at toplevel into one of your C++ files and link to the static library:
-@example
-SCF_REGISTER_STATIC_LIBRARY(@var{name})
-@end example
-This will register all plug-ins in the statically-linked library @file{name}.
-This name is chosen by the author of the library. In the case of static
-libraries, it may be different from the filename of the library.
+How you must register a library depends on whether it is a static library or a
+dynamic library (@file{.dll} or @file{.so}).  For a static library, that is,
+one which is linked directly into the application, rather than loaded
+dynamically at run-time, put the following macro invocation at top-level in one
+of your C++ files once for each @sc{scf} class contained in your library:
 
-For a dynamic library, use @samp{scfreg} at your command line:
 @example
-scfreg @var{name}.dll    # @r{For Windows or @sc{dos}}
-scfreg lib@var{name}.so  # @r{For most Unix platforms}
+SCF_REGISTER_STATIC_CLASS(
+  @var{plugin-name},
+  @var{scf-name},
+  @var{description},
+  @var{dependencies})
 @end example
-This will register all plug-ins in the specified dynamic library. Dynamic
-libraries need to be registered only once as long as you do not modify the
-library itself. The information is then stored in @file{scf.cfg} (that's why
-you can find examples of plugin-to-library association in this file).
+
+Here, @var{plugin-name} is the name of the C++ class which implements the
+factory for this particular @sc{scf} class.  @var{plugin-name} is the same name
+given to the @code{SCF_IMPLEMENT_FACTORY()} macro.  @var{scf-name} is the
+@sc{scf} class name corrsponding to @var{plugin-name}, @var{description} is a
+human-readable string describing the purpose of the class, and
+@var{dependencies} is a comma-separated list of other @sc{scf} class upon which
+this class depends.
+
+For a dynamic library, @sc{scf} will discover the plugin and register the
+contained classes automatically by consulting the associated metainformation.
 
 @item
 How can I load the plug-in?

@@ -128,8 +128,7 @@ and not a plugin, do the following:
 Note that the difference between compiling an executable and a plugin
 is the change of @samp{$(DO.EXEC)} to @samp{$(DO.PLUGIN)}, and vice
 versa. Of course, an application must have a main routine and initialize
-Crystal Space, and a plugin needs to declare its SCF class table and
-interfaces.
+Crystal Space.
 
 @subsubheading Using the Makefile
 

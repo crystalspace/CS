@@ -196,7 +196,7 @@ See image below for an example of these set.
 
 Once done, click on the @emph{@sc{ok}} button and return to the @sc{msvc ide}.
 
-@subsubheading Step 4 - Setting Crystal Space preprocessor definitions inside @sc{msvc}.
+@subsubheading Step 4 - Setting Preprocessor Definitions in @sc{msvc}.
 
 Step 4 Video - 0.9Mb zip archive download.
 
@@ -256,7 +256,7 @@ ones entered for a release build can be seen in the image below.
 
 Once done, click on the @emph{@sc{ok}} button and return to the @sc{msvc ide}.
 
-@subsubheading Step 5 - Setting the run-time library we need to use with Crystal Space applications.
+@subsubheading Step 5 - Setting Run-Time Library Used with Crystal Space Applications.
 
 Step 5 Video - 0.5Mb zip archive download.
 
@@ -319,7 +319,7 @@ When compiling Crystal Space in release and debug mode, you will end up with the
 following static libs, some of which you may require at some point in your own
 applications if you use the functionality contained within a given library.
 
-Crystal Space debug library names (The @emph{_d} indicates a debug CS library):
+Crystal Space debug library names (the @emph{_d} indicates a debug CS library):
 
 @iftex
 @code{libcssys_d.lib libcsengine_d.lib libcsutil_d.lib libcsgeom_d.lib}@*
@@ -397,10 +397,11 @@ project.
 Q. @emph{I get the following error:}
 
 @example
---------------------Configuration: simple1 - Win32 Release--------------------
+----------Configuration: simple1 - Win32 Release----------
 Compiling...
 simple1.cpp
-C:\CS\INCLUDE\platform.h(26) : fatal error C1083: Cannot open include file: 'volatile.h': No such file or directory
+C:\CS\INCLUDE\platform.h(26) : fatal error C1083:
+  Cannot open include file: 'volatile.h': No such file or directory
 Error executing cl.exe.
 
 simple1.exe - 1 error(s), 0 warning(s)
@@ -413,7 +414,7 @@ preprocessor definitions correctly.
 Q. @emph{I get the following link errors:}
 
 @example
---------------------Configuration: simple1 - Win32 Release--------------------
+----------Configuration: simple1 - Win32 Release----------
 Compiling...
 simple1.cpp
 Linking...
@@ -470,7 +471,7 @@ settings you have entered.
 Q. @emph{I get the following link errors:}
 
 @example
---------------------Configuration: simple1 - Win32 Release--------------------
+----------Configuration: simple1 - Win32 Release----------
 Compiling...
 simple1.cpp
 Linking...

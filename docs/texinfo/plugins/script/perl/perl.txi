@@ -49,14 +49,14 @@ there are no more references to it in Perl.
 There are three ways to access object properties:
 @example
 print $vect->x;		# Preferred way, conforms to Perl convention
-print $vect->{"x"};	# Swig's generated primary way
+print $vect->@{"x"@};	# Swig's generated primary way
 print $vect->get_x();	# Swig's generated secondary way
 @end example
 
 And three ways to modify object properties:
 @example
 $vect->x(123);		# Preferred way, conforms to Perl convention
-$vect->{"x"} = 123;	# Swig's generated primary way
+$vect->@{"x"@} = 123;	# Swig's generated primary way
 $vect->set_x(123);	# Swig's generated secondary way
 @end example
 
@@ -98,18 +98,18 @@ is expected. Currently the interfaces that support this feature are
 
 @example
 package MyPerlEventHandler;
-@ISA = qw{ cspace::iEventHandler };
+@@ISA = qw@{ cspace::iEventHandler @};
 sub new
-{
-  $x = {};
+@{
+  $x = @{@};
   bless ($x, "MyPerlEventHandler");
   return $x;
-}
+@}
 sub HandleEvent
-{
-  ($self, $event) = @_;
+@{
+  ($self, $event) = @@_;
   # your event handler here...
-}
+@}
 
 package main;
 $eventq = cspace::CS_QUERY_REGISTRY ($object_reg, "iEventQueue");
@@ -122,7 +122,8 @@ $eventq->RegisterListener ($handler);
 @subsubheading Macros that take Interfaces as Parameters
 
 In Perl, CS macros that take interface names as parameters, for instance
-@code{CS_QUERY_REGISTRY}, take those interface names as strings:
+@code{CS_QUERY_REGISTRY()}, take those interface names as strings:
+
 @example
 $engine = cspace::CS_QUERY_REGISTRY($object_reg, "iEngine");
 @end example
@@ -131,6 +132,7 @@ $engine = cspace::CS_QUERY_REGISTRY($object_reg, "iEngine");
 
 To convert a @code{csRGBpixel} to a @code{csRGBcolor}, use the
 @code{asRGBcolor} method:
+
 @example
 $color = $pixel->asRGBcolor();
 @end example
@@ -146,6 +148,51 @@ which takes a single integer parameter, an array index, and returns a
 The overloaded @code{Add} and @code{Find} methods in @code{iEvent} are
 replaced in Perl with ones with names which explicitly specify the types
 of their parameters (since otherwise Perl wouldn't know which C++ function to
-call): @code{AddInt8 AddInt16 AddInt32 AddUInt8 AddUInt16 AddUInt32 AddFloat
-AddDouble AddString AddBool AddVoidPtr FindInt8 FindInt16 FindInt32 FindUInt8
-FindUInt16 FindUInt32 FindFloat FindDouble FindString FindBool FindVoidPtr}.
+call):
+
+@itemize @bullet
+@item
+@code{AddInt8}
+@item
+@code{AddInt16}
+@item
+@code{AddInt32}
+@item
+@code{AddUInt8}
+@item
+@code{AddUInt16}
+@item
+@code{AddUInt32}
+@item
+@code{AddFloat}
+@item
+@code{AddDouble}
+@item
+@code{AddString}
+@item
+@code{AddBool}
+@item
+@code{AddVoidPtr}
+@item
+@code{FindInt8}
+@item
+@code{FindInt16}
+@item
+@code{FindInt32}
+@item
+@code{FindUInt8}
+@item
+@code{FindUInt16}
+@item
+@code{FindUInt32}
+@item
+@code{FindFloat}
+@item
+@code{FindDouble}
+@item
+@code{FindString}
+@item
+@code{FindBool}
+@item
+@code{FindVoidPtr}
+@end itemize

@@ -27,28 +27,19 @@ build.
 
 You can also use the movie recorder with an existing binary without any
 recompilation.  Just place the movie recorder plugin in the application's
-library directory, and add these lines to the application's @file{scf.cfg}
-file:
-
-@example
-; Realtime movie recorder
-crystalspace.utilities.movierecorder = movierecorder
-@end example
+library directory.
 
 Like the BugPlug plugin, the movie recorder can be loaded and manipulated
 explicitly by an application or it can be loaded transparently into an existing
 application.  To load it transparently, you can add a line to
-@file{data/config/user.cfg}:
+@file{data/config/user.cfg} (this is really one line even though it appears
+wrapped over two lines in the printed output.):
 
 @iftex
 @example
 Global.System.Plugins.iMovieRecorder =
-    crystalspace.utilities.movierecorder
+  crystalspace.utilities.movierecorder
 @end example
-
-@noindent
-(This is really one line even though it
-appears wrapped over two lines in the printed output.)
 @end iftex
 @ifnottex
 @example
