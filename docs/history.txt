@@ -39,6 +39,10 @@ The history order has been reversed so that new features are at the top.
 	      via a physical filesystem.
 	    - The format of the 'coord' file has changed slightly.  The stored
 	      sector name is now quoted (with double-quotes) rather than bare.
+	- Eric Sunshine worked around a limitation of Wouter's Solaris
+	  compiler which could not grok the 64,000 byte "Data" buffer built
+	  into dnFileBuffer.  Therefore, the Data buffer is now allocated from
+	  heap.
 7-May-2000
 	- More work on PVS. Still not working properly though.
 	- Started working on saving and loading of octree and PVS.
