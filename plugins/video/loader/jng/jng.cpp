@@ -321,7 +321,7 @@ csPtr<iDataBuffer> csJNGImageIO::Save (iImage *Image,
       imgRGBA->SetFormat (CS_IMGFMT_TRUECOLOR | (Image->GetFormat() & CS_IMGFMT_ALPHA));
       break;
     case CS_IMGFMT_TRUECOLOR:
-      imgRGBA = csPtr<iImage>(Image);
+      imgRGBA = csRef<iImage>(Image);
       break;
     default:
       // unknown format

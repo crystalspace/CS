@@ -3,6 +3,7 @@ The history order is reversed so that new features are at the top.
 2-Feb-2003
 	- Eric Sunshine modified tutorial/intro.txi so that it gives the full
 	  name of SCF and features a hyperlink to the SCF section.
+	- res fixed a crash in JNG saving
 31-Jan-2003
 	- res fixed MSVC assertion in csString::Collapse() if the string
 	  contains characters >= 0x80
