@@ -290,7 +290,7 @@ void csRectRegion::nkSplit (csRect &r1, csRect &r2)
   }
 }
 
-void csRectRegion::Include (csRect &nrect)
+void csRectRegion::Include (const csRect &nrect)
 {
   // Ignore an empty rect
   if (nrect.IsEmpty ())
@@ -392,7 +392,7 @@ void csRectRegion::Include (csRect &nrect)
   } while (!no_fragments);
 }
 
-void csRectRegion::Exclude (csRect &nrect)
+void csRectRegion::Exclude (const csRect &nrect)
 {
   // Ignore an empty rect
   if (nrect.IsEmpty ())
