@@ -35,8 +35,8 @@
     unsigned int last_error;
      	
  public:
-	csRENode *Build(char **regexp);
-	bool      Compile(char *regexp);
+	csRENode *Build(unsigned char **regexp);
+	bool      Compile(unsigned char *regexp);
 	
  public:
     void SetErrorCondition(unsigned int errc)

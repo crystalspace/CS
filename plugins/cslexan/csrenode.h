@@ -1,6 +1,8 @@
 #ifndef __CS_CSRENODE_H__
 #define __CS_CSRENODE_H__
 
+#include <string.h>
+
 /*****************************************************************************
     Copyright (C) 2001 by Christopher Nelson
   
@@ -35,8 +37,8 @@
      4. alt-node:  matches an alternate.  alternates are binary. equivalent to "|"
      5. qm-node:   matches one or none.  equivalent to "?"
      
-   Leaves are always the individual characters to match, unless they are special table leaves.  A table leaf supports "[]", and
- therefore may match any of the characters in the table.  However, it still only matches ONE character from the table.  
+   Leaves are always the individual unsigned characters to match, unless they are special table leaves.  A table leaf supports "[]", and
+ therefore may match any of the unsigned characters in the table.  However, it still only matches ONE unsigned character from the table.  
 
    These classes are for the INTERNAL use of the engine ONLY.  They are NOT intended to be exported by any module.
 
@@ -174,7 +176,7 @@
  //                  								Leaves
  ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
  
- /// The char leaf class.  Contains a character to match.
+ /// The unsigned char leaf class.  Contains a unsigned character to match.
  class csRECharLeaf : public csRENode
  {
   int c;
@@ -193,23 +195,26 @@
    virtual csRENode *Right()
    { return NULL;  }
    
-   /// Returns a true if this char matches the stored char.
+   /// Returns a true if this unsigned char matches the stored unsigned char.
    virtual bool Accept(int ch)
    { return c==ch; } 
  };
  
- /// The table leaf class.  Contains a set of characters to match.
+ /// The table leaf class.  Contains a set of unsigned characters to match.
  class csRETableLeaf : public csRENode
  {
-  /// The set of characters that can be matched by this node.
-  char *set;
+  /// The set of unsigned characters that can be matched by this node.
+  unsigned char *set;
   
-  /// If true, then Accept returns true if the char is NOT in this table, otherwise returns true if char IS in the table.
+  /// If true, then Accept returns true if the unsigned char is NOT in this table, otherwise returns true if unsigned char IS in the table.
   bool invert_match;
    
  public:
-   csRETableLeaf(char *s, bool invert=false):set(s), invert_match(invert) {};
-   virtual ~csRETableLeaf() { if (set) delete set; };
+   csRETableLeaf(unsigned char *s, bool invert=false):invert_match(invert) 
+   { set = (unsigned char *)strdup((char *)s);  };
+   
+   virtual ~csRETableLeaf() 
+   { if (set) delete set; };
    
  public:
    virtual unsigned char Type()
@@ -221,15 +226,15 @@
    virtual csRENode *Right()
    { return NULL;  }
    
-   /// Returns a true if this char matches the stored char.
+   /// Returns a true if this unsigned char matches the stored unsigned char.
    virtual bool Accept(int ch)
    { 
      bool matched=false;
      
-     char mc = (char)ch;
-     char *p = set;
+     unsigned char mc = (unsigned char)ch;
+     unsigned char *p = set;
      
-     // see if the char is in this set.
+     // see if the unsigned char is in this set.
      while(*p)
      {
        if (*p == mc) 

@@ -28,14 +28,15 @@
  
  1. Fri Jun 01 03:00:01 PM MDT 2001 paradox <paradox@bbhc.org>  Created new file, implemented basic parsing.
  2. Sat Jun 02 10:16:35 AM MDT 2001 paradox <paradox@bbhc.org>  Fixed some compile errors, add "csrdparse.h" interface file.
-
+ 3. Mon Jun 04 08:16:45 AM MDT 2001 paradox <paradox@bbhc.org>  Noted that Eric Sunshine made some useful modifications to the includes 
+ 															 and fixed my naming mistake.
  ****/
 
 /// Does a foreward lookup to support wildcards
 bool
-SupportWildCards(char **pRE, csRESyntaxTree &tree, csRENode **node)
+SupportWildCards(unsigned char **pRE, csRESyntaxTree &tree, csRENode **node)
 {
-  char *p = *pRE;
+  unsigned char *p = *pRE;
   bool  wild_found=false;
 	
   // Foreward-lookup the next char for special handling of alternates and wildcards
@@ -75,10 +76,10 @@ SupportWildCards(char **pRE, csRESyntaxTree &tree, csRENode **node)
 
 /// Builds a character leaf node, with proper checking for alternate branching.
 csRENode *
-BuildCharLeaf(char **pRE, csRESyntaxTree &tree)
+BuildCharLeaf(unsigned char **pRE, csRESyntaxTree &tree)
 {
-  char     *p = *pRE;
-  csRENode *node = new csRECharLeaf(*p);
+  unsigned char *p = *pRE;
+  csRENode      *node = new csRECharLeaf(*p);
              
   // Look ahead one, to see if we need to perform alternating.
   ++p;
@@ -92,9 +93,9 @@ BuildCharLeaf(char **pRE, csRESyntaxTree &tree)
 
 /// Builds a parenthetical branch (infix order override) with support for wildcards and alternate branches.
 csRENode *
-BuildParenBranch(char **pRE, csRESyntaxTree &tree)
+BuildParenBranch(unsigned char **pRE, csRESyntaxTree &tree)
 {
-  char     *p = *pRE;
+  unsigned char     *p = *pRE;
   csRENode *node;
   
   csRENode *top_node = new csRECatNode(tree.Build(&p), tree.Build(&p));
@@ -125,12 +126,13 @@ BuildParenBranch(char **pRE, csRESyntaxTree &tree)
 
 /// Builds a table leaf with support for wildcards and alternate branches.
 csRENode *
-BuildTableLeaf(char **pRE, csRESyntaxTree &tree)
+BuildTableLeaf(unsigned char **pRE, csRESyntaxTree &tree)
 {
-  char     *p = *pRE;
-  bool      table[256];  // The table size should never exceed 256 different characters.
-  bool      invert_match = false;
-  csRENode *node;
+  unsigned char     	 *p = *pRE;
+  bool      	table[256];  // The table size should never exceed 256 different unsigned characters.
+  unsigned char tbl[256];    // Since we'll never have more than 256 unsigned chars, we won't need a larger table.
+  bool      	invert_match = false;
+  csRENode 	 *node;
   
   memset(table, sizeof(table), 0);
   
@@ -142,7 +144,7 @@ BuildTableLeaf(char **pRE, csRESyntaxTree &tree)
     return NULL;
   } 
      
-  // Preprocess special characters.
+  // Preprocess special unsigned characters.
   if (*p=='^') 
   {
     invert_match=true;
@@ -161,15 +163,17 @@ BuildTableLeaf(char **pRE, csRESyntaxTree &tree)
     // check for ranges!
     if (*(p+1) == '-')
     {
-      char start = *p;
-      char end   = *(p+2);
+      unsigned char start = *p;
+      unsigned char end   = *(p+2);
      
       // insert this range
-      for(int i=start; i<=end; ++i)
+      for(unsigned int i=start; i<=end; ++i)
         table[i]=true; 
       
-    } 
-  }
+    }
+    else
+     table[*p] = true;
+   }
   
   // Check for missing ')'
   if (*p == 0)
@@ -177,6 +181,22 @@ BuildTableLeaf(char **pRE, csRESyntaxTree &tree)
     tree.SetErrorCondition(RE_COMP_ERR_MISSING_RIGHT_BRACKET);
     return NULL;
   }
+  
+  // Create a perfect table (no overlaps or repeats)
+  {
+    int i, j;
+    
+    for(i=0, j=0; i<256; ++i)
+    {
+      if (table[i]) tbl[j++]=(unsigned char)i;
+    }
+    
+    tbl[j] = 0;   
+  
+  }
+  
+  // Create the new leaf
+  node = new csRETableLeaf(tbl, invert_match);
   
   // Support scoping wild cards 
   while(SupportWildCards(&p, tree, &node));        
@@ -188,9 +208,9 @@ BuildTableLeaf(char **pRE, csRESyntaxTree &tree)
 
 /// Recursive descent parsing of regular expressions
 csRENode *
-csRESyntaxTree::Build(char **regexp)
+csRESyntaxTree::Build(unsigned char **regexp)
 {
-  char *p = *regexp;
+  unsigned char *p = *regexp;
   csRENode  *node=0;
  
   switch(*p)
@@ -198,7 +218,7 @@ csRESyntaxTree::Build(char **regexp)
      case '[':
      { // Begin table creation.  
      
-        // Special case: is there only one char inside the table?
+        // Special case: is there only one unsigned char inside the table?
         if (*(p+2) == ']')
         {  // yes, treat it like it wasn't a table.
          node = BuildCharLeaf(&p, *this);
@@ -206,7 +226,7 @@ csRESyntaxTree::Build(char **regexp)
          // Abort on error
          if (GetError()) return NULL;
          
-         p+=3; // Set pointer to next character to be consumed.
+         p+=3; // Set pointer to next unsigned character to be consumed.
         }
         else
         { // no, begin recursion
@@ -233,7 +253,7 @@ csRESyntaxTree::Build(char **regexp)
      case '(':
      { // Begin parenthetical recursion
         
-        // Special case: is there only one char inside the parentheses?
+        // Special case: is there only one unsigned char inside the parentheses?
         if (*(p+2) == ')')
         {  // yes, treat it like it wasn't in parentheses.
          node = BuildCharLeaf(&p, *this);
@@ -241,7 +261,7 @@ csRESyntaxTree::Build(char **regexp)
          // Abort on error
          if (GetError()) return NULL;
          
-         p+=3; // Set pointer to next character to be consumed.
+         p+=3; // Set pointer to next unsigned character to be consumed.
         }
         else
         { // no, begin recursion
@@ -274,9 +294,9 @@ csRESyntaxTree::Build(char **regexp)
 
 
 bool
-csRESyntaxTree::Compile(char *regexp)
+csRESyntaxTree::Compile(unsigned char *regexp)
 {
- char *pRE = regexp;
+ unsigned char *pRE = regexp;
  
  SetErrorCondition(RE_COMP_ERR_NONE);
  
