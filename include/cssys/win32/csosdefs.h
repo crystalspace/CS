@@ -451,7 +451,7 @@ static inline void* fast_mem_copy (void *dest, const void *src, int count)
 #ifdef __CYGWIN32__
 #ifndef _beginthread
 #define _beginthread(func, stack, ptr)	CreateThread (NULL, 0, \
-	  LPTHREAD_START_ROUTINE(func), ptr, CREATE_SUSPEND, 0)
+	  LPTHREAD_START_ROUTINE(func), ptr, CREATE_SUSPENDED, 0)
 #endif
 #ifndef _endthread
 #define _endthread
