@@ -1234,7 +1234,7 @@ void csGLTextureManager::Clear()
 
 void csGLTextureManager::UnregisterMaterial (csGLMaterialHandle* handle)
 {
-  int idx = materials.Find (handle);
+  size_t const idx = materials.Find (handle);
   if (idx != csArrayItemNotFound) materials.DeleteIndexFast (idx);
 }
 
@@ -1299,7 +1299,7 @@ csPtr<iTextureHandle> csGLTextureManager::RegisterTexture (iImageVector *image,
 
 void csGLTextureManager::UnregisterTexture (csGLTextureHandle* handle)
 {
-  int idx = textures.Find (handle);
+  size_t const idx = textures.Find (handle);
   if (idx != csArrayItemNotFound) textures.DeleteIndexFast (idx);
 }
 
