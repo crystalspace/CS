@@ -1,6 +1,7 @@
 The history order has been reversed so that new features are at the top.
 
 13-Nov-2000
+	- Philip Wyett added /nodefaultlib:"LIBC" to template/plugin.tpl.
 	- Eric Sunshine corrected the long standing misnomer where USE_PLUGINS
 	    was incorrectly specified as USE_SHARED_PLUGINS.  Updated all
 	    makefiles, scripts, and documentation to reflect this change.
@@ -69,6 +70,10 @@ The history order has been reversed so that new features are at the top.
 	  a more object oriented version of dtsimple.
 	- Fixed solaris.mak because it suddenly appears needed to
 	  compile oglempty for OpenGL.
+	- Martin Geisse changed the DirectSound renderer to use the new
+	  sound interfaces.
+	- Norman Kramer fixed the sound software renderer so that it decref's
+	  the sounddriver at destruction.
 9-Nov-2000
 	- Small type problem in ogl_halo.cpp (GLuint instead of GLenum for
 	  blend mode).
