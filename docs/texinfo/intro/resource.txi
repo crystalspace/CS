@@ -35,7 +35,7 @@ from the following location:
 Levels and data for Crystal Space's current stable release can be
 downloaded via @sc{ftp} from sunsite.dk:
 
-@uref{ftp://sunsite.dk/pub/projects/crystal/cs096}
+@uref{ftp://sunsite.dk/pub/projects/crystal/cs098}
 
 @noindent
 Older release data and separate packages may also be found one directory up

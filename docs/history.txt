@@ -22,6 +22,9 @@ chronological order.
 	- Jorrit updated the collision detection howto to talk more about
 	  OPCODE plugin and also changed this in some other parts of the
 	  documentation.
+	- Jorrit did some additional updates to the documentation:
+	    - Updated link to the sunsite data directory from cs096 to cs098.
+	    - Updated feedback chapter a bit.
 6-Jun-2004
 	- Jorrit modified the Jamfile so that the isotest application
 	  is only build with new renderer.

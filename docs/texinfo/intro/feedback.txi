@@ -28,6 +28,10 @@ state when it was that you last did an update.
 Operating System (Windows (@emph{95, 98/SE/ME, NT4, 2000, XP}), MacOS/X, Unix
 --- Linux, FreeBSD, etc. --- @dots{})
 @item
+the compiler that you used (GCC, MINGW, MSVC, @dots{})
+@item
+which renderer system you are using (old or new renderer).
+@item
 architecture (Intel x86, AMD x86, SPARC, MIPS, m68k, Alpha, PowerPC, @dots{})
 @item
 graphics adapter (brand/model, total on-board memory, driver version, @dots{})
