@@ -5,6 +5,10 @@ The history order has been reversed so that new features are at the top.
 	- Eric Sunshine eliminated a slew of compilation warning in cstree.cpp
 	  and cswstest.cpp.
 	- Eric Sunshine fixed several broken comments in sft3dcom.h.
+	- Eric Sunshine worked around an OpenStep compiler bug triggered by
+	  cstreend.h where unlinkable code is generated when an inline method
+	  calls a second inline before the compiler has seen a declaration of
+	  the second method.
 25-Jun-2000
 	- New tree control in CSWS from Norman Kramer.
 	- Did an experiment for speeding up OpenGL by putting the setup

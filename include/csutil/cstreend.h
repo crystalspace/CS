@@ -16,19 +16,21 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __CSTREENODE_H__
-#define __CSTREENODE_H__
+#ifndef __CS_CSTREENODE_H__
+#define __CS_CSTREENODE_H__
+
+#include "csutil/csvector.h"
 
 /**
  * A generic tree class.
  */
-
-#include "csutil/csvector.h"
-
 class csTreeNode
 {
-
  public:
+  bool IsLeaf () { return children.Length () == 0; }
+  void RemoveChild (csTreeNode *child) { int idx = children.Find (child); if (idx != -1) children.Delete (idx); }
+  void AddChild (csTreeNode *child) { children.Push (child); child->parent = this; }
+
   csTreeNode (csTreeNode *theParent=NULL) { parent=theParent; if (parent) parent->children.Push (this); }
 
   virtual ~csTreeNode () 
@@ -36,10 +38,6 @@ class csTreeNode
       for(int i=0; i<children.Length (); i++) delete (csTreeNode*)children.Get (i); 
       if (parent) parent->RemoveChild (this);
     }
-
-  bool IsLeaf (){ return children.Length () == 0; }
-  void RemoveChild (csTreeNode *child) { int idx = children.Find (child); if (idx != -1) children.Delete (idx); }
-  void AddChild (csTreeNode *child) { children.Push (child); child->parent = this; }
 
   /**
    * Execute a function on this node and its children. Do this in "DepthSearchFirst" order, that is check a childs children
@@ -96,4 +94,4 @@ class csTreeNode
   csVector children; // node children
 };
 
-#endif
+#endif // __CS_CSTREENODE_H__
