@@ -84,7 +84,7 @@ endif
 
 # Flags for the linker which are used when building a shared library.
 # <cs-config>
-LFLAGS.DLL = -Wl,-shared -Wl,-soname -Wl,$@
+LFLAGS.DLL = -shared -Wl,-soname -Wl,$@
 # </cs-config>
 
 # System-dependent flags to pass to NASM
