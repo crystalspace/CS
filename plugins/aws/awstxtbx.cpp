@@ -644,13 +644,13 @@ bool awsTextBox::OnKeyboard (const csKeyEventData& eventData)
 	  break;
 
 	utf32_char composedCh[2];
-	size_t composedCount;
+	int composedCount;
 	if (composer->HandleKey (eventData, composedCh, 
 	  sizeof (composedCh) / sizeof (utf32_char), 
 	  &composedCount) != csComposeNoChar)
 	{
 	  bool changed = false;
-	  for (size_t n = 0; n < composedCount; n++)
+	  for (int n = 0; n < composedCount; n++)
 	  {
 	    utf8_char ch[CS_UC_MAX_UTF8_ENCODED + 1];
 	    size_t chSize = csUnicodeTransform::EncodeUTF8 (composedCh[n],

@@ -62,6 +62,7 @@ chronological order.
 	      features have been added as well, for example, CS can now 
 	      distinguish between left/right modifiers or keypad and 
 	      non-keypad keys.
+	- res fixed a few files to compile again after his latest changes.
 15-Oct-2003
 	- Eric Sunshine fixed a bug in RemoveDups from helper.jam.  It was
 	  trying to dereference a variable using an 8-bit character instead of
