@@ -9,6 +9,7 @@ chronological order.
 5-Aug-2003
 	- Jorrit fixed metaball.mak. Was missing a CSUTIL dependency after
 	  CSSYS.
+	- Jorrit fixed makefiles for GIF and PNG image loaders.
         - Boyan fixed errors in broadcasting in iNetworkSocket2.
 4-Aug-2003
 	- Oktal added the following to csutil:

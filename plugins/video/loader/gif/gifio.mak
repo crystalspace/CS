@@ -44,7 +44,7 @@ INC.CSGIFIMG = $(wildcard $(addprefix $(SRCDIR)/,plugins/video/loader/gif/*.h))
 SRC.CSGIFIMG = $(wildcard $(addprefix $(SRCDIR)/,plugins/video/loader/gif/*.cpp))
 
 OBJ.CSGIFIMG = $(addprefix $(OUT)/,$(notdir $(SRC.CSGIFIMG:.cpp=$O)))
-DEP.CSGIFIMG = CSUTIL CSSYS CSGFX CSUTIL
+DEP.CSGIFIMG = CSUTIL CSSYS CSGFX CSSYS CSUTIL
 
 MSVC.DSP += CSGIFIMG
 DSP.CSGIFIMG.NAME = csgifimg
