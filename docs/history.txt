@@ -40,8 +40,8 @@ chronological order.
 	- Eric Sunshine eliminated compilation warnings in viewmesh.cpp.
 	- Eric Sunshine fixed cspython/Jamfile so that the 'pythmod' module is
 	  now a dependency of the 'all' and 'plugins' pseudo-targets.
-	  Previously, it was a dependency only of 'install', which mean that it
-	  only got built at installation time (unless the user built it
+	  Previously, it was a dependency only of 'install', which meant that
+	  it got built only at installation time (unless the user built it
 	  explicitly).
 16-May-2004
         - Philip Wyett eliminated gcc compiler warnings in simpleformer.cpp.
