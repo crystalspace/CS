@@ -6,6 +6,9 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+4-Oct-2004
+	- res fixed xmlshader to correctly deal with shader conditionals 
+	  in text.
 3-Oct-2004
 	- Jorrit added iTextureHandle->Blit() for new renderer. Only the
 	  NR OpenGL renderer implements this. This is a faster way to

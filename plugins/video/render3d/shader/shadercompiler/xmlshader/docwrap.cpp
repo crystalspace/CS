@@ -344,6 +344,21 @@ void csWrappedDocumentNode::Report (int severity, iDocumentNode* node,
   va_end (args);
 }
 
+void csWrappedDocumentNode::AppendNodeText (WrapperWalker& walker, 
+					    csString& text)
+{
+  while (walker.HasNext ())
+  {
+    iDocumentNode* node = walker.Peek ();
+    if (node->GetType () != CS_NODE_TEXT)
+      break;
+
+    text.Append (node->GetValue ());
+
+    walker.Next ();
+  }
+}
+
 bool csWrappedDocumentNode::Equals (iDocumentNode* other)
 {
   return wrappedNode->Equals (((csWrappedDocumentNode*)other)->wrappedNode);
@@ -351,17 +366,7 @@ bool csWrappedDocumentNode::Equals (iDocumentNode* other)
 
 const char* csWrappedDocumentNode::GetValue ()
 {
-  /*if (wrappedNode->GetType() == CS_NODE_TEXT)
-  {
-    if (textValueBuf.IsEmpty())
-    {
-      textValueBuf.Append (wrappedNode->GetValue ());
-      textValueBuf.Append (next->GetValue ());
-    }
-    return textValueBuf.GetDataSafe ();
-  }
-  else*/
-    return wrappedNode->GetValue();
+  return wrappedNode->GetValue();
 }
 
 csRef<iDocumentNodeIterator> csWrappedDocumentNode::GetNodes ()
@@ -392,17 +397,19 @@ csRef<iDocumentNode> csWrappedDocumentNode::GetNode (const char* value)
 
 const char* csWrappedDocumentNode::GetContentsValue ()
 {
-/*  for (size_t i = 0; i < children.Length(); i++)
-  {
-    if (children[i]->GetType() == CS_NODE_TEXT)
-      return children[i]->GetValue();
-  }*/
+  if (contents.GetData () != 0)
+    return contents;
+
   WrapperWalker walker (wrappedChildren, resolver);
   while (walker.HasNext ())
   {
     iDocumentNode* node = walker.Next ();
     if (node->GetType() == CS_NODE_TEXT)
-      return node->GetValue ();
+    {
+      contents.Append (node->GetValue ());
+      AppendNodeText (walker, contents);
+      return contents;
+    }
   }
   return 0;
 }
@@ -508,11 +515,36 @@ bool csWrappedDocumentNode::WrapperWalker::HasNext ()
   return next.IsValid();
 }
 
+iDocumentNode* csWrappedDocumentNode::WrapperWalker::Peek ()
+{
+  return next;
+}
+
 iDocumentNode* csWrappedDocumentNode::WrapperWalker::Next ()
 {
   iDocumentNode* ret = next;
   SeekNext();
   return ret;
+}
+
+//---------------------------------------------------------------------------
+
+SCF_IMPLEMENT_IBASE(csTextNodeWrapper)
+  SCF_IMPLEMENTS_INTERFACE(iDocumentNode)
+SCF_IMPLEMENT_IBASE_END
+
+csTextNodeWrapper::csTextNodeWrapper (iDocumentNode* realMe, const char* text)
+{
+  SCF_CONSTRUCT_IBASE(0);
+
+  csTextNodeWrapper::realMe = realMe;
+  nodeText = csStrNew (text);
+}
+
+csTextNodeWrapper::~csTextNodeWrapper ()
+{
+  delete[] nodeText;
+  SCF_DESTRUCT_IBASE();
 }
 
 //---------------------------------------------------------------------------
@@ -552,6 +584,13 @@ void csWrappedDocumentNodeIterator::SeekNext()
       next = node;
       break;
     }
+  }
+  if (next.IsValid () && (next->GetType () == CS_NODE_TEXT))
+  {
+    csString str;
+    str.Append (next->GetValue ());
+    csWrappedDocumentNode::AppendNodeText (walker, str);
+    next.AttachNew (new csTextNodeWrapper (next, str));
   }
 }
 

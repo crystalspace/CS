@@ -70,11 +70,13 @@ class csWrappedDocumentNode : public iDocumentNode
 {
   friend class csWrappedDocumentNodeIterator;
   friend struct WrapperStackEntry;
+  friend class csTextNodeWrapper;
 
   csRef<iDocumentNode> wrappedNode;
   csWeakRef<csWrappedDocumentNode> parent;
   iConditionResolver* resolver;
   iObjectRegistry* objreg;
+  csString contents;
 
   /**
    * Contains all the consecutive children that are dependant on the same
@@ -118,11 +120,13 @@ class csWrappedDocumentNode : public iDocumentNode
       iConditionResolver* resolver);
 
     bool HasNext ();
+    iDocumentNode* Peek ();
     iDocumentNode* Next ();
   };
-
   void ProcessWrappedNode ();
   void Report (int severity, iDocumentNode* node, const char* msg, ...);
+
+  static void AppendNodeText (WrapperWalker& walker, csString& text);
 
   csWrappedDocumentNode (iDocumentNode* wrappedNode,
     csWrappedDocumentNode* parent);
@@ -167,6 +171,74 @@ public:
   virtual float GetAttributeValueAsFloat (const char* name);
   virtual bool GetAttributeValueAsBool (const char* name, 
     bool defaultvalue = false);
+
+  virtual void RemoveAttribute (const csRef<iDocumentAttribute>& attr) {}
+  virtual void RemoveAttributes () {}
+
+  virtual void SetAttribute (const char* name, const char* value) {}
+  virtual void SetAttributeAsInt (const char* name, int value) {}
+  virtual void SetAttributeAsFloat (const char* name, float value) {}
+};
+
+class csTextNodeWrapper : public iDocumentNode
+{
+  char* nodeText;
+  csRef<iDocumentNode> realMe;
+public:
+  SCF_DECLARE_IBASE;
+
+  csTextNodeWrapper (iDocumentNode* realMe, const char* text);
+  virtual ~csTextNodeWrapper ();
+
+  virtual csDocumentNodeType GetType ()
+  { return CS_NODE_TEXT; }
+  virtual bool Equals (iDocumentNode* other)
+  { return realMe->Equals (other); }
+
+  virtual const char* GetValue ()
+  { return nodeText; }
+  virtual void SetValue (const char* value) {}
+  virtual void SetValueAsInt (int value) {}
+  virtual void SetValueAsFloat (float value) {}
+
+  virtual csRef<iDocumentNode> GetParent ()
+  { return realMe->GetParent (); }
+
+  virtual csRef<iDocumentNodeIterator> GetNodes ()
+  { return 0; }
+  virtual csRef<iDocumentNodeIterator> GetNodes (const char* value)
+  { return 0; }
+  virtual csRef<iDocumentNode> GetNode (const char* value)
+  { return 0; }
+
+  virtual void RemoveNode (const csRef<iDocumentNode>& child) {}
+  virtual void RemoveNodes () {}
+
+  virtual csRef<iDocumentNode> CreateNodeBefore (csDocumentNodeType type,
+  	iDocumentNode* before = 0)
+  { return 0; }
+
+  virtual const char* GetContentsValue ()
+  { return 0; }
+  virtual int GetContentsValueAsInt ()
+  { return 0; }
+  virtual float GetContentsValueAsFloat ()
+  { return 0.0f; }
+
+  virtual csRef<iDocumentAttributeIterator> GetAttributes ()
+  { return 0; }
+
+  virtual csRef<iDocumentAttribute> GetAttribute (const char* name)
+  { return 0; }
+  virtual const char* GetAttributeValue (const char* name)
+  { return 0; }
+  virtual int GetAttributeValueAsInt (const char* name)
+  { return 0; }
+  virtual float GetAttributeValueAsFloat (const char* name)
+  { return 0.0f; }
+  virtual bool GetAttributeValueAsBool (const char* name,
+  	bool defaultvalue=false)
+  { return defaultvalue; }
 
   virtual void RemoveAttribute (const csRef<iDocumentAttribute>& attr) {}
   virtual void RemoveAttributes () {}
