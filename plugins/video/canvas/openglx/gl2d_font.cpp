@@ -79,7 +79,6 @@ void csGraphics2DOpenGLFontServer::BuildFont(FontDef &newfont)
 
     // new shove all the raster data at openGL...
     int charwidth = newfont.Width;
-    int offsetfrombottom = WordsPerChar-newfont.Height;
     for (int characterindex=0; characterindex<128; characterindex++)
     {
     	glNewList(newfontoffset+characterindex,GL_COMPILE);
@@ -107,7 +106,7 @@ void csGraphics2DOpenGLFontServer::BuildFont(FontDef &newfont)
 	// 0 pixels in the y direction and moving 'charwidth' pixels to the
 	// right
 	glBitmap(charwidth, newfont.Height,  /* bitmap size */
-		 0.0 , offsetfrombottom,      /* offset from bitmap origin */
+		 0.0 , 0.0,      /* offset from bitmap origin */
 		 charwidth, 0, 		     /* shift raster position by this */
 		 flipbuffer
 		 );
