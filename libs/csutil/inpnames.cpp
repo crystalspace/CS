@@ -151,7 +151,7 @@ bool csParseKeyDef (const char *name, int &key, int &shift, bool use_shift)
   if (ret)
   {
     if (ev.Key.Code >= CSKEY_FIRST && ev.Key.Code <= CSKEY_LAST)
-      key = ev.Key.Char;
+      key = ev.Key.Code;
     else if (ev.Key.Char < 256 && ev.Key.Char > 0)
       key = ev.Key.Char;
     else return false;
