@@ -3255,9 +3255,6 @@ class iClipper2DPtr(iClipper2D):
         _swig_setattr(self, iClipper2D,self.__class__,iClipper2D)
 _cspace.iClipper2D_swigregister(iClipper2DPtr)
 
-CS_BBOX_NORMAL = _cspace.CS_BBOX_NORMAL
-CS_BBOX_ACCURATE = _cspace.CS_BBOX_ACCURATE
-CS_BBOX_MAX = _cspace.CS_BBOX_MAX
 class iObjectModelListener(iBase):
     __swig_setmethods__ = {}
     for _s in [iBase]: __swig_setmethods__.update(_s.__swig_setmethods__)
@@ -3305,6 +3302,7 @@ class iObjectModel(iBase):
     def SetPolygonMeshShadows(*args): return _cspace.iObjectModel_SetPolygonMeshShadows(*args)
     def CreateLowerDetailPolygonMesh(*args): return _cspace.iObjectModel_CreateLowerDetailPolygonMesh(*args)
     def GetObjectBoundingBox(*args): return _cspace.iObjectModel_GetObjectBoundingBox(*args)
+    def SetObjectBoundingBox(*args): return _cspace.iObjectModel_SetObjectBoundingBox(*args)
     def GetRadius(*args): return _cspace.iObjectModel_GetRadius(*args)
     def AddListener(*args): return _cspace.iObjectModel_AddListener(*args)
     def RemoveListener(*args): return _cspace.iObjectModel_RemoveListener(*args)
