@@ -345,6 +345,8 @@ void SysSystemDriver::NextFrame ()
     static bool driverNeedsEvent = false;
     EventRecord anEvent;
 
+	csSystemDriver::NextFrame();
+
     if (!piG2D)
     {
         // UGLY: should do this somewhere in other place
@@ -380,29 +382,21 @@ void SysSystemDriver::NextFrame ()
     /*
      *  Get the next event in the queue.
      */
-    if (WaitNextEvent (everyEvent, &anEvent, 1, NULL))
-    {
+    if (WaitNextEvent (everyEvent, &anEvent, 1, NULL)) {
         /*
          *  If we got an event, check to see if sioux wants it
          */
-        if (SIOUXHandleOneEvent ( &anEvent ))
-            { 
-//            continue; 
-            }
-        
-        /*
-         *  If sioux doesn't want it, check to see if the driver needs it.
-         */
-        if ((driverNeedsEvent) && (piG2D))
-            if (piG2D->HandleEvent (&anEvent))
-            {
-//                continue;
-            }
-
-        /*
-         *  Otherwise handle it.
-         */
-        DispatchEvent (&anEvent, piG2D );
+        if (!SIOUXHandleOneEvent ( &anEvent )) { 
+	        /*
+	         *  If sioux doesn't want it, check to see if the driver needs it.
+	         */
+	        if ( (!driverNeedsEvent) || (piG2D==NULL) || (!piG2D->HandleEvent (&anEvent))) {
+		        /*
+		         *  Otherwise handle it.
+		         */
+		        DispatchEvent (&anEvent, piG2D );
+		    }
+		}
     } else {
         /*
          *  No event in the queue, get the mouse location so we can track it.
