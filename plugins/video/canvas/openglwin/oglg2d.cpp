@@ -78,7 +78,7 @@ CS_IMPLEMENT_PLUGIN
 #define DISP_CHANGE_BADPARAM        -5
 #endif
 
-#define WINDOW_STYLE (WS_POPUP | WS_MINIMIZEBOX | WS_SYSMENU | WS_OVERLAPPEDWINDOW)
+#define WINDOW_STYLE (WS_POPUP | WS_MINIMIZEBOX | WS_SYSMENU | WS_CAPTION | WS_BORDER)
 
 static void SystemFatalError (char *str, HRESULT hRes = S_OK)
 {
@@ -381,8 +381,8 @@ bool csGraphics2DOpenGL::Open()
   else
   {
 	  int wwidth,wheight;
-	  wwidth=Width+2*GetSystemMetrics(SM_CXSIZEFRAME);
-	  wheight=Height+2*GetSystemMetrics(SM_CYSIZEFRAME)+GetSystemMetrics(SM_CYCAPTION);
+	  wwidth=Width+2*GetSystemMetrics(SM_CXBORDER);
+	  wheight=Height+2*GetSystemMetrics(SM_CYBORDER)+GetSystemMetrics(SM_CYCAPTION);
 	  m_hWnd = CreateWindowEx(exStyle, CS_WIN32_WINDOW_CLASS_NAME, win_title, style,
 		(GetSystemMetrics(SM_CXSCREEN)-wwidth)/2,
 		(GetSystemMetrics(SM_CYSCREEN)-wheight)/2,
