@@ -276,7 +276,7 @@ csPtr<iBase> csSprite3DBinFactoryLoader::Parse (void* data,
       }
       spr3dLook->SetVertex (anm_idx, j, csVector3 (x, y, z));
       spr3dLook->SetTexel  (tex_idx, j, csVector2 (u, v));
-      spr3dLook->SetNormal (anm_idx, i, csVector3 (nx, ny, nz));
+      spr3dLook->SetNormal (anm_idx, j, csVector3 (nx, ny, nz));
     }
 
     if (j < spr3dLook->GetVertexCount ())
