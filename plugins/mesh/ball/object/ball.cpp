@@ -613,8 +613,8 @@ bool csBallMeshObject::HitBeamObject(const csVector3& start,
 		csSquaredDist::PointPoint (start, end));
       }
 #ifdef CS_DEBUG
-      printf("Ball:Hit Beam Object: HIT! intersect : (%f,%f,%f)\n",i
-        sect.x, isect.y, isect.z);
+      printf("Ball:Hit Beam Object: HIT! intersect : (%f,%f,%f)\n",
+        isect.x, isect.y, isect.z);
 #endif
       return true;
     }
