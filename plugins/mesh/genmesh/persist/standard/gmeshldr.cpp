@@ -168,8 +168,6 @@ csPtr<iBase> csGeneralFactoryLoader::Parse (iDocumentNode* node,
   fact = type->NewFactory ();
   state = SCF_QUERY_INTERFACE (fact, iGeneralFactoryState);
 
-  type->DecRef ();
-
   int num_tri = 0;
   int num_nor = 0;
   int num_col = 0;
