@@ -9,6 +9,9 @@ chronological order.
 22-Jul-2004
 	- Jorrit started work on adding a new test to csbench to test lots
 	  of smaller objects.
+        - Peter Amstutz fixed an initialization bug in the csvosa3dl 
+          plugin that caused a crash when compiled with visual studio 
+          (but not gcc).  The plugin works on Windows now.
 20-Jul-2004
 	- PK added GetMeshObjectType() to iMeshObjectFactory.
 	- PK worked a bit on iSaver.
