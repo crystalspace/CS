@@ -6254,11 +6254,6 @@ private:
 public:
   csGLExtensionManager (): object_reg(NULL)
   {
-#ifdef CS_DEBUG
-    defaultReportMissingEntries = true;
-#else
-    defaultReportMissingEntries = false;
-#endif
     CS_GL_version_1_2 = false;
     tested_CS_GL_version_1_2 = false;
     CS_GL_version_1_3 = false;
@@ -19269,5 +19264,11 @@ public:
   }
 
 };
+
+#ifdef CS_DEBUG
+    bool csGLExtensionManager::defaultReportMissingEntries = true;
+#else
+    bool csGLExtensionManager::defaultReportMissingEntries = false;
+#endif
 
 #endif // __CS_GLEXTENSIONMANAGER_H__
