@@ -118,14 +118,6 @@ struct iMeshObject : public iBase
   virtual void NextFrame (csTicks current_time,const csVector3& pos) = 0;
 
   /**
-   * If this method returns true this object wants to die. The
-   * user of this object should take care to make it die at the
-   * soonest possible time. This is usally used for things like
-   * particle systems that only have a limited time to live.
-   */
-  virtual bool WantToDie () const = 0;
-
-  /**
    * Do a hard transform of this object.
    * This transformation and the original coordinates are not
    * remembered but the object space coordinates are directly

@@ -139,7 +139,7 @@ struct iSharedVariableList;
 #define CS_RENDPRI_FRONT2BACK 2
 /** @} */
 
-SCF_VERSION (iEngine, 0, 16, 0);
+SCF_VERSION (iEngine, 0, 16, 1);
 
 /**
  * This interface is the main interface to the 3D engine.
@@ -777,6 +777,14 @@ struct iEngine : public iBase
    * other objects. The engine will not keep a reference to this object.
    */
   virtual csPtr<iObjectWatcher> CreateObjectWatcher () = 0;
+
+  /**
+   * Sometimes a mesh wants to destruct itself (for example
+   * a particle system that has only limited lifetime). It can do that
+   * by calling this function on itself. The engine will then remove
+   * the object before the next frame.
+   */
+  virtual void WantToDie (iMeshWrapper* mesh) = 0;
 };
 
 /** @} */

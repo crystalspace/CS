@@ -240,7 +240,6 @@ public:
     return vis_cb;
   }
   virtual void NextFrame (csTicks /*current_time*/, const csVector3& /*pos*/) { }
-  virtual bool WantToDie () const { return false; }
   virtual void HardTransform (const csReversibleTransform& t);
   virtual bool SupportsHardTransform () const { return true; }
   virtual bool HitBeamOutline (const csVector3& start, const csVector3& end,

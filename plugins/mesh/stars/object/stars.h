@@ -146,7 +146,6 @@ public:
     return vis_cb;
   }
   virtual void NextFrame (csTicks /*current_time*/, const csVector3& /*pos*/) { }
-  virtual bool WantToDie () const { return false; }
   virtual void HardTransform (const csReversibleTransform&) { }
   virtual bool SupportsHardTransform () const { return false; }
   virtual bool HitBeamOutline (const csVector3&, const csVector3&,

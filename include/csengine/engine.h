@@ -25,6 +25,7 @@
 #include "csutil/garray.h"
 #include "csutil/ptrarr.h"
 #include "csutil/refarr.h"
+#include "csutil/hashmap.h"
 #include "iutil/eventh.h"
 #include "iutil/comp.h"
 #include "iutil/config.h"
@@ -364,6 +365,9 @@ private:
   /// Current render context (proc texture) or NULL if global.
   iTextureHandle* render_context;
 
+  /// Array of objects that want to die next frame (iMeshWrapper*).
+  csHashSet want_to_die;
+
   /// Pointer to radiosity system if we are in step-by-step radiosity mode.
   //csRadiosity* rad_debug;
 
@@ -653,6 +657,7 @@ public:
   
   virtual csPtr<iFrustumView> CreateFrustumView ();
   virtual csPtr<iObjectWatcher> CreateObjectWatcher ();
+  virtual void WantToDie (iMeshWrapper* mesh);
 
   /**
    * Reset a subset of flags/settings (which may differ from one world/map to 

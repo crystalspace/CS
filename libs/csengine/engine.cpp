@@ -1639,15 +1639,13 @@ void csEngine::ControlMeshes ()
   nextframe_pending = virtual_clock->GetCurrentTicks ();
 
   // Delete particle systems that self-destructed now.
-
-  // @@@ Need to optimize this?
-  int i = meshes.GetCount () - 1;
-  while (i >= 0)
+  csHashIterator it (want_to_die.GetHashMap ());
+  while (it.HasNext ())
   {
-    iMeshWrapper *sp = meshes.Get (i);
-    if (sp->WantToDie ()) GetMeshes ()->Remove (sp);
-    i--;
+    iMeshWrapper* mesh = (iMeshWrapper*)it.Next ();
+    GetMeshes ()->Remove (mesh);
   }
+  want_to_die.DeleteAll ();
 }
 
 char* csEngine::SplitRegionName (const char* name, iRegion*& region,
@@ -2946,6 +2944,11 @@ csPtr<iObjectWatcher> csEngine::CreateObjectWatcher ()
 {
   csObjectWatcher* watch = new csObjectWatcher ();
   return csPtr<iObjectWatcher> (watch);
+}
+
+void csEngine::WantToDie (iMeshWrapper* mesh)
+{
+  want_to_die.Add (mesh);
 }
 
 bool csEngine::DebugCommand (const char* cmd)

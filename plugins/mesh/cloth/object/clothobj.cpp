@@ -279,9 +279,6 @@ iMeshObjectDrawCallback* csStuffObject::GetVisibleCallback () const
 void csStuffObject::NextFrame (unsigned int ticks, const csVector3& /*pos*/)
 { Dynamics->Update(ticks); }
  
-bool csStuffObject::WantToDie () const 
-{ return false; }
- 
 void csStuffObject::HardTransform (const csReversibleTransform &) 
 {}
    

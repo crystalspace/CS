@@ -407,9 +407,6 @@ public:
   /// For animation.
   virtual void NextFrame (csTicks, const csVector3& /*pos*/) { }
 
-  /// For dieing.
-  virtual bool WantToDie () const { return false; }
-
   /// We don't support this.
   virtual void HardTransform (const csReversibleTransform&) { }
 

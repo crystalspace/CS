@@ -140,7 +140,6 @@ class           csStuffObject:public iMeshObject
     virtual void    SetVisibleCallback(iMeshObjectDrawCallback *);
     virtual iMeshObjectDrawCallback *GetVisibleCallback() const;
     virtual void    NextFrame(unsigned int, const csVector3& /*pos*/);
-    virtual bool    WantToDie() const;
     virtual void    HardTransform(const csReversibleTransform &);
     virtual bool    SupportsHardTransform() const;
     virtual bool    HitBeamOutline(const csVector3 &, const csVector3 &,

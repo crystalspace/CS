@@ -27,6 +27,14 @@ The history order is reversed so that new features are at the top.
 	  for reporting this.
 	- Added new IntersectSegment() routine to iVisibilityCuller which
 	  returns all objects that are intersected by the segment.
+	- Mesh objects used to have an old system where a particle system
+	  could remove itself by returning true with WantToDie(). However
+	  this system is slow since the engine has to check this flag
+	  every frame. I replaced this with a new function in the engine
+	  (which is also called WantToDie()). With that functions objects
+	  (like particle systems) can schedule themselves so that they are
+	  deleted the next frame. The engine will only have to check if
+	  there are any sheduled deletions every frame. Much faster...
 13-Feb-2003
 	- Added another trivial case to csRect::ClipLine() making it a little
 	  bit safer again.
