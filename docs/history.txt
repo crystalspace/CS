@@ -13,6 +13,8 @@ The history order is reversed so that new features are at the top.
 	  options are not possible. It is funny to see that this software
 	  clipper is FASTER than letting OpenGL clip the triangles to the
 	  screen boundaries on my card (ATI Rage PRO Mobility).
+	- Moved the new ClipToPlane() routine which was specifically written
+	  for the OpenGL clipper to csFrustum and generalized it.
 7-May-2001
 	- Martin Geisse started to change the engine to use the new RTTI
 	  system. Also changed IMPLEMENT_OBJECT_INTERFACE and

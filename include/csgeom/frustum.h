@@ -40,6 +40,82 @@ class csTransform;
 #define CS_FRUST_PARTIAL	3
 
 /**
+ * Structure for use with ClipToPlane. This structure
+ * is used in addition to a vertex to give additional information
+ * about how to interpolate additional information that goes
+ * with the vertex.
+ */
+struct csClipInfo
+{
+# define CS_CLIPINFO_ORIGINAL 0
+# define CS_CLIPINFO_ONEDGE 1
+# define CS_CLIPINFO_INSIDE 2
+  int type;	// One of CS_CLIPINFO_???
+  union
+  {
+    struct { int idx; } original;
+    struct { int i1, i2; float r; } onedge;
+    struct { csClipInfo* ci1, * ci2; float r; } inside;
+  };
+
+  csClipInfo () : type (CS_CLIPINFO_ORIGINAL) { }
+  csClipInfo (const csClipInfo& other)
+  {
+    type = other.type;
+    if (type == CS_CLIPINFO_INSIDE)
+    {
+      inside.ci1 = new csClipInfo (*other.inside.ci1);
+      inside.ci2 = new csClipInfo (*other.inside.ci2);
+      inside.r = other.inside.r;
+    }
+    else if (type == CS_CLIPINFO_ORIGINAL)
+      original.idx = other.original.idx;
+    else
+      onedge = other.onedge;
+  }
+  void Clear ()
+  {
+    if (type == CS_CLIPINFO_INSIDE)
+    {
+      delete inside.ci1;
+      delete inside.ci2;
+    }
+  }
+  ~csClipInfo () { Clear (); }
+
+  csClipInfo& operator= (const csClipInfo& other)
+  {
+    Clear ();
+    type = other.type;
+    if (type == CS_CLIPINFO_INSIDE)
+    {
+      inside.ci1 = new csClipInfo (*other.inside.ci1);
+      inside.ci2 = new csClipInfo (*other.inside.ci2);
+      inside.r = other.inside.r;
+    }
+    else if (type == CS_CLIPINFO_ORIGINAL)
+      original.idx = other.original.idx;
+    else
+      onedge = other.onedge;
+    return *this;
+  }
+
+  // Move the information from another clipinfo instance to this one.
+  void Move (csClipInfo& other)
+  {
+    Clear ();
+    type = other.type;
+    if (type == CS_CLIPINFO_INSIDE)
+      inside = other.inside;
+    else if (type == CS_CLIPINFO_ORIGINAL)
+      original.idx = other.original.idx;
+    else
+      onedge = other.onedge;
+    other.type = CS_CLIPINFO_ORIGINAL;
+  }
+};
+
+/**
  * A general frustum. This consist of a center point (origin),
  * a frustum polygon in 3D space (relative to center point)
  * and a plane. The planes which go through the center and
@@ -200,6 +276,17 @@ public:
    * 'v1' and 'v2' are given relative to that origin.
    */
   void ClipToPlane (csVector3& v1, csVector3& v2);
+
+  /**
+   * Clip a frustum (defined from 0,0,0 origin) to the given plane
+   * (defined as 0-v1-v2). This routine will also fill an array
+   * of clipinfo so that you can use this information to correctly
+   * interpolate information related to the vertex (like texture mapping
+   * coordinates). Note that clipinfo needs to be preinitialized correctly
+   * with CS_CLIPINFO_ORIGINAL instances and correct indices.
+   */
+  static void ClipToPlane (csVector3* vertices, int& num_vertices,
+	csClipInfo* clipinfo, const csVector3& v1, const csVector3& v2);
 
   /**
    * Clip the polygon of this frustum to the postive side of an arbitrary plane

@@ -301,6 +301,124 @@ void csFrustum::ClipToPlane (csVector3& v1, csVector3& v2)
   }
 }
 
+void csFrustum::ClipToPlane (csVector3* vertices, int& num_vertices,
+	csClipInfo* clipinfo, const csVector3& v1, const csVector3& v2)
+{
+  int cw_offset = -1;
+  int ccw_offset;
+  bool first_vertex_side;
+  csVector3 isect_cw, isect_ccw;
+  csVector3 Plane_Normal;
+  int i;
+
+  // Do the check only once at the beginning.
+  Plane_Normal = v1%v2;
+
+  // On which side is the first vertex?
+  first_vertex_side = (Plane_Normal*vertices[num_vertices -1] > 0);
+
+  for (i = 0; i < num_vertices - 1; i++)
+  {
+    if ( (Plane_Normal*vertices[i] > 0) != first_vertex_side)
+    {
+      cw_offset = i;
+      break;
+    }
+  }
+
+  if (cw_offset == -1)
+  {
+    // Return, if there is no intersection.
+    if (first_vertex_side)
+      num_vertices = 0;  // The whole polygon is behind the plane
+      			 // because the first is.
+    return;
+  }
+
+  for (ccw_offset = num_vertices -2; ccw_offset >= 0; ccw_offset--)
+  {
+    if ((Plane_Normal*vertices[ccw_offset] > 0) != first_vertex_side)
+      break;
+  }
+
+  // Calculate the intersection points.
+  i = cw_offset - 1;
+  if (i < 0) i = num_vertices-1;
+  float dist_cw, dist_ccw;
+  csIntersect3::Plane (vertices[cw_offset], vertices[i],
+  	Plane_Normal, v1, isect_cw, dist_cw);
+  csClipInfo clip_cw;
+  if (clipinfo[cw_offset].type != CS_CLIPINFO_ORIGINAL ||
+  	clipinfo[i].type != CS_CLIPINFO_ORIGINAL)
+  {
+    clip_cw.type = CS_CLIPINFO_INSIDE;
+    clip_cw.inside.r = dist_cw;
+    clip_cw.inside.ci1 = new csClipInfo (clipinfo[cw_offset]);
+    clip_cw.inside.ci2 = new csClipInfo (clipinfo[i]);
+  }
+  else
+  {
+    clip_cw.type = CS_CLIPINFO_ONEDGE;
+    clip_cw.onedge.r = dist_cw;
+    clip_cw.onedge.i1 = clipinfo[cw_offset].original.idx;
+    clip_cw.onedge.i2 = clipinfo[i].original.idx;
+  }
+  csIntersect3::Plane (vertices[ccw_offset], vertices[ccw_offset + 1],
+  	Plane_Normal, v1, isect_ccw, dist_ccw);
+  csClipInfo clip_ccw;
+  if (clipinfo[ccw_offset].type != CS_CLIPINFO_ORIGINAL ||
+  	clipinfo[ccw_offset + 1].type != CS_CLIPINFO_ORIGINAL)
+  {
+    clip_ccw.type = CS_CLIPINFO_INSIDE;
+    clip_ccw.inside.r = dist_ccw;
+    clip_ccw.inside.ci1 = new csClipInfo (clipinfo[ccw_offset]);
+    clip_ccw.inside.ci2 = new csClipInfo (clipinfo[ccw_offset + 1]);
+  }
+  else
+  {
+    clip_ccw.type = CS_CLIPINFO_ONEDGE;
+    clip_ccw.onedge.r = dist_ccw;
+    clip_ccw.onedge.i1 = clipinfo[ccw_offset].original.idx;
+    clip_ccw.onedge.i2 = clipinfo[ccw_offset + 1].original.idx;
+  }
+
+  // Remove the obsolete point and insert the intersection points.
+  if (first_vertex_side)
+  {
+    for (i = 0; i < ccw_offset - cw_offset + 1; i++)
+    {
+      vertices[i] = vertices[i + cw_offset];
+      clipinfo[i] = clipinfo[i + cw_offset];
+    }
+    vertices[i] = isect_ccw;
+    clipinfo[i].Move (clip_ccw);
+    vertices[i+1] = isect_cw;
+    clipinfo[i+1].Move (clip_cw);
+    num_vertices = 3 + ccw_offset - cw_offset;
+  }
+  else
+  {
+    if (cw_offset + 1 < ccw_offset)
+      for (i = 0; i < num_vertices - ccw_offset - 1; i++)
+      {
+        vertices[cw_offset + 2 + i] = vertices[ccw_offset + 1 + i];
+	clipinfo[cw_offset + 2 + i] = clipinfo[ccw_offset + 1 + i];
+      }
+    else if (cw_offset + 1 > ccw_offset)
+      for (i = num_vertices - 2 - ccw_offset;i >= 0; i--)
+      {
+        vertices[cw_offset + 2 + i] = vertices[ccw_offset + 1 + i];
+	clipinfo[cw_offset + 2 + i] = clipinfo[ccw_offset + 1 + i];
+      }
+
+    vertices[cw_offset] = isect_cw;
+    clipinfo[cw_offset].Move (clip_cw);
+    vertices[cw_offset+1] = isect_ccw;
+    clipinfo[cw_offset+1].Move (clip_ccw);
+    num_vertices = 2 + cw_offset + num_vertices - ccw_offset - 1;
+  }
+}
+
 csFrustum* csFrustum::Intersect (const csFrustum& other)
 {
   if (other.IsEmpty ()) return NULL;
