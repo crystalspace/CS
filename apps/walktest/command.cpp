@@ -314,7 +314,7 @@ bool csCommandProcessor::perform (const char* cmd, const char* arg)
     change_float (arg, &csSprite3D::global_lod_detail, "LOD detail", 
       -1, 1000000);
   else if (!strcasecmp (cmd, "sprlight"))
-    change_int (arg, &csSprite3D::global_lighting_quality, "sprite lighting quality", 0, 2);
+    change_int (arg, &csSprite3D::global_lighting_quality, "sprite lighting quality", 0, 3);
   else if (!strcasecmp (cmd, "dnl"))
     CsPrintf (MSG_DEBUG_0, "\n");
   else if (!strcasecmp (cmd, "exec"))
