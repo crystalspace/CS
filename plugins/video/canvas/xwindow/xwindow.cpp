@@ -318,7 +318,7 @@ bool csXWindow::Open ()
   Canvas->AllowResize (false);
 
   // Tell event queue to call us on every frame
-  iEventQueue* q = CS_QUERY_REGISTRY(object_reg);
+  iEventQueue* q = CS_QUERY_REGISTRY(object_reg, iEventQueue);
   if (q != 0)
     q->RegisterListener (&scfiPlugin, CSMASK_Nothing);
 
