@@ -34,7 +34,6 @@
 #include "csutil/util.h"
 #include "iobject/object.h"
 #include "iengine/material.h"
-#include "csengine/material.h"
 
 CS_TOKEN_DEF_START
   CS_TOKEN_DEF (ADD)
@@ -427,7 +426,7 @@ void csBallSaver::WriteDown (iBase* obj, iStrVector *str,
   sprintf(buf, "NUMRIM (%d)\n", state->GetRimVertices());
   str->Push(strnew(buf));
   sprintf(buf, "MATERIAL (%s)\n", state->GetMaterialWrapper()->
-    GetPrivateObject()->GetName());
+    QueryObject ()->GetName());
   str->Push(strnew(buf));
   if (!state->IsLighting ())
     str->Push (strnew ("LIGHTING (no)\n"));

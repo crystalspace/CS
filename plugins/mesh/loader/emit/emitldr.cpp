@@ -35,7 +35,6 @@
 #include "csutil/util.h"
 #include "iobject/object.h"
 #include "iengine/material.h"
-#include "csengine/material.h"
 
 CS_TOKEN_DEF_START
   CS_TOKEN_DEF (ADD)
@@ -686,7 +685,7 @@ void csEmitSaver::WriteDown (iBase* obj, iStrVector *str,
     WriteMixmode(str, partstate->GetMixMode());
   }
   sprintf(buf, "MATERIAL (%s)\n", partstate->GetMaterialWrapper()->
-    GetPrivateObject()->GetName());
+    QueryObject()->GetName());
   str->Push(strnew(buf));
   printf(buf, "NUMBER (%d)\n", state->GetNumberParticles());
   str->Push(strnew(buf));

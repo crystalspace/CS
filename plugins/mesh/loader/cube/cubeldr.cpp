@@ -33,7 +33,6 @@
 #include "csutil/util.h"
 #include "iobject/object.h"
 #include "iengine/material.h"
-#include "csengine/material.h"
 
 CS_TOKEN_DEF_START
   CS_TOKEN_DEF (ADD)
@@ -288,7 +287,7 @@ void csCubeFactorySaver::WriteDown (iBase* obj, iStrVector * str,
 
   char buf[MAXLINE];
   sprintf(buf, "MATERIAL (%s)\n", cubelook->GetMaterialWrapper()->
-    GetPrivateObject()->GetName());
+    QueryObject ()->GetName());
   str->Push(strnew(buf));
   sprintf(buf, "SIZE (%g, %g, %g)\n", cubelook->GetSizeX (),
     cubelook->GetSizeY (), cubelook->GetSizeZ ());

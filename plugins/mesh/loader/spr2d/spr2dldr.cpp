@@ -33,7 +33,6 @@
 #include "csutil/util.h"
 #include "iobject/object.h"
 #include "iengine/material.h"
-#include "csengine/material.h"
 
 CS_TOKEN_DEF_START
   CS_TOKEN_DEF (ADD)
@@ -323,7 +322,7 @@ void csSprite2DFactorySaver::WriteDown (iBase* obj, iStrVector * str,
   char buf[MAXLINE];
 
   sprintf(buf, "MATERIAL (%s)\n", state->GetMaterialWrapper()->
-    GetPrivateObject()->GetName());
+    QueryObject ()->GetName());
   str->Push(strnew(buf));
   if(state->GetMixMode() != CS_FX_COPY)
   {
@@ -522,7 +521,7 @@ void csSprite2DSaver::WriteDown (iBase* obj, iStrVector *str,
   str->Push(strnew(buf));
 
   sprintf(buf, "MATERIAL (%s)\n", state->GetMaterialWrapper()->
-    GetPrivateObject()->GetName());
+    QueryObject ()->GetName());
   str->Push(strnew(buf));
   sprintf(buf, "LIGHTING (%s)\n", state->HasLighting()?"true":"false");
   str->Push(strnew(buf));

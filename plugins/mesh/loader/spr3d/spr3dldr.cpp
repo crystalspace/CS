@@ -36,7 +36,6 @@
 #include "csutil/util.h"
 #include "iobject/object.h"
 #include "iengine/material.h"
-#include "csengine/material.h"
 #include "iengine/motion.h"
 
 CS_TOKEN_DEF_START
@@ -715,7 +714,7 @@ void csSprite3DFactorySaver::WriteDown (iBase* obj, iStrVector * str,
   char buf[MAXLINE];
 
   sprintf(buf, "MATERIAL (%s)\n", state->GetMaterialWrapper()->
-    GetPrivateObject()->GetName());
+    QueryObject ()->GetName());
   str->Push(strnew(buf));
 
   int i,j;
@@ -978,7 +977,7 @@ void csSprite3DSaver::WriteDown (iBase* obj, iStrVector *str,
   if(state->GetMaterialWrapper() != factstate->GetMaterialWrapper())
   {
     sprintf(buf, "MATERIAL (%s)\n", state->GetMaterialWrapper()->
-      GetPrivateObject()->GetName());
+      QueryObject ()->GetName());
     str->Push(strnew(buf));
   }
   sprintf(buf, "LIGHTING (%s)\n", state->IsLighting ()?"true":"false");

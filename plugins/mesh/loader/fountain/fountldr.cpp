@@ -35,7 +35,6 @@
 #include "csutil/util.h"
 #include "iobject/object.h"
 #include "iengine/material.h"
-#include "csengine/material.h"
 
 CS_TOKEN_DEF_START
   CS_TOKEN_DEF (ADD)
@@ -444,7 +443,7 @@ void csFountainSaver::WriteDown (iBase* obj, iStrVector *str,
     WriteMixmode(str, partstate->GetMixMode());
   }
   sprintf(buf, "MATERIAL (%s)\n", partstate->GetMaterialWrapper()->
-    GetPrivateObject()->GetName());
+    QueryObject ()->GetName());
   str->Push(strnew(buf));
   sprintf(buf, "COLOR (%g, %g, %g)\n", partstate->GetColor().red,
     partstate->GetColor().green, partstate->GetColor().blue);
