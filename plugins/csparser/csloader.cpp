@@ -2376,10 +2376,6 @@ bool csLoader::HandleMeshParameter (iLoaderContext* ldr_context,
       }
       else
       {
-        csRef<iVisibilityObject> visobj = SCF_QUERY_INTERFACE (mesh,
-  	  iVisibilityObject);
-        visobj->GetCullerFlags ().Set (CS_CULLER_HINT_CLOSED);
-
 	iObjectModel* objmodel = mesh->GetMeshObject ()->GetObjectModel ();
         if (objmodel->GetPolygonMeshShadows ())
           objmodel->GetPolygonMeshShadows ()->GetFlags ().Set (
@@ -2402,10 +2398,6 @@ bool csLoader::HandleMeshParameter (iLoaderContext* ldr_context,
       }
       else
       {
-        csRef<iVisibilityObject> visobj = SCF_QUERY_INTERFACE (mesh,
-  	  iVisibilityObject);
-        visobj->GetCullerFlags ().Set (CS_CULLER_HINT_CONVEX);
-
 	iObjectModel* objmodel = mesh->GetMeshObject ()->GetObjectModel ();
         if (objmodel->GetPolygonMeshShadows ())
           objmodel->GetPolygonMeshShadows ()->GetFlags ().Set (

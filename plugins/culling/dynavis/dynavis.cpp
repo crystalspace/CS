@@ -318,11 +318,15 @@ void csDynaVis::RegisterVisObject (iVisibilityObject* visobj)
   // be called by the calls above (i.e. especially the calculation of
   // the bounding box could cause a listener to be fired).
   movable->AddListener ((iMovableListener*)visobj_wrap);
-  visobj_wrap->model->GetModel ()->AddListener (
-		  (iObjectModelListener*)visobj_wrap);
+  iObjectModel* model = visobj_wrap->model->GetModel ();
+  model->AddListener ((iObjectModelListener*)visobj_wrap);
 
-  visobj_wrap->hint_closed = visobj->GetCullerFlags ().Check (
-  	CS_CULLER_HINT_CLOSED);
+  if (model->GetPolygonMeshViscull ())
+    visobj_wrap->hint_closed = model->GetPolygonMeshViscull ()
+    	->GetFlags ().Check (CS_POLYMESH_CLOSED);
+  else
+    visobj_wrap->hint_closed = false;
+
   visobj_wrap->hint_badoccluder = visobj->GetCullerFlags ().Check (
   	CS_CULLER_HINT_BADOCCLUDER);
   visobj_wrap->hint_goodoccluder = visobj->GetCullerFlags ().Check (

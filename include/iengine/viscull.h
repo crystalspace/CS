@@ -191,26 +191,6 @@ struct iVisibilityCuller : public iBase
 /** \name GetCullerFlags() flags
  * @{ */
 /**
- * Object is fully convex. This is a hint for the culler so it
- * can potentially perform more efficient culling operations
- * on the object.
- */
-#define CS_CULLER_HINT_CONVEX 1
-
-/**
- * Object is closed. This is a hint for the culler which
- * means that the object is closed (meaning that if you are
- * outside the object, you can only see the visible side of
- * all polygons). It is legal to set this hint even if the
- * object is not really closed. For example, a cube with
- * five faces (i.e. one face missing) can be set as closed
- * with this flag because treating this as closed will
- * not cause culling errors (unless there are objects in
- * the cube of course).
- */
-#define CS_CULLER_HINT_CLOSED 2
-
-/**
  * This is a good occluder. With this hint you say that
  * this object is a good occluder. The culler can still ignore
  * this hint of course.
@@ -260,8 +240,6 @@ struct iVisibilityObject : public iBase
    * Get flags for this object. This is a combination of zero or more of the
    * following flags. See the documentation with these flags for more info:
    * <ul>
-   * <li>#CS_CULLER_HINT_CONVEX
-   * <li>#CS_CULLER_HINT_CLOSED
    * <li>#CS_CULLER_HINT_GOODOCCLUDER
    * <li>#CS_CULLER_HINT_BADOCCLUDER
    * </ul>

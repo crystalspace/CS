@@ -55,6 +55,9 @@ chronological order.
 	  CS_POlYMESH_... flags in all polygon meshes associated with that mesh.
 	- Jorrit added support for <closed> and <convex> to factories too.
 	- Jorrit changed api mod documentation for latest polymesh change.
+	- Jorrit removed CS_CULLER_HINT_CONVEX and CS_CULLER_HINT_CLOSED.
+	  These are now obsolete since they are replaced by CS_POLYMESH_...
+	  flags.
 4-Sep-2003
 	- Peter Amstutz fixed the csPolyTexture destructor (part of
 	  the thing plugin) to not try to deallocate the lightmap
