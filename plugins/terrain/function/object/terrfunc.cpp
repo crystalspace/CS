@@ -165,7 +165,7 @@ csTerrFuncObject::csTerrFuncObject (iSystem* pSys,
   max_cost[1] = .08;
   max_cost[2] = .2;
   CorrectSeams (0, 0);
-  quad_depth = 4;
+  quad_depth = 6;
   quadtree = NULL;
 }
 

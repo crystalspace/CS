@@ -17,6 +17,8 @@ The history order is reversed so that new features are at the top.
 	- Fixed the bug in the visibility checker. The minimum and maximum
 	  heights were correctly calculated but not scaled and translated
 	  according to the parameters given by the terrfunc user.
+	- Set default quad-tree depth to 6 instead of 4. This seems to give
+	  much better results for newsky.zip.
 13-Jun-2001
 	- Increased robustness of the Spider in BugPlug a little. If there
 	  are no sectors it will not start hunting. There is also a timeout

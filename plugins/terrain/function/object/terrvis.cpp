@@ -66,20 +66,20 @@ void csTerrainQuad::Build (int depth)
 #define MININF (-99999999.0)
 #define MAXINF (-MININF)
 
-void csTerrainQuad::InitHorizon(float *horizon, int horsize)
+void csTerrainQuad::InitHorizon (float *horizon, int horsize)
 {
   for(int i=0; i<horsize; i++)
     horizon[i] = MININF;
 }
 
-static bool horidx_table_ok = false;
+static int horidx_table_horsize = 0;
 static int horidx_table[259];
 static void BuildHorIndexTable (int horsize)
 {
-  if (horidx_table_ok) return;
-  horidx_table_ok = true;
+  if (horidx_table_horsize == horsize) return;
+  horidx_table_horsize = horsize;
 
-  // circle is split into horsize parts, each of size k (of 2*PI total)
+  // Circle is split into horsize parts, each of size k (of 2*PI total)
   // the x-axis is right in the middle of parts 0 and horsize/2
   // thus precision around z==0 is not so important
   float k = 2.0*PI / float(horsize);
