@@ -94,7 +94,11 @@ public:
 #ifdef CS_USE_NEW_RENDERER
   virtual bool DrawZ (iRenderView*, iMovable*, csZBufMode) { return false; }
   virtual bool DrawShadow (iRenderView*, iMovable*, csZBufMode, iLight *light) { return false; }
-  virtual bool DrawLight (iRenderView*, iMovable*, csZBufMode) { return false; }
+  virtual bool DrawLight (iRenderView*, iMovable*, csZBufMode, iLight *) { return false; }
+  /// The following enable/disable shadow caps for stencil shadow rendering
+  virtual void EnableShadowCaps (){;}
+  virtual void DisableShadowCaps (){;}
+
 #endif // CS_USE_NEW_RENDERER
   virtual void SetVisibleCallback (iMeshObjectDrawCallback*) { }
   virtual iMeshObjectDrawCallback* GetVisibleCallback () const { return NULL; }
