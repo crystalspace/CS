@@ -153,9 +153,9 @@ void csIsoCell::TraversePost(csIsoCellNode *tree,
 void csIsoCell::TraverseInOrder(csIsoCellNode *tree, 
   void (*func)(csIsoCellNode *, void *), void *data)
 {
-  if(tree->left) TraversePost(tree->left, func, data);
+  if(tree->left) TraverseInOrder(tree->left, func, data);
   func(tree, data);
-  if(tree->right) TraversePost(tree->right, func, data);
+  if(tree->right) TraverseInOrder(tree->right, func, data);
 }
 
 
