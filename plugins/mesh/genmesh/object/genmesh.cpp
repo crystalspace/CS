@@ -278,13 +278,13 @@ void csGenmeshMeshObject::InitializeDefault (bool clear)
   if (!do_shadow_rec) return;
   if (do_manual_colors) return;
 
-  // Set all colors to ambient light (@@@ NEED TO GET AMBIENT!)
+  // Set all colors to ambient light.
   int i;
   CheckLitColors ();
-  csColor amb;
-  factory->engine->GetAmbientLight (amb);
   if (clear)
   {
+    csColor amb;
+    factory->engine->GetAmbientLight (amb);
     for (i = 0 ; i < num_lit_mesh_colors ; i++)
     {
       lit_mesh_colors[i].Set (0, 0, 0);
@@ -818,18 +818,17 @@ void csGenmeshMeshObject::CastShadows (iMovable* movable, iFrustumView* fview)
     if (cosinus > 0)
     {
       if (vrt_sq_dist >= SMALL_EPSILON) cosinus *= in_vrt_dist;
+      float bright = li->GetBrightnessAtDistance (csQsqrt (vrt_sq_dist));
+      if (cosinus < 1) bright *= cosinus;
       if (pseudoDyn)
       {
 	// Pseudo-dynamic
-	float bright = li->GetBrightnessAtDistance (csQsqrt (vrt_sq_dist));
-	if (cosinus < 1) bright *= cosinus;
 	if (bright > 2.0f) bright = 2.0f; // @@@ clamp here?
 	shadowArr->shadowmap[i] = bright;
       }
       else
       {
-	col = light_color * li->GetBrightnessAtDistance (csQsqrt (vrt_sq_dist));
-	if (cosinus < 1) col *= cosinus;
+	col = light_color * bright;
 	colors[i] += col;
       }
     }
@@ -856,12 +855,15 @@ void csGenmeshMeshObject::UpdateLightingOne (
 
   csColor light_color = li->GetColor () * (256. / CS_NORMAL_LIGHT_LEVEL)
       * li->GetBrightnessAtDistance (csQsqrt (obj_sq_dist));
+  if (light_color.red < EPSILON && light_color.green < EPSILON
+  	&& light_color.blue < EPSILON)
+    return;
 
   csColor col;
   int i;
   for (i = 0 ; i < factory->GetVertexCount () ; i++)
   {
-    csVector3 normal = normals[i];
+    csVector3& normal = normals[i];
     float cosinus;
     if (obj_sq_dist < SMALL_EPSILON) cosinus = 1;
     else cosinus = obj_light_pos * normal;
@@ -873,7 +875,7 @@ void csGenmeshMeshObject::UpdateLightingOne (
       col = light_color;
       if (obj_sq_dist >= SMALL_EPSILON) cosinus *= in_obj_dist;
       if (cosinus < 1) col *= cosinus;
-       colors[i] += col;
+      colors[i] += col;
     }
   }
 }
@@ -901,8 +903,9 @@ void csGenmeshMeshObject::UpdateLighting2 (iMovable* movable)
     {
       csColor col;
       col = sect->GetDynamicAmbientLight ();
-      for (i = 0 ; i < factory->GetVertexCount () ; i++)
-	colors[i] += col;
+      if (col.red > EPSILON || col.green > EPSILON || col.blue > EPSILON)
+        for (i = 0 ; i < factory->GetVertexCount () ; i++)
+	  colors[i] += col;
     }
   }
   else
@@ -939,10 +942,14 @@ void csGenmeshMeshObject::UpdateLighting2 (iMovable* movable)
     iLight* l;
     csShadowArray* shadowArr = pdlIt.Next (l);
     csColor c = l->GetColor ();
-    float* intensities = shadowArr->shadowmap;
-    for (int i = 0; i < num_lit_mesh_colors; i++)
+    if (c.red > EPSILON || c.green > EPSILON || c.blue > EPSILON)
     {
-      colors[i] += c * intensities[i];
+      c = c * (256. / CS_NORMAL_LIGHT_LEVEL);
+      float* intensities = shadowArr->shadowmap;
+      for (int i = 0; i < num_lit_mesh_colors; i++)
+      {
+        colors[i] += c * intensities[i];
+      }
     }
   }
 

@@ -6,6 +6,17 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+6-Oct-2004
+	- Jorrit did various lighting related optimizations to genmesh:
+	    - To genmesh pseudo dynamic lighting handling. If the light is
+	      near black a loop will be avoided.
+	    - To genmesh lighting handling. If dynamic sector ambient is near
+	      black a loop will be avoided.
+	    - To dynamic lighting. If light at that distance is near black
+	      a loop will be avoided.
+	- Jorrit fixed a bug in genmesh pseudo-dynamic lighting handling.
+	  The lighting was too dark because it forgot to multiply the
+	  color with a factor.
 5-Oct-2004
 	- Rhad fixed a long standing bug in the Ogg loader.
 	  - Per specs, SEEK_END must seek 1 byte past the end of data
