@@ -1,5 +1,0 @@
-SubDir TOP apps tests eventtest ;
-
-Description eventtest : "eventtest tester" ;
-Application eventtest : [ Wildcard *.cpp *.h ] : console noinstall ;
-LinkWith eventtest : cstool csutil ;

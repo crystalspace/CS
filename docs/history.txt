@@ -23,10 +23,14 @@ chronological order.
 	  UpdateMove() unless something has actually changed.
 	- Eric Sunshine fixed 2-Jun-2004 bug in msvcgen.jam which caused
 	  --accept and --reject patterns to be ignored by msvcgen.pl.
+	- Eric Sunshine removed the `eventtest' program.  Although useful when
+	  making low-level modifications to the event system, it is not
+	  otherwise especially meaningful to have around.  To make it easy to
+	  recover the program if revival is warranted or if testing needs to be
+	  done, it has been tagged in CVS as EVENTTEST_OBSOLETE.
 7-Jun-2004
-	- Jorrit added an assignement operator to csHashMapReversible.
-	  This actually fixes the crash at exit bug for some of the CSWS
-	  apps.
+	- Jorrit added an assignement operator to csHashMapReversible.  This
+	  actually fixes the crash at exit bug for some of the CSWS apps.
 	- Jorrit also added fixed the csEvent assignement operator so that
 	  it copies the 'attributes' field too.
 	- Jorrit enhanced the build instructions so they invite people to try

@@ -1,7 +1,6 @@
 SubDir TOP apps tests ;
 
 SubInclude TOP apps tests awstest ;
-SubInclude TOP apps tests eventtest ;
 SubInclude TOP apps tests g2dtest ;
 SubInclude TOP apps tests gfxtst ;
 SubInclude TOP apps tests joytest ;
