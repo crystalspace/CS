@@ -146,8 +146,8 @@ TOKEN_DEF_START
   TOKEN_DEF (STATIC)
   TOKEN_DEF (TEMPLATE)
   TOKEN_DEF (TERRAIN)
-  TOKEN_DEF (TERRAIN_HEIGHTMAP)
-  TOKEN_DEF (TERRAIN_DETAIL)
+  TOKEN_DEF (HEIGHTMAP)
+  TOKEN_DEF (DETAIL)
   TOKEN_DEF (TEX)
   TOKEN_DEF (TEXLEN)
   TOKEN_DEF (TEXNR)
@@ -3464,8 +3464,8 @@ void csLoader::terrain_process (csSector& sector, char* name, char* buf,
         csTextureHandle* /*texture*/)
 {
   TOKEN_TABLE_START (commands)
-    TOKEN_TABLE (TERRAIN_HEIGHTMAP)
-    TOKEN_TABLE (TERRAIN_DETAIL)
+    TOKEN_TABLE (HEIGHTMAP)
+    TOKEN_TABLE (DETAIL)
   TOKEN_TABLE_END
 
   long cmd;
@@ -3477,11 +3477,11 @@ void csLoader::terrain_process (csSector& sector, char* name, char* buf,
   {
     switch (cmd)
     {
-      case TOKEN_TERRAIN_HEIGHTMAP:
+      case TOKEN_HEIGHTMAP:
         ScanStr (params, "%s", heightmap);
         break;
-      case TOKEN_TERRAIN_DETAIL:
-        ScanStr (params, "%D", &detail);
+      case TOKEN_DETAIL:
+        ScanStr (params, "%d", &detail);
         break;
     }
   }
