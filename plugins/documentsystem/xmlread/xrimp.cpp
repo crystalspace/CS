@@ -224,7 +224,9 @@ csDocumentNodeType csXmlReadNode::GetType ()
     case TrDocumentNode::DOCUMENT: return CS_NODE_DOCUMENT;
     case TrDocumentNode::ELEMENT: return CS_NODE_ELEMENT;
     case TrDocumentNode::COMMENT: return CS_NODE_COMMENT;
-    case TrDocumentNode::TEXT: return CS_NODE_TEXT;
+    case TrDocumentNode::CDATA:
+    case TrDocumentNode::TEXT:
+      return CS_NODE_TEXT;
     case TrDocumentNode::DECLARATION: return CS_NODE_DECLARATION;
     default: return CS_NODE_UNKNOWN;
   }
@@ -273,7 +275,8 @@ const char* csXmlReadNode::GetContentsValue ()
   TrDocumentNode* child = node_children->FirstChild ();
   while (child)
   {
-    if (child->Type () == TrDocumentNode::TEXT)
+    if (child->Type () == TrDocumentNode::TEXT ||
+    	child->Type () == TrDocumentNode::CDATA)
     {
       return child->Value ();
     }

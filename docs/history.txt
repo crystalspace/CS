@@ -3,6 +3,10 @@ http://crystal.sourceforge.net/
 
 The history order is reversed so that new features are at the top.
 
+3-Apr-2003
+	- Applied the fix that res did to the TinyXML parser (with CDATA)
+	  also to xmlread.
+	- Added 'xmlread' to 'make walkall'.
 2-Apr-2003
         - Jonathan Tarbox fixed some bugs in csEvent::Flatten/Unflatten
 	- Matze removed the csSome, csConstSome and uint type from cstypes.h
@@ -53,11 +57,12 @@ The history order is reversed so that new features are at the top.
 	- res fixed mismatching de-/allocation of CDATA nodes in TinyXML
 	  (block allocator vs. new).
 	- res made following changes to render3d:
-	    - moved some features of the old texture manager over, namely: 
+	    - Moved some features of the old texture manager over, namely: 
 	      mipmap sharpening, texture downsampling, anisotropic filtering,
 	      use of prerendered mipmaps.
-	    - Texture LOD bias can be set via cfgvar Video.OpenGL.TextureLODBias.
-	    - removed unnecessary gluBuild2DMipmaps(); instead previously in
+	    - Texture LOD bias can be set via cfgvar
+	      Video.OpenGL.TextureLODBias.
+	    - Removed unnecessary gluBuild2DMipmaps(); instead previously in
 	      CreateMipmaps() determined mipmaps are used.
 1-Apr-2003
         - Jonathan Tarbox Added int64 support to convert_endian.

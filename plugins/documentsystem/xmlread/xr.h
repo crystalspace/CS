@@ -209,7 +209,7 @@ public:
    */
   enum NodeType
   {
-    DOCUMENT, ELEMENT, COMMENT, UNKNOWN, TEXT, DECLARATION, TYPECOUNT
+    DOCUMENT, ELEMENT, COMMENT, UNKNOWN, TEXT, CDATA, DECLARATION, TYPECOUNT
   };
 
   virtual ~TrDocumentNode();
@@ -262,7 +262,11 @@ public:
   TrXmlUnknown*  ToUnknown() const
   { return ( Type () == UNKNOWN  ) ? (TrXmlUnknown*)  this : 0; }
   TrXmlText*   ToText()    const
-  { return ( Type () == TEXT     ) ? (TrXmlText*)     this : 0; }
+  {
+    int t = Type ();
+    return ( t == TEXT || t == CDATA )
+    	? (TrXmlText*)     this : 0;
+  }
   TrXmlDeclaration* ToDeclaration() const
   { return ( Type () == DECLARATION ) ? (TrXmlDeclaration*) this : 0; }
 
@@ -520,6 +524,7 @@ public:
   /// Constructor.
   TrXmlCData () : TrXmlText ()
   {
+    type = CDATA;
   }
   virtual ~TrXmlCData() {}
 
