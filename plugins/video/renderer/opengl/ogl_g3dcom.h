@@ -163,6 +163,7 @@ public:
   GLfloat* GetFogTxt (int idx) { return &fog_txt[idx<<1]; }
 
   csFogQueue () :
+	z_buf_mode (CS_ZBUF_NONE),
 	num_vertices (0), max_vertices (0),
 	glverts (NULL), fog_color (NULL), fog_txt (NULL),
 	num_triangles (0), max_triangles (0),

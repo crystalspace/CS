@@ -1,5 +1,8 @@
 The history order is reversed so that new features are at the top.
 
+28-Apr-2002
+	- Fixed another initialization bug in the OpenGL renderer found
+	  by valgrind.
 27-Apr-2002
 	- Worked around a bug in the mipmapping code in csImage. When
 	  mipmapping is called for one dimension equal to 1 the routine
