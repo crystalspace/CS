@@ -97,7 +97,7 @@ $(OUT)%$O: plugins/video/renderer/software/i386/%.asm
 	$(DO.COMPILE.ASM) $(NASMFLAGS.SOFT3D)
 
 $(OUT)%$O: plugins/video/renderer/software/%.cpp
-	$(DO.COMPILE.CPP) $(CFLAGS.SOFT3D.PIXEL_LAYOUT)
+	$(DO.COMPILE.CPP) $(CFLAGS.PIXEL_LAYOUT)
 
 $(SOFT3D): $(OBJ.SOFT3D) $(LIB.SOFT3D)
 	$(DO.PLUGIN)
@@ -108,7 +108,7 @@ soft3dclean:
 ifdef DO_DEPEND
 dep: $(OUTOS)soft3d.dep
 $(OUTOS)soft3d.dep: $(SRC.SOFT3D)
-	$(DO.DEP1) $(CFLAGS.SOFT3D.PIXEL_LAYOUT) $(DO.DEP2)
+	$(DO.DEP1) $(CFLAGS.PIXEL_LAYOUT) $(DO.DEP2)
 else
 -include $(OUTOS)soft3d.dep
 endif

@@ -18,21 +18,7 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-// Whether the renderer uses ARGB or ABGR should not be tied directly to
-// the endianness of the platform.  But in order not to break code that
-// is used to the old way of doing things, we use the following #define's
-// which can be overridden for certain platforms
-#define CS_SOFT3D_24BIT_PIXEL_ARGB 0
-#define CS_SOFT3D_24BIT_PIXEL_ABGR 1
-
-#if !defined(CS_SOFT3D_24BIT_PIXEL_LAYOUT)
-#  if defined(CS_LITTLE_ENDIAN)
-#    define CS_SOFT3D_24BIT_PIXEL_LAYOUT CS_SOFT3D_24BIT_PIXEL_ARGB
-#  else
-#    define CS_SOFT3D_24BIT_PIXEL_LAYOUT CS_SOFT3D_24BIT_PIXEL_ABGR
-#  endif
-#endif
-
+#include "video/renderer/common/pixfmt.h"
 
 // Depending on the Colorformat, we define different masks and shiftvalues
 // to get the accrding values for rgb; R,G,B stands for Red, Green and Blue,
@@ -78,7 +64,7 @@
 #  define PI_RB	8
 #  define PI_GB	8
 #  define PI_BB	8
-#  if (CS_SOFT3D_24BIT_PIXEL_LAYOUT == CS_SOFT3D_24BIT_PIXEL_ABGR)
+#  if (CS_24BIT_PIXEL_LAYOUT == CS_24BIT_PIXEL_ABGR)
 #    define PI_RS	0
 #    define PI_GS	8
 #    define PI_BS	16
