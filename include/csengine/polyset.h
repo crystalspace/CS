@@ -145,6 +145,9 @@ protected:
   /// If true then the bounding box in object space is valid.
   bool obj_bbox_valid;
 
+  /// Radius of object in object space.
+  csVector3 obj_radius;
+
   /**
    * Light frame number. Using this number one can see if gouraud shaded
    * vertices have been initialized already.
@@ -444,6 +447,11 @@ public:
    */
   void GetBoundingBox (csBox3& box);
 
+  /**
+   * Get the radius in object space for this polygon set.
+   */
+  const csVector3& GetRadius ();
+
   /// Return true if this has fog.
   bool HasFog () { return fog.enabled; }
 
@@ -558,7 +566,8 @@ public:
     /// Get the number of polygons for this mesh.
     virtual int GetNumPolygons ()
     {
-      return scfParent->GetNumPolygons ();
+      GetPolygons ();	// To make sure our count is ok.
+      return num;
     }
     /// Get the pointer to the array of polygons.
     virtual csMeshedPolygon* GetPolygons ();
@@ -574,6 +583,7 @@ public:
     }
 
     csMeshedPolygon* polygons;
+    int num;
   } scfiPolygonMesh;
   friend struct PolyMesh;
 };

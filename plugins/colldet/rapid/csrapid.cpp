@@ -70,19 +70,28 @@ iCollider* csRapidCollideSystem::CreateCollider (iPolygonMesh* mesh)
   return col;
 }
 
-csCollisionPair* csRapidCollideSystem::Collide (iCollider* collider1, csTransform* trans1,
-  	iCollider* collider2, csTransform* trans2, int& num_pairs)
+bool csRapidCollideSystem::Collide (iCollider* collider1, csTransform* trans1,
+  	iCollider* collider2, csTransform* trans2)
 {
-  csRAPIDCollider::CollideReset ();
   csRapidCollider* col1 = (csRapidCollider*)collider1;
   csRapidCollider* col2 = (csRapidCollider*)collider2;
-  bool rc = col1->GetPrivateCollider ()->Collide (*(col2->GetPrivateCollider ()),
+  return col1->GetPrivateCollider ()->Collide (*(col2->GetPrivateCollider ()),
   	trans1, trans2);
-  if (rc)
-  {
-    num_pairs = csRAPIDCollider::numHits;
-    return csRAPIDCollider::GetCollisions ();
-  }
-  else return NULL;
+}
+
+csCollisionPair* csRapidCollideSystem::GetCollisionPairs ()
+{
+  return csRAPIDCollider::GetCollisions ();
+}
+
+int csRapidCollideSystem::GetNumCollisionPairs ()
+{
+  return csRAPIDCollider::numHits;
+}
+
+csCollisionPair* csRapidCollideSystem::ResetCollisionPairs ()
+{
+  csRAPIDCollider::CollideReset ();
+  csRAPIDCollider::numHits = 0;
 }
 

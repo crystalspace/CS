@@ -48,13 +48,14 @@
 #include "csutil/inifile.h"
 #include "csutil/csrect.h"
 #include "csobject/dataobj.h"
+#include "icollide.h"
 
 extern WalkTest *Sys;
 
-int FindIntersection(csCdTriangle *t1,csCdTriangle *t2,csVector3 line[2])
+int FindIntersection(csCollisionPair& cd,csVector3 line[2])
 {
-  csVector3 tri1[3]; tri1[0]=t1->p1; tri1[1]=t1->p2; tri1[2]=t1->p3;
-  csVector3 tri2[3]; tri2[0]=t2->p1; tri2[1]=t2->p2; tri2[2]=t2->p3;
+  csVector3 tri1[3]; tri1[0]=cd.a1; tri1[1]=cd.b1; tri1[2]=cd.c1;
+  csVector3 tri2[3]; tri2[0]=cd.a2; tri2[1]=cd.b2; tri2[2]=cd.c2;
 
   return csMath3::FindIntersection(tri1,tri2,line);
 }
@@ -85,6 +86,7 @@ int FindIntersection(csCdTriangle *t1,csCdTriangle *t2,csVector3 line[2])
 void WalkTest::CreateColliders ()
 {
   csPolygon3D *p;
+  iPolygonMesh* mesh;
   plbody = new csPolygonSet (world);
   plbody->SetName ("Player's Body");
 
@@ -128,7 +130,9 @@ void WalkTest::CreateColliders ()
   p->AddVertex (0); p->AddVertex (4);
   p->AddVertex (7); p->AddVertex (3);
 
-  body = new csRAPIDCollider (plbody);
+  mesh = QUERY_INTERFACE (plbody, iPolygonMesh);
+  body = new csPluginCollider (*plbody, collide_system, mesh);
+  body_radius = plbody->GetRadius ();
 
   pllegs = new csPolygonSet (world);
 
@@ -172,7 +176,9 @@ void WalkTest::CreateColliders ()
   p->AddVertex (0); p->AddVertex (4);
   p->AddVertex (7); p->AddVertex (3);
 
-  legs = new csRAPIDCollider(pllegs);
+  mesh = QUERY_INTERFACE (pllegs, iPolygonMesh);
+  legs = new csPluginCollider (*pllegs, collide_system, mesh);
+  legs_radius = pllegs->GetRadius ();
 
   if (!body || !legs)
     do_cd = false;
@@ -181,7 +187,7 @@ void WalkTest::CreateColliders ()
 #define MAXSECTORSOCCUPIED  20
 
 // No more than 1000 collisions ;)
-collision_pair our_cd_contact[1000];
+csCollisionPair our_cd_contact[1000];
 int num_our_cd;
 
 int FindSectors (csVector3 v, csVector3 d, csSector *s, csSector **sa)
@@ -211,19 +217,19 @@ int FindSectors (csVector3 v, csVector3 d, csSector *s, csSector **sa)
   return c;
 }
 
-int CollisionDetect (csRAPIDCollider *c, csSector* sp, csTransform *cdt)
+int CollisionDetect (csPluginCollider *c, csSector* sp, csTransform *cdt)
 {
   int hit = 0;
 
   // Check collision with this sector.
-  csRAPIDCollider::CollideReset();
-  if (c->Collide(*sp, cdt)) hit++;
-  collision_pair *CD_contact = csRAPIDCollider::GetCollisions ();
+  Sys->collide_system->ResetCollisionPairs ();
+  if (c->Collide (*sp, cdt)) hit++;
+  csCollisionPair* CD_contact = Sys->collide_system->GetCollisionPairs ();
 
-  for (int i=0 ; i<csRAPIDCollider::numHits ; i++)
+  for (int i=0 ; i<Sys->collide_system->GetNumCollisionPairs () ; i++)
     our_cd_contact[num_our_cd++] = CD_contact[i];
 
-  if (csRAPIDCollider::GetFirstHit() && hit)
+  if (Sys->collide_system->GetOneHitOnly () && hit)
     return 1;
 
   // Check collision with the things in this sector.
@@ -231,14 +237,14 @@ int CollisionDetect (csRAPIDCollider *c, csSector* sp, csTransform *cdt)
   while (tp)
   {
     // TODO, if and when Things can move, their transform must be passed in.
-    csRAPIDCollider::numHits = 0;
-    if (c->Collide(*tp, cdt)) hit++;
+    Sys->collide_system->ResetCollisionPairs ();
+    if (c->Collide (*tp, cdt)) hit++;
 
-    CD_contact = csRAPIDCollider::GetCollisions ();
-    for (int i=0 ; i<csRAPIDCollider::numHits ; i++)
+    CD_contact = Sys->collide_system->GetCollisionPairs ();
+    for (int i=0 ; i<Sys->collide_system->GetNumCollisionPairs () ; i++)
       our_cd_contact[num_our_cd++] = CD_contact[i];
 
-    if (csRAPIDCollider::GetFirstHit() && hit)
+    if (Sys->collide_system->GetOneHitOnly () && hit)
       return 1;
     tp = (csThing*)(tp->GetNext ());
     // TODO, should test which one is the closest.
@@ -256,11 +262,11 @@ void DoGravity (csVector3& pos, csVector3& vel)
   csOrthoTransform test (m, new_pos);
 
   csSector *n[MAXSECTORSOCCUPIED];
-  int num_sectors = FindSectors (new_pos, 4.0f*Sys->body->GetRadius(),
+  int num_sectors = FindSectors (new_pos, 4.0f*Sys->body_radius,
     Sys->view->GetCamera()->GetSector(), n);
 
   num_our_cd = 0;
-  csRAPIDCollider::SetFirstHit (false);
+  Sys->collide_system->SetOneHitOnly (false);
   int hits = 0;
 
   // Check to see if there are any terrains, if so test against those.
@@ -285,7 +291,7 @@ void DoGravity (csVector3& pos, csVector3& vel)
   }
   if (hits == 0)
   {
-    csRAPIDCollider::CollideReset ();
+    Sys->collide_system->ResetCollisionPairs ();
 
     for ( ; num_sectors-- ; )
       hits += CollisionDetect (Sys->body, n[num_sectors], &test);
@@ -293,8 +299,8 @@ void DoGravity (csVector3& pos, csVector3& vel)
 //printf ("body: hits=%d num_our_cd=%d\n", hits, num_our_cd);
     for (int j=0 ; j<num_our_cd ; j++)
     {
-      csCdTriangle *wall = our_cd_contact[j].tr2;
-      csVector3 n = ((wall->p3-wall->p2)%(wall->p2-wall->p1)).Unit();
+      csCollisionPair& cd = our_cd_contact[j];
+      csVector3 n = ((cd.c2-cd.b2)%(cd.b2-cd.a2)).Unit();
       if (n*vel<0)
         continue;
       vel = -(vel%n)%n;
@@ -304,15 +310,13 @@ void DoGravity (csVector3& pos, csVector3& vel)
     new_pos = pos+vel;
     test = csOrthoTransform (csMatrix3(), new_pos);
 
-    num_sectors = FindSectors (new_pos, 4.0f*Sys->legs->GetRadius(), 
+    num_sectors = FindSectors (new_pos, 4.0f*Sys->legs_radius, 
 		Sys->view->GetCamera()->GetSector(), n);
 
     num_our_cd = 0;
-    csRAPIDCollider::SetFirstHit (false);
-    csRAPIDCollider::numHits = 0;
+    Sys->collide_system->SetOneHitOnly (false);
+    Sys->collide_system->ResetCollisionPairs ();
     int hit = 0;
-
-    csRAPIDCollider::CollideReset ();
 
     for ( ; num_sectors-- ; )
       hit += CollisionDetect (Sys->legs, n[num_sectors], &test);
@@ -329,20 +333,18 @@ void DoGravity (csVector3& pos, csVector3& vel)
       
       for (int j=0 ; j<num_our_cd ; j++)
       {
-	csCdTriangle first  = *our_cd_contact[j].tr1;
-	csCdTriangle second = *our_cd_contact[j].tr2;
-
-	csVector3 n=((second.p3-second.p2)%(second.p2-second.p1)).Unit ();
+	csCollisionPair cd = our_cd_contact[j];
+        csVector3 n = ((cd.c2-cd.b2)%(cd.b2-cd.a2)).Unit();
 
 	if (n*csVector3(0,-1,0)<0.7) continue;
 
 	csVector3 line[2];
 
-	first.p1 += new_pos;
-	first.p2 += new_pos;
-	first.p3 += new_pos;
+	cd.a1 += new_pos;
+	cd.b1 += new_pos;
+	cd.c1 += new_pos;
 
-	if (FindIntersection (&first,&second,line))
+	if (FindIntersection (cd,line))
 	{
 	  if (line[0].y>max_y)
 	    max_y=line[0].y;

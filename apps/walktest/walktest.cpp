@@ -960,18 +960,21 @@ void WalkTest::InitWorld (csWorld* world, csCamera* /*camera*/)
 {
   Sys->Printf (MSG_INITIALIZATION, "Computing OBBs ...\n");
 
+  iPolygonMesh* mesh;
   int sn = world->sectors.Length ();
   while (sn > 0)
   {
     sn--;
     csSector* sp = (csSector*)world->sectors[sn];
     // Initialize the sector itself.
-    (void)new csRAPIDCollider(*sp, sp);
+    mesh = QUERY_INTERFACE (sp, iPolygonMesh);
+    (void)new csPluginCollider (*sp, collide_system, mesh);
     // Initialize the things in this sector.
     csThing* tp = sp->GetFirstThing ();
     while (tp)
     {
-      (void)new csRAPIDCollider(*tp, tp);
+      mesh = QUERY_INTERFACE (tp, iPolygonMesh);
+      (void)new csPluginCollider (*tp, collide_system, mesh);
       tp = (csThing*)(tp->GetNext ());
     }
   }
@@ -984,9 +987,8 @@ void WalkTest::InitWorld (csWorld* world, csCamera* /*camera*/)
     csSprite* sp = (csSprite*)world->sprites[i];
     if (sp->GetType () != csSprite3D::Type) continue;
     spp = (csSprite3D*)sp;
-
-    // TODO: Should create beings for these.
-    (void)new csRAPIDCollider(*spp, spp);
+    mesh = QUERY_INTERFACE (spp, iPolygonMesh);
+    (void)new csPluginCollider (*spp, collide_system, mesh);
   }
 
   // Create a player object that follows the camera around.
@@ -995,7 +997,6 @@ void WalkTest::InitWorld (csWorld* world, csCamera* /*camera*/)
 //  init = true;
 //  Sys->Printf (MSG_INITIALIZATION, "DONE\n");
 }
-
 
 void WalkTest::LoadLibraryData(void)
 {
@@ -1120,7 +1121,7 @@ bool WalkTest::Initialize (int argc, const char* const argv[], const char *iConf
   if (!collide_system)
   {
     Printf (MSG_FATAL_ERROR, "No Collision Detection plugin found!\n");
-    //return false;
+    return false;
   }
 
   // Initialize the command processor with the world and camera.

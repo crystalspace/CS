@@ -63,15 +63,31 @@ struct iCollideSystem : public iPlugIn
   /**
    * Test collision between two colliders.
    * This is only supported for iCollider objects created by
-   * this plugin. Returns null if no collision or else a
-   * pointer to an array of csCollisionPair's. In the latter
-   * case 'num_pairs' will be set to the number of pairs in that
-   * array. Note that this array will only be valid upto the next
-   * time that Collide is called.
+   * this plugin. Returns false if no collision or else true.
+   * The collisions will be added to the collision pair array
+   * that you can query with GetCollisionPairs and reset/clear
+   * with ResetCollisionPairs. Every call to Collide will
+   * add to that array.
    */
-  virtual csCollisionPair* Collide (iCollider* collider1, csTransform* trans1,
-  	iCollider* collider2, csTransform* trans2,
-	int& num_pairs) = 0;
+  virtual bool Collide (iCollider* collider1, csTransform* trans1,
+  	iCollider* collider2, csTransform* trans2) = 0;
+
+  /**
+   * Get pointer to current array of collision pairs.
+   * This array will grow with every call to Collide until you clear
+   * it using 'ResetCollisionPairs'.
+   */
+  virtual csCollisionPair* GetCollisionPairs () = 0;
+
+  /**
+   * Get number of collision pairs in array.
+   */
+  virtual int GetNumCollisionPairs () = 0;
+
+  /**
+   * Reset the array with collision pairs.
+   */
+  virtual csCollisionPair* ResetCollisionPairs () = 0;
 
   /**
    * Indicate if we are interested only in the first hit that is found.

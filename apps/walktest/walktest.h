@@ -40,6 +40,7 @@ class csWireFrameCam;
 class PhysicsLibrary;
 class InfiniteMaze;
 class HugeRoom;
+class csPolygonSet;
 struct iCollideSystem;
 
 // Several map modes.
@@ -123,8 +124,9 @@ public:
   csVector3 angle_velocity;
 
   /// Colliders for "legs" and "body". Intersections are handled differently.
-  csRAPIDCollider *legs;
-  csRAPIDCollider *body;
+  csPluginCollider *legs;
+  csPluginCollider *body;
+  csVector3 body_radius, legs_radius;
 
   /// Vector with recorded camera transformations.
   csRecordVector recording;

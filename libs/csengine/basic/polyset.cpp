@@ -851,10 +851,22 @@ void csPolygonSet::CreateBoundingBox ()
   bbox->i2 = AddVertex (maxx, maxy, maxz);
 }
 
+const csVector3& csPolygonSet::GetRadius ()
+{
+  if (!obj_bbox_valid)
+  {
+    csBox3 b;
+    GetBoundingBox (b);
+  }
+  return obj_radius;
+}
+
 void csPolygonSet::GetBoundingBox (csBox3& box)
 {
   if (obj_bbox_valid) { box = obj_bbox; return; }
   obj_bbox_valid = true;
+
+  if (!bbox) CreateBoundingBox ();
 
   if (!obj_verts)
   {
@@ -908,6 +920,7 @@ void csPolygonSet::GetBoundingBox (csBox3& box)
   else if (Vobj (bbox->i8).z > max_bbox.z) max_bbox.z = Vobj (bbox->i8).z;
   obj_bbox.Set (min_bbox, max_bbox);
   box = obj_bbox;
+  obj_radius = (max_bbox - min_bbox) * 0.5f;
 }
 
 //---------------------------------------------------------------------------------------------------------
@@ -1106,25 +1119,26 @@ csMeshedPolygon* csPolygonSet::PolyMesh::GetPolygons ()
 {
   if (!polygons)
   {
-    int i, cnt = 0;
+    int i;
+    num = 0;
     const csPolygonArray& pol = scfParent->polygons;
     for (i = 0 ; i < scfParent->GetNumPolygons () ; i++)
     {
       csPolygon3D* p = pol.Get (i);
       if (!p->GetUnsplitPolygon () && p->flags.Check (CS_POLY_COLLDET))
-        cnt++;
+        num++;
     }
   
-    polygons = new csMeshedPolygon [cnt];
-    cnt = 0;
+    polygons = new csMeshedPolygon [num];
+    num = 0;
     for (i = 0 ; i < scfParent->GetNumPolygons () ; i++)
     {
       csPolygon3D* p = pol.Get (i);
       if (!p->GetUnsplitPolygon () && p->flags.Check (CS_POLY_COLLDET))
       {
-        polygons[cnt].num_vertices = p->GetNumVertices ();
-        polygons[cnt].vertices = p->GetVertexIndices ();
-	cnt++;
+        polygons[num].num_vertices = p->GetNumVertices ();
+        polygons[num].vertices = p->GetVertexIndices ();
+	num++;
       }
     }
   }

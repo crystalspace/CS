@@ -90,6 +90,9 @@ public:
   /// Destroy the plugin collider object
   virtual ~csPluginCollider ();
 
+  /// Get the collider interface for this object.
+  iCollider* GetCollider () { return collider; }
+
   /**
    * Check if this collider collides with pOtherCollider.
    * Returns true if collision detected and adds the pair to the collisions
@@ -114,6 +117,7 @@ public:
   CSOBJTYPE;
 };
 
+#if 0
 class csCdModel;
 class csCdBBox;
 class csPolygonSet;
@@ -220,6 +224,6 @@ public:
   
   CSOBJTYPE;
 };
-
+#endif
 
 #endif // __CS_COLLIDER_H__

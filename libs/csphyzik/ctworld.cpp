@@ -465,7 +465,7 @@ void ctWorld::apply_function_to_body_list( void(*fcn)( ctEntity *ppe ) )
 // return the relative velocity between up to two bodies at a point in world space
 ctVector3 ctWorld::get_relative_v( ctPhysicalEntity *body_a, ctPhysicalEntity *body_b, const ctVector3 &the_p )
 {
-  if( (!body_a) || (!body_b) ){
+  if( (!body_a) && (!body_b) ){
     return ctVector3(0,0,0);	
   }
 

@@ -73,8 +73,25 @@ public:
    * This is only supported for iCollider objects created by
    * this plugin.
    */
-  virtual csCollisionPair* Collide (iCollider* collider1, csTransform* trans1,
-  	iCollider* collider2, csTransform* trans2, int& num_pairs);
+  virtual bool Collide (iCollider* collider1, csTransform* trans1,
+  	iCollider* collider2, csTransform* trans2);
+
+  /**
+   * Get pointer to current array of collision pairs.
+   * This array will grow with every call to Collide until you clear
+   * it using 'ResetCollisionPairs'.
+   */
+  virtual csCollisionPair* GetCollisionPairs ();
+
+  /**
+   * Get number of collision pairs in array.
+   */
+  virtual int GetNumCollisionPairs ();
+
+  /**
+   * Reset the array with collision pairs.
+   */
+  virtual csCollisionPair* ResetCollisionPairs ();
 
   /**
    * Indicate if we are interested only in the first hit that is found.

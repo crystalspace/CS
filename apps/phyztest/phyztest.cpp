@@ -357,7 +357,7 @@ void Phyztest::NextFrame (time_t elapsed_time, time_t current_time)
     phyz_world.add_entity( rb_bot );
 
     // create a spring force object and add it to our test body
-    ctSpringF *sf = new ctSpringF( rb_bot, ctVector3( 0, 0.2, 0 ) , &phyz_world, ctVector3( 0,12, 0 ) );
+    ctSpringF *sf = new ctSpringF( rb_bot, ctVector3( 0, 0.2, 0 ) , NULL, ctVector3( 0,12, 0 ) );
     sf->set_rest_length( 0 );
     sf->set_magnitude( 300.0 );
   //  rb_bot->add_force( sf );

@@ -815,6 +815,13 @@ void csSprite3D::GetObjectBoundingBox (csBox3& b)
   }
 }
 
+csVector3 csSprite3D::GetRadius ()
+{
+  csBox3 b;
+  GetObjectBoundingBox (b);
+  return (b.Max () - b.Min ()) * .5f;
+}
+
 void csSprite3D::GetCameraBoundingBox (const csCamera& camtrans, csBox3& cbox)
 {
   csTranCookie cur_cookie = csWorld::current_world->tr_manager.GetCookie ();

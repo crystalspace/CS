@@ -800,6 +800,11 @@ public:
   void GetObjectBoundingBox (csBox3& box);
 
   /**
+   * Get a radius in object space.
+   */
+  csVector3 GetRadius ();
+
+  /**
    * Get a 3D bounding box in camera space. This function is smart.
    * It will only recompute this information if needed. So if you call
    * this function several times in the same frame it will not recompute

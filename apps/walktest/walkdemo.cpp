@@ -54,6 +54,7 @@
 #include "isndbuf.h"
 #include "isndrdr.h"
 #include "igraph3d.h"
+#include "icollide.h"
 #include "csengine/rapid.h"
 
 extern WalkTest* Sys;
@@ -683,7 +684,8 @@ void add_skeleton_ghost (csSector* where, csVector3 const& pos, int maxdepth,
   }
   csSprite3D* spr = add_sprite (skelname, "__skelghost__", where, pos, 1);
   spr->SetMixmode (CS_FX_SETALPHA (0.75));
-  (void)new csRAPIDCollider (*spr, spr);
+  iPolygonMesh* mesh = QUERY_INTERFACE (spr, iPolygonMesh);
+  (void)new csPluginCollider (*spr, Sys->collide_system, mesh);
   GhostSpriteInfo* gh_info = new GhostSpriteInfo ();
   spr->ObjAdd (gh_info);
   gh_info->dir = 1;
@@ -693,13 +695,13 @@ void add_skeleton_ghost (csSector* where, csVector3 const& pos, int maxdepth,
 #define MAXSECTORSOCCUPIED  20
 
 extern int FindSectors (csVector3 v, csVector3 d, csSector *s, csSector **sa);
-extern int CollisionDetect (csRAPIDCollider *c, csSector* sp, csTransform *cdt);
+extern int CollisionDetect (csPluginCollider *c, csSector* sp, csTransform *cdt);
 extern collision_pair our_cd_contact[1000];//=0;
 extern int num_our_cd;
 
 void move_ghost (csSprite3D* spr)
 {
-  csRAPIDCollider* col = csRAPIDCollider::GetRAPIDCollider (*spr);
+  csPluginCollider* col = csPluginCollider::GetPluginCollider (*spr);
   csSector* first_sector = spr->GetSector (0);
 
   // Create a transformation 'test' which indicates where the ghost
@@ -713,13 +715,13 @@ void move_ghost (csSprite3D* spr)
 
   // Find all sectors that the ghost will occupy on the new position.
   csSector *n[MAXSECTORSOCCUPIED];
-  int num_sectors = FindSectors (new_pos, 4.0f*col->GetRadius(),
+  int num_sectors = FindSectors (new_pos, 4.0f*spr->GetRadius(),
   	first_sector, n);
 
   // Start collision detection.
-  csRAPIDCollider::CollideReset ();
+  Sys->collide_system->ResetCollisionPairs ();
   num_our_cd = 0;
-  csRAPIDCollider::SetFirstHit(false);
+  Sys->collide_system->SetOneHitOnly (false);
   int hits = 0;
   for ( ; num_sectors-- ; )
     hits += CollisionDetect (col, n[num_sectors], &test);

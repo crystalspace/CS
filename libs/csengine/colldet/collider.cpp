@@ -37,6 +37,7 @@ csPluginCollider::csPluginCollider (csObject& parent,
   csPluginCollider::collide_system = collide_system;
   collide_system->IncRef ();
   collider = collide_system->CreateCollider (mesh);
+  m_CollisionDetectionActive = true;
 }
 
 csPluginCollider::~csPluginCollider ()
@@ -67,9 +68,8 @@ bool csPluginCollider::Collide (csCollider &otherCollider,
   if (!m_CollisionDetectionActive || 
       !pCollider2->m_CollisionDetectionActive) return 0;
 
-  int num_hits;
   return collide_system->Collide (collider, pTransform1,
-  	pCollider2->collider, pTransform2, num_hits) != NULL;
+  	pCollider2->collider, pTransform2);
 }
 
 csPluginCollider *csPluginCollider::GetPluginCollider (csObject &object) 

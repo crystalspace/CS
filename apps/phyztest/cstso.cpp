@@ -4,6 +4,8 @@
 #include "csengine/cssprite.h"
 #include "csengine/sector.h"
 
+extern ctWorld phyz_world;
+
 static ctCollidingContact contact_heap[1024];  // no more than that
 static int contact_heap_index = 0;
 
@@ -146,6 +148,7 @@ collision_pair *CD_contact = NULL;
 
         // here is where the body hit should be recorded as well
         // NULL means we hit an immovable object, like a wall
+		this_contact->body_a = space_time_continuum[i]->rb;
         this_contact->body_b = NULL;
 
         this_contact->restitution = 0.75;
@@ -199,6 +202,7 @@ collision_pair *CD_contact = NULL;
               this_contact->next = space_time_continuum[i]->contact;
               space_time_continuum[i]->contact = this_contact;
               this_contact = &(contact_heap[++contact_heap_index]);
+			  this_contact->body_a = space_time_continuum[i]->rb;
               this_contact->body_b = NULL;
               this_contact->restitution = space_time_continuum[i]->contact->restitution;
               this_contact->n = space_time_continuum[i]->contact->n;
@@ -224,7 +228,8 @@ csRigidSpaceTimeObj *sto;
   for( int i = 0; i < continuum_end; i++ ){
     sto = space_time_continuum[i];
     if( sto->num_collisions > 0 && sto->contact != NULL ){
-      sto->rb->resolve_collision( sto->contact );
+//      sto->rb->resolve_collision( sto->contact );
+		phyz_world.resolve_collision( sto->contact );
     }
   }
 }

@@ -1,6 +1,20 @@
 The history order has been reversed so that new features are at the top.
 
 2-Aug-2000
+	- Changed API in iCollideSystem to make it easier to collect
+	  collisions with multiple objects.
+	- Added csPolygonSet::GetRadius() which will return the radius
+	  in object space. Also added csSprite3D::GetRadius().
+	- Converted WalkTest to use the new collision detection plugin.
+	  Seems to work ok.
+	- Fixed a bug in the iPolygonMesh embedded in csPolygonSet which
+	  caused a wrong number of polygons to be returned to iCollideSystem.
+	- Removed rapid implementation from csengine now that the plugin
+	  is working. This might break several other things though. Especially
+	  your own apps if you used CD. I think csgame is broken too. Will
+	  fix later.
+	- Michael Ewert send in a patch to make sure that phyztest
+	  compiles again. Still doesn't work completely correctly though.
 	- Removed several warnings.
 	- Samuel Humphreys did the following:
 	    - Fixed another command line processing bug.
@@ -19,6 +33,12 @@ The history order has been reversed so that new features are at the top.
             - Cleaned out x2d of commented out code
             - isprotex.h interface changed slightly (internal to proc
 	      textures).
+	- Wouter Wijngaards committed a patch to mdl2spr by Luca Pancallo:
+	  a commandline option that limits the number of frames exported.
+	  Also a bugfix.
+	- Alex Pfaffe updated the terrain engine to remove an obsolete
+	  clipbox variable, fixed plane normalization and did some
+	  optimizations.
 1-Aug-2000
 	- Norman Kramer fixed a crash scenario in OpenGL renderer: sprite is
 	  textured and has FX_ALPHA set but no vertex colors -> boom, now it
