@@ -6,19 +6,6 @@
 
 This section describes how you can load a level in your game.
 
-@subsubheading Setting up the Plugin
-
-At this moment the level loader is not yet a plugin but already
-behaves like one. For that reason you still have to do:
-
-@example
-  SCF_REGISTER_STATIC_LIBRARY (lvlload)
-@end example
-
-Somewhere in the beginning of your program (this is a declaration, put
-it outside code). This line will not be needed anymore as soon as the
-level loader becomes a real plugin.
-
 @subsubheading Getting the Level Loader Plugin
 
 To load a level you need the level loader plugin. There are two
