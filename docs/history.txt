@@ -22,6 +22,10 @@ chronological order.
 	- Jorrit removed the entry from the GL driver database that forced
 	  stencil clipping for GeForce4 Go cards. Don't know why in the
 	  past that seemed to cause massive slowdown. It no longer does that.
+	- Jorrit made stencil clipping default again for the new renderer.
+	  It does make flarge slower but that's because flarge is really
+	  not designed for good hardware (objects don't have sufficient
+	  number of triangles).
 15-Apr-2004
 	- Eric Sunshine added a blurb to the Unix and MacOS/X build
 	  instructions cautioning about potential problems caused by

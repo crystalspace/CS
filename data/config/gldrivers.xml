@@ -32,13 +32,6 @@
 	</OpenGL>
       </Video>
     </config>
-    <config name="preferstencil">
-      <Video>
-	<OpenGL>
-	  <PreferClipPlane>false</PreferClipPlane>
-	</OpenGL>
-      </Video>
-    </config>
     <config name="novbo">
       <Video>
 	<OpenGL>
@@ -171,24 +164,6 @@
 	<usecfg>texturecompression</usecfg>
       </applicable>
     </rule>
-    <rule description="ATI Cards: Prefer Stencil">
-      <conditions>
-	<regexp string="renderer" pattern="^R\(ADEON\|adeon\)" />
-      </conditions>
-      <applicable>
-	<usecfg>preferstencil</usecfg>
-      </applicable>
-    </rule>
-    <!--<rule description="GeForce MX/Go class HW: Prefer Stencil">
-      <conditions fulfill="one">
-	<regexp	string="renderer" pattern="^GeForce.*MX" />
-	<regexp	string="renderer" pattern="^GeForce.*Go" />
-      </conditions>
-      <applicable>
-	<usecfg>preferstencil</usecfg>
-      </applicable>
-    </rule>
-    -->
     <!--
     <rule description="Software GL tweaks">
       <conditions fulfill="one">
