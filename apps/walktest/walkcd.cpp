@@ -354,7 +354,7 @@ void DoGravity (csVector3& pos, csVector3& vel)
       }
 
       float p = new_pos.y-max_y+OYL+0.01;
-      if (fabs(p)<DYL-0.01)
+      if (ABS(p)<DYL-0.01)
       {
 	if (max_y != -1e10)
 	  new_pos.y = max_y-OYL-0.01;
@@ -383,6 +383,6 @@ void DoGravity (csVector3& pos, csVector3& vel)
   Sys->velocity = Sys->view->GetCamera ()->GetO2T ()*vel;
 
   if(!Sys->do_gravity)
-    Sys->velocity.y -= SIGN (Sys->velocity.y) * MIN (0.017, fabs (Sys->velocity.y));
+    Sys->velocity.y -= SIGN (Sys->velocity.y) * MIN (0.017, ABS (Sys->velocity.y));
 }
 

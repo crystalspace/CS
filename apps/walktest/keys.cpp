@@ -263,7 +263,7 @@ void WalkTest::strafe (float speed,int keep_old)
   long cur_time = Time ();
   if (!keep_old)
   {
-    bool new_pressed = fabs (speed) > 0.001;
+    bool new_pressed = ABS (speed) > 0.001;
     if (new_pressed != pressed)
     {
       pressed = new_pressed;
@@ -277,7 +277,7 @@ void WalkTest::strafe (float speed,int keep_old)
     if (pressed)
     {
       // accelerate
-      if (fabs (velocity.x) < cfg_walk_maxspeed)
+      if (ABS (velocity.x) < cfg_walk_maxspeed)
         velocity.x += strafe_speed;
     }
     else
@@ -305,7 +305,7 @@ void WalkTest::step (float speed,int keep_old)
   long cur_time = Time ();
   if (!keep_old)
   {
-    bool new_pressed = fabs (speed) > 0.001;
+    bool new_pressed = ABS (speed) > 0.001;
     if (new_pressed != pressed)
     {
       pressed = new_pressed;
@@ -319,7 +319,7 @@ void WalkTest::step (float speed,int keep_old)
     if (pressed)
     {
       // accelerate
-      if (fabs (velocity.z) < cfg_walk_maxspeed)
+      if (ABS (velocity.z) < cfg_walk_maxspeed)
         velocity.z += step_speed;
     }
     else
@@ -347,7 +347,7 @@ void WalkTest::rotate (float speed,int keep_old)
   long cur_time = Time ();
   if (!keep_old)
   {
-    bool new_pressed = fabs (speed) > 0.001;
+    bool new_pressed = ABS (speed) > 0.001;
     if (new_pressed != pressed)
     {
       pressed = new_pressed;
@@ -361,7 +361,7 @@ void WalkTest::rotate (float speed,int keep_old)
     if (pressed)
     {
       // accelerate rotation
-      if (fabs (angle_velocity.y) < cfg_rotate_maxspeed)
+      if (ABS (angle_velocity.y) < cfg_rotate_maxspeed)
         angle_velocity.y += angle_accel;
     }
     else
@@ -384,7 +384,7 @@ void WalkTest::look (float speed,int keep_old)
   static float step_speed = 0;
   if (!keep_old)
     step_speed = speed*cfg_look_accelerate;
-  if (fabs (angle.x+step_speed) <= (355.0/113.0/4))
+  if (ABS (angle.x+step_speed) <= (355.0/113.0/4))
     angle.x += step_speed;
 }
 
