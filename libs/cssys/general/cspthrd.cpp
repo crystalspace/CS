@@ -26,188 +26,150 @@
 #include <string.h>
 
 #ifdef CS_DEBUG
-#define CS_SHOW_ERROR if (lasterr) printf ("%s\n",lasterr)
+#define CS_SHOW_ERROR if (lasterr) printf ("%s\n", GetLastError ())
 #else
 #define CS_SHOW_ERROR
 #endif
 
 csRef<csMutex> csMutex::Create (bool needrecursive)
 {
-  return csPtr<csMutex>(new csPosixMutex (needrecursive));
-}
-
-csPosixMutex::csPosixMutex (bool needrecursive)
-{
-  lasterr = NULL;
-
 #ifdef CS_PTHREAD_MUTEX_RECURSIVE
   if (needrecursive)
   {
     pthread_mutexattr_t attr;
     pthread_mutexattr_init (&attr);
     pthread_mutexattr_settype (&attr, CS_PTHREAD_MUTEX_RECURSIVE);
-    pthread_mutex_init (&mutex, &attr);
+
+    return csPtr<csMutex> (new csPosixMutex (&attr));
   }
-  else
-  {
-    pthread_mutex_init (&mutex, NULL);
-  }
+  
+  return csPtr<csMutex> (new csPosixMutex (NULL));
 #else
-  (void) needrecursive;
-  count = 0;
-  owner = 0;
-  pthread_mutex_init (&mutex, NULL);
+  return csPtr<csMutex>(new csPosixMutexRecursive (NULL));
 #endif
+}
+
+csPosixMutex::csPosixMutex (pthread_mutexattr_t* attr)
+  : lasterr (0)
+{
+  pthread_mutex_init (&mutex, attr);
 }
 
 csPosixMutex::~csPosixMutex ()
 {
-  Destroy ();
-}
+  lasterr = pthread_mutex_destroy (&mutex);
 
-bool csPosixMutex::Destroy ()
-{
-  int rc = pthread_mutex_destroy (&mutex);
-  switch (rc)
-  {
-  case EBUSY:
-    lasterr = "Mutex busy";
-    break;
-  case 0:
-    lasterr = NULL;
-    break;
-  default:
-    lasterr = "Unknown error while destroying mutex";
-    break;
-  }
   CS_SHOW_ERROR;
-  return rc == 0;
 }
 
 bool csPosixMutex::LockWait()
 {
-  int rc;
-#ifdef CS_PTHREAD_MUTEX_RECURSIVE
-  rc = pthread_mutex_lock (&mutex);
-#else
-  pthread_t self = pthread_self();
-  if (owner != self)
-  {
-    rc = pthread_mutex_lock(&mutex);
-    owner = self;
-  }
-  else
-    rc = 0;
-  count += 1;
-#endif
+  lasterr = pthread_mutex_lock (&mutex);
 
-  switch (rc)
-  {
-  case EINVAL:
-    lasterr = "Mutex not initialized";
-    break;
-  case EDEADLK:
-    lasterr = "Deadlock";
-    break;
-  case 0:
-    lasterr = NULL;
-    break;
-  default:
-    lasterr = "Unknown error while locking mutex";
-    break;
-  }
   CS_SHOW_ERROR;
-  return rc == 0;
+  return lasterr == 0;
 }
 
 bool csPosixMutex::LockTry ()
 {
-  int rc;
-#ifdef CS_PTHREAD_MUTEX_RECURSIVE
-  rc = pthread_mutex_trylock (&mutex);
-#else
-  pthread_t self = pthread_self();
-  if (owner != self)
-  {
-    rc = pthread_mutex_trylock(&mutex);
-    if (rc!=0)
-      return false;
-    owner = self;                     
-  }
-  else
-    rc = 0;
-  count += 1;
-#endif
-
-  switch (rc)
-  {
-  case EINVAL:
-    lasterr = "Mutex not initialized";
-    break;
-  case EBUSY:
-    lasterr = "Mutex locked";
-    break;
-  case EDEADLK:
-    lasterr = "Deadlock";
-    break;
-  case 0:
-    lasterr = NULL;
-    break;
-  default:
-    lasterr = "Unknown error while trying to lock mutex";
-    //    printf ("rc = %d\n", rc);
-    break;
-  }
+  lasterr = pthread_mutex_trylock (&mutex);
+  
   CS_SHOW_ERROR;
-  return rc == 0;
+  return lasterr == 0;
 }
 
 bool csPosixMutex::Release ()
 {
-  int rc;
+  lasterr = pthread_mutex_unlock (&mutex);
   
-#ifdef CS_PTHREAD_MUTEX_RECURSIVE
-  rc = pthread_mutex_unlock (&mutex);
-#else
-  CS_ASSERT (pthread_self() == owner);
-  if (--count == 0)
-  {
-    owner = 0;
-    rc = pthread_mutex_unlock(&mutex);
-  }
-  else
-    rc = 0;
-#endif
- 
-  switch (rc)
-  {
-  case EINVAL:
-    lasterr = "Mutex not initialized";
-    break;
-  case EPERM:
-    lasterr = "No permission";
-    break;
-  case 0:
-    lasterr = NULL;
-    break;
-  default:
-    lasterr = "Unknown error while releasing mutex";
-    break;
-  }
   CS_SHOW_ERROR;
-  return rc == 0;
-}
-
-void csPosixMutex::Cleanup (void* arg)
-{
-  ((csPosixMutex*)arg)->Release ();
+  return lasterr == 0;
 }
 
 char const* csPosixMutex::GetLastError ()
 {
-  return lasterr;
+  switch (lasterr)
+  {
+    case EINVAL:
+      return "Mutex not initialized";
+    case EPERM:
+      return "No permission";
+    case 0:
+      return "";
+    default:
+      return "Unknown error";
+  }
 }
 
+//---------------------------------------------------------------------------
+
+#ifndef CS_PTHREAD_MUTEX_RECURSIVE
+csPosixMutexRecursive::csPosixMutexRecursive (pthread_mutexattr_t* attr)
+  : csPosixMutex(attr), count(0), owner(0)
+{
+}
+
+csPosixMutexRecursive::~csPosixMutexRecursive ()
+{
+  CS_ASSERT (count==0);
+}
+
+bool csPosixMutexRecursive::LockWait ()
+{
+  pthread_t self = pthread_self ();
+  
+  if (owner != self)
+  {
+    lasterr = pthread_mutex_lock(&mutex);  
+    owner = self;
+  }
+  else
+    lasterr = 0;
+  count += 1;
+
+  CS_SHOW_ERROR;
+}
+
+bool csPosixMutexRecursive::LockTry ()
+{
+  int rc = pthread_mutex_trylock (&mutex); 
+
+  if (rc == 0)
+  {
+    owner = self;
+    count = 1;
+    return true;
+  }
+  else if (owner = self)
+  {
+    count += 1;
+    return true;
+  }
+
+  lasterr = rc;
+  CS_SHOW_ERROR;
+  return false;
+}
+
+void csPosixMutexRecursive::Release ()
+{
+  if (owner != self)
+  {
+    lasterr = EPERM;
+    CS_SHOW_ERROR;
+    return false;
+  }
+
+  count -= 1;
+  if (count == 0)
+    lasterr = pthread_mutex_unlock (&mutex);
+  
+  CS_SHOW_ERROR;
+  return lasterr == 0;
+}
+#endif
+
+//---------------------------------------------------------------------------
 
 csRef<csSemaphore> csSemaphore::Create (uint32 value)
 {

@@ -19,6 +19,9 @@
 #ifndef __CS_POSIX_THREAD_H__
 #define __CS_POSIX_THREAD_H__
 
+#ifndef _GNU_SOURCE
+#define _GNU_SOURCE
+#endif
 #include <pthread.h>
 #include <semaphore.h>
 #include "cssys/thread.h"
@@ -72,8 +75,7 @@ class csPosixThread : public csThread
 
 class csPosixMutex : public csMutex
 {
- public:
-  csPosixMutex (bool needrecursive);
+public:
   virtual ~csPosixMutex ();
 
   virtual bool LockWait ();
@@ -81,24 +83,44 @@ class csPosixMutex : public csMutex
   virtual bool Release  ();
   virtual char const* GetLastError ();
 
- protected:
-  static void Cleanup (void* arg);
- private:
-  bool Destroy ();
- protected:
-  pthread_mutex_t mutex;
-#ifndef CS_PTHREAD_MUTEX_RECURSIVE
-  int count;
-  pthread_t owner;
-#endif
+protected:
+  friend class csMutex;
+  csPosixMutex (pthread_mutexattr_t* attr);
   
-  char const* lasterr;
+  static void Cleanup (void* arg);
+private:
+  bool Destroy ();
+
+protected:
+  pthread_mutex_t mutex;
+  
+  int lasterr;
   friend class csPosixCondition;
 };
 
+#ifndef PTHREAD_HAS_RECURSIVE_NP
+class csPosixMutexRecursive : public csPosixMutex
+{
+public:
+  virtual ~csPosixMutexRecursive ();
+
+  virtual bool LockWait ();
+  virtual bool LockTry ();
+  virtual bool Release ();
+  
+protected:
+  friend class csMutex;
+  csPosixMutexRecursive (pthread_mutexattr_t* attr);
+
+private:
+  int count;
+  pthread_t owner;  
+};
+#endif
+
 class csPosixSemaphore : public csSemaphore
 {
- public:
+public:
   csPosixSemaphore (uint32 value);
   virtual ~csPosixSemaphore ();
 
@@ -108,16 +130,17 @@ class csPosixSemaphore : public csSemaphore
   virtual uint32 Value ();
   virtual char const* GetLastError ();
 
- protected:
+protected:
   char const *lasterr;
   sem_t sem;
- private:
+
+private:
   bool Destroy ();
 };
 
 class csPosixCondition : public csCondition
 {
- public:
+public:
   csPosixCondition (uint32 conditionAttributes);
   virtual ~csPosixCondition ();
 
@@ -125,11 +148,12 @@ class csPosixCondition : public csCondition
   virtual bool Wait (csMutex*, csTicks timeout = 0);
   virtual char const* GetLastError ();
 
- private:
+private:
   bool Destroy ();
- private:
+
   pthread_cond_t cond;
   char const* lasterr;
 };
 
 #endif // __CS_POSIX_THREAD_H__
+

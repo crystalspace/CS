@@ -1091,7 +1091,11 @@ AS_IF([test $cs_cv_sys_pthread = yes],
 	[cs_cv_sys_pthread_recursive],
 	[CS_BUILD_IFELSE(
 	    [AC_LANG_PROGRAM(
-		[#include <pthread.h>],
+		[#ifndef _GNU_SOURCE
+		 #define _GNU_SOURCE
+		 #endif
+		 #include <pthread.h>
+		 ],
 		[pthread_mutexattr_t attr;
 		pthread_mutexattr_settype (&attr, CS_RECURSIVE);])],
 	    [CS_CREATE_TUPLE([-DCS_RECURSIVE=PTHREAD_MUTEX_RECURSIVE]) \
