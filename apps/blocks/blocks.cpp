@@ -1,3 +1,11 @@
+#if defined(__BORLANDC__)
+#define _NO_VCL
+#include <condefs.h>
+USEUNIT("..\..\libs\cssys\win32\exeentry.cpp");
+USEUNIT("..\..\apps\blocks\states.cpp");
+USERC(".\Blocks.rc");
+USEFILE("vctobpr.log");
+#endif // defined(__BORLANDC__)
 /*
     Copyright (C) 1998-2000 by Jorrit Tyberghein
 
@@ -1813,7 +1821,8 @@ void Blocks::DrawMenu (float menu_trans, float menu_hor_trans, int old_menu, int
   if ((ABS (menu_hor_trans) < SMALL_EPSILON) &&
   	menu_hor_old_menu)
   {
-    float x = menu_hor_trans * menu_hor_old_x_src +
+    float x
+    = menu_hor_trans * menu_hor_old_x_src +
     		(1-menu_hor_trans) * menu_hor_old_x_dst;
     float angle = 0;
     float y = 3. + sin (angle)*3.;
@@ -3024,3 +3033,5 @@ int main (int argc, char* argv[])
 
   return 0;
 }
+
+#define WinMain

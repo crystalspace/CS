@@ -44,18 +44,28 @@
 // independently for each processor type (if needed)
 extern "C" void csDetectCPU (int *Family, char Vendor[13], int *Features);
 
-#elif defined (COMP_VC) || defined (COMP_WCC)
+#elif defined (COMP_VC) || defined (COMP_WCC) || defined (COMP_BC)
 
-#if _MSC_VER < 1200     // If compiler version is below 6
-#  define cpuid __asm _emit 0x0F __asm _emit 0xA2
-#endif
 
 /**
  * Detect whenever current CPU supports MMX instructions and return its ID.
  * Memory block to hold id string should be at least 13 bytes size.
  */
+#if defined(COMP_BC)
 
-static inline void csDetectCPU (int *Family, char Vendor[13], int *Features)
+#define cpuid db 0x0f,0xa2
+
+static  // the rest of the function delaration follows below, (Borland doens't like inline asm)
+#else
+
+#if _MSC_VER < 1200     // If compiler version is below 6
+#  define cpuid __asm _emit 0x0F __asm _emit 0xA2
+#endif
+
+static inline
+#endif
+                void csDetectCPU (int *Family, char Vendor[13], int *Features)
+
 {
   __asm{
 		pushfd
@@ -79,7 +89,10 @@ static inline void csDetectCPU (int *Family, char Vendor[13], int *Features)
 		mov     eax, 1
 		cpuid
 		mov	al,100
-		mul	ah			; Compute the ??86 number
+                }
+                // Compute the ??86 number
+   __asm {
+                mul     ah
 		movzx	eax,ax
 		add	eax,86
 		jmp	short setVal

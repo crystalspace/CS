@@ -100,7 +100,7 @@ MEM=$(MEM.$(MODE))
 
 # Set to 1 to use Mesa instead of "real" OpenGL.  You can define MESA_PATH
 # variable in environment to point to MesaGL base path
-USE_MESA=1
+USE_MESA=0
 
 # The tool used to build dependencies. The possible values are:
 # none  - Cannot build dependencies on this platform

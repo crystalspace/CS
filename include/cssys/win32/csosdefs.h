@@ -19,7 +19,6 @@
 
 #ifndef __CSOSDEFS_H__
 #define __CSOSDEFS_H__
-
 // For GUI applications, use "csMain" instead of "main".
 // For console applications, use regular "main".
 #ifndef CONSOLE

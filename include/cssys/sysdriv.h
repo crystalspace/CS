@@ -19,6 +19,7 @@
 #ifndef __SYSDRIV_H__
 #define __SYSDRIV_H__
 
+
 // Include the system dependent driver classes.
 
 #if defined(OS_NEXT)
@@ -50,5 +51,4 @@
 #if defined(OS_BE)
 #  include "cssys/be/csbe.h"
 #endif
-
 #endif //SYSDRIV_H

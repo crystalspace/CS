@@ -155,7 +155,6 @@ public:
   {
     if (Size != iStr.Length ())
       return false;
-
     return (strncasecmp (Data, iStr.GetData (), Size) == 0);
   }
 
