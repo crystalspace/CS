@@ -64,7 +64,7 @@ csPtr<iImage> csDDSImageIO::Load (uint8* buffer, uint32 size, int format)
   if (!loader->IsDDS())                       
   {
     delete loader;
-    return false;
+    return NULL;
   }
 
   csDDSImageFile* image = new csDDSImageFile(format);
