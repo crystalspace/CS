@@ -41,9 +41,10 @@ csConfigAccess::~csConfigAccess()
   if (object_reg)
   {
     iConfigManager* cfgmgr = CS_QUERY_REGISTRY (object_reg, iConfigManager);
-	int i;
-    for (i = 0; i < ConfigFiles.Length (); i++)
-      cfgmgr->RemoveDomain ((iConfigFile *)ConfigFiles.Get (i));
+    int i;
+    if (cfgmgr)
+      for (i = 0; i < ConfigFiles.Length (); i++)
+	cfgmgr->RemoveDomain ((iConfigFile *)ConfigFiles.Get (i));
   }
 }
 
