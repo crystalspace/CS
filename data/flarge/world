@@ -1,4 +1,23 @@
 <world>
+    <plugins>
+        <plugin name="bezier">crystalspace.mesh.loader.bezier</plugin>
+        <plugin name="bezierFact">crystalspace.mesh.loader.factory.bezier</plugin>
+        <plugin name="thing">crystalspace.mesh.loader.thing</plugin>
+        <plugin name="thingFact">crystalspace.mesh.loader.factory.thing</plugin>
+        <plugin name="spr3dFact">crystalspace.mesh.loader.factory.sprite.3d</plugin>
+        <plugin name="spr3d">crystalspace.mesh.loader.sprite.3d</plugin>
+        <plugin name="spr2dFact">crystalspace.mesh.loader.factory.sprite.2d</plugin>
+        <plugin name="spr2d">crystalspace.mesh.loader.sprite.2d</plugin>
+        <plugin name="treeFact">crystalspace.mesh.loader.factory.genmesh.tree</plugin>
+        <plugin name="meshFact">crystalspace.mesh.loader.factory.genmesh</plugin>
+        <plugin name="mesh">crystalspace.mesh.loader.genmesh</plugin>
+        <plugin name="metafact">crystalspace.mesh.loader.factory.metaball</plugin>
+        <plugin name="metablob">crystalspace.mesh.loader.metaball</plugin>
+        <plugin name="emitFact">crystalspace.mesh.loader.factory.emit</plugin>
+        <plugin name="emit">crystalspace.mesh.loader.emit</plugin>
+        <plugin name="dots">crystalspace.proctex.loader.dots</plugin>
+        <plugin name="fire">crystalspace.proctex.loader.fire</plugin>
+    </plugins>
     <textures>
         <texture name="tree">
             <file>/lib/stdtex/tree.gif</file>
@@ -83,13 +102,13 @@
             <type>fire</type>
         </proctex>
         <proctex name="water">
-            <type>water</type>
+            <type>crystalspace.proctex.loader.water</type>
         </proctex>
         <proctex name="dots">
             <type>dots</type>
         </proctex>
         <proctex name="plasma">
-            <type>plasma</type>
+            <type>crystalspace.proctex.loader.plasma</type>
         </proctex>
         <texture name="billboard">
             <file>/lib/std/cslogods.png</file>
@@ -247,23 +266,6 @@
             <sort>BACK2FRONT</sort>
         </priority>
     </renderpriorities>
-    <plugins>
-        <plugin name="bezier">crystalspace.mesh.loader.bezier</plugin>
-        <plugin name="bezierFact">crystalspace.mesh.loader.factory.bezier</plugin>
-        <plugin name="thing">crystalspace.mesh.loader.thing</plugin>
-        <plugin name="thingFact">crystalspace.mesh.loader.factory.thing</plugin>
-        <plugin name="spr3dFact">crystalspace.mesh.loader.factory.sprite.3d</plugin>
-        <plugin name="spr3d">crystalspace.mesh.loader.sprite.3d</plugin>
-        <plugin name="spr2dFact">crystalspace.mesh.loader.factory.sprite.2d</plugin>
-        <plugin name="spr2d">crystalspace.mesh.loader.sprite.2d</plugin>
-        <plugin name="treeFact">crystalspace.mesh.loader.factory.genmesh.tree</plugin>
-        <plugin name="meshFact">crystalspace.mesh.loader.factory.genmesh</plugin>
-        <plugin name="mesh">crystalspace.mesh.loader.genmesh</plugin>
-        <plugin name="metafact">crystalspace.mesh.loader.factory.metaball</plugin>
-        <plugin name="metablob">crystalspace.mesh.loader.metaball</plugin>
-        <plugin name="emitFact">crystalspace.mesh.loader.factory.emit</plugin>
-        <plugin name="emit">crystalspace.mesh.loader.emit</plugin>
-    </plugins>
     <start>
         <sector>room</sector>
         <position x="0" y="0" z="0" />

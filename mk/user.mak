@@ -100,6 +100,7 @@ PLUGINS += culling/dynavis
 PLUGINS += culling/frustvis
 PLUGINS += csparser
 PLUGINS += csparser/services
+PLUGINS += proctex/standard
 PLUGINS += cssaver
 PLUGINS += sequence
 PLUGINS += engseq

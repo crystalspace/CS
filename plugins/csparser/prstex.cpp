@@ -19,8 +19,10 @@
 
 #include "cssysdef.h"
 #include "qint.h"
+#include "ivideo/graph3d.h"
 #include "csloader.h"
 #include "imap/ldrctxt.h"
+#include "imap/reader.h"
 #include "csutil/scanstr.h"
 #include "iutil/document.h"
 #include "cstool/proctex.h"
@@ -29,7 +31,6 @@
 #include "cstool/prplasma.h"
 #include "cstool/prwater.h"
 #include "csgfx/rgbpixel.h"
-#include "ivideo/graph3d.h"
 #include "ivideo/texture.h"
 #include "ivideo/material.h"
 #include "iengine/engine.h"
@@ -37,6 +38,7 @@
 #include "iengine/material.h"
 #include "iengine/region.h"
 #include "iutil/objreg.h"
+#include "ivaria/reporter.h"
 
 #ifdef CS_USE_NEW_RENDERER
 #include "ivideo/shader/shader.h"
@@ -231,7 +233,11 @@ iTextureWrapper* csLoader::ParseProcTex (iDocumentNode* node)
 {
   if (!Engine) return NULL;
 
+  static bool deprecated_warned = false;
+
   csProcTexture* pt = NULL;
+  iLoaderPlugin* plug = NULL;
+  iBinaryLoaderPlugin* binplug = NULL;
 
   csRef<iDocumentNodeIterator> it = node->GetNodes ();
   while (it->HasNext ())
@@ -243,7 +249,7 @@ iTextureWrapper* csLoader::ParseProcTex (iDocumentNode* node)
     switch (id)
     {
       case XMLTOKEN_TYPE:
-        if (pt)
+        if (pt || plug)
 	{
 	  SyntaxService->ReportError (
 	      "crystalspace.maploader.parse.proctex",
@@ -253,43 +259,76 @@ iTextureWrapper* csLoader::ParseProcTex (iDocumentNode* node)
 	else
 	{
 	  const char* type = child->GetContentsValue ();
-          if (!strcasecmp (type, "dots"))
-	    pt = new csProcDots ();
-	  else if (!strcasecmp (type, "plasma"))
-	    pt = new csProcPlasma ();
-	  else if (!strcasecmp (type, "water"))
-	    pt = new csProcWater ();
-	  else if (!strcasecmp (type, "fire"))
-	    pt = new csProcFire ();
-	  else
+
+	  if (!loaded_plugins.FindPlugin (type, plug, binplug))
 	  {
-	    SyntaxService->ReportError (
-	      "crystalspace.maploader.parse.proctex",
-	      child, "Unknown 'type' '%s' of proctex!", type);
-	    return NULL;
+	    if (!strcasecmp (type, "dots"))
+	      pt = new csProcDots ();
+	    else if (!strcasecmp (type, "plasma"))
+	      pt = new csProcPlasma ();
+	    else if (!strcasecmp (type, "water"))
+	      pt = new csProcWater ();
+	    else if (!strcasecmp (type, "fire"))
+	      pt = new csProcFire ();
+	    else
+	    {
+	      SyntaxService->ReportError (
+		"crystalspace.maploader.parse.proctex",
+		child, "Unknown 'type' '%s' of proctex!", type);
+	      return NULL;
+	    }
+	    if (!deprecated_warned)
+	    {
+	      SyntaxService->Report (
+		"crystalspace.maploader.parse.proctex",
+		CS_REPORTER_SEVERITY_NOTIFY,
+		node,
+		"Deprecated syntax used for proctex! "
+		"Specify a plugin classid or map the old types to their "
+		"plugin counterparts in the 'plugins' node.");
+	      deprecated_warned = true;
+	    }
 	  }
 	}
         break;
+      case XMLTOKEN_PARAMS:
+	break;
       default:
         SyntaxService->ReportBadToken (child);
 	return NULL;
     }
   }
 
-  if (pt == NULL)
+  if (plug)
   {
-    SyntaxService->ReportError (
-	      "crystalspace.maploader.parse.proctex",
-	      node, "'type' of proctex not given!");
-    return NULL;
+    /*
+      @@@ The <proctex> node is passed to the loader plugin.
+      Really, there should only used something like a <params> block
+      here. However, th PT loader needs the name, which is an attrib
+      of the <proctex> tag.
+     */
+    csRef<iBase> b = plug->Parse (node,
+      GetLoaderContext (), NULL);
+    csRef<iTextureWrapper> tw = SCF_QUERY_INTERFACE (b, iTextureWrapper);
+    return tw;
   }
+  else
+  {
+    if (pt == NULL)
+    {
+      SyntaxService->ReportError (
+		"crystalspace.maploader.parse.proctex",
+		node, "'type' of proctex not given!");
+      return NULL;
+    }
 
-  iMaterialWrapper *mw = pt->Initialize (object_reg, Engine,
-	 G3D ? G3D->GetTextureManager () : NULL,
-	 node->GetAttributeValue ("name"));
-  mw->QueryObject ()->ObjAdd (pt);
-  pt->DecRef ();
-  return pt->GetTextureWrapper ();
+    iMaterialWrapper *mw = pt->Initialize (object_reg, Engine,
+	  G3D ? G3D->GetTextureManager () : NULL,
+	  node->GetAttributeValue ("name"));
+    mw->QueryObject ()->ObjAdd (pt);
+    pt->DecRef ();
+    return pt->GetTextureWrapper ();
+  }
 }
 
 iMaterialWrapper* csLoader::ParseMaterial (iDocumentNode* node,

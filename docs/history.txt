@@ -22,6 +22,9 @@ The history order is reversed so that new features are at the top.
 	- Fixed a memory leak in AWS reported by Gersh.
 	- Fixed case in awsmled where 0 chars will be deleted from an empty
 	  string, which led to an assertion failure.
+	- res changed the proctex loader to support plugins. Specifying a
+	  proctex the 'old' style will result in a notification.
+	- res wrote a plugin wrapping the four built-in proctexes.
 6-May-2003
 	- Eric Sunshine made the following changes:
 	    - Fixed Linux joystick makefile so that makefile target and
