@@ -1,5 +1,10 @@
 The history order is reversed so that new features are at the top.
 
+16-Sep-2002
+	- Fixed a DecRef() problem with the g2d plugin (ddraw). Please
+	  people! When replacing a normal pointer with a csRef you
+	  must ALSO take care to remove the DecRef()!!! Don't blindly
+	  fix things so they compile.
 15-Sep-2002
 	- Several csPtr/csRef related changes.
 	- Fixed a potential crash bug in AWS. An SCF_DEC_REF
