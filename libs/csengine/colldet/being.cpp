@@ -240,7 +240,7 @@ int csBeing::CollisionDetect( void )
   csSector *all [MAXSECTORSOCCUPIED];
   int scount = 0;
 
-  scount = FindSectors (transform->GetO2TTranslation (), GetBbox()->d, sector, all);
+  scount = FindSectors (transform->GetO2TTranslation (), GetBbox()->GetRadius(), sector, all);
 
   // If we were to fall from our new position, which sector would our feet end up in?
   csTransform cdtnew (transform->GetO2T (), transform->GetO2TTranslation ());
@@ -267,7 +267,7 @@ int csBeing::CollisionDetect( void )
     climbing = false;
                 
     // We are on something solid, remember what the ground was.
-    CDTriangle *tr1 = 0, *tr2 = 0;
+    csCdTriangle *tr1 = 0, *tr2 = 0;
     _ground = FindCollision(&tr1,&tr2);
     // TODO: Check tr2 and what its normal is w.r.t. gravity,
     // If the angle more than 45* we should slip/bounce.

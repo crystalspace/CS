@@ -27,16 +27,37 @@
 #include "csengine/camera.h"
 #include "csengine/sector.h"
 
-struct CDTriangle
+class csCollider;
+class csCdModel;
+
+/// A triangle, to be used in collision detection
+struct csCdTriangle
 {
+  /**
+    * an Identifier for the triangle. This will help to identify the triangle,
+    * if it is returned to a higher level later on. This id is assigned in 
+    * csCdModel::AddTriangle()
+    */
   int id;
+  
+  /// The three edges of the triangle
   csVector3 p1, p2, p3;
 };
 
-//
-class BBox
+/**
+  * A bounding box, used in collision detection. Any bounding box, can either be a 
+  * node or a leaf. A leaf will contain a single polygon, while a node contains
+  * pointers to two other bounding boxes. This means, that this class in fact
+  * represents a tree of hierarchical bounding boxes.
+  */
+class csCdBBox
 {
-public:
+  friend class csCdModel;
+  friend class csCollider;
+
+protected:
+  /// Pointer to the contained triangle. May be NULL, if the BBox is a node.
+  csCdTriangle* m_pTriangle;
 
   // placement in parent's space
   // box to parent space: x_m = pR*x_b + pT
@@ -46,35 +67,56 @@ public:
 
   // this is "radius", that is, half the measure of a side length
   csVector3 d;
-  // points to but does not "own".  
-  BBox *P;
-  BBox *N;
 
-  CDTriangle *trp;
+  /**
+    * Pointers to child boxes. These pointers are only for reference, they
+    * do not indicate ownership. (these boxes are deleted elsewhere)
+    * (Formerly called P(m_pChild[0]) and N(m_pChild[1])
+    */
+  csCdBBox* m_pChild[2];
 
-  BBox () : pT (0, 0, 0), d (0, 0, 0) { }
-
-  int leaf ()
-  { return (!P && !N); } 
-  float size ()
-  { return d.x; } 
-
-  bool split_recurse(int *t, int n, BBox *&box_pool, CDTriangle *tris);
-  // specialized for leaf nodes
-  bool split_recurse(int *t, CDTriangle *tris);
-  //
-  static bool tri_contact (BBox *b1, BBox *b2);
-};
-
-class CD_model
-{
 public:
 
+  /// Construct a default bounding box
+  csCdBBox () : pT (0, 0, 0), d (0, 0, 0) { }
+
+  /// returns the "Radius", that is, half the measure of each side's length
+  const csVector3& GetRadius() {return d;}
+
+  /**
+    * returns true, if this is a leaf bounding box, Maybe, this would be 
+    * faster and more secure, if we would return true, if m_pTriangle is set.
+    * Maybe I will change that later. - thieber 13.03.2000 -
+    */
+  bool IsLeaf() { return (!m_pChild[0] && !m_pChild[1]); } 
+  
+  /**
+    * return the size of the bounding box. Why this returns d.x and not d.y or
+    * d.z is not obious to me. - thieber 13.03.2000 -
+    */
+  float GetSize() { return d.x; } 
+
+  bool split_recurse(int *t, int n, csCdBBox *&box_pool, csCdTriangle *tris);
+  // specialized for leaf nodes
+  bool split_recurse(int *t, csCdTriangle *tris);
+  
+  /**
+    * Checks if two Bounding Boxes do collide. Thes routine assumes, that
+    * each Bounding Box contains _exactly_ one Triangle in m_pTriangle!
+    */
+  static bool tri_contact (csCdBBox* pBox1, csCdBBox* pBox2);
+};
+
+class csCdModel
+{
+  friend class csCollider;
+protected:
+
   // these are only for internal use
-  BBox *b;
+  csCdBBox *b;
   int num_boxes_alloced;
 
-  CDTriangle *tris;
+  csCdTriangle *tris;
   int num_tris;
   int num_tris_alloced;
   
@@ -83,10 +125,10 @@ public:
 public:
 
   /// Create a model object given number of triangles
-  CD_model (int n_triangles);
+  csCdModel (int n_triangles);
 
   /// Free the memory allocated for this model
-  ~CD_model ();
+  ~csCdModel ();
 
   /// Add a triangle to the model
   bool AddTriangle (int id, const csVector3 &p1, const csVector3 &p2, const csVector3 &p3);
@@ -101,8 +143,8 @@ public:
 // this is for the client
 struct collision_pair
 {
-  CDTriangle *tr1;
-  CDTriangle *tr2;
+  csCdTriangle *tr1;
+  csCdTriangle *tr2;
 };
 
 /****************************************************************************/
@@ -113,7 +155,7 @@ class csCollider
   /// If true this is an active collision object.
   int _cd_state;
   /// The internal collision object.
-  CD_model *_rm;
+  csCdModel* _rm;
 
 public:
   typedef enum { POLYGONSET, SPRITE3D } ColliderType;
@@ -160,7 +202,7 @@ public:
   void DestroyBbox ();
 
   /// Recursively test collisions of bounding boxes.
-  static int CollideRecursive (BBox *b1, BBox *b2, csMatrix3 R, csVector3 T);
+  static int CollideRecursive (csCdBBox *b1, csCdBBox *b2, csMatrix3 R, csVector3 T);
 
   /// Reset the collision hits vector.
   static void CollideReset ();
@@ -176,10 +218,10 @@ public:
    * collision involving this object occurred.
    * Optionally return the triangles involved in the collision.
    */
-  csCollider* FindCollision (CDTriangle **tr1 = 0, CDTriangle **tr2 = 0);
+  csCollider* FindCollision (csCdTriangle **tr1 = 0, csCdTriangle **tr2 = 0);
 
   /// Get top level bounding box.
-  BBox * GetBbox(void) { return _rm->b; }
+  csCdBBox * GetBbox(void) { return _rm->b; }
 
   /// Query the array with collisions (and their count)
   static collision_pair *GetCollisions ();

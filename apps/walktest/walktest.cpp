@@ -600,134 +600,12 @@ void WalkTest::DrawFrame (time_t elapsed_time, time_t current_time)
 int cnt = 1;
 time_t time0 = (time_t)-1;
 
-#define EPS 0.00001
-
-int FindIntersection(csVector3 *tri1,csVector3 *tri2,csVector3 line[2])
-{
-  int i,j;
-  csVector3 v1[3],v2[3];
-
-  for(i=0;i<3;i++)
-  {
-    j=(i+1)%3;
-    v1[i]=tri1[j]-tri1[i];
-    v2[i]=tri2[j]-tri2[i];
-  }
-
-  csVector3 n1=v1[0]%v1[1];
-  csVector3 n2=v2[0]%v2[1];
-
-  float d1=-n1*tri1[0],d2=-n2*tri2[0];
-
-  csVector3 d=n1%n2;
-
-  int index=0;
-  float max=fabs(d.x);
-  if(fabs(d.y)>max)
-    max=fabs(d.y), index=1;
-  if(fabs(d.z)>max)
-    max=fabs(d.z), index=2;
-
-  int m1=0,m2=0,n=0;
-  float t1[3],t2[3];
-  csVector3 p1[2],p2[2];
-  p1[0].Set (0, 0, 0);
-  p1[1].Set (0, 0, 0);
-  p2[0].Set (0, 0, 0);
-  p2[1].Set (0, 0, 0);
-  float isect1[2],isect2[2],isect[4];
-  csVector3 *idx[4];
-
-  for(i=0;i<3;i++)
-  {
-    float div1=n2*v1[i],div2=n1*v2[i];
-    float pr1=-(n2*tri1[i]+d2),pr2=-(n1*tri2[i]+d1);
-
-    if(fabs(div1)<EPS)
-    {
-      if(fabs(pr1)<EPS)
-      {
-	// line is in the plane of intersection
-	t1[i]=0;
-      }
-      else
-      {
-	// line is parallel to the plane of
-	// intersection, so we don't need it ;)
-	t1[i]=15.0;
-      }
-    }
-    else
-      t1[i]=pr1/div1;
-
-    if(fabs(div2)<EPS)
-    {
-      if(fabs(pr2)<EPS)
-      {
-	// line is in the plane of intersection
-	t2[i]=0;
-      }
-      else
-      {
-	// line is parallel to the plane of
-	// intersection, so we don't need it ;)
-	t2[i]=15.0;
-      }
-    }
-    else
-      t2[i]=pr2/div2;
-
-    if(t1[i]>=0.0&&t1[i]<=1.0&&m1!=2)
-    {
-      p1[m1]=tri1[i]+v1[i]*t1[i];
-      isect1[m1]=p1[m1][index];
-      idx[n]=p1+m1;
-      isect[n++]=isect1[m1++];
-    }
-    if(t2[i]>=0.0&&t2[i]<=1.0&&m2!=2)
-    {
-      p2[m2]=tri2[i]+v2[i]*t2[i];
-      isect2[m2]=p2[m2][index];
-      idx[n]=p2+m2;
-      isect[n++]=isect2[m2++];
-    }
-  }
-
-  if(n<4)
-  {
-    // triangles are not intersecting
-    return 0;
-  }
-
-  for(i=0;i<4;i++)
-  {
-    for(j=i+1;j<4;j++)
-    {
-      if(isect[i]>isect[j])
-      {
-	csVector3 *p=idx[j];
-	idx[j]=idx[i];
-	idx[i]=p;
-
-	float _=isect[i];
-	isect[i]=isect[j];
-	isect[j]=_;
-      }
-    }
-  }
-
-  line[0]=*idx[1];
-  line[1]=*idx[2];
-
-  return 1;
-}
-
-int FindIntersection(CDTriangle *t1,CDTriangle *t2,csVector3 line[2])
+int FindIntersection(csCdTriangle *t1,csCdTriangle *t2,csVector3 line[2])
 {
   csVector3 tri1[3]; tri1[0]=t1->p1; tri1[1]=t1->p2; tri1[2]=t1->p3;
   csVector3 tri2[3]; tri2[0]=t2->p1; tri2[1]=t2->p2; tri2[2]=t2->p3;
 
-  return FindIntersection(tri1,tri2,line);
+  return csMath3::FindIntersection(tri1,tri2,line);
 }
 
 // Define the player bounding box.
@@ -931,7 +809,7 @@ void DoGravity (csVector3& pos, csVector3& vel)
   csOrthoTransform test (m, new_pos);
 
   csSector *n[MAXSECTORSOCCUPIED];
-  int num_sectors = FindSectors (new_pos, 4*Sys->body->GetBbox()->d,
+  int num_sectors = FindSectors (new_pos, 4*Sys->body->GetBbox()->GetRadius(),
     Sys->view->GetCamera()->GetSector(), n);
 
   num_our_cd = 0;
@@ -945,7 +823,7 @@ void DoGravity (csVector3& pos, csVector3& vel)
 
   for (int j=0 ; j<hits ; j++)
   {
-    CDTriangle *wall = our_cd_contact[j].tr2;
+    csCdTriangle *wall = our_cd_contact[j].tr2;
     csVector3 n = ((wall->p3-wall->p2)%(wall->p2-wall->p1)).Unit();
     if (n*vel<0)
       continue;
@@ -956,7 +834,8 @@ void DoGravity (csVector3& pos, csVector3& vel)
   new_pos = pos+vel;
   test = csOrthoTransform (csMatrix3(), new_pos);
 
-  num_sectors = FindSectors (new_pos, 4*Sys->legs->GetBbox()->d, Sys->view->GetCamera()->GetSector(), n);
+  num_sectors = FindSectors (new_pos, 4*Sys->legs->GetBbox()->GetRadius(), 
+                             Sys->view->GetCamera()->GetSector(), n);
 
   num_our_cd = 0;
   csCollider::firstHit = false;
@@ -980,8 +859,8 @@ void DoGravity (csVector3& pos, csVector3& vel)
 
     for (int j=0 ; j<hit ; j++)
     {
-      CDTriangle first = *our_cd_contact[j].tr1;
-      CDTriangle second = *our_cd_contact[j].tr2;
+      csCdTriangle first  = *our_cd_contact[j].tr1;
+      csCdTriangle second = *our_cd_contact[j].tr2;
 
       csVector3 n=((second.p3-second.p2)%(second.p2-second.p1)).Unit ();
 

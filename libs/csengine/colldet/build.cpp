@@ -27,17 +27,17 @@
  */
 int SortedEigen (csMatrix3& M, csMatrix3& evecs);
 
-CD_model::CD_model (int n_triangles)
+csCdModel::csCdModel (int n_triangles)
 {
   b = NULL;
   num_boxes_alloced = 0;
 
-  CHK (tris = new CDTriangle [n_triangles]);
+  CHK (tris = new csCdTriangle [n_triangles]);
   num_tris = 0;
   num_tris_alloced = tris ? n_triangles : 0;
 }
 
-CD_model::~CD_model ()
+csCdModel::~csCdModel ()
 {
   // the boxes pointed to should be deleted.
   CHK (delete [] b);
@@ -45,7 +45,7 @@ CD_model::~CD_model ()
   CHK (delete [] tris);
 }
 
-bool CD_model::AddTriangle (int id, const csVector3 &p1, const csVector3 &p2,
+bool csCdModel::AddTriangle (int id, const csVector3 &p1, const csVector3 &p2,
   const csVector3 &p3)
 {
   // first make sure that we haven't filled up our allocation.
@@ -73,14 +73,14 @@ bool CD_model::AddTriangle (int id, const csVector3 &p1, const csVector3 &p2,
 
   <or>, <ax>, and <mp> are model space coordinates.
 */
-bool CD_model::build_hierarchy ()
+bool csCdModel::build_hierarchy ()
 {
   // Delete the boxes if they're already allocated
   CHK (delete [] b);
 
   // allocate the boxes and set the box list globals
   num_boxes_alloced = num_tris * 2;
-  CHK (b = new BBox [num_boxes_alloced]);
+  CHK (b = new csCdBBox [num_boxes_alloced]);
   if (!b) return false;
   
   // Determine initial orientation, mean point, and splitting axis.
@@ -155,7 +155,7 @@ bool CD_model::build_hierarchy ()
     t [i] = i;
 
   // do the build
-  BBox *pool = b + 1;
+  csCdBBox *pool = b + 1;
   if (!b [0].split_recurse (t, num_tris, pool, tris))
   {
     CHK (delete [] b); b = NULL;
@@ -173,7 +173,7 @@ bool CD_model::build_hierarchy ()
   return true;
 }
 
-bool BBox::split_recurse (int *t, int n, BBox *&box_pool, CDTriangle *tris)
+bool csCdBBox::split_recurse (int *t, int n, csCdBBox *&box_pool, csCdTriangle *tris)
 {
   // The orientation for the parent box is already assigned to this->pR.
   // The axis along which to split will be column 0 of this->pR.
@@ -195,7 +195,7 @@ bool BBox::split_recurse (int *t, int n, BBox *&box_pool, CDTriangle *tris)
   csMatrix3 C;
 
   int in;
-  CDTriangle *ptr;
+  csCdTriangle *ptr;
   int i;
   float axdmp;
   int n1 = 0;  // The number of tris in group 1.  
@@ -281,8 +281,8 @@ bool BBox::split_recurse (int *t, int n, BBox *&box_pool, CDTriangle *tris)
   d = (maxval - minval ) * 0.5;
 
   // allocate new boxes
-  P = box_pool++;
-  N = box_pool++;
+  m_pChild[0] = box_pool++;
+  m_pChild[1] = box_pool++;
 
   // Compute the orientations for the child boxes (eigenvectors of
   // covariance matrix).  Select the direction of maximum spread to be
@@ -290,7 +290,7 @@ bool BBox::split_recurse (int *t, int n, BBox *&box_pool, CDTriangle *tris)
   csMatrix3 tR;
   if (n1 > 1)
   {
-    _M1.mean (&P->pT);
+    _M1.mean (&m_pChild[0]->pT);
     _M1.covariance (&C);
 
     int nn = SortedEigen(C, tR);
@@ -300,24 +300,24 @@ bool BBox::split_recurse (int *t, int n, BBox *&box_pool, CDTriangle *tris)
       tR.Identity ();
     }
 
-    P->pR = tR;
-    if (!P->split_recurse (t, n1, box_pool, tris))
+    m_pChild[0]->pR = tR;
+    if (!m_pChild[0]->split_recurse (t, n1, box_pool, tris))
       return false;
   }
   else
   {
-    if (!P->split_recurse (t, tris))
+    if (!m_pChild[0]->split_recurse (t, tris))
       return false;
   }
 
-  C = P->pR;
-  P->pR = pR.GetTranspose () * C;
-  c = P->pT - pT;
-  P->pT = pR.GetTranspose () * c;
+  C = m_pChild[0]->pR;
+  m_pChild[0]->pR = pR.GetTranspose () * C;
+  c = m_pChild[0]->pT - pT;
+  m_pChild[0]->pT = pR.GetTranspose () * c;
 
   if ((n-n1) > 1)
   {      
-    _M2.mean (&N->pT);
+    _M2.mean (&m_pChild[1]->pT);
     _M2.covariance (&C);
     int nn = SortedEigen(C, tR);
 
@@ -327,27 +327,27 @@ bool BBox::split_recurse (int *t, int n, BBox *&box_pool, CDTriangle *tris)
       tR.Identity ();
     }
       
-    N->pR = tR;
-    if (!N->split_recurse (t + n1, n - n1, box_pool, tris))
+    m_pChild[1]->pR = tR;
+    if (!m_pChild[1]->split_recurse (t + n1, n - n1, box_pool, tris))
       return false;
   }
   else
   {
-    if (!N->split_recurse (t + n1, tris))
+    if (!m_pChild[1]->split_recurse (t + n1, tris))
       return false;
   }
 
-  C = N->pR;
-  N->pR = pR.GetTranspose () * C;
+  C = m_pChild[1]->pR;
+  m_pChild[1]->pR = pR.GetTranspose () * C;
  
-  c = N->pT - pT;
+  c = m_pChild[1]->pT - pT;
 
-  N->pT = pR.GetTranspose () * c;
+  m_pChild[1]->pT = pR.GetTranspose () * c;
 
   return true;
 }
 
-bool BBox::split_recurse (int *t, CDTriangle *tris)
+bool csCdBBox::split_recurse (int *t, csCdTriangle *tris)
 {
   // For a single triangle, orientation is easily determined.
   // The major axis is parallel to the longest edge.
@@ -356,8 +356,10 @@ bool BBox::split_recurse (int *t, CDTriangle *tris)
 
   // this->pR, this->d, and this->pT are set herein.
 
-  P = N = 0;
-  CDTriangle *ptr = tris + t [0];
+  m_pChild[0] = NULL;
+  m_pChild[1] = NULL;
+
+  csCdTriangle *ptr = tris + t [0];
 
   // Find the major axis: parallel to the longest edge.
   // First compute the squared-lengths of each edge
@@ -440,7 +442,7 @@ bool BBox::split_recurse (int *t, CDTriangle *tris)
   d = (maxval - minval) * 0.5;
 
   // Assign the one triangle to this box
-  trp = ptr;
+  m_pTriangle = ptr;
 
   return true;
 }

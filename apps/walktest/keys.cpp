@@ -578,7 +578,7 @@ void move_ghost (csSprite3D* spr)
 
   // Find all sectors that the ghost will occupy on the new position.
   csSector *n[MAXSECTORSOCCUPIED];
-  int num_sectors = FindSectors (new_pos, 4*col->GetBbox()->d, first_sector, n);
+  int num_sectors = FindSectors (new_pos, 4*col->GetBbox()->GetRadius(), first_sector, n);
 
   // Start collision detection.
   csCollider::CollideReset ();
@@ -591,7 +591,7 @@ void move_ghost (csSprite3D* spr)
   // Change our velocity according to the collisions.
   for (int j=0 ; j<hits ; j++)
   {
-    CDTriangle *wall = our_cd_contact[j].tr2;
+    csCdTriangle *wall = our_cd_contact[j].tr2;
     csVector3 n = ((wall->p3-wall->p2)%(wall->p2-wall->p1)).Unit();
     if (n*vel<0)
       continue;

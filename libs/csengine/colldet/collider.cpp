@@ -67,7 +67,7 @@ csCollider::csCollider (csPolygonSet *ps)
 
   if (tri_count)
   {
-    CHK (_rm = new CD_model (tri_count));
+    CHK (_rm = new csCdModel (tri_count));
     if (!_rm)
       return;
     
@@ -108,7 +108,7 @@ csCollider::csCollider (csSprite3D *sp)
   // It correctly takes care of optional skeletons.
   csVector3* object_vertices = _sp->GetObjectVerts (cf);
 
-  CHK (_rm = new CD_model (mesh->GetNumTriangles ()));
+  CHK (_rm = new csCdModel (mesh->GetNumTriangles ()));
   if (!_rm)
      return;  // Error
   _rm->b = 0;
@@ -164,8 +164,8 @@ int csCollider::CollidePair (csCollider *p1, csCollider *p2, csTransform *t1, cs
   //call the low level collision detection routine.
 //  csCollider::firstHit = true;
 
-  BBox *b1 = p1->_rm->b;
-  BBox *b2 = p2->_rm->b;
+  csCdBBox *b1 = p1->_rm->b;
+  csCdBBox *b2 = p2->_rm->b;
 
   csMatrix3 R1, R2;
   csVector3 T1 (0, 0, 0), T2 (0, 0, 0);
@@ -619,7 +619,7 @@ bool tri_contact (csVector3 P1, csVector3 P2, csVector3 P3,
 }
 */
 
-int add_collision (CDTriangle *tr1, CDTriangle *tr2)
+int add_collision (csCdTriangle *tr1, csCdTriangle *tr2)
 {
   int limit = CD_contact.GetLimit ();
   if (csCollider::numHits >= limit)
@@ -764,7 +764,7 @@ int obb_disjoint (csMatrix3 B, csVector3 T, csVector3 a, csVector3 b)
 }
 
 
-int csCollider::CollideRecursive (BBox *b1, BBox *b2, csMatrix3 R, csVector3 T)
+int csCollider::CollideRecursive (csCdBBox *b1, csCdBBox *b2, csMatrix3 R, csVector3 T)
 {
   int rc;      // return codes
   if (csCollider::firstHit && (csCollider::numHits > 0))
@@ -779,7 +779,7 @@ int csCollider::CollideRecursive (BBox *b1, BBox *b2, csMatrix3 R, csVector3 T)
     return false;  // stop processing this test, go to top of loop
 
   // contact between boxes
-  if (b1->leaf () && b2->leaf ())
+  if (b1->IsLeaf() && b2->IsLeaf())
   {
     // it is a leaf pair - compare the polygons therein
     // tri_contact uses the model-to-model transforms stored in
@@ -787,7 +787,7 @@ int csCollider::CollideRecursive (BBox *b1, BBox *b2, csMatrix3 R, csVector3 T)
 
     // this will pass along any OUT_OF_MEMORY return codes which
     // may be generated.
-    return BBox::tri_contact (b1, b2);
+    return csCdBBox::tri_contact (b1, b2);
   }
 
   csMatrix3 cR;
@@ -796,7 +796,7 @@ int csCollider::CollideRecursive (BBox *b1, BBox *b2, csMatrix3 R, csVector3 T)
   // Currently, the transform from model 2 to model 1 space is
   // given by [B T], where y = [B T].x = B.x + T.
 
-  if (b2->leaf () || (!b1->leaf () && (b1->size () > b2->size ())))
+  if (b2->IsLeaf() || (!b1->IsLeaf() && (b1->GetSize() > b2->GetSize())))
   {
     // here we descend to children of b1.  The transform from
     // a child of b1 to b1 is stored in [b1->N->pR,b1->N->pT],
@@ -806,16 +806,16 @@ int csCollider::CollideRecursive (BBox *b1, BBox *b2, csMatrix3 R, csVector3 T)
     // for each child, and store the transform into the collision
     // test queue.
 
-    cR = b1->N->pR.GetTranspose () * R;
-    cT = b1->N->pR.GetTranspose () * (T - b1->N->pT);
+    cR = b1->m_pChild[1]->pR.GetTranspose () * R;
+    cT = b1->m_pChild[1]->pR.GetTranspose () * (T - b1->m_pChild[1]->pT);
 
-    if ((rc = CollideRecursive (b1->N, b2, cR, cT)) != false)
+    if ((rc = CollideRecursive (b1->m_pChild[1], b2, cR, cT)) != false)
       return rc;
 	
-    cR = b1->P->pR.GetTranspose () * R;
-    cT = b1->P->pR.GetTranspose () * (T - b1->P->pT);
+    cR = b1->m_pChild[0]->pR.GetTranspose () * R;
+    cT = b1->m_pChild[0]->pR.GetTranspose () * (T - b1->m_pChild[0]->pT);
 
-    if ((rc = CollideRecursive (b1->P, b2, cR, cT)) != false)
+    if ((rc = CollideRecursive (b1->m_pChild[0], b2, cR, cT)) != false)
       return rc;
   }
   else
@@ -823,16 +823,16 @@ int csCollider::CollideRecursive (BBox *b1, BBox *b2, csMatrix3 R, csVector3 T)
     // here we descend to the children of b2.  See comments for
     // other 'if' clause for explanation.
 
-    cR = R * b2->N->pR;
-    cT = ( R * b2->N->pT) + T;
+    cR = R * b2->m_pChild[1]->pR;
+    cT = ( R * b2->m_pChild[1]->pT) + T;
 	
-    if ((rc = CollideRecursive (b1, b2->N, cR, cT)) != false)
+    if ((rc = CollideRecursive (b1, b2->m_pChild[1], cR, cT)) != false)
       return rc;
 	
-    cR = R * b2->P->pR;
-    cT = ( R * b2->P->pT) + T;
+    cR = R * b2->m_pChild[0]->pR;
+    cT = ( R * b2->m_pChild[0]->pT) + T;
 
-    if ((rc = CollideRecursive (b1, b2->P, cR, cT)) != false)
+    if ((rc = CollideRecursive (b1, b2->m_pChild[0], cR, cT)) != false)
       return rc;
   }
 
@@ -855,7 +855,7 @@ int csCollider::Report (csCollider **id1, csCollider **id2)
   return 1;
 }
 
-csCollider* csCollider::FindCollision (CDTriangle **tr1, CDTriangle **tr2)
+csCollider* csCollider::FindCollision (csCdTriangle **tr1, csCdTriangle **tr2)
 {
   int i = 0;
   while (i < hits)
@@ -880,7 +880,7 @@ csCollider* csCollider::FindCollision (CDTriangle **tr1, CDTriangle **tr2)
   return 0;
 }
 
-bool BBox::tri_contact (BBox *b1, BBox *b2)
+bool csCdBBox::tri_contact (csCdBBox *pBox1, csCdBBox *pBox2)
 {
   // assume just one triangle in each box.
 
@@ -890,19 +890,22 @@ bool BBox::tri_contact (BBox *b1, BBox *b2)
 
   int rc;  // return code
 
-  csVector3 i1 = ((csCollider::mR * b1->trp->p1) + csCollider::mT);
-  csVector3 i2 = ((csCollider::mR * b1->trp->p2) + csCollider::mT);
-  csVector3 i3 = ((csCollider::mR * b1->trp->p3) + csCollider::mT);
+  csVector3 i1 = ((csCollider::mR * pBox1->m_pTriangle->p1) + csCollider::mT);
+  csVector3 i2 = ((csCollider::mR * pBox1->m_pTriangle->p2) + csCollider::mT);
+  csVector3 i3 = ((csCollider::mR * pBox1->m_pTriangle->p3) + csCollider::mT);
 
   csCollider::trianglesTested++;
 
-  bool f = ::tri_contact(i1, i2, i3, b2->trp->p1, b2->trp->p2, b2->trp->p3);
+  bool f = ::tri_contact(i1, i2, i3, 
+                         pBox2->m_pTriangle->p1, 
+                         pBox2->m_pTriangle->p2, 
+                         pBox2->m_pTriangle->p3);
 
   if (f)
   {
     // add_collision may be unable to allocate enough memory,
     // so be prepared to pass along an OUT_OF_MEMORY return code.
-    if ((rc = add_collision(b1->trp, b2->trp)) != false)
+    if ((rc = add_collision(pBox1->m_pTriangle, pBox2->m_pTriangle)) != false)
       return rc;
   }
 
