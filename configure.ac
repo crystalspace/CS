@@ -1639,7 +1639,21 @@ AS_IF([test -n "$SDLCONFIG"],
     CS_EMIT_BUILD_RESULT([cs_cv_libsdl], [SDL])
     CS_MAKEFILE_PROPERTY([HAS_SDL], [yes])])
 
-
+#------------------------------------------------------------------------------
+# Check for VOS.
+#------------------------------------------------------------------------------
+AC_CHECK_TOOLS([PKGCONFIG], [pkg-config])
+AS_IF([test -n "$SDLCONFIG"],
+	AC_MSG_CHECKING([for VOS])
+	AS_IF([$PKGCONFIG --exists libmetaobject_a3dl],
+	    [cs_cv_libvos=yes
+	    cs_cv_libvos_cflags=`AC_RUN_LOG([$PKGCONFIG --cflags libmetaobject_a3dl libmetaobject_misc])`
+	    cs_cv_libvos_lflags=''
+	    cs_cv_libvos_libs=`AC_RUN_LOG([$PKGCONFIG --libs libmetaobject_a3dl libmetaobject_misc])`
+	    CS_EMIT_BUILD_RESULT([cs_cv_libvos], [VOS])
+	    CS_MAKEFILE_PROPERTY([HAS_VOS], [yes])
+        AC_MSG_RESULT([yes])],
+        AC_MSG_RESULT([no])))
 
 #------------------------------------------------------------------------------
 # Check if Linux joystick API is present.
