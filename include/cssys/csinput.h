@@ -68,7 +68,7 @@ public:
   void Reset ();
 
   /// Call this routine to add a key down/up event to queue
-  void do_key (int iKey, int iChar, bool iDown);
+  void DoKey (int iKey, int iChar, bool iDown);
 
   /**
    * Query the state of a key. All key codes in range 0..255,
@@ -139,9 +139,9 @@ public:
   }
 
   /// Call this to add a 'mouse button down/up' event to queue
-  void do_button (int button, bool down, int x, int y);
+  void DoButton (int button, bool down, int x, int y);
   /// Call this to add a 'mouse moved' event to queue
-  void do_motion (int x, int y);
+  void DoMotion (int x, int y);
 };
 
 /**
@@ -185,9 +185,9 @@ public:
   }
 
   /// Call this to add a 'joystick button down/up' event to queue
-  void do_button (int number, int button, bool down, int x, int y);
+  void DoButton (int number, int button, bool down, int x, int y);
   /// Call this to add a 'joystick moved' event to queue
-  void do_motion (int number, int x, int y);
+  void DoMotion (int number, int x, int y);
 };
 
 #endif // __CS_CSINPUT_H__

@@ -47,10 +47,10 @@ void csKeyboardDriver::Reset ()
 {
   for (size_t i = 0; i < KeyState.GetBitCount (); i++)
     if (KeyState [i])
-      do_key (i < 256 ? i : i - 256 + CSKEY_FIRST, 0, false);
+      DoKey (i < 256 ? i : i - 256 + CSKEY_FIRST, 0, false);
 }
 
-void csKeyboardDriver::do_key (int iKey, int iChar, bool iDown)
+void csKeyboardDriver::DoKey (int iKey, int iChar, bool iDown)
 {
   int smask = (iDown && !GetKeyState (iKey)) ? CSMASK_FIRST : 0;
 
@@ -104,14 +104,14 @@ void csMouseDriver::Reset ()
 {
   for (int i = 0; i < CS_MAX_MOUSE_BUTTONS; i++)
     if (Button[i])
-      do_button (i + 1, false, LastX, LastY);
+      DoButton (i + 1, false, LastX, LastY);
   LastClickButton = -1;
 }
 
-void csMouseDriver::do_button (int button, bool down, int x, int y)
+void csMouseDriver::DoButton (int button, bool down, int x, int y)
 {
   if (x != LastX || y != LastY)
-    do_motion (x, y);
+    DoMotion (x, y);
 
   if (button <= 0 || button >= CS_MAX_MOUSE_BUTTONS)
     return;
@@ -147,7 +147,7 @@ void csMouseDriver::do_button (int button, bool down, int x, int y)
   }
 }
 
-void csMouseDriver::do_motion (int x, int y)
+void csMouseDriver::DoMotion (int x, int y)
 {
   if (x != LastX || y != LastY)
   {
@@ -184,17 +184,17 @@ void csJoystickDriver::Reset ()
   for (int i = 0; i < CS_MAX_JOYSTICK_COUNT; i++)
     for (int j = 0; j < CS_MAX_JOYSTICK_BUTTONS; j++)
       if (Button [i][j])
-        do_button (i + 1, j + 1, false, LastX [i], LastY [i]);
+        DoButton (i + 1, j + 1, false, LastX [i], LastY [i]);
 }
 
-void csJoystickDriver::do_button (int number, int button, bool down,
+void csJoystickDriver::DoButton (int number, int button, bool down,
   int x, int y)
 {
   if (number <= 0 && number > CS_MAX_JOYSTICK_COUNT)
     return;
 
   if (x != LastX [number - 1] || y != LastY [number - 1])
-    do_motion (number, x, y);
+    DoMotion (number, x, y);
 
   if (button <= 0 || button > CS_MAX_JOYSTICK_BUTTONS)
     return;
@@ -208,7 +208,7 @@ void csJoystickDriver::do_button (int number, int button, bool down,
     down ? csevJoystickDown : csevJoystickUp, number, x, y, button, smask));
 }
 
-void csJoystickDriver::do_motion (int number, int x, int y)
+void csJoystickDriver::DoMotion (int number, int x, int y)
 {
   if (number <= 0 && number > CS_MAX_JOYSTICK_COUNT)
     return;

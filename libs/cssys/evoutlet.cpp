@@ -68,16 +68,16 @@ void csSystemDriver::csEventOutlet::PutEvent (iEvent *Event)
 void csSystemDriver::csEventOutlet::Key (int iKey, int iChar, bool iDown)
 {
   if ((iKey || iChar) && (EnableMask & CSEVTYPE_Keyboard))
-    System->Keyboard.do_key (iKey, iChar, iDown);
+    System->Keyboard.DoKey (iKey, iChar, iDown);
 }
 
 void csSystemDriver::csEventOutlet::Mouse (int iButton, bool iDown, int x, int y)
 {
   if (EnableMask & CSEVTYPE_Mouse)
     if (iButton == 0)
-      System->Mouse.do_motion (x, y);
+      System->Mouse.DoMotion (x, y);
     else
-      System->Mouse.do_button (iButton, iDown, x, y);
+      System->Mouse.DoButton (iButton, iDown, x, y);
 }
 
 void csSystemDriver::csEventOutlet::Joystick (int iNumber, int iButton,
@@ -85,9 +85,9 @@ void csSystemDriver::csEventOutlet::Joystick (int iNumber, int iButton,
 {
   if (EnableMask & CSEVTYPE_Joystick)
     if (iButton == 0)
-      System->Joystick.do_motion (iNumber, x, y);
+      System->Joystick.DoMotion (iNumber, x, y);
     else
-      System->Joystick.do_button (iNumber, iButton, iDown, x, y);
+      System->Joystick.DoButton (iNumber, iButton, iDown, x, y);
 }
 
 void csSystemDriver::csEventOutlet::Broadcast (int iCode, void *iInfo)
