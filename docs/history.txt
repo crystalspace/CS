@@ -12,6 +12,10 @@ The history order is reversed so that new features are at the top.
 	- Removed RelinkMesh() from iSector. This is a private function
 	  and not to be used from user code.
 	- Added apimod appendix between 0.90 and 0.92.
+	- Chen Puning <chenpuning@hotmail.com> discovered a bug in
+	  csMeshWrapper::GetScreenBoundingBox(). It was incorrectly ignoring
+	  the movable transformation so it would not work on mesh objects
+	  that were moved away from the default identity position.
 28-Nov-2001
 	- Made the test on bad UV coordinates for a polygon a little
 	  bit more strict so that it rejects more polygons. There were
