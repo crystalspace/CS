@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<shader type="xmlshader" name="parallax">
+
+	<technique priority="150">
+        
+        <pass>
+            <mixmode><add/></mixmode>
+            <buffer name="vertices" destination="position" />
+            <buffer name="normals" destination="normal" />
+            <buffer name="texture coordinates" destination="texture coordinate 0" />
+            <buffer name="tangents" destination="texture coordinate 1" />
+            <buffer name="binormals" destination="texture coordinate 2" />
+            <vp plugin="glcg" file="/shader/parallax/parallax.cgvp"/>
+            
+            <texture destination="unit 0" name="tex normal" />
+            <texture destination="unit 1" name="tex diffuse" />
+            <texture destination="unit 2" name="tex height" />
+            <fp plugin="glcg" file="/shader/parallax/parallax.cgfp"/>
+        </pass>
+    </technique>
+
+
+	<technique priority="100">
+        
+        <pass>
+            <mixmode><add/></mixmode>
+            <buffer name="vertices" destination="position" />
+            <buffer name="normals" destination="normal" />
+            <buffer name="texture coordinates" destination="texture coordinate 0" />
+            <buffer name="tangents" destination="texture coordinate 1" />
+            <buffer name="binormals" destination="texture coordinate 2" />
+            <vp plugin="glarb" file="/shader/parallax/parallax.avp"/>
+         
+            <texture destination="unit 0" name="tex normal" />
+            <texture destination="unit 1" name="tex diffuse" />
+            <texture destination="unit 2" name="tex height" />
+            <fp plugin="glarb" file="/shader/parallax/parallax.afp"/>
+        </pass>
+    </technique>
+</shader>

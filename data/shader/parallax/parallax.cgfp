@@ -1,0 +1,39 @@
+<cgfp>
+<variablemap variable="STANDARD_LIGHT_0_DIFFUSE" destination="lightcolor"/>
+<program>
+<![CDATA[
+
+struct vertex2fragment { 
+	float4 Position : POSITION;
+	float2 TexCoord : TEXCOORD0;
+	float3 LightDir : TEXCOORD1;
+	float3 EyeVec : TEXCOORD2;
+};
+
+
+float4 main (vertex2fragment IN,
+			uniform float4 lightcolor,
+			uniform sampler2D TexNormal,
+			uniform sampler2D TexDiffuse,
+			uniform sampler2D TexHeight) : COLOR
+{
+	float3 normEye = normalize(IN.EyeVec);
+	
+	float4 height = 0.04 * tex2D(TexHeight, IN.TexCoord) - 0.02;
+	float2 newTexcoord = (height * normEye).xy + IN.TexCoord;
+	
+	float4 diffuseCol = tex2D(TexDiffuse, newTexcoord);
+	float4 bumpNormal = tex2D(TexNormal, newTexcoord);
+	bumpNormal *= 2;
+	bumpNormal -= 1;
+		
+	float bump = dot(normalize(IN.LightDir.xyz).xyz, normalize(bumpNormal.xyz).xyz);
+	float4 outCol = saturate(lightcolor*bump.xxxx);
+	
+	return saturate(outCol*diffuseCol);
+		
+}
+
+]]>
+</program>
+</cgfp>

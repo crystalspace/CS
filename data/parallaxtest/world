@@ -1,0 +1,297 @@
+<world>
+	<addon>
+		<plugin>crystalspace.renderloop.loop.loader</plugin>
+		<params>
+			<name>ourloop</name>
+			<steps>
+				<step plugin="crystalspace.renderloop.step.generic">
+					<shadertype>diffuse</shadertype>
+					<zoffset>yes</zoffset>
+					<portaltraversal />
+					<zuse />
+				</step>
+				<step plugin="crystalspace.renderloop.step.lightiter">
+					<steps>
+						<!-- diffuse lighting -->
+						<step plugin="crystalspace.renderloop.step.generic">
+							<shadertype>light</shadertype>
+							<zoffset>no</zoffset>
+							<ztest />
+						</step>
+					</steps>
+				</step>
+			</steps>
+		</params>
+	</addon>
+	<settings>
+		<clearzbuf>yes</clearzbuf>
+		<clearscreen>yes</clearscreen>
+		<lightmapcellsize>16</lightmapcellsize>
+		<renderloop>ourloop</renderloop>
+	</settings>
+	<plugins>
+		<plugin name="thing">crystalspace.mesh.loader.thing</plugin>
+	</plugins>
+	<shaders>
+		<shader>
+			<file>/shader/or_lighting.xml</file>
+		</shader>
+		<shader>
+			<file>/shader/light.xml</file>
+		</shader>	
+		<shader>
+			<file>/shader/ambient.xml</file>
+		</shader>
+		<shader>
+			<file>/shader/parallax/parallax.xml</file>
+		</shader>
+	</shaders>
+	<textures>
+		<texture name="walls.jpg">
+			<file>walls.jpg</file>
+		</texture>
+		<texture name="floor.jpg">
+			<file>floor.jpg</file>
+		</texture>
+
+		<texture name="box.jpg">
+			<file>box.jpg</file>
+		</texture>
+		<texture name="boxn.jpg">
+			<file>boxn.jpg</file>
+		</texture>
+		<texture name="boxh.jpg">
+			<file>boxh.jpg</file>
+		</texture>
+	</textures>
+	<materials>
+		<material name="walls.jpg">
+			<texture>walls.jpg</texture>
+			<shader type="diffuse">light</shader>
+		</material>
+		<material name="floor.jpg">
+			<texture>floor.jpg</texture>
+			<shader type="diffuse">light</shader>
+		</material>
+		
+		<material name="box.jpg">
+			<texture>box.jpg</texture>
+			<shadervar name="tex normal" type="texture">boxn.jpg</shadervar>
+			<shadervar name="tex height" type="texture">boxh.jpg</shadervar>
+			<shader type="light">parallax</shader>
+			<shader type="diffuse">ambient</shader>
+		</material>
+	</materials>
+	<start name="Camera">
+		<sector>Scene</sector>
+		<position x="0.00333691" y="-0.00952018" z="-0.00766289" />
+	</start>
+	<sector name="Scene">
+		<meshobj name="Cube">
+			<plugin>thing</plugin>
+			<params>
+				<v x="6.51433" y="-2.10426" z="3.51433" />
+				<v x="6.51433" y="-2.10426" z="-3.51433" />
+				<v x="-3.51433" y="-2.10426" z="-3.51433" />
+				<v x="-3.51433" y="-2.10426" z="3.51433" />
+				<v x="6.51433" y="2.10426" z="3.51433" />
+				<v x="6.51433" y="2.10426" z="-3.51433" />
+				<v x="-3.51433" y="2.10426" z="-3.51433" />
+				<v x="-3.51433" y="2.10426" z="3.51433" />
+				<p name="1">
+					<v>1</v>
+					<v>2</v>
+					<v>3</v>
+					<v>0</v>
+					<material>floor.jpg</material>
+					<texmap>
+						<uv idx="0" u="0" v="1" />
+						<uv idx="1" u="1" v="1" />
+						<uv idx="2" u="1" v="0" />
+					</texmap>
+				</p>
+				<p name="2">
+					<v>7</v>
+					<v>6</v>
+					<v>5</v>
+					<v>4</v>
+					<material>walls.jpg</material>
+					<texmap>
+						<uv idx="0" u="0" v="1" />
+						<uv idx="1" u="1" v="1" />
+						<uv idx="2" u="1" v="0" />
+					</texmap>
+				</p>
+				<p name="3">
+					<v>4</v>
+					<v>5</v>
+					<v>1</v>
+					<v>0</v>
+					<material>walls.jpg</material>
+					<texmap>
+						<uv idx="0" u="0" v="1" />
+						<uv idx="1" u="1" v="1" />
+						<uv idx="2" u="1" v="0" />
+					</texmap>
+				</p>
+				<p name="4">
+					<v>5</v>
+					<v>6</v>
+					<v>2</v>
+					<v>1</v>
+					<material>walls.jpg</material>
+					<texmap>
+						<uv idx="0" u="0" v="1" />
+						<uv idx="1" u="1" v="1" />
+						<uv idx="2" u="1" v="0" />
+					</texmap>
+				</p>
+				<p name="5">
+					<v>6</v>
+					<v>7</v>
+					<v>3</v>
+					<v>2</v>
+					<material>walls.jpg</material>
+					<texmap>
+						<uv idx="0" u="0" v="1" />
+						<uv idx="1" u="1" v="1" />
+						<uv idx="2" u="1" v="0" />
+					</texmap>
+				</p>
+				<p name="6">
+					<v>7</v>
+					<v>4</v>
+					<v>0</v>
+					<v>3</v>
+					<material>walls.jpg</material>
+					<texmap>
+						<uv idx="0" u="1" v="0" />
+						<uv idx="1" u="0" v="0" />
+						<uv idx="2" u="0" v="1" />
+					</texmap>
+				</p>
+			</params>
+			<zuse />
+			<move>
+				<v x="0.00333691" y="-0.00952018" z="0.000414791" />
+			</move>
+		</meshobj>
+		<meshobj name="Cube.001">
+			<plugin>thing</plugin>
+			<params>
+				<v x="0.493757" y="-0.493757" z="0.493757" />
+				<v x="0.493757" y="-0.493757" z="-0.493757" />
+				<v x="-0.493757" y="-0.493757" z="-0.493757" />
+				<v x="-0.493757" y="-0.493757" z="0.493757" />
+				<v x="0.493757" y="0.493757" z="0.493757" />
+				<v x="0.493757" y="0.493757" z="-0.493757" />
+				<v x="-0.493757" y="0.493757" z="-0.493757" />
+				<v x="-0.493757" y="0.493757" z="0.493757" />
+				<p name="1">
+					<v>3</v>
+					<v>2</v>
+					<v>1</v>
+					<v>0</v>
+					<material>box.jpg</material>
+					<texmap>
+						<uv idx="0" u="1" v="0" />
+						<uv idx="1" u="1" v="1" />
+						<uv idx="2" u="0" v="1" />
+					</texmap>
+				</p>
+				<p name="2">
+					<v>5</v>
+					<v>6</v>
+					<v>7</v>
+					<v>4</v>
+					<material>box.jpg</material>
+					<texmap>
+						<uv idx="0" u="1" v="0" />
+						<uv idx="1" u="1" v="1" />
+						<uv idx="2" u="0" v="1" />
+					</texmap>
+				</p>
+				<p name="3">
+					<v>1</v>
+					<v>5</v>
+					<v>4</v>
+					<v>0</v>
+					<material>box.jpg</material>
+					<texmap>
+						<uv idx="0" u="1" v="0" />
+						<uv idx="1" u="1" v="1" />
+						<uv idx="2" u="0" v="1" />
+					</texmap>
+				</p>
+				<p name="4">
+					<v>2</v>
+					<v>6</v>
+					<v>5</v>
+					<v>1</v>
+					<material>box.jpg</material>
+					<texmap>
+						<uv idx="0" u="1" v="0" />
+						<uv idx="1" u="1" v="1" />
+						<uv idx="2" u="0" v="1" />
+					</texmap>
+				</p>
+				<p name="5">
+					<v>3</v>
+					<v>7</v>
+					<v>6</v>
+					<v>2</v>
+					<material>box.jpg</material>
+					<texmap>
+						<uv idx="0" u=".5" v=".5" />
+						<uv idx="1" u=".5" v="0" />
+						<uv idx="2" u="1" v="0" />
+					</texmap>
+				</p>
+				<p name="6">
+					<v>7</v>
+					<v>3</v>
+					<v>0</v>
+					<v>4</v>
+					<material>box.jpg</material>
+					<texmap>
+						<uv idx="0" u=".5" v="0" />
+						<uv idx="1" u=".5" v=".5" />
+						<uv idx="2" u="0" v=".5" />
+					</texmap>
+				</p>
+			</params>
+			<zuse />
+			<move>
+				 <v x="3.79896" y="0.0553295" z="0.0295588" />
+			</move>
+		</meshobj>
+		<light name="Lamp">
+			<center x="-.05294" y="0" z="0" />
+			<color red="0.9" green="0.9" blue="1.1" />
+			
+			<attenuation c="0" l="0" q="0.1"/>
+		</light>
+	</sector>
+	<sequences>
+        <sequence name="rotateCube">
+	    <rotate mesh="Cube.001" duration="2000">
+	      <rotx>1.8</rotx>
+	       <v x="3.79896" y="0.0553295" z="0.0295588" />
+	    </rotate>
+	    <delay time="2000" />
+	    <rotate mesh="Cube.001" duration="2000">
+	      <roty>1.4</roty>
+	       <v x="3.79896" y="0.0553295" z="0.0295588" />
+	    </rotate>
+	    <delay time="2000" />
+	    <enable trigger="rotateCube" />
+        </sequence>
+    </sequences>
+    <triggers>
+        <trigger name="rotateCube">
+          <sectorvis sector="Scene" />
+          <fire delay="20" sequence="rotateCube" />
+    	</trigger>
+    </triggers>
+</world>
+

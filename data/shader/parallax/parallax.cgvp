@@ -1,0 +1,66 @@
+<cgvp>
+<variablemap variable="STANDARD_LIGHT_0_POSITION" destination="LightPos" />
+<variablemap variable="STANDARD_LIGHT_0_DIFFUSE" destination="LightColor" />
+<program>
+<![CDATA[
+
+struct app2vertex {
+	float4 Position : POSITION;
+	float3 Normal : NORMAL;
+	float2 TexCoord : TEXCOORD0;
+	float3 Tangent : TEXCOORD1;
+	float3 BiNormal : TEXCOORD2;
+};
+
+struct vertex2fragment { 
+	float4 Position : POSITION;
+	float2 TexCoord : TEXCOORD0;
+	float3 oLightDir : TEXCOORD1;
+	float3 oEyeVec : TEXCOORD2;
+};
+
+vertex2fragment main (app2vertex IN,
+	uniform float4x4 ModelViewI,		
+	  /* The CG plugin automatically binds the right matrices if the params
+	     are named appropriately.
+	     
+	     Currently supported base names:
+	       ModelView
+	       ModelViewProj
+	       Proj
+	     Currently supported suffixes:
+	       T - transpose, I - inverse, IT - inverse transposed
+	     */
+	uniform float4x4 ModelViewIT,	
+	uniform float4x4 ModelViewProj,
+	uniform float4 LightPos,
+	uniform float3 LightColor)
+{
+	vertex2fragment OUT;
+	
+	float3 objLight = mul(ModelViewI, LightPos).xyz;
+	objLight -= IN.Position;
+	
+	float3x3 obj2tang;
+	obj2tang[0] = IN.Tangent;
+	obj2tang[1] = IN.BiNormal;
+	obj2tang[2] = IN.Normal;
+	
+	float3 tangLight = mul (obj2tang, objLight);
+	
+	
+	float3 eyeVec = ModelViewIT[3] - IN.Position;
+	float3 tangEyeVec = mul (obj2tang, eyeVec);
+	
+	
+	OUT.Position = mul (ModelViewProj, IN.Position);
+	OUT.TexCoord = IN.TexCoord;
+	OUT.oLightDir = tangLight;
+	OUT.oEyeVec = tangEyeVec;
+	
+	return OUT;
+}
+
+]]>
+</program>
+</cgvp>

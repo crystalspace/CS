@@ -26,6 +26,9 @@ chronological order.
 	  above fail, now also checks a couple other likely (hard-coded)
 	  locations. Also upgraded to understand LFS installation structure
 	  used by Jam build system.
+	- Marten Svanfeldt added a parallax mapping (also known as virtual
+	  displacement mapping or offset mapping) shader and testlevel to CS.
+	  The testlevel and shader requires NR, and a pretty highend card to work.
 17-Sep-2004
 	- Eric Sunshine fixed a couple methods in odedynam which were returning
 	  a value despite being declared as returning void. Reported by Brendon
