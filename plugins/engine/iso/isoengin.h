@@ -118,6 +118,8 @@ public:
   }
   virtual iMeshFactoryWrapper *CreateMeshFactory(const char* classId,
       const char *name);
+  virtual iMeshFactoryWrapper *CreateMeshFactory(const char *name);
+
 };
 
 #endif

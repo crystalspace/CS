@@ -928,7 +928,8 @@ bool csIsoLoader::ParseMeshFactory(char *buf, const char *prefix)
   char classId[255];
   iLoaderPlugin* plug = NULL;
   iMaterialWrapper* mat = NULL;
-  iMeshFactoryWrapper* mfw = NULL;
+
+  iMeshFactoryWrapper* mfw = Engine->CreateMeshFactory(prefix);
 
   SCF_DEC_REF (ldr_context); ldr_context = NULL;
 
@@ -940,22 +941,6 @@ bool csIsoLoader::ParseMeshFactory(char *buf, const char *prefix)
 
     switch (cmd)
     {
-
-      case CS_TOKEN_CLASS:
-        {
-          
-          classId[0] = 0;
-          csScanStr (params, "%s", classId);
-          mfw = Engine->CreateMeshFactory(classId,prefix);
-
-          if (!mfw)
-          {
-            ReportError (tag, "Failed to create '%s'!", classId);
-            return false;
-          }
-          
-        }
-        break;
 
       case CS_TOKEN_PLUGIN:
         {
@@ -980,7 +965,7 @@ bool csIsoLoader::ParseMeshFactory(char *buf, const char *prefix)
 	          return false;
           }
 
-      	  // We give here the iMeshObjectFactory as the context.
+      	  // iMeshFactoryWrapper context.
           iBase* mof = plug->Parse (params, GetLoaderContext(), mfw);
 	        if (!mof)
           {

@@ -378,4 +378,22 @@ iMeshFactoryWrapper *csIsoEngine::CreateMeshFactory(const char* classId,
   return NULL;
 }
 
+iMeshFactoryWrapper *csIsoEngine::CreateMeshFactory (const char *name)
+{
+  if (name)
+  {
+    iMeshFactoryWrapper* mfw = meshfactories.
+      scfiMeshFactoryList.FindByName (name);
+    if (mfw)
+      return mfw;
+  }
+
+  csIsoMeshFactoryWrapper *mfw = new csIsoMeshFactoryWrapper ();
+  if (name) 
+    mfw->SetName (name);
+  meshfactories.scfiMeshFactoryList.Add (&(mfw->scfiMeshFactoryWrapper));
+  mfw->DecRef ();
+
+  return &mfw->scfiMeshFactoryWrapper;
+}
 

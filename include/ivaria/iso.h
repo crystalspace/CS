@@ -65,7 +65,7 @@ struct iGridChangeCallback : public iBase
   virtual void GridChange (iIsoSprite* spr) = 0;
 };
 
-SCF_VERSION (iIsoEngine, 0, 1, 0);
+SCF_VERSION (iIsoEngine, 0, 1, 1);
 
 /**
  * SCF Interface to the isometric engine.
@@ -121,6 +121,9 @@ struct iIsoEngine : public iBase
   /// Load and add a mesh factory, given classID under given name.
   virtual iMeshFactoryWrapper *CreateMeshFactory(const char* classId,
     const char *name) = 0;
+  /// Create an empty meshfactory (used by iIsoLoader)
+  virtual iMeshFactoryWrapper *CreateMeshFactory(const char *name) = 0;
+
 };
 
 SCF_VERSION (iIsoWorld, 0, 0, 1);
