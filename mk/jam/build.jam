@@ -1,6 +1,12 @@
 #============================================================================
 # Main rules file - Includes all important rulefiles in correct order
 #============================================================================
+
+if $(JAMVERSION) < 2.4
+{
+    EXIT "Error: This buildsystem requires jam version 2.4 or later."
+}
+
 mkdir = $(TOP)/mk/jam ;
 
 include $(mkdir)/variables.jam ;
