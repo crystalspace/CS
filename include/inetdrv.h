@@ -37,6 +37,8 @@
     #include <libc.h>   // For FD_*, select()
     #include <string.h> // For memset()
     #define bzero(b,len) memset(b,0,len) /* bzero used by FD_ZERO */
+  #elif defined(OS_BE)
+    #include <socket.h>
   #else
     #include <sys/select.h>
   #endif
