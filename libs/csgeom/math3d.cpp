@@ -433,15 +433,6 @@ bool csMath3::Visible (const csVector3& p, const csVector3& t1,
    return c > 0;
 }
 
-int csMath3::WhichSide3D (const csVector3& p,
-			  const csVector3& v1, const csVector3& v2)
-{
-  float s = p * (v1%v2);
-  if (s < 0) return 1;
-  else if (s > 0) return -1;
-  else return 0;
-}
-
 bool csMath3::PlanesClose (const csPlane& p1, const csPlane& p2)
 {
   if (PlanesEqual (p1, p2)) return true;

@@ -424,7 +424,14 @@ public:
    * Plane '0-v1-v2' is the plane passing through points <0,0,0>, v1, and v2.
    */
   static int WhichSide3D (const csVector3& p,
-                          const csVector3& v1, const csVector3& v2);
+                          const csVector3& v1, const csVector3& v2)
+  {
+    // float s = p * (v1%v2); (original expression: expanded to the below:)
+    float s = p.x*(v1.y*v2.z-v1.z*v2.y) + p.y*(v1.z*v2.x-v1.x*v2.z) + p.z*(v1.x*v2.y-v1.y*v2.x);
+    if (s < 0) return 1;
+    else if (s > 0) return -1;
+    else return 0;
+  }
 
   /**
    * Tests if the front face of a triangle is visible from the given point.
