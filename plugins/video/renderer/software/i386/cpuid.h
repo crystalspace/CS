@@ -40,6 +40,7 @@
 #define CPUx86_FEATURE_MCA	0x00004000	// Machine Check Architecture
 #define CPUx86_FEATURE_CMOV	0x00008000	// CMOV supported
 #define CPUx86_FEATURE_MMX	0x00800000	// MMX supported
+#define CPUx86_FEATURE_SSE	0x02000000	// SSE supported
 
 /*
     Detect 80x86 CPU and its feature bits.
