@@ -5379,6 +5379,7 @@ package cspace::iRegion;
 %ITERATORS = ();
 *QueryObject = *cspacec::iRegion_QueryObject;
 *Add = *cspacec::iRegion_Add;
+*Remove = *cspacec::iRegion_Remove;
 *Clear = *cspacec::iRegion_Clear;
 *DeleteAll = *cspacec::iRegion_DeleteAll;
 *PrepareTextures = *cspacec::iRegion_PrepareTextures;
@@ -13113,6 +13114,7 @@ sub PIXMAP_RIGHT () { $cspacec::PIXMAP_RIGHT }
 
 package cspace;
 
+*csArrayItemNotFound = *cspacec::csArrayItemNotFound;
 
 my %__iSCF_SCF_hash;
 tie %__iSCF_SCF_hash,"cspace::iSCF", $cspacec::iSCF_SCF;
