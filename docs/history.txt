@@ -14,26 +14,35 @@ Short-term cleanups that need to be done:
 	  includes that don't belong there (like from csengine).
 
 15-Nov-1999
-	- Eric Sunshine renamed the Python test program from cspythontest
-	  to pytest in order to appease DOS's 8.3 requirement.
+	- Eric Sunshine renamed the Python test program from cspythontest to
+	  pytest in order to appease DOS's 8.3 requirement.
 	- Eric Sunshine fixed the pytest makefile so that it only adds itself
 	  to the global list of makefile targets if haspythn.sh has detected
-	  that Python in installed.  Also fixed the 'tests' target so that
-	  it works in a more reasonable manner.
+	  that Python in installed.  Also fixed the 'tests' target so that it
+	  works in a more reasonable manner.
 	- Eric Sunshine fixed pytest so that it makes proper use of SCF and
 	  actually works in accordance with requirements of the system-driver.
 	- Eric Sunshine fixed the csClear plug-in so that it compiles with
 	  compilers which use the old-style casting syntax.
-	- Jorrit updated a lot of makefiles so that most apps at least
-	  compile on Unix (some do not run though).
+	- Eric Sunshine eliminated duplicate symbol definition in ccTest &
+	  csClear.
+	- Eric Sunshine fixed a problem in SCF.cfg where a CrystalClear module
+	  entry was incorrectly listed.
+	- Eric Sunshine fixed a bug in SCF.  It incorrectly tried to load the
+	  same plug-in module multiple times if multiple classes were exported
+	  from it.  The problem was that the search for an already loaded
+	  plug-in was broken, so it assumed the plug-in had not yet been
+	  loaded.
+	- Jorrit updated a lot of makefiles so that most apps at least compile
+	  on Unix (some do not run though).
 14-Nov-1999
-	- Updates to CrystalClear from Michael Dale Long and
-	  fixes for SCF to cctest.
+	- Updates to CrystalClear from Michael Dale Long and fixes for SCF to
+	  cctest.
 	- Denis Dmitriev fixed a bug in OpenGL texture manager.
-	- Update to Map2CS from Thomas Hieber. He added further
-	  extensions for manual sectoring.
+	- Update to Map2CS from Thomas Hieber.  He added further extensions
+	  for manual sectoring.
 13-Nov-1999
-	- Andrew Zabolotny did the following changes:
+	- Andrew Zabolotny made the following changes:
 	    - Improved memory debugger (nested CHK's supported).
 	    - Added CHK to many places.
 	    - Fixed some CHKs that should be CHKB's.
