@@ -326,7 +326,14 @@ void funConsole::PrepPix( csIniFile *ini, const char *sect, ConDecoBorder &borde
 
   if ( strlen( pix ) ){
     size_t len=0;
-    char *data = piVFS->ReadFile( pix, len );
+    char *data = NULL;
+    iFile *F = piVFS->Open ( pix, VFS_FILE_READ );
+    if ( F ){
+      len = F->GetSize ();
+      data = new char [len];
+      if ( data ) len = F->Read ( data, len );
+      F->DecRef();
+    }
     if ( len ){
       iTextureManager *tm = piG3D->GetTextureManager();
       iImage *image = csImageLoader::Load( (UByte*)data, len, tm->GetTextureFormat() );
@@ -349,7 +356,7 @@ void funConsole::PrepPix( csIniFile *ini, const char *sect, ConDecoBorder &borde
 	border.do_stretch = ini->GetYesNo( sect, "do_stretch", false );
       }
 
-      free (data);
+      delete [] data;
     }else{
       printf("couldnt read %s\n", pix );
     }
