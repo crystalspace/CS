@@ -91,6 +91,10 @@ chronological order.
 	  served only to confuse new users.
 	- Eric Sunshine fixed Texinfo formatting and mark-up problems in the
 	  tutorials and HOWTO's.
+	- Jorrit worked further on the genmesh animation system. The basic
+	  principles are now working. Removed the jittering test case.
+	  Currently no animation is occuring but you can see test messages
+	  appear on stdout. Still work in progress.
 13-Sep-2004
 	- Eric Sunshine renamed the following symbols in order to avoid
 	  global namespace pollution:

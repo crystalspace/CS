@@ -304,33 +304,49 @@ struct iGenMeshAnimationControl : public iBase
    * Given the factory vertex data, return the animated data.
    * If this control doesn't animate vertices then it will return the
    * source array unchanged.
+   * The 'version_id' is a number that changes whenever the input array
+   * changes. The animation control can use this to optimize the animation
+   * calculation by caching the animated version of the array and returning
+   * that one.
    */
   virtual const csVector3* UpdateVertices (csTicks current,
-  	const csVector3* verts, int num_verts) = 0;
+  	const csVector3* verts, int num_verts, uint32 version_id) = 0;
 
   /**
    * Given the factory texel data, return the animated data.
    * If this control doesn't animate texels then it will return the
    * source array unchanged.
+   * The 'version_id' is a number that changes whenever the input array
+   * changes. The animation control can use this to optimize the animation
+   * calculation by caching the animated version of the array and returning
+   * that one.
    */
   virtual const csVector2* UpdateTexels (csTicks current,
-  	const csVector2* texels, int num_texels) = 0;
+  	const csVector2* texels, int num_texels, uint32 version_id) = 0;
 
   /**
    * Given the factory normal data, return the animated data.
    * If this control doesn't animate normals then it will return the
    * source array unchanged.
+   * The 'version_id' is a number that changes whenever the input array
+   * changes. The animation control can use this to optimize the animation
+   * calculation by caching the animated version of the array and returning
+   * that one.
    */
   virtual const csVector3* UpdateNormals (csTicks current,
-  	const csVector3* normals, int num_normals) = 0;
+  	const csVector3* normals, int num_normals, uint32 version_id) = 0;
 
   /**
    * Given the factory color data, return the animated data.
    * If this control doesn't animate colors then it will return the
    * source array unchanged.
+   * The 'version_id' is a number that changes whenever the input array
+   * changes. The animation control can use this to optimize the animation
+   * calculation by caching the animated version of the array and returning
+   * that one.
    */
   virtual const csColor* UpdateColors (csTicks current,
-  	const csColor* colors, int num_colors) = 0;
+  	const csColor* colors, int num_colors, uint32 version_id) = 0;
 };
 
 SCF_VERSION (iGenMeshAnimationControlFactory, 0, 0, 1);

@@ -196,28 +196,32 @@ const csVector3* csGenmeshMeshObject::AnimControlGetVertices ()
 {
   return anim_ctrl->UpdateVertices (vc->GetCurrentTicks (),
   	factory->GetVertices (),
-	factory->GetVertexCount ());
+	factory->GetVertexCount (),
+	factory->scfiObjectModel.GetShapeNumber ());
 }
 
 const csVector2* csGenmeshMeshObject::AnimControlGetTexels ()
 {
   return anim_ctrl->UpdateTexels (vc->GetCurrentTicks (),
   	factory->GetTexels (),
-	factory->GetVertexCount ());
+	factory->GetVertexCount (),
+	factory->scfiObjectModel.GetShapeNumber ());
 }
 
 const csVector3* csGenmeshMeshObject::AnimControlGetNormals ()
 {
   return anim_ctrl->UpdateNormals (vc->GetCurrentTicks (),
   	factory->GetNormals (),
-	factory->GetVertexCount ());
+	factory->GetVertexCount (),
+	factory->scfiObjectModel.GetShapeNumber ());
 }
 
 const csColor* csGenmeshMeshObject::AnimControlGetColors (csColor* source)
 {
   return anim_ctrl->UpdateColors (vc->GetCurrentTicks (),
   	source,
-	factory->GetVertexCount ());
+	factory->GetVertexCount (),
+	factory->scfiObjectModel.GetShapeNumber ());
 }
 
 void csGenmeshMeshObject::SetAnimationControl (
@@ -2410,6 +2414,8 @@ void csGenmeshMeshObjectFactory::Invalidate ()
   mesh_triangle_dirty_flag = true;
   mesh_tangents_dirty_flag = true;
 #endif
+
+  scfiObjectModel.ShapeChanged ();
 }
 
 SCF_IMPLEMENT_IBASE (csGenmeshMeshObjectFactory::PolyMesh)
