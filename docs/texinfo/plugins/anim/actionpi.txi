@@ -1,5 +1,5 @@
 @c -*-texinfo-*-
-@node The Sprite Action Interface, Moving On, Sprite Actions, Animation
+@node The Sprite Action Interface, , Sprite Actions, Animation
 @subsection The Sprite Action Interface
 
 @emph{Written by Michael Voase,

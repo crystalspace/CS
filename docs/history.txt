@@ -44,6 +44,8 @@ chronological order.
 	      $(PACKAGE_LONGNAME) if available rather than $(PACKAGE_NAME).  If
 	      neither is available, it just uses the bare target name as the
 	      package name.
+	- Eric Sunshine eliminated TeX 'underfull hbox' warning from
+	  apimod98.txi.
 18-Apr-2004
 	- Eric Sunshine fixed CS/bin/autogen.sh so that it returns the exit
 	  status of 'autoconf' as its own exit status. This allows invokers of
