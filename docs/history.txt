@@ -17,7 +17,7 @@ chronological order.
 	- res augmented the Cg configure check to use pthread, required by
 	  Cg for Linux.
 	- Eric Sunshine added a "default" comparison function to csArrayCmp,
-	  and made the "comparision function" argument to the csArrayCmp
+	  and made the "comparison function" argument to the csArrayCmp
 	  contructor optional.  If the client does not supply a function to the
 	  constructor, then the default function is used.  This makes it much
 	  simpler to perform searches in csArrays in cases when the element and
@@ -6810,7 +6810,7 @@ chronological order.
 	- Oktal changed csHash::DeleteAll() from void to bool.
 	- Eric Sunshine made the following changes:
 	    - Removed the pointless csStringArray::Find() method which did
-	      pointer comparisions.  This would never succeed under normal
+	      pointer comparisons.  This would never succeed under normal
 	      circumstances.  Ditto for iStringArray and scfStringArray.
 	    - Renamed csStringArray::FindContent() and FindCaseContent() to
 	      Find() and FindCaseInsensitive().	 Ditto for iStringArray and
@@ -9689,7 +9689,7 @@ chronological order.
 	- Jorrit fixed an error message in the genmesh loader. It would
 	  complain about too many colors when it meant too many vertices.
 	- Eric Sunshine eliminated a compilation warning in ensocket driver
-	  regarding signed versus unsigned comparision.
+	  regarding signed versus unsigned comparison.
 	- Eric Sunshine performed Phase Three of the elimination of the
 	  monolithic scf.cfg:
 	    - Eliminated the SCF information which was hardcoded in the .cpp
@@ -11315,7 +11315,7 @@ chronological order.
 	  jam versions of the script.
 	- Norman Kraemer fixed version detection.  The right result is now also
 	  found if not all parts of the version string return the same result
-	  in comparision with the supplied version, e.g.  That is not only
+	  in comparison with the supplied version, e.g.  That is not only
 	  "1.3.16 >= 1.2.13" will yield true, but also "1.3.16 >= 1.2.20".  He
 	  also changed some of the variable names to comply with Autoconf
 	  rules.
