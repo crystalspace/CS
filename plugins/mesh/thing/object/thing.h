@@ -31,7 +31,6 @@
 #include "csutil/util.h"
 #include "csutil/flags.h"
 #include "csutil/cscolor.h"
-#include "csutil/csvector.h"
 #include "csutil/array.h"
 #include "csutil/refarr.h"
 #include "csutil/garray.h"

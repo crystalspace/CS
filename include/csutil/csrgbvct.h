@@ -21,22 +21,24 @@
 #ifndef __CS_RGB_VECTOR_H__
 #define __CS_RGB_VECTOR_H__
 
-#include "csvector.h"
+#include "array.h"
+#include "csgfx/rgbpixel.h"
+
+// @@@@@@@@@ THIS CLASS SHOULD MOVE TO include/csgfx probably!
 
 /**
  * This is a vector class that expects you to push
  * csRGBcolor structs onto it.  It has overrides for
  * Compare and CompareKey.  
  */
-class csRGBVector : public csVector
+class csRGBVector : public csArray<csRGBcolor*>
 {
 public:
   /// Compare two csRGBcolor structs.
-  virtual int Compare (void* item1, void* item2, int /*Mode*/)
+  static int Compare (void const* item1, void const* item2)
   {
-    csRGBcolor *i1 = STATIC_CAST(csRGBcolor *, item1);
-    csRGBcolor *i2 = STATIC_CAST(csRGBcolor *, item2);
-
+    csRGBcolor* i1 = (csRGBcolor*)item1;
+    csRGBcolor* i2 = (csRGBcolor*)item2;
     if ((*i1)==(*i2))
       return 0;
     else if(i1->red < i2->red &&
@@ -48,9 +50,8 @@ public:
   }
 
   /// Compare a key (csRGBcolor struct) with a csRGBcolor struct
-  virtual int CompareKey (void* item, const void* key, int /*Mode*/)
+  static int CompareKey (csRGBcolor* const& i1, void* key)
   {
-    csRGBcolor *i1 = STATIC_CAST(csRGBcolor *, item);
     const csRGBcolor *i2 = STATIC_CAST(const csRGBcolor *, key);
 
     if ((*i1)==(*i2))

@@ -22,7 +22,6 @@
 #include <stdarg.h>
 #include "csutil/ref.h"
 #include "csgeom/vector3.h"
-#include "csutil/csvector.h"
 #include "iengine/mesh.h"
 
 struct iEngine;

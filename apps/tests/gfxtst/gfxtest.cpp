@@ -24,7 +24,6 @@
 #include "cstool/initapp.h"
 #include "csgfx/csimage.h"
 #include "csutil/util.h"
-#include "csutil/csvector.h"
 #include "csutil/cfgfile.h"
 #include "iutil/databuff.h"
 #include "iutil/objreg.h"

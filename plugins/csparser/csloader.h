@@ -25,7 +25,6 @@
 #include "imap/parser.h"
 #include "iutil/eventh.h"
 #include "iutil/comp.h"
-#include "csutil/csvector.h"
 #include "csutil/util.h"
 #include "csutil/strhash.h"
 #include "csutil/array.h"

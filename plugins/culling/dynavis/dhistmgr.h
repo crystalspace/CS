@@ -22,7 +22,6 @@
 #include "iutil/eventh.h"
 #include "iutil/comp.h"
 #include "iutil/dbghelp.h"
-#include "csutil/csvector.h"
 #include "csutil/scf.h"
 #include "csgeom/plane3.h"
 #include "iengine/viscull.h"

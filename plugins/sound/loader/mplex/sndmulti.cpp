@@ -28,7 +28,6 @@
 #include "csutil/refarr.h"
 #include "csutil/util.h"
 #include "ivaria/reporter.h"
-#include "csutil/csvector.h"
 
 #define SNDPLEX_CLASSNAME "crystalspace.sound.loader.multiplexer"
 

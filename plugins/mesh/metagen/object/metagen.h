@@ -33,7 +33,6 @@
 #include "imesh/metagen.h"
 #include "iutil/eventh.h"
 #include "iutil/comp.h"
-#include "csutil/csvector.h"
 #include "csutil/parray.h"
 #include "csutil/cscolor.h"
 

@@ -20,7 +20,6 @@
 #ifndef __CS_CARRAYS_H__
 #define __CS_CARRAYS_H__
 
-#include "csutil/csvector.h"
 #include "csutil/parray.h"
 #include "curvebase.h"
 

@@ -20,7 +20,6 @@
 #define __CS_ENGSEQ_H__
 
 #include "csutil/util.h"
-#include "csutil/csvector.h"
 #include "csutil/csobject.h"
 #include "csutil/refcount.h"
 #include "csutil/refarr.h"

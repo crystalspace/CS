@@ -22,7 +22,6 @@
 #include "csgeom/math3d.h"
 #include "csgeom/box.h"
 #include "csgeom/tesselat.h"
-#include "csutil/csvector.h"
 #include "csutil/parray.h"
 #include "csutil/bitarray.h"
 #include "csutil/refarr.h"

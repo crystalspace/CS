@@ -23,7 +23,6 @@
 #include "cssysdef.h"
 #include "csutil/scf.h"
 #include "csutil/plugldr.h"
-#include "csutil/csvector.h"
 #include "csutil/util.h"
 #include "csutil/snprintf.h"
 #include "ivaria/reporter.h"

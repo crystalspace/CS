@@ -19,7 +19,6 @@
 #ifndef __CS_CSTREENODE_H__
 #define __CS_CSTREENODE_H__
 
-#include "csutil/csvector.h"
 #include "csutil/array.h"
 
 /**

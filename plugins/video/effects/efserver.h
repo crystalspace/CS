@@ -26,7 +26,6 @@
 #include "csutil/refarr.h"
 #include "csutil/objreg.h"
 #include "iutil/comp.h"
-#include "csutil/csvector.h"
 #include "ivideo/effects/efdef.h"
 #include "ivideo/effects/efstring.h"
 

@@ -20,7 +20,6 @@
 #define __CS_CMDLINE_H__
 
 #include "iutil/cmdline.h"
-#include "csutil/csvector.h"
 #include "csutil/parray.h"
 #include "csutil/stringarray.h"
 #include "csutil/util.h"

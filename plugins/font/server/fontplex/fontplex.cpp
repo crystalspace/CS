@@ -24,7 +24,6 @@
 #include "iutil/comp.h"
 #include "iutil/objreg.h"
 #include "ivaria/reporter.h"
-#include "csutil/csvector.h"
 #include "fontplex.h"
 
 CS_IMPLEMENT_PLUGIN

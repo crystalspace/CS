@@ -38,7 +38,6 @@
 #include "iengine/shadcast.h"
 #ifdef CS_USE_NEW_RENDERER
 #include "ivideo/rndbuf.h"
-#include "csutil/csvector.h"
 #include "ivideo/rendermesh.h"
 #include "cstool/anonrndbuf.h"
 #endif

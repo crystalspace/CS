@@ -97,7 +97,6 @@ struct iEvent;
 
 // Include all Windowing System components
 #include "csgeom/csrect.h"		// Rectangle class
-#include "csutil/csvector.h"		// Vector of objects
 #include "csutil/csevent.h"		// Event class
 #include "csutil/cseventq.h"		// Event Queue class
 #include "csutil/csinput.h"		// Keyboard codes

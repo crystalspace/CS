@@ -1,27 +1,26 @@
 #ifndef __CS_AWS_ITEM_VECTOR_H__
 #define __CS_AWS_ITEM_VECTOR_H__
 
-# include "csutil/csvector.h"
+# include "csutil/parray.h"
+
+struct awsListRow;
 
 /// Holds a vector of awsListRows
-class awsListRowVector :
-  public csVector
+class awsListRowVector : public csPDelArray<awsListRow>
 {
-  int sortcol;
 public:
-  awsListRowVector ();
-  virtual ~awsListRowVector ();
-
-  /// Virtual function which frees a vector element; returns success status
-  virtual bool FreeItem (void* Item);
+  int local_sortcol;
+  static int sortcol;
+public:
+  awsListRowVector () : local_sortcol (0) { }
 
   /// Compare two array elements in given Mode
-  virtual int Compare (void* Item1, void* Item2, int Mode) const;
+  static int Compare (awsListRow const* Item1, awsListRow const* Item2);
 
   /// Compare entry with a key
-  virtual int CompareKey (void* Item, const void* Key, int Mode) const;
+  static int CompareKey (awsListRow const* Item, void* Key);
 
   /// Set the sort column
-  void SetSortCol (int sc)  { sortcol = sc; }
+  void SetSortCol (int sc)  { local_sortcol = sc; }
 };
 #endif // __CS_AWS_ITEM_VECTOR_H__

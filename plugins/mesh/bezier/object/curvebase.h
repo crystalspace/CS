@@ -20,7 +20,6 @@
 #define __CS_CURVE_H__
 
 #include "csutil/scf.h"
-#include "csutil/csvector.h"
 #include "csgeom/math3d.h"
 #include "csgeom/math2d.h"
 #include "csgeom/box.h"

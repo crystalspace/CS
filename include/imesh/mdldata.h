@@ -22,7 +22,6 @@
 #include "csgeom/vector2.h"
 #include "csgeom/vector3.h"
 #include "csutil/cscolor.h"
-#include "csutil/csvector.h"
 #include "csutil/scf.h"
 
 struct iObject;

@@ -25,7 +25,6 @@
 #include "csutil/strset.h"
 #include "csutil/ref.h"
 #include "csutil/refarr.h"
-#include "csutil/csvector.h"
 #include "ivideo/effects/efvector4.h"
 #include "ivideo/effects/eftech.h"
 

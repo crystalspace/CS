@@ -29,7 +29,6 @@
 #include "csutil/scf.h"
 #include "csutil/strset.h"
 #include "csutil/strhash.h"
-#include "csutil/csvector.h"
 
 #ifdef CS_USE_NEW_RENDERER
   #include "ivideo/rndbuf.h"

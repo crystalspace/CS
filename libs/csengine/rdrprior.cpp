@@ -16,7 +16,6 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 #include "cssysdef.h"
-#include "csutil/csvector.h"
 #include "csutil/garray.h"
 #include "csengine/engine.h"
 #include "csengine/rdrprior.h"

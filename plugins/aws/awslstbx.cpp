@@ -322,11 +322,12 @@ void awsListBox::MapVisibleItems (
 
 static int DoFindItem (awsListRowVector *v, iString *text, bool with_delete)
 {
-  int i = v->FindKey (text);
+  v->sortcol = v->local_sortcol;
+  int i = v->FindKey (text, v->CompareKey);
 
   if (i>=0)
   {
-    if (with_delete) v->Delete (i, true);
+    if (with_delete) v->DeleteIndex (i);
 
     return i;
   }
@@ -339,7 +340,7 @@ static int DoFindItem (awsListRowVector *v, iString *text, bool with_delete)
       if (r->children &&
         (j = DoFindItem (r->children, text, with_delete)) >= 0)
       {
-        if (with_delete) r->children->Delete (j, true);
+        if (with_delete) r->children->DeleteIndex (j);
 
         return j;
       }
@@ -363,7 +364,7 @@ static void DoRecursiveClearList (awsListRowVector *v)
     }
   }
 
-  v->DeleteAll (true);
+  v->DeleteAll ();
 }
 
 /////////////// Scripted Actions /////////////////////////////////////////////////////////////

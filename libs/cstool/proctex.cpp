@@ -37,7 +37,6 @@
 #include "iutil/eventq.h"
 #include "iutil/comp.h"
 #include "iutil/virtclk.h"
-#include "csutil/csvector.h"
 #include "csutil/hashmap.h"
 
 #include "cstool/proctex.h"

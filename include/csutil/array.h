@@ -76,6 +76,9 @@ private:
   }
 
 public:
+  /// This function prototype is used for csArray::Sort()
+  typedef int ArraySortCompareFunction (void const* item1,
+	void const* item2);
   /// This function prototype is used for csArray::InsertSorted()
   typedef int ArrayCompareFunction (T const& item1, T const& item2);
   /// This function prototype is used for csArray::FindKey()
@@ -446,6 +449,14 @@ public:
     if (equal_index) *equal_index = -1;
     Insert (m, item);
     return m;
+  }
+
+  /**
+   * Sort array.
+   */
+  void Sort (ArraySortCompareFunction* compare)
+  {
+    qsort (root, Length (), sizeof (T), compare);
   }
 
   /** Iterator for the Array object */

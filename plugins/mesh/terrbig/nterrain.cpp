@@ -494,7 +494,7 @@ void nTerrain::CreateMaterialMap(iFile *matmap, iImage* /*terrtex*/)
   }
 
   // Now sort the list
-  if (map_mode==MAP_MODE_RGB) rgb_colors.QuickSort();
+  if (map_mode==MAP_MODE_RGB) rgb_colors.Sort(rgb_colors.Compare);
   // Disabled: not used: else pal_colors.Sort();
 }
 

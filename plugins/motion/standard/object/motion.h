@@ -22,7 +22,6 @@
 #include "iengine/motion.h"
 #include "iutil/eventh.h"
 #include "iutil/comp.h"
-#include "csutil/csvector.h"
 #include "csutil/parray.h"
 #include "csgeom/quaterni.h"
 

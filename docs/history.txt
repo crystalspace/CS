@@ -47,6 +47,10 @@ chronological order.
 	- Jorrit fixed a bug in awsSinkManager::RemoveSink(). That function
 	  was trying to find an iAwsSink inside the sinks basic vector but
 	  that vector only contains SinkMap instances.
+	- Jorrit replaced csRGBVector with csArray<csRGBcolor>.
+	- Jorrit replaced awsListRowVector with csPDelArray<awsListRow>.
+	- Jorrit removed all includes from csvector.h from all CS sources.
+	- Jorrit added csArray::Sort().
 2-Aug-2003
 	- Jorrit renamed csPDelArray::Delete(int) to DeleteIndex() to conform
 	  more to the API used by csArray.

@@ -25,7 +25,6 @@
 #include "isound/renderer.h"
 #include "iutil/eventh.h"
 #include "iutil/comp.h"
-#include "csutil/csvector.h"
 #include "csutil/cfgacc.h"
 #include "csutil/ref.h"
 #include "csutil/refarr.h"

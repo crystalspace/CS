@@ -21,7 +21,6 @@
 
 #include <stdarg.h>
 #include "csws/csws.h"
-#include "csutil/csvector.h"
 #include "csutil/ref.h"
 #include "csgeom/math2d.h"
 #include "csgeom/math3d.h"

@@ -24,7 +24,6 @@
 #include "isomesh.h"
 #include "iutil/eventh.h"
 #include "iutil/comp.h"
-#include "csutil/csvector.h"
 #include "csutil/csobject.h"
 
 /**

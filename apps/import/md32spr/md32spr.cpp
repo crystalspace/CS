@@ -37,7 +37,6 @@
 #include "csutil/xmltiny.h"
 #include "csutil/csstring.h"
 #include "csutil/memfile.h"
-#include "csutil/csvector.h"
 #include "csutil/archive.h"
 
 CS_IMPLEMENT_APPLICATION

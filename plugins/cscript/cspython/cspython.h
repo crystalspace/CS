@@ -24,7 +24,6 @@
 #include "iutil/eventh.h"
 #include "iutil/comp.h"
 #include "csutil/csinput.h"
-#include "csutil/csvector.h"
 
 class csPython : public iScript {
 public:

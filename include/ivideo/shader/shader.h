@@ -26,7 +26,6 @@
 #include "csutil/refarr.h"
 #include "csutil/scf.h"
 #include "csutil/strhash.h"
-#include "csutil/csvector.h"
 #include "ivideo/render3d.h"
 #include "ivideo/rendermesh.h"
 #include "csutil/symtable.h"

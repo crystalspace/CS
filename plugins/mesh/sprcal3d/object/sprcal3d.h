@@ -26,7 +26,6 @@
 
 #include "cssys/sysfunc.h"
 #include "csutil/cscolor.h"
-#include "csutil/csvector.h"
 #include "csutil/parray.h"
 #include "csutil/randomgen.h"
 #include "csutil/refarr.h"

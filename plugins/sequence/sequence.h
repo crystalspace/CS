@@ -20,7 +20,6 @@
 #define __CS_SEQUENCE_H__
 
 #include "csutil/util.h"
-#include "csutil/csvector.h"
 #include "ivaria/sequence.h"
 #include "iutil/eventh.h"
 #include "iutil/comp.h"

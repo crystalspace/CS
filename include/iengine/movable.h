@@ -26,7 +26,6 @@
  * @{ */
  
 #include "csutil/scf.h"
-#include "csutil/csvector.h"
 #include "csgeom/transfrm.h"
 
 class csVector3;

@@ -19,7 +19,6 @@
 #ifndef __CS_TXTMGR_H__
 #define __CS_TXTMGR_H__
 
-#include "csutil/csvector.h"
 #include "csutil/parray.h"
 #include "ivideo/txtmgr.h"
 #include "ivideo/material.h"

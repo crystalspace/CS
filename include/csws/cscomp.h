@@ -29,7 +29,6 @@
  * @{ */
 
 #include "csgeom/csrect.h"
-#include "csutil/csvector.h"
 #include "csutil/parray.h"
 #include "csutil/array.h"
 #include "cstool/cspixmap.h"

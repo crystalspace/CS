@@ -24,7 +24,6 @@
 
 #include "cssysdef.h"
 #include "csutil/csstring.h"
-#include "csutil/csvector.h"
 #include "csutil/datastrm.h"
 #include "cstool/mdldata.h"
 #include "imesh/mdldata.h"

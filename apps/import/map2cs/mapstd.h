@@ -24,7 +24,6 @@
 
 #include <stdio.h>
 
-#include "csutil/csvector.h"
 #include "csutil/csstring.h"
 #include "dmath3d.h"
 

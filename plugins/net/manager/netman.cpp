@@ -27,7 +27,6 @@
 #include "inetwork/sockerr.h"
 #include "csutil/csstring.h"
 #include "csutil/hashmap.h"
-#include "csutil/csvector.h"
 #include "csutil/datastrm.h"
 
 SCF_IMPLEMENT_IBASE (csNetworkManager)

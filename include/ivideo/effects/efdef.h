@@ -31,7 +31,6 @@
 #include "csutil/scf.h"
 #include "cstypes.h"
 #include "efvector4.h"
-#include "csutil/csvector.h"
 
 struct iEffectTechnique;
 

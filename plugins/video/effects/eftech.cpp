@@ -21,7 +21,6 @@
 #include "cstypes.h"
 #include "csutil/ref.h"
 #include "csutil/scf.h"
-#include "csutil/csvector.h"
 #include "csutil/hashmap.h"
 #include "csutil/strset.h"
 

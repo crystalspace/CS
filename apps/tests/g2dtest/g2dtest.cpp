@@ -23,7 +23,6 @@
 #define CS_SYSDEF_PROVIDE_SOFTWARE2D
 #include "cssysdef.h"
 #include "cssys/sysfunc.h"
-#include "csutil/csvector.h"
 #include "csutil/randomgen.h"
 #include "csutil/csstring.h"
 #include "cstool/initapp.h"

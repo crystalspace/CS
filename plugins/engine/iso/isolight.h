@@ -19,7 +19,6 @@
 #ifndef __CS_ISOLIGHT_H__
 #define __CS_ISOLIGHT_H__
 
-#include "csutil/csvector.h"
 #include "ivaria/iso.h"
 #include "iengine/light.h"
 #include "csutil/refarr.h"

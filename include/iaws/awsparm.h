@@ -22,7 +22,6 @@
 #include "csgeom/csrect.h"
 #include "csgeom/cspoint.h"
 #include "csutil/scfstr.h"
-#include "csutil/csvector.h"
 #include "iutil/stringarray.h"
 
 SCF_VERSION (iAwsParmList, 0, 1, 0);

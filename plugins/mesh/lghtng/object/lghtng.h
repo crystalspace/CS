@@ -23,7 +23,6 @@
 #include "csgeom/transfrm.h"
 #include "csgeom/objmodel.h"
 #include "csutil/cscolor.h"
-#include "csutil/csvector.h"
 #include "csutil/refarr.h"
 #include "csutil/randomgen.h"
 #include "imesh/object.h"

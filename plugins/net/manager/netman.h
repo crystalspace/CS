@@ -23,7 +23,6 @@
 #include "iutil/eventh.h"
 #include "iutil/event.h"
 #include "csutil/hashmap.h"
-#include "csutil/csvector.h"
 
 struct iEventQueue;
 struct iObjectRegistry;

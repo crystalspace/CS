@@ -23,7 +23,6 @@
 #include "csgeom/vector3.h"
 #include "csgeom/transfrm.h"
 #include "csutil/cscolor.h"
-#include "csutil/csvector.h"
 
 struct iLight;
 struct iMeshWrapper;

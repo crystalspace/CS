@@ -21,7 +21,6 @@
 #define __CS_IVARIA_COLLIDER_H__
 
 #include "csutil/scf.h"
-#include "csutil/csvector.h"
 #include "csgeom/vector3.h"
 
 struct iPolygonMesh;

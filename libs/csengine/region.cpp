@@ -17,7 +17,6 @@
 */
 #include "cssysdef.h"
 #include "cssys/sysfunc.h"
-#include "csutil/csvector.h"
 #include "csutil/array.h"
 #include "ivideo/txtmgr.h"
 #include "ivideo/texture.h"

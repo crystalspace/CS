@@ -21,7 +21,6 @@
 #include "iutil/objreg.h"
 #include "iutil/stringarray.h"
 #include "csutil/csstring.h"
-#include "csutil/csvector.h"
 #include "csutil/array.h"
 #include "csutil/refarr.h"
 #include "iutil/plugin.h"
