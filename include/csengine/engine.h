@@ -1,16 +1,16 @@
 /*
     Copyright (C) 1998-2001 by Jorrit Tyberghein
-  
+
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
     License as published by the Free Software Foundation; either
     version 2 of the License, or (at your option) any later version.
-  
+
     This library is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
     Library General Public License for more details.
-  
+
     You should have received a copy of the GNU Library General Public
     License along with this library; if not, write to the Free
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
@@ -64,7 +64,7 @@ struct iClipper2D;
 struct iReporter;
 struct iProgressMeter;
 struct iObjectRegistry;
-struct iPluginManager;
+struct iVirtualClock;
 
 SCF_DECLARE_FAST_INTERFACE (iEngine)
 SCF_DECLARE_FAST_INTERFACE (iSector)
@@ -297,8 +297,6 @@ public:
   static int frame_width, frame_height;
   /// Remember iObjectRegistry.
   static iObjectRegistry* object_reg;
-  /// Remember iPluginManager.
-  static iPluginManager* plugin_mgr;
   /// The shared engine instance.
   static csEngine* current_engine;
   /// The shared engine instance.
@@ -362,7 +360,7 @@ private:
   /// Linked list of dynamic lights.
   csDynLight* first_dyn_lights;
   /// List of halos (csHaloInformation).
-  csHaloArray halos;  
+  csHaloArray halos;
   /// Debugging: maximum number of polygons to process in one frame.
   static int max_process_polygons;
   /// Current number of processed polygons.
@@ -406,8 +404,11 @@ private:
    * last-anim value is different from this one. This should improve
    * global speed of the engine as this means that invisible particle
    * systems will now not be updated anymore until they are really visible.
-  */
+   */
   csTicks nextframe_pending;
+
+  /// Store virtual clock to speed up time queries.
+  iVirtualClock* virtual_clock;
 
 private:
   /**
@@ -1014,7 +1015,7 @@ private:
   /// Flag set when window requires resizing.
   bool resize;
   /**
-   * Private class which keeps state information about the engine specific to 
+   * Private class which keeps state information about the engine specific to
    * each context.
    */
 

@@ -59,13 +59,13 @@
 #include "iutil/databuff.h"
 #include "iutil/eventq.h"
 #include "iutil/objreg.h"
-#include "iutil/virtclk.h"
 #include "imap/reader.h"
 #include "imesh/lighting.h"
 #include "imesh/thing/polytmap.h"
 #include "imesh/thing/curve.h"
 #include "ivaria/reporter.h"
 #include "iutil/plugin.h"
+#include "iutil/virtclk.h"
 
 //---------------------------------------------------------------------------
 
@@ -655,7 +655,6 @@ iObject* csObjectIt::Fetch ()
 int csEngine::frame_width;
 int csEngine::frame_height;
 iObjectRegistry* csEngine::object_reg = NULL;
-iPluginManager* csEngine::plugin_mgr = NULL;
 csEngine* csEngine::current_engine = NULL;
 iEngine* csEngine::current_iengine = NULL;
 bool csEngine::use_new_radiosity = false;
@@ -726,6 +725,7 @@ csEngine::csEngine (iBase *iParent) : sectors (true)
   engine_states = NULL;
   rad_debug = NULL;
   nextframe_pending = 0;
+  virtual_clock = NULL;
 
   cbufcube = new csCBufferCube (1024);
   InitCuller ();
@@ -768,11 +768,11 @@ csEngine::~csEngine ()
   }
   render_priorities.DeleteAll ();
 
-  if (plugin_mgr) plugin_mgr->DecRef ();
   if (G3D) G3D->DecRef ();
   if (ImageLoader) ImageLoader->DecRef();
   if (VFS) VFS->DecRef ();
   if (Reporter) Reporter->DecRef ();
+  if (virtual_clock) virtual_clock->DecRef ();
   thing_type->DecRef ();
   delete materials;
   delete textures;
@@ -791,7 +791,9 @@ csEngine::~csEngine ()
 bool csEngine::Initialize (iObjectRegistry* object_reg)
 {
   csEngine::object_reg = object_reg;
-  plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
+
+  if (!(virtual_clock = CS_QUERY_REGISTRY (object_reg, iVirtualClock)))
+    return false;
 
   if (!(G3D = CS_QUERY_REGISTRY (object_reg, iGraphics3D)))
   {
@@ -1508,15 +1510,13 @@ void csEngine::Draw (iCamera* c, iClipper2D* view)
   s->Draw (&rview);
 
   // draw all halos on the screen
-  csTicks Elapsed, Current;
-  iVirtualClock* vc = CS_QUERY_REGISTRY (object_reg, iVirtualClock);
-  Elapsed = vc->GetElapsedTicks ();
-  Current = vc->GetCurrentTicks ();
-  vc->DecRef ();
-  int halo;
-  for (halo = halos.Length () - 1; halo >= 0; halo--)
-    if (!halos.Get (halo)->Process (Elapsed, *this))
-      halos.Delete (halo);
+  if (halos.Length () > 0)
+  {
+    csTicks elapsed = virtual_clock->GetElapsedTicks ();
+    for (int halo = halos.Length () - 1; halo >= 0; halo--)
+      if (!halos.Get (halo)->Process (elapsed, *this))
+        halos.Delete (halo);
+  }
 
   G3D->SetClipper (NULL, CS_CLIPPER_NONE);
 }
@@ -1624,7 +1624,7 @@ iStatLight* csEngine::FindLight (const char* name, bool regionOnly) const
 {
   // XXX: Need to implement region?
   (void) regionOnly;
-    
+
   // @@@### regionOnly
   for (int i=0; i<sectors.Length (); i++)
   {
@@ -1662,13 +1662,7 @@ void csEngine::RemoveDynLight (csDynLight* dyn)
 
 void csEngine::ControlMeshes ()
 {
-  csTicks elapsed_time, current_time;
-  iVirtualClock* vc = CS_QUERY_REGISTRY (object_reg, iVirtualClock);
-  elapsed_time = vc->GetElapsedTicks ();
-  current_time = vc->GetCurrentTicks ();
-  vc->DecRef ();
-
-  nextframe_pending = current_time;
+  nextframe_pending = virtual_clock->GetCurrentTicks ();
 
   // Delete particle systems that self-destructed now.
   // @@@ Need to optimize this?
@@ -2110,10 +2104,12 @@ iMeshFactoryWrapper* csEngine::CreateMeshFactory (const char* classId,
     }
   }
 
+  iPluginManager* plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
   iMeshObjectType* type = CS_QUERY_PLUGIN_CLASS (plugin_mgr, classId,
   	iMeshObjectType);
   if (!type)
     type = CS_LOAD_PLUGIN (plugin_mgr, classId, iMeshObjectType);
+  plugin_mgr->DecRef ();
   if (!type) return NULL;
   iMeshObjectFactory* fact = type->NewFactory ();
   if (!fact) return NULL;
@@ -2171,10 +2167,12 @@ iMeshFactoryWrapper* csEngine::LoadMeshFactory (
 	const char* loaderClassId,
 	iDataBuffer* input)
 {
+  iPluginManager* plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
   iLoaderPlugin* plug = CS_QUERY_PLUGIN_CLASS (plugin_mgr,
   	loaderClassId, iLoaderPlugin);
   if (!plug)
     plug = CS_LOAD_PLUGIN (plugin_mgr, loaderClassId, iLoaderPlugin);
+  plugin_mgr->DecRef ();
   if (!plug)
     return NULL;
 
@@ -2200,10 +2198,12 @@ iMeshWrapper* csEngine::LoadMeshWrapper (
 	iDataBuffer* input, iSector* sector, const csVector3& pos)
 {
   (void)classId;
+  iPluginManager* plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
   iLoaderPlugin* plug = CS_QUERY_PLUGIN_CLASS (plugin_mgr,
   	loaderClassId, iLoaderPlugin);
   if (!plug)
     plug = CS_LOAD_PLUGIN (plugin_mgr, loaderClassId, iLoaderPlugin);
+  plugin_mgr->DecRef ();
   if (!plug)
     return NULL;
 

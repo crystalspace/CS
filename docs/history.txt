@@ -1,5 +1,12 @@
 The history order is reversed so that new features are at the top.
 
+31-Dec-2001
+	- Got a patch from Tobias Brueckner <tobias.brueckner@gmx.net> which
+	  does the following:
+	      - Only process halos if there are halos.
+	      - Keep virtual clock instance in csEngine instead of querying
+	        it every time.
+	- Removed the plugin manager variable in csEngine.
 30-Dec-2001
 	- Fixed iPolygonMesh implementation in csThing so that it will
 	  check if the parent array of object-space vertices is still
