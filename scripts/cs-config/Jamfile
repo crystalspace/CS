@@ -63,7 +63,7 @@ rule ConfigHelper
   MAKEVARS = $(MAKEVARS:R=$(SUBDIR)) ;
   Depends $(<) : $(MAKEVARS) ;
 
-  InstallApplication $(<) ;
+  InstallShellScript $(<) ;
 }
 
 ConfigHelper cs-config ;

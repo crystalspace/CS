@@ -3,6 +3,33 @@ http://crystal.sourceforge.net/
 
 The history order is reversed so that new features are at the top.
 
+19-May-2003
+	- Eric Sunshine made the following changes to the Jam build facility:
+	    - Added helper rules InstallApplicationGUI and
+	      InstallApplicationConsole to install.jam.  The InstallApplication
+	      rule now invokes these rules to perform the actual installation.
+	      These rules can be overridden by platforms or facilities with
+	      special requirements.
+	    - MacOS/X now overrides InstallApplicationGUI in macosx.jam in
+	      order to correctly install the application wrapper, which is an
+	      entire directory hierarchy (per application), rather than a
+	      single executable file.
+	    - Added new InstallShellScript rule to install.jam.
+	    - Fixed CS/scripts/cs-config/Jamfile to invoke the new
+	      InstallShellScript rule, rather than InstallApplication.  Since
+	      platforms may now override the application installation rules for
+	      special situations, it is no longer wise to treat cs-config as an
+	      application at install time, thus the new shell-script-specific
+	      rule.
+	    - Fixed bug in CS/include/Jamfile where the `install' and
+	      `install_header' targets would encounter errors if the
+	      installation "include" directory did not already exist.
+	      Specifically, it invoked both "MkDir <install>/include/crystal"
+	      and "MkDir <install>/include/crystal/.", which Unix treats as the
+	      same directory, but which Jam treated as two distinct
+	      directories.  The result was that the second mkdir (for the
+	      "crystal/." variation) would fail with "directory already exists"
+	      error.
 18-May-2003
 	- res made the following changes in and around render3d:
 	    - ATI/NV only exts can be disabled all at once via cfg.
@@ -13,9 +40,11 @@ The history order is reversed so that new features are at the top.
 	- Eric Sunshine made the following changes to the Jam build facility:
 	    - Upgraded macosx.jam so that LinkApplication now knows how to
 	      create the entire application wrapper.  It no longer invokes the
-	      external appwrap.sh script.  The benefit of this approach is that
-	      Jam can now do all of its normal dependency tracking upon the
-	      resources contained in the wrapper.
+	      external appwrap.sh script.  The benefits of this approach
+	      include: Jam can now do all of its normal dependency tracking
+	      upon the resources contained in the wrapper; no longer dependent
+	      upon external shell script; third-party CS applications may now
+	      build proper application wrappers directly via the Jam rules.
 	    - Added ApplicationIconDefaultOSX and ApplicationIconOSX rules
 	      which allow setting of the default application icon, and the icon
 	      for a particular application, respectively.  (In the future, we
@@ -30,11 +59,10 @@ The history order is reversed so that new features are at the top.
 	      did not already exist.  For instance, "jam simple1clean" followed
 	      immediately by "jam simple1clean" would cause simple1 to be built
 	      by the second invocation of the `simpel1clean' rule.
-        - Jonathan Tarbox made the following change to the event object:
-            - Due to the assumtion of identical functionality between csVector
-              and csArray, I missed the CS_ASSERT when csArray::Pop() reached
-              the end of the array.  csVector would return NULL, csArray just
-              asserts.
+        - Jonathan Tarbox fixed the following problem with the event object:
+          Due to the assumtion of identical functionality between csVector and
+          csArray, I missed the CS_ASSERT when csArray::Pop() reached the end
+          of the array.  csVector would return NULL, csArray just asserts.
 17-May-2003
 	- res made the following changes:
 	    - extended the stdpt plugin with a fire texture loader.

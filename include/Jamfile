@@ -9,7 +9,7 @@ rule ScanHeaders
   {
     if $(_i:S) = ".h"
     {
-      LOCATE on $(_i:BSG=header_$(<)) = $(_dir) ;
+      SEARCH on $(_i:BSG=header_$(<)) = $(_dir) ;
       InstallHeader $(_i:BSG=header_$(<)) : $(<) ;
     }
     else
@@ -22,5 +22,4 @@ rule ScanHeaders
   }
 }
 
-ScanHeaders . ;
-
+ScanHeaders ;

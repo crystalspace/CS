@@ -15,11 +15,36 @@ rule InstallApplication
 {
   local dir = [ FDirName $(INSTALLDIR.APPLICATION) $(2) ] ;
   local target = $(<:R=$(dir):G=install) ;
-  
-  Install $(target) : $(<) ;
-  MODE on $(target) = $(EXEMODE) ;
+
+  if $(CONSOLEAPP_$(<)) = "yes"
+  {
+    InstallApplicationConsole $(target) : $(<) ;
+  }
+  else
+  {
+    InstallApplicationGUI $(target) : $(<) ;
+  }
   Depends install_apps : $(target) ;
 }
+
+##  InstallApplicationGUI installapp : app
+##  InstallApplicationConsole installapp : app
+##    Utility rules for InstallApplication which perform the actual
+##    installation.  These default implementations merely invokes the Install
+##    rule. Platforms with special installation requirements may override
+##    these rules.
+rule InstallApplicationGUI
+{
+  Install $(<) : $(>) ;
+  MODE on $(<) = $(EXEMODE) ;
+}
+
+rule InstallApplicationConsole
+{
+  Install $(<) : $(>) ;
+  MODE on $(<) = $(EXEMODE) ;
+}
+
 
 ##  InstallPlugin pluginname [ : subdir ]
 ##    Install a plugin into the plugindir directory. A subdirectory relative
@@ -71,6 +96,19 @@ rule InstallHeader
   Install $(target) : $(<) ;
   MODE on $(target) = $(FILEMODE) ;
   Depends install_headers : $(target) ;
+}
+
+##  InstallShellScript scriptname [ : subdir ]
+##    Install a shell script into the bindir directory. A subdirectory
+##    relative to the bindir can be specified.
+rule InstallShellScript
+{
+  local dir = [ FDirName $(INSTALLDIR.APPLICATION) $(2) ] ;
+  local target = $(<:R=$(dir):G=install) ;
+  
+  Install $(target) : $(<) ;
+  MODE on $(target) = $(EXEMODE) ;
+  Depends install_shellscripts : $(target) ;
 }
 
 ##  InstallData datafiles [ : subdir ]
@@ -221,7 +259,8 @@ rule Mapfile
 #----------------------------------------------------------------------------
 
 INSTALLTARGETS = install_apps install_plugins install_libs install_headers
-		 install_data install_configs install_maps ;
+		 install_shellscripts install_data install_configs
+		 install_maps ;
 EXTRAINSTALL = install_docs ;
 
 Always install $(INSTALLTARGETS) $(EXTRAINSTALL) ;
@@ -255,4 +294,3 @@ actions CopyDirs
 #  unset CRYSTAL
 #  $(BINDIR)/cslight $(<)
 #}
-

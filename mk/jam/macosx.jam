@@ -3,6 +3,7 @@
 # Copyright (C) 2003 by Eric Sunshine <sunshine@sunshineco.com>
 #============================================================================
 SHELL ?= "/bin/sh" ;
+DEEPCOPY ?= "cp -R" ;
 
 APPLICATION.LFLAGS += -framework AppKit -framework Foundation ;
 APPLICATION.CONSOLE.LFLAGS += -framework AppKit -framework Foundation ;
@@ -279,4 +280,30 @@ rule AppIcon
 actions AppIcon1
 {
     $(CP) $(>) $(<)
+}
+
+## InstallApplicationGUI installapp : app
+##    Overrides InstallApplicationGUI from install.jam.  Unlike applications
+##    on other platforms which exist as a single executable file, on MacOS/X,
+##    an application is wrapped in a directory hierarchy, thus a deep copy is
+##    needed (i.e. the typical Install rule does not work).
+rule InstallApplicationGUI
+{
+  local target = $(<).app ;
+  local wrapper = [ Wrapper $(>) : app ] ;
+  SEARCH on $(wrapper) = $(LOCATE.TARGETS) ;
+  NotFile $(<) ;
+  Always $(<) ;
+  Depends $(<) : $(target) ;
+  Depends $(target) : $(<:D:G=dir) ; # Ensure installation directory exists.
+  MkDir $(<:D:G=dir) ;
+  Depends $(target) : $(wrapper) ;
+  Depends $(wrapper) : $(>) ;
+  InstallApplicationWrapper $(target) : $(wrapper) ;
+}
+
+actions InstallApplicationWrapper
+{
+  $(DELTREE) $(<) ;
+  $(DEEPCOPY) $(>) $(<) ;
 }
