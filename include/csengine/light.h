@@ -350,7 +350,7 @@ public:
     { scfParent->SetAttenuationVector(attenv); }
     virtual const csVector3 &GetAttenuationVector() { return scfParent->GetAttenuationVector(); }
     virtual void CalculateAttenuationVector (int atttype, float radius,
-      float brightness) { return scfParent->CalculateAttenuationVector 
+      float brightness) { scfParent->CalculateAttenuationVector 
         (atttype, radius, brightness); }
     virtual bool GetDistanceForBrightness (float brightness, float& distance)
     { return scfParent->GetDistanceForBrightness (brightness, distance); }
