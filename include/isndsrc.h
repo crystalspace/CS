@@ -18,8 +18,8 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#if !defined(__ISOUNDSOURCE_H__)
-#define __ISOUNDSOURCE_H__
+#ifndef __ISNDSRC_H__
+#define __ISNDSRC_H__
 
 #include "csutil/scf.h"
 #include "csgeom/vector3.h"
@@ -31,8 +31,10 @@
 SCF_VERSION (iSoundSource, 0, 0, 1);
 
 /**
- * @@@ Please document me using Doc++!
- * Note: Merged sound buffers and sources into this class.
+ * The sound source is used to play a sound stream. It can be a non-3d source,
+ * in which case it plays the sound as it was recorded, or a 3d source, in
+ * which case it represents an object in 3d space and adjusts L/R volume for
+ * 3d sound.
  */
 struct iSoundSource : public iBase
 {
@@ -44,7 +46,7 @@ struct iSoundSource : public iBase
   virtual void SetVolume (float volume) = 0;
   /// Get volume
   virtual float GetVolume () = 0;
-  /// Set frequency factor : 1 = normal, >1 more speed, <1 more slow
+  /// Set frequency factor : 1 = normal, >1 faster, 0-1 slower
   virtual void SetFrequencyFactor (float factor) = 0;
   /// Get frequency factor
   virtual float GetFrequencyFactor () = 0;
@@ -61,4 +63,4 @@ struct iSoundSource : public iBase
   virtual csVector3 GetVelocity() = 0;
 };
 
-#endif // __ISOUNDBUFFER_H__
+#endif

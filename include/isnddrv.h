@@ -18,8 +18,8 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __ISOUNDDRIVER_H__
-#define __ISOUNDDRIVER_H__
+#ifndef __ISNDDRV_H__
+#define __ISNDDRV_H__
 
 #include "csutil/scf.h"
 #include "iplugin.h"
@@ -59,4 +59,4 @@ struct iSoundDriver : public iPlugIn
   virtual bool IsHandleVoidSound () = 0;
 };
 
-#endif //__ISOUNDDRIVER_H__
+#endif

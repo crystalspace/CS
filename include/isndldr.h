@@ -1,6 +1,23 @@
+/*
+    Copyright (C) 1998 by Jorrit Tyberghein    
 
-#ifndef ISNDLDR_H
-#define ISNDLDR_H
+    This library is free software; you can redistribute it and/or
+    modify it under the terms of the GNU Library General Public
+    License as published by the Free Software Foundation; either
+    version 2 of the License, or (at your option) any later version.
+
+    This library is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+    Library General Public License for more details.
+
+    You should have received a copy of the GNU Library General Public
+    License along with this library; if not, write to the Free
+    Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+*/
+
+#ifndef __ISNDLDR_H__
+#define __ISNDLDR_H__
 
 #include "iplugin.h"
 
@@ -8,10 +25,10 @@ struct iSoundData;
 struct csSoundFormat;
 
 /**
- * The sound loader plugin. This loads sound files and creates iSoundData
- * objects from it, which you can use to play the sound.
+ * The sound loader plugin is used to load sound files from the VFS and
+ * create sound data objects or sound streams from it.
  */
-SCF_VERSION (iSoundLoader, 0, 0, 1);
+SCF_VERSION (iSoundLoader, 1, 0, 0);
 
 struct iSoundLoader : public iPlugIn
 {
@@ -19,15 +36,9 @@ public:
   /// Initialize the Sound Loader.
   virtual bool Initialize (iSystem *sys) = 0;
 
-  /**
-   * Load a sound from the VFS. The fields of the format descriptor may be
-   * set to a negative number to let the sound loader choose a format.
-   * Set 'Streamed' to true to keep the sound data's original representation
-   * as streamed data. This is currently useless but should in the future be
-   * helpful to implement music. You should leave it false currently.
-   */
-  virtual iSoundData *LoadSound(UByte *Buffer, ULong Size,
-    const csSoundFormat *RequestFormat, bool Streamed=false) = 0;
+  /// load a sound file from the VFS
+  virtual iSoundData *LoadSound(void *Data, unsigned long Size,
+    const csSoundFormat *Format) = 0;
 };
 
 #endif

@@ -18,9 +18,10 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#if !defined(__ISOUNDLISTENER_H__)
-#define __ISOUNDLISTENER_H__
+#ifndef __ISNDLSTN_H__
+#define __ISNDLSTN_H__
 
+#include "csutil/scf.h"
 #include "csgeom/vector3.h"
 
 /// taken from eax preset environment
@@ -53,11 +54,13 @@ enum SoundEnvironment
   ENVIRONMENT_PSYCHOTIC
 };
 
+/**
+ * The sound listener is a unique object created by the sound renderer. It
+ * can be used to setup 'yourself' (the player) for 3d sound: position,
+ * orientation, speed and environment effects.
+ */
 SCF_VERSION (iSoundListener, 0, 0, 1);
 
-/**
- * @@@ Please document me using Doc++!
- */
 struct iSoundListener : public iBase
 {
   /// Set direction of listener (front and top 3d vectors)
@@ -95,4 +98,4 @@ struct iSoundListener : public iBase
   virtual SoundEnvironment GetEnvironment () = 0;
 };
 
-#endif // __ISOUNDLISTENER_H__
+#endif

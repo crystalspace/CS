@@ -18,31 +18,35 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __ISOUNDRENDER_H__
-#define __ISOUNDRENDER_H__
+#ifndef __ISNDRDR_H__
+#define __ISNDRDR_H__
 
-#include "csutil/scf.h"
-
-/**
- * This is the sound render interface for CS.
- * All sound renders must implement this interface.
- * The standard implementation is ISoundDriver.
- */
-
-struct iSoundListener;
-struct iSoundSource;
-struct iSoundBuffer;
-struct iSoundData;
-struct csSoundFormat;
 #include "iplugin.h"
 
-SCF_VERSION (iSoundRender, 0, 0, 1);
+struct iSoundListener;
+struct iSoundData;
+struct iSoundStream;
+struct iSoundSource;
+struct csSoundFormat;
 
 /**
- * @@@ Please document me using Doc++!
- * Note: Merged CreateSoundBuffer() and CreateSource(). You can switch between
- * them with the Is3d parameter.
+ * The sound renderer is used to play previously loaded sounds or music.
+ * Loading itself is NOT done through this interface. <p>
+ *
+ * Sounds may be played as non-3d directly with PlaySound(). If you want
+ * more control (for example, stop the sound at any time) or if you want 3d
+ * sound you have to create a sound source. Sources can be 3d or non-3d,
+ * where non-3d sources simply ignore the position and velocity control
+ * methods of iSoundSource. <p>
+ *
+ * The renderer can play sound data and sound stream objects. You should
+ * read the docs for them to understand the template-instance relation
+ * between them. This basically means that you can create any number of
+ * sound sources from a sound data object, but only one source from a sound
+ * stream.
  */
+SCF_VERSION (iSoundRender, 1, 0, 0);
+
 struct iSoundRender : public iPlugIn
 {
 public:
@@ -50,26 +54,45 @@ public:
   virtual bool Open () = 0;
   /// Close the sound render
   virtual void Close () = 0;
+
   /// Set Volume [0, 1]
   virtual void SetVolume (float vol) = 0;
   /// Get Volume [0, 1]
   virtual float GetVolume () = 0;
-  /// Play a sound buffer without control; data should be decoded
-  virtual void PlayEphemeral (iSoundData *snd, bool Loop=false) = 0;
-  /// create a sound source; data should be decoded
-  virtual iSoundSource *CreateSource (iSoundData *snd, bool Is3d) = 0;
+
+  /**
+   * Play a sound without further control. This is a convenience function
+   * to create and play a new sound stream.
+   */
+  virtual void PlaySound(iSoundData *Data, bool Loop = false) = 0;
+  /**
+   * Play a sound without further control. Note: No other part of your
+   * program should read data from the sound stream while it is playing.
+   */
+  virtual void PlaySound(iSoundStream *Sound, bool Loop = false) = 0;
+
+  /**
+   * Create a sound source. This is a convenience function
+   * to create a new sound stream and attach it to a new sound source.
+   */
+  virtual iSoundSource *CreateSource(iSoundData *Sound, bool is3d) = 0;
+  /**
+   * Create a sound source and attach the given sound stream. Note: No other
+   * part of your program should read data from the sound stream as long as
+   * the sound source exists.
+   */
+  virtual iSoundSource *CreateSource(iSoundStream *Sound, bool is3d) = 0;
+
   /// Get the global Listener object
   virtual iSoundListener *GetListener () = 0;
-  /// play background music; data should NOT be decoded to save memory
-  virtual void PlayMusic(iSoundData *snd) = 0;
-  /// stop background music
-  virtual void StopMusic() = 0;
-  /// get format for sound loader
+
+  /// return the sound format to load a sound
   virtual const csSoundFormat *GetLoadFormat() = 0;
-  /// update the renderer
+
+  /// update the renderer (must be called regularly).
   virtual void Update() = 0;
-  /// Internal use : mixing function (need if your render use a driver)
+  /// Internal use : mixing function (needed if your renderer uses a driver)
   virtual void MixingFunction () = 0;
 };
 
-#endif //__ISOUNDRENDER_H__
+#endif
