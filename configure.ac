@@ -1276,7 +1276,16 @@ CS_CHECK_LIB_WITH([ode],
     [libs/libode*], [],                                                         
     [CS_MAKEFILE_BUILD_RESULT([cs_cv_libode], [ODE])])
 
-
+#-----------------------------------------------------------------------------
+# Check for libopenal.  In addition to the standard installed locations, we
+# also search CS/libs/libopenal*.
+#------------------------------------------------------------------------------
+CS_CHECK_LIB_WITH([openal],
+    [AC_LANG_PROGRAM(
+	[#include <AL/al.h>],
+	[/*some test would be nice here...*/])],
+    [libs/libopenal*], [],
+    [CS_MAKEFILE_BUILD_RESULT([cs_cv_libopenal], [OPENAL])])
 
 #------------------------------------------------------------------------------
 # For Mingw, test if we need to link explicitly with libmingwex.a.  Older

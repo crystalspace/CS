@@ -134,11 +134,13 @@ endif
 ifeq ($(MIKMOD.AVAILABLE),yes)
 PLUGINS.DYNAMIC += sound/loader/mod
 endif
-#PLUGINS.DYNAMIC += sound/renderer/openal
+ifeq ($(OPENAL.AVAILABLE),yes)
+PLUGINS.DYNAMIC += sound/renderer/openal
+endif
 ifeq ($(ODE.AVAILABLE),yes)
 PLUGINS.DYNAMIC += physics/odedynam
+PLUGINS.DYNAMIC += physics/loader
 endif
-#PLUGINS.DYNAMIC += physics/loader
 #PLUGINS.DYNAMIC += device/joystick/linux
 #PLUGINS.DYNAMIC += video/render3d/opengl
 #PLUGINS.DYNAMIC += video/render3d/shadermgr

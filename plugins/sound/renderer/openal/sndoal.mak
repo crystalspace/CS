@@ -28,7 +28,7 @@ ifeq ($(MAKESECTION),postdefines)
 
 vpath %.cpp plugins/sound/renderer/openal plugins/sound/renderer/common
 
-LIB.EXTERNAL.sndoal = -lopenal
+LIB.EXTERNAL.sndoal = $(OPENAL.LFLAGS)
 
 # COMP_GCC Linker assumes static libs have extension '.a'.  Mingw/Cygwin both
 # use libdsound.a (static lib) as the place from which to get MS DirectSound.
