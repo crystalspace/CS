@@ -434,7 +434,7 @@ int main (int argc, char * argv[])
     {
       if ((flags & FLAG_OVERWR) == 0)
       {
-        fprintf (stderr, "%s exist, overwrite [y/n] ", outfn);
+        fprintf (stderr, "%s exists; overwrite? [y/n] ", outfn);
         fflush (stdout);
         if (toupper(getc(stdin)) != 'Y')
         {

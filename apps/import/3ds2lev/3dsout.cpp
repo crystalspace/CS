@@ -249,7 +249,6 @@ void CSWriter::WriteFooter ()
 {
   if (flags & FLAG_SPRITE)
   {
-    WriteL ("ACTION 'default' (F (f1,1000))");
     UnIndent();
     WriteL (")"); // close MESHFACT
   }
@@ -313,6 +312,8 @@ void CSWriter::WriteVertices (Lib3dsMesh* mesh)
 	      xyz[2]*zscale + zrelocate);
       WriteL ("%g,%g)",u, (flags & FLAG_SWAP_V ? 1.-v : v));
     }
+    UnIndent();
+    WriteL(")"); // close FRAME
   }
   else
   {
@@ -797,8 +798,18 @@ void CSWriter::WriteObjects (bool lighting)
     
     // <--output vertexes-->
     
+    if (flags & FLAG_SPRITE) {
+      WriteL("FRAME 'f1' (");
+      Indent();
+    }
+
     WriteVertices(p3dsMesh);
     
+    if (flags & FLAG_SPRITE) {
+      WriteL ("ACTION 'default' (F (f1,1000))");
+      WriteL("");
+    }
+
     // <--output faces-->
     
     WriteFaces(p3dsMesh, lighting, numMesh);
