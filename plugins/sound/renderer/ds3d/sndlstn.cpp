@@ -69,7 +69,6 @@ bool csSoundListenerDS3D::Initialize(csSoundRenderDS3D *srdr) {
       reporter->Report (CS_REPORTER_SEVERITY_WARNING,
       	"crystalspace.sound.ds3d", "DS3D listener: "
         "Cannot create primary sound buffer (%s).", Renderer->GetError(r));
-    if (reporter) reporter->DecRef ();
     return false;
   }
 
@@ -80,13 +79,11 @@ bool csSoundListenerDS3D::Initialize(csSoundRenderDS3D *srdr) {
       	"crystalspace.sound.ds3d",
         "DS3D listener: Cannot query listener"
         " interface from primary sound buffer (%s).", Renderer->GetError(r));
-    if (reporter) reporter->DecRef ();
     return false;
   }
 
   Dirty = true;
   Prepare();
-  if (reporter) reporter->DecRef ();
   return true;
 }
 
