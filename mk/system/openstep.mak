@@ -15,15 +15,16 @@
 #	Build-time configuration options for the OpenStep platform.
 #
 # *NOTE*
-#	The OpenStep 4.2 Objective-C++ compiler has a register allocation
-#	bug which causes it to corrupt the virtual-table pointer of classes
-#	whose parent class (and sometimes parent's parent class) have very
-#	small inline constructors.  This bug only manifests itself when the
-#	constructors are *not* inlined, such as when compiling for debug.
-#	When inlined, they work correctly.  To work around this problem, we
-#	must force use of inline functions even when compiling for debug.
-#	Consequently, NEXT.CFLAGS.DEBUG includes the -finline-functions
-#	directive.
+#	The OpenStep 4.2 Objective-C++ compiler has a register allocation bug
+#	which causes it to corrupt the virtual-table pointer of classes whose
+#	parent class (and sometimes parent's parent class) have very small
+#	constructors or very small inline constructors.  This bug only
+#	manifests itself when the constructors are not inlined and when no
+#	optimization is in effect, such as when compiling for debug.  When the
+#	constructors are inlined or when even minimal optimization is in
+#	effect, they work correctly.  To work around this problem, we enable
+#	minimal optimization (-O) and force use of inline functions
+#	(-finline-functions) when compiling for debug.
 #
 #-------------------------------------------------------------------------------
 
@@ -35,7 +36,7 @@ NEXT.ARCHS=i386 m68k sparc
 NEXT.SOURCE_DIRS=openstep
 NEXT.INCLUDE_DIRS=-FAppKit -FFoundation
 NEXT.CFLAGS.GENERAL=-Wmost $(CFLAGS.D)_POSIX_SOURCE $(CFLAGS.D)__STRICT_ANSI__
-NEXT.CFLAGS.DEBUG=-finline-functions
+NEXT.CFLAGS.DEBUG=-finline-functions -O
 NEXT.CFLAGS.DLL=
 NEXT.LIBS=
 NEXT.LFLAGS.GENERAL=-framework AppKit -framework Foundation

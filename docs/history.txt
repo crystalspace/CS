@@ -21,6 +21,8 @@ Short-term cleanups that need to be done:
 	- Eric Sunshine fixed a BeOS-specific latent bug in the COM library,
 	  which was incorrectly associating DLLs with the Windows section of
 	  csCOM.cfg, rather than the desired Unix section.
+	- Eric Sunshine worked around a register allocation bug in the
+	  OpenStep compiler which was triggered when compiling for 'debug'.
 10-Oct-1999
 	- Fixed bug in octree outline table which caused octree visibility
 	  culling not to work correctly in some cases.

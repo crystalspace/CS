@@ -15,15 +15,16 @@
 #	Build-time configuration options for the MacOS/X Server platform.
 #
 # *NOTE*
-#	The MacOS/X Server Objective-C++ compiler has a register allocation
-#	bug which causes it to corrupt the virtual-table pointer of classes
-#	whose parent class (and sometimes parent's parent class) have very
-#	small inline constructors.  This bug only manifests itself when the
-#	constructors are *not* inlined, such as when compiling for debug.
-#	When inlined, they work correctly.  To work around this problem, we
-#	must force use of inline functions even when compiling for debug.
-#	Consequently, NEXT.CFLAGS.DEBUG includes the -finline-functions
-#	directive.
+#	The OpenStep 4.2 Objective-C++ compiler has a register allocation bug
+#	which causes it to corrupt the virtual-table pointer of classes whose
+#	parent class (and sometimes parent's parent class) have very small
+#	constructors or very small inline constructors.  This bug only
+#	manifests itself when the constructors are not inlined and when no
+#	optimization is in effect, such as when compiling for debug.  When the
+#	constructors are inlined or when even minimal optimization is in
+#	effect, they work correctly.  To work around this problem, we enable
+#	minimal optimization (-O) and force use of inline functions
+#	(-finline-functions) when compiling for debug.
 #
 # *NOTE*
 #	The $(subst) calls in DO.MAKE.VOLATILE work around a bug in GNU make
@@ -34,6 +35,7 @@
 #	we manually translate .t and .tm back into .tmp.  Do not replace the
 #	$(subst) calls with $(patsubst) since patsubst is incapable of
 #	transforming the sort of strings which MAKE_VOLATILE_H contains.
+#
 #-------------------------------------------------------------------------------
 
 NEXT.TARGET=macosxs
@@ -44,7 +46,7 @@ NEXT.ARCHS=i386 ppc
 NEXT.SOURCE_DIRS=macosxs openstep
 NEXT.INCLUDE_DIRS=-FAppKit -FFoundation
 NEXT.CFLAGS.GENERAL=-Wmost
-NEXT.CFLAGS.DEBUG=-finline-functions
+NEXT.CFLAGS.DEBUG=-finline-functions -O
 NEXT.CFLAGS.DLL=
 NEXT.LIBS=
 NEXT.LFLAGS.GENERAL=-framework AppKit -framework Foundation
