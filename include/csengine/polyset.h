@@ -521,7 +521,7 @@ public:
     /// Create a key/value pair object
     virtual bool CreateKey (const char *iName, const char *iValue);
   } scfiPolygonSet;
-  friend class PolySet;
+  friend struct PolySet;
 };
 
 #endif // __CS_POLYSET_H__

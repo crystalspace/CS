@@ -1143,7 +1143,7 @@ public:
     /// Set polygon texture mapping plane
     virtual bool SetPlane (const char *iName);
   } scfiPolygon3D;
-  friend class Poly3D;
+  friend struct Poly3D;
 };
 
 #endif // __CS_POLYGON_H__
