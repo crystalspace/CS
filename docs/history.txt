@@ -47,6 +47,12 @@ The history order is reversed so that new features are at the top.
 	- Implemented XML version of the starldr.
 	- Fixed a crash bug in 3ds2lev with sprites if the 3ds file doesn't
 	  have texture mapping information.
+	- Eric Sunshine started fixing problems caused by the introduction of
+	  csFindSystemRoots().  The implementation broke linkage on several
+	  platforms as a result of incorrect organization and makefile
+	  modifications.  Fixes for other problems will be forthcoming.  Other
+	  problems include an apparent double-delete of allocated strings,
+	  unnecessary code inefficiencies, and poor API.
 22-Aug-2002
 	- Fixed Cs2Xml for DURATION and FRAME commands in motion loader.
 	- Cs2Xml now supports the normal notation for vertices in 3D

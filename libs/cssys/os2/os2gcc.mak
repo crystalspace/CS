@@ -139,6 +139,7 @@ SRC.SYS_CSSYS = \
   libs/cssys/os2/csos2.cpp \
   libs/cssys/os2/scancode.cpp \
   libs/cssys/os2/loadlib.cpp \
+  libs/cssys/os2/sysroot.cpp \
   libs/cssys/general/findlib.cpp \
   libs/cssys/general/getopt.cpp \
   libs/cssys/general/instpath.cpp \

@@ -9,15 +9,15 @@ DESCRIPTION.OS.win32gcc = Win32
 PLUGINS += sound/renderer/software
 PLUGINS += video/canvas/ddraw
 #PLUGINS += video/canvas/ddraw8
-PLUGINS.DYNAMIC += sound/loader/mp3
+#PLUGINS.DYNAMIC += sound/loader/mp3
 PLUGINS.DYNAMIC +=net/driver/ensocket
-PLUGINS.DYNAMIC += mesh/impexp/3ds
-PLUGINS.DYNAMIC += font/server/freefnt2
-PLUGINS.DYNAMIC +=video/format/avi
-PLUGINS.DYNAMIC +=video/format/codecs/opendivx
+#PLUGINS.DYNAMIC += mesh/impexp/3ds
+#PLUGINS.DYNAMIC += font/server/freefnt2
+#PLUGINS.DYNAMIC +=video/format/avi
+#PLUGINS.DYNAMIC +=video/format/codecs/opendivx
 PLUGINS.DYNAMIC +=physics/odedynam
 #PLUGINS.DYNAMIC +=video/loader/jng
-PLUGINS.DYNAMIC += cscript/cspython
+#PLUGINS.DYNAMIC += cscript/cspython
 #PLUGINS.DYNAMIC += cscript/cslua
 
 # If you have the following line uncommented make sure one

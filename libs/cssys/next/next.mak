@@ -175,7 +175,8 @@ SRC.SYS_CSSYS = $(wildcard \
   $(addsuffix /*.m,$(NEXT.SOURCE_PATHS))) \
   libs/cssys/general/findlib.cpp \
   libs/cssys/general/getopt.cpp \
-  libs/cssys/general/printf.cpp
+  libs/cssys/general/printf.cpp \
+  libs/cssys/general/sysroot.cpp
 
 # Where to put dynamic libraries on this system?
 OUTDLL = $(NEXT.PLUGIN_DIR)

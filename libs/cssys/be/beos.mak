@@ -109,7 +109,8 @@ SRC.SYS_CSSYS=$(wildcard libs/cssys/be/*.cpp) \
   libs/cssys/general/instpath.cpp \
   libs/cssys/general/printf.cpp \
   libs/cssys/general/runloop.cpp \
-  libs/cssys/general/sysinit.cpp
+  libs/cssys/general/sysinit.cpp \
+  libs/cssys/general/sysroot.cpp
 
 # Where to put dynamic libraries on this system?
 OUTDLL=add-ons

@@ -22,10 +22,8 @@
 
 char * csFindSystemRoots ()
 {
-  char * buffer = new char[3];
-  buffer[0] = '/';
+  char * buffer = new char[2];
+  buffer[0] = '\0';
   buffer[1] = '\0';
-  buffer[2] = '\0';
-
   return buffer;
 }
