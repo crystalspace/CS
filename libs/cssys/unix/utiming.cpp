@@ -21,13 +21,7 @@
 #include "cssysdef.h"
 #include "cssys/sysdriv.h"
 
-// Define this if we have GCC3.
-// @@@ We need to change the makefile to detect this automatically!
-#ifndef COMP_GCC3
-#define COMP_GCC3 0
-#endif
-
-#if COMP_GCC3
+#ifdef COMP_GCC3
 extern "C"
 {
   extern long int __sysconf (int);
@@ -38,7 +32,7 @@ extern "C"
 csTicks csGetTicks ()
 {
   struct tms buf;
-#if COMP_GCC3
+#ifdef COMP_GCC3
   return times (&buf) * 1000 / ((__clock_t) __sysconf(2));
 #else
   return times (&buf) * 1000 / CLK_TCK;
