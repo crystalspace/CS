@@ -203,18 +203,18 @@ void csThing::GenerateCacheName ()
   mf.Write ((char*)&l, 4);
   if (GetName ())
     mf.Write (GetName (), strlen (GetName ()));
-
-  l = convert_endian (QInt ((b.MinX () * 1000)+.5));
+  
+  l = convert_endian ((long)QInt ((b.MinX () * 1000)+.5));
   mf.Write ((char*)&l, 4);
-  l = convert_endian (QInt ((b.MinY () * 1000)+.5));
+  l = convert_endian ((long)QInt ((b.MinY () * 1000)+.5));
   mf.Write ((char*)&l, 4);
-  l = convert_endian (QInt ((b.MinZ () * 1000)+.5));
+  l = convert_endian ((long)QInt ((b.MinZ () * 1000)+.5));
   mf.Write ((char*)&l, 4);
-  l = convert_endian (QInt ((b.MaxX () * 1000)+.5));
+  l = convert_endian ((long)QInt ((b.MaxX () * 1000)+.5));
   mf.Write ((char*)&l, 4);
-  l = convert_endian (QInt ((b.MaxY () * 1000)+.5));
+  l = convert_endian ((long)QInt ((b.MaxY () * 1000)+.5));
   mf.Write ((char*)&l, 4);
-  l = convert_endian (QInt ((b.MaxZ () * 1000)+.5));
+  l = convert_endian ((long)QInt ((b.MaxZ () * 1000)+.5));
   mf.Write ((char*)&l, 4);
 
   csMD5::Digest digest = csMD5::Encode (mf.GetData (), mf.GetSize ());
