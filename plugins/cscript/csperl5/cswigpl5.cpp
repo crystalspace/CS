@@ -1,7 +1,8 @@
 /*
  
- css.h *must* be the very *first* header we include from our module code,
- otherwise things (eg. int64 types from stdint.h) will break.
+ crystalspace.h *must* be the very *first* header we include from our
+ module code, otherwise things (eg. int64 types from stdint.h) will
+ break.
 
  Since it is impossible to tell SWIG to put any code above it's auto-
  generated header (which includes some system files), we have to do it this
@@ -10,8 +11,7 @@
 
 */
 
-#include "cssysdef.h"
-#include "css.h"
+#include "crystalspace.h"
 #undef MIN
 #undef MAX
 #include "cswigpl5.inc"

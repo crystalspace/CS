@@ -403,3 +403,8 @@ Users new to the SDK will probably want to include @file{crystalspace.h} since
 it is simplest; whereas more advanced users may want to include
 @file{csutil.h}, @file{cstool.h}, etc.; and power users can continue to include
 only the individual headers required by a particular piece of code.
+
+As a corollary, the old @file{CS/include/css.h} header, which included many,
+though not all Crystal Space header files, has been removed. If you require
+this type functionality from a header, then include the new
+@file{crystalspace.h} instead.

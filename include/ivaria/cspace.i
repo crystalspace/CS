@@ -126,11 +126,12 @@
 #endif
 
 /* @@@ The following is a kludge. In the future, all cspace modules for all
- *     scripting languages should include css.h in the same way Perl does.
+ *     scripting languages should include crystalspace.h in the same way Perl
+ *     does.
  */
 #ifndef SWIGPERL5
   %{
-    #include "css.h"
+    #include "crystalspace.h"
   %}
 #endif
 
