@@ -1510,18 +1510,71 @@ AS_IF([test "$with_vos" != no],
 
 
 #------------------------------------------------------------------------------
-# Check whether to build the WxWidgets Canvas
+# Check for wxWidgets. Also check if it was built with OpenGL support since it
+# is required by the Crystal Space wxWidgets canvas.
+#
+# IMPLEMENTATION NOTE
+#
+# On Windows, wx-config's --gl-libs options incorrectly emits a reference to a
+# non-existent library (wxmsw_glxxx.lib). To handle this broken case, we first
+# try the result of --libs and --gl-libs together; if that fails, then we try
+# only --libs augmented with the results of our own OpenGL checks.
 #------------------------------------------------------------------------------
 AC_CHECK_TOOLS([WXCONFIG], [wx-config])
+
 AC_CACHE_CHECK([for wxWidgets], [cs_cv_wxwidgets],
     [AS_IF([test -n "$WXCONFIG"],
     	[cs_cv_wxwidgets=yes
     	cs_cv_wxwidgets_cflags="`AC_RUN_LOG([$WXCONFIG --cxxflags])`"
     	cs_cv_wxwidgets_lflags="`AC_RUN_LOG([$WXCONFIG --ldflags])`"
-    	cs_cv_wxwidgets_libs="`AC_RUN_LOG([$WXCONFIG --libs --gl-libs])`"],
+    	cs_cv_wxwidgets_libs="`AC_RUN_LOG([$WXCONFIG --libs])`"
+    	cs_cv_wxwidgets_gllibs="`AC_RUN_LOG([$WXCONFIG --gl-libs])`"],
         [cs_cv_wxwidgets=no])])
+
 AS_IF([test $cs_cv_wxwidgets = yes],
-	[CS_EMIT_BUILD_RESULT([cs_cv_wxwidgets], [WX])])
+    [CS_CHECK_BUILD([if wxWidgets SDK is usable], [cs_cv_wxwidgets_ok],
+	[AC_LANG_PROGRAM(
+	    [[#include "wx/wxprec.h"
+	    #ifdef __BORLANDC__
+	    #pragma hdrstop
+	    #endif
+	    #ifndef WX_PRECOMP
+	    #include "wx/wx.h"
+	    #endif
+	    ]],
+	    [[wxWindow* p = 0; int w,h; p->GetClientSize(&w,&h);]])],
+	[], [C++], [], [], [],
+	[$cs_cv_wxwidgets_cflags],
+	[$cs_cv_wxwidgets_lflags],
+	[$cs_cv_wxwidgets_libs])])
+
+AS_IF([test $cs_cv_wxwidgets_ok = yes],
+    [CS_CHECK_BUILD([if wxWidgets is built with OpenGL support],
+	[cs_cv_wxwidgets_opengl],
+	[AC_LANG_PROGRAM(
+	    [[#include "wx/wxprec.h"
+	    #ifdef __BORLANDC__
+	    #pragma hdrstop
+	    #endif
+	    #ifndef WX_PRECOMP
+	    #include "wx/wx.h"
+	    #endif
+	    #include "wx/glcanvas.h"
+	    ]],
+	    [wxGLCanvas* f = new wxGLCanvas(0, wxID_ANY)])],
+	[CS_CREATE_TUPLE(
+	    [$cs_cv_wxwidgets_ok_cflags],
+	    [$cs_cv_wxwidgets_ok_lflags],
+	    [$cs_cv_wxwidgets_ok_libs   $cs_cv_wxwidgets_gllibs]) \
+	CS_CREATE_TUPLE(
+	    [$cs_cv_wxwidgets_ok_cflags $cs_cv_libglu_cflags],
+	    [$cs_cv_wxwidgets_ok_lflags $cs_cv_libglu_lflags],
+	    [$cs_cv_wxwidgets_ok_libs   $cs_cv_libglu_libs])],
+	[C++])])
+
+AS_IF([test $cs_cv_wxwidgets_opengl = yes],
+    [CS_EMIT_BUILD_RESULT([cs_cv_wxwidgets_opengl], [WX])
+    CS_HEADER_PROPERTY([CS_HAS_WXWIDGETS])])
 
 
 

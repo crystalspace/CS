@@ -26,10 +26,28 @@ chronological order.
 	  namespace, and which interfere with CS's own method and function
 	  names. This file is now included by the various csutil/win32 headers
 	  after all Win32 API have been included.
-	- Marten Svanfeldt fixed some compilation errors Erics last fix itroduced.
-	  If you use Win32 API functions which is listed in sanity.inc, make sure
-	  that the windows headers are included in your sourcefile after sanity.inc, 
-	  otherwise it will not work.
+	- Marten Svanfeldt fixed some compilation errors Eric's last fix
+	  introduced.  If you use Win32 API functions which is listed in
+	  sanity.inc, make sure that the windows headers are included in your
+	  sourcefile after sanity.inc, otherwise it will not work.
+	- Eric Sunshine made the following changes to the wxWidgets check in
+	  configure.ac:
+	    - Added an "SDK usable" check.
+	    - Now checks if wxWidgets has been built with OpenGL support. This
+	      is needed by the CS `wxgl' canvas.
+	    - Worked around bug in wx-config on Windows where the --gl-libs
+	      option emits a reference to a non-existent library
+	      (wxmsw_glxxx.lib). To handle this broken case, configure first
+	      tries the result of --libs and --gl-libs together; if that fails,
+	      then it tries only --libs augmented with the results of CS's own
+	      OpenGL checks.
+	    - Now emits CS_HAS_WXWIDGETS to csconfig.h if wxWidgets is present.
+	- Eric Sunshine fixed ivaria/wxwin.h so that it now #includes <wx/wx.h>
+	  in order to get the declaration of wxWindow rather than trying to
+	  forward declare wxWindow manually via `class wxWindow'. This is
+	  necessary because wxWindow is typically an alias, created with
+	  #define, to some platform-specific implementation class, so our
+	  forward declaration was incorrect.
 18-Sep-2004
 	- Eric Sunshine changed the executable subsystem type in the MSVC
 	  project files for GUI applications from "windows" to "console". This
