@@ -241,6 +241,17 @@ int CollisionDetect (iEngine* Engine, csColliderWrapper *c, iSector* sp,
   return hit;
 }
 
+SCF_VERSION (TerrainInfo, 0, 0, 1);
+struct TerrainInfo : public csObject
+{
+  iTerrFuncState* terrfunc;
+  SCF_DECLARE_IBASE_EXT (csObject);
+};
+
+SCF_IMPLEMENT_IBASE_EXT (TerrainInfo)
+  SCF_IMPLEMENTS_INTERFACE (TerrainInfo)
+SCF_IMPLEMENT_IBASE_EXT_END
+
 void DoGravity (iEngine* Engine, csVector3& pos, csVector3& vel)
 {
   pos=Sys->view->GetCamera ()->GetTransform ().GetOrigin ();
@@ -261,21 +272,41 @@ void DoGravity (iEngine* Engine, csVector3& pos, csVector3& vel)
   // This routine will automatically adjust the transform to the highest
   // terrain at this point.
 
-  // @@@@@@ This is not efficient if there are lots of objects in the level!!!
+  // @@@@@@ The following code supports only one terrain in a sector!
   int k;
   for ( k = 0; k < num_sectors ; k++)
   {
     iMeshList* ml = n[k]->GetMeshes ();
     if (ml->GetCount () > 0)
     {
-      int i;
-      for (i = 0 ; i < ml->GetCount () ; i++)
+      csRef<TerrainInfo> ti (CS_GET_CHILD_OBJECT (n[k]->QueryObject (),
+						      TerrainInfo));
+      if (ti)
       {
-	iMeshWrapper* terrain = ml->Get (i);
-	csRef<iTerrFuncState> state (SCF_QUERY_INTERFACE (terrain
-		->GetMeshObject (), iTerrFuncState));
-	if (state)
-	  hits += state->CollisionDetect( &test );
+        if (ti->terrfunc)
+	{
+	  hits += ti->terrfunc->CollisionDetect (&test);
+	}
+      }
+      else
+      {
+	ti = csPtr<TerrainInfo> (new TerrainInfo ());
+	ti->terrfunc = NULL;	// No terrain found yet.
+        int i;
+        for (i = 0 ; i < ml->GetCount () ; i++)
+        {
+	  iMeshWrapper* terrain = ml->Get (i);
+	  csRef<iTerrFuncState> state (SCF_QUERY_INTERFACE (terrain
+		  ->GetMeshObject (), iTerrFuncState));
+	  if (state)
+	  {
+	    hits += state->CollisionDetect (&test);
+	    ti->terrfunc = state;
+	    break;
+	  }
+        }
+	csRef<iObject> iobj (SCF_QUERY_INTERFACE (ti, iObject));
+	n[k]->QueryObject ()->ObjAdd (iobj);
       }
     }
   }

@@ -1,5 +1,12 @@
 The history order is reversed so that new features are at the top.
 
+4-Nov-2002
+	- Significantly optimized walking around in walktest in sectors
+	  with a huge number of objects. Walktest was doing QUERY_INTERFACE
+	  for EVERY object in the current sector every time the camera
+	  moved. It was doing this only to test if there was a terrain
+	  with which to do visibility testing. I optimized this by attaching
+	  an object to the sector which contains this information.
 3-Nov-2002
 	- Changed DynaVis to use the new movable and object model
 	  listeners. This significantly speeds up rendering and walking
