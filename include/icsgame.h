@@ -53,11 +53,13 @@ struct iPosition : public iBase
    * Sets the position using traditional access.
    * pSector is a pointer to the sector,
    * Pos is the worldspace position in that sector,
-   * Orientation is the orientation of the entity
-   * In oritentation: x is the roation around the upward axis,
-   *                  y is the elevation against the floor plane
-   *                  z is the rotation of the object around the 
-   *                    forward axis
+   * Orientation is the orientation of the entity<br>
+   * In orientation:
+   * <ul>
+   * <li>x is the roation around the upward axis,
+   * <li>y is the elevation against the floor plane
+   * <li>z is the rotation of the object around the forward axis
+   * </ul>
    * All angles are in Rad, which means 360° = 2Pi
    * So the orientation will allow you, to have the object being turned
    * in every possible orentation, but you can not stretch or bend it.
@@ -104,12 +106,12 @@ struct iPosition : public iBase
   /**
    * Change the orientation by the given angle differences
    */
-  virtual void Rotate(const csVector& Offset) = 0;
+  virtual void Rotate(const csVector3& Offset) = 0;
 
   /**
    * Sets a new orientation for the position
    */
-  virtual void SetOrientation(const csVector& Orientation) = 0;
+  virtual void SetOrientation(const csVector3& Orientation) = 0;
 
   /**
    * Create a new Position object, that is linked to this position object.
@@ -124,7 +126,7 @@ struct iPosition : public iBase
    * the linked objects new relative coordinates.
    */
   virtual iPosition* CreateLinkedPosition(const csTransform& Transform, 
-                                          DWORD LinkFlags) = 0;
+                                          ULong LinkFlags) = 0;
 };
 
 //---------------------------------------------------------------------------
@@ -167,7 +169,7 @@ struct iAttribute : public iBase
    * This is also true for Arrays and Position. For Entities you can 
    * choose, if you want reference or aggregation.
    */
-  virtual bool IsAggegated() = 0;
+  virtual bool IsAggregated() = 0;
 
   /// Get the value as various types.
   virtual double           GetFloat()        = 0;
@@ -184,7 +186,7 @@ struct iAttribute : public iBase
   virtual void SetString  (const char* Val)              = 0;
   virtual void SetEntity  (iEntity* Val, bool Aggregate) = 0;
   virtual void SetPosition(iPosition* Val)               = 0;
-  virtual void SetVector  (csVector3 Val)                = 0;
+  virtual void SetVector  (const csVector3& Val)         = 0;
   virtual void SetArray   (iAttributeArray* Val)         = 0;
 };
 
@@ -192,6 +194,9 @@ struct iAttribute : public iBase
 
 SCF_VERSION (iAttributeIterator, 0, 1, 0);
 
+/**
+ * Document me @@@
+ */
 struct iAttributeIterator : public iBase
 {
   /// Get a pointer to the first matching attribute.
@@ -564,7 +569,7 @@ struct iDataLoader : public iBase
 SCF_VERSION (iDataSaver, 0, 1, 0);
 
 /**
- * A Data Loader allows entites to read a structured datafile
+ * A Data Saver allows entites to write a structured datafile
  */
 struct iDataSaver : public iBase
 {
@@ -594,6 +599,7 @@ struct iDataSaver : public iBase
 SCF_VERSION (iGameNetworkConnection, 0, 1, 0);
 
 /**
+ * @@@ Comment needs fixing
  * A Data Loader allows entites to read a structured datafile
  */
 struct iGameNetworkConnection : public iBase
