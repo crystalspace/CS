@@ -24,7 +24,7 @@
  */
  
 /**
- * \addtogroup addframe
+ * \addtogroup appframe
  * @{ */
 
 #include "cstypes.h"
