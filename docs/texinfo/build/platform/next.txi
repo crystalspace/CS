@@ -56,15 +56,27 @@ current Unix installations, but are absent from MacOS/X, MacOS/X Server 1.0
 (Rhapsody), OpenStep, and NextStep.
 
 @anchor{NeXT Resources}
-The most convenient site from which to download these library packages is the
-LinuxGames @sc{ftp} site.  These packages are known to work with MacOS/X,
-MacOS/X Server 1.0 (Rhapsody), OpenStep, and NextStep and have already been
-organized to fit correctly into the Crystal Space project hierarchy.
+One common site from which to download these packages is from the Crystal Space
+download directory at @uref{http://www.3ddownloads.com/}.  These packages are
+known to work with MacOS/X, MacOS/X Server 1.0 (Rhapsody), OpenStep, and
+NextStep and have already been organized to fit correctly into the Crystal
+Space project hierarchy.
+
+You can find these packages at the following location:
 
 @noindent
-@uref{ftp://ftp.linuxgames.com/crystal/support/general/zlib_1.1.1.tgz}@*
-@uref{ftp://ftp.linuxgames.com/crystal/support/general/libjpeg-6a.tgz}@*
-@uref{ftp://ftp.linuxgames.com/crystal/support/general/libpng_1.0.tgz}
+@uref{http://www.3ddownloads.com/?directory=/linuxgames/crystal/support/general/}
+
+At this page, click on the following links to download the desired packages:
+
+@itemize @bullet
+@item
+@code{libjpeg-6a.tgz}
+@item
+@code{zlib_1.1.1.tgz}
+@item
+@code{libpng_1.0.tgz}
+@end itemize
 
 Finally, if you are building Crystal Space on NextStep, you will need to
 download and install the @sc{gnu} @samp{make} program since Crystal Space
@@ -189,13 +201,16 @@ contains resources which are used by several Crystal Space demonstration
 programs.  Do not unpack this file; Crystal Space uses it as is.
 
 The standard texture archive, @file{stdtex.zip}, contains textures which are
-required by many of the example Crystal Space map files.  You should download
-this file and place it in the @file{CS/data} directory.  As with
-@file{standard.zip}, do not unpack this file.  @file{stdtex.zip} can be
-downloaded from the following location:
+required by many of the example Crystal Space map files.  If this file is not
+already present in your @file{CS/data} directory, then you should download it
+and place it there.  As with @file{standard.zip}, do not unpack this file.
+@file{stdtex.zip} can be downloaded from the following location:
 
 @noindent
-@uref{ftp://ftp.linuxgames.com/crystal/levels/stdtex.zip}
+@uref{http://www.3ddownloads.com/?directory=/linuxgames/crystal/levels/}
+
+@noindent
+Click on the @file{stdtex.zip} link.
 
 You will also need to have at least one @dfn{map} file in order to use the
 Crystal Space demonstration program, WalkTest.  Typically map files should be
@@ -209,7 +224,7 @@ areas.  You can download @file{flarge.zip}, as well as several other example
 map files from the following location:
 
 @noindent
-@uref{ftp://ftp.linuxgames.com/crystal/levels/}
+@uref{http://www.3ddownloads.com/?directory=/linuxgames/crystal/levels/}
 
 @noindent
 Be sure to place the map files into the @file{CS/data} directory.

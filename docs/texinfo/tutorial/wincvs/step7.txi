@@ -1,100 +1,128 @@
 @c -*-texinfo-*-
-@node WinCVS Tutorial Step 7, Advanced Topics for Developers Only, WinCVS Tutorial Step 6, WinCVS Tutorial
+@node WinCVS Tutorial Step 7, , WinCVS Tutorial Step 6, WinCVS Tutorial
 @subsection Step 7: Updating Crystal Space
 
-@subsubheading Updating Crystal Space with WinCVS - PSERVER
+@subsubheading Updating Crystal Space with WinCVS --- @sc{pserver}
 
 Once you've successfully checked out the complete source code tree and changes
-have been made, you can update your local copy to mirror the latest code on the CVS
-server. The steps in this section must be completed every time you do an update.
+have been made, you can update your local copy to mirror the latest code on the
+@sc{cvs} server.  The steps in this section must be completed every time you do
+an update.
 
-Before updating you must login to the server. From the WinCVS file menu click on
-@file{Admin} then @file{Login}. The @file{Password authentication} dialog prompt
-will appear, just click on @file{OK}.
+Before updating you must login to the server.  From the WinCVS file menu click
+on @emph{Admin} then @emph{Login}.  The @emph{Password authentication} dialog
+prompt will appear, just click on @sc{ok}.
 
-@picturess{tutorial,wincvs,wincvsshot6}
+@ifnotinfo
+@picturess{tutorial,wincvs,wincvs06}
 
-In the @file{Output} window at the bottom of the WinCVS client should appear
+@end ifnotinfo
+In the @emph{Output} window at the bottom of the WinCVS client should appear
 the following:
 
-@emph{cvs -z4 -q login}
+@example
+cvs -z4 -q login
+(Logging in to anonymous@@cvs.crystal.sourceforge.net)
+*****CVS exited normally with code 0*****
+@end example
 
-@emph{(Logging in to anonymous@cvs.crystal.sourceforge.net)}
+If the login was successful, then you can proceed to update.  In the left hand
+@emph{Workspace} window, where you can see the directory @file{crystal_space}.
+Well now you have a ticked subdirectory @file{CS}.  Right click on that
+directory and then click on @emph{Update selection} and the following dialog
+box will appear:
 
-@emph{*****CVS exited normally with code 0*****}
+@ifnotinfo
+@picturess{tutorial,wincvs,wincvs10}
 
-If yes, now you can proceed and update. In the left hand @file{Workspace} window,
-where you can see the directory @file{crystal_space}. Well now you have a ticked
-subdirectory @file{CS}. Right click on that directory and then click on
-@file{Update selection} and the following dialog box will appear:
-
-@picturess{tutorial,wincvs,wincvsshot10}
-
-On the @file{Update settings} property sheet, edit as shown in the screenshot below.
-
-@picturess{tutorial,wincvs,wincvsshot11}
-
-Next click on the property sheet tab @file{Sticky options} and edit as shown in the
-screenshot below.
-
-@picturess{tutorial,wincvs,wincvsshot12}
-
-Next click on the property sheet tab @file{Globals} and edit as shown in the screenshot
+@end ifnotinfo
+On the @emph{Update settings} property sheet, edit as shown in the screenshot
 below.
 
-@picturess{tutorial,wincvs,wincvsshot13}
+@ifnotinfo
+@picturess{tutorial,wincvs,wincvs11}
 
-Now just click on the @file{OK} button and after a few seconds no more than a minute
-you should start to see the files being updated the server and start appearing in
-the bottom @file{Output} window.
+@end ifnotinfo
+Next click on the property sheet tab @emph{Sticky options} and edit as shown in
+the screenshot below.
 
+@ifnotinfo
+@picturess{tutorial,wincvs,wincvs12}
+
+@end ifnotinfo
+Next click on the property sheet tab @emph{Globals} and edit as shown in the
+screenshot below.
+
+@ifnotinfo
+@picturess{tutorial,wincvs,wincvs13}
+
+@end ifnotinfo
+Now just click on the @sc{ok} button and after several seconds you should start
+to see the files being updated the server and start appearing in the bottom
+@emph{Output} window.
 
 The end of a successful update will be indicated by the line:
 
-@emph{*****CVS exited normally with code 0*****}
+@example
+*****CVS exited normally with code 0*****
+@end example
 
-If the checkout ends with the line:
+If the checkout ends with the following line, then the update has failed and
+you must repeat the update steps in this section.
 
-@emph{*****CVS exited normally with code 1*****}
+@example
+*****CVS exited normally with code 1*****
+@end example
 
-The update has failed and you must repeat the update steps in this section.
+@subsubheading Updating Crystal Space with WinCVS --- @sc{ssh}
 
-@subsubheading Updating Crystal Space with WinCVS - SSH
+In the left hand @emph{Workspace} window of the WinCVS client, where you can
+see the directory @file{crystal_space}.  Well now you have a ticked
+subdirectory @file{CS}.  Right click on that directory and then click on
+@emph{Update selection} and the following dialog box will appear:
 
-In the left hand @file{Workspace} window of the WinCVS client, where you can see
-the directory @file{crystal_space}. Well now you have a ticked subdirectory
-@file{CS}. Right click on that directory and then click on @file{Update selection}
-and the following dialog box will appear:
+@ifnotinfo
+@picturess{tutorial,wincvs,wincvs10}
 
-@picturess{tutorial,wincvs,wincvsshot10}
+@end ifnotinfo
+On the @emph{Update settings} property sheet, edit as shown in the screenshot
+below.
 
-On the @file{Update settings} property sheet, edit as shown in the screenshot below.
+@ifnotinfo
+@picturess{tutorial,wincvs,wincvs11}
 
-@picturess{tutorial,wincvs,wincvsshot11}
+@end ifnotinfo
+Next click on the property sheet tab @emph{Sticky options} and edit as shown in
+the screenshot below.
 
-Next click on the property sheet tab @file{Sticky options} and edit as shown in the
-screenshot below.
+@ifnotinfo
+@picturess{tutorial,wincvs,wincvs12}
 
-@picturess{tutorial,wincvs,wincvsshot12}
-
+@end ifnotinfo
 Next click on the property sheet tab @file{Globals} and edit as shown in the
 screenshot below.
 
-@picturess{tutorial,wincvs,wincvsshot13}
+@ifnotinfo
+@picturess{tutorial,wincvs,wincvs13}
 
-Now just click on the @file{OK}
+@end ifnotinfo
+Now just click on the @sc{ok}
 
-This is where an SSH update differs from PSERVER, a blank DOS/Command window should have now
-appeared. Enter your Sourceforge password which corresponds to your username and hit the
-@file{ENTER} key. After a few seconds no more than a minute you should start to see the files
-being updated appearing in the bottom @file{Output} window.
+This is where an @sc{ssh} update differs from @sc{pserver}.  A blank
+@sc{dos}/Command window should have now appeared.  Enter your SourceForge
+password or @sc{ssh} key and hit the @kbd{@key{ENTER}} key.  After several
+seconds you should start to see the files being updated appearing in the bottom
+@emph{Output} window.
 
 The end of a successful update will be indicated by the line:
 
-@emph{*****CVS exited normally with code 0*****}
+@example
+*****CVS exited normally with code 0*****
+@end example
 
-If the checkout ends with the line:
+If the checkout ends with the following line, then the update has failed and
+you must repeat the update steps in this section.
 
-@emph{*****CVS exited normally with code 1*****}
-
-The update has failed and you must repeat the update steps in this section.
+@example
+*****CVS exited normally with code 1*****
+@end example

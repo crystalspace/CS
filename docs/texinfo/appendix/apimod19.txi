@@ -10,20 +10,19 @@ Crystal Space.
 @cindex @code{csImageLoader}
 @cindex @code{iImageIO}
 
-@code{csImageLoader} is gone and has now become a plugin which implements
+@samp{csImageLoader} is gone and has now become a plugin which implements
 the @code{iImageIO} interface. To use it you typically use the following
 code:
 
 @example
-  #include "igraphic/imageio.h"
-  ...
-  iDataBuffer* buf = ...;
-  iImageIO* imgldr = QUERY_PlUGIN (System, iImageIO);
-  imgldr->Load (buf->GetUint8 (), buf->GetSize (),
-    txtmgr->GetTextureFormat ());
-
-  ...
-  imgldr->DecRef ();
+#include "igraphic/imageio.h"
+@dots{}
+iDataBuffer* buf = @dots{};
+iImageIO* imgldr = QUERY_PlUGIN (System, iImageIO);
+imgldr->Load (buf->GetUint8 (), buf->GetSize (),
+txtmgr->GetTextureFormat ());
+@dots{}
+imgldr->DecRef ();
 @end example
 
 @subheading Level Loading (csLoader)
@@ -35,7 +34,7 @@ At this moment the level loader is not yet a plugin but already
 behaves like one. For that reason you still have to do:
 
 @example
-  REGISTER_STATIC_LIBRARY (lvlload)
+REGISTER_STATIC_LIBRARY (lvlload)
 @end example
 
 Somewhere in the beginning of your program (this is a declaration, put
@@ -45,58 +44,62 @@ Then make sure you have the level loader plugin by putting the following
 in your config file:
 
 @example
-  System.PlugIns.LevelLoader = crystalspace.level.loader
+System.PlugIns.LevelLoader = crystalspace.level.loader
 @end example
 
-or else put the following line in your @code{main} routine right
-before calling @code{csSystemDriver::Initialize()}:
+@noindent
+Or else put the following line in your @code{main} routine right
+before calling @code{csSystemDriver}'s @code{Initialize()} method:
 
 @example
-  System->RequestPlugin ("crystalspace.level.loader:LevelLoader");
+System->RequestPlugin("crystalspace.level.loader:LevelLoader");
 @end example
 
+@noindent
 Then you can get the level loader with:
 
 @example
-  iLoader* level_loader = QUERY_PLUGIN_ID (System,
-  	CS_FUNCID_LVLLOADER, iLoader);
+iLoader* level_loader =
+  QUERY_PLUGIN_ID (System, CS_FUNCID_LVLLOADER, iLoader);
 @end example
 
 When you don't need it anymore you must call @code{level_loader->DecRef ()}.
 Check the API reference to see what functions you can use on level_loader.
-There are functions to load a map, textures, mesh objects, ...
+There are functions to load a map, textures, mesh objects, etc.
 
 @subheading Things are Mesh Objects
 @cindex @code{csThing}
 @cindex mesh objects
 
-@@@ TODO
+@@@@@@ TODO
 
 @subheading String Server
 
-@@@ TODO
+@@@@@@ TODO
 
 @subheading Map File Changes
 
-@@@ TODO
+@@@@@@ TODO
+@example
 PLANE -> ADDON
 THING -> MESHOBJ
 SKY -> MESHOBJ + RENDPRI
-MESHOBJ -> MESHFACT (for factories)
+MESHOBJ -> MESHFACT @r{(for factories)}
 BEZIER -> ADDON
 MATERIALS
 RENDERPRIORITIES
 PLUGINS
+@end example
 
 @subheading Sky Objects Gone
 
-@@@ TODO
+@@@@@@ TODO
 
 @subheading Using the Engine as a Plugin
 
-@@@ TODO
+@@@@@@ TODO
 
-@subheading Sectors have no Polygons
+@subheading Sectors Have No Polygons
 @cindex csSector
 
 Sectors can no longer contain polygons. All geometry is now represented
@@ -110,19 +113,19 @@ SECTOR 'room' (
   MESHOBJ 'walls' (
     PLUGIN ('crystalspace.mesh.loader.thing')
     PARAMS (
-      VERTEX (...) ...
-      POLYGON (...) ...
+      VERTEX (@dots{}) @dots{}
+      POLYGON (@dots{}) @dots{}
     )
     ZFILL ()
     PRIORITY ('wall')
   )
-  ...
+  @dots{}
 )
 @end example
 
 In code you can use @code{iEngine::CreateSectorWallsMesh()} like this:
 
 @example
-  iMeshWrapper* mesh = engine->CreateSectorWallsMesh (sector, "walls");
+iMeshWrapper* mesh =
+  engine->CreateSectorWallsMesh (sector, "walls");
 @end example
-

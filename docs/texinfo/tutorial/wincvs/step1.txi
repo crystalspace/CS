@@ -2,23 +2,30 @@
 @node WinCVS Tutorial Step 1, WinCVS Tutorial Step 2, WinCVS Tutorial, WinCVS Tutorial
 @subsection Step 1: Getting the Software
 
+Developers with write-access to the Crystal Space @sc{cvs} repository will
+require two separate software packages, the @sc{cvs} client and the secure
+shell.  Other users only require the @sc{cvs} client.
+
 @subsubheading WinCVS Client
 
-The WinCVS client is as Crystal Space, open source and presently is an under development
-piece of software. A latest stable release of the WinCVS client can be obtained from
-the WinCVS website:
+The WinCVS client is as Crystal Space, open source and presently is an under
+development piece of software.  A latest stable release of the WinCVS client
+can be obtained from the WinCVS website:
 
-@uref{http://www.cvsgui.org}
+@uref{http://www.cvsgui.org/}
 
-@subsubheading Secure Shell (SSH)
+@subsubheading Secure Shell (@sc{ssh})
 
-@file{NOTE: The Secure Shell (SSH) software should only be downloaded/installed by those
-who have been granted Crystal Space CVS server write access by either Jorrit Tyberghein
-or Eric Sunshine, the Crystal Space project administrators.}
+@emph{Note}: The secure shell (@sc{ssh}) software is only required by
+developers who have been granted write-access to the Crystal Space @sc{cvs}
+repository by either Jorrit Tyberghein
+(@email{jorrit.tyberghein@@uz.kuleuven.ac.be}) or Eric Sunshine
+(@email{sunshine@@sunshineco.com}, the Crystal Space project administrators.
 
-Secure Shell software comes in a variety of forms and increasingly some open source
-SSH projects. However, for use with WinCVS, other CS developers and myself have found
-one version to work and work well. The package @file{ssh-1.2.14-win32.exe} can be downloaded
-by using the following web link:
+Secure Shell software comes in a variety of forms and increasingly via some
+open source @sc{ssh} projects.  However, for use with WinCVS, many Crystal
+Space developers and myself have found one particular version which works well.
+The package @file{ssh-1.2.14-win32.exe} can be downloaded by using the
+following @sc{url}:
 
 @uref{http://www.redeye-entertainment.co.uk/downloads/cs/ssh-1.2.14-win32.exe}

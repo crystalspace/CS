@@ -17,7 +17,7 @@ and what you should do to use them.
 
 The basis of the collision detection system is the @samp{iCollideSystem}.
 This is an interface which implemented by some collision detection plugin.
-At this moment we only have an implementation of the @sc{RAPID} collision
+At this moment we only have an implementation of the @sc{rapid} collision
 detection system but it would be a simple matter to add a new plugin for
 another system.
 
@@ -26,7 +26,8 @@ To load a collision detection system you can use the following code:
 @example
 const char* p = Config->GetStr ("MyGame.Settings.CollDetPlugIn",
   	"crystalspace.colldet.rapid");
-iCollideSystem* cd_sys = LOAD_PLUGIN (System, p, "CollDet", iCollideSystem);
+iCollideSystem* cd_sys =
+  LOAD_PLUGIN (System, p, "CollDet", iCollideSystem);
 if (!cd_sys)
 @{
   Printf (MSG_FATAL_ERROR, "No Collision Detection plugin found!\n");
@@ -69,10 +70,10 @@ Usually in a game you have entity classes which will have a pointer to the
 mesh. In that case you can easily store the collider in that entity class.
 
 However, you can also use the @samp{iObject} system to attach your collider
-to the mesh itself (@@@TODO! More on this subject later when Martin finishes
-his new RTTI system).
+to the mesh itself (@@@@@@FIXME: The pseudo-@sc{rtti} system is going away
+and will be replaced entirely by @sc{scf}.)
 
-@@@TODO! More info about how to add this collider for all objects loaded
+@@@@@@TODO: More info about how to add this collider for all objects loaded
 in the engine.
 
 @subsubheading The Player Collider
@@ -115,7 +116,7 @@ moves.
 
 @subsubheading Limitation of RAPID
 
-The current @sc{RAPID} collision detection implementation has one
+The current @sc{rapid} collision detection implementation has one
 important limitation. It assumes that the transform from object to world
 space will not change the size of the object. i.e. you cannot scale the
 object using the object to world transformation (which is kept in the
@@ -130,9 +131,8 @@ the object changes.
 The include files useful for this section are:
 
 @example
-  #include "iobject/object.h"
-  #include "iengine/collider.h"
-  #include "iengine/polymesh.h"
-  #include "iengine/mesh.h"
+#include "iobject/object.h"
+#include "iengine/collider.h"
+#include "iengine/polymesh.h"
+#include "iengine/mesh.h"
 @end example
-

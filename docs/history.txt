@@ -57,6 +57,23 @@ The history order is reversed so that new features are at the top.
 	- Eric Sunshine worked around a silly texi2html bug where it complained
 	  about a @node and @subsubheading both named "Lighting" (even though
 	  the @subsubheading wasn't even related to the @node).
+	- Eric Sunshine made the following changes to the Texinfo documenation:
+	    - Repaired a very significant number of Texinfo mark-up errors and
+	      problems which were introduced into the documentation over the
+	      last couple months.
+	    - Eliminated all overfull and underfull `hbox' warnings from TeX.
+	    - Removed unnecessary PNG images which duplicated JPG images for
+	      the WinCVS tutorial.
+	    - Renamed the WinCVS tutorial images so that they respect DOS 8.3
+	      naming conventions.
+	    - Fixed the WinCVS tutorial so that it also builds in Info mode
+	      where images are not available.
+	    - Fixed several INTEL -> X86 references which Philip missed when
+	      he made a symbolic change of INTEL to X86 to a couple facets of
+	      the project.
+	    - Updated Robert Bate's email address in several locations.
+	    - Updated out-of-date URLs in the MacOS/X, OpenStep, NextStep
+	      documentation.
 29-May-2001
 	- Michael Voasse added accessor functions to iCameraPosition for
 	  sector, position upward vector and forward vector.

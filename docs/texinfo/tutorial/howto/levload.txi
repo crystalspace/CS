@@ -60,9 +60,9 @@ Loading a map is simple. You just do:
   engine->Prepare ();
 @end example
 
-This will first set the current directory to the right @sc{VFS} dir
-(See @xpref{VFS} for more information) and then it will load the map
-file which is called 'world' (this is not a requirement).
+This will first set the current directory to the right @sc{vfs} dir
+(@pxref{VFS}) and then it will load the map file which is called 'world' (this
+is not a requirement).
 
 Note that this will clear all other geometry that might have been
 loaded in the engine before. If you don't want that then you need to

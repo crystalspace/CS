@@ -2,47 +2,75 @@
 @node WinCVS Tutorial Step 4, WinCVS Tutorial Step 5, WinCVS Tutorial Step 3, WinCVS Tutorial
 @subsection Step 4: Setting WinCVS Preferences
 
-Firstly start the WinCVS client software. If it is the first time after installation of the
-client you will be presented with the Tip of the Day dialog box. Just click on close
-for the time being.
+First, start the WinCVS client software.  If it is the first time after
+installation of the client you will be presented with the @emph{Tip of the Day}
+dialog box.  Just click on @emph{Close} for the time being.
 
-@picturess{tutorial,wincvs,wincvsshot1}
+@ifnotinfo
+@picturess{tutorial,wincvs,wincvs01}
 
-You will now be presented with the WinCVS Preferences dialog box @emph{Below}. If it is not
-the first time running the WinCVS client, then from the file menu click on Admin then
-Preferences to make the following dialog box appear.
+@end ifnotinfo
+You will now be presented with the WinCVS Preferences dialog box.  If it is not
+the first time running the WinCVS client, then from the file menu click on
+@emph{Admin} then @emph{Preferences}
+@ifnotinfo
+The following dialog box will appear.
 
-@picturess{tutorial,wincvs,wincvsshot2}
+@picturess{tutorial,wincvs,wincvs02}
+@end ifnotinfo
 
-Now fill in this portion of the dialog box to match the screenshot below.
+@ifinfo
+Now fill in this dialog box by setting the @emph{Authentication} field
+to @emph{"passwd" file on the cvs server"} and the @sc{cvsroot} setting to
+the following value:
 
-@emph{NOTE: In the Enter the CVSROOT section in the screenshot below, Crystal Space developers
-with write access to the CVS server need to replace pserver with ext and anonymous with
-their Sourceforge username e.g. johndoe. Developers also need to change the section
-Authentication to SSH Server.}
+@example
+:pserver:anonymous@@cvs.crystal.sourceforge.net:/cvsroot/crystal
+@end example
 
-@picturess{tutorial,wincvs,wincvsshot3}
+@end ifinfo
+@ifnotinfo
+Now fill in this dialog box to match the screenshot below.
 
-Next, click on the property sheet tab Globals and edit to match the screenshot below.
+@picturess{tutorial,wincvs,wincvs03}
 
-@picturess{tutorial,wincvs,wincvsshot4}
+@end ifnotinfo
+@emph{Note}: Developers with @sc{cvs} write-access should replace
+@samp{:pserver:} with @samp{:ext:} and @samp{anonymous} with their SourceForge
+username.  Developers also need to change the @emph{Authentication} field to
+@emph{@sc{ssh} Server}.
 
-Next click on the WinCVS property sheet tab and you'll realize why earlier you created
-a home directory. With the browse button to the right of the @file{HOME folder
-(where cvs stores your passwords)} edit box, browse and point it to your home directory.
-If you created your home directory on your @file{c:\} drive, it should look as the screenshot
-below.
+Next, click on the property sheet tab @emph{Globals} and edit to match the
+screenshot below.
 
-@picturess{tutorial,wincvs,wincvsshot5}
+@ifnotinfo
+@picturess{tutorial,wincvs,wincvs04}
 
-Now click on the OK button to apply the changes made.
+@end ifnotinfo
+Next click on the WinCVS property sheet tab and you'll realize why earlier you
+created a home directory.  With the browse button to the right of the @sc{home}
+edit box, browse and point it to your home directory.  If you created your home
+directory on your @file{c:\} drive, it should look as the screenshot below.
 
-In the bottom Output window of the client - users should see the following appear.
+@ifnotinfo
+@picturess{tutorial,wincvs,wincvs05}
 
-@emph{NEW CVSROOT: :pserver:anonymous@cvs.crystal.sourceforge.net:/cvsroot/crystal
-(password authentication)}
+@end ifnotinfo
+Now click on the @sc{ok} button to apply the changes made.
 
-Developers with write access to the server, should see something similar to below.
+In the bottom @emph{Output} window of the client you should see the following
+appear.
 
-@emph{NEW CVSROOT: :ext:johndoe@cvs.crystal.sourceforge.net:/cvsroot/crystal
-(ssh authentication)}
+@example
+NEW CVSROOT:
+:pserver:anonymous@@cvs.crystal.sourceforge.net:/cvsroot/crystal
+(password authentication)
+@end example
+
+Developers with write access to the server, will see something similar:
+
+@example
+NEW CVSROOT:
+:ext:jorrit@@cvs.crystal.sourceforge.net:/cvsroot/crystal
+(ssh authentication)
+@end example

@@ -22,4 +22,3 @@ environment.
 @importss{tutorial,map2cs,map2cs.txi}
 @importss{tutorial,wincvs,wincvs.txi}
 @importss{tutorial,howto,howto.txi}
-

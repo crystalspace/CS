@@ -2,9 +2,8 @@
 @node WinCVS Tutorial Step 3, WinCVS Tutorial Step 4, WinCVS Tutorial Step 2, WinCVS Tutorial
 @subsection Step 3: Creating a Home Directory
 
-Before we start setting up WinCVS itself, we need to create a home directory somewhere on
-your system. The home directory is a place where WinCVS will store data specific to the
-CVS passwords, servers you login too etc. For the purposes of this tutorial, we will
-assume you have created the home directory of your @file{C:\} drive, thus:
-
-@emph{C:\home}
+Before setting up WinCVS, itself, you need to create a home directory somewhere
+on your system.  The home directory is a place where WinCVS will store some
+@sc{cvs} administrative information, such as @sc{cvs} passwords, servers you
+login too etc.  For the purposes of this tutorial, it is assumed that you have
+created the home directory named @file{C:\home}.

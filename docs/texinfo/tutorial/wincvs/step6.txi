@@ -2,91 +2,114 @@
 @node WinCVS Tutorial Step 6, WinCVS Tutorial Step 7, WinCVS Tutorial Step 5, WinCVS Tutorial
 @subsection Step 6: Checking out Crystal Space
 
-@subsubheading Checking out Crystal Space with WinCVS - PSERVER
+@subsubheading Checking Out Crystal Space with WinCVS --- @sc{pserver}
 
-Before checking out the code Crystal Space code you must login to the server. From
-the WinCVS file menu click on @file{Admin} then @file{Login}. The @file{Password
-authentication} dialog prompt will appear, just click on the @file{OK} button.
+Before checking out the Crystal Space code you must login to the server.
+From the WinCVS file menu click on @emph{Admin} then @emph{Login}.  The
+@emph{Password authentication} dialog prompt will appear.  Just click on the
+@file{OK} button without entering a password.
 
-@picturess{tutorial,wincvs,wincvsshot6}
+@ifnotinfo
+@picturess{tutorial,wincvs,wincvs06}
 
-In the @file{Output} window at the bottom of the WinCVS client should appear the following:
+@end ifnotinfo
+In the @emph{Output} window at the bottom of the WinCVS client should appear
+the following:
 
-@emph{cvs -z4 -q login}
+@example
+cvs -z4 -q login
+(Logging in to anonymous@@cvs.crystal.sourceforge.net)
+*****CVS exited normally with code 0*****
+@end example
 
-@emph{(Logging in to anonymous@cvs.crystal.sourceforge.net)}
+If the login was successful, then you can proceed and checkout the Crystal
+Space code.  In the left hand @emph{Workspace} window, where you can see the
+directory @file{crystal_space} right-click on that directory and then click on
+the @emph{Checkout module} menu item and you will be presented with the
+following dialog box.
 
-@emph{*****CVS exited normally with code 0*****}
+In the edit field @emph{Enter the module name and path on the server}, enter
+the word @samp{crystal}.
 
-If yes, now you can proceed and checkout the Crystal Space code. In the left hand
-@file{Workspace} window, where you can see the directory @file{crystal_space}. Well
-right click on that directory and then click on @file{Checkout module} and the
-following dialog box will appear:
+@ifnotinfo
+@picturess{tutorial,wincvs,wincvs07}
 
-In the edit box @file{Enter the module name and path on the server}, enter the word
-@file{crystal}.
+@end ifnotinfo
+Next click on the property sheet tab @emph{Checkout options} and edit as shown
+in the screenshot below.
 
-@picturess{tutorial,wincvs,wincvsshot7}
+@ifnotinfo
+@picturess{tutorial,wincvs,wincvs08}
 
-Next click on the property sheet tab @file{Checkout options} and edit as shown in the
+@end ifnotinfo
+Next click on the property sheet tab @emph{Globals} and edit as shown in the
 screenshot below.
 
-@picturess{tutorial,wincvs,wincvsshot8}
+@ifnotinfo
+@picturess{tutorial,wincvs,wincvs09}
 
-Next click on the property sheet tab @file{Globals} and edit as shown in the screenshot
-below.
-
-@picturess{tutorial,wincvs,wincvsshot9}
-
-Now just click on the @file{OK} button and after a few seconds no more than a minute
-you should start to see the files being checked out of the server start appearing in
-the bottom @fileOutput} window.
+@end ifnotinfo
+Now just click on the @sc{ok} button and after several seconds you should begin
+seeing messages that files are being checked out from the @sc{cvs} server.
+These messages will appear in the bottom @emph{Output} window.
 
 The end of a successful checkout will be indicated by the line:
 
-@emph{*****CVS exited normally with code 0*****}
+@example
+*****CVS exited normally with code 0*****
+@end example
 
-@emph{If the checkout ends with the line:}
+If the checkout fails, then you will see the following line and must
+repeat the checkout steps in this section.
 
-@emph{*****CVS exited normally with code 1*****}
+@example
+*****CVS exited normally with code 1*****
+@end example
 
-@emph{The checkout has failed and you must repeat the checkout steps in this section.}
+@subsubheading Checking Out Crystal Space with WinCVS --- @sc{ssh}
 
-@subsubheading Checking out Crystal Space with WinCVS - SSH
+In the left hand @emph{Workspace} window of the WinCVS client, where you can
+see the directory @file{crystal_space} right-click on that directory and then
+click on @emph{Checkout module}.  The following dialog box will appear.
 
-In the left hand @file{Workspace} window of the WinCVS client, where you can see the
-directory @file{crystal_space}. Well right click on that directory and then click on
-@file{Checkout module}. The following dialog box will appear:
+In the edit field @emph{Enter the module name and path on the server}, enter
+the word @samp{crystal}.
 
-In the edit box @file{Enter the module name and path on the server}, enter the word
-@file{crystal}.
+@ifnotinfo
+@picturess{tutorial,wincvs,wincvs07}
 
-@picturess{tutorial,wincvs,wincvsshot7}
+@end ifnotinfo
+Next click on the property sheet tab @emph{Checkout options} and edit as shown
+in the screenshot below.
 
-Next click on the property sheet tab @file{Checkout options} and edit as shown in
-the screenshot below.
+@ifnotinfo
+@picturess{tutorial,wincvs,wincvs08}
 
-@picturess{tutorial,wincvs,wincvsshot8}
+@end ifnotinfo
+Next click on the property sheet tab @emph{Globals} and edit as shown in the
+screenshot below.
 
-Next click on the property sheet tab @file{Globals} and edit as shown in the screenshot
-below.
+@ifnotinfo
+@picturess{tutorial,wincvs,wincvs09}
 
-@picturess{tutorial,wincvs,wincvsshot9}
+@end ifnotinfo
+Now just click on the @sc{ok} button.
 
-Now just click on the @file{OK}
-
-This is where an SSH checkout differs from PSERVER, a blank DOS/Command window should
-have now appeared. Enter your Sourceforge password which corresponds to your username
-and hit the @file{ENTER} key. After a few seconds no more than a minute you should start
-to see the files being checked out appearing in the bottom @file{Output} window.
+This is where an @sc{ssh} checkout differs from @sc{pserver}.  A blank
+@sc{dos}/Command window should have now appeared.  Enter your SourceForge
+password or @sc{ssh} key and hit the @kbd{@key{ENTER}} key.  After several
+seconds you should start to see the files being checked out.  This information
+will appear in the bottom @emph{Output} window.
 
 The end of a successful checkout will be indicated by the line:
 
-@emph{*****CVS exited normally with code 0*****}
+@example
+*****CVS exited normally with code 0*****
+@end example
 
-@emph{If the checkout ends with the line:}
+If the checkout fails, then you will see the following line and must
+repeat the checkout steps in this section.
 
-@emph{*****CVS exited normally with code 1*****}
-
-@emph{The checkout has failed and you must repeat the checkout steps in this section.}
-
+@example
+*****CVS exited normally with code 1*****
+@end example

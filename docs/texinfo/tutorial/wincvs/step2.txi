@@ -2,27 +2,34 @@
 @node WinCVS Tutorial Step 2, WinCVS Tutorial Step 3, WinCVS Tutorial Step 1, WinCVS Tutorial
 @subsection Step 2: Installing the Software
 
+This section explains how to install the software which you downloaded in the
+previous section.
+
 @subsubheading WinCVS Client
 
-Firstly unpack the downloaded @file{.zip} e.g. @file{WinCvs120.zip} to a temporary location
-on your hard drive. Next browse to that temporary location and execute @file{Setup.exe} to
-begin the WinCVS installation. During the installation process, follow the on screen
-instructions and complete the process installing to a location of your choosing on your
-system. At the end of the installation process you will prompted to restart your system. We
+First unpack the downloaded @file{.zip} (e.g. @file{WinCvs120.zip}) to a
+temporary location on your hard drive.  Next browse to that temporary location
+and execute @file{Setup.exe} to begin the WinCVS installation.  During the
+installation process, follow the on screen instructions and complete the
+process installing to a location of your choosing on your system.  At the end
+of the installation process you will prompted to restart your system.  We
 strongly advise you do so, then come back and continue with this guide.
 
 @subsubheading Secure Shell (SSH)
 
-The SSH package you have downloaded is a self extracting executable with it's base ssh
-directory already in the archive. Open it and extract to a location of your choosing. For
-the purposes of this guide we will assume you extracted to your @file{C:\} drive i.e. if
-you now look at your @file{C:\} drive, you will see a new directory called ssh. 
+The @sc{ssh} package you have downloaded is a self extracting executable with
+its base @file{ssh} directory already in the archive.  Open it and extract to a
+location of your choosing.  For the purposes of this guide we will assume you
+extracted to your @file{C:\} drive, thus the software resides in @file{C:\ssh}.
 
-Now adjust your PATH environment variable. On Windows 95 and 98 edit the @file{C:\autoexec.bat}
-file add the following entries. On Windows NT and Windows 2000, use the System control panel
-to edit the environment variable.
+Now adjust your @samp{PATH} environment variable.  On Windows 95 and 98 edit
+the @file{C:\autoexec.bat} file and add the following entry.  On Windows
+@sc{nt} and Windows 2000, use the System control panel to edit the environment
+variable.
 
-@emph{set PATH=C:\ssh\bin}
+@example
+set PATH=C:\ssh\bin
+@end example
 
-Before continuing with this guide. Windows 95, 98, etc. users will need to reboot their
-systems, to make the previous the change's take effect.
+Before continuing with this guide.  Windows 95, 98, etc.  users will need to
+reboot their systems, to ensure that the previous the changes take effect.

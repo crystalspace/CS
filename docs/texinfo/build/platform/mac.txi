@@ -4,11 +4,11 @@
 @cindex MacOS/9
 
 @noindent
-@emph{Written by K.  Robert Bate, @email{rbate@@ma.ultranet.com}.  Last
+@emph{Written by K.  Robert Bate, @email{rbate@@mac.com}.  Last
 updated 8 December 1999.}
 
 The MacOS/9 port of Crystal Space is maintained by K.  Robert Bate.  If you
-have any questions or problems, contact him at @email{rbate@@ma.ultranet.com}.
+have any questions or problems, contact him at @email{rbate@@mac.com}.
 
 This port of Crystal Space is based upon the pre-Carbon Macintosh Toolbox API.
 Because it utilizes the classic Macintosh API it is suitable for MacOS/9 as

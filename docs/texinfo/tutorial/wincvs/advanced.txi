@@ -1,3 +1,0 @@
-@c -*-texinfo-*-
-@node Advanced Topics for Developers Only, , WinCVS Tutorial Step 7, WinCVS Tutorial
-@subsection Advanced Topics for Developers Only

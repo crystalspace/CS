@@ -11,11 +11,11 @@
 @cindex @code{iParticle}
 
 @emph{Written by Jorrit Tyberghein,
-@email{jorrit.tyberghein@@uz.kuleuven.ac.be}.}
+(@email{jorrit.tyberghein@@uz.kuleuven.ac.be}).}
 
-A 2D Sprite is basically a polygon that always faces the camera. There
-are some special effects that you can do with this but it is really
-very simple otherwise.
+A 2D Sprite is basically a polygon that always faces the camera.  There are
+some special effects that you can do with this but it is really very simple
+otherwise.
 
 @subsubheading Basic Structure
 
@@ -30,8 +30,8 @@ Loader plugin: @samp{crystalspace.mesh.loader.sprite.2d}
 Factory loader plugin: @samp{crystalspace.mesh.loader.factory.sprite.2d}
 @end itemize
 
-Objects in this plugin implement the following @sc{scf} interfaces (get
-with @code{QUERY_INTERFACE()}):
+Objects in this plugin implement the following @sc{scf} interfaces (get with
+@code{QUERY_INTERFACE()}):
 
 @itemize @bullet
 @item
@@ -62,12 +62,11 @@ Implements @samp{iMeshObjectType}
 
 @subsubheading Factory State Interface
 
-@samp{iSprite2DFactoryState} is the @sc{scf} interface that you can
-use to set/get settings for a 2D sprite factory. The definition of this
-interface can be found in @file{CS/include/imspr2d.h} and that is also the
-include file you need to include in your applications to use this plugin.
-Using this interface you can access the material, blending mode (mixmode),
-and lighting settings.
+@samp{iSprite2DFactoryState} is the @sc{scf} interface that you can use to
+set/get settings for a 2D sprite factory.  The definition of this interface can
+be found in @file{CS/include/imspr2d.h} and that is also the include file you
+need to include in your applications to use this plugin.  Using this interface
+you can access the material, blending mode (mixmode), and lighting settings.
 
 @subsubheading Factory Loader
 
@@ -80,12 +79,12 @@ Material to use for the polygon.
 Blending mode; one of @samp{ADD}, @samp{ALPHA}, @samp{COPY}, @samp{KEYCOLOR},
 @samp{MULTIPLY2}, @samp{MULTIPLY}, or @samp{TRANSPARENT}.
 @item UVANIMATION
-Define an uv animation, that is a sequence of frames which textures are all in one big texture.
-Thus the animation is achieved by altering the (u,v) coordinates of the polygon defined by this
-sprite.
+Define an uv animation, that is a sequence of frames which textures are all in
+one big texture.  Thus the animation is achieved by altering the (u,v)
+coordinates of the polygon defined by this sprite.
 @item FRAME
-Defines a single frame within an uv animation by specifying its duration in milliseconds and the u,v
-coordinates to use.
+Defines a single frame within an uv animation by specifying its duration in
+milliseconds and the u,v coordinates to use.
 @itemize
 FRAME 'framename' (millisec, u,v coo list)
 @end itemize
@@ -93,13 +92,12 @@ FRAME 'framename' (millisec, u,v coo list)
 
 @subsubheading Object State Interface
 
-@samp{iSprite2DState} is the @sc{scf} interface that you can
-use to set/get settings for a 2D sprite object. The definition of this
-interface can be found in @file{CS/include/imspr2d.h} and that is also the
-include file you need to include in your applications to use this plugin.
-Using this interface you can access the material, blending mode (mixmode),
-lighting settings, and also the vertices of the 2D polygon controlled
-by this plugin.
+@samp{iSprite2DState} is the @sc{scf} interface that you can use to set/get
+settings for a 2D sprite object.  The definition of this interface can be found
+in @file{CS/include/imspr2d.h} and that is also the include file you need to
+include in your applications to use this plugin.  Using this interface you can
+access the material, blending mode (mixmode), lighting settings, and also the
+vertices of the 2D polygon controlled by this plugin.
 
 @subsubheading Object Loader
 
@@ -138,11 +136,10 @@ loop : loop the animation or stop after last frame (and show the last frame)
 
 @subsubheading Example 1
 
-This is how our world file looks like:
+This is how our world file looks:
 
 @example
 WORLD (
-
   TEXTURES (
     TEXTURE 'blow' (FILE(blow.png))
   )
@@ -176,7 +173,8 @@ WORLD (
         UV (0,0,1,0,1,1,0,1)
         COLORS (1,1,1,1,1,1,1,1,1,1,1,1)
 	LIGHTING (no)
-        ; show the animation, use the timings attached to the frames, loop
+        ; show the animation, use the timings attached to
+	; the frames, loop
         ANIMATE ('boom', 0, yes)
       )
       MOVE (0,0,0)

@@ -22,12 +22,12 @@ space which needs to be filled with geometry. In Crystal Space 0.18 or
 older a sector could also contain geometry (i.e. the sector walls) but
 since 0.19 this is no longer possible (nor needed).
 
-To put geometry in a sector you use one or more mesh objects (see
-@xpref{MeshObject} for more information). Note that a mesh object can also
-be in several sectors at once. This happens when some object is busy traversing
-some portal from one sector to another. The list of sectors that a mesh
-object is in and also the position (i.e. transform) is kept by an instance of
-@code{iMovable} (see @xpref{HOWTO Mesh Movement} for more information).
+To put geometry in a sector you use one or more mesh objects
+(@pxref{MeshObject}).  Note that a mesh object can also be in several sectors
+at once.  This happens when some object is busy traversing some portal from one
+sector to another.  The list of sectors that a mesh object is in and also the
+position (i.e. transform) is kept by an instance of @code{iMovable}
+(@pxref{HOWTO Mesh Movement}).
 
 @subsubheading Render Priorities
 

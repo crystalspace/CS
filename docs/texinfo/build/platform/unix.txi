@@ -161,7 +161,7 @@ The build process places all object files and libraries in the directory
 @file{CS/out}.  This directory contains subdirectories for the operating
 system and processor architecture.  For example, if you compile on Linux
 for Intel with optimization then all object files will end up in
-@file{CS/out/LINUX/INTEL/optimize}.  However if you compile on a Solaris
+@file{CS/out/LINUX/X86/optimize}.  However if you compile on a Solaris
 system for Sparc with debugging enabled then all objects files end up in
 @file{CS/out/SOLARIS/SPARC/debug}.
 

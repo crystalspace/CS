@@ -3,9 +3,11 @@
 @subsection Windows - Using Mingw Compiler
 
 @noindent
-@emph{Last updated, 24 March, 2001  by Philip Wyett, @email{philipwyett@@redeye-entertainment.co.uk}.}
+@emph{Philip Wyett @email{philipwyett@@redeye-entertainment.co.uk}.}
+@noindent
+@emph{Last updated 24 March 2001}
 
-These instructions are for building Crystal Space with Mingw - a @sc{gnu}
+These instructions are for building Crystal Space with Mingw --- a @sc{gnu}
 compiler for Windows.  There are many different versions of the @sc{gnu}
 Windows compiler and problems arise with some Windows header files
 containing non-standard code used by Microsoft, so we recommend
@@ -17,13 +19,25 @@ Download the following packages:
 
 @itemize @bullet
 @item
-Crystal Space MingW package 'cs_mingw_0.20.exe' from the Mingw32 support directory at Linux Games
-This package contains all the recent MingW package releases i.e. all the files necessary to compile
-Crystal Space successfully.@*
+Crystal Space MingW package 'cs_mingw_0.20.exe' from the Mingw32 support
+directory at Linux Games This package contains all the recent MingW package
+releases i.e.  all the files necessary to compile Crystal Space successfully.
+
+@iftex
+@noindent
+@uref{http://www.3ddownloads.com/?directory=}@*
+@uref{/linuxgames/crystal/support/mingw32/}
+@end iftex
+@ifnottex
+@noindent
+@noindent
 @uref{http://www.3ddownloads.com/?directory=/linuxgames/crystal/support/mingw32/}
+@end ifnottex
 
 @item
-@sc{nasm} (Netwide Assembler) for Windows @samp{nasm-0.98e-bin-w32.zip}@*
+@sc{nasm} (Netwide Assembler) for Windows @samp{nasm-0.98e-bin-w32.zip}
+
+@noindent
 @uref{http://www.3ddownloads.com/?directory=/linuxgames/crystal/nasm/}
 @end itemize
 
@@ -33,36 +47,39 @@ Follow these instructions to install the packages which you downloaded.
 
 @itemize @bullet
 @item
-First install the Mingw compiler.  The file is a self extracting executable and will
-create the 'mingw32' directory for you. So if you wish to install it to your
-c:\ drive as c:\mingw32\*, extract the archive to c:\.
+First install the Mingw compiler.  The file is a self extracting executable and
+will create the @file{mingw32} directory for you.  So if you wish to install it
+to your @file{C:\} drive as @file{C:\mingw32\}, extract the archive to
+@file{C:\}.
 
-The following instructions assume you have the MingW package installed in c:\mingw32
+The following instructions assume the Mingw package is installed in
+@file{C:\mingw32}.
 
 @item
 Unzip the @sc{nasm} archive files and copy the @file{.exe} files into
-@file{c:\mingw32\bin}.
+@file{C:\mingw32\bin}.
 
 @item
 Adjust your @samp{PATH} environment variable.  On Windows 95 and 98 edit the
-@file{c:\autoexec.bat} file add the following entries.
+@file{C:\autoexec.bat} file add the following entry:
 
 @example
-SET PATH=c:\mingw32\bin
+SET PATH=C:\mingw32\bin
 @end example
 
-You must also add the following variable, so that GCC can find the @samp{Python} header files.
+You must also add the following variable, so that @sc{gcc} can find the Python
+header files.
 
 @example
-set PYTHON_INC=c:\mingw32\include
+SET PYTHON_INC=C:\mingw32\include
 @end example
 
 @noindent
 On Windows @sc{nt} and Windows 2000, use the System control panel to edit the
 environment variable.
 
-If you fail to do so, then the makedep tool will not know where to look for
-Mingw32's system include files, and will emit a lot of warnings.
+If you fail to do so, then the @file{makedep} tool will not know where to look
+for Mingw32's system include files, and will emit a lot of warnings.
 
 @item
 Reboot your computer.
@@ -76,10 +93,8 @@ commands:
 
 @example
 make win32gcc MODE=debug
-
 make depend
-
-make all
+make -k all
 @end example
 
 Note that making the @samp{depend} target is not absolutely required.  If
@@ -87,24 +102,24 @@ doing so presents problems, then you can safely omit it:
 
 @example
 make win32gcc MODE=debug
-
-make all
+make -k all
 @end example
 
-@subsubheading Additional command line compile parameters
+@subsubheading Additional Command Line Compile Options
 
-Adding @samp{clean} to the compile command line e.g.:
+You can also inser the @samp{clean} makefile target into the @samp{make}
+command, as follows:
 
-make clean all
+@example
+make -k clean all
+@end example
 
-Will instruct and perform a cleanout of all object files, link libraries etc. from
-the @samp{out\WIN32\INTEL\debug} directory.
+@noindent
+This will first remove all object files, libraries, etc.  from the
+@file{CS\out\WIN32\X86\debug} directory and will then build the entire project.
 
-Adding @samp{-k} to the compile command line e.g.:
-
-make -k all
-
-Will instruct the compiler to ignore errors and continue compiling regardless.
+The @samp{-k} option used in the @samp{make -k all} command instructs the
+compiler to ignore errors and continue compiling regardless.
 
 @subsubheading Customizing
 

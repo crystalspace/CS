@@ -52,7 +52,6 @@ by the copyright holders.
 @author Andrew Zabolotny
 @author Eric Sunshine
 @author Thomas Hieber
-@author Michael Dale Long
 @author Michael Ewert
 @author Seth Galbraith
 

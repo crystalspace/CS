@@ -438,7 +438,7 @@ uses the @sc{com} subsystem so it can easily be extended for system-dependent
 parts.
 
 @item
-Robert Bate (@email{rbate@@ma.ultranet.com})
+Robert Bate (@email{rbate@@mac.com})
 
 Robert is the current pre-Carbon Macintosh port maintainer.
 
@@ -728,6 +728,15 @@ Travis McIntosh (@email{Travis.McIntosh@@student.oc.edu})
 Travis did some very fundamental work on the curve and lighting code
 in order to implement both dynamic and pseudo-dynamic lights for them
 and also allow shadows.
+
+@item
+Bob Ham (@email{node@@users.sourceforge.net})
+
+Bob submitted the Makefile changes need to compile on @sc{gnu}/Hurd.  He proof-
+read much of this manual.  He also started working on a level editor for
+Crystal Space but ceased work on it:
+
+@uref{http://sourceforge.net/projects/ticle/}
 @end itemize
 
 Many thanks also for the people at @uref{http://www.grimmware.com, GrimmWare}
@@ -737,15 +746,6 @@ Many thanks to Alessandro Russo for convincing his system manager to create
 a mailing list for Crystal Space.  Thanks to Marco d'Itri (the system manager)
 for creating this list for me.  Also thanks to those people for creating an
 ftp mirror of this site.
-
-@item
-Bob Ham (@email{node@@users.sourceforge.net})
-
-Bob submitted the Makefile changes need to compile on GNU/Hurd.  He proof
-read much of this manual.  He also started working on a level editor for
-Crystal Space but ceased work on it:
-
-@uref{http://sourceforge.net/projects/ticle/}
 
 If we have forgotten anyone or missed a contribution, we sincerely apologize.
 Please feel free to notify us of errors or omissions.
