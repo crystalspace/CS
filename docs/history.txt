@@ -28,6 +28,9 @@ chronological order.
 	  now. It works nice now (you have to relight the lighting for
 	  terrainf to see it) but there seems to be a problem with normals
 	  so the lighting effect is not very visible right now.
+	- Jorrit changed the lightmap size in bruteblock to 257x257 by
+	  default. In addition added a 'lightmap resolution' LOD value
+	  with which you can set this size.
 5-Oct-2004
 	- Rhad fixed a long standing bug in the Ogg loader.
 	  - Per specs, SEEK_END must seek 1 byte past the end of data

@@ -838,6 +838,7 @@ csTerrainObject::csTerrainObject (iObjectRegistry* object_reg,
 
   staticlighting = false;
   castshadows = false;
+  lmres = 257;
 
   colorVersion = 0;
   last_colorVersion = ~0;
@@ -862,7 +863,6 @@ void csTerrainObject::SetStaticLighting (bool enable)
   staticlighting = enable;
   if (staticlighting)
   {
-    lmres = pFactory->hm_x;
     staticLights.SetLength (lmres * lmres);
   }
   else
@@ -1532,6 +1532,13 @@ bool csTerrainObject::SetLODValue (const char* parameter, float value)
     cd_resolution = int (value);
     return true;
   }
+  else if (strcmp (parameter, "lightmap resolution") == 0)
+  {
+    lmres = int (value);
+    if (staticlighting)
+      staticLights.SetLength (lmres * lmres);
+    return true;
+  }
   return false;
 }
 
@@ -1556,6 +1563,10 @@ float csTerrainObject::GetLODValue (const char* parameter)
   else if (strcmp (parameter, "cd resolution") == 0)
   {
     return float (cd_resolution);
+  }
+  else if (strcmp (parameter, "lightmap resolution") == 0)
+  {
+    return float (lmres);
   }
   return 0;
 }
