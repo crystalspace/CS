@@ -26,6 +26,10 @@ The history order is reversed so that new features are at the top.
 	- changed win slashes '\' in aws.mak to unix ones '/' to make it at
 	  least compiling with unix. I'm not sure if it still works in win now
 	  :)
+	- Matze changed bin/arch.sh to use the value of the CPU, MACHINE and
+	  PROC vars if they are alread set in environment
+	- also changed comptest to use a already set ARCH var (Eric, please
+	  check if it still works with older shells)
 3-Dec-2001
 	- Toni Asco' Gonzalez fixed the 3ds loader so that it now correctly
 	  supports normal and texture mapping information.

@@ -50,11 +50,14 @@ echo "LINK = ${CXX}"
 # Create a dummy C++ program
 echo "int main() { return 0; }" > comptest.cpp
 
+if test -n "$ARCH"; then
+    ARCH="-march=$ARCH";
+fi
 # Check for machine-specific C compiler flags
-(echo "$CPU" | grep -s 686 >/dev/null && ${CXX} -c -mcpu=pentiumpro -march=i686 comptest.cpp && echo "CFLAGS.SYSTEM += -mcpu=pentiumpro -march=i686") || \
-(echo "$CPU" | grep -s 686 >/dev/null && ${CXX} -c -mpentiumpro -march=i686 comptest.cpp && echo "CFLAGS.SYSTEM += -mpentiumpro -march=i686") || \
-(echo "$CPU" | grep -s [5-6]86 >/dev/null && ${CXX} -c -mcpu=pentium -march=i586 comptest.cpp && echo "CFLAGS.SYSTEM += -mcpu=pentium -march=i586") || \
-(echo "$CPU" | grep -s [5-6]86 >/dev/null && ${CXX} -c -mpentium -march=i586 comptest.cpp && echo "CFLAGS.SYSTEM += -mpentium -march=i586") || \
+(echo "$CPU" | grep -s 686 >/dev/null && ${CXX} -c -mcpu=pentiumpro ${ARCH-"-march=i686"} comptest.cpp && echo "CFLAGS.SYSTEM += -mcpu=pentiumpro ${ARCH-"-march=i686"}") || \
+(echo "$CPU" | grep -s 686 >/dev/null && ${CXX} -c -mpentiumpro ${ARCH-"-march=i686"} comptest.cpp && echo "CFLAGS.SYSTEM += -mpentiumpro ${ARCH-"-march=i686"}") || \
+(echo "$CPU" | grep -s [5-6]86 >/dev/null && ${CXX} -c -mcpu=pentium ${ARCH-"-march=i586"} comptest.cpp && echo "CFLAGS.SYSTEM += -mcpu=pentium ${ARCH-"-march=i586"}") || \
+(echo "$CPU" | grep -s [5-6]86 >/dev/null && ${CXX} -c -mpentium ${ARCH-"-march=i586"} comptest.cpp && echo "CFLAGS.SYSTEM += -mpentium ${ARCH-"-march=i586"}") || \
 (echo "$CPU" | grep -s [3-9]86 >/dev/null && ${CXX} -c -mcpu=i486 comptest.cpp && echo "CFLAGS.SYSTEM += -mcpu=i486") || \
 (echo "$CPU" | grep -s [3-9]86 >/dev/null && ${CXX} -c -m486 comptest.cpp && echo "CFLAGS.SYSTEM += -m486") || \
 (echo "$MACHINE" | grep -s alpha >/dev/null && ${CXX} -c -mieee comptest.cpp && echo "CFLAGS.SYSTEM += -mieee")
