@@ -316,13 +316,10 @@ void csGraphics3DSoftware::ScanSetup ()
 #endif
         csScan_8_draw_pi_scanline_tex_zuse;
 
-      if (rstate_gouraud)
-      {
-//      ScanProcPIG [SCANPROCPI_FLAT_GOURAUD_ZFIL] = csScan_8_draw_pi_scanline_flat_gouraud_zfil;
-//      ScanProcPIG [SCANPROCPI_FLAT_GOURAUD_ZUSE] = csScan_8_draw_pi_scanline_flat_gouraud_zuse;
-//      ScanProcPIG [SCANPROCPI_TEX_GOURAUD_ZFIL] = csScan_8_draw_pi_scanline_tex_gouraud_zfil;
-//      ScanProcPIG [SCANPROCPI_TEX_GOURAUD_ZUSE] = csScan_8_draw_pi_scanline_tex_gouraud_zuse;
-      } /* endif */
+//    ScanProcPIG [SCANPROCPI_FLAT_GOURAUD_ZFIL] = csScan_8_draw_pi_scanline_flat_gouraud_zfil;
+//    ScanProcPIG [SCANPROCPI_FLAT_GOURAUD_ZUSE] = csScan_8_draw_pi_scanline_flat_gouraud_zuse;
+//    ScanProcPIG [SCANPROCPI_TEX_GOURAUD_ZFIL] = csScan_8_draw_pi_scanline_tex_gouraud_zfil;
+//    ScanProcPIG [SCANPROCPI_TEX_GOURAUD_ZUSE] = csScan_8_draw_pi_scanline_tex_gouraud_zuse;
 
       if (do_transp)
         ScanProc_Alpha = ScanProc_8_Alpha;
@@ -389,21 +386,18 @@ void csGraphics3DSoftware::ScanSetup ()
 #endif
         csScan_16_draw_pi_scanline_tex_zuse;
 
-      if (rstate_gouraud)
-      {
-        ScanProcPIG [SCANPROCPI_FLAT_GOURAUD_ZFIL] = (pfmt.GreenBits == 5) ?
+      ScanProcPIG [SCANPROCPI_FLAT_GOURAUD_ZFIL] = (pfmt.GreenBits == 5) ?
           csScan_16_draw_pi_scanline_flat_gouraud_zfil_565 :
           csScan_16_draw_pi_scanline_flat_gouraud_zfil_555;
-        ScanProcPIG [SCANPROCPI_FLAT_GOURAUD_ZUSE] = (pfmt.GreenBits == 5) ?
+      ScanProcPIG [SCANPROCPI_FLAT_GOURAUD_ZUSE] = (pfmt.GreenBits == 5) ?
           csScan_16_draw_pi_scanline_flat_gouraud_zuse_555 :
           csScan_16_draw_pi_scanline_flat_gouraud_zuse_565;
-        ScanProcPIG [SCANPROCPI_TEX_GOURAUD_ZFIL] = (pfmt.GreenBits == 5) ?
+      ScanProcPIG [SCANPROCPI_TEX_GOURAUD_ZFIL] = (pfmt.GreenBits == 5) ?
           csScan_16_draw_pi_scanline_tex_gouraud_zfil_555 :
           csScan_16_draw_pi_scanline_tex_gouraud_zfil_565;
-        ScanProcPIG [SCANPROCPI_TEX_GOURAUD_ZUSE] = (pfmt.GreenBits == 5) ?
+      ScanProcPIG [SCANPROCPI_TEX_GOURAUD_ZUSE] = (pfmt.GreenBits == 5) ?
           csScan_16_draw_pi_scanline_tex_gouraud_zuse_555 :
           csScan_16_draw_pi_scanline_tex_gouraud_zuse_565;
-      } /* endif */
 
       ScanProcPIFX[SCANPROCPIFX_ZUSE] = (pfmt.GreenBits == 5) ?
           csScan_16_draw_pifx_scanline_zuse_555 :
@@ -457,13 +451,10 @@ void csGraphics3DSoftware::ScanSetup ()
       ScanProcPI [SCANPROCPI_TEX_ZFIL] = csScan_32_draw_pi_scanline_tex_zfil;
       ScanProcPI [SCANPROCPI_TEX_ZUSE] = csScan_32_draw_pi_scanline_tex_zuse;
 
-      if (rstate_gouraud)
-      {
-        ScanProcPIG [SCANPROCPI_FLAT_GOURAUD_ZFIL] = csScan_32_draw_pi_scanline_flat_gouraud_zfil;
-        ScanProcPIG [SCANPROCPI_FLAT_GOURAUD_ZUSE] = csScan_32_draw_pi_scanline_flat_gouraud_zuse;
-        ScanProcPIG [SCANPROCPI_TEX_GOURAUD_ZFIL] = csScan_32_draw_pi_scanline_tex_gouraud_zfil;
-        ScanProcPIG [SCANPROCPI_TEX_GOURAUD_ZUSE] = csScan_32_draw_pi_scanline_tex_gouraud_zuse;
-      } /* endif */
+      ScanProcPIG [SCANPROCPI_FLAT_GOURAUD_ZFIL] = csScan_32_draw_pi_scanline_flat_gouraud_zfil;
+      ScanProcPIG [SCANPROCPI_FLAT_GOURAUD_ZUSE] = csScan_32_draw_pi_scanline_flat_gouraud_zuse;
+      ScanProcPIG [SCANPROCPI_TEX_GOURAUD_ZFIL] = csScan_32_draw_pi_scanline_tex_gouraud_zfil;
+      ScanProcPIG [SCANPROCPI_TEX_GOURAUD_ZUSE] = csScan_32_draw_pi_scanline_tex_gouraud_zuse;
 
       ScanProcPIFX[SCANPROCPIFX_ZUSE]        = csScan_32_draw_pifx_scanline_zuse;
       ScanProcPIFX[SCANPROCPIFX_ZFIL]        = csScan_32_draw_pifx_scanline_zfil;
