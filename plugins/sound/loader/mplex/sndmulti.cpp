@@ -94,7 +94,7 @@ csSoundLoaderMultiplexer::~csSoundLoaderMultiplexer()
 
 bool csSoundLoaderMultiplexer::Initialize(iObjectRegistry *object_reg)
 {
-  iReporter* reporter = CS_QUERY_REGISTRY (object_reg, iReporter);
+  csRef<iReporter> reporter (CS_QUERY_REGISTRY (object_reg, iReporter));
   if (reporter)
     reporter->Report (CS_REPORTER_SEVERITY_NOTIFY,
       "crystalspace.sound.loader.mplex",
@@ -103,7 +103,8 @@ bool csSoundLoaderMultiplexer::Initialize(iObjectRegistry *object_reg)
 
   iStrVector* list = iSCF::SCF->QueryClassList ("crystalspace.sound.loader.");
   int const nmatches = list->Length();
-  iPluginManager* plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
+  csRef<iPluginManager> plugin_mgr (
+  	CS_QUERY_REGISTRY (object_reg, iPluginManager));
   if (nmatches != 0)
   {
     int i;
@@ -118,8 +119,8 @@ bool csSoundLoaderMultiplexer::Initialize(iObjectRegistry *object_reg)
           reporter->Report (CS_REPORTER_SEVERITY_NOTIFY,
       		"crystalspace.sound.loader.mplex",
 	  	"  %s", classname);
-        iSoundLoader *ldr = CS_LOAD_PLUGIN (plugin_mgr, classname,
-		iSoundLoader);
+        csRef<iSoundLoader> ldr (CS_LOAD_PLUGIN (plugin_mgr, classname,
+		iSoundLoader));
         if (ldr)
 	{
 	  // ok the following is a bit hacky, but since the mp3 loader skips junk until
@@ -130,6 +131,7 @@ bool csSoundLoaderMultiplexer::Initialize(iObjectRegistry *object_reg)
 	    pushback.Push (ldr);
 	  else
 	    Loaders.Push(ldr);
+	  ldr->IncRef ();	// Prevent smart pointer release.
 	}
       }
     }
@@ -137,8 +139,6 @@ bool csSoundLoaderMultiplexer::Initialize(iObjectRegistry *object_reg)
       Loaders.Push((iSoundLoader*)pushback.Get (i));
   }
   list->DecRef();
-  if (reporter) reporter->DecRef ();
-  plugin_mgr->DecRef ();
   return true;
 }
 
@@ -148,8 +148,12 @@ csSoundLoaderMultiplexer::LoadSound(void *Data, unsigned long Size) const
   for (long i=0;i<Loaders.Length();i++)
   {
     iSoundLoader *Ldr=(iSoundLoader*)(Loaders.Get(i));
-    iSoundData* snd=Ldr->LoadSound(Data, Size);
-    if (snd) return csPtr<iSoundData> (snd);
+    csRef<iSoundData> snd (Ldr->LoadSound(Data, Size));
+    if (snd)
+    {
+      snd->IncRef ();	// Avoid smart pointer release.
+      return csPtr<iSoundData> (snd);
+    }
   }
   return NULL;
 }

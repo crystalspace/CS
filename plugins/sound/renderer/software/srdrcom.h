@@ -86,7 +86,7 @@ public:
   csVector SoundHandles;
 
   // the low-level sound driver
-  iSoundDriver *SoundDriver;
+  csRef<iSoundDriver> SoundDriver;
 
   // memory of the sound driver
   void *memory;

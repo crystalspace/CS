@@ -69,7 +69,6 @@ csSoundRenderSoftware::csSoundRenderSoftware(iBase* piBase) : Listener(NULL)
   SCF_CONSTRUCT_EMBEDDED_IBASE(scfiComponent);
   scfiEventHandler = NULL;
   object_reg = NULL;
-  SoundDriver = NULL;
   Listener = NULL;
   memory = NULL;
   memorysize = 0;
@@ -80,12 +79,9 @@ void csSoundRenderSoftware::Report (int severity, const char* msg, ...)
 {
   va_list arg;
   va_start (arg, msg);
-  iReporter* rep = CS_QUERY_REGISTRY (object_reg, iReporter);
+  csRef<iReporter> rep (CS_QUERY_REGISTRY (object_reg, iReporter));
   if (rep)
-  {
     rep->ReportV (severity, "crystalspace.sound.software", msg, arg);
-    rep->DecRef ();
-  }
   else
   {
     csPrintfV (msg, arg);
@@ -106,9 +102,9 @@ bool csSoundRenderSoftware::Initialize (iObjectRegistry *r)
   char *drv = "crystalspace.sound.driver.null";
 #endif
 
-  iPluginManager* plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
+  csRef<iPluginManager> plugin_mgr (
+  	CS_QUERY_REGISTRY (object_reg, iPluginManager));
   SoundDriver = CS_LOAD_PLUGIN (plugin_mgr, drv, iSoundDriver);
-  plugin_mgr->DecRef ();
   if (!SoundDriver)
   {
     Report (CS_REPORTER_SEVERITY_ERROR,
@@ -119,13 +115,10 @@ bool csSoundRenderSoftware::Initialize (iObjectRegistry *r)
   // set event callback
   if (!scfiEventHandler)
     scfiEventHandler = new EventHandler (this);
-  iEventQueue* q = CS_QUERY_REGISTRY(object_reg, iEventQueue);
+  csRef<iEventQueue> q (CS_QUERY_REGISTRY(object_reg, iEventQueue));
   if (q != 0)
-  {
     q->RegisterListener(scfiEventHandler,
       CSMASK_Command | CSMASK_Broadcast | CSMASK_Nothing);
-    q->DecRef ();
-  }
 
   // read the config file
   Config.AddConfig(object_reg, "/config/sound.cfg");
@@ -137,16 +130,12 @@ csSoundRenderSoftware::~csSoundRenderSoftware()
 {
   if (scfiEventHandler)
   {
-    iEventQueue* q = CS_QUERY_REGISTRY(object_reg, iEventQueue);
+    csRef<iEventQueue> q (CS_QUERY_REGISTRY(object_reg, iEventQueue));
     if (q != 0)
-    {
       q->RemoveListener (scfiEventHandler);
-      q->DecRef ();
-    }
     scfiEventHandler->DecRef ();
   }
   Close();
-  if (SoundDriver) SoundDriver->DecRef();
 }
 
 bool csSoundRenderSoftware::Open()
@@ -176,11 +165,10 @@ bool csSoundRenderSoftware::Open()
   Report (CS_REPORTER_SEVERITY_NOTIFY, "  Volume: %g", Volume);
 
   csTicks et, ct;
-  iVirtualClock* vc = CS_QUERY_REGISTRY (object_reg, iVirtualClock);
+  csRef<iVirtualClock> vc (CS_QUERY_REGISTRY (object_reg, iVirtualClock));
 
   et = vc->GetElapsedTicks ();
   ct = vc->GetCurrentTicks ();
-  vc->DecRef ();
   LastTime = ct;
 
   return true;
@@ -191,10 +179,8 @@ void csSoundRenderSoftware::Close()
   ActivateMixing = false;
   if (SoundDriver)
   {
-    iSoundDriver *d = SoundDriver;
+    SoundDriver->Close ();
     SoundDriver = NULL;
-    d->Close ();
-    d->DecRef ();
   }
 
   if (Listener)
