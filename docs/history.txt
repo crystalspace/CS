@@ -6,6 +6,9 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+4-Jun-2004
+        - Andrew Craig removed misplaced return in sprcal3d as reported by
+          Ingie from the mailing list.
 3-Jun-2004
 	- Eric Sunshine added MsvcGenVariable rule to msvcgen.jam, which allows
 	  clients to create msvcgen %foo%-style template variables on-the-fly.

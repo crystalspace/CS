@@ -975,7 +975,7 @@ public:
     }
     virtual void SetAnimationTime(float animationTime)
     {
-      return scfParent->SetAnimationTime(animationTime);
+      scfParent->SetAnimationTime(animationTime);
     }
 
   } scfiSpriteCal3DState;
