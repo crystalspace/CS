@@ -16,6 +16,10 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
+#include <wx/wx.h>
+
+#define CS_IMPLEMENT_PLATFORM_APPLICATION
+
 #include "cssysdef.h"
 #include "csutil/sysfunc.h"
 #include "csutil/cfgfile.h"
@@ -69,7 +73,7 @@ END_EVENT_TABLE()
 Simple* simple = 0;
 
 Simple::Simple (iObjectRegistry* object_reg)
-  : wxFrame(NULL, -1, "Crystal Space WxWidget Canvas test", wxDefaultPosition, wxSize(500, 500))
+  : wxFrame(NULL, -1, wxT("Crystal Space WxWidget Canvas test"), wxDefaultPosition, wxSize(500, 500))
 {
   Simple::object_reg = object_reg;
 }
@@ -376,17 +380,29 @@ void Simple::OnShow(wxShowEvent& event)
   printf("got show %i\n", event.GetShow());
 }
 
+/* There are two ways to drive the CS event loop, from
+  a Wx timer or from idle events.  This test app demonstrates
+  either method depending on which #define is set below.  Using
+  a timer seems to produce better results (a smoother framerate
+  and better CPU utilization).
+*/
 
+//#define USE_IDLE
+#define USE_TIMER
 
+#ifdef USE_TIMER
 class Pump : public wxTimer
 {
 public:
   Simple* s;
+  Pump() { };
   virtual void Notify()
     {
-      s->PushFrame();
+		s->PushFrame();
     }
 };
+#endif
+
 
 // Define a new application type
 class MyApp: public wxApp
@@ -396,7 +412,19 @@ public:
 
   virtual bool OnInit(void);
   virtual int OnExit(void);
+
+#ifdef USE_IDLE
+  virtual void OnIdle();
+  DECLARE_EVENT_TABLE();
+#endif
 };
+
+#ifdef USE_IDLE
+BEGIN_EVENT_TABLE(MyApp, wxApp)
+  EVT_IDLE(MyApp::OnIdle)
+END_EVENT_TABLE()
+#endif
+
 
 IMPLEMENT_APP(MyApp)
 
@@ -405,17 +433,40 @@ IMPLEMENT_APP(MyApp)
  *---------------------------------------------------------------------*/
   bool MyApp::OnInit(void)
 {
-  object_reg = csInitializer::CreateEnvironment (argc, argv);
+	char** csargv;
+    csargv = (char**)malloc(sizeof(char*) * argc);
+	for(int i = 0; i < argc; i++) {
+		csargv[i] = strdup(wxString(argv[i]).mb_str().data());
+	}
+  object_reg = csInitializer::CreateEnvironment (argc, csargv);
 
   simple = new Simple (object_reg);
   simple->Initialize ();
 
+#ifdef USE_TIMER
+  /* This triggers a timer event every 20 milliseconds, which will yield
+   a maximum framerate of 1000/20 = 50 FPS.  Obviously if it takes longer
+   than 20 ms to render a frame the framerate will be lower :-)
+   You may wish to tweak this for your own application.  Note that
+   this also lets you throttle the CPU usage of your app, because
+   the application will yield the CPU and wait for events in the 
+   time between when it completes rendering the current frame and 
+   the timer triggers the next frame. 
+  */
+
   Pump* p = new Pump();
   p->s = simple;
-  p->Start(10);
+  p->Start(20);
+#endif
 
   return true;
 }
+
+#ifdef USE_IDLE
+void MyApp::OnIdle() {	
+	simple->PushFrame();
+}
+#endif
 
 int MyApp::OnExit()
 {
