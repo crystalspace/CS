@@ -370,6 +370,44 @@ sub ACQUIRE {
 }
 
 
+############# Class : cspace::csColor4 ##############
+
+package cspace::csColor4;
+@ISA = qw( cspace cspace::csColor );
+%OWNER = ();
+%ITERATORS = ();
+*swig_alpha_get = *cspacec::csColor4_alpha_get;
+*swig_alpha_set = *cspacec::csColor4_alpha_set;
+sub new {
+    my $pkg = shift;
+    my $self = cspacec::new_csColor4(@_);
+    bless $self, $pkg if defined($self);
+}
+
+sub DESTROY {
+    return unless $_[0]->isa('HASH');
+    my $self = tied(%{$_[0]});
+    return unless defined $self;
+    delete $ITERATORS{$self};
+    if (exists $OWNER{$self}) {
+        cspacec::delete_csColor4($self);
+        delete $OWNER{$self};
+    }
+}
+
+sub DISOWN {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    delete $OWNER{$ptr};
+}
+
+sub ACQUIRE {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    $OWNER{$ptr} = 1;
+}
+
+
 ############# Class : cspace::csCommandLineHelper ##############
 
 package cspace::csCommandLineHelper;
@@ -2237,6 +2275,7 @@ sub DESTROY {
     }
 }
 
+*Clone = *cspacec::csCatmullRomSpline_Clone;
 sub DISOWN {
     my $self = shift;
     my $ptr = tied(%$self);
@@ -6630,6 +6669,7 @@ package cspace::iMeshObjectFactory;
 *SupportsHardTransform = *cspacec::iMeshObjectFactory_SupportsHardTransform;
 *SetLogicalParent = *cspacec::iMeshObjectFactory_SetLogicalParent;
 *GetLogicalParent = *cspacec::iMeshObjectFactory_GetLogicalParent;
+*GetMeshObjectType = *cspacec::iMeshObjectFactory_GetMeshObjectType;
 *GetObjectModel = *cspacec::iMeshObjectFactory_GetObjectModel;
 sub DESTROY {
     return unless $_[0]->isa('HASH');
@@ -13055,6 +13095,7 @@ sub CS_FX_ALPHA () { $cspacec::CS_FX_ALPHA }
 sub CS_FX_TRANSPARENT () { $cspacec::CS_FX_TRANSPARENT }
 sub CS_FX_DESTALPHAADD () { $cspacec::CS_FX_DESTALPHAADD }
 sub CS_FX_SRCALPHAADD () { $cspacec::CS_FX_SRCALPHAADD }
+sub CS_FX_PREMULTALPHA () { $cspacec::CS_FX_PREMULTALPHA }
 sub CS_FX_MESH () { $cspacec::CS_FX_MESH }
 sub CS_FX_KEYCOLOR () { $cspacec::CS_FX_KEYCOLOR }
 sub CS_FX_FLAT () { $cspacec::CS_FX_FLAT }
