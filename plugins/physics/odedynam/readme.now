@@ -1,4 +1,4 @@
-Currently (as of 30 Nov 2002) you need the CVS version of the ODE
-library.  Information about downloading it can be found at
-http://www.q12.org/ode.  The "stable" version 0.03 is not sufficient.
-This should work out of the box with the current CVS version of ODE.
+To build this plugin modules, you will need at least the 0.035 release of ODE,
+which can be downloaded from the ODE web site:
+
+http://opende.sourceforge.net/
