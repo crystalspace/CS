@@ -21,8 +21,8 @@
 #ifndef __CS_BELIBG2D_H__
 #define __CS_BELIBG2D_H__
 
-#include "GraphicsDefs.h"
-#include "Rect.h"
+#include <GraphicsDefs.h>
+#include <Rect.h>
 #include "csutil/scf.h"
 #include "cs2d/common/graph2d.h"
 #include "cssys/be/icsbe.h"

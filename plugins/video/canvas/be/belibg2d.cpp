@@ -20,6 +20,7 @@
 */
 
 #include <sys/param.h>
+#include <Screen.h>
 #include "sysdef.h"
 #include "csutil/scf.h"
 #include "cs2d/be/belibg2d.h"

@@ -19,6 +19,7 @@
 
 #include <stdarg.h>
 #include <sys/param.h>
+#include <Screen.h>
 #include "sysdef.h"
 #include "csutil/scf.h"
 #include "cs2d/openglbe/glbe2d.h"

@@ -25,6 +25,7 @@
 #include <sys/param.h>
 #include <Application.h>
 #include <Beep.h>
+#include <View.h>
 
 #include "sysdef.h"
 #include "cssys/system.h"

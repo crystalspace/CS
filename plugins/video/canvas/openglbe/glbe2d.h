@@ -21,8 +21,8 @@
 #define __CS_GLBE2D_H__
 
 #include <GL/gl.h>
-#include "GraphicsDefs.h"
-#include "Rect.h"
+#include <GraphicsDefs.h>
+#include <Rect.h>
 #include "csutil/scf.h"
 #include "cs2d/common/graph2d.h"
 #include "cssys/be/icsbe.h"
