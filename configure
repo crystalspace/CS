@@ -37131,11 +37131,12 @@ cat confdefs.h >>conftest.$ac_ext
 cat >>conftest.$ac_ext <<_ACEOF
 /* end confdefs.h.  */
 #include <cal3d/cal3d.h>
+	    #include <cal3d/animcallback.h>
 int
 main ()
 {
-CalAnimation* a = 0; a->completeCallbacks((CalModel*)0);
-	    CalCoreSkeletonPtr s = CalLoader::loadCoreSkeleton((void*)0);
+CalAnimationCallback* c = 0;
+	    c->AnimationComplete((CalModel*)0, (void*)0);
   ;
   return 0;
 }
@@ -37283,11 +37284,12 @@ cat confdefs.h >>conftest.$ac_ext
 cat >>conftest.$ac_ext <<_ACEOF
 /* end confdefs.h.  */
 #include <cal3d/cal3d.h>
+	    #include <cal3d/animcallback.h>
 int
 main ()
 {
-CalAnimation* a = 0; a->completeCallbacks((CalModel*)0);
-	    CalCoreSkeletonPtr s = CalLoader::loadCoreSkeleton((void*)0);
+CalAnimationCallback* c = 0;
+	    c->AnimationComplete((CalModel*)0, (void*)0);
   ;
   return 0;
 }

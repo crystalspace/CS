@@ -44,6 +44,9 @@ chronological order.
 	  which are not part of the present standard.)
 	- Eric Sunshine eliminated a number of compilation warnings throughout
 	  the project.
+	- Eric Sunshine updated the cal3d check in configure.ac so that it
+	  demands the very latest CVS version of cal3d since it is required by
+	  viewmesh.
 2-Mar-2005
 	- Jorrit changed pvscalc to use the Description() method to print
 	  out boxes and vectors instead of the ugly B2F and other macros.
