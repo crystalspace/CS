@@ -88,8 +88,8 @@ void csRainMeshObject::Update (csTicks elapsed_time)
       if (v.y < Bounds.MinY ()) v.y += Bounds.MaxY () - Bounds.MinY ();
       if (v.z < Bounds.MinZ ()) v.z += Bounds.MaxZ () - Bounds.MinZ ();
       if (v.x > Bounds.MaxX ()) v.x += Bounds.MinX () - Bounds.MaxX ();
-      if (v.y > Bounds.MaxY ()) v.y += Bounds.MinY () - Bounds.MaxX ();
-      if (v.z > Bounds.MaxZ ()) v.z += Bounds.MinZ () - Bounds.MaxX ();
+      if (v.y > Bounds.MaxY ()) v.y += Bounds.MinY () - Bounds.MaxY ();
+      if (v.z > Bounds.MaxZ ()) v.z += Bounds.MinZ () - Bounds.MaxZ ();
     }
   }
 }
