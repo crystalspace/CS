@@ -204,7 +204,7 @@ void CSWriter::WriteMaterials()
   Indent();
   // set the current mesh to the first in the file
   for (j=0; j<numTextures; j++)
-    WriteL ("TEXTURE '%s' (FILE (%s)) ",textures[j], textures[j]);
+    WriteL ("TEXTURE '%s' (FILE ('%s')) ",textures[j], textures[j]);
   
   UnIndent();
   WriteL (")"); 
