@@ -203,23 +203,30 @@ AS_IF([test -n "$NASM"],
 
 
 #------------------------------------------------------------------------------
-# Check for typical required libraries (libm, libdl, libnsl).
+# Check for typical required libraries (libm, libmx, libdl, libnsl).
 #------------------------------------------------------------------------------
 AC_DEFUN([CS_CHECK_COMMON_LIBS],
     [AC_LANG_PUSH([C])
-    AC_CHECK_LIB([m], [pow],
-	[CS_EMIT_BUILD_PROPERTY([COMPILER.LFLAGS], [-lm], [+])
-	cs_cv_libm=yes cs_cv_libm_libs='-lm'],
-	[cs_cv_libm=no cs_cv_libm_libs=''])
-    AC_CHECK_LIB([dl], [dlopen],
-	[CS_EMIT_BUILD_PROPERTY([COMPILER.LFLAGS], [-ldl], [+])
-	cs_cv_libdl=yes cs_cv_libdl_libs='-ldl'],
-	[cs_cv_libdl=no cs_cv_libdl_libs=''])
-    AC_CHECK_LIB([nsl], [gethostbyname],
-	[CS_EMIT_BUILD_PROPERTY([COMPILER.LFLAGS], [-lnsl], [+])])
+    AC_CHECK_LIB([m], [pow], [cs_cv_libm_libs=-lm], [cs_cv_libm_libs=])
+    AC_CHECK_LIB([m], [cosf], [cs_cv_libm_libs=-lm], [cs_cv_libm_libs=])
+    AC_CHECK_LIB([mx], [cosf])
+    AC_CHECK_LIB([dl], [dlopen], [cs_cv_libdl_libs=-ldl], [cs_cv_libdl_libs=])
+    AC_CHECK_LIB([nsl], [gethostbyname])
     AC_LANG_POP([C])])
 
 CS_CHECK_COMMON_LIBS
+
+AS_IF([test $ac_cv_lib_m_pow = yes || test $ac_cv_lib_m_cosf = yes],
+    [CS_EMIT_BUILD_PROPERTY([COMPILER.LFLAGS], [-lm], [+])])
+AS_IF([test $ac_cv_lib_mx_cosf = yes],
+    [CS_EMIT_BUILD_PROPERTY([COMPILER.LFLAGS], [-lmx], [+])])
+AS_IF([test $ac_cv_lib_dl_dlopen = yes],
+    [CS_EMIT_BUILD_PROPERTY([COMPILER.LFLAGS], [-ldl], [+])])
+AS_IF([test $ac_cv_lib_nsl_gethostbyname = yes],
+    [CS_EMIT_BUILD_PROPERTY([COMPILER.LFLAGS], [-lnsl], [+])])
+
+AS_IF([test $ac_cv_lib_m_cosf = no && test $ac_cv_lib_mx_cosf = no],
+    [CS_HEADER_PROPERTY([CS_USE_FAKE_MATH_H_FLOAT_FUNCS])])
 
 
 
@@ -991,7 +998,7 @@ CS_CHECK_GL_PREPARE
 cs_gl_plat_cflags=''
 cs_gl_plat_lflags=''
 cs_gl_plat_libs=''
-AS_IF([test $cs_cv_libm = yes],
+AS_IF([test -n "$cs_cv_libm_cflags$cs_cv_libm_lflags$cs_cv_libm_libs"],
     [cs_gl_plat_cflags="$cs_cv_libm_cflags $cs_gl_plat_cflags"
     cs_gl_plat_lflags="$cs_cv_libm_lflags $cs_gl_plat_lflags"
     cs_gl_plat_libs="$cs_cv_libm_libs $cs_gl_plat_libs"])

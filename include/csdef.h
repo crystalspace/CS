@@ -97,6 +97,24 @@
 #define REINTERPRET_CAST(T,V) CS_REINTERPRET_CAST(T,V)
 #define CONST_CAST(T,V)       CS_CONST_CAST(T,V)
 
+// Platforms which do not have floating-point variations of the standard math.h
+// cos(), sin(), tan(), sqrt(), etc. functions should define
+// CS_USE_FAKE_MATH_H_FLOAT_FUNCS.
+#if defined(CS_USE_FAKE_MATH_H_FLOAT_FUNCS)
+  #define atan2f(X) CS_STATIC_CAST(float,atan2(X))
+  #define atanf(X)  CS_STATIC_CAST(float,atan(X))
+  #define cosf(X)   CS_STATIC_CAST(float,cos(X))
+  #define exp2f(X)  CS_STATIC_CAST(float,exp2(X))
+  #define expf(X)   CS_STATIC_CAST(float,exp(X))
+  #define log10f(X) CS_STATIC_CAST(float,log10(X))
+  #define log2f(X)  CS_STATIC_CAST(float,log2(X))
+  #define logf(X)   CS_STATIC_CAST(float,log(X))
+  #define powf(X)   CS_STATIC_CAST(float,pow(X))
+  #define sinf(X)   CS_STATIC_CAST(float,sin(X))
+  #define sqrtf(X)  CS_STATIC_CAST(float,sqrt(X))
+  #define tanf(X)   CS_STATIC_CAST(float,tan(X))
+#endif
+
 // Platforms with compilers which do not understand the new C++ keyword
 // `explicit' should define CS_USE_FAKE_EXPLICIT_KEYWORD.
 #if defined(CS_USE_FAKE_EXPLICIT_KEYWORD)
