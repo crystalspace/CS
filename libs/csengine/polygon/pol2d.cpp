@@ -251,10 +251,11 @@ void PreparePolygonFX (G3DPolygonDPFX* g3dpoly, csVector2* clipped_verts,
 //#define USE_EXP_FOG
 
 // After such number of values fog density coefficient can be considered 0.
+#ifdef USE_EXP_FOG
+
 #define FOG_EXP_TABLE_SIZE 1600
 static float *fog_exp_table = NULL;
 
-#ifdef USE_EXP_FOG
 static void InitializeFogTable ()
 {
   CHK (fog_exp_table = new float [FOG_EXP_TABLE_SIZE]);
