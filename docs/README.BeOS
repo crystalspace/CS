@@ -96,6 +96,7 @@ The Print() method displays the bitmap by locking the window, blitting the BBitm
 ========================================
 This is the list of BeOS-specific bugs compiled by Eric Sunshine <sunshine@sunshineco.com>.  These bugs are being actively eradicated.
 
+- Add full-screen support.  Be careful about the resolution, since CS can use any arbitrary window dimension.
 - Application should be able to redraw rendering window when BeOS asks for a redraw even if CS is busy (that is, not pushing out a continuous stream of frames).  There are already cases where this is needed, and will be very important when a pause feature is added.
 - Pause when not foreground application.  Make sure that screen redraws correctly even when paused.
 - The various 2D graphics drivers (software, OpenGL, Glide) should all be derived from a common class rather than being nearly identical copies of one another.
@@ -136,3 +137,4 @@ This is the list of problems which have recently been fixed.
 - Update the OpenGL driver to match the implementation of the default 2D (software) driver.
 - Squawk crashes upon initialization when using OpenGL driver.
 - Application bombs at termination when using OpenGL driver.
+- Document building libjpeg.a.  People have trouble with this.
