@@ -179,6 +179,18 @@ public:
   csString &Append (unsigned char c)
   { return Append(char(c)); }
 
+  /// SubString another string out of this one
+  csString SubString (size_t x, size_t y);
+
+  /// Find first c from pos
+  size_t FindFirst(const char c, size_t p = (size_t)-1);
+
+  /// Return a substring of this string
+  csString SubString (size_t x, size_t y);
+
+  /// Search for the first instance of character 'c'
+  size_t FindFirst(char c, size_t p = 0);
+
 #define STR_APPEND(TYPE,FMT,SZ) csString& Append(TYPE n) \
   { char s[SZ]; cs_snprintf(s, SZ, #FMT, n); return Append(s); }
   STR_APPEND(short, %hd, 32)

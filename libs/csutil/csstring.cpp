@@ -181,6 +181,32 @@ csString &csString::Append (const char *iStr, size_t iCount)
   return *this;
 }
 
+csString csString::SubString (size_t x, size_t y)
+{
+  if (x < 0 || x >= Size || y < 0 || y >= Size || y <= x) 
+    return csString("");
+
+  char * tmp = Data + x;
+  csString temp(tmp);
+  
+  y -= x;
+  temp.Truncate(y);
+
+  return temp;
+}
+
+size_t csString::FindFirst (char c, size_t pos)
+{
+  if (pos > Size || !Data)
+    return (size_t)-1;
+
+  char * tmp = strchr(Data + pos, c);
+  if (!tmp) 
+    return (size_t)-1;
+
+  return tmp - Data;
+}
+
 csString &csString::LTrim()
 {
   size_t i;
