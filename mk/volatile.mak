@@ -29,3 +29,5 @@ endif
 ifdef CS_BIG_ENDIAN
   MAKE_VOLATILE_H+=$(NEWLINE)echo $"\#define CS_BIG_ENDIAN$">>volatile.tmp
 endif
+
+  MAKE_VOLATILE_H+=$(NEWLINE)echo $"\#endif // __VOLATILE_H__$">>volatile.tmp
