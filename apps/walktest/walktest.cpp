@@ -53,7 +53,6 @@
 #include "isound/handle.h"
 #include "isound/source.h"
 #include "isound/listener.h"
-#include "isound/source.h"
 #include "isound/renderer.h"
 #include "igraphic/image.h"
 #include "igraphic/imageio.h"

@@ -40,7 +40,6 @@
 #include "isound/handle.h"
 #include "isound/source.h"
 #include "isound/listener.h"
-#include "isound/source.h"
 #include "isound/renderer.h"
 #include "isound/wrapper.h"
 #include "ivideo/graph3d.h"
