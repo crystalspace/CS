@@ -260,7 +260,8 @@ public:
   virtual csEventError Retrieve (const char *name, float &v) const;
   virtual csEventError Retrieve (const char *name, double &v) const;
   virtual csEventError Retrieve (const char *name, const char *&v) const;
-  virtual csEventError Retrieve (const char *name, const void *&v, uint32 &size) const;
+  virtual csEventError Retrieve (const char *name, const void *&v,
+  	size_t &size) const;
   virtual csEventError Retrieve (const char *name, bool &v) const;
   virtual csEventError Retrieve (const char *name, csRef<iEvent> &v) const;
   virtual csEventError Retrieve (const char *name, csRef<iBase> &v) const;
