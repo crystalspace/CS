@@ -36,8 +36,10 @@
   IMPLEMENT_ARRAY_INTERFACE_NONUM (clname, type, sing_name, mult_name)	\
   int clname::Get##sing_name##Count () const				\
   { return mult_name.Length (); }					\
-  void clname::Add##sing_name (type v)					\
-  { mult_name.Push (v); }
+  int clname::Add##sing_name (type v)					\
+  { mult_name.Push (v); return mult_name.Length () - 1; }		\
+  void clname::Delete##sing_name (int n)				\
+  { mult_name.Delete (n); }
 
 #define IMPLEMENT_ACCESSOR_METHOD(clname,type,name)			\
   type clname::Get##name () const					\
@@ -59,6 +61,98 @@
 SCF_DECLARE_FAST_INTERFACE (iModelDataTexture);
 SCF_DECLARE_FAST_INTERFACE (iModelDataMaterial);
 
+//----------------------------------------------------------------------------
+
+/*** csModelDataTexture ***/
+
+SCF_IMPLEMENT_IBASE (csModelDataTexture)
+  SCF_IMPLEMENTS_INTERFACE (iModelDataTexture)
+  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iObject)
+SCF_IMPLEMENT_IBASE_END
+
+IMPLEMENT_OBJECT_INTERFACE (csModelDataTexture);
+
+csModelDataTexture::csModelDataTexture ()
+{
+  SCF_CONSTRUCT_IBASE (NULL);
+  SCF_CONSTRUCT_EMBEDDED_IBASE (scfiObject);
+  FileName = NULL;
+  Image = NULL;
+  TextureWrapper = NULL;
+}
+
+csModelDataTexture::~csModelDataTexture ()
+{
+  delete[] FileName;
+  SCF_DEC_REF (Image);
+  SCF_DEC_REF (TextureWrapper);
+}
+
+void csModelDataTexture::SetFileName (const char *fn)
+{
+  delete[] FileName;
+  FileName = csStrNew (fn);
+}
+
+const char *csModelDataTexture::GetFileName () const
+{
+  return FileName;
+}
+
+IMPLEMENT_ACCESSOR_METHOD_REF (csModelDataTexture, iImage*, Image);
+IMPLEMENT_ACCESSOR_METHOD_REF (csModelDataTexture, iTextureWrapper*, TextureWrapper);
+
+void csModelDataTexture::LoadImage (iVFS *vfs, iImageIO *io, int Format)
+{
+  if (!FileName) return;
+  SCF_DEC_REF (Image);
+  Image = NULL;
+
+  iDataBuffer *dbuf = vfs->ReadFile (FileName);
+  if (!dbuf) return;
+
+  Image = io->Load (dbuf->GetUint8 (), dbuf->GetSize (), Format);
+  dbuf->DecRef ();
+}
+
+void csModelDataTexture::Register (iTextureList *tl)
+{
+  if (!Image) return;
+  SetTextureWrapper (tl->NewTexture (Image));
+}
+
+/*** csModelDataMaterial ***/
+
+SCF_IMPLEMENT_IBASE (csModelDataMaterial)
+  SCF_IMPLEMENTS_INTERFACE (iModelDataMaterial)
+  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iObject)
+SCF_IMPLEMENT_IBASE_END
+
+IMPLEMENT_OBJECT_INTERFACE (csModelDataMaterial);
+
+csModelDataMaterial::csModelDataMaterial ()
+{
+  SCF_CONSTRUCT_IBASE (NULL);
+  SCF_CONSTRUCT_EMBEDDED_IBASE (scfiObject);
+  BaseMaterial = NULL;
+  MaterialWrapper = NULL;
+}
+
+csModelDataMaterial::~csModelDataMaterial ()
+{
+  SCF_DEC_REF (BaseMaterial);
+  SCF_DEC_REF (MaterialWrapper);
+}
+
+IMPLEMENT_ACCESSOR_METHOD_REF (csModelDataMaterial, iMaterial*, BaseMaterial);
+IMPLEMENT_ACCESSOR_METHOD_REF (csModelDataMaterial, iMaterialWrapper*, MaterialWrapper);
+
+void csModelDataMaterial::Register (iMaterialList *ml)
+{
+  if (!BaseMaterial) return;
+  SetMaterialWrapper (ml->NewMaterial (BaseMaterial));
+}
+
 /*** csModelDataVertices ***/
 
 SCF_IMPLEMENT_IBASE (csModelDataVertices)
@@ -70,6 +164,12 @@ IMPLEMENT_OBJECT_INTERFACE (csModelDataVertices);
 
 IMPLEMENT_ARRAY_INTERFACE (csModelDataVertices,
 	const csVector3 &, Vertex, Vertices);
+IMPLEMENT_ARRAY_INTERFACE (csModelDataVertices,
+	const csVector3 &, Normal, Normals);
+IMPLEMENT_ARRAY_INTERFACE (csModelDataVertices,
+	const csColor &, Color, Colors);
+IMPLEMENT_ARRAY_INTERFACE (csModelDataVertices,
+	const csVector2 &, Texel, Texels);
 
 csModelDataVertices::csModelDataVertices ()
 {
@@ -138,6 +238,12 @@ void csModelDataAction::AddFrame (float Time, iObject *State)
   States.Insert (i, State);
 }
 
+void csModelDataAction::DeleteFrame (int n)
+{
+  Times.Delete (n);
+  States.Delete (n);
+}
+
 /*** csModelDataPolygon ***/
 
 SCF_IMPLEMENT_IBASE (csModelDataPolygon)
@@ -164,13 +270,13 @@ int csModelDataPolygon::GetVertexCount () const
   return Vertices.Length ();
 }
 
-void csModelDataPolygon::AddVertex (int PositionIndex,
-  const csVector3 &Normal, const csColor &Color, const csVector2 &TexCoords)
+int csModelDataPolygon::AddVertex (int ver, int nrm, int col, int tex)
 {
-  Vertices.Push (PositionIndex);
-  Normals.Push (Normal);
-  Colors.Push (Color);
-  TextureCoords.Push (TexCoords);
+  Vertices.Push (ver);
+  Normals.Push (nrm);
+  Colors.Push (col);
+  Texels.Push (tex);
+  return Vertices.Length () - 1;
 }
 
 void csModelDataPolygon::DeleteVertex (int n)
@@ -178,19 +284,14 @@ void csModelDataPolygon::DeleteVertex (int n)
   Vertices.Delete (n);
   Normals.Delete (n);
   Colors.Delete (n);
-  TextureCoords.Delete (n);
+  Texels.Delete (n);
 }
 
-IMPLEMENT_ARRAY_INTERFACE_NONUM (csModelDataPolygon,
-	int, Vertex, Vertices);
-IMPLEMENT_ARRAY_INTERFACE_NONUM (csModelDataPolygon,
-	const csVector3 &, Normal, Normals);
-IMPLEMENT_ARRAY_INTERFACE_NONUM (csModelDataPolygon,
-	const csVector2 &, TextureCoords, TextureCoords);
-IMPLEMENT_ARRAY_INTERFACE_NONUM (csModelDataPolygon,
-	const csColor &, Color, Colors);
-IMPLEMENT_ACCESSOR_METHOD_REF (csModelDataPolygon,
-	iModelDataMaterial *, Material);
+IMPLEMENT_ACCESSOR_METHOD_REF (csModelDataPolygon, iModelDataMaterial*, Material);
+IMPLEMENT_ARRAY_INTERFACE_NONUM (csModelDataPolygon, int, Vertex, Vertices);
+IMPLEMENT_ARRAY_INTERFACE_NONUM (csModelDataPolygon, int, Normal, Normals);
+IMPLEMENT_ARRAY_INTERFACE_NONUM (csModelDataPolygon, int, Color, Colors);
+IMPLEMENT_ARRAY_INTERFACE_NONUM (csModelDataPolygon, int, Texel, Texels);
 
 /*** csModelDataObject ***/
 
@@ -284,96 +385,6 @@ csModelDataLight::csModelDataLight ()
 {
   SCF_CONSTRUCT_IBASE (NULL);
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiObject);
-}
-
-/*** csModelDataMaterial ***/
-
-SCF_IMPLEMENT_IBASE (csModelDataMaterial)
-  SCF_IMPLEMENTS_INTERFACE (iModelDataMaterial)
-  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iObject)
-SCF_IMPLEMENT_IBASE_END
-
-IMPLEMENT_OBJECT_INTERFACE (csModelDataMaterial);
-
-csModelDataMaterial::csModelDataMaterial ()
-{
-  SCF_CONSTRUCT_IBASE (NULL);
-  SCF_CONSTRUCT_EMBEDDED_IBASE (scfiObject);
-  BaseMaterial = NULL;
-  MaterialWrapper = NULL;
-}
-
-csModelDataMaterial::~csModelDataMaterial ()
-{
-  SCF_DEC_REF (BaseMaterial);
-  SCF_DEC_REF (MaterialWrapper);
-}
-
-IMPLEMENT_ACCESSOR_METHOD_REF (csModelDataMaterial, iMaterial*, BaseMaterial);
-IMPLEMENT_ACCESSOR_METHOD_REF (csModelDataMaterial, iMaterialWrapper*, MaterialWrapper);
-
-void csModelDataMaterial::Register (iMaterialList *ml)
-{
-  if (!BaseMaterial) return;
-  SetMaterialWrapper (ml->NewMaterial (BaseMaterial));
-}
-
-/*** csModelDataTexture ***/
-
-SCF_IMPLEMENT_IBASE (csModelDataTexture)
-  SCF_IMPLEMENTS_INTERFACE (iModelDataTexture)
-  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iObject)
-SCF_IMPLEMENT_IBASE_END
-
-IMPLEMENT_OBJECT_INTERFACE (csModelDataTexture);
-
-csModelDataTexture::csModelDataTexture ()
-{
-  SCF_CONSTRUCT_IBASE (NULL);
-  SCF_CONSTRUCT_EMBEDDED_IBASE (scfiObject);
-  FileName = NULL;
-  Image = NULL;
-  TextureWrapper = NULL;
-}
-
-csModelDataTexture::~csModelDataTexture ()
-{
-  delete[] FileName;
-  SCF_DEC_REF (Image);
-  SCF_DEC_REF (TextureWrapper);
-}
-
-void csModelDataTexture::SetFileName (const char *fn)
-{
-  delete[] FileName;
-  FileName = csStrNew (fn);
-}
-
-const char *csModelDataTexture::GetFileName () const
-{
-  return FileName;
-}
-
-IMPLEMENT_ACCESSOR_METHOD_REF (csModelDataTexture, iImage*, Image);
-IMPLEMENT_ACCESSOR_METHOD_REF (csModelDataTexture, iTextureWrapper*, TextureWrapper);
-
-void csModelDataTexture::LoadImage (iVFS *vfs, iImageIO *io, int Format)
-{
-  if (!FileName) return;
-  SCF_DEC_REF (Image);
-  Image = NULL;
-
-  iDataBuffer *dbuf = vfs->ReadFile (FileName);
-  if (!dbuf) return;
-
-  Image = io->Load (dbuf->GetUint8 (), dbuf->GetSize (), Format);
-  dbuf->DecRef ();
-}
-
-void csModelDataTexture::Register (iTextureList *tl)
-{
-  if (!Image) return;
-  SetTextureWrapper (tl->NewTexture (Image));
 }
 
 /*** csModelData ***/

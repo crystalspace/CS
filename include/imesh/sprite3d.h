@@ -133,7 +133,10 @@ struct iSprite3DFactoryState : public iBase
   /**
    * Reserve space for the given number of vertices. A vertex includes
    * information about its position, normal and texel. This function will
-   * not write any information into the reserved space.
+   * not write any information into the reserved space. <p>
+   *
+   * Note that this function requires that at least one frame exists in
+   * the sprite factory, otherwise this function will fail!
    */
   virtual void AddVertices (int num) = 0;
   /// Return the current number of vertices

@@ -124,7 +124,11 @@ struct iModelDataMaterial : public iBase
 
 SCF_VERSION (iModelDataVertices, 0, 0, 1);
 
-/// A set of vertex positions. 
+/**
+ * A set of vertices, including position, normal, color and texture
+ * coordinates. They are stored in independent lists, i.e. it is for example
+ * possible to have different numbers of vertices and normals.
+ */ 
 struct iModelDataVertices : public iBase
 {
   /// Query the iObject for this vertex set
@@ -137,7 +141,42 @@ struct iModelDataVertices : public iBase
   /// Set the coordinates of a vertex
   virtual void SetVertex (int n, const csVector3 &v) = 0;
   /// Add a vertex
-  virtual void AddVertex (const csVector3 &v) = 0;
+  virtual int AddVertex (const csVector3 &v) = 0;
+  /// Delete a vertex
+  virtual void DeleteVertex (int n) = 0;
+
+  /// Return the number of contained normals
+  virtual int GetNormalCount () const = 0;
+  /// Return a normal
+  virtual const csVector3 &GetNormal (int n) const = 0;
+  /// Set a normal
+  virtual void SetNormal (int n, const csVector3 &v) = 0;
+  /// Add a normal
+  virtual int AddNormal (const csVector3 &v) = 0;
+  /// Delete a normal
+  virtual void DeleteNormal (int n) = 0;
+
+  /// Return the number of contained colors
+  virtual int GetColorCount () const = 0;
+  /// Return a color
+  virtual const csColor &GetColor (int n) const = 0;
+  /// Set a color
+  virtual void SetColor (int n, const csColor &v) = 0;
+  /// Add a color
+  virtual int AddColor (const csColor &v) = 0;
+  /// Delete a color
+  virtual void DeleteColor (int n) = 0;
+
+  /// Return the number of contained texels
+  virtual int GetTexelCount () const = 0;
+  /// Return a texel
+  virtual const csVector2 &GetTexel (int n) const = 0;
+  /// Set a texel
+  virtual void SetTexel (int n, const csVector2 &v) = 0;
+  /// Add a texel
+  virtual int AddTexel (const csVector2 &v) = 0;
+  /// Delete a texel
+  virtual void DeleteTexel (int n) = 0;
 };
 
 
@@ -179,15 +218,17 @@ struct iModelDataAction : public iBase
   virtual void SetState (int Frame, iObject *State) = 0;
   /// Add a frame
   virtual void AddFrame (float Time, iObject *State) = 0;
+  /// Delete a frame
+  virtual void DeleteFrame (int Frame) = 0;
 };
 
 
 SCF_VERSION (iModelDataPolygon, 0, 0, 1);
 
 /**
- * One polygon in a model. The normals, texture coordinates and color are kept
- * per vertex. The vertex positions are indices for the vertex list of the
- * parent iModelDataObject.
+ * One polygon in a model. The vertices, normals, colors and texels are only
+ * indices for lists in the parent iModelDataObject. In addition, a polygon
+ * contains a material.
  */
 struct iModelDataPolygon : public iBase
 {
@@ -197,30 +238,26 @@ struct iModelDataPolygon : public iBase
   /// return the number of vertices
   virtual int GetVertexCount () const = 0;
   /// Add a vertex
-  virtual void AddVertex (int PositionIndex, const csVector3 &Normal,
-    const csColor &Color, const csVector2 &TextureCoords) = 0;
+  virtual int AddVertex (int Vertex, int Normal, int Color, int Texel) = 0;
   /// Delete a vertex
   virtual void DeleteVertex (int n) = 0;
 
-  /// return the coordinate index of a vertex
+  /// return the index of a vertex
   virtual int GetVertex (int n) const = 0;
-  /// set the coordinate index of a vertex
+  /// set the index of a vertex
   virtual void SetVertex (int n, int Index) = 0;
-
-  /// return the normal of a vertex
-  virtual const csVector3 &GetNormal (int n) const = 0;
-  /// set the normal of a vertex
-  virtual void SetNormal (int n, const csVector3 &v) = 0;
-
-  /// return the color for a vertex
-  virtual const csColor &GetColor (int n) const = 0;
-  /// set the color for a vertex
-  virtual void SetColor (int n, const csColor &c) = 0;
-
-  /// return the texture coordinates for a vertex
-  virtual const csVector2 &GetTextureCoords (int n) const = 0;
-  /// set the texture coordinates for a vertex
-  virtual void SetTextureCoords (int n, const csVector2 &v) = 0;
+  /// return the index of a normal
+  virtual int GetNormal (int n) const = 0;
+  /// set the index of a normal
+  virtual void SetNormal (int n, int Index) = 0;
+  /// return the index of a color
+  virtual int GetColor (int n) const = 0;
+  /// set the index of a color
+  virtual void SetColor (int n, int Index) = 0;
+  /// return the index of a texel
+  virtual int GetTexel (int n) const = 0;
+  /// set the index of a texel
+  virtual void SetTexel (int n, int Index) = 0;
 
   /// return the current material
   virtual iModelDataMaterial *GetMaterial () const = 0;

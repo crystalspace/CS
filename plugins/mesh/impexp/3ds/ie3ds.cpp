@@ -308,6 +308,13 @@ csVector3 vertex;
 
   pCurPoint = p3dsMesh->pointL;
 
+  // add a dummy normal, white as the default color and three default texels
+  Vertices->AddNormal (csVector3 (0, 0, 0));
+  Vertices->AddColor (csColor (1, 1, 1));
+  Vertices->AddTexel (csVector2 (0, 0));
+  Vertices->AddTexel (csVector2 (1, 0));
+  Vertices->AddTexel (csVector2 (1, 1));
+
   for ( i = 0 ; i < numVertices ; i++ )
   {
     // index to the position on the list using index (do I have to loop? should I build a list)
@@ -332,11 +339,6 @@ csVector2 textureUV;
     numTriangles = p3dsMesh->faces;
     pCurFace = p3dsMesh->faceL;
 
-    // set a dummy values
-    normal.Set( 0, 0, 0 );
-    color.Set( .5, .5, .5 );
-    textureUV.Set( 0, 0 );
-
     // now copy each triangle over
     for ( i = 0 ; i < numTriangles ; i++ )
     {
@@ -355,7 +357,7 @@ csVector2 textureUV;
         index = pCurFace->points[j];
 
         // now add the vertex
-        pCurPoly->AddVertex( index, normal, color, textureUV );
+        pCurPoly->AddVertex( index, 0, 0, j );
 
       }
 

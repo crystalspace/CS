@@ -34,6 +34,7 @@
 #include "imesh/thing/thing.h"
 #include "imesh/object.h"
 #include "imesh/crossbld.h"
+#include "imesh/sprite3d.h"
 #include "ivideo/graph3d.h"
 #include "ivideo/txtmgr.h"
 #include "ivideo/texture.h"
@@ -46,8 +47,7 @@ CS_IMPLEMENT_APPLICATION
 
 void Cleanup ();
 
-void Simple::ImportModel (iThingState *fState, iMaterialWrapper *DefaultMaterial,
-  iMaterialWrapper *OtherMaterial)
+iModelData *Simple::ImportModel (iMaterialWrapper *OtherMaterial)
 {
   iModelData *Model = new csModelData ();
 
@@ -68,51 +68,64 @@ void Simple::ImportModel (iThingState *fState, iMaterialWrapper *DefaultMaterial
   Vertices->AddVertex (csVector3 (+5, +5, +5));
   Vertices->AddVertex (csVector3 (+5, +5, -5));
 
+  Vertices->AddNormal (csVector3 (1, 0, 0));
+  Vertices->AddNormal (csVector3 (-1, 0, 0));
+  Vertices->AddNormal (csVector3 (0, 1, 0));
+  Vertices->AddNormal (csVector3 (0, -1, 0));
+  Vertices->AddNormal (csVector3 (0, 0, 1));
+  Vertices->AddNormal (csVector3 (0, 0, -1));
+
+  Vertices->AddColor (csColor (1, 1, 1));
+
+  Vertices->AddTexel (csVector2 (0, 0));
+  Vertices->AddTexel (csVector2 (0, 5));
+  Vertices->AddTexel (csVector2 (5, 5));
+  Vertices->AddTexel (csVector2 (5, 0));
+
   iModelDataPolygon *Polygon = new csModelDataPolygon ();
   Object->QueryObject ()->ObjAdd (Polygon->QueryObject ());
-  Polygon->AddVertex (0, csVector3 (0,1,0), csColor (1,1,1), csVector2 (0,0));
-  Polygon->AddVertex (1, csVector3 (0,1,0), csColor (1,1,1), csVector2 (0,5));
-  Polygon->AddVertex (2, csVector3 (0,1,0), csColor (1,1,1), csVector2 (5,5));
-  Polygon->AddVertex (3, csVector3 (0,1,0), csColor (1,1,1), csVector2 (5,0));
+  Polygon->AddVertex (0, 3, 0, 0);
+  Polygon->AddVertex (1, 3, 0, 1);
+  Polygon->AddVertex (2, 3, 0, 2);
+  Polygon->AddVertex (3, 3, 0, 3);
   Polygon->SetMaterial (mat);
 
   Polygon = new csModelDataPolygon ();
   Object->QueryObject ()->ObjAdd (Polygon->QueryObject ());
-  Polygon->AddVertex (1, csVector3 (0,1,0), csColor (1,1,1), csVector2 (0,0));
-  Polygon->AddVertex (0, csVector3 (0,1,0), csColor (1,1,1), csVector2 (0,5));
-  Polygon->AddVertex (4, csVector3 (0,1,0), csColor (1,1,1), csVector2 (5,5));
-  Polygon->AddVertex (5, csVector3 (0,1,0), csColor (1,1,1), csVector2 (5,0));
+  Polygon->AddVertex (1, 1, 0, 0);
+  Polygon->AddVertex (0, 1, 0, 1);
+  Polygon->AddVertex (4, 1, 0, 2);
+  Polygon->AddVertex (5, 1, 0, 3);
 
   Polygon = new csModelDataPolygon ();
   Object->QueryObject ()->ObjAdd (Polygon->QueryObject ());
-  Polygon->AddVertex (2, csVector3 (0,1,0), csColor (1,1,1), csVector2 (0,0));
-  Polygon->AddVertex (1, csVector3 (0,1,0), csColor (1,1,1), csVector2 (0,5));
-  Polygon->AddVertex (5, csVector3 (0,1,0), csColor (1,1,1), csVector2 (5,5));
-  Polygon->AddVertex (6, csVector3 (0,1,0), csColor (1,1,1), csVector2 (5,0));
+  Polygon->AddVertex (2, 4, 0, 0);
+  Polygon->AddVertex (1, 4, 0, 1);
+  Polygon->AddVertex (5, 4, 0, 2);
+  Polygon->AddVertex (6, 4, 0, 3);
 
   Polygon = new csModelDataPolygon ();
   Object->QueryObject ()->ObjAdd (Polygon->QueryObject ());
-  Polygon->AddVertex (3, csVector3 (0,1,0), csColor (1,1,1), csVector2 (0,0));
-  Polygon->AddVertex (2, csVector3 (0,1,0), csColor (1,1,1), csVector2 (0,5));
-  Polygon->AddVertex (6, csVector3 (0,1,0), csColor (1,1,1), csVector2 (5,5));
-  Polygon->AddVertex (7, csVector3 (0,1,0), csColor (1,1,1), csVector2 (5,0));
+  Polygon->AddVertex (3, 0, 0, 0);
+  Polygon->AddVertex (2, 0, 0, 1);
+  Polygon->AddVertex (6, 0, 0, 2);
+  Polygon->AddVertex (7, 0, 0, 3);
 
   Polygon = new csModelDataPolygon ();
   Object->QueryObject ()->ObjAdd (Polygon->QueryObject ());
-  Polygon->AddVertex (0, csVector3 (0,1,0), csColor (1,1,1), csVector2 (0,0));
-  Polygon->AddVertex (3, csVector3 (0,1,0), csColor (1,1,1), csVector2 (0,5));
-  Polygon->AddVertex (7, csVector3 (0,1,0), csColor (1,1,1), csVector2 (5,5));
-  Polygon->AddVertex (4, csVector3 (0,1,0), csColor (1,1,1), csVector2 (5,0));
+  Polygon->AddVertex (0, 5, 0, 0);
+  Polygon->AddVertex (3, 5, 0, 1);
+  Polygon->AddVertex (7, 5, 0, 2);
+  Polygon->AddVertex (4, 5, 0, 3);
 
   Polygon = new csModelDataPolygon ();
   Object->QueryObject ()->ObjAdd (Polygon->QueryObject ());
-  Polygon->AddVertex (7, csVector3 (0,1,0), csColor (1,1,1), csVector2 (0,0));
-  Polygon->AddVertex (6, csVector3 (0,1,0), csColor (1,1,1), csVector2 (0,5));
-  Polygon->AddVertex (5, csVector3 (0,1,0), csColor (1,1,1), csVector2 (5,5));
-  Polygon->AddVertex (4, csVector3 (0,1,0), csColor (1,1,1), csVector2 (5,0));
+  Polygon->AddVertex (7, 2, 0, 0);
+  Polygon->AddVertex (6, 2, 0, 1);
+  Polygon->AddVertex (5, 2, 0, 2);
+  Polygon->AddVertex (4, 2, 0, 3);
 
-  crossbuilder->BuildThing (Model, fState, DefaultMaterial);
-  Model->DecRef ();
+  return Model;
 }
 
 iMaterialWrapper *Simple::LoadTexture (const char *name, const char *fn)
@@ -220,19 +233,45 @@ bool Simple::Initialize (int argc, const char* const argv[],
   room = engine->CreateSector ("room");
 
   iMeshObjectType *ThingType = engine->GetThingType ();
-  iMeshObjectFactory *Factory = ThingType->NewFactory ();
+  iMeshObjectFactory *ThingFactory = ThingType->NewFactory ();
+  iMeshFactoryWrapper *SpriteFactory = engine->CreateMeshFactory (
+    "crystalspace.mesh.object.sprite.3d", "SpriteFactory");
 
-  iThingState *fState = SCF_QUERY_INTERFACE (Factory, iThingState);
-  ImportModel (fState, tm, tm2);
+  iModelData *Model = ImportModel (tm2);
+  iThingState *fState =
+	SCF_QUERY_INTERFACE (ThingFactory, iThingState);
+  iSprite3DFactoryState *sState = SCF_QUERY_INTERFACE (
+	SpriteFactory->GetMeshObjectFactory (), iSprite3DFactoryState);
+  sState->SetMaterialWrapper (tm);
+  crossbuilder->BuildThing (Model, fState, tm);
+  crossbuilder->BuildSpriteFactory (Model, sState);
   fState->DecRef ();
+  sState->DecRef ();
+  Model->DecRef ();
 
-  iMeshObject *Object = Factory->NewInstance ();
-  iMeshWrapper *Wrapper = engine->CreateMeshObject (Object, "object");
-  Wrapper->GetMovable ()->SetSector (room);
-  Wrapper->GetMovable ()->UpdateMove ();
-  Wrapper->GetFlags().Set (CS_ENTITY_CONVEX);
-  Wrapper->SetZBufMode (CS_ZBUF_USE);
-  Wrapper->SetRenderPriority (engine->GetWallRenderPriority ());
+  iMeshObject *ThingObject = ThingFactory->NewInstance ();
+  iMeshWrapper *ThingWrapper = engine->CreateMeshObject (ThingObject, "thing");
+  iMeshWrapper *SpriteWrapper = engine->CreateMeshObject (SpriteFactory, "sprite");
+
+  ThingWrapper->GetMovable ()->SetSector (room);
+  ThingWrapper->GetMovable ()->UpdateMove ();
+  ThingWrapper->GetFlags().Set (CS_ENTITY_CONVEX);
+  ThingWrapper->SetZBufMode (CS_ZBUF_USE);
+  ThingWrapper->SetRenderPriority (engine->GetWallRenderPriority ());
+
+/*
+  SpriteWrapper->GetMovable ()->SetSector (room);
+  SpriteWrapper->GetMovable ()->UpdateMove ();
+  SpriteWrapper->GetFlags().Set (CS_ENTITY_CONVEX);
+  SpriteWrapper->SetZBufMode (CS_ZBUF_USE);
+  SpriteWrapper->SetRenderPriority (engine->GetWallRenderPriority ());
+
+  iSprite3DState *sprState = SCF_QUERY_INTERFACE (SpriteWrapper->GetMeshObject (),
+    iSprite3DState);
+  sprState->SetBaseColor (csColor (1, 1, 1));
+  sprState->SetLighting (false);
+  sprState->DecRef ();
+*/
 
   engine->SetAmbientLight (csColor (0.5, 0.5, 0.5));
 

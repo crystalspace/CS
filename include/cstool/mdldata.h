@@ -35,7 +35,7 @@
 #define DECLARE_ARRAY_INTERFACE(type,sing_name)		\
   DECLARE_ARRAY_INTERFACE_NONUM (type, sing_name)			\
   int Get##sing_name##Count () const;					\
-  void Add##sing_name (type obj);					\
+  int Add##sing_name (type obj);					\
   void Delete##sing_name (int n);
 
 #define DECLARE_OBJECT_INTERFACE					\
@@ -69,10 +69,68 @@ CS_DECLARE_TYPED_IBASE_VECTOR (csObjectVector, iObject);
 
 //----------------------------------------------------------------------------
 
+class csModelDataTexture : public iModelDataTexture
+{
+private:
+  char *FileName;
+  iImage *Image;
+  iTextureWrapper *TextureWrapper;
+public:
+  SCF_DECLARE_IBASE;
+  DECLARE_OBJECT_INTERFACE;
+
+  /// Constructor
+  csModelDataTexture ();
+  /// Destructor
+  virtual ~csModelDataTexture ();
+
+  /// Set the file name of the texture
+  void SetFileName (const char *fn);
+  /// Return the file name of the texture
+  const char *GetFileName () const;
+
+  DECLARE_ACCESSOR_METHODS (iImage*, Image);
+  DECLARE_ACCESSOR_METHODS (iTextureWrapper*, TextureWrapper);
+
+  /**
+   * Load the image from a file with the current filename (i.e. this
+   * texture must have a file name) from the CWD of the given file
+   * system. Note: This leaves the texture wrapper untouched.
+   */
+  void LoadImage (iVFS *VFS, iImageIO *ImageIO, int Format);
+
+  /// Create a texture wrapper from the given texture list
+  void Register (iTextureList *tl);
+};
+
+class csModelDataMaterial : public iModelDataMaterial
+{
+private:
+  iMaterial *BaseMaterial;
+  iMaterialWrapper *MaterialWrapper;
+public:
+  SCF_DECLARE_IBASE;
+  DECLARE_OBJECT_INTERFACE;
+
+  /// Constructor
+  csModelDataMaterial ();
+  /// Destructor
+  virtual ~csModelDataMaterial ();
+
+  DECLARE_ACCESSOR_METHODS (iMaterial*, BaseMaterial);
+  DECLARE_ACCESSOR_METHODS (iMaterialWrapper*, MaterialWrapper);
+
+  /// Create a material wrapper from the given material list
+  void Register (iMaterialList *ml);
+};
+
 class csModelDataVertices : public iModelDataVertices
 {
 private:
   DECLARE_GROWING_ARRAY (Vertices, csVector3);
+  DECLARE_GROWING_ARRAY (Normals, csVector3);
+  DECLARE_GROWING_ARRAY (Colors, csColor);
+  DECLARE_GROWING_ARRAY (Texels, csVector2);
 
 public:
   SCF_DECLARE_IBASE;
@@ -84,6 +142,9 @@ public:
   virtual ~csModelDataVertices() {}
 
   DECLARE_ARRAY_INTERFACE (const csVector3 &, Vertex);
+  DECLARE_ARRAY_INTERFACE (const csVector3 &, Normal);
+  DECLARE_ARRAY_INTERFACE (const csColor &, Color);
+  DECLARE_ARRAY_INTERFACE (const csVector2 &, Texel);
 };
 
 class csModelDataAction : public iModelDataAction
@@ -113,16 +174,19 @@ public:
   virtual void SetState (int Frame, iObject *State);
   /// Add a frame
   virtual void AddFrame (float Time, iObject *State);
+  /// Delete a frame
+  virtual void DeleteFrame (int Frame);
 };
 
 class csModelDataPolygon : public iModelDataPolygon
 {
 private:
   DECLARE_GROWING_ARRAY (Vertices, int);
-  DECLARE_GROWING_ARRAY (Normals, csVector3);
-  DECLARE_GROWING_ARRAY (Colors, csColor);
-  DECLARE_GROWING_ARRAY (TextureCoords, csVector2);
+  DECLARE_GROWING_ARRAY (Normals, int);
+  DECLARE_GROWING_ARRAY (Colors, int);
+  DECLARE_GROWING_ARRAY (Texels, int);
   iModelDataMaterial *Material;
+
 public:
   SCF_DECLARE_IBASE;
   DECLARE_OBJECT_INTERFACE;
@@ -132,18 +196,17 @@ public:
   /// destructor
   virtual ~csModelDataPolygon ();
   
-  /// return the number of vertices
-  int GetVertexCount () const;
   /// Add a vertex
-  void AddVertex (int PositionIndex, const csVector3 &Normal,
-    const csColor &Color, const csVector2 &TextureCoords);
+  int AddVertex (int ver, int nrm, int col, int tex);
+  /// Return the number of vertices
+  int GetVertexCount () const;
   /// Delete a vertex
   void DeleteVertex (int n);
 
   DECLARE_ARRAY_INTERFACE_NONUM (int, Vertex);
-  DECLARE_ARRAY_INTERFACE_NONUM (const csVector3 &, Normal);
-  DECLARE_ARRAY_INTERFACE_NONUM (const csVector2 &, TextureCoords);
-  DECLARE_ARRAY_INTERFACE_NONUM (const csColor &, Color);
+  DECLARE_ARRAY_INTERFACE_NONUM (int, Normal);
+  DECLARE_ARRAY_INTERFACE_NONUM (int, Color);
+  DECLARE_ARRAY_INTERFACE_NONUM (int, Texel);
   DECLARE_ACCESSOR_METHODS (iModelDataMaterial*, Material);
 };
 
@@ -215,61 +278,6 @@ public:
   DECLARE_ACCESSOR_METHODS (float, Radius);
   DECLARE_ACCESSOR_METHODS (const csVector3 &, Position);
   DECLARE_ACCESSOR_METHODS (const csColor &, Color);
-};
-
-class csModelDataMaterial : public iModelDataMaterial
-{
-private:
-  iMaterial *BaseMaterial;
-  iMaterialWrapper *MaterialWrapper;
-public:
-  SCF_DECLARE_IBASE;
-  DECLARE_OBJECT_INTERFACE;
-
-  /// Constructor
-  csModelDataMaterial ();
-  /// Destructor
-  virtual ~csModelDataMaterial ();
-
-  DECLARE_ACCESSOR_METHODS (iMaterial*, BaseMaterial);
-  DECLARE_ACCESSOR_METHODS (iMaterialWrapper*, MaterialWrapper);
-
-  /// Create a material wrapper from the given material list
-  void Register (iMaterialList *ml);
-};
-
-class csModelDataTexture : public iModelDataTexture
-{
-private:
-  char *FileName;
-  iImage *Image;
-  iTextureWrapper *TextureWrapper;
-public:
-  SCF_DECLARE_IBASE;
-  DECLARE_OBJECT_INTERFACE;
-
-  /// Constructor
-  csModelDataTexture ();
-  /// Destructor
-  virtual ~csModelDataTexture ();
-
-  /// Set the file name of the texture
-  void SetFileName (const char *fn);
-  /// Return the file name of the texture
-  const char *GetFileName () const;
-
-  DECLARE_ACCESSOR_METHODS (iImage*, Image);
-  DECLARE_ACCESSOR_METHODS (iTextureWrapper*, TextureWrapper);
-
-  /**
-   * Load the image from a file with the current filename (i.e. this
-   * texture must have a file name) from the CWD of the given file
-   * system. Note: This leaves the texture wrapper untouched.
-   */
-  void LoadImage (iVFS *VFS, iImageIO *ImageIO, int Format);
-
-  /// Create a texture wrapper from the given texture list
-  void Register (iTextureList *tl);
 };
 
 class csModelData : public iModelData

@@ -47,11 +47,10 @@ public:
   virtual ~Simple ();
 
   virtual bool Initialize (int argc, const char* const argv[],
-    const char *iConfigName);
+	const char *iConfigName);
   virtual bool HandleEvent (iEvent&);
   virtual void NextFrame ();
-  void ImportModel (iThingState *Target, iMaterialWrapper *DefaultMaterial,
-    iMaterialWrapper *OtherMaterial);
+  iModelData *ImportModel (iMaterialWrapper *OtherMaterial);
   iMaterialWrapper *LoadTexture (const char *Name, const char *Filename);
 };
 
