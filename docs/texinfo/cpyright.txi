@@ -11,4 +11,5 @@ Copyright @copyright{} 2000 by Martin Geisse@*
 Copyright @copyright{} 1999 by Alex Pfaffe@*
 Copyright @copyright{} 1999 by Michael Ewert@*
 Copyright @copyright{} 1999 by Robert Bate@*
-Copyright @copyright{} 1998 by Gary Haussmann
+Copyright @copyright{} 1998 by Gary Haussmann@*
+Copyright @copyright{} 2000, 2001 by Philip Wyett
