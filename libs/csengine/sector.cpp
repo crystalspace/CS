@@ -285,6 +285,7 @@ iPolygon3D *csSector::IntersectSegment (
   bool only_portals,
   csMeshWrapper **p_mesh)
 {
+  GetVisibilityCuller ();
   float r, best_r = 10000000000.;
   csVector3 cur_isect;
   iPolygon3D *best_p = NULL;

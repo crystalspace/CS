@@ -16,6 +16,9 @@ The history order is reversed so that new features are at the top.
 	  It was not even possible to use it since there was no SCF
 	  API to access it. And it doesn't belong in the engine anyway.
 	- Removed the obsolete and broken map commands in walktest.
+	- Fixed a bug in the engine where it would forget to load the
+	  default culler in one of the IntersectSegment functions. So if
+	  the sector was not visited then this could cause a crash.
 19-Feb-2003
 	- Mårten Svanfeldt fixed a bug introduced when adding the new
 	  light-parameters for the new renderer due to a missing
