@@ -915,7 +915,7 @@ bool csODEBodyGroup::BodyInGroup (iRigidBody *body)
   return bodies.Find (body) != -1;
 }
 
-csODERigidBody::csODERigidBody (csODEDynamicSystem* sys) : geoms(1,4)
+csODERigidBody::csODERigidBody (csODEDynamicSystem* sys) : geoms (1,4)
 {
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiRigidBody);
 
