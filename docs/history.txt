@@ -101,9 +101,9 @@ chronological order.
 	  LIBS.EXE was changed so that it is distinct from LIBS.EXE.PLATFORM,
 	  rather than incorporating LIBS.EXE.PLATFORM.  Problem was reported by
 	  Dariusz Dawidowski <chfsoft@interia.pl>.
-    - Reed Hedges added cscmdCanvasHidden/Exposed events to MacOSX (cssys lib), 
-      and made some small documentation changes for the Blender scripts and for
-      the System.RunWhenNotFocused config option.
+	- Reed Hedges added cscmdCanvasHidden/Exposed events to MacOSX (cssys
+	  lib), and made some small documentation changes for the Blender
+	  scripts and for the System.RunWhenNotFocused config option.
 30-Sep-2003
 	- Jorrit fixed a bug in thing polygon mesh helper where it would not
 	  clean up old data if the thing changes and at the same time the
