@@ -1,8 +1,8 @@
-#ifndef VERSION_H
-#define VERSION_H
+#ifndef __CS_VERSION_H__
+#define __CS_VERSION_H__
 
-#define CS_VERSION	"0.15"
-#define CS_SUBVERSION	"002"
+#define CS_VERSION	"0.15"	/* NOTE: Update docs/texinfo/version.txi  */
+#define CS_SUBVERSION	"002"	/* whenever updating these two values.    */
 #define RELEASE_DATE	"Wed, 23-Feb-2000"
 
 #if defined(OS_SOLARIS)
@@ -69,7 +69,7 @@
 #  error "Unspecified compiler!"
 #endif
 
-#define VERSION CS_VERSION " r" CS_SUBVERSION " [" OS_VERSION "-" PR_VERSION "-" CC_VERSION "]"
+#define VERSION CS_VERSION \
+  " r" CS_SUBVERSION " [" OS_VERSION "-" PR_VERSION "-" CC_VERSION "]"
 
-#endif
-
+#endif // __CS_VERSION_H__

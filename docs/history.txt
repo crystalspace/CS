@@ -66,6 +66,11 @@ The history order has been reversed so that new features are at the top.
 	      inaccurate.  It no longer reflected reality.
 	- Eric Sunshine eliminated compilation warning about */ appearing
 	    outside of comment from many of the files which Samuel patched.
+	- Eric Sunshine fixed a signed-vs-unsigned compilation warning in
+	  the terrain library.
+	- Eric Sunshine added a note to version.h instructing anyone updating
+	  CS_VERSION and CS_RELEASE that they should also update
+	  docs/texinfo/version.txi.
 22-May-2000
 	- Added csPoly2D::GetSignedArea() and csPoly3D::GetSignedArea() to
 	  calculate the signed area of a polygon.
