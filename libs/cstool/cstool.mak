@@ -31,7 +31,7 @@ CSTOOL.LIB = $(OUT)/$(LIB_PREFIX)cstool$(LIB_SUFFIX)
 INC.CSTOOL = $(wildcard include/cstool/*.h)
 SRC.CSTOOL = $(wildcard libs/cstool/*.cpp)
 OBJ.CSTOOL = $(addprefix $(OUT)/,$(notdir $(SRC.CSTOOL:.cpp=$O)))
-CFG.CSTOOL = scf.cfg data/config/system.cfg
+CFG.CSTOOL = data/config/system.cfg
 
 TO_INSTALL.CONFIG += $(CFG.CSTOOL)
 TO_INSTALL.STATIC_LIBS += $(CSTOOL.LIB)
