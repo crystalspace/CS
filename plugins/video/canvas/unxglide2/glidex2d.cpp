@@ -321,6 +321,7 @@ bool csGraphics2DGlideX::SetMouseCursor (csMouseCursorID iShape, iTextureHandle*
 static Bool CheckKeyPress (Display *dpy, XEvent *event, XPointer arg)
 {
   XEvent *curevent = (XEvent *)arg;
+  (void)dpy;
   if ((event->type == KeyPress)
    && (event->xkey.keycode == curevent->xkey.keycode)
    && (event->xkey.state == curevent->xkey.state))

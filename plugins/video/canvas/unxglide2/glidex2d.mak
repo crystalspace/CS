@@ -62,7 +62,7 @@ ifeq ($(MAKESECTION),targets)
 .PHONY: glidex2d glidex2dclean
 
 # Chain rules
-clean: glidexclean
+clean: glidex2dclean
 
 glidex2d: $(OUTDIRS) $(GLIDEX2D)
 

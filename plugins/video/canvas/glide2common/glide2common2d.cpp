@@ -49,6 +49,7 @@ bool csGraphics2DGlideCommon::locked=false;
 csGraphics2DGlideCommon::csGraphics2DGlideCommon (iBase *iParent) :
   csGraphics2D ()
 {
+  (void)iParent;
   CONSTRUCT_IBASE (NULL);
   SetVRetrace( false );
 }
@@ -111,6 +112,7 @@ void csGraphics2DGlideCommon::SetTMUPalette(int tmu)
     p.data[i]=0xFF<<24 | pal.red<<16 | pal.green<<8 | pal.blue;
   }
 #ifdef GLIDE3
+  (void)tmu;
   GlideLib_grTexDownloadTable( GR_TEXTABLE_PALETTE, &p);
 #else
   GlideLib_grTexDownloadTable( tmu, GR_TEXTABLE_PALETTE, &p);
@@ -234,7 +236,7 @@ unsigned char* csGraphics2DGlideCommon::GetPixelAt ( int x, int y)
 }
 
 void csGraphics2DGlideCommon::Print( csRect* area ){
-
+  (void)area;
   // swap the buffers only to show the new frame
   GlideLib_grBufferSwap( m_bVRetrace ? 1 : 0 );
 }
