@@ -16,8 +16,8 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __CS_CFGFILE_H__
-#define __CS_CFGFILE_H__
+#ifndef __CSUTIL_CFGFILE_H__
+#define __CSUTIL_CFGFILE_H__
 
 #include "iutil/cfgfile.h"
 #include "csutil/csvector.h"
@@ -39,10 +39,7 @@ public:
   /// Delete this configuration.
   virtual ~csConfigFile();
 
-  /**
-   * Get configuration file name.  Also consult GetVFS() to determine which
-   * (if any) VFS object was used for the file's storage.
-   */
+  /// Get configuration file name.
   virtual const char *GetFileName () const;
 
   /**
@@ -142,49 +139,49 @@ public:
 private:
   friend class csConfigIterator;
 
-  /**
+  /*
    * pointer to the root node (there are always two unnamed nodes at the
    * beginning and end of the list to make inserting and deleting nodes
    * easier).
    */
   csConfigNode *FirstNode, *LastNode;
-  /**
+  /*
    * list of all iterators for this config object. This is required because
    * changes to the configuration may affect the iterators (e.g. when
    * you delete a key). Sorry, but this can't be a typed vector!
    */
   csVector *Iterators;
-  /// current file name and file system
+  // current file name and file system
   char *Filename;
-  /// the VFS filesystem used for this file (or NULL if not used)
+  // the VFS filesystem used for this file (or NULL if not used)
   csRef<iVFS> VFS;
-  /**
+  /*
    * are the current contents of this object different from the contents
    * stored in the config file?
    */
   bool Dirty;
-  /// final comment at the end of the configuration file
+  // final comment at the end of the configuration file
   char *EOFComment;
 
-  /// private initialization function
+  // private initialization function
   void InitializeObject ();
-  /// load the configuration from a file, ignoring the dirty flag
+  // load the configuration from a file, ignoring the dirty flag
   virtual bool LoadNow(const char *Filename, iVFS *vfs, bool overwrite);
-  /**
+  /*
    * load the configuration from a data buffer and add it to the current
    * configuration. This may modify the contents of the file buffer but
    * will not delete it. This function will set the dirty flag if any
    * options have been added or modified.
    */
   virtual void LoadFromBuffer(char *Filedata, bool overwrite);
-  /// return a pointer to the named node or the first node of a subsection.
+  // return a pointer to the named node or the first node of a subsection.
   csConfigNode *FindNode(const char *Name, bool isSubsection = false) const;
-  /// create a new node in the list
+  // create a new node in the list
   csConfigNode *CreateNode(const char *Name);
-  /// deregister an iterator
+  // deregister an iterator
   void RemoveIterator(csConfigIterator *it) const;
-  /// save file without looking for dirty flag
+  // save file without looking for dirty flag
   virtual bool SaveNow(const char *Filename, iVFS *vfs) const;
 };
 
-#endif // __CS_CFGFILE_H__
+#endif // __CSUTIL_CFGFILE_H__
