@@ -364,7 +364,7 @@ iBase* csBallLoader::Parse (const char* string, iEngine* engine,
 	UInt mm;
 	if (!synldr->ParseMixmode (params, mm))
 	{
-	  ReportError (reporter, "crystalspace.ballloader.parse.unknownmaterial",
+	  ReportError (reporter, "crystalspace.ballloader.parse.mixmode",
 		       synldr->GetLastError ());
 	  if (ballstate) ballstate->DecRef ();
 	  mesh->DecRef ();
@@ -414,16 +414,18 @@ void csBallSaver::WriteDown (iBase* obj, iStrVector *str,
   iMeshObject *mesh = SCF_QUERY_INTERFACE(obj, iMeshObject);
   if(!mesh)
   {
-    printf("Error: non-mesh given to %s.\n",
-      fact->QueryDescription () );
+    ReportError (reporter,
+		 "crystalspace.ballsaver",
+		 "Error: non-mesh given to %s.\n", fact->QueryDescription () );
     fact->DecRef();
     return;
   }
   iBallState *state = SCF_QUERY_INTERFACE(obj, iBallState);
   if(!state)
   {
-    printf("Error: invalid mesh given to %s.\n",
-      fact->QueryDescription () );
+    ReportError (reporter,
+		 "crystalspace.ballsaver",
+		 "Error: invalid mesh given to %s.\n", fact->QueryDescription () );
     fact->DecRef();
     mesh->DecRef();
     return;
