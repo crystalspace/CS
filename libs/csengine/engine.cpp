@@ -748,7 +748,7 @@ void csEngine::PrepareTextures ()
   // First register all textures to the texture manager.
   for (i = 0; i < textures->Length (); i++)
   {
-    csTextureWrapper *csth = textures->Get (i);
+    iTextureWrapper *csth = textures->Get (i);
     if (!csth->GetTextureHandle ())
       csth->Register (txtmgr);
   }
@@ -1628,8 +1628,8 @@ bool csEngine::DeleteLibrary (const char *iName)
     {								\
       type *x = SCF_QUERY_INTERFACE_FAST (iter->GetObject (), type);\
       int idx = vector.Find (x);				\
+      x->DecRef ();						\
       if (idx >= 0) vector.Delete (idx);			\
-      /* x->DecRef (); */					\
     }								\
   }
 
@@ -1638,8 +1638,9 @@ bool csEngine::DeleteLibrary (const char *iName)
   DELETE_ALL_OBJECTS (mesh_factories, csMeshFactoryWrapper)
   DELETE_ALL_OBJECTS (curve_templates, csCurveTemplate)
   DELETE_ALL_OBJECTS (sectors, csSector)
-  DELETE_ALL_OBJECTS ((*textures), csTextureWrapper)
   DELETE_ALL_OBJECTS ((*materials), csMaterialWrapper)
+
+  DELETE_ALL_OBJECTS ((*textures), iTextureWrapper)
 
 #undef DELETE_ALL_OBJECTS
 #define DELETE_ALL_OBJECTS(vector,type)				\
@@ -1703,14 +1704,14 @@ iTextureWrapper* csEngine::CreateTexture (const char *iName, const char *iFileNa
   xname->DecRef ();
 
   // Okay, now create the respective texture handle object
-  csTextureWrapper *tex = GetTextures ()->FindByName (iName);
+  iTextureWrapper *tex = GetTextures ()->FindByName (iName);
   if (tex)
     tex->SetImageFile (ifile);
   else
     tex = GetTextures ()->NewTexture (ifile);
 
   tex->SetFlags (iFlags);
-  tex->SetName (iName);
+  tex->QueryObject ()->SetName (iName);
 
   // dereference image pointer since tex already incremented it
   ifile->DecRef ();
@@ -1719,7 +1720,7 @@ iTextureWrapper* csEngine::CreateTexture (const char *iName, const char *iFileNa
     tex->SetKeyColor (QInt (iTransp->red * 255.2),
       QInt (iTransp->green * 255.2), QInt (iTransp->blue * 255.2));
 
-  return &tex->scfiTextureWrapper;
+  return tex;
 }
 
 iMaterialWrapper* csEngine::CreateMaterial (const char *iName, iTextureWrapper* texture)
@@ -1812,6 +1813,20 @@ csObject* csEngine::FindObjectInRegion (csRegion* region,
   for (int i = vector.Length () - 1; i >= 0; i--)
   {
     csObject* o = (csObject *)vector[i];
+    if (!region->IsInRegion (o)) continue;
+    const char* oname = o->GetName ();
+    if (name == oname || (name && oname && !strcmp (oname, name)))
+      return o;
+  }
+  return NULL;
+}
+
+iObject* csEngine::FindObjectInRegion (csRegion* region,
+	const csNamedObjectVector& vector, const char* name) const
+{
+  for (int i = vector.Length () - 1; i >= 0; i--)
+  {
+    iObject* o = vector.GetObject (i);
     if (!region->IsInRegion (o)) continue;
     const char* oname = o->GetName ();
     if (name == oname || (name && oname && !strcmp (oname, name)))
@@ -1930,24 +1945,19 @@ csMaterialWrapper* csEngine::FindCsMaterial (const char* iName,
 iTextureWrapper* csEngine::FindTexture (const char* iName,
   bool regionOnly) const
 {
-  csTextureWrapper* wr;
+  iTextureWrapper* wr;
   if (regionOnly && region)
-    wr = (csTextureWrapper*)FindObjectInRegion (region, *textures, iName);
+    wr = SCF_QUERY_INTERFACE_FAST (FindObjectInRegion (region, *textures, iName),
+      iTextureWrapper);
   else
     wr = textures->FindByName (iName);
-  if (!wr) return NULL;
-  return &wr->scfiTextureWrapper;
+  return wr;
 }
 
 csTextureWrapper* csEngine::FindCsTexture (const char* iName,
   bool regionOnly) const
 {
-  csTextureWrapper* wr;
-  if (regionOnly && region)
-    wr = (csTextureWrapper*)FindObjectInRegion (region, *textures, iName);
-  else
-    wr = textures->FindByName (iName);
-  return wr;
+  return FindTexture (iName, regionOnly)->GetPrivateObject ();
 }
 
 iCameraPosition* csEngine::FindCameraPosition (const char* iName,

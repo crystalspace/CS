@@ -22,7 +22,7 @@
 
 #include "ivideo/texture.h"
 #include "iengine/texture.h"
-#include "csutil/csvector.h"
+#include "csutil/typedvec.h"
 #include "csws/csgfxppl.h"
 
 class csMouse;

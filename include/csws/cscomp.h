@@ -21,7 +21,7 @@
 #define __CSCOMP_H__
 
 #include "csgeom/csrect.h"
-#include "csutil/csvector.h"
+#include "csutil/typedvec.h"
 #include "cstool/cspixmap.h"
 #include "cswspal.h"
 #include "ivideo/graph2d.h"

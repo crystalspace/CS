@@ -176,8 +176,7 @@ void csRegion::Region::DeleteAll ()
       iTextureWrapper* o = SCF_QUERY_INTERFACE_FAST (obj, iTextureWrapper);
       if (!o) continue;
       o->DecRef ();	// Remove ref from SCF_QUERY_INTERFACE_FAST.
-      int idx = scfParent->engine->GetTextures ()->Find (
-      	o->GetPrivateObject ());
+      int idx = scfParent->engine->GetTextures ()->Find (o);
       if (idx != -1)
         scfParent->engine->GetTextures ()->Delete (idx);
       else

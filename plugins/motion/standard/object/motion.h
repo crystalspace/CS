@@ -21,7 +21,7 @@
 
 #include "iengine/motion.h"
 #include "isys/plugin.h"
-#include "csutil/csvector.h"
+#include "csutil/typedvec.h"
 #include "csgeom/quaterni.h"
 #include "csgeom/matrix3.h"
 

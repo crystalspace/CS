@@ -20,7 +20,7 @@
 #include "cssysdef.h"
 #include "csutil/csobject.h"
 #include "csutil/dataobj.h"
-#include "csutil/csvector.h"
+#include "csutil/typedvec.h"
 
 #include <stdlib.h>
 #include <string.h>

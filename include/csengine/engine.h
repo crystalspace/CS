@@ -467,6 +467,13 @@ private:
 	const csNamedObjVector& vector, const char* name) const;
 
   /**
+   * Find some object (given a name) which is both in a region
+   * and the given vector.
+   */
+  iObject* FindObjectInRegion (csRegion* region,
+	const csNamedObjectVector& vector, const char* name) const;
+
+  /**
    * Controll animation and delete meshes that want to die.
    */
   void ControlMeshes ();

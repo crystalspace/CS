@@ -19,7 +19,8 @@
 #ifndef __CS_HASHMAP_H__
 #define __CS_HASHMAP_H__
 
-#include "csutil/csvector.h"
+#include "csutil/typedvec.h"
+
 class csHashMap;
 
 /// An opaque hash key.

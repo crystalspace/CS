@@ -20,7 +20,7 @@
 #define __CS_SPR3D_H__
 
 #include "csutil/cscolor.h"
-#include "csutil/csvector.h"
+#include "csutil/typedvec.h"
 #include "csutil/rng.h"
 #include "csgeom/math3d.h"
 #include "csgeom/math2d.h"

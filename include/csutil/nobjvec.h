@@ -21,8 +21,13 @@
 #define __NOBJVEC_H__
 
 #include "csutil/csobjvec.h"
+#include "csutil/typedvec.h"
+#include "iutil/object.h"
 
 class csObject;
+struct iObject;
+
+SCF_DECLARE_FAST_INTERFACE (iObject);
 
 /**
  * csNamedObjVector is a version of csObjVector that assumes all
@@ -50,5 +55,92 @@ public:
   csObject *Get (int idx) const
   { return (csObject *)csVector::Get (idx); }
 };
+
+/**
+ * Object Vectors: A subset of typed vectors. They assume that it is possible
+ * to cast the contained objects from and to (iBase*). This pointer is then
+ * used to query the iObject interface form the contained objects.
+ */
+
+/**
+ * This class is intended as a superclass for typed object vectors. Instances
+ * of this class itself should not be created; However it is valid to cast
+ * a typed object vector to this class. It is not possible to add objects to
+ * the vector though this interface, because this interface does not know
+ * which type of objects is actually contained.
+ */
+class csNamedObjectVector : protected csIBaseVector
+{
+protected:
+  /// Find an object by name
+  csSome FindByName (const char* iName) const;
+  /// Compare two objects by their names
+  virtual int Compare (csSome Item1, csSome Item2, int Mode) const;
+  /// Compare object's name with a string
+  virtual int CompareKey (csSome Item, csConstSome Key, int Mode) const;
+
+public:
+  /// constructor
+  csNamedObjectVector (int iLimit = 8, int iThreshold = 16) :
+    csIBaseVector (iLimit, iThreshold) {}
+
+  /// Set the length of this vector
+  inline void SetLength (int n)
+  { csIBaseVector::SetLength(n); }
+  /// Return the length of this vector
+  inline int Length () const
+  { return count; }
+  /// Return the limit of this vector
+  inline int Limit () const
+  { return limit; }
+  /// Exchange two elements of the vector
+  inline void Exchange (int n1, int n2)
+  { csIBaseVector::Exchange (n1, n2); }
+  /// Quick-sort the elements, using the given mode
+  inline void QuickSort (int Left, int Right, int Mode = 0)
+  { csIBaseVector::QuickSort (Left, Right, Mode); }
+  /// Quick-sort the elements, using the given mode
+  inline void QuickSort (int Mode = 0)
+  { csIBaseVector::QuickSort (Mode); }
+  /// Find an element using the given key
+  inline int FindKey (csConstSome Key, int Mode = 0) const
+  { return csIBaseVector::FindKey (Key, Mode); }
+  /// Find an element using the given key. Expects the elements to be sorted.
+  inline int FindSortedKey (csConstSome Key, int Mode = 0) const
+  { return csIBaseVector::FindSortedKey (Key, Mode); }
+  /// Pop an element from the vector.
+  inline iObject *PopObject ()
+  { return SCF_QUERY_INTERFACE_FAST (((iBase*)csIBaseVector::Pop()), iObject); }
+  /// Delete an element from the vector
+  inline bool Delete (int n)
+  { return csIBaseVector::Delete (n); }
+  /// Delete all elements
+  inline void DeleteAll ()
+  { csIBaseVector::DeleteAll (); }
+  /// Return the pointer to an element
+  inline iObject *GetObject (int n) const
+  { return SCF_QUERY_INTERFACE_FAST (((iBase*)(csIBaseVector::Get(n))), iObject); }
+};
+
+/**
+ * Begin the class definition of an object vector. Be careful with
+ * user-defined methods in this class: Due to the 'protected' inheritance
+ * they can access members and methods of csVector (not type-safe!). <p>
+ *
+ * Note that exploiting the inheritance from csNamedObjectVector is legal. 
+ */
+#define CS_BEGIN_OBJECT_VECTOR(NAME,TYPE)				\
+  CS_BEGIN_TYPED_IBASE_VECTOR_WITH_SUPERCLASS (NAME, TYPE, public, csNamedObjectVector) \
+    TYPE *FindByName (const char* iName) const				\
+    { return (TYPE*)csNamedObjectVector::FindByName (iName); }		\
+
+/// Finish the class definition of an object vector
+#define CS_FINISH_OBJECT_VECTOR						\
+  CS_FINISH_TYPED_IBASE_VECTOR
+
+/// Declare an object vector class
+#define CS_DECLARE_OBJECT_VECTOR(NAME,TYPE)				\
+  CS_BEGIN_OBJECT_VECTOR (NAME, TYPE)					\
+  CS_FINISH_OBJECT_VECTOR
 
 #endif // __NOBJVEC_H__

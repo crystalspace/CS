@@ -155,33 +155,26 @@ public:
   friend struct TextureWrapper;
 };
 
+// helper for the texture list
+CS_DECLARE_OBJECT_VECTOR (csTextureListHelper, iTextureWrapper);
+
 /**
  * This class is used to hold a list of textures.
  */
-class csTextureList : public csNamedObjVector
+class csTextureList : public csTextureListHelper
 {
 public:
   /// Initialize the array
   csTextureList ();
-  /// Destroy every texture in the list
-  virtual ~csTextureList ();
 
   /// Create a new texture.
-  csTextureWrapper *NewTexture (iImage *image);
+  iTextureWrapper *NewTexture (iImage *image);
 
   /**
    * Create a engine wrapper for a pre-prepared iTextureHandle
    * The handle will be IncRefed
    */
-  csTextureWrapper *NewTexture (iTextureHandle *ith);
-
-  /// Return texture by index
-  csTextureWrapper *Get (int idx)
-  { return (csTextureWrapper *)csNamedObjVector::Get (idx); }
-
-  /// Find a texture by name
-  csTextureWrapper *FindByName (const char* iName)
-  { return (csTextureWrapper *)csNamedObjVector::FindByName (iName); }
+  iTextureWrapper *NewTexture (iTextureHandle *ith);
 
   SCF_DECLARE_IBASE;
 

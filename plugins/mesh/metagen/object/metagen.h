@@ -30,7 +30,7 @@
 #include "imesh/object.h"
 #include "imesh/metagen.h"
 #include "isys/plugin.h"
-#include "csutil/csvector.h"
+#include "csutil/typedvec.h"
 #include "csutil/cscolor.h"
 
 #define ALL_FEATURES (CS_OBJECT_FEATURE_LIGHTING|CS_OBJECT_FEATURE_ANIMATION)

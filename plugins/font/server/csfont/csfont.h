@@ -23,7 +23,7 @@
 
 #include "ivideo/fontserv.h"
 #include "isys/plugin.h"
-#include "csutil/csvector.h"
+#include "csutil/typedvec.h"
 
 struct iSystem;
 class csDefaultFontServer;

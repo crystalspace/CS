@@ -20,7 +20,7 @@
 #ifndef __ARRAYS_H__
 #define __ARRAYS_H__
 
-#include "csutil/csvector.h"
+#include "csutil/typedvec.h"
 
 class csCurve;
 class csLightHalo;

@@ -48,3 +48,38 @@ int csNamedObjVector::CompareKey (csSome Item, csConstSome Key, int Mode) const
   return (((csObject *)Item)->GetName () == (char *)Key) ? 0
        : strcmp (((csObject *)Item)->GetName (), (char *)Key);
 }
+
+// ---------------------------------------------------------------------------
+
+// @@@ is there a better way than doing QUERY_INTERFACE all the time?
+
+csSome csNamedObjectVector::FindByName (const char* name) const
+{
+  int i;
+  for (i = 0; i < Length (); i++)
+  {
+    iObject *o = GetObject (i);
+    const char* oname = o->GetName ();
+    if (name == oname || (name && oname && !strcmp (oname, name)))
+      return Get (i);
+  }
+  return NULL;
+}
+
+int csNamedObjectVector::Compare (csSome Item1, csSome Item2, int /*Mode*/) const
+{
+  iObject *obj1 = SCF_QUERY_INTERFACE_FAST (((iBase*)Item1), iObject);
+  iObject *obj2 = SCF_QUERY_INTERFACE_FAST (((iBase*)Item2), iObject);
+
+  return (obj1->GetName () == obj2->GetName ()) ? 0
+       : strcmp (obj1->GetName (), obj2->GetName ());
+}
+
+int csNamedObjectVector::CompareKey (csSome Item, csConstSome Key, int /*Mode*/) const
+{
+  iObject *obj = SCF_QUERY_INTERFACE_FAST (((iBase*)Item), iObject);
+  const char *name = (const char *)Key;
+
+  return (obj->GetName () == name) ? 0
+       : strcmp (obj->GetName (), name);
+}

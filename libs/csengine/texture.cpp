@@ -137,33 +137,33 @@ void csTextureWrapper::Register (iTextureManager *txtmgr)
 }
 
 iObject *csTextureWrapper::TextureWrapper::QueryObject()
-{ return scfParent; }
+  { return scfParent; }
 void csTextureWrapper::TextureWrapper::SetImageFile (iImage *Image)
-{ scfParent->SetImageFile (Image); }
+  { scfParent->SetImageFile (Image); }
 iImage* csTextureWrapper::TextureWrapper::GetImageFile ()
-{ return scfParent->GetImageFile (); }
+  { return scfParent->GetImageFile (); }
 void csTextureWrapper::TextureWrapper::SetTextureHandle (iTextureHandle *tex)
-{ scfParent->SetTextureHandle (tex); }
+  { scfParent->SetTextureHandle (tex); }
 iTextureHandle* csTextureWrapper::TextureWrapper::GetTextureHandle ()
-{ return scfParent->GetTextureHandle (); }
+  { return scfParent->GetTextureHandle (); }
 void csTextureWrapper::TextureWrapper::SetKeyColor (int red, int green, int blue)
-{ scfParent->SetKeyColor (red, green, blue); }
+  { scfParent->SetKeyColor (red, green, blue); }
 void csTextureWrapper::TextureWrapper::GetKeyColor (int &red, int &green, int &blue)
-{ scfParent->GetKeyColor (red, green, blue); }
+  { scfParent->GetKeyColor (red, green, blue); }
 void csTextureWrapper::TextureWrapper::SetFlags (int flags)
-{ scfParent->SetFlags (flags); }
+  { scfParent->SetFlags (flags); }
 int csTextureWrapper::TextureWrapper::GetFlags ()
-{ return scfParent->GetFlags (); }
+  { return scfParent->GetFlags (); }
 void csTextureWrapper::TextureWrapper::Register (iTextureManager *txtmng)
-{ scfParent->Register (txtmng); }
+  { scfParent->Register (txtmng); }
 void csTextureWrapper::TextureWrapper::SetUseCallback (csTextureCallback* callback, void* data)
-{ scfParent->SetUseCallback (callback, data); }
+  { scfParent->SetUseCallback (callback, data); }
 csTextureCallback* csTextureWrapper::TextureWrapper::GetUseCallback ()
-{ return scfParent->GetUseCallback (); }
+  { return scfParent->GetUseCallback (); }
 void* csTextureWrapper::TextureWrapper::GetUseData ()
-{ return scfParent->GetUseData (); }
+  { return scfParent->GetUseData (); }
 void csTextureWrapper::TextureWrapper::Visit ()
-{ scfParent->Visit (); }
+  { scfParent->Visit (); }
 
 //------------------------------------------------------- csTextureList -----//
 
@@ -175,52 +175,35 @@ SCF_IMPLEMENT_EMBEDDED_IBASE (csTextureList::TextureList)
   SCF_IMPLEMENTS_INTERFACE (iTextureList)
 SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
-csTextureList::csTextureList () : csNamedObjVector (16, 16)
+csTextureList::csTextureList () : csTextureListHelper (16, 16)
 {
   SCF_CONSTRUCT_IBASE (NULL);
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiTextureList);
 }
 
-csTextureList::~csTextureList ()
+iTextureWrapper *csTextureList::NewTexture (iImage *image)
 {
-  DeleteAll ();
-}
-
-csTextureWrapper *csTextureList::NewTexture (iImage *image)
-{
-  csTextureWrapper *tm = new csTextureWrapper (image);
+  iTextureWrapper *tm = &(new csTextureWrapper (image))->scfiTextureWrapper;
   Push (tm);
+  tm->DecRef ();
   return tm;
 }
 
-csTextureWrapper *csTextureList::NewTexture (iTextureHandle *ith)
+iTextureWrapper *csTextureList::NewTexture (iTextureHandle *ith)
 {
-  csTextureWrapper *tm = new csTextureWrapper (ith);
+  iTextureWrapper *tm = &(new csTextureWrapper (ith))->scfiTextureWrapper;
   Push (tm);
+  tm->DecRef ();
   return tm;
 }
 
 iTextureWrapper *csTextureList::TextureList::NewTexture (iImage *image)
-{
-  return &scfParent->NewTexture(image)->scfiTextureWrapper;
-}
-
+  { return scfParent->NewTexture (image); }
 iTextureWrapper *csTextureList::TextureList::NewTexture (iTextureHandle *ith)
-{
-  return &scfParent->NewTexture(ith)->scfiTextureWrapper;
-}
-
+  { return scfParent->NewTexture (ith); }
 long csTextureList::TextureList::GetTextureCount () const
-{
-  return scfParent->Length();
-}
-
+  { return scfParent->Length (); }
 iTextureWrapper *csTextureList::TextureList::Get (int idx) const
-{
-  return &scfParent->Get(idx)->scfiTextureWrapper;
-}
-
+  { return scfParent->Get (idx); }
 iTextureWrapper *csTextureList::TextureList::FindByName (const char* iName) const
-{
-  return &scfParent->FindByName(iName)->scfiTextureWrapper;
-}
+  { return scfParent->FindByName (iName); }
