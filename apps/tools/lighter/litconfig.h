@@ -32,6 +32,7 @@ public:
   csRef<litObjectSelect> receivers_selector;
   csRef<litObjectSelect> lights_selector;
   csRef<litObjectSelect> sectors_selector;
+  csRef<litObjectSelect> portals_selector;
 };
 
 #endif // __LITCONFIG_H__

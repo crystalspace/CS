@@ -419,6 +419,8 @@ bool Lighter::Initialize ()
 
   // If any of the selectors is not defined we will set it to 'all' to
   // select everything.
+  if (litconfig.portals_selector == 0)
+    litconfig.portals_selector.AttachNew (new litObjectSelectAll ());
   if (litconfig.sectors_selector == 0)
     litconfig.sectors_selector.AttachNew (new litObjectSelectAll ());
   if (litconfig.lights_selector == 0)

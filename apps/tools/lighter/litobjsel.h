@@ -40,6 +40,12 @@ public:
   virtual ~litObjectSelect () { }
 
   /**
+   * Return 0 if this selector is valid, otherwise returns an error
+   * string with error.
+   */
+  virtual const char* IsValid () { return 0; }
+
+  /**
    * Return true if this object should be selected.
    */
   virtual bool SelectObject (iObject*) = 0;
@@ -79,6 +85,14 @@ private:
 public:
   litObjectSelectByNameRE (const char* name_re) : matcher (name_re) { }
   virtual ~litObjectSelectByNameRE () { }
+  virtual const char* IsValid ()
+  {
+    csRegExpMatchError rc = matcher.Match ("");
+    if (rc == NoError || rc == NoMatch) return 0;
+    static char error_string[100];
+    sprintf (error_string, "Regexp error %d", rc);
+    return error_string;
+  }
   virtual bool SelectObject (iObject* obj)
   {
     return matcher.Match (obj->GetName ()) == NoError;
@@ -137,6 +151,68 @@ public:
   virtual ~litObjectSelectByType ()
   {
     delete[] type;
+  }
+  virtual bool SelectObject (iObject* obj);
+};
+
+/**
+ * Select an object based on the presence of a key value pair.
+ */
+class litObjectSelectByKeyValue : public litObjectSelect
+{
+private:
+  char* keyname;
+  char* keyattrtype;
+  char* keyattrvalue;
+
+public:
+  litObjectSelectByKeyValue (const char* keyname,
+  	const char* keyattrtype, const char* keyattrvalue)
+  {
+    litObjectSelectByKeyValue::keyname = csStrNew (keyname);
+    litObjectSelectByKeyValue::keyattrtype = csStrNew (keyattrtype);
+    litObjectSelectByKeyValue::keyattrvalue = csStrNew (keyattrvalue);
+  }
+  virtual ~litObjectSelectByKeyValue ()
+  {
+    delete[] keyname;
+    delete[] keyattrtype;
+    delete[] keyattrvalue;
+  }
+  virtual bool SelectObject (iObject* obj);
+};
+
+/**
+ * Select an object based on the presence of a key value pair.
+ * Regex version.
+ */
+class litObjectSelectByKeyValueRE : public litObjectSelect
+{
+private:
+  char* keyname;
+  char* keyattrtype;
+  csRegExpMatcher matcher;
+
+public:
+  litObjectSelectByKeyValueRE (const char* keyname,
+  	const char* keyattrtype, const char* keyattrvalue)
+	: matcher (keyattrvalue)
+  {
+    litObjectSelectByKeyValueRE::keyname = csStrNew (keyname);
+    litObjectSelectByKeyValueRE::keyattrtype = csStrNew (keyattrtype);
+  }
+  virtual ~litObjectSelectByKeyValueRE ()
+  {
+    delete[] keyname;
+    delete[] keyattrtype;
+  }
+  virtual const char* IsValid ()
+  {
+    csRegExpMatchError rc = matcher.Match ("");
+    if (rc == NoError || rc == NoMatch) return 0;
+    static char error_string[100];
+    sprintf (error_string, "Regexp error %d", rc);
+    return error_string;
   }
   virtual bool SelectObject (iObject* obj);
 };
@@ -210,6 +286,17 @@ public:
   litObjectSelectAll () { }
   virtual ~litObjectSelectAll () { }
   virtual bool SelectObject (iObject*) { return true; }
+};
+
+/**
+ * Select nothing.
+ */
+class litObjectSelectNone : public litObjectSelect
+{
+public:
+  litObjectSelectNone () { }
+  virtual ~litObjectSelectNone () { }
+  virtual bool SelectObject (iObject*) { return false; }
 };
 
 #endif // __LITMESHSEL_H__

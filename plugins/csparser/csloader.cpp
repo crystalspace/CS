@@ -4348,6 +4348,9 @@ bool csLoader::ParsePortal (iLoaderContext* ldr_context,
   scfString destSectorName;
   bool autoresolve = false;
 
+  // Array of keys we need to parse later.
+  csRefArray<iDocumentNode> key_nodes;
+
   csRef<iDocumentNodeIterator> it = node->GetNodes ();
   while (it->HasNext ())
   {
@@ -4366,6 +4369,9 @@ bool csLoader::ParsePortal (iLoaderContext* ldr_context,
       csStringID id = xmltokens.Request (value);
       switch (id)
       {
+	case XMLTOKEN_KEY:
+	  key_nodes.Push (child);
+	  break;
         case XMLTOKEN_V:
           {
             csVector3 vec;
@@ -4442,6 +4448,16 @@ bool csLoader::ParsePortal (iLoaderContext* ldr_context,
   if (msv != -1)
   {
     portal->SetMaximumSectorVisit (msv);
+  }
+
+  size_t i;
+  for (i = 0 ; i < key_nodes.Length () ; i++)
+  {
+    iKeyValuePair* kvp = ParseKey (key_nodes[i], container_mesh->QueryObject());
+    if (kvp)
+      kvp->DecRef ();
+    else
+      return false;
   }
 
   return true;

@@ -59,7 +59,7 @@ public:
   virtual void SetValue (const char* value);
   virtual void SetValue (const char* vname, const char* value);
 
-	//----------------------- iSaverPlugin ---------------------------
+  //----------------------- iSaverPlugin ---------------------------
 };
 
 #endif // __CS_KEYVAL_H__

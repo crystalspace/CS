@@ -18,6 +18,7 @@
 
 #include "cssysdef.h"
 #include "litobjsel.h"
+#include "ivaria/keyval.h"
 
 bool litObjectSelectAnd::SelectObject (iObject* obj)
 {
@@ -37,6 +38,44 @@ bool litObjectSelectOr::SelectObject (iObject* obj)
   {
     bool rc = a[i]->SelectObject (obj);
     if (rc) return true;
+  }
+  return false;
+}
+
+bool litObjectSelectByKeyValue::SelectObject (iObject* obj)
+{
+  csRef<iObjectIterator> it = obj->GetIterator ();
+  while (it->HasNext ())
+  {
+    csRef<iKeyValuePair> kp = SCF_QUERY_INTERFACE (it->Next (), iKeyValuePair);
+    if (kp)
+    {
+      if (!strcmp (keyname, kp->GetKey ()))
+      {
+        const char* v = kp->GetValue (keyattrtype);
+	if (v && !strcmp (keyattrvalue, v))
+	  return true;
+      }
+    }
+  }
+  return false;
+}
+
+bool litObjectSelectByKeyValueRE::SelectObject (iObject* obj)
+{
+  csRef<iObjectIterator> it = obj->GetIterator ();
+  while (it->HasNext ())
+  {
+    csRef<iKeyValuePair> kp = SCF_QUERY_INTERFACE (it->Next (), iKeyValuePair);
+    if (kp)
+    {
+      if (!strcmp (keyname, kp->GetKey ()))
+      {
+        const char* v = kp->GetValue (keyattrtype);
+	if (v && matcher.Match (v) == NoError)
+	  return true;
+      }
+    }
   }
   return false;
 }

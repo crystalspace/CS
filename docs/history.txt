@@ -11,6 +11,15 @@ chronological order.
 	  valid iPolygonRenderer instance on calling
 	  g3d->CreatePolygonRenderer(). That way PrecacheDraw() can work
 	  fine in combination with null3d.
+	- Jorrit did the following lighter changes:
+	    - Support for filtering meshes on key value pairs (regexp and
+	      normal).
+	    - Added the ability to reject bad object selectors (can happen
+	      if there is an invalid regexp for example).
+	    - Added a portals selector.
+	    - Added a selector that selects nothing.
+	- Jorrit added support for key-value pairs to portals (only when
+	  specified outside things).
 17-Aug-2004
 	- Jorrit did some more work on lighter config parsing.
 	- Jorrit did the following lighter changes:

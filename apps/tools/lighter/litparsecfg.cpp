@@ -73,13 +73,13 @@ bool litConfigParser::ParseObjectSelect (iDocumentNode* objsel_node,
 	if (!ParseMulti (objsel_node,
 		(litObjectSelectChildren*)(litObjectSelect*)objsel))
 	  return false;
-	return true;
+	break;
       case XMLTOKEN_OR:
 	objsel.AttachNew (new litObjectSelectOr ());
 	if (!ParseMulti (objsel_node,
 		(litObjectSelectChildren*)(litObjectSelect*)objsel))
 	  return false;
-	return true;
+	break;
       case XMLTOKEN_NOT:
 	{
 	  csRef<litObjectSelect> a;
@@ -87,41 +87,69 @@ bool litConfigParser::ParseObjectSelect (iDocumentNode* objsel_node,
 	    return false;
 	  objsel.AttachNew (new litObjectSelectNot (a));
 	}
-	return true;
+	break;
+      case XMLTOKEN_KEY:
+        {
+	  csRef<iDocumentAttribute> attr = objsel_node->GetAttribute ("regex");
+	  if (attr)
+	  {
+	    // Regex version.
+	    objsel.AttachNew (new litObjectSelectByKeyValueRE (
+	    	objsel_node->GetAttributeValue ("name"),
+	    	objsel_node->GetAttributeValue ("attr"),
+	    	objsel_node->GetAttributeValue ("regex")));
+	  }
+	  else
+	  {
+	    // Normal version.
+	    objsel.AttachNew (new litObjectSelectByKeyValue (
+	    	objsel_node->GetAttributeValue ("name"),
+	    	objsel_node->GetAttributeValue ("attr"),
+	    	objsel_node->GetAttributeValue ("value")));
+	  }
+	}
+        break;
+      case XMLTOKEN_NONE:
+	objsel.AttachNew (new litObjectSelectNone ());
+	break;
       case XMLTOKEN_ALL:
 	objsel.AttachNew (new litObjectSelectAll ());
-	return true;
+	break;
       case XMLTOKEN_STATICPOS:
 	objsel.AttachNew (new litObjectSelectByMOFlags (CS_MESH_STATICPOS,
 	      CS_MESH_STATICPOS));
-	return true;
+	break;
       case XMLTOKEN_STATICSHAPE:
 	objsel.AttachNew (new litObjectSelectByMOFlags (CS_MESH_STATICSHAPE,
 	      CS_MESH_STATICSHAPE));
-	return true;
+	break;
       case XMLTOKEN_STATIC:
 	objsel.AttachNew (new litObjectSelectByMOFlags (
 	      CS_MESH_STATICSHAPE|CS_MESH_STATICPOS,
 	      CS_MESH_STATICSHAPE|CS_MESH_STATICPOS));
-	return true;
+	break;
       case XMLTOKEN_NAME:
 	objsel.AttachNew (new litObjectSelectByName (
 		objsel_node->GetContentsValue ()));
-	return true;
+	break;
       case XMLTOKEN_REGEXP:
 	objsel.AttachNew (new litObjectSelectByNameRE (
 		objsel_node->GetContentsValue ()));
-	return true;
+	break;
       case XMLTOKEN_TYPE:
 	objsel.AttachNew (new litObjectSelectByType (
 		objsel_node->GetContentsValue ()));
-	return true;
+	break;
       default:
-        return lighter->Report ("Unknown token <%s> in mesh selector!", value);
+        return lighter->Report ("Unknown token <%s> in selector!", value);
     }
+    const char* err = objsel->IsValid ();
+    if (err)
+      return lighter->Report ("Error in selector: '%s'!", err);
+    return true;
   }
   CS_ASSERT (false);
-  return lighter->Report ("Missing mesh selector!");
+  return lighter->Report ("Missing selector!");
 }
 
 bool litConfigParser::ParseLighter (iDocumentNode* lighter_node,
@@ -136,6 +164,11 @@ bool litConfigParser::ParseLighter (iDocumentNode* lighter_node,
     csStringID id = xmltokens.Request (value);
     switch (id)
     {
+      case XMLTOKEN_SELECT_PORTALS:
+        if (!ParseObjectSelect (FindChildNode (child),
+		litconfig.portals_selector))
+	  return false;
+        break;
       case XMLTOKEN_SELECT_SECTORS:
         if (!ParseObjectSelect (FindChildNode (child),
 		litconfig.sectors_selector))
