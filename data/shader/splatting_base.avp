@@ -65,6 +65,7 @@ DP3 objEye.w, objEye, objEye;
 RSQ objEye.w, objEye.w;
 MUL lodblend, objEye.w, loddist;
 RCP lodblend.x, lodblend.x;
+MIN lodblend.x, lodblend.x, eyePos.w;
 
 #Set color
 MUL oCol0, lightDiffuse, lodblend.x;

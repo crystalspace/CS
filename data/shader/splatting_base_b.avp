@@ -31,7 +31,7 @@ ATTRIB iNorm		= vertex.attrib[2];
 ATTRIB iTex0		= vertex.attrib[3];
 # Outputs
 OUTPUT oPos		= result.position;
-OUTPUT oSplat		= result.texcoord[2];
+OUTPUT oSplat		= result.texcoord[0];
 OUTPUT oCol0		= result.color;
 # Temporaries
 TEMP objEye;
@@ -55,6 +55,7 @@ DP3 objEye.w, objEye, objEye;
 RSQ objEye.w, objEye.w;
 MUL lodblend, objEye.w, loddist;
 RCP lodblend.x, lodblend.x;
+MIN lodblend.x, lodblend.x, eyePos.w;
 
 #Set color
 MUL oCol0, lightDiffuse, lodblend.x;

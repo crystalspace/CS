@@ -42,7 +42,7 @@
       <buffer name="vertices" destination="attribute 0" />
       <buffer name="normals" destination="attribute 2" />
       <buffer name="texture coordinates" destination="attribute 3" />
-      <vp plugin="glarb" file="/shader/flat_ppl_attenuation.avp"/>
+      <vp plugin="glarb" file="/shader/flat_ppl_diffuse_a.avp"/>
       <texture destination="unit 0" name="standardtex normalization map" />
       <texture destination="unit 1" name="standardtex normalization map" />
       <fp plugin="glfixed">

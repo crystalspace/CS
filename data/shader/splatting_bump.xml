@@ -49,7 +49,7 @@
       <buffer name="texture coordinates" destination="attribute 3" />
       <buffer name="tangents" destination="attribute 4" />
       <buffer name="binormals" destination="attribute 5" />
-      <vp plugin="glarb" file="/shader/bump_ppl_diffuse_a.avp" />
+      <vp plugin="glarb" file="/shader/splatting_bump_a.avp" />
       <texture destination="unit 0" name="standardtex normalization map" />
       <texture destination="unit 1" name="tex normal" />
       <fp plugin="glfixed">
@@ -123,4 +123,5 @@
       </fp>
     </pass>
   </technique>
+
 </shader>

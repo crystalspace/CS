@@ -72,11 +72,11 @@ DP3 objEye.w, objEye, objEye;
 RSQ objEye.w, objEye.w;
 MUL lodblend, objEye.w, loddist;
 RCP lodblend.x, lodblend.x;
+MIN lodblend.x, lodblend.x, eyePos.w;
 ADD lodblend.x, eyePos.w, -lodblend.x;
 
 # Pass along diffuse light
-# MUL oCol0, lightDiffuse, lodblend.x;
-MOV oCol0, lightDiffuse;
+MUL oCol0, lightDiffuse, lodblend.x;
 
 END
 ]]>
