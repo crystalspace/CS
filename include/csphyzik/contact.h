@@ -32,7 +32,9 @@ class ctCollidingContact
 {
 public:
 
-  ctCollidingContact(){
+  ctCollidingContact() :
+    contact_p(0), ea(0), eb(0), n(0)
+  {
     body_b = NULL;
     restitution = 1.0;
     next = NULL;
@@ -65,7 +67,9 @@ class ctContact
 {
 public:
 
-  ctContact(){
+  ctContact() :
+    contact_p(0), ea(0), eb(0), n(0)
+  {
     body_b = NULL;
     next = NULL;
   }
