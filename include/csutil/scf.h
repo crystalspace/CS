@@ -505,12 +505,13 @@ struct scfClassInfo
  * LibraryName_scfUnitInitialize() function which is not qualified as
  * `extern "C"'.
  */
-#define SCF_EXPORT_CLASS_TABLE(LibraryName)				\
+// extern CS_DECLARE_STATIC_VARIABLE_CLEANUP 
+#define SCF_EXPORT_CLASS_TABLE(LibraryName)			\
 static inline void							\
 CS_EXPORTED_NAME(LibraryName,_scfUnitInitialize)(iSCF *SCF)		\
 { iSCF::SCF = SCF; }							\
 CS_EXPORTED_FUNCTION scfClassInfo*					\
-CS_EXPORTED_NAME(LibraryName,_scfInitialize)(iSCF *SCF)		\
+CS_EXPORTED_NAME(LibraryName,_scfInitialize)(iSCF *SCF)		        \
 {									\
   CS_EXPORTED_NAME(LibraryName,_scfUnitInitialize)(SCF);		\
   static scfClassInfo ExportClassTable [] =				\

@@ -139,8 +139,8 @@ scfSharedLibrary::scfSharedLibrary (const char *iLibraryName)
   if (!LibraryHandle)
     return;
 
-  // This is the prototype for the only function that
-  // a shared library should export
+  // This is the prototype for the function that
+  // a shared library should export - it will be called upon loading
   typedef scfClassInfo *(*scfInitializeFunc) (iSCF*);
 
   // To get the library name, split the input name into path and file name.
@@ -159,7 +159,20 @@ scfSharedLibrary::scfSharedLibrary (const char *iLibraryName)
 scfSharedLibrary::~scfSharedLibrary ()
 {
   if (LibraryHandle)
+  {
+    // This is the prototype for the function that
+    // a shared library should export - it will be called upon unloading
+    typedef void (*scfFinalizeFunc) ();
+
+    char name [200];
+    csSplitPath (LibraryName, NULL, 0, name, 200);
+    strcat (name, "_scfFinalize");
+
+    scfFinalizeFunc func = (scfFinalizeFunc)csGetLibrarySymbol (LibraryHandle, name);
+    if (func)
+      func ();
     csUnloadLibrary (LibraryHandle);
+  }
 }
 
 scfClassInfo *scfSharedLibrary::Find (const char *iClassID)

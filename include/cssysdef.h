@@ -379,10 +379,14 @@
 #  define CS_STATIC_VAR_DESTRUCTION_REGISTRAR_FUNCTION cs_static_var_cleanup
 #endif
 
+#ifndef CS_DECLARE_STATIC_VARIABLE_CLEANUP
+#  define CS_DECLARE_STATIC_VARIABLE_CLEANUP \
+void CS_STATIC_VAR_DESTRUCTION_REGISTRAR_FUNCTION (void (*p)());
+#endif
+
 #ifndef CS_IMPLEMENT_STATIC_VARIABLE_CLEANUP
 #  define CS_IMPLEMENT_STATIC_VARIABLE_CLEANUP                         \
-CS_EXPORTED_FUNCTION                                                   \
- void CS_STATIC_VAR_DESTRUCTION_REGISTRAR_FUNCTION (void (*p)())       \
+void CS_STATIC_VAR_DESTRUCTION_REGISTRAR_FUNCTION (void (*p)())        \
 {                                                                      \
   static void (**a)()=0;                                               \
   static int lastEntry=0;                                              \
@@ -416,12 +420,25 @@ CS_EXPORTED_FUNCTION                                                   \
  * of the plugin module with any special implementation details required by the
  * platform.
  */
-#ifndef CS_IMPLEMENT_PLUGIN
-#  define CS_IMPLEMENT_PLUGIN        \
-CS_IMPLEMENT_STATIC_VARIABLE_CLEANUP \
-CS_IMPLEMENT_PLATFORM_PLUGIN 
-#endif
+#if defined(CS_STATIC_LINKED)
 
+#  ifndef CS_IMPLEMENT_PLUGIN
+#  define CS_IMPLEMENT_PLUGIN        \
+          CS_IMPLEMENT_PLATFORM_PLUGIN 
+#  endif
+
+#else
+
+#  ifndef CS_IMPLEMENT_PLUGIN
+#  define CS_IMPLEMENT_PLUGIN                                   \
+static CS_IMPLEMENT_STATIC_VARIABLE_CLEANUP                     \
+          CS_EXPORTED_FUNCTION void              		\
+          CS_EXPORTED_NAME(LibraryName,_scfFinalize)()          \
+          { CS_STATIC_VAR_DESTRUCTION_REGISTRAR_FUNCTION (0);}  \
+          CS_IMPLEMENT_PLATFORM_PLUGIN 
+#  endif
+
+#endif
 /**
  * The CS_IMPLEMENT_APPLICATION macro should be placed at the global scope in
  * exactly one compilation unit comprising an application.  For maximum
@@ -431,11 +448,94 @@ CS_IMPLEMENT_PLATFORM_PLUGIN
  * platform.
  */
 #ifndef CS_IMPLEMENT_APPLICATION
-#  define CS_IMPLEMENT_APPLICATION   \
-CS_IMPLEMENT_STATIC_VARIABLE_CLEANUP \
-CS_IMPLEMENT_PLATFORM_APPLICATION 
+#  define CS_IMPLEMENT_APPLICATION CS_IMPLEMENT_PLATFORM_APPLICATION 
 #endif
 
+/**
+ * Register a method that will destruct one static variable.
+ */
+#ifndef CS_REGISTER_STATIC_FOR_DESTRUCTION
+#define CS_REGISTER_STATIC_FOR_DESTRUCTION(getterFunc)\
+        CS_STATIC_VAR_DESTRUCTION_REGISTRAR_FUNCTION (getterFunc);
+#endif
+
+/**
+ * Invoke the function that will call all destruction functions
+ */
+#ifndef CS_STATIC_VAR_DESTRUCTION
+#define CS_STATIC_VAR_DESTRUCTION  CS_STATIC_VAR_DESTRUCTION_REGISTRAR_FUNCTION (0);
+#endif
+
+/**
+ * Create a global variable thats created on demand. Create a Getter function to access 
+ * the variable and a destruction function. The Getter function will register
+ * the destruction function on first invocation.
+ * Example:
+ * CS_IMPLEMENT_STATIC_VAR (GetVertexPool, csVertexPool,)
+ * This will give you a global function GetVertexPool that returns a pointer to a 
+ * static variable.
+ */
+#ifndef CS_IMPLEMENT_STATIC_VAR
+#define CS_IMPLEMENT_STATIC_VAR(getterFunc,Type,initParam)    \
+extern "C" {                                                  \
+static Type* getterFunc ();                                   \
+void getterFunc ## _kill ();                                  \
+void getterFunc ## _kill ()                                   \
+{                                                             \
+  delete getterFunc ();                                       \
+}                                                             \
+Type* getterFunc ()                                           \
+{                                                             \
+  static Type *v=0;                                           \
+  if (v)                                                      \
+    return v;                                                 \
+  v = new Type (initParam);                                   \
+  CS_REGISTER_STATIC_FOR_DESTRUCTION (getterFunc ## _kill);   \
+  return v;                                                   \
+}                                                             \
+}
+#endif
+
+/**
+ * Declare a static variable inside a class. This will also declare a Getter function.
+ * Example:
+ * CS_DECLARE_STATIC_CLASSVAR (pool, GetVertexPool, csVertexPool)
+ */
+#ifndef CS_DECLARE_STATIC_CLASSVAR
+#define CS_DECLARE_STATIC_CLASSVAR(var,getterFunc,Type)       \
+static Type *var;                                             \
+static Type *getterFunc ();                                   
+#endif
+
+/**
+ * Create the static class variable that has been declared with 
+ * CS_DECLARE_STATIC_CLASSVAR.
+ * This will also create the Getter function and the destruction function. 
+ * The destruction function will be registered upon the first invocation
+ * of the Getter function.
+ * Example:
+ * CS_IMPLEMENT_STATIC_CLASSVAR (csPolygon2D, pool, GetVertexPool, csVertexPool,)
+ */
+#ifndef CS_IMPLEMENT_STATIC_CLASSVAR
+#define CS_IMPLEMENT_STATIC_CLASSVAR(Class,var,getterFunc,Type,initParam) \
+Type *Class::var = 0;                                                     \
+extern "C" {                                                              \
+void Class ## _ ## getterFunc ## _kill ();                                \
+void Class ## _ ## getterFunc ## _kill ()                                 \
+{                                                                         \
+  delete Class::getterFunc ();                                            \
+}                                                                         \
+}                                                                         \
+Type* Class::getterFunc ()                                                \
+{                                                                         \
+  static Type *var=0;                                                     \
+  if (var)                                                                \
+    return var;                                                           \
+  var = new Type (initParam);                                             \
+  CS_REGISTER_STATIC_FOR_DESTRUCTION (Class ## _ ## getterFunc ## _kill); \
+  return v;                                                               \
+}
+#endif
 
 // The following define should only be enabled if you have defined
 // a special version of overloaded new that accepts two additional

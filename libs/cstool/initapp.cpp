@@ -71,6 +71,8 @@ static bool config_done = false;
 static bool sys_init_done = false;
 static iEventHandler* installed_event_handler = NULL;
 
+CS_IMPLEMENT_STATIC_VARIABLE_CLEANUP
+
 iObjectRegistry* csInitializer::CreateEnvironment (
   int argc, char const* const argv[])
 {
@@ -440,6 +442,9 @@ void csInitializer::DestroyApplication (iObjectRegistry* r)
   // finalized (see below).
   r->Clear ();
   r->DecRef ();
+
+  // destruct all static variables that had been created during runtime
+  CS_STATIC_VAR_DESTRUCTION
 
   iSCF::SCF->Finish();
 }
