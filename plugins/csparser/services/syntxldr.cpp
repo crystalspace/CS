@@ -1512,7 +1512,7 @@ bool csTextSyntaxService::ParseMatrix (iXmlNode* node, csMatrix3 &m)
       case XMLTOKEN_M33: m.m33 = child->GetContentsValueAsFloat (); break;
       default:
         ReportError (reporter, "crystalspace.syntax.matrix",
-          "Unknown token '%s'!", value);
+          "Unknown token '%s' for 'matrix'!", value);
         return false;
     }
   }
