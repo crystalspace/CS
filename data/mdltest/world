@@ -27,23 +27,23 @@ WORLD (
 
   MESHFACT 'test' (
     PLUGIN ('spr3d')
-    FILE (/lev/mdltest/model)
-    MATERIAL ('mosaic')
+    FILE (/lev/mdltest/model.3ds)
+    MATERIAL ('oldmetal')
   )
 
   SECTOR 'room' (
     MESHOBJ 'walls' (
       PLUGIN ('thing')
       PARAMS (
-        MATERIAL ('oldmetal')
-        VERTEX (-5,-5,-5)
-        VERTEX (-5,-5,+5)
-        VERTEX (+5,-5,+5)
-        VERTEX (+5,-5,-5)
-        VERTEX (-5,+5,-5)
-        VERTEX (-5,+5,+5)
-        VERTEX (+5,+5,+5)
-        VERTEX (+5,+5,-5)
+        MATERIAL ('mosaic')
+        VERTEX (-3,-1,-2)
+        VERTEX (-3,-1,+4)
+        VERTEX (+3,-1,+4)
+        VERTEX (+3,-1,-2)
+        VERTEX (-3,+5,-2)
+        VERTEX (-3,+5,+4)
+        VERTEX (+3,+5,+4)
+        VERTEX (+3,+5,-2)
 
         POLYGON (VERTICES (0,1,2,3))
         POLYGON (VERTICES (1,0,4,5))
@@ -54,13 +54,20 @@ WORLD (
       )
       ZFILL ()
     )
-    LIGHT (0,0,0:3,1,1,1,0)
+    LIGHT (-1,4,-1:10,1,0,0,0)
+    LIGHT (2,2,2:10,0,1,0,0)
+    LIGHT (1,0,4:10,0,0,1,0)
+    LIGHT (0,0,0:5,1,1,1,0)
 
     MESHOBJ (
       PLUGIN ('spr3d')
       PARAMS (FACTORY (test))
+      MOVE (
+        MATRIX (-1, 0, 0, 0, 0, 1, 0, 1, 0)
+        V (0, 0.18, 3)
+      )
+      ZUSE ()
     )
-    ZUSE ()
   )
 )
 

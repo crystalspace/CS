@@ -773,10 +773,12 @@ int converter::data_read ( void ) {
 /*
   Read the input file. 
 */
+
+/*
   if ( leqi ( filein_type, "3DS" ) == TRUE ) {
     ierror = tds_read ( filein );
   }
-  else if ( leqi ( filein_type, "ASE" ) == TRUE ) {
+  else */ if ( leqi ( filein_type, "ASE" ) == TRUE ) {
     ierror = ase_read ( filein );
     cor3_2_vertex_rgb ( );
   }
