@@ -69,7 +69,7 @@ The fountain mesh factory loader has no parameters.
 
 @samp{iFountainState} is the @sc{scf} interface that you can
 use to set/get settings for a fountain object. The definition of this
-interface can be found in @file{CS/include/imfount.h} and that's also the
+interface can be found in @file{CS/include/imesh/fountain.h} and that's also the
 include file you need to include in your applications to use this plugin.
 Using this interface you can access the number of particles, the size
 of the particles, and various other fountain parameters.

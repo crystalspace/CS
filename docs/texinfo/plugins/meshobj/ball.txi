@@ -65,7 +65,7 @@ The ball mesh factory loader has no parameters.
 
 @samp{iBallState} is the @sc{scf} interface that you can
 use to set/get settings for a ball object. The definition of this
-interface can be found in @code{include/imball.h} and that's also the
+interface can be found in @code{include/imesh/ball.h} and that's also the
 include file you need to include in your applications to use this plugin.
 Using this interface you can access the material, blending mode (mixmode),
 and radius.

@@ -59,7 +59,7 @@ Implements @samp{iConfig}
 
 @samp{iCubeFactoryState} is the @sc{scf} interface that you can
 use to set/get settings for a cube factory. The definition of this
-interface can be found in @file{CS/include/imcube.h} and that's also the
+interface can be found in @file{CS/include/imesh/cube.h} and that's also the
 include file you need to include in your applications to use this plugin.
 Using this interface you can access the material, blending mode (mixmode),
 and various settings related to the shape of the cube.

@@ -6,13 +6,400 @@
 @cindex @code{iMeshObject}
 @cindex @code{iMeshObjectFactory}
 @cindex @code{iMeshObjectType}
-@cindex @code{iTerrFuncState}
+@cindex @code{iThingState}
+@cindex @code{iPolygonMesh}
+@cindex @code{iVisibilityCuller}
+@cindex @code{iLightingInfo}
+@cindex @code{iThingEnvironment}
 
 @emph{Written by Jorrit Tyberghein,
 (@email{jorrit.tyberghein@@uz.kuleuven.ac.be}).}
 
-@strong{DOCUMENTATION NOT UP-TO-DATE}
-
 This mesh object represents a 'thing' which is a very often used
-geometry object in Crystal Space.
+geometry object in Crystal Space. Things are often used to mark the bounding
+geometry of a sector so that it represents a closed space. Things are not
+very dynamic in nature (although you can have things that move) so they
+are most often used for static geometry.
+
+Things support both polygons and curved surfaces (bezier surfaces only
+at this moment). Things also support portals which means that they can
+be used to define transition polygons between adjacent or non-adjacent
+sectors.
+
+One important aspect of the thing mesh object is that there is no difference
+between a mesh object and a mesh factory. You can create a mesh factory
+and use it as a mesh object.
+
+@subsubheading Basic Structure
+
+The following @sc{scf} class names are used (for @code{CS_LOAD_PLUGIN()}):
+
+@itemize @bullet
+@item
+Type plugin: @samp{crystalspace.mesh.object.thing}
+@item
+Loader plugin: @samp{crystalspace.mesh.loader.thing}
+@item
+Factory loader plugin: @samp{crystalspace.mesh.loader.factory.thing}
+@item
+Plane loader addon plugin: @samp{crystalspace.mesh.loader.thing.plane}
+@item
+Bezier curve loader addon plugin: @samp{crystalspace.mesh.loader.thing.bezier}
+@end itemize
+
+Objects in this plugin implement the following @sc{scf} interfaces (get
+with @code{SCF_QUERY_INTERFACE()}):
+
+@itemize @bullet
+@item
+@emph{MeshObject} and @emph{MeshObjectFactory}
+@itemize @bullet
+@item
+Implements @samp{iMeshObject}
+@item
+Implements @samp{iMeshObjectFactory}
+@item
+Implements @samp{iThingState}
+@item
+Implements @samp{iPolygonMesh}
+@item
+Implements @samp{iVisibilityCuller}
+@item
+Implements @samp{iLightingInfo}
+@end itemize
+@item
+@emph{MeshObjectType}
+@itemize @bullet
+@item
+Implements @samp{iMeshObjectType}
+@item
+Implements @samp{iThingEnvironment}
+@end itemize
+@end itemize
+
+@subsubheading State Interface
+
+Since mesh objects and mesh factories are the same for things there is
+only one state interface.
+
+@samp{iThingState} is the @sc{scf} interface that you can use to
+set/get settings for a thing. The definition of this interface
+can be found in @file{CS/include/imesh/thing/thing.h} and that is also the
+include file you need to include in your applications to use this plugin.
+Using this interface you can access the vertices, polygons, materials,
+curved surfaces, and various other configuration parameters for a thing.
+
+All include files for the thing mesh can be found in the
+@file{CS/include/imesh/thing} directory. There are include files for the
+curve definition, for lightmaps, polygons, portals, ...
+
+@subsubheading Factory and Object Loader
+
+At load time a thing can be constructed from several @dfn{thing parts}.
+At run time these parts will all be combined into one big thing but
+at load time it is sometimes easy to be able to split the thing in parts
+so that you can have a more logical grouping of thing data. The important
+feature of parts is that the vertex table starts from zero again. This means
+that you can define vertices in a part and then use them in polygons in that
+part as if the vertex table starts at 0 again. This is useful because then
+you can more easily add new parts and even move around parts without having
+to change all vertex indices. Note that it is no problem to have duplicate
+vertices between different parts as they will be combined in a post-processing
+pass anyway. The table below describes everything which you can use in a
+single @sc{PART} which is also what you can use in the top level thing
+definition.
+
+@itemize @bullet
+
+@item
+Vertex and polygon definition commands. Note that in a given part the vertex
+table always starts at index 0. Every vertex you add will use a new index.
+@table @code
+@item VERTEX
+Define a single vertex given three coordinates. The coordinates are given
+in local object space for this thing.
+@item V
+Shorthand for @samp{VERTEX}.
+@item VBLOCK
+This is a conveniance command that creates eight vertices shaped in a block.
+You can then easily define polygons that use some of these vertices to form
+one surface of the block. VBLOCK expects six parameters: minx, miny, minz,
+maxx, maxy, maxz. These are the dimensions of the block.
+@item VROOM
+This command is similar to VBLOCK. Except that it will generate the vertices
+in a different order so that later created polygons will
+be visible from the inside instead of the outside.
+@item CIRCLE
+Generate a circle of vertices. The parameters are: @samp{x,y,z,rx,ry,rz,num}.
+@samp{x,y,z} is the centre of the circle. @samp{rx,ry,rz} is the radius of
+the circle. @samp{num} is the number of vertices to generate. If @samp{num}
+is negative the vertices will be generated in a different direction.
+@item POLYGON
+This defines a single polygon using the vertices described above. The
+definition of a polygon is given below.
+@item P
+Shorthand for @samp{POLYGON}.
+@end table
+
+@item
+Curve related commands. Currently only 3x3 bezier patches are supported.
+Note that to use a curve in a thing mesh object you need to describe
+a curve template first (more on this later).
+@table @code
+@item CURVECONTROL
+A control point for a curve. There are 9 control points (for a 3x3
+bezier patch). Every control point has the following format: @samp{x,y,z:u,v}.
+@samp{x,y,z} is the location of the point in object space. @samp{u,v} is
+the texture mapping coordinate for this control point.
+@item CURVECENTER
+Set the center point (@samp{x,y,z}) of the curve.
+@item CURVESCALE
+Set the scale of the curve.
+@item CURVE
+Get the name of the curve template to use for this curve. Read about curve
+templates later.
+@end table
+
+@item
+Material related commands.
+@table @code
+@item MATERIAL
+The default material to use for all following polygons. A polygon can
+still override this.
+@item MAT_SET_SELECT
+Use a set of textures that was defined previously.
+@item TEXLEN
+This is a very general and easy command to control texture mapping on
+a polygon. It basically defines the scale of a texture. If you want more
+control over polygon texture mapping you should look at the texture mapping
+parameters in a polygon. But if you want Quick-And-Dirty texture mapping
+then this command can help you. @samp{TEXLEN} expects a single parameter
+which is a scale. A scale of 1 means that the given texture will be scaled
+once in both directions for 1 unit in world space. A scale of 2 means that
+the given texture will be scaled once in 2 units of world space.
+@end table
+
+@item
+Various other commands.
+@table @code
+@item MOVEABLE
+This command only works for the top-level thing. It indicates that the
+thing can possibly move around. If you don't set this option then it is
+illegal to later move the thing.
+@item VISTREE
+This command only works for the top-level thing. It indicates that this
+thing will have an octree + mini-bsp trees. This is used for visibility
+culling. Usually only big things will have VISTREE and usually there is
+only one thing in a sector which has this flag set. In this case you probably
+want to use the @samp{CULLER} keyword in the sector to indicate that
+this thing is the one containing the visibility culling information.
+@item FASTMESH
+This command only works for the top-level thing. It indicates that this
+mesh will be rendered using a faster technique. At this moment this is
+not properly implemented though.
+@item FACTORY
+This thing will be made from the given thing factory.
+@item TEMPLATE
+Same as @samp{FACTORY}
+@item CLONE
+This is similar to @samp{FACTORY} but the thing will be made from the
+given thing instead. i.e. it is a clone.
+@end table
+@end itemize
+
+A given polygon (inside the @samp{POLYGON} keyword) is defined as
+follows:
+
+@table @code
+@item MATERIAL
+The material to use for this polygon. If not given then the default material
+will be used.
+@item TEXTURE
+This keyword can be used to define additional texture mapping parameters.
+@item LIGHTING
+Should this polygon use lighting or not. By default this is enabled. If
+disabled the texture on this polygon will be rendered using original colors
+(i.e. full-bright texture).
+@item PORTAL
+If you use this keyword then this polygon is a portal to the given sector.
+@item WARP
+This keyword can be used to define additional parameters for the portal.
+More on this later.
+@item SHADING
+This describes the kind of shading to use for this polygon. Possible values
+are: @samp{NONE}, @samp{FLAT}, @samp{GOURAUD}, or @samp{LIGHTMAP}. Default
+is @samp{LIGHTMAP}.
+@item VERTICES
+The vertices of the polygon. This is a list of vertex indices local to the
+part this polygon is in. In combination with the @samp{VBLOCK} or @samp{VROOM}
+commands this command can also contain something with the name: @samp{w},
+@samp{e}, @samp{n}, @samp{s}, @samp{u}, or @samp{d} (for west, east, north,
+south, up, or down). This will then create vertices according to the last
+@samp{VBLOCK} or @samp{VROOM}. Note that there should be no other vertex
+generating command between the @samp{VBLOCK} or @samp{VROOM} and this
+polygon command! You can also give the first index of the @samp{VBLOCK}
+or @samp{VROOM} generated vertices with a notation like this:
+@samp{VERTICES (w,8)}.
+@item V
+Shorthand for @samp{VERTICES}.
+@item UV
+If you use this keyword the polygon will be gouraud shaded and not
+lightmapped. This keyword allows you to describe the uv coordinates
+for the polygon with gouraud shading. Currently a gouraud shaded polygon
+is limited to three vertices. This limitation will be removed in the
+future. But for now it means that UV will be followed by six parameters (three
+u,v coordinate sets).
+@item UVA
+Similar to @samp{UV} but uses another technique to describe the coordinates
+using angle.
+@item COLORS
+When using @samp{UV} you can use this command to give colors (r,g,b) for
+every vertex.
+@item COLLDET
+Enable/disable collision detection for this polygon. By default a normal
+polygon will have collision detection enabled. If the polygon has a portal
+then collision detection will be disabled unless the portal is a mirror in
+which case it will be enabled again. But using @samp{COLLDET} allows you to
+override all this.
+@item COSFACT
+The cosinus factor to use for lighting. The default is 0 which means
+that the strength of the light falling on this polygon will depend
+completely on the angle of the light and this polygon. This is the most
+realistic setting but in some cases it doesn't look right. To completely
+disable dependence on angle you can use 1. In between values are also
+possible.
+@item ALPHA
+Using this you can set the alpha transparency factor of this polygon.
+This is a value between 0 and 100.
+@item MIXMODE
+With this you can control more blending options for the polygon.
+One of @samp{ADD}, @samp{ALPHA}, @samp{COPY}, @samp{KEYCOLOR},
+@samp{MULTIPLY2}, @samp{MULTIPLY}, or @samp{TRANSPARENT}.
+@item LEN
+This is similar to the @samp{TEXLEN} command in the part and also to the
+@samp{LEN} command in the texture definition but it is repeated here
+as a short-hand for @samp{TEXTURE (LEN (...))}.
+@item PLANE
+This is a shorthand for @samp{TEXTURE (PLANE (...))}.
+@end table
+
+A texture mapping specification (the @samp{TEXTURE} keyword in a polygon)
+has the following parameters:
+
+@table @code
+@item ORIG
+The origin for texture mapping (3D coord).
+@item FIRST
+The u-axis coordinate for texture mapping (3D coord).
+@item SECOND
+The v-axis coordinate for texture mapping (3D coord).
+@item FIRST_LEN
+Scale along the u-axis.
+@item SECOND_LEN
+Scale along the v-axis.
+@item UVEC
+Similar to @samp{FIRST} with @samp{FIRST_LEN} set to length
+of vector (@samp{FIRST}-@samp{ORIG}).
+@item VVEC
+Similar to @samp{SECOND} with @samp{SECOND_LEN} set to length
+of vector (@samp{SECOND}-@samp{ORIG}).
+@item MATRIX
+Most general way to describe texture mapping using the transformation matrix.
+@item V
+Most general way to describe texture mapping using the transformation vector.
+@item LEN
+Use this as an easier way to describe texture scale (i.e. instead
+of all the above).
+@item UV
+Directly specify u,v mapping coordinates for three given vertices. Syntax
+is: @samp{idx1,u1,v1,idx2,u2,v2,idx3,u3,v3}.
+@item UV_SHIFT
+Given the mapping described above, further shift with the given
+u,v shift value.
+@item PLANE
+Use the given texture mapping plane instead of all the above.
+See how to define planes later.
+@end table
+
+The @samp{WARP} keyword as used in a polygon has the following keywords:
+
+@table @code
+@item MATRIX
+The matrix to use for space warping the portal.
+@item V
+The vector to use for space warping before the matrix is applied.
+@item W
+The vector to use for space warping after the matrix is applied. If not
+given this is the same as @samp{V}.
+@item MIRROR
+Short-hand to generate a mirror portal. This will automatically calculate
+@samp{MATRIX}, @samp{V}, and @samp{W}.
+@item STATIC
+When this item is given the portal destination will be static. This means
+that the portal will point to the same location even if the portal polygon
+moves. Otherwise the portal destination will move accordingly.
+@item ZFILL
+Set this option on a portal that floats in the middle of a room. It will
+make sure that the Z-buffer is filled AFTER rendering all objects seen
+through the portal.
+@item CLIP
+Set this option on a portal that points to the middle of a room. It will
+make sure that all geometry in the destination sector is correctly clipped
+to the portal so that it is not rendered in this sector.
+@end table
+
+@subsubheading Plane Add-on Loader
+
+The thing loader plugin also supports an additional plugin which can load
+plane definitions. A plane definition is used for texture mapping. It is
+an optional (but very useful) feature which allows you to define texture
+mapping planes for polygons that share the same texture mapping.
+
+The following keywords are supported by the plane loader:
+
+@table @code
+@item NAME
+The name of this plane. This can then be used later in @samp{PLANE} commands
+for the texture or polygon.
+@item ORIG
+The origin for texture mapping (3D coord).
+@item FIRST
+The u-axis coordinate for texture mapping (3D coord).
+@item SECOND
+The v-axis coordinate for texture mapping (3D coord).
+@item FIRST_LEN
+Scale along the u-axis.
+@item SECOND_LEN
+Scale along the v-axis.
+@item UVEC
+Similar to @samp{FIRST} with @samp{FIRST_LEN} set to length
+of vector (@samp{FIRST}-@samp{ORIG}).
+@item VVEC
+Similar to @samp{SECOND} with @samp{SECOND_LEN} set to length
+of vector (@samp{SECOND}-@samp{ORIG}).
+@item MATRIX
+Most general way to describe texture mapping using the transformation matrix.
+@item V
+Most general way to describe texture mapping using the transformation vector.
+@end table
+
+@subsubheading Bezier Curve Add-on Loader
+
+The thing loader also supports an additional plugin which can load curve
+template definitions.
+
+The following keywords are supported by the bezier curve loader:
+
+@table @code
+@item NAME
+The name of this curve template. This can then be used later in @samp{CURVE}
+commands in the thing part definition.
+@item MATERIAL
+The material to use for this curve.
+@item VERTICES
+Nine vertex indices (the exact position and texture mapping coordinate will
+be defined in the thing mesh object using @samp{CURVECONTROL}).
+@item V
+Shorthand for @samp{VERTICES}.
+@end table
 

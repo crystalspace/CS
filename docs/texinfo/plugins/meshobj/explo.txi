@@ -69,7 +69,7 @@ The fountain mesh factory loader has no parameters.
 
 @samp{iExplosionState} is the @sc{scf} interface that you can
 use to set/get settings for an explosion object. The definition of this
-interface can be found in @file{CS/include/imexplo.h} and that's also the
+interface can be found in @file{CS/include/imesh/explode.h} and that's also the
 include file you need to include in your applications to use this plugin.
 Using this interface you can access the number of particles, the size
 of the particles, and various other explosion parameters.

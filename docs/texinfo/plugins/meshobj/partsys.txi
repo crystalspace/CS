@@ -19,10 +19,10 @@ a particle system in particular.
 
 @samp{iParticleState} is the @sc{scf} interface that you can
 use to set/get settings for a particle system in general. The definition of
-this interface can be found in @file{CS/include/impartic.h} and that's also the
-include file you need to include in your applications to use particle system
-plugins. Using this interface you can access the material, blending mode
-(mixmode), color, and various other parameters.
+this interface can be found in @file{CS/include/imesh/partsys.h} and that's
+also the include file you need to include in your applications to use
+particle system plugins. Using this interface you can access the material,
+blending mode (mixmode), color, and various other parameters.
 
 @subsubheading Object Loader
 

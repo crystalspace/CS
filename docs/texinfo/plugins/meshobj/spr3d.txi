@@ -61,7 +61,7 @@ Implements @samp{iMeshObjectFactory}
 Implements @samp{iSprite3DFactoryState}
 @end itemize
 @item
-@emph{MeshObjectFactory}
+@emph{MeshObjectType}
 @itemize @bullet
 @item
 Implements @samp{iMeshObjectType}
@@ -74,20 +74,21 @@ Implements @samp{iConfig}
 
 @samp{iSprite3DFactoryState} is the @sc{scf} interface that you can
 use to set/get settings for a 3D Sprite factory. The definition of this
-interface can be found in @file{CS/include/imspr3d.h} and that is also the
-include file you need to include in your applications to use this plugin.
+interface can be found in @file{CS/include/imesh/sprite3d.h} and that is
+also the include file you need to include in your applications to use this
+plugin.
 Using this interface you can access the material, triangles, vertices, texture
 coordinates, normals, frames, actions, skeletal structure, and various
 other configuration parameters for a 3D sprite factory.
 
 For frame based animation you need to access the @samp{iSpriteFrame} and
-@samp{iSpriteAction} interfaces (defined in @file{CS/include/imspr3d.h})
+@samp{iSpriteAction} interfaces (defined in @file{CS/include/imesh/sprite3d.h})
 and for skeletal animation you need to work with @samp{iSkeletonLimb},
 @samp{iSkeletonConnection}, and @samp{iSkeleton} (defined in
-@file{CS/include/iskel.h}).  Note that you will also have to setup one frame if
-you use skeletal animation.  This frame defines the default setup of the sprite
-if the skeleton is at rest (i.e. all transformations in the skeleton
-connectors are identity transformations).
+@file{CS/include/imesh/skeleton.h}).  Note that you will also have to
+setup one frame if you use skeletal animation.  This frame defines the
+default setup of the sprite if the skeleton is at rest (i.e. all
+transformations in the skeleton connectors are identity transformations).
 
 @subsubheading Factory Loader
 
@@ -132,14 +133,14 @@ parent (cannot be used on the top level).
 
 @samp{iSprite3DState} is the @sc{scf} interface that you can
 use to set/get settings for a 3D Sprite object. The definition of this
-interface can be found in @file{CS/include/imspr3d.h} and that's also the
+interface can be found in @file{CS/include/imesh/sprite3d.h} and that's also the
 include file you need to include in your applications to use this plugin.
 Using this interface you can access the material, blending mode (mixmode),
 current frame and action, current skeletal animation state, and various
 other configuration parameters for a 3D sprite object.
 
 The state of a skeleton is described via the following interfaces which are
-defined in @file{CS/include/imspr3d.h}:
+defined in @file{CS/include/imesh/sprite3d.h}:
 
 @itemize @bullet
 @item
@@ -181,3 +182,4 @@ Set the sprite level-of-detail (@sc{lod}) level.
 @item sprlq
 Set the sprite lighting quality.
 @end table
+

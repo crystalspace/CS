@@ -70,7 +70,7 @@ The fountain mesh factory loader has no parameters.
 
 @samp{iSpiralState} is the @sc{scf} interface that you can
 use to set/get settings for an spiral object. The definition of this
-interface can be found in @file{CS/include/imspiral.h} and that's also the
+interface can be found in @file{CS/include/imesh/spiral.h} and that's also the
 include file you need to include in your applications to use this plugin.
 Using this interface you can access the number of particles and the
 source of the spiral.

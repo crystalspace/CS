@@ -25,6 +25,7 @@ there you can always email the mailing lists. @xref{FAQ}, or
 
 @menu
 * HowToRead:: How To Read This Manual
+* DocGuide:: A Guide to This Documentation
 * Current Status::
 * UsingForProject:: Using Crystal Space For Your Project
 * Feature List::
@@ -39,6 +40,7 @@ there you can always email the mailing lists. @xref{FAQ}, or
 @end menu
 
 @imports{intro,foreword.txi}
+@imports{intro,guide.txi}
 @imports{intro,features.txi}
 @imports{intro,resource.txi}
 @imports{intro,feedback.txi}

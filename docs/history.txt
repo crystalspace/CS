@@ -1,5 +1,11 @@
 The history order is reversed so that new features are at the top.
 
+22-Nov-2001
+	- Further work on documentation. Created a 'Documentation Guide'
+	  section which guides the CS game writer through some of the more
+	  useful sections in the documentation.
+	- Fixed a few errors throughout the mesh object documentation.
+	- Fully updated the 'thing mesh object' documentation.
 21-Nov-2001
 	- Worked a bit on documentation. The 'intro' section in the
 	  tutorials was heavily outdated. It was still referring to
