@@ -55,7 +55,7 @@ SCF_VERSION (iCamera, 0, 2, 0);
  *      camera. The position should be inside the home sector.
  * <li> Field of View: Controls the size on screen of the rendered objects and
  *      can be used for zooming effects. The FOV can be given either in pixels
- *      or as an angle in radians.
+ *      or as an angle in degrees.
  * <li> Shift amount: The projection center in screen coordinates.
  * <li> Mirrored Flag: Should be set to true if the transformation is mirrored.
  * <li> Far Plane: A distant plane that is orthogonal to the view direction. It
@@ -76,7 +76,7 @@ struct iCamera : public iBase
   virtual int GetFOV () const = 0;
   /// Return the inverse flield of view (1/FOV) in pixels
   virtual float GetInvFOV () const = 0;
-  /// Return the FOV (field of view) in radians
+  /// Return the FOV (field of view) in degrees.
   virtual float GetFOVAngle () const = 0;
 
   /**
@@ -85,7 +85,7 @@ struct iCamera : public iBase
    */
   virtual void SetFOV (int fov, int width) = 0;
   /**
-   * Set the FOV in radians. 'fov' is the desired FOV in radians. 'width' is
+   * Set the FOV in radians. 'fov' is the desired FOV in degrees. 'width' is
    * the display width in pixels.
    */
   virtual void SetFOVAngle (float fov, int width) = 0;
