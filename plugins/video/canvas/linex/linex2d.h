@@ -133,6 +133,9 @@ class csLineX2DFontServer : public iFontServer
     virtual bool GetGlyphSize (uint8 c, int &oW, int &oH, int &adv, int &left, int &top);
     virtual uint8 *GetGlyphBitmap (uint8 c, int &oW, int &oH);
     virtual uint8 *GetGlyphBitmap (uint8 c, int &oW, int &oH, int &adv, int &left, int &top);
+    virtual uint8 *GetGlyphAlphaBitmap (uint8 c, int &oW, int &oH);
+    virtual uint8 *GetGlyphAlphaBitmap (uint8 c, int &oW, int &oH, int &adv,
+  	int &left, int &top);
     virtual void GetDimensions (const char *text, int &oW, int &oH);
     virtual void GetDimensions (const char *text, int &oW, int &oH, int &desc);
     virtual void GetDimensions (const char *text, int &oW, int &oH, int &, int &, int &);
