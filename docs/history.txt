@@ -26,6 +26,31 @@ chronological order.
 	- Eric Sunshine relocated the remaining const/non-const-disambiguating
 	  %ignores from javapre.i to cspace.i. They are sufficiently general
 	  that they can be applied to all supported scripting interfaces.
+	- Eric Sunshine fixed crasher in csjava's CS.requestPlugin() where it
+	  was incorrectly invoking the do-nothing constructor of
+	  csPluginRequestArray which did not even create the underlying C++
+	  object. Therefore, later method invocations on that object crashed.
+	- Eric Sunshine fixed nasty bug in csjava's <iface/iface_ver> typemap
+	  (javapost.i) where it incorrectly used the full JNI class name when
+	  it should have extracted just the SCF interface name. This resulted
+	  in several serious problems. First, it invoked iBase::DynamicCast()
+	  with the full JNI name, despite the fact that DynamicCast() expects
+	  only the SCF interface name; thus all such invocations
+	  failed. Second, other code which tried to reconstruct the JNI name
+	  from the interface name would produce incorrect names such as
+	  com/crystalspace/com/crystalspace/iVFS. These incorrect names led to
+	  crashes later when the "out" typemap tried invoking methods upon the
+	  non-existent class mentioned by the incorrect JNI name.  In practice,
+	  this caused all query macros (CS_QUERY_REGISTRY, SCF_QUERY_INTERFACE,
+	  etc.) to crash and burn.
+	- Eric Sunshine fixed bug in csjava where it was invoking the plugin
+	  manager's RequestPlugin() method once per desired plugin, rather than
+	  one only with a single list of all desired plugins. This prevented
+	  the plugin manager from performing proper dependency resolution
+	  between plugins at load time. Toward this end, renamed
+	  CS.requestPlugin() to CS.requestPlugins(). It now accepts a
+	  java.util.Vector filled with csPluginRequest objects, rather than
+	  accepting only a single plugin name and interface.
 22-Sep-2004
 	- Jorrit changed the loader so that it only prints certain
 	  notifications if -verbose is given on the commandline. These

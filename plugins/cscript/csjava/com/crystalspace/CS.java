@@ -20,6 +20,8 @@
 package com.crystalspace;
 
 import com.crystalspace.csPluginRequest;
+import java.util.Enumeration;
+import java.util.Vector;
 
 public class CS extends cspace
 {
@@ -48,20 +50,13 @@ public class CS extends cspace
         }
     }
 
-    // handy
-    protected static boolean requestPlugin (String name, String intf)
+    public static boolean requestPlugins (Vector plugins)
     {
-        int intfVersion = 0;
-        long intfID = (long) iSCF.getSCF().GetInterfaceID(intf);
-
-	csPluginRequestArray arr = new csPluginRequestArray();
-        arr.Push(new csPluginRequest(
-	    new csString(name), new csString(intf), intfID, intfVersion));
-
-	boolean result =
-	    csInitializer._RequestPlugins(getTheObjectRegistry(), arr); 
-        System.out.println("Loading " + name + "? " + result);
-        return result;
+	csPluginRequestArray arr = new csPluginRequestArray(0,0);
+	Enumeration e = plugins.elements();
+	while (e.hasMoreElements())
+	    arr.Push((csPluginRequest)e.nextElement());
+	return csInitializer._RequestPlugins(getTheObjectRegistry(), arr);
     }
 
     // CS_VEC_* constants
@@ -77,5 +72,4 @@ public class CS extends cspace
     public static csVector3 CS_VEC_TILT_LEFT = new csVector3(0,0,1);
     public static csVector3 CS_VEC_TILT_UP = new csVector3(-1,0,0);
     public static csVector3 CS_VEC_TILT_DOWN = new csVector3(1,0,0);
-
 };

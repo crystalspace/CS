@@ -42,7 +42,7 @@
     const char * dot = strrchr(s, '.');
     strcpy(className, "com/crystalspace/");
     strcat(className, dot?dot+1:s);
-    $1 = className;
+    $1 = className + sizeof("com/crystalspace/") - 1;
     jenv->ReleaseStringUTFChars($input, s);
     jclass cls = jenv->FindClass(className);
     jmethodID mid = jenv->GetStaticMethodID(cls, "scfGetVersion", "()I");

@@ -18,6 +18,7 @@
 */
 
 import com.crystalspace.*;
+import java.util.Vector;
 
 class EventHandler extends csJEventHandler
 {
@@ -148,14 +149,25 @@ class SimpleRoom extends CS
 	    System.out.println("Creating Environment...");
 	    iObjectRegistry object_reg = csInitializer.CreateEnvironment(args);
 	    setTheObjectRegistry(object_reg);
+
 	    boolean result;
 	    System.out.println("Requesting Plugins...");
-	    result = requestPlugin("crystalspace.kernel.vfs", "iVFS");
-	    result = requestPlugin("crystalspace.graphics3d.opengl", "iGraphics3D");
-	    result = requestPlugin("crystalspace.engine.3d", "iEngine");
-	    result = requestPlugin("crystalspace.graphic.image.io.multiplex", "iImageIO");
-	    result = requestPlugin("crystalspace.level.loader", "iLoader");
-	    result = requestPlugin("crystalspace.font.server.default", "iFontServer");
+	    {
+		Vector plugins = new Vector();
+		plugins.addElement(new csPluginRequest(
+                  "crystalspace.kernel.vfs", "iVFS"));
+		plugins.addElement(new csPluginRequest(
+                  "crystalspace.graphics3d.null", "iGraphics3D"));
+		plugins.addElement(new csPluginRequest(
+                  "crystalspace.graphic.image.io.multiplex", "iImageIO"));
+		plugins.addElement(new csPluginRequest(
+                  "crystalspace.font.server.default", "iFontServer"));
+		plugins.addElement(new csPluginRequest(
+                  "crystalspace.engine.3d", "iEngine"));
+		plugins.addElement(new csPluginRequest(
+                  "crystalspace.level.loader", "iLoader"));
+		result = requestPlugins(plugins);
+	    }
 
 	    System.out.println("Opening application...");
 	    result = csInitializer.OpenApplication(object_reg);

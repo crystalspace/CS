@@ -76,6 +76,15 @@
 %rename(bitOrAssign) *::operator|=;
 %rename(bitXorAssign) *::operator^=;
 
+// cstool/initapp.h
+%extend csPluginRequest
+{
+  csPluginRequest(char const* cls, char const* intf)
+  {
+    return new csPluginRequest(cls, intf, iSCF::SCF->GetInterfaceID(intf), 0);
+  }
+}
+
 // csgeom/transfrm.h
 %rename(mul2) csTransform::operator * (const csReversibleTransform &);
 #ifndef CS_MINI_SWIG
