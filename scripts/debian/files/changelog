@@ -1,3 +1,10 @@
+crystalspace (0.94-20020502-1) unstable; urgency=low
+
+  * New snapshot
+  * Updated description in control file (Closes: bug#145225)
+
+ -- Christian Bayle <bayle@aist.enst.fr>  Wed, 13 Feb 2002 08:31:56 +0100
+
 crystalspace (0.94-20020412-3) unstable; urgency=low
 
   * I completly missed version numbering to 2001 instead of 2002 
