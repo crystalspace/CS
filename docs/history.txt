@@ -64,6 +64,7 @@ The history order is reversed so that new features are at the top.
 	  Not all usages could be removed however. The ones that were removed
 	  now were the easy ones.
 	- Eric Sunshine eliminated the unmaintained and broken cslua module.
+	- Oktal added a Jamfile to the PicoGUI test app.
 27-May-2003
 	- Boyan made the following changes:
 	    - Fixed kyboard focusing component bug in AWS 

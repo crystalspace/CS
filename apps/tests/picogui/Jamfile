@@ -1,0 +1,9 @@
+SubDir TOP apps tests picogui ;
+
+Application pgtest
+	: pgtest.cpp
+;
+LinkWith pgtest : csgeom csgfx cssys cstool csutil ;
+
+Help pgtesttest : "Crystal Space PicoGUI test" ;
+
