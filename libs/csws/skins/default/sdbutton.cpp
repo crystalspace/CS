@@ -231,12 +231,12 @@ void csDefaultButtonSkin::Draw (csComponent &This)
   // Draw text
   if (text)
   {
-    if (!This.GetDrawTextOnHighlightOnly() ||
-        (This.GetDrawTextOnHighlightOnly() && (This.Highlighted || This.Pressed)))
-   {    
+//redeye    if (!This.GetDrawTextOnHighlightOnly() ||
+//        (This.GetDrawTextOnHighlightOnly() && (This.Highlighted || This.Pressed)))
+//   {    
       This.Text (txtx, txty, This.GetState (CSS_DISABLED) ? CSPAL_BUTTON_DTEXT :
       	(This.Highlighted ?  CSPAL_BUTTON_LIGHT3D : CSPAL_BUTTON_TEXT), -1, text);
-   }
+//redeye   }
       
     if (!This.GetState (CSS_DISABLED))
       This.DrawUnderline (txtx, txty, text, This.GetUnderlinePos (), CSPAL_BUTTON_TEXT);

@@ -36,7 +36,7 @@ csButton::csButton (csComponent *iParent, int iCommandCode,
   delImages (false), delFrameImages(false),
   CommandCode (iCommandCode), underline_pos (-1),
   ButtonStyle (iButtonStyle), FrameStyle (iFrameStyle),
-  ButtonAlpha(0), Pressed (false), Highlighted (false), DrawTextOnHighlightOnly(false)
+  ButtonAlpha(0), Pressed (false), Highlighted (false), DrawTextOnHighlightOnly (false)
 {
   SetPalette (CSPAL_BUTTON);
   if (ButtonStyle & CSBS_SELECTABLE)
