@@ -6,6 +6,10 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+8-Sep-2004
+	- Jorrit fixed a bug in all particle systems that depend on
+	  csNewParticleSystem (rain and fountain). 'camera_origin' was
+	  not set which could lead to bad back-to-front sorting for them.
 6-Sep-2004
 	- Eric Sunshine upgraded the ODE "sufficiently recent" check in
 	  configure.ac so that it demands version 0.5. Also added a check to
@@ -62,7 +66,7 @@ chronological order.
 	  portals too).
 	- Jorrit added functionality in bugplug to test this new routine
 	  in case the third mouse button is pressed.
-	- Jorrit changed walktest to also  register the iCollideSystem to
+	- Jorrit changed walktest to also register the iCollideSystem to
 	  the object registry.
 	- Jorrit fixed csString::DeleteAt() so it no longer tries to do
 	  something in case iCount == 0.

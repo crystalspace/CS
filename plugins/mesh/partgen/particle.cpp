@@ -554,6 +554,7 @@ csRenderMesh **csNewParticleSystem::GetRenderMeshes (int &num,
   rm->material = Material;
   CS_ASSERT (Material != 0);
   rm->object2camera = csReversibleTransform ();
+  rm->camera_origin = vertices[0];
   rm->camera_transform = &camera->GetTransform();
  
   num = 1;
