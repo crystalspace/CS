@@ -8,6 +8,8 @@ The history order is reversed so that new features are at the top.
 	  Added an assert to protect for future equivalent bugs.
 	- Fixed a bad bug in cs2xml which I introduced yesterday.
 	- The parsing of LEN now actually works with cs2xml.
+	- Anders Stenberg added actual support for different meshtypes 
+	  in new renderer. (Triangle strips, quads, points, lines, etc.)
 7-Feb-2003
 	- Fixed levtool so that by default it now gives usage information
 	  instead of the -list option. That way people will not forget

@@ -726,7 +726,7 @@ bool csGLRender3D::Open ()
   shadermgr->AddVariable(shvar_light_0_attenuation);
 
 
-  if ( ext.CS_GL_NV_vertex_array_range && ext.CS_GL_NV_fence)
+  if (ext.CS_GL_NV_vertex_array_range && ext.CS_GL_NV_fence)
   {
     csVARRenderBufferManager * bm = new csVARRenderBufferManager();
     bm->Initialize(this);
@@ -1000,6 +1000,32 @@ void csGLRender3D::DrawMesh(csRenderMesh* mymesh)
                 mymesh->clip_z_plane);
 
   SetZMode (mymesh->z_buf_mode);
+  GLenum primitivetype;
+  switch (mymesh->GetType ())
+  {
+  case csRenderMesh::MESHTYPE_QUADS:
+    primitivetype = GL_QUADS;
+    break;
+  case csRenderMesh::MESHTYPE_TRIANGLESTRIP:
+    primitivetype = GL_TRIANGLE_STRIP;
+    break;
+  case csRenderMesh::MESHTYPE_TRIANGLEFAN:
+    primitivetype = GL_TRIANGLE_FAN;
+    break;
+  case csRenderMesh::MESHTYPE_POINTS:
+    primitivetype = GL_POINTS;
+    break;
+  case csRenderMesh::MESHTYPE_LINES:
+    primitivetype = GL_LINES;
+    break;
+  case csRenderMesh::MESHTYPE_LINESTRIP:
+    primitivetype = GL_LINE_STRIP;
+    break;
+  case csRenderMesh::MESHTYPE_TRIANGLES:
+  default:
+    primitivetype = GL_TRIANGLES;
+    break;
+  }
 
   switch (current_shadow_state)
   {
@@ -1090,7 +1116,7 @@ void csGLRender3D::DrawMesh(csRenderMesh* mymesh)
     {
       tech->GetPass(currp)->Activate(mymesh);
       glDrawElements (
-      GL_TRIANGLES,
+      primitivetype,
       mymesh->GetIndexEnd ()-mymesh->GetIndexStart (),
       GL_UNSIGNED_INT,
       ((unsigned int*)indexbuf->Lock(iRenderBuffer::CS_BUF_LOCK_RENDER))
@@ -1140,7 +1166,7 @@ void csGLRender3D::DrawMesh(csRenderMesh* mymesh)
     }
 
     glDrawElements (
-      GL_TRIANGLES,
+      primitivetype,
       mymesh->GetIndexEnd ()-mymesh->GetIndexStart (),
       GL_UNSIGNED_INT,
       ((unsigned int*)indexbuf->Lock(iRenderBuffer::CS_BUF_LOCK_RENDER))
@@ -1188,7 +1214,7 @@ void csGLRender3D::DrawMesh(csRenderMesh* mymesh)
         glLoadMatrixf (scalematrix);
 
         glDrawElements (
-          GL_TRIANGLES,
+          primitivetype,
           mymesh->GetIndexEnd ()-mymesh->GetIndexStart (),
           GL_UNSIGNED_INT,
           ((unsigned int*)indexbuf->Lock(iRenderBuffer::CS_BUF_LOCK_RENDER))
