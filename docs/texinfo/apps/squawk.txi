@@ -62,14 +62,6 @@ Look right.
 Roll left.
 @item DELETE
 Roll right.
-@item HOME
-Look up and left.
-@item END
-Look down and left.
-@item PGUP
-Look up and right.
-@item PGDN
-Look down and right.
 @end table
 
 @noindent
@@ -79,7 +71,7 @@ These keys control the Lower left view:
 @item w
 Look up.
 @item s
-Look down (also key @kbd{x}).
+Look down.
 @item a
 Look left.
 @item d
@@ -88,14 +80,6 @@ Look right.
 Roll left.
 @item f
 Roll right.
-@item q
-Look up and left.
-@item z
-Look down and left.
-@item e
-Look up and right.
-@item c
-Look down and right.
 @end table
 
 @noindent
@@ -105,7 +89,7 @@ These keys control the lower right view:
 @item i
 Look up.
 @item k
-Look down (also key @kbd{,}).
+Look down.
 @item j
 Look left.
 @item l
@@ -114,14 +98,6 @@ Look right.
 Roll left.
 @item h
 Roll right.
-@item u
-Look up and left.
-@item m
-Look down and left.
-@item o
-Look up and right.
-@item . @r{(period)}
-Look down and right.
 @end table
 
 @subheading To-Do List
@@ -134,13 +110,9 @@ Controls
 
 @itemize @minus
 @item
-Better keyboard and mouse handling
+Mouse, joystick, and gamepad control
 @item
-Multiple controls that can be used simultaneously
-@item
-Control character rather than camera
-@item
-Gamepad and Joystick support
+Controllable characters
 @item
 Chase cameras that follow characters
 @end itemize
