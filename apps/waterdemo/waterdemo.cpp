@@ -507,21 +507,21 @@ bool csWaterDemo::Initialize ()
   csRef<iImage> img;
 
 
-  img = loader->LoadImage ("/this/data/cube/cubemap_rt.jpg");
+  img = loader->LoadImage ("/lib/cubemap/cubemap_rt.jpg");
   imgvec->AddImage (img);
-  img = loader->LoadImage ("/this/data/cube/cubemap_lf.jpg");
+  img = loader->LoadImage ("/lib/cubemap/cubemap_lf.jpg");
   imgvec->AddImage (img);
 
  
 
-  img = loader->LoadImage ("/this/data/cube/cubemap_up.jpg");
+  img = loader->LoadImage ("/lib/cubemap/cubemap_up.jpg");
   imgvec->AddImage (img);
-  img = loader->LoadImage ("/this/data/cube/cubemap_dn.jpg");
+  img = loader->LoadImage ("/lib/cubemap/cubemap_dn.jpg");
   imgvec->AddImage (img);
 
-  img = loader->LoadImage ("/this/data/cube/cubemap_fr.jpg");
+  img = loader->LoadImage ("/lib/cubemap/cubemap_fr.jpg");
   imgvec->AddImage (img);
-  img = loader->LoadImage ("/this/data/cube/cubemap_bk.jpg");
+  img = loader->LoadImage ("/lib/cubemap/cubemap_bk.jpg");
   imgvec->AddImage (img);
 
 
