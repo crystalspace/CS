@@ -181,7 +181,7 @@ public:
   virtual int GetNumFonts ()
   { return font.xfont ? 1 : 0; }
   virtual iFont *GetFont (int iIndex)
-  { (void)iIndex; return font.xfont ? &font : NULL; }
+  { (void)iIndex; return font.xfont ? &font : (iFont*)NULL; }
 };
 
 #endif // __LINEX2D_H__
