@@ -195,7 +195,7 @@ int main (int argc, char * argv[])
                " -r x y z  Relocate objects (x,y,z = floats)\n"
 	       " -s x y t  Scale objects (x,y,z = floats)\n"
                " -pl       Make polygons lit\n"
-               " -3        Output 3D sprite instead of level\n"
+               " -3 name   Output 3D sprite instead of level\n"
 	       " -tl       Make texture origin lower left (default)\n"
 	       " -b	   Use clearzbuf and clearscreen settings\n"
 	       " -xyz      Convert model xyz -> CS xyz\n"
@@ -373,6 +373,12 @@ int main (int argc, char * argv[])
     document = writer.WriteSprite(spritename);
   else
     document = writer.WriteDocument();
+
+  if(!document)
+  {
+    fprintf(stderr, "Problem creating document.\n");
+    exit(1);
+  }
   
   iString* str = new scfString;
   document->Write (str);
