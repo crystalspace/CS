@@ -8,5 +8,5 @@ Library csplugincommon_w32 :
   [ Wildcard
     [ ConcatDirs $(DOTDOT) $(DOTDOT) include csplugincommon win32 ] : *.h ]
   : shared ;
-LinkWith csplugincommon_w32 : csplugincommon csgfx csutil ;
+LibDepends csplugincommon_w32 : csplugincommon csgfx csutil ;
 }

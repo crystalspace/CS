@@ -8,6 +8,6 @@ Library csplugincommon_dx :
   [ Wildcard
     [ ConcatDirs $(DOTDOT) $(DOTDOT) include csplugincommon directx ] : *.h ]
   : shared ;
-LinkWith csplugincommon_dx : csplugincommon csgfx csutil ;
+LibDepends csplugincommon_dx : csplugincommon csgfx csutil ;
 ExternalLibs csplugincommon_dx : DIRECTX ;
 }

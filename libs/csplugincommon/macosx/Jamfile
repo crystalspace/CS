@@ -8,5 +8,5 @@ Library csplugincommon_osx :
   [ Wildcard
     [ ConcatDirs $(DOTDOT) $(DOTDOT) include csplugincommon macosx ] : *.h ]
   : shared ;
-LinkWith csplugincommon_osx : csplugincommon csgfx csutil ;
+LibDepends csplugincommon_osx : csplugincommon csgfx csutil ;
 }

@@ -8,6 +8,6 @@ Library csplugincommon_ogl :
   [ Wildcard
     [ ConcatDirs $(DOTDOT) $(DOTDOT) include csplugincommon opengl ] : *.h ]
   : shared ;
-LinkWith csplugincommon_ogl : csplugincommon csgfx csutil ;
+LibDepends csplugincommon_ogl : csplugincommon csgfx csutil ;
 ExternalLibs csplugincommon_ogl : GL ;
 }

@@ -57,6 +57,10 @@ chronological order.
 	  the files "/a/foo" and "/b/bar", they would be sorted into ("/a/foo",
 	  "/b/bar"), and then the prefixes would be stripped, giving ("foo",
 	  "bar"), which is improperly sorted.
+	- Eric Sunshine fixed the csplugincommon DirectX, MacOS/X, OpenGL, and
+	  Win32 sub-Jamfiles to correctly use LibDepends instead of
+	  LinkWith. This fixes dependency problems in the generated project
+	  files.
 1-Mar-2005
 	- res fixed the use of 'return' in a void method in glrender3d.cpp.
 	- Marten fixed a bug related to attenuation of lights in r3dtest. 
