@@ -705,13 +705,10 @@ int WINAPI WinMain (HINSTANCE hInstance, HINSTANCE hPrevInstance,
   (void)lpCmdLine;
   (void)hPrevInstance;
 
-  int return_value;
-
+  return
 #ifdef COMP_BC
-  return_value=csMain ( _argc,  _argv);
+    csMain ( _argc,  _argv);
 #else
-  return_value=csMain (__argc, __argv);
+    csMain (__argc, __argv);
 #endif
-
-  return return_value;
 }
