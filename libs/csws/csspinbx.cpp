@@ -210,7 +210,9 @@ bool csSpinBox::HandleEvent (csEvent &Event)
           } /* endif */
           break;
       } /* endswitch */
-      return true;
+      if ((Event.Key.Code >= ' ') && (Event.Key.Code <= 255))
+        return true;
+      break;
     case csevKeyUp:
       switch (Event.Key.Code)
       {
@@ -224,7 +226,9 @@ bool csSpinBox::HandleEvent (csEvent &Event)
           } /* endif */
           break;
       } /* endswitch */
-      return true;
+      if ((Event.Key.Code >= ' ') && (Event.Key.Code <= 255))
+        return true;
+      break;
   } /* endswitch */
   return csInputLine::HandleEvent (Event);
 }

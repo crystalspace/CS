@@ -116,13 +116,19 @@ bool csDialog::HandleEvent (csEvent &Event)
           break;
         case CSKEY_LEFT:
         case CSKEY_UP:
-          SetFocused (PrevControl ());
-          return true;
+          if ((Event.Key.ShiftKeys & CSMASK_ALLSHIFTS) == 0)
+          {
+            SetFocused (PrevControl ());
+            return true;
+          }
           break;
         case CSKEY_RIGHT:
         case CSKEY_DOWN:
-          SetFocused (NextControl ());
-          return true;
+          if ((Event.Key.ShiftKeys & CSMASK_ALLSHIFTS) == 0)
+          {
+            SetFocused (NextControl ());
+            return true;
+          }
           break;
         case CSKEY_ENTER:
           if ((Event.Key.ShiftKeys & CSMASK_ALLSHIFTS) == 0)

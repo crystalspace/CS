@@ -69,7 +69,7 @@ enum
    */
   cscmdScrollBarGetStatus,
   /**
-   * Scroll bar value changed
+   * Scroll bar value changed (parent notification)
    * <pre>
    * IN: (csScrollBar *)source
    * </pre>
@@ -117,7 +117,7 @@ public:
   csScrollBar (csComponent *iParent, csScrollBarFrameStyle iFrameStyle = cssfsThickRect);
 
   /// Destroy the scroll bar
-  ~csScrollBar ();
+  virtual ~csScrollBar ();
 
   /// Draw the scrollbar
   virtual void Draw ();

@@ -70,6 +70,8 @@ protected:
   int LoopLevel;
   /// The code that dialog passed to Dismiss ()
   int DismissCode;
+  /// This is equal to 8 if any of physical r,g,b masks is 0xff000000
+  int PhysColorShift;
 
   /// Set up initial application layout (read configs, create windows, menus etc)
   virtual bool InitialSetup (int argc, char *argv[],
@@ -77,7 +79,7 @@ protected:
 
 public:
   /// Application's adaptive palette
-  int Pal[cs_Color_Last];
+  int Pal [cs_Color_Last];
   /// The component that captured the mouse
   csComponent *MouseOwner;
   /// The component that captured the keyboard
@@ -208,21 +210,28 @@ public:
  * are deferred until Update () is called.
  */
 
+  /// Return a color identifier given R,G,B (each 0..255)
+  int FindColor (int r, int g, int b);
+
+  /// Convert a logical color into physical
+  int pplColor (int color)
+  { return color & 0x80000000 ? (color & 0x7fffffff) << PhysColorShift : Pal [color]; }
+
   /// Draw a box
   void pplBox (int x, int y, int w, int h, int color)
-  { GfxPpl->Box (x, y, w, h, Pal [color]); }
+  { GfxPpl->Box (x, y, w, h, pplColor (color)); }
 
   /// Draw a line
   void pplLine (float x1, float y1, float x2, float y2, int color)
-  { GfxPpl->Line (x1, y1, x2, y2, Pal [color]); }
+  { GfxPpl->Line (x1, y1, x2, y2, pplColor (color)); }
 
   /// Draw a pixel
   void pplPixel (int x, int y, int color)
-  { GfxPpl->Pixel (x, y, Pal [color]); }
+  { GfxPpl->Pixel (x, y, pplColor (color)); }
 
   /// Draw a text string: if bg < 0 background is not drawn
   void pplText (int x, int y, int fg, int bg, int Font, const char *s)
-  { GfxPpl->Text (x, y, Pal[fg], bg >= 0 ? Pal[bg] : bg, Font, s); }
+  { GfxPpl->Text (x, y, pplColor (fg), bg >= 0 ? pplColor (bg) : bg, Font, s); }
 
   /// Draw a (scaled) 2D sprite
   void pplSprite2D (csSprite2D *s2d, int x, int y, int w, int h)
@@ -240,7 +249,7 @@ public:
 
   /// Clear page with specified color
   void pplClear (int color)
-  { GfxPpl->Clear (Pal[color]); }
+  { GfxPpl->Clear (pplColor (color)); }
 
   /// Set clipping rectangle: SHOULD CALL pplRestoreClipRect() AFTER DRAWING!
   void pplSetClipRect (int xmin, int ymin, int xmax, int ymax)

@@ -175,6 +175,10 @@ public:
   virtual void SuggestSize (int &w, int &h);
 
   /// Query this button's command code
+  void SetCommandCode (int iCommandCode)
+  { CommandCode = iCommandCode; }
+
+  /// Query this button's command code
   int GetCommandCode ()
   { return CommandCode; }
 

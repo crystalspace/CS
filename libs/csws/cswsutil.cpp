@@ -27,10 +27,13 @@
 #include "csws/csdialog.h"
 #include "csws/cslistbx.h"
 #include "csws/csstatic.h"
+#include "csws/csradbut.h"
+#include "csws/cscwheel.h"
 #include "csutil/parser.h"
 #include "csutil/scanstr.h"
 #include "csinput/csinput.h"
 #include "csengine/texture.h"
+#include "itxtmgr.h"
 
 #define MSGBOX_TEXTURE "tex/msgicons.png"
 
@@ -439,7 +442,89 @@ void FindCFGBitmap (csStrVector &sv, char *id, int *x, int *y, int *w, int *h)
   } /* endif */
 }
 
-//--//--//--//--//--//--//--//--//--//--//--//--//--// File choose dialog --//--
+// Multiply with this constant to convert from range -1/3..+1/3 to -PI...+PI
+#define CONST_F2A	(M_PI * 3.0)
+
+// HLS -> RGB
+void HLS2RGB (float h, float l, float s, float &r, float &g, float &b)
+{
+  float hr = (h > 2.0 / 3.0) ? h - 1.0 : h;
+
+  r = (hr < 1.0 / 3.0) ?
+    1 + s * cos ((hr           ) * CONST_F2A) :
+    1 - s;
+  g = (h < 2.0 / 3.0) ?
+    1 + s * cos ((h - 1.0 / 3.0) * CONST_F2A) :
+    1 - s;
+  b = (h > 1.0 / 3.0) ?
+    1 + s * cos ((h - 2.0 / 3.0) * CONST_F2A) :
+    1 - s;
+
+  r *= l; if (r > 1.0) r = 1.0;
+  g *= l; if (g > 1.0) g = 1.0;
+  b *= l; if (b > 1.0) b = 1.0;
+}
+
+// RGB -> HLS
+// Phew! It took me two days until I figured how to do
+// the reverse transformation :-) -- A.Z.
+void RGB2HLS (float r, float g, float b, float &h, float &l, float &s)
+{
+  float max, mid, min, sign, delta;
+  if (r > g)
+    if (r > b)
+    {
+      delta = 0;
+      max = r;
+      if (g > b)
+        mid = g, min = b, sign = 1;
+      else
+        mid = b, min = g, sign = -1;
+    }
+    else
+    {
+      delta = 2.0 / 3.0;
+      max = b;
+      mid = r;
+      min = g;
+      sign = 1;
+    }
+  else
+    if (g > b)
+    {
+      delta = 1.0 / 3.0;
+      max = g;
+      if (r > b)
+        mid = r, min = b, sign = -1;
+      else
+        mid = b, min = r, sign = 1;
+    }
+    else
+    {
+      delta = 2.0 / 3.0;
+      max = b;
+      mid = g;
+      min = r;
+      sign = -1;
+    }
+  l = max;
+
+  if (l == 0)
+    s = 0;
+  else
+    s = 1 - min / l;
+
+  if ((r == g) && (g == b))
+    h = 0;
+  else
+    h = delta + sign * (acos ((max - mid) / (max - min))) / CONST_F2A;
+  if (h < 0) 
+    h += 1;
+}
+
+#undef CONST_F2A
+
+//--//--//--//--//--//--//--//--//--//--//--//--//--//-- File open dialog --//--
 
 #define FILEDLG_TEXTURE_NAME "tex/filedlg.png"
 
@@ -465,7 +550,7 @@ public:
 
 #define CSFDI_PATHCOMPONENT 0x9999
 static int fdref = 0;
-static csSprite2D *fdspr[2] = {NULL, NULL};
+static csSprite2D *fdspr[2] = { NULL, NULL };
 
 cspFileDialog::cspFileDialog (csComponent *iParent)
   : csDialog (iParent)
@@ -714,28 +799,28 @@ csWindow *csFileDialog (csComponent *iParent, char *iTitle, char *iFileName,
   c->SetRect (5, 15, 5+310, 31);
 
   CHK (c = new csStatic (d, c, "File ~name"));
-  c->SetRect (5, 5, 5+310, 15);
+  c->SetPos (5, 5);
 
   CHK (c = new csInputLine (d, MAXPATHLEN));
   c->id = CSWID_PATHNAME;
   c->SetRect (5, 45, 5+310, 61);
 
   CHK (c = new csStatic (d, c, "File ~path"));
-  c->SetRect (5, 35, 5+310, 45);
+  c->SetPos (5, 35);
 
   CHK (c = new csListBox (d, CSLBS_HSCROLL | CSLBS_VSCROLL));
   c->id = CSWID_DIRLIST;
   c->SetRect (5, 75, 5+150, 245);
 
   CHK (c = new csStatic (d, c, "~Directories"));
-  c->SetRect (5, 65, 5+150, 75);
+  c->SetPos (5, 65);
 
   CHK (c = new csListBox (d, CSLBS_HSCROLL | CSLBS_VSCROLL));
   c->id = CSWID_FILELIST;
   c->SetRect (165, 75, 165+150, 245);
 
   CHK (c = new csStatic (d, c, "~Files"));
-  c->SetRect (165, 65, 165+150, 75);
+  c->SetPos (165, 65);
 
   csButton *b[2];
   CHK (b [0] = new csButton (d, cscmdOK, CSBS_DEFAULTVALUE | CSBS_DEFAULT));
@@ -800,4 +885,296 @@ void csQueryFileDialog (csWindow *iFileDialog, char *iFileName,
       } /* endif */
     } /* endif */
   } /* endif */
+}
+
+//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--/ Color wheel --//--
+
+// there is not much sense in making these IDs public
+#define CSWID_COLORHR_NUM	0x99990000
+#define CSWID_COLORHR_LABEL	0x99990001
+#define CSWID_COLORLG_NUM	0x99990002
+#define CSWID_COLORLG_LABEL	0x99990003
+#define CSWID_COLORSB_NUM	0x99990004
+#define CSWID_COLORSB_LABEL	0x99990005
+
+#define cscmdToggleHLS		0x99999999
+
+// private class
+class cspColorDialog : public csDialog
+{
+  float r, g, b;
+  float h, l, s;
+  bool hlsmode;
+  int color;
+public:
+  cspColorDialog (csComponent *iParent);
+  virtual ~cspColorDialog ();
+  virtual bool HandleEvent (csEvent &Event);
+  void SetColor (int iColor);
+  int GetColor ()
+  { return color; }
+  void GetColor (float &oR, float &oG, float &oB)
+  { oR = r; oG = g; oB = b; }
+  void SetRGB (float iR, float iG, float iB);
+  void UpdateInfo (bool UpdateSlider);
+  void SetHLSmode (bool Enable);
+  void HLS2RGB ()
+  { ::HLS2RGB (h, l, s, r, g, b); }
+  void RGB2HLS ()
+  { ::RGB2HLS (r, g, b, h, l, s); }
+};
+
+cspColorDialog::cspColorDialog (csComponent *iParent) : csDialog (iParent)
+{
+  r = g = b = h = l = s = 0.0;
+  hlsmode = false;
+}
+
+cspColorDialog::~cspColorDialog ()
+{
+}
+
+void cspColorDialog::UpdateInfo (bool UpdateSlider)
+{
+  float tr = 255, tg = 255, tb = 255;
+  if (r > 0.5) tr = 0;
+  if (g > 0.5) tg = 0;
+  if (b > 0.5) tb = 0;
+  color = app->FindColor (int (r * 255.9), int (g * 255.9), int (b * 255.9));
+  int tcolor = app->FindColor (tr, tg, tb);
+
+  csStatic *sample = (csStatic *)GetChild (CSWID_COLORSAMPLE);
+  if (sample)
+  {
+    sample->SetColor (CSPAL_STATIC_BACKGROUND, color);
+    sample->SetColor (CSPAL_STATIC_ITEXT, tcolor);
+    sample->Invalidate ();
+  }
+
+  csColorWheel *wheel = (csColorWheel *)GetChild (CSWID_COLORWHEEL);
+  if (wheel)
+    wheel->SetHS (h, s);
+
+  #define CHANGE_SLIDER(wid, val)			\
+  {							\
+    csScrollBarStatus sbs;				\
+    csComponent *c = GetChild (wid);			\
+    if (c)						\
+    {							\
+      c->SendCommand (cscmdScrollBarGetStatus, &sbs);	\
+      sbs.value = int ((val) * 255.9);			\
+      if (UpdateSlider)					\
+        c->SendCommand (cscmdScrollBarSet, &sbs);	\
+      char buff [10];					\
+      sprintf (buff, "%d", sbs.value);			\
+      c = GetChild (wid##_NUM);				\
+      if (c)						\
+        c->SetText (buff);				\
+    }							\
+  }
+
+  CHANGE_SLIDER (CSWID_COLORHR, hlsmode ? h : r);
+  CHANGE_SLIDER (CSWID_COLORLG, hlsmode ? l : g);
+  CHANGE_SLIDER (CSWID_COLORSB, hlsmode ? s : b);
+
+  #undef CHANGE_SLIDER
+}
+
+void cspColorDialog::SetColor (int iColor)
+{
+  csPixelFormat pfmt;
+  RGBpaletteEntry *palette;
+  System->piGI->GetPixelFormat (&pfmt);
+  System->piGI->GetPalette (&palette);
+  if (pfmt.PalEntries)
+  {
+    r = float (palette [iColor].red) / 255;
+    g = float (palette [iColor].green) / 255;
+    b = float (palette [iColor].blue) / 255;
+  }
+  else
+  {
+    r = float ((iColor & pfmt.RedMask  ) >> pfmt.RedShift  ) / float ((1 << pfmt.RedBits  ) - 1);
+    g = float ((iColor & pfmt.GreenMask) >> pfmt.GreenShift) / float ((1 << pfmt.GreenBits) - 1);
+    b = float ((iColor & pfmt.BlueMask ) >> pfmt.BlueShift ) / float ((1 << pfmt.BlueBits ) - 1);
+  }
+  RGB2HLS ();
+  UpdateInfo (true);
+}
+
+void cspColorDialog::SetRGB (float iR, float iG, float iB)
+{
+  r = iR; g = iG; b = iB;
+  RGB2HLS ();
+  UpdateInfo (true);
+}
+
+void cspColorDialog::SetHLSmode (bool Enable)
+{
+  hlsmode = Enable;
+  GetChild (CSWID_COLORHLS)->SendCommand (cscmdRadioButtonSet, (void *)Enable);
+  GetChild (CSWID_COLORRGB)->SendCommand (cscmdRadioButtonSet, (void *)!Enable);
+
+  csComponent *c = GetChild (CSWID_COLORHR_LABEL);
+  if (c) c->SetText (hlsmode ? "~H" : "~R");
+  c = GetChild (CSWID_COLORLG_LABEL);
+  if (c) c->SetText (hlsmode ? "~L" : "~G");
+  c = GetChild (CSWID_COLORSB_LABEL);
+  if (c) c->SetText (hlsmode ? "~S" : "~B");
+
+  UpdateInfo (true);
+}
+
+bool cspColorDialog::HandleEvent (csEvent &Event)
+{
+  switch (Event.Type)
+  {
+    case csevCommand:
+      switch (Event.Command.Code)
+      {
+        case cscmdOK:
+        case cscmdCancel:
+          app->Dismiss (Event.Command.Code);
+          return true;
+        case cscmdToggleHLS:
+          SetHLSmode (Event.Command.Info == GetChild (CSWID_COLORHLS));
+          return true;
+        case cscmdScrollBarValueChanged:
+        {
+          csScrollBarStatus sbs;
+          csComponent *c = ((csComponent *)Event.Command.Info);
+          c->SendCommand (cscmdScrollBarGetStatus, &sbs);
+          float val = float (sbs.value) / 255;
+          if (GetChild (CSWID_COLORHR) == c)
+            if (hlsmode) h = val; else r = val;
+          if (GetChild (CSWID_COLORLG) == c)
+            if (hlsmode) l = val; else g = val;
+          if (GetChild (CSWID_COLORSB) == c)
+            if (hlsmode) s = val; else b = val;
+          if (hlsmode)
+            HLS2RGB ();
+          else
+            RGB2HLS ();
+          UpdateInfo (false);
+          return true;
+        }
+        case cscmdColorWheelChanged:
+        {
+          csColorWheel *wheel = (csColorWheel *)Event.Command.Info;
+          wheel->GetHS (h, s);
+          HLS2RGB ();
+          UpdateInfo (true);
+          return true;
+        }
+      } /* endswitch */
+      break;
+  } /* endswitch */
+  return csDialog::HandleEvent (Event);
+}
+
+// color dialog width (without frames)
+#define CD_WIDTH	(5 + (10 + 128 + CSSB_DEFAULTSIZE * 2 + 30) + 5)
+
+csWindow *csColorDialog (csComponent *iParent, char *iTitle, int iColor)
+{
+  CHK (csWindow *w = new csWindow (iParent, iTitle,
+    CSWS_BUTSYSMENU | CSWS_BUTCLOSE | CSWS_TITLEBAR));
+  CHK (cspColorDialog *d = new cspColorDialog (w));
+  w->SetDragStyle (w->GetDragStyle () & ~CS_DRAG_SIZEABLE);
+
+  csColorWheel *cw = new csColorWheel (d);
+  cw->SetPos (5, 5);
+  cw->id = CSWID_COLORWHEEL;
+
+  csScrollBar *sb;
+  csStatic *st;
+  int sbx = 5;
+#define ADD_SLIDER(wid,y)						\
+  {									\
+    int sby = y + 4;							\
+    CHK (sb = new csScrollBar (d, cssfsThinRect));			\
+    sb->id = wid;							\
+    sb->SetRect (sbx + 10, sby,						\
+      sbx + 10 + 128 + CSSB_DEFAULTSIZE * 2, sby + CSSB_DEFAULTSIZE);	\
+    sb->SetState (CSS_SELECTABLE, true);				\
+    csScrollBarStatus sbs;						\
+    sbs.value = 0;							\
+    sbs.maxvalue = 255;							\
+    sbs.size = 1;							\
+    sbs.maxsize = 10;							\
+    sbs.step = 1;							\
+    sbs.pagestep = 10;							\
+    sb->SendCommand (cscmdScrollBarSet, &sbs);				\
+									\
+    CHK (st = new csStatic (d, NULL, "@@@"));				\
+    st->SetPos (sb->bound.xmax + 4,					\
+     sby + (sb->bound.Height () - st->bound.Height ()) / 2);		\
+    st->id = wid##_NUM;							\
+									\
+    CHK (st = new csStatic (d, sb, "@"));				\
+    st->SetPos (sb->bound.xmin - 10,					\
+     sby + (sb->bound.Height () - st->bound.Height ()) / 2);		\
+    st->id = wid##_LABEL;						\
+  }
+
+  ADD_SLIDER (CSWID_COLORHR, 144);
+  sb->SetState (CSS_GROUP, true);
+  ADD_SLIDER (CSWID_COLORLG, sb->bound.ymax);
+  ADD_SLIDER (CSWID_COLORSB, sb->bound.ymax);
+
+#undef ADD_SLIDER
+
+  csButton *b;
+  CHK (b = new csButton (d, cscmdOK, CSBS_DEFAULTVALUE | CSBS_DEFAULT));
+  b->SetText ("~Ok");
+  b->SetRect (CD_WIDTH - 65, 5, CD_WIDTH - 5, 25);
+  b->SetState (CSS_GROUP, true);
+
+  CHK (b = new csButton (d, cscmdCancel, CSBS_DEFAULTVALUE));
+  b->SetText ("Cancel");
+  b->SetRect (CD_WIDTH - 65, 30, CD_WIDTH - 5, 50);
+
+  st = new csStatic (d);
+  st->SetText ("Sample");
+  st->SetTextAlign (CSSTA_HCENTER | CSSTA_VCENTER);
+  st->SetRect (CD_WIDTH - 65, 55, CD_WIDTH - 5, 112);
+  st->id = CSWID_COLORSAMPLE;
+
+  csRadioButton *rb;
+  CHK (rb = new csRadioButton (d, CSWID_COLORHLS));
+  rb->SetPos (CD_WIDTH - 65, 116); rb->SetState (CSS_GROUP, true);
+  rb->SetCommandCode (cscmdToggleHLS);
+  CHK (st = new csStatic (d, rb, "HLS"));
+  st->SetPos (CD_WIDTH - 50, 118);
+
+  CHK (rb = new csRadioButton (d, CSWID_COLORRGB));
+  rb->SetPos (CD_WIDTH - 65, 130);
+  rb->SetCommandCode (cscmdToggleHLS);
+  CHK (st = new csStatic (d, rb, "RGB"));
+  st->SetPos (CD_WIDTH - 50, 132);
+
+  // Set starting color value
+  d->SetColor (iColor);
+  d->SetHLSmode (true);
+
+  // and now set window size and center it.
+  w->SetSize (4 + CD_WIDTH + 4, 230);
+  w->Center ();
+
+  d->GetChild (CSWID_COLORWHEEL)->Select ();
+  return w;
+}
+
+void csQueryColorDialog (csWindow *iColorDialog, int &oColor)
+{
+  cspColorDialog *d = (cspColorDialog *)iColorDialog->GetChild (CSWID_CLIENT);
+  if (d)
+    oColor = d->GetColor ();
+}
+
+void csQueryColorDialog (csWindow *iColorDialog, float &oR, float &oG, float &oB)
+{
+  cspColorDialog *d = (cspColorDialog *)iColorDialog->GetChild (CSWID_CLIENT);
+  if (d)
+    d->GetColor (oR, oG, oB);
 }

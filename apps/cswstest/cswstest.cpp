@@ -199,7 +199,7 @@ bool csWsTest::InitialSetup (int argc, char *argv[],
     csButton *but = new csButton (this, 9999);
     but->SetText ("Hello"); but->SetRect (10, 10, 100, 30);
     but->SetFont (csFontTiny);
-    but = new csButton (this, cscmdNothing);
+    but = new csButton (this, 9998);
     but->SetText ("Othello"); but->SetRect (210, 10, 300, 30);
   }
   return true;
@@ -230,11 +230,34 @@ bool csWsTest::HandleEvent (csEvent &Event)
             csWindow *d = csFileDialog (this, "test file dialog");
             if (d)
             {
-              Execute (d);
+              if (Execute (d) == cscmdCancel)
+              {
+                delete d;
+                return true;
+              }
               char filename [MAXPATHLEN + 1];
               csQueryFileDialog (d, filename, sizeof (filename));
               delete d;
               MessageBox (app, "Result", filename);
+            }
+            return true;
+          }
+        case 9998:
+          {
+            csWindow *d = csColorDialog (this, "test color dialog");
+            if (d)
+            {
+              if (Execute (d) == cscmdCancel)
+              {
+                delete d;
+                return true;
+              }
+              int color;
+              csQueryColorDialog (d, color);
+              delete d;
+              char buff [100];
+              sprintf (buff, "color value: %08X\n", color);
+              MessageBox (app, "Result", buff);
             }
             return true;
           }

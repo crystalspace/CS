@@ -103,6 +103,7 @@ enum
  *         <li>0x00000800 ... 0x000008FF: csCheckBox class messages
  *         <li>0x00000900 ... 0x000009FF: csRadioButton class messages
  *         <li>0x00000A00 ... 0x00000AFF: csSpinBox class messages
+ *         <li>0x00000B00 ... 0x00000BFF: csColorWheel class messages
  *       </ul>
  *   <li>0x80000000 ... 0xFFFFFFFF: Reserved for user class-specific messages
  * </ul>

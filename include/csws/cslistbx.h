@@ -61,7 +61,7 @@ public:
     csListBoxItemStyle iStyle = cslisNormal);
 
   /// Listbox item destructor
-  ~csListBoxItem ();
+  virtual ~csListBoxItem ();
 
   /// Handle input events
   virtual bool HandleEvent (csEvent &Event);

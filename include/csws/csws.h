@@ -40,6 +40,7 @@
  *        |--[ csMenu ]			// popup menu / menu bar
  *        |--[ csDialog ]		// dialog client window
  *        |--[ csStatic ]		// static control
+ *        |    +--[ csColorWheel ]	// color wheel control
  *        |--[ csButton ]		// button control
  *        |    |--[ csCheckBox ]	// check box control
  *        |    +--[ csRadioButton ]	// radio button control
@@ -97,6 +98,7 @@ class csApp;
 #include "cscomp.h"			// Windowing System Component
 #include "csmouse.h"			// Mouse manager class
 #include "csstatic.h"			// Static components
+#include "cscwheel.h"			// Color wheel components
 #include "csbutton.h"			// Buttons
 #include "cschkbox.h"			// CheckBox buttons
 #include "csradbut.h"			// Radio buttons

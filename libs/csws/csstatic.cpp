@@ -79,7 +79,6 @@ void csStatic::Draw ()
     case csscsEmpty:
       break;
     case csscsLabel:
-      Text (0, 0, textcolor, -1, text);
       DrawUnderline (0, 0, text, underline_pos, textcolor);
       break;
     case csscsFrameLabel:
@@ -101,26 +100,29 @@ void csStatic::Draw ()
       Sprite2D (Bitmap, 0, 0, bound.Width (), bound.Height ());
       break;
     case csscsText:
-    {
-      int x, y;
-      switch (TextAlignment & CSSTA_HALIGNMASK)
-      {
-        case CSSTA_LEFT:    x = 0; break;
-        case CSSTA_RIGHT:   x = bound.Width () - TextWidth (text); break;
-        case CSSTA_HCENTER: x = (bound.Width () - TextWidth (text)) / 2; break;
-        default:            return;
-      } /* endswitch */
-      switch (TextAlignment & CSSTA_VALIGNMASK)
-      {
-        case CSSTA_TOP:     y = 0; break;
-        case CSSTA_BOTTOM:  y = bound.Height () - TextHeight (); break;
-        case CSSTA_VCENTER: y = (bound.Height () - TextHeight ()) / 2; break;
-        default:            return;
-      } /* endswitch */
-      Text (x, y, textcolor, -1, text);
       break;
-    }
   } /* endswitch */
+
+  if (text && (style != csscsFrameLabel))
+  {
+    int x, y;
+    switch (TextAlignment & CSSTA_HALIGNMASK)
+    {
+      case CSSTA_LEFT:    x = 0; break;
+      case CSSTA_RIGHT:   x = bound.Width () - TextWidth (text); break;
+      case CSSTA_HCENTER: x = (bound.Width () - TextWidth (text)) / 2; break;
+      default:            return;
+    } /* endswitch */
+    switch (TextAlignment & CSSTA_VALIGNMASK)
+    {
+      case CSSTA_TOP:     y = 0; break;
+      case CSSTA_BOTTOM:  y = bound.Height () - TextHeight (); break;
+      case CSSTA_VCENTER: y = (bound.Height () - TextHeight ()) / 2; break;
+      default:            return;
+    } /* endswitch */
+    Text (x, y, textcolor, -1, text);
+  }
+
   csComponent::Draw ();
 }
 
@@ -134,22 +136,52 @@ bool csStatic::IsHotKey (csEvent &Event)
 bool csStatic::HandleEvent (csEvent &Event)
 {
   CheckUp ();
-  if ((style == csscsLabel)
-   || (style == csscsFrameLabel))
-    switch (Event.Type)
-    {
-      case csevMouseDown:
-      case csevMouseDoubleClick:
+
+  switch (Event.Type)
+  {
+    case csevCommand:
+      switch (Event.Command.Code)
+      {
+        case cscmdStaticGetBitmap:
+          Event.Command.Info = Bitmap;
+          break;
+        case cscmdStaticSetBitmap:
+          if (style == csscsBitmap)
+          {
+            Bitmap = (csSprite2D *)Event.Command.Info;
+            Event.Command.Info = NULL;
+            Invalidate ();
+          }
+          break;
+      } /* endswitch */
+      break;
+    case csevMouseDown:
+    case csevMouseDoubleClick:
+      if ((style == csscsLabel)
+       || (style == csscsFrameLabel))
+      {
+        // for frames, check if mouse is within label text
+        if (style == csscsFrameLabel)
+        {
+          int xmin = TextWidth ("@@");
+          csRect r (xmin, 0, xmin + TextWidth (text), TextHeight ());
+          if (!r.Contains (Event.Mouse.x, Event.Mouse.y))
+            break;
+        }
         if (!app->MouseOwner
          && link)
         {
           app->CaptureMouse (this);
           link->SendCommand (cscmdStaticMouseEvent, (void *)&Event);
+          // if link did not captured the mouse, release it
+          if (app->MouseOwner == this)
+            app->CaptureMouse (NULL);
           CheckUp ();
           return true;
         } /* endif */
-        break;
-    } /* endswitch */
+      } /* endif */
+      break;
+  } /* endswitch */
   return csComponent::HandleEvent (Event);
 }
 
@@ -223,7 +255,10 @@ void csStatic::SetText (const char *iText)
   if (style == csscsText)
     csComponent::SetText (iText);
   else
+  {
     PrepareLabel (iText, text, underline_pos);
+    Invalidate ();
+  }
 }
 
 void csStatic::CheckUp ()

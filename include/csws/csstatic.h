@@ -75,7 +75,24 @@ enum
    * IN:  (csEvent *)Event
    * </pre>
    */
-  cscmdStaticMouseEvent
+  cscmdStaticMouseEvent,
+  /**
+   * Set static control bitmap (if control style is csscsBitmap)<p>
+   * <b>NOTE</b>: We don't delete the old bitmap, because we assume
+   * that if you're changing bitmaps, you're going to reuse them.
+   * <pre>
+   * IN:  (csSprite2D *)iBitmap
+   * </pre>
+   */
+  cscmdStaticSetBitmap,
+  /**
+   * Get static control bitmap handle
+   * <pre>
+   * IN:  nothing
+   * OUT: (csSprite2D *)iBitmap
+   * </pre>
+   */
+  cscmdStaticGetBitmap
 };
 
 /**
@@ -92,6 +109,7 @@ enum
  */
 class csStatic : public csComponent
 {
+protected:
   // Character number that should be underlined (-1 == none)
   int underline_pos;
   // Static component style
@@ -138,7 +156,7 @@ public:
   void SetTextAlign (int iTextAlignment)
   { TextAlignment = iTextAlignment; }
 
-private:
+protected:
   // Common part of constructors
   void Init (csStaticStyle iStyle);
   // Check if event is a hotkey event

@@ -342,28 +342,42 @@ void csApp::LoadTextures ()
 
 void csApp::SetupPalette ()
 {
+  csPixelFormat pfmt;
+  System->piGI->GetPixelFormat (&pfmt);
+  PhysColorShift = ((pfmt.RedShift >= 24) || (pfmt.GreenShift >= 24)
+    || (pfmt.BlueShift >= 24)) ? 8 : 0;
+
   ITextureManager* txtmgr;
   System->piG3D->GetTextureManager (&txtmgr);
-  txtmgr->FindRGB (  0,   0,   0, Pal[cs_Color_Black]);
-  txtmgr->FindRGB (255, 255, 255, Pal[cs_Color_White]);
-  txtmgr->FindRGB (128, 128, 128, Pal[cs_Color_Gray_D]);
-  txtmgr->FindRGB (160, 160, 160, Pal[cs_Color_Gray_M]);
-  txtmgr->FindRGB (204, 204, 204, Pal[cs_Color_Gray_L]);
-  txtmgr->FindRGB (  0,  20,  80, Pal[cs_Color_Blue_D]);
-  txtmgr->FindRGB (  0,  44, 176, Pal[cs_Color_Blue_M]);
-  txtmgr->FindRGB (  0,  64, 255, Pal[cs_Color_Blue_L]);
-  txtmgr->FindRGB ( 20,  80,  20, Pal[cs_Color_Green_D]);
-  txtmgr->FindRGB ( 44, 176,  44, Pal[cs_Color_Green_M]);
-  txtmgr->FindRGB ( 64, 255,  64, Pal[cs_Color_Green_L]);
-  txtmgr->FindRGB ( 80,   0,   0, Pal[cs_Color_Red_D]);
-  txtmgr->FindRGB (176,   0,   0, Pal[cs_Color_Red_M]);
-  txtmgr->FindRGB (255,   0,   0, Pal[cs_Color_Red_L]);
-  txtmgr->FindRGB (  0,  60,  80, Pal[cs_Color_Cyan_D]);
-  txtmgr->FindRGB (  0, 132, 176, Pal[cs_Color_Cyan_M]);
-  txtmgr->FindRGB (  0, 192, 255, Pal[cs_Color_Cyan_L]);
-  txtmgr->FindRGB ( 80,  60,  20, Pal[cs_Color_Brown_D]);
-  txtmgr->FindRGB (176, 132,  44, Pal[cs_Color_Brown_M]);
-  txtmgr->FindRGB (255, 192,  64, Pal[cs_Color_Brown_L]);
+  txtmgr->FindRGB (  0,   0,   0, Pal [cs_Color_Black]);
+  txtmgr->FindRGB (255, 255, 255, Pal [cs_Color_White]);
+  txtmgr->FindRGB (128, 128, 128, Pal [cs_Color_Gray_D]);
+  txtmgr->FindRGB (160, 160, 160, Pal [cs_Color_Gray_M]);
+  txtmgr->FindRGB (204, 204, 204, Pal [cs_Color_Gray_L]);
+  txtmgr->FindRGB (  0,  20,  80, Pal [cs_Color_Blue_D]);
+  txtmgr->FindRGB (  0,  44, 176, Pal [cs_Color_Blue_M]);
+  txtmgr->FindRGB (  0,  64, 255, Pal [cs_Color_Blue_L]);
+  txtmgr->FindRGB ( 20,  80,  20, Pal [cs_Color_Green_D]);
+  txtmgr->FindRGB ( 44, 176,  44, Pal [cs_Color_Green_M]);
+  txtmgr->FindRGB ( 64, 255,  64, Pal [cs_Color_Green_L]);
+  txtmgr->FindRGB ( 80,   0,   0, Pal [cs_Color_Red_D]);
+  txtmgr->FindRGB (176,   0,   0, Pal [cs_Color_Red_M]);
+  txtmgr->FindRGB (255,   0,   0, Pal [cs_Color_Red_L]);
+  txtmgr->FindRGB (  0,  60,  80, Pal [cs_Color_Cyan_D]);
+  txtmgr->FindRGB (  0, 132, 176, Pal [cs_Color_Cyan_M]);
+  txtmgr->FindRGB (  0, 192, 255, Pal [cs_Color_Cyan_L]);
+  txtmgr->FindRGB ( 80,  60,  20, Pal [cs_Color_Brown_D]);
+  txtmgr->FindRGB (176, 132,  44, Pal [cs_Color_Brown_M]);
+  txtmgr->FindRGB (255, 192,  64, Pal [cs_Color_Brown_L]);
+}
+
+int csApp::FindColor (int r, int g, int b)
+{
+  int color;
+  ITextureManager *txtmgr;
+  System->piG3D->GetTextureManager (&txtmgr);
+  txtmgr->FindRGB (r, g, b, color);
+  return (color >> PhysColorShift) | 0x80000000;
 }
 
 void csApp::Process ()

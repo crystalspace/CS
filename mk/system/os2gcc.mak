@@ -172,9 +172,9 @@ NETSOCK_LIBS=-lsocket
 # Extra parameters for 'sed' which are used for doing 'make depend'.
 SYS_SED_DEPEND=-e "s/\.ob*j*\:/\$$O:/g"
 
-# Override linker with os2link.cmd
-LINK=@cmd /c bin\\os2link.cmd OUT=$(OUT) DESCRIPTION="$(DESCRIPTION.$@)"
-LFLAGS.CONSOLE.EXE=CONSOLE
+# Override linker with os2link.exe
+LINK=@$(OS2LINK) --linker=$(LD) --description="$(DESCRIPTION.$@)" --verbose --out=$(OUT)
+LFLAGS.CONSOLE.EXE=--console
 
 # We don't need separate directories for dynamic libraries
 OUTSUFX.yes=
@@ -230,3 +230,21 @@ define SYSCONFIG
 endef
 
 endif # ifeq ($(ROOTCONFIG),config)
+
+#------------------------------------------------------------------ targets ---#
+ifeq ($(MAKESECTION),targets)
+
+ifndef OS2LINK
+
+# Define a rule to build os2link.exe before any other file,
+# if it is not pre-installed
+OS2LINK = ./os2link$(EXE)
+
+mk/system/os2gcc.mak: $(OS2LINK)
+
+$(OS2LINK): libs/cssys/os2/support/os2link.cpp
+	$(LD) $(LFLAGS.@) $(CFLAGS.optimize) $(LFLAGS.optimize) $^
+
+endif
+
+endif # ifeq ($(MAKESECTION),targets)

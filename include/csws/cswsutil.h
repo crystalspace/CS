@@ -110,12 +110,44 @@ protected:
 /// Display a message box and return ID of pressed button (0 for Esc)
 extern int MessageBox (csComponent *iParent, char *iTitle, char *iMessage,
   int iFlags = CSMBS_INFO | CSMBS_OK);
+
+/// File name entry field in file dialogs
+#define CSWID_FILENAME		0xC509
+/// Path name entry field in file dialogs
+#define CSWID_PATHNAME		0xC50A
+/// Directory list box in file dialogs
+#define CSWID_DIRLIST		0xC50B
+/// File list box in file dialogs
+#define CSWID_FILELIST		0xC50C
+
 /// Create and return a new file open dialog
 extern csWindow *csFileDialog (csComponent *iParent, char *iTitle,
   char *iFileName = "./", char *iOpenButtonText = "~Load");
 /// Query full name, filename and pathname from a file dialog
 extern void csQueryFileDialog (csWindow *iFileDialog, char *iFileName,
   size_t iFileNameSize);
+
+/// Color wheel in color choose dialogs
+#define CSWID_COLORWHEEL	0xC50D
+/// Color hue/red scrollbar in color choose dialogs
+#define CSWID_COLORHR		0xC50E
+/// Color light/green scrollbar in color choose dialogs
+#define CSWID_COLORLG		0xC50F
+/// Color saturation/blue scrollbar in color choose dialogs
+#define CSWID_COLORSB		0xC510
+/// Color sample (static rectangle) in color choose dialogs
+#define CSWID_COLORSAMPLE	0xC511
+/// "HLS" radio button identifier
+#define CSWID_COLORHLS		0xC512
+/// "RGB" radio button identifier
+#define CSWID_COLORRGB		0xC513
+
+/// Create and return a new color choose dialog
+extern csWindow *csColorDialog (csComponent *iParent, char *iTitle, int iColor = 0);
+/// Query color dialog contents as a single color value
+extern void csQueryColorDialog (csWindow *iColorDialog, int &oColor);
+/// Query color dialog contents as R,G,B floating-point numbers
+extern void csQueryColorDialog (csWindow *iColorDialog, float &oR, float &oG, float &oB);
 
 /// Compute the biggest union of a set of adjanced rectangles
 /// (i.e. rectangles do not overlap and can have adjanced edges).
@@ -124,6 +156,11 @@ extern void RectUnion (csObjVector &rect, csRect &result);
 /// Find a bitmap definition in one of CSWS.CFG bitmap arrays
 extern void FindCFGBitmap (csStrVector &sv, char *id, int *x, int *y,
   int *w, int *h);
+
+/// Convert HLS to RGB
+extern void HLS2RGB (float h, float l, float s, float &r, float &g, float &b);
+/// Convert RGB to HLS
+extern void RGB2HLS (float r, float g, float b, float &h, float &l, float &s);
 
 /// The short way to add a text button to a toolbar
 extern csButton *csNewToolbarButton (csComponent *iToolbar, int iCommand,

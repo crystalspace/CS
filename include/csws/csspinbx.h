@@ -109,7 +109,7 @@ public:
     csInputLineFrameStyle iFrameStyle = csifsThickRect);
 
   /// Destructor
-  ~csSpinBox ();
+  virtual ~csSpinBox ();
 
   /// Draw the spin box
   virtual void Draw ();

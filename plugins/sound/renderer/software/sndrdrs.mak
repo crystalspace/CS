@@ -32,7 +32,7 @@ vpath %.cpp libs/cssndrdr/software
 # The Software Sound renderer
 ifeq ($(USE_DLL),yes)
   SNDRDRS=$(OUTDLL)sndrdrs$(DLL)
-  DEP.SNDRDRS=$(CSCOM.LIB) $(CSUTIL.LIB) $(CSSYS.LIB) $(CSSNDLDR.LIB)
+  DEP.SNDRDRS=$(CSCOM.LIB) $(CSUTIL.LIB) $(CSSYS.LIB) $(CSSNDLDR.LIB) $(CSSFXLDR.LIB)
 else
   SNDRDRS=$(OUT)$(LIB_PREFIX)sndrdrs$(LIB)
   DEP.EXE+=$(SNDRDRS)

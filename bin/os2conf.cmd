@@ -34,6 +34,7 @@
   end;
 
   call saycon ANSI.WHITE||CC;
+  say "LD = "filespec('Name', left(CC, length(CC) - 4));
   say "CC = "filespec('Name', left(CC, length(CC) - 4))" -c";
 
   call outcon ANSI.LGREEN"Detecting your C++ compiler ... "
@@ -187,6 +188,13 @@
       say 'DEPEND_TOOL.INSTALLED = yes';
       call saycon ANSI.LCYAN||"      found"
     end;
+  end;
+
+  call saycon ANSI.LGREEN"Checking for an installed version of os2link ..."
+  if (SysSearchPath("PATH", "os2link.exe") \= "") then
+  do
+    say 'OS2LINK = os2link';
+    call saycon ANSI.LCYAN||"      found"
   end;
 
   call saycon ANSI.LGREEN"Checking whenever OpenGL toolkit is installed ..."

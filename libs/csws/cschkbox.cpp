@@ -21,7 +21,6 @@
 #include <string.h>
 #include "sysdef.h"
 #include "csws/cschkbox.h"
-#include "csws/csstatic.h"
 #include "csws/csapp.h"
 #include "csws/cswsutil.h"
 #include "csengine/texture.h"
@@ -110,33 +109,6 @@ bool csCheckBox::HandleEvent (csEvent &Event)
         case cscmdCheckBoxQuery:
           Event.Command.Info = (void *)CheckBoxState;
           return true;
-        case cscmdStaticHotKeyEvent:
-        {
-          csEvent *ev = (csEvent *)Event.Command.Info;
-          ev->Key.Code = ' ';
-          return csButton::HandleEvent (*ev);
-        }
-        case cscmdStaticMouseEvent:
-        {
-          csEvent *ev = (csEvent *)Event.Command.Info;
-          if (app->MouseOwner)
-          {
-            int dX = 0, dY = 0;
-            app->MouseOwner->LocalToGlobal (dX, dY);
-            GlobalToLocal (dX, dY);
-            // release mouse ownership so that csButton::HandleEvent can capture it
-            app->CaptureMouse (NULL);
-            if ((ev->Type == csevMouseMove)
-             && app->MouseOwner->bound.ContainsRel (ev->Mouse.x, ev->Mouse.y))
-              ev->Mouse.x = ev->Mouse.y = 0;
-            else
-            {
-              ev->Mouse.x -= dX;
-              ev->Mouse.y -= dY;
-            } /* endif */
-          } /* endif */
-          return csButton::HandleEvent (*ev);
-        }
       } /* endswitch */
       break;
   } /* endswitch */

@@ -43,14 +43,6 @@
 #define CSWID_SYSMENU		0xC507
 /// Tool bar ID
 #define CSWID_TOOLBAR		0xC508
-/// File name entry field in file dialogs
-#define CSWID_FILENAME		0xC509
-/// Path name entry field in file dialogs
-#define CSWID_PATHNAME		0xC50A
-/// Directory list box in file dialogs
-#define CSWID_DIRLIST		0xC50B
-/// File list box in file dialogs
-#define CSWID_FILELIST		0xC50C
 
 /// Window style flags: does window have a system menu?
 #define CSWS_BUTSYSMENU		0x00000001
