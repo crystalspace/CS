@@ -23,6 +23,7 @@
 #include "csutil/mmapio.h"
 #include "ivaria/reporter.h"
 #include "iengine/light.h"
+#include "iengine/movable.h"
 #include "qsqrt.h"
 #include "nterrain.h"
 
@@ -63,17 +64,17 @@ float nTerrain::BuildTreeNode(FILE *f, unsigned int level,
   nBlock b;
 
   // Get heights.
-  b.ne = 10 * heightmap[bounds.x +              (bounds.y * w)];
-  b.nw = 10 * heightmap[bounds.x + bounds.w-1 + (bounds.y * w)];
-  b.se = 10 * heightmap[bounds.x +              ((bounds.y + bounds.h-1) * w)];
-  b.sw = 10 * heightmap[bounds.x + bounds.w-1 + ((bounds.y + bounds.h-1) * w)];
-  b.center = 10 * heightmap[bounds.x +  mid  +  ((bounds.y + mid) * w)];
+  b.ne = heightmap[bounds.x +              (bounds.y * w)];
+  b.nw = heightmap[bounds.x + bounds.w-1 + (bounds.y * w)];
+  b.se = heightmap[bounds.x +              ((bounds.y + bounds.h-1) * w)];
+  b.sw = heightmap[bounds.x + bounds.w-1 + ((bounds.y + bounds.h-1) * w)];
+  b.center = heightmap[bounds.x +  mid  +  ((bounds.y + mid) * w)];
 
   b.ne_norm = norms[bounds.x +              (bounds.y * w)];
   b.nw_norm = norms[bounds.x + bounds.w-1 + (bounds.y * w)];
   b.se_norm = norms[bounds.x +              ((bounds.y + bounds.h-1) * w)];
   b.sw_norm = norms[bounds.x + bounds.w-1 + ((bounds.y + bounds.h-1) * w)];
-  b.center_norm = norms[bounds.x +  mid  +  ((bounds.y + mid) * w)];
+  b.ce_norm = norms[bounds.x +  mid  +  ((bounds.y + mid) * w)];
 
   // Set the variance for this block (the difference between the highest and lowest points.)
   SetVariance(b);
@@ -93,8 +94,6 @@ float nTerrain::BuildTreeNode(FILE *f, unsigned int level,
   }
   /* midh was set to low */
   b.midh += b.variance/2.0;
-  float wid = (float)bounds.w;
-  b.radius = qsqrt(b.variance*b.variance/4.0 + wid*wid/2.0);
 
   // Store the block in the file.
   fseek(f, my_index*nBlockLen, SEEK_SET);
@@ -103,12 +102,13 @@ float nTerrain::BuildTreeNode(FILE *f, unsigned int level,
   return b.variance;
 }
 
-csColor nTerrain::CalculateLightIntensity (iLight *li, csVector3 v, csVector3 n)
+csColor nTerrain::CalculateLightIntensity (iLight *li, iMovable *m, csVector3 v, csVector3 n)
 {
   csColor color (0.0, 0.0, 0.0);
-  float sq_dist = csSquaredDist::PointPoint (li->GetCenter(), v);
+  csVector3 li_center = m->GetTransform().Other2This (li->GetCenter());
+  csVector3 light_dir = v - li_center;
+  float sq_dist = light_dir.SquaredNorm();
   if (sq_dist < li->GetSquaredRadius ()) {
-    csVector3 light_dir = v - li->GetCenter ();
     
     csColor light_color = li->GetColor () * (256.0 / CS_NORMAL_LIGHT_LEVEL)
       * li->GetBrightnessAtDistance (qsqrt (sq_dist));
@@ -131,33 +131,49 @@ csColor nTerrain::CalculateLightIntensity (iLight *li, csVector3 v, csVector3 n)
   return color;
 }
 
-void nTerrain::BufferTreeNode(nBlock *b, nRect bounds)
+void nTerrain::BufferTreeNode(iMovable *m, nBlock *b, nRect bounds)
 {
   int mid = terrain_w >> 1;
-  int ne = info->vertices.Push(csVector3(bounds.x-mid, b->ne, bounds.y-mid)),
-      nw = info->vertices.Push(csVector3(bounds.x+bounds.w-1-mid, b->nw, bounds.y-mid)),
-      se = info->vertices.Push(csVector3(bounds.x-mid, b->se, bounds.y+bounds.h-1-mid)),
-      sw = info->vertices.Push(csVector3(bounds.x+bounds.w-1-mid, b->sw, bounds.y+bounds.h-1-mid)),
-      center = info->vertices.Push(csVector3(bounds.x+bounds.h/2.0-mid, b->center, bounds.y+bounds.h/2.0-mid));
+  csReversibleTransform t = m->GetTransform();
+  int ne = info->vertex_count ++;
+  int nw = info->vertex_count ++;
+  int se = info->vertex_count ++;
+  int sw = info->vertex_count ++;
+  int ce = info->vertex_count ++;
+  info->vertices[ne] = csVector3((bounds.x-mid)*scale.x, 
+                                 b->ne*scale.y, 
+							     (bounds.y-mid)*scale.z) / t;
+  info->vertices[nw] = csVector3((bounds.x+bounds.w-1-mid)*scale.x, 
+                                 b->nw*scale.y, 
+                                 (bounds.y-mid)*scale.z) / t;
+  info->vertices[se] = csVector3((bounds.x-mid)*scale.x,
+                                 b->se*scale.y, 
+                                 (bounds.y+bounds.h-1-mid)*scale.z) / t;
+  info->vertices[sw] = csVector3((bounds.x+bounds.w-1-mid)*scale.x,
+                                 b->sw*scale.y, 
+                                 (bounds.y+bounds.h-1-mid)*scale.z) / t;
+  info->vertices[ce] = csVector3((bounds.x+bounds.h/2.0-mid)*scale.x,
+                                 b->center*scale.y, 
+                                 (bounds.y+bounds.h/2.0-mid)*scale.z) / t; 
 
   float wid = (float)terrain_w;
-  info->texels.Push(csVector2(bounds.x/wid, bounds.y/wid));
-  info->texels.Push(csVector2((bounds.x+bounds.w-1)/wid, bounds.y/wid));
-  info->texels.Push(csVector2(bounds.x/wid, (bounds.y+bounds.h-1)/wid));
-  info->texels.Push(csVector2((bounds.x+bounds.w-1)/wid, (bounds.y+bounds.h-1)/wid));
-  info->texels.Push(csVector2((bounds.x+bounds.h/2.0)/wid, (bounds.y+bounds.h/2.0)/wid));
+  info->texels[ne] = csVector2(bounds.x/wid, bounds.y/wid);
+  info->texels[nw] = csVector2((bounds.x+bounds.w-1)/wid, bounds.y/wid);
+  info->texels[se] = csVector2(bounds.x/wid, (bounds.y+bounds.h-1)/wid);
+  info->texels[sw] = csVector2((bounds.x+bounds.w-1)/wid, (bounds.y+bounds.h-1)/wid);
+  info->texels[ce] = csVector2((bounds.x+bounds.h/2.0)/wid, (bounds.y+bounds.h/2.0)/wid);
 
-  csColor nec, nwc, sec, swc, centerc;
+  csColor nec(0,0,0), nwc(0,0,0), sec(0,0,0), swc(0,0,0), centerc(0,0,0);
 
   if (info->num_lights > 0) {
     for (int i = 0; i < info->num_lights; i ++) {
       iLight* li = info->light_list[i];
 
-      nec += CalculateLightIntensity (li, ne, b->ne_norm);
-      nwc += CalculateLightIntensity (li, nw, b->nw_norm);
-      sec += CalculateLightIntensity (li, se, b->se_norm);
-      swc += CalculateLightIntensity (li, sw, b->sw_norm);
-      centerc += CalculateLightIntensity (li, center, b->center_norm);
+      nec += CalculateLightIntensity (li, m, info->vertices[ne], b->ne_norm);
+      nwc += CalculateLightIntensity (li, m, info->vertices[nw], b->nw_norm);
+      sec += CalculateLightIntensity (li, m, info->vertices[se], b->se_norm);
+      swc += CalculateLightIntensity (li, m, info->vertices[sw], b->sw_norm);
+      centerc += CalculateLightIntensity (li, m, info->vertices[ce], b->ce_norm);
     }
   } else {
     nec = csColor (1.0, 1.0, 1.0);
@@ -173,24 +189,25 @@ void nTerrain::BufferTreeNode(nBlock *b, nRect bounds)
   swc.Clamp (2., 2., 2.);
   centerc.Clamp (2., 2., 2.);
 
-  info->colors.Push (nec);
-  info->colors.Push (nwc);
-  info->colors.Push (sec);
-  info->colors.Push (swc);
-  info->colors.Push (centerc);
+  info->colors[ne] = (nec);
+  info->colors[nw] = (nwc);
+  info->colors[se] = (sec);
+  info->colors[sw] = (swc);
+  info->colors[ce] = (centerc);
 
   /** Build triangle stacks, for each block output four triangles.
    * No need to merge and split because each block is at full resolution,
    * we have no partial resolution blocks.
    */
-  info->triq[0/*b->ti*/].triangles.Push(csTriangle(sw, center, se));
-  info->triq[0/*b->ti*/].triangles.Push(csTriangle(nw, center, sw));
-  info->triq[0/*b->ti*/].triangles.Push(csTriangle(ne, center, nw));
-  info->triq[0/*b->ti*/].triangles.Push(csTriangle(se, center, ne));
+  info->triq[0/*b->ti*/].triangles[info->triangle_count++] = csTriangle(sw, ce, se);
+  info->triq[0/*b->ti*/].triangles[info->triangle_count++] = csTriangle(nw, ce, sw);
+  info->triq[0/*b->ti*/].triangles[info->triangle_count++] = csTriangle(ne, ce, nw);
+  info->triq[0/*b->ti*/].triangles[info->triangle_count++] = csTriangle(se, ce, ne);
 }
 
-void nTerrain::ProcessTreeNode(iRenderView *rv, unsigned int level, unsigned int parent_index, unsigned int child_num, nRect bounds)
+void nTerrain::ProcessTreeNode(iRenderView *rv, iMovable *m, unsigned int level, unsigned int parent_index, unsigned int child_num, nRect bounds)
 {
+
   unsigned int my_index = (parent_index<<2) + child_num + NTERRAIN_QUADTREE_ROOT;
   int mid = bounds.w>>1;
   unsigned int cw = mid+1;
@@ -206,7 +223,9 @@ void nTerrain::ProcessTreeNode(iRenderView *rv, unsigned int level, unsigned int
 
   // Create a bounding sphere.
   int c = terrain_w >> 1;
-  csSphere bs(csVector3 (bounds.x+mid-c, b->midh, bounds.y+mid-c), b->radius);
+  csVector3 center (bounds.x+mid-c*scale.x, b->midh*scale.y, bounds.y+mid-c*scale.z);
+  csVector3 radius (bounds.w * scale.x, b->variance * scale.y, bounds.h * scale.z);
+  csSphere bs(m->GetTransform().This2Other(center), radius.Norm());
 
   // Test it for culling, return if it's not visible.
   if (!rv->TestBSphere(obj2cam, bs)) return;
@@ -219,9 +238,8 @@ void nTerrain::ProcessTreeNode(iRenderView *rv, unsigned int level, unsigned int
   {
     // Get distance from center of block to camera, plus a small epsilon to avoid division by zero.
     float distance = ((cam-bs.GetCenter()).Norm())+1e-10;
-
     // Get the error metric, in this case it's the ratio between variance and distance.
-    float error_metric = b->variance / distance;
+    float error_metric = b->variance * scale.y / distance;
 
     if (error_metric<=error_metric_tolerance) {
       render_this=true;
@@ -231,14 +249,14 @@ void nTerrain::ProcessTreeNode(iRenderView *rv, unsigned int level, unsigned int
   // Don't render this block, resolve to the next level.
   if (!render_this)
   {
-    ProcessTreeNode(rv, level+1, my_index, 0, nRect(bounds.x,bounds.y,cw,cw));
-    ProcessTreeNode(rv, level+1, my_index, 1, nRect(bounds.x+mid,bounds.y,cw,cw));
-    ProcessTreeNode(rv, level+1, my_index, 2, nRect(bounds.x,bounds.y+mid,cw,cw));
-    ProcessTreeNode(rv, level+1, my_index, 3, nRect(bounds.x+mid,bounds.y+mid,cw,cw));
+    ProcessTreeNode(rv, m, level+1, my_index, 0, nRect(bounds.x,bounds.y,cw,cw));
+    ProcessTreeNode(rv, m, level+1, my_index, 1, nRect(bounds.x+mid,bounds.y,cw,cw));
+    ProcessTreeNode(rv, m, level+1, my_index, 2, nRect(bounds.x,bounds.y+mid,cw,cw));
+    ProcessTreeNode(rv, m, level+1, my_index, 3, nRect(bounds.x+mid,bounds.y+mid,cw,cw));
   }
   // Render this block to the buffer for later drawing.
   else
-    BufferTreeNode(b, bounds);
+    BufferTreeNode(m, b, bounds);
 
 }
 
@@ -252,17 +270,17 @@ void nTerrain::BuildTree(FILE *f, float *heightmap, csVector3 *norms, unsigned i
   unsigned int x=0, y=0;
   nBlock b;
 
-  b.ne = 10 * heightmap[0];
-  b.nw = 10 * heightmap[w-1];
-  b.se = 10 * heightmap[(w-1)*w];
-  b.sw = 10 * heightmap[w-1 + (w-1) * w];
-  b.center = 10 * heightmap[mid + mid * w];
+  b.ne = heightmap[0];
+  b.nw = heightmap[w-1];
+  b.se = heightmap[(w-1)*w];
+  b.sw = heightmap[w-1 + (w-1) * w];
+  b.center = heightmap[mid + mid * w];
 
   b.ne_norm = norms[0];
   b.nw_norm = norms[w-1];
   b.se_norm = norms[(w-1)*w];
   b.sw_norm = norms[w-1 + (w-1) * w];
-  b.center_norm = norms[mid + mid * w];
+  b.ce_norm = norms[mid + mid * w];
 
   SetVariance(b);
 
@@ -278,13 +296,11 @@ void nTerrain::BuildTree(FILE *f, float *heightmap, csVector3 *norms, unsigned i
   b.variance = (var3 > b.variance) ? var3 : b.variance;
   b.variance = (var4 > b.variance) ? var4 : b.variance;
 
-  b.radius = qsqrt(b.variance*b.variance/4.0 + w*w/2.0);
-
   fseek (f, 0, SEEK_SET); 
   fwrite (&b, nBlockLen, 1, f);
 }
 
-void nTerrain::AssembleTerrain(iRenderView *rv, nTerrainInfo *terrinfo)
+void nTerrain::AssembleTerrain(iRenderView *rv, iMovable *m, nTerrainInfo *terrinfo)
 {
   // Clear mesh lists
   info = terrinfo;   
@@ -299,30 +315,29 @@ void nTerrain::AssembleTerrain(iRenderView *rv, nTerrainInfo *terrinfo)
   unsigned int cw = mid+1;
   unsigned int x=0, y=0;
   
-  csSphere bs (csVector3 (0, b->variance/2.0, 0), b->radius);
+  csVector3 center (0, b->variance / 2.0 * scale.y, 0);
+  csVector3 radius (terrain_w * scale.x, b->variance * scale.y, terrain_w * scale.z);
+  csSphere bs (m->GetTransform().This2Other(center), radius.Norm());
   if (!rv->TestBSphere(obj2cam, bs)) return;
 
-  /*
   float distance = ((cam-bs.GetCenter()).Norm())+0.0001;
-  float error_metric = b->variance / distance;
+  float error_metric = b->variance * scale.y / distance;
 
   if (error_metric <= error_metric_tolerance) 
-  */
-  // This is a really bad hack to overcome the large error glitches, but it works
-  BufferTreeNode (b, nRect (0, 0, terrain_w+1, terrain_w+1));
+  BufferTreeNode (m, b, nRect (0, 0, terrain_w+1, terrain_w+1));
 
-  // else {
+  else {
 
   // Buffer entire viewable terrain by first doing view culling on the block, then checking for the
   // error metric.  If the error metric fails, then we need to drop down another level. Begin that
   // process here.
   
-  ProcessTreeNode(rv, 1, 0, 0, nRect(x,y,cw,cw));
-  ProcessTreeNode(rv, 1, 0, 1, nRect(x+mid,y,cw,cw));
-  ProcessTreeNode(rv, 1, 0, 2, nRect(x,y+mid,cw,cw));
-  ProcessTreeNode(rv, 1, 0, 3, nRect(x+mid,y+mid,cw,cw));
+  ProcessTreeNode(rv, m, 1, 0, 0, nRect(x,y,cw,cw));
+  ProcessTreeNode(rv, m, 1, 0, 1, nRect(x+mid,y,cw,cw));
+  ProcessTreeNode(rv, m, 1, 0, 2, nRect(x,y+mid,cw,cw));
+  ProcessTreeNode(rv, m, 1, 0, 3, nRect(x+mid,y+mid,cw,cw));
   
-  // }
+  }
 
 }
 
@@ -447,6 +462,18 @@ bool csBigTerrainObject::LoadHeightMapFile (const char *filename)
   return true;
 }
 
+void csBigTerrainObject::SetScaleFactor (const csVector3 &scale)
+{
+  if (terrain)
+    terrain->SetScaleFactor (scale);
+}
+
+void csBigTerrainObject::SetErrorTolerance (float tolerance)
+{
+  if (terrain)
+    terrain->SetErrorTolerance (tolerance);
+}
+
 bool csBigTerrainObject::ConvertImageToMapFile (iFile *input, 
 	iImageIO *imageio, const char *hm) 
 {
@@ -551,6 +578,24 @@ void csBigTerrainObject::InitMesh (nTerrainInfo *info)
  
     info->mesh = new G3DTriangleMesh[nTextures];
     info->triq = new nTerrainInfo::triangle_queue[nTextures];
+	if (terrain) {
+	  unsigned int size = terrain->GetWidth () * terrain->GetWidth();
+	  for (int i = 0; i < nTextures; i ++) {
+	  	info->triq->triangles = new csTriangle[size];
+	  }
+	  info->vertices = new csVector3[size];
+	  info->texels = new csVector2[size];
+	  info->tindexes = new ti_type[size];
+	  info->colors = new csColor[size];
+	} else {
+	  for (int i = 0; i < nTextures; i ++) {
+	  	info->triq->triangles = NULL;
+	  }
+	  info->vertices = NULL;
+	  info->texels = NULL;
+	  info->tindexes = NULL;
+	  info->colors = NULL;
+	}
     info->num_lights = 0;
 	info->light_list = NULL;
 
@@ -566,6 +611,8 @@ void csBigTerrainObject::InitMesh (nTerrainInfo *info)
   }
 }  
 
+#include <sys/time.h>
+
 bool 
 csBigTerrainObject::DrawTest (iRenderView* rview, iMovable* movable)
 {
@@ -573,13 +620,11 @@ csBigTerrainObject::DrawTest (iRenderView* rview, iMovable* movable)
   {
     iCamera* cam = rview->GetCamera ();
 
-	info->vertices.SetLength( 0 );
-	info->colors.SetLength( 0 );
-	info->texels.SetLength( 0 );
-	info->triq[0].triangles.SetLength( 0 );
+	info->triangle_count = 0;
+	info->vertex_count = 0;
     terrain->SetObjectToCamera(cam->GetTransform());
     terrain->SetCameraOrigin(cam->GetTransform().GetOrigin());
-    terrain->AssembleTerrain(rview, info);
+    terrain->AssembleTerrain(rview, movable, info);
 
 	int i;
     for(i=0; i<nTextures; ++i)
@@ -603,7 +648,6 @@ csBigTerrainObject::DrawTest (iRenderView* rview, iMovable* movable)
 void 
 csBigTerrainObject::UpdateLighting (iLight** lis, int num_lights, iMovable* movable)
 {
-  /*
   if (info->light_list) {
     delete [] info->light_list;
   }
@@ -611,7 +655,6 @@ csBigTerrainObject::UpdateLighting (iLight** lis, int num_lights, iMovable* mova
   info->num_lights = num_lights;
   info->light_list = new iLight*[num_lights];
   memcpy (info->light_list, lis, sizeof (iLight *) * num_lights);
-  */
 }
 
 bool 
@@ -634,20 +677,20 @@ csBigTerrainObject::Draw (iRenderView* rview, iMovable* movable, csZBufMode zbuf
   bufcount++;
 
   vbufmgr->LockBuffer(vbuf, 
-	 	      info->vertices.GetArray(), 
-		      info->texels.GetArray(),
-		      info->colors.GetArray(),
-		      info->vertices.Length(),
+	 	      info->vertices, 
+		      info->texels,
+		      info->colors,
+		      info->vertex_count,
 		      bufcount);
 
   for(i=0; i<nTextures; i++)
   {
     info->mesh[i].mat_handle = terrain->GetMaterialsList()[i]->GetMaterialHandle();
 	terrain->GetMaterialsList()[i]->Visit ();
-    info->mesh[i].triangles = info->triq[i].triangles.GetArray();
-    info->mesh[i].vertex_fog = new G3DFogInfo[info->vertices.Length()]; 
+    info->mesh[i].triangles = info->triq[i].triangles;
+    info->mesh[i].vertex_fog = new G3DFogInfo[info->vertex_count]; 
     info->mesh[i].buffers[0]=vbuf;
-    info->mesh[i].num_triangles = info->triq[i].triangles.Length();
+    info->mesh[i].num_triangles = info->triangle_count;
     rview->CalculateFogMesh( pG3D->GetObjectToCamera(), info->mesh[i] );
     pG3D->DrawTriangleMesh(info->mesh[i]);
     delete[] info->mesh[i].vertex_fog;

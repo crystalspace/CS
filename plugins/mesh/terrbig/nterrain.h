@@ -65,7 +65,7 @@ struct nRect
 
 
 /// The length of the nBlock structure
-unsigned const nBlockLen=94;
+unsigned const nBlockLen=90;
 
 typedef unsigned short ti_type;
 
@@ -78,13 +78,10 @@ struct nBlock
   float ne, nw, se, sw, center;
 
   /// Normal based on surrounding vertices
-  csVector3 ne_norm, nw_norm, se_norm, sw_norm, center_norm;
+  csVector3 ne_norm, nw_norm, se_norm, sw_norm, ce_norm;
 
   /// Variance for block
   float variance;
-
-  /// Radius of block
-  float radius;
 
   /// Middle height of the block
   float midh;
@@ -167,13 +164,15 @@ struct nTerrainInfo
     /// Keep track of tris, verts, tex, indexes, and color
     struct triangle_queue
     {
-      CS_DECLARE_GROWING_ARRAY (triangles, csTriangle);
+      csTriangle *triangles;
     } *triq;
-    
-    CS_DECLARE_GROWING_ARRAY (vertices, csVector3);
-    CS_DECLARE_GROWING_ARRAY (texels, csVector2);
-    CS_DECLARE_GROWING_ARRAY (tindexes, ti_type);
-    CS_DECLARE_GROWING_ARRAY (colors, csColor);
+    int triangle_count;
+
+	int vertex_count;
+    csVector3 *vertices;
+    csVector2 *texels;
+    ti_type *tindexes;
+    csColor *colors;
 	int num_lights;
     iLight **light_list;
 };
@@ -221,6 +220,9 @@ class nTerrain
   // Map mode, whether we are looking up stuff in rgb_colors or pal_colors.
   int map_mode;
   
+  /// Scales
+  csVector3 scale;
+  
   /// Calculates the binary logarithm of n
   int ilogb (unsigned n) 
   {
@@ -239,13 +241,13 @@ class nTerrain
   float BuildTreeNode(FILE *f, unsigned int level, unsigned int parent_index, unsigned int child_num, nRect bounds, float *heightmap, csVector3 *norms, unsigned int w);
 
   /// Calculates the insensity and color at a given vertex for a given light
-  csColor nTerrain::CalculateLightIntensity (iLight *li, csVector3 v, csVector3 n);
+  csColor CalculateLightIntensity (iLight *li, iMovable *m, csVector3 v, csVector3 n);
 
   /// Buffers the node passed into it for later drawing, bounds are needed to generate all the verts.
-  void BufferTreeNode(nBlock *b, nRect bounds);
+  void BufferTreeNode(iMovable *m, nBlock *b, nRect bounds);
 
   /// Processes a node for buffering, checks for visibility and detail levels.
-  void ProcessTreeNode(iRenderView *rv, unsigned int level, unsigned int parent_index, unsigned int child_num, nRect bounds);
+  void ProcessTreeNode(iRenderView *rv, iMovable *m, unsigned int level, unsigned int parent_index, unsigned int child_num, nRect bounds);
     
 public:
   /// Sets the heightmap file
@@ -253,7 +255,23 @@ public:
     {
     if (hm) { delete hm; }
     hm = new csMemoryMappedIO (nBlockLen, (char *)filename);
+    nBlock *b = (nBlock *)hm->GetPointer(0);
+    if (!b) { return; }
+    terrain_w = (unsigned int)b->midh;
+    max_levels = ilogb(terrain_w) - 1;
     }
+  /// Sets the scale factor
+  void SetScaleFactor (const csVector3 &s)
+    {
+	  scale = s;
+    }
+  /// Sets the scale factor
+  void SetErrorTolerance (float tolerance)
+    {
+	  error_metric_tolerance = tolerance;
+    }
+  /// Gets the width (and height) of the heightmap
+  unsigned int GetWidth () { return terrain_w; }
   /** Builds a full-resolution quadtree terrain mesh object on disk, 
    *  heightmap is the data, w is the width and height (map must be square
    *  and MUST be a power of two + 1, e.g. 129x129, 257x257, 513x513.)
@@ -261,7 +279,7 @@ public:
   void BuildTree(FILE *f, float *heightmap, csVector3 *norms, unsigned int w);
 
   /// Assembles the terrain into the buffer when called by the engine.  
-  void AssembleTerrain(iRenderView *rv, nTerrainInfo *terrinfo);
+  void AssembleTerrain(iRenderView *rv, iMovable *m, nTerrainInfo *terrinfo);
 
   /// Sets the object to camera transform
   void SetObjectToCamera(csOrthoTransform &o2c)
@@ -292,9 +310,9 @@ public:
 
   nTerrain(csMemoryMappedIO *phm=NULL):max_levels(0), 
 			 /* this is 4 pixel accuracy on 800x600 */
-             error_metric_tolerance(0.005), 
+             error_metric_tolerance(0.00125), 
 	     info(NULL), hm(phm), materials(NULL), 
-	     map_scale(0), map_mode(0) {}
+	     map_scale(0), map_mode(0), scale(1,1,1) {}
 
   ~nTerrain()
   {
@@ -343,7 +361,6 @@ private:
   /// Number of textures
   unsigned short nTextures;
 
-  
 protected:
   /// Creates and sets up a vertex buffer.
   void SetupVertexBuffer (csRef<iVertexBuffer> &vbuf1);
@@ -360,6 +377,10 @@ public:
     SCF_DECLARE_EMBEDDED_IBASE (csBigTerrainObject);
     virtual bool LoadHeightMapFile (const char *hm) 
     { return scfParent->LoadHeightMapFile (hm); }
+	virtual void SetScaleFactor (const csVector3 &scale)
+	{ scfParent->SetScaleFactor (scale); }
+	virtual void SetErrorTolerance (float tolerance)
+	{ scfParent->SetErrorTolerance (tolerance); }
     virtual bool ConvertImageToMapFile (iFile *input, iImageIO *imageio, const char *hm)
     { return scfParent->ConvertImageToMapFile (input, imageio, hm); }
     virtual void SetMaterialsList(iMaterialWrapper **matlist, unsigned int nMaterials)
@@ -410,6 +431,8 @@ public:
   virtual ~csBigTerrainObject();
 
   virtual bool LoadHeightMapFile (const char *hm);
+  virtual void SetScaleFactor (const csVector3 &scale);
+  virtual void SetErrorTolerance (float tolerance);
   virtual bool ConvertImageToMapFile (iFile *input, iImageIO *imageio, const char *hm);
 
   /// Returns a pointer to the factory that made this.
