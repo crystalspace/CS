@@ -8,6 +8,37 @@ The history order is reversed so that new features are at the top.
 	  used there had the wrong number of parameters.
 	- Increased the number of hardcoded vertices in a limb (skeletal
 	  animation) from 1000 to 20000. Still hardcoded though.
+	- Made several functions in iThingState 'const':
+	    - CurveTexel()
+	    - CurveVertex()
+	    - GetCurveVertices()
+	    - GetCurveVertexCount()
+	    - GetCurveCount()
+	    - GetCurvesScale()
+	    - GetMovingOption()
+	    - GetPortalCount()
+	    - GetPortal()
+	    - GetPortalPolygon()
+	    - GetVertexCount()
+	- Renamed two functions in iThingState:
+	    - CurveVertex() to GetCurveVertex()
+	    - CurveTexel() to GetCuveTexel()
+	- Added several functions to iThingState:
+	    - FindPolygonIndex()
+	    - RemovePolygon()
+	    - RemovePolygons()
+	    - SetVertex()
+	    - DeleteVertex()
+	    - DeleteVertices()
+	    - SetCurveVertex()
+	    - SetCurveTexel()
+	    - ClearCurveVertices()
+	    - FindCurveIndex()
+	    - RemoveCurve()
+	    - RemoveCurves()
+	- Fixed a bug with things when adding a polygon that already
+	  contained a portal. In that case the array of portals for that
+	  thing would not be updated.
 24-Nov-2001
 	- Added more debug graph commands for iImage. Also added links to
 	  iImage and the texture manager for the 3D renderers. This reveals

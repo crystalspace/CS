@@ -298,6 +298,12 @@ private:
   void PreparePolygonBuffer ();
 
   /**
+   * Invalidate a thing. This has to be called when new polygons are
+   * added or removed.
+   */
+  void InvalidateThing ();
+
+  /**
    * Draw the given array of polygons in the current thing.
    * This version uses iGraphics3D->DrawPolygonMesh()
    * for more efficient rendering. WARNING! This version only works for
@@ -451,7 +457,16 @@ public:
   const csVector3& Vcam (int idx) const { return cam_verts[idx]; }
 
   /// Return the number of vertices.
-  int GetVertexCount () { return num_vertices; }
+  int GetVertexCount () const { return num_vertices; }
+
+  /// Change a vertex.
+  void SetVertex (int idx, const csVector3& vt);
+
+  /// Delete a vertex.
+  void DeleteVertex (int idx);
+
+  /// Delete a range of vertices.
+  void DeleteVertices (int from, int to);
 
   //----------------------------------------------------------------------
   // Polygon handling functions
@@ -489,6 +504,15 @@ public:
     return last_polygon_id;
   }
 
+  /// Find a polygon index.
+  int FindPolygonIndex (iPolygon3D* polygon) const;
+
+  /// Remove a single polygon.
+  void RemovePolygon (int idx);
+
+  /// Remove all polygons.
+  void RemovePolygons ();
+
   //----------------------------------------------------------------------
   // Curve handling functions
   //----------------------------------------------------------------------
@@ -497,42 +521,60 @@ public:
   void AddCurve (csCurve* curve);
 
   /// Get the number of curves in this thing.
-  int GetCurveCount ()
+  int GetCurveCount () const
   { return curves.Length (); }
 
   /// Get the specified curve from this set.
-  csCurve* GetCurve (int idx)
+  csCurve* GetCurve (int idx) const
   { return curves.Get (idx); }
 
   /// Create a curve from a template.
   iCurve* CreateCurve (iCurveTemplate* tmpl);
 
+  /// Find a curve index.
+  int FindCurveIndex (iCurve* curve) const;
+
+  /// Delete a curve given an index.
+  void RemoveCurve (int idx);
+
+  /// Delete all curves.
+  void RemoveCurves ();
+
   /// Get the named curve from this set.
-  csCurve* GetCurve (char* name);
+  csCurve* GetCurve (char* name) const;
 
   /// Get the number of curve vertices.
-  int GetCurveVertexCount () { return num_curve_vertices; }
+  int GetCurveVertexCount () const { return num_curve_vertices; }
 
   /// Get the specified curve vertex.
-  csVector3& CurveVertex (int i) { return curve_vertices[i]; }
+  csVector3& GetCurveVertex (int i) const { return curve_vertices[i]; }
 
   /// Get the curve vertices.
-  csVector3* GetCurveVertices () { return curve_vertices; }
+  csVector3* GetCurveVertices () const { return curve_vertices; }
 
   /// Get the specified curve texture coordinate (texel).
-  csVector2& CurveTexel (int i) { return curve_texels[i]; }
+  csVector2& GetCurveTexel (int i) const { return curve_texels[i]; }
+
+  /// Get the specified curve coordinate.
+  void SetCurveVertex (int idx, const csVector3& vt);
+
+  /// Set the specified curve texture coordinate (texel).
+  void SetCurveTexel (int idx, const csVector2& vt);
+
+  /// Clear the curve vertices.
+  void ClearCurveVertices ();
 
   /// Add a curve vertex and return the index of the vertex.
   int AddCurveVertex (const csVector3& v, const csVector2& t);
 
   /// Get the curve scale.
-  float GetCurvesScale () { return curves_scale; }
+  float GetCurvesScale () const { return curves_scale; }
 
   /// Set the curve scale.
   void SetCurvesScale (float f) { curves_scale = f; }
 
   /// Get the curves center.
-  const csVector3& GetCurvesCenter () { return curves_center; }
+  const csVector3& GetCurvesCenter () const { return curves_center; }
 
   /// Set the curves center.
   void SetCurvesCenter (csVector3& v) { curves_center = v; }
@@ -857,7 +899,7 @@ public:
   /**
    * Get the moving option.
    */
-  int GetMovingOption () { return cfg_moving; }
+  int GetMovingOption () const { return cfg_moving; }
 
   /**
    * Set convexity flag of this thing. You should call this instead
@@ -901,14 +943,23 @@ public:
     virtual void* GetPrivateObject () { return (void*)scfParent; }
     virtual iObject* QueryObject () { return scfParent; }
     virtual void CompressVertices () { scfParent->CompressVertices(); }
+
     virtual int GetPolygonCount () { return scfParent->polygons.Length (); }
     virtual iPolygon3D *GetPolygon (int idx);
     virtual iPolygon3D *GetPolygon (const char* name);
     virtual iPolygon3D *CreatePolygon (const char *iName);
-    virtual int GetPortalCount ();
-    virtual iPortal* GetPortal (int idx);
-    virtual iPolygon3D* GetPortalPolygon (int idx);
-    virtual int GetVertexCount () { return scfParent->num_vertices; }
+    virtual int FindPolygonIndex (iPolygon3D* polygon) const
+    { return scfParent->FindPolygonIndex (polygon); }
+    virtual void RemovePolygon (int idx)
+    { scfParent->RemovePolygon (idx); }
+    virtual void RemovePolygons ()
+    { scfParent->RemovePolygons (); }
+
+    virtual int GetPortalCount () const;
+    virtual iPortal* GetPortal (int idx) const;
+    virtual iPolygon3D* GetPortalPolygon (int idx) const;
+
+    virtual int GetVertexCount () const { return scfParent->num_vertices; }
     virtual const csVector3 &GetVertex (int i) const
     { return scfParent->obj_verts[i]; }
     virtual const csVector3* GetVertices () const
@@ -923,36 +974,55 @@ public:
     { return scfParent->cam_verts; }
     virtual int CreateVertex (const csVector3 &iVertex)
     { return scfParent->AddVertex (iVertex.x, iVertex.y, iVertex.z); }
+    virtual void SetVertex (int idx, const csVector3& vt)
+    { scfParent->SetVertex (idx, vt); }
+    virtual void DeleteVertex (int idx)
+    { scfParent->DeleteVertex (idx); }
+    virtual void DeleteVertices (int from, int to)
+    { scfParent->DeleteVertices (from, to); }
+
     virtual void CheckFrustum (iFrustumView* fview, iMovable* movable)
     { scfParent->CheckFrustum (fview, movable); }
     virtual csFlags& GetFlags () { return scfParent->flags; }
-    virtual int GetMovingOption ()
+    virtual int GetMovingOption () const
     { return scfParent->GetMovingOption (); }
     virtual void SetMovingOption (int opt)
     { scfParent->SetMovingOption (opt); }
+
     virtual const csVector3& GetCurvesCenter () const
     { return scfParent->curves_center; }
     virtual void SetCurvesCenter (const csVector3& cen)
     { scfParent->curves_center = cen; }
-    virtual float GetCurvesScale ()
+    virtual float GetCurvesScale () const
     { return scfParent->curves_scale; }
     virtual void SetCurvesScale (float scale)
     { scfParent->curves_scale = scale; }
-    virtual int GetCurveCount ()
+    virtual int GetCurveCount () const
     { return scfParent->GetCurveCount (); }
-    virtual int GetCurveVertexCount ()
+    virtual int GetCurveVertexCount () const
     { return scfParent->GetCurveVertexCount (); }
-    virtual csVector3& CurveVertex (int i)
-    { return scfParent->CurveVertex (i); }
-    virtual csVector3* GetCurveVertices ()
+    virtual csVector3& GetCurveVertex (int i) const
+    { return scfParent->GetCurveVertex (i); }
+    virtual csVector3* GetCurveVertices () const
     { return scfParent->GetCurveVertices (); }
-    virtual csVector2& CurveTexel (int i)
-    { return scfParent->CurveTexel (i); }
-    virtual iCurve* GetCurve (int idx);
+    virtual csVector2& GetCurveTexel (int i) const
+    { return scfParent->GetCurveTexel (i); }
+    virtual void SetCurveVertex (int idx, const csVector3& vt)
+    { scfParent->SetCurveVertex (idx, vt); }
+    virtual void SetCurveTexel (int idx, const csVector2& vt)
+    { scfParent->SetCurveTexel (idx, vt); }
+    virtual void ClearCurveVertices ()
+    { scfParent->ClearCurveVertices (); }
+    virtual iCurve* GetCurve (int idx) const;
     virtual iCurve* CreateCurve (iCurveTemplate* tmpl)
-    {
-      return scfParent->CreateCurve (tmpl);
-    }
+    { return scfParent->CreateCurve (tmpl); }
+    virtual int FindCurveIndex (iCurve* curve) const
+    { return scfParent->FindCurveIndex (curve); }
+    virtual void RemoveCurve (int idx)
+    { scfParent->RemoveCurve (idx); }
+    virtual void RemoveCurves ()
+    { scfParent->RemoveCurves (); }
+
     virtual void MergeTemplate (iThingState* tpl,
   	iMaterialWrapper* default_material = NULL,
 	csVector3* shift = NULL, csMatrix3* transform = NULL)

@@ -69,7 +69,7 @@ struct csFog;
 #define CS_THING_MOVE_OFTEN 1
 #define CS_THING_MOVE_OCCASIONAL 2
 
-SCF_VERSION (iThingState, 0, 0, 11);
+SCF_VERSION (iThingState, 0, 1, 0);
 
 /**
  * This is the state interface to access the internals of a thing
@@ -103,16 +103,22 @@ struct iThingState : public iBase
   virtual iPolygon3D *GetPolygon (const char* name) = 0;
   /// Create a new polygon and return a pointer to it.
   virtual iPolygon3D *CreatePolygon (const char *iName = NULL) = 0;
+  /// Find the index for a polygon. Returns -1 if polygon cannot be found.
+  virtual int FindPolygonIndex (iPolygon3D* polygon) const = 0;
+  /// Delete a polygon given an index.
+  virtual void RemovePolygon (int idx) = 0;
+  /// Delete all polygons.
+  virtual void RemovePolygons () = 0;
 
   /// Query number of portals in this thing.
-  virtual int GetPortalCount () = 0;
+  virtual int GetPortalCount () const = 0;
   /// Get a portal.
-  virtual iPortal* GetPortal (int idx) = 0;
+  virtual iPortal* GetPortal (int idx) const = 0;
   /// Get the polygon for the given portal (with index).
-  virtual iPolygon3D* GetPortalPolygon (int idx) = 0;
+  virtual iPolygon3D* GetPortalPolygon (int idx) const = 0;
 
   /// Query number of vertices in set
-  virtual int GetVertexCount () = 0;
+  virtual int GetVertexCount () const = 0;
   /// Get the given vertex coordinates in object space
   virtual const csVector3 &GetVertex (int idx) const = 0;
   /// Get the vertiex coordinates in object space
@@ -126,7 +132,24 @@ struct iThingState : public iBase
   /// Get the vertex coordinates in camera space
   virtual const csVector3* GetVerticesC () const = 0;
   /// Create a vertex given his object-space coords and return his index
-  virtual int CreateVertex (const csVector3 &iVertex) = 0;
+  virtual int CreateVertex (const csVector3& vt) = 0;
+  /// Set the object space vertices for a given vertex.
+  virtual void SetVertex (int idx, const csVector3& vt) = 0;
+  /**
+   * Delete a vertex. Warning this will invalidate all polygons
+   * that use vertices after this vertex because their vertex indices
+   * will no longer be ok.
+   */
+  virtual void DeleteVertex (int idx) = 0;
+  /**
+   * Delete a range of vertices (inclusive). Warning this will invalidate
+   * all polygons that use vertices after these vertices because their
+   * vertex indices will no longer be ok. This function does
+   * bounds-checking so an easy way to delete all vertices is
+   * DeleteVertices(0,1000000000).
+   */
+  virtual void DeleteVertices (int from, int to) = 0;
+
   /**
    * Check frustum visibility on this thing.
    * First initialize the 2D culler cube.
@@ -140,7 +163,7 @@ struct iThingState : public iBase
   /**
    * Get the moving option.
    */
-  virtual int GetMovingOption () = 0;
+  virtual int GetMovingOption () const = 0;
 
   /**
    * Control how this thing will be moved.
@@ -188,7 +211,7 @@ struct iThingState : public iBase
   /**
    * Get the scale of the curves.
    */
-  virtual float GetCurvesScale () = 0;
+  virtual float GetCurvesScale () const = 0;
   /**
    * Set the scale of the curves.
    */
@@ -197,20 +220,32 @@ struct iThingState : public iBase
   /// Add a curve vertex.
   virtual void AddCurveVertex (const csVector3& v, const csVector2& uv) = 0;
   /// Get the number of curves.
-  virtual int GetCurveCount () = 0;
+  virtual int GetCurveCount () const = 0;
   /// Get the curve.
-  virtual iCurve* GetCurve (int idx) = 0;
+  virtual iCurve* GetCurve (int idx) const = 0;
   /// Get the number of curve vertices.
-  virtual int GetCurveVertexCount () = 0;
+  virtual int GetCurveVertexCount () const = 0;
   /// Get the specified curve vertex.
-  virtual csVector3& CurveVertex (int i) = 0;
+  virtual csVector3& GetCurveVertex (int i) const = 0;
   /// Get the curve vertices.
-  virtual csVector3* GetCurveVertices () = 0;
+  virtual csVector3* GetCurveVertices () const = 0;
   /// Get the specified curve texture coordinate (texel).
-  virtual csVector2& CurveTexel (int i) = 0;
+  virtual csVector2& GetCurveTexel (int i) const = 0;
+  /// Set a curve vertex.
+  virtual void SetCurveVertex (int idx, const csVector3& vt) = 0;
+  /// Set a curve texel.
+  virtual void SetCurveTexel (int idx, const csVector2& vt) = 0;
+  /// Clear all curve vertices (and texels too).
+  virtual void ClearCurveVertices () = 0;
 
   /// Create a new curve for this thing from the given template.
   virtual iCurve* CreateCurve (iCurveTemplate* tmpl) = 0;
+  /// Find the index for a curve. Returns -1 if curve cannot be found.
+  virtual int FindCurveIndex (iCurve* curve) const = 0;
+  /// Delete a curve given an index.
+  virtual void RemoveCurve (int idx) = 0;
+  /// Delete all curves.
+  virtual void RemoveCurves () = 0;
 
   /**
    * Add polygons and vertices from the specified thing (seen as template).

@@ -324,6 +324,30 @@ int csThing::AddCurveVertex (const csVector3& v, const csVector2& t)
   return num_curve_vertices-1;
 }
 
+void csThing::SetCurveVertex (int idx, const csVector3& vt)
+{
+  CS_ASSERT (idx >= 0 && idx < num_curve_vertices);
+  curve_vertices[idx] = vt;
+  obj_bbox_valid = false;
+  delete bbox; bbox = NULL;
+  curves_transf_ok = false;
+}
+
+void csThing::SetCurveTexel (int idx, const csVector2& vt)
+{
+  CS_ASSERT (idx >= 0 && idx < num_curve_vertices);
+  curve_texels[idx] = vt;
+}
+
+void csThing::ClearCurveVertices ()
+{
+  delete [] curve_vertices; curve_vertices = NULL;
+  delete [] curve_texels; curve_texels = NULL;
+  obj_bbox_valid = false;
+  delete bbox; bbox = NULL;
+  curves_transf_ok = false;
+}
+
 int csThing::AddVertex (float x, float y, float z)
 {
   if (!obj_verts)
@@ -380,6 +404,55 @@ int csThing::AddVertexSmart (float x, float y, float z)
   AddVertex (x, y, z);
   return num_vertices-1;
 }
+
+void csThing::SetVertex (int idx, const csVector3& vt)
+{
+  CS_ASSERT (idx >= 0 && idx < num_vertices);
+  obj_verts[idx] = vt;
+  if (wor_verts && wor_verts != obj_verts) wor_verts[idx] = vt;
+}
+
+void csThing::DeleteVertex (int idx)
+{
+  CS_ASSERT (idx >= 0 && idx < num_vertices);
+  int copysize = sizeof (csVector3)*(num_vertices-idx-1);
+  memmove (obj_verts+idx, obj_verts+idx+1, copysize);
+  if (wor_verts && wor_verts != obj_verts)
+    memmove (wor_verts+idx, wor_verts+idx+1, copysize);
+  if (cam_verts)
+    memmove (cam_verts+idx, cam_verts+idx+1, copysize);
+  num_vertices--;
+}
+
+void csThing::DeleteVertices (int from, int to)
+{
+  if (from <= 0 && to >= num_vertices-1)
+  {
+    // Delete everything.
+    if (wor_verts == obj_verts) delete [] obj_verts;
+    else { delete [] wor_verts; delete [] obj_verts; }
+    delete [] cam_verts;
+    max_vertices = num_vertices = 0;
+    wor_verts = NULL;
+    obj_verts = NULL;
+    cam_verts = NULL;
+    num_cam_verts = 0;
+  }
+  else
+  {
+    if (from < 0) from = 0;
+    if (to >= num_vertices) to = num_vertices-1;
+    int rangelen = to-from+1;
+    int copysize = sizeof (csVector3)*(num_vertices-from-rangelen);
+    memmove (obj_verts+from, obj_verts+from+rangelen, copysize);
+    if (wor_verts && wor_verts != obj_verts)
+      memmove (wor_verts+from, wor_verts+from+rangelen, copysize);
+    if (cam_verts)
+      memmove (cam_verts+from, cam_verts+from+rangelen, copysize);
+    num_vertices -= rangelen;
+  }
+}
+
 
 struct CompressVertex
 {
@@ -675,6 +748,12 @@ csPolygon3D* csThing::GetPolygon3D (const char* name)
   return idx >= 0 ? polygons.Get (idx) : NULL;
 }
 
+int csThing::FindPolygonIndex (iPolygon3D* polygon) const
+{
+  csPolygon3D* p = polygon->GetPrivateObject ();
+  return polygons.Find (p);
+}
+  
 csPolygon3D* csThing::NewPolygon (csMaterialWrapper* material)
 {
   csPolygon3D* p = new csPolygon3D (material);
@@ -682,19 +761,46 @@ csPolygon3D* csThing::NewPolygon (csMaterialWrapper* material)
   return p;
 }
 
-void csThing::AddPolygon (csPolygonInt* poly)
+void csThing::InvalidateThing ()
 {
   if (polybuf) { polybuf->DecRef (); polybuf = NULL; }
   delete[] polybuf_materials; polybuf_materials = NULL;
-  ((csPolygon3D *)poly)->SetParent (this);
-  polygons.Push ((csPolygon3D *)poly);
   thing_edges_valid = false;
   prepared = false;
   obj_bbox_valid = false;
   delete bbox; bbox = NULL;
+  CleanupThingEdgeTable ();
 }
 
-csCurve* csThing::GetCurve (char* name)
+void csThing::RemovePolygon (int idx)
+{
+  InvalidateThing ();
+  csPolygon3D* poly3d = GetPolygon3D (idx);
+  if (poly3d->GetPortal ())
+  {
+    RemovePortalPolygon (poly3d);
+  }
+  polygons.Delete (idx);
+}
+
+void csThing::RemovePolygons ()
+{
+  InvalidateThing ();
+  polygons.DeleteAll (); // delete prior to portal_poly array !
+  if (portal_polygons.Length ()) portal_polygons.DeleteAll ();
+}
+
+void csThing::AddPolygon (csPolygonInt* poly)
+{
+  InvalidateThing ();
+  csPolygon3D* poly3d = (csPolygon3D*)poly;
+  poly3d->SetParent (this);
+  polygons.Push (poly3d);
+  if (poly3d->GetPortal ())
+    AddPortalPolygon (poly3d);
+}
+
+csCurve* csThing::GetCurve (char* name) const
 {
   int idx = curves.FindKey (name);
   return idx >= 0 ? curves.Get (idx) : NULL;
@@ -719,6 +825,27 @@ iCurve* csThing::CreateCurve (iCurveTemplate* tmpl)
     curve->SetControlPoint (i, tmpl->GetVertex (i));
   AddCurve (c);
   return curve;
+}
+
+int csThing::FindCurveIndex (iCurve* curve) const
+{
+  return curves.Find (curve->GetOriginalObject ());
+}
+
+void csThing::RemoveCurve (int idx)
+{
+  curves.Delete (idx);
+  curves_transf_ok = false;
+  obj_bbox_valid = false;
+  delete bbox; bbox = NULL;
+}
+
+void csThing::RemoveCurves ()
+{
+  curves.DeleteAll ();
+  curves_transf_ok = false;
+  obj_bbox_valid = false;
+  delete bbox; bbox = NULL;
 }
 
 void csThing::HardTransform (const csReversibleTransform& t)
@@ -2963,7 +3090,7 @@ void csThing::Merge (csThing* other)
   }
 
   for (i = 0 ; i < other->GetCurveVertexCount () ; i++)
-    AddCurveVertex (other->CurveVertex (i), other->CurveTexel (i));
+    AddCurveVertex (other->GetCurveVertex (i), other->GetCurveTexel (i));
 
   for (i = 0 ; i < other->curves.Length () ; i++)
   {
@@ -3024,10 +3151,10 @@ void csThing::MergeTemplate (iThingState* tpl,
 
   for (i = 0; i < tpl->GetCurveVertexCount (); i++)
   {
-    csVector3 v = tpl->CurveVertex (i);
+    csVector3 v = tpl->GetCurveVertex (i);
     if (transform) v = *transform * v;
     if (shift) v += *shift;
-    AddCurveVertex (v, tpl->CurveTexel (i));
+    AddCurveVertex (v, tpl->GetCurveTexel (i));
   }
 
   for (i = 0; i < tpl->GetCurveCount (); i++)
@@ -3081,7 +3208,7 @@ void csThing::RemovePortalPolygon (csPolygon3D* poly)
 
 //---------------------------------------------------------------------------
 
-iCurve *csThing::ThingState::GetCurve (int idx)
+iCurve *csThing::ThingState::GetCurve (int idx) const
 {
   csCurve* c = scfParent->GetCurve (idx);
   return &(c->scfiCurve);
@@ -3109,18 +3236,18 @@ iPolygon3D *csThing::ThingState::CreatePolygon (const char *iName)
   return ip;
 }
 
-int csThing::ThingState::GetPortalCount ()
+int csThing::ThingState::GetPortalCount () const
 {
   return scfParent->portal_polygons.Length ();
 }
 
-iPortal* csThing::ThingState::GetPortal (int idx)
+iPortal* csThing::ThingState::GetPortal (int idx) const
 {
   csPolygon3D* p = (csPolygon3D*)(scfParent->portal_polygons)[idx];
   return &(p->GetPortal ()->scfiPortal);
 }
 
-iPolygon3D* csThing::ThingState::GetPortalPolygon (int idx)
+iPolygon3D* csThing::ThingState::GetPortalPolygon (int idx) const
 {
   csPolygon3D* p = (csPolygon3D*)(scfParent->portal_polygons)[idx];
   return &(p->scfiPolygon3D);

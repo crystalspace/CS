@@ -939,8 +939,8 @@ csBezierCurve::~csBezierCurve ()
 
 void csBezierCurve::SetControlPoint (int index, int control_id)
 {
-  GetControlPoint(index) = ParentThing->CurveVertex (control_id);
-  GetTextureCoord(index) = ParentThing->CurveTexel (control_id);
+  GetControlPoint(index) = ParentThing->GetCurveVertex (control_id);
+  GetTextureCoord(index) = ParentThing->GetCurveTexel (control_id);
   cpt[index][0] = GetControlPoint(index).x;
   cpt[index][1] = GetControlPoint(index).y;
   cpt[index][2] = GetControlPoint(index).z;
