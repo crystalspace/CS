@@ -414,15 +414,15 @@ bool PVSCalcSector::SetupProjectionPlane (const csBox3& source,
   return true;
 }
 
-bool PVSCalcSector::CastAreaShadow (const csPoly3D& polygon)
+bool PVSCalcSector::CastAreaShadow (const csBox3& source,
+	const csPoly3D& polygon)
 {
-#if 0
   // First we calculate the projection of the polygon on the shadow plane
   // as seen from the first point on the source box. That will be the start
   // for calculating the intersection of all those projections.
   csPoly2D poly_intersect;
-  if (!dest.ProjectOutline (source.GetCorner (CS_BOX_CORNER_xyz),
-  	plane.axis, plane.where, poly_intersect))
+  if (!polygon.ProjectAxisPlane (source.GetCorner (CS_BOX_CORNER_xyz),
+  	plane.axis, plane.where, &poly_intersect))
     return false;
 
   // First we clip the projected polygon to the bounding box that
@@ -437,8 +437,8 @@ bool PVSCalcSector::CastAreaShadow (const csPoly3D& polygon)
   for (i = 1 ; i < 8 ; i++)
   {
     csPoly2D poly;
-    if (!dest.ProjectOutline (source.GetCorner (i),
-  	plane.axis, plane.where, poly))
+    if (!polygon.ProjectAxisPlane (source.GetCorner (i),
+  	plane.axis, plane.where, &poly))
       return false;
 
     // Now we construct a clipper from this projected polygon.
@@ -452,16 +452,12 @@ bool PVSCalcSector::CastAreaShadow (const csPoly3D& polygon)
   // Now 'poly_intersect' contains the intersection of all projected
   // polygons on the shadow plane. This is the area shadow and we will now
   // insert that in the coverage buffer.
-  csBox2Int modified_bbox;	//@@@ ???
   int nummod = plane.covbuf->InsertPolygonNoDepth (
-  	poly_intersect.GetVertices (), poly_intersect.GetVertexCount (),
-	modified_bbox);
+  	poly_intersect.GetVertices (), poly_intersect.GetVertexCount ());
 
   // If nummod > 0 then we modified the coverage buffer and we return
   // true then.
   return nummod > 0;
-#endif
-return true;
 }
 
 void PVSCalcSector::Calculate ()

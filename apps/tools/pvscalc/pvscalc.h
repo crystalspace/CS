@@ -114,11 +114,12 @@ private:
   bool SetupProjectionPlane (const csBox3& source, const csBox3& dest);
 
   /**
-   * Calculate the area shadow on the shadow plane for a given polygon.
+   * Calculate the area shadow on the shadow plane for a given polygon as
+   * seen from the source box.
    * Also update this on the coverage buffer. This function returns true
    * if the coverage buffer was actually modified.
    */
-  bool CastAreaShadow (const csPoly3D& polygon);
+  bool CastAreaShadow (const csBox3& source, const csPoly3D& polygon);
 
 public:
   PVSCalcSector (PVSCalc* parent, iSector* sector, iPVSCuller* pvs);

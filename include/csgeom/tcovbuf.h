@@ -564,17 +564,14 @@ public:
    * Insert a polygon in the coverage buffer.
    * This function will not do any backface culling and it will work
    * perfectly in all orientations. Polygon has to be convex.
-   * It will update the screen buffer. 'modified_bbox' will be updated to
-   * contain the union of the previous contents of 'modified_bbox' and also
-   * the screen space box that was modified by this function.
+   * It will update the screen buffer.
    * <p>
    * If this function returns the number of tiles that were modified.
    * <p>
    * This function ignores depth in the depth buffer and should only
    * be used if you don't plan to use depth information nor depend on it.
    */
-  int InsertPolygonNoDepth (csVector2* verts, int num_verts,
-  	csBox2Int& modified_bbox);
+  int InsertPolygonNoDepth (csVector2* verts, int num_verts);
 
   /**
    * Insert an outline in the coverage buffer.
