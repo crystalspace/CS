@@ -206,7 +206,7 @@ void awsManager::SetFocusedComponent (iAwsComponent *_focused)
 		focused->UnsetFocus();
 	if(_focused)
 		_focused->SetFocus();
-  focused = _focused;
+  /*keyb_focus = */focused = _focused;
 }
 
 void awsManager::SetCanvas (iAwsCanvas *newCanvas)
@@ -997,26 +997,18 @@ bool awsManager::HandleEvent (iEvent &Event)
       
     case csevKeyDown:
 			{
+        iAwsComponent *cmp = NULL;
+
 				if( flags & AWSF_KeyboardControl)	
 				{
-					  iAwsComponent *comp = GetFocusedComponent();
+					  cmp = GetFocusedComponent();
 
 						char code = (char)(Event.Key.Code);
 
 						if(code == CSKEY_TAB)
 						{
 
-											 // if( !(comp->Parent()) )
-											 // {
-											 //	 comp = comp->GetTopChild();
-											 //	 if(comp && comp->Focusable())
-					 						 //		 SetFocusedComponent(comp);
-											 //	 return true;
-											 // }	
-
-						 iAwsComponent *cmp = comp;
-
-						 bool found = false;
+             bool found = false;
 
 						 while(cmp && !found) 
 						 {
@@ -1024,7 +1016,7 @@ bool awsManager::HandleEvent (iEvent &Event)
 							 {
 								 if(cmp->Parent() 
 								 && cmp == cmp->Parent()->GetTabComponent(0)
-								 && cmp->Parent()->Parent() != NULL)
+								 && cmp->Parent()->Parent())
 									cmp = cmp->Parent();
 
 								 cmp = cmp->Parent()->TabPrev(cmp);
@@ -1033,22 +1025,22 @@ bool awsManager::HandleEvent (iEvent &Event)
 							 {
 								 if(cmp->Parent() 
 								 && cmp == cmp->Parent()->GetTabComponent(cmp->Parent()->GetTabLength() - 1)
-								 && cmp->Parent()->Parent() != NULL)
+								 && cmp->Parent()->Parent())
 									cmp = cmp->Parent();
 
 								cmp = cmp->Parent()->TabNext(cmp);
 							 }
 
-							 if(cmp->Focusable() && !cmp->isHidden())
+							 if(cmp && cmp->Focusable() && !cmp->isHidden())
 								 found = true;
 							 else 
 							 {
-								 if(cmp->HasChildren())
+								 if(cmp && cmp->HasChildren())
 								 {
 									 if(Event.Key.Modifiers & CSMASK_CTRL)
 										cmp = cmp->GetTabComponent(cmp->GetTabLength() - 1);
 									 else cmp = cmp->GetTabComponent(0);
-									 if(cmp->Focusable() && !cmp->isHidden())
+									 if(cmp && cmp->Focusable() && !cmp->isHidden())
 										 found = true;
 								 }
 
@@ -1057,12 +1049,12 @@ bool awsManager::HandleEvent (iEvent &Event)
 						 }
 
 						 if(cmp)
-						 {
 							 SetFocusedComponent(cmp);
-							 ChangeKeyboardFocus(cmp, Event);
-						 }
+
 						 return true;
 						}
+
+            ChangeKeyboardFocus(cmp, Event);
 					}
 
 				if (keyb_focus) 
@@ -1166,7 +1158,7 @@ bool awsManager::ChangeMouseFocusHelper(iAwsComponent *cmp, iEvent &Event)
     RaiseComponents(cmp);
 
 		//if component is focusable then focus it
-		if(cmp && cmp->Focusable()) 
+		if(cmp && cmp->Focusable())
 			SetFocusedComponent(cmp);
 	}
   
@@ -1178,7 +1170,9 @@ void awsManager::ChangeKeyboardFocus(iAwsComponent *cmp, iEvent &Event)
   // Reusing this event, save the orignal type
   uint8 et = Event.Type;
 
-  if (et == csevMouseDown || (flags & AWSF_RaiseOnMouseOver))
+  if (et == csevMouseDown 
+    ||(et == csevMouseMove && (flags & AWSF_RaiseOnMouseOver))
+    ||(et == csevKeyDown && (flags & AWSF_KeyboardControl) )  )
   {
     if (keyb_focus != cmp)
     {
