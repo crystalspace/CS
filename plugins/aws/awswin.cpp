@@ -395,7 +395,7 @@ awsWindow::OnDraw(csRect clip)
       else
       {
         // create even border all the way around
-        for(int i=0; i<9; ++i)
+        for(i=0; i<9; ++i)
         {
           g2d->DrawLine(Frame().xmin+i, Frame().ymin+i, Frame().xmax-i, Frame().ymin+i,  topleft[i]);
           g2d->DrawLine(Frame().xmin+i, Frame().ymin+i, Frame().xmin+i, Frame().ymax-i,  topleft[i]);

@@ -36,7 +36,8 @@ csObjectRegistry::csObjectRegistry () : clearing (false)
 void csObjectRegistry::Clear ()
 {
   clearing = true;
-  for (int i = registry.Length() - 1; i >= 0; i--)
+  int i;
+  for (i = registry.Length() - 1; i >= 0; i--)
   {
     // Take special care to ensure that this object is no longer on the list
     // before calling DecRef(), since we don't want some other object asking
@@ -67,7 +68,8 @@ void csObjectRegistry::Unregister (iBase* obj, char const* tag)
 {
   if (!clearing)
   {
-    for (int i = registry.Length() - 1; i >= 0; i--)
+	int i;
+    for (i = registry.Length() - 1; i >= 0; i--)
     {
       iBase* b = (iBase*)registry[i];
       if (b == obj)
@@ -88,7 +90,8 @@ void csObjectRegistry::Unregister (iBase* obj, char const* tag)
 
 iBase* csObjectRegistry::Get (char const* tag)
 {
-  for (int i = registry.Length() - 1; i >= 0; i--)
+  int i;
+  for (i = registry.Length() - 1; i >= 0; i--)
   {
     char* t = (char*)tags[i];
     if (t && !strcmp (tag, t))
@@ -100,7 +103,8 @@ iBase* csObjectRegistry::Get (char const* tag)
 iBase* csObjectRegistry::Get (scfInterfaceID id, int version)
 {
   iBase* found_one = 0;
-  for (int i = registry.Length() - 1; i >= 0; i--)
+  int i;
+  for (i = registry.Length() - 1; i >= 0; i--)
   {
     iBase* b = (iBase*)registry[i];
     iBase* interf = (iBase*)(b->QueryInterface (id, version));

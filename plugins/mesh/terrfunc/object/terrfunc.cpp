@@ -1243,7 +1243,8 @@ void csTerrFuncObject::RecomputeLighting (int lod, int bx, int by)
     block.dirlight_numbers[lod] = dirlight_number;
     csColor* vtcols = block.mesh_colors[lod];
     csVector3* norms = block.normals[lod];
-    for (int i = 0 ; i < block.num_mesh_vertices[lod] ; i++, vtcols++)
+	int i;
+    for (i = 0 ; i < block.num_mesh_vertices[lod] ; i++, vtcols++)
     {
       float l = dirlight * *(norms++);
       if (l <= 0)

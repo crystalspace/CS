@@ -503,7 +503,8 @@ void csTextureManagerLine::SetPalette ()
   if (!truecolor && !palette_ok)
     compute_palette ();
 
-  for (int i = 0; i < 256; i++)
+  int i;
+  for (i = 0; i < 256; i++)
     G2D->SetRGB (i, cmap [i].red, cmap [i].green, cmap [i].blue);
 
   iEventQueue* q = CS_QUERY_REGISTRY(object_reg, iEventQueue);

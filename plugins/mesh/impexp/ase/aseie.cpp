@@ -621,7 +621,8 @@ iDataBuffer *csModelConverterASE::Save (iModelData *Data, const char *Format)
     int v1 = VertexTexelSet.Add (poly->GetVertex (0), -1, -1, poly->GetTexel (0));
     int vprev = VertexTexelSet.Add (poly->GetVertex (1), -1, -1, poly->GetTexel (1));
 
-    for (int i=2; i<poly->GetVertexCount (); i++)
+	int i;
+    for (i=2; i<poly->GetVertexCount (); i++)
     {
       int vn = VertexTexelSet.Add (poly->GetVertex (i), -1, -1, poly->GetTexel (i));
       tri.Push (new csTriangle (v1, vprev, vn));

@@ -211,7 +211,8 @@ void csSoundListenerEAX::SetEnvironment(csSoundEnvironment env) {
 	{
 		DWORD preset={EAX_ENVIRONMENT_GENERIC};
 		
-		for(int i=0; i<MAX_s2eaxEnv; i++)
+		int i;
+		for(i=0; i<MAX_s2eaxEnv; i++)
 		{
 			if(s2eaxEnv[i].senv==env)
 			{

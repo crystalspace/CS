@@ -399,7 +399,8 @@ CS_IMPLEMENT_ARRAY_INTERFACE_NONUM (csModelDataPolygon, int, Texel, Texels);
 iModelDataPolygon *csModelDataPolygon::Clone () const
 {
   csModelDataPolygon *p = new csModelDataPolygon ();
-  for (int i=0; i<Vertices.Length (); i++)
+  int i;
+  for (i=0; i<Vertices.Length (); i++)
     p->AddVertex (Vertices[i], Normals[i], Colors[i], Texels[i]);
   p->SetMaterial (Material);
   return p;

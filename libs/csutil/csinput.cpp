@@ -181,7 +181,8 @@ csMouseDriver::csMouseDriver (iObjectRegistry* r) :
 
 void csMouseDriver::Reset ()
 {
-  for (int i = 0; i < CS_MAX_MOUSE_BUTTONS; i++)
+  int i;
+  for (i = 0; i < CS_MAX_MOUSE_BUTTONS; i++)
     if (Button[i])
       DoButton (i + 1, false, LastX, LastY);
   LastClickButton = -1;
@@ -271,8 +272,9 @@ csJoystickDriver::csJoystickDriver (iObjectRegistry* r) :
 
 void csJoystickDriver::Reset ()
 {
-  for (int i = 0; i < CS_MAX_JOYSTICK_COUNT; i++)
-    for (int j = 0; j < CS_MAX_JOYSTICK_BUTTONS; j++)
+  int i, j;
+  for (i = 0; i < CS_MAX_JOYSTICK_COUNT; i++)
+    for (j = 0; j < CS_MAX_JOYSTICK_BUTTONS; j++)
       if (Button [i][j])
         DoButton (i + 1, j + 1, false, LastX [i], LastY [i]);
 }

@@ -130,7 +130,8 @@ void csRectRegion::Include(csRect &rect)
 
   // Otherwise, we have to see if this rect creates a union with any other
   // rectangles.
-  for(int i = 0; i < region_count; i++)
+  int i;
+  for(i = 0; i < region_count; i++)
   {
     csRect &r1 = region[i];
     csRect r2(rect);

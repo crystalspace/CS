@@ -302,7 +302,9 @@ void csSpriteBuilderMesh::StoreMaterial (iModelDataMaterial *mat)
 int csSpriteBuilderMesh::StoreFrameInfo (int FrameCount, int VertexCount)
 {
   int NumPreviousFrames = Out->GetFrameCount ();
-  for (int i=0; i<FrameCount; i++) Out->AddFrame ();
+
+  int i;
+  for (i=0; i<FrameCount; i++) Out->AddFrame ();
   Out->AddVertices (VertexCount);
   return NumPreviousFrames;
 }

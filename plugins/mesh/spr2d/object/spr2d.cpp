@@ -647,7 +647,8 @@ bool csSprite2DMeshObject::HitBeamOutline(const csVector3& start,
   int trail, len = vertices.Length();
   trail = len - 1;
   csVector2 isec(r.x, r.y);
-  for (int i = 0; i < len; trail = i++)
+  int i;
+  for (i = 0; i < len; trail = i++)
     if (csMath2::WhichSide2D(isec, vertices[trail].pos, vertices[i].pos) > 0)
       return false;
   return true;

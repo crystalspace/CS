@@ -43,7 +43,8 @@ csEventQueue::~csEventQueue ()
   Clear();
   if (EventQueue)
     delete[] EventQueue;
-  for (int i = Listeners.Length() - 1; i >= 0; i--)
+  int i;
+  for (i = Listeners.Length() - 1; i >= 0; i--)
     Listeners[i].object->DecRef();
 }
 
@@ -128,7 +129,8 @@ void csEventQueue::Resize (size_t iLength)
 
 void csEventQueue::Notify(iEvent& e) const
 {
-  for (int i = Listeners.Length() - 1; i >= 0; i--)
+  int i;
+  for (i = Listeners.Length() - 1; i >= 0; i--)
   {
     Listener const& listener = Listeners[i];
     if ((listener.trigger & CSMASK_Nothing) != 0)
@@ -156,7 +158,8 @@ void csEventQueue::Dispatch(iEvent& e)
 {
   int const evmask = 1 << e.Type;
   bool const canstop = ((e.Flags & CSEF_BROADCAST) == 0);
-  for (int i = 0, n = Listeners.Length(); i < n; i++)
+  int i, n;
+  for (i = 0, n = Listeners.Length(); i < n; i++)
   {
     Listener const& l = Listeners[i];
     if ((l.trigger & evmask) != 0 && l.object->HandleEvent(e) && canstop)
@@ -166,7 +169,8 @@ void csEventQueue::Dispatch(iEvent& e)
 
 int csEventQueue::FindListener(iEventHandler* listener) const
 {
-  for (int i = Listeners.Length() - 1; i >= 0; i--)
+  int i;
+  for (i = Listeners.Length() - 1; i >= 0; i--)
   {
     Listener const& l = Listeners[i];
     if (l.object == listener)
@@ -237,7 +241,8 @@ iEventCord* csEventQueue::GetEventCord (int cat, int subcat)
 
 int csEventQueue::EventCordsVector::Find (int cat, int subcat)
 {
-  for (int i = Length() - 1; i >= 0; i--)
+  int i;
+  for (i = Length() - 1; i >= 0; i--)
   {
     csEventCord *cord = Get(i);
     if (cat == cord->GetCategory() && subcat == cord->GetSubcategory())

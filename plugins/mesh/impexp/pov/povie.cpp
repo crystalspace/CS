@@ -253,7 +253,8 @@ iDataBuffer *csModelConverterPOV::Save (iModelData *Data, const char *Format)
     {
       iModelDataPolygon *Polygon = it2.Get ();
 
-      for (int i=2; i<Polygon->GetVertexCount (); i++)
+	  int i;
+      for (i=2; i<Polygon->GetVertexCount (); i++)
       {
         /* @@@ is the vertex order correct ??? */
         out << "  smooth_triangle {\n";
