@@ -52,8 +52,13 @@ AC_DEFUN([CS_CHECK_PTHREAD],
 	    CS_CHECK_BUILD([for pthread], [cs_cv_sys_pthread],
 		[AC_LANG_PROGRAM(
 		    [[#include <pthread.h>
+		    #include <semaphore.h>
 		    void* worker(void* p) { (void)p; return p; }]],
-		    [pthread_t tid; pthread_create(&tid, 0, worker, 0);])],
+		    [pthread_t tid;
+		    pthread_create(&tid, 0, worker, 0);
+		    sem_t sem;
+		    sem_init(&sem, 0, 0);
+		    sem_destroy(&sem);])],
 		[cs_pthread_flags])
 	    ;;
     esac
@@ -80,6 +85,7 @@ AC_DEFUN([CS_CHECK_PTHREAD],
 m4_define([cs_pthread_flags],
     [CS_CREATE_TUPLE() \
     CS_CREATE_TUPLE([], [], [-lpthread]) \
+    CS_CREATE_TUPLE([], [], [-lpthread -lrt]) \
     CS_CREATE_TUPLE([-pthread], [-pthread], []) \
     CS_CREATE_TUPLE([-pthread], [-pthread], [-lpthread]) \
     CS_CREATE_TUPLE([-pthread], [-pthread], [-lc_r])])

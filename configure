@@ -5869,6 +5869,7 @@ ac_compiler_gnu=$ac_cv_c_compiler_gnu
 
     for cs_build_item in `echo @@@ | sed 'y% %#%'` \
     `echo @@@-lpthread | sed 'y% %#%'` \
+    `echo @@@-lpthread -lrt | sed 'y% %#%'` \
     `echo @-pthread@-pthread@ | sed 'y% %#%'` \
     `echo @-pthread@-pthread@-lpthread | sed 'y% %#%'` \
     `echo @-pthread@-pthread@-lc_r | sed 'y% %#%'`
@@ -5937,11 +5938,16 @@ cat confdefs.h >>conftest.$ac_ext
 cat >>conftest.$ac_ext <<_ACEOF
 /* end confdefs.h.  */
 #include <pthread.h>
+		    #include <semaphore.h>
 		    void* worker(void* p) { (void)p; return p; }
 int
 main ()
 {
-pthread_t tid; pthread_create(&tid, 0, worker, 0);
+pthread_t tid;
+		    pthread_create(&tid, 0, worker, 0);
+		    sem_t sem;
+		    sem_init(&sem, 0, 0);
+		    sem_destroy(&sem);
   ;
   return 0;
 }
@@ -6025,6 +6031,7 @@ ac_compiler_gnu=$ac_cv_c_compiler_gnu
 
     for cs_build_item in `echo @@@ | sed 'y% %#%'` \
     `echo @@@-lpthread | sed 'y% %#%'` \
+    `echo @@@-lpthread -lrt | sed 'y% %#%'` \
     `echo @-pthread@-pthread@ | sed 'y% %#%'` \
     `echo @-pthread@-pthread@-lpthread | sed 'y% %#%'` \
     `echo @-pthread@-pthread@-lc_r | sed 'y% %#%'`
@@ -6093,11 +6100,16 @@ cat confdefs.h >>conftest.$ac_ext
 cat >>conftest.$ac_ext <<_ACEOF
 /* end confdefs.h.  */
 #include <pthread.h>
+		    #include <semaphore.h>
 		    void* worker(void* p) { (void)p; return p; }
 int
 main ()
 {
-pthread_t tid; pthread_create(&tid, 0, worker, 0);
+pthread_t tid;
+		    pthread_create(&tid, 0, worker, 0);
+		    sem_t sem;
+		    sem_init(&sem, 0, 0);
+		    sem_destroy(&sem);
   ;
   return 0;
 }
