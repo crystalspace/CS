@@ -39,7 +39,6 @@ csIsoCell::csIsoCell (iBase *iParent)
 static void deletenode(csIsoCellNode* node, void * /*data*/)
 {
   delete node;
-  SCF_DESTRUCT_IBASE();
 }
 
 csIsoCell::~csIsoCell ()
@@ -47,6 +46,7 @@ csIsoCell::~csIsoCell ()
   /// traverse in post order and delete all nodes
   if(root)
     TraversePost(root, deletenode, (void*)0);
+  SCF_DESTRUCT_IBASE();
 }
 
 void csIsoCell::AddSprite(iIsoSprite *sprite, const csVector3& pos)
