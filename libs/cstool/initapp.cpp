@@ -247,7 +247,7 @@ bool csInitializer::SetupConfigManager (
   if (!VFS)
   {
     csRef<iPluginManager> plugin_mgr (CS_QUERY_REGISTRY (r, iPluginManager));
-    VFS = csPtr<iVFS> ((iVFS*)(plugin_mgr->QueryPlugin ("iVFS", VERSION_iVFS)));
+    VFS = csPtr<iVFS> ((iVFS*)(plugin_mgr->QueryPlugin ("iVFS", iVFS_VERSION)));
   }
   if (!VFS)
   {
