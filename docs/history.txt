@@ -58,6 +58,7 @@ chronological order.
 	  specified.
 	- res made some smaller changes & workarounds to NR SW. Works with 
 	  flarge with the sense of 'work' as in 'does not crash instantly'.
+	- res fixed a missing quoted string termination in csconf.mak.
 29-Apr-2004
 	- Marten fixed a bug in xmlshader where it assumed the syntax-service
 	  was already loaded.  Now it loads it if needed.

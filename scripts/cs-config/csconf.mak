@@ -171,7 +171,7 @@ $(CSCONFIG.EXE): $(CSCONFIG.DEP)
 	@echo $"        cstool $"			>> cs-config
 	@echo $"        csutil $"			>> cs-config
 	@echo $"        csws $"				>> cs-config
-	@echo $""					>> cs-config
+	@echo $""$"					>> cs-config
 	@echo						>> cs-config
 	@cat $(SRCDIR)/scripts/cs-config/cs-config.temppost >> cs-config
 
