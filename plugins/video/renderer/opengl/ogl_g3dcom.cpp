@@ -1772,10 +1772,13 @@ void csGraphics3DOGLCommon::FlushDrawPolygon ()
   float flat_g = queue.flat_color_g;
   float flat_b = queue.flat_color_b;
 
+  float alpha = BYTE_TO_FLOAT (queue.mixmode & CS_FX_MASK_ALPHA);
+  alpha = SetupBlend (queue.mixmode, alpha, tex_transp);
+
   if (m_renderstate.textured && txt_handle)
   {
     glEnable (GL_TEXTURE_2D);
-    if (txt_mm->GetKeyColor())
+    if (txt_mm->GetKeyColor() && !(alpha < 0.8f))
     {
       glEnable (GL_ALPHA_TEST);
       glAlphaFunc (GL_GEQUAL, 0.8);
@@ -1807,8 +1810,6 @@ void csGraphics3DOGLCommon::FlushDrawPolygon ()
 
   SetGLZBufferFlags (queue.z_buf_mode);
 
-  float alpha = 1.0f - BYTE_TO_FLOAT (queue.mixmode & CS_FX_MASK_ALPHA);
-  alpha = SetupBlend (queue.mixmode, alpha, tex_transp);
   glColor4f (flat_r, flat_g, flat_b, alpha);
 
   if (txt_handle)
@@ -4883,13 +4884,13 @@ void csGraphics3DOGLCommon::DrawPolygonMultiTexture (G3DPolygonDP & poly)
   // configure base texture for texure unit 0
   glActiveTextureARB (GL_TEXTURE0_ARB);
   glBindTexture (GL_TEXTURE_2D, texturehandle);
-  if (txt_mm->GetKeyColor())
+  float alpha = BYTE_TO_FLOAT (poly.mixmode & CS_FX_MASK_ALPHA);
+  alpha = SetupBlend (poly.mixmode, alpha, tex_transp);
+  if (txt_mm->GetKeyColor() && !(alpha < 0.8f))
   {
     glEnable (GL_ALPHA_TEST);
     glAlphaFunc (GL_GEQUAL, 0.8);
   }
-  float alpha = 1.0f - BYTE_TO_FLOAT (poly.mixmode & CS_FX_MASK_ALPHA);
-  alpha = SetupBlend (poly.mixmode, alpha, tex_transp);
   if (ARB_texture_env_combine)
   {
     float c[4] = {1.0, 1.0, 1.0, alpha};

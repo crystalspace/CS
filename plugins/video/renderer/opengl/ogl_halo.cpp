@@ -26,6 +26,7 @@
 #include "csutil/util.h"
 #include "ogl_g3dcom.h"
 #include "ivideo/halo.h"
+#include "ogl_txtcache.h"
 
 class csOpenGLHalo : public iHalo
 {
@@ -140,6 +141,10 @@ void csOpenGLHalo::Draw (float x, float y, float w, float h, float iIntensity,
   int swidth = G3D->width;
   int sheight = G3D->height;
   int i;
+
+  G3D->FlushDrawPolygon();
+  G3D->lightmap_cache->Flush ();
+  G3D->FlushDrawFog ();
 
   if (w < 0) w = Width;
   if (h < 0) h = Height;
