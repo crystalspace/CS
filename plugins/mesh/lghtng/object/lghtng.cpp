@@ -127,6 +127,20 @@ bool csLightningMeshObject::Draw (iRenderView* rview, iMovable* movable,
   return GenMesh->Draw (rview, movable, mode);  
 }
 
+csRenderMesh** csLightningMeshObject::GetRenderMeshes (int &n, 
+						       iRenderView* rview, 
+						       iMovable* movable, 
+						       uint32 frust_mask)
+{ 
+  csReversibleTransform &camtr = rview->GetCamera ()->GetTransform ();
+  csReversibleTransform &sprtr = movable->GetTransform ();
+  sprtr.LookAt(directional, camtr.GetOrigin () - sprtr.GetOrigin ());  
+  
+  movable->UpdateMove ();
+
+  return GenMesh->GetRenderMeshes (n, rview, movable, frust_mask); 
+}
+
 
 void csLightningMeshObject::GetObjectBoundingBox (csBox3& retbbox, int type)
 {

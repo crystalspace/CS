@@ -29,6 +29,9 @@
 #include "csutil/array.h"
 #include "csutil/refarr.h"
 #include "csutil/weakref.h"
+#include "cstool/rendermeshholder.h"
+#include "cstool/framedataholder.h"
+#include "csgfx/shadervarcontext.h"
 #include "igeom/polymesh.h"
 #include "csgeom/objmodel.h"
 #include "csgeom/pmtools.h"
@@ -336,6 +339,19 @@ private:
   csFlags object_flags;
   csFlags factory_flags;
 
+  csRenderMeshHolderMultiple rmHolder;
+  csShaderVariableContext* svcontext;
+
+  struct BezierRenderBuffer
+  {
+    size_t count;
+    csRef<iRenderBuffer> buffer;
+
+    BezierRenderBuffer() : count(0) { }
+  };
+  csFrameDataHolder<BezierRenderBuffer> renderBuffers;
+  csFrameDataHolder<BezierRenderBuffer> indexBuffers;
+  static csStringID vertex_name, texel_name, color_name, index_name;
 private:
   /**
    * Invalidate a thing. This has to be called when new polygons are
@@ -507,6 +523,9 @@ public:
    * Draw all curves in this thing given a view and transformation.
    */
   bool DrawCurves (iRenderView* rview, iMovable* movable, csZBufMode zMode);
+
+  csRenderMesh** GetRenderMeshes (int &n, iRenderView* rview, 
+    iMovable* movable, uint32 frustum_mask);
 
   //----------------------------------------------------------------------
   // Lighting
@@ -778,8 +797,11 @@ public:
     {
       return scfParent->DrawTest (rview, movable, frustum_mask);
     }
-    virtual csRenderMesh **GetRenderMeshes (int &n, iRenderView*, 
-      iMovable*, uint32) { n = 0; return 0; }
+    virtual csRenderMesh** GetRenderMeshes (int &n, iRenderView* rview, 
+      iMovable* movable, uint32 frustum_mask) 
+    { 
+      return scfParent->GetRenderMeshes (n, rview, movable, frustum_mask);
+    }
     virtual bool Draw (iRenderView* rview, iMovable* movable,
     	csZBufMode zMode)
     {

@@ -11,6 +11,9 @@ chronological order.
         - Philip Wyett fixed attempts to load
           "crystalspace.graphics3d.shader.soft" instead of the
           correct "crystalspace.graphics3d.shader.software".
+	- res made the lightning and bezier meshes work with NR.
+	- res changed the lghtngtest app to use the 'alpha' render priority 
+	  for the lighting meshes.
 20-Aug-2004
 	- Jorrit fixed a bug added yesterday in the font multiplexor that
 	  would cause crashes at exit.

@@ -299,7 +299,7 @@ bool Simple::Initialize ()
 
   csRef<iMeshObject> mesh1 = LightningObjectFactory1->NewInstance();    
   csRef<iMeshWrapper> mw1 = engine->CreateMeshWrapper(mesh1, "lightning1", room, csVector3(-2, 3, 4));
-
+  mw1->SetRenderPriority (engine->GetRenderPriority ("alpha"));
 
   /// Lightning 2
   csRef<iMeshObjectFactory> LightningObjectFactory2 = type->NewFactory();
@@ -317,6 +317,7 @@ bool Simple::Initialize ()
                        
   csRef<iMeshObject> mesh2 = LightningObjectFactory2->NewInstance();    
   csRef<iMeshWrapper> mw2 = engine->CreateMeshWrapper(mesh2, "lightning2", room, csVector3(0, 3, 4));
+  mw2->SetRenderPriority (engine->GetRenderPriority ("alpha"));
 
   ///Lightning 3
   csRef<iMeshObjectFactory> LightningObjectFactory3 = type->NewFactory();
@@ -335,6 +336,7 @@ bool Simple::Initialize ()
 
   csRef<iMeshObject> mesh3 = LightningObjectFactory3->NewInstance();    
   csRef<iMeshWrapper> mw3 = engine->CreateMeshWrapper(mesh3, "lightning3", room, csVector3(2, 3, 4));
+  mw3->SetRenderPriority (engine->GetRenderPriority ("alpha"));
 
   engine->Prepare ();
 

@@ -56,6 +56,7 @@
 #include "iengine/fview.h"
 #include "csqsqrt.h"
 #include "ivideo/graph3d.h"
+#include "ivideo/rendermesh.h"
 #include "ivaria/reporter.h"
 
 CS_IMPLEMENT_PLUGIN
@@ -161,6 +162,11 @@ void csBezierMeshStatic::Prepare ()
 // Option variable: cosinus factor.
 float csBezierMesh:: cfg_cosinus_factor = 0;
 
+csStringID csBezierMesh::vertex_name = csInvalidStringID;
+csStringID csBezierMesh::texel_name = csInvalidStringID;
+csStringID csBezierMesh::color_name = csInvalidStringID;
+csStringID csBezierMesh::index_name = csInvalidStringID;
+
 csBezierMesh::csBezierMesh (iBase *parent, csBezierMeshObjectType* thing_type) :
   curves (4, 16)
 {
@@ -209,6 +215,21 @@ csBezierMesh::csBezierMesh (iBase *parent, csBezierMeshObjectType* thing_type) :
 
   current_visnr = 1;
   cosinus_factor = -1;
+
+  csRef<iStringSet> strings;
+  strings = CS_QUERY_REGISTRY_TAG_INTERFACE (thing_type->object_reg,
+    "crystalspace.shared.stringset", iStringSet);
+
+  if ((vertex_name == csInvalidStringID) ||
+    (texel_name == csInvalidStringID) ||
+    (color_name == csInvalidStringID) ||
+    (index_name == csInvalidStringID))
+  {
+    vertex_name = strings->Request ("vertices");
+    texel_name = strings->Request ("texture coordinates");
+    color_name = strings->Request ("colors");
+    index_name = strings->Request ("indices");
+  }
 }
 
 csBezierMesh::~csBezierMesh ()
@@ -943,6 +964,174 @@ bool csBezierMesh::Draw (iRenderView *rview, iMovable *movable,
 {
   DrawCurves (rview, movable, zMode);
   return true;                                  // @@@@ RETURN correct vis info
+}
+
+csRenderMesh** csBezierMesh::GetRenderMeshes (int &n, iRenderView* rview,
+					      iMovable* movable, 
+					      uint32 frustum_mask)
+{
+  if (GetCurveCount () <= 0) return false;
+
+  iCamera *icam = rview->GetCamera ();
+  const csReversibleTransform &camtrans = icam->GetTransform ();
+
+  csReversibleTransform movtrans;
+
+  // Only get the transformation if this thing can move.
+  movtrans = movable->GetFullTransform ();
+
+  int i;
+  int res = 1;
+
+  // Calculate tesselation resolution
+  csVector3 wv = static_data->curves_center;
+  csVector3 world_coord = movtrans.This2Other (wv);
+
+  csVector3 camera_coord = camtrans.Other2This (world_coord);
+
+  if (camera_coord.z >= SMALL_Z)
+  {
+    res = (int)(static_data->curves_scale / camera_coord.z);
+  }
+  else
+    res = 1000;                                 // some big tesselation value...
+
+  // Create the combined transform of object to camera by
+  // combining object to world and world to camera.
+  csReversibleTransform obj_cam = camtrans;
+  obj_cam /= movtrans;
+  //rview->GetGraphics3D ()->SetObjectToCamera (&obj_cam);
+  //rview->GetGraphics3D ()->SetRenderState (G3DRENDERSTATE_ZBUFFERMODE, zMode);
+
+  int clip_portal, clip_plane, clip_z_plane;
+  rview->CalculateClipSettings (frustum_mask, clip_portal, clip_plane,
+      clip_z_plane);
+  csVector3 camera_origin = obj_cam.GetT2OTranslation ();
+
+  const uint currentFrame = rview->GetCurrentFrameNumber();
+  csDirtyAccessArray<csRenderMesh*>& meshes = rmHolder.GetUnusedMeshes (
+    currentFrame);
+  meshes.SetLength (GetCurveCount(), 0);
+
+  iGraphics3D* g3d = rview->GetGraphics3D ();
+  
+  csCurve *c;
+  for (i = 0; i < GetCurveCount (); i++)
+  {
+    csRenderMesh* rm = meshes.Get (i);
+    if (rm == 0)
+    {
+      rm = meshes[i] = new csRenderMesh;
+      rm->variablecontext.AttachNew (new csShaderVariableContext);
+    }
+    rm->object2camera = obj_cam;
+    rm->camera_origin = camera_origin;
+    rm->camera_transform = &icam->GetTransform();
+    rm->clip_portal = clip_portal;
+    rm->clip_plane = clip_plane;
+    rm->clip_z_plane = clip_z_plane;
+    rm->do_mirror = icam->IsMirrored ();
+    rm->lastFrame = currentFrame;
+
+    c = curves.Get (i);
+
+    // First get a bounding box in camera space.
+    csBox3 cbox;
+    csBox2 sbox;
+    if (c->GetScreenBoundingBox (obj_cam, icam, cbox, sbox) < 0)
+      continue;                                 // Not visible.
+
+    // If we have a dirty lightmap recombine the curves and the shadow maps.
+    bool updated_lm = c->RecalculateDynamicLights ();
+
+    // Create a new tesselation reuse an old one.
+    csCurveTesselated *tess = c->Tesselate (res);
+
+    // If the lightmap was updated or the new tesselation doesn't yet
+    // have a valid colors table we need to update colors here.
+    if (updated_lm || !tess->AreColorsValid ())
+      tess->UpdateColors (c->LightMap);
+
+    c->GetMaterial ()->Visit ();
+
+    bool gouraud = !!c->LightMap;
+    rm->mixmode = CS_FX_COPY | (gouraud ? 0 : CS_FX_FLAT);
+
+    iShaderVariableContext* svcontext = rm->variablecontext;
+    /* @@@ TODO: use an SV accessor for geometry delivery */
+    bool bufferCreated;
+    {
+      BezierRenderBuffer& vertices = renderBuffers.GetUnusedData (bufferCreated, 
+	currentFrame);
+      if (bufferCreated || (vertices.count < (tess->GetVertexCount () * 3)))
+      {
+	vertices.buffer = g3d->CreateRenderBuffer (
+	  tess->GetVertexCount () * 3 * sizeof (float), CS_BUF_STREAM, 
+	  CS_BUFCOMP_FLOAT, 3);
+      }
+      vertices.buffer->CopyToBuffer (tess->GetVertices(),
+	tess->GetVertexCount () * 3 * sizeof (float));
+
+      csShaderVariable* sv = svcontext->GetVariableAdd (vertex_name);
+      sv->SetValue (vertices.buffer);
+    }
+
+    {
+      BezierRenderBuffer& colors = renderBuffers.GetUnusedData (bufferCreated, 
+	currentFrame);
+      if (bufferCreated || (colors.count < (tess->GetVertexCount () * 3)))
+      {
+	colors.buffer = g3d->CreateRenderBuffer (
+	  tess->GetVertexCount () * 3 * sizeof (float), CS_BUF_STREAM, 
+	  CS_BUFCOMP_FLOAT, 3);
+      }
+      colors.buffer->CopyToBuffer (tess->GetColors(),
+	tess->GetVertexCount () * 3 * sizeof (float));
+
+      csShaderVariable* sv = svcontext->GetVariableAdd (color_name);
+      sv->SetValue (colors.buffer);
+    }
+
+    {
+      BezierRenderBuffer& texcoords = renderBuffers.GetUnusedData (bufferCreated, 
+	currentFrame);
+      if (bufferCreated || (texcoords.count < (tess->GetVertexCount () * 2)))
+      {
+	texcoords.buffer = g3d->CreateRenderBuffer (
+	  tess->GetVertexCount () * 2 * sizeof (float), CS_BUF_STREAM, 
+	  CS_BUFCOMP_FLOAT, 2);
+      }
+      texcoords.buffer->CopyToBuffer (tess->GetTxtCoords(),
+	tess->GetVertexCount () * 2 * sizeof (float));
+
+      csShaderVariable* sv = svcontext->GetVariableAdd (texel_name);
+      sv->SetValue (texcoords.buffer);
+    }
+
+    {
+      BezierRenderBuffer& indices = indexBuffers.GetUnusedData (bufferCreated, 
+	currentFrame);
+      if (bufferCreated || (indices.count < (tess->GetTriangleCount() * 3)))
+      {
+	indices.buffer = g3d->CreateIndexRenderBuffer (
+	  tess->GetTriangleCount () * 3 * sizeof (uint), CS_BUF_STREAM, 
+	  CS_BUFCOMP_UNSIGNED_INT, 0, tess->GetVertexCount ());
+      }
+      indices.buffer->CopyToBuffer (tess->GetTriangles(),
+	tess->GetTriangleCount () * 3 * sizeof (uint));
+
+      csShaderVariable* sv = svcontext->GetVariableAdd (index_name);
+      sv->SetValue (indices.buffer);
+    }
+
+    rm->indexstart = 0;
+    rm->indexend = tess->GetTriangleCount() * 3;
+    rm->meshtype = CS_MESHTYPE_TRIANGLES;
+    rm->material = c->GetMaterial ();
+  }
+
+  n = meshes.Length();
+  return meshes.GetArray();
 }
 
 //----------------------------------------------------------------------
