@@ -76,18 +76,6 @@
 %rename(bitOrAssign) *::operator|=;
 %rename(bitXorAssign) *::operator^=;
 
-// csutil/csstring.h
-%rename(toString) csString::GetData() const;
-
-// csgeom/plane3.h
-%ignore csPlane3::Normal () const;
-
-// csgeom/sphere.h
-%ignore csSphere::GetCenter () const;
-
-// csgeom/poly2d.h
-%ignore csPoly2D::GetVertexCount () const;
-
 // csgeom/transfrm.h
 %rename(mul2) csTransform::operator * (const csReversibleTransform &);
 #ifndef CS_MINI_SWIG
@@ -97,9 +85,6 @@
 		{ return *self * t; } 
 }
 #endif // CS_MINI_SWIG
-
-// iengine/camera.h
-%ignore iCamera::GetTransform () const;
 
 // iutil/event.h
 %{
@@ -116,11 +101,9 @@ jobject
 _csRef_to_Java (const csRef<iBase> & ref, void * ptr, const char * name,
     const char * clazz, JNIEnv * jenv)
 {
-	if (!ref.IsValid())
-	{
-        return 0;
-	}
-	ref->IncRef();
+    if (!ref.IsValid())
+      return 0;
+    ref->IncRef();
     jlong cptr = 0;
     *(void **)&cptr = ptr; 
     jclass cls = jenv->FindClass(clazz);

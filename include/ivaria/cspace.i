@@ -735,6 +735,7 @@ TYPEMAP_OUT_csWrapPtr
 %include "csgeom/transfrm.h"
 
 %ignore csSphere::operator+ (const csSphere &, const csSphere &);
+%ignore csSphere::GetCenter (); // Non-const.
 %include "csgeom/sphere.h"
 
 %ignore csPlane2::A ();
@@ -746,6 +747,7 @@ TYPEMAP_OUT_csWrapPtr
 %ignore csPlane3::B ();
 %ignore csPlane3::C ();
 %ignore csPlane3::D ();
+%ignore csPlane3::Normal (); // Non-const.
 %include "csgeom/plane3.h"
 
 %include "csgeom/math2d.h"
@@ -832,7 +834,10 @@ TYPEMAP_OUT_csWrapPtr
 %include "iengine/light.h"
 %include "iengine/sector.h"
 %include "iengine/engine.h"
+
+%ignore iCamera::GetTransform (); // Non-const.
 %include "iengine/camera.h"
+
 %include "iengine/campos.h"
 %include "iengine/texture.h"
 %include "iengine/material.h"
