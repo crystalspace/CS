@@ -6,8 +6,7 @@ DESCRIPTION.freebsd = FreeBSD
 DESCRIPTION.OS.freebsd = FreeBSD
 
 # Choose which drivers you want to build/use
-PLUGINS+=video/canvas/softx video/renderer/software \
-  sound/renderer/software sound/driver/oss
+PLUGINS+=video/canvas/softx sound/renderer/software sound/driver/oss
 
 #--------------------------------------------------- rootdefines & defines ---#
 ifneq (,$(findstring defines,$(MAKESECTION)))

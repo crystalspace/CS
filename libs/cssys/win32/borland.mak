@@ -8,7 +8,7 @@ DESCRIPTION.OS.borland = Win32
 # video/canvas/ddraw6 video/canvas/openglwin video/renderer/direct3d5 
 # video/renderer/direct3d6 video/renderer/opengl
 #
-PLUGINS+=video/canvas/ddraw video/renderer/software cssndrdr/software \
+PLUGINS+=video/canvas/ddraw cssndrdr/software \
   video/renderer/opengl video/canvas/openglwin video/renderer/direct3d5
 
 #--------------------------------------------------- rootdefines & defines ---#

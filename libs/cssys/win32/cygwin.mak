@@ -8,7 +8,7 @@ DESCRIPTION.OS.cygwin = Win32
 # video/canvas/ddraw6 video/canvas/openglwin video/renderer/direct3d5 
 # video/renderer/direct3d6 video/renderer/opengl
 #
-PLUGINS+=video/canvas/ddraw video/renderer/software sound/renderer/software
+PLUGINS+=video/canvas/ddraw sound/renderer/software
 
 #--------------------------------------------------- rootdefines & defines ---#
 ifneq (,$(findstring defines,$(MAKESECTION)))

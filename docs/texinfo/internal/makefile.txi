@@ -169,7 +169,7 @@ software X-windows 2D driver and to the software 3D renderer would look like
 this:
 
 @example
-PLUGINS += video/canvas/softx video/renderer/soft
+PLUGINS += video/canvas/softx video/canvas/linex
 @end example
 
 To find the submakefiles for drivers, @file{plugins/} is prepended to all
@@ -178,7 +178,7 @@ is performed.  A possible result of above expansion might be:
 
 @example
 PLUGINS_SUBMAKEFILES=plugins/video/canvas/softx/x2d.mak
-  plugins/video/renderer/soft/soft3d.mak
+  plugins/video/canvas/linex/linex2d.mak
 @end example
 
 These submakefiles are included each time when @file{subs.mak} is included

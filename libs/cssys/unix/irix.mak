@@ -6,7 +6,7 @@ DESCRIPTION.irix = Irix
 DESCRIPTION.OS.irix = Irix
 
 # Choose which drivers you want to build/use
-PLUGINS+=video/canvas/softx video/renderer/software sound/renderer/software
+PLUGINS+=video/canvas/softx sound/renderer/software
 
 # Uncomment the following to build GGI 2D driver
 #PLUGINS+=video/canvas/ggi

@@ -6,8 +6,6 @@
 DESCRIPTION.djgpp = DOS/DJGPP
 DESCRIPTION.OS.djgpp = DOS
 
-PLUGINS+=video/renderer/software
-
 ifeq ($(USE_ALLEGRO),yes)
   PLUGINS += video/canvas/alleg2
 else

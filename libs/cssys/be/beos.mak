@@ -5,8 +5,7 @@
 DESCRIPTION.beos = BeOS
 
 # Choose which drivers you want to build/use
-PLUGINS += video/renderer/software video/canvas/be \
-  video/canvas/openglbe video/renderer/opengl
+PLUGINS += video/canvas/be video/canvas/openglbe video/renderer/opengl
 
 # Automatically detect presence of Glide packages.
 GLIDE_VERSIONS =

@@ -19,6 +19,7 @@
 # in most cases you will want to add to PLUGINS.DYNAMIC.
 
 PLUGINS += video/renderer video/canvas  # Do not remove this line.
+PLUGINS += video/renderer/software
 PLUGINS += filesys/vfs
 PLUGINS += simpcon
 PLUGINS += colldet/rapid

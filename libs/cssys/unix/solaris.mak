@@ -6,7 +6,7 @@ DESCRIPTION.solaris = Solaris
 DESCRIPTION.OS.solaris = Solaris
 
 # Choose which 2D/3D driver combinations you want to build/use
-PLUGINS+=video/renderer/software video/canvas/softx
+PLUGINS+=video/canvas/softx
 PLUGINS+=video/renderer/opengl video/canvas/openglx
 PLUGINS+=video/canvas/linex
 

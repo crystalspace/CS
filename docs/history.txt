@@ -17,11 +17,15 @@ The history order has been reversed so that new features are at the top.
 	    - Fixed all makefiles, source files, header files, documentation,
 	      and `world' files to account for the directory and SCF class name
 	      changes.
+	- Eric Sunshine moved selection of the software renderer for PLUGINS
+	  out of the platform-specific makefiles (CS/libs/cssys/*.mak) and
+	  into CS/mk/user.mak since it is not specific to any particular
+	  platform.
 10-Jan-2001
-	- Martin Geisse fixed some minor naming and comment flaws in
-	  the idungeon interface file.
-	- Martin changed the win32 docs: grouped msvc5 stuff in one
-	  section and added a FAQ entry.
+	- Martin Geisse fixed some minor naming and comment flaws in the
+	  idungeon interface file.
+	- Martin changed the win32 docs: grouped msvc5 stuff in one section and
+	  added a FAQ entry.
 	- Martin also committed a patch to win32.cpp from Ed Halley.
 	- Martin added some information to the procedural texture docs and
 	  added better explanation of the Print() function of the 2D and 3D
