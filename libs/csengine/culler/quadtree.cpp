@@ -20,7 +20,12 @@
 #include "csgeom/frustum.h"
 #include "csgeom/poly2d.h"
 #include "csengine/quadtree.h"
+#include "csengine/world.h"
 #include "isystem.h"
+
+
+#if 0
+//// dead code now...
 
 csQuadtreeNode::csQuadtreeNode ()
 {
@@ -520,6 +525,8 @@ int csQuadtree::TestPoint (const csVector2& point)
   return TestPoint (root, point);
 }
 
+#endif
+
 /*----------------------------------------------------------------*/
 /* Wouter's Wild QuadTree implementation */
 
@@ -534,7 +541,7 @@ static int Pow2(int x)
   return res;
 }
 
-WWQuadTree :: WWQuadTree (const csBox2& the_box, int the_depth)
+csQuadTree :: csQuadTree (const csBox2& the_box, int the_depth)
 {
   bbox = the_box;
   depth= the_depth;
@@ -569,35 +576,126 @@ WWQuadTree :: WWQuadTree (const csBox2& the_box, int the_depth)
 }
 
 
-void WWQuadTree :: CallChildren(quad_traverse_func func, int offset, 
-  int node_nr, void *data, int& rc1, int& rc2, int& rc3, int& rc4)
-{
-
-}
-
-
-WWQuadTree :: ~WWQuadTree ()
+csQuadTree :: ~csQuadTree ()
 {
   delete[] states;
 }
 
 
-bool WWQuadTree :: InsertPolygon (csVector2* verts, int num_verts,
+void csQuadTree :: CallChildren(int (csQuadTree::*func)(const csBox2& node_bbox,
+    int node_state, int offset, int node_nr, void* data), const csBox2& box,
+  int offset, int node_nr, void *data, int retval[4])
+{
+  // call func for each child of parent node with (offset, node_nr)
+  csBox2 childbox;
+  csVector2 center = (box.Min() + box.Max()) / 2.0f;
+  int childstate, childoffset, childnr;
+
+  /*
+  *  states are ordered like this:
+  *  root has children in byte 0.
+  *  nodes in byte 0 have children in byte 0+node_nr+1(1,2,3,4).
+  *  nodes in byte 1 have children in byte 4+node_nr+1.
+  *  nodes in byte n have children in byte 4*n+node_nr+1
+  *  So for byte n, take 4*n + node_nr+1 as the new byte
+  *  that new byte has the states of it's four children.
+  */
+  if(offset == -1)
+    childoffset = 0; // root node's children
+  else childoffset = 4 * offset + node_nr + 1;
+  for(childnr=0; childnr<4; childnr++)
+  {
+    // compute new bounding box.
+    switch(childnr)
+    {
+      case 0 /*topleft*/ : 
+        childbox.Set(box.Min(), center); break;
+      case 1 /*topright*/ : 
+        childbox.Set(center.x, box.MinY(), box.MaxX(), center.y); break;
+      case 2 /*bottomright*/ : 
+        childbox.Set(center, box.Max()); break;
+      case 3 /*bottomleft*/ : 
+        childbox.Set(box.MinX(), center.y, center.x, box.MaxY()); break;
+      default: CsPrintf(MSG_FATAL_ERROR, "QuadTree: Unknown child\n");
+    }
+    childstate = GetNodeState(childoffset, childnr);
+    retval[childnr] = func(childbox, childstate, childoffset, childnr, data);
+  }
+}
+
+/// masks and shifts for GetNodeState and SetNodeState
+static const int node_masks[4] = {0xC0, 0x30, 0x0C, 0x03};
+static const int node_shifts[4] = {6, 4, 2, 0};
+
+int csQuadTree :: GetNodeState(int offset, int nodenr)
+{
+  if(offset > state_size)
+  {
+    CsPrintf(MSG_INTERNAL_ERROR, "QuadTree: state out of range\n");
+    return 0;
+  }
+  unsigned char bits = states[offset];
+  bits &= node_masks[nodenr];
+  bits >>= node_shifts[nodenr];
+  return bits;
+}
+
+
+void csQuadTree :: SetNodeState(int offset, int nodenr, int newstate)
+{
+  if(offset > state_size)
+  {
+    CsPrintf(MSG_INTERNAL_ERROR, "QuadTree: setstate out of range\n");
+    return;
+  }
+  unsigned char bits = states[offset];     // get all bits
+  bits &= ~node_masks[nodenr];             // purge this node's bits
+  bits |= newstate << node_shifts[nodenr]; // insert new bits
+  states[offset] = bits;                   // store bits
+}
+
+
+bool csQuadTree :: InsertPolygon (csVector2* verts, int num_verts,
   const csBox2& pol_bbox)
 {
 }
 
 
-bool WWQuadTree :: TestPolygon (csVector2* verts, int num_verts,
+bool csQuadTree :: TestPolygon (csVector2* verts, int num_verts,
   const csBox2& pol_bbox)
 {
 }
 
 
-int WWQuadTree :: TestPoint (const csVector2& point)
+int csQuadTree :: GetTestPointResult(int retval[4])
+{
+  int res = CS_QUAD_UNKNOWN;
+  for(int i=0; i<4; i++)
+  {
+    if(retval[i] != CS_QUAD_UNKNOWN)
+      res = retval[i];
+  }
+  return res;
+}
+
+
+int csQuadTree :: test_point_func (const csBox2& node_bbox,
+  int node_state, int offset, int node_nr, void* data)
+{
+  ;
+}
+
+
+int csQuadTree :: TestPoint (const csVector2& point)
 {
   if(root_state == CS_QUAD_FULL || root_state == CS_QUAD_EMPTY) 
     return root_state;
+  if(state_size == 0) /// only a root node in the tree
+    return root_state;
+  /// ask children
+  int retval[4];
+  CallChildren(test_point_func, bbox, -1, 0, (void*)&point, retval);
+  return GetTestPointResult(retval);
 }
 
 #endif

@@ -33,6 +33,9 @@
 class csQuadtree;
 class Dumper;
 
+
+#if 0
+//// old Quadtree code
 /**
  * A quadtree node.
  */
@@ -152,27 +155,21 @@ public:
   int TestPoint (const csVector2& point);
 };
 
+#endif /// old quadtree code
+
 /**
  *  4 child node states are stored in one byte.
  *  2 bits per node, in sequence. topleft, topright, botright, botleft
+ *  nodenrs are: 0 = topleft, 1=topright, 2=bottomright, 3=bottomleft.
  */
-#define CS_QUAD_TOPLEFT_MASK   0xC0
-#define CS_QUAD_TOPLEFT_SHIFT  6
-#define CS_QUAD_TOPRIGHT_MASK  0x30
-#define CS_QUAD_TOPRIGHT_SHIFT 4
-#define CS_QUAD_BOTRIGHT_MASK  0x0C
-#define CS_QUAD_BOTRIGHT_SHIFT 2
-#define CS_QUAD_BOTLEFT_MASK   0x03
-#define CS_QUAD_BOTLEFT_SHIFT  0
 #define CS_QUAD_ALL_EMPTY 0x0 /* because CS_QUAD_EMPTY == 0 */
 #define CS_QUAD_ALL_FULL 0xFF /* because CS_QUAD_FULL == 3 */
 
-class WWQuadTree;
-
 /**
- *  Wouter's Wild QuadTree
+ *  QuadTree
  */
-class WWQuadTree {
+class csQuadTree {
+  friend class Dumper;
 private:
   /// bounding box of the quadtree
   csBox2 bbox;
@@ -184,11 +181,10 @@ private:
   /** state of all children, and their children.
    *  they are ordered like this:
    *  root has children in byte 0.
-   *  nodes in byte 0 have children in byte 0+node_nr(1,2,3,4).
-   *  nodes in byte 1 have children in byte 4+node_nr.
-   *  nodes in byte n have children in byte 4*n+node_nr
-   *  So for byte 0, take 0+node_nr as the new byte
-   *  for byte n, take 4*n + node_nr as the new byte
+   *  nodes in byte 0 have children in byte 0+node_nr+1(1,2,3,4).
+   *  nodes in byte 1 have children in byte 4+node_nr+1.
+   *  nodes in byte n have children in byte 4*n+node_nr+1
+   *  So for byte n, take 4*n + node_nr+1 as the new byte
    */
   unsigned char* states;
   /// convenience variable: how many bytes alloced in states
@@ -196,29 +192,53 @@ private:
 
 
   /** this function is used for traversing the quadtree.
-   *  it will get the nodes bounding box, state, byte offset and node_nr and 
-   *  custom clientdata.
+   *  it will get the nodes bounding box, state, byte offset and node_nr,
+   *  all these are this node's values.
+   *  and custom clientdata.
+   *  It can return an integer.
    */
-  typedef int WWQuadTree::quad_traverse_func(csBox2& node_bbox, 
+  typedef int (csQuadTree::quad_traverse_func)(const csBox2& node_bbox, 
     int node_state, int offset, int node_nr, void* data);
 
   /** private functions to help dealing with quadtree
-   *  call all four children of node at offset and node_nr
+   *  call all four children of the node with it's state at offset and node_nr
+   *  box is the bounding box of the node.
    *  each will be passed the data.
-   *  returns return values of children in rc1,rc2,rc3,rc4
+   *  returns return values of children in retval.
    *  note that theoretically the state of the caller could be changed.
+   *  also: the offset -1 denotes the root node is calling.
+   *  func is of type quad_traverse_func
    */
-  void CallChildren(quad_traverse_func func, int offset, int node_nr, 
-    void *data, int& rc1, int& rc2, int& rc3, int& rc4);
+  void CallChildren(int (csQuadTree::*func)(const csBox2& node_bbox,
+    int node_state, int offset, int node_nr, void* data), const csBox2& box,
+    int offset, int node_nr, void *data, int retval[4]);
+
+  /** Get the state of a node, in byte offset , nodenr given.
+   */
+  int GetNodeState(int offset, int nodenr);
+
+  /** Set the state of a node, in byte offset , nodenr given.
+   */
+  void SetNodeState(int offset, int nodenr, int newstate);
+
+  /** for a node, check if data (a csVector2 * )
+   * is in this node, possibly recursing.
+   * returning the QUAD_FULL/PARTIAL/EMPTY if it hits.
+   * returning QUAD_UNKOWN if the point is not in the node.
+   */
+  quad_traverse_func test_point_func;
+  /** gather result from retval for testpoint
+   */
+  int GetTestPointResult(int retval[4]); 
 
 public:
   /** create a quadtree of depth, using about 2**twice depth bytes. depth >= 1
    *  depth=1 is only the root.
    */
-  WWQuadTree(const csBox2& the_box, int the_depth);
+  csQuadTree(const csBox2& the_box, int the_depth);
 
   /// destroy quadtree
-  ~WWQuadTree();
+  ~csQuadTree();
 
   /**
    * Is the tree full?
