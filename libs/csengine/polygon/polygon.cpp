@@ -1027,8 +1027,8 @@ int csPolygon3D::AddVertex (int v)
   if (v >= thing->GetVertexCount ())
   {
     csEngine::current_engine->ReportBug (
-    	"Index number %d is too high for a polygon (max=%d)!",
-    	v, thing->GetVertexCount ());
+    	"Index number %d is too high for a polygon (max=%d) (polygon '%s')!",
+    	v, thing->GetVertexCount (), GetName () ? GetName () : "<noname>");
     return 0;
   }
   if (v < 0)
