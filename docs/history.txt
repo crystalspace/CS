@@ -12,6 +12,12 @@ Short-term cleanups that need to be done:
 	- Check the dependencies of libraries/COM objects and try to find
 	  includes that don't belong there (like from csengine).
 
+3-Feb-2000
+	- Eric Sunshine temporarily removed Seth Galbraith's new call to
+	  csSpriteTemplate::MergeTexels() from csLoader since MergeTexels() is
+	  buggy and results in deferred memory corruption at termination time.
+	  The problem is that MergeTexels() causes the merged texels[] arrays
+	  to be deleted multiple times.
 2-Feb-2000
 	- Large update to terrain engine from Alex Pfaffe.
 	    - Now renders 3000 triangles instead of only about 1000.

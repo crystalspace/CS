@@ -4457,10 +4457,6 @@ bool csLoader::LoadSpriteTemplate (csSpriteTemplate* stemp, char* buf, csTexture
 
   stemp->GenerateLOD ();
   stemp->ComputeBoundingBox ();
-
-  int same_count = stemp->MergeTexels ();
-  CsPrintf (MSG_INITIALIZATION, "Deleted %d redundant texel maps.\n", same_count);
-
   return true;
 }
 
