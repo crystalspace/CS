@@ -23,7 +23,6 @@ code.
 * HOWTO Pixmaps:: Loading Images for Pixmaps
 * HOWTO Render Priorities:: Render Priorities and Objects in Sectors
 * HOWTO User Objects:: Attaching User Objects to CS Objects
-* HOWTO User Objects in Maps:: Attaching User Objects to CS Objects in a map file
 * HOWTO CS Project:: Creating an External Crystal Space Application
 * HOWTO Creating External MSVC 6 Application:: Creating an External @sc{msvc} 6 Application
 * HOWTO Creating External MSVC 7 Application:: Creating an External @sc{msvc} 7 Application
