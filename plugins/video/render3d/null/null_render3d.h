@@ -138,8 +138,19 @@ public:
     size_t rangeStart, size_t rangeEnd, bool copy = true);
   void CreateInterleavedRenderBuffers (size_t size, csRenderBufferType type,
     int count, csRef<iRenderBuffer>* buffers);
-  void SetBufferState (csVertexAttrib* attribs, iRenderBuffer** buffers, 
-    int count);
+  bool ActivateBuffers (csRenderBufferHolder* holder, 
+    csRenderBufferName mapping[CS_VATTRIB_SPECIFIC_LAST+1])
+  {
+    return true;
+  }
+  bool ActivateBuffers (csVertexAttrib *attribs,
+    iRenderBuffer **buffers, unsigned int count)
+  {
+    return true;
+  }
+  virtual void DeactivateBuffers (csVertexAttrib *attribs, unsigned int count)
+  {
+  }
   void SetTextureState (int* units, iTextureHandle** textures, int count);
   void DrawMesh (const csCoreRenderMesh* mymesh,
     const csRenderMeshModes& modes,

@@ -52,28 +52,6 @@
 
 #define CS_GL_MAX_LAYER 16
 
-#define IMPLEMENT_CACHED_BOOL_LAYER(name) \
-  bool enabled_##name[CS_GL_MAX_LAYER]; \
-  void Enable_##name (int l = 0) \
-  { \
-    if (!enabled_##name[l]) \
-    { \
-      enabled_##name[l] = true;  \
-      glEnable (name); \
-    } \
-  } \
-  void Disable_##name (int l = 0) \
-  { \
-    if (enabled_##name[l]) \
-    { \
-      enabled_##name[l] = false;  \
-      glDisable (name); \
-    } \
-  } \
-  bool IsEnabled_##name (int l = 0) const \
-  { \
-    return enabled_##name[l]; \
-  }
 
 #define IMPLEMENT_CACHED_BOOL_CURRENTLAYER(name) \
   bool enabled_##name[CS_GL_MAX_LAYER]; \
@@ -81,6 +59,7 @@
   { \
     if (!enabled_##name[currentUnit]) \
     { \
+      ActivateTU (); \
       enabled_##name[currentUnit] = true;  \
       glEnable (name); \
     } \
@@ -89,6 +68,7 @@
   { \
     if (enabled_##name[currentUnit]) \
     { \
+      ActivateTU (); \
       enabled_##name[currentUnit] = false;  \
       glDisable (name); \
     } \
@@ -210,6 +190,7 @@
   { \
     if (!enabled_##name[currentUnit]) \
     { \
+      ActivateTU (); \
       enabled_##name[currentUnit] = true;  \
       glEnableClientState (name); \
     } \
@@ -217,6 +198,7 @@
   void Disable_##name () \
   { \
     if (enabled_##name[currentUnit]) { \
+      ActivateTU (); \
       enabled_##name[currentUnit] = false;  \
       glDisableClientState (name); \
     } \
@@ -225,7 +207,103 @@
   { \
     return enabled_##name[currentUnit]; \
   }
-  
+
+#define IMPLEMENT_CACHED_PARAMETER_1_LAYER(func, name, type1, param1) \
+  type1 parameter_##param1[CS_GL_MAX_LAYER]; \
+  void Set##name (type1 param1, bool forced = false) \
+  { \
+    if (forced || (param1 != parameter_##param1[currentUnit])) \
+    { \
+      ActivateTU (); \
+      parameter_##param1[currentUnit] = param1;  \
+      func (param1); \
+    } \
+  } \
+  void Get##name (type1 &param1) const\
+  { \
+    param1 = parameter_##param1[currentUnit];  \
+  }
+
+
+#define IMPLEMENT_CACHED_PARAMETER_2_LAYER(func, name, type1, param1, \
+  type2, param2) \
+  type1 parameter_##param1[CS_GL_MAX_LAYER]; \
+  type2 parameter_##param2[CS_GL_MAX_LAYER]; \
+  void Set##name (type1 param1, type2 param2, bool forced = false) \
+  { \
+    if (forced || (param1 != parameter_##param1[currentUnit]) || \
+                  (param2 != parameter_##param2[currentUnit])) \
+    { \
+      ActivateTU (); \
+      parameter_##param1[currentUnit] = param1;  \
+      parameter_##param2[currentUnit] = param2;  \
+      func (param1, param2); \
+    } \
+  } \
+  void Get##name (type1 &param1, type2 & param2) const\
+  { \
+    param1 = parameter_##param1[currentUnit];  \
+    param2 = parameter_##param2[currentUnit];  \
+  }
+
+
+#define IMPLEMENT_CACHED_PARAMETER_3_LAYER(func, name, type1, param1, \
+  type2, param2, type3, param3) \
+  type1 parameter_##param1[CS_GL_MAX_LAYER]; \
+  type2 parameter_##param2[CS_GL_MAX_LAYER]; \
+  type3 parameter_##param3[CS_GL_MAX_LAYER]; \
+  void Set##name (type1 param1, type2 param2, type3 param3,\
+    bool forced = false) \
+  { \
+    if (forced || (param1 != parameter_##param1[currentUnit]) || \
+                  (param2 != parameter_##param2[currentUnit]) || \
+                  (param3 != parameter_##param3[currentUnit])) \
+    { \
+      ActivateTU (); \
+      parameter_##param1[currentUnit] = param1;  \
+      parameter_##param2[currentUnit] = param2;  \
+      parameter_##param3[currentUnit] = param3;  \
+      func (param1, param2, param3); \
+    } \
+  } \
+  void Get##name (type1 &param1, type2 & param2, type3 & param3) const\
+  { \
+    param1 = parameter_##param1[currentUnit];  \
+    param2 = parameter_##param2[currentUnit];  \
+    param3 = parameter_##param3[currentUnit];  \
+  }
+
+
+#define IMPLEMENT_CACHED_PARAMETER_4_LAYER(func, name, type1, param1, \
+    type2, param2, type3, param3, type4, param4) \
+  type1 parameter_##param1[CS_GL_MAX_LAYER]; \
+  type2 parameter_##param2[CS_GL_MAX_LAYER]; \
+  type3 parameter_##param3[CS_GL_MAX_LAYER]; \
+  type4 parameter_##param4[CS_GL_MAX_LAYER]; \
+  void Set##name (type1 param1, type2 param2, type3 param3, type4 param4, \
+    bool forced = false) \
+  { \
+    if (forced || (param1 != parameter_##param1[currentUnit]) || \
+                  (param2 != parameter_##param2[currentUnit]) || \
+                  (param3 != parameter_##param3[currentUnit]) || \
+                  (param4 != parameter_##param4[currentUnit])) \
+    { \
+      ActivateTU (); \
+      parameter_##param1[currentUnit] = param1;  \
+      parameter_##param2[currentUnit] = param2;  \
+      parameter_##param3[currentUnit] = param3;  \
+      parameter_##param4[currentUnit] = param4;  \
+      func (param1, param2, param3, param4); \
+    } \
+  } \
+  void Get##name (type1 &param1, type2 & param2, type3 & param3, type4& param4) const\
+  { \
+    param1 = parameter_##param1[currentUnit];  \
+    param2 = parameter_##param2[currentUnit];  \
+    param3 = parameter_##param3[currentUnit];  \
+    param4 = parameter_##param4[currentUnit];  \
+  }
+
 
 /**
  * Since this class is passed directly between plugins the
@@ -301,6 +379,23 @@ public:
 
     memset (boundtexture, 0, CS_GL_MAX_LAYER * sizeof (GLuint));
     currentUnit = 0;
+    activeUnit = 0;
+    currentBufferID = 0;
+    currentIndexID = 0;
+    
+    glGetIntegerv (GL_VERTEX_ARRAY_SIZE, (GLint*)&parameter_vsize);
+    glGetIntegerv (GL_VERTEX_ARRAY_STRIDE, (GLint*)&parameter_vstride);
+    glGetIntegerv (GL_VERTEX_ARRAY_TYPE, (GLint*)&parameter_vtype);
+    glGetPointerv (GL_VERTEX_ARRAY_POINTER, &parameter_vpointer);
+
+    glGetIntegerv (GL_NORMAL_ARRAY_STRIDE, (GLint*)&parameter_nstride);
+    glGetIntegerv (GL_NORMAL_ARRAY_TYPE, (GLint*)&parameter_ntype);
+    glGetPointerv (GL_NORMAL_ARRAY_POINTER, &parameter_npointer);
+
+    glGetIntegerv (GL_COLOR_ARRAY_SIZE, (GLint*)&parameter_vsize);
+    glGetIntegerv (GL_COLOR_ARRAY_STRIDE, (GLint*)&parameter_vstride);
+    glGetIntegerv (GL_COLOR_ARRAY_TYPE, (GLint*)&parameter_vtype);
+    glGetPointerv (GL_COLOR_ARRAY_POINTER, &parameter_vpointer);
   }
 
   // Standardized caches
@@ -332,19 +427,31 @@ public:
   IMPLEMENT_CACHED_PARAMETER_1 (glStencilMask, StencilMask, GLuint, maskl)
   IMPLEMENT_CACHED_PARAMETER_4 (glColorMask, ColorMask, GLboolean, wmRed, \
     GLboolean, wmGreen, GLboolean, wmBlue, GLboolean, wmAlpha)
+
   IMPLEMENT_CACHED_CLIENT_STATE (GL_VERTEX_ARRAY)
-  IMPLEMENT_CACHED_CLIENT_STATE_LAYER (GL_TEXTURE_COORD_ARRAY)
   IMPLEMENT_CACHED_CLIENT_STATE (GL_COLOR_ARRAY)
   IMPLEMENT_CACHED_CLIENT_STATE (GL_NORMAL_ARRAY)
-  IMPLEMENT_CACHED_PARAMETER_1 (glMatrixMode, MatrixMode, GLenum, matrixMode)
+  IMPLEMENT_CACHED_CLIENT_STATE_LAYER (GL_TEXTURE_COORD_ARRAY)
 
+  IMPLEMENT_CACHED_PARAMETER_1 (glMatrixMode, MatrixMode, GLenum, matrixMode)
+  
+  IMPLEMENT_CACHED_PARAMETER_4 (glVertexPointer, VertexPointer, GLint, vsize,
+    GLenum, vtype, GLsizei, vstride, GLvoid*, vpointer);
+  IMPLEMENT_CACHED_PARAMETER_3 (glNormalPointer, NormalPointer, GLenum, ntype,
+    GLsizei, nstride, GLvoid*, npointer);
+  IMPLEMENT_CACHED_PARAMETER_4 (glColorPointer, ColorPointer, GLint, csize,
+    GLenum, ctype, GLsizei, cstride, GLvoid*, cpointer);
+  IMPLEMENT_CACHED_PARAMETER_4_LAYER (glTexCoordPointer, TexCoordPointer, GLint, tsize,
+    GLenum, ttype, GLsizei, tstride, GLvoid*, tpointer);
+  
   // Special caches
   GLuint boundtexture[CS_GL_MAX_LAYER]; // 32 max texture layers
-  int currentUnit;
+  int currentUnit, activeUnit;
   void SetTexture (GLenum target, GLuint texture)
   {
     if (texture != boundtexture[currentUnit])
     {
+      ActivateTU ();
       boundtexture[currentUnit] = texture;
       glBindTexture (target, texture);
     }
@@ -363,21 +470,56 @@ public:
    */
   void SetActiveTU (int unit)
   {
-    if (currentUnit != unit)
-    {
-      extmgr->glActiveTextureARB (GL_TEXTURE0_ARB + unit);
-      extmgr->glClientActiveTextureARB (GL_TEXTURE0_ARB + unit);
-      currentUnit = unit;
-    }
+    currentUnit = unit;   
   }
   int GetActiveTU ()
   {
     return currentUnit;
   }
+  void ActivateTU ()
+  {
+    if (activeUnit != currentUnit && extmgr->CS_GL_ARB_multitexture)
+    {
+      extmgr->glActiveTextureARB (GL_TEXTURE0_ARB + currentUnit);
+      extmgr->glClientActiveTextureARB (GL_TEXTURE0_ARB + currentUnit);
+    }
+    activeUnit = currentUnit;
+  }
+
+  //VBO buffers
+  GLuint currentBufferID, currentIndexID;
+  void SetBufferARB (GLenum target, GLuint id)
+  {
+    if (target == GL_ELEMENT_ARRAY_BUFFER_ARB)
+    {
+      if (id != currentIndexID)
+      {
+        extmgr->glBindBufferARB (target, id);
+      }
+    } 
+    else 
+    {
+      if (id != currentBufferID)
+      {
+        extmgr->glBindBufferARB (target, id);
+      }
+    }
+  }
+
+  GLuint GetBufferARB (GLenum target)
+  {
+    if (target == GL_ELEMENT_ARRAY_BUFFER_ARB)
+    {
+      return currentIndexID;
+    } 
+    else 
+    {
+      return currentBufferID;
+    }
+  }
 };
 
 #undef IMPLEMENT_CACHED_BOOL
-#undef IMPLEMENT_CACHED_BOOL_LAYER
 #undef IMPLEMENT_CACHED_BOOL_CURRENTLAYER
 #undef IMPLEMENT_CACHED_PARAMETER_1
 #undef IMPLEMENT_CACHED_PARAMETER_2

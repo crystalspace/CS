@@ -97,16 +97,14 @@ csTerrBlock::csTerrBlock (csTerrainObject *terr)
   neighbours[3] = 0;
 
   vertex_data = 0;
-  morphvertex_data = 0;
   normal_data = 0;
-  morphnormal_data = 0;
   texcoord_data = 0;
   color_data = 0;
   last_colorVersion = ~0;
 
   built = false;
 
-  svcontext.AttachNew (new csShaderVariableContext ());
+  bufferHolder.AttachNew (new csRenderBufferHolder);
 
   detach = false;
 
@@ -116,9 +114,7 @@ csTerrBlock::csTerrBlock (csTerrainObject *terr)
 csTerrBlock::~csTerrBlock ()
 {
   delete [] vertex_data;
-  delete [] morphvertex_data;
   delete [] normal_data;
-  delete [] morphnormal_data;
   delete [] texcoord_data;
   delete [] color_data;
 }
@@ -527,15 +523,6 @@ void csTerrBlock::DrawTest (iGraphics3D* g3d,
     //delete[] vertex_data;@@@ CD
     //vertex_data = 0;
 
-    /*mesh_morphvertices = 
-      g3d->CreateRenderBuffer (
-      sizeof(csVector3)*num_mesh_vertices, CS_BUF_STATIC, CS_BUFCOMP_FLOAT,
-      3, false);
-    mesh_morphvertices->CopyToBuffer (morphvertex_data,
-      sizeof(csVector3)*num_mesh_vertices);
-    delete[] morphvertex_data;
-    morphvertex_data = 0;*/
-
     mesh_normals = 
       g3d->CreateRenderBuffer (sizeof(csVector3)*num_mesh_vertices,
       CS_BUF_STATIC, CS_BUFCOMP_FLOAT,
@@ -544,15 +531,6 @@ void csTerrBlock::DrawTest (iGraphics3D* g3d,
       sizeof(csVector3)*num_mesh_vertices);
     delete[] normal_data;
     normal_data = 0;
-
-    /*mesh_morphnormals = 
-      g3d->CreateRenderBuffer (
-      sizeof(csVector3)*num_mesh_vertices, CS_BUF_STATIC, CS_BUFCOMP_FLOAT,
-      3, false);
-    mesh_morphnormals->CopyToBuffer (morphnormal_data,
-      sizeof(csVector3)*num_mesh_vertices);
-    delete[] morphnormal_data;
-    morphnormal_data = 0;*/
 
     mesh_texcoords = 
     g3d->CreateRenderBuffer (sizeof(csVector2)*num_mesh_vertices,
@@ -574,20 +552,10 @@ void csTerrBlock::DrawTest (iGraphics3D* g3d,
       delete[] color_data;
       color_data = 0;
     }
-
-    csRef<csShaderVariable> sv;
-    sv = svcontext->GetVariableAdd (terr->vertices_name);
-    sv->SetValue (mesh_vertices);
-    /*sv = svcontext->GetVariableAdd (terr->morphvertices_name);
-    sv->SetValue (mesh_morphvertices);*/
-    sv = svcontext->GetVariableAdd (terr->normals_name);
-    sv->SetValue (mesh_normals);
-    /*sv = svcontext->GetVariableAdd (terr->morphnormals_name);
-    sv->SetValue (mesh_morphnormals);*/
-    sv = svcontext->GetVariableAdd (terr->texcoords_name);
-    sv->SetValue (mesh_texcoords);
-    sv = svcontext->GetVariableAdd (terr->colors_name);
-    sv->SetValue (mesh_colors);
+    bufferHolder->SetRenderBuffer (CS_BUFFER_POSITION, mesh_vertices);
+    bufferHolder->SetRenderBuffer (CS_BUFFER_NORMAL, mesh_normals);
+    bufferHolder->SetRenderBuffer (CS_BUFFER_TEXCOORD0, mesh_texcoords);
+    bufferHolder->SetRenderBuffer (CS_BUFFER_COLOR, mesh_colors);
   }
 
   //csVector3 cam = rview->GetCamera ()->GetTransform ().GetOrigin ();
@@ -607,9 +575,7 @@ void csTerrBlock::DrawTest (iGraphics3D* g3d,
             (((neighbours[2] && neighbours[2]->size>size)?1:0)<<2)+
             (((neighbours[3] && neighbours[3]->size>size)?1:0)<<3);
   
-  csRef<csShaderVariable> sv;
-  sv = svcontext->GetVariableAdd (terr->indices_name);
-  sv->SetValue (terr->mesh_indices[idx]);
+  bufferHolder->SetRenderBuffer (CS_BUFFER_INDEX, terr->mesh_indices[idx]);
 
   for (size_t i=0; i<=(baseonly?0:terr->palette.Length ()); ++i)
   {
@@ -619,7 +585,7 @@ void csTerrBlock::DrawTest (iGraphics3D* g3d,
     csRenderMesh*& rm = terr->rmHolder.GetUnusedMesh (meshCreated,
       rview->GetCurrentFrameNumber ());
     rm->meshtype = CS_MESHTYPE_TRIANGLESTRIP;
-    rm->variablecontext = svcontext;
+    rm->buffers = bufferHolder;
     rm->clip_portal = clip_portal;
     rm->clip_plane = clip_plane;
     rm->clip_z_plane = clip_z_plane;
@@ -1173,13 +1139,9 @@ csTerrainObject::csTerrainObject (iObjectRegistry* object_reg,
   csRef<iStringSet> strings = CS_QUERY_REGISTRY_TAG_INTERFACE (
     object_reg, "crystalspace.shared.stringset", iStringSet);
   
-  indices_name = strings->Request ("indices");
   vertices_name = strings->Request ("vertices");
-  morphvertices_name = strings->Request ("morph source vertices");
   normals_name = strings->Request ("normals");
-  morphnormals_name = strings->Request ("morph source normals");
   texcoords_name = strings->Request ("texture coordinates");
-  morphval_name = strings->Request ("morph amount");
   colors_name = strings->Request ("colors");
 
   //terr_func = &((csTerrainFactory*)pFactory)->terr_func;

@@ -45,7 +45,7 @@
 
 CS_LEAKGUARD_IMPLEMENT (csParticlesFactory);
 CS_LEAKGUARD_IMPLEMENT (csParticlesObject);
-CS_LEAKGUARD_IMPLEMENT (csParticlesObject::eiShaderVariableAccessor);
+CS_LEAKGUARD_IMPLEMENT (csParticlesObject::eiRenderBufferAccessor);
 
 CS_IMPLEMENT_PLUGIN
 
@@ -162,8 +162,8 @@ SCF_IMPLEMENT_EMBEDDED_IBASE (csParticlesObject::eiObjectModel)
   SCF_IMPLEMENTS_INTERFACE (iObjectModel)
 SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
-SCF_IMPLEMENT_IBASE (csParticlesObject::eiShaderVariableAccessor)
-  SCF_IMPLEMENTS_INTERFACE (iShaderVariableAccessor)
+SCF_IMPLEMENT_IBASE (csParticlesObject::eiRenderBufferAccessor)
+  SCF_IMPLEMENTS_INTERFACE (iRenderBufferAccessor)
 SCF_IMPLEMENT_IBASE_END
 
 csParticlesObject::csParticlesObject (csParticlesFactory* p)
@@ -181,10 +181,6 @@ csParticlesObject::csParticlesObject (csParticlesFactory* p)
     CS_QUERY_REGISTRY_TAG_INTERFACE (p->object_reg,
 	  "crystalspace.shared.stringset", iStringSet);
 
-  vertex_name = strings->Request ("vertices");
-  color_name = strings->Request ("colors");
-  texcoord_name = strings->Request ("texture coordinates");
-  index_name = strings->Request ("indices");
   radius_name = strings->Request ("point radius");
   scale_name = strings->Request ("point scale");
 
@@ -245,18 +241,14 @@ csParticlesObject::csParticlesObject (csParticlesFactory* p)
 
   running = false;
 
-  svcontext = new csShaderVariableContext ();
-  scfiShaderVariableAccessor.AttachNew (new eiShaderVariableAccessor (this));
+  svcontext.AttachNew (new csShaderVariableContext);
+  bufferHolder.AttachNew (new csRenderBufferHolder);
+
+  scfiRenderBufferAccessor.AttachNew (new eiRenderBufferAccessor (this));
+
+  bufferHolder->SetAccessor (scfiRenderBufferAccessor, ~0);  
 
   csShaderVariable* sv;
-  sv = svcontext->GetVariableAdd (vertex_name);
-  sv->SetAccessor ((iShaderVariableAccessor*)scfiShaderVariableAccessor);
-  sv = svcontext->GetVariableAdd (color_name);
-  sv->SetAccessor ((iShaderVariableAccessor*)scfiShaderVariableAccessor);
-  sv = svcontext->GetVariableAdd (texcoord_name);
-  sv->SetAccessor ((iShaderVariableAccessor*)scfiShaderVariableAccessor);
-  sv = svcontext->GetVariableAdd (index_name);
-  sv->SetAccessor ((iShaderVariableAccessor*)scfiShaderVariableAccessor);
   sv = svcontext->GetVariableAdd (radius_name);
   sv->SetValue (particle_radius);
   sv = svcontext->GetVariableAdd (scale_name);
@@ -402,12 +394,13 @@ void csParticlesObject::SetParticleRadius (float rad)
   }
 }
 
-void csParticlesObject::PreGetShaderVariableValue (csShaderVariable* var)
+void csParticlesObject::PreGetBuffer (csRenderBufferHolder* holder, csRenderBufferName buffer)
 {
-  var->SetValue(GetRenderBuffer(var->Name));
+  if (!holder) return;
+  holder->SetRenderBuffer (buffer, GetRenderBuffer(buffer));
 }
 
-iRenderBuffer *csParticlesObject::GetRenderBuffer (csStringID name)
+iRenderBuffer *csParticlesObject::GetRenderBuffer (csRenderBufferName name)
 {
   if (!vertex_buffer || buffer_length != point_data->Length ())
   {
@@ -473,7 +466,7 @@ iRenderBuffer *csParticlesObject::GetRenderBuffer (csStringID name)
     texcoord_buffer->CopyToBuffer (texcoords, sizeof(csVector2) * bufsize);
     delete [] texcoords;
   }
-  if (name == vertex_name)
+  if (name == CS_BUFFER_POSITION)
   {
     void *data;
     int size;
@@ -523,15 +516,15 @@ iRenderBuffer *csParticlesObject::GetRenderBuffer (csStringID name)
     vertex_buffer->CopyToBuffer (data, size);
     return vertex_buffer;
   }
-  else if (name == color_name)
+  else if (name == CS_BUFFER_COLOR)
   {
     return color_buffer;
   }
-  else if (name == texcoord_name)
+  else if (name == CS_BUFFER_TEXCOORD0)
   {
     return texcoord_buffer;
   }
-  else if (name == index_name)
+  else if (name == CS_BUFFER_INDEX)
   {
     return index_buffer;
   }
@@ -639,6 +632,7 @@ csRenderMesh** csParticlesObject::GetRenderMeshes (int& n, iRenderView* rview,
   mesh->indexend = vertnum;
   mesh->variablecontext = 
     (iShaderVariableContext*)svcontext; // Cast for gcc 2.95.x.
+  mesh->buffers = bufferHolder;
   if (point_sprites)
     mesh->meshtype = CS_MESHTYPE_POINT_SPRITES;
   else

@@ -1,12 +1,11 @@
-
 <shader type="xmlshader" name="shadowextrudeen">
-	<technique priority="100">
-		<pass>
-			<mixmode><copy/></mixmode>
-			<buffer name="shadow vertices" destination="attribute 0" />
-			<writemask r="false" g="false" b="false" a="false"/>
-			<vp plugin="glarb" file="/shader/shadowextrude2.avp"/>
-		</pass>
-	</technique>
+  <technique priority="100">
+    <pass>
+      <mixmode>
+        <copy />
+      </mixmode>
+      <writemask r="false" g="false" b="false" a="false" />
+      <vp plugin="glarb" file="/shader/shadowextrude2.avp" />
+    </pass>
+  </technique>
 </shader>
-

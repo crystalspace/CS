@@ -5,8 +5,7 @@
   <technique priority="50">
     <pass>
       <mixmode><copy/></mixmode>
-      <buffer name="vertices" destination="position" />
-      <buffer name="normals" destination="normal"/>
+      <buffer source="normal" destination="normal"/>
       <vp plugin="glfixed">
         <fixedvp>  
           <texgen type="reflection" mapping="cube" />
@@ -27,10 +26,7 @@
   </technique>
   <technique priority="75">
       <pass>
-	<buffer name="vertices" destination="position" />
-	<buffer name="normals" destination="normal" />
-	<buffer name="texture coordinates" destination="texture coordinate" />
-	<buffer name="colors" destination="color" />
+	<buffer source="normal" destination="normal" />
 	<vp plugin="software" />
 	<fp plugin="software" />
       </pass>

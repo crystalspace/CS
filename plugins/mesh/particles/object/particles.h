@@ -474,6 +474,7 @@ private:
   csParticlesFactory* pFactory;
   iMeshObjectDrawCallback* vis_cb;
   csRef<csShaderVariableContext> svcontext;
+  csRef<csRenderBufferHolder> bufferHolder;
   csRef<iParticlesPhysics> physics;
 
   csRef<iMaterialWrapper> matwrap;
@@ -619,7 +620,7 @@ public:
   /// Get the constant base color
   bool GetColor (csColor &c) const { c = basecolor; return true; }
 
-  iRenderBuffer *GetRenderBuffer (csStringID name);
+  iRenderBuffer *GetRenderBuffer (csRenderBufferName name);
 
   /// Set the material wrapper
   bool SetMaterialWrapper (iMaterialWrapper* m)
@@ -975,31 +976,31 @@ public:
   } scfiObjectModel;
   friend struct eiObjectModel;
 
-  class eiShaderVariableAccessor : public iShaderVariableAccessor
+  class eiRenderBufferAccessor : public iRenderBufferAccessor
   {
   private:
     csParticlesObject* parent;
   public:
-    CS_LEAKGUARD_DECLARE (eiShaderVariableAccessor);
+    CS_LEAKGUARD_DECLARE (eiRenderBufferAccessor);
     SCF_DECLARE_IBASE;
-    eiShaderVariableAccessor (csParticlesObject* parent)
+    eiRenderBufferAccessor (csParticlesObject* parent)
     {
       SCF_CONSTRUCT_IBASE (0);
-      eiShaderVariableAccessor::parent = parent;
+      eiRenderBufferAccessor::parent = parent;
     }
-    virtual ~eiShaderVariableAccessor ()
+    virtual ~eiRenderBufferAccessor ()
     {
       SCF_DESTRUCT_IBASE ();
     }
-    virtual void PreGetValue (csShaderVariable* variable)
+    virtual void PreGetBuffer (csRenderBufferHolder* holder, csRenderBufferName buffer)
     {
-      parent->PreGetShaderVariableValue (variable);
+      parent->PreGetBuffer (holder, buffer);
     }
   };
-  csRef<eiShaderVariableAccessor> scfiShaderVariableAccessor;
-  friend class eiShaderVariableAccessor;
+  csRef<eiRenderBufferAccessor> scfiRenderBufferAccessor;
+  friend class eiRenderBufferAccessor;
 
-  void PreGetShaderVariableValue (csShaderVariable* variable);
+  void PreGetBuffer (csRenderBufferHolder* holder, csRenderBufferName buffer);
 };
 
 #endif // __CS_PARTICLES_H__

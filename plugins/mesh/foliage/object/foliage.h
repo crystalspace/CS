@@ -219,19 +219,18 @@ private:
   // render meshes that can be returned by that function.
   csRenderMeshHolderSingle rmHolder;
 
-  // The shared variable context is the object that takes care
-  // of supplying the render buffers to the renderer. It is put
-  // in the render mesh that is returned by GetRenderMeshes().
-  csRef<csShaderVariableContext> svcontext;
+  // The standard render buffer holder. It takes care of giving
+  // the renderer all required renderbuffers.
+  csRef<csRenderBufferHolder> bufferHolder;
 
   // Since every mesh can have a different color we need to have
   // the color buffer here. But we will use the basic colors
   // from the factory.
   csRef<iRenderBuffer> color_buffer;
 
-  // Setup the 'svcontext' to get the buffers and accessors
+  // Setup the bufferholder to get the buffers and accessors
   // for all types of data we need.
-  void SetupShaderVariableContext ();
+  void SetupBufferHolder ();
 
   // Admin stuff.
   csWeakRef<iGraphics3D> g3d;
@@ -351,31 +350,31 @@ public:
     SCF_DECLARE_EMBEDDED_IBASE (csFoliageMeshObject);
   } scfiFoliageMeshState;
 
-  //------------------ iShaderVariableAccessor implementation ------------
-  class ShaderVariableAccessor : public iShaderVariableAccessor
+  //------------------ iRenderBufferAccessor implementation ------------
+  class RenderBufferAccessor : public iRenderBufferAccessor
   {
   private:
     csFoliageMeshObject* parent;
 
   public:
     SCF_DECLARE_IBASE;
-    ShaderVariableAccessor (csFoliageMeshObject* parent)
+    RenderBufferAccessor (csFoliageMeshObject* parent)
     {
       SCF_CONSTRUCT_IBASE (0);
-      ShaderVariableAccessor::parent = parent;
+      RenderBufferAccessor::parent = parent;
     }
-    virtual ~ShaderVariableAccessor ()
+    virtual ~RenderBufferAccessor ()
     {
       SCF_DESTRUCT_IBASE ();
     }
-    virtual void PreGetValue (csShaderVariable* variable)
+    virtual void PreGetBuffer (csRenderBufferHolder* holder, csRenderBufferName buffer)
     {
-      parent->PreGetShaderVariableValue (variable);
+      parent->PreGetBuffer (holder, buffer);
     }
-  } *scfiShaderVariableAccessor;
-  friend class ShaderVariableAccessor;
+  } *scfiRenderBufferAccessor;
+  friend class RenderBufferAccessor;
 
-  void PreGetShaderVariableValue (csShaderVariable* variable);
+  void PreGetBuffer (csRenderBufferHolder* holder, csRenderBufferName buffer);
 };
 
 /// Palette type.
@@ -461,8 +460,7 @@ private:
   void SetupFactory ();
 
 public:
-  static csStringID vertex_name, texel_name, normal_name, color_name, 
-    index_name, heights_name, foliage_density_name, foliage_types_name;
+  static csStringID heights_name, foliage_density_name, foliage_types_name;
 
   iObjectRegistry* object_reg;
   iBase* logparent;
@@ -643,29 +641,8 @@ public:
 
   virtual iObjectModel* GetObjectModel () { return &scfiObjectModel; }
 
-  //------------------ iShaderVariableAccessor implementation ------------
-  class ShaderVariableAccessor : public iShaderVariableAccessor
-  {
-  public:
-    SCF_DECLARE_IBASE;
-    csFoliageMeshObjectFactory* parent;
-    virtual ~ShaderVariableAccessor ()
-    {
-      SCF_DESTRUCT_IBASE ();
-    }
-    ShaderVariableAccessor (csFoliageMeshObjectFactory* parent)
-    {
-      SCF_CONSTRUCT_IBASE (0);
-      ShaderVariableAccessor::parent = parent;
-    }
-    virtual void PreGetValue (csShaderVariable* variable)
-    {
-      parent->PreGetShaderVariableValue (variable);
-    }
-  } *scfiShaderVariableAccessor;
-  friend class ShaderVariableAccessor;
-
-  void PreGetShaderVariableValue (csShaderVariable* variable);
+ 
+  void PreGetBuffer (csRenderBufferHolder* holder, csRenderBufferName buffer);
 };
 
 /**

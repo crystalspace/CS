@@ -65,7 +65,7 @@ protected:
   bool initialized;
 
   csRenderMeshHolderSingle rmHolder;
-  csRef<csShaderVariableContext> svcontext;
+  csRef<csRenderBufferHolder> bufferHolder;
 
   int VertexCount;
   int TriangleCount;

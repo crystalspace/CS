@@ -121,19 +121,13 @@ csBallMeshObject::csBallMeshObject (iMeshObjectFactory* factory)
     	((csBallMeshObjectFactory*)factory)->object_reg, 
 	"crystalspace.shared.stringset", iStringSet);
 
-  vertex_name = strings->Request ("vertices");
-  texel_name = strings->Request ("texture coordinates");
-  normal_name = strings->Request ("normals");
-  color_name = strings->Request ("colors");
-  index_name = strings->Request ("indices");
-
   ball_vertices_dirty_flag = false;
   ball_texels_dirty_flag = false;
   ball_normals_dirty_flag = false;
   ball_colors_dirty_flag = false;
   ball_triangle_dirty_flag = false;
 
-  svcontext.AttachNew (new csShaderVariableContext);
+  bufferHolder.AttachNew (new csRenderBufferHolder);
 }
 
 csBallMeshObject::~csBallMeshObject ()
@@ -500,106 +494,61 @@ void csBallMeshObject::SetupObject ()
   }
 }
 
-iRenderBuffer* csBallMeshObject::GetRenderBuffer (csStringID name)
+void csBallMeshObject::UpdateBuffers()
 {
-  if (name == vertex_name)
-  {
-    if (ball_vertices_dirty_flag)
-    {
-      vertex_buffer = g3d->CreateRenderBuffer (
-        sizeof (csVector3)*num_ball_vertices, CS_BUF_STATIC, 
-        CS_BUFCOMP_FLOAT, 3);
-      ball_vertices_dirty_flag = false;
-      vertex_buffer->CopyToBuffer(ball_vertices, sizeof(csVector3)*num_ball_vertices);
-    }
-    if (vertex_buffer)
-    {
-      return vertex_buffer;
-    }
-    return 0;
-  }
-  if (name == texel_name)
-  {
-    if (ball_texels_dirty_flag)
-    {
-      texel_buffer = g3d->CreateRenderBuffer (
-        sizeof (csVector2)*num_ball_vertices, CS_BUF_STATIC, 
-        CS_BUFCOMP_FLOAT, 2);
-      ball_texels_dirty_flag = false;
-      texel_buffer->CopyToBuffer (ball_texels,
-      	sizeof (csVector2) * num_ball_vertices);
-    }
-    return texel_buffer;
-  }
-  if (name == normal_name)
-  {
-    if (ball_normals_dirty_flag )
-    {
-      normal_buffer = g3d->CreateRenderBuffer (
-        sizeof (csVector3)*num_ball_vertices, CS_BUF_STATIC,
-        CS_BUFCOMP_FLOAT, 3);
-      ball_normals_dirty_flag = false;
-      normal_buffer->CopyToBuffer (top_normals,
-      	sizeof (csVector3)*num_ball_vertices);
-    }
-    return normal_buffer;
-  }
-  if (name == color_name)
-  {
-    if (ball_colors_dirty_flag)
-    {
-      color_buffer = g3d->CreateRenderBuffer (
-        sizeof (csColor)*num_ball_vertices, CS_BUF_STATIC,
-        CS_BUFCOMP_FLOAT, 3);
-      ball_colors_dirty_flag = false;
-      color_buffer->CopyToBuffer (ball_colors,
-      	sizeof (csColor) * num_ball_vertices);
-    }
-    return color_buffer;
-  }
-  if (name == index_name)
-  {
-    if (ball_triangle_dirty_flag)
-    {
-      index_buffer = g3d->CreateIndexRenderBuffer (
-        sizeof (unsigned int)*ball_triangles*3, CS_BUF_STATIC,
-        CS_BUFCOMP_UNSIGNED_INT, 0, num_ball_vertices - 1);
-      ball_triangle_dirty_flag = false;
-      index_buffer->CopyToBuffer (ball_indices,
-      	sizeof (unsigned int) * ball_triangles *3);
-    }
-    return index_buffer;
-  }
-  return 0;
-}
-
-void csBallMeshObject::UpdateBufferSV()
-{
-  csShaderVariable *sv;
   if (ball_vertices_dirty_flag)
   {
-    sv = svcontext->GetVariableAdd (vertex_name);
-    sv->SetValue (GetRenderBuffer(vertex_name));
+    vertex_buffer = g3d->CreateRenderBuffer (
+      sizeof (csVector3)*num_ball_vertices, CS_BUF_STATIC, 
+      CS_BUFCOMP_FLOAT, 3);
+    ball_vertices_dirty_flag = false;
+    vertex_buffer->CopyToBuffer(ball_vertices, sizeof(csVector3)*num_ball_vertices);
+
+    bufferHolder->SetRenderBuffer (CS_BUFFER_POSITION, vertex_buffer);
   }
   if (ball_texels_dirty_flag)
   {
-    sv = svcontext->GetVariableAdd (texel_name);
-    sv->SetValue (GetRenderBuffer(texel_name));
+    texel_buffer = g3d->CreateRenderBuffer (
+      sizeof (csVector2)*num_ball_vertices, CS_BUF_STATIC, 
+      CS_BUFCOMP_FLOAT, 2);
+    ball_texels_dirty_flag = false;
+    texel_buffer->CopyToBuffer (ball_texels,
+      sizeof (csVector2) * num_ball_vertices);
+
+    bufferHolder->SetRenderBuffer (CS_BUFFER_TEXCOORD0, texel_buffer);
   }
   if (ball_normals_dirty_flag)
   {
-    sv = svcontext->GetVariableAdd (normal_name);
-    sv->SetValue (GetRenderBuffer(normal_name));
+    normal_buffer = g3d->CreateRenderBuffer (
+      sizeof (csVector3)*num_ball_vertices, CS_BUF_STATIC,
+      CS_BUFCOMP_FLOAT, 3);
+    ball_normals_dirty_flag = false;
+    normal_buffer->CopyToBuffer (top_normals,
+      sizeof (csVector3)*num_ball_vertices);
+
+    bufferHolder->SetRenderBuffer (CS_BUFFER_NORMAL, normal_buffer);
   }
   if (ball_colors_dirty_flag)
   {
-    sv = svcontext->GetVariableAdd (color_name);
-    sv->SetValue (GetRenderBuffer(color_name));
+    color_buffer = g3d->CreateRenderBuffer (
+      sizeof (csColor)*num_ball_vertices, CS_BUF_STATIC,
+      CS_BUFCOMP_FLOAT, 3);
+    ball_colors_dirty_flag = false;
+    color_buffer->CopyToBuffer (ball_colors,
+      sizeof (csColor) * num_ball_vertices);
+
+    bufferHolder->SetRenderBuffer (CS_BUFFER_COLOR, color_buffer);
   }
   if (ball_triangle_dirty_flag)
   {
-    sv = svcontext->GetVariableAdd (index_name);
-    sv->SetValue (GetRenderBuffer(index_name));
+    index_buffer = g3d->CreateIndexRenderBuffer (
+      sizeof (unsigned int)*ball_triangles*3, CS_BUF_STATIC,
+      CS_BUFCOMP_UNSIGNED_INT, 0, num_ball_vertices - 1);
+    ball_triangle_dirty_flag = false;
+    index_buffer->CopyToBuffer (ball_indices,
+      sizeof (unsigned int) * ball_triangles *3);
+
+    bufferHolder->SetRenderBuffer (CS_BUFFER_INDEX, index_buffer);
   }
 }
 
@@ -644,7 +593,7 @@ csRenderMesh **csBallMeshObject::GetRenderMeshes (int &num, iRenderView* rview,
     printf ("INTERNAL ERROR: mesh used without material!\n");
     return 0;
   }
-  UpdateBufferSV ();
+  UpdateBuffers ();
   mater->Visit ();
 
   bool rmCreated;
@@ -665,7 +614,7 @@ csRenderMesh **csBallMeshObject::GetRenderMeshes (int &num, iRenderView* rview,
   meshPtr->camera_transform = &camera->GetTransform();
   if (rmCreated)
   {
-    meshPtr->variablecontext = svcontext;
+    meshPtr->buffers = bufferHolder;
   }
   meshPtr->geometryInstance = (void*)factory;
   

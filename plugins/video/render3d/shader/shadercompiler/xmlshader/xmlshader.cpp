@@ -206,7 +206,6 @@ bool csXMLShaderTech::LoadPass (iDocumentNode *node, shaderPass *pass)
   //if we got this far, load buffermappings
   csRef<iDocumentNodeIterator> it;
   it = node->GetNodes (xmltokens.Request (csXMLShaderCompiler::XMLTOKEN_BUFFER));
-  pass->bufferCount = 0;
   while(it->HasNext ())
   {
     csRef<iDocumentNode> mapping = it->Next ();
@@ -291,20 +290,101 @@ bool csXMLShaderTech::LoadPass (iDocumentNode *node, shaderPass *pass)
     }
     if (found)
     {
-      csStringID varID = strings->Request (mapping->GetAttributeValue("name"));
-      pass->bufferID[pass->bufferCount] = varID; //MUST HAVE STRINGS
-      pass->bufferGeneric[pass->bufferCount] = CS_VATTRIB_IS_GENERIC (attrib);
+      const char* cname = mapping->GetAttributeValue("customsource");
+      if (cname) 
+      {
+        //custom name
+        csStringID varID = strings->Request (cname);
+        pass->custommapping_id.Push (varID);
+        //pass->bufferGeneric[pass->bufferCount] = CS_VATTRIB_IS_GENERIC (attrib);
 
-      csShaderVariable *varRef=0;
-      varRef = pass->svcontext.GetVariable(pass->bufferID[pass->bufferCount]);
+        csShaderVariable *varRef=0;
+        varRef = pass->svcontext.GetVariable(varID);
 
-      if(!varRef)
-        varRef = svcontext.GetVariable (pass->bufferID[pass->bufferCount]);
+        if(!varRef)
+          varRef = svcontext.GetVariable (varID);
 
-      if (varRef)
-	pass->bufferRef[pass->bufferCount] = varRef;
-      pass->vertexattributes[pass->bufferCount] = attrib;
-      pass->bufferCount++;
+        pass->custommapping_variables.Push (varRef);
+        pass->custommaping_attrib.Push (attrib);
+      }
+      else
+      {
+        csRenderBufferName sourceName = CS_BUFFER_NONE;
+        //default mapping
+        const char *source = mapping->GetAttributeValue ("source");
+        if (!source)
+        {
+          SetFailReason ("invalid buffermapping, source missing.");
+          return false;
+        }
+
+        if (strcasecmp (source, "position") == 0)
+        {
+          sourceName = CS_BUFFER_POSITION;
+        }
+        else if (strcasecmp (source, "normal") == 0)
+        {
+          sourceName = CS_BUFFER_NORMAL;
+        }
+        else if (strcasecmp (source, "color") == 0)
+        {
+          sourceName = CS_BUFFER_COLOR;
+        }
+        else if (strcasecmp (source, "primary color") == 0)
+        {
+          sourceName = CS_BUFFER_COLOR;
+        }
+        else if (strcasecmp (source, "lighted color") == 0)
+        {
+          sourceName = CS_BUFFER_COLOR_LIGHTING;
+        }
+        else if (strcasecmp (source, "texture coordinate 0") == 0)
+        {
+          sourceName = CS_BUFFER_TEXCOORD0;
+        }
+        else if (strcasecmp (source, "texture coordinate 1") == 0)
+        {
+          sourceName = CS_BUFFER_TEXCOORD1;
+        }
+        else if (strcasecmp (source, "texture coordinate 2") == 0)
+        {
+          sourceName = CS_BUFFER_TEXCOORD2;
+        }
+        else if (strcasecmp (source, "texture coordinate 3") == 0)
+        {
+          sourceName = CS_BUFFER_TEXCOORD3;
+        }
+        else if (strcasecmp (source, "texture coordinate lightmap") == 0)
+        {
+          sourceName = CS_BUFFER_TEXCOORD_LIGHTMAP;
+        }
+        else if (strcasecmp (source, "generic 0") == 0)
+        {
+          sourceName = CS_BUFFER_GENERIC0;
+        }
+        else if (strcasecmp (source, "generic 1") == 0)
+        {
+          sourceName = CS_BUFFER_GENERIC1;
+        }
+        else if (strcasecmp (source, "generic 2") == 0)
+        {
+          sourceName = CS_BUFFER_GENERIC2;
+        }
+        else if (strcasecmp (source, "generic 3") == 0)
+        {
+          sourceName = CS_BUFFER_GENERIC3;
+        }
+        else if (strcasecmp (source, "binormal") == 0)
+        {
+          sourceName = CS_BUFFER_BINORMAL;
+        }
+        else if (strcasecmp (source, "tangent") == 0)
+        {
+          sourceName = CS_BUFFER_TANGENT;
+        }
+        
+        pass->defaultMappings[attrib] = sourceName;
+      }
     }
     else
     {
@@ -314,12 +394,6 @@ bool csXMLShaderTech::LoadPass (iDocumentNode *node, shaderPass *pass)
     }
   }
 
-  if (pass->bufferCount == 0)
-  {
-    parent->compiler->Report (CS_REPORTER_SEVERITY_WARNING,
-      "Shader '%s', pass %d has no buffer mappings",
-      parent->GetName (), GetPassNumber (pass));
-  }
 
   //get texturemappings
   pass->textureCount = 0;
@@ -597,8 +671,9 @@ bool csXMLShaderTech::DeactivatePass ()
   if(thispass->fp) thispass->fp->Deactivate ();
 
   iGraphics3D* g3d = parent->g3d;
-  g3d->SetBufferState(thispass->vertexattributes, clear_buffers, 
-    lastBufferCount);
+/*  g3d->SetBufferState(thispass->vertexattributes, clear_buffers, 
+    lastBufferCount);*/
+  g3d->DeactivateBuffers (thispass->custommaping_attrib.GetArray (), lastBufferCount);
   lastBufferCount=0;
 
   g3d->SetTextureState(textureUnits, clear_textures, 
@@ -624,16 +699,16 @@ bool csXMLShaderTech::SetupPass (const csRenderMesh *mesh,
   shaderPass *thispass = &passes[currentPass];
 
   //now map our buffers. all refs should be set
-  int i;
-  for (i = 0; i < thispass->bufferCount; i++)
+  unsigned int i;
+  for (i = 0; i < thispass->custommaping_attrib.Length (); i++)
   {
-    if (thispass->bufferRef[i] != 0)
-      thispass->bufferRef[i]->GetValue(last_buffers[i]);
-    else if (thispass->bufferID[i] < (csStringID)stacks.Length ())
+    if (thispass->custommapping_variables.Length () >= i && thispass->custommapping_variables[i] != 0)
+      thispass->custommapping_variables[i]->GetValue(last_buffers[i]);
+    else if (thispass->custommapping_id[i] < (csStringID)stacks.Length ())
     {
       csShaderVariable* var = 0;
-      if (stacks[thispass->bufferID[i]].Length () > 0)
-        var = stacks[thispass->bufferID[i]].Top ();
+      if (stacks[thispass->custommapping_id[i]].Length () > 0)
+        var = stacks[thispass->custommapping_id[i]].Top ();
       if (var)
         var->GetValue(last_buffers[i]);
       else
@@ -642,10 +717,11 @@ bool csXMLShaderTech::SetupPass (const csRenderMesh *mesh,
     else
       last_buffers[i] = 0;
   }
-  g3d->SetBufferState (thispass->vertexattributes, last_buffers, 
-    thispass->bufferCount);
-  lastBufferCount = thispass->bufferCount;
-
+  g3d->ActivateBuffers (mesh->buffers, thispass->defaultMappings);
+  g3d->ActivateBuffers (thispass->custommaping_attrib.GetArray (), last_buffers, 
+    thispass->custommaping_attrib.Length ());
+  lastBufferCount = thispass->custommaping_attrib.Length ();
+  
   //and the textures
   for (i = 0; i < thispass->textureCount; i++)
   {

@@ -100,7 +100,6 @@ csParticleSystem::csParticleSystem (iObjectRegistry* object_reg,
   colors = 0;
   part_sides = 0;
 
-  svcontext.AttachNew (new csShaderVariableContext);
 }
 
 csParticleSystem::~csParticleSystem()
@@ -139,15 +138,6 @@ void csParticleSystem::SetupBuffers (size_t part_sides)
   delete[] vertices;
   vertices = new csVector3 [VertexCount];
 
-  csStringID vertex_name, texel_name, normal_name, color_name, index_name;
-  csRef<iStringSet> strings = CS_QUERY_REGISTRY_TAG_INTERFACE (object_reg, 
-	"crystalspace.shared.stringset", iStringSet);
-  vertex_name = strings->Request ("vertices");
-  texel_name = strings->Request ("texture coordinates");
-  normal_name = strings->Request ("normals");
-  color_name = strings->Request ("colors");
-  index_name = strings->Request ("indices");
-
   vertex_buffer = g3d->CreateRenderBuffer (
         sizeof (csVector3)*VertexCount, CS_BUF_DYNAMIC, 
         CS_BUFCOMP_FLOAT, 3);
@@ -178,15 +168,12 @@ void csParticleSystem::SetupBuffers (size_t part_sides)
     }
   }
 
-  csShaderVariable *sv;
-  sv = svcontext->GetVariableAdd (vertex_name);
-  sv->SetValue (vertex_buffer);
-  sv = svcontext->GetVariableAdd (texel_name);
-  sv->SetValue (texel_buffer);
-  sv = svcontext->GetVariableAdd (color_name);
-  sv->SetValue (color_buffer);
-  sv = svcontext->GetVariableAdd (index_name);
-  sv->SetValue (index_buffer);
+  bufferHolder.AttachNew (new csRenderBufferHolder);
+  bufferHolder->SetRenderBuffer (CS_BUFFER_INDEX, index_buffer);
+  bufferHolder->SetRenderBuffer (CS_BUFFER_POSITION, vertex_buffer);
+  bufferHolder->SetRenderBuffer (CS_BUFFER_TEXCOORD0, texel_buffer);
+  bufferHolder->SetRenderBuffer (CS_BUFFER_COLOR, color_buffer);
+
 }
 
 void csParticleSystem::RemoveParticles ()
@@ -400,7 +387,7 @@ csRenderMesh** csParticleSystem::GetRenderMeshes (int& n, iRenderView* rview,
 
   if (meshCreated)
   {
-    rm->variablecontext = svcontext;
+    rm->buffers = bufferHolder;
   }
 
   // Prepare for rendering.

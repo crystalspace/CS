@@ -22,6 +22,8 @@
 #include "csutil/weakref.h"
 #include "csutil/csobject.h"
 #include "csutil/leakguard.h"
+#include "csutil/array.h"
+#include "csutil/dirtyaccessarray.h"
 #include "ivideo/material.h"
 #include "ivideo/graph3d.h"
 #include "ivideo/shader/shader.h"
@@ -54,6 +56,13 @@ private:
     { 
       mixMode = CS_FX_MESH;
       overrideZmode = false;
+      //setup default mappings
+      for (unsigned int i=0; i < STREAMMAX; i++)
+        defaultMappings[i] = CS_BUFFER_NONE;
+
+      defaultMappings[CS_VATTRIB_POSITION] = CS_BUFFER_POSITION;
+      defaultMappings[CS_VATTRIB_COLOR] = CS_BUFFER_COLOR;
+      defaultMappings[CS_VATTRIB_TEXCOORD] = CS_BUFFER_TEXCOORD0;
     }
 
     enum
@@ -63,18 +72,24 @@ private:
     };
 
     //buffer mappings
-    csStringID bufferID[STREAMMAX];
+    //default mapping, index is csVertexAttrib (16 first), value is csRenderBufferName
+    csRenderBufferName defaultMappings[STREAMMAX];
+    csArray<csStringID> custommapping_id;
+    csDirtyAccessArray<csVertexAttrib> custommaping_attrib;
+    csArray<bool> custommapping_generic;
+    csDirtyAccessArray<csRef<csShaderVariable> > custommapping_variables;
+
+/*    csStringID bufferID[STREAMMAX];
     csRef<csShaderVariable> bufferRef[TEXTUREMAX];
     csVertexAttrib vertexattributes[STREAMMAX];
     bool bufferGeneric[STREAMMAX];
-    int bufferCount;
+    int bufferCount;*/
 
     //texture mappings
     csStringID textureID[TEXTUREMAX];
     csRef<csShaderVariable> textureRef[TEXTUREMAX];
     csRef<csShaderVariable> autoAlphaTexRef;
-    //int textureUnits[TEXTUREMAX];
-    int textureCount;
+    unsigned int textureCount;
 
     //programs
     csRef<iShaderProgram> vp;

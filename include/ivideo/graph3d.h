@@ -68,7 +68,7 @@ struct iRenderBufferManager;
 struct iLightingManager;
 struct iShader;
 struct iShaderVariableContext;
-
+struct csRenderBufferHolder;
 
 /**\name iGraphics3D::BeginDraw() flags
  * @{ */
@@ -167,10 +167,10 @@ enum csZBufMode
 
 // @@@ Keep in sync with values below
 // @@@ Document me better!
-#define CS_VATTRIB_GENERIC_FIRST     0
-#define CS_VATTRIB_GENERIC_LAST     15
-#define CS_VATTRIB_SPECIFIC_FIRST  100
-#define CS_VATTRIB_SPECIFIC_LAST   (CS_VATTRIB_SPECIFIC_FIRST + 15)
+#define CS_VATTRIB_SPECIFIC_FIRST    0
+#define CS_VATTRIB_SPECIFIC_LAST    15
+#define CS_VATTRIB_GENERIC_FIRST   100
+#define CS_VATTRIB_GENERIC_LAST    (CS_VATTRIB_GENERIC_FIRST + 15)
 
 #define CS_VATTRIB_IS_GENERIC(va)   \
   ((va >= CS_VATTRIB_GENERIC_FIRST) && (va <=CS_VATTRIB_GENERIC_LAST))
@@ -183,27 +183,6 @@ enum csZBufMode
  */
 enum csVertexAttrib
 {
-  //@{
-  /**
-   * General vertex attribute
-   */
-  CS_VATTRIB_0	= 0,
-  CS_VATTRIB_1	= 1,
-  CS_VATTRIB_2	= 2,
-  CS_VATTRIB_3	= 3,
-  CS_VATTRIB_4	= 4,
-  CS_VATTRIB_5	= 5,
-  CS_VATTRIB_6	= 6,
-  CS_VATTRIB_7	= 7,
-  CS_VATTRIB_8	= 8,
-  CS_VATTRIB_9	= 9,
-  CS_VATTRIB_10 = 10,
-  CS_VATTRIB_11 = 11,
-  CS_VATTRIB_12 = 12,
-  CS_VATTRIB_13 = 13,
-  CS_VATTRIB_14 = 14,
-  CS_VATTRIB_15 = 15,
-  //@}
   /// Position vertex attribute
   CS_VATTRIB_POSITION	      = CS_VATTRIB_SPECIFIC_FIRST + 0,
   /// Vertex weight attribute
@@ -235,7 +214,28 @@ enum csVertexAttrib
   /// TU 6 texture coordinates
   CS_VATTRIB_TEXCOORD6	      = CS_VATTRIB_SPECIFIC_FIRST + 14,
   /// TU 7 texture coordinates
-  CS_VATTRIB_TEXCOORD7	      = CS_VATTRIB_SPECIFIC_FIRST + 15
+  CS_VATTRIB_TEXCOORD7	      = CS_VATTRIB_SPECIFIC_FIRST + 15,
+  //@{
+  /**
+  * General vertex attribute
+  */
+  CS_VATTRIB_0	= CS_VATTRIB_GENERIC_FIRST + 0,
+  CS_VATTRIB_1	= CS_VATTRIB_GENERIC_FIRST + 1,
+  CS_VATTRIB_2	= CS_VATTRIB_GENERIC_FIRST + 2,
+  CS_VATTRIB_3	= CS_VATTRIB_GENERIC_FIRST + 3,
+  CS_VATTRIB_4	= CS_VATTRIB_GENERIC_FIRST + 4,
+  CS_VATTRIB_5	= CS_VATTRIB_GENERIC_FIRST + 5,
+  CS_VATTRIB_6	= CS_VATTRIB_GENERIC_FIRST + 6,
+  CS_VATTRIB_7	= CS_VATTRIB_GENERIC_FIRST + 7,
+  CS_VATTRIB_8	= CS_VATTRIB_GENERIC_FIRST + 8,
+  CS_VATTRIB_9	= CS_VATTRIB_GENERIC_FIRST + 9,
+  CS_VATTRIB_10 = CS_VATTRIB_GENERIC_FIRST + 10,
+  CS_VATTRIB_11 = CS_VATTRIB_GENERIC_FIRST + 11,
+  CS_VATTRIB_12 = CS_VATTRIB_GENERIC_FIRST + 12,
+  CS_VATTRIB_13 = CS_VATTRIB_GENERIC_FIRST + 13,
+  CS_VATTRIB_14 = CS_VATTRIB_GENERIC_FIRST + 14,
+  CS_VATTRIB_15 = CS_VATTRIB_GENERIC_FIRST + 15,
+  //@}
 };
 
 /// 
@@ -773,11 +773,29 @@ struct iGraphics3D : public iBase
     csRenderBufferType type, int count, csRef<iRenderBuffer>* buffers) = 0;
 
   /**
+   * Activate the buffers in the default buffer holder.
+   */
+  virtual bool ActivateBuffers (csRenderBufferHolder* holder, 
+    csRenderBufferName mapping[CS_VATTRIB_SPECIFIC_LAST+1]) = 0;
+
+  /**
+   * Activate all given buffers.
+   */
+  virtual bool ActivateBuffers (csVertexAttrib *attribs,
+    iRenderBuffer **buffers, unsigned int count) = 0;
+
+  /**
+   * Deactivate all given buffers.
+   * If attribs is 0, all buffers are deactivated;
+   */
+   virtual void DeactivateBuffers (csVertexAttrib *attribs, unsigned int count) = 0;
+
+  /**
    * Activate or deactivate all given buffers depending on the value of
    * 'buffers' for that index.
    */
-  virtual void SetBufferState (csVertexAttrib* attribs,
-  	iRenderBuffer** buffers, int count) = 0;
+/*  virtual void SetBufferState (csVertexAttrib* attribs,
+  	iRenderBuffer** buffers, int count) = 0;*/
 
   /**
    * Activate or deactivate all given textures depending on the value

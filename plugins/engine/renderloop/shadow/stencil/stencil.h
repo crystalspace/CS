@@ -93,7 +93,7 @@ private:
   void HandleEdge (EdgeInfo* e, csHash<EdgeInfo*>& edge_stack);
 public:
   SCF_DECLARE_IBASE;
-  csShaderVariableContext *svcontext;
+  csRef<csRenderBufferHolder> bufferHolder;
 
   csStencilShadowCacheEntry (csStencilShadowStep* parent, 
     iMeshWrapper* mesh);
@@ -102,7 +102,6 @@ public:
   void SetActiveLight (iLight *light, csVector3 meshlightpos, 
     int& active_index_range, int& active_edge_start);
   virtual void ObjectModelChanged (iObjectModel* model);
-  virtual iRenderBuffer *GetRenderBuffer (csStringID name);
   void EnableShadowCaps () { enable_caps = true; }
   void DisableShadowCaps () { enable_caps = false; }
   bool ShadowCaps () { return enable_caps; }
@@ -123,10 +122,6 @@ private:
   csWeakRef<iGraphics3D> g3d;
   csWeakRef<iShaderManager> shmgr;
   csRef<csStencilShadowType> type;
-
-  static csStringID shadow_vertex_name;
-  static csStringID shadow_normal_name; 
-  static csStringID shadow_index_name;
 
   bool enableShadows;
   csRefArray<iLightRenderStep> steps;

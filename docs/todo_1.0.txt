@@ -12,6 +12,9 @@ have on CS.  The following modifiers can be given:
 	- O: organization and other. An organizational change or something
 	  else.
 	- **: bug or feature has been fixed or implemented.
+	- --: bug or feature no longer relevant as module/application in
+	  question have been dropped, or is total broken and should be
+	  removed.
 
 A number after the character indicates priority (1=low, 2=medium, 3=high)
 
@@ -30,7 +33,7 @@ HIGH:
 	     Unfortunatelly this function is still buggy (fog is not
 	     implemented and some transparency effects don't seem to be
 	     working).
-	[S3] Some canvases still clip improperly as shown by the clipping tests
+	[**] Some canvases still clip improperly as shown by the clipping tests
 	     in g2dtest.  The Windows OpenGL canvas is one such canvas.
 	     Possibly, the MacOS/X canvases are also flawed.  Same is true for
 	     xwindows and glx2d canvas.  As Jorrit says probably the test and
@@ -43,7 +46,7 @@ HIGH:
 	     memory).  This shows with BugPlug and also with AWS in some cases.
 	     Is this related to incorrect clipping?  (See above item.)
 	     [Bug 747988]
-	[S3] There are still some unreleased instances of SCF classes.
+	[**] There are still some unreleased instances of SCF classes.
 	     Update: When talking about walktest this only true in the flarge
 	     map.  Problem is probably the hierarchical mesh factory there.
 	     [Bug 747995]
@@ -73,7 +76,7 @@ HIGH:
 	     (optimize mode)
 	     Note by Jorrit: this will most likely not be fixed soon as it is
 	     a rather fundamental problem.
-	[**] simplecloth crashes consistently at startup dereferencing address
+	[--] simplecloth crashes consistently at startup dereferencing address
 	     0x0884 when run with the software renderer.  The program seems to
 	     run correctly with the OpenGL renderer.  (optimize mode) Matze
 	     Braun <matze@braunis.de> further reports that the bounding box of
@@ -83,7 +86,7 @@ HIGH:
 	     but the fix is not yet in CVS.  Dan Mahoney
 	     <domahoneyii@users.sourceforget.net> reports that the crash is on
 	     line 95 of scanp2.inc. [Bug 747983] Module dropped.
-	[**] Cloth plugin has a culling problem.  If any corner of the cloth's
+	[--] Cloth plugin has a culling problem.  If any corner of the cloth's
 	     bbox is above the top border of the screen, then the entire cloth
 	     is culled.  Charles James Leonardo Quarra Cappiello
 	     <charsquarra@hotmail.com> wonders if this problem arose when the
@@ -107,11 +110,11 @@ HIGH:
 	[F1] Re-implement locking in csEventQueue using csMutex rather than the
 	     fallible spin-lock which is presently in use.  Ditto for
 	     csEventCord.
-	[S1] perftest used to print a message at the bottom of the window
+	[--] perftest used to print a message at the bottom of the window
 	     briefly describing each test.  These messages are no longer
 	     present.
-	     [Bug 747981]
-	[S1] tbtut crashes after moving a bit in software mode.  Also, the
+	     [Bug 747981] Application removed.
+	[--] tbtut crashes after moving a bit in software mode.  Also, the
 	     program seems very incomplete.  Matze Braun <matze@braunis.de>
 	     reports: "I always start the app move 2 or 3 seconds forward
 	     (already at this point I get strangely culled polygons which
@@ -121,16 +124,17 @@ HIGH:
 	     reports: "I've noticed a problem with tbtut running with the
 	     software renderer.  If you just go forward for just a bit (holding
 	     down the up arrow for a few seconds), it suddenly locks up."
-	[**] NetTut doesn't parse it's commandline (one always get an error
+	     Application removed.
+	[--] NetTut doesn't parse it's commandline (one always get an error
 	     message no matter what is entered at the command line).
 		Usage:  ./nettut [server/client] [tcp/udp] [hostname*] [port]
 		 * - specify hostname only if you are using client mode.
 	     [Bug 747994] (Network support dropped.)
-	[**] NetMantest or the netmanager plugin leaks. (Networking support
+	[--] NetMantest or the netmanager plugin leaks. (Networking support
 	     dropped.)
 	[O1] Implement 3-bit outline renderer in Dynavis.
 	[O1] Implement better kd-tree balancing in Dynavis.
-	[V1] Walktest + newsky: it appears that there are some visibility
+	[--] Walktest + newsky: it appears that there are some visibility
 	     culling problems in some rare cases.  Solution: try to find a spot
 	     that doesn't work right and remember with 'C'.  Later on you can
 	     go back to that position with 'c' (after including debug info).
@@ -143,28 +147,29 @@ HIGH:
 		"room"
 		0
 		--snap--
-	     [Bug 748002]
-	[V1] Fix radiosity so that it works again.  Radiosity is currently
+	     [Bug 748002] Module terrfunc dropped.
+	[--] Fix radiosity so that it works again.  Radiosity is currently
 	     disabled because several things had been rewritten and the
 	     radiosity code was left behind.  To fix this we need to have a way
 	     to iterate over all polygons.  This is not hard.  Harder will be
 	     the fact that the lighting system has changed.  It now works with
 	     the shadow bitmaps.
-	     [Bug 429283]
-	[V1] Investigate if skeletal sprites work nicely with the visibility
+	     [Bug 429283] Will not be fixed. Radiosity is broken beyond repair
+	     and needs total rewrite.
+	[--] Investigate if skeletal sprites work nicely with the visibility
 	     culling system.  Major problem is that calculating a bounding box
 	     for a skeletal sprite is not easy.  We have to find an efficient
 	     way to do this, especially when the transforms change.
-	     [Bug 204194]
-	[V1] Lighting for skeletal sprites is not good.  The problem is that
+	     [Bug 204194] (No longer relevant)
+	[--] Lighting for skeletal sprites is not good.  The problem is that
 	     normals are precalculated for the 'base mesh'.  When the mesh
 	     later animates (using the transforms) the normals will not change.
 	     A solution is perhaps to transform the normals with the
 	     hierarchical transform.  But this will not work correctly for
 	     vertices that are connected to triangles that have vertices from
 	     other limbs.
-	     [Bug 493454]
-	[V1] Investigate clipping bug in OpenGL.
+	     [Bug 493454] (Skeletal sprite support removed from spr3d)
+	[**] Investigate clipping bug in OpenGL.
 	     [Bug 430214]
 	[V1] In OpenGL adjacent polygons do not match nicely. Especially if
 	     you clear the background every frame you can easily notice gaps

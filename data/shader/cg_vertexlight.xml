@@ -2,10 +2,7 @@
   <technique priority="300">
     <pass>
       <mixmode><add /></mixmode>
-      <buffer name="vertices" destination="position" />
-      <buffer name="colors" destination="primary color" />
-      <buffer name="texture coordinates" destination="texture coordinate 0" />
-      <buffer name="normals" destination="normal" />
+      <buffer source="normal" destination="normal" />
       <texture name="tex diffuse" destination="Texture" />
       <vp plugin="glcg" file="/shader/vertexlight.cgvp" />
       <fp plugin="glcg" file="/shader/passthrough.cgfp" />

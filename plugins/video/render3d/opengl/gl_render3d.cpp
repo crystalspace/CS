@@ -128,9 +128,6 @@ csGLGraphics3D::csGLGraphics3D (iBase *parent)
   int i;
   for (i=0; i<16; i++)
   {
-    vertattrib[i] = 0;
-    vertattribenabled[i] = false;
-    vertattribenabled100[i] = false;
     texunittarget[i] = 0;
     texunitenabled[i] = false;
   }
@@ -138,6 +135,7 @@ csGLGraphics3D::csGLGraphics3D (iBase *parent)
 
   scrapIndicesSize = 0;
   scrapVerticesSize = 0;
+  scrapBufferHolder.AttachNew (new csRenderBufferHolder);
 
   shadow_stencil_enabled = false;
   clipping_stencil_enabled = false;
@@ -922,7 +920,8 @@ bool csGLGraphics3D::Open ()
       for (int u = texUnits - 1; u >= 0; u--)
       {
 	statecache->SetActiveTU (u);
-	glTexEnvf (GL_TEXTURE_FILTER_CONTROL_EXT, 
+        statecache->ActivateTU ();
+        glTexEnvf (GL_TEXTURE_FILTER_CONTROL_EXT, 
 	  GL_TEXTURE_LOD_BIAS_EXT, textureLodBias); 
       }
     }
@@ -1153,7 +1152,10 @@ bool csGLGraphics3D::BeginDraw (int drawflags)
       }
       statecache->Disable_GL_ALPHA_TEST ();
       if (ext->CS_GL_ARB_multitexture)
+      {
 	statecache->SetActiveTU (0);
+        statecache->ActivateTU ();
+      }
 
       statecache->SetMatrixMode (GL_PROJECTION);
       glLoadIdentity ();
@@ -1200,11 +1202,11 @@ void csGLGraphics3D::PrepareAsRenderTarget (csGLTextureHandle* tex_mm)
     {
       if (ext->CS_GL_SGIS_generate_mipmap)
       {
-	glTexParameteri (GL_TEXTURE_2D, GL_GENERATE_MIPMAP_SGIS, GL_TRUE);
+        glTexParameteri (GL_TEXTURE_2D, GL_GENERATE_MIPMAP_SGIS, GL_TRUE);
       }
       else
       {
-	glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER,
+	glTexParameteri  (GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER,
 	  txtmgr->rstate_bilinearmap ? GL_LINEAR : GL_NEAREST);
       }
     }
@@ -1367,172 +1369,236 @@ void csGLGraphics3D::DrawLine (const csVector3 & v1, const csVector3 & v2,
   G2D->DrawLine (px1, py1, px2, py2, color);
 }
 
-bool csGLGraphics3D::ActivateBuffer (csVertexAttrib attrib,
-	iRenderBuffer* buffer)
+
+bool csGLGraphics3D::ActivateBuffers (csRenderBufferHolder *holder, 
+                                      csRenderBufferName mapping[CS_VATTRIB_SPECIFIC_LAST+1])
 {
-  bool bind = true;
-  int att;
-  if (attrib < 100)
+  if (!holder) return false;
+
+  iRenderBuffer *buffer = 0;
+  void *data = 0;
+
+  buffer = holder->GetRenderBuffer (mapping[CS_VATTRIB_POSITION]);
+  if (buffer) 
   {
-    if (vertattrib[attrib] == buffer)
+    data = ((csGLRenderBuffer*)buffer)->RenderLock (CS_GLBUF_RENDERLOCK_ARRAY);
+    if (data != (void*)-1) 
     {
-      if (vertattribenabled[attrib])
-        return true;
-      //bind = false; //@@@[res]: causes graphical errors in some cases
+      statecache->SetVertexPointer (buffer->GetComponentCount (),
+        ((csGLRenderBuffer*)buffer)->compGLType, 
+        buffer->GetStride (), data);
+      statecache->Enable_GL_VERTEX_ARRAY ();
     }
-    att = attrib;
   }
   else
   {
-    att = attrib-100;
-    if (vertattrib[att] == buffer)
-    {
-      if (vertattribenabled100[att])
-        return true;
-      //bind = false; //@@@[res]: causes graphical errors in some cases
-    }
-  }
-  if (bind && vertattrib[att])
-  {
-    vertattrib[att]->Release ();
-    vertattrib[att] = 0;
+    statecache->Disable_GL_VERTEX_ARRAY ();
   }
 
-  if (use_hw_render_buffers && vbo_thresshold > 0)
+  buffer = holder->GetRenderBuffer (mapping[CS_VATTRIB_NORMAL]);
+  if (buffer) 
   {
-    ext->glBindBufferARB (GL_ELEMENT_ARRAY_BUFFER_ARB, 0);
-    ext->glBindBufferARB (GL_ARRAY_BUFFER_ARB, 0);
+    data = ((csGLRenderBuffer*)buffer)->RenderLock (CS_GLBUF_RENDERLOCK_ARRAY);
+    if (data != (void*)-1) 
+    {
+      statecache->SetNormalPointer (((csGLRenderBuffer*)buffer)->compGLType, 
+        buffer->GetStride(), data);
+      statecache->Enable_GL_NORMAL_ARRAY ();
+    }
   }
-  void* data = ((csGLRenderBuffer*)buffer)->RenderLock (
-  	CS_GLBUF_RENDERLOCK_ARRAY); //buffer->Lock (CS_BUF_LOCK_RENDER);
-  int stride = buffer->GetStride ();
-  if (data != (void*)-1)
+  else
   {
-    if (ext->glEnableVertexAttribArrayARB && attrib < CS_VATTRIB_SPECIFIC_FIRST)
+    statecache->Disable_GL_NORMAL_ARRAY ();
+  }
+  
+  buffer = holder->GetRenderBuffer (mapping[CS_VATTRIB_COLOR]);
+  if (buffer)
+  {
+    data = ((csGLRenderBuffer*)buffer)->RenderLock (CS_GLBUF_RENDERLOCK_ARRAY);
+    if (data != (void*)-1) 
     {
-      ext->glEnableVertexAttribArrayARB (att);
-      if (bind)
+      statecache->SetColorPointer (buffer->GetComponentCount(),
+        ((csGLRenderBuffer*)buffer)->compGLType, 
+        buffer->GetStride (), data);
+      statecache->Enable_GL_COLOR_ARRAY ();
+    }
+  }
+  else
+  {
+    statecache->Disable_GL_COLOR_ARRAY ();
+  }
+
+  unsigned int u = -1;
+
+  buffer = holder->GetRenderBuffer (mapping[CS_VATTRIB_TEXCOORD0]);
+  if (buffer)
+  {
+    data = ((csGLRenderBuffer*)buffer)->RenderLock (CS_GLBUF_RENDERLOCK_ARRAY);
+    if (data != (void*)-1)
+    {
+      if (ext->CS_GL_ARB_multitexture)
       {
-        ext->glVertexAttribPointerARB(attrib, buffer->GetComponentCount (),
-          ((csGLRenderBuffer*)buffer)->compGLType, true, stride, data);
+        statecache->SetActiveTU (0);
+      }
+      statecache->SetTexCoordPointer (buffer->GetComponentCount (),
+        ((csGLRenderBuffer*)buffer)->compGLType, 
+        buffer->GetStride (), data);
+      statecache->Enable_GL_TEXTURE_COORD_ARRAY ();
+    }
+  }
+  else
+  {
+    if (ext->CS_GL_ARB_multitexture)
+    {
+      statecache->SetActiveTU (0);
+    }
+    statecache->Disable_GL_TEXTURE_COORD_ARRAY ();
+  }
+
+  if (ext->CS_GL_ARB_multitexture)
+  {
+    unsigned int i;
+    for (i = 1; i < 8; i++)
+    {
+      buffer = holder->GetRenderBuffer (mapping[CS_VATTRIB_TEXCOORD0+i]);
+      if (buffer)
+      {
+        data = ((csGLRenderBuffer*)buffer)->RenderLock (CS_GLBUF_RENDERLOCK_ARRAY);
+        if (data != (void*)-1)
+        {
+          statecache->SetActiveTU (i);
+          statecache->SetTexCoordPointer (buffer->GetComponentCount (),
+            ((csGLRenderBuffer*)buffer)->compGLType, 
+            buffer->GetStride (), data);
+          statecache->Enable_GL_TEXTURE_COORD_ARRAY ();
+        }
+      }
+      else
+      {
+        statecache->SetActiveTU (i);
+        statecache->Disable_GL_TEXTURE_COORD_ARRAY ();
       }
     }
-    else
-    {
-      switch (attrib)
-      {
-        case CS_VATTRIB_POSITION:
-          glVertexPointer (buffer->GetComponentCount (),
-            ((csGLRenderBuffer*)buffer)->compGLType, stride, data);
-	  statecache->Enable_GL_VERTEX_ARRAY();
-          break;
-        case CS_VATTRIB_NORMAL:
-          glNormalPointer (((csGLRenderBuffer*)buffer)->compGLType, stride, data);
-          statecache->Enable_GL_NORMAL_ARRAY();
-          break;
-        case CS_VATTRIB_PRIMARY_COLOR:
-          glColorPointer (buffer->GetComponentCount (),
-            ((csGLRenderBuffer*)buffer)->compGLType, stride, data);
-          statecache->Enable_GL_COLOR_ARRAY();
-	  break;
-        default:
-	  if ((attrib >= CS_VATTRIB_TEXCOORD0) && 
-	    (attrib <= CS_VATTRIB_TEXCOORD7))
-	  {
-	    int unit = attrib - CS_VATTRIB_TEXCOORD0;
-	    if (ext->CS_GL_ARB_multitexture)
-	    {
-	      statecache->SetActiveTU (unit);
-	    }
-	    else if (unit != 0) return false;
-	    glTexCoordPointer (buffer->GetComponentCount (), 
-	      ((csGLRenderBuffer*)buffer)->compGLType, stride, data);
-	    statecache->Enable_GL_TEXTURE_COORD_ARRAY();
-	  }
-	  break;
-      }
-    }
-    vertattrib[att] = buffer;
-    if (attrib < CS_VATTRIB_SPECIFIC_FIRST)
-      vertattribenabled[att] = true;
-    else
-      vertattribenabled100[att] = true;
   }
   return true;
 }
 
-void csGLGraphics3D::DeactivateBuffer (csVertexAttrib attrib)
+bool csGLGraphics3D::ActivateBuffers (csVertexAttrib *attribs, 
+                                      iRenderBuffer** buffers, unsigned int count)
 {
-  int att;
-  if (attrib < CS_VATTRIB_SPECIFIC_FIRST)
+  for (unsigned int i = 0; i < count; i++)
   {
-    if (vertattribenabled[attrib] == false) return;
-    att = attrib;
-  }
-  else
-  {
-    att = attrib - CS_VATTRIB_SPECIFIC_FIRST;
-    if (vertattribenabled100[att] == false) return;
-  }
-  if (ext->glDisableVertexAttribArrayARB && attrib<100) 
-  {
-    ext->glDisableVertexAttribArrayARB (attrib);
-    /*if (use_hw_render_buffers)
-      ext->glBindBufferARB (GL_ARRAY_BUFFER_ARB, 0);
+    csVertexAttrib att = attribs[i];
+    iRenderBuffer *buffer = buffers[i];
+    if (!buffer) continue;
 
-    ext->glVertexAttribPointerARB(attrib, 1, GL_FLOAT, true, 0, 0);*/
-  }
-  else
-  {
-    switch (attrib)
+    void* data = ((csGLRenderBuffer*)buffer)->RenderLock (
+      CS_GLBUF_RENDERLOCK_ARRAY);
+
+    if (data == (void*)-1) return false;
+
+    switch (att)
     {
-      case CS_VATTRIB_POSITION:
-        statecache->Disable_GL_VERTEX_ARRAY();
-        break;
-      case CS_VATTRIB_NORMAL:
-        statecache->Disable_GL_NORMAL_ARRAY();
-        break;
-      case CS_VATTRIB_PRIMARY_COLOR:
-        statecache->Disable_GL_COLOR_ARRAY();
-        break;
-      default:
-	if ((attrib >= CS_VATTRIB_TEXCOORD0) && 
-	  (attrib <= CS_VATTRIB_TEXCOORD7))
-	{
-	  int unit = attrib - CS_VATTRIB_TEXCOORD0;
-	  if (ext->CS_GL_ARB_multitexture)
-	  {
-	    statecache->SetActiveTU (unit);
-	  }
-	  else if (unit != 0) break;
-	  statecache->Disable_GL_TEXTURE_COORD_ARRAY();
-	}
-	break;
+    case CS_VATTRIB_POSITION:
+      statecache->Enable_GL_VERTEX_ARRAY ();
+      statecache->SetVertexPointer (buffer->GetComponentCount (),
+        ((csGLRenderBuffer*)buffer)->compGLType, buffer->GetStride (), data);
+      break;
+    case CS_VATTRIB_NORMAL:
+      statecache->Enable_GL_NORMAL_ARRAY ();
+      statecache->SetNormalPointer (((csGLRenderBuffer*)buffer)->compGLType,
+        buffer->GetStride (), data);
+      break;
+    case CS_VATTRIB_COLOR:
+      statecache->Enable_GL_COLOR_ARRAY ();
+      statecache->SetColorPointer (buffer->GetComponentCount (),
+        ((csGLRenderBuffer*)buffer)->compGLType, buffer->GetStride (), data);
+      break;
+    default:
+      if (att >= CS_VATTRIB_TEXCOORD0 && att <= CS_VATTRIB_TEXCOORD7)
+      {
+        //texcoord
+        unsigned int unit = att- CS_VATTRIB_TEXCOORD0;
+        if (ext->CS_GL_ARB_multitexture)
+        {
+          statecache->SetActiveTU (unit);
+        } 
+        statecache->Enable_GL_TEXTURE_COORD_ARRAY ();
+        statecache->SetTexCoordPointer (buffer->GetComponentCount (),
+          ((csGLRenderBuffer*)buffer)->compGLType, buffer->GetStride (), data);
+      }
+      else if (CS_VATTRIB_IS_GENERIC(att) && ext->glEnableVertexAttribArrayARB)
+      {
+        ext->glEnableVertexAttribArrayARB (att);
+        ext->glVertexAttribPointerARB(att, buffer->GetComponentCount (),
+          ((csGLRenderBuffer*)buffer)->compGLType, false, buffer->GetStride (), data);
+      }
+      else
+      {
+        //none, assert...
+        CS_ASSERT_MSG("Unknown vertex attribute", 0);
+      }
     }
   }
-  if (vertattrib[att])
-  {
-    vertattrib[att]->Release ();
-    vertattrib[att] = 0;
-    if (attrib < CS_VATTRIB_SPECIFIC_FIRST)
-      vertattribenabled[att] = false;
-    else
-      vertattribenabled100[att] = false;
-  }
+  return true;
 }
 
-void csGLGraphics3D::SetBufferState (csVertexAttrib* attribs,
-	iRenderBuffer** buffers, int count)
+void csGLGraphics3D::DeactivateBuffers (csVertexAttrib *attribs, unsigned int count)
 {
-  int i;
-  for (i = 0 ; i < count ; i++)
+  if (!attribs)
   {
-    csVertexAttrib attrib = attribs[i];
-    iRenderBuffer* buf = buffers[i];
-    if (buf)
-      ActivateBuffer (attrib, buf);
-    else
-      DeactivateBuffer (attrib);
+    //disable all
+    statecache->Disable_GL_VERTEX_ARRAY ();
+    statecache->Disable_GL_NORMAL_ARRAY ();
+    statecache->Disable_GL_COLOR_ARRAY ();
+    statecache->Disable_GL_TEXTURE_COORD_ARRAY ();
+    if (ext->CS_GL_ARB_multitexture)
+    {
+      for (unsigned int i = 0; i < CS_GL_MAX_LAYER; i++)
+      {
+        statecache->SetActiveTU (i);
+        statecache->Disable_GL_TEXTURE_COORD_ARRAY ();
+      }
+    }
+  }
+  else
+  {
+    for (unsigned int i = 0; i < count; i++)
+    {
+      csVertexAttrib att = attribs[i];
+      switch (att)
+      {
+      case CS_VATTRIB_POSITION:
+        statecache->Disable_GL_VERTEX_ARRAY ();
+        break;
+      case CS_VATTRIB_NORMAL:
+        statecache->Disable_GL_NORMAL_ARRAY ();
+        break;
+      case CS_VATTRIB_COLOR:
+        statecache->Disable_GL_COLOR_ARRAY ();
+        break;
+      default:
+        if (att >= CS_VATTRIB_TEXCOORD0 && att <= CS_VATTRIB_TEXCOORD7)
+        {
+          //texcoord
+          unsigned int unit = att- CS_VATTRIB_TEXCOORD0;
+          if (ext->CS_GL_ARB_multitexture)
+          {
+            statecache->SetActiveTU (unit);
+          }
+          statecache->Disable_GL_TEXTURE_COORD_ARRAY ();
+        }
+        else if (CS_VATTRIB_IS_GENERIC(att) && ext->glDisableVertexAttribArrayARB)
+        {
+          ext->glDisableVertexAttribArrayARB (att);
+        }
+        else
+        {
+          //none, assert...
+          CS_ASSERT_MSG("Unknown vertex attribute", 0);
+        }
+      }
+    }
   }
 }
 
@@ -1541,6 +1607,7 @@ bool csGLGraphics3D::ActivateTexture (iTextureHandle *txthandle, int unit)
   if (ext->CS_GL_ARB_multitexture)
   {
     statecache->SetActiveTU (unit);
+    statecache->ActivateTU ();
   }
   else if (unit != 0) return false;
 
@@ -1642,13 +1709,17 @@ void csGLGraphics3D::DrawMesh (const csCoreRenderMesh* mymesh,
   if (debug_inhibit_draw) return;
 
   SetObjectToCameraInternal (mymesh->object2camera);
+    
+  iRenderBuffer* iIndexbuf = (mymesh->buffers ? mymesh->buffers->GetRenderBuffer(CS_BUFFER_INDEX) : 0);
   
-  CS_ASSERT (string_indices<(csStringID)stacks.Length ()
+  if (!iIndexbuf)
+  {
+    CS_ASSERT (string_indices<(csStringID)stacks.Length ()
       && stacks[string_indices].Length () > 0);
-  csShaderVariable* indexBufSV = stacks[string_indices].Top ();
-  iRenderBuffer* iIndexbuf = 0;
-  indexBufSV->GetValue (iIndexbuf);
-  CS_ASSERT(iIndexbuf);
+    csShaderVariable* indexBufSV = stacks[string_indices].Top ();
+    indexBufSV->GetValue (iIndexbuf);
+    CS_ASSERT(iIndexbuf);
+  }
   csGLRenderBuffer* indexbuf = (csGLRenderBuffer*)iIndexbuf;
   
   const size_t indexCompsBytes = indexbuf->compSize;
@@ -1704,6 +1775,7 @@ void csGLGraphics3D::DrawMesh (const csCoreRenderMesh* mymesh,
       glEnable (GL_POINT_SPRITE_ARB);
       primitivetype = GL_POINTS;
       statecache->SetActiveTU (0);
+      statecache->ActivateTU ();
       glTexEnvi (GL_POINT_SPRITE_ARB, GL_COORD_REPLACE_ARB, GL_TRUE);
 
       break;
@@ -2254,7 +2326,7 @@ csPtr<iPolygonRenderer> csGLGraphics3D::CreatePolygonRenderer ()
 
 void csGLGraphics3D::DrawSimpleMesh (const csSimpleRenderMesh& mesh, 
 				     uint flags)
-{
+{  
   if (scrapIndicesSize < mesh.indexCount)
   {
     scrapIndices = CreateIndexRenderBuffer (mesh.indexCount * sizeof (uint),
@@ -2286,9 +2358,11 @@ void csGLGraphics3D::DrawSimpleMesh (const csSimpleRenderMesh& mesh,
     scrapIndices->CopyToBuffer (mesh.indices, 
       mesh.indexCount * sizeof (uint));
     sv->SetValue (scrapIndices);
+    scrapBufferHolder->SetRenderBuffer (CS_BUFFER_INDEX, scrapIndices);
   }
   else
   {
+    scrapBufferHolder->SetRenderBuffer (CS_BUFFER_INDEX, 0);
     sv->SetValue (0);
   }
   sv = scrapContext.GetVariableAdd (string_vertices);
@@ -2296,51 +2370,45 @@ void csGLGraphics3D::DrawSimpleMesh (const csSimpleRenderMesh& mesh,
   {
     scrapVertices->CopyToBuffer (mesh.vertices, 
       mesh.vertexCount * sizeof (csVector3));
+    scrapBufferHolder->SetRenderBuffer (CS_BUFFER_POSITION, scrapVertices);
     if (useShader)
       sv->SetValue (scrapVertices);
-    else
-      ActivateBuffer (CS_VATTRIB_POSITION, scrapVertices);
   }
   else
   {
+    scrapBufferHolder->SetRenderBuffer (CS_BUFFER_POSITION, 0);
     if (useShader)
       sv->SetValue (0);
-    else
-      DeactivateBuffer (CS_VATTRIB_POSITION);
   }
   sv = scrapContext.GetVariableAdd (string_texture_coordinates);
   if (mesh.texcoords)
   {
     scrapTexcoords->CopyToBuffer (mesh.texcoords, 
       mesh.vertexCount * sizeof (csVector2));
+    scrapBufferHolder->SetRenderBuffer (CS_BUFFER_TEXCOORD0, scrapTexcoords);
     if (useShader)
       sv->SetValue (scrapTexcoords);
-    else
-      ActivateBuffer (CS_VATTRIB_TEXCOORD, scrapTexcoords);
   }
   else
   {
+    scrapBufferHolder->SetRenderBuffer (CS_BUFFER_TEXCOORD0, 0);
     if (useShader)
       sv->SetValue (0);
-    else
-      DeactivateBuffer (CS_VATTRIB_TEXCOORD);
   }
   sv = scrapContext.GetVariableAdd (string_colors);
   if (mesh.colors)
   {
     scrapColors->CopyToBuffer (mesh.colors, 
       mesh.vertexCount * sizeof (csVector4));
+    scrapBufferHolder->SetRenderBuffer (CS_BUFFER_COLOR, scrapColors);
     if (useShader)
       sv->SetValue (scrapColors);
-    else
-      ActivateBuffer (CS_VATTRIB_COLOR, scrapColors);
   }
   else
   {
+    scrapBufferHolder->SetRenderBuffer (CS_BUFFER_COLOR, 0);
     if (useShader)
       sv->SetValue (0);
-    else
-      DeactivateBuffer (CS_VATTRIB_COLOR);
   }
   if (useShader)
   {
@@ -2350,7 +2418,10 @@ void csGLGraphics3D::DrawSimpleMesh (const csSimpleRenderMesh& mesh,
   else
   {
     if (ext->CS_GL_ARB_multitexture)
+    {
       statecache->SetActiveTU (0);
+      statecache->ActivateTU ();
+    }
     if (mesh.texture)
       ActivateTexture (mesh.texture);
     else
@@ -2368,6 +2439,7 @@ void csGLGraphics3D::DrawSimpleMesh (const csSimpleRenderMesh& mesh,
   rmesh.indexstart = 0;
   rmesh.indexend = mesh.indexCount;
   rmesh.variablecontext = &scrapContext;
+  rmesh.buffers = scrapBufferHolder;
 
   if (flags & csSimpleMeshScreenspace)
   {
@@ -2468,9 +2540,6 @@ void csGLGraphics3D::DrawSimpleMesh (const csSimpleRenderMesh& mesh,
 
   if (!useShader)
   {
-    DeactivateBuffer (CS_VATTRIB_POSITION);
-    DeactivateBuffer (CS_VATTRIB_TEXCOORD);
-    DeactivateBuffer (CS_VATTRIB_COLOR);
     if (mesh.texture)
       DeactivateTexture ();
   }
@@ -2487,8 +2556,7 @@ csOpenGLHalo::csOpenGLHalo (float iR, float iG, float iB, unsigned char *iAlpha,
 {
   SCF_CONSTRUCT_IBASE (0);
 
-  // Initialization
-  R = iR; G = iG; B = iB;
+  // Initialization  R = iR; G = iG; B = iB;
   // OpenGL can only use 2^n sized textures
   Width = csFindNearestPowerOf2 (iWidth);
   Height = csFindNearestPowerOf2 (iHeight);
@@ -2515,9 +2583,9 @@ csOpenGLHalo::csOpenGLHalo (float iR, float iG, float iB, unsigned char *iAlpha,
   csGLGraphics3D::statecache->SetTexture (GL_TEXTURE_2D, halohandle);
 
   // Jaddajaddajadda
-  glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP);
-  glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-  glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+  glTexEnvi (GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP);
+  glTexEnvi (GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+  glTexEnvi (GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
   glTexImage2D (GL_TEXTURE_2D, 0, GL_RGBA, Width, Height, 0, GL_RGBA,
     GL_UNSIGNED_BYTE, rgba);
 
@@ -2594,6 +2662,7 @@ void csOpenGLHalo::Draw (float x, float y, float w, float h, float iIntensity,
   int oldTU = G3D->statecache->GetActiveTU ();
   if (G3D->ext->CS_GL_ARB_multitexture)
     G3D->statecache->SetActiveTU (0);
+  G3D->statecache->ActivateTU ();
 
   //csGLGraphics3D::SetGLZBufferFlags (CS_ZBUF_NONE);
   // @@@ Is this correct to override current_zmode?
@@ -2636,6 +2705,7 @@ void csOpenGLHalo::Draw (float x, float y, float w, float h, float iIntensity,
     csGLGraphics3D::statecache->Disable_GL_TEXTURE_2D ();
   if (G3D->ext->CS_GL_ARB_multitexture)
     G3D->statecache->SetActiveTU (oldTU);
+  G3D->statecache->ActivateTU ();
 }
 
 iHalo *csGLGraphics3D::CreateHalo (float iR, float iG, float iB,

@@ -30,9 +30,7 @@
   <technique priority="200">
     <pass>
       <mixmode><copy/></mixmode>
-      <buffer name="vertices" destination="attribute 0" />
-      <buffer name="normals" destination="attribute 1" />
-      <buffer name="texture coordinates" destination="attribute 2" />
+      <buffer source="normal" destination="normal" />
       <vp plugin="glarb" file="/shader/splatting_scattering_base.avp"/>
       <texture destination="unit 0" name="standardtex normalization map" />
       <texture destination="unit 1" name="standardtex normalization map" />
@@ -64,7 +62,6 @@
     </pass>
     <pass>
       <mixmode><add/></mixmode>
-      <buffer name="vertices" destination="attribute 0" />
       <vp plugin="glarb" file="/shader/scattering.avp" />
       <texture destination="unit 0" name="tex diffuse" />
       <fp plugin="glfixed">
@@ -81,8 +78,7 @@
   <technique priority="100">
     <pass>
       <mixmode><copy/></mixmode>
-      <buffer name="vertices" destination="attribute 0" />
-      <buffer name="normals" destination="attribute 2" />
+      <buffer source="normal" destination="normal" />
       <vp plugin="glarb" file="/shader/flat_ppl_diffuse_a.avp"/>
       <texture destination="unit 0" name="standardtex normalization map" />
       <texture destination="unit 1" name="standardtex normalization map" />
@@ -102,8 +98,6 @@
     </pass>
     <pass>
       <mixmode><multiply/></mixmode>
-      <buffer name="vertices" destination="attribute 0" />
-      <buffer name="texture coordinates" destination="attribute 2" />
       <vp plugin="glarb" file="/shader/splatting_scattering_base_b.avp"/>
       <texture destination="unit 0" name="tex diffuse" />
       <fp plugin="glfixed">
@@ -118,7 +112,6 @@
     </pass>
     <pass>
       <mixmode><add/></mixmode>
-      <buffer name="vertices" destination="attribute 0" />
       <vp plugin="glarb" file="/shader/scattering.avp" />
       <texture destination="unit 0" name="tex diffuse" />
       <fp plugin="glfixed">
@@ -135,9 +128,7 @@
   <technique priority="50">
     <pass>
       <mixmode><copy/></mixmode>
-      <buffer name="vertices" destination="position" />
-      <buffer name="normals" destination="normal" />
-      <buffer name="texture coordinates" destination="texture coordinate" />
+      <buffer source="normal" destination="normal" />
       <vp plugin="glfixed" file="/shader/vertexlight.fvp"/>
       <texture destination="unit 0" name="tex diffuse" />
       <fp plugin="glfixed">
@@ -155,10 +146,7 @@
   <technique priority="0">
     <pass>
       <mixmode><copy/></mixmode>
-      <buffer name="vertices" destination="position" />
-      <buffer name="normals" destination="normal" />
-      <buffer name="texture coordinates" destination="texture coordinate" />
-      <buffer name="colors" destination="color" />
+      <buffer source="normal" destination="normal" />
       <vp plugin="software" />
       <fp plugin="software" />
     </pass>

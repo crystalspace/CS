@@ -182,7 +182,7 @@ public:
     MeshTreeNode *GetChild (int i) 
     { CS_ASSERT (i >= 0 && i < 4); return (error > 0) ? children[i] : 0; }
 
-    iRenderBuffer *GetRenderBuffer (csStringID name);
+    iRenderBuffer *GetRenderBuffer (csRenderBufferName name);
 
     const csVector3 &Center () { return center; }
     const csBox3 &BBox () { return box; }
@@ -332,7 +332,7 @@ private:
   public:
     csWeakRef<csChunkLodTerrainObject> obj;
     csChunkLodTerrainFactory::MeshTreeNode* factoryNode;
-    csRef<csShaderVariableContext> svcontext;
+    csRef<csRenderBufferHolder> bufferHolder;
 
     SCF_DECLARE_IBASE;
 
@@ -342,7 +342,8 @@ private:
     MeshTreeNodeWrapper* GetChild (int n);
   };
   friend class MeshTreeNodeWrapper;
-  class MeshTreeNodeSVA : public iShaderVariableAccessor
+
+  class MeshTreeNodeRBA : public iRenderBufferAccessor
   {
     csWeakRef<MeshTreeNodeWrapper> wrapper;
     csRef<iRenderBuffer> colorBuffer;
@@ -350,12 +351,13 @@ private:
   public:
     SCF_DECLARE_IBASE;
 
-    MeshTreeNodeSVA (MeshTreeNodeWrapper* wrapper);
-    virtual ~MeshTreeNodeSVA ();
+    MeshTreeNodeRBA (MeshTreeNodeWrapper* wrapper);
+    virtual ~MeshTreeNodeRBA ();
 
-    virtual void PreGetValue (csShaderVariable *variable);
-  };
-  friend class MeshTreeNodeSVA;
+    virtual void PreGetBuffer (csRenderBufferHolder* holder, csRenderBufferName buffer);
+  };    
+  friend class MeshTreeNodeRBA;
+
   
   csRef<MeshTreeNodeWrapper> rootNode;
   iMovable* light_movable; 

@@ -1707,26 +1707,11 @@ void csSpriteCal3DMeshObject::SetupRenderMeshes ()
       rm.indexend = submesh->getFaceCount () * 3;
       rm.meshtype = CS_MESHTYPE_TRIANGLES;
       rm.material = (iMaterialWrapper *)submesh->getCoreMaterialId ();
-      rm.variablecontext.AttachNew (new csShaderVariableContext ());
+      rm.buffers.AttachNew (new csRenderBufferHolder );
 
-      csShaderVariable* sv;
-      csRef<iShaderVariableAccessor> accessor (
-	csPtr<iShaderVariableAccessor> (new BaseAccessor (this, m, s)));
-      sv = rm.variablecontext->GetVariableAdd (
-        csSpriteCal3DMeshObjectFactory::index_name);
-      sv->SetAccessor (accessor);
-      sv = rm.variablecontext->GetVariableAdd (
-        csSpriteCal3DMeshObjectFactory::texel_name);
-      sv->SetAccessor (accessor);
-      sv = rm.variablecontext->GetVariableAdd (
-        csSpriteCal3DMeshObjectFactory::normal_name);
-      sv->SetAccessor (accessor);
-      sv = rm.variablecontext->GetVariableAdd (
-        csSpriteCal3DMeshObjectFactory::color_name);
-      sv->SetAccessor (accessor);
-      sv = rm.variablecontext->GetVariableAdd (
-        csSpriteCal3DMeshObjectFactory::vertex_name);
-      sv->SetAccessor (accessor);
+      csRef<iRenderBufferAccessor> accessor (
+	csPtr<iRenderBufferAccessor> (new BaseAccessor (this, m, s)));
+      rm.buffers->SetAccessor (accessor, CS_BUFFER_ALL_MASK);
 
       allRenderMeshes.Push (&rm);
     }
@@ -2231,15 +2216,15 @@ float csSpriteCal3DMeshObject::GetTimeFactor()
 SCF_IMPLEMENT_IBASE(csSpriteCal3DMeshObject::BaseAccessor)
 SCF_IMPLEMENT_IBASE_END
 
-void csSpriteCal3DMeshObject::BaseAccessor::PreGetValue (
-  csShaderVariable *variable)
+void csSpriteCal3DMeshObject::BaseAccessor::PreGetBuffer 
+  (csRenderBufferHolder* holder, csRenderBufferName buffer)
 {
-  const csStringID id = variable->Name;
-  if ((id == csSpriteCal3DMeshObjectFactory::index_name) || 
-    (id == csSpriteCal3DMeshObjectFactory::vertex_name) ||
-    (id == csSpriteCal3DMeshObjectFactory::texel_name) ||
-    (id == csSpriteCal3DMeshObjectFactory::normal_name) ||
-    (id == csSpriteCal3DMeshObjectFactory::color_name))
+  if (!holder) return;
+  if ((buffer == CS_BUFFER_INDEX) || 
+      (buffer == CS_BUFFER_POSITION) ||
+      (buffer == CS_BUFFER_TEXCOORD0) ||
+      (buffer == CS_BUFFER_NORMAL) ||
+      (buffer == CS_BUFFER_COLOR))
   {
     if (meshobj->meshVersion != meshVersion)
     {
@@ -2308,29 +2293,27 @@ void csSpriteCal3DMeshObject::BaseAccessor::PreGetValue (
       meshVersion = meshobj->meshVersion;
     }
 
-    if (id == csSpriteCal3DMeshObjectFactory::index_name)
+    if (buffer == CS_BUFFER_INDEX)
     {
-      variable->SetValue (index_buffer);
+      holder->SetRenderBuffer (CS_BUFFER_INDEX, index_buffer);   
     }
-    else if (id == csSpriteCal3DMeshObjectFactory::vertex_name)
+    else if (buffer == CS_BUFFER_POSITION)
     {
-      variable->SetValue (vertex_buffer);
+      holder->SetRenderBuffer (CS_BUFFER_POSITION, vertex_buffer);
     }
-    else if (id == csSpriteCal3DMeshObjectFactory::normal_name)
+    else if (buffer == CS_BUFFER_NORMAL)
     {
-      variable->SetValue (normal_buffer);
+      holder->SetRenderBuffer (CS_BUFFER_NORMAL, normal_buffer);
     }
-    else if (id == csSpriteCal3DMeshObjectFactory::texel_name)
+    else if (buffer == CS_BUFFER_TEXCOORD0)
     {
-      variable->SetValue (texel_buffer);
+      holder->SetRenderBuffer (CS_BUFFER_TEXCOORD0, texel_buffer);
     }
-    else if (id == csSpriteCal3DMeshObjectFactory::color_name)
+    else if (buffer == CS_BUFFER_COLOR)
     {
-      variable->SetValue (color_buffer);
+      holder->SetRenderBuffer (CS_BUFFER_COLOR, color_buffer);
     }
   }
-  //variable->SetValue (meshobj->GetRenderBuffer (mesh, submesh,
-  //  variable->Name));
 }
 
 //----------------------------------------------------------------------

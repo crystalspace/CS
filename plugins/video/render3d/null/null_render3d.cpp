@@ -506,10 +506,7 @@ void csNullGraphics3D::CreateInterleavedRenderBuffers (size_t size,
   }
 }
 
-void csNullGraphics3D::SetBufferState (csVertexAttrib*, iRenderBuffer**, int)
-{
-  return;
-}
+
 
 void csNullGraphics3D::SetTextureState (int*, iTextureHandle**, int)
 {

@@ -8,101 +8,101 @@
 
   <variablemap variable="texture lod distance" destination="register 7"/>
 
-<program>
-<![CDATA[
-!!ARBvp1.0
-#---------------------------------------
-# Simple Vertex Lighting Program
-#---------------------------------------
-#Parameter definition
-PARAM mvp[4]		= { state.matrix.mvp };
-PARAM mvi[4]		= { state.matrix.modelview.inverse };
-PARAM eyePos    	= { 0.0, 0.0, 0.0, 1};
-PARAM lightIntensity	= { 100, 100, 100, 0 };
-PARAM log_2_e		= { 1.4427, 1.4427, 1.4427, 1.4427 };
-PARAM terrain_reflectance = { 0.0138, 0.0113, 0.008, 0 };
-PARAM lightAmbient	= program.local[0];
-PARAM lightPos  	= program.local[1];
-PARAM lightDiffuse 	= program.local[2];
-PARAM lightSpecular 	= program.local[3];
-PARAM lightAttenuation 	= program.local[4];
-PARAM cB1plusB2		= program.local[5];
-PARAM loddist   	= program.local[7];
+  <program>
+  <![CDATA[
+    !!ARBvp1.0
+    #---------------------------------------
+    # Simple Vertex Lighting Program
+    #---------------------------------------
+    #Parameter definition
+    PARAM mvp[4]                = { state.matrix.mvp };
+    PARAM mvi[4]                = { state.matrix.modelview.inverse };
+    PARAM eyePos                = { 0.0, 0.0, 0.0, 1};
+    PARAM lightIntensity        = { 100, 100, 100, 0 };
+    PARAM log_2_e               = { 1.4427, 1.4427, 1.4427, 1.4427 };
+    PARAM terrain_reflectance   = { 0.0138, 0.0113, 0.008, 0 };
+    PARAM lightAmbient          = program.local[0];
+    PARAM lightPos              = program.local[1];
+    PARAM lightDiffuse          = program.local[2];
+    PARAM lightSpecular         = program.local[3];
+    PARAM lightAttenuation      = program.local[4];
+    PARAM cB1plusB2             = program.local[5];
+    PARAM loddist               = program.local[7];
 
-# Per vertex inputs
-ATTRIB iPos		= vertex.attrib[0];
-ATTRIB iNorm		= vertex.attrib[1];
-ATTRIB iTex0		= vertex.attrib[2];
-# Outputs
-OUTPUT oPos		= result.position;
-OUTPUT oLightDir	= result.texcoord[0];
-OUTPUT oNormal		= result.texcoord[1];
-OUTPUT oSplat		= result.texcoord[2];
-OUTPUT oCol0		= result.color;
-# Temporaries
-TEMP objLight;
-TEMP objEye;
-TEMP lodblend;
-TEMP theta;
-TEMP extinction;
+    # Per vertex inputs
+    ATTRIB iPos                 = vertex.position;
+    ATTRIB iNorm                = vertex.normal;
+    ATTRIB iTex0                = vertex.texcoord[0];
+    # Outputs
+    OUTPUT oPos                 = result.position;
+    OUTPUT oLightDir            = result.texcoord[0];
+    OUTPUT oNormal              = result.texcoord[1];
+    OUTPUT oSplat               = result.texcoord[2];
+    OUTPUT oCol0                = result.color;
+    # Temporaries
+    TEMP objLight;
+    TEMP objEye;
+    TEMP lodblend;
+    TEMP theta;
+    TEMP extinction;
 
-#Transform vertex to viewspace
-DP4 oPos.x, mvp[0], iPos;
-DP4 oPos.y, mvp[1], iPos;
-DP4 oPos.z, mvp[2], iPos;
-DP4 oPos.w, mvp[3], iPos;
+    #Transform vertex to viewspace
+    DP4 oPos.x, mvp[0], iPos;
+    DP4 oPos.y, mvp[1], iPos;
+    DP4 oPos.z, mvp[2], iPos;
+    DP4 oPos.w, mvp[3], iPos;
 
-DP4 objLight.x, mvi[0], lightPos;
-DP4 objLight.y, mvi[1], lightPos;
-DP4 objLight.z, mvi[2], lightPos;
-DP4 objLight.w, mvi[3], lightPos;
+    DP4 objLight.x, mvi[0], lightPos;
+    DP4 objLight.y, mvi[1], lightPos;
+    DP4 objLight.z, mvi[2], lightPos;
+    DP4 objLight.w, mvi[3], lightPos;
 
-ADD oLightDir, objLight, -iPos;
-MOV oNormal, iNorm;
-MOV oSplat, iTex0;
+    ADD oLightDir, objLight, -iPos;
+    MOV oNormal, iNorm;
+    MOV oSplat, iTex0;
 
-DP4 objEye.x, mvi[0], eyePos;
-DP4 objEye.y, mvi[1], eyePos;
-DP4 objEye.z, mvi[2], eyePos;
-DP4 objEye.w, mvi[3], eyePos;
-      
-ADD objEye, objEye, -iPos;
-DP3 objEye.w, objEye, objEye;
-RSQ objEye.w, objEye.w;
-MUL lodblend, objEye.w, loddist;
-RCP lodblend.x, lodblend.x;
-MIN lodblend.x, lodblend.x, eyePos.w;
-RCP theta.z, objEye.w;
+    DP4 objEye.x, mvi[0], eyePos;
+    DP4 objEye.y, mvi[1], eyePos;
+    DP4 objEye.z, mvi[2], eyePos;
+    DP4 objEye.w, mvi[3], eyePos;
+          
+    ADD objEye, objEye, -iPos;
+    DP3 objEye.w, objEye, objEye;
+    RSQ objEye.w, objEye.w;
+    MUL lodblend, objEye.w, loddist;
+    RCP lodblend.x, lodblend.x;
+    MIN lodblend.x, lodblend.x, eyePos.w;
+    RCP theta.z, objEye.w;
 
-###
-# Find extinction term
-# extinction = -(beta_1+beta_2) * s
-MUL extinction, cB1plusB2, -theta.z;
-###
-# extinction = -(beta_1+beta_2) * s * log_2(e)
-MUL extinction, extinction, log_2_e;
-###
-# extinction = e^(-(beta1 + beta2) * s)
-EX2 extinction.x, extinction.x;
-EX2 extinction.y, extinction.y;
-EX2 extinction.z, extinction.z;
+    ###
+    # Find extinction term
+    # extinction = -(beta_1+beta_2) * s
+    MUL extinction, cB1plusB2, -theta.z;
+    ###
+    # extinction = -(beta_1+beta_2) * s * log_2(e)
+    MUL extinction, extinction, log_2_e;
+    ###
+    # extinction = e^(-(beta1 + beta2) * s)
+    EX2 extinction.x, extinction.x;
+    EX2 extinction.y, extinction.y;
+    EX2 extinction.z, extinction.z;
 
-###
-# Apply reflectance to E to get the net effective E
-# MUL extinction, extinction, materialReflection;
-MUL extinction, extinction, terrain_reflectance;
+    ###
+    # Apply reflectance to E to get the net effective E
+    # MUL extinction, extinction, materialReflection;
+    MUL extinction, extinction, terrain_reflectance;
 
-###
-# Apply light color and intensity
-MUL extinction, extinction, lightDiffuse;
-MUL extinction, extinction, lightIntensity;
-#MUL extinction, extinction, lightDiffuse.w;
-#ADD extinction, extinction, lightAmbient;
+    ###
+    # Apply light color and intensity
+    MUL extinction, extinction, lightDiffuse;
+    MUL extinction, extinction, lightIntensity;
+    #MUL extinction, extinction, lightDiffuse.w;
+    #ADD extinction, extinction, lightAmbient;
 
-#Set color
-MUL oCol0, extinction, lodblend.x;
+    #Set color
+    MUL oCol0, extinction, lodblend.x;
 
-END
-]]>
-</program>
+    END
+  ]]>
+  </program>
 </arbvp>

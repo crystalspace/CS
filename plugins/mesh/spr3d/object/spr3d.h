@@ -1306,16 +1306,11 @@ private:
   int final_num_triangles;
 
   csRef<iRenderBuffer> vertices;
-  csRef<iRenderBuffer> shadow_verts;
   csRef<iRenderBuffer> normals;
-  csRef<iRenderBuffer> shadow_norms;
   csRef<iRenderBuffer> texcoords;
   csRef<iRenderBuffer> colors;
   csRef<iRenderBuffer> indices;
-  csStringID vertices_name, normals_name,
-    texcoords_name, colors_name, indices_name, 
-    shadow_verts_name, shadow_norms_name;
-  csShaderVariableContext svcontext;
+  csRef<csRenderBufferHolder> bufferHolder;
 
   /// Setup this object.
   void SetupObject ();
@@ -1962,33 +1957,33 @@ public:
   } scfiLODControl;
   friend struct LODControl;
 
-  //------------------ iShaderVariableAccessor implementation ------------
-  class eiShaderVariableAccessor : public iShaderVariableAccessor
+  //------------------ iRenderBufferAccessor implementation ------------
+  class eiRenderBufferAccessor : public iRenderBufferAccessor
   {
   private:
     csSprite3DMeshObject* parent;
 
   public:
-    CS_LEAKGUARD_DECLARE (eiShaderVariableAccessor);
-    eiShaderVariableAccessor (csSprite3DMeshObject* p)
+    CS_LEAKGUARD_DECLARE (eiRenderBufferAccessor);
+    eiRenderBufferAccessor (csSprite3DMeshObject* p)
     {
       SCF_CONSTRUCT_IBASE (0);
       parent = p;
     }
-    virtual ~eiShaderVariableAccessor ()
+    virtual ~eiRenderBufferAccessor ()
     {
       SCF_DESTRUCT_IBASE ();
     }
     SCF_DECLARE_IBASE;
-    virtual void PreGetValue (csShaderVariable* variable)
+    virtual void PreGetBuffer (csRenderBufferHolder* holder, csRenderBufferName buffer)
     {
-      parent->PreGetShaderVariableValue (variable);
+      parent->PreGetBuffer (holder, buffer);
     }
   };
-  friend class eiShaderVariableAccessor;
-  csRef<eiShaderVariableAccessor> scfiShaderVariableAccessor;
+  friend class eiRenderBufferAccessor;
+  csRef<eiRenderBufferAccessor> scfiRenderBufferAccessor;
 
-  void PreGetShaderVariableValue (csShaderVariable* variable);
+  void PreGetBuffer (csRenderBufferHolder* holder, csRenderBufferName buffer);
 };
 
 /**

@@ -382,8 +382,8 @@ void csGLFontCache::FlushArrays ()
     envColor = -1;
     needStates = false;
   }
-  glTexCoordPointer(2, GL_FLOAT, sizeof (float) * 2, texcoords.GetArray ());
-  glVertexPointer(2, GL_FLOAT, sizeof (float) * 2, verts2d.GetArray ());
+  statecache->SetTexCoordPointer (2, GL_FLOAT, sizeof (float) * 2, texcoords.GetArray ());
+  statecache->SetVertexPointer (2, GL_FLOAT, sizeof (float) * 2, verts2d.GetArray ());
   for (size_t j = 0; j < jobCount; j++)
   {
     const TextJob& job = jobs[j];

@@ -6,59 +6,59 @@
 
   <variablemap variable="texture lod distance" destination="register 5"/>
 
-<program>
-<![CDATA[
-!!ARBvp1.0
-#---------------------------------------
-# Simple Vertex Lighting Program
-#---------------------------------------
-#Parameter definition
-PARAM mvp[4]		= { state.matrix.mvp };
-PARAM mvi[4]		= { state.matrix.modelview.inverse };
-PARAM eyePos    	= { 0.0, 0.0, 0.0, 1};
-PARAM lightPos  	= program.local[0];
-PARAM lightDiffuse 	= program.local[1];
-PARAM lightSpecular 	= program.local[2];
-PARAM lightAttenuation 	= program.local[3];
-PARAM loddist   	= program.local[5];
+  <program>
+  <![CDATA[
+    !!ARBvp1.0
+    #---------------------------------------
+    # Simple Vertex Lighting Program
+    #---------------------------------------
+    #Parameter definition
+    PARAM mvp[4]		= { state.matrix.mvp };
+    PARAM mvi[4]		= { state.matrix.modelview.inverse };
+    PARAM eyePos    	        = { 0.0, 0.0, 0.0, 1};
+    PARAM lightPos  	        = program.local[0];
+    PARAM lightDiffuse    	= program.local[1];
+    PARAM lightSpecular 	= program.local[2];
+    PARAM lightAttenuation 	= program.local[3];
+    PARAM loddist               = program.local[5];
 
-# Per vertex inputs
-ATTRIB iPos		= vertex.attrib[0];
-ATTRIB iCol0		= vertex.attrib[1];
-ATTRIB iNorm		= vertex.attrib[2];
-ATTRIB iTex0		= vertex.attrib[3];
-# Outputs
-OUTPUT oPos		= result.position;
-OUTPUT oSplat		= result.texcoord[0];
-OUTPUT oCol0		= result.color;
-# Temporaries
-TEMP objEye;
-TEMP lodblend;
+    # Per vertex inputs
+    ATTRIB iPos		        = vertex.position;
+    ATTRIB iCol0		= vertex.color;
+    ATTRIB iNorm		= vertex.normal;
+    ATTRIB iTex0		= vertex.texcoord;
+    # Outputs
+    OUTPUT oPos		        = result.position;
+    OUTPUT oSplat		= result.texcoord[0];
+    OUTPUT oCol0		= result.color;
+    # Temporaries
+    TEMP objEye;
+    TEMP lodblend;
 
-#Transform vertex to viewspace
-DP4 oPos.x, mvp[0], iPos;
-DP4 oPos.y, mvp[1], iPos;
-DP4 oPos.z, mvp[2], iPos;
-DP4 oPos.w, mvp[3], iPos;
+    #Transform vertex to viewspace
+    DP4 oPos.x, mvp[0], iPos;
+    DP4 oPos.y, mvp[1], iPos;
+    DP4 oPos.z, mvp[2], iPos;
+    DP4 oPos.w, mvp[3], iPos;
 
-MOV oSplat, iTex0;
+    MOV oSplat, iTex0;
 
-DP4 objEye.x, mvi[0], eyePos;
-DP4 objEye.y, mvi[1], eyePos;
-DP4 objEye.z, mvi[2], eyePos;
-DP4 objEye.w, mvi[3], eyePos;
-      
-ADD objEye, objEye, -iPos;
-DP3 objEye.w, objEye, objEye;
-RSQ objEye.w, objEye.w;
-MUL lodblend, objEye.w, loddist;
-RCP lodblend.x, lodblend.x;
-MIN lodblend.x, lodblend.x, eyePos.w;
+    DP4 objEye.x, mvi[0], eyePos;
+    DP4 objEye.y, mvi[1], eyePos;
+    DP4 objEye.z, mvi[2], eyePos;
+    DP4 objEye.w, mvi[3], eyePos;
+          
+    ADD objEye, objEye, -iPos;
+    DP3 objEye.w, objEye, objEye;
+    RSQ objEye.w, objEye.w;
+    MUL lodblend, objEye.w, loddist;
+    RCP lodblend.x, lodblend.x;
+    MIN lodblend.x, lodblend.x, eyePos.w;
 
-#Set color
-MUL oCol0, lightDiffuse, lodblend.x;
+    #Set color
+    MUL oCol0, lightDiffuse, lodblend.x;
 
-END
-]]>
-</program>
+    END
+  ]]>
+  </program>
 </arbvp>

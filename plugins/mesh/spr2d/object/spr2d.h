@@ -65,36 +65,35 @@ protected:
 
   uvAnimationControl* uvani;
 
-  class eiShaderVariableAccessor : public iShaderVariableAccessor
+  class eiRenderBufferAccessor : public iRenderBufferAccessor
   {
   private:
     csWeakRef<csSprite2DMeshObject> parent;
   public:
-    CS_LEAKGUARD_DECLARE (eiShaderVariableAccessor);
+    CS_LEAKGUARD_DECLARE (eiRenderBufferAccessor);
     SCF_DECLARE_IBASE;
 
-    eiShaderVariableAccessor (csSprite2DMeshObject* parent)
+    eiRenderBufferAccessor (csSprite2DMeshObject* parent)
     {
       SCF_CONSTRUCT_IBASE(0);
-      eiShaderVariableAccessor::parent = parent;
+      eiRenderBufferAccessor::parent = parent;
     }
-    virtual ~eiShaderVariableAccessor() 
+    virtual ~eiRenderBufferAccessor() 
     {
       SCF_DESTRUCT_IBASE();
     }
 
-    virtual void PreGetValue (csShaderVariable* variable)
+    void PreGetBuffer (csRenderBufferHolder* holder, csRenderBufferName buffer)
     {
-      if (parent) parent->PreGetShaderVariableValue (variable);
+      if (parent) parent->PreGetBuffer (holder, buffer);
     }
   };
-  friend class eiShaderVariableAccessor;
+  friend class eiRenderBufferAccessor;
 
-  void PreGetShaderVariableValue (csShaderVariable* variable);
+  void PreGetBuffer (csRenderBufferHolder* holder, csRenderBufferName buffer);
 
-  csRef<csShaderVariableContext> svcontext;
+  csRef<csRenderBufferHolder> bufferHolder;
   csRenderMeshHolderSingle rmHolder;
-  static csStringID vertex_name, texel_name, color_name, index_name;
   csRef<iRenderBuffer> vertex_buffer;
   bool vertices_dirty;
   csRef<iRenderBuffer> texel_buffer;

@@ -27,12 +27,11 @@
     <shadervar name="inscattering term" type="vector3">0.3, 0.3, 0.3</shadervar>
   </shadervars>
 
+
   <technique priority="200"> 
     <pass>
       <mixmode><srcalphaadd/></mixmode>
-      <buffer name="vertices" destination="attribute 0" />
-      <buffer name="normals" destination="attribute 1" />
-      <buffer name="texture coordinates" destination="attribute 2" />
+      <buffer source="normal" destination="normal" />
       <vp plugin="glarb" file="/shader/compressed_splatting_scattering.avp" />
       <texture destination="unit 0" name="standardtex normalization map" />
       <texture destination="unit 1" name="tex normal" />
@@ -70,11 +69,9 @@
     <pass>
       <mixmode><copy/></mixmode>
       <writemask r="false" g="false" b="false" a="true"/>
-      <buffer name="vertices" destination="attribute 0" />
-      <buffer name="normals" destination="attribute 2" />
-      <buffer name="texture coordinates" destination="attribute 3" />
-      <buffer name="tangents" destination="attribute 4" />
-      <buffer name="binormals" destination="attribute 5" />
+      <buffer source="normal" destination="normal" />
+      <buffer source="tangent" destination="texture coordinate 1" />
+      <buffer source="binormal" destination="texture coordinate 2" />
       <vp plugin="glarb" file="/shader/splatting_scattering_a.avp" />
       <texture destination="unit 0" name="standardtex normalization map" />
       <texture destination="unit 1" name="tex normal" />
@@ -94,8 +91,6 @@
     </pass>
     <pass>
       <mixmode><destalphaadd/></mixmode>
-      <buffer name="vertices" destination="attribute 0" />
-      <buffer name="texture coordinates" destination="attribute 2" />
       <vp plugin="glarb" file="/shader/splatting_scattering_b.avp" />
       <texture destination="unit 0" name="tex diffuse"/>
       <texture destination="unit 1" name="splat alpha map"/>

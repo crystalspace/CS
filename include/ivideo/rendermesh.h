@@ -1,20 +1,20 @@
 /*
-Copyright (C) 2002 by Marten Svanfeldt
-                      Anders Stenberg
+  Copyright (C) 2002 by Marten Svanfeldt
+                        Anders Stenberg
 
-This library is free software; you can redistribute it and/or
-modify it under the terms of the GNU Library General Public
-License as published by the Free Software Foundation; either
-version 2 of the License, or (at your option) any later version.
+  This library is free software; you can redistribute it and/or
+  modify it under the terms of the GNU Library General Public
+  License as published by the Free Software Foundation; either
+  version 2 of the License, or (at your option) any later version.
 
-This library is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-Library General Public License for more details.
+  This library is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+  Library General Public License for more details.
 
-You should have received a copy of the GNU Library General Public
-License along with this library; if not, write to the Free
-Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+  You should have received a copy of the GNU Library General Public
+  License along with this library; if not, write to the Free
+  Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
 #ifndef __CS_IVIDEO_RENDERMESH_H__
@@ -31,6 +31,7 @@ Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "csutil/strset.h"
 #include "csutil/ref.h"
 #include "ivideo/graph3d.h"
+#include "ivideo/rndbuf.h"
 #include "ivideo/shader/shader.h"
 #include "csgfx/shadervarcontext.h"
 
@@ -42,6 +43,8 @@ struct iTextureHandle;
 struct iMaterialWrapper;
 struct iMeshFactory;
 struct iPortalContainer;
+struct iRenderBuffer;
+
 
 /**
  * Mesh render mode information. Contains the Z, mix and alpha modes to use
@@ -88,7 +91,7 @@ struct csCoreRenderMesh
     clip_z_plane = 0;
     do_mirror = false;
     indexstart = indexend = 0;
-    
+    buffers = 0;
     db_mesh_name = "<unknown>";
   }
 
@@ -123,6 +126,9 @@ struct csCoreRenderMesh
 
   /// Mesh type
   csRenderMeshType meshtype;
+
+  /// Holder of default render buffers
+  csRef<csRenderBufferHolder> buffers;
 
   /// Start of the range of indices to use
   unsigned int indexstart;

@@ -186,6 +186,7 @@ void csGLShaderFVP::SetupState (const csRenderMesh *mesh,
   for (i=0; i<layers.Length (); i++)
   {
     statecache->SetActiveTU (i);
+    statecache->ActivateTU ();
     if (layers[i].texgen == TEXGEN_REFLECT_CUBE)
     {
       //setup for environmental cubemapping
@@ -433,6 +434,7 @@ void csGLShaderFVP::SetupState (const csRenderMesh *mesh,
   }
 
   statecache->SetActiveTU (0);
+  statecache->ActivateTU ();
 
   var = primcolVarRef;
   if (!var && primcolvar != csInvalidStringID &&
@@ -462,6 +464,7 @@ void csGLShaderFVP::ResetState ()
   for (i=0; i<layers.Length (); i++)
   {
     statecache->SetActiveTU (i);
+    statecache->ActivateTU ();
     if ((layers[i].texgen != TEXGEN_NONE) ||
       (layers[i].texMatrixOps.Length() > 0))
     {
@@ -474,6 +477,7 @@ void csGLShaderFVP::ResetState ()
     }
   }
   statecache->SetActiveTU (0);
+  statecache->ActivateTU ();
 }
 
 bool csGLShaderFVP::ParseTexMatrixOp (iDocumentNode* node, 

@@ -6,6 +6,10 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+8-Jan-2005
+	- Marten completly rewrote the way renderbuffers are sent from the
+	  mesh into renderer. Also changed the syntax of buffermappings a bit.
+	  All the shaders in CS is fixed to use this new way.
 7-Jan-2005
 	- Jorrit added missing SCF_VERSION for iSectorMeshCallback.
 	- Jorrit added a new iEngineSectorCallback system to the engine. This

@@ -29,18 +29,6 @@ class csSoftPolygonRenderer : public iPolygonRenderer,
   uint renderBufferNum;
   uint polysNum;
 
-  csRef<iRenderBuffer> vertex_buffer;
-  //csRef<iRenderBuffer> texel_buffer;
-  //csRef<iRenderBuffer> normal_buffer;
-  //csRef<iRenderBuffer> color_buffer;
-  //csRef<iRenderBuffer> index_buffer;
-
-  static csStringID vertex_name;
-  //static csStringID texel_name;
-  //static csStringID normal_name;
-  //static csStringID color_name;
-  static csStringID index_name;
-
   uint rbIndexStart, rbIndexEnd;
 
   void PrepareBuffers (uint& indexStart, uint& indexEnd);
@@ -74,5 +62,6 @@ public:
   virtual void SetStride(int stride) {}
   virtual int GetStride() const { return 0; }
   virtual void SetOffset(int offset) {}
+  virtual uint GetVersion () {return 0;}
 };
 

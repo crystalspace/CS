@@ -781,7 +781,7 @@ csRenderMesh** csHazeMeshObject::GetRenderMeshes (int &n, iRenderView* rview,
     rview->GetCurrentFrameNumber());
   if (rmCreated)
   {
-    rm->variablecontext.AttachNew (new csShaderVariableContext);
+    rm->buffers.AttachNew (new csRenderBufferHolder);
     rm->meshtype = CS_MESHTYPE_TRIANGLES;
     rm->material = material;
     rm->mixmode = MixMode;
@@ -802,12 +802,10 @@ csRenderMesh** csHazeMeshObject::GetRenderMeshes (int &n, iRenderView* rview,
   //rm->object2camera = tr_o2c;
 
   rm->indexend = GetTempIndices()->Length();
-  csShaderVariable* sv = rm->variablecontext->GetVariableAdd (vertex_name);
-  sv->SetValue (vertices.buffer);
-  sv = rm->variablecontext->GetVariableAdd (texel_name);
-  sv->SetValue (texels.buffer);
-  sv = rm->variablecontext->GetVariableAdd (index_name);
-  sv->SetValue (indices.buffer);
+
+  rm->buffers->SetRenderBuffer (CS_BUFFER_INDEX, indices.buffer);
+  rm->buffers->SetRenderBuffer (CS_BUFFER_POSITION, vertices.buffer);
+  rm->buffers->SetRenderBuffer (CS_BUFFER_TEXCOORD0, texels.buffer);
 
   delete[] layer_poly;
   delete[] layer_pts;

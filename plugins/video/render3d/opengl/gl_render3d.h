@@ -237,6 +237,7 @@ private:
   csRef<iRenderBuffer> scrapTexcoords;
   csRef<iRenderBuffer> scrapColors;
   csShaderVariableContext scrapContext;
+  csRef<csRenderBufferHolder> scrapBufferHolder;
 
   ////////////////////////////////////////////////////////////////////
   //                         Private helpers
@@ -281,10 +282,10 @@ private:
 
   csZBufMode GetZModePass2 (csZBufMode mode);
 
-  iRenderBuffer* vertattrib[16]; // @@@ Hardcoded max number of attributes
+/*  iRenderBuffer* vertattrib[16]; // @@@ Hardcoded max number of attributes
   bool vertattribenabled[16]; // @@@ Hardcoded max number of attributes
   bool vertattribenabled100[16]; // @@@ Hardcoded max number of attributes (for conventional)
-  //iTextureHandle* texunit[16]; // @@@ Hardcoded max number of units
+ */ //iTextureHandle* texunit[16]; // @@@ Hardcoded max number of units
   bool texunitenabled[16]; // @@@ Hardcoded max number of units
   GLuint texunittarget[16]; // @@@ Hardcoded max number of units
 
@@ -341,10 +342,11 @@ public:
     csRenderBufferType type, int count, csRef<iRenderBuffer>* buffers);
 
   /// Activate a vertex buffer
-  bool ActivateBuffer (csVertexAttrib attrib, iRenderBuffer* buffer);
-  void DeactivateBuffer (csVertexAttrib attrib);
-  virtual void SetBufferState (csVertexAttrib* attribs,
-  	iRenderBuffer** buffers, int count);
+  bool ActivateBuffers (csRenderBufferHolder* holder, 
+    csRenderBufferName mapping[CS_VATTRIB_SPECIFIC_LAST+1]);
+  bool ActivateBuffers (csVertexAttrib *attribs,
+    iRenderBuffer **buffers, unsigned int count);
+  void DeactivateBuffers (csVertexAttrib *attribs, unsigned int count);
 
   /// Activate a texture
   bool ActivateTexture (iTextureHandle *txthandle, int unit = 0);

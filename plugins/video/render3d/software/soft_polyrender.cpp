@@ -29,12 +29,6 @@ SCF_IMPLEMENT_IBASE(csSoftPolygonRenderer)
   SCF_IMPLEMENTS_INTERFACE(iPolygonRenderer)
 SCF_IMPLEMENT_IBASE_END
 
-csStringID csSoftPolygonRenderer::vertex_name   = csInvalidStringID;
-//csStringID csSoftPolygonRenderer::texel_name    = csInvalidStringID;
-//csStringID csSoftPolygonRenderer::normal_name   = csInvalidStringID;
-//csStringID csSoftPolygonRenderer::color_name    = csInvalidStringID;
-csStringID csSoftPolygonRenderer::index_name    = csInvalidStringID;
-
 csSoftPolygonRenderer::csSoftPolygonRenderer (
   csSoftwareGraphics3DCommon* parent)
 {
@@ -51,49 +45,12 @@ csSoftPolygonRenderer::~csSoftPolygonRenderer ()
 
 void csSoftPolygonRenderer::PrepareBuffers (uint& indexStart, uint& indexEnd)
 {
-  if ((vertex_name  == csInvalidStringID) ||
-    /*
-    (texel_name     == csInvalidStringID) ||
-    (normal_name    == csInvalidStringID) ||
-    (color_name     == csInvalidStringID) ||
-    */
-    (index_name     == csInvalidStringID))
-  {
-    iStringSet* strings = parent->GetStrings ();
-
-    vertex_name   = strings->Request ("vertices");
-    /*
-    texel_name    = strings->Request ("texture coordinates");
-    normal_name   = strings->Request ("normals");
-    color_name    = strings->Request ("colors");
-    */
-    index_name    = strings->Request ("indices");
-  }
 }
 
 void csSoftPolygonRenderer::PrepareRenderMesh (csRenderMesh& mesh)
 {
-  PrepareBuffers (mesh.indexstart, mesh.indexend);
-
-  csShaderVariable* sv;
-  sv = mesh.variablecontext->GetVariableAdd (index_name);
-  sv->SetValue (this /*index_buffer*/);
-  sv = mesh.variablecontext->GetVariableAdd (vertex_name);
-  sv->SetValue (vertex_buffer);
-  /*
-  sv = mesh.variablecontext->GetVariableAdd (texel_name);
-  sv->SetValue (texel_buffer);
-  sv = mesh.variablecontext->GetVariableAdd (normal_name);
-  sv->SetValue (normal_buffer);
-  sv = mesh.variablecontext->GetVariableAdd (binormal_name);
-  sv->SetValue (binormal_buffer);
-  sv = mesh.variablecontext->GetVariableAdd (tangent_name);
-  sv->SetValue (tangent_buffer);
-  sv = mesh.variablecontext->GetVariableAdd (lmcoords_name);
-  sv->SetValue (lmcoords_buffer);
-  sv = mesh.variablecontext->GetVariableAdd (color_name);
-  sv->SetValue (color_buffer);
-  */
+  if (!mesh.buffers) mesh.buffers.AttachNew (new csRenderBufferHolder);
+  mesh.buffers->SetRenderBuffer (CS_BUFFER_INDEX, this);
 }
 
 void csSoftPolygonRenderer::Clear ()

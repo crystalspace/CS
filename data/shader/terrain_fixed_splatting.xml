@@ -9,10 +9,7 @@
     <pass>
       <mixmode><add /></mixmode>
       <alphamode><smooth /></alphamode>
-      <buffer name="vertices" destination="position" />
-      <buffer name="texture coordinates" destination="texture coordinate 0" />
-      <buffer name="texture coordinates" destination="texture coordinate 1" />
-      <buffer name="colors" destination="primary color" />
+      <buffer source="texture coordinate 0" destination="texture coordinate 1" />
       <vp plugin="glfixed">
 	<fixedvp>
 	  <texmatrix destination="unit 0">

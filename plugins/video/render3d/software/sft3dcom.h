@@ -1,6 +1,7 @@
 /*
     Copyright (C) 1998-2000 by Jorrit Tyberghein
     Copyright (C) 2003 by Anders Stenberg
+              (C) 2005 by Marten Svanfeldt
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -827,19 +828,48 @@ public:
     if (!CS_VATTRIB_IS_SPECIFIC(attrib)) return;
     activebuffers[attrib - CS_VATTRIB_SPECIFIC_FIRST] = 0;
   }
-
-  virtual void SetBufferState (csVertexAttrib* attribs, iRenderBuffer** buffers,
-      int count)
+  
+  virtual bool ActivateBuffers (csRenderBufferHolder* holder, 
+    csRenderBufferName mapping[CS_VATTRIB_SPECIFIC_LAST+1])
   {
-    int i;
+    if (!holder) return false;
+
+    iRenderBuffer* buffer = 0;
+    unsigned int i = 0;
+    for (i = 0; i < 16; i++)
+    {
+      buffer = holder->GetRenderBuffer (mapping[i]);
+      activebuffers[i] = buffer;
+    }
+    return true;
+  }
+
+
+  virtual bool ActivateBuffers (csVertexAttrib *attribs,
+    iRenderBuffer **buffers, unsigned int count)
+  {
+    unsigned int i;
     for (i = 0 ; i < count ; i++)
     {
       csVertexAttrib attrib = attribs[i];
       iRenderBuffer* buf = buffers[i];
       if (buf)
         ActivateBuffer (attrib, buf);
-      else
-        DeactivateBuffer (attrib);
+    }
+    return true;
+  }
+
+  /**
+  * Deactivate all given buffers.
+  * If attribs is 0, all buffers are deactivated;
+  */
+  virtual void DeactivateBuffers (csVertexAttrib *attribs, unsigned int count)
+  {
+    unsigned int i;
+    for (i = 0 ; i < count ; i++)
+    {
+      csVertexAttrib attrib = attribs[i];
+      DeactivateBuffer (attrib);
     }
   }
 

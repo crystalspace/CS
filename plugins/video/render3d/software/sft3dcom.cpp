@@ -4316,6 +4316,9 @@ static bool DoPolyPerspective (csVector3* verts, int num_verts,
 void csSoftwareGraphics3DCommon::DrawSimpleMesh (const csSimpleRenderMesh &mesh,
 						 uint flags)
 {
+  csRef<csRenderBufferHolder> scrapBufferHolder;
+  scrapBufferHolder.AttachNew (new csRenderBufferHolder);
+
   if (scrapIndicesSize < mesh.indexCount)
   {
     scrapIndices = CreateIndexRenderBuffer (mesh.indexCount * sizeof (uint),
@@ -4344,6 +4347,7 @@ void csSoftwareGraphics3DCommon::DrawSimpleMesh (const csSimpleRenderMesh &mesh,
     scrapIndices->CopyToBuffer (mesh.indices, 
       mesh.indexCount * sizeof (uint));
     sv->SetValue (scrapIndices);
+    scrapBufferHolder->SetRenderBuffer (CS_BUFFER_INDEX, scrapIndices);
   }
   else
   {
@@ -4355,6 +4359,7 @@ void csSoftwareGraphics3DCommon::DrawSimpleMesh (const csSimpleRenderMesh &mesh,
     scrapVertices->CopyToBuffer (mesh.vertices, 
       mesh.vertexCount * sizeof (csVector3));
     ActivateBuffer (CS_VATTRIB_POSITION, scrapVertices);
+    scrapBufferHolder->SetRenderBuffer (CS_BUFFER_POSITION, scrapVertices);
   }
   else
   {
@@ -4366,6 +4371,7 @@ void csSoftwareGraphics3DCommon::DrawSimpleMesh (const csSimpleRenderMesh &mesh,
     scrapTexcoords->CopyToBuffer (mesh.texcoords, 
       mesh.vertexCount * sizeof (csVector2));
     ActivateBuffer (CS_VATTRIB_TEXCOORD, scrapTexcoords);
+    scrapBufferHolder->SetRenderBuffer (CS_BUFFER_TEXCOORD0, scrapTexcoords);
   }
   else
   {
@@ -4376,6 +4382,7 @@ void csSoftwareGraphics3DCommon::DrawSimpleMesh (const csSimpleRenderMesh &mesh,
   {
     scrapColors->CopyToBuffer (mesh.colors, 
       mesh.vertexCount * sizeof (csVector4));
+    scrapBufferHolder->SetRenderBuffer (CS_BUFFER_COLOR, scrapColors);
     ActivateBuffer (CS_VATTRIB_COLOR, scrapColors);
   }
   else
@@ -4399,6 +4406,7 @@ void csSoftwareGraphics3DCommon::DrawSimpleMesh (const csSimpleRenderMesh &mesh,
   rmesh.indexstart = 0;
   rmesh.indexend = mesh.indexCount;
   rmesh.variablecontext = &scrapContext;
+  rmesh.buffers = scrapBufferHolder;
 
   if (flags & csSimpleMeshScreenspace)
   {
@@ -4462,12 +4470,17 @@ void csSoftwareGraphics3DCommon::DrawPolysMesh (const csCoreRenderMesh* mesh,
   csSoftPolygonRenderer* polyRender = (csSoftPolygonRenderer*)source;
   */
 
+  iRenderBuffer* indexbuf = (mesh->buffers ? mesh->buffers->GetRenderBuffer(CS_BUFFER_INDEX) : 0);
   size_t i;
-  CS_ASSERT (string_indices<(csStringID)stacks.Length ()
-      && stacks[string_indices].Length () > 0);
-  csShaderVariable* indexBufSV = stacks[string_indices].Top ();
-  iRenderBuffer* indexbuf = 0;
-  indexBufSV->GetValue (indexbuf);
+  
+  if (!indexbuf)
+  {  
+    CS_ASSERT (string_indices<(csStringID)stacks.Length ()
+        && stacks[string_indices].Length () > 0);
+    csShaderVariable* indexBufSV = stacks[string_indices].Top ();
+    
+    indexBufSV->GetValue (indexbuf);
+  }
   CS_ASSERT(indexbuf);
   
   csSoftPolygonRenderer* polyRender = (csSoftPolygonRenderer*)indexbuf;
@@ -4684,11 +4697,15 @@ void csSoftwareGraphics3DCommon::DrawMesh (const csCoreRenderMesh* mesh,
     color_verts = Get_color_verts ();
   }
 
-  CS_ASSERT (string_indices<(csStringID)stacks.Length ()
-      && stacks[string_indices].Length () > 0);
-  csShaderVariable* indexBufSV = stacks[string_indices].Top ();
-  iRenderBuffer* indexbuf = 0;
-  indexBufSV->GetValue (indexbuf);
+  iRenderBuffer* indexbuf = (mesh->buffers ? mesh->buffers->GetRenderBuffer(CS_BUFFER_INDEX) : 0);
+
+  if (!indexbuf)
+  {
+    CS_ASSERT (string_indices<(csStringID)stacks.Length ()
+        && stacks[string_indices].Length () > 0);
+    csShaderVariable* indexBufSV = stacks[string_indices].Top ();
+    indexBufSV->GetValue (indexbuf);
+  }
   CS_ASSERT(indexbuf);
 
   uint32 *indices = (uint32*)indexbuf->Lock (CS_BUF_LOCK_NORMAL);

@@ -61,14 +61,9 @@ SCF_IMPLEMENT_EMBEDDED_IBASE (csSprite2DMeshObject::Particle)
   SCF_IMPLEMENTS_INTERFACE (iParticle)
 SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
-SCF_IMPLEMENT_IBASE (csSprite2DMeshObject::eiShaderVariableAccessor)
-  SCF_IMPLEMENTS_INTERFACE (iShaderVariableAccessor)
+SCF_IMPLEMENT_IBASE (csSprite2DMeshObject::eiRenderBufferAccessor)
+  SCF_IMPLEMENTS_INTERFACE (iRenderBufferAccessor)
 SCF_IMPLEMENT_IBASE_END
-
-csStringID csSprite2DMeshObject::vertex_name = csInvalidStringID;
-csStringID csSprite2DMeshObject::texel_name = csInvalidStringID;
-csStringID csSprite2DMeshObject::color_name = csInvalidStringID;
-csStringID csSprite2DMeshObject::index_name = csInvalidStringID;
 
 csSprite2DMeshObject::csSprite2DMeshObject (csSprite2DMeshObjectFactory* factory)
 {
@@ -129,32 +124,8 @@ void csSprite2DMeshObject::SetupObject ()
     float max_dist = csQsqrt (max_sq_dist);
     radius.Set (max_dist, max_dist, max_dist);
 
-    if ((vertex_name == csInvalidStringID) ||
-      (color_name == csInvalidStringID) ||
-      (texel_name == csInvalidStringID) ||
-      (index_name  == csInvalidStringID))
-    {
-      csRef<iStringSet> strings = 
-	CS_QUERY_REGISTRY_TAG_INTERFACE (factory->object_reg,
-	"crystalspace.shared.stringset", iStringSet);
-      vertex_name = strings->Request ("vertices");
-      texel_name = strings->Request ("texture coordinates");
-      color_name = strings->Request ("colors");
-      index_name = strings->Request ("indices");
-    }
-    
-    svcontext.AttachNew (new csShaderVariableContext ());
-    csRef<iShaderVariableAccessor> accessor;
-    accessor.AttachNew (new eiShaderVariableAccessor (this));
-    csShaderVariable* sv;
-    sv = svcontext->GetVariableAdd (index_name);
-    sv->SetAccessor (accessor);
-    sv = svcontext->GetVariableAdd (vertex_name);
-    sv->SetAccessor (accessor);
-    sv = svcontext->GetVariableAdd (texel_name);
-    sv->SetAccessor (accessor);
-    sv = svcontext->GetVariableAdd (color_name);
-    sv->SetAccessor (accessor);
+    bufferHolder.AttachNew (new csRenderBufferHolder);
+    bufferHolder->SetAccessor (new eiRenderBufferAccessor (this), CS_BUFFER_ALL_MASK);
   }
 }
 
@@ -254,7 +225,7 @@ csRenderMesh** csSprite2DMeshObject::GetRenderMeshes (int &n,
   {
     rm->meshtype = CS_MESHTYPE_TRIANGLEFAN;
     rm->material = material;
-    rm->variablecontext = svcontext;
+    rm->buffers = bufferHolder;
     rm->geometryInstance = this;
   }
   
@@ -276,10 +247,11 @@ csRenderMesh** csSprite2DMeshObject::GetRenderMeshes (int &n,
   return &rm; 
 }
 
-void csSprite2DMeshObject::PreGetShaderVariableValue (csShaderVariable* variable)
+void csSprite2DMeshObject::PreGetBuffer (csRenderBufferHolder* holder, csRenderBufferName buffer)
 {
-  const csStringID name = variable->GetName ();
-  if (name == index_name)
+  if (!holder) return;
+
+  if (buffer == CS_BUFFER_INDEX)
   {
     size_t indexSize = sizeof (uint) * vertices.Length();
     if (!index_buffer.IsValid() || 
@@ -288,7 +260,8 @@ void csSprite2DMeshObject::PreGetShaderVariableValue (csShaderVariable* variable
       index_buffer.AttachNew (factory->g3d->CreateIndexRenderBuffer (
 	indexSize, CS_BUF_DYNAMIC, 
 	CS_BUFCOMP_UNSIGNED_INT, 0, vertices.Length() - 1));
-      variable->SetValue (index_buffer);
+      
+      holder->SetRenderBuffer (CS_BUFFER_INDEX, index_buffer);
 
       csRenderBufferLock<uint> indexLock (index_buffer);
       uint* ptr = indexLock;
@@ -300,7 +273,7 @@ void csSprite2DMeshObject::PreGetShaderVariableValue (csShaderVariable* variable
       indicesSize = indexSize;
     }
   }
-  else if (name == texel_name)
+  else if (buffer == CS_BUFFER_TEXCOORD0)
   {
     if (texels_dirty)
     {
@@ -317,7 +290,7 @@ void csSprite2DMeshObject::PreGetShaderVariableValue (csShaderVariable* variable
       {
 	texel_buffer.AttachNew (factory->g3d->CreateRenderBuffer (
 	  texelSize, CS_BUF_STATIC, CS_BUFCOMP_FLOAT, 2));
-	variable->SetValue (texel_buffer);
+	holder->SetRenderBuffer (CS_BUFFER_TEXCOORD0, texel_buffer);
       }
 
       csRenderBufferLock<csVector2> texelLock (texel_buffer);
@@ -339,7 +312,7 @@ void csSprite2DMeshObject::PreGetShaderVariableValue (csShaderVariable* variable
       texels_dirty = false;
     }
   }
-  else if (name == color_name)
+  else if (buffer == CS_BUFFER_COLOR)
   {
     if (colors_dirty)
     {
@@ -350,7 +323,7 @@ void csSprite2DMeshObject::PreGetShaderVariableValue (csShaderVariable* variable
 	color_buffer.AttachNew (factory->g3d->CreateRenderBuffer (
 	  color_size, CS_BUF_STATIC, 
 	  CS_BUFCOMP_FLOAT, 3));
-	variable->SetValue (color_buffer);
+	holder->SetRenderBuffer (CS_BUFFER_COLOR, color_buffer);
       }
 
       csRenderBufferLock<csColor> colorLock (color_buffer);
@@ -362,7 +335,7 @@ void csSprite2DMeshObject::PreGetShaderVariableValue (csShaderVariable* variable
       colors_dirty = false;
     }
   }
-  else if (name == vertex_name)
+  else if (buffer == CS_BUFFER_POSITION)
   {
     if (vertices_dirty)
     {
@@ -373,7 +346,7 @@ void csSprite2DMeshObject::PreGetShaderVariableValue (csShaderVariable* variable
 	vertex_buffer.AttachNew (factory->g3d->CreateRenderBuffer (
 	  vertices_size, CS_BUF_STATIC, 
 	  CS_BUFCOMP_FLOAT, 3));
-	variable->SetValue (vertex_buffer);
+	holder->SetRenderBuffer (CS_BUFFER_POSITION, vertex_buffer);
       }
 
       csRenderBufferLock<csVector3> vertexLock (vertex_buffer);

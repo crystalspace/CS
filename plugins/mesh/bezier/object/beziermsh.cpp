@@ -877,7 +877,7 @@ csRenderMesh** csBezierMesh::GetRenderMeshes (int &n, iRenderView* rview,
     if (rm == 0)
     {
       rm = meshes[i] = new csRenderMesh;
-      rm->variablecontext.AttachNew (new csShaderVariableContext);
+      rm->buffers.AttachNew (new csRenderBufferHolder);
     }
     rm->object2camera = obj_cam;
     rm->camera_origin = camera_origin;
@@ -912,7 +912,8 @@ csRenderMesh** csBezierMesh::GetRenderMeshes (int &n, iRenderView* rview,
     bool gouraud = !!c->LightMap;
     rm->mixmode = CS_FX_COPY | (gouraud ? 0 : CS_FX_FLAT);
 
-    iShaderVariableContext* svcontext = rm->variablecontext;
+    
+    csRenderBufferHolder* holder = rm->buffers;
     /* @@@ TODO: use an SV accessor for geometry delivery */
     bool bufferCreated;
     {
@@ -927,8 +928,7 @@ csRenderMesh** csBezierMesh::GetRenderMeshes (int &n, iRenderView* rview,
       vertices.buffer->CopyToBuffer (tess->GetVertices(),
 	tess->GetVertexCount () * 3 * sizeof (float));
 
-      csShaderVariable* sv = svcontext->GetVariableAdd (vertex_name);
-      sv->SetValue (vertices.buffer);
+      holder->SetRenderBuffer (CS_BUFFER_POSITION, vertices.buffer);
     }
 
     {
@@ -943,8 +943,7 @@ csRenderMesh** csBezierMesh::GetRenderMeshes (int &n, iRenderView* rview,
       colors.buffer->CopyToBuffer (tess->GetColors(),
 	tess->GetVertexCount () * 3 * sizeof (float));
 
-      csShaderVariable* sv = svcontext->GetVariableAdd (color_name);
-      sv->SetValue (colors.buffer);
+      holder->SetRenderBuffer (CS_BUFFER_COLOR, colors.buffer);
     }
 
     {
@@ -959,8 +958,7 @@ csRenderMesh** csBezierMesh::GetRenderMeshes (int &n, iRenderView* rview,
       texcoords.buffer->CopyToBuffer (tess->GetTxtCoords(),
 	tess->GetVertexCount () * 2 * sizeof (float));
 
-      csShaderVariable* sv = svcontext->GetVariableAdd (texel_name);
-      sv->SetValue (texcoords.buffer);
+      holder->SetRenderBuffer (CS_BUFFER_TEXCOORD0, texcoords.buffer);
     }
 
     {
@@ -975,8 +973,7 @@ csRenderMesh** csBezierMesh::GetRenderMeshes (int &n, iRenderView* rview,
       indices.buffer->CopyToBuffer (tess->GetTriangles(),
 	tess->GetTriangleCount () * 3 * sizeof (uint));
 
-      csShaderVariable* sv = svcontext->GetVariableAdd (index_name);
-      sv->SetValue (indices.buffer);
+      holder->SetRenderBuffer (CS_BUFFER_INDEX, indices.buffer);
     }
 
     rm->indexstart = 0;

@@ -9,9 +9,6 @@
     <tag>terrain_splatting</tag>
     <pass>
       <mixmode><copy /></mixmode>
-      <buffer name="vertices" destination="position" />
-      <buffer name="texture coordinates" destination="texture coordinate" />
-      <buffer name="colors" destination="primary color" />
       <vp plugin="glfixed">
 	<fixedvp>
 	  <constantcolor layer="0" type="vector4">0,0,0,1</constantcolor>
@@ -41,9 +38,6 @@
     <tag>terrain_splatting</tag>
     <pass>
       <mixmode><copy /></mixmode>
-      <buffer name="vertices" destination="position" />
-      <buffer name="texture coordinates" destination="texture coordinate" />
-      <buffer name="colors" destination="primary color" />
       <vp plugin="glarb">
 	<!--
 	  Certain HW does not like the "inverted fog" trick above and does
@@ -121,9 +115,6 @@
   <technique priority="200">
     <pass>
       <mixmode><copy /></mixmode>
-      <buffer name="vertices" destination="position" />
-      <buffer name="texture coordinates" destination="texture coordinate" />
-      <buffer name="colors" destination="primary color" />
       <vp plugin="glfixed">
 	<fixedvp>
 	  <constantcolor layer="0" type="vector4">0,0,0,1</constantcolor>

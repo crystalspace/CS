@@ -61,16 +61,13 @@ public:
 
   csRef<iRenderBuffer> mesh_vertices;
   csVector3 *vertex_data;
-  csRef<iRenderBuffer> mesh_morphvertices;
-  csVector3 *morphvertex_data;
   csRef<iRenderBuffer> mesh_normals;
   csVector3 *normal_data;
-  csRef<iRenderBuffer> mesh_morphnormals;
-  csVector3 *morphnormal_data;
   csRef<iRenderBuffer> mesh_texcoords;
   csVector2 *texcoord_data;
   csRef<iRenderBuffer> mesh_colors;
   csColor *color_data;
+  csRef<csRenderBufferHolder> bufferHolder;
 
   csArray<csRenderMesh> meshes;
   csRef<iMaterialWrapper> material;
@@ -97,8 +94,6 @@ public:
   csRef<csTerrBlock> children[4];
   csTerrBlock* neighbours[4];
   int child;
-
-  csRef<csShaderVariableContext> svcontext;
 
   static int tris;
 
@@ -295,10 +290,7 @@ private:
   // Use for clipping during rendering.
   csPlane3 planes[10];
 
-  csStringID vertices_name, morphvertices_name,
-    normals_name, morphnormals_name,
-    texcoords_name, indices_name,
-    morphval_name, colors_name;
+  csStringID vertices_name, normals_name, texcoords_name, colors_name;
 
   bool initialized;
 

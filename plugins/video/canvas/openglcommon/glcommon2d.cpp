@@ -185,6 +185,7 @@ bool csGraphics2DGLCommon::Open ()
     for (GLint u = texUnits - 1; u >= 0; u--)
     {
       statecache->SetActiveTU (u);
+      statecache->ActivateTU ();
       glTexEnvi (GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_COMBINE_ARB);
     }
   }

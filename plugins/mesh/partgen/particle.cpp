@@ -70,12 +70,6 @@ csNewParticleSystem::csNewParticleSystem (
 
   vertices = 0;
 
-  svcontext.AttachNew (new csShaderVariableContext);
-  /*mesh.variablecontext.AttachNew (new csShaderVariableContext);
-  mesh.object2camera = csReversibleTransform ();
-  mesh.meshtype = CS_MESHTYPE_TRIANGLES;
-  meshPtr = &mesh;*/
-
   texels = 0;
   triangles = 0;
   colors = 0;
@@ -212,17 +206,6 @@ void csNewParticleSystem::SetupObject ()
       *c++ = Color;
     }
 
-    csStringID vertex_name, texel_name, normal_name, color_name, index_name;
-    csMeshFactory* mf = (csMeshFactory*)Factory;
-    iObjectRegistry* object_reg = mf->GetObjectRegistry ();
-    csRef<iStringSet> strings = CS_QUERY_REGISTRY_TAG_INTERFACE (object_reg, 
-	"crystalspace.shared.stringset", iStringSet);
-    vertex_name = strings->Request ("vertices");
-    texel_name = strings->Request ("texture coordinates");
-    normal_name = strings->Request ("normals");
-    color_name = strings->Request ("colors");
-    index_name = strings->Request ("indices");
-
     delete[] vertices;
     VertexCount = ParticleCount * 4;
     TriangleCount = ParticleCount * 2;
@@ -239,15 +222,12 @@ void csNewParticleSystem::SetupObject ()
     index_buffer = g3d->CreateIndexRenderBuffer (
         sizeof (unsigned int)*TriangleCount*3, CS_BUF_DYNAMIC,
         CS_BUFCOMP_UNSIGNED_INT, 0, VertexCount - 1);
-    csShaderVariable *sv;
-    sv = svcontext->GetVariableAdd (vertex_name);
-    sv->SetValue (vertex_buffer);
-    sv = svcontext->GetVariableAdd (texel_name);
-    sv->SetValue (texel_buffer);
-    sv = svcontext->GetVariableAdd (color_name);
-    sv->SetValue (color_buffer);
-    sv = svcontext->GetVariableAdd (index_name);
-    sv->SetValue (index_buffer);
+
+    bufferHolder.AttachNew (new csRenderBufferHolder);
+    bufferHolder->SetRenderBuffer (CS_BUFFER_INDEX, index_buffer);
+    bufferHolder->SetRenderBuffer (CS_BUFFER_POSITION, vertex_buffer);
+    bufferHolder->SetRenderBuffer (CS_BUFFER_TEXCOORD0, texel_buffer);
+    bufferHolder->SetRenderBuffer (CS_BUFFER_COLOR, color_buffer);
   }
 }
 
@@ -393,7 +373,7 @@ csRenderMesh **csNewParticleSystem::GetRenderMeshes (int &num,
 
   if (meshCreated)
   {
-    rm->variablecontext = svcontext;
+    rm->buffers = bufferHolder;
   }
 
   // Prepare for rendering.

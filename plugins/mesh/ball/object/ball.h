@@ -95,9 +95,8 @@ private:
   bool ball_normals_dirty_flag;
   bool ball_colors_dirty_flag;
   bool ball_triangle_dirty_flag;
-  csRef<csShaderVariableContext> svcontext;
-  csStringID vertex_name, texel_name, normal_name, color_name, index_name;
-
+  csRef<csRenderBufferHolder> bufferHolder;
+  
   /**
    * Camera space bounding box is cached here.
    * GetCameraBoundingBox() will check the current camera number from the
@@ -235,8 +234,7 @@ public:
     return (csTriangle*)ball_indices;
   }
 
-  iRenderBuffer *GetRenderBuffer (csStringID name);
-  void UpdateBufferSV();
+  void UpdateBuffers();
 
 
   //----------------------- iMeshObject implementation ------------------------

@@ -293,15 +293,15 @@ SCF_IMPLEMENT_EMBEDDED_IBASE (csFoliageMeshObject::FoliageMeshState)
   SCF_IMPLEMENTS_INTERFACE (iFoliageMeshState)
 SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
-SCF_IMPLEMENT_IBASE (csFoliageMeshObject::ShaderVariableAccessor)
-  SCF_IMPLEMENTS_INTERFACE (iShaderVariableAccessor)
+SCF_IMPLEMENT_IBASE (csFoliageMeshObject::RenderBufferAccessor)
+  SCF_IMPLEMENTS_INTERFACE (iRenderBufferAccessor)
 SCF_IMPLEMENT_IBASE_END
 
 csFoliageMeshObject::csFoliageMeshObject (csFoliageMeshObjectFactory* factory)
 {
   SCF_CONSTRUCT_IBASE (0);
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiFoliageMeshState);
-  scfiShaderVariableAccessor = new ShaderVariableAccessor (this);
+  scfiRenderBufferAccessor = new RenderBufferAccessor (this);
 
   csFoliageMeshObject::factory = factory;
   logparent = 0;
@@ -324,7 +324,7 @@ csFoliageMeshObject::csFoliageMeshObject (csFoliageMeshObjectFactory* factory)
 
 csFoliageMeshObject::~csFoliageMeshObject ()
 {
-  scfiShaderVariableAccessor->DecRef ();
+  scfiRenderBufferAccessor->DecRef ();
   SCF_DESTRUCT_EMBEDDED_IBASE (scfiFoliageMeshState);
   SCF_DESTRUCT_IBASE ();
 }
@@ -335,11 +335,10 @@ bool csFoliageMeshObject::SetMaterialWrapper (iMaterialWrapper* mat)
   return true;
 }
 
-void csFoliageMeshObject::SetupShaderVariableContext ()
+void csFoliageMeshObject::SetupBufferHolder ()
 {
-  if (svcontext == 0)
-    svcontext.AttachNew (new csShaderVariableContext ());
-  csShaderVariable* sv;
+  if (bufferHolder == 0)
+    bufferHolder.AttachNew (new csRenderBufferHolder);
 
   // Make sure the factory is ok and his its buffers.
   factory->SetupFactory ();
@@ -356,26 +355,19 @@ void csFoliageMeshObject::SetupShaderVariableContext ()
   // the creation of potentially unneeded buffers there.
 
   // Indices are fetched directly from the factory.
-  sv = svcontext->GetVariableAdd (csFoliageMeshObjectFactory::index_name);
-  sv->SetValue (factory->index_buffer);
+  bufferHolder->SetRenderBuffer (CS_BUFFER_INDEX, factory->index_buffer);
 
   // Vertices are fetched from the factory.
-  sv = svcontext->GetVariableAdd (csFoliageMeshObjectFactory::vertex_name);
-  sv->SetValue (factory->vertex_buffer);
+  bufferHolder->SetRenderBuffer (CS_BUFFER_POSITION, factory->vertex_buffer);
 
   // Texels are fetched from the factory.
-  sv = svcontext->GetVariableAdd (csFoliageMeshObjectFactory::texel_name);
-  sv->SetValue (factory->texel_buffer);
+  bufferHolder->SetRenderBuffer (CS_BUFFER_TEXCOORD0, factory->texel_buffer);
 
   // Normals are fetched from the factory but we use an accessor
   // for those because they are not always needed.
-  sv = svcontext->GetVariableAdd (csFoliageMeshObjectFactory::normal_name);
-  sv->SetAccessor (factory->scfiShaderVariableAccessor);
-
   // Colors are fetched from the object because we need to add the mesh
   // base color to the static colors in the factory.
-  sv = svcontext->GetVariableAdd (csFoliageMeshObjectFactory::color_name);
-  sv->SetAccessor (scfiShaderVariableAccessor);
+  bufferHolder->SetAccessor (scfiRenderBufferAccessor, CS_BUFFER_NORMAL_MASK | CS_BUFFER_COLOR_MASK);
 }
   
 void csFoliageMeshObject::SetupObject ()
@@ -383,7 +375,7 @@ void csFoliageMeshObject::SetupObject ()
   if (!initialized)
   {
     initialized = true;
-    SetupShaderVariableContext ();
+    SetupBufferHolder ();
   }
 }
 
@@ -451,7 +443,7 @@ csRenderMesh** csFoliageMeshObject::GetRenderMeshes (
   meshPtr->camera_origin = camera_origin;
   meshPtr->camera_transform = &camera->GetTransform();
   if (rmCreated)
-    meshPtr->variablecontext = svcontext;
+    meshPtr->buffers = bufferHolder;
   meshPtr->geometryInstance = (void*)factory;
  
   n = 1;
@@ -525,20 +517,20 @@ iObjectModel* csFoliageMeshObject::GetObjectModel ()
   return factory->GetObjectModel ();
 }
 
-void csFoliageMeshObject::PreGetShaderVariableValue (csShaderVariable* var)
+void csFoliageMeshObject::PreGetBuffer (csRenderBufferHolder *holder, csRenderBufferName buffer)
 {
-  if (var->Name == csFoliageMeshObjectFactory::color_name)
+  if (buffer == CS_BUFFER_COLOR)
   {
     if (mesh_colors_dirty_flag)
     {
       if (!color_buffer)
       {
         // Here we create a render buffer that copies the data
-	// since we don't keep a local copy of the color buffer here.
-	// (final 'true' parameter).
+        // since we don't keep a local copy of the color buffer here.
+        // (final 'true' parameter).
         color_buffer = g3d->CreateRenderBuffer (
-              sizeof (csColor) * PROTO_VERTS, CS_BUF_STATIC,
-              CS_BUFCOMP_FLOAT, 3, true);
+          sizeof (csColor) * PROTO_VERTS, CS_BUF_STATIC,
+          CS_BUFCOMP_FLOAT, 3, true);
       }
       mesh_colors_dirty_flag = false;
       const csColor* factory_colors = factory->colors;
@@ -548,8 +540,11 @@ void csFoliageMeshObject::PreGetShaderVariableValue (csShaderVariable* var)
         colors[i] = factory_colors[i]+color;
       color_buffer->CopyToBuffer (colors, sizeof (csColor) * PROTO_VERTS);
     }
-    var->SetValue (color_buffer);
-    return;
+    holder->SetRenderBuffer (CS_BUFFER_COLOR, color_buffer);
+  } 
+  else 
+  {
+    factory->PreGetBuffer (holder, buffer);
   }
 }
 
@@ -569,15 +564,6 @@ SCF_IMPLEMENT_EMBEDDED_IBASE (csFoliageMeshObjectFactory::ObjectModel)
   SCF_IMPLEMENTS_INTERFACE (iObjectModel)
 SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
-SCF_IMPLEMENT_IBASE (csFoliageMeshObjectFactory::ShaderVariableAccessor)
-  SCF_IMPLEMENTS_INTERFACE (iShaderVariableAccessor)
-SCF_IMPLEMENT_IBASE_END
-
-csStringID csFoliageMeshObjectFactory::vertex_name = csInvalidStringID;
-csStringID csFoliageMeshObjectFactory::texel_name = csInvalidStringID;
-csStringID csFoliageMeshObjectFactory::normal_name = csInvalidStringID;
-csStringID csFoliageMeshObjectFactory::color_name = csInvalidStringID;
-csStringID csFoliageMeshObjectFactory::index_name = csInvalidStringID;
 csStringID csFoliageMeshObjectFactory::heights_name = csInvalidStringID;
 csStringID csFoliageMeshObjectFactory::foliage_density_name = csInvalidStringID;
 csStringID csFoliageMeshObjectFactory::foliage_types_name = csInvalidStringID;
@@ -588,7 +574,6 @@ csFoliageMeshObjectFactory::csFoliageMeshObjectFactory (
   SCF_CONSTRUCT_IBASE (pParent);
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiFoliageFactoryState);
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiObjectModel);
-  scfiShaderVariableAccessor = new ShaderVariableAccessor (this);
   csFoliageMeshObjectFactory::object_reg = object_reg;
 
   scfiPolygonMesh.SetFactory (this);
@@ -609,13 +594,8 @@ csFoliageMeshObjectFactory::csFoliageMeshObjectFactory (
   csRef<iStringSet> strings = CS_QUERY_REGISTRY_TAG_INTERFACE (object_reg,
     "crystalspace.shared.stringset", iStringSet);
 
-  if (vertex_name == csInvalidStringID)
+  if (heights_name == csInvalidStringID)
   {
-    vertex_name = strings->Request ("vertices");
-    texel_name = strings->Request ("texture coordinates");
-    normal_name = strings->Request ("normals");
-    color_name = strings->Request ("colors");
-    index_name = strings->Request ("indices");
     heights_name = strings->Request ("heights");
     foliage_density_name = strings->Request ("foliage_density");
     foliage_types_name = strings->Request ("foliage_types");
@@ -632,7 +612,6 @@ csFoliageMeshObjectFactory::csFoliageMeshObjectFactory (
 
 csFoliageMeshObjectFactory::~csFoliageMeshObjectFactory ()
 {
-  scfiShaderVariableAccessor->DecRef ();
   ClearGeneratedFoliage ();
 
   SCF_DESTRUCT_EMBEDDED_IBASE (scfiFoliageFactoryState);
@@ -724,10 +703,9 @@ void csFoliageMeshObjectFactory::SetupFactory ()
   }
 }
 
-void csFoliageMeshObjectFactory::PreGetShaderVariableValue (
-  csShaderVariable* var)
+void csFoliageMeshObjectFactory::PreGetBuffer (csRenderBufferHolder* holder, csRenderBufferName buffer)
 {
-  if (var->Name == normal_name)
+  if (buffer == CS_BUFFER_NORMAL)
   {
     if (mesh_normals_dirty_flag)
     {
@@ -742,11 +720,9 @@ void csFoliageMeshObjectFactory::PreGetShaderVariableValue (
       normal_buffer->CopyToBuffer (
         normals, sizeof (csVector3)*PROTO_VERTS);
     }
-    var->SetValue (normal_buffer);
-    return;
+    holder->SetRenderBuffer (CS_BUFFER_NORMAL, normal_buffer);
   }
 }
-
 
 void csFoliageMeshObjectFactory::Invalidate ()
 {

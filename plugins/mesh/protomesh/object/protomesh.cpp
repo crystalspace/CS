@@ -46,8 +46,8 @@ SCF_IMPLEMENT_EMBEDDED_IBASE (csProtoMeshObject::ProtoMeshState)
   SCF_IMPLEMENTS_INTERFACE (iProtoMeshState)
 SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
-SCF_IMPLEMENT_IBASE (csProtoMeshObject::ShaderVariableAccessor)
-  SCF_IMPLEMENTS_INTERFACE (iShaderVariableAccessor)
+SCF_IMPLEMENT_IBASE (csProtoMeshObject::RenderBufferAccessor)
+  SCF_IMPLEMENTS_INTERFACE (iRenderBufferAccessor)
 SCF_IMPLEMENT_IBASE_END
 
 csProtoMeshObject::csProtoMeshObject (csProtoMeshObjectFactory* factory)
@@ -55,7 +55,7 @@ csProtoMeshObject::csProtoMeshObject (csProtoMeshObjectFactory* factory)
   SCF_CONSTRUCT_IBASE (0);
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiProtoMeshState);
 
-  scfiShaderVariableAccessor = new ShaderVariableAccessor (this);
+  scfiRenderBufferAccessor = new RenderBufferAccessor (this);
 
   csProtoMeshObject::factory = factory;
   logparent = 0;
@@ -78,7 +78,7 @@ csProtoMeshObject::csProtoMeshObject (csProtoMeshObjectFactory* factory)
 
 csProtoMeshObject::~csProtoMeshObject ()
 {
-  scfiShaderVariableAccessor->DecRef ();
+  scfiRenderBufferAccessor->DecRef ();
 
   SCF_DESTRUCT_EMBEDDED_IBASE (scfiProtoMeshState);
   SCF_DESTRUCT_IBASE ();
@@ -90,11 +90,10 @@ bool csProtoMeshObject::SetMaterialWrapper (iMaterialWrapper* mat)
   return true;
 }
 
-void csProtoMeshObject::SetupShaderVariableContext ()
+void csProtoMeshObject::SetupBufferHolder ()
 {
-  if (svcontext == 0)
-    svcontext.AttachNew (new csShaderVariableContext ());
-  csShaderVariable* sv;
+  if (bufferHolder == 0)
+    bufferHolder.AttachNew (new csRenderBufferHolder);
 
   // Make sure the factory is ok and his its buffers.
   factory->SetupFactory ();
@@ -111,26 +110,19 @@ void csProtoMeshObject::SetupShaderVariableContext ()
   // the creation of potentially unneeded buffers there.
 
   // Indices are fetched directly from the factory.
-  sv = svcontext->GetVariableAdd (csProtoMeshObjectFactory::index_name);
-  sv->SetValue (factory->index_buffer);
-
+  bufferHolder->SetRenderBuffer (CS_BUFFER_INDEX, factory->index_buffer);
+  
   // Vertices are fetched from the factory.
-  sv = svcontext->GetVariableAdd (csProtoMeshObjectFactory::vertex_name);
-  sv->SetValue (factory->vertex_buffer);
+  bufferHolder->SetRenderBuffer (CS_BUFFER_POSITION, factory->vertex_buffer);
 
   // Texels are fetched from the factory.
-  sv = svcontext->GetVariableAdd (csProtoMeshObjectFactory::texel_name);
-  sv->SetValue (factory->texel_buffer);
-
+  bufferHolder->SetRenderBuffer (CS_BUFFER_TEXCOORD0, factory->texel_buffer);
+  
   // Normals are fetched from the factory but we use an accessor
   // for those because they are not always needed.
-  sv = svcontext->GetVariableAdd (csProtoMeshObjectFactory::normal_name);
-  sv->SetAccessor (factory->scfiShaderVariableAccessor);
-
   // Colors are fetched from the object because we need to add the mesh
   // base color to the static colors in the factory.
-  sv = svcontext->GetVariableAdd (csProtoMeshObjectFactory::color_name);
-  sv->SetAccessor (scfiShaderVariableAccessor);
+  bufferHolder->SetAccessor (scfiRenderBufferAccessor, CS_BUFFER_NORMAL_MASK | CS_BUFFER_COLOR_MASK);
 }
   
 void csProtoMeshObject::SetupObject ()
@@ -138,7 +130,7 @@ void csProtoMeshObject::SetupObject ()
   if (!initialized)
   {
     initialized = true;
-    SetupShaderVariableContext ();
+    SetupBufferHolder ();
   }
 }
 
@@ -206,7 +198,7 @@ csRenderMesh** csProtoMeshObject::GetRenderMeshes (
   meshPtr->camera_origin = camera_origin;
   meshPtr->camera_transform = &camera->GetTransform();
   if (rmCreated)
-    meshPtr->variablecontext = svcontext;
+    meshPtr->buffers = bufferHolder;
   meshPtr->geometryInstance = (void*)factory;
  
   n = 1;
@@ -280,9 +272,9 @@ iObjectModel* csProtoMeshObject::GetObjectModel ()
   return factory->GetObjectModel ();
 }
 
-void csProtoMeshObject::PreGetShaderVariableValue (csShaderVariable* var)
+void csProtoMeshObject::PreGetBuffer (csRenderBufferHolder *holder, csRenderBufferName buffer)
 {
-  if (var->Name == csProtoMeshObjectFactory::color_name)
+  if (buffer == CS_BUFFER_COLOR)
   {
     if (mesh_colors_dirty_flag)
     {
@@ -303,8 +295,11 @@ void csProtoMeshObject::PreGetShaderVariableValue (csShaderVariable* var)
         colors[i] = factory_colors[i]+color;
       color_buffer->CopyToBuffer (colors, sizeof (csColor) * PROTO_VERTS);
     }
-    var->SetValue (color_buffer);
-    return;
+    holder->SetRenderBuffer (CS_BUFFER_COLOR, color_buffer);
+  } 
+  else 
+  {
+    factory->PreGetBuffer (holder, buffer);
   }
 }
 
@@ -324,16 +319,6 @@ SCF_IMPLEMENT_EMBEDDED_IBASE (csProtoMeshObjectFactory::ObjectModel)
   SCF_IMPLEMENTS_INTERFACE (iObjectModel)
 SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
-SCF_IMPLEMENT_IBASE (csProtoMeshObjectFactory::ShaderVariableAccessor)
-  SCF_IMPLEMENTS_INTERFACE (iShaderVariableAccessor)
-SCF_IMPLEMENT_IBASE_END
-
-
-csStringID csProtoMeshObjectFactory::vertex_name = csInvalidStringID;
-csStringID csProtoMeshObjectFactory::texel_name = csInvalidStringID;
-csStringID csProtoMeshObjectFactory::normal_name = csInvalidStringID;
-csStringID csProtoMeshObjectFactory::color_name = csInvalidStringID;
-csStringID csProtoMeshObjectFactory::index_name = csInvalidStringID;
 
 csProtoMeshObjectFactory::csProtoMeshObjectFactory (iMeshObjectType *pParent,
       iObjectRegistry* object_reg)
@@ -341,8 +326,6 @@ csProtoMeshObjectFactory::csProtoMeshObjectFactory (iMeshObjectType *pParent,
   SCF_CONSTRUCT_IBASE (pParent);
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiProtoFactoryState);
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiObjectModel);
-
-  scfiShaderVariableAccessor = new ShaderVariableAccessor (this);
 
   csProtoMeshObjectFactory::object_reg = object_reg;
 
@@ -362,22 +345,6 @@ csProtoMeshObjectFactory::csProtoMeshObjectFactory (iMeshObjectType *pParent,
 
   g3d = CS_QUERY_REGISTRY (object_reg, iGraphics3D);
 
-  csRef<iStringSet> strings = CS_QUERY_REGISTRY_TAG_INTERFACE (object_reg,
-    "crystalspace.shared.stringset", iStringSet);
-
-  if ((vertex_name == csInvalidStringID) ||
-    (texel_name == csInvalidStringID) ||
-    (normal_name == csInvalidStringID) ||
-    (color_name == csInvalidStringID) ||
-    (index_name == csInvalidStringID))
-  {
-    vertex_name = strings->Request ("vertices");
-    texel_name = strings->Request ("texture coordinates");
-    normal_name = strings->Request ("normals");
-    color_name = strings->Request ("colors");
-    index_name = strings->Request ("indices");
-  }
-
   mesh_vertices_dirty_flag = true;
   mesh_texels_dirty_flag = true;
   mesh_normals_dirty_flag = true;
@@ -386,8 +353,6 @@ csProtoMeshObjectFactory::csProtoMeshObjectFactory (iMeshObjectType *pParent,
 
 csProtoMeshObjectFactory::~csProtoMeshObjectFactory ()
 {
-  scfiShaderVariableAccessor->DecRef ();
-
   SCF_DESTRUCT_EMBEDDED_IBASE (scfiProtoFactoryState);
   SCF_DESTRUCT_EMBEDDED_IBASE (scfiObjectModel);
   SCF_DESTRUCT_IBASE ();
@@ -439,10 +404,9 @@ void csProtoMeshObjectFactory::SetupFactory ()
   }
 }
 
-void csProtoMeshObjectFactory::PreGetShaderVariableValue (
-  csShaderVariable* var)
+void csProtoMeshObjectFactory::PreGetBuffer (csRenderBufferHolder* holder, csRenderBufferName buffer)
 {
-  if (var->Name == normal_name)
+  if (buffer == CS_BUFFER_NORMAL)
   {
     if (mesh_normals_dirty_flag)
     {
@@ -457,8 +421,7 @@ void csProtoMeshObjectFactory::PreGetShaderVariableValue (
       normal_buffer->CopyToBuffer (
         normals, sizeof (csVector3)*PROTO_VERTS);
     }
-    var->SetValue (normal_buffer);
-    return;
+    holder->SetRenderBuffer (CS_BUFFER_NORMAL, normal_buffer);
   }
 }
 

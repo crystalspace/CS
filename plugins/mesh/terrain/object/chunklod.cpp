@@ -522,9 +522,9 @@ csChunkLodTerrainFactory::MeshTreeNode::~MeshTreeNode ()
 }
 
 iRenderBuffer *csChunkLodTerrainFactory::MeshTreeNode::GetRenderBuffer (
-	csStringID name)
+	csRenderBufferName name)
 {
-  if (name == pFactory->vertex_name) 
+  if (name == CS_BUFFER_POSITION) 
   {
     if (!vertex_buffer) 
     {
@@ -532,17 +532,11 @@ iRenderBuffer *csChunkLodTerrainFactory::MeshTreeNode::GetRenderBuffer (
       vertex_buffer = pFactory->r3d->CreateRenderBuffer (
 	sizeof (csVector3) * len, CS_BUF_STATIC, 
 	CS_BUFCOMP_FLOAT, 3);
-      csVector3 *vbuf = (csVector3*)vertex_buffer->Lock (CS_BUF_LOCK_NORMAL);
-      memcpy (vbuf, &vertices[0], len * sizeof (csVector3));
-      vertex_buffer->Release ();
+      vertex_buffer->CopyToBuffer (&vertices[0], len * sizeof (csVector3));
     }
     return vertex_buffer;
   }
-  else if (name == pFactory->compressed_vertex_name)
-  {
-    return 0;
-  }
-  else if (name == pFactory->normal_name) 
+  else if (name == CS_BUFFER_NORMAL) 
   {
     if (!normal_buffer)
     {
@@ -551,31 +545,11 @@ iRenderBuffer *csChunkLodTerrainFactory::MeshTreeNode::GetRenderBuffer (
 	sizeof (csVector3) * len, CS_BUF_STATIC, 
 	CS_BUFCOMP_FLOAT, 3);
    
-      csVector3 *nbuf = (csVector3*)normal_buffer->Lock (CS_BUF_LOCK_NORMAL);
-      memcpy (nbuf, &normals[0], len * sizeof (csVector3));
-      normal_buffer->Release ();
+      normal_buffer->CopyToBuffer (&normals[0], len * sizeof (csVector3));
     }
     return normal_buffer;
   }
-  else if (name == pFactory->compressed_normal_name)
-  {
-    if (!compressed_normal_buffer)
-    {
-      unsigned int len = normals.Length();
-      compressed_normal_buffer = pFactory->r3d->CreateRenderBuffer (
-        sizeof (csVector2) * len, CS_BUF_STATIC,
-	CS_BUFCOMP_FLOAT, 2);
-      csVector2 *cnbuf = (csVector2*)compressed_normal_buffer->Lock (
-      	CS_BUF_LOCK_NORMAL);
-      for (unsigned int i = 0; i < len; i ++) {
-        cnbuf[i].x = normals[i].x;
-        cnbuf[i].y = normals[i].z;
-      }
-      compressed_normal_buffer->Release ();
-    }
-    return compressed_normal_buffer;
-  }
-  else if (name == pFactory->tangent_name) 
+  else if (name == CS_BUFFER_TANGENT) 
   {
     if (!tangent_buffer)
     {
@@ -584,17 +558,11 @@ iRenderBuffer *csChunkLodTerrainFactory::MeshTreeNode::GetRenderBuffer (
 	sizeof (csVector3) * len, CS_BUF_STATIC, 
 	CS_BUFCOMP_FLOAT, 3);
    
-      csVector3 *tbuf = (csVector3*)tangent_buffer->Lock (CS_BUF_LOCK_NORMAL);
-      memcpy (tbuf, &tangents[0], len * sizeof (csVector3));
-      tangent_buffer->Release ();
+      tangent_buffer->CopyToBuffer (&tangents[0], len * sizeof (csVector3));
     }
     return tangent_buffer;
   }
-  else if (name == pFactory->compressed_tangent_name)
-  {
-    return 0;
-  }
-  else if (name == pFactory->binormal_name) 
+  else if (name == CS_BUFFER_BINORMAL) 
   {
     if (!binormal_buffer)
     {
@@ -602,18 +570,12 @@ iRenderBuffer *csChunkLodTerrainFactory::MeshTreeNode::GetRenderBuffer (
       binormal_buffer = pFactory->r3d->CreateRenderBuffer (
 	sizeof (csVector3) * len, CS_BUF_STATIC, 
 	CS_BUFCOMP_FLOAT, 3);
-   
-      csVector3 *bbuf = (csVector3*)binormal_buffer->Lock (CS_BUF_LOCK_NORMAL);
-      memcpy (bbuf, &binormals[0], len * sizeof (csVector3));
-      binormal_buffer->Release ();
+
+      binormal_buffer->CopyToBuffer (&binormals[0], len * sizeof (csVector3));
     }
     return binormal_buffer;
   }
-  else if (name == pFactory->compressed_binormal_name)
-  {
-    return 0;
-  }
-  else if (name == pFactory->texcors_name) 
+  else if (name == CS_BUFFER_TEXCOORD0) 
   {
     if (!texcors_buffer)
     {
@@ -628,15 +590,7 @@ iRenderBuffer *csChunkLodTerrainFactory::MeshTreeNode::GetRenderBuffer (
     }
     return texcors_buffer;
   }
-  else if (name == pFactory->compressed_texcors_name)
-  {
-    return 0;
-  }
-  else if (name == pFactory->compressed_color_name)
-  {
-    return 0;
-  }
-  else if (name == pFactory->index_name) 
+  else if (name == CS_BUFFER_INDEX) 
   {
     if (!index_buffer)
     {
@@ -976,7 +930,7 @@ bool csChunkLodTerrainObject::DrawTestQuad (iRenderView* rv,
     rm->material = matwrap;
     rm->z_buf_mode = CS_ZBUF_TEST;
     rm->mixmode = CS_FX_COPY;
-    rm->variablecontext = nodeWrapper->svcontext;
+    rm->buffers = nodeWrapper->bufferHolder;
     rm->indexstart = 1;
     rm->indexend = node->Count ();
     rm->meshtype = CS_MESHTYPE_TRIANGLESTRIP;
@@ -1001,7 +955,7 @@ bool csChunkLodTerrainObject::DrawTestQuad (iRenderView* rv,
         rm->material = palette[i];
         rm->z_buf_mode = CS_ZBUF_TEST;
         rm->mixmode = CS_FX_COPY;
-	rm->variablecontext = nodeWrapper->svcontext;
+	rm->buffers = nodeWrapper->bufferHolder;
         rm->indexstart = 1;
         rm->indexend = node->Count ();
         rm->meshtype = CS_MESHTYPE_TRIANGLESTRIP;
@@ -1056,7 +1010,7 @@ csRenderMesh** csChunkLodTerrainObject::GetRenderMeshes (
       rview->GetCurrentFrameNumber ());
     rm->z_buf_mode = CS_ZBUF_TEST;
     rm->mixmode = CS_FX_COPY;
-    rm->variablecontext = rootNode->svcontext;
+    rm->buffers = rootNode->bufferHolder;
     rm->indexstart = 1;
     rm->indexend = rootNode->factoryNode->Count ();
     rm->meshtype = CS_MESHTYPE_TRIANGLESTRIP;
@@ -1812,25 +1766,8 @@ csChunkLodTerrainObject::MeshTreeNodeWrapper::MeshTreeNodeWrapper (
   MeshTreeNodeWrapper::obj = obj;
   factoryNode = node;
 
-  svcontext.AttachNew (new csShaderVariableContext ());
-  csRef<iShaderVariableAccessor> sva;
-  sva.AttachNew (new MeshTreeNodeSVA (this));
-
-  csShaderVariable *sv = 0; // =0 pacifies gcc 2.95.4.
-  sv = svcontext->GetVariableAdd (obj->pFactory->vertex_name);
-  sv->SetAccessor (sva);
-  sv = svcontext->GetVariableAdd (obj->pFactory->normal_name);
-  sv->SetAccessor (sva);
-  sv = svcontext->GetVariableAdd (obj->pFactory->tangent_name);
-  sv->SetAccessor (sva);
-  sv = svcontext->GetVariableAdd (obj->pFactory->binormal_name);
-  sv->SetAccessor (sva);
-  sv = svcontext->GetVariableAdd (obj->pFactory->texcors_name);
-  sv->SetAccessor (sva);
-  sv = svcontext->GetVariableAdd (obj->pFactory->color_name);
-  sv->SetAccessor (sva);
-  sv = svcontext->GetVariableAdd (obj->pFactory->index_name);
-  sv->SetAccessor (sva);
+  bufferHolder.AttachNew (new csRenderBufferHolder);
+  bufferHolder->SetAccessor (new MeshTreeNodeRBA(this), CS_BUFFER_ALL_MASK);
 }
 
 csChunkLodTerrainObject::MeshTreeNodeWrapper::~MeshTreeNodeWrapper()
@@ -1851,31 +1788,31 @@ csChunkLodTerrainObject::MeshTreeNodeWrapper::GetChild (int n)
 
 //---------------------------------------------------------------------------
 
-SCF_IMPLEMENT_IBASE(csChunkLodTerrainObject::MeshTreeNodeSVA)
-  SCF_IMPLEMENTS_INTERFACE(iShaderVariableAccessor)
+SCF_IMPLEMENT_IBASE(csChunkLodTerrainObject::MeshTreeNodeRBA)
+  SCF_IMPLEMENTS_INTERFACE(iRenderBufferAccessor)
 SCF_IMPLEMENT_IBASE_END
 
-csChunkLodTerrainObject::MeshTreeNodeSVA::MeshTreeNodeSVA (
+csChunkLodTerrainObject::MeshTreeNodeRBA::MeshTreeNodeRBA (
   MeshTreeNodeWrapper* wrapper)
 {
   SCF_CONSTRUCT_IBASE(0);
 
-  MeshTreeNodeSVA::wrapper = wrapper;
+  MeshTreeNodeRBA::wrapper = wrapper;
   colorVersion = ~0;
 }
 
-csChunkLodTerrainObject::MeshTreeNodeSVA::~MeshTreeNodeSVA ()
+csChunkLodTerrainObject::MeshTreeNodeRBA::~MeshTreeNodeRBA ()
 {
   SCF_DESTRUCT_IBASE();
 }
 
-void csChunkLodTerrainObject::MeshTreeNodeSVA::PreGetValue (
-  csShaderVariable *variable)
+void csChunkLodTerrainObject::MeshTreeNodeRBA::PreGetBuffer 
+  (csRenderBufferHolder* holder, csRenderBufferName buffer)
 {
-  const csStringID name = variable->GetName ();
+  if (!holder) return;
   csChunkLodTerrainObject* obj = wrapper->obj;
   csChunkLodTerrainFactory* factory = obj->pFactory;
-  if (name == factory->color_name)
+  if (buffer == CS_BUFFER_COLOR)
   {
     if (!colorBuffer || (colorVersion != obj->colorVersion))
     {
@@ -1899,9 +1836,8 @@ void csChunkLodTerrainObject::MeshTreeNodeSVA::PreGetValue (
 
       colorVersion = obj->colorVersion;
     }
-    variable->SetValue (colorBuffer);
+    holder->SetRenderBuffer (CS_BUFFER_COLOR, colorBuffer);
   }
   else
-    variable->SetValue (
-      wrapper->factoryNode->GetRenderBuffer (name));
+    holder->SetRenderBuffer (buffer, wrapper->factoryNode->GetRenderBuffer (buffer));
 }

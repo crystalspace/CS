@@ -35,8 +35,8 @@
       PARAM loddist		= program.local[8];
       # Per vertex inputs
       ATTRIB iPos		= vertex.position;
-      ATTRIB iNorm		= vertex.attrib[1];
-      ATTRIB iTex0		= vertex.attrib[2];
+      ATTRIB iNorm		= vertex.normal;
+      ATTRIB iTex0		= vertex.texcoord;
       # Outputs
       OUTPUT oPos		= result.position;
       OUTPUT oCol0		= result.color;

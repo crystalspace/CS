@@ -81,6 +81,7 @@ class csSysRenderBuffer : public csNullRenderBuffer
 private:
   void *buffer;
   bool locked;
+  uint version;
 public:
   csSysRenderBuffer (void *buffer, size_t size, csRenderBufferType type,
     csRenderBufferComponentType comptype, int compcount) :
@@ -88,6 +89,7 @@ public:
   {
     csSysRenderBuffer::buffer = buffer;
     locked = false;
+    version = 0;
   }
 
   virtual ~csSysRenderBuffer ()
@@ -102,6 +104,7 @@ public:
   virtual void* Lock(csRenderBufferLockType lockType, 
     bool samePointer = false)
   {
+    version++;
     locked = true;
     return buffer;
   }
@@ -111,7 +114,13 @@ public:
 
   virtual void CopyToBuffer(const void *data, size_t length)
   {
+    version++;
     memcpy(buffer, data, length);
+  }
+
+  virtual unsigned int GetVersion () 
+  {
+    return version;
   }
 };
 

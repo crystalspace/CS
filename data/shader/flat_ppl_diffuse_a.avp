@@ -33,12 +33,12 @@
       PARAM materialSpecular 	= program.local[8];
       # Per vertex inputs
       ATTRIB iPos		= vertex.position;
-      ATTRIB iCol0		= vertex.attrib[1];
-      ATTRIB iNorm		= vertex.attrib[2];
-      ATTRIB iTex0		= vertex.attrib[3];
+      ATTRIB iCol0		= vertex.color;
+      ATTRIB iNorm		= vertex.normal;
+      ATTRIB iTex0		= vertex.texcoord;
       # Outputs
-      OUTPUT oPos		    = result.position;
-      OUTPUT oLightDir	= result.texcoord[0];
+      OUTPUT oPos		= result.position;
+      OUTPUT oLightDir	        = result.texcoord[0];
       OUTPUT oNormal		= result.texcoord[1];
       # Temporaries
       TEMP objLight;

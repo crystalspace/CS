@@ -42,6 +42,7 @@ protected:
   bool nodelete;
   size_t rangeStart;
   size_t rangeEnd;
+  unsigned int version;
 public:
   SCF_DECLARE_IBASE;
 
@@ -89,6 +90,11 @@ public:
   {
     rangeStart = start; rangeEnd = end;
   }
+
+  virtual unsigned int GetVersion ()
+  {
+    return version;
+  }
 };
 
 
@@ -135,6 +141,7 @@ public:
     bool samePointer = false)
   {
     locked = true;
+    version++;
     return buffer;
   }
 
@@ -143,6 +150,7 @@ public:
 
   virtual void CopyToBuffer(const void *data, size_t length)
   {
+    version++;
     if (iscopy)
       memcpy (buffer, data, length);
     else
@@ -240,6 +248,7 @@ public:
 	  break;
       }
     }
+    version++;
     return (void*)-1;
   }
 
@@ -259,6 +268,7 @@ public:
 
   virtual void CopyToBuffer(const void *data, size_t length)
   {
+    version++;
     ext->glBindBufferARB (bufferTarget, bufferId);
     ext->glBufferDataARB (bufferTarget, length, data, bufferUsage);
   }

@@ -15,8 +15,6 @@
       <mixmode>
         <alpha />
       </mixmode>
-      <buffer name="vertices" destination="position" />
-      <buffer name="colors" destination="primary color" />
       <texture name="standardtex fog" destination="unit 0" />
       <vp plugin="glfixed">
         <fixedvp>

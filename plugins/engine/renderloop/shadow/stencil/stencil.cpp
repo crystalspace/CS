@@ -79,7 +79,7 @@ csStencilShadowCacheEntry::csStencilShadowCacheEntry (
   meshWrapper = mesh;
   model = 0;
   closedMesh = 0;
-  svcontext = new csShaderVariableContext;
+  bufferHolder.AttachNew (new csRenderBufferHolder);
 
   csRef<iObjectModel> model = mesh->GetMeshObject ()->GetObjectModel ();
   model->AddListener (this);
@@ -89,7 +89,6 @@ csStencilShadowCacheEntry::csStencilShadowCacheEntry (
 csStencilShadowCacheEntry::~csStencilShadowCacheEntry ()
 {
   delete closedMesh;
-  delete svcontext;
   SCF_DESTRUCT_IBASE();
 }
 
@@ -381,7 +380,7 @@ void csStencilShadowCacheEntry::ObjectModelChanged (iObjectModel* model)
 
   meshShadows = ((triangle_count != 0) && (vertex_count != 0));
 }
-
+/*
 iRenderBuffer *csStencilShadowCacheEntry::GetRenderBuffer (csStringID name)
 {
   if (name == parent->shadow_vertex_name) 
@@ -392,23 +391,15 @@ iRenderBuffer *csStencilShadowCacheEntry::GetRenderBuffer (csStringID name)
     return active_index_buffer;
   return 0;
 }
-
+*/
 void csStencilShadowCacheEntry::UpdateBuffers ()
 {
-  csShaderVariable *sv;
-  sv = svcontext->GetVariableAdd (parent->shadow_vertex_name);
-  sv->SetValue (shadow_vertex_buffer);
-  sv = svcontext->GetVariableAdd (parent->shadow_normal_name);
-  sv->SetValue (shadow_normal_buffer);
-  sv = svcontext->GetVariableAdd (parent->shadow_index_name);
-  sv->SetValue (active_index_buffer);
+  bufferHolder->SetRenderBuffer (CS_BUFFER_POSITION, shadow_vertex_buffer);
+  bufferHolder->SetRenderBuffer (CS_BUFFER_NORMAL, shadow_normal_buffer);
+  bufferHolder->SetRenderBuffer (CS_BUFFER_INDEX, active_index_buffer);
 }
 
 //---------------------------------------------------------------------------
-
-csStringID csStencilShadowStep::shadow_index_name = csInvalidStringID;
-csStringID csStencilShadowStep::shadow_normal_name = csInvalidStringID;
-csStringID csStencilShadowStep::shadow_vertex_name = csInvalidStringID;
 
 csStencilShadowStep::csStencilShadowStep (csStencilShadowType* type) :  
   shadowDrawVisCallback ()
@@ -439,20 +430,6 @@ bool csStencilShadowStep::Initialize (iObjectRegistry* objreg)
   object_reg = objreg;
   g3d = CS_QUERY_REGISTRY (object_reg, iGraphics3D);
   shmgr = CS_QUERY_REGISTRY (object_reg, iShaderManager);
-
-  csRef<iStringSet> strings = CS_QUERY_REGISTRY_TAG_INTERFACE (objreg,
-	"crystalspace.shared.stringset", iStringSet);
-  if (!strings)
-  {
-    Report (CS_REPORTER_SEVERITY_ERROR, "Unable to retrieve string set");
-    return false;
-  }
-  if (shadow_vertex_name == csInvalidStringID)
-    shadow_vertex_name = strings->Request ("shadow vertices");
-  if (shadow_normal_name == csInvalidStringID)
-    shadow_normal_name = strings->Request ("shadow normals");
-  if (shadow_index_name == csInvalidStringID)
-    shadow_index_name = strings->Request ("indices");
 
   const csGraphics3DCaps* caps = g3d->GetCaps();
   enableShadows = caps->StencilShadows;
@@ -506,7 +483,7 @@ void csStencilShadowStep::DrawShadow (iRenderView* rview, iLight* light,
   rmesh.z_buf_mode = CS_ZBUF_TEST;
   //rmesh.mixmode = shader->GetMixmodeOverride (); //CS_FX_COPY;
   rmesh.material = 0;
-  rmesh.variablecontext = shadowCacheEntry->svcontext;
+  rmesh.buffers = shadowCacheEntry->bufferHolder;
   rmesh.meshtype = CS_MESHTYPE_TRIANGLES;
 
   csRenderMeshModes modes (rmesh);
@@ -519,7 +496,6 @@ void csStencilShadowStep::DrawShadow (iRenderView* rview, iLight* light,
 
     shadowCacheEntry->UpdateBuffers ();
     shmgr->PushVariables (stacks);
-    shadowCacheEntry->svcontext->PushVariables (stacks);
     shader->SetupPass (shaderTicket, &rmesh, modes, stacks);
     if (shadowCacheEntry->ShadowCaps())
     {
@@ -543,6 +519,7 @@ void csStencilShadowStep::DrawShadow (iRenderView* rview, iLight* light,
       g3d->DrawMesh (&rmesh, rmesh, stacks);
     }
     shader->TeardownPass (shaderTicket);
+    shmgr->PopVariables (stacks);
   }
 }
 

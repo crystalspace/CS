@@ -25,19 +25,19 @@
     <!-- inscatter = .3 -->
     <shadervar name="inscattering term" type="vector3">0.4, 0.4, 0.4</shadervar>
   </shadervars>
-
+  
   <technique priority="50">
     <pass>
-      <mixmode><copy/></mixmode>
-      <buffer name="vertices" destination="attribute 0" />
-      <buffer name="texture coordinates" destination="attribute 1" />
+      <mixmode>
+        <copy />
+      </mixmode>
       <vp plugin="glarb" file="/shader/scattering.avp" />
       <texture destination="unit 0" name="tex diffuse" />
       <fp plugin="glfixed">
         <fixedfp>
           <layer>
-            <colorsource num="0" source="primary color" modifier="color"/>
-            <coloroperation operation="replace"/>
+            <colorsource num="0" source="primary color" modifier="color" />
+            <coloroperation operation="replace" />
           </layer>
         </fixedfp>
       </fp>

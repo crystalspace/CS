@@ -33,7 +33,6 @@
 #include "csgeom/poly3d.h"
 #include "csgeom/box.h"
 #include "csgeom/objmodel.h"
-#include "csgfx/shadervarcontext.h"
 #include "cstool/rendermeshholder.h"
 #include "imesh/spritecal3d.h"
 #include "imesh/object.h"
@@ -588,7 +587,7 @@ private:
 
 
 
-  class BaseAccessor : public iShaderVariableAccessor
+  class BaseAccessor : public iRenderBufferAccessor
   {
   protected:
     csSpriteCal3DMeshObject* meshobj;
@@ -621,8 +620,7 @@ private:
     {
       SCF_DESTRUCT_IBASE ();
     }
-    virtual void PreGetValue (csShaderVariable *variable);
-
+    virtual void PreGetBuffer (csRenderBufferHolder* holder, csRenderBufferName buffer);
     
   };
   friend class BaseAccessor;

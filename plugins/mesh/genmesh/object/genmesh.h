@@ -87,7 +87,8 @@ class csGenmeshMeshObject : public iMeshObject
 private:
 
   csRenderMeshHolderSingle rmHolder;
-  csShaderVariableContext* svcontext;
+  csRef<csShaderVariableContext> svcontext;
+  csRef<csRenderBufferHolder> bufferHolder;
   csWeakRef<iGraphics3D> g3d;
   bool mesh_colors_dirty_flag;
 
@@ -443,32 +444,29 @@ public:
   } scfiPolygonMesh;
   friend struct PolyMesh;
 
-  //------------------ iShaderVariableAccessor implementation ------------
-  class eiShaderVariableAccessor : public iShaderVariableAccessor
+  class eiRenderBufferAccessor : public iRenderBufferAccessor
   {
   public:
-    CS_LEAKGUARD_DECLARE (eiShaderVariableAccessor);
+    CS_LEAKGUARD_DECLARE (eiRenderBufferAccessor);
     SCF_DECLARE_IBASE;
     csGenmeshMeshObject* parent;
-    virtual ~eiShaderVariableAccessor ()
+    virtual ~eiRenderBufferAccessor ()
     {
       SCF_DESTRUCT_IBASE ();
     }
-    eiShaderVariableAccessor (csGenmeshMeshObject* parent)
+    eiRenderBufferAccessor (csGenmeshMeshObject* parent)
     {
       SCF_CONSTRUCT_IBASE (0);
-      eiShaderVariableAccessor::parent = parent;
+      eiRenderBufferAccessor::parent = parent;
     }
-    virtual void PreGetValue (csShaderVariable* variable)
+    virtual void PreGetBuffer (csRenderBufferHolder* holder, csRenderBufferName buffer)
     {
-      //scfParent->PreGetShaderVariableValue (variable);
-      parent->PreGetShaderVariableValue (variable);
+      parent->PreGetBuffer (holder, buffer);
     }
-  } *scfiShaderVariableAccessor;
-  friend class eiShaderVariableAccessor;
+  } *scfiRenderBufferAccessor;
+  friend class eiRenderBufferAccessor;
 
-  void PreGetShaderVariableValue (csShaderVariable* variable);
-
+  void PreGetBuffer (csRenderBufferHolder* holder, csRenderBufferName buffer);
 };
 
 /**
@@ -947,6 +945,31 @@ public:
   friend class eiShaderVariableAccessor;
 
   void PreGetShaderVariableValue (csShaderVariable* variable);
+
+
+  class eiRenderBufferAccessor : public iRenderBufferAccessor
+  {
+  public:
+    CS_LEAKGUARD_DECLARE (eiRenderBufferAccessor);
+    SCF_DECLARE_IBASE;
+    csGenmeshMeshObjectFactory* parent;
+    virtual ~eiRenderBufferAccessor ()
+    {
+      SCF_DESTRUCT_IBASE ();
+    }
+    eiRenderBufferAccessor (csGenmeshMeshObjectFactory* parent)
+    {
+      SCF_CONSTRUCT_IBASE (0);
+      eiRenderBufferAccessor::parent = parent;
+    }
+    virtual void PreGetBuffer (csRenderBufferHolder* holder, csRenderBufferName buffer)
+    {
+      parent->PreGetBuffer (holder, buffer);
+    }
+  } *scfiRenderBufferAccessor;
+  friend class eiRenderBufferAccessor;
+
+  void PreGetBuffer (csRenderBufferHolder* holder, csRenderBufferName buffer);
 };
 
 /**

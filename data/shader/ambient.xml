@@ -7,8 +7,6 @@
     <technique priority="50">
 	<pass>
 	    <mixmode><copy/></mixmode>
-	    <buffer name="vertices" destination="position" />
-	    <buffer name="texture coordinates" destination="texture coordinate" />
 	    <vp plugin="glfixed" file="/shader/ambient.fvp"/>
 	    <texture name="tex diffuse" destination="unit 0" />
 	    <fp plugin="glfixed">

@@ -715,6 +715,7 @@ bool csConditionEvaluator::EvaluateOperandB (const CondOperand& operand,
 	}
       }
     case operandSVValueBuffer:
+      //@@TODO: CHECK FOR DEFAULTBUFFERS
       {
 	if (stacks.Length() > operand.svName)
 	{

@@ -984,8 +984,8 @@ SCF_IMPLEMENT_EMBEDDED_IBASE (csSprite3DMeshObject::PolyMesh)
   SCF_IMPLEMENTS_INTERFACE (iPolygonMesh)
 SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
-SCF_IMPLEMENT_IBASE (csSprite3DMeshObject::eiShaderVariableAccessor)
-  SCF_IMPLEMENTS_INTERFACE (iShaderVariableAccessor)
+SCF_IMPLEMENT_IBASE (csSprite3DMeshObject::eiRenderBufferAccessor)
+  SCF_IMPLEMENTS_INTERFACE (iRenderBufferAccessor)
 SCF_IMPLEMENT_IBASE_END
 
 SCF_IMPLEMENT_EMBEDDED_IBASE (csSprite3DMeshObject::LODControl)
@@ -1055,6 +1055,8 @@ csSprite3DMeshObject::csSprite3DMeshObject ()
   last_action = 0;
   single_step = false;
   frame_increment = 1;
+  bufferHolder.AttachNew (new csRenderBufferHolder);
+  scfiRenderBufferAccessor.AttachNew (new eiRenderBufferAccessor(this));
 }
 
 csSprite3DMeshObject::~csSprite3DMeshObject ()
@@ -1331,27 +1333,7 @@ void csSprite3DMeshObject::SetupObject ()
   {
     initialized = true;
 
-    csRef<iStringSet> strings = 
-      CS_QUERY_REGISTRY_TAG_INTERFACE (factory->object_reg,
-      "crystalspace.shared.stringset", iStringSet);
-    vertices_name = strings->Request ("vertices");
-    normals_name = strings->Request ("normals");
-    texcoords_name = strings->Request ("texture coordinates");
-    colors_name = strings->Request ("colors");
-    indices_name = strings->Request ("indices");
-  
-    scfiShaderVariableAccessor.AttachNew (new eiShaderVariableAccessor (this));
-    csShaderVariable* sv;
-    sv = svcontext.GetVariableAdd (vertices_name);
-    sv->SetAccessor ((iShaderVariableAccessor*)scfiShaderVariableAccessor);
-    sv = svcontext.GetVariableAdd (normals_name);
-    sv->SetAccessor ((iShaderVariableAccessor*)scfiShaderVariableAccessor);
-    sv = svcontext.GetVariableAdd (texcoords_name);
-    sv->SetAccessor ((iShaderVariableAccessor*)scfiShaderVariableAccessor);
-    sv = svcontext.GetVariableAdd (colors_name);
-    sv->SetAccessor ((iShaderVariableAccessor*)scfiShaderVariableAccessor);
-    sv = svcontext.GetVariableAdd (indices_name);
-    sv->SetAccessor ((iShaderVariableAccessor*)scfiShaderVariableAccessor);
+    bufferHolder->SetAccessor (scfiRenderBufferAccessor, CS_BUFFER_ALL_MASK);
 
     InitSprite ();
   }
@@ -1584,7 +1566,7 @@ csRenderMesh** csSprite3DMeshObject::GetRenderMeshes (int& n,
   
   if (rmCreated)
   {
-    rmesh->variablecontext = &svcontext;
+    rmesh->buffers = bufferHolder;
   }
   rmesh->meshtype = CS_MESHTYPE_TRIANGLES;
   n = 1;
@@ -2380,11 +2362,10 @@ csMeshedPolygon* csSprite3DMeshObject::PolyMesh::GetPolygons ()
 
 
 //iRenderBuffer *csSprite3DMeshObject::GetRenderBuffer (csStringID name)
-void csSprite3DMeshObject::PreGetShaderVariableValue (
-  csShaderVariable* variable)
+void csSprite3DMeshObject::PreGetBuffer (csRenderBufferHolder* holder, csRenderBufferName buffer)
 {
-  const csStringID name = variable->GetName();
-  if (name == vertices_name)
+  if (!holder) return;
+  if (buffer == CS_BUFFER_POSITION)
   {
     if (!vertices)
     {
@@ -2407,9 +2388,9 @@ void csSprite3DMeshObject::PreGetShaderVariableValue (
       vertices->CopyToBuffer (real_obj_verts, 
 	sizeof (csVector3) * final_num_vertices);
       //vertices->CopyToBuffer(final_verts, sizeof (csVector3)*final_num_vertices);
-    variable->SetValue (vertices);
+    holder->SetRenderBuffer (CS_BUFFER_POSITION, vertices);
   }
-  else if (name == normals_name)
+  else if (buffer == CS_BUFFER_NORMAL)
   {
     if (!normals)
     {
@@ -2451,9 +2432,9 @@ void csSprite3DMeshObject::PreGetShaderVariableValue (
     else
       normals->CopyToBuffer (real_obj_norms, 
 	sizeof (csVector3) * final_num_vertices);
-    variable->SetValue (normals);
+    holder->SetRenderBuffer (CS_BUFFER_NORMAL, normals);
   }
-  else if (name == texcoords_name)
+  else if (buffer == CS_BUFFER_TEXCOORD0)
   {
     if (!texcoords)
     {
@@ -2462,9 +2443,9 @@ void csSprite3DMeshObject::PreGetShaderVariableValue (
 		    CS_BUFCOMP_FLOAT, 2);
     }
     texcoords->CopyToBuffer (final_texcoords, sizeof (csVector2)*final_num_vertices);
-    variable->SetValue (texcoords);
+    holder->SetRenderBuffer (CS_BUFFER_TEXCOORD0, texcoords);
   }
-  else if (name == colors_name)
+  else if (buffer == CS_BUFFER_COLOR)
   {
     if (!colors)
     {
@@ -2473,9 +2454,9 @@ void csSprite3DMeshObject::PreGetShaderVariableValue (
 		    CS_BUFCOMP_FLOAT, 4);
     }
     colors->CopyToBuffer (final_colors, sizeof (csColor4)*final_num_vertices);
-    variable->SetValue (colors);
+    holder->SetRenderBuffer (CS_BUFFER_COLOR, colors);
   }
-  else if (name == indices_name)
+  else if (buffer == CS_BUFFER_INDEX)
   {
     if (!indices)
     {
@@ -2484,7 +2465,7 @@ void csSprite3DMeshObject::PreGetShaderVariableValue (
 		    CS_BUFCOMP_UNSIGNED_INT, 0, final_num_vertices - 1);
     }
     indices->CopyToBuffer (final_triangles, sizeof (csTriangle)*final_num_triangles);
-    variable->SetValue (indices);
+    holder->SetRenderBuffer (CS_BUFFER_INDEX, indices);
   }
 }
 

@@ -103,7 +103,7 @@ protected:
 
   csRenderMeshHolderSingle rmHolder;
 
-  csRef<csShaderVariableContext> svcontext;
+  csRef<csRenderBufferHolder> bufferHolder;
   size_t VertexCount;
   size_t TriangleCount;
   csVector3* vertices;

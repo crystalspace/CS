@@ -47,18 +47,12 @@ static const GLenum compGLtypes[] =
 
 csGLRenderBuffer::csGLRenderBuffer (size_t size, csRenderBufferType type,
 	csRenderBufferComponentType comptype, int compcount)
+  : size(size), type(type), comptype(comptype), compcount(compcount), stride(0), offset(0),
+  nodelete (false), version(0)
 {
   SCF_CONSTRUCT_IBASE (0)
-  csGLRenderBuffer::size = size;
-  csGLRenderBuffer::type = type;
-  csGLRenderBuffer::comptype = comptype;
-  csGLRenderBuffer::compcount = compcount;
-  stride = offset = 0;
-
   compSize = compSizes [comptype];
   compGLType = compGLtypes [comptype];
-
-  nodelete = false;
 }
 
 csGLRenderBuffer::~csGLRenderBuffer()

@@ -36,7 +36,7 @@
       PARAM eyePos		= { 0, 0, 0, 1};
       
       # Input vertex info
-      ATTRIB iPos		= vertex.attrib[0];
+      ATTRIB iPos		= vertex.position;
       
       # Output information
       OUTPUT oPos		= result.position;

@@ -23,10 +23,10 @@
       # Per vertex inputs
       ATTRIB iPos		= vertex.position;
       # Outputs
-      OUTPUT oPos		    = result.position;
-      OUTPUT oCol0		  = result.color;
-      OUTPUT oAttMapXY  = result.texcoord[0];
-      OUTPUT oAttMapZ   = result.texcoord[1];
+      OUTPUT oPos		= result.position;
+      OUTPUT oCol0		= result.color;
+      OUTPUT oAttMapXY          = result.texcoord[0];
+      OUTPUT oAttMapZ           = result.texcoord[1];
       # Temporaries
       TEMP objLight;
       TEMP oLightDir;

@@ -4,8 +4,7 @@
       <mixmode>
         <add />
       </mixmode>
-      <buffer name="shadow vertices" destination="attribute 0" />
-      <buffer name="shadow normals" destination="attribute 1" />
+      <buffer source="normal" destination="normal" />
       <vp plugin="glarb" file="/shader/shadowextrude.avp" />
       <fp plugin="glfixed">
         <fixedfp>

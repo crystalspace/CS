@@ -1,6 +1,7 @@
 /*
     Copyright (C) 2003 by Jorrit Tyberghein
               (C) 2003 by Frank Richter
+              (C) 2005 by Marten Svanfeldt
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -33,105 +34,51 @@ private:
   csArray<csPolygonRenderData*> polys;
   csRef<iShaderManager> shadermanager;
 
+  csRef<csRenderBufferHolder> bufferHolder;
+
   csRef<iRenderBuffer> vertex_buffer;
   csRef<iRenderBuffer> texel_buffer;
   csRef<iRenderBuffer> index_buffer;
   csRef<iRenderBuffer> lmcoords_buffer;
   uint rbIndexStart, rbIndexEnd;
 
-  static csStringID vertex_name;
-  static csStringID texel_name;
-  static csStringID normal_name;
-  static csStringID index_name;
-  static csStringID tangent_name;
-  static csStringID binormal_name;
-  static csStringID lmcoords_name;
   
   void PrepareBuffers (uint& indexStart, uint& indexEnd);
 
-  class NormalAccesor : public iShaderVariableAccessor
+  class BufferAccessor : public iRenderBufferAccessor
   {
-  private:
+  private: 
     csGLPolygonRenderer *renderer;
     csRef<iRenderBuffer> normal_buffer;
-    
-    uint normalVerticesNum;
-  public:
-    CS_LEAKGUARD_DECLARE (NormalAccesor);
-    SCF_DECLARE_IBASE;
-
-    NormalAccesor (csGLPolygonRenderer *renderer)
-      : normalVerticesNum (0)
-    {
-      SCF_CONSTRUCT_IBASE(0);
-      this->renderer = renderer;    
-    }
-
-    virtual ~NormalAccesor()
-    {
-      SCF_DESTRUCT_IBASE();
-    }
-
-    void PreGetValue (csShaderVariable *variable);
-  };
-  friend class NormalAccesor;
-  csRef<NormalAccesor> normal_accessor;
-
-  class BiNormalAccesor : public iShaderVariableAccessor
-  {
-  private:
-    csGLPolygonRenderer *renderer;
     csRef<iRenderBuffer> binormal_buffer;
-    
-    uint binormalVerticesNum;
-  public:
-    CS_LEAKGUARD_DECLARE (BiNormalAccesor);
-    SCF_DECLARE_IBASE;
-
-    BiNormalAccesor (csGLPolygonRenderer *renderer)
-      : binormalVerticesNum (0)
-    {
-      SCF_CONSTRUCT_IBASE(0);
-      this->renderer = renderer;    
-    }
-
-    virtual ~BiNormalAccesor()
-    {
-      SCF_DESTRUCT_IBASE();
-    }
-
-    void PreGetValue (csShaderVariable *variable);
-  };
-  friend class BiNormalAccesor;
-  csRef<BiNormalAccesor> binormal_accessor;
-
-  class TangentAccesor : public iShaderVariableAccessor
-  {
-  private:
-    csGLPolygonRenderer *renderer;
     csRef<iRenderBuffer> tangent_buffer;
     
+    uint normalVerticesNum;
+    uint binormalVerticesNum;
     uint tangentVerticesNum;
   public:
-    CS_LEAKGUARD_DECLARE (TangentAccesor);
+    CS_LEAKGUARD_DECLARE (BufferAccessor);
     SCF_DECLARE_IBASE;
 
-    TangentAccesor (csGLPolygonRenderer *renderer)
-      : tangentVerticesNum (0)
+    BufferAccessor (csGLPolygonRenderer *renderer)
+      : renderer(renderer), normalVerticesNum (0)
     {
       SCF_CONSTRUCT_IBASE(0);
-      this->renderer = renderer;    
     }
 
-    virtual ~TangentAccesor()
+    virtual ~BufferAccessor()
     {
       SCF_DESTRUCT_IBASE();
     }
 
-    void PreGetValue (csShaderVariable *variable);
+    virtual void PreGetBuffer (csRenderBufferHolder* holder, csRenderBufferName buffer);
+    
+    bool UpdateNormals ();
+    bool UpdateBinormals ();
+    bool UpdateTangents ();
   };
-  friend class TangentAccesor;
-  csRef<TangentAccesor> tangent_accessor;
+  friend class BufferAccessor;
+  csRef<BufferAccessor> buffer_accessor;
 
 public:
   CS_LEAKGUARD_DECLARE (csGLPolygonRenderer);

@@ -37,6 +37,7 @@ private:
   int compcount, compSize, stride, offset;
   csRenderBufferType type;
   csRenderBufferComponentType comptype;
+  unsigned int version;
 public:
   SCF_DECLARE_IBASE;
 
@@ -75,6 +76,7 @@ public:
   virtual void* Lock(csRenderBufferLockType lockType, 
     bool samePointer = false)
   {
+    version++;
     locked = true;
     return (void*)((unsigned char*)buffer + offset);
   }
@@ -84,6 +86,7 @@ public:
 
   virtual void CopyToBuffer (const void *data, size_t length)
   {
+    version++;
     memcpy (buffer, data, length);
   }
 
@@ -92,6 +95,8 @@ public:
   virtual int GetStride () const { return stride; }
 
   virtual void SetOffset (int o) { offset = o; }
+
+  virtual unsigned int GetVersion () { return version; }
 };
 
 #endif //__CS_SOFT_RENDERBUFFER_H__
