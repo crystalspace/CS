@@ -786,10 +786,10 @@ void csSector::Draw (iRenderView *rview)
 
     for (i = alllights.GetCount () - 1; i >= 0; i--) 
     {
-      r3d->DisableColorWrite ();
+      r3d->SetWriteMask (false, false, false, false);
       r3d->SetShadowState (CS_SHADOW_VOLUME_BEGIN);
       DrawShadow (rview, alllights.Get (i));
-      r3d->EnableColorWrite ();
+      r3d->SetWriteMask (true, true, true, true);
       r3d->SetShadowState (CS_SHADOW_VOLUME_USE);
       DrawLight (rview, alllights.Get(i));
       r3d->SetShadowState (CS_SHADOW_VOLUME_FINISH);
@@ -932,7 +932,7 @@ void csSector::DrawShadow (iRenderView* rview, iLight* light)
         // light is behind camera
         // if mesh is behind the light we don't draw it
         v = pos - lightPos;
-        if (camPlaneZ*v < maxRadius)
+        if (!(camPlaneZ*v < -maxRadius))
           sp->DrawShadow (rview, light); //mesh is infront of the light, draw the shadow
       }
     }

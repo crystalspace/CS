@@ -1,6 +1,11 @@
 The history order is reversed so that new features are at the top.
 
 24-Feb-2003
+	- Mårten Svanfeldt made these changes:
+	    - Modified the light/shadow culling algoritm.
+	    - Changed the way to mask color and alphawrites in new renderer.
+	    - Added the posibility to specify color and/or alphamasking from 
+	      shaders.
 	- Andrew Craig fixed error in csMeshMeshList::FreeItem() where the
 	  meshes were not being unprepared from sectors.
 	- Added some asserts in spr3d to check if cur_action is not NULL.

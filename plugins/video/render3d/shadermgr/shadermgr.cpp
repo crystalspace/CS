@@ -483,7 +483,6 @@ bool csShader::Load(iDocumentNode* node)
           variables->Put( csHashCompute(var->GetName()), var);
         }
         break;
-      
       }
     }
   }
@@ -588,6 +587,7 @@ void csShaderPass::BuildTokenHash()
   xmltokens.Register ("declare", XMLTOKEN_DECLARE);
   xmltokens.Register ("vp", XMLTOKEN_VP);
   xmltokens.Register ("fp", XMLTOKEN_FP);
+  xmltokens.Register ("writemask", XMLTOKEN_WRITEMASK);
 }
 
 bool csShaderPass::Load(iDocumentNode* node)
@@ -678,7 +678,29 @@ bool csShaderPass::Load(iDocumentNode* node)
           variables.Put( csHashCompute(var->GetName()), var);
         }
         break;
-      
+      case XMLTOKEN_WRITEMASK:
+        {
+          if (strcasecmp(child->GetAttributeValue ("r"), "true")==0)
+            writemaskRed = true;
+          else if (strcasecmp(child->GetAttributeValue ("r"), "false")==0)
+            writemaskRed = false;
+          
+          if (strcasecmp(child->GetAttributeValue ("g"), "true")==0)
+            writemaskGreen = true;
+          else if (strcasecmp(child->GetAttributeValue ("g"), "false")==0)
+            writemaskGreen = false;
+
+          if (strcasecmp(child->GetAttributeValue ("b"), "true")==0)
+            writemaskBlue = true;
+          else if (strcasecmp(child->GetAttributeValue ("b"), "false")==0)
+            writemaskBlue = false;
+
+          if (strcasecmp(child->GetAttributeValue ("a"), "true")==0)
+            writemaskAlpha = true;
+          else if (strcasecmp(child->GetAttributeValue ("a"), "false")==0)
+            writemaskAlpha = false;
+        }
+        break;
       }
     }
   }
@@ -756,7 +778,7 @@ bool csShaderTechnique::IsValid()
 
 void csShaderTechnique::BuildTokenHash()
 {
-  xmltokens.Register ("pass", XMLTOKEN_PASS);  
+  xmltokens.Register ("pass", XMLTOKEN_PASS);
 }
 
 bool csShaderTechnique::Load(iDocumentNode* node)

@@ -2,6 +2,7 @@
 <shader name="shadowextrude">
 	<technique priority="100">
 		<pass>
+		  <writemask r="false" g="false" b="false" a="false"/>
 			<vp type="gl_arb_vp" file="/shader/shadowextrude.avp"/>
 		</pass>
 	</technique>

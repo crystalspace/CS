@@ -115,7 +115,10 @@ csGLRender3D::csGLRender3D (iBase *parent)
 
   render_target = NULL;
 
-  color_enabled = false;
+  color_red_enabled = false;
+  color_green_enabled = false;
+  color_blue_enabled = false;
+  alpha_enabled = false;
   current_shadow_state = 0;
 
   //@@@ Test default. Will have to be autodetected later.
@@ -384,8 +387,10 @@ void csGLRender3D::SetupStencil ()
     SetZMode (CS_ZBUF_NONE);
 
     statecache->Disable_GL_TEXTURE_2D ();
-    if (color_enabled)
+    if (color_red_enabled || color_green_enabled || color_blue_enabled ||
+      alpha_enabled)
       glColorMask (GL_FALSE, GL_FALSE, GL_FALSE, GL_FALSE);
+
     statecache->SetStencilFunc (GL_ALWAYS, 128, 128);
     statecache->SetStencilOp (GL_REPLACE, GL_REPLACE, GL_REPLACE);
     glBegin (GL_TRIANGLE_FAN);
@@ -404,8 +409,10 @@ void csGLRender3D::SetupStencil ()
                   2.0*v[i].y/(float)viewheight-1.0);
     glEnd ();
 
-    if (color_enabled)
-      glColorMask (GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE);
+    if (color_red_enabled || color_green_enabled || color_blue_enabled ||
+      alpha_enabled)
+      glColorMask (color_red_enabled, color_green_enabled, color_blue_enabled,
+        alpha_enabled);
 
     //statecache->Disable_GL_STENCIL_TEST ();
 
@@ -734,7 +741,7 @@ bool csGLRender3D::Open ()
     bm->Initialize(this);
     buffermgr = bm;
   } 
-  else if (ext.CS_GL_ATI_vertex_array_object && ext.CS_GL_ATI_vertex_attrib_array_object)
+  else if ( ext.CS_GL_ATI_vertex_array_object && ext.CS_GL_ATI_vertex_attrib_array_object)
   {
     csVaoRenderBufferManager* bm = new csVaoRenderBufferManager();
     bm->Initialize(this);

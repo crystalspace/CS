@@ -99,7 +99,8 @@ private:
   csGLTextureCache *txtcache;
   csGLTextureManager *txtmgr;
 
-  bool color_enabled;
+  bool color_red_enabled, color_green_enabled, color_blue_enabled, 
+    alpha_enabled;
   int current_drawflags;
   int current_shadow_state;
   csZBufMode current_zmode;
@@ -303,15 +304,24 @@ public:
   /// Drawroutine. Only way to draw stuff
   void DrawMesh (csRenderMesh* mymesh);
 
-  /// Enables writing of color values to framebuffer
-  virtual void EnableColorWrite ()
-    { color_enabled = true;
-      glColorMask (GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE); }
+  /// Set the masking of color and/or alpha values to framebuffer
+  virtual void SetWriteMask (bool red, bool green, bool blue, bool alpha)
+  { 
+    color_red_enabled = red;
+    color_green_enabled = green;
+    color_blue_enabled = blue;
+    alpha_enabled = alpha;
+    glColorMask (red, green, blue, alpha); 
+  }
 
-  /// Disables writing of color values to framebuffer
-  virtual void DisableColorWrite ()
-    { color_enabled = false;
-      glColorMask (GL_FALSE, GL_FALSE, GL_FALSE, GL_FALSE); }
+  virtual void GetWriteMask (bool &red, bool &green, bool &blue, bool &alpha)
+  {
+    red = color_red_enabled;
+    green = color_green_enabled;
+    blue = color_blue_enabled;
+    alpha = alpha_enabled;
+  }
+
 
   /// Enables offsetting of Z values
   virtual void EnableZOffset ()

@@ -331,11 +331,11 @@ struct iRender3D : public iBase
   /// Drawroutine. Only way to draw stuff
   virtual void DrawMesh (csRenderMesh* mymesh) = 0;
 
-  /// Enables writing of color values to framebuffer
-  virtual void EnableColorWrite () = 0;
+  /// Set the masking of color and/or alpha values to framebuffer
+  virtual void SetWriteMask (bool red, bool green, bool blue, bool alpha) = 0;
 
-  /// Disables writing of color values to framebuffer
-  virtual void DisableColorWrite () = 0;
+  /// Get the masking of color and/or alpha values to framebuffer
+  virtual void GetWriteMask (bool &red, bool &green, bool &blue, bool &alpha) = 0;
 
   /// Enables offsetting of Z values
   virtual void EnableZOffset () = 0;

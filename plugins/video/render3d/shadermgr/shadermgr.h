@@ -31,6 +31,7 @@
 #include "iutil/string.h"
 #include "iutil/comp.h"
 
+#include "ivideo/render3d.h"
 #include "ivideo/shader/shader.h"
 
 class csShaderManager : public iShaderManager
@@ -110,36 +111,7 @@ public:
   } * scfiEventHandler;
 };
 
-/*class csShaderVariable : public iShaderVariable
-{
-private:
-  csString name;
 
-  int type;
-
-  int intval; //0
-  csRef<iString> istring; //1
-  csVector3 v3; //2
-
-public:
-  SCF_DECLARE_IBASE;
-
-  csShaderVariable()
-  {
-    type = 0;
-  }
-  virtual void SetName(const char* name) { csShaderVariable::name = csString(name); }
-  virtual const char* GetName() { return name; }
-  virtual bool GetValue(int& value) { if(type==0) {value = intval; return true;} return false; }
-  virtual bool GetValue(iString* value) { if(type==1) {value = istring; return true;} return false; }
-  virtual bool GetValue(csVector3& value) { if(type==2) {value = v3; return true;} return false; }
-//  virtual bool GetValue(csVector4* value);
-  virtual bool SetValue(int value) { type=0; intval = value; return true; }
-  virtual bool SetValue(iString* value) { type=1; istring = value; return true; }
-  virtual bool SetValue(csVector3 value) { type=2; v3 = value; return true; }
-//  virtual bool SetValue(csVector4* value);
-};
-*/
 class csShader : public iShader
 {
 private:
@@ -285,12 +257,20 @@ private:
   {
     XMLTOKEN_DECLARE,
     XMLTOKEN_VP,
-    XMLTOKEN_FP
+    XMLTOKEN_FP,
+    XMLTOKEN_WRITEMASK
   };
 
   csStringHash xmltokens;
   void BuildTokenHash();
 
+  // writemask
+  bool writemaskRed, writemaskGreen, writemaskBlue, writemaskAlpha;
+
+  // writemask before we changed it, restor to this in deactivate
+  bool OrigWMRed, OrigWMGreen, OrigWMBlue, OrigWMAlpha;
+  
+  csRef<iRender3D> r3d;
 public:
   SCF_DECLARE_IBASE;
 
@@ -299,9 +279,14 @@ public:
   csShaderPass(csShaderTechnique* owner, iObjectRegistry* reg)
   {
     SCF_CONSTRUCT_IBASE( NULL );
+    r3d = CS_QUERY_REGISTRY (reg, iRender3D);
     vp = 0; fp = 0;
     parent = owner;
     objectreg = reg;
+    writemaskRed = true;
+    writemaskGreen = true;
+    writemaskBlue = true;
+    writemaskAlpha = true;
   }
   virtual ~csShaderPass () {}
 
@@ -329,6 +314,8 @@ public:
   /// Activate
   virtual void Activate(csRenderMesh* mesh)
   {
+    r3d->GetWriteMask (OrigWMRed, OrigWMGreen, OrigWMBlue, OrigWMAlpha);
+    r3d->SetWriteMask (writemaskRed, writemaskGreen, writemaskBlue, writemaskAlpha);
     if(vp) vp->Activate(this, mesh);
     if(fp) fp->Activate(this, mesh);
   }
@@ -338,6 +325,7 @@ public:
   {
     if(vp) vp->Deactivate(this, mesh);
     if(fp) fp->Deactivate(this, mesh);
+    r3d->SetWriteMask (OrigWMRed, OrigWMGreen, OrigWMBlue, OrigWMAlpha);
   }
 
   /// Add a variable to this context
