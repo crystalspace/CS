@@ -324,7 +324,7 @@ awsManager::Print(iGraphics3D *g3d, uint8 Alpha)
   UpdateStore();
 
   int i;
-  csRect clip(0,0,g3d->GetWidth(),g3d->GetHeight());
+  csRect clip(0,0,g3d->GetWidth()-1,g3d->GetHeight()-1);
 
   updatestore.ClipTo(clip);
   
