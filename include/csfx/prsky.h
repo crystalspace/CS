@@ -49,6 +49,8 @@ public:
 
   /// methods for the Sky parent - get the g2d
   iGraphics2D* GetG2D() const {return ptG2D;}
+  /// get the g3d
+  iGraphics3D* GetG3D() const {return ptG3D;}
   /// get the texture manager (used for encoding colors)
   iTextureManager* GetTextureManager() const {return ptTxtMgr;}
   /// get the width of this texture

@@ -295,6 +295,9 @@ void csProcSky::DrawToTexture(csProcSkyTexture *skytex)
   iGraphics2D *g2d = skytex->GetG2D();
   iTextureManager *txtmgr = skytex->GetTextureManager();
 
+  if (!skytex->GetG3D()->BeginDraw (CSDRAW_2DGRAPHICS))
+    return;
+
   csVector3 texelu = txtu / float(width);
   csVector3 texelv = txtv / float(height);
   csVector3 spot, isect;
@@ -338,5 +341,8 @@ void csProcSky::DrawToTexture(csProcSkyTexture *skytex)
       int col = txtmgr->FindRGB(r, g, b);
       g2d->DrawPixel(x,y,col);
     }
+
+  skytex->GetG3D()->FinishDraw();
+  skytex->GetG3D()->Print(NULL);
 }
 
