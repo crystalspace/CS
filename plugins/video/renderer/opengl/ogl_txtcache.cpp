@@ -16,6 +16,8 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
+#include "sysdef.h"
+
 #if defined(OS_WIN32)
 #include <windows.h>
 #endif
@@ -23,7 +25,6 @@
 #include <GL/gl.h>
 #include <GL/glu.h>
 
-#include "sysdef.h"
 #include "cs3d/opengl/ogl_txtcache.h"
 #include "cs3d/opengl/ogl_txtmgr.h"
 #include "cs3d/opengl/ogl_hicache.h"

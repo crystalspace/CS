@@ -16,9 +16,10 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
+#include "sysdef.h"
+
 #ifdef OS_WIN32
 
-#include "sysdef.h"
 #include "csgeom/math3d.h"
 #include "cssys/common/system.h"
 #include "cssys/win32/win32.h"

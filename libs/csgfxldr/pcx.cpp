@@ -19,11 +19,13 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+
+#include "sysdef.h"
+
 #ifndef OS_WIN32
 #include <unistd.h>
 #endif
 
-#include "sysdef.h"
 #include "types.h"
 
 typedef struct
