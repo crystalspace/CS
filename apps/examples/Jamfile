@@ -1,4 +1,3 @@
 SubDir TOP apps examples ;
 
 SubInclude TOP apps examples cswseng ;
-SubInclude TOP apps examples simplevp ;

@@ -9,6 +9,14 @@ chronological order.
 3-Feb-2004
 	- Eric Sunshine fixed syntax error in aws.mak introduced yesterday
 	  which manifested when running 'msvcgen' targets.
+	- Jorrit removed the obsolete simplevp application.
+	- Jorrit enabled csVideoPreferences compilation with NR. It seems
+	  to compile fine without changes. This also fixes compilation
+	  of simpvs. Note that simpvs with OpenGL still crashes though.
+	  simpvs with software works fine. 'simpvs' with NR crashes even
+	  earlier before showing the AWS dialog.
+	- Jorrit fixed csVideoPreferences so it no longer uses the VFS
+	  /this path.
 	- Eric Sunshine worked around more fallout from recent changes to the
 	  Jam build facility.  Jambase in Jam 2.4 incorrectly defines RANLIB as
 	  "" on MacOS/X, and this bogus setting overrides the `RANLIB ?=

@@ -37,8 +37,6 @@
 #include "ivideo/fontserv.h"
 #include "ivideo/txtmgr.h"
 
-#ifndef CS_USE_NEW_RENDERER
-
 csVideoPreferences::csVideoPreferences ()
 {
   object_reg = 0;
@@ -257,7 +255,7 @@ bool csVideoPreferences::SetupWindow ()
   aws->GetSinkMgr ()->RegisterSink ("VidPrefsSink", sink);
 
   // now load preferences
-  if (!aws->GetPrefMgr()->Load ("/this/data/temp/vidprefs.def"))
+  if (!aws->GetPrefMgr()->Load ("/temp/vidprefs.def"))
   {
     csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
       "crystalspace.tools.vidprefs",
@@ -331,4 +329,3 @@ void csVideoPreferences::SetOpenGL (void* vp, iAwsSource* source)
   vidprefs->SetOpenGLL (source);
 }
 
-#endif // CS_USE_NEW_RENDERER
