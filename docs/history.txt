@@ -1,6 +1,15 @@
 The history order is reversed so that new features are at the top.
 
 3-Feb-2003
+	- Eric Sunshine replaced fabsf() with fabs() in terrbig plugin for
+	  improved portability since not all platforms have fabsf().  (An
+	  alternate solution would be to check for fabsf via configure.  We
+	  will probably want to do this in the future.)
+	- Eric Sunshine fixed bugs in the new pthread RECURSIVE_NP check which
+	  was recently added to configure.ac:
+	    - Was incorrectly using "==" rather than "=" in a `test'
+	      conditional.
+	    - Was passing incorrect flags to CS_CHECK_BUILD().
 	- OpenGL: Removed the unlit superlightmap. This is not needed anymore.
 	- OpenGL: Added code to detect the optimal size for the super lightmap.
 	- Removed the ExtraBright option in opengl.cfg. Wasn't working anyway.
@@ -16,16 +25,20 @@ The history order is reversed so that new features are at the top.
 	- Changed Video.OpenGL.SuperLightMapNum to SuperLightMapNum0,
 	  SuperLightMapNum1, SuperLightMapNum2, and SuperLightMapNum3.
 	  With these you can set the sizes of the four queues.
+	- Eric Sunshine made the following changes to configure's OpenGL tests:
+	    - Now checks for opengl32 and cousins before libGL and libMesaGL.
+	      Hopefully this will work around problems experienced by Cygwin
+	      users who have Mesa installed.  The problem is that Mesa seems to
+	      be compiled without __stdcall, yet the header found by CS
+	      contains __stdcall.  This mismatch leads to linkage errors.
+	      Also, Cygwin users report that using opengl32 works properly.
+	    - On Unix, now prefers the vendor's OpenGL over Mesa.  Hopefully
+	      this will work around some problems reported by users when Mesa
+	      was used rather than the vendor's implementation.
+	    - Now uses the pthread flags if present when attempting to resolve
+	      the OpenGL library since some users have reported that Mesa's
+	      OpenGL library references pthread functions.
 2-Feb-2002
-	- Eric Sunshine replaced fabsf() with fabs() in terrbig plugin for
-	  improved portability since not all platforms have fabsf().  (An
-	  alternate solution would be to check for fabsf via configure.  We
-	  will probably want to do this in the future.)
-	- Eric Sunshine fixed bugs in the new pthread RECURSIVE_NP check which
-	  was recently added to configure.ac:
-	    - Was incorrectly using "==" rather than "=" in a `test'
-	      conditional.
-	    - Was passing incorrect flags to CS_CHECK_BUILD().
 	- Optimization with polygon buffers (DrawPolygonMesh) in OpenGL
 	  renderer. They use less memory now and they are also more efficient.
 	- Cleaned up some unused code in ogl_g3dcom.cpp.
