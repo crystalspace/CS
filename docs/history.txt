@@ -79,6 +79,19 @@ The history order is reversed so that new features are at the top.
 	  caused 'make' to show the description of both plugins
 	  misaligned compared to all the others! Lucky I catched this bug
 	  in time before it did any major harm.
+11-Nov-2001
+	- Wouter Wijngaards gave stars mesh a code filler. It works but it
+	  is extremely slow. It does use boxes to clip away stars, and
+	  seeding to no avail.
+	- Added a starfield to csdemo. It looks mer like space dust that
+	  is flying by the camera. Good framerates by restricting the maximum
+	  distance of visibility and density.
+10-Nov-2001
+	- Wouter Wijngaards added documentation to the cs-config HOWTO for
+	  the new plugin-capable template makefile. Also fixed the template
+	  makefile depend target.
+	- 'res' added a request to canvas to perform extensionk
+	  'configureopengl'.
 9-Nov-2001
 	- Reverted the SCF changes made to scfFactory yesterday since they
 	  completely break CS. The problem seems to be when attempting
@@ -189,6 +202,14 @@ The history order is reversed so that new features are at the top.
 	  scfSharedLibrary objects more sane (and less insane).  Also fixed a
 	  bug where scfFactory was decrementing the reference count of the
 	  scfSharedLibrary one too many times.
+	- 'res' moved the windows icon in apps/win32 to libs/cssys/win32/rsrc.
+	- 'res' removed csInitializer::SetupCommandLineParser() and added
+	  new parameters for csInitializer::CreateEnvironment() (argc and
+	  argv).
+	- 'res' added a facility to the OpenGL renderer to detect different
+	  hardware and use different configs.
+	- 'res' fixed the windows port so that it uses the commandline parser
+	  to read -noconsole option.
 7-Nov-2001
 	- Eric Sunshine fixed simpcon.cpp so that it now uses an octal
 	  character constant for cursor assignment, rather than using an 8-bit
@@ -225,6 +246,17 @@ The history order is reversed so that new features are at the top.
 	      of CS_QUERY_REGISTRY() was changed.  Several places in the code
 	      were accessing SCF objects _after_ DecRef() had been called.
 	      This is a big No-No.
+	- Matze fixed config scripts to remove temp files on cygwin too.
+	- Matze fixed cs-config issues on older shells.
+	- Matze fixed cygwin port and csFileDialog.
+	- Christopher Nelson did the following:
+            - Fixed some bugs that were causing very busy or detailed
+	      textures to look bad on windows because they weren't being
+	      aligned properly. Everything now looks much better.
+	    - Made lots of bug fixes (redraw, resize, etc.)
+	    - Fixed window frame so that it's better looking now when textured.
+	    - Made some changes to the defintions file and texture file to
+	      help me fix alignment and visual bugs.
 6-Nov-2001
 	- Eric Sunshine fixed the derivation of Win32Assistant.  It was
 	  incorrectly inheriting iEventPlug and iEventHandler privately, rather
