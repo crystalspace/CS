@@ -29,6 +29,13 @@ The history order is reversed so that new features are at the top.
 	- Andreas Busch modified the documentation for all meshobjects
 	  from old syntax to XML. The thing documentation needs a big
 	  review, and Texinfo box-warnings need to be checked.
+	- Eric Sunshine augmented the configure script to emit
+	  CS_UNIX_PLUGIN_REQUIRES_MAIN to volatile.h for Unix platforms.  Note
+	  that it emits this based upon the broad assumption that Unix
+	  platforms will require it.  In the future, we need to perform a real
+	  check.
+	- Eric Sunshine repaired overfull hbox warnings reported by TeX in
+	  xmlfmt.txi.
 12-Jan-2002
 	- Started work on new map format document.
 	- Eric Sunshine silenced some warning messages from ActiveState Perl

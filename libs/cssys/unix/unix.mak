@@ -93,7 +93,7 @@ endif
 
 # Flags for the compiler which are used when building a shared library.
 ifndef CFLAGS.DLL
-  CFLAGS.DLL = $(CFLAGS.D)CS_UNIX_PLUGIN_REQUIRES_MAIN
+  CFLAGS.DLL =
 endif
 
 # General flags for the linker which are used in any case.

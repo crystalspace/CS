@@ -1334,6 +1334,32 @@ AC_LANG_POP([C])
 
 
 #------------------------------------------------------------------------------
+# Determine if plugin modules must implement main().  This is needed on some
+# platforms to ensure that global constructors and functions which initialize
+# global variables in the plugin module get invoked.
+#
+# @@@ FIXME: Currently, we answer this question by making the (potentially
+# incorrect) assumption that plugins on platforms other than Windows, MacOS/X,
+# and Darwin require main().  In the future, we should use a proper test to
+# make this determination.
+#------------------------------------------------------------------------------
+AC_DEFUN([CS_SYS_PLUGIN_MAIN],
+    [AC_REQUIRE([AC_CANONICAL_HOST])
+    AC_CACHE_CHECK([if plugins require main()], [cs_cv_sys_plugin_main],
+	[case $host_os in
+	    mingw*|cygwin*) cs_cv_sys_plugin_main=no ;;
+	    darwin*) cs_cv_sys_plugin_main=no ;;
+	    # Everything else is assumed to be Unix or Unix-like.
+	    *) cs_cv_sys_plugin_main=yes ;;
+	esac])
+    AS_IF([test $cs_cv_sys_plugin_main = yes],
+	[CS_HEADER_PROPERTY([CS_UNIX_PLUGIN_REQUIRES_MAIN])])])
+
+CS_SYS_PLUGIN_MAIN
+
+
+
+#------------------------------------------------------------------------------
 # Determine host platform.  Recognized families: Unix, Windows, MacOS/X.
 #
 # CS_CHECK_HOST

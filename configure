@@ -14031,6 +14031,41 @@ ac_compiler_gnu=$ac_cv_c_compiler_gnu
 
 
 #------------------------------------------------------------------------------
+# Determine if plugin modules must implement main().  This is needed on some
+# platforms to ensure that global constructors and functions which initialize
+# global variables in the plugin module get invoked.
+#
+# @@@ FIXME: Currently, we answer this question by making the (potentially
+# incorrect) assumption that plugins on platforms other than Windows, MacOS/X,
+# and Darwin require main().  In the future, we should use a proper test to
+# make this determination.
+#------------------------------------------------------------------------------
+
+
+
+    echo "$as_me:$LINENO: checking if plugins require main()" >&5
+echo $ECHO_N "checking if plugins require main()... $ECHO_C" >&6
+if test "${cs_cv_sys_plugin_main+set}" = set; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+else
+  case $host_os in
+	    mingw*|cygwin*) cs_cv_sys_plugin_main=no ;;
+	    darwin*) cs_cv_sys_plugin_main=no ;;
+	    # Everything else is assumed to be Unix or Unix-like.
+	    *) cs_cv_sys_plugin_main=yes ;;
+	esac
+fi
+echo "$as_me:$LINENO: result: $cs_cv_sys_plugin_main" >&5
+echo "${ECHO_T}$cs_cv_sys_plugin_main" >&6
+    if test $cs_cv_sys_plugin_main = yes; then
+  cs_header_text="${cs_header_text}#define CS_UNIX_PLUGIN_REQUIRES_MAIN
+"
+fi
+
+
+
+
+#------------------------------------------------------------------------------
 # Determine host platform.  Recognized families: Unix, Windows, MacOS/X.
 #
 # CS_CHECK_HOST
