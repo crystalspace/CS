@@ -116,6 +116,16 @@ public:
   }
 
   /**
+   * Sets the values of the control point at index idx.
+   */
+  void SetIndexValues (int idx, float* d);
+  
+  /**
+   * Gets the values of the control point at index idx.
+   */
+  float* GetIndexValues (int idx);
+  
+  /**
    * Calculate internal values for this spline given some time value.
    */
   virtual void Calculate (float time) = 0;
@@ -221,4 +231,3 @@ public:
 /** @} */
 
 #endif // __CS_SPLINE_H__
-

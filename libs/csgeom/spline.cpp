@@ -134,6 +134,21 @@ void csSpline::SetDimensionValue (int dim, int idx, float d)
   precalculation_valid = false;
 }
 
+void csSpline::SetIndexValues (int idx, float* d)
+{
+  for (int a=0; a<GetDimensionCount(); ++a)
+    points[a * num_points + idx] = d[a];
+  precalculation_valid = false;
+}
+
+float* csSpline::GetIndexValues (int idx)
+{
+  float *p = new float[GetDimensionCount()];
+  for (int a=0; a<GetDimensionCount(); ++a)
+    p[a] = points[a * num_points + idx];
+  return p;
+}
+
 //---------------------------------------------------------------------------
 csCubicSpline::csCubicSpline (int d, int p) :
   csSpline(d, p)

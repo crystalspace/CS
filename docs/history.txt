@@ -36,6 +36,8 @@ chronological order.
 	- res augmented the glwin32 canvas to also determine the version of 
 	  the GL driver DLL. This version can be used for comparisons in the
 	  driver database.
+	- aarobber extended csSpline to allow for specifying/accessing of data
+	  per control point and not just per dimension.
 16-Jun-2004
 	- Jorrit cleaned up stencil clipping in the NR/OpenGL renderer.
 	  Now mask 128 is used for both stencil clipping and floating portals
