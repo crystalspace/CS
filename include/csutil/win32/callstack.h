@@ -27,7 +27,7 @@ class CS_CSUTIL_EXPORT cswinCallStackHelper
 {
 public:
   static csCallStack* CreateCallStack (HANDLE hProc, HANDLE hThread,
-    CONTEXT& context, uint skip = 0);
+    CONTEXT& context, int skip = 0);
 };
 
 #endif // __CS_UTIL_WIN32_CALLSTACK_H__

@@ -226,7 +226,7 @@ public:
 
 static SymInitializer symInit;
 
-csCallStack* csCallStackHelper::CreateCallStack (uint skip)
+csCallStack* csCallStackHelper::CreateCallStack (int skip)
 {
   HANDLE hProc = GetCurrentProcess ();
   HANDLE hThread = GetCurrentThread ();
@@ -243,7 +243,7 @@ csCallStack* csCallStackHelper::CreateCallStack (uint skip)
 csCallStack* cswinCallStackHelper::CreateCallStack (HANDLE hProc, 
 						    HANDLE hThread,
 						    CONTEXT& context, 
-						    uint skip)
+						    int skip)
 {
   if (!DbgHelp::SymSupportAvailable()) return 0;
 
@@ -256,7 +256,7 @@ csCallStack* cswinCallStackHelper::CreateCallStack (HANDLE hProc,
   frame.AddrFrame.Offset = context.Ebp;
   frame.AddrFrame.Mode = AddrModeFlat;
 
-  uint count = 0;
+  int count = 0;
   cswinCallStack* stack = new cswinCallStack;
   while (DbgHelp::StackWalk64 (IMAGE_FILE_MACHINE_I386, hProc,
     hThread, &frame, &context, 0, DbgHelp::SymFunctionTableAccess64, 

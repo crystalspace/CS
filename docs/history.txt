@@ -59,6 +59,7 @@ chronological order.
 	  contain some extra useful info and set up an exception handler 
 	  (which creates such minidumps).
 	- res augmented walktest to create such minidumps.
+	- res fixed some gcc warnings & errors in the minidump code.
 25-Apr-2004
 	- Jorrit changed the way render priorities work in the engine. The
 	  RenderQueues field no longer contains all meshes for all render

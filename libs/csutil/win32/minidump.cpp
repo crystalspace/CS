@@ -36,7 +36,7 @@
 #include "csutil/win32/minidump.h"
 #include "csutil/memfile.h"
 
-#include <winuser.h>
+#include <windows.h>
 #include <tlhelp32.h>
 
 static void WriteRangeInfo (HANDLE tempFile, HANDLE rangeFile, 
@@ -395,8 +395,8 @@ const char* cswinMinidumpWriter::WriteWrappedMinidump (
     char tempPath[MAX_PATH];
     GetTempPath (sizeof (tempPath), tempPath);
     static char reportName[MAX_PATH+32];
-    cs_snprintf (reportName, sizeof (reportName), "%s\\cscrash%u.zip", tempPath, 
-      GetCurrentProcessId ());
+    cs_snprintf (reportName, sizeof (reportName), "%s\\cscrash%u.zip", 
+      tempPath, (uint)GetCurrentProcessId ());
 
     csArchive* reportZip = new csArchive (reportName);
     CopyPhysicalToArchive (dumpFileName, reportZip, "crash.dmp");

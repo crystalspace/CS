@@ -54,7 +54,7 @@ public:
 class CS_CSUTIL_EXPORT csCallStackHelper
 {
 public:
-  static csCallStack* CreateCallStack (uint skip = 0);
+  static csCallStack* CreateCallStack (int skip = 0);
 };
 
 #endif // __CS_UTIL_CALLSTACK_H__
