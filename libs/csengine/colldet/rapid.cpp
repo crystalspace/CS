@@ -99,18 +99,18 @@ float csRAPIDCollider::minBBoxDiam     = 0.0;
 Moment *Moment::stack = 0;
 
 csRAPIDCollider::csRAPIDCollider (csObject &parent, csPolygonSet *ps) :
-    csCollider(parent)
+    csCollider (parent)
 {
-  PolygonInitialize(ps);
+  PolygonInitialize (ps);
 }
 
 csRAPIDCollider::csRAPIDCollider (csPolygonSet *ps) :
-    csCollider(*ps)
+    csCollider (*ps)
 {
-  PolygonInitialize(ps);
+  PolygonInitialize (ps);
 }
 
-void csRAPIDCollider::PolygonInitialize(csPolygonSet *ps)
+void csRAPIDCollider::PolygonInitialize (csPolygonSet *ps)
 {
 //    m_ColliderType = POLYGONSET;
 //    m_pPolygonSet = ps;
@@ -121,6 +121,8 @@ void csRAPIDCollider::PolygonInitialize(csPolygonSet *ps)
   int i;
   int tri_count = 0;
   // first, count the number of triangles polyset contains
+  // @@@ If the csPolygonSet is the static thing then we
+  // should use the original polygons and not the BSP split polygons.
   for (i = 0; i < ps->GetNumPolygons () ; i++)
   {
     csPolygon3D *p = ps->GetPolygon3D (i);
@@ -145,8 +147,7 @@ void csRAPIDCollider::PolygonInitialize(csPolygonSet *ps)
         int *vt = p->GetVertices ().GetVertexIndices ();
         for (int v = 2; v < p->GetVertices ().GetNumVertices (); v++)
         {
-          m_pCollisionModel->AddTriangle (v - 2, 
-                                          ps->Vwor (vt [v - 1]),
+          m_pCollisionModel->AddTriangle (ps->Vwor (vt [v - 1]),
                                           ps->Vwor (vt [v]), 
                                           ps->Vwor (vt [0]));
         }
@@ -170,7 +171,7 @@ csRAPIDCollider::csRAPIDCollider (csSprite3D *sp) :
   Sprite3DInitialize(sp);
 }
 
-void csRAPIDCollider::Sprite3DInitialize(csSprite3D *sp)
+void csRAPIDCollider::Sprite3DInitialize (csSprite3D *sp)
 {
 //    m_ColliderType = SPRITE3D;
 //    m_pSprite3d    = sp;
@@ -194,18 +195,15 @@ void csRAPIDCollider::Sprite3DInitialize(csSprite3D *sp)
     return;  // Error
   }
 
-  m_pCollisionModel->m_pBoxes          = NULL;
-  m_pCollisionModel->m_NumBoxesAlloced = 0;
-
   for (int i = 0; i < mesh->GetNumTriangles (); i++)
   {
     int v[3];
     v[0] = mesh->GetTriangles () [i].a;
     v[1] = mesh->GetTriangles () [i].b;
     v[2] = mesh->GetTriangles () [i].c;
-    m_pCollisionModel->AddTriangle (i, object_vertices[v [0]], 
-                                       object_vertices[v [1]],
-                                       object_vertices[v [2]]);
+    m_pCollisionModel->AddTriangle (object_vertices[v [0]], 
+                                    object_vertices[v [1]],
+                                    object_vertices[v [2]]);
   }
 
   m_pCollisionModel->BuildHierarchy();
@@ -715,7 +713,8 @@ int add_collision (csCdTriangle *tr1, csCdTriangle *tr2)
   return false;
 }
 
-int obb_disjoint (csMatrix3 B, csVector3 T, csVector3 a, csVector3 b)
+int obb_disjoint (const csMatrix3& B, const csVector3& T,
+	const csVector3& a, const csVector3& b)
 {
   register float t, s;
   register int r;
@@ -842,7 +841,8 @@ int obb_disjoint (csMatrix3 B, csVector3 T, csVector3 a, csVector3 b)
 }
 
 
-int csRAPIDCollider::CollideRecursive (csCdBBox *b1, csCdBBox *b2, csMatrix3 R, csVector3 T)
+int csRAPIDCollider::CollideRecursive (csCdBBox *b1, csCdBBox *b2,
+	const csMatrix3& R, const csVector3& T)
 {
   int rc;      // return codes
   if (csRAPIDCollider::firstHit && (csRAPIDCollider::numHits > 0))

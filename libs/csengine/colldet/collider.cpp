@@ -20,7 +20,8 @@
 #include "sysdef.h"
 #include "csengine/collider.h"
 
-csCollider::csCollider (csObject &parent) {
+csCollider::csCollider (csObject &parent)
+{
   parent.ObjAdd(this);
 }
 

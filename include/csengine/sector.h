@@ -249,8 +249,8 @@ public:
 
   /**
    * Follow a beam from start to end and return the first polygon that
-   * is hit. This function correctly traverse portals but not space
-   * warping portals.
+   * is hit. This function correctly traverse portals and space warping
+   * portals.
    */
   csPolygon3D* HitBeam (csVector3& start, csVector3& end);
 

@@ -134,14 +134,7 @@ csVector2 coord_check_vector;
 
 void select_object (csRenderView* rview, int type, void* entity)
 {
-  static csPolygon3D* last_poly = NULL;
-
-  if (type == CALLBACK_POLYGON)
-  {
-    // Here we depend on CALLBACK_POLYGON being called right before CALLBACK_POLYGON2D.
-    last_poly = (csPolygon3D*)entity;
-  }
-  else if (type == CALLBACK_POLYGON2D)
+  if (type == CALLBACK_POLYGON2D)
   {
     int i;
     csPolygon2D* polygon = (csPolygon2D*)entity;
@@ -155,19 +148,7 @@ void select_object (csRenderView* rview, int type, void* entity)
         pp->AddVertex  (polygon->GetVertices ()[i]);
     if (csMath2::InPoly2D (coord_check_vector, pp->GetVertices (),
         pp->GetNumVertices (), &pp->GetBoundingBox ()) != CS_POLY_OUT)
-    {
-      csPolygonSet* ps = (csPolygonSet*)(last_poly->GetParent ());
-      Sys->Printf (MSG_DEBUG_0, "Hit polygon '%s/%s'\n",
-        ps->GetName (), last_poly->GetName ());
       Dumper::dump (polygon, "csPolygon2D");
-      Dumper::dump (last_poly);
-      if (check_poly && !last_poly->GetPortal ())
-      {
-        if (Sys->selected_polygon == last_poly) Sys->selected_polygon = NULL;
-        else Sys->selected_polygon = last_poly;
-	//check_poly = false;
-      }
-    }
 
     CHK (delete pp);
   }

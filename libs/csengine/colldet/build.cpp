@@ -46,7 +46,7 @@ csCdModel::~csCdModel ()
   CHK (delete [] m_pTriangles);
 }
 
-bool csCdModel::AddTriangle (int id, const csVector3 &p1, const csVector3 &p2,
+bool csCdModel::AddTriangle (const csVector3 &p1, const csVector3 &p2,
   const csVector3 &p3)
 {
   // first make sure that we haven't filled up our allocation.
@@ -54,7 +54,6 @@ bool csCdModel::AddTriangle (int id, const csVector3 &p1, const csVector3 &p2,
     return false;
 
   // now copy the new tri into the array
-  m_pTriangles [m_NumTriangles].id = id;
   m_pTriangles [m_NumTriangles].p1 = p1;
   m_pTriangles [m_NumTriangles].p2 = p2;
   m_pTriangles [m_NumTriangles].p3 = p3;

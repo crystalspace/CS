@@ -223,8 +223,9 @@ public:
 
   /**
    * Follow a beam through this portal and return the polygon
-   * that it hits with.
-   * NOTE@@@! This function does not take proper care of space warping!
+   * that it hits with. This function properly acounts for space
+   * warping portals and also checks for infinite recursion (does
+   * not allow traversing the same sector more than five times).
    */
   virtual csPolygon3D* HitBeam (csVector3& start, csVector3& end);
 

@@ -126,7 +126,15 @@ bool csPortal::Draw (csPolygon2D* new_clipper, csPolygon3D* portal_polygon,
 
 csPolygon3D* csPortal::HitBeam (csVector3& start, csVector3& end)
 {
-  return sector->HitBeam (start, end);
+  if (sector->draw_busy >= 5)
+    return NULL;
+  if (do_warp_space)
+  {
+    csVector3 new_start = warp_wor.Other2This (start);
+    csVector3 new_end = warp_wor.Other2This (end);
+    return sector->HitBeam (new_start, new_end);
+  }
+  else return sector->HitBeam (start, end);
 }
 
 csPolygon3D* csPortal::IntersectSphere (csVector3& center, float radius, float* pr)

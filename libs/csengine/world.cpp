@@ -325,12 +325,12 @@ void csWorld::Clear ()
 {
   halos.DeleteAll ();
   collections.DeleteAll ();
+  particle_systems.DeleteAll ();
   while (sprites.Length () > 0)
     delete (csSprite*)sprites[0];
   sprite_templates.DeleteAll ();
   thing_templates.DeleteAll ();
   sectors.DeleteAll ();
-  particle_systems.DeleteAll ();
   CLights::DeleteAll ();
   camera_positions.DeleteAll ();
   int i;

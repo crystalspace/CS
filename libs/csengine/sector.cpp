@@ -198,33 +198,17 @@ void csSector::UseStaticTree (int mode, bool octree)
 csPolygon3D* csSector::HitBeam (csVector3& start, csVector3& end)
 {
   csVector3 isect;
-  csPolygon3D* p;
-
-  // First check the things of this sector and return the one with
-  // the closest distance.
-  csThing* sp = first_thing;
-  float sq_dist, min_sq_dist = 100000000.;
-  csPolygon3D* min_poly = NULL;
-  while (sp)
-  {
-    p = sp->IntersectSegment (start, end, isect);
-    if (p)
-    {
-      sq_dist = (isect.x-start.x)*(isect.x-start.x) +
-        (isect.y-start.y)*(isect.y-start.y) +
-        (isect.z-start.z)*(isect.z-start.z);
-      if (sq_dist < min_sq_dist) { min_sq_dist = sq_dist; min_poly = p; }
-    }
-    sp = (csThing*)(sp->GetNext ());
-  }
-
-  if (min_poly) return min_poly;
-
-  p = IntersectSegment (start, end, isect);
+  csPolygon3D* p = IntersectSegment (start, end, isect);
   if (p)
   {
     csPortal* po = p->GetPortal ();
-    if (po) return po->HitBeam (start, end);
+    if (po)
+    {
+      draw_busy++;
+      p = po->HitBeam (isect, end);
+      draw_busy--;
+      return p;
+    }
     else return p;
   }
   else return NULL;
@@ -247,15 +231,88 @@ void csSector::CreateLightMaps (iGraphics3D* g3d)
   }
 }
 
+
+/*
+ * @@@
+ * This function does not yet do anything but it should
+ * use the PVS as soon as we have that to make csSector::IntersectSegment
+ * even faster.
+ */
+bool IntersectSegmentCull (csPolygonTree* /*tree*/,
+	csPolygonTreeNode* /*node*/,
+	const csVector3& /*pos*/, void* /*data*/)
+{
+  return true;
+}
+
+struct ISectData
+{
+  csVector3 start, end;
+  csVector3 isect;
+  float r;
+};
+
+void* IntersectSegmentTestPol (csSector*,
+	csPolygonInt** polygon, int num, void* data)
+{
+  ISectData* idata = (ISectData*)data;
+  int i;
+  for (i = 0 ; i < num ; i++)
+  {
+    // @@@ What about other types of polygons?
+    if (polygon[i]->GetType () == 1)
+    {
+      csPolygon3D* p = (csPolygon3D*)polygon[i];
+      if (p->IntersectSegment (idata->start, idata->end, idata->isect, &(idata->r)))
+        return (void*)p;
+    }
+  }
+  return NULL;
+}
+
 csPolygon3D* csSector::IntersectSegment (const csVector3& start,
   const csVector3& end, csVector3& isect, float* pr)
 {
+  float r, best_r = 10000000000.;
+  csVector3 cur_isect;
+  csPolygon3D* best_p = NULL;
+
   csThing* sp = first_thing;
   while (sp)
   {
-    csPolygon3D* p = sp->IntersectSegment (start, end, isect, pr);
-    if (p) return p;
+    if (sp != static_thing)
+    {
+      csPolygon3D* p = sp->IntersectSegment (start, end, cur_isect, &r);
+      if (p && r < best_r)
+      {
+        best_r = r;
+	best_p = p;
+	isect = cur_isect;
+      }
+    }
     sp = (csThing*)(sp->GetNext ());
+  }
+
+  if (static_tree)
+  {
+    // Handle the octree.
+    ISectData idata;
+    idata.start = start;
+    idata.end = end;
+    void* rc = static_tree->Front2Back (start, IntersectSegmentTestPol,
+      (void*)&idata, IntersectSegmentCull, NULL);
+    if (rc && idata.r < best_r)
+    {
+      best_r = idata.r;
+      best_p = (csPolygon3D*)rc;
+      isect = idata.isect;
+    }
+  }
+
+  if (best_p)
+  {
+    if (pr) *pr = best_r;
+    return best_p;
   }
 
   return csPolygonSet::IntersectSegment (start, end, isect, pr);
@@ -279,7 +336,6 @@ csSector* csSector::FollowSegment (csReversibleTransform& t,
 
   return this;
 }
-
 
 csPolygon3D* csSector::IntersectSphere (csVector3& center, float radius,
   float* pr)

@@ -328,29 +328,6 @@ void csPolygonSet::AddCurve (csCurve* curve)
   curves.Push (curve);
 }
 
-
-struct IntersInfo
-{
-  const csVector3* start;
-  const csVector3* end;
-  csVector3* isect;
-  float* pr;
-};
-
-void* test_bsp_intersection (csSector*, csPolygonInt** polygon, int num,
-	void* data)
-{
-  IntersInfo* d = (IntersInfo*)data;
-  int i;
-  for (i = 0 ; i < num ; i++)
-  {
-    csPolygon3D* p = (csPolygon3D*)polygon[i];
-    if (p->IntersectSegment (*d->start, *d->end, *d->isect, d->pr))
-      return (void*)p;
-  }
-  return NULL;
-}
-
 csPolygon3D* csPolygonSet::IntersectSegment (const csVector3& start, 
   const csVector3& end, csVector3& isect, float* pr)
 {
@@ -464,7 +441,7 @@ void csPolygonSet::DrawPolygonArrayDPM (csPolygonInt** polygon, int num,
 {
   // @@@ We should include object 2 world transform here too like it
   // happens with sprites.
-  int i, j;
+  int i;
   csReversibleTransform tr_o2c = (*d);
   d->g3d->SetObjectToCamera (&tr_o2c);
   d->g3d->SetClipper (d->view->GetClipPoly (), d->view->GetNumVertices ());

@@ -1,8 +1,33 @@
 The history order has been reversed so that new features are at the top.
 
 11-Apr-2000
+	- Wouter Wijngaards fixed SHM problem on some versions of
+	  Solaris. If SHM fails it will automatically retry without
+	  SHM (X2d driver).
 	- Andrew Zabolotny added a SciTech MGL 2D driver (unfinished, won't
 	  compile).
+	- Andrew Zabolotny also did the following changes:
+	    - Added CAMERA keyword to the new loader. Not to the old one
+	      though.
+	    - Added named camera positions support in the engine. Now
+	      START (...) is just an alias for CAMERA 'Start'
+	      (POSITION (...))
+	- Moved deletion of particle systems before sprites so that
+	  we can't have crashes because of this.
+	- Did a little cleanup of the colldet stuff (i.e. mostly coding
+	  style and Doc++ comments).
+	- Fixed a bug with DrawPolygonFX/software which would crash
+	  for polygons that exceed screen size. It is still strange that
+	  this occurs though. Normally the engine should not let that
+	  through.
+	- Fixed csSector::IntersectSegment to support octree for faster
+	  checking. This also fixes FollowSegment.
+	- Rewrote csSector::HitBeam() to use the new IntersectSegment
+	  better. This function should now work better and faster than
+	  before. This is basicly the much requested TraceLine.
+	  HitBeam() also supports warping portals correctly now.
+	- Changed WalkTest to use the new HitBeam() function to click
+	  on objects.
 	- Eric Sunshine created a custom PHP script (cvssnap.php) which allows
 	  people to access the daily CVS snapshots via HTTP.  Previously they
 	  were only accessible via FTP.  Thus, CVS snapshots may now be

@@ -2163,6 +2163,10 @@ void csGraphics3DSoftware::DrawPolygonFX (G3DPolygonDPFX& poly)
       bot_y = poly.vertices [bot = i].sy;
   }
 
+  // If the polygon exceeds the screen, it is a engine failure
+  if (top_y > height || bot_y < 0)
+    return;
+
   float inv_dd = 1 / dd;
   int dz = QInt24 (((iz [0] - iz [last]) * (poly.vertices [1].sy - poly.vertices [last].sy)
                   - (iz [1] - iz [last]) * (poly.vertices [0].sy - poly.vertices [last].sy)) * inv_dd);

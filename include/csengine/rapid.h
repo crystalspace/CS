@@ -66,13 +66,6 @@
 /// A triangle, to be used in collision detection
 struct csCdTriangle
 {
-  /**
-    * an Identifier for the triangle. This will help to identify the 
-    * triangle, if it is returned to a higher level later on. This id 
-    * is assigned in csCdModel::AddTriangle()
-    */
-  int id;
-  
   /// The three edges of the triangle
   csVector3 p1, p2, p3;
 };
@@ -200,8 +193,7 @@ public:
   csCdBBox* GetTopLevelBox() {return &m_pBoxes[0];}
 
   /// Add a triangle to the model
-  bool AddTriangle (int              id, 
-                    const csVector3& p1, 
+  bool AddTriangle (const csVector3& p1, 
                     const csVector3& p2, 
                     const csVector3& p3);
 };

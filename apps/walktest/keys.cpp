@@ -2281,13 +2281,27 @@ bool WalkTest::HandleEvent (csEvent &Event)
         Sys->Printf (MSG_CONSOLE, "LMB down : cam:(%f,%f,%f) world:(%f,%f,%f)\n", v.x, v.y, v.z, vw.x, vw.y, vw.z);
         Sys->Printf (MSG_DEBUG_0, "LMB down : cam:(%f,%f,%f) world:(%f,%f,%f)\n", v.x, v.y, v.z, vw.x, vw.y, vw.z);
 
+	csSector* sector = view->GetCamera ()->GetSector ();
+	csVector3 origin = view->GetCamera ()->GetW2CTranslation ();
+	csPolygon3D* sel = sector->HitBeam (origin, origin + (vw-origin) * 10);
+	if (sel)
+	{
+          if (Sys->selected_polygon == sel) Sys->selected_polygon = NULL;
+          else Sys->selected_polygon = sel;
+          csPolygonSet* ps = (csPolygonSet*)(sel->GetParent ());
+          Sys->Printf (MSG_DEBUG_0, "Hit polygon '%s/%s'\n",
+            ps->GetName (), sel->GetName ());
+	  Dumper::dump (sel);
+	}
+
         extern csVector2 coord_check_vector;
         coord_check_vector.x = Event.Mouse.x;
         coord_check_vector.y = FRAME_HEIGHT-Event.Mouse.y;
-        extern bool check_poly, check_light;
+        extern bool check_light;
         extern void select_object (csRenderView* rview, int type, void* entity);
-        check_poly = check_light = true;
-	  view->GetWorld ()->DrawFunc (view->GetCamera (), view->GetClipper (), select_object);
+        check_light = true;
+	view->GetWorld ()->DrawFunc (view->GetCamera (), view->GetClipper (),
+		select_object);
       }
       break;
     case csevMouseMove:
