@@ -1,6 +1,6 @@
 /*
-    Crystal Space Virtual File System SCF interface
-    Copyright (C) 1999 by Andrew Zabolotny <bit@eltech.ru>
+    Crystal Space Shared String Vector class
+    Copyright (C) 1998,1999 by Andrew Zabolotny <bit@eltech.ru>
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -17,24 +17,59 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __CS_SCFSTRV_H_
-#define __CS_SCFSTRV_H_
+#ifndef __SCFSTRV_H__
+#define __SCFSTRV_H__
 
 #include "istrvec.h"
 #include "csutil/csstrvec.h"
 
-class scfStrVector : public csStrVector, public iStrVector
+/// This class is a thin wrapper around csStrVector with SCF capability
+class scfStrVector : public iStrVector
 {
-  typedef csStrVector superclass;
-public:
-  DECLARE_IBASE;
+  csStrVector *v;
 
-  scfStrVector (int ilimit = 64, int ithreshold = 64);
-  virtual int Length() const;
-  virtual char* Get (int n) const;
-  virtual int Find (const char*) const;
-  virtual int Push (char*);
-  virtual char* Pop();
+public:
+  DECLARE_IBASE
+
+  /// Create a iStrVector from scratch
+  scfStrVector (int iLimit = 16, int iDelta = 16)
+  { v = new csStrVector (iLimit, iDelta); }
+
+  /// Create a iStrVector from given csStrVector
+  scfStrVector (csStrVector *iSrc) : v (iSrc) {}
+
+  /// Destroy the iStrVector object
+  virtual ~scfStrVector ();
+
+  /// Query array length
+  virtual int Length ();
+
+  /// Push a string onto the stack
+  virtual void Push (char *iValue);
+
+  /// Pop a string from the top of stack
+  virtual char *Pop ();
+
+  /// Get Nth string in vector
+  virtual char *Get (int iIndex);
+
+  /// Find index of given string
+  virtual int Find (const char *iValue);
+
+  /// Find index of a string in a pre-sorted string array
+  virtual int FindSorted (const char *iValue);
+
+  /// Sort the string array
+  virtual void QuickSort ();
+
+  /// Delete Nth string in the array
+  virtual void Delete (int iIndex);
+
+  /// Insert a string before Nth string in the array
+  virtual void Insert (int iIndex, char *iValue);
+
+  /// Delete all strings in array
+  virtual void DeleteAll ();
 };
 
-#endif // __CS_SCFSTRV_H_
+#endif // __SCFSTRV_H__
