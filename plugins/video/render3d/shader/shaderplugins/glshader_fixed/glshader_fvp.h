@@ -36,6 +36,23 @@ public:
     TEXGEN_NONE = 0,
     TEXGEN_REFLECT_CUBE
   };
+  enum TexMatrixOpType
+  {
+    TexMatrixScale,
+    TexMatrixRotate,
+    TexMatrixTranslate,
+    TexMatrixMatrix
+  };
+  struct TexMatrixOp
+  {
+    TexMatrixOpType type;
+    csStringID valueVar;
+    csRef<csShaderVariable> valueVarRef;
+    csVector3 vectorValue;
+    csMatrix3 matrixValue;
+
+    TexMatrixOp() : valueVar(csInvalidStringID) { }
+  };
 private:
   csStringHash tokens;
 #define CS_TOKEN_ITEM_FILE \
@@ -72,9 +89,11 @@ private:
   struct layerentry
   {
     TEXGENMODE texgen;
-    csStringID constcolorvar; csRef<csShaderVariable> constcolorVarRef;
-    layerentry () : texgen(TEXGEN_NONE), 
-                    constcolorvar (csInvalidStringID) {}
+    csStringID constcolorvar; 
+    csRef<csShaderVariable> constcolorVarRef;
+    csArray<TexMatrixOp> texMatrixOps;
+
+    layerentry () : texgen(TEXGEN_NONE), constcolorvar (csInvalidStringID) {}
   };
 
   csArray<layerentry> layers;
@@ -83,6 +102,11 @@ private:
   csRef<csShaderVariable> primcolVarRef;
 
   bool validProgram;
+
+  bool ParseTexMatrixOp (iDocumentNode* node, 
+    TexMatrixOp& op, bool matrix = false);
+  bool ParseTexMatrix (iDocumentNode* node, 
+    csArray<TexMatrixOp>& matrixOps);
 public:
   csGLShaderFVP (csGLShader_FIXED* shaderPlug);
   virtual ~csGLShaderFVP ();

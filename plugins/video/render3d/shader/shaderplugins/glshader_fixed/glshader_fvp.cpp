@@ -177,7 +177,7 @@ void csGLShaderFVP::SetupState (
       v = csVector4 (0, 0, 0, 1);
     glLightModelfv (GL_LIGHT_MODEL_AMBIENT, (float*)&v);
 
-    glEnable (GL_LIGHTING);
+    statecache->Enable_GL_LIGHTING ();
     glDisable (GL_COLOR_MATERIAL);
   }
 
@@ -191,9 +191,9 @@ void csGLShaderFVP::SetupState (
       glTexGeni (GL_T, GL_TEXTURE_GEN_MODE, GL_REFLECTION_MAP_ARB);
       glTexGeni (GL_R, GL_TEXTURE_GEN_MODE, GL_REFLECTION_MAP_ARB);
 
-      glEnable (GL_TEXTURE_GEN_S);
-      glEnable (GL_TEXTURE_GEN_T);
-      glEnable (GL_TEXTURE_GEN_R);
+      statecache->Enable_GL_TEXTURE_GEN_S ();
+      statecache->Enable_GL_TEXTURE_GEN_T ();
+      statecache->Enable_GL_TEXTURE_GEN_R ();
 
       csReversibleTransform *t = &mesh->object2camera;
       const csMatrix3 &orientation = t->GetO2T();
@@ -223,7 +223,92 @@ void csGLShaderFVP::SetupState (
 
       glMatrixMode (GL_TEXTURE);
       glLoadMatrixf (mAutoTextureMatrix);
-    } 
+    }
+    if (layers[i].texMatrixOps.Length() > 0)
+    {
+      glMatrixMode (GL_TEXTURE);
+
+      for (int j = 0; j < layers[i].texMatrixOps.Length(); j++)
+      {
+	TexMatrixOp& op = layers[i].texMatrixOps[j];
+
+	if (op.valueVar != csInvalidStringID)
+	{
+	  if (!op.valueVarRef && 
+	      op.valueVar < (csStringID)stacks.Length () && 
+	      stacks[op.valueVar].Length () > 0)
+	    op.valueVarRef = stacks[op.valueVar].Top ();
+	}
+
+	switch (op.type)
+	{
+	  case TexMatrixScale:
+	    {
+	      csVector3 v;
+	      if (op.valueVarRef.IsValid())
+		op.valueVarRef->GetValue (v);
+	      else
+		v = op.vectorValue;
+
+	      glScalef (v.x, v.y, v.z);
+	    }
+	    break;
+	  case TexMatrixRotate:
+	    {
+	      csVector3 v;
+	      if (op.valueVarRef.IsValid())
+		op.valueVarRef->GetValue (v);
+	      else
+		v = op.vectorValue;
+
+	      glRotatef (v.x, 1.0f, 0.0f, 0.0f);
+	      glRotatef (v.y, 0.0f, 1.0f, 0.0f);
+	      glRotatef (v.z, 0.0f, 0.0f, 1.0f);
+	    }
+	    break;
+	  case TexMatrixTranslate:
+	    {
+	      csVector3 v;
+	      if (op.valueVarRef.IsValid())
+		op.valueVarRef->GetValue (v);
+	      else
+		v = op.vectorValue;
+
+	      glTranslatef (v.x, v.y, v.z);
+	    }
+	    break;
+	  case TexMatrixMatrix:
+	    {
+	      csMatrix3 m;
+	      if (op.valueVarRef.IsValid())
+		op.valueVarRef->GetValue (m);
+	      else
+		m = op.matrixValue;
+
+	      float matrix[16];
+	      matrix[0] = m.m11; 
+	      matrix[1] = m.m21; 
+	      matrix[2] = m.m31;
+
+	      matrix[4] = m.m12;
+	      matrix[5] = m.m22;
+	      matrix[6] = m.m32;
+
+	      matrix[8] = m.m13; 
+	      matrix[9] = m.m23; 
+	      matrix[10] = m.m33;
+
+	      matrix[3] = matrix[7] = matrix[11] = 0.0f;
+	      matrix[12] = matrix[13] = matrix[14] = 0.0f;
+	      matrix[15] = 1.0f;  
+
+	      glMultMatrixf (matrix);
+	    }
+	    break;
+	}
+      }
+    }
+
 
     var = layers[i].constcolorVarRef;
     if (!var && layers[i].constcolorvar != csInvalidStringID &&
@@ -265,23 +350,169 @@ void csGLShaderFVP::ResetState ()
     for (i = 0; i < lights.Length(); ++i)
       glDisable (GL_LIGHT0+lights[i].lightnum);
 
-    glDisable (GL_LIGHTING);
+    statecache->Disable_GL_LIGHTING ();
   }
 
   for (i=0; i<layers.Length (); i++)
   {
     statecache->SetActiveTU (i);
-    if (layers[i].texgen != TEXGEN_NONE)
+    if ((layers[i].texgen != TEXGEN_NONE) ||
+      (layers[i].texMatrixOps.Length() > 0))
     {
-      glDisable (GL_TEXTURE_GEN_S);
-      glDisable (GL_TEXTURE_GEN_T);
-      glDisable (GL_TEXTURE_GEN_R);
+      statecache->Disable_GL_TEXTURE_GEN_S ();
+      statecache->Disable_GL_TEXTURE_GEN_T ();
+      statecache->Disable_GL_TEXTURE_GEN_R ();
 
       glMatrixMode (GL_TEXTURE);
       glLoadIdentity ();
     }
   }
   statecache->SetActiveTU (0);
+}
+
+bool csGLShaderFVP::ParseTexMatrixOp (iDocumentNode* node, 
+				      TexMatrixOp& op, bool matrix)
+{
+  const char* type = node->GetAttributeValue ("type");
+  if (type == 0)
+  {
+    synsrv->Report ("crystalspace.graphics3d.shader.glfixed",
+      CS_REPORTER_SEVERITY_WARNING,
+      node,
+      "No 'type' attribute");
+    return false;
+  }
+  if (!matrix && (strcmp (type, "vector2") == 0))
+  {
+    float x, y;
+    const char* value = node->GetContentsValue();
+    if (!value)
+    {
+      synsrv->Report ("crystalspace.graphics3d.shader.glfixed",
+	CS_REPORTER_SEVERITY_WARNING,
+	node,
+	"Node has no contents");
+      return false;
+    }
+    if (sscanf (value, "%f,%f", &x, &y) != 2)
+    {
+      synsrv->Report ("crystalspace.graphics3d.shader.glfixed",
+	CS_REPORTER_SEVERITY_WARNING,
+	node,
+	"Couldn't parse vector2 '%s'", value);
+      return false;
+    }
+    op.vectorValue.Set (x, y, 0.0f);
+  }
+  else if (!matrix && (strcmp (type, "vector3") == 0))
+  {
+    float x, y, z;
+    const char* value = node->GetContentsValue();
+    if (!value)
+    {
+      synsrv->Report ("crystalspace.graphics3d.shader.glfixed",
+	CS_REPORTER_SEVERITY_WARNING,
+	node,
+	"Node has no contents");
+      return false;
+    }
+    if (sscanf (value, "%f,%f", &x, &y, &z) != 3)
+    {
+      synsrv->Report ("crystalspace.graphics3d.shader.glfixed",
+	CS_REPORTER_SEVERITY_WARNING,
+	node,
+	"Couldn't parse vector3 '%s'", value);
+      return false;
+    }
+    op.vectorValue.Set (x, y, z);
+  }
+  else if (matrix && (strcmp (type, "matrix") == 0))
+  {
+    if (!synsrv->ParseMatrix (node, op.matrixValue))
+      return false;
+    op.vectorValue.Set (0.0f);
+  }
+  else if (strcmp (type, "shadervar") == 0)
+  {
+    const char* value = node->GetContentsValue();
+    if (!value)
+    {
+      synsrv->Report ("crystalspace.graphics3d.shader.glfixed",
+	CS_REPORTER_SEVERITY_WARNING,
+	node,
+	"Node has no contents");
+      return false;
+    }
+    op.valueVar = strings->Request (value);
+  }
+  else 
+  {
+    synsrv->Report ("crystalspace.graphics3d.shader.glfixed",
+      CS_REPORTER_SEVERITY_WARNING,
+      node,
+      "Unknown type '%s'", type);
+    return false;
+  }
+  return true;
+}
+
+bool csGLShaderFVP::ParseTexMatrix (iDocumentNode* node, 
+				    csArray<TexMatrixOp>& matrixOps)
+{
+  csRef<iDocumentNodeIterator> it = node->GetNodes ();
+  while(it->HasNext())
+  {
+    csRef<iDocumentNode> child = it->Next();
+    if(child->GetType() != CS_NODE_ELEMENT) continue;
+    const char* value = child->GetValue ();
+    csStringID id = tokens.Request (value);
+    switch(id)
+    {
+      case XMLTOKEN_SCALE:
+	{
+	  TexMatrixOp newOp;
+	  newOp.type = TexMatrixScale;
+	  if (!ParseTexMatrixOp (child, newOp))
+	    return false;
+	  matrixOps.Push (newOp);
+	}
+	break;
+      case XMLTOKEN_ROTATE:
+	{
+	  TexMatrixOp newOp;
+	  newOp.type = TexMatrixRotate;
+	  if (!ParseTexMatrixOp (child, newOp))
+	    return false;
+	  matrixOps.Push (newOp);
+	}
+	break;
+      case XMLTOKEN_TRANSLATE:
+	{
+	  TexMatrixOp newOp;
+	  newOp.type = TexMatrixTranslate;
+	  if (!ParseTexMatrixOp (child, newOp))
+	    return false;
+	  matrixOps.Push (newOp);
+	}
+	break;
+      case XMLTOKEN_MATRIX:
+	{
+	  TexMatrixOp newOp;
+	  newOp.type = TexMatrixMatrix;
+	  if (!ParseTexMatrixOp (child, newOp, true))
+	    return false;
+	  matrixOps.Push (newOp);
+	}
+	break;
+      default:
+	{
+	  synsrv->ReportBadToken (child);
+	  return false;
+	}
+	break;
+    }
+  }
+  return true;
 }
 
 bool csGLShaderFVP::Load(iDocumentNode* program)
@@ -409,6 +640,36 @@ bool csGLShaderFVP::Load(iDocumentNode* program)
             }
           }
           break;
+	case XMLTOKEN_TEXMATRIX:
+	  {
+	    const char* dest = child->GetAttributeValue ("destination");
+	    if (!dest)
+	    {
+	      synsrv->Report ("crystalspace.graphics3d.shader.glfixed",
+		CS_REPORTER_SEVERITY_WARNING,
+		child,
+		"No 'destination' attribute");
+	      return false;
+	    }
+	    int unit = 0;
+	    if (sscanf (dest, "unit %d", &unit) != 1)
+	    {
+	      synsrv->Report ("crystalspace.graphics3d.shader.glfixed",
+		CS_REPORTER_SEVERITY_WARNING,
+		child,
+		"Unknown destination '%s'", dest);
+	      return false;
+	    }
+	    /*
+	     @@@ Would be nice to somehow utilize the 'Resolve TU' function 
+	         of the FP.
+	     */
+            if (layers.Length () <= unit)
+              layers.SetLength (unit + 1);
+	    if (!ParseTexMatrix (child, layers[unit].texMatrixOps))
+	      return false;
+	  }
+	  break;
         default:
 	  {
 	    switch (commonTokens.Request (value))
