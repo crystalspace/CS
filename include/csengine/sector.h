@@ -251,7 +251,8 @@ public:
   /**
    * Follow a beam from start to end and return the first polygon that
    * is hit. This function correctly traverse portals and space warping
-   * portals.
+   * portals. Normally the sector you call this on should be the sector
+   * containing the 'start' point.
    */
   csPolygon3D* HitBeam (const csVector3& start, const csVector3& end);
 
