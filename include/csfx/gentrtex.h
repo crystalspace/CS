@@ -23,7 +23,31 @@
 #include "csgeom/vector2.h"
 #include "csgfx/rgbpixel.h"
 struct iImage;
-class csGenerateTerrainImagePart;
+class csGenerateTerrainImageValue;
+class csGenerateTerrainImageTexture;
+
+/** a base class which represents a value that can be computed
+  for blending purposes for each pixel. */
+class csGenerateTerrainImageValue
+{
+public:
+  /// delete it
+  virtual ~csGenerateTerrainImageValue() {}
+  /// get the value for location
+  virtual float GetValue(float x, float y) = 0;
+};
+
+/** a base class which represents a texture that can be displayed
+  on the terrain. It has a colour for each pixel */
+class csGenerateTerrainImageTexture
+{
+public:
+  /// delete it
+  virtual ~csGenerateTerrainImageTexture() {}
+  /// get color (0..255) for location
+  virtual void GetColor(csColor& col, float x, float y) = 0;
+};
+
 
 /** This class will compute a texture for a terrain.
  * The texture is based on the heightmap for the terrain.
@@ -36,49 +60,19 @@ class csGenerateTerrainImagePart;
 */
 class csGenerateTerrainImage 
 {
-  /// the list of base textures, sorted from low to high height
-  csGenerateTerrainImagePart *baselist;
-  /// the height function to use float func(userdata, x, y);
-  float (*heightfunc)(void*, float, float);
-  /// user data for height function
-  void *userdata;
+  /// the texture to show
+  csGenerateTerrainImageTexture *tex;
 public:
   /// create empty
   csGenerateTerrainImage();
   /// destroy
   ~csGenerateTerrainImage();
 
-  /// get a color for a pixel in image, tiles, result in res.
-  void GetImagePixel(iImage *image, int x, int y, csRGBpixel& res);
-
-  /// compute a color (0..255) for a spot on a layer
-  void ComputeLayerColor(csGenerateTerrainImagePart *layer,
-    const csVector2& pos, csColor& col);
-
-  /// compute color for a spot (0..1) on the terrain
-  void ComputeColor(const csVector2& pos, csRGBpixel& pix);
-
   /**
-   * Add a base texture. It is displayed at a certain layer of height.
-   * You can give the height where this texture should show up.
-   * (0 == low, 1 == high)
-   * give the iImage of the texture, as well as the scale and offset.
-   * offset is from 0..1, scale is the size respective to total image size.
-   * A scale of 1 means the texture will fit exactly onto the entire terrain.
-   * A scale of 10 means the texture will be tiled 10x10 times.
+   * Set the texture to show, You can easily construct one yourself,
+   * using the classes below.
    */
-  void AddLayer(float height, iImage *image, const csVector2& scale,
-    const csVector2& offset);
-
-  /**
-   * Set the height function to use for the terrain.
-   * The function type is:
-   * float heightfunc(void *userdata, float x, float y);
-   * userdata is passed unchanged. x and y range from 0..1;
-   * return a height from 0 (low) to 1(high)
-   */
-  void SetHeightFunction( float (*func)(void*,float,float), void *data)
-  { heightfunc = func; userdata = data;}
+  void SetTexture(csGenerateTerrainImageTexture *t) {tex = t;}
 
   /**
    * Generate part of a terrain image.
@@ -92,22 +86,106 @@ public:
 };
 
 /** 
- * This class is used to store the base texture information
- * inside the csGenerateTerrainImage class 
+ * This class is used to store the layers of textures per value. Used in the
+ * Blend class.
  */
-class csGenerateTerrainImagePart
+class csGenerateTerrainImageLayer {
+public:
+  /// the value where this texture should show
+  float value;
+  /// the texture for this layer
+  csGenerateTerrainImageTexture *tex;
+  /// next part (ascending in height)
+  csGenerateTerrainImageLayer *next;
+};
+
+/**
+ * A class for a single texture
+*/
+class csGenerateTerrainImageTextureSingle:public csGenerateTerrainImageTexture
 {
 public:
-  /// the height where this texture should show (0..1)
-  float height;
   /// the image - the texture image
   iImage *image;
   /// the scale of the image, (nr of times tiled on the terrain)
   csVector2 scale;
   /// offset to shift image (0..1)
   csVector2 offset;
-  /// next part (ascending in height)
-  csGenerateTerrainImagePart *next;
+
+  /// delete it
+  virtual ~csGenerateTerrainImageTextureSingle();
+  /// add image
+  void SetImage(iImage *im);
+  /// get the color
+  virtual void GetColor(csColor& col, float x, float y);
+  /// get a color for a pixel in image, tiles, result in res.
+  void GetImagePixel(iImage *image, int x, int y, csRGBpixel& res);
+  /// compute a color (0..255) for a spot on a layer
+  void ComputeLayerColor(const csVector2& pos, csColor& col);
 };
+
+/**
+ * a class for a texture that is made by blending together other textures
+ * based on a value. It has a set of layers to blend between.
+ */
+class csGenerateTerrainImageTextureBlend:public csGenerateTerrainImageTexture
+{
+public:
+  /// the list - sorted by value - of layers
+  csGenerateTerrainImageLayer *layers;
+  /// the value function object
+  csGenerateTerrainImageValue *valuefunc;
+  /// deletes the list too
+  virtual ~csGenerateTerrainImageTextureBlend();
+  /// get the color
+  virtual void GetColor(csColor& col, float x, float y);
+  /// add a layer correctly sorted into the list
+  void AddLayer(float value, csGenerateTerrainImageTexture *tex);
+};
+
+
+/**
+ * This class will generate a value using a given function. For heights
+ * or slopes.
+*/
+class csGenerateTerrainImageValueFunc : public csGenerateTerrainImageValue
+{
+public:
+  /// height or slope func
+  float (*heightfunc)(void *, float, float);
+  /// userdata for the heightfunc
+  void *userdata;
+  /// get the value for location
+  virtual float GetValue(float x, float y){return heightfunc(userdata, x, y);}
+};
+
+/**
+ * This class will generate a constant value
+*/
+class csGenerateTerrainImageValueFuncConst : public csGenerateTerrainImageValue
+{
+public:
+  /// the value to return
+  float constant;
+  /// get the value for location
+  virtual float GetValue(float, float){return constant;}
+};
+
+/**
+ * This class will generate a value using a texture. The average of the
+ * rgb values will be returned.
+*/
+class csGenerateTerrainImageValueFuncTex : public csGenerateTerrainImageValue
+{
+public:
+  /// the texture to use
+  csGenerateTerrainImageTexture *tex;
+  ///
+  ~csGenerateTerrainImageValueFuncTex();
+  /// get the value for location
+  virtual float GetValue(float x, float y);
+};
+
+
 #endif
 
