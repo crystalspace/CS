@@ -1,5 +1,18 @@
 The history order has been reversed so that new features are at the top.
 
+4-Feb-2001
+	- Wouter Wijngaards changed includes, so that make depend works
+	  nicer for csfedit.
+	- Norman Kramer fixed a bug in the AVI plugin. Red and blue
+	  chrominance values were swapped.
+3-Feb-2001
+	- Wouter Wijngaards added full functionality to the .csf font
+	  editor. You can edit characters, see a preview, change individual
+	  character widths, change font names, widths, save, load, etc.
+	- Philip Wyett started integration of DivX into CS tree.
+	- Philip also added plggamecore and added "DSP.GCORE.LIBS = xmlparse"
+	  to generate correct VC6 project file and fix link errors in
+	  the plugin.
 2-Feb-2001
 	- Wouter Wijngaards continued work on csfedit. You can now load
 	  a font (or make a new font) and see its contents in a window.
@@ -17,6 +30,7 @@ The history order has been reversed so that new features are at the top.
 	- Eric Sunshine enabled generation of MSVC DSP files for the csPython
 	  plug-in module and the PySimp application since we have one or two
 	  Windows users who would like to build these modules.
+	- Martin Geisse fixed two bugs in the sound system.
 1-Feb-2001
 	- Martin Geisse changed the sockets driver to use system events
 	  instead of Open() and Close() methods.
