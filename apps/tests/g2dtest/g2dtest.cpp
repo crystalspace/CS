@@ -78,7 +78,6 @@ public:
 public:
   G2DTestSystemDriver ();
   virtual ~G2DTestSystemDriver ();
-  virtual bool CheckDrivers () { return true; }
   virtual void NextFrame ();
   virtual bool HandleEvent (iEvent &Event);
 

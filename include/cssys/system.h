@@ -303,9 +303,6 @@ public:
   /// This is usually called right after object creation.
   virtual bool Initialize (int argc, const char* const argv[], const char *iConfigName);
 
-  /// Check if all required drivers are loaded
-  virtual bool CheckDrivers ();
-
   /**
    * Open the graphics context (with optional title on titlebar),
    * mouse and keyboard.

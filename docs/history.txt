@@ -41,6 +41,10 @@ The history order is reversed so that new features are at the top.
 	  and csFindFrameSet() in order to avoid pollution of the global
 	  namespace.
 	- Eric Sunshine removed the obsolete igraphic/loader.h header.
+	- Eric Sunshine removed the cumbersom, ill-conceived and
+	  monolithic-oriented csSystemDriver::CheckDrivers() method.
+	- Eric Sunshine removed the csjava plugin since it was completely
+	  unimplemented.
 28-Jun-2001
 	- Fixed error handling in spr2dldr (for mixmode) a little.
 	- Added error reporting to ballldr (using reporter plugin).

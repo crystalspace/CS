@@ -510,13 +510,8 @@ bool csSystemDriver::Initialize (int argc, const char* const argv[],
   Console = CS_QUERY_PLUGIN_ID (this, CS_FUNCID_CONSOLE, iConsoleOutput);
   MotionMan = CS_QUERY_PLUGIN_ID (this, CS_FUNCID_MOTION, iMotionManager);
 
-  // Check if the minimal required drivers are loaded
-  if (!CheckDrivers ())
-    return false;
-
   // flush all removed config files
   Config->FlushRemoved();
-
   return true;
 }
 
@@ -553,28 +548,6 @@ void csSystemDriver::Close ()
 
   if (G3D)
     G3D->Close ();
-}
-
-bool csSystemDriver::CheckDrivers ()
-{
-  bool rc = true;
-  if (!VFS)
-  {
-    Printf (CS_MSG_FATAL_ERROR, "FATAL: No iVFS plug-in loaded!\n");
-    rc = false;
-  }
-  if (!G3D)
-  {
-    Printf (CS_MSG_FATAL_ERROR, "FATAL: No iGraphics3D plug-in loaded!\n");
-    rc = false;
-  }
-  if (!G2D)
-  {
-    Printf (CS_MSG_FATAL_ERROR, "FATAL: No iGraphics2D plug-in loaded!\n");
-    rc = false;
-  }
-
-  return rc;
 }
 
 void csSystemDriver::NextFrame ()
