@@ -27,6 +27,13 @@ The history order is reversed so that new features are at the top.
 	- Added 'const' to a few methods in iSharedVariable.
 	- Updated the FAQ a little bit.
 	- Updated a bit of the engine documentation.
+	- Eric Sunshine fixed a problem with the Autoconf configure script
+	  where it was emitting the obsolete "MINGW_LIBS+=-lmingwex" rather
+	  than the newer "LIBS.SYSTEM+=-lmingwex" for older versions of Mingw
+	  which require explicit mention of libmingwex.a.  Problem was
+	  discovered based upon bug report from Calvin Finch
+	  <calvinfinch@shaw.ca> in which he noted that link failed to resolve
+	  opendir(), readdir(), closedir().
 15-Jan-2003
 	- Started removing a few csVector usages and replacing them
 	  with typed versions. In particular changed:

@@ -1272,7 +1272,7 @@ AC_DEFUN([CS_CHECK_LIBMINGWX],
 
 CS_CHECK_LIBMINGWX
 AS_IF([test $cs_cv_libmingwex = yes],
-    [CS_MAKEFILE_PROPERTY([MINGW_LIBS], [-lmingwex], [+])])
+    [CS_MAKEFILE_PROPERTY([LIBS.SYSTEM], [-lmingwex], [+])])
 
 
 

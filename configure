@@ -12491,7 +12491,7 @@ echo "${ECHO_T}$cs_cv_libmingwex" >&6
 	*) cs_cv_libmingwex=no ;;
     esac
 if test $cs_cv_libmingwex = yes; then
-  cs_makefile_text="${cs_makefile_text}MINGW_LIBS += -lmingwex
+  cs_makefile_text="${cs_makefile_text}LIBS.SYSTEM += -lmingwex
 "
 fi
 
