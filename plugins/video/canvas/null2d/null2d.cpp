@@ -74,7 +74,7 @@ void csGraphics2DNull::Close()
 
 bool csGraphics2DNull::BeginDraw()
 {
-    return csGraphics2DNull::BeginDraw();
+    return csGraphics2D::BeginDraw();
 }
 
 void csGraphics2DNull::FinishDraw()
