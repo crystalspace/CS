@@ -415,7 +415,7 @@ iBase* csSprite3DFactoryLoader::Parse (const char* string,
 	      spr3dLook->SetMaterialWrapper (mat);
 	    }
 	    break;
-      
+
       case CS_TOKEN_SKELETON:
 	    {
         spr3dLook->EnableSkeletalAnimation ();
@@ -559,7 +559,7 @@ iBase* csSprite3DFactoryLoader::Parse (const char* string,
 
       }
       break;
-      
+
       case CS_TOKEN_SMOOTH:
       {
         int num, list[30];
@@ -572,7 +572,7 @@ iBase* csSprite3DFactoryLoader::Parse (const char* string,
 	        default:
 	          ReportError (reporter,
 		          "crystalspace.sprite3dfactoryloader.parse.badsmooth",
-		          "Bad smooth option '%s', use 0, 1, or 2 parameters!", 
+		          "Bad smooth option '%s', use 0, 1, or 2 parameters!",
               params);
 	          spr3dLook->DecRef ();
 	          fact->DecRef ();
