@@ -114,7 +114,7 @@ bool csModelConverterMultiplexer::LoadNextPlugin ()
     char const* classname = 0;
     do
     {
-      if (classname) classlist->Delete (0);
+      if (classname) classlist->DeleteIndex (0);
       if (classlist->Length() == 0)
       {
 	classlist = 0;
@@ -134,7 +134,7 @@ bool csModelConverterMultiplexer::LoadNextPlugin ()
       for (i=0; i<plugin->GetFormatCount (); i++)
 	Formats.Push (plugin->GetFormat (i));
     }
-    classlist->Delete (0);
+    classlist->DeleteIndex (0);
   }
   return true;
 }
@@ -176,7 +176,7 @@ csPtr<iModelData> csModelConverterMultiplexer::Load (uint8* Buffer, uint32 Size)
 	  // when a plugin is already one of the first asked
 	{
 	  Converters.Push (conv);
-	  Converters.Delete (i);
+	  Converters.DeleteIndex (i);
 	}
 	return csPtr<iModelData> (mdl);
       }
@@ -204,7 +204,7 @@ csPtr<iDataBuffer> csModelConverterMultiplexer::Save (iModelData *mdl,
 	if ((Converters.Length()-i) > 4)
 	{
 	  Converters.Push (conv);
-	  Converters.Delete (i);
+	  Converters.DeleteIndex (i);
 	}
 	return csPtr<iDataBuffer> (dbuf);
       }

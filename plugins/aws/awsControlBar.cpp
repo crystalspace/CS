@@ -39,7 +39,7 @@ void awsControlBar::AddChild(iAwsComponent* comp)
 
 void awsControlBar::RemoveChild(iAwsComponent* comp)
 {
-  comps.Delete(comp);
+  comps.Delete (comp);
   awsPanel::RemoveChild(comp);
   DoLayout();
 }

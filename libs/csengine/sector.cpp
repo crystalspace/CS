@@ -1417,7 +1417,7 @@ bool csSectorList::Remove (iSector *obj)
 bool csSectorList::Remove (int n)
 {
   FreeItem (list[n]);
-  return list.Delete (n);
+  return list.DeleteIndex (n);
 }
 
 void csSectorList::RemoveAll ()

@@ -123,9 +123,7 @@ public:
   }
   virtual void RemoveListener (iObjectModelListener* listener)
   {
-    int idx = listeners.Find (listener);
-    if (idx == -1) return ;
-    listeners.Delete (idx);
+    listeners.Delete (listener);
   }
 };
 

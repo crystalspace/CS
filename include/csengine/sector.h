@@ -372,9 +372,7 @@ public:
 
   void RemoveSectorCallback (iSectorCallback* cb)
   {
-    int idx = sector_cb_vector.Find (cb);
-    if (idx != -1)
-      sector_cb_vector.Delete (idx);
+    sector_cb_vector.Delete (cb);
   }
 
   int GetSectorCallbackCount () const

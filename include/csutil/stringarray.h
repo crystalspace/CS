@@ -296,7 +296,7 @@ public:
   }
 
   /// Delete element number 'n' from vector.
-  bool Delete (int n)
+  bool DeleteIndex (int n)
   {
     char* p = Extract (n);
     if (p)
@@ -318,7 +318,7 @@ public:
   {
     int n = Find (item);
     if (n == -1) return false;
-    else return Delete (n);
+    else return DeleteIndex (n);
   }
 
   /**

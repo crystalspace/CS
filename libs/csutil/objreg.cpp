@@ -63,8 +63,8 @@ csObjectRegistryIterator::~csObjectRegistryIterator ()
     // Take special care to ensure that this object is no longer on the list
     // before calling DecRef(), since we don't want some other object asking
     // for it during its own destruction.
-    objects.Delete (i);
-    tags.Delete (i);
+    objects.DeleteIndex (i);
+    tags.DeleteIndex (i);
   }
 }
 
@@ -134,7 +134,7 @@ void csObjectRegistry::Clear ()
     iBase* b = registry[i];
 //printf ("Unregister %08lx/'%s' ref=%d\n", b, t, b->GetRefCount ()); fflush (stdout);
     registry.DeleteIndex (i); // Remove from list before DecRef().
-    tags.Delete (i);
+    tags.DeleteIndex (i);
     b->DecRef ();
   }
   clearing = false;
@@ -184,7 +184,7 @@ void csObjectRegistry::Unregister (iBase* obj, char const* tag)
         if ((t == 0 && tag == 0) || (t != 0 && tag != 0 && !strcmp (tag, t)))
         {
 	  registry.DeleteIndex (i);
-	  tags.Delete (i);
+	  tags.DeleteIndex (i);
           b->DecRef ();
 	  if (tag != 0) // For a tagged object, we're done.
 	    break;

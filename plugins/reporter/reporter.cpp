@@ -171,7 +171,7 @@ void csReporter::Clear (int severity)
     csReporterMessage* msg = messages[i];
     if (severity == -1 || msg->severity == severity)
     {
-      messages.Delete (i);
+      messages.DeleteIndex (i);
       len--;
     }
     else
@@ -191,7 +191,7 @@ void csReporter::Clear (const char* mask)
     csReporterMessage* msg = messages[i];
     if (csGlobMatches (msg->id, mask))
     {
-      messages.Delete (i);
+      messages.DeleteIndex (i);
       len--;
     }
     else
@@ -229,7 +229,7 @@ void csReporter::RemoveReporterListener (iReporterListener* listener)
   int idx = listeners.Find (listener);
   if (idx != -1)
   {
-    listeners.Delete (idx);
+    listeners.DeleteIndex (idx);
   }
 }
 

@@ -41,7 +41,7 @@
   int clname::Add##sing_name (type v)					\
   { mult_name.Push (v); return mult_name.Length () - 1; }		\
   void clname::Delete##sing_name (int n)				\
-  { mult_name.Delete (n); }
+  { mult_name.DeleteIndex (n); }
 
 #define CS_IMPLEMENT_ACCESSOR_METHOD(clname,type,name)			\
   type clname::Get##name () const					\
@@ -304,8 +304,8 @@ void csModelDataAction::SetTime (int Frame, float NewTime)
   obj->IncRef ();
 
   // remove it from the vectors
-  Times.Delete (Frame);
-  States.Delete (Frame);
+  Times.DeleteIndex (Frame);
+  States.DeleteIndex (Frame);
 
   // add it again with the new time value
   AddFrame (NewTime, obj);
@@ -330,8 +330,8 @@ void csModelDataAction::AddFrame (float Time, iObject *State)
 
 void csModelDataAction::DeleteFrame (int n)
 {
-  Times.Delete (n);
-  States.Delete (n);
+  Times.DeleteIndex (n);
+  States.DeleteIndex (n);
 }
 
 float csModelDataAction::GetTotalTime () const
@@ -376,10 +376,10 @@ int csModelDataPolygon::AddVertex (int ver, int nrm, int col, int tex)
 
 void csModelDataPolygon::DeleteVertex (int n)
 {
-  Vertices.Delete (n);
-  Normals.Delete (n);
-  Colors.Delete (n);
-  Texels.Delete (n);
+  Vertices.DeleteIndex (n);
+  Normals.DeleteIndex (n);
+  Colors.DeleteIndex (n);
+  Texels.DeleteIndex (n);
 }
 
 CS_IMPLEMENT_ACCESSOR_METHOD_REF (csModelDataPolygon, iModelDataMaterial*, Material);

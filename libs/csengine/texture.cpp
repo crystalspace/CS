@@ -328,7 +328,7 @@ bool csTextureList::TextureList::Remove (iTextureWrapper *obj)
 
 bool csTextureList::TextureList::Remove (int n)
 {
-  return scfParent->Delete (n);
+  return scfParent->DeleteIndex (n);
 }
 
 void csTextureList::TextureList::RemoveAll ()

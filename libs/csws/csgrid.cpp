@@ -164,7 +164,7 @@ void csSparseGrid::csGridRow::SetAt (int col, void* data)
     if (data)
       Get (key)->data = data;
     else
-      Delete (key);
+      DeleteIndex (key);
 }
 
 int csSparseGrid::csGridRow::Compare (csGridRowEntry const* Item1,

@@ -612,7 +612,7 @@ void csBdNode::atRemove (int pos)
 {
   if (flags & BD_NODE_MODIFIED)
   {
-    attrs->Delete (pos);
+    attrs->DeleteIndex (pos);
     if (attrs->Length() == 0)
       flags &= ~BD_NODE_HAS_ATTR;
   }
@@ -681,7 +681,7 @@ void csBdNode::ctRemove (int pos)
 {
   if (flags & BD_NODE_MODIFIED)
   {
-    nodes->Delete (pos);
+    nodes->DeleteIndex (pos);
     if (nodes->Length() == 0)
       flags &= ~BD_NODE_HAS_CHILDREN;
   }

@@ -6,6 +6,18 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+2-Aug-2003
+	- Jorrit renamed csPDelArray::Delete(int) to DeleteIndex() to conform
+	  more to the API used by csArray.
+	- Jorrit renamed csRefArray::Delete(int) to DeleteIndex() to conform
+	  more to the API used by csArray.
+	- Jorrit renamed csStringArray::Delete(int) to DeleteIndex() to conform
+	  more to the API used by csArray.
+	- Jorrit renamed csGrowingArray::Delete(int) to DeleteIndex() to conform
+	  more to the API used by csArray.
+	- Jorrit modified the api documentation to reflect the pending removal
+	  of csVector and csBasicVector. Also explained how to do most common
+	  transitions.
 1-Aug-2003
 	- Jorrit changed csPDelArray::Sort() to use a new
 	  csArraySortCompareFunction typedef instead of csArrayCompareFunction.

@@ -103,7 +103,7 @@ bool csSoundLoaderMultiplexer::Initialize(iObjectRegistry *object_reg)
     char const* classname = list->Get(i);
     if (!strcasecmp (classname, SNDPLEX_CLASSNAME))
     {
-      list->Delete(i);
+      list->DeleteIndex (i);
     }
     else if (strstr (classname, "mp3") && (i < (list->Length() - 1)))
     {
@@ -112,7 +112,7 @@ bool csSoundLoaderMultiplexer::Initialize(iObjectRegistry *object_reg)
       // header the bigger the input gets, so we give all other loaders a
       // chance to look at it first
       list->Push (csStrNew (classname));
-      list->Delete (i);
+      list->DeleteIndex (i);
     }
     else
       i++;
@@ -133,7 +133,7 @@ bool csSoundLoaderMultiplexer::LoadNextPlugin ()
       // remember the plugin
       Loaders.Push (plugin);
     }
-    list->Delete (0);
+    list->DeleteIndex (0);
     if (list->Length() == 0)
     {
       list = 0;
@@ -169,7 +169,7 @@ csPtr<iSoundData> csSoundLoaderMultiplexer::LoadSound (
 	  // when a plugin is already one of the first asked
 	{
 	  Loaders.Push (ldr);
-	  Loaders.Delete (i);
+	  Loaders.DeleteIndex (i);
 	}
 	return csPtr<iSoundData> (snd);
       }

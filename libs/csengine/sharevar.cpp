@@ -72,7 +72,7 @@ bool csSharedVariableList::SharedVariableList::Remove (iSharedVariable *obj)
 
 bool csSharedVariableList::SharedVariableList::Remove (int n)
 {
-  return scfParent->Delete (n);
+  return scfParent->DeleteIndex (n);
 }
 
 void csSharedVariableList::SharedVariableList::RemoveAll ()

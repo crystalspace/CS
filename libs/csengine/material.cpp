@@ -319,7 +319,7 @@ bool csMaterialList::MaterialList::Remove (iMaterialWrapper *obj)
 
 bool csMaterialList::MaterialList::Remove (int n)
 {
-  return scfParent->Delete (n);
+  return scfParent->DeleteIndex (n);
 }
 
 void csMaterialList::MaterialList::RemoveAll ()

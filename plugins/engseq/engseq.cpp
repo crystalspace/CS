@@ -1866,7 +1866,7 @@ bool csEngineSequenceManager::HandleEvent (iEvent &event)
       if (curtime >= op->end)
       {
         op->op->Do (1.0, op->GetParams ());
-        timed_operations.Delete (i);
+        timed_operations.DeleteIndex (i);
       }
       else
       {

@@ -188,7 +188,7 @@ void awsMultiLineEdit::InsertClipboard (int row, int col)
       csString *left = new csString;
       csString *right = new csString;
 
-      vText.Delete (atrow);
+      vText.DeleteIndex (atrow);
 
       int atcol = MIN (MAX (0, col), (int)target->Length ());
 
@@ -951,7 +951,7 @@ void awsMultiLineEdit::DeleteBackward ()
       csString *sp = vText[row-1];
       col = sp->Length ();
       sp->Append (*s);
-      vText.Delete (row);
+      vText.DeleteIndex (row);
       row--;
     }
     MoveCursor (row, col);
@@ -972,7 +972,7 @@ void awsMultiLineEdit::DeleteForward ()
     {
       csString *sn = vText[row+1];
       s->Append (*sn);
-      vText.Delete (row+1);
+      vText.DeleteIndex (row+1);
     }
   }
 }
@@ -1054,7 +1054,7 @@ void awsMultiLineEdit::DeleteMarked ()
 
         if (i > fromRow && i < toRow)
         {
-          vText.Delete (i);
+          vText.DeleteIndex (i);
         }
         else
         {
@@ -1073,7 +1073,7 @@ void awsMultiLineEdit::DeleteMarked ()
     else if (nMarkMode == MARK_ROW)
       for (int i=toRow; i >= fromRow; i--)
       {
-        vText.Delete (i);
+        vText.DeleteIndex (i);
       }
 
     // make sure we didnt delete everything, if so put in a new empty first line
@@ -1135,7 +1135,7 @@ void awsMultiLineEdit::actDeleteRow (void *owner, iAwsParmList* parmlist)
 
   if (parmlist->GetInt ("row", &row) && row < me->vText.Length () && row >= 0)
   {
-    me->vText.Delete (row);
+    me->vText.DeleteIndex (row);
     me->MoveCursor (me->row, me->col); // in case we removed the last line
   }
 }
@@ -1155,7 +1155,7 @@ void awsMultiLineEdit::actReplaceRow (void *owner, iAwsParmList* parmlist)
   {
     csString *s = new csString (str->GetData ());
     me->vText.Insert (row, s);
-    me->vText.Delete (row+1);
+    me->vText.DeleteIndex (row+1);
   }
 }
 

@@ -198,7 +198,7 @@ void csObject::ObjRemove (iObject *obj)
     obj->SetObjectParent (0);
     DG_REMPARENT (obj, this);
     DG_REMCHILD (this, obj);
-    Children->Delete (n);
+    Children->DeleteIndex (n);
   }
 }
 
@@ -220,7 +220,7 @@ void csObject::ObjReleaseOld (iObject *obj)
     // since it is being deleted already.
     obj->IncRef ();
     obj->IncRef ();
-    Children->Delete (n);
+    Children->DeleteIndex (n);
   }
 }
 
@@ -236,7 +236,7 @@ void csObject::ObjRemoveAll ()
     child->SetObjectParent (0);
     DG_REMPARENT (child, this);
     DG_REMCHILD (this, child);
-    Children->Delete (i);
+    Children->DeleteIndex (i);
   }
 }
 

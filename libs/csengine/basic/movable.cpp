@@ -82,7 +82,7 @@ bool csMovableSectorList::SectorList::Remove (iSector *obj)
 
 bool csMovableSectorList::SectorList::Remove (int n)
 {
-  return scfParent->Delete (n);
+  return scfParent->DeleteIndex (n);
 }
 
 void csMovableSectorList::SectorList::RemoveAll ()
@@ -179,9 +179,7 @@ void csMovable::AddListener (iMovableListener *listener)
 
 void csMovable::RemoveListener (iMovableListener *listener)
 {
-  int idx = listeners.Find (listener);
-  if (idx == -1) return ;
-  listeners.Delete (idx);
+  listeners.Delete (listener);
 }
 
 void csMovable::UpdateMove ()

@@ -646,7 +646,7 @@ bool csLightList::Remove (iLight *obj)
 bool csLightList::Remove (int n)
 {
   FreeItem (list[n]);
-  return list.Delete (n);
+  return list.DeleteIndex (n);
 }
 
 void csLightList::RemoveAll ()

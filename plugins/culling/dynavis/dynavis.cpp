@@ -206,7 +206,7 @@ csDynaVis::~csDynaVis ()
     model_mgr->ReleaseObjectModel (visobj_wrap->model);
     kdtree->RemoveObject (visobj_wrap->child);
     visobj->DecRef ();
-    visobj_vector.Delete (0);
+    visobj_vector.DeleteIndex (0);
   }
   delete kdtree;
   delete tcovbuf;
@@ -355,7 +355,7 @@ void csDynaVis::UnregisterVisObject (iVisibilityObject* visobj)
       // To easily recognize that the vis wrapper has been deleted:
       visobj_wrap->dynavis = (csDynaVis*)0xdeadbeef;
 #endif
-      visobj_vector.Delete (i);
+      visobj_vector.DeleteIndex (i);
       return;
     }
   }

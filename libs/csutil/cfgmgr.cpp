@@ -544,7 +544,7 @@ void csConfigManager::FlushRemoved()
 
 void csConfigManager::FlushRemoved(int n)
 {
-  Removed.Delete (n);
+  Removed.DeleteIndex (n);
 }
 
 int csConfigManager::FindRemoved(const char *Name) const

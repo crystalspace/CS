@@ -324,9 +324,7 @@ public:
 
   void RemoveDrawCallback (iMeshDrawCallback* cb)
   {
-    int idx = draw_cb_vector.Find (cb);
-    if (idx != -1)
-      draw_cb_vector.Delete (idx);
+    draw_cb_vector.Delete (cb);
   }
 
   virtual int GetDrawCallbackCount () const

@@ -137,9 +137,7 @@ public:
 
   virtual void RemoveLightCallback (iLightCallback* cb)
   {
-    int idx = light_cb_vector.Find (cb);
-    if (idx != -1)
-      light_cb_vector.Delete (idx);
+    light_cb_vector.Delete (cb);
   }
 
   virtual int GetLightCallbackCount () const

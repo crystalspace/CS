@@ -82,9 +82,9 @@ public:
   }
 
   /// Delete Nth string in the array.
-  virtual bool Delete (int n)
+  virtual bool DeleteIndex (int n)
   {
-    return v.Delete (n);
+    return v.DeleteIndex (n);
   }
 
   /// Insert a string before Nth string in the array.

@@ -514,7 +514,7 @@ bool csFreeType2Font::RemoveDeleteCallback (iFontDeleteNotify* func)
     iFontDeleteNotify* delnot = DeleteCallbacks[i];
     if (delnot == func)
     {
-      DeleteCallbacks.Delete (i);
+      DeleteCallbacks.DeleteIndex (i);
       return true;
     }
   }

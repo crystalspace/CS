@@ -554,11 +554,12 @@ void awsTabCtrl::RemoveTab(int index)
     if (index < active)
       active--;
 
-	slot_activate.Disconnect ((iAwsSource*)vTabs.Get(index), awsTab::signalActivateTab, 
-                           sink, sink->GetTriggerID ("ActivateTab"));
-    vTabs.Delete (index);
+    slot_activate.Disconnect ((iAwsSource*)vTabs.Get(index),
+	awsTab::signalActivateTab, 
+	sink, sink->GetTriggerID ("ActivateTab"));
+    vTabs.DeleteIndex (index);
 
-	DoLayout();
+    DoLayout();
   }
 }
 

@@ -5617,7 +5617,7 @@ void csGraphics3DOGLCommon::OpenPortal (G3DPolygonDFP* poly)
 void csGraphics3DOGLCommon::ClosePortal ()
 {
   if (clipportal_stack.Length () <= 0) return;
-  clipportal_stack.Delete (clipportal_stack.Length ()-1);
+  clipportal_stack.DeleteIndex (clipportal_stack.Length ()-1);
   clipportal_dirty = true;
 }
 

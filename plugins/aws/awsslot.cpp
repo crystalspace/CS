@@ -61,7 +61,7 @@ bool awsSinkManager::RemoveSink (iAwsSink* sink)
   if (rc<0)
     return false;
 
-  sinks.Delete(rc);
+  sinks.Delete (rc);
   sink->DecRef ();
   return true;
 }
@@ -277,8 +277,8 @@ void awsSlot::Disconnect (
 
       if (stm->refs == 0)
       {
-	  stm->sink->DecRef ();
-	  stmap.Delete (i);
+	stm->sink->DecRef ();
+	stmap.Delete (i);
       }
 
       return ;

@@ -64,7 +64,8 @@ csSingleIndexVertexSet::csSingleIndexVertexSet (csIntArray *v, csIntArray *n,
 
 csSingleIndexVertexSet::~csSingleIndexVertexSet ()
 {
-  if (Delete) {
+  if (Delete)
+  {
     delete Vertices;
     delete Normals;
     delete Colors;
@@ -990,8 +991,8 @@ void csModelDataTools::CompressVertices (iModelDataObject *Object)
     type o1 = obj##List [0];						\
     int Index1 = obj##ListIndices->Get (0);				\
     Set->Push (Index1);							\
-    obj##List.Delete (0);						\
-    obj##ListIndices->Delete (0);					\
+    obj##List.DeleteIndex (0);						\
+    obj##ListIndices->DeleteIndex (0);					\
 									\
     for (i=0; i<obj##List.Length (); i++)				\
     {									\
@@ -999,8 +1000,8 @@ void csModelDataTools::CompressVertices (iModelDataObject *Object)
       if (comp)								\
       {									\
         Set->Push (obj##ListIndices->Get (i));				\
-	obj##List.Delete (i);						\
-	obj##ListIndices->Delete (i);					\
+	obj##List.DeleteIndex (i);					\
+	obj##ListIndices->DeleteIndex (i);				\
 	i--;								\
       }									\
     }									\
@@ -1033,7 +1034,7 @@ void csModelDataTools::CompressVertices (iModelDataObject *Object)
       if (!(comp)) {							\
         if (!Removed) Removed = new csIntArray ();			\
         Removed->Push (Set->Get (j));					\
-        Set->Delete (j); j--;						\
+        Set->DeleteIndex (j); j--;					\
       }									\
     }									\
     if (Removed) {							\
@@ -1041,7 +1042,7 @@ void csModelDataTools::CompressVertices (iModelDataObject *Object)
       { Unique##obj##List.Push (Removed->Get (0)); delete Removed; }	\
       else obj##Sets.Push (Removed);					\
     }									\
-    if (Set->Length () < 2) {obj##Sets.Delete (i); i--;}		\
+    if (Set->Length () < 2) {obj##Sets.DeleteIndex (i); i--;}		\
   }
 
   for (k=1; k<VertexFrames.Length (); k++)

@@ -263,7 +263,7 @@ void csMotionController::Update(float timedelta)
   //Update the time of the anims and delete expired motions from stack
   for(int i=0; i<stack.Length(); i++) {
     if(!stack[i]->Update(timedelta)) {
-      stack.Delete(i--);
+      stack.DeleteIndex (i--);
       stackchanged=1;
     }
   }

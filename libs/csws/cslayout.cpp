@@ -79,7 +79,7 @@ void csLayout::RemoveLayoutComponent (csComponent* comp)
 {
   int idx = vConstraints.FindKey (comp, vConstraints.CompareKey);
   if (idx != -1)
-    vConstraints.Delete (idx);
+    vConstraints.DeleteIndex (idx);
   InvalidateLayout ();
 }
 

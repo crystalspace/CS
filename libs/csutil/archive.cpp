@@ -238,7 +238,7 @@ csArchive::ArchiveEntry *csArchive::InsertEntry (const char *name,
   ArchiveEntry *e = new ArchiveEntry (name, cdfh);
   dir.InsertSorted (e, dir.Compare, &dupentry);
   if (dupentry >= 0)
-    dir.Delete (dupentry);
+    dir.DeleteIndex (dupentry);
   return e;
 }
 
@@ -676,7 +676,7 @@ void csArchive::UpdateDirectory ()
   {
     ArchiveEntry *e = dir.Get (n);
     if (IsDeleted (e->filename))
-      dir.Delete (n);
+      dir.DeleteIndex (n);
   }
   del.DeleteAll ();
 

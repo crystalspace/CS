@@ -246,7 +246,7 @@ iBase *csPluginManager::LoadPlugin (const char *classID,
     	"WARNING: failed to initialize plugin '%s'", classID);
     // If we added this plugin in this call then we remove it here as well.
     if (added_here)
-      Plugins.Delete (index);
+      Plugins.DeleteIndex (index);
   }
   return 0;
 }
@@ -267,7 +267,7 @@ bool csPluginManager::RegisterPlugin (const char *classID,
     csReport (object_reg, CS_REPORTER_SEVERITY_WARNING,
     	"crystalspace.pluginmgr.registerplugin",
     	"WARNING: failed to initialize plugin '%s'", classID);
-    Plugins.Delete (index);
+    Plugins.DeleteIndex (index);
     return false;
   }
 }
@@ -329,11 +329,11 @@ bool csPluginManager::UnloadPlugin (iComponent* obj)
     {
       csPluginOption *pio = (csPluginOption *)OptionList.Get (i);
       if (pio->Config == config)
-        OptionList.Delete (i);
+        OptionList.DeleteIndex (i);
     }
   }
 
   object_reg->Unregister ((iBase *)obj, 0);
-  return Plugins.Delete (idx);
+  return Plugins.DeleteIndex (idx);
 }
 

@@ -54,7 +54,7 @@ struct iStringArray : public iBase
   virtual void Sort () = 0;
 
   /// Delete Nth string in the array.
-  virtual bool Delete (int n) = 0;
+  virtual bool DeleteIndex (int n) = 0;
 
   /// Insert a string before Nth string in the array.
   virtual bool Insert (int n, char const *value) = 0;

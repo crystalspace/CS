@@ -184,7 +184,7 @@ void csEventQueue::EndLoop ()
     {
       Listener const& listener = Listeners[i];
       if (!listener.object)
-        Listeners.Delete (i);
+        Listeners.DeleteIndex (i);
     }
   }
 }
@@ -271,10 +271,10 @@ void csEventQueue::RemoveListener (iEventHandler* listener)
   int const n = FindListener(listener);
   if (n >= 0)
   {
-		iBase* listener = Listeners[n].object;
+    iBase* listener = Listeners[n].object;
     // Only delete the entry in the vector if we're not in a loop.
     if (busy_looping <= 0)
-      Listeners.Delete(n);
+      Listeners.DeleteIndex (n);
     else
     {
       Listeners[n].object = 0;
@@ -288,10 +288,10 @@ void csEventQueue::RemoveAllListeners ()
 {
   for (int i = Listeners.Length() - 1; i >= 0; i--)
   {
-		iBase* listener = Listeners[i].object;
+    iBase* listener = Listeners[i].object;
     if (busy_looping <= 0)
     {
-      Listeners.Delete (i);
+      Listeners.DeleteIndex (i);
     }
     else
     {

@@ -935,7 +935,7 @@ bool awsNotebookButtonBar::Remove (iAwsComponent *comp)
       active--;
 
     vTabs.FreeItem (vTabs[idx]);
-    vTabs.Delete (idx);
+    vTabs.DeleteIndex (idx);
     return true;
   }
   return false;

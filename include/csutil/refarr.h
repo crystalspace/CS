@@ -220,7 +220,7 @@ public:
   }
 
   /// Delete element number 'n' from vector.
-  bool Delete (int n)
+  bool DeleteIndex (int n)
   {
     if (n >= 0 && n < count)
     {
@@ -247,7 +247,7 @@ public:
   {
     int n = Find (item);
     if (n == -1) return false;
-    else return Delete (n);
+    else return DeleteIndex (n);
   }
 
   /// Insert element 'Item' before element 'n'.

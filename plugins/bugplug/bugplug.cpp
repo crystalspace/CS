@@ -2480,7 +2480,7 @@ void csBugPlug::RemoveCounter (const char* countername)
 {
   int i = FindCounter (countername);
   if (i != -1)
-    counters.Delete (i);
+    counters.DeleteIndex (i);
 }
 
 //---------------------------------------------------------------------------

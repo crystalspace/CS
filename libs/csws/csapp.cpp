@@ -263,7 +263,7 @@ void csApp::InitializeSkin ()
       }
       if (unload)
       {
-        Textures.Delete (i);
+        Textures.DeleteIndex (i);
         modified = true;
       }
     }

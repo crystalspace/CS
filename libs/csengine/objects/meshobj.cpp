@@ -827,7 +827,7 @@ bool csMeshList::Remove (iMeshWrapper *obj)
 bool csMeshList::Remove (int n)
 {
   FreeItem (list[n]);
-  list.Delete (n);
+  list.DeleteIndex (n);
   return true;
 }
 

@@ -204,7 +204,7 @@ bool csCameraPositionList::CameraPositionList::Remove (iCameraPosition *obj)
 
 bool csCameraPositionList::CameraPositionList::Remove (int n)
 {
-  return scfParent->Delete (n);
+  return scfParent->DeleteIndex (n);
 }
 
 void csCameraPositionList::CameraPositionList::RemoveAll ()
@@ -276,7 +276,7 @@ bool csCollectionList::CollectionList::Remove (iCollection *obj)
 
 bool csCollectionList::CollectionList::Remove (int n)
 {
-  return scfParent->Delete (n);
+  return scfParent->DeleteIndex (n);
 }
 
 void csCollectionList::CollectionList::RemoveAll ()
@@ -1679,7 +1679,8 @@ void csEngine::Draw (iCamera *c, iClipper2D *view)
   {
     csTicks elapsed = virtual_clock->GetElapsedTicks ();
     for (int halo = halos.Length () - 1; halo >= 0; halo--)
-      if (!halos[halo]->Process (elapsed, *this)) halos.Delete (halo);
+      if (!halos[halo]->Process (elapsed, *this))
+	halos.DeleteIndex (halo);
   }
 
   G3D->SetClipper (0, CS_CLIPPER_NONE);
@@ -1827,7 +1828,7 @@ void csEngine::RemoveHalo (csLight *Light)
     csLightHalo* lh = halos[i];
     if (lh->Light == Light)
     {
-      halos.Delete (i);
+      halos.DeleteIndex (i);
       return;
     }
   }

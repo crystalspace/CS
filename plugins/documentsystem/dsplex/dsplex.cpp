@@ -336,7 +336,7 @@ csRef<iDocumentSystem> csMplexDocumentSystem::LoadNextPlugin (int num)
 	  char const* classname = 0;
 	  do
 	  {
-	    if (classname) classlist->Delete (0);
+	    if (classname) classlist->DeleteIndex (0);
 	    if (classlist->Length() == 0)
 	    {
 	      classlist = 0;
@@ -352,7 +352,7 @@ csRef<iDocumentSystem> csMplexDocumentSystem::LoadNextPlugin (int num)
 	    // remember the plugin
 	    autolist.Push (res);
 	  }
-	  classlist->Delete (0);
+	  classlist->DeleteIndex (0);
 	}
       }
     }
@@ -368,7 +368,7 @@ void csMplexDocumentSystem::RewardPlugin (int num)
   {
     csRef<iDocumentSystem> plugin = autolist[anum];
     autolist.Push (plugin);
-    autolist.Delete (anum);
+    autolist.DeleteIndex (anum);
   }
 }
 

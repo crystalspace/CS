@@ -85,7 +85,7 @@ void csSprite2DUVAnimationFrame::SetFrameData (const char *name, int duration, i
 
 void csSprite2DUVAnimationFrame::RemoveUV (int idx)
 {
-  vCoo.Delete (idx);
+  vCoo.DeleteIndex (idx);
 }
 
 int csSprite2DUVAnimationFrame::GetDuration ()

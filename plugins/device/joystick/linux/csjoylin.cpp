@@ -21,11 +21,7 @@
 #include "csjoylin.h"
 #include "ivaria/reporter.h"
 #include "csutil/csstring.h"
-<<<<<<< csjoylin.cpp
 #include "csutil/array.h"
-=======
-#include "csutil/csvector.h"
->>>>>>> 1.15
 
 #include <fcntl.h>
 #include <unistd.h>

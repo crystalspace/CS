@@ -273,7 +273,7 @@ bool csReporterListener::HandleEvent (iEvent& event)
 	      csTimedMessage* tm = messages[i];
 	      if (tm->time != 0 && t > tm->time)
 	      {
-	        messages.Delete (i);
+	        messages.DeleteIndex (i);
 	        l--;
 	      }
 	      else

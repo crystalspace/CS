@@ -1374,7 +1374,7 @@ void csComponent::ClipChild (cswsRectVector &rect, csComponent *child)
       if (!r.IsEmpty ())
         rect.Push (new csRect (r));
 
-      rect.Delete (i);
+      rect.DeleteIndex (i);
     } /* endif */
   } /* endfor */
 }
@@ -1397,7 +1397,7 @@ void csComponent::Clip (cswsRectVector &rect, csComponent *last, bool forchild)
     {
       ((csRect *)rect[i])->Intersect (relbound);
       if (((csRect *)rect[i])->IsEmpty ())
-        rect.Delete (i);
+        rect.DeleteIndex (i);
     } /* endfor */
   }
 
@@ -1472,7 +1472,7 @@ void csComponent::FastClip (cswsRectVector &rect)
         }
     }
     if (!used)
-      rect.Delete (i);
+      rect.DeleteIndex (i);
   }
 }
 

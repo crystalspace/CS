@@ -455,7 +455,7 @@ int csBezierMesh::FindCurveIndex (iCurve *curve) const
 
 void csBezierMesh::RemoveCurve (int idx)
 {
-  curves.Delete (idx);
+  curves.DeleteIndex (idx);
   curves_transf_ok = false;
   static_data->obj_bbox_valid = false;
 }

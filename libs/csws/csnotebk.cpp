@@ -730,13 +730,13 @@ bool csNotebook::SelectTab (csComponent *iComponent)
 bool csNotebook::DeleteTab (csComponent *iComponent)
 {
   fReposition = true;
-  return pages.Delete (FindPage (iComponent));
+  return pages.DeleteIndex (FindPage (iComponent));
 }
 
 bool csNotebook::DeleteTab (int iIndex)
 {
   fReposition = true;
-  return pages.Delete (iIndex);
+  return pages.DeleteIndex (iIndex);
 }
 
 bool csNotebook::AddTab (cspPageData *iPageData, const char *iInfo,

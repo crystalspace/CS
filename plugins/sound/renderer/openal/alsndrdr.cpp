@@ -264,7 +264,7 @@ void csSoundRenderOpenAL::UnregisterSound (iSoundHandle *snd)
   int n = SoundHandles.Find(hdl);
   if (n != -1)
   {
-    SoundHandles.Delete(n);
+    SoundHandles.DeleteIndex (n);
   }
   mutex_SoundHandles->Release();
 
@@ -320,7 +320,7 @@ void csSoundRenderOpenAL::Update()
     if (!src->IsPlaying())
     {
       //  Once a source has stopped playing it can be removed.
-      ActiveSources.Delete(i);
+      ActiveSources.DeleteIndex (i);
       i--;
     }
   }

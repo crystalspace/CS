@@ -259,7 +259,7 @@ public:
     {
       VfsArchive *a = array.Get (i);
       if (a->CheckUp ())
-        array.Delete (i);
+        array.DeleteIndex (i);
     }
   }
 };
@@ -989,8 +989,8 @@ bool VfsNode::RemoveRPath (const char *RealPath)
   for (i = 0; i < RPathV.Length (); i++)
     if (strcmp ((char *)RPathV.Get (i), RealPath) == 0)
     {
-      RPathV.Delete (i);
-      UPathV.Delete (i);
+      RPathV.DeleteIndex (i);
+      UPathV.DeleteIndex (i);
       return true;
     } /* endif */
 
@@ -1884,7 +1884,7 @@ bool csVFS::Mount (const char *VirtualPath, const char *RealPath)
   {
     int idx = NodeList.Find (node);
     if (idx >= 0)
-      NodeList.Delete (idx);
+      NodeList.DeleteIndex (idx);
     return false;
   }
 
@@ -1915,7 +1915,7 @@ bool csVFS::Unmount (const char *VirtualPath, const char *RealPath)
     config.DeleteKey (s);
     int idx = NodeList.Find (node);
     if (idx >= 0)
-      NodeList.Delete (idx);
+      NodeList.DeleteIndex (idx);
   }
 
   return true;

@@ -479,7 +479,7 @@ bool csRegionList::RegionList::Remove (iRegion *obj)
 
 bool csRegionList::RegionList::Remove (int n)
 {
-  return scfParent->Delete (n);
+  return scfParent->DeleteIndex (n);
 }
 
 void csRegionList::RegionList::RemoveAll ()
