@@ -1,5 +1,25 @@
 The history order has been reversed so that new features are at the top.
 
+3-Jul-2000
+	- Seth Galbraith cut skybox in half to save 200 KB for Squawk.
+2-Jul-2000
+	- Samuel Humphreys did the following fixes to dtsimple:
+	    - Thanks to AndyZ's mem debugger, plugged all the memory leaks
+	      I'd introduced :) From (cough) ~1.5k to 0.
+	    - Also fixed a couple of memory leaks in the software texture
+	      manager while in 8bit.
+	    - Fixed the crasher in dtsimple in 8bit software mode.
+	    - Context close messages now sent on procedural texture canvas
+	      destruction.
+	    - Fixed various comments.
+	- Cleaned up the code to load and save a recording. The format
+	  is now endian correct and somewhat shorter.
+	- Added 'clrrec' command to clear the recording in memory.
+	  Multiple recording sessions will otherwise just be appended to
+	  each other.
+	- Made the size of the saved recording smaller again by not
+	  repeating the sector name if it is the same as the previous
+	  entry.
 1-Jul-2000
 	- Added a primitive recording function for LinuxTag. Will clean
 	  it up for general use later (in WalkTest).
@@ -9,6 +29,8 @@ The history order has been reversed so that new features are at the top.
 	- Wouter also worked on the 3D quadtree (which is possibly
 	  going to be used for fast visibility).
 	- I decreased the snow particle size from 1 to .7.
+30-Jun-2000
+	- Andrew Zabolotny fixed class tree a little in CSWS.
 29-Jun-2000
 	- Added csOctree::GetLeaf() function that calculates the leaf where
 	  the given position is in.

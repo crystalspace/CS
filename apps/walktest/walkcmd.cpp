@@ -19,6 +19,7 @@
 #include "cssysdef.h"
 #include "qint.h"
 #include "cssys/system.h"
+#include "cssys/csendian.h"
 #include "walktest/walktest.h"
 #include "walktest/bot.h"
 #include "walktest/infmaze.h"
@@ -65,17 +66,45 @@ void SaveRecording (iVFS* vfs, const char* fName)
 {
   iFile* cf;
   cf = vfs->Open (fName, VFS_FILE_WRITE);
-  int l = Sys->recording.Length ();
+  long l = convert_endian (Sys->recording.Length ());
   cf->Write ((char*)&l, sizeof (l));
   int i;
+  csRecordedCameraFile camint;
+  csSector* prev_sector = NULL;
   for (i = 0 ; i < Sys->recording.Length () ; i++)
   {
     csRecordedCamera* reccam = (csRecordedCamera*)Sys->recording[i];
-    cf->Write ((char*)reccam, sizeof (*reccam));
+    camint.m11 = convert_endian (float2long (reccam->mat.m11));
+    camint.m12 = convert_endian (float2long (reccam->mat.m12));
+    camint.m13 = convert_endian (float2long (reccam->mat.m13));
+    camint.m21 = convert_endian (float2long (reccam->mat.m21));
+    camint.m22 = convert_endian (float2long (reccam->mat.m22));
+    camint.m23 = convert_endian (float2long (reccam->mat.m23));
+    camint.m31 = convert_endian (float2long (reccam->mat.m31));
+    camint.m32 = convert_endian (float2long (reccam->mat.m32));
+    camint.m33 = convert_endian (float2long (reccam->mat.m33));
+    camint.x = convert_endian (float2long (reccam->vec.x));
+    camint.y = convert_endian (float2long (reccam->vec.y));
+    camint.z = convert_endian (float2long (reccam->vec.z));
+    camint.ax = convert_endian (float2long (reccam->angle.x));
+    camint.ay = convert_endian (float2long (reccam->angle.y));
+    camint.az = convert_endian (float2long (reccam->angle.z));
+    camint.mirror = reccam->mirror;
+    cf->Write ((char*)&camint, sizeof (camint));
     unsigned char len;
-    len = strlen (reccam->sector->GetName ());
-    cf->Write ((char*)&len, 1);
-    cf->Write (reccam->sector->GetName (), 1+strlen (reccam->sector->GetName ()));
+    if (prev_sector == reccam->sector)
+    {
+      len = 255;
+      cf->Write ((char*)&len, 1);
+    }
+    else
+    {
+      len = strlen (reccam->sector->GetName ());
+      cf->Write ((char*)&len, 1);
+      cf->Write (reccam->sector->GetName (),
+      	1+strlen (reccam->sector->GetName ()));
+    }
+    prev_sector = reccam->sector;
   }
   cf->DecRef ();
 }
@@ -85,20 +114,49 @@ void LoadRecording (iVFS* vfs, const char* fName)
 {
   iFile* cf;
   cf = vfs->Open (fName, VFS_FILE_READ);
+  Sys->recording.DeleteAll ();
   Sys->recording.SetLength (0);
-  int l;
+  long l;
   cf->Read ((char*)&l, sizeof (l));
+  l = convert_endian (l);
+  csRecordedCameraFile camint;
+  csSector* prev_sector = NULL;
   int i;
   for (i = 0 ; i < l ; i++)
   {
     csRecordedCamera* reccam = new csRecordedCamera ();
-    cf->Read ((char*)reccam, sizeof (*reccam));
+    cf->Read ((char*)&camint, sizeof (camint));
+    reccam->mat.m11 = long2float (convert_endian (camint.m11));
+    reccam->mat.m12 = long2float (convert_endian (camint.m12));
+    reccam->mat.m13 = long2float (convert_endian (camint.m13));
+    reccam->mat.m21 = long2float (convert_endian (camint.m21));
+    reccam->mat.m22 = long2float (convert_endian (camint.m22));
+    reccam->mat.m23 = long2float (convert_endian (camint.m23));
+    reccam->mat.m31 = long2float (convert_endian (camint.m31));
+    reccam->mat.m32 = long2float (convert_endian (camint.m32));
+    reccam->mat.m33 = long2float (convert_endian (camint.m33));
+    reccam->vec.x = long2float (convert_endian (camint.x));
+    reccam->vec.y = long2float (convert_endian (camint.y));
+    reccam->vec.z = long2float (convert_endian (camint.z));
+    reccam->angle.x = long2float (convert_endian (camint.ax));
+    reccam->angle.y = long2float (convert_endian (camint.ay));
+    reccam->angle.z = long2float (convert_endian (camint.az));
+    reccam->mirror = camint.mirror;
     unsigned char len;
     cf->Read ((char*)&len, 1);
-    char buf[100];
-    cf->Read (buf, 1+len);
-    csSector* s = (csSector*)Sys->world->sectors.FindByName (buf);
+    csSector* s;
+    if (len == 255)
+    {
+      s = prev_sector;
+    }
+    else
+    {
+      char buf[100];
+      cf->Read (buf, 1+len);
+      s = (csSector*)Sys->world->sectors.FindByName (buf);
+    }
     reccam->sector = s;
+    prev_sector = s;
     Sys->recording.Push ((void*)reccam);
   }
   cf->DecRef ();
@@ -277,7 +335,7 @@ bool CommandHandler (const char *cmd, const char *arg)
     CONPRI("Various:\n");
     CONPRI("  coordsave coordload bind capture map p_alpha s_fog\n");
     CONPRI("  snd_play snd_volume loadsprite addsprite delsprite\n");
-    CONPRI("  record play saverec loadrec\n");
+    CONPRI("  record play clrrec saverec loadrec\n");
 #   undef CONPRI
   }
   else if (!strcasecmp (cmd, "coordsave"))
@@ -297,6 +355,11 @@ bool CommandHandler (const char *cmd, const char *arg)
   else if (!strcasecmp (cmd, "loadrec"))
   {
     LoadRecording (Sys->VFS, "/this/record");
+  }
+  else if (!strcasecmp (cmd, "clrrec"))
+  {
+    Sys->recording.DeleteAll ();
+    Sys->recording.SetLength (0);
   }
   else if (!strcasecmp (cmd, "record"))
   {

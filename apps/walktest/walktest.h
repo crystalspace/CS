@@ -56,20 +56,51 @@ struct csKeyMap
   int need_status,is_on;
 };
 
-///
+/**
+ * An entry for the record function.
+ */
 struct csRecordedCamera
 {
   csMatrix3 mat;
   csVector3 vec;
+  csVector3 angle;
   bool mirror;
   csSector* sector;
-  csVector3 angle;
+};
+
+/**
+ * A recorded entry saved in a file.
+ */
+struct csRecordedCameraFile
+{
+  long m11, m12, m13;
+  long m21, m22, m23;
+  long m31, m32, m33;
+  long x, y, z;
+  long ax, ay, az;
+  unsigned char mirror;
+};
+
+/**
+ * A vector which holds the recorded items and cleans them up if needed.
+ */
+class csRecordVector : public csVector
+{
+public:
+  /// Free a single element of the array
+  virtual bool FreeItem (csSome Item)
+  {
+    csRecordedCamera* reccam = (csRecordedCamera*)Item;
+    delete reccam;
+    return true;
+  }
 };
 
 ///
 class WalkTest : public SysSystemDriver
 {
   typedef SysSystemDriver superclass;
+
 public:
   /// The startup directory on VFS with needed world file
   static char world_dir [100];
@@ -83,7 +114,11 @@ public:
 
   /// Camera angles. X and Y are user controllable, Z is not.
   csVector3 angle;
-  /// Angular velocity: angle_velocity.x is constantly added to angle.x and so on.
+
+  /**
+   * Angular velocity: angle_velocity.x is constantly added to angle.x
+   * and so on.
+   */
   csVector3 angle_velocity;
 
   /// Colliders for "legs" and "body". Intersections are handled differently.
@@ -91,7 +126,7 @@ public:
   csRAPIDCollider *body;
 
   /// Vector with recorded camera transformations.
-  csVector recording;
+  csRecordVector recording;
 
   // Various configuration values for collision detection.
   /// If >= 0 then we're recording. The value is the current frame entry.

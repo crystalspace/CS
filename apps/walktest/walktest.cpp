@@ -585,7 +585,7 @@ void WalkTest::DrawFrame (time_t elapsed_time, time_t current_time)
     reccam->angle = Sys->angle;
     recording.Push ((void*)reccam);
   }
-  if (cfg_playrecording >= 0)
+  if (cfg_playrecording >= 0 && recording.Length () > 0)
   {
     csRecordedCamera* reccam = (csRecordedCamera*)recording[cfg_playrecording];
     cfg_playrecording++;
