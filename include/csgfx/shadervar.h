@@ -318,15 +318,20 @@ public:
   */
   inline void FillVariableList (csShaderVariableList *list) const
   {
+    if (list->Length ()== 0 || variables.Length() == 0) return;
+
     csRefArray<csShaderVariable>::Iterator varIter (variables.GetIterator ());
     csShaderVariableList::Iterator inputIter (list->GetIterator ());
     csShaderVariable* curVar=0;
+    curVar=varIter.Next ();
 
     while (inputIter.HasNext())
     {
       csShaderVariableProxy *curInput = (csShaderVariableProxy*)&inputIter.Next();
-      while (varIter.HasNext () && ((curVar=varIter.Next ())->Name < curInput->Name))
-        ;
+      while (varIter.HasNext () && curVar->Name < curInput->Name)
+      {
+        curVar=varIter.Next ();
+      }
       if (curVar->Name == curInput->Name && curInput->shaderVariable == 0)
         curInput->shaderVariable = curVar;
       else if (varIter.HasNext ())
