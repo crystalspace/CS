@@ -182,13 +182,13 @@
 #define SHORT1FROMLONG(l)     (short)(((long)l) >> 16)
 #define SHORT2FROMLONG(l)     (short)(((long)l) & 0xffff)
 
-enum SubSystemsID
+enum SubSystemsIDs
 {
-  piG3D_ID = 0,
-  piG2D_ID,
-  piGI_ID,
-  piNetDrv_ID,
-  piNetMan_ID
+  G3D_ID = 0,
+  G2D_ID,
+  GI_ID,
+  NetDrv_ID,
+  NetMan_ID
 };
 
 #endif // __DEF_H__
