@@ -56,6 +56,7 @@
  */
 class csBitSet
 {
+protected:
   unsigned bit_count;
   unsigned byte_count;
   unsigned char *bits;
