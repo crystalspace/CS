@@ -5,8 +5,12 @@
 @cindex Culling, Visibility
 @cindex octrees
 @cindex BSP trees
+@cindex PVS
+@cindex Potentially Visible Set
 @cindex portals
+@cindex sectors
 @cindex c-buffer
+@cindex view frustrum
 
 @emph{NOTE:} This section describes in detail how visibility culling in
 Crystal Space works or will work in the not-to-distant future.
@@ -28,10 +32,233 @@ This effect of portals makes them very powerful. It also means that
 you can have overlapping sectors and in general other weird portal
 constructs.
 
-Important for this discussion is that the visibility problem is
-mostly solved within one sector. Between the sectors visibility can
-easily be solved using the portal outline. When drawing through a
-portal everything that is behind that portal will be clipped to the
-portal polygon. This clipping currently happens in 2D which means
-that the geometry behind needs to be transformed to 2D (screen space).
+Portals starting in arbitrary space (i.e. on a thing) are called
+floating portals. Some special care needs to be taken for those because
+we can't rely on the Z-buffer to be useful here. So this is a case
+where clipping to the 2D boundary of the portal must happen.
+
+Important for this discussion is the fact that we have two important
+areas where culling happens. We have in-sector visibility culling which
+is all visibility testing that ignores portal boundaries and we have
+portal/sector visibility which controls what you can see through a
+portal. Discussing both will be the main focus of this document later.
+
+@node entities
+@subsection Entities
+
+But first lets discuss the type of entities that CS supports.
+We already saw sectors above. These are the main containers for all
+the entities below.
+
+@node sprites or models
+@subsubsection Sprites or Models
+
+CS supports both 3D and 2D sprites. A 3D sprite is basicly a
+set of triangles or a triangle mesh. I will not go into much more
+detail here because this document is related to visibility. A 2D sprite
+is a general polygon which always faces the camera. Both are considered
+detail objects (more on that later).
+
+@node things
+@subsubsection Things
+
+Things are general objects used to enhance geometry. They can move
+and rotate but in general their most important use is to enhance
+geometry of a level (i.e. a painting on the wall, a staircase,
+a chair, ...). Large things can be merged with sector geometry (more
+on that later). Small and detailed things will be tagged as detail
+objects. Polygons on things can also be portals to other areas.
+
+@node curved surfaces
+@subsubsection Curved Surfaces
+
+Curved surfaces are technically part of things but for visibility
+they are considered differently. They are always considered as detail
+objects as they represent a rather large triangle mesh.
+
+@node terrain
+@subsubsection Terrain Surfaces
+
+A terrain surface is a large entity that can be in a sector.
+It is not a detail object (obviously). Handling of terrain and visibility
+is not ready yet. We need to do more work on this part.
+
+@node sector structure
+@subsection Sector Structure
+
+In this subsection we go deeper into the structure of a sector.
+A sector is always convex. i.e. this means that all the polygons making
+up the boundary of a sector must form a convex (and in most cases closed)
+hull.
+
+Then we have two possibilities. Either we stop here and add entities
+from the above list to this sector and use outgoing portals to define
+the rest of the world or else we first add a number of
+things and merge them into an octree/bsp-tree combination. After that
+we add further entities like above (and we can still use the outgoing
+portals). All things which are not marked as
+moveable and detail can be added to the octree.
+
+@node about octrees and bsp trees
+@subsubsection About Octrees and BSP Trees
+
+Note that this is only a very short explanation about BSP trees.
+There are much better documents explaining them.
+
+A BSP tree is a way to partition space into convex subspaces. CS uses
+BSP trees mostly to get perfect Z ordering of polygons (i.e. front to
+back or back to front). Why CS needs this will be explained later.
+
+To build a BSP tree you take the entire sector (i.e. all polygons
+from the merged things) and you select one polygon to split all the others.
+This will create two child nodes. All polygons on the same plane as the
+splitter will be added to the current node. All polygons at the left side
+of the splitter will be added to the left node and all polygons at the
+right side will be added to the right node.
+
+If a polygon intersects the plane of the splitter then the polygon
+will have to be split. The left side of the polygon will go to the left
+node and the right side to the right node.
+
+This process continues recursively (i.e. into the left and right children)
+until there are no more polygons left.
+
+This entire process creates a tree (i.e. a BSP tree) that can be used
+for many purposes. i.e. to render from back to front (painters algo)
+using a BSP tree you take the camera view point and then start
+traversing the tree. First you traverse the node that is on the back
+side of the splitter plane as seen from the camera. Then you traverse
+the polygons on the splitter (i.e. in this node) and then the polygons
+on the side in front of the splitter plane. This is also a recursive
+process. To render front to back you simply reverse the process.
+
+An octree is a variant of a BSP tree. Instead of selecting a splitter
+from the given polygons you select three axis aligned splitter planes
+usually centered around the center of the set of input polygons. The planes
+are always axis aligned so you can't do much about that but there is
+some freedome with the choice of the center of those three planes.
+CS currently tries a number of random center points and selects the one
+which causes least number of splits. A better criterium would be to
+select a center which causes the planes to intersect as much solid space
+as possible. This is somewhat harder to implement. The reason why this
+is good has to do with visibility culling and PVS. If a splitter plane
+intersects more solid space than open space the chance is high that
+you will be able to cull nearby octree nodes. More about culling later
+though.
+
+The advantages of an octree in comparison with a BSP tree is that it
+is easier to handle (easier to calculate) and also easier to do culling
+with as all nodes are boxes.
+
+CS uses an octree for structuring polygons. However, at some number
+of polygons (currently set at 150) it will switch to BSP trees.
+So at the end you get a large octree with many mini-BSP trees at the
+leaves of the octree. This combined structure provides everything that
+CS needs for efficient visibility culling.
+
+@node visibility culling
+@subsection Visibility Culling
+
+Ok, here it comes. Given the above structure with sectors, entities,
+and the optional octree we can define how we want to calculate
+optimal (or near optimal) visibility.
+
+When speaking about culling we are mainly speaking about three
+types of geometry:
+
+@table @emph
+@item World Geometry
+World geometry is the basic geometry that makes up the world.
+Sector walls are part of world geometry. In general world geometry
+are big polygons that define large boundaries in some world or
+level.
+
+@item Detail Objects
+Detail objects are entities which are too detailed (i.e. too
+many small polygons or triangles) to be included in the processor
+intensive visibility calculations. So we mark them as detail and
+we process them on a higher level for visibility (mostly by treating
+their bounding box instead of the object itself). Curved surfaces,
+sprites, and some things are all detail objects.
+
+@item Culling Objects
+Culling objects are invisible objects. Their only purpose is to cull
+geometry. So they are in fact the reverse of detail objects. In general
+culling objects should be large and have few polygons. These polygons
+will be included in visibility testing. You can add a culling object
+inside a detail object. The detail object will not participate in culling
+objects behind it (it will itself be culled by its bounding box however)
+but the culling object inside will take care of culling what is hidden
+by the detail object. Culling objects are only useful for detail objects
+that are sufficiently large and in sectors where there is a sufficient
+number of other entities (i.e. objects or portals) to be culled.
+A question here is wether or not it is possible (easy) to generate culling
+objects automatically from detail objects.
+
+@end table
+
+@node view frustrum culling
+@subsection View Frustrum Culling
+
+View frustrum culling is the most obvious type of culling. CS does not
+do it right now (see the following section about portal/sector visibility
+for the reason) but there are some areas where we should certainly do
+this. Detail objects are one example.
+
+@node portal/sector visibility
+@subsection Portal/sector Visibility
+
+Portal/sector visibility is based on 2D clipping. The 2D projected
+outline (in screen coordinates) of the last portal is used as a clipper
+for all geometry that can be seen through that portal.
+
+This approach obviously has some disadvantages. It means we have to
+transform all geometry to camera space and then to screen space. Given
+the current advances in hardware (i.e. hardware accelerated transforms)
+this is no longer a good thing to do. In the future it might be possible
+to change this system to 3D clipping. For now this is a fundamental change
+and we'll try to get around this limitation in other ways.
+
+The most important way to fix this limitation is not to cull detail
+objects like this. i.e. sprites, curved surfaces, and detail things should
+not be clipped to the 2D portal this way. Only for the software renderer
+could this make some sense as overdraw is expensive there. The
+new DrawTriangleMesh and the even newer DrawPolygonMesh (in iGraphics3D
+interface) will be able to handle this. All detail objects will be
+rendered with those. The engine will take care to only enable
+clipping if REALLY needed (i.e. there are some cases where clipping
+is mandatory: for example, if you have a floating portal you cannot
+rely on correct Z-buffer information. So you need to clip geometry
+to the 2D clipper).
+
+For detail objects we have a number of options. We can simply
+consider them visible is they are in the view frustrum and ignore
+portals alltogether. Note that all detail objects are linked to a
+sector. If a sector is not traversed too (because the current viewable
+portals don't connect to that sector) then the detail objects in
+that sector will not be considered as well. So for fast hardware this
+approach can be good as overdraw is not very expensive.
+
+Another option is to clip the convex outline of the detail object to
+the portal. This is a rough clip which will simply indicate if part
+of the object is visible and then render it in total if that's the case
+(unless we have a special case like a floating portal which requires
+clipping). This option is useful for intermediate speed hardware or
+even for software if the detail object is very small. Clipping is
+still an expensive operation (especially doing it for every triangle
+or polygon) so we need to balance that against the cost of overdraw.
+
+The last option is to clip every individual triangle or polygon.
+For software rendering this might be the base case as overdraw
+is expensive. This will have to be tested to see if that is really
+the case.
+
+So this will limit 2D clipping to world geometry which is still useful
+because that enables good culling of other portals. Culling portals
+is valuable because culling a portal means that the entire sector behind
+that portal is also culled.
+
+@node in sector visibility
+@subsection In-sector Visibility
+
 
