@@ -43,6 +43,7 @@ csTextureWrapper::csTextureWrapper (iImage* Image) :
   DG_TYPE (this, "csTextureWrapper");
 
   (image = Image)->IncRef ();
+  DG_LINK (this, image);
   UpdateKeyColorFromImage ();
 
   csEngine::current_engine->AddToCurrentRegion (this);
@@ -80,6 +81,7 @@ csTextureWrapper::csTextureWrapper (csTextureWrapper &t) :
   (handle = t.handle)->IncRef ();
   DG_LINK (this, handle);
   (image = t.image)->IncRef ();
+  DG_LINK (this, image);
 
   UpdateKeyColorFromImage ();
 
@@ -94,15 +96,18 @@ csTextureWrapper::~csTextureWrapper ()
     handle->DecRef ();
   }
   if (image)
+  {
+    DG_UNLINK (this, image);
     image->DecRef ();
+  }
   if (use_callback)
     use_callback->DecRef ();
 }
 
 void csTextureWrapper::SetImageFile (iImage *Image)
 {
-  if (Image) Image->IncRef ();
-  if (image) image->DecRef ();
+  if (Image) { Image->IncRef (); DG_LINK (this, Image); }
+  if (image) { DG_UNLINK (this, image); image->DecRef (); }
   image = Image;
 
   UpdateKeyColorFromImage ();
@@ -110,7 +115,7 @@ void csTextureWrapper::SetImageFile (iImage *Image)
 
 void csTextureWrapper::SetTextureHandle (iTextureHandle *tex)
 {
-  if (image) { image->DecRef (); image = NULL; }
+  if (image) { DG_UNLINK (this, image); image->DecRef (); image = NULL; }
   if (tex) tex->DecRef ();
   if (handle)
   {
