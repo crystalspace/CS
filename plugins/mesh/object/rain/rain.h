@@ -64,6 +64,8 @@ public:
 
   /// Set the number of particles to use.
   void SetNumberParticles (int num) { initialized = false; number = num; }
+  /// Get the number of particles
+  int GetNumberParticles () const { return number; }
   /// Set the size of the drops.
   void SetDropSize (float dropwidth, float dropheight)
   {
@@ -71,24 +73,36 @@ public:
     drop_width = dropwidth;
     drop_height = dropheight;
   }
+  /// Get the size of the drops.
+  void GetDropSize (float& dropwidth, float& dropheight) const
+  { dropwidth = drop_width; dropheight = drop_height; }
   /// Set box.
   void SetBox (const csVector3& minbox, const csVector3& maxbox)
   {
     initialized = false;
     rainbox.Set (minbox, maxbox);
   }
+  /// Get box.
+  void GetBox (csVector3& minbox, csVector3& maxbox) const
+  { minbox = rainbox.Min(); maxbox = rainbox.Max(); }
   /// Enable or disable lighting.
   void SetLighting (bool l)
   {
     initialized = false;
     lighted_particles = l;
   }
+  /// see if lighting is enabled
+  bool GetLighting () const
+  { return lighted_particles; }
   /// Set fall speed.
   void SetFallSpeed (const csVector3& fspeed)
   {
     initialized = false;
     rain_dir = fspeed;
   }
+  /// Get fall speed.
+  const csVector3& GetFallSpeed () const
+  { return rain_dir; }
 
   /// Update the particle system.
   virtual void Update (cs_time elapsed_time);
@@ -123,6 +137,16 @@ public:
     {
       scfParent->SetFallSpeed (fspeed);
     }
+    virtual int GetNumberParticles () const 
+    { return scfParent->GetNumberParticles(); }
+    virtual void GetDropSize (float& dropwidth, float& dropheight) const
+    { scfParent->GetDropSize(dropwidth, dropheight); }
+    virtual void GetBox (csVector3& minbox, csVector3& maxbox) const
+    { scfParent->GetBox(minbox, maxbox); }
+    virtual bool GetLighting () const
+    { return scfParent->GetLighting(); }
+    virtual const csVector3& GetFallSpeed () const
+    { return scfParent->GetFallSpeed(); }
   } scfiRainState;
   friend class RainState;
 };
