@@ -117,8 +117,8 @@ void csGenerateTerrainImage::GetImagePixel(iImage *image, int x, int y,
 }
 
 
-csColor csGenerateTerrainImage::ComputeLayerColor(
-  csGenerateTerrainImagePart *layer, const csVector2& pos)
+void csGenerateTerrainImage::ComputeLayerColor(
+  csGenerateTerrainImagePart *layer, const csVector2& pos, csColor& col)
 {
   csVector2 imagepos = pos - layer->offset;
   imagepos.x *= layer->scale.x;
@@ -156,7 +156,6 @@ csColor csGenerateTerrainImage::ComputeLayerColor(
   col2.blue += float(pix.blue) * invblendy;
 
   /// now linearly interpolate col1 and col2
-  csColor col;
   float blendx = imagepos.x - float(x);
   float invblendx = 1.f - blendx;
   col.red = invblendx * col1.red + blendx * col2.red;
@@ -166,10 +165,10 @@ csColor csGenerateTerrainImage::ComputeLayerColor(
   // return trilinear interpolated value
   //printf("layercol = %g %g %g\n", col.red, col.green, col.blue);
   //col *= 1./255.;
-  return col;
 }
 
-csRGBpixel csGenerateTerrainImage::ComputeColor(const csVector2& pos)
+void csGenerateTerrainImage::ComputeColor(const csVector2& pos,
+  csRGBpixel& pix)
 {
   /// get height
   float height = heightfunc(userdata, pos.x, pos.y);
@@ -185,23 +184,27 @@ csRGBpixel csGenerateTerrainImage::ComputeColor(const csVector2& pos)
   float belowfactor = 0.0;
   float abovefactor = 0.0;
   csColor abovecol, belowcol;
-  if(!below && !above) return csRGBpixel(128, 128, 128);
+  if(!below && !above)
+  {
+    pix.Set(128, 128, 128);
+    return;
+  }
   if(!below)
   {
     abovefactor = 1.0;
-    abovecol = ComputeLayerColor(above, pos);
+    ComputeLayerColor(above, pos, abovecol);
   }
   else if(!above)
   {
     belowfactor = 1.0;
-    belowcol = ComputeLayerColor(below, pos);
+    ComputeLayerColor(below, pos, belowcol);
   }
   else { // both an above and below - blend
     float dist = above->height - below->height;
     belowfactor = (above->height - height) / dist;
     abovefactor = 1.0 - belowfactor;
-    abovecol = ComputeLayerColor(above, pos);
-    belowcol = ComputeLayerColor(below, pos);
+    ComputeLayerColor(above, pos, abovecol);
+    ComputeLayerColor(below, pos, belowcol);
   }
 
   csColor col(0,0,0);
@@ -210,7 +213,7 @@ csRGBpixel csGenerateTerrainImage::ComputeColor(const csVector2& pos)
   col += belowcol * belowfactor;
   //printf("col = %g %g %g\n", col.red, col.green, col.blue);
 
-  return csRGBpixel (QInt(col.red), QInt(col.green), QInt(col.blue));
+  pix.Set(QInt(col.red), QInt(col.green), QInt(col.blue));
 }
 
 
@@ -226,6 +229,7 @@ iImage *csGenerateTerrainImage::Generate(int totalw, int totalh,
   csVector2 pos;
   /// memory image is always truecolor
   csRGBpixel *destpix = (csRGBpixel*)result->GetImageData();
+  csRGBpixel col;
   for(int y=0; y< parth; y++)
   {
     pos.y = startpos.y + pixelsize.y * float(y);
@@ -233,9 +237,9 @@ iImage *csGenerateTerrainImage::Generate(int totalw, int totalh,
     for(int x=0; x< partw; x++)
     {
       /// compute color
-      csRGBpixel col = ComputeColor(pos);
-      if(1)if(x==0)printf("Set pixel %3d, %3d to %3d %3d %3d\n", x, y, 
-        col.red, col.green, col.blue);
+      ComputeColor(pos, col);
+      //if(x==0)printf("Set pixel %3d, %3d to %3d %3d %3d\n", x, y, 
+        //col.red, col.green, col.blue);
       /// set pixel
       *destpix = col;
       destpix++;

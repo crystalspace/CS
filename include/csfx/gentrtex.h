@@ -52,11 +52,11 @@ public:
   void GetImagePixel(iImage *image, int x, int y, csRGBpixel& res);
 
   /// compute a color (0..255) for a spot on a layer
-  csColor ComputeLayerColor(csGenerateTerrainImagePart *layer,
-    const csVector2& pos);
+  void ComputeLayerColor(csGenerateTerrainImagePart *layer,
+    const csVector2& pos, csColor& col);
 
   /// compute color for a spot (0..1) on the terrain
-  csRGBpixel ComputeColor(const csVector2& pos);
+  void ComputeColor(const csVector2& pos, csRGBpixel& pix);
 
   /**
    * Add a base texture. It is displayed at a certain layer of height.
