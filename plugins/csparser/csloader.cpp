@@ -1821,7 +1821,6 @@ bool csLoader::LoadMeshObjectFactory (iLoaderContext* ldr_context,
   iBinaryLoaderPlugin* binplug = 0;
   iMaterialWrapper *mat = 0;
   bool staticshape = false;
-  bool params_given = false;
   csRef<iDocumentNodeIterator> prev_it;
   csRef<iDocumentNodeIterator> it = node->GetNodes ();
   while (true)
@@ -1954,7 +1953,6 @@ bool csLoader::LoadMeshObjectFactory (iLoaderContext* ldr_context,
 	}
 	else
 	{
-	  params_given = true;
 	  // We give here the iMeshObjectFactory as the context. If this
 	  // is a new factory this will be 0. Otherwise it is possible
 	  // to append information to the already loaded factory.
@@ -2001,7 +1999,6 @@ bool csLoader::LoadMeshObjectFactory (iLoaderContext* ldr_context,
 	      child, "Error opening file '%s'!", child->GetContentsValue ());
 	    return false;
 	  }
-	  params_given = true;
 	  // We give here the iMeshObjectFactory as the context. If this
 	  // is a new factory this will be 0. Otherwise it is possible
 	  // to append information to the already loaded factory.
@@ -2303,13 +2300,6 @@ bool csLoader::LoadMeshObjectFactory (iLoaderContext* ldr_context,
 	SyntaxService->ReportBadToken (child);
         return false;
     }
-  }
-
-  if (!params_given)
-  {
-    SyntaxService->ReportError("crystalspace.maploader.parse.meshfactory",
-	node, "No <params> given!");
-    return false;
   }
 
   stemp->GetMeshObjectFactory ()->GetFlags ().SetBool (CS_FACTORY_STATICSHAPE,
@@ -2925,7 +2915,6 @@ bool csLoader::LoadMeshObject (iLoaderContext* ldr_context,
   iBinaryLoaderPlugin* binplug = 0;
   bool staticpos = false;
   bool staticshape = false;
-  bool params_given = false;
 
   csRef<iDocumentNodeIterator> prev_it;
   csRef<iDocumentNodeIterator> it = node->GetNodes ();
@@ -3047,7 +3036,6 @@ bool csLoader::LoadMeshObject (iLoaderContext* ldr_context,
 	}
 	else
 	{
-	  params_given = true;
 	  csRef<iBase> mo = plug->Parse (child, ldr_context, mesh);
           if (!mo || !HandleMeshObjectPluginResult (mo, child, mesh))
 	    goto error;	// Error already reported.
@@ -3181,7 +3169,6 @@ bool csLoader::LoadMeshObject (iLoaderContext* ldr_context,
 	  }
           if (!mo || !HandleMeshObjectPluginResult (mo, child, mesh))
 	    goto error;	// Error already reported.
-	  params_given = true;
 	}
         break;
 
@@ -3248,13 +3235,6 @@ bool csLoader::LoadMeshObject (iLoaderContext* ldr_context,
 	SyntaxService->ReportBadToken (child);
 	goto error;
     }
-  }
-
-  if (!params_given)
-  {
-    SyntaxService->ReportError("crystalspace.maploader.parse.meshobj", node,
-			      "No <params> given!");
-    goto error;
   }
 
   if (!priority) priority = csStrNew ("object");
