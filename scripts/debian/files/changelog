@@ -1,0 +1,48 @@
+crystalspace (0.92-1) unstable; urgency=low
+
+  * First upload (CLoses: bug#120691)
+  * CVS Daily Packaging
+
+ -- Christian Bayle <bayle@aist.enst.fr>  Wed, 13 Feb 2002 08:31:56 +0100
+
+crystalspace (0.90-5) unstable; urgency=low
+
+  * Added hints in menu
+  * Added missing build dependencies
+  * Force compiling with i386 
+
+ -- Christian Bayle <bayle@aist.enst.fr>  Mon,  3 Dec 2001 17:52:23 +0100
+
+crystalspace (0.90-4) unstable; urgency=low
+
+  * Policy Cleaning
+  * -Moved demos binaries to /usr/games
+  * -Moved dev binary to /usr/bin
+  * -Moved includes to /usr/include/crystalspace
+  * Added man generator (Not all binaries yet)
+  * Added menus for software or opengl rendering 
+
+ -- Christian Bayle <bayle@aist.enst.fr>  Mon, 26 Nov 2001 10:22:33 +0100
+
+crystalspace (0.90-3) unstable; urgency=low
+
+  * Made better distribution of files beetween main and demos packages
+  * Added demos and data packages
+
+ -- Christian Bayle <bayle@aist.enst.fr>  Wed, 21 Nov 2001 15:16:07 +0100
+
+crystalspace (0.90-2) unstable; urgency=low
+
+  * Added more appli in menus 
+
+ -- Christian Bayle <bayle@aist.enst.fr>  Mon, 19 Nov 2001 22:35:02 +0100
+
+crystalspace (0.90-1) unstable; urgency=low
+
+  * Initial Release.
+
+ -- Christian Bayle <bayle@aist.enst.fr>  Tue, 20 Nov 2001 21:49:31 +0100
+
+Local variables:
+mode: debian-changelog
+End:

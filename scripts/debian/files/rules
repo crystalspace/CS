@@ -1,0 +1,193 @@
+#!/usr/bin/make -f
+# Sample debian/rules that uses debhelper. 
+# GNU copyright 1997 by Joey Hess.
+#
+# This version is for a hypothetical package that builds an
+# architecture-dependant package, as well as an architecture-independent
+# package.
+
+# Uncomment this to turn on verbose mode. 
+#export DH_VERBOSE=1
+
+# This is the debhelper compatability version to use.
+export DH_COMPAT=3
+
+configure: configure-stamp
+configure-stamp:
+	dh_testdir
+	# Add here commands to configure the package.
+	# Activate all plugins
+	perl -pi -e "s/^#PLUGINS/PLUGINS/" $(CURDIR)/CS/mk/user.mak
+	cd CS; make linux
+	# CPU=i386 make linux 
+	# Install as much as possible
+	perl -pi -e "s/#TO_INSTALL/TO_INSTALL/" $(CURDIR)/CS/cache.mak
+	# Activating scripts
+	chmod +x $(CURDIR)/debian/createmenus
+	chmod +x $(CURDIR)/debian/addmissing
+	chmod +x $(CURDIR)/debian/automan
+	# Creating menus
+	$(CURDIR)/debian/createmenus $(CURDIR)
+
+	touch configure-stamp
+
+build: configure-stamp build-stamp
+build-stamp:
+	dh_testdir
+
+	# Add here commands to compile the package.
+	cd CS; $(MAKE) all
+
+	touch build-stamp
+
+clean:
+	dh_testdir
+	dh_testroot
+	rm -f build-stamp configure-stamp
+
+	# Add here commands to clean up after the build process.
+	-cd $(CURDIR)/CS; $(MAKE) clean
+	-cd $(CURDIR)/CS; $(MAKE) distclean
+	rm -f $(CURDIR)/CS/cache.mak
+	rm -f $(CURDIR)/CS/config.mak
+	rm -f $(CURDIR)/debian/crystalspace-data.menu
+
+	dh_clean
+
+DEVBIN=3ds2lev map2cs mdl2spr \
+	csfedit csfgen cslight picview scfreg viewmesh vsh \
+	cs-config
+
+install: DH_OPTIONS=
+install: build ###xpms
+	dh_testdir
+	dh_testroot
+	dh_clean -k
+	dh_installdirs
+
+	# Add here commands to install the package into debian/crystalspace.
+	mkdir -p $(CURDIR)/debian/tmp/usr/lib/crystalspace
+	cd CS; $(MAKE) install INSTALL_DIR=$(CURDIR)/debian/tmp/usr/lib/crystalspace
+	$(CURDIR)/debian/addmissing $(CURDIR)
+
+	find $(CURDIR)/debian/tmp/usr/lib/crystalspace/include -type f \
+		-exec chmod 644 {} \;
+	chmod +x \
+	$(CURDIR)/debian/tmp/usr/lib/crystalspace/scripts/python/cssh.py
+	chmod +x \
+	$(CURDIR)/debian/tmp/usr/lib/crystalspace/scripts/python/pysimp.py
+
+	# Move to respect Debian Policy
+
+	# dev binaries in /usr/bin
+	mkdir -p $(CURDIR)/debian/tmp/usr/bin
+	mv $(addprefix $(CURDIR)/debian/tmp/usr/lib/crystalspace/bin/,\
+		 $(DEVBIN))\
+		$(CURDIR)/debian/tmp/usr/bin
+
+	# demos binaries in /usr/games
+	mkdir -p $(CURDIR)/debian/tmp/usr/games
+	mv $(CURDIR)/debian/tmp/usr/lib/crystalspace/bin/* \
+		$(CURDIR)/debian/tmp/usr/games
+
+	# includes in /usr/include/crystalspace
+	mkdir -p $(CURDIR)/debian/tmp/usr/include
+	mv $(CURDIR)/debian/tmp/usr/lib/crystalspace/include \
+		$(CURDIR)/debian/tmp/usr/include/crystalspace
+
+	dh_movefiles
+
+	# Adding home made xpm
+	cp $(CURDIR)/debian/xpm/*.xpm \
+		$(CURDIR)/debian/crystalspace-demos/usr/share/pixmaps
+
+	# These are levels for walktest + data for csdemo
+	###cp $(CURDIR)/data.extra/*.zip \
+	###	$(CURDIR)/debian/crystalspace-data/usr/lib/crystalspace/data
+	# This one needed by csdemo is more logically in demos package
+	###mv $(CURDIR)/debian/crystalspace-data/usr/lib/crystalspace/data/demodata.zip	\
+	###$(CURDIR)/debian/crystalspace-demos/usr/lib/crystalspace/data
+	###cp $(CURDIR)/data.extra/*.xpm \
+	###	$(CURDIR)/debian/crystalspace-data/usr/share/pixmaps
+
+	# Autogenerate man
+	$(CURDIR)/debian/automan $(CURDIR)
+	$(CURDIR)/debian/rules man
+	rm -f $(CURDIR)/debian/man/*.sgml.?
+	dh_installman -p crystalspace-demos $(CURDIR)/debian/man/*.6
+	dh_installman -p crystalspace-dev $(CURDIR)/debian/man/*.1
+
+%.xpm: %.jpg
+	convert -size 32x32 $< $@
+	mogrify -format xpm -geometry 32x32 -map /usr/X11R6/include/X11/pixmaps/cmap.xpm $@
+
+###xpms: $(patsubst %.jpg,%.xpm,$(wildcard $(CURDIR)/data.extra/*.jpg))
+
+man: $(subst .sgml,, $(wildcard $(CURDIR)/debian/man/*.sgml*))
+%.1: %.sgml.1
+	@echo "Creating $(notdir $@)"
+	@docbook-to-man $< > $@
+%.6: %.sgml.6
+	@echo "Creating $(notdir $@)"
+	@docbook-to-man $< > $@
+
+# Build architecture-independent files here.
+# Pass -i to all debhelper commands in this target to reduce clutter.
+binary-indep: build install
+	dh_testdir -i
+	dh_testroot -i
+#	dh_installdebconf -i
+	dh_installdocs -i
+	dh_installexamples -i
+	dh_installmenu -i
+#	dh_installlogrotate -i
+#	dh_installemacsen -i
+#	dh_installpam -i
+#	dh_installmime -i
+#	dh_installinit -i
+	dh_installcron -i
+#	dh_installman -i
+	dh_installinfo -i
+#	dh_undocumented -i
+	dh_installchangelogs  -i
+	dh_link -i
+	dh_compress -i
+	dh_fixperms -i
+	dh_installdeb -i
+#	dh_perl -i
+	dh_gencontrol -i
+	dh_md5sums -i
+	dh_builddeb -i
+
+# Build architecture-dependent files here.
+binary-arch: build install
+	dh_testdir 
+	dh_testroot 
+#	dh_installdebconf 
+	dh_installdocs 
+	dh_installexamples 
+	dh_installmenu 
+#	dh_installlogrotate 
+#	dh_installemacsen
+#	dh_installpam 
+#	dh_installmime 
+#	dh_installinit
+#	dh_installcron
+	dh_installman
+	dh_installinfo
+#	dh_undocumented
+	dh_installchangelogs 
+	dh_strip 
+	dh_link
+	dh_compress
+	dh_fixperms 
+	dh_makeshlibs 
+	dh_installdeb 
+#	dh_perl
+	dh_shlibdeps -l$(CURDIR)/debian/usr/lib/crystalspace/lib
+	dh_gencontrol
+	dh_md5sums 
+	dh_builddeb 
+
+binary: binary-indep binary-arch
+.PHONY: build clean binary-indep binary-arch binary install configure

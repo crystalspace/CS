@@ -1,0 +1,33 @@
+# !/bin/sh
+CURDIR=$1
+
+rm -f $CURDIR/debian/crystalspace-data.menu
+rm -f $CURDIR/debian/crystalspace-demos.menu
+
+for videotype in software opengl
+do
+
+cat >> $CURDIR/debian/crystalspace-demos.menu <<-FIN
+?package(crystalspace-demos):needs=X11 section="Games"\\
+  hints="CrystalSpace,Demos,$videotype"\\
+  title="Blocks $videotype" command="/usr/games/blocks -video=$videotype"\\
+  icon="/usr/share/pixmaps/blocks.xpm"
+?package(crystalspace-demos):needs=X11 section="Games"\\
+  hints="CrystalSpace,Demos,$videotype"\\
+  title="CSdemo $videotype" command="/usr/games/csdemo -video=$videotype"\\
+  icon="/usr/share/pixmaps/csdemo.xpm"
+?package(crystalspace-demos):needs=X11 section="Games"\\
+  hints="CrystalSpace,Demos,$videotype"\\
+  title="Walktest flarge $videotype" command="/usr/games/walktest -video=$videotype"\\
+  icon="/usr/share/pixmaps/flarge.xpm"
+?package(crystalspace-demos):needs=X11 section="Games"\\
+  hints="CrystalSpace,Demos,$videotype"\\
+  title="Walktest mdltest $videotype" command="/usr/games/walktest -video=$videotype mdltest"\\
+  icon="/usr/share/pixmaps/mdltest.xpm"
+?package(crystalspace-demos):needs=X11 section="Games"\\
+  hints="CrystalSpace,Demos,$videotype"\\
+  title="Walktest partsys $videotype" command="/usr/games/walktest -video=$videotype partsys"\\
+  icon="/usr/share/pixmaps/partsys.xpm"
+FIN
+
+done
