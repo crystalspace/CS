@@ -8,6 +8,7 @@ chronological order.
 
 12-Sep-2004
 	- Jorrit fixed genmesh so it compiles with OR again.
+	- Jorrit did some more work on gmeshanim. Still unfinished.
 11-Sep-2004
 	- Andrew Robberts updated sprcal3d to allow for transformations of
 	  a mesh attached to a socket.

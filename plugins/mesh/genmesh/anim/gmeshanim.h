@@ -20,6 +20,7 @@
 #define __CS_GENMESHANIM_H__
 
 #include "csgeom/vector3.h"
+#include "csgeom/transfrm.h"
 #include "csutil/array.h"
 #include "csutil/parray.h"
 #include "csutil/csstring.h"
@@ -40,6 +41,7 @@ class csAnimControlGroup
 private:
   char* name;
   csArray<ac_vertex_data> vertices;
+  csReversibleTransform transf;
 
 public:
   csAnimControlGroup (const char* name);
@@ -51,6 +53,7 @@ public:
 
 enum ac_opcode
 {
+  AC_DELAY,
   AC_STOP,
   AC_REPEAT,
   AC_MOVE
@@ -58,20 +61,51 @@ enum ac_opcode
 
 struct ac_instruction
 {
-  csTicks time;
   ac_opcode opcode;
   union
   {
-    
+    struct
+    {
+      int group_id;
+      csTicks duration;
+      float delta_x;
+      float delta_y;
+      float delta_z;
+    } movement;
+    struct
+    {
+      csTicks delay;
+    } delay;
   };
 };
 
 class csAnimControlScript
 {
 private:
+  char* name;
   csArray<ac_instruction> instructions;
 
 public:
+  csAnimControlScript (const char* name);
+  ~csAnimControlScript () { delete[] name; }
+};
+
+class csAnimControlRunnable
+{
+private:
+  csAnimControlScript* script;
+  size_t current_instructions;
+
+  // Current movement operation.
+  struct
+  {
+    csTicks todo;
+    csVector3 delta_per_tick;
+    csVector3 final;
+  } movement;
+
+public:
+
 };
 
 /**

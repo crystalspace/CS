@@ -56,6 +56,13 @@ void csAnimControlGroup::AddVertex (int idx, float weight)
 
 //-------------------------------------------------------------------------
 
+csAnimControlScript::csAnimControlScript (const char* name)
+{
+  csAnimControlScript::name = csStrNew (name);
+}
+
+//-------------------------------------------------------------------------
+
 csGenmeshAnimationControl::csGenmeshAnimationControl (
 	csGenmeshAnimationControlFactory* fact)
 {
@@ -130,7 +137,11 @@ const char* csGenmeshAnimationControl::ParseGroup (iDocumentNode* node)
 
 const char* csGenmeshAnimationControl::ParseScript (iDocumentNode* node)
 {
-  csAnimControlScript* script = new csAnimControlScript ();
+  const char* scriptname = node->GetAttributeValue ("name");
+  if (!scriptname)
+    return "Name of the script is missing!";
+
+  csAnimControlScript* script = new csAnimControlScript (scriptname);
 
   csStringHash& xmltokens = factory->xmltokens;
   csRef<iDocumentNodeIterator> it = node->GetNodes ();
@@ -184,6 +195,8 @@ const char* csGenmeshAnimationControl::Load (iDocumentNode* node)
 	  if (err) return err;
 	}
         break;
+      case csGenmeshAnimationControlFactory::XMLTOKEN_RUN:
+	break;
       default:
         sprintf (factory->error_buf,
 		"Don't recognize token '%s' in anim control!",
