@@ -146,6 +146,11 @@
 #define strncasecmp strnicmp
 #endif
 
+#if defined(COMP_VC)
+#define strcasecmp _stricmp
+#define strncasecmp _strnicmp
+#endif
+
 // NextStep 3.3 compiler frequently crashes when initializing static const
 // tables of unknown size.  Ex: static const Foo[] = { ... };  Work around
 // the problem by removing 'const'.
