@@ -24,6 +24,7 @@
 #include "csutil/ref.h"
 
 struct iEngine;
+struct iObjectRegistry;
 class csRenderMesh;
 
 /**

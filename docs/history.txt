@@ -36,6 +36,8 @@ chronological order.
 	- Jorrit added three torus objects from stenciltest to r3dtest.
 	- Eric Sunshine fixed errors in glshader_fixed.mak where the SRC and
 	  INC variables were not respecting SRCDIR.
+	- Eric Sunshine fixed problem in rendermeshlist.h where it mentioned
+	  iObjectRegistry in a prototype even though it wasn't declared.
 9-Sep-2003
 	- res added a simple calculation of binormals and tangents to thing.
 	- res reformatted light.xml a bit.
