@@ -706,9 +706,11 @@ public:
    * for for this box as seen from the given position.
    * The coordinates returned are world space coordinates.
    * Note that you need place for at least six vectors in the array.
+   * If you set bVisible true, you will get all visible corners - this
+   * could be up to 7.
    */
   void GetConvexOutline (const csVector3& pos,
-  	csVector3* array, int& num_array) const;
+  	csVector3* array, int& num_array, bool bVisible=false) const;
 
   /**
    * Test if this box is between two others.
