@@ -28,9 +28,9 @@ The history order is reversed so that new features are at the top.
 	      now the GLX check will succeed.  This change also fixes a problem
 	      where the GLX "extensions" check failed to run if GLX was built
 	      into libGL.a.
-	    - Now that GLX.AVAIALBLE has a meaningful value even when GLX is
+	    - Now that GLX.AVAILABLE has a meaningful value even when GLX is
 	      built into libGL.a, this variable is used to control building of
-	      glx2d rather than GL.AVAIALBLE.
+	      glx2d rather than GL.AVAILABLE.
 	    - Now checks for upper- and lowercase OpenGL-related library names
 	      rather than assuming that GL, GLU, and GLX should be uppercase.
 	      This should help to identify these libraries on platforms where
