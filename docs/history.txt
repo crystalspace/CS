@@ -28,6 +28,9 @@ The history order is reversed so that new features are at the top.
 	  disables all functionality that has to do with iEngine (like the
 	  Spider). All other functionality will work though.
 	- Fixed some documentation with regards to recent changes.
+	- Eric Sunshine applied a more correct fix to SCF following Jorrit's
+	  patch today.  DECLARE_FAST_INTERFACE() now correctly employs the
+	  opaque scfInterfaceID rather than uint32.
 11-Jun-2001
 	- Created a new 'bugplug' plugin. This plugin will give debugging
 	  functionality to any CS app. To use it just add the following
@@ -124,16 +127,6 @@ The history order is reversed so that new features are at the top.
 	  csFindLoadLibrary in NeXTDynamicLibrary.cpp so that scfreg can once
 	  again find plugin modules which are stored in the "components"
 	  subdirectory of the current directory.
-	- Eric Sunshine made the following changes to AWS:
-	    - Fixed up the SCF goop so that the plugin loads properly and
-	      registers all of its plublic classes.  In particular, added
-	      registration for the awsPrefManager class.  Also added a missing
-	      IMPLEMENT_FACTORY() for this class.
-	    - Replaced use of static_cast<> with STATIC_CAST() for better
-	      portability.
-	    - Removed the `i' prefix from the names of the AWS files in
-	      CS/include/ivaria and merged them into aws.h.
-	    - Repaired a couple minor makefile defects.
 	- Martin Geisse changed the way the ID numbers for
 	  QUERY_INTERFACE_FAST are stored. There is now an inline wrapper
 	  function around each ID variable, DECLARE_FAST_INTERFACE.
@@ -148,17 +141,26 @@ The history order is reversed so that new features are at the top.
 	  plugin and also updated all project files to the new directory
 	  structure and added targets for emit, metaball, and stars mesh
 	  objects.
-	- Robert also did a fix to the emit particle system.
+	- Robert also did a fix to the emit particle system for the picky
+	  CodeWarrior compiler.
 	- Christopher Nelson added interface includes for AWS in ivaria.
 	- Christopher also made some modifications to AWS so that it can be
 	  a plugin. Still doesn't load properly.
+	- Eric Sunshine made the following changes to AWS:
+	    - Fixed up the SCF goop so that the plugin loads properly and
+	      registers all of its plublic classes.  In particular, added
+	      registration for the awsPrefManager class.  Also added a missing
+	      IMPLEMENT_FACTORY() for this class.
+	    - Replaced use of static_cast<> with STATIC_CAST() for better
+	      portability.
+	    - Removed the `i' prefix from the names of the AWS files in
+	      CS/include/ivaria and merged them into aws.h.
+	    - Repaired a couple minor makefile defects.
 	- Norman Kramer fixed g2dtest so that it works again. To fix this he
 	  made the G2D variable in csSystemDriver protected. This is a
 	  temporary solution.
 	- Norman also fixed some include paths in some of the files of
 	  the 3D sprite mesh plugin.
-	- Philip Wyett updated the software renderer project file for VC
-	  after Eric changed the NASM settings.
 10-Jun-2001
 	- Norman Kramer did the following:
 	    - Blocks now decrefs its queried soundwrapper, releases/stops the
