@@ -31,7 +31,19 @@
 struct iTextureHandle;
 struct csRGBpixel;
 
-SCF_VERSION (iMaterial, 0, 0, 1);
+/**
+ * This structure represents an extra texture
+ * layer which is applied on top of the previous one.
+ */
+struct csTextureLayer
+{
+  iTextureHandle* txt_handle;
+  UInt mode;		// Mode: one of CS_FX_ADD ...
+  int uscale, vscale;	// Txt mapping scale relative to parent texture
+  int ushift, vshift;	// Txt mapping shift relative to parent texture
+};
+
+SCF_VERSION (iMaterial, 0, 0, 3);
 
 /**
  * This class represents a material as seen from the engine
@@ -43,10 +55,21 @@ SCF_VERSION (iMaterial, 0, 0, 1);
 struct iMaterial : public iBase
 {
   /**
-   * Get a texture from the material.
+   * Get the base texture from the material.
    */
   virtual iTextureHandle *GetTexture () = 0;
 
+  /**
+   * Get the number of texture layers. The base
+   * texture is not counted in this.
+   */
+  virtual int GetNumTextureLayers () = 0;
+
+  /**
+   * Get a texture layer.
+   */
+  virtual csTextureLayer* GetTextureLayer (int idx) = 0;
+  
   /**
    * Get the flat color. If the material has a texture assigned, this
    * will return the mean texture color.

@@ -99,7 +99,9 @@ public:
 
 // Define all tokens used through this file
 CS_TOKEN_DEF_START
+  CS_TOKEN_DEF (ADD)
   CS_TOKEN_DEF (ADDON)
+  CS_TOKEN_DEF (ALPHA)
   CS_TOKEN_DEF (AMBIENT)
   CS_TOKEN_DEF (ANIM)
   CS_TOKEN_DEF (ATTENUATION)
@@ -109,6 +111,7 @@ CS_TOKEN_DEF_START
   CS_TOKEN_DEF (COLLECTION)
   CS_TOKEN_DEF (COLOR)
   CS_TOKEN_DEF (CONVEX)
+  CS_TOKEN_DEF (COPY)
   CS_TOKEN_DEF (CULLER)
   CS_TOKEN_DEF (DETAIL)
   CS_TOKEN_DEF (DIFFUSE)
@@ -126,6 +129,8 @@ CS_TOKEN_DEF_START
   CS_TOKEN_DEF (IDENTITY)
   CS_TOKEN_DEF (INVISIBLE)
   CS_TOKEN_DEF (KEY)
+  CS_TOKEN_DEF (KEYCOLOR)
+  CS_TOKEN_DEF (LAYER)
   CS_TOKEN_DEF (LIBRARY)
   CS_TOKEN_DEF (LIGHT)
   CS_TOKEN_DEF (LINK)
@@ -135,7 +140,10 @@ CS_TOKEN_DEF_START
   CS_TOKEN_DEF (MESHFACT)
   CS_TOKEN_DEF (MESHOBJ)
   CS_TOKEN_DEF (MIPMAP)
+  CS_TOKEN_DEF (MIXMODE)
   CS_TOKEN_DEF (MOVE)
+  CS_TOKEN_DEF (MULTIPLY)
+  CS_TOKEN_DEF (MULTIPLY2)
   CS_TOKEN_DEF (NODE)
   CS_TOKEN_DEF (NOLIGHTING)
   CS_TOKEN_DEF (NOSHADOWS)
@@ -159,6 +167,7 @@ CS_TOKEN_DEF_START
   CS_TOKEN_DEF (SCALE_Y)
   CS_TOKEN_DEF (SCALE_Z)
   CS_TOKEN_DEF (SECTOR)
+  CS_TOKEN_DEF (SHIFT)
   CS_TOKEN_DEF (SOUND)
   CS_TOKEN_DEF (SOUNDS)
   CS_TOKEN_DEF (START)
@@ -166,10 +175,10 @@ CS_TOKEN_DEF_START
   CS_TOKEN_DEF (TERRAINOBJ)
   CS_TOKEN_DEF (TEXTURE)
   CS_TOKEN_DEF (TEXTURES)
+  CS_TOKEN_DEF (TRANSPARENT)
   CS_TOKEN_DEF (MAT_SET)
   CS_TOKEN_DEF (MOTION)
   CS_TOKEN_DEF (Q)
-  CS_TOKEN_DEF (TRANSPARENT)
   CS_TOKEN_DEF (V)
   CS_TOKEN_DEF (WORLD)
   CS_TOKEN_DEF (ZFILL)
@@ -724,6 +733,59 @@ void csLoader::txt_process (char *name, char* buf)
       QInt (transp.green * 255.99), QInt (transp.blue * 255.99));
 }
 
+static UInt ParseMixmode (char* buf)
+{
+  CS_TOKEN_TABLE_START (modes)
+    CS_TOKEN_TABLE (COPY)
+    CS_TOKEN_TABLE (MULTIPLY2)
+    CS_TOKEN_TABLE (MULTIPLY)
+    CS_TOKEN_TABLE (ADD)
+    CS_TOKEN_TABLE (ALPHA)
+    CS_TOKEN_TABLE (TRANSPARENT)
+    CS_TOKEN_TABLE (KEYCOLOR)
+  CS_TOKEN_TABLE_END
+
+  char* name;
+  long cmd;
+  char* params;
+
+  UInt Mixmode = 0;
+
+  while ((cmd = csGetObject (&buf, modes, &name, &params)) > 0)
+  {
+    if (!params)
+    {
+      printf ("Expected parameters instead of '%s'!\n", buf);
+      return 0;
+    }
+    switch (cmd)
+    {
+      case CS_TOKEN_COPY: Mixmode |= CS_FX_COPY; break;
+      case CS_TOKEN_MULTIPLY: Mixmode |= CS_FX_MULTIPLY; break;
+      case CS_TOKEN_MULTIPLY2: Mixmode |= CS_FX_MULTIPLY2; break;
+      case CS_TOKEN_ADD: Mixmode |= CS_FX_ADD; break;
+      case CS_TOKEN_ALPHA:
+	Mixmode &= ~CS_FX_MASK_ALPHA;
+	float alpha;
+	int ialpha;
+        ScanStr (params, "%f", &alpha);
+	ialpha = QInt (alpha * 255.99);
+	Mixmode |= CS_FX_SETALPHA(ialpha);
+	break;
+      case CS_TOKEN_TRANSPARENT: Mixmode |= CS_FX_TRANSPARENT; break;
+      case CS_TOKEN_KEYCOLOR: Mixmode |= CS_FX_KEYCOLOR; break;
+    }
+  }
+  if (cmd == CS_PARSERR_TOKENNOTFOUND)
+  {
+    printf ("Token '%s' not found while parsing the modes!\n",
+    	csGetLastOffender ());
+    return 0;
+  }
+  return Mixmode;
+}
+
+
 void csLoader::mat_process (char *name, char* buf, const char *prefix)
 {
   CS_TOKEN_TABLE_START (commands)
@@ -732,6 +794,14 @@ void csLoader::mat_process (char *name, char* buf, const char *prefix)
     CS_TOKEN_TABLE (DIFFUSE)
     CS_TOKEN_TABLE (AMBIENT)
     CS_TOKEN_TABLE (REFLECTION)
+    CS_TOKEN_TABLE (LAYER)
+  CS_TOKEN_TABLE_END
+
+  CS_TOKEN_TABLE_START (layerCommands)
+    CS_TOKEN_TABLE (TEXTURE)
+    CS_TOKEN_TABLE (MIXMODE)
+    CS_TOKEN_TABLE (SCALE)
+    CS_TOKEN_TABLE (SHIFT)
   CS_TOKEN_TABLE_END
 
   long cmd;
@@ -740,6 +810,10 @@ void csLoader::mat_process (char *name, char* buf, const char *prefix)
   float tmp;
 
   csMaterial* material = new csMaterial ();
+
+  csTextureWrapper* layer_texture = NULL;
+  int layer_uscale = 1, layer_vscale = 1, layer_ushift = 0, layer_vshift = 0;
+  UInt layer_mode = CS_FX_ADD;
 
   while ((cmd = csGetCommand (&buf, commands, &params)) > 0)
   {
@@ -773,6 +847,40 @@ void csLoader::mat_process (char *name, char* buf, const char *prefix)
         ScanStr (params, "%f", &tmp);
         material->SetReflection (tmp);
         break;
+      case CS_TOKEN_LAYER:
+	{
+	  char* params2;
+	  while ((cmd = csGetObject (&params, layerCommands,
+		&name, &params2)) > 0)
+	  {
+	    switch (cmd)
+	    {
+	      case CS_TOKEN_TEXTURE:
+		{
+                  ScanStr (params2, "%s", str);
+                  iTextureWrapper *texh = Engine->FindTexture (str, ResolveOnlyRegion);
+                  if (texh)
+                    layer_texture = texh->GetPrivateObject();
+                  else
+                  {
+                    System->Printf (MSG_FATAL_ERROR, "Cannot find texture `%s' for material `%s'\n", str, name);
+                    fatal_exit (0, false);
+                  }
+		}
+		break;
+	      case CS_TOKEN_SCALE:
+	        ScanStr (params2, "%d,%d", &layer_uscale, &layer_vscale);
+	        break;
+	      case CS_TOKEN_SHIFT:
+	        ScanStr (params2, "%d,%d", &layer_ushift, &layer_vshift);
+	        break;
+	      case CS_TOKEN_MIXMODE:
+	        layer_mode = ParseMixmode (params2);
+	        break;
+	    }
+	  }
+	}
+        break;
     }
   }
 
@@ -780,6 +888,12 @@ void csLoader::mat_process (char *name, char* buf, const char *prefix)
   {
     System->Printf (MSG_FATAL_ERROR, "Token '%s' not found while parsing a material specification!\n", csGetLastOffender ());
     fatal_exit (0, false);
+  }
+
+  if (layer_texture)
+  {
+    material->AddTextureLayer (layer_texture, layer_mode,
+	layer_uscale, layer_vscale, layer_ushift, layer_vshift);
   }
 
   iMaterialWrapper *mat = Engine->GetMaterialList ()->NewMaterial (material);

@@ -29,6 +29,8 @@ IMPLEMENT_IBASE_END
 
 csMaterial::csMaterial () :
   texture(0),
+  num_texture_layers (0),
+  texture_layer_wrapper (NULL),
   diffuse(CS_DEFMAT_DIFFUSE),
   ambient(CS_DEFMAT_AMBIENT),
   reflection(CS_DEFMAT_REFLECTION)
@@ -39,6 +41,8 @@ csMaterial::csMaterial () :
 
 csMaterial::csMaterial (csTextureWrapper* w) :
   texture(w),
+  num_texture_layers (0),
+  texture_layer_wrapper (NULL),
   diffuse(CS_DEFMAT_DIFFUSE),
   ambient(CS_DEFMAT_AMBIENT),
   reflection(CS_DEFMAT_REFLECTION)
@@ -73,6 +77,29 @@ void csMaterial::GetReflection (float &oDiffuse, float &oAmbient,
   oDiffuse = diffuse;
   oAmbient = ambient;
   oReflection = reflection;
+}
+
+void csMaterial::AddTextureLayer (csTextureWrapper* txtwrap, UInt mode,
+      	int uscale, int vscale, int ushift, int vshift)
+{
+  if (num_texture_layers >= 1) return;
+  num_texture_layers = 1;
+  texture_layer_wrapper = txtwrap;
+  texture_layer.mode = mode;
+  texture_layer.uscale = uscale;
+  texture_layer.vscale = vscale;
+  texture_layer.ushift = ushift;
+  texture_layer.vshift = vshift;
+}
+
+csTextureLayer* csMaterial::GetTextureLayer (int idx)
+{
+  if (num_texture_layers == 1)
+  {
+    texture_layer.txt_handle = texture_layer_wrapper->GetTextureHandle ();
+    return &texture_layer;
+  }
+  else return NULL;
 }
 
 //---------------------------------------------------------------------------

@@ -40,6 +40,12 @@ private:
   csRGBcolor flat_color;
   /// the texture of the material (can be NULL)
   csTextureWrapper *texture;
+  /// Number of texture layers. Currently only one supported.
+  int num_texture_layers;
+  /// Optional texture layer.
+  csTextureLayer texture_layer;
+  /// Texture wrappers for texture layers.
+  csTextureWrapper* texture_layer_wrapper;
 
   /// The diffuse reflection value of the material
   float diffuse;
@@ -73,6 +79,10 @@ public:
   /// Set the texture (pass NULL to set no texture)
   inline void SetTextureWrapper (csTextureWrapper *tex) { texture = tex; }
 
+  /// Add a texture layer (currently only one supported).
+  void AddTextureLayer (csTextureWrapper* txtwrap, UInt mode,
+      	int uscale, int vscale, int ushift, int vshift);
+  
   /// Get diffuse reflection constant for the material
   inline float GetDiffuse () const { return diffuse; }
   /// Set diffuse reflection constant for the material
@@ -94,6 +104,10 @@ public:
 
   /// Get texture.
   virtual iTextureHandle* GetTexture ();
+  /// Get num texture layers.
+  virtual int GetNumTextureLayers () { return num_texture_layers; }
+  /// Get a texture layer.
+  virtual csTextureLayer* GetTextureLayer (int idx);
   /// Get flat color.
   virtual void GetFlatColor (csRGBpixel &oColor);
   /// Get reflection values (diffuse, ambient, reflection).

@@ -2,6 +2,12 @@ The history order is reversed so that new features are at the top.
 
 1-May-2001
 	- Fixed a bug in software renderer so that tiling really works.
+	- Extended the iMaterial structure in preparation of multi-texturing
+	  support.
+	- Extended the loader of materials in preparation of multi-texturing
+	  support. There is now a new LAYER keyword in the definition
+	  of a MATERIAL. In LAYER you can specify the texture, scale, shift,
+	  and mixmode to use for that texture layer.
 30-Apr-2001
 	- Philip Wyett fixed csVector3 up (); so that you/camera
 	  is the right way up in ptlab. :-)
