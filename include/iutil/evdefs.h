@@ -217,7 +217,7 @@ typedef struct _csKeyModifiers
 {
   /**
    * Bitmasks for different modifiers.
-   * If the modifier number <i>n></i> was pressed, the <i>n</i>th bit is set.
+   * If the modifier number <i>n</i> was pressed, the <i>n</i>th bit is set.
    * <p>
    * Example - testing for a specific modifier:
    * \code
