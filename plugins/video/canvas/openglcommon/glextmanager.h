@@ -5908,12 +5908,16 @@ typedef GLvoid (csAPIENTRY* csGLPRIMITIVERESTARTINDEXNV) (GLuint index);
 // GL_NV_vertex_program2
 
 
+#ifdef CS_DEBUG
+#  define REPORT_MISSING_ENTRIES true
+#else
+#  define REPORT_MISSING_ENTRIES false
+#endif
 
 
 struct csGLExtensionManager
 {
 private:
-  static bool defaultReportMissingEntries;
   iObjectRegistry* object_reg;
   csConfigAccess config;
   iOpenGLInterface* gl;
@@ -10501,19 +10505,19 @@ public:
     {
       allclear = true;
       funcTest = ((glDrawRangeElements = (csGLDRAWRANGEELEMENTS) gl->GetProcAddress ("glDrawRangeElements")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glDrawRangeElements");
       allclear &= funcTest;
       funcTest = ((glTexImage3D = (csGLTEXIMAGE3D) gl->GetProcAddress ("glTexImage3D")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glTexImage3D");
       allclear &= funcTest;
       funcTest = ((glTexSubImage3D = (csGLTEXSUBIMAGE3D) gl->GetProcAddress ("glTexSubImage3D")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glTexSubImage3D");
       allclear &= funcTest;
       funcTest = ((glCopyTexSubImage3D = (csGLCOPYTEXSUBIMAGE3D) gl->GetProcAddress ("glCopyTexSubImage3D")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glCopyTexSubImage3D");
       allclear &= funcTest;
       if (CS_GL_version_1_2 = allclear)
@@ -10554,187 +10558,187 @@ public:
     {
       allclear = true;
       funcTest = ((glActiveTexture = (csGLACTIVETEXTURE) gl->GetProcAddress ("glActiveTexture")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glActiveTexture");
       allclear &= funcTest;
       funcTest = ((glClientActiveTexture = (csGLCLIENTACTIVETEXTURE) gl->GetProcAddress ("glClientActiveTexture")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glClientActiveTexture");
       allclear &= funcTest;
       funcTest = ((glMultiTexCoord1d = (csGLMULTITEXCOORD1D) gl->GetProcAddress ("glMultiTexCoord1d")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glMultiTexCoord1d");
       allclear &= funcTest;
       funcTest = ((glMultiTexCoord1dv = (csGLMULTITEXCOORD1DV) gl->GetProcAddress ("glMultiTexCoord1dv")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glMultiTexCoord1dv");
       allclear &= funcTest;
       funcTest = ((glMultiTexCoord1f = (csGLMULTITEXCOORD1F) gl->GetProcAddress ("glMultiTexCoord1f")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glMultiTexCoord1f");
       allclear &= funcTest;
       funcTest = ((glMultiTexCoord1fv = (csGLMULTITEXCOORD1FV) gl->GetProcAddress ("glMultiTexCoord1fv")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glMultiTexCoord1fv");
       allclear &= funcTest;
       funcTest = ((glMultiTexCoord1i = (csGLMULTITEXCOORD1I) gl->GetProcAddress ("glMultiTexCoord1i")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glMultiTexCoord1i");
       allclear &= funcTest;
       funcTest = ((glMultiTexCoord1iv = (csGLMULTITEXCOORD1IV) gl->GetProcAddress ("glMultiTexCoord1iv")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glMultiTexCoord1iv");
       allclear &= funcTest;
       funcTest = ((glMultiTexCoord1s = (csGLMULTITEXCOORD1S) gl->GetProcAddress ("glMultiTexCoord1s")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glMultiTexCoord1s");
       allclear &= funcTest;
       funcTest = ((glMultiTexCoord1sv = (csGLMULTITEXCOORD1SV) gl->GetProcAddress ("glMultiTexCoord1sv")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glMultiTexCoord1sv");
       allclear &= funcTest;
       funcTest = ((glMultiTexCoord2d = (csGLMULTITEXCOORD2D) gl->GetProcAddress ("glMultiTexCoord2d")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glMultiTexCoord2d");
       allclear &= funcTest;
       funcTest = ((glMultiTexCoord2dv = (csGLMULTITEXCOORD2DV) gl->GetProcAddress ("glMultiTexCoord2dv")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glMultiTexCoord2dv");
       allclear &= funcTest;
       funcTest = ((glMultiTexCoord2f = (csGLMULTITEXCOORD2F) gl->GetProcAddress ("glMultiTexCoord2f")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glMultiTexCoord2f");
       allclear &= funcTest;
       funcTest = ((glMultiTexCoord2fv = (csGLMULTITEXCOORD2FV) gl->GetProcAddress ("glMultiTexCoord2fv")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glMultiTexCoord2fv");
       allclear &= funcTest;
       funcTest = ((glMultiTexCoord2i = (csGLMULTITEXCOORD2I) gl->GetProcAddress ("glMultiTexCoord2i")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glMultiTexCoord2i");
       allclear &= funcTest;
       funcTest = ((glMultiTexCoord2iv = (csGLMULTITEXCOORD2IV) gl->GetProcAddress ("glMultiTexCoord2iv")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glMultiTexCoord2iv");
       allclear &= funcTest;
       funcTest = ((glMultiTexCoord2s = (csGLMULTITEXCOORD2S) gl->GetProcAddress ("glMultiTexCoord2s")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glMultiTexCoord2s");
       allclear &= funcTest;
       funcTest = ((glMultiTexCoord2sv = (csGLMULTITEXCOORD2SV) gl->GetProcAddress ("glMultiTexCoord2sv")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glMultiTexCoord2sv");
       allclear &= funcTest;
       funcTest = ((glMultiTexCoord3d = (csGLMULTITEXCOORD3D) gl->GetProcAddress ("glMultiTexCoord3d")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glMultiTexCoord3d");
       allclear &= funcTest;
       funcTest = ((glMultiTexCoord3dv = (csGLMULTITEXCOORD3DV) gl->GetProcAddress ("glMultiTexCoord3dv")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glMultiTexCoord3dv");
       allclear &= funcTest;
       funcTest = ((glMultiTexCoord3f = (csGLMULTITEXCOORD3F) gl->GetProcAddress ("glMultiTexCoord3f")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glMultiTexCoord3f");
       allclear &= funcTest;
       funcTest = ((glMultiTexCoord3fv = (csGLMULTITEXCOORD3FV) gl->GetProcAddress ("glMultiTexCoord3fv")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glMultiTexCoord3fv");
       allclear &= funcTest;
       funcTest = ((glMultiTexCoord3i = (csGLMULTITEXCOORD3I) gl->GetProcAddress ("glMultiTexCoord3i")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glMultiTexCoord3i");
       allclear &= funcTest;
       funcTest = ((glMultiTexCoord3iv = (csGLMULTITEXCOORD3IV) gl->GetProcAddress ("glMultiTexCoord3iv")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glMultiTexCoord3iv");
       allclear &= funcTest;
       funcTest = ((glMultiTexCoord3s = (csGLMULTITEXCOORD3S) gl->GetProcAddress ("glMultiTexCoord3s")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glMultiTexCoord3s");
       allclear &= funcTest;
       funcTest = ((glMultiTexCoord3sv = (csGLMULTITEXCOORD3SV) gl->GetProcAddress ("glMultiTexCoord3sv")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glMultiTexCoord3sv");
       allclear &= funcTest;
       funcTest = ((glMultiTexCoord4d = (csGLMULTITEXCOORD4D) gl->GetProcAddress ("glMultiTexCoord4d")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glMultiTexCoord4d");
       allclear &= funcTest;
       funcTest = ((glMultiTexCoord4dv = (csGLMULTITEXCOORD4DV) gl->GetProcAddress ("glMultiTexCoord4dv")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glMultiTexCoord4dv");
       allclear &= funcTest;
       funcTest = ((glMultiTexCoord4f = (csGLMULTITEXCOORD4F) gl->GetProcAddress ("glMultiTexCoord4f")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glMultiTexCoord4f");
       allclear &= funcTest;
       funcTest = ((glMultiTexCoord4fv = (csGLMULTITEXCOORD4FV) gl->GetProcAddress ("glMultiTexCoord4fv")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glMultiTexCoord4fv");
       allclear &= funcTest;
       funcTest = ((glMultiTexCoord4i = (csGLMULTITEXCOORD4I) gl->GetProcAddress ("glMultiTexCoord4i")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glMultiTexCoord4i");
       allclear &= funcTest;
       funcTest = ((glMultiTexCoord4iv = (csGLMULTITEXCOORD4IV) gl->GetProcAddress ("glMultiTexCoord4iv")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glMultiTexCoord4iv");
       allclear &= funcTest;
       funcTest = ((glMultiTexCoord4s = (csGLMULTITEXCOORD4S) gl->GetProcAddress ("glMultiTexCoord4s")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glMultiTexCoord4s");
       allclear &= funcTest;
       funcTest = ((glMultiTexCoord4sv = (csGLMULTITEXCOORD4SV) gl->GetProcAddress ("glMultiTexCoord4sv")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glMultiTexCoord4sv");
       allclear &= funcTest;
       funcTest = ((glLoadTransposeMatrixf = (csGLLOADTRANSPOSEMATRIXF) gl->GetProcAddress ("glLoadTransposeMatrixf")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glLoadTransposeMatrixf");
       allclear &= funcTest;
       funcTest = ((glLoadTransposeMatrixd = (csGLLOADTRANSPOSEMATRIXD) gl->GetProcAddress ("glLoadTransposeMatrixd")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glLoadTransposeMatrixd");
       allclear &= funcTest;
       funcTest = ((glMultTransposeMatrixf = (csGLMULTTRANSPOSEMATRIXF) gl->GetProcAddress ("glMultTransposeMatrixf")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glMultTransposeMatrixf");
       allclear &= funcTest;
       funcTest = ((glMultTransposeMatrixd = (csGLMULTTRANSPOSEMATRIXD) gl->GetProcAddress ("glMultTransposeMatrixd")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glMultTransposeMatrixd");
       allclear &= funcTest;
       funcTest = ((glSampleCoverage = (csGLSAMPLECOVERAGE) gl->GetProcAddress ("glSampleCoverage")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glSampleCoverage");
       allclear &= funcTest;
       funcTest = ((glCompressedTexImage3D = (csGLCOMPRESSEDTEXIMAGE3D) gl->GetProcAddress ("glCompressedTexImage3D")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glCompressedTexImage3D");
       allclear &= funcTest;
       funcTest = ((glCompressedTexImage2D = (csGLCOMPRESSEDTEXIMAGE2D) gl->GetProcAddress ("glCompressedTexImage2D")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glCompressedTexImage2D");
       allclear &= funcTest;
       funcTest = ((glCompressedTexImage1D = (csGLCOMPRESSEDTEXIMAGE1D) gl->GetProcAddress ("glCompressedTexImage1D")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glCompressedTexImage1D");
       allclear &= funcTest;
       funcTest = ((glCompressedTexSubImage3D = (csGLCOMPRESSEDTEXSUBIMAGE3D) gl->GetProcAddress ("glCompressedTexSubImage3D")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glCompressedTexSubImage3D");
       allclear &= funcTest;
       funcTest = ((glCompressedTexSubImage2D = (csGLCOMPRESSEDTEXSUBIMAGE2D) gl->GetProcAddress ("glCompressedTexSubImage2D")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glCompressedTexSubImage2D");
       allclear &= funcTest;
       funcTest = ((glCompressedTexSubImage1D = (csGLCOMPRESSEDTEXSUBIMAGE1D) gl->GetProcAddress ("glCompressedTexSubImage1D")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glCompressedTexSubImage1D");
       allclear &= funcTest;
       funcTest = ((glGetCompressedTexImage = (csGLGETCOMPRESSEDTEXIMAGE) gl->GetProcAddress ("glGetCompressedTexImage")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glGetCompressedTexImage");
       allclear &= funcTest;
       if (CS_GL_version_1_3 = allclear)
@@ -10776,139 +10780,139 @@ public:
     {
       allclear = true;
       funcTest = ((glColorTable = (csGLCOLORTABLE) gl->GetProcAddress ("glColorTable")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glColorTable");
       allclear &= funcTest;
       funcTest = ((glColorTableParameterfv = (csGLCOLORTABLEPARAMETERFV) gl->GetProcAddress ("glColorTableParameterfv")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glColorTableParameterfv");
       allclear &= funcTest;
       funcTest = ((glColorTableParameteriv = (csGLCOLORTABLEPARAMETERIV) gl->GetProcAddress ("glColorTableParameteriv")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glColorTableParameteriv");
       allclear &= funcTest;
       funcTest = ((glCopyColorTable = (csGLCOPYCOLORTABLE) gl->GetProcAddress ("glCopyColorTable")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glCopyColorTable");
       allclear &= funcTest;
       funcTest = ((glGetColorTable = (csGLGETCOLORTABLE) gl->GetProcAddress ("glGetColorTable")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glGetColorTable");
       allclear &= funcTest;
       funcTest = ((glGetColorTableParameterfv = (csGLGETCOLORTABLEPARAMETERFV) gl->GetProcAddress ("glGetColorTableParameterfv")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glGetColorTableParameterfv");
       allclear &= funcTest;
       funcTest = ((glGetColorTableParameteriv = (csGLGETCOLORTABLEPARAMETERIV) gl->GetProcAddress ("glGetColorTableParameteriv")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glGetColorTableParameteriv");
       allclear &= funcTest;
       funcTest = ((glColorSubTable = (csGLCOLORSUBTABLE) gl->GetProcAddress ("glColorSubTable")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glColorSubTable");
       allclear &= funcTest;
       funcTest = ((glCopyColorSubTable = (csGLCOPYCOLORSUBTABLE) gl->GetProcAddress ("glCopyColorSubTable")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glCopyColorSubTable");
       allclear &= funcTest;
       funcTest = ((glConvolutionFilter1D = (csGLCONVOLUTIONFILTER1D) gl->GetProcAddress ("glConvolutionFilter1D")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glConvolutionFilter1D");
       allclear &= funcTest;
       funcTest = ((glConvolutionFilter2D = (csGLCONVOLUTIONFILTER2D) gl->GetProcAddress ("glConvolutionFilter2D")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glConvolutionFilter2D");
       allclear &= funcTest;
       funcTest = ((glConvolutionParameterf = (csGLCONVOLUTIONPARAMETERF) gl->GetProcAddress ("glConvolutionParameterf")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glConvolutionParameterf");
       allclear &= funcTest;
       funcTest = ((glConvolutionParameterfv = (csGLCONVOLUTIONPARAMETERFV) gl->GetProcAddress ("glConvolutionParameterfv")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glConvolutionParameterfv");
       allclear &= funcTest;
       funcTest = ((glConvolutionParameteri = (csGLCONVOLUTIONPARAMETERI) gl->GetProcAddress ("glConvolutionParameteri")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glConvolutionParameteri");
       allclear &= funcTest;
       funcTest = ((glConvolutionParameteriv = (csGLCONVOLUTIONPARAMETERIV) gl->GetProcAddress ("glConvolutionParameteriv")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glConvolutionParameteriv");
       allclear &= funcTest;
       funcTest = ((glCopyConvolutionFilter1D = (csGLCOPYCONVOLUTIONFILTER1D) gl->GetProcAddress ("glCopyConvolutionFilter1D")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glCopyConvolutionFilter1D");
       allclear &= funcTest;
       funcTest = ((glCopyConvolutionFilter2D = (csGLCOPYCONVOLUTIONFILTER2D) gl->GetProcAddress ("glCopyConvolutionFilter2D")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glCopyConvolutionFilter2D");
       allclear &= funcTest;
       funcTest = ((glGetConvolutionFilter = (csGLGETCONVOLUTIONFILTER) gl->GetProcAddress ("glGetConvolutionFilter")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glGetConvolutionFilter");
       allclear &= funcTest;
       funcTest = ((glGetConvolutionParameterfv = (csGLGETCONVOLUTIONPARAMETERFV) gl->GetProcAddress ("glGetConvolutionParameterfv")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glGetConvolutionParameterfv");
       allclear &= funcTest;
       funcTest = ((glGetConvolutionParameteriv = (csGLGETCONVOLUTIONPARAMETERIV) gl->GetProcAddress ("glGetConvolutionParameteriv")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glGetConvolutionParameteriv");
       allclear &= funcTest;
       funcTest = ((glGetSeparableFilter = (csGLGETSEPARABLEFILTER) gl->GetProcAddress ("glGetSeparableFilter")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glGetSeparableFilter");
       allclear &= funcTest;
       funcTest = ((glSeparableFilter2D = (csGLSEPARABLEFILTER2D) gl->GetProcAddress ("glSeparableFilter2D")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glSeparableFilter2D");
       allclear &= funcTest;
       funcTest = ((glGetHistogram = (csGLGETHISTOGRAM) gl->GetProcAddress ("glGetHistogram")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glGetHistogram");
       allclear &= funcTest;
       funcTest = ((glGetHistogramParameterfv = (csGLGETHISTOGRAMPARAMETERFV) gl->GetProcAddress ("glGetHistogramParameterfv")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glGetHistogramParameterfv");
       allclear &= funcTest;
       funcTest = ((glGetHistogramParameteriv = (csGLGETHISTOGRAMPARAMETERIV) gl->GetProcAddress ("glGetHistogramParameteriv")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glGetHistogramParameteriv");
       allclear &= funcTest;
       funcTest = ((glGetMinmax = (csGLGETMINMAX) gl->GetProcAddress ("glGetMinmax")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glGetMinmax");
       allclear &= funcTest;
       funcTest = ((glGetMinmaxParameterfv = (csGLGETMINMAXPARAMETERFV) gl->GetProcAddress ("glGetMinmaxParameterfv")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glGetMinmaxParameterfv");
       allclear &= funcTest;
       funcTest = ((glGetMinmaxParameteriv = (csGLGETMINMAXPARAMETERIV) gl->GetProcAddress ("glGetMinmaxParameteriv")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glGetMinmaxParameteriv");
       allclear &= funcTest;
       funcTest = ((glHistogram = (csGLHISTOGRAM) gl->GetProcAddress ("glHistogram")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glHistogram");
       allclear &= funcTest;
       funcTest = ((glMinmax = (csGLMINMAX) gl->GetProcAddress ("glMinmax")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glMinmax");
       allclear &= funcTest;
       funcTest = ((glResetHistogram = (csGLRESETHISTOGRAM) gl->GetProcAddress ("glResetHistogram")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glResetHistogram");
       allclear &= funcTest;
       funcTest = ((glResetMinmax = (csGLRESETMINMAX) gl->GetProcAddress ("glResetMinmax")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glResetMinmax");
       allclear &= funcTest;
       funcTest = ((glBlendColor = (csGLBLENDCOLOR) gl->GetProcAddress ("glBlendColor")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glBlendColor");
       allclear &= funcTest;
       funcTest = ((glBlendEquation = (csGLBLENDEQUATION) gl->GetProcAddress ("glBlendEquation")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glBlendEquation");
       allclear &= funcTest;
       if (CS_GL_ARB_imaging = allclear)
@@ -10950,139 +10954,139 @@ public:
     {
       allclear = true;
       funcTest = ((glActiveTextureARB = (csGLACTIVETEXTUREARB) gl->GetProcAddress ("glActiveTextureARB")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glActiveTextureARB");
       allclear &= funcTest;
       funcTest = ((glClientActiveTextureARB = (csGLCLIENTACTIVETEXTUREARB) gl->GetProcAddress ("glClientActiveTextureARB")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glClientActiveTextureARB");
       allclear &= funcTest;
       funcTest = ((glMultiTexCoord1dARB = (csGLMULTITEXCOORD1DARB) gl->GetProcAddress ("glMultiTexCoord1dARB")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glMultiTexCoord1dARB");
       allclear &= funcTest;
       funcTest = ((glMultiTexCoord1dvARB = (csGLMULTITEXCOORD1DVARB) gl->GetProcAddress ("glMultiTexCoord1dvARB")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glMultiTexCoord1dvARB");
       allclear &= funcTest;
       funcTest = ((glMultiTexCoord1fARB = (csGLMULTITEXCOORD1FARB) gl->GetProcAddress ("glMultiTexCoord1fARB")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glMultiTexCoord1fARB");
       allclear &= funcTest;
       funcTest = ((glMultiTexCoord1fvARB = (csGLMULTITEXCOORD1FVARB) gl->GetProcAddress ("glMultiTexCoord1fvARB")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glMultiTexCoord1fvARB");
       allclear &= funcTest;
       funcTest = ((glMultiTexCoord1iARB = (csGLMULTITEXCOORD1IARB) gl->GetProcAddress ("glMultiTexCoord1iARB")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glMultiTexCoord1iARB");
       allclear &= funcTest;
       funcTest = ((glMultiTexCoord1ivARB = (csGLMULTITEXCOORD1IVARB) gl->GetProcAddress ("glMultiTexCoord1ivARB")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glMultiTexCoord1ivARB");
       allclear &= funcTest;
       funcTest = ((glMultiTexCoord1sARB = (csGLMULTITEXCOORD1SARB) gl->GetProcAddress ("glMultiTexCoord1sARB")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glMultiTexCoord1sARB");
       allclear &= funcTest;
       funcTest = ((glMultiTexCoord1svARB = (csGLMULTITEXCOORD1SVARB) gl->GetProcAddress ("glMultiTexCoord1svARB")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glMultiTexCoord1svARB");
       allclear &= funcTest;
       funcTest = ((glMultiTexCoord2dARB = (csGLMULTITEXCOORD2DARB) gl->GetProcAddress ("glMultiTexCoord2dARB")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glMultiTexCoord2dARB");
       allclear &= funcTest;
       funcTest = ((glMultiTexCoord2dvARB = (csGLMULTITEXCOORD2DVARB) gl->GetProcAddress ("glMultiTexCoord2dvARB")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glMultiTexCoord2dvARB");
       allclear &= funcTest;
       funcTest = ((glMultiTexCoord2fARB = (csGLMULTITEXCOORD2FARB) gl->GetProcAddress ("glMultiTexCoord2fARB")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glMultiTexCoord2fARB");
       allclear &= funcTest;
       funcTest = ((glMultiTexCoord2fvARB = (csGLMULTITEXCOORD2FVARB) gl->GetProcAddress ("glMultiTexCoord2fvARB")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glMultiTexCoord2fvARB");
       allclear &= funcTest;
       funcTest = ((glMultiTexCoord2iARB = (csGLMULTITEXCOORD2IARB) gl->GetProcAddress ("glMultiTexCoord2iARB")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glMultiTexCoord2iARB");
       allclear &= funcTest;
       funcTest = ((glMultiTexCoord2ivARB = (csGLMULTITEXCOORD2IVARB) gl->GetProcAddress ("glMultiTexCoord2ivARB")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glMultiTexCoord2ivARB");
       allclear &= funcTest;
       funcTest = ((glMultiTexCoord2sARB = (csGLMULTITEXCOORD2SARB) gl->GetProcAddress ("glMultiTexCoord2sARB")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glMultiTexCoord2sARB");
       allclear &= funcTest;
       funcTest = ((glMultiTexCoord2svARB = (csGLMULTITEXCOORD2SVARB) gl->GetProcAddress ("glMultiTexCoord2svARB")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glMultiTexCoord2svARB");
       allclear &= funcTest;
       funcTest = ((glMultiTexCoord3dARB = (csGLMULTITEXCOORD3DARB) gl->GetProcAddress ("glMultiTexCoord3dARB")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glMultiTexCoord3dARB");
       allclear &= funcTest;
       funcTest = ((glMultiTexCoord3dvARB = (csGLMULTITEXCOORD3DVARB) gl->GetProcAddress ("glMultiTexCoord3dvARB")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glMultiTexCoord3dvARB");
       allclear &= funcTest;
       funcTest = ((glMultiTexCoord3fARB = (csGLMULTITEXCOORD3FARB) gl->GetProcAddress ("glMultiTexCoord3fARB")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glMultiTexCoord3fARB");
       allclear &= funcTest;
       funcTest = ((glMultiTexCoord3fvARB = (csGLMULTITEXCOORD3FVARB) gl->GetProcAddress ("glMultiTexCoord3fvARB")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glMultiTexCoord3fvARB");
       allclear &= funcTest;
       funcTest = ((glMultiTexCoord3iARB = (csGLMULTITEXCOORD3IARB) gl->GetProcAddress ("glMultiTexCoord3iARB")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glMultiTexCoord3iARB");
       allclear &= funcTest;
       funcTest = ((glMultiTexCoord3ivARB = (csGLMULTITEXCOORD3IVARB) gl->GetProcAddress ("glMultiTexCoord3ivARB")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glMultiTexCoord3ivARB");
       allclear &= funcTest;
       funcTest = ((glMultiTexCoord3sARB = (csGLMULTITEXCOORD3SARB) gl->GetProcAddress ("glMultiTexCoord3sARB")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glMultiTexCoord3sARB");
       allclear &= funcTest;
       funcTest = ((glMultiTexCoord3svARB = (csGLMULTITEXCOORD3SVARB) gl->GetProcAddress ("glMultiTexCoord3svARB")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glMultiTexCoord3svARB");
       allclear &= funcTest;
       funcTest = ((glMultiTexCoord4dARB = (csGLMULTITEXCOORD4DARB) gl->GetProcAddress ("glMultiTexCoord4dARB")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glMultiTexCoord4dARB");
       allclear &= funcTest;
       funcTest = ((glMultiTexCoord4dvARB = (csGLMULTITEXCOORD4DVARB) gl->GetProcAddress ("glMultiTexCoord4dvARB")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glMultiTexCoord4dvARB");
       allclear &= funcTest;
       funcTest = ((glMultiTexCoord4fARB = (csGLMULTITEXCOORD4FARB) gl->GetProcAddress ("glMultiTexCoord4fARB")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glMultiTexCoord4fARB");
       allclear &= funcTest;
       funcTest = ((glMultiTexCoord4fvARB = (csGLMULTITEXCOORD4FVARB) gl->GetProcAddress ("glMultiTexCoord4fvARB")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glMultiTexCoord4fvARB");
       allclear &= funcTest;
       funcTest = ((glMultiTexCoord4iARB = (csGLMULTITEXCOORD4IARB) gl->GetProcAddress ("glMultiTexCoord4iARB")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glMultiTexCoord4iARB");
       allclear &= funcTest;
       funcTest = ((glMultiTexCoord4ivARB = (csGLMULTITEXCOORD4IVARB) gl->GetProcAddress ("glMultiTexCoord4ivARB")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glMultiTexCoord4ivARB");
       allclear &= funcTest;
       funcTest = ((glMultiTexCoord4sARB = (csGLMULTITEXCOORD4SARB) gl->GetProcAddress ("glMultiTexCoord4sARB")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glMultiTexCoord4sARB");
       allclear &= funcTest;
       funcTest = ((glMultiTexCoord4svARB = (csGLMULTITEXCOORD4SVARB) gl->GetProcAddress ("glMultiTexCoord4svARB")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glMultiTexCoord4svARB");
       allclear &= funcTest;
       if (CS_GL_ARB_multitexture = allclear)
@@ -11124,19 +11128,19 @@ public:
     {
       allclear = true;
       funcTest = ((glLoadTransposeMatrixfARB = (csGLLOADTRANSPOSEMATRIXFARB) gl->GetProcAddress ("glLoadTransposeMatrixfARB")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glLoadTransposeMatrixfARB");
       allclear &= funcTest;
       funcTest = ((glLoadTransposeMatrixdARB = (csGLLOADTRANSPOSEMATRIXDARB) gl->GetProcAddress ("glLoadTransposeMatrixdARB")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glLoadTransposeMatrixdARB");
       allclear &= funcTest;
       funcTest = ((glMultTransposeMatrixfARB = (csGLMULTTRANSPOSEMATRIXFARB) gl->GetProcAddress ("glMultTransposeMatrixfARB")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glMultTransposeMatrixfARB");
       allclear &= funcTest;
       funcTest = ((glMultTransposeMatrixdARB = (csGLMULTTRANSPOSEMATRIXDARB) gl->GetProcAddress ("glMultTransposeMatrixdARB")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glMultTransposeMatrixdARB");
       allclear &= funcTest;
       if (CS_GL_ARB_transpose_matrix = allclear)
@@ -11178,7 +11182,7 @@ public:
     {
       allclear = true;
       funcTest = ((glSampleCoverageARB = (csGLSAMPLECOVERAGEARB) gl->GetProcAddress ("glSampleCoverageARB")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glSampleCoverageARB");
       allclear &= funcTest;
       if (CS_GL_ARB_multisample = allclear)
@@ -11258,7 +11262,7 @@ public:
     {
       allclear = true;
       funcTest = ((wglGetExtensionsStringARB = (csWGLGETEXTENSIONSSTRINGARB) gl->GetProcAddress ("wglGetExtensionsStringARB")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "wglGetExtensionsStringARB");
       allclear &= funcTest;
       if (CS_WGL_ARB_extensions_string = allclear)
@@ -11311,19 +11315,19 @@ public:
     {
       allclear = true;
       funcTest = ((wglCreateBufferRegionARB = (csWGLCREATEBUFFERREGIONARB) gl->GetProcAddress ("wglCreateBufferRegionARB")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "wglCreateBufferRegionARB");
       allclear &= funcTest;
       funcTest = ((wglDeleteBufferRegionARB = (csWGLDELETEBUFFERREGIONARB) gl->GetProcAddress ("wglDeleteBufferRegionARB")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "wglDeleteBufferRegionARB");
       allclear &= funcTest;
       funcTest = ((wglSaveBufferRegionARB = (csWGLSAVEBUFFERREGIONARB) gl->GetProcAddress ("wglSaveBufferRegionARB")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "wglSaveBufferRegionARB");
       allclear &= funcTest;
       funcTest = ((wglRestoreBufferRegionARB = (csWGLRESTOREBUFFERREGIONARB) gl->GetProcAddress ("wglRestoreBufferRegionARB")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "wglRestoreBufferRegionARB");
       allclear &= funcTest;
       if (CS_WGL_ARB_buffer_region = allclear)
@@ -11442,11 +11446,11 @@ public:
     {
       allclear = true;
       funcTest = ((glPointParameterfARB = (csGLPOINTPARAMETERFARB) gl->GetProcAddress ("glPointParameterfARB")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glPointParameterfARB");
       allclear &= funcTest;
       funcTest = ((glPointParameterfvARB = (csGLPOINTPARAMETERFVARB) gl->GetProcAddress ("glPointParameterfvARB")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glPointParameterfvARB");
       allclear &= funcTest;
       if (CS_GL_ARB_point_parameters = allclear)
@@ -11602,31 +11606,31 @@ public:
     {
       allclear = true;
       funcTest = ((glCompressedTexImage3DARB = (csGLCOMPRESSEDTEXIMAGE3DARB) gl->GetProcAddress ("glCompressedTexImage3DARB")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glCompressedTexImage3DARB");
       allclear &= funcTest;
       funcTest = ((glCompressedTexImage2DARB = (csGLCOMPRESSEDTEXIMAGE2DARB) gl->GetProcAddress ("glCompressedTexImage2DARB")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glCompressedTexImage2DARB");
       allclear &= funcTest;
       funcTest = ((glCompressedTexImage1DARB = (csGLCOMPRESSEDTEXIMAGE1DARB) gl->GetProcAddress ("glCompressedTexImage1DARB")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glCompressedTexImage1DARB");
       allclear &= funcTest;
       funcTest = ((glCompressedTexSubImage3DARB = (csGLCOMPRESSEDTEXSUBIMAGE3DARB) gl->GetProcAddress ("glCompressedTexSubImage3DARB")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glCompressedTexSubImage3DARB");
       allclear &= funcTest;
       funcTest = ((glCompressedTexSubImage2DARB = (csGLCOMPRESSEDTEXSUBIMAGE2DARB) gl->GetProcAddress ("glCompressedTexSubImage2DARB")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glCompressedTexSubImage2DARB");
       allclear &= funcTest;
       funcTest = ((glCompressedTexSubImage1DARB = (csGLCOMPRESSEDTEXSUBIMAGE1DARB) gl->GetProcAddress ("glCompressedTexSubImage1DARB")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glCompressedTexSubImage1DARB");
       allclear &= funcTest;
       funcTest = ((glGetCompressedTexImageARB = (csGLGETCOMPRESSEDTEXIMAGEARB) gl->GetProcAddress ("glGetCompressedTexImageARB")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glGetCompressedTexImageARB");
       allclear &= funcTest;
       if (CS_GL_ARB_texture_compression = allclear)
@@ -11820,47 +11824,47 @@ public:
     {
       allclear = true;
       funcTest = ((glWeightbvARB = (csGLWEIGHTBVARB) gl->GetProcAddress ("glWeightbvARB")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glWeightbvARB");
       allclear &= funcTest;
       funcTest = ((glWeightsvARB = (csGLWEIGHTSVARB) gl->GetProcAddress ("glWeightsvARB")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glWeightsvARB");
       allclear &= funcTest;
       funcTest = ((glWeightivARB = (csGLWEIGHTIVARB) gl->GetProcAddress ("glWeightivARB")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glWeightivARB");
       allclear &= funcTest;
       funcTest = ((glWeightfvARB = (csGLWEIGHTFVARB) gl->GetProcAddress ("glWeightfvARB")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glWeightfvARB");
       allclear &= funcTest;
       funcTest = ((glWeightdvARB = (csGLWEIGHTDVARB) gl->GetProcAddress ("glWeightdvARB")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glWeightdvARB");
       allclear &= funcTest;
       funcTest = ((glWeightvARB = (csGLWEIGHTVARB) gl->GetProcAddress ("glWeightvARB")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glWeightvARB");
       allclear &= funcTest;
       funcTest = ((glWeightubvARB = (csGLWEIGHTUBVARB) gl->GetProcAddress ("glWeightubvARB")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glWeightubvARB");
       allclear &= funcTest;
       funcTest = ((glWeightusvARB = (csGLWEIGHTUSVARB) gl->GetProcAddress ("glWeightusvARB")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glWeightusvARB");
       allclear &= funcTest;
       funcTest = ((glWeightuivARB = (csGLWEIGHTUIVARB) gl->GetProcAddress ("glWeightuivARB")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glWeightuivARB");
       allclear &= funcTest;
       funcTest = ((glWeightPointerARB = (csGLWEIGHTPOINTERARB) gl->GetProcAddress ("glWeightPointerARB")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glWeightPointerARB");
       allclear &= funcTest;
       funcTest = ((glVertexBlendARB = (csGLVERTEXBLENDARB) gl->GetProcAddress ("glVertexBlendARB")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glVertexBlendARB");
       allclear &= funcTest;
       if (CS_GL_ARB_vertex_blend = allclear)
@@ -11902,251 +11906,251 @@ public:
     {
       allclear = true;
       funcTest = ((glVertexAttrib1sARB = (csGLVERTEXATTRIB1SARB) gl->GetProcAddress ("glVertexAttrib1sARB")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glVertexAttrib1sARB");
       allclear &= funcTest;
       funcTest = ((glVertexAttrib1fARB = (csGLVERTEXATTRIB1FARB) gl->GetProcAddress ("glVertexAttrib1fARB")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glVertexAttrib1fARB");
       allclear &= funcTest;
       funcTest = ((glVertexAttrib1dARB = (csGLVERTEXATTRIB1DARB) gl->GetProcAddress ("glVertexAttrib1dARB")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glVertexAttrib1dARB");
       allclear &= funcTest;
       funcTest = ((glVertexAttrib2sARB = (csGLVERTEXATTRIB2SARB) gl->GetProcAddress ("glVertexAttrib2sARB")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glVertexAttrib2sARB");
       allclear &= funcTest;
       funcTest = ((glVertexAttrib2fARB = (csGLVERTEXATTRIB2FARB) gl->GetProcAddress ("glVertexAttrib2fARB")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glVertexAttrib2fARB");
       allclear &= funcTest;
       funcTest = ((glVertexAttrib2dARB = (csGLVERTEXATTRIB2DARB) gl->GetProcAddress ("glVertexAttrib2dARB")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glVertexAttrib2dARB");
       allclear &= funcTest;
       funcTest = ((glVertexAttrib3sARB = (csGLVERTEXATTRIB3SARB) gl->GetProcAddress ("glVertexAttrib3sARB")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glVertexAttrib3sARB");
       allclear &= funcTest;
       funcTest = ((glVertexAttrib3fARB = (csGLVERTEXATTRIB3FARB) gl->GetProcAddress ("glVertexAttrib3fARB")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glVertexAttrib3fARB");
       allclear &= funcTest;
       funcTest = ((glVertexAttrib3dARB = (csGLVERTEXATTRIB3DARB) gl->GetProcAddress ("glVertexAttrib3dARB")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glVertexAttrib3dARB");
       allclear &= funcTest;
       funcTest = ((glVertexAttrib4sARB = (csGLVERTEXATTRIB4SARB) gl->GetProcAddress ("glVertexAttrib4sARB")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glVertexAttrib4sARB");
       allclear &= funcTest;
       funcTest = ((glVertexAttrib4fARB = (csGLVERTEXATTRIB4FARB) gl->GetProcAddress ("glVertexAttrib4fARB")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glVertexAttrib4fARB");
       allclear &= funcTest;
       funcTest = ((glVertexAttrib4dARB = (csGLVERTEXATTRIB4DARB) gl->GetProcAddress ("glVertexAttrib4dARB")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glVertexAttrib4dARB");
       allclear &= funcTest;
       funcTest = ((glVertexAttrib4NubARB = (csGLVERTEXATTRIB4NUBARB) gl->GetProcAddress ("glVertexAttrib4NubARB")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glVertexAttrib4NubARB");
       allclear &= funcTest;
       funcTest = ((glVertexAttrib1svARB = (csGLVERTEXATTRIB1SVARB) gl->GetProcAddress ("glVertexAttrib1svARB")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glVertexAttrib1svARB");
       allclear &= funcTest;
       funcTest = ((glVertexAttrib1fvARB = (csGLVERTEXATTRIB1FVARB) gl->GetProcAddress ("glVertexAttrib1fvARB")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glVertexAttrib1fvARB");
       allclear &= funcTest;
       funcTest = ((glVertexAttrib1dvARB = (csGLVERTEXATTRIB1DVARB) gl->GetProcAddress ("glVertexAttrib1dvARB")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glVertexAttrib1dvARB");
       allclear &= funcTest;
       funcTest = ((glVertexAttrib2svARB = (csGLVERTEXATTRIB2SVARB) gl->GetProcAddress ("glVertexAttrib2svARB")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glVertexAttrib2svARB");
       allclear &= funcTest;
       funcTest = ((glVertexAttrib2fvARB = (csGLVERTEXATTRIB2FVARB) gl->GetProcAddress ("glVertexAttrib2fvARB")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glVertexAttrib2fvARB");
       allclear &= funcTest;
       funcTest = ((glVertexAttrib2dvARB = (csGLVERTEXATTRIB2DVARB) gl->GetProcAddress ("glVertexAttrib2dvARB")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glVertexAttrib2dvARB");
       allclear &= funcTest;
       funcTest = ((glVertexAttrib3svARB = (csGLVERTEXATTRIB3SVARB) gl->GetProcAddress ("glVertexAttrib3svARB")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glVertexAttrib3svARB");
       allclear &= funcTest;
       funcTest = ((glVertexAttrib3fvARB = (csGLVERTEXATTRIB3FVARB) gl->GetProcAddress ("glVertexAttrib3fvARB")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glVertexAttrib3fvARB");
       allclear &= funcTest;
       funcTest = ((glVertexAttrib3dvARB = (csGLVERTEXATTRIB3DVARB) gl->GetProcAddress ("glVertexAttrib3dvARB")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glVertexAttrib3dvARB");
       allclear &= funcTest;
       funcTest = ((glVertexAttrib4bvARB = (csGLVERTEXATTRIB4BVARB) gl->GetProcAddress ("glVertexAttrib4bvARB")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glVertexAttrib4bvARB");
       allclear &= funcTest;
       funcTest = ((glVertexAttrib4svARB = (csGLVERTEXATTRIB4SVARB) gl->GetProcAddress ("glVertexAttrib4svARB")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glVertexAttrib4svARB");
       allclear &= funcTest;
       funcTest = ((glVertexAttrib4ivARB = (csGLVERTEXATTRIB4IVARB) gl->GetProcAddress ("glVertexAttrib4ivARB")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glVertexAttrib4ivARB");
       allclear &= funcTest;
       funcTest = ((glVertexAttrib4ubvARB = (csGLVERTEXATTRIB4UBVARB) gl->GetProcAddress ("glVertexAttrib4ubvARB")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glVertexAttrib4ubvARB");
       allclear &= funcTest;
       funcTest = ((glVertexAttrib4usvARB = (csGLVERTEXATTRIB4USVARB) gl->GetProcAddress ("glVertexAttrib4usvARB")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glVertexAttrib4usvARB");
       allclear &= funcTest;
       funcTest = ((glVertexAttrib4uivARB = (csGLVERTEXATTRIB4UIVARB) gl->GetProcAddress ("glVertexAttrib4uivARB")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glVertexAttrib4uivARB");
       allclear &= funcTest;
       funcTest = ((glVertexAttrib4fvARB = (csGLVERTEXATTRIB4FVARB) gl->GetProcAddress ("glVertexAttrib4fvARB")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glVertexAttrib4fvARB");
       allclear &= funcTest;
       funcTest = ((glVertexAttrib4dvARB = (csGLVERTEXATTRIB4DVARB) gl->GetProcAddress ("glVertexAttrib4dvARB")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glVertexAttrib4dvARB");
       allclear &= funcTest;
       funcTest = ((glVertexAttrib4NbvARB = (csGLVERTEXATTRIB4NBVARB) gl->GetProcAddress ("glVertexAttrib4NbvARB")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glVertexAttrib4NbvARB");
       allclear &= funcTest;
       funcTest = ((glVertexAttrib4NsvARB = (csGLVERTEXATTRIB4NSVARB) gl->GetProcAddress ("glVertexAttrib4NsvARB")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glVertexAttrib4NsvARB");
       allclear &= funcTest;
       funcTest = ((glVertexAttrib4NivARB = (csGLVERTEXATTRIB4NIVARB) gl->GetProcAddress ("glVertexAttrib4NivARB")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glVertexAttrib4NivARB");
       allclear &= funcTest;
       funcTest = ((glVertexAttrib4NubvARB = (csGLVERTEXATTRIB4NUBVARB) gl->GetProcAddress ("glVertexAttrib4NubvARB")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glVertexAttrib4NubvARB");
       allclear &= funcTest;
       funcTest = ((glVertexAttrib4NusvARB = (csGLVERTEXATTRIB4NUSVARB) gl->GetProcAddress ("glVertexAttrib4NusvARB")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glVertexAttrib4NusvARB");
       allclear &= funcTest;
       funcTest = ((glVertexAttrib4NuivARB = (csGLVERTEXATTRIB4NUIVARB) gl->GetProcAddress ("glVertexAttrib4NuivARB")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glVertexAttrib4NuivARB");
       allclear &= funcTest;
       funcTest = ((glVertexAttribPointerARB = (csGLVERTEXATTRIBPOINTERARB) gl->GetProcAddress ("glVertexAttribPointerARB")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glVertexAttribPointerARB");
       allclear &= funcTest;
       funcTest = ((glEnableVertexAttribArrayARB = (csGLENABLEVERTEXATTRIBARRAYARB) gl->GetProcAddress ("glEnableVertexAttribArrayARB")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glEnableVertexAttribArrayARB");
       allclear &= funcTest;
       funcTest = ((glDisableVertexAttribArrayARB = (csGLDISABLEVERTEXATTRIBARRAYARB) gl->GetProcAddress ("glDisableVertexAttribArrayARB")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glDisableVertexAttribArrayARB");
       allclear &= funcTest;
       funcTest = ((glProgramStringARB = (csGLPROGRAMSTRINGARB) gl->GetProcAddress ("glProgramStringARB")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glProgramStringARB");
       allclear &= funcTest;
       funcTest = ((glBindProgramARB = (csGLBINDPROGRAMARB) gl->GetProcAddress ("glBindProgramARB")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glBindProgramARB");
       allclear &= funcTest;
       funcTest = ((glDeleteProgramsARB = (csGLDELETEPROGRAMSARB) gl->GetProcAddress ("glDeleteProgramsARB")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glDeleteProgramsARB");
       allclear &= funcTest;
       funcTest = ((glGenProgramsARB = (csGLGENPROGRAMSARB) gl->GetProcAddress ("glGenProgramsARB")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glGenProgramsARB");
       allclear &= funcTest;
       funcTest = ((glProgramEnvParameter4dARB = (csGLPROGRAMENVPARAMETER4DARB) gl->GetProcAddress ("glProgramEnvParameter4dARB")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glProgramEnvParameter4dARB");
       allclear &= funcTest;
       funcTest = ((glProgramEnvParameter4dvARB = (csGLPROGRAMENVPARAMETER4DVARB) gl->GetProcAddress ("glProgramEnvParameter4dvARB")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glProgramEnvParameter4dvARB");
       allclear &= funcTest;
       funcTest = ((glProgramEnvParameter4fARB = (csGLPROGRAMENVPARAMETER4FARB) gl->GetProcAddress ("glProgramEnvParameter4fARB")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glProgramEnvParameter4fARB");
       allclear &= funcTest;
       funcTest = ((glProgramEnvParameter4fvARB = (csGLPROGRAMENVPARAMETER4FVARB) gl->GetProcAddress ("glProgramEnvParameter4fvARB")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glProgramEnvParameter4fvARB");
       allclear &= funcTest;
       funcTest = ((glProgramLocalParameter4dARB = (csGLPROGRAMLOCALPARAMETER4DARB) gl->GetProcAddress ("glProgramLocalParameter4dARB")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glProgramLocalParameter4dARB");
       allclear &= funcTest;
       funcTest = ((glProgramLocalParameter4dvARB = (csGLPROGRAMLOCALPARAMETER4DVARB) gl->GetProcAddress ("glProgramLocalParameter4dvARB")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glProgramLocalParameter4dvARB");
       allclear &= funcTest;
       funcTest = ((glProgramLocalParameter4fARB = (csGLPROGRAMLOCALPARAMETER4FARB) gl->GetProcAddress ("glProgramLocalParameter4fARB")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glProgramLocalParameter4fARB");
       allclear &= funcTest;
       funcTest = ((glProgramLocalParameter4fvARB = (csGLPROGRAMLOCALPARAMETER4FVARB) gl->GetProcAddress ("glProgramLocalParameter4fvARB")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glProgramLocalParameter4fvARB");
       allclear &= funcTest;
       funcTest = ((glGetProgramEnvParameterdvARB = (csGLGETPROGRAMENVPARAMETERDVARB) gl->GetProcAddress ("glGetProgramEnvParameterdvARB")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glGetProgramEnvParameterdvARB");
       allclear &= funcTest;
       funcTest = ((glGetProgramEnvParameterfvARB = (csGLGETPROGRAMENVPARAMETERFVARB) gl->GetProcAddress ("glGetProgramEnvParameterfvARB")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glGetProgramEnvParameterfvARB");
       allclear &= funcTest;
       funcTest = ((glGetProgramLocalParameterdvARB = (csGLGETPROGRAMLOCALPARAMETERDVARB) gl->GetProcAddress ("glGetProgramLocalParameterdvARB")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glGetProgramLocalParameterdvARB");
       allclear &= funcTest;
       funcTest = ((glGetProgramLocalParameterfvARB = (csGLGETPROGRAMLOCALPARAMETERFVARB) gl->GetProcAddress ("glGetProgramLocalParameterfvARB")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glGetProgramLocalParameterfvARB");
       allclear &= funcTest;
       funcTest = ((glGetProgramivARB = (csGLGETPROGRAMIVARB) gl->GetProcAddress ("glGetProgramivARB")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glGetProgramivARB");
       allclear &= funcTest;
       funcTest = ((glGetProgramStringARB = (csGLGETPROGRAMSTRINGARB) gl->GetProcAddress ("glGetProgramStringARB")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glGetProgramStringARB");
       allclear &= funcTest;
       funcTest = ((glGetVertexAttribdvARB = (csGLGETVERTEXATTRIBDVARB) gl->GetProcAddress ("glGetVertexAttribdvARB")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glGetVertexAttribdvARB");
       allclear &= funcTest;
       funcTest = ((glGetVertexAttribfvARB = (csGLGETVERTEXATTRIBFVARB) gl->GetProcAddress ("glGetVertexAttribfvARB")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glGetVertexAttribfvARB");
       allclear &= funcTest;
       funcTest = ((glGetVertexAttribivARB = (csGLGETVERTEXATTRIBIVARB) gl->GetProcAddress ("glGetVertexAttribivARB")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glGetVertexAttribivARB");
       allclear &= funcTest;
       funcTest = ((glGetVertexAttribPointervARB = (csGLGETVERTEXATTRIBPOINTERVARB) gl->GetProcAddress ("glGetVertexAttribPointervARB")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glGetVertexAttribPointervARB");
       allclear &= funcTest;
       funcTest = ((glIsProgramARB = (csGLISPROGRAMARB) gl->GetProcAddress ("glIsProgramARB")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glIsProgramARB");
       allclear &= funcTest;
       if (CS_GL_ARB_vertex_program = allclear)
@@ -12188,67 +12192,67 @@ public:
     {
       allclear = true;
       funcTest = ((glWindowPos2dARB = (csGLWINDOWPOS2DARB) gl->GetProcAddress ("glWindowPos2dARB")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glWindowPos2dARB");
       allclear &= funcTest;
       funcTest = ((glWindowPos2fARB = (csGLWINDOWPOS2FARB) gl->GetProcAddress ("glWindowPos2fARB")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glWindowPos2fARB");
       allclear &= funcTest;
       funcTest = ((glWindowPos2iARB = (csGLWINDOWPOS2IARB) gl->GetProcAddress ("glWindowPos2iARB")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glWindowPos2iARB");
       allclear &= funcTest;
       funcTest = ((glWindowPos2sARB = (csGLWINDOWPOS2SARB) gl->GetProcAddress ("glWindowPos2sARB")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glWindowPos2sARB");
       allclear &= funcTest;
       funcTest = ((glWindowPos2dvARB = (csGLWINDOWPOS2DVARB) gl->GetProcAddress ("glWindowPos2dvARB")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glWindowPos2dvARB");
       allclear &= funcTest;
       funcTest = ((glWindowPos2fvARB = (csGLWINDOWPOS2FVARB) gl->GetProcAddress ("glWindowPos2fvARB")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glWindowPos2fvARB");
       allclear &= funcTest;
       funcTest = ((glWindowPos2ivARB = (csGLWINDOWPOS2IVARB) gl->GetProcAddress ("glWindowPos2ivARB")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glWindowPos2ivARB");
       allclear &= funcTest;
       funcTest = ((glWindowPos2svARB = (csGLWINDOWPOS2SVARB) gl->GetProcAddress ("glWindowPos2svARB")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glWindowPos2svARB");
       allclear &= funcTest;
       funcTest = ((glWindowPos3dARB = (csGLWINDOWPOS3DARB) gl->GetProcAddress ("glWindowPos3dARB")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glWindowPos3dARB");
       allclear &= funcTest;
       funcTest = ((glWindowPos3fARB = (csGLWINDOWPOS3FARB) gl->GetProcAddress ("glWindowPos3fARB")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glWindowPos3fARB");
       allclear &= funcTest;
       funcTest = ((glWindowPos3iARB = (csGLWINDOWPOS3IARB) gl->GetProcAddress ("glWindowPos3iARB")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glWindowPos3iARB");
       allclear &= funcTest;
       funcTest = ((glWindowPos3sARB = (csGLWINDOWPOS3SARB) gl->GetProcAddress ("glWindowPos3sARB")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glWindowPos3sARB");
       allclear &= funcTest;
       funcTest = ((glWindowPos3dvARB = (csGLWINDOWPOS3DVARB) gl->GetProcAddress ("glWindowPos3dvARB")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glWindowPos3dvARB");
       allclear &= funcTest;
       funcTest = ((glWindowPos3fvARB = (csGLWINDOWPOS3FVARB) gl->GetProcAddress ("glWindowPos3fvARB")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glWindowPos3fvARB");
       allclear &= funcTest;
       funcTest = ((glWindowPos3ivARB = (csGLWINDOWPOS3IVARB) gl->GetProcAddress ("glWindowPos3ivARB")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glWindowPos3ivARB");
       allclear &= funcTest;
       funcTest = ((glWindowPos3svARB = (csGLWINDOWPOS3SVARB) gl->GetProcAddress ("glWindowPos3svARB")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glWindowPos3svARB");
       allclear &= funcTest;
       if (CS_GL_ARB_window_pos = allclear)
@@ -12404,7 +12408,7 @@ public:
     {
       allclear = true;
       funcTest = ((glBlendColorEXT = (csGLBLENDCOLOREXT) gl->GetProcAddress ("glBlendColorEXT")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glBlendColorEXT");
       allclear &= funcTest;
       if (CS_GL_EXT_blend_color = allclear)
@@ -12446,7 +12450,7 @@ public:
     {
       allclear = true;
       funcTest = ((glBlendFuncSeparateEXT = (csGLBLENDFUNCSEPARATEEXT) gl->GetProcAddress ("glBlendFuncSeparateEXT")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glBlendFuncSeparateEXT");
       allclear &= funcTest;
       if (CS_GL_EXT_blend_func_separate = allclear)
@@ -12526,7 +12530,7 @@ public:
     {
       allclear = true;
       funcTest = ((glBlendEquationEXT = (csGLBLENDEQUATIONEXT) gl->GetProcAddress ("glBlendEquationEXT")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glBlendEquationEXT");
       allclear &= funcTest;
       if (CS_GL_EXT_blend_minmax = allclear)
@@ -12644,11 +12648,11 @@ public:
     {
       allclear = true;
       funcTest = ((glColorSubTableEXT = (csGLCOLORSUBTABLEEXT) gl->GetProcAddress ("glColorSubTableEXT")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glColorSubTableEXT");
       allclear &= funcTest;
       funcTest = ((glCopyColorSubTableEXT = (csGLCOPYCOLORSUBTABLEEXT) gl->GetProcAddress ("glCopyColorSubTableEXT")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glCopyColorSubTableEXT");
       allclear &= funcTest;
       if (CS_GL_EXT_color_subtable = allclear)
@@ -12690,11 +12694,11 @@ public:
     {
       allclear = true;
       funcTest = ((glLockArraysEXT = (csGLLOCKARRAYSEXT) gl->GetProcAddress ("glLockArraysEXT")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glLockArraysEXT");
       allclear &= funcTest;
       funcTest = ((glUnlockArraysEXT = (csGLUNLOCKARRAYSEXT) gl->GetProcAddress ("glUnlockArraysEXT")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glUnlockArraysEXT");
       allclear &= funcTest;
       if (CS_GL_EXT_compiled_vertex_array = allclear)
@@ -12736,55 +12740,55 @@ public:
     {
       allclear = true;
       funcTest = ((glConvolutionFilter1DEXT = (csGLCONVOLUTIONFILTER1DEXT) gl->GetProcAddress ("glConvolutionFilter1DEXT")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glConvolutionFilter1DEXT");
       allclear &= funcTest;
       funcTest = ((glConvolutionFilter2DEXT = (csGLCONVOLUTIONFILTER2DEXT) gl->GetProcAddress ("glConvolutionFilter2DEXT")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glConvolutionFilter2DEXT");
       allclear &= funcTest;
       funcTest = ((glCopyConvolutionFilter1DEXT = (csGLCOPYCONVOLUTIONFILTER1DEXT) gl->GetProcAddress ("glCopyConvolutionFilter1DEXT")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glCopyConvolutionFilter1DEXT");
       allclear &= funcTest;
       funcTest = ((glCopyConvolutionFilter2DEXT = (csGLCOPYCONVOLUTIONFILTER2DEXT) gl->GetProcAddress ("glCopyConvolutionFilter2DEXT")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glCopyConvolutionFilter2DEXT");
       allclear &= funcTest;
       funcTest = ((glGetConvolutionFilterEXT = (csGLGETCONVOLUTIONFILTEREXT) gl->GetProcAddress ("glGetConvolutionFilterEXT")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glGetConvolutionFilterEXT");
       allclear &= funcTest;
       funcTest = ((glSeparableFilter2DEXT = (csGLSEPARABLEFILTER2DEXT) gl->GetProcAddress ("glSeparableFilter2DEXT")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glSeparableFilter2DEXT");
       allclear &= funcTest;
       funcTest = ((glGetSeparableFilterEXT = (csGLGETSEPARABLEFILTEREXT) gl->GetProcAddress ("glGetSeparableFilterEXT")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glGetSeparableFilterEXT");
       allclear &= funcTest;
       funcTest = ((glConvolutionParameteriEXT = (csGLCONVOLUTIONPARAMETERIEXT) gl->GetProcAddress ("glConvolutionParameteriEXT")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glConvolutionParameteriEXT");
       allclear &= funcTest;
       funcTest = ((glConvolutionParameterivEXT = (csGLCONVOLUTIONPARAMETERIVEXT) gl->GetProcAddress ("glConvolutionParameterivEXT")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glConvolutionParameterivEXT");
       allclear &= funcTest;
       funcTest = ((glConvolutionParameterfEXT = (csGLCONVOLUTIONPARAMETERFEXT) gl->GetProcAddress ("glConvolutionParameterfEXT")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glConvolutionParameterfEXT");
       allclear &= funcTest;
       funcTest = ((glConvolutionParameterfvEXT = (csGLCONVOLUTIONPARAMETERFVEXT) gl->GetProcAddress ("glConvolutionParameterfvEXT")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glConvolutionParameterfvEXT");
       allclear &= funcTest;
       funcTest = ((glGetConvolutionParameterivEXT = (csGLGETCONVOLUTIONPARAMETERIVEXT) gl->GetProcAddress ("glGetConvolutionParameterivEXT")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glGetConvolutionParameterivEXT");
       allclear &= funcTest;
       funcTest = ((glGetConvolutionParameterfvEXT = (csGLGETCONVOLUTIONPARAMETERFVEXT) gl->GetProcAddress ("glGetConvolutionParameterfvEXT")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glGetConvolutionParameterfvEXT");
       allclear &= funcTest;
       if (CS_GL_EXT_convolution = allclear)
@@ -12826,23 +12830,23 @@ public:
     {
       allclear = true;
       funcTest = ((glFogCoordfEXfloat = (csGLFOGCOORDFEXFLOAT) gl->GetProcAddress ("glFogCoordfEXfloat")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glFogCoordfEXfloat");
       allclear &= funcTest;
       funcTest = ((glFogCoorddEXdouble = (csGLFOGCOORDDEXDOUBLE) gl->GetProcAddress ("glFogCoorddEXdouble")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glFogCoorddEXdouble");
       allclear &= funcTest;
       funcTest = ((glFogCoordfvEXfloat = (csGLFOGCOORDFVEXFLOAT) gl->GetProcAddress ("glFogCoordfvEXfloat")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glFogCoordfvEXfloat");
       allclear &= funcTest;
       funcTest = ((glFogCoorddvEXdouble = (csGLFOGCOORDDVEXDOUBLE) gl->GetProcAddress ("glFogCoorddvEXdouble")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glFogCoorddvEXdouble");
       allclear &= funcTest;
       funcTest = ((glFogCoordPointerEXT = (csGLFOGCOORDPOINTEREXT) gl->GetProcAddress ("glFogCoordPointerEXT")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glFogCoordPointerEXT");
       allclear &= funcTest;
       if (CS_GL_EXT_fog_coord = allclear)
@@ -12884,43 +12888,43 @@ public:
     {
       allclear = true;
       funcTest = ((glHistogramEXT = (csGLHISTOGRAMEXT) gl->GetProcAddress ("glHistogramEXT")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glHistogramEXT");
       allclear &= funcTest;
       funcTest = ((glResetHistogramEXT = (csGLRESETHISTOGRAMEXT) gl->GetProcAddress ("glResetHistogramEXT")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glResetHistogramEXT");
       allclear &= funcTest;
       funcTest = ((glGetHistogramEXT = (csGLGETHISTOGRAMEXT) gl->GetProcAddress ("glGetHistogramEXT")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glGetHistogramEXT");
       allclear &= funcTest;
       funcTest = ((glGetHistogramParameterivEXT = (csGLGETHISTOGRAMPARAMETERIVEXT) gl->GetProcAddress ("glGetHistogramParameterivEXT")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glGetHistogramParameterivEXT");
       allclear &= funcTest;
       funcTest = ((glGetHistogramParameterfvEXT = (csGLGETHISTOGRAMPARAMETERFVEXT) gl->GetProcAddress ("glGetHistogramParameterfvEXT")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glGetHistogramParameterfvEXT");
       allclear &= funcTest;
       funcTest = ((glMinmaxEXT = (csGLMINMAXEXT) gl->GetProcAddress ("glMinmaxEXT")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glMinmaxEXT");
       allclear &= funcTest;
       funcTest = ((glResetMinmaxEXT = (csGLRESETMINMAXEXT) gl->GetProcAddress ("glResetMinmaxEXT")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glResetMinmaxEXT");
       allclear &= funcTest;
       funcTest = ((glGetMinmaxEXT = (csGLGETMINMAXEXT) gl->GetProcAddress ("glGetMinmaxEXT")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glGetMinmaxEXT");
       allclear &= funcTest;
       funcTest = ((glGetMinmaxParameterivEXT = (csGLGETMINMAXPARAMETERIVEXT) gl->GetProcAddress ("glGetMinmaxParameterivEXT")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glGetMinmaxParameterivEXT");
       allclear &= funcTest;
       funcTest = ((glGetMinmaxParameterfvEXT = (csGLGETMINMAXPARAMETERFVEXT) gl->GetProcAddress ("glGetMinmaxParameterfvEXT")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glGetMinmaxParameterfvEXT");
       allclear &= funcTest;
       if (CS_GL_EXT_histogram = allclear)
@@ -12962,11 +12966,11 @@ public:
     {
       allclear = true;
       funcTest = ((glMultiDrawArraysEXT = (csGLMULTIDRAWARRAYSEXT) gl->GetProcAddress ("glMultiDrawArraysEXT")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glMultiDrawArraysEXT");
       allclear &= funcTest;
       funcTest = ((glMultiDrawElementsEXT = (csGLMULTIDRAWELEMENTSEXT) gl->GetProcAddress ("glMultiDrawElementsEXT")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glMultiDrawElementsEXT");
       allclear &= funcTest;
       if (CS_GL_EXT_multi_draw_arrays = allclear)
@@ -13046,23 +13050,23 @@ public:
     {
       allclear = true;
       funcTest = ((glColorTableEXT = (csGLCOLORTABLEEXT) gl->GetProcAddress ("glColorTableEXT")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glColorTableEXT");
       allclear &= funcTest;
       funcTest = ((glColorSubTableEXT = (csGLCOLORSUBTABLEEXT) gl->GetProcAddress ("glColorSubTableEXT")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glColorSubTableEXT");
       allclear &= funcTest;
       funcTest = ((glGetColorTableEXT = (csGLGETCOLORTABLEEXT) gl->GetProcAddress ("glGetColorTableEXT")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glGetColorTableEXT");
       allclear &= funcTest;
       funcTest = ((glGetColorTableParameterivEXT = (csGLGETCOLORTABLEPARAMETERIVEXT) gl->GetProcAddress ("glGetColorTableParameterivEXT")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glGetColorTableParameterivEXT");
       allclear &= funcTest;
       funcTest = ((glGetColorTableParameterfvEXT = (csGLGETCOLORTABLEPARAMETERFVEXT) gl->GetProcAddress ("glGetColorTableParameterfvEXT")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glGetColorTableParameterfvEXT");
       allclear &= funcTest;
       if (CS_GL_EXT_paletted_texture = allclear)
@@ -13104,11 +13108,11 @@ public:
     {
       allclear = true;
       funcTest = ((glPointParameterfEXT = (csGLPOINTPARAMETERFEXT) gl->GetProcAddress ("glPointParameterfEXT")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glPointParameterfEXT");
       allclear &= funcTest;
       funcTest = ((glPointParameterfvEXT = (csGLPOINTPARAMETERFVEXT) gl->GetProcAddress ("glPointParameterfvEXT")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glPointParameterfvEXT");
       allclear &= funcTest;
       if (CS_GL_EXT_point_parameters = allclear)
@@ -13150,7 +13154,7 @@ public:
     {
       allclear = true;
       funcTest = ((glPolygonOffsetEXT = (csGLPOLYGONOFFSETEXT) gl->GetProcAddress ("glPolygonOffsetEXT")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glPolygonOffsetEXT");
       allclear &= funcTest;
       if (CS_GL_EXT_polygon_offset = allclear)
@@ -13192,71 +13196,71 @@ public:
     {
       allclear = true;
       funcTest = ((glSecondaryColor3bEXT = (csGLSECONDARYCOLOR3BEXT) gl->GetProcAddress ("glSecondaryColor3bEXT")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glSecondaryColor3bEXT");
       allclear &= funcTest;
       funcTest = ((glSecondaryColor3sEXT = (csGLSECONDARYCOLOR3SEXT) gl->GetProcAddress ("glSecondaryColor3sEXT")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glSecondaryColor3sEXT");
       allclear &= funcTest;
       funcTest = ((glSecondaryColor3iEXT = (csGLSECONDARYCOLOR3IEXT) gl->GetProcAddress ("glSecondaryColor3iEXT")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glSecondaryColor3iEXT");
       allclear &= funcTest;
       funcTest = ((glSecondaryColor3fEXT = (csGLSECONDARYCOLOR3FEXT) gl->GetProcAddress ("glSecondaryColor3fEXT")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glSecondaryColor3fEXT");
       allclear &= funcTest;
       funcTest = ((glSecondaryColor3dEXT = (csGLSECONDARYCOLOR3DEXT) gl->GetProcAddress ("glSecondaryColor3dEXT")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glSecondaryColor3dEXT");
       allclear &= funcTest;
       funcTest = ((glSecondaryColor3ubEXT = (csGLSECONDARYCOLOR3UBEXT) gl->GetProcAddress ("glSecondaryColor3ubEXT")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glSecondaryColor3ubEXT");
       allclear &= funcTest;
       funcTest = ((glSecondaryColor3usEXT = (csGLSECONDARYCOLOR3USEXT) gl->GetProcAddress ("glSecondaryColor3usEXT")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glSecondaryColor3usEXT");
       allclear &= funcTest;
       funcTest = ((glSecondaryColor3uiEXT = (csGLSECONDARYCOLOR3UIEXT) gl->GetProcAddress ("glSecondaryColor3uiEXT")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glSecondaryColor3uiEXT");
       allclear &= funcTest;
       funcTest = ((glSecondaryColor3bvEXT = (csGLSECONDARYCOLOR3BVEXT) gl->GetProcAddress ("glSecondaryColor3bvEXT")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glSecondaryColor3bvEXT");
       allclear &= funcTest;
       funcTest = ((glSecondaryColor3svEXT = (csGLSECONDARYCOLOR3SVEXT) gl->GetProcAddress ("glSecondaryColor3svEXT")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glSecondaryColor3svEXT");
       allclear &= funcTest;
       funcTest = ((glSecondaryColor3ivEXT = (csGLSECONDARYCOLOR3IVEXT) gl->GetProcAddress ("glSecondaryColor3ivEXT")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glSecondaryColor3ivEXT");
       allclear &= funcTest;
       funcTest = ((glSecondaryColor3fvEXT = (csGLSECONDARYCOLOR3FVEXT) gl->GetProcAddress ("glSecondaryColor3fvEXT")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glSecondaryColor3fvEXT");
       allclear &= funcTest;
       funcTest = ((glSecondaryColor3dvEXT = (csGLSECONDARYCOLOR3DVEXT) gl->GetProcAddress ("glSecondaryColor3dvEXT")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glSecondaryColor3dvEXT");
       allclear &= funcTest;
       funcTest = ((glSecondaryColor3ubvEXT = (csGLSECONDARYCOLOR3UBVEXT) gl->GetProcAddress ("glSecondaryColor3ubvEXT")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glSecondaryColor3ubvEXT");
       allclear &= funcTest;
       funcTest = ((glSecondaryColor3usvEXT = (csGLSECONDARYCOLOR3USVEXT) gl->GetProcAddress ("glSecondaryColor3usvEXT")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glSecondaryColor3usvEXT");
       allclear &= funcTest;
       funcTest = ((glSecondaryColor3uivEXT = (csGLSECONDARYCOLOR3UIVEXT) gl->GetProcAddress ("glSecondaryColor3uivEXT")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glSecondaryColor3uivEXT");
       allclear &= funcTest;
       funcTest = ((glSecondaryColorPointerEXT = (csGLSECONDARYCOLORPOINTEREXT) gl->GetProcAddress ("glSecondaryColorPointerEXT")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glSecondaryColorPointerEXT");
       allclear &= funcTest;
       if (CS_GL_EXT_secondary_color = allclear)
@@ -13412,7 +13416,7 @@ public:
     {
       allclear = true;
       funcTest = ((glActiveStencilFaceEXT = (csGLACTIVESTENCILFACEEXT) gl->GetProcAddress ("glActiveStencilFaceEXT")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glActiveStencilFaceEXT");
       allclear &= funcTest;
       if (CS_GL_EXT_stencil_two_side = allclear)
@@ -13492,15 +13496,15 @@ public:
     {
       allclear = true;
       funcTest = ((glTexSubImage1DEXT = (csGLTEXSUBIMAGE1DEXT) gl->GetProcAddress ("glTexSubImage1DEXT")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glTexSubImage1DEXT");
       allclear &= funcTest;
       funcTest = ((glTexSubImage2DEXT = (csGLTEXSUBIMAGE2DEXT) gl->GetProcAddress ("glTexSubImage2DEXT")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glTexSubImage2DEXT");
       allclear &= funcTest;
       funcTest = ((glTexSubImage3DEXT = (csGLTEXSUBIMAGE3DEXT) gl->GetProcAddress ("glTexSubImage3DEXT")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glTexSubImage3DEXT");
       allclear &= funcTest;
       if (CS_GL_EXT_subtexture = allclear)
@@ -13542,7 +13546,7 @@ public:
     {
       allclear = true;
       funcTest = ((glTexImage3DEXT = (csGLTEXIMAGE3DEXT) gl->GetProcAddress ("glTexImage3DEXT")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glTexImage3DEXT");
       allclear &= funcTest;
       if (CS_GL_EXT_texture3D = allclear)
@@ -13812,27 +13816,27 @@ public:
     {
       allclear = true;
       funcTest = ((glGenTexturesEXT = (csGLGENTEXTURESEXT) gl->GetProcAddress ("glGenTexturesEXT")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glGenTexturesEXT");
       allclear &= funcTest;
       funcTest = ((glDeleteTexturesEXT = (csGLDELETETEXTURESEXT) gl->GetProcAddress ("glDeleteTexturesEXT")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glDeleteTexturesEXT");
       allclear &= funcTest;
       funcTest = ((glBindTextureEXT = (csGLBINDTEXTUREEXT) gl->GetProcAddress ("glBindTextureEXT")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glBindTextureEXT");
       allclear &= funcTest;
       funcTest = ((glPrioritizeTexturesEXT = (csGLPRIORITIZETEXTURESEXT) gl->GetProcAddress ("glPrioritizeTexturesEXT")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glPrioritizeTexturesEXT");
       allclear &= funcTest;
       funcTest = ((glAreTexturesResidentEXT = (csGLARETEXTURESRESIDENTEXT) gl->GetProcAddress ("glAreTexturesResidentEXT")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glAreTexturesResidentEXT");
       allclear &= funcTest;
       funcTest = ((glIsTextureEXT = (csGLISTEXTUREEXT) gl->GetProcAddress ("glIsTextureEXT")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glIsTextureEXT");
       allclear &= funcTest;
       if (CS_GL_EXT_texture_object = allclear)
@@ -13874,39 +13878,39 @@ public:
     {
       allclear = true;
       funcTest = ((glArrayElementEXT = (csGLARRAYELEMENTEXT) gl->GetProcAddress ("glArrayElementEXT")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glArrayElementEXT");
       allclear &= funcTest;
       funcTest = ((glDrawArraysEXT = (csGLDRAWARRAYSEXT) gl->GetProcAddress ("glDrawArraysEXT")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glDrawArraysEXT");
       allclear &= funcTest;
       funcTest = ((glVertexPointerEXT = (csGLVERTEXPOINTEREXT) gl->GetProcAddress ("glVertexPointerEXT")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glVertexPointerEXT");
       allclear &= funcTest;
       funcTest = ((glNormalPointerEXT = (csGLNORMALPOINTEREXT) gl->GetProcAddress ("glNormalPointerEXT")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glNormalPointerEXT");
       allclear &= funcTest;
       funcTest = ((glColorPointerEXT = (csGLCOLORPOINTEREXT) gl->GetProcAddress ("glColorPointerEXT")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glColorPointerEXT");
       allclear &= funcTest;
       funcTest = ((glIndexPointerEXT = (csGLINDEXPOINTEREXT) gl->GetProcAddress ("glIndexPointerEXT")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glIndexPointerEXT");
       allclear &= funcTest;
       funcTest = ((glTexCoordPointerEXT = (csGLTEXCOORDPOINTEREXT) gl->GetProcAddress ("glTexCoordPointerEXT")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glTexCoordPointerEXT");
       allclear &= funcTest;
       funcTest = ((glEdgeFlagPointerEXT = (csGLEDGEFLAGPOINTEREXT) gl->GetProcAddress ("glEdgeFlagPointerEXT")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glEdgeFlagPointerEXT");
       allclear &= funcTest;
       funcTest = ((glGetPointervEXT = (csGLGETPOINTERVEXT) gl->GetProcAddress ("glGetPointervEXT")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glGetPointervEXT");
       allclear &= funcTest;
       if (CS_GL_EXT_vertex_array = allclear)
@@ -13948,171 +13952,171 @@ public:
     {
       allclear = true;
       funcTest = ((glBeginVertexShaderEXT = (csGLBEGINVERTEXSHADEREXT) gl->GetProcAddress ("glBeginVertexShaderEXT")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glBeginVertexShaderEXT");
       allclear &= funcTest;
       funcTest = ((glEndVertexShaderEXT = (csGLENDVERTEXSHADEREXT) gl->GetProcAddress ("glEndVertexShaderEXT")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glEndVertexShaderEXT");
       allclear &= funcTest;
       funcTest = ((glBindVertexShaderEXT = (csGLBINDVERTEXSHADEREXT) gl->GetProcAddress ("glBindVertexShaderEXT")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glBindVertexShaderEXT");
       allclear &= funcTest;
       funcTest = ((glGenVertexShadersEXT = (csGLGENVERTEXSHADERSEXT) gl->GetProcAddress ("glGenVertexShadersEXT")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glGenVertexShadersEXT");
       allclear &= funcTest;
       funcTest = ((glDeleteVertexShaderEXT = (csGLDELETEVERTEXSHADEREXT) gl->GetProcAddress ("glDeleteVertexShaderEXT")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glDeleteVertexShaderEXT");
       allclear &= funcTest;
       funcTest = ((glShaderOp1EXT = (csGLSHADEROP1EXT) gl->GetProcAddress ("glShaderOp1EXT")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glShaderOp1EXT");
       allclear &= funcTest;
       funcTest = ((glShaderOp2EXT = (csGLSHADEROP2EXT) gl->GetProcAddress ("glShaderOp2EXT")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glShaderOp2EXT");
       allclear &= funcTest;
       funcTest = ((glShaderOp3EXT = (csGLSHADEROP3EXT) gl->GetProcAddress ("glShaderOp3EXT")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glShaderOp3EXT");
       allclear &= funcTest;
       funcTest = ((glSwizzleEXT = (csGLSWIZZLEEXT) gl->GetProcAddress ("glSwizzleEXT")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glSwizzleEXT");
       allclear &= funcTest;
       funcTest = ((glWriteMaskEXT = (csGLWRITEMASKEXT) gl->GetProcAddress ("glWriteMaskEXT")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glWriteMaskEXT");
       allclear &= funcTest;
       funcTest = ((glInsertComponentEXT = (csGLINSERTCOMPONENTEXT) gl->GetProcAddress ("glInsertComponentEXT")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glInsertComponentEXT");
       allclear &= funcTest;
       funcTest = ((glExtractComponentEXT = (csGLEXTRACTCOMPONENTEXT) gl->GetProcAddress ("glExtractComponentEXT")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glExtractComponentEXT");
       allclear &= funcTest;
       funcTest = ((glGenSymbolsEXT = (csGLGENSYMBOLSEXT) gl->GetProcAddress ("glGenSymbolsEXT")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glGenSymbolsEXT");
       allclear &= funcTest;
       funcTest = ((glSetInvariantEXT = (csGLSETINVARIANTEXT) gl->GetProcAddress ("glSetInvariantEXT")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glSetInvariantEXT");
       allclear &= funcTest;
       funcTest = ((glSetLocalConstantEXT = (csGLSETLOCALCONSTANTEXT) gl->GetProcAddress ("glSetLocalConstantEXT")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glSetLocalConstantEXT");
       allclear &= funcTest;
       funcTest = ((glVariantbvEXT = (csGLVARIANTBVEXT) gl->GetProcAddress ("glVariantbvEXT")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glVariantbvEXT");
       allclear &= funcTest;
       funcTest = ((glVariantsvEXT = (csGLVARIANTSVEXT) gl->GetProcAddress ("glVariantsvEXT")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glVariantsvEXT");
       allclear &= funcTest;
       funcTest = ((glVariantivEXT = (csGLVARIANTIVEXT) gl->GetProcAddress ("glVariantivEXT")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glVariantivEXT");
       allclear &= funcTest;
       funcTest = ((glVariantfvEXT = (csGLVARIANTFVEXT) gl->GetProcAddress ("glVariantfvEXT")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glVariantfvEXT");
       allclear &= funcTest;
       funcTest = ((glVariantdvEXT = (csGLVARIANTDVEXT) gl->GetProcAddress ("glVariantdvEXT")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glVariantdvEXT");
       allclear &= funcTest;
       funcTest = ((glVariantubvEXT = (csGLVARIANTUBVEXT) gl->GetProcAddress ("glVariantubvEXT")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glVariantubvEXT");
       allclear &= funcTest;
       funcTest = ((glVariantusvEXT = (csGLVARIANTUSVEXT) gl->GetProcAddress ("glVariantusvEXT")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glVariantusvEXT");
       allclear &= funcTest;
       funcTest = ((glVariantuivEXT = (csGLVARIANTUIVEXT) gl->GetProcAddress ("glVariantuivEXT")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glVariantuivEXT");
       allclear &= funcTest;
       funcTest = ((glVariantPointerEXT = (csGLVARIANTPOINTEREXT) gl->GetProcAddress ("glVariantPointerEXT")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glVariantPointerEXT");
       allclear &= funcTest;
       funcTest = ((glEnableVariantClientStateEXT = (csGLENABLEVARIANTCLIENTSTATEEXT) gl->GetProcAddress ("glEnableVariantClientStateEXT")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glEnableVariantClientStateEXT");
       allclear &= funcTest;
       funcTest = ((glDisableVariantClientStateEXT = (csGLDISABLEVARIANTCLIENTSTATEEXT) gl->GetProcAddress ("glDisableVariantClientStateEXT")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glDisableVariantClientStateEXT");
       allclear &= funcTest;
       funcTest = ((glBindLightParameterEXT = (csGLBINDLIGHTPARAMETEREXT) gl->GetProcAddress ("glBindLightParameterEXT")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glBindLightParameterEXT");
       allclear &= funcTest;
       funcTest = ((glBindMaterialParameterEXT = (csGLBINDMATERIALPARAMETEREXT) gl->GetProcAddress ("glBindMaterialParameterEXT")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glBindMaterialParameterEXT");
       allclear &= funcTest;
       funcTest = ((glBindTexGenParameterEXT = (csGLBINDTEXGENPARAMETEREXT) gl->GetProcAddress ("glBindTexGenParameterEXT")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glBindTexGenParameterEXT");
       allclear &= funcTest;
       funcTest = ((glBindTextureUnitParameterEXT = (csGLBINDTEXTUREUNITPARAMETEREXT) gl->GetProcAddress ("glBindTextureUnitParameterEXT")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glBindTextureUnitParameterEXT");
       allclear &= funcTest;
       funcTest = ((glBindParameterEXT = (csGLBINDPARAMETEREXT) gl->GetProcAddress ("glBindParameterEXT")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glBindParameterEXT");
       allclear &= funcTest;
       funcTest = ((glIsVariantEnabledEXT = (csGLISVARIANTENABLEDEXT) gl->GetProcAddress ("glIsVariantEnabledEXT")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glIsVariantEnabledEXT");
       allclear &= funcTest;
       funcTest = ((glGetVariantBooleanvEXT = (csGLGETVARIANTBOOLEANVEXT) gl->GetProcAddress ("glGetVariantBooleanvEXT")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glGetVariantBooleanvEXT");
       allclear &= funcTest;
       funcTest = ((glGetVariantIntegervEXT = (csGLGETVARIANTINTEGERVEXT) gl->GetProcAddress ("glGetVariantIntegervEXT")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glGetVariantIntegervEXT");
       allclear &= funcTest;
       funcTest = ((glGetVariantFloatvEXT = (csGLGETVARIANTFLOATVEXT) gl->GetProcAddress ("glGetVariantFloatvEXT")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glGetVariantFloatvEXT");
       allclear &= funcTest;
       funcTest = ((glGetVariantPointervEXT = (csGLGETVARIANTPOINTERVEXT) gl->GetProcAddress ("glGetVariantPointervEXT")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glGetVariantPointervEXT");
       allclear &= funcTest;
       funcTest = ((glGetInvariantBooleanvEXT = (csGLGETINVARIANTBOOLEANVEXT) gl->GetProcAddress ("glGetInvariantBooleanvEXT")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glGetInvariantBooleanvEXT");
       allclear &= funcTest;
       funcTest = ((glGetInvariantIntegervEXT = (csGLGETINVARIANTINTEGERVEXT) gl->GetProcAddress ("glGetInvariantIntegervEXT")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glGetInvariantIntegervEXT");
       allclear &= funcTest;
       funcTest = ((glGetInvariantFloatvEXT = (csGLGETINVARIANTFLOATVEXT) gl->GetProcAddress ("glGetInvariantFloatvEXT")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glGetInvariantFloatvEXT");
       allclear &= funcTest;
       funcTest = ((glGetLocalConstantBooleanvEXT = (csGLGETLOCALCONSTANTBOOLEANVEXT) gl->GetProcAddress ("glGetLocalConstantBooleanvEXT")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glGetLocalConstantBooleanvEXT");
       allclear &= funcTest;
       funcTest = ((glGetLocalConstantIntegervEXT = (csGLGETLOCALCONSTANTINTEGERVEXT) gl->GetProcAddress ("glGetLocalConstantIntegervEXT")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glGetLocalConstantIntegervEXT");
       allclear &= funcTest;
       funcTest = ((glGetLocalConstantFloatvEXT = (csGLGETLOCALCONSTANTFLOATVEXT) gl->GetProcAddress ("glGetLocalConstantFloatvEXT")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glGetLocalConstantFloatvEXT");
       allclear &= funcTest;
       if (CS_GL_EXT_vertex_shader = allclear)
@@ -14154,15 +14158,15 @@ public:
     {
       allclear = true;
       funcTest = ((glVertexWeightfEXT = (csGLVERTEXWEIGHTFEXT) gl->GetProcAddress ("glVertexWeightfEXT")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glVertexWeightfEXT");
       allclear &= funcTest;
       funcTest = ((glVertexWeightfvEXT = (csGLVERTEXWEIGHTFVEXT) gl->GetProcAddress ("glVertexWeightfvEXT")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glVertexWeightfvEXT");
       allclear &= funcTest;
       funcTest = ((glVertexWeightPointerEXT = (csGLVERTEXWEIGHTPOINTEREXT) gl->GetProcAddress ("glVertexWeightPointerEXT")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glVertexWeightPointerEXT");
       allclear &= funcTest;
       if (CS_GL_EXT_vertex_weighting = allclear)
@@ -14356,39 +14360,39 @@ public:
     {
       allclear = true;
       funcTest = ((glMapControlPointsNV = (csGLMAPCONTROLPOINTSNV) gl->GetProcAddress ("glMapControlPointsNV")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glMapControlPointsNV");
       allclear &= funcTest;
       funcTest = ((glMapParameterivNV = (csGLMAPPARAMETERIVNV) gl->GetProcAddress ("glMapParameterivNV")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glMapParameterivNV");
       allclear &= funcTest;
       funcTest = ((glMapParameterfvNV = (csGLMAPPARAMETERFVNV) gl->GetProcAddress ("glMapParameterfvNV")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glMapParameterfvNV");
       allclear &= funcTest;
       funcTest = ((glGetMapControlPointsNV = (csGLGETMAPCONTROLPOINTSNV) gl->GetProcAddress ("glGetMapControlPointsNV")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glGetMapControlPointsNV");
       allclear &= funcTest;
       funcTest = ((glGetMapParameterivNV = (csGLGETMAPPARAMETERIVNV) gl->GetProcAddress ("glGetMapParameterivNV")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glGetMapParameterivNV");
       allclear &= funcTest;
       funcTest = ((glGetMapParameterfvNV = (csGLGETMAPPARAMETERFVNV) gl->GetProcAddress ("glGetMapParameterfvNV")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glGetMapParameterfvNV");
       allclear &= funcTest;
       funcTest = ((glGetMapAttribParameterivNV = (csGLGETMAPATTRIBPARAMETERIVNV) gl->GetProcAddress ("glGetMapAttribParameterivNV")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glGetMapAttribParameterivNV");
       allclear &= funcTest;
       funcTest = ((glGetMapAttribParameterfvNV = (csGLGETMAPATTRIBPARAMETERFVNV) gl->GetProcAddress ("glGetMapAttribParameterfvNV")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glGetMapAttribParameterfvNV");
       allclear &= funcTest;
       funcTest = ((glEvalMapsNV = (csGLEVALMAPSNV) gl->GetProcAddress ("glEvalMapsNV")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glEvalMapsNV");
       allclear &= funcTest;
       if (CS_GL_NV_evaluators = allclear)
@@ -14430,31 +14434,31 @@ public:
     {
       allclear = true;
       funcTest = ((glGenFencesNV = (csGLGENFENCESNV) gl->GetProcAddress ("glGenFencesNV")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glGenFencesNV");
       allclear &= funcTest;
       funcTest = ((glDeleteFencesNV = (csGLDELETEFENCESNV) gl->GetProcAddress ("glDeleteFencesNV")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glDeleteFencesNV");
       allclear &= funcTest;
       funcTest = ((glSetFenceNV = (csGLSETFENCENV) gl->GetProcAddress ("glSetFenceNV")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glSetFenceNV");
       allclear &= funcTest;
       funcTest = ((glTestFenceNV = (csGLTESTFENCENV) gl->GetProcAddress ("glTestFenceNV")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glTestFenceNV");
       allclear &= funcTest;
       funcTest = ((glFinishFenceNV = (csGLFINISHFENCENV) gl->GetProcAddress ("glFinishFenceNV")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glFinishFenceNV");
       allclear &= funcTest;
       funcTest = ((glIsFenceNV = (csGLISFENCENV) gl->GetProcAddress ("glIsFenceNV")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glIsFenceNV");
       allclear &= funcTest;
       funcTest = ((glGetFenceivNV = (csGLGETFENCEIVNV) gl->GetProcAddress ("glGetFenceivNV")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glGetFenceivNV");
       allclear &= funcTest;
       if (CS_GL_NV_fence = allclear)
@@ -14610,31 +14614,31 @@ public:
     {
       allclear = true;
       funcTest = ((glGenOcclusionQueriesNV = (csGLGENOCCLUSIONQUERIESNV) gl->GetProcAddress ("glGenOcclusionQueriesNV")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glGenOcclusionQueriesNV");
       allclear &= funcTest;
       funcTest = ((glDeleteOcclusionQueriesNV = (csGLDELETEOCCLUSIONQUERIESNV) gl->GetProcAddress ("glDeleteOcclusionQueriesNV")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glDeleteOcclusionQueriesNV");
       allclear &= funcTest;
       funcTest = ((glIsOcclusionQueryNV = (csGLISOCCLUSIONQUERYNV) gl->GetProcAddress ("glIsOcclusionQueryNV")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glIsOcclusionQueryNV");
       allclear &= funcTest;
       funcTest = ((glBeginOcclusionQueryNV = (csGLBEGINOCCLUSIONQUERYNV) gl->GetProcAddress ("glBeginOcclusionQueryNV")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glBeginOcclusionQueryNV");
       allclear &= funcTest;
       funcTest = ((glEndOcclusionQueryNV = (csGLENDOCCLUSIONQUERYNV) gl->GetProcAddress ("glEndOcclusionQueryNV")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glEndOcclusionQueryNV");
       allclear &= funcTest;
       funcTest = ((glGetOcclusionQueryivNV = (csGLGETOCCLUSIONQUERYIVNV) gl->GetProcAddress ("glGetOcclusionQueryivNV")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glGetOcclusionQueryivNV");
       allclear &= funcTest;
       funcTest = ((glGetOcclusionQueryuivNV = (csGLGETOCCLUSIONQUERYUIVNV) gl->GetProcAddress ("glGetOcclusionQueryuivNV")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glGetOcclusionQueryuivNV");
       allclear &= funcTest;
       if (CS_GL_NV_occlusion_query = allclear)
@@ -14714,11 +14718,11 @@ public:
     {
       allclear = true;
       funcTest = ((glPointParameteriNV = (csGLPOINTPARAMETERINV) gl->GetProcAddress ("glPointParameteriNV")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glPointParameteriNV");
       allclear &= funcTest;
       funcTest = ((glPointParameterivNV = (csGLPOINTPARAMETERIVNV) gl->GetProcAddress ("glPointParameterivNV")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glPointParameterivNV");
       allclear &= funcTest;
       if (CS_GL_NV_point_sprite = allclear)
@@ -14760,55 +14764,55 @@ public:
     {
       allclear = true;
       funcTest = ((glCombinerParameterfvNV = (csGLCOMBINERPARAMETERFVNV) gl->GetProcAddress ("glCombinerParameterfvNV")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glCombinerParameterfvNV");
       allclear &= funcTest;
       funcTest = ((glCombinerParameterivNV = (csGLCOMBINERPARAMETERIVNV) gl->GetProcAddress ("glCombinerParameterivNV")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glCombinerParameterivNV");
       allclear &= funcTest;
       funcTest = ((glCombinerParameterfNV = (csGLCOMBINERPARAMETERFNV) gl->GetProcAddress ("glCombinerParameterfNV")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glCombinerParameterfNV");
       allclear &= funcTest;
       funcTest = ((glCombinerParameteriNV = (csGLCOMBINERPARAMETERINV) gl->GetProcAddress ("glCombinerParameteriNV")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glCombinerParameteriNV");
       allclear &= funcTest;
       funcTest = ((glCombinerInputNV = (csGLCOMBINERINPUTNV) gl->GetProcAddress ("glCombinerInputNV")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glCombinerInputNV");
       allclear &= funcTest;
       funcTest = ((glCombinerOutputNV = (csGLCOMBINEROUTPUTNV) gl->GetProcAddress ("glCombinerOutputNV")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glCombinerOutputNV");
       allclear &= funcTest;
       funcTest = ((glFinalCombinerInputNV = (csGLFINALCOMBINERINPUTNV) gl->GetProcAddress ("glFinalCombinerInputNV")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glFinalCombinerInputNV");
       allclear &= funcTest;
       funcTest = ((glGetCombinerInputParameterfvNV = (csGLGETCOMBINERINPUTPARAMETERFVNV) gl->GetProcAddress ("glGetCombinerInputParameterfvNV")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glGetCombinerInputParameterfvNV");
       allclear &= funcTest;
       funcTest = ((glGetCombinerInputParameterivNV = (csGLGETCOMBINERINPUTPARAMETERIVNV) gl->GetProcAddress ("glGetCombinerInputParameterivNV")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glGetCombinerInputParameterivNV");
       allclear &= funcTest;
       funcTest = ((glGetCombinerOutputParameterfvNV = (csGLGETCOMBINEROUTPUTPARAMETERFVNV) gl->GetProcAddress ("glGetCombinerOutputParameterfvNV")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glGetCombinerOutputParameterfvNV");
       allclear &= funcTest;
       funcTest = ((glGetCombinerOutputParameterivNV = (csGLGETCOMBINEROUTPUTPARAMETERIVNV) gl->GetProcAddress ("glGetCombinerOutputParameterivNV")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glGetCombinerOutputParameterivNV");
       allclear &= funcTest;
       funcTest = ((glGetFinalCombinerInputParameterfvNV = (csGLGETFINALCOMBINERINPUTPARAMETERFVNV) gl->GetProcAddress ("glGetFinalCombinerInputParameterfvNV")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glGetFinalCombinerInputParameterfvNV");
       allclear &= funcTest;
       funcTest = ((glGetFinalCombinerInputParameterivNV = (csGLGETFINALCOMBINERINPUTPARAMETERIVNV) gl->GetProcAddress ("glGetFinalCombinerInputParameterivNV")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glGetFinalCombinerInputParameterivNV");
       allclear &= funcTest;
       if (CS_GL_NV_register_combiners = allclear)
@@ -14850,11 +14854,11 @@ public:
     {
       allclear = true;
       funcTest = ((glCombinerStageParameterfvNV = (csGLCOMBINERSTAGEPARAMETERFVNV) gl->GetProcAddress ("glCombinerStageParameterfvNV")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glCombinerStageParameterfvNV");
       allclear &= funcTest;
       funcTest = ((glGetCombinerStageParameterfvNV = (csGLGETCOMBINERSTAGEPARAMETERFVNV) gl->GetProcAddress ("glGetCombinerStageParameterfvNV")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glGetCombinerStageParameterfvNV");
       allclear &= funcTest;
       if (CS_GL_NV_register_combiners2 = allclear)
@@ -15200,19 +15204,19 @@ public:
     {
       allclear = true;
       funcTest = ((glVertexArrayRangeNV = (csGLVERTEXARRAYRANGENV) gl->GetProcAddress ("glVertexArrayRangeNV")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glVertexArrayRangeNV");
       allclear &= funcTest;
       funcTest = ((glFlushVertexArrayRangeNV = (csGLFLUSHVERTEXARRAYRANGENV) gl->GetProcAddress ("glFlushVertexArrayRangeNV")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glFlushVertexArrayRangeNV");
       allclear &= funcTest;
       funcTest = ((wglAllocateMemoryNV = (csWGLALLOCATEMEMORYNV) gl->GetProcAddress ("wglAllocateMemoryNV")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "wglAllocateMemoryNV");
       allclear &= funcTest;
       funcTest = ((wglFreeMemoryNV = (csWGLFREEMEMORYNV) gl->GetProcAddress ("wglFreeMemoryNV")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "wglFreeMemoryNV");
       allclear &= funcTest;
       if (CS_GL_NV_vertex_array_range = allclear)
@@ -15292,251 +15296,251 @@ public:
     {
       allclear = true;
       funcTest = ((glBindProgramNV = (csGLBINDPROGRAMNV) gl->GetProcAddress ("glBindProgramNV")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glBindProgramNV");
       allclear &= funcTest;
       funcTest = ((glDeleteProgramsNV = (csGLDELETEPROGRAMSNV) gl->GetProcAddress ("glDeleteProgramsNV")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glDeleteProgramsNV");
       allclear &= funcTest;
       funcTest = ((glExecuteProgramNV = (csGLEXECUTEPROGRAMNV) gl->GetProcAddress ("glExecuteProgramNV")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glExecuteProgramNV");
       allclear &= funcTest;
       funcTest = ((glGenProgramsNV = (csGLGENPROGRAMSNV) gl->GetProcAddress ("glGenProgramsNV")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glGenProgramsNV");
       allclear &= funcTest;
       funcTest = ((glAreProgramsResidentNV = (csGLAREPROGRAMSRESIDENTNV) gl->GetProcAddress ("glAreProgramsResidentNV")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glAreProgramsResidentNV");
       allclear &= funcTest;
       funcTest = ((glRequestResidentProgramsNV = (csGLREQUESTRESIDENTPROGRAMSNV) gl->GetProcAddress ("glRequestResidentProgramsNV")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glRequestResidentProgramsNV");
       allclear &= funcTest;
       funcTest = ((glGetProgramParameterfvNV = (csGLGETPROGRAMPARAMETERFVNV) gl->GetProcAddress ("glGetProgramParameterfvNV")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glGetProgramParameterfvNV");
       allclear &= funcTest;
       funcTest = ((glGetProgramParameterdvNV = (csGLGETPROGRAMPARAMETERDVNV) gl->GetProcAddress ("glGetProgramParameterdvNV")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glGetProgramParameterdvNV");
       allclear &= funcTest;
       funcTest = ((glGetProgramivNV = (csGLGETPROGRAMIVNV) gl->GetProcAddress ("glGetProgramivNV")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glGetProgramivNV");
       allclear &= funcTest;
       funcTest = ((glGetProgramStringNV = (csGLGETPROGRAMSTRINGNV) gl->GetProcAddress ("glGetProgramStringNV")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glGetProgramStringNV");
       allclear &= funcTest;
       funcTest = ((glGetTrackMatrixivNV = (csGLGETTRACKMATRIXIVNV) gl->GetProcAddress ("glGetTrackMatrixivNV")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glGetTrackMatrixivNV");
       allclear &= funcTest;
       funcTest = ((glGetVertexAttribdvNV = (csGLGETVERTEXATTRIBDVNV) gl->GetProcAddress ("glGetVertexAttribdvNV")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glGetVertexAttribdvNV");
       allclear &= funcTest;
       funcTest = ((glGetVertexAttribfvNV = (csGLGETVERTEXATTRIBFVNV) gl->GetProcAddress ("glGetVertexAttribfvNV")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glGetVertexAttribfvNV");
       allclear &= funcTest;
       funcTest = ((glGetVertexAttribivNV = (csGLGETVERTEXATTRIBIVNV) gl->GetProcAddress ("glGetVertexAttribivNV")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glGetVertexAttribivNV");
       allclear &= funcTest;
       funcTest = ((glGetVertexAttribPointervNV = (csGLGETVERTEXATTRIBPOINTERVNV) gl->GetProcAddress ("glGetVertexAttribPointervNV")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glGetVertexAttribPointervNV");
       allclear &= funcTest;
       funcTest = ((glIsProgramNV = (csGLISPROGRAMNV) gl->GetProcAddress ("glIsProgramNV")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glIsProgramNV");
       allclear &= funcTest;
       funcTest = ((glLoadProgramNV = (csGLLOADPROGRAMNV) gl->GetProcAddress ("glLoadProgramNV")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glLoadProgramNV");
       allclear &= funcTest;
       funcTest = ((glProgramParameter4fNV = (csGLPROGRAMPARAMETER4FNV) gl->GetProcAddress ("glProgramParameter4fNV")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glProgramParameter4fNV");
       allclear &= funcTest;
       funcTest = ((glProgramParameter4fvNV = (csGLPROGRAMPARAMETER4FVNV) gl->GetProcAddress ("glProgramParameter4fvNV")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glProgramParameter4fvNV");
       allclear &= funcTest;
       funcTest = ((glProgramParameters4dvNV = (csGLPROGRAMPARAMETERS4DVNV) gl->GetProcAddress ("glProgramParameters4dvNV")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glProgramParameters4dvNV");
       allclear &= funcTest;
       funcTest = ((glProgramParameters4fvNV = (csGLPROGRAMPARAMETERS4FVNV) gl->GetProcAddress ("glProgramParameters4fvNV")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glProgramParameters4fvNV");
       allclear &= funcTest;
       funcTest = ((glTrackMatrixNV = (csGLTRACKMATRIXNV) gl->GetProcAddress ("glTrackMatrixNV")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glTrackMatrixNV");
       allclear &= funcTest;
       funcTest = ((glVertexAttribPointerNV = (csGLVERTEXATTRIBPOINTERNV) gl->GetProcAddress ("glVertexAttribPointerNV")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glVertexAttribPointerNV");
       allclear &= funcTest;
       funcTest = ((glVertexAttrib1sNV = (csGLVERTEXATTRIB1SNV) gl->GetProcAddress ("glVertexAttrib1sNV")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glVertexAttrib1sNV");
       allclear &= funcTest;
       funcTest = ((glVertexAttrib1fNV = (csGLVERTEXATTRIB1FNV) gl->GetProcAddress ("glVertexAttrib1fNV")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glVertexAttrib1fNV");
       allclear &= funcTest;
       funcTest = ((glVertexAttrib1dNV = (csGLVERTEXATTRIB1DNV) gl->GetProcAddress ("glVertexAttrib1dNV")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glVertexAttrib1dNV");
       allclear &= funcTest;
       funcTest = ((glVertexAttrib2sNV = (csGLVERTEXATTRIB2SNV) gl->GetProcAddress ("glVertexAttrib2sNV")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glVertexAttrib2sNV");
       allclear &= funcTest;
       funcTest = ((glVertexAttrib2fNV = (csGLVERTEXATTRIB2FNV) gl->GetProcAddress ("glVertexAttrib2fNV")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glVertexAttrib2fNV");
       allclear &= funcTest;
       funcTest = ((glVertexAttrib2dNV = (csGLVERTEXATTRIB2DNV) gl->GetProcAddress ("glVertexAttrib2dNV")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glVertexAttrib2dNV");
       allclear &= funcTest;
       funcTest = ((glVertexAttrib3sNV = (csGLVERTEXATTRIB3SNV) gl->GetProcAddress ("glVertexAttrib3sNV")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glVertexAttrib3sNV");
       allclear &= funcTest;
       funcTest = ((glVertexAttrib3fNV = (csGLVERTEXATTRIB3FNV) gl->GetProcAddress ("glVertexAttrib3fNV")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glVertexAttrib3fNV");
       allclear &= funcTest;
       funcTest = ((glVertexAttrib3dNV = (csGLVERTEXATTRIB3DNV) gl->GetProcAddress ("glVertexAttrib3dNV")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glVertexAttrib3dNV");
       allclear &= funcTest;
       funcTest = ((glVertexAttrib4sNV = (csGLVERTEXATTRIB4SNV) gl->GetProcAddress ("glVertexAttrib4sNV")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glVertexAttrib4sNV");
       allclear &= funcTest;
       funcTest = ((glVertexAttrib4fNV = (csGLVERTEXATTRIB4FNV) gl->GetProcAddress ("glVertexAttrib4fNV")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glVertexAttrib4fNV");
       allclear &= funcTest;
       funcTest = ((glVertexAttrib4dNV = (csGLVERTEXATTRIB4DNV) gl->GetProcAddress ("glVertexAttrib4dNV")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glVertexAttrib4dNV");
       allclear &= funcTest;
       funcTest = ((glVertexAttrib4ubNV = (csGLVERTEXATTRIB4UBNV) gl->GetProcAddress ("glVertexAttrib4ubNV")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glVertexAttrib4ubNV");
       allclear &= funcTest;
       funcTest = ((glVertexAttrib1svNV = (csGLVERTEXATTRIB1SVNV) gl->GetProcAddress ("glVertexAttrib1svNV")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glVertexAttrib1svNV");
       allclear &= funcTest;
       funcTest = ((glVertexAttrib1fvNV = (csGLVERTEXATTRIB1FVNV) gl->GetProcAddress ("glVertexAttrib1fvNV")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glVertexAttrib1fvNV");
       allclear &= funcTest;
       funcTest = ((glVertexAttrib1dvNV = (csGLVERTEXATTRIB1DVNV) gl->GetProcAddress ("glVertexAttrib1dvNV")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glVertexAttrib1dvNV");
       allclear &= funcTest;
       funcTest = ((glVertexAttrib2svNV = (csGLVERTEXATTRIB2SVNV) gl->GetProcAddress ("glVertexAttrib2svNV")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glVertexAttrib2svNV");
       allclear &= funcTest;
       funcTest = ((glVertexAttrib2fvNV = (csGLVERTEXATTRIB2FVNV) gl->GetProcAddress ("glVertexAttrib2fvNV")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glVertexAttrib2fvNV");
       allclear &= funcTest;
       funcTest = ((glVertexAttrib2dvNV = (csGLVERTEXATTRIB2DVNV) gl->GetProcAddress ("glVertexAttrib2dvNV")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glVertexAttrib2dvNV");
       allclear &= funcTest;
       funcTest = ((glVertexAttrib3svNV = (csGLVERTEXATTRIB3SVNV) gl->GetProcAddress ("glVertexAttrib3svNV")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glVertexAttrib3svNV");
       allclear &= funcTest;
       funcTest = ((glVertexAttrib3fvNV = (csGLVERTEXATTRIB3FVNV) gl->GetProcAddress ("glVertexAttrib3fvNV")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glVertexAttrib3fvNV");
       allclear &= funcTest;
       funcTest = ((glVertexAttrib3dvNV = (csGLVERTEXATTRIB3DVNV) gl->GetProcAddress ("glVertexAttrib3dvNV")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glVertexAttrib3dvNV");
       allclear &= funcTest;
       funcTest = ((glVertexAttrib4svNV = (csGLVERTEXATTRIB4SVNV) gl->GetProcAddress ("glVertexAttrib4svNV")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glVertexAttrib4svNV");
       allclear &= funcTest;
       funcTest = ((glVertexAttrib4fvNV = (csGLVERTEXATTRIB4FVNV) gl->GetProcAddress ("glVertexAttrib4fvNV")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glVertexAttrib4fvNV");
       allclear &= funcTest;
       funcTest = ((glVertexAttrib4dvNV = (csGLVERTEXATTRIB4DVNV) gl->GetProcAddress ("glVertexAttrib4dvNV")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glVertexAttrib4dvNV");
       allclear &= funcTest;
       funcTest = ((glVertexAttrib4ubvNV = (csGLVERTEXATTRIB4UBVNV) gl->GetProcAddress ("glVertexAttrib4ubvNV")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glVertexAttrib4ubvNV");
       allclear &= funcTest;
       funcTest = ((glVertexAttribs1svNV = (csGLVERTEXATTRIBS1SVNV) gl->GetProcAddress ("glVertexAttribs1svNV")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glVertexAttribs1svNV");
       allclear &= funcTest;
       funcTest = ((glVertexAttribs1fvNV = (csGLVERTEXATTRIBS1FVNV) gl->GetProcAddress ("glVertexAttribs1fvNV")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glVertexAttribs1fvNV");
       allclear &= funcTest;
       funcTest = ((glVertexAttribs1dvNV = (csGLVERTEXATTRIBS1DVNV) gl->GetProcAddress ("glVertexAttribs1dvNV")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glVertexAttribs1dvNV");
       allclear &= funcTest;
       funcTest = ((glVertexAttribs2svNV = (csGLVERTEXATTRIBS2SVNV) gl->GetProcAddress ("glVertexAttribs2svNV")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glVertexAttribs2svNV");
       allclear &= funcTest;
       funcTest = ((glVertexAttribs2fvNV = (csGLVERTEXATTRIBS2FVNV) gl->GetProcAddress ("glVertexAttribs2fvNV")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glVertexAttribs2fvNV");
       allclear &= funcTest;
       funcTest = ((glVertexAttribs2dvNV = (csGLVERTEXATTRIBS2DVNV) gl->GetProcAddress ("glVertexAttribs2dvNV")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glVertexAttribs2dvNV");
       allclear &= funcTest;
       funcTest = ((glVertexAttribs3svNV = (csGLVERTEXATTRIBS3SVNV) gl->GetProcAddress ("glVertexAttribs3svNV")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glVertexAttribs3svNV");
       allclear &= funcTest;
       funcTest = ((glVertexAttribs3fvNV = (csGLVERTEXATTRIBS3FVNV) gl->GetProcAddress ("glVertexAttribs3fvNV")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glVertexAttribs3fvNV");
       allclear &= funcTest;
       funcTest = ((glVertexAttribs3dvNV = (csGLVERTEXATTRIBS3DVNV) gl->GetProcAddress ("glVertexAttribs3dvNV")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glVertexAttribs3dvNV");
       allclear &= funcTest;
       funcTest = ((glVertexAttribs4svNV = (csGLVERTEXATTRIBS4SVNV) gl->GetProcAddress ("glVertexAttribs4svNV")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glVertexAttribs4svNV");
       allclear &= funcTest;
       funcTest = ((glVertexAttribs4fvNV = (csGLVERTEXATTRIBS4FVNV) gl->GetProcAddress ("glVertexAttribs4fvNV")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glVertexAttribs4fvNV");
       allclear &= funcTest;
       funcTest = ((glVertexAttribs4dvNV = (csGLVERTEXATTRIBS4DVNV) gl->GetProcAddress ("glVertexAttribs4dvNV")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glVertexAttribs4dvNV");
       allclear &= funcTest;
       funcTest = ((glVertexAttribs4ubvNV = (csGLVERTEXATTRIBS4UBVNV) gl->GetProcAddress ("glVertexAttribs4ubvNV")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glVertexAttribs4ubvNV");
       allclear &= funcTest;
       if (CS_GL_NV_vertex_program = allclear)
@@ -15616,15 +15620,15 @@ public:
     {
       allclear = true;
       funcTest = ((glElementPointerATI = (csGLELEMENTPOINTERATI) gl->GetProcAddress ("glElementPointerATI")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glElementPointerATI");
       allclear &= funcTest;
       funcTest = ((glDrawElementArrayATI = (csGLDRAWELEMENTARRAYATI) gl->GetProcAddress ("glDrawElementArrayATI")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glDrawElementArrayATI");
       allclear &= funcTest;
       funcTest = ((glDrawRangeElementArrayATI = (csGLDRAWRANGEELEMENTARRAYATI) gl->GetProcAddress ("glDrawRangeElementArrayATI")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glDrawRangeElementArrayATI");
       allclear &= funcTest;
       if (CS_GL_ATI_element_array = allclear)
@@ -15666,19 +15670,19 @@ public:
     {
       allclear = true;
       funcTest = ((glTexBumpParameterivATI = (csGLTEXBUMPPARAMETERIVATI) gl->GetProcAddress ("glTexBumpParameterivATI")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glTexBumpParameterivATI");
       allclear &= funcTest;
       funcTest = ((glTexBumpParameterfvATI = (csGLTEXBUMPPARAMETERFVATI) gl->GetProcAddress ("glTexBumpParameterfvATI")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glTexBumpParameterfvATI");
       allclear &= funcTest;
       funcTest = ((glGetTexBumpParameterivATI = (csGLGETTEXBUMPPARAMETERIVATI) gl->GetProcAddress ("glGetTexBumpParameterivATI")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glGetTexBumpParameterivATI");
       allclear &= funcTest;
       funcTest = ((glGetTexBumpParameterfvATI = (csGLGETTEXBUMPPARAMETERFVATI) gl->GetProcAddress ("glGetTexBumpParameterfvATI")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glGetTexBumpParameterfvATI");
       allclear &= funcTest;
       if (CS_GL_ATI_envmap_bumpmap = allclear)
@@ -15720,59 +15724,59 @@ public:
     {
       allclear = true;
       funcTest = ((glGenFragmentShadersATI = (csGLGENFRAGMENTSHADERSATI) gl->GetProcAddress ("glGenFragmentShadersATI")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glGenFragmentShadersATI");
       allclear &= funcTest;
       funcTest = ((glBindFragmentShaderATI = (csGLBINDFRAGMENTSHADERATI) gl->GetProcAddress ("glBindFragmentShaderATI")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glBindFragmentShaderATI");
       allclear &= funcTest;
       funcTest = ((glDeleteFragmentShaderATI = (csGLDELETEFRAGMENTSHADERATI) gl->GetProcAddress ("glDeleteFragmentShaderATI")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glDeleteFragmentShaderATI");
       allclear &= funcTest;
       funcTest = ((glBeginFragmentShaderATI = (csGLBEGINFRAGMENTSHADERATI) gl->GetProcAddress ("glBeginFragmentShaderATI")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glBeginFragmentShaderATI");
       allclear &= funcTest;
       funcTest = ((glEndFragmentShaderATI = (csGLENDFRAGMENTSHADERATI) gl->GetProcAddress ("glEndFragmentShaderATI")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glEndFragmentShaderATI");
       allclear &= funcTest;
       funcTest = ((glPassTexCoordATI = (csGLPASSTEXCOORDATI) gl->GetProcAddress ("glPassTexCoordATI")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glPassTexCoordATI");
       allclear &= funcTest;
       funcTest = ((glSampleMapATI = (csGLSAMPLEMAPATI) gl->GetProcAddress ("glSampleMapATI")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glSampleMapATI");
       allclear &= funcTest;
       funcTest = ((glColorFragmentOp1ATI = (csGLCOLORFRAGMENTOP1ATI) gl->GetProcAddress ("glColorFragmentOp1ATI")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glColorFragmentOp1ATI");
       allclear &= funcTest;
       funcTest = ((glColorFragmentOp2ATI = (csGLCOLORFRAGMENTOP2ATI) gl->GetProcAddress ("glColorFragmentOp2ATI")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glColorFragmentOp2ATI");
       allclear &= funcTest;
       funcTest = ((glColorFragmentOp3ATI = (csGLCOLORFRAGMENTOP3ATI) gl->GetProcAddress ("glColorFragmentOp3ATI")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glColorFragmentOp3ATI");
       allclear &= funcTest;
       funcTest = ((glAlphaFragmentOp1ATI = (csGLALPHAFRAGMENTOP1ATI) gl->GetProcAddress ("glAlphaFragmentOp1ATI")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glAlphaFragmentOp1ATI");
       allclear &= funcTest;
       funcTest = ((glAlphaFragmentOp2ATI = (csGLALPHAFRAGMENTOP2ATI) gl->GetProcAddress ("glAlphaFragmentOp2ATI")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glAlphaFragmentOp2ATI");
       allclear &= funcTest;
       funcTest = ((glAlphaFragmentOp3ATI = (csGLALPHAFRAGMENTOP3ATI) gl->GetProcAddress ("glAlphaFragmentOp3ATI")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glAlphaFragmentOp3ATI");
       allclear &= funcTest;
       funcTest = ((glSetFragmentShaderConstantATI = (csGLSETFRAGMENTSHADERCONSTANTATI) gl->GetProcAddress ("glSetFragmentShaderConstantATI")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glSetFragmentShaderConstantATI");
       allclear &= funcTest;
       if (CS_GL_ATI_fragment_shader = allclear)
@@ -15814,11 +15818,11 @@ public:
     {
       allclear = true;
       funcTest = ((glPNTrianglesiATI = (csGLPNTRIANGLESIATI) gl->GetProcAddress ("glPNTrianglesiATI")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glPNTrianglesiATI");
       allclear &= funcTest;
       funcTest = ((glPNTrianglesfATI = (csGLPNTRIANGLESFATI) gl->GetProcAddress ("glPNTrianglesfATI")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glPNTrianglesfATI");
       allclear &= funcTest;
       if (CS_GL_ATI_pn_triangles = allclear)
@@ -15898,51 +15902,51 @@ public:
     {
       allclear = true;
       funcTest = ((glNewObjectBufferATI = (csGLNEWOBJECTBUFFERATI) gl->GetProcAddress ("glNewObjectBufferATI")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glNewObjectBufferATI");
       allclear &= funcTest;
       funcTest = ((glIsObjectBufferATI = (csGLISOBJECTBUFFERATI) gl->GetProcAddress ("glIsObjectBufferATI")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glIsObjectBufferATI");
       allclear &= funcTest;
       funcTest = ((glUpdateObjectBufferATI = (csGLUPDATEOBJECTBUFFERATI) gl->GetProcAddress ("glUpdateObjectBufferATI")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glUpdateObjectBufferATI");
       allclear &= funcTest;
       funcTest = ((glGetObjectBufferfvATI = (csGLGETOBJECTBUFFERFVATI) gl->GetProcAddress ("glGetObjectBufferfvATI")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glGetObjectBufferfvATI");
       allclear &= funcTest;
       funcTest = ((glGetObjectBufferivATI = (csGLGETOBJECTBUFFERIVATI) gl->GetProcAddress ("glGetObjectBufferivATI")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glGetObjectBufferivATI");
       allclear &= funcTest;
       funcTest = ((glFreeObjectBufferATI = (csGLFREEOBJECTBUFFERATI) gl->GetProcAddress ("glFreeObjectBufferATI")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glFreeObjectBufferATI");
       allclear &= funcTest;
       funcTest = ((glArrayObjectATI = (csGLARRAYOBJECTATI) gl->GetProcAddress ("glArrayObjectATI")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glArrayObjectATI");
       allclear &= funcTest;
       funcTest = ((glGetArrayObjectfvATI = (csGLGETARRAYOBJECTFVATI) gl->GetProcAddress ("glGetArrayObjectfvATI")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glGetArrayObjectfvATI");
       allclear &= funcTest;
       funcTest = ((glGetArrayObjectivATI = (csGLGETARRAYOBJECTIVATI) gl->GetProcAddress ("glGetArrayObjectivATI")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glGetArrayObjectivATI");
       allclear &= funcTest;
       funcTest = ((glVariantArrayObjectATI = (csGLVARIANTARRAYOBJECTATI) gl->GetProcAddress ("glVariantArrayObjectATI")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glVariantArrayObjectATI");
       allclear &= funcTest;
       funcTest = ((glGetVariantArrayObjectfvATI = (csGLGETVARIANTARRAYOBJECTFVATI) gl->GetProcAddress ("glGetVariantArrayObjectfvATI")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glGetVariantArrayObjectfvATI");
       allclear &= funcTest;
       funcTest = ((glGetVariantArrayObjectivATI = (csGLGETVARIANTARRAYOBJECTIVATI) gl->GetProcAddress ("glGetVariantArrayObjectivATI")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glGetVariantArrayObjectivATI");
       allclear &= funcTest;
       if (CS_GL_ATI_vertex_array_object = allclear)
@@ -15984,15 +15988,15 @@ public:
     {
       allclear = true;
       funcTest = ((glVertexAttribArrayObjectATI = (csGLVERTEXATTRIBARRAYOBJECTATI) gl->GetProcAddress ("glVertexAttribArrayObjectATI")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glVertexAttribArrayObjectATI");
       allclear &= funcTest;
       funcTest = ((glGetVertexAttribArrayObjectfvATI = (csGLGETVERTEXATTRIBARRAYOBJECTFVATI) gl->GetProcAddress ("glGetVertexAttribArrayObjectfvATI")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glGetVertexAttribArrayObjectfvATI");
       allclear &= funcTest;
       funcTest = ((glGetVertexAttribArrayObjectivATI = (csGLGETVERTEXATTRIBARRAYOBJECTIVATI) gl->GetProcAddress ("glGetVertexAttribArrayObjectivATI")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glGetVertexAttribArrayObjectivATI");
       allclear &= funcTest;
       if (CS_GL_ATI_vertex_attrib_array_object = allclear)
@@ -16034,183 +16038,183 @@ public:
     {
       allclear = true;
       funcTest = ((glVertexStream1s = (csGLVERTEXSTREAM1S) gl->GetProcAddress ("glVertexStream1s")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glVertexStream1s");
       allclear &= funcTest;
       funcTest = ((glVertexStream1i = (csGLVERTEXSTREAM1I) gl->GetProcAddress ("glVertexStream1i")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glVertexStream1i");
       allclear &= funcTest;
       funcTest = ((glVertexStream1f = (csGLVERTEXSTREAM1F) gl->GetProcAddress ("glVertexStream1f")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glVertexStream1f");
       allclear &= funcTest;
       funcTest = ((glVertexStream1d = (csGLVERTEXSTREAM1D) gl->GetProcAddress ("glVertexStream1d")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glVertexStream1d");
       allclear &= funcTest;
       funcTest = ((glVertexStream1sv = (csGLVERTEXSTREAM1SV) gl->GetProcAddress ("glVertexStream1sv")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glVertexStream1sv");
       allclear &= funcTest;
       funcTest = ((glVertexStream1iv = (csGLVERTEXSTREAM1IV) gl->GetProcAddress ("glVertexStream1iv")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glVertexStream1iv");
       allclear &= funcTest;
       funcTest = ((glVertexStream1fv = (csGLVERTEXSTREAM1FV) gl->GetProcAddress ("glVertexStream1fv")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glVertexStream1fv");
       allclear &= funcTest;
       funcTest = ((glVertexStream1dv = (csGLVERTEXSTREAM1DV) gl->GetProcAddress ("glVertexStream1dv")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glVertexStream1dv");
       allclear &= funcTest;
       funcTest = ((glVertexStream2s = (csGLVERTEXSTREAM2S) gl->GetProcAddress ("glVertexStream2s")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glVertexStream2s");
       allclear &= funcTest;
       funcTest = ((glVertexStream2i = (csGLVERTEXSTREAM2I) gl->GetProcAddress ("glVertexStream2i")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glVertexStream2i");
       allclear &= funcTest;
       funcTest = ((glVertexStream2f = (csGLVERTEXSTREAM2F) gl->GetProcAddress ("glVertexStream2f")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glVertexStream2f");
       allclear &= funcTest;
       funcTest = ((glVertexStream2d = (csGLVERTEXSTREAM2D) gl->GetProcAddress ("glVertexStream2d")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glVertexStream2d");
       allclear &= funcTest;
       funcTest = ((glVertexStream2sv = (csGLVERTEXSTREAM2SV) gl->GetProcAddress ("glVertexStream2sv")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glVertexStream2sv");
       allclear &= funcTest;
       funcTest = ((glVertexStream2iv = (csGLVERTEXSTREAM2IV) gl->GetProcAddress ("glVertexStream2iv")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glVertexStream2iv");
       allclear &= funcTest;
       funcTest = ((glVertexStream2fv = (csGLVERTEXSTREAM2FV) gl->GetProcAddress ("glVertexStream2fv")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glVertexStream2fv");
       allclear &= funcTest;
       funcTest = ((glVertexStream2dv = (csGLVERTEXSTREAM2DV) gl->GetProcAddress ("glVertexStream2dv")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glVertexStream2dv");
       allclear &= funcTest;
       funcTest = ((glVertexStream3s = (csGLVERTEXSTREAM3S) gl->GetProcAddress ("glVertexStream3s")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glVertexStream3s");
       allclear &= funcTest;
       funcTest = ((glVertexStream3i = (csGLVERTEXSTREAM3I) gl->GetProcAddress ("glVertexStream3i")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glVertexStream3i");
       allclear &= funcTest;
       funcTest = ((glVertexStream3f = (csGLVERTEXSTREAM3F) gl->GetProcAddress ("glVertexStream3f")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glVertexStream3f");
       allclear &= funcTest;
       funcTest = ((glVertexStream3d = (csGLVERTEXSTREAM3D) gl->GetProcAddress ("glVertexStream3d")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glVertexStream3d");
       allclear &= funcTest;
       funcTest = ((glVertexStream3sv = (csGLVERTEXSTREAM3SV) gl->GetProcAddress ("glVertexStream3sv")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glVertexStream3sv");
       allclear &= funcTest;
       funcTest = ((glVertexStream3iv = (csGLVERTEXSTREAM3IV) gl->GetProcAddress ("glVertexStream3iv")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glVertexStream3iv");
       allclear &= funcTest;
       funcTest = ((glVertexStream3fv = (csGLVERTEXSTREAM3FV) gl->GetProcAddress ("glVertexStream3fv")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glVertexStream3fv");
       allclear &= funcTest;
       funcTest = ((glVertexStream3dv = (csGLVERTEXSTREAM3DV) gl->GetProcAddress ("glVertexStream3dv")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glVertexStream3dv");
       allclear &= funcTest;
       funcTest = ((glVertexStream4s = (csGLVERTEXSTREAM4S) gl->GetProcAddress ("glVertexStream4s")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glVertexStream4s");
       allclear &= funcTest;
       funcTest = ((glVertexStream4i = (csGLVERTEXSTREAM4I) gl->GetProcAddress ("glVertexStream4i")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glVertexStream4i");
       allclear &= funcTest;
       funcTest = ((glVertexStream4f = (csGLVERTEXSTREAM4F) gl->GetProcAddress ("glVertexStream4f")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glVertexStream4f");
       allclear &= funcTest;
       funcTest = ((glVertexStream4d = (csGLVERTEXSTREAM4D) gl->GetProcAddress ("glVertexStream4d")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glVertexStream4d");
       allclear &= funcTest;
       funcTest = ((glVertexStream4sv = (csGLVERTEXSTREAM4SV) gl->GetProcAddress ("glVertexStream4sv")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glVertexStream4sv");
       allclear &= funcTest;
       funcTest = ((glVertexStream4iv = (csGLVERTEXSTREAM4IV) gl->GetProcAddress ("glVertexStream4iv")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glVertexStream4iv");
       allclear &= funcTest;
       funcTest = ((glVertexStream4fv = (csGLVERTEXSTREAM4FV) gl->GetProcAddress ("glVertexStream4fv")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glVertexStream4fv");
       allclear &= funcTest;
       funcTest = ((glVertexStream4dv = (csGLVERTEXSTREAM4DV) gl->GetProcAddress ("glVertexStream4dv")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glVertexStream4dv");
       allclear &= funcTest;
       funcTest = ((glNormalStream3b = (csGLNORMALSTREAM3B) gl->GetProcAddress ("glNormalStream3b")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glNormalStream3b");
       allclear &= funcTest;
       funcTest = ((glNormalStream3s = (csGLNORMALSTREAM3S) gl->GetProcAddress ("glNormalStream3s")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glNormalStream3s");
       allclear &= funcTest;
       funcTest = ((glNormalStream3i = (csGLNORMALSTREAM3I) gl->GetProcAddress ("glNormalStream3i")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glNormalStream3i");
       allclear &= funcTest;
       funcTest = ((glNormalStream3f = (csGLNORMALSTREAM3F) gl->GetProcAddress ("glNormalStream3f")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glNormalStream3f");
       allclear &= funcTest;
       funcTest = ((glNormalStream3d = (csGLNORMALSTREAM3D) gl->GetProcAddress ("glNormalStream3d")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glNormalStream3d");
       allclear &= funcTest;
       funcTest = ((glNormalStream3bv = (csGLNORMALSTREAM3BV) gl->GetProcAddress ("glNormalStream3bv")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glNormalStream3bv");
       allclear &= funcTest;
       funcTest = ((glNormalStream3sv = (csGLNORMALSTREAM3SV) gl->GetProcAddress ("glNormalStream3sv")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glNormalStream3sv");
       allclear &= funcTest;
       funcTest = ((glNormalStream3iv = (csGLNORMALSTREAM3IV) gl->GetProcAddress ("glNormalStream3iv")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glNormalStream3iv");
       allclear &= funcTest;
       funcTest = ((glNormalStream3fv = (csGLNORMALSTREAM3FV) gl->GetProcAddress ("glNormalStream3fv")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glNormalStream3fv");
       allclear &= funcTest;
       funcTest = ((glNormalStream3dv = (csGLNORMALSTREAM3DV) gl->GetProcAddress ("glNormalStream3dv")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glNormalStream3dv");
       allclear &= funcTest;
       funcTest = ((glClientActiveVertexStream = (csGLCLIENTACTIVEVERTEXSTREAM) gl->GetProcAddress ("glClientActiveVertexStream")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glClientActiveVertexStream");
       allclear &= funcTest;
       funcTest = ((glVertexBlendEnvi = (csGLVERTEXBLENDENVI) gl->GetProcAddress ("glVertexBlendEnvi")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glVertexBlendEnvi");
       allclear &= funcTest;
       funcTest = ((glVertexBlendEnvf = (csGLVERTEXBLENDENVF) gl->GetProcAddress ("glVertexBlendEnvf")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glVertexBlendEnvf");
       allclear &= funcTest;
       if (CS_GL_ATI_vertex_streams = allclear)
@@ -16262,19 +16266,19 @@ public:
     {
       allclear = true;
       funcTest = ((wglCreateImageBufferI3D = (csWGLCREATEIMAGEBUFFERI3D) gl->GetProcAddress ("wglCreateImageBufferI3D")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "wglCreateImageBufferI3D");
       allclear &= funcTest;
       funcTest = ((wglDestroyImageBufferI3D = (csWGLDESTROYIMAGEBUFFERI3D) gl->GetProcAddress ("wglDestroyImageBufferI3D")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "wglDestroyImageBufferI3D");
       allclear &= funcTest;
       funcTest = ((wglAssociateImageBufferEventsI3D = (csWGLASSOCIATEIMAGEBUFFEREVENTSI3D) gl->GetProcAddress ("wglAssociateImageBufferEventsI3D")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "wglAssociateImageBufferEventsI3D");
       allclear &= funcTest;
       funcTest = ((wglReleaseImageBufferEventsI3D = (csWGLRELEASEIMAGEBUFFEREVENTSI3D) gl->GetProcAddress ("wglReleaseImageBufferEventsI3D")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "wglReleaseImageBufferEventsI3D");
       allclear &= funcTest;
       if (CS_WGL_I3D_image_buffer = allclear)
@@ -16327,19 +16331,19 @@ public:
     {
       allclear = true;
       funcTest = ((wglEnableFrameLockI3D = (csWGLENABLEFRAMELOCKI3D) gl->GetProcAddress ("wglEnableFrameLockI3D")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "wglEnableFrameLockI3D");
       allclear &= funcTest;
       funcTest = ((wglDisableFrameLockI3D = (csWGLDISABLEFRAMELOCKI3D) gl->GetProcAddress ("wglDisableFrameLockI3D")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "wglDisableFrameLockI3D");
       allclear &= funcTest;
       funcTest = ((wglIsEnabledFrameLockI3D = (csWGLISENABLEDFRAMELOCKI3D) gl->GetProcAddress ("wglIsEnabledFrameLockI3D")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "wglIsEnabledFrameLockI3D");
       allclear &= funcTest;
       funcTest = ((wglQueryFrameLockMasterI3D = (csWGLQUERYFRAMELOCKMASTERI3D) gl->GetProcAddress ("wglQueryFrameLockMasterI3D")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "wglQueryFrameLockMasterI3D");
       allclear &= funcTest;
       if (CS_WGL_I3D_swap_frame_lock = allclear)
@@ -16392,19 +16396,19 @@ public:
     {
       allclear = true;
       funcTest = ((wglGetFrameUsageI3D = (csWGLGETFRAMEUSAGEI3D) gl->GetProcAddress ("wglGetFrameUsageI3D")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "wglGetFrameUsageI3D");
       allclear &= funcTest;
       funcTest = ((wglBeginFrameTrackingI3D = (csWGLBEGINFRAMETRACKINGI3D) gl->GetProcAddress ("wglBeginFrameTrackingI3D")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "wglBeginFrameTrackingI3D");
       allclear &= funcTest;
       funcTest = ((wglEndFrameTrackingI3D = (csWGLENDFRAMETRACKINGI3D) gl->GetProcAddress ("wglEndFrameTrackingI3D")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "wglEndFrameTrackingI3D");
       allclear &= funcTest;
       funcTest = ((wglQueryFrameTrackingI3D = (csWGLQUERYFRAMETRACKINGI3D) gl->GetProcAddress ("wglQueryFrameTrackingI3D")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "wglQueryFrameTrackingI3D");
       allclear &= funcTest;
       if (CS_WGL_I3D_swap_frame_usage = allclear)
@@ -16523,11 +16527,11 @@ public:
     {
       allclear = true;
       funcTest = ((glMultiModeDrawArraysIBM = (csGLMULTIMODEDRAWARRAYSIBM) gl->GetProcAddress ("glMultiModeDrawArraysIBM")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glMultiModeDrawArraysIBM");
       allclear &= funcTest;
       funcTest = ((glMultiModeDrawElementsIBM = (csGLMULTIMODEDRAWELEMENTSIBM) gl->GetProcAddress ("glMultiModeDrawElementsIBM")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glMultiModeDrawElementsIBM");
       allclear &= funcTest;
       if (CS_GL_IBM_multimode_draw_arrays = allclear)
@@ -16645,31 +16649,31 @@ public:
     {
       allclear = true;
       funcTest = ((glColorPointerListIBM = (csGLCOLORPOINTERLISTIBM) gl->GetProcAddress ("glColorPointerListIBM")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glColorPointerListIBM");
       allclear &= funcTest;
       funcTest = ((glSecondaryColorPointerListIBM = (csGLSECONDARYCOLORPOINTERLISTIBM) gl->GetProcAddress ("glSecondaryColorPointerListIBM")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glSecondaryColorPointerListIBM");
       allclear &= funcTest;
       funcTest = ((glEdgeFlagPointerListIBM = (csGLEDGEFLAGPOINTERLISTIBM) gl->GetProcAddress ("glEdgeFlagPointerListIBM")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glEdgeFlagPointerListIBM");
       allclear &= funcTest;
       funcTest = ((glFogCoordPointerListIBM = (csGLFOGCOORDPOINTERLISTIBM) gl->GetProcAddress ("glFogCoordPointerListIBM")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glFogCoordPointerListIBM");
       allclear &= funcTest;
       funcTest = ((glNormalPointerListIBM = (csGLNORMALPOINTERLISTIBM) gl->GetProcAddress ("glNormalPointerListIBM")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glNormalPointerListIBM");
       allclear &= funcTest;
       funcTest = ((glTexCoordPointerListIBM = (csGLTEXCOORDPOINTERLISTIBM) gl->GetProcAddress ("glTexCoordPointerListIBM")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glTexCoordPointerListIBM");
       allclear &= funcTest;
       funcTest = ((glVertexPointerListIBM = (csGLVERTEXPOINTERLISTIBM) gl->GetProcAddress ("glVertexPointerListIBM")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glVertexPointerListIBM");
       allclear &= funcTest;
       if (CS_GL_IBM_vertex_array_lists = allclear)
@@ -16711,7 +16715,7 @@ public:
     {
       allclear = true;
       funcTest = ((glResizeBuffersMESA = (csGLRESIZEBUFFERSMESA) gl->GetProcAddress ("glResizeBuffersMESA")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glResizeBuffersMESA");
       allclear &= funcTest;
       if (CS_GL_MESA_resize_buffers = allclear)
@@ -16753,99 +16757,99 @@ public:
     {
       allclear = true;
       funcTest = ((glWindowPos2dMESA = (csGLWINDOWPOS2DMESA) gl->GetProcAddress ("glWindowPos2dMESA")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glWindowPos2dMESA");
       allclear &= funcTest;
       funcTest = ((glWindowPos2fMESA = (csGLWINDOWPOS2FMESA) gl->GetProcAddress ("glWindowPos2fMESA")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glWindowPos2fMESA");
       allclear &= funcTest;
       funcTest = ((glWindowPos2iMESA = (csGLWINDOWPOS2IMESA) gl->GetProcAddress ("glWindowPos2iMESA")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glWindowPos2iMESA");
       allclear &= funcTest;
       funcTest = ((glWindowPos2sMESA = (csGLWINDOWPOS2SMESA) gl->GetProcAddress ("glWindowPos2sMESA")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glWindowPos2sMESA");
       allclear &= funcTest;
       funcTest = ((glWindowPos2ivMESA = (csGLWINDOWPOS2IVMESA) gl->GetProcAddress ("glWindowPos2ivMESA")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glWindowPos2ivMESA");
       allclear &= funcTest;
       funcTest = ((glWindowPos2svMESA = (csGLWINDOWPOS2SVMESA) gl->GetProcAddress ("glWindowPos2svMESA")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glWindowPos2svMESA");
       allclear &= funcTest;
       funcTest = ((glWindowPos2fvMESA = (csGLWINDOWPOS2FVMESA) gl->GetProcAddress ("glWindowPos2fvMESA")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glWindowPos2fvMESA");
       allclear &= funcTest;
       funcTest = ((glWindowPos2dvMESA = (csGLWINDOWPOS2DVMESA) gl->GetProcAddress ("glWindowPos2dvMESA")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glWindowPos2dvMESA");
       allclear &= funcTest;
       funcTest = ((glWindowPos3iMESA = (csGLWINDOWPOS3IMESA) gl->GetProcAddress ("glWindowPos3iMESA")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glWindowPos3iMESA");
       allclear &= funcTest;
       funcTest = ((glWindowPos3sMESA = (csGLWINDOWPOS3SMESA) gl->GetProcAddress ("glWindowPos3sMESA")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glWindowPos3sMESA");
       allclear &= funcTest;
       funcTest = ((glWindowPos3fMESA = (csGLWINDOWPOS3FMESA) gl->GetProcAddress ("glWindowPos3fMESA")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glWindowPos3fMESA");
       allclear &= funcTest;
       funcTest = ((glWindowPos3dMESA = (csGLWINDOWPOS3DMESA) gl->GetProcAddress ("glWindowPos3dMESA")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glWindowPos3dMESA");
       allclear &= funcTest;
       funcTest = ((glWindowPos3ivMESA = (csGLWINDOWPOS3IVMESA) gl->GetProcAddress ("glWindowPos3ivMESA")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glWindowPos3ivMESA");
       allclear &= funcTest;
       funcTest = ((glWindowPos3svMESA = (csGLWINDOWPOS3SVMESA) gl->GetProcAddress ("glWindowPos3svMESA")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glWindowPos3svMESA");
       allclear &= funcTest;
       funcTest = ((glWindowPos3fvMESA = (csGLWINDOWPOS3FVMESA) gl->GetProcAddress ("glWindowPos3fvMESA")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glWindowPos3fvMESA");
       allclear &= funcTest;
       funcTest = ((glWindowPos3dvMESA = (csGLWINDOWPOS3DVMESA) gl->GetProcAddress ("glWindowPos3dvMESA")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glWindowPos3dvMESA");
       allclear &= funcTest;
       funcTest = ((glWindowPos4iMESA = (csGLWINDOWPOS4IMESA) gl->GetProcAddress ("glWindowPos4iMESA")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glWindowPos4iMESA");
       allclear &= funcTest;
       funcTest = ((glWindowPos4sMESA = (csGLWINDOWPOS4SMESA) gl->GetProcAddress ("glWindowPos4sMESA")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glWindowPos4sMESA");
       allclear &= funcTest;
       funcTest = ((glWindowPos4fMESA = (csGLWINDOWPOS4FMESA) gl->GetProcAddress ("glWindowPos4fMESA")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glWindowPos4fMESA");
       allclear &= funcTest;
       funcTest = ((glWindowPos4dMESA = (csGLWINDOWPOS4DMESA) gl->GetProcAddress ("glWindowPos4dMESA")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glWindowPos4dMESA");
       allclear &= funcTest;
       funcTest = ((glWindowPos4ivMESA = (csGLWINDOWPOS4IVMESA) gl->GetProcAddress ("glWindowPos4ivMESA")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glWindowPos4ivMESA");
       allclear &= funcTest;
       funcTest = ((glWindowPos4svMESA = (csGLWINDOWPOS4SVMESA) gl->GetProcAddress ("glWindowPos4svMESA")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glWindowPos4svMESA");
       allclear &= funcTest;
       funcTest = ((glWindowPos4fvMESA = (csGLWINDOWPOS4FVMESA) gl->GetProcAddress ("glWindowPos4fvMESA")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glWindowPos4fvMESA");
       allclear &= funcTest;
       funcTest = ((glWindowPos4dvMESA = (csGLWINDOWPOS4DVMESA) gl->GetProcAddress ("glWindowPos4dvMESA")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glWindowPos4dvMESA");
       allclear &= funcTest;
       if (CS_GL_MESA_window_pos = allclear)
@@ -17039,11 +17043,11 @@ public:
     {
       allclear = true;
       funcTest = ((glSampleMaskSGIS = (csGLSAMPLEMASKSGIS) gl->GetProcAddress ("glSampleMaskSGIS")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glSampleMaskSGIS");
       allclear &= funcTest;
       funcTest = ((glSamplePatternSGIS = (csGLSAMPLEPATTERNSGIS) gl->GetProcAddress ("glSamplePatternSGIS")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glSamplePatternSGIS");
       allclear &= funcTest;
       if (CS_GL_SGIS_multisample = allclear)
@@ -17085,19 +17089,19 @@ public:
     {
       allclear = true;
       funcTest = ((glPixelTexGenParameteriSGIS = (csGLPIXELTEXGENPARAMETERISGIS) gl->GetProcAddress ("glPixelTexGenParameteriSGIS")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glPixelTexGenParameteriSGIS");
       allclear &= funcTest;
       funcTest = ((glPixelTexGenParameterfSGIS = (csGLPIXELTEXGENPARAMETERFSGIS) gl->GetProcAddress ("glPixelTexGenParameterfSGIS")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glPixelTexGenParameterfSGIS");
       allclear &= funcTest;
       funcTest = ((glGetPixelTexGenParameterivSGIS = (csGLGETPIXELTEXGENPARAMETERIVSGIS) gl->GetProcAddress ("glGetPixelTexGenParameterivSGIS")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glGetPixelTexGenParameterivSGIS");
       allclear &= funcTest;
       funcTest = ((glGetPixelTexGenParameterfvSGIS = (csGLGETPIXELTEXGENPARAMETERFVSGIS) gl->GetProcAddress ("glGetPixelTexGenParameterfvSGIS")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glGetPixelTexGenParameterfvSGIS");
       allclear &= funcTest;
       if (CS_GL_SGIS_pixel_texture = allclear)
@@ -17177,7 +17181,7 @@ public:
     {
       allclear = true;
       funcTest = ((glTextureColorMaskSGIS = (csGLTEXTURECOLORMASKSGIS) gl->GetProcAddress ("glTextureColorMaskSGIS")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glTextureColorMaskSGIS");
       allclear &= funcTest;
       if (CS_GL_SGIS_texture_color_mask = allclear)
@@ -17485,31 +17489,31 @@ public:
     {
       allclear = true;
       funcTest = ((glColorTableSGI = (csGLCOLORTABLESGI) gl->GetProcAddress ("glColorTableSGI")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glColorTableSGI");
       allclear &= funcTest;
       funcTest = ((glCopyColorTableSGI = (csGLCOPYCOLORTABLESGI) gl->GetProcAddress ("glCopyColorTableSGI")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glCopyColorTableSGI");
       allclear &= funcTest;
       funcTest = ((glColorTableParameterivSGI = (csGLCOLORTABLEPARAMETERIVSGI) gl->GetProcAddress ("glColorTableParameterivSGI")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glColorTableParameterivSGI");
       allclear &= funcTest;
       funcTest = ((glColorTableParameterfvSGI = (csGLCOLORTABLEPARAMETERFVSGI) gl->GetProcAddress ("glColorTableParameterfvSGI")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glColorTableParameterfvSGI");
       allclear &= funcTest;
       funcTest = ((glGetColorTableSGI = (csGLGETCOLORTABLESGI) gl->GetProcAddress ("glGetColorTableSGI")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glGetColorTableSGI");
       allclear &= funcTest;
       funcTest = ((glGetColorTableParameterivSGI = (csGLGETCOLORTABLEPARAMETERIVSGI) gl->GetProcAddress ("glGetColorTableParameterivSGI")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glGetColorTableParameterivSGI");
       allclear &= funcTest;
       funcTest = ((glGetColorTableParameterfvSGI = (csGLGETCOLORTABLEPARAMETERFVSGI) gl->GetProcAddress ("glGetColorTableParameterfvSGI")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glGetColorTableParameterfvSGI");
       allclear &= funcTest;
       if (CS_GL_SGI_color_table = allclear)
@@ -17589,163 +17593,163 @@ public:
     {
       allclear = true;
       funcTest = ((glColor4ubVertex2fSUN = (csGLCOLOR4UBVERTEX2FSUN) gl->GetProcAddress ("glColor4ubVertex2fSUN")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glColor4ubVertex2fSUN");
       allclear &= funcTest;
       funcTest = ((glColor4ubVertex2fvSUN = (csGLCOLOR4UBVERTEX2FVSUN) gl->GetProcAddress ("glColor4ubVertex2fvSUN")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glColor4ubVertex2fvSUN");
       allclear &= funcTest;
       funcTest = ((glColor4ubVertex3fSUN = (csGLCOLOR4UBVERTEX3FSUN) gl->GetProcAddress ("glColor4ubVertex3fSUN")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glColor4ubVertex3fSUN");
       allclear &= funcTest;
       funcTest = ((glColor4ubVertex3fvSUN = (csGLCOLOR4UBVERTEX3FVSUN) gl->GetProcAddress ("glColor4ubVertex3fvSUN")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glColor4ubVertex3fvSUN");
       allclear &= funcTest;
       funcTest = ((glColor3fVertex3fSUN = (csGLCOLOR3FVERTEX3FSUN) gl->GetProcAddress ("glColor3fVertex3fSUN")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glColor3fVertex3fSUN");
       allclear &= funcTest;
       funcTest = ((glColor3fVertex3fvSUN = (csGLCOLOR3FVERTEX3FVSUN) gl->GetProcAddress ("glColor3fVertex3fvSUN")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glColor3fVertex3fvSUN");
       allclear &= funcTest;
       funcTest = ((glNormal3fVertex3fSUN = (csGLNORMAL3FVERTEX3FSUN) gl->GetProcAddress ("glNormal3fVertex3fSUN")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glNormal3fVertex3fSUN");
       allclear &= funcTest;
       funcTest = ((glNormal3fVertex3fvSUN = (csGLNORMAL3FVERTEX3FVSUN) gl->GetProcAddress ("glNormal3fVertex3fvSUN")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glNormal3fVertex3fvSUN");
       allclear &= funcTest;
       funcTest = ((glColor4fNormal3fVertex3fSUN = (csGLCOLOR4FNORMAL3FVERTEX3FSUN) gl->GetProcAddress ("glColor4fNormal3fVertex3fSUN")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glColor4fNormal3fVertex3fSUN");
       allclear &= funcTest;
       funcTest = ((glColor4fNormal3fVertex3fvSUN = (csGLCOLOR4FNORMAL3FVERTEX3FVSUN) gl->GetProcAddress ("glColor4fNormal3fVertex3fvSUN")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glColor4fNormal3fVertex3fvSUN");
       allclear &= funcTest;
       funcTest = ((glTexCoord2fVertex3fSUN = (csGLTEXCOORD2FVERTEX3FSUN) gl->GetProcAddress ("glTexCoord2fVertex3fSUN")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glTexCoord2fVertex3fSUN");
       allclear &= funcTest;
       funcTest = ((glTexCoord2fVertex3fvSUN = (csGLTEXCOORD2FVERTEX3FVSUN) gl->GetProcAddress ("glTexCoord2fVertex3fvSUN")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glTexCoord2fVertex3fvSUN");
       allclear &= funcTest;
       funcTest = ((glTexCoord4fVertex4fSUN = (csGLTEXCOORD4FVERTEX4FSUN) gl->GetProcAddress ("glTexCoord4fVertex4fSUN")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glTexCoord4fVertex4fSUN");
       allclear &= funcTest;
       funcTest = ((glTexCoord4fVertex4fvSUN = (csGLTEXCOORD4FVERTEX4FVSUN) gl->GetProcAddress ("glTexCoord4fVertex4fvSUN")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glTexCoord4fVertex4fvSUN");
       allclear &= funcTest;
       funcTest = ((glTexCoord2fColor4ubVertex3fSUN = (csGLTEXCOORD2FCOLOR4UBVERTEX3FSUN) gl->GetProcAddress ("glTexCoord2fColor4ubVertex3fSUN")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glTexCoord2fColor4ubVertex3fSUN");
       allclear &= funcTest;
       funcTest = ((glTexCoord2fColor4ubVertex3fvSUN = (csGLTEXCOORD2FCOLOR4UBVERTEX3FVSUN) gl->GetProcAddress ("glTexCoord2fColor4ubVertex3fvSUN")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glTexCoord2fColor4ubVertex3fvSUN");
       allclear &= funcTest;
       funcTest = ((glTexCoord2fColor3fVertex3fSUN = (csGLTEXCOORD2FCOLOR3FVERTEX3FSUN) gl->GetProcAddress ("glTexCoord2fColor3fVertex3fSUN")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glTexCoord2fColor3fVertex3fSUN");
       allclear &= funcTest;
       funcTest = ((glTexCoord2fColor3fVertex3fvSUN = (csGLTEXCOORD2FCOLOR3FVERTEX3FVSUN) gl->GetProcAddress ("glTexCoord2fColor3fVertex3fvSUN")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glTexCoord2fColor3fVertex3fvSUN");
       allclear &= funcTest;
       funcTest = ((glTexCoord2fNormal3fVertex3fSUN = (csGLTEXCOORD2FNORMAL3FVERTEX3FSUN) gl->GetProcAddress ("glTexCoord2fNormal3fVertex3fSUN")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glTexCoord2fNormal3fVertex3fSUN");
       allclear &= funcTest;
       funcTest = ((glTexCoord2fNormal3fVertex3fvSUN = (csGLTEXCOORD2FNORMAL3FVERTEX3FVSUN) gl->GetProcAddress ("glTexCoord2fNormal3fVertex3fvSUN")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glTexCoord2fNormal3fVertex3fvSUN");
       allclear &= funcTest;
       funcTest = ((glTexCoord2fColor4fNormal3fVertex3fSUN = (csGLTEXCOORD2FCOLOR4FNORMAL3FVERTEX3FSUN) gl->GetProcAddress ("glTexCoord2fColor4fNormal3fVertex3fSUN")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glTexCoord2fColor4fNormal3fVertex3fSUN");
       allclear &= funcTest;
       funcTest = ((glTexCoord2fColor4fNormal3fVertex3fvSUN = (csGLTEXCOORD2FCOLOR4FNORMAL3FVERTEX3FVSUN) gl->GetProcAddress ("glTexCoord2fColor4fNormal3fVertex3fvSUN")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glTexCoord2fColor4fNormal3fVertex3fvSUN");
       allclear &= funcTest;
       funcTest = ((glTexCoord4fColor4fNormal3fVertex4fSUN = (csGLTEXCOORD4FCOLOR4FNORMAL3FVERTEX4FSUN) gl->GetProcAddress ("glTexCoord4fColor4fNormal3fVertex4fSUN")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glTexCoord4fColor4fNormal3fVertex4fSUN");
       allclear &= funcTest;
       funcTest = ((glTexCoord4fColor4fNormal3fVertex4fvSUN = (csGLTEXCOORD4FCOLOR4FNORMAL3FVERTEX4FVSUN) gl->GetProcAddress ("glTexCoord4fColor4fNormal3fVertex4fvSUN")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glTexCoord4fColor4fNormal3fVertex4fvSUN");
       allclear &= funcTest;
       funcTest = ((glReplacementCodeuiVertex3fSUN = (csGLREPLACEMENTCODEUIVERTEX3FSUN) gl->GetProcAddress ("glReplacementCodeuiVertex3fSUN")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glReplacementCodeuiVertex3fSUN");
       allclear &= funcTest;
       funcTest = ((glReplacementCodeuiVertex3fvSUN = (csGLREPLACEMENTCODEUIVERTEX3FVSUN) gl->GetProcAddress ("glReplacementCodeuiVertex3fvSUN")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glReplacementCodeuiVertex3fvSUN");
       allclear &= funcTest;
       funcTest = ((glReplacementCodeuiColor4ubVertex3fSUN = (csGLREPLACEMENTCODEUICOLOR4UBVERTEX3FSUN) gl->GetProcAddress ("glReplacementCodeuiColor4ubVertex3fSUN")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glReplacementCodeuiColor4ubVertex3fSUN");
       allclear &= funcTest;
       funcTest = ((glReplacementCodeuiColor4ubVertex3fvSUN = (csGLREPLACEMENTCODEUICOLOR4UBVERTEX3FVSUN) gl->GetProcAddress ("glReplacementCodeuiColor4ubVertex3fvSUN")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glReplacementCodeuiColor4ubVertex3fvSUN");
       allclear &= funcTest;
       funcTest = ((glReplacementCodeuiColor3fVertex3fSUN = (csGLREPLACEMENTCODEUICOLOR3FVERTEX3FSUN) gl->GetProcAddress ("glReplacementCodeuiColor3fVertex3fSUN")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glReplacementCodeuiColor3fVertex3fSUN");
       allclear &= funcTest;
       funcTest = ((glReplacementCodeuiColor3fVertex3fvSUN = (csGLREPLACEMENTCODEUICOLOR3FVERTEX3FVSUN) gl->GetProcAddress ("glReplacementCodeuiColor3fVertex3fvSUN")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glReplacementCodeuiColor3fVertex3fvSUN");
       allclear &= funcTest;
       funcTest = ((glReplacementCodeuiNormal3fVertex3fSUN = (csGLREPLACEMENTCODEUINORMAL3FVERTEX3FSUN) gl->GetProcAddress ("glReplacementCodeuiNormal3fVertex3fSUN")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glReplacementCodeuiNormal3fVertex3fSUN");
       allclear &= funcTest;
       funcTest = ((glReplacementCodeuiNormal3fVertex3fvSUN = (csGLREPLACEMENTCODEUINORMAL3FVERTEX3FVSUN) gl->GetProcAddress ("glReplacementCodeuiNormal3fVertex3fvSUN")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glReplacementCodeuiNormal3fVertex3fvSUN");
       allclear &= funcTest;
       funcTest = ((glReplacementCodeuiColor4fNormal3fVertex3fSUN = (csGLREPLACEMENTCODEUICOLOR4FNORMAL3FVERTEX3FSUN) gl->GetProcAddress ("glReplacementCodeuiColor4fNormal3fVertex3fSUN")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glReplacementCodeuiColor4fNormal3fVertex3fSUN");
       allclear &= funcTest;
       funcTest = ((glReplacementCodeuiColor4fNormal3fVertex3fvSUN = (csGLREPLACEMENTCODEUICOLOR4FNORMAL3FVERTEX3FVSUN) gl->GetProcAddress ("glReplacementCodeuiColor4fNormal3fVertex3fvSUN")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glReplacementCodeuiColor4fNormal3fVertex3fvSUN");
       allclear &= funcTest;
       funcTest = ((glReplacementCodeuiTexCoord2fVertex3fSUN = (csGLREPLACEMENTCODEUITEXCOORD2FVERTEX3FSUN) gl->GetProcAddress ("glReplacementCodeuiTexCoord2fVertex3fSUN")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glReplacementCodeuiTexCoord2fVertex3fSUN");
       allclear &= funcTest;
       funcTest = ((glReplacementCodeuiTexCoord2fVertex3fvSUN = (csGLREPLACEMENTCODEUITEXCOORD2FVERTEX3FVSUN) gl->GetProcAddress ("glReplacementCodeuiTexCoord2fVertex3fvSUN")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glReplacementCodeuiTexCoord2fVertex3fvSUN");
       allclear &= funcTest;
       funcTest = ((glReplacementCodeuiTexCoord2fNormal3fVertex3fSUN = (csGLREPLACEMENTCODEUITEXCOORD2FNORMAL3FVERTEX3FSUN) gl->GetProcAddress ("glReplacementCodeuiTexCoord2fNormal3fVertex3fSUN")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glReplacementCodeuiTexCoord2fNormal3fVertex3fSUN");
       allclear &= funcTest;
       funcTest = ((glReplacementCodeuiTexCoord2fNormal3fVertex3fvSUN = (csGLREPLACEMENTCODEUITEXCOORD2FNORMAL3FVERTEX3FVSUN) gl->GetProcAddress ("glReplacementCodeuiTexCoord2fNormal3fVertex3fvSUN")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glReplacementCodeuiTexCoord2fNormal3fVertex3fvSUN");
       allclear &= funcTest;
       funcTest = ((glReplacementCodeuiTexCoord2fColor4fNormal3fVertex3fSUN = (csGLREPLACEMENTCODEUITEXCOORD2FCOLOR4FNORMAL3FVERTEX3FSUN) gl->GetProcAddress ("glReplacementCodeuiTexCoord2fColor4fNormal3fVertex3fSUN")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glReplacementCodeuiTexCoord2fColor4fNormal3fVertex3fSUN");
       allclear &= funcTest;
       funcTest = ((glReplacementCodeuiTexCoord2fColor4fNormal3fVertex3fvSUN = (csGLREPLACEMENTCODEUITEXCOORD2FCOLOR4FNORMAL3FVERTEX3FVSUN) gl->GetProcAddress ("glReplacementCodeuiTexCoord2fColor4fNormal3fVertex3fvSUN")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glReplacementCodeuiTexCoord2fColor4fNormal3fVertex3fvSUN");
       allclear &= funcTest;
       if (CS_GL_SUN_vertex = allclear)
@@ -17787,79 +17791,79 @@ public:
     {
       allclear = true;
       funcTest = ((glProgramStringARB = (csGLPROGRAMSTRINGARB) gl->GetProcAddress ("glProgramStringARB")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glProgramStringARB");
       allclear &= funcTest;
       funcTest = ((glBindProgramARB = (csGLBINDPROGRAMARB) gl->GetProcAddress ("glBindProgramARB")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glBindProgramARB");
       allclear &= funcTest;
       funcTest = ((glDeleteProgramsARB = (csGLDELETEPROGRAMSARB) gl->GetProcAddress ("glDeleteProgramsARB")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glDeleteProgramsARB");
       allclear &= funcTest;
       funcTest = ((glGenProgramsARB = (csGLGENPROGRAMSARB) gl->GetProcAddress ("glGenProgramsARB")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glGenProgramsARB");
       allclear &= funcTest;
       funcTest = ((glProgramEnvParameter4dARB = (csGLPROGRAMENVPARAMETER4DARB) gl->GetProcAddress ("glProgramEnvParameter4dARB")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glProgramEnvParameter4dARB");
       allclear &= funcTest;
       funcTest = ((glProgramEnvParameter4dvARB = (csGLPROGRAMENVPARAMETER4DVARB) gl->GetProcAddress ("glProgramEnvParameter4dvARB")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glProgramEnvParameter4dvARB");
       allclear &= funcTest;
       funcTest = ((glProgramEnvParameter4fARB = (csGLPROGRAMENVPARAMETER4FARB) gl->GetProcAddress ("glProgramEnvParameter4fARB")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glProgramEnvParameter4fARB");
       allclear &= funcTest;
       funcTest = ((glProgramEnvParameter4fvARB = (csGLPROGRAMENVPARAMETER4FVARB) gl->GetProcAddress ("glProgramEnvParameter4fvARB")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glProgramEnvParameter4fvARB");
       allclear &= funcTest;
       funcTest = ((glProgramLocalParameter4dARB = (csGLPROGRAMLOCALPARAMETER4DARB) gl->GetProcAddress ("glProgramLocalParameter4dARB")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glProgramLocalParameter4dARB");
       allclear &= funcTest;
       funcTest = ((glProgramLocalParameter4dvARB = (csGLPROGRAMLOCALPARAMETER4DVARB) gl->GetProcAddress ("glProgramLocalParameter4dvARB")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glProgramLocalParameter4dvARB");
       allclear &= funcTest;
       funcTest = ((glProgramLocalParameter4fARB = (csGLPROGRAMLOCALPARAMETER4FARB) gl->GetProcAddress ("glProgramLocalParameter4fARB")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glProgramLocalParameter4fARB");
       allclear &= funcTest;
       funcTest = ((glProgramLocalParameter4fvARB = (csGLPROGRAMLOCALPARAMETER4FVARB) gl->GetProcAddress ("glProgramLocalParameter4fvARB")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glProgramLocalParameter4fvARB");
       allclear &= funcTest;
       funcTest = ((glGetProgramEnvParameterdvARB = (csGLGETPROGRAMENVPARAMETERDVARB) gl->GetProcAddress ("glGetProgramEnvParameterdvARB")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glGetProgramEnvParameterdvARB");
       allclear &= funcTest;
       funcTest = ((glGetProgramEnvParameterfvARB = (csGLGETPROGRAMENVPARAMETERFVARB) gl->GetProcAddress ("glGetProgramEnvParameterfvARB")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glGetProgramEnvParameterfvARB");
       allclear &= funcTest;
       funcTest = ((glGetProgramLocalParameterdvARB = (csGLGETPROGRAMLOCALPARAMETERDVARB) gl->GetProcAddress ("glGetProgramLocalParameterdvARB")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glGetProgramLocalParameterdvARB");
       allclear &= funcTest;
       funcTest = ((glGetProgramLocalParameterfvARB = (csGLGETPROGRAMLOCALPARAMETERFVARB) gl->GetProcAddress ("glGetProgramLocalParameterfvARB")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glGetProgramLocalParameterfvARB");
       allclear &= funcTest;
       funcTest = ((glGetProgramivARB = (csGLGETPROGRAMIVARB) gl->GetProcAddress ("glGetProgramivARB")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glGetProgramivARB");
       allclear &= funcTest;
       funcTest = ((glGetProgramStringARB = (csGLGETPROGRAMSTRINGARB) gl->GetProcAddress ("glGetProgramStringARB")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glGetProgramStringARB");
       allclear &= funcTest;
       funcTest = ((glIsProgramARB = (csGLISPROGRAMARB) gl->GetProcAddress ("glIsProgramARB")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glIsProgramARB");
       allclear &= funcTest;
       if (CS_GL_ARB_fragment_program = allclear)
@@ -17977,23 +17981,23 @@ public:
     {
       allclear = true;
       funcTest = ((glElementPointerAPPLE = (csGLELEMENTPOINTERAPPLE) gl->GetProcAddress ("glElementPointerAPPLE")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glElementPointerAPPLE");
       allclear &= funcTest;
       funcTest = ((glDrawElementArrayAPPLE = (csGLDRAWELEMENTARRAYAPPLE) gl->GetProcAddress ("glDrawElementArrayAPPLE")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glDrawElementArrayAPPLE");
       allclear &= funcTest;
       funcTest = ((glDrawRangeElementArrayAPPLE = (csGLDRAWRANGEELEMENTARRAYAPPLE) gl->GetProcAddress ("glDrawRangeElementArrayAPPLE")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glDrawRangeElementArrayAPPLE");
       allclear &= funcTest;
       funcTest = ((glMultiDrawElementArrayAPPLE = (csGLMULTIDRAWELEMENTARRAYAPPLE) gl->GetProcAddress ("glMultiDrawElementArrayAPPLE")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glMultiDrawElementArrayAPPLE");
       allclear &= funcTest;
       funcTest = ((glMultiDrawRangeElementArrayAPPLE = (csGLMULTIDRAWRANGEELEMENTARRAYAPPLE) gl->GetProcAddress ("glMultiDrawRangeElementArrayAPPLE")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glMultiDrawRangeElementArrayAPPLE");
       allclear &= funcTest;
       if (CS_GL_APPLE_element_array = allclear)
@@ -18035,35 +18039,35 @@ public:
     {
       allclear = true;
       funcTest = ((glGenFencesAPPLE = (csGLGENFENCESAPPLE) gl->GetProcAddress ("glGenFencesAPPLE")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glGenFencesAPPLE");
       allclear &= funcTest;
       funcTest = ((glDeleteFencesAPPLE = (csGLDELETEFENCESAPPLE) gl->GetProcAddress ("glDeleteFencesAPPLE")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glDeleteFencesAPPLE");
       allclear &= funcTest;
       funcTest = ((glSetFenceAPPLE = (csGLSETFENCEAPPLE) gl->GetProcAddress ("glSetFenceAPPLE")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glSetFenceAPPLE");
       allclear &= funcTest;
       funcTest = ((glIsFenceAPPLE = (csGLISFENCEAPPLE) gl->GetProcAddress ("glIsFenceAPPLE")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glIsFenceAPPLE");
       allclear &= funcTest;
       funcTest = ((glTestFenceAPPLE = (csGLTESTFENCEAPPLE) gl->GetProcAddress ("glTestFenceAPPLE")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glTestFenceAPPLE");
       allclear &= funcTest;
       funcTest = ((glFinishFenceAPPLE = (csGLFINISHFENCEAPPLE) gl->GetProcAddress ("glFinishFenceAPPLE")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glFinishFenceAPPLE");
       allclear &= funcTest;
       funcTest = ((glTestObjectAPPLE = (csGLTESTOBJECTAPPLE) gl->GetProcAddress ("glTestObjectAPPLE")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glTestObjectAPPLE");
       allclear &= funcTest;
       funcTest = ((glFinishObjectAPPLE = (csGLFINISHOBJECTAPPLE) gl->GetProcAddress ("glFinishObjectAPPLE")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glFinishObjectAPPLE");
       allclear &= funcTest;
       if (CS_GL_APPLE_fence = allclear)
@@ -18105,19 +18109,19 @@ public:
     {
       allclear = true;
       funcTest = ((glBindVertexArrayAPPLE = (csGLBINDVERTEXARRAYAPPLE) gl->GetProcAddress ("glBindVertexArrayAPPLE")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glBindVertexArrayAPPLE");
       allclear &= funcTest;
       funcTest = ((glDeleteVertexArraysAPPLE = (csGLDELETEVERTEXARRAYSAPPLE) gl->GetProcAddress ("glDeleteVertexArraysAPPLE")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glDeleteVertexArraysAPPLE");
       allclear &= funcTest;
       funcTest = ((glGenVertexArraysAPPLE = (csGLGENVERTEXARRAYSAPPLE) gl->GetProcAddress ("glGenVertexArraysAPPLE")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glGenVertexArraysAPPLE");
       allclear &= funcTest;
       funcTest = ((glIsVertexArrayAPPLE = (csGLISVERTEXARRAYAPPLE) gl->GetProcAddress ("glIsVertexArrayAPPLE")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glIsVertexArrayAPPLE");
       allclear &= funcTest;
       if (CS_GL_APPLE_vertex_array_object = allclear)
@@ -18159,15 +18163,15 @@ public:
     {
       allclear = true;
       funcTest = ((glVertexArrayRangeAPPLE = (csGLVERTEXARRAYRANGEAPPLE) gl->GetProcAddress ("glVertexArrayRangeAPPLE")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glVertexArrayRangeAPPLE");
       allclear &= funcTest;
       funcTest = ((glFlushVertexArrayRangeAPPLE = (csGLFLUSHVERTEXARRAYRANGEAPPLE) gl->GetProcAddress ("glFlushVertexArrayRangeAPPLE")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glFlushVertexArrayRangeAPPLE");
       allclear &= funcTest;
       funcTest = ((glVertexArrayParameteriAPPLE = (csGLVERTEXARRAYPARAMETERIAPPLE) gl->GetProcAddress ("glVertexArrayParameteriAPPLE")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glVertexArrayParameteriAPPLE");
       allclear &= funcTest;
       if (CS_GL_APPLE_vertex_array_range = allclear)
@@ -18219,15 +18223,15 @@ public:
     {
       allclear = true;
       funcTest = ((wglGetPixelFormatAttribivARB = (csWGLGETPIXELFORMATATTRIBIVARB) gl->GetProcAddress ("wglGetPixelFormatAttribivARB")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "wglGetPixelFormatAttribivARB");
       allclear &= funcTest;
       funcTest = ((wglGetPixelFormatAttribfvARB = (csWGLGETPIXELFORMATATTRIBFVARB) gl->GetProcAddress ("wglGetPixelFormatAttribfvARB")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "wglGetPixelFormatAttribfvARB");
       allclear &= funcTest;
       funcTest = ((wglChoosePixelFormatARB = (csWGLCHOOSEPIXELFORMATARB) gl->GetProcAddress ("wglChoosePixelFormatARB")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "wglChoosePixelFormatARB");
       allclear &= funcTest;
       if (CS_WGL_ARB_pixel_format = allclear)
@@ -18280,11 +18284,11 @@ public:
     {
       allclear = true;
       funcTest = ((wglMakeContextCurrentARB = (csWGLMAKECONTEXTCURRENTARB) gl->GetProcAddress ("wglMakeContextCurrentARB")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "wglMakeContextCurrentARB");
       allclear &= funcTest;
       funcTest = ((wglGetCurrentReadDCARB = (csWGLGETCURRENTREADDCARB) gl->GetProcAddress ("wglGetCurrentReadDCARB")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "wglGetCurrentReadDCARB");
       allclear &= funcTest;
       if (CS_WGL_ARB_make_current_read = allclear)
@@ -18337,23 +18341,23 @@ public:
     {
       allclear = true;
       funcTest = ((wglCreatePbufferARB = (csWGLCREATEPBUFFERARB) gl->GetProcAddress ("wglCreatePbufferARB")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "wglCreatePbufferARB");
       allclear &= funcTest;
       funcTest = ((wglGetPbufferDCARB = (csWGLGETPBUFFERDCARB) gl->GetProcAddress ("wglGetPbufferDCARB")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "wglGetPbufferDCARB");
       allclear &= funcTest;
       funcTest = ((wglReleasePbufferDCARB = (csWGLRELEASEPBUFFERDCARB) gl->GetProcAddress ("wglReleasePbufferDCARB")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "wglReleasePbufferDCARB");
       allclear &= funcTest;
       funcTest = ((wglDestroyPbufferARB = (csWGLDESTROYPBUFFERARB) gl->GetProcAddress ("wglDestroyPbufferARB")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "wglDestroyPbufferARB");
       allclear &= funcTest;
       funcTest = ((wglQueryPbufferARB = (csWGLQUERYPBUFFERARB) gl->GetProcAddress ("wglQueryPbufferARB")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "wglQueryPbufferARB");
       allclear &= funcTest;
       if (CS_WGL_ARB_pbuffer = allclear)
@@ -18406,11 +18410,11 @@ public:
     {
       allclear = true;
       funcTest = ((wglSwapIntervalEXT = (csWGLSWAPINTERVALEXT) gl->GetProcAddress ("wglSwapIntervalEXT")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "wglSwapIntervalEXT");
       allclear &= funcTest;
       funcTest = ((wglGetSwapIntervalEXT = (csWGLGETSWAPINTERVALEXT) gl->GetProcAddress ("wglGetSwapIntervalEXT")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "wglGetSwapIntervalEXT");
       allclear &= funcTest;
       if (CS_WGL_EXT_swap_control = allclear)
@@ -18463,15 +18467,15 @@ public:
     {
       allclear = true;
       funcTest = ((wglBindTexImageARB = (csWGLBINDTEXIMAGEARB) gl->GetProcAddress ("wglBindTexImageARB")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "wglBindTexImageARB");
       allclear &= funcTest;
       funcTest = ((wglReleaseTexImageARB = (csWGLRELEASETEXIMAGEARB) gl->GetProcAddress ("wglReleaseTexImageARB")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "wglReleaseTexImageARB");
       allclear &= funcTest;
       funcTest = ((wglSetPbufferAttribARB = (csWGLSETPBUFFERATTRIBARB) gl->GetProcAddress ("wglSetPbufferAttribARB")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "wglSetPbufferAttribARB");
       allclear &= funcTest;
       if (CS_WGL_ARB_render_texture = allclear)
@@ -18514,7 +18518,7 @@ public:
     {
       allclear = true;
       funcTest = ((wglGetExtensionsStringEXT = (csWGLGETEXTENSIONSSTRINGEXT) gl->GetProcAddress ("wglGetExtensionsStringEXT")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "wglGetExtensionsStringEXT");
       allclear &= funcTest;
       if (CS_WGL_EXT_extensions_string = allclear)
@@ -18567,11 +18571,11 @@ public:
     {
       allclear = true;
       funcTest = ((wglMakeContextCurrentEXT = (csWGLMAKECONTEXTCURRENTEXT) gl->GetProcAddress ("wglMakeContextCurrentEXT")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "wglMakeContextCurrentEXT");
       allclear &= funcTest;
       funcTest = ((wglGetCurrentReadDCEXT = (csWGLGETCURRENTREADDCEXT) gl->GetProcAddress ("wglGetCurrentReadDCEXT")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "wglGetCurrentReadDCEXT");
       allclear &= funcTest;
       if (CS_WGL_EXT_make_current_read = allclear)
@@ -18624,23 +18628,23 @@ public:
     {
       allclear = true;
       funcTest = ((wglCreatePbufferEXT = (csWGLCREATEPBUFFEREXT) gl->GetProcAddress ("wglCreatePbufferEXT")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "wglCreatePbufferEXT");
       allclear &= funcTest;
       funcTest = ((wglGetPbufferDCEXT = (csWGLGETPBUFFERDCEXT) gl->GetProcAddress ("wglGetPbufferDCEXT")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "wglGetPbufferDCEXT");
       allclear &= funcTest;
       funcTest = ((wglReleasePbufferDCEXT = (csWGLRELEASEPBUFFERDCEXT) gl->GetProcAddress ("wglReleasePbufferDCEXT")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "wglReleasePbufferDCEXT");
       allclear &= funcTest;
       funcTest = ((wglDestroyPbufferEXT = (csWGLDESTROYPBUFFEREXT) gl->GetProcAddress ("wglDestroyPbufferEXT")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "wglDestroyPbufferEXT");
       allclear &= funcTest;
       funcTest = ((wglQueryPbufferEXT = (csWGLQUERYPBUFFEREXT) gl->GetProcAddress ("wglQueryPbufferEXT")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "wglQueryPbufferEXT");
       allclear &= funcTest;
       if (CS_WGL_EXT_pbuffer = allclear)
@@ -18693,15 +18697,15 @@ public:
     {
       allclear = true;
       funcTest = ((wglGetPixelFormatAttribivEXT = (csWGLGETPIXELFORMATATTRIBIVEXT) gl->GetProcAddress ("wglGetPixelFormatAttribivEXT")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "wglGetPixelFormatAttribivEXT");
       allclear &= funcTest;
       funcTest = ((wglGetPixelFormatAttribfvEXT = (csWGLGETPIXELFORMATATTRIBFVEXT) gl->GetProcAddress ("wglGetPixelFormatAttribfvEXT")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "wglGetPixelFormatAttribfvEXT");
       allclear &= funcTest;
       funcTest = ((wglChoosePixelFormatEXT = (csWGLCHOOSEPIXELFORMATEXT) gl->GetProcAddress ("wglChoosePixelFormatEXT")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "wglChoosePixelFormatEXT");
       allclear &= funcTest;
       if (CS_WGL_EXT_pixel_format = allclear)
@@ -18754,11 +18758,11 @@ public:
     {
       allclear = true;
       funcTest = ((wglGetDigitalVideoParametersI3D = (csWGLGETDIGITALVIDEOPARAMETERSI3D) gl->GetProcAddress ("wglGetDigitalVideoParametersI3D")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "wglGetDigitalVideoParametersI3D");
       allclear &= funcTest;
       funcTest = ((wglSetDigitalVideoParametersI3D = (csWGLSETDIGITALVIDEOPARAMETERSI3D) gl->GetProcAddress ("wglSetDigitalVideoParametersI3D")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "wglSetDigitalVideoParametersI3D");
       allclear &= funcTest;
       if (CS_WGL_I3D_digital_video_control = allclear)
@@ -18811,19 +18815,19 @@ public:
     {
       allclear = true;
       funcTest = ((wglGetGammaTableParametersI3D = (csWGLGETGAMMATABLEPARAMETERSI3D) gl->GetProcAddress ("wglGetGammaTableParametersI3D")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "wglGetGammaTableParametersI3D");
       allclear &= funcTest;
       funcTest = ((wglSetGammaTableParametersI3D = (csWGLSETGAMMATABLEPARAMETERSI3D) gl->GetProcAddress ("wglSetGammaTableParametersI3D")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "wglSetGammaTableParametersI3D");
       allclear &= funcTest;
       funcTest = ((wglGetGammaTableI3D = (csWGLGETGAMMATABLEI3D) gl->GetProcAddress ("wglGetGammaTableI3D")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "wglGetGammaTableI3D");
       allclear &= funcTest;
       funcTest = ((wglSetGammaTableI3D = (csWGLSETGAMMATABLEI3D) gl->GetProcAddress ("wglSetGammaTableI3D")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "wglSetGammaTableI3D");
       allclear &= funcTest;
       if (CS_WGL_I3D_gamma = allclear)
@@ -18876,51 +18880,51 @@ public:
     {
       allclear = true;
       funcTest = ((wglEnableGenlockI3D = (csWGLENABLEGENLOCKI3D) gl->GetProcAddress ("wglEnableGenlockI3D")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "wglEnableGenlockI3D");
       allclear &= funcTest;
       funcTest = ((wglDisableGenlockI3D = (csWGLDISABLEGENLOCKI3D) gl->GetProcAddress ("wglDisableGenlockI3D")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "wglDisableGenlockI3D");
       allclear &= funcTest;
       funcTest = ((wglIsEnabledGenlockI3D = (csWGLISENABLEDGENLOCKI3D) gl->GetProcAddress ("wglIsEnabledGenlockI3D")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "wglIsEnabledGenlockI3D");
       allclear &= funcTest;
       funcTest = ((wglGenlockSourceI3D = (csWGLGENLOCKSOURCEI3D) gl->GetProcAddress ("wglGenlockSourceI3D")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "wglGenlockSourceI3D");
       allclear &= funcTest;
       funcTest = ((wglGetGenlockSourceI3D = (csWGLGETGENLOCKSOURCEI3D) gl->GetProcAddress ("wglGetGenlockSourceI3D")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "wglGetGenlockSourceI3D");
       allclear &= funcTest;
       funcTest = ((wglGenlockSourceEdgeI3D = (csWGLGENLOCKSOURCEEDGEI3D) gl->GetProcAddress ("wglGenlockSourceEdgeI3D")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "wglGenlockSourceEdgeI3D");
       allclear &= funcTest;
       funcTest = ((wglGetGenlockSourceEdgeI3D = (csWGLGETGENLOCKSOURCEEDGEI3D) gl->GetProcAddress ("wglGetGenlockSourceEdgeI3D")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "wglGetGenlockSourceEdgeI3D");
       allclear &= funcTest;
       funcTest = ((wglGenlockSampleRateI3D = (csWGLGENLOCKSAMPLERATEI3D) gl->GetProcAddress ("wglGenlockSampleRateI3D")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "wglGenlockSampleRateI3D");
       allclear &= funcTest;
       funcTest = ((wglGetGenlockSampleRateI3D = (csWGLGETGENLOCKSAMPLERATEI3D) gl->GetProcAddress ("wglGetGenlockSampleRateI3D")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "wglGetGenlockSampleRateI3D");
       allclear &= funcTest;
       funcTest = ((wglGenlockSourceDelayI3D = (csWGLGENLOCKSOURCEDELAYI3D) gl->GetProcAddress ("wglGenlockSourceDelayI3D")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "wglGenlockSourceDelayI3D");
       allclear &= funcTest;
       funcTest = ((wglGetGenlockSourceDelayI3D = (csWGLGETGENLOCKSOURCEDELAYI3D) gl->GetProcAddress ("wglGetGenlockSourceDelayI3D")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "wglGetGenlockSourceDelayI3D");
       allclear &= funcTest;
       funcTest = ((wglQueryGenlockMaxSourceDelayI3D = (csWGLQUERYGENLOCKMAXSOURCEDELAYI3D) gl->GetProcAddress ("wglQueryGenlockMaxSourceDelayI3D")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "wglQueryGenlockMaxSourceDelayI3D");
       allclear &= funcTest;
       if (CS_WGL_I3D_genlock = allclear)
@@ -18963,23 +18967,23 @@ public:
     {
       allclear = true;
       funcTest = ((glCurrentPaletteMatrixARB = (csGLCURRENTPALETTEMATRIXARB) gl->GetProcAddress ("glCurrentPaletteMatrixARB")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glCurrentPaletteMatrixARB");
       allclear &= funcTest;
       funcTest = ((glMatrixIndexubvARB = (csGLMATRIXINDEXUBVARB) gl->GetProcAddress ("glMatrixIndexubvARB")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glMatrixIndexubvARB");
       allclear &= funcTest;
       funcTest = ((glMatrixIndexusvARB = (csGLMATRIXINDEXUSVARB) gl->GetProcAddress ("glMatrixIndexusvARB")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glMatrixIndexusvARB");
       allclear &= funcTest;
       funcTest = ((glMatrixIndexuivARB = (csGLMATRIXINDEXUIVARB) gl->GetProcAddress ("glMatrixIndexuivARB")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glMatrixIndexuivARB");
       allclear &= funcTest;
       funcTest = ((glMatrixIndexPointerARB = (csGLMATRIXINDEXPOINTERARB) gl->GetProcAddress ("glMatrixIndexPointerARB")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glMatrixIndexPointerARB");
       allclear &= funcTest;
       if (CS_GL_ARB_matrix_palette = allclear)
@@ -19021,23 +19025,23 @@ public:
     {
       allclear = true;
       funcTest = ((glElementPointerNV = (csGLELEMENTPOINTERNV) gl->GetProcAddress ("glElementPointerNV")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glElementPointerNV");
       allclear &= funcTest;
       funcTest = ((glDrawElementArrayNV = (csGLDRAWELEMENTARRAYNV) gl->GetProcAddress ("glDrawElementArrayNV")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glDrawElementArrayNV");
       allclear &= funcTest;
       funcTest = ((glDrawRangeElementArrayNV = (csGLDRAWRANGEELEMENTARRAYNV) gl->GetProcAddress ("glDrawRangeElementArrayNV")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glDrawRangeElementArrayNV");
       allclear &= funcTest;
       funcTest = ((glMultiDrawElementArrayNV = (csGLMULTIDRAWELEMENTARRAYNV) gl->GetProcAddress ("glMultiDrawElementArrayNV")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glMultiDrawElementArrayNV");
       allclear &= funcTest;
       funcTest = ((glMultiDrawRangeElementArrayNV = (csGLMULTIDRAWRANGEELEMENTARRAYNV) gl->GetProcAddress ("glMultiDrawRangeElementArrayNV")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glMultiDrawRangeElementArrayNV");
       allclear &= funcTest;
       if (CS_GL_NV_element_array = allclear)
@@ -19117,43 +19121,43 @@ public:
     {
       allclear = true;
       funcTest = ((glProgramNamedParameter4fNV = (csGLPROGRAMNAMEDPARAMETER4FNV) gl->GetProcAddress ("glProgramNamedParameter4fNV")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glProgramNamedParameter4fNV");
       allclear &= funcTest;
       funcTest = ((glProgramNamedParameter4dNV = (csGLPROGRAMNAMEDPARAMETER4DNV) gl->GetProcAddress ("glProgramNamedParameter4dNV")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glProgramNamedParameter4dNV");
       allclear &= funcTest;
       funcTest = ((glGetProgramNamedParameterfvNV = (csGLGETPROGRAMNAMEDPARAMETERFVNV) gl->GetProcAddress ("glGetProgramNamedParameterfvNV")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glGetProgramNamedParameterfvNV");
       allclear &= funcTest;
       funcTest = ((glGetProgramNamedParameterdvNV = (csGLGETPROGRAMNAMEDPARAMETERDVNV) gl->GetProcAddress ("glGetProgramNamedParameterdvNV")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glGetProgramNamedParameterdvNV");
       allclear &= funcTest;
       funcTest = ((glProgramLocalParameter4dARB = (csGLPROGRAMLOCALPARAMETER4DARB) gl->GetProcAddress ("glProgramLocalParameter4dARB")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glProgramLocalParameter4dARB");
       allclear &= funcTest;
       funcTest = ((glProgramLocalParameter4dvARB = (csGLPROGRAMLOCALPARAMETER4DVARB) gl->GetProcAddress ("glProgramLocalParameter4dvARB")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glProgramLocalParameter4dvARB");
       allclear &= funcTest;
       funcTest = ((glProgramLocalParameter4fARB = (csGLPROGRAMLOCALPARAMETER4FARB) gl->GetProcAddress ("glProgramLocalParameter4fARB")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glProgramLocalParameter4fARB");
       allclear &= funcTest;
       funcTest = ((glProgramLocalParameter4fvARB = (csGLPROGRAMLOCALPARAMETER4FVARB) gl->GetProcAddress ("glProgramLocalParameter4fvARB")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glProgramLocalParameter4fvARB");
       allclear &= funcTest;
       funcTest = ((glGetProgramLocalParameterdvARB = (csGLGETPROGRAMLOCALPARAMETERDVARB) gl->GetProcAddress ("glGetProgramLocalParameterdvARB")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glGetProgramLocalParameterdvARB");
       allclear &= funcTest;
       funcTest = ((glGetProgramLocalParameterfvARB = (csGLGETPROGRAMLOCALPARAMETERFVARB) gl->GetProcAddress ("glGetProgramLocalParameterfvARB")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glGetProgramLocalParameterfvARB");
       allclear &= funcTest;
       if (CS_GL_NV_fragment_program = allclear)
@@ -19195,11 +19199,11 @@ public:
     {
       allclear = true;
       funcTest = ((glPrimitiveRestartNV = (csGLPRIMITIVERESTARTNV) gl->GetProcAddress ("glPrimitiveRestartNV")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glPrimitiveRestartNV");
       allclear &= funcTest;
       funcTest = ((glPrimitiveRestartIndexNV = (csGLPRIMITIVERESTARTINDEXNV) gl->GetProcAddress ("glPrimitiveRestartIndexNV")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", defaultReportMissingEntries))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
         Report ("Failed to retrieve %s", "glPrimitiveRestartIndexNV");
       allclear &= funcTest;
       if (CS_GL_NV_primitive_restart = allclear)
@@ -19264,11 +19268,5 @@ public:
   }
 
 };
-
-#ifdef CS_DEBUG
-    bool csGLExtensionManager::defaultReportMissingEntries = true;
-#else
-    bool csGLExtensionManager::defaultReportMissingEntries = false;
-#endif
 
 #endif // __CS_GLEXTENSIONMANAGER_H__
