@@ -18,6 +18,7 @@
 
 #include "cssysdef.h"
 #include "csutil/datastrm.h"
+#include <ctype.h>
 
 csDataStream::csDataStream (void *buf, int n, bool del) :
   Data ((uint8*)buf), Position (0), Size (n), DeleteBuffer (del)
