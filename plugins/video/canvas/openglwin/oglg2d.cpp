@@ -499,42 +499,17 @@ void csGraphics2DOpenGL::SetRGB(int i, int r, int g, int b)
 
 bool csGraphics2DOpenGL::SetMouseCursor (csMouseCursorID iShape)
 {
-  HCURSOR hCursor;
-
-  if (!m_bHardwareCursor)
-  {
-    SetCursor (NULL);
-    return false;
+  iWin32Assistant* winhelper = CS_QUERY_REGISTRY (object_reg, iWin32Assistant);
+  CS_ASSERT (winhelper != NULL);
+  bool rc;
+  if (!m_bHardwareCursor) {
+    winhelper->SetCursor (csmcNone);
+    rc = false;
+  } else {
+    rc = winhelper->SetCursor (iShape);
   }
-
-  switch (iShape)
-  {
-    case csmcNone:     hCursor = NULL; break;
-    case csmcArrow:    hCursor = LoadCursor (NULL, IDC_ARROW);    break;
-    case csmcMove:     hCursor = LoadCursor (NULL, IDC_SIZEALL);  break;
-    case csmcCross:    hCursor = LoadCursor (NULL, IDC_CROSS);	  break;
-    //case csmcPen:      hCursor = LoadCursor (NULL, IDC_PEN);	  break;
-    case csmcPen:      hCursor = LoadCursor (NULL, MAKEINTRESOURCE(32631));
-    		       break;
-    case csmcSizeNWSE: hCursor = LoadCursor (NULL, IDC_SIZENWSE); break;
-    case csmcSizeNESW: hCursor = LoadCursor (NULL, IDC_SIZENESW); break;
-    case csmcSizeNS:   hCursor = LoadCursor (NULL, IDC_SIZENS);   break;
-    case csmcSizeEW:   hCursor = LoadCursor (NULL, IDC_SIZEWE);   break;
-    case csmcStop:     hCursor = LoadCursor (NULL, IDC_NO);       break;
-    case csmcWait:     hCursor = LoadCursor (NULL, IDC_WAIT);     break;
-    default: hCursor = NULL;		//return false;
-  }
-
-  if (hCursor)
-  {
-    SetCursor (hCursor);
-    return true;
-  }
-  else
-  {
-    SetCursor (NULL);
-    return false;
-  }
+  winhelper->DecRef ();
+  return rc;
 }
 
 bool csGraphics2DOpenGL::SetMousePosition (int x, int y)
