@@ -12,6 +12,12 @@ The history order is reversed so that new features are at the top.
 	      also made to Python module).
 	    - Uncommented the plugin from user.mak.
 	- Oktal fixed a typo and a missing #include in unix/instpath.cpp.
+	- Duhprey did the following (new renderer):
+	    - Added Shadow Volume step for custom renderloop, needs 
+	      speed optimiations
+	    - Modified Light Iterator step to always do stencil write
+	      (should be optimized out later when stencil writes aren't 
+	      needed)
 18-Jun-2003
 	- Jorrit added a new 'do_logo' command to walktest. Assigned 'l' key
 	  to it. This command toggles the display of the logo.
