@@ -13,7 +13,6 @@
 TARGET=unknown
 SYSMAKEFILE=mk/system/unknown.mak
 USE_DLL=yes
-USE_NASM=no
 MODE=optimize
 # The following two symbols are intended to be used in "echo" commands
 # System-dependent makefiles can override them
@@ -58,12 +57,11 @@ else
 	@echo $"  nextstep, openstep, rhapsody, amiga or win32vc with the following modifiers:$"
 endif
 	@echo $"  USE_DLL=yes$|no    Build dynamic/static modules (drivers, plugins)$"
-	@echo $"  USE_NASM=yes$|no   Use NASM/GAS assembly (Intel x86 processors only)$"
 	@echo $"  MODE=optimize$|debug$|profile  Select how to compile everything.$"
 ifdef SYSMODIFIERSHELP
 	@$(SYSMODIFIERSHELP)
 endif
-	@echo $"  Example: make linux USE_DLL=yes USE_NASM=yes MODE=debug$"
+	@echo $"  Example: make linux USE_DLL=yes MODE=debug$"
 	@echo $"+-----------------------------------------------------------------------------+$"
 ifneq ($(PROC),invalid)
 	@$(DRVHELP)
@@ -105,7 +103,6 @@ amiga unknown win32vc:
 	@echo SYSMAKEFILE = mk/system/$@.mak>>config.mak
 	@echo MODE = $(MODE)>>config.mak
 	@echo USE_DLL = $(USE_DLL)>>config.mak
-	@echo USE_NASM = $(USE_NASM)>>config.mak
 	@echo "+==================================================================="
 	@echo "| System-dependent configuration pass."
 	@echo "+==================================================================="
