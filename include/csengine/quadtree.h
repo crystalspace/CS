@@ -126,8 +126,8 @@ private:
     const csBox2& node_bbox, int node_state, node_pos_info *node_pos,
     void* data);
 
-  /** private functions to help dealing with quadtree
-   *  call all four children. Of the node at parent_pos,
+  /** private functions to help dealing with quadtree.
+   *  Call all four children. Of the node at parent_pos,
    *  box is the bounding box of the parent node.
    *  each child will be passed the data.
    *  returns return values of children in retval.
@@ -209,13 +209,13 @@ private:
    *  give children a good value. CS_QUAD_UNKNOWN means the
    *  child's value is unchanged.
    */
-  int propagate_down_func(csQuadTree* pObj, const csBox2& node_bbox,
+  int propagate_func(csQuadTree* pObj, const csBox2& node_bbox,
      int node_state, node_pos_info *node_pos, void* data);
 
   /** Set the state of the node based on states of child nodes.
    * returns new node state, leaves only return their state.
    */
-  int sift_up_func(csQuadTree* pObj, const csBox2& node_bbox,
+  int sift_func(csQuadTree* pObj, const csBox2& node_bbox,
      int node_state, node_pos_info *node_pos, void* data);
 
 public:
@@ -276,21 +276,20 @@ public:
    *  Give depth of the node-plane to test on, the x and y integer node coords
    *  of the topleft corner of the rectangle, and it's width and height.
    *  Returns true if and only if all nodes at that spot are CS_QUAD_FULL.
-   *  Note: You must have called PropagateDown() before using this method.
+   *  Note: You must have called Propagate() before using this method.
    */
   bool TestRectangle(int depth, int x, int y, int w, int h);
 
-  /** Propagate down, makes sure that all nodes in the tree get a value
+  /** Propagate, makes sure that all nodes in the tree get a value
    * repesenting their state. For speed reasons this is not always the case
    * after an InsertPolygon() call.
    */
-  void PropagateDown(void);
+  void Propagate(void);
 
-  /** The leaves must have valid values. The higher level nodes are
-   * given the correct values.
+  /** The leaves must have valid values. The other nodes are
+   *  given correct values.
    */
-  void SiftUp(void);
-  
+  void Sift(void);
 
   
   /** This function will print the quadtree...

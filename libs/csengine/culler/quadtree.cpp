@@ -490,7 +490,7 @@ void csQuadTree :: Print(void)
 }
 
 
-int csQuadTree :: propagate_down_func (csQuadTree* pObj, 
+int csQuadTree :: propagate_func (csQuadTree* pObj, 
   const csBox2& node_bbox, int node_state, node_pos_info *node_pos, void* data)
 {
   int newstate = (int)data;
@@ -499,29 +499,29 @@ int csQuadTree :: propagate_down_func (csQuadTree* pObj,
   else if(node_state == CS_QUAD_FULL || node_state == CS_QUAD_EMPTY)
     newstate = node_state;
   if(node_pos->depth < pObj->max_depth)
-    CallChildren(&csQuadTree::propagate_down_func, pObj, node_bbox, node_pos,
+    CallChildren(&csQuadTree::propagate_func, pObj, node_bbox, node_pos,
     (void*)newstate);
   return 0;
 }
 
 
-void csQuadTree :: PropagateDown(void)
+void csQuadTree :: Propagate(void)
 {
   node_pos_info start_pos;
   start_pos.set_root();
-  propagate_down_func(this, bbox, root_state, &start_pos, 
+  propagate_func(this, bbox, root_state, &start_pos, 
     (void*)CS_QUAD_UNKNOWN);
 }
 
 
-int csQuadTree :: sift_up_func (csQuadTree* pObj, const csBox2& node_bbox, 
+int csQuadTree :: sift_func (csQuadTree* pObj, const csBox2& node_bbox, 
   int node_state, node_pos_info *node_pos, void* data)
 {
   if(node_pos->depth >= pObj->max_depth) // this is a leaf
     return node_state;
   // ask my children what value should me
   int retval[4];
-  CallChildren(&csQuadTree::propagate_down_func, pObj, node_bbox, node_pos,
+  CallChildren(&csQuadTree::sift_func, pObj, node_bbox, node_pos,
     data, retval);
   int newstate = pObj->GetTestPointResult(retval);
   if(node_state != newstate)
@@ -530,11 +530,11 @@ int csQuadTree :: sift_up_func (csQuadTree* pObj, const csBox2& node_bbox,
 }
 
 
-void csQuadTree :: SiftUp(void)
+void csQuadTree :: Sift(void)
 {
   node_pos_info start_pos;
   start_pos.set_root();
-  sift_up_func(this, bbox, root_state, &start_pos, 0);
+  sift_func(this, bbox, root_state, &start_pos, 0);
 }
 
 
