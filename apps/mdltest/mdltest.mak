@@ -46,7 +46,7 @@ endif # ifeq ($(MAKESECTION),postdefines)
 #----------------------------------------------------------------- targets ---#
 ifeq ($(MAKESECTION),targets)
 
-.PHONY: mdltest mdltestclean
+.PHONY: build.mdltest mdltestclean
 
 all: $(MDLTEST.EXE)
 build.mdltest: $(OUTDIRS) $(MDLTEST.EXE)
