@@ -2560,7 +2560,6 @@ iSector* csLoader::ParseSector (char* secname, char* buf)
           iMapNode *n = ParseNode (name, params, sector);
 	  if (n)
 	  {
-            sector->QueryObject ()->ObjAdd (n->QueryObject ());
 	    n->DecRef ();
 	  }
 	  else
