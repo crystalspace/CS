@@ -40,14 +40,11 @@ interface ISystem;
 struct Filter3x3;
 struct Filter5x5;
 
-/**
- * An abstract class implementing an image loader. For every image
- * type supported, a subclass should be created for loading that image
- * type.
- */
-
 class AlphaMapFile: public csObject
 {
+// @@@ FIXME: None of this is implemented anywhere.
+// @@@ FIXME: The COM stuff is completely broken.
+#if 0
 private:
 	int width;
 	int height;
@@ -69,7 +66,14 @@ public:
 	DECLARE_INTERFACE_TABLE(AlphaMapFile)
 	DECLARE_IUNKNOWN()
 	DECLARE_COMPOSITE_INTERFACE(AlphaMapFile)
+#endif
 };
+
+/**
+ * An abstract class implementing an image loader. For every image
+ * type supported, a subclass should be created for loading that image
+ * type.
+ */
 
 class ImageFile : public csObject
 {
