@@ -25,8 +25,6 @@
 #include "isys/system.h"
 #include "qint.h"
 
-CS_IMPLEMENT_PLUGIN
-
 IMPLEMENT_IBASE (csGraphics2DGLCommon)
   IMPLEMENTS_INTERFACE (iPlugIn)
   IMPLEMENTS_INTERFACE (iGraphics2D)
