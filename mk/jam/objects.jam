@@ -53,8 +53,8 @@ rule RegisterHeaderRule
 
 ##  CompileObjects sources
 ##    Compile a set of sourcefiles into objectfiles (extension: SUFOBJ,
-##    usually .o). This rule takes care of setting LOCATE and SEARCH
-##    variables to the $(SEARCH_SOURCE) and $(LOCATE_SOURCE) variables.
+##    usually .o). This rule takes care of setting the SEARCH and LOCATE
+##    variables to the values of $(SEARCH_SOURCE) and $(LOCATE_TARGET).
 ##    The Application, Plugin and Library rules already use this rule
 ##    internally. You should only use this rule if you have to avoid the
 ##    Application, Plugin or Library rules.
