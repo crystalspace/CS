@@ -149,7 +149,7 @@ LINK=gcc
 # Command sequence for creating a directory.
 # Note that directories will have forward slashes. Please
 # make sure that this command accepts that (or use 'subst' first).
-ifneq (,$(findstring command,$(SHELL))$(findstring COMMAND,$(SHELL)))
+ifneq (,$(findstring command,$(SHELL))$(findstring COMMAND,$(SHELL))$(findstring cmd,$(SHELL))$(findstring CMD,$(SHELL)))
   MKDIR = mkdir $(subst /,\,$(@:/=))
 else
   MKDIR = mkdir $@
