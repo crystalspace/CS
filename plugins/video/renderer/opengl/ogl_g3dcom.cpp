@@ -172,6 +172,7 @@ csGraphics3DOGLCommon::csGraphics3DOGLCommon ():
   uv_verts.IncRef ();
   uv_mul_verts.IncRef ();
   color_verts.IncRef ();
+  rgba_verts.IncRef ();
   clipped_triangles.IncRef ();
   clipped_translate.IncRef ();
   clipped_vertices.IncRef ();
@@ -193,6 +194,7 @@ csGraphics3DOGLCommon::~csGraphics3DOGLCommon ()
   uv_verts.DecRef ();
   uv_mul_verts.DecRef ();
   color_verts.DecRef ();
+  rgba_verts.DecRef ();
   clipped_triangles.DecRef ();
   clipped_translate.DecRef ();
   clipped_vertices.DecRef ();

@@ -338,7 +338,8 @@ void csStatLight::LightingFunc (csLightingFunc* callback, void* callback_data)
 
 void csStatLight::RegisterLightMap (csLightMap* lmap)
 {
-  if (dynamic && !lightmaps)
+  if (!dynamic) return;
+  if (!lightmaps)
   {
     num_lightmap = 0;
     lightmaps = new csLightMap* [MAX_NUM_LIGHTMAP];

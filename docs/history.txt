@@ -26,6 +26,9 @@ The history order is reversed so that new features are at the top.
 	- StartPolygonFX and FinishPolygonFX in OpenGL are now empty.
 	  DrawPolygonFX will automatically detect the need for doing
 	  initialization.
+	- Fixed a very small robustness bug in the lighting code.
+	- Fixed a bug in OpenGL renderer. The ref count of rgba_verts
+	  was not properly incremented.
 10-May-2001
 	- Fixed a bug in clipper detection for OpenGL. In some cases it
 	  would select 'N' for the required clipper which is not allowed.
