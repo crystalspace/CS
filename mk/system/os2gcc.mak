@@ -86,9 +86,11 @@ CFLAGS.DLL=
 LFLAGS.GENERAL=-Zmt
 
 # Flags for the linker which are used when optimizing.
-LFLAGS.optimize=-s -Zsmall-conv
+LFLAGS.optimize=-s
 ifeq ($(USE_OMF),yes)
-LFLAGS.optimize+=-Zsys 
+LFLAGS.optimize+=-Zsys -Zsmall-conv
+else
+LFLAGS.optimize+=-Zcrtdll
 endif
 
 # Flags for the linker which are used when debugging.
@@ -108,7 +110,7 @@ ifeq ($(USE_OMF),yes)
   ARFLAGS=cr
   CFLAGS.GENERAL += -Zomf
   LFLAGS.GENERAL += -Zomf
-  NASMFLAGS.SYSTEM=-f obj -DEXTERNC_UNDERSCORE
+  NASMFLAGS.SYSTEM=-f obj
 else
   LIB=.a
   AR=ar
