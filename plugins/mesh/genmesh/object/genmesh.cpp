@@ -132,7 +132,7 @@ csGenmeshMeshObject::csGenmeshMeshObject (csGenmeshMeshObjectFactory* factory)
   ambient_version = 0;
 
 #ifdef CS_USE_NEW_RENDERER
-  csRef<iRender3D> r3d = CS_QUERY_REGISTRY (factory->object_reg, iRender3D);
+  r3d = CS_QUERY_REGISTRY (factory->object_reg, iRender3D);
   shadow_index_buffer = NULL;
   shadow_index_name = r3d->GetStringContainer ()->Request ("indices");
 #endif
@@ -1254,7 +1254,6 @@ void csGenmeshMeshObjectFactory::SetupFactory ()
 
 iRenderBuffer *csGenmeshMeshObjectFactory::GetBuffer (csStringID name)
 {
-  csRef<iRender3D> r3d (CS_QUERY_REGISTRY (object_reg, iRender3D));
   if (name == vertex_name)
   {
     if (mesh_vertices_dirty_flag)

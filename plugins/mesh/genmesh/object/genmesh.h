@@ -77,6 +77,7 @@ private:
   csRenderMesh mesh;
   csRef<iRenderBuffer> shadow_index_buffer;
   csStringID shadow_index_name;
+  csRef<iRender3D> r3d;
 #endif
   csGenmeshMeshObjectFactory* factory;
   iBase* logparent;
