@@ -24,6 +24,15 @@ Short-term cleanups that need to be done:
 	  because of that bug.
 	- Increased size of bsp trees to 150 polygons (instead of 100)
 	  because that seems to give better results.
+	- Eric Sunshine made a few changes to bitset.h.
+	    - Eliminated a bug which 'link' had introduced in revision 1.2.
+	      His change caused 'src' & 'dst' to be incorrectly incremented by
+	      four bytes rather than one byte.
+	    - Should now compile with non-gcc compilers.  Now uses a valid
+	      lvalue everywhere.
+	    - Now compiles on NeXT.  Had to disable assembly for NeXT.
+	    - Fixed names of variables 'src' and 'dst' which were used in a
+	      fashion exactly opposite of their intended meanings.
 24-Feb-2000
 	- Michael Dale Long did various fixes after Andrew's large change.
 	- Wyatt Miler did some fixes to Mac sound drivers.
