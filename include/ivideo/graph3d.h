@@ -153,6 +153,11 @@ struct G3DPolygonDPFX
   UByte flat_color_r;
   UByte flat_color_g;
   UByte flat_color_b;
+
+  // A dummy constructor to appease NextStep compiler which otherwise
+  // complains that it is unable to create this object.  This happens when
+  // a subcomponent such as G3DTexturedVertex has a constructor.
+  G3DPolygonDPFX() {}
 };
 
 /// Structure containing all info needed by DrawFogPolygon (DFP)

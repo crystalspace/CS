@@ -36,6 +36,11 @@ The history order is reversed so that new features are at the top.
 	  in the system driver with this implementation.
 	- Made CS_QUERY_REGISTRY variants safe by putting brackets around
 	  the first argument.
+	- Eric Sunshine added a dummy constructor to G3DPolygonDPFX to pacify
+	  the NextStep compiler which complained that it wasn't able to
+	  instantiate the object.  This problem cropped up when the
+	  subcomponent G3DTexturedVertex was re-derived from csVector2 (which
+	  has a constructor).
 26-Aug-2001
 	- Removed G3DVertex class since this is equivalent to using
 	  csVector2 instead.
