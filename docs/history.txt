@@ -31,6 +31,10 @@ Short-term cleanups that need to be done:
 	  now respect the CS_POLY_LIGHTING flag.  Jorrit provided the
 	  information necessary to make this change.
 	- Eric Sunshine adjusted map2cs to conform to DOS's 8.3 limitation.
+	- Seth Galbrain :-) made more improvements to Squawk v17.
+	- Eric Sunshine fixed a bug in Squawk where it would crash if fewer
+	  than three views were created and the user tried navigating one of
+	  the missing views.
 29-Sep-1999
 	- Added initial code base from Brandon Ehle for the CS scripting
 	  layer.
