@@ -18,7 +18,6 @@ Direct3D.
 * Win32 Quick Start:: Quick Start
 * Win32 Workspace:: Workspace
 * Win32 FAQ:: Frequently Asked Questions (@sc{faq})
-* Win32 Create:: Creating Your Own Application
 @end menu
 
 @node Win32 Quick Start, Win32 Workspace, Win32, Win32
@@ -286,7 +285,7 @@ Test application which implemented multiple views.
 
 @end table
 
-@node Win32 FAQ, Win32 Create, Win32 Workspace, Win32
+@node Win32 FAQ, , Win32 Workspace, Win32
 @subsubsection Frequently Asked Questions (@sc{faq})
 
 This is the list of frequently asked questions for the Win32 port of Crsytal
