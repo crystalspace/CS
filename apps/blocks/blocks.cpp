@@ -821,10 +821,10 @@ void debug_dump ()
 
 void cleanup ()
 {
-  pprintf ("Cleaning up...\n");
+  // pprintf ("Cleaning up...\n");
   CHK (delete view);
   CHK (delete Sys);
-  pprintf_close();              // DAN: this closes the pprintf routine
+  // pprintf_close();              // DAN: this closes the pprintf routine
 }
 
 /*---------------------------------------------------------------------*
