@@ -25,6 +25,15 @@ chronological order.
 	  the code will not be buildable when configured for the new-renderer.
 	  Since the Swig-generated code stored in CVS is generated for the
 	  old-renderer, it should not be built by wksnewrenderer.
+	- Eric Sunshine re-ordered the "!MESSAGE "%project% - Win32 ..." lines
+	  in the msvcgen/template6 project templates so that the "Release" or
+	  "Debug" line is listed last rather than "Release_NR" appearing last.
+	  This was necessary because MSVC6 chooses its default build
+	  configuration by consulting the last such line it finds in the
+	  "active" project, and we want people who use wkstypical, wksall, or
+	  wkswalkall to build with "Release" or "Debug", not with "Release_NR"
+	  (which is reserved for wksnewrenderer).  Defaulting to "Release_NR"
+	  for the project files used by most people was a Bad Thing.
 18-Mar-2004
 	- Anders Stenberg changed the terraformer interface a bit (made Sample
 	  functions return pointers to data instead of filling out supplied

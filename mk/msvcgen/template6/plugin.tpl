@@ -18,10 +18,10 @@ CFG=%project% - Win32 Debug
 !MESSAGE Possible choices for configuration are:
 !MESSAGE 
 !MESSAGE "%project% - Win32 ExtensiveMemDebug" (based on "Win32 (x86) Dynamic-Link Library")
-!MESSAGE "%project% - Win32 Debug" (based on "Win32 (x86) Dynamic-Link Library")
-!MESSAGE "%project% - Win32 Release" (based on "Win32 (x86) Dynamic-Link Library")
 !MESSAGE "%project% - Win32 Debug_NR" (based on "Win32 (x86) Dynamic-Link Library")
 !MESSAGE "%project% - Win32 Release_NR" (based on "Win32 (x86) Dynamic-Link Library")
+!MESSAGE "%project% - Win32 Debug" (based on "Win32 (x86) Dynamic-Link Library")
+!MESSAGE "%project% - Win32 Release" (based on "Win32 (x86) Dynamic-Link Library")
 !MESSAGE 
 
 # Begin Project
