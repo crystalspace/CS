@@ -49,9 +49,9 @@
 #  define GLAPIENTRY
 #endif /* WIN32 / CYGWIN bracket */
 
-#if defined(_WIN32) && !defined(_WINGDI_) && !defined(__CYGWIN__) && !defined(_GNU_H_WINDOWS32_DEFINES) && !defined(OPENSTEP)
-#include <gl/mesa_wgl.h>
-#endif
+//#if defined(_WIN32) && !defined(_WINGDI_) && !defined(__CYGWIN__) && !defined(_GNU_H_WINDOWS32_DEFINES) && !defined(OPENSTEP)
+//#include <gl/mesa_wgl.h>
+//#endif
 
 #if defined(macintosh) && PRAGMA_IMPORT_SUPPORTED
 #pragma import on
