@@ -173,11 +173,15 @@ static inline unsigned int csFastrand ()
 // for some other reason.
 static inline int dist_history ()
 {
-  return 6+(csFastrand () & 0x7);
+  return 9+(csFastrand () & 0x7);
 }
 static inline int dist_nowritequeue ()
 {
-  return 12+(csFastrand () & 0x7);
+  return 15+(csFastrand () & 0x7);
+}
+static inline int dist_nooccluder ()
+{
+  return 8+(csFastrand () & 0x7);
 }
 
 bool csDynaVis::do_cull_frustum = true;
@@ -189,6 +193,9 @@ bool csDynaVis::do_cull_clampoccluder = false;
 bool csDynaVis::do_cull_vpt = true;
 bool csDynaVis::do_cull_outline_splatting = false;	// Fix bug with outlines behind view plane first!!!
 bool csDynaVis::do_insert_inverted_clipper = true;
+bool csDynaVis::do_cull_ignore_bad_occluders = true;
+int csDynaVis::badoccluder_thresshold = 10;
+int csDynaVis::badoccluder_maxsweepcount = 50;
 
 csDynaVis::csDynaVis (iBase *iParent) : visobj_wrappers (1000)
 {
@@ -202,6 +209,7 @@ csDynaVis::csDynaVis (iBase *iParent) : visobj_wrappers (1000)
   model_mgr = new csObjectModelManager ();
   write_queue = new csWriteQueue ();
   current_vistest_nr = 1;
+  badoccluder_sweepcount = 0;
   history_frame_cnt = 2;
   vistest_objects_inuse = false;
 
@@ -293,6 +301,12 @@ bool csDynaVis::Initialize (iObjectRegistry *object_reg)
 
   do_insert_inverted_clipper = config->GetBool (
   	"Culling.Dynavis.InvertedClipper", true);
+  do_cull_ignore_bad_occluders = config->GetBool (
+  	"Culling.Dynavis.IgnoreBadOccluders", true);
+  badoccluder_maxsweepcount = config->GetInt (
+  	"Culling.Dynavis.RetryOccluders", 50);
+  badoccluder_thresshold = config->GetInt (
+  	"Culling.Dynavis.BadOccluderThresshold", 10);
 
   kdtree = new csKDTree ();
 
@@ -439,7 +453,8 @@ void csDynaVis::UpdateObjects ()
 {
   updating = true;
   {
-    csSet<csVisibilityObjectWrapper*>::GlobalIterator it = update_queue.GetIterator ();
+    csSet<csVisibilityObjectWrapper*>::GlobalIterator it = update_queue.
+    	GetIterator ();
     while (it.HasNext ())
     {
       csVisibilityObjectWrapper* vw = it.Next ();
@@ -634,14 +649,25 @@ bool csDynaVis::TestNodeVisibility (csKDTree* treenode,
 #     endif
       // @@@ VPT tracking for nodes!!!
       csTestRectData testrect_data;
+      bool mark_culled_object;
       bool rc = tcovbuf->PrepareTestRectangle (sbox, testrect_data);
-      if (rc) rc = tcovbuf->TestRectangle (testrect_data, min_depth);
+      if (rc)
+      {
+        mark_culled_object = badoccluder_thresshold >= 0;
+        rc = tcovbuf->TestRectangle (testrect_data, min_depth);
+      }
+      else
+      {
+        mark_culled_object = false;
+      }
 
       if (!rc)
       {
         hist->reason = INVISIBLE_TESTRECT;
         hist->no_writequeue_vis_cnt = 0;
         vis = false;
+        if (mark_culled_object)
+          tcovbuf->MarkCulledObject (testrect_data);
         goto end;
       }
 #if DO_WRITEQUEUE_TEST
@@ -676,6 +702,8 @@ bool csDynaVis::TestNodeVisibility (csKDTree* treenode,
 		hist->reason = INVISIBLE_TESTRECT;
 		hist->no_writequeue_vis_cnt = 0;
 	        vis = false;
+		if (mark_culled_object)
+		  tcovbuf->MarkCulledObject (testrect_data);
                 goto end;
 	      }
 	      qobj = (csVisibilityObjectWrapper*)
@@ -698,6 +726,8 @@ bool csDynaVis::TestNodeVisibility (csKDTree* treenode,
           hist->reason = INVISIBLE_TESTRECT;
 	  hist->no_writequeue_vis_cnt = 0;
           vis = false;
+	  if (mark_culled_object)
+	    tcovbuf->MarkCulledObject (testrect_data);
           goto end;
         }
       }
@@ -818,6 +848,12 @@ void csDynaVis::UpdateCoverageBuffer (csVisibilityObjectWrapper* obj)
   csMeshedPolygon* poly = polymesh->GetPolygons ();
   const csPlane3* planes = model->GetPlanes ();
   csVector2 verts2d[64];
+  int modified = 0;
+  csBox2Int occluder_box;
+  occluder_box.minx = 10000;
+  occluder_box.miny = 10000;
+  occluder_box.maxx = -10000;
+  occluder_box.maxy = -10000;
   for (i = 0 ; i < poly_count ; i++, poly++)
   {
     if (planes[i].Classify (campos_object) >= 0.0)
@@ -871,7 +907,9 @@ void csDynaVis::UpdateCoverageBuffer (csVisibilityObjectWrapper* obj)
     }
     if (max_depth > 0.0)
     {
-      tcovbuf->InsertPolygon (verts2d, num_verts, max_depth);
+      int mod = tcovbuf->InsertPolygon (verts2d, num_verts, max_depth,
+      	occluder_box);
+      modified += mod;
 #     ifdef CS_DEBUG
       if (do_state_dump)
       {
@@ -901,7 +939,9 @@ void csDynaVis::UpdateCoverageBuffer (csVisibilityObjectWrapper* obj)
         Perspective (v, verts2d[j], fov, sx, sy);
       }
 
-      tcovbuf->InsertPolygon (verts2d, num_verts, max_depth);
+      int mod = tcovbuf->InsertPolygon (verts2d, num_verts, max_depth,
+      	occluder_box);
+      modified += mod;
 #     ifdef CS_DEBUG
       if (do_state_dump)
       {
@@ -912,6 +952,24 @@ void csDynaVis::UpdateCoverageBuffer (csVisibilityObjectWrapper* obj)
       }
 #     endif
     }
+  }
+  if (modified <= 0)
+  {
+    // This is not a good occluder. It didn't modify the coverage or depth
+    // buffer at all. Disable this occluder for a while.
+    obj->history->no_occluder_vis_cnt = history_frame_cnt + dist_nooccluder ();
+  }
+  else if (badoccluder_thresshold >= 0)
+  {
+    // Remember the amount of already occluded objects in all tiles modified
+    // by this occluder.
+    int idx = occluder_info.Length ();
+    occluder_info.SetLength (idx+1);
+    csOccluderInfo& occinfo = occluder_info[idx];
+    occinfo.obj = obj;
+    occinfo.occluder_box = occluder_box;
+    occinfo.total_notoccluded = tcovbuf->CountNotCulledObjects (
+    	occinfo.occluder_box);
   }
 
 # ifdef CS_DEBUG
@@ -966,11 +1024,31 @@ void csDynaVis::UpdateCoverageBufferOutline (csVisibilityObjectWrapper* obj)
 # endif
 
   // Then insert the outline.
-  tcovbuf->InsertOutline (
+  csBox2Int occluder_box;
+  int modified = tcovbuf->InsertOutline (
   	trans, fov, sx, sy, verts, vertex_count,
   	outline_info.outline_verts,
   	outline_info.outline_edges, outline_info.num_outline_edges,
-	do_cull_outline_splatting);
+	do_cull_outline_splatting,
+	occluder_box);
+  if (modified <= 0)
+  {
+    // This is not a good occluder. It didn't modify the coverage or depth
+    // buffer at all. Disable this occluder for a while.
+    obj->history->no_occluder_vis_cnt = history_frame_cnt + dist_nooccluder ();
+  }
+  else if (badoccluder_thresshold >= 0)
+  {
+    // Remember the amount of already occluded objects in all tiles modified
+    // by this occluder.
+    int idx = occluder_info.Length ();
+    occluder_info.SetLength (idx+1);
+    csOccluderInfo& occinfo = occluder_info[idx];
+    occinfo.obj = obj;
+    occinfo.occluder_box = occluder_box;
+    occinfo.total_notoccluded = tcovbuf->CountNotCulledObjects (
+    	occinfo.occluder_box);
+  }
 # ifdef CS_DEBUG
   if (do_state_dump)
   {
@@ -1173,8 +1251,17 @@ void csDynaVis::TestSinglePolygonVisibility (csVisibilityObjectWrapper* obj,
       printf ("Before single-poly test:\n%s\n", str->GetData ());
     }
 #   endif
+    bool mark_culled_object;
     rc = tcovbuf->PrepareTestRectangle (sbox, testrect_data);
-    if (rc) rc = tcovbuf->TestRectangle (testrect_data, min_depth);
+    if (rc)
+    {
+      mark_culled_object = badoccluder_thresshold >= 0;
+      rc = tcovbuf->TestRectangle (testrect_data, min_depth);
+    }
+    else
+    {
+      mark_culled_object = false;
+    }
 
     if (rc)
     {
@@ -1215,9 +1302,8 @@ void csDynaVis::TestSinglePolygonVisibility (csVisibilityObjectWrapper* obj,
 	      {
 	        // It really is invisible.
 	        obj->MarkInvisible (INVISIBLE_TESTRECT);
-#		if TEST_OCCLUDER_QUALITY
-		tcovbuf->MarkCulledObject (testrect_data);
-#		endif
+		if (mark_culled_object)
+		  tcovbuf->MarkCulledObject (testrect_data);
 	        vis = false;
                 return;
 	      }
@@ -1232,9 +1318,8 @@ void csDynaVis::TestSinglePolygonVisibility (csVisibilityObjectWrapper* obj,
     else
     {
       obj->MarkInvisible (INVISIBLE_TESTRECT);
-#     if TEST_OCCLUDER_QUALITY
-      tcovbuf->MarkCulledObject (testrect_data);
-#     endif
+      if (mark_culled_object)
+        tcovbuf->MarkCulledObject (testrect_data);
       vis = false;
       return;
     }
@@ -1393,8 +1478,17 @@ bool csDynaVis::TestObjectVisibility (csVisibilityObjectWrapper* obj,
       printf ("Before obj test:\n%s\n", str->GetData ());
     }
 #   endif
+    bool mark_culled_object;
     rc = tcovbuf->PrepareTestRectangle (sbox, testrect_data);
-    if (rc) rc = tcovbuf->TestRectangle (testrect_data, min_depth);
+    if (rc)
+    {
+      mark_culled_object = badoccluder_thresshold >= 0;
+      rc = tcovbuf->TestRectangle (testrect_data, min_depth);
+    }
+    else
+    {
+      mark_culled_object = false;
+    }
 
     if (rc)
     {
@@ -1435,9 +1529,8 @@ bool csDynaVis::TestObjectVisibility (csVisibilityObjectWrapper* obj,
 	      {
 	        // It really is invisible.
 	        obj->MarkInvisible (INVISIBLE_TESTRECT);
-#		if TEST_OCCLUDER_QUALITY
-		tcovbuf->MarkCulledObject (testrect_data);
-#		endif
+		if (mark_culled_object)
+		  tcovbuf->MarkCulledObject (testrect_data);
 	        vis = false;
                 goto end;
 	      }
@@ -1452,9 +1545,8 @@ bool csDynaVis::TestObjectVisibility (csVisibilityObjectWrapper* obj,
     else
     {
       obj->MarkInvisible (INVISIBLE_TESTRECT);
-#     if TEST_OCCLUDER_QUALITY
-      tcovbuf->MarkCulledObject (testrect_data);
-#     endif
+      if (mark_culled_object)
+        tcovbuf->MarkCulledObject (testrect_data);
       vis = false;
       goto end;
     }
@@ -1520,19 +1612,27 @@ end:
   {
     if (!obj->hint_badoccluder)
     {
-      // Object is visible.
-      if (do_cull_writequeue)
+      // First test if this occluder is not marked as bad.
+      if (badoccluder_retry)
+        hist->no_occluder_vis_cnt = history_frame_cnt-1;
+
+      if (!do_cull_ignore_bad_occluders ||
+      	hist->no_occluder_vis_cnt <= history_frame_cnt)
       {
-        // We are using the write queue so we insert the object there
-        // for later culling.
-        AppendWriteQueue (obj->visobj, obj->model,
-      	  obj, sbox, min_depth, max_depth);
-      }
-      else
-      {
-        // Let it update the coverage buffer if we
-        // are using cull_coverage.
-        UpdateCoverageBuffer (obj);
+        // Object is visible.
+        if (do_cull_writequeue)
+        {
+          // We are using the write queue so we insert the object there
+          // for later culling.
+          AppendWriteQueue (obj->visobj, obj->model,
+      	    obj, sbox, min_depth, max_depth);
+        }
+        else
+        {
+          // Let it update the coverage buffer if we
+          // are using cull_coverage.
+          UpdateCoverageBuffer (obj);
+        }
       }
     }
   }
@@ -1610,7 +1710,6 @@ bool csDynaVis::VisTest (iRenderView* rview,
 
   UpdateObjects ();
   current_vistest_nr++;
-  history_frame_cnt++;	// Only for history culling.
   cnt_visible = 0;
   cnt_node_visible = 0;
 
@@ -1623,9 +1722,10 @@ bool csDynaVis::VisTest (iRenderView* rview,
   debug_ty = ty;
   debug_by = by;
 
-  fov = float (rview->GetCamera ()->GetFOV ());
-  sx = rview->GetCamera ()->GetShiftX ();
-  sy = rview->GetCamera ()->GetShiftY ();
+  iCamera* camera = rview->GetCamera ();
+  fov = float (camera->GetFOV ());
+  sx = camera->GetShiftX ();
+  sy = camera->GetShiftY ();
   int rb = reduce_buf;
   while (rb)
   {
@@ -1634,7 +1734,32 @@ bool csDynaVis::VisTest (iRenderView* rview,
     sy /= 2.0f;
     rb >>= 1;
   }
-  cam_trans = rview->GetCamera ()->GetTransform ();
+  csVector3 old_camera_pos = cam_trans.GetOrigin ();
+  cam_trans = camera->GetTransform ();
+  float sqdist = csSquaredDist::PointPoint (old_camera_pos,
+  	cam_trans.GetOrigin ());
+  history_frame_cnt++;	// Update for history culling.
+  if (sqdist > .005f)
+  {
+    history_frame_cnt += 2;
+    if (sqdist > 0.1f)
+    {
+      history_frame_cnt += 2;
+      if (sqdist > 0.5f)
+        history_frame_cnt += 5;
+    }
+  }
+
+  // Test if we must retry all bad occluders.
+  if (badoccluder_sweepcount <= history_frame_cnt)
+  {
+    badoccluder_sweepcount += badoccluder_maxsweepcount;
+    badoccluder_retry = true;
+  }
+  else
+  {
+    badoccluder_retry = false;
+  }
 
   // Just keep vis information from last frame.
   if (do_freeze_vis)
@@ -1658,6 +1783,9 @@ bool csDynaVis::VisTest (iRenderView* rview,
 
   // Initialize the write queue to empty.
   write_queue->Initialize ();
+
+  // Clear the list of occluders.
+  occluder_info.SetLength (0);
 
   // If BugPlug is currently showing the debug sector we return here
   // so that all is marked invisible and rendering goes faster.
@@ -1712,6 +1840,28 @@ bool csDynaVis::VisTest (iRenderView* rview,
   data.dynavis = this;
   data.viscallback = viscallback;
   kdtree->Front2Back (data.pos, VisTest_Front2Back, (void*)&data, frustum_mask);
+
+  if (badoccluder_thresshold >= 0)
+  {
+    int i;
+    for (i = 0 ; i < occluder_info.Length () ; i++)
+    {
+      csOccluderInfo& occinfo = occluder_info[i];
+      // Get the total number of occluded objects on all tiles covered by
+      // this occluder.
+      int total_occluded = tcovbuf->CountNotCulledObjects (
+      	occinfo.occluder_box);
+      // Subtract the total number of occluded objects BEFORE this occluder
+      // was used.
+      total_occluded -= occinfo.total_notoccluded;
+      // 'total_occluded' now contains the number of objects that were occluded
+      // on all tiles covered by this occluder. This doesn't mean that this
+      // occluder really helped occlude those objects but it is possible.
+      if (total_occluded < badoccluder_thresshold)
+        occinfo.obj->history->no_occluder_vis_cnt = history_frame_cnt
+      	  + dist_nooccluder ();
+    }
+  }
 
   do_state_dump = false;
 
@@ -2004,7 +2154,6 @@ csPtr<iVisibilityObjectIterator> csDynaVis::VisTest (const csSphere& sphere)
     vistest_objects.DeleteAll ();
   }
 
-
   VisTestSphere_Front2BackData data;
   data.current_vistestnr = current_vistest_nr;
   data.vistest_objects = v;
@@ -2023,7 +2172,6 @@ void csDynaVis::VisTest (const csSphere& sphere,
 {
   UpdateObjects ();
   current_vistest_nr++;
-
 
   VisTestSphere_Front2BackData data;
   data.current_vistestnr = current_vistest_nr;
@@ -2474,7 +2622,7 @@ void csDynaVis::Debug_Dump (iGraphics3D* g3d)
 
     char buf[200];
     sprintf (buf,
-        "FR%c COV%c HIS%c WQ%c VPT%c IS%c CO%c OS%c IC%c #visobj=%d #visnode=%d",
+        "FR%c COV%c HIS%c WQ%c VPT%c IS%c CO%c OS%c IC%c BO%c #visobj=%d #visnode=%d",
         do_cull_frustum ? '+' : '-',
 	do_cull_coverage == COVERAGE_OUTLINE ? 'o' :
 	do_cull_coverage == COVERAGE_POLYGON ? 'p' :
@@ -2486,6 +2634,7 @@ void csDynaVis::Debug_Dump (iGraphics3D* g3d)
 	do_cull_clampoccluder ? '+' : '-',
 	do_cull_outline_splatting ? '+' : '-',
 	do_insert_inverted_clipper ? '+' : '-',
+	do_cull_ignore_bad_occluders ? '+' : '-',
     	cnt_visible, cnt_node_visible);
     g2d->Write (fnt, 10, 5, col_fgtext, col_bgtext, buf);
 
@@ -2780,9 +2929,10 @@ public:
       ol.verts3d[i].Set (ol.verts[i].x, ol.verts[i].y, ol.depth);
     }
     csReversibleTransform trans;
+    csBox2Int modified_bbox;
     tcovbuf->InsertOutline (trans, ol.depth, 0.0, 0.0,
     	ol.verts3d, ol.num_verts, ol.used_verts,
-    	ol.edges, ol.num_edges, false);
+    	ol.edges, ol.num_edges, false, modified_bbox);
   }
 
   virtual void Render (iGraphics3D* g3d, iBugPlug* bugplug)
@@ -2890,6 +3040,14 @@ bool csDynaVis::Debug_DebugCommand (const char* cmd)
       csReport(object_reg, CS_REPORTER_SEVERITY_NOTIFY, "crystalspace.dynavis",
     	"BugPlug not found!");
     }
+    return true;
+  }
+  else if (!strcmp (cmd, "toggle_ignorebadoccluder"))
+  {
+    do_cull_ignore_bad_occluders = !do_cull_ignore_bad_occluders;
+    csReport (object_reg, CS_REPORTER_SEVERITY_NOTIFY, "crystalspace.dynavis",
+    	"%s ignoring of bad occluders!",
+	do_cull_clampoccluder ? "Enabled" : "Disabled");
     return true;
   }
   else if (!strcmp (cmd, "toggle_clampoccluder"))

@@ -38,7 +38,7 @@
 #define TILECOL_EMPTY 0
 #define TILECOL_FULL ((uint32)~0)
 
-#define TEST_OCCLUDER_QUALITY 0
+#define TEST_OCCLUDER_QUALITY 1
 
 typedef uint32 csTileCol;
 
@@ -50,6 +50,14 @@ class csBox2Int
 public:
   int minx, miny;
   int maxx, maxy;
+  csBox2Int& operator+= (const csBox2Int& box)
+  {
+    if (box.minx < minx) minx = box.minx;
+    if (box.miny < miny) miny = box.miny;
+    if (box.maxx > maxx) maxx = box.maxx;
+    if (box.maxy > maxy) maxy = box.maxy;
+    return *this;
+  }
 };
 
 /**
@@ -146,10 +154,8 @@ private:
   // precalculate them.
   static void MakePrecalcTables ();
 
-#if TEST_OCCLUDER_QUALITY
   // Count how many objects were occluded away that covered this tile.
   int objects_culled;
-#endif
 
 public:
   csCoverageTile () :
@@ -177,9 +183,7 @@ public:
   {
     queue_tile_empty = true;
     tile_full = false;
-#if TEST_OCCLUDER_QUALITY
     objects_culled = 0;
-#endif
   }
 
 #define INIT_MIN_DEPTH     999999999.0f
@@ -196,9 +200,7 @@ public:
     memset (depth, 0, sizeof (float)*NUM_DEPTH);
     tile_min_depth = INIT_MIN_DEPTH;
     tile_max_depth = 0;
-#if TEST_OCCLUDER_QUALITY
     objects_culled = 0;
-#endif
   }
 
   /**
@@ -212,9 +214,7 @@ public:
     memset (depth, 0, sizeof (float)*NUM_DEPTH);
     tile_min_depth = INIT_MIN_DEPTH;
     tile_max_depth = 0;
-#if TEST_OCCLUDER_QUALITY
     objects_culled = 0;
-#endif
   }
 
   /**
@@ -542,16 +542,19 @@ public:
    * Insert a polygon in the coverage buffer.
    * This function will not do any backface culling and it will work
    * perfectly in all orientations. Polygon has to be convex.
-   * It will update the screen buffer.
+   * It will update the screen buffer. 'modified_bbox' will be updated to
+   * contain the union of the previous contents of 'modified_bbox' and also
+   * the screen space box that was modified by this function.
    * <p>
-   * If this function returns false it means that the coverage buffer
-   * wasn't modified which means the object is not visible.
+   * If this function returns the number of tiles that were modified.
    */
-  bool InsertPolygon (csVector2* verts, int num_verts, float max_depth);
+  int InsertPolygon (csVector2* verts, int num_verts, float max_depth,
+  	csBox2Int& modified_bbox);
 
   /**
    * Insert an outline in the coverage buffer.
-   * It will update the screen buffer.
+   * It will update the screen buffer. 'bbox' will contain the screen
+   * space box that was modified by this function.
    * Function returns false if outline was not visible (i.e.
    * screen buffer was not modified).
    * The given array of edges is an array of two integers (vertex indices)
@@ -559,13 +562,13 @@ public:
    * The 'used_verts' contains true for all vertices that are used.
    * If 'splat_outline' is true then outline splatting is used.
    * <p>
-   * If this function returns false it means that the coverage buffer
-   * wasn't modified which means the object is not visible.
+   * If this function returns the number of tiles that were modified.
    */
-  bool InsertOutline (const csReversibleTransform& trans,
+  int InsertOutline (const csReversibleTransform& trans,
   	float fov, float sx, float sy, csVector3* verts, int num_verts,
   	bool* used_verts,
-  	int* edges, int num_edges, bool splat_outline);
+  	int* edges, int num_edges, bool splat_outline,
+	csBox2Int& modified_bbox);
 
   /**
    * Prepare data for TestRectangle. If this returns false you have
@@ -591,13 +594,17 @@ public:
    */
   bool QuickTestRectangle (const csTestRectData& data, float min_depth);
 
-#if TEST_OCCLUDER_QUALITY
   /**
    * Mark the given rectangle as being culled away. For every
    * affected tile this will increase the objects_culled field.
    */
   void MarkCulledObject (const csTestRectData& data);
-#endif
+
+  /**
+   * Count the number of objects that were already culled away previously
+   * for the given rectangle.
+   */
+  int CountNotCulledObjects (const csBox2Int& bbox);
 
   /**
    * Prepare a write queue test for the given rectangle. This returns the
