@@ -332,12 +332,6 @@ void csTextureHandleSoftware::remap_texture ()
   }
 }
 
-iGraphics3D *csTextureHandleSoftware::GetProcTextureInterface ()
-{
-  // REMOVE @@@
-  return NULL;
-}
-
 void csTextureHandleSoftware::Prepare ()
 {
   CreateMipmaps ();

@@ -600,12 +600,6 @@ bool csTextureHandleOpenGL::GetMipMapDimensions (int mipmap, int &w, int &h)
   return false;
 }
 
-iGraphics3D *csTextureHandleOpenGL::GetProcTextureInterface ()
-{
-  // @@@ REMOVE!
-  return NULL;
-}
-
 void csTextureHandleOpenGL::Prepare ()
 {
   InitTexture (txtmgr, &txtmgr->pfmt);

@@ -155,11 +155,6 @@ public:
   virtual void *GetPrivateObject ()
   { return (csTextureHandle *)this; }
 
-  virtual iGraphics3D *GetProcTextureInterface ()
-  { return NULL; }
-
-  virtual void ProcTextureSync () {};
-
   /**
    * Query if the texture has an alpha channel.<p>
    * This depends both on whenever the original image had an alpha channel

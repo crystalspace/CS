@@ -26,7 +26,7 @@
 
 struct iGraphics3D;
 
-SCF_VERSION (iTextureHandle, 2, 1, 1);
+SCF_VERSION (iTextureHandle, 2, 2, 1);
 
 /**
  * A texture handle as returned by iTextureManager.
@@ -83,22 +83,6 @@ struct iTextureHandle : public iBase
    * For internal usage by the 3D driver.
    */
   virtual void *GetPrivateObject () = 0;
-
-  /**
-   * If the texture handle was created with as a procedural texture, this
-   * function returns an iGraphics3D interface to a texture buffer which
-   * can be used in the  same way as a frame buffer based iGraphics3D.
-   * This interface only becomes available once the texture has been
-   * prepared by the texture manager.
-   */
-  virtual iGraphics3D *GetProcTextureInterface () = 0;
-
-  /**
-   * If this is a procedural texture with mip-mapping on sync enabled, call
-   * this function to update its mip maps when required.  (Currently
-   * unimplemented)
-   */
-  virtual void ProcTextureSync () = 0;
 
   /**
    * Query if the texture has an alpha channel.<p>

@@ -155,8 +155,6 @@ public:
 
   /// Get the csTextureHandle object associated with the texture handle
   virtual void *GetPrivateObject ()               { return (csTextureHandle *)this; }
-  virtual iGraphics3D *GetProcTextureInterface () { return NULL; }
-  virtual void ProcTextureSync ()                 { };
 
   /**
    * Query if the texture has an alpha channel.<p>

@@ -217,9 +217,6 @@ public:
    * before using any texture.
    */
   virtual void Prepare ();
-
-  /// Return the interfaces to the procedural texture buffer
-  virtual iGraphics3D *GetProcTextureInterface ();
 };
 
 /**

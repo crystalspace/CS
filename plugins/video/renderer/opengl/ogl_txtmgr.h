@@ -111,8 +111,6 @@ public:
   void ComputeMeanColor (int w, int h, csRGBpixel *src);
   virtual void CreateMipmaps ();
 
-  /// Returns dynamic texture interface if any.
-  virtual iGraphics3D *GetProcTextureInterface ();
   /// Prepare the texture for usage
 
   virtual void Prepare ();

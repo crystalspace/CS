@@ -1,11 +1,14 @@
 The history order is reversed so that new features are at the top.
 
+17-Oct-2002
+	- Removed a few additional procedural texture functions from the
+	  iGraphics3D/iGraphics2D interfaces.
 16-Oct-2002
 	- Keith Fulton added definitions and initial implementations for
 	  iSharedVariable, iSharedVariableList and iImposter.  iEngine now
 	  keeps an iSharedVariableList, and csMeshWrapper implements iImposter,
- 	  which uses iSharedVariable. See new flarge for examples of definitions
-	  of both.
+ 	  which uses iSharedVariable. See new flarge for examples of
+	  definitions of both.
 	- csProcTexture is now able to use the new SetRenderTarget() system.
 	  And it seems to work fine. Converted all current proc textures
 	  that inherit from csProcTexture to the new system.
