@@ -19,14 +19,8 @@ ifeq ($(MAKESECTION),roottargets)
 
 all plugins drivers drivers3d: soft
 
-ifeq ($(USE_SHARED_PLUGINS),yes)
 soft:
 	$(MAKE_TARGET) MAKE_DLL=yes
-else
-soft:
-	$(MAKE_TARGET) MAKE_DLL=no
-endif
-
 softclean:
 	$(MAKE_CLEAN)
 
