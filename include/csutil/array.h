@@ -316,8 +316,8 @@ private:
 
 public:
   /**
-   * The default comparison function searching and sorting; assumes that both
-   * elements are of the same type, and that they can be compared with < and >.
+   * The default comparison function for searching; assumes that both elements
+   * are of the same type, and that they can be compared with < and >.
    */
   static int DefaultCompare (T const &item1, T const &item2)
   {
