@@ -13,7 +13,7 @@ have any questions or problems, contact him at @email{rbate@@mac.com}.
 This port of Crystal Space is based upon the pre-Carbon Macintosh Toolbox API.
 Because it utilizes the classic Macintosh API it is suitable for MacOS/9 as
 well as possibly earlier releases.  This port of Crystal Space will not work on
-MacOS/X since it is not Carbon-compatible
+MacOS/X since it is not Carbon-compatible.
 
 You will need the following to compile Crystal Space:
 

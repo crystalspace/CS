@@ -1,17 +1,17 @@
 @c -*-texinfo-*-
-@node MingW, NeXT, MSVC, Platform Instructions
-@subsection Windows using MingW
+@node MinGW, NeXT, MSVC, Platform Instructions
+@subsection Windows using MinGW
 
 @noindent
 @emph{Philip Wyett @email{philipwyett@@dsl.pipex.com}.}
 @noindent
 @emph{Last updated October 13, 2001}
 
-These instructions are for building Crystal Space with Mingw---a @sc{gnu}
+These instructions are for building Crystal Space with MinGW---a @sc{gnu}
 compiler for Windows.  There are many different versions of the @sc{gnu}
 Windows compiler and problems arise with some Windows header files
 containing non-standard code used by Microsoft, so we recommend
-the Mingw compiler which is currently best supported by Crystal Space.
+the MinGW compiler which is currently best supported by Crystal Space.
 
 @subsubheading Necessary Resources
 
@@ -19,8 +19,8 @@ Download the following packages:
 
 @itemize @bullet
 @item
-Crystal Space MingW package @file{cs_mingw_0.70.exe} from the Mingw32 support
-directory at Linux Games.  This package contains all the recent MingW package
+Crystal Space MinGW package @file{cs_mingw_0.70.exe} from the Mingw32 support
+directory at Linux Games.  This package contains all the recent MinGW package
 releases (i.e. all the files necessary to compile Crystal Space successfully).
 
 @noindent
@@ -46,12 +46,12 @@ Follow these instructions to install the packages which you downloaded.
 
 @itemize @bullet
 @item
-First install the Mingw compiler.  The file is a self extracting executable and
+First install the MinGW compiler.  The file is a self extracting executable and
 will create the @file{mingw32} directory for you.  So if you wish to install it
 to your @file{C:\} drive as @file{C:\mingw32\}, extract the archive to
 @file{C:\}.
 
-The following instructions assume the Mingw package is installed in
+The following instructions assume the MinGW package is installed in
 @file{C:\mingw32}.
 
 @item

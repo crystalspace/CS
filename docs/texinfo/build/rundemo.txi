@@ -5,8 +5,8 @@
 @cindex Quick Start
 
 Once you have built the Crystal Space system and its demonstration applications
-you may be eager to test them out.  This section will give you the opprtunity
-to do so without forcing you to wade through an over-abundance of explanations.
+you may be eager to test them out.  This section will give you the opportunity
+to do so without forcing you to wade through an overabundance of explanations.
 Later sections will describe options and applications in more detail, but
 for now, sit back and have some fun.
 
