@@ -807,7 +807,7 @@ bool csPolygon3D::ClipToPlane (csPlane* portal_plane, const csVector3& v_w2c,
   cnt_vis = 0;
   for (i = 0 ; i < num_vertices ; i++)
   {
-    vis[i] = csMath3::Visible(Vcam(i), *portal_plane);
+    vis[i] = csMath3::Visible (Vcam (i), *portal_plane);
     if (vis[i]) cnt_vis++;
   }
 

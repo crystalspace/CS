@@ -108,6 +108,7 @@ bool csPortalCS::Draw (csPolygon2D* new_clipper, csPlane* portal_plane, bool loo
     WarpSpace (new_rview, mirror);
     new_rview.SetMirrored (mirror);
   }
+
   sector->Draw (new_rview);
 
   return true;
@@ -142,6 +143,10 @@ void csPortalCS::CalculateLighting (csLightView& lview)
   if (lview.light_frustrum)
     CHKB (new_lview.light_frustrum = new csFrustrum (*lview.light_frustrum));
 
+  // If copied_frustrums is true we copied the frustrums and we need to delete them
+  // later.
+  bool copied_frustrums = false;
+
   if (do_warp_space)
   {
     new_lview.light_frustrum->Transform (&warp_wor);
@@ -166,6 +171,7 @@ void csPortalCS::CalculateLighting (csLightView& lview)
       }
       sf = sf->next;
     }
+    copied_frustrums = true;
     new_lview.shadows.Transform (&warp_wor);
 
     if (cfg_alpha)
@@ -194,10 +200,31 @@ void csPortalCS::CalculateLighting (csLightView& lview)
     if (new_lview.r < SMALL_EPSILON && new_lview.g < SMALL_EPSILON && new_lview.b < SMALL_EPSILON)
       return;
   }
+  else if (lview.shadows.GetFirst ())
+  {
+    // There is no space warping. In this case we still want to
+    // remove all non-relevant shadow frustrums if there are any.
+    // We know that csPolygon3D::CalculateLighting() called
+    // csPolygon3D::MarkRelevantShadowFrustrums() some time before
+    // calling this function so the 'relevant' flags are still valid.
+    new_lview.shadows.Clear ();	// Don't delete elements.
+    csShadowFrustrum* sf, * copy_sf;
+    sf = lview.shadows.GetFirst ();
+    while (sf)
+    {
+      if (sf->relevant)
+      {
+        CHK (copy_sf = new csShadowFrustrum (*sf));
+        new_lview.shadows.AddLast (copy_sf);
+      }
+      sf = sf->next;
+    }
+    copied_frustrums = true;
+  }
 
   sector->CalculateLighting (new_lview);
 
-  if (do_warp_space)
+  if (copied_frustrums)
   {
     // Delete all copied frustrums.
     new_lview.shadows.DeleteFrustrums ();
