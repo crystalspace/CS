@@ -122,7 +122,7 @@ CLASS_DIAGRAMS         = YES
 # If the SOURCE_BROWSER tag is set to YES then a list of source files will 
 # be generated. Documented entities will be cross-referenced with these sources. 
 
-SOURCE_BROWSER         = NO
+SOURCE_BROWSER         = YES
 
 # Setting the INLINE_SOURCES tag to YES will include the body 
 # of functions and classes directly in the documentation. 
@@ -360,14 +360,14 @@ ALPHABETICAL_INDEX     = YES
 # the COLS_IN_ALPHA_INDEX tag can be used to specify the number of columns 
 # in which this list will be split (can be a number in the range [1..20]) 
 
-COLS_IN_ALPHA_INDEX    = 5
+COLS_IN_ALPHA_INDEX    = 3
 
 # In case all classes in a project start with a common prefix, all 
 # classes will be put under the same header in the alphabetical index. 
 # The IGNORE_PREFIX tag can be used to specify one or more prefixes that 
 # should be ignored while generating the index headers. 
 
-IGNORE_PREFIX          = 
+IGNORE_PREFIX          = cs i aws scf
 
 #---------------------------------------------------------------------------
 # configuration options related to the HTML output
