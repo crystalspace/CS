@@ -70,7 +70,7 @@ DEP.CSLUA = CSGEOM CSSYS CSUTIL CSSYS
 MSVC.DSP += CSLUA
 DSP.CSLUA.NAME = cslua
 DSP.CSLUA.TYPE = plugin
-DSP.CSLUA.LIBS = lua lualib
+DSP.CSLUA.LIBS = lua lualib lauxlib luaswig40
 DSP.CSLUA.RESOURCES = $(SWIG.INTERFACE)
 
 endif # ifeq ($(MAKESECTION),postdefines)
