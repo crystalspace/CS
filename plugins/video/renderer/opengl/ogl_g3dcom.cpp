@@ -53,6 +53,7 @@
 #include "csutil/cscolor.h"
 #include "csgfx/rgbpixel.h"
 #include "qsqrt.h"
+#include <GL/glext.h>
 
 // uncomment the 'USE_MULTITEXTURE 1' define to enable code for
 // multitexture support - this is independent of the extension detection,
@@ -71,7 +72,6 @@
 // directory and mangle the file 'ext/ext_auto.inc'
 // to access your extension code
 #if USE_EXTENSIONS
-#include <GL/glext.h>
 #include "ext/ext_auto.inc"
 #else
 void csGraphics3DOGLCommon::DetectExtensions() {}
