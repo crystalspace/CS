@@ -132,13 +132,29 @@ bool ViewMesh::HandleEvent (iEvent& ev)
       switch(ev.Command.Code)
       {
 	case VIEWMESH_COMMAND_LOADMESH:
+	{
+	  if (menu)
 	  {
-	    if (dialog)
-	      delete dialog;
-  	    dialog= csFileDialog (this, "Select Mesg Object");
-  	    StartModal (dialog, NULL);
-  	    return true;
+	    delete menu;
+	    menu=NULL;
 	  }
+      	  if (dialog)
+	    delete dialog;
+	  dialog= csFileDialog (this, "Select Mesg Object");
+	  StartModal (dialog, NULL);
+	  return true;
+	}
+	case cscmdStopModal:
+	{
+	  char filename[1024];
+	  csQueryFileDialog (dialog, filename, sizeof(filename));
+	  delete dialog;
+	  dialog = NULL;
+	  if (!LoadSprite(filename,1))
+	  {
+	    Printf (CS_REPORTER_SEVERITY_ERROR, "couldn't load mesh");
+	  }
+	}
 	default:
 	  break;
       }
@@ -146,6 +162,32 @@ bool ViewMesh::HandleEvent (iEvent& ev)
   }
  
   return false; 
+}
+
+bool ViewMesh::LoadSprite(const char *filename,float scale)
+{
+  iMeshFactoryWrapper *imeshfact = loader->LoadMeshObjectFactory (filename);
+
+  if (!imeshfact)
+    return false;
+
+  iMeshWrapper *sprite = engine->CreateMeshWrapper(
+      imeshfact, "MySprite", room,
+      csVector3 (0, 10, 0));
+  csMatrix3 m; m.Identity(); m *= scale;
+  sprite->GetMovable()->GetTransform();
+  sprite->GetMovable()->UpdateMove();
+  iSprite3DState *spstate = SCF_QUERY_INTERFACE(sprite->GetMeshObject(),
+      iSprite3DState);
+  if (spstate)
+  {
+    spstate->SetAction("default");
+    spstate->DecRef();
+  }
+  imeshfact->DecRef();
+  sprite->DeferUpdateLighting (CS_NLIGHT_DYNAMIC|CS_NLIGHT_STATIC, 10);
+
+  return true;
 }
 
 void ViewMesh::Draw()
@@ -158,19 +200,22 @@ void ViewMesh::Draw()
   // Now rotate the camera according to keyboard state
   float speed = (elapsed_time / 1000.0) * (0.03 * 20);
 
-  iCamera* c = view->GetCamera();
-  if (GetKeyState (CSKEY_RIGHT))
-    c->GetTransform ().RotateThis (VEC_ROT_RIGHT, speed);
-  if (GetKeyState (CSKEY_LEFT))
-    c->GetTransform ().RotateThis (VEC_ROT_LEFT, speed);
-  if (GetKeyState (CSKEY_PGUP))
-    c->GetTransform ().RotateThis (VEC_TILT_UP, speed);
-  if (GetKeyState (CSKEY_PGDN))
-    c->GetTransform ().RotateThis (VEC_TILT_DOWN, speed);
-  if (GetKeyState (CSKEY_UP))
-    c->Move (VEC_FORWARD * 4 * speed);
-  if (GetKeyState (CSKEY_DOWN))
-    c->Move (VEC_BACKWARD * 4 * speed);
+  if (!dialog && !menu)
+  {
+    iCamera* c = view->GetCamera();
+    if (GetKeyState (CSKEY_RIGHT))
+      c->GetTransform ().RotateThis (VEC_ROT_RIGHT, speed);
+    if (GetKeyState (CSKEY_LEFT))
+      c->GetTransform ().RotateThis (VEC_ROT_LEFT, speed);
+    if (GetKeyState (CSKEY_PGUP))
+      c->GetTransform ().RotateThis (VEC_TILT_UP, speed);
+    if (GetKeyState (CSKEY_PGDN))
+      c->GetTransform ().RotateThis (VEC_TILT_DOWN, speed);
+    if (GetKeyState (CSKEY_UP))
+      c->Move (VEC_FORWARD * 4 * speed);
+    if (GetKeyState (CSKEY_DOWN))
+      c->Move (VEC_BACKWARD * 4 * speed);
+  }
     
   csApp::Draw();
   pplBeginDraw(CSDRAW_3DGRAPHICS);
@@ -356,33 +401,11 @@ bool ViewMesh::Initialize ()
   }
 
   // Load a sprite template from disk.
-  if (meshfilename)
+  if (meshfilename && !LoadSprite(meshfilename,scale))
   {
-    iMeshFactoryWrapper* imeshfact = loader->LoadMeshObjectFactory (
-  	  meshfilename);
-    if (imeshfact == NULL)
-    {
-      Printf (CS_REPORTER_SEVERITY_ERROR,
-        "Error loading mesh object factory '%s'!", meshfilename);
-      return false;
-    }
-
-    // Add the sprite to the engine.
-    iMeshWrapper* sprite = engine->CreateMeshWrapper (
-  	imeshfact, "MySprite", room,
-	csVector3 (0, 10, 0));
-    csMatrix3 m; m.Identity (); m *= scale;
-    sprite->GetMovable ()->SetTransform (m);
-    sprite->GetMovable ()->UpdateMove ();
-    iSprite3DState* spstate = SCF_QUERY_INTERFACE (sprite->GetMeshObject (),
-  	iSprite3DState);
-    if (spstate)
-    {
-      spstate->SetAction ("default");
-      spstate->DecRef ();
-    }
-    imeshfact->DecRef ();
-    sprite->DeferUpdateLighting (CS_NLIGHT_STATIC|CS_NLIGHT_DYNAMIC, 10);
+    Printf (CS_REPORTER_SEVERITY_ERROR,
+    	"Error loading mesh object factory '%s'!", meshfilename);
+    return false;
   }
 
   return true;

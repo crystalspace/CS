@@ -49,6 +49,8 @@ public:
   ViewMesh (iObjectRegistry *object_reg, csSkin &Skin);
   virtual ~ViewMesh ();
 
+  bool LoadSprite(const char *filename,float scale);
+
   virtual bool Initialize ();
   virtual bool HandleEvent (iEvent&);
   virtual void Draw();
