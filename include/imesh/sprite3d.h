@@ -375,6 +375,10 @@ struct iSprite3DState : public iBase
    * Returns true if lod is enabled, else false.
    */
   virtual bool IsLodEnabled () = 0;
+
+  virtual void GetBaseColor (csColor& col) = 0;
+
+  virtual void SetBaseColor (const csColor& col) = 0;
 };
 
 #endif
