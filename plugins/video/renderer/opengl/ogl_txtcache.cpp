@@ -808,44 +808,11 @@ void OpenGLLightmapCache::Cache (iPolygonTexture *polytex)
     //clm->Source = piLM;
     Load (clm);
     float lm_low_u, lm_low_v, lm_high_u, lm_high_v;
+   
     polytex->GetTextureBox (lm_low_u, lm_low_v, lm_high_u, lm_high_v);
 
-#if 0
-    // @@@ Experiment to try to get the lightmap mapped correctly
-    // on the texture.
-    if (lm_high_u <= lm_low_u)
-      clm->lm_scale_u = 1.;       // @@@ Is this right?
-    else
-      clm->lm_scale_u = 1. / (lm_high_u - lm_low_u);
-
-    if (lm_high_v <= lm_low_v)
-      clm->lm_scale_v = 1.;       // @@@ Is this right?
-    else
-      clm->lm_scale_v = 1. / (lm_high_v - lm_low_v);
-
-    lm_low_u -= 0.5 / (float (lmwidth) * clm->lm_scale_u);
-    lm_low_v -= 0.5 / (float (lmheight) * clm->lm_scale_v);
-    //lm_low_u -= .06;
-    //lm_low_v -= .06;
-    //clm->lm_scale_u *= .96;
-    //clm->lm_scale_v *= .96;
-
-    // Calculate position in super texture.
-    float dlm = 1. / float (super_lm_size);
-    float sup_u = float (clm->super_lm_rect.xmin) * dlm;
-    float sup_v = float (clm->super_lm_rect.ymin) * dlm;
-    clm->lm_scale_u = clm->lm_scale_u * float (lmwidth-1) * dlm;
-    clm->lm_scale_v = clm->lm_scale_v * float (lmheight-1) * dlm;
-    clm->lm_offset_u = lm_low_u - sup_u / clm->lm_scale_u;
-    clm->lm_offset_v = lm_low_v - sup_v / clm->lm_scale_v;
-#else
     // lightmap fudge factor
-
-    
-    lm_low_u -= 0.125;
-    lm_low_v -= 0.125;
-    lm_high_u += 0.125;
-    lm_high_v += 0.125;
+ 
 
     if (lm_high_u <= lm_low_u)
       clm->lm_scale_u = 1.;       // @@@ Is this right?
@@ -857,15 +824,25 @@ void OpenGLLightmapCache::Cache (iPolygonTexture *polytex)
     else
       clm->lm_scale_v = 1. / (lm_high_v - lm_low_v);
 
-    // Calculate position in super texture.
+	  lm_low_u -= .75 / (double (lmwidth) * clm->lm_scale_u);
+	  lm_high_u += .75 / (double (lmwidth) * clm->lm_scale_u);
+
+    lm_low_v -= .75 / (double (lmheight) * clm->lm_scale_v);
+	  lm_high_v += .75 / (double (lmheight) * clm->lm_scale_v);
+
+  	clm->lm_scale_u = 1.00 / (lm_high_u - lm_low_u);
+	  clm->lm_scale_v = 1.00 / (lm_high_v - lm_low_v);
+
+	  // We take 95% of the total
+	  // Calculate position in super lightmap.
     float dlm = 1. / float (super_lm_size);
     float sup_u = float (clm->super_lm_rect.xmin) * dlm;
     float sup_v = float (clm->super_lm_rect.ymin) * dlm;
     clm->lm_scale_u = clm->lm_scale_u * float (lmwidth) * dlm;
     clm->lm_scale_v = clm->lm_scale_v * float (lmheight) * dlm;
-    clm->lm_offset_u = lm_low_u - sup_u / clm->lm_scale_u;
-    clm->lm_offset_v = lm_low_v - sup_v / clm->lm_scale_v;
-#endif
+    
+	  clm->lm_offset_u = lm_low_u - sup_u / clm->lm_scale_u;
+	  clm->lm_offset_v = lm_low_v - sup_v / clm->lm_scale_v;
   }
 }
 
