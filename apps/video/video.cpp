@@ -31,6 +31,7 @@
 #include "ivideo/graph3d.h"
 #include "ivideo/txtmgr.h"
 #include "ivaria/conout.h"
+#include "imap/parser.h"
 
 //------------------------------------------------- We need the 3D engine -----
 
