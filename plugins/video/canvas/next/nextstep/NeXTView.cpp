@@ -1,6 +1,6 @@
 //=============================================================================
 //
-//	Copyright (C)1999 by Eric Sunshine <sunshine@sunshineco.com>
+//	Copyright (C)1999,2000 by Eric Sunshine <sunshine@sunshineco.com>
 //
 // The contents of this file are copyrighted by Eric Sunshine.  This work is
 // distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
@@ -9,15 +9,16 @@
 // copyright notice is retained.  Send comments to <sunshine@sunshineco.com>.
 //
 //=============================================================================
-#import "NeXTView.h"
-#import "NeXTDelegate.h"
+#include "sysdef.h"
+#include "NeXTView.h"
+#include "NeXTDelegate.h"
 extern "Objective-C" {
 #import <appkit/Application.h>
 #import <appkit/NXBitmapImageRep.h>
 }
 extern "C" {
-#import <assert.h>
-#import <limits.h>	// CHAR_BIT
+#include <assert.h>
+#include <limits.h>	// CHAR_BIT
 }
 
 //=============================================================================

@@ -1,6 +1,6 @@
 //=============================================================================
 //
-//	Copyright (C)1999 by Eric Sunshine <sunshine@sunshineco.com>
+//	Copyright (C)1999,2000 by Eric Sunshine <sunshine@sunshineco.com>
 //
 // The contents of this file are copyrighted by Eric Sunshine.  This work is
 // distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
@@ -16,6 +16,7 @@
 //	a raw Crystal Space frame buffer into a NeXT format frame buffer.
 //
 //-----------------------------------------------------------------------------
+#include "sysdef.h"
 #include "NeXTFrameBuffer.h"
 extern "Objective-C" {
 #import <Foundation/NSZone.h>
