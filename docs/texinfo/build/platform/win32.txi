@@ -171,10 +171,10 @@ After a while the compilation should finish without errors.
 @subsubsection Running the Demonstration Applications
 
 The first app you should try is @emph{Walktest}. This program shows many of
-the features of the 3d engine. You can run it either by starting it from the
-windows explorer (it should be at @file{.../cs/walktest.exe}, or you can
-select Walktest as the active project and then select
-@emph{Build/Execute walktest.exe}.
+the features of the 3d engine. You can run it by starting it from the windows
+explorer. It should be at @file{.../cs/walktest.exe}. Don't start it from
+other locations or from within Visual Studio. It won't find the required
+files if you do.
 
 If you want to run a debug session, you first have to set the working
 directory. Open @emph{Project/Settings}, select the appWalktest project,
