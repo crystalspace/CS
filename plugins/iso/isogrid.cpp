@@ -391,16 +391,17 @@ void csIsoGrid::GetFakeLights(const csVector3& pos, iLight **& flights,
   num = 0;
   int l;
 
+  int visx = QInt( (pos.z - float(mingridx) )*groundmap->GetMultX());
+  int visy = QInt( (pos.x - float(mingridy) )*groundmap->GetMultY());
+
   for(l=0; l<lights.Length(); l++)
   {
-    if(((iIsoLight*)(lights[l]))->GetVis(
-      QInt(pos.z)-mingridx, QInt(pos.x)-mingridy) > 0.0 )
+    if(((iIsoLight*)(lights[l]))->GetVis(visx, visy) > 0.0 )
       flights[num++] = ((iIsoLight*)(lights[l]))->GetFakeLight();
   }
   for(l=0; l<dynamiclights.Length(); l++)
   {
-    if(((iIsoLight*)(dynamiclights[l]))->GetVis(
-      QInt(pos.z)-mingridx, QInt(pos.x)-mingridy) > 0.0 )
+    if(((iIsoLight*)(dynamiclights[l]))->GetVis(visx, visy) > 0.0 )
       flights[num++] = ((iIsoLight*)(dynamiclights[l]))->GetFakeLight();
   }
 

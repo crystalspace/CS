@@ -225,6 +225,7 @@ void csIsoFakeCamera::SetIsoView(const csVector2& scroll,
   //screen.x=scroll.x+ world.x*x_axis.x + world.z*z_axis.x;
   //screen.y=scroll.y+ world.x*x_axis.y + world.y*y_axis.y + world.z*z_axis.y;
   //screen.z= 1.0*world.z - 1.0*world.x;
+
   m.Set(
     x_axis.x, 0.0, z_axis.x,
     x_axis.y, y_axis.y, z_axis.y,
@@ -237,6 +238,7 @@ void csIsoFakeCamera::SetIsoView(const csVector2& scroll,
   /// will the scale times larger - and thus transform nicely.
   scale = (x_axis.x + y_axis.y)*0.5;
   float div = 1./scale;
+
   m.m11 *= div;
   //m.m12 *= div; // is zero
   m.m13 *= div;
@@ -286,11 +288,21 @@ void csIsoFakeCamera::IsoReady(const csVector3& position,
   invfov = 1. / (position.z - position.x - minz);
   //trans.SetO2TTranslation( csVector3(0, 0, -minz) );
   //trans.SetO2TTranslation( trans.This2Other(csVector3(0, 0, -minz)) );
+
+  /*
   // shift Z by the zlowerbound
   trans.SetO2TTranslation( csVector3(0,0, +minz) );
   // compensate for the z shift in the x,y shift in screenspace.
   shiftx = scroll.x + scale * minz * trans.GetO2T().m13;
   shifty = scroll.y + scale * minz * trans.GetO2T().m23;
+  */
+  //csVector3 move( -minz/2.,-minz/2., +minz/2. );
+  csVector3 move( -minz*45./60.,-minz/4., +minz*15./60. );
+  trans.SetO2TTranslation( move );
+  shiftx = scroll.x + scale*move.x*trans.GetO2T().m11 +
+    scale*move.y*trans.GetO2T().m12 + scale*move.z*trans.GetO2T().m13;
+  shifty = scroll.y + scale*move.x*trans.GetO2T().m21 +
+    scale*move.y*trans.GetO2T().m22 + scale*move.z*trans.GetO2T().m23;
 
   rview->GetG3D()->SetPerspectiveCenter(QInt(shiftx), QInt(shifty));
   rview->GetG3D()->SetPerspectiveAspect( ffov );
