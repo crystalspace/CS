@@ -5735,6 +5735,7 @@ package cspace::iVisibilityCuller;
 *IntersectSegmentSloppy = *cspacec::iVisibilityCuller_IntersectSegmentSloppy;
 *IntersectSegment = *cspacec::iVisibilityCuller_IntersectSegment;
 *CastShadows = *cspacec::iVisibilityCuller_CastShadows;
+*ParseCullerParameters = *cspacec::iVisibilityCuller_ParseCullerParameters;
 sub DESTROY {
     return unless $_[0]->isa('HASH');
     my $self = tied(%{$_[0]});
