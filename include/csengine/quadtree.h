@@ -122,7 +122,7 @@ private:
    *  node_depth==1 means you are the root, and so on,
    *  if the node_depth == max_depth you are a leaf.
    */
-  typedef int (csQuadTree::quad_traverse_func)(csQuadTree* pObj, 
+  typedef int (csQuadTree::*quad_traverse_func)(csQuadTree* pObj, 
     const csBox2& node_bbox, int node_state, node_pos_info *node_pos,
     void* data);
 
@@ -135,13 +135,13 @@ private:
    *  note that theoretically the state of the caller could be changed.
    *  func is of type quad_traverse_func.
    */
-  static void CallChildren(quad_traverse_func* func, csQuadTree* pObj, 
+  void CallChildren(quad_traverse_func func, csQuadTree* pObj, 
     const csBox2& box, node_pos_info *parent_pos, void *data, int retval[4]);
 
   /** Convenience version, the retval argument is omitted, return values
    * are discarded.
    */
-  static void CallChildren(quad_traverse_func* func, csQuadTree* pObj, 
+  void CallChildren(quad_traverse_func func, csQuadTree* pObj, 
     const csBox2& box, node_pos_info *parent_pos, void *data);
 
   /** Get the state of a node, in byte offset , nodenr given.
@@ -167,7 +167,8 @@ private:
    * returning the QUAD_FULL/PARTIAL/EMPTY if it hits.
    * returning QUAD_UNKOWN if the point is not in the node.
    */
-  static quad_traverse_func test_point_func;
+  int test_point_func(csQuadTree* pObj, const csBox2& node_bbox,
+     int node_state, node_pos_info *node_pos, void* data);
 
   /** gather result from retval for testpoint
    */
@@ -190,7 +191,8 @@ private:
    *  CS_QUAD_POSSIBLECHANGE if it probably changed, and 
    *  CS_QUAD_CERTAINCHANGE if it changed for certain.
    */
-  static quad_traverse_func insert_polygon_func;
+  int insert_polygon_func(csQuadTree* pObj, const csBox2& node_bbox,
+     int node_state, node_pos_info *node_pos, void* data);
 
   /** gather result from retval for insertpolygon_func
    *  NOCHANGE < POSSIBLECHANGE < CERTAINCHANGE
@@ -200,18 +202,21 @@ private:
   /** for a node, mark it by casting (void*)data to an int.
    *  that is the new state.
    */
-  static quad_traverse_func mark_node_func;
+  int mark_node_func (csQuadTree* pObj, const csBox2& node_bbox,
+     int node_state, node_pos_info *node_pos, void* data);
 
   /** for a node, give it the (int) cast of data as value and
    *  give children a good value. CS_QUAD_UNKNOWN means the
    *  child's value is unchanged.
    */
-  static quad_traverse_func propagate_down_func;
+  int propagate_down_func(csQuadTree* pObj, const csBox2& node_bbox,
+     int node_state, node_pos_info *node_pos, void* data);
 
   /** Set the state of the node based on states of child nodes.
    * returns new node state, leaves only return their state.
    */
-  static quad_traverse_func sift_up_func;
+  int sift_up_func(csQuadTree* pObj, const csBox2& node_bbox,
+     int node_state, node_pos_info *node_pos, void* data);
 
 public:
   /** create a quadtree of depth, using about (4**depth-1)/3-1/3 bytes. 
