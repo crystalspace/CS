@@ -161,17 +161,15 @@ public:
   csArray<csWalkEntity*> busy_entities;
   /// A vector that is used to temporarily store references to busy entities.
   csArray<csWalkEntity*> busy_vector;
-  /// Plugin which calculates fps and records statistics
-  csRef<iPerfStats> perf_stats;
   /// Vector with recorded camera transformations and commands.
   csRecordVector recording;
-  /// While playing/recording demos a secondary perfstats instance is used to
-  /// accumulate statistics.
-  char *recorded_perf_stats_name;
-  iPerfStats *recorded_perf_stats;
   /// This frames current recorded cmd and arg
   char *recorded_cmd;
   char *recorded_arg;
+  /// Time when we started playing back the recording.
+  csTicks record_start_time;
+  /// Number of frames that have passed since we started playing back recording.
+  int record_frame_count;
   // Various configuration values for collision detection.
   /// If >= 0 then we're recording. The value is the current frame entry.
   int cfg_recording;
@@ -335,9 +333,6 @@ public:
   csBox3 debug_box2;
   /// If true then show both debug boxes.
   bool do_show_debug_boxes;
-
-  /// Timing.
-  float timeFPS;
 
   bool on_ground;
   bool inverse_mouse;

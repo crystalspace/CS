@@ -1061,7 +1061,7 @@ bool CommandHandler (const char *cmd, const char *arg)
     CONPRI("  listactions setaction setmotion");
     CONPRI("Various:");
     CONPRI("  coordsave coordload bind p_alpha s_fog");
-    CONPRI("  snd_play snd_volume record play clrrec saverec");
+    CONPRI("  snd_play snd_volume record play playonce clrrec saverec");
     CONPRI("  loadrec action plugins conflist confset do_logo");
     CONPRI("  varlist var setvar setvarv setvarc");
 
@@ -1366,17 +1366,11 @@ bool CommandHandler (const char *cmd, const char *arg)
   }
   else if (!strcasecmp (cmd, "loadrec"))
   {
-    if (Sys->perf_stats && Sys->recorded_perf_stats)
-      Sys->perf_stats->FinishSubsection ();
-    Sys->recorded_perf_stats = 0;
-    delete [] Sys->recorded_perf_stats_name;
-    Sys->recorded_perf_stats_name = 0;
     if (arg)
     {
       char buf[255];
       sprintf (buf, "/tmp/%s.rec", arg);
       LoadRecording (Sys->myVFS, buf);
-      Sys->recorded_perf_stats_name = csStrNew (arg);
     }
     else
       LoadRecording (Sys->myVFS, "/tmp/record");
@@ -1394,17 +1388,12 @@ bool CommandHandler (const char *cmd, const char *arg)
       Sys->cfg_recording = 0;
       Sys->Report (CS_REPORTER_SEVERITY_NOTIFY,
       	"Start recording camera movement...");
-      if (Sys->perf_stats)
-        Sys->recorded_perf_stats = Sys->perf_stats->StartNewSubsection (0);
     }
     else
     {
       Sys->cfg_recording = -1;
       Sys->Report (CS_REPORTER_SEVERITY_NOTIFY,
       	"Stop recording.");
-      if (Sys->perf_stats)
-        Sys->perf_stats->FinishSubsection ();
-      Sys->recorded_perf_stats = 0;
     }
   }
   else if (!strcasecmp (cmd, "play"))
@@ -1416,76 +1405,32 @@ bool CommandHandler (const char *cmd, const char *arg)
       Sys->Report (CS_REPORTER_SEVERITY_NOTIFY,
       	"Start playing back camera movement...");
       Sys->cfg_playloop = true;
-      if (arg)
-      {
-	bool summary = true;
-	char name[50], option[50];
-	int resolution = 0;
-	csScanStr (arg, "%s,%d,%s", option, &resolution, name);
-	if (Sys->perf_stats)
-	  Sys->recorded_perf_stats = Sys->perf_stats->StartNewSubsection (name);
-	if (!strcasecmp (option, "res") && (resolution >= 1))
-	{
-	  if (Sys->perf_stats)
-	    Sys->perf_stats->SetResolution (resolution);
-	  summary = false;
-	}
-	else if (!strcasecmp (option, "break") && (resolution >= 1))
-	{
-	  Sys->recorded_perf_stats->DebugSetBreak (resolution);
-	  return true;
-	}
-	else
-	{
-	  strcpy(name, option);
-	}
-	char buf[255];
-	sprintf (buf, "/tmp/%s.rps", name);
-	Sys->recorded_perf_stats->SetOutputFile (buf, summary);
-	if (Sys->recorded_perf_stats_name)
-	  Sys->recorded_perf_stats->SetName (Sys->recorded_perf_stats_name);
-	Sys->recorded_perf_stats->DebugSetBreak (-1);
-	Sys->cfg_playloop = false;
-      }
+      Sys->record_start_time = csGetTicks ();
+      Sys->record_frame_count = 0;
     }
     else
     {
       Sys->cfg_playrecording = -1;
       Sys->Report (CS_REPORTER_SEVERITY_NOTIFY, "Stop playback.");
-      if (Sys->perf_stats)
-        Sys->perf_stats->FinishSubsection ();
-      Sys->recorded_perf_stats = 0;
     }
   }
-  else if (!strcasecmp (cmd, "recsubperf"))
+  else if (!strcasecmp (cmd, "playonce"))
   {
-    RECORD_ARGS (cmd, arg);
-    if (Sys->recorded_perf_stats)
+    if (Sys->cfg_playrecording == -1)
     {
-      if (!Sys->recorded_perf_stats->IsSubsection ())
-      {
-	if (!arg)
-	  Sys->Report (CS_REPORTER_SEVERITY_NOTIFY,
-	  	"Error: Expecting name of subsection.");
-	else
-	{
-	  Sys->recorded_perf_stats->StartNewSubsection (arg);
-	  Sys->Report (CS_REPORTER_SEVERITY_NOTIFY,
-	  	"Performance subsection '%s'",arg);
-	}
-      }
-      else
-      {
-	Sys->Report (CS_REPORTER_SEVERITY_NOTIFY,
-		"Finished performance subsection.");
-	Sys->recorded_perf_stats->
-		PrintSubsectionStats (CS_REPORTER_SEVERITY_NOTIFY);
-	Sys->recorded_perf_stats->FinishSubsection ();
-      }
+      Sys->cfg_recording = -1;
+      Sys->cfg_playrecording = 0;
+      Sys->Report (CS_REPORTER_SEVERITY_NOTIFY,
+      	"Start playing back camera movement once...");
+      Sys->cfg_playloop = false;
+      Sys->record_start_time = csGetTicks ();
+      Sys->record_frame_count = 0;
     }
     else
-      Sys->Report (CS_REPORTER_SEVERITY_NOTIFY,
-      	"Error: Option valid only when recording.");
+    {
+      Sys->cfg_playrecording = -1;
+      Sys->Report (CS_REPORTER_SEVERITY_NOTIFY, "Stop playback.");
+    }
   }
   else if (!strcasecmp (cmd, "bind"))
   {
@@ -1751,7 +1696,8 @@ bool CommandHandler (const char *cmd, const char *arg)
     if (Sys->do_fs_shadevert)
     {
       float tr = 1, tg = 0, tb = 0, br = 0, bg = 0, bb = 1;
-      if (arg) csScanStr (arg, "%f,%f,%f,%f,%f,%f", &tr, &tg, &tb, &br, &bg, &bb);
+      if (arg) csScanStr (arg, "%f,%f,%f,%f,%f,%f",
+      	&tr, &tg, &tb, &br, &bg, &bb);
       Sys->fs_shadevert_topcol.Set (tr, tg, tb);
       Sys->fs_shadevert_botcol.Set (br, bg, bb);
     }
@@ -1759,7 +1705,15 @@ bool CommandHandler (const char *cmd, const char *arg)
   else if (!strcasecmp (cmd, "perftest"))
   {
     int num = 100;
-    if (arg) csScanStr (arg, "%d", &num);
+    if (arg)
+    {
+      csScanStr (arg, "%d", &num);
+      RECORD_ARGS (cmd, arg);
+    }
+    else
+    {
+      RECORD_CMD (cmd);
+    }
     perf_test (num);
   }
   else if (!strcasecmp (cmd, "debug0"))

@@ -127,9 +127,6 @@ WalkTest::WalkTest () :
   selected_polygon = 0;
   move_forward = false;
   cfg_recording = -1;
-  recorded_perf_stats_name = 0;
-  recorded_perf_stats = 0;
-  perf_stats = 0;
   recorded_cmd = 0;
   recorded_arg = 0;
   cfg_playrecording = -1;
@@ -146,8 +143,6 @@ WalkTest::WalkTest () :
 
   velocity.Set (0, 0, 0);
   angle_velocity.Set (0, 0, 0);
-
-  timeFPS = 0.0;
 
   bgcolor_txtmap = 255;
   bgcolor_map = 0;
@@ -175,7 +170,6 @@ WalkTest::~WalkTest ()
   delete [] auto_script;
   delete infinite_maze;
   delete cslogo;
-  delete [] recorded_perf_stats_name;
 
   while (first_map)
   {
@@ -312,27 +306,18 @@ void WalkTest::SetupFrame ()
   elapsed_time = vc->GetElapsedTicks ();
   current_time = vc->GetCurrentTicks ();
 
-  if (perf_stats) timeFPS = perf_stats->GetFPS ();
-  else timeFPS = 0;
-
   if (!myConsole || !myConsole->GetVisible ())
   {
-    // If the console was turned off last frame no stats have been accumulated
-    // as it was paused so we return here and loop again.
-    if (perf_stats && perf_stats->Pause (false))
-      return;
     // Emit recorded commands directly to the CommandHandler
     if (cfg_playrecording > 0 &&
 	recording.Length () > 0)
     {
-      csRecordedCamera* reccam = (csRecordedCamera*)recording[cfg_playrecording];
+      csRecordedCamera* reccam = (csRecordedCamera*)recording[
+      	cfg_playrecording];
       if (reccam->cmd)
 	CommandHandler(reccam->cmd, reccam->arg);
     }
   }
-  else
-    // The console has been turned on so we pause the stats plugin.
-    if (perf_stats) perf_stats->Pause (true);
 
   // Update the Motion Manager
   if (myMotionMan)
@@ -770,23 +755,30 @@ void WalkTest::DrawFrame (csTicks elapsed_time, csTicks current_time)
     {
       csRecordedCamera* reccam = (csRecordedCamera*)recording[cfg_playrecording];
       cfg_playrecording++;
+      record_frame_count++;
       if (cfg_playrecording >= recording.Length ())
       {
+	csTicks t1 = record_start_time;
+	csTicks t2 = csGetTicks ();
+	int num = record_frame_count;
+	Sys->Report (CS_REPORTER_SEVERITY_NOTIFY,
+	  "End demo: %f secs to render %d frames: %f fps",
+	  (float) (t2 - t1) / 1000.,
+	  num, float (num) * 1000. / (float) (t2 - t1));
+	printf (
+	  "End demo: %f secs to render %d frames: %f fps\n",
+	  (float) (t2 - t1) / 1000.,
+	  num, float (num) * 1000. / (float) (t2 - t1));
+	fflush (stdout);
 	if (cfg_playloop)
 	  cfg_playrecording = 0;
-	else
-	{
-	  // A performance measuring demo has finished..stop and write to
-	  // file
-	  cfg_playrecording = -1;
-	  if (perf_stats) perf_stats->FinishSubsection ();
-	  recorded_perf_stats = 0;
-	  Report (CS_REPORTER_SEVERITY_NOTIFY, "Demo '%s' finished",
-		       recorded_perf_stats_name);
-	}
+
+        record_start_time = csGetTicks ();
+        record_frame_count = 0;
       }
       iCamera* c = view->GetCamera ();
-      c->SetSector (reccam->sector);
+      if (reccam->sector)
+        c->SetSector (reccam->sector);
       c->SetMirrored (reccam->mirror);
       c->GetTransform ().SetO2T (reccam->mat);
       c->GetTransform ().SetOrigin (reccam->vec);
@@ -1241,22 +1233,9 @@ bool WalkTest::Initialize (int argc, const char* const argv[],
 
   // Find the model converter plugin
   ModelConverter = CS_QUERY_REGISTRY (object_reg, iModelConverter);
-  //if (!ModelConverter)
-  //{
-    //Report (CS_REPORTER_SEVERITY_ERROR, "No model converter plugin!");
-    //return false;
-  //}
 
   // Find the model crossbuilder plugin
   CrossBuilder = CS_QUERY_REGISTRY (object_reg, iCrossBuilder);
-  //if (!CrossBuilder)
-  //{
-    //Report (CS_REPORTER_SEVERITY_ERROR, "No model crossbuilder plugin!");
-    //return false;
-  //}
-
-  // performance statistics module.
-  perf_stats = CS_QUERY_REGISTRY (object_reg, iPerfStats);
 
   // csView is a view encapsulating both a camera and a clipper.
   // You don't have to use csView as you can do the same by

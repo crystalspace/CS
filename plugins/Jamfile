@@ -19,7 +19,6 @@ SubInclude TOP plugins mesh ;
 SubInclude TOP plugins motion ;
 SubInclude TOP plugins movierecorder ;
 SubInclude TOP plugins net ;
-SubInclude TOP plugins perfstat ;
 SubInclude TOP plugins physics ;
 SubInclude TOP plugins picogui ;
 SubInclude TOP plugins proctex ;

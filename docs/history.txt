@@ -11,6 +11,22 @@ chronological order.
 	  be giving better fps in most cases. Perhaps we need to come up with
 	  a way to avoid the write queue overhead in cases where it would
 	  be worse.
+	- Jorrit fixed the walktest movement recording feature to also record
+	  'perftest' command. That way it is possible to make walkthroughs
+	  through a level with performance tests included.
+	- Jorrit fixed playback of a recorded file in walktest so that it
+	  ignores the sectors it cannot find. In that case it will simply
+	  stay in the current sector. This makes it possible to use a
+	  recorded sequence that was recorded while in a multi-sector
+	  level and reuse that same sequence in a single-sector level (provided
+	  it represents exactly the same geometry).
+	- Jorrit removed the last remnants of perfstat usage in Walktest and
+	  then he removed the perfstat plugin itself.
+	- Jorrit added 'playonce' command to Walktest. This is similar to
+	  'play' but it doesn't loop the recorded demo. Assigned alt-r to
+	  this command.
+	- Jorrit extended walktest demo playback so that it shows the fps after
+	  finishing one run.
 26-Feb-2004
 	- Eric Sunshine fixed the old renderer gl3d, soft3d, null3d, and the
 	  ISO engine plugins so that they once again build successfully
