@@ -319,9 +319,19 @@ csInputDefinition::csInputDefinition (const char *_s, uint32 mods, bool cook)
   else
   {
     containedType = csevKeyboard;
-    if (str.Length () == 1) keyboard.code = str.GetAt (0);
-    else keyboard.code = cook ? NameToCooked (str.GetData ())
-			      : NameToRaw (str.GetData ());
+
+    size_t skip = (size_t) csUnicodeTransform::UTF8Skip
+      ((utf8_char *) str.GetData (), str.Length ());
+    if (skip == str.Length ())
+    {
+      bool valid;
+      csUnicodeTransform::UTF8Decode
+        ((utf8_char *) str.GetData (), str.Length (), keyboard.code, &valid);
+      if (! valid) keyboard.code = 0;
+    }
+    else
+      keyboard.code = cook ? NameToCooked (str.GetData ())
+			   : NameToRaw (str.GetData ());
   }
 }
 
@@ -366,7 +376,12 @@ csString csInputDefinition::ToString (bool distinguishMods) const
       str.Append (keyboard.isCooked ? CookedToName (keyboard.code)
 				    : RawToName (keyboard.code));
     else
-      str.Append ((char) keyboard.code);
+    {
+      char buf[CS_UC_MAX_UTF8_ENCODED];
+      size_t size = csUnicodeTransform::EncodeUTF8
+        (keyboard.code, (utf8_char *) buf, sizeof (buf));
+      str.Append (buf, size);
+    }
     break;
 
     case csevMouseDown:
@@ -469,6 +484,7 @@ csString csInputDefinition::GetKeyString (utf32_char code,
   const csKeyModifiers *mods, bool distinguishModifiers)
 {
   csInputDefinition def (CSMASK_ALLMODIFIERS, true);
+  def.containedType = csevKeyboard;
   def.keyboard.code = code;
   if (mods) def.modifiers = *mods;
   return def.ToString (distinguishModifiers);
