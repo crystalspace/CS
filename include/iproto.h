@@ -42,7 +42,7 @@ struct iPROTO: public iPlugIn
   ///
   /// Command processor - for things coming from above
   ///
-  virtual int OnCmd(csNetCmd *cmd) = 0;
+  virtual int OnCmd(int NetPort, csNode *cmd) = 0;
 
   ///
   /// Create an outbound protocol "pipe" connection

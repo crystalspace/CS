@@ -23,11 +23,25 @@
 #include "isystem.h"
 #include "iplugin.h"
 
-typedef struct 
+/// Very generic Command structure that gets passed round
+typedef struct csNodeEl
 {
-  int Cmd;
-  int NetPort;
-} csNetCmd;
+  int nodetype;
+  union
+  {
+    long l;
+    int i;
+    bool b;
+    float f;
+    char *s;
+    struct csNodeEl *child;
+  };
+  struct csNodeEl *left;
+  struct csNodeEl *right;
+  struct csNodeEl *next;
+}
+csNode;
+
 
 SCF_VERSION (iCmdMgr, 0, 0, 1);
 
@@ -46,10 +60,10 @@ struct iCMDMGR: public iPlugIn
   virtual bool Initialize (iSystem *iSys) = 0;
   virtual bool Open() =0;
   virtual bool Close() = 0;
-  virtual void ReceiveCmd(csNetCmd *Cmd) = 0;
-  virtual void SendCmd(csNetCmd *Cmd) = 0;
+  virtual void ReceiveCmd(int NetPort, csNode *Cmd) = 0;
+  virtual void SendCmd(int NetPort, csNode *Cmd) = 0;
   /// Debugging routine to print out the command.
-  virtual void DisplayCmd(csNetCmd *Cmd) = 0;
+  virtual void DisplayCmd(csNode *Cmd) = 0;
 
   /// Start a server going.
   virtual int InitiateServer(char *hostname,
