@@ -70,10 +70,10 @@ libs_l=false
 includedeps()
 {
 #we have to rememver vars here because on older shells $1,$2... are global
-    id_all=$@
     id_first=$1
-    id_second=$2
+    id_all=$@
     shift
+    id_second=$1
     id_rest=$@
 
 # already had all dependencies of this lib? then exit
@@ -89,13 +89,13 @@ includedeps()
 	case " ${id_all} " in
 	    *\ $a\ *) ;;
     	    *)  
-		the_libs="$the_libs $a"
+		the_libs="${the_libs} $a"
 	    	return 1
 	    ;;
 	esac
     done
     if test -n "${id_second}"; then
-	if includedeps $@; then
+	if includedeps ${id_rest}; then
 	    return 0
 	else
 	    return 1
