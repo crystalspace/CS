@@ -30,6 +30,8 @@
 #include "iutil/vfs.h"
 #include "iutil/cache.h"
 
+#define LMMAGIC	    "LM03" // must be 4 chars!
+
 csShadowMap::csShadowMap ()
 {
   Light = NULL;
@@ -253,7 +255,7 @@ bool csLightMap::ReadFromCache (
   char* type;
   uint32 uid;
 
-  strcpy (pswanted.header, "LM02");
+  strcpy (pswanted.header, LMMAGIC);
   if (poly)
   {
     pswanted.x1 = convert_endian (float2short (poly->Vobj (0).x));
@@ -327,8 +329,19 @@ bool csLightMap::ReadFromCache (
   static_lm.Clear ();
 
   static_lm.Alloc (lm_size);
-  memcpy (static_lm.GetArray (), d, lm_size * 4);
-  d += lm_size * 4;
+
+  int n = lm_size;
+  char *lm_rgba = new char[lm_size*4];
+  char *lm_ptr = lm_rgba;
+  while (--n >= 0) 
+  {
+    *(lm_ptr++) = *(d++);
+    *(lm_ptr++) = *(d++);
+    *(lm_ptr++) = *(d++);
+    *(lm_ptr++) = -127;
+  }
+  memcpy (static_lm.GetArray (), lm_rgba, lm_size * 4);
+  delete[] lm_rgba;
 
   data->DecRef ();
 
@@ -387,7 +400,6 @@ void csLightMap::Cache (
 {
   (void)engine;
 
-  char buf[200];
   PolySave ps;
   long l;
   short s;
@@ -395,7 +407,7 @@ void csLightMap::Cache (
   char* type;
   uint32 uid;
 
-  strcpy (ps.header, "LM02");
+  strcpy (ps.header, LMMAGIC);
   if (poly)
   {
     ps.x1 = convert_endian (float2short (poly->Vobj (0).x));
@@ -441,8 +453,16 @@ void csLightMap::Cache (
   l = ps.lm_cnt;
   cf->Write ((char *) &l, sizeof (l));
 
-  if (static_lm.GetArray ())
-    cf->Write ((char *)static_lm.GetArray (), lm_size * 4);
+  int n = lm_size;
+  char *lm_rgba = new char[lm_size*4];
+  char *lm_ptr = lm_rgba;
+  memcpy (lm_ptr, static_lm.GetArray (), lm_size * 4);
+  while (--n >= 0) 
+  {
+    cf->Write(lm_ptr, 3);
+    lm_ptr += 4;
+  }
+  delete[] lm_rgba;
 
   if (!cache_mgr->CacheData ((void*)(cf->GetData ()), cf->GetSize (),
   	type, NULL, uid))

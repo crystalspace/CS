@@ -1391,7 +1391,7 @@ void csEngine::ShineLights (iRegion *iregion, iProgressMeter *meter)
 
   PrecalcInfo current;
   memset (&current, 0, sizeof (current));
-  current.lm_version = 1;
+  current.lm_version = 2;
   current.normal_light_level = CS_NORMAL_LIGHT_LEVEL;
   current.ambient_red = csLight::ambient_red;
   current.ambient_green = csLight::ambient_green;
