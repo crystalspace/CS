@@ -4,8 +4,8 @@
 
 @noindent
 @emph{Written by Eric Sunshine, @email{sunshine@@sunshineco.com}.  Originally
-written by Philip Wyett, @email{philipwyett@@dsl.pipex.com}.  Last updated 3
-May 2004.}
+written by Philip Wyett, @email{philipwyett@@dsl.pipex.com}.  Last updated 13
+Dec 2004.}
 
 These instructions are for building Crystal Space with MinGW, the
 @emph{Minimalist @sc{gnu} compiler for Windows}.
@@ -80,20 +80,6 @@ also use CrystalSpace with VisualC++).
 @emph{Note}: If you ever install a new version of @sc{msys}, then you should 
 also re-install the @file{cs-win32libs} package.
 
-@subsubheading Selecting the Renderer Architecture
-
-At this moment we have two completely different renderer architectures
-in Crystal Space. The old renderer (which is still default) and the new
-renderer. The new renderer hasn't been made default yet because it is still
-considered to be experimental and some features haven't been ported yet
-(like software renderer which works only partially and fog). On the other
-hand the new renderer supports shaders, stencil shadows, and other advanced
-OpenGL stuff and for most people it seems to work very well. So we personally
-recommend trying out the new renderer first. If it doesn't work right for
-you then you should send us a report and go back to old renderer then.
-To use the new renderer you should add the @samp{--enable-new-renderer}
-option to configure below.
-
 @subsubheading Building Crystal Space
 
 You must configure and build Crystal Space from within the @sc{msys} shell
@@ -128,14 +114,6 @@ the following commands for those shown above:
 
 @example
 ./configure --enable-debug
-make -k all
-@end example
-
-If you wish to build with debugging information and for the new renderer
-architecture you can do:
-
-@example
-./configure --enable-debug --enable-new-renderer
 make -k all
 @end example
 

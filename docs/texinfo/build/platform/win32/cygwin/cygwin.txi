@@ -5,7 +5,7 @@
 @noindent
 @emph{Philip Wyett @email{philipwyett@@dsl.pipex.com}.}
 @noindent
-@emph{Last updated 3 May 2004.}
+@emph{Last updated 13 Dec 2004.}
 
 These instructions are for building Crystal Space with Cygwin a @sc{gnu}
 compiler for Windows created by Red Hat Inc. and other third party
@@ -274,20 +274,6 @@ Bash prompt and navigate to where you extracted the files (that is, the
 directory which contains the @file{install-sh}).  Next, at the command prompt
 type @samp{make install}.
 
-@subsubheading Selecting the Renderer Architecture
-
-At this moment we have two completely different renderer architectures
-in Crystal Space. The old renderer (which is still default) and the new
-renderer. The new renderer hasn't been made default yet because it is still
-considered to be experimental and some features haven't been ported yet
-(like software renderer which works only partially and fog). On the other
-hand the new renderer supports shaders, stencil shadows, and other advanced
-OpenGL stuff and for most people it seems to work very well. So we personally
-recommend trying out the new renderer first. If it doesn't work right for
-you then you should send us a report and go back to old renderer then.
-To use the new renderer you should add the @samp{--enable-new-renderer}
-option to configure below.
-
 @subsubheading Building Crystal Space
 @anchor{Cygwin: Building Crystal Space}
 
@@ -323,14 +309,6 @@ the following commands for those shown above:
 
 @example
 ./configure --enable-debug
-make -k all
-@end example
-
-If you wish to build with debugging information and for the new renderer
-architecture you can do:
-
-@example
-./configure --enable-debug --enable-new-renderer
 make -k all
 @end example
 
