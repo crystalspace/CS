@@ -142,7 +142,9 @@ Bugs to fix:
 	     Problem here is that the bounding box is not recalculated when
 	     the movable is changed.
 	     [Bug 478072]
-
+	[S]  Using software renderer proctexes with OpenGL causes a crash
+	     (At some place the OpenGL texture's images get NULL)
+	
 API and Small Feature Additions:
 	[F]  Translate point on polygon to texture space/object space
 	     coordinates (for selection). This is useful for Quark++.
