@@ -36,33 +36,19 @@ struct iTextureHandle;
  * going to use it for 2D (DrawPixmap ()), for 3D (DrawPolygon ()), whenever
  * the texture will be dynamically modified.
  */
-/// You're going to yse the texture for 2D drawing
+/// You're going to use the texture for 2D drawing
 #define CS_TEXTURE_2D			0x00000001
-/// You're going to yse the texture for 3D drawing
+/// You're going to use the texture for 3D drawing
 #define CS_TEXTURE_3D			0x00000002
 /**
- * Create a procedural texture.
- * After the texture is prepared call 
- * iTextureHangle->GetDynamicTextureInterface to retrieve an iGraphics3D
- * interface to the texture. Render as usual.
+ * Dither texture or not.<p>
+ * Some renderers may use dithering while converting textures to internal
+ * format (say from truecolor to 8-bit paletted). For most textures dithering
+ * won't give any visual effect, but very seldom there are textures that looks
+ * relatively bad after being converted. In this case you can enable this
+ * per-texture flag.
  */
-#define CS_TEXTURE_PROC  		0x00000004
-
-/**
- * Currently this flag is acted upon by the 16/32bit software renderer and the
- * opengl software texture implementation only. 
- * It has no performance penalty for the other drivers, so set it when you can,
- * which practically speaking will be most of the time. 
- * Set this flag when you can safely allocate the procedural textures their
- * own set of textures which will not be referred to when calling the main 
- * renderer. This means that the engine for example will not be able to render
- * to these procedural textures. 
- * This flag allows for a big optimisation by setting up an 8bit texture 
- * manager for the software procedural textures so that all rendering is done 
- * within the software texture managers' native format.  
- */
-#define CS_TEXTURE_PROC_ALONE_HINT   0x00000008
-
+#define CS_TEXTURE_DITHER		0x00000004
 /**
  * Create mipmaps for this texture?<p>
  * Sometimes we know in advance that some texture will need just one
@@ -72,16 +58,42 @@ struct iTextureHandle;
  * Note that if texture is not registered for 3D usage (i.e. if CS_TEXTURE_3D
  * is not set) this flag does not matter - 2D textures do not use mipmaps.
  */
-#define CS_TEXTURE_NOMIPMAPS		0x00000010
+#define CS_TEXTURE_NOMIPMAPS		0x00000008
 /**
- * Dither texture or not.<p>
- * Some renderers may use dithering while converting textures to internal
- * format (say from truecolor to 8-bit paletted). For most textures dithering
- * won't give any visual effect, but very seldom there are textures that looks
- * relatively bad after being converted. In this case you can enable this
- * per-texture flag.
+ * Create a procedural texture.
+ * After the texture is prepared call 
+ * iTextureHangle->GetDynamicTextureInterface to retrieve an iGraphics3D
+ * interface to the texture. Render as usual.
  */
-#define CS_TEXTURE_DITHER		0x00000020
+#define CS_TEXTURE_PROC  		0x00000010
+/**
+ * Set this flag if you want mip-mapping but wish to control when the mip-mapping
+ * actually occurs by calling iTextureHandle->ProcTextureSync ()
+ */
+#define CS_TEXTURE_PROC_MIPMAP_ON_SYNC  0x00000020
+/**
+ * By setting this flag it guarantess that the procedural texture buffers contents
+ * persists between frames. There is a small performance penalty on the opengl and
+ * glide implementations with this flag.
+ */
+#define CS_TEXTURE_PROC_PERSISTENT  	0x00000040
+/**
+ * Currently this flag is acted upon by the 16/32bit software renderer and the
+ * opengl software texture implementation only. 
+ * It has no performance penalty for the other drivers, so set it when you can,
+ * which practically speaking will be most of the time. 
+ * Set this flag when you can safely allocate the procedural textures their
+ * own set of textures which will not be referred to when calling the main 
+ * renderer. This means that the engine for example will not be able to render
+ * to these procedural textures as well as the main renderer. 
+ * This flag allows for a big optimisation by setting up an 8bit texture 
+ * manager for the software procedural textures so that all rendering is done 
+ * within the software texture managers' native format.  
+ */
+#define CS_TEXTURE_PROC_ALONE_HINT      0x00000080
+
+
+
 
 SCF_VERSION (iTextureManager, 1, 0, 0);
 

@@ -1,5 +1,5 @@
 @c -*-texinfo-*-
-@node Memory Debugger, Platform Details, VFS, Anatomy
+@node Memory Debugger, ProcTextures, VFS, Anatomy
 @section Crystal Space Memory Debugger
 @cindex Memory Debugger
 

@@ -27,6 +27,7 @@ Scripting
 * SCF:: Shared Class Facility (@sc{scf})
 * VFS:: Virtual File System (@sc{vfs})
 * Memory Debugger:: Crystal Space Memory Debugger
+* ProcTextures:: Procedural Texture System
 * Platform Details:: Platform-Specific Details
 @end menu
 
@@ -37,4 +38,5 @@ Scripting
 @imports{anatomy,scf.txi}
 @imports{anatomy,vfs.txi}
 @imports{anatomy,memdebug.txi}
+@imports{anatomy,proctex.txi}
 @importss{anatomy,platform,details.txi}

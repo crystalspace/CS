@@ -75,8 +75,8 @@ struct iTextureHandle : public iBase
   virtual iGraphics3D *GetProcTextureInterface () = 0;
 
   /**
-   * If this is a procedural texture with mip-mapping enabled, call this 
-   * function to update its mip maps after a change. 
+   * If this is a procedural texture with mip-mapping on sync enabled, call this 
+   * function to update its mip maps when required. 
    * (currently unimplemented)
    */
   virtual void ProcTextureSync () = 0;

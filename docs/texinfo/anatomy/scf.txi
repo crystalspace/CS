@@ -12,10 +12,10 @@ General Public License (@sc{lgpl}).  @xref{License}.}
 This library is intended for separating C++ class implementations from
 programs that use them; this is achieved by separating class implementations
 into a separate module (currently only shared libraries are supported).  There
-is very little requirements to the shared library itself: this helps to
+are few requirements of the shared library itself: this helps to
 address many problems regarding shared library facility differences
-encountered on different platforms.  In fact, it is possible to use some
-different mechanism for @sc{scf}, for example inter-process communication
+encountered on different platforms.  In fact, it is possible to use 
+different mechanisms for @sc{scf}, for example inter-process communication
 (through pipes, shared memory or whatever); communication through network or
 through a @sc{com} or @sc{corba} request broker, although currently there are
 only two minimal configurations supported: using shared libraries and using
@@ -35,33 +35,33 @@ static linkage (for platforms that don't have shared library support).
 @subsection How it Works
 
 This paragraph contains technical details about @sc{scf}.  If you're not
-interested in details, you can skip directly to next chapter which explains
-how @sc{scf} should be used from end-user point of view.
+interested in details, you can skip directly to the next chapter which explains
+how @sc{scf} should be used from the end-users' point of view.
 
-@sc{scf} is somewhat similar to @sc{com}.  That's because historically Crystal
+@sc{scf} is somewhat similar to @sc{com}.  This is because historically Crystal
 Space initially used @sc{com} for inter-module communications.  Thanks to Dan
 Ogles for the initial implementation of a cross-platform @sc{com} library; his
 implementation was a good testbed for this @sc{scf} implementation.
 
-The differences between @sc{com} and @sc{scf} are due to increased need in a
-easier-to-use and maybe a more lightweighted interface than @sc{com}.  The
+The differences between @sc{com} and @sc{scf} are due to the increased need for an
+easier-to-use and maybe a more lightweight interface than @sc{com}.  The
 @sc{com} implementation caused some problems (because of bugs in @sc{egcs}
 1.1.x and incompatibilities with the Objective-C language used by NeXT).  Also
-it has some problems due to native Windows types used in @sc{com}; this
+it has some problems due to the native Windows types used in @sc{com}; this
 experience has been taken into account while developing @sc{scf}.
 
-The main paradigm of @sc{scf}, as in @sc{com}/@sc{corba}/Java/etc is
+The main paradigm of @sc{scf}, as in @sc{com}/@sc{corba}/Java/etc is the
 interface.  You define an @emph{interface}, that is, a set of abstract methods
 that you want to access within some object.  @sc{scf} interfaces are plain C++
 structs (or classes, it doesn't matter much except that if you're using
-classes you will have to add the @samp{public:} keyword).  Theoretically
-interface can contain even member variables and inline methods (but no
+classes to which you will have to add the @samp{public:} keyword).  Theoretically
+interfaces can contain even member variables and inline methods (but no
 non-virtual methods and constructors), @emph{but} this practice is not
-encouraged because later someone can want to add an @sc{com}, @sc{corba}, etc.
-layer between client and the actual object, and this will not be possible if
-interface would contain variables or inline methods.  If you don't plan to use
-@sc{com} or @sc{corba} later, you can use variables and inline functions as
-much as you want.
+encouraged because later someone may want to add a @sc{com}, @sc{corba}, etc.
+layer between the client and the actual object, and this will not be possible if
+the interfaces were to contain variables or inline methods.  If you don't plan to 
+use @sc{com} or @sc{corba} later, then you can use variables and inline functions
+as much as you like.
 
 Here is an example of an interface:
 
@@ -126,10 +126,10 @@ void MyDog::SetName(char const* iName)
 @end example
 
 Now we put the actual implementation into a separate module (i.e. into a
-shared library), and include into client just the interface file
-@file{idog.h}.  Now, since the client don't have an idea how we should build a
-object of the @samp{MyDog} class, we also should provide a function that will
-return a newly-allocated object of that class.  This is further called a
+shared library), and include within the client just the interface file
+@file{idog.h}.  Now, since the client don't have any idea how we should build an
+object of the @samp{MyDog} class, we also provide a function that will
+return a newly-allocated object of that class.  This is called the
 @dfn{class factory} (in fact, a class factory is a bit more than just this,
 but more about this later).  Here is how to do it:
 
@@ -142,7 +142,7 @@ static iDog* Create_iDog()
 
 Okay, we did it.  Now back to the client.  To work with an object that
 implements the @samp{iDog} interface we need to load the shared library, get a
-pointer to @code{Create_MyDog()} function, call it and get a new @samp{MyDog}
+pointer to the @code{Create_MyDog()} function, call it and get a new @samp{MyDog}
 object.  Further we work with this pointer as if it were pointing an
 @samp{iDog} object:
 

@@ -31,7 +31,8 @@ $\N\_{\n\_\o\}$%
 @cindex Texture Mapping
 
 @emph{Written by Jorrit Tyberghein,
-@email{jorrit.tyberghein@@uz.kuleuven.ac.be}.  Mathematical typesetting for
+@email{jorrit.tyberghein@@uz.kuleuven.ac.be} with additions by Samuel Humphreys.
+Mathematical typesetting for
 @TeX{} performed by Eric Sunshine, @email{sunshine@@sunshineco.com}.}
 
 This document explains the formulas that are used to perform texture mapping
@@ -45,6 +46,7 @@ transformations.  @xref{Cameras and Matrices}.
 * Texture Mapping Perspective Correction:: Perspective Correction
 * Texture Mapping Together:: Bringing it All Together
 * Texture Mapping Instructions:: Instructions for Texture Mapper
+* Texture Mapping Animations:: Procedural, Dynamic and Animated Textures
 @end menu
 
 @node Texture Mapping Conventions, Texture Mapping Concepts, Texture Mapping, Texture Mapping
@@ -821,7 +823,7 @@ With the first equation we can calculate @math{1/z}.  This is useful for
 Z-buffering and also for calculating (@math{u,v}) from the two other
 equations.
 
-@node Texture Mapping Instructions, , Texture Mapping Together, Texture Mapping
+@node Texture Mapping Instructions, Texture Mapping Animations, Texture Mapping Together, Texture Mapping
 @subsection Instructions for Texture Mapper
 
 In the Crystal Space map file,
@@ -940,3 +942,39 @@ space.
 
 @unmacro Nno
 @unmacro Nn
+
+@node Texture Mapping Animations, , Texture Mapping Instructions, Texture Mapping
+@subsection Procedural, Dynamic and Animated Textures
+
+OK so we have the texture mapped onto the polygon, now the fun stuff starts.
+There are several ways to introduce movement into textures. Here is the terminology
+used in crystal space to describe these methods and brief explanations of what they
+entail:
+
+@subsubheading Animated Textures
+ 
+Lets say we have several precomputed texture images, which when taken in 
+sequence form an animation. An Animated texture is simply when you swap
+the texture image mapped on to the polygon between the precomputed texture images.
+This is the simplest, cheapest and most common method.
+
+@subsubheading Dynamic Textures
+
+Dynamic textures are when you manipulate the texture mapping transformation, or 
+the texture co-ordinates directly. This way you can rotate/scroll for example the 
+texture on the polygon while it remains static.
+
+@subsubheading Procedural Textures
+
+If you defnitley can't produce the effect you want with animated and or dynamic
+textures then you can resort to procedural textures. Be warned this method is quite
+expensive compared to the previous two, and should be used sparingly and only when
+absolutely necessary. Another less common name for procedural textures is 
+programmatic textures. This is when you write the texture on the fly. The texture
+is typically a buffer you render to in the same way as you would render to the 
+main screen. Good procedural texture implementations gives you full blown 3d
+capable facilities to render to the texture. Fortunately Crystal Space has this :)
+Typical uses for procedural textures is when the content of the texture responds
+uniquely to user input or behaviour. A good example is having a computer terminal
+within the virtual world which the user can type on and can see what they type
+come up on the virtual screen.

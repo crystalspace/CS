@@ -22,7 +22,7 @@ Crystal Space consists of the following directories:
 The main directory for Crystal Space.  You can choose any path for it, as long
 as it is supported by your operating system.  This is the path that all
 compiled programs end up in.  This should be your working directory for these
-executables.  Configuration files (@file{.cfg}) also reside here.
+executables. 
 
 @item CS/apps
 This is where all applications which ship with Crystal Space reside.
@@ -41,6 +41,10 @@ Here you should place your levels like @file{large.zip}. You can use any
 directory for this, so this is only a suggestion. If you change the name, you
 must update the information in the configuration for the Virtual File System,
 (@file{vfs.cfg}).
+
+@item CS/data/config
+Most applications and plugins utilise a (@file{.cfg}) file. For convenience they
+are all grouped here. 
 
 @item CS/docs
 The root of the Crystal Space documentation hierarchy.  There are several
