@@ -3,7 +3,7 @@
 
     This document was written by Eric Sunshine <sunshine@sunshineco.com>
     Copyright (C)1999 by Eric Sunshine
-    1999/07/19
+    1999/07/27
 
     Also see INSTALL.NeXT for installation details.
 ===============================================================================
@@ -12,12 +12,12 @@
 -----------
 
     1. Introduction
-    2. BOOL vs. BOOL
+    2. COM Dilemma
     3. Directories
     4. Files
     5. Run-Loop
     6. Video Optimizations
-    7. Palette
+    7. Frame Buffer Processing
     8. Future Plans
     9. Bugs
    10. History
@@ -55,23 +55,36 @@ such support.  Therefore, at this time, "plug-in" renderers are not supported.
 This limitation is subject to change in the future.
 
 This implementation makes use of public AppKit API to interface with the
-Display PostScript Server (DPS) for all animation and event handling.  It does
-not make use of the private, undocumented & unsupported Interceptor library.
+Window Server for all animation and event handling.  It does not make use of
+the private, undocumented, and unsupported Interceptor library.
 
 A future version of the MacOS/X Server port may make use of the new public API
 for direct frame-buffer access provided by the NSDirectBitmap,
 NSDirectPalette, and NSDirectScreen classes.
 
 
-2. BOOL vs. BOOL
-----------------
+2. COM Dilemma
+--------------
 
-Objective-C and Crystal Space each define a BOOL type, and unfortunately these
-definitions conflict.  To be compatible with Microsoft's implementation of
-COM, BOOL as defined by Crystal Space's COM module, is an (unsigned long).
-Objective-C, on the other hand, defines BOOL as (char).  This conflict causes
-serious problems when COM header files and Objective-C header files are
-included in the same compilation unit.
+Crystal Space attempts to conform to the Common Object Model (COM)
+specification in order support plug-in module capability.  Unfortunately, in a
+couple cases, the COM specification is incompatible with Objective-C.
+
+First, COM defines a 4-byte BOOL type (long), whereas Objective-C defines BOOL
+as a 1-byte value (char).  This inequality of type results in a compilation
+error when including both COM and Objective-C headers in the same file.  To
+work around this problem, the COM BOOL type was renamed to COMBOOL within the
+Crystal Space project.  COMBOOL remains binary compatible with the real COM
+BOOL while avoiding messy naming complications.
+
+Second, the COM headers define the macro "interface" as having the value
+"struct".  This, too, results in a compilation error whenever COM and
+Objective-C headers are included in the same compilation unit.  The problem is
+that Objective-C uses the keyword "@interface" to introduce Objective-C
+classes.  However, the C-preprocessor, which translates C macros prior to the
+actual compilation phase, replaces "@interface" with "@struct".  The
+Objective-C compiler then complains about "@struct", which is not a recognized
+keyword, and the compilation fails.
 
 In order to work around this problem, classes were split apart in such a way
 as to ensure that conflicting headers are never included in the same
@@ -94,7 +107,7 @@ A more thorough discussion of the functionality of these files may be found in
 the "Files" section of this document.
 
 Other classes have been dissected in a similar fashion in order to work around
-the BOOL conflict.  In general a class named "SomeClass" is split into
+the COM conflict.  In general a class named "SomeClass" is split into
 component parts in the following manner.
 
     SomeClass           A skeleton COM-based class.  Acts as a shell which
@@ -177,7 +190,7 @@ AppKit's Application class.  The files comprising this module are:
                             functionality of SysSystemDriver is actually
                             handled by this class on its behalf since
                             SysSystemDriver can not cleanly interface with
-                            Objective-C on account of the BOOL type conflict.
+                            Objective-C on account of the COM conflict.
 
     NeXTSystemProxy.cpp     The implementation of the Objective-C-specific
                             functionality used by SysSystemDriver.  Does not
@@ -237,25 +250,36 @@ graphics library are:
                             object which performs the actual functionality on
                             behalf of NeXTDriver2D.
 
+    NeXTDriver2DCom.cpp     The implementation of the COM-specific
+                            functionality used by NeXTDriver2D.  Does not
+                            include Objective-C headers.
+
     NeXTProxy2D.h           A pure C++ interface.  Can be included by both COM
                             and Objective-C compilation units.  The core
                             functionality of NeXTDriver2D is actually handled
                             by this class on its behalf since NeXTDriver2D can
                             not cleanly interface with Objective-C on account
-                            of the BOOL type conflict.
+                            of the COM conflict.
 
     NeXTProxy2D.cpp         The implementation of the Objective-C-specific
                             functionality used by NeXTDriver2D.  Does not
                             include COM headers.
 
-    NeXTDriver2DCom.cpp     The implementation of the COM-specific
-                            functionality used by NeXTDriver2D.  Does not
-                            include Objective-C headers.
-
     NeXTView.cpp            An Objective-C subclass of the AppKit's View class.
     NeXTView.h              This is the view where the animation is actually
                             displayed.  Forwards events to NeXTDelegate which
                             propagates them up to Crystal Space.
+
+    NeXTFrameBuffer.cpp     A mostly abstract 2D frame buffer which defines
+    NeXTFrameBuffer.h       the interface of objects which are capable of
+                            converting a raw Crystal Space frame buffer into a
+                            NeXT-format frame buffer.
+
+    NeXTFrameBuffer15.cpp   A concrete subclass of NeXTFrameBuffer which can
+    NeXTFrameBuffer15.h     convert Crystal Space RGB:555 to NeXT RGBA:4444.
+
+    NeXTFrameBuffer32.cpp   A concrete subclass of NeXTFrameBuffer which can
+    NeXTFrameBuffer32.h     convert Crystal Space RGB:888 to NeXT RGBA:8888.
 
 
 5. Run-Loop
@@ -404,9 +428,20 @@ WindowServer release notes.  These include:
       backing-store which would then need be flushed to the screen with an
       expensive memory copy.
 
+It is worth noting that none of the aforementioned video optimizations deal
+with 2-bit gray, 8-bit gray, or 8-bit color.  Consequently this implementation
+does not even attempt to perform any optimization in these cases and simply
+hands the WindowServer 12-bit color data and lets the WindowServer massage it
+as appropriate.  The upshot is that for displays other than 12- and 24-bit
+RGB, video performance will probably suffer since the WindowServer will have
+to massage and dither color data itself.  It is further worth noting, though,
+that the majority of OpenStep and NextStep installations on Intel and NeXT
+hardware use either 12- or 24-bit RGB frame buffers so the actual impact of
+this limitation may not be particularly severe.
 
-7. Palette
-----------
+
+7. Frame Buffer Processing
+--------------------------
 
 With few exceptions, most MacOS/X Server, OpenStep, and NextStep
 configurations use "true color" rather than palettized color.  However, "true
@@ -440,7 +475,7 @@ alpha bits must be set to one.
 Unfortunately Crystal Space is unable to produce image data in a format usable
 by the WindowServer when video performance is a concern.  This is unfortunate
 since it means that this port must itself massage the data into a format
-suitable to the WindowServer, and that tends to be a time consuming operation.
+suitable to the WindowServer, which can be a time consuming operation.
 Crystal Space is unable to produce the proper image format for two reasons.
 
     1) The rendering engine has no facilities for forcing certain unused bits
@@ -449,97 +484,73 @@ Crystal Space is unable to produce the proper image format for two reasons.
        unused bits, but this is insufficient since the alpha bits would be
        uninitialized.
 
-    2) The rendering engine does not support any of the AppKit defined display
-       depths.  In particular, for color modes the AppKit can deal with 12-bit
-       and 24-bit RGB.  Crystal Space, however, can only produce 15-bit,
-       16-bit, and 32-bit RGB data.
+    2) The rendering engine does not support all of the common AppKit display
+       modes.  For instance, the engine can generate 8-bit, 15-bit, and
+       16-bit, but not the 12-bit RGB data which is quite common on MacOS/X
+       Server, OpenStep, and NextStep platforms.
 
-The upshot is that even though NeXT supports "true color" data and Crystal
-Space is capable of generating "true color" data, the formats are incompatible
-and consequently "true color" can not be used.
+The upshot is that even though MacOS/X Server, OpenStep, and NextStep support
+"true color" data and Crystal Space is capable of generating "true color"
+data, the formats are incompatible.
 
 One solution to the problem is to allow Crystal Space to generate 15-bit or
-16-bit "true color" data and then have the NeXT-specific code massage the data
-into an appropriate format immediately before passing it to the WindowServer
-for each animation frame.  However in the interest of video performance, this
-is probably a sub-optimal solution since it tends to be quite time-consuming.
+16-bit "true color" data and then have port-specific code massage it into an
+appropriate format immediately before passing it to the WindowServer for each
+animation frame.  However in the interest of video performance, this is
+probably a sub-optimal solution since it tends to be quite time-consuming.
 
-As an alternative, this implementation uses a pseudo 8-bit palette approach
-which essentially makes use of pre-formatted image data.  In this case the
-data is pre-formatted with an alpha channel such that is is directly usable by
-the WindowServer.  The down-side to this approach, of course, is that the
-palette is limited to 256 colors.
+Rather than performing the time-consuming massaging of image data prior to
+flusing it to the display, this port attempts to perform most of the
+time-consuming work during a one-time initialization phase which simplifies
+conversion from Crystal Space format image data to WindowServer format data,
+as well as enhancing the speed of the operation.
 
-The class which maintains the pseudo palette is NeXTProxy2D.  It generates the
-palette in parallel with csSystemDriver's palette using the same color values
-but massages them into a format usable by the WindowServer as shown below.
+Crystal Space is automatically configured to generate 32-bit RGB image data
+when running on MacOS/X Server, OpenStep, and NextStep machines configured for
+24-bit RGBA display.  Conversion of Crystal Space 32-bit RGB:888 data to
+RGBA:8888 needed by the WindowServer is encapsulated in the class
+NeXTFrameBuffer32.  This class instructs the Crystal Space renderer to
+generate RGB data in the first three bytes of a four-byte pixel entity.  Just
+prior to flushing the image data to the display, NeXTFrameBuffer32 places 0xff
+in every fourth byte to satisfy the requirement that the alpha byte be set to
+0xff, as explained in the Video Optimizations section.  This technique is both
+simple and efficient and achieves the objective admirably.
 
-    Depth       Data Format
-    -----       -----------
-    12-bit      RRRRGGGGBBBB1111
-    24-bit      RRRRRRRRGGGGGGGGBBBBBBBB11111111
-
-For 12-bit depth each palette entry contains 16 bits.  For 24-bit depth, each
-entry contains 32 bits.
-
-To flush the image to screen, NeXTProxy2D enumerates over the 8-bit data
-generated by the renderer and converts each 8-bit quantity into a properly
-formatted 12- or 24-bit RGBA value by extracting the pre-formatted color value
-directly from the palette and placing it into the output buffer which is then
-sent to the WindowServer.
-
-It is worth noting that none of the aforementioned video optimizations deal
-with 2-bit gray, 8-bit gray, or 8-bit color.  Consequently this implementation
-does not even attempt to perform any optimization in these cases and simply
-hands the WindowServer 12-bit color data and lets the WindowServer massage it
-as appropriate.  The upshot is that for displays other than 12- and 24-bit
-RGB, video performance will probably suffer since the WindowServer will have
-to massage and dither color data itself.  It is further worth noting, though,
-that the majority of NextStep and OpenStep installations on Intel and NeXT
-hardware use either 12- or 24-bit RGB frame-buffers so the actual impact of
-this limitation may not be particularly severe.
+Crystal Space is automatically configured to generate 15-bit RGB image data
+when running on machines configured for 12-bit RGBA display.  Conversion of
+Crsytal Space 15-bit RGB:555 data to RGBA:4444 needed by the WindowServer is
+encapsulated in the class NeXTFrameBuffer15.  In order to avoid time-consuming
+bit manipulation of image data, this class generates a translation table which
+equates each possible RGB:555 color value with the corresponding RGBA:4444
+color.  The alpha nybble of the translated color contains 0x0f as explained in
+the Video Optimizations section.  To translate incoming RGB:555 data to
+RGBA:4444, NeXTFrameBuffer15 enumerates over each color value in the incoming
+image data, looks up its corresponding RGBA:4444 value in the translation
+table and outputs that color.  This technique is both simple and generally
+efficient.
 
 
 8. Future Plans
 ---------------
 This is a list of items which are planned for future releases of this project.
 
-    o Round window position down rather than up.
-    o Rewrite code which queries for device depth.  It should really be
-      querying the WindowServer directly instead of the AppKit, since the
-      WindowServer has a better notion of its preferred image format.  Under
-      NextStep the WindowServer and AppKit will return the same value, however
-      as of OpenStep 4.1, the values may differ, and the WindowServer's result
-      should be taken as the truth.
-    o NeXTSystemProxy.h is identical in the nextstep & openstep directories.
-      It can be moved to the shared directory.
+    o Re-write event handling so that it no longer relies on a timer to drive
+      animation.  The problem with using the timer is that (1) it places an
+      upper limit on the frame rate, and (2) on slow machines it can fire
+      frequently enough to put a strangle hold on the user event queue, since
+      the run loop checks for timer events before checking for user events.
+      Probably a good way to re-engineer this is to place an "application
+      defined" event in the event queue at the end of each animation frame,
+      then have the application event trigger the next animation frame.  Since
+      the event will be placed at the tail of the event queue, it will not
+      smother out user events.
     o Possibly implement sound support.
-    o Consult with Jorrit or Andrew Zabolotny concerning "true color" video
-      modes.  The more I think about it, the more I think it can be
-      implemented without too much difficulty, but I would like some
-      clarification with regards to the engine's treatment of color
-      bits/masks.
 
 
 9. Bugs
 -------
 This is a list of known problems with the current release of this project.
 
-    o In NeXTDelegate.cpp, all values are inappropriately being assigned to
-      the variable "s":
-        - (void)isEvent:(NSEvent*)p shift:(bool*)s alt:(bool*)a ctrl:(bool*)c
-            {
-            unsigned int const flags = [p modifierFlags];
-            *s = (flags & NSShiftKeyMask    ) != 0;
-            *s = (flags & NSAlternateKeyMask) != 0;
-            *s = (flags & NSControlKeyMask  ) != 0;
-            }
-      This entire method can probably be dropped.  It is only used by
-      -mouseDown: to determine which modifiers are depressed.  However, since
-      NeXTDelegate is already keeping state information for each of the
-      modifiers from -flagsChanged: events, this information is already
-      available and need not be extracted a second time from the mouse-down
-      event.
     o The NextStep compiler generates invalid code at locations which make COM
       queries for the IID_IHaloRasterizer module.  This is the only COM module
       which is derived with multiple-inheritance, and it is the only module
@@ -570,11 +581,46 @@ This is a list of known problems with the current release of this project.
 
 10. History
 -----------
+1999/07/26 (13r012+CVS)
+    Now supports 16-bit and 32-bit RGB instead of being limited to 8-bit, 256
+        color palette.  Not only does this improve display quality, but it
+        also means that the MacOS/X Server, OpenStep, and NextStep ports can
+        take advantage of all the features which are not available in 8-bit
+        mode.  For instance, sprites are now lighted correctly, bots and the
+        skeletal tree are now properly Gouraud shaded, the translucent green
+        ghost is visible, and Crystal Shooter works.  Testing indicates that
+        the low-level 15-bit blitter is just as fast as the old 8-bit one, and
+        the 32-bit blitter is actually faster on account of the fact that the
+        frame buffer is no longer copied.
+    Rewrote the code which queries for device depth.  It now queries the
+        WindowServer directly instead of the AppKit, since the WindowServer
+        has a better notion of its preferred image format.  Under NextStep the
+        WindowServer and AppKit will return the same value, however as of
+        OpenStep 4.1, the values may differ, and the WindowServer's result
+        should be taken as the truth.
+    Now rounds the window's position down to a multiple of 8, rather than up.
+    Since NeXTSystemProxy.h was identical in the "nextstep" and "openstep"
+        directories, it has been moved to the "shared" directory.
+    In -[NeXTDelegate isEvent:shift:alt:ctrl], which is called by -mouseDown:
+        and reads the shift, alternate, and control flags from a mouse down
+        event, the alternate and control flags were being incorrectly
+        computed.  Furthermore, the entire method was unnecessary since
+        NeXTDelegate already keeps state information concerning these keys.
+        Consequently, the method was removed since its functionality was
+        redundant.
+    Worked around a nasty bug in GNU make on MacOS/X Server.  Specifically, it
+        corrupts the contents of MAKE_VOLATILE_H (and probably other
+        variables) by truncating values which are appended to it with +=.
+    Worked around a bizarre bug in the MacOS/X Server PPC compiler, where it
+        would crash with an "internal compiler error" in soft_txt.cpp any time
+        find_rgb_map() was called.  A simple textual reorganization of the
+        file cured the problem.
+
 1999/07/19 (13r012+CVS)
     Once again create_lighted_texture_true_rgb_priv() was causing HPPA
         compiler to crash with an internal error.  Presumably the argument
-	list changed, which made the methods signature longer.  To work
-	around this, I shortened the method's name yet again.
+        list changed, which made the methods signature longer.  To work
+        around this, I shortened the method's name yet again.
 
 1999/07/16 (13r012+CVS)
     Updated all ports to work with Crystal Space beta 13.  Much has changed
@@ -590,8 +636,8 @@ This is a list of known problems with the current release of this project.
     Now TARGET_ARCHS is a "sticky" option, specified at configuration time.
     Worked around compiler bug in OpenStep 4.2 where compiler corrupts virtual
         table pointers when compiling for debug.  Did so by adding
-	-finline-functions flag to compilation statement even for debug.  See
-	openstep.mak for a full explanation.
+        -finline-functions flag to compilation statement even for debug.  See
+        openstep.mak for a full explanation.
     Added -finline-function when compiling for optimize.
 
 1999/03/02 (12r002)
@@ -612,7 +658,7 @@ This is a list of known problems with the current release of this project.
         temporal anomaly when execution is resumed.
     Added a README.Binaries file which will be included in the binary-only
         distributions of Crystal Space for MacOS/X Server, OpenStep, and
-	NextStep.
+        NextStep.
 
 1999/03/02 (12r001)
     Moved the Blocks game into the cryst/src/general directory.  It used to be
