@@ -23,6 +23,7 @@ chronological order.
 	  This will basically be a simple kdtree for polygons that I plan
 	  to use to do a HUGE optimization of the ODE mesh->ball and other
 	  mesh related tests.
+	- Jorrit added csPolygonTree::IntersectBox() and IntersectSphere().
 17-Aug-2003
 	- Jorrit fixed a bug in csIntersect3::IntersectTriangle(). In
 	  some cases it would fail to register a hit.

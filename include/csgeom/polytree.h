@@ -67,6 +67,13 @@ public:
 
   /// Get the array of polygon indices.
   const csArray<int>& GetPolygons () const { return polygons; }
+
+  /// Hit a box with this tree and return the polygons that intersect.
+  void IntersectBox (csArray<int>& polyidx, const csBox3& box);
+
+  /// Hit a sphere with this tree and return the polygons that intersect.
+  void IntersectSphere (csArray<int>& polyidx, const csVector3& center,
+  	float sqradius);
 };
 
 #endif // __CS_POLYTREE_H__

@@ -17,6 +17,7 @@
 */
 #include "cssysdef.h"
 #include "csgeom/polytree.h"
+#include "csgeom/math3d.h"
 #include "igeom/polymesh.h"
 
 //---------------------------------------------------------------------------
@@ -138,5 +139,30 @@ void csPolygonTree::Build (iPolygonMesh* mesh)
   for (i = 0 ; i < mesh->GetPolygonCount () ; i++)
     polyidx.Push (i);
   Build (polyidx, mesh);
+}
+
+void csPolygonTree::IntersectBox (csArray<int>& polyidx, const csBox3& box)
+{
+  if (box.TestIntersect (bbox))
+  {
+    int i;
+    for (i = 0 ; i < polygons.Length () ; i++)
+      polyidx.Push (polygons[i]);
+    if (child1) child1->IntersectBox (polyidx, box);
+    if (child2) child2->IntersectBox (polyidx, box);
+  }
+}
+
+void csPolygonTree::IntersectSphere (csArray<int>& polyidx, const csVector3& center,
+  	float sqradius)
+{
+  if (csIntersect3::BoxSphere (bbox, center, sqradius))
+  {
+    int i;
+    for (i = 0 ; i < polygons.Length () ; i++)
+      polyidx.Push (polygons[i]);
+    if (child1) child1->IntersectSphere (polyidx, center, sqradius);
+    if (child2) child2->IntersectSphere (polyidx, center, sqradius);
+  }
 }
 
