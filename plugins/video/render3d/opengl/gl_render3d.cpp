@@ -705,7 +705,7 @@ void csGLGraphics3D::SetupProjection ()
   if (render_target)
   {
     int txt_w, txt_h;
-    render_target->GetMipMapDimensions (0, txt_w, txt_h);
+    render_target->GetRendererDimensions (txt_w, txt_h);
 
     /*
       Need a different translation for PTs, they are in the upper left.
@@ -781,7 +781,7 @@ bool csGLGraphics3D::Open ()
   ext->InitGL_ARB_texture_cube_map();
   ext->InitGL_EXT_texture3D ();
   ext->InitGL_ARB_texture_compression ();
-  //ext->InitGL_EXT_texture_compression_s3tc (); // not used atm
+  ext->InitGL_EXT_texture_compression_s3tc (); 
   ext->InitGL_ARB_vertex_buffer_object ();
   ext->InitGL_SGIS_generate_mipmap ();
   ext->InitGL_EXT_texture_filter_anisotropic ();
@@ -1087,7 +1087,7 @@ bool csGLGraphics3D::BeginDraw (int drawflags)
   if (render_target)
   {
     int txt_w, txt_h;
-    render_target->GetMipMapDimensions (0, txt_w, txt_h);
+    render_target->GetRendererDimensions (txt_w, txt_h);
     if (!rt_cliprectset)
     {
       G2D->GetClipRect (rt_old_minx, rt_old_miny, rt_old_maxx, rt_old_maxy);
@@ -1172,7 +1172,7 @@ bool csGLGraphics3D::BeginDraw (int drawflags)
       if (render_target)
       {
 	int txt_w, txt_h;
-	render_target->GetMipMapDimensions (0, txt_w, txt_h);
+	render_target->GetRendererDimensions (txt_w, txt_h);
 	/*
 	  Render target: draw everything in top-left corner, but flipped.
 	*/
@@ -1257,7 +1257,7 @@ void csGLGraphics3D::FinishDraw ()
       statecache->Disable_GL_BLEND ();
       statecache->Disable_GL_ALPHA_TEST ();
       int txt_w, txt_h;
-      render_target->GetMipMapDimensions (0, txt_w, txt_h);
+      render_target->GetRendererDimensions (txt_w, txt_h);
       csGLTextureHandle* tex_mm = (csGLTextureHandle *)
         render_target->GetPrivateObject ();
       tex_mm->Precache ();
@@ -1937,7 +1937,7 @@ void csGLGraphics3D::DrawPixmap (iTextureHandle *hTex,
   // image has been scaled to conform to OpenGL texture size restrictions)
   // we correct the input coordinates here.
   int bitmapwidth = 0, bitmapheight = 0;
-  hTex->GetMipMapDimensions (0, bitmapwidth, bitmapheight);
+  hTex->GetRendererDimensions (bitmapwidth, bitmapheight);
   csGLTextureHandle *txt_mm = (csGLTextureHandle *)
     hTex->GetPrivateObject ();
   int owidth = txt_mm->orig_width;

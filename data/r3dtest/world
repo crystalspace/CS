@@ -46,6 +46,7 @@
         </texture>
         <texture name="CRETE3_CEIL02A_NORM">
             <file>/lib/stdtex/blobbyDOT3.png</file>
+	    <class>normalmap</class>
         </texture>
         
         <texture name="CRETE2_FLR01">
@@ -53,6 +54,7 @@
         </texture>
         <texture name="CRETE2_FLR01_NORM">
             <file>/lib/stdtex/blobbyDOT3.png</file>
+	    <class>normalmap</class>
         </texture>
         
         <texture name="C2A1_W1">
@@ -60,6 +62,7 @@
         </texture>
         <texture name="C2A1_W1_NORM">
             <file>/lib/stdtex/oldbrickDOT3.png</file>
+	    <class>normalmap</class>
         </texture>
         
         <texture name="CRATE02B">
@@ -67,6 +70,7 @@
         </texture>
         <texture name="CRATE02B_NORM">
             <file>/lib/stdtex/parketDOT3.png</file>
+	    <class>normalmap</class>
         </texture>
 
         <texture name="CRATE02">
@@ -74,6 +78,7 @@
         </texture>
         <texture name="CRATE02_NORM">
             <file>/lib/stdtex/parketDOT3.png</file>
+	    <class>normalmap</class>
         </texture>
 
         <texture name="{GRATE2A">
@@ -82,6 +87,7 @@
         </texture>
         <texture name="{GRATE2A_NORM">
             <file>/lib/stdtex/oldmetalDOT3.png</file>
+	    <class>normalmap</class>
         </texture>
 
         <texture name="C2A2_SATORB">
@@ -89,6 +95,7 @@
         </texture>
         <texture name="C2A2_SATORB_NORM">
             <file>/lib/stdtex/bricksDOT3.png</file>
+	    <class>normalmap</class>
         </texture>
     </textures>
     <shaders>

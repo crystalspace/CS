@@ -59,6 +59,7 @@
 		</texture>
 		<texture name="boxn.jpg">
 			<file>boxn.jpg</file>
+			<class>normalmap</class>
 		</texture>
 		<texture name="boxh.jpg">
 			<file>boxh.jpg</file>

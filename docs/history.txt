@@ -10,11 +10,20 @@ chronological order.
 	- acraig extended StandardReporterListener to allow appending to file.
 	  Default behaviour is create new file but can now also configure to 
 	  append by:
-	  1) Reporter.FileAppend = true in a cfg file
-	  2) command line option append
-	  3) through  a param in SetDebugFile()
+	    1) Reporter.FileAppend = true in a cfg file
+	    2) command line option append
+	    3) through  a param in SetDebugFile()
 	- Marten fixed a bug in csGLRender3D::DrawSimpleMesh he introduced in
 	  his last commit.
+	- res made the following changes:
+	    - Removed iTextureHandle::GetCanvas(). The render target mechanism
+	      is nowadays used to draw onto textures.
+	    - Simplified GetMipMapDimensions() by taking out the 'mipmap'
+	      parameter and renamed it to GetRendererDimensions(). Commonly,
+	      only the mipmap 0 was queried anyway.
+	    - Added "texture classes". They allow to vary the upload settings
+	      of textures on a per-texture basis (e.g. only compress some
+	      textures).
 8-Jan-2005
 	- Marten completly rewrote the way renderbuffers are sent from the
 	  mesh into renderer. Also changed the syntax of buffermappings a bit.

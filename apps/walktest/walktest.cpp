@@ -971,7 +971,7 @@ void WalkTest::Create2DSprites ()
     phTex = texh->GetTextureHandle();
     if (phTex)
     {
-      phTex->GetMipMapDimensions (0, w, h);
+      phTex->GetRendererDimensions (w, h);
       cslogo = new csSimplePixmap (phTex, 0, 0, w, h);
     }
   }
