@@ -22,10 +22,11 @@ DESCRIPTION.beos	= BeOS
 DESCRIPTION.os2gcc	= OS/2 with GCC/EMX
 DESCRIPTION.os2wcc	= OS/2 with Watcom C
 DESCRIPTION.djgpp	= DOS with DJGPP
-DESCRIPTION.nextstep	= NextStep 3.3
+DESCRIPTION.macosxs	= MacOS/X Server
 DESCRIPTION.openstep	= OpenStep 4.2
-DESCRIPTION.rhapsody	= Rhapsody (MacOS/X Server) DR2
+DESCRIPTION.nextstep	= NextStep 3.3
 DESCRIPTION.amiga	= Amiga with GCC
+DESCRIPTION.win32vc	= Win32 with MSVC
 DESCRIPTION.unknown	= Unknown invalid target
 
 # The suffixes for $(OUT) directory when making PIC and non-PIC code
