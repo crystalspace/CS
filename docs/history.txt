@@ -1,5 +1,9 @@
 The history order is reversed so that new features are at the top.
 
+1-Nov-2001
+	- Fixed a bug in csRenderView::ClipBSphere. The bug was
+	  actually a false CS_ASSERT based on a wrong assumption
+	  that TestBSphere() is perfect which it isn't.
 29-Oct-2001
 	- Eric Sunshine augmented the makefile configuration procedure for the
 	  Apple/NeXT ports so that they work even if executable permission has
