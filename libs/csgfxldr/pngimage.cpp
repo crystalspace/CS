@@ -38,7 +38,9 @@ bool RegisterPNG ()
 
 AlphaMapFile* PNGImageLoader::LoadAlphaMap (UByte* buf, ULong size)
 {
-	return NULL;
+  (void) buf;
+  (void) size;
+  return NULL;
 }
 
 ImageFile* PNGImageLoader::LoadImage (UByte* buf, ULong size)

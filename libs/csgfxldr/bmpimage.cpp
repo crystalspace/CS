@@ -43,7 +43,9 @@ ImageFile* BMPImageLoader::LoadImage (UByte* buf, ULong size)
 
 AlphaMapFile *BMPImageLoader::LoadAlphaMap(UByte* buf,ULong size)
 {
-	return NULL;
+  (void) buf;
+  (void) size;
+  return NULL;
 }
 
 //---------------------------------------------------------------------------

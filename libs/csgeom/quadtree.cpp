@@ -145,7 +145,6 @@ bool csQuadtree::InsertPolygon (csQuadtreeNode* node,
   const csVector2& center = node->GetCenter ();
   bool vis, rc1, rc2, rc3, rc4;
   csVector2 v;
-  int i;
   rc1 = rc2 = rc3 = rc4 = false;
 
   // center_vis contains visibility info about the visibility
@@ -348,7 +347,6 @@ bool csQuadtree::TestPolygon (csQuadtreeNode* node,
   const csVector2& center = node->GetCenter ();
   bool vis;
   csVector2 v;
-  int i;
 
   // center_vis contains visibility info about the visibility
   // of the center inside the polygon.

@@ -33,7 +33,9 @@ bool RegisterGIF ()
 
 AlphaMapFile *GIFImageLoader::LoadAlphaMap(UByte *buf,ULong size)
 {
-	return NULL;
+  (void) buf;
+  (void) size;
+  return NULL;
 }
 
 ImageFile* GIFImageLoader::LoadImage (UByte* buf, ULong size)

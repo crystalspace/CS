@@ -43,7 +43,9 @@ bool RegisterJPG ()
 
 AlphaMapFile* JPGImageLoader::LoadAlphaMap(UByte *buf,ULong size)
 {
-	return NULL;
+  (void) buf;
+  (void) size;
+  return NULL;
 }
 
 ImageFile* JPGImageLoader::LoadImage (UByte* buf, ULong size)

@@ -42,9 +42,11 @@ bool RegisterTGA ()
   return ImageLoader::Register (&loader);
 }
 
-AlphaMapFile* TGAImageLoader::LoadAlphaMap(UByte *buffer,ULong size)
+AlphaMapFile* TGAImageLoader::LoadAlphaMap(UByte *buf,ULong size)
 {
-	return NULL;
+  (void) buf;
+  (void) size;
+  return NULL;
 }
 
 ImageFile* TGAImageLoader::LoadImage (UByte* buf, ULong size)
