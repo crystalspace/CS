@@ -1,8 +1,8 @@
 @c -*-texinfo-*-
 @noindent
-Copyright @copyright{} 1998, 1999, 2000, 2001 by Jorrit Tyberghein@*
+Copyright @copyright{} 1998, 1999, 2000, 2001, 2002 by Jorrit Tyberghein@*
 Copyright @copyright{} 1998, 1999, 2000 by Andrew Zabolotny@*
-Copyright @copyright{} 1999, 2000, 2001 by Eric Sunshine@*
+Copyright @copyright{} 1999, 2000, 2001, 2002 by Eric Sunshine@*
 Copyright @copyright{} 1999, 2000 by Thomas Hieber@*
 Copyright @copyright{} 1999, 2000 by Seth Galbraith@*
 Copyright @copyright{} 2001 by Christopher Nelson@*
@@ -15,4 +15,3 @@ Copyright @copyright{} 1999 by Robert Bate@*
 Copyright @copyright{} 1998 by Gary Haussmann@*
 Copyright @copyright{} 2000, 2001 by Philip Wyett@*
 Copyright @copyright{} 2000, 2001 by Brandon Ehle@*
-
