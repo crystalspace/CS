@@ -1,237 +1,189 @@
 from xml.dom import minidom
+from string import *
 
 xmldoc = minidom.parse ("metaglext.xml")
-header = file ("glextheader", "r")
-footer = file ("glextfooter", "r")
-output = file ("glextmanager.h", "w")
 
 writtenFuncs = list()
 writtenFuncTypes = list()
 
-def writeConstant (const):
-    output.write ("#ifndef " + const.getAttribute ("name") + "\n")
-    output.write (("#define " + const.getAttribute ("name") + \
-                   "\t" + const.getAttribute ("value") + "\n").expandtabs (70))
-    output.write ("#endif\n")
+templates = {}
 
-def writeFunctionType (func):
-    output.write ("typedef " + func.getAttribute ("return"))
+def getTemplate (template):
+  if template in templates:
+    return templates[template];
+  else:
+    templateFile = file ("glext/" + template, "r");
+    lines = templateFile.readlines();
+    templates[template] = lines;
+    return lines;   
+
+def concat(list):
+  result = "";
+  for word in list:
+    result += word;
+  return result;
+
+def getTemplateK (template, kind):
+  return getTemplate (template + "_" + kind);
+
+def interpolate (strings, values):
+  resStrings = list();
+  for string in strings:
+    words = string.split ("%");
+    result = "";
+    i = 0;
+    if len (words) >= 2:
+      while i < (len (words) - 1):
+	result = result + words[i];
+	key = words[i + 1];
+	if key == "":
+	  result = result + "%"
+	else:
+	  ksplit = key.split (":");
+	  value = values [ksplit[0].lower()];
+	  if key.islower():
+	    value = value.lower();
+	  if key.isupper():
+	    value = value.upper();
+	  if len (ksplit) > 1:
+	    width = int (ksplit[1]);
+	    if width > 0:
+	      value = value.ljust (width);
+	    if width < 0:
+	      value = value.rjust (-width);
+	  result = result + value;  
+	i = i + 2;
+    while i < len (words):
+      result = result + words[i];
+      i = i + 1;
+    resStrings.append (result);
+  return resStrings;
+
+def getConstant (const):
+    values = { "name" : const.getAttribute ("name"), 
+      "value" : const.getAttribute ("value") };
+    return interpolate (getTemplate ("constant"), values);
+
+def getFunctionType (func):
+    values = { "name" : func.getAttribute ("name"), 
+      "return" : func.getAttribute ("return") };
     if (func.getAttribute ("pointer") == "TRUE"):
-        output.write ("*")
-    output.write (" (csAPIENTRY* cs" + \
-                  func.getAttribute ("name").upper () + ") (")
-    prevarg = 0;
-    for arg in func.getElementsByTagName ("ARG"):
-        writeArgument (arg, prevarg)
-        prevarg = arg;
-    output.write (");\n")
-
-def writeArgument (arg, prevarg):
-    if prevarg != 0:
-        output.write (", ")
-    if arg.getAttribute("type").endswith("GL",0,2):
-        output.write ("GL" + arg.getAttribute("type").lstrip ("GL").lower ());
+      values["pointer"] = "*";
     else:
-        output.write (arg.getAttribute("type"));
+      values["pointer"] = "";
+    prevarg = 0;
+    arguments = "";
+    for arg in func.getElementsByTagName ("ARG"):
+      arguments = arguments + join (getArgument (arg, prevarg), "");
+      prevarg = arg;
+    values["arglist"] = arguments;
+    return interpolate (getTemplate ("func_type"), values);
+
+def getArgument (arg, prevarg):
+    values = { "name" : arg.getAttribute ("name") };
+    if prevarg != 0:
+      values["comma"] = ", ";
+    else:
+      values["comma"] = "";
+    if arg.getAttribute("type").startswith("GL"):
+        values["type"] = "GL" + arg.getAttribute("type").lstrip ("GL").lower ();
+    else:
+        values["type"] = arg.getAttribute("type");
     if (arg.getAttribute ("pointer") == "TRUE"):
-        output.write ("*")
-    output.write (" " + arg.getAttribute("name"));
+      values["pointer"] = "*";
+    else:
+      values["pointer"] = "";
+    return interpolate (getTemplate ("func_arg"), values);
 
 
-def writeDefinitions (extensions):
+def getDefinitions (ext):
+    name = ext.getAttribute ("name");
+    type = ((name.split ("_"))[0]).lower();
+    values = { "name" : name, "tokens" : "", "functiontypes" : "" };
+    for const in ext.getElementsByTagName ("TOKEN"):
+      values["tokens"] = values["tokens"] + join (getConstant (const), "");
+    for func in ext.getElementsByTagName ("FUNCTION"):
+      if func.getAttribute("name") not in writtenFuncTypes:
+	values["functiontypes"] = values["functiontypes"] + \
+	  join (getFunctionType (func), "");
+	writtenFuncTypes.append (func.getAttribute("name"))
+    return interpolate (getTemplateK ("defs", type), values);
+
+def getExtensions (extensions):
+    tflags = list();
+    dflags = list();
+    initflags = list();
+    defs = list();
+    funcs = list();
+    initext = list();
     for ext in extensions:
-        output.write ("// " + ext.getAttribute ("name") + "\n")
-        if ext.getAttribute("name").endswith("WGL",0,3):
-            output.write ("#ifdef _WIN32\n")
-        for const in ext.getElementsByTagName ("TOKEN"):
-            writeConstant (const)
-        for func in ext.getElementsByTagName ("FUNCTION"):
-            if func.getAttribute("name") not in writtenFuncTypes:
-            	writeFunctionType (func)
-            	writtenFuncTypes.append (func.getAttribute("name"))
-        if ext.getAttribute("name").endswith("WGL",0,3):
-            output.write ("#endif\n")
-        output.write ("\n")
-    output.write ("\n\n\n")
+      print ext.getAttribute ("name") + "...";
+      values = { "name" : ext.getAttribute ("name") };
+      print " flags...";
+      tflags += interpolate (getTemplate ("ext_tested"), values);
+      dflags += interpolate (getTemplate ("ext_flag"), values);
+      initflags += interpolate (getTemplate ("ext_init"), values);
+      print " tokens...";
+      defs += getDefinitions (ext);
+      print " funcs...";
+      funcs += getFunctions (ext);
+      initext += getInitExtensions (ext);
+    values = {
+      "definitions" : concat (defs),
+      "initflags" : concat (initflags),
+      "functions" : concat (funcs),
+      "extflagsdetected" : concat (dflags),
+      "extflagstested" : concat (tflags),
+      "initextensions" : concat (initext)
+    };
+    print "assembling...";
+    return interpolate (getTemplate ("headerfiletemplate"), values);
 
-def writeExtensions (extensions):
-    for ext in extensions:
-        output.write ("  bool CS_" + ext.getAttribute ("name") + ";\n")
-    output.write ("\n")
-    output.write ("\
-private:\n");
-    for ext in extensions:
-        output.write ("  bool tested_CS_" + ext.getAttribute ("name") + ";\n")
-    output.write ("\
-public:\n\
-  csGLExtensionManager (): object_reg(NULL)\n\
-  {\n");
-    for ext in extensions:
-        output.write ("    CS_" + ext.getAttribute ("name") + " = false;\n")
-        output.write ("    tested_CS_" + ext.getAttribute ("name") + " = false;\n")
-    output.write ("\
-  }\n");
+def getFunctions (ext):
+  funcs = list();
+  name = ext.getAttribute ("name");
+  type = ((name.split ("_"))[0]).lower();
+  for func in ext.getElementsByTagName ("FUNCTION"):
+    values = { "name" : func.getAttribute("name") };
+    if func.getAttribute("name") not in writtenFuncs:
+      funcs = funcs + interpolate (getTemplate ("func"), values);
+      writtenFuncs.append (func.getAttribute("name"))
+  values = {"name" : name, "functions" : join (funcs, "") };
+  return interpolate (getTemplateK ("funcs", type), values);
 
-def writeFunctions (extensions):
-    for ext in extensions:
-        output.write ("  // " + ext.getAttribute ("name") + "\n")
-        if ext.getAttribute("name").endswith("WGL",0,3):
-            output.write ("#ifdef _WIN32\n")
-        for func in ext.getElementsByTagName ("FUNCTION"):
-            if func.getAttribute("name") not in writtenFuncs:
-            	writeFunction (func)
-            	writtenFuncs.append (func.getAttribute("name"))
-        if ext.getAttribute("name").endswith("WGL",0,3):
-            output.write ("#endif\n")
-        output.write ("\n")
-
-def writeFunction (func):
-    output.write ("  #ifndef " + func.getAttribute ("name").upper () + "_DECL\n"\
-                  "  #define " + func.getAttribute ("name").upper () + "_DECL\n") 
-    output.write ("  cs" + func.getAttribute ("name").upper () + \
-                  " " + func.getAttribute ("name") + ";\n")
-    output.write ("  #endif\n\n")
-
-def writeInitExtensions (extensions):
+def getInitExtensions (ext):
     cfgprefix = "Video.OpenGL.UseExtension.";
-    for ext in extensions:
-        name = ext.getAttribute ("name")
-        if name.endswith("WGL",0,3):
-	  output.write ("#ifdef _WIN32\n")
-	  output.write ("  void Init" + name + " (HDC hDC)\n  {\n")
-	else:
-	  output.write ("  void Init" + name + " ()\n  {\n")
-        output.write ("    if (tested_CS_" + name + ") return;\n");
-        output.write ("    tested_CS_" + name + " = true;\n")
-        output.write ("    const char* ext = \"" + name +"\";\n");
-        output.write ("    char cfgkey[" + str (len (cfgprefix) + len (name) + 1) + "];\n");
-        output.write ("    sprintf (cfgkey, \"" + cfgprefix + "%s\", ext);\n\n");
-	# sligthly different ext checking for Win32
-        if ((name.startswith("GL_version_")) or 
-	  (name == "WGL_ARB_extensions_string") or 
-	  (name == "WGL_EXT_extensions_string")):
-          output.write ("    CS_" + ext.getAttribute ("name") + " = true;\n")
-	else:
-	  if name.endswith("WGL",0,3):
-	    output.write ("    if (!tested_CS_WGL_ARB_extensions_string) " +
-	      "InitWGL_ARB_extensions_string (hDC);\n");
-	    output.write ("    const char* extensions;\n");
-	    output.write ("    if (CS_WGL_ARB_extensions_string)\n");
-	    output.write ("    {\n");
-	    output.write ("      extensions = wglGetExtensionsStringARB (hDC);\n");
-	    output.write ("    }\n");
-	    output.write ("    else\n");
-	    output.write ("    {\n");
-	    output.write ("      extensions = " +
-	      " (const char*)glGetString (GL_EXTENSIONS);\n");
-	    output.write ("    }\n");
-	  else:
-	    output.write ("    const char* extensions = (const char*)glGetString (GL_EXTENSIONS);\n");
-	  output.write ("    CS_" + ext.getAttribute ("name") + " = (strstr (extensions, ext) != NULL);\n")
-	output.write ("\n");
-        output.write ("    bool allclear, funcTest;\n")
-        if name.endswith("WGL",0,3):
-	  output.write ("    if (CS_" + name + ")\n");
-	else:
-	  output.write ("    if (gl && CS_" + name + ")\n");
-        output.write ("\
-    {\n");
-        output.write ("      allclear = true;\n")
-	for func in ext.getElementsByTagName ("FUNCTION"):
-	    writeFunctionInit (func)
-        output.write ("      if (CS_" + name + " = allclear)\n")
-        output.write ("      {\n");
-        output.write ("\
-        CS_" + name + " &= config->GetBool (cfgkey, true);\n\
-        if (CS_" + name + ")\n\
-        {\n\
-          Report (\"GL Extension '%s' found and used.\", ext);\n\
-        }\n\
-        else\n\
-        {\n\
-          Report (\"GL Extension '%s' found, but not used.\", ext);\n\
-        }\n\
-      }\n\
-      else\n\
-      {\n\
-        Report (\"GL Extension '%s' failed to initialize.\", ext);\n\
-      }\n\
-    }\n\
-    else\n\
-    {\n\
-      Report (\"GL Extension '%s' not found.\", ext);\n\
-    }\n");
-        output.write ("  }\n\n");
-        if name.endswith("WGL",0,3):
-            output.write ("#endif\n")
+    name = ext.getAttribute ("name")
+    values = { 
+      "name" : name, 
+      "namelen" : str (len (name)),
+      "cfgprefix" : cfgprefix, 
+      "cfglen" : str (len (cfgprefix)),
+      "functionsinit" : "" };
+    type = ((name.split ("_"))[0]).lower();
+    ettype = type;
+    specials = ( 
+      "GL_version_1_2",
+      "GL_version_1_3",
+      "WGL_ARB_extensions_string"
+      );
+    if name in specials:
+      ettype = "special";
+    values["extcheck"] = join (interpolate (getTemplateK ("extcheck", 
+      ettype), values), "");
+    for func in ext.getElementsByTagName ("FUNCTION"):
+      values["functionsinit"] += join (getFunctionInit (func), "");
+    return interpolate (getTemplateK ("initext", 
+      type), values);
 
-def writeFunctionInit (func):
+def getFunctionInit (func):
     name = func.getAttribute ("name")
-    output.write ("      funcTest = ((" + name + " = (" + \
-                  "cs" + name.upper () + \
-                  ") gl->GetProcAddress (\"" + \
-                  name + "\")) != NULL);\n")
-    output.write ("      if (!funcTest && config->GetBool \
-(\"Video.OpenGL.ReportMissingEntries\", REPORT_MISSING_ENTRIES))\n");                
-    output.write ("        Report (\"Failed to retrieve %s\", \"" + name + "\");\n");
-    output.write ("      allclear &= funcTest;\n");
+    values = { 
+      "name" : name};
+    return interpolate (getTemplate ("funcinit"), values);
 
-output.write (header.read ())
-writeDefinitions (xmldoc.getElementsByTagName ("EXTENSION"))
-output.write ("\
-#ifdef CS_DEBUG\n\
-#  define REPORT_MISSING_ENTRIES true\n\
-#else\n\
-#  define REPORT_MISSING_ENTRIES false\n\
-#endif\n\
-\n\
-struct csGLExtensionManager\n\
-{\n\
-private:\n\
-  iObjectRegistry* object_reg;\n\
-  csConfigAccess config;\n\
-  iOpenGLInterface* gl;\n\
-\n\
-  void Report (const char* msg, ...)\n\
-  {\n\
-    va_list arg;\n\
-    va_start (arg, msg);\n\
-    csRef<iReporter> rep (CS_QUERY_REGISTRY (object_reg, iReporter));\n\
-    if (rep)\n\
-      rep->ReportV (CS_REPORTER_SEVERITY_NOTIFY,\n\
-         \"crystalspace.canvas.opengl.extmgr\", msg, arg);\n\
-    else\n\
-    {\n\
-      csPrintfV (msg, arg);\n\
-      csPrintf (\"\\n\");\n\
-    }\n\
-    va_end (arg);\n\
-  }\n\
-\n\
-public:\n\
-  void Initialize (iObjectRegistry* object_reg, iGraphics2D* g2d)\n\
-  {\n\
-    csGLExtensionManager::object_reg = object_reg;\n\
-    gl = csRef<iOpenGLInterface>\n\
-      (SCF_QUERY_INTERFACE (g2d, iOpenGLInterface));\n\
-    // Low priority so canvas/renderer cfgs may override the settings\n\
-    config.AddConfig (object_reg, \"/config/glext.cfg\", true,\n\
-      iConfigManager::ConfigPriorityPlugin - 1);\n\
-  }\n\
-  \n\
-  void Open ()\n\
-  {\n\
-  }\n\
-  \n\
-  void Close ()\n\
-  {\n\
-  }\n\
-  \n\
-");
-writeExtensions (xmldoc.getElementsByTagName ("EXTENSION"))
-writeFunctions (xmldoc.getElementsByTagName ("EXTENSION"))
-writeInitExtensions (xmldoc.getElementsByTagName ("EXTENSION"))
-output.write ("};\n\
-#undef REPORT_MISSING_ENTRIES\n\n");
-output.write (footer.read ())
+stuff = join (getExtensions (xmldoc.getElementsByTagName ("EXTENSION")),
+  "");
+output = file ("glextmanager.h", "w")
+output.write (stuff);
 output.close ()

@@ -108,123 +108,164 @@
 #ifndef GL_UNSIGNED_BYTE_3_3_2
 #define GL_UNSIGNED_BYTE_3_3_2                                        32818
 #endif
+
 #ifndef GL_UNSIGNED_SHORT_4_4_4_4
 #define GL_UNSIGNED_SHORT_4_4_4_4                                     32819
 #endif
+
 #ifndef GL_UNSIGNED_SHORT_5_5_5_1
 #define GL_UNSIGNED_SHORT_5_5_5_1                                     32820
 #endif
+
 #ifndef GL_UNSIGNED_INT_8_8_8_8
 #define GL_UNSIGNED_INT_8_8_8_8                                       32821
 #endif
+
 #ifndef GL_UNSIGNED_INT_10_10_10_2
 #define GL_UNSIGNED_INT_10_10_10_2                                    32822
 #endif
+
 #ifndef GL_RESCALE_NORMAL
 #define GL_RESCALE_NORMAL                                             32826
 #endif
+
 #ifndef GL_UNSIGNED_BYTE_2_3_3_REV
 #define GL_UNSIGNED_BYTE_2_3_3_REV                                    33634
 #endif
+
 #ifndef GL_UNSIGNED_SHORT_5_6_5
 #define GL_UNSIGNED_SHORT_5_6_5                                       33635
 #endif
+
 #ifndef GL_UNSIGNED_SHORT_5_6_5_REV
 #define GL_UNSIGNED_SHORT_5_6_5_REV                                   33636
 #endif
+
 #ifndef GL_UNSIGNED_SHORT_4_4_4_4_REV
 #define GL_UNSIGNED_SHORT_4_4_4_4_REV                                 33637
 #endif
+
 #ifndef GL_UNSIGNED_SHORT_1_5_5_5_REV
 #define GL_UNSIGNED_SHORT_1_5_5_5_REV                                 33638
 #endif
+
 #ifndef GL_UNSIGNED_INT_8_8_8_8_REV
 #define GL_UNSIGNED_INT_8_8_8_8_REV                                   33639
 #endif
+
 #ifndef GL_UNSIGNED_INT_2_10_10_10_REV
 #define GL_UNSIGNED_INT_2_10_10_10_REV                                33640
 #endif
+
 #ifndef GL_BGR
 #define GL_BGR                                                        32992
 #endif
+
 #ifndef GL_BGRA
 #define GL_BGRA                                                       32993
 #endif
+
 #ifndef GL_MAX_ELEMENTS_VERTICES
 #define GL_MAX_ELEMENTS_VERTICES                                      33000
 #endif
+
 #ifndef GL_MAX_ELEMENTS_INDICES
 #define GL_MAX_ELEMENTS_INDICES                                       33001
 #endif
+
 #ifndef GL_CLAMP_TO_EDGE
 #define GL_CLAMP_TO_EDGE                                              33071
 #endif
+
 #ifndef GL_TEXTURE_MIN_LOD
 #define GL_TEXTURE_MIN_LOD                                            33082
 #endif
+
 #ifndef GL_TEXTURE_MAX_LOD
 #define GL_TEXTURE_MAX_LOD                                            33083
 #endif
+
 #ifndef GL_TEXTURE_BASE_LEVEL
 #define GL_TEXTURE_BASE_LEVEL                                         33084
 #endif
+
 #ifndef GL_TEXTURE_MAX_LEVEL
 #define GL_TEXTURE_MAX_LEVEL                                          33085
 #endif
+
 #ifndef GL_LIGHT_MODEL_COLOR_CONTROL
 #define GL_LIGHT_MODEL_COLOR_CONTROL                                  33272
 #endif
+
 #ifndef GL_SINGLE_COLOR
 #define GL_SINGLE_COLOR                                               33273
 #endif
+
 #ifndef GL_SEPARATE_SPECULAR_COLOR
 #define GL_SEPARATE_SPECULAR_COLOR                                    33274
 #endif
+
 #ifndef GL_SMOOTH_POINT_SIZE_RANGE
-#define GL_SMOOTH_POINT_SIZE_RANGE                                    2834
+#define GL_SMOOTH_POINT_SIZE_RANGE                                     2834
 #endif
+
 #ifndef GL_SMOOTH_POINT_SIZE_GRANULARITY
-#define GL_SMOOTH_POINT_SIZE_GRANULARITY                              2835
+#define GL_SMOOTH_POINT_SIZE_GRANULARITY                               2835
 #endif
+
 #ifndef GL_SMOOTH_LINE_WIDTH_RANGE
-#define GL_SMOOTH_LINE_WIDTH_RANGE                                    2850
+#define GL_SMOOTH_LINE_WIDTH_RANGE                                     2850
 #endif
+
 #ifndef GL_SMOOTH_LINE_WIDTH_GRANULARITY
-#define GL_SMOOTH_LINE_WIDTH_GRANULARITY                              2851
+#define GL_SMOOTH_LINE_WIDTH_GRANULARITY                               2851
 #endif
+
 #ifndef GL_ALIASED_POINT_SIZE_RANGE
 #define GL_ALIASED_POINT_SIZE_RANGE                                   33901
 #endif
+
 #ifndef GL_ALIASED_LINE_WIDTH_RANGE
 #define GL_ALIASED_LINE_WIDTH_RANGE                                   33902
 #endif
+
 #ifndef GL_PACK_SKIP_IMAGES
 #define GL_PACK_SKIP_IMAGES                                           32875
 #endif
+
 #ifndef GL_PACK_IMAGE_HEIGHT
 #define GL_PACK_IMAGE_HEIGHT                                          32876
 #endif
+
 #ifndef GL_UNPACK_SKIP_IMAGES
 #define GL_UNPACK_SKIP_IMAGES                                         32877
 #endif
+
 #ifndef GL_UNPACK_IMAGE_HEIGHT
 #define GL_UNPACK_IMAGE_HEIGHT                                        32878
 #endif
+
 #ifndef GL_TEXTURE_3D
 #define GL_TEXTURE_3D                                                 32879
 #endif
+
 #ifndef GL_PROXY_TEXTURE_3D
 #define GL_PROXY_TEXTURE_3D                                           32880
 #endif
+
 #ifndef GL_TEXTURE_DEPTH
 #define GL_TEXTURE_DEPTH                                              32881
 #endif
+
 #ifndef GL_TEXTURE_WRAP_R
 #define GL_TEXTURE_WRAP_R                                             32882
 #endif
+
 #ifndef GL_MAX_3D_TEXTURE_SIZE
 #define GL_MAX_3D_TEXTURE_SIZE                                        32883
 #endif
+
+
 typedef GLvoid (csAPIENTRY* csGLDRAWRANGEELEMENTS) (GLenum mode, GLuint start, GLuint end, GLsizei count, GLenum type, GLvoid* indices);
 typedef GLvoid (csAPIENTRY* csGLTEXIMAGE3D) (GLenum target, GLint level, GLint internalformat, GLsizei width, GLsizei height, GLsizei depth, GLint border, GLenum format, GLenum type, GLvoid* pixels);
 typedef GLvoid (csAPIENTRY* csGLTEXSUBIMAGE3D) (GLenum target, GLint level, GLint xoffset, GLint yoffset, GLint zoffset, GLsizei width, GLsizei height, GLsizei depth, GLenum format, GLenum type, GLvoid* pixels);
@@ -234,294 +275,392 @@ typedef GLvoid (csAPIENTRY* csGLCOPYTEXSUBIMAGE3D) (GLenum target, GLint level, 
 #ifndef GL_TEXTURE0
 #define GL_TEXTURE0                                                   33984
 #endif
+
 #ifndef GL_TEXTURE1
 #define GL_TEXTURE1                                                   33985
 #endif
+
 #ifndef GL_TEXTURE2
 #define GL_TEXTURE2                                                   33986
 #endif
+
 #ifndef GL_TEXTURE3
 #define GL_TEXTURE3                                                   33987
 #endif
+
 #ifndef GL_TEXTURE4
 #define GL_TEXTURE4                                                   33988
 #endif
+
 #ifndef GL_TEXTURE5
 #define GL_TEXTURE5                                                   33989
 #endif
+
 #ifndef GL_TEXTURE6
 #define GL_TEXTURE6                                                   33990
 #endif
+
 #ifndef GL_TEXTURE7
 #define GL_TEXTURE7                                                   33991
 #endif
+
 #ifndef GL_TEXTURE8
 #define GL_TEXTURE8                                                   33992
 #endif
+
 #ifndef GL_TEXTURE9
 #define GL_TEXTURE9                                                   33993
 #endif
+
 #ifndef GL_TEXTURE10
 #define GL_TEXTURE10                                                  33994
 #endif
+
 #ifndef GL_TEXTURE11
 #define GL_TEXTURE11                                                  33995
 #endif
+
 #ifndef GL_TEXTURE12
 #define GL_TEXTURE12                                                  33996
 #endif
+
 #ifndef GL_TEXTURE13
 #define GL_TEXTURE13                                                  33997
 #endif
+
 #ifndef GL_TEXTURE14
 #define GL_TEXTURE14                                                  33998
 #endif
+
 #ifndef GL_TEXTURE15
 #define GL_TEXTURE15                                                  33999
 #endif
+
 #ifndef GL_TEXTURE16
 #define GL_TEXTURE16                                                  34000
 #endif
+
 #ifndef GL_TEXTURE17
 #define GL_TEXTURE17                                                  34001
 #endif
+
 #ifndef GL_TEXTURE18
 #define GL_TEXTURE18                                                  34002
 #endif
+
 #ifndef GL_TEXTURE19
 #define GL_TEXTURE19                                                  34003
 #endif
+
 #ifndef GL_TEXTURE20
 #define GL_TEXTURE20                                                  34004
 #endif
+
 #ifndef GL_TEXTURE21
 #define GL_TEXTURE21                                                  34005
 #endif
+
 #ifndef GL_TEXTURE22
 #define GL_TEXTURE22                                                  34006
 #endif
+
 #ifndef GL_TEXTURE23
 #define GL_TEXTURE23                                                  34007
 #endif
+
 #ifndef GL_TEXTURE24
 #define GL_TEXTURE24                                                  34008
 #endif
+
 #ifndef GL_TEXTURE25
 #define GL_TEXTURE25                                                  34009
 #endif
+
 #ifndef GL_TEXTURE26
 #define GL_TEXTURE26                                                  34010
 #endif
+
 #ifndef GL_TEXTURE27
 #define GL_TEXTURE27                                                  34011
 #endif
+
 #ifndef GL_TEXTURE28
 #define GL_TEXTURE28                                                  34012
 #endif
+
 #ifndef GL_TEXTURE29
 #define GL_TEXTURE29                                                  34013
 #endif
+
 #ifndef GL_TEXTURE30
 #define GL_TEXTURE30                                                  34014
 #endif
+
 #ifndef GL_TEXTURE31
 #define GL_TEXTURE31                                                  34015
 #endif
+
 #ifndef GL_ACTIVE_TEXTURE
 #define GL_ACTIVE_TEXTURE                                             34016
 #endif
+
 #ifndef GL_CLIENT_ACTIVE_TEXTURE
 #define GL_CLIENT_ACTIVE_TEXTURE                                      34017
 #endif
+
 #ifndef GL_MAX_TEXTURE_UNITS
 #define GL_MAX_TEXTURE_UNITS                                          34018
 #endif
+
 #ifndef GL_TRANSPOSE_MODELVIEW_MATRIX
 #define GL_TRANSPOSE_MODELVIEW_MATRIX                                 34019
 #endif
+
 #ifndef GL_TRANSPOSE_PROJECTION_MATRIX
 #define GL_TRANSPOSE_PROJECTION_MATRIX                                34020
 #endif
+
 #ifndef GL_TRANSPOSE_TEXTURE_MATRIX
 #define GL_TRANSPOSE_TEXTURE_MATRIX                                   34021
 #endif
+
 #ifndef GL_TRANSPOSE_COLOR_MATRIX
 #define GL_TRANSPOSE_COLOR_MATRIX                                     34022
 #endif
+
 #ifndef GL_MULTISAMPLE
 #define GL_MULTISAMPLE                                                32925
 #endif
+
 #ifndef GL_SAMPLE_ALPHA_TO_COVERAGE
 #define GL_SAMPLE_ALPHA_TO_COVERAGE                                   32926
 #endif
+
 #ifndef GL_SAMPLE_ALPHA_TO_ONE
 #define GL_SAMPLE_ALPHA_TO_ONE                                        32927
 #endif
+
 #ifndef GL_SAMPLE_COVERAGE
 #define GL_SAMPLE_COVERAGE                                            32928
 #endif
+
 #ifndef GL_SAMPLE_BUFFERS
 #define GL_SAMPLE_BUFFERS                                             32936
 #endif
+
 #ifndef GL_SAMPLES
 #define GL_SAMPLES                                                    32937
 #endif
+
 #ifndef GL_SAMPLE_COVERAGE_VALUE
 #define GL_SAMPLE_COVERAGE_VALUE                                      32938
 #endif
+
 #ifndef GL_SAMPLE_COVERAGE_INVERT
 #define GL_SAMPLE_COVERAGE_INVERT                                     32939
 #endif
+
 #ifndef GL_MULTISAMPLE_BIT
-#define GL_MULTISAMPLE_BIT                                            536870912
+#define GL_MULTISAMPLE_BIT                                           536870912
 #endif
+
 #ifndef GL_NORMAL_MAP
 #define GL_NORMAL_MAP                                                 34065
 #endif
+
 #ifndef GL_REFLECTION_MAP
 #define GL_REFLECTION_MAP                                             34066
 #endif
+
 #ifndef GL_TEXTURE_CUBE_MAP
 #define GL_TEXTURE_CUBE_MAP                                           34067
 #endif
+
 #ifndef GL_TEXTURE_BINDING_CUBE_MAP
 #define GL_TEXTURE_BINDING_CUBE_MAP                                   34068
 #endif
+
 #ifndef GL_TEXTURE_CUBE_MAP_POSITIVE_X
 #define GL_TEXTURE_CUBE_MAP_POSITIVE_X                                34069
 #endif
+
 #ifndef GL_TEXTURE_CUBE_MAP_NEGATIVE_X
 #define GL_TEXTURE_CUBE_MAP_NEGATIVE_X                                34070
 #endif
+
 #ifndef GL_TEXTURE_CUBE_MAP_POSITIVE_Y
 #define GL_TEXTURE_CUBE_MAP_POSITIVE_Y                                34071
 #endif
+
 #ifndef GL_TEXTURE_CUBE_MAP_NEGATIVE_Y
 #define GL_TEXTURE_CUBE_MAP_NEGATIVE_Y                                34072
 #endif
+
 #ifndef GL_TEXTURE_CUBE_MAP_POSITIVE_Z
 #define GL_TEXTURE_CUBE_MAP_POSITIVE_Z                                34073
 #endif
+
 #ifndef GL_TEXTURE_CUBE_MAP_NEGATIVE_Z
 #define GL_TEXTURE_CUBE_MAP_NEGATIVE_Z                                34074
 #endif
+
 #ifndef GL_PROXY_TEXTURE_CUBE_MAP
 #define GL_PROXY_TEXTURE_CUBE_MAP                                     34075
 #endif
+
 #ifndef GL_MAX_CUBE_MAP_TEXTURE_SIZE
 #define GL_MAX_CUBE_MAP_TEXTURE_SIZE                                  34076
 #endif
+
 #ifndef GL_COMPRESSED_ALPHA
 #define GL_COMPRESSED_ALPHA                                           34025
 #endif
+
 #ifndef GL_COMPRESSED_LUMINANCE
 #define GL_COMPRESSED_LUMINANCE                                       34026
 #endif
+
 #ifndef GL_COMPRESSED_LUMINANCE_ALPHA
 #define GL_COMPRESSED_LUMINANCE_ALPHA                                 34027
 #endif
+
 #ifndef GL_COMPRESSED_INTENSITY
 #define GL_COMPRESSED_INTENSITY                                       34028
 #endif
+
 #ifndef GL_COMPRESSED_RGB
 #define GL_COMPRESSED_RGB                                             34029
 #endif
+
 #ifndef GL_COMPRESSED_RGBA
 #define GL_COMPRESSED_RGBA                                            34030
 #endif
+
 #ifndef GL_TEXTURE_COMPRESSION_HINT
 #define GL_TEXTURE_COMPRESSION_HINT                                   34031
 #endif
+
 #ifndef GL_TEXTURE_COMPRESSED_IMAGE_SIZE
 #define GL_TEXTURE_COMPRESSED_IMAGE_SIZE                              34464
 #endif
+
 #ifndef GL_TEXTURE_COMPRESSED
 #define GL_TEXTURE_COMPRESSED                                         34465
 #endif
+
 #ifndef GL_NUM_COMPRESSED_TEXTURE_FORMATS
 #define GL_NUM_COMPRESSED_TEXTURE_FORMATS                             34466
 #endif
+
 #ifndef GL_COMPRESSED_TEXTURE_FORMATS
 #define GL_COMPRESSED_TEXTURE_FORMATS                                 34467
 #endif
+
 #ifndef GL_CLAMP_TO_BORDER
 #define GL_CLAMP_TO_BORDER                                            33069
 #endif
+
 #ifndef GL_CLAMP_TO_BORDER_SGIS
 #define GL_CLAMP_TO_BORDER_SGIS                                       33069
 #endif
+
 #ifndef GL_COMBINE
 #define GL_COMBINE                                                    34160
 #endif
+
 #ifndef GL_COMBINE_RGB
 #define GL_COMBINE_RGB                                                34161
 #endif
+
 #ifndef GL_COMBINE_ALPHA
 #define GL_COMBINE_ALPHA                                              34162
 #endif
+
 #ifndef GL_SOURCE0_RGB
 #define GL_SOURCE0_RGB                                                34176
 #endif
+
 #ifndef GL_SOURCE1_RGB
 #define GL_SOURCE1_RGB                                                34177
 #endif
+
 #ifndef GL_SOURCE2_RGB
 #define GL_SOURCE2_RGB                                                34178
 #endif
+
 #ifndef GL_SOURCE0_ALPHA
 #define GL_SOURCE0_ALPHA                                              34184
 #endif
+
 #ifndef GL_SOURCE1_ALPHA
 #define GL_SOURCE1_ALPHA                                              34185
 #endif
+
 #ifndef GL_SOURCE2_ALPHA
 #define GL_SOURCE2_ALPHA                                              34186
 #endif
+
 #ifndef GL_OPERAND0_RGB
 #define GL_OPERAND0_RGB                                               34192
 #endif
+
 #ifndef GL_OPERAND1_RGB
 #define GL_OPERAND1_RGB                                               34193
 #endif
+
 #ifndef GL_OPERAND2_RGB
 #define GL_OPERAND2_RGB                                               34194
 #endif
+
 #ifndef GL_OPERAND0_ALPHA
 #define GL_OPERAND0_ALPHA                                             34200
 #endif
+
 #ifndef GL_OPERAND1_ALPHA
 #define GL_OPERAND1_ALPHA                                             34201
 #endif
+
 #ifndef GL_OPERAND2_ALPHA
 #define GL_OPERAND2_ALPHA                                             34202
 #endif
+
 #ifndef GL_RGB_SCALE
 #define GL_RGB_SCALE                                                  34163
 #endif
+
 #ifndef GL_ADD_SIGNED
 #define GL_ADD_SIGNED                                                 34164
 #endif
+
 #ifndef GL_INTERPOLATE
 #define GL_INTERPOLATE                                                34165
 #endif
+
 #ifndef GL_SUBTRACT
 #define GL_SUBTRACT                                                   34023
 #endif
+
 #ifndef GL_CONSTANT
 #define GL_CONSTANT                                                   34166
 #endif
+
 #ifndef GL_PRIMARY_COLOR
 #define GL_PRIMARY_COLOR                                              34167
 #endif
+
 #ifndef GL_PREVIOUS
 #define GL_PREVIOUS                                                   34168
 #endif
+
 #ifndef GL_DOT3_RGB
 #define GL_DOT3_RGB                                                   34478
 #endif
+
 #ifndef GL_DOT3_RGBA
 #define GL_DOT3_RGBA                                                  34479
 #endif
+
+
 typedef GLvoid (csAPIENTRY* csGLACTIVETEXTURE) (GLenum texture);
 typedef GLvoid (csAPIENTRY* csGLCLIENTACTIVETEXTURE) (GLenum texture);
 typedef GLvoid (csAPIENTRY* csGLMULTITEXCOORD1D) (GLenum target, GLdouble s);
@@ -573,234 +712,312 @@ typedef GLvoid (csAPIENTRY* csGLGETCOMPRESSEDTEXIMAGE) (GLenum target, GLint lev
 #ifndef GL_CONSTANT_COLOR
 #define GL_CONSTANT_COLOR                                             32769
 #endif
+
 #ifndef GL_ONE_MINUS_CONSTANT_COLOR
 #define GL_ONE_MINUS_CONSTANT_COLOR                                   32770
 #endif
+
 #ifndef GL_CONSTANT_ALPHA
 #define GL_CONSTANT_ALPHA                                             32771
 #endif
+
 #ifndef GL_ONE_MINUS_CONSTANT_ALPHA
 #define GL_ONE_MINUS_CONSTANT_ALPHA                                   32772
 #endif
+
 #ifndef GL_BLEND_COLOR
 #define GL_BLEND_COLOR                                                32773
 #endif
+
 #ifndef GL_FUNC_ADD
 #define GL_FUNC_ADD                                                   32774
 #endif
+
 #ifndef GL_MIN
 #define GL_MIN                                                        32775
 #endif
+
 #ifndef GL_MAX
 #define GL_MAX                                                        32776
 #endif
+
 #ifndef GL_BLEND_EQUATION
 #define GL_BLEND_EQUATION                                             32777
 #endif
+
 #ifndef GL_FUNC_SUBTRACT
 #define GL_FUNC_SUBTRACT                                              32778
 #endif
+
 #ifndef GL_FUNC_REVERSE_SUBTRACT
 #define GL_FUNC_REVERSE_SUBTRACT                                      32779
 #endif
+
 #ifndef GL_CONVOLUTION_1D
 #define GL_CONVOLUTION_1D                                             32784
 #endif
+
 #ifndef GL_CONVOLUTION_2D
 #define GL_CONVOLUTION_2D                                             32785
 #endif
+
 #ifndef GL_SEPARABLE_2D
 #define GL_SEPARABLE_2D                                               32786
 #endif
+
 #ifndef GL_CONVOLUTION_BORDER_MODE
 #define GL_CONVOLUTION_BORDER_MODE                                    32787
 #endif
+
 #ifndef GL_CONVOLUTION_FILTER_SCALE
 #define GL_CONVOLUTION_FILTER_SCALE                                   32788
 #endif
+
 #ifndef GL_CONVOLUTION_FILTER_BIAS
 #define GL_CONVOLUTION_FILTER_BIAS                                    32789
 #endif
+
 #ifndef GL_REDUCE
 #define GL_REDUCE                                                     32790
 #endif
+
 #ifndef GL_CONVOLUTION_FORMAT
 #define GL_CONVOLUTION_FORMAT                                         32791
 #endif
+
 #ifndef GL_CONVOLUTION_WIDTH
 #define GL_CONVOLUTION_WIDTH                                          32792
 #endif
+
 #ifndef GL_CONVOLUTION_HEIGHT
 #define GL_CONVOLUTION_HEIGHT                                         32793
 #endif
+
 #ifndef GL_MAX_CONVOLUTION_WIDTH
 #define GL_MAX_CONVOLUTION_WIDTH                                      32794
 #endif
+
 #ifndef GL_MAX_CONVOLUTION_HEIGHT
 #define GL_MAX_CONVOLUTION_HEIGHT                                     32795
 #endif
+
 #ifndef GL_POST_CONVOLUTION_RED_SCALE
 #define GL_POST_CONVOLUTION_RED_SCALE                                 32796
 #endif
+
 #ifndef GL_POST_CONVOLUTION_GREEN_SCALE
 #define GL_POST_CONVOLUTION_GREEN_SCALE                               32797
 #endif
+
 #ifndef GL_POST_CONVOLUTION_BLUE_SCALE
 #define GL_POST_CONVOLUTION_BLUE_SCALE                                32798
 #endif
+
 #ifndef GL_POST_CONVOLUTION_ALPHA_SCALE
 #define GL_POST_CONVOLUTION_ALPHA_SCALE                               32799
 #endif
+
 #ifndef GL_POST_CONVOLUTION_RED_BIAS
 #define GL_POST_CONVOLUTION_RED_BIAS                                  32800
 #endif
+
 #ifndef GL_POST_CONVOLUTION_GREEN_BIAS
 #define GL_POST_CONVOLUTION_GREEN_BIAS                                32801
 #endif
+
 #ifndef GL_POST_CONVOLUTION_BLUE_BIAS
 #define GL_POST_CONVOLUTION_BLUE_BIAS                                 32802
 #endif
+
 #ifndef GL_POST_CONVOLUTION_ALPHA_BIAS
 #define GL_POST_CONVOLUTION_ALPHA_BIAS                                32803
 #endif
+
 #ifndef GL_HISTOGRAM
 #define GL_HISTOGRAM                                                  32804
 #endif
+
 #ifndef GL_PROXY_HISTOGRAM
 #define GL_PROXY_HISTOGRAM                                            32805
 #endif
+
 #ifndef GL_HISTOGRAM_WIDTH
 #define GL_HISTOGRAM_WIDTH                                            32806
 #endif
+
 #ifndef GL_HISTOGRAM_FORMAT
 #define GL_HISTOGRAM_FORMAT                                           32807
 #endif
+
 #ifndef GL_HISTOGRAM_RED_SIZE
 #define GL_HISTOGRAM_RED_SIZE                                         32808
 #endif
+
 #ifndef GL_HISTOGRAM_GREEN_SIZE
 #define GL_HISTOGRAM_GREEN_SIZE                                       32809
 #endif
+
 #ifndef GL_HISTOGRAM_BLUE_SIZE
 #define GL_HISTOGRAM_BLUE_SIZE                                        32810
 #endif
+
 #ifndef GL_HISTOGRAM_ALPHA_SIZE
 #define GL_HISTOGRAM_ALPHA_SIZE                                       32811
 #endif
+
 #ifndef GL_HISTOGRAM_LUMINANCE_SIZE
 #define GL_HISTOGRAM_LUMINANCE_SIZE                                   32812
 #endif
+
 #ifndef GL_HISTOGRAM_SINK
 #define GL_HISTOGRAM_SINK                                             32813
 #endif
+
 #ifndef GL_MINMAX
 #define GL_MINMAX                                                     32814
 #endif
+
 #ifndef GL_MINMAX_FORMAT
 #define GL_MINMAX_FORMAT                                              32815
 #endif
+
 #ifndef GL_MINMAX_SINK
 #define GL_MINMAX_SINK                                                32816
 #endif
+
 #ifndef GL_TABLE_TOO_LARGE
 #define GL_TABLE_TOO_LARGE                                            32817
 #endif
+
 #ifndef GL_COLOR_MATRIX
 #define GL_COLOR_MATRIX                                               32945
 #endif
+
 #ifndef GL_COLOR_MATRIX_STACK_DEPTH
 #define GL_COLOR_MATRIX_STACK_DEPTH                                   32946
 #endif
+
 #ifndef GL_MAX_COLOR_MATRIX_STACK_DEPTH
 #define GL_MAX_COLOR_MATRIX_STACK_DEPTH                               32947
 #endif
+
 #ifndef GL_POST_COLOR_MATRIX_RED_SCALE
 #define GL_POST_COLOR_MATRIX_RED_SCALE                                32948
 #endif
+
 #ifndef GL_POST_COLOR_MATRIX_GREEN_SCALE
 #define GL_POST_COLOR_MATRIX_GREEN_SCALE                              32949
 #endif
+
 #ifndef GL_POST_COLOR_MATRIX_BLUE_SCALE
 #define GL_POST_COLOR_MATRIX_BLUE_SCALE                               32950
 #endif
+
 #ifndef GL_POST_COLOR_MATRIX_ALPHA_SCALE
 #define GL_POST_COLOR_MATRIX_ALPHA_SCALE                              32951
 #endif
+
 #ifndef GL_POST_COLOR_MATRIX_RED_BIAS
 #define GL_POST_COLOR_MATRIX_RED_BIAS                                 32952
 #endif
+
 #ifndef GL_POST_COLOR_MATRIX_GREEN_BIAS
 #define GL_POST_COLOR_MATRIX_GREEN_BIAS                               32953
 #endif
+
 #ifndef GL_POST_COLOR_MATRIX_BLUE_BIAS
 #define GL_POST_COLOR_MATRIX_BLUE_BIAS                                32954
 #endif
+
 #ifndef GL_POST_COLOR_MATIX_ALPHA_BIAS
 #define GL_POST_COLOR_MATIX_ALPHA_BIAS                                32955
 #endif
+
 #ifndef GL_COLOR_TABLE
 #define GL_COLOR_TABLE                                                32976
 #endif
+
 #ifndef GL_POST_CONVOLUTION_COLOR_TABLE
 #define GL_POST_CONVOLUTION_COLOR_TABLE                               32977
 #endif
+
 #ifndef GL_POST_COLOR_MATRIX_COLOR_TABLE
 #define GL_POST_COLOR_MATRIX_COLOR_TABLE                              32978
 #endif
+
 #ifndef GL_PROXY_COLOR_TABLE
 #define GL_PROXY_COLOR_TABLE                                          32979
 #endif
+
 #ifndef GL_PROXY_POST_CONVOLUTION_COLOR_TABLE
 #define GL_PROXY_POST_CONVOLUTION_COLOR_TABLE                         32980
 #endif
+
 #ifndef GL_PROXY_POST_COLOR_MATRIX_COLOR_TABLE
 #define GL_PROXY_POST_COLOR_MATRIX_COLOR_TABLE                        32981
 #endif
+
 #ifndef GL_COLOR_TABLE_SCALE
 #define GL_COLOR_TABLE_SCALE                                          32982
 #endif
+
 #ifndef GL_COLOR_TABLE_BIAS
 #define GL_COLOR_TABLE_BIAS                                           32983
 #endif
+
 #ifndef GL_COLOR_TABLE_FORMAT
 #define GL_COLOR_TABLE_FORMAT                                         32984
 #endif
+
 #ifndef GL_COLOR_TABLE_WIDTH
 #define GL_COLOR_TABLE_WIDTH                                          32985
 #endif
+
 #ifndef GL_COLOR_TABLE_RED_SIZE
 #define GL_COLOR_TABLE_RED_SIZE                                       32986
 #endif
+
 #ifndef GL_COLOR_TABLE_GREEN_SIZE
 #define GL_COLOR_TABLE_GREEN_SIZE                                     32987
 #endif
+
 #ifndef GL_COLOR_TABLE_BLUE_SIZE
 #define GL_COLOR_TABLE_BLUE_SIZE                                      32988
 #endif
+
 #ifndef GL_COLOR_TABLE_ALPHA_SIZE
 #define GL_COLOR_TABLE_ALPHA_SIZE                                     32989
 #endif
+
 #ifndef GL_COLOR_TABLE_LUMINANCE_SIZE
 #define GL_COLOR_TABLE_LUMINANCE_SIZE                                 32990
 #endif
+
 #ifndef GL_COLOR_TABLE_INTENSITY_SIZE
 #define GL_COLOR_TABLE_INTENSITY_SIZE                                 32991
 #endif
+
 #ifndef GL_IGNORE_BORDER
 #define GL_IGNORE_BORDER                                              33104
 #endif
+
 #ifndef GL_CONSTANT_BORDER
 #define GL_CONSTANT_BORDER                                            33105
 #endif
+
 #ifndef GL_WRAP_BORDER
 #define GL_WRAP_BORDER                                                33106
 #endif
+
 #ifndef GL_REPLICATE_BORDER
 #define GL_REPLICATE_BORDER                                           33107
 #endif
+
 #ifndef GL_CONVOLUTION_BORDER_COLOR
 #define GL_CONVOLUTION_BORDER_COLOR                                   33108
 #endif
+
+
 typedef GLvoid (csAPIENTRY* csGLCOLORTABLE) (GLenum target, GLenum internalformat, GLsizei width, GLenum format, GLenum type, GLvoid* table);
 typedef GLvoid (csAPIENTRY* csGLCOLORTABLEPARAMETERFV) (GLenum target, GLenum pname, GLfloat* params);
 typedef GLvoid (csAPIENTRY* csGLCOLORTABLEPARAMETERIV) (GLenum target, GLenum pname, GLint* params);
@@ -840,108 +1057,144 @@ typedef GLvoid (csAPIENTRY* csGLBLENDEQUATION) (GLenum mode);
 #ifndef GL_TEXTURE0_ARB
 #define GL_TEXTURE0_ARB                                               33984
 #endif
+
 #ifndef GL_TEXTURE1_ARB
 #define GL_TEXTURE1_ARB                                               33985
 #endif
+
 #ifndef GL_TEXTURE2_ARB
 #define GL_TEXTURE2_ARB                                               33986
 #endif
+
 #ifndef GL_TEXTURE3_ARB
 #define GL_TEXTURE3_ARB                                               33987
 #endif
+
 #ifndef GL_TEXTURE4_ARB
 #define GL_TEXTURE4_ARB                                               33988
 #endif
+
 #ifndef GL_TEXTURE5_ARB
 #define GL_TEXTURE5_ARB                                               33989
 #endif
+
 #ifndef GL_TEXTURE6_ARB
 #define GL_TEXTURE6_ARB                                               33990
 #endif
+
 #ifndef GL_TEXTURE7_ARB
 #define GL_TEXTURE7_ARB                                               33991
 #endif
+
 #ifndef GL_TEXTURE8_ARB
 #define GL_TEXTURE8_ARB                                               33992
 #endif
+
 #ifndef GL_TEXTURE9_ARB
 #define GL_TEXTURE9_ARB                                               33993
 #endif
+
 #ifndef GL_TEXTURE10_ARB
 #define GL_TEXTURE10_ARB                                              33994
 #endif
+
 #ifndef GL_TEXTURE11_ARB
 #define GL_TEXTURE11_ARB                                              33995
 #endif
+
 #ifndef GL_TEXTURE12_ARB
 #define GL_TEXTURE12_ARB                                              33996
 #endif
+
 #ifndef GL_TEXTURE13_ARB
 #define GL_TEXTURE13_ARB                                              33997
 #endif
+
 #ifndef GL_TEXTURE14_ARB
 #define GL_TEXTURE14_ARB                                              33998
 #endif
+
 #ifndef GL_TEXTURE15_ARB
 #define GL_TEXTURE15_ARB                                              33999
 #endif
+
 #ifndef GL_TEXTURE16_ARB
 #define GL_TEXTURE16_ARB                                              34000
 #endif
+
 #ifndef GL_TEXTURE17_ARB
 #define GL_TEXTURE17_ARB                                              34001
 #endif
+
 #ifndef GL_TEXTURE18_ARB
 #define GL_TEXTURE18_ARB                                              34002
 #endif
+
 #ifndef GL_TEXTURE19_ARB
 #define GL_TEXTURE19_ARB                                              34003
 #endif
+
 #ifndef GL_TEXTURE20_ARB
 #define GL_TEXTURE20_ARB                                              34004
 #endif
+
 #ifndef GL_TEXTURE21_ARB
 #define GL_TEXTURE21_ARB                                              34005
 #endif
+
 #ifndef GL_TEXTURE22_ARB
 #define GL_TEXTURE22_ARB                                              34006
 #endif
+
 #ifndef GL_TEXTURE23_ARB
 #define GL_TEXTURE23_ARB                                              34007
 #endif
+
 #ifndef GL_TEXTURE24_ARB
 #define GL_TEXTURE24_ARB                                              34008
 #endif
+
 #ifndef GL_TEXTURE25_ARB
 #define GL_TEXTURE25_ARB                                              34009
 #endif
+
 #ifndef GL_TEXTURE26_ARB
 #define GL_TEXTURE26_ARB                                              34010
 #endif
+
 #ifndef GL_TEXTURE27_ARB
 #define GL_TEXTURE27_ARB                                              34011
 #endif
+
 #ifndef GL_TEXTURE28_ARB
 #define GL_TEXTURE28_ARB                                              34012
 #endif
+
 #ifndef GL_TEXTURE29_ARB
 #define GL_TEXTURE29_ARB                                              34013
 #endif
+
 #ifndef GL_TEXTURE30_ARB
 #define GL_TEXTURE30_ARB                                              34014
 #endif
+
 #ifndef GL_TEXTURE31_ARB
 #define GL_TEXTURE31_ARB                                              34015
 #endif
+
 #ifndef GL_ACTIVE_TEXTURE_ARB
 #define GL_ACTIVE_TEXTURE_ARB                                         34016
 #endif
+
 #ifndef GL_CLIENT_ACTIVE_TEXTURE_ARB
 #define GL_CLIENT_ACTIVE_TEXTURE_ARB                                  34017
 #endif
+
 #ifndef GL_MAX_TEXTURE_UNITS_ARB
 #define GL_MAX_TEXTURE_UNITS_ARB                                      34018
 #endif
+
+
 typedef GLvoid (csAPIENTRY* csGLACTIVETEXTUREARB) (GLenum texture);
 typedef GLvoid (csAPIENTRY* csGLCLIENTACTIVETEXTUREARB) (GLenum texture);
 typedef GLvoid (csAPIENTRY* csGLMULTITEXCOORD1DARB) (GLenum target, GLdouble s);
@@ -981,15 +1234,20 @@ typedef GLvoid (csAPIENTRY* csGLMULTITEXCOORD4SVARB) (GLenum target, GLshort* v)
 #ifndef GL_TRANSPOSE_MODELVIEW_MATRIX_ARB
 #define GL_TRANSPOSE_MODELVIEW_MATRIX_ARB                             34019
 #endif
+
 #ifndef GL_TRANSPOSE_PROJECTION_MATRIX_ARB
 #define GL_TRANSPOSE_PROJECTION_MATRIX_ARB                            34020
 #endif
+
 #ifndef GL_TRANSPOSE_TEXTURE_MATRIX_ARB
 #define GL_TRANSPOSE_TEXTURE_MATRIX_ARB                               34021
 #endif
+
 #ifndef GL_TRANSPOSE_COLOR_MATRIX_ARB
 #define GL_TRANSPOSE_COLOR_MATRIX_ARB                                 34022
 #endif
+
+
 typedef GLvoid (csAPIENTRY* csGLLOADTRANSPOSEMATRIXFARB) (GLfloat* m);
 typedef GLvoid (csAPIENTRY* csGLLOADTRANSPOSEMATRIXDARB) (GLdouble* m);
 typedef GLvoid (csAPIENTRY* csGLMULTTRANSPOSEMATRIXFARB) (GLfloat* m);
@@ -997,135 +1255,180 @@ typedef GLvoid (csAPIENTRY* csGLMULTTRANSPOSEMATRIXDARB) (GLdouble* m);
 
 // GL_ARB_multisample
 #ifndef WGL_SAMPLE_BUFFERS_ARB
-#define WGL_SAMPLE_BUFFERS_ARB                                        8257
+#define WGL_SAMPLE_BUFFERS_ARB                                         8257
 #endif
+
 #ifndef WGL_SAMPLES_ARB
-#define WGL_SAMPLES_ARB                                               8258
+#define WGL_SAMPLES_ARB                                                8258
 #endif
+
 #ifndef GL_MULTISAMPLE_ARB
 #define GL_MULTISAMPLE_ARB                                            32925
 #endif
+
 #ifndef GL_SAMPLE_ALPHA_TO_COVERAGE_ARB
 #define GL_SAMPLE_ALPHA_TO_COVERAGE_ARB                               32926
 #endif
+
 #ifndef GL_SAMPLE_ALPHA_TO_ONE_ARB
 #define GL_SAMPLE_ALPHA_TO_ONE_ARB                                    32927
 #endif
+
 #ifndef GL_SAMPLE_COVERAGE_ARB
 #define GL_SAMPLE_COVERAGE_ARB                                        32928
 #endif
+
 #ifndef GL_MULTISAMPLE_BIT_ARB
-#define GL_MULTISAMPLE_BIT_ARB                                        536870912
+#define GL_MULTISAMPLE_BIT_ARB                                       536870912
 #endif
+
 #ifndef GL_SAMPLE_BUFFERS_ARB
 #define GL_SAMPLE_BUFFERS_ARB                                         32936
 #endif
+
 #ifndef GL_SAMPLES_ARB
 #define GL_SAMPLES_ARB                                                32937
 #endif
+
 #ifndef GL_SAMPLE_COVERAGE_VALUE_ARB
 #define GL_SAMPLE_COVERAGE_VALUE_ARB                                  32938
 #endif
+
 #ifndef GL_SAMPLE_COVERAGE_INVERT_ARB
 #define GL_SAMPLE_COVERAGE_INVERT_ARB                                 32939
 #endif
+
+
 typedef GLvoid (csAPIENTRY* csGLSAMPLECOVERAGEARB) (GLclampf value, GLboolean invert);
 
 // GL_ARB_texture_env_add
 
+
 // WGL_ARB_extensions_string
 #ifdef _WIN32
+
 typedef char* (csAPIENTRY* csWGLGETEXTENSIONSSTRINGARB) (HDC hdc);
+
 #endif
 
 // WGL_ARB_buffer_region
 #ifdef _WIN32
 #ifndef WGL_FRONT_COLOR_BUFFER_BIT_ARB
-#define WGL_FRONT_COLOR_BUFFER_BIT_ARB                                1
+#define WGL_FRONT_COLOR_BUFFER_BIT_ARB                                    1
 #endif
+
 #ifndef WGL_BACK_COLOR_BUFFER_BIT_ARB
-#define WGL_BACK_COLOR_BUFFER_BIT_ARB                                 2
+#define WGL_BACK_COLOR_BUFFER_BIT_ARB                                     2
 #endif
+
 #ifndef WGL_DEPTH_BUFFER_BIT_ARB
-#define WGL_DEPTH_BUFFER_BIT_ARB                                      4
+#define WGL_DEPTH_BUFFER_BIT_ARB                                          4
 #endif
+
 #ifndef WGL_STENCIL_BUFFER_BIT_ARB
-#define WGL_STENCIL_BUFFER_BIT_ARB                                    8
+#define WGL_STENCIL_BUFFER_BIT_ARB                                        8
 #endif
+
+
 typedef HANDLE (csAPIENTRY* csWGLCREATEBUFFERREGIONARB) (HDC hDC, GLint iLayerPlane, GLuint uType);
 typedef GLvoid (csAPIENTRY* csWGLDELETEBUFFERREGIONARB) (HANDLE hRegion);
 typedef BOOL (csAPIENTRY* csWGLSAVEBUFFERREGIONARB) (HANDLE hRegion, GLint x, GLint y, GLint width, GLint height);
 typedef BOOL (csAPIENTRY* csWGLRESTOREBUFFERREGIONARB) (HANDLE hRegion, GLint x, GLint y, GLint width, GLint height, GLint xSrc, GLint ySrc);
+
 #endif
 
 // GL_ARB_texture_cube_map
 #ifndef GL_NORMAL_MAP_ARB
 #define GL_NORMAL_MAP_ARB                                             34065
 #endif
+
 #ifndef GL_REFLECTION_MAP_ARB
 #define GL_REFLECTION_MAP_ARB                                         34066
 #endif
+
 #ifndef GL_TEXTURE_CUBE_MAP_ARB
 #define GL_TEXTURE_CUBE_MAP_ARB                                       34067
 #endif
+
 #ifndef GL_TEXTURE_BINDING_CUBE_MAP_ARB
 #define GL_TEXTURE_BINDING_CUBE_MAP_ARB                               34068
 #endif
+
 #ifndef GL_TEXTURE_CUBE_MAP_POSITIVE_X_ARB
 #define GL_TEXTURE_CUBE_MAP_POSITIVE_X_ARB                            34069
 #endif
+
 #ifndef GL_TEXTURE_CUBE_MAP_NEGATIVE_X_ARB
 #define GL_TEXTURE_CUBE_MAP_NEGATIVE_X_ARB                            34070
 #endif
+
 #ifndef GL_TEXTURE_CUBE_MAP_POSITIVE_Y_ARB
 #define GL_TEXTURE_CUBE_MAP_POSITIVE_Y_ARB                            34071
 #endif
+
 #ifndef GL_TEXTURE_CUBE_MAP_NEGATIVE_Y_ARB
 #define GL_TEXTURE_CUBE_MAP_NEGATIVE_Y_ARB                            34072
 #endif
+
 #ifndef GL_TEXTURE_CUBE_MAP_POSITIVE_Z_ARB
 #define GL_TEXTURE_CUBE_MAP_POSITIVE_Z_ARB                            34073
 #endif
+
 #ifndef GL_TEXTURE_CUBE_MAP_NEGATIVE_Z_ARB
 #define GL_TEXTURE_CUBE_MAP_NEGATIVE_Z_ARB                            34074
 #endif
+
 #ifndef GL_PROXY_TEXTURE_CUBE_MAP_ARB
 #define GL_PROXY_TEXTURE_CUBE_MAP_ARB                                 34075
 #endif
+
 #ifndef GL_MAX_CUBE_MAP_TEXTURE_SIZE_ARB
 #define GL_MAX_CUBE_MAP_TEXTURE_SIZE_ARB                              34076
 #endif
+
+
 
 // GL_ARB_depth_texture
 #ifndef GL_DEPTH_COMPONENT16_ARB
 #define GL_DEPTH_COMPONENT16_ARB                                      33189
 #endif
+
 #ifndef GL_DEPTH_COMPONENT24_ARB
 #define GL_DEPTH_COMPONENT24_ARB                                      33190
 #endif
+
 #ifndef GL_DEPTH_COMPONENT32_ARB
 #define GL_DEPTH_COMPONENT32_ARB                                      33191
 #endif
+
 #ifndef GL_TEXTURE_DEPTH_SIZE_ARB
 #define GL_TEXTURE_DEPTH_SIZE_ARB                                     34890
 #endif
+
 #ifndef GL_DEPTH_TEXTURE_MODE_ARB
 #define GL_DEPTH_TEXTURE_MODE_ARB                                     34891
 #endif
+
+
 
 // GL_ARB_point_parameters
 #ifndef GL_POINT_SIZE_MIN_ARB
 #define GL_POINT_SIZE_MIN_ARB                                         33062
 #endif
+
 #ifndef GL_POINT_SIZE_MAX_ARB
 #define GL_POINT_SIZE_MAX_ARB                                         33063
 #endif
+
 #ifndef GL_POINT_FADE_THRESHOLD_SIZE_ARB
 #define GL_POINT_FADE_THRESHOLD_SIZE_ARB                              33064
 #endif
+
 #ifndef GL_POINT_DISTANCE_ATTENUATION_ARB
 #define GL_POINT_DISTANCE_ATTENUATION_ARB                             33065
 #endif
+
+
 typedef GLvoid (csAPIENTRY* csGLPOINTPARAMETERFARB) (GLenum pname, GLfloat param);
 typedef GLvoid (csAPIENTRY* csGLPOINTPARAMETERFVARB) (GLenum pname, GLfloat* params);
 
@@ -1133,57 +1436,77 @@ typedef GLvoid (csAPIENTRY* csGLPOINTPARAMETERFVARB) (GLenum pname, GLfloat* par
 #ifndef GL_TEXTURE_COMPARE_MODE_ARB
 #define GL_TEXTURE_COMPARE_MODE_ARB                                   34892
 #endif
+
 #ifndef GL_TEXTURE_COMPARE_FUNC_ARB
 #define GL_TEXTURE_COMPARE_FUNC_ARB                                   34893
 #endif
+
 #ifndef GL_COMPARE_R_TO_TEXTURE_ARB
 #define GL_COMPARE_R_TO_TEXTURE_ARB                                   34894
 #endif
+
+
 
 // GL_ARB_shadow_ambient
 #ifndef GL_TEXTURE_COMPARE_FAIL_VALUE_ARB
 #define GL_TEXTURE_COMPARE_FAIL_VALUE_ARB                             32959
 #endif
 
+
+
 // GL_ARB_texture_border_clamp
 #ifndef GL_CLAMP_TO_BORDER_ARB
 #define GL_CLAMP_TO_BORDER_ARB                                        33069
 #endif
 
+
+
 // GL_ARB_texture_compression
 #ifndef GL_COMPRESSED_ALPHA_ARB
 #define GL_COMPRESSED_ALPHA_ARB                                       34025
 #endif
+
 #ifndef GL_COMPRESSED_LUMINANCE_ARB
 #define GL_COMPRESSED_LUMINANCE_ARB                                   34026
 #endif
+
 #ifndef GL_COMPRESSED_LUMINANCE_ALPHA_ARB
 #define GL_COMPRESSED_LUMINANCE_ALPHA_ARB                             34027
 #endif
+
 #ifndef GL_COMPRESSED_INTENSITY_ARB
 #define GL_COMPRESSED_INTENSITY_ARB                                   34028
 #endif
+
 #ifndef GL_COMPRESSED_RGB_ARB
 #define GL_COMPRESSED_RGB_ARB                                         34029
 #endif
+
 #ifndef GL_COMPRESSED_RGBA_ARB
 #define GL_COMPRESSED_RGBA_ARB                                        34030
 #endif
+
 #ifndef GL_TEXTURE_COMPRESSION_HINT_ARB
 #define GL_TEXTURE_COMPRESSION_HINT_ARB                               34031
 #endif
+
 #ifndef GL_TEXTURE_COMPRESSED_IMAGE_SIZE_ARB
 #define GL_TEXTURE_COMPRESSED_IMAGE_SIZE_ARB                          34464
 #endif
+
 #ifndef GL_TEXTURE_COMPRESSED_ARB
 #define GL_TEXTURE_COMPRESSED_ARB                                     34465
 #endif
+
 #ifndef GL_NUM_COMPRESSED_TEXTURE_FORMATS_ARB
 #define GL_NUM_COMPRESSED_TEXTURE_FORMATS_ARB                         34466
 #endif
+
 #ifndef GL_COMPRESSED_TEXTURE_FORMATS_ARB
 #define GL_COMPRESSED_TEXTURE_FORMATS_ARB                             34467
 #endif
+
+
 typedef GLvoid (csAPIENTRY* csGLCOMPRESSEDTEXIMAGE3DARB) (GLenum target, GLint level, GLenum internalformat, GLsizei width, GLsizei height, GLsizei depth, GLint border, GLsizei imageSize, GLvoid* data);
 typedef GLvoid (csAPIENTRY* csGLCOMPRESSEDTEXIMAGE2DARB) (GLenum target, GLint level, GLenum internalformat, GLsizei width, GLsizei height, GLint border, GLsizei imageSize, GLvoid* data);
 typedef GLvoid (csAPIENTRY* csGLCOMPRESSEDTEXIMAGE1DARB) (GLenum target, GLint level, GLenum internalformat, GLsizei width, GLint border, GLsizei imageSize, GLvoid* data);
@@ -1196,212 +1519,284 @@ typedef GLvoid (csAPIENTRY* csGLGETCOMPRESSEDTEXIMAGEARB) (GLenum target, GLint 
 #ifndef GL_COMBINE_ARB
 #define GL_COMBINE_ARB                                                34160
 #endif
+
 #ifndef GL_COMBINE_RGB_ARB
 #define GL_COMBINE_RGB_ARB                                            34161
 #endif
+
 #ifndef GL_COMBINE_ALPHA_ARB
 #define GL_COMBINE_ALPHA_ARB                                          34162
 #endif
+
 #ifndef GL_SOURCE0_RGB_ARB
 #define GL_SOURCE0_RGB_ARB                                            34176
 #endif
+
 #ifndef GL_SOURCE1_RGB_ARB
 #define GL_SOURCE1_RGB_ARB                                            34177
 #endif
+
 #ifndef GL_SOURCE2_RGB_ARB
 #define GL_SOURCE2_RGB_ARB                                            34178
 #endif
+
 #ifndef GL_SOURCE0_ALPHA_ARB
 #define GL_SOURCE0_ALPHA_ARB                                          34184
 #endif
+
 #ifndef GL_SOURCE1_ALPHA_ARB
 #define GL_SOURCE1_ALPHA_ARB                                          34185
 #endif
+
 #ifndef GL_SOURCE2_ALPHA_ARB
 #define GL_SOURCE2_ALPHA_ARB                                          34186
 #endif
+
 #ifndef GL_OPERAND0_RGB_ARB
 #define GL_OPERAND0_RGB_ARB                                           34192
 #endif
+
 #ifndef GL_OPERAND1_RGB_ARB
 #define GL_OPERAND1_RGB_ARB                                           34193
 #endif
+
 #ifndef GL_OPERAND2_RGB_ARB
 #define GL_OPERAND2_RGB_ARB                                           34194
 #endif
+
 #ifndef GL_OPERAND0_ALPHA_ARB
 #define GL_OPERAND0_ALPHA_ARB                                         34200
 #endif
+
 #ifndef GL_OPERAND1_ALPHA_ARB
 #define GL_OPERAND1_ALPHA_ARB                                         34201
 #endif
+
 #ifndef GL_OPERAND2_ALPHA_ARB
 #define GL_OPERAND2_ALPHA_ARB                                         34202
 #endif
+
 #ifndef GL_RGB_SCALE_ARB
 #define GL_RGB_SCALE_ARB                                              34163
 #endif
+
 #ifndef GL_ADD_SIGNED_ARB
 #define GL_ADD_SIGNED_ARB                                             34164
 #endif
+
 #ifndef GL_INTERPOLATE_ARB
 #define GL_INTERPOLATE_ARB                                            34165
 #endif
+
 #ifndef GL_SUBTRACT_ARB
 #define GL_SUBTRACT_ARB                                               34023
 #endif
+
 #ifndef GL_CONSTANT_ARB
 #define GL_CONSTANT_ARB                                               34166
 #endif
+
 #ifndef GL_PRIMARY_COLOR_ARB
 #define GL_PRIMARY_COLOR_ARB                                          34167
 #endif
+
 #ifndef GL_PREVIOUS_ARB
 #define GL_PREVIOUS_ARB                                               34168
 #endif
 
+
+
 // GL_ARB_texture_env_crossbar
+
 
 // GL_ARB_texture_env_dot3
 #ifndef GL_DOT3_RGB_ARB
 #define GL_DOT3_RGB_ARB                                               34478
 #endif
+
 #ifndef GL_DOT3_RGBA_ARB
 #define GL_DOT3_RGBA_ARB                                              34479
 #endif
+
+
 
 // GL_ARB_texture_mirrored_repeat
 #ifndef GL_MIRRORED_REPEAT_ARB
 #define GL_MIRRORED_REPEAT_ARB                                        33648
 #endif
 
+
+
 // GL_ARB_vertex_blend
 #ifndef GL_MAX_VERTEX_UNITS_ARB
 #define GL_MAX_VERTEX_UNITS_ARB                                       34468
 #endif
+
 #ifndef GL_ACTIVE_VERTEX_UNITS_ARB
 #define GL_ACTIVE_VERTEX_UNITS_ARB                                    34469
 #endif
+
 #ifndef GL_WEIGHT_SUM_UNITY_ARB
 #define GL_WEIGHT_SUM_UNITY_ARB                                       34470
 #endif
+
 #ifndef GL_VERTEX_BLEND_ARB
 #define GL_VERTEX_BLEND_ARB                                           34471
 #endif
+
 #ifndef GL_MODELVIEW0_ARB
-#define GL_MODELVIEW0_ARB                                             5888
+#define GL_MODELVIEW0_ARB                                              5888
 #endif
+
 #ifndef GL_MODELVIEW1_ARB
 #define GL_MODELVIEW1_ARB                                             34058
 #endif
+
 #ifndef GL_MODELVIEW2_ARB
 #define GL_MODELVIEW2_ARB                                             34594
 #endif
+
 #ifndef GL_MODELVIEW3_ARB
 #define GL_MODELVIEW3_ARB                                             34595
 #endif
+
 #ifndef GL_MODELVIEW4_ARB
 #define GL_MODELVIEW4_ARB                                             34596
 #endif
+
 #ifndef GL_MODELVIEW5_ARB
 #define GL_MODELVIEW5_ARB                                             34597
 #endif
+
 #ifndef GL_MODELVIEW6_ARB
 #define GL_MODELVIEW6_ARB                                             34598
 #endif
+
 #ifndef GL_MODELVIEW7_ARB
 #define GL_MODELVIEW7_ARB                                             34599
 #endif
+
 #ifndef GL_MODELVIEW8_ARB
 #define GL_MODELVIEW8_ARB                                             34600
 #endif
+
 #ifndef GL_MODELVIEW9_ARB
 #define GL_MODELVIEW9_ARB                                             34601
 #endif
+
 #ifndef GL_MODELVIEW10_ARB
 #define GL_MODELVIEW10_ARB                                            34602
 #endif
+
 #ifndef GL_MODELVIEW11_ARB
 #define GL_MODELVIEW11_ARB                                            34603
 #endif
+
 #ifndef GL_MODELVIEW12_ARB
 #define GL_MODELVIEW12_ARB                                            34604
 #endif
+
 #ifndef GL_MODELVIEW13_ARB
 #define GL_MODELVIEW13_ARB                                            34605
 #endif
+
 #ifndef GL_MODELVIEW14_ARB
 #define GL_MODELVIEW14_ARB                                            34606
 #endif
+
 #ifndef GL_MODELVIEW15_ARB
 #define GL_MODELVIEW15_ARB                                            34607
 #endif
+
 #ifndef GL_MODELVIEW16_ARB
 #define GL_MODELVIEW16_ARB                                            34608
 #endif
+
 #ifndef GL_MODELVIEW17_ARB
 #define GL_MODELVIEW17_ARB                                            34609
 #endif
+
 #ifndef GL_MODELVIEW18_ARB
 #define GL_MODELVIEW18_ARB                                            34610
 #endif
+
 #ifndef GL_MODELVIEW19_ARB
 #define GL_MODELVIEW19_ARB                                            34611
 #endif
+
 #ifndef GL_MODELVIEW20_ARB
 #define GL_MODELVIEW20_ARB                                            34612
 #endif
+
 #ifndef GL_MODELVIEW21_ARB
 #define GL_MODELVIEW21_ARB                                            34613
 #endif
+
 #ifndef GL_MODELVIEW22_ARB
 #define GL_MODELVIEW22_ARB                                            34614
 #endif
+
 #ifndef GL_MODELVIEW23_ARB
 #define GL_MODELVIEW23_ARB                                            34615
 #endif
+
 #ifndef GL_MODELVIEW24_ARB
 #define GL_MODELVIEW24_ARB                                            34616
 #endif
+
 #ifndef GL_MODELVIEW25_ARB
 #define GL_MODELVIEW25_ARB                                            34617
 #endif
+
 #ifndef GL_MODELVIEW26_ARB
 #define GL_MODELVIEW26_ARB                                            34618
 #endif
+
 #ifndef GL_MODELVIEW27_ARB
 #define GL_MODELVIEW27_ARB                                            34619
 #endif
+
 #ifndef GL_MODELVIEW28_ARB
 #define GL_MODELVIEW28_ARB                                            34620
 #endif
+
 #ifndef GL_MODELVIEW29_ARB
 #define GL_MODELVIEW29_ARB                                            34621
 #endif
+
 #ifndef GL_MODELVIEW30_ARB
 #define GL_MODELVIEW30_ARB                                            34622
 #endif
+
 #ifndef GL_MODELVIEW31_ARB
 #define GL_MODELVIEW31_ARB                                            34623
 #endif
+
 #ifndef GL_CURRENT_WEIGHT_ARB
 #define GL_CURRENT_WEIGHT_ARB                                         34472
 #endif
+
 #ifndef GL_WEIGHT_ARRAY_TYPE_ARB
 #define GL_WEIGHT_ARRAY_TYPE_ARB                                      34473
 #endif
+
 #ifndef GL_WEIGHT_ARRAY_STRIDE_ARB
 #define GL_WEIGHT_ARRAY_STRIDE_ARB                                    34474
 #endif
+
 #ifndef GL_WEIGHT_ARRAY_SIZE_ARB
 #define GL_WEIGHT_ARRAY_SIZE_ARB                                      34475
 #endif
+
 #ifndef GL_WEIGHT_ARRAY_POINTER_ARB
 #define GL_WEIGHT_ARRAY_POINTER_ARB                                   34476
 #endif
+
 #ifndef GL_WEIGHT_ARRAY_ARB
 #define GL_WEIGHT_ARRAY_ARB                                           34477
 #endif
+
+
 typedef GLvoid (csAPIENTRY* csGLWEIGHTBVARB) (GLint size, GLbyte* weights);
 typedef GLvoid (csAPIENTRY* csGLWEIGHTSVARB) (GLint size, GLshort* weights);
 typedef GLvoid (csAPIENTRY* csGLWEIGHTIVARB) (GLint size, GLint* weights);
@@ -1418,240 +1813,320 @@ typedef GLvoid (csAPIENTRY* csGLVERTEXBLENDARB) (GLint count);
 #ifndef GL_VERTEX_PROGRAM_ARB
 #define GL_VERTEX_PROGRAM_ARB                                         34336
 #endif
+
 #ifndef GL_VERTEX_PROGRAM_POINT_SIZE_ARB
 #define GL_VERTEX_PROGRAM_POINT_SIZE_ARB                              34370
 #endif
+
 #ifndef GL_VERTEX_PROGRAM_TWO_SIDE_ARB
 #define GL_VERTEX_PROGRAM_TWO_SIDE_ARB                                34371
 #endif
+
 #ifndef GL_COLOR_SUM_ARB
 #define GL_COLOR_SUM_ARB                                              33880
 #endif
+
 #ifndef GL_PROGRAM_FORMAT_ASCII_ARB
 #define GL_PROGRAM_FORMAT_ASCII_ARB                                   34933
 #endif
+
 #ifndef GL_VERTEX_ATTRIB_ARRAY_ENABLED_ARB
 #define GL_VERTEX_ATTRIB_ARRAY_ENABLED_ARB                            34338
 #endif
+
 #ifndef GL_VERTEX_ATTRIB_ARRAY_SIZE_ARB
 #define GL_VERTEX_ATTRIB_ARRAY_SIZE_ARB                               34339
 #endif
+
 #ifndef GL_VERTEX_ATTRIB_ARRAY_STRIDE_ARB
 #define GL_VERTEX_ATTRIB_ARRAY_STRIDE_ARB                             34340
 #endif
+
 #ifndef GL_VERTEX_ATTRIB_ARRAY_TYPE_ARB
 #define GL_VERTEX_ATTRIB_ARRAY_TYPE_ARB                               34341
 #endif
+
 #ifndef GL_VERTEX_ATTRIB_ARRAY_NORMALIZED_ARB
 #define GL_VERTEX_ATTRIB_ARRAY_NORMALIZED_ARB                         34922
 #endif
+
 #ifndef GL_CURRENT_VERTEX_ATTRIB_ARB
 #define GL_CURRENT_VERTEX_ATTRIB_ARB                                  34342
 #endif
+
 #ifndef GL_VERTEX_ATTRIB_ARRAY_POINTER_ARB
 #define GL_VERTEX_ATTRIB_ARRAY_POINTER_ARB                            34373
 #endif
+
 #ifndef GL_PROGRAM_LENGTH_ARB
 #define GL_PROGRAM_LENGTH_ARB                                         34343
 #endif
+
 #ifndef GL_PROGRAM_FORMAT_ARB
 #define GL_PROGRAM_FORMAT_ARB                                         34934
 #endif
+
 #ifndef GL_PROGRAM_BINDING_ARB
 #define GL_PROGRAM_BINDING_ARB                                        34423
 #endif
+
 #ifndef GL_PROGRAM_INSTRUCTIONS_ARB
 #define GL_PROGRAM_INSTRUCTIONS_ARB                                   34976
 #endif
+
 #ifndef GL_MAX_PROGRAM_INSTRUCTIONS_ARB
 #define GL_MAX_PROGRAM_INSTRUCTIONS_ARB                               34977
 #endif
+
 #ifndef GL_PROGRAM_NATIVE_INSTRUCTIONS_ARB
 #define GL_PROGRAM_NATIVE_INSTRUCTIONS_ARB                            34978
 #endif
+
 #ifndef GL_MAX_PROGRAM_NATIVE_INSTRUCTIONS_ARB
 #define GL_MAX_PROGRAM_NATIVE_INSTRUCTIONS_ARB                        34979
 #endif
+
 #ifndef GL_PROGRAM_TEMPORARIES_ARB
 #define GL_PROGRAM_TEMPORARIES_ARB                                    34980
 #endif
+
 #ifndef GL_MAX_PROGRAM_TEMPORARIES_ARB
 #define GL_MAX_PROGRAM_TEMPORARIES_ARB                                34981
 #endif
+
 #ifndef GL_PROGRAM_NATIVE_TEMPORARIES_ARB
 #define GL_PROGRAM_NATIVE_TEMPORARIES_ARB                             34982
 #endif
+
 #ifndef GL_MAX_PROGRAM_NATIVE_TEMPORARIES_ARB
 #define GL_MAX_PROGRAM_NATIVE_TEMPORARIES_ARB                         34983
 #endif
+
 #ifndef GL_PROGRAM_PARAMETERS_ARB
 #define GL_PROGRAM_PARAMETERS_ARB                                     34984
 #endif
+
 #ifndef GL_MAX_PROGRAM_PARAMETERS_ARB
 #define GL_MAX_PROGRAM_PARAMETERS_ARB                                 34985
 #endif
+
 #ifndef GL_PROGRAM_NATIVE_PARAMETERS_ARB
 #define GL_PROGRAM_NATIVE_PARAMETERS_ARB                              34986
 #endif
+
 #ifndef GL_MAX_PROGRAM_NATIVE_PARAMETERS_ARB
 #define GL_MAX_PROGRAM_NATIVE_PARAMETERS_ARB                          34987
 #endif
+
 #ifndef GL_PROGRAM_ATTRIBS_ARB
 #define GL_PROGRAM_ATTRIBS_ARB                                        34988
 #endif
+
 #ifndef GL_MAX_PROGRAM_ATTRIBS_ARB
 #define GL_MAX_PROGRAM_ATTRIBS_ARB                                    34989
 #endif
+
 #ifndef GL_PROGRAM_NATIVE_ATTRIBS_ARB
 #define GL_PROGRAM_NATIVE_ATTRIBS_ARB                                 34990
 #endif
+
 #ifndef GL_MAX_PROGRAM_NATIVE_ATTRIBS_ARB
 #define GL_MAX_PROGRAM_NATIVE_ATTRIBS_ARB                             34991
 #endif
+
 #ifndef GL_PROGRAM_ADDRESS_REGISTERS_ARB
 #define GL_PROGRAM_ADDRESS_REGISTERS_ARB                              34992
 #endif
+
 #ifndef GL_MAX_PROGRAM_ADDRESS_REGISTERS_ARB
 #define GL_MAX_PROGRAM_ADDRESS_REGISTERS_ARB                          34993
 #endif
+
 #ifndef GL_PROGRAM_NATIVE_ADDRESS_REGISTERS_ARB
 #define GL_PROGRAM_NATIVE_ADDRESS_REGISTERS_ARB                       34994
 #endif
+
 #ifndef GL_MAX_PROGRAM_NATIVE_ADDRESS_REGISTERS_ARB
 #define GL_MAX_PROGRAM_NATIVE_ADDRESS_REGISTERS_ARB                   34995
 #endif
+
 #ifndef GL_MAX_PROGRAM_LOCAL_PARAMETERS_ARB
 #define GL_MAX_PROGRAM_LOCAL_PARAMETERS_ARB                           34996
 #endif
+
 #ifndef GL_MAX_PROGRAM_ENV_PARAMETERS_ARB
 #define GL_MAX_PROGRAM_ENV_PARAMETERS_ARB                             34997
 #endif
+
 #ifndef GL_PROGRAM_UNDER_NATIVE_LIMITS_ARB
 #define GL_PROGRAM_UNDER_NATIVE_LIMITS_ARB                            34998
 #endif
+
 #ifndef GL_PROGRAM_STRING_ARB
 #define GL_PROGRAM_STRING_ARB                                         34344
 #endif
+
 #ifndef GL_PROGRAM_ERROR_POSITION_ARB
 #define GL_PROGRAM_ERROR_POSITION_ARB                                 34379
 #endif
+
 #ifndef GL_CURRENT_MATRIX_ARB
 #define GL_CURRENT_MATRIX_ARB                                         34369
 #endif
+
 #ifndef GL_TRANSPOSE_CURRENT_MATRIX_ARB
 #define GL_TRANSPOSE_CURRENT_MATRIX_ARB                               34999
 #endif
+
 #ifndef GL_CURRENT_MATRIX_STACK_DEPTH_ARB
 #define GL_CURRENT_MATRIX_STACK_DEPTH_ARB                             34368
 #endif
+
 #ifndef GL_MAX_VERTEX_ATTRIBS_ARB
 #define GL_MAX_VERTEX_ATTRIBS_ARB                                     34921
 #endif
+
 #ifndef GL_MAX_PROGRAM_MATRICES_ARB
 #define GL_MAX_PROGRAM_MATRICES_ARB                                   34351
 #endif
+
 #ifndef GL_MAX_PROGRAM_MATRIX_STACK_DEPTH_ARB
 #define GL_MAX_PROGRAM_MATRIX_STACK_DEPTH_ARB                         34350
 #endif
+
 #ifndef GL_PROGRAM_ERROR_STRING_ARB
 #define GL_PROGRAM_ERROR_STRING_ARB                                   34932
 #endif
+
 #ifndef GL_MATRIX0_ARB
 #define GL_MATRIX0_ARB                                                35008
 #endif
+
 #ifndef GL_MATRIX1_ARB
 #define GL_MATRIX1_ARB                                                35009
 #endif
+
 #ifndef GL_MATRIX2_ARB
 #define GL_MATRIX2_ARB                                                35010
 #endif
+
 #ifndef GL_MATRIX3_ARB
 #define GL_MATRIX3_ARB                                                35011
 #endif
+
 #ifndef GL_MATRIX4_ARB
 #define GL_MATRIX4_ARB                                                35012
 #endif
+
 #ifndef GL_MATRIX5_ARB
 #define GL_MATRIX5_ARB                                                35013
 #endif
+
 #ifndef GL_MATRIX6_ARB
 #define GL_MATRIX6_ARB                                                35014
 #endif
+
 #ifndef GL_MATRIX7_ARB
 #define GL_MATRIX7_ARB                                                35015
 #endif
+
 #ifndef GL_MATRIX8_ARB
 #define GL_MATRIX8_ARB                                                35016
 #endif
+
 #ifndef GL_MATRIX9_ARB
 #define GL_MATRIX9_ARB                                                35017
 #endif
+
 #ifndef GL_MATRIX10_ARB
 #define GL_MATRIX10_ARB                                               35018
 #endif
+
 #ifndef GL_MATRIX11_ARB
 #define GL_MATRIX11_ARB                                               35019
 #endif
+
 #ifndef GL_MATRIX12_ARB
 #define GL_MATRIX12_ARB                                               35020
 #endif
+
 #ifndef GL_MATRIX13_ARB
 #define GL_MATRIX13_ARB                                               35021
 #endif
+
 #ifndef GL_MATRIX14_ARB
 #define GL_MATRIX14_ARB                                               35022
 #endif
+
 #ifndef GL_MATRIX15_ARB
 #define GL_MATRIX15_ARB                                               35023
 #endif
+
 #ifndef GL_MATRIX16_ARB
 #define GL_MATRIX16_ARB                                               35024
 #endif
+
 #ifndef GL_MATRIX17_ARB
 #define GL_MATRIX17_ARB                                               35025
 #endif
+
 #ifndef GL_MATRIX18_ARB
 #define GL_MATRIX18_ARB                                               35026
 #endif
+
 #ifndef GL_MATRIX19_ARB
 #define GL_MATRIX19_ARB                                               35027
 #endif
+
 #ifndef GL_MATRIX20_ARB
 #define GL_MATRIX20_ARB                                               35028
 #endif
+
 #ifndef GL_MATRIX21_ARB
 #define GL_MATRIX21_ARB                                               35029
 #endif
+
 #ifndef GL_MATRIX22_ARB
 #define GL_MATRIX22_ARB                                               35030
 #endif
+
 #ifndef GL_MATRIX23_ARB
 #define GL_MATRIX23_ARB                                               35031
 #endif
+
 #ifndef GL_MATRIX24_ARB
 #define GL_MATRIX24_ARB                                               35032
 #endif
+
 #ifndef GL_MATRIX25_ARB
 #define GL_MATRIX25_ARB                                               35033
 #endif
+
 #ifndef GL_MATRIX26_ARB
 #define GL_MATRIX26_ARB                                               35034
 #endif
+
 #ifndef GL_MATRIX27_ARB
 #define GL_MATRIX27_ARB                                               35035
 #endif
+
 #ifndef GL_MATRIX28_ARB
 #define GL_MATRIX28_ARB                                               35036
 #endif
+
 #ifndef GL_MATRIX29_ARB
 #define GL_MATRIX29_ARB                                               35037
 #endif
+
 #ifndef GL_MATRIX30_ARB
 #define GL_MATRIX30_ARB                                               35038
 #endif
+
 #ifndef GL_MATRIX31_ARB
 #define GL_MATRIX31_ARB                                               35039
 #endif
+
+
 typedef GLvoid (csAPIENTRY* csGLVERTEXATTRIB1SARB) (GLuint index, GLshort x);
 typedef GLvoid (csAPIENTRY* csGLVERTEXATTRIB1FARB) (GLuint index, GLfloat x);
 typedef GLvoid (csAPIENTRY* csGLVERTEXATTRIB1DARB) (GLuint index, GLdouble x);
@@ -1716,6 +2191,7 @@ typedef GLvoid (csAPIENTRY* csGLGETVERTEXATTRIBPOINTERVARB) (GLuint index, GLenu
 typedef GLboolean (csAPIENTRY* csGLISPROGRAMARB) (GLuint program);
 
 // GL_ARB_window_pos
+
 typedef GLvoid (csAPIENTRY* csGLWINDOWPOS2DARB) (GLdouble x, GLdouble y);
 typedef GLvoid (csAPIENTRY* csGLWINDOWPOS2FARB) (GLfloat x, GLfloat y);
 typedef GLvoid (csAPIENTRY* csGLWINDOWPOS2IARB) (GLint x, GLint y);
@@ -1737,93 +2213,126 @@ typedef GLvoid (csAPIENTRY* csGLWINDOWPOS3SVARB) (GLshort* p);
 #ifndef GL_422_EXT
 #define GL_422_EXT                                                    32972
 #endif
+
 #ifndef GL_422_REV_EXT
 #define GL_422_REV_EXT                                                32973
 #endif
+
 #ifndef GL_422_AVERAGE_EXT
 #define GL_422_AVERAGE_EXT                                            32974
 #endif
+
 #ifndef GL_422_REV_AVERAGE_EXT
 #define GL_422_REV_AVERAGE_EXT                                        32975
 #endif
+
+
 
 // GL_EXT_abgr
 #ifndef GL_ABGR_EXT
 #define GL_ABGR_EXT                                                   32768
 #endif
 
+
+
 // GL_EXT_bgra
 #ifndef GL_BGR_EXT
 #define GL_BGR_EXT                                                    32992
 #endif
+
 #ifndef GL_BGRA_EXT
 #define GL_BGRA_EXT                                                   32993
 #endif
+
+
 
 // GL_EXT_blend_color
 #ifndef GL_CONSTANT_COLOR_EXT
 #define GL_CONSTANT_COLOR_EXT                                         32769
 #endif
+
 #ifndef GL_ONE_MINUS_CONSTANT_COLOR_EXT
 #define GL_ONE_MINUS_CONSTANT_COLOR_EXT                               32770
 #endif
+
 #ifndef GL_CONSTANT_ALPHA_EXT
 #define GL_CONSTANT_ALPHA_EXT                                         32771
 #endif
+
 #ifndef GL_ONE_MINUS_CONSTANT_ALPHA_EXT
 #define GL_ONE_MINUS_CONSTANT_ALPHA_EXT                               32772
 #endif
+
 #ifndef GL_BLEND_COLOR_EXT
 #define GL_BLEND_COLOR_EXT                                            32773
 #endif
+
+
 typedef GLvoid (csAPIENTRY* csGLBLENDCOLOREXT) (GLclampf red, GLclampf green, GLclampf blue, GLclampf alpha);
 
 // GL_EXT_blend_func_separate
 #ifndef GL_BLEND_DST_RGB_EXT
 #define GL_BLEND_DST_RGB_EXT                                          32968
 #endif
+
 #ifndef GL_BLEND_SRC_RGB_EXT
 #define GL_BLEND_SRC_RGB_EXT                                          32969
 #endif
+
 #ifndef GL_BLEND_DST_ALPHA_EXT
 #define GL_BLEND_DST_ALPHA_EXT                                        32970
 #endif
+
 #ifndef GL_BLEND_SRC_ALPHA_EXT
 #define GL_BLEND_SRC_ALPHA_EXT                                        32971
 #endif
+
+
 typedef GLvoid (csAPIENTRY* csGLBLENDFUNCSEPARATEEXT) (GLenum sfactorRGB, GLenum dfactorRGB, GLenum sfactorAlpha, GLenum dfactorAlpha);
 
 // GL_EXT_blend_logic_op
+
 
 // GL_EXT_blend_minmax
 #ifndef GL_FUNC_ADD_EXT
 #define GL_FUNC_ADD_EXT                                               32774
 #endif
+
 #ifndef GL_MIN_EXT
 #define GL_MIN_EXT                                                    32775
 #endif
+
 #ifndef GL_MAX_EXT
 #define GL_MAX_EXT                                                    32776
 #endif
+
 #ifndef GL_BLEND_EQUATION_EXT
 #define GL_BLEND_EQUATION_EXT                                         32777
 #endif
+
+
 typedef GLvoid (csAPIENTRY* csGLBLENDEQUATIONEXT) (GLenum mode);
 
 // GL_EXT_blend_subtract
 #ifndef GL_FUNC_SUBTRACT_EXT
 #define GL_FUNC_SUBTRACT_EXT                                          32778
 #endif
+
 #ifndef GL_FUNC_REVERSE_SUBTRACT_EXT
 #define GL_FUNC_REVERSE_SUBTRACT_EXT                                  32779
 #endif
+
+
 
 // GL_EXT_clip_volume_hint
 #ifndef GL_CLIP_VOLUME_CLIPPING_HINT_EXT
 #define GL_CLIP_VOLUME_CLIPPING_HINT_EXT                              33008
 #endif
 
+
+
 // GL_EXT_color_subtable
+
 typedef GLvoid (csAPIENTRY* csGLCOLORSUBTABLEEXT) (GLenum target, GLsizei start, GLsizei count, GLenum format, GLenum type, GLvoid* data);
 typedef GLvoid (csAPIENTRY* csGLCOPYCOLORSUBTABLEEXT) (GLenum target, GLsizei start, GLint x, GLint y, GLsizei width);
 
@@ -1831,9 +2340,12 @@ typedef GLvoid (csAPIENTRY* csGLCOPYCOLORSUBTABLEEXT) (GLenum target, GLsizei st
 #ifndef GL_ARRAY_ELEMENT_LOCK_FIRST_EXT
 #define GL_ARRAY_ELEMENT_LOCK_FIRST_EXT                               33192
 #endif
+
 #ifndef GL_ARRAY_ELEMENT_LOCK_COUNT_EXT
 #define GL_ARRAY_ELEMENT_LOCK_COUNT_EXT                               33193
 #endif
+
+
 typedef GLvoid (csAPIENTRY* csGLLOCKARRAYSEXT) (GLint first, GLsizei count);
 typedef GLvoid (csAPIENTRY* csGLUNLOCKARRAYSEXT) ();
 
@@ -1841,63 +2353,84 @@ typedef GLvoid (csAPIENTRY* csGLUNLOCKARRAYSEXT) ();
 #ifndef GL_CONVOLUTION_1D_EXT
 #define GL_CONVOLUTION_1D_EXT                                         32784
 #endif
+
 #ifndef GL_CONVOLUTION_2D_EXT
 #define GL_CONVOLUTION_2D_EXT                                         32785
 #endif
+
 #ifndef GL_SEPARABLE_2D_EXT
 #define GL_SEPARABLE_2D_EXT                                           32786
 #endif
+
 #ifndef GL_CONVOLUTION_BORDER_MODE_EXT
 #define GL_CONVOLUTION_BORDER_MODE_EXT                                32787
 #endif
+
 #ifndef GL_CONVOLUTION_FILTER_SCALE_EXT
 #define GL_CONVOLUTION_FILTER_SCALE_EXT                               32788
 #endif
+
 #ifndef GL_CONVOLUTION_FILTER_BIAS_EXT
 #define GL_CONVOLUTION_FILTER_BIAS_EXT                                32789
 #endif
+
 #ifndef GL_REDUCE_EXT
 #define GL_REDUCE_EXT                                                 32790
 #endif
+
 #ifndef GL_CONVOLUTION_FORMAT_EXT
 #define GL_CONVOLUTION_FORMAT_EXT                                     32791
 #endif
+
 #ifndef GL_CONVOLUTION_WIDTH_EXT
 #define GL_CONVOLUTION_WIDTH_EXT                                      32792
 #endif
+
 #ifndef GL_CONVOLUTION_HEIGHT_EXT
 #define GL_CONVOLUTION_HEIGHT_EXT                                     32793
 #endif
+
 #ifndef GL_MAX_CONVOLUTION_WIDTH_EXT
 #define GL_MAX_CONVOLUTION_WIDTH_EXT                                  32794
 #endif
+
 #ifndef GL_MAX_CONVOLUTION_HEIGHT_EXT
 #define GL_MAX_CONVOLUTION_HEIGHT_EXT                                 32795
 #endif
+
 #ifndef GL_POST_CONVOLUTION_RED_SCALE_EXT
 #define GL_POST_CONVOLUTION_RED_SCALE_EXT                             32796
 #endif
+
 #ifndef GL_POST_CONVOLUTION_GREEN_SCALE_EXT
 #define GL_POST_CONVOLUTION_GREEN_SCALE_EXT                           32797
 #endif
+
 #ifndef GL_POST_CONVOLUTION_BLUE_SCALE_EXT
 #define GL_POST_CONVOLUTION_BLUE_SCALE_EXT                            32798
 #endif
+
 #ifndef GL_POST_CONVOLUTION_ALPHA_SCALE_EXT
 #define GL_POST_CONVOLUTION_ALPHA_SCALE_EXT                           32799
 #endif
+
 #ifndef GL_POST_CONVOLUTION_RED_BIAS_EXT
 #define GL_POST_CONVOLUTION_RED_BIAS_EXT                              32800
 #endif
+
 #ifndef GL_POST_CONVOLUTION_GREEN_BIAS_EXT
 #define GL_POST_CONVOLUTION_GREEN_BIAS_EXT                            32801
 #endif
+
 #ifndef GL_POST_CONVOLUTION_BLUE_BIAS_EXT
 #define GL_POST_CONVOLUTION_BLUE_BIAS_EXT                             32802
 #endif
+
 #ifndef GL_POST_CONVOLUTION_ALPHA_BIAS_EXT
 #define GL_POST_CONVOLUTION_ALPHA_BIAS_EXT                            32803
 #endif
+
+
 typedef GLvoid (csAPIENTRY* csGLCONVOLUTIONFILTER1DEXT) (GLenum target, GLenum internalformat, GLsizei width, GLenum format, GLenum type, GLvoid* image);
 typedef GLvoid (csAPIENTRY* csGLCONVOLUTIONFILTER2DEXT) (GLenum target, GLenum internalformat, GLsizei width, GLsizei height, GLenum format, GLenum type, GLvoid* image);
 typedef GLvoid (csAPIENTRY* csGLCOPYCONVOLUTIONFILTER1DEXT) (GLenum target, GLenum internalformat, GLint x, GLint y, GLsizei width);
@@ -1916,27 +2449,36 @@ typedef GLvoid (csAPIENTRY* csGLGETCONVOLUTIONPARAMETERFVEXT) (GLenum target, GL
 #ifndef GL_FOG_COORDINATE_SOURCE_EXT
 #define GL_FOG_COORDINATE_SOURCE_EXT                                  33872
 #endif
+
 #ifndef GL_FOG_COORDINATE_EXT
 #define GL_FOG_COORDINATE_EXT                                         33873
 #endif
+
 #ifndef GL_FRAGMENT_DEPTH_EXT
 #define GL_FRAGMENT_DEPTH_EXT                                         33874
 #endif
+
 #ifndef GL_CURRENT_FOG_COORDINATE_EXT
 #define GL_CURRENT_FOG_COORDINATE_EXT                                 33875
 #endif
+
 #ifndef GL_FOG_COORDINATE_ARRAY_TYPE_EXT
 #define GL_FOG_COORDINATE_ARRAY_TYPE_EXT                              33876
 #endif
+
 #ifndef GL_FOG_COORDINATE_ARRAY_STRIDE_EXT
 #define GL_FOG_COORDINATE_ARRAY_STRIDE_EXT                            33877
 #endif
+
 #ifndef GL_FOG_COORDINATE_ARRAY_POINTER_EXT
 #define GL_FOG_COORDINATE_ARRAY_POINTER_EXT                           33878
 #endif
+
 #ifndef GL_FOG_COORDINATE_ARRAY_EXT
 #define GL_FOG_COORDINATE_ARRAY_EXT                                   33879
 #endif
+
+
 typedef GLvoid (csAPIENTRY* csGLFOGCOORDFEXFLOAT) (GLfloat coord);
 typedef GLvoid (csAPIENTRY* csGLFOGCOORDDEXDOUBLE) (GLdouble coord);
 typedef GLvoid (csAPIENTRY* csGLFOGCOORDFVEXFLOAT) (GLfloat coord);
@@ -1947,42 +2489,56 @@ typedef GLvoid (csAPIENTRY* csGLFOGCOORDPOINTEREXT) (GLenum type, GLsizei stride
 #ifndef GL_HISTOGRAM_EXT
 #define GL_HISTOGRAM_EXT                                              32804
 #endif
+
 #ifndef GL_PROXY_HISTOGRAM_EXT
 #define GL_PROXY_HISTOGRAM_EXT                                        32805
 #endif
+
 #ifndef GL_HISTOGRAM_WIDTH_EXT
 #define GL_HISTOGRAM_WIDTH_EXT                                        32806
 #endif
+
 #ifndef GL_HISTOGRAM_FORMAT_EXT
 #define GL_HISTOGRAM_FORMAT_EXT                                       32807
 #endif
+
 #ifndef GL_HISTOGRAM_RED_SIZE_EXT
 #define GL_HISTOGRAM_RED_SIZE_EXT                                     32808
 #endif
+
 #ifndef GL_HISTOGRAM_GREEN_SIZE_EXT
 #define GL_HISTOGRAM_GREEN_SIZE_EXT                                   32809
 #endif
+
 #ifndef GL_HISTOGRAM_BLUE_SIZE_EXT
 #define GL_HISTOGRAM_BLUE_SIZE_EXT                                    32810
 #endif
+
 #ifndef GL_HISTOGRAM_ALPHA_SIZE_EXT
 #define GL_HISTOGRAM_ALPHA_SIZE_EXT                                   32811
 #endif
+
 #ifndef GL_HISTOGRAM_LUMINANCE_SIZE_EXT
 #define GL_HISTOGRAM_LUMINANCE_SIZE_EXT                               32812
 #endif
+
 #ifndef GL_HISTOGRAM_SINK_EXT
 #define GL_HISTOGRAM_SINK_EXT                                         32813
 #endif
+
 #ifndef GL_MINMAX_EXT
 #define GL_MINMAX_EXT                                                 32814
 #endif
+
 #ifndef GL_MINMAX_FORMAT_EXT
 #define GL_MINMAX_FORMAT_EXT                                          32815
 #endif
+
 #ifndef GL_MINMAX_SINK_EXT
 #define GL_MINMAX_SINK_EXT                                            32816
 #endif
+
+
 typedef GLvoid (csAPIENTRY* csGLHISTOGRAMEXT) (GLenum target, GLsizei width, GLenum internalformat, GLboolean sink);
 typedef GLvoid (csAPIENTRY* csGLRESETHISTOGRAMEXT) (GLenum target);
 typedef GLvoid (csAPIENTRY* csGLGETHISTOGRAMEXT) (GLenum target, GLboolean reset, GLenum format, GLenum type, GLvoid* values);
@@ -1995,6 +2551,7 @@ typedef GLvoid (csAPIENTRY* csGLGETMINMAXPARAMETERIVEXT) (GLenum target, GLenum 
 typedef GLvoid (csAPIENTRY* csGLGETMINMAXPARAMETERFVEXT) (GLenum target, GLenum pname, GLfloat* params);
 
 // GL_EXT_multi_draw_arrays
+
 typedef GLvoid (csAPIENTRY* csGLMULTIDRAWARRAYSEXT) (GLenum mode, GLint* first, GLsizei* count, GLsizei primcount);
 typedef GLvoid (csAPIENTRY* csGLMULTIDRAWELEMENTSEXT) (GLenum mode, GLsizei* count, GLenum type, GLvoid* indices, GLsizei primcount);
 
@@ -2002,101 +2559,135 @@ typedef GLvoid (csAPIENTRY* csGLMULTIDRAWELEMENTSEXT) (GLenum mode, GLsizei* cou
 #ifndef GL_UNSIGNED_BYTE_3_3_2_EXT
 #define GL_UNSIGNED_BYTE_3_3_2_EXT                                    32818
 #endif
+
 #ifndef GL_UNSIGNED_SHORT_4_4_4_4_EXT
 #define GL_UNSIGNED_SHORT_4_4_4_4_EXT                                 32819
 #endif
+
 #ifndef GL_UNSIGNED_SHORT_5_5_5_1_EXT
 #define GL_UNSIGNED_SHORT_5_5_5_1_EXT                                 32820
 #endif
+
 #ifndef GL_UNSIGNED_INT_8_8_8_8_EXT
 #define GL_UNSIGNED_INT_8_8_8_8_EXT                                   32821
 #endif
+
 #ifndef GL_UNSIGNED_INT_10_10_10_2_EXT
 #define GL_UNSIGNED_INT_10_10_10_2_EXT                                32822
 #endif
+
+
 
 // GL_EXT_paletted_texture
 #ifndef GL_COLOR_INDEX1_EXT
 #define GL_COLOR_INDEX1_EXT                                           32994
 #endif
+
 #ifndef GL_COLOR_INDEX2_EXT
 #define GL_COLOR_INDEX2_EXT                                           32995
 #endif
+
 #ifndef GL_COLOR_INDEX4_EXT
 #define GL_COLOR_INDEX4_EXT                                           32996
 #endif
+
 #ifndef GL_COLOR_INDEX8_EXT
 #define GL_COLOR_INDEX8_EXT                                           32997
 #endif
+
 #ifndef GL_COLOR_INDEX12_EXT
 #define GL_COLOR_INDEX12_EXT                                          32998
 #endif
+
 #ifndef GL_COLOR_INDEX16_EXT
 #define GL_COLOR_INDEX16_EXT                                          32999
 #endif
+
 #ifndef GL_COLOR_TABLE_FORMAT_EXT
 #define GL_COLOR_TABLE_FORMAT_EXT                                     32984
 #endif
+
 #ifndef GL_COLOR_TABLE_WIDTH_EXT
 #define GL_COLOR_TABLE_WIDTH_EXT                                      32985
 #endif
+
 #ifndef GL_COLOR_TABLE_RED_SIZE_EXT
 #define GL_COLOR_TABLE_RED_SIZE_EXT                                   32986
 #endif
+
 #ifndef GL_COLOR_TABLE_GREEN_SIZE_EXT
 #define GL_COLOR_TABLE_GREEN_SIZE_EXT                                 32987
 #endif
+
 #ifndef GL_COLOR_TABLE_BLUE_SIZE_EXT
 #define GL_COLOR_TABLE_BLUE_SIZE_EXT                                  32988
 #endif
+
 #ifndef GL_COLOR_TABLE_ALPHA_SIZE_EXT
 #define GL_COLOR_TABLE_ALPHA_SIZE_EXT                                 32989
 #endif
+
 #ifndef GL_COLOR_TABLE_LUMINANCE_SIZE_EXT
 #define GL_COLOR_TABLE_LUMINANCE_SIZE_EXT                             32990
 #endif
+
 #ifndef GL_COLOR_TABLE_INTENSITY_SIZE_EXT
 #define GL_COLOR_TABLE_INTENSITY_SIZE_EXT                             32991
 #endif
+
 #ifndef GL_TEXTURE_INDEX_SIZE_EXT
 #define GL_TEXTURE_INDEX_SIZE_EXT                                     33005
 #endif
+
 #ifndef GL_TEXTURE_1D
-#define GL_TEXTURE_1D                                                 3552
+#define GL_TEXTURE_1D                                                  3552
 #endif
+
 #ifndef GL_TEXTURE_2D
-#define GL_TEXTURE_2D                                                 3553
+#define GL_TEXTURE_2D                                                  3553
 #endif
+
 #ifndef GL_TEXTURE_3D_EXT
 #define GL_TEXTURE_3D_EXT                                             32879
 #endif
+
 #ifndef GL_TEXTURE_CUBE_MAP_ARB
 #define GL_TEXTURE_CUBE_MAP_ARB                                       34067
 #endif
+
 #ifndef GL_PROXY_TEXTURE_1D
 #define GL_PROXY_TEXTURE_1D                                           32867
 #endif
+
 #ifndef GL_PROXY_TEXTURE_2D
 #define GL_PROXY_TEXTURE_2D                                           32868
 #endif
+
 #ifndef GL_PROXY_TEXTURE_3D_EXT
 #define GL_PROXY_TEXTURE_3D_EXT                                       32880
 #endif
+
 #ifndef GL_PROXY_TEXTURE_CUBE_MAP_ARB
 #define GL_PROXY_TEXTURE_CUBE_MAP_ARB                                 34075
 #endif
+
 #ifndef GL_TEXTURE_1D
-#define GL_TEXTURE_1D                                                 3552
+#define GL_TEXTURE_1D                                                  3552
 #endif
+
 #ifndef GL_TEXTURE_2D
-#define GL_TEXTURE_2D                                                 3553
+#define GL_TEXTURE_2D                                                  3553
 #endif
+
 #ifndef GL_TEXTURE_3D_EXT
 #define GL_TEXTURE_3D_EXT                                             32879
 #endif
+
 #ifndef GL_TEXTURE_CUBE_MAP_ARB
 #define GL_TEXTURE_CUBE_MAP_ARB                                       34067
 #endif
+
+
 typedef GLvoid (csAPIENTRY* csGLCOLORTABLEEXT) (GLenum target, GLenum internalFormat, GLsizei width, GLenum format, GLenum type, GLvoid* data);
 typedef GLvoid (csAPIENTRY* csGLGETCOLORTABLEEXT) (GLenum target, GLenum format, GLenum type, GLvoid* data);
 typedef GLvoid (csAPIENTRY* csGLGETCOLORTABLEPARAMETERIVEXT) (GLenum target, GLenum pname, GLint* params);
@@ -2106,15 +2697,20 @@ typedef GLvoid (csAPIENTRY* csGLGETCOLORTABLEPARAMETERFVEXT) (GLenum target, GLe
 #ifndef GL_POINT_SIZE_MIN_EXT
 #define GL_POINT_SIZE_MIN_EXT                                         33062
 #endif
+
 #ifndef GL_POINT_SIZE_MAX_EXT
 #define GL_POINT_SIZE_MAX_EXT                                         33063
 #endif
+
 #ifndef GL_POINT_FADE_THRESHOLD_SIZE_EXT
 #define GL_POINT_FADE_THRESHOLD_SIZE_EXT                              33064
 #endif
+
 #ifndef GL_DISTANCE_ATTENUATION_EXT
 #define GL_DISTANCE_ATTENUATION_EXT                                   33065
 #endif
+
+
 typedef GLvoid (csAPIENTRY* csGLPOINTPARAMETERFEXT) (GLenum pname, GLfloat param);
 typedef GLvoid (csAPIENTRY* csGLPOINTPARAMETERFVEXT) (GLenum pname, GLfloat* params);
 
@@ -2122,36 +2718,48 @@ typedef GLvoid (csAPIENTRY* csGLPOINTPARAMETERFVEXT) (GLenum pname, GLfloat* par
 #ifndef GL_POLYGON_OFFSET_EXT
 #define GL_POLYGON_OFFSET_EXT                                         32823
 #endif
+
 #ifndef GL_POLYGON_OFFSET_FACTOR_EXT
 #define GL_POLYGON_OFFSET_FACTOR_EXT                                  32824
 #endif
+
 #ifndef GL_POLYGON_OFFSET_BIAS_EXT
 #define GL_POLYGON_OFFSET_BIAS_EXT                                    32825
 #endif
+
+
 typedef GLvoid (csAPIENTRY* csGLPOLYGONOFFSETEXT) (GLfloat factor, GLfloat bias);
 
 // GL_EXT_secondary_color
 #ifndef GL_COLOR_SUM_EXT
 #define GL_COLOR_SUM_EXT                                              33880
 #endif
+
 #ifndef GL_CURRENT_SECONDARY_COLOR_EXT
 #define GL_CURRENT_SECONDARY_COLOR_EXT                                33881
 #endif
+
 #ifndef GL_SECONDARY_COLOR_ARRAY_SIZE_EXT
 #define GL_SECONDARY_COLOR_ARRAY_SIZE_EXT                             33882
 #endif
+
 #ifndef GL_SECONDARY_COLOR_ARRAY_TYPE_EXT
 #define GL_SECONDARY_COLOR_ARRAY_TYPE_EXT                             33883
 #endif
+
 #ifndef GL_SECONDARY_COLOR_ARRAY_STRIDE_EXT
 #define GL_SECONDARY_COLOR_ARRAY_STRIDE_EXT                           33884
 #endif
+
 #ifndef GL_SECONDARY_COLOR_ARRAY_POINTER_EXT
 #define GL_SECONDARY_COLOR_ARRAY_POINTER_EXT                          33885
 #endif
+
 #ifndef GL_SECONDARY_COLOR_ARRAY_EXT
 #define GL_SECONDARY_COLOR_ARRAY_EXT                                  33886
 #endif
+
+
 typedef GLvoid (csAPIENTRY* csGLSECONDARYCOLOR3BEXT) (GLbyte components);
 typedef GLvoid (csAPIENTRY* csGLSECONDARYCOLOR3SEXT) (GLshort components);
 typedef GLvoid (csAPIENTRY* csGLSECONDARYCOLOR3IEXT) (GLint components);
@@ -2174,38 +2782,52 @@ typedef GLvoid (csAPIENTRY* csGLSECONDARYCOLORPOINTEREXT) (GLint size, GLenum ty
 #ifndef GL_LIGHT_MODEL_COLOR_CONTROL_EXT
 #define GL_LIGHT_MODEL_COLOR_CONTROL_EXT                              33272
 #endif
+
 #ifndef GL_SINGLE_COLOR_EXT
 #define GL_SINGLE_COLOR_EXT                                           33273
 #endif
+
 #ifndef GL_SEPARATE_SPECULAR_COLOR_EXT
 #define GL_SEPARATE_SPECULAR_COLOR_EXT                                33274
 #endif
 
+
+
 // GL_EXT_shadow_funcs
+
 
 // GL_EXT_shared_texture_palette
 #ifndef GL_SHARED_TEXTURE_PALETTE_EXT
 #define GL_SHARED_TEXTURE_PALETTE_EXT                                 33275
 #endif
 
+
+
 // GL_EXT_stencil_two_side
 #ifndef GL_STENCIL_TEST_TWO_SIDE_EXT
 #define GL_STENCIL_TEST_TWO_SIDE_EXT                                  35088
 #endif
+
 #ifndef GL_ACTIVE_STENCIL_FACE_EXT
 #define GL_ACTIVE_STENCIL_FACE_EXT                                    35089
 #endif
+
+
 typedef GLvoid (csAPIENTRY* csGLACTIVESTENCILFACEEXT) (GLenum face);
 
 // GL_EXT_stencil_wrap
 #ifndef GL_INCR_WRAP_EXT
 #define GL_INCR_WRAP_EXT                                              34055
 #endif
+
 #ifndef GL_DECR_WRAP_EXT
 #define GL_DECR_WRAP_EXT                                              34056
 #endif
 
+
+
 // GL_EXT_subtexture
+
 typedef GLvoid (csAPIENTRY* csGLTEXSUBIMAGE1DEXT) (GLenum target, GLint level, GLint xoffset, GLsizei width, GLenum format, GLenum type, GLvoid* pixels);
 typedef GLvoid (csAPIENTRY* csGLTEXSUBIMAGE2DEXT) (GLenum target, GLint level, GLint xoffset, GLint yoffset, GLsizei width, GLsizei height, GLenum format, GLenum type, GLvoid* pixels);
 typedef GLvoid (csAPIENTRY* csGLTEXSUBIMAGE3DEXT) (GLenum target, GLint level, GLint xoffset, GLint yoffset, GLint zoffset, GLsizei width, GLsizei height, GLsizei depth, GLenum format, GLenum type, GLvoid* pixels);
@@ -2214,156 +2836,210 @@ typedef GLvoid (csAPIENTRY* csGLTEXSUBIMAGE3DEXT) (GLenum target, GLint level, G
 #ifndef GL_PACK_SKIP_IMAGES_EXT
 #define GL_PACK_SKIP_IMAGES_EXT                                       32875
 #endif
+
 #ifndef GL_PACK_IMAGE_HEIGHT_EXT
 #define GL_PACK_IMAGE_HEIGHT_EXT                                      32876
 #endif
+
 #ifndef GL_UNPACK_SKIP_IMAGES_EXT
 #define GL_UNPACK_SKIP_IMAGES_EXT                                     32877
 #endif
+
 #ifndef GL_UNPACK_IMAGE_HEIGHT_EXT
 #define GL_UNPACK_IMAGE_HEIGHT_EXT                                    32878
 #endif
+
 #ifndef GL_TEXTURE_3D_EXT
 #define GL_TEXTURE_3D_EXT                                             32879
 #endif
+
 #ifndef GL_PROXY_TEXTURE_3D_EXT
 #define GL_PROXY_TEXTURE_3D_EXT                                       32880
 #endif
+
 #ifndef GL_TEXTURE_DEPTH_EXT
 #define GL_TEXTURE_DEPTH_EXT                                          32881
 #endif
+
 #ifndef GL_TEXTURE_WRAP_R_EXT
 #define GL_TEXTURE_WRAP_R_EXT                                         32882
 #endif
+
 #ifndef GL_MAX_3D_TEXTURE_SIZE_EXT
 #define GL_MAX_3D_TEXTURE_SIZE_EXT                                    32883
 #endif
+
+
 typedef GLvoid (csAPIENTRY* csGLTEXIMAGE3DEXT) (GLenum target, GLint level, GLenum internalformat, GLsizei width, GLsizei height, GLsizei depth, GLint border, GLenum format, GLenum type, GLvoid* pixels);
 
 // GL_EXT_texture_compression_s3tc
 #ifndef GL_COMPRESSED_RGB_S3TC_DXT1_EXT
 #define GL_COMPRESSED_RGB_S3TC_DXT1_EXT                               33776
 #endif
+
 #ifndef GL_COMPRESSED_RGBA_S3TC_DXT1_EXT
 #define GL_COMPRESSED_RGBA_S3TC_DXT1_EXT                              33777
 #endif
+
 #ifndef GL_COMPRESSED_RGBA_S3TC_DXT3_EXT
 #define GL_COMPRESSED_RGBA_S3TC_DXT3_EXT                              33778
 #endif
+
 #ifndef GL_COMPRESSED_RGBA_S3TC_DXT5_EXT
 #define GL_COMPRESSED_RGBA_S3TC_DXT5_EXT                              33779
 #endif
 
+
+
 // GL_EXT_texture_env_add
+
 
 // GL_EXT_texture_env_combine
 #ifndef GL_COMBINE_EXT
 #define GL_COMBINE_EXT                                                34160
 #endif
+
 #ifndef GL_COMBINE_RGB_EXT
 #define GL_COMBINE_RGB_EXT                                            34161
 #endif
+
 #ifndef GL_COMBINE_ALPHA_EXT
 #define GL_COMBINE_ALPHA_EXT                                          34162
 #endif
+
 #ifndef GL_SOURCE0_RGB_EXT
 #define GL_SOURCE0_RGB_EXT                                            34176
 #endif
+
 #ifndef GL_SOURCE1_RGB_EXT
 #define GL_SOURCE1_RGB_EXT                                            34177
 #endif
+
 #ifndef GL_SOURCE2_RGB_EXT
 #define GL_SOURCE2_RGB_EXT                                            34178
 #endif
+
 #ifndef GL_SOURCE0_ALPHA_EXT
 #define GL_SOURCE0_ALPHA_EXT                                          34184
 #endif
+
 #ifndef GL_SOURCE1_ALPHA_EXT
 #define GL_SOURCE1_ALPHA_EXT                                          34185
 #endif
+
 #ifndef GL_SOURCE2_ALPHA_EXT
 #define GL_SOURCE2_ALPHA_EXT                                          34186
 #endif
+
 #ifndef GL_OPERAND0_RGB_EXT
 #define GL_OPERAND0_RGB_EXT                                           34192
 #endif
+
 #ifndef GL_OPERAND1_RGB_EXT
 #define GL_OPERAND1_RGB_EXT                                           34193
 #endif
+
 #ifndef GL_OPERAND2_RGB_EXT
 #define GL_OPERAND2_RGB_EXT                                           34194
 #endif
+
 #ifndef GL_OPERAND0_ALPHA_EXT
 #define GL_OPERAND0_ALPHA_EXT                                         34200
 #endif
+
 #ifndef GL_OPERAND1_ALPHA_EXT
 #define GL_OPERAND1_ALPHA_EXT                                         34201
 #endif
+
 #ifndef GL_OPERAND2_ALPHA_EXT
 #define GL_OPERAND2_ALPHA_EXT                                         34202
 #endif
+
 #ifndef GL_RGB_SCALE_EXT
 #define GL_RGB_SCALE_EXT                                              34163
 #endif
+
 #ifndef GL_ADD_SIGNED_EXT
 #define GL_ADD_SIGNED_EXT                                             34164
 #endif
+
 #ifndef GL_INTERPOLATE_EXT
 #define GL_INTERPOLATE_EXT                                            34165
 #endif
+
 #ifndef GL_CONSTANT_EXT
 #define GL_CONSTANT_EXT                                               34166
 #endif
+
 #ifndef GL_PRIMARY_COLOR_EXT
 #define GL_PRIMARY_COLOR_EXT                                          34167
 #endif
+
 #ifndef GL_PREVIOUS_EXT
 #define GL_PREVIOUS_EXT                                               34168
 #endif
+
+
 
 // GL_EXT_texture_env_dot3
 #ifndef GL_DOT3_RGB_EXT
 #define GL_DOT3_RGB_EXT                                               34624
 #endif
+
 #ifndef GL_DOT3_RGBA_EXT
 #define GL_DOT3_RGBA_EXT                                              34625
 #endif
+
+
 
 // GL_EXT_texture_filter_anisotropic
 #ifndef GL_TEXTURE_MAX_ANISOTROPY_EXT
 #define GL_TEXTURE_MAX_ANISOTROPY_EXT                                 34046
 #endif
+
 #ifndef GL_MAX_TEXTURE_MAX_ANISOTROPY_EXT
 #define GL_MAX_TEXTURE_MAX_ANISOTROPY_EXT                             34047
 #endif
+
+
 
 // GL_EXT_texture_lod_bias
 #ifndef GL_TEXTURE_FILTER_CONTROL_EXT
 #define GL_TEXTURE_FILTER_CONTROL_EXT                                 34048
 #endif
+
 #ifndef GL_TEXTURE_LOD_BIAS_EXT
 #define GL_TEXTURE_LOD_BIAS_EXT                                       34049
 #endif
+
 #ifndef GL_MAX_TEXTURE_LOD_BIAS_EXT
 #define GL_MAX_TEXTURE_LOD_BIAS_EXT                                   34045
 #endif
+
+
 
 // GL_EXT_texture_object
 #ifndef GL_TEXTURE_PRIORITY_EXT
 #define GL_TEXTURE_PRIORITY_EXT                                       32870
 #endif
+
 #ifndef GL_TEXTURE_RESIDENT_EXT
 #define GL_TEXTURE_RESIDENT_EXT                                       32871
 #endif
+
 #ifndef GL_TEXTURE_1D_BINDING_EXT
 #define GL_TEXTURE_1D_BINDING_EXT                                     32872
 #endif
+
 #ifndef GL_TEXTURE_2D_BINDING_EXT
 #define GL_TEXTURE_2D_BINDING_EXT                                     32873
 #endif
+
 #ifndef GL_TEXTURE_3D_BINDING_EXT
 #define GL_TEXTURE_3D_BINDING_EXT                                     32874
 #endif
+
+
 typedef GLvoid (csAPIENTRY* csGLGENTEXTURESEXT) (GLsizei n, GLuint* textures);
 typedef GLvoid (csAPIENTRY* csGLDELETETEXTURESEXT) (GLsizei n, GLuint* textures);
 typedef GLvoid (csAPIENTRY* csGLBINDTEXTUREEXT) (GLenum target, GLuint texture);
@@ -2375,102 +3051,136 @@ typedef GLboolean (csAPIENTRY* csGLISTEXTUREEXT) (GLuint texture);
 #ifndef GL_VERTEX_ARRAY_EXT
 #define GL_VERTEX_ARRAY_EXT                                           32884
 #endif
+
 #ifndef GL_NORMAL_ARRAY_EXT
 #define GL_NORMAL_ARRAY_EXT                                           32885
 #endif
+
 #ifndef GL_COLOR_ARRAY_EXT
 #define GL_COLOR_ARRAY_EXT                                            32886
 #endif
+
 #ifndef GL_INDEX_ARRAY_EXT
 #define GL_INDEX_ARRAY_EXT                                            32887
 #endif
+
 #ifndef GL_TEXTURE_COORD_ARRAY_EXT
 #define GL_TEXTURE_COORD_ARRAY_EXT                                    32888
 #endif
+
 #ifndef GL_EDGE_FLAG_ARRAY_EXT
 #define GL_EDGE_FLAG_ARRAY_EXT                                        32889
 #endif
+
 #ifndef GL_DOUBLE_EXT
-#define GL_DOUBLE_EXT                                                 5130
+#define GL_DOUBLE_EXT                                                  5130
 #endif
+
 #ifndef GL_VERTEX_ARRAY_SIZE_EXT
 #define GL_VERTEX_ARRAY_SIZE_EXT                                      32890
 #endif
+
 #ifndef GL_VERTEX_ARRAY_TYPE_EXT
 #define GL_VERTEX_ARRAY_TYPE_EXT                                      32891
 #endif
+
 #ifndef GL_VERTEX_ARRAY_STRIDE_EXT
 #define GL_VERTEX_ARRAY_STRIDE_EXT                                    32892
 #endif
+
 #ifndef GL_VERTEX_ARRAY_COUNT_EXT
 #define GL_VERTEX_ARRAY_COUNT_EXT                                     32893
 #endif
+
 #ifndef GL_NORMAL_ARRAY_TYPE_EXT
 #define GL_NORMAL_ARRAY_TYPE_EXT                                      32894
 #endif
+
 #ifndef GL_NORMAL_ARRAY_STRIDE_EXT
 #define GL_NORMAL_ARRAY_STRIDE_EXT                                    32895
 #endif
+
 #ifndef GL_NORMAL_ARRAY_COUNT_EXT
 #define GL_NORMAL_ARRAY_COUNT_EXT                                     32896
 #endif
+
 #ifndef GL_COLOR_ARRAY_SIZE_EXT
 #define GL_COLOR_ARRAY_SIZE_EXT                                       32897
 #endif
+
 #ifndef GL_COLOR_ARRAY_TYPE_EXT
 #define GL_COLOR_ARRAY_TYPE_EXT                                       32898
 #endif
+
 #ifndef GL_COLOR_ARRAY_STRIDE_EXT
 #define GL_COLOR_ARRAY_STRIDE_EXT                                     32899
 #endif
+
 #ifndef GL_COLOR_ARRAY_COUNT_EXT
 #define GL_COLOR_ARRAY_COUNT_EXT                                      32900
 #endif
+
 #ifndef GL_INDEX_ARRAY_TYPE_EXT
 #define GL_INDEX_ARRAY_TYPE_EXT                                       32901
 #endif
+
 #ifndef GL_INDEX_ARRAY_STRIDE_EXT
 #define GL_INDEX_ARRAY_STRIDE_EXT                                     32902
 #endif
+
 #ifndef GL_INDEX_ARRAY_COUNT_EXT
 #define GL_INDEX_ARRAY_COUNT_EXT                                      32903
 #endif
+
 #ifndef GL_TEXTURE_COORD_ARRAY_SIZE_EXT
 #define GL_TEXTURE_COORD_ARRAY_SIZE_EXT                               32904
 #endif
+
 #ifndef GL_TEXTURE_COORD_ARRAY_TYPE_EXT
 #define GL_TEXTURE_COORD_ARRAY_TYPE_EXT                               32905
 #endif
+
 #ifndef GL_TEXTURE_COORD_ARRAY_STRIDE_EXT
 #define GL_TEXTURE_COORD_ARRAY_STRIDE_EXT                             32906
 #endif
+
 #ifndef GL_TEXTURE_COORD_ARRAY_COUNT_EXT
 #define GL_TEXTURE_COORD_ARRAY_COUNT_EXT                              32907
 #endif
+
 #ifndef GL_EDGE_FLAG_ARRAY_STRIDE_EXT
 #define GL_EDGE_FLAG_ARRAY_STRIDE_EXT                                 32908
 #endif
+
 #ifndef GL_EDGE_FLAG_ARRAY_COUNT_EXT
 #define GL_EDGE_FLAG_ARRAY_COUNT_EXT                                  32909
 #endif
+
 #ifndef GL_VERTEX_ARRAY_POINTER_EXT
 #define GL_VERTEX_ARRAY_POINTER_EXT                                   32910
 #endif
+
 #ifndef GL_NORMAL_ARRAY_POINTER_EXT
 #define GL_NORMAL_ARRAY_POINTER_EXT                                   32911
 #endif
+
 #ifndef GL_COLOR_ARRAY_POINTER_EXT
 #define GL_COLOR_ARRAY_POINTER_EXT                                    32912
 #endif
+
 #ifndef GL_INDEX_ARRAY_POINTER_EXT
 #define GL_INDEX_ARRAY_POINTER_EXT                                    32913
 #endif
+
 #ifndef GL_TEXTURE_COORD_ARRAY_POINTER_EXT
 #define GL_TEXTURE_COORD_ARRAY_POINTER_EXT                            32914
 #endif
+
 #ifndef GL_EDGE_FLAG_ARRAY_POINTER_EXT
 #define GL_EDGE_FLAG_ARRAY_POINTER_EXT                                32915
 #endif
+
+
 typedef GLvoid (csAPIENTRY* csGLARRAYELEMENTEXT) (GLint i);
 typedef GLvoid (csAPIENTRY* csGLDRAWARRAYSEXT) (GLenum mode, GLint first, GLsizei count);
 typedef GLvoid (csAPIENTRY* csGLVERTEXPOINTEREXT) (GLint size, GLenum type, GLsizei stride, GLsizei count, GLvoid* pointer);
@@ -2485,333 +3195,444 @@ typedef GLvoid (csAPIENTRY* csGLGETPOINTERVEXT) (GLenum pname, GLvoid* params);
 #ifndef GL_VERTEX_SHADER_EXT
 #define GL_VERTEX_SHADER_EXT                                          34688
 #endif
+
 #ifndef GL_VARIANT_VALUE_EXT
 #define GL_VARIANT_VALUE_EXT                                          34788
 #endif
+
 #ifndef GL_VARIANT_DATATYPE_EXT
 #define GL_VARIANT_DATATYPE_EXT                                       34789
 #endif
+
 #ifndef GL_VARIANT_ARRAY_STRIDE_EXT
 #define GL_VARIANT_ARRAY_STRIDE_EXT                                   34790
 #endif
+
 #ifndef GL_VARIANT_ARRAY_TYPE_EXT
 #define GL_VARIANT_ARRAY_TYPE_EXT                                     34791
 #endif
+
 #ifndef GL_VARIANT_ARRAY_EXT
 #define GL_VARIANT_ARRAY_EXT                                          34792
 #endif
+
 #ifndef GL_VARIANT_ARRAY_POINTER_EXT
 #define GL_VARIANT_ARRAY_POINTER_EXT                                  34793
 #endif
+
 #ifndef GL_INVARIANT_VALUE_EXT
 #define GL_INVARIANT_VALUE_EXT                                        34794
 #endif
+
 #ifndef GL_INVARIANT_DATATYPE_EXT
 #define GL_INVARIANT_DATATYPE_EXT                                     34795
 #endif
+
 #ifndef GL_LOCAL_CONSTANT_VALUE_EXT
 #define GL_LOCAL_CONSTANT_VALUE_EXT                                   34796
 #endif
+
 #ifndef GL_LOCAL_CONSTANT_DATATYPE_EXT
 #define GL_LOCAL_CONSTANT_DATATYPE_EXT                                34797
 #endif
+
 #ifndef GL_OP_INDEX_EXT
 #define GL_OP_INDEX_EXT                                               34690
 #endif
+
 #ifndef GL_OP_NEGATE_EXT
 #define GL_OP_NEGATE_EXT                                              34691
 #endif
+
 #ifndef GL_OP_DOT3_EXT
 #define GL_OP_DOT3_EXT                                                34692
 #endif
+
 #ifndef GL_OP_DOT4_EXT
 #define GL_OP_DOT4_EXT                                                34693
 #endif
+
 #ifndef GL_OP_MUL_EXT
 #define GL_OP_MUL_EXT                                                 34694
 #endif
+
 #ifndef GL_OP_ADD_EXT
 #define GL_OP_ADD_EXT                                                 34695
 #endif
+
 #ifndef GL_OP_MADD_EXT
 #define GL_OP_MADD_EXT                                                34696
 #endif
+
 #ifndef GL_OP_FRAC_EXT
 #define GL_OP_FRAC_EXT                                                34697
 #endif
+
 #ifndef GL_OP_MAX_EXT
 #define GL_OP_MAX_EXT                                                 34698
 #endif
+
 #ifndef GL_OP_MIN_EXT
 #define GL_OP_MIN_EXT                                                 34699
 #endif
+
 #ifndef GL_OP_SET_GE_EXT
 #define GL_OP_SET_GE_EXT                                              34700
 #endif
+
 #ifndef GL_OP_SET_LT_EXT
 #define GL_OP_SET_LT_EXT                                              34701
 #endif
+
 #ifndef GL_OP_CLAMP_EXT
 #define GL_OP_CLAMP_EXT                                               34702
 #endif
+
 #ifndef GL_OP_FLOOR_EXT
 #define GL_OP_FLOOR_EXT                                               34703
 #endif
+
 #ifndef GL_OP_ROUND_EXT
 #define GL_OP_ROUND_EXT                                               34704
 #endif
+
 #ifndef GL_OP_EXP_BASE_2_EXT
 #define GL_OP_EXP_BASE_2_EXT                                          34705
 #endif
+
 #ifndef GL_OP_LOG_BASE_2_EXT
 #define GL_OP_LOG_BASE_2_EXT                                          34706
 #endif
+
 #ifndef GL_OP_POWER_EXT
 #define GL_OP_POWER_EXT                                               34707
 #endif
+
 #ifndef GL_OP_RECIP_EXT
 #define GL_OP_RECIP_EXT                                               34708
 #endif
+
 #ifndef GL_OP_RECIP_SQRT_EXT
 #define GL_OP_RECIP_SQRT_EXT                                          34709
 #endif
+
 #ifndef GL_OP_SUB_EXT
 #define GL_OP_SUB_EXT                                                 34710
 #endif
+
 #ifndef GL_OP_CROSS_PRODUCT_EXT
 #define GL_OP_CROSS_PRODUCT_EXT                                       34711
 #endif
+
 #ifndef GL_OP_MULTIPLY_MATRIX_EXT
 #define GL_OP_MULTIPLY_MATRIX_EXT                                     34712
 #endif
+
 #ifndef GL_OP_MOV_EXT
 #define GL_OP_MOV_EXT                                                 34713
 #endif
+
 #ifndef GL_OUTPUT_VERTEX_EXT
 #define GL_OUTPUT_VERTEX_EXT                                          34714
 #endif
+
 #ifndef GL_OUTPUT_COLOR0_EXT
 #define GL_OUTPUT_COLOR0_EXT                                          34715
 #endif
+
 #ifndef GL_OUTPUT_COLOR1_EXT
 #define GL_OUTPUT_COLOR1_EXT                                          34716
 #endif
+
 #ifndef GL_OUTPUT_TEXTURE_COORD0_EXT
 #define GL_OUTPUT_TEXTURE_COORD0_EXT                                  34717
 #endif
+
 #ifndef GL_OUTPUT_TEXTURE_COORD1_EXT
 #define GL_OUTPUT_TEXTURE_COORD1_EXT                                  34718
 #endif
+
 #ifndef GL_OUTPUT_TEXTURE_COORD2_EXT
 #define GL_OUTPUT_TEXTURE_COORD2_EXT                                  34719
 #endif
+
 #ifndef GL_OUTPUT_TEXTURE_COORD3_EXT
 #define GL_OUTPUT_TEXTURE_COORD3_EXT                                  34720
 #endif
+
 #ifndef GL_OUTPUT_TEXTURE_COORD4_EXT
 #define GL_OUTPUT_TEXTURE_COORD4_EXT                                  34721
 #endif
+
 #ifndef GL_OUTPUT_TEXTURE_COORD5_EXT
 #define GL_OUTPUT_TEXTURE_COORD5_EXT                                  34722
 #endif
+
 #ifndef GL_OUTPUT_TEXTURE_COORD6_EXT
 #define GL_OUTPUT_TEXTURE_COORD6_EXT                                  34723
 #endif
+
 #ifndef GL_OUTPUT_TEXTURE_COORD7_EXT
 #define GL_OUTPUT_TEXTURE_COORD7_EXT                                  34724
 #endif
+
 #ifndef GL_OUTPUT_TEXTURE_COORD8_EXT
 #define GL_OUTPUT_TEXTURE_COORD8_EXT                                  34725
 #endif
+
 #ifndef GL_OUTPUT_TEXTURE_COORD9_EXT
 #define GL_OUTPUT_TEXTURE_COORD9_EXT                                  34726
 #endif
+
 #ifndef GL_OUTPUT_TEXTURE_COORD10_EXT
 #define GL_OUTPUT_TEXTURE_COORD10_EXT                                 34727
 #endif
+
 #ifndef GL_OUTPUT_TEXTURE_COORD11_EXT
 #define GL_OUTPUT_TEXTURE_COORD11_EXT                                 34728
 #endif
+
 #ifndef GL_OUTPUT_TEXTURE_COORD12_EXT
 #define GL_OUTPUT_TEXTURE_COORD12_EXT                                 34729
 #endif
+
 #ifndef GL_OUTPUT_TEXTURE_COORD13_EXT
 #define GL_OUTPUT_TEXTURE_COORD13_EXT                                 34730
 #endif
+
 #ifndef GL_OUTPUT_TEXTURE_COORD14_EXT
 #define GL_OUTPUT_TEXTURE_COORD14_EXT                                 34731
 #endif
+
 #ifndef GL_OUTPUT_TEXTURE_COORD15_EXT
 #define GL_OUTPUT_TEXTURE_COORD15_EXT                                 34732
 #endif
+
 #ifndef GL_OUTPUT_TEXTURE_COORD16_EXT
 #define GL_OUTPUT_TEXTURE_COORD16_EXT                                 34733
 #endif
+
 #ifndef GL_OUTPUT_TEXTURE_COORD17_EXT
 #define GL_OUTPUT_TEXTURE_COORD17_EXT                                 34734
 #endif
+
 #ifndef GL_OUTPUT_TEXTURE_COORD18_EXT
 #define GL_OUTPUT_TEXTURE_COORD18_EXT                                 34735
 #endif
+
 #ifndef GL_OUTPUT_TEXTURE_COORD19_EXT
 #define GL_OUTPUT_TEXTURE_COORD19_EXT                                 34736
 #endif
+
 #ifndef GL_OUTPUT_TEXTURE_COORD20_EXT
 #define GL_OUTPUT_TEXTURE_COORD20_EXT                                 34737
 #endif
+
 #ifndef GL_OUTPUT_TEXTURE_COORD21_EXT
 #define GL_OUTPUT_TEXTURE_COORD21_EXT                                 34738
 #endif
+
 #ifndef GL_OUTPUT_TEXTURE_COORD22_EXT
 #define GL_OUTPUT_TEXTURE_COORD22_EXT                                 34739
 #endif
+
 #ifndef GL_OUTPUT_TEXTURE_COORD23_EXT
 #define GL_OUTPUT_TEXTURE_COORD23_EXT                                 34740
 #endif
+
 #ifndef GL_OUTPUT_TEXTURE_COORD24_EXT
 #define GL_OUTPUT_TEXTURE_COORD24_EXT                                 34741
 #endif
+
 #ifndef GL_OUTPUT_TEXTURE_COORD25_EXT
 #define GL_OUTPUT_TEXTURE_COORD25_EXT                                 34742
 #endif
+
 #ifndef GL_OUTPUT_TEXTURE_COORD26_EXT
 #define GL_OUTPUT_TEXTURE_COORD26_EXT                                 34743
 #endif
+
 #ifndef GL_OUTPUT_TEXTURE_COORD27_EXT
 #define GL_OUTPUT_TEXTURE_COORD27_EXT                                 34744
 #endif
+
 #ifndef GL_OUTPUT_TEXTURE_COORD28_EXT
 #define GL_OUTPUT_TEXTURE_COORD28_EXT                                 34745
 #endif
+
 #ifndef GL_OUTPUT_TEXTURE_COORD29_EXT
 #define GL_OUTPUT_TEXTURE_COORD29_EXT                                 34746
 #endif
+
 #ifndef GL_OUTPUT_TEXTURE_COORD30_EXT
 #define GL_OUTPUT_TEXTURE_COORD30_EXT                                 34747
 #endif
+
 #ifndef GL_OUTPUT_TEXTURE_COORD31_EXT
 #define GL_OUTPUT_TEXTURE_COORD31_EXT                                 34748
 #endif
+
 #ifndef GL_OUTPUT_FOG_EXT
 #define GL_OUTPUT_FOG_EXT                                             34749
 #endif
+
 #ifndef GL_SCALAR_EXT
 #define GL_SCALAR_EXT                                                 34750
 #endif
+
 #ifndef GL_VECTOR_EXT
 #define GL_VECTOR_EXT                                                 34751
 #endif
+
 #ifndef GL_MATRIX_EXT
 #define GL_MATRIX_EXT                                                 34752
 #endif
+
 #ifndef GL_VARIANT_EXT
 #define GL_VARIANT_EXT                                                34753
 #endif
+
 #ifndef GL_INVARIANT_EXT
 #define GL_INVARIANT_EXT                                              34754
 #endif
+
 #ifndef GL_LOCAL_CONSTANT_EXT
 #define GL_LOCAL_CONSTANT_EXT                                         34755
 #endif
+
 #ifndef GL_LOCAL_EXT
 #define GL_LOCAL_EXT                                                  34756
 #endif
+
 #ifndef GL_MAX_VERTEX_SHADER_INSTRUCTIONS_EXT
 #define GL_MAX_VERTEX_SHADER_INSTRUCTIONS_EXT                         34757
 #endif
+
 #ifndef GL_MAX_VERTEX_SHADER_VARIANTS_EXT
 #define GL_MAX_VERTEX_SHADER_VARIANTS_EXT                             34758
 #endif
+
 #ifndef GL_MAX_VERTEX_SHADER_INVARIANTS_EXT
 #define GL_MAX_VERTEX_SHADER_INVARIANTS_EXT                           34759
 #endif
+
 #ifndef GL_MAX_VERTEX_SHADER_LOCAL_CONSTANTS_EXT
 #define GL_MAX_VERTEX_SHADER_LOCAL_CONSTANTS_EXT                      34760
 #endif
+
 #ifndef GL_MAX_VERTEX_SHADER_LOCALS_EXT
 #define GL_MAX_VERTEX_SHADER_LOCALS_EXT                               34761
 #endif
+
 #ifndef GL_MAX_OPTIMIZED_VERTEX_SHADER_INSTRUCTIONS_EXT
 #define GL_MAX_OPTIMIZED_VERTEX_SHADER_INSTRUCTIONS_EXT               34762
 #endif
+
 #ifndef GL_MAX_OPTIMIZED_VERTEX_SHADER_VARIANTS_EXT
 #define GL_MAX_OPTIMIZED_VERTEX_SHADER_VARIANTS_EXT                   34763
 #endif
+
 #ifndef GL_MAX_OPTIMIZED_VERTEX_SHADER_LOCAL_CONSTANTS_EXT
 #define GL_MAX_OPTIMIZED_VERTEX_SHADER_LOCAL_CONSTANTS_EXT            34764
 #endif
+
 #ifndef GL_MAX_OPTIMIZED_VERTEX_SHADER_INVARIANTS_EXT
 #define GL_MAX_OPTIMIZED_VERTEX_SHADER_INVARIANTS_EXT                 34765
 #endif
+
 #ifndef GL_MAX_OPTIMIZED_VERTEX_SHADER_LOCALS_EXT
 #define GL_MAX_OPTIMIZED_VERTEX_SHADER_LOCALS_EXT                     34766
 #endif
+
 #ifndef GL_VERTEX_SHADER_INSTRUCTIONS_EXT
 #define GL_VERTEX_SHADER_INSTRUCTIONS_EXT                             34767
 #endif
+
 #ifndef GL_VERTEX_SHADER_VARIANTS_EXT
 #define GL_VERTEX_SHADER_VARIANTS_EXT                                 34768
 #endif
+
 #ifndef GL_VERTEX_SHADER_INVARIANTS_EXT
 #define GL_VERTEX_SHADER_INVARIANTS_EXT                               34769
 #endif
+
 #ifndef GL_VERTEX_SHADER_LOCAL_CONSTANTS_EXT
 #define GL_VERTEX_SHADER_LOCAL_CONSTANTS_EXT                          34770
 #endif
+
 #ifndef GL_VERTEX_SHADER_LOCALS_EXT
 #define GL_VERTEX_SHADER_LOCALS_EXT                                   34771
 #endif
+
 #ifndef GL_VERTEX_SHADER_BINDING_EXT
 #define GL_VERTEX_SHADER_BINDING_EXT                                  34689
 #endif
+
 #ifndef GL_VERTEX_SHADER_OPTIMIZED_EXT
 #define GL_VERTEX_SHADER_OPTIMIZED_EXT                                34772
 #endif
+
 #ifndef GL_X_EXT
 #define GL_X_EXT                                                      34773
 #endif
+
 #ifndef GL_Y_EXT
 #define GL_Y_EXT                                                      34774
 #endif
+
 #ifndef GL_Z_EXT
 #define GL_Z_EXT                                                      34775
 #endif
+
 #ifndef GL_W_EXT
 #define GL_W_EXT                                                      34776
 #endif
+
 #ifndef GL_NEGATIVE_X_EXT
 #define GL_NEGATIVE_X_EXT                                             34777
 #endif
+
 #ifndef GL_NEGATIVE_Y_EXT
 #define GL_NEGATIVE_Y_EXT                                             34778
 #endif
+
 #ifndef GL_NEGATIVE_Z_EXT
 #define GL_NEGATIVE_Z_EXT                                             34779
 #endif
+
 #ifndef GL_NEGATIVE_W_EXT
 #define GL_NEGATIVE_W_EXT                                             34780
 #endif
+
 #ifndef GL_ZERO_EXT
 #define GL_ZERO_EXT                                                   34781
 #endif
+
 #ifndef GL_ONE_EXT
 #define GL_ONE_EXT                                                    34782
 #endif
+
 #ifndef GL_NEGATIVE_ONE_EXT
 #define GL_NEGATIVE_ONE_EXT                                           34783
 #endif
+
 #ifndef GL_NORMALIZED_RANGE_EXT
 #define GL_NORMALIZED_RANGE_EXT                                       34784
 #endif
+
 #ifndef GL_FULL_RANGE_EXT
 #define GL_FULL_RANGE_EXT                                             34785
 #endif
+
 #ifndef GL_CURRENT_VERTEX_EXT
 #define GL_CURRENT_VERTEX_EXT                                         34786
 #endif
+
 #ifndef GL_MVP_MATRIX_EXT
 #define GL_MVP_MATRIX_EXT                                             34787
 #endif
+
+
 typedef GLvoid (csAPIENTRY* csGLBEGINVERTEXSHADEREXT) ();
 typedef GLvoid (csAPIENTRY* csGLENDVERTEXSHADEREXT) ();
 typedef GLvoid (csAPIENTRY* csGLBINDVERTEXSHADEREXT) (GLuint id);
@@ -2859,42 +3680,56 @@ typedef GLvoid (csAPIENTRY* csGLGETLOCALCONSTANTFLOATVEXT) (GLuint id, GLenum va
 #ifndef GL_VERTEX_WEIGHTING_EXT
 #define GL_VERTEX_WEIGHTING_EXT                                       34057
 #endif
+
 #ifndef GL_MODELVIEW0_EXT
-#define GL_MODELVIEW0_EXT                                             5888
+#define GL_MODELVIEW0_EXT                                              5888
 #endif
+
 #ifndef GL_MODELVIEW1_EXT
 #define GL_MODELVIEW1_EXT                                             34058
 #endif
+
 #ifndef GL_MODELVIEW0_MATRIX_EXT
-#define GL_MODELVIEW0_MATRIX_EXT                                      2982
+#define GL_MODELVIEW0_MATRIX_EXT                                       2982
 #endif
+
 #ifndef GL_MODELVIEW1_MATRIX_EXT
 #define GL_MODELVIEW1_MATRIX_EXT                                      34054
 #endif
+
 #ifndef GL_CURRENT_VERTEX_WEIGHT_EXT
 #define GL_CURRENT_VERTEX_WEIGHT_EXT                                  34059
 #endif
+
 #ifndef GL_VERTEX_WEIGHT_ARRAY_EXT
 #define GL_VERTEX_WEIGHT_ARRAY_EXT                                    34060
 #endif
+
 #ifndef GL_VERTEX_WEIGHT_ARRAY_SIZE_EXT
 #define GL_VERTEX_WEIGHT_ARRAY_SIZE_EXT                               34061
 #endif
+
 #ifndef GL_VERTEX_WEIGHT_ARRAY_TYPE_EXT
 #define GL_VERTEX_WEIGHT_ARRAY_TYPE_EXT                               34062
 #endif
+
 #ifndef GL_VERTEX_WEIGHT_ARRAY_STRIDE_EXT
 #define GL_VERTEX_WEIGHT_ARRAY_STRIDE_EXT                             34063
 #endif
+
 #ifndef GL_MODELVIEW0_STACK_DEPTH_EXT
-#define GL_MODELVIEW0_STACK_DEPTH_EXT                                 2979
+#define GL_MODELVIEW0_STACK_DEPTH_EXT                                  2979
 #endif
+
 #ifndef GL_MODELVIEW1_STACK_DEPTH_EXT
 #define GL_MODELVIEW1_STACK_DEPTH_EXT                                 34050
 #endif
+
 #ifndef GL_VERTEX_WEIGHT_ARRAY_POINTER_EXT
 #define GL_VERTEX_WEIGHT_ARRAY_POINTER_EXT                            34064
 #endif
+
+
 typedef GLvoid (csAPIENTRY* csGLVERTEXWEIGHTFEXT) (GLfloat weight);
 typedef GLvoid (csAPIENTRY* csGLVERTEXWEIGHTFVEXT) (GLfloat* weight);
 typedef GLvoid (csAPIENTRY* csGLVERTEXWEIGHTPOINTEREXT) (GLint size, GLenum type, GLsizei stride, GLvoid* pointer);
@@ -2903,98 +3738,132 @@ typedef GLvoid (csAPIENTRY* csGLVERTEXWEIGHTPOINTEREXT) (GLint size, GLenum type
 #ifndef GL_OCCLUSION_TEST_HP
 #define GL_OCCLUSION_TEST_HP                                          33125
 #endif
+
 #ifndef GL_OCCLUSION_TEST_RESULT_HP
 #define GL_OCCLUSION_TEST_RESULT_HP                                   33126
 #endif
 
+
+
 // GL_NV_blend_square
+
 
 // GL_NV_copy_depth_to_color
 #ifndef GL_DEPTH_STENCIL_TO_RGBA_NV
 #define GL_DEPTH_STENCIL_TO_RGBA_NV                                   34926
 #endif
+
 #ifndef GL_DEPTH_STENCIL_TO_BGRA_NV
 #define GL_DEPTH_STENCIL_TO_BGRA_NV                                   34927
 #endif
+
+
 
 // GL_NV_depth_clamp
 #ifndef GL_DEPTH_CLAMP_NV
 #define GL_DEPTH_CLAMP_NV                                             34383
 #endif
 
+
+
 // GL_NV_evaluators
 #ifndef GL_EVAL_2D_NV
 #define GL_EVAL_2D_NV                                                 34496
 #endif
+
 #ifndef GL_EVAL_TRIANGULAR_2D_NV
 #define GL_EVAL_TRIANGULAR_2D_NV                                      34497
 #endif
+
 #ifndef GL_MAP_TESSELLATION_NV
 #define GL_MAP_TESSELLATION_NV                                        34498
 #endif
+
 #ifndef GL_MAP_ATTRIB_U_ORDER_NV
 #define GL_MAP_ATTRIB_U_ORDER_NV                                      34499
 #endif
+
 #ifndef GL_MAP_ATTRIB_V_ORDER_NV
 #define GL_MAP_ATTRIB_V_ORDER_NV                                      34500
 #endif
+
 #ifndef GL_EVAL_FRACTIONAL_TESSELLATION_NV
 #define GL_EVAL_FRACTIONAL_TESSELLATION_NV                            34501
 #endif
+
 #ifndef GL_EVAL_VERTEX_ATTRIB0_NV
 #define GL_EVAL_VERTEX_ATTRIB0_NV                                     34502
 #endif
+
 #ifndef GL_EVAL_VERTEX_ATTRIB1_NV
 #define GL_EVAL_VERTEX_ATTRIB1_NV                                     34503
 #endif
+
 #ifndef GL_EVAL_VERTEX_ATTRIB2_NV
 #define GL_EVAL_VERTEX_ATTRIB2_NV                                     34504
 #endif
+
 #ifndef GL_EVAL_VERTEX_ATTRIB3_NV
 #define GL_EVAL_VERTEX_ATTRIB3_NV                                     34505
 #endif
+
 #ifndef GL_EVAL_VERTEX_ATTRIB4_NV
 #define GL_EVAL_VERTEX_ATTRIB4_NV                                     34506
 #endif
+
 #ifndef GL_EVAL_VERTEX_ATTRIB5_NV
 #define GL_EVAL_VERTEX_ATTRIB5_NV                                     34507
 #endif
+
 #ifndef GL_EVAL_VERTEX_ATTRIB6_NV
 #define GL_EVAL_VERTEX_ATTRIB6_NV                                     34508
 #endif
+
 #ifndef GL_EVAL_VERTEX_ATTRIB7_NV
 #define GL_EVAL_VERTEX_ATTRIB7_NV                                     34509
 #endif
+
 #ifndef GL_EVAL_VERTEX_ATTRIB8_NV
 #define GL_EVAL_VERTEX_ATTRIB8_NV                                     34510
 #endif
+
 #ifndef GL_EVAL_VERTEX_ATTRIB9_NV
 #define GL_EVAL_VERTEX_ATTRIB9_NV                                     34511
 #endif
+
 #ifndef GL_EVAL_VERTEX_ATTRIB10_NV
 #define GL_EVAL_VERTEX_ATTRIB10_NV                                    34512
 #endif
+
 #ifndef GL_EVAL_VERTEX_ATTRIB11_NV
 #define GL_EVAL_VERTEX_ATTRIB11_NV                                    34513
 #endif
+
 #ifndef GL_EVAL_VERTEX_ATTRIB12_NV
 #define GL_EVAL_VERTEX_ATTRIB12_NV                                    34514
 #endif
+
 #ifndef GL_EVAL_VERTEX_ATTRIB13_NV
 #define GL_EVAL_VERTEX_ATTRIB13_NV                                    34515
 #endif
+
 #ifndef GL_EVAL_VERTEX_ATTRIB14_NV
 #define GL_EVAL_VERTEX_ATTRIB14_NV                                    34516
 #endif
+
 #ifndef GL_EVAL_VERTEX_ATTRIB15_NV
 #define GL_EVAL_VERTEX_ATTRIB15_NV                                    34517
 #endif
+
 #ifndef GL_MAX_MAP_TESSELLATION_NV
 #define GL_MAX_MAP_TESSELLATION_NV                                    34518
 #endif
+
 #ifndef GL_MAX_RATIONAL_EVAL_ORDER_NV
 #define GL_MAX_RATIONAL_EVAL_ORDER_NV                                 34519
 #endif
+
+
 typedef GLvoid (csAPIENTRY* csGLMAPCONTROLPOINTSNV) (GLenum target, GLuint index, GLenum type, GLsizei ustride, GLsizei vstride, GLint uorder, GLint vorder, GLboolean packed, GLvoid* points);
 typedef GLvoid (csAPIENTRY* csGLMAPPARAMETERIVNV) (GLenum target, GLenum pname, GLint* params);
 typedef GLvoid (csAPIENTRY* csGLMAPPARAMETERFVNV) (GLenum target, GLenum pname, GLfloat* params);
@@ -3009,12 +3878,16 @@ typedef GLvoid (csAPIENTRY* csGLEVALMAPSNV) (GLenum target, GLenum mode);
 #ifndef GL_ALL_COMPLETED_NV
 #define GL_ALL_COMPLETED_NV                                           34034
 #endif
+
 #ifndef GL_FENCE_STATUS_NV
 #define GL_FENCE_STATUS_NV                                            34035
 #endif
+
 #ifndef GL_FENCE_CONDITION_NV
 #define GL_FENCE_CONDITION_NV                                         34036
 #endif
+
+
 typedef GLvoid (csAPIENTRY* csGLGENFENCESNV) (GLsizei n, GLuint* fences);
 typedef GLvoid (csAPIENTRY* csGLDELETEFENCESNV) (GLsizei n, GLuint* fences);
 typedef GLvoid (csAPIENTRY* csGLSETFENCENV) (GLuint fence, GLenum condition);
@@ -3027,45 +3900,61 @@ typedef GLvoid (csAPIENTRY* csGLGETFENCEIVNV) (GLuint fence, GLenum pname, GLint
 #ifndef GL_FOG_DISTANCE_MODE_NV
 #define GL_FOG_DISTANCE_MODE_NV                                       34138
 #endif
+
 #ifndef GL_EYE_RADIAL_NV
 #define GL_EYE_RADIAL_NV                                              34139
 #endif
+
 #ifndef GL_EYE_PLANE_ABSOLUTE_NV
 #define GL_EYE_PLANE_ABSOLUTE_NV                                      34140
 #endif
+
+
 
 // GL_NV_light_max_exponent
 #ifndef GL_MAX_SHININESS_NV
 #define GL_MAX_SHININESS_NV                                           34052
 #endif
+
 #ifndef GL_MAX_SPOT_EXPONENT_NV
 #define GL_MAX_SPOT_EXPONENT_NV                                       34053
 #endif
+
+
 
 // GL_NV_multisample_filter_hint
 #ifndef GL_MULTISAMPLE_FILTER_HINT_NV
 #define GL_MULTISAMPLE_FILTER_HINT_NV                                 34100
 #endif
 
+
+
 // GL_NV_occlusion_query
 #ifndef GL_OCCLUSION_TEST_HP
 #define GL_OCCLUSION_TEST_HP                                          33125
 #endif
+
 #ifndef GL_OCCLUSION_TEST_RESULT_HP
 #define GL_OCCLUSION_TEST_RESULT_HP                                   33126
 #endif
+
 #ifndef GL_PIXEL_COUNTER_BITS_NV
 #define GL_PIXEL_COUNTER_BITS_NV                                      34916
 #endif
+
 #ifndef GL_CURRENT_OCCLUSION_QUERY_ID_NV
 #define GL_CURRENT_OCCLUSION_QUERY_ID_NV                              34917
 #endif
+
 #ifndef GL_PIXEL_COUNT_NV
 #define GL_PIXEL_COUNT_NV                                             34918
 #endif
+
 #ifndef GL_PIXEL_COUNT_AVAILABLE_NV
 #define GL_PIXEL_COUNT_AVAILABLE_NV                                   34919
 #endif
+
+
 typedef GLvoid (csAPIENTRY* csGLGENOCCLUSIONQUERIESNV) (GLsizei n, GLuint* ids);
 typedef GLvoid (csAPIENTRY* csGLDELETEOCCLUSIONQUERIESNV) (GLsizei n, GLuint* ids);
 typedef GLboolean (csAPIENTRY* csGLISOCCLUSIONQUERYNV) (GLuint id);
@@ -3078,20 +3967,27 @@ typedef GLvoid (csAPIENTRY* csGLGETOCCLUSIONQUERYUIVNV) (GLuint id, GLenum pname
 #ifndef GL_DEPTH_STENCIL_NV
 #define GL_DEPTH_STENCIL_NV                                           34041
 #endif
+
 #ifndef GL_UNSIGNED_INT_24_8_NV
 #define GL_UNSIGNED_INT_24_8_NV                                       34042
 #endif
+
+
 
 // GL_NV_point_sprite
 #ifndef GL_POINT_SPRITE_NV
 #define GL_POINT_SPRITE_NV                                            34913
 #endif
+
 #ifndef GL_COORD_REPLACE_NV
 #define GL_COORD_REPLACE_NV                                           34914
 #endif
+
 #ifndef GL_POINT_SPRITE_R_MODE_NV
 #define GL_POINT_SPRITE_R_MODE_NV                                     34915
 #endif
+
+
 typedef GLvoid (csAPIENTRY* csGLPOINTPARAMETERINV) (GLenum pname, GLint param);
 typedef GLvoid (csAPIENTRY* csGLPOINTPARAMETERIVNV) (GLenum pname, GLint* params);
 
@@ -3099,156 +3995,208 @@ typedef GLvoid (csAPIENTRY* csGLPOINTPARAMETERIVNV) (GLenum pname, GLint* params
 #ifndef GL_REGISTER_COMBINERS_NV
 #define GL_REGISTER_COMBINERS_NV                                      34082
 #endif
+
 #ifndef GL_COMBINER0_NV
 #define GL_COMBINER0_NV                                               34128
 #endif
+
 #ifndef GL_COMBINER1_NV
 #define GL_COMBINER1_NV                                               34129
 #endif
+
 #ifndef GL_COMBINER2_NV
 #define GL_COMBINER2_NV                                               34130
 #endif
+
 #ifndef GL_COMBINER3_NV
 #define GL_COMBINER3_NV                                               34131
 #endif
+
 #ifndef GL_COMBINER4_NV
 #define GL_COMBINER4_NV                                               34132
 #endif
+
 #ifndef GL_COMBINER5_NV
 #define GL_COMBINER5_NV                                               34133
 #endif
+
 #ifndef GL_COMBINER6_NV
 #define GL_COMBINER6_NV                                               34134
 #endif
+
 #ifndef GL_COMBINER7_NV
 #define GL_COMBINER7_NV                                               34135
 #endif
+
 #ifndef GL_VARIABLE_A_NV
 #define GL_VARIABLE_A_NV                                              34083
 #endif
+
 #ifndef GL_VARIABLE_B_NV
 #define GL_VARIABLE_B_NV                                              34084
 #endif
+
 #ifndef GL_VARIABLE_C_NV
 #define GL_VARIABLE_C_NV                                              34085
 #endif
+
 #ifndef GL_VARIABLE_D_NV
 #define GL_VARIABLE_D_NV                                              34086
 #endif
+
 #ifndef GL_VARIABLE_E_NV
 #define GL_VARIABLE_E_NV                                              34087
 #endif
+
 #ifndef GL_VARIABLE_F_NV
 #define GL_VARIABLE_F_NV                                              34088
 #endif
+
 #ifndef GL_VARIABLE_G_NV
 #define GL_VARIABLE_G_NV                                              34089
 #endif
+
 #ifndef GL_CONSTANT_COLOR0_NV
 #define GL_CONSTANT_COLOR0_NV                                         34090
 #endif
+
 #ifndef GL_CONSTANT_COLOR1_NV
 #define GL_CONSTANT_COLOR1_NV                                         34091
 #endif
+
 #ifndef GL_PRIMARY_COLOR_NV
 #define GL_PRIMARY_COLOR_NV                                           34092
 #endif
+
 #ifndef GL_SECONDARY_COLOR_NV
 #define GL_SECONDARY_COLOR_NV                                         34093
 #endif
+
 #ifndef GL_SPARE0_NV
 #define GL_SPARE0_NV                                                  34094
 #endif
+
 #ifndef GL_SPARE1_NV
 #define GL_SPARE1_NV                                                  34095
 #endif
+
 #ifndef GL_UNSIGNED_IDENTITY_NV
 #define GL_UNSIGNED_IDENTITY_NV                                       34102
 #endif
+
 #ifndef GL_UNSIGNED_INVERT_NV
 #define GL_UNSIGNED_INVERT_NV                                         34103
 #endif
+
 #ifndef GL_EXPAND_NORMAL_NV
 #define GL_EXPAND_NORMAL_NV                                           34104
 #endif
+
 #ifndef GL_EXPAND_NEGATE_NV
 #define GL_EXPAND_NEGATE_NV                                           34105
 #endif
+
 #ifndef GL_HALF_BIAS_NORMAL_NV
 #define GL_HALF_BIAS_NORMAL_NV                                        34106
 #endif
+
 #ifndef GL_HALF_BIAS_NEGATE_NV
 #define GL_HALF_BIAS_NEGATE_NV                                        34107
 #endif
+
 #ifndef GL_SIGNED_IDENTITY_NV
 #define GL_SIGNED_IDENTITY_NV                                         34108
 #endif
+
 #ifndef GL_SIGNED_NEGATE_NV
 #define GL_SIGNED_NEGATE_NV                                           34109
 #endif
+
 #ifndef GL_E_TIMES_F_NV
 #define GL_E_TIMES_F_NV                                               34097
 #endif
+
 #ifndef GL_SPARE0_PLUS_SECONDARY_COLOR_NV
 #define GL_SPARE0_PLUS_SECONDARY_COLOR_NV                             34098
 #endif
+
 #ifndef GL_SCALE_BY_TWO_NV
 #define GL_SCALE_BY_TWO_NV                                            34110
 #endif
+
 #ifndef GL_SCALE_BY_FOUR_NV
 #define GL_SCALE_BY_FOUR_NV                                           34111
 #endif
+
 #ifndef GL_SCALE_BY_ONE_HALF_NV
 #define GL_SCALE_BY_ONE_HALF_NV                                       34112
 #endif
+
 #ifndef GL_BIAS_BY_NEGATIVE_ONE_HALF_NV
 #define GL_BIAS_BY_NEGATIVE_ONE_HALF_NV                               34113
 #endif
+
 #ifndef GL_DISCARD_NV
 #define GL_DISCARD_NV                                                 34096
 #endif
+
 #ifndef GL_COMBINER_INPUT_NV
 #define GL_COMBINER_INPUT_NV                                          34114
 #endif
+
 #ifndef GL_COMBINER_MAPPING_NV
 #define GL_COMBINER_MAPPING_NV                                        34115
 #endif
+
 #ifndef GL_COMBINER_COMPONENT_USAGE_NV
 #define GL_COMBINER_COMPONENT_USAGE_NV                                34116
 #endif
+
 #ifndef GL_COMBINER_AB_DOT_PRODUCT_NV
 #define GL_COMBINER_AB_DOT_PRODUCT_NV                                 34117
 #endif
+
 #ifndef GL_COMBINER_CD_DOT_PRODUCT_NV
 #define GL_COMBINER_CD_DOT_PRODUCT_NV                                 34118
 #endif
+
 #ifndef GL_COMBINER_MUX_SUM_NV
 #define GL_COMBINER_MUX_SUM_NV                                        34119
 #endif
+
 #ifndef GL_COMBINER_SCALE_NV
 #define GL_COMBINER_SCALE_NV                                          34120
 #endif
+
 #ifndef GL_COMBINER_BIAS_NV
 #define GL_COMBINER_BIAS_NV                                           34121
 #endif
+
 #ifndef GL_COMBINER_AB_OUTPUT_NV
 #define GL_COMBINER_AB_OUTPUT_NV                                      34122
 #endif
+
 #ifndef GL_COMBINER_CD_OUTPUT_NV
 #define GL_COMBINER_CD_OUTPUT_NV                                      34123
 #endif
+
 #ifndef GL_COMBINER_SUM_OUTPUT_NV
 #define GL_COMBINER_SUM_OUTPUT_NV                                     34124
 #endif
+
 #ifndef GL_NUM_GENERAL_COMBINERS_NV
 #define GL_NUM_GENERAL_COMBINERS_NV                                   34126
 #endif
+
 #ifndef GL_COLOR_SUM_CLAMP_NV
 #define GL_COLOR_SUM_CLAMP_NV                                         34127
 #endif
+
 #ifndef GL_MAX_GENERAL_COMBINERS_NV
 #define GL_MAX_GENERAL_COMBINERS_NV                                   34125
 #endif
+
+
 typedef GLvoid (csAPIENTRY* csGLCOMBINERPARAMETERFVNV) (GLenum pname, GLfloat* params);
 typedef GLvoid (csAPIENTRY* csGLCOMBINERPARAMETERIVNV) (GLenum pname, GLint* params);
 typedef GLvoid (csAPIENTRY* csGLCOMBINERPARAMETERFNV) (GLenum pname, GLfloat param);
@@ -3267,6 +4215,8 @@ typedef GLvoid (csAPIENTRY* csGLGETFINALCOMBINERINPUTPARAMETERIVNV) (GLenum vari
 #ifndef GL_PER_STAGE_CONSTANTS_NV
 #define GL_PER_STAGE_CONSTANTS_NV                                     34101
 #endif
+
+
 typedef GLvoid (csAPIENTRY* csGLCOMBINERSTAGEPARAMETERFVNV) (GLenum stage, GLenum pname, GLfloat* params);
 typedef GLvoid (csAPIENTRY* csGLGETCOMBINERSTAGEPARAMETERFVNV) (GLenum stage, GLenum pname, GLfloat* params);
 
@@ -3274,433 +4224,580 @@ typedef GLvoid (csAPIENTRY* csGLGETCOMBINERSTAGEPARAMETERFVNV) (GLenum stage, GL
 #ifndef GL_EMBOSS_MAP_NV
 #define GL_EMBOSS_MAP_NV                                              34143
 #endif
+
 #ifndef GL_EMBOSS_LIGHT_NV
 #define GL_EMBOSS_LIGHT_NV                                            34141
 #endif
+
 #ifndef GL_EMBOSS_CONSTANT_NV
 #define GL_EMBOSS_CONSTANT_NV                                         34142
 #endif
+
+
 
 // GL_NV_texgen_reflection
 #ifndef GL_NORMAL_MAP_NV
 #define GL_NORMAL_MAP_NV                                              34065
 #endif
+
 #ifndef GL_REFLECTION_MAP_NV
 #define GL_REFLECTION_MAP_NV                                          34066
 #endif
+
+
 
 // GL_NV_texture_compression_vtc
 #ifndef GL_COMPRESSED_RGB_S3TC_DXT1_EXT
 #define GL_COMPRESSED_RGB_S3TC_DXT1_EXT                               33776
 #endif
+
 #ifndef GL_COMPRESSED_RGBA_S3TC_DXT1_EXT
 #define GL_COMPRESSED_RGBA_S3TC_DXT1_EXT                              33777
 #endif
+
 #ifndef GL_COMPRESSED_RGBA_S3TC_DXT3_EXT
 #define GL_COMPRESSED_RGBA_S3TC_DXT3_EXT                              33778
 #endif
+
 #ifndef GL_COMPRESSED_RGBA_S3TC_DXT5_EXT
 #define GL_COMPRESSED_RGBA_S3TC_DXT5_EXT                              33779
 #endif
+
+
 
 // GL_NV_texture_env_combine4
 #ifndef GL_COMBINE4_NV
 #define GL_COMBINE4_NV                                                34051
 #endif
+
 #ifndef GL_SOURCE3_RGB_NV
 #define GL_SOURCE3_RGB_NV                                             34179
 #endif
+
 #ifndef GL_SOURCE3_ALPHA_NV
 #define GL_SOURCE3_ALPHA_NV                                           34187
 #endif
+
 #ifndef GL_OPERAND3_RGB_NV
 #define GL_OPERAND3_RGB_NV                                            34195
 #endif
+
 #ifndef GL_OPERAND3_ALPHA_NV
 #define GL_OPERAND3_ALPHA_NV                                          34203
 #endif
+
+
 
 // GL_NV_texture_rectangle
 #ifndef GL_TEXTURE_RECTANGLE_NV
 #define GL_TEXTURE_RECTANGLE_NV                                       34037
 #endif
+
 #ifndef GL_TEXTURE_BINDING_RECTANGLE_NV
 #define GL_TEXTURE_BINDING_RECTANGLE_NV                               34038
 #endif
+
 #ifndef GL_PROXY_TEXTURE_RECTANGLE_NV
 #define GL_PROXY_TEXTURE_RECTANGLE_NV                                 34039
 #endif
+
 #ifndef GL_MAX_RECTANGLE_TEXTURE_SIZE_NV
 #define GL_MAX_RECTANGLE_TEXTURE_SIZE_NV                              34040
 #endif
+
+
 
 // GL_NV_texture_shader
 #ifndef GL_TEXTURE_SHADER_NV
 #define GL_TEXTURE_SHADER_NV                                          34526
 #endif
+
 #ifndef GL_RGBA_UNSIGNED_DOT_PRODUCT_MAPPING_NV
 #define GL_RGBA_UNSIGNED_DOT_PRODUCT_MAPPING_NV                       34521
 #endif
+
 #ifndef GL_SHADER_OPERATION_NV
 #define GL_SHADER_OPERATION_NV                                        34527
 #endif
+
 #ifndef GL_CULL_MODES_NV
 #define GL_CULL_MODES_NV                                              34528
 #endif
+
 #ifndef GL_OFFSET_TEXTURE_MATRIX_NV
 #define GL_OFFSET_TEXTURE_MATRIX_NV                                   34529
 #endif
+
 #ifndef GL_OFFSET_TEXTURE_SCALE_NV
 #define GL_OFFSET_TEXTURE_SCALE_NV                                    34530
 #endif
+
 #ifndef GL_OFFSET_TEXTURE_BIAS_NV
 #define GL_OFFSET_TEXTURE_BIAS_NV                                     34531
 #endif
+
 #ifndef GL_PREVIOUS_TEXTURE_INPUT_NV
 #define GL_PREVIOUS_TEXTURE_INPUT_NV                                  34532
 #endif
+
 #ifndef GL_CONST_EYE_NV
 #define GL_CONST_EYE_NV                                               34533
 #endif
+
 #ifndef GL_SHADER_CONSISTENT_NV
 #define GL_SHADER_CONSISTENT_NV                                       34525
 #endif
+
 #ifndef GL_PASS_THROUGH_NV
 #define GL_PASS_THROUGH_NV                                            34534
 #endif
+
 #ifndef GL_CULL_FRAGMENT_NV
 #define GL_CULL_FRAGMENT_NV                                           34535
 #endif
+
 #ifndef GL_OFFSET_TEXTURE_2D_NV
 #define GL_OFFSET_TEXTURE_2D_NV                                       34536
 #endif
+
 #ifndef GL_OFFSET_TEXTURE_RECTANGLE_NV
 #define GL_OFFSET_TEXTURE_RECTANGLE_NV                                34380
 #endif
+
 #ifndef GL_OFFSET_TEXTURE_RECTANGLE_SCALE_NV
 #define GL_OFFSET_TEXTURE_RECTANGLE_SCALE_NV                          34381
 #endif
+
 #ifndef GL_DEPENDENT_AR_TEXTURE_2D_NV
 #define GL_DEPENDENT_AR_TEXTURE_2D_NV                                 34537
 #endif
+
 #ifndef GL_DEPENDENT_GB_TEXTURE_2D_NV
 #define GL_DEPENDENT_GB_TEXTURE_2D_NV                                 34538
 #endif
+
 #ifndef GL_DOT_PRODUCT_NV
 #define GL_DOT_PRODUCT_NV                                             34540
 #endif
+
 #ifndef GL_DOT_PRODUCT_DEPTH_REPLACE_NV
 #define GL_DOT_PRODUCT_DEPTH_REPLACE_NV                               34541
 #endif
+
 #ifndef GL_DOT_PRODUCT_TEXTURE_2D_NV
 #define GL_DOT_PRODUCT_TEXTURE_2D_NV                                  34542
 #endif
+
 #ifndef GL_DOT_PRODUCT_TEXTURE_RECTANGLE_NV
 #define GL_DOT_PRODUCT_TEXTURE_RECTANGLE_NV                           34382
 #endif
+
 #ifndef GL_DOT_PRODUCT_TEXTURE_CUBE_MAP_NV
 #define GL_DOT_PRODUCT_TEXTURE_CUBE_MAP_NV                            34544
 #endif
+
 #ifndef GL_DOT_PRODUCT_DIFFUSE_CUBE_MAP_NV
 #define GL_DOT_PRODUCT_DIFFUSE_CUBE_MAP_NV                            34545
 #endif
+
 #ifndef GL_DOT_PRODUCT_REFLECT_CUBE_MAP_NV
 #define GL_DOT_PRODUCT_REFLECT_CUBE_MAP_NV                            34546
 #endif
+
 #ifndef GL_DOT_PRODUCT_CONST_EYE_REFLECT_CUBE_MAP_NV
 #define GL_DOT_PRODUCT_CONST_EYE_REFLECT_CUBE_MAP_NV                  34547
 #endif
+
 #ifndef GL_HILO_NV
 #define GL_HILO_NV                                                    34548
 #endif
+
 #ifndef GL_DSDT_NV
 #define GL_DSDT_NV                                                    34549
 #endif
+
 #ifndef GL_DSDT_MAG_NV
 #define GL_DSDT_MAG_NV                                                34550
 #endif
+
 #ifndef GL_DSDT_MAG_VIB_NV
 #define GL_DSDT_MAG_VIB_NV                                            34551
 #endif
+
 #ifndef GL_UNSIGNED_INT_S8_S8_8_8_NV
 #define GL_UNSIGNED_INT_S8_S8_8_8_NV                                  34522
 #endif
+
 #ifndef GL_UNSIGNED_INT_8_8_S8_S8_REV_NV
 #define GL_UNSIGNED_INT_8_8_S8_S8_REV_NV                              34523
 #endif
+
 #ifndef GL_SIGNED_RGBA_NV
 #define GL_SIGNED_RGBA_NV                                             34555
 #endif
+
 #ifndef GL_SIGNED_RGBA8_NV
 #define GL_SIGNED_RGBA8_NV                                            34556
 #endif
+
 #ifndef GL_SIGNED_RGB_NV
 #define GL_SIGNED_RGB_NV                                              34558
 #endif
+
 #ifndef GL_SIGNED_RGB8_NV
 #define GL_SIGNED_RGB8_NV                                             34559
 #endif
+
 #ifndef GL_SIGNED_LUMINANCE_NV
 #define GL_SIGNED_LUMINANCE_NV                                        34561
 #endif
+
 #ifndef GL_SIGNED_LUMINANCE8_NV
 #define GL_SIGNED_LUMINANCE8_NV                                       34562
 #endif
+
 #ifndef GL_SIGNED_LUMINANCE_ALPHA_NV
 #define GL_SIGNED_LUMINANCE_ALPHA_NV                                  34563
 #endif
+
 #ifndef GL_SIGNED_LUMINANCE8_ALPHA8_NV
 #define GL_SIGNED_LUMINANCE8_ALPHA8_NV                                34564
 #endif
+
 #ifndef GL_SIGNED_ALPHA_NV
 #define GL_SIGNED_ALPHA_NV                                            34565
 #endif
+
 #ifndef GL_SIGNED_ALPHA8_NV
 #define GL_SIGNED_ALPHA8_NV                                           34566
 #endif
+
 #ifndef GL_SIGNED_INTENSITY_NV
 #define GL_SIGNED_INTENSITY_NV                                        34567
 #endif
+
 #ifndef GL_SIGNED_INTENSITY8_NV
 #define GL_SIGNED_INTENSITY8_NV                                       34568
 #endif
+
 #ifndef GL_SIGNED_RGB_UNSIGNED_ALPHA_NV
 #define GL_SIGNED_RGB_UNSIGNED_ALPHA_NV                               34572
 #endif
+
 #ifndef GL_SIGNED_RGB8_UNSIGNED_ALPHA8_NV
 #define GL_SIGNED_RGB8_UNSIGNED_ALPHA8_NV                             34573
 #endif
+
 #ifndef GL_HILO16_NV
 #define GL_HILO16_NV                                                  34552
 #endif
+
 #ifndef GL_SIGNED_HILO_NV
 #define GL_SIGNED_HILO_NV                                             34553
 #endif
+
 #ifndef GL_SIGNED_HILO16_NV
 #define GL_SIGNED_HILO16_NV                                           34554
 #endif
+
 #ifndef GL_DSDT8_NV
 #define GL_DSDT8_NV                                                   34569
 #endif
+
 #ifndef GL_DSDT8_MAG8_NV
 #define GL_DSDT8_MAG8_NV                                              34570
 #endif
+
 #ifndef GL_DSDT_MAG_INTENSITY_NV
 #define GL_DSDT_MAG_INTENSITY_NV                                      34524
 #endif
+
 #ifndef GL_DSDT8_MAG8_INTENSITY8_NV
 #define GL_DSDT8_MAG8_INTENSITY8_NV                                   34571
 #endif
+
 #ifndef GL_HI_SCALE_NV
 #define GL_HI_SCALE_NV                                                34574
 #endif
+
 #ifndef GL_LO_SCALE_NV
 #define GL_LO_SCALE_NV                                                34575
 #endif
+
 #ifndef GL_DS_SCALE_NV
 #define GL_DS_SCALE_NV                                                34576
 #endif
+
 #ifndef GL_DT_SCALE_NV
 #define GL_DT_SCALE_NV                                                34577
 #endif
+
 #ifndef GL_MAGNITUDE_SCALE_NV
 #define GL_MAGNITUDE_SCALE_NV                                         34578
 #endif
+
 #ifndef GL_VIBRANCE_SCALE_NV
 #define GL_VIBRANCE_SCALE_NV                                          34579
 #endif
+
 #ifndef GL_HI_BIAS_NV
 #define GL_HI_BIAS_NV                                                 34580
 #endif
+
 #ifndef GL_LO_BIAS_NV
 #define GL_LO_BIAS_NV                                                 34581
 #endif
+
 #ifndef GL_DS_BIAS_NV
 #define GL_DS_BIAS_NV                                                 34582
 #endif
+
 #ifndef GL_DT_BIAS_NV
 #define GL_DT_BIAS_NV                                                 34583
 #endif
+
 #ifndef GL_MAGNITUDE_BIAS_NV
 #define GL_MAGNITUDE_BIAS_NV                                          34584
 #endif
+
 #ifndef GL_VIBRANCE_BIAS_NV
 #define GL_VIBRANCE_BIAS_NV                                           34585
 #endif
+
 #ifndef GL_TEXTURE_BORDER_VALUES_NV
 #define GL_TEXTURE_BORDER_VALUES_NV                                   34586
 #endif
+
 #ifndef GL_TEXTURE_HI_SIZE_NV
 #define GL_TEXTURE_HI_SIZE_NV                                         34587
 #endif
+
 #ifndef GL_TEXTURE_LO_SIZE_NV
 #define GL_TEXTURE_LO_SIZE_NV                                         34588
 #endif
+
 #ifndef GL_TEXTURE_DS_SIZE_NV
 #define GL_TEXTURE_DS_SIZE_NV                                         34589
 #endif
+
 #ifndef GL_TEXTURE_DT_SIZE_NV
 #define GL_TEXTURE_DT_SIZE_NV                                         34590
 #endif
+
 #ifndef GL_TEXTURE_MAG_SIZE_NV
 #define GL_TEXTURE_MAG_SIZE_NV                                        34591
 #endif
+
+
 
 // GL_NV_texture_shader2
 #ifndef GL_DOT_PRODUCT_TEXTURE_3D_NV
 #define GL_DOT_PRODUCT_TEXTURE_3D_NV                                  34543
 #endif
+
 #ifndef GL_HILO_NV
 #define GL_HILO_NV                                                    34548
 #endif
+
 #ifndef GL_DSDT_NV
 #define GL_DSDT_NV                                                    34549
 #endif
+
 #ifndef GL_DSDT_MAG_NV
 #define GL_DSDT_MAG_NV                                                34550
 #endif
+
 #ifndef GL_DSDT_MAG_VIB_NV
 #define GL_DSDT_MAG_VIB_NV                                            34551
 #endif
+
 #ifndef GL_UNSIGNED_INT_S8_S8_8_8_NV
 #define GL_UNSIGNED_INT_S8_S8_8_8_NV                                  34522
 #endif
+
 #ifndef GL_UNSIGNED_INT_8_8_S8_S8_REV_NV
 #define GL_UNSIGNED_INT_8_8_S8_S8_REV_NV                              34523
 #endif
+
 #ifndef GL_SIGNED_RGBA_NV
 #define GL_SIGNED_RGBA_NV                                             34555
 #endif
+
 #ifndef GL_SIGNED_RGBA8_NV
 #define GL_SIGNED_RGBA8_NV                                            34556
 #endif
+
 #ifndef GL_SIGNED_RGB_NV
 #define GL_SIGNED_RGB_NV                                              34558
 #endif
+
 #ifndef GL_SIGNED_RGB8_NV
 #define GL_SIGNED_RGB8_NV                                             34559
 #endif
+
 #ifndef GL_SIGNED_LUMINANCE_NV
 #define GL_SIGNED_LUMINANCE_NV                                        34561
 #endif
+
 #ifndef GL_SIGNED_LUMINANCE8_NV
 #define GL_SIGNED_LUMINANCE8_NV                                       34562
 #endif
+
 #ifndef GL_SIGNED_LUMINANCE_ALPHA_NV
 #define GL_SIGNED_LUMINANCE_ALPHA_NV                                  34563
 #endif
+
 #ifndef GL_SIGNED_LUMINANCE8_ALPHA8_NV
 #define GL_SIGNED_LUMINANCE8_ALPHA8_NV                                34564
 #endif
+
 #ifndef GL_SIGNED_ALPHA_NV
 #define GL_SIGNED_ALPHA_NV                                            34565
 #endif
+
 #ifndef GL_SIGNED_ALPHA8_NV
 #define GL_SIGNED_ALPHA8_NV                                           34566
 #endif
+
 #ifndef GL_SIGNED_INTENSITY_NV
 #define GL_SIGNED_INTENSITY_NV                                        34567
 #endif
+
 #ifndef GL_SIGNED_INTENSITY8_NV
 #define GL_SIGNED_INTENSITY8_NV                                       34568
 #endif
+
 #ifndef GL_SIGNED_RGB_UNSIGNED_ALPHA_NV
 #define GL_SIGNED_RGB_UNSIGNED_ALPHA_NV                               34572
 #endif
+
 #ifndef GL_SIGNED_RGB8_UNSIGNED_ALPHA8_NV
 #define GL_SIGNED_RGB8_UNSIGNED_ALPHA8_NV                             34573
 #endif
+
 #ifndef GL_HILO16_NV
 #define GL_HILO16_NV                                                  34552
 #endif
+
 #ifndef GL_SIGNED_HILO_NV
 #define GL_SIGNED_HILO_NV                                             34553
 #endif
+
 #ifndef GL_SIGNED_HILO16_NV
 #define GL_SIGNED_HILO16_NV                                           34554
 #endif
+
 #ifndef GL_DSDT8_NV
 #define GL_DSDT8_NV                                                   34569
 #endif
+
 #ifndef GL_DSDT8_MAG8_NV
 #define GL_DSDT8_MAG8_NV                                              34570
 #endif
+
 #ifndef GL_DSDT_MAG_INTENSITY_NV
 #define GL_DSDT_MAG_INTENSITY_NV                                      34524
 #endif
+
 #ifndef GL_DSDT8_MAG8_INTENSITY8_NV
 #define GL_DSDT8_MAG8_INTENSITY8_NV                                   34571
 #endif
+
+
 
 // GL_NV_texture_shader3
 #ifndef GL_OFFSET_PROJECTIVE_TEXTURE_2D_NV
 #define GL_OFFSET_PROJECTIVE_TEXTURE_2D_NV                            34896
 #endif
+
 #ifndef GL_OFFSET_PROJECTIVE_TEXTURE_2D_SCALE_NV
 #define GL_OFFSET_PROJECTIVE_TEXTURE_2D_SCALE_NV                      34897
 #endif
+
 #ifndef GL_OFFSET_PROJECTIVE_TEXTURE_RECTANGLE_NV
 #define GL_OFFSET_PROJECTIVE_TEXTURE_RECTANGLE_NV                     34898
 #endif
+
 #ifndef GL_OFFSET_PROJECTIVE_TEXTURE_RECTANGLE_SCALE_NV
 #define GL_OFFSET_PROJECTIVE_TEXTURE_RECTANGLE_SCALE_NV               34899
 #endif
+
 #ifndef GL_OFFSET_HILO_TEXTURE_2D_NV
 #define GL_OFFSET_HILO_TEXTURE_2D_NV                                  34900
 #endif
+
 #ifndef GL_OFFSET_HILO_TEXTURE_RECTANGLE_NV
 #define GL_OFFSET_HILO_TEXTURE_RECTANGLE_NV                           34901
 #endif
+
 #ifndef GL_OFFSET_HILO_PROJECTIVE_TEXTURE_2D_NV
 #define GL_OFFSET_HILO_PROJECTIVE_TEXTURE_2D_NV                       34902
 #endif
+
 #ifndef GL_OFFSET_HILO_PROJECTIVE_TEXTURE_RECTANGLE_NV
 #define GL_OFFSET_HILO_PROJECTIVE_TEXTURE_RECTANGLE_NV                34903
 #endif
+
 #ifndef GL_DEPENDENT_HILO_TEXTURE_2D_NV
 #define GL_DEPENDENT_HILO_TEXTURE_2D_NV                               34904
 #endif
+
 #ifndef GL_DEPENDENT_RGB_TEXTURE_3D_NV
 #define GL_DEPENDENT_RGB_TEXTURE_3D_NV                                34905
 #endif
+
 #ifndef GL_DEPENDENT_RGB_TEXTURE_CUBE_MAP_NV
 #define GL_DEPENDENT_RGB_TEXTURE_CUBE_MAP_NV                          34906
 #endif
+
 #ifndef GL_DOT_PRODUCT_PASS_THROUGH_NV
 #define GL_DOT_PRODUCT_PASS_THROUGH_NV                                34907
 #endif
+
 #ifndef GL_DOT_PRODUCT_TEXTURE_1D_NV
 #define GL_DOT_PRODUCT_TEXTURE_1D_NV                                  34908
 #endif
+
 #ifndef GL_DOT_PRODUCT_AFFINE_DEPTH_REPLACE_NV
 #define GL_DOT_PRODUCT_AFFINE_DEPTH_REPLACE_NV                        34909
 #endif
+
 #ifndef GL_HILO8_NV
 #define GL_HILO8_NV                                                   34910
 #endif
+
 #ifndef GL_SIGNED_HILO8_NV
 #define GL_SIGNED_HILO8_NV                                            34911
 #endif
+
 #ifndef GL_FORCE_BLUE_TO_ONE_NV
 #define GL_FORCE_BLUE_TO_ONE_NV                                       34912
 #endif
+
+
 
 // GL_NV_vertex_array_range
 #ifndef GL_VERTEX_ARRAY_RANGE_NV
 #define GL_VERTEX_ARRAY_RANGE_NV                                      34077
 #endif
+
 #ifndef GL_VERTEX_ARRAY_RANGE_LENGTH_NV
 #define GL_VERTEX_ARRAY_RANGE_LENGTH_NV                               34078
 #endif
+
 #ifndef GL_VERTEX_ARRAY_RANGE_VALID_NV
 #define GL_VERTEX_ARRAY_RANGE_VALID_NV                                34079
 #endif
+
 #ifndef GL_MAX_VERTEX_ARRAY_RANGE_ELEMENT_NV
 #define GL_MAX_VERTEX_ARRAY_RANGE_ELEMENT_NV                          34080
 #endif
+
 #ifndef GL_VERTEX_ARRAY_RANGE_POINTER_NV
 #define GL_VERTEX_ARRAY_RANGE_POINTER_NV                              34081
 #endif
+
+
 typedef GLvoid (csAPIENTRY* csGLVERTEXARRAYRANGENV) (GLsizei length, GLvoid* pointer);
 typedef GLvoid (csAPIENTRY* csGLFLUSHVERTEXARRAYRANGENV) ();
 typedef GLvoid* (csAPIENTRY* csWGLALLOCATEMEMORYNV) (GLsizei size, GLfloat readFrequency, GLfloat writeFrequency, GLfloat priority);
@@ -3711,256 +4808,342 @@ typedef GLvoid (csAPIENTRY* csWGLFREEMEMORYNV) (GLvoid* pointer);
 #define GL_VERTEX_ARRAY_RANGE_WITHOUT_FLUSH_NV                        34099
 #endif
 
+
+
 // GL_NV_vertex_program
 #ifndef GL_VERTEX_PROGRAM_NV
 #define GL_VERTEX_PROGRAM_NV                                          34336
 #endif
+
 #ifndef GL_VERTEX_PROGRAM_POINT_SIZE_NV
 #define GL_VERTEX_PROGRAM_POINT_SIZE_NV                               34370
 #endif
+
 #ifndef GL_VERTEX_PROGRAM_TWO_SIDE_NV
 #define GL_VERTEX_PROGRAM_TWO_SIDE_NV                                 34371
 #endif
+
 #ifndef GL_VERTEX_STATE_PROGRAM_NV
 #define GL_VERTEX_STATE_PROGRAM_NV                                    34337
 #endif
+
 #ifndef GL_ATTRIB_ARRAY_SIZE_NV
 #define GL_ATTRIB_ARRAY_SIZE_NV                                       34339
 #endif
+
 #ifndef GL_ATTRIB_ARRAY_STRIDE_NV
 #define GL_ATTRIB_ARRAY_STRIDE_NV                                     34340
 #endif
+
 #ifndef GL_ATTRIB_ARRAY_TYPE_NV
 #define GL_ATTRIB_ARRAY_TYPE_NV                                       34341
 #endif
+
 #ifndef GL_CURRENT_ATTRIB_NV
 #define GL_CURRENT_ATTRIB_NV                                          34342
 #endif
+
 #ifndef GL_PROGRAM_PARAMETER_NV
 #define GL_PROGRAM_PARAMETER_NV                                       34372
 #endif
+
 #ifndef GL_ATTRIB_ARRAY_POINTER_NV
 #define GL_ATTRIB_ARRAY_POINTER_NV                                    34373
 #endif
+
 #ifndef GL_PROGRAM_TARGET_NV
 #define GL_PROGRAM_TARGET_NV                                          34374
 #endif
+
 #ifndef GL_PROGRAM_LENGTH_NV
 #define GL_PROGRAM_LENGTH_NV                                          34343
 #endif
+
 #ifndef GL_PROGRAM_RESIDENT_NV
 #define GL_PROGRAM_RESIDENT_NV                                        34375
 #endif
+
 #ifndef GL_PROGRAM_STRING_NV
 #define GL_PROGRAM_STRING_NV                                          34344
 #endif
+
 #ifndef GL_TRACK_MATRIX_NV
 #define GL_TRACK_MATRIX_NV                                            34376
 #endif
+
 #ifndef GL_TRACK_MATRIX_TRANSFORM_NV
 #define GL_TRACK_MATRIX_TRANSFORM_NV                                  34377
 #endif
+
 #ifndef GL_MAX_TRACK_MATRIX_STACK_DEPTH_NV
 #define GL_MAX_TRACK_MATRIX_STACK_DEPTH_NV                            34350
 #endif
+
 #ifndef GL_MAX_TRACK_MATRICES_NV
 #define GL_MAX_TRACK_MATRICES_NV                                      34351
 #endif
+
 #ifndef GL_CURRENT_MATRIX_STACK_DEPTH_NV
 #define GL_CURRENT_MATRIX_STACK_DEPTH_NV                              34368
 #endif
+
 #ifndef GL_CURRENT_MATRIX_NV
 #define GL_CURRENT_MATRIX_NV                                          34369
 #endif
+
 #ifndef GL_VERTEX_PROGRAM_BINDING_NV
 #define GL_VERTEX_PROGRAM_BINDING_NV                                  34378
 #endif
+
 #ifndef GL_PROGRAM_ERROR_POSITION_NV
 #define GL_PROGRAM_ERROR_POSITION_NV                                  34379
 #endif
+
 #ifndef GL_MODELVIEW_PROJECTION_NV
 #define GL_MODELVIEW_PROJECTION_NV                                    34345
 #endif
+
 #ifndef GL_MATRIX0_NV
 #define GL_MATRIX0_NV                                                 34352
 #endif
+
 #ifndef GL_MATRIX1_NV
 #define GL_MATRIX1_NV                                                 34353
 #endif
+
 #ifndef GL_MATRIX2_NV
 #define GL_MATRIX2_NV                                                 34354
 #endif
+
 #ifndef GL_MATRIX3_NV
 #define GL_MATRIX3_NV                                                 34355
 #endif
+
 #ifndef GL_MATRIX4_NV
 #define GL_MATRIX4_NV                                                 34356
 #endif
+
 #ifndef GL_MATRIX5_NV
 #define GL_MATRIX5_NV                                                 34357
 #endif
+
 #ifndef GL_MATRIX6_NV
 #define GL_MATRIX6_NV                                                 34358
 #endif
+
 #ifndef GL_MATRIX7_NV
 #define GL_MATRIX7_NV                                                 34359
 #endif
+
 #ifndef GL_IDENTITY_NV
 #define GL_IDENTITY_NV                                                34346
 #endif
+
 #ifndef GL_INVERSE_NV
 #define GL_INVERSE_NV                                                 34347
 #endif
+
 #ifndef GL_TRANSPOSE_NV
 #define GL_TRANSPOSE_NV                                               34348
 #endif
+
 #ifndef GL_INVERSE_TRANSPOSE_NV
 #define GL_INVERSE_TRANSPOSE_NV                                       34349
 #endif
+
 #ifndef GL_VERTEX_ATTRIB_ARRAY0_NV
 #define GL_VERTEX_ATTRIB_ARRAY0_NV                                    34384
 #endif
+
 #ifndef GL_VERTEX_ATTRIB_ARRAY1_NV
 #define GL_VERTEX_ATTRIB_ARRAY1_NV                                    34385
 #endif
+
 #ifndef GL_VERTEX_ATTRIB_ARRAY2_NV
 #define GL_VERTEX_ATTRIB_ARRAY2_NV                                    34386
 #endif
+
 #ifndef GL_VERTEX_ATTRIB_ARRAY3_NV
 #define GL_VERTEX_ATTRIB_ARRAY3_NV                                    34387
 #endif
+
 #ifndef GL_VERTEX_ATTRIB_ARRAY4_NV
 #define GL_VERTEX_ATTRIB_ARRAY4_NV                                    34388
 #endif
+
 #ifndef GL_VERTEX_ATTRIB_ARRAY5_NV
 #define GL_VERTEX_ATTRIB_ARRAY5_NV                                    34389
 #endif
+
 #ifndef GL_VERTEX_ATTRIB_ARRAY6_NV
 #define GL_VERTEX_ATTRIB_ARRAY6_NV                                    34390
 #endif
+
 #ifndef GL_VERTEX_ATTRIB_ARRAY7_NV
 #define GL_VERTEX_ATTRIB_ARRAY7_NV                                    34391
 #endif
+
 #ifndef GL_VERTEX_ATTRIB_ARRAY8_NV
 #define GL_VERTEX_ATTRIB_ARRAY8_NV                                    34392
 #endif
+
 #ifndef GL_VERTEX_ATTRIB_ARRAY9_NV
 #define GL_VERTEX_ATTRIB_ARRAY9_NV                                    34393
 #endif
+
 #ifndef GL_VERTEX_ATTRIB_ARRAY10_NV
 #define GL_VERTEX_ATTRIB_ARRAY10_NV                                   34394
 #endif
+
 #ifndef GL_VERTEX_ATTRIB_ARRAY11_NV
 #define GL_VERTEX_ATTRIB_ARRAY11_NV                                   34395
 #endif
+
 #ifndef GL_VERTEX_ATTRIB_ARRAY12_NV
 #define GL_VERTEX_ATTRIB_ARRAY12_NV                                   34396
 #endif
+
 #ifndef GL_VERTEX_ATTRIB_ARRAY13_NV
 #define GL_VERTEX_ATTRIB_ARRAY13_NV                                   34397
 #endif
+
 #ifndef GL_VERTEX_ATTRIB_ARRAY14_NV
 #define GL_VERTEX_ATTRIB_ARRAY14_NV                                   34398
 #endif
+
 #ifndef GL_VERTEX_ATTRIB_ARRAY15_NV
 #define GL_VERTEX_ATTRIB_ARRAY15_NV                                   34399
 #endif
+
 #ifndef GL_MAP1_VERTEX_ATTRIB0_4_NV
 #define GL_MAP1_VERTEX_ATTRIB0_4_NV                                   34400
 #endif
+
 #ifndef GL_MAP1_VERTEX_ATTRIB1_4_NV
 #define GL_MAP1_VERTEX_ATTRIB1_4_NV                                   34401
 #endif
+
 #ifndef GL_MAP1_VERTEX_ATTRIB2_4_NV
 #define GL_MAP1_VERTEX_ATTRIB2_4_NV                                   34402
 #endif
+
 #ifndef GL_MAP1_VERTEX_ATTRIB3_4_NV
 #define GL_MAP1_VERTEX_ATTRIB3_4_NV                                   34403
 #endif
+
 #ifndef GL_MAP1_VERTEX_ATTRIB4_4_NV
 #define GL_MAP1_VERTEX_ATTRIB4_4_NV                                   34404
 #endif
+
 #ifndef GL_MAP1_VERTEX_ATTRIB5_4_NV
 #define GL_MAP1_VERTEX_ATTRIB5_4_NV                                   34405
 #endif
+
 #ifndef GL_MAP1_VERTEX_ATTRIB6_4_NV
 #define GL_MAP1_VERTEX_ATTRIB6_4_NV                                   34406
 #endif
+
 #ifndef GL_MAP1_VERTEX_ATTRIB7_4_NV
 #define GL_MAP1_VERTEX_ATTRIB7_4_NV                                   34407
 #endif
+
 #ifndef GL_MAP1_VERTEX_ATTRIB8_4_NV
 #define GL_MAP1_VERTEX_ATTRIB8_4_NV                                   34408
 #endif
+
 #ifndef GL_MAP1_VERTEX_ATTRIB9_4_NV
 #define GL_MAP1_VERTEX_ATTRIB9_4_NV                                   34409
 #endif
+
 #ifndef GL_MAP1_VERTEX_ATTRIB10_4_NV
 #define GL_MAP1_VERTEX_ATTRIB10_4_NV                                  34410
 #endif
+
 #ifndef GL_MAP1_VERTEX_ATTRIB11_4_NV
 #define GL_MAP1_VERTEX_ATTRIB11_4_NV                                  34411
 #endif
+
 #ifndef GL_MAP1_VERTEX_ATTRIB12_4_NV
 #define GL_MAP1_VERTEX_ATTRIB12_4_NV                                  34412
 #endif
+
 #ifndef GL_MAP1_VERTEX_ATTRIB13_4_NV
 #define GL_MAP1_VERTEX_ATTRIB13_4_NV                                  34413
 #endif
+
 #ifndef GL_MAP1_VERTEX_ATTRIB14_4_NV
 #define GL_MAP1_VERTEX_ATTRIB14_4_NV                                  34414
 #endif
+
 #ifndef GL_MAP1_VERTEX_ATTRIB15_4_NV
 #define GL_MAP1_VERTEX_ATTRIB15_4_NV                                  34415
 #endif
+
 #ifndef GL_MAP2_VERTEX_ATTRIB0_4_NV
 #define GL_MAP2_VERTEX_ATTRIB0_4_NV                                   34416
 #endif
+
 #ifndef GL_MAP2_VERTEX_ATTRIB1_4_NV
 #define GL_MAP2_VERTEX_ATTRIB1_4_NV                                   34417
 #endif
+
 #ifndef GL_MAP2_VERTEX_ATTRIB2_4_NV
 #define GL_MAP2_VERTEX_ATTRIB2_4_NV                                   34418
 #endif
+
 #ifndef GL_MAP2_VERTEX_ATTRIB3_4_NV
 #define GL_MAP2_VERTEX_ATTRIB3_4_NV                                   34419
 #endif
+
 #ifndef GL_MAP2_VERTEX_ATTRIB4_4_NV
 #define GL_MAP2_VERTEX_ATTRIB4_4_NV                                   34420
 #endif
+
 #ifndef GL_MAP2_VERTEX_ATTRIB5_4_NV
 #define GL_MAP2_VERTEX_ATTRIB5_4_NV                                   34421
 #endif
+
 #ifndef GL_MAP2_VERTEX_ATTRIB6_4_NV
 #define GL_MAP2_VERTEX_ATTRIB6_4_NV                                   34422
 #endif
+
 #ifndef GL_MAP2_VERTEX_ATTRIB7_4_NV
 #define GL_MAP2_VERTEX_ATTRIB7_4_NV                                   34423
 #endif
+
 #ifndef GL_MAP2_VERTEX_ATTRIB8_4_NV
 #define GL_MAP2_VERTEX_ATTRIB8_4_NV                                   34424
 #endif
+
 #ifndef GL_MAP2_VERTEX_ATTRIB9_4_NV
 #define GL_MAP2_VERTEX_ATTRIB9_4_NV                                   34425
 #endif
+
 #ifndef GL_MAP2_VERTEX_ATTRIB10_4_NV
 #define GL_MAP2_VERTEX_ATTRIB10_4_NV                                  34426
 #endif
+
 #ifndef GL_MAP2_VERTEX_ATTRIB11_4_NV
 #define GL_MAP2_VERTEX_ATTRIB11_4_NV                                  34427
 #endif
+
 #ifndef GL_MAP2_VERTEX_ATTRIB12_4_NV
 #define GL_MAP2_VERTEX_ATTRIB12_4_NV                                  34428
 #endif
+
 #ifndef GL_MAP2_VERTEX_ATTRIB13_4_NV
 #define GL_MAP2_VERTEX_ATTRIB13_4_NV                                  34429
 #endif
+
 #ifndef GL_MAP2_VERTEX_ATTRIB14_4_NV
 #define GL_MAP2_VERTEX_ATTRIB14_4_NV                                  34430
 #endif
+
 #ifndef GL_MAP2_VERTEX_ATTRIB15_4_NV
 #define GL_MAP2_VERTEX_ATTRIB15_4_NV                                  34431
 #endif
+
+
 typedef GLvoid (csAPIENTRY* csGLBINDPROGRAMNV) (GLenum target, GLuint id);
 typedef GLvoid (csAPIENTRY* csGLDELETEPROGRAMSNV) (GLsizei n, GLuint* ids);
 typedef GLvoid (csAPIENTRY* csGLEXECUTEPROGRAMNV) (GLenum target, GLuint id, GLfloat* params);
@@ -4026,16 +5209,21 @@ typedef GLvoid (csAPIENTRY* csGLVERTEXATTRIBS4UBVNV) (GLuint index, GLsizei n, G
 
 // GL_NV_vertex_program1_1
 
+
 // GL_ATI_element_array
 #ifndef GL_ELEMENT_ARRAY_ATI
 #define GL_ELEMENT_ARRAY_ATI                                          34664
 #endif
+
 #ifndef GL_ELEMENT_ARRAY_TYPE_ATI
 #define GL_ELEMENT_ARRAY_TYPE_ATI                                     34665
 #endif
+
 #ifndef GL_ELEMENT_ARRAY_POINTER_ATI
 #define GL_ELEMENT_ARRAY_POINTER_ATI                                  34666
 #endif
+
+
 typedef GLvoid (csAPIENTRY* csGLELEMENTPOINTERATI) (GLenum type, GLvoid* pointer);
 typedef GLvoid (csAPIENTRY* csGLDRAWELEMENTARRAYATI) (GLenum mode, GLsizei count);
 typedef GLvoid (csAPIENTRY* csGLDRAWRANGEELEMENTARRAYATI) (GLenum mode, GLuint start, GLuint end, GLsizei count);
@@ -4044,27 +5232,36 @@ typedef GLvoid (csAPIENTRY* csGLDRAWRANGEELEMENTARRAYATI) (GLenum mode, GLuint s
 #ifndef GL_BUMP_ROT_MATRIX_ATI
 #define GL_BUMP_ROT_MATRIX_ATI                                        34677
 #endif
+
 #ifndef GL_BUMP_ROT_MATRIX_SIZE_ATI
 #define GL_BUMP_ROT_MATRIX_SIZE_ATI                                   34678
 #endif
+
 #ifndef GL_BUMP_NUM_TEX_UNITS_ATI
 #define GL_BUMP_NUM_TEX_UNITS_ATI                                     34679
 #endif
+
 #ifndef GL_BUMP_TEX_UNITS_ATI
 #define GL_BUMP_TEX_UNITS_ATI                                         34680
 #endif
+
 #ifndef GL_DUDV_ATI
 #define GL_DUDV_ATI                                                   34681
 #endif
+
 #ifndef GL_DU8DV8_ATI
 #define GL_DU8DV8_ATI                                                 34682
 #endif
+
 #ifndef GL_BUMP_ENVMAP_ATI
 #define GL_BUMP_ENVMAP_ATI                                            34683
 #endif
+
 #ifndef GL_BUMP_TARGET_ATI
 #define GL_BUMP_TARGET_ATI                                            34684
 #endif
+
+
 typedef GLvoid (csAPIENTRY* csGLTEXBUMPPARAMETERIVATI) (GLenum pname, GLint* param);
 typedef GLvoid (csAPIENTRY* csGLTEXBUMPPARAMETERFVATI) (GLenum pname, GLfloat* param);
 typedef GLvoid (csAPIENTRY* csGLGETTEXBUMPPARAMETERIVATI) (GLenum pname, GLint* param);
@@ -4074,138 +5271,184 @@ typedef GLvoid (csAPIENTRY* csGLGETTEXBUMPPARAMETERFVATI) (GLenum pname, GLfloat
 #ifndef GL_FRAGMENT_SHADER_ATI
 #define GL_FRAGMENT_SHADER_ATI                                        35104
 #endif
+
 #ifndef GL_REG_0_ATI
 #define GL_REG_0_ATI                                                  35105
 #endif
+
 #ifndef GL_REG_1_ATI
 #define GL_REG_1_ATI                                                  35106
 #endif
+
 #ifndef GL_REG_2_ATI
 #define GL_REG_2_ATI                                                  35107
 #endif
+
 #ifndef GL_REG_3_ATI
 #define GL_REG_3_ATI                                                  35108
 #endif
+
 #ifndef GL_REG_4_ATI
 #define GL_REG_4_ATI                                                  35109
 #endif
+
 #ifndef GL_REG_5_ATI
 #define GL_REG_5_ATI                                                  35110
 #endif
+
 #ifndef GL_CON_0_ATI
 #define GL_CON_0_ATI                                                  35137
 #endif
+
 #ifndef GL_CON_1_ATI
 #define GL_CON_1_ATI                                                  35138
 #endif
+
 #ifndef GL_CON_2_ATI
 #define GL_CON_2_ATI                                                  35139
 #endif
+
 #ifndef GL_CON_3_ATI
 #define GL_CON_3_ATI                                                  35140
 #endif
+
 #ifndef GL_CON_4_ATI
 #define GL_CON_4_ATI                                                  35141
 #endif
+
 #ifndef GL_CON_5_ATI
 #define GL_CON_5_ATI                                                  35142
 #endif
+
 #ifndef GL_CON_6_ATI
 #define GL_CON_6_ATI                                                  35143
 #endif
+
 #ifndef GL_CON_7_ATI
 #define GL_CON_7_ATI                                                  35144
 #endif
+
 #ifndef GL_MOV_ATI
 #define GL_MOV_ATI                                                    35169
 #endif
+
 #ifndef GL_ADD_ATI
 #define GL_ADD_ATI                                                    35171
 #endif
+
 #ifndef GL_MUL_ATI
 #define GL_MUL_ATI                                                    35172
 #endif
+
 #ifndef GL_SUB_ATI
 #define GL_SUB_ATI                                                    35173
 #endif
+
 #ifndef GL_DOT3_ATI
 #define GL_DOT3_ATI                                                   35174
 #endif
+
 #ifndef GL_DOT4_ATI
 #define GL_DOT4_ATI                                                   35175
 #endif
+
 #ifndef GL_MAD_ATI
 #define GL_MAD_ATI                                                    35176
 #endif
+
 #ifndef GL_LERP_ATI
 #define GL_LERP_ATI                                                   35177
 #endif
+
 #ifndef GL_CND_ATI
 #define GL_CND_ATI                                                    35178
 #endif
+
 #ifndef GL_CND0_ATI
 #define GL_CND0_ATI                                                   35179
 #endif
+
 #ifndef GL_DOT2_ADD_ATI
 #define GL_DOT2_ADD_ATI                                               35180
 #endif
+
 #ifndef GL_SECONDARY_INTERPOLATOR_ATI
 #define GL_SECONDARY_INTERPOLATOR_ATI                                 35181
 #endif
+
 #ifndef GL_SWIZZLE_STR_ATI
 #define GL_SWIZZLE_STR_ATI                                            35190
 #endif
+
 #ifndef GL_SWIZZLE_STQ_ATI
 #define GL_SWIZZLE_STQ_ATI                                            35191
 #endif
+
 #ifndef GL_SWIZZLE_STR_DR_ATI
 #define GL_SWIZZLE_STR_DR_ATI                                         35192
 #endif
+
 #ifndef GL_SWIZZLE_STQ_DQ_ATI
 #define GL_SWIZZLE_STQ_DQ_ATI                                         35193
 #endif
+
 #ifndef GL_RED_BIT_ATI
-#define GL_RED_BIT_ATI                                                1
+#define GL_RED_BIT_ATI                                                    1
 #endif
+
 #ifndef GL_GREEN_BIT_ATI
-#define GL_GREEN_BIT_ATI                                              2
+#define GL_GREEN_BIT_ATI                                                  2
 #endif
+
 #ifndef GL_BLUE_BIT_ATI
-#define GL_BLUE_BIT_ATI                                               4
+#define GL_BLUE_BIT_ATI                                                   4
 #endif
+
 #ifndef GL_2X_BIT_ATI
-#define GL_2X_BIT_ATI                                                 1
+#define GL_2X_BIT_ATI                                                     1
 #endif
+
 #ifndef GL_4X_BIT_ATI
-#define GL_4X_BIT_ATI                                                 2
+#define GL_4X_BIT_ATI                                                     2
 #endif
+
 #ifndef GL_8X_BIT_ATI
-#define GL_8X_BIT_ATI                                                 4
+#define GL_8X_BIT_ATI                                                     4
 #endif
+
 #ifndef GL_HALF_BIT_ATI
-#define GL_HALF_BIT_ATI                                               8
+#define GL_HALF_BIT_ATI                                                   8
 #endif
+
 #ifndef GL_QUARTER_BIT_ATI
-#define GL_QUARTER_BIT_ATI                                            16
+#define GL_QUARTER_BIT_ATI                                               16
 #endif
+
 #ifndef GL_EIGHTH_BIT_ATI
-#define GL_EIGHTH_BIT_ATI                                             32
+#define GL_EIGHTH_BIT_ATI                                                32
 #endif
+
 #ifndef GL_SATURATE_BIT_ATI
-#define GL_SATURATE_BIT_ATI                                           64
+#define GL_SATURATE_BIT_ATI                                              64
 #endif
+
 #ifndef GL_2X_BIT_ATI
-#define GL_2X_BIT_ATI                                                 1
+#define GL_2X_BIT_ATI                                                     1
 #endif
+
 #ifndef GL_COMP_BIT_ATI
-#define GL_COMP_BIT_ATI                                               2
+#define GL_COMP_BIT_ATI                                                   2
 #endif
+
 #ifndef GL_NEGATE_BIT_ATI
-#define GL_NEGATE_BIT_ATI                                             4
+#define GL_NEGATE_BIT_ATI                                                 4
 #endif
+
 #ifndef GL_BIAS_BIT_ATI
-#define GL_BIAS_BIT_ATI                                               8
+#define GL_BIAS_BIT_ATI                                                   8
 #endif
+
+
 typedef GLuint (csAPIENTRY* csGLGENFRAGMENTSHADERSATI) (GLuint range);
 typedef GLvoid (csAPIENTRY* csGLBINDFRAGMENTSHADERATI) (GLuint id);
 typedef GLvoid (csAPIENTRY* csGLDELETEFRAGMENTSHADERATI) (GLuint id);
@@ -4225,30 +5468,40 @@ typedef GLvoid (csAPIENTRY* csGLSETFRAGMENTSHADERCONSTANTATI) (GLuint dst, GLflo
 #ifndef GL_PN_TRIANGLES_ATI
 #define GL_PN_TRIANGLES_ATI                                           34800
 #endif
+
 #ifndef GL_MAX_PN_TRIANGLES_TESSELATION_LEVEL_ATI
 #define GL_MAX_PN_TRIANGLES_TESSELATION_LEVEL_ATI                     34801
 #endif
+
 #ifndef GL_PN_TRIANGLES_POINT_MODE_ATI
 #define GL_PN_TRIANGLES_POINT_MODE_ATI                                34802
 #endif
+
 #ifndef GL_PN_TRIANGLES_NORMAL_MODE_ATI
 #define GL_PN_TRIANGLES_NORMAL_MODE_ATI                               34803
 #endif
+
 #ifndef GL_PN_TRIANGLES_TESSELATION_LEVEL_ATI
 #define GL_PN_TRIANGLES_TESSELATION_LEVEL_ATI                         34804
 #endif
+
 #ifndef GL_PN_TRIANGLES_POINT_MODE_LINEAR_ATI
 #define GL_PN_TRIANGLES_POINT_MODE_LINEAR_ATI                         34805
 #endif
+
 #ifndef GL_PN_TRIANGLES_POINT_MODE_CUBIC_ATI
 #define GL_PN_TRIANGLES_POINT_MODE_CUBIC_ATI                          34806
 #endif
+
 #ifndef GL_PN_TRIANGLES_NORMAL_MODE_LINEAR_ATI
 #define GL_PN_TRIANGLES_NORMAL_MODE_LINEAR_ATI                        34807
 #endif
+
 #ifndef GL_PN_TRIANGLES_NORMAL_MODE_QUADRATIC_ATI
 #define GL_PN_TRIANGLES_NORMAL_MODE_QUADRATIC_ATI                     34808
 #endif
+
+
 typedef GLvoid (csAPIENTRY* csGLPNTRIANGLESIATI) (GLenum pname, GLint param);
 typedef GLvoid (csAPIENTRY* csGLPNTRIANGLESFATI) (GLenum pname, GLfloat param);
 
@@ -4256,35 +5509,47 @@ typedef GLvoid (csAPIENTRY* csGLPNTRIANGLESFATI) (GLenum pname, GLfloat param);
 #ifndef GL_MIRROR_CLAMP_ATI
 #define GL_MIRROR_CLAMP_ATI                                           34626
 #endif
+
 #ifndef GL_MIRROR_CLAMP_TO_EDGE_ATI
 #define GL_MIRROR_CLAMP_TO_EDGE_ATI                                   34627
 #endif
+
+
 
 // GL_ATI_vertex_array_object
 #ifndef GL_STATIC_ATI
 #define GL_STATIC_ATI                                                 34656
 #endif
+
 #ifndef GL_DYNAMIC_ATI
 #define GL_DYNAMIC_ATI                                                34657
 #endif
+
 #ifndef GL_PRESERVE_ATI
 #define GL_PRESERVE_ATI                                               34658
 #endif
+
 #ifndef GL_DISCARD_ATI
 #define GL_DISCARD_ATI                                                34659
 #endif
+
 #ifndef GL_OBJECT_BUFFER_SIZE_ATI
 #define GL_OBJECT_BUFFER_SIZE_ATI                                     34660
 #endif
+
 #ifndef GL_OBJECT_BUFFER_USAGE_ATI
 #define GL_OBJECT_BUFFER_USAGE_ATI                                    34661
 #endif
+
 #ifndef GL_ARRAY_OBJECT_BUFFER_ATI
 #define GL_ARRAY_OBJECT_BUFFER_ATI                                    34662
 #endif
+
 #ifndef GL_ARRAY_OBJECT_OFFSET_ATI
 #define GL_ARRAY_OBJECT_OFFSET_ATI                                    34663
 #endif
+
+
 typedef GLuint (csAPIENTRY* csGLNEWOBJECTBUFFERATI) (GLsizei size, GLvoid* pointer, GLenum usage);
 typedef GLboolean (csAPIENTRY* csGLISOBJECTBUFFERATI) (GLuint buffer);
 typedef GLvoid (csAPIENTRY* csGLUPDATEOBJECTBUFFERATI) (GLuint buffer, GLuint offset, GLsizei size, GLvoid* pointer, GLenum preserve);
@@ -4299,6 +5564,7 @@ typedef GLvoid (csAPIENTRY* csGLGETVARIANTARRAYOBJECTFVATI) (GLuint id, GLenum p
 typedef GLvoid (csAPIENTRY* csGLGETVARIANTARRAYOBJECTIVATI) (GLuint id, GLenum pname, GLint* params);
 
 // GL_ATI_vertex_attrib_array_object
+
 typedef GLvoid (csAPIENTRY* csGLVERTEXATTRIBARRAYOBJECTATI) (GLuint index, GLint size, GLenum type, GLboolean normalized, GLsizei stride, GLuint buffer, GLuint offset);
 typedef GLvoid (csAPIENTRY* csGLGETVERTEXATTRIBARRAYOBJECTFVATI) (GLuint index, GLenum pname, GLfloat* params);
 typedef GLvoid (csAPIENTRY* csGLGETVERTEXATTRIBARRAYOBJECTIVATI) (GLuint index, GLenum pname, GLint* params);
@@ -4307,33 +5573,44 @@ typedef GLvoid (csAPIENTRY* csGLGETVERTEXATTRIBARRAYOBJECTIVATI) (GLuint index, 
 #ifndef GL_MAX_VERTEX_STREAMS_ATI
 #define GL_MAX_VERTEX_STREAMS_ATI                                     34667
 #endif
+
 #ifndef GL_VERTEX_STREAM0_ATI
 #define GL_VERTEX_STREAM0_ATI                                         34668
 #endif
+
 #ifndef GL_VERTEX_STREAM1_ATI
 #define GL_VERTEX_STREAM1_ATI                                         34669
 #endif
+
 #ifndef GL_VERTEX_STREAM2_ATI
 #define GL_VERTEX_STREAM2_ATI                                         34670
 #endif
+
 #ifndef GL_VERTEX_STREAM3_ATI
 #define GL_VERTEX_STREAM3_ATI                                         34671
 #endif
+
 #ifndef GL_VERTEX_STREAM4_ATI
 #define GL_VERTEX_STREAM4_ATI                                         34672
 #endif
+
 #ifndef GL_VERTEX_STREAM5_ATI
 #define GL_VERTEX_STREAM5_ATI                                         34673
 #endif
+
 #ifndef GL_VERTEX_STREAM6_ATI
 #define GL_VERTEX_STREAM6_ATI                                         34674
 #endif
+
 #ifndef GL_VERTEX_STREAM7_ATI
 #define GL_VERTEX_STREAM7_ATI                                         34675
 #endif
+
 #ifndef GL_VERTEX_SOURCE_ATI
 #define GL_VERTEX_SOURCE_ATI                                          34676
 #endif
+
+
 typedef GLvoid (csAPIENTRY* csGLVERTEXSTREAM1S) (GLenum stream, GLshort coords);
 typedef GLvoid (csAPIENTRY* csGLVERTEXSTREAM1I) (GLenum stream, GLint coords);
 typedef GLvoid (csAPIENTRY* csGLVERTEXSTREAM1F) (GLenum stream, GLfloat coords);
@@ -4383,109 +5660,144 @@ typedef GLvoid (csAPIENTRY* csGLVERTEXBLENDENVF) (GLenum pname, GLfloat param);
 // WGL_I3D_image_buffer
 #ifdef _WIN32
 #ifndef WGL_IMAGE_BUFFER_MIN_ACCESS_I3D
-#define WGL_IMAGE_BUFFER_MIN_ACCESS_I3D                               1
+#define WGL_IMAGE_BUFFER_MIN_ACCESS_I3D                                   1
 #endif
+
 #ifndef WGL_IMAGE_BUFFER_LOCK_I3D
-#define WGL_IMAGE_BUFFER_LOCK_I3D                                     2
+#define WGL_IMAGE_BUFFER_LOCK_I3D                                         2
 #endif
+
+
 typedef GLvoid* (csAPIENTRY* csWGLCREATEIMAGEBUFFERI3D) (HDC hDC, DWORD dwSize, UINT uFlags);
 typedef BOOL (csAPIENTRY* csWGLDESTROYIMAGEBUFFERI3D) (HDC hDC, GLvoid* pAddress);
 typedef BOOL (csAPIENTRY* csWGLASSOCIATEIMAGEBUFFEREVENTSI3D) (HDC hdc, HANDLE* pEvent, GLvoid* pAddress, DWORD* pSize, UINT count);
 typedef BOOL (csAPIENTRY* csWGLRELEASEIMAGEBUFFEREVENTSI3D) (HDC hdc, GLvoid* pAddress, UINT count);
+
 #endif
 
 // WGL_I3D_swap_frame_lock
 #ifdef _WIN32
+
 typedef BOOL (csAPIENTRY* csWGLENABLEFRAMELOCKI3D) ();
 typedef BOOL (csAPIENTRY* csWGLDISABLEFRAMELOCKI3D) ();
 typedef BOOL (csAPIENTRY* csWGLISENABLEDFRAMELOCKI3D) (BOOL* pFlag);
 typedef BOOL (csAPIENTRY* csWGLQUERYFRAMELOCKMASTERI3D) (BOOL* pFlag);
+
 #endif
 
 // WGL_I3D_swap_frame_usage
 #ifdef _WIN32
+
 typedef BOOL (csAPIENTRY* csWGLGETFRAMEUSAGEI3D) (GLfloat* pUsage);
 typedef BOOL (csAPIENTRY* csWGLBEGINFRAMETRACKINGI3D) ();
 typedef BOOL (csAPIENTRY* csWGLENDFRAMETRACKINGI3D) ();
 typedef BOOL (csAPIENTRY* csWGLQUERYFRAMETRACKINGI3D) (DWORD* pFrameCount, DWORD* pMissedFrames, GLfloat* pLastMissedUsage);
+
 #endif
 
 // GL_3DFX_texture_compression_FXT1
 #ifndef GL_COMPRESSED_RGB_FXT1_3DFX
 #define GL_COMPRESSED_RGB_FXT1_3DFX                                   34480
 #endif
+
 #ifndef GL_COMPRESSED_RGBA_FXT1_3DFX
 #define GL_COMPRESSED_RGBA_FXT1_3DFX                                  34481
 #endif
 
+
+
 // GL_IBM_cull_vertex
 #ifndef GL_CULL_VERTEX_IBM
-#define GL_CULL_VERTEX_IBM                                            103050
+#define GL_CULL_VERTEX_IBM                                           103050
 #endif
 
+
+
 // GL_IBM_multimode_draw_arrays
+
 typedef GLvoid (csAPIENTRY* csGLMULTIMODEDRAWARRAYSIBM) (GLenum* mode, GLint* first, GLsizei* count, GLsizei primcount, GLint modestride);
 typedef GLvoid (csAPIENTRY* csGLMULTIMODEDRAWELEMENTSIBM) (GLenum* mode, GLsizei* count, GLenum type, GLvoid* indices, GLsizei primcount, GLint modestride);
 
 // GL_IBM_raster_pos_clip
 #ifndef GL_RASTER_POSITION_UNCLIPPED_IBM
-#define GL_RASTER_POSITION_UNCLIPPED_IBM                              103010
+#define GL_RASTER_POSITION_UNCLIPPED_IBM                             103010
 #endif
+
+
 
 // GL_IBM_texture_mirrored_repeat
 #ifndef GL_MIRRORED_REPEAT_IBM
 #define GL_MIRRORED_REPEAT_IBM                                        33648
 #endif
 
+
+
 // GL_IBM_vertex_array_lists
 #ifndef GL_VERTEX_ARRAY_LIST_IBM
-#define GL_VERTEX_ARRAY_LIST_IBM                                      103070
+#define GL_VERTEX_ARRAY_LIST_IBM                                     103070
 #endif
+
 #ifndef GL_NORMAL_ARRAY_LIST_IBM
-#define GL_NORMAL_ARRAY_LIST_IBM                                      103071
+#define GL_NORMAL_ARRAY_LIST_IBM                                     103071
 #endif
+
 #ifndef GL_COLOR_ARRAY_LIST_IBM
-#define GL_COLOR_ARRAY_LIST_IBM                                       103072
+#define GL_COLOR_ARRAY_LIST_IBM                                      103072
 #endif
+
 #ifndef GL_INDEX_ARRAY_LIST_IBM
-#define GL_INDEX_ARRAY_LIST_IBM                                       103073
+#define GL_INDEX_ARRAY_LIST_IBM                                      103073
 #endif
+
 #ifndef GL_TEXTURE_COORD_ARRAY_LIST_IBM
-#define GL_TEXTURE_COORD_ARRAY_LIST_IBM                               103074
+#define GL_TEXTURE_COORD_ARRAY_LIST_IBM                              103074
 #endif
+
 #ifndef GL_EDGE_FLAG_ARRAY_LIST_IBM
-#define GL_EDGE_FLAG_ARRAY_LIST_IBM                                   103075
+#define GL_EDGE_FLAG_ARRAY_LIST_IBM                                  103075
 #endif
+
 #ifndef GL_FOG_COORDINATE_ARRAY_LIST_IBM
-#define GL_FOG_COORDINATE_ARRAY_LIST_IBM                              103076
+#define GL_FOG_COORDINATE_ARRAY_LIST_IBM                             103076
 #endif
+
 #ifndef GL_SECONDARY_COLOR_ARRAY_LIST_IBM
-#define GL_SECONDARY_COLOR_ARRAY_LIST_IBM                             103077
+#define GL_SECONDARY_COLOR_ARRAY_LIST_IBM                            103077
 #endif
+
 #ifndef GL_VERTEX_ARRAY_LIST_STRIDE_IBM
-#define GL_VERTEX_ARRAY_LIST_STRIDE_IBM                               103080
+#define GL_VERTEX_ARRAY_LIST_STRIDE_IBM                              103080
 #endif
+
 #ifndef GL_NORMAL_ARRAY_LIST_STRIDE_IBM
-#define GL_NORMAL_ARRAY_LIST_STRIDE_IBM                               103081
+#define GL_NORMAL_ARRAY_LIST_STRIDE_IBM                              103081
 #endif
+
 #ifndef GL_COLOR_ARRAY_LIST_STRIDE_IBM
-#define GL_COLOR_ARRAY_LIST_STRIDE_IBM                                103082
+#define GL_COLOR_ARRAY_LIST_STRIDE_IBM                               103082
 #endif
+
 #ifndef GL_INDEX_ARRAY_LIST_STRIDE_IBM
-#define GL_INDEX_ARRAY_LIST_STRIDE_IBM                                103083
+#define GL_INDEX_ARRAY_LIST_STRIDE_IBM                               103083
 #endif
+
 #ifndef GL_TEXTURE_COORD_ARRAY_LIST_STRIDE_IBM
-#define GL_TEXTURE_COORD_ARRAY_LIST_STRIDE_IBM                        103084
+#define GL_TEXTURE_COORD_ARRAY_LIST_STRIDE_IBM                       103084
 #endif
+
 #ifndef GL_EDGE_FLAG_ARRAY_LIST_STRIDE_IBM
-#define GL_EDGE_FLAG_ARRAY_LIST_STRIDE_IBM                            103085
+#define GL_EDGE_FLAG_ARRAY_LIST_STRIDE_IBM                           103085
 #endif
+
 #ifndef GL_FOG_COORDINATE_ARRAY_LIST_STRIDE_IBM
-#define GL_FOG_COORDINATE_ARRAY_LIST_STRIDE_IBM                       103086
+#define GL_FOG_COORDINATE_ARRAY_LIST_STRIDE_IBM                      103086
 #endif
+
 #ifndef GL_SECONDARY_COLOR_ARRAY_LIST_STRIDE_IBM
-#define GL_SECONDARY_COLOR_ARRAY_LIST_STRIDE_IBM                      103087
+#define GL_SECONDARY_COLOR_ARRAY_LIST_STRIDE_IBM                     103087
 #endif
+
+
 typedef GLvoid (csAPIENTRY* csGLCOLORPOINTERLISTIBM) (GLint size, GLenum type, GLint stride, GLvoid* pointer, GLint ptrstride);
 typedef GLvoid (csAPIENTRY* csGLSECONDARYCOLORPOINTERLISTIBM) (GLint size, GLenum type, GLint stride, GLvoid* pointer, GLint ptrstride);
 typedef GLvoid (csAPIENTRY* csGLEDGEFLAGPOINTERLISTIBM) (GLint stride, GLboolean* pointer, GLint ptrstride);
@@ -4495,9 +5807,11 @@ typedef GLvoid (csAPIENTRY* csGLTEXCOORDPOINTERLISTIBM) (GLint size, GLenum type
 typedef GLvoid (csAPIENTRY* csGLVERTEXPOINTERLISTIBM) (GLint size, GLenum type, GLint stride, GLvoid* pointer, GLint ptrstride);
 
 // GL_MESA_resize_buffers
+
 typedef GLvoid (csAPIENTRY* csGLRESIZEBUFFERSMESA) ();
 
 // GL_MESA_window_pos
+
 typedef GLvoid (csAPIENTRY* csGLWINDOWPOS2DMESA) (GLdouble x, GLdouble y);
 typedef GLvoid (csAPIENTRY* csGLWINDOWPOS2FMESA) (GLfloat x, GLfloat y);
 typedef GLvoid (csAPIENTRY* csGLWINDOWPOS2IMESA) (GLint x, GLint y);
@@ -4527,107 +5841,144 @@ typedef GLvoid (csAPIENTRY* csGLWINDOWPOS4DVMESA) (GLdouble* p);
 #ifndef GL_INTERLACE_OML
 #define GL_INTERLACE_OML                                              35200
 #endif
+
 #ifndef GL_INTERLACE_READ_OML
 #define GL_INTERLACE_READ_OML                                         35201
 #endif
+
+
 
 // GL_OML_resample
 #ifndef GL_PACK_RESAMPLE_OML
 #define GL_PACK_RESAMPLE_OML                                          35204
 #endif
+
 #ifndef GL_UNPACK_RESAMPLE_OML
 #define GL_UNPACK_RESAMPLE_OML                                        35205
 #endif
+
 #ifndef GL_RESAMPLE_REPLICATE_OML
 #define GL_RESAMPLE_REPLICATE_OML                                     35206
 #endif
+
 #ifndef GL_RESAMPLE_ZERO_FILL_OML
 #define GL_RESAMPLE_ZERO_FILL_OML                                     35207
 #endif
+
 #ifndef GL_RESAMPLE_AVERAGE_OML
 #define GL_RESAMPLE_AVERAGE_OML                                       35208
 #endif
+
 #ifndef GL_RESAMPLE_DECIMATE_OML
 #define GL_RESAMPLE_DECIMATE_OML                                      35209
 #endif
+
 #ifndef GL_RESAMPLE_AVERAGE_OML
 #define GL_RESAMPLE_AVERAGE_OML                                       35208
 #endif
+
+
 
 // GL_OML_subsample
 #ifndef GL_FORMAT_SUBSAMPLE_24_24_OML
 #define GL_FORMAT_SUBSAMPLE_24_24_OML                                 35202
 #endif
+
 #ifndef GL_FORMAT_SUBSAMPLE_244_244_OML
 #define GL_FORMAT_SUBSAMPLE_244_244_OML                               35203
 #endif
+
+
 
 // GL_SGIS_generate_mipmap
 #ifndef GL_GENERATE_MIPMAP_SGIS
 #define GL_GENERATE_MIPMAP_SGIS                                       33169
 #endif
+
 #ifndef GL_GENERATE_MIPMAP_HINT_SGIS
 #define GL_GENERATE_MIPMAP_HINT_SGIS                                  33170
 #endif
 
+
+
 // GL_SGIS_multisample
 #ifndef GLX_SAMPLE_BUFFERS_SGIS
-#define GLX_SAMPLE_BUFFERS_SGIS                                       100000
+#define GLX_SAMPLE_BUFFERS_SGIS                                      100000
 #endif
+
 #ifndef GLX_SAMPLES_SGIS
-#define GLX_SAMPLES_SGIS                                              100001
+#define GLX_SAMPLES_SGIS                                             100001
 #endif
+
 #ifndef GL_MULTISAMPLE_SGIS
 #define GL_MULTISAMPLE_SGIS                                           32925
 #endif
+
 #ifndef GL_SAMPLE_ALPHA_TO_MASK_SGIS
 #define GL_SAMPLE_ALPHA_TO_MASK_SGIS                                  32926
 #endif
+
 #ifndef GL_SAMPLE_ALPHA_TO_ONE_SGIS
 #define GL_SAMPLE_ALPHA_TO_ONE_SGIS                                   32927
 #endif
+
 #ifndef GL_SAMPLE_MASK_SGIS
 #define GL_SAMPLE_MASK_SGIS                                           32928
 #endif
+
 #ifndef GL_MULTISAMPLE_BIT_EXT
-#define GL_MULTISAMPLE_BIT_EXT                                        536870912
+#define GL_MULTISAMPLE_BIT_EXT                                       536870912
 #endif
+
 #ifndef GL_1PASS_SGIS
 #define GL_1PASS_SGIS                                                 32929
 #endif
+
 #ifndef GL_2PASS_0_SGIS
 #define GL_2PASS_0_SGIS                                               32930
 #endif
+
 #ifndef GL_2PASS_1_SGIS
 #define GL_2PASS_1_SGIS                                               32931
 #endif
+
 #ifndef GL_4PASS_0_SGIS
 #define GL_4PASS_0_SGIS                                               32932
 #endif
+
 #ifndef GL_4PASS_1_SGIS
 #define GL_4PASS_1_SGIS                                               32933
 #endif
+
 #ifndef GL_4PASS_2_SGIS
 #define GL_4PASS_2_SGIS                                               32934
 #endif
+
 #ifndef GL_4PASS_3_SGIS
 #define GL_4PASS_3_SGIS                                               32935
 #endif
+
 #ifndef GL_SAMPLE_BUFFERS_SGIS
 #define GL_SAMPLE_BUFFERS_SGIS                                        32936
 #endif
+
 #ifndef GL_SAMPLES_SGIS
 #define GL_SAMPLES_SGIS                                               32937
 #endif
+
 #ifndef GL_SAMPLE_MASK_VALUE_SGIS
 #define GL_SAMPLE_MASK_VALUE_SGIS                                     32938
 #endif
+
 #ifndef GL_SAMPLE_MASK_INVERT_SGIS
 #define GL_SAMPLE_MASK_INVERT_SGIS                                    32939
 #endif
+
 #ifndef GL_SAMPLE_PATTERN_SGIS
 #define GL_SAMPLE_PATTERN_SGIS                                        32940
 #endif
+
+
 typedef GLvoid (csAPIENTRY* csGLSAMPLEMASKSGIS) (GLclampf value, GLboolean invert);
 typedef GLvoid (csAPIENTRY* csGLSAMPLEPATTERNSGIS) (GLenum pattern);
 
@@ -4635,15 +5986,20 @@ typedef GLvoid (csAPIENTRY* csGLSAMPLEPATTERNSGIS) (GLenum pattern);
 #ifndef GL_PIXEL_TEXTURE_SGIS
 #define GL_PIXEL_TEXTURE_SGIS                                         33619
 #endif
+
 #ifndef GL_PIXEL_FRAGMENT_RGB_SOURCE_SGIS
 #define GL_PIXEL_FRAGMENT_RGB_SOURCE_SGIS                             33620
 #endif
+
 #ifndef GL_PIXEL_FRAGMENT_ALPHA_SOURCE_SGIS
 #define GL_PIXEL_FRAGMENT_ALPHA_SOURCE_SGIS                           33621
 #endif
+
 #ifndef GL_PIXEL_GROUP_COLOR_SGIS
 #define GL_PIXEL_GROUP_COLOR_SGIS                                     33622
 #endif
+
+
 typedef GLvoid (csAPIENTRY* csGLPIXELTEXGENPARAMETERISGIS) (GLenum pname, GLint param);
 typedef GLvoid (csAPIENTRY* csGLPIXELTEXGENPARAMETERFSGIS) (GLenum pname, GLfloat param);
 typedef GLvoid (csAPIENTRY* csGLGETPIXELTEXGENPARAMETERIVSGIS) (GLenum pname, GLint params);
@@ -4654,10 +6010,14 @@ typedef GLvoid (csAPIENTRY* csGLGETPIXELTEXGENPARAMETERFVSGIS) (GLenum pname, GL
 #define GL_CLAMP_TO_BORDER_SGIS                                       33069
 #endif
 
+
+
 // GL_SGIS_texture_color_mask
 #ifndef GL_TEXTURE_COLOR_WRITEMASK_SGIS
 #define GL_TEXTURE_COLOR_WRITEMASK_SGIS                               33263
 #endif
+
+
 typedef GLvoid (csAPIENTRY* csGLTEXTURECOLORMASKSGIS) (GLboolean r, GLboolean g, GLboolean b, GLboolean a);
 
 // GL_SGIS_texture_edge_clamp
@@ -4665,133 +6025,180 @@ typedef GLvoid (csAPIENTRY* csGLTEXTURECOLORMASKSGIS) (GLboolean r, GLboolean g,
 #define GL_CLAMP_TO_EDGE_SGIS                                         33071
 #endif
 
+
+
 // GL_SGIS_texture_lod
 #ifndef GL_TEXTURE_MIN_LOD_SGIS
 #define GL_TEXTURE_MIN_LOD_SGIS                                       33082
 #endif
+
 #ifndef GL_TEXTURE_MAX_LOD_SGIS
 #define GL_TEXTURE_MAX_LOD_SGIS                                       33083
 #endif
+
 #ifndef GL_TEXTURE_BASE_LEVEL_SGIS
 #define GL_TEXTURE_BASE_LEVEL_SGIS                                    33084
 #endif
+
 #ifndef GL_TEXTURE_MAX_LEVEL_SGIS
 #define GL_TEXTURE_MAX_LEVEL_SGIS                                     33085
 #endif
+
+
 
 // GL_SGIS_depth_texture
 #ifndef GL_DEPTH_COMPONENT16_SGIX
 #define GL_DEPTH_COMPONENT16_SGIX                                     33189
 #endif
+
 #ifndef GL_DEPTH_COMPONENT24_SGIX
 #define GL_DEPTH_COMPONENT24_SGIX                                     33190
 #endif
+
 #ifndef GL_DEPTH_COMPONENT32_SGIX
 #define GL_DEPTH_COMPONENT32_SGIX                                     33191
 #endif
+
+
 
 // GL_SGIX_fog_offset
 #ifndef GL_FOG_OFFSET_SGIX
 #define GL_FOG_OFFSET_SGIX                                            33176
 #endif
+
 #ifndef GL_FOG_OFFSET_VALUE_SGIX
 #define GL_FOG_OFFSET_VALUE_SGIX                                      33177
 #endif
+
+
 
 // GL_SGIX_interlace
 #ifndef GL_INTERLACE_SGIX
 #define GL_INTERLACE_SGIX                                             32916
 #endif
 
+
+
 // GL_SGIX_shadow_ambient
 #ifndef GL_SHADOW_AMBIENT_SGIX
 #define GL_SHADOW_AMBIENT_SGIX                                        32959
 #endif
 
+
+
 // GL_SGI_color_matrix
 #ifndef GL_COLOR_MATRIX_SGI
 #define GL_COLOR_MATRIX_SGI                                           32945
 #endif
+
 #ifndef GL_COLOR_MATRIX_STACK_DEPTH_SGI
 #define GL_COLOR_MATRIX_STACK_DEPTH_SGI                               32946
 #endif
+
 #ifndef GL_MAX_COLOR_MATRIX_STACK_DEPTH_SGI
 #define GL_MAX_COLOR_MATRIX_STACK_DEPTH_SGI                           32947
 #endif
+
 #ifndef GL_POST_COLOR_MATRIX_RED_SCALE_SGI
 #define GL_POST_COLOR_MATRIX_RED_SCALE_SGI                            32948
 #endif
+
 #ifndef GL_POST_COLOR_MATRIX_GREEN_SCALE_SGI
 #define GL_POST_COLOR_MATRIX_GREEN_SCALE_SGI                          32949
 #endif
+
 #ifndef GL_POST_COLOR_MATRIX_BLUE_SCALE_SGI
 #define GL_POST_COLOR_MATRIX_BLUE_SCALE_SGI                           32950
 #endif
+
 #ifndef GL_POST_COLOR_MATRIX_ALPHA_SCALE_SGI
 #define GL_POST_COLOR_MATRIX_ALPHA_SCALE_SGI                          32951
 #endif
+
 #ifndef GL_POST_COLOR_MATRIX_RED_BIAS_SGI
 #define GL_POST_COLOR_MATRIX_RED_BIAS_SGI                             32952
 #endif
+
 #ifndef GL_POST_COLOR_MATRIX_GREEN_BIAS_SGI
 #define GL_POST_COLOR_MATRIX_GREEN_BIAS_SGI                           32953
 #endif
+
 #ifndef GL_POST_COLOR_MATRIX_BLUE_BIAS_SGI
 #define GL_POST_COLOR_MATRIX_BLUE_BIAS_SGI                            32954
 #endif
+
 #ifndef GL_POST_COLOR_MATRIX_ALPHA_BIAS_SGI
 #define GL_POST_COLOR_MATRIX_ALPHA_BIAS_SGI                           32955
 #endif
+
+
 
 // GL_SGI_color_table
 #ifndef GL_COLOR_TABLE_SGI
 #define GL_COLOR_TABLE_SGI                                            32976
 #endif
+
 #ifndef GL_POST_CONVOLUTION_COLOR_TABLE_SGI
 #define GL_POST_CONVOLUTION_COLOR_TABLE_SGI                           32977
 #endif
+
 #ifndef GL_POST_COLOR_MATRIX_COLOR_TABLE_SGI
 #define GL_POST_COLOR_MATRIX_COLOR_TABLE_SGI                          32978
 #endif
+
 #ifndef GL_PROXY_COLOR_TABLE_SGI
 #define GL_PROXY_COLOR_TABLE_SGI                                      32979
 #endif
+
 #ifndef GL_PROXY_POST_CONVOLUTION_COLOR_TABLE_SGI
 #define GL_PROXY_POST_CONVOLUTION_COLOR_TABLE_SGI                     32980
 #endif
+
 #ifndef GL_PROXY_POST_COLOR_MATRIX_COLOR_TABLE_SGI
 #define GL_PROXY_POST_COLOR_MATRIX_COLOR_TABLE_SGI                    32981
 #endif
+
 #ifndef GL_COLOR_TABLE_SCALE_SGI
 #define GL_COLOR_TABLE_SCALE_SGI                                      32982
 #endif
+
 #ifndef GL_COLOR_TABLE_BIAS_SGI
 #define GL_COLOR_TABLE_BIAS_SGI                                       32983
 #endif
+
 #ifndef GL_COLOR_TABLE_FORMAT_SGI
 #define GL_COLOR_TABLE_FORMAT_SGI                                     32984
 #endif
+
 #ifndef GL_COLOR_TABLE_WIDTH_SGI
 #define GL_COLOR_TABLE_WIDTH_SGI                                      32985
 #endif
+
 #ifndef GL_COLOR_TABLE_RED_SIZE_SGI
 #define GL_COLOR_TABLE_RED_SIZE_SGI                                   32986
 #endif
+
 #ifndef GL_COLOR_TABLE_GREEN_SIZE_SGI
 #define GL_COLOR_TABLE_GREEN_SIZE_SGI                                 32987
 #endif
+
 #ifndef GL_COLOR_TABLE_BLUE_SIZE_SGI
 #define GL_COLOR_TABLE_BLUE_SIZE_SGI                                  32988
 #endif
+
 #ifndef GL_COLOR_TABLE_ALPHA_SIZE_SGI
 #define GL_COLOR_TABLE_ALPHA_SIZE_SGI                                 32989
 #endif
+
 #ifndef GL_COLOR_TABLE_LUMINANCE_SIZE_SGI
 #define GL_COLOR_TABLE_LUMINANCE_SIZE_SGI                             32990
 #endif
+
 #ifndef GL_COLOR_TABLE_INTENSITY_SIZE_SGI
 #define GL_COLOR_TABLE_INTENSITY_SIZE_SGI                             32991
 #endif
+
+
 typedef GLvoid (csAPIENTRY* csGLCOLORTABLESGI) (GLenum target, GLenum internalformat, GLsizei width, GLenum format, GLenum type, GLvoid* table);
 typedef GLvoid (csAPIENTRY* csGLCOPYCOLORTABLESGI) (GLenum target, GLenum internalformat, GLint x, GLint y, GLsizei width);
 typedef GLvoid (csAPIENTRY* csGLCOLORTABLEPARAMETERIVSGI) (GLenum target, GLenum pname, GLint* params);
@@ -4804,11 +6211,15 @@ typedef GLvoid (csAPIENTRY* csGLGETCOLORTABLEPARAMETERFVSGI) (GLenum target, GLe
 #ifndef GL_TEXTURE_COLOR_TABLE_SGI
 #define GL_TEXTURE_COLOR_TABLE_SGI                                    32956
 #endif
+
 #ifndef GL_PROXY_TEXTURE_COLOR_TABLE_SGI
 #define GL_PROXY_TEXTURE_COLOR_TABLE_SGI                              32957
 #endif
 
+
+
 // GL_SUN_vertex
+
 typedef GLvoid (csAPIENTRY* csGLCOLOR4UBVERTEX2FSUN) (GLubyte r, GLubyte g, GLubyte b, GLubyte a, GLfloat x, GLfloat y);
 typedef GLvoid (csAPIENTRY* csGLCOLOR4UBVERTEX2FVSUN) (GLubyte* c, GLfloat* v);
 typedef GLvoid (csAPIENTRY* csGLCOLOR4UBVERTEX3FSUN) (GLubyte r, GLubyte g, GLubyte b, GLubyte a, GLfloat x, GLfloat y, GLfloat z);
@@ -4854,258 +6265,345 @@ typedef GLvoid (csAPIENTRY* csGLREPLACEMENTCODEUITEXCOORD2FCOLOR4FNORMAL3FVERTEX
 #ifndef GL_FRAGMENT_PROGRAM_ARB
 #define GL_FRAGMENT_PROGRAM_ARB                                       34820
 #endif
+
 #ifndef GL_PROGRAM_FORMAT_ASCII_ARB
 #define GL_PROGRAM_FORMAT_ASCII_ARB                                   34933
 #endif
+
 #ifndef GL_PROGRAM_LENGTH_ARB
 #define GL_PROGRAM_LENGTH_ARB                                         34343
 #endif
+
 #ifndef GL_PROGRAM_FORMAT_ARB
 #define GL_PROGRAM_FORMAT_ARB                                         34934
 #endif
+
 #ifndef GL_PROGRAM_BINDING_ARB
 #define GL_PROGRAM_BINDING_ARB                                        34423
 #endif
+
 #ifndef GL_PROGRAM_INSTRUCTIONS_ARB
 #define GL_PROGRAM_INSTRUCTIONS_ARB                                   34976
 #endif
+
 #ifndef GL_MAX_PROGRAM_INSTRUCTIONS_ARB
 #define GL_MAX_PROGRAM_INSTRUCTIONS_ARB                               34977
 #endif
+
 #ifndef GL_PROGRAM_NATIVE_INSTRUCTIONS_ARB
 #define GL_PROGRAM_NATIVE_INSTRUCTIONS_ARB                            34978
 #endif
+
 #ifndef GL_MAX_PROGRAM_NATIVE_INSTRUCTIONS_ARB
 #define GL_MAX_PROGRAM_NATIVE_INSTRUCTIONS_ARB                        34979
 #endif
+
 #ifndef GL_PROGRAM_TEMPORARIES_ARB
 #define GL_PROGRAM_TEMPORARIES_ARB                                    34980
 #endif
+
 #ifndef GL_MAX_PROGRAM_TEMPORARIES_ARB
 #define GL_MAX_PROGRAM_TEMPORARIES_ARB                                34981
 #endif
+
 #ifndef GL_PROGRAM_NATIVE_TEMPORARIES_ARB
 #define GL_PROGRAM_NATIVE_TEMPORARIES_ARB                             34982
 #endif
+
 #ifndef GL_MAX_PROGRAM_NATIVE_TEMPORARIES_ARB
 #define GL_MAX_PROGRAM_NATIVE_TEMPORARIES_ARB                         34983
 #endif
+
 #ifndef GL_PROGRAM_PARAMETERS_ARB
 #define GL_PROGRAM_PARAMETERS_ARB                                     34984
 #endif
+
 #ifndef GL_MAX_PROGRAM_PARAMETERS_ARB
 #define GL_MAX_PROGRAM_PARAMETERS_ARB                                 34985
 #endif
+
 #ifndef GL_PROGRAM_NATIVE_PARAMETERS_ARB
 #define GL_PROGRAM_NATIVE_PARAMETERS_ARB                              34986
 #endif
+
 #ifndef GL_MAX_PROGRAM_NATIVE_PARAMETERS_ARB
 #define GL_MAX_PROGRAM_NATIVE_PARAMETERS_ARB                          34987
 #endif
+
 #ifndef GL_PROGRAM_ATTRIBS_ARB
 #define GL_PROGRAM_ATTRIBS_ARB                                        34988
 #endif
+
 #ifndef GL_MAX_PROGRAM_ATTRIBS_ARB
 #define GL_MAX_PROGRAM_ATTRIBS_ARB                                    34989
 #endif
+
 #ifndef GL_PROGRAM_NATIVE_ATTRIBS_ARB
 #define GL_PROGRAM_NATIVE_ATTRIBS_ARB                                 34990
 #endif
+
 #ifndef GL_MAX_PROGRAM_NATIVE_ATTRIBS_ARB
 #define GL_MAX_PROGRAM_NATIVE_ATTRIBS_ARB                             34991
 #endif
+
 #ifndef GL_MAX_PROGRAM_LOCAL_PARAMETERS_ARB
 #define GL_MAX_PROGRAM_LOCAL_PARAMETERS_ARB                           34996
 #endif
+
 #ifndef GL_MAX_PROGRAM_ENV_PARAMETERS_ARB
 #define GL_MAX_PROGRAM_ENV_PARAMETERS_ARB                             34997
 #endif
+
 #ifndef GL_PROGRAM_UNDER_NATIVE_LIMITS_ARB
 #define GL_PROGRAM_UNDER_NATIVE_LIMITS_ARB                            34998
 #endif
+
 #ifndef GL_PROGRAM_ALU_INSTRUCTIONS_ARB
 #define GL_PROGRAM_ALU_INSTRUCTIONS_ARB                               34821
 #endif
+
 #ifndef GL_PROGRAM_TEX_INSTRUCTIONS_ARB
 #define GL_PROGRAM_TEX_INSTRUCTIONS_ARB                               34822
 #endif
+
 #ifndef GL_PROGRAM_TEX_INDIRECTIONS_ARB
 #define GL_PROGRAM_TEX_INDIRECTIONS_ARB                               34823
 #endif
+
 #ifndef GL_PROGRAM_NATIVE_ALU_INSTRUCTIONS_ARB
 #define GL_PROGRAM_NATIVE_ALU_INSTRUCTIONS_ARB                        34824
 #endif
+
 #ifndef GL_PROGRAM_NATIVE_TEX_INSTRUCTIONS_ARB
 #define GL_PROGRAM_NATIVE_TEX_INSTRUCTIONS_ARB                        34825
 #endif
+
 #ifndef GL_PROGRAM_NATIVE_TEX_INDIRECTIONS_ARB
 #define GL_PROGRAM_NATIVE_TEX_INDIRECTIONS_ARB                        34826
 #endif
+
 #ifndef GL_MAX_PROGRAM_ALU_INSTRUCTIONS_ARB
 #define GL_MAX_PROGRAM_ALU_INSTRUCTIONS_ARB                           34827
 #endif
+
 #ifndef GL_MAX_PROGRAM_TEX_INSTRUCTIONS_ARB
 #define GL_MAX_PROGRAM_TEX_INSTRUCTIONS_ARB                           34828
 #endif
+
 #ifndef GL_MAX_PROGRAM_TEX_INDIRECTIONS_ARB
 #define GL_MAX_PROGRAM_TEX_INDIRECTIONS_ARB                           34829
 #endif
+
 #ifndef GL_MAX_PROGRAM_NATIVE_ALU_INSTRUCTIONS_ARB
 #define GL_MAX_PROGRAM_NATIVE_ALU_INSTRUCTIONS_ARB                    34830
 #endif
+
 #ifndef GL_MAX_PROGRAM_NATIVE_TEX_INSTRUCTIONS_ARB
 #define GL_MAX_PROGRAM_NATIVE_TEX_INSTRUCTIONS_ARB                    34831
 #endif
+
 #ifndef GL_MAX_PROGRAM_NATIVE_TEX_INDIRECTIONS_ARB
 #define GL_MAX_PROGRAM_NATIVE_TEX_INDIRECTIONS_ARB                    34832
 #endif
+
 #ifndef GL_PROGRAM_STRING_ARB
 #define GL_PROGRAM_STRING_ARB                                         34344
 #endif
+
 #ifndef GL_PROGRAM_ERROR_POSITION_ARB
 #define GL_PROGRAM_ERROR_POSITION_ARB                                 34379
 #endif
+
 #ifndef GL_CURRENT_MATRIX_ARB
 #define GL_CURRENT_MATRIX_ARB                                         34369
 #endif
+
 #ifndef GL_TRANSPOSE_CURRENT_MATRIX_ARB
 #define GL_TRANSPOSE_CURRENT_MATRIX_ARB                               34999
 #endif
+
 #ifndef GL_CURRENT_MATRIX_STACK_DEPTH_ARB
 #define GL_CURRENT_MATRIX_STACK_DEPTH_ARB                             34368
 #endif
+
 #ifndef GL_MAX_PROGRAM_MATRICES_ARB
 #define GL_MAX_PROGRAM_MATRICES_ARB                                   34351
 #endif
+
 #ifndef GL_MAX_PROGRAM_MATRIX_STACK_DEPTH_ARB
 #define GL_MAX_PROGRAM_MATRIX_STACK_DEPTH_ARB                         34350
 #endif
+
 #ifndef GL_MAX_TEXTURE_COORDS_ARB
 #define GL_MAX_TEXTURE_COORDS_ARB                                     34929
 #endif
+
 #ifndef GL_MAX_TEXTURE_IMAGE_UNITS_ARB
 #define GL_MAX_TEXTURE_IMAGE_UNITS_ARB                                34930
 #endif
+
 #ifndef GL_PROGRAM_ERROR_STRING_ARB
 #define GL_PROGRAM_ERROR_STRING_ARB                                   34932
 #endif
+
 #ifndef GL_MATRIX0_ARB
 #define GL_MATRIX0_ARB                                                35008
 #endif
+
 #ifndef GL_MATRIX1_ARB
 #define GL_MATRIX1_ARB                                                35009
 #endif
+
 #ifndef GL_MATRIX2_ARB
 #define GL_MATRIX2_ARB                                                35010
 #endif
+
 #ifndef GL_MATRIX3_ARB
 #define GL_MATRIX3_ARB                                                35011
 #endif
+
 #ifndef GL_MATRIX4_ARB
 #define GL_MATRIX4_ARB                                                35012
 #endif
+
 #ifndef GL_MATRIX5_ARB
 #define GL_MATRIX5_ARB                                                35013
 #endif
+
 #ifndef GL_MATRIX6_ARB
 #define GL_MATRIX6_ARB                                                35014
 #endif
+
 #ifndef GL_MATRIX7_ARB
 #define GL_MATRIX7_ARB                                                35015
 #endif
+
 #ifndef GL_MATRIX8_ARB
 #define GL_MATRIX8_ARB                                                35016
 #endif
+
 #ifndef GL_MATRIX9_ARB
 #define GL_MATRIX9_ARB                                                35017
 #endif
+
 #ifndef GL_MATRIX10_ARB
 #define GL_MATRIX10_ARB                                               35018
 #endif
+
 #ifndef GL_MATRIX11_ARB
 #define GL_MATRIX11_ARB                                               35019
 #endif
+
 #ifndef GL_MATRIX12_ARB
 #define GL_MATRIX12_ARB                                               35020
 #endif
+
 #ifndef GL_MATRIX13_ARB
 #define GL_MATRIX13_ARB                                               35021
 #endif
+
 #ifndef GL_MATRIX14_ARB
 #define GL_MATRIX14_ARB                                               35022
 #endif
+
 #ifndef GL_MATRIX15_ARB
 #define GL_MATRIX15_ARB                                               35023
 #endif
+
 #ifndef GL_MATRIX16_ARB
 #define GL_MATRIX16_ARB                                               35024
 #endif
+
 #ifndef GL_MATRIX17_ARB
 #define GL_MATRIX17_ARB                                               35025
 #endif
+
 #ifndef GL_MATRIX18_ARB
 #define GL_MATRIX18_ARB                                               35026
 #endif
+
 #ifndef GL_MATRIX19_ARB
 #define GL_MATRIX19_ARB                                               35027
 #endif
+
 #ifndef GL_MATRIX20_ARB
 #define GL_MATRIX20_ARB                                               35028
 #endif
+
 #ifndef GL_MATRIX21_ARB
 #define GL_MATRIX21_ARB                                               35029
 #endif
+
 #ifndef GL_MATRIX22_ARB
 #define GL_MATRIX22_ARB                                               35030
 #endif
+
 #ifndef GL_MATRIX23_ARB
 #define GL_MATRIX23_ARB                                               35031
 #endif
+
 #ifndef GL_MATRIX24_ARB
 #define GL_MATRIX24_ARB                                               35032
 #endif
+
 #ifndef GL_MATRIX25_ARB
 #define GL_MATRIX25_ARB                                               35033
 #endif
+
 #ifndef GL_MATRIX26_ARB
 #define GL_MATRIX26_ARB                                               35034
 #endif
+
 #ifndef GL_MATRIX27_ARB
 #define GL_MATRIX27_ARB                                               35035
 #endif
+
 #ifndef GL_MATRIX28_ARB
 #define GL_MATRIX28_ARB                                               35036
 #endif
+
 #ifndef GL_MATRIX29_ARB
 #define GL_MATRIX29_ARB                                               35037
 #endif
+
 #ifndef GL_MATRIX30_ARB
 #define GL_MATRIX30_ARB                                               35038
 #endif
+
 #ifndef GL_MATRIX31_ARB
 #define GL_MATRIX31_ARB                                               35039
 #endif
+
+
 
 // GL_ATI_text_fragment_shader
 #ifndef GL_TEXT_FRAGMENT_SHADER_ATI
 #define GL_TEXT_FRAGMENT_SHADER_ATI                                   33280
 #endif
 
+
+
 // GL_APPLE_client_storage
 #ifndef GL_UNPACK_CLIENT_STORAGE_APPLE
 #define GL_UNPACK_CLIENT_STORAGE_APPLE                                34226
 #endif
 
+
+
 // GL_APPLE_element_array
 #ifndef GL_ELEMENT_ARRAY_APPLE
 #define GL_ELEMENT_ARRAY_APPLE                                        34664
 #endif
+
 #ifndef GL_ELEMENT_ARRAY_TYPE_APPLE
 #define GL_ELEMENT_ARRAY_TYPE_APPLE                                   34665
 #endif
+
 #ifndef GL_ELEMENT_ARRAY_POINTER_APPLE
 #define GL_ELEMENT_ARRAY_POINTER_APPLE                                34666
 #endif
+
+
 typedef GLvoid (csAPIENTRY* csGLELEMENTPOINTERAPPLE) (GLenum type, GLvoid* pointer);
 typedef GLvoid (csAPIENTRY* csGLDRAWELEMENTARRAYAPPLE) (GLenum mode, GLint first, GLsizei count);
 typedef GLvoid (csAPIENTRY* csGLDRAWRANGEELEMENTARRAYAPPLE) (GLenum mode, GLuint start, GLuint end, GLint first, GLsizei count);
@@ -5116,9 +6614,12 @@ typedef GLvoid (csAPIENTRY* csGLMULTIDRAWRANGEELEMENTARRAYAPPLE) (GLenum mode, G
 #ifndef GL_DRAW_PIXELS_APPLE
 #define GL_DRAW_PIXELS_APPLE                                          35338
 #endif
+
 #ifndef GL_FENCE_APPLE
 #define GL_FENCE_APPLE                                                35339
 #endif
+
+
 typedef GLvoid (csAPIENTRY* csGLGENFENCESAPPLE) (GLsizei n, GLuint* fences);
 typedef GLvoid (csAPIENTRY* csGLDELETEFENCESAPPLE) (GLsizei n, GLuint* fences);
 typedef GLvoid (csAPIENTRY* csGLSETFENCEAPPLE) (GLuint fence);
@@ -5132,6 +6633,8 @@ typedef GLvoid (csAPIENTRY* csGLFINISHOBJECTAPPLE) (GLenum object, GLint name);
 #ifndef GL_VERTEX_ARRAY_BINDING_APPLE
 #define GL_VERTEX_ARRAY_BINDING_APPLE                                 34229
 #endif
+
+
 typedef GLvoid (csAPIENTRY* csGLBINDVERTEXARRAYAPPLE) (GLuint array);
 typedef GLvoid (csAPIENTRY* csGLDELETEVERTEXARRAYSAPPLE) (GLsizei n, GLuint* arrays);
 typedef GLvoid (csAPIENTRY* csGLGENVERTEXARRAYSAPPLE) (GLsizei n, GLuint* arrays);
@@ -5141,24 +6644,32 @@ typedef GLboolean (csAPIENTRY* csGLISVERTEXARRAYAPPLE) (GLuint array);
 #ifndef GL_VERTEX_ARRAY_RANGE_APPLE
 #define GL_VERTEX_ARRAY_RANGE_APPLE                                   34077
 #endif
+
 #ifndef GL_VERTEX_ARRAY_RANGE_LENGTH_APPLE
 #define GL_VERTEX_ARRAY_RANGE_LENGTH_APPLE                            34078
 #endif
+
 #ifndef GL_MAX_VERTEX_ARRAY_RANGE_ELEMENT_APPLE
 #define GL_MAX_VERTEX_ARRAY_RANGE_ELEMENT_APPLE                       34080
 #endif
+
 #ifndef GL_VERTEX_ARRAY_RANGE_POINTER_APPLE
 #define GL_VERTEX_ARRAY_RANGE_POINTER_APPLE                           34081
 #endif
+
 #ifndef GL_VERTEX_ARRAY_STORAGE_HINT_APPLE
 #define GL_VERTEX_ARRAY_STORAGE_HINT_APPLE                            34079
 #endif
+
 #ifndef GL_STORAGE_CACHED_APPLE
 #define GL_STORAGE_CACHED_APPLE                                       34238
 #endif
+
 #ifndef GL_STORAGE_SHARED_APPLE
 #define GL_STORAGE_SHARED_APPLE                                       34239
 #endif
+
+
 typedef GLvoid (csAPIENTRY* csGLVERTEXARRAYRANGEAPPLE) (GLsizei length, GLvoid* pointer);
 typedef GLvoid (csAPIENTRY* csGLFLUSHVERTEXARRAYRANGEAPPLE) (GLsizei length, GLvoid* pointer);
 typedef GLvoid (csAPIENTRY* csGLVERTEXARRAYPARAMETERIAPPLE) (GLenum pname, GLint param);
@@ -5166,573 +6677,760 @@ typedef GLvoid (csAPIENTRY* csGLVERTEXARRAYPARAMETERIAPPLE) (GLenum pname, GLint
 // WGL_ARB_pixel_format
 #ifdef _WIN32
 #ifndef WGL_NUMBER_PIXEL_FORMATS_ARB
-#define WGL_NUMBER_PIXEL_FORMATS_ARB                                  8192
+#define WGL_NUMBER_PIXEL_FORMATS_ARB                                   8192
 #endif
+
 #ifndef WGL_DRAW_TO_WINDOW_ARB
-#define WGL_DRAW_TO_WINDOW_ARB                                        8193
+#define WGL_DRAW_TO_WINDOW_ARB                                         8193
 #endif
+
 #ifndef WGL_DRAW_TO_BITMAP_ARB
-#define WGL_DRAW_TO_BITMAP_ARB                                        8194
+#define WGL_DRAW_TO_BITMAP_ARB                                         8194
 #endif
+
 #ifndef WGL_ACCELERATION_ARB
-#define WGL_ACCELERATION_ARB                                          8195
+#define WGL_ACCELERATION_ARB                                           8195
 #endif
+
 #ifndef WGL_NEED_PALETTE_ARB
-#define WGL_NEED_PALETTE_ARB                                          8196
+#define WGL_NEED_PALETTE_ARB                                           8196
 #endif
+
 #ifndef WGL_NEED_SYSTEM_PALETTE_ARB
-#define WGL_NEED_SYSTEM_PALETTE_ARB                                   8197
+#define WGL_NEED_SYSTEM_PALETTE_ARB                                    8197
 #endif
+
 #ifndef WGL_SWAP_LAYER_BUFFERS_ARB
-#define WGL_SWAP_LAYER_BUFFERS_ARB                                    8198
+#define WGL_SWAP_LAYER_BUFFERS_ARB                                     8198
 #endif
+
 #ifndef WGL_SWAP_METHOD_ARB
-#define WGL_SWAP_METHOD_ARB                                           8199
+#define WGL_SWAP_METHOD_ARB                                            8199
 #endif
+
 #ifndef WGL_NUMBER_OVERLAYS_ARB
-#define WGL_NUMBER_OVERLAYS_ARB                                       8200
+#define WGL_NUMBER_OVERLAYS_ARB                                        8200
 #endif
+
 #ifndef WGL_NUMBER_UNDERLAYS_ARB
-#define WGL_NUMBER_UNDERLAYS_ARB                                      8201
+#define WGL_NUMBER_UNDERLAYS_ARB                                       8201
 #endif
+
 #ifndef WGL_TRANSPARENT_ARB
-#define WGL_TRANSPARENT_ARB                                           8202
+#define WGL_TRANSPARENT_ARB                                            8202
 #endif
+
 #ifndef WGL_TRANSPARENT_RED_VALUE_ARB
-#define WGL_TRANSPARENT_RED_VALUE_ARB                                 8247
+#define WGL_TRANSPARENT_RED_VALUE_ARB                                  8247
 #endif
+
 #ifndef WGL_TRANSPARENT_GREEN_VALUE_ARB
-#define WGL_TRANSPARENT_GREEN_VALUE_ARB                               8248
+#define WGL_TRANSPARENT_GREEN_VALUE_ARB                                8248
 #endif
+
 #ifndef WGL_TRANSPARENT_BLUE_VALUE_ARB
-#define WGL_TRANSPARENT_BLUE_VALUE_ARB                                8249
+#define WGL_TRANSPARENT_BLUE_VALUE_ARB                                 8249
 #endif
+
 #ifndef WGL_TRANSPARENT_ALPHA_VALUE_ARB
-#define WGL_TRANSPARENT_ALPHA_VALUE_ARB                               8250
+#define WGL_TRANSPARENT_ALPHA_VALUE_ARB                                8250
 #endif
+
 #ifndef WGL_TRANSPARENT_INDEX_VALUE_ARB
-#define WGL_TRANSPARENT_INDEX_VALUE_ARB                               8251
+#define WGL_TRANSPARENT_INDEX_VALUE_ARB                                8251
 #endif
+
 #ifndef WGL_SHARE_DEPTH_ARB
-#define WGL_SHARE_DEPTH_ARB                                           8204
+#define WGL_SHARE_DEPTH_ARB                                            8204
 #endif
+
 #ifndef WGL_SHARE_STENCIL_ARB
-#define WGL_SHARE_STENCIL_ARB                                         8205
+#define WGL_SHARE_STENCIL_ARB                                          8205
 #endif
+
 #ifndef WGL_SHARE_ACCUM_ARB
-#define WGL_SHARE_ACCUM_ARB                                           8206
+#define WGL_SHARE_ACCUM_ARB                                            8206
 #endif
+
 #ifndef WGL_SUPPORT_GDI_ARB
-#define WGL_SUPPORT_GDI_ARB                                           8207
+#define WGL_SUPPORT_GDI_ARB                                            8207
 #endif
+
 #ifndef WGL_SUPPORT_OPENGL_ARB
-#define WGL_SUPPORT_OPENGL_ARB                                        8208
+#define WGL_SUPPORT_OPENGL_ARB                                         8208
 #endif
+
 #ifndef WGL_DOUBLE_BUFFER_ARB
-#define WGL_DOUBLE_BUFFER_ARB                                         8209
+#define WGL_DOUBLE_BUFFER_ARB                                          8209
 #endif
+
 #ifndef WGL_STEREO_ARB
-#define WGL_STEREO_ARB                                                8210
+#define WGL_STEREO_ARB                                                 8210
 #endif
+
 #ifndef WGL_PIXEL_TYPE_ARB
-#define WGL_PIXEL_TYPE_ARB                                            8211
+#define WGL_PIXEL_TYPE_ARB                                             8211
 #endif
+
 #ifndef WGL_COLOR_BITS_ARB
-#define WGL_COLOR_BITS_ARB                                            8212
+#define WGL_COLOR_BITS_ARB                                             8212
 #endif
+
 #ifndef WGL_RED_BITS_ARB
-#define WGL_RED_BITS_ARB                                              8213
+#define WGL_RED_BITS_ARB                                               8213
 #endif
+
 #ifndef WGL_RED_SHIFT_ARB
-#define WGL_RED_SHIFT_ARB                                             8214
+#define WGL_RED_SHIFT_ARB                                              8214
 #endif
+
 #ifndef WGL_GREEN_BITS_ARB
-#define WGL_GREEN_BITS_ARB                                            8215
+#define WGL_GREEN_BITS_ARB                                             8215
 #endif
+
 #ifndef WGL_GREEN_SHIFT_ARB
-#define WGL_GREEN_SHIFT_ARB                                           8216
+#define WGL_GREEN_SHIFT_ARB                                            8216
 #endif
+
 #ifndef WGL_BLUE_BITS_ARB
-#define WGL_BLUE_BITS_ARB                                             8217
+#define WGL_BLUE_BITS_ARB                                              8217
 #endif
+
 #ifndef WGL_BLUE_SHIFT_ARB
-#define WGL_BLUE_SHIFT_ARB                                            8218
+#define WGL_BLUE_SHIFT_ARB                                             8218
 #endif
+
 #ifndef WGL_ALPHA_BITS_ARB
-#define WGL_ALPHA_BITS_ARB                                            8219
+#define WGL_ALPHA_BITS_ARB                                             8219
 #endif
+
 #ifndef WGL_ALPHA_SHIFT_ARB
-#define WGL_ALPHA_SHIFT_ARB                                           8220
+#define WGL_ALPHA_SHIFT_ARB                                            8220
 #endif
+
 #ifndef WGL_ACCUM_BITS_ARB
-#define WGL_ACCUM_BITS_ARB                                            8221
+#define WGL_ACCUM_BITS_ARB                                             8221
 #endif
+
 #ifndef WGL_ACCUM_RED_BITS_ARB
-#define WGL_ACCUM_RED_BITS_ARB                                        8222
+#define WGL_ACCUM_RED_BITS_ARB                                         8222
 #endif
+
 #ifndef WGL_ACCUM_GREEN_BITS_ARB
-#define WGL_ACCUM_GREEN_BITS_ARB                                      8223
+#define WGL_ACCUM_GREEN_BITS_ARB                                       8223
 #endif
+
 #ifndef WGL_ACCUM_BLUE_BITS_ARB
-#define WGL_ACCUM_BLUE_BITS_ARB                                       8224
+#define WGL_ACCUM_BLUE_BITS_ARB                                        8224
 #endif
+
 #ifndef WGL_ACCUM_ALPHA_BITS_ARB
-#define WGL_ACCUM_ALPHA_BITS_ARB                                      8225
+#define WGL_ACCUM_ALPHA_BITS_ARB                                       8225
 #endif
+
 #ifndef WGL_DEPTH_BITS_ARB
-#define WGL_DEPTH_BITS_ARB                                            8226
+#define WGL_DEPTH_BITS_ARB                                             8226
 #endif
+
 #ifndef WGL_STENCIL_BITS_ARB
-#define WGL_STENCIL_BITS_ARB                                          8227
+#define WGL_STENCIL_BITS_ARB                                           8227
 #endif
+
 #ifndef WGL_AUX_BUFFERS_ARB
-#define WGL_AUX_BUFFERS_ARB                                           8228
+#define WGL_AUX_BUFFERS_ARB                                            8228
 #endif
+
 #ifndef WGL_NO_ACCELERATION_ARB
-#define WGL_NO_ACCELERATION_ARB                                       8229
+#define WGL_NO_ACCELERATION_ARB                                        8229
 #endif
+
 #ifndef WGL_GENERIC_ACCELERATION_ARB
-#define WGL_GENERIC_ACCELERATION_ARB                                  8230
+#define WGL_GENERIC_ACCELERATION_ARB                                   8230
 #endif
+
 #ifndef WGL_FULL_ACCELERATION_ARB
-#define WGL_FULL_ACCELERATION_ARB                                     8231
+#define WGL_FULL_ACCELERATION_ARB                                      8231
 #endif
+
 #ifndef WGL_SWAP_EXCHANGE_ARB
-#define WGL_SWAP_EXCHANGE_ARB                                         8232
+#define WGL_SWAP_EXCHANGE_ARB                                          8232
 #endif
+
 #ifndef WGL_SWAP_COPY_ARB
-#define WGL_SWAP_COPY_ARB                                             8233
+#define WGL_SWAP_COPY_ARB                                              8233
 #endif
+
 #ifndef WGL_SWAP_UNDEFINED_ARB
-#define WGL_SWAP_UNDEFINED_ARB                                        8234
+#define WGL_SWAP_UNDEFINED_ARB                                         8234
 #endif
+
 #ifndef WGL_TYPE_RGBA_ARB
-#define WGL_TYPE_RGBA_ARB                                             8235
+#define WGL_TYPE_RGBA_ARB                                              8235
 #endif
+
 #ifndef WGL_TYPE_COLORINDEX_ARB
-#define WGL_TYPE_COLORINDEX_ARB                                       8236
+#define WGL_TYPE_COLORINDEX_ARB                                        8236
 #endif
+
+
 typedef BOOL (csAPIENTRY* csWGLGETPIXELFORMATATTRIBIVARB) (HDC hdc, GLint iPixelFormat, GLint iLayerPlane, GLuint nAttributes, GLint* piAttributes, GLint* piValues);
 typedef BOOL (csAPIENTRY* csWGLGETPIXELFORMATATTRIBFVARB) (HDC hdc, GLint iPixelFormat, GLint iLayerPlane, GLuint nAttributes, GLint* piAttributes, GLfloat* pfValues);
 typedef BOOL (csAPIENTRY* csWGLCHOOSEPIXELFORMATARB) (HDC hdc, GLint* piAttribIList, GLfloat* pfAttribFList, GLuint nMaxFormats, GLint* piFormats, GLuint* nNumFormats);
+
 #endif
 
 // WGL_ARB_make_current_read
 #ifdef _WIN32
 #ifndef WGL_ERROR_INVALID_PIXEL_TYPE_ARB
-#define WGL_ERROR_INVALID_PIXEL_TYPE_ARB                              8259
+#define WGL_ERROR_INVALID_PIXEL_TYPE_ARB                               8259
 #endif
+
 #ifndef WGL_ERROR_INCOMPATIBLE_DEVICE_CONTEXTS_ARB
-#define WGL_ERROR_INCOMPATIBLE_DEVICE_CONTEXTS_ARB                    8276
+#define WGL_ERROR_INCOMPATIBLE_DEVICE_CONTEXTS_ARB                     8276
 #endif
+
+
 typedef BOOL (csAPIENTRY* csWGLMAKECONTEXTCURRENTARB) (HDC hDrawDC, HDC hReadDC, HGLRC hglrc);
 typedef HDC (csAPIENTRY* csWGLGETCURRENTREADDCARB) ();
+
 #endif
 
 // WGL_ARB_pbuffer
 #ifdef _WIN32
 #ifndef WGL_DRAW_TO_PBUFFER_ARB
-#define WGL_DRAW_TO_PBUFFER_ARB                                       8237
+#define WGL_DRAW_TO_PBUFFER_ARB                                        8237
 #endif
+
 #ifndef WGL_DRAW_TO_PBUFFER_ARB
-#define WGL_DRAW_TO_PBUFFER_ARB                                       8237
+#define WGL_DRAW_TO_PBUFFER_ARB                                        8237
 #endif
+
 #ifndef WGL_MAX_PBUFFER_PIXELS_ARB
-#define WGL_MAX_PBUFFER_PIXELS_ARB                                    8238
+#define WGL_MAX_PBUFFER_PIXELS_ARB                                     8238
 #endif
+
 #ifndef WGL_MAX_PBUFFER_WIDTH_ARB
-#define WGL_MAX_PBUFFER_WIDTH_ARB                                     8239
+#define WGL_MAX_PBUFFER_WIDTH_ARB                                      8239
 #endif
+
 #ifndef WGL_MAX_PBUFFER_HEIGHT_ARB
-#define WGL_MAX_PBUFFER_HEIGHT_ARB                                    8240
+#define WGL_MAX_PBUFFER_HEIGHT_ARB                                     8240
 #endif
+
 #ifndef WGL_PBUFFER_LARGEST_ARB
-#define WGL_PBUFFER_LARGEST_ARB                                       8243
+#define WGL_PBUFFER_LARGEST_ARB                                        8243
 #endif
+
 #ifndef WGL_PBUFFER_WIDTH_ARB
-#define WGL_PBUFFER_WIDTH_ARB                                         8244
+#define WGL_PBUFFER_WIDTH_ARB                                          8244
 #endif
+
 #ifndef WGL_PBUFFER_HEIGHT_ARB
-#define WGL_PBUFFER_HEIGHT_ARB                                        8245
+#define WGL_PBUFFER_HEIGHT_ARB                                         8245
 #endif
+
 #ifndef WGL_PBUFFER_LOST_ARB
-#define WGL_PBUFFER_LOST_ARB                                          8246
+#define WGL_PBUFFER_LOST_ARB                                           8246
 #endif
+
+
 typedef HANDLE (csAPIENTRY* csWGLCREATEPBUFFERARB) (HDC hDC, GLint iPixelFormat, GLint iWidth, GLint iHeight, GLint* piAttribList);
 typedef HDC (csAPIENTRY* csWGLGETPBUFFERDCARB) (HANDLE hPbuffer);
 typedef GLint (csAPIENTRY* csWGLRELEASEPBUFFERDCARB) (HANDLE hPbuffer, HDC hDC);
 typedef BOOL (csAPIENTRY* csWGLDESTROYPBUFFERARB) (HANDLE hPbuffer);
 typedef BOOL (csAPIENTRY* csWGLQUERYPBUFFERARB) (HANDLE hPbuffer, GLint iAttribute, GLint* piValue);
+
 #endif
 
 // WGL_EXT_swap_control
 #ifdef _WIN32
+
 typedef BOOL (csAPIENTRY* csWGLSWAPINTERVALEXT) (GLint interval);
 typedef GLint (csAPIENTRY* csWGLGETSWAPINTERVALEXT) ();
+
 #endif
 
 // WGL_ARB_render_texture
 #ifdef _WIN32
 #ifndef WGL_BIND_TO_TEXTURE_RGB_ARB
-#define WGL_BIND_TO_TEXTURE_RGB_ARB                                   8304
+#define WGL_BIND_TO_TEXTURE_RGB_ARB                                    8304
 #endif
+
 #ifndef WGL_BIND_TO_TEXTURE_RGBA_ARB
-#define WGL_BIND_TO_TEXTURE_RGBA_ARB                                  8305
+#define WGL_BIND_TO_TEXTURE_RGBA_ARB                                   8305
 #endif
+
 #ifndef WGL_TEXTURE_FORMAT_ARB
-#define WGL_TEXTURE_FORMAT_ARB                                        8306
+#define WGL_TEXTURE_FORMAT_ARB                                         8306
 #endif
+
 #ifndef WGL_TEXTURE_TARGET_ARB
-#define WGL_TEXTURE_TARGET_ARB                                        8307
+#define WGL_TEXTURE_TARGET_ARB                                         8307
 #endif
+
 #ifndef WGL_MIPMAP_TEXTURE_ARB
-#define WGL_MIPMAP_TEXTURE_ARB                                        8308
+#define WGL_MIPMAP_TEXTURE_ARB                                         8308
 #endif
+
 #ifndef WGL_TEXTURE_RGB_ARB
-#define WGL_TEXTURE_RGB_ARB                                           8309
+#define WGL_TEXTURE_RGB_ARB                                            8309
 #endif
+
 #ifndef WGL_TEXTURE_RGBA_ARB
-#define WGL_TEXTURE_RGBA_ARB                                          8310
+#define WGL_TEXTURE_RGBA_ARB                                           8310
 #endif
+
 #ifndef WGL_NO_TEXTURE_ARB
-#define WGL_NO_TEXTURE_ARB                                            8311
+#define WGL_NO_TEXTURE_ARB                                             8311
 #endif
+
 #ifndef WGL_TEXTURE_CUBE_MAP_ARB
-#define WGL_TEXTURE_CUBE_MAP_ARB                                      8312
+#define WGL_TEXTURE_CUBE_MAP_ARB                                       8312
 #endif
+
 #ifndef WGL_TEXTURE_1D_ARB
-#define WGL_TEXTURE_1D_ARB                                            8313
+#define WGL_TEXTURE_1D_ARB                                             8313
 #endif
+
 #ifndef WGL_TEXTURE_2D_ARB
-#define WGL_TEXTURE_2D_ARB                                            8314
+#define WGL_TEXTURE_2D_ARB                                             8314
 #endif
+
 #ifndef WGL_NO_TEXTURE_ARB
-#define WGL_NO_TEXTURE_ARB                                            8311
+#define WGL_NO_TEXTURE_ARB                                             8311
 #endif
+
 #ifndef WGL_MIPMAP_LEVEL_ARB
-#define WGL_MIPMAP_LEVEL_ARB                                          8315
+#define WGL_MIPMAP_LEVEL_ARB                                           8315
 #endif
+
 #ifndef WGL_CUBE_MAP_FACE_ARB
-#define WGL_CUBE_MAP_FACE_ARB                                         8316
+#define WGL_CUBE_MAP_FACE_ARB                                          8316
 #endif
+
 #ifndef WGL_TEXTURE_CUBE_MAP_POSITIVE_X_ARB
-#define WGL_TEXTURE_CUBE_MAP_POSITIVE_X_ARB                           8317
+#define WGL_TEXTURE_CUBE_MAP_POSITIVE_X_ARB                            8317
 #endif
+
 #ifndef WGL_TEXTURE_CUBE_MAP_NEGATIVE_X_ARB
-#define WGL_TEXTURE_CUBE_MAP_NEGATIVE_X_ARB                           8318
+#define WGL_TEXTURE_CUBE_MAP_NEGATIVE_X_ARB                            8318
 #endif
+
 #ifndef WGL_TEXTURE_CUBE_MAP_POSITIVE_Y_ARB
-#define WGL_TEXTURE_CUBE_MAP_POSITIVE_Y_ARB                           8319
+#define WGL_TEXTURE_CUBE_MAP_POSITIVE_Y_ARB                            8319
 #endif
+
 #ifndef WGL_TEXTURE_CUBE_MAP_NEGATIVE_Y_ARB
-#define WGL_TEXTURE_CUBE_MAP_NEGATIVE_Y_ARB                           8320
+#define WGL_TEXTURE_CUBE_MAP_NEGATIVE_Y_ARB                            8320
 #endif
+
 #ifndef WGL_TEXTURE_CUBE_MAP_POSITIVE_Z_ARB
-#define WGL_TEXTURE_CUBE_MAP_POSITIVE_Z_ARB                           8321
+#define WGL_TEXTURE_CUBE_MAP_POSITIVE_Z_ARB                            8321
 #endif
+
 #ifndef WGL_TEXTURE_CUBE_MAP_NEGATIVE_Z_ARB
-#define WGL_TEXTURE_CUBE_MAP_NEGATIVE_Z_ARB                           8322
+#define WGL_TEXTURE_CUBE_MAP_NEGATIVE_Z_ARB                            8322
 #endif
+
 #ifndef WGL_FRONT_LEFT_ARB
-#define WGL_FRONT_LEFT_ARB                                            8323
+#define WGL_FRONT_LEFT_ARB                                             8323
 #endif
+
 #ifndef WGL_FRONT_RIGHT_ARB
-#define WGL_FRONT_RIGHT_ARB                                           8324
+#define WGL_FRONT_RIGHT_ARB                                            8324
 #endif
+
 #ifndef WGL_BACK_LEFT_ARB
-#define WGL_BACK_LEFT_ARB                                             8325
+#define WGL_BACK_LEFT_ARB                                              8325
 #endif
+
 #ifndef WGL_BACK_RIGHT_ARB
-#define WGL_BACK_RIGHT_ARB                                            8326
+#define WGL_BACK_RIGHT_ARB                                             8326
 #endif
+
 #ifndef WGL_AUX0_ARB
-#define WGL_AUX0_ARB                                                  8327
+#define WGL_AUX0_ARB                                                   8327
 #endif
+
 #ifndef WGL_AUX1_ARB
-#define WGL_AUX1_ARB                                                  8328
+#define WGL_AUX1_ARB                                                   8328
 #endif
+
 #ifndef WGL_AUX2_ARB
-#define WGL_AUX2_ARB                                                  8329
+#define WGL_AUX2_ARB                                                   8329
 #endif
+
 #ifndef WGL_AUX3_ARB
-#define WGL_AUX3_ARB                                                  8330
+#define WGL_AUX3_ARB                                                   8330
 #endif
+
 #ifndef WGL_AUX4_ARB
-#define WGL_AUX4_ARB                                                  8331
+#define WGL_AUX4_ARB                                                   8331
 #endif
+
 #ifndef WGL_AUX5_ARB
-#define WGL_AUX5_ARB                                                  8332
+#define WGL_AUX5_ARB                                                   8332
 #endif
+
 #ifndef WGL_AUX6_ARB
-#define WGL_AUX6_ARB                                                  8333
+#define WGL_AUX6_ARB                                                   8333
 #endif
+
 #ifndef WGL_AUX7_ARB
-#define WGL_AUX7_ARB                                                  8334
+#define WGL_AUX7_ARB                                                   8334
 #endif
+
 #ifndef WGL_AUX8_ARB
-#define WGL_AUX8_ARB                                                  8335
+#define WGL_AUX8_ARB                                                   8335
 #endif
+
 #ifndef WGL_AUX9_ARB
-#define WGL_AUX9_ARB                                                  8336
+#define WGL_AUX9_ARB                                                   8336
 #endif
+
+
 typedef BOOL (csAPIENTRY* csWGLBINDTEXIMAGEARB) (HANDLE hPbuffer, GLint iBuffer);
 typedef BOOL (csAPIENTRY* csWGLRELEASETEXIMAGEARB) (HANDLE hPbuffer, GLint iBuffer);
 typedef BOOL (csAPIENTRY* csWGLSETPBUFFERATTRIBARB) (HANDLE hPbuffer, GLint* piAttribList);
+
 #endif
 
 // WGL_EXT_extensions_string
 #ifdef _WIN32
+
 typedef char* (csAPIENTRY* csWGLGETEXTENSIONSSTRINGEXT) ();
+
 #endif
 
 // WGL_EXT_make_current_read
 #ifdef _WIN32
+
 typedef BOOL (csAPIENTRY* csWGLMAKECONTEXTCURRENTEXT) (HDC hDrawDC, HDC hReadDC, HGLRC hglrc);
 typedef HDC (csAPIENTRY* csWGLGETCURRENTREADDCEXT) ();
+
 #endif
 
 // WGL_EXT_pbuffer
 #ifdef _WIN32
 #ifndef WGL_DRAW_TO_PBUFFER_EXT
-#define WGL_DRAW_TO_PBUFFER_EXT                                       8237
+#define WGL_DRAW_TO_PBUFFER_EXT                                        8237
 #endif
+
 #ifndef WGL_MAX_PBUFFER_PIXELS_EXT
-#define WGL_MAX_PBUFFER_PIXELS_EXT                                    8238
+#define WGL_MAX_PBUFFER_PIXELS_EXT                                     8238
 #endif
+
 #ifndef WGL_MAX_PBUFFER_WIDTH_EXT
-#define WGL_MAX_PBUFFER_WIDTH_EXT                                     8239
+#define WGL_MAX_PBUFFER_WIDTH_EXT                                      8239
 #endif
+
 #ifndef WGL_MAX_PBUFFER_HEIGHT_EXT
-#define WGL_MAX_PBUFFER_HEIGHT_EXT                                    8240
+#define WGL_MAX_PBUFFER_HEIGHT_EXT                                     8240
 #endif
+
 #ifndef WGL_OPTIMAL_PBUFFER_WIDTH_EXT
-#define WGL_OPTIMAL_PBUFFER_WIDTH_EXT                                 8241
+#define WGL_OPTIMAL_PBUFFER_WIDTH_EXT                                  8241
 #endif
+
 #ifndef WGL_OPTIMAL_PBUFFER_HEIGHT_EXT
-#define WGL_OPTIMAL_PBUFFER_HEIGHT_EXT                                8242
+#define WGL_OPTIMAL_PBUFFER_HEIGHT_EXT                                 8242
 #endif
+
 #ifndef WGL_PBUFFER_LARGEST_EXT
-#define WGL_PBUFFER_LARGEST_EXT                                       8243
+#define WGL_PBUFFER_LARGEST_EXT                                        8243
 #endif
+
 #ifndef WGL_PBUFFER_WIDTH_EXT
-#define WGL_PBUFFER_WIDTH_EXT                                         8244
+#define WGL_PBUFFER_WIDTH_EXT                                          8244
 #endif
+
 #ifndef WGL_PBUFFER_HEIGHT_EXT
-#define WGL_PBUFFER_HEIGHT_EXT                                        8245
+#define WGL_PBUFFER_HEIGHT_EXT                                         8245
 #endif
+
+
 typedef HANDLE (csAPIENTRY* csWGLCREATEPBUFFEREXT) (HDC hDC, GLint iPixelFormat, GLint iWidth, GLint iHeight, GLint* piAttribList);
 typedef HDC (csAPIENTRY* csWGLGETPBUFFERDCEXT) (HANDLE hPbuffer);
 typedef GLint (csAPIENTRY* csWGLRELEASEPBUFFERDCEXT) (HANDLE hPbuffer, HDC hDC);
 typedef BOOL (csAPIENTRY* csWGLDESTROYPBUFFEREXT) (HANDLE hPbuffer);
 typedef BOOL (csAPIENTRY* csWGLQUERYPBUFFEREXT) (HANDLE hPbuffer, GLint iAttribute, GLint* piValue);
+
 #endif
 
 // WGL_EXT_pixel_format
 #ifdef _WIN32
 #ifndef WGL_NUMBER_PIXEL_FORMATS_EXT
-#define WGL_NUMBER_PIXEL_FORMATS_EXT                                  8192
+#define WGL_NUMBER_PIXEL_FORMATS_EXT                                   8192
 #endif
+
 #ifndef WGL_DRAW_TO_WINDOW_EXT
-#define WGL_DRAW_TO_WINDOW_EXT                                        8193
+#define WGL_DRAW_TO_WINDOW_EXT                                         8193
 #endif
+
 #ifndef WGL_DRAW_TO_BITMAP_EXT
-#define WGL_DRAW_TO_BITMAP_EXT                                        8194
+#define WGL_DRAW_TO_BITMAP_EXT                                         8194
 #endif
+
 #ifndef WGL_ACCELERATION_EXT
-#define WGL_ACCELERATION_EXT                                          8195
+#define WGL_ACCELERATION_EXT                                           8195
 #endif
+
 #ifndef WGL_NEED_PALETTE_EXT
-#define WGL_NEED_PALETTE_EXT                                          8196
+#define WGL_NEED_PALETTE_EXT                                           8196
 #endif
+
 #ifndef WGL_NEED_SYSTEM_PALETTE_EXT
-#define WGL_NEED_SYSTEM_PALETTE_EXT                                   8197
+#define WGL_NEED_SYSTEM_PALETTE_EXT                                    8197
 #endif
+
 #ifndef WGL_SWAP_LAYER_BUFFERS_EXT
-#define WGL_SWAP_LAYER_BUFFERS_EXT                                    8198
+#define WGL_SWAP_LAYER_BUFFERS_EXT                                     8198
 #endif
+
 #ifndef WGL_SWAP_METHOD_EXT
-#define WGL_SWAP_METHOD_EXT                                           8199
+#define WGL_SWAP_METHOD_EXT                                            8199
 #endif
+
 #ifndef WGL_NUMBER_OVERLAYS_EXT
-#define WGL_NUMBER_OVERLAYS_EXT                                       8200
+#define WGL_NUMBER_OVERLAYS_EXT                                        8200
 #endif
+
 #ifndef WGL_NUMBER_UNDERLAYS_EXT
-#define WGL_NUMBER_UNDERLAYS_EXT                                      8201
+#define WGL_NUMBER_UNDERLAYS_EXT                                       8201
 #endif
+
 #ifndef WGL_TRANSPARENT_EXT
-#define WGL_TRANSPARENT_EXT                                           8202
+#define WGL_TRANSPARENT_EXT                                            8202
 #endif
+
 #ifndef WGL_TRANSPARENT_VALUE_EXT
-#define WGL_TRANSPARENT_VALUE_EXT                                     8203
+#define WGL_TRANSPARENT_VALUE_EXT                                      8203
 #endif
+
 #ifndef WGL_SHARE_DEPTH_EXT
-#define WGL_SHARE_DEPTH_EXT                                           8204
+#define WGL_SHARE_DEPTH_EXT                                            8204
 #endif
+
 #ifndef WGL_SHARE_STENCIL_EXT
-#define WGL_SHARE_STENCIL_EXT                                         8205
+#define WGL_SHARE_STENCIL_EXT                                          8205
 #endif
+
 #ifndef WGL_SHARE_ACCUM_EXT
-#define WGL_SHARE_ACCUM_EXT                                           8206
+#define WGL_SHARE_ACCUM_EXT                                            8206
 #endif
+
 #ifndef WGL_SUPPORT_GDI_EXT
-#define WGL_SUPPORT_GDI_EXT                                           8207
+#define WGL_SUPPORT_GDI_EXT                                            8207
 #endif
+
 #ifndef WGL_SUPPORT_OPENGL_EXT
-#define WGL_SUPPORT_OPENGL_EXT                                        8208
+#define WGL_SUPPORT_OPENGL_EXT                                         8208
 #endif
+
 #ifndef WGL_DOUBLE_BUFFER_EXT
-#define WGL_DOUBLE_BUFFER_EXT                                         8209
+#define WGL_DOUBLE_BUFFER_EXT                                          8209
 #endif
+
 #ifndef WGL_STEREO_EXT
-#define WGL_STEREO_EXT                                                8210
+#define WGL_STEREO_EXT                                                 8210
 #endif
+
 #ifndef WGL_PIXEL_TYPE_EXT
-#define WGL_PIXEL_TYPE_EXT                                            8211
+#define WGL_PIXEL_TYPE_EXT                                             8211
 #endif
+
 #ifndef WGL_COLOR_BITS_EXT
-#define WGL_COLOR_BITS_EXT                                            8212
+#define WGL_COLOR_BITS_EXT                                             8212
 #endif
+
 #ifndef WGL_RED_BITS_EXT
-#define WGL_RED_BITS_EXT                                              8213
+#define WGL_RED_BITS_EXT                                               8213
 #endif
+
 #ifndef WGL_RED_SHIFT_EXT
-#define WGL_RED_SHIFT_EXT                                             8214
+#define WGL_RED_SHIFT_EXT                                              8214
 #endif
+
 #ifndef WGL_GREEN_BITS_EXT
-#define WGL_GREEN_BITS_EXT                                            8215
+#define WGL_GREEN_BITS_EXT                                             8215
 #endif
+
 #ifndef WGL_GREEN_SHIFT_EXT
-#define WGL_GREEN_SHIFT_EXT                                           8216
+#define WGL_GREEN_SHIFT_EXT                                            8216
 #endif
+
 #ifndef WGL_BLUE_BITS_EXT
-#define WGL_BLUE_BITS_EXT                                             8217
+#define WGL_BLUE_BITS_EXT                                              8217
 #endif
+
 #ifndef WGL_BLUE_SHIFT_EXT
-#define WGL_BLUE_SHIFT_EXT                                            8218
+#define WGL_BLUE_SHIFT_EXT                                             8218
 #endif
+
 #ifndef WGL_ALPHA_BITS_EXT
-#define WGL_ALPHA_BITS_EXT                                            8219
+#define WGL_ALPHA_BITS_EXT                                             8219
 #endif
+
 #ifndef WGL_ALPHA_SHIFT_EXT
-#define WGL_ALPHA_SHIFT_EXT                                           8220
+#define WGL_ALPHA_SHIFT_EXT                                            8220
 #endif
+
 #ifndef WGL_ACCUM_BITS_EXT
-#define WGL_ACCUM_BITS_EXT                                            8221
+#define WGL_ACCUM_BITS_EXT                                             8221
 #endif
+
 #ifndef WGL_ACCUM_RED_BITS_EXT
-#define WGL_ACCUM_RED_BITS_EXT                                        8222
+#define WGL_ACCUM_RED_BITS_EXT                                         8222
 #endif
+
 #ifndef WGL_ACCUM_GREEN_BITS_EXT
-#define WGL_ACCUM_GREEN_BITS_EXT                                      8223
+#define WGL_ACCUM_GREEN_BITS_EXT                                       8223
 #endif
+
 #ifndef WGL_ACCUM_BLUE_BITS_EXT
-#define WGL_ACCUM_BLUE_BITS_EXT                                       8224
+#define WGL_ACCUM_BLUE_BITS_EXT                                        8224
 #endif
+
 #ifndef WGL_ACCUM_ALPHA_BITS_EXT
-#define WGL_ACCUM_ALPHA_BITS_EXT                                      8225
+#define WGL_ACCUM_ALPHA_BITS_EXT                                       8225
 #endif
+
 #ifndef WGL_DEPTH_BITS_EXT
-#define WGL_DEPTH_BITS_EXT                                            8226
+#define WGL_DEPTH_BITS_EXT                                             8226
 #endif
+
 #ifndef WGL_STENCIL_BITS_EXT
-#define WGL_STENCIL_BITS_EXT                                          8227
+#define WGL_STENCIL_BITS_EXT                                           8227
 #endif
+
 #ifndef WGL_AUX_BUFFERS_EXT
-#define WGL_AUX_BUFFERS_EXT                                           8228
+#define WGL_AUX_BUFFERS_EXT                                            8228
 #endif
+
 #ifndef WGL_NO_ACCELERATION_EXT
-#define WGL_NO_ACCELERATION_EXT                                       8229
+#define WGL_NO_ACCELERATION_EXT                                        8229
 #endif
+
 #ifndef WGL_GENERIC_ACCELERATION_EXT
-#define WGL_GENERIC_ACCELERATION_EXT                                  8230
+#define WGL_GENERIC_ACCELERATION_EXT                                   8230
 #endif
+
 #ifndef WGL_FULL_ACCELERATION_EXT
-#define WGL_FULL_ACCELERATION_EXT                                     8231
+#define WGL_FULL_ACCELERATION_EXT                                      8231
 #endif
+
 #ifndef WGL_SWAP_EXCHANGE_EXT
-#define WGL_SWAP_EXCHANGE_EXT                                         8232
+#define WGL_SWAP_EXCHANGE_EXT                                          8232
 #endif
+
 #ifndef WGL_SWAP_COPY_EXT
-#define WGL_SWAP_COPY_EXT                                             8233
+#define WGL_SWAP_COPY_EXT                                              8233
 #endif
+
 #ifndef WGL_SWAP_UNDEFINED_EXT
-#define WGL_SWAP_UNDEFINED_EXT                                        8234
+#define WGL_SWAP_UNDEFINED_EXT                                         8234
 #endif
+
 #ifndef WGL_TYPE_RGBA_EXT
-#define WGL_TYPE_RGBA_EXT                                             8235
+#define WGL_TYPE_RGBA_EXT                                              8235
 #endif
+
 #ifndef WGL_TYPE_COLORINDEX_EXT
-#define WGL_TYPE_COLORINDEX_EXT                                       8236
+#define WGL_TYPE_COLORINDEX_EXT                                        8236
 #endif
+
+
 typedef BOOL (csAPIENTRY* csWGLGETPIXELFORMATATTRIBIVEXT) (HDC hdc, GLint iPixelFormat, GLint iLayerPlane, GLuint nAttributes, GLint* piAttributes, GLint* piValues);
 typedef BOOL (csAPIENTRY* csWGLGETPIXELFORMATATTRIBFVEXT) (HDC hdc, GLint iPixelFormat, GLint iLayerPlane, GLuint nAttributes, GLint* piAttributes, GLfloat* pfValues);
 typedef BOOL (csAPIENTRY* csWGLCHOOSEPIXELFORMATEXT) (HDC hdc, GLint* piAttribIList, GLfloat* pfAttribFList, GLuint nMaxFormats, GLint* piFormats, GLuint* nNumFormats);
+
 #endif
 
 // WGL_I3D_digital_video_control
 #ifdef _WIN32
 #ifndef WGL_DIGITAL_VIDEO_CURSOR_ALPHA_FRAMEBUFFER_I3D
-#define WGL_DIGITAL_VIDEO_CURSOR_ALPHA_FRAMEBUFFER_I3D                8272
+#define WGL_DIGITAL_VIDEO_CURSOR_ALPHA_FRAMEBUFFER_I3D                 8272
 #endif
+
 #ifndef WGL_DIGITAL_VIDEO_CURSOR_ALPHA_VALUE_I3D
-#define WGL_DIGITAL_VIDEO_CURSOR_ALPHA_VALUE_I3D                      8273
+#define WGL_DIGITAL_VIDEO_CURSOR_ALPHA_VALUE_I3D                       8273
 #endif
+
 #ifndef WGL_DIGITAL_VIDEO_CURSOR_INCLUDED_I3D
-#define WGL_DIGITAL_VIDEO_CURSOR_INCLUDED_I3D                         8274
+#define WGL_DIGITAL_VIDEO_CURSOR_INCLUDED_I3D                          8274
 #endif
+
 #ifndef WGL_DIGITAL_VIDEO_GAMMA_CORRECTED_I3D
-#define WGL_DIGITAL_VIDEO_GAMMA_CORRECTED_I3D                         8275
+#define WGL_DIGITAL_VIDEO_GAMMA_CORRECTED_I3D                          8275
 #endif
+
+
 typedef BOOL (csAPIENTRY* csWGLGETDIGITALVIDEOPARAMETERSI3D) (HDC hDC, GLint iAttribute, GLint* piValue);
 typedef BOOL (csAPIENTRY* csWGLSETDIGITALVIDEOPARAMETERSI3D) (HDC hDC, GLint iAttribute, GLint* piValue);
+
 #endif
 
 // WGL_I3D_gamma
 #ifdef _WIN32
 #ifndef WGL_GAMMA_TABLE_SIZE_I3D
-#define WGL_GAMMA_TABLE_SIZE_I3D                                      8270
+#define WGL_GAMMA_TABLE_SIZE_I3D                                       8270
 #endif
+
 #ifndef WGL_GAMMA_EXCLUDE_DESKTOP_I3D
-#define WGL_GAMMA_EXCLUDE_DESKTOP_I3D                                 8271
+#define WGL_GAMMA_EXCLUDE_DESKTOP_I3D                                  8271
 #endif
+
 #ifndef WGL_GAMMA_EXCLUDE_DESKTOP_I3D
-#define WGL_GAMMA_EXCLUDE_DESKTOP_I3D                                 8271
+#define WGL_GAMMA_EXCLUDE_DESKTOP_I3D                                  8271
 #endif
+
+
 typedef BOOL (csAPIENTRY* csWGLGETGAMMATABLEPARAMETERSI3D) (HDC hDC, GLint iAttribute, GLint* piValue);
 typedef BOOL (csAPIENTRY* csWGLSETGAMMATABLEPARAMETERSI3D) (HDC hDC, GLint iAttribute, GLint* piValue);
 typedef BOOL (csAPIENTRY* csWGLGETGAMMATABLEI3D) (HDC hDC, GLint iEntries, GLushort* puRed, GLushort* puGreen, GLushort* puBlue);
 typedef BOOL (csAPIENTRY* csWGLSETGAMMATABLEI3D) (HDC hDC, GLint iEntries, GLushort* puRed, GLushort* puGreen, GLushort* puBlue);
+
 #endif
 
 // WGL_I3D_genlock
 #ifdef _WIN32
 #ifndef WGL_GENLOCK_SOURCE_MULTIVIEW_I3D
-#define WGL_GENLOCK_SOURCE_MULTIVIEW_I3D                              8260
+#define WGL_GENLOCK_SOURCE_MULTIVIEW_I3D                               8260
 #endif
+
 #ifndef WGL_GENLOCK_SOURCE_EXTERNAL_SYNC_I3D
-#define WGL_GENLOCK_SOURCE_EXTERNAL_SYNC_I3D                          8261
+#define WGL_GENLOCK_SOURCE_EXTERNAL_SYNC_I3D                           8261
 #endif
+
 #ifndef WGL_GENLOCK_SOURCE_EXTERNAL_FIELD_I3D
-#define WGL_GENLOCK_SOURCE_EXTERNAL_FIELD_I3D                         8262
+#define WGL_GENLOCK_SOURCE_EXTERNAL_FIELD_I3D                          8262
 #endif
+
 #ifndef WGL_GENLOCK_SOURCE_EXTERNAL_TTL_I3D
-#define WGL_GENLOCK_SOURCE_EXTERNAL_TTL_I3D                           8263
+#define WGL_GENLOCK_SOURCE_EXTERNAL_TTL_I3D                            8263
 #endif
+
 #ifndef WGL_GENLOCK_SOURCE_DIGITAL_SYNC_I3D
-#define WGL_GENLOCK_SOURCE_DIGITAL_SYNC_I3D                           8264
+#define WGL_GENLOCK_SOURCE_DIGITAL_SYNC_I3D                            8264
 #endif
+
 #ifndef WGL_GENLOCK_SOURCE_DIGITAL_FIELD_I3D
-#define WGL_GENLOCK_SOURCE_DIGITAL_FIELD_I3D                          8265
+#define WGL_GENLOCK_SOURCE_DIGITAL_FIELD_I3D                           8265
 #endif
+
 #ifndef WGL_GENLOCK_SOURCE_EDGE_FALLING_I3D
-#define WGL_GENLOCK_SOURCE_EDGE_FALLING_I3D                           8266
+#define WGL_GENLOCK_SOURCE_EDGE_FALLING_I3D                            8266
 #endif
+
 #ifndef WGL_GENLOCK_SOURCE_EDGE_RISING_I3D
-#define WGL_GENLOCK_SOURCE_EDGE_RISING_I3D                            8267
+#define WGL_GENLOCK_SOURCE_EDGE_RISING_I3D                             8267
 #endif
+
 #ifndef WGL_GENLOCK_SOURCE_EDGE_BOTH_I3D
-#define WGL_GENLOCK_SOURCE_EDGE_BOTH_I3D                              8268
+#define WGL_GENLOCK_SOURCE_EDGE_BOTH_I3D                               8268
 #endif
+
+
 typedef BOOL (csAPIENTRY* csWGLENABLEGENLOCKI3D) (HDC hDC);
 typedef BOOL (csAPIENTRY* csWGLDISABLEGENLOCKI3D) (HDC hDC);
 typedef BOOL (csAPIENTRY* csWGLISENABLEDGENLOCKI3D) (HDC hDC, BOOL* pFlag);
@@ -5745,39 +7443,51 @@ typedef BOOL (csAPIENTRY* csWGLGETGENLOCKSAMPLERATEI3D) (HDC hDC, GLuint* uRate)
 typedef BOOL (csAPIENTRY* csWGLGENLOCKSOURCEDELAYI3D) (HDC hDC, GLuint uDelay);
 typedef BOOL (csAPIENTRY* csWGLGETGENLOCKSOURCEDELAYI3D) (HDC hDC, GLuint* uDelay);
 typedef BOOL (csAPIENTRY* csWGLQUERYGENLOCKMAXSOURCEDELAYI3D) (HDC hDC, GLuint* uMaxLineDelay, GLuint* uMaxPixelDelay);
+
 #endif
 
 // GL_ARB_matrix_palette
 #ifndef GL_MATRIX_PALETTE_ARB
 #define GL_MATRIX_PALETTE_ARB                                         34880
 #endif
+
 #ifndef GL_MAX_MATRIX_PALETTE_STACK_DEPTH_ARB
 #define GL_MAX_MATRIX_PALETTE_STACK_DEPTH_ARB                         34881
 #endif
+
 #ifndef GL_MAX_PALETTE_MATRICES_ARB
 #define GL_MAX_PALETTE_MATRICES_ARB                                   34882
 #endif
+
 #ifndef GL_CURRENT_PALETTE_MATRIX_ARB
 #define GL_CURRENT_PALETTE_MATRIX_ARB                                 34883
 #endif
+
 #ifndef GL_MATRIX_INDEX_ARRAY_ARB
 #define GL_MATRIX_INDEX_ARRAY_ARB                                     34884
 #endif
+
 #ifndef GL_CURRENT_MATRIX_INDEX_ARB
 #define GL_CURRENT_MATRIX_INDEX_ARB                                   34885
 #endif
+
 #ifndef GL_MATRIX_INDEX_ARRAY_SIZE_ARB
 #define GL_MATRIX_INDEX_ARRAY_SIZE_ARB                                34886
 #endif
+
 #ifndef GL_MATRIX_INDEX_ARRAY_TYPE_ARB
 #define GL_MATRIX_INDEX_ARRAY_TYPE_ARB                                34887
 #endif
+
 #ifndef GL_MATRIX_INDEX_ARRAY_STRIDE_ARB
 #define GL_MATRIX_INDEX_ARRAY_STRIDE_ARB                              34888
 #endif
+
 #ifndef GL_MATRIX_INDEX_ARRAY_POINTER_ARB
 #define GL_MATRIX_INDEX_ARRAY_POINTER_ARB                             34889
 #endif
+
+
 typedef GLvoid (csAPIENTRY* csGLCURRENTPALETTEMATRIXARB) (GLint index);
 typedef GLvoid (csAPIENTRY* csGLMATRIXINDEXUBVARB) (GLint size, GLubyte* indices);
 typedef GLvoid (csAPIENTRY* csGLMATRIXINDEXUSVARB) (GLint size, GLushort* indices);
@@ -5788,9 +7498,12 @@ typedef GLvoid (csAPIENTRY* csGLMATRIXINDEXPOINTERARB) (GLint size, GLenum type,
 #ifndef GL_ELEMENT_ARRAY_TYPE_NV
 #define GL_ELEMENT_ARRAY_TYPE_NV                                      34665
 #endif
+
 #ifndef GL_ELEMENT_ARRAY_POINTER_NV
 #define GL_ELEMENT_ARRAY_POINTER_NV                                   34666
 #endif
+
+
 typedef GLvoid (csAPIENTRY* csGLELEMENTPOINTERNV) (GLenum type, GLvoid* pointer);
 typedef GLvoid (csAPIENTRY* csGLDRAWELEMENTARRAYNV) (GLenum mode, GLint first, GLsizei count);
 typedef GLvoid (csAPIENTRY* csGLDRAWRANGEELEMENTARRAYNV) (GLenum mode, GLuint start, GLuint end, GLint first, GLsizei count);
@@ -5801,95 +7514,127 @@ typedef GLvoid (csAPIENTRY* csGLMULTIDRAWRANGEELEMENTARRAYNV) (GLenum mode, GLui
 #ifndef GL_FLOAT_R_NV
 #define GL_FLOAT_R_NV                                                 34944
 #endif
+
 #ifndef GL_FLOAT_RG_NV
 #define GL_FLOAT_RG_NV                                                34945
 #endif
+
 #ifndef GL_FLOAT_RGB_NV
 #define GL_FLOAT_RGB_NV                                               34946
 #endif
+
 #ifndef GL_FLOAT_RGBA_NV
 #define GL_FLOAT_RGBA_NV                                              34947
 #endif
+
 #ifndef GL_FLOAT_R16_NV
 #define GL_FLOAT_R16_NV                                               34948
 #endif
+
 #ifndef GL_FLOAT_R32_NV
 #define GL_FLOAT_R32_NV                                               34949
 #endif
+
 #ifndef GL_FLOAT_RG16_NV
 #define GL_FLOAT_RG16_NV                                              34950
 #endif
+
 #ifndef GL_FLOAT_RG32_NV
 #define GL_FLOAT_RG32_NV                                              34951
 #endif
+
 #ifndef GL_FLOAT_RGB16_NV
 #define GL_FLOAT_RGB16_NV                                             34952
 #endif
+
 #ifndef GL_FLOAT_RGB32_NV
 #define GL_FLOAT_RGB32_NV                                             34953
 #endif
+
 #ifndef GL_FLOAT_RGBA16_NV
 #define GL_FLOAT_RGBA16_NV                                            34954
 #endif
+
 #ifndef GL_FLOAT_RGBA32_NV
 #define GL_FLOAT_RGBA32_NV                                            34955
 #endif
+
 #ifndef GL_TEXTURE_FLOAT_COMPONENTS_NV
 #define GL_TEXTURE_FLOAT_COMPONENTS_NV                                34956
 #endif
+
 #ifndef GL_FLOAT_CLEAR_COLOR_VALUE_NV
 #define GL_FLOAT_CLEAR_COLOR_VALUE_NV                                 34957
 #endif
+
 #ifndef GL_FLOAT_RGBA_MODE_NV
 #define GL_FLOAT_RGBA_MODE_NV                                         34958
 #endif
+
 #ifndef WGL_FLOAT_COMPONENTS_NV
-#define WGL_FLOAT_COMPONENTS_NV                                       8368
+#define WGL_FLOAT_COMPONENTS_NV                                        8368
 #endif
+
 #ifndef WGL_BIND_TO_TEXTURE_RECTANGLE_FLOAT_R_NV
-#define WGL_BIND_TO_TEXTURE_RECTANGLE_FLOAT_R_NV                      8369
+#define WGL_BIND_TO_TEXTURE_RECTANGLE_FLOAT_R_NV                       8369
 #endif
+
 #ifndef WGL_BIND_TO_TEXTURE_RECTANGLE_FLOAT_RG_NV
-#define WGL_BIND_TO_TEXTURE_RECTANGLE_FLOAT_RG_NV                     8370
+#define WGL_BIND_TO_TEXTURE_RECTANGLE_FLOAT_RG_NV                      8370
 #endif
+
 #ifndef WGL_BIND_TO_TEXTURE_RECTANGLE_FLOAT_RGB_NV
-#define WGL_BIND_TO_TEXTURE_RECTANGLE_FLOAT_RGB_NV                    8371
+#define WGL_BIND_TO_TEXTURE_RECTANGLE_FLOAT_RGB_NV                     8371
 #endif
+
 #ifndef WGL_BIND_TO_TEXTURE_RECTANGLE_FLOAT_RGBA_NV
-#define WGL_BIND_TO_TEXTURE_RECTANGLE_FLOAT_RGBA_NV                   8372
+#define WGL_BIND_TO_TEXTURE_RECTANGLE_FLOAT_RGBA_NV                    8372
 #endif
+
 #ifndef WGL_TEXTURE_FLOAT_R_NV
-#define WGL_TEXTURE_FLOAT_R_NV                                        8373
+#define WGL_TEXTURE_FLOAT_R_NV                                         8373
 #endif
+
 #ifndef WGL_TEXTURE_FLOAT_RG_NV
-#define WGL_TEXTURE_FLOAT_RG_NV                                       8374
+#define WGL_TEXTURE_FLOAT_RG_NV                                        8374
 #endif
+
 #ifndef WGL_TEXTURE_FLOAT_RGB_NV
-#define WGL_TEXTURE_FLOAT_RGB_NV                                      8375
+#define WGL_TEXTURE_FLOAT_RGB_NV                                       8375
 #endif
+
 #ifndef WGL_TEXTURE_FLOAT_RGBA_NV
-#define WGL_TEXTURE_FLOAT_RGBA_NV                                     8376
+#define WGL_TEXTURE_FLOAT_RGBA_NV                                      8376
 #endif
+
+
 
 // GL_NV_fragment_program
 #ifndef GL_FRAGMENT_PROGRAM_NV
 #define GL_FRAGMENT_PROGRAM_NV                                        34928
 #endif
+
 #ifndef GL_MAX_TEXTURE_COORDS_NV
 #define GL_MAX_TEXTURE_COORDS_NV                                      34929
 #endif
+
 #ifndef GL_MAX_TEXTURE_IMAGE_UNITS_NV
 #define GL_MAX_TEXTURE_IMAGE_UNITS_NV                                 34930
 #endif
+
 #ifndef GL_FRAGMENT_PROGRAM_BINDING_NV
 #define GL_FRAGMENT_PROGRAM_BINDING_NV                                34931
 #endif
+
 #ifndef GL_MAX_FRAGMENT_PROGRAM_LOCAL_PARAMETERS_NV
 #define GL_MAX_FRAGMENT_PROGRAM_LOCAL_PARAMETERS_NV                   34920
 #endif
+
 #ifndef GL_PROGRAM_ERROR_STRING_NV
 #define GL_PROGRAM_ERROR_STRING_NV                                    34932
 #endif
+
+
 typedef GLvoid (csAPIENTRY* csGLPROGRAMNAMEDPARAMETER4FNV) (GLuint id, GLsizei len, GLubyte* name, GLfloat x, GLfloat y, GLfloat z, GLfloat w);
 typedef GLvoid (csAPIENTRY* csGLPROGRAMNAMEDPARAMETER4DNV) (GLuint id, GLsizei len, GLubyte* name, GLdouble x, GLdouble y, GLdouble z, GLdouble w);
 typedef GLvoid (csAPIENTRY* csGLGETPROGRAMNAMEDPARAMETERFVNV) (GLuint id, GLsizei len, GLubyte* name, GLfloat* params);
@@ -5899,21 +7644,27 @@ typedef GLvoid (csAPIENTRY* csGLGETPROGRAMNAMEDPARAMETERDVNV) (GLuint id, GLsize
 #ifndef GL_PRIMITIVE_RESTART_NV
 #define GL_PRIMITIVE_RESTART_NV                                       34136
 #endif
+
 #ifndef GL_PRIMITIVE_RESTART_INDEX_NV
 #define GL_PRIMITIVE_RESTART_INDEX_NV                                 34137
 #endif
+
+
 typedef GLvoid (csAPIENTRY* csGLPRIMITIVERESTARTNV) ();
 typedef GLvoid (csAPIENTRY* csGLPRIMITIVERESTARTINDEXNV) (GLuint index);
 
 // GL_NV_vertex_program2
 
 
+
+
+// end of definitions
+
 #ifdef CS_DEBUG
 #  define REPORT_MISSING_ENTRIES true
 #else
 #  define REPORT_MISSING_ENTRIES false
 #endif
-
 
 struct csGLExtensionManager
 {
@@ -5949,613 +7700,10 @@ public:
       iConfigManager::ConfigPriorityPlugin - 1);
   }
   
-  void Open ()
-  {
-  }
+  void Open () { }
+  void Close () { }
   
-  void Close ()
-  {
-  }
-  
-  bool CS_GL_version_1_2;
-  bool CS_GL_version_1_3;
-  bool CS_GL_ARB_imaging;
-  bool CS_GL_ARB_multitexture;
-  bool CS_GL_ARB_transpose_matrix;
-  bool CS_GL_ARB_multisample;
-  bool CS_GL_ARB_texture_env_add;
-  bool CS_WGL_ARB_extensions_string;
-  bool CS_WGL_ARB_buffer_region;
-  bool CS_GL_ARB_texture_cube_map;
-  bool CS_GL_ARB_depth_texture;
-  bool CS_GL_ARB_point_parameters;
-  bool CS_GL_ARB_shadow;
-  bool CS_GL_ARB_shadow_ambient;
-  bool CS_GL_ARB_texture_border_clamp;
-  bool CS_GL_ARB_texture_compression;
-  bool CS_GL_ARB_texture_env_combine;
-  bool CS_GL_ARB_texture_env_crossbar;
-  bool CS_GL_ARB_texture_env_dot3;
-  bool CS_GL_ARB_texture_mirrored_repeat;
-  bool CS_GL_ARB_vertex_blend;
-  bool CS_GL_ARB_vertex_program;
-  bool CS_GL_ARB_window_pos;
-  bool CS_GL_EXT_422_pixels;
-  bool CS_GL_EXT_abgr;
-  bool CS_GL_EXT_bgra;
-  bool CS_GL_EXT_blend_color;
-  bool CS_GL_EXT_blend_func_separate;
-  bool CS_GL_EXT_blend_logic_op;
-  bool CS_GL_EXT_blend_minmax;
-  bool CS_GL_EXT_blend_subtract;
-  bool CS_GL_EXT_clip_volume_hint;
-  bool CS_GL_EXT_color_subtable;
-  bool CS_GL_EXT_compiled_vertex_array;
-  bool CS_GL_EXT_convolution;
-  bool CS_GL_EXT_fog_coord;
-  bool CS_GL_EXT_histogram;
-  bool CS_GL_EXT_multi_draw_arrays;
-  bool CS_GL_EXT_packed_pixels;
-  bool CS_GL_EXT_paletted_texture;
-  bool CS_GL_EXT_point_parameters;
-  bool CS_GL_EXT_polygon_offset;
-  bool CS_GL_EXT_secondary_color;
-  bool CS_GL_EXT_separate_specular_color;
-  bool CS_GL_EXT_shadow_funcs;
-  bool CS_GL_EXT_shared_texture_palette;
-  bool CS_GL_EXT_stencil_two_side;
-  bool CS_GL_EXT_stencil_wrap;
-  bool CS_GL_EXT_subtexture;
-  bool CS_GL_EXT_texture3D;
-  bool CS_GL_EXT_texture_compression_s3tc;
-  bool CS_GL_EXT_texture_env_add;
-  bool CS_GL_EXT_texture_env_combine;
-  bool CS_GL_EXT_texture_env_dot3;
-  bool CS_GL_EXT_texture_filter_anisotropic;
-  bool CS_GL_EXT_texture_lod_bias;
-  bool CS_GL_EXT_texture_object;
-  bool CS_GL_EXT_vertex_array;
-  bool CS_GL_EXT_vertex_shader;
-  bool CS_GL_EXT_vertex_weighting;
-  bool CS_GL_HP_occlusion_test;
-  bool CS_GL_NV_blend_square;
-  bool CS_GL_NV_copy_depth_to_color;
-  bool CS_GL_NV_depth_clamp;
-  bool CS_GL_NV_evaluators;
-  bool CS_GL_NV_fence;
-  bool CS_GL_NV_fog_distance;
-  bool CS_GL_NV_light_max_exponent;
-  bool CS_GL_NV_multisample_filter_hint;
-  bool CS_GL_NV_occlusion_query;
-  bool CS_GL_NV_packed_depth_stencil;
-  bool CS_GL_NV_point_sprite;
-  bool CS_GL_NV_register_combiners;
-  bool CS_GL_NV_register_combiners2;
-  bool CS_GL_NV_texgen_emboss;
-  bool CS_GL_NV_texgen_reflection;
-  bool CS_GL_NV_texture_compression_vtc;
-  bool CS_GL_NV_texture_env_combine4;
-  bool CS_GL_NV_texture_rectangle;
-  bool CS_GL_NV_texture_shader;
-  bool CS_GL_NV_texture_shader2;
-  bool CS_GL_NV_texture_shader3;
-  bool CS_GL_NV_vertex_array_range;
-  bool CS_GL_NV_vertex_array_range2;
-  bool CS_GL_NV_vertex_program;
-  bool CS_GL_NV_vertex_program1_1;
-  bool CS_GL_ATI_element_array;
-  bool CS_GL_ATI_envmap_bumpmap;
-  bool CS_GL_ATI_fragment_shader;
-  bool CS_GL_ATI_pn_triangles;
-  bool CS_GL_ATI_texture_mirror_once;
-  bool CS_GL_ATI_vertex_array_object;
-  bool CS_GL_ATI_vertex_attrib_array_object;
-  bool CS_GL_ATI_vertex_streams;
-  bool CS_WGL_I3D_image_buffer;
-  bool CS_WGL_I3D_swap_frame_lock;
-  bool CS_WGL_I3D_swap_frame_usage;
-  bool CS_GL_3DFX_texture_compression_FXT1;
-  bool CS_GL_IBM_cull_vertex;
-  bool CS_GL_IBM_multimode_draw_arrays;
-  bool CS_GL_IBM_raster_pos_clip;
-  bool CS_GL_IBM_texture_mirrored_repeat;
-  bool CS_GL_IBM_vertex_array_lists;
-  bool CS_GL_MESA_resize_buffers;
-  bool CS_GL_MESA_window_pos;
-  bool CS_GL_OML_interlace;
-  bool CS_GL_OML_resample;
-  bool CS_GL_OML_subsample;
-  bool CS_GL_SGIS_generate_mipmap;
-  bool CS_GL_SGIS_multisample;
-  bool CS_GL_SGIS_pixel_texture;
-  bool CS_GL_SGIS_texture_border_clamp;
-  bool CS_GL_SGIS_texture_color_mask;
-  bool CS_GL_SGIS_texture_edge_clamp;
-  bool CS_GL_SGIS_texture_lod;
-  bool CS_GL_SGIS_depth_texture;
-  bool CS_GL_SGIX_fog_offset;
-  bool CS_GL_SGIX_interlace;
-  bool CS_GL_SGIX_shadow_ambient;
-  bool CS_GL_SGI_color_matrix;
-  bool CS_GL_SGI_color_table;
-  bool CS_GL_SGI_texture_color_table;
-  bool CS_GL_SUN_vertex;
-  bool CS_GL_ARB_fragment_program;
-  bool CS_GL_ATI_text_fragment_shader;
-  bool CS_GL_APPLE_client_storage;
-  bool CS_GL_APPLE_element_array;
-  bool CS_GL_APPLE_fence;
-  bool CS_GL_APPLE_vertex_array_object;
-  bool CS_GL_APPLE_vertex_array_range;
-  bool CS_WGL_ARB_pixel_format;
-  bool CS_WGL_ARB_make_current_read;
-  bool CS_WGL_ARB_pbuffer;
-  bool CS_WGL_EXT_swap_control;
-  bool CS_WGL_ARB_render_texture;
-  bool CS_WGL_EXT_extensions_string;
-  bool CS_WGL_EXT_make_current_read;
-  bool CS_WGL_EXT_pbuffer;
-  bool CS_WGL_EXT_pixel_format;
-  bool CS_WGL_I3D_digital_video_control;
-  bool CS_WGL_I3D_gamma;
-  bool CS_WGL_I3D_genlock;
-  bool CS_GL_ARB_matrix_palette;
-  bool CS_GL_NV_element_array;
-  bool CS_GL_NV_float_buffer;
-  bool CS_GL_NV_fragment_program;
-  bool CS_GL_NV_primitive_restart;
-  bool CS_GL_NV_vertex_program2;
-
-private:
-  bool tested_CS_GL_version_1_2;
-  bool tested_CS_GL_version_1_3;
-  bool tested_CS_GL_ARB_imaging;
-  bool tested_CS_GL_ARB_multitexture;
-  bool tested_CS_GL_ARB_transpose_matrix;
-  bool tested_CS_GL_ARB_multisample;
-  bool tested_CS_GL_ARB_texture_env_add;
-  bool tested_CS_WGL_ARB_extensions_string;
-  bool tested_CS_WGL_ARB_buffer_region;
-  bool tested_CS_GL_ARB_texture_cube_map;
-  bool tested_CS_GL_ARB_depth_texture;
-  bool tested_CS_GL_ARB_point_parameters;
-  bool tested_CS_GL_ARB_shadow;
-  bool tested_CS_GL_ARB_shadow_ambient;
-  bool tested_CS_GL_ARB_texture_border_clamp;
-  bool tested_CS_GL_ARB_texture_compression;
-  bool tested_CS_GL_ARB_texture_env_combine;
-  bool tested_CS_GL_ARB_texture_env_crossbar;
-  bool tested_CS_GL_ARB_texture_env_dot3;
-  bool tested_CS_GL_ARB_texture_mirrored_repeat;
-  bool tested_CS_GL_ARB_vertex_blend;
-  bool tested_CS_GL_ARB_vertex_program;
-  bool tested_CS_GL_ARB_window_pos;
-  bool tested_CS_GL_EXT_422_pixels;
-  bool tested_CS_GL_EXT_abgr;
-  bool tested_CS_GL_EXT_bgra;
-  bool tested_CS_GL_EXT_blend_color;
-  bool tested_CS_GL_EXT_blend_func_separate;
-  bool tested_CS_GL_EXT_blend_logic_op;
-  bool tested_CS_GL_EXT_blend_minmax;
-  bool tested_CS_GL_EXT_blend_subtract;
-  bool tested_CS_GL_EXT_clip_volume_hint;
-  bool tested_CS_GL_EXT_color_subtable;
-  bool tested_CS_GL_EXT_compiled_vertex_array;
-  bool tested_CS_GL_EXT_convolution;
-  bool tested_CS_GL_EXT_fog_coord;
-  bool tested_CS_GL_EXT_histogram;
-  bool tested_CS_GL_EXT_multi_draw_arrays;
-  bool tested_CS_GL_EXT_packed_pixels;
-  bool tested_CS_GL_EXT_paletted_texture;
-  bool tested_CS_GL_EXT_point_parameters;
-  bool tested_CS_GL_EXT_polygon_offset;
-  bool tested_CS_GL_EXT_secondary_color;
-  bool tested_CS_GL_EXT_separate_specular_color;
-  bool tested_CS_GL_EXT_shadow_funcs;
-  bool tested_CS_GL_EXT_shared_texture_palette;
-  bool tested_CS_GL_EXT_stencil_two_side;
-  bool tested_CS_GL_EXT_stencil_wrap;
-  bool tested_CS_GL_EXT_subtexture;
-  bool tested_CS_GL_EXT_texture3D;
-  bool tested_CS_GL_EXT_texture_compression_s3tc;
-  bool tested_CS_GL_EXT_texture_env_add;
-  bool tested_CS_GL_EXT_texture_env_combine;
-  bool tested_CS_GL_EXT_texture_env_dot3;
-  bool tested_CS_GL_EXT_texture_filter_anisotropic;
-  bool tested_CS_GL_EXT_texture_lod_bias;
-  bool tested_CS_GL_EXT_texture_object;
-  bool tested_CS_GL_EXT_vertex_array;
-  bool tested_CS_GL_EXT_vertex_shader;
-  bool tested_CS_GL_EXT_vertex_weighting;
-  bool tested_CS_GL_HP_occlusion_test;
-  bool tested_CS_GL_NV_blend_square;
-  bool tested_CS_GL_NV_copy_depth_to_color;
-  bool tested_CS_GL_NV_depth_clamp;
-  bool tested_CS_GL_NV_evaluators;
-  bool tested_CS_GL_NV_fence;
-  bool tested_CS_GL_NV_fog_distance;
-  bool tested_CS_GL_NV_light_max_exponent;
-  bool tested_CS_GL_NV_multisample_filter_hint;
-  bool tested_CS_GL_NV_occlusion_query;
-  bool tested_CS_GL_NV_packed_depth_stencil;
-  bool tested_CS_GL_NV_point_sprite;
-  bool tested_CS_GL_NV_register_combiners;
-  bool tested_CS_GL_NV_register_combiners2;
-  bool tested_CS_GL_NV_texgen_emboss;
-  bool tested_CS_GL_NV_texgen_reflection;
-  bool tested_CS_GL_NV_texture_compression_vtc;
-  bool tested_CS_GL_NV_texture_env_combine4;
-  bool tested_CS_GL_NV_texture_rectangle;
-  bool tested_CS_GL_NV_texture_shader;
-  bool tested_CS_GL_NV_texture_shader2;
-  bool tested_CS_GL_NV_texture_shader3;
-  bool tested_CS_GL_NV_vertex_array_range;
-  bool tested_CS_GL_NV_vertex_array_range2;
-  bool tested_CS_GL_NV_vertex_program;
-  bool tested_CS_GL_NV_vertex_program1_1;
-  bool tested_CS_GL_ATI_element_array;
-  bool tested_CS_GL_ATI_envmap_bumpmap;
-  bool tested_CS_GL_ATI_fragment_shader;
-  bool tested_CS_GL_ATI_pn_triangles;
-  bool tested_CS_GL_ATI_texture_mirror_once;
-  bool tested_CS_GL_ATI_vertex_array_object;
-  bool tested_CS_GL_ATI_vertex_attrib_array_object;
-  bool tested_CS_GL_ATI_vertex_streams;
-  bool tested_CS_WGL_I3D_image_buffer;
-  bool tested_CS_WGL_I3D_swap_frame_lock;
-  bool tested_CS_WGL_I3D_swap_frame_usage;
-  bool tested_CS_GL_3DFX_texture_compression_FXT1;
-  bool tested_CS_GL_IBM_cull_vertex;
-  bool tested_CS_GL_IBM_multimode_draw_arrays;
-  bool tested_CS_GL_IBM_raster_pos_clip;
-  bool tested_CS_GL_IBM_texture_mirrored_repeat;
-  bool tested_CS_GL_IBM_vertex_array_lists;
-  bool tested_CS_GL_MESA_resize_buffers;
-  bool tested_CS_GL_MESA_window_pos;
-  bool tested_CS_GL_OML_interlace;
-  bool tested_CS_GL_OML_resample;
-  bool tested_CS_GL_OML_subsample;
-  bool tested_CS_GL_SGIS_generate_mipmap;
-  bool tested_CS_GL_SGIS_multisample;
-  bool tested_CS_GL_SGIS_pixel_texture;
-  bool tested_CS_GL_SGIS_texture_border_clamp;
-  bool tested_CS_GL_SGIS_texture_color_mask;
-  bool tested_CS_GL_SGIS_texture_edge_clamp;
-  bool tested_CS_GL_SGIS_texture_lod;
-  bool tested_CS_GL_SGIS_depth_texture;
-  bool tested_CS_GL_SGIX_fog_offset;
-  bool tested_CS_GL_SGIX_interlace;
-  bool tested_CS_GL_SGIX_shadow_ambient;
-  bool tested_CS_GL_SGI_color_matrix;
-  bool tested_CS_GL_SGI_color_table;
-  bool tested_CS_GL_SGI_texture_color_table;
-  bool tested_CS_GL_SUN_vertex;
-  bool tested_CS_GL_ARB_fragment_program;
-  bool tested_CS_GL_ATI_text_fragment_shader;
-  bool tested_CS_GL_APPLE_client_storage;
-  bool tested_CS_GL_APPLE_element_array;
-  bool tested_CS_GL_APPLE_fence;
-  bool tested_CS_GL_APPLE_vertex_array_object;
-  bool tested_CS_GL_APPLE_vertex_array_range;
-  bool tested_CS_WGL_ARB_pixel_format;
-  bool tested_CS_WGL_ARB_make_current_read;
-  bool tested_CS_WGL_ARB_pbuffer;
-  bool tested_CS_WGL_EXT_swap_control;
-  bool tested_CS_WGL_ARB_render_texture;
-  bool tested_CS_WGL_EXT_extensions_string;
-  bool tested_CS_WGL_EXT_make_current_read;
-  bool tested_CS_WGL_EXT_pbuffer;
-  bool tested_CS_WGL_EXT_pixel_format;
-  bool tested_CS_WGL_I3D_digital_video_control;
-  bool tested_CS_WGL_I3D_gamma;
-  bool tested_CS_WGL_I3D_genlock;
-  bool tested_CS_GL_ARB_matrix_palette;
-  bool tested_CS_GL_NV_element_array;
-  bool tested_CS_GL_NV_float_buffer;
-  bool tested_CS_GL_NV_fragment_program;
-  bool tested_CS_GL_NV_primitive_restart;
-  bool tested_CS_GL_NV_vertex_program2;
-public:
-  csGLExtensionManager (): object_reg(NULL)
-  {
-    CS_GL_version_1_2 = false;
-    tested_CS_GL_version_1_2 = false;
-    CS_GL_version_1_3 = false;
-    tested_CS_GL_version_1_3 = false;
-    CS_GL_ARB_imaging = false;
-    tested_CS_GL_ARB_imaging = false;
-    CS_GL_ARB_multitexture = false;
-    tested_CS_GL_ARB_multitexture = false;
-    CS_GL_ARB_transpose_matrix = false;
-    tested_CS_GL_ARB_transpose_matrix = false;
-    CS_GL_ARB_multisample = false;
-    tested_CS_GL_ARB_multisample = false;
-    CS_GL_ARB_texture_env_add = false;
-    tested_CS_GL_ARB_texture_env_add = false;
-    CS_WGL_ARB_extensions_string = false;
-    tested_CS_WGL_ARB_extensions_string = false;
-    CS_WGL_ARB_buffer_region = false;
-    tested_CS_WGL_ARB_buffer_region = false;
-    CS_GL_ARB_texture_cube_map = false;
-    tested_CS_GL_ARB_texture_cube_map = false;
-    CS_GL_ARB_depth_texture = false;
-    tested_CS_GL_ARB_depth_texture = false;
-    CS_GL_ARB_point_parameters = false;
-    tested_CS_GL_ARB_point_parameters = false;
-    CS_GL_ARB_shadow = false;
-    tested_CS_GL_ARB_shadow = false;
-    CS_GL_ARB_shadow_ambient = false;
-    tested_CS_GL_ARB_shadow_ambient = false;
-    CS_GL_ARB_texture_border_clamp = false;
-    tested_CS_GL_ARB_texture_border_clamp = false;
-    CS_GL_ARB_texture_compression = false;
-    tested_CS_GL_ARB_texture_compression = false;
-    CS_GL_ARB_texture_env_combine = false;
-    tested_CS_GL_ARB_texture_env_combine = false;
-    CS_GL_ARB_texture_env_crossbar = false;
-    tested_CS_GL_ARB_texture_env_crossbar = false;
-    CS_GL_ARB_texture_env_dot3 = false;
-    tested_CS_GL_ARB_texture_env_dot3 = false;
-    CS_GL_ARB_texture_mirrored_repeat = false;
-    tested_CS_GL_ARB_texture_mirrored_repeat = false;
-    CS_GL_ARB_vertex_blend = false;
-    tested_CS_GL_ARB_vertex_blend = false;
-    CS_GL_ARB_vertex_program = false;
-    tested_CS_GL_ARB_vertex_program = false;
-    CS_GL_ARB_window_pos = false;
-    tested_CS_GL_ARB_window_pos = false;
-    CS_GL_EXT_422_pixels = false;
-    tested_CS_GL_EXT_422_pixels = false;
-    CS_GL_EXT_abgr = false;
-    tested_CS_GL_EXT_abgr = false;
-    CS_GL_EXT_bgra = false;
-    tested_CS_GL_EXT_bgra = false;
-    CS_GL_EXT_blend_color = false;
-    tested_CS_GL_EXT_blend_color = false;
-    CS_GL_EXT_blend_func_separate = false;
-    tested_CS_GL_EXT_blend_func_separate = false;
-    CS_GL_EXT_blend_logic_op = false;
-    tested_CS_GL_EXT_blend_logic_op = false;
-    CS_GL_EXT_blend_minmax = false;
-    tested_CS_GL_EXT_blend_minmax = false;
-    CS_GL_EXT_blend_subtract = false;
-    tested_CS_GL_EXT_blend_subtract = false;
-    CS_GL_EXT_clip_volume_hint = false;
-    tested_CS_GL_EXT_clip_volume_hint = false;
-    CS_GL_EXT_color_subtable = false;
-    tested_CS_GL_EXT_color_subtable = false;
-    CS_GL_EXT_compiled_vertex_array = false;
-    tested_CS_GL_EXT_compiled_vertex_array = false;
-    CS_GL_EXT_convolution = false;
-    tested_CS_GL_EXT_convolution = false;
-    CS_GL_EXT_fog_coord = false;
-    tested_CS_GL_EXT_fog_coord = false;
-    CS_GL_EXT_histogram = false;
-    tested_CS_GL_EXT_histogram = false;
-    CS_GL_EXT_multi_draw_arrays = false;
-    tested_CS_GL_EXT_multi_draw_arrays = false;
-    CS_GL_EXT_packed_pixels = false;
-    tested_CS_GL_EXT_packed_pixels = false;
-    CS_GL_EXT_paletted_texture = false;
-    tested_CS_GL_EXT_paletted_texture = false;
-    CS_GL_EXT_point_parameters = false;
-    tested_CS_GL_EXT_point_parameters = false;
-    CS_GL_EXT_polygon_offset = false;
-    tested_CS_GL_EXT_polygon_offset = false;
-    CS_GL_EXT_secondary_color = false;
-    tested_CS_GL_EXT_secondary_color = false;
-    CS_GL_EXT_separate_specular_color = false;
-    tested_CS_GL_EXT_separate_specular_color = false;
-    CS_GL_EXT_shadow_funcs = false;
-    tested_CS_GL_EXT_shadow_funcs = false;
-    CS_GL_EXT_shared_texture_palette = false;
-    tested_CS_GL_EXT_shared_texture_palette = false;
-    CS_GL_EXT_stencil_two_side = false;
-    tested_CS_GL_EXT_stencil_two_side = false;
-    CS_GL_EXT_stencil_wrap = false;
-    tested_CS_GL_EXT_stencil_wrap = false;
-    CS_GL_EXT_subtexture = false;
-    tested_CS_GL_EXT_subtexture = false;
-    CS_GL_EXT_texture3D = false;
-    tested_CS_GL_EXT_texture3D = false;
-    CS_GL_EXT_texture_compression_s3tc = false;
-    tested_CS_GL_EXT_texture_compression_s3tc = false;
-    CS_GL_EXT_texture_env_add = false;
-    tested_CS_GL_EXT_texture_env_add = false;
-    CS_GL_EXT_texture_env_combine = false;
-    tested_CS_GL_EXT_texture_env_combine = false;
-    CS_GL_EXT_texture_env_dot3 = false;
-    tested_CS_GL_EXT_texture_env_dot3 = false;
-    CS_GL_EXT_texture_filter_anisotropic = false;
-    tested_CS_GL_EXT_texture_filter_anisotropic = false;
-    CS_GL_EXT_texture_lod_bias = false;
-    tested_CS_GL_EXT_texture_lod_bias = false;
-    CS_GL_EXT_texture_object = false;
-    tested_CS_GL_EXT_texture_object = false;
-    CS_GL_EXT_vertex_array = false;
-    tested_CS_GL_EXT_vertex_array = false;
-    CS_GL_EXT_vertex_shader = false;
-    tested_CS_GL_EXT_vertex_shader = false;
-    CS_GL_EXT_vertex_weighting = false;
-    tested_CS_GL_EXT_vertex_weighting = false;
-    CS_GL_HP_occlusion_test = false;
-    tested_CS_GL_HP_occlusion_test = false;
-    CS_GL_NV_blend_square = false;
-    tested_CS_GL_NV_blend_square = false;
-    CS_GL_NV_copy_depth_to_color = false;
-    tested_CS_GL_NV_copy_depth_to_color = false;
-    CS_GL_NV_depth_clamp = false;
-    tested_CS_GL_NV_depth_clamp = false;
-    CS_GL_NV_evaluators = false;
-    tested_CS_GL_NV_evaluators = false;
-    CS_GL_NV_fence = false;
-    tested_CS_GL_NV_fence = false;
-    CS_GL_NV_fog_distance = false;
-    tested_CS_GL_NV_fog_distance = false;
-    CS_GL_NV_light_max_exponent = false;
-    tested_CS_GL_NV_light_max_exponent = false;
-    CS_GL_NV_multisample_filter_hint = false;
-    tested_CS_GL_NV_multisample_filter_hint = false;
-    CS_GL_NV_occlusion_query = false;
-    tested_CS_GL_NV_occlusion_query = false;
-    CS_GL_NV_packed_depth_stencil = false;
-    tested_CS_GL_NV_packed_depth_stencil = false;
-    CS_GL_NV_point_sprite = false;
-    tested_CS_GL_NV_point_sprite = false;
-    CS_GL_NV_register_combiners = false;
-    tested_CS_GL_NV_register_combiners = false;
-    CS_GL_NV_register_combiners2 = false;
-    tested_CS_GL_NV_register_combiners2 = false;
-    CS_GL_NV_texgen_emboss = false;
-    tested_CS_GL_NV_texgen_emboss = false;
-    CS_GL_NV_texgen_reflection = false;
-    tested_CS_GL_NV_texgen_reflection = false;
-    CS_GL_NV_texture_compression_vtc = false;
-    tested_CS_GL_NV_texture_compression_vtc = false;
-    CS_GL_NV_texture_env_combine4 = false;
-    tested_CS_GL_NV_texture_env_combine4 = false;
-    CS_GL_NV_texture_rectangle = false;
-    tested_CS_GL_NV_texture_rectangle = false;
-    CS_GL_NV_texture_shader = false;
-    tested_CS_GL_NV_texture_shader = false;
-    CS_GL_NV_texture_shader2 = false;
-    tested_CS_GL_NV_texture_shader2 = false;
-    CS_GL_NV_texture_shader3 = false;
-    tested_CS_GL_NV_texture_shader3 = false;
-    CS_GL_NV_vertex_array_range = false;
-    tested_CS_GL_NV_vertex_array_range = false;
-    CS_GL_NV_vertex_array_range2 = false;
-    tested_CS_GL_NV_vertex_array_range2 = false;
-    CS_GL_NV_vertex_program = false;
-    tested_CS_GL_NV_vertex_program = false;
-    CS_GL_NV_vertex_program1_1 = false;
-    tested_CS_GL_NV_vertex_program1_1 = false;
-    CS_GL_ATI_element_array = false;
-    tested_CS_GL_ATI_element_array = false;
-    CS_GL_ATI_envmap_bumpmap = false;
-    tested_CS_GL_ATI_envmap_bumpmap = false;
-    CS_GL_ATI_fragment_shader = false;
-    tested_CS_GL_ATI_fragment_shader = false;
-    CS_GL_ATI_pn_triangles = false;
-    tested_CS_GL_ATI_pn_triangles = false;
-    CS_GL_ATI_texture_mirror_once = false;
-    tested_CS_GL_ATI_texture_mirror_once = false;
-    CS_GL_ATI_vertex_array_object = false;
-    tested_CS_GL_ATI_vertex_array_object = false;
-    CS_GL_ATI_vertex_attrib_array_object = false;
-    tested_CS_GL_ATI_vertex_attrib_array_object = false;
-    CS_GL_ATI_vertex_streams = false;
-    tested_CS_GL_ATI_vertex_streams = false;
-    CS_WGL_I3D_image_buffer = false;
-    tested_CS_WGL_I3D_image_buffer = false;
-    CS_WGL_I3D_swap_frame_lock = false;
-    tested_CS_WGL_I3D_swap_frame_lock = false;
-    CS_WGL_I3D_swap_frame_usage = false;
-    tested_CS_WGL_I3D_swap_frame_usage = false;
-    CS_GL_3DFX_texture_compression_FXT1 = false;
-    tested_CS_GL_3DFX_texture_compression_FXT1 = false;
-    CS_GL_IBM_cull_vertex = false;
-    tested_CS_GL_IBM_cull_vertex = false;
-    CS_GL_IBM_multimode_draw_arrays = false;
-    tested_CS_GL_IBM_multimode_draw_arrays = false;
-    CS_GL_IBM_raster_pos_clip = false;
-    tested_CS_GL_IBM_raster_pos_clip = false;
-    CS_GL_IBM_texture_mirrored_repeat = false;
-    tested_CS_GL_IBM_texture_mirrored_repeat = false;
-    CS_GL_IBM_vertex_array_lists = false;
-    tested_CS_GL_IBM_vertex_array_lists = false;
-    CS_GL_MESA_resize_buffers = false;
-    tested_CS_GL_MESA_resize_buffers = false;
-    CS_GL_MESA_window_pos = false;
-    tested_CS_GL_MESA_window_pos = false;
-    CS_GL_OML_interlace = false;
-    tested_CS_GL_OML_interlace = false;
-    CS_GL_OML_resample = false;
-    tested_CS_GL_OML_resample = false;
-    CS_GL_OML_subsample = false;
-    tested_CS_GL_OML_subsample = false;
-    CS_GL_SGIS_generate_mipmap = false;
-    tested_CS_GL_SGIS_generate_mipmap = false;
-    CS_GL_SGIS_multisample = false;
-    tested_CS_GL_SGIS_multisample = false;
-    CS_GL_SGIS_pixel_texture = false;
-    tested_CS_GL_SGIS_pixel_texture = false;
-    CS_GL_SGIS_texture_border_clamp = false;
-    tested_CS_GL_SGIS_texture_border_clamp = false;
-    CS_GL_SGIS_texture_color_mask = false;
-    tested_CS_GL_SGIS_texture_color_mask = false;
-    CS_GL_SGIS_texture_edge_clamp = false;
-    tested_CS_GL_SGIS_texture_edge_clamp = false;
-    CS_GL_SGIS_texture_lod = false;
-    tested_CS_GL_SGIS_texture_lod = false;
-    CS_GL_SGIS_depth_texture = false;
-    tested_CS_GL_SGIS_depth_texture = false;
-    CS_GL_SGIX_fog_offset = false;
-    tested_CS_GL_SGIX_fog_offset = false;
-    CS_GL_SGIX_interlace = false;
-    tested_CS_GL_SGIX_interlace = false;
-    CS_GL_SGIX_shadow_ambient = false;
-    tested_CS_GL_SGIX_shadow_ambient = false;
-    CS_GL_SGI_color_matrix = false;
-    tested_CS_GL_SGI_color_matrix = false;
-    CS_GL_SGI_color_table = false;
-    tested_CS_GL_SGI_color_table = false;
-    CS_GL_SGI_texture_color_table = false;
-    tested_CS_GL_SGI_texture_color_table = false;
-    CS_GL_SUN_vertex = false;
-    tested_CS_GL_SUN_vertex = false;
-    CS_GL_ARB_fragment_program = false;
-    tested_CS_GL_ARB_fragment_program = false;
-    CS_GL_ATI_text_fragment_shader = false;
-    tested_CS_GL_ATI_text_fragment_shader = false;
-    CS_GL_APPLE_client_storage = false;
-    tested_CS_GL_APPLE_client_storage = false;
-    CS_GL_APPLE_element_array = false;
-    tested_CS_GL_APPLE_element_array = false;
-    CS_GL_APPLE_fence = false;
-    tested_CS_GL_APPLE_fence = false;
-    CS_GL_APPLE_vertex_array_object = false;
-    tested_CS_GL_APPLE_vertex_array_object = false;
-    CS_GL_APPLE_vertex_array_range = false;
-    tested_CS_GL_APPLE_vertex_array_range = false;
-    CS_WGL_ARB_pixel_format = false;
-    tested_CS_WGL_ARB_pixel_format = false;
-    CS_WGL_ARB_make_current_read = false;
-    tested_CS_WGL_ARB_make_current_read = false;
-    CS_WGL_ARB_pbuffer = false;
-    tested_CS_WGL_ARB_pbuffer = false;
-    CS_WGL_EXT_swap_control = false;
-    tested_CS_WGL_EXT_swap_control = false;
-    CS_WGL_ARB_render_texture = false;
-    tested_CS_WGL_ARB_render_texture = false;
-    CS_WGL_EXT_extensions_string = false;
-    tested_CS_WGL_EXT_extensions_string = false;
-    CS_WGL_EXT_make_current_read = false;
-    tested_CS_WGL_EXT_make_current_read = false;
-    CS_WGL_EXT_pbuffer = false;
-    tested_CS_WGL_EXT_pbuffer = false;
-    CS_WGL_EXT_pixel_format = false;
-    tested_CS_WGL_EXT_pixel_format = false;
-    CS_WGL_I3D_digital_video_control = false;
-    tested_CS_WGL_I3D_digital_video_control = false;
-    CS_WGL_I3D_gamma = false;
-    tested_CS_WGL_I3D_gamma = false;
-    CS_WGL_I3D_genlock = false;
-    tested_CS_WGL_I3D_genlock = false;
-    CS_GL_ARB_matrix_palette = false;
-    tested_CS_GL_ARB_matrix_palette = false;
-    CS_GL_NV_element_array = false;
-    tested_CS_GL_NV_element_array = false;
-    CS_GL_NV_float_buffer = false;
-    tested_CS_GL_NV_float_buffer = false;
-    CS_GL_NV_fragment_program = false;
-    tested_CS_GL_NV_fragment_program = false;
-    CS_GL_NV_primitive_restart = false;
-    tested_CS_GL_NV_primitive_restart = false;
-    CS_GL_NV_vertex_program2 = false;
-    tested_CS_GL_NV_vertex_program2 = false;
-  }
-  // GL_version_1_2
+    // GL_version_1_2
   #ifndef GLDRAWRANGEELEMENTS_DECL
   #define GLDRAWRANGEELEMENTS_DECL
   csGLDRAWRANGEELEMENTS glDrawRangeElements;
@@ -7191,7 +8339,8 @@ public:
   csWGLGETEXTENSIONSSTRINGARB wglGetExtensionsStringARB;
   #endif
 
-#endif
+
+#endif // _WIN32
 
   // WGL_ARB_buffer_region
 #ifdef _WIN32
@@ -7215,7 +8364,8 @@ public:
   csWGLRESTOREBUFFERREGIONARB wglRestoreBufferRegionARB;
   #endif
 
-#endif
+
+#endif // _WIN32
 
   // GL_ARB_texture_cube_map
 
@@ -9474,7 +10624,8 @@ public:
   csWGLRELEASEIMAGEBUFFEREVENTSI3D wglReleaseImageBufferEventsI3D;
   #endif
 
-#endif
+
+#endif // _WIN32
 
   // WGL_I3D_swap_frame_lock
 #ifdef _WIN32
@@ -9498,7 +10649,8 @@ public:
   csWGLQUERYFRAMELOCKMASTERI3D wglQueryFrameLockMasterI3D;
   #endif
 
-#endif
+
+#endif // _WIN32
 
   // WGL_I3D_swap_frame_usage
 #ifdef _WIN32
@@ -9522,7 +10674,8 @@ public:
   csWGLQUERYFRAMETRACKINGI3D wglQueryFrameTrackingI3D;
   #endif
 
-#endif
+
+#endif // _WIN32
 
   // GL_3DFX_texture_compression_FXT1
 
@@ -10147,7 +11300,8 @@ public:
   csWGLCHOOSEPIXELFORMATARB wglChoosePixelFormatARB;
   #endif
 
-#endif
+
+#endif // _WIN32
 
   // WGL_ARB_make_current_read
 #ifdef _WIN32
@@ -10161,7 +11315,8 @@ public:
   csWGLGETCURRENTREADDCARB wglGetCurrentReadDCARB;
   #endif
 
-#endif
+
+#endif // _WIN32
 
   // WGL_ARB_pbuffer
 #ifdef _WIN32
@@ -10190,7 +11345,8 @@ public:
   csWGLQUERYPBUFFERARB wglQueryPbufferARB;
   #endif
 
-#endif
+
+#endif // _WIN32
 
   // WGL_EXT_swap_control
 #ifdef _WIN32
@@ -10204,7 +11360,8 @@ public:
   csWGLGETSWAPINTERVALEXT wglGetSwapIntervalEXT;
   #endif
 
-#endif
+
+#endif // _WIN32
 
   // WGL_ARB_render_texture
 #ifdef _WIN32
@@ -10223,7 +11380,8 @@ public:
   csWGLSETPBUFFERATTRIBARB wglSetPbufferAttribARB;
   #endif
 
-#endif
+
+#endif // _WIN32
 
   // WGL_EXT_extensions_string
 #ifdef _WIN32
@@ -10232,7 +11390,8 @@ public:
   csWGLGETEXTENSIONSSTRINGEXT wglGetExtensionsStringEXT;
   #endif
 
-#endif
+
+#endif // _WIN32
 
   // WGL_EXT_make_current_read
 #ifdef _WIN32
@@ -10246,7 +11405,8 @@ public:
   csWGLGETCURRENTREADDCEXT wglGetCurrentReadDCEXT;
   #endif
 
-#endif
+
+#endif // _WIN32
 
   // WGL_EXT_pbuffer
 #ifdef _WIN32
@@ -10275,7 +11435,8 @@ public:
   csWGLQUERYPBUFFEREXT wglQueryPbufferEXT;
   #endif
 
-#endif
+
+#endif // _WIN32
 
   // WGL_EXT_pixel_format
 #ifdef _WIN32
@@ -10294,7 +11455,8 @@ public:
   csWGLCHOOSEPIXELFORMATEXT wglChoosePixelFormatEXT;
   #endif
 
-#endif
+
+#endif // _WIN32
 
   // WGL_I3D_digital_video_control
 #ifdef _WIN32
@@ -10308,7 +11470,8 @@ public:
   csWGLSETDIGITALVIDEOPARAMETERSI3D wglSetDigitalVideoParametersI3D;
   #endif
 
-#endif
+
+#endif // _WIN32
 
   // WGL_I3D_gamma
 #ifdef _WIN32
@@ -10332,7 +11495,8 @@ public:
   csWGLSETGAMMATABLEI3D wglSetGammaTableI3D;
   #endif
 
-#endif
+
+#endif // _WIN32
 
   // WGL_I3D_genlock
 #ifdef _WIN32
@@ -10396,7 +11560,8 @@ public:
   csWGLQUERYGENLOCKMAXSOURCEDELAYI3D wglQueryGenlockMaxSourceDelayI3D;
   #endif
 
-#endif
+
+#endif // _WIN32
 
   // GL_ARB_matrix_palette
   #ifndef GLCURRENTPALETTEMATRIXARB_DECL
@@ -10490,36 +11655,655 @@ public:
 
   // GL_NV_vertex_program2
 
-  void InitGL_version_1_2 ()
+
+
+  // end of functions
+  
+  bool CS_GL_version_1_2;
+  bool CS_GL_version_1_3;
+  bool CS_GL_ARB_imaging;
+  bool CS_GL_ARB_multitexture;
+  bool CS_GL_ARB_transpose_matrix;
+  bool CS_GL_ARB_multisample;
+  bool CS_GL_ARB_texture_env_add;
+  bool CS_WGL_ARB_extensions_string;
+  bool CS_WGL_ARB_buffer_region;
+  bool CS_GL_ARB_texture_cube_map;
+  bool CS_GL_ARB_depth_texture;
+  bool CS_GL_ARB_point_parameters;
+  bool CS_GL_ARB_shadow;
+  bool CS_GL_ARB_shadow_ambient;
+  bool CS_GL_ARB_texture_border_clamp;
+  bool CS_GL_ARB_texture_compression;
+  bool CS_GL_ARB_texture_env_combine;
+  bool CS_GL_ARB_texture_env_crossbar;
+  bool CS_GL_ARB_texture_env_dot3;
+  bool CS_GL_ARB_texture_mirrored_repeat;
+  bool CS_GL_ARB_vertex_blend;
+  bool CS_GL_ARB_vertex_program;
+  bool CS_GL_ARB_window_pos;
+  bool CS_GL_EXT_422_pixels;
+  bool CS_GL_EXT_abgr;
+  bool CS_GL_EXT_bgra;
+  bool CS_GL_EXT_blend_color;
+  bool CS_GL_EXT_blend_func_separate;
+  bool CS_GL_EXT_blend_logic_op;
+  bool CS_GL_EXT_blend_minmax;
+  bool CS_GL_EXT_blend_subtract;
+  bool CS_GL_EXT_clip_volume_hint;
+  bool CS_GL_EXT_color_subtable;
+  bool CS_GL_EXT_compiled_vertex_array;
+  bool CS_GL_EXT_convolution;
+  bool CS_GL_EXT_fog_coord;
+  bool CS_GL_EXT_histogram;
+  bool CS_GL_EXT_multi_draw_arrays;
+  bool CS_GL_EXT_packed_pixels;
+  bool CS_GL_EXT_paletted_texture;
+  bool CS_GL_EXT_point_parameters;
+  bool CS_GL_EXT_polygon_offset;
+  bool CS_GL_EXT_secondary_color;
+  bool CS_GL_EXT_separate_specular_color;
+  bool CS_GL_EXT_shadow_funcs;
+  bool CS_GL_EXT_shared_texture_palette;
+  bool CS_GL_EXT_stencil_two_side;
+  bool CS_GL_EXT_stencil_wrap;
+  bool CS_GL_EXT_subtexture;
+  bool CS_GL_EXT_texture3D;
+  bool CS_GL_EXT_texture_compression_s3tc;
+  bool CS_GL_EXT_texture_env_add;
+  bool CS_GL_EXT_texture_env_combine;
+  bool CS_GL_EXT_texture_env_dot3;
+  bool CS_GL_EXT_texture_filter_anisotropic;
+  bool CS_GL_EXT_texture_lod_bias;
+  bool CS_GL_EXT_texture_object;
+  bool CS_GL_EXT_vertex_array;
+  bool CS_GL_EXT_vertex_shader;
+  bool CS_GL_EXT_vertex_weighting;
+  bool CS_GL_HP_occlusion_test;
+  bool CS_GL_NV_blend_square;
+  bool CS_GL_NV_copy_depth_to_color;
+  bool CS_GL_NV_depth_clamp;
+  bool CS_GL_NV_evaluators;
+  bool CS_GL_NV_fence;
+  bool CS_GL_NV_fog_distance;
+  bool CS_GL_NV_light_max_exponent;
+  bool CS_GL_NV_multisample_filter_hint;
+  bool CS_GL_NV_occlusion_query;
+  bool CS_GL_NV_packed_depth_stencil;
+  bool CS_GL_NV_point_sprite;
+  bool CS_GL_NV_register_combiners;
+  bool CS_GL_NV_register_combiners2;
+  bool CS_GL_NV_texgen_emboss;
+  bool CS_GL_NV_texgen_reflection;
+  bool CS_GL_NV_texture_compression_vtc;
+  bool CS_GL_NV_texture_env_combine4;
+  bool CS_GL_NV_texture_rectangle;
+  bool CS_GL_NV_texture_shader;
+  bool CS_GL_NV_texture_shader2;
+  bool CS_GL_NV_texture_shader3;
+  bool CS_GL_NV_vertex_array_range;
+  bool CS_GL_NV_vertex_array_range2;
+  bool CS_GL_NV_vertex_program;
+  bool CS_GL_NV_vertex_program1_1;
+  bool CS_GL_ATI_element_array;
+  bool CS_GL_ATI_envmap_bumpmap;
+  bool CS_GL_ATI_fragment_shader;
+  bool CS_GL_ATI_pn_triangles;
+  bool CS_GL_ATI_texture_mirror_once;
+  bool CS_GL_ATI_vertex_array_object;
+  bool CS_GL_ATI_vertex_attrib_array_object;
+  bool CS_GL_ATI_vertex_streams;
+  bool CS_WGL_I3D_image_buffer;
+  bool CS_WGL_I3D_swap_frame_lock;
+  bool CS_WGL_I3D_swap_frame_usage;
+  bool CS_GL_3DFX_texture_compression_FXT1;
+  bool CS_GL_IBM_cull_vertex;
+  bool CS_GL_IBM_multimode_draw_arrays;
+  bool CS_GL_IBM_raster_pos_clip;
+  bool CS_GL_IBM_texture_mirrored_repeat;
+  bool CS_GL_IBM_vertex_array_lists;
+  bool CS_GL_MESA_resize_buffers;
+  bool CS_GL_MESA_window_pos;
+  bool CS_GL_OML_interlace;
+  bool CS_GL_OML_resample;
+  bool CS_GL_OML_subsample;
+  bool CS_GL_SGIS_generate_mipmap;
+  bool CS_GL_SGIS_multisample;
+  bool CS_GL_SGIS_pixel_texture;
+  bool CS_GL_SGIS_texture_border_clamp;
+  bool CS_GL_SGIS_texture_color_mask;
+  bool CS_GL_SGIS_texture_edge_clamp;
+  bool CS_GL_SGIS_texture_lod;
+  bool CS_GL_SGIS_depth_texture;
+  bool CS_GL_SGIX_fog_offset;
+  bool CS_GL_SGIX_interlace;
+  bool CS_GL_SGIX_shadow_ambient;
+  bool CS_GL_SGI_color_matrix;
+  bool CS_GL_SGI_color_table;
+  bool CS_GL_SGI_texture_color_table;
+  bool CS_GL_SUN_vertex;
+  bool CS_GL_ARB_fragment_program;
+  bool CS_GL_ATI_text_fragment_shader;
+  bool CS_GL_APPLE_client_storage;
+  bool CS_GL_APPLE_element_array;
+  bool CS_GL_APPLE_fence;
+  bool CS_GL_APPLE_vertex_array_object;
+  bool CS_GL_APPLE_vertex_array_range;
+  bool CS_WGL_ARB_pixel_format;
+  bool CS_WGL_ARB_make_current_read;
+  bool CS_WGL_ARB_pbuffer;
+  bool CS_WGL_EXT_swap_control;
+  bool CS_WGL_ARB_render_texture;
+  bool CS_WGL_EXT_extensions_string;
+  bool CS_WGL_EXT_make_current_read;
+  bool CS_WGL_EXT_pbuffer;
+  bool CS_WGL_EXT_pixel_format;
+  bool CS_WGL_I3D_digital_video_control;
+  bool CS_WGL_I3D_gamma;
+  bool CS_WGL_I3D_genlock;
+  bool CS_GL_ARB_matrix_palette;
+  bool CS_GL_NV_element_array;
+  bool CS_GL_NV_float_buffer;
+  bool CS_GL_NV_fragment_program;
+  bool CS_GL_NV_primitive_restart;
+  bool CS_GL_NV_vertex_program2;
+
+private:
+  bool tested_CS_GL_version_1_2;
+  bool tested_CS_GL_version_1_3;
+  bool tested_CS_GL_ARB_imaging;
+  bool tested_CS_GL_ARB_multitexture;
+  bool tested_CS_GL_ARB_transpose_matrix;
+  bool tested_CS_GL_ARB_multisample;
+  bool tested_CS_GL_ARB_texture_env_add;
+  bool tested_CS_WGL_ARB_extensions_string;
+  bool tested_CS_WGL_ARB_buffer_region;
+  bool tested_CS_GL_ARB_texture_cube_map;
+  bool tested_CS_GL_ARB_depth_texture;
+  bool tested_CS_GL_ARB_point_parameters;
+  bool tested_CS_GL_ARB_shadow;
+  bool tested_CS_GL_ARB_shadow_ambient;
+  bool tested_CS_GL_ARB_texture_border_clamp;
+  bool tested_CS_GL_ARB_texture_compression;
+  bool tested_CS_GL_ARB_texture_env_combine;
+  bool tested_CS_GL_ARB_texture_env_crossbar;
+  bool tested_CS_GL_ARB_texture_env_dot3;
+  bool tested_CS_GL_ARB_texture_mirrored_repeat;
+  bool tested_CS_GL_ARB_vertex_blend;
+  bool tested_CS_GL_ARB_vertex_program;
+  bool tested_CS_GL_ARB_window_pos;
+  bool tested_CS_GL_EXT_422_pixels;
+  bool tested_CS_GL_EXT_abgr;
+  bool tested_CS_GL_EXT_bgra;
+  bool tested_CS_GL_EXT_blend_color;
+  bool tested_CS_GL_EXT_blend_func_separate;
+  bool tested_CS_GL_EXT_blend_logic_op;
+  bool tested_CS_GL_EXT_blend_minmax;
+  bool tested_CS_GL_EXT_blend_subtract;
+  bool tested_CS_GL_EXT_clip_volume_hint;
+  bool tested_CS_GL_EXT_color_subtable;
+  bool tested_CS_GL_EXT_compiled_vertex_array;
+  bool tested_CS_GL_EXT_convolution;
+  bool tested_CS_GL_EXT_fog_coord;
+  bool tested_CS_GL_EXT_histogram;
+  bool tested_CS_GL_EXT_multi_draw_arrays;
+  bool tested_CS_GL_EXT_packed_pixels;
+  bool tested_CS_GL_EXT_paletted_texture;
+  bool tested_CS_GL_EXT_point_parameters;
+  bool tested_CS_GL_EXT_polygon_offset;
+  bool tested_CS_GL_EXT_secondary_color;
+  bool tested_CS_GL_EXT_separate_specular_color;
+  bool tested_CS_GL_EXT_shadow_funcs;
+  bool tested_CS_GL_EXT_shared_texture_palette;
+  bool tested_CS_GL_EXT_stencil_two_side;
+  bool tested_CS_GL_EXT_stencil_wrap;
+  bool tested_CS_GL_EXT_subtexture;
+  bool tested_CS_GL_EXT_texture3D;
+  bool tested_CS_GL_EXT_texture_compression_s3tc;
+  bool tested_CS_GL_EXT_texture_env_add;
+  bool tested_CS_GL_EXT_texture_env_combine;
+  bool tested_CS_GL_EXT_texture_env_dot3;
+  bool tested_CS_GL_EXT_texture_filter_anisotropic;
+  bool tested_CS_GL_EXT_texture_lod_bias;
+  bool tested_CS_GL_EXT_texture_object;
+  bool tested_CS_GL_EXT_vertex_array;
+  bool tested_CS_GL_EXT_vertex_shader;
+  bool tested_CS_GL_EXT_vertex_weighting;
+  bool tested_CS_GL_HP_occlusion_test;
+  bool tested_CS_GL_NV_blend_square;
+  bool tested_CS_GL_NV_copy_depth_to_color;
+  bool tested_CS_GL_NV_depth_clamp;
+  bool tested_CS_GL_NV_evaluators;
+  bool tested_CS_GL_NV_fence;
+  bool tested_CS_GL_NV_fog_distance;
+  bool tested_CS_GL_NV_light_max_exponent;
+  bool tested_CS_GL_NV_multisample_filter_hint;
+  bool tested_CS_GL_NV_occlusion_query;
+  bool tested_CS_GL_NV_packed_depth_stencil;
+  bool tested_CS_GL_NV_point_sprite;
+  bool tested_CS_GL_NV_register_combiners;
+  bool tested_CS_GL_NV_register_combiners2;
+  bool tested_CS_GL_NV_texgen_emboss;
+  bool tested_CS_GL_NV_texgen_reflection;
+  bool tested_CS_GL_NV_texture_compression_vtc;
+  bool tested_CS_GL_NV_texture_env_combine4;
+  bool tested_CS_GL_NV_texture_rectangle;
+  bool tested_CS_GL_NV_texture_shader;
+  bool tested_CS_GL_NV_texture_shader2;
+  bool tested_CS_GL_NV_texture_shader3;
+  bool tested_CS_GL_NV_vertex_array_range;
+  bool tested_CS_GL_NV_vertex_array_range2;
+  bool tested_CS_GL_NV_vertex_program;
+  bool tested_CS_GL_NV_vertex_program1_1;
+  bool tested_CS_GL_ATI_element_array;
+  bool tested_CS_GL_ATI_envmap_bumpmap;
+  bool tested_CS_GL_ATI_fragment_shader;
+  bool tested_CS_GL_ATI_pn_triangles;
+  bool tested_CS_GL_ATI_texture_mirror_once;
+  bool tested_CS_GL_ATI_vertex_array_object;
+  bool tested_CS_GL_ATI_vertex_attrib_array_object;
+  bool tested_CS_GL_ATI_vertex_streams;
+  bool tested_CS_WGL_I3D_image_buffer;
+  bool tested_CS_WGL_I3D_swap_frame_lock;
+  bool tested_CS_WGL_I3D_swap_frame_usage;
+  bool tested_CS_GL_3DFX_texture_compression_FXT1;
+  bool tested_CS_GL_IBM_cull_vertex;
+  bool tested_CS_GL_IBM_multimode_draw_arrays;
+  bool tested_CS_GL_IBM_raster_pos_clip;
+  bool tested_CS_GL_IBM_texture_mirrored_repeat;
+  bool tested_CS_GL_IBM_vertex_array_lists;
+  bool tested_CS_GL_MESA_resize_buffers;
+  bool tested_CS_GL_MESA_window_pos;
+  bool tested_CS_GL_OML_interlace;
+  bool tested_CS_GL_OML_resample;
+  bool tested_CS_GL_OML_subsample;
+  bool tested_CS_GL_SGIS_generate_mipmap;
+  bool tested_CS_GL_SGIS_multisample;
+  bool tested_CS_GL_SGIS_pixel_texture;
+  bool tested_CS_GL_SGIS_texture_border_clamp;
+  bool tested_CS_GL_SGIS_texture_color_mask;
+  bool tested_CS_GL_SGIS_texture_edge_clamp;
+  bool tested_CS_GL_SGIS_texture_lod;
+  bool tested_CS_GL_SGIS_depth_texture;
+  bool tested_CS_GL_SGIX_fog_offset;
+  bool tested_CS_GL_SGIX_interlace;
+  bool tested_CS_GL_SGIX_shadow_ambient;
+  bool tested_CS_GL_SGI_color_matrix;
+  bool tested_CS_GL_SGI_color_table;
+  bool tested_CS_GL_SGI_texture_color_table;
+  bool tested_CS_GL_SUN_vertex;
+  bool tested_CS_GL_ARB_fragment_program;
+  bool tested_CS_GL_ATI_text_fragment_shader;
+  bool tested_CS_GL_APPLE_client_storage;
+  bool tested_CS_GL_APPLE_element_array;
+  bool tested_CS_GL_APPLE_fence;
+  bool tested_CS_GL_APPLE_vertex_array_object;
+  bool tested_CS_GL_APPLE_vertex_array_range;
+  bool tested_CS_WGL_ARB_pixel_format;
+  bool tested_CS_WGL_ARB_make_current_read;
+  bool tested_CS_WGL_ARB_pbuffer;
+  bool tested_CS_WGL_EXT_swap_control;
+  bool tested_CS_WGL_ARB_render_texture;
+  bool tested_CS_WGL_EXT_extensions_string;
+  bool tested_CS_WGL_EXT_make_current_read;
+  bool tested_CS_WGL_EXT_pbuffer;
+  bool tested_CS_WGL_EXT_pixel_format;
+  bool tested_CS_WGL_I3D_digital_video_control;
+  bool tested_CS_WGL_I3D_gamma;
+  bool tested_CS_WGL_I3D_genlock;
+  bool tested_CS_GL_ARB_matrix_palette;
+  bool tested_CS_GL_NV_element_array;
+  bool tested_CS_GL_NV_float_buffer;
+  bool tested_CS_GL_NV_fragment_program;
+  bool tested_CS_GL_NV_primitive_restart;
+  bool tested_CS_GL_NV_vertex_program2;
+
+public:
+  csGLExtensionManager (): object_reg(NULL)
+  {
+        CS_GL_version_1_2 = false;
+    tested_CS_GL_version_1_2 = false;
+    CS_GL_version_1_3 = false;
+    tested_CS_GL_version_1_3 = false;
+    CS_GL_ARB_imaging = false;
+    tested_CS_GL_ARB_imaging = false;
+    CS_GL_ARB_multitexture = false;
+    tested_CS_GL_ARB_multitexture = false;
+    CS_GL_ARB_transpose_matrix = false;
+    tested_CS_GL_ARB_transpose_matrix = false;
+    CS_GL_ARB_multisample = false;
+    tested_CS_GL_ARB_multisample = false;
+    CS_GL_ARB_texture_env_add = false;
+    tested_CS_GL_ARB_texture_env_add = false;
+    CS_WGL_ARB_extensions_string = false;
+    tested_CS_WGL_ARB_extensions_string = false;
+    CS_WGL_ARB_buffer_region = false;
+    tested_CS_WGL_ARB_buffer_region = false;
+    CS_GL_ARB_texture_cube_map = false;
+    tested_CS_GL_ARB_texture_cube_map = false;
+    CS_GL_ARB_depth_texture = false;
+    tested_CS_GL_ARB_depth_texture = false;
+    CS_GL_ARB_point_parameters = false;
+    tested_CS_GL_ARB_point_parameters = false;
+    CS_GL_ARB_shadow = false;
+    tested_CS_GL_ARB_shadow = false;
+    CS_GL_ARB_shadow_ambient = false;
+    tested_CS_GL_ARB_shadow_ambient = false;
+    CS_GL_ARB_texture_border_clamp = false;
+    tested_CS_GL_ARB_texture_border_clamp = false;
+    CS_GL_ARB_texture_compression = false;
+    tested_CS_GL_ARB_texture_compression = false;
+    CS_GL_ARB_texture_env_combine = false;
+    tested_CS_GL_ARB_texture_env_combine = false;
+    CS_GL_ARB_texture_env_crossbar = false;
+    tested_CS_GL_ARB_texture_env_crossbar = false;
+    CS_GL_ARB_texture_env_dot3 = false;
+    tested_CS_GL_ARB_texture_env_dot3 = false;
+    CS_GL_ARB_texture_mirrored_repeat = false;
+    tested_CS_GL_ARB_texture_mirrored_repeat = false;
+    CS_GL_ARB_vertex_blend = false;
+    tested_CS_GL_ARB_vertex_blend = false;
+    CS_GL_ARB_vertex_program = false;
+    tested_CS_GL_ARB_vertex_program = false;
+    CS_GL_ARB_window_pos = false;
+    tested_CS_GL_ARB_window_pos = false;
+    CS_GL_EXT_422_pixels = false;
+    tested_CS_GL_EXT_422_pixels = false;
+    CS_GL_EXT_abgr = false;
+    tested_CS_GL_EXT_abgr = false;
+    CS_GL_EXT_bgra = false;
+    tested_CS_GL_EXT_bgra = false;
+    CS_GL_EXT_blend_color = false;
+    tested_CS_GL_EXT_blend_color = false;
+    CS_GL_EXT_blend_func_separate = false;
+    tested_CS_GL_EXT_blend_func_separate = false;
+    CS_GL_EXT_blend_logic_op = false;
+    tested_CS_GL_EXT_blend_logic_op = false;
+    CS_GL_EXT_blend_minmax = false;
+    tested_CS_GL_EXT_blend_minmax = false;
+    CS_GL_EXT_blend_subtract = false;
+    tested_CS_GL_EXT_blend_subtract = false;
+    CS_GL_EXT_clip_volume_hint = false;
+    tested_CS_GL_EXT_clip_volume_hint = false;
+    CS_GL_EXT_color_subtable = false;
+    tested_CS_GL_EXT_color_subtable = false;
+    CS_GL_EXT_compiled_vertex_array = false;
+    tested_CS_GL_EXT_compiled_vertex_array = false;
+    CS_GL_EXT_convolution = false;
+    tested_CS_GL_EXT_convolution = false;
+    CS_GL_EXT_fog_coord = false;
+    tested_CS_GL_EXT_fog_coord = false;
+    CS_GL_EXT_histogram = false;
+    tested_CS_GL_EXT_histogram = false;
+    CS_GL_EXT_multi_draw_arrays = false;
+    tested_CS_GL_EXT_multi_draw_arrays = false;
+    CS_GL_EXT_packed_pixels = false;
+    tested_CS_GL_EXT_packed_pixels = false;
+    CS_GL_EXT_paletted_texture = false;
+    tested_CS_GL_EXT_paletted_texture = false;
+    CS_GL_EXT_point_parameters = false;
+    tested_CS_GL_EXT_point_parameters = false;
+    CS_GL_EXT_polygon_offset = false;
+    tested_CS_GL_EXT_polygon_offset = false;
+    CS_GL_EXT_secondary_color = false;
+    tested_CS_GL_EXT_secondary_color = false;
+    CS_GL_EXT_separate_specular_color = false;
+    tested_CS_GL_EXT_separate_specular_color = false;
+    CS_GL_EXT_shadow_funcs = false;
+    tested_CS_GL_EXT_shadow_funcs = false;
+    CS_GL_EXT_shared_texture_palette = false;
+    tested_CS_GL_EXT_shared_texture_palette = false;
+    CS_GL_EXT_stencil_two_side = false;
+    tested_CS_GL_EXT_stencil_two_side = false;
+    CS_GL_EXT_stencil_wrap = false;
+    tested_CS_GL_EXT_stencil_wrap = false;
+    CS_GL_EXT_subtexture = false;
+    tested_CS_GL_EXT_subtexture = false;
+    CS_GL_EXT_texture3D = false;
+    tested_CS_GL_EXT_texture3D = false;
+    CS_GL_EXT_texture_compression_s3tc = false;
+    tested_CS_GL_EXT_texture_compression_s3tc = false;
+    CS_GL_EXT_texture_env_add = false;
+    tested_CS_GL_EXT_texture_env_add = false;
+    CS_GL_EXT_texture_env_combine = false;
+    tested_CS_GL_EXT_texture_env_combine = false;
+    CS_GL_EXT_texture_env_dot3 = false;
+    tested_CS_GL_EXT_texture_env_dot3 = false;
+    CS_GL_EXT_texture_filter_anisotropic = false;
+    tested_CS_GL_EXT_texture_filter_anisotropic = false;
+    CS_GL_EXT_texture_lod_bias = false;
+    tested_CS_GL_EXT_texture_lod_bias = false;
+    CS_GL_EXT_texture_object = false;
+    tested_CS_GL_EXT_texture_object = false;
+    CS_GL_EXT_vertex_array = false;
+    tested_CS_GL_EXT_vertex_array = false;
+    CS_GL_EXT_vertex_shader = false;
+    tested_CS_GL_EXT_vertex_shader = false;
+    CS_GL_EXT_vertex_weighting = false;
+    tested_CS_GL_EXT_vertex_weighting = false;
+    CS_GL_HP_occlusion_test = false;
+    tested_CS_GL_HP_occlusion_test = false;
+    CS_GL_NV_blend_square = false;
+    tested_CS_GL_NV_blend_square = false;
+    CS_GL_NV_copy_depth_to_color = false;
+    tested_CS_GL_NV_copy_depth_to_color = false;
+    CS_GL_NV_depth_clamp = false;
+    tested_CS_GL_NV_depth_clamp = false;
+    CS_GL_NV_evaluators = false;
+    tested_CS_GL_NV_evaluators = false;
+    CS_GL_NV_fence = false;
+    tested_CS_GL_NV_fence = false;
+    CS_GL_NV_fog_distance = false;
+    tested_CS_GL_NV_fog_distance = false;
+    CS_GL_NV_light_max_exponent = false;
+    tested_CS_GL_NV_light_max_exponent = false;
+    CS_GL_NV_multisample_filter_hint = false;
+    tested_CS_GL_NV_multisample_filter_hint = false;
+    CS_GL_NV_occlusion_query = false;
+    tested_CS_GL_NV_occlusion_query = false;
+    CS_GL_NV_packed_depth_stencil = false;
+    tested_CS_GL_NV_packed_depth_stencil = false;
+    CS_GL_NV_point_sprite = false;
+    tested_CS_GL_NV_point_sprite = false;
+    CS_GL_NV_register_combiners = false;
+    tested_CS_GL_NV_register_combiners = false;
+    CS_GL_NV_register_combiners2 = false;
+    tested_CS_GL_NV_register_combiners2 = false;
+    CS_GL_NV_texgen_emboss = false;
+    tested_CS_GL_NV_texgen_emboss = false;
+    CS_GL_NV_texgen_reflection = false;
+    tested_CS_GL_NV_texgen_reflection = false;
+    CS_GL_NV_texture_compression_vtc = false;
+    tested_CS_GL_NV_texture_compression_vtc = false;
+    CS_GL_NV_texture_env_combine4 = false;
+    tested_CS_GL_NV_texture_env_combine4 = false;
+    CS_GL_NV_texture_rectangle = false;
+    tested_CS_GL_NV_texture_rectangle = false;
+    CS_GL_NV_texture_shader = false;
+    tested_CS_GL_NV_texture_shader = false;
+    CS_GL_NV_texture_shader2 = false;
+    tested_CS_GL_NV_texture_shader2 = false;
+    CS_GL_NV_texture_shader3 = false;
+    tested_CS_GL_NV_texture_shader3 = false;
+    CS_GL_NV_vertex_array_range = false;
+    tested_CS_GL_NV_vertex_array_range = false;
+    CS_GL_NV_vertex_array_range2 = false;
+    tested_CS_GL_NV_vertex_array_range2 = false;
+    CS_GL_NV_vertex_program = false;
+    tested_CS_GL_NV_vertex_program = false;
+    CS_GL_NV_vertex_program1_1 = false;
+    tested_CS_GL_NV_vertex_program1_1 = false;
+    CS_GL_ATI_element_array = false;
+    tested_CS_GL_ATI_element_array = false;
+    CS_GL_ATI_envmap_bumpmap = false;
+    tested_CS_GL_ATI_envmap_bumpmap = false;
+    CS_GL_ATI_fragment_shader = false;
+    tested_CS_GL_ATI_fragment_shader = false;
+    CS_GL_ATI_pn_triangles = false;
+    tested_CS_GL_ATI_pn_triangles = false;
+    CS_GL_ATI_texture_mirror_once = false;
+    tested_CS_GL_ATI_texture_mirror_once = false;
+    CS_GL_ATI_vertex_array_object = false;
+    tested_CS_GL_ATI_vertex_array_object = false;
+    CS_GL_ATI_vertex_attrib_array_object = false;
+    tested_CS_GL_ATI_vertex_attrib_array_object = false;
+    CS_GL_ATI_vertex_streams = false;
+    tested_CS_GL_ATI_vertex_streams = false;
+    CS_WGL_I3D_image_buffer = false;
+    tested_CS_WGL_I3D_image_buffer = false;
+    CS_WGL_I3D_swap_frame_lock = false;
+    tested_CS_WGL_I3D_swap_frame_lock = false;
+    CS_WGL_I3D_swap_frame_usage = false;
+    tested_CS_WGL_I3D_swap_frame_usage = false;
+    CS_GL_3DFX_texture_compression_FXT1 = false;
+    tested_CS_GL_3DFX_texture_compression_FXT1 = false;
+    CS_GL_IBM_cull_vertex = false;
+    tested_CS_GL_IBM_cull_vertex = false;
+    CS_GL_IBM_multimode_draw_arrays = false;
+    tested_CS_GL_IBM_multimode_draw_arrays = false;
+    CS_GL_IBM_raster_pos_clip = false;
+    tested_CS_GL_IBM_raster_pos_clip = false;
+    CS_GL_IBM_texture_mirrored_repeat = false;
+    tested_CS_GL_IBM_texture_mirrored_repeat = false;
+    CS_GL_IBM_vertex_array_lists = false;
+    tested_CS_GL_IBM_vertex_array_lists = false;
+    CS_GL_MESA_resize_buffers = false;
+    tested_CS_GL_MESA_resize_buffers = false;
+    CS_GL_MESA_window_pos = false;
+    tested_CS_GL_MESA_window_pos = false;
+    CS_GL_OML_interlace = false;
+    tested_CS_GL_OML_interlace = false;
+    CS_GL_OML_resample = false;
+    tested_CS_GL_OML_resample = false;
+    CS_GL_OML_subsample = false;
+    tested_CS_GL_OML_subsample = false;
+    CS_GL_SGIS_generate_mipmap = false;
+    tested_CS_GL_SGIS_generate_mipmap = false;
+    CS_GL_SGIS_multisample = false;
+    tested_CS_GL_SGIS_multisample = false;
+    CS_GL_SGIS_pixel_texture = false;
+    tested_CS_GL_SGIS_pixel_texture = false;
+    CS_GL_SGIS_texture_border_clamp = false;
+    tested_CS_GL_SGIS_texture_border_clamp = false;
+    CS_GL_SGIS_texture_color_mask = false;
+    tested_CS_GL_SGIS_texture_color_mask = false;
+    CS_GL_SGIS_texture_edge_clamp = false;
+    tested_CS_GL_SGIS_texture_edge_clamp = false;
+    CS_GL_SGIS_texture_lod = false;
+    tested_CS_GL_SGIS_texture_lod = false;
+    CS_GL_SGIS_depth_texture = false;
+    tested_CS_GL_SGIS_depth_texture = false;
+    CS_GL_SGIX_fog_offset = false;
+    tested_CS_GL_SGIX_fog_offset = false;
+    CS_GL_SGIX_interlace = false;
+    tested_CS_GL_SGIX_interlace = false;
+    CS_GL_SGIX_shadow_ambient = false;
+    tested_CS_GL_SGIX_shadow_ambient = false;
+    CS_GL_SGI_color_matrix = false;
+    tested_CS_GL_SGI_color_matrix = false;
+    CS_GL_SGI_color_table = false;
+    tested_CS_GL_SGI_color_table = false;
+    CS_GL_SGI_texture_color_table = false;
+    tested_CS_GL_SGI_texture_color_table = false;
+    CS_GL_SUN_vertex = false;
+    tested_CS_GL_SUN_vertex = false;
+    CS_GL_ARB_fragment_program = false;
+    tested_CS_GL_ARB_fragment_program = false;
+    CS_GL_ATI_text_fragment_shader = false;
+    tested_CS_GL_ATI_text_fragment_shader = false;
+    CS_GL_APPLE_client_storage = false;
+    tested_CS_GL_APPLE_client_storage = false;
+    CS_GL_APPLE_element_array = false;
+    tested_CS_GL_APPLE_element_array = false;
+    CS_GL_APPLE_fence = false;
+    tested_CS_GL_APPLE_fence = false;
+    CS_GL_APPLE_vertex_array_object = false;
+    tested_CS_GL_APPLE_vertex_array_object = false;
+    CS_GL_APPLE_vertex_array_range = false;
+    tested_CS_GL_APPLE_vertex_array_range = false;
+    CS_WGL_ARB_pixel_format = false;
+    tested_CS_WGL_ARB_pixel_format = false;
+    CS_WGL_ARB_make_current_read = false;
+    tested_CS_WGL_ARB_make_current_read = false;
+    CS_WGL_ARB_pbuffer = false;
+    tested_CS_WGL_ARB_pbuffer = false;
+    CS_WGL_EXT_swap_control = false;
+    tested_CS_WGL_EXT_swap_control = false;
+    CS_WGL_ARB_render_texture = false;
+    tested_CS_WGL_ARB_render_texture = false;
+    CS_WGL_EXT_extensions_string = false;
+    tested_CS_WGL_EXT_extensions_string = false;
+    CS_WGL_EXT_make_current_read = false;
+    tested_CS_WGL_EXT_make_current_read = false;
+    CS_WGL_EXT_pbuffer = false;
+    tested_CS_WGL_EXT_pbuffer = false;
+    CS_WGL_EXT_pixel_format = false;
+    tested_CS_WGL_EXT_pixel_format = false;
+    CS_WGL_I3D_digital_video_control = false;
+    tested_CS_WGL_I3D_digital_video_control = false;
+    CS_WGL_I3D_gamma = false;
+    tested_CS_WGL_I3D_gamma = false;
+    CS_WGL_I3D_genlock = false;
+    tested_CS_WGL_I3D_genlock = false;
+    CS_GL_ARB_matrix_palette = false;
+    tested_CS_GL_ARB_matrix_palette = false;
+    CS_GL_NV_element_array = false;
+    tested_CS_GL_NV_element_array = false;
+    CS_GL_NV_float_buffer = false;
+    tested_CS_GL_NV_float_buffer = false;
+    CS_GL_NV_fragment_program = false;
+    tested_CS_GL_NV_fragment_program = false;
+    CS_GL_NV_primitive_restart = false;
+    tested_CS_GL_NV_primitive_restart = false;
+    CS_GL_NV_vertex_program2 = false;
+    tested_CS_GL_NV_vertex_program2 = false;
+
+  }
+  
+    void InitGL_version_1_2 ()
   {
     if (tested_CS_GL_version_1_2) return;
     tested_CS_GL_version_1_2 = true;
     const char* ext = "GL_version_1_2";
-    char cfgkey[41];
+    char cfgkey[26 + 14 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
-
+    
     CS_GL_version_1_2 = true;
 
     bool allclear, funcTest;
-    if (gl && CS_GL_version_1_2)
+    (void)funcTest; // shut up "variable unused" warnings
+    if (CS_GL_version_1_2)
     {
       allclear = true;
       funcTest = ((glDrawRangeElements = (csGLDRAWRANGEELEMENTS) gl->GetProcAddress ("glDrawRangeElements")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glDrawRangeElements");
+      }
       allclear &= funcTest;
       funcTest = ((glTexImage3D = (csGLTEXIMAGE3D) gl->GetProcAddress ("glTexImage3D")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glTexImage3D");
+      }
       allclear &= funcTest;
       funcTest = ((glTexSubImage3D = (csGLTEXSUBIMAGE3D) gl->GetProcAddress ("glTexSubImage3D")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glTexSubImage3D");
+      }
       allclear &= funcTest;
       funcTest = ((glCopyTexSubImage3D = (csGLCOPYTEXSUBIMAGE3D) gl->GetProcAddress ("glCopyTexSubImage3D")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glCopyTexSubImage3D");
+      }
       allclear &= funcTest;
+
       if (CS_GL_version_1_2 = allclear)
       {
         CS_GL_version_1_2 &= config->GetBool (cfgkey, true);
@@ -10542,205 +12326,345 @@ public:
       Report ("GL Extension '%s' not found.", ext);
     }
   }
-
+  
   void InitGL_version_1_3 ()
   {
     if (tested_CS_GL_version_1_3) return;
     tested_CS_GL_version_1_3 = true;
     const char* ext = "GL_version_1_3";
-    char cfgkey[41];
+    char cfgkey[26 + 14 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
-
+    
     CS_GL_version_1_3 = true;
 
     bool allclear, funcTest;
-    if (gl && CS_GL_version_1_3)
+    (void)funcTest; // shut up "variable unused" warnings
+    if (CS_GL_version_1_3)
     {
       allclear = true;
       funcTest = ((glActiveTexture = (csGLACTIVETEXTURE) gl->GetProcAddress ("glActiveTexture")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glActiveTexture");
+      }
       allclear &= funcTest;
       funcTest = ((glClientActiveTexture = (csGLCLIENTACTIVETEXTURE) gl->GetProcAddress ("glClientActiveTexture")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glClientActiveTexture");
+      }
       allclear &= funcTest;
       funcTest = ((glMultiTexCoord1d = (csGLMULTITEXCOORD1D) gl->GetProcAddress ("glMultiTexCoord1d")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glMultiTexCoord1d");
+      }
       allclear &= funcTest;
       funcTest = ((glMultiTexCoord1dv = (csGLMULTITEXCOORD1DV) gl->GetProcAddress ("glMultiTexCoord1dv")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glMultiTexCoord1dv");
+      }
       allclear &= funcTest;
       funcTest = ((glMultiTexCoord1f = (csGLMULTITEXCOORD1F) gl->GetProcAddress ("glMultiTexCoord1f")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glMultiTexCoord1f");
+      }
       allclear &= funcTest;
       funcTest = ((glMultiTexCoord1fv = (csGLMULTITEXCOORD1FV) gl->GetProcAddress ("glMultiTexCoord1fv")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glMultiTexCoord1fv");
+      }
       allclear &= funcTest;
       funcTest = ((glMultiTexCoord1i = (csGLMULTITEXCOORD1I) gl->GetProcAddress ("glMultiTexCoord1i")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glMultiTexCoord1i");
+      }
       allclear &= funcTest;
       funcTest = ((glMultiTexCoord1iv = (csGLMULTITEXCOORD1IV) gl->GetProcAddress ("glMultiTexCoord1iv")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glMultiTexCoord1iv");
+      }
       allclear &= funcTest;
       funcTest = ((glMultiTexCoord1s = (csGLMULTITEXCOORD1S) gl->GetProcAddress ("glMultiTexCoord1s")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glMultiTexCoord1s");
+      }
       allclear &= funcTest;
       funcTest = ((glMultiTexCoord1sv = (csGLMULTITEXCOORD1SV) gl->GetProcAddress ("glMultiTexCoord1sv")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glMultiTexCoord1sv");
+      }
       allclear &= funcTest;
       funcTest = ((glMultiTexCoord2d = (csGLMULTITEXCOORD2D) gl->GetProcAddress ("glMultiTexCoord2d")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glMultiTexCoord2d");
+      }
       allclear &= funcTest;
       funcTest = ((glMultiTexCoord2dv = (csGLMULTITEXCOORD2DV) gl->GetProcAddress ("glMultiTexCoord2dv")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glMultiTexCoord2dv");
+      }
       allclear &= funcTest;
       funcTest = ((glMultiTexCoord2f = (csGLMULTITEXCOORD2F) gl->GetProcAddress ("glMultiTexCoord2f")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glMultiTexCoord2f");
+      }
       allclear &= funcTest;
       funcTest = ((glMultiTexCoord2fv = (csGLMULTITEXCOORD2FV) gl->GetProcAddress ("glMultiTexCoord2fv")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glMultiTexCoord2fv");
+      }
       allclear &= funcTest;
       funcTest = ((glMultiTexCoord2i = (csGLMULTITEXCOORD2I) gl->GetProcAddress ("glMultiTexCoord2i")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glMultiTexCoord2i");
+      }
       allclear &= funcTest;
       funcTest = ((glMultiTexCoord2iv = (csGLMULTITEXCOORD2IV) gl->GetProcAddress ("glMultiTexCoord2iv")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glMultiTexCoord2iv");
+      }
       allclear &= funcTest;
       funcTest = ((glMultiTexCoord2s = (csGLMULTITEXCOORD2S) gl->GetProcAddress ("glMultiTexCoord2s")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glMultiTexCoord2s");
+      }
       allclear &= funcTest;
       funcTest = ((glMultiTexCoord2sv = (csGLMULTITEXCOORD2SV) gl->GetProcAddress ("glMultiTexCoord2sv")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glMultiTexCoord2sv");
+      }
       allclear &= funcTest;
       funcTest = ((glMultiTexCoord3d = (csGLMULTITEXCOORD3D) gl->GetProcAddress ("glMultiTexCoord3d")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glMultiTexCoord3d");
+      }
       allclear &= funcTest;
       funcTest = ((glMultiTexCoord3dv = (csGLMULTITEXCOORD3DV) gl->GetProcAddress ("glMultiTexCoord3dv")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glMultiTexCoord3dv");
+      }
       allclear &= funcTest;
       funcTest = ((glMultiTexCoord3f = (csGLMULTITEXCOORD3F) gl->GetProcAddress ("glMultiTexCoord3f")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glMultiTexCoord3f");
+      }
       allclear &= funcTest;
       funcTest = ((glMultiTexCoord3fv = (csGLMULTITEXCOORD3FV) gl->GetProcAddress ("glMultiTexCoord3fv")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glMultiTexCoord3fv");
+      }
       allclear &= funcTest;
       funcTest = ((glMultiTexCoord3i = (csGLMULTITEXCOORD3I) gl->GetProcAddress ("glMultiTexCoord3i")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glMultiTexCoord3i");
+      }
       allclear &= funcTest;
       funcTest = ((glMultiTexCoord3iv = (csGLMULTITEXCOORD3IV) gl->GetProcAddress ("glMultiTexCoord3iv")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glMultiTexCoord3iv");
+      }
       allclear &= funcTest;
       funcTest = ((glMultiTexCoord3s = (csGLMULTITEXCOORD3S) gl->GetProcAddress ("glMultiTexCoord3s")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glMultiTexCoord3s");
+      }
       allclear &= funcTest;
       funcTest = ((glMultiTexCoord3sv = (csGLMULTITEXCOORD3SV) gl->GetProcAddress ("glMultiTexCoord3sv")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glMultiTexCoord3sv");
+      }
       allclear &= funcTest;
       funcTest = ((glMultiTexCoord4d = (csGLMULTITEXCOORD4D) gl->GetProcAddress ("glMultiTexCoord4d")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glMultiTexCoord4d");
+      }
       allclear &= funcTest;
       funcTest = ((glMultiTexCoord4dv = (csGLMULTITEXCOORD4DV) gl->GetProcAddress ("glMultiTexCoord4dv")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glMultiTexCoord4dv");
+      }
       allclear &= funcTest;
       funcTest = ((glMultiTexCoord4f = (csGLMULTITEXCOORD4F) gl->GetProcAddress ("glMultiTexCoord4f")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glMultiTexCoord4f");
+      }
       allclear &= funcTest;
       funcTest = ((glMultiTexCoord4fv = (csGLMULTITEXCOORD4FV) gl->GetProcAddress ("glMultiTexCoord4fv")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glMultiTexCoord4fv");
+      }
       allclear &= funcTest;
       funcTest = ((glMultiTexCoord4i = (csGLMULTITEXCOORD4I) gl->GetProcAddress ("glMultiTexCoord4i")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glMultiTexCoord4i");
+      }
       allclear &= funcTest;
       funcTest = ((glMultiTexCoord4iv = (csGLMULTITEXCOORD4IV) gl->GetProcAddress ("glMultiTexCoord4iv")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glMultiTexCoord4iv");
+      }
       allclear &= funcTest;
       funcTest = ((glMultiTexCoord4s = (csGLMULTITEXCOORD4S) gl->GetProcAddress ("glMultiTexCoord4s")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glMultiTexCoord4s");
+      }
       allclear &= funcTest;
       funcTest = ((glMultiTexCoord4sv = (csGLMULTITEXCOORD4SV) gl->GetProcAddress ("glMultiTexCoord4sv")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glMultiTexCoord4sv");
+      }
       allclear &= funcTest;
       funcTest = ((glLoadTransposeMatrixf = (csGLLOADTRANSPOSEMATRIXF) gl->GetProcAddress ("glLoadTransposeMatrixf")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glLoadTransposeMatrixf");
+      }
       allclear &= funcTest;
       funcTest = ((glLoadTransposeMatrixd = (csGLLOADTRANSPOSEMATRIXD) gl->GetProcAddress ("glLoadTransposeMatrixd")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glLoadTransposeMatrixd");
+      }
       allclear &= funcTest;
       funcTest = ((glMultTransposeMatrixf = (csGLMULTTRANSPOSEMATRIXF) gl->GetProcAddress ("glMultTransposeMatrixf")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glMultTransposeMatrixf");
+      }
       allclear &= funcTest;
       funcTest = ((glMultTransposeMatrixd = (csGLMULTTRANSPOSEMATRIXD) gl->GetProcAddress ("glMultTransposeMatrixd")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glMultTransposeMatrixd");
+      }
       allclear &= funcTest;
       funcTest = ((glSampleCoverage = (csGLSAMPLECOVERAGE) gl->GetProcAddress ("glSampleCoverage")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glSampleCoverage");
+      }
       allclear &= funcTest;
       funcTest = ((glCompressedTexImage3D = (csGLCOMPRESSEDTEXIMAGE3D) gl->GetProcAddress ("glCompressedTexImage3D")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glCompressedTexImage3D");
+      }
       allclear &= funcTest;
       funcTest = ((glCompressedTexImage2D = (csGLCOMPRESSEDTEXIMAGE2D) gl->GetProcAddress ("glCompressedTexImage2D")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glCompressedTexImage2D");
+      }
       allclear &= funcTest;
       funcTest = ((glCompressedTexImage1D = (csGLCOMPRESSEDTEXIMAGE1D) gl->GetProcAddress ("glCompressedTexImage1D")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glCompressedTexImage1D");
+      }
       allclear &= funcTest;
       funcTest = ((glCompressedTexSubImage3D = (csGLCOMPRESSEDTEXSUBIMAGE3D) gl->GetProcAddress ("glCompressedTexSubImage3D")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glCompressedTexSubImage3D");
+      }
       allclear &= funcTest;
       funcTest = ((glCompressedTexSubImage2D = (csGLCOMPRESSEDTEXSUBIMAGE2D) gl->GetProcAddress ("glCompressedTexSubImage2D")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glCompressedTexSubImage2D");
+      }
       allclear &= funcTest;
       funcTest = ((glCompressedTexSubImage1D = (csGLCOMPRESSEDTEXSUBIMAGE1D) gl->GetProcAddress ("glCompressedTexSubImage1D")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glCompressedTexSubImage1D");
+      }
       allclear &= funcTest;
       funcTest = ((glGetCompressedTexImage = (csGLGETCOMPRESSEDTEXIMAGE) gl->GetProcAddress ("glGetCompressedTexImage")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glGetCompressedTexImage");
+      }
       allclear &= funcTest;
+
       if (CS_GL_version_1_3 = allclear)
       {
         CS_GL_version_1_3 &= config->GetBool (cfgkey, true);
@@ -10763,158 +12687,263 @@ public:
       Report ("GL Extension '%s' not found.", ext);
     }
   }
-
+  
   void InitGL_ARB_imaging ()
   {
     if (tested_CS_GL_ARB_imaging) return;
     tested_CS_GL_ARB_imaging = true;
     const char* ext = "GL_ARB_imaging";
-    char cfgkey[41];
+    char cfgkey[26 + 14 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
-
-    const char* extensions = (const char*)glGetString (GL_EXTENSIONS);
+    
+    const char* extensions;
+    extensions = (const char*)glGetString (GL_EXTENSIONS);
     CS_GL_ARB_imaging = (strstr (extensions, ext) != NULL);
 
     bool allclear, funcTest;
-    if (gl && CS_GL_ARB_imaging)
+    (void)funcTest; // shut up "variable unused" warnings
+    if (CS_GL_ARB_imaging)
     {
       allclear = true;
       funcTest = ((glColorTable = (csGLCOLORTABLE) gl->GetProcAddress ("glColorTable")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glColorTable");
+      }
       allclear &= funcTest;
       funcTest = ((glColorTableParameterfv = (csGLCOLORTABLEPARAMETERFV) gl->GetProcAddress ("glColorTableParameterfv")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glColorTableParameterfv");
+      }
       allclear &= funcTest;
       funcTest = ((glColorTableParameteriv = (csGLCOLORTABLEPARAMETERIV) gl->GetProcAddress ("glColorTableParameteriv")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glColorTableParameteriv");
+      }
       allclear &= funcTest;
       funcTest = ((glCopyColorTable = (csGLCOPYCOLORTABLE) gl->GetProcAddress ("glCopyColorTable")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glCopyColorTable");
+      }
       allclear &= funcTest;
       funcTest = ((glGetColorTable = (csGLGETCOLORTABLE) gl->GetProcAddress ("glGetColorTable")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glGetColorTable");
+      }
       allclear &= funcTest;
       funcTest = ((glGetColorTableParameterfv = (csGLGETCOLORTABLEPARAMETERFV) gl->GetProcAddress ("glGetColorTableParameterfv")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glGetColorTableParameterfv");
+      }
       allclear &= funcTest;
       funcTest = ((glGetColorTableParameteriv = (csGLGETCOLORTABLEPARAMETERIV) gl->GetProcAddress ("glGetColorTableParameteriv")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glGetColorTableParameteriv");
+      }
       allclear &= funcTest;
       funcTest = ((glColorSubTable = (csGLCOLORSUBTABLE) gl->GetProcAddress ("glColorSubTable")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glColorSubTable");
+      }
       allclear &= funcTest;
       funcTest = ((glCopyColorSubTable = (csGLCOPYCOLORSUBTABLE) gl->GetProcAddress ("glCopyColorSubTable")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glCopyColorSubTable");
+      }
       allclear &= funcTest;
       funcTest = ((glConvolutionFilter1D = (csGLCONVOLUTIONFILTER1D) gl->GetProcAddress ("glConvolutionFilter1D")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glConvolutionFilter1D");
+      }
       allclear &= funcTest;
       funcTest = ((glConvolutionFilter2D = (csGLCONVOLUTIONFILTER2D) gl->GetProcAddress ("glConvolutionFilter2D")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glConvolutionFilter2D");
+      }
       allclear &= funcTest;
       funcTest = ((glConvolutionParameterf = (csGLCONVOLUTIONPARAMETERF) gl->GetProcAddress ("glConvolutionParameterf")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glConvolutionParameterf");
+      }
       allclear &= funcTest;
       funcTest = ((glConvolutionParameterfv = (csGLCONVOLUTIONPARAMETERFV) gl->GetProcAddress ("glConvolutionParameterfv")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glConvolutionParameterfv");
+      }
       allclear &= funcTest;
       funcTest = ((glConvolutionParameteri = (csGLCONVOLUTIONPARAMETERI) gl->GetProcAddress ("glConvolutionParameteri")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glConvolutionParameteri");
+      }
       allclear &= funcTest;
       funcTest = ((glConvolutionParameteriv = (csGLCONVOLUTIONPARAMETERIV) gl->GetProcAddress ("glConvolutionParameteriv")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glConvolutionParameteriv");
+      }
       allclear &= funcTest;
       funcTest = ((glCopyConvolutionFilter1D = (csGLCOPYCONVOLUTIONFILTER1D) gl->GetProcAddress ("glCopyConvolutionFilter1D")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glCopyConvolutionFilter1D");
+      }
       allclear &= funcTest;
       funcTest = ((glCopyConvolutionFilter2D = (csGLCOPYCONVOLUTIONFILTER2D) gl->GetProcAddress ("glCopyConvolutionFilter2D")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glCopyConvolutionFilter2D");
+      }
       allclear &= funcTest;
       funcTest = ((glGetConvolutionFilter = (csGLGETCONVOLUTIONFILTER) gl->GetProcAddress ("glGetConvolutionFilter")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glGetConvolutionFilter");
+      }
       allclear &= funcTest;
       funcTest = ((glGetConvolutionParameterfv = (csGLGETCONVOLUTIONPARAMETERFV) gl->GetProcAddress ("glGetConvolutionParameterfv")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glGetConvolutionParameterfv");
+      }
       allclear &= funcTest;
       funcTest = ((glGetConvolutionParameteriv = (csGLGETCONVOLUTIONPARAMETERIV) gl->GetProcAddress ("glGetConvolutionParameteriv")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glGetConvolutionParameteriv");
+      }
       allclear &= funcTest;
       funcTest = ((glGetSeparableFilter = (csGLGETSEPARABLEFILTER) gl->GetProcAddress ("glGetSeparableFilter")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glGetSeparableFilter");
+      }
       allclear &= funcTest;
       funcTest = ((glSeparableFilter2D = (csGLSEPARABLEFILTER2D) gl->GetProcAddress ("glSeparableFilter2D")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glSeparableFilter2D");
+      }
       allclear &= funcTest;
       funcTest = ((glGetHistogram = (csGLGETHISTOGRAM) gl->GetProcAddress ("glGetHistogram")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glGetHistogram");
+      }
       allclear &= funcTest;
       funcTest = ((glGetHistogramParameterfv = (csGLGETHISTOGRAMPARAMETERFV) gl->GetProcAddress ("glGetHistogramParameterfv")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glGetHistogramParameterfv");
+      }
       allclear &= funcTest;
       funcTest = ((glGetHistogramParameteriv = (csGLGETHISTOGRAMPARAMETERIV) gl->GetProcAddress ("glGetHistogramParameteriv")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glGetHistogramParameteriv");
+      }
       allclear &= funcTest;
       funcTest = ((glGetMinmax = (csGLGETMINMAX) gl->GetProcAddress ("glGetMinmax")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glGetMinmax");
+      }
       allclear &= funcTest;
       funcTest = ((glGetMinmaxParameterfv = (csGLGETMINMAXPARAMETERFV) gl->GetProcAddress ("glGetMinmaxParameterfv")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glGetMinmaxParameterfv");
+      }
       allclear &= funcTest;
       funcTest = ((glGetMinmaxParameteriv = (csGLGETMINMAXPARAMETERIV) gl->GetProcAddress ("glGetMinmaxParameteriv")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glGetMinmaxParameteriv");
+      }
       allclear &= funcTest;
       funcTest = ((glHistogram = (csGLHISTOGRAM) gl->GetProcAddress ("glHistogram")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glHistogram");
+      }
       allclear &= funcTest;
       funcTest = ((glMinmax = (csGLMINMAX) gl->GetProcAddress ("glMinmax")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glMinmax");
+      }
       allclear &= funcTest;
       funcTest = ((glResetHistogram = (csGLRESETHISTOGRAM) gl->GetProcAddress ("glResetHistogram")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glResetHistogram");
+      }
       allclear &= funcTest;
       funcTest = ((glResetMinmax = (csGLRESETMINMAX) gl->GetProcAddress ("glResetMinmax")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glResetMinmax");
+      }
       allclear &= funcTest;
       funcTest = ((glBlendColor = (csGLBLENDCOLOR) gl->GetProcAddress ("glBlendColor")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glBlendColor");
+      }
       allclear &= funcTest;
       funcTest = ((glBlendEquation = (csGLBLENDEQUATION) gl->GetProcAddress ("glBlendEquation")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glBlendEquation");
+      }
       allclear &= funcTest;
+
       if (CS_GL_ARB_imaging = allclear)
       {
         CS_GL_ARB_imaging &= config->GetBool (cfgkey, true);
@@ -10937,158 +12966,263 @@ public:
       Report ("GL Extension '%s' not found.", ext);
     }
   }
-
+  
   void InitGL_ARB_multitexture ()
   {
     if (tested_CS_GL_ARB_multitexture) return;
     tested_CS_GL_ARB_multitexture = true;
     const char* ext = "GL_ARB_multitexture";
-    char cfgkey[46];
+    char cfgkey[26 + 19 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
-
-    const char* extensions = (const char*)glGetString (GL_EXTENSIONS);
+    
+    const char* extensions;
+    extensions = (const char*)glGetString (GL_EXTENSIONS);
     CS_GL_ARB_multitexture = (strstr (extensions, ext) != NULL);
 
     bool allclear, funcTest;
-    if (gl && CS_GL_ARB_multitexture)
+    (void)funcTest; // shut up "variable unused" warnings
+    if (CS_GL_ARB_multitexture)
     {
       allclear = true;
       funcTest = ((glActiveTextureARB = (csGLACTIVETEXTUREARB) gl->GetProcAddress ("glActiveTextureARB")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glActiveTextureARB");
+      }
       allclear &= funcTest;
       funcTest = ((glClientActiveTextureARB = (csGLCLIENTACTIVETEXTUREARB) gl->GetProcAddress ("glClientActiveTextureARB")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glClientActiveTextureARB");
+      }
       allclear &= funcTest;
       funcTest = ((glMultiTexCoord1dARB = (csGLMULTITEXCOORD1DARB) gl->GetProcAddress ("glMultiTexCoord1dARB")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glMultiTexCoord1dARB");
+      }
       allclear &= funcTest;
       funcTest = ((glMultiTexCoord1dvARB = (csGLMULTITEXCOORD1DVARB) gl->GetProcAddress ("glMultiTexCoord1dvARB")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glMultiTexCoord1dvARB");
+      }
       allclear &= funcTest;
       funcTest = ((glMultiTexCoord1fARB = (csGLMULTITEXCOORD1FARB) gl->GetProcAddress ("glMultiTexCoord1fARB")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glMultiTexCoord1fARB");
+      }
       allclear &= funcTest;
       funcTest = ((glMultiTexCoord1fvARB = (csGLMULTITEXCOORD1FVARB) gl->GetProcAddress ("glMultiTexCoord1fvARB")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glMultiTexCoord1fvARB");
+      }
       allclear &= funcTest;
       funcTest = ((glMultiTexCoord1iARB = (csGLMULTITEXCOORD1IARB) gl->GetProcAddress ("glMultiTexCoord1iARB")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glMultiTexCoord1iARB");
+      }
       allclear &= funcTest;
       funcTest = ((glMultiTexCoord1ivARB = (csGLMULTITEXCOORD1IVARB) gl->GetProcAddress ("glMultiTexCoord1ivARB")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glMultiTexCoord1ivARB");
+      }
       allclear &= funcTest;
       funcTest = ((glMultiTexCoord1sARB = (csGLMULTITEXCOORD1SARB) gl->GetProcAddress ("glMultiTexCoord1sARB")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glMultiTexCoord1sARB");
+      }
       allclear &= funcTest;
       funcTest = ((glMultiTexCoord1svARB = (csGLMULTITEXCOORD1SVARB) gl->GetProcAddress ("glMultiTexCoord1svARB")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glMultiTexCoord1svARB");
+      }
       allclear &= funcTest;
       funcTest = ((glMultiTexCoord2dARB = (csGLMULTITEXCOORD2DARB) gl->GetProcAddress ("glMultiTexCoord2dARB")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glMultiTexCoord2dARB");
+      }
       allclear &= funcTest;
       funcTest = ((glMultiTexCoord2dvARB = (csGLMULTITEXCOORD2DVARB) gl->GetProcAddress ("glMultiTexCoord2dvARB")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glMultiTexCoord2dvARB");
+      }
       allclear &= funcTest;
       funcTest = ((glMultiTexCoord2fARB = (csGLMULTITEXCOORD2FARB) gl->GetProcAddress ("glMultiTexCoord2fARB")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glMultiTexCoord2fARB");
+      }
       allclear &= funcTest;
       funcTest = ((glMultiTexCoord2fvARB = (csGLMULTITEXCOORD2FVARB) gl->GetProcAddress ("glMultiTexCoord2fvARB")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glMultiTexCoord2fvARB");
+      }
       allclear &= funcTest;
       funcTest = ((glMultiTexCoord2iARB = (csGLMULTITEXCOORD2IARB) gl->GetProcAddress ("glMultiTexCoord2iARB")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glMultiTexCoord2iARB");
+      }
       allclear &= funcTest;
       funcTest = ((glMultiTexCoord2ivARB = (csGLMULTITEXCOORD2IVARB) gl->GetProcAddress ("glMultiTexCoord2ivARB")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glMultiTexCoord2ivARB");
+      }
       allclear &= funcTest;
       funcTest = ((glMultiTexCoord2sARB = (csGLMULTITEXCOORD2SARB) gl->GetProcAddress ("glMultiTexCoord2sARB")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glMultiTexCoord2sARB");
+      }
       allclear &= funcTest;
       funcTest = ((glMultiTexCoord2svARB = (csGLMULTITEXCOORD2SVARB) gl->GetProcAddress ("glMultiTexCoord2svARB")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glMultiTexCoord2svARB");
+      }
       allclear &= funcTest;
       funcTest = ((glMultiTexCoord3dARB = (csGLMULTITEXCOORD3DARB) gl->GetProcAddress ("glMultiTexCoord3dARB")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glMultiTexCoord3dARB");
+      }
       allclear &= funcTest;
       funcTest = ((glMultiTexCoord3dvARB = (csGLMULTITEXCOORD3DVARB) gl->GetProcAddress ("glMultiTexCoord3dvARB")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glMultiTexCoord3dvARB");
+      }
       allclear &= funcTest;
       funcTest = ((glMultiTexCoord3fARB = (csGLMULTITEXCOORD3FARB) gl->GetProcAddress ("glMultiTexCoord3fARB")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glMultiTexCoord3fARB");
+      }
       allclear &= funcTest;
       funcTest = ((glMultiTexCoord3fvARB = (csGLMULTITEXCOORD3FVARB) gl->GetProcAddress ("glMultiTexCoord3fvARB")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glMultiTexCoord3fvARB");
+      }
       allclear &= funcTest;
       funcTest = ((glMultiTexCoord3iARB = (csGLMULTITEXCOORD3IARB) gl->GetProcAddress ("glMultiTexCoord3iARB")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glMultiTexCoord3iARB");
+      }
       allclear &= funcTest;
       funcTest = ((glMultiTexCoord3ivARB = (csGLMULTITEXCOORD3IVARB) gl->GetProcAddress ("glMultiTexCoord3ivARB")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glMultiTexCoord3ivARB");
+      }
       allclear &= funcTest;
       funcTest = ((glMultiTexCoord3sARB = (csGLMULTITEXCOORD3SARB) gl->GetProcAddress ("glMultiTexCoord3sARB")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glMultiTexCoord3sARB");
+      }
       allclear &= funcTest;
       funcTest = ((glMultiTexCoord3svARB = (csGLMULTITEXCOORD3SVARB) gl->GetProcAddress ("glMultiTexCoord3svARB")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glMultiTexCoord3svARB");
+      }
       allclear &= funcTest;
       funcTest = ((glMultiTexCoord4dARB = (csGLMULTITEXCOORD4DARB) gl->GetProcAddress ("glMultiTexCoord4dARB")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glMultiTexCoord4dARB");
+      }
       allclear &= funcTest;
       funcTest = ((glMultiTexCoord4dvARB = (csGLMULTITEXCOORD4DVARB) gl->GetProcAddress ("glMultiTexCoord4dvARB")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glMultiTexCoord4dvARB");
+      }
       allclear &= funcTest;
       funcTest = ((glMultiTexCoord4fARB = (csGLMULTITEXCOORD4FARB) gl->GetProcAddress ("glMultiTexCoord4fARB")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glMultiTexCoord4fARB");
+      }
       allclear &= funcTest;
       funcTest = ((glMultiTexCoord4fvARB = (csGLMULTITEXCOORD4FVARB) gl->GetProcAddress ("glMultiTexCoord4fvARB")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glMultiTexCoord4fvARB");
+      }
       allclear &= funcTest;
       funcTest = ((glMultiTexCoord4iARB = (csGLMULTITEXCOORD4IARB) gl->GetProcAddress ("glMultiTexCoord4iARB")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glMultiTexCoord4iARB");
+      }
       allclear &= funcTest;
       funcTest = ((glMultiTexCoord4ivARB = (csGLMULTITEXCOORD4IVARB) gl->GetProcAddress ("glMultiTexCoord4ivARB")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glMultiTexCoord4ivARB");
+      }
       allclear &= funcTest;
       funcTest = ((glMultiTexCoord4sARB = (csGLMULTITEXCOORD4SARB) gl->GetProcAddress ("glMultiTexCoord4sARB")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glMultiTexCoord4sARB");
+      }
       allclear &= funcTest;
       funcTest = ((glMultiTexCoord4svARB = (csGLMULTITEXCOORD4SVARB) gl->GetProcAddress ("glMultiTexCoord4svARB")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glMultiTexCoord4svARB");
+      }
       allclear &= funcTest;
+
       if (CS_GL_ARB_multitexture = allclear)
       {
         CS_GL_ARB_multitexture &= config->GetBool (cfgkey, true);
@@ -11111,38 +13245,53 @@ public:
       Report ("GL Extension '%s' not found.", ext);
     }
   }
-
+  
   void InitGL_ARB_transpose_matrix ()
   {
     if (tested_CS_GL_ARB_transpose_matrix) return;
     tested_CS_GL_ARB_transpose_matrix = true;
     const char* ext = "GL_ARB_transpose_matrix";
-    char cfgkey[50];
+    char cfgkey[26 + 23 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
-
-    const char* extensions = (const char*)glGetString (GL_EXTENSIONS);
+    
+    const char* extensions;
+    extensions = (const char*)glGetString (GL_EXTENSIONS);
     CS_GL_ARB_transpose_matrix = (strstr (extensions, ext) != NULL);
 
     bool allclear, funcTest;
-    if (gl && CS_GL_ARB_transpose_matrix)
+    (void)funcTest; // shut up "variable unused" warnings
+    if (CS_GL_ARB_transpose_matrix)
     {
       allclear = true;
       funcTest = ((glLoadTransposeMatrixfARB = (csGLLOADTRANSPOSEMATRIXFARB) gl->GetProcAddress ("glLoadTransposeMatrixfARB")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glLoadTransposeMatrixfARB");
+      }
       allclear &= funcTest;
       funcTest = ((glLoadTransposeMatrixdARB = (csGLLOADTRANSPOSEMATRIXDARB) gl->GetProcAddress ("glLoadTransposeMatrixdARB")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glLoadTransposeMatrixdARB");
+      }
       allclear &= funcTest;
       funcTest = ((glMultTransposeMatrixfARB = (csGLMULTTRANSPOSEMATRIXFARB) gl->GetProcAddress ("glMultTransposeMatrixfARB")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glMultTransposeMatrixfARB");
+      }
       allclear &= funcTest;
       funcTest = ((glMultTransposeMatrixdARB = (csGLMULTTRANSPOSEMATRIXDARB) gl->GetProcAddress ("glMultTransposeMatrixdARB")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glMultTransposeMatrixdARB");
+      }
       allclear &= funcTest;
+
       if (CS_GL_ARB_transpose_matrix = allclear)
       {
         CS_GL_ARB_transpose_matrix &= config->GetBool (cfgkey, true);
@@ -11165,26 +13314,32 @@ public:
       Report ("GL Extension '%s' not found.", ext);
     }
   }
-
+  
   void InitGL_ARB_multisample ()
   {
     if (tested_CS_GL_ARB_multisample) return;
     tested_CS_GL_ARB_multisample = true;
     const char* ext = "GL_ARB_multisample";
-    char cfgkey[45];
+    char cfgkey[26 + 18 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
-
-    const char* extensions = (const char*)glGetString (GL_EXTENSIONS);
+    
+    const char* extensions;
+    extensions = (const char*)glGetString (GL_EXTENSIONS);
     CS_GL_ARB_multisample = (strstr (extensions, ext) != NULL);
 
     bool allclear, funcTest;
-    if (gl && CS_GL_ARB_multisample)
+    (void)funcTest; // shut up "variable unused" warnings
+    if (CS_GL_ARB_multisample)
     {
       allclear = true;
       funcTest = ((glSampleCoverageARB = (csGLSAMPLECOVERAGEARB) gl->GetProcAddress ("glSampleCoverageARB")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glSampleCoverageARB");
+      }
       allclear &= funcTest;
+
       if (CS_GL_ARB_multisample = allclear)
       {
         CS_GL_ARB_multisample &= config->GetBool (cfgkey, true);
@@ -11207,22 +13362,25 @@ public:
       Report ("GL Extension '%s' not found.", ext);
     }
   }
-
+  
   void InitGL_ARB_texture_env_add ()
   {
     if (tested_CS_GL_ARB_texture_env_add) return;
     tested_CS_GL_ARB_texture_env_add = true;
     const char* ext = "GL_ARB_texture_env_add";
-    char cfgkey[49];
+    char cfgkey[26 + 22 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
-
-    const char* extensions = (const char*)glGetString (GL_EXTENSIONS);
+    
+    const char* extensions;
+    extensions = (const char*)glGetString (GL_EXTENSIONS);
     CS_GL_ARB_texture_env_add = (strstr (extensions, ext) != NULL);
 
     bool allclear, funcTest;
-    if (gl && CS_GL_ARB_texture_env_add)
+    (void)funcTest; // shut up "variable unused" warnings
+    if (CS_GL_ARB_texture_env_add)
     {
       allclear = true;
+
       if (CS_GL_ARB_texture_env_add = allclear)
       {
         CS_GL_ARB_texture_env_add &= config->GetBool (cfgkey, true);
@@ -11245,26 +13403,31 @@ public:
       Report ("GL Extension '%s' not found.", ext);
     }
   }
-
+  
 #ifdef _WIN32
   void InitWGL_ARB_extensions_string (HDC hDC)
   {
     if (tested_CS_WGL_ARB_extensions_string) return;
     tested_CS_WGL_ARB_extensions_string = true;
     const char* ext = "WGL_ARB_extensions_string";
-    char cfgkey[52];
+    char cfgkey[26 + 25 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
-
+    
     CS_WGL_ARB_extensions_string = true;
 
     bool allclear, funcTest;
+    (void)funcTest; // shut up "variable unused" warnings
     if (CS_WGL_ARB_extensions_string)
     {
       allclear = true;
       funcTest = ((wglGetExtensionsStringARB = (csWGLGETEXTENSIONSSTRINGARB) gl->GetProcAddress ("wglGetExtensionsStringARB")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "wglGetExtensionsStringARB");
+      }
       allclear &= funcTest;
+
       if (CS_WGL_ARB_extensions_string = allclear)
       {
         CS_WGL_ARB_extensions_string &= config->GetBool (cfgkey, true);
@@ -11287,17 +13450,17 @@ public:
       Report ("GL Extension '%s' not found.", ext);
     }
   }
-
 #endif
+
 #ifdef _WIN32
   void InitWGL_ARB_buffer_region (HDC hDC)
   {
     if (tested_CS_WGL_ARB_buffer_region) return;
     tested_CS_WGL_ARB_buffer_region = true;
     const char* ext = "WGL_ARB_buffer_region";
-    char cfgkey[48];
+    char cfgkey[26 + 21 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
-
+    
     if (!tested_CS_WGL_ARB_extensions_string) InitWGL_ARB_extensions_string (hDC);
     const char* extensions;
     if (CS_WGL_ARB_extensions_string)
@@ -11306,30 +13469,44 @@ public:
     }
     else
     {
-      extensions =  (const char*)glGetString (GL_EXTENSIONS);
+      extensions = (const char*)glGetString (GL_EXTENSIONS);
     }
     CS_WGL_ARB_buffer_region = (strstr (extensions, ext) != NULL);
 
     bool allclear, funcTest;
+    (void)funcTest; // shut up "variable unused" warnings
     if (CS_WGL_ARB_buffer_region)
     {
       allclear = true;
       funcTest = ((wglCreateBufferRegionARB = (csWGLCREATEBUFFERREGIONARB) gl->GetProcAddress ("wglCreateBufferRegionARB")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "wglCreateBufferRegionARB");
+      }
       allclear &= funcTest;
       funcTest = ((wglDeleteBufferRegionARB = (csWGLDELETEBUFFERREGIONARB) gl->GetProcAddress ("wglDeleteBufferRegionARB")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "wglDeleteBufferRegionARB");
+      }
       allclear &= funcTest;
       funcTest = ((wglSaveBufferRegionARB = (csWGLSAVEBUFFERREGIONARB) gl->GetProcAddress ("wglSaveBufferRegionARB")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "wglSaveBufferRegionARB");
+      }
       allclear &= funcTest;
       funcTest = ((wglRestoreBufferRegionARB = (csWGLRESTOREBUFFERREGIONARB) gl->GetProcAddress ("wglRestoreBufferRegionARB")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "wglRestoreBufferRegionARB");
+      }
       allclear &= funcTest;
+
       if (CS_WGL_ARB_buffer_region = allclear)
       {
         CS_WGL_ARB_buffer_region &= config->GetBool (cfgkey, true);
@@ -11352,23 +13529,26 @@ public:
       Report ("GL Extension '%s' not found.", ext);
     }
   }
-
 #endif
+
   void InitGL_ARB_texture_cube_map ()
   {
     if (tested_CS_GL_ARB_texture_cube_map) return;
     tested_CS_GL_ARB_texture_cube_map = true;
     const char* ext = "GL_ARB_texture_cube_map";
-    char cfgkey[50];
+    char cfgkey[26 + 23 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
-
-    const char* extensions = (const char*)glGetString (GL_EXTENSIONS);
+    
+    const char* extensions;
+    extensions = (const char*)glGetString (GL_EXTENSIONS);
     CS_GL_ARB_texture_cube_map = (strstr (extensions, ext) != NULL);
 
     bool allclear, funcTest;
-    if (gl && CS_GL_ARB_texture_cube_map)
+    (void)funcTest; // shut up "variable unused" warnings
+    if (CS_GL_ARB_texture_cube_map)
     {
       allclear = true;
+
       if (CS_GL_ARB_texture_cube_map = allclear)
       {
         CS_GL_ARB_texture_cube_map &= config->GetBool (cfgkey, true);
@@ -11391,22 +13571,25 @@ public:
       Report ("GL Extension '%s' not found.", ext);
     }
   }
-
+  
   void InitGL_ARB_depth_texture ()
   {
     if (tested_CS_GL_ARB_depth_texture) return;
     tested_CS_GL_ARB_depth_texture = true;
     const char* ext = "GL_ARB_depth_texture";
-    char cfgkey[47];
+    char cfgkey[26 + 20 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
-
-    const char* extensions = (const char*)glGetString (GL_EXTENSIONS);
+    
+    const char* extensions;
+    extensions = (const char*)glGetString (GL_EXTENSIONS);
     CS_GL_ARB_depth_texture = (strstr (extensions, ext) != NULL);
 
     bool allclear, funcTest;
-    if (gl && CS_GL_ARB_depth_texture)
+    (void)funcTest; // shut up "variable unused" warnings
+    if (CS_GL_ARB_depth_texture)
     {
       allclear = true;
+
       if (CS_GL_ARB_depth_texture = allclear)
       {
         CS_GL_ARB_depth_texture &= config->GetBool (cfgkey, true);
@@ -11429,30 +13612,39 @@ public:
       Report ("GL Extension '%s' not found.", ext);
     }
   }
-
+  
   void InitGL_ARB_point_parameters ()
   {
     if (tested_CS_GL_ARB_point_parameters) return;
     tested_CS_GL_ARB_point_parameters = true;
     const char* ext = "GL_ARB_point_parameters";
-    char cfgkey[50];
+    char cfgkey[26 + 23 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
-
-    const char* extensions = (const char*)glGetString (GL_EXTENSIONS);
+    
+    const char* extensions;
+    extensions = (const char*)glGetString (GL_EXTENSIONS);
     CS_GL_ARB_point_parameters = (strstr (extensions, ext) != NULL);
 
     bool allclear, funcTest;
-    if (gl && CS_GL_ARB_point_parameters)
+    (void)funcTest; // shut up "variable unused" warnings
+    if (CS_GL_ARB_point_parameters)
     {
       allclear = true;
       funcTest = ((glPointParameterfARB = (csGLPOINTPARAMETERFARB) gl->GetProcAddress ("glPointParameterfARB")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glPointParameterfARB");
+      }
       allclear &= funcTest;
       funcTest = ((glPointParameterfvARB = (csGLPOINTPARAMETERFVARB) gl->GetProcAddress ("glPointParameterfvARB")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glPointParameterfvARB");
+      }
       allclear &= funcTest;
+
       if (CS_GL_ARB_point_parameters = allclear)
       {
         CS_GL_ARB_point_parameters &= config->GetBool (cfgkey, true);
@@ -11475,22 +13667,25 @@ public:
       Report ("GL Extension '%s' not found.", ext);
     }
   }
-
+  
   void InitGL_ARB_shadow ()
   {
     if (tested_CS_GL_ARB_shadow) return;
     tested_CS_GL_ARB_shadow = true;
     const char* ext = "GL_ARB_shadow";
-    char cfgkey[40];
+    char cfgkey[26 + 13 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
-
-    const char* extensions = (const char*)glGetString (GL_EXTENSIONS);
+    
+    const char* extensions;
+    extensions = (const char*)glGetString (GL_EXTENSIONS);
     CS_GL_ARB_shadow = (strstr (extensions, ext) != NULL);
 
     bool allclear, funcTest;
-    if (gl && CS_GL_ARB_shadow)
+    (void)funcTest; // shut up "variable unused" warnings
+    if (CS_GL_ARB_shadow)
     {
       allclear = true;
+
       if (CS_GL_ARB_shadow = allclear)
       {
         CS_GL_ARB_shadow &= config->GetBool (cfgkey, true);
@@ -11513,22 +13708,25 @@ public:
       Report ("GL Extension '%s' not found.", ext);
     }
   }
-
+  
   void InitGL_ARB_shadow_ambient ()
   {
     if (tested_CS_GL_ARB_shadow_ambient) return;
     tested_CS_GL_ARB_shadow_ambient = true;
     const char* ext = "GL_ARB_shadow_ambient";
-    char cfgkey[48];
+    char cfgkey[26 + 21 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
-
-    const char* extensions = (const char*)glGetString (GL_EXTENSIONS);
+    
+    const char* extensions;
+    extensions = (const char*)glGetString (GL_EXTENSIONS);
     CS_GL_ARB_shadow_ambient = (strstr (extensions, ext) != NULL);
 
     bool allclear, funcTest;
-    if (gl && CS_GL_ARB_shadow_ambient)
+    (void)funcTest; // shut up "variable unused" warnings
+    if (CS_GL_ARB_shadow_ambient)
     {
       allclear = true;
+
       if (CS_GL_ARB_shadow_ambient = allclear)
       {
         CS_GL_ARB_shadow_ambient &= config->GetBool (cfgkey, true);
@@ -11551,22 +13749,25 @@ public:
       Report ("GL Extension '%s' not found.", ext);
     }
   }
-
+  
   void InitGL_ARB_texture_border_clamp ()
   {
     if (tested_CS_GL_ARB_texture_border_clamp) return;
     tested_CS_GL_ARB_texture_border_clamp = true;
     const char* ext = "GL_ARB_texture_border_clamp";
-    char cfgkey[54];
+    char cfgkey[26 + 27 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
-
-    const char* extensions = (const char*)glGetString (GL_EXTENSIONS);
+    
+    const char* extensions;
+    extensions = (const char*)glGetString (GL_EXTENSIONS);
     CS_GL_ARB_texture_border_clamp = (strstr (extensions, ext) != NULL);
 
     bool allclear, funcTest;
-    if (gl && CS_GL_ARB_texture_border_clamp)
+    (void)funcTest; // shut up "variable unused" warnings
+    if (CS_GL_ARB_texture_border_clamp)
     {
       allclear = true;
+
       if (CS_GL_ARB_texture_border_clamp = allclear)
       {
         CS_GL_ARB_texture_border_clamp &= config->GetBool (cfgkey, true);
@@ -11589,50 +13790,74 @@ public:
       Report ("GL Extension '%s' not found.", ext);
     }
   }
-
+  
   void InitGL_ARB_texture_compression ()
   {
     if (tested_CS_GL_ARB_texture_compression) return;
     tested_CS_GL_ARB_texture_compression = true;
     const char* ext = "GL_ARB_texture_compression";
-    char cfgkey[53];
+    char cfgkey[26 + 26 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
-
-    const char* extensions = (const char*)glGetString (GL_EXTENSIONS);
+    
+    const char* extensions;
+    extensions = (const char*)glGetString (GL_EXTENSIONS);
     CS_GL_ARB_texture_compression = (strstr (extensions, ext) != NULL);
 
     bool allclear, funcTest;
-    if (gl && CS_GL_ARB_texture_compression)
+    (void)funcTest; // shut up "variable unused" warnings
+    if (CS_GL_ARB_texture_compression)
     {
       allclear = true;
       funcTest = ((glCompressedTexImage3DARB = (csGLCOMPRESSEDTEXIMAGE3DARB) gl->GetProcAddress ("glCompressedTexImage3DARB")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glCompressedTexImage3DARB");
+      }
       allclear &= funcTest;
       funcTest = ((glCompressedTexImage2DARB = (csGLCOMPRESSEDTEXIMAGE2DARB) gl->GetProcAddress ("glCompressedTexImage2DARB")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glCompressedTexImage2DARB");
+      }
       allclear &= funcTest;
       funcTest = ((glCompressedTexImage1DARB = (csGLCOMPRESSEDTEXIMAGE1DARB) gl->GetProcAddress ("glCompressedTexImage1DARB")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glCompressedTexImage1DARB");
+      }
       allclear &= funcTest;
       funcTest = ((glCompressedTexSubImage3DARB = (csGLCOMPRESSEDTEXSUBIMAGE3DARB) gl->GetProcAddress ("glCompressedTexSubImage3DARB")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glCompressedTexSubImage3DARB");
+      }
       allclear &= funcTest;
       funcTest = ((glCompressedTexSubImage2DARB = (csGLCOMPRESSEDTEXSUBIMAGE2DARB) gl->GetProcAddress ("glCompressedTexSubImage2DARB")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glCompressedTexSubImage2DARB");
+      }
       allclear &= funcTest;
       funcTest = ((glCompressedTexSubImage1DARB = (csGLCOMPRESSEDTEXSUBIMAGE1DARB) gl->GetProcAddress ("glCompressedTexSubImage1DARB")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glCompressedTexSubImage1DARB");
+      }
       allclear &= funcTest;
       funcTest = ((glGetCompressedTexImageARB = (csGLGETCOMPRESSEDTEXIMAGEARB) gl->GetProcAddress ("glGetCompressedTexImageARB")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glGetCompressedTexImageARB");
+      }
       allclear &= funcTest;
+
       if (CS_GL_ARB_texture_compression = allclear)
       {
         CS_GL_ARB_texture_compression &= config->GetBool (cfgkey, true);
@@ -11655,22 +13880,25 @@ public:
       Report ("GL Extension '%s' not found.", ext);
     }
   }
-
+  
   void InitGL_ARB_texture_env_combine ()
   {
     if (tested_CS_GL_ARB_texture_env_combine) return;
     tested_CS_GL_ARB_texture_env_combine = true;
     const char* ext = "GL_ARB_texture_env_combine";
-    char cfgkey[53];
+    char cfgkey[26 + 26 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
-
-    const char* extensions = (const char*)glGetString (GL_EXTENSIONS);
+    
+    const char* extensions;
+    extensions = (const char*)glGetString (GL_EXTENSIONS);
     CS_GL_ARB_texture_env_combine = (strstr (extensions, ext) != NULL);
 
     bool allclear, funcTest;
-    if (gl && CS_GL_ARB_texture_env_combine)
+    (void)funcTest; // shut up "variable unused" warnings
+    if (CS_GL_ARB_texture_env_combine)
     {
       allclear = true;
+
       if (CS_GL_ARB_texture_env_combine = allclear)
       {
         CS_GL_ARB_texture_env_combine &= config->GetBool (cfgkey, true);
@@ -11693,22 +13921,25 @@ public:
       Report ("GL Extension '%s' not found.", ext);
     }
   }
-
+  
   void InitGL_ARB_texture_env_crossbar ()
   {
     if (tested_CS_GL_ARB_texture_env_crossbar) return;
     tested_CS_GL_ARB_texture_env_crossbar = true;
     const char* ext = "GL_ARB_texture_env_crossbar";
-    char cfgkey[54];
+    char cfgkey[26 + 27 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
-
-    const char* extensions = (const char*)glGetString (GL_EXTENSIONS);
+    
+    const char* extensions;
+    extensions = (const char*)glGetString (GL_EXTENSIONS);
     CS_GL_ARB_texture_env_crossbar = (strstr (extensions, ext) != NULL);
 
     bool allclear, funcTest;
-    if (gl && CS_GL_ARB_texture_env_crossbar)
+    (void)funcTest; // shut up "variable unused" warnings
+    if (CS_GL_ARB_texture_env_crossbar)
     {
       allclear = true;
+
       if (CS_GL_ARB_texture_env_crossbar = allclear)
       {
         CS_GL_ARB_texture_env_crossbar &= config->GetBool (cfgkey, true);
@@ -11731,22 +13962,25 @@ public:
       Report ("GL Extension '%s' not found.", ext);
     }
   }
-
+  
   void InitGL_ARB_texture_env_dot3 ()
   {
     if (tested_CS_GL_ARB_texture_env_dot3) return;
     tested_CS_GL_ARB_texture_env_dot3 = true;
     const char* ext = "GL_ARB_texture_env_dot3";
-    char cfgkey[50];
+    char cfgkey[26 + 23 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
-
-    const char* extensions = (const char*)glGetString (GL_EXTENSIONS);
+    
+    const char* extensions;
+    extensions = (const char*)glGetString (GL_EXTENSIONS);
     CS_GL_ARB_texture_env_dot3 = (strstr (extensions, ext) != NULL);
 
     bool allclear, funcTest;
-    if (gl && CS_GL_ARB_texture_env_dot3)
+    (void)funcTest; // shut up "variable unused" warnings
+    if (CS_GL_ARB_texture_env_dot3)
     {
       allclear = true;
+
       if (CS_GL_ARB_texture_env_dot3 = allclear)
       {
         CS_GL_ARB_texture_env_dot3 &= config->GetBool (cfgkey, true);
@@ -11769,22 +14003,25 @@ public:
       Report ("GL Extension '%s' not found.", ext);
     }
   }
-
+  
   void InitGL_ARB_texture_mirrored_repeat ()
   {
     if (tested_CS_GL_ARB_texture_mirrored_repeat) return;
     tested_CS_GL_ARB_texture_mirrored_repeat = true;
     const char* ext = "GL_ARB_texture_mirrored_repeat";
-    char cfgkey[57];
+    char cfgkey[26 + 30 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
-
-    const char* extensions = (const char*)glGetString (GL_EXTENSIONS);
+    
+    const char* extensions;
+    extensions = (const char*)glGetString (GL_EXTENSIONS);
     CS_GL_ARB_texture_mirrored_repeat = (strstr (extensions, ext) != NULL);
 
     bool allclear, funcTest;
-    if (gl && CS_GL_ARB_texture_mirrored_repeat)
+    (void)funcTest; // shut up "variable unused" warnings
+    if (CS_GL_ARB_texture_mirrored_repeat)
     {
       allclear = true;
+
       if (CS_GL_ARB_texture_mirrored_repeat = allclear)
       {
         CS_GL_ARB_texture_mirrored_repeat &= config->GetBool (cfgkey, true);
@@ -11807,66 +14044,102 @@ public:
       Report ("GL Extension '%s' not found.", ext);
     }
   }
-
+  
   void InitGL_ARB_vertex_blend ()
   {
     if (tested_CS_GL_ARB_vertex_blend) return;
     tested_CS_GL_ARB_vertex_blend = true;
     const char* ext = "GL_ARB_vertex_blend";
-    char cfgkey[46];
+    char cfgkey[26 + 19 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
-
-    const char* extensions = (const char*)glGetString (GL_EXTENSIONS);
+    
+    const char* extensions;
+    extensions = (const char*)glGetString (GL_EXTENSIONS);
     CS_GL_ARB_vertex_blend = (strstr (extensions, ext) != NULL);
 
     bool allclear, funcTest;
-    if (gl && CS_GL_ARB_vertex_blend)
+    (void)funcTest; // shut up "variable unused" warnings
+    if (CS_GL_ARB_vertex_blend)
     {
       allclear = true;
       funcTest = ((glWeightbvARB = (csGLWEIGHTBVARB) gl->GetProcAddress ("glWeightbvARB")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glWeightbvARB");
+      }
       allclear &= funcTest;
       funcTest = ((glWeightsvARB = (csGLWEIGHTSVARB) gl->GetProcAddress ("glWeightsvARB")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glWeightsvARB");
+      }
       allclear &= funcTest;
       funcTest = ((glWeightivARB = (csGLWEIGHTIVARB) gl->GetProcAddress ("glWeightivARB")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glWeightivARB");
+      }
       allclear &= funcTest;
       funcTest = ((glWeightfvARB = (csGLWEIGHTFVARB) gl->GetProcAddress ("glWeightfvARB")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glWeightfvARB");
+      }
       allclear &= funcTest;
       funcTest = ((glWeightdvARB = (csGLWEIGHTDVARB) gl->GetProcAddress ("glWeightdvARB")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glWeightdvARB");
+      }
       allclear &= funcTest;
       funcTest = ((glWeightvARB = (csGLWEIGHTVARB) gl->GetProcAddress ("glWeightvARB")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glWeightvARB");
+      }
       allclear &= funcTest;
       funcTest = ((glWeightubvARB = (csGLWEIGHTUBVARB) gl->GetProcAddress ("glWeightubvARB")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glWeightubvARB");
+      }
       allclear &= funcTest;
       funcTest = ((glWeightusvARB = (csGLWEIGHTUSVARB) gl->GetProcAddress ("glWeightusvARB")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glWeightusvARB");
+      }
       allclear &= funcTest;
       funcTest = ((glWeightuivARB = (csGLWEIGHTUIVARB) gl->GetProcAddress ("glWeightuivARB")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glWeightuivARB");
+      }
       allclear &= funcTest;
       funcTest = ((glWeightPointerARB = (csGLWEIGHTPOINTERARB) gl->GetProcAddress ("glWeightPointerARB")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glWeightPointerARB");
+      }
       allclear &= funcTest;
       funcTest = ((glVertexBlendARB = (csGLVERTEXBLENDARB) gl->GetProcAddress ("glVertexBlendARB")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glVertexBlendARB");
+      }
       allclear &= funcTest;
+
       if (CS_GL_ARB_vertex_blend = allclear)
       {
         CS_GL_ARB_vertex_blend &= config->GetBool (cfgkey, true);
@@ -11889,270 +14162,459 @@ public:
       Report ("GL Extension '%s' not found.", ext);
     }
   }
-
+  
   void InitGL_ARB_vertex_program ()
   {
     if (tested_CS_GL_ARB_vertex_program) return;
     tested_CS_GL_ARB_vertex_program = true;
     const char* ext = "GL_ARB_vertex_program";
-    char cfgkey[48];
+    char cfgkey[26 + 21 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
-
-    const char* extensions = (const char*)glGetString (GL_EXTENSIONS);
+    
+    const char* extensions;
+    extensions = (const char*)glGetString (GL_EXTENSIONS);
     CS_GL_ARB_vertex_program = (strstr (extensions, ext) != NULL);
 
     bool allclear, funcTest;
-    if (gl && CS_GL_ARB_vertex_program)
+    (void)funcTest; // shut up "variable unused" warnings
+    if (CS_GL_ARB_vertex_program)
     {
       allclear = true;
       funcTest = ((glVertexAttrib1sARB = (csGLVERTEXATTRIB1SARB) gl->GetProcAddress ("glVertexAttrib1sARB")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glVertexAttrib1sARB");
+      }
       allclear &= funcTest;
       funcTest = ((glVertexAttrib1fARB = (csGLVERTEXATTRIB1FARB) gl->GetProcAddress ("glVertexAttrib1fARB")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glVertexAttrib1fARB");
+      }
       allclear &= funcTest;
       funcTest = ((glVertexAttrib1dARB = (csGLVERTEXATTRIB1DARB) gl->GetProcAddress ("glVertexAttrib1dARB")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glVertexAttrib1dARB");
+      }
       allclear &= funcTest;
       funcTest = ((glVertexAttrib2sARB = (csGLVERTEXATTRIB2SARB) gl->GetProcAddress ("glVertexAttrib2sARB")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glVertexAttrib2sARB");
+      }
       allclear &= funcTest;
       funcTest = ((glVertexAttrib2fARB = (csGLVERTEXATTRIB2FARB) gl->GetProcAddress ("glVertexAttrib2fARB")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glVertexAttrib2fARB");
+      }
       allclear &= funcTest;
       funcTest = ((glVertexAttrib2dARB = (csGLVERTEXATTRIB2DARB) gl->GetProcAddress ("glVertexAttrib2dARB")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glVertexAttrib2dARB");
+      }
       allclear &= funcTest;
       funcTest = ((glVertexAttrib3sARB = (csGLVERTEXATTRIB3SARB) gl->GetProcAddress ("glVertexAttrib3sARB")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glVertexAttrib3sARB");
+      }
       allclear &= funcTest;
       funcTest = ((glVertexAttrib3fARB = (csGLVERTEXATTRIB3FARB) gl->GetProcAddress ("glVertexAttrib3fARB")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glVertexAttrib3fARB");
+      }
       allclear &= funcTest;
       funcTest = ((glVertexAttrib3dARB = (csGLVERTEXATTRIB3DARB) gl->GetProcAddress ("glVertexAttrib3dARB")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glVertexAttrib3dARB");
+      }
       allclear &= funcTest;
       funcTest = ((glVertexAttrib4sARB = (csGLVERTEXATTRIB4SARB) gl->GetProcAddress ("glVertexAttrib4sARB")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glVertexAttrib4sARB");
+      }
       allclear &= funcTest;
       funcTest = ((glVertexAttrib4fARB = (csGLVERTEXATTRIB4FARB) gl->GetProcAddress ("glVertexAttrib4fARB")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glVertexAttrib4fARB");
+      }
       allclear &= funcTest;
       funcTest = ((glVertexAttrib4dARB = (csGLVERTEXATTRIB4DARB) gl->GetProcAddress ("glVertexAttrib4dARB")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glVertexAttrib4dARB");
+      }
       allclear &= funcTest;
       funcTest = ((glVertexAttrib4NubARB = (csGLVERTEXATTRIB4NUBARB) gl->GetProcAddress ("glVertexAttrib4NubARB")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glVertexAttrib4NubARB");
+      }
       allclear &= funcTest;
       funcTest = ((glVertexAttrib1svARB = (csGLVERTEXATTRIB1SVARB) gl->GetProcAddress ("glVertexAttrib1svARB")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glVertexAttrib1svARB");
+      }
       allclear &= funcTest;
       funcTest = ((glVertexAttrib1fvARB = (csGLVERTEXATTRIB1FVARB) gl->GetProcAddress ("glVertexAttrib1fvARB")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glVertexAttrib1fvARB");
+      }
       allclear &= funcTest;
       funcTest = ((glVertexAttrib1dvARB = (csGLVERTEXATTRIB1DVARB) gl->GetProcAddress ("glVertexAttrib1dvARB")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glVertexAttrib1dvARB");
+      }
       allclear &= funcTest;
       funcTest = ((glVertexAttrib2svARB = (csGLVERTEXATTRIB2SVARB) gl->GetProcAddress ("glVertexAttrib2svARB")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glVertexAttrib2svARB");
+      }
       allclear &= funcTest;
       funcTest = ((glVertexAttrib2fvARB = (csGLVERTEXATTRIB2FVARB) gl->GetProcAddress ("glVertexAttrib2fvARB")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glVertexAttrib2fvARB");
+      }
       allclear &= funcTest;
       funcTest = ((glVertexAttrib2dvARB = (csGLVERTEXATTRIB2DVARB) gl->GetProcAddress ("glVertexAttrib2dvARB")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glVertexAttrib2dvARB");
+      }
       allclear &= funcTest;
       funcTest = ((glVertexAttrib3svARB = (csGLVERTEXATTRIB3SVARB) gl->GetProcAddress ("glVertexAttrib3svARB")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glVertexAttrib3svARB");
+      }
       allclear &= funcTest;
       funcTest = ((glVertexAttrib3fvARB = (csGLVERTEXATTRIB3FVARB) gl->GetProcAddress ("glVertexAttrib3fvARB")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glVertexAttrib3fvARB");
+      }
       allclear &= funcTest;
       funcTest = ((glVertexAttrib3dvARB = (csGLVERTEXATTRIB3DVARB) gl->GetProcAddress ("glVertexAttrib3dvARB")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glVertexAttrib3dvARB");
+      }
       allclear &= funcTest;
       funcTest = ((glVertexAttrib4bvARB = (csGLVERTEXATTRIB4BVARB) gl->GetProcAddress ("glVertexAttrib4bvARB")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glVertexAttrib4bvARB");
+      }
       allclear &= funcTest;
       funcTest = ((glVertexAttrib4svARB = (csGLVERTEXATTRIB4SVARB) gl->GetProcAddress ("glVertexAttrib4svARB")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glVertexAttrib4svARB");
+      }
       allclear &= funcTest;
       funcTest = ((glVertexAttrib4ivARB = (csGLVERTEXATTRIB4IVARB) gl->GetProcAddress ("glVertexAttrib4ivARB")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glVertexAttrib4ivARB");
+      }
       allclear &= funcTest;
       funcTest = ((glVertexAttrib4ubvARB = (csGLVERTEXATTRIB4UBVARB) gl->GetProcAddress ("glVertexAttrib4ubvARB")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glVertexAttrib4ubvARB");
+      }
       allclear &= funcTest;
       funcTest = ((glVertexAttrib4usvARB = (csGLVERTEXATTRIB4USVARB) gl->GetProcAddress ("glVertexAttrib4usvARB")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glVertexAttrib4usvARB");
+      }
       allclear &= funcTest;
       funcTest = ((glVertexAttrib4uivARB = (csGLVERTEXATTRIB4UIVARB) gl->GetProcAddress ("glVertexAttrib4uivARB")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glVertexAttrib4uivARB");
+      }
       allclear &= funcTest;
       funcTest = ((glVertexAttrib4fvARB = (csGLVERTEXATTRIB4FVARB) gl->GetProcAddress ("glVertexAttrib4fvARB")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glVertexAttrib4fvARB");
+      }
       allclear &= funcTest;
       funcTest = ((glVertexAttrib4dvARB = (csGLVERTEXATTRIB4DVARB) gl->GetProcAddress ("glVertexAttrib4dvARB")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glVertexAttrib4dvARB");
+      }
       allclear &= funcTest;
       funcTest = ((glVertexAttrib4NbvARB = (csGLVERTEXATTRIB4NBVARB) gl->GetProcAddress ("glVertexAttrib4NbvARB")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glVertexAttrib4NbvARB");
+      }
       allclear &= funcTest;
       funcTest = ((glVertexAttrib4NsvARB = (csGLVERTEXATTRIB4NSVARB) gl->GetProcAddress ("glVertexAttrib4NsvARB")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glVertexAttrib4NsvARB");
+      }
       allclear &= funcTest;
       funcTest = ((glVertexAttrib4NivARB = (csGLVERTEXATTRIB4NIVARB) gl->GetProcAddress ("glVertexAttrib4NivARB")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glVertexAttrib4NivARB");
+      }
       allclear &= funcTest;
       funcTest = ((glVertexAttrib4NubvARB = (csGLVERTEXATTRIB4NUBVARB) gl->GetProcAddress ("glVertexAttrib4NubvARB")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glVertexAttrib4NubvARB");
+      }
       allclear &= funcTest;
       funcTest = ((glVertexAttrib4NusvARB = (csGLVERTEXATTRIB4NUSVARB) gl->GetProcAddress ("glVertexAttrib4NusvARB")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glVertexAttrib4NusvARB");
+      }
       allclear &= funcTest;
       funcTest = ((glVertexAttrib4NuivARB = (csGLVERTEXATTRIB4NUIVARB) gl->GetProcAddress ("glVertexAttrib4NuivARB")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glVertexAttrib4NuivARB");
+      }
       allclear &= funcTest;
       funcTest = ((glVertexAttribPointerARB = (csGLVERTEXATTRIBPOINTERARB) gl->GetProcAddress ("glVertexAttribPointerARB")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glVertexAttribPointerARB");
+      }
       allclear &= funcTest;
       funcTest = ((glEnableVertexAttribArrayARB = (csGLENABLEVERTEXATTRIBARRAYARB) gl->GetProcAddress ("glEnableVertexAttribArrayARB")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glEnableVertexAttribArrayARB");
+      }
       allclear &= funcTest;
       funcTest = ((glDisableVertexAttribArrayARB = (csGLDISABLEVERTEXATTRIBARRAYARB) gl->GetProcAddress ("glDisableVertexAttribArrayARB")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glDisableVertexAttribArrayARB");
+      }
       allclear &= funcTest;
       funcTest = ((glProgramStringARB = (csGLPROGRAMSTRINGARB) gl->GetProcAddress ("glProgramStringARB")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glProgramStringARB");
+      }
       allclear &= funcTest;
       funcTest = ((glBindProgramARB = (csGLBINDPROGRAMARB) gl->GetProcAddress ("glBindProgramARB")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glBindProgramARB");
+      }
       allclear &= funcTest;
       funcTest = ((glDeleteProgramsARB = (csGLDELETEPROGRAMSARB) gl->GetProcAddress ("glDeleteProgramsARB")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glDeleteProgramsARB");
+      }
       allclear &= funcTest;
       funcTest = ((glGenProgramsARB = (csGLGENPROGRAMSARB) gl->GetProcAddress ("glGenProgramsARB")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glGenProgramsARB");
+      }
       allclear &= funcTest;
       funcTest = ((glProgramEnvParameter4dARB = (csGLPROGRAMENVPARAMETER4DARB) gl->GetProcAddress ("glProgramEnvParameter4dARB")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glProgramEnvParameter4dARB");
+      }
       allclear &= funcTest;
       funcTest = ((glProgramEnvParameter4dvARB = (csGLPROGRAMENVPARAMETER4DVARB) gl->GetProcAddress ("glProgramEnvParameter4dvARB")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glProgramEnvParameter4dvARB");
+      }
       allclear &= funcTest;
       funcTest = ((glProgramEnvParameter4fARB = (csGLPROGRAMENVPARAMETER4FARB) gl->GetProcAddress ("glProgramEnvParameter4fARB")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glProgramEnvParameter4fARB");
+      }
       allclear &= funcTest;
       funcTest = ((glProgramEnvParameter4fvARB = (csGLPROGRAMENVPARAMETER4FVARB) gl->GetProcAddress ("glProgramEnvParameter4fvARB")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glProgramEnvParameter4fvARB");
+      }
       allclear &= funcTest;
       funcTest = ((glProgramLocalParameter4dARB = (csGLPROGRAMLOCALPARAMETER4DARB) gl->GetProcAddress ("glProgramLocalParameter4dARB")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glProgramLocalParameter4dARB");
+      }
       allclear &= funcTest;
       funcTest = ((glProgramLocalParameter4dvARB = (csGLPROGRAMLOCALPARAMETER4DVARB) gl->GetProcAddress ("glProgramLocalParameter4dvARB")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glProgramLocalParameter4dvARB");
+      }
       allclear &= funcTest;
       funcTest = ((glProgramLocalParameter4fARB = (csGLPROGRAMLOCALPARAMETER4FARB) gl->GetProcAddress ("glProgramLocalParameter4fARB")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glProgramLocalParameter4fARB");
+      }
       allclear &= funcTest;
       funcTest = ((glProgramLocalParameter4fvARB = (csGLPROGRAMLOCALPARAMETER4FVARB) gl->GetProcAddress ("glProgramLocalParameter4fvARB")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glProgramLocalParameter4fvARB");
+      }
       allclear &= funcTest;
       funcTest = ((glGetProgramEnvParameterdvARB = (csGLGETPROGRAMENVPARAMETERDVARB) gl->GetProcAddress ("glGetProgramEnvParameterdvARB")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glGetProgramEnvParameterdvARB");
+      }
       allclear &= funcTest;
       funcTest = ((glGetProgramEnvParameterfvARB = (csGLGETPROGRAMENVPARAMETERFVARB) gl->GetProcAddress ("glGetProgramEnvParameterfvARB")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glGetProgramEnvParameterfvARB");
+      }
       allclear &= funcTest;
       funcTest = ((glGetProgramLocalParameterdvARB = (csGLGETPROGRAMLOCALPARAMETERDVARB) gl->GetProcAddress ("glGetProgramLocalParameterdvARB")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glGetProgramLocalParameterdvARB");
+      }
       allclear &= funcTest;
       funcTest = ((glGetProgramLocalParameterfvARB = (csGLGETPROGRAMLOCALPARAMETERFVARB) gl->GetProcAddress ("glGetProgramLocalParameterfvARB")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glGetProgramLocalParameterfvARB");
+      }
       allclear &= funcTest;
       funcTest = ((glGetProgramivARB = (csGLGETPROGRAMIVARB) gl->GetProcAddress ("glGetProgramivARB")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glGetProgramivARB");
+      }
       allclear &= funcTest;
       funcTest = ((glGetProgramStringARB = (csGLGETPROGRAMSTRINGARB) gl->GetProcAddress ("glGetProgramStringARB")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glGetProgramStringARB");
+      }
       allclear &= funcTest;
       funcTest = ((glGetVertexAttribdvARB = (csGLGETVERTEXATTRIBDVARB) gl->GetProcAddress ("glGetVertexAttribdvARB")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glGetVertexAttribdvARB");
+      }
       allclear &= funcTest;
       funcTest = ((glGetVertexAttribfvARB = (csGLGETVERTEXATTRIBFVARB) gl->GetProcAddress ("glGetVertexAttribfvARB")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glGetVertexAttribfvARB");
+      }
       allclear &= funcTest;
       funcTest = ((glGetVertexAttribivARB = (csGLGETVERTEXATTRIBIVARB) gl->GetProcAddress ("glGetVertexAttribivARB")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glGetVertexAttribivARB");
+      }
       allclear &= funcTest;
       funcTest = ((glGetVertexAttribPointervARB = (csGLGETVERTEXATTRIBPOINTERVARB) gl->GetProcAddress ("glGetVertexAttribPointervARB")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glGetVertexAttribPointervARB");
+      }
       allclear &= funcTest;
       funcTest = ((glIsProgramARB = (csGLISPROGRAMARB) gl->GetProcAddress ("glIsProgramARB")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glIsProgramARB");
+      }
       allclear &= funcTest;
+
       if (CS_GL_ARB_vertex_program = allclear)
       {
         CS_GL_ARB_vertex_program &= config->GetBool (cfgkey, true);
@@ -12175,86 +14637,137 @@ public:
       Report ("GL Extension '%s' not found.", ext);
     }
   }
-
+  
   void InitGL_ARB_window_pos ()
   {
     if (tested_CS_GL_ARB_window_pos) return;
     tested_CS_GL_ARB_window_pos = true;
     const char* ext = "GL_ARB_window_pos";
-    char cfgkey[44];
+    char cfgkey[26 + 17 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
-
-    const char* extensions = (const char*)glGetString (GL_EXTENSIONS);
+    
+    const char* extensions;
+    extensions = (const char*)glGetString (GL_EXTENSIONS);
     CS_GL_ARB_window_pos = (strstr (extensions, ext) != NULL);
 
     bool allclear, funcTest;
-    if (gl && CS_GL_ARB_window_pos)
+    (void)funcTest; // shut up "variable unused" warnings
+    if (CS_GL_ARB_window_pos)
     {
       allclear = true;
       funcTest = ((glWindowPos2dARB = (csGLWINDOWPOS2DARB) gl->GetProcAddress ("glWindowPos2dARB")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glWindowPos2dARB");
+      }
       allclear &= funcTest;
       funcTest = ((glWindowPos2fARB = (csGLWINDOWPOS2FARB) gl->GetProcAddress ("glWindowPos2fARB")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glWindowPos2fARB");
+      }
       allclear &= funcTest;
       funcTest = ((glWindowPos2iARB = (csGLWINDOWPOS2IARB) gl->GetProcAddress ("glWindowPos2iARB")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glWindowPos2iARB");
+      }
       allclear &= funcTest;
       funcTest = ((glWindowPos2sARB = (csGLWINDOWPOS2SARB) gl->GetProcAddress ("glWindowPos2sARB")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glWindowPos2sARB");
+      }
       allclear &= funcTest;
       funcTest = ((glWindowPos2dvARB = (csGLWINDOWPOS2DVARB) gl->GetProcAddress ("glWindowPos2dvARB")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glWindowPos2dvARB");
+      }
       allclear &= funcTest;
       funcTest = ((glWindowPos2fvARB = (csGLWINDOWPOS2FVARB) gl->GetProcAddress ("glWindowPos2fvARB")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glWindowPos2fvARB");
+      }
       allclear &= funcTest;
       funcTest = ((glWindowPos2ivARB = (csGLWINDOWPOS2IVARB) gl->GetProcAddress ("glWindowPos2ivARB")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glWindowPos2ivARB");
+      }
       allclear &= funcTest;
       funcTest = ((glWindowPos2svARB = (csGLWINDOWPOS2SVARB) gl->GetProcAddress ("glWindowPos2svARB")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glWindowPos2svARB");
+      }
       allclear &= funcTest;
       funcTest = ((glWindowPos3dARB = (csGLWINDOWPOS3DARB) gl->GetProcAddress ("glWindowPos3dARB")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glWindowPos3dARB");
+      }
       allclear &= funcTest;
       funcTest = ((glWindowPos3fARB = (csGLWINDOWPOS3FARB) gl->GetProcAddress ("glWindowPos3fARB")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glWindowPos3fARB");
+      }
       allclear &= funcTest;
       funcTest = ((glWindowPos3iARB = (csGLWINDOWPOS3IARB) gl->GetProcAddress ("glWindowPos3iARB")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glWindowPos3iARB");
+      }
       allclear &= funcTest;
       funcTest = ((glWindowPos3sARB = (csGLWINDOWPOS3SARB) gl->GetProcAddress ("glWindowPos3sARB")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glWindowPos3sARB");
+      }
       allclear &= funcTest;
       funcTest = ((glWindowPos3dvARB = (csGLWINDOWPOS3DVARB) gl->GetProcAddress ("glWindowPos3dvARB")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glWindowPos3dvARB");
+      }
       allclear &= funcTest;
       funcTest = ((glWindowPos3fvARB = (csGLWINDOWPOS3FVARB) gl->GetProcAddress ("glWindowPos3fvARB")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glWindowPos3fvARB");
+      }
       allclear &= funcTest;
       funcTest = ((glWindowPos3ivARB = (csGLWINDOWPOS3IVARB) gl->GetProcAddress ("glWindowPos3ivARB")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glWindowPos3ivARB");
+      }
       allclear &= funcTest;
       funcTest = ((glWindowPos3svARB = (csGLWINDOWPOS3SVARB) gl->GetProcAddress ("glWindowPos3svARB")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glWindowPos3svARB");
+      }
       allclear &= funcTest;
+
       if (CS_GL_ARB_window_pos = allclear)
       {
         CS_GL_ARB_window_pos &= config->GetBool (cfgkey, true);
@@ -12277,22 +14790,25 @@ public:
       Report ("GL Extension '%s' not found.", ext);
     }
   }
-
+  
   void InitGL_EXT_422_pixels ()
   {
     if (tested_CS_GL_EXT_422_pixels) return;
     tested_CS_GL_EXT_422_pixels = true;
     const char* ext = "GL_EXT_422_pixels";
-    char cfgkey[44];
+    char cfgkey[26 + 17 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
-
-    const char* extensions = (const char*)glGetString (GL_EXTENSIONS);
+    
+    const char* extensions;
+    extensions = (const char*)glGetString (GL_EXTENSIONS);
     CS_GL_EXT_422_pixels = (strstr (extensions, ext) != NULL);
 
     bool allclear, funcTest;
-    if (gl && CS_GL_EXT_422_pixels)
+    (void)funcTest; // shut up "variable unused" warnings
+    if (CS_GL_EXT_422_pixels)
     {
       allclear = true;
+
       if (CS_GL_EXT_422_pixels = allclear)
       {
         CS_GL_EXT_422_pixels &= config->GetBool (cfgkey, true);
@@ -12315,22 +14831,25 @@ public:
       Report ("GL Extension '%s' not found.", ext);
     }
   }
-
+  
   void InitGL_EXT_abgr ()
   {
     if (tested_CS_GL_EXT_abgr) return;
     tested_CS_GL_EXT_abgr = true;
     const char* ext = "GL_EXT_abgr";
-    char cfgkey[38];
+    char cfgkey[26 + 11 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
-
-    const char* extensions = (const char*)glGetString (GL_EXTENSIONS);
+    
+    const char* extensions;
+    extensions = (const char*)glGetString (GL_EXTENSIONS);
     CS_GL_EXT_abgr = (strstr (extensions, ext) != NULL);
 
     bool allclear, funcTest;
-    if (gl && CS_GL_EXT_abgr)
+    (void)funcTest; // shut up "variable unused" warnings
+    if (CS_GL_EXT_abgr)
     {
       allclear = true;
+
       if (CS_GL_EXT_abgr = allclear)
       {
         CS_GL_EXT_abgr &= config->GetBool (cfgkey, true);
@@ -12353,22 +14872,25 @@ public:
       Report ("GL Extension '%s' not found.", ext);
     }
   }
-
+  
   void InitGL_EXT_bgra ()
   {
     if (tested_CS_GL_EXT_bgra) return;
     tested_CS_GL_EXT_bgra = true;
     const char* ext = "GL_EXT_bgra";
-    char cfgkey[38];
+    char cfgkey[26 + 11 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
-
-    const char* extensions = (const char*)glGetString (GL_EXTENSIONS);
+    
+    const char* extensions;
+    extensions = (const char*)glGetString (GL_EXTENSIONS);
     CS_GL_EXT_bgra = (strstr (extensions, ext) != NULL);
 
     bool allclear, funcTest;
-    if (gl && CS_GL_EXT_bgra)
+    (void)funcTest; // shut up "variable unused" warnings
+    if (CS_GL_EXT_bgra)
     {
       allclear = true;
+
       if (CS_GL_EXT_bgra = allclear)
       {
         CS_GL_EXT_bgra &= config->GetBool (cfgkey, true);
@@ -12391,26 +14913,32 @@ public:
       Report ("GL Extension '%s' not found.", ext);
     }
   }
-
+  
   void InitGL_EXT_blend_color ()
   {
     if (tested_CS_GL_EXT_blend_color) return;
     tested_CS_GL_EXT_blend_color = true;
     const char* ext = "GL_EXT_blend_color";
-    char cfgkey[45];
+    char cfgkey[26 + 18 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
-
-    const char* extensions = (const char*)glGetString (GL_EXTENSIONS);
+    
+    const char* extensions;
+    extensions = (const char*)glGetString (GL_EXTENSIONS);
     CS_GL_EXT_blend_color = (strstr (extensions, ext) != NULL);
 
     bool allclear, funcTest;
-    if (gl && CS_GL_EXT_blend_color)
+    (void)funcTest; // shut up "variable unused" warnings
+    if (CS_GL_EXT_blend_color)
     {
       allclear = true;
       funcTest = ((glBlendColorEXT = (csGLBLENDCOLOREXT) gl->GetProcAddress ("glBlendColorEXT")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glBlendColorEXT");
+      }
       allclear &= funcTest;
+
       if (CS_GL_EXT_blend_color = allclear)
       {
         CS_GL_EXT_blend_color &= config->GetBool (cfgkey, true);
@@ -12433,26 +14961,32 @@ public:
       Report ("GL Extension '%s' not found.", ext);
     }
   }
-
+  
   void InitGL_EXT_blend_func_separate ()
   {
     if (tested_CS_GL_EXT_blend_func_separate) return;
     tested_CS_GL_EXT_blend_func_separate = true;
     const char* ext = "GL_EXT_blend_func_separate";
-    char cfgkey[53];
+    char cfgkey[26 + 26 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
-
-    const char* extensions = (const char*)glGetString (GL_EXTENSIONS);
+    
+    const char* extensions;
+    extensions = (const char*)glGetString (GL_EXTENSIONS);
     CS_GL_EXT_blend_func_separate = (strstr (extensions, ext) != NULL);
 
     bool allclear, funcTest;
-    if (gl && CS_GL_EXT_blend_func_separate)
+    (void)funcTest; // shut up "variable unused" warnings
+    if (CS_GL_EXT_blend_func_separate)
     {
       allclear = true;
       funcTest = ((glBlendFuncSeparateEXT = (csGLBLENDFUNCSEPARATEEXT) gl->GetProcAddress ("glBlendFuncSeparateEXT")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glBlendFuncSeparateEXT");
+      }
       allclear &= funcTest;
+
       if (CS_GL_EXT_blend_func_separate = allclear)
       {
         CS_GL_EXT_blend_func_separate &= config->GetBool (cfgkey, true);
@@ -12475,22 +15009,25 @@ public:
       Report ("GL Extension '%s' not found.", ext);
     }
   }
-
+  
   void InitGL_EXT_blend_logic_op ()
   {
     if (tested_CS_GL_EXT_blend_logic_op) return;
     tested_CS_GL_EXT_blend_logic_op = true;
     const char* ext = "GL_EXT_blend_logic_op";
-    char cfgkey[48];
+    char cfgkey[26 + 21 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
-
-    const char* extensions = (const char*)glGetString (GL_EXTENSIONS);
+    
+    const char* extensions;
+    extensions = (const char*)glGetString (GL_EXTENSIONS);
     CS_GL_EXT_blend_logic_op = (strstr (extensions, ext) != NULL);
 
     bool allclear, funcTest;
-    if (gl && CS_GL_EXT_blend_logic_op)
+    (void)funcTest; // shut up "variable unused" warnings
+    if (CS_GL_EXT_blend_logic_op)
     {
       allclear = true;
+
       if (CS_GL_EXT_blend_logic_op = allclear)
       {
         CS_GL_EXT_blend_logic_op &= config->GetBool (cfgkey, true);
@@ -12513,26 +15050,32 @@ public:
       Report ("GL Extension '%s' not found.", ext);
     }
   }
-
+  
   void InitGL_EXT_blend_minmax ()
   {
     if (tested_CS_GL_EXT_blend_minmax) return;
     tested_CS_GL_EXT_blend_minmax = true;
     const char* ext = "GL_EXT_blend_minmax";
-    char cfgkey[46];
+    char cfgkey[26 + 19 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
-
-    const char* extensions = (const char*)glGetString (GL_EXTENSIONS);
+    
+    const char* extensions;
+    extensions = (const char*)glGetString (GL_EXTENSIONS);
     CS_GL_EXT_blend_minmax = (strstr (extensions, ext) != NULL);
 
     bool allclear, funcTest;
-    if (gl && CS_GL_EXT_blend_minmax)
+    (void)funcTest; // shut up "variable unused" warnings
+    if (CS_GL_EXT_blend_minmax)
     {
       allclear = true;
       funcTest = ((glBlendEquationEXT = (csGLBLENDEQUATIONEXT) gl->GetProcAddress ("glBlendEquationEXT")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glBlendEquationEXT");
+      }
       allclear &= funcTest;
+
       if (CS_GL_EXT_blend_minmax = allclear)
       {
         CS_GL_EXT_blend_minmax &= config->GetBool (cfgkey, true);
@@ -12555,22 +15098,25 @@ public:
       Report ("GL Extension '%s' not found.", ext);
     }
   }
-
+  
   void InitGL_EXT_blend_subtract ()
   {
     if (tested_CS_GL_EXT_blend_subtract) return;
     tested_CS_GL_EXT_blend_subtract = true;
     const char* ext = "GL_EXT_blend_subtract";
-    char cfgkey[48];
+    char cfgkey[26 + 21 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
-
-    const char* extensions = (const char*)glGetString (GL_EXTENSIONS);
+    
+    const char* extensions;
+    extensions = (const char*)glGetString (GL_EXTENSIONS);
     CS_GL_EXT_blend_subtract = (strstr (extensions, ext) != NULL);
 
     bool allclear, funcTest;
-    if (gl && CS_GL_EXT_blend_subtract)
+    (void)funcTest; // shut up "variable unused" warnings
+    if (CS_GL_EXT_blend_subtract)
     {
       allclear = true;
+
       if (CS_GL_EXT_blend_subtract = allclear)
       {
         CS_GL_EXT_blend_subtract &= config->GetBool (cfgkey, true);
@@ -12593,22 +15139,25 @@ public:
       Report ("GL Extension '%s' not found.", ext);
     }
   }
-
+  
   void InitGL_EXT_clip_volume_hint ()
   {
     if (tested_CS_GL_EXT_clip_volume_hint) return;
     tested_CS_GL_EXT_clip_volume_hint = true;
     const char* ext = "GL_EXT_clip_volume_hint";
-    char cfgkey[50];
+    char cfgkey[26 + 23 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
-
-    const char* extensions = (const char*)glGetString (GL_EXTENSIONS);
+    
+    const char* extensions;
+    extensions = (const char*)glGetString (GL_EXTENSIONS);
     CS_GL_EXT_clip_volume_hint = (strstr (extensions, ext) != NULL);
 
     bool allclear, funcTest;
-    if (gl && CS_GL_EXT_clip_volume_hint)
+    (void)funcTest; // shut up "variable unused" warnings
+    if (CS_GL_EXT_clip_volume_hint)
     {
       allclear = true;
+
       if (CS_GL_EXT_clip_volume_hint = allclear)
       {
         CS_GL_EXT_clip_volume_hint &= config->GetBool (cfgkey, true);
@@ -12631,30 +15180,39 @@ public:
       Report ("GL Extension '%s' not found.", ext);
     }
   }
-
+  
   void InitGL_EXT_color_subtable ()
   {
     if (tested_CS_GL_EXT_color_subtable) return;
     tested_CS_GL_EXT_color_subtable = true;
     const char* ext = "GL_EXT_color_subtable";
-    char cfgkey[48];
+    char cfgkey[26 + 21 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
-
-    const char* extensions = (const char*)glGetString (GL_EXTENSIONS);
+    
+    const char* extensions;
+    extensions = (const char*)glGetString (GL_EXTENSIONS);
     CS_GL_EXT_color_subtable = (strstr (extensions, ext) != NULL);
 
     bool allclear, funcTest;
-    if (gl && CS_GL_EXT_color_subtable)
+    (void)funcTest; // shut up "variable unused" warnings
+    if (CS_GL_EXT_color_subtable)
     {
       allclear = true;
       funcTest = ((glColorSubTableEXT = (csGLCOLORSUBTABLEEXT) gl->GetProcAddress ("glColorSubTableEXT")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glColorSubTableEXT");
+      }
       allclear &= funcTest;
       funcTest = ((glCopyColorSubTableEXT = (csGLCOPYCOLORSUBTABLEEXT) gl->GetProcAddress ("glCopyColorSubTableEXT")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glCopyColorSubTableEXT");
+      }
       allclear &= funcTest;
+
       if (CS_GL_EXT_color_subtable = allclear)
       {
         CS_GL_EXT_color_subtable &= config->GetBool (cfgkey, true);
@@ -12677,30 +15235,39 @@ public:
       Report ("GL Extension '%s' not found.", ext);
     }
   }
-
+  
   void InitGL_EXT_compiled_vertex_array ()
   {
     if (tested_CS_GL_EXT_compiled_vertex_array) return;
     tested_CS_GL_EXT_compiled_vertex_array = true;
     const char* ext = "GL_EXT_compiled_vertex_array";
-    char cfgkey[55];
+    char cfgkey[26 + 28 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
-
-    const char* extensions = (const char*)glGetString (GL_EXTENSIONS);
+    
+    const char* extensions;
+    extensions = (const char*)glGetString (GL_EXTENSIONS);
     CS_GL_EXT_compiled_vertex_array = (strstr (extensions, ext) != NULL);
 
     bool allclear, funcTest;
-    if (gl && CS_GL_EXT_compiled_vertex_array)
+    (void)funcTest; // shut up "variable unused" warnings
+    if (CS_GL_EXT_compiled_vertex_array)
     {
       allclear = true;
       funcTest = ((glLockArraysEXT = (csGLLOCKARRAYSEXT) gl->GetProcAddress ("glLockArraysEXT")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glLockArraysEXT");
+      }
       allclear &= funcTest;
       funcTest = ((glUnlockArraysEXT = (csGLUNLOCKARRAYSEXT) gl->GetProcAddress ("glUnlockArraysEXT")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glUnlockArraysEXT");
+      }
       allclear &= funcTest;
+
       if (CS_GL_EXT_compiled_vertex_array = allclear)
       {
         CS_GL_EXT_compiled_vertex_array &= config->GetBool (cfgkey, true);
@@ -12723,74 +15290,116 @@ public:
       Report ("GL Extension '%s' not found.", ext);
     }
   }
-
+  
   void InitGL_EXT_convolution ()
   {
     if (tested_CS_GL_EXT_convolution) return;
     tested_CS_GL_EXT_convolution = true;
     const char* ext = "GL_EXT_convolution";
-    char cfgkey[45];
+    char cfgkey[26 + 18 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
-
-    const char* extensions = (const char*)glGetString (GL_EXTENSIONS);
+    
+    const char* extensions;
+    extensions = (const char*)glGetString (GL_EXTENSIONS);
     CS_GL_EXT_convolution = (strstr (extensions, ext) != NULL);
 
     bool allclear, funcTest;
-    if (gl && CS_GL_EXT_convolution)
+    (void)funcTest; // shut up "variable unused" warnings
+    if (CS_GL_EXT_convolution)
     {
       allclear = true;
       funcTest = ((glConvolutionFilter1DEXT = (csGLCONVOLUTIONFILTER1DEXT) gl->GetProcAddress ("glConvolutionFilter1DEXT")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glConvolutionFilter1DEXT");
+      }
       allclear &= funcTest;
       funcTest = ((glConvolutionFilter2DEXT = (csGLCONVOLUTIONFILTER2DEXT) gl->GetProcAddress ("glConvolutionFilter2DEXT")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glConvolutionFilter2DEXT");
+      }
       allclear &= funcTest;
       funcTest = ((glCopyConvolutionFilter1DEXT = (csGLCOPYCONVOLUTIONFILTER1DEXT) gl->GetProcAddress ("glCopyConvolutionFilter1DEXT")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glCopyConvolutionFilter1DEXT");
+      }
       allclear &= funcTest;
       funcTest = ((glCopyConvolutionFilter2DEXT = (csGLCOPYCONVOLUTIONFILTER2DEXT) gl->GetProcAddress ("glCopyConvolutionFilter2DEXT")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glCopyConvolutionFilter2DEXT");
+      }
       allclear &= funcTest;
       funcTest = ((glGetConvolutionFilterEXT = (csGLGETCONVOLUTIONFILTEREXT) gl->GetProcAddress ("glGetConvolutionFilterEXT")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glGetConvolutionFilterEXT");
+      }
       allclear &= funcTest;
       funcTest = ((glSeparableFilter2DEXT = (csGLSEPARABLEFILTER2DEXT) gl->GetProcAddress ("glSeparableFilter2DEXT")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glSeparableFilter2DEXT");
+      }
       allclear &= funcTest;
       funcTest = ((glGetSeparableFilterEXT = (csGLGETSEPARABLEFILTEREXT) gl->GetProcAddress ("glGetSeparableFilterEXT")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glGetSeparableFilterEXT");
+      }
       allclear &= funcTest;
       funcTest = ((glConvolutionParameteriEXT = (csGLCONVOLUTIONPARAMETERIEXT) gl->GetProcAddress ("glConvolutionParameteriEXT")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glConvolutionParameteriEXT");
+      }
       allclear &= funcTest;
       funcTest = ((glConvolutionParameterivEXT = (csGLCONVOLUTIONPARAMETERIVEXT) gl->GetProcAddress ("glConvolutionParameterivEXT")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glConvolutionParameterivEXT");
+      }
       allclear &= funcTest;
       funcTest = ((glConvolutionParameterfEXT = (csGLCONVOLUTIONPARAMETERFEXT) gl->GetProcAddress ("glConvolutionParameterfEXT")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glConvolutionParameterfEXT");
+      }
       allclear &= funcTest;
       funcTest = ((glConvolutionParameterfvEXT = (csGLCONVOLUTIONPARAMETERFVEXT) gl->GetProcAddress ("glConvolutionParameterfvEXT")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glConvolutionParameterfvEXT");
+      }
       allclear &= funcTest;
       funcTest = ((glGetConvolutionParameterivEXT = (csGLGETCONVOLUTIONPARAMETERIVEXT) gl->GetProcAddress ("glGetConvolutionParameterivEXT")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glGetConvolutionParameterivEXT");
+      }
       allclear &= funcTest;
       funcTest = ((glGetConvolutionParameterfvEXT = (csGLGETCONVOLUTIONPARAMETERFVEXT) gl->GetProcAddress ("glGetConvolutionParameterfvEXT")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glGetConvolutionParameterfvEXT");
+      }
       allclear &= funcTest;
+
       if (CS_GL_EXT_convolution = allclear)
       {
         CS_GL_EXT_convolution &= config->GetBool (cfgkey, true);
@@ -12813,42 +15422,60 @@ public:
       Report ("GL Extension '%s' not found.", ext);
     }
   }
-
+  
   void InitGL_EXT_fog_coord ()
   {
     if (tested_CS_GL_EXT_fog_coord) return;
     tested_CS_GL_EXT_fog_coord = true;
     const char* ext = "GL_EXT_fog_coord";
-    char cfgkey[43];
+    char cfgkey[26 + 16 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
-
-    const char* extensions = (const char*)glGetString (GL_EXTENSIONS);
+    
+    const char* extensions;
+    extensions = (const char*)glGetString (GL_EXTENSIONS);
     CS_GL_EXT_fog_coord = (strstr (extensions, ext) != NULL);
 
     bool allclear, funcTest;
-    if (gl && CS_GL_EXT_fog_coord)
+    (void)funcTest; // shut up "variable unused" warnings
+    if (CS_GL_EXT_fog_coord)
     {
       allclear = true;
       funcTest = ((glFogCoordfEXfloat = (csGLFOGCOORDFEXFLOAT) gl->GetProcAddress ("glFogCoordfEXfloat")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glFogCoordfEXfloat");
+      }
       allclear &= funcTest;
       funcTest = ((glFogCoorddEXdouble = (csGLFOGCOORDDEXDOUBLE) gl->GetProcAddress ("glFogCoorddEXdouble")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glFogCoorddEXdouble");
+      }
       allclear &= funcTest;
       funcTest = ((glFogCoordfvEXfloat = (csGLFOGCOORDFVEXFLOAT) gl->GetProcAddress ("glFogCoordfvEXfloat")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glFogCoordfvEXfloat");
+      }
       allclear &= funcTest;
       funcTest = ((glFogCoorddvEXdouble = (csGLFOGCOORDDVEXDOUBLE) gl->GetProcAddress ("glFogCoorddvEXdouble")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glFogCoorddvEXdouble");
+      }
       allclear &= funcTest;
       funcTest = ((glFogCoordPointerEXT = (csGLFOGCOORDPOINTEREXT) gl->GetProcAddress ("glFogCoordPointerEXT")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glFogCoordPointerEXT");
+      }
       allclear &= funcTest;
+
       if (CS_GL_EXT_fog_coord = allclear)
       {
         CS_GL_EXT_fog_coord &= config->GetBool (cfgkey, true);
@@ -12871,62 +15498,95 @@ public:
       Report ("GL Extension '%s' not found.", ext);
     }
   }
-
+  
   void InitGL_EXT_histogram ()
   {
     if (tested_CS_GL_EXT_histogram) return;
     tested_CS_GL_EXT_histogram = true;
     const char* ext = "GL_EXT_histogram";
-    char cfgkey[43];
+    char cfgkey[26 + 16 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
-
-    const char* extensions = (const char*)glGetString (GL_EXTENSIONS);
+    
+    const char* extensions;
+    extensions = (const char*)glGetString (GL_EXTENSIONS);
     CS_GL_EXT_histogram = (strstr (extensions, ext) != NULL);
 
     bool allclear, funcTest;
-    if (gl && CS_GL_EXT_histogram)
+    (void)funcTest; // shut up "variable unused" warnings
+    if (CS_GL_EXT_histogram)
     {
       allclear = true;
       funcTest = ((glHistogramEXT = (csGLHISTOGRAMEXT) gl->GetProcAddress ("glHistogramEXT")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glHistogramEXT");
+      }
       allclear &= funcTest;
       funcTest = ((glResetHistogramEXT = (csGLRESETHISTOGRAMEXT) gl->GetProcAddress ("glResetHistogramEXT")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glResetHistogramEXT");
+      }
       allclear &= funcTest;
       funcTest = ((glGetHistogramEXT = (csGLGETHISTOGRAMEXT) gl->GetProcAddress ("glGetHistogramEXT")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glGetHistogramEXT");
+      }
       allclear &= funcTest;
       funcTest = ((glGetHistogramParameterivEXT = (csGLGETHISTOGRAMPARAMETERIVEXT) gl->GetProcAddress ("glGetHistogramParameterivEXT")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glGetHistogramParameterivEXT");
+      }
       allclear &= funcTest;
       funcTest = ((glGetHistogramParameterfvEXT = (csGLGETHISTOGRAMPARAMETERFVEXT) gl->GetProcAddress ("glGetHistogramParameterfvEXT")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glGetHistogramParameterfvEXT");
+      }
       allclear &= funcTest;
       funcTest = ((glMinmaxEXT = (csGLMINMAXEXT) gl->GetProcAddress ("glMinmaxEXT")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glMinmaxEXT");
+      }
       allclear &= funcTest;
       funcTest = ((glResetMinmaxEXT = (csGLRESETMINMAXEXT) gl->GetProcAddress ("glResetMinmaxEXT")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glResetMinmaxEXT");
+      }
       allclear &= funcTest;
       funcTest = ((glGetMinmaxEXT = (csGLGETMINMAXEXT) gl->GetProcAddress ("glGetMinmaxEXT")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glGetMinmaxEXT");
+      }
       allclear &= funcTest;
       funcTest = ((glGetMinmaxParameterivEXT = (csGLGETMINMAXPARAMETERIVEXT) gl->GetProcAddress ("glGetMinmaxParameterivEXT")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glGetMinmaxParameterivEXT");
+      }
       allclear &= funcTest;
       funcTest = ((glGetMinmaxParameterfvEXT = (csGLGETMINMAXPARAMETERFVEXT) gl->GetProcAddress ("glGetMinmaxParameterfvEXT")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glGetMinmaxParameterfvEXT");
+      }
       allclear &= funcTest;
+
       if (CS_GL_EXT_histogram = allclear)
       {
         CS_GL_EXT_histogram &= config->GetBool (cfgkey, true);
@@ -12949,30 +15609,39 @@ public:
       Report ("GL Extension '%s' not found.", ext);
     }
   }
-
+  
   void InitGL_EXT_multi_draw_arrays ()
   {
     if (tested_CS_GL_EXT_multi_draw_arrays) return;
     tested_CS_GL_EXT_multi_draw_arrays = true;
     const char* ext = "GL_EXT_multi_draw_arrays";
-    char cfgkey[51];
+    char cfgkey[26 + 24 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
-
-    const char* extensions = (const char*)glGetString (GL_EXTENSIONS);
+    
+    const char* extensions;
+    extensions = (const char*)glGetString (GL_EXTENSIONS);
     CS_GL_EXT_multi_draw_arrays = (strstr (extensions, ext) != NULL);
 
     bool allclear, funcTest;
-    if (gl && CS_GL_EXT_multi_draw_arrays)
+    (void)funcTest; // shut up "variable unused" warnings
+    if (CS_GL_EXT_multi_draw_arrays)
     {
       allclear = true;
       funcTest = ((glMultiDrawArraysEXT = (csGLMULTIDRAWARRAYSEXT) gl->GetProcAddress ("glMultiDrawArraysEXT")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glMultiDrawArraysEXT");
+      }
       allclear &= funcTest;
       funcTest = ((glMultiDrawElementsEXT = (csGLMULTIDRAWELEMENTSEXT) gl->GetProcAddress ("glMultiDrawElementsEXT")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glMultiDrawElementsEXT");
+      }
       allclear &= funcTest;
+
       if (CS_GL_EXT_multi_draw_arrays = allclear)
       {
         CS_GL_EXT_multi_draw_arrays &= config->GetBool (cfgkey, true);
@@ -12995,22 +15664,25 @@ public:
       Report ("GL Extension '%s' not found.", ext);
     }
   }
-
+  
   void InitGL_EXT_packed_pixels ()
   {
     if (tested_CS_GL_EXT_packed_pixels) return;
     tested_CS_GL_EXT_packed_pixels = true;
     const char* ext = "GL_EXT_packed_pixels";
-    char cfgkey[47];
+    char cfgkey[26 + 20 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
-
-    const char* extensions = (const char*)glGetString (GL_EXTENSIONS);
+    
+    const char* extensions;
+    extensions = (const char*)glGetString (GL_EXTENSIONS);
     CS_GL_EXT_packed_pixels = (strstr (extensions, ext) != NULL);
 
     bool allclear, funcTest;
-    if (gl && CS_GL_EXT_packed_pixels)
+    (void)funcTest; // shut up "variable unused" warnings
+    if (CS_GL_EXT_packed_pixels)
     {
       allclear = true;
+
       if (CS_GL_EXT_packed_pixels = allclear)
       {
         CS_GL_EXT_packed_pixels &= config->GetBool (cfgkey, true);
@@ -13033,42 +15705,60 @@ public:
       Report ("GL Extension '%s' not found.", ext);
     }
   }
-
+  
   void InitGL_EXT_paletted_texture ()
   {
     if (tested_CS_GL_EXT_paletted_texture) return;
     tested_CS_GL_EXT_paletted_texture = true;
     const char* ext = "GL_EXT_paletted_texture";
-    char cfgkey[50];
+    char cfgkey[26 + 23 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
-
-    const char* extensions = (const char*)glGetString (GL_EXTENSIONS);
+    
+    const char* extensions;
+    extensions = (const char*)glGetString (GL_EXTENSIONS);
     CS_GL_EXT_paletted_texture = (strstr (extensions, ext) != NULL);
 
     bool allclear, funcTest;
-    if (gl && CS_GL_EXT_paletted_texture)
+    (void)funcTest; // shut up "variable unused" warnings
+    if (CS_GL_EXT_paletted_texture)
     {
       allclear = true;
       funcTest = ((glColorTableEXT = (csGLCOLORTABLEEXT) gl->GetProcAddress ("glColorTableEXT")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glColorTableEXT");
+      }
       allclear &= funcTest;
       funcTest = ((glColorSubTableEXT = (csGLCOLORSUBTABLEEXT) gl->GetProcAddress ("glColorSubTableEXT")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glColorSubTableEXT");
+      }
       allclear &= funcTest;
       funcTest = ((glGetColorTableEXT = (csGLGETCOLORTABLEEXT) gl->GetProcAddress ("glGetColorTableEXT")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glGetColorTableEXT");
+      }
       allclear &= funcTest;
       funcTest = ((glGetColorTableParameterivEXT = (csGLGETCOLORTABLEPARAMETERIVEXT) gl->GetProcAddress ("glGetColorTableParameterivEXT")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glGetColorTableParameterivEXT");
+      }
       allclear &= funcTest;
       funcTest = ((glGetColorTableParameterfvEXT = (csGLGETCOLORTABLEPARAMETERFVEXT) gl->GetProcAddress ("glGetColorTableParameterfvEXT")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glGetColorTableParameterfvEXT");
+      }
       allclear &= funcTest;
+
       if (CS_GL_EXT_paletted_texture = allclear)
       {
         CS_GL_EXT_paletted_texture &= config->GetBool (cfgkey, true);
@@ -13091,30 +15781,39 @@ public:
       Report ("GL Extension '%s' not found.", ext);
     }
   }
-
+  
   void InitGL_EXT_point_parameters ()
   {
     if (tested_CS_GL_EXT_point_parameters) return;
     tested_CS_GL_EXT_point_parameters = true;
     const char* ext = "GL_EXT_point_parameters";
-    char cfgkey[50];
+    char cfgkey[26 + 23 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
-
-    const char* extensions = (const char*)glGetString (GL_EXTENSIONS);
+    
+    const char* extensions;
+    extensions = (const char*)glGetString (GL_EXTENSIONS);
     CS_GL_EXT_point_parameters = (strstr (extensions, ext) != NULL);
 
     bool allclear, funcTest;
-    if (gl && CS_GL_EXT_point_parameters)
+    (void)funcTest; // shut up "variable unused" warnings
+    if (CS_GL_EXT_point_parameters)
     {
       allclear = true;
       funcTest = ((glPointParameterfEXT = (csGLPOINTPARAMETERFEXT) gl->GetProcAddress ("glPointParameterfEXT")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glPointParameterfEXT");
+      }
       allclear &= funcTest;
       funcTest = ((glPointParameterfvEXT = (csGLPOINTPARAMETERFVEXT) gl->GetProcAddress ("glPointParameterfvEXT")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glPointParameterfvEXT");
+      }
       allclear &= funcTest;
+
       if (CS_GL_EXT_point_parameters = allclear)
       {
         CS_GL_EXT_point_parameters &= config->GetBool (cfgkey, true);
@@ -13137,26 +15836,32 @@ public:
       Report ("GL Extension '%s' not found.", ext);
     }
   }
-
+  
   void InitGL_EXT_polygon_offset ()
   {
     if (tested_CS_GL_EXT_polygon_offset) return;
     tested_CS_GL_EXT_polygon_offset = true;
     const char* ext = "GL_EXT_polygon_offset";
-    char cfgkey[48];
+    char cfgkey[26 + 21 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
-
-    const char* extensions = (const char*)glGetString (GL_EXTENSIONS);
+    
+    const char* extensions;
+    extensions = (const char*)glGetString (GL_EXTENSIONS);
     CS_GL_EXT_polygon_offset = (strstr (extensions, ext) != NULL);
 
     bool allclear, funcTest;
-    if (gl && CS_GL_EXT_polygon_offset)
+    (void)funcTest; // shut up "variable unused" warnings
+    if (CS_GL_EXT_polygon_offset)
     {
       allclear = true;
       funcTest = ((glPolygonOffsetEXT = (csGLPOLYGONOFFSETEXT) gl->GetProcAddress ("glPolygonOffsetEXT")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glPolygonOffsetEXT");
+      }
       allclear &= funcTest;
+
       if (CS_GL_EXT_polygon_offset = allclear)
       {
         CS_GL_EXT_polygon_offset &= config->GetBool (cfgkey, true);
@@ -13179,90 +15884,144 @@ public:
       Report ("GL Extension '%s' not found.", ext);
     }
   }
-
+  
   void InitGL_EXT_secondary_color ()
   {
     if (tested_CS_GL_EXT_secondary_color) return;
     tested_CS_GL_EXT_secondary_color = true;
     const char* ext = "GL_EXT_secondary_color";
-    char cfgkey[49];
+    char cfgkey[26 + 22 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
-
-    const char* extensions = (const char*)glGetString (GL_EXTENSIONS);
+    
+    const char* extensions;
+    extensions = (const char*)glGetString (GL_EXTENSIONS);
     CS_GL_EXT_secondary_color = (strstr (extensions, ext) != NULL);
 
     bool allclear, funcTest;
-    if (gl && CS_GL_EXT_secondary_color)
+    (void)funcTest; // shut up "variable unused" warnings
+    if (CS_GL_EXT_secondary_color)
     {
       allclear = true;
       funcTest = ((glSecondaryColor3bEXT = (csGLSECONDARYCOLOR3BEXT) gl->GetProcAddress ("glSecondaryColor3bEXT")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glSecondaryColor3bEXT");
+      }
       allclear &= funcTest;
       funcTest = ((glSecondaryColor3sEXT = (csGLSECONDARYCOLOR3SEXT) gl->GetProcAddress ("glSecondaryColor3sEXT")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glSecondaryColor3sEXT");
+      }
       allclear &= funcTest;
       funcTest = ((glSecondaryColor3iEXT = (csGLSECONDARYCOLOR3IEXT) gl->GetProcAddress ("glSecondaryColor3iEXT")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glSecondaryColor3iEXT");
+      }
       allclear &= funcTest;
       funcTest = ((glSecondaryColor3fEXT = (csGLSECONDARYCOLOR3FEXT) gl->GetProcAddress ("glSecondaryColor3fEXT")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glSecondaryColor3fEXT");
+      }
       allclear &= funcTest;
       funcTest = ((glSecondaryColor3dEXT = (csGLSECONDARYCOLOR3DEXT) gl->GetProcAddress ("glSecondaryColor3dEXT")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glSecondaryColor3dEXT");
+      }
       allclear &= funcTest;
       funcTest = ((glSecondaryColor3ubEXT = (csGLSECONDARYCOLOR3UBEXT) gl->GetProcAddress ("glSecondaryColor3ubEXT")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glSecondaryColor3ubEXT");
+      }
       allclear &= funcTest;
       funcTest = ((glSecondaryColor3usEXT = (csGLSECONDARYCOLOR3USEXT) gl->GetProcAddress ("glSecondaryColor3usEXT")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glSecondaryColor3usEXT");
+      }
       allclear &= funcTest;
       funcTest = ((glSecondaryColor3uiEXT = (csGLSECONDARYCOLOR3UIEXT) gl->GetProcAddress ("glSecondaryColor3uiEXT")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glSecondaryColor3uiEXT");
+      }
       allclear &= funcTest;
       funcTest = ((glSecondaryColor3bvEXT = (csGLSECONDARYCOLOR3BVEXT) gl->GetProcAddress ("glSecondaryColor3bvEXT")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glSecondaryColor3bvEXT");
+      }
       allclear &= funcTest;
       funcTest = ((glSecondaryColor3svEXT = (csGLSECONDARYCOLOR3SVEXT) gl->GetProcAddress ("glSecondaryColor3svEXT")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glSecondaryColor3svEXT");
+      }
       allclear &= funcTest;
       funcTest = ((glSecondaryColor3ivEXT = (csGLSECONDARYCOLOR3IVEXT) gl->GetProcAddress ("glSecondaryColor3ivEXT")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glSecondaryColor3ivEXT");
+      }
       allclear &= funcTest;
       funcTest = ((glSecondaryColor3fvEXT = (csGLSECONDARYCOLOR3FVEXT) gl->GetProcAddress ("glSecondaryColor3fvEXT")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glSecondaryColor3fvEXT");
+      }
       allclear &= funcTest;
       funcTest = ((glSecondaryColor3dvEXT = (csGLSECONDARYCOLOR3DVEXT) gl->GetProcAddress ("glSecondaryColor3dvEXT")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glSecondaryColor3dvEXT");
+      }
       allclear &= funcTest;
       funcTest = ((glSecondaryColor3ubvEXT = (csGLSECONDARYCOLOR3UBVEXT) gl->GetProcAddress ("glSecondaryColor3ubvEXT")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glSecondaryColor3ubvEXT");
+      }
       allclear &= funcTest;
       funcTest = ((glSecondaryColor3usvEXT = (csGLSECONDARYCOLOR3USVEXT) gl->GetProcAddress ("glSecondaryColor3usvEXT")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glSecondaryColor3usvEXT");
+      }
       allclear &= funcTest;
       funcTest = ((glSecondaryColor3uivEXT = (csGLSECONDARYCOLOR3UIVEXT) gl->GetProcAddress ("glSecondaryColor3uivEXT")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glSecondaryColor3uivEXT");
+      }
       allclear &= funcTest;
       funcTest = ((glSecondaryColorPointerEXT = (csGLSECONDARYCOLORPOINTEREXT) gl->GetProcAddress ("glSecondaryColorPointerEXT")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glSecondaryColorPointerEXT");
+      }
       allclear &= funcTest;
+
       if (CS_GL_EXT_secondary_color = allclear)
       {
         CS_GL_EXT_secondary_color &= config->GetBool (cfgkey, true);
@@ -13285,22 +16044,25 @@ public:
       Report ("GL Extension '%s' not found.", ext);
     }
   }
-
+  
   void InitGL_EXT_separate_specular_color ()
   {
     if (tested_CS_GL_EXT_separate_specular_color) return;
     tested_CS_GL_EXT_separate_specular_color = true;
     const char* ext = "GL_EXT_separate_specular_color";
-    char cfgkey[57];
+    char cfgkey[26 + 30 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
-
-    const char* extensions = (const char*)glGetString (GL_EXTENSIONS);
+    
+    const char* extensions;
+    extensions = (const char*)glGetString (GL_EXTENSIONS);
     CS_GL_EXT_separate_specular_color = (strstr (extensions, ext) != NULL);
 
     bool allclear, funcTest;
-    if (gl && CS_GL_EXT_separate_specular_color)
+    (void)funcTest; // shut up "variable unused" warnings
+    if (CS_GL_EXT_separate_specular_color)
     {
       allclear = true;
+
       if (CS_GL_EXT_separate_specular_color = allclear)
       {
         CS_GL_EXT_separate_specular_color &= config->GetBool (cfgkey, true);
@@ -13323,22 +16085,25 @@ public:
       Report ("GL Extension '%s' not found.", ext);
     }
   }
-
+  
   void InitGL_EXT_shadow_funcs ()
   {
     if (tested_CS_GL_EXT_shadow_funcs) return;
     tested_CS_GL_EXT_shadow_funcs = true;
     const char* ext = "GL_EXT_shadow_funcs";
-    char cfgkey[46];
+    char cfgkey[26 + 19 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
-
-    const char* extensions = (const char*)glGetString (GL_EXTENSIONS);
+    
+    const char* extensions;
+    extensions = (const char*)glGetString (GL_EXTENSIONS);
     CS_GL_EXT_shadow_funcs = (strstr (extensions, ext) != NULL);
 
     bool allclear, funcTest;
-    if (gl && CS_GL_EXT_shadow_funcs)
+    (void)funcTest; // shut up "variable unused" warnings
+    if (CS_GL_EXT_shadow_funcs)
     {
       allclear = true;
+
       if (CS_GL_EXT_shadow_funcs = allclear)
       {
         CS_GL_EXT_shadow_funcs &= config->GetBool (cfgkey, true);
@@ -13361,22 +16126,25 @@ public:
       Report ("GL Extension '%s' not found.", ext);
     }
   }
-
+  
   void InitGL_EXT_shared_texture_palette ()
   {
     if (tested_CS_GL_EXT_shared_texture_palette) return;
     tested_CS_GL_EXT_shared_texture_palette = true;
     const char* ext = "GL_EXT_shared_texture_palette";
-    char cfgkey[56];
+    char cfgkey[26 + 29 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
-
-    const char* extensions = (const char*)glGetString (GL_EXTENSIONS);
+    
+    const char* extensions;
+    extensions = (const char*)glGetString (GL_EXTENSIONS);
     CS_GL_EXT_shared_texture_palette = (strstr (extensions, ext) != NULL);
 
     bool allclear, funcTest;
-    if (gl && CS_GL_EXT_shared_texture_palette)
+    (void)funcTest; // shut up "variable unused" warnings
+    if (CS_GL_EXT_shared_texture_palette)
     {
       allclear = true;
+
       if (CS_GL_EXT_shared_texture_palette = allclear)
       {
         CS_GL_EXT_shared_texture_palette &= config->GetBool (cfgkey, true);
@@ -13399,26 +16167,32 @@ public:
       Report ("GL Extension '%s' not found.", ext);
     }
   }
-
+  
   void InitGL_EXT_stencil_two_side ()
   {
     if (tested_CS_GL_EXT_stencil_two_side) return;
     tested_CS_GL_EXT_stencil_two_side = true;
     const char* ext = "GL_EXT_stencil_two_side";
-    char cfgkey[50];
+    char cfgkey[26 + 23 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
-
-    const char* extensions = (const char*)glGetString (GL_EXTENSIONS);
+    
+    const char* extensions;
+    extensions = (const char*)glGetString (GL_EXTENSIONS);
     CS_GL_EXT_stencil_two_side = (strstr (extensions, ext) != NULL);
 
     bool allclear, funcTest;
-    if (gl && CS_GL_EXT_stencil_two_side)
+    (void)funcTest; // shut up "variable unused" warnings
+    if (CS_GL_EXT_stencil_two_side)
     {
       allclear = true;
       funcTest = ((glActiveStencilFaceEXT = (csGLACTIVESTENCILFACEEXT) gl->GetProcAddress ("glActiveStencilFaceEXT")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glActiveStencilFaceEXT");
+      }
       allclear &= funcTest;
+
       if (CS_GL_EXT_stencil_two_side = allclear)
       {
         CS_GL_EXT_stencil_two_side &= config->GetBool (cfgkey, true);
@@ -13441,22 +16215,25 @@ public:
       Report ("GL Extension '%s' not found.", ext);
     }
   }
-
+  
   void InitGL_EXT_stencil_wrap ()
   {
     if (tested_CS_GL_EXT_stencil_wrap) return;
     tested_CS_GL_EXT_stencil_wrap = true;
     const char* ext = "GL_EXT_stencil_wrap";
-    char cfgkey[46];
+    char cfgkey[26 + 19 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
-
-    const char* extensions = (const char*)glGetString (GL_EXTENSIONS);
+    
+    const char* extensions;
+    extensions = (const char*)glGetString (GL_EXTENSIONS);
     CS_GL_EXT_stencil_wrap = (strstr (extensions, ext) != NULL);
 
     bool allclear, funcTest;
-    if (gl && CS_GL_EXT_stencil_wrap)
+    (void)funcTest; // shut up "variable unused" warnings
+    if (CS_GL_EXT_stencil_wrap)
     {
       allclear = true;
+
       if (CS_GL_EXT_stencil_wrap = allclear)
       {
         CS_GL_EXT_stencil_wrap &= config->GetBool (cfgkey, true);
@@ -13479,34 +16256,46 @@ public:
       Report ("GL Extension '%s' not found.", ext);
     }
   }
-
+  
   void InitGL_EXT_subtexture ()
   {
     if (tested_CS_GL_EXT_subtexture) return;
     tested_CS_GL_EXT_subtexture = true;
     const char* ext = "GL_EXT_subtexture";
-    char cfgkey[44];
+    char cfgkey[26 + 17 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
-
-    const char* extensions = (const char*)glGetString (GL_EXTENSIONS);
+    
+    const char* extensions;
+    extensions = (const char*)glGetString (GL_EXTENSIONS);
     CS_GL_EXT_subtexture = (strstr (extensions, ext) != NULL);
 
     bool allclear, funcTest;
-    if (gl && CS_GL_EXT_subtexture)
+    (void)funcTest; // shut up "variable unused" warnings
+    if (CS_GL_EXT_subtexture)
     {
       allclear = true;
       funcTest = ((glTexSubImage1DEXT = (csGLTEXSUBIMAGE1DEXT) gl->GetProcAddress ("glTexSubImage1DEXT")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glTexSubImage1DEXT");
+      }
       allclear &= funcTest;
       funcTest = ((glTexSubImage2DEXT = (csGLTEXSUBIMAGE2DEXT) gl->GetProcAddress ("glTexSubImage2DEXT")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glTexSubImage2DEXT");
+      }
       allclear &= funcTest;
       funcTest = ((glTexSubImage3DEXT = (csGLTEXSUBIMAGE3DEXT) gl->GetProcAddress ("glTexSubImage3DEXT")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glTexSubImage3DEXT");
+      }
       allclear &= funcTest;
+
       if (CS_GL_EXT_subtexture = allclear)
       {
         CS_GL_EXT_subtexture &= config->GetBool (cfgkey, true);
@@ -13529,26 +16318,32 @@ public:
       Report ("GL Extension '%s' not found.", ext);
     }
   }
-
+  
   void InitGL_EXT_texture3D ()
   {
     if (tested_CS_GL_EXT_texture3D) return;
     tested_CS_GL_EXT_texture3D = true;
     const char* ext = "GL_EXT_texture3D";
-    char cfgkey[43];
+    char cfgkey[26 + 16 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
-
-    const char* extensions = (const char*)glGetString (GL_EXTENSIONS);
+    
+    const char* extensions;
+    extensions = (const char*)glGetString (GL_EXTENSIONS);
     CS_GL_EXT_texture3D = (strstr (extensions, ext) != NULL);
 
     bool allclear, funcTest;
-    if (gl && CS_GL_EXT_texture3D)
+    (void)funcTest; // shut up "variable unused" warnings
+    if (CS_GL_EXT_texture3D)
     {
       allclear = true;
       funcTest = ((glTexImage3DEXT = (csGLTEXIMAGE3DEXT) gl->GetProcAddress ("glTexImage3DEXT")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glTexImage3DEXT");
+      }
       allclear &= funcTest;
+
       if (CS_GL_EXT_texture3D = allclear)
       {
         CS_GL_EXT_texture3D &= config->GetBool (cfgkey, true);
@@ -13571,22 +16366,25 @@ public:
       Report ("GL Extension '%s' not found.", ext);
     }
   }
-
+  
   void InitGL_EXT_texture_compression_s3tc ()
   {
     if (tested_CS_GL_EXT_texture_compression_s3tc) return;
     tested_CS_GL_EXT_texture_compression_s3tc = true;
     const char* ext = "GL_EXT_texture_compression_s3tc";
-    char cfgkey[58];
+    char cfgkey[26 + 31 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
-
-    const char* extensions = (const char*)glGetString (GL_EXTENSIONS);
+    
+    const char* extensions;
+    extensions = (const char*)glGetString (GL_EXTENSIONS);
     CS_GL_EXT_texture_compression_s3tc = (strstr (extensions, ext) != NULL);
 
     bool allclear, funcTest;
-    if (gl && CS_GL_EXT_texture_compression_s3tc)
+    (void)funcTest; // shut up "variable unused" warnings
+    if (CS_GL_EXT_texture_compression_s3tc)
     {
       allclear = true;
+
       if (CS_GL_EXT_texture_compression_s3tc = allclear)
       {
         CS_GL_EXT_texture_compression_s3tc &= config->GetBool (cfgkey, true);
@@ -13609,22 +16407,25 @@ public:
       Report ("GL Extension '%s' not found.", ext);
     }
   }
-
+  
   void InitGL_EXT_texture_env_add ()
   {
     if (tested_CS_GL_EXT_texture_env_add) return;
     tested_CS_GL_EXT_texture_env_add = true;
     const char* ext = "GL_EXT_texture_env_add";
-    char cfgkey[49];
+    char cfgkey[26 + 22 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
-
-    const char* extensions = (const char*)glGetString (GL_EXTENSIONS);
+    
+    const char* extensions;
+    extensions = (const char*)glGetString (GL_EXTENSIONS);
     CS_GL_EXT_texture_env_add = (strstr (extensions, ext) != NULL);
 
     bool allclear, funcTest;
-    if (gl && CS_GL_EXT_texture_env_add)
+    (void)funcTest; // shut up "variable unused" warnings
+    if (CS_GL_EXT_texture_env_add)
     {
       allclear = true;
+
       if (CS_GL_EXT_texture_env_add = allclear)
       {
         CS_GL_EXT_texture_env_add &= config->GetBool (cfgkey, true);
@@ -13647,22 +16448,25 @@ public:
       Report ("GL Extension '%s' not found.", ext);
     }
   }
-
+  
   void InitGL_EXT_texture_env_combine ()
   {
     if (tested_CS_GL_EXT_texture_env_combine) return;
     tested_CS_GL_EXT_texture_env_combine = true;
     const char* ext = "GL_EXT_texture_env_combine";
-    char cfgkey[53];
+    char cfgkey[26 + 26 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
-
-    const char* extensions = (const char*)glGetString (GL_EXTENSIONS);
+    
+    const char* extensions;
+    extensions = (const char*)glGetString (GL_EXTENSIONS);
     CS_GL_EXT_texture_env_combine = (strstr (extensions, ext) != NULL);
 
     bool allclear, funcTest;
-    if (gl && CS_GL_EXT_texture_env_combine)
+    (void)funcTest; // shut up "variable unused" warnings
+    if (CS_GL_EXT_texture_env_combine)
     {
       allclear = true;
+
       if (CS_GL_EXT_texture_env_combine = allclear)
       {
         CS_GL_EXT_texture_env_combine &= config->GetBool (cfgkey, true);
@@ -13685,22 +16489,25 @@ public:
       Report ("GL Extension '%s' not found.", ext);
     }
   }
-
+  
   void InitGL_EXT_texture_env_dot3 ()
   {
     if (tested_CS_GL_EXT_texture_env_dot3) return;
     tested_CS_GL_EXT_texture_env_dot3 = true;
     const char* ext = "GL_EXT_texture_env_dot3";
-    char cfgkey[50];
+    char cfgkey[26 + 23 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
-
-    const char* extensions = (const char*)glGetString (GL_EXTENSIONS);
+    
+    const char* extensions;
+    extensions = (const char*)glGetString (GL_EXTENSIONS);
     CS_GL_EXT_texture_env_dot3 = (strstr (extensions, ext) != NULL);
 
     bool allclear, funcTest;
-    if (gl && CS_GL_EXT_texture_env_dot3)
+    (void)funcTest; // shut up "variable unused" warnings
+    if (CS_GL_EXT_texture_env_dot3)
     {
       allclear = true;
+
       if (CS_GL_EXT_texture_env_dot3 = allclear)
       {
         CS_GL_EXT_texture_env_dot3 &= config->GetBool (cfgkey, true);
@@ -13723,22 +16530,25 @@ public:
       Report ("GL Extension '%s' not found.", ext);
     }
   }
-
+  
   void InitGL_EXT_texture_filter_anisotropic ()
   {
     if (tested_CS_GL_EXT_texture_filter_anisotropic) return;
     tested_CS_GL_EXT_texture_filter_anisotropic = true;
     const char* ext = "GL_EXT_texture_filter_anisotropic";
-    char cfgkey[60];
+    char cfgkey[26 + 33 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
-
-    const char* extensions = (const char*)glGetString (GL_EXTENSIONS);
+    
+    const char* extensions;
+    extensions = (const char*)glGetString (GL_EXTENSIONS);
     CS_GL_EXT_texture_filter_anisotropic = (strstr (extensions, ext) != NULL);
 
     bool allclear, funcTest;
-    if (gl && CS_GL_EXT_texture_filter_anisotropic)
+    (void)funcTest; // shut up "variable unused" warnings
+    if (CS_GL_EXT_texture_filter_anisotropic)
     {
       allclear = true;
+
       if (CS_GL_EXT_texture_filter_anisotropic = allclear)
       {
         CS_GL_EXT_texture_filter_anisotropic &= config->GetBool (cfgkey, true);
@@ -13761,22 +16571,25 @@ public:
       Report ("GL Extension '%s' not found.", ext);
     }
   }
-
+  
   void InitGL_EXT_texture_lod_bias ()
   {
     if (tested_CS_GL_EXT_texture_lod_bias) return;
     tested_CS_GL_EXT_texture_lod_bias = true;
     const char* ext = "GL_EXT_texture_lod_bias";
-    char cfgkey[50];
+    char cfgkey[26 + 23 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
-
-    const char* extensions = (const char*)glGetString (GL_EXTENSIONS);
+    
+    const char* extensions;
+    extensions = (const char*)glGetString (GL_EXTENSIONS);
     CS_GL_EXT_texture_lod_bias = (strstr (extensions, ext) != NULL);
 
     bool allclear, funcTest;
-    if (gl && CS_GL_EXT_texture_lod_bias)
+    (void)funcTest; // shut up "variable unused" warnings
+    if (CS_GL_EXT_texture_lod_bias)
     {
       allclear = true;
+
       if (CS_GL_EXT_texture_lod_bias = allclear)
       {
         CS_GL_EXT_texture_lod_bias &= config->GetBool (cfgkey, true);
@@ -13799,46 +16612,67 @@ public:
       Report ("GL Extension '%s' not found.", ext);
     }
   }
-
+  
   void InitGL_EXT_texture_object ()
   {
     if (tested_CS_GL_EXT_texture_object) return;
     tested_CS_GL_EXT_texture_object = true;
     const char* ext = "GL_EXT_texture_object";
-    char cfgkey[48];
+    char cfgkey[26 + 21 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
-
-    const char* extensions = (const char*)glGetString (GL_EXTENSIONS);
+    
+    const char* extensions;
+    extensions = (const char*)glGetString (GL_EXTENSIONS);
     CS_GL_EXT_texture_object = (strstr (extensions, ext) != NULL);
 
     bool allclear, funcTest;
-    if (gl && CS_GL_EXT_texture_object)
+    (void)funcTest; // shut up "variable unused" warnings
+    if (CS_GL_EXT_texture_object)
     {
       allclear = true;
       funcTest = ((glGenTexturesEXT = (csGLGENTEXTURESEXT) gl->GetProcAddress ("glGenTexturesEXT")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glGenTexturesEXT");
+      }
       allclear &= funcTest;
       funcTest = ((glDeleteTexturesEXT = (csGLDELETETEXTURESEXT) gl->GetProcAddress ("glDeleteTexturesEXT")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glDeleteTexturesEXT");
+      }
       allclear &= funcTest;
       funcTest = ((glBindTextureEXT = (csGLBINDTEXTUREEXT) gl->GetProcAddress ("glBindTextureEXT")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glBindTextureEXT");
+      }
       allclear &= funcTest;
       funcTest = ((glPrioritizeTexturesEXT = (csGLPRIORITIZETEXTURESEXT) gl->GetProcAddress ("glPrioritizeTexturesEXT")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glPrioritizeTexturesEXT");
+      }
       allclear &= funcTest;
       funcTest = ((glAreTexturesResidentEXT = (csGLARETEXTURESRESIDENTEXT) gl->GetProcAddress ("glAreTexturesResidentEXT")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glAreTexturesResidentEXT");
+      }
       allclear &= funcTest;
       funcTest = ((glIsTextureEXT = (csGLISTEXTUREEXT) gl->GetProcAddress ("glIsTextureEXT")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glIsTextureEXT");
+      }
       allclear &= funcTest;
+
       if (CS_GL_EXT_texture_object = allclear)
       {
         CS_GL_EXT_texture_object &= config->GetBool (cfgkey, true);
@@ -13861,58 +16695,88 @@ public:
       Report ("GL Extension '%s' not found.", ext);
     }
   }
-
+  
   void InitGL_EXT_vertex_array ()
   {
     if (tested_CS_GL_EXT_vertex_array) return;
     tested_CS_GL_EXT_vertex_array = true;
     const char* ext = "GL_EXT_vertex_array";
-    char cfgkey[46];
+    char cfgkey[26 + 19 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
-
-    const char* extensions = (const char*)glGetString (GL_EXTENSIONS);
+    
+    const char* extensions;
+    extensions = (const char*)glGetString (GL_EXTENSIONS);
     CS_GL_EXT_vertex_array = (strstr (extensions, ext) != NULL);
 
     bool allclear, funcTest;
-    if (gl && CS_GL_EXT_vertex_array)
+    (void)funcTest; // shut up "variable unused" warnings
+    if (CS_GL_EXT_vertex_array)
     {
       allclear = true;
       funcTest = ((glArrayElementEXT = (csGLARRAYELEMENTEXT) gl->GetProcAddress ("glArrayElementEXT")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glArrayElementEXT");
+      }
       allclear &= funcTest;
       funcTest = ((glDrawArraysEXT = (csGLDRAWARRAYSEXT) gl->GetProcAddress ("glDrawArraysEXT")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glDrawArraysEXT");
+      }
       allclear &= funcTest;
       funcTest = ((glVertexPointerEXT = (csGLVERTEXPOINTEREXT) gl->GetProcAddress ("glVertexPointerEXT")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glVertexPointerEXT");
+      }
       allclear &= funcTest;
       funcTest = ((glNormalPointerEXT = (csGLNORMALPOINTEREXT) gl->GetProcAddress ("glNormalPointerEXT")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glNormalPointerEXT");
+      }
       allclear &= funcTest;
       funcTest = ((glColorPointerEXT = (csGLCOLORPOINTEREXT) gl->GetProcAddress ("glColorPointerEXT")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glColorPointerEXT");
+      }
       allclear &= funcTest;
       funcTest = ((glIndexPointerEXT = (csGLINDEXPOINTEREXT) gl->GetProcAddress ("glIndexPointerEXT")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glIndexPointerEXT");
+      }
       allclear &= funcTest;
       funcTest = ((glTexCoordPointerEXT = (csGLTEXCOORDPOINTEREXT) gl->GetProcAddress ("glTexCoordPointerEXT")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glTexCoordPointerEXT");
+      }
       allclear &= funcTest;
       funcTest = ((glEdgeFlagPointerEXT = (csGLEDGEFLAGPOINTEREXT) gl->GetProcAddress ("glEdgeFlagPointerEXT")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glEdgeFlagPointerEXT");
+      }
       allclear &= funcTest;
       funcTest = ((glGetPointervEXT = (csGLGETPOINTERVEXT) gl->GetProcAddress ("glGetPointervEXT")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glGetPointervEXT");
+      }
       allclear &= funcTest;
+
       if (CS_GL_EXT_vertex_array = allclear)
       {
         CS_GL_EXT_vertex_array &= config->GetBool (cfgkey, true);
@@ -13935,190 +16799,319 @@ public:
       Report ("GL Extension '%s' not found.", ext);
     }
   }
-
+  
   void InitGL_EXT_vertex_shader ()
   {
     if (tested_CS_GL_EXT_vertex_shader) return;
     tested_CS_GL_EXT_vertex_shader = true;
     const char* ext = "GL_EXT_vertex_shader";
-    char cfgkey[47];
+    char cfgkey[26 + 20 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
-
-    const char* extensions = (const char*)glGetString (GL_EXTENSIONS);
+    
+    const char* extensions;
+    extensions = (const char*)glGetString (GL_EXTENSIONS);
     CS_GL_EXT_vertex_shader = (strstr (extensions, ext) != NULL);
 
     bool allclear, funcTest;
-    if (gl && CS_GL_EXT_vertex_shader)
+    (void)funcTest; // shut up "variable unused" warnings
+    if (CS_GL_EXT_vertex_shader)
     {
       allclear = true;
       funcTest = ((glBeginVertexShaderEXT = (csGLBEGINVERTEXSHADEREXT) gl->GetProcAddress ("glBeginVertexShaderEXT")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glBeginVertexShaderEXT");
+      }
       allclear &= funcTest;
       funcTest = ((glEndVertexShaderEXT = (csGLENDVERTEXSHADEREXT) gl->GetProcAddress ("glEndVertexShaderEXT")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glEndVertexShaderEXT");
+      }
       allclear &= funcTest;
       funcTest = ((glBindVertexShaderEXT = (csGLBINDVERTEXSHADEREXT) gl->GetProcAddress ("glBindVertexShaderEXT")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glBindVertexShaderEXT");
+      }
       allclear &= funcTest;
       funcTest = ((glGenVertexShadersEXT = (csGLGENVERTEXSHADERSEXT) gl->GetProcAddress ("glGenVertexShadersEXT")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glGenVertexShadersEXT");
+      }
       allclear &= funcTest;
       funcTest = ((glDeleteVertexShaderEXT = (csGLDELETEVERTEXSHADEREXT) gl->GetProcAddress ("glDeleteVertexShaderEXT")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glDeleteVertexShaderEXT");
+      }
       allclear &= funcTest;
       funcTest = ((glShaderOp1EXT = (csGLSHADEROP1EXT) gl->GetProcAddress ("glShaderOp1EXT")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glShaderOp1EXT");
+      }
       allclear &= funcTest;
       funcTest = ((glShaderOp2EXT = (csGLSHADEROP2EXT) gl->GetProcAddress ("glShaderOp2EXT")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glShaderOp2EXT");
+      }
       allclear &= funcTest;
       funcTest = ((glShaderOp3EXT = (csGLSHADEROP3EXT) gl->GetProcAddress ("glShaderOp3EXT")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glShaderOp3EXT");
+      }
       allclear &= funcTest;
       funcTest = ((glSwizzleEXT = (csGLSWIZZLEEXT) gl->GetProcAddress ("glSwizzleEXT")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glSwizzleEXT");
+      }
       allclear &= funcTest;
       funcTest = ((glWriteMaskEXT = (csGLWRITEMASKEXT) gl->GetProcAddress ("glWriteMaskEXT")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glWriteMaskEXT");
+      }
       allclear &= funcTest;
       funcTest = ((glInsertComponentEXT = (csGLINSERTCOMPONENTEXT) gl->GetProcAddress ("glInsertComponentEXT")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glInsertComponentEXT");
+      }
       allclear &= funcTest;
       funcTest = ((glExtractComponentEXT = (csGLEXTRACTCOMPONENTEXT) gl->GetProcAddress ("glExtractComponentEXT")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glExtractComponentEXT");
+      }
       allclear &= funcTest;
       funcTest = ((glGenSymbolsEXT = (csGLGENSYMBOLSEXT) gl->GetProcAddress ("glGenSymbolsEXT")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glGenSymbolsEXT");
+      }
       allclear &= funcTest;
       funcTest = ((glSetInvariantEXT = (csGLSETINVARIANTEXT) gl->GetProcAddress ("glSetInvariantEXT")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glSetInvariantEXT");
+      }
       allclear &= funcTest;
       funcTest = ((glSetLocalConstantEXT = (csGLSETLOCALCONSTANTEXT) gl->GetProcAddress ("glSetLocalConstantEXT")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glSetLocalConstantEXT");
+      }
       allclear &= funcTest;
       funcTest = ((glVariantbvEXT = (csGLVARIANTBVEXT) gl->GetProcAddress ("glVariantbvEXT")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glVariantbvEXT");
+      }
       allclear &= funcTest;
       funcTest = ((glVariantsvEXT = (csGLVARIANTSVEXT) gl->GetProcAddress ("glVariantsvEXT")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glVariantsvEXT");
+      }
       allclear &= funcTest;
       funcTest = ((glVariantivEXT = (csGLVARIANTIVEXT) gl->GetProcAddress ("glVariantivEXT")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glVariantivEXT");
+      }
       allclear &= funcTest;
       funcTest = ((glVariantfvEXT = (csGLVARIANTFVEXT) gl->GetProcAddress ("glVariantfvEXT")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glVariantfvEXT");
+      }
       allclear &= funcTest;
       funcTest = ((glVariantdvEXT = (csGLVARIANTDVEXT) gl->GetProcAddress ("glVariantdvEXT")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glVariantdvEXT");
+      }
       allclear &= funcTest;
       funcTest = ((glVariantubvEXT = (csGLVARIANTUBVEXT) gl->GetProcAddress ("glVariantubvEXT")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glVariantubvEXT");
+      }
       allclear &= funcTest;
       funcTest = ((glVariantusvEXT = (csGLVARIANTUSVEXT) gl->GetProcAddress ("glVariantusvEXT")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glVariantusvEXT");
+      }
       allclear &= funcTest;
       funcTest = ((glVariantuivEXT = (csGLVARIANTUIVEXT) gl->GetProcAddress ("glVariantuivEXT")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glVariantuivEXT");
+      }
       allclear &= funcTest;
       funcTest = ((glVariantPointerEXT = (csGLVARIANTPOINTEREXT) gl->GetProcAddress ("glVariantPointerEXT")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glVariantPointerEXT");
+      }
       allclear &= funcTest;
       funcTest = ((glEnableVariantClientStateEXT = (csGLENABLEVARIANTCLIENTSTATEEXT) gl->GetProcAddress ("glEnableVariantClientStateEXT")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glEnableVariantClientStateEXT");
+      }
       allclear &= funcTest;
       funcTest = ((glDisableVariantClientStateEXT = (csGLDISABLEVARIANTCLIENTSTATEEXT) gl->GetProcAddress ("glDisableVariantClientStateEXT")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glDisableVariantClientStateEXT");
+      }
       allclear &= funcTest;
       funcTest = ((glBindLightParameterEXT = (csGLBINDLIGHTPARAMETEREXT) gl->GetProcAddress ("glBindLightParameterEXT")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glBindLightParameterEXT");
+      }
       allclear &= funcTest;
       funcTest = ((glBindMaterialParameterEXT = (csGLBINDMATERIALPARAMETEREXT) gl->GetProcAddress ("glBindMaterialParameterEXT")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glBindMaterialParameterEXT");
+      }
       allclear &= funcTest;
       funcTest = ((glBindTexGenParameterEXT = (csGLBINDTEXGENPARAMETEREXT) gl->GetProcAddress ("glBindTexGenParameterEXT")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glBindTexGenParameterEXT");
+      }
       allclear &= funcTest;
       funcTest = ((glBindTextureUnitParameterEXT = (csGLBINDTEXTUREUNITPARAMETEREXT) gl->GetProcAddress ("glBindTextureUnitParameterEXT")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glBindTextureUnitParameterEXT");
+      }
       allclear &= funcTest;
       funcTest = ((glBindParameterEXT = (csGLBINDPARAMETEREXT) gl->GetProcAddress ("glBindParameterEXT")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glBindParameterEXT");
+      }
       allclear &= funcTest;
       funcTest = ((glIsVariantEnabledEXT = (csGLISVARIANTENABLEDEXT) gl->GetProcAddress ("glIsVariantEnabledEXT")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glIsVariantEnabledEXT");
+      }
       allclear &= funcTest;
       funcTest = ((glGetVariantBooleanvEXT = (csGLGETVARIANTBOOLEANVEXT) gl->GetProcAddress ("glGetVariantBooleanvEXT")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glGetVariantBooleanvEXT");
+      }
       allclear &= funcTest;
       funcTest = ((glGetVariantIntegervEXT = (csGLGETVARIANTINTEGERVEXT) gl->GetProcAddress ("glGetVariantIntegervEXT")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glGetVariantIntegervEXT");
+      }
       allclear &= funcTest;
       funcTest = ((glGetVariantFloatvEXT = (csGLGETVARIANTFLOATVEXT) gl->GetProcAddress ("glGetVariantFloatvEXT")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glGetVariantFloatvEXT");
+      }
       allclear &= funcTest;
       funcTest = ((glGetVariantPointervEXT = (csGLGETVARIANTPOINTERVEXT) gl->GetProcAddress ("glGetVariantPointervEXT")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glGetVariantPointervEXT");
+      }
       allclear &= funcTest;
       funcTest = ((glGetInvariantBooleanvEXT = (csGLGETINVARIANTBOOLEANVEXT) gl->GetProcAddress ("glGetInvariantBooleanvEXT")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glGetInvariantBooleanvEXT");
+      }
       allclear &= funcTest;
       funcTest = ((glGetInvariantIntegervEXT = (csGLGETINVARIANTINTEGERVEXT) gl->GetProcAddress ("glGetInvariantIntegervEXT")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glGetInvariantIntegervEXT");
+      }
       allclear &= funcTest;
       funcTest = ((glGetInvariantFloatvEXT = (csGLGETINVARIANTFLOATVEXT) gl->GetProcAddress ("glGetInvariantFloatvEXT")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glGetInvariantFloatvEXT");
+      }
       allclear &= funcTest;
       funcTest = ((glGetLocalConstantBooleanvEXT = (csGLGETLOCALCONSTANTBOOLEANVEXT) gl->GetProcAddress ("glGetLocalConstantBooleanvEXT")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glGetLocalConstantBooleanvEXT");
+      }
       allclear &= funcTest;
       funcTest = ((glGetLocalConstantIntegervEXT = (csGLGETLOCALCONSTANTINTEGERVEXT) gl->GetProcAddress ("glGetLocalConstantIntegervEXT")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glGetLocalConstantIntegervEXT");
+      }
       allclear &= funcTest;
       funcTest = ((glGetLocalConstantFloatvEXT = (csGLGETLOCALCONSTANTFLOATVEXT) gl->GetProcAddress ("glGetLocalConstantFloatvEXT")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glGetLocalConstantFloatvEXT");
+      }
       allclear &= funcTest;
+
       if (CS_GL_EXT_vertex_shader = allclear)
       {
         CS_GL_EXT_vertex_shader &= config->GetBool (cfgkey, true);
@@ -14141,34 +17134,46 @@ public:
       Report ("GL Extension '%s' not found.", ext);
     }
   }
-
+  
   void InitGL_EXT_vertex_weighting ()
   {
     if (tested_CS_GL_EXT_vertex_weighting) return;
     tested_CS_GL_EXT_vertex_weighting = true;
     const char* ext = "GL_EXT_vertex_weighting";
-    char cfgkey[50];
+    char cfgkey[26 + 23 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
-
-    const char* extensions = (const char*)glGetString (GL_EXTENSIONS);
+    
+    const char* extensions;
+    extensions = (const char*)glGetString (GL_EXTENSIONS);
     CS_GL_EXT_vertex_weighting = (strstr (extensions, ext) != NULL);
 
     bool allclear, funcTest;
-    if (gl && CS_GL_EXT_vertex_weighting)
+    (void)funcTest; // shut up "variable unused" warnings
+    if (CS_GL_EXT_vertex_weighting)
     {
       allclear = true;
       funcTest = ((glVertexWeightfEXT = (csGLVERTEXWEIGHTFEXT) gl->GetProcAddress ("glVertexWeightfEXT")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glVertexWeightfEXT");
+      }
       allclear &= funcTest;
       funcTest = ((glVertexWeightfvEXT = (csGLVERTEXWEIGHTFVEXT) gl->GetProcAddress ("glVertexWeightfvEXT")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glVertexWeightfvEXT");
+      }
       allclear &= funcTest;
       funcTest = ((glVertexWeightPointerEXT = (csGLVERTEXWEIGHTPOINTEREXT) gl->GetProcAddress ("glVertexWeightPointerEXT")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glVertexWeightPointerEXT");
+      }
       allclear &= funcTest;
+
       if (CS_GL_EXT_vertex_weighting = allclear)
       {
         CS_GL_EXT_vertex_weighting &= config->GetBool (cfgkey, true);
@@ -14191,22 +17196,25 @@ public:
       Report ("GL Extension '%s' not found.", ext);
     }
   }
-
+  
   void InitGL_HP_occlusion_test ()
   {
     if (tested_CS_GL_HP_occlusion_test) return;
     tested_CS_GL_HP_occlusion_test = true;
     const char* ext = "GL_HP_occlusion_test";
-    char cfgkey[47];
+    char cfgkey[26 + 20 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
-
-    const char* extensions = (const char*)glGetString (GL_EXTENSIONS);
+    
+    const char* extensions;
+    extensions = (const char*)glGetString (GL_EXTENSIONS);
     CS_GL_HP_occlusion_test = (strstr (extensions, ext) != NULL);
 
     bool allclear, funcTest;
-    if (gl && CS_GL_HP_occlusion_test)
+    (void)funcTest; // shut up "variable unused" warnings
+    if (CS_GL_HP_occlusion_test)
     {
       allclear = true;
+
       if (CS_GL_HP_occlusion_test = allclear)
       {
         CS_GL_HP_occlusion_test &= config->GetBool (cfgkey, true);
@@ -14229,22 +17237,25 @@ public:
       Report ("GL Extension '%s' not found.", ext);
     }
   }
-
+  
   void InitGL_NV_blend_square ()
   {
     if (tested_CS_GL_NV_blend_square) return;
     tested_CS_GL_NV_blend_square = true;
     const char* ext = "GL_NV_blend_square";
-    char cfgkey[45];
+    char cfgkey[26 + 18 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
-
-    const char* extensions = (const char*)glGetString (GL_EXTENSIONS);
+    
+    const char* extensions;
+    extensions = (const char*)glGetString (GL_EXTENSIONS);
     CS_GL_NV_blend_square = (strstr (extensions, ext) != NULL);
 
     bool allclear, funcTest;
-    if (gl && CS_GL_NV_blend_square)
+    (void)funcTest; // shut up "variable unused" warnings
+    if (CS_GL_NV_blend_square)
     {
       allclear = true;
+
       if (CS_GL_NV_blend_square = allclear)
       {
         CS_GL_NV_blend_square &= config->GetBool (cfgkey, true);
@@ -14267,22 +17278,25 @@ public:
       Report ("GL Extension '%s' not found.", ext);
     }
   }
-
+  
   void InitGL_NV_copy_depth_to_color ()
   {
     if (tested_CS_GL_NV_copy_depth_to_color) return;
     tested_CS_GL_NV_copy_depth_to_color = true;
     const char* ext = "GL_NV_copy_depth_to_color";
-    char cfgkey[52];
+    char cfgkey[26 + 25 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
-
-    const char* extensions = (const char*)glGetString (GL_EXTENSIONS);
+    
+    const char* extensions;
+    extensions = (const char*)glGetString (GL_EXTENSIONS);
     CS_GL_NV_copy_depth_to_color = (strstr (extensions, ext) != NULL);
 
     bool allclear, funcTest;
-    if (gl && CS_GL_NV_copy_depth_to_color)
+    (void)funcTest; // shut up "variable unused" warnings
+    if (CS_GL_NV_copy_depth_to_color)
     {
       allclear = true;
+
       if (CS_GL_NV_copy_depth_to_color = allclear)
       {
         CS_GL_NV_copy_depth_to_color &= config->GetBool (cfgkey, true);
@@ -14305,22 +17319,25 @@ public:
       Report ("GL Extension '%s' not found.", ext);
     }
   }
-
+  
   void InitGL_NV_depth_clamp ()
   {
     if (tested_CS_GL_NV_depth_clamp) return;
     tested_CS_GL_NV_depth_clamp = true;
     const char* ext = "GL_NV_depth_clamp";
-    char cfgkey[44];
+    char cfgkey[26 + 17 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
-
-    const char* extensions = (const char*)glGetString (GL_EXTENSIONS);
+    
+    const char* extensions;
+    extensions = (const char*)glGetString (GL_EXTENSIONS);
     CS_GL_NV_depth_clamp = (strstr (extensions, ext) != NULL);
 
     bool allclear, funcTest;
-    if (gl && CS_GL_NV_depth_clamp)
+    (void)funcTest; // shut up "variable unused" warnings
+    if (CS_GL_NV_depth_clamp)
     {
       allclear = true;
+
       if (CS_GL_NV_depth_clamp = allclear)
       {
         CS_GL_NV_depth_clamp &= config->GetBool (cfgkey, true);
@@ -14343,58 +17360,88 @@ public:
       Report ("GL Extension '%s' not found.", ext);
     }
   }
-
+  
   void InitGL_NV_evaluators ()
   {
     if (tested_CS_GL_NV_evaluators) return;
     tested_CS_GL_NV_evaluators = true;
     const char* ext = "GL_NV_evaluators";
-    char cfgkey[43];
+    char cfgkey[26 + 16 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
-
-    const char* extensions = (const char*)glGetString (GL_EXTENSIONS);
+    
+    const char* extensions;
+    extensions = (const char*)glGetString (GL_EXTENSIONS);
     CS_GL_NV_evaluators = (strstr (extensions, ext) != NULL);
 
     bool allclear, funcTest;
-    if (gl && CS_GL_NV_evaluators)
+    (void)funcTest; // shut up "variable unused" warnings
+    if (CS_GL_NV_evaluators)
     {
       allclear = true;
       funcTest = ((glMapControlPointsNV = (csGLMAPCONTROLPOINTSNV) gl->GetProcAddress ("glMapControlPointsNV")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glMapControlPointsNV");
+      }
       allclear &= funcTest;
       funcTest = ((glMapParameterivNV = (csGLMAPPARAMETERIVNV) gl->GetProcAddress ("glMapParameterivNV")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glMapParameterivNV");
+      }
       allclear &= funcTest;
       funcTest = ((glMapParameterfvNV = (csGLMAPPARAMETERFVNV) gl->GetProcAddress ("glMapParameterfvNV")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glMapParameterfvNV");
+      }
       allclear &= funcTest;
       funcTest = ((glGetMapControlPointsNV = (csGLGETMAPCONTROLPOINTSNV) gl->GetProcAddress ("glGetMapControlPointsNV")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glGetMapControlPointsNV");
+      }
       allclear &= funcTest;
       funcTest = ((glGetMapParameterivNV = (csGLGETMAPPARAMETERIVNV) gl->GetProcAddress ("glGetMapParameterivNV")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glGetMapParameterivNV");
+      }
       allclear &= funcTest;
       funcTest = ((glGetMapParameterfvNV = (csGLGETMAPPARAMETERFVNV) gl->GetProcAddress ("glGetMapParameterfvNV")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glGetMapParameterfvNV");
+      }
       allclear &= funcTest;
       funcTest = ((glGetMapAttribParameterivNV = (csGLGETMAPATTRIBPARAMETERIVNV) gl->GetProcAddress ("glGetMapAttribParameterivNV")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glGetMapAttribParameterivNV");
+      }
       allclear &= funcTest;
       funcTest = ((glGetMapAttribParameterfvNV = (csGLGETMAPATTRIBPARAMETERFVNV) gl->GetProcAddress ("glGetMapAttribParameterfvNV")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glGetMapAttribParameterfvNV");
+      }
       allclear &= funcTest;
       funcTest = ((glEvalMapsNV = (csGLEVALMAPSNV) gl->GetProcAddress ("glEvalMapsNV")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glEvalMapsNV");
+      }
       allclear &= funcTest;
+
       if (CS_GL_NV_evaluators = allclear)
       {
         CS_GL_NV_evaluators &= config->GetBool (cfgkey, true);
@@ -14417,50 +17464,74 @@ public:
       Report ("GL Extension '%s' not found.", ext);
     }
   }
-
+  
   void InitGL_NV_fence ()
   {
     if (tested_CS_GL_NV_fence) return;
     tested_CS_GL_NV_fence = true;
     const char* ext = "GL_NV_fence";
-    char cfgkey[38];
+    char cfgkey[26 + 11 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
-
-    const char* extensions = (const char*)glGetString (GL_EXTENSIONS);
+    
+    const char* extensions;
+    extensions = (const char*)glGetString (GL_EXTENSIONS);
     CS_GL_NV_fence = (strstr (extensions, ext) != NULL);
 
     bool allclear, funcTest;
-    if (gl && CS_GL_NV_fence)
+    (void)funcTest; // shut up "variable unused" warnings
+    if (CS_GL_NV_fence)
     {
       allclear = true;
       funcTest = ((glGenFencesNV = (csGLGENFENCESNV) gl->GetProcAddress ("glGenFencesNV")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glGenFencesNV");
+      }
       allclear &= funcTest;
       funcTest = ((glDeleteFencesNV = (csGLDELETEFENCESNV) gl->GetProcAddress ("glDeleteFencesNV")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glDeleteFencesNV");
+      }
       allclear &= funcTest;
       funcTest = ((glSetFenceNV = (csGLSETFENCENV) gl->GetProcAddress ("glSetFenceNV")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glSetFenceNV");
+      }
       allclear &= funcTest;
       funcTest = ((glTestFenceNV = (csGLTESTFENCENV) gl->GetProcAddress ("glTestFenceNV")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glTestFenceNV");
+      }
       allclear &= funcTest;
       funcTest = ((glFinishFenceNV = (csGLFINISHFENCENV) gl->GetProcAddress ("glFinishFenceNV")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glFinishFenceNV");
+      }
       allclear &= funcTest;
       funcTest = ((glIsFenceNV = (csGLISFENCENV) gl->GetProcAddress ("glIsFenceNV")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glIsFenceNV");
+      }
       allclear &= funcTest;
       funcTest = ((glGetFenceivNV = (csGLGETFENCEIVNV) gl->GetProcAddress ("glGetFenceivNV")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glGetFenceivNV");
+      }
       allclear &= funcTest;
+
       if (CS_GL_NV_fence = allclear)
       {
         CS_GL_NV_fence &= config->GetBool (cfgkey, true);
@@ -14483,22 +17554,25 @@ public:
       Report ("GL Extension '%s' not found.", ext);
     }
   }
-
+  
   void InitGL_NV_fog_distance ()
   {
     if (tested_CS_GL_NV_fog_distance) return;
     tested_CS_GL_NV_fog_distance = true;
     const char* ext = "GL_NV_fog_distance";
-    char cfgkey[45];
+    char cfgkey[26 + 18 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
-
-    const char* extensions = (const char*)glGetString (GL_EXTENSIONS);
+    
+    const char* extensions;
+    extensions = (const char*)glGetString (GL_EXTENSIONS);
     CS_GL_NV_fog_distance = (strstr (extensions, ext) != NULL);
 
     bool allclear, funcTest;
-    if (gl && CS_GL_NV_fog_distance)
+    (void)funcTest; // shut up "variable unused" warnings
+    if (CS_GL_NV_fog_distance)
     {
       allclear = true;
+
       if (CS_GL_NV_fog_distance = allclear)
       {
         CS_GL_NV_fog_distance &= config->GetBool (cfgkey, true);
@@ -14521,22 +17595,25 @@ public:
       Report ("GL Extension '%s' not found.", ext);
     }
   }
-
+  
   void InitGL_NV_light_max_exponent ()
   {
     if (tested_CS_GL_NV_light_max_exponent) return;
     tested_CS_GL_NV_light_max_exponent = true;
     const char* ext = "GL_NV_light_max_exponent";
-    char cfgkey[51];
+    char cfgkey[26 + 24 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
-
-    const char* extensions = (const char*)glGetString (GL_EXTENSIONS);
+    
+    const char* extensions;
+    extensions = (const char*)glGetString (GL_EXTENSIONS);
     CS_GL_NV_light_max_exponent = (strstr (extensions, ext) != NULL);
 
     bool allclear, funcTest;
-    if (gl && CS_GL_NV_light_max_exponent)
+    (void)funcTest; // shut up "variable unused" warnings
+    if (CS_GL_NV_light_max_exponent)
     {
       allclear = true;
+
       if (CS_GL_NV_light_max_exponent = allclear)
       {
         CS_GL_NV_light_max_exponent &= config->GetBool (cfgkey, true);
@@ -14559,22 +17636,25 @@ public:
       Report ("GL Extension '%s' not found.", ext);
     }
   }
-
+  
   void InitGL_NV_multisample_filter_hint ()
   {
     if (tested_CS_GL_NV_multisample_filter_hint) return;
     tested_CS_GL_NV_multisample_filter_hint = true;
     const char* ext = "GL_NV_multisample_filter_hint";
-    char cfgkey[56];
+    char cfgkey[26 + 29 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
-
-    const char* extensions = (const char*)glGetString (GL_EXTENSIONS);
+    
+    const char* extensions;
+    extensions = (const char*)glGetString (GL_EXTENSIONS);
     CS_GL_NV_multisample_filter_hint = (strstr (extensions, ext) != NULL);
 
     bool allclear, funcTest;
-    if (gl && CS_GL_NV_multisample_filter_hint)
+    (void)funcTest; // shut up "variable unused" warnings
+    if (CS_GL_NV_multisample_filter_hint)
     {
       allclear = true;
+
       if (CS_GL_NV_multisample_filter_hint = allclear)
       {
         CS_GL_NV_multisample_filter_hint &= config->GetBool (cfgkey, true);
@@ -14597,50 +17677,74 @@ public:
       Report ("GL Extension '%s' not found.", ext);
     }
   }
-
+  
   void InitGL_NV_occlusion_query ()
   {
     if (tested_CS_GL_NV_occlusion_query) return;
     tested_CS_GL_NV_occlusion_query = true;
     const char* ext = "GL_NV_occlusion_query";
-    char cfgkey[48];
+    char cfgkey[26 + 21 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
-
-    const char* extensions = (const char*)glGetString (GL_EXTENSIONS);
+    
+    const char* extensions;
+    extensions = (const char*)glGetString (GL_EXTENSIONS);
     CS_GL_NV_occlusion_query = (strstr (extensions, ext) != NULL);
 
     bool allclear, funcTest;
-    if (gl && CS_GL_NV_occlusion_query)
+    (void)funcTest; // shut up "variable unused" warnings
+    if (CS_GL_NV_occlusion_query)
     {
       allclear = true;
       funcTest = ((glGenOcclusionQueriesNV = (csGLGENOCCLUSIONQUERIESNV) gl->GetProcAddress ("glGenOcclusionQueriesNV")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glGenOcclusionQueriesNV");
+      }
       allclear &= funcTest;
       funcTest = ((glDeleteOcclusionQueriesNV = (csGLDELETEOCCLUSIONQUERIESNV) gl->GetProcAddress ("glDeleteOcclusionQueriesNV")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glDeleteOcclusionQueriesNV");
+      }
       allclear &= funcTest;
       funcTest = ((glIsOcclusionQueryNV = (csGLISOCCLUSIONQUERYNV) gl->GetProcAddress ("glIsOcclusionQueryNV")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glIsOcclusionQueryNV");
+      }
       allclear &= funcTest;
       funcTest = ((glBeginOcclusionQueryNV = (csGLBEGINOCCLUSIONQUERYNV) gl->GetProcAddress ("glBeginOcclusionQueryNV")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glBeginOcclusionQueryNV");
+      }
       allclear &= funcTest;
       funcTest = ((glEndOcclusionQueryNV = (csGLENDOCCLUSIONQUERYNV) gl->GetProcAddress ("glEndOcclusionQueryNV")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glEndOcclusionQueryNV");
+      }
       allclear &= funcTest;
       funcTest = ((glGetOcclusionQueryivNV = (csGLGETOCCLUSIONQUERYIVNV) gl->GetProcAddress ("glGetOcclusionQueryivNV")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glGetOcclusionQueryivNV");
+      }
       allclear &= funcTest;
       funcTest = ((glGetOcclusionQueryuivNV = (csGLGETOCCLUSIONQUERYUIVNV) gl->GetProcAddress ("glGetOcclusionQueryuivNV")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glGetOcclusionQueryuivNV");
+      }
       allclear &= funcTest;
+
       if (CS_GL_NV_occlusion_query = allclear)
       {
         CS_GL_NV_occlusion_query &= config->GetBool (cfgkey, true);
@@ -14663,22 +17767,25 @@ public:
       Report ("GL Extension '%s' not found.", ext);
     }
   }
-
+  
   void InitGL_NV_packed_depth_stencil ()
   {
     if (tested_CS_GL_NV_packed_depth_stencil) return;
     tested_CS_GL_NV_packed_depth_stencil = true;
     const char* ext = "GL_NV_packed_depth_stencil";
-    char cfgkey[53];
+    char cfgkey[26 + 26 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
-
-    const char* extensions = (const char*)glGetString (GL_EXTENSIONS);
+    
+    const char* extensions;
+    extensions = (const char*)glGetString (GL_EXTENSIONS);
     CS_GL_NV_packed_depth_stencil = (strstr (extensions, ext) != NULL);
 
     bool allclear, funcTest;
-    if (gl && CS_GL_NV_packed_depth_stencil)
+    (void)funcTest; // shut up "variable unused" warnings
+    if (CS_GL_NV_packed_depth_stencil)
     {
       allclear = true;
+
       if (CS_GL_NV_packed_depth_stencil = allclear)
       {
         CS_GL_NV_packed_depth_stencil &= config->GetBool (cfgkey, true);
@@ -14701,30 +17808,39 @@ public:
       Report ("GL Extension '%s' not found.", ext);
     }
   }
-
+  
   void InitGL_NV_point_sprite ()
   {
     if (tested_CS_GL_NV_point_sprite) return;
     tested_CS_GL_NV_point_sprite = true;
     const char* ext = "GL_NV_point_sprite";
-    char cfgkey[45];
+    char cfgkey[26 + 18 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
-
-    const char* extensions = (const char*)glGetString (GL_EXTENSIONS);
+    
+    const char* extensions;
+    extensions = (const char*)glGetString (GL_EXTENSIONS);
     CS_GL_NV_point_sprite = (strstr (extensions, ext) != NULL);
 
     bool allclear, funcTest;
-    if (gl && CS_GL_NV_point_sprite)
+    (void)funcTest; // shut up "variable unused" warnings
+    if (CS_GL_NV_point_sprite)
     {
       allclear = true;
       funcTest = ((glPointParameteriNV = (csGLPOINTPARAMETERINV) gl->GetProcAddress ("glPointParameteriNV")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glPointParameteriNV");
+      }
       allclear &= funcTest;
       funcTest = ((glPointParameterivNV = (csGLPOINTPARAMETERIVNV) gl->GetProcAddress ("glPointParameterivNV")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glPointParameterivNV");
+      }
       allclear &= funcTest;
+
       if (CS_GL_NV_point_sprite = allclear)
       {
         CS_GL_NV_point_sprite &= config->GetBool (cfgkey, true);
@@ -14747,74 +17863,116 @@ public:
       Report ("GL Extension '%s' not found.", ext);
     }
   }
-
+  
   void InitGL_NV_register_combiners ()
   {
     if (tested_CS_GL_NV_register_combiners) return;
     tested_CS_GL_NV_register_combiners = true;
     const char* ext = "GL_NV_register_combiners";
-    char cfgkey[51];
+    char cfgkey[26 + 24 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
-
-    const char* extensions = (const char*)glGetString (GL_EXTENSIONS);
+    
+    const char* extensions;
+    extensions = (const char*)glGetString (GL_EXTENSIONS);
     CS_GL_NV_register_combiners = (strstr (extensions, ext) != NULL);
 
     bool allclear, funcTest;
-    if (gl && CS_GL_NV_register_combiners)
+    (void)funcTest; // shut up "variable unused" warnings
+    if (CS_GL_NV_register_combiners)
     {
       allclear = true;
       funcTest = ((glCombinerParameterfvNV = (csGLCOMBINERPARAMETERFVNV) gl->GetProcAddress ("glCombinerParameterfvNV")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glCombinerParameterfvNV");
+      }
       allclear &= funcTest;
       funcTest = ((glCombinerParameterivNV = (csGLCOMBINERPARAMETERIVNV) gl->GetProcAddress ("glCombinerParameterivNV")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glCombinerParameterivNV");
+      }
       allclear &= funcTest;
       funcTest = ((glCombinerParameterfNV = (csGLCOMBINERPARAMETERFNV) gl->GetProcAddress ("glCombinerParameterfNV")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glCombinerParameterfNV");
+      }
       allclear &= funcTest;
       funcTest = ((glCombinerParameteriNV = (csGLCOMBINERPARAMETERINV) gl->GetProcAddress ("glCombinerParameteriNV")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glCombinerParameteriNV");
+      }
       allclear &= funcTest;
       funcTest = ((glCombinerInputNV = (csGLCOMBINERINPUTNV) gl->GetProcAddress ("glCombinerInputNV")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glCombinerInputNV");
+      }
       allclear &= funcTest;
       funcTest = ((glCombinerOutputNV = (csGLCOMBINEROUTPUTNV) gl->GetProcAddress ("glCombinerOutputNV")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glCombinerOutputNV");
+      }
       allclear &= funcTest;
       funcTest = ((glFinalCombinerInputNV = (csGLFINALCOMBINERINPUTNV) gl->GetProcAddress ("glFinalCombinerInputNV")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glFinalCombinerInputNV");
+      }
       allclear &= funcTest;
       funcTest = ((glGetCombinerInputParameterfvNV = (csGLGETCOMBINERINPUTPARAMETERFVNV) gl->GetProcAddress ("glGetCombinerInputParameterfvNV")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glGetCombinerInputParameterfvNV");
+      }
       allclear &= funcTest;
       funcTest = ((glGetCombinerInputParameterivNV = (csGLGETCOMBINERINPUTPARAMETERIVNV) gl->GetProcAddress ("glGetCombinerInputParameterivNV")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glGetCombinerInputParameterivNV");
+      }
       allclear &= funcTest;
       funcTest = ((glGetCombinerOutputParameterfvNV = (csGLGETCOMBINEROUTPUTPARAMETERFVNV) gl->GetProcAddress ("glGetCombinerOutputParameterfvNV")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glGetCombinerOutputParameterfvNV");
+      }
       allclear &= funcTest;
       funcTest = ((glGetCombinerOutputParameterivNV = (csGLGETCOMBINEROUTPUTPARAMETERIVNV) gl->GetProcAddress ("glGetCombinerOutputParameterivNV")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glGetCombinerOutputParameterivNV");
+      }
       allclear &= funcTest;
       funcTest = ((glGetFinalCombinerInputParameterfvNV = (csGLGETFINALCOMBINERINPUTPARAMETERFVNV) gl->GetProcAddress ("glGetFinalCombinerInputParameterfvNV")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glGetFinalCombinerInputParameterfvNV");
+      }
       allclear &= funcTest;
       funcTest = ((glGetFinalCombinerInputParameterivNV = (csGLGETFINALCOMBINERINPUTPARAMETERIVNV) gl->GetProcAddress ("glGetFinalCombinerInputParameterivNV")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glGetFinalCombinerInputParameterivNV");
+      }
       allclear &= funcTest;
+
       if (CS_GL_NV_register_combiners = allclear)
       {
         CS_GL_NV_register_combiners &= config->GetBool (cfgkey, true);
@@ -14837,30 +17995,39 @@ public:
       Report ("GL Extension '%s' not found.", ext);
     }
   }
-
+  
   void InitGL_NV_register_combiners2 ()
   {
     if (tested_CS_GL_NV_register_combiners2) return;
     tested_CS_GL_NV_register_combiners2 = true;
     const char* ext = "GL_NV_register_combiners2";
-    char cfgkey[52];
+    char cfgkey[26 + 25 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
-
-    const char* extensions = (const char*)glGetString (GL_EXTENSIONS);
+    
+    const char* extensions;
+    extensions = (const char*)glGetString (GL_EXTENSIONS);
     CS_GL_NV_register_combiners2 = (strstr (extensions, ext) != NULL);
 
     bool allclear, funcTest;
-    if (gl && CS_GL_NV_register_combiners2)
+    (void)funcTest; // shut up "variable unused" warnings
+    if (CS_GL_NV_register_combiners2)
     {
       allclear = true;
       funcTest = ((glCombinerStageParameterfvNV = (csGLCOMBINERSTAGEPARAMETERFVNV) gl->GetProcAddress ("glCombinerStageParameterfvNV")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glCombinerStageParameterfvNV");
+      }
       allclear &= funcTest;
       funcTest = ((glGetCombinerStageParameterfvNV = (csGLGETCOMBINERSTAGEPARAMETERFVNV) gl->GetProcAddress ("glGetCombinerStageParameterfvNV")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glGetCombinerStageParameterfvNV");
+      }
       allclear &= funcTest;
+
       if (CS_GL_NV_register_combiners2 = allclear)
       {
         CS_GL_NV_register_combiners2 &= config->GetBool (cfgkey, true);
@@ -14883,22 +18050,25 @@ public:
       Report ("GL Extension '%s' not found.", ext);
     }
   }
-
+  
   void InitGL_NV_texgen_emboss ()
   {
     if (tested_CS_GL_NV_texgen_emboss) return;
     tested_CS_GL_NV_texgen_emboss = true;
     const char* ext = "GL_NV_texgen_emboss";
-    char cfgkey[46];
+    char cfgkey[26 + 19 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
-
-    const char* extensions = (const char*)glGetString (GL_EXTENSIONS);
+    
+    const char* extensions;
+    extensions = (const char*)glGetString (GL_EXTENSIONS);
     CS_GL_NV_texgen_emboss = (strstr (extensions, ext) != NULL);
 
     bool allclear, funcTest;
-    if (gl && CS_GL_NV_texgen_emboss)
+    (void)funcTest; // shut up "variable unused" warnings
+    if (CS_GL_NV_texgen_emboss)
     {
       allclear = true;
+
       if (CS_GL_NV_texgen_emboss = allclear)
       {
         CS_GL_NV_texgen_emboss &= config->GetBool (cfgkey, true);
@@ -14921,22 +18091,25 @@ public:
       Report ("GL Extension '%s' not found.", ext);
     }
   }
-
+  
   void InitGL_NV_texgen_reflection ()
   {
     if (tested_CS_GL_NV_texgen_reflection) return;
     tested_CS_GL_NV_texgen_reflection = true;
     const char* ext = "GL_NV_texgen_reflection";
-    char cfgkey[50];
+    char cfgkey[26 + 23 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
-
-    const char* extensions = (const char*)glGetString (GL_EXTENSIONS);
+    
+    const char* extensions;
+    extensions = (const char*)glGetString (GL_EXTENSIONS);
     CS_GL_NV_texgen_reflection = (strstr (extensions, ext) != NULL);
 
     bool allclear, funcTest;
-    if (gl && CS_GL_NV_texgen_reflection)
+    (void)funcTest; // shut up "variable unused" warnings
+    if (CS_GL_NV_texgen_reflection)
     {
       allclear = true;
+
       if (CS_GL_NV_texgen_reflection = allclear)
       {
         CS_GL_NV_texgen_reflection &= config->GetBool (cfgkey, true);
@@ -14959,22 +18132,25 @@ public:
       Report ("GL Extension '%s' not found.", ext);
     }
   }
-
+  
   void InitGL_NV_texture_compression_vtc ()
   {
     if (tested_CS_GL_NV_texture_compression_vtc) return;
     tested_CS_GL_NV_texture_compression_vtc = true;
     const char* ext = "GL_NV_texture_compression_vtc";
-    char cfgkey[56];
+    char cfgkey[26 + 29 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
-
-    const char* extensions = (const char*)glGetString (GL_EXTENSIONS);
+    
+    const char* extensions;
+    extensions = (const char*)glGetString (GL_EXTENSIONS);
     CS_GL_NV_texture_compression_vtc = (strstr (extensions, ext) != NULL);
 
     bool allclear, funcTest;
-    if (gl && CS_GL_NV_texture_compression_vtc)
+    (void)funcTest; // shut up "variable unused" warnings
+    if (CS_GL_NV_texture_compression_vtc)
     {
       allclear = true;
+
       if (CS_GL_NV_texture_compression_vtc = allclear)
       {
         CS_GL_NV_texture_compression_vtc &= config->GetBool (cfgkey, true);
@@ -14997,22 +18173,25 @@ public:
       Report ("GL Extension '%s' not found.", ext);
     }
   }
-
+  
   void InitGL_NV_texture_env_combine4 ()
   {
     if (tested_CS_GL_NV_texture_env_combine4) return;
     tested_CS_GL_NV_texture_env_combine4 = true;
     const char* ext = "GL_NV_texture_env_combine4";
-    char cfgkey[53];
+    char cfgkey[26 + 26 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
-
-    const char* extensions = (const char*)glGetString (GL_EXTENSIONS);
+    
+    const char* extensions;
+    extensions = (const char*)glGetString (GL_EXTENSIONS);
     CS_GL_NV_texture_env_combine4 = (strstr (extensions, ext) != NULL);
 
     bool allclear, funcTest;
-    if (gl && CS_GL_NV_texture_env_combine4)
+    (void)funcTest; // shut up "variable unused" warnings
+    if (CS_GL_NV_texture_env_combine4)
     {
       allclear = true;
+
       if (CS_GL_NV_texture_env_combine4 = allclear)
       {
         CS_GL_NV_texture_env_combine4 &= config->GetBool (cfgkey, true);
@@ -15035,22 +18214,25 @@ public:
       Report ("GL Extension '%s' not found.", ext);
     }
   }
-
+  
   void InitGL_NV_texture_rectangle ()
   {
     if (tested_CS_GL_NV_texture_rectangle) return;
     tested_CS_GL_NV_texture_rectangle = true;
     const char* ext = "GL_NV_texture_rectangle";
-    char cfgkey[50];
+    char cfgkey[26 + 23 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
-
-    const char* extensions = (const char*)glGetString (GL_EXTENSIONS);
+    
+    const char* extensions;
+    extensions = (const char*)glGetString (GL_EXTENSIONS);
     CS_GL_NV_texture_rectangle = (strstr (extensions, ext) != NULL);
 
     bool allclear, funcTest;
-    if (gl && CS_GL_NV_texture_rectangle)
+    (void)funcTest; // shut up "variable unused" warnings
+    if (CS_GL_NV_texture_rectangle)
     {
       allclear = true;
+
       if (CS_GL_NV_texture_rectangle = allclear)
       {
         CS_GL_NV_texture_rectangle &= config->GetBool (cfgkey, true);
@@ -15073,22 +18255,25 @@ public:
       Report ("GL Extension '%s' not found.", ext);
     }
   }
-
+  
   void InitGL_NV_texture_shader ()
   {
     if (tested_CS_GL_NV_texture_shader) return;
     tested_CS_GL_NV_texture_shader = true;
     const char* ext = "GL_NV_texture_shader";
-    char cfgkey[47];
+    char cfgkey[26 + 20 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
-
-    const char* extensions = (const char*)glGetString (GL_EXTENSIONS);
+    
+    const char* extensions;
+    extensions = (const char*)glGetString (GL_EXTENSIONS);
     CS_GL_NV_texture_shader = (strstr (extensions, ext) != NULL);
 
     bool allclear, funcTest;
-    if (gl && CS_GL_NV_texture_shader)
+    (void)funcTest; // shut up "variable unused" warnings
+    if (CS_GL_NV_texture_shader)
     {
       allclear = true;
+
       if (CS_GL_NV_texture_shader = allclear)
       {
         CS_GL_NV_texture_shader &= config->GetBool (cfgkey, true);
@@ -15111,22 +18296,25 @@ public:
       Report ("GL Extension '%s' not found.", ext);
     }
   }
-
+  
   void InitGL_NV_texture_shader2 ()
   {
     if (tested_CS_GL_NV_texture_shader2) return;
     tested_CS_GL_NV_texture_shader2 = true;
     const char* ext = "GL_NV_texture_shader2";
-    char cfgkey[48];
+    char cfgkey[26 + 21 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
-
-    const char* extensions = (const char*)glGetString (GL_EXTENSIONS);
+    
+    const char* extensions;
+    extensions = (const char*)glGetString (GL_EXTENSIONS);
     CS_GL_NV_texture_shader2 = (strstr (extensions, ext) != NULL);
 
     bool allclear, funcTest;
-    if (gl && CS_GL_NV_texture_shader2)
+    (void)funcTest; // shut up "variable unused" warnings
+    if (CS_GL_NV_texture_shader2)
     {
       allclear = true;
+
       if (CS_GL_NV_texture_shader2 = allclear)
       {
         CS_GL_NV_texture_shader2 &= config->GetBool (cfgkey, true);
@@ -15149,22 +18337,25 @@ public:
       Report ("GL Extension '%s' not found.", ext);
     }
   }
-
+  
   void InitGL_NV_texture_shader3 ()
   {
     if (tested_CS_GL_NV_texture_shader3) return;
     tested_CS_GL_NV_texture_shader3 = true;
     const char* ext = "GL_NV_texture_shader3";
-    char cfgkey[48];
+    char cfgkey[26 + 21 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
-
-    const char* extensions = (const char*)glGetString (GL_EXTENSIONS);
+    
+    const char* extensions;
+    extensions = (const char*)glGetString (GL_EXTENSIONS);
     CS_GL_NV_texture_shader3 = (strstr (extensions, ext) != NULL);
 
     bool allclear, funcTest;
-    if (gl && CS_GL_NV_texture_shader3)
+    (void)funcTest; // shut up "variable unused" warnings
+    if (CS_GL_NV_texture_shader3)
     {
       allclear = true;
+
       if (CS_GL_NV_texture_shader3 = allclear)
       {
         CS_GL_NV_texture_shader3 &= config->GetBool (cfgkey, true);
@@ -15187,38 +18378,53 @@ public:
       Report ("GL Extension '%s' not found.", ext);
     }
   }
-
+  
   void InitGL_NV_vertex_array_range ()
   {
     if (tested_CS_GL_NV_vertex_array_range) return;
     tested_CS_GL_NV_vertex_array_range = true;
     const char* ext = "GL_NV_vertex_array_range";
-    char cfgkey[51];
+    char cfgkey[26 + 24 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
-
-    const char* extensions = (const char*)glGetString (GL_EXTENSIONS);
+    
+    const char* extensions;
+    extensions = (const char*)glGetString (GL_EXTENSIONS);
     CS_GL_NV_vertex_array_range = (strstr (extensions, ext) != NULL);
 
     bool allclear, funcTest;
-    if (gl && CS_GL_NV_vertex_array_range)
+    (void)funcTest; // shut up "variable unused" warnings
+    if (CS_GL_NV_vertex_array_range)
     {
       allclear = true;
       funcTest = ((glVertexArrayRangeNV = (csGLVERTEXARRAYRANGENV) gl->GetProcAddress ("glVertexArrayRangeNV")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glVertexArrayRangeNV");
+      }
       allclear &= funcTest;
       funcTest = ((glFlushVertexArrayRangeNV = (csGLFLUSHVERTEXARRAYRANGENV) gl->GetProcAddress ("glFlushVertexArrayRangeNV")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glFlushVertexArrayRangeNV");
+      }
       allclear &= funcTest;
       funcTest = ((wglAllocateMemoryNV = (csWGLALLOCATEMEMORYNV) gl->GetProcAddress ("wglAllocateMemoryNV")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "wglAllocateMemoryNV");
+      }
       allclear &= funcTest;
       funcTest = ((wglFreeMemoryNV = (csWGLFREEMEMORYNV) gl->GetProcAddress ("wglFreeMemoryNV")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "wglFreeMemoryNV");
+      }
       allclear &= funcTest;
+
       if (CS_GL_NV_vertex_array_range = allclear)
       {
         CS_GL_NV_vertex_array_range &= config->GetBool (cfgkey, true);
@@ -15241,22 +18447,25 @@ public:
       Report ("GL Extension '%s' not found.", ext);
     }
   }
-
+  
   void InitGL_NV_vertex_array_range2 ()
   {
     if (tested_CS_GL_NV_vertex_array_range2) return;
     tested_CS_GL_NV_vertex_array_range2 = true;
     const char* ext = "GL_NV_vertex_array_range2";
-    char cfgkey[52];
+    char cfgkey[26 + 25 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
-
-    const char* extensions = (const char*)glGetString (GL_EXTENSIONS);
+    
+    const char* extensions;
+    extensions = (const char*)glGetString (GL_EXTENSIONS);
     CS_GL_NV_vertex_array_range2 = (strstr (extensions, ext) != NULL);
 
     bool allclear, funcTest;
-    if (gl && CS_GL_NV_vertex_array_range2)
+    (void)funcTest; // shut up "variable unused" warnings
+    if (CS_GL_NV_vertex_array_range2)
     {
       allclear = true;
+
       if (CS_GL_NV_vertex_array_range2 = allclear)
       {
         CS_GL_NV_vertex_array_range2 &= config->GetBool (cfgkey, true);
@@ -15279,270 +18488,459 @@ public:
       Report ("GL Extension '%s' not found.", ext);
     }
   }
-
+  
   void InitGL_NV_vertex_program ()
   {
     if (tested_CS_GL_NV_vertex_program) return;
     tested_CS_GL_NV_vertex_program = true;
     const char* ext = "GL_NV_vertex_program";
-    char cfgkey[47];
+    char cfgkey[26 + 20 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
-
-    const char* extensions = (const char*)glGetString (GL_EXTENSIONS);
+    
+    const char* extensions;
+    extensions = (const char*)glGetString (GL_EXTENSIONS);
     CS_GL_NV_vertex_program = (strstr (extensions, ext) != NULL);
 
     bool allclear, funcTest;
-    if (gl && CS_GL_NV_vertex_program)
+    (void)funcTest; // shut up "variable unused" warnings
+    if (CS_GL_NV_vertex_program)
     {
       allclear = true;
       funcTest = ((glBindProgramNV = (csGLBINDPROGRAMNV) gl->GetProcAddress ("glBindProgramNV")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glBindProgramNV");
+      }
       allclear &= funcTest;
       funcTest = ((glDeleteProgramsNV = (csGLDELETEPROGRAMSNV) gl->GetProcAddress ("glDeleteProgramsNV")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glDeleteProgramsNV");
+      }
       allclear &= funcTest;
       funcTest = ((glExecuteProgramNV = (csGLEXECUTEPROGRAMNV) gl->GetProcAddress ("glExecuteProgramNV")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glExecuteProgramNV");
+      }
       allclear &= funcTest;
       funcTest = ((glGenProgramsNV = (csGLGENPROGRAMSNV) gl->GetProcAddress ("glGenProgramsNV")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glGenProgramsNV");
+      }
       allclear &= funcTest;
       funcTest = ((glAreProgramsResidentNV = (csGLAREPROGRAMSRESIDENTNV) gl->GetProcAddress ("glAreProgramsResidentNV")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glAreProgramsResidentNV");
+      }
       allclear &= funcTest;
       funcTest = ((glRequestResidentProgramsNV = (csGLREQUESTRESIDENTPROGRAMSNV) gl->GetProcAddress ("glRequestResidentProgramsNV")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glRequestResidentProgramsNV");
+      }
       allclear &= funcTest;
       funcTest = ((glGetProgramParameterfvNV = (csGLGETPROGRAMPARAMETERFVNV) gl->GetProcAddress ("glGetProgramParameterfvNV")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glGetProgramParameterfvNV");
+      }
       allclear &= funcTest;
       funcTest = ((glGetProgramParameterdvNV = (csGLGETPROGRAMPARAMETERDVNV) gl->GetProcAddress ("glGetProgramParameterdvNV")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glGetProgramParameterdvNV");
+      }
       allclear &= funcTest;
       funcTest = ((glGetProgramivNV = (csGLGETPROGRAMIVNV) gl->GetProcAddress ("glGetProgramivNV")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glGetProgramivNV");
+      }
       allclear &= funcTest;
       funcTest = ((glGetProgramStringNV = (csGLGETPROGRAMSTRINGNV) gl->GetProcAddress ("glGetProgramStringNV")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glGetProgramStringNV");
+      }
       allclear &= funcTest;
       funcTest = ((glGetTrackMatrixivNV = (csGLGETTRACKMATRIXIVNV) gl->GetProcAddress ("glGetTrackMatrixivNV")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glGetTrackMatrixivNV");
+      }
       allclear &= funcTest;
       funcTest = ((glGetVertexAttribdvNV = (csGLGETVERTEXATTRIBDVNV) gl->GetProcAddress ("glGetVertexAttribdvNV")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glGetVertexAttribdvNV");
+      }
       allclear &= funcTest;
       funcTest = ((glGetVertexAttribfvNV = (csGLGETVERTEXATTRIBFVNV) gl->GetProcAddress ("glGetVertexAttribfvNV")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glGetVertexAttribfvNV");
+      }
       allclear &= funcTest;
       funcTest = ((glGetVertexAttribivNV = (csGLGETVERTEXATTRIBIVNV) gl->GetProcAddress ("glGetVertexAttribivNV")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glGetVertexAttribivNV");
+      }
       allclear &= funcTest;
       funcTest = ((glGetVertexAttribPointervNV = (csGLGETVERTEXATTRIBPOINTERVNV) gl->GetProcAddress ("glGetVertexAttribPointervNV")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glGetVertexAttribPointervNV");
+      }
       allclear &= funcTest;
       funcTest = ((glIsProgramNV = (csGLISPROGRAMNV) gl->GetProcAddress ("glIsProgramNV")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glIsProgramNV");
+      }
       allclear &= funcTest;
       funcTest = ((glLoadProgramNV = (csGLLOADPROGRAMNV) gl->GetProcAddress ("glLoadProgramNV")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glLoadProgramNV");
+      }
       allclear &= funcTest;
       funcTest = ((glProgramParameter4fNV = (csGLPROGRAMPARAMETER4FNV) gl->GetProcAddress ("glProgramParameter4fNV")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glProgramParameter4fNV");
+      }
       allclear &= funcTest;
       funcTest = ((glProgramParameter4fvNV = (csGLPROGRAMPARAMETER4FVNV) gl->GetProcAddress ("glProgramParameter4fvNV")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glProgramParameter4fvNV");
+      }
       allclear &= funcTest;
       funcTest = ((glProgramParameters4dvNV = (csGLPROGRAMPARAMETERS4DVNV) gl->GetProcAddress ("glProgramParameters4dvNV")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glProgramParameters4dvNV");
+      }
       allclear &= funcTest;
       funcTest = ((glProgramParameters4fvNV = (csGLPROGRAMPARAMETERS4FVNV) gl->GetProcAddress ("glProgramParameters4fvNV")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glProgramParameters4fvNV");
+      }
       allclear &= funcTest;
       funcTest = ((glTrackMatrixNV = (csGLTRACKMATRIXNV) gl->GetProcAddress ("glTrackMatrixNV")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glTrackMatrixNV");
+      }
       allclear &= funcTest;
       funcTest = ((glVertexAttribPointerNV = (csGLVERTEXATTRIBPOINTERNV) gl->GetProcAddress ("glVertexAttribPointerNV")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glVertexAttribPointerNV");
+      }
       allclear &= funcTest;
       funcTest = ((glVertexAttrib1sNV = (csGLVERTEXATTRIB1SNV) gl->GetProcAddress ("glVertexAttrib1sNV")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glVertexAttrib1sNV");
+      }
       allclear &= funcTest;
       funcTest = ((glVertexAttrib1fNV = (csGLVERTEXATTRIB1FNV) gl->GetProcAddress ("glVertexAttrib1fNV")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glVertexAttrib1fNV");
+      }
       allclear &= funcTest;
       funcTest = ((glVertexAttrib1dNV = (csGLVERTEXATTRIB1DNV) gl->GetProcAddress ("glVertexAttrib1dNV")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glVertexAttrib1dNV");
+      }
       allclear &= funcTest;
       funcTest = ((glVertexAttrib2sNV = (csGLVERTEXATTRIB2SNV) gl->GetProcAddress ("glVertexAttrib2sNV")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glVertexAttrib2sNV");
+      }
       allclear &= funcTest;
       funcTest = ((glVertexAttrib2fNV = (csGLVERTEXATTRIB2FNV) gl->GetProcAddress ("glVertexAttrib2fNV")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glVertexAttrib2fNV");
+      }
       allclear &= funcTest;
       funcTest = ((glVertexAttrib2dNV = (csGLVERTEXATTRIB2DNV) gl->GetProcAddress ("glVertexAttrib2dNV")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glVertexAttrib2dNV");
+      }
       allclear &= funcTest;
       funcTest = ((glVertexAttrib3sNV = (csGLVERTEXATTRIB3SNV) gl->GetProcAddress ("glVertexAttrib3sNV")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glVertexAttrib3sNV");
+      }
       allclear &= funcTest;
       funcTest = ((glVertexAttrib3fNV = (csGLVERTEXATTRIB3FNV) gl->GetProcAddress ("glVertexAttrib3fNV")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glVertexAttrib3fNV");
+      }
       allclear &= funcTest;
       funcTest = ((glVertexAttrib3dNV = (csGLVERTEXATTRIB3DNV) gl->GetProcAddress ("glVertexAttrib3dNV")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glVertexAttrib3dNV");
+      }
       allclear &= funcTest;
       funcTest = ((glVertexAttrib4sNV = (csGLVERTEXATTRIB4SNV) gl->GetProcAddress ("glVertexAttrib4sNV")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glVertexAttrib4sNV");
+      }
       allclear &= funcTest;
       funcTest = ((glVertexAttrib4fNV = (csGLVERTEXATTRIB4FNV) gl->GetProcAddress ("glVertexAttrib4fNV")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glVertexAttrib4fNV");
+      }
       allclear &= funcTest;
       funcTest = ((glVertexAttrib4dNV = (csGLVERTEXATTRIB4DNV) gl->GetProcAddress ("glVertexAttrib4dNV")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glVertexAttrib4dNV");
+      }
       allclear &= funcTest;
       funcTest = ((glVertexAttrib4ubNV = (csGLVERTEXATTRIB4UBNV) gl->GetProcAddress ("glVertexAttrib4ubNV")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glVertexAttrib4ubNV");
+      }
       allclear &= funcTest;
       funcTest = ((glVertexAttrib1svNV = (csGLVERTEXATTRIB1SVNV) gl->GetProcAddress ("glVertexAttrib1svNV")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glVertexAttrib1svNV");
+      }
       allclear &= funcTest;
       funcTest = ((glVertexAttrib1fvNV = (csGLVERTEXATTRIB1FVNV) gl->GetProcAddress ("glVertexAttrib1fvNV")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glVertexAttrib1fvNV");
+      }
       allclear &= funcTest;
       funcTest = ((glVertexAttrib1dvNV = (csGLVERTEXATTRIB1DVNV) gl->GetProcAddress ("glVertexAttrib1dvNV")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glVertexAttrib1dvNV");
+      }
       allclear &= funcTest;
       funcTest = ((glVertexAttrib2svNV = (csGLVERTEXATTRIB2SVNV) gl->GetProcAddress ("glVertexAttrib2svNV")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glVertexAttrib2svNV");
+      }
       allclear &= funcTest;
       funcTest = ((glVertexAttrib2fvNV = (csGLVERTEXATTRIB2FVNV) gl->GetProcAddress ("glVertexAttrib2fvNV")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glVertexAttrib2fvNV");
+      }
       allclear &= funcTest;
       funcTest = ((glVertexAttrib2dvNV = (csGLVERTEXATTRIB2DVNV) gl->GetProcAddress ("glVertexAttrib2dvNV")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glVertexAttrib2dvNV");
+      }
       allclear &= funcTest;
       funcTest = ((glVertexAttrib3svNV = (csGLVERTEXATTRIB3SVNV) gl->GetProcAddress ("glVertexAttrib3svNV")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glVertexAttrib3svNV");
+      }
       allclear &= funcTest;
       funcTest = ((glVertexAttrib3fvNV = (csGLVERTEXATTRIB3FVNV) gl->GetProcAddress ("glVertexAttrib3fvNV")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glVertexAttrib3fvNV");
+      }
       allclear &= funcTest;
       funcTest = ((glVertexAttrib3dvNV = (csGLVERTEXATTRIB3DVNV) gl->GetProcAddress ("glVertexAttrib3dvNV")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glVertexAttrib3dvNV");
+      }
       allclear &= funcTest;
       funcTest = ((glVertexAttrib4svNV = (csGLVERTEXATTRIB4SVNV) gl->GetProcAddress ("glVertexAttrib4svNV")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glVertexAttrib4svNV");
+      }
       allclear &= funcTest;
       funcTest = ((glVertexAttrib4fvNV = (csGLVERTEXATTRIB4FVNV) gl->GetProcAddress ("glVertexAttrib4fvNV")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glVertexAttrib4fvNV");
+      }
       allclear &= funcTest;
       funcTest = ((glVertexAttrib4dvNV = (csGLVERTEXATTRIB4DVNV) gl->GetProcAddress ("glVertexAttrib4dvNV")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glVertexAttrib4dvNV");
+      }
       allclear &= funcTest;
       funcTest = ((glVertexAttrib4ubvNV = (csGLVERTEXATTRIB4UBVNV) gl->GetProcAddress ("glVertexAttrib4ubvNV")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glVertexAttrib4ubvNV");
+      }
       allclear &= funcTest;
       funcTest = ((glVertexAttribs1svNV = (csGLVERTEXATTRIBS1SVNV) gl->GetProcAddress ("glVertexAttribs1svNV")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glVertexAttribs1svNV");
+      }
       allclear &= funcTest;
       funcTest = ((glVertexAttribs1fvNV = (csGLVERTEXATTRIBS1FVNV) gl->GetProcAddress ("glVertexAttribs1fvNV")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glVertexAttribs1fvNV");
+      }
       allclear &= funcTest;
       funcTest = ((glVertexAttribs1dvNV = (csGLVERTEXATTRIBS1DVNV) gl->GetProcAddress ("glVertexAttribs1dvNV")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glVertexAttribs1dvNV");
+      }
       allclear &= funcTest;
       funcTest = ((glVertexAttribs2svNV = (csGLVERTEXATTRIBS2SVNV) gl->GetProcAddress ("glVertexAttribs2svNV")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glVertexAttribs2svNV");
+      }
       allclear &= funcTest;
       funcTest = ((glVertexAttribs2fvNV = (csGLVERTEXATTRIBS2FVNV) gl->GetProcAddress ("glVertexAttribs2fvNV")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glVertexAttribs2fvNV");
+      }
       allclear &= funcTest;
       funcTest = ((glVertexAttribs2dvNV = (csGLVERTEXATTRIBS2DVNV) gl->GetProcAddress ("glVertexAttribs2dvNV")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glVertexAttribs2dvNV");
+      }
       allclear &= funcTest;
       funcTest = ((glVertexAttribs3svNV = (csGLVERTEXATTRIBS3SVNV) gl->GetProcAddress ("glVertexAttribs3svNV")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glVertexAttribs3svNV");
+      }
       allclear &= funcTest;
       funcTest = ((glVertexAttribs3fvNV = (csGLVERTEXATTRIBS3FVNV) gl->GetProcAddress ("glVertexAttribs3fvNV")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glVertexAttribs3fvNV");
+      }
       allclear &= funcTest;
       funcTest = ((glVertexAttribs3dvNV = (csGLVERTEXATTRIBS3DVNV) gl->GetProcAddress ("glVertexAttribs3dvNV")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glVertexAttribs3dvNV");
+      }
       allclear &= funcTest;
       funcTest = ((glVertexAttribs4svNV = (csGLVERTEXATTRIBS4SVNV) gl->GetProcAddress ("glVertexAttribs4svNV")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glVertexAttribs4svNV");
+      }
       allclear &= funcTest;
       funcTest = ((glVertexAttribs4fvNV = (csGLVERTEXATTRIBS4FVNV) gl->GetProcAddress ("glVertexAttribs4fvNV")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glVertexAttribs4fvNV");
+      }
       allclear &= funcTest;
       funcTest = ((glVertexAttribs4dvNV = (csGLVERTEXATTRIBS4DVNV) gl->GetProcAddress ("glVertexAttribs4dvNV")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glVertexAttribs4dvNV");
+      }
       allclear &= funcTest;
       funcTest = ((glVertexAttribs4ubvNV = (csGLVERTEXATTRIBS4UBVNV) gl->GetProcAddress ("glVertexAttribs4ubvNV")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glVertexAttribs4ubvNV");
+      }
       allclear &= funcTest;
+
       if (CS_GL_NV_vertex_program = allclear)
       {
         CS_GL_NV_vertex_program &= config->GetBool (cfgkey, true);
@@ -15565,22 +18963,25 @@ public:
       Report ("GL Extension '%s' not found.", ext);
     }
   }
-
+  
   void InitGL_NV_vertex_program1_1 ()
   {
     if (tested_CS_GL_NV_vertex_program1_1) return;
     tested_CS_GL_NV_vertex_program1_1 = true;
     const char* ext = "GL_NV_vertex_program1_1";
-    char cfgkey[50];
+    char cfgkey[26 + 23 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
-
-    const char* extensions = (const char*)glGetString (GL_EXTENSIONS);
+    
+    const char* extensions;
+    extensions = (const char*)glGetString (GL_EXTENSIONS);
     CS_GL_NV_vertex_program1_1 = (strstr (extensions, ext) != NULL);
 
     bool allclear, funcTest;
-    if (gl && CS_GL_NV_vertex_program1_1)
+    (void)funcTest; // shut up "variable unused" warnings
+    if (CS_GL_NV_vertex_program1_1)
     {
       allclear = true;
+
       if (CS_GL_NV_vertex_program1_1 = allclear)
       {
         CS_GL_NV_vertex_program1_1 &= config->GetBool (cfgkey, true);
@@ -15603,34 +19004,46 @@ public:
       Report ("GL Extension '%s' not found.", ext);
     }
   }
-
+  
   void InitGL_ATI_element_array ()
   {
     if (tested_CS_GL_ATI_element_array) return;
     tested_CS_GL_ATI_element_array = true;
     const char* ext = "GL_ATI_element_array";
-    char cfgkey[47];
+    char cfgkey[26 + 20 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
-
-    const char* extensions = (const char*)glGetString (GL_EXTENSIONS);
+    
+    const char* extensions;
+    extensions = (const char*)glGetString (GL_EXTENSIONS);
     CS_GL_ATI_element_array = (strstr (extensions, ext) != NULL);
 
     bool allclear, funcTest;
-    if (gl && CS_GL_ATI_element_array)
+    (void)funcTest; // shut up "variable unused" warnings
+    if (CS_GL_ATI_element_array)
     {
       allclear = true;
       funcTest = ((glElementPointerATI = (csGLELEMENTPOINTERATI) gl->GetProcAddress ("glElementPointerATI")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glElementPointerATI");
+      }
       allclear &= funcTest;
       funcTest = ((glDrawElementArrayATI = (csGLDRAWELEMENTARRAYATI) gl->GetProcAddress ("glDrawElementArrayATI")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glDrawElementArrayATI");
+      }
       allclear &= funcTest;
       funcTest = ((glDrawRangeElementArrayATI = (csGLDRAWRANGEELEMENTARRAYATI) gl->GetProcAddress ("glDrawRangeElementArrayATI")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glDrawRangeElementArrayATI");
+      }
       allclear &= funcTest;
+
       if (CS_GL_ATI_element_array = allclear)
       {
         CS_GL_ATI_element_array &= config->GetBool (cfgkey, true);
@@ -15653,38 +19066,53 @@ public:
       Report ("GL Extension '%s' not found.", ext);
     }
   }
-
+  
   void InitGL_ATI_envmap_bumpmap ()
   {
     if (tested_CS_GL_ATI_envmap_bumpmap) return;
     tested_CS_GL_ATI_envmap_bumpmap = true;
     const char* ext = "GL_ATI_envmap_bumpmap";
-    char cfgkey[48];
+    char cfgkey[26 + 21 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
-
-    const char* extensions = (const char*)glGetString (GL_EXTENSIONS);
+    
+    const char* extensions;
+    extensions = (const char*)glGetString (GL_EXTENSIONS);
     CS_GL_ATI_envmap_bumpmap = (strstr (extensions, ext) != NULL);
 
     bool allclear, funcTest;
-    if (gl && CS_GL_ATI_envmap_bumpmap)
+    (void)funcTest; // shut up "variable unused" warnings
+    if (CS_GL_ATI_envmap_bumpmap)
     {
       allclear = true;
       funcTest = ((glTexBumpParameterivATI = (csGLTEXBUMPPARAMETERIVATI) gl->GetProcAddress ("glTexBumpParameterivATI")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glTexBumpParameterivATI");
+      }
       allclear &= funcTest;
       funcTest = ((glTexBumpParameterfvATI = (csGLTEXBUMPPARAMETERFVATI) gl->GetProcAddress ("glTexBumpParameterfvATI")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glTexBumpParameterfvATI");
+      }
       allclear &= funcTest;
       funcTest = ((glGetTexBumpParameterivATI = (csGLGETTEXBUMPPARAMETERIVATI) gl->GetProcAddress ("glGetTexBumpParameterivATI")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glGetTexBumpParameterivATI");
+      }
       allclear &= funcTest;
       funcTest = ((glGetTexBumpParameterfvATI = (csGLGETTEXBUMPPARAMETERFVATI) gl->GetProcAddress ("glGetTexBumpParameterfvATI")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glGetTexBumpParameterfvATI");
+      }
       allclear &= funcTest;
+
       if (CS_GL_ATI_envmap_bumpmap = allclear)
       {
         CS_GL_ATI_envmap_bumpmap &= config->GetBool (cfgkey, true);
@@ -15707,78 +19135,123 @@ public:
       Report ("GL Extension '%s' not found.", ext);
     }
   }
-
+  
   void InitGL_ATI_fragment_shader ()
   {
     if (tested_CS_GL_ATI_fragment_shader) return;
     tested_CS_GL_ATI_fragment_shader = true;
     const char* ext = "GL_ATI_fragment_shader";
-    char cfgkey[49];
+    char cfgkey[26 + 22 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
-
-    const char* extensions = (const char*)glGetString (GL_EXTENSIONS);
+    
+    const char* extensions;
+    extensions = (const char*)glGetString (GL_EXTENSIONS);
     CS_GL_ATI_fragment_shader = (strstr (extensions, ext) != NULL);
 
     bool allclear, funcTest;
-    if (gl && CS_GL_ATI_fragment_shader)
+    (void)funcTest; // shut up "variable unused" warnings
+    if (CS_GL_ATI_fragment_shader)
     {
       allclear = true;
       funcTest = ((glGenFragmentShadersATI = (csGLGENFRAGMENTSHADERSATI) gl->GetProcAddress ("glGenFragmentShadersATI")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glGenFragmentShadersATI");
+      }
       allclear &= funcTest;
       funcTest = ((glBindFragmentShaderATI = (csGLBINDFRAGMENTSHADERATI) gl->GetProcAddress ("glBindFragmentShaderATI")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glBindFragmentShaderATI");
+      }
       allclear &= funcTest;
       funcTest = ((glDeleteFragmentShaderATI = (csGLDELETEFRAGMENTSHADERATI) gl->GetProcAddress ("glDeleteFragmentShaderATI")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glDeleteFragmentShaderATI");
+      }
       allclear &= funcTest;
       funcTest = ((glBeginFragmentShaderATI = (csGLBEGINFRAGMENTSHADERATI) gl->GetProcAddress ("glBeginFragmentShaderATI")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glBeginFragmentShaderATI");
+      }
       allclear &= funcTest;
       funcTest = ((glEndFragmentShaderATI = (csGLENDFRAGMENTSHADERATI) gl->GetProcAddress ("glEndFragmentShaderATI")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glEndFragmentShaderATI");
+      }
       allclear &= funcTest;
       funcTest = ((glPassTexCoordATI = (csGLPASSTEXCOORDATI) gl->GetProcAddress ("glPassTexCoordATI")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glPassTexCoordATI");
+      }
       allclear &= funcTest;
       funcTest = ((glSampleMapATI = (csGLSAMPLEMAPATI) gl->GetProcAddress ("glSampleMapATI")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glSampleMapATI");
+      }
       allclear &= funcTest;
       funcTest = ((glColorFragmentOp1ATI = (csGLCOLORFRAGMENTOP1ATI) gl->GetProcAddress ("glColorFragmentOp1ATI")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glColorFragmentOp1ATI");
+      }
       allclear &= funcTest;
       funcTest = ((glColorFragmentOp2ATI = (csGLCOLORFRAGMENTOP2ATI) gl->GetProcAddress ("glColorFragmentOp2ATI")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glColorFragmentOp2ATI");
+      }
       allclear &= funcTest;
       funcTest = ((glColorFragmentOp3ATI = (csGLCOLORFRAGMENTOP3ATI) gl->GetProcAddress ("glColorFragmentOp3ATI")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glColorFragmentOp3ATI");
+      }
       allclear &= funcTest;
       funcTest = ((glAlphaFragmentOp1ATI = (csGLALPHAFRAGMENTOP1ATI) gl->GetProcAddress ("glAlphaFragmentOp1ATI")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glAlphaFragmentOp1ATI");
+      }
       allclear &= funcTest;
       funcTest = ((glAlphaFragmentOp2ATI = (csGLALPHAFRAGMENTOP2ATI) gl->GetProcAddress ("glAlphaFragmentOp2ATI")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glAlphaFragmentOp2ATI");
+      }
       allclear &= funcTest;
       funcTest = ((glAlphaFragmentOp3ATI = (csGLALPHAFRAGMENTOP3ATI) gl->GetProcAddress ("glAlphaFragmentOp3ATI")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glAlphaFragmentOp3ATI");
+      }
       allclear &= funcTest;
       funcTest = ((glSetFragmentShaderConstantATI = (csGLSETFRAGMENTSHADERCONSTANTATI) gl->GetProcAddress ("glSetFragmentShaderConstantATI")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glSetFragmentShaderConstantATI");
+      }
       allclear &= funcTest;
+
       if (CS_GL_ATI_fragment_shader = allclear)
       {
         CS_GL_ATI_fragment_shader &= config->GetBool (cfgkey, true);
@@ -15801,30 +19274,39 @@ public:
       Report ("GL Extension '%s' not found.", ext);
     }
   }
-
+  
   void InitGL_ATI_pn_triangles ()
   {
     if (tested_CS_GL_ATI_pn_triangles) return;
     tested_CS_GL_ATI_pn_triangles = true;
     const char* ext = "GL_ATI_pn_triangles";
-    char cfgkey[46];
+    char cfgkey[26 + 19 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
-
-    const char* extensions = (const char*)glGetString (GL_EXTENSIONS);
+    
+    const char* extensions;
+    extensions = (const char*)glGetString (GL_EXTENSIONS);
     CS_GL_ATI_pn_triangles = (strstr (extensions, ext) != NULL);
 
     bool allclear, funcTest;
-    if (gl && CS_GL_ATI_pn_triangles)
+    (void)funcTest; // shut up "variable unused" warnings
+    if (CS_GL_ATI_pn_triangles)
     {
       allclear = true;
       funcTest = ((glPNTrianglesiATI = (csGLPNTRIANGLESIATI) gl->GetProcAddress ("glPNTrianglesiATI")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glPNTrianglesiATI");
+      }
       allclear &= funcTest;
       funcTest = ((glPNTrianglesfATI = (csGLPNTRIANGLESFATI) gl->GetProcAddress ("glPNTrianglesfATI")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glPNTrianglesfATI");
+      }
       allclear &= funcTest;
+
       if (CS_GL_ATI_pn_triangles = allclear)
       {
         CS_GL_ATI_pn_triangles &= config->GetBool (cfgkey, true);
@@ -15847,22 +19329,25 @@ public:
       Report ("GL Extension '%s' not found.", ext);
     }
   }
-
+  
   void InitGL_ATI_texture_mirror_once ()
   {
     if (tested_CS_GL_ATI_texture_mirror_once) return;
     tested_CS_GL_ATI_texture_mirror_once = true;
     const char* ext = "GL_ATI_texture_mirror_once";
-    char cfgkey[53];
+    char cfgkey[26 + 26 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
-
-    const char* extensions = (const char*)glGetString (GL_EXTENSIONS);
+    
+    const char* extensions;
+    extensions = (const char*)glGetString (GL_EXTENSIONS);
     CS_GL_ATI_texture_mirror_once = (strstr (extensions, ext) != NULL);
 
     bool allclear, funcTest;
-    if (gl && CS_GL_ATI_texture_mirror_once)
+    (void)funcTest; // shut up "variable unused" warnings
+    if (CS_GL_ATI_texture_mirror_once)
     {
       allclear = true;
+
       if (CS_GL_ATI_texture_mirror_once = allclear)
       {
         CS_GL_ATI_texture_mirror_once &= config->GetBool (cfgkey, true);
@@ -15885,70 +19370,109 @@ public:
       Report ("GL Extension '%s' not found.", ext);
     }
   }
-
+  
   void InitGL_ATI_vertex_array_object ()
   {
     if (tested_CS_GL_ATI_vertex_array_object) return;
     tested_CS_GL_ATI_vertex_array_object = true;
     const char* ext = "GL_ATI_vertex_array_object";
-    char cfgkey[53];
+    char cfgkey[26 + 26 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
-
-    const char* extensions = (const char*)glGetString (GL_EXTENSIONS);
+    
+    const char* extensions;
+    extensions = (const char*)glGetString (GL_EXTENSIONS);
     CS_GL_ATI_vertex_array_object = (strstr (extensions, ext) != NULL);
 
     bool allclear, funcTest;
-    if (gl && CS_GL_ATI_vertex_array_object)
+    (void)funcTest; // shut up "variable unused" warnings
+    if (CS_GL_ATI_vertex_array_object)
     {
       allclear = true;
       funcTest = ((glNewObjectBufferATI = (csGLNEWOBJECTBUFFERATI) gl->GetProcAddress ("glNewObjectBufferATI")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glNewObjectBufferATI");
+      }
       allclear &= funcTest;
       funcTest = ((glIsObjectBufferATI = (csGLISOBJECTBUFFERATI) gl->GetProcAddress ("glIsObjectBufferATI")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glIsObjectBufferATI");
+      }
       allclear &= funcTest;
       funcTest = ((glUpdateObjectBufferATI = (csGLUPDATEOBJECTBUFFERATI) gl->GetProcAddress ("glUpdateObjectBufferATI")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glUpdateObjectBufferATI");
+      }
       allclear &= funcTest;
       funcTest = ((glGetObjectBufferfvATI = (csGLGETOBJECTBUFFERFVATI) gl->GetProcAddress ("glGetObjectBufferfvATI")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glGetObjectBufferfvATI");
+      }
       allclear &= funcTest;
       funcTest = ((glGetObjectBufferivATI = (csGLGETOBJECTBUFFERIVATI) gl->GetProcAddress ("glGetObjectBufferivATI")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glGetObjectBufferivATI");
+      }
       allclear &= funcTest;
       funcTest = ((glFreeObjectBufferATI = (csGLFREEOBJECTBUFFERATI) gl->GetProcAddress ("glFreeObjectBufferATI")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glFreeObjectBufferATI");
+      }
       allclear &= funcTest;
       funcTest = ((glArrayObjectATI = (csGLARRAYOBJECTATI) gl->GetProcAddress ("glArrayObjectATI")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glArrayObjectATI");
+      }
       allclear &= funcTest;
       funcTest = ((glGetArrayObjectfvATI = (csGLGETARRAYOBJECTFVATI) gl->GetProcAddress ("glGetArrayObjectfvATI")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glGetArrayObjectfvATI");
+      }
       allclear &= funcTest;
       funcTest = ((glGetArrayObjectivATI = (csGLGETARRAYOBJECTIVATI) gl->GetProcAddress ("glGetArrayObjectivATI")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glGetArrayObjectivATI");
+      }
       allclear &= funcTest;
       funcTest = ((glVariantArrayObjectATI = (csGLVARIANTARRAYOBJECTATI) gl->GetProcAddress ("glVariantArrayObjectATI")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glVariantArrayObjectATI");
+      }
       allclear &= funcTest;
       funcTest = ((glGetVariantArrayObjectfvATI = (csGLGETVARIANTARRAYOBJECTFVATI) gl->GetProcAddress ("glGetVariantArrayObjectfvATI")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glGetVariantArrayObjectfvATI");
+      }
       allclear &= funcTest;
       funcTest = ((glGetVariantArrayObjectivATI = (csGLGETVARIANTARRAYOBJECTIVATI) gl->GetProcAddress ("glGetVariantArrayObjectivATI")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glGetVariantArrayObjectivATI");
+      }
       allclear &= funcTest;
+
       if (CS_GL_ATI_vertex_array_object = allclear)
       {
         CS_GL_ATI_vertex_array_object &= config->GetBool (cfgkey, true);
@@ -15971,34 +19495,46 @@ public:
       Report ("GL Extension '%s' not found.", ext);
     }
   }
-
+  
   void InitGL_ATI_vertex_attrib_array_object ()
   {
     if (tested_CS_GL_ATI_vertex_attrib_array_object) return;
     tested_CS_GL_ATI_vertex_attrib_array_object = true;
     const char* ext = "GL_ATI_vertex_attrib_array_object";
-    char cfgkey[60];
+    char cfgkey[26 + 33 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
-
-    const char* extensions = (const char*)glGetString (GL_EXTENSIONS);
+    
+    const char* extensions;
+    extensions = (const char*)glGetString (GL_EXTENSIONS);
     CS_GL_ATI_vertex_attrib_array_object = (strstr (extensions, ext) != NULL);
 
     bool allclear, funcTest;
-    if (gl && CS_GL_ATI_vertex_attrib_array_object)
+    (void)funcTest; // shut up "variable unused" warnings
+    if (CS_GL_ATI_vertex_attrib_array_object)
     {
       allclear = true;
       funcTest = ((glVertexAttribArrayObjectATI = (csGLVERTEXATTRIBARRAYOBJECTATI) gl->GetProcAddress ("glVertexAttribArrayObjectATI")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glVertexAttribArrayObjectATI");
+      }
       allclear &= funcTest;
       funcTest = ((glGetVertexAttribArrayObjectfvATI = (csGLGETVERTEXATTRIBARRAYOBJECTFVATI) gl->GetProcAddress ("glGetVertexAttribArrayObjectfvATI")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glGetVertexAttribArrayObjectfvATI");
+      }
       allclear &= funcTest;
       funcTest = ((glGetVertexAttribArrayObjectivATI = (csGLGETVERTEXATTRIBARRAYOBJECTIVATI) gl->GetProcAddress ("glGetVertexAttribArrayObjectivATI")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glGetVertexAttribArrayObjectivATI");
+      }
       allclear &= funcTest;
+
       if (CS_GL_ATI_vertex_attrib_array_object = allclear)
       {
         CS_GL_ATI_vertex_attrib_array_object &= config->GetBool (cfgkey, true);
@@ -16021,202 +19557,340 @@ public:
       Report ("GL Extension '%s' not found.", ext);
     }
   }
-
+  
   void InitGL_ATI_vertex_streams ()
   {
     if (tested_CS_GL_ATI_vertex_streams) return;
     tested_CS_GL_ATI_vertex_streams = true;
     const char* ext = "GL_ATI_vertex_streams";
-    char cfgkey[48];
+    char cfgkey[26 + 21 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
-
-    const char* extensions = (const char*)glGetString (GL_EXTENSIONS);
+    
+    const char* extensions;
+    extensions = (const char*)glGetString (GL_EXTENSIONS);
     CS_GL_ATI_vertex_streams = (strstr (extensions, ext) != NULL);
 
     bool allclear, funcTest;
-    if (gl && CS_GL_ATI_vertex_streams)
+    (void)funcTest; // shut up "variable unused" warnings
+    if (CS_GL_ATI_vertex_streams)
     {
       allclear = true;
       funcTest = ((glVertexStream1s = (csGLVERTEXSTREAM1S) gl->GetProcAddress ("glVertexStream1s")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glVertexStream1s");
+      }
       allclear &= funcTest;
       funcTest = ((glVertexStream1i = (csGLVERTEXSTREAM1I) gl->GetProcAddress ("glVertexStream1i")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glVertexStream1i");
+      }
       allclear &= funcTest;
       funcTest = ((glVertexStream1f = (csGLVERTEXSTREAM1F) gl->GetProcAddress ("glVertexStream1f")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glVertexStream1f");
+      }
       allclear &= funcTest;
       funcTest = ((glVertexStream1d = (csGLVERTEXSTREAM1D) gl->GetProcAddress ("glVertexStream1d")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glVertexStream1d");
+      }
       allclear &= funcTest;
       funcTest = ((glVertexStream1sv = (csGLVERTEXSTREAM1SV) gl->GetProcAddress ("glVertexStream1sv")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glVertexStream1sv");
+      }
       allclear &= funcTest;
       funcTest = ((glVertexStream1iv = (csGLVERTEXSTREAM1IV) gl->GetProcAddress ("glVertexStream1iv")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glVertexStream1iv");
+      }
       allclear &= funcTest;
       funcTest = ((glVertexStream1fv = (csGLVERTEXSTREAM1FV) gl->GetProcAddress ("glVertexStream1fv")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glVertexStream1fv");
+      }
       allclear &= funcTest;
       funcTest = ((glVertexStream1dv = (csGLVERTEXSTREAM1DV) gl->GetProcAddress ("glVertexStream1dv")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glVertexStream1dv");
+      }
       allclear &= funcTest;
       funcTest = ((glVertexStream2s = (csGLVERTEXSTREAM2S) gl->GetProcAddress ("glVertexStream2s")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glVertexStream2s");
+      }
       allclear &= funcTest;
       funcTest = ((glVertexStream2i = (csGLVERTEXSTREAM2I) gl->GetProcAddress ("glVertexStream2i")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glVertexStream2i");
+      }
       allclear &= funcTest;
       funcTest = ((glVertexStream2f = (csGLVERTEXSTREAM2F) gl->GetProcAddress ("glVertexStream2f")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glVertexStream2f");
+      }
       allclear &= funcTest;
       funcTest = ((glVertexStream2d = (csGLVERTEXSTREAM2D) gl->GetProcAddress ("glVertexStream2d")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glVertexStream2d");
+      }
       allclear &= funcTest;
       funcTest = ((glVertexStream2sv = (csGLVERTEXSTREAM2SV) gl->GetProcAddress ("glVertexStream2sv")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glVertexStream2sv");
+      }
       allclear &= funcTest;
       funcTest = ((glVertexStream2iv = (csGLVERTEXSTREAM2IV) gl->GetProcAddress ("glVertexStream2iv")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glVertexStream2iv");
+      }
       allclear &= funcTest;
       funcTest = ((glVertexStream2fv = (csGLVERTEXSTREAM2FV) gl->GetProcAddress ("glVertexStream2fv")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glVertexStream2fv");
+      }
       allclear &= funcTest;
       funcTest = ((glVertexStream2dv = (csGLVERTEXSTREAM2DV) gl->GetProcAddress ("glVertexStream2dv")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glVertexStream2dv");
+      }
       allclear &= funcTest;
       funcTest = ((glVertexStream3s = (csGLVERTEXSTREAM3S) gl->GetProcAddress ("glVertexStream3s")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glVertexStream3s");
+      }
       allclear &= funcTest;
       funcTest = ((glVertexStream3i = (csGLVERTEXSTREAM3I) gl->GetProcAddress ("glVertexStream3i")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glVertexStream3i");
+      }
       allclear &= funcTest;
       funcTest = ((glVertexStream3f = (csGLVERTEXSTREAM3F) gl->GetProcAddress ("glVertexStream3f")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glVertexStream3f");
+      }
       allclear &= funcTest;
       funcTest = ((glVertexStream3d = (csGLVERTEXSTREAM3D) gl->GetProcAddress ("glVertexStream3d")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glVertexStream3d");
+      }
       allclear &= funcTest;
       funcTest = ((glVertexStream3sv = (csGLVERTEXSTREAM3SV) gl->GetProcAddress ("glVertexStream3sv")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glVertexStream3sv");
+      }
       allclear &= funcTest;
       funcTest = ((glVertexStream3iv = (csGLVERTEXSTREAM3IV) gl->GetProcAddress ("glVertexStream3iv")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glVertexStream3iv");
+      }
       allclear &= funcTest;
       funcTest = ((glVertexStream3fv = (csGLVERTEXSTREAM3FV) gl->GetProcAddress ("glVertexStream3fv")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glVertexStream3fv");
+      }
       allclear &= funcTest;
       funcTest = ((glVertexStream3dv = (csGLVERTEXSTREAM3DV) gl->GetProcAddress ("glVertexStream3dv")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glVertexStream3dv");
+      }
       allclear &= funcTest;
       funcTest = ((glVertexStream4s = (csGLVERTEXSTREAM4S) gl->GetProcAddress ("glVertexStream4s")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glVertexStream4s");
+      }
       allclear &= funcTest;
       funcTest = ((glVertexStream4i = (csGLVERTEXSTREAM4I) gl->GetProcAddress ("glVertexStream4i")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glVertexStream4i");
+      }
       allclear &= funcTest;
       funcTest = ((glVertexStream4f = (csGLVERTEXSTREAM4F) gl->GetProcAddress ("glVertexStream4f")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glVertexStream4f");
+      }
       allclear &= funcTest;
       funcTest = ((glVertexStream4d = (csGLVERTEXSTREAM4D) gl->GetProcAddress ("glVertexStream4d")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glVertexStream4d");
+      }
       allclear &= funcTest;
       funcTest = ((glVertexStream4sv = (csGLVERTEXSTREAM4SV) gl->GetProcAddress ("glVertexStream4sv")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glVertexStream4sv");
+      }
       allclear &= funcTest;
       funcTest = ((glVertexStream4iv = (csGLVERTEXSTREAM4IV) gl->GetProcAddress ("glVertexStream4iv")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glVertexStream4iv");
+      }
       allclear &= funcTest;
       funcTest = ((glVertexStream4fv = (csGLVERTEXSTREAM4FV) gl->GetProcAddress ("glVertexStream4fv")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glVertexStream4fv");
+      }
       allclear &= funcTest;
       funcTest = ((glVertexStream4dv = (csGLVERTEXSTREAM4DV) gl->GetProcAddress ("glVertexStream4dv")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glVertexStream4dv");
+      }
       allclear &= funcTest;
       funcTest = ((glNormalStream3b = (csGLNORMALSTREAM3B) gl->GetProcAddress ("glNormalStream3b")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glNormalStream3b");
+      }
       allclear &= funcTest;
       funcTest = ((glNormalStream3s = (csGLNORMALSTREAM3S) gl->GetProcAddress ("glNormalStream3s")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glNormalStream3s");
+      }
       allclear &= funcTest;
       funcTest = ((glNormalStream3i = (csGLNORMALSTREAM3I) gl->GetProcAddress ("glNormalStream3i")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glNormalStream3i");
+      }
       allclear &= funcTest;
       funcTest = ((glNormalStream3f = (csGLNORMALSTREAM3F) gl->GetProcAddress ("glNormalStream3f")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glNormalStream3f");
+      }
       allclear &= funcTest;
       funcTest = ((glNormalStream3d = (csGLNORMALSTREAM3D) gl->GetProcAddress ("glNormalStream3d")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glNormalStream3d");
+      }
       allclear &= funcTest;
       funcTest = ((glNormalStream3bv = (csGLNORMALSTREAM3BV) gl->GetProcAddress ("glNormalStream3bv")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glNormalStream3bv");
+      }
       allclear &= funcTest;
       funcTest = ((glNormalStream3sv = (csGLNORMALSTREAM3SV) gl->GetProcAddress ("glNormalStream3sv")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glNormalStream3sv");
+      }
       allclear &= funcTest;
       funcTest = ((glNormalStream3iv = (csGLNORMALSTREAM3IV) gl->GetProcAddress ("glNormalStream3iv")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glNormalStream3iv");
+      }
       allclear &= funcTest;
       funcTest = ((glNormalStream3fv = (csGLNORMALSTREAM3FV) gl->GetProcAddress ("glNormalStream3fv")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glNormalStream3fv");
+      }
       allclear &= funcTest;
       funcTest = ((glNormalStream3dv = (csGLNORMALSTREAM3DV) gl->GetProcAddress ("glNormalStream3dv")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glNormalStream3dv");
+      }
       allclear &= funcTest;
       funcTest = ((glClientActiveVertexStream = (csGLCLIENTACTIVEVERTEXSTREAM) gl->GetProcAddress ("glClientActiveVertexStream")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glClientActiveVertexStream");
+      }
       allclear &= funcTest;
       funcTest = ((glVertexBlendEnvi = (csGLVERTEXBLENDENVI) gl->GetProcAddress ("glVertexBlendEnvi")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glVertexBlendEnvi");
+      }
       allclear &= funcTest;
       funcTest = ((glVertexBlendEnvf = (csGLVERTEXBLENDENVF) gl->GetProcAddress ("glVertexBlendEnvf")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glVertexBlendEnvf");
+      }
       allclear &= funcTest;
+
       if (CS_GL_ATI_vertex_streams = allclear)
       {
         CS_GL_ATI_vertex_streams &= config->GetBool (cfgkey, true);
@@ -16239,16 +19913,16 @@ public:
       Report ("GL Extension '%s' not found.", ext);
     }
   }
-
+  
 #ifdef _WIN32
   void InitWGL_I3D_image_buffer (HDC hDC)
   {
     if (tested_CS_WGL_I3D_image_buffer) return;
     tested_CS_WGL_I3D_image_buffer = true;
     const char* ext = "WGL_I3D_image_buffer";
-    char cfgkey[47];
+    char cfgkey[26 + 20 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
-
+    
     if (!tested_CS_WGL_ARB_extensions_string) InitWGL_ARB_extensions_string (hDC);
     const char* extensions;
     if (CS_WGL_ARB_extensions_string)
@@ -16257,30 +19931,44 @@ public:
     }
     else
     {
-      extensions =  (const char*)glGetString (GL_EXTENSIONS);
+      extensions = (const char*)glGetString (GL_EXTENSIONS);
     }
     CS_WGL_I3D_image_buffer = (strstr (extensions, ext) != NULL);
 
     bool allclear, funcTest;
+    (void)funcTest; // shut up "variable unused" warnings
     if (CS_WGL_I3D_image_buffer)
     {
       allclear = true;
       funcTest = ((wglCreateImageBufferI3D = (csWGLCREATEIMAGEBUFFERI3D) gl->GetProcAddress ("wglCreateImageBufferI3D")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "wglCreateImageBufferI3D");
+      }
       allclear &= funcTest;
       funcTest = ((wglDestroyImageBufferI3D = (csWGLDESTROYIMAGEBUFFERI3D) gl->GetProcAddress ("wglDestroyImageBufferI3D")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "wglDestroyImageBufferI3D");
+      }
       allclear &= funcTest;
       funcTest = ((wglAssociateImageBufferEventsI3D = (csWGLASSOCIATEIMAGEBUFFEREVENTSI3D) gl->GetProcAddress ("wglAssociateImageBufferEventsI3D")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "wglAssociateImageBufferEventsI3D");
+      }
       allclear &= funcTest;
       funcTest = ((wglReleaseImageBufferEventsI3D = (csWGLRELEASEIMAGEBUFFEREVENTSI3D) gl->GetProcAddress ("wglReleaseImageBufferEventsI3D")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "wglReleaseImageBufferEventsI3D");
+      }
       allclear &= funcTest;
+
       if (CS_WGL_I3D_image_buffer = allclear)
       {
         CS_WGL_I3D_image_buffer &= config->GetBool (cfgkey, true);
@@ -16303,17 +19991,17 @@ public:
       Report ("GL Extension '%s' not found.", ext);
     }
   }
-
 #endif
+
 #ifdef _WIN32
   void InitWGL_I3D_swap_frame_lock (HDC hDC)
   {
     if (tested_CS_WGL_I3D_swap_frame_lock) return;
     tested_CS_WGL_I3D_swap_frame_lock = true;
     const char* ext = "WGL_I3D_swap_frame_lock";
-    char cfgkey[50];
+    char cfgkey[26 + 23 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
-
+    
     if (!tested_CS_WGL_ARB_extensions_string) InitWGL_ARB_extensions_string (hDC);
     const char* extensions;
     if (CS_WGL_ARB_extensions_string)
@@ -16322,30 +20010,44 @@ public:
     }
     else
     {
-      extensions =  (const char*)glGetString (GL_EXTENSIONS);
+      extensions = (const char*)glGetString (GL_EXTENSIONS);
     }
     CS_WGL_I3D_swap_frame_lock = (strstr (extensions, ext) != NULL);
 
     bool allclear, funcTest;
+    (void)funcTest; // shut up "variable unused" warnings
     if (CS_WGL_I3D_swap_frame_lock)
     {
       allclear = true;
       funcTest = ((wglEnableFrameLockI3D = (csWGLENABLEFRAMELOCKI3D) gl->GetProcAddress ("wglEnableFrameLockI3D")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "wglEnableFrameLockI3D");
+      }
       allclear &= funcTest;
       funcTest = ((wglDisableFrameLockI3D = (csWGLDISABLEFRAMELOCKI3D) gl->GetProcAddress ("wglDisableFrameLockI3D")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "wglDisableFrameLockI3D");
+      }
       allclear &= funcTest;
       funcTest = ((wglIsEnabledFrameLockI3D = (csWGLISENABLEDFRAMELOCKI3D) gl->GetProcAddress ("wglIsEnabledFrameLockI3D")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "wglIsEnabledFrameLockI3D");
+      }
       allclear &= funcTest;
       funcTest = ((wglQueryFrameLockMasterI3D = (csWGLQUERYFRAMELOCKMASTERI3D) gl->GetProcAddress ("wglQueryFrameLockMasterI3D")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "wglQueryFrameLockMasterI3D");
+      }
       allclear &= funcTest;
+
       if (CS_WGL_I3D_swap_frame_lock = allclear)
       {
         CS_WGL_I3D_swap_frame_lock &= config->GetBool (cfgkey, true);
@@ -16368,17 +20070,17 @@ public:
       Report ("GL Extension '%s' not found.", ext);
     }
   }
-
 #endif
+
 #ifdef _WIN32
   void InitWGL_I3D_swap_frame_usage (HDC hDC)
   {
     if (tested_CS_WGL_I3D_swap_frame_usage) return;
     tested_CS_WGL_I3D_swap_frame_usage = true;
     const char* ext = "WGL_I3D_swap_frame_usage";
-    char cfgkey[51];
+    char cfgkey[26 + 24 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
-
+    
     if (!tested_CS_WGL_ARB_extensions_string) InitWGL_ARB_extensions_string (hDC);
     const char* extensions;
     if (CS_WGL_ARB_extensions_string)
@@ -16387,30 +20089,44 @@ public:
     }
     else
     {
-      extensions =  (const char*)glGetString (GL_EXTENSIONS);
+      extensions = (const char*)glGetString (GL_EXTENSIONS);
     }
     CS_WGL_I3D_swap_frame_usage = (strstr (extensions, ext) != NULL);
 
     bool allclear, funcTest;
+    (void)funcTest; // shut up "variable unused" warnings
     if (CS_WGL_I3D_swap_frame_usage)
     {
       allclear = true;
       funcTest = ((wglGetFrameUsageI3D = (csWGLGETFRAMEUSAGEI3D) gl->GetProcAddress ("wglGetFrameUsageI3D")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "wglGetFrameUsageI3D");
+      }
       allclear &= funcTest;
       funcTest = ((wglBeginFrameTrackingI3D = (csWGLBEGINFRAMETRACKINGI3D) gl->GetProcAddress ("wglBeginFrameTrackingI3D")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "wglBeginFrameTrackingI3D");
+      }
       allclear &= funcTest;
       funcTest = ((wglEndFrameTrackingI3D = (csWGLENDFRAMETRACKINGI3D) gl->GetProcAddress ("wglEndFrameTrackingI3D")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "wglEndFrameTrackingI3D");
+      }
       allclear &= funcTest;
       funcTest = ((wglQueryFrameTrackingI3D = (csWGLQUERYFRAMETRACKINGI3D) gl->GetProcAddress ("wglQueryFrameTrackingI3D")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "wglQueryFrameTrackingI3D");
+      }
       allclear &= funcTest;
+
       if (CS_WGL_I3D_swap_frame_usage = allclear)
       {
         CS_WGL_I3D_swap_frame_usage &= config->GetBool (cfgkey, true);
@@ -16433,23 +20149,26 @@ public:
       Report ("GL Extension '%s' not found.", ext);
     }
   }
-
 #endif
+
   void InitGL_3DFX_texture_compression_FXT1 ()
   {
     if (tested_CS_GL_3DFX_texture_compression_FXT1) return;
     tested_CS_GL_3DFX_texture_compression_FXT1 = true;
     const char* ext = "GL_3DFX_texture_compression_FXT1";
-    char cfgkey[59];
+    char cfgkey[26 + 32 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
-
-    const char* extensions = (const char*)glGetString (GL_EXTENSIONS);
+    
+    const char* extensions;
+    extensions = (const char*)glGetString (GL_EXTENSIONS);
     CS_GL_3DFX_texture_compression_FXT1 = (strstr (extensions, ext) != NULL);
 
     bool allclear, funcTest;
-    if (gl && CS_GL_3DFX_texture_compression_FXT1)
+    (void)funcTest; // shut up "variable unused" warnings
+    if (CS_GL_3DFX_texture_compression_FXT1)
     {
       allclear = true;
+
       if (CS_GL_3DFX_texture_compression_FXT1 = allclear)
       {
         CS_GL_3DFX_texture_compression_FXT1 &= config->GetBool (cfgkey, true);
@@ -16472,22 +20191,25 @@ public:
       Report ("GL Extension '%s' not found.", ext);
     }
   }
-
+  
   void InitGL_IBM_cull_vertex ()
   {
     if (tested_CS_GL_IBM_cull_vertex) return;
     tested_CS_GL_IBM_cull_vertex = true;
     const char* ext = "GL_IBM_cull_vertex";
-    char cfgkey[45];
+    char cfgkey[26 + 18 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
-
-    const char* extensions = (const char*)glGetString (GL_EXTENSIONS);
+    
+    const char* extensions;
+    extensions = (const char*)glGetString (GL_EXTENSIONS);
     CS_GL_IBM_cull_vertex = (strstr (extensions, ext) != NULL);
 
     bool allclear, funcTest;
-    if (gl && CS_GL_IBM_cull_vertex)
+    (void)funcTest; // shut up "variable unused" warnings
+    if (CS_GL_IBM_cull_vertex)
     {
       allclear = true;
+
       if (CS_GL_IBM_cull_vertex = allclear)
       {
         CS_GL_IBM_cull_vertex &= config->GetBool (cfgkey, true);
@@ -16510,30 +20232,39 @@ public:
       Report ("GL Extension '%s' not found.", ext);
     }
   }
-
+  
   void InitGL_IBM_multimode_draw_arrays ()
   {
     if (tested_CS_GL_IBM_multimode_draw_arrays) return;
     tested_CS_GL_IBM_multimode_draw_arrays = true;
     const char* ext = "GL_IBM_multimode_draw_arrays";
-    char cfgkey[55];
+    char cfgkey[26 + 28 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
-
-    const char* extensions = (const char*)glGetString (GL_EXTENSIONS);
+    
+    const char* extensions;
+    extensions = (const char*)glGetString (GL_EXTENSIONS);
     CS_GL_IBM_multimode_draw_arrays = (strstr (extensions, ext) != NULL);
 
     bool allclear, funcTest;
-    if (gl && CS_GL_IBM_multimode_draw_arrays)
+    (void)funcTest; // shut up "variable unused" warnings
+    if (CS_GL_IBM_multimode_draw_arrays)
     {
       allclear = true;
       funcTest = ((glMultiModeDrawArraysIBM = (csGLMULTIMODEDRAWARRAYSIBM) gl->GetProcAddress ("glMultiModeDrawArraysIBM")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glMultiModeDrawArraysIBM");
+      }
       allclear &= funcTest;
       funcTest = ((glMultiModeDrawElementsIBM = (csGLMULTIMODEDRAWELEMENTSIBM) gl->GetProcAddress ("glMultiModeDrawElementsIBM")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glMultiModeDrawElementsIBM");
+      }
       allclear &= funcTest;
+
       if (CS_GL_IBM_multimode_draw_arrays = allclear)
       {
         CS_GL_IBM_multimode_draw_arrays &= config->GetBool (cfgkey, true);
@@ -16556,22 +20287,25 @@ public:
       Report ("GL Extension '%s' not found.", ext);
     }
   }
-
+  
   void InitGL_IBM_raster_pos_clip ()
   {
     if (tested_CS_GL_IBM_raster_pos_clip) return;
     tested_CS_GL_IBM_raster_pos_clip = true;
     const char* ext = "GL_IBM_raster_pos_clip";
-    char cfgkey[49];
+    char cfgkey[26 + 22 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
-
-    const char* extensions = (const char*)glGetString (GL_EXTENSIONS);
+    
+    const char* extensions;
+    extensions = (const char*)glGetString (GL_EXTENSIONS);
     CS_GL_IBM_raster_pos_clip = (strstr (extensions, ext) != NULL);
 
     bool allclear, funcTest;
-    if (gl && CS_GL_IBM_raster_pos_clip)
+    (void)funcTest; // shut up "variable unused" warnings
+    if (CS_GL_IBM_raster_pos_clip)
     {
       allclear = true;
+
       if (CS_GL_IBM_raster_pos_clip = allclear)
       {
         CS_GL_IBM_raster_pos_clip &= config->GetBool (cfgkey, true);
@@ -16594,22 +20328,25 @@ public:
       Report ("GL Extension '%s' not found.", ext);
     }
   }
-
+  
   void InitGL_IBM_texture_mirrored_repeat ()
   {
     if (tested_CS_GL_IBM_texture_mirrored_repeat) return;
     tested_CS_GL_IBM_texture_mirrored_repeat = true;
     const char* ext = "GL_IBM_texture_mirrored_repeat";
-    char cfgkey[57];
+    char cfgkey[26 + 30 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
-
-    const char* extensions = (const char*)glGetString (GL_EXTENSIONS);
+    
+    const char* extensions;
+    extensions = (const char*)glGetString (GL_EXTENSIONS);
     CS_GL_IBM_texture_mirrored_repeat = (strstr (extensions, ext) != NULL);
 
     bool allclear, funcTest;
-    if (gl && CS_GL_IBM_texture_mirrored_repeat)
+    (void)funcTest; // shut up "variable unused" warnings
+    if (CS_GL_IBM_texture_mirrored_repeat)
     {
       allclear = true;
+
       if (CS_GL_IBM_texture_mirrored_repeat = allclear)
       {
         CS_GL_IBM_texture_mirrored_repeat &= config->GetBool (cfgkey, true);
@@ -16632,50 +20369,74 @@ public:
       Report ("GL Extension '%s' not found.", ext);
     }
   }
-
+  
   void InitGL_IBM_vertex_array_lists ()
   {
     if (tested_CS_GL_IBM_vertex_array_lists) return;
     tested_CS_GL_IBM_vertex_array_lists = true;
     const char* ext = "GL_IBM_vertex_array_lists";
-    char cfgkey[52];
+    char cfgkey[26 + 25 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
-
-    const char* extensions = (const char*)glGetString (GL_EXTENSIONS);
+    
+    const char* extensions;
+    extensions = (const char*)glGetString (GL_EXTENSIONS);
     CS_GL_IBM_vertex_array_lists = (strstr (extensions, ext) != NULL);
 
     bool allclear, funcTest;
-    if (gl && CS_GL_IBM_vertex_array_lists)
+    (void)funcTest; // shut up "variable unused" warnings
+    if (CS_GL_IBM_vertex_array_lists)
     {
       allclear = true;
       funcTest = ((glColorPointerListIBM = (csGLCOLORPOINTERLISTIBM) gl->GetProcAddress ("glColorPointerListIBM")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glColorPointerListIBM");
+      }
       allclear &= funcTest;
       funcTest = ((glSecondaryColorPointerListIBM = (csGLSECONDARYCOLORPOINTERLISTIBM) gl->GetProcAddress ("glSecondaryColorPointerListIBM")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glSecondaryColorPointerListIBM");
+      }
       allclear &= funcTest;
       funcTest = ((glEdgeFlagPointerListIBM = (csGLEDGEFLAGPOINTERLISTIBM) gl->GetProcAddress ("glEdgeFlagPointerListIBM")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glEdgeFlagPointerListIBM");
+      }
       allclear &= funcTest;
       funcTest = ((glFogCoordPointerListIBM = (csGLFOGCOORDPOINTERLISTIBM) gl->GetProcAddress ("glFogCoordPointerListIBM")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glFogCoordPointerListIBM");
+      }
       allclear &= funcTest;
       funcTest = ((glNormalPointerListIBM = (csGLNORMALPOINTERLISTIBM) gl->GetProcAddress ("glNormalPointerListIBM")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glNormalPointerListIBM");
+      }
       allclear &= funcTest;
       funcTest = ((glTexCoordPointerListIBM = (csGLTEXCOORDPOINTERLISTIBM) gl->GetProcAddress ("glTexCoordPointerListIBM")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glTexCoordPointerListIBM");
+      }
       allclear &= funcTest;
       funcTest = ((glVertexPointerListIBM = (csGLVERTEXPOINTERLISTIBM) gl->GetProcAddress ("glVertexPointerListIBM")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glVertexPointerListIBM");
+      }
       allclear &= funcTest;
+
       if (CS_GL_IBM_vertex_array_lists = allclear)
       {
         CS_GL_IBM_vertex_array_lists &= config->GetBool (cfgkey, true);
@@ -16698,26 +20459,32 @@ public:
       Report ("GL Extension '%s' not found.", ext);
     }
   }
-
+  
   void InitGL_MESA_resize_buffers ()
   {
     if (tested_CS_GL_MESA_resize_buffers) return;
     tested_CS_GL_MESA_resize_buffers = true;
     const char* ext = "GL_MESA_resize_buffers";
-    char cfgkey[49];
+    char cfgkey[26 + 22 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
-
-    const char* extensions = (const char*)glGetString (GL_EXTENSIONS);
+    
+    const char* extensions;
+    extensions = (const char*)glGetString (GL_EXTENSIONS);
     CS_GL_MESA_resize_buffers = (strstr (extensions, ext) != NULL);
 
     bool allclear, funcTest;
-    if (gl && CS_GL_MESA_resize_buffers)
+    (void)funcTest; // shut up "variable unused" warnings
+    if (CS_GL_MESA_resize_buffers)
     {
       allclear = true;
       funcTest = ((glResizeBuffersMESA = (csGLRESIZEBUFFERSMESA) gl->GetProcAddress ("glResizeBuffersMESA")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glResizeBuffersMESA");
+      }
       allclear &= funcTest;
+
       if (CS_GL_MESA_resize_buffers = allclear)
       {
         CS_GL_MESA_resize_buffers &= config->GetBool (cfgkey, true);
@@ -16740,118 +20507,193 @@ public:
       Report ("GL Extension '%s' not found.", ext);
     }
   }
-
+  
   void InitGL_MESA_window_pos ()
   {
     if (tested_CS_GL_MESA_window_pos) return;
     tested_CS_GL_MESA_window_pos = true;
     const char* ext = "GL_MESA_window_pos";
-    char cfgkey[45];
+    char cfgkey[26 + 18 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
-
-    const char* extensions = (const char*)glGetString (GL_EXTENSIONS);
+    
+    const char* extensions;
+    extensions = (const char*)glGetString (GL_EXTENSIONS);
     CS_GL_MESA_window_pos = (strstr (extensions, ext) != NULL);
 
     bool allclear, funcTest;
-    if (gl && CS_GL_MESA_window_pos)
+    (void)funcTest; // shut up "variable unused" warnings
+    if (CS_GL_MESA_window_pos)
     {
       allclear = true;
       funcTest = ((glWindowPos2dMESA = (csGLWINDOWPOS2DMESA) gl->GetProcAddress ("glWindowPos2dMESA")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glWindowPos2dMESA");
+      }
       allclear &= funcTest;
       funcTest = ((glWindowPos2fMESA = (csGLWINDOWPOS2FMESA) gl->GetProcAddress ("glWindowPos2fMESA")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glWindowPos2fMESA");
+      }
       allclear &= funcTest;
       funcTest = ((glWindowPos2iMESA = (csGLWINDOWPOS2IMESA) gl->GetProcAddress ("glWindowPos2iMESA")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glWindowPos2iMESA");
+      }
       allclear &= funcTest;
       funcTest = ((glWindowPos2sMESA = (csGLWINDOWPOS2SMESA) gl->GetProcAddress ("glWindowPos2sMESA")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glWindowPos2sMESA");
+      }
       allclear &= funcTest;
       funcTest = ((glWindowPos2ivMESA = (csGLWINDOWPOS2IVMESA) gl->GetProcAddress ("glWindowPos2ivMESA")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glWindowPos2ivMESA");
+      }
       allclear &= funcTest;
       funcTest = ((glWindowPos2svMESA = (csGLWINDOWPOS2SVMESA) gl->GetProcAddress ("glWindowPos2svMESA")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glWindowPos2svMESA");
+      }
       allclear &= funcTest;
       funcTest = ((glWindowPos2fvMESA = (csGLWINDOWPOS2FVMESA) gl->GetProcAddress ("glWindowPos2fvMESA")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glWindowPos2fvMESA");
+      }
       allclear &= funcTest;
       funcTest = ((glWindowPos2dvMESA = (csGLWINDOWPOS2DVMESA) gl->GetProcAddress ("glWindowPos2dvMESA")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glWindowPos2dvMESA");
+      }
       allclear &= funcTest;
       funcTest = ((glWindowPos3iMESA = (csGLWINDOWPOS3IMESA) gl->GetProcAddress ("glWindowPos3iMESA")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glWindowPos3iMESA");
+      }
       allclear &= funcTest;
       funcTest = ((glWindowPos3sMESA = (csGLWINDOWPOS3SMESA) gl->GetProcAddress ("glWindowPos3sMESA")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glWindowPos3sMESA");
+      }
       allclear &= funcTest;
       funcTest = ((glWindowPos3fMESA = (csGLWINDOWPOS3FMESA) gl->GetProcAddress ("glWindowPos3fMESA")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glWindowPos3fMESA");
+      }
       allclear &= funcTest;
       funcTest = ((glWindowPos3dMESA = (csGLWINDOWPOS3DMESA) gl->GetProcAddress ("glWindowPos3dMESA")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glWindowPos3dMESA");
+      }
       allclear &= funcTest;
       funcTest = ((glWindowPos3ivMESA = (csGLWINDOWPOS3IVMESA) gl->GetProcAddress ("glWindowPos3ivMESA")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glWindowPos3ivMESA");
+      }
       allclear &= funcTest;
       funcTest = ((glWindowPos3svMESA = (csGLWINDOWPOS3SVMESA) gl->GetProcAddress ("glWindowPos3svMESA")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glWindowPos3svMESA");
+      }
       allclear &= funcTest;
       funcTest = ((glWindowPos3fvMESA = (csGLWINDOWPOS3FVMESA) gl->GetProcAddress ("glWindowPos3fvMESA")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glWindowPos3fvMESA");
+      }
       allclear &= funcTest;
       funcTest = ((glWindowPos3dvMESA = (csGLWINDOWPOS3DVMESA) gl->GetProcAddress ("glWindowPos3dvMESA")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glWindowPos3dvMESA");
+      }
       allclear &= funcTest;
       funcTest = ((glWindowPos4iMESA = (csGLWINDOWPOS4IMESA) gl->GetProcAddress ("glWindowPos4iMESA")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glWindowPos4iMESA");
+      }
       allclear &= funcTest;
       funcTest = ((glWindowPos4sMESA = (csGLWINDOWPOS4SMESA) gl->GetProcAddress ("glWindowPos4sMESA")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glWindowPos4sMESA");
+      }
       allclear &= funcTest;
       funcTest = ((glWindowPos4fMESA = (csGLWINDOWPOS4FMESA) gl->GetProcAddress ("glWindowPos4fMESA")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glWindowPos4fMESA");
+      }
       allclear &= funcTest;
       funcTest = ((glWindowPos4dMESA = (csGLWINDOWPOS4DMESA) gl->GetProcAddress ("glWindowPos4dMESA")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glWindowPos4dMESA");
+      }
       allclear &= funcTest;
       funcTest = ((glWindowPos4ivMESA = (csGLWINDOWPOS4IVMESA) gl->GetProcAddress ("glWindowPos4ivMESA")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glWindowPos4ivMESA");
+      }
       allclear &= funcTest;
       funcTest = ((glWindowPos4svMESA = (csGLWINDOWPOS4SVMESA) gl->GetProcAddress ("glWindowPos4svMESA")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glWindowPos4svMESA");
+      }
       allclear &= funcTest;
       funcTest = ((glWindowPos4fvMESA = (csGLWINDOWPOS4FVMESA) gl->GetProcAddress ("glWindowPos4fvMESA")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glWindowPos4fvMESA");
+      }
       allclear &= funcTest;
       funcTest = ((glWindowPos4dvMESA = (csGLWINDOWPOS4DVMESA) gl->GetProcAddress ("glWindowPos4dvMESA")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glWindowPos4dvMESA");
+      }
       allclear &= funcTest;
+
       if (CS_GL_MESA_window_pos = allclear)
       {
         CS_GL_MESA_window_pos &= config->GetBool (cfgkey, true);
@@ -16874,22 +20716,25 @@ public:
       Report ("GL Extension '%s' not found.", ext);
     }
   }
-
+  
   void InitGL_OML_interlace ()
   {
     if (tested_CS_GL_OML_interlace) return;
     tested_CS_GL_OML_interlace = true;
     const char* ext = "GL_OML_interlace";
-    char cfgkey[43];
+    char cfgkey[26 + 16 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
-
-    const char* extensions = (const char*)glGetString (GL_EXTENSIONS);
+    
+    const char* extensions;
+    extensions = (const char*)glGetString (GL_EXTENSIONS);
     CS_GL_OML_interlace = (strstr (extensions, ext) != NULL);
 
     bool allclear, funcTest;
-    if (gl && CS_GL_OML_interlace)
+    (void)funcTest; // shut up "variable unused" warnings
+    if (CS_GL_OML_interlace)
     {
       allclear = true;
+
       if (CS_GL_OML_interlace = allclear)
       {
         CS_GL_OML_interlace &= config->GetBool (cfgkey, true);
@@ -16912,22 +20757,25 @@ public:
       Report ("GL Extension '%s' not found.", ext);
     }
   }
-
+  
   void InitGL_OML_resample ()
   {
     if (tested_CS_GL_OML_resample) return;
     tested_CS_GL_OML_resample = true;
     const char* ext = "GL_OML_resample";
-    char cfgkey[42];
+    char cfgkey[26 + 15 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
-
-    const char* extensions = (const char*)glGetString (GL_EXTENSIONS);
+    
+    const char* extensions;
+    extensions = (const char*)glGetString (GL_EXTENSIONS);
     CS_GL_OML_resample = (strstr (extensions, ext) != NULL);
 
     bool allclear, funcTest;
-    if (gl && CS_GL_OML_resample)
+    (void)funcTest; // shut up "variable unused" warnings
+    if (CS_GL_OML_resample)
     {
       allclear = true;
+
       if (CS_GL_OML_resample = allclear)
       {
         CS_GL_OML_resample &= config->GetBool (cfgkey, true);
@@ -16950,22 +20798,25 @@ public:
       Report ("GL Extension '%s' not found.", ext);
     }
   }
-
+  
   void InitGL_OML_subsample ()
   {
     if (tested_CS_GL_OML_subsample) return;
     tested_CS_GL_OML_subsample = true;
     const char* ext = "GL_OML_subsample";
-    char cfgkey[43];
+    char cfgkey[26 + 16 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
-
-    const char* extensions = (const char*)glGetString (GL_EXTENSIONS);
+    
+    const char* extensions;
+    extensions = (const char*)glGetString (GL_EXTENSIONS);
     CS_GL_OML_subsample = (strstr (extensions, ext) != NULL);
 
     bool allclear, funcTest;
-    if (gl && CS_GL_OML_subsample)
+    (void)funcTest; // shut up "variable unused" warnings
+    if (CS_GL_OML_subsample)
     {
       allclear = true;
+
       if (CS_GL_OML_subsample = allclear)
       {
         CS_GL_OML_subsample &= config->GetBool (cfgkey, true);
@@ -16988,22 +20839,25 @@ public:
       Report ("GL Extension '%s' not found.", ext);
     }
   }
-
+  
   void InitGL_SGIS_generate_mipmap ()
   {
     if (tested_CS_GL_SGIS_generate_mipmap) return;
     tested_CS_GL_SGIS_generate_mipmap = true;
     const char* ext = "GL_SGIS_generate_mipmap";
-    char cfgkey[50];
+    char cfgkey[26 + 23 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
-
-    const char* extensions = (const char*)glGetString (GL_EXTENSIONS);
+    
+    const char* extensions;
+    extensions = (const char*)glGetString (GL_EXTENSIONS);
     CS_GL_SGIS_generate_mipmap = (strstr (extensions, ext) != NULL);
 
     bool allclear, funcTest;
-    if (gl && CS_GL_SGIS_generate_mipmap)
+    (void)funcTest; // shut up "variable unused" warnings
+    if (CS_GL_SGIS_generate_mipmap)
     {
       allclear = true;
+
       if (CS_GL_SGIS_generate_mipmap = allclear)
       {
         CS_GL_SGIS_generate_mipmap &= config->GetBool (cfgkey, true);
@@ -17026,30 +20880,39 @@ public:
       Report ("GL Extension '%s' not found.", ext);
     }
   }
-
+  
   void InitGL_SGIS_multisample ()
   {
     if (tested_CS_GL_SGIS_multisample) return;
     tested_CS_GL_SGIS_multisample = true;
     const char* ext = "GL_SGIS_multisample";
-    char cfgkey[46];
+    char cfgkey[26 + 19 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
-
-    const char* extensions = (const char*)glGetString (GL_EXTENSIONS);
+    
+    const char* extensions;
+    extensions = (const char*)glGetString (GL_EXTENSIONS);
     CS_GL_SGIS_multisample = (strstr (extensions, ext) != NULL);
 
     bool allclear, funcTest;
-    if (gl && CS_GL_SGIS_multisample)
+    (void)funcTest; // shut up "variable unused" warnings
+    if (CS_GL_SGIS_multisample)
     {
       allclear = true;
       funcTest = ((glSampleMaskSGIS = (csGLSAMPLEMASKSGIS) gl->GetProcAddress ("glSampleMaskSGIS")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glSampleMaskSGIS");
+      }
       allclear &= funcTest;
       funcTest = ((glSamplePatternSGIS = (csGLSAMPLEPATTERNSGIS) gl->GetProcAddress ("glSamplePatternSGIS")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glSamplePatternSGIS");
+      }
       allclear &= funcTest;
+
       if (CS_GL_SGIS_multisample = allclear)
       {
         CS_GL_SGIS_multisample &= config->GetBool (cfgkey, true);
@@ -17072,38 +20935,53 @@ public:
       Report ("GL Extension '%s' not found.", ext);
     }
   }
-
+  
   void InitGL_SGIS_pixel_texture ()
   {
     if (tested_CS_GL_SGIS_pixel_texture) return;
     tested_CS_GL_SGIS_pixel_texture = true;
     const char* ext = "GL_SGIS_pixel_texture";
-    char cfgkey[48];
+    char cfgkey[26 + 21 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
-
-    const char* extensions = (const char*)glGetString (GL_EXTENSIONS);
+    
+    const char* extensions;
+    extensions = (const char*)glGetString (GL_EXTENSIONS);
     CS_GL_SGIS_pixel_texture = (strstr (extensions, ext) != NULL);
 
     bool allclear, funcTest;
-    if (gl && CS_GL_SGIS_pixel_texture)
+    (void)funcTest; // shut up "variable unused" warnings
+    if (CS_GL_SGIS_pixel_texture)
     {
       allclear = true;
       funcTest = ((glPixelTexGenParameteriSGIS = (csGLPIXELTEXGENPARAMETERISGIS) gl->GetProcAddress ("glPixelTexGenParameteriSGIS")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glPixelTexGenParameteriSGIS");
+      }
       allclear &= funcTest;
       funcTest = ((glPixelTexGenParameterfSGIS = (csGLPIXELTEXGENPARAMETERFSGIS) gl->GetProcAddress ("glPixelTexGenParameterfSGIS")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glPixelTexGenParameterfSGIS");
+      }
       allclear &= funcTest;
       funcTest = ((glGetPixelTexGenParameterivSGIS = (csGLGETPIXELTEXGENPARAMETERIVSGIS) gl->GetProcAddress ("glGetPixelTexGenParameterivSGIS")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glGetPixelTexGenParameterivSGIS");
+      }
       allclear &= funcTest;
       funcTest = ((glGetPixelTexGenParameterfvSGIS = (csGLGETPIXELTEXGENPARAMETERFVSGIS) gl->GetProcAddress ("glGetPixelTexGenParameterfvSGIS")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glGetPixelTexGenParameterfvSGIS");
+      }
       allclear &= funcTest;
+
       if (CS_GL_SGIS_pixel_texture = allclear)
       {
         CS_GL_SGIS_pixel_texture &= config->GetBool (cfgkey, true);
@@ -17126,22 +21004,25 @@ public:
       Report ("GL Extension '%s' not found.", ext);
     }
   }
-
+  
   void InitGL_SGIS_texture_border_clamp ()
   {
     if (tested_CS_GL_SGIS_texture_border_clamp) return;
     tested_CS_GL_SGIS_texture_border_clamp = true;
     const char* ext = "GL_SGIS_texture_border_clamp";
-    char cfgkey[55];
+    char cfgkey[26 + 28 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
-
-    const char* extensions = (const char*)glGetString (GL_EXTENSIONS);
+    
+    const char* extensions;
+    extensions = (const char*)glGetString (GL_EXTENSIONS);
     CS_GL_SGIS_texture_border_clamp = (strstr (extensions, ext) != NULL);
 
     bool allclear, funcTest;
-    if (gl && CS_GL_SGIS_texture_border_clamp)
+    (void)funcTest; // shut up "variable unused" warnings
+    if (CS_GL_SGIS_texture_border_clamp)
     {
       allclear = true;
+
       if (CS_GL_SGIS_texture_border_clamp = allclear)
       {
         CS_GL_SGIS_texture_border_clamp &= config->GetBool (cfgkey, true);
@@ -17164,26 +21045,32 @@ public:
       Report ("GL Extension '%s' not found.", ext);
     }
   }
-
+  
   void InitGL_SGIS_texture_color_mask ()
   {
     if (tested_CS_GL_SGIS_texture_color_mask) return;
     tested_CS_GL_SGIS_texture_color_mask = true;
     const char* ext = "GL_SGIS_texture_color_mask";
-    char cfgkey[53];
+    char cfgkey[26 + 26 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
-
-    const char* extensions = (const char*)glGetString (GL_EXTENSIONS);
+    
+    const char* extensions;
+    extensions = (const char*)glGetString (GL_EXTENSIONS);
     CS_GL_SGIS_texture_color_mask = (strstr (extensions, ext) != NULL);
 
     bool allclear, funcTest;
-    if (gl && CS_GL_SGIS_texture_color_mask)
+    (void)funcTest; // shut up "variable unused" warnings
+    if (CS_GL_SGIS_texture_color_mask)
     {
       allclear = true;
       funcTest = ((glTextureColorMaskSGIS = (csGLTEXTURECOLORMASKSGIS) gl->GetProcAddress ("glTextureColorMaskSGIS")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glTextureColorMaskSGIS");
+      }
       allclear &= funcTest;
+
       if (CS_GL_SGIS_texture_color_mask = allclear)
       {
         CS_GL_SGIS_texture_color_mask &= config->GetBool (cfgkey, true);
@@ -17206,22 +21093,25 @@ public:
       Report ("GL Extension '%s' not found.", ext);
     }
   }
-
+  
   void InitGL_SGIS_texture_edge_clamp ()
   {
     if (tested_CS_GL_SGIS_texture_edge_clamp) return;
     tested_CS_GL_SGIS_texture_edge_clamp = true;
     const char* ext = "GL_SGIS_texture_edge_clamp";
-    char cfgkey[53];
+    char cfgkey[26 + 26 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
-
-    const char* extensions = (const char*)glGetString (GL_EXTENSIONS);
+    
+    const char* extensions;
+    extensions = (const char*)glGetString (GL_EXTENSIONS);
     CS_GL_SGIS_texture_edge_clamp = (strstr (extensions, ext) != NULL);
 
     bool allclear, funcTest;
-    if (gl && CS_GL_SGIS_texture_edge_clamp)
+    (void)funcTest; // shut up "variable unused" warnings
+    if (CS_GL_SGIS_texture_edge_clamp)
     {
       allclear = true;
+
       if (CS_GL_SGIS_texture_edge_clamp = allclear)
       {
         CS_GL_SGIS_texture_edge_clamp &= config->GetBool (cfgkey, true);
@@ -17244,22 +21134,25 @@ public:
       Report ("GL Extension '%s' not found.", ext);
     }
   }
-
+  
   void InitGL_SGIS_texture_lod ()
   {
     if (tested_CS_GL_SGIS_texture_lod) return;
     tested_CS_GL_SGIS_texture_lod = true;
     const char* ext = "GL_SGIS_texture_lod";
-    char cfgkey[46];
+    char cfgkey[26 + 19 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
-
-    const char* extensions = (const char*)glGetString (GL_EXTENSIONS);
+    
+    const char* extensions;
+    extensions = (const char*)glGetString (GL_EXTENSIONS);
     CS_GL_SGIS_texture_lod = (strstr (extensions, ext) != NULL);
 
     bool allclear, funcTest;
-    if (gl && CS_GL_SGIS_texture_lod)
+    (void)funcTest; // shut up "variable unused" warnings
+    if (CS_GL_SGIS_texture_lod)
     {
       allclear = true;
+
       if (CS_GL_SGIS_texture_lod = allclear)
       {
         CS_GL_SGIS_texture_lod &= config->GetBool (cfgkey, true);
@@ -17282,22 +21175,25 @@ public:
       Report ("GL Extension '%s' not found.", ext);
     }
   }
-
+  
   void InitGL_SGIS_depth_texture ()
   {
     if (tested_CS_GL_SGIS_depth_texture) return;
     tested_CS_GL_SGIS_depth_texture = true;
     const char* ext = "GL_SGIS_depth_texture";
-    char cfgkey[48];
+    char cfgkey[26 + 21 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
-
-    const char* extensions = (const char*)glGetString (GL_EXTENSIONS);
+    
+    const char* extensions;
+    extensions = (const char*)glGetString (GL_EXTENSIONS);
     CS_GL_SGIS_depth_texture = (strstr (extensions, ext) != NULL);
 
     bool allclear, funcTest;
-    if (gl && CS_GL_SGIS_depth_texture)
+    (void)funcTest; // shut up "variable unused" warnings
+    if (CS_GL_SGIS_depth_texture)
     {
       allclear = true;
+
       if (CS_GL_SGIS_depth_texture = allclear)
       {
         CS_GL_SGIS_depth_texture &= config->GetBool (cfgkey, true);
@@ -17320,22 +21216,25 @@ public:
       Report ("GL Extension '%s' not found.", ext);
     }
   }
-
+  
   void InitGL_SGIX_fog_offset ()
   {
     if (tested_CS_GL_SGIX_fog_offset) return;
     tested_CS_GL_SGIX_fog_offset = true;
     const char* ext = "GL_SGIX_fog_offset";
-    char cfgkey[45];
+    char cfgkey[26 + 18 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
-
-    const char* extensions = (const char*)glGetString (GL_EXTENSIONS);
+    
+    const char* extensions;
+    extensions = (const char*)glGetString (GL_EXTENSIONS);
     CS_GL_SGIX_fog_offset = (strstr (extensions, ext) != NULL);
 
     bool allclear, funcTest;
-    if (gl && CS_GL_SGIX_fog_offset)
+    (void)funcTest; // shut up "variable unused" warnings
+    if (CS_GL_SGIX_fog_offset)
     {
       allclear = true;
+
       if (CS_GL_SGIX_fog_offset = allclear)
       {
         CS_GL_SGIX_fog_offset &= config->GetBool (cfgkey, true);
@@ -17358,22 +21257,25 @@ public:
       Report ("GL Extension '%s' not found.", ext);
     }
   }
-
+  
   void InitGL_SGIX_interlace ()
   {
     if (tested_CS_GL_SGIX_interlace) return;
     tested_CS_GL_SGIX_interlace = true;
     const char* ext = "GL_SGIX_interlace";
-    char cfgkey[44];
+    char cfgkey[26 + 17 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
-
-    const char* extensions = (const char*)glGetString (GL_EXTENSIONS);
+    
+    const char* extensions;
+    extensions = (const char*)glGetString (GL_EXTENSIONS);
     CS_GL_SGIX_interlace = (strstr (extensions, ext) != NULL);
 
     bool allclear, funcTest;
-    if (gl && CS_GL_SGIX_interlace)
+    (void)funcTest; // shut up "variable unused" warnings
+    if (CS_GL_SGIX_interlace)
     {
       allclear = true;
+
       if (CS_GL_SGIX_interlace = allclear)
       {
         CS_GL_SGIX_interlace &= config->GetBool (cfgkey, true);
@@ -17396,22 +21298,25 @@ public:
       Report ("GL Extension '%s' not found.", ext);
     }
   }
-
+  
   void InitGL_SGIX_shadow_ambient ()
   {
     if (tested_CS_GL_SGIX_shadow_ambient) return;
     tested_CS_GL_SGIX_shadow_ambient = true;
     const char* ext = "GL_SGIX_shadow_ambient";
-    char cfgkey[49];
+    char cfgkey[26 + 22 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
-
-    const char* extensions = (const char*)glGetString (GL_EXTENSIONS);
+    
+    const char* extensions;
+    extensions = (const char*)glGetString (GL_EXTENSIONS);
     CS_GL_SGIX_shadow_ambient = (strstr (extensions, ext) != NULL);
 
     bool allclear, funcTest;
-    if (gl && CS_GL_SGIX_shadow_ambient)
+    (void)funcTest; // shut up "variable unused" warnings
+    if (CS_GL_SGIX_shadow_ambient)
     {
       allclear = true;
+
       if (CS_GL_SGIX_shadow_ambient = allclear)
       {
         CS_GL_SGIX_shadow_ambient &= config->GetBool (cfgkey, true);
@@ -17434,22 +21339,25 @@ public:
       Report ("GL Extension '%s' not found.", ext);
     }
   }
-
+  
   void InitGL_SGI_color_matrix ()
   {
     if (tested_CS_GL_SGI_color_matrix) return;
     tested_CS_GL_SGI_color_matrix = true;
     const char* ext = "GL_SGI_color_matrix";
-    char cfgkey[46];
+    char cfgkey[26 + 19 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
-
-    const char* extensions = (const char*)glGetString (GL_EXTENSIONS);
+    
+    const char* extensions;
+    extensions = (const char*)glGetString (GL_EXTENSIONS);
     CS_GL_SGI_color_matrix = (strstr (extensions, ext) != NULL);
 
     bool allclear, funcTest;
-    if (gl && CS_GL_SGI_color_matrix)
+    (void)funcTest; // shut up "variable unused" warnings
+    if (CS_GL_SGI_color_matrix)
     {
       allclear = true;
+
       if (CS_GL_SGI_color_matrix = allclear)
       {
         CS_GL_SGI_color_matrix &= config->GetBool (cfgkey, true);
@@ -17472,50 +21380,74 @@ public:
       Report ("GL Extension '%s' not found.", ext);
     }
   }
-
+  
   void InitGL_SGI_color_table ()
   {
     if (tested_CS_GL_SGI_color_table) return;
     tested_CS_GL_SGI_color_table = true;
     const char* ext = "GL_SGI_color_table";
-    char cfgkey[45];
+    char cfgkey[26 + 18 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
-
-    const char* extensions = (const char*)glGetString (GL_EXTENSIONS);
+    
+    const char* extensions;
+    extensions = (const char*)glGetString (GL_EXTENSIONS);
     CS_GL_SGI_color_table = (strstr (extensions, ext) != NULL);
 
     bool allclear, funcTest;
-    if (gl && CS_GL_SGI_color_table)
+    (void)funcTest; // shut up "variable unused" warnings
+    if (CS_GL_SGI_color_table)
     {
       allclear = true;
       funcTest = ((glColorTableSGI = (csGLCOLORTABLESGI) gl->GetProcAddress ("glColorTableSGI")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glColorTableSGI");
+      }
       allclear &= funcTest;
       funcTest = ((glCopyColorTableSGI = (csGLCOPYCOLORTABLESGI) gl->GetProcAddress ("glCopyColorTableSGI")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glCopyColorTableSGI");
+      }
       allclear &= funcTest;
       funcTest = ((glColorTableParameterivSGI = (csGLCOLORTABLEPARAMETERIVSGI) gl->GetProcAddress ("glColorTableParameterivSGI")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glColorTableParameterivSGI");
+      }
       allclear &= funcTest;
       funcTest = ((glColorTableParameterfvSGI = (csGLCOLORTABLEPARAMETERFVSGI) gl->GetProcAddress ("glColorTableParameterfvSGI")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glColorTableParameterfvSGI");
+      }
       allclear &= funcTest;
       funcTest = ((glGetColorTableSGI = (csGLGETCOLORTABLESGI) gl->GetProcAddress ("glGetColorTableSGI")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glGetColorTableSGI");
+      }
       allclear &= funcTest;
       funcTest = ((glGetColorTableParameterivSGI = (csGLGETCOLORTABLEPARAMETERIVSGI) gl->GetProcAddress ("glGetColorTableParameterivSGI")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glGetColorTableParameterivSGI");
+      }
       allclear &= funcTest;
       funcTest = ((glGetColorTableParameterfvSGI = (csGLGETCOLORTABLEPARAMETERFVSGI) gl->GetProcAddress ("glGetColorTableParameterfvSGI")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glGetColorTableParameterfvSGI");
+      }
       allclear &= funcTest;
+
       if (CS_GL_SGI_color_table = allclear)
       {
         CS_GL_SGI_color_table &= config->GetBool (cfgkey, true);
@@ -17538,22 +21470,25 @@ public:
       Report ("GL Extension '%s' not found.", ext);
     }
   }
-
+  
   void InitGL_SGI_texture_color_table ()
   {
     if (tested_CS_GL_SGI_texture_color_table) return;
     tested_CS_GL_SGI_texture_color_table = true;
     const char* ext = "GL_SGI_texture_color_table";
-    char cfgkey[53];
+    char cfgkey[26 + 26 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
-
-    const char* extensions = (const char*)glGetString (GL_EXTENSIONS);
+    
+    const char* extensions;
+    extensions = (const char*)glGetString (GL_EXTENSIONS);
     CS_GL_SGI_texture_color_table = (strstr (extensions, ext) != NULL);
 
     bool allclear, funcTest;
-    if (gl && CS_GL_SGI_texture_color_table)
+    (void)funcTest; // shut up "variable unused" warnings
+    if (CS_GL_SGI_texture_color_table)
     {
       allclear = true;
+
       if (CS_GL_SGI_texture_color_table = allclear)
       {
         CS_GL_SGI_texture_color_table &= config->GetBool (cfgkey, true);
@@ -17576,182 +21511,305 @@ public:
       Report ("GL Extension '%s' not found.", ext);
     }
   }
-
+  
   void InitGL_SUN_vertex ()
   {
     if (tested_CS_GL_SUN_vertex) return;
     tested_CS_GL_SUN_vertex = true;
     const char* ext = "GL_SUN_vertex";
-    char cfgkey[40];
+    char cfgkey[26 + 13 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
-
-    const char* extensions = (const char*)glGetString (GL_EXTENSIONS);
+    
+    const char* extensions;
+    extensions = (const char*)glGetString (GL_EXTENSIONS);
     CS_GL_SUN_vertex = (strstr (extensions, ext) != NULL);
 
     bool allclear, funcTest;
-    if (gl && CS_GL_SUN_vertex)
+    (void)funcTest; // shut up "variable unused" warnings
+    if (CS_GL_SUN_vertex)
     {
       allclear = true;
       funcTest = ((glColor4ubVertex2fSUN = (csGLCOLOR4UBVERTEX2FSUN) gl->GetProcAddress ("glColor4ubVertex2fSUN")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glColor4ubVertex2fSUN");
+      }
       allclear &= funcTest;
       funcTest = ((glColor4ubVertex2fvSUN = (csGLCOLOR4UBVERTEX2FVSUN) gl->GetProcAddress ("glColor4ubVertex2fvSUN")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glColor4ubVertex2fvSUN");
+      }
       allclear &= funcTest;
       funcTest = ((glColor4ubVertex3fSUN = (csGLCOLOR4UBVERTEX3FSUN) gl->GetProcAddress ("glColor4ubVertex3fSUN")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glColor4ubVertex3fSUN");
+      }
       allclear &= funcTest;
       funcTest = ((glColor4ubVertex3fvSUN = (csGLCOLOR4UBVERTEX3FVSUN) gl->GetProcAddress ("glColor4ubVertex3fvSUN")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glColor4ubVertex3fvSUN");
+      }
       allclear &= funcTest;
       funcTest = ((glColor3fVertex3fSUN = (csGLCOLOR3FVERTEX3FSUN) gl->GetProcAddress ("glColor3fVertex3fSUN")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glColor3fVertex3fSUN");
+      }
       allclear &= funcTest;
       funcTest = ((glColor3fVertex3fvSUN = (csGLCOLOR3FVERTEX3FVSUN) gl->GetProcAddress ("glColor3fVertex3fvSUN")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glColor3fVertex3fvSUN");
+      }
       allclear &= funcTest;
       funcTest = ((glNormal3fVertex3fSUN = (csGLNORMAL3FVERTEX3FSUN) gl->GetProcAddress ("glNormal3fVertex3fSUN")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glNormal3fVertex3fSUN");
+      }
       allclear &= funcTest;
       funcTest = ((glNormal3fVertex3fvSUN = (csGLNORMAL3FVERTEX3FVSUN) gl->GetProcAddress ("glNormal3fVertex3fvSUN")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glNormal3fVertex3fvSUN");
+      }
       allclear &= funcTest;
       funcTest = ((glColor4fNormal3fVertex3fSUN = (csGLCOLOR4FNORMAL3FVERTEX3FSUN) gl->GetProcAddress ("glColor4fNormal3fVertex3fSUN")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glColor4fNormal3fVertex3fSUN");
+      }
       allclear &= funcTest;
       funcTest = ((glColor4fNormal3fVertex3fvSUN = (csGLCOLOR4FNORMAL3FVERTEX3FVSUN) gl->GetProcAddress ("glColor4fNormal3fVertex3fvSUN")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glColor4fNormal3fVertex3fvSUN");
+      }
       allclear &= funcTest;
       funcTest = ((glTexCoord2fVertex3fSUN = (csGLTEXCOORD2FVERTEX3FSUN) gl->GetProcAddress ("glTexCoord2fVertex3fSUN")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glTexCoord2fVertex3fSUN");
+      }
       allclear &= funcTest;
       funcTest = ((glTexCoord2fVertex3fvSUN = (csGLTEXCOORD2FVERTEX3FVSUN) gl->GetProcAddress ("glTexCoord2fVertex3fvSUN")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glTexCoord2fVertex3fvSUN");
+      }
       allclear &= funcTest;
       funcTest = ((glTexCoord4fVertex4fSUN = (csGLTEXCOORD4FVERTEX4FSUN) gl->GetProcAddress ("glTexCoord4fVertex4fSUN")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glTexCoord4fVertex4fSUN");
+      }
       allclear &= funcTest;
       funcTest = ((glTexCoord4fVertex4fvSUN = (csGLTEXCOORD4FVERTEX4FVSUN) gl->GetProcAddress ("glTexCoord4fVertex4fvSUN")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glTexCoord4fVertex4fvSUN");
+      }
       allclear &= funcTest;
       funcTest = ((glTexCoord2fColor4ubVertex3fSUN = (csGLTEXCOORD2FCOLOR4UBVERTEX3FSUN) gl->GetProcAddress ("glTexCoord2fColor4ubVertex3fSUN")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glTexCoord2fColor4ubVertex3fSUN");
+      }
       allclear &= funcTest;
       funcTest = ((glTexCoord2fColor4ubVertex3fvSUN = (csGLTEXCOORD2FCOLOR4UBVERTEX3FVSUN) gl->GetProcAddress ("glTexCoord2fColor4ubVertex3fvSUN")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glTexCoord2fColor4ubVertex3fvSUN");
+      }
       allclear &= funcTest;
       funcTest = ((glTexCoord2fColor3fVertex3fSUN = (csGLTEXCOORD2FCOLOR3FVERTEX3FSUN) gl->GetProcAddress ("glTexCoord2fColor3fVertex3fSUN")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glTexCoord2fColor3fVertex3fSUN");
+      }
       allclear &= funcTest;
       funcTest = ((glTexCoord2fColor3fVertex3fvSUN = (csGLTEXCOORD2FCOLOR3FVERTEX3FVSUN) gl->GetProcAddress ("glTexCoord2fColor3fVertex3fvSUN")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glTexCoord2fColor3fVertex3fvSUN");
+      }
       allclear &= funcTest;
       funcTest = ((glTexCoord2fNormal3fVertex3fSUN = (csGLTEXCOORD2FNORMAL3FVERTEX3FSUN) gl->GetProcAddress ("glTexCoord2fNormal3fVertex3fSUN")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glTexCoord2fNormal3fVertex3fSUN");
+      }
       allclear &= funcTest;
       funcTest = ((glTexCoord2fNormal3fVertex3fvSUN = (csGLTEXCOORD2FNORMAL3FVERTEX3FVSUN) gl->GetProcAddress ("glTexCoord2fNormal3fVertex3fvSUN")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glTexCoord2fNormal3fVertex3fvSUN");
+      }
       allclear &= funcTest;
       funcTest = ((glTexCoord2fColor4fNormal3fVertex3fSUN = (csGLTEXCOORD2FCOLOR4FNORMAL3FVERTEX3FSUN) gl->GetProcAddress ("glTexCoord2fColor4fNormal3fVertex3fSUN")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glTexCoord2fColor4fNormal3fVertex3fSUN");
+      }
       allclear &= funcTest;
       funcTest = ((glTexCoord2fColor4fNormal3fVertex3fvSUN = (csGLTEXCOORD2FCOLOR4FNORMAL3FVERTEX3FVSUN) gl->GetProcAddress ("glTexCoord2fColor4fNormal3fVertex3fvSUN")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glTexCoord2fColor4fNormal3fVertex3fvSUN");
+      }
       allclear &= funcTest;
       funcTest = ((glTexCoord4fColor4fNormal3fVertex4fSUN = (csGLTEXCOORD4FCOLOR4FNORMAL3FVERTEX4FSUN) gl->GetProcAddress ("glTexCoord4fColor4fNormal3fVertex4fSUN")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glTexCoord4fColor4fNormal3fVertex4fSUN");
+      }
       allclear &= funcTest;
       funcTest = ((glTexCoord4fColor4fNormal3fVertex4fvSUN = (csGLTEXCOORD4FCOLOR4FNORMAL3FVERTEX4FVSUN) gl->GetProcAddress ("glTexCoord4fColor4fNormal3fVertex4fvSUN")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glTexCoord4fColor4fNormal3fVertex4fvSUN");
+      }
       allclear &= funcTest;
       funcTest = ((glReplacementCodeuiVertex3fSUN = (csGLREPLACEMENTCODEUIVERTEX3FSUN) gl->GetProcAddress ("glReplacementCodeuiVertex3fSUN")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glReplacementCodeuiVertex3fSUN");
+      }
       allclear &= funcTest;
       funcTest = ((glReplacementCodeuiVertex3fvSUN = (csGLREPLACEMENTCODEUIVERTEX3FVSUN) gl->GetProcAddress ("glReplacementCodeuiVertex3fvSUN")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glReplacementCodeuiVertex3fvSUN");
+      }
       allclear &= funcTest;
       funcTest = ((glReplacementCodeuiColor4ubVertex3fSUN = (csGLREPLACEMENTCODEUICOLOR4UBVERTEX3FSUN) gl->GetProcAddress ("glReplacementCodeuiColor4ubVertex3fSUN")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glReplacementCodeuiColor4ubVertex3fSUN");
+      }
       allclear &= funcTest;
       funcTest = ((glReplacementCodeuiColor4ubVertex3fvSUN = (csGLREPLACEMENTCODEUICOLOR4UBVERTEX3FVSUN) gl->GetProcAddress ("glReplacementCodeuiColor4ubVertex3fvSUN")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glReplacementCodeuiColor4ubVertex3fvSUN");
+      }
       allclear &= funcTest;
       funcTest = ((glReplacementCodeuiColor3fVertex3fSUN = (csGLREPLACEMENTCODEUICOLOR3FVERTEX3FSUN) gl->GetProcAddress ("glReplacementCodeuiColor3fVertex3fSUN")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glReplacementCodeuiColor3fVertex3fSUN");
+      }
       allclear &= funcTest;
       funcTest = ((glReplacementCodeuiColor3fVertex3fvSUN = (csGLREPLACEMENTCODEUICOLOR3FVERTEX3FVSUN) gl->GetProcAddress ("glReplacementCodeuiColor3fVertex3fvSUN")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glReplacementCodeuiColor3fVertex3fvSUN");
+      }
       allclear &= funcTest;
       funcTest = ((glReplacementCodeuiNormal3fVertex3fSUN = (csGLREPLACEMENTCODEUINORMAL3FVERTEX3FSUN) gl->GetProcAddress ("glReplacementCodeuiNormal3fVertex3fSUN")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glReplacementCodeuiNormal3fVertex3fSUN");
+      }
       allclear &= funcTest;
       funcTest = ((glReplacementCodeuiNormal3fVertex3fvSUN = (csGLREPLACEMENTCODEUINORMAL3FVERTEX3FVSUN) gl->GetProcAddress ("glReplacementCodeuiNormal3fVertex3fvSUN")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glReplacementCodeuiNormal3fVertex3fvSUN");
+      }
       allclear &= funcTest;
       funcTest = ((glReplacementCodeuiColor4fNormal3fVertex3fSUN = (csGLREPLACEMENTCODEUICOLOR4FNORMAL3FVERTEX3FSUN) gl->GetProcAddress ("glReplacementCodeuiColor4fNormal3fVertex3fSUN")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glReplacementCodeuiColor4fNormal3fVertex3fSUN");
+      }
       allclear &= funcTest;
       funcTest = ((glReplacementCodeuiColor4fNormal3fVertex3fvSUN = (csGLREPLACEMENTCODEUICOLOR4FNORMAL3FVERTEX3FVSUN) gl->GetProcAddress ("glReplacementCodeuiColor4fNormal3fVertex3fvSUN")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glReplacementCodeuiColor4fNormal3fVertex3fvSUN");
+      }
       allclear &= funcTest;
       funcTest = ((glReplacementCodeuiTexCoord2fVertex3fSUN = (csGLREPLACEMENTCODEUITEXCOORD2FVERTEX3FSUN) gl->GetProcAddress ("glReplacementCodeuiTexCoord2fVertex3fSUN")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glReplacementCodeuiTexCoord2fVertex3fSUN");
+      }
       allclear &= funcTest;
       funcTest = ((glReplacementCodeuiTexCoord2fVertex3fvSUN = (csGLREPLACEMENTCODEUITEXCOORD2FVERTEX3FVSUN) gl->GetProcAddress ("glReplacementCodeuiTexCoord2fVertex3fvSUN")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glReplacementCodeuiTexCoord2fVertex3fvSUN");
+      }
       allclear &= funcTest;
       funcTest = ((glReplacementCodeuiTexCoord2fNormal3fVertex3fSUN = (csGLREPLACEMENTCODEUITEXCOORD2FNORMAL3FVERTEX3FSUN) gl->GetProcAddress ("glReplacementCodeuiTexCoord2fNormal3fVertex3fSUN")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glReplacementCodeuiTexCoord2fNormal3fVertex3fSUN");
+      }
       allclear &= funcTest;
       funcTest = ((glReplacementCodeuiTexCoord2fNormal3fVertex3fvSUN = (csGLREPLACEMENTCODEUITEXCOORD2FNORMAL3FVERTEX3FVSUN) gl->GetProcAddress ("glReplacementCodeuiTexCoord2fNormal3fVertex3fvSUN")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glReplacementCodeuiTexCoord2fNormal3fVertex3fvSUN");
+      }
       allclear &= funcTest;
       funcTest = ((glReplacementCodeuiTexCoord2fColor4fNormal3fVertex3fSUN = (csGLREPLACEMENTCODEUITEXCOORD2FCOLOR4FNORMAL3FVERTEX3FSUN) gl->GetProcAddress ("glReplacementCodeuiTexCoord2fColor4fNormal3fVertex3fSUN")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glReplacementCodeuiTexCoord2fColor4fNormal3fVertex3fSUN");
+      }
       allclear &= funcTest;
       funcTest = ((glReplacementCodeuiTexCoord2fColor4fNormal3fVertex3fvSUN = (csGLREPLACEMENTCODEUITEXCOORD2FCOLOR4FNORMAL3FVERTEX3FVSUN) gl->GetProcAddress ("glReplacementCodeuiTexCoord2fColor4fNormal3fVertex3fvSUN")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glReplacementCodeuiTexCoord2fColor4fNormal3fVertex3fvSUN");
+      }
       allclear &= funcTest;
+
       if (CS_GL_SUN_vertex = allclear)
       {
         CS_GL_SUN_vertex &= config->GetBool (cfgkey, true);
@@ -17774,98 +21832,158 @@ public:
       Report ("GL Extension '%s' not found.", ext);
     }
   }
-
+  
   void InitGL_ARB_fragment_program ()
   {
     if (tested_CS_GL_ARB_fragment_program) return;
     tested_CS_GL_ARB_fragment_program = true;
     const char* ext = "GL_ARB_fragment_program";
-    char cfgkey[50];
+    char cfgkey[26 + 23 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
-
-    const char* extensions = (const char*)glGetString (GL_EXTENSIONS);
+    
+    const char* extensions;
+    extensions = (const char*)glGetString (GL_EXTENSIONS);
     CS_GL_ARB_fragment_program = (strstr (extensions, ext) != NULL);
 
     bool allclear, funcTest;
-    if (gl && CS_GL_ARB_fragment_program)
+    (void)funcTest; // shut up "variable unused" warnings
+    if (CS_GL_ARB_fragment_program)
     {
       allclear = true;
       funcTest = ((glProgramStringARB = (csGLPROGRAMSTRINGARB) gl->GetProcAddress ("glProgramStringARB")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glProgramStringARB");
+      }
       allclear &= funcTest;
       funcTest = ((glBindProgramARB = (csGLBINDPROGRAMARB) gl->GetProcAddress ("glBindProgramARB")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glBindProgramARB");
+      }
       allclear &= funcTest;
       funcTest = ((glDeleteProgramsARB = (csGLDELETEPROGRAMSARB) gl->GetProcAddress ("glDeleteProgramsARB")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glDeleteProgramsARB");
+      }
       allclear &= funcTest;
       funcTest = ((glGenProgramsARB = (csGLGENPROGRAMSARB) gl->GetProcAddress ("glGenProgramsARB")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glGenProgramsARB");
+      }
       allclear &= funcTest;
       funcTest = ((glProgramEnvParameter4dARB = (csGLPROGRAMENVPARAMETER4DARB) gl->GetProcAddress ("glProgramEnvParameter4dARB")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glProgramEnvParameter4dARB");
+      }
       allclear &= funcTest;
       funcTest = ((glProgramEnvParameter4dvARB = (csGLPROGRAMENVPARAMETER4DVARB) gl->GetProcAddress ("glProgramEnvParameter4dvARB")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glProgramEnvParameter4dvARB");
+      }
       allclear &= funcTest;
       funcTest = ((glProgramEnvParameter4fARB = (csGLPROGRAMENVPARAMETER4FARB) gl->GetProcAddress ("glProgramEnvParameter4fARB")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glProgramEnvParameter4fARB");
+      }
       allclear &= funcTest;
       funcTest = ((glProgramEnvParameter4fvARB = (csGLPROGRAMENVPARAMETER4FVARB) gl->GetProcAddress ("glProgramEnvParameter4fvARB")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glProgramEnvParameter4fvARB");
+      }
       allclear &= funcTest;
       funcTest = ((glProgramLocalParameter4dARB = (csGLPROGRAMLOCALPARAMETER4DARB) gl->GetProcAddress ("glProgramLocalParameter4dARB")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glProgramLocalParameter4dARB");
+      }
       allclear &= funcTest;
       funcTest = ((glProgramLocalParameter4dvARB = (csGLPROGRAMLOCALPARAMETER4DVARB) gl->GetProcAddress ("glProgramLocalParameter4dvARB")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glProgramLocalParameter4dvARB");
+      }
       allclear &= funcTest;
       funcTest = ((glProgramLocalParameter4fARB = (csGLPROGRAMLOCALPARAMETER4FARB) gl->GetProcAddress ("glProgramLocalParameter4fARB")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glProgramLocalParameter4fARB");
+      }
       allclear &= funcTest;
       funcTest = ((glProgramLocalParameter4fvARB = (csGLPROGRAMLOCALPARAMETER4FVARB) gl->GetProcAddress ("glProgramLocalParameter4fvARB")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glProgramLocalParameter4fvARB");
+      }
       allclear &= funcTest;
       funcTest = ((glGetProgramEnvParameterdvARB = (csGLGETPROGRAMENVPARAMETERDVARB) gl->GetProcAddress ("glGetProgramEnvParameterdvARB")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glGetProgramEnvParameterdvARB");
+      }
       allclear &= funcTest;
       funcTest = ((glGetProgramEnvParameterfvARB = (csGLGETPROGRAMENVPARAMETERFVARB) gl->GetProcAddress ("glGetProgramEnvParameterfvARB")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glGetProgramEnvParameterfvARB");
+      }
       allclear &= funcTest;
       funcTest = ((glGetProgramLocalParameterdvARB = (csGLGETPROGRAMLOCALPARAMETERDVARB) gl->GetProcAddress ("glGetProgramLocalParameterdvARB")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glGetProgramLocalParameterdvARB");
+      }
       allclear &= funcTest;
       funcTest = ((glGetProgramLocalParameterfvARB = (csGLGETPROGRAMLOCALPARAMETERFVARB) gl->GetProcAddress ("glGetProgramLocalParameterfvARB")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glGetProgramLocalParameterfvARB");
+      }
       allclear &= funcTest;
       funcTest = ((glGetProgramivARB = (csGLGETPROGRAMIVARB) gl->GetProcAddress ("glGetProgramivARB")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glGetProgramivARB");
+      }
       allclear &= funcTest;
       funcTest = ((glGetProgramStringARB = (csGLGETPROGRAMSTRINGARB) gl->GetProcAddress ("glGetProgramStringARB")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glGetProgramStringARB");
+      }
       allclear &= funcTest;
       funcTest = ((glIsProgramARB = (csGLISPROGRAMARB) gl->GetProcAddress ("glIsProgramARB")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glIsProgramARB");
+      }
       allclear &= funcTest;
+
       if (CS_GL_ARB_fragment_program = allclear)
       {
         CS_GL_ARB_fragment_program &= config->GetBool (cfgkey, true);
@@ -17888,22 +22006,25 @@ public:
       Report ("GL Extension '%s' not found.", ext);
     }
   }
-
+  
   void InitGL_ATI_text_fragment_shader ()
   {
     if (tested_CS_GL_ATI_text_fragment_shader) return;
     tested_CS_GL_ATI_text_fragment_shader = true;
     const char* ext = "GL_ATI_text_fragment_shader";
-    char cfgkey[54];
+    char cfgkey[26 + 27 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
-
-    const char* extensions = (const char*)glGetString (GL_EXTENSIONS);
+    
+    const char* extensions;
+    extensions = (const char*)glGetString (GL_EXTENSIONS);
     CS_GL_ATI_text_fragment_shader = (strstr (extensions, ext) != NULL);
 
     bool allclear, funcTest;
-    if (gl && CS_GL_ATI_text_fragment_shader)
+    (void)funcTest; // shut up "variable unused" warnings
+    if (CS_GL_ATI_text_fragment_shader)
     {
       allclear = true;
+
       if (CS_GL_ATI_text_fragment_shader = allclear)
       {
         CS_GL_ATI_text_fragment_shader &= config->GetBool (cfgkey, true);
@@ -17926,22 +22047,25 @@ public:
       Report ("GL Extension '%s' not found.", ext);
     }
   }
-
+  
   void InitGL_APPLE_client_storage ()
   {
     if (tested_CS_GL_APPLE_client_storage) return;
     tested_CS_GL_APPLE_client_storage = true;
     const char* ext = "GL_APPLE_client_storage";
-    char cfgkey[50];
+    char cfgkey[26 + 23 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
-
-    const char* extensions = (const char*)glGetString (GL_EXTENSIONS);
+    
+    const char* extensions;
+    extensions = (const char*)glGetString (GL_EXTENSIONS);
     CS_GL_APPLE_client_storage = (strstr (extensions, ext) != NULL);
 
     bool allclear, funcTest;
-    if (gl && CS_GL_APPLE_client_storage)
+    (void)funcTest; // shut up "variable unused" warnings
+    if (CS_GL_APPLE_client_storage)
     {
       allclear = true;
+
       if (CS_GL_APPLE_client_storage = allclear)
       {
         CS_GL_APPLE_client_storage &= config->GetBool (cfgkey, true);
@@ -17964,42 +22088,60 @@ public:
       Report ("GL Extension '%s' not found.", ext);
     }
   }
-
+  
   void InitGL_APPLE_element_array ()
   {
     if (tested_CS_GL_APPLE_element_array) return;
     tested_CS_GL_APPLE_element_array = true;
     const char* ext = "GL_APPLE_element_array";
-    char cfgkey[49];
+    char cfgkey[26 + 22 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
-
-    const char* extensions = (const char*)glGetString (GL_EXTENSIONS);
+    
+    const char* extensions;
+    extensions = (const char*)glGetString (GL_EXTENSIONS);
     CS_GL_APPLE_element_array = (strstr (extensions, ext) != NULL);
 
     bool allclear, funcTest;
-    if (gl && CS_GL_APPLE_element_array)
+    (void)funcTest; // shut up "variable unused" warnings
+    if (CS_GL_APPLE_element_array)
     {
       allclear = true;
       funcTest = ((glElementPointerAPPLE = (csGLELEMENTPOINTERAPPLE) gl->GetProcAddress ("glElementPointerAPPLE")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glElementPointerAPPLE");
+      }
       allclear &= funcTest;
       funcTest = ((glDrawElementArrayAPPLE = (csGLDRAWELEMENTARRAYAPPLE) gl->GetProcAddress ("glDrawElementArrayAPPLE")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glDrawElementArrayAPPLE");
+      }
       allclear &= funcTest;
       funcTest = ((glDrawRangeElementArrayAPPLE = (csGLDRAWRANGEELEMENTARRAYAPPLE) gl->GetProcAddress ("glDrawRangeElementArrayAPPLE")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glDrawRangeElementArrayAPPLE");
+      }
       allclear &= funcTest;
       funcTest = ((glMultiDrawElementArrayAPPLE = (csGLMULTIDRAWELEMENTARRAYAPPLE) gl->GetProcAddress ("glMultiDrawElementArrayAPPLE")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glMultiDrawElementArrayAPPLE");
+      }
       allclear &= funcTest;
       funcTest = ((glMultiDrawRangeElementArrayAPPLE = (csGLMULTIDRAWRANGEELEMENTARRAYAPPLE) gl->GetProcAddress ("glMultiDrawRangeElementArrayAPPLE")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glMultiDrawRangeElementArrayAPPLE");
+      }
       allclear &= funcTest;
+
       if (CS_GL_APPLE_element_array = allclear)
       {
         CS_GL_APPLE_element_array &= config->GetBool (cfgkey, true);
@@ -18022,54 +22164,81 @@ public:
       Report ("GL Extension '%s' not found.", ext);
     }
   }
-
+  
   void InitGL_APPLE_fence ()
   {
     if (tested_CS_GL_APPLE_fence) return;
     tested_CS_GL_APPLE_fence = true;
     const char* ext = "GL_APPLE_fence";
-    char cfgkey[41];
+    char cfgkey[26 + 14 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
-
-    const char* extensions = (const char*)glGetString (GL_EXTENSIONS);
+    
+    const char* extensions;
+    extensions = (const char*)glGetString (GL_EXTENSIONS);
     CS_GL_APPLE_fence = (strstr (extensions, ext) != NULL);
 
     bool allclear, funcTest;
-    if (gl && CS_GL_APPLE_fence)
+    (void)funcTest; // shut up "variable unused" warnings
+    if (CS_GL_APPLE_fence)
     {
       allclear = true;
       funcTest = ((glGenFencesAPPLE = (csGLGENFENCESAPPLE) gl->GetProcAddress ("glGenFencesAPPLE")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glGenFencesAPPLE");
+      }
       allclear &= funcTest;
       funcTest = ((glDeleteFencesAPPLE = (csGLDELETEFENCESAPPLE) gl->GetProcAddress ("glDeleteFencesAPPLE")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glDeleteFencesAPPLE");
+      }
       allclear &= funcTest;
       funcTest = ((glSetFenceAPPLE = (csGLSETFENCEAPPLE) gl->GetProcAddress ("glSetFenceAPPLE")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glSetFenceAPPLE");
+      }
       allclear &= funcTest;
       funcTest = ((glIsFenceAPPLE = (csGLISFENCEAPPLE) gl->GetProcAddress ("glIsFenceAPPLE")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glIsFenceAPPLE");
+      }
       allclear &= funcTest;
       funcTest = ((glTestFenceAPPLE = (csGLTESTFENCEAPPLE) gl->GetProcAddress ("glTestFenceAPPLE")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glTestFenceAPPLE");
+      }
       allclear &= funcTest;
       funcTest = ((glFinishFenceAPPLE = (csGLFINISHFENCEAPPLE) gl->GetProcAddress ("glFinishFenceAPPLE")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glFinishFenceAPPLE");
+      }
       allclear &= funcTest;
       funcTest = ((glTestObjectAPPLE = (csGLTESTOBJECTAPPLE) gl->GetProcAddress ("glTestObjectAPPLE")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glTestObjectAPPLE");
+      }
       allclear &= funcTest;
       funcTest = ((glFinishObjectAPPLE = (csGLFINISHOBJECTAPPLE) gl->GetProcAddress ("glFinishObjectAPPLE")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glFinishObjectAPPLE");
+      }
       allclear &= funcTest;
+
       if (CS_GL_APPLE_fence = allclear)
       {
         CS_GL_APPLE_fence &= config->GetBool (cfgkey, true);
@@ -18092,38 +22261,53 @@ public:
       Report ("GL Extension '%s' not found.", ext);
     }
   }
-
+  
   void InitGL_APPLE_vertex_array_object ()
   {
     if (tested_CS_GL_APPLE_vertex_array_object) return;
     tested_CS_GL_APPLE_vertex_array_object = true;
     const char* ext = "GL_APPLE_vertex_array_object";
-    char cfgkey[55];
+    char cfgkey[26 + 28 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
-
-    const char* extensions = (const char*)glGetString (GL_EXTENSIONS);
+    
+    const char* extensions;
+    extensions = (const char*)glGetString (GL_EXTENSIONS);
     CS_GL_APPLE_vertex_array_object = (strstr (extensions, ext) != NULL);
 
     bool allclear, funcTest;
-    if (gl && CS_GL_APPLE_vertex_array_object)
+    (void)funcTest; // shut up "variable unused" warnings
+    if (CS_GL_APPLE_vertex_array_object)
     {
       allclear = true;
       funcTest = ((glBindVertexArrayAPPLE = (csGLBINDVERTEXARRAYAPPLE) gl->GetProcAddress ("glBindVertexArrayAPPLE")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glBindVertexArrayAPPLE");
+      }
       allclear &= funcTest;
       funcTest = ((glDeleteVertexArraysAPPLE = (csGLDELETEVERTEXARRAYSAPPLE) gl->GetProcAddress ("glDeleteVertexArraysAPPLE")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glDeleteVertexArraysAPPLE");
+      }
       allclear &= funcTest;
       funcTest = ((glGenVertexArraysAPPLE = (csGLGENVERTEXARRAYSAPPLE) gl->GetProcAddress ("glGenVertexArraysAPPLE")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glGenVertexArraysAPPLE");
+      }
       allclear &= funcTest;
       funcTest = ((glIsVertexArrayAPPLE = (csGLISVERTEXARRAYAPPLE) gl->GetProcAddress ("glIsVertexArrayAPPLE")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glIsVertexArrayAPPLE");
+      }
       allclear &= funcTest;
+
       if (CS_GL_APPLE_vertex_array_object = allclear)
       {
         CS_GL_APPLE_vertex_array_object &= config->GetBool (cfgkey, true);
@@ -18146,34 +22330,46 @@ public:
       Report ("GL Extension '%s' not found.", ext);
     }
   }
-
+  
   void InitGL_APPLE_vertex_array_range ()
   {
     if (tested_CS_GL_APPLE_vertex_array_range) return;
     tested_CS_GL_APPLE_vertex_array_range = true;
     const char* ext = "GL_APPLE_vertex_array_range";
-    char cfgkey[54];
+    char cfgkey[26 + 27 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
-
-    const char* extensions = (const char*)glGetString (GL_EXTENSIONS);
+    
+    const char* extensions;
+    extensions = (const char*)glGetString (GL_EXTENSIONS);
     CS_GL_APPLE_vertex_array_range = (strstr (extensions, ext) != NULL);
 
     bool allclear, funcTest;
-    if (gl && CS_GL_APPLE_vertex_array_range)
+    (void)funcTest; // shut up "variable unused" warnings
+    if (CS_GL_APPLE_vertex_array_range)
     {
       allclear = true;
       funcTest = ((glVertexArrayRangeAPPLE = (csGLVERTEXARRAYRANGEAPPLE) gl->GetProcAddress ("glVertexArrayRangeAPPLE")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glVertexArrayRangeAPPLE");
+      }
       allclear &= funcTest;
       funcTest = ((glFlushVertexArrayRangeAPPLE = (csGLFLUSHVERTEXARRAYRANGEAPPLE) gl->GetProcAddress ("glFlushVertexArrayRangeAPPLE")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glFlushVertexArrayRangeAPPLE");
+      }
       allclear &= funcTest;
       funcTest = ((glVertexArrayParameteriAPPLE = (csGLVERTEXARRAYPARAMETERIAPPLE) gl->GetProcAddress ("glVertexArrayParameteriAPPLE")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glVertexArrayParameteriAPPLE");
+      }
       allclear &= funcTest;
+
       if (CS_GL_APPLE_vertex_array_range = allclear)
       {
         CS_GL_APPLE_vertex_array_range &= config->GetBool (cfgkey, true);
@@ -18196,16 +22392,16 @@ public:
       Report ("GL Extension '%s' not found.", ext);
     }
   }
-
+  
 #ifdef _WIN32
   void InitWGL_ARB_pixel_format (HDC hDC)
   {
     if (tested_CS_WGL_ARB_pixel_format) return;
     tested_CS_WGL_ARB_pixel_format = true;
     const char* ext = "WGL_ARB_pixel_format";
-    char cfgkey[47];
+    char cfgkey[26 + 20 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
-
+    
     if (!tested_CS_WGL_ARB_extensions_string) InitWGL_ARB_extensions_string (hDC);
     const char* extensions;
     if (CS_WGL_ARB_extensions_string)
@@ -18214,26 +22410,37 @@ public:
     }
     else
     {
-      extensions =  (const char*)glGetString (GL_EXTENSIONS);
+      extensions = (const char*)glGetString (GL_EXTENSIONS);
     }
     CS_WGL_ARB_pixel_format = (strstr (extensions, ext) != NULL);
 
     bool allclear, funcTest;
+    (void)funcTest; // shut up "variable unused" warnings
     if (CS_WGL_ARB_pixel_format)
     {
       allclear = true;
       funcTest = ((wglGetPixelFormatAttribivARB = (csWGLGETPIXELFORMATATTRIBIVARB) gl->GetProcAddress ("wglGetPixelFormatAttribivARB")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "wglGetPixelFormatAttribivARB");
+      }
       allclear &= funcTest;
       funcTest = ((wglGetPixelFormatAttribfvARB = (csWGLGETPIXELFORMATATTRIBFVARB) gl->GetProcAddress ("wglGetPixelFormatAttribfvARB")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "wglGetPixelFormatAttribfvARB");
+      }
       allclear &= funcTest;
       funcTest = ((wglChoosePixelFormatARB = (csWGLCHOOSEPIXELFORMATARB) gl->GetProcAddress ("wglChoosePixelFormatARB")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "wglChoosePixelFormatARB");
+      }
       allclear &= funcTest;
+
       if (CS_WGL_ARB_pixel_format = allclear)
       {
         CS_WGL_ARB_pixel_format &= config->GetBool (cfgkey, true);
@@ -18256,17 +22463,17 @@ public:
       Report ("GL Extension '%s' not found.", ext);
     }
   }
-
 #endif
+
 #ifdef _WIN32
   void InitWGL_ARB_make_current_read (HDC hDC)
   {
     if (tested_CS_WGL_ARB_make_current_read) return;
     tested_CS_WGL_ARB_make_current_read = true;
     const char* ext = "WGL_ARB_make_current_read";
-    char cfgkey[52];
+    char cfgkey[26 + 25 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
-
+    
     if (!tested_CS_WGL_ARB_extensions_string) InitWGL_ARB_extensions_string (hDC);
     const char* extensions;
     if (CS_WGL_ARB_extensions_string)
@@ -18275,22 +22482,30 @@ public:
     }
     else
     {
-      extensions =  (const char*)glGetString (GL_EXTENSIONS);
+      extensions = (const char*)glGetString (GL_EXTENSIONS);
     }
     CS_WGL_ARB_make_current_read = (strstr (extensions, ext) != NULL);
 
     bool allclear, funcTest;
+    (void)funcTest; // shut up "variable unused" warnings
     if (CS_WGL_ARB_make_current_read)
     {
       allclear = true;
       funcTest = ((wglMakeContextCurrentARB = (csWGLMAKECONTEXTCURRENTARB) gl->GetProcAddress ("wglMakeContextCurrentARB")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "wglMakeContextCurrentARB");
+      }
       allclear &= funcTest;
       funcTest = ((wglGetCurrentReadDCARB = (csWGLGETCURRENTREADDCARB) gl->GetProcAddress ("wglGetCurrentReadDCARB")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "wglGetCurrentReadDCARB");
+      }
       allclear &= funcTest;
+
       if (CS_WGL_ARB_make_current_read = allclear)
       {
         CS_WGL_ARB_make_current_read &= config->GetBool (cfgkey, true);
@@ -18313,17 +22528,17 @@ public:
       Report ("GL Extension '%s' not found.", ext);
     }
   }
-
 #endif
+
 #ifdef _WIN32
   void InitWGL_ARB_pbuffer (HDC hDC)
   {
     if (tested_CS_WGL_ARB_pbuffer) return;
     tested_CS_WGL_ARB_pbuffer = true;
     const char* ext = "WGL_ARB_pbuffer";
-    char cfgkey[42];
+    char cfgkey[26 + 15 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
-
+    
     if (!tested_CS_WGL_ARB_extensions_string) InitWGL_ARB_extensions_string (hDC);
     const char* extensions;
     if (CS_WGL_ARB_extensions_string)
@@ -18332,34 +22547,51 @@ public:
     }
     else
     {
-      extensions =  (const char*)glGetString (GL_EXTENSIONS);
+      extensions = (const char*)glGetString (GL_EXTENSIONS);
     }
     CS_WGL_ARB_pbuffer = (strstr (extensions, ext) != NULL);
 
     bool allclear, funcTest;
+    (void)funcTest; // shut up "variable unused" warnings
     if (CS_WGL_ARB_pbuffer)
     {
       allclear = true;
       funcTest = ((wglCreatePbufferARB = (csWGLCREATEPBUFFERARB) gl->GetProcAddress ("wglCreatePbufferARB")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "wglCreatePbufferARB");
+      }
       allclear &= funcTest;
       funcTest = ((wglGetPbufferDCARB = (csWGLGETPBUFFERDCARB) gl->GetProcAddress ("wglGetPbufferDCARB")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "wglGetPbufferDCARB");
+      }
       allclear &= funcTest;
       funcTest = ((wglReleasePbufferDCARB = (csWGLRELEASEPBUFFERDCARB) gl->GetProcAddress ("wglReleasePbufferDCARB")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "wglReleasePbufferDCARB");
+      }
       allclear &= funcTest;
       funcTest = ((wglDestroyPbufferARB = (csWGLDESTROYPBUFFERARB) gl->GetProcAddress ("wglDestroyPbufferARB")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "wglDestroyPbufferARB");
+      }
       allclear &= funcTest;
       funcTest = ((wglQueryPbufferARB = (csWGLQUERYPBUFFERARB) gl->GetProcAddress ("wglQueryPbufferARB")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "wglQueryPbufferARB");
+      }
       allclear &= funcTest;
+
       if (CS_WGL_ARB_pbuffer = allclear)
       {
         CS_WGL_ARB_pbuffer &= config->GetBool (cfgkey, true);
@@ -18382,17 +22614,17 @@ public:
       Report ("GL Extension '%s' not found.", ext);
     }
   }
-
 #endif
+
 #ifdef _WIN32
   void InitWGL_EXT_swap_control (HDC hDC)
   {
     if (tested_CS_WGL_EXT_swap_control) return;
     tested_CS_WGL_EXT_swap_control = true;
     const char* ext = "WGL_EXT_swap_control";
-    char cfgkey[47];
+    char cfgkey[26 + 20 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
-
+    
     if (!tested_CS_WGL_ARB_extensions_string) InitWGL_ARB_extensions_string (hDC);
     const char* extensions;
     if (CS_WGL_ARB_extensions_string)
@@ -18401,22 +22633,30 @@ public:
     }
     else
     {
-      extensions =  (const char*)glGetString (GL_EXTENSIONS);
+      extensions = (const char*)glGetString (GL_EXTENSIONS);
     }
     CS_WGL_EXT_swap_control = (strstr (extensions, ext) != NULL);
 
     bool allclear, funcTest;
+    (void)funcTest; // shut up "variable unused" warnings
     if (CS_WGL_EXT_swap_control)
     {
       allclear = true;
       funcTest = ((wglSwapIntervalEXT = (csWGLSWAPINTERVALEXT) gl->GetProcAddress ("wglSwapIntervalEXT")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "wglSwapIntervalEXT");
+      }
       allclear &= funcTest;
       funcTest = ((wglGetSwapIntervalEXT = (csWGLGETSWAPINTERVALEXT) gl->GetProcAddress ("wglGetSwapIntervalEXT")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "wglGetSwapIntervalEXT");
+      }
       allclear &= funcTest;
+
       if (CS_WGL_EXT_swap_control = allclear)
       {
         CS_WGL_EXT_swap_control &= config->GetBool (cfgkey, true);
@@ -18439,17 +22679,17 @@ public:
       Report ("GL Extension '%s' not found.", ext);
     }
   }
-
 #endif
+
 #ifdef _WIN32
   void InitWGL_ARB_render_texture (HDC hDC)
   {
     if (tested_CS_WGL_ARB_render_texture) return;
     tested_CS_WGL_ARB_render_texture = true;
     const char* ext = "WGL_ARB_render_texture";
-    char cfgkey[49];
+    char cfgkey[26 + 22 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
-
+    
     if (!tested_CS_WGL_ARB_extensions_string) InitWGL_ARB_extensions_string (hDC);
     const char* extensions;
     if (CS_WGL_ARB_extensions_string)
@@ -18458,26 +22698,37 @@ public:
     }
     else
     {
-      extensions =  (const char*)glGetString (GL_EXTENSIONS);
+      extensions = (const char*)glGetString (GL_EXTENSIONS);
     }
     CS_WGL_ARB_render_texture = (strstr (extensions, ext) != NULL);
 
     bool allclear, funcTest;
+    (void)funcTest; // shut up "variable unused" warnings
     if (CS_WGL_ARB_render_texture)
     {
       allclear = true;
       funcTest = ((wglBindTexImageARB = (csWGLBINDTEXIMAGEARB) gl->GetProcAddress ("wglBindTexImageARB")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "wglBindTexImageARB");
+      }
       allclear &= funcTest;
       funcTest = ((wglReleaseTexImageARB = (csWGLRELEASETEXIMAGEARB) gl->GetProcAddress ("wglReleaseTexImageARB")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "wglReleaseTexImageARB");
+      }
       allclear &= funcTest;
       funcTest = ((wglSetPbufferAttribARB = (csWGLSETPBUFFERATTRIBARB) gl->GetProcAddress ("wglSetPbufferAttribARB")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "wglSetPbufferAttribARB");
+      }
       allclear &= funcTest;
+
       if (CS_WGL_ARB_render_texture = allclear)
       {
         CS_WGL_ARB_render_texture &= config->GetBool (cfgkey, true);
@@ -18500,27 +22751,42 @@ public:
       Report ("GL Extension '%s' not found.", ext);
     }
   }
-
 #endif
+
 #ifdef _WIN32
   void InitWGL_EXT_extensions_string (HDC hDC)
   {
     if (tested_CS_WGL_EXT_extensions_string) return;
     tested_CS_WGL_EXT_extensions_string = true;
     const char* ext = "WGL_EXT_extensions_string";
-    char cfgkey[52];
+    char cfgkey[26 + 25 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
-
-    CS_WGL_EXT_extensions_string = true;
+    
+    if (!tested_CS_WGL_ARB_extensions_string) InitWGL_ARB_extensions_string (hDC);
+    const char* extensions;
+    if (CS_WGL_ARB_extensions_string)
+    {
+      extensions = wglGetExtensionsStringARB (hDC);
+    }
+    else
+    {
+      extensions = (const char*)glGetString (GL_EXTENSIONS);
+    }
+    CS_WGL_EXT_extensions_string = (strstr (extensions, ext) != NULL);
 
     bool allclear, funcTest;
+    (void)funcTest; // shut up "variable unused" warnings
     if (CS_WGL_EXT_extensions_string)
     {
       allclear = true;
       funcTest = ((wglGetExtensionsStringEXT = (csWGLGETEXTENSIONSSTRINGEXT) gl->GetProcAddress ("wglGetExtensionsStringEXT")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "wglGetExtensionsStringEXT");
+      }
       allclear &= funcTest;
+
       if (CS_WGL_EXT_extensions_string = allclear)
       {
         CS_WGL_EXT_extensions_string &= config->GetBool (cfgkey, true);
@@ -18543,17 +22809,17 @@ public:
       Report ("GL Extension '%s' not found.", ext);
     }
   }
-
 #endif
+
 #ifdef _WIN32
   void InitWGL_EXT_make_current_read (HDC hDC)
   {
     if (tested_CS_WGL_EXT_make_current_read) return;
     tested_CS_WGL_EXT_make_current_read = true;
     const char* ext = "WGL_EXT_make_current_read";
-    char cfgkey[52];
+    char cfgkey[26 + 25 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
-
+    
     if (!tested_CS_WGL_ARB_extensions_string) InitWGL_ARB_extensions_string (hDC);
     const char* extensions;
     if (CS_WGL_ARB_extensions_string)
@@ -18562,22 +22828,30 @@ public:
     }
     else
     {
-      extensions =  (const char*)glGetString (GL_EXTENSIONS);
+      extensions = (const char*)glGetString (GL_EXTENSIONS);
     }
     CS_WGL_EXT_make_current_read = (strstr (extensions, ext) != NULL);
 
     bool allclear, funcTest;
+    (void)funcTest; // shut up "variable unused" warnings
     if (CS_WGL_EXT_make_current_read)
     {
       allclear = true;
       funcTest = ((wglMakeContextCurrentEXT = (csWGLMAKECONTEXTCURRENTEXT) gl->GetProcAddress ("wglMakeContextCurrentEXT")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "wglMakeContextCurrentEXT");
+      }
       allclear &= funcTest;
       funcTest = ((wglGetCurrentReadDCEXT = (csWGLGETCURRENTREADDCEXT) gl->GetProcAddress ("wglGetCurrentReadDCEXT")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "wglGetCurrentReadDCEXT");
+      }
       allclear &= funcTest;
+
       if (CS_WGL_EXT_make_current_read = allclear)
       {
         CS_WGL_EXT_make_current_read &= config->GetBool (cfgkey, true);
@@ -18600,17 +22874,17 @@ public:
       Report ("GL Extension '%s' not found.", ext);
     }
   }
-
 #endif
+
 #ifdef _WIN32
   void InitWGL_EXT_pbuffer (HDC hDC)
   {
     if (tested_CS_WGL_EXT_pbuffer) return;
     tested_CS_WGL_EXT_pbuffer = true;
     const char* ext = "WGL_EXT_pbuffer";
-    char cfgkey[42];
+    char cfgkey[26 + 15 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
-
+    
     if (!tested_CS_WGL_ARB_extensions_string) InitWGL_ARB_extensions_string (hDC);
     const char* extensions;
     if (CS_WGL_ARB_extensions_string)
@@ -18619,34 +22893,51 @@ public:
     }
     else
     {
-      extensions =  (const char*)glGetString (GL_EXTENSIONS);
+      extensions = (const char*)glGetString (GL_EXTENSIONS);
     }
     CS_WGL_EXT_pbuffer = (strstr (extensions, ext) != NULL);
 
     bool allclear, funcTest;
+    (void)funcTest; // shut up "variable unused" warnings
     if (CS_WGL_EXT_pbuffer)
     {
       allclear = true;
       funcTest = ((wglCreatePbufferEXT = (csWGLCREATEPBUFFEREXT) gl->GetProcAddress ("wglCreatePbufferEXT")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "wglCreatePbufferEXT");
+      }
       allclear &= funcTest;
       funcTest = ((wglGetPbufferDCEXT = (csWGLGETPBUFFERDCEXT) gl->GetProcAddress ("wglGetPbufferDCEXT")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "wglGetPbufferDCEXT");
+      }
       allclear &= funcTest;
       funcTest = ((wglReleasePbufferDCEXT = (csWGLRELEASEPBUFFERDCEXT) gl->GetProcAddress ("wglReleasePbufferDCEXT")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "wglReleasePbufferDCEXT");
+      }
       allclear &= funcTest;
       funcTest = ((wglDestroyPbufferEXT = (csWGLDESTROYPBUFFEREXT) gl->GetProcAddress ("wglDestroyPbufferEXT")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "wglDestroyPbufferEXT");
+      }
       allclear &= funcTest;
       funcTest = ((wglQueryPbufferEXT = (csWGLQUERYPBUFFEREXT) gl->GetProcAddress ("wglQueryPbufferEXT")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "wglQueryPbufferEXT");
+      }
       allclear &= funcTest;
+
       if (CS_WGL_EXT_pbuffer = allclear)
       {
         CS_WGL_EXT_pbuffer &= config->GetBool (cfgkey, true);
@@ -18669,17 +22960,17 @@ public:
       Report ("GL Extension '%s' not found.", ext);
     }
   }
-
 #endif
+
 #ifdef _WIN32
   void InitWGL_EXT_pixel_format (HDC hDC)
   {
     if (tested_CS_WGL_EXT_pixel_format) return;
     tested_CS_WGL_EXT_pixel_format = true;
     const char* ext = "WGL_EXT_pixel_format";
-    char cfgkey[47];
+    char cfgkey[26 + 20 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
-
+    
     if (!tested_CS_WGL_ARB_extensions_string) InitWGL_ARB_extensions_string (hDC);
     const char* extensions;
     if (CS_WGL_ARB_extensions_string)
@@ -18688,26 +22979,37 @@ public:
     }
     else
     {
-      extensions =  (const char*)glGetString (GL_EXTENSIONS);
+      extensions = (const char*)glGetString (GL_EXTENSIONS);
     }
     CS_WGL_EXT_pixel_format = (strstr (extensions, ext) != NULL);
 
     bool allclear, funcTest;
+    (void)funcTest; // shut up "variable unused" warnings
     if (CS_WGL_EXT_pixel_format)
     {
       allclear = true;
       funcTest = ((wglGetPixelFormatAttribivEXT = (csWGLGETPIXELFORMATATTRIBIVEXT) gl->GetProcAddress ("wglGetPixelFormatAttribivEXT")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "wglGetPixelFormatAttribivEXT");
+      }
       allclear &= funcTest;
       funcTest = ((wglGetPixelFormatAttribfvEXT = (csWGLGETPIXELFORMATATTRIBFVEXT) gl->GetProcAddress ("wglGetPixelFormatAttribfvEXT")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "wglGetPixelFormatAttribfvEXT");
+      }
       allclear &= funcTest;
       funcTest = ((wglChoosePixelFormatEXT = (csWGLCHOOSEPIXELFORMATEXT) gl->GetProcAddress ("wglChoosePixelFormatEXT")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "wglChoosePixelFormatEXT");
+      }
       allclear &= funcTest;
+
       if (CS_WGL_EXT_pixel_format = allclear)
       {
         CS_WGL_EXT_pixel_format &= config->GetBool (cfgkey, true);
@@ -18730,17 +23032,17 @@ public:
       Report ("GL Extension '%s' not found.", ext);
     }
   }
-
 #endif
+
 #ifdef _WIN32
   void InitWGL_I3D_digital_video_control (HDC hDC)
   {
     if (tested_CS_WGL_I3D_digital_video_control) return;
     tested_CS_WGL_I3D_digital_video_control = true;
     const char* ext = "WGL_I3D_digital_video_control";
-    char cfgkey[56];
+    char cfgkey[26 + 29 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
-
+    
     if (!tested_CS_WGL_ARB_extensions_string) InitWGL_ARB_extensions_string (hDC);
     const char* extensions;
     if (CS_WGL_ARB_extensions_string)
@@ -18749,22 +23051,30 @@ public:
     }
     else
     {
-      extensions =  (const char*)glGetString (GL_EXTENSIONS);
+      extensions = (const char*)glGetString (GL_EXTENSIONS);
     }
     CS_WGL_I3D_digital_video_control = (strstr (extensions, ext) != NULL);
 
     bool allclear, funcTest;
+    (void)funcTest; // shut up "variable unused" warnings
     if (CS_WGL_I3D_digital_video_control)
     {
       allclear = true;
       funcTest = ((wglGetDigitalVideoParametersI3D = (csWGLGETDIGITALVIDEOPARAMETERSI3D) gl->GetProcAddress ("wglGetDigitalVideoParametersI3D")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "wglGetDigitalVideoParametersI3D");
+      }
       allclear &= funcTest;
       funcTest = ((wglSetDigitalVideoParametersI3D = (csWGLSETDIGITALVIDEOPARAMETERSI3D) gl->GetProcAddress ("wglSetDigitalVideoParametersI3D")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "wglSetDigitalVideoParametersI3D");
+      }
       allclear &= funcTest;
+
       if (CS_WGL_I3D_digital_video_control = allclear)
       {
         CS_WGL_I3D_digital_video_control &= config->GetBool (cfgkey, true);
@@ -18787,17 +23097,17 @@ public:
       Report ("GL Extension '%s' not found.", ext);
     }
   }
-
 #endif
+
 #ifdef _WIN32
   void InitWGL_I3D_gamma (HDC hDC)
   {
     if (tested_CS_WGL_I3D_gamma) return;
     tested_CS_WGL_I3D_gamma = true;
     const char* ext = "WGL_I3D_gamma";
-    char cfgkey[40];
+    char cfgkey[26 + 13 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
-
+    
     if (!tested_CS_WGL_ARB_extensions_string) InitWGL_ARB_extensions_string (hDC);
     const char* extensions;
     if (CS_WGL_ARB_extensions_string)
@@ -18806,30 +23116,44 @@ public:
     }
     else
     {
-      extensions =  (const char*)glGetString (GL_EXTENSIONS);
+      extensions = (const char*)glGetString (GL_EXTENSIONS);
     }
     CS_WGL_I3D_gamma = (strstr (extensions, ext) != NULL);
 
     bool allclear, funcTest;
+    (void)funcTest; // shut up "variable unused" warnings
     if (CS_WGL_I3D_gamma)
     {
       allclear = true;
       funcTest = ((wglGetGammaTableParametersI3D = (csWGLGETGAMMATABLEPARAMETERSI3D) gl->GetProcAddress ("wglGetGammaTableParametersI3D")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "wglGetGammaTableParametersI3D");
+      }
       allclear &= funcTest;
       funcTest = ((wglSetGammaTableParametersI3D = (csWGLSETGAMMATABLEPARAMETERSI3D) gl->GetProcAddress ("wglSetGammaTableParametersI3D")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "wglSetGammaTableParametersI3D");
+      }
       allclear &= funcTest;
       funcTest = ((wglGetGammaTableI3D = (csWGLGETGAMMATABLEI3D) gl->GetProcAddress ("wglGetGammaTableI3D")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "wglGetGammaTableI3D");
+      }
       allclear &= funcTest;
       funcTest = ((wglSetGammaTableI3D = (csWGLSETGAMMATABLEI3D) gl->GetProcAddress ("wglSetGammaTableI3D")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "wglSetGammaTableI3D");
+      }
       allclear &= funcTest;
+
       if (CS_WGL_I3D_gamma = allclear)
       {
         CS_WGL_I3D_gamma &= config->GetBool (cfgkey, true);
@@ -18852,17 +23176,17 @@ public:
       Report ("GL Extension '%s' not found.", ext);
     }
   }
-
 #endif
+
 #ifdef _WIN32
   void InitWGL_I3D_genlock (HDC hDC)
   {
     if (tested_CS_WGL_I3D_genlock) return;
     tested_CS_WGL_I3D_genlock = true;
     const char* ext = "WGL_I3D_genlock";
-    char cfgkey[42];
+    char cfgkey[26 + 15 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
-
+    
     if (!tested_CS_WGL_ARB_extensions_string) InitWGL_ARB_extensions_string (hDC);
     const char* extensions;
     if (CS_WGL_ARB_extensions_string)
@@ -18871,62 +23195,100 @@ public:
     }
     else
     {
-      extensions =  (const char*)glGetString (GL_EXTENSIONS);
+      extensions = (const char*)glGetString (GL_EXTENSIONS);
     }
     CS_WGL_I3D_genlock = (strstr (extensions, ext) != NULL);
 
     bool allclear, funcTest;
+    (void)funcTest; // shut up "variable unused" warnings
     if (CS_WGL_I3D_genlock)
     {
       allclear = true;
       funcTest = ((wglEnableGenlockI3D = (csWGLENABLEGENLOCKI3D) gl->GetProcAddress ("wglEnableGenlockI3D")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "wglEnableGenlockI3D");
+      }
       allclear &= funcTest;
       funcTest = ((wglDisableGenlockI3D = (csWGLDISABLEGENLOCKI3D) gl->GetProcAddress ("wglDisableGenlockI3D")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "wglDisableGenlockI3D");
+      }
       allclear &= funcTest;
       funcTest = ((wglIsEnabledGenlockI3D = (csWGLISENABLEDGENLOCKI3D) gl->GetProcAddress ("wglIsEnabledGenlockI3D")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "wglIsEnabledGenlockI3D");
+      }
       allclear &= funcTest;
       funcTest = ((wglGenlockSourceI3D = (csWGLGENLOCKSOURCEI3D) gl->GetProcAddress ("wglGenlockSourceI3D")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "wglGenlockSourceI3D");
+      }
       allclear &= funcTest;
       funcTest = ((wglGetGenlockSourceI3D = (csWGLGETGENLOCKSOURCEI3D) gl->GetProcAddress ("wglGetGenlockSourceI3D")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "wglGetGenlockSourceI3D");
+      }
       allclear &= funcTest;
       funcTest = ((wglGenlockSourceEdgeI3D = (csWGLGENLOCKSOURCEEDGEI3D) gl->GetProcAddress ("wglGenlockSourceEdgeI3D")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "wglGenlockSourceEdgeI3D");
+      }
       allclear &= funcTest;
       funcTest = ((wglGetGenlockSourceEdgeI3D = (csWGLGETGENLOCKSOURCEEDGEI3D) gl->GetProcAddress ("wglGetGenlockSourceEdgeI3D")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "wglGetGenlockSourceEdgeI3D");
+      }
       allclear &= funcTest;
       funcTest = ((wglGenlockSampleRateI3D = (csWGLGENLOCKSAMPLERATEI3D) gl->GetProcAddress ("wglGenlockSampleRateI3D")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "wglGenlockSampleRateI3D");
+      }
       allclear &= funcTest;
       funcTest = ((wglGetGenlockSampleRateI3D = (csWGLGETGENLOCKSAMPLERATEI3D) gl->GetProcAddress ("wglGetGenlockSampleRateI3D")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "wglGetGenlockSampleRateI3D");
+      }
       allclear &= funcTest;
       funcTest = ((wglGenlockSourceDelayI3D = (csWGLGENLOCKSOURCEDELAYI3D) gl->GetProcAddress ("wglGenlockSourceDelayI3D")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "wglGenlockSourceDelayI3D");
+      }
       allclear &= funcTest;
       funcTest = ((wglGetGenlockSourceDelayI3D = (csWGLGETGENLOCKSOURCEDELAYI3D) gl->GetProcAddress ("wglGetGenlockSourceDelayI3D")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "wglGetGenlockSourceDelayI3D");
+      }
       allclear &= funcTest;
       funcTest = ((wglQueryGenlockMaxSourceDelayI3D = (csWGLQUERYGENLOCKMAXSOURCEDELAYI3D) gl->GetProcAddress ("wglQueryGenlockMaxSourceDelayI3D")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "wglQueryGenlockMaxSourceDelayI3D");
+      }
       allclear &= funcTest;
+
       if (CS_WGL_I3D_genlock = allclear)
       {
         CS_WGL_I3D_genlock &= config->GetBool (cfgkey, true);
@@ -18949,43 +23311,61 @@ public:
       Report ("GL Extension '%s' not found.", ext);
     }
   }
-
 #endif
+
   void InitGL_ARB_matrix_palette ()
   {
     if (tested_CS_GL_ARB_matrix_palette) return;
     tested_CS_GL_ARB_matrix_palette = true;
     const char* ext = "GL_ARB_matrix_palette";
-    char cfgkey[48];
+    char cfgkey[26 + 21 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
-
-    const char* extensions = (const char*)glGetString (GL_EXTENSIONS);
+    
+    const char* extensions;
+    extensions = (const char*)glGetString (GL_EXTENSIONS);
     CS_GL_ARB_matrix_palette = (strstr (extensions, ext) != NULL);
 
     bool allclear, funcTest;
-    if (gl && CS_GL_ARB_matrix_palette)
+    (void)funcTest; // shut up "variable unused" warnings
+    if (CS_GL_ARB_matrix_palette)
     {
       allclear = true;
       funcTest = ((glCurrentPaletteMatrixARB = (csGLCURRENTPALETTEMATRIXARB) gl->GetProcAddress ("glCurrentPaletteMatrixARB")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glCurrentPaletteMatrixARB");
+      }
       allclear &= funcTest;
       funcTest = ((glMatrixIndexubvARB = (csGLMATRIXINDEXUBVARB) gl->GetProcAddress ("glMatrixIndexubvARB")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glMatrixIndexubvARB");
+      }
       allclear &= funcTest;
       funcTest = ((glMatrixIndexusvARB = (csGLMATRIXINDEXUSVARB) gl->GetProcAddress ("glMatrixIndexusvARB")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glMatrixIndexusvARB");
+      }
       allclear &= funcTest;
       funcTest = ((glMatrixIndexuivARB = (csGLMATRIXINDEXUIVARB) gl->GetProcAddress ("glMatrixIndexuivARB")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glMatrixIndexuivARB");
+      }
       allclear &= funcTest;
       funcTest = ((glMatrixIndexPointerARB = (csGLMATRIXINDEXPOINTERARB) gl->GetProcAddress ("glMatrixIndexPointerARB")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glMatrixIndexPointerARB");
+      }
       allclear &= funcTest;
+
       if (CS_GL_ARB_matrix_palette = allclear)
       {
         CS_GL_ARB_matrix_palette &= config->GetBool (cfgkey, true);
@@ -19008,42 +23388,60 @@ public:
       Report ("GL Extension '%s' not found.", ext);
     }
   }
-
+  
   void InitGL_NV_element_array ()
   {
     if (tested_CS_GL_NV_element_array) return;
     tested_CS_GL_NV_element_array = true;
     const char* ext = "GL_NV_element_array";
-    char cfgkey[46];
+    char cfgkey[26 + 19 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
-
-    const char* extensions = (const char*)glGetString (GL_EXTENSIONS);
+    
+    const char* extensions;
+    extensions = (const char*)glGetString (GL_EXTENSIONS);
     CS_GL_NV_element_array = (strstr (extensions, ext) != NULL);
 
     bool allclear, funcTest;
-    if (gl && CS_GL_NV_element_array)
+    (void)funcTest; // shut up "variable unused" warnings
+    if (CS_GL_NV_element_array)
     {
       allclear = true;
       funcTest = ((glElementPointerNV = (csGLELEMENTPOINTERNV) gl->GetProcAddress ("glElementPointerNV")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glElementPointerNV");
+      }
       allclear &= funcTest;
       funcTest = ((glDrawElementArrayNV = (csGLDRAWELEMENTARRAYNV) gl->GetProcAddress ("glDrawElementArrayNV")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glDrawElementArrayNV");
+      }
       allclear &= funcTest;
       funcTest = ((glDrawRangeElementArrayNV = (csGLDRAWRANGEELEMENTARRAYNV) gl->GetProcAddress ("glDrawRangeElementArrayNV")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glDrawRangeElementArrayNV");
+      }
       allclear &= funcTest;
       funcTest = ((glMultiDrawElementArrayNV = (csGLMULTIDRAWELEMENTARRAYNV) gl->GetProcAddress ("glMultiDrawElementArrayNV")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glMultiDrawElementArrayNV");
+      }
       allclear &= funcTest;
       funcTest = ((glMultiDrawRangeElementArrayNV = (csGLMULTIDRAWRANGEELEMENTARRAYNV) gl->GetProcAddress ("glMultiDrawRangeElementArrayNV")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glMultiDrawRangeElementArrayNV");
+      }
       allclear &= funcTest;
+
       if (CS_GL_NV_element_array = allclear)
       {
         CS_GL_NV_element_array &= config->GetBool (cfgkey, true);
@@ -19066,22 +23464,25 @@ public:
       Report ("GL Extension '%s' not found.", ext);
     }
   }
-
+  
   void InitGL_NV_float_buffer ()
   {
     if (tested_CS_GL_NV_float_buffer) return;
     tested_CS_GL_NV_float_buffer = true;
     const char* ext = "GL_NV_float_buffer";
-    char cfgkey[45];
+    char cfgkey[26 + 18 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
-
-    const char* extensions = (const char*)glGetString (GL_EXTENSIONS);
+    
+    const char* extensions;
+    extensions = (const char*)glGetString (GL_EXTENSIONS);
     CS_GL_NV_float_buffer = (strstr (extensions, ext) != NULL);
 
     bool allclear, funcTest;
-    if (gl && CS_GL_NV_float_buffer)
+    (void)funcTest; // shut up "variable unused" warnings
+    if (CS_GL_NV_float_buffer)
     {
       allclear = true;
+
       if (CS_GL_NV_float_buffer = allclear)
       {
         CS_GL_NV_float_buffer &= config->GetBool (cfgkey, true);
@@ -19104,62 +23505,95 @@ public:
       Report ("GL Extension '%s' not found.", ext);
     }
   }
-
+  
   void InitGL_NV_fragment_program ()
   {
     if (tested_CS_GL_NV_fragment_program) return;
     tested_CS_GL_NV_fragment_program = true;
     const char* ext = "GL_NV_fragment_program";
-    char cfgkey[49];
+    char cfgkey[26 + 22 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
-
-    const char* extensions = (const char*)glGetString (GL_EXTENSIONS);
+    
+    const char* extensions;
+    extensions = (const char*)glGetString (GL_EXTENSIONS);
     CS_GL_NV_fragment_program = (strstr (extensions, ext) != NULL);
 
     bool allclear, funcTest;
-    if (gl && CS_GL_NV_fragment_program)
+    (void)funcTest; // shut up "variable unused" warnings
+    if (CS_GL_NV_fragment_program)
     {
       allclear = true;
       funcTest = ((glProgramNamedParameter4fNV = (csGLPROGRAMNAMEDPARAMETER4FNV) gl->GetProcAddress ("glProgramNamedParameter4fNV")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glProgramNamedParameter4fNV");
+      }
       allclear &= funcTest;
       funcTest = ((glProgramNamedParameter4dNV = (csGLPROGRAMNAMEDPARAMETER4DNV) gl->GetProcAddress ("glProgramNamedParameter4dNV")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glProgramNamedParameter4dNV");
+      }
       allclear &= funcTest;
       funcTest = ((glGetProgramNamedParameterfvNV = (csGLGETPROGRAMNAMEDPARAMETERFVNV) gl->GetProcAddress ("glGetProgramNamedParameterfvNV")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glGetProgramNamedParameterfvNV");
+      }
       allclear &= funcTest;
       funcTest = ((glGetProgramNamedParameterdvNV = (csGLGETPROGRAMNAMEDPARAMETERDVNV) gl->GetProcAddress ("glGetProgramNamedParameterdvNV")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glGetProgramNamedParameterdvNV");
+      }
       allclear &= funcTest;
       funcTest = ((glProgramLocalParameter4dARB = (csGLPROGRAMLOCALPARAMETER4DARB) gl->GetProcAddress ("glProgramLocalParameter4dARB")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glProgramLocalParameter4dARB");
+      }
       allclear &= funcTest;
       funcTest = ((glProgramLocalParameter4dvARB = (csGLPROGRAMLOCALPARAMETER4DVARB) gl->GetProcAddress ("glProgramLocalParameter4dvARB")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glProgramLocalParameter4dvARB");
+      }
       allclear &= funcTest;
       funcTest = ((glProgramLocalParameter4fARB = (csGLPROGRAMLOCALPARAMETER4FARB) gl->GetProcAddress ("glProgramLocalParameter4fARB")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glProgramLocalParameter4fARB");
+      }
       allclear &= funcTest;
       funcTest = ((glProgramLocalParameter4fvARB = (csGLPROGRAMLOCALPARAMETER4FVARB) gl->GetProcAddress ("glProgramLocalParameter4fvARB")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glProgramLocalParameter4fvARB");
+      }
       allclear &= funcTest;
       funcTest = ((glGetProgramLocalParameterdvARB = (csGLGETPROGRAMLOCALPARAMETERDVARB) gl->GetProcAddress ("glGetProgramLocalParameterdvARB")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glGetProgramLocalParameterdvARB");
+      }
       allclear &= funcTest;
       funcTest = ((glGetProgramLocalParameterfvARB = (csGLGETPROGRAMLOCALPARAMETERFVARB) gl->GetProcAddress ("glGetProgramLocalParameterfvARB")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glGetProgramLocalParameterfvARB");
+      }
       allclear &= funcTest;
+
       if (CS_GL_NV_fragment_program = allclear)
       {
         CS_GL_NV_fragment_program &= config->GetBool (cfgkey, true);
@@ -19182,30 +23616,39 @@ public:
       Report ("GL Extension '%s' not found.", ext);
     }
   }
-
+  
   void InitGL_NV_primitive_restart ()
   {
     if (tested_CS_GL_NV_primitive_restart) return;
     tested_CS_GL_NV_primitive_restart = true;
     const char* ext = "GL_NV_primitive_restart";
-    char cfgkey[50];
+    char cfgkey[26 + 23 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
-
-    const char* extensions = (const char*)glGetString (GL_EXTENSIONS);
+    
+    const char* extensions;
+    extensions = (const char*)glGetString (GL_EXTENSIONS);
     CS_GL_NV_primitive_restart = (strstr (extensions, ext) != NULL);
 
     bool allclear, funcTest;
-    if (gl && CS_GL_NV_primitive_restart)
+    (void)funcTest; // shut up "variable unused" warnings
+    if (CS_GL_NV_primitive_restart)
     {
       allclear = true;
       funcTest = ((glPrimitiveRestartNV = (csGLPRIMITIVERESTARTNV) gl->GetProcAddress ("glPrimitiveRestartNV")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glPrimitiveRestartNV");
+      }
       allclear &= funcTest;
       funcTest = ((glPrimitiveRestartIndexNV = (csGLPRIMITIVERESTARTINDEXNV) gl->GetProcAddress ("glPrimitiveRestartIndexNV")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", REPORT_MISSING_ENTRIES))
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
+        REPORT_MISSING_ENTRIES))
+      {
         Report ("Failed to retrieve %s", "glPrimitiveRestartIndexNV");
+      }
       allclear &= funcTest;
+
       if (CS_GL_NV_primitive_restart = allclear)
       {
         CS_GL_NV_primitive_restart &= config->GetBool (cfgkey, true);
@@ -19228,22 +23671,25 @@ public:
       Report ("GL Extension '%s' not found.", ext);
     }
   }
-
+  
   void InitGL_NV_vertex_program2 ()
   {
     if (tested_CS_GL_NV_vertex_program2) return;
     tested_CS_GL_NV_vertex_program2 = true;
     const char* ext = "GL_NV_vertex_program2";
-    char cfgkey[48];
+    char cfgkey[26 + 21 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
-
-    const char* extensions = (const char*)glGetString (GL_EXTENSIONS);
+    
+    const char* extensions;
+    extensions = (const char*)glGetString (GL_EXTENSIONS);
     CS_GL_NV_vertex_program2 = (strstr (extensions, ext) != NULL);
 
     bool allclear, funcTest;
-    if (gl && CS_GL_NV_vertex_program2)
+    (void)funcTest; // shut up "variable unused" warnings
+    if (CS_GL_NV_vertex_program2)
     {
       allclear = true;
+
       if (CS_GL_NV_vertex_program2 = allclear)
       {
         CS_GL_NV_vertex_program2 &= config->GetBool (cfgkey, true);
@@ -19266,7 +23712,11 @@ public:
       Report ("GL Extension '%s' not found.", ext);
     }
   }
+  
 
 };
 
+#undef REPORT_MISSING_ENTRIES
+
 #endif // __CS_GLEXTENSIONMANAGER_H__
+

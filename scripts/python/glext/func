@@ -1,0 +1,5 @@
+  #ifndef %NAME%_DECL
+  #define %NAME%_DECL
+  cs%NAME% %Name%;
+  #endif
+

@@ -1,0 +1,3 @@
+    const char* extensions;
+    extensions = (const char*)glGetString (GL_EXTENSIONS);
+    CS_%Name% = (strstr (extensions, ext) != NULL);

@@ -1,0 +1,40 @@
+#ifdef _WIN32
+  void Init%Name% (HDC hDC)
+  {
+    if (tested_CS_%Name%) return;
+    tested_CS_%Name% = true;
+    const char* ext = "%Name%";
+    char cfgkey[%Cfglen% + %Namelen% + 1];
+    sprintf (cfgkey, "%Cfgprefix%%%s", ext);
+    
+%Extcheck%
+    bool allclear, funcTest;
+    (void)funcTest; // shut up "variable unused" warnings
+    if (CS_%Name%)
+    {
+      allclear = true;
+%FunctionsInit%
+      if (CS_%Name% = allclear)
+      {
+        CS_%Name% &= config->GetBool (cfgkey, true);
+        if (CS_%Name%)
+        {
+          Report ("GL Extension '%%s' found and used.", ext);
+        }
+        else
+        {
+          Report ("GL Extension '%%s' found, but not used.", ext);
+        }
+      }
+      else
+      {
+        Report ("GL Extension '%%s' failed to initialize.", ext);
+      }
+    }
+    else
+    {
+      Report ("GL Extension '%%s' not found.", ext);
+    }
+  }
+#endif
+
