@@ -759,9 +759,6 @@ ddgVisState ddgTBinTree::visibilityTriangle(ddgTriIndex tindex)
 {
 	ddgAsserts(tindex <= _mesh->triNo(), " No leaf node was found in the queue!");
 
-	ddgTriIndex tva = parent(tindex),
-		tv0 = _mesh->v0(tindex),
-		tv1 = _mesh->v1(tindex);
 #ifdef _DEBUG
 	_mesh->visCountIncr();
 #endif
@@ -784,6 +781,9 @@ ddgVisState ddgTBinTree::visibilityTriangle(ddgTriIndex tindex)
 // For debugging CRYSTAL SPACE
 	return ddgIN;
 #else
+	ddgTriIndex tva = parent(tindex),
+		tv0 = _mesh->v0(tindex),
+		tv1 = _mesh->v1(tindex);
 	int r0 = mrow(tv0), r1 = mrow(tv1), ra = mrow(tva), rmin, rmax;
 	int c0 = mcol(tv0), c1 = mcol(tv1), ca = mcol(tva), cmin, cmax;
 	// Bounding box is defined by points tva, v0 and v1.

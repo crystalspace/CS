@@ -345,14 +345,14 @@ bool ddgTBinMesh::calculate( ddgContext *ctx )
 	ddgTBinTree::updateContext(ctx,this);
 
 	// See if we moved.
-	if (lastPosition != ctx->control()->position())
+	if (lastPosition != *(ctx->control()->position()))
 	{
 		lastPosition -= ctx->control()->position();
 		deltaMoveDistance = lastPosition.size();
 		lastPosition = ctx->control()->position();
 	}
 	// See if we changed our orientation.
-	if (lastForward != ctx->forward())
+	if (lastForward != *(ctx->forward()))
 	{
 		deltaViewAngle = lastForward.dot(ctx->forward());
 		lastForward.set(ctx->forward());
@@ -498,8 +498,8 @@ bool ddgTBinMesh::calculate( ddgContext *ctx )
 	unsigned int count = 0;
 
 	ddgQNode *qn;
-	ddgTBinTree *sbt, *mbt;
-	ddgTriIndex si, mi;
+	ddgTBinTree *sbt = 0, *mbt;
+	ddgTriIndex si = 0, mi;
 	ddgPriority sp, mp;
 	ddgCacheIndex csi, cmi;
 	while (!done)
@@ -523,6 +523,7 @@ bool ddgTBinMesh::calculate( ddgContext *ctx )
 #ifdef _DEBUG
 			ddgAssert(sbt->tcacheId(qn->tindex()));
 			ddgTNode *tns = _tcache.get(sbt->tcacheId(qn->tindex()));
+			(void)tns;
 #endif
 		}
 		if (merge())
@@ -538,6 +539,7 @@ bool ddgTBinMesh::calculate( ddgContext *ctx )
 #ifdef _DEBUG
 				ddgAssert(mbt->tcacheId(qn->tindex()));
 				ddgTNode *tnm = _tcache.get(mbt->tcacheId(qn->tindex()));
+				(void)tnm;
 #endif
 				ddgAssert(sp == 0 || sp == qscache()->convert(qscache()->get(csi)->bucket()));
 				if (( _triVis > _maxDetail) // We have too many triangles.
