@@ -246,7 +246,8 @@ MSVC.SILENT = @
 endif
 
 MSVC.CVS.BASE = mk
-MSVC.OUT.BASE = $(OUTBASE)mk
+MSVC.OUT.BASE.0 = $(OUTBASE)mk
+MSVC.OUT.BASE = $(MSVC.OUT.BASE.0)/msvcgen
 ifeq ($(MSVCGEN_VERSION),6)
 MSVC.CVS.DIR = $(MSVC.CVS.BASE)/visualc
 MSVC.OUT.DIR = $(MSVC.OUT.BASE)/visualc
@@ -412,7 +413,10 @@ ifeq ($(MAKESECTION),targets)
 .PHONY: msvcgen msvcinst msvcgenclean dswgen
 
 # Directory creation targets.
-$(MSVC.OUT.BASE): $(OUTBASE)
+$(MSVC.OUT.BASE.0): $(OUTBASE)
+	-$(MSVC.SILENT)$(MKDIR)
+
+$(MSVC.OUT.BASE): $(MSVC.OUT.BASE.0)
 	-$(MSVC.SILENT)$(MKDIR)
 
 $(MSVC.OUT.DIR) $(MSVC.OUT.FRAGMENT): $(MSVC.OUT.BASE)
@@ -482,7 +486,13 @@ endif
 	@echo $(SEPARATOR)
 
 # Scrub the sink; mop the floor; wash the dishes; paint the door.
-clean: msvcgenclean
+clean: msvcgencleanall
+
+# Clean all files, regardless of MSVCGEN_VERSION.
+msvcgencleanall:
+	$(MSVC.SILENT)$(RMDIR) $(MSVC.OUT.BASE)
+
+# Clean the files the invocation specified by MSVCGEN_VERSION.
 msvcgenclean:
 	$(MSVC.SILENT)$(RMDIR) $(MSVC.OUT.DIR) $(MSVC.OUT.FRAGMENT)
 	

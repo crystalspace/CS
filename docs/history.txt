@@ -16,6 +16,8 @@ The history order is reversed so that new features are at the top.
 	      variables have a different scope on Windows than in Unix.)
 	    - Folded out a bunch of common code in the root targets makefile
 	      section.  This will reduce future maintenance headaches.
+	    - Fixed the global "clean" target so that it works correctly with
+	      the merged (msvc + msvc7) msvcgen makefile.
 	- Eric Sunshine added apps/import/caltocs to msvcgen/required.mak.
 4-Aug-2002
 	- Eric Sunshine made the following changes to mk/msvcgen/msvcgen.mak
