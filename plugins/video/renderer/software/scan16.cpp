@@ -753,9 +753,9 @@ void csScan_16_draw_scanline_fog_view_565 (int xx, unsigned char* d,
 
 //------------------------------------------------------------------
 
-#ifndef NO_draw_pifx_scanline_zfil_555
+#ifndef NO_draw_pifx_scanline_tex_zfil_555
 
-#define PI_SCANFUNC csScan_16_draw_pifx_scanline_zfil_555
+#define PI_SCANFUNC csScan_16_draw_pifx_scanline_tex_zfil_555
 #define PI_ZFILL
 #define PI_GOURAUD
 #define PI_R5G5B5
@@ -766,9 +766,9 @@ void csScan_16_draw_scanline_fog_view_565 (int xx, unsigned char* d,
 
 //------------------------------------------------------------------
 
-#ifndef NO_draw_pifx_scanline_zfil_565
+#ifndef NO_draw_pifx_scanline_tex_zfil_565
 
-#define PI_SCANFUNC csScan_16_draw_pifx_scanline_zfil_565
+#define PI_SCANFUNC csScan_16_draw_pifx_scanline_tex_zfil_565
 #define PI_ZFILL
 #define PI_GOURAUD
 #define PI_R5G6B5
@@ -779,9 +779,9 @@ void csScan_16_draw_scanline_fog_view_565 (int xx, unsigned char* d,
 
 //------------------------------------------------------------------
 
-#ifndef NO_draw_pifx_scanline_zuse_555
+#ifndef NO_draw_pifx_scanline_tex_zuse_555
 
-#define PI_SCANFUNC csScan_16_draw_pifx_scanline_zuse_555
+#define PI_SCANFUNC csScan_16_draw_pifx_scanline_tex_zuse_555
 #define PI_ZUSE
 #define PI_GOURAUD
 #define PI_R5G5B5
@@ -792,9 +792,9 @@ void csScan_16_draw_scanline_fog_view_565 (int xx, unsigned char* d,
 
 //------------------------------------------------------------------
 
-#ifndef NO_draw_pifx_scanline_zuse_565
+#ifndef NO_draw_pifx_scanline_tex_zuse_565
 
-#define PI_SCANFUNC csScan_16_draw_pifx_scanline_zuse_565
+#define PI_SCANFUNC csScan_16_draw_pifx_scanline_tex_zuse_565
 #define PI_ZUSE
 #define PI_GOURAUD
 #define PI_R5G6B5
@@ -805,9 +805,9 @@ void csScan_16_draw_scanline_fog_view_565 (int xx, unsigned char* d,
 
 //------------------------------------------------------------------
 
-#ifndef NO_draw_pifx_scanline_transp_zfil_555
+#ifndef NO_draw_pifx_scanline_tex_transp_zfil_555
 
-#define PI_SCANFUNC csScan_16_draw_pifx_scanline_transp_zfil_555
+#define PI_SCANFUNC csScan_16_draw_pifx_scanline_tex_transp_zfil_555
 #define PI_ZFILL
 #define PI_GOURAUD
 #define PI_R5G5B5
@@ -819,9 +819,9 @@ void csScan_16_draw_scanline_fog_view_565 (int xx, unsigned char* d,
 
 //------------------------------------------------------------------
 
-#ifndef NO_draw_pifx_scanline_transp_zfil_565
+#ifndef NO_draw_pifx_scanline_tex_transp_zfil_565
 
-#define PI_SCANFUNC csScan_16_draw_pifx_scanline_transp_zfil_565
+#define PI_SCANFUNC csScan_16_draw_pifx_scanline_tex_transp_zfil_565
 #define PI_ZFILL
 #define PI_GOURAUD
 #define PI_R5G6B5
@@ -833,9 +833,9 @@ void csScan_16_draw_scanline_fog_view_565 (int xx, unsigned char* d,
 
 //------------------------------------------------------------------
 
-#ifndef NO_draw_pifx_scanline_transp_zuse_555
+#ifndef NO_draw_pifx_scanline_tex_transp_zuse_555
 
-#define PI_SCANFUNC csScan_16_draw_pifx_scanline_transp_zuse_555
+#define PI_SCANFUNC csScan_16_draw_pifx_scanline_tex_transp_zuse_555
 #define PI_ZUSE
 #define PI_GOURAUD
 #define PI_R5G5B5
@@ -847,9 +847,9 @@ void csScan_16_draw_scanline_fog_view_565 (int xx, unsigned char* d,
 
 //------------------------------------------------------------------
 
-#ifndef NO_draw_pifx_scanline_transp_zuse_565
+#ifndef NO_draw_pifx_scanline_tex_transp_zuse_565
 
-#define PI_SCANFUNC csScan_16_draw_pifx_scanline_transp_zuse_565
+#define PI_SCANFUNC csScan_16_draw_pifx_scanline_tex_transp_zuse_565
 #define PI_ZUSE
 #define PI_GOURAUD
 #define PI_R5G6B5

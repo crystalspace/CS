@@ -197,6 +197,7 @@ int main (int argc, char *argv[])
     fprintf (f, "LIBRARY %s INITINSTANCE TERMINSTANCE\n", opt.modname);
     if (opt.description)
       fprintf (f, "DESCRIPTION \"%s\"\n", opt.description);
+    fprintf (f, "DATA NONSHARED\n");
     fprintf (f, "EXPORTS\n");
     fprintf (f, "	%s_GetClassTable\n", opt.modname);
   }

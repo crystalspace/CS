@@ -34,7 +34,7 @@ public:
 
   virtual void Loop ();
 
-  DECLARE_IBASE_EXT (csSystemDriver)
+  DECLARE_IBASE_EXT (csSystemDriver);
 
   virtual bool Open (const char *Title);
   virtual void Close ();

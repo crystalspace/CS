@@ -512,7 +512,7 @@ float csIntersect3::ZPlane(
   return r;
 }
 
-float csIntersect3::XFrustrum(
+float csIntersect3::XFrustum(
   float A, const csVector3& u, const csVector3& v, csVector3& isect)
 {
   float r = (A*u.x+u.z) / ( A*(u.x-v.x) + u.z-v.z );
@@ -522,7 +522,7 @@ float csIntersect3::XFrustrum(
   return r;
 }
 
-float csIntersect3::YFrustrum(
+float csIntersect3::YFrustum(
   float B, const csVector3& u, const csVector3& v, csVector3& isect)
 {
   float r = (B*u.y+u.z) / ( B*(u.y-v.y) + u.z-v.z );

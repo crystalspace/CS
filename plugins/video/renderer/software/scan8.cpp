@@ -320,35 +320,35 @@ void csScan_8_draw_scanline_fog_view (int xx, unsigned char* d,
 
 //------------------------------------------------------------------
 
-#ifndef NO_draw_pifx_scanline_zfil
+#ifndef NO_draw_pifx_scanline_tex_zfil
 
-#define PI_SCANFUNC csScan_8_draw_pifx_scanline_zfil
+#define PI_SCANFUNC csScan_8_draw_pifx_scanline_tex_zfil
 #define PI_ZFILL
 #define PI_GOURAUD
 #define PI_INDEX8
 #define PI_BLEND
 #include "scanpi.inc"
 
-#endif // NO_draw_pifx_scanline_zfil
+#endif
 
 //------------------------------------------------------------------
 
-#ifndef NO_draw_pifx_scanline_zuse
+#ifndef NO_draw_pifx_scanline_tex_zuse
 
-#define PI_SCANFUNC csScan_8_draw_pifx_scanline_zuse
+#define PI_SCANFUNC csScan_8_draw_pifx_scanline_tex_zuse
 #define PI_ZUSE
 #define PI_GOURAUD
 #define PI_INDEX8
 #define PI_BLEND
 #include "scanpi.inc"
 
-#endif // NO_draw_pifx_scanline_zuse
+#endif
 
 //------------------------------------------------------------------
 
-#ifndef NO_draw_pifx_scanline_transp_zfil
+#ifndef NO_draw_pifx_scanline_tex_transp_zfil
 
-#define PI_SCANFUNC csScan_8_draw_pifx_scanline_transp_zfil
+#define PI_SCANFUNC csScan_8_draw_pifx_scanline_tex_transp_zfil
 #define PI_ZFILL
 #define PI_GOURAUD
 #define PI_INDEX8
@@ -356,13 +356,13 @@ void csScan_8_draw_scanline_fog_view (int xx, unsigned char* d,
 #define PI_BLEND
 #include "scanpi.inc"
 
-#endif // NO_draw_pifx_scanline_transp_zfil
+#endif
 
 //------------------------------------------------------------------
 
-#ifndef NO_draw_pifx_scanline_transp_zuse
+#ifndef NO_draw_pifx_scanline_tex_transp_zuse
 
-#define PI_SCANFUNC csScan_8_draw_pifx_scanline_transp_zuse
+#define PI_SCANFUNC csScan_8_draw_pifx_scanline_tex_transp_zuse
 #define PI_ZUSE
 #define PI_GOURAUD
 #define PI_INDEX8
@@ -370,6 +370,6 @@ void csScan_8_draw_scanline_fog_view (int xx, unsigned char* d,
 #define PI_BLEND
 #include "scanpi.inc"
 
-#endif // NO_draw_pifx_scanline_transp_zuse
+#endif
 
 //------------------------------------------------------------------

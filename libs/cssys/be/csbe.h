@@ -37,7 +37,7 @@ protected:
 public:
   SysSystemDriver ();
 
-  DECLARE_IBASE_EXT (csSystemDriver)
+  DECLARE_IBASE_EXT (csSystemDriver);
 
   // Main event loop
   virtual void Loop ();

@@ -17,6 +17,7 @@
 */
 
 #include "sysdef.h"
+#include "csgeom/polyaa.h"
 #include "csengine/radiosty.h"
 #include "csengine/world.h"
 #include "csengine/sector.h"
@@ -230,7 +231,7 @@ void csRadPoly :: ApplyAmbient(int red, int green, int blue)
 /// the map and the width to draw in for draw_lumel_cov
 static int draw_lumel_cov_width = 0;
 static float *draw_lumel_coverage_map = 0;
-static void draw_lumel_cov( int x, int y, float density )
+static void draw_lumel_cov( int x, int y, float density, void * )
 {
   int addr = x + y * draw_lumel_cov_width;
   draw_lumel_coverage_map[addr] = density;
@@ -269,8 +270,7 @@ float* csRadPoly :: ComputeLumelCoverage()
     rp [i].y = (projector.y * hh - Imin_v) * inv_lightcell_size;
   }
   // draw the polygon in lumel space.
-  csPolyTexture::SetupPolyFill( draw_lumel_cov );
-  csPolyTexture::DoPolyFill( 0,0, width, height, rpv, rp);
+  csAntialiasedPolyFill (rp, rpv, NULL, draw_lumel_cov);
 
   //printf("Coverage map for %x (w=%d, h=%d)\n", (int)this, width, height);
   //printf("coords (%d): ", rpv);
@@ -700,8 +700,8 @@ void csRadiosity :: DoRadiosity()
     pulse->Step();
     // prepare to shoot from source (visibility, precompute, etc)
     PrepareShootSource(shoot);
-    // start the frustrum calcs.
-    StartFrustrum();
+    // start the frustum calcs.
+    StartFrustum();
     // have shot all from shootrad.
     shoot->CopyAndClearDelta();
     list->InsertElement(shoot); 
@@ -774,15 +774,15 @@ csRadPoly* csRadiosity :: FetchNext()
   return p;
 }
 
-static void frustrum_polygon_report_func (csObject *obj, csFrustrumView* lview);
-static void frustrum_curve_report_func (csObject *obj, csFrustrumView* lview);
+static void frustum_polygon_report_func (csObject *obj, csFrustumView* lview);
+static void frustum_curve_report_func (csObject *obj, csFrustumView* lview);
 static csVector3 plane_origin, plane_v1, plane_v2;
-void csRadiosity :: StartFrustrum()
+void csRadiosity :: StartFrustum()
 {
-  csFrustrumView *lview = new csFrustrumView();
+  csFrustumView *lview = new csFrustumView();
   lview->userdata = (void*) this;
-  lview->curve_func = frustrum_curve_report_func;
-  lview->poly_func = frustrum_polygon_report_func;
+  lview->curve_func = frustum_curve_report_func;
+  lview->poly_func = frustum_polygon_report_func;
   lview->radius = 10000000.0; // should be enough
   lview->sq_radius = lview->radius * lview->radius;
   lview->things_shadow = csPolyTexture::do_accurate_things; 
@@ -799,30 +799,30 @@ void csRadiosity :: StartFrustrum()
   // And this leads to sharper shadows as well.
   shoot_src->QuickLumel2World(center, shoot_src->GetWidth()/2.,
     shoot_src->GetHeight()/2.);
-  lview->light_frustrum = new csFrustrum (center);
-  lview->light_frustrum->MakeInfinite ();
-  // add a backplane to frustrum to clip to it... But which plane?
+  lview->light_frustum = new csFrustum (center);
+  lview->light_frustum->MakeInfinite ();
+  // add a backplane to frustum to clip to it... But which plane?
   //csPlane3 *src_plane = shoot_src->GetPolygon3D()->GetPolyPlane();
-  //lview->light_frustrum->SetBackPlane(* src_plane);
+  //lview->light_frustum->SetBackPlane(* src_plane);
   
   /// setup some vectors so we can test on plane location
   plane_origin = shoot_src->GetPolygon3D()->Vwor(0);
   plane_v1 = shoot_src->GetPolygon3D()->Vwor(1) - plane_origin;
   plane_v2 = shoot_src->GetPolygon3D()->Vwor(2) - plane_origin;
-  shoot_src->GetPolygon3D()->GetSector()->CheckFrustrum (*lview);
+  shoot_src->GetPolygon3D()->GetSector()->CheckFrustum (*lview);
 
   delete lview;
 }
 
 
-static void frustrum_curve_report_func (csObject *obj, csFrustrumView* lview)
+static void frustum_curve_report_func (csObject *obj, csFrustumView* lview)
 { 
   (void)obj;
   (void)lview;
   // empty for now
 }
 
-static void frustrum_polygon_report_func (csObject *obj, csFrustrumView* lview)
+static void frustum_polygon_report_func (csObject *obj, csFrustumView* lview)
 {
   csPolygon3D *destpoly3d = (csPolygon3D*)obj;
   csRadPoly *dest = csRadPoly::GetRadPoly(*destpoly3d); // obtain radpoly
@@ -840,11 +840,11 @@ static void frustrum_polygon_report_func (csObject *obj, csFrustrumView* lview)
 }
 
 
-void csRadiosity :: ProcessDest(csRadPoly *dest, csFrustrumView *lview)
+void csRadiosity :: ProcessDest(csRadPoly *dest, csFrustumView *lview)
 {
   if(shoot_src == dest) return; // different polys required. or we 
     			//might requeue 'shoot', and corrupt the list.
-  //if(!VisiblePoly(shoot_src, dest)) continue; // done by frustrum already
+  //if(!VisiblePoly(shoot_src, dest)) continue; // done by frustum already
   // prepare to send/receive light.
   PrepareShootDest(dest, lview);
   ShootRadiosityToPolygon(dest);
@@ -894,12 +894,12 @@ void csRadiosity :: PrepareShootSource(csRadPoly *src)
 
 static float *static_shadow_map = 0;
 static int static_shadow_width = 0;
-static void draw_light_frustrum(int x, int y, float density)
+static void draw_light_frustum(int x, int y, float density, void *)
 {
   int addr = x + y*static_shadow_width;
   static_shadow_map[addr] = density;
 }
-static void draw_shadow_frustrum(int x, int y, float density)
+static void draw_shadow_frustum(int x, int y, float density, void *)
 {
   int addr = x + y*static_shadow_width;
   float res = static_shadow_map[addr] - density;
@@ -907,7 +907,7 @@ static void draw_shadow_frustrum(int x, int y, float density)
   static_shadow_map[addr] = res;
 }
 
-void csRadiosity :: PrepareShootDest(csRadPoly *dest, csFrustrumView *lview)
+void csRadiosity :: PrepareShootDest(csRadPoly *dest, csFrustumView *lview)
 {
   shoot_dest = dest;
   // compute the factor for the light getting through. The same for
@@ -940,21 +940,21 @@ void csRadiosity :: PrepareShootDest(csRadPoly *dest, csFrustrumView *lview)
   for(int i=0; i<dest->GetSize(); i++)
     static_shadow_map[i] = 0.0; // start with none visible.
   //memset(static_shadow_map, 0, dest->GetSize() * sizeof(float));
-  // factor in light frustrum
-  MapFrustrum(lview->light_frustrum, draw_light_frustrum);
+  // factor in light frustum
+  MapFrustum(lview->light_frustum, draw_light_frustum);
   csRadPoly::FixCoverageMap(static_shadow_map, shoot_dest->GetWidth(),
     shoot_dest->GetHeight());
 
   // remove shadows
   // should be done by first acculumating shadows in one map,
   // and only then subtracting them, as shadows map overlap.
-  csShadowFrustrum *shadow = lview->shadows.GetFirst();
+  csShadowFrustum *shadow = lview->shadows.GetFirst();
   while(shadow)
   {
     // put shadow in map
     if(shadow->relevant && shadow->polygon != shoot_dest->GetPolygon3D() &&
       shadow->polygon != shoot_src ->GetPolygon3D() )
-        MapFrustrum(shadow, draw_shadow_frustrum);
+        MapFrustum(shadow, draw_shadow_frustum);
     shadow = shadow->next;
   }
 }
@@ -1103,8 +1103,8 @@ bool csRadiosity :: VisiblePoly(csRadPoly *src, csRadPoly *dest)
 }
 
 
-void csRadiosity :: MapFrustrum(csFrustrum *shad, 
-     void (*drawfunc)(int, int, float))
+void csRadiosity :: MapFrustum(csFrustum *shad, 
+     void (*drawfunc)(int, int, float, void*))
 {
   int i;
   int destnum = shoot_dest->GetPolygon3D()->GetNumVertices();
@@ -1112,7 +1112,7 @@ void csRadiosity :: MapFrustrum(csFrustrum *shad,
   for(i=0; i<destnum; i++)
     destpol[i] = shoot_dest->GetPolygon3D()->Vwor(i) - shad->GetOrigin();
   // maps using dest, onto shadow_map
-  csFrustrum* frust = shad->Intersect(destpol, destnum);
+  csFrustum* frust = shad->Intersect(destpol, destnum);
   delete destpol;
   if(!frust) return;
   /// the frust polygon is coplanar with us, so project onto lumel space
@@ -1142,9 +1142,7 @@ void csRadiosity :: MapFrustrum(csFrustrum *shad,
   }
 
   // paint onto shadow map
-  csPolyTexture::SetupPolyFill( drawfunc );
-  csPolyTexture::DoPolyFill( 0,0, shoot_dest->GetWidth(), 
-    shoot_dest->GetHeight(), rpv, rp);
+  csAntialiasedPolyFill (rp, rpv, NULL, drawfunc);
 
   delete frust;
 }

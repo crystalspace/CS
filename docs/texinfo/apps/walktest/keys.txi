@@ -54,8 +54,8 @@ files. When edges are on you will also see where all the lights are.
 Clicking on a light will select it (useful for the next key).
 
 @item @key{SHIFT}-e
-Toggle frustrum viewing on/off (default off). This is useful for debugging
-the engine. With this option you see the view frustrum around the selected
+Toggle frustum viewing on/off (default off). This is useful for debugging
+the engine. With this option you see the view frustum around the selected
 light (see the @key{e} key above). The white outlines are the shapes where
 the light may hit the polygon (ignoring radius of the light). The red lines
 connect the vertices of every outline with the center of the light.

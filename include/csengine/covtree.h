@@ -59,7 +59,7 @@ public:
   /**
    * Initialize the coverage mask tree with an inverted
    * polygon. This can be used after MakeEmpty() to set
-   * the coverage mask tree to the view frustrum.
+   * the coverage mask tree to the view frustum.
    */
   void UpdatePolygonInverted (csVector2* verts, int num_verts);
 

@@ -228,7 +228,7 @@ OS2LINK = ./os2link$(EXE)
 libs/cssys/os2/os2gcc.mak: $(OS2LINK)
 
 $(OS2LINK): libs/cssys/os2/support/os2link.cpp
-	$(LD) $(LFLAGS.@) $(CFLAGS.optimize) $(LFLAGS.optimize) $^
+	$(LD) $(LFLAGS.@) $(CFLAGS.optimize) $(LFLAGS.optimize) -Zomf -Zlinker /PM:VIO $^
 
 endif
 

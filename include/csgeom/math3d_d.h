@@ -668,17 +668,17 @@ public:
     csDVector3& isect);                    // intersection point
 
   /**
-   * Intersect a 3D segment with the frustrum plane Ax + z = 0.
+   * Intersect a 3D segment with the frustum plane Ax + z = 0.
    * Assumes an intersection, and returns the intersection point in isect.
    */
-  static double XFrustrum (
+  static double XFrustum (
     double A, const csDVector3& u, const csDVector3& v, csDVector3& isect);
 
   /**
-   * Intersect a 3D segment with the frustrum plane By + z = 0.
+   * Intersect a 3D segment with the frustum plane By + z = 0.
    * Assumes an intersection, and returns the intersection point in isect.
    */
-  static double YFrustrum (
+  static double YFrustum (
     double B, const csDVector3& u, const csDVector3& v, csDVector3& isect);
 };
 

@@ -20,11 +20,13 @@
 #define LIGHTMAP_H
 
 #include "csutil/scf.h"
+#include "csgfxldr/rgbpixel.h"
 #include "ilghtmap.h"
 
 class csPolyTexture;
 class csPolygonSet;
 class csPolygon3D;
+class csFrustumView;
 class csLight;
 class csWorld;
 class Dumper;
@@ -160,12 +162,15 @@ private:
    * Mean lighting value of this lightmap.
    * (only for static lighting currently).
    */
-  unsigned char mean_r;
-  unsigned char mean_g;
-  unsigned char mean_b;
+  RGBPixel mean_color;
 
   /// The hicolor cache ptr.
   void *cachedata;
+
+  /// Used when computing lightmaps to fill every lightmap only once
+  csFrustumView *last_lview;
+  /// The lighting cookie when last_lview was valid
+  int last_lighting_cookie;
 
   /**
    * Convert three lightmap tables to the right mixing mode.
@@ -189,8 +194,6 @@ public:
   static int lightcell_size;
   /// Log base 2 of lightcell_size
   static int lightcell_shift;
-  /// Align lightmap size to be a divider of this number
-  static int lightsize_align;
 
   ///
   csLightMap ();
@@ -250,12 +253,6 @@ public:
     csWorld* world);
 
   /**
-   * Scale the lightmap one step down. This is used in
-   * 'High Quality Lightmap Mode'.
-   */
-  void Scale2X (int w, int h);
-
-  /**
    * Convert the lightmaps to the correct mixing mode.
    * This function does nothing unless the mixing mode is
    * nocolor.<p>
@@ -272,10 +269,9 @@ public:
   /**
    * Set the size of one lightmap cell (default = 16).
    * Do not directly assign to the lightcell_size variable, as
-   * lightmap_shift also has to be updated. The "align" parameter
-   * tells how the lightmap size should be aligned (usually = 1 or 2)
+   * lightmap_shift also has to be updated.
    */
-  static void SetLightCellSize (int size, int align);
+  static void SetLightCellSize (int size);
 
   //------------------------ iLightMap implementation ------------------------
   DECLARE_IBASE;
@@ -301,7 +297,7 @@ public:
   { cachedata = d; }
   ///
   virtual void GetMeanLighting (int &r, int &g, int &b)
-  { r = mean_r; g = mean_g; b = mean_b; }
+  { r = mean_color.red; g = mean_color.green; b = mean_color.blue; }
   /// Get size of one lightmap
   virtual long GetSize ()
   { return lm_size; }

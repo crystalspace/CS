@@ -189,9 +189,9 @@ public:
   void InitLightMaps (bool do_cache = true);
 
   /**
-   * Check frustrum visibility on this thing.
+   * Check frustum visibility on this thing.
    */
-  void CheckFrustrum (csFrustrumView& lview);
+  void CheckFrustum (csFrustumView& lview);
 
   /**
    * Cache the lightmaps for all polygons in this thing.

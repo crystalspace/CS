@@ -128,8 +128,21 @@ static inline long QRound (double inval)
 }
 
 /**
+ * Add this constant to convert a floating-point value to 24.8
+ * fixed-point value.
+ */
+#define FIST_MAGIC_QINT8 (((65536.0 * 16.0) + 0.5) * 65536.0 * 256.0)
+
+/// Convert a floating-point number to 24.8 fixed-point value.
+inline long QInt8 (float inval)
+{
+  double dtemp = FIST_MAGIC_QINT8 + inval;
+  return ((*(long *)&dtemp) - 0x80000000);
+}
+
+/**
  * Add this constant to convert a floating-point value to 16.16
- * fixed-point value. In fact, this is FIST_MAGIC_QROUND/2^16
+ * fixed-point value.
  */
 #define FIST_MAGIC_QINT16 (((65536.0 * 16.0) + 0.5) * 65536.0)
 
@@ -141,8 +154,8 @@ inline long QInt16 (float inval)
 }
 
 /**
- * Add this constant to convert a floating-point value to 16.16
- * fixed-point value. In fact, this is FIST_MAGIC_QROUND/2^20
+ * Add this constant to convert a floating-point value to 8.24
+ * fixed-point value.
  */
 #define FIST_MAGIC_QINT24 (((65536.0 * 16.0) + 0.5) * 256.0)
 
@@ -156,6 +169,7 @@ inline long QInt24 (float inval)
 
 #define QRound(x) (int ((x)+.5))
 #define QInt(x)   (int (x))
+#define QInt8(x)  (int ((x)*256.))
 #define QInt16(x) (int ((x)*65536.))
 #define QInt24(x) (int ((x)*16777216.))
 	

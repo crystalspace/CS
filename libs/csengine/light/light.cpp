@@ -35,11 +35,12 @@
 int csLight::ambient_red = DEFAULT_LIGHT_LEVEL;
 int csLight::ambient_green = DEFAULT_LIGHT_LEVEL;
 int csLight::ambient_blue = DEFAULT_LIGHT_LEVEL;
+int csLight::lighting_cookie = 0;
 
 IMPLEMENT_CSOBJTYPE (csLight,csObject);
 
 csLight::csLight (float x, float y, float z, float d,
-	      float red, float green, float blue) : csObject()
+  float red, float green, float blue) : csObject()
 {
   center.x = x;
   center.y = y;
@@ -79,7 +80,7 @@ float csLight::GetBrightnessAtDistance (float d)
 }
 
 void csLight::CorrectForNocolor (unsigned char* rp, unsigned char* gp,
-					unsigned char* bp)
+  unsigned char* bp)
 {
 (void)rp; (void)gp; (void)bp;
 //@@@
@@ -162,8 +163,8 @@ void csLight::CorrectForNocolor (float* rp, float* gp, float* bp)
 IMPLEMENT_CSOBJTYPE (csStatLight,csLight);
 
 csStatLight::csStatLight (float x, float y, float z, float dist,
-	      float red, float green, float blue, bool dynamic)
-	      : csLight (x, y, z, dist, red, green, blue)
+  float red, float green, float blue, bool dynamic)
+  : csLight (x, y, z, dist, red, green, blue)
 {
   csStatLight::dynamic = dynamic;
   polygons = NULL;
@@ -175,13 +176,13 @@ csStatLight::~csStatLight ()
   CHK (delete [] polygons);
 }
 
-void poly_light_func (csObject* obj, csFrustrumView* lview)
+void poly_light_func (csObject* obj, csFrustumView* lview)
 {
   csPolygon3D* poly = (csPolygon3D*)obj;
   poly->CalculateLighting (lview);
 }
 
-void curve_light_func (csObject* obj, csFrustrumView* lview)
+void curve_light_func (csObject* obj, csFrustumView* lview)
 {
   csCurve* curve = (csCurve*)obj;
   curve->CalculateLighting (*lview);
@@ -194,7 +195,7 @@ void csStatLight::CalculateLighting ()
   if (cb) cb->MakeEmpty ();
   else cc->MakeEmpty ();
   //CsPrintf (MSG_INITIALIZATION, "  Shine light (%f,%f,%f).\n", center.x, center.y, center.z);
-  csFrustrumView lview;
+  csFrustumView lview;
   lview.userdata = (void*)this;
   lview.poly_func = poly_light_func;
   lview.curve_func = curve_light_func;
@@ -209,9 +210,10 @@ void csStatLight::CalculateLighting ()
   lview.b = GetColor ().blue;
   lview.dynamic = false;
 
-  CHK (lview.light_frustrum = new csFrustrum (center));
-  lview.light_frustrum->MakeInfinite ();
-  sector->CheckFrustrum (lview);
+  CHK (lview.light_frustum = new csFrustum (center));
+  lview.light_frustum->MakeInfinite ();
+  lighting_cookie++;
+  sector->CheckFrustum (lview);
 }
 
 void csStatLight::CalculateLighting (csThing* th)
@@ -221,7 +223,7 @@ void csStatLight::CalculateLighting (csThing* th)
   if (cb) cb->MakeEmpty ();
   else cc->MakeEmpty ();
   //CsPrintf (MSG_INITIALIZATION, "  Shine light (%f,%f,%f).\n", center.x, center.y, center.z);
-  csFrustrumView lview;
+  csFrustumView lview;
   lview.userdata = (void*)this;
   lview.poly_func = poly_light_func;
   lview.curve_func = curve_light_func;
@@ -236,9 +238,10 @@ void csStatLight::CalculateLighting (csThing* th)
   lview.b = GetColor ().blue;
   lview.dynamic = false;
 
-  CHK (lview.light_frustrum = new csFrustrum (center));
-  lview.light_frustrum->MakeInfinite ();
-  th->CheckFrustrum (lview);
+  CHK (lview.light_frustum = new csFrustum (center));
+  lview.light_frustum->MakeInfinite ();
+  lighting_cookie++;
+  th->CheckFrustum (lview);
 }
 
 void csStatLight::LightingFunc (csLightingFunc* callback, void* callback_data)
@@ -247,7 +250,7 @@ void csStatLight::LightingFunc (csLightingFunc* callback, void* callback_data)
   csCovcube* cc = csWorld::current_world->GetCovcube ();
   if (cb) cb->MakeEmpty ();
   else cc->MakeEmpty ();
-  csFrustrumView lview;
+  csFrustumView lview;
   lview.userdata = (void*)this;
   lview.poly_func = poly_light_func;
   lview.curve_func = curve_light_func;
@@ -264,9 +267,10 @@ void csStatLight::LightingFunc (csLightingFunc* callback, void* callback_data)
   lview.callback = callback;
   lview.callback_data = callback_data;
 
-  CHK (lview.light_frustrum = new csFrustrum (center));
-  lview.light_frustrum->MakeInfinite ();
-  sector->CheckFrustrum (lview);
+  CHK (lview.light_frustum = new csFrustum (center));
+  lview.light_frustum->MakeInfinite ();
+  lighting_cookie++;
+  sector->CheckFrustum (lview);
 }
 
 
@@ -336,7 +340,7 @@ void csLightPatch::RemovePatch ()
 {
   if (polygon) polygon->UnlinkLightpatch (this);
   if (light) light->UnlinkLightpatch (this);
-  shadows.DeleteFrustrums ();
+  shadows.DeleteFrustums ();
 }
 
 void csLightPatch::Initialize (int n)
@@ -355,8 +359,8 @@ void csLightPatch::Initialize (int n)
 IMPLEMENT_CSOBJTYPE (csDynLight,csLight);
 
 csDynLight::csDynLight (float x, float y, float z, float dist,
-	      float red, float green, float blue)
-	      : csLight (x, y, z, dist, red, green, blue)
+  float red, float green, float blue)
+  : csLight (x, y, z, dist, red, green, blue)
 {
   lightpatches = NULL;
 }
@@ -376,7 +380,7 @@ void csDynLight::Setup ()
   else cc->MakeEmpty ();
   while (lightpatches)
     csWorld::current_world->lightpatch_pool->Free (lightpatches);
-  csFrustrumView lview;
+  csFrustumView lview;
   lview.userdata = (void*)this;
   lview.poly_func = poly_light_func;
   lview.curve_func = curve_light_func;
@@ -391,9 +395,10 @@ void csDynLight::Setup ()
   lview.b = GetColor ().blue;
   lview.dynamic = true;
 
-  CHK (lview.light_frustrum = new csFrustrum (center));
-  lview.light_frustrum->MakeInfinite ();
-  sector->CheckFrustrum (lview);
+  CHK (lview.light_frustum = new csFrustum (center));
+  lview.light_frustum->MakeInfinite ();
+  lighting_cookie++;
+  sector->CheckFrustum (lview);
 }
 
 void csDynLight::Move (csSector* sector, float x, float y, float z)

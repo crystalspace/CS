@@ -29,7 +29,7 @@ class csVector3;
 class csLight;
 class csPolygon3D;
 class csRenderView;
-class csFrustrumView;
+class csFrustumView;
 struct csFog;
 struct iGraphics3D;
 struct iGraphics2D;
@@ -38,7 +38,7 @@ struct iGraphics2D;
 typedef void (csDrawFunc) (csRenderView* rview, int type, void* entity);
 
 /// A callback function for csLight::LightingFunc().
-typedef void (csLightingFunc) (csFrustrumView* lview, int type, void* entity);
+typedef void (csLightingFunc) (csFrustumView* lview, int type, void* entity);
 
 /**
  * Flags for the callbacks called via csWorld::DrawFunc() or
@@ -98,7 +98,7 @@ public:
   /// The 2D graphics subsystem used for drawing.
   iGraphics2D* g2d;
 
-  /// The view frustrum as defined at z=1.
+  /// The view frustum as defined at z=1.
   float leftx, rightx, topy, boty;
 
   /**
@@ -125,14 +125,14 @@ public:
   bool do_clip_plane;
 
   /**
-   * If true then we have to clip all objects to the portal frustrum
+   * If true then we have to clip all objects to the portal frustum
    * (either in 2D or 3D). Normally this is not needed but some portals
    * require this. If do_clip_plane is true then the value of this
    * field is also implied to be true. The top-level portal should
-   * set do_clip_frustrum to true in order for all geometry to be
+   * set do_clip_frustum to true in order for all geometry to be
    * correctly clipped to screen boundaries.
    */
-  bool do_clip_frustrum;
+  bool do_clip_frustum;
 
   /**
    * A callback function. If this is set then no drawing is done.
@@ -157,18 +157,18 @@ public:
 
   ///
   csRenderView () : csCamera (), view (NULL), g3d (NULL), g2d (NULL),
-  	portal_polygon (NULL), do_clip_plane (false), do_clip_frustrum (false),
+  	portal_polygon (NULL), do_clip_plane (false), do_clip_frustum (false),
 	callback (NULL), callback_data (NULL),
 	fog_info (NULL), added_fog_info (false) {}
   ///
   csRenderView (const csCamera& c) : csCamera (c), view (NULL), g3d (NULL), g2d (NULL),
-  	portal_polygon (NULL), do_clip_plane (false), do_clip_frustrum (false),
+  	portal_polygon (NULL), do_clip_plane (false), do_clip_frustum (false),
 	callback (NULL), callback_data (NULL),
 	fog_info (NULL), added_fog_info (false) {}
   ///
   csRenderView (const csCamera& c, csClipper* v, iGraphics3D* ig3d, iGraphics2D* ig2d) :
 	csCamera (c), view (v), g3d (ig3d), g2d (ig2d),
-	portal_polygon (NULL), do_clip_plane (false), do_clip_frustrum (false),
+	portal_polygon (NULL), do_clip_plane (false), do_clip_frustum (false),
 	callback (NULL), callback_data (NULL),
 	fog_info (NULL), added_fog_info (false) {}
 
@@ -176,8 +176,8 @@ public:
   void SetView (csClipper* v) { view = v; }
   ///
   void SetClipPlane (csPlane3& p) { clip_plane = p; }
-  /// Set the view frustrum at z=1.
-  void SetFrustrum (float lx, float rx, float ty, float by)
+  /// Set the view frustum at z=1.
+  void SetFrustum (float lx, float rx, float ty, float by)
   {
     leftx = lx;
     rightx = rx;
@@ -187,16 +187,16 @@ public:
 };
 
 /**
- * This class is a csFrustrum especially used for the lighting calculations.
- * It represents a shadow. It extends csFrustrum by adding 'next' and 'prev' for
+ * This class is a csFrustum especially used for the lighting calculations.
+ * It represents a shadow. It extends csFrustum by adding 'next' and 'prev' for
  * living in a linked list and it adds the 'polygon' member so that we can find
- * for which polygon this frustrum was generated.
+ * for which polygon this frustum was generated.
  */
-class csShadowFrustrum : public csFrustrum
+class csShadowFrustum : public csFrustum
 {
 public:
   /// Linked list.
-  csShadowFrustrum* next, * prev;
+  csShadowFrustum* next, * prev;
 
   /**
    * Polygon which generated this shadow.
@@ -204,51 +204,51 @@ public:
   csPolygon3D* polygon;
 
   /**
-   * Current sector when adding this frustrum. This is useful to find
-   * all shadow frustrums added in the same recursion level for one sector
+   * Current sector when adding this frustum. This is useful to find
+   * all shadow frustums added in the same recursion level for one sector
    * (together with draw_busy below).
    */
   csSector* sector;
 
   /**
    * draw_busy value of the sector when adding this
-   * frustrum. This is useful to find all shadow frustrums added
+   * frustum. This is useful to find all shadow frustums added
    * in the same recursion level for one sector.
    */
   int draw_busy;
 
   /**
-   * If true then this frustrum is relevant. This is
+   * If true then this frustum is relevant. This is
    * a temporary variable which is used during the lighting
    * calculation process. It may change value several times during
-   * the life time of a shadow frustrum.
+   * the life time of a shadow frustum.
    */
   bool relevant;
 
 public:
-  /// Create empty frustrum.
-  csShadowFrustrum (csVector3& origin) : csFrustrum (origin), next (NULL), prev (NULL), polygon (NULL) { }
+  /// Create empty frustum.
+  csShadowFrustum (csVector3& origin) : csFrustum (origin), next (NULL), prev (NULL), polygon (NULL) { }
 };
 
 /**
- * A list of frustrums.
+ * A list of frustums.
  */
-class csFrustrumList
+class csFrustumList
 {
 private:
-  csShadowFrustrum* first, * last;
+  csShadowFrustum* first, * last;
 
 public:
   /// Create an empty list.
-  csFrustrumList () : first (NULL), last (NULL) { }
+  csFrustumList () : first (NULL), last (NULL) { }
 
   /// Destroy the list but do not destroy the individual elements!
-  virtual ~csFrustrumList () { }
+  virtual ~csFrustumList () { }
 
-  /// Destroy all frustrums in the list.
-  void DeleteFrustrums ()
+  /// Destroy all frustums in the list.
+  void DeleteFrustums ()
   {
-    csShadowFrustrum* sf;
+    csShadowFrustum* sf;
     while (first)
     {
       sf = first->next;
@@ -262,17 +262,17 @@ public:
   void Clear () { first = last = NULL; }
 
   /// Get the first element in this list (or NULL if empty).
-  csShadowFrustrum* GetFirst () { return first; }
+  csShadowFrustum* GetFirst () { return first; }
 
   /// Get the last element in this list (or NULL if empty).
-  csShadowFrustrum* GetLast () { return last; }
+  csShadowFrustum* GetLast () { return last; }
 
   /**
    * Append a list to this one. Note that you
    * should not do any modifications on the other list
    * after this is done.
    */
-  void AppendList (csFrustrumList* list)
+  void AppendList (csFrustumList* list)
   {
     if (last)
     {
@@ -290,14 +290,14 @@ public:
   /**
    * Set the last element in this list. This basicly has
    * the effect of truncating the list to some specific element.
-   * Note that this function only works if the frustrum is actually
+   * Note that this function only works if the frustum is actually
    * part of the list. No checking is done. The elements which
    * are clipped of the list are unchanged (not deleted). You
-   * can relink or delete them if you want. If the given frustrum
+   * can relink or delete them if you want. If the given frustum
    * is NULL then this function has the same effect as making
    * the list empty.
    */
-  void SetLast (csShadowFrustrum* frust)
+  void SetLast (csShadowFrustum* frust)
   {
     if (frust)
     {
@@ -307,8 +307,8 @@ public:
     else { first = last = NULL; }
   }
 
-  /// Add a new frustrum to the front of the list.
-  void AddFirst (csShadowFrustrum* fr)
+  /// Add a new frustum to the front of the list.
+  void AddFirst (csShadowFrustum* fr)
   {
     fr->prev = NULL;
     fr->next = first;
@@ -317,8 +317,8 @@ public:
     if (!last) last = fr;
   }
 
-  /// Add a new frustrum to the back of the list.
-  void AddLast (csShadowFrustrum* fr)
+  /// Add a new frustum to the back of the list.
+  void AddLast (csShadowFrustum* fr)
   {
     fr->next = NULL;
     fr->prev = last;
@@ -327,8 +327,8 @@ public:
     if (!first) first = fr;
   }
 
-  /// Unlink a shadow frustrum from the list.
-  void Unlink (csShadowFrustrum* sf)
+  /// Unlink a shadow frustum from the list.
+  void Unlink (csShadowFrustum* sf)
   {
     if (sf->next) sf->next->prev = sf->prev;
     else last = sf->prev;
@@ -337,11 +337,11 @@ public:
   }
 
   /**
-   * Apply a transformation to all frustrums in this list.
+   * Apply a transformation to all frustums in this list.
    */
   void Transform (csTransform* trans)
   {
-    csShadowFrustrum* sf = first;
+    csShadowFrustum* sf = first;
     while (sf)
     {
       sf->Transform (trans);
@@ -350,26 +350,26 @@ public:
   }
 };
 
-class csFrustrumView;
+class csFrustumView;
 class csObject;
-typedef void (csFrustrumViewFunc)(csObject* obj, csFrustrumView* lview);
+typedef void (csFrustumViewFunc)(csObject* obj, csFrustumView* lview);
 
 /**
- * This structure represents all information needed for the frustrum
+ * This structure represents all information needed for the frustum
  * visibility calculator.
  * @@@ This structure needs some cleanup. It contains too many
  * fields that are lighting related. These should probably go to
  * the 'userdata'.
  */
-class csFrustrumView
+class csFrustumView
 {
 public:
   /// Data for the functions below.
   void* userdata;
   /// A function that is called for every polygon that is hit.
-  csFrustrumViewFunc* poly_func;
+  csFrustumViewFunc* poly_func;
   /// A function that is called for every curve that is hit.
-  csFrustrumViewFunc* curve_func;
+  csFrustumViewFunc* curve_func;
   /// If true the we process shadows for things.
   bool things_shadow;
 
@@ -389,7 +389,7 @@ public:
   bool mirror;
 
   /**
-   * If this structure is used for dynamic light frustrum calculation
+   * If this structure is used for dynamic light frustum calculation
    * then this flag is true.
    */
   bool dynamic;
@@ -407,17 +407,17 @@ public:
   bool gouraud_color_reset;
 
   /**
-   * The frustrum for the light. Everthing that falls in this frustrum
-   * is lit unless it also is in a shadow frustrum.
+   * The frustum for the light. Everthing that falls in this frustum
+   * is lit unless it also is in a shadow frustum.
    */
-  csFrustrum* light_frustrum;
+  csFrustum* light_frustum;
 
   /**
-   * The list of shadow frustrums. Note that this list will be
+   * The list of shadow frustums. Note that this list will be
    * expanded with every traversal through a portal but it needs
    * to be restored to original state again before returning.
    */
-  csFrustrumList shadows;
+  csFrustumList shadows;
 
   /**
    * A callback function. If this is set then no actual
@@ -431,12 +431,12 @@ public:
 
 public:
   ///
-  csFrustrumView () : light_frustrum (NULL), callback (NULL), callback_data (NULL) { }
+  csFrustumView () : light_frustum (NULL), callback (NULL), callback_data (NULL) { }
  
   ///
-  ~csFrustrumView ()
+  ~csFrustumView ()
   {
-    CHK (delete light_frustrum);
+    CHK (delete light_frustum);
   }
 };
 

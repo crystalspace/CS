@@ -689,8 +689,8 @@ void csPolygonSet::GetCameraMinMaxZ (float& minz, float& maxz)
 
 // @@@ We need a more clever algorithm here. We should try
 // to recognize convex sub-parts of a polygonset and return
-// convex shadow frustrums for those. This will significantly
-// reduce the number of shadow frustrums. There are basicly
+// convex shadow frustums for those. This will significantly
+// reduce the number of shadow frustums. There are basicly
 // two ways to do this:
 //	- Split object into convex sub-parts in 3D.
 //	- Split object into convex sub-parts in 2D.
@@ -699,10 +699,10 @@ void csPolygonSet::GetCameraMinMaxZ (float& minz, float& maxz)
 // and also more correct in that a convex 3D object has no internal
 // shadowing while a convex outline may have no correspondance to internal
 // shadows.
-csFrustrumList* csPolygonSet::GetShadows (csSector* sector, csVector3& origin)
+csFrustumList* csPolygonSet::GetShadows (csSector* sector, csVector3& origin)
 {
-  CHK (csFrustrumList* list = new csFrustrumList ());
-  csShadowFrustrum* frust;
+  CHK (csFrustumList* list = new csFrustumList ());
+  csShadowFrustum* frust;
   int i, j;
   csPolygon3D* p;
   bool cw = true; //@@@ Use mirroring parameter here!
@@ -714,7 +714,7 @@ csFrustrumList* csPolygonSet::GetShadows (csSector* sector, csVector3& origin)
     if (ABS (clas) < EPSILON) continue;
     if ((clas <= 0) != cw) continue;
 
-    CHK (frust = new csShadowFrustrum (origin));
+    CHK (frust = new csShadowFrustum (origin));
     frust->sector = sector;
     frust->draw_busy = sector->draw_busy;
     list->AddFirst (frust);

@@ -1,16 +1,16 @@
 /*
     Copyright (C) 1998 by Jorrit Tyberghein
-  
+
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
     License as published by the Free Software Foundation; either
     version 2 of the License, or (at your option) any later version.
-  
+
     This library is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
     Library General Public License for more details.
-  
+
     You should have received a copy of the GNU Library General Public
     License along with this library; if not, write to the Free
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
@@ -18,11 +18,11 @@
 
 #include <math.h>
 
-#define SYSDEF_ALLOCA
 #include "sysdef.h"
 #include "qint.h"
 #include "csgeom/fastsqrt.h"
-#include "csutil/bitset.h"
+#include "csgeom/polyclip.h"
+#include "csgeom/polyaa.h"
 #include "csengine/polytext.h"
 #include "csengine/polyplan.h"
 #include "csengine/polytmap.h"
@@ -46,7 +46,7 @@ float csPolyTexture::cfg_cosinus_factor = 0;
 IMPLEMENT_IBASE (csPolyTexture)
   IMPLEMENTS_INTERFACE (iPolygonTexture)
 IMPLEMENT_IBASE_END
-  
+
 csPolyTexture::csPolyTexture ()
 {
   CONSTRUCT_IBASE (NULL);
@@ -82,7 +82,7 @@ void csPolyTexture::CreateBoundingTextureBox ()
   csVector3 v1, v2;
   for (i = 0; i < polygon->GetVertices ().GetNumVertices (); i++)
   {
-    v1 = polygon->Vwor (i);   // Coordinates of vertex in world space.
+    v1 = polygon->Vwor (i);           // Coordinates of vertex in world space.
     v1 -= txt_pl->v_world2tex;
     v2 = (txt_pl->m_world2tex) * v1;  // Coordinates of vertex in texture space.
     if (v2.x < min_u) min_u = v2.x;
@@ -91,7 +91,7 @@ void csPolyTexture::CreateBoundingTextureBox ()
     if (v2.y > max_v) max_v = v2.y;
   }
 
-  // DAN: used in hardware accel drivers
+  // used in hardware accel drivers
   Fmin_u = min_u;
   Fmax_u = max_u;
   Fmin_v = min_v;
@@ -103,7 +103,7 @@ void csPolyTexture::CreateBoundingTextureBox ()
   Imin_v = QRound (min_v * hh);
   Imax_u = QRound (max_u * ww);
   Imax_v = QRound (max_v * hh);
-  
+
   h = Imax_v - Imin_v;
   w_orig = Imax_u - Imin_u;
   w = 1;
@@ -204,252 +204,173 @@ void csPolyTexture::InitLightMaps ()
 {
 }
 
-/*
- * Added by Denis Dmitriev for correct lightmaps shining. This code above draws
- * perfectly (like perfect texture mapping -- I mean most correctly)
- * anti-aliased polygon on lightmap and adjusts it according to the actual
- * polygon shape on the texture
- */
-#define EPS   0.0001
-
-float calc_area (int n, csVector2 *p)
+bool csPolyTexture::GetLightmapBounds (csFrustumView *lview, csVector3 *bounds)
 {
-  float area = 0;
+  // Take care not to fill same lightmap twice
+  if (!lm
+   || (lm->last_lview == lview
+    && lm->last_lighting_cookie == csLight::lighting_cookie))
+    return false;
+  lm->last_lview = lview;
+  lm->last_lighting_cookie = csLight::lighting_cookie;
 
-  for (int i = 0; i < n; i++)
+  csPolyTxtPlane *txt_pl = polygon->GetLightMapInfo ()->GetTxtPlane ();
+  csMatrix3 m_t2w = txt_pl->m_world2tex.GetInverse ();
+  csVector3 &v_t2w = txt_pl->v_world2tex;
+
+  int lmw = lm->rwidth;
+  int lmh = lm->rheight;
+  csVector3 &lightpos = lview->light_frustum->GetOrigin ();
+
+  int ww, hh;
+  txt_handle->GetMipMapDimensions (0, ww, hh);
+  float inv_ww = 1.0 / ww;
+  float inv_hh = 1.0 / hh;
+
+  // Calculate the responsability grid bounds as a polygon in world space.
+  for (int i = 0; i < 4; i++)
   {
-    int j = (i != n - 1) ? i + 1 : 0;
-    area += (p [i].y + p [j].y) * (p [i].x - p [j].x);
-  }
+    csVector3 v;
+    v.x = (i == 0 || i == 3) ? -0.5 : lmw - 0.5;
+    v.y = (i < 2) ? -0.5 : lmh - 0.5;
+    v.z = 0.0;
 
-  return fabs (area / 2.0);
+    v.x = ((v.x * lightcell_size) + Imin_u) * inv_ww;
+    v.y = ((v.y * lightcell_size) + Imin_v) * inv_hh;
+
+    v = (m_t2w * v + v_t2w) - lightpos;
+
+    bounds [lview->mirror ? 3 - i : i] = v;
+  } /* endfor */
+
+  return true;
 }
 
-static int __texture_width;
-static float *__texture;
-static unsigned char *__mark;
+//
+// Here goes a little theory about lightmap calculations (A.Z.).
+// Since lightmaps are bi-linearily interpolated (both for hardware and
+// software 3D drivers) and every light cell covers a relatively large number
+// of texels (typically 16x16), the lightmap is like a grid that covers the
+// actual lighted polygon. The picture below illustrates a lightmap grid
+// covering a irregular polygon:
+//
+//   0      1      2      3
+// 0 *------*------*-*====* Thick lines denotes the grid, thin lines represents
+//   #\     #      # |    # the polygon. Since the light cells are always square
+//   # \    #      # |    # (usually they are 16x16 texels) the lightmap is a
+//   #  \   #      # *    # bit larger than the polygon. The lightmap contains
+// 1 *===\==*======*/=====* the lighting values in the nodes, or crosses of the
+//   #    \ #      /      # lightmap grid. We will address lightmap cells as
+//   #     *------*#      # lm[x,y], for example the top-left lightmap cell is
+//   #      #      #      # lm[0,0], the bottom-right lightmap cell is lm[3,2].
+// 2 *======*======*======*
+//           fig.1
+//
+// Every lightmap cell is basically responsible for containing the average
+// light level for a certain area around the grid cross. We will consider
+// these areas as squares that are located around every grid cross (which
+// form another grid themselves, which we will call "responsability grid"
+// in the following):
+//
+//     a  0  b  1  c  2  d    Thick lines denotes the actual lightmap grid.
+//   a +..#..+..#..+..#..+    Dot lines shows the "responsability domain"
+//     :  #  :  #  :  #  :    for each lightmap cell. Thus, the lightmap
+// 0 =====*-----*-----*-*===  cell lm[0,0] is responsable for the following
+//     :  #\ :  #  :  # |:    area: [a,a] - [b,a] - [b,b] - [a,b]. This means
+//   b +..#.\+..#..+..#.|+    that the lighting value in the cell [0,0] should
+//     :  #  \  #  :  # *:    approximate the lightness of the entire mentioned
+// 1 =====*===\=*=====*/====  square. Mean square lightness is computed as
+//     :  #  : \#  :  /  :    light intensity in the lightmap grid cross
+//   c +..#..+..*----*#..+    multiplied by a factor that consist of:
+//     :  #  :  #  :  #  :    - Plus area of domain that is covered by light.
+// 2 =====*=====*=====*=====    That is, if light frustum is limited by
+//     :  #  :  #  :  #  :      something (e.g. a portal), we should see first
+//   d +..#..+..#..+..#..+      if the light covers given domain, and how much.
+//        #     #     #       - Minus area of domain that is covered by shadows.
+//           fig.2              Note that these areas can overlap, e.g. a light
+//                              can be blocked by a shadow.
+//
+// The part of sub-polygon that is covered by the light is computed in the
+// following way: first we clip all shadow frustums (in 2D) against the
+// light frustum. That is, the parts of "shadow polygons" that are outside
+// of the "light polygon" are removed. Then we clip every shadow polygon
+// against each other to get the common shadow area polygons, to compensate
+// later for doubly-shaded areas. The shadow polygons are left in their
+// original form, but we remember the result of each clipping.
+//
+// Finally, we proceed to split all polygons against the responsability grid:
+// one light polygon, several shadow polygons and several "doubly-shadowed"
+// polygons. The result of every split is the sub-area of polygon that falls
+// inside each grid cell. We initialize every cell of the lighting matrix to
+// zero, then we add to every cell the area of the light polygon and the area
+// of "doubly-shadowed" polygons; finally we subtract the area of shadow
+// polygons.
+//
 
-struct __rect
+// This is a private structure used while we build the light coverage data
+struct __light_coverage
 {
-  int left, right;
-  int top, bottom;
+  // The coverage array. Each float corresponds to a lightmap grid cell
+  // and contains the area of light cell that is covered by light.
+  float *coverage;
+  // The width and height of the coverage array
+  int width, height;
+
+  __light_coverage (int w, int h)
+  { coverage = (float *)calloc ((width = w) * (height = h), sizeof (float)); }
+  ~__light_coverage ()
+  { free (coverage); }
 };
 
-static void (*__draw_func)(int, int, float);
-
-static void lixel_intensity (int x, int y, float density)
+static void __add_PutPixel (int x, int y, float area, void *arg)
 {
-  int addr = x + y * __texture_width;
-
-  if (density >= 1.0)
-    density = 1.0;
-
-  __texture [addr] = density;
+  __light_coverage *lc = (__light_coverage *)arg;
+  lc->coverage [lc->width * y + x] += area;
 }
 
-static void correct_results (int x, int y, float density)
+static void __add_DrawBox (int x, int y, int w, int h, void *arg)
 {
-  if (density < EPS || density >= 1 - EPS)
-    return;
-
-  int addr = x + y * __texture_width;
-  float res = __texture [addr] / density;
-
-  if (res > 1)
-    res = 1;
-
-  __texture [addr] = res;
-  __mark [addr] = 1;
+  __light_coverage *lc = (__light_coverage *)arg;
+  int ofs = lc->width * y + x;
+  int delta = lc->width - w;
+  for (int yy = h; yy > 0; yy--)
+  {
+    for (int xx = w; xx > 0; xx--)
+      lc->coverage [ofs++] += 1.0;
+    ofs += delta;
+  } /* endfor */
 }
 
-/* I was interested in these values */
-static int max_depth = 0, depth = 0;
-
-static void poly_fill (int n, csVector2 *p2d, __rect &visible)
+static void __sub_PutPixel (int x, int y, float area, void *arg)
 {
-  depth++;
-
-  if (depth > max_depth)
-    max_depth = depth;
-
-  // Calculate the complete are of visible rectangle
-  int height = visible.bottom - visible.top;
-  int width = visible.right - visible.left;
-  int visarea = width * height;
-
-  // Sanity check
-  if (visarea <= 0)
-  {
-    depth--;
-    return;
-  }
-
-  // Calculate the complete area of the polygon
-  float a = calc_area (n, p2d);
-
-  // Check if polygon is hollow
-  if (a < EPS)
-  {
-    // this area is hollow
-    depth--;
-    return;
-  }
-
-  // Check if polygon surface equals the visible rectangle surface
-  if (fabs (a - visarea) < EPS)
-  {
-    // this area is completely covered
-
-    int x = visible.left, y = visible.top;
-    for (int i = 0 ; i < height; i++)
-      for (int j = 0 ; j < width; j++)
-        __draw_func (j + x, i + y, 1);
-
-    depth--;
-    return;
-  }
-
-  if (height == 1 && width == 1)
-  {
-    __draw_func (visible.left, visible.top, a);
-
-    depth--;
-    return;
-  }
-
-  int sub_x = visible.left + width / 2;
-  int sub_y = visible.top + height / 2;
-
-  // 0 -- horizontal
-  // 1 -- vertical
-  int how_to_divide = (height > width) ? 0 : 1;
-
-  int n2 [2];
-  csVector2 *p2 [2];
-
-  p2 [0] = (csVector2 *)alloca (sizeof (csVector2) * (n + 1));
-  p2 [1] = (csVector2 *)alloca (sizeof (csVector2) * (n + 1));
-
-  n2 [0] = n2 [1] = 0;
-
-  if (how_to_divide)
-  {
-    // Split the polygon vertically by the line "x = sub_x"
-    // (p2 [0] -- left poly, p2 [1] -- right poly)
-
-    int where_are_we = p2d [0].x > sub_x;
-    p2 [where_are_we] [n2 [where_are_we]++] = p2d [0];
-    for (int v = 1, prev = 0; v <= n; v++)
-    {
-      // Check whenever current vertex is on left or right side of divider
-      int cur = (v == n) ? 0 : v;
-      int now_we_are = p2d [cur].x > sub_x;
-
-      if (now_we_are == where_are_we)
-      {
-        // Do not add the first point since it will be added at the end
-        if (cur) p2 [where_are_we] [n2 [where_are_we]++] = p2d [cur];
-      }
-      else
-      {
-        // The most complex case: find the Y at intersection point
-        float y = p2d [prev].y + (p2d [cur].y - p2d [prev].y) *
-          (sub_x - p2d [prev].x) / (p2d [cur].x - p2d [prev].x);
-
-        // Add the intersection point to both polygons
-  	p2 [0] [n2 [0]++] = p2 [1] [n2 [1]++] = csVector2 (sub_x,y);
-
-  	if (cur) p2 [now_we_are] [n2 [now_we_are]++] = p2d [cur];
-      }
-
-      where_are_we = now_we_are;
-      prev = cur;
-    }
-
-    __rect u;
-    u.left = visible.left;
-    u.right = sub_x;
-    u.top = visible.top;
-    u.bottom = visible.bottom;
-    poly_fill (n2 [0], p2 [0], u);
-
-    u.left = sub_x;
-    u.right = visible.right;
-    poly_fill (n2[1], p2[1], u);
-  }
-  else
-  {
-    // Split the polygon horizontally by the line "y = sub_y"
-    // (p[0] -- top poly, p[1] -- bottom poly)
-
-    int where_are_we = p2d [0].y > sub_y;
-    p2 [where_are_we] [n2 [where_are_we]++] = p2d [0];
-    for (int v = 1, prev = 0; v <= n; v++)
-    {
-      // Check whenever current vertex is on top or down side of divider
-      int cur = (v == n) ? 0 : v;
-      int now_we_are = p2d [cur].y > sub_y;
-
-      if (now_we_are == where_are_we)
-      {
-        // Do not add the first point since it will be added at the end
-  	if (cur) p2 [where_are_we] [n2 [where_are_we]++] = p2d [cur];
-      }
-      else
-      {
-        // The most complex case: find the X at intersection point
-        float x = p2d [prev].x + (p2d [cur].x - p2d [prev].x) *
-          (sub_y - p2d [prev].y) / (p2d [cur].y - p2d [prev].y);
-
-        // Add the intersection point to both polygons
-  	p2 [0] [n2 [0]++] = p2 [1] [n2 [1]++] = csVector2 (x, sub_y);
-
-  	if (cur) p2 [now_we_are] [n2 [now_we_are]++] = p2d [cur];
-      }
-
-      where_are_we = now_we_are;
-      prev = cur;
-    }
-
-    __rect u;
-    u.left = visible.left;
-    u.right = visible.right;
-    u.top = visible.top;
-    u.bottom = sub_y;
-    poly_fill (n2[0], p2[0], u);
-
-    u.top = sub_y;
-    u.bottom = visible.bottom;
-    poly_fill (n2 [1], p2 [1], u);
-  }
-
-  depth--;
+  __light_coverage *lc = (__light_coverage *)arg;
+  lc->coverage [lc->width * y + x] -= area;
 }
 
-/* Modified by me to add nice lightmaps recalculations -- D.D. */
-void csPolyTexture::FillLightMap (csFrustrumView& lview)
+static void __sub_DrawBox (int x, int y, int w, int h, void *arg)
+{
+  __light_coverage *lc = (__light_coverage *)arg;
+  int ofs = lc->width * y + x;
+  int delta = lc->width - w;
+  for (int yy = h; yy > 0; yy--)
+  {
+    for (int xx = w; xx > 0; xx--)
+      lc->coverage [ofs++] -= 1.0;
+    ofs += delta;
+  } /* endfor */
+}
+
+void csPolyTexture::FillLightMap (csFrustumView& lview)
 {
   if (!lm) return;
-  csStatLight* light = (csStatLight*)lview.userdata;
 
-#define QUADTREE_SHADOW 0
-#if QUADTREE_SHADOW
-  csQuadcube* qc = csWorld::current_world->GetQuadcube ();
-#endif
-
-  int lw = lm->GetWidth ();
-  int lh = lm->GetHeight ();
-
-  int u, uv;
-
-  int l1, l2 = 0, l3 = 0;
-  float d, dl;
+  csStatLight *light = (csStatLight *)lview.userdata;
 
   int ww, hh;
   txt_handle->GetMipMapDimensions (0, ww, hh);
 
-  csPolyTxtPlane* txt_pl = polygon->GetLightMapInfo ()->GetTxtPlane ();
-  csPolyPlane* pl = polygon->GetPlane ();
+  csPolyTxtPlane *txt_pl = polygon->GetLightMapInfo ()->GetTxtPlane ();
+  csPolyPlane *pl = polygon->GetPlane ();
   float cosfact = polygon->GetCosinusFactor ();
   if (cosfact == -1) cosfact = cfg_cosinus_factor;
 
@@ -458,7 +379,7 @@ void csPolyTexture::FillLightMap (csFrustrumView& lview)
   // Mtw * T = W - Vwt
   // Mtw * T + Vwt = W
   csMatrix3 m_t2w = txt_pl->m_world2tex.GetInverse ();
-  csVector3 vv = txt_pl->v_world2tex;
+  csVector3 &v_t2w = txt_pl->v_world2tex;
 
   // From: Ax+By+Cz+D = 0
   // From: T = Mwt * (W - Vwt)
@@ -469,32 +390,25 @@ void csPolyTexture::FillLightMap (csFrustrumView& lview)
   float B = pl->GetWorldPlane ().B ();
   float C = pl->GetWorldPlane ().C ();
   float D = pl->GetWorldPlane ().D ();
-  float txt_A = A*m_t2w.m11 + B*m_t2w.m21 + C*m_t2w.m31;
-  float txt_B = A*m_t2w.m12 + B*m_t2w.m22 + C*m_t2w.m32;
-  float txt_C = A*m_t2w.m13 + B*m_t2w.m23 + C*m_t2w.m33;
-  float txt_D = A*txt_pl->v_world2tex.x + B*txt_pl->v_world2tex.y + C*txt_pl->v_world2tex.z + D;
+  float txt_A = A * m_t2w.m11 + B * m_t2w.m21 + C * m_t2w.m31;
+  float txt_B = A * m_t2w.m12 + B * m_t2w.m22 + C * m_t2w.m32;
+  float txt_C = A * m_t2w.m13 + B * m_t2w.m23 + C * m_t2w.m33;
+  float txt_D = A * txt_pl->v_world2tex.x +
+                B * txt_pl->v_world2tex.y +
+                C * txt_pl->v_world2tex.z + D;
 
-  csVector3 v1, v2(0);
+  float inv_ww = 1.0 / ww;
+  float inv_hh = 1.0 / hh;
 
-  int ru, rv;
-  float invww, invhh;
-  invww = 1. / (float)ww;
-  invhh = 1. / (float)hh;
+  unsigned char *mapR;
+  unsigned char *mapG;
+  unsigned char *mapB;
+  csShadowMap *smap = NULL;
 
-  bool hit;     // Set to true if there is a hit
+  bool hit = false;         // Set to true if there is a hit
   bool first_time = false;  // Set to true if this is the first pass for the dynamic light
-  int dyn;
+  bool dyn = light->IsDynamic ();
 
-  unsigned char* mapR;
-  unsigned char* mapG;
-  unsigned char* mapB;
-  csShadowMap* smap;
-
-  int i;
-  smap = NULL;
-  hit = false;
-
-  dyn = light->IsDynamic ();
   if (dyn)
   {
     smap = lm->FindShadowMap (light);
@@ -513,237 +427,147 @@ void csPolyTexture::FillLightMap (csFrustrumView& lview)
     mapB = lm->GetStaticMap ().GetBlue ();
   }
 
-  float miny = 1000000, maxy = -1000000;
-  int MaxIndex = -1, MinIndex = -1;
+  // We will compute the lighting of the entire lightmap, disregarding
+  // polygon bounds. This removes both the "black borders" and "white
+  // borders" problems. However, we should take care not to fill same
+  // lightmap twice, otherwise we'll get very bright lighting for
+  // shared lightmaps.
+  int lmw = lm->rwidth;
+  int lmh = lm->rheight;
+  csVector3 &lightpos = lview.light_frustum->GetOrigin ();
 
-  // Calculate the uv's for all points of the frustrum (the
-  // frustrum is actually a clipped version of the polygon).
-  csVector2* f_uv = NULL;
-
-  // Our polygon on its own texture space. Weird, isn't it? ;)
-  csVector2* rp = NULL;
-  int rpv=0;
-
-  csFrustrum* light_frustrum = lview.light_frustrum;
-  int num_frustrum = light_frustrum->GetNumVertices ();
-  csVector3* frustrum = light_frustrum->GetVertices ();
-  int mi;
-  CHK (f_uv = new csVector2 [num_frustrum]);
-
-  rpv = polygon->GetVertices ().GetNumVertices ();
-  CHK (rp = new csVector2 [rpv]);
-
-  csVector3 projector;
-
+  // Now allocate the space for the projected lighted polygon
+  int nvlf = lview.light_frustum->GetNumVertices ();
+  csVector3 *lf3d = lview.light_frustum->GetVertices ();
+  csVector2 *lf2d = (csVector2 *)alloca (nvlf * sizeof (csVector2));
+  // Project the light polygon from world space to responsability grid space
   float inv_lightcell_size = 1.0 / lightcell_size;
-  for (i = 0; i < rpv; i++)
+  int i, j, k;
+  for (i = 0; i < nvlf; i++)
   {
-    projector = txt_pl->m_world2tex * (polygon->Vwor (i) - txt_pl->v_world2tex);
-    rp [i].x = (projector.x * ww - Imin_u) * inv_lightcell_size + 0.5;
-    rp [i].y = (projector.y * hh - Imin_v) * inv_lightcell_size + 0.5;
-  }
-
-  for (i = 0; i < num_frustrum; i++)
-  {
-    if (lview.mirror)
-      mi = num_frustrum - i - 1;
-    else
-      mi = i;
-
     // T = Mwt * (W - Vwt)
-    v1 = txt_pl->m_world2tex *
-      (frustrum [mi] + light_frustrum->GetOrigin () - txt_pl->v_world2tex);
-    f_uv [i].x = (v1.x * ww - Imin_u) * inv_lightcell_size + 0.5;
-    f_uv [i].y = (v1.y * hh - Imin_v) * inv_lightcell_size + 0.5;
-    if (f_uv [i].y < miny) miny = f_uv [MinIndex = i].y;
-    if (f_uv [i].y > maxy) maxy = f_uv [MaxIndex = i].y;
+    csVector3 v = txt_pl->m_world2tex *
+      (lf3d [i] + lightpos - txt_pl->v_world2tex);
+    lf2d [i].x = (v.x * ww - Imin_u) * inv_lightcell_size + 0.5;
+    lf2d [i].y = (v.y * hh - Imin_v) * inv_lightcell_size + 0.5;
   }
 
-  csColor color = csColor (lview.r, lview.g, lview.b) * NORMAL_LIGHT_LEVEL;
+  // Create the light coverage array
+  __light_coverage lc (lmw, lmh);
 
-  __texture_width = lw;
-  __texture = (float *)calloc (lh * lw, sizeof (float));
-  __mark = (unsigned char *)calloc (lh, lw);
+  // Now fill the lightmap polygon with light coverage values
+  csAntialiasedPolyFill (lf2d, nvlf, &lc, __add_PutPixel, __add_DrawBox);
 
-  __rect vis = { 0, lw, 0, lh };
-
-  __draw_func = lixel_intensity;
-  poly_fill (num_frustrum, f_uv, vis);
-  __draw_func = correct_results;
-  poly_fill (rpv, rp, vis);
-
-  uv = 0;
-  for (int sy = 0; sy < lh; sy++)
+  // Now subtract all shadow polygons from the coverage matrix.
+  // At the same time, add the overlapping shadows to the coverage matrix.
+  int nsf = 0;
+  csShadowFrustum *csf = lview.shadows.GetFirst ();
+  while (csf) { nsf++; csf = csf->next; }
+  csPolygonClipper **sfc = (csPolygonClipper **)alloca (nsf * sizeof (csPolygonClipper *));
+  for (i = 0, csf = lview.shadows.GetFirst (); i < nsf; i++, csf = csf->next)
   {
-    for (u = 0; u < lw; u++, uv++)
+    sfc [i] = NULL;
+
+    if (!csf->relevant) continue;
+
+    csFrustum *shadow = csf->Intersect (*lview.light_frustum);
+    if (!shadow) continue;
+
+    // Translate the shadow frustum to polygon plane
+    int nv = shadow->GetNumVertices ();
+    csVector3 *s3d = shadow->GetVertices ();
+    // MAX_OUTPUT_VERTICES should be far too enough
+    csVector2 s2d [MAX_OUTPUT_VERTICES];
+    if (nv > MAX_OUTPUT_VERTICES) nv = MAX_OUTPUT_VERTICES;
+    for (j = 0; j < nv; j++)
     {
-      float usual_value = 1.0;
-
-      float lightintensity = __texture[uv];
-
-      if (!lightintensity)
-      {
-        usual_value = 0.0;
-
-        if (u && __mark [uv - 1])
-        {
-          lightintensity += __texture [uv - 1];
-          usual_value++;
-        }
-
-        if (sy && __mark [uv - lw])
-        {
-          lightintensity += __texture [uv - lw];
-          usual_value++;
-        }
-
-        if ((u != lw - 1) && __mark [uv + 1])
-        {
-          lightintensity += __texture [uv + 1];
-          usual_value++;
-        }
-
-        if ((sy != lh - 1) && __mark [uv + lw])
-        {
-          lightintensity += __texture [uv + lw];
-          usual_value++;
-        }
-
-        if (!lightintensity)
-          continue;
-      }
-
-      float lightness = lightintensity / usual_value;
-
-      //@@@todo
-      //The infamous Black Borders {tm} problem:
-      // we should set lightness == 1.0 for non-shared edges
-      // and leave it as-is for shared
-      //if (lightness) lightness = 1.0;
-
-      ru = u << lightcell_shift;
-      rv = sy << lightcell_shift;
-
-      // rc tests wether or not the lumel will be shadowed.
-      // If true then shadow.
-      bool rc = false;
-      int tst;
-      static int shift_u [5] = { 0, 2, 0, -2, 0 };
-      static int shift_v [5] = { 0, 0, 2, 0, -2 };
-      for (tst = 0 ; tst < 5 ; tst++)
-      {
-        v1.x = (float)(ru + shift_u [tst] + Imin_u) * invww;
-        v1.y = (float)(rv + shift_v [tst] + Imin_v) * invhh;
-        if (ABS (txt_C) < SMALL_EPSILON)
-          v1.z = 0;
-        else
-          v1.z = - (txt_D + txt_A*v1.x + txt_B*v1.y) / txt_C;
-        v2 = vv + m_t2w * v1;
-
-        // Check if the point on the polygon is shadowed. To do this
-        // we traverse all shadow frustrums and see if it is contained in any of them.
-        csShadowFrustrum *shadow_frust;
-        shadow_frust = lview.shadows.GetFirst ();
-        bool shadow = false;
-#if QUADTREE_SHADOW
-        int state = qc->TestPoint (v2-light_frustrum->GetOrigin ());
-        if (state == CS_QUAD_FULL)
-        {
-          // The quadtree indicates that we have shadow. However, it is possible
-          // that we have an adjacent polygon which gives false shadows. Therefor
-          // we test if the lumel coordinate falls outside the polygon and if so
-          // we do the full frustrum test below.
-          if (!light_frustrum->Contains (v2)) state = CS_QUAD_PARTIAL;
-        }
-
-        if (state == CS_QUAD_EMPTY) shadow = false;
-        else if (state == CS_QUAD_FULL) shadow = true;
-        else
-#endif
-        {
-          while (shadow_frust)
-          {
-            if (shadow_frust->relevant && shadow_frust->polygon != polygon)
-              if (shadow_frust->Contains (v2-shadow_frust->GetOrigin ()))
-                { shadow = true; break; }
-            shadow_frust = shadow_frust->next;
-          }
-        }
-        if (!shadow) { rc = false; break; }
-
-        if (!do_accurate_things) break;
-        rc = true;
-      }
-
-      if (!rc)
-      {
-        d = csSquaredDist::PointPoint (lview.light_frustrum->GetOrigin (), v2);
-        if (d >= light->GetSquaredRadius ()) continue;
-
-        d = FastSqrt (d);
-        hit = true;
-        l1 = mapR[uv];
-
-        float cosinus = (v2-lview.light_frustrum->GetOrigin ())*polygon->GetPolyPlane ()->Normal ();
-        cosinus /= d;
-        cosinus += cosfact;
-        if (cosinus < 0) cosinus = 0;
-        else if (cosinus > 1) cosinus = 1;
-
-        if (dyn)
-        {
-          dl = NORMAL_LIGHT_LEVEL/light->GetRadius ();
-          l1 = l1 + QRound (lightness*(cosinus * (NORMAL_LIGHT_LEVEL - d*dl)));
-          if (l1 > 255) l1 = 255;
-          mapR[uv] = l1;
-        }
-        else
-        {
-          float brightness = cosinus * light->GetBrightnessAtDistance (d);
-
-          if (lview.r > 0)
-          {
-            l1 = l1 + QRound (lightness * (color.red * brightness));
-            if (l1 > 255) l1 = 255;
-            mapR[uv] = l1;
-          }
-          if (lview.g > 0 && mapG)
-          {
-            l2 = mapG[uv] + QRound (lightness * (color.green * brightness));
-            if (l2 > 255) l2 = 255;
-            mapG[uv] = l2;
-          }
-          if (lview.b > 0 && mapB)
-          {
-            l3 = mapB[uv] + QRound (lightness * (color.blue * brightness));
-            if (l3 > 255) l3 = 255;
-            mapB[uv] = l3;
-          }
-        }
-      }
+      csVector3 v = txt_pl->m_world2tex *
+        (s3d [j] + lightpos - txt_pl->v_world2tex);
+      s2d [j].x = (v.x * ww - Imin_u) * inv_lightcell_size + 0.5;
+      s2d [j].y = (v.y * hh - Imin_v) * inv_lightcell_size + 0.5;
     }
-  }
 
-  CHK (delete [] f_uv);
-  CHK (delete [] rp);
+    // Now subtract the shadow from the coverage matrix
+    csAntialiasedPolyFill (s2d, nv, &lc, __sub_PutPixel, __sub_DrawBox);
 
-  free(__texture);
-  free(__mark);
+    // Create a polygon clipper from this shadow polygon
+    sfc [i] = new csPolygonClipper (s2d, nv, shadow->IsMirrored (), true);
 
-  if (dyn && first_time)
+    // Now subtract the common part of this and
+    // all previous shadows from the coverage matrix.
+    for (k = 0; k < i; k++)
+    {
+      if (!sfc [k]) continue;
+      // Intersect current shadow with one of the previous shadows
+      csVector2 sfi [MAX_OUTPUT_VERTICES];
+      int sfic;
+      if (sfc [k]->Clip (s2d, nv, sfi, sfic) == CS_CLIP_OUTSIDE)
+        continue;
+
+      // Now add the common shadow to the coverage matrix
+      csAntialiasedPolyFill (sfi, sfic, &lc, __add_PutPixel, __add_DrawBox);
+    } /* endfor */
+  } /* endfor */
+
+  // Free all shadow frustums
+  for (i = 0; i < nsf; i++)
+    delete sfc [i];
+
+  // Finally, use the light coverage values to compute the actual lighting
+  int covaddr = 0;
+  float light_r = lview.r * NORMAL_LIGHT_LEVEL;
+  float light_g = lview.g * NORMAL_LIGHT_LEVEL;
+  float light_b = lview.b * NORMAL_LIGHT_LEVEL;
+  for (i = 0; i < lmh; i++)
   {
-    if (!hit)
+    int uv = i * lm->GetWidth ();
+    for (j = 0; j < lmw; j++, uv++)
     {
-      // There was no hit. Just remove the dynamic light map from the polygon
-      // unless it was not allocated this turn.
-      lm->DelShadowMap (smap);
-    }
-    else
-    {
-      // There was a hit. Register this polygon with the light.
-      light->RegisterPolygon (polygon);
-    }
-  }
+      float lightness = lc.coverage [covaddr++];
+      if (lightness < EPSILON)
+        continue;
+
+      int ru = j << lightcell_shift;
+      int rv = i << lightcell_shift;
+
+      csVector3 v (float (ru + Imin_u) * inv_ww, float (rv + Imin_v) * inv_hh, 0);
+      if (ABS (txt_C) > SMALL_EPSILON)
+        v.z = - (txt_D + txt_A * v.x + txt_B * v.y) / txt_C;
+      v = v_t2w + m_t2w * v;
+
+      float d = csSquaredDist::PointPoint (lightpos, v);
+      if (d >= light->GetSquaredRadius ()) continue;
+
+      d = FastSqrt (d);
+      hit = true;
+
+      float cosinus = (v - lightpos) * polygon->GetPolyPlane ()->Normal ();
+      cosinus /= d;
+      cosinus += cosfact;
+      if (cosinus < 0)
+        cosinus = 0;
+      else if (cosinus > 1)
+        cosinus = 1;
+
+      int l;
+      float brightness = cosinus * light->GetBrightnessAtDistance (d);
+
+      if (dyn)
+      {
+        l = mapR [uv] + QRound (NORMAL_LIGHT_LEVEL * lightness * brightness);
+        mapR [uv] = l < 255 ? l : 255;
+      }
+      else
+      {
+        l = mapR [uv] + QRound (light_r * lightness * brightness);
+        mapR [uv] = l < 255 ? l : 255;
+        l = mapG [uv] + QRound (light_g * lightness * brightness);
+        mapG [uv] = l < 255 ? l : 255;
+        l = mapB [uv] + QRound (light_b * lightness * brightness);
+        mapB [uv] = l < 255 ? l : 255;
+      } /* endif */
+    } /* endfor */
+  } /* endfor */
 }
 
 /* Modified by me to correct some lightmap's border problems -- D.D. */
@@ -804,8 +628,8 @@ void csPolyTexture::ShineDynLightMap (csLightPatch* lp)
   int MaxIndex = -1, MinIndex = -1;
   float inv_lightcell_size = 1.0 / lightcell_size;
 
-  // Calculate the uv's for all points of the frustrum (the
-  // frustrum is actually a clipped version of the polygon).
+  // Calculate the uv's for all points of the frustum (the
+  // frustum is actually a clipped version of the polygon).
   csVector2* f_uv = NULL;
   if (lp->vertices)
   {
@@ -813,7 +637,7 @@ void csPolyTexture::ShineDynLightMap (csLightPatch* lp)
     CHK (f_uv = new csVector2 [lp->num_vertices]);
     for (i = 0 ; i < lp->num_vertices ; i++)
     {
-      //if (lview.mirror) mi = lview.num_frustrum-i-1;
+      //if (lview.mirror) mi = lview.num_frustum-i-1;
       //else mi = i;
       mi = i;
 
@@ -858,7 +682,7 @@ a:      if (scanR2 == MinIndex) goto finish;
         scanR1 = scanR2;
         scanR2 = (scanR2 + 1) % lp->num_vertices;
 
-        if(fabs(f_uv[scanR2].y-f_uv[MaxIndex].y)<EPS)
+        if (fabs (f_uv [scanR2].y - f_uv [MaxIndex].y) < EPSILON)
         {
           // oops! we have a flat bottom!
           goto a;
@@ -885,7 +709,7 @@ b:      if (scanL2 == MinIndex) goto finish;
         scanL1 = scanL2;
         scanL2 = (scanL2 - 1 + lp->num_vertices) % lp->num_vertices;
 
-        if(fabs(f_uv[scanL2].y-f_uv[MaxIndex].y)<EPS)
+        if (fabs (f_uv [scanL2].y - f_uv [MaxIndex].y) < EPSILON)
         {
           // oops! we have a flat bottom!
           goto b;
@@ -943,8 +767,8 @@ b:      if (scanL2 == MinIndex) goto finish;
         v2 = vv + m_t2w * v1;
 
 	// Check if the point on the polygon is shadowed. To do this
-	// we traverse all shadow frustrums and see if it is contained in any of them.
-	csShadowFrustrum* shadow_frust;
+	// we traverse all shadow frustums and see if it is contained in any of them.
+	csShadowFrustum* shadow_frust;
 	shadow_frust = lp->shadows.GetFirst ();
 	bool shadow = false;
 	while (shadow_frust)
@@ -1016,19 +840,6 @@ finish:
 
   CHK (delete [] f_uv);
 }
-
-void csPolyTexture::SetupPolyFill( void (*drawpixel)(int, int, float) )
-{
-  __draw_func = drawpixel;
-}
-
-void csPolyTexture::DoPolyFill(int left, int top, int width, int height,
-    int n, csVector2 *pol2d)
-{
-  __rect vis = {left, width, top, height};
-  poly_fill(n, pol2d, vis);
-}
-
 
 void csPolyTexture::GetTextureBox (float& fMinU, float& fMinV, float& fMaxU, float& fMaxV)
 {

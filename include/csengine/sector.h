@@ -120,7 +120,7 @@ private:
    * This function is called by the BSP tree traversal routine
    * to update the lighting for a number of polygons.
    */
-  static void* CheckFrustrumPolygons (csSector*, csPolygonInt** polygon,
+  static void* CheckFrustumPolygons (csSector*, csPolygonInt** polygon,
   	int num, void* data);
 
   /**
@@ -279,17 +279,17 @@ public:
   void InitLightMaps (bool do_cache = true);
 
   /**
-   * Check visibility in a frustrum way for all things and polygons in
+   * Check visibility in a frustum way for all things and polygons in
    * this sector and possibly traverse through portals to other sectors.
    */
-  void CheckFrustrum (csFrustrumView& lview);
+  void CheckFrustum (csFrustumView& lview);
 
   /**
-   * Get a list of all things which are visible in the given frustrum.
+   * Get a list of all things which are visible in the given frustum.
    * Return an array to pointers to visible things.
    * You must delete this array after you are ready using it.
    */
-  csThing** GetVisibleThings (csFrustrumView& lview, int& num_things);
+  csThing** GetVisibleThings (csFrustumView& lview, int& num_things);
 
   /**
    * Cache the lightmaps for all polygons in this sector.
@@ -352,9 +352,9 @@ public:
    * csSector::shine_lights for every sector in the world.
    * This function will call csStatLight::shine_lightmaps for every
    * light in the sector.
-   * csStatLight::shine_light will generate a view frustrum from the
+   * csStatLight::shine_light will generate a view frustum from the
    * center of the light and use that to light all polygons that
-   * are hit by the frustrum.
+   * are hit by the frustum.
    */
   void ShineLights (csProgressPulse* = 0);
 

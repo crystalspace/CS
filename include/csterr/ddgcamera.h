@@ -88,7 +88,7 @@ class WEXP ddgCamera
     ddgVector3			_forward;
     /// Camera's up vector (calculated).
 	ddgVector3			_up;
-	/// Box representing the camera's viewing frustrum.
+	/// Box representing the camera's viewing frustum.
     ddgBBox			_clipbox;
     /// Field of view (wideangle/zoom).
 	float			_fov;
@@ -129,9 +129,9 @@ class WEXP ddgCamera
 	void fov( float f) { _fov = f; _dirty = true; }
 	/// Return the field of vision angle of the camera.
 	float fov( void ) { return _fov; }
-	/// Modify the bounding box of the camera's viewing frustrum.
+	/// Modify the bounding box of the camera's viewing frustum.
 	void clipbox( ddgBBox *b) { _clipbox.set( b); _dirty = true; }
-	/// Return the bounding box of the camera's viewing frustrum.
+	/// Return the bounding box of the camera's viewing frustum.
 	ddgBBox *clipbox( void ) { return &_clipbox; }
 	/// Modify the external force moving the camera.
 	void delta( ddgVector3* d) { _delta.set( d); _dirty = true; }
@@ -207,7 +207,7 @@ class WEXP ddgCamera
     ddgMatrix4 *wtoc(void) { return &_mm; }
 	/// Set inverse matrix for objects which should always face the camera.
 	void uploadInvertRot();
-	/// Get frustrum clipping planes in world space coordinates.
+	/// Get frustum clipping planes in world space coordinates.
 	void extractPlanes(ddgPlane Planes[6]);
 
 }; 

@@ -437,37 +437,37 @@ public:
   }
 
   /**
-   * Intersect a 3D segment with the frustrum plane Ax + z = 0.
+   * Intersect a 3D segment with the frustum plane Ax + z = 0.
    * Assumes an intersection, and returns the intersection point in isect.
    */
-  static float XFrustrum (
+  static float XFrustum (
     float A, const csVector3& u, const csVector3& v, csVector3& isect);
 
   /**
-   * Intersect a 3D segment with the frustrum plane Ax + z = 0.
+   * Intersect a 3D segment with the frustum plane Ax + z = 0.
    * Assumes an intersection, and returns the intersection point in isect.
    */
-  static float XFrustrum (
+  static float XFrustum (
     float A, const csSegment3& uv, csVector3& isect)
   {
-    return XFrustrum (A, uv.Start (), uv.End (), isect);
+    return XFrustum (A, uv.Start (), uv.End (), isect);
   }
 
   /**
-   * Intersect a 3D segment with the frustrum plane By + z = 0.
+   * Intersect a 3D segment with the frustum plane By + z = 0.
    * Assumes an intersection, and returns the intersection point in isect.
    */
-  static float YFrustrum (
+  static float YFrustum (
     float B, const csVector3& u, const csVector3& v, csVector3& isect);
 
   /**
-   * Intersect a 3D segment with the frustrum plane By + z = 0.
+   * Intersect a 3D segment with the frustum plane By + z = 0.
    * Assumes an intersection, and returns the intersection point in isect.
    */
-  static float YFrustrum (
+  static float YFrustum (
     float B, const csSegment3& uv, csVector3& isect)
   {
-    return YFrustrum (B, uv.Start (), uv.End (), isect);
+    return YFrustum (B, uv.Start (), uv.End (), isect);
   }
 };
 

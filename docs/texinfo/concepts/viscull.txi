@@ -16,7 +16,7 @@ system are implemented though.
 * VIS entities:: Entities
 * VIS sector structure:: Sector Structure
 * VIS visibility culling:: Visibility Culling
-* VIS view frustrum culling:: View Frustrum Culling
+* VIS view frustum culling:: View Frustum Culling
 * VIS portal/Sector visibility:: Portal/Sector Visibility
 * VIS in Sector Visibility:: In-Sector Visibility
 * VIS PVS:: Potentially Visible Set (PVS)
@@ -158,7 +158,7 @@ So at the end you get a large octree with many mini-BSP trees at the
 leaves of the octree. This combined structure provides everything that
 CS needs for efficient visibility culling.
 
-@node VIS visibility culling, VIS view frustrum culling, VIS sector structure, Visibility Culling
+@node VIS visibility culling, VIS view frustum culling, VIS sector structure, Visibility Culling
 @subsection Visibility Culling
 
 Ok, here it comes. Given the above structure with sectors, entities,
@@ -200,16 +200,16 @@ added to the octree if there is one.
 
 @end table
 
-@node VIS view frustrum culling, VIS portal/Sector visibility, VIS visibility culling, Visibility Culling
-@subsection View Frustrum Culling
-@cindex View frustrum
+@node VIS view frustum culling, VIS portal/Sector visibility, VIS visibility culling, Visibility Culling
+@subsection View Frustum Culling
+@cindex View frustum
 
-View frustrum culling is the most obvious type of culling. CS does not
+View frustum culling is the most obvious type of culling. CS does not
 do it right now (see the following section about portal/sector visibility
 for the reason) but there are some areas where we should certainly do
 this. Detail objects are one example.
 
-@node VIS portal/Sector visibility, VIS in Sector Visibility, VIS view frustrum culling, Visibility Culling
+@node VIS portal/Sector visibility, VIS in Sector Visibility, VIS view frustum culling, Visibility Culling
 @subsection Portal/Sector Visibility
 
 Portal/sector visibility is based on 2D clipping. The 2D projected
@@ -236,7 +236,7 @@ rely on correct Z-buffer information. So you need to clip geometry
 to the 2D clipper).
 
 For detail objects we have a number of options. We can simply
-consider them visible is they are in the view frustrum and ignore
+consider them visible is they are in the view frustum and ignore
 portals all-together. Note that all detail objects are linked to a
 sector. If a sector is not traversed too (because the current viewable
 portals don't connect to that sector) then the detail objects in
@@ -267,7 +267,7 @@ that portal is also culled.
 @cindex c-buffer
 
 For a normal sector which has no octree in-sector visibility is really
-very simple. Everything which is not culled by the view frustrum or
+very simple. Everything which is not culled by the view frustum or
 the portal/sector visibility system is visible.
 
 If a sector has an octree then the situation is vastly different.

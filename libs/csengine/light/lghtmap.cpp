@@ -39,20 +39,13 @@ csShadowMap::~csShadowMap ()
 
 #define lightcell_size	csLightMap::lightcell_size
 #define lightcell_shift	csLightMap::lightcell_shift
-#define lightsize_align	csLightMap::lightsize_align
 
 void csShadowMap::Alloc (csLight*, int w, int h)
 {
   CHK (delete [] map); map = NULL;
 
-  // When doing twice smaller lightcells (high-quality-lightmaps)
-  // we should prepare the lightmaps EXACTLY twice bigger in both
-  // directions (width and height) otherwise we'll get black borders
-
-  int lw = (1 + ((w + (lightcell_size << lightsize_align) - 1)
-    >> (lightcell_shift + lightsize_align))) << lightsize_align;
-  int lh = (1 + ((h + (lightcell_size << lightsize_align) - 1)
-    >> (lightcell_shift + lightsize_align))) << lightsize_align;
+  int lw = 1 + ((w + lightcell_size - 1) >> lightcell_shift);
+  int lh = 1 + ((h + lightcell_size - 1) >> lightcell_shift);
 
   long lm_size = lw * lh;
   CHK (map = new unsigned char [lm_size]);
@@ -61,7 +54,6 @@ void csShadowMap::Alloc (csLight*, int w, int h)
 
 #undef lightcell_size
 #undef lightcell_shift
-#undef lightsize_align
 
 void csShadowMap::CopyLightMap (csShadowMap *source, int size)
 {
@@ -75,7 +67,6 @@ void csShadowMap::CopyLightMap (csShadowMap *source, int size)
 
 int csLightMap::lightcell_size = 16;
 int csLightMap::lightcell_shift = 4;
-int csLightMap::lightsize_align = 1;
 
 IMPLEMENT_IBASE (csLightMap)
   IMPLEMENTS_INTERFACE (iLightMap)
@@ -86,6 +77,7 @@ csLightMap::csLightMap ()
   CONSTRUCT_IBASE (NULL);
   first_smap = NULL;
   cachedata = NULL;
+  last_lview = NULL;
 }
 
 csLightMap::~csLightMap ()
@@ -100,11 +92,10 @@ csLightMap::~csLightMap ()
   real_lm.Clear ();
 }
 
-void csLightMap::SetLightCellSize (int size, int align)
+void csLightMap::SetLightCellSize (int size)
 {
   lightcell_size = size;
   lightcell_shift = csLog2 (size);
-  lightsize_align = csLog2 (align);
 }
 
 void csLightMap::DelShadowMap (csShadowMap* smap)
@@ -113,7 +104,7 @@ void csLightMap::DelShadowMap (csShadowMap* smap)
   CHK (delete smap);
 }
 
-csShadowMap* csLightMap::NewShadowMap (csLight* light, int w, int h)
+csShadowMap *csLightMap::NewShadowMap (csLight* light, int w, int h)
 {
   CHK (csShadowMap *smap = new csShadowMap ());
   smap->light = light;
@@ -138,18 +129,9 @@ csShadowMap* csLightMap::FindShadowMap (csLight* light)
 
 void csLightMap::SetSize (int w, int h)
 {
-  // When doing twice smaller lightcells (high-quality-lightmaps)
-  // we should prepare the lightmaps EXACTLY twice bigger in both
-  // directions (width and height) otherwise we'll get black borders
-
-  lwidth  = (1 + ((w + (lightcell_size << lightsize_align) - 1)
-    >> (lightcell_shift + lightsize_align))) << lightsize_align;
-  lheight = (1 + ((h + (lightcell_size << lightsize_align) - 1)
-    >> (lightcell_shift + lightsize_align))) << lightsize_align;
-
+  rwidth  = lwidth  = 1 + ((w + lightcell_size - 1) >> lightcell_shift);
+  rheight = lheight = 1 + ((h + lightcell_size - 1) >> lightcell_shift);
   lm_size = lwidth * lheight;
-  rwidth  = lwidth;
-  rheight = lheight;
 }
 
 void csLightMap::Alloc (int w, int h, int r, int g, int b)
@@ -428,76 +410,6 @@ void csLightMap::Cache (csPolygonSet* owner, csPolygon3D* poly, int index, csWor
   }
 }
 
-void csLightMap::Scale2X (int w, int h)
-{
-  csRGBLightMap old_static_lm;
-  old_static_lm.Copy (static_lm, lm_size);
-  int old_rwidth = rwidth;
-  int old_rheight = rheight;
-  Alloc (w, h, 0, 0, 0);
-
-  // Sanity check: new width/height should be exactly twice smaller than old
-#ifdef CS_DEBUG
-  if (rwidth * 2 != old_rwidth || rheight * 2 != old_rheight)
-    DEBUG_BREAK;
-#endif
-
-  int x, y, new_val;
-  unsigned char* mr, * mg, * mb;
-  mr = static_lm.GetRed ();
-  mg = static_lm.GetGreen ();
-  mb = static_lm.GetBlue ();
-  unsigned char* old_mr, * old_mg, * old_mb;
-  old_mr = old_static_lm.GetRed ();
-  old_mg = old_static_lm.GetGreen ();
-  old_mb = old_static_lm.GetBlue ();
-  for (y = 0; y < old_rheight - 1 ; y += 2)
-    for (x = 0; x < old_rwidth - 1 ; x += 2)
-    {
-      int old_idx = y * old_rwidth + x;
-      int new_idx = (y >> 1) * rwidth + (x >> 1);
-      new_val = ((int)old_mr [old_idx]) +
-      	        ((int)old_mr [old_idx + 1]) +
-      	        ((int)old_mr [old_idx + old_rwidth]) +
-      	        ((int)old_mr [old_idx + old_rwidth + 1]);
-      mr[new_idx] = new_val / 4;
-      new_val = ((int)old_mg [old_idx]) +
-      	        ((int)old_mg [old_idx + 1]) +
-      	        ((int)old_mg [old_idx + old_rwidth]) +
-      	        ((int)old_mg [old_idx + old_rwidth + 1]);
-      mg[new_idx] = new_val / 4;
-      new_val = ((int)old_mb [old_idx]) +
-      	        ((int)old_mb [old_idx+1]) +
-      	        ((int)old_mb [old_idx+old_rwidth]) +
-      	        ((int)old_mb [old_idx+old_rwidth + 1]);
-      mb[new_idx] = new_val / 4;
-    }
-
-  // Scale all shadowmaps as well.
-  csShadowMap* smap = first_smap;
-  while (smap)
-  {
-    unsigned char* oldmap = smap->map;
-    smap->map = NULL;
-    smap->Alloc (smap->light, w, h);
-    for (y = 0 ; y < old_rheight - 1 ; y += 2)
-    {
-      for (x = 0 ; x < old_rwidth - 1 ; x += 2)
-      {
-        int old_idx = y * old_rwidth + x;
-        int new_idx = (y >> 1) * rwidth + (x >> 1);
-        new_val = ((int)oldmap [old_idx]) +
-      	          ((int)oldmap [old_idx + 1]) +
-      	          ((int)oldmap [old_idx + old_rwidth]) +
-      	          ((int)oldmap [old_idx + old_rwidth + 1]);
-        smap->map [new_idx] = new_val / 4;
-      }
-    }
-    CHK (delete [] oldmap);
-    smap = smap->next;
-  }
-}
-
 void csLightMap::ConvertToMixingMode ()
 {
   int i;
@@ -515,9 +427,9 @@ void csLightMap::ConvertToMixingMode ()
     meg += mg[i];
     meb += mb[i];
   }
-  mean_r = mer/lm_size;
-  mean_g = meg/lm_size;
-  mean_b = meb/lm_size;
+  mean_color.red   = mer/lm_size;
+  mean_color.green = meg/lm_size;
+  mean_color.blue  = meb/lm_size;
 
   //@@@
   //if (Textures::mixing == MIX_TRUE_RGB) return;

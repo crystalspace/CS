@@ -31,8 +31,8 @@ class csLightMap;
 class csRGBLightMap;
 class csProgressMeter;
 class csProgressPulse;
-class csFrustrumView;
-class csShadowFrustrum;
+class csFrustumView;
+class csShadowFrustum;
 
 /**
  *  A radiosity polygon, containing lightmap patches, the lumels.
@@ -152,7 +152,7 @@ public:
   csRGBLightMap *ComputeTextureLumelSized();
 
   /**
-   *  Fix a float* map with a polygon or lightfrustrum projected onto
+   *  Fix a float* map with a polygon or lightfrustum projected onto
    *  it, for laterinterpolation.
    */
   static void FixCoverageMap(float* map, int width, int height);
@@ -282,16 +282,16 @@ public:
 
   /// get next best poly to shoot, or NULL if we should stop.
   csRadPoly* FetchNext();
-  /// Start a sector frustrum to shoot from the source. callback is used.
-  void StartFrustrum();
+  /// Start a sector frustum to shoot from the source. callback is used.
+  void StartFrustum();
   /// found a destination polygon, test and process it
-  void ProcessDest(csRadPoly *dest, csFrustrumView *lview);
+  void ProcessDest(csRadPoly *dest, csFrustumView *lview);
   /// Shoot light from one polygon to another
   void ShootRadiosityToPolygon(csRadPoly* dest);
   /// Prepare to shoot from source poly
   void PrepareShootSource(csRadPoly* src);
   /// Prepare to shoot from source to dest 
-  void PrepareShootDest(csRadPoly* dest, csFrustrumView *lview);
+  void PrepareShootDest(csRadPoly* dest, csFrustumView *lview);
   /// Prepare to shoot from a lumel
   void PrepareShootSourceLumel(int sx, int sy, int suv);
   /// Shoot it, dest lumel given.
@@ -310,8 +310,8 @@ public:
   void RemoveAmbient();
   /// check if dest poly is visible to source poly
   bool VisiblePoly(csRadPoly *src, csRadPoly *dest);
-  /// map a frustrum using given drawfunc.
-  void MapFrustrum(csFrustrum *shad, void (*drawfunc)(int, int, float));
+  /// map a frustum using given drawfunc.
+  void MapFrustum(csFrustum *shad, void (*drawfunc)(int, int, float, void*));
 
 };
 

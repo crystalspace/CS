@@ -296,13 +296,13 @@ csDrawPIScanlineGouraud csScan_8_draw_pi_scanline_flat_gouraud_zfil;
 csDrawPIScanlineGouraud csScan_8_draw_pi_scanline_flat_gouraud_zuse;
 
 /// Draw a perspective-incorrect polygon scanline with various effects Z fill only
-csDrawPIScanlineGouraud csScan_8_draw_pifx_scanline_zfil;
+csDrawPIScanlineGouraud csScan_8_draw_pifx_scanline_tex_zfil;
 /// Draw a perspective-incorrect polygon scanline with various effects
-csDrawPIScanlineGouraud csScan_8_draw_pifx_scanline_zuse;
+csDrawPIScanlineGouraud csScan_8_draw_pifx_scanline_tex_zuse;
 /// Draw a perspective-incorrect polygon scanline with various effects Z fill only (colorkeying)
-csDrawPIScanlineGouraud csScan_8_draw_pifx_scanline_transp_zfil;
+csDrawPIScanlineGouraud csScan_8_draw_pifx_scanline_tex_transp_zfil;
 /// Draw a perspective-incorrect polygon scanline with various effects (colorkeying)
-csDrawPIScanlineGouraud csScan_8_draw_pifx_scanline_transp_zuse;
+csDrawPIScanlineGouraud csScan_8_draw_pifx_scanline_tex_transp_zuse;
 
 #ifdef DO_MMX
 /// Draw one horizontal scanline (lighting) using MMX
@@ -386,21 +386,21 @@ csDrawPIScanlineGouraud csScan_16_draw_pi_scanline_flat_gouraud_zuse_555;
 csDrawPIScanlineGouraud csScan_16_draw_pi_scanline_flat_gouraud_zuse_565;
 
 /// Draw a perspective-incorrect polygon scanline with various effects Z fill only
-csDrawPIScanlineGouraud csScan_16_draw_pifx_scanline_zfil_555;
+csDrawPIScanlineGouraud csScan_16_draw_pifx_scanline_tex_zfil_555;
 /// Draw a perspective-incorrect polygon scanline with various effects Z fill only
-csDrawPIScanlineGouraud csScan_16_draw_pifx_scanline_zfil_565;
+csDrawPIScanlineGouraud csScan_16_draw_pifx_scanline_tex_zfil_565;
 /// Draw a perspective-incorrect polygon scanline with various effects
-csDrawPIScanlineGouraud csScan_16_draw_pifx_scanline_zuse_555;
+csDrawPIScanlineGouraud csScan_16_draw_pifx_scanline_tex_zuse_555;
 /// Draw a perspective-incorrect polygon scanline with various effects
-csDrawPIScanlineGouraud csScan_16_draw_pifx_scanline_zuse_565;
+csDrawPIScanlineGouraud csScan_16_draw_pifx_scanline_tex_zuse_565;
 /// Draw a perspective-incorrect polygon scanline with various effects Z fill only (colorkeying)
-csDrawPIScanlineGouraud csScan_16_draw_pifx_scanline_transp_zfil_555;
+csDrawPIScanlineGouraud csScan_16_draw_pifx_scanline_tex_transp_zfil_555;
 /// Draw a perspective-incorrect polygon scanline with various effects Z fill only (colorkeying)
-csDrawPIScanlineGouraud csScan_16_draw_pifx_scanline_transp_zfil_565;
+csDrawPIScanlineGouraud csScan_16_draw_pifx_scanline_tex_transp_zfil_565;
 /// Draw a perspective-incorrect polygon scanline with various effects (colorkeying)
-csDrawPIScanlineGouraud csScan_16_draw_pifx_scanline_transp_zuse_555;
+csDrawPIScanlineGouraud csScan_16_draw_pifx_scanline_tex_transp_zuse_555;
 /// Draw a perspective-incorrect polygon scanline with various effects (colorkeying)
-csDrawPIScanlineGouraud csScan_16_draw_pifx_scanline_transp_zuse_565;
+csDrawPIScanlineGouraud csScan_16_draw_pifx_scanline_tex_transp_zuse_565;
 
 #if defined (DO_MMX) && !defined (DO_NASM)
 // There are no MMX perspective-incorrect routines for GAS and VC assembler
@@ -472,13 +472,13 @@ csDrawPIScanlineGouraud csScan_32_draw_pi_scanline_tex_gouraud_zfil;
 csDrawPIScanlineGouraud csScan_32_draw_pi_scanline_tex_gouraud_zuse;
 
 /// Draw a perspective-incorrect polygon scanline with various effects Z fill only
-csDrawPIScanlineGouraud csScan_32_draw_pifx_scanline_zfil;
+csDrawPIScanlineGouraud csScan_32_draw_pifx_scanline_tex_zfil;
 /// Draw a perspective-incorrect polygon scanline with various effects
-csDrawPIScanlineGouraud csScan_32_draw_pifx_scanline_zuse;
+csDrawPIScanlineGouraud csScan_32_draw_pifx_scanline_tex_zuse;
 /// Draw a perspective-incorrect polygon scanline with various effects Z fill (colorkeying)
-csDrawPIScanlineGouraud csScan_32_draw_pifx_scanline_transp_zfil;
+csDrawPIScanlineGouraud csScan_32_draw_pifx_scanline_tex_transp_zfil;
 /// Draw a perspective-incorrect polygon scanline with various effects (colorkeying)
-csDrawPIScanlineGouraud csScan_32_draw_pifx_scanline_transp_zuse;
+csDrawPIScanlineGouraud csScan_32_draw_pifx_scanline_tex_transp_zuse;
 
 #if defined (DO_MMX) && defined (DO_NASM)
 /// Draw a perspective-incorrect texture mapped polygon scanline using MMX

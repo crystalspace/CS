@@ -4159,14 +4159,11 @@ bool csLoader::LoadWorldFile (csWorld* world, LanguageLayer* layer, const char* 
   if (cfg)
   {
     csLightMap::SetLightCellSize (cfg->GetInt ("Lighting", "LIGHTMAP_SIZE",
-    	csLightMap::lightcell_size), 1);
-    csWorld::do_lightmap_highqual = cfg->GetInt ("Lighting", "LIGHTMAP_HIGHQUAL",
-    	csWorld::do_lightmap_highqual);
+    	csLightMap::lightcell_size));
     CHK (delete cfg);
   }
-  CsPrintf (MSG_INITIALIZATION, "Lightmap grid size = %dx%d%s.\n",
-      csLightMap::lightcell_size, csLightMap::lightcell_size,
-      csWorld::do_lightmap_highqual ? " (high quality)" : " (normal quality)");
+  CsPrintf (MSG_INITIALIZATION, "Lightmap grid size = %dx%d.\n",
+      csLightMap::lightcell_size, csLightMap::lightcell_size);
 
   if (!LoadWorld (buf))
     return false;

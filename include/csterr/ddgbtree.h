@@ -57,7 +57,7 @@ class WEXP ddgMTri {
 	 */
 	unsigned short _cbufindex;
     /**
-	 * The state which indicates whether we are visible w.r.t. the viewing frustrum. (1 byte)
+	 * The state which indicates whether we are visible w.r.t. the viewing frustum. (1 byte)
 	 * Only 2 bits are currently used.
 	 */
 	ddgVisState _vis;
@@ -411,7 +411,7 @@ public:
 	/// Is i part of a mergeble diamond?
 	bool isDiamond(ddgTriIndex i);
     /**
-     * Return if a mergeble diamond us within the viewing frustrum.
+     * Return if a mergeble diamond us within the viewing frustum.
      * Returns true if at least one child is partially visible.
      */
     bool isDiamondVisible(ddgTriIndex i);
@@ -471,7 +471,7 @@ public:
 	inline unsigned int index(void) { return _index; }
 	/// Init wtoc.
 #ifdef DDG
-	static void initWtoC( ddgMatrix4 *wtoc, ddgBBox *camClipBox, float fov, ddgPlane frustrum[6]);
+	static void initWtoC( ddgMatrix4 *wtoc, ddgBBox *camClipBox, float fov, ddgPlane frustum[6]);
 #else
 	static void initWtoC( ddgBBox *camClipBox );
 #endif

@@ -43,7 +43,7 @@ class csBspNode2D;
 class csOctree;
 class csOctreeNode;
 class csPolygonClipper;
-class csFrustrum;
+class csFrustum;
 class csPoly2DPool;
 class csLightPatchPool;
 class csQuadcube;
@@ -89,7 +89,7 @@ public:
   static void dump (csBspTree* tree);
   static void dump (csBspTree2D* tree);
   static void dump (csPolygonClipper* clipper, char* name);
-  static void dump (csFrustrum* frustrum, char* name);
+  static void dump (csFrustum* frustum, char* name);
   static void dump (csPoly2DPool* pool, char* name);
   static void dump (csLightPatchPool* pool, char* name);
   static void dump (csQuadcube* cube);

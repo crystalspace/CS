@@ -249,9 +249,9 @@ public:
                                   csVector3& new_position, bool& mirror);
 
   /**
-   * Check frustrum visibility of all polygons reachable through this portal.
+   * Check frustum visibility of all polygons reachable through this portal.
    */
-  virtual void CheckFrustrum (csFrustrumView& lview);
+  virtual void CheckFrustum (csFrustumView& lview);
 };
 
 #endif /*PORTAL_H*/

@@ -146,7 +146,7 @@ public:
   /**
    * Update the lightmap for the given light.
    */
-  void FillLightMap (csFrustrumView& lview);
+  void FillLightMap (csFrustumView& lview);
 
   /**
    * Update the real lightmap for a given csLightPatch
@@ -157,18 +157,8 @@ public:
   ///
   void MakeDirtyDynamicLights ();
 
-  /**
-   *  Setup PolyFill by giving the drawing function to call.
-   *  Drawpixel: (x, y, density), x,y are the coords, density is 0..1.
-   */
-  static void SetupPolyFill( void (*drawpixel)(int, int, float) );
-  /** 
-   *  fill given 2d polygon antialiased by calling the drawpixel for every 
-   *  pixel. Give the visible rectangle, the number of vertices and
-   *  the vertice array. (i.e. try DoPolyFill(0,0, w, h, ...) 
-   */
-  static void DoPolyFill(int left, int top, int width, int height,
-    int n, csVector2 *pol2d);
+  /// Get the bounding rectangle of the whole lightmap in world space
+  bool GetLightmapBounds (csFrustumView *lview, csVector3 *bounds);
 
   //--------------------- iPolygonTexture implementation ---------------------
   DECLARE_IBASE;

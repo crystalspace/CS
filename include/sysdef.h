@@ -322,9 +322,12 @@
 #        define DEBUG_BREAK	asm ("int $3")
 #      endif
 #    else
-#      define DEBUG_BREAK { static int x = 0; x /= x; }
+#      define DEBUG_BREAK	{ static int x = 0; x /= x; }
 #    endif
 #  endif
+#else
+#  undef DEBUG_BREAK
+#  define DEBUG_BREAK
 #endif
 
 // Check if the csosdefs.h defined either CS_LITTLE_ENDIAN or CS_BIG_ENDIAN

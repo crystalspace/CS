@@ -153,45 +153,45 @@ csSector* csPortal::FollowSegment (csReversibleTransform& t,
   return sector ? sector->FollowSegment (t, new_position, mirror) : (csSector*)NULL;
 }
 
-void csPortal::CheckFrustrum (csFrustrumView& lview)
+void csPortal::CheckFrustum (csFrustumView& lview)
 {
   if (sector->draw_busy > csSector::cfg_reflections) return;
 
-  csFrustrumView new_lview = lview;
-  if (lview.light_frustrum)
-    CHKB (new_lview.light_frustrum = new csFrustrum (*lview.light_frustrum));
+  csFrustumView new_lview = lview;
+  if (lview.light_frustum)
+    CHKB (new_lview.light_frustum = new csFrustum (*lview.light_frustum));
 
-  // If copied_frustrums is true we copied the frustrums and we need to delete them
+  // If copied_frustums is true we copied the frustums and we need to delete them
   // later.
-  bool copied_frustrums = false;
+  bool copied_frustums = false;
 
   csTranCookie old_cookie = 0;
   if (do_warp_space)
   {
     old_cookie = csWorld::current_world->tr_manager.NewCameraFrame ();
-    new_lview.light_frustrum->Transform (&warp_wor);
+    new_lview.light_frustum->Transform (&warp_wor);
 
     if (do_mirror) new_lview.mirror = !lview.mirror;
-    new_lview.light_frustrum->SetMirrored (new_lview.mirror);
+    new_lview.light_frustum->SetMirrored (new_lview.mirror);
 
-    // Transform all shadow frustrums. First make a copy.
-    // Note that we only copy the relevant shadow frustrums.
+    // Transform all shadow frustums. First make a copy.
+    // Note that we only copy the relevant shadow frustums.
     // We know that csPolygon3D::CalculateLighting() called
-    // csPolygon3D::MarkRelevantShadowFrustrums() some time before
+    // csPolygon3D::MarkRelevantShadowFrustums() some time before
     // calling this function so the 'relevant' flags are still valid.
     new_lview.shadows.Clear ();	// Don't delete elements.
-    csShadowFrustrum* sf, * copy_sf;
+    csShadowFrustum* sf, * copy_sf;
     sf = lview.shadows.GetFirst ();
     while (sf)
     {
       if (sf->relevant)
       {
-        CHK (copy_sf = new csShadowFrustrum (*sf));
+        CHK (copy_sf = new csShadowFrustum (*sf));
         new_lview.shadows.AddLast (copy_sf);
       }
       sf = sf->next;
     }
-    copied_frustrums = true;
+    copied_frustums = true;
     new_lview.shadows.Transform (&warp_wor);
 
     if (cfg_alpha)
@@ -225,34 +225,34 @@ void csPortal::CheckFrustrum (csFrustrumView& lview)
   else if (lview.shadows.GetFirst ())
   {
     // There is no space warping. In this case we still want to
-    // remove all non-relevant shadow frustrums if there are any.
+    // remove all non-relevant shadow frustums if there are any.
     // We know that csPolygon3D::CalculateLighting() called
-    // csPolygon3D::MarkRelevantShadowFrustrums() some time before
+    // csPolygon3D::MarkRelevantShadowFrustums() some time before
     // calling this function so the 'relevant' flags are still valid.
     new_lview.shadows.Clear ();	// Don't delete elements.
-    csShadowFrustrum* sf, * copy_sf;
+    csShadowFrustum* sf, * copy_sf;
     sf = lview.shadows.GetFirst ();
     while (sf)
     {
       if (sf->relevant)
       {
-        CHK (copy_sf = new csShadowFrustrum (*sf));
+        CHK (copy_sf = new csShadowFrustum (*sf));
         new_lview.shadows.AddLast (copy_sf);
       }
       sf = sf->next;
     }
-    copied_frustrums = true;
+    copied_frustums = true;
   }
 
-  sector->CheckFrustrum (new_lview);
+  sector->CheckFrustum (new_lview);
 
   if (do_warp_space)
     csWorld::current_world->tr_manager.RestoreCameraFrame (old_cookie);
 
-  if (copied_frustrums)
+  if (copied_frustums)
   {
-    // Delete all copied frustrums.
-    new_lview.shadows.DeleteFrustrums ();
+    // Delete all copied frustums.
+    new_lview.shadows.DeleteFrustums ();
     new_lview.shadows.Clear ();
   }
 }

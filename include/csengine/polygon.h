@@ -849,17 +849,17 @@ public:
   csLightPatch* GetLightpatches () { return light_info.lightpatches; }
 
   /**
-   * Clip a polygon against a frustrum in camera space.
-   * The frustrum is defined with (0,0,0) as one of the
+   * Clip a polygon against a frustum in camera space.
+   * The frustum is defined with (0,0,0) as one of the
    * points of the plane.<p>
    *
-   * If the frustrum == NULL then it is considered infinite.
+   * If the frustum == NULL then it is considered infinite.
    * This function returns false (and does not allocate the
    * clipped polygon) if the polygon is completely clipped
    * away. Otherwise it will allocated a new array
    * of csVector3 in dest.
    */
-  bool ClipPoly (csVector3* frustrum, int num_frustrum,
+  bool ClipPoly (csVector3* frustum, int num_frustum,
 	bool mirror, csVector3** dest, int* num_dest);
 
   /**
@@ -872,17 +872,17 @@ public:
 
   /**
    * See if a polygon is visible from the given center (in world space
-   * using backface culling) and then clip against the frustrum and return
-   * a new frustrum (in camera space with the frustrum center at (0,0,0)).
+   * using backface culling) and then clip against the frustum and return
+   * a new frustum (in camera space with the frustum center at (0,0,0)).
    * This function returns false if the polygon is completely clipped away
-   * or if it is not visible. No new_frustrum will be allocated in that case.
-   * If 'mirror' is true the given frustrum is mirrored (vertices in
+   * or if it is not visible. No new_frustum will be allocated in that case.
+   * If 'mirror' is true the given frustum is mirrored (vertices in
    * anti-clockwise order). This function correctly handles that case and
-   * will return a new frustrum that is also mirrored.
+   * will return a new frustum that is also mirrored.
    */
-  bool ClipFrustrum (csVector3& center, csVector3* frustrum,
-  	int num_frustrum, bool mirror,
-  	csVector3** new_frustrum, int* new_num_frustrum);
+  bool ClipFrustum (csVector3& center, csVector3* frustum,
+  	int num_frustum, bool mirror,
+  	csVector3** new_frustum, int* new_num_frustum);
 
   /**
    * Initialize the lightmaps for this polygon.
@@ -900,14 +900,16 @@ public:
 
   /**
    * Fill the lightmap of this polygon according to the given light and
-   * the frustrum. The light is given in world space coordinates. The
-   * view frustrum is given in camera space (with (0,0,0) the origin
-   * of the frustrum). The camera space used is just world space translated
+   * the frustum. The light is given in world space coordinates. The
+   * view frustum is given in camera space (with (0,0,0) the origin
+   * of the frustum). The camera space used is just world space translated
    * so that the center of the light is at (0,0,0).
    * If the lightmaps were cached in the level archive this function will
    * do nothing.
+   * The "frustum" parameter defines the original light frustum (not the
+   * one bounded by this polygon as given by "lview").
    */
-  void FillLightMap (csFrustrumView& lview);
+  void FillLightMap (csFrustumView& lview);
 
   /**
    * Update vertex lighting for this polygon. Only works if the
@@ -925,24 +927,24 @@ public:
   	bool dynamic, bool reset);
 
   /**
-   * Check all shadow frustrums and mark all relevant ones. A shadow
-   * frustrum is relevant if it is (partially) inside the light frustrum
-   * and if it is not obscured by other shadow frustrums.
+   * Check all shadow frustums and mark all relevant ones. A shadow
+   * frustum is relevant if it is (partially) inside the light frustum
+   * and if it is not obscured by other shadow frustums.
    * In addition to the checking above this routine will return false
-   * if it can find a shadow frustrum which totally obscures the light
-   * frustrum. In this case it makes no sense to continue lighting the
+   * if it can find a shadow frustum which totally obscures the light
+   * frustum. In this case it makes no sense to continue lighting the
    * polygon.<br>
-   * This function will also discard all shadow frustrums which start at
+   * This function will also discard all shadow frustums which start at
    * the same plane as the given plane.
    */
-  bool MarkRelevantShadowFrustrums (csFrustrumView& lview, csPlane3& plane);
+  bool MarkRelevantShadowFrustums (csFrustumView& lview, csPlane3& plane);
 
   /**
-   * Check visibility of this polygon with the given csFrustrumView
+   * Check visibility of this polygon with the given csFrustumView
    * and fill the lightmap if needed (this function calls FillLightMap ()).
    * This function will also traverse through a portal if so needed.
    */
-  void CalculateLighting (csFrustrumView* lview);
+  void CalculateLighting (csFrustumView* lview);
 
   /**
    * Call after calling InitLightMaps and CalculateLighting to cache
@@ -950,19 +952,6 @@ public:
    * nothing if the cached lightmap was already up-to-date.
    */
   void CacheLightMaps (csPolygonSet* owner, int index);
-
-  /**
-   * Scale the lightmaps one step down. This is used in 'High Quality
-   * Lightmap Mode' and is generally only called by csWorld.
-   */
-  void ScaleLightMaps2X ();
-
-  /**
-   * Redo some init of the polygon when the lumel size of
-   * lightmaps change. This can only be done at init time
-   * of polygons and is generally only called by csWorld.
-   */
-  void UpdateLightMapSize ();
 
   /**
    * Transform the plane of this polygon from object space to world space.

@@ -314,37 +314,37 @@ void Dumper::dump (csPolygonClipper* clipper, char* name)
     CsPrintf (MSG_DEBUG_0, "  %d: (%f,%f)\n", i, clipper->ClipPoly[i].x, clipper->ClipPoly[i].y);
 }
 
-void Dumper::dump (csFrustrum* frustrum, char* name)
+void Dumper::dump (csFrustum* frustum, char* name)
 {
-  CsPrintf (MSG_DEBUG_0, "csFrustrum '%s'\n", name);
-  if (!frustrum)
+  CsPrintf (MSG_DEBUG_0, "csFrustum '%s'\n", name);
+  if (!frustum)
   {
     CsPrintf (MSG_DEBUG_0, "  NULL\n");
     return;
   }
-  if (frustrum->IsEmpty ())
+  if (frustum->IsEmpty ())
   {
     CsPrintf (MSG_DEBUG_0, "  EMPTY\n");
     return;
   }
-  if (frustrum->IsInfinite ())
+  if (frustum->IsInfinite ())
   {
     CsPrintf (MSG_DEBUG_0, "  INFINITE\n");
     return;
   }
   int i;
-  CsPrintf (MSG_DEBUG_0, "  "); dump (&frustrum->GetOrigin (), "origin");
-  for (i = 0 ; i < frustrum->GetNumVertices () ; i++)
+  CsPrintf (MSG_DEBUG_0, "  "); dump (&frustum->GetOrigin (), "origin");
+  for (i = 0 ; i < frustum->GetNumVertices () ; i++)
   {
     CsPrintf (MSG_DEBUG_0, "  ");
     char buf[20];
     sprintf (buf, "[%d]", i);
-    dump (&frustrum->GetVertex (i), buf);
+    dump (&frustum->GetVertex (i), buf);
   }
-  if (frustrum->GetBackPlane ())
+  if (frustum->GetBackPlane ())
   {
     CsPrintf (MSG_DEBUG_0, "  ");
-    dump (frustrum->GetBackPlane ());
+    dump (frustum->GetBackPlane ());
   }
 }
 

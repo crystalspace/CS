@@ -165,7 +165,7 @@ public:
 	 */
     ddgClipFlags visibleSpace( ddgBBox b, float tanHalfFOV );
 	/**
-	 * Test bounding box agains a set of planes (frustrum).
+	 * Test bounding box agains a set of planes (frustum).
 	 * Return 0 if out, 1 intersecting, 2 completely inside.
 	 */
 	ddgVis isVisible(ddgPlane Planes[6]);

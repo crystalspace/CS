@@ -192,7 +192,7 @@ bool CommandHandler (char *cmd, char *arg)
     Sys->Printf (MSG_CONSOLE, "-*- Additional commands -*-\n");
     Sys->Printf (MSG_CONSOLE, " coordsave, coordload, dumpvis\n");
     Sys->Printf (MSG_CONSOLE, " bind, fclear, addlight, dellight, dellights\n");
-    Sys->Printf (MSG_CONSOLE, " picklight, droplight, colldet, stats, hi, frustrum\n");
+    Sys->Printf (MSG_CONSOLE, " picklight, droplight, colldet, stats, hi, frustum\n");
     Sys->Printf (MSG_CONSOLE, " fps, perftest, capture, coordshow, zbuf, freelook\n");
     Sys->Printf (MSG_CONSOLE, " map, fire, debug0, debug1, debug2, edges, p_alpha, s_fog\n");
     Sys->Printf (MSG_CONSOLE, " snd_play, snd_volume, do_gravity, cbuffer, covtree, solidbsp\n");
@@ -240,8 +240,8 @@ bool CommandHandler (char *cmd, char *arg)
     Command::change_boolean (arg, &Sys->inverse_mouse, "inverse_mouse");
   else if (!strcasecmp (cmd, "colldet"))
     Command::change_boolean (arg, &Sys->do_cd, "colldet");
-  else if (!strcasecmp (cmd, "frustrum"))
-    Command::change_boolean (arg, &Sys->do_light_frust, "frustrum");
+  else if (!strcasecmp (cmd, "frustum"))
+    Command::change_boolean (arg, &Sys->do_light_frust, "frustum");
   else if (!strcasecmp (cmd, "zbuf"))
     Command::change_boolean (arg, &Sys->do_show_z, "zbuf");
   else if (!strcasecmp (cmd, "db_octree"))

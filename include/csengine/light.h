@@ -129,6 +129,8 @@ public:
   static int ambient_green;
   /// Config value: ambient blue value.
   static int ambient_blue;
+  /// Used to avoid shining same lightmap twice
+  static int lighting_cookie;
 
 public:
   /**
@@ -452,12 +454,12 @@ private:
   /// Light that this light patch originates from.
   csDynLight* light;
 
-  /// List of shadow frustrums.
-  csFrustrumList shadows;
+  /// List of shadow frustums.
+  csFrustumList shadows;
 
 private:
   /**
-   * Create an empty light patch (infinite frustrum).
+   * Create an empty light patch (infinite frustum).
    */
   csLightPatch ();
 
@@ -536,7 +538,7 @@ public:
 
   /**
    * Initial placement of the light. This routine generates a view
-   * frustrum as seen from the light. The clipped polygons that
+   * frustum as seen from the light. The clipped polygons that
    * result from this are light patches and are put in the
    * lightpatches list. This routine needs to be called whenever
    * the light moves.
@@ -545,19 +547,19 @@ public:
 
   /**
    * Move the light. This will NOT automatically recalculate the
-   * view frustrum. You still need to call Setup() after this.
+   * view frustum. You still need to call Setup() after this.
    */
   void Move (csSector* sector, csVector3& v) { Move (sector, v.x, v.y, v.z); }
 
   /**
    * Move the light. This will NOT automatically recalculate the
-   * view frustrum. You still need to call Setup() after this.
+   * view frustum. You still need to call Setup() after this.
    */
   void Move (csSector* sector, float x, float y, float z);
 
   /**
    * Resize the light. This will NOT automatically recalculate the
-   * view frustrum. You still need to call Setup() after this.
+   * view frustum. You still need to call Setup() after this.
    */
   void Resize (float radius) { dist = radius; sqdist = dist*dist; inv_dist = 1 / dist; }
 

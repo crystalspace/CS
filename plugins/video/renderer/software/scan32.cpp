@@ -405,9 +405,9 @@ void csScan_32_draw_scanline_fog_view (int xx, unsigned char* d,
 
 //------------------------------------------------------------------
 
-#ifndef NO_draw_pifx_scanline_zfil
+#ifndef NO_draw_pifx_scanline_tex_zfil
 
-#define PI_SCANFUNC csScan_32_draw_pifx_scanline_zfil
+#define PI_SCANFUNC csScan_32_draw_pifx_scanline_tex_zfil
 #define PI_ZFILL
 #define PI_GOURAUD
 #define PI_R8G8B8
@@ -418,9 +418,9 @@ void csScan_32_draw_scanline_fog_view (int xx, unsigned char* d,
 
 //------------------------------------------------------------------
 
-#ifndef NO_draw_pifx_scanline_zuse
+#ifndef NO_draw_pifx_scanline_tex_zuse
 
-#define PI_SCANFUNC csScan_32_draw_pifx_scanline_zuse
+#define PI_SCANFUNC csScan_32_draw_pifx_scanline_tex_zuse
 #define PI_ZUSE
 #define PI_GOURAUD
 #define PI_R8G8B8
@@ -431,9 +431,9 @@ void csScan_32_draw_scanline_fog_view (int xx, unsigned char* d,
 
 //------------------------------------------------------------------
 
-#ifndef NO_draw_pifx_scanline_transp_zfil
+#ifndef NO_draw_pifx_scanline_tex_transp_zfil
 
-#define PI_SCANFUNC csScan_32_draw_pifx_scanline_transp_zfil
+#define PI_SCANFUNC csScan_32_draw_pifx_scanline_tex_transp_zfil
 #define PI_ZFILL
 #define PI_GOURAUD
 #define PI_COLORKEY
@@ -445,9 +445,9 @@ void csScan_32_draw_scanline_fog_view (int xx, unsigned char* d,
 
 //------------------------------------------------------------------
 
-#ifndef NO_draw_pifx_scanline_transp_zuse
+#ifndef NO_draw_pifx_scanline_tex_transp_zuse
 
-#define PI_SCANFUNC csScan_32_draw_pifx_scanline_transp_zuse
+#define PI_SCANFUNC csScan_32_draw_pifx_scanline_tex_transp_zuse
 #define PI_ZUSE
 #define PI_GOURAUD
 #define PI_COLORKEY

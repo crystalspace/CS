@@ -31,5 +31,5 @@ long csSystemDriver::Time ()
 {
   timeb tp;
   ftime (&tp);
-  return tp.time*1000+tp.millitm;
+  return tp.time * 1000 + tp.millitm;
 }

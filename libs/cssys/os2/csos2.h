@@ -41,7 +41,7 @@ public:
   /// Initialize system-dependent data
   SysSystemDriver ();
 
-  DECLARE_IBASE_EXT (csSystemDriver)
+  DECLARE_IBASE_EXT (csSystemDriver);
 
   /// Check if configuration files requests 16 bits per pixel
   virtual void SetSystemDefaults (csIniFile *config);

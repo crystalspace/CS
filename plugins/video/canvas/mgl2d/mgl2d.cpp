@@ -55,6 +55,12 @@ bool csGraphics2DMGL::Initialize (iSystem *pSystem)
   if (!csGraphics2D::Initialize (pSystem))
     return false;
 
+  if (Depth != 8 && Depth != 16 && Depth != 32)
+  {
+    System->Printf (MSG_FATAL_ERROR, "Invalid color bit depth (%d)!\n", Depth);
+    return false;
+  }
+
   if (MGL_init (".", NULL) == 0)
   {
     System->Printf (MSG_FATAL_ERROR, MGL_errorMsg (MGL_result ()));

@@ -41,13 +41,13 @@ public:
   csQuadtreePersp (const csBox2& box, int depth) : csQuadtree (box, depth) { }
 
   /**
-   * Insert a polygon/frustrum into the quad-tree.
+   * Insert a polygon/frustum into the quad-tree.
    * The optional 'clipper' will be used to clip the resulting polygon.
    */
   bool InsertPolygon (csVector3* verts, int num_verts, csClipper* clipper = NULL);
 
   /**
-   * Test for polygon/frustrum visibility with the quad-tree.
+   * Test for polygon/frustum visibility with the quad-tree.
    * The optional 'clipper' will be used to clip the resulting polygon.
    */
   bool TestPolygon (csVector3* verts, int num_verts, csClipper* clipper = NULL);
@@ -93,7 +93,7 @@ public:
    * Return true if the cube was modified (i.e. if parts of the
    * polygon were visible.<p>
    * The polygon does not actually need to be a polygon. It can
-   * be a general frustrum. Note that the frustrum is assumed
+   * be a general frustum. Note that the frustum is assumed
    * to start at (0,0,0).
    */
   bool InsertPolygon (csVector3* verts, int num_verts);
@@ -102,7 +102,7 @@ public:
    * Test for polygon visibility with the quad-cube.
    * Return true if polygon is visible.<p>
    * The polygon does not actually need to be a polygon. It can
-   * be a general frustrum. Note that the frustrum is assumed
+   * be a general frustum. Note that the frustum is assumed
    * to start at (0,0,0).
    */
   bool TestPolygon (csVector3* verts, int num_verts);

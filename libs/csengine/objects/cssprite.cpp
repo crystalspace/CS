@@ -1284,7 +1284,7 @@ void csSprite3D::Draw (csRenderView& rview)
   box_class = rview.view->ClassifyBox (bbox);
   if (box_class == -1) return; // Not visible.
   bool do_clip = false;
-  if (rview.do_clip_plane || rview.do_clip_frustrum)
+  if (rview.do_clip_plane || rview.do_clip_frustum)
   {
     if (box_class == 0) do_clip = true;
   }
@@ -1292,7 +1292,7 @@ void csSprite3D::Draw (csRenderView& rview)
   // If we don't need to clip to the current portal then we
   // test if we need to clip to the top-level portal.
   // Top-level clipping is always required unless we are totally
-  // within the top-level frustrum.
+  // within the top-level frustum.
   // IF it is decided that we need to clip here then we still
   // clip to the inner portal. We have to do clipping anyway so
   // why not do it to the smallest possible clip area.

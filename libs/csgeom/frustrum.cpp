@@ -20,7 +20,7 @@
 #include "csgeom/frustrum.h"
 #include "csgeom/transfrm.h"
 
-void csFrustrum::Clear ()
+void csFrustum::Clear ()
 {
   CHK (delete [] vertices); vertices = NULL;
   num_vertices = max_vertices = 0;
@@ -29,7 +29,7 @@ void csFrustrum::Clear ()
   mirrored = false;
 }
 
-csFrustrum::csFrustrum (csVector3& o, csVector3* verts, int num_verts,
+csFrustum::csFrustum (csVector3& o, csVector3* verts, int num_verts,
 	csPlane3* backp)
 {
   origin = o;
@@ -51,7 +51,7 @@ csFrustrum::csFrustrum (csVector3& o, csVector3* verts, int num_verts,
   else backplane = NULL;
 }
 
-csFrustrum::csFrustrum (const csFrustrum &copy)
+csFrustum::csFrustum (const csFrustum &copy)
 {
   origin = copy.origin;
   num_vertices = copy.num_vertices;
@@ -72,18 +72,18 @@ csFrustrum::csFrustrum (const csFrustrum &copy)
   else backplane = NULL;
 }
 
-void csFrustrum::SetBackPlane (csPlane3& plane)
+void csFrustum::SetBackPlane (csPlane3& plane)
 {
   CHK (delete backplane);
   CHK (backplane = new csPlane3 (plane));
 }
 
-void csFrustrum::RemoveBackPlane ()
+void csFrustum::RemoveBackPlane ()
 {
   CHK (delete backplane); backplane = NULL;
 }
 
-void csFrustrum::ExtendVertexArray (int num)
+void csFrustum::ExtendVertexArray (int num)
 {
   CHK (csVector3* new_vertices = new csVector3 [max_vertices+num]);
   if (vertices)
@@ -95,26 +95,26 @@ void csFrustrum::ExtendVertexArray (int num)
   max_vertices += num;
 }
 
-void csFrustrum::AddVertex (const csVector3& v)
+void csFrustum::AddVertex (const csVector3& v)
 {
   if (num_vertices >= max_vertices) ExtendVertexArray (10);
   vertices[num_vertices] = v;
   num_vertices++;
 }
 
-void csFrustrum::MakeInfinite ()
+void csFrustum::MakeInfinite ()
 {
   Clear ();
   wide = true;
 }
 
-void csFrustrum::MakeEmpty ()
+void csFrustum::MakeEmpty ()
 {
   Clear ();
   wide = false;
 }
 
-void csFrustrum::Transform (csTransform* trans)
+void csFrustum::Transform (csTransform* trans)
 {
   int i;
   origin = trans->Other2This (origin);
@@ -123,7 +123,7 @@ void csFrustrum::Transform (csTransform* trans)
   if (backplane) (*backplane) *= (*trans);
 }
 
-void csFrustrum::ClipPolyToPlane (csPlane3* plane)
+void csFrustum::ClipPolyToPlane (csPlane3* plane)
 {
   // First classify all vertices of the current polygon with regards to this
   // plane.
@@ -139,7 +139,7 @@ void csFrustrum::ClipPolyToPlane (csPlane3* plane)
   if (count_front == 0)
   {
     // None of the vertices of the new polygon are in front of the back
-    // plane of this frustrum. So intersection is empty.
+    // plane of this frustum. So intersection is empty.
     MakeEmpty ();
     return;
   }
@@ -169,16 +169,16 @@ void csFrustrum::ClipPolyToPlane (csPlane3* plane)
 
     if (z1s && !zs)
     {
-      csIntersect3::Plane (vertices[i1], vertices[i], A, B, C, D,
-      	clipped_verts[num_clipped_verts], r);
-      num_clipped_verts++;
+      if (csIntersect3::Plane (vertices[i1], vertices[i], A, B, C, D,
+      	clipped_verts[num_clipped_verts], r))
+        num_clipped_verts++;
       clipped_verts[num_clipped_verts++] = vertices[i];
     }
     else if (!z1s && zs)
     {
-      csIntersect3::Plane (vertices[i1], vertices[i], A, B, C, D,
-      	clipped_verts[num_clipped_verts], r);
-      num_clipped_verts++;
+      if (csIntersect3::Plane (vertices[i1], vertices[i], A, B, C, D,
+      	clipped_verts[num_clipped_verts], r))
+        num_clipped_verts++;
     }
     else if (!z1s && !zs)
     {
@@ -187,6 +187,14 @@ void csFrustrum::ClipPolyToPlane (csPlane3* plane)
     }
     i1 = i;
   }
+
+  // If we have too little vertices, make frustrum empty
+  if (num_clipped_verts < 3)
+  {
+    MakeEmpty ();
+    return;
+  }
+
   // Copy the clipped vertices. @@@ Is this efficient? Can't we clip in place?
   if (num_clipped_verts >= max_vertices) ExtendVertexArray (num_clipped_verts-max_vertices+2);
   num_vertices = num_clipped_verts;
@@ -194,7 +202,7 @@ void csFrustrum::ClipPolyToPlane (csPlane3* plane)
     vertices[i] = clipped_verts[i];
 }
 
-void csFrustrum::ClipToPlane (csVector3& v1, csVector3& v2)
+void csFrustum::ClipToPlane (csVector3& v1, csVector3& v2)
 {
   int cw_offset = -1;
   int ccw_offset;
@@ -269,86 +277,86 @@ void csFrustrum::ClipToPlane (csVector3& v1, csVector3& v2)
   }
 }
 
-csFrustrum* csFrustrum::Intersect (const csFrustrum& other)
+csFrustum* csFrustum::Intersect (const csFrustum& other)
 {
   if (other.IsEmpty ()) return NULL;
-  if (other.IsInfinite ()) { CHK (csFrustrum* f = new csFrustrum (*this)); return f; }
+  if (other.IsInfinite ()) { CHK (csFrustum* f = new csFrustum (*this)); return f; }
   return Intersect (other.vertices, other.num_vertices);
 }
 
-csFrustrum* csFrustrum::Intersect (csVector3* poly, int num)
+csFrustum* csFrustum::Intersect (csVector3* poly, int num)
 {
-  csFrustrum* new_frustrum;
+  csFrustum* new_frustum;
   if (IsInfinite ())
   {
-    // If this frustrum is infinite then the intersection of this
-    // frustrum with the other is equal to the other.
-    CHK (new_frustrum = new csFrustrum (origin, poly, num));
-    new_frustrum->SetMirrored (IsMirrored ());
+    // If this frustum is infinite then the intersection of this
+    // frustum with the other is equal to the other.
+    CHK (new_frustum = new csFrustum (origin, poly, num));
+    new_frustum->SetMirrored (IsMirrored ());
   }
   else if (IsEmpty ())
   {
-    // If this frustrum is empty then the intersection will be empty
+    // If this frustum is empty then the intersection will be empty
     // as well.
     return NULL;
   }
   else
   {
-    // General case. Create a new frustrum from the given polygon with
-    // the origin of this frustrum and clip it to every plane from this
-    // frustrum.
-    CHK (new_frustrum = new csFrustrum (GetOrigin (), poly, num));
-    new_frustrum->SetMirrored (IsMirrored ());
+    // General case. Create a new frustum from the given polygon with
+    // the origin of this frustum and clip it to every plane from this
+    // frustum.
+    CHK (new_frustum = new csFrustum (GetOrigin (), poly, num));
+    new_frustum->SetMirrored (IsMirrored ());
     int i, i1;
     i1 = num_vertices-1;
     for (i = 0 ; i < num_vertices ; i++)
     {
-      new_frustrum->ClipToPlane (vertices[i1], vertices[i]);
-      if (new_frustrum->IsEmpty ())
+      new_frustum->ClipToPlane (vertices[i1], vertices[i]);
+      if (new_frustum->IsEmpty ())
       {
         // Intersection has become empty. Return NULL.
-	CHK (delete new_frustrum);
+	CHK (delete new_frustum);
 	return NULL;
       }
       i1 = i;
     }
 
-    // If this frustrum has a back plane then we also need to clip the polygon
-    // in the new frustrum to that.
+    // If this frustum has a back plane then we also need to clip the polygon
+    // in the new frustum to that.
     if (backplane)
     {
-      new_frustrum->ClipPolyToPlane (backplane);
-      if (new_frustrum->IsEmpty ())
+      new_frustum->ClipPolyToPlane (backplane);
+      if (new_frustum->IsEmpty ())
       {
         // Intersection has become empty. Return NULL.
-	CHK (delete new_frustrum);
+	CHK (delete new_frustum);
 	return NULL;
       }
     }
   }
-  return new_frustrum;
+  return new_frustum;
 }
 
-bool csFrustrum::Contains (const csVector3& point)
+bool csFrustum::Contains (const csVector3& point)
 {
   if (backplane)
     return Contains (vertices, num_vertices, *backplane, point);
   return Contains (vertices, num_vertices, point);
 }
 
-bool csFrustrum::Contains (csVector3* frustrum, int num_frust, const csVector3& point)
+bool csFrustum::Contains (csVector3* frustum, int num_frust, const csVector3& point)
 {
   int i, i1;
   i1 = num_frust-1;
   for (i = 0 ; i < num_frust ; i++)
   {
-    if (csMath3::WhichSide3D (point, frustrum[i], frustrum[i1]) > 0) return false;
+    if (csMath3::WhichSide3D (point, frustum[i], frustum[i1]) > 0) return false;
     i1 = i;
   }
   return true;
 }
 
-bool csFrustrum::Contains (csVector3* frustrum, int num_frust,
+bool csFrustum::Contains (csVector3* frustum, int num_frust,
 	const csPlane3& plane, const csVector3& point)
 {
   if (!csMath3::Visible (point, plane)) return false;
@@ -356,37 +364,37 @@ bool csFrustrum::Contains (csVector3* frustrum, int num_frust,
   i1 = num_frust-1;
   for (i = 0 ; i < num_frust ; i++)
   {
-    if (csMath3::WhichSide3D (point, frustrum[i], frustrum[i1]) > 0) return false;
+    if (csMath3::WhichSide3D (point, frustum[i], frustum[i1]) > 0) return false;
     i1 = i;
   }
   return true;
 }
 
-bool csFrustrum::IsVisible (csVector3* frustrum, int num_frust,
+bool csFrustum::IsVisible (csVector3* frustum, int num_frust,
   	csVector3* poly, int num_poly)
 {
   int i;
 
-  // If any of the polygon vertices is in the frustrum then
+  // If any of the polygon vertices is in the frustum then
   // the polygon is visible.
   for (i = 0 ; i < num_poly ; i++)
-    if (Contains (frustrum, num_frust, poly[i])) return true;
+    if (Contains (frustum, num_frust, poly[i])) return true;
 
-  // If any of the frustrum vertices is in the polygon (reverse
+  // If any of the frustum vertices is in the polygon (reverse
   // roles) then the polygon is visible.
   for (i = 0 ; i < num_frust ; i++)
-    if (Contains (poly, num_poly, frustrum[i])) return true;
+    if (Contains (poly, num_poly, frustum[i])) return true;
 
-  return IsVisibleFull (frustrum, num_frust, poly, num_poly);
+  return IsVisibleFull (frustum, num_frust, poly, num_poly);
 }
 
-bool csFrustrum::IsVisibleFull (csVector3* frustrum, int num_frust,
+bool csFrustum::IsVisibleFull (csVector3* frustum, int num_frust,
   	csVector3* poly, int num_poly)
 {
   int i1, j1, i, j;
 
   // Here is the difficult case. We need to see if there is an
-  // edge from the polygon which intersects a frustrum plane.
+  // edge from the polygon which intersects a frustum plane.
   // If so then polygon is visible. Otherwise not.
   csVector3 normal;
   csVector3 isect;
@@ -394,14 +402,14 @@ bool csFrustrum::IsVisibleFull (csVector3* frustrum, int num_frust,
   j1 = num_frust-1;
   for (j = 0 ; j < num_frust ; j++)
   {
-    normal = frustrum[j] % frustrum[j1];
+    normal = frustum[j] % frustum[j1];
     i1 = num_poly-1;
     for (i = 0 ; i < num_poly ; i++)
     {
       if (csIntersect3::Plane (poly[i], poly[i1],
       	normal.x, normal.y, normal.z, 0, isect, dist))
       {
-        if (Contains (frustrum, num_frust, isect)) return true;
+        if (Contains (frustum, num_frust, isect)) return true;
       }
       i1 = i;
     }

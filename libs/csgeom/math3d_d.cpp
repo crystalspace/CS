@@ -434,7 +434,7 @@ double csDIntersect3::ZPlane (
   return r;
 }
 
-double csDIntersect3::XFrustrum (
+double csDIntersect3::XFrustum (
   double A, const csDVector3& u, const csDVector3& v, csDVector3& isect)
 {
   double r = (A*u.x+u.z) / ( A*(u.x-v.x) + u.z-v.z );
@@ -444,7 +444,7 @@ double csDIntersect3::XFrustrum (
   return r;
 }
 
-double csDIntersect3::YFrustrum (
+double csDIntersect3::YFrustum (
   double B, const csDVector3& u, const csDVector3& v, csDVector3& isect)
 {
   double r = (B*u.y+u.z) / ( B*(u.y-v.y) + u.z-v.z );

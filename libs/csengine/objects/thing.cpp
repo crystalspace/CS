@@ -475,13 +475,13 @@ void csThing::DrawFoggy (csRenderView& d)
 }
 
 
-void csThing::CheckFrustrum (csFrustrumView& lview)
+void csThing::CheckFrustum (csFrustumView& lview)
 {
   csPolygon3D* p;
   int i;
 
   draw_busy++;
-  UpdateTransformation (lview.light_frustrum->GetOrigin ());
+  UpdateTransformation (lview.light_frustum->GetOrigin ());
 
   if (light_frame_number != current_light_frame_number)
   {

@@ -118,7 +118,7 @@ float           _tanHalfFOV   = 1.0;
 #ifdef DDG
 /// World to camera space transformation matrix must be initialized before calling calculate.
 ddgMatrix4 _wtoc;
-ddgPlane		*_frustrum;
+ddgPlane		*_frustum;
 void ddgTBinTree::transform( ddgVector3 *vino, ddgVector3 *vouto )
 {
 	float *m = _wtoc, *vin = (float*)vino, *vout = (float*)vouto;
@@ -129,7 +129,7 @@ void ddgTBinTree::transform( ddgVector3 *vino, ddgVector3 *vouto )
     vout[2] = m[2]*vin[0]+m[6]*vin[1]+m[10]*vin[2]+m[14];
 }
 
-void ddgTBinTree::initWtoC( ddgMatrix4 *wtoc, ddgBBox *camClipBox, float fov, ddgPlane frustrum[6])
+void ddgTBinTree::initWtoC( ddgMatrix4 *wtoc, ddgBBox *camClipBox, float fov, ddgPlane frustum[6])
 {
 	ddgAssert(camClipBox);
 	int i;
@@ -141,7 +141,7 @@ void ddgTBinTree::initWtoC( ddgMatrix4 *wtoc, ddgBBox *camClipBox, float fov, dd
     _camBBox = camClipBox;
     // Set the field of view.
     _tanHalfFOV = tan(ddgAngle::degtorad(fov/2.0));
-	_frustrum = frustrum;
+	_frustum = frustum;
 	ddgVector3 ev0,ev1;
 	ddgTBinTree::transform( ddgVector3(0,0,0), ev0 );
 	ddgTBinTree::transform( ddgVector3(0,1,0), ev1 );
@@ -407,7 +407,7 @@ bool ddgTBinTree::isDiamond(ddgTriIndex tindex)
 }
 
 /**
- * Return if a mergeble diamond is within the viewing frustrum.
+ * Return if a mergeble diamond is within the viewing frustum.
  * Returns true if at least one child is partially visible.
  */
 bool ddgTBinTree::isDiamondVisible(ddgTriIndex tindex)
@@ -539,7 +539,7 @@ void ddgTBinTree::visibility(ddgTriIndex tindex)
 			// Adjust box by wedgie thickness.
 			pmin->v[1] = pmin->v[1] - tri(tindex)->thick();
 			pmax->v[1] = pmax->v[1] + tri(tindex)->thick();
-			tri(tindex)->vis( bbox.isVisible(_frustrum));
+			tri(tindex)->vis( bbox.isVisible(_frustum));
 #endif
 		}
 		// Check if we need to reset the priority delay

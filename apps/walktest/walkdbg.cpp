@@ -97,9 +97,9 @@ int collcount = 0;
 // which are called by csWorld::DrawFunc() or csLight::LightingFunc().
 //------------------------------------------------------------------------
 
-// Callback for LightingFunc() to show the lighting frustrum for the
+// Callback for LightingFunc() to show the lighting frustum for the
 // selected light.
-void show_frustrum (csFrustrumView* lview, int type, void* /*entity*/)
+void show_frustum (csFrustumView* lview, int type, void* /*entity*/)
 {
   iTextureManager* txtmgr = Gfx3D->GetTextureManager ();
   int white = txtmgr->FindRGB (255, 255, 255);
@@ -108,7 +108,7 @@ void show_frustrum (csFrustrumView* lview, int type, void* /*entity*/)
   if (type == CALLBACK_POLYGON)
   {
     csCamera* cam = Sys->view->GetCamera ();
-    csFrustrum* fr = lview->light_frustrum;
+    csFrustum* fr = lview->light_frustum;
     csVector3 v0, v1, v2;
     csVector3 light_cam = cam->Other2This (fr->GetOrigin ());
     int j;

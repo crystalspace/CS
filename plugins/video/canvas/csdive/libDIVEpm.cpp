@@ -29,7 +29,7 @@
 #define WM_DiveCommand	0x9F37		// Choose a unused msg #
 #define defWindowStyle  FCF_TITLEBAR | FCF_SYSMENU | FCF_ACCELTABLE
 
-static volatile TID PMtid;              // PM thread ID
+static volatile TID PMtid = 0;          // PM thread ID
 static volatile HWND PMmng = NULLHANDLE;// PM request manager window
 static diveApp *volatile dA;            // PM application object
 static volatile HMTX semBusy;           // PM thread requests semaphore

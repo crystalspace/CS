@@ -348,8 +348,8 @@ void WalkTest::DrawFrameDebug ()
 	draw_edges, (void*)1);
   if (do_light_frust && selected_light)
   {
-    extern void show_frustrum (csFrustrumView*, int, void*);
-    ((csStatLight*)selected_light)->LightingFunc (show_frustrum);
+    extern void show_frustum (csFrustumView*, int, void*);
+    ((csStatLight*)selected_light)->LightingFunc (show_frustum);
   }
   if (cfg_draw_octree)
   {
@@ -491,7 +491,7 @@ void WalkTest::DrawFrame (time_t elapsed_time, time_t current_time)
   (void)elapsed_time; (void)current_time;
 
   //not used since we need WHITE background not black
-  int drawflags = 0; /* do_clear ? CSDRAW_CLEARSCREEN : 0; */
+  int drawflags = do_clear ? CSDRAW_CLEARZBUFFER : 0;
   if (do_clear || map_mode == MAP_ON)
   {
     if (!Gfx3D->BeginDraw (CSDRAW_2DGRAPHICS))

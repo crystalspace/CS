@@ -184,7 +184,6 @@ csWorld* csWorld::current_world = NULL;
 bool csWorld::use_new_radiosity = false;
 int csWorld::max_process_polygons = 2000000000;
 int csWorld::cur_process_polygons = 0;
-bool csWorld::do_lightmap_highqual = true;
 bool csWorld::do_lighting_cache = true;
 bool csWorld::do_not_force_relight = false;
 bool csWorld::do_force_relight = false;
@@ -577,7 +576,6 @@ void csWorld::ShineLights ()
       int accurate_things;
       float cosinus_factor;
       int lightmap_size;
-      int lightmap_highqual;
     };
     PrecalcInfo current;
     memset (&current, 0, sizeof (current));
@@ -591,7 +589,6 @@ void csWorld::ShineLights ()
     current.accurate_things = csPolyTexture::do_accurate_things;
     current.cosinus_factor = csPolyTexture::cfg_cosinus_factor;
     current.lightmap_size = csLightMap::lightcell_size;
-    current.lightmap_highqual = do_lightmap_highqual;
     char *reason = NULL;
 
     size_t size;
@@ -627,7 +624,6 @@ void csWorld::ShineLights ()
         CHECK ("ACCURATE_THINGS", xi != current.accurate_things, "'accurate things' flag")
         CHECK ("COSINUS_FACTOR", ABS (xf - current.cosinus_factor) > SMALL_EPSILON, "cosinus factor")
         CHECK ("LIGHTMAP_SIZE", xi != current.lightmap_size, "lightmap size")
-        CHECK ("LIGHTMAP_HIGHQUAL", xi != current.lightmap_highqual, "lightmap quality setting")
 
 #undef CHECK
       }
@@ -646,12 +642,11 @@ void csWorld::ShineLights ()
         "RADIOSITY=%d\n"
         "ACCURATE_THINGS=%d\n"
         "COSINUS_FACTOR=%g\n"
-        "LIGHTMAP_SIZE=%d\n"
-        "LIGHTMAP_HIGHQUAL=%d\n",
+        "LIGHTMAP_SIZE=%d\n",
         current.lm_version, current.normal_light_level, current.ambient_red,
         current.ambient_green, current.ambient_blue, current.reflect,
         current.radiosity, current.accurate_things, current.cosinus_factor,
-        current.lightmap_size, current.lightmap_highqual);
+        current.lightmap_size);
       VFS->WriteFile ("precalc_info", data, strlen (data));
       CsPrintf (MSG_INITIALIZATION, "Lightmap data is not up to date (reason: %s).\n", reason);
       do_force_relight = true;
@@ -675,20 +670,12 @@ void csWorld::ShineLights ()
   csPolyIt* pit = NewPolyIterator ();
   csLightIt* lit = NewLightIterator ();
 
-  // Set lumel size for 'High Quality Mode'
-  // and reinit all lightmaps.
-  // This loop also counts all polygons.
+  // Reinit all lightmaps. This loop also counts all polygons.
   csPolygon3D* p;
   int polygon_count = 0;
-  if (do_lightmap_highqual && do_force_relight)
-    csLightMap::SetLightCellSize (csLightMap::lightcell_size / 2, 2);
   pit->Restart ();
   while ((p = pit->Fetch ()) != NULL)
-  {
-    if (do_lightmap_highqual && do_force_relight)
-      p->UpdateLightMapSize ();
     polygon_count++;
-  }
 
   // Count number of lights to process.
   csLight* l;
@@ -724,24 +711,7 @@ void csWorld::ShineLights ()
   stop = System->GetTime ();
   CsPrintf (MSG_INITIALIZATION, "\n(%.4f seconds)", (float)(stop-start)/1000.);
 
-  // Restore lumel size from 'High Quality Mode'
-  // and remap all lightmaps.
-  if (do_lightmap_highqual && do_force_relight)
-  {
-    CsPrintf (MSG_INITIALIZATION, "\nScaling lightmaps (%d maps):\n  ", polygon_count);
-    csLightMap::SetLightCellSize (csLightMap::lightcell_size * 2, 1);
-    meter.SetTotal (polygon_count);
-    meter.Restart ();
-    pit->Restart ();
-    while ((p = pit->Fetch ()) != NULL)
-    {
-      p->ScaleLightMaps2X ();
-      meter.Step();
-    }
-  }
-
   // Render radiosity
-  // -- could put his before scaling to have high quality radiosity
   if (use_new_radiosity && !do_not_force_relight && do_force_relight)
   {
     start = System->GetTime ();
@@ -946,12 +916,12 @@ void csWorld::Draw (csCamera* c, csClipper* view)
   rview.clip_plane.Set (0, 0, 1, -1);   //@@@CHECK!!!
   rview.callback = NULL;
 
-  // Calculate frustrum for screen dimensions (at z=1).
+  // Calculate frustum for screen dimensions (at z=1).
   float leftx = - c->shift_x * c->inv_aspect;
   float rightx = (frame_width - c->shift_x) * c->inv_aspect;
   float topy = - c->shift_y * c->inv_aspect;
   float boty = (frame_height - c->shift_y) * c->inv_aspect;
-  rview.SetFrustrum (leftx, rightx, topy, boty);
+  rview.SetFrustum (leftx, rightx, topy, boty);
 
   tr_manager.NewFrame ();
 
@@ -1036,12 +1006,12 @@ void csWorld::DrawFunc (csCamera* c, csClipper* view,
     if (solidbsp) EnableSolidBsp (true);      
   }
 
-  // Calculate frustrum for screen dimensions (at z=1).
+  // Calculate frustum for screen dimensions (at z=1).
   float leftx = - c->shift_x * c->inv_aspect;
   float rightx = (frame_width - c->shift_x) * c->inv_aspect;
   float topy = - c->shift_y * c->inv_aspect;
   float boty = (frame_height - c->shift_y) * c->inv_aspect;
-  rview.SetFrustrum (leftx, rightx, topy, boty);
+  rview.SetFrustum (leftx, rightx, topy, boty);
 
   tr_manager.NewFrame ();
 
@@ -1259,13 +1229,12 @@ void csWorld::AdvanceSpriteFrames (time_t current_time)
 void csWorld::ReadConfig ()
 {
   if (!System) return;
-  csLightMap::SetLightCellSize (System->ConfigGetInt ("Lighting", "LIGHTMAP_SIZE", 16), 1);
-  do_lightmap_highqual = System->ConfigGetYesNo ("Lighting", "LIGHTMAP_HIGHQUAL", true);
-  csLight::ambient_red = System->ConfigGetInt ("World", "AMBIENT_RED", DEFAULT_LIGHT_LEVEL);
-  csLight::ambient_green = System->ConfigGetInt ("World", "AMBIENT_GREEN", DEFAULT_LIGHT_LEVEL);
-  csLight::ambient_blue = System->ConfigGetInt ("World", "AMBIENT_BLUE", DEFAULT_LIGHT_LEVEL);
+  csLightMap::SetLightCellSize (System->ConfigGetInt ("Lighting", "LIGHTMAP_SIZE", 16));
+  csLight::ambient_red = System->ConfigGetInt ("Lighting", "AMBIENT_RED", DEFAULT_LIGHT_LEVEL);
+  csLight::ambient_green = System->ConfigGetInt ("Lighting", "AMBIENT_GREEN", DEFAULT_LIGHT_LEVEL);
+  csLight::ambient_blue = System->ConfigGetInt ("Lighting", "AMBIENT_BLUE", DEFAULT_LIGHT_LEVEL);
 
-  int ambient_white = System->ConfigGetInt ("World", "AMBIENT_WHITE", DEFAULT_LIGHT_LEVEL);
+  int ambient_white = System->ConfigGetInt ("Lighting", "AMBIENT_WHITE", DEFAULT_LIGHT_LEVEL);
   csLight::ambient_red += ambient_white;
   csLight::ambient_green += ambient_white;
   csLight::ambient_blue += ambient_white;

@@ -208,7 +208,7 @@ ddgClipFlags ddgBBox::visibleSpace( ddgBBox b, float tanHalfFOV )
 #endif
   if (tanHalfFOV != 1.0)    // Not 90 degree case
     b.scale(ddgVector3(1.0/tanHalfFOV,1.0/tanHalfFOV,1));
-  // Test against near, and far plane and test viewing frustrum.
+  // Test against near, and far plane and test viewing frustum.
   if (b.maxz() >= minz())
     DDG_BSET(vis, DDGCF_NIN);
   if (b.minz() <= maxz())

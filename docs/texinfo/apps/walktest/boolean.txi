@@ -57,8 +57,8 @@ draw as the default texture on the polygon.
 Enable/disable display of edges around polygons. This is useful for
 debugging.
 
-@item frustrum
-Enable/disable the display of the view frustrum around the selected light
+@item frustum
+Enable/disable the display of the view frustum around the selected light
 (select lights with @samp{edges} enabled and by clicking the left
 mousebutton on the light).
 

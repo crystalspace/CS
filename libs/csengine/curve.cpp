@@ -176,7 +176,7 @@ void csCurve::InitLightMaps (csPolygonSet* owner, bool do_cache, int index)
   else lightmap_up_to_date = true;
 }
 
-void csCurve::CalculateLighting (csFrustrumView& lview)
+void csCurve::CalculateLighting (csFrustumView& lview)
 {
   if (!lightmap) return;
   if (lightmap_up_to_date) return;

@@ -101,10 +101,10 @@ int csGraphics3DSoftware::filter_bf = 1;
 #define SCANPROCPI_TEX_GOURAUD_ZUSE     0x03
 
 // Pointers to scanline drawing with effects.
-#define SCANPROCPIFX_ZUSE               0x00
-#define SCANPROCPIFX_ZFIL               0x01
-#define SCANPROCPIFX_TRANSP_ZUSE        0x02
-#define SCANPROCPIFX_TRANSP_ZFIL        0x03
+#define SCANPROCPIFX_TEX_ZUSE           0x00
+#define SCANPROCPIFX_TEX_ZFIL           0x01
+#define SCANPROCPIFX_TEX_TRANSP_ZUSE    0x02
+#define SCANPROCPIFX_TEX_TRANSP_ZFIL    0x03
 
 ///---------------------------------------------------------------------------
 
@@ -260,10 +260,10 @@ void csGraphics3DSoftware::ScanSetup ()
       if (do_transp)
         ScanProc_Alpha = ScanProc_8_Alpha;
 
-      ScanProcPIFX [SCANPROCPIFX_ZUSE] = csScan_8_draw_pifx_scanline_zuse;
-      ScanProcPIFX [SCANPROCPIFX_ZFIL] = csScan_8_draw_pifx_scanline_zfil;
-      ScanProcPIFX [SCANPROCPIFX_TRANSP_ZUSE] = csScan_8_draw_pifx_scanline_transp_zuse;
-      ScanProcPIFX [SCANPROCPIFX_TRANSP_ZFIL] = csScan_8_draw_pifx_scanline_transp_zfil;
+      ScanProcPIFX [SCANPROCPIFX_TEX_ZUSE] = csScan_8_draw_pifx_scanline_tex_zuse;
+      ScanProcPIFX [SCANPROCPIFX_TEX_ZFIL] = csScan_8_draw_pifx_scanline_tex_zfil;
+      ScanProcPIFX [SCANPROCPIFX_TEX_TRANSP_ZUSE] = csScan_8_draw_pifx_scanline_tex_transp_zuse;
+      ScanProcPIFX [SCANPROCPIFX_TEX_TRANSP_ZFIL] = csScan_8_draw_pifx_scanline_tex_transp_zfil;
       break;
 
     case 2:
@@ -328,18 +328,18 @@ void csGraphics3DSoftware::ScanSetup ()
         csScan_16_draw_pi_scanline_tex_gouraud_zuse_555 :
         csScan_16_draw_pi_scanline_tex_gouraud_zuse_565;
 
-      ScanProcPIFX [SCANPROCPIFX_ZUSE] = (pfmt.GreenBits == 5) ?
-          csScan_16_draw_pifx_scanline_zuse_555 :
-          csScan_16_draw_pifx_scanline_zuse_565;
-      ScanProcPIFX [SCANPROCPIFX_ZFIL] = (pfmt.GreenBits == 5) ?
-          csScan_16_draw_pifx_scanline_zfil_555 :
-          csScan_16_draw_pifx_scanline_zfil_565;
-      ScanProcPIFX [SCANPROCPIFX_TRANSP_ZUSE] = (pfmt.GreenBits == 5) ?
-          csScan_16_draw_pifx_scanline_transp_zuse_555 :
-          csScan_16_draw_pifx_scanline_transp_zuse_565;
-      ScanProcPIFX [SCANPROCPIFX_TRANSP_ZFIL] = (pfmt.GreenBits == 5) ?
-          csScan_16_draw_pifx_scanline_transp_zfil_555 :
-          csScan_16_draw_pifx_scanline_transp_zfil_565;
+      ScanProcPIFX [SCANPROCPIFX_TEX_ZUSE] = (pfmt.GreenBits == 5) ?
+          csScan_16_draw_pifx_scanline_tex_zuse_555 :
+          csScan_16_draw_pifx_scanline_tex_zuse_565;
+      ScanProcPIFX [SCANPROCPIFX_TEX_ZFIL] = (pfmt.GreenBits == 5) ?
+          csScan_16_draw_pifx_scanline_tex_zfil_555 :
+          csScan_16_draw_pifx_scanline_tex_zfil_565;
+      ScanProcPIFX [SCANPROCPIFX_TEX_TRANSP_ZUSE] = (pfmt.GreenBits == 5) ?
+          csScan_16_draw_pifx_scanline_tex_transp_zuse_555 :
+          csScan_16_draw_pifx_scanline_tex_transp_zuse_565;
+      ScanProcPIFX [SCANPROCPIFX_TEX_TRANSP_ZFIL] = (pfmt.GreenBits == 5) ?
+          csScan_16_draw_pifx_scanline_tex_transp_zfil_555 :
+          csScan_16_draw_pifx_scanline_tex_transp_zfil_565;
 
       if (do_transp)
         ScanProc_Alpha = ScanProc_16_Alpha;
@@ -384,10 +384,10 @@ void csGraphics3DSoftware::ScanSetup ()
       ScanProcPIG [SCANPROCPI_TEX_GOURAUD_ZFIL] = csScan_32_draw_pi_scanline_tex_gouraud_zfil;
       ScanProcPIG [SCANPROCPI_TEX_GOURAUD_ZUSE] = csScan_32_draw_pi_scanline_tex_gouraud_zuse;
 
-      ScanProcPIFX [SCANPROCPIFX_ZUSE] = csScan_32_draw_pifx_scanline_zuse;
-      ScanProcPIFX [SCANPROCPIFX_ZFIL] = csScan_32_draw_pifx_scanline_zfil;
-      ScanProcPIFX [SCANPROCPIFX_TRANSP_ZUSE] = csScan_32_draw_pifx_scanline_transp_zuse;
-      ScanProcPIFX [SCANPROCPIFX_TRANSP_ZFIL] = csScan_32_draw_pifx_scanline_transp_zfil;
+      ScanProcPIFX [SCANPROCPIFX_TEX_ZUSE] = csScan_32_draw_pifx_scanline_tex_zuse;
+      ScanProcPIFX [SCANPROCPIFX_TEX_ZFIL] = csScan_32_draw_pifx_scanline_tex_zfil;
+      ScanProcPIFX [SCANPROCPIFX_TEX_TRANSP_ZUSE] = csScan_32_draw_pifx_scanline_tex_transp_zuse;
+      ScanProcPIFX [SCANPROCPIFX_TEX_TRANSP_ZFIL] = csScan_32_draw_pifx_scanline_tex_transp_zfil;
 
       if (do_transp)
         ScanProc_Alpha = ScanProc_32_Alpha;
@@ -1997,7 +1997,8 @@ void csGraphics3DSoftware::StartPolygonFX (iTextureHandle* handle,
     pqinfo.drawline_gouraud = gouraud_proc;
   else
   {
-    scan_index = (z_buf_mode == CS_ZBUF_USE) ? SCANPROCPIFX_ZUSE : SCANPROCPIFX_ZFIL;
+    scan_index = (z_buf_mode == CS_ZBUF_USE) ?
+      SCANPROCPIFX_TEX_ZUSE : SCANPROCPIFX_TEX_ZFIL;
     if (pqinfo.transparent) scan_index += 2;
     pqinfo.drawline_gouraud = ScanProcPIFX [scan_index];
   }

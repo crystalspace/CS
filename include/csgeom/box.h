@@ -168,6 +168,13 @@ public:
     maxbox = v;
   }
 
+  /// Same but given some coordinates.
+  void StartBoundingBox (float x, float y)
+  {
+    minbox.x = maxbox.x = x;
+    minbox.y = maxbox.y = y;
+  }
+
   /// Add a new vertex and recalculate the bounding box.
   void AddBoundingVertex (float x, float y)
   {

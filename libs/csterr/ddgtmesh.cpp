@@ -492,7 +492,7 @@ bool ddgTBinMesh::calculate( void )
 		}
 		i++;
 	}
-	// Update priorities based on frustrum culling etc.
+	// Update priorities based on frustum culling etc.
 	// If a priority has changed, the triangle needs to be removed and reinserted
 	i = 0;
 	while (i < _bintreeMax)

@@ -57,9 +57,9 @@
  * This identifier is used by other plugins/engine/system driver to
  * find some plugin that user assigned to perform some function.
  * For example, the "VideoDriver" functionality identifier is used to
- * separate the main 3D graphics driver from other possibly loader
- * driver that implement the iGraphics3D interface (they could be
- * secondary video drivers for example).
+ * separate the main 3D graphics driver from other possibly loaded
+ * driver that also implements the iGraphics3D interface (it could be
+ * the secondary video driver for example).
  *<p>
  * The functionality ID is given in the system config file as left
  * side of assignment in "PlugIns" section. For example, in the
@@ -69,9 +69,16 @@
  * VideoDriver = crystal.graphics3d.software
  * </pre>
  * "VideoDriver" is functionality identifier, and "crystal.graphics3d.software"
- * is SCF class ID. No two plugins can have same functionality ID. This ID
- * can be NULL for unnamed plugins.
+ * is SCF class ID. No two plugins can have same functionality ID. When you
+ * load a plugin with System::RequestPlugin() you can define functionality ID
+ * after a double colon:
+ * <pre>
+ * System->RequestPlugin ("crystalspace.kernel.vfs:VFS");
+ * </pre>
+ * If you load a plugin via the ::LoadPlugIn method you just specify the
+ * functionality ID as one of arguments.
  */
+
 /// VFS plugin functionality identifier
 #define CS_FUNCID_VFS		"VFS"
 /// Functionality ID for the video driver

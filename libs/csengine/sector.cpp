@@ -491,7 +491,7 @@ bool CullOctreeNode (csPolygonTree* tree, csPolygonTreeNode* node,
     // If all vertices are behind z plane then the node is
     // not visible. If some vertices are behind z plane then we
     // need to clip the polygon.
-    // We also test the node against the view frustrum here.
+    // We also test the node against the view frustum here.
     int num_z_0 = 0;
     bool left = true, right = true, top = true, bot = true;
     for (i = 0 ; i < num_array ; i++)
@@ -1002,12 +1002,12 @@ void csSector::Draw (csRenderView& rview)
   draw_busy--;
 }
 
-void* csSector::CheckFrustrumPolygons (csSector*,
+void* csSector::CheckFrustumPolygons (csSector*,
 	csPolygonInt** polygon, int num, void* data)
 {
   csPolygon3D* p;
-  csFrustrumView* lview = (csFrustrumView*)data;
-  csVector3& center = lview->light_frustrum->GetOrigin ();
+  csFrustumView* lview = (csFrustumView*)data;
+  csVector3& center = lview->light_frustum->GetOrigin ();
   int i, j;
   for (i = 0 ; i < num ; i++)
   {
@@ -1032,14 +1032,14 @@ void* csSector::CheckFrustrumPolygons (csSector*,
 }
 
 //@@@ Needs to be part of sector?
-void CompressShadowFrustrums (csFrustrumList* list)
+void CompressShadowFrustums (csFrustumList* list)
 {
   csCBufferCube* cb = csWorld::current_world->GetCBufCube ();
   csCovcube* cc = csWorld::current_world->GetCovcube ();
   if (cb) cb->MakeEmpty ();
   else cc->MakeEmpty ();
 
-  csShadowFrustrum* sf = list->GetLast ();
+  csShadowFrustum* sf = list->GetLast ();
   csSector* cur_sector = NULL;
   int cur_draw_busy = 0;
   if (sf)
@@ -1058,7 +1058,7 @@ void CompressShadowFrustrums (csFrustrumList* list)
       vis = cc->InsertPolygon (sf->GetVertices (), sf->GetNumVertices ());
     if (!vis)
     {
-      csShadowFrustrum* sfdel = sf;
+      csShadowFrustum* sfdel = sf;
       sf = sf->prev;
       list->Unlink (sfdel);
       CHK (delete sfdel);
@@ -1069,12 +1069,12 @@ void CompressShadowFrustrums (csFrustrumList* list)
 }
 
 //@@@ Needs to be part of sector?
-void* CheckFrustrumPolygonsFB (csSector*,
+void* CheckFrustumPolygonsFB (csSector*,
 	csPolygonInt** polygon, int num, void* data)
 {
   csPolygon3D* p;
-  csFrustrumView* lview = (csFrustrumView*)data;
-  csVector3& center = lview->light_frustrum->GetOrigin ();
+  csFrustumView* lview = (csFrustumView*)data;
+  csVector3& center = lview->light_frustum->GetOrigin ();
   csCBufferCube* cb = csWorld::current_world->GetCBufCube ();
   csCovcube* cc = csWorld::current_world->GetCovcube ();
   bool cw = true;	// @@@ Mirror flag?
@@ -1123,8 +1123,8 @@ void* CheckFrustrumPolygonsFB (csSector*,
       if (ABS (clas) < EPSILON) continue;
       if ((clas <= 0) != cw) continue;
 
-      csShadowFrustrum* frust;
-      CHK (frust = new csShadowFrustrum (center));
+      csShadowFrustum* frust;
+      CHK (frust = new csShadowFrustum (center));
       csPlane3 pl = p->GetPlane ()->GetWorldPlane ();
       pl.DD += center * pl.norm;
       pl.Invert ();
@@ -1137,7 +1137,7 @@ void* CheckFrustrumPolygonsFB (csSector*,
       if (frust_cnt < 0)
       {
         frust_cnt = 200;
-	CompressShadowFrustrums (&(lview->shadows));
+	CompressShadowFrustums (&(lview->shadows));
       }
     }
   }
@@ -1158,9 +1158,9 @@ bool CullOctreeNodeLighting (csPolygonTree* tree, csPolygonTreeNode* node,
 
   csOctree* otree = (csOctree*)tree;
   csOctreeNode* onode = (csOctreeNode*)node;
-  csFrustrumView* lview = (csFrustrumView*)data;
+  csFrustumView* lview = (csFrustumView*)data;
 
-  const csVector3& center = lview->light_frustrum->GetOrigin ();
+  const csVector3& center = lview->light_frustum->GetOrigin ();
   csVector3 bmin = onode->GetMinCorner ()-center;
   csVector3 bmax = onode->GetMaxCorner ()-center;
 
@@ -1215,9 +1215,9 @@ bool CullOctreeNodeLighting (csPolygonTree* tree, csPolygonTreeNode* node,
   return true;
 }
 
-csThing** csSector::GetVisibleThings (csFrustrumView& lview, int& num_things)
+csThing** csSector::GetVisibleThings (csFrustumView& lview, int& num_things)
 {
-  csFrustrum* lf = lview.light_frustrum;
+  csFrustum* lf = lview.light_frustum;
   bool infinite = lf->IsInfinite ();
   csVector3& center = lf->GetOrigin ();
   csThing* sp;
@@ -1239,7 +1239,7 @@ csThing** csSector::GetVisibleThings (csFrustrumView& lview, int& num_things)
   sp = first_thing;
   while (sp)
   {
-    // If the light frustrum is infinite then every thing
+    // If the light frustum is infinite then every thing
     // in this sector is of course visible.
     if (infinite) vis = true;
     else
@@ -1248,7 +1248,7 @@ csThing** csSector::GetVisibleThings (csFrustrumView& lview, int& num_things)
       if (bbox)
       {
         // If we have a bounding box then we can do a quick test to
-	// see if the bounding box is visible in the frustrum. This
+	// see if the bounding box is visible in the frustum. This
 	// test is not complete in the sense that it will say that
 	// some bounding boxes are visible even if they are not. But
 	// it is correct in the sense that if it says a bounding box
@@ -1256,7 +1256,7 @@ csThing** csSector::GetVisibleThings (csFrustrumView& lview, int& num_things)
 	//
 	// It works by taking all vertices of the bounding box. If
 	// ALL of them are on the outside of the same plane from the
-	// frustrum then the object is certainly not visible.
+	// frustum then the object is certainly not visible.
 	vis = true;
 	i1 = lf->GetNumVertices ()-1;
 	for (i = 0 ; i < lf->GetNumVertices () ; i1 = i, i++)
@@ -1287,7 +1287,7 @@ csThing** csSector::GetVisibleThings (csFrustrumView& lview, int& num_things)
 	if (vis && lf->GetBackPlane ())
 	{
 	  // If still visible then we can also check the back plane.
-	  // @@@ NOTE THIS IS UNTESTED CODE. LIGHT_FRUSTRUMS CURRENTLY DON'T
+	  // @@@ NOTE THIS IS UNTESTED CODE. LIGHT_FRUSTUMS CURRENTLY DON'T
 	  // HAVE A BACK PLANE YET.
 	  if (!csMath3::Visible (sp->Vwor (bbox->i1)-center, *lf->GetBackPlane ()) &&
 	      !csMath3::Visible (sp->Vwor (bbox->i2)-center, *lf->GetBackPlane ()) &&
@@ -1313,7 +1313,7 @@ csThing** csSector::GetVisibleThings (csFrustrumView& lview, int& num_things)
   return visible_things;
 }
 
-void csSector::CheckFrustrum (csFrustrumView& lview)
+void csSector::CheckFrustum (csFrustumView& lview)
 {
   if (draw_busy > cfg_reflections) return;
   draw_busy++;
@@ -1324,7 +1324,7 @@ void csSector::CheckFrustrum (csFrustrumView& lview)
   // Translate this sector so that it is oriented around
   // the position of the light (position of the light becomes
   // the new origin).
-  csVector3& center = lview.light_frustrum->GetOrigin ();
+  csVector3& center = lview.light_frustum->GetOrigin ();
 
   // Check if gouraud shading needs to be updated.
   if (light_frame_number != current_light_frame_number)
@@ -1335,17 +1335,17 @@ void csSector::CheckFrustrum (csFrustrumView& lview)
   else lview.gouraud_color_reset = false;
 
   // First mark all things which are visible in the current
-  // frustrum.
+  // frustum.
   int num_visible_things;
   csThing** visible_things = GetVisibleThings (lview, num_visible_things);
 
   // If we are doing shadow casting for things then we also calculate
-  // a list of all shadow frustrums which are going to be used
+  // a list of all shadow frustums which are going to be used
   // in the lighting calculations. This list is appended to the
   // one given in 'lview'. After returning, the list in 'lview'
   // will be restored.
-  csShadowFrustrum* previous_last = lview.shadows.GetLast ();
-  csFrustrumList* shadows;
+  csShadowFrustum* previous_last = lview.shadows.GetLast ();
+  csFrustumList* shadows;
   if (lview.things_shadow)
     for (i = 0 ; i < num_visible_things ; i++)
     {
@@ -1370,9 +1370,9 @@ void csSector::CheckFrustrum (csFrustrumView& lview)
     count_cull_quad = 0;
     count_cull_not = 0;
     static_thing->UpdateTransformation (center);
-    static_tree->Front2Back (center, &CheckFrustrumPolygonsFB, (void*)&lview,
+    static_tree->Front2Back (center, &CheckFrustumPolygonsFB, (void*)&lview,
       	CullOctreeNodeLighting, (void*)&lview);
-    CheckFrustrumPolygonsFB (this, polygons.GetArray (),
+    CheckFrustumPolygonsFB (this, polygons.GetArray (),
       polygons.Length (), (void*)&lview);
     //printf ("Cull: dist=%d quad=%d not=%d\n",
     	//count_cull_dist, count_cull_quad, count_cull_not);
@@ -1380,7 +1380,7 @@ void csSector::CheckFrustrum (csFrustrumView& lview)
   else
   {
     // Calculate lighting for all polygons in this sector.
-    CheckFrustrumPolygons (this, polygons.GetArray (),
+    CheckFrustumPolygons (this, polygons.GetArray (),
         polygons.Length (), (void*)&lview);
   }
 
@@ -1391,22 +1391,22 @@ void csSector::CheckFrustrum (csFrustrumView& lview)
   {
     sp = visible_things[i];
     if (sp != static_thing)
-      sp->CheckFrustrum (lview);
+      sp->CheckFrustum (lview);
   }
   CHK (delete [] visible_things);
 
   // Restore the shadow list in 'lview' and then delete
-  // all the shadow frustrums that were added in this recursion
+  // all the shadow frustums that were added in this recursion
   // level.
-  csShadowFrustrum* frustrum;
-  if (previous_last) frustrum = previous_last->next;
-  else frustrum = lview.shadows.GetFirst ();
+  csShadowFrustum* frustum;
+  if (previous_last) frustum = previous_last->next;
+  else frustum = lview.shadows.GetFirst ();
   lview.shadows.SetLast (previous_last);
-  while (frustrum)
+  while (frustum)
   {
-    csShadowFrustrum* sf = frustrum->next;
-    CHK (delete frustrum);
-    frustrum = sf;
+    csShadowFrustum* sf = frustum->next;
+    CHK (delete frustum);
+    frustum = sf;
   }
 
   draw_busy--;
