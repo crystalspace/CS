@@ -91,6 +91,7 @@ enum
   XMLTOKEN_MULTIPLY,
   XMLTOKEN_ADD,
   XMLTOKEN_DESTALPHAADD,
+  XMLTOKEN_SRCALPHAADD,
   XMLTOKEN_ALPHA,
   XMLTOKEN_TRANSPARENT,
   XMLTOKEN_KEYCOLOR,
@@ -173,6 +174,7 @@ bool csTextSyntaxService::Initialize (iObjectRegistry* object_reg)
   xmltokens.Register ("multiply", XMLTOKEN_MULTIPLY);
   xmltokens.Register ("add", XMLTOKEN_ADD);
   xmltokens.Register ("destalphaadd", XMLTOKEN_DESTALPHAADD);
+  xmltokens.Register ("srcalphaadd", XMLTOKEN_SRCALPHAADD);
   xmltokens.Register ("alpha", XMLTOKEN_ALPHA);
   xmltokens.Register ("transparent", XMLTOKEN_TRANSPARENT);
   xmltokens.Register ("keycolor", XMLTOKEN_KEYCOLOR);
@@ -440,6 +442,8 @@ bool csTextSyntaxService::ParseMixmode (iDocumentNode* node, uint &mixmode)
 	MIXMODE_EXCLUSIVE mixmode |= CS_FX_ADD; break;
       case XMLTOKEN_DESTALPHAADD:
 	MIXMODE_EXCLUSIVE mixmode |= CS_FX_DESTALPHAADD; break;
+      case XMLTOKEN_SRCALPHAADD:
+	MIXMODE_EXCLUSIVE mixmode |= CS_FX_SRCALPHAADD; break;
       case XMLTOKEN_ALPHA:
         MIXMODE_EXCLUSIVE {
 	  mixmode &= ~CS_FX_MASK_ALPHA;
