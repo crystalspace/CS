@@ -73,6 +73,8 @@
 #include <math.h>
 #ifdef WIN32
 #include <float.h>
+  int __mb_cur_max;
+  unsigned short* _pctype;
 #endif
 
 typedef enum {
