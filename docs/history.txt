@@ -21,6 +21,7 @@ The history order is reversed so that new features are at the top.
 	- Fixed another related bug in cs2xml.
 	- Converted standard.zip to XML.
 	- Added support for ROT and Q (quaternions) in cs2xml.
+	- Converted blocks.zip to XML.
 21-Aug-2002
 	- Implemented XML version of the spiral loader.
 	- Fixed a bug in cs2xml with parsing of the RADIUS
