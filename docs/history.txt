@@ -1,5 +1,10 @@
 The history order is reversed so that new features are at the top.
 
+2-Feb-2002
+	- Eric Sunshine replaced fabsf() with fabs() in terrbig plugin for
+	  improved portability since not all platforms have fabsf().  (An
+	  alternate solution would be to check for fabsf via configure.  We
+	  will probably want to do this in the future.)
 2-Feb-2003
 	- Optimization with polygon buffers (DrawPolygonMesh) in OpenGL
 	  renderer. They use less memory now and they are also more efficient.
