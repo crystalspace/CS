@@ -300,7 +300,7 @@ bool csBox3::AdjacentZ (const csBox3& other) const
 }
 
 void csBox3::GetConvexOutline (const csVector3& pos,
-	csVector3* ar, int& num_array)
+	csVector3* ar, int& num_array) const
 {
   const csVector3& bmin = Min ();
   const csVector3& bmax = Max ();
@@ -335,6 +335,25 @@ void csBox3::GetConvexOutline (const csVector3& pos,
       case 7: ar[i].x = bmax.x; ar[i].y = bmax.y; ar[i].z = bmax.z; break;
     }
   }
+}
+
+bool csBox3::Between (const csBox3& box1, const csBox3& box2,
+  	csPlane3* /*planes*/, int /*num_planes*/) const
+{
+  // First the trival test to see if the coordinates are
+  // at least within the right intervals.
+  if (((maxbox.x >= box1.minbox.x && minbox.x <= box2.maxbox.x) ||
+       (maxbox.x >= box2.minbox.x && minbox.x <= box1.maxbox.x)) &&
+      ((maxbox.y >= box1.minbox.y && minbox.y <= box2.maxbox.y) ||
+       (maxbox.y >= box2.minbox.y && minbox.y <= box1.maxbox.y)) &&
+      ((maxbox.z >= box1.minbox.z && minbox.z <= box2.maxbox.z) ||
+       (maxbox.z >= box2.minbox.z && minbox.z <= box1.maxbox.z)))
+  {
+    // @@@ Ok, let's just return true here. Maybe this test is already
+    // enough? We could have used the planes as well.
+    return true;
+  }
+  return false;
 }
 
 csBox3& csBox3::operator+= (const csBox3& box)

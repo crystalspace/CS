@@ -291,6 +291,30 @@ private:
 	int* tot_tot_poly, int* min_tot_poly, int* max_tot_poly);
 
   /**
+   * Help function for BoxCanSeeOccludee.
+   */
+  void BoxOccludeeShadowPolygons (const csBox3& box,
+  	const csBox3& occludee,
+	csPolygonInt** polygons, int num_polygons,
+	csCovcube* cube, int* relevant_sides, int num_relevant_sides);
+
+  /**
+   * Help function for BoxCanSeeOccludee.
+   */
+  void BoxOccludeeAddShadows (csOctreeNode* occluder, csCovcube* cube,
+  	const csBox3& box, const csBox3& occludee,
+	csVector3& box_center, csVector3& occludee_center,
+	int* relevant_sides, int num_relevant_sides,
+	csPlane3* planes, int num_planes);
+
+  /**
+   * Test if 'box' can see 'occludee' through all the polygons
+   * in this octree. May use the given coverage mask tree cube.
+   */
+  bool BoxCanSeeOccludee (const csBox3& box, const csBox3& occludee,
+  	csCovcube* cube);
+
+  /**
    * Build PVS for this leaf.
    */
   void BuildPVSForLeaf (csOctreeNode* occludee, csThing* thing,

@@ -949,6 +949,107 @@ void csOctree::AddToPVS (csPVS& pvs, csOctreeNode* node)
     AddToPVS (pvs, (csOctreeNode*)node->children[i]);
 }
 
+void csOctree::BoxOccludeeShadowPolygons (const csBox3& box,
+	const csBox3& occludee,
+	csPolygonInt** polygons, int num_polygons,
+	csCovcube* cube, int* relevant_sides, int num_relevant_sides)
+{
+  int i, j, k;
+  csPolygon3D* p;
+  csPoly3D cur_poly;
+  csPoly2D proj_poly;
+  for (i = 0 ; i < num_polygons ; i++)
+    if (polygons[i]->GetType () == 1)
+    {
+      p = (csPolygon3D*)polygons[i];
+      cur_poly.SetNumVertices (0);
+      for (j = 0 ; j < p->GetNumVertices () ; j++)
+        cur_poly.AddVertex (p->Vwor (j));
+      for (j = 0 ; j < num_relevant_sides ; j++)
+        for (k = 0 ; k < 8 ; k++)
+	{
+	  const csVector3& corner = box.GetCorner (k);
+	  switch (relevant_sides[j])
+	  {
+	    case 0:
+	      cur_poly.ProjectXPlane (corner, box.MinX (), &proj_poly);
+	      break;
+	    case 1:
+	      cur_poly.ProjectXPlane (corner, box.MaxX (), &proj_poly);
+	      break;
+	    case 2:
+	      cur_poly.ProjectYPlane (corner, box.MinY (), &proj_poly);
+	      break;
+	    case 3:
+	      cur_poly.ProjectYPlane (corner, box.MaxY (), &proj_poly);
+	      break;
+	    case 4:
+	      cur_poly.ProjectZPlane (corner, box.MinZ (), &proj_poly);
+	      break;
+	    case 5:
+	      cur_poly.ProjectZPlane (corner, box.MaxZ (), &proj_poly);
+	      break;
+	  }
+	  //@@@@@@@@@@@@@
+	}
+    }
+}
+
+void csOctree::BoxOccludeeAddShadows (csOctreeNode* occluder, csCovcube* cube,
+	const csBox3& box, const csBox3& occludee,
+	csVector3& box_center, csVector3& occludee_center,
+	int* relevant_sides, int num_relevant_sides,
+	csPlane3* planes, int num_planes)
+{
+  if (!occluder) return;
+  int i;
+  const csBox3& occluder_box = occluder->GetBox ();
+  if (occluder_box.In (box_center) || occluder_box.In (occludee_center))
+  {
+    for (i = 0 ; i < 8 ; i++)
+      BoxOccludeeAddShadows ((csOctreeNode*)occluder->children[i],
+      	cube, box, occludee, box_center, occludee_center,
+	relevant_sides, num_relevant_sides, planes, num_planes);
+  }
+  else if (occluder_box.Between (box, occludee, planes, num_planes))
+  {
+    if (occluder->IsLeaf ())
+      BoxOccludeeShadowPolygons (box, occludee,
+	occluder->unsplit_polygons.GetPolygons (),
+	occluder->unsplit_polygons.GetNumPolygons (),
+	cube, relevant_sides, num_relevant_sides);
+    else
+      for (i = 0 ; i < 8 ; i++)
+        BoxOccludeeAddShadows ((csOctreeNode*)occluder->children[i],
+      	  cube, box, occludee, box_center, occludee_center,
+	  relevant_sides, num_relevant_sides, planes, num_planes);
+  }
+}
+
+bool csOctree::BoxCanSeeOccludee (const csBox3& box, const csBox3& occludee,
+	csCovcube* cube)
+{
+  int i;
+  csPlane3 planes[8];
+  int num_planes;
+  num_planes = csMath3::OuterPlanes (occludee, box, planes);
+  int relevant_sides[6];
+  int num_relevant_sides;
+  num_relevant_sides = csMath3::FindObserverSides (box, occludee,
+  	relevant_sides);
+  for (i = 0 ; i < num_relevant_sides ; i++)
+    cube->GetFace (relevant_sides[i])->MakeEmpty ();
+  csVector3 box_center= box.GetCenter ();
+  csVector3 occludee_center = occludee.GetCenter ();
+  BoxOccludeeAddShadows ((csOctreeNode*)root, cube, box, occludee,
+  	box_center, occludee_center,
+  	relevant_sides, num_relevant_sides, planes, num_planes);
+  for (i = 0 ; i < num_relevant_sides ; i++)
+    if (!cube->GetFace (relevant_sides[i])->IsFull ())
+      return true;
+  return false;
+}
+
 #if 1
 void csOctree::BuildPVSForLeaf (csOctreeNode* occludee, csThing* thing,
 	csOctreeNode* leaf, csCovcube* cube)
@@ -963,26 +1064,8 @@ void csOctree::BuildPVSForLeaf (csOctreeNode* occludee, csThing* thing,
     // nodes in the PVS by testing if the shared plane between
     // the two nodes is completely solid.
     visible = true;
-  else
-  {
-    csPlane3 planes[8];
-    int num_planes;
-    num_planes = csMath3::OuterPlanes (occludee->GetBox (), leaf->GetBox (),
-    	planes);
-    int relevant_sides[6];
-    int num_relevant_sides;
-    num_relevant_sides = csMath3::FindObserverSides (leaf->GetBox (),
-    	occludee->GetBox (), relevant_sides);
-    for (i = 0 ; i < num_relevant_sides ; i++)
-      cube->GetFace (relevant_sides[i])->MakeEmpty ();
-    //@@@ BuildPVSAddShadows ();
-    for (i = 0 ; i < num_relevant_sides ; i++)
-      if (!cube->GetFace (relevant_sides[i])->IsFull ())
-      {
-        visible = true;
-	break;
-      }
-  }
+  else if (BoxCanSeeOccludee (leaf->GetBox (), occludee->GetBox (), cube))
+    visible = true;
 
   // If visible then we add to the PVS and build the PVS for
   // the polygons in the node as well.

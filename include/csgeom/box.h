@@ -25,6 +25,8 @@
 #include "vector3.h"
 #include "segment.h"
 
+class csPlane3;
+
 /**
  * The maximum value that a coordinate in the bounding box can use.
  * This is considered the 'infinity' value used for empty bounding boxes.
@@ -73,6 +75,11 @@ public:
    * Corner 0 = xy, 1 = xY, 2 = Xy, 3 = XY.
    */
   csVector2 GetCorner (int corner) const;
+
+  /**
+   * Get the center of this box.
+   */
+  csVector2 GetCenter () const { return (minbox+maxbox)/2; }
 
   /**
    * Return every edge (segment) of this bounding box
@@ -310,6 +317,11 @@ public:
   csVector3 GetCorner (int corner) const;
 
   /**
+   * Get the center of this box.
+   */
+  csVector3 GetCenter () const { return (minbox+maxbox)/2; }
+
+  /**
    * Return every edge (segment) of this bounding box
    * from 0 to 11. The returned edge is undefined for any
    * other index.
@@ -486,7 +498,14 @@ public:
    * Note that you need place for at least six vectors in the array.
    */
   void GetConvexOutline (const csVector3& pos,
-  	csVector3* array, int& num_array);
+  	csVector3* array, int& num_array) const;
+
+  /**
+   * Test if this box is between two others. The set of planes
+   * that is given to this routine can be made with csMath3::OuterPlanes().
+   */
+  bool Between (const csBox3& box1, const csBox3& box2,
+  	csPlane3* planes, int num_planes) const;
 
   /// Compute the union of two bounding boxes.
   csBox3& operator+= (const csBox3& box);

@@ -1,9 +1,11 @@
 The history order has been reversed so that new features are at the top.
 
 30-Apr-2000
+	- More work on the PVS.
+	- Added csBox2 and csBox3::GetCenter().
+	- Added csBox3::Between() to test if a box is between two others.
 	- Martin Geisse added framework for object conditions and cleaned up
 	  thing handling for the DUNGEON plugin.
-
 28-Apr-2000
 	- Paul Garceau modified for COMP_GCC/COMP_VC Win32 implementation:
 	    - Re-enabled "make ddraw".

@@ -1331,8 +1331,6 @@ void csSprite3D::Draw (csRenderView& rview)
   bool do_tween = false;
   if (!skeleton_state && tween_ratio) do_tween = true;
 
-  // @@@ Can't this copy be avoided?
-
   int cf_idx = cframe->GetAnmIndex();
 
   csVector3* real_obj_verts;
