@@ -103,9 +103,9 @@ static void get_pixel (UByte*& ptr, csRGBpixel* dest, int Size, bool alpha);
 static iImageIO::FileFormatDescription formatlist[6] = 
 {
   {TGA_MIME, "Map", CS_IMAGEIO_LOAD},
-  {TGA_MIME, "RGB", CS_IMAGEIO_LOAD},
+  {TGA_MIME, "RGB", CS_IMAGEIO_LOAD|CS_IMAGEIO_SAVE},
   {TGA_MIME, "Mono", CS_IMAGEIO_LOAD},
-  {TGA_MIME, "RLEMap", CS_IMAGEIO_LOAD},
+  {TGA_MIME, "RLEMap", CS_IMAGEIO_LOAD|CS_IMAGEIO_SAVE},
   {TGA_MIME, "RLERGB", CS_IMAGEIO_LOAD},
   {TGA_MIME, "RLEMono", CS_IMAGEIO_LOAD}
 };
@@ -215,7 +215,9 @@ iDataBuffer *csTGAImageIO::Save (iImage *Image, iImageIO::FileFormatDescription 
     }
 
     unsigned char *data = (unsigned char *)Image->GetImageData ();
-    memcpy (p, data, w*h*hdr.PixelSize/8);
+    for (int y=h-1; y >= 0; y--)
+      for (int x=0; x < w; x++)
+	*p++ = data[y*w+x];
   }
   else
   {
