@@ -16,6 +16,13 @@ chronological order.
 	      list which it assigns to DEPEND.
 	- Eric Sunshine disable MSVC6 warning C4503 "'identifier' : decorated
 	  name length exceeded" which is triggered by thing.cpp/ref.h.
+	- Eric Sunshine augmented the ODE check in configure.ac so that it also
+	  determines if `extern "C"' should be used for the functions exported
+	  by ODE.  This is needed for the cs-win32libs package which exports
+	  functions with `extern "C"' to avoid name mangling so that the
+	  package can be used with many different compilers.  Other platforms
+	  do not need `extern "C"', nor do Windows installations in which ODE
+	  has been installed manually.
 17-May-2004
 	- Eric Sunshine made the following msvcgen-related changes:
 	    - Added --source-root and --build-root options to msvcgen.pl, as

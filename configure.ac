@@ -1270,8 +1270,11 @@ AS_IF([test $cs_cv_lib3ds = yes],
 
 #------------------------------------------------------------------------------
 # Check for libode.  In addition to the standard installed locations, we also
-# search CS/libs/libode*.  Also check if it is a sufficiently recent version
-# (0.039 as of this writing).
+# search CS/libs/libode*.  Also check if it is a sufficiently recent version.
+# Finally, the cs-win32libs package uses a slightly augmented libode in which
+# functions are exported as `extern "C"' to avoid name mangling problems which
+# would otherwise prevent the package from being used with different compilers.
+# Therefore, we need to check if `extern "C"' is needed.
 #------------------------------------------------------------------------------
 CS_CHECK_LIB_WITH([ode],
     [AC_LANG_PROGRAM([[#include <ode/ode.h>]], [dWorldCreate()])],
@@ -1286,6 +1289,18 @@ AS_IF([test $cs_cv_libode = yes],
 	    dWorldStepFast1(w,0,0);
 	    dCloseODE();])],
 	[], [C++], [CS_EMIT_BUILD_RESULT([cs_cv_libode], [ODE])], [], [],
+	[$cs_cv_libode_cflags], [$cs_cv_libode_lflags], [$cs_cv_libode_libs])],
+	[cs_cv_libode_recent=no])
+
+AS_IF([test $cs_cv_libode_recent = yes],
+    [CS_CHECK_BUILD([if extern "C" is needed with libode],
+	[cs_cv_libode_extern_c],
+	[AC_LANG_PROGRAM(
+	    [[#include <ode/ode.h>
+	    extern "C"
+	    int dCollideBoxPlane(dxGeom*,dxGeom*,int,dContactGeom*,int);]],
+	    [dCollideBoxPlane(0,0,0,0,0);])],
+	[], [C++], [CS_EMIT_BUILD_RESULT([ODE.EXTERN_C], [yes])], [], [],
 	[$cs_cv_libode_cflags], [$cs_cv_libode_lflags], [$cs_cv_libode_libs])])
 
 

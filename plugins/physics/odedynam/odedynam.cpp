@@ -347,12 +347,14 @@ int csODEDynamics::CollideMeshMesh (dGeomID o1, dGeomID o2, int flags,
   return i;*/
 }
 
-#ifdef OS_WIN32
 /*
   The ODE version contained in the win32libs package defines the dCollide*
   functions as extern "C" (otherwise the DLL couldn't be shared by different
-  compilers). For other platforms, it's not the case.
+  compilers). For other platforms, it's not the case. For Mingw and Cygwin
+  users, this setting will be detected automatically by the CS configure
+  script.
  */
+#if defined(CS_USE_ODE_EXTERN_C)
 #define ODE_EXTERN  extern "C"
 #else
 #define ODE_EXTERN  extern

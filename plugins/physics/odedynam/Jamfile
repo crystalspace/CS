@@ -2,8 +2,16 @@ SubDir TOP plugins physics odedynam ;
 
 if $(ODE.AVAILABLE) = "yes"
 {
-Description odedynam : "ODE dynamics plugin" ;
-Plugin odedynam : [ Wildcard *.cpp *.h ] ;
-LinkWith odedynam : csgeom csutil ;
-ExternalLibs odedynam : ODE ;
+  Description odedynam : "ODE physics plugin" ;
+  Plugin odedynam : [ Wildcard *.cpp *.h ] ;
+  LinkWith odedynam : csgeom csutil ;
+  ExternalLibs odedynam : ODE ;
+  if $(ODE.EXTERN_C) = "yes"
+  {
+    CFlags odedynam : [ FDefines CS_USE_ODE_EXTERN_C ] ;
+  }
+  if [ Property build : projgen ] = msvc
+  {
+    MsvcCFlags odedynam : "/D \"CS_USE_ODE_EXTERN_C\"" ;
+  }
 }
