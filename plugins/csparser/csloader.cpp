@@ -424,8 +424,12 @@ iBase* csLoader::TestXmlPlugParse (iLoaderPlugin* plug, iDataBuffer* buf,
     return plug->Parse (paramsnode, GetLoaderContext (), context);
   }
   else
+  {
+    ReportNotify ("crystalspace.maploader", 
+		    "Please convert your models to XML using cs2xml (file '%s')!", fname);
     return plug->Parse ((char*)(buf->GetUint8 ()), GetLoaderContext (),
     	context);
+  }
 }
 
 //---------------------------------------------------------------------------
@@ -607,6 +611,8 @@ bool csLoader::LoadMapFile (const char* file, bool iClearEngine,
   }
   else
   {
+    ReportNotify ("crystalspace.maploader", 
+		    "Please convert your map to XML using cs2xml (file '%s')!", file);
     if (!LoadMap (**buf)) return false;
   }
 
@@ -808,6 +814,8 @@ bool csLoader::LoadLibraryFile (const char* fname)
   }
   else
   {
+    ReportNotify ("crystalspace.maploader",
+		    "Please convert your library to XML using cs2xml (file '%s')!", fname);
     return LoadLibrary (**buf);
   }
 }
@@ -962,6 +970,10 @@ csPtr<iMeshFactoryWrapper> csLoader::LoadMeshObjectFactory (const char* fname)
   }
   else
   {
+    ReportNotify ("crystalspace.maploader",
+		    "Please convert your mesh object factory to XML using cs2xml (file '%s')!",
+		    fname);
+
     CS_TOKEN_TABLE_START (tokens)
       CS_TOKEN_TABLE (MESHFACT)
     CS_TOKEN_TABLE_END
@@ -2407,6 +2419,10 @@ csPtr<iMeshWrapper> csLoader::LoadMeshObject (const char* fname)
   }
   else
   {
+    ReportNotify ("crystalspace.maploader",
+		    "Please convert your mesh object to XML using cs2xml (file '%s')!",
+		    fname);
+
     CS_TOKEN_TABLE_START (tokens)
       CS_TOKEN_TABLE (MESHOBJ)
     CS_TOKEN_TABLE_END
