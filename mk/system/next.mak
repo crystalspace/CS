@@ -208,7 +208,7 @@ NEXT.ARCHS.ALL :=
 endif # ALREADY_INCLUDED
 
 NEXT.SYSHELP += \
-  $(NEWLINE)echo $"  make $(NEXT.TARGET)     Prepare for building under and for $(DESCRIPTION.$(NEXT.TARGET))$"
+  $(NEWLINE)echo $"  make $(NEXT.TARGET.DESCRIPTION)     Prepare for building under and for $(DESCRIPTION.$(NEXT.TARGET))$"
 NEXT.ARCHS.HELP += \
   $(NEWLINE)echo $"          $(NEXT.ARCHS)  [$(NEXT.DESCRIPTION)]$"
 NEXT.ARCHS.ALL += $(NEXT.ARCHS)
@@ -218,24 +218,27 @@ NEXT.COMMA = ,
 endif # ifeq ($(MAKESECTION),confighelp)
 
 #---------------------------------------------------------------- configure ---#
-ifeq ($(ROOTCONFIG),config)
+ifeq ($(MAKESECTION),rootdefines) # Makefile includes us twice with valid
+ifeq ($(ROOTCONFIG),config)	  # ROOTCONFIG, but we only need to run once.
 
 # Currently this port does not support dynamic libraries
 override USE_DLL = no
 
-SYSCONFIG=$(NEWLINE)echo override DO_ASM = $(DO_ASM)>>config.tmp
+SYSCONFIG += $(NEWLINE)bin/booltest.sh "cc -ObjC++" >> config.tmp
+SYSCONFIG += $(NEWLINE)echo override DO_ASM = $(DO_ASM)>>config.tmp
 ifneq ($(strip $(TARGET_ARCHS)),)
   SYSCONFIG += $(NEWLINE)echo TARGET_ARCHS = $(NEXT.TARGET_ARCHS)>>config.tmp
 endif
 
 endif # ifeq ($(ROOTCONFIG),config)
 
-ifeq ($(ROOTCONFIG)/$(MAKESECTION),volatile/rootdefines)
+ifeq ($(ROOTCONFIG),volatile)
 
 # Add required defines to volatile.h
 MAKE_VOLATILE_H += $(NEWLINE)echo $"\#define OS_NEXT_$(NEXT.FLAVOR)$">>volatile.tmp
 MAKE_VOLATILE_H += $(NEWLINE)echo $"\#define OS_NEXT_DESCRIPTION "$(NEXT.DESCRIPTION)"$">>volatile.tmp
 
-endif # ifeq ($(ROOTCONFIG)/$(MAKESECTION),volatile/rootdefines)
+endif # ifeq ($(ROOTCONFIG),volatile)
+endif # ifeq ($(MAKESECTION),rootdefines)
 
 endif # ifeq ($(NEXT.FRIEND),yes)
