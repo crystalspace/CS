@@ -1549,7 +1549,7 @@ void csGraphics3DDirect3DDx6::SysPrintf(int mode, char* szMsg, ...)
 }
 
 csHaloHandle csGraphics3DDirect3DDx6::CreateHalo (float iR, float iG, float iB,
-  float iFactor, float iCross);
+  float /*iFactor*/, float /*iCross*/)
 {
   if(m_bHaloEffect)
   {

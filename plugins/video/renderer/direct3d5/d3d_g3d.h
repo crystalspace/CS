@@ -278,7 +278,7 @@ public:
   virtual void DestroyHalo (csHaloHandle iHalo);
   virtual bool DrawHalo (csVector3 *iCenter, float iIntensity, csHaloHandle iHalo);
   virtual bool TestHalo (csVector3 *iCenter);
-  virtual void SetHaloClipper (csVector2 *iClipper, int iCount) {}
+  virtual void SetHaloClipper (csVector2* /*iClipper*/, int /*iCount*/) {}
 
   /// Our internal representation of halos.
   struct csG3DHardwareHaloInfo

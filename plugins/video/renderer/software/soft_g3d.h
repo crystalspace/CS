@@ -397,7 +397,7 @@ public:
     virtual bool TestHalo (csVector3 *iCenter);
     virtual void SetHaloClipper (csVector2 *iClipper, int iCount);
   } scfiHaloRasterizer;
-  friend struct csSoftHalo;
+  friend class  csSoftHalo;
   friend struct csSoftHaloHandle;
 
   ///------------------- iConfig interface implementation -------------------
