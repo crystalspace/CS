@@ -206,7 +206,7 @@ public:
 
   /// Auto-mount ChDir.
   virtual bool ChDirAuto (const char* path, const csStringArray* paths = 0,
-  	const char* vfspath = 0);
+  	const char* vfspath = 0, const char* filename = 0);
 
   /// Initialize the Virtual File System
   virtual bool Initialize (iObjectRegistry *object_reg);

@@ -1704,12 +1704,16 @@ static bool VisTest_Front2Back (csKDTree* treenode, void* userdata,
 bool csDynaVis::VisTest (iRenderView* rview, 
 			 iVisibilityCullerListener* viscallback)
 {
+  // We update the objects before testing the callback so that
+  // we can use this VisTest() call to make sure the objects in the
+  // culler are precached.
+  UpdateObjects ();
+  current_vistest_nr++;
+
   // just make sure we have a callback
   if (viscallback == 0)
     return false;
 
-  UpdateObjects ();
-  current_vistest_nr++;
   cnt_visible = 0;
   cnt_node_visible = 0;
 

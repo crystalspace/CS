@@ -6014,6 +6014,7 @@
                 <color red="1" green="1" blue="1" />
                 <material>billboard</material>
             </params>
+	    <ztest/>
             <move>
                 <v x="-4" y="0" z="8" />
             </move>
@@ -22973,6 +22974,45 @@
     </sector>
     <sector name="wavySector">
         <meshobj name="walls">
+	    <portals name="wavyPortals">
+                <portal name="north">
+                    <v x="-6" y="4" z="6" />
+                    <v x="6" y="4" z="6" />
+                    <v x="6" y="-4" z="6" />
+                    <v x="-6" y="-4" z="6" />
+                    <sector>wavySector</sector>
+                    <ww x="0" y="0" z="11" />
+                    <maxvisit>15</maxvisit>
+                </portal>
+                <portal name="south">
+                    <v x="6" y="4" z="-6" />
+                    <v x="-6" y="4" z="-6" />
+                    <v x="-6" y="-4" z="-6" />
+                    <v x="6" y="-4" z="-6" />
+                    <sector>wavySector</sector>
+                    <ww x="0" y="0" z="-11" />
+                    <maxvisit>15</maxvisit>
+                </portal>
+                <portal name="east">
+                    <v x="6" y="4" z="6" />
+                    <v x="6" y="4" z="-6" />
+                    <v x="6" y="-4" z="-6" />
+                    <v x="6" y="-4" z="6" />
+                    <sector>wavySector</sector>
+                    <ww x="11" y="0" z="0" />
+                    <maxvisit>15</maxvisit>
+                </portal>
+                <portal name="west">
+                    <v x="-6" y="4" z="-6" />
+                    <v x="-6" y="4" z="6" />
+                    <v x="-6" y="-4" z="6" />
+                    <v x="-6" y="-4" z="-6" />
+                    <sector>wavySector</sector>
+                    <ww x="-11" y="0" z="0" />
+                    <maxvisit>15</maxvisit>
+                </portal>
+	        <priority>specialportal</priority>
+            </portals>
             <plugin>thing</plugin>
             <params>
                 <v x="-6" y="-4" z="-6" />
@@ -22985,42 +23025,6 @@
                 <v x="6" y="4" z="6" />
                 <material>plasma</material>
                 <texlen>5.5</texlen>
-                <p name="east">
-                    <v>7</v>
-                    <v>6</v>
-                    <v>4</v>
-                    <v>5</v>
-                    <lighting>no</lighting>
-                    <portal>
-                        <sector>wavySector</sector>
-                        <ww x="11" y="0" z="0" />
-                        <maxvisit>15</maxvisit>
-                    </portal>
-                </p>
-                <p name="south">
-                    <v>6</v>
-                    <v>2</v>
-                    <v>0</v>
-                    <v>4</v>
-                    <lighting>no</lighting>
-                    <portal>
-                        <sector>wavySector</sector>
-                        <ww x="0" y="0" z="-11" />
-                        <maxvisit>15</maxvisit>
-                    </portal>
-                </p>
-                <p name="west">
-                    <v>2</v>
-                    <v>3</v>
-                    <v>1</v>
-                    <v>0</v>
-                    <lighting>no</lighting>
-                    <portal>
-                        <sector>wavySector</sector>
-                        <ww x="-11" y="0" z="0" />
-                        <maxvisit>15</maxvisit>
-                    </portal>
-                </p>
                 <p name="up">
                     <v>2</v>
                     <v>6</v>
@@ -23034,18 +23038,6 @@
                     <v>4</v>
                     <v>0</v>
                     <lighting>no</lighting>
-                </p>
-                <p name="north">
-                    <v>3</v>
-                    <v>7</v>
-                    <v>5</v>
-                    <v>1</v>
-                    <lighting>no</lighting>
-                    <portal>
-                        <sector>wavySector</sector>
-                        <ww x="0" y="0" z="11" />
-                        <maxvisit>15</maxvisit>
-                    </portal>
                 </p>
             </params>
             <zfill />

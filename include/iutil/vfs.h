@@ -374,9 +374,12 @@ struct iVFS : public iBase
    * \param vfspath is the temporary name to use in case it is not a vfs
    *        path. If not given then this routine will try to use a suitable
    *        temporary name.
+   * \param filename is an optional filename that must be present on the
+   *        given path. If this is given then the chdir will only work
+   *        if the given file is present.
    */
   virtual bool ChDirAuto (const char* path, const csStringArray* paths = 0,
-  	const char* vfspath = 0) = 0;
+  	const char* vfspath = 0, const char* filename = 0) = 0;
 
   /**
    * Query file date/time.

@@ -284,7 +284,7 @@ void WalkTest::Help ()
   printf ("  -[no]logo          draw logo (default '%slogo')\n", do_logo ? "" : "no");
   printf ("  -regions           load every map in a separate region (default off)\n");
   printf ("  -dupes             check for duplicate objects in multiple maps (default off)\n");
-  printf ("  -prepare           after loading, pre-prepare all things (default off)\n");
+  printf ("  -precache          after loading precache to speed up rendering (default off)\n");
   printf ("  -infinite          special infinite level generation (ignores map file!)\n");
   printf ("  -bots              allow random generation of bots\n");
   printf ("  <path>             load map from VFS <path> (default '%s')\n",
@@ -1006,7 +1006,7 @@ bool WalkTest::SetMapDir (const char* map_dir)
 {
   csStringArray paths;
   paths.Push ("/lev/");
-  if (!myVFS->ChDirAuto (map_dir, &paths))
+  if (!myVFS->ChDirAuto (map_dir, &paths, 0, "world"))
   {
     Report (CS_REPORTER_SEVERITY_ERROR, "Error setting directory '%s'!",
     	map_dir);
@@ -1438,26 +1438,11 @@ bool WalkTest::Initialize (int argc, const char* const argv[],
       txtmgr->FreeImages ();
     }
 
-    if (cmdline->GetOption ("prepare"))
+    if (cmdline->GetOption ("precache"))
     {
-      Report (CS_REPORTER_SEVERITY_NOTIFY, "Preparing all things...");
-#if 1
-      Engine->PrecacheDraw (view->GetCamera (), view->GetClipper ());
-#else
-      iMeshList* ml = Engine->GetMeshes ();
-      int i;
-      for (i = 0 ; i < ml->GetCount () ; i++)
-      {
-        iMeshWrapper* m = ml->Get (i);
-	if (m->GetMeshObject ())
-	{
-	  csRef<iThingState> thing = SCF_QUERY_INTERFACE (m->GetMeshObject (),
-	  	iThingState);
-	  if (thing) thing->Prepare ();
-        }
-      }
-#endif
-      Report (CS_REPORTER_SEVERITY_NOTIFY, "Preparing finished...");
+      Report (CS_REPORTER_SEVERITY_NOTIFY, "Precaching all things...");
+      Engine->PrecacheDraw ();
+      Report (CS_REPORTER_SEVERITY_NOTIFY, "Precaching finished...");
     }
 
     csTicks stop_time = csGetTicks ();

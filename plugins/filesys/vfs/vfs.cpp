@@ -1692,7 +1692,6 @@ bool csVFS::ChDir (const char *Path)
   char *newwd = _ExpandPath (Path, true);
   if (!newwd)
     return false;
-
   // Find the current directory node and directory suffix
   VfsNode* newcnode = GetNode (newwd, cnsufx, sizeof (cnsufx));
   if (!newcnode)
@@ -2065,18 +2064,25 @@ static char* TransformPath (const char* path, bool add_end)
   bool lastispath = false;
   while (*path)
   {
-    if (*path == '$' && *(path+1) == '/')
+    if (*path == '$' && (*(path+1) == '/' || *(path+1) == '.'))
     {
       *np++ = '$';
-      *np++ = '/';
+      *np++ = *(path+1);
       path++;
-      lastispath = true;
+      if (*(path+1) == '/')
+        lastispath = true;
     }
     else if (*path == '/' || *path=='\\')
     {
       *np++ = '$';
       *np++ = '/';
       lastispath = true;
+    }
+    else if (*path == '.')
+    {
+      *np++ = '$';
+      *np++ = '.';
+      lastispath = false;
     }
     else
     {
@@ -2095,11 +2101,12 @@ static char* TransformPath (const char* path, bool add_end)
 }
 
 bool csVFS::ChDirAuto (const char* path, const csStringArray* paths,
-	const char* vfspath)
+	const char* vfspath, const char* filename)
 {
   // If the VFS path is valid we can use that.
   if (ChDir (path))
-    return true;
+    if (filename == 0 || Exists (filename))
+      return true;
 
   // Now try to see if we can get it from one of the paths.
   if (paths)
@@ -2111,9 +2118,9 @@ bool csVFS::ChDirAuto (const char* path, const csStringArray* paths,
       if (testpath[testpath.Length ()-1] != '/')
         testpath += "/";
       testpath += path;
-      printf ("Try '%s'\n", (const char*)testpath);
       if (ChDir ((const char*)testpath))
-	return true;
+        if (filename == 0 || Exists (filename))
+	  return true;
     }
   }
 

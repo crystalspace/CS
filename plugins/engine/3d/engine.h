@@ -800,7 +800,7 @@ public:
   void RemoveHalo (csLight* Light);
 
   void PrecacheMesh (iMeshWrapper* s, iRenderView* rview);
-  virtual void PrecacheDraw (iCamera* c, iClipper2D* view);
+  virtual void PrecacheDraw (iRegion* region = 0);
 
   /**
    * Draw the 3D world given a camera and a clipper. Note that

@@ -9,11 +9,33 @@ chronological order.
 16-Aug-2004
 	- Steven Geens added an example of how to view a cal3d file with
 	  viewmesh to the docs and how to load a cal3d file in code.
+	- Jorrit fixed flarge so that the billboard has <ztest/> mode.
+15-Aug-2004
+	- Jorrit extended iEngine->PrecacheDraw() so that it also causes
+	  the cullers to precache. To do that it calls a new
+	  iVisibilityCuller->PrecacheCulling() function.
+	- Jorrit changed iEngine->PrecacheDraw() so that it no longer
+	  requires the dummy camera and view parameters.
+	- Jorrit added an optional region parameter to iEngine->PrecacheDraw()
+	  so that you can precache a region alone.
+	- Jorrit renamed '-prepare' option in walktest to '-precache' because
+	  that better reflects what it does.
+	- Jorrit tried to work around a problem where multiple calls
+	  to iVFS->ChDirAuto() doesn't work properly because it is hard
+	  to discover if a VFS path is going to be valid or not. To solve this
+	  iVFS->ChDirAuto() has an additional filename parameter which causes
+	  ChDirAuto() to also check if that file is present in the given path
+	  so that it is better able to select the right path. This fixes
+	  a problem in walktest where it could not open multiple levels.
 14-Aug-2004
 	- Jorrit added a new iEngine->PrecacheDraw() function which precaches
 	  the GetRenderMeshes() of all meshes in the engine. Walktest now
 	  uses this function if you specify '-prepare' option. This speeds up
 	  running through a level.
+	- Jorrit did further work on lighter:
+	    - Mesh selection system.
+	    - Started working on a new XML config file for lighter. Not
+	      functional yet.
         - Philip Wyett eliminated the redefinition of _POSIX_C_SOURCE warning
           within the CS Python plugin.
 13-Aug-2004

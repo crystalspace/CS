@@ -887,8 +887,10 @@ struct iEngine : public iBase
    * on them. By doing this the level will run smoother if you walk
    * through it because all meshes will have had a chance to update
    * caches and stuff.
+   * \param region is an optional region. If given then only objects
+   *        in that region will be precached.
    */
-  virtual void PrecacheDraw (iCamera* c, iClipper2D* view) = 0;
+  virtual void PrecacheDraw (iRegion* region = 0) = 0;
 
   /**
    * Draw the 3D world given a camera and a clipper. Note that

@@ -21,7 +21,6 @@
 #include "csutil/cscolor.h"
 #include "cstool/initapp.h"
 #include "csutil/cmdhelp.h"
-#include "lighter.h"
 #include "iengine/engine.h"
 #include "ivideo/graph2d.h"
 #include "ivideo/graph3d.h"
@@ -40,6 +39,8 @@
 #include "ivaria/reporter.h"
 #include "ivaria/stdrep.h"
 #include "igraphic/imageio.h"
+
+#include "lighter.h"
 
 CS_IMPLEMENT_APPLICATION
 

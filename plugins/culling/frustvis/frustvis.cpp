@@ -461,12 +461,15 @@ void csFrustumVis::FrustTest_Traverse (csKDTree* treenode,
 bool csFrustumVis::VisTest (iRenderView* rview, 
                             iVisibilityCullerListener* viscallback)
 {
+  // We update the objects before testing the callback so that
+  // we can use this VisTest() call to make sure the objects in the
+  // culler are precached.
+  UpdateObjects ();
+  current_vistest_nr++;
+
   // just make sure we have a callback
   if (viscallback == 0)
     return false;
-
-  UpdateObjects ();
-  current_vistest_nr++;
 
   // Data for the vis tester.
   FrustTest_Front2BackData data;

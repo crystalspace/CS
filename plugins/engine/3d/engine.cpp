@@ -42,6 +42,7 @@
 #include "csgeom/fastsqrt.h"
 #include "csgeom/sphere.h"
 #include "csgeom/kdtree.h"
+#include "csgeom/polyclip.h"
 #include "csgfx/csimage.h"
 #include "csgfx/memimage.h"
 #include "csutil/util.h"
@@ -1794,9 +1795,15 @@ void csEngine::PrecacheMesh (iMeshWrapper* s, iRenderView* rview)
 #endif
 }
 
-void csEngine::PrecacheDraw (iCamera* c, iClipper2D* view)
+void csEngine::PrecacheDraw (iRegion* region)
 {
   current_framenumber++;
+
+  csRef<iCamera> c = CreateCamera ();
+  csRef<iClipper2D> view;
+  view.AttachNew (new csBoxClipper (0.0, 0.0, float (G3D->GetWidth ()),
+  	float (G3D->GetHeight ())));
+
   csRenderView rview (c, view, G3D, G2D);
   StartDraw (c, view, rview);
 
@@ -1804,7 +1811,15 @@ void csEngine::PrecacheDraw (iCamera* c, iClipper2D* view)
   for (sn = 0; sn < meshes.GetCount (); sn++)
   {
     iMeshWrapper *s = meshes.Get (sn);
-    PrecacheMesh (s, &rview);
+    if (!region || region->IsInRegion (s->QueryObject ()))
+      PrecacheMesh (s, &rview);
+  }
+
+  for (sn = 0 ; sn < sectors.GetCount () ; sn++)
+  {
+    iSector* s = sectors.Get (sn);
+    if (!region || region->IsInRegion (s->QueryObject ()))
+      s->GetVisibilityCuller ()->PrecacheCulling ();
   }
 }
 

@@ -78,7 +78,7 @@ struct iVisibilityCullerListener : public iBase
     iMeshWrapper *mesh, uint32 frustum_mask) = 0;
 };
 
-SCF_VERSION (iVisibilityCuller, 0, 4, 0);
+SCF_VERSION (iVisibilityCuller, 0, 5, 0);
 
 /**
  * This interface represents a visibility culling system.
@@ -128,6 +128,13 @@ struct iVisibilityCuller : public iBase
    */
   virtual bool VisTest (iRenderView* irview, 
     iVisibilityCullerListener* viscallback) = 0;
+  /**
+   * Precache visibility culling. This can be useful in case you want
+   * to ensure that render speed doesn't get any hickups as soon as a portal
+   * to this sector becomes visible. iEngine->PrecacheDraw() will call this
+   * function.
+   */
+  virtual void PrecacheCulling () = 0;
 
   /**
    * Mark all objects as visible that intersect with the given bounding
