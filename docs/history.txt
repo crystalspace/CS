@@ -1,5 +1,12 @@
 The history order is reversed so that new features are at the top.
 
+12-Feb-2002
+	- Matt Reda moved the event-handling code in the OSX canvases 
+	  from the delegate to a new NSView-derived class.  The old code 
+	  wasn't detecting right button clicks for some odd reason, but 
+	  it works now.  Events are passed back through the delegate.
+	- Matt Reda updated the OSX canvases so that when entering/exiting 
+	  fullscreen mode, both canvases now fade in/out
 11-Feb-2002
 	- Added csMath3::SpherePosition() which calculates the position
 	  on a unit sphere given two angles.
