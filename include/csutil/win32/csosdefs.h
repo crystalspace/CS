@@ -198,7 +198,9 @@
 #include <malloc.h>
 #include <sys/types.h>
 #include <sys/stat.h>
+#ifdef CS_HAS_SYS_PARAM_H
 #include <sys/param.h>
+#endif
 #ifndef __CYGWIN32__
 #include <direct.h>
 #endif

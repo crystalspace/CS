@@ -37,6 +37,8 @@ chronological order.
 	  to avoid re-declaring it in our own glextmanager.h for those cases.
 	- res changed the loader to let the <meshobj>s Z buffer mode and render
 	  priority always override the <factory> settings.
+	- res fixed csosdefs.h to only include <sys/param.h> in case configure
+	  detected it.
 14-Nov-2004
 	- Eric Sunshine updated cspace.i to take csPoly2D decomposition into
 	  account.
