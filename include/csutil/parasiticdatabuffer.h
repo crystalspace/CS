@@ -32,8 +32,8 @@ class csParasiticDataBufferBase : public iDataBuffer
 {
 protected:
   csRef<iDataBuffer> parentBuffer;
-  size_t size;
   uint8* data;
+  size_t size;
   
   void SetContents (iDataBuffer* parent, size_t offs, size_t size)
   {
