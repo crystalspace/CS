@@ -3,16 +3,9 @@
 import types, string, re
 
 try:
-	import cPickle
-	pickle=cPickle
-except:
-	print "WARNING: Failed to import module cPickle, using slower pickle library"
-	import pickle
-
-try:
 	from cspace import *
 except:
-    	print "WARNING: Failed to import module cspace, can only pickle the map"
+    	print "WARNING: Failed to import module cspace"
 
 def CreateRoom(matname):
 	print 'Start creating polygons...'
