@@ -551,6 +551,7 @@ public:
     virtual void AddSector (iSector *sec);
     virtual void RemoveSector (iSector *sec);
     virtual iSector *FindByName (const char *name) const;
+    virtual int Find (iSector *sec) const;
   } scfiSectorList;
 };
 

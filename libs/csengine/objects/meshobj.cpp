@@ -91,8 +91,7 @@ csMeshWrapper::csMeshWrapper (csObject* theParent, iMeshObject* mesh)
   iMeshWrapper *sparent = SCF_QUERY_INTERFACE_FAST (parent, iMeshWrapper);
   if (sparent)
   {
-    movable.SetParent(
-      ((csMovable::eiMovable*)sparent->GetMovable())->scfParent);
+    movable.SetParent(sparent->GetMovable());
     sparent->DecRef ();
   }
 
@@ -123,8 +122,7 @@ csMeshWrapper::csMeshWrapper (csObject* theParent)
   iMeshWrapper *sparent = SCF_QUERY_INTERFACE_FAST (parent, iMeshWrapper);
   if (sparent)
   {
-    movable.SetParent(
-      ((csMovable::eiMovable*)sparent->GetMovable())->scfParent);
+    movable.SetParent(sparent->GetMovable());
     sparent->DecRef ();
   }
 
@@ -177,12 +175,12 @@ void csMeshWrapper::RemoveFromSectors ()
   iEngine *e = SCF_QUERY_INTERFACE_FAST (parent, iEngine);
   if (!e) return;
   int i;
-  const csSectorVector& sectors = movable.GetSectors ();
-  for (i = 0 ; i < sectors.Length () ; i++)
+  const iSectorList *sectors = movable.GetSectors ();
+  for (i = 0 ; i < sectors->GetSectorCount () ; i++)
   {
-    csSector* ss = sectors[i];
+    iSector* ss = sectors->GetSector (i);
     if (ss)
-      ss->UnlinkMesh (this);
+      ss->UnlinkMesh (&scfiMeshWrapper);
   }
   e->DecRef ();
 }
@@ -193,11 +191,11 @@ void csMeshWrapper::SetRenderPriority (long rp)
   iEngine *e = SCF_QUERY_INTERFACE_FAST (parent, iEngine);
   if (!e) return;
   int i;
-  const csSectorVector& sectors = movable.GetSectors ();
-  for (i = 0 ; i < sectors.Length () ; i++)
+  const iSectorList *sectors = movable.GetSectors ();
+  for (i = 0 ; i < sectors->GetSectorCount () ; i++)
   {
-    csSector* ss = sectors[i];
-    if (ss) ss->RelinkMesh (this);
+    iSector* ss = sectors->GetSector (i);
+    if (ss) ss->GetPrivateObject ()->RelinkMesh (this);
   }
   e->DecRef ();
 }
@@ -207,13 +205,14 @@ static DECLARE_GROWING_ARRAY_REF (light_worktable, iLight*);
 
 void csMeshWrapper::UpdateDeferedLighting (const csVector3& pos)
 {
-  if (defered_num_lights)
+  if (defered_num_lights && movable.GetSectorCount()>0)
   {
     if (defered_num_lights > light_worktable.Limit ())
       light_worktable.SetLimit (defered_num_lights);
 
-    csSector* sect = movable.GetSector (0);
-    int num_lights = csEngine::current_engine->GetNearbyLights (sect,
+    iSector* sect = movable.GetSector (0);
+    int num_lights = csEngine::current_engine->GetNearbyLights (
+      sect->GetPrivateObject (),
       pos, defered_lighting_flags,
       light_worktable.GetArray (), defered_num_lights);
     UpdateLighting (light_worktable.GetArray (), num_lights);
@@ -453,7 +452,7 @@ void csMeshWrapper::MeshWrapper::AddChild (iMeshWrapper* child)
   }
   c->SetParentContainer ((csMeshWrapper*)scfParent);
   scfParent->children.Push (c);
-  c->GetMovable ().SetParent (&scfParent->movable);
+  c->GetMovable ().SetParent (&scfParent->movable.scfiMovable);
 }
 
 void csMeshWrapper::MeshWrapper::RemoveChild (iMeshWrapper* child)

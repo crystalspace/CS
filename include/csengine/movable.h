@@ -19,16 +19,16 @@
 #ifndef __CS_MOVABLE_H__
 #define __CS_MOVABLE_H__
 
-#include "csgeom/transfrm.h"
 #include "csutil/typedvec.h"
 #include "iengine/movable.h"
 #include "iengine/sector.h"
 
-class csSector;
-class csObject;
+class csVector3;
+class csMatrix3;
+struct iObject;
 
 CS_DECLARE_TYPED_VECTOR_NODELETE (csMovableListenerVector, iMovableListener);
-CS_DECLARE_TYPED_VECTOR_NODELETE (csSectorVector, csSector);
+CS_DECLARE_TYPED_VECTOR_NODELETE (csSectorVector, iSector);
 
 /// A list of sectors as the movable uses it
 class csMovableSectorList : public csSectorVector
@@ -37,7 +37,7 @@ public:
   SCF_DECLARE_IBASE;
 
   csMovableSectorList ();
-  csSector *FindByName (const char *name) const;
+  iSector *FindByName (const char *name) const;
   class SectorList : public iSectorList
   {
     SCF_DECLARE_EMBEDDED_IBASE (csMovableSectorList);
@@ -46,6 +46,7 @@ public:
     virtual void AddSector (iSector *sec);
     virtual void RemoveSector (iSector *sec);
     virtual iSector *FindByName (const char *name) const;
+    virtual int Find (iSector *sec) const;
   } scfiSectorList;
 };
 
@@ -75,15 +76,13 @@ private:
    * returned) and the 'obj' transformation is relative to
    * the parent one.
    */
-  csMovable* parent;
-  /// SCF interface to movable.
-  iMovable* iparent;
+  iMovable* parent;
 
   /**
    * Object on which this movable operates (csThing or
    * csMeshWrapper currently).
    */
-  csObject* object;
+  iObject* object;
 
   /// Update number.
   long updatenr;
@@ -98,13 +97,13 @@ public:
   virtual ~csMovable ();
 
   /// Set object on which this movable operates.
-  void SetObject (csObject* obj) { object = obj; }
+  void SetObject (iObject* obj) { object = obj; }
 
   /// Set the parent movable.
-  void SetParent (csMovable* parent);
+  void SetParent (iMovable* parent);
 
   /// Get the parent movable.
-  csMovable* GetParent () const
+  iMovable* GetParent () const
   {
     return parent;
   }
@@ -114,7 +113,7 @@ public:
    * this thing is. This is a conveniance funcion.
    * This function does not do anything if the parent is not NULL.
    */
-  void SetSector (csSector* sector);
+  void SetSector (iSector* sector);
 
   /**
    * Clear the list of sectors.
@@ -126,31 +125,31 @@ public:
    * Add a sector to the list of sectors.
    * This function does not do anything if the parent is not NULL.
    */
-  void AddSector (csSector* sector);
+  void AddSector (iSector* sector);
 
   /**
    * Get list of sectors for this entity.
    * This will return the sectors of the parent if there
    * is a parent.
    */
-  const csMovableSectorList& GetSectors () const
+  const iSectorList *GetSectors () const
   {
     if (parent) return parent->GetSectors ();
-    else return sectors;
+    else return &sectors.scfiSectorList;
   }
 
   /**
    * Get the specified sector where this entity lives.
    * (conveniance function).
    */
-  csSector* GetSector (int idx) const { return (csSector*)GetSectors ()[idx]; }
+  iSector* GetSector (int idx) const { return sectors[idx]; }
 
   /**
    * Get the number of sectors.
    */
   int GetSectorCount () const
   {
-    return GetSectors ().Length ();
+    return sectors.Length ();
   }
 
   /**
@@ -158,14 +157,14 @@ public:
    */
   bool InSector () const
   {
-    return GetSectors ().Length () > 0;
+    return sectors.Length () > 0;
   }
 
   /**
    * Set the transformation vector and sector to move to
    * some position.
    */
-  void SetPosition (csSector* home, const csVector3& v);
+  void SetPosition (iSector* home, const csVector3& v);
 
   /**
    * Set the transformation vector for this object. Note
@@ -258,82 +257,28 @@ public:
   struct eiMovable : public iMovable
   {
     SCF_DECLARE_EMBEDDED_IBASE (csMovable);
-    virtual iMovable* GetParent () const
-    {
-      return scfParent->iparent;
-    }
+    virtual iMovable* GetParent () const;
     virtual void SetSector (iSector* sector);
-    virtual void ClearSectors ()
-    {
-      scfParent->ClearSectors ();
-    }
+    virtual void ClearSectors ();
     virtual void AddSector (iSector* sector);
-    virtual const iSectorList *GetSectors () const
-    {
-      return &scfParent->GetSectors ().scfiSectorList;
-    }
+    virtual const iSectorList *GetSectors () const;
     virtual iSector* GetSector (int idx) const;
-    virtual bool InSector () const
-    {
-      return scfParent->InSector ();
-    }
-    virtual int GetSectorCount () const
-    {
-      return scfParent->GetSectorCount ();
-    }
+    virtual bool InSector () const;
+    virtual int GetSectorCount () const;
     virtual void SetPosition (iSector* home, const csVector3& v);
-    virtual void SetPosition (const csVector3& v)
-    {
-      scfParent->SetPosition (v);
-    }
-    virtual const csVector3& GetPosition () const
-    {
-      return scfParent->GetPosition ();
-    }
-    virtual const csVector3 GetFullPosition () const
-    {
-      return scfParent->GetFullPosition ();
-    }
-    virtual void SetTransform (const csMatrix3& matrix)
-    {
-      scfParent->SetTransform (matrix);
-    }
-    virtual void SetTransform (const csReversibleTransform& t)
-    {
-      scfParent->SetTransform (t);
-    }
-    virtual csReversibleTransform& GetTransform ()
-    {
-      return scfParent->GetTransform ();
-    }
-    virtual csReversibleTransform GetFullTransform () const
-    {
-      return scfParent->GetFullTransform ();
-    }
-    virtual void MovePosition (const csVector3& v)
-    {
-      scfParent->MovePosition (v);
-    }
-    virtual void Transform (const csMatrix3& matrix)
-    {
-      scfParent->Transform (matrix);
-    }
-    virtual void AddListener (iMovableListener* listener, void* userdata)
-    {
-      scfParent->AddListener (listener, userdata);
-    }
-    virtual void RemoveListener (iMovableListener* listener)
-    {
-      scfParent->RemoveListener (listener);
-    }
-    virtual void UpdateMove ()
-    {
-      scfParent->UpdateMove ();
-    }
-    virtual long GetUpdateNumber () const
-    {
-      return scfParent->GetUpdateNumber ();
-    }
+    virtual void SetPosition (const csVector3& v);
+    virtual const csVector3& GetPosition () const;
+    virtual const csVector3 GetFullPosition () const;
+    virtual void SetTransform (const csMatrix3& matrix);
+    virtual void SetTransform (const csReversibleTransform& t);
+    virtual csReversibleTransform& GetTransform ();
+    virtual csReversibleTransform GetFullTransform () const;
+    virtual void MovePosition (const csVector3& v);
+    virtual void Transform (const csMatrix3& matrix);
+    virtual void AddListener (iMovableListener* listener, void* userdata);
+    virtual void RemoveListener (iMovableListener* listener);
+    virtual void UpdateMove ();
+    virtual long GetUpdateNumber () const;
   } scfiMovable;
   friend struct eiMovable;
 };

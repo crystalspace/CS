@@ -102,7 +102,7 @@ csMeshWrapper *add_test_mesh( csMeshFactoryWrapper *tmpl, csSector *aroom, csVie
   
   tsprt = tmpl->NewMeshObject (view->GetEngine ()->GetCsEngine ()->QueryCsObject ());
   view->GetEngine ()->GetCsEngine ()->meshes.Push (tsprt);
-  tsprt->GetMovable ().SetSector (aroom);
+  tsprt->GetMovable ().SetSector (&aroom->scfiSector);
   csXScaleMatrix3 m (2);
   tsprt->GetMovable ().SetTransform (m);
   tsprt->GetMovable ().SetPosition (csVector3( 0, 0, 0 ));    // only matters for root in chain demo
@@ -429,7 +429,7 @@ void Phyztest::NextFrame ()
 
       bot = tmpl->NewMeshObject (view->GetEngine ()->GetCsEngine ()->QueryCsObject ());
       view->GetEngine ()->GetCsEngine ()->meshes.Push (bot);
-      bot->GetMovable ().SetSector (room);
+      bot->GetMovable ().SetSector (&room->scfiSector);
       iSprite3DState* state = SCF_QUERY_INTERFACE (bot->GetMeshObject (), iSprite3DState);
       state->SetAction ("default");
       state->DecRef ();

@@ -1709,7 +1709,7 @@ iMeshWrapper* csEngine::CreateSectorWallsMesh (csSector* sector,
   thing_obj->DecRef ();
   thing_wrap->SetName (iName);
   meshes.Push (thing_wrap);
-  thing_wrap->GetMovable ().SetSector (sector);
+  thing_wrap->GetMovable ().SetSector (&sector->scfiSector);
   thing_wrap->GetMovable ().UpdateMove ();
   thing_wrap->flags.Set (CS_ENTITY_CONVEX);
   thing_wrap->SetZBufMode (CS_ZBUF_FILL);
@@ -2060,7 +2060,7 @@ iMeshWrapper* csEngine::LoadMeshObject (
   meshes.Push (meshwrap);
   if (sector)
   {
-    meshwrap->GetMovable ().SetSector (sector->GetPrivateObject ());
+    meshwrap->GetMovable ().SetSector (sector);
     meshwrap->GetMovable ().SetPosition (pos);
     meshwrap->GetMovable ().UpdateMove ();
   }
@@ -2094,7 +2094,7 @@ iMeshWrapper* csEngine::CreateMeshObject (iMeshObject* mesh,
   meshes.Push (meshwrap);
   if (sector)
   {
-    meshwrap->GetMovable ().SetSector (sector->GetPrivateObject ());
+    meshwrap->GetMovable ().SetSector (sector);
     meshwrap->GetMovable ().SetPosition (pos);
     meshwrap->GetMovable ().UpdateMove ();
   }

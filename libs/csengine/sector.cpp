@@ -848,8 +848,8 @@ void csSector::Draw (iRenderView* rview)
     if (mesh_queue) sp = mesh_queue[i];
     else sp = (csMeshWrapper*)meshes[i];
 
-    if (!previous_sector || sp->GetMovable ().GetSectors ().
-    	Find (previous_sector->GetPrivateObject ()) == -1)
+    if (!previous_sector || sp->GetMovable ().GetSectors ()->
+    	Find (previous_sector) == -1)
     {
       // Mesh is not in the previous sector or there is no previous sector.
       sp->Draw (rview);
@@ -1280,3 +1280,5 @@ void csSectorList::SectorList::RemoveSector (iSector *sec)
   }
 iSector *csSectorList::SectorList::FindByName (const char *name) const
   { return scfParent->FindByName (name); }
+int csSectorList::SectorList::Find (iSector *sec) const
+  { return scfParent->Find (sec); }

@@ -19,12 +19,12 @@
 #include "cssysdef.h"
 #include "qint.h"
 #include "csengine/movable.h"
+
 #include "csengine/sector.h"
 #include "csengine/thing.h"
 #include "csengine/meshobj.h"
 #include "csengine/cscoll.h"
 #include "csengine/engine.h"
-#include "iengine/sector.h"
 
 
 //---------------------------------------------------------------------------
@@ -43,15 +43,15 @@ csMovableSectorList::csMovableSectorList ()
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiSectorList);
 }
 
-csSector *csMovableSectorList::FindByName (const char *name) const
+iSector *csMovableSectorList::FindByName (const char *name) const
 {
   if (!name) return NULL;
 
   for (int i=0; i<Length (); i++)
   {
-    csSector *sec = Get(i);
-    if (sec->GetName ())
-      if (!strcmp (sec->GetName (), name))
+    iSector *sec = Get(i);
+    if (sec->QueryObject ()->GetName ())
+      if (!strcmp (sec->QueryObject ()->GetName (), name))
         return sec;
   }
   return NULL;
@@ -60,13 +60,15 @@ csSector *csMovableSectorList::FindByName (const char *name) const
 int csMovableSectorList::SectorList::GetSectorCount () const
 { return scfParent->Length (); }
 iSector *csMovableSectorList::SectorList::GetSector (int idx) const
-{ return &scfParent->Get (idx)->scfiSector; }
+{ return scfParent->Get (idx); }
 void csMovableSectorList::SectorList::AddSector (iSector *)
 { }
 void csMovableSectorList::SectorList::RemoveSector (iSector *)
 { }
 iSector *csMovableSectorList::SectorList::FindByName (const char *name) const
-{ return &scfParent->FindByName (name)->scfiSector; }
+{ return scfParent->FindByName (name); }
+int csMovableSectorList::SectorList::Find (iSector *sec) const
+  { return scfParent->Find (sec); }
 
 //---------------------------------------------------------------------------
 
@@ -85,7 +87,6 @@ csMovable::csMovable ()
   SCF_CONSTRUCT_IBASE (NULL);
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiMovable);
   parent = NULL;
-  iparent = NULL;
   updatenr = 0;
 }
 
@@ -105,19 +106,16 @@ csMovable::~csMovable ()
   //if (iparent) iparent->DecRef ();
 }
 
-void csMovable::SetParent (csMovable* parent)
+void csMovable::SetParent (iMovable* p)
 {
   //@@@ (see comment above)
   //iMovable* ipar = SCF_QUERY_INTERFACE_SAFE (parent, iMovable);
   //if (iparent) iparent->DecRef ();
   //iparent = ipar;
-  iparent = SCF_QUERY_INTERFACE_SAFE (parent, iMovable);
-  if (iparent) iparent->DecRef ();
-
-  csMovable::parent = parent;
+  parent = p;
 }
 
-void csMovable::SetPosition (csSector* home, const csVector3& pos)
+void csMovable::SetPosition (iSector* home, const csVector3& pos)
 {
   obj.SetOrigin (pos);
   SetSector (home);
@@ -138,7 +136,7 @@ void csMovable::Transform (const csMatrix3& matrix)
   obj.SetT2O (matrix * obj.GetT2O ());
 }
 
-void csMovable::SetSector (csSector* sector)
+void csMovable::SetSector (iSector* sector)
 {
   if (sectors.Length () == 1 && sector == sectors[0])
     return;
@@ -169,7 +167,7 @@ void csMovable::ClearSectors ()
   }
 }
 
-void csMovable::AddSector (csSector* sector)
+void csMovable::AddSector (iSector* sector)
 {
   if (sector == NULL) return;
   if (parent == NULL)
@@ -178,7 +176,7 @@ void csMovable::AddSector (csSector* sector)
     iMeshWrapper* sp = SCF_QUERY_INTERFACE_FAST (object, iMeshWrapper);
     if (sp)
     {
-      sp->GetPrivateObject ()->MoveToSector (sector);
+      sp->GetPrivateObject ()->MoveToSector (sector->GetPrivateObject ());
       sp->DecRef ();
     }
     else
@@ -186,7 +184,8 @@ void csMovable::AddSector (csSector* sector)
       iCollection* col = SCF_QUERY_INTERFACE_FAST (object, iCollection);
       if (col)
       {
-        ((csCollection::Collection*)col)->scfParent->MoveToSector (sector);
+        ((csCollection::Collection*)col)->scfParent->MoveToSector
+	  (sector->GetPrivateObject ());
         col->DecRef ();
       }
     }
@@ -246,25 +245,47 @@ csReversibleTransform csMovable::GetFullTransform () const
 
 //--------------------------------------------------------------------------
 
+iMovable* csMovable::eiMovable::GetParent () const
+  { return scfParent->parent; }
 void csMovable::eiMovable::SetSector (iSector* sector)
-{
-  scfParent->SetSector (sector->GetPrivateObject ());
-}
-
+  { scfParent->SetSector (sector); }
+void csMovable::eiMovable::ClearSectors ()
+  { scfParent->ClearSectors (); }
 void csMovable::eiMovable::AddSector (iSector* sector)
-{
-  scfParent->AddSector (sector->GetPrivateObject ());
-}
-
-void csMovable::eiMovable::SetPosition (iSector* home, const csVector3& v)
-{
-  scfParent->SetPosition (home->GetPrivateObject (), v);
-}
-
+  { scfParent->AddSector (sector); }
+const iSectorList *csMovable::eiMovable::GetSectors () const
+  { return scfParent->GetSectors (); }
 iSector* csMovable::eiMovable::GetSector (int idx) const
-{
-  csSector* sect = scfParent->GetSectors ()[idx];
-  if (!sect) return NULL;
-  return &sect->scfiSector;
-}
-
+  { return scfParent->GetSectors ()->GetSector (idx); }
+bool csMovable::eiMovable::InSector () const
+  { return scfParent->InSector (); }
+int csMovable::eiMovable::GetSectorCount () const
+  { return scfParent->GetSectorCount (); }
+void csMovable::eiMovable::SetPosition (iSector* home, const csVector3& v)
+  { scfParent->SetPosition (home, v); }
+void csMovable::eiMovable::SetPosition (const csVector3& v)
+  { scfParent->SetPosition (v); }
+const csVector3& csMovable::eiMovable::GetPosition () const
+  { return scfParent->GetPosition (); }
+const csVector3 csMovable::eiMovable::GetFullPosition () const
+  { return scfParent->GetFullPosition (); }
+void csMovable::eiMovable::SetTransform (const csMatrix3& matrix)
+  { scfParent->SetTransform (matrix); }
+void csMovable::eiMovable::SetTransform (const csReversibleTransform& t)
+  { scfParent->SetTransform (t); }
+csReversibleTransform& csMovable::eiMovable::GetTransform ()
+  { return scfParent->GetTransform (); }
+csReversibleTransform csMovable::eiMovable::GetFullTransform () const
+  { return scfParent->GetFullTransform (); }
+void csMovable::eiMovable::MovePosition (const csVector3& v)
+  { scfParent->MovePosition (v); }
+void csMovable::eiMovable::Transform (const csMatrix3& matrix)
+  { scfParent->Transform (matrix); }
+void csMovable::eiMovable::AddListener (iMovableListener* listener, void* userdata)
+  { scfParent->AddListener (listener, userdata); }
+void csMovable::eiMovable::RemoveListener (iMovableListener* listener)
+  { scfParent->RemoveListener (listener); }
+void csMovable::eiMovable::UpdateMove ()
+  { scfParent->UpdateMove (); }
+long csMovable::eiMovable::GetUpdateNumber () const
+  { return scfParent->GetUpdateNumber (); }

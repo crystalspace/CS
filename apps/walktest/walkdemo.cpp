@@ -945,7 +945,7 @@ void add_bot (float size, iSector* where, csVector3 const& pos,
   botmesh->DecRef ();
   bot->SetName ("bot");
   Sys->view->GetEngine ()->GetCsEngine ()->meshes.Push (bot);
-  bot->GetMovable ().SetSector (where->GetPrivateObject ());
+  bot->GetMovable ().SetSector (where);
   csMatrix3 m; m.Identity (); m = m * size;
   bot->GetMovable ().SetTransform (m);
   bot->set_bot_move (pos);

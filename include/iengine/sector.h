@@ -169,7 +169,7 @@ struct iSector : public iBase
 };
 
 
-SCF_VERSION (iSectorList, 0, 0, 1);
+SCF_VERSION (iSectorList, 0, 0, 2);
 
 struct iSectorList : public iBase
 {
@@ -183,6 +183,8 @@ struct iSectorList : public iBase
   virtual void RemoveSector (iSector *sec) = 0;
   /// Find a sector by name
   virtual iSector *FindByName (const char *name) const = 0;
+  /// Find a sector and return its index
+  virtual int Find (iSector *sec) const = 0;
 };
 
 #endif // __IENGINE_SECTOR_H__
