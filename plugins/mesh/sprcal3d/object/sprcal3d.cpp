@@ -1207,6 +1207,7 @@ bool csSpriteCal3DMeshObject::HitBeamOutline (const csVector3& start,
 	++iteratorFace;
       }
       ++iteratorSubmesh;
+      delete[] pVertexBuffer;
     }
     ++iteratorMesh;
   }
@@ -1260,6 +1261,7 @@ bool csSpriteCal3DMeshObject::HitBeamObject (const csVector3& start,
 	++iteratorFace;
       }
       ++iteratorSubmesh;
+    delete[] pVertexBuffer;
     }
     ++iteratorMesh;
   }
