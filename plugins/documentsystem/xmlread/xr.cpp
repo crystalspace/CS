@@ -299,6 +299,7 @@ TrXmlDeclaration::TrXmlDeclaration( const char * _version,
   version = _version;
   encoding = _encoding;
   standalone = _standalone;
+  value = 0;
   type = DECLARATION;
 }
 

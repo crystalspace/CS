@@ -25,7 +25,11 @@ chronological order.
         - Philip Wyett added test for PGSERVER.AVAILABLE in user.mak, so that
           the Pico plugin is not built unless the library is on the build box.
           Also added test to Pico test app 'pgtest', so that if the plugin
-          associated is not built the test app will also not be built.
+          associated is not built the test app will also not be built.          
+	- Jorrit fixed uninitialized variables in the xmlread plugin in case
+	  of an xml declaration. Some of the shader xml files use this and
+	  this could cause crashes with walktest (which uses xmlread) and
+	  the new renderer.
         - Philip Wyett added CSTOOL to the spr3d makefile as a dependency.
           This fixes the unresolved symbols of csAnonRenderBuffer error at
           runtime, which prevents the spr3d plugin loading when in conjunction

@@ -559,7 +559,14 @@ class TrXmlDeclaration : public TrDocumentNode
 {
 public:
   /// Construct an empty declaration.
-  TrXmlDeclaration() { type = DECLARATION; }
+  TrXmlDeclaration()
+  {
+    version = 0;
+    encoding = 0;
+    standalone = 0;
+    value = 0;
+    type = DECLARATION;
+  }
 
   /// Construct.
   TrXmlDeclaration (const char * _version,
