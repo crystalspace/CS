@@ -35,11 +35,6 @@ SRC.CSGFX = libs/csgfx/csimage.cpp \
   libs/csgfx/quantize.cpp libs/csgfx/inv_cmap.cpp \
   libs/csgfx/memimage.cpp libs/csgfx/bumpmap.cpp
 
-ifeq ($(DO_PNG),yes)
-  INC.CSGFX += include/csgfx/pngsave.h
-  LIBS.EXE += $(PNG_LIBS)
-endif
-
 CSGFX.LIB = $(OUT)$(LIB_PREFIX)csgfx$(LIB_SUFFIX)
 OBJ.CSGFX = $(addprefix $(OUT),$(notdir $(SRC.CSGFX:.cpp=$O)))
 
