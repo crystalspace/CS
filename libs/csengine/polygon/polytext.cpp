@@ -1191,7 +1191,7 @@ void csPolyTexture::MakeAllDirty ()
   if (dirty_matrix)
   {
     dirty_matrix->Set ();
-    dirty_cnt = dirty_matrix->GetSize ();
+    dirty_cnt = dirty_matrix->GetByteCount ();
   }
   dyn_dirty = true;
 }
@@ -1221,7 +1221,7 @@ bool csPolyTexture::CleanIfDirty (csBitSet *bs)
     return false;
 
   int dc = dirty_cnt;
-  unsigned sz = MIN (bs->GetSize (), dirty_matrix->GetSize ());
+  unsigned sz = MIN (bs->GetByteCount (), dirty_matrix->GetByteCount ());
   ULong *src = (ULong *)bs->GetBits ();
   ULong *dst = (ULong *)dirty_matrix->GetBits ();
   while (sz >= sizeof (ULong))
