@@ -1,4 +1,4 @@
-crystalspace (0.96-20030205) unstable; urgency=low
+crystalspace (0.96-20030205-2) unstable; urgency=low
 
   * New upstream version from R0_96 branch (Closes: bug#180419)
   * -fno-rtti and -fno-exceptions removed from cs-config (Closes: bug#147818)
@@ -7,9 +7,11 @@ crystalspace (0.96-20030205) unstable; urgency=low
   * Isomap re-added (Closes: bug#178464)
   * Added new targets in rules, not completly satisfying, should be better in
   next upstream (Closes: bug#179528)
-  * Moved config files in /etc and added proper symlink 
+  * Moved config files in /etc and added proper symlink
+  * Added a build dependancy on libode-dev
+  * Now build static lib without -fPIC to respect policy
 
- -- Christian Bayle <bayle@debian.org>  Sat, 15 Feb 2003 20:17:00 +0100
+ -- Christian Bayle <bayle@debian.org>  Sat, 22 Feb 2003 21:10:42 +0100
 
 crystalspace (0.94-20020502-4) unstable; urgency=low
 
