@@ -1,5 +1,14 @@
 The history order has been reversed so that new features are at the top.
 
+18-Jul-2000
+	- Renamed cmd_Door to entity_Door in WalkTest.
+	- Fixed another bug in csFrustum::Classify() where it would
+	  misclassify adjacent frustum/polygon as covered instead of
+	  outside.
+	- Fixed another bug in csFrustum::Classify() where it would
+	  misclassify overlapping frustum/polygon as outside instead
+	  of partial. In this case the bug was that the edges either
+	  fully cover each other or intersect at corners.
 17-Jul-2000
 	- Added LGPL notice to a few .inc files.
 	- Change to OpenGL renderer so that lightmaps are only cached
@@ -35,6 +44,8 @@ The history order has been reversed so that new features are at the top.
 	  though. If the lightmap is bigger than 256x256 it will not
 	  be used. This is to avoid problems with some cards that have
 	  this texture size limitation.
+	- Wouter Wijngaards completed bounding box support for particle
+	  systems.
 16-Jul-2000
 	- Samuel Humphreys did the following changes..
             - Added two new procedural textures to dtsimple. This is to complete

@@ -410,7 +410,7 @@ int csFrustum::Classify (csVector3* frustum, int num_frust,
         //@@@ This is the old code but I think this code
 	// should test against the frustum.
 	//--- if ((poly [pvp] % p) * (poly [pv] % p) < 0)
-        if ((v1 % p) * (v2 % p) < 0)
+        if ((v1 % p) * (v2 % p) <= 0)
           return CS_FRUST_PARTIAL;
       }
       prev_d = d;
@@ -429,7 +429,7 @@ int csFrustum::Classify (csVector3* frustum, int num_frust,
   for (int pv = 0, pvp = num_poly - 1; pv < num_poly; pvp = pv++)
   {
     csVector3 pn = poly [pvp] % poly [pv];
-    if (pn * frustum [0] > 0)
+    if (pn * frustum [0] >= 0)
       return CS_FRUST_OUTSIDE;
   }
 
