@@ -837,6 +837,59 @@ void csTiledCoverageBuffer::DrawLine (int x1, int y1, int x2, int y2,
 //printf ("  GENERAL CASE after clip: %d,%d - %d,%d\n", x1, y1, x2, y2);
   if (y1 == y2) return;	// Return if clipping results in one pixel.
 
+  // After clipping we have to check x1,x2 constraints again.
+  if (x1 >= width && x2 >= width)
+  {
+    //------
+    // Lines on the far right can just be dropped since they
+    // will have no effect on the coverage buffer.
+    //------
+    return;
+  }
+
+  if (x1 <= 0 && x2 <= 0)
+  {
+    //------
+    // Totally on the left side. Just clamp.
+    //------
+
+    // First calculate tile coordinates of x1,y1 and x2,y2.
+    int tile_y1 = y1 >> 6;
+    int tile_y2 = (y2-1) >> 6;
+    csCoverageTile* tile = GetTile (0, tile_y1);
+
+    if (tile_y1 == tile_y2)
+    {
+//printf ("    ONE TILE\n");
+      //------
+      // All is contained in one tile.
+      //------
+      tile->PushVLine (0, y1 & 63, (y2-1) & 63);
+      MarkTileDirty (0, tile_y1);
+    }
+    else
+    {
+//printf ("    MULTIPLE TILES\n");
+      //------
+      // Multiple tiles. First do first tile, then intermediate tiles,
+      // and finally the last tile.
+      //------
+      tile->PushVLine (0, y1 & 63, 63);
+      MarkTileDirty (0, tile_y1);
+      int t;
+      for (t = tile_y1+1 ; t < tile_y2 ; t++)
+      {
+        tile += width_po2 >> 5;
+        tile->PushFullVLine (0);
+	MarkTileDirty (0, t);
+      }
+      tile += width_po2 >> 5;
+      tile->PushVLine (0, 0, (y2-1) & 63);
+      MarkTileDirty (0, tile_y2);
+    }
+    return;
+  }
+
   //------
   // First calculate tile coordinates of x1,y1 and x2,y2.
   //------

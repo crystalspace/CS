@@ -8,6 +8,9 @@ The history order is reversed so that new features are at the top.
 	  instead of OBB in that case.
 	- Fixed a bug in Dynavis::IntersectSegment(). The intersection
 	  point was not correctly passed to the caller.
+	- Fixed a severe memory overwrite bug caused by out of bounds
+	  line drawing in the DrawLine function of the tiled
+	  coverage buffer.
 21-Jun-2002
 	- Fixed a bug in csSector::IntersectSegment() (which is used
 	  in HitBeam() and other functions like that). Apparently if an

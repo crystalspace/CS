@@ -290,6 +290,8 @@ private:
    */
   csCoverageTile* GetTile (int tx, int ty)
   {
+    CS_ASSERT (tx >= 0);
+    CS_ASSERT (ty >= 0 && ty < num_tile_rows);
     return &tiles[(ty<<w_shift) + tx];
   }
 
