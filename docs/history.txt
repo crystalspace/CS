@@ -5,6 +5,10 @@ The history order has been reversed so that new features are at the top.
 	  initialization of the tween setting in sprite templates.
 	- Received a new patch from Travis McIntosh to speed up dynamic
 	  lighting for curved surfaces.
+	- Eric Sunshine made another fix to Dungeon plug-in in response to a
+	  fix by Martin to Eric's fix to Martin's fix. :-)  Martin's most
+	  recent change triggered an internal NextStep compiler error again.
+	  *Hopefully* this fix will be acceptable to all compilers.
 22-Jun-2000
 	- Got a new patch from Travis McIntosh.  This patch finished
 	  dynamic lighting for curved surfaces. Still a bit slow but it
