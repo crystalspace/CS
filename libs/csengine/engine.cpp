@@ -2168,7 +2168,7 @@ iMeshFactoryWrapper* csEngine::CreateMeshFactory (const char* name)
 }
 
 iMeshFactoryWrapper* csEngine::LoadMeshFactory (
-  	const char* classId, const char* name,
+  	const char* name,
 	const char* loaderClassId,
 	iDataBuffer* input)
 {
@@ -2181,28 +2181,37 @@ iMeshFactoryWrapper* csEngine::LoadMeshFactory (
   if (!plug)
     return NULL;
 
-  iMeshFactoryWrapper* fact = CreateMeshFactory (classId, name);
+  iMeshFactoryWrapper* fact = CreateMeshFactory (name);
   if (!fact) return NULL;
 
   char* buf = **input;
-  iBase* mof = plug->Parse (buf, GetMaterialList (), GetMeshFactories (), fact);
+  iBase* mof = plug->Parse (buf, GetMaterialList (), GetMeshFactories (),
+  	fact->GetMeshObjectFactory ());
   plug->DecRef ();
   if (!mof)
   {
     GetMeshFactories ()->Remove (fact);
     return NULL;
   }
-  fact->SetMeshObjectFactory ((iMeshObjectFactory*)mof);
+  iMeshObjectFactory* mof2 = SCF_QUERY_INTERFACE (mof, iMeshObjectFactory);
+  if (!mof2)
+  {
+    // @@@ ERROR?
+    GetMeshFactories ()->Remove (fact);
+    return NULL;
+  }
+  fact->SetMeshObjectFactory (mof2);
+  mof2->SetLogicalParent (fact);
+  mof2->DecRef ();
   mof->DecRef ();
   return fact;
 }
 
 iMeshWrapper* csEngine::LoadMeshWrapper (
-  	const char* classId, const char* name,
+  	const char* name,
 	const char* loaderClassId,
 	iDataBuffer* input, iSector* sector, const csVector3& pos)
 {
-  (void)classId;
   iPluginManager* plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
   iLoaderPlugin* plug = CS_QUERY_PLUGIN_CLASS (plugin_mgr,
   	loaderClassId, iLoaderPlugin);

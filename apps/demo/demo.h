@@ -37,6 +37,7 @@ struct iVirtualClock;
 struct iObjectRegistry;
 struct iGraphics3D;
 struct iGraphics2D;
+struct iLoader;
 struct iVFS;
 struct iEvent;
 class DemoSequenceManager;
@@ -55,6 +56,7 @@ public:
   iConsoleOutput* myConsole;
   iObjectRegistry* object_reg;
   iVirtualClock* vc;
+  iLoader* loader;
 
   DemoSequenceManager* seqmgr;
   iFont* font;
@@ -65,9 +67,6 @@ public:
   bool message_error;
 
 private:
-  void LoadMaterial (const char* matname, const char* filename);
-  void LoadFactory (const char* factname, const char* filename,
-  	const char* classId, const char* loaderClassId);
   iMeshWrapper* LoadObject (const char* objname, const char* filename,
 	const char* classId, const char* loaderClassId,
 	iSector* sector, const csVector3& pos);
@@ -91,8 +90,6 @@ public:
   void ShowMessage (const char* msg, ...);
   void ShowError (const char* msg, ...);
 
-  void SetupFactories ();
-  void SetupMaterials ();
   void SetupSector ();
   void SetupObjects ();
 };

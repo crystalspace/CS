@@ -43,10 +43,15 @@ The following defines have changed:
 
 @subheading Engine Changes
 @cindex far planes
+@cindex @code{iEngine::LoadMeshFactory()}
+@cindex @code{iEngine::LoadMeshWrapper()}
 
 Far plane handling in the engine has changed. Polygons are no longer
 clipped exactly to the far plane but instead the polygons are rejected
 which are fully behind the far plane.
+
+@code{iEngine::LoadMeshFactory()} and @code{iEngine::LoadMeshWrapper()}
+used to have a @samp{classId} parameter. That parameter has now been removed.
 
 @subheading Various Changes
 @cindex @code{csPlane3::ClipPolygon()}

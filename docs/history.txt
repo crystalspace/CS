@@ -6,7 +6,21 @@ The history order is reversed so that new features are at the top.
 	  wasn't detecting right button clicks for some odd reason, but 
 	  it works now.  Events are passed back through the delegate.
 	- Matt Reda updated the OSX canvases so that when entering/exiting 
-	  fullscreen mode, both canvases now fade in/out
+	  fullscreen mode, both canvases now fade in/out.
+	- Fixed iLoader::LoadLibraryFile() so that it now reports an error
+	  when the engine cannot be found.
+	- Discovered that iEngine::LoadMeshFactory() and LoadMeshWrapper()
+	  don't actually need the classId parameter. They only need the
+	  loaderClassId parameter. So I removed that parameter.
+	- Added new 'PARAMSFILE' keyword to the loader for mesh factories
+	  and objects. This is similar to 'PARAMS' except that the
+	  parameters are read from the given file.
+	- Added support for HARDMOVE for mesh factories (in loader).
+	- Loader will now check if HARDMOVE is allowed for the given mesh
+	  object or factory. If not an error is given.
+	- The csdemo app now loads materials and factories from a library
+	  instead of hardcoding this in the code. This makes it a little
+	  bit more general (but still not general enough).
 11-Feb-2002
 	- Added csMath3::SpherePosition() which calculates the position
 	  on a unit sphere given two angles.

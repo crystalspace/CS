@@ -171,7 +171,7 @@ struct iDrawFuncCallback : public iBase
 };
 
 
-SCF_VERSION (iEngine, 0, 7, 1);
+SCF_VERSION (iEngine, 0, 7, 2);
 
 /**
  * This interface is the main interface to the 3D engine.
@@ -444,8 +444,7 @@ struct iEngine : public iBase
    * Conveniance function to load a mesh factory from a given loader plugin.
    */
   virtual iMeshFactoryWrapper* LoadMeshFactory (
-  	const char* classId, const char* name,
-	const char* loaderClassId,
+  	const char* name, const char* loaderClassId,
 	iDataBuffer* input) = 0;
 
   /**
@@ -469,8 +468,7 @@ struct iEngine : public iBase
    * If sector == NULL the object will not be placed in a sector.
    */
   virtual iMeshWrapper* LoadMeshWrapper (
-  	const char* classId, const char* name,
-	const char* loaderClassId,
+  	const char* name, const char* loaderClassId,
 	iDataBuffer* input, iSector* sector, const csVector3& pos) = 0;
 
   /**

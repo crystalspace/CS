@@ -127,6 +127,7 @@ CS_TOKEN_DEF_START
   CS_TOKEN_DEF (NOLIGHTING)
   CS_TOKEN_DEF (NOSHADOWS)
   CS_TOKEN_DEF (PARAMS)
+  CS_TOKEN_DEF (PARAMSFILE)
   CS_TOKEN_DEF (PLUGIN)
   CS_TOKEN_DEF (PLUGINS)
   CS_TOKEN_DEF (POSITION)
@@ -561,8 +562,14 @@ bool csLoader::LoadPlugins (char* buf)
 
 bool csLoader::LoadLibrary (char* buf)
 {
-  if (!Engine) return false;
-
+  if (!Engine)
+  {
+    ReportError (
+	  "crystalspace.maploader.parse.noengine",
+	  "No engine present while in LoadLibrary!");
+    return false;
+  }
+ 
   CS_TOKEN_TABLE_START (tokens)
     CS_TOKEN_TABLE (LIBRARY)
   CS_TOKEN_TABLE_END
@@ -801,7 +808,7 @@ iMeshFactoryWrapper* csLoader::LoadMeshObjectFactory (const char* fname)
       return NULL;
     }
 
-    iMeshFactoryWrapper* t = Engine->CreateMeshFactory(name);
+    iMeshFactoryWrapper* t = Engine->CreateMeshFactory (name);
     if (LoadMeshObjectFactory (t, data))
     {
       databuff->DecRef ();
@@ -832,9 +839,11 @@ bool csLoader::LoadMeshObjectFactory (iMeshFactoryWrapper* stemp, char* buf,
     CS_TOKEN_TABLE (FILE)
     CS_TOKEN_TABLE (MATERIAL)
     CS_TOKEN_TABLE (PARAMS)
+    CS_TOKEN_TABLE (PARAMSFILE)
     CS_TOKEN_TABLE (PLUGIN)
     CS_TOKEN_TABLE (MESHFACT)
     CS_TOKEN_TABLE (MOVE)
+    CS_TOKEN_TABLE (HARDMOVE)
     CS_TOKEN_TABLE (LOD)
   CS_TOKEN_TABLE_END
 
@@ -934,6 +943,58 @@ bool csLoader::LoadMeshObjectFactory (iMeshFactoryWrapper* stemp, char* buf,
 	  }
 	}
         break;
+      case CS_TOKEN_PARAMSFILE:
+	if (!plug)
+	{
+          ReportError (
+	      "crystalspace.maploader.load.plugin",
+              "Could not load plugin!");
+	  return false;
+	}
+	else
+        {
+          csScanStr (params, "%s", str);
+          iDataBuffer *buf = VFS->ReadFile (str);
+	  if (!buf)
+	  {
+            ReportError (
+	      "crystalspace.maploader.parse.loadingfile",
+	      "Error opening file '%s'!", str);
+	    return false;
+	  }
+
+	  // We give here the iMeshObjectFactory as the context. If this
+	  // is a new factory this will be NULL. Otherwise it is possible
+	  // to append information to the already loaded factory.
+	  iBase* mof = plug->Parse ((char*)(buf->GetUint8 ()),
+	  	Engine->GetMaterialList (),
+	  	Engine->GetMeshFactories (), stemp->GetMeshObjectFactory ());
+	  buf->DecRef ();
+	  if (!mof)
+	  {
+            ReportError (
+	      "crystalspace.maploader.parse.plugin",
+              "Could not parse plugin!");
+	    return false;
+	  }
+	  else
+	  {
+	    iMeshObjectFactory* mof2 = SCF_QUERY_INTERFACE (mof,
+	    	iMeshObjectFactory);
+	    if (!mof2)
+	    {
+              ReportError (
+	        "crystalspace.maploader.parse.meshfactory",
+		"Returned object does not implement iMeshObjectFactory!");
+	      return false;
+	    }
+	    stemp->SetMeshObjectFactory (mof2);
+	    mof2->SetLogicalParent (stemp);
+	    mof2->DecRef ();
+	    mof->DecRef ();
+	  }
+        }
+        break;
 
       case CS_TOKEN_MATERIAL:
         {
@@ -988,7 +1049,8 @@ bool csLoader::LoadMeshObjectFactory (iMeshFactoryWrapper* stemp, char* buf,
 	  iModelData *Model = ModelConverter->Load (buf->GetUint8 (),
 	  	buf->GetSize ());
 	  buf->DecRef ();
-          if (!Model) {
+          if (!Model)
+	  {
             ReportError (
  	      "crystalspace.maploader.parse.loadingmodel",
 	      "Error loading file model '%s'!", str);
@@ -1076,6 +1138,57 @@ bool csLoader::LoadMeshObjectFactory (iMeshFactoryWrapper* stemp, char* buf,
             }
           }
         }
+        break;
+      case CS_TOKEN_HARDMOVE:
+        {
+	  if (!stemp->GetMeshObjectFactory ())
+	  {
+            ReportError (
+	      "crystalspace.maploader.parse.meshfactory",
+              "Please use PARAMS before specifying HARDMOVE!");
+	    return false;
+	  }
+	  if (!stemp->GetMeshObjectFactory ()->SupportsHardTransform ())
+	  {
+            ReportError (
+	      "crystalspace.maploader.parse.meshfactory",
+              "This factory doesn't support HARDMOVE!");
+	    return false;
+	  }
+          char* params2;
+	  csReversibleTransform tr;
+          while ((cmd = csGetObject (&params, tok_matvec, &name, &params2)) > 0)
+          {
+            if (!params2)
+            {
+	      ReportError (
+		"crystalspace.maploader.parse.badformat",
+		"Expected parameters instead of '%s' while parsing hardmove!",
+		params);
+	      return false;
+            }
+            switch (cmd)
+            {
+              case CS_TOKEN_MATRIX:
+              {
+		csMatrix3 m;
+                if (!ParseMatrix (params2, m))
+		  return false;
+                tr.SetT2O (m);
+                break;
+              }
+              case CS_TOKEN_V:
+              {
+		csVector3 v;
+                ParseVector (params2, v);
+		tr.SetOrigin (v);
+                break;
+              }
+            }
+          }
+	  stemp->HardTransform (tr);
+        }
+        break;
     }
   }
   if (cmd == CS_PARSERR_TOKENNOTFOUND)
@@ -1315,6 +1428,13 @@ iMeshWrapper* csLoader::LoadMeshObjectFromFactory (char* buf)
 	  	"First specify the parent factory with FACTORY!");
 	  return NULL;
 	}
+	else if (!mesh->GetMeshObject ()->SupportsHardTransform ())
+	{
+          ReportError (
+	    "crystalspace.maploader.parse.meshobject",
+            "This mesh object doesn't support HARDMOVE!");
+	  return false;
+	}
 	else
         {
           char* params2;
@@ -1454,6 +1574,7 @@ bool csLoader::LoadMeshObject (iMeshWrapper* mesh, char* buf)
     CS_TOKEN_TABLE (HARDMOVE)
     CS_TOKEN_TABLE (PLUGIN)
     CS_TOKEN_TABLE (PARAMS)
+    CS_TOKEN_TABLE (PARAMSFILE)
     CS_TOKEN_TABLE (NOLIGHTING)
     CS_TOKEN_TABLE (NOSHADOWS)
     CS_TOKEN_TABLE (INVISIBLE)
@@ -1609,6 +1730,13 @@ bool csLoader::LoadMeshObject (iMeshWrapper* mesh, char* buf)
         break;
       case CS_TOKEN_HARDMOVE:
         {
+	  if (!mesh->GetMeshObject ()->SupportsHardTransform ())
+	  {
+            ReportError (
+	      "crystalspace.maploader.parse.meshobject",
+              "This mesh object doesn't support HARDMOVE!");
+	    return false;
+	  }
           char* params2;
 	  csReversibleTransform tr;
           while ((cmd = csGetObject (&params, tok_matvec, &name, &params2)) > 0)
@@ -1723,11 +1851,70 @@ bool csLoader::LoadMeshObject (iMeshWrapper* mesh, char* buf)
           {
             ReportError (
 	      "crystalspace.maploader.parse.plugin",
-              "Error parsing PARAM() in plugin '%s'!", str);
+              "Error parsing PARAMS() in plugin '%s'!", str);
 	    return false;
           }
 	}
         break;
+      case CS_TOKEN_PARAMSFILE:
+	if (!plug)
+	{
+          ReportError (
+	      "crystalspace.maploader.load.plugin",
+              "Could not load plugin!");
+	  return false;
+	}
+	else
+        {
+          csScanStr (params, "%s", str);
+          iDataBuffer *buf = VFS->ReadFile (str);
+	  if (!buf)
+	  {
+            ReportError (
+	      "crystalspace.maploader.parse.loadingfile",
+	      "Error opening file '%s'!", str);
+	    return false;
+	  }
+	  iBase* mo = plug->Parse ((char*)(buf->GetUint8 ()),
+	  	Engine->GetMaterialList (),
+	  	Engine->GetMeshFactories (), NULL);
+          if (mo)
+          {
+	    iMeshObject* mo2 = SCF_QUERY_INTERFACE (mo, iMeshObject);
+	    if (!mo2)
+	    {
+              ReportError (
+	        "crystalspace.maploader.parse.mesh",
+		"Returned object does not implement iMeshObject!");
+	      return false;
+	    }
+	    mesh->SetMeshObject (mo2);
+	    mo2->SetLogicalParent (mesh);
+	    if (mo2->GetFactory () && mo2->GetFactory ()->GetLogicalParent ())
+	    {
+	      iBase* lp = mo2->GetFactory ()->GetLogicalParent ();
+	      iMeshFactoryWrapper* mfw = SCF_QUERY_INTERFACE (lp,
+	      	iMeshFactoryWrapper);
+	      if (mfw)
+	      {
+	        mesh->SetFactory (mfw);
+		mfw->DecRef ();
+	      }
+	    }
+	    mo2->DecRef ();
+            mo->DecRef ();
+          }
+          else
+          {
+            ReportError (
+	      "crystalspace.maploader.parse.plugin",
+              "Error parsing PARAMSFILE() in plugin '%s'!", str);
+	    return false;
+          }
+
+        }
+        break;
+
 
       case CS_TOKEN_PLUGIN:
 	{
@@ -2054,7 +2241,7 @@ csLoader::~csLoader()
 #define GET_PLUGIN(var, intf, msgname)	\
   var = CS_QUERY_REGISTRY(object_reg, intf);
 
-bool csLoader::Initialize(iObjectRegistry *object_Reg)
+bool csLoader::Initialize (iObjectRegistry *object_Reg)
 {
   csLoader::object_reg = object_Reg;
   plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
@@ -2073,7 +2260,7 @@ bool csLoader::Initialize(iObjectRegistry *object_Reg)
     return false;
   }
 
-  // get all optional plugins
+  // Get all optional plugins.
   GET_PLUGIN (ImageLoader, iImageIO, "image-loader");
   GET_PLUGIN (SoundLoader, iSoundLoader, "sound-loader");
   GET_PLUGIN (Engine, iEngine, "engine");

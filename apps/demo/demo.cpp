@@ -51,6 +51,7 @@
 #include "imesh/stars.h"
 #include "imesh/object.h"
 #include "imap/reader.h"
+#include "imap/parser.h"
 #include "iutil/comp.h"
 #include "iutil/eventh.h"
 #include "iutil/event.h"
@@ -94,6 +95,7 @@ Demo::Demo ()
   vc = NULL;
   engine = NULL;
   seqmgr = NULL;
+  loader = NULL;
   myG3D = NULL;
   myG2D = NULL;
   myVFS = NULL;
@@ -113,6 +115,7 @@ Demo::~Demo ()
   if (myG2D) myG2D->DecRef ();
   if (myVFS) myVFS->DecRef ();
   if (kbd) kbd->DecRef ();
+  if (loader) loader->DecRef ();
   delete seqmgr;
 }
 
@@ -136,7 +139,7 @@ iMeshWrapper* Demo::LoadObject (const char* objname, const char* filename,
     	filename);
     exit (0);
   }
-  iMeshWrapper* obj = engine->LoadMeshWrapper (classId, objname,
+  iMeshWrapper* obj = engine->LoadMeshWrapper (objname,
   	loaderClassId, databuf, sector, pos);
   databuf->DecRef ();
   if (!obj)
@@ -147,134 +150,6 @@ iMeshWrapper* Demo::LoadObject (const char* objname, const char* filename,
     exit (0);
   }
   return obj;
-}
-
-void Demo::LoadFactory (const char* factname, const char* filename,
-	const char* classId, const char* loaderClassId)
-{
-  iDataBuffer* databuf = myVFS->ReadFile (filename);
-  if (!databuf || !databuf->GetSize ())
-  {
-    if (databuf) databuf->DecRef ();
-    Report (CS_REPORTER_SEVERITY_ERROR, "Could not open file '%s' on VFS!",
-    	filename);
-    exit (0);
-  }
-  iMeshFactoryWrapper* fact = engine->LoadMeshFactory (classId, factname,
-  	loaderClassId, databuf);
-  databuf->DecRef ();
-  if (!fact)
-  {
-    Report (CS_REPORTER_SEVERITY_ERROR,
-    	"There was an error loading factory from file '%s'!",
-	filename);
-    exit (0);
-  }
-  fact->DecRef ();
-}
-
-void Demo::SetupFactories ()
-{
-  iMeshFactoryWrapper* fact;
-  fact = engine->CreateMeshFactory ("crystalspace.mesh.object.ball",
-  	"ball_factory");
-  if (!fact)
-  {
-    Report (CS_REPORTER_SEVERITY_ERROR, "Could not open ball plugin!");
-    exit (0);
-  }
-  fact->DecRef ();
-
-  fact = engine->CreateMeshFactory ("crystalspace.mesh.object.fire",
-  	"fire_factory");
-  if (!fact)
-  {
-    Report (CS_REPORTER_SEVERITY_ERROR, "Could not open fire plugin!");
-    exit (0);
-  }
-  fact->DecRef ();
-
-  //=====
-  // Load all factories.
-  //=====
-  LoadFactory ("shuttle", "/data/demo/objects/shuttle",
-  	"crystalspace.mesh.object.sprite.3d",
-	"crystalspace.mesh.loader.factory.sprite.3d");
-  LoadFactory ("th_ship", "/data/demo/objects/th_ship",
-  	"crystalspace.mesh.object.sprite.3d",
-	"crystalspace.mesh.loader.factory.sprite.3d");
-  LoadFactory ("fighter", "/data/demo/objects/fighter",
-  	"crystalspace.mesh.object.sprite.3d",
-	"crystalspace.mesh.loader.factory.sprite.3d");
-  LoadFactory ("station", "/data/demo/objects/tho_station",
-  	"crystalspace.mesh.object.sprite.3d",
-	"crystalspace.mesh.loader.factory.sprite.3d");
-  LoadFactory ("ss1_dummy", "/data/demo/objects/ss1_dummy",
-  	"crystalspace.mesh.object.sprite.3d",
-	"crystalspace.mesh.loader.factory.sprite.3d");
-  LoadFactory ("ss1_tower", "/data/demo/objects/ss1_tower",
-  	"crystalspace.mesh.object.sprite.3d",
-	"crystalspace.mesh.loader.factory.sprite.3d");
-  LoadFactory ("ss1_spoke", "/data/demo/objects/ss1_spoke",
-  	"crystalspace.mesh.object.sprite.3d",
-	"crystalspace.mesh.loader.factory.sprite.3d");
-  LoadFactory ("ss1_dome", "/data/demo/objects/ss1_dome",
-  	"crystalspace.mesh.object.sprite.3d",
-	"crystalspace.mesh.loader.factory.sprite.3d");
-  LoadFactory ("ss1_tail", "/data/demo/objects/ss1_tail",
-  	"crystalspace.mesh.object.sprite.3d",
-	"crystalspace.mesh.loader.factory.sprite.3d");
-  LoadFactory ("ss1_arm1", "/data/demo/objects/ss1_arm1",
-  	"crystalspace.mesh.object.sprite.3d",
-	"crystalspace.mesh.loader.factory.sprite.3d");
-  LoadFactory ("ss1_pod1", "/data/demo/objects/ss1_pod1",
-  	"crystalspace.mesh.object.sprite.3d",
-	"crystalspace.mesh.loader.factory.sprite.3d");
-  LoadFactory ("laser", "/data/demo/objects/laser",
-  	"crystalspace.mesh.object.sprite.3d",
-	"crystalspace.mesh.loader.factory.sprite.3d");
-  LoadFactory ("photonTorpedo", "/data/demo/objects/photon",
-  	"crystalspace.mesh.object.sprite.2d",
-	"crystalspace.mesh.loader.factory.sprite.2d");
-  fact = engine->GetMeshFactories ()->FindByName ("th_ship");
-  fact->HardTransform (csTransform (csXRotMatrix3 (-HALF_PI), csVector3 (0)));
-}
-
-void Demo::LoadMaterial (const char* matname, const char* filename)
-{
-  iTextureWrapper* txt = engine->CreateTexture (matname, filename,
-  	NULL, CS_TEXTURE_3D);
-  engine->CreateMaterial (matname, txt);
-}
-
-void Demo::SetupMaterials ()
-{
-  //LoadMaterial ("flare_center", "/lib/std/snow.jpg");
-  //LoadMaterial ("flare_spark", "/lib/std/spark.png");
-  LoadMaterial ("flare_center", "/lib/stdtex/flare_center.jpg");
-  LoadMaterial ("flare_spark1", "/lib/stdtex/flare_rbow.jpg");
-  LoadMaterial ("flare_spark2", "/lib/stdtex/flare_purp.jpg");
-  LoadMaterial ("flare_spark3", "/lib/stdtex/flare_picir.jpg");
-  LoadMaterial ("flare_spark4", "/lib/stdtex/flare_grcir.jpg");
-  LoadMaterial ("flare_spark5", "/lib/stdtex/flare_pink.jpg");
-  LoadMaterial ("stone", "/lib/std/stone4.gif");
-  LoadMaterial ("white", "/lib/std/white.gif");
-  LoadMaterial ("exhaust", "/data/demo/textures/explode.jpg");
-  LoadMaterial ("jupiter", "/data/demo/textures/jup0vtt2.jpg");
-  LoadMaterial ("saturn", "/data/demo/textures/Saturn.jpg");
-  LoadMaterial ("earth", "/data/demo/textures/Earth.jpg");
-  LoadMaterial ("earthclouds", "/data/demo/textures/earthclouds.jpg");
-  LoadMaterial ("nebula_b", "/data/demo/textures/nebula_b.png");
-  LoadMaterial ("nebula_d", "/data/demo/textures/nebula_d.png");
-  LoadMaterial ("nebula_f", "/data/demo/textures/nebula_f.png");
-  LoadMaterial ("nebula_l", "/data/demo/textures/nebula_l.png");
-  LoadMaterial ("nebula_r", "/data/demo/textures/nebula_r.png");
-  LoadMaterial ("nebula_u", "/data/demo/textures/nebula_u.png");
-  LoadMaterial ("stars", "/data/demo/textures/stars.png");
-  LoadMaterial ("starcross", "/data/demo/textures/starcross2.jpg");
-  LoadMaterial ("fighter", "/data/demo/textures/camo.png");
-  LoadMaterial ("shuttle", "/data/demo/textures/alien.jpg");
-  LoadMaterial ("th_ship", "/data/demo/textures/shiptex.jpg");
 }
 
 static void SetTexSpace (iPolygon3D* poly,
@@ -906,19 +781,17 @@ bool Demo::Initialize (int argc, const char* const argv[],
     return false;
   }
 
-  iPluginManager* plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
-
-  // Load the engine plugin.
-  engine = CS_LOAD_PLUGIN (plugin_mgr, "crystalspace.engine.3d", iEngine);
+  engine = CS_QUERY_REGISTRY (object_reg, iEngine);
   if (!engine)
   {
     Report (CS_REPORTER_SEVERITY_ERROR, "No engine!");
     return false;
   }
-  plugin_mgr->DecRef ();
-  if (!object_reg->Register (engine, "iEngine"))
+
+  loader = CS_QUERY_REGISTRY (object_reg, iLoader);
+  if (!loader)
   {
-    Report (CS_REPORTER_SEVERITY_ERROR, "Could not register engine!");
+    Report (CS_REPORTER_SEVERITY_ERROR, "No loader!");
     return false;
   }
 
@@ -978,8 +851,13 @@ bool Demo::Initialize (int argc, const char* const argv[],
   engine->RegisterRenderPriority ("starLevel2", 2);
   engine->RegisterRenderPriority ("object", 3);
   engine->RegisterRenderPriority ("alpha", 4);
-  SetupMaterials ();
-  SetupFactories ();
+
+  if (!loader->LoadLibraryFile ("/data/demo/library"))
+  {
+    Report (CS_REPORTER_SEVERITY_ERROR, "There was an error loading library!");
+    exit (0);
+  }
+
   SetupSector ();
   seqmgr = new DemoSequenceManager (this);
   SetupObjects ();

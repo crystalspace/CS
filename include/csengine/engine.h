@@ -981,8 +981,7 @@ public:
   virtual iMeshFactoryWrapper* CreateMeshFactory (const char* name);
   /// Load mesh factory.
   virtual iMeshFactoryWrapper* LoadMeshFactory (
-  	const char* classId, const char* name,
-	const char* loaderClassId,
+  	const char* name, const char* loaderClassId,
 	iDataBuffer* input);
 
   /// Create a mesh wrapper from a mesh factory wrapper
@@ -997,8 +996,7 @@ public:
   virtual iMeshWrapper* CreateMeshWrapper (const char* name);
   /// Load mesh object.
   virtual iMeshWrapper* LoadMeshWrapper (
-  	const char* classId, const char* name,
-	const char* loaderClassId,
+  	const char* name, const char* loaderClassId,
 	iDataBuffer* input, iSector* sector, const csVector3& pos);
 
   virtual iClipper2D* GetTopLevelClipper () const;
