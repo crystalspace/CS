@@ -1,5 +1,8 @@
 The history order is reversed so that new features are at the top.
 
+26-Oct-2001
+	- Jorge Acereda fixed coredumps when passing options to the 
+	  software renderer.
 23-Oct-2001
 	- Michael Voase improved lighting on water procedural texture in
 	  flarge.
