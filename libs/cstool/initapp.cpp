@@ -268,11 +268,12 @@ bool csInitializer::RequestPlugins (iObjectRegistry* r, ...)
   char* plugName = va_arg (arg, char*);
   while (plugName != NULL)
   {
+    char* intName = va_arg (arg, char*);
     int scfId = va_arg (arg, scfInterfaceID);
     int version = va_arg (arg, int);
     // scfId and version are unused for now.
     (void)scfId; (void)version;
-    plugldr->RequestPlugin (plugName);
+    plugldr->RequestPlugin (plugName, intName);
     plugName = va_arg (arg, char*);
   }
   va_end (arg);

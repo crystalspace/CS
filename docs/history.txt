@@ -48,6 +48,14 @@ The history order is reversed so that new features are at the top.
 	  the interface name is used as the FuncID.
 	- Made networking driver optional in Blocks (it gave an error when
 	  this plugin wasn't present).
+	- csInitializer::RequestPlugins() no longer needs a func-id after
+	  the plugin name. This means that if you use CS_REQUEST_PLUGIN
+	  you better remove everything after the ':' in the plugin name
+	  (including the ':'). Note that in the future this notation will
+	  still be useful. If given this will be used as the tag to register
+	  this plugin with the object registry. That way you can request
+	  plugins with another tag (normally it would be the default tag
+	  which is the same as the interface name).
 14-Oct-2001
 	- The 'stdrep' plugin now depends on output console and
 	  reporter plugins in SCF. This means that it will be loaded

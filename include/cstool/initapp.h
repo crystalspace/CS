@@ -33,32 +33,29 @@ struct iConfigManager;
 
 // Defines to select what plugins you want to have.
 #define CS_REQUEST_PLUGIN(Name,Interface)	\
-  Name, iSCF::SCF->GetInterfaceID (#Interface), VERSION_##Interface
+  Name, #Interface, iSCF::SCF->GetInterfaceID (#Interface), VERSION_##Interface
 #define CS_REQUEST_END \
   NULL
 #define CS_REQUEST_VFS \
-  CS_REQUEST_PLUGIN("crystalspace.kernel.vfs:VFS", iVFS)
+  CS_REQUEST_PLUGIN("crystalspace.kernel.vfs", iVFS)
 #define CS_REQUEST_FONTSERVER \
-  CS_REQUEST_PLUGIN("crystalspace.font.server.default:FontServer", iFontServer)
+  CS_REQUEST_PLUGIN("crystalspace.font.server.default", iFontServer)
 #define CS_REQUEST_IMAGELOADER \
-  CS_REQUEST_PLUGIN("crystalspace.graphic.image.io.multiplex:ImageLoader", \
-    iImageIO)
+  CS_REQUEST_PLUGIN("crystalspace.graphic.image.io.multiplex", iImageIO)
 #define CS_REQUEST_SOFTWARE3D \
-  CS_REQUEST_PLUGIN("crystalspace.graphics3d.software:VideoDriver",iGraphics3D)
+  CS_REQUEST_PLUGIN("crystalspace.graphics3d.software",iGraphics3D)
 #define CS_REQUEST_OPENGL3D \
-  CS_REQUEST_PLUGIN("crystalspace.graphics3d.opengl:VideoDriver", iGraphics3D)
+  CS_REQUEST_PLUGIN("crystalspace.graphics3d.opengl", iGraphics3D)
 #define CS_REQUEST_ENGINE \
-  CS_REQUEST_PLUGIN("crystalspace.engine.3d:Engine", iEngine)
+  CS_REQUEST_PLUGIN("crystalspace.engine.3d", iEngine)
 #define CS_REQUEST_LEVELLOADER \
-  CS_REQUEST_PLUGIN("crystalspace.level.loader:LevelLoader", iLoader)
+  CS_REQUEST_PLUGIN("crystalspace.level.loader", iLoader)
 #define CS_REQUEST_REPORTER \
-  CS_REQUEST_PLUGIN("crystalspace.utilities.reporter:Reporter", iReporter)
+  CS_REQUEST_PLUGIN("crystalspace.utilities.reporter", iReporter)
 #define CS_REQUEST_REPORTERLISTENER \
-  CS_REQUEST_PLUGIN("crystalspace.utilities.stdrep:StdRep", \
-    iStandardReporterListener)
+  CS_REQUEST_PLUGIN("crystalspace.utilities.stdrep", iStandardReporterListener)
 #define CS_REQUEST_CONSOLEOUT \
-  CS_REQUEST_PLUGIN("crystalspace.console.output.simple:Console.Output", \
-    iConsoleOutput)
+  CS_REQUEST_PLUGIN("crystalspace.console.output.simple", iConsoleOutput)
 
 /**
  * Function to handle events for apps.

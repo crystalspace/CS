@@ -40,7 +40,7 @@ public:
   virtual ~csPluginLoader ();
 
   /// A shortcut for requesting to load a plugin (before LoadPlugins()).
-  void RequestPlugin (const char *iPluginName);
+  void RequestPlugin (const char *iPluginName, const char* interfaceName);
 
   /// Load the plugins.
   bool LoadPlugins ();

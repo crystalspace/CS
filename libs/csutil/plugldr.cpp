@@ -355,10 +355,19 @@ bool csPluginLoader::LoadPlugins ()
   return true;
 }
 
-void csPluginLoader::RequestPlugin (const char *iPluginName)
+void csPluginLoader::RequestPlugin (const char *iPluginName,
+	const char* interfaceName)
 {
   iCommandLineParser* CommandLine = CS_QUERY_REGISTRY (object_reg,
   	iCommandLineParser);
-  CommandLine->AddOption ("plugin", iPluginName);
+  //@@@ Temporary
+  char buf[256];
+  strcpy (buf, iPluginName);
+  if (!strchr (buf, ':'))
+  {
+    strcat (buf, ":");
+    strcat (buf, interfaceName);
+  }
+  CommandLine->AddOption ("plugin", buf);
 }
 

@@ -332,9 +332,8 @@ bool Simple::Initialize (int argc, const char* const argv[],
 	CS_REQUEST_FONTSERVER,
 	CS_REQUEST_IMAGELOADER,
 	CS_REQUEST_LEVELLOADER,
-	CS_REQUEST_PLUGIN("crystalspace.mesh.crossbuilder:CrossBuilder",
-		iCrossBuilder),
-	CS_REQUEST_PLUGIN("crystalspace.modelconverter.multiplexer:Converter",
+	CS_REQUEST_PLUGIN("crystalspace.mesh.crossbuilder", iCrossBuilder),
+	CS_REQUEST_PLUGIN("crystalspace.modelconverter.multiplexer",
 		iModelConverter),
 	CS_REQUEST_END))
   {
