@@ -7,7 +7,11 @@
 
   #define OS_WIN32
   #define PROC_INTEL
+#if defined(__BORLANDC__)
+  #define COMP_BC
+#else
   #define COMP_VC
+#endif
   #define DO_SOUND
   #define DO_GIF
   #define DO_BMP

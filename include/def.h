@@ -83,7 +83,7 @@
 #  error "Please specify the operating system in the makefile! (OS=...)"
 #endif
 
-#if !defined(COMP_GCC) && !defined(COMP_WCC) && !defined(COMP_UNKNOWN) && !defined(COMP_MWERKS) && !defined(COMP_VC)
+#if !defined(COMP_GCC) && !defined(COMP_WCC) && !defined(COMP_UNKNOWN) && !defined(COMP_MWERKS) && !defined(COMP_VC) && !defined(COMP_BC)
 #  error "Please specify the compiler in the makefile! (COMP=...)"
 #endif
 
@@ -144,11 +144,6 @@
 #if defined(COMP_WCC)
 #define strcasecmp stricmp
 #define strncasecmp strnicmp
-#endif
-
-#if defined(COMP_VC)
-#define strcasecmp _stricmp
-#define strncasecmp _strnicmp
 #endif
 
 // NextStep 3.3 compiler frequently crashes when initializing static const
