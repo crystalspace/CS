@@ -8,9 +8,11 @@
 
 struct iAws;
 struct iAwsPrefs;
+struct iAwsSlot;
+struct iAwsSigSrc;
+
 class  awsWindow;
 class  awsComponentNode;
-class  awsComponent;
             
 
 SCF_VERSION (iAws, 0, 0, 1);
@@ -75,6 +77,22 @@ public:
 
 };
 
+SCF_VERSION (iAwsSigSrc, 0, 0, 1);
+
+struct iAwsSigSrc : public iBase
+{      
+    /// Registers a slot for any one of the signals defined by a source.  Each sources's signals exist in it's own namespace
+    virtual bool RegisterSlot(iAwsSlot *slot, unsigned long signal)=0;
+
+    /// Unregisters a slot for a signal.
+    virtual bool UnregisterSlot(iAwsSlot *slot, unsigned long signal)=0;
+
+    /// Broadcasts a signal to all slots that are interested.
+    virtual void Broadcast(unsigned long signal)=0;
+
+};
+
+
 SCF_VERSION (iAwsSlot, 0, 0, 1);
 
 struct iAwsSlot : public iBase
@@ -82,21 +100,21 @@ struct iAwsSlot : public iBase
   /** This initializes a slot for a given component.  This slot may connect to any number of signal sources, and
    * all signals will be delivered back to this initialized slot.  Need only be intialized ONCE.
    */
-  virtual void Initialize(awsComponent *sink, void (awsComponent::*Slot)(awsComponent &source, unsigned long signal))=0;
+  virtual void Initialize(iBase *sink, void (iBase::*Slot)(iBase &source, unsigned long signal))=0;
   
   /** Connect sets us up to receive signals from some other component.  You can connect to as many different sources 
     and signals as you'd like.  You may connect to multiple signals from the same source.
   */
-  virtual void Connect(awsComponent &source, unsigned long signal)=0;
+  virtual void Connect(iAwsSigSrc &source, unsigned long signal)=0;
   
   /**  Disconnects us from the specified source and signal.  This may happen automatically if the signal source
    *  goes away.  You will receive disconnect notification always (even if you request the disconnection.)
    */
-  virtual void Disconnect(awsComponent &source, unsigned long signal)=0;
+  virtual void Disconnect(iAwsSigSrc &source, unsigned long signal)=0;
 
   /** Invoked by a source to emit the signal to this slot's sink.
    */
-  virtual void Emit(awsComponent &source, unsigned long signal)=0;
+  virtual void Emit(iBase &source, unsigned long signal)=0;
 };
 
 
