@@ -33,6 +33,9 @@ chronological order.
 	- aarobber added an anonymous union to csVector3 to allow for easier
 	  accessing/storing of float* data to a csVector3
 	- aarobber reverted a wrongly committed r3dopengl.cfg
+	- res augmented the glwin32 canvas to also determine the version of 
+	  the GL driver DLL. This version can be used for comparisons in the
+	  driver database.
 16-Jun-2004
 	- Jorrit cleaned up stencil clipping in the NR/OpenGL renderer.
 	  Now mask 128 is used for both stencil clipping and floating portals

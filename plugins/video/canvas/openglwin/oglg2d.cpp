@@ -354,7 +354,8 @@ void csGraphics2DOpenGL::CalcPixelFormat (int pixelFormat)
    */
   depthBits = pfd.cDepthBits;
 
-  hardwareAccelerated = !(pfd.dwFlags & PFD_GENERIC_FORMAT);
+  hardwareAccelerated = !(pfd.dwFlags & PFD_GENERIC_FORMAT) ||
+    (pfd.dwFlags & PFD_GENERIC_ACCELERATED);
   if (!hardwareAccelerated)
   {
     Report (CS_REPORTER_SEVERITY_WARNING,
@@ -587,6 +588,12 @@ bool csGraphics2DOpenGL::Open ()
   SetForegroundWindow (m_hWnd);
   SetFocus (m_hWnd);
 
+  detector.DoDetection (m_hWnd, hDC);
+  Report (CS_REPORTER_SEVERITY_NOTIFY,
+    "GL driver: %s %s", detector.GetDriverDLL(), 
+    detector.GetDriverVersion() ? detector.GetDriverVersion() : 
+      "<version unknown>");
+
   if (FullScreen)
   {
     /* 
@@ -629,6 +636,30 @@ bool csGraphics2DOpenGL::RestoreDisplayMode ()
     return true;
   }
   return false;
+}
+
+const char* csGraphics2DOpenGL::GetRendererString (const char* str)
+{
+  if (strcmp (str, "win32_driver") == 0)
+  {
+    return detector.GetDriverDLL();
+  }
+  else if (strcmp (str, "win32_driverversion") == 0)
+  {
+    return detector.GetDriverVersion();
+  }
+  else
+    return csGraphics2DGLCommon::GetRendererString (str);
+}
+
+const char* csGraphics2DOpenGL::GetVersionString (const char* ver)
+{
+  if (strcmp (ver, "win32_driver") == 0)
+  {
+    return detector.GetDriverVersion();
+  }
+  else
+    return csGraphics2DGLCommon::GetVersionString (ver);
 }
 
 void csGraphics2DOpenGL::Close (void)

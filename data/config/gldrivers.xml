@@ -115,7 +115,7 @@
     <!-- rule description="Some more examples">
       <conditions>
 	<comparever version="gl" relation="ge 1.1" />
-	<comparever version="driver" relation="lt 6.34" />
+	<comparever version="win32_driver" relation="lt 6.34" />
       </conditions>
       <applicable>
       </applicable>

@@ -19,7 +19,12 @@
 
 class cswinCacheDLL;
 
-class CS_CSUTIL_EXPORT CS_API_NAME
+#ifndef CS_API_EXPORT
+#define CS_API_EXPORT CS_CSUTIL_EXPORT
+#define CS_API_EXPORT_UNDEF
+#endif
+
+class CS_API_EXPORT CS_API_NAME
 {
 private:
   static cswinCacheDLL* dll;
@@ -50,3 +55,8 @@ public:
     static PFN ## name name;
   #include CS_API_FUNCTIONS
 };
+
+#ifdef CS_API_EXPORT_UNDEF
+#undef CS_API_EXPORT_UNDEF
+#undef CS_API_EXPORT
+#endif

@@ -25,6 +25,8 @@
 #include "plugins/video/canvas/openglcommon/glcommon2d.h"
 #include "plugins/video/canvas/openglcommon/iogl.h"
 
+#include "detectdriver.h"
+
 struct iWin32Assistant;
 
 /// Windows version.
@@ -39,6 +41,9 @@ private:
 
   bool RestoreDisplayMode ();
 public:
+  virtual const char* GetRendererString (const char* str);
+  virtual const char* GetVersionString (const char* ver);
+
   SCF_DECLARE_IBASE_EXT (csGraphics2DGLCommon);
 
   csGraphics2DOpenGL(iBase *iParent);
@@ -92,6 +97,8 @@ protected:
   HWND m_hWnd;
   HINSTANCE  m_hInstance;
   int m_nCmdShow;
+
+  csDetectDriver detector;
 
   csRef<iWin32Assistant> m_piWin32Assistant;
 
