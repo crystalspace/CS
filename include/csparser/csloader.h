@@ -31,9 +31,9 @@ struct Color;
 struct iMotion;
 struct iMotionAnim;
 struct iSoundData;
+struct iSkeletonLimb;
 class csTextureWrapper;
 class csMaterialWrapper;
-class csSkeletonLimb;
 class csPolygonTemplate;
 class csPolyPlane;
 class csPolyTxtPlane;
@@ -130,7 +130,7 @@ class csLoader
   static csSector* load_sector (char* secname, char* buf);
 
   /// Load a skeleton part.
-  static bool LoadSkeleton (csSkeletonLimb*, char* buf, bool is_connection);
+  static bool LoadSkeleton (iSkeletonLimb*, char* buf);
 
   /// Load the sprite template from the map file.
   static bool LoadSpriteTemplate (csSpriteTemplate* stemp, char* buf);

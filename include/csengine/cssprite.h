@@ -73,10 +73,6 @@ public:
   virtual ~csFrame ();
 
   ///
-  int GetAnmIndex () { return animation_index; }
-  ///
-  int GetTexIndex () { return texturing_index; }
-  ///
   void SetTexIndex (int tex_idx) { texturing_index = tex_idx; }
 
   /// Return true if normals are already calculated.
@@ -88,6 +84,10 @@ public:
   virtual void SetName (char const*);
   /// Get the name.
   virtual char const* GetName () const { return name; }
+  ///
+  virtual int GetAnmIndex () const { return animation_index; }
+  ///
+  virtual int GetTexIndex () const { return texturing_index; }
 
   /**
    * Compute the object space bounding box for this frame.
@@ -616,6 +616,18 @@ public:
     virtual int GetLodLevelConfig ()
     {
       return scfParent->GetLodLevelConfig ();
+    }
+    virtual void MergeNormals (int base, int frame)
+    {
+      scfParent->MergeNormals (base, frame);
+    }
+    virtual void MergeNormals (int base)
+    {
+      scfParent->MergeNormals (base);
+    }
+    virtual void MergeNormals ()
+    {
+      scfParent->MergeNormals ();
     }
   } scfiSprite3DFactoryState;
 };

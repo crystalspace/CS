@@ -157,8 +157,7 @@ IMPLEMENT_EMBEDDED_IBASE_END
 
 IMPLEMENT_CSOBJTYPE (csSpriteTemplate, csPObject)
 
-csSpriteTemplate::csSpriteTemplate ()
-  : csPObject (),
+csSpriteTemplate::csSpriteTemplate () : csPObject (),
     texels (8, 8), vertices (8, 8), normals (8, 8)
 {
   CONSTRUCT_EMBEDDED_IBASE (scfiSpriteTemplate);
@@ -176,7 +175,6 @@ csSpriteTemplate::csSpriteTemplate ()
   
   lod_level = DEFAULT_LOD;
   lod_level_config = CS_SPR_LOD_GLOBAL;
-  
 }
 
 csSpriteTemplate::~csSpriteTemplate ()

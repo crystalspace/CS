@@ -75,7 +75,7 @@ struct iRenderView;
 // @@@ CONFIG TODO: global_lighting_quality
 // @@@ CONFIG TODO: global_lod_level
 
-SCF_VERSION (iSpriteFrame, 0, 0, 1);
+SCF_VERSION (iSpriteFrame, 0, 0, 2);
 
 /**
  * A frame for 3D sprite animation.
@@ -86,6 +86,10 @@ struct iSpriteFrame : public iBase
   virtual void SetName (char const*) = 0;
   /// Get the name.
   virtual char const* GetName () const = 0;
+  ///
+  virtual int GetAnmIndex () const = 0;
+  ///
+  virtual int GetTexIndex () const = 0;
 };
 
 SCF_VERSION (iSpriteAction, 0, 0, 1);
@@ -111,7 +115,7 @@ struct iSpriteAction : public iBase
   virtual void AddFrame (iSpriteFrame* frame, int delay) = 0;
 };
 
-SCF_VERSION (iSprite3DFactoryState, 0, 0, 1);
+SCF_VERSION (iSprite3DFactoryState, 0, 0, 2);
 
 /**
  * This interface describes the API for the 3D sprite factory mesh object.
@@ -234,6 +238,27 @@ struct iSprite3DFactoryState : public iBase
 
   /// Returns what this template is using for determining the lod quality.
   virtual int GetLodLevelConfig () = 0;
+
+  /**
+   * Smooth out the gouraud shading by merging the precalculated
+   * vertex normals along seams in frame 'frame' based on which
+   * vertices are very close in frame 'base'
+   */
+  virtual void MergeNormals (int base, int frame) = 0;
+
+  /**
+   * Smooth out the gouraud shading by merging the precalculated
+   * vertex normals along seams in all frames based on which
+   * vertices are very close in frame 'base'
+   */
+  virtual void MergeNormals (int base) = 0;
+
+  /**
+   * Smooth out the gouraud shading by merging the precalculated
+   * vertex normals along seams in all frames based on which
+   * vertices are very close in each frame
+   */
+  virtual void MergeNormals () = 0;
 };
 
 SCF_VERSION (iSprite3DState, 0, 0, 1);

@@ -7,6 +7,14 @@ The history order has been reversed so that new features are at the top.
 	- Philip also added new avi plugin to autogeneration process. This
 	  will generate both the VC6 project files for the plugin and
 	  the test application.
+	- Added GetAnmIndex() and GetTexIndex() to iSpriteFrame.
+	- Added MergeNormals() to iSprite3DFactoryState.
+	- Changed csLoader to use the new iSkeletonLimb, iSkeletonConnection,
+	  iSkeleton, and iSprite3DFactoryState to load a sprite template.
+	  Only partially done though. The impexp loaders still need a pointer
+	  to csSpriteTemplate.
+	- Fixed QUERY_INTERFACE_SAFE so that it doesn't evaluate it's
+	  parameters multiple times.
 31-Jan-2001
 	- Martin Geisse fixed a compile-time error in CSWS.
 	- Added GetPrivateObject() to iMaterialWrapper.

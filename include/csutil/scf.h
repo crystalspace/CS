@@ -83,6 +83,16 @@ struct iBase
   virtual void DecRef () = 0;
   /// Query a particular interface embedded into this object.
   virtual void *QueryInterface (const char *iInterfaceID, int iVersion) = 0;
+  /**
+   * Query a particular interface embedded into an object.
+   * This version will test if 'ibase' is NULL.
+   */
+  static void* QueryInterfaceSafe (iBase* ibase, const char* iInterfaceID,
+  	int iVersion)
+  {
+    if (ibase == NULL) return NULL;
+    else return ibase->QueryInterface (iInterfaceID, iVersion);
+  }
 };
 
 /// This macro should make use of IncRef() safer.
@@ -436,7 +446,7 @@ struct iConfigFileNew;
  * This version tests if Object is NULL and will return NULL in that case.
  */
 #define QUERY_INTERFACE_SAFE(Object,Interface)				\
-  ((Interface *)(((Object)==NULL) ? NULL : (Object)->QueryInterface (#Interface, VERSION_##Interface)))
+  (Interface *)(iBase::QueryInterfaceSafe ((Object), #Interface, VERSION_##Interface))
 
 /**
  * This function should be called to initialize client SCF library.

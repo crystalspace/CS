@@ -4091,7 +4091,7 @@ bool csLoader::LoadSounds (char* buf)
 
 //---------------------------------------------------------------------------
 
-bool csLoader::LoadSkeleton (csSkeletonLimb* limb, char* buf, bool is_connection)
+bool csLoader::LoadSkeleton (iSkeletonLimb* limb, char* buf)
 {
   CS_TOKEN_TABLE_START (commands)
     CS_TOKEN_TABLE (LIMB)
@@ -4110,6 +4110,8 @@ bool csLoader::LoadSkeleton (csSkeletonLimb* limb, char* buf, bool is_connection
   long cmd;
   char* params;
 
+  iSkeletonConnection* con = QUERY_INTERFACE (limb, iSkeletonConnection);
+
   while ((cmd = csGetObject (&buf, commands, &name, &params)) > 0)
   {
     if (!params)
@@ -4121,14 +4123,14 @@ bool csLoader::LoadSkeleton (csSkeletonLimb* limb, char* buf, bool is_connection
     {
       case CS_TOKEN_LIMB:
         {
-          csSkeletonConnection* con = new csSkeletonConnection ();
-	  if (name) con->SetName (name);
-	  if (!LoadSkeleton (con, params, true)) return false;
-	  limb->AddChild (con);
+          iSkeletonConnection* newcon = limb->CreateConnection ();
+	  iSkeletonLimb* newlimb = QUERY_INTERFACE (newcon, iSkeletonLimb);
+	  if (name) newlimb->SetName (name);
+	  if (!LoadSkeleton (newlimb, params)) return false;
 	}
         break;
       case CS_TOKEN_TRANSFORM:
-        if (is_connection)
+        if (con)
         {
           char* params2;
 	  csMatrix3 m;
@@ -4151,7 +4153,7 @@ bool csLoader::LoadSkeleton (csSkeletonLimb* limb, char* buf, bool is_connection
             }
           }
 	  csTransform tr (m, -m.GetInverse () * v);
-	  ((csSkeletonConnection*)limb)->SetTransformation (tr);
+	  con->SetTransformation (tr);
         }
 	else
 	{
@@ -4463,6 +4465,8 @@ bool csLoader::LoadSpriteTemplate (csSpriteTemplate* stemp, char* buf)
   char* params2;
   char str[255];
 
+  iSprite3DFactoryState* state = QUERY_INTERFACE (stemp, iSprite3DFactoryState);
+
   while ((cmd = csGetObject (&buf, commands, &name, &params)) > 0)
   {
     if (!params)
@@ -4479,7 +4483,7 @@ bool csLoader::LoadSpriteTemplate (csSpriteTemplate* stemp, char* buf)
           ScanStr (params, "%s", str);
           csMaterialWrapper *mat = FindMaterial (str, onlyRegion);
           if (mat)
-            stemp->SetMaterial (mat);
+            state->SetMaterialWrapper (QUERY_INTERFACE (mat, iMaterialWrapper));
           else
           {
             CsPrintf (MSG_FATAL_ERROR, "Material `%s' not found!\n", str);
@@ -4490,16 +4494,17 @@ bool csLoader::LoadSpriteTemplate (csSpriteTemplate* stemp, char* buf)
 
       case CS_TOKEN_SKELETON:
 	{
-          csSkeleton* skeleton = new csSkeleton ();
-	  if (name) skeleton->SetName (name);
-	  if (!LoadSkeleton (skeleton, params, false)) return false;
-	  stemp->SetSkeleton (skeleton);
+	  state->EnableSkeletalAnimation ();
+	  iSkeleton* skeleton = state->GetSkeleton ();
+	  iSkeletonLimb* skellimb = QUERY_INTERFACE (skeleton, iSkeletonLimb);
+	  if (name) skellimb->SetName (name);
+	  if (!LoadSkeleton (skellimb, params)) return false;
 	}
         break;
 
       case CS_TOKEN_ACTION:
         {
-          csSpriteAction* act = stemp->AddAction ();
+          iSpriteAction* act = state->AddAction ();
           act->SetName (name);
           int d;
           char fn[64];
@@ -4514,8 +4519,8 @@ bool csLoader::LoadSpriteTemplate (csSpriteTemplate* stemp, char* buf)
             {
               case CS_TOKEN_F:
                 ScanStr (params2, "%s,%d", fn, &d);
-                csFrame * ff = stemp->FindFrame (fn);
-                if(!ff)
+                iSpriteFrame* ff = state->FindFrame (fn);
+                if (!ff)
                 {
                   CsPrintf (MSG_FATAL_ERROR, "Error! Trying to add a unknown frame '%s' in %s action !\n",
                         fn, act->GetName ());
@@ -4530,7 +4535,7 @@ bool csLoader::LoadSpriteTemplate (csSpriteTemplate* stemp, char* buf)
 
       case CS_TOKEN_FRAME:
         {
-          csFrame* fr = stemp->AddFrame ();
+          iSpriteFrame* fr = state->AddFrame ();
           fr->SetName (name);
           int anm_idx = fr->GetAnmIndex ();
           int tex_idx = fr->GetTexIndex ();
@@ -4548,18 +4553,18 @@ bool csLoader::LoadSpriteTemplate (csSpriteTemplate* stemp, char* buf)
               case CS_TOKEN_V:
                 ScanStr (params2, "%f,%f,%f:%f,%f", &x, &y, &z, &u, &v);
                 // check if it's the first frame
-                if (stemp->GetNumFrames () == 1)
+                if (state->GetNumFrames () == 1)
                 {
-                  stemp->AddVertex();
+                  state->AddVertices (1);
                 }
-                else if (i >= stemp->GetNumTexels ())
+                else if (i >= state->GetNumTexels ())
                 {
                   CsPrintf (MSG_FATAL_ERROR, "Error! Trying to add too many vertices in frame '%s'!\n",
                     fr->GetName ());
                   fatal_exit (0, false);
                 }
-                stemp->GetVertex (anm_idx, i) = csVector3 (x, y, z);
-                stemp->GetTexel  (tex_idx, i) = csVector2 (u, v);
+                state->GetVertex (anm_idx, i) = csVector3 (x, y, z);
+                state->GetTexel  (tex_idx, i) = csVector2 (u, v);
                 i++;
                 break;
             }
@@ -4570,10 +4575,10 @@ bool csLoader::LoadSpriteTemplate (csSpriteTemplate* stemp, char* buf)
                 fr->GetName (), csGetLastOffender ());
             fatal_exit (0, false);
           }
-          if (i < stemp->GetNumTexels ())
+          if (i < state->GetNumTexels ())
           {
             CsPrintf (MSG_FATAL_ERROR, "Error! Too few vertices in frame '%s'! (%d %d)\n",
-                fr->GetName (), i, stemp->GetNumTexels ());
+                fr->GetName (), i, state->GetNumTexels ());
             fatal_exit (0, false);
           }
         }
@@ -4583,7 +4588,7 @@ bool csLoader::LoadSpriteTemplate (csSpriteTemplate* stemp, char* buf)
         {
           int a, b, c;
           ScanStr (params, "%d,%d,%d", &a, &b, &c);
-          stemp->AddTriangle (a, b, c);
+          state->AddTriangle (a, b, c);
         }
         break;
 
@@ -4609,9 +4614,9 @@ bool csLoader::LoadSpriteTemplate (csSpriteTemplate* stemp, char* buf)
           ScanStr (params, "%D", list, &num);
           switch (num)
           {
-            case 0  :  stemp->MergeNormals ();                  break;
-            case 1  :  stemp->MergeNormals (list[0]);           break;
-            case 2  :  stemp->MergeNormals (list[0], list[1]);  break;
+            case 0  :  state->MergeNormals ();                  break;
+            case 1  :  state->MergeNormals (list[0]);           break;
+            case 2  :  state->MergeNormals (list[0], list[1]);  break;
             default :  CsPrintf (MSG_WARNING, "Confused by SMOOTH options: '%s'\n", params);
                        CsPrintf (MSG_WARNING, "no smoothing performed\n");
           }
@@ -4622,7 +4627,7 @@ bool csLoader::LoadSpriteTemplate (csSpriteTemplate* stemp, char* buf)
 	{
 	  bool do_tween;
           ScanStr (params, "%b", &do_tween);
-          stemp->EnableTweening (do_tween);
+          state->EnableTweening (do_tween);
 	}
 	break;
     }
@@ -4634,6 +4639,8 @@ bool csLoader::LoadSpriteTemplate (csSpriteTemplate* stemp, char* buf)
     fatal_exit (0, false);
   }
 
+  // @@@ In the future this should be done automatically as soon
+  // as the sprite template thinks it is needed.
   stemp->GenerateLOD ();
   stemp->ComputeBoundingBox ();
 
