@@ -41,7 +41,7 @@ NeXTSystemDriver::~NeXTSystemDriver()
 {
   if (assistant != 0)
   {
-    scfiObjectRegistry.Unregister(assistant, "NeXTAssistant");
+    object_reg.Unregister(assistant, "NeXTAssistant");
     assistant->orphan();
     assistant->DecRef();
   }
@@ -55,7 +55,7 @@ bool NeXTSystemDriver::Initialize(int argc, char const* const argv[],
   char const* cfgfile)
 {
   assistant = new NeXTAssistant(this);
-  scfiObjectRegistry.Register(assistant, "NeXTAssistant");
+  object_reg.Register(assistant, "NeXTAssistant");
   return superclass::Initialize(argc, argv, cfgfile);
 }
 
