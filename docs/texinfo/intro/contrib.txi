@@ -1025,5 +1025,9 @@ a mailing list for Crystal Space.  Thanks to Marco d'Itri (the system manager)
 for creating this list for me.  Also thanks to those people for creating an
 ftp mirror of this site.
 
+Many thanks to Ted Nguyen for donating a version of Microsoft Visual C++ to
+Eric Sunshine and Jorrit Tyberghein.
+
 If we have forgotten anyone or missed a contribution, we sincerely apologize.
 Please feel free to notify us of errors or omissions.
+
