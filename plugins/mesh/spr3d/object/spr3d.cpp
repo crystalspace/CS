@@ -2538,9 +2538,7 @@ bool csSprite3DMeshObject::HitBeamObject (const csVector3& start,
   {
     csTriangle& tr = tris[i];
     if (csIntersect3::IntersectTriangle (verts[tr.a], verts[tr.b],
-    	verts[tr.c], seg, tsect) ||
-	csIntersect3::IntersectTriangle (verts[tr.c], verts[tr.b],
-    	verts[tr.a], seg, tsect))
+    	verts[tr.c], seg, tsect))
     {
       temp = csSquaredDist::PointPoint (start, tsect);
       if (temp < dist)

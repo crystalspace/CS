@@ -1982,7 +1982,7 @@ bool csTerrFuncObject::HitBeamOutline (const csVector3& start,
       vrt = blocks[index].mesh_vertices[0];
       tr = blocks[index].mesh[0].triangles;
       for (i = 0 ; i < max ; i++)
-      { // Check each triangle in both orientations. This is the slow version
+      { // Check each triangle in both orientations.
         if (csIntersect3::IntersectTriangle (vrt[tr[i].a], vrt[tr[i].b],
     	     vrt[tr[i].c], seg, isect))
         {
@@ -2047,11 +2047,9 @@ bool csTerrFuncObject::HitBeamObject (const csVector3& start,
       vrt = blocks[index].mesh_vertices[0];
       tr = blocks[index].mesh[0].triangles;
       for (i = 0 ; i < max ; i++)
-      { // Check each triangle in both orientations. This is the slow version
+      { // Check each triangle in both orientations.
         if (csIntersect3::IntersectTriangle (vrt[tr[i].a], vrt[tr[i].b],
-    	     vrt[tr[i].c], seg, st) ||
-	    csIntersect3::IntersectTriangle (vrt[tr[i].c], vrt[tr[i].b],
-    	     vrt[tr[i].a], seg, st))
+    	     vrt[tr[i].c], seg, st))
 	{
           dist2 = csSquaredDist::PointPoint (start, st);
 	  if ( dist2 < dist )

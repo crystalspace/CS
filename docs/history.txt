@@ -34,6 +34,12 @@ chronological order.
 	  returns a successful intersection for both frontface and backface
 	  triangles.  This fixes a previous problem with HitBeam not working
 	  correctly for genmesh objects.
+	- Chris Matuszewski updated some code that was using
+	  csIntersect3::IntersectTriangle twice: once for frontface, once for
+	  backface.  This is no longer necessary due to the updated
+	  implementation of csIntersect3::IntersectTriangle, which works for
+	  both frontface and backface now.  The affected files are
+	  terrfunc.cpp and spr3d.cpp.
 9-Nov-2003
 	- Rhad added functions to handle reversing some operations with
 	  particle emitters.  These take care of some simple situations where
