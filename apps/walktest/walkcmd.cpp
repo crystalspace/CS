@@ -722,14 +722,7 @@ bool CommandHandler (char *cmd, char *arg)
     }
   }
   else if (!strcasecmp (cmd, "fullscreen"))
-  {
-		iBase *pBG2D = (iBase *)System->QueryPlugIn("iGraphics2D",0);
-		ASSERT(pBG2D);
-		iGraphics2D *pG2D = (iGraphics2D *) pBG2D->QueryInterface("iGraphics2D",0);
-		ASSERT(pG2D);
-		pG2D->PerformExtension("FullScreen");
-  }
-
+    Sys->G2D->PerformExtension("FullScreen");
   else
     return false;
   return true;
