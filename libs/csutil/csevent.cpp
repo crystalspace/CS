@@ -727,9 +727,9 @@ bool csEvent::RemoveAll()
       if (v)
       {
         attribute *object = NULL;
-        while((object = (attribute *) v->Pop()) != NULL)
+        while(v->Length() > 0)
         {
-          if (object)
+          if ((object = (attribute *) v->Pop()) != NULL)
           {
             if (object->type == attribute::tag_event)
               object->Event->DecRef();

@@ -30,6 +30,11 @@ The history order is reversed so that new features are at the top.
 	      did not already exist.  For instance, "jam simple1clean" followed
 	      immediately by "jam simple1clean" would cause simple1 to be built
 	      by the second invocation of the `simpel1clean' rule.
+        - Jonathan Tarbox made the following change to the event object:
+            - Due to the assumtion of identical functionality between csVector
+              and csArray, I missed the CS_ASSERT when csArray::Pop() reached
+              the end of the array.  csVector would return NULL, csArray just
+              asserts.
 17-May-2003
 	- res made the following changes:
 	    - extended the stdpt plugin with a fire texture loader.
