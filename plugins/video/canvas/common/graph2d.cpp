@@ -139,7 +139,7 @@ bool csGraphics2D::Initialize (iObjectRegistry* r)
 }
 
 bool csGraphics2D::Initialize (iObjectRegistry* r, int width, int height,
-	int depth, void* memory, iOffscreenCanvasCallback* ofscb)
+    int depth, void* memory, iOffscreenCanvasCallback* ofscb)
 {
   CS_ASSERT (r != NULL);
   object_reg = r;
@@ -327,7 +327,7 @@ void csGraphics2D::DrawPixels (csPixelCoord* pixels, int num_pixels, int color)
 }
 
 void csGraphics2D::Blit (int x, int y, int w, int h,
-	unsigned char* data)
+    unsigned char* data)
 {
   bool hor_clip_needed = false;
   bool ver_clip_needed = false;
@@ -361,15 +361,15 @@ void csGraphics2D::Blit (int x, int y, int w, int h,
     case 1:
       while (h)
       {
-	register uint8 *vram = GetPixelAt (x, y);
-	int w2 = w;
-	d = data;
-	while (w2 > 0)
-	{
-	  r = *d++; g = *d++; b = *d++; d++;
-	  *vram++ = FindRGB (r, g, b);
-	  w2--;
-	}
+    register uint8 *vram = GetPixelAt (x, y);
+    int w2 = w;
+    d = data;
+    while (w2 > 0)
+    {
+      r = *d++; g = *d++; b = *d++; d++;
+      *vram++ = FindRGB (r, g, b);
+      w2--;
+    }
         data += 4*orig_w;
         y++; h--;
       }
@@ -378,14 +378,14 @@ void csGraphics2D::Blit (int x, int y, int w, int h,
       while (h)
       {
         register uint16 *vram = (uint16 *)GetPixelAt (x, y);
-	int w2 = w;
-	d = data;
-	while (w2 > 0)
-	{
-	  r = *d++; g = *d++; b = *d++; d++;
-	  *vram++ = FindRGB (r, g, b);
-	  w2--;
-	}
+    int w2 = w;
+    d = data;
+    while (w2 > 0)
+    {
+      r = *d++; g = *d++; b = *d++; d++;
+      *vram++ = FindRGB (r, g, b);
+      w2--;
+    }
         data += 4*orig_w;
         y++; h--;
       } /* endwhile */
@@ -394,14 +394,14 @@ void csGraphics2D::Blit (int x, int y, int w, int h,
       while (h)
       {
         register uint32 *vram = (uint32 *)GetPixelAt (x, y);
-	int w2 = w;
-	d = data;
-	while (w2 > 0)
-	{
-	  r = *d++; g = *d++; b = *d++; d++;
-	  *vram++ = FindRGB (r, g, b);
-	  w2--;
-	}
+    int w2 = w;
+    d = data;
+    while (w2 > 0)
+    {
+      r = *d++; g = *d++; b = *d++; d++;
+      *vram++ = FindRGB (r, g, b);
+      w2--;
+    }
         data += 4*orig_w;
         y++; h--;
       } /* endwhile */
@@ -626,7 +626,7 @@ bool csGraphics2D::CLIPt(float denom, float num, float& tE, float& tL)
     } else if(denom < 0) {
         t = num / denom;
         if(t < tE) return false;
-        else tL = t;
+        else if(t < tL) tL = t; // note: there is a mistake on this line in the C edition of the book!
     } else if(num > 0) return false;
     return true;
 }
@@ -932,24 +932,24 @@ int csGraphics2D::FindRGBPalette (int r, int g, int b)
     if (PaletteAlloc[i])
     {
       int dist = rgb_dist (r, g, b, Palette[i].red, Palette[i].green,
-      	Palette[i].blue);
+        Palette[i].blue);
       if (dist == 0) return i;
       if (dist < best_dist)
       {
         best_dist = dist;
-	best_idx = i;
+    best_idx = i;
       }
     }
   return best_idx;
 }
 
 csPtr<iGraphics2D> csGraphics2D::CreateOffscreenCanvas (
-  	void* memory, int width, int height, int depth,
-	iOffscreenCanvasCallback* ofscb)
+    void* memory, int width, int height, int depth,
+    iOffscreenCanvasCallback* ofscb)
 {
   csGraphics2D* g2d = new csGraphics2D (NULL);
   if (g2d->Initialize (object_reg, width, height, depth, memory,
-  	ofscb) && g2d->Open ())
+    ofscb) && g2d->Open ())
   {
     return csPtr<iGraphics2D> (g2d);
   }
