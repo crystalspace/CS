@@ -24,10 +24,10 @@
 #include <DrawSprocket.h>
 #include "csutil/scf.h"
 #include "cs2d/common/graph2d.h"
-#include "isysg2d.h"
+#include "IMacGraphics.h"
 
 /// Macintosh version.
-class csGraphics2DMac : public csGraphics2D, public iMacGraphicsInfo
+class csGraphics2DMac : public csGraphics2D, public iMacGraphics
 {
   friend class csGraphics3DSoftware;
 
