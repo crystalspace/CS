@@ -73,11 +73,11 @@ protected:
   bool Stereo;
 
   // switch to activate/deactivate the sound proc
-  bool ActivateSoundProc;
+  volatile bool ActivateSoundProc;
   // is the sound proc locked?
-  bool SoundProcLocked;
+  volatile bool SoundProcLocked;
   // number of sound blocks to write
-  int NumSoundBlocksToWrite;
+  volatile int NumSoundBlocksToWrite;
 
   // this function is called when a sound block is returned by wave-out
   static void CALLBACK waveOutProc(HWAVEOUT hwo, UINT uMsg, DWORD dwInstance,
