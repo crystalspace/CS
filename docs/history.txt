@@ -25,7 +25,14 @@ Short-term cleanups that need to be done:
 	  can be optimized but I have to do some thinking about that :-)
 	- Fixed a bug with loading of sprite position from world file.
 	  This bug was recently introduced with VFS changes.
+	- Tristan McLure provided a new DX6.1 renderer.
 	- Jonathan Hudson provided a fix for the upside-down BMP bug.
+	- Eric Sunshine fixed some bugs in DECLARE_TYPED_VECTOR from
+	  csvector.h which would cause the Insert(), FreeItem(), and Equal()
+	  methods to loop infinitely.
+	- Eric Sunshine fixed some bugs in csCom which was introduced with the
+	  new DX6.1 renderer.  The bugs prevented the application from
+	  launching on all non-Windows platforms.
 15-Sep-1999
         - Ivan Avramovic fixed a few spots where "sysdef.h" was not included,
           but should have been.
