@@ -107,6 +107,11 @@ class Snapshot:
     def makedirectory(self, path):
         if not os.path.exists(path) :
             os.mkdir(path)
+	try:
+            os.chmod(path, 0775)
+        except Exception, e:
+            self.log("Error making directory group writable: " +
+                     path + '; reason: ' + str(e))
         if ownergroup:
             try:
                 os.chown(path, os.getuid(), grp.getgrnam(ownergroup)[2])
