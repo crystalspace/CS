@@ -24,7 +24,6 @@
 #include "itexture.h"
 #include "cs3d/common/imgtools.h"
 
-class ImageColorInfo;
 class csTextureMMGlide;
 class csTextureManagerGlide;
 struct iImage;
