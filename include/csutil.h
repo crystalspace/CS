@@ -18,6 +18,8 @@
 */
 
 #include "cssysdef.h"
+#include "csutil/ansicolor.h"
+#include "csutil/ansiparse.h"
 #include "csutil/array.h"
 #include "csutil/binder.h"
 #include "csutil/bintree.h"
