@@ -1,3 +1,23 @@
+/*
+    Copyright (C) ???
+
+    This library is free software; you can redistribute it and/or
+    modify it under the terms of the GNU Library General Public
+    License as published by the Free Software Foundation; either
+    version 2 of the License, or (at your option) any later version.
+
+    This library is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+    Library General Public License for more details.
+
+    You should have received a copy of the GNU Library General Public
+    License along with this library; if not, write to the Free
+    Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+*/
+
+#include <stdio.h>
+
 #include "cssysdef.h"
 #include "awsimgvw.h"
 #include "aws3dfrm.h"
@@ -8,37 +28,34 @@
 #include "csutil/csevent.h"
 #include "iutil/evdefs.h"
 
-#include <stdio.h>
+const int awsImageView::signalClicked = 0x1;
+const int awsImageView::signalMouseDown = 0x2;
+const int awsImageView::signalMouseUp = 0x3;
+const int awsImageView::signalMouseMoved = 0x4;
 
-const int awsImageView:: signalClicked = 0x1;
-const int awsImageView:: signalMouseDown = 0x2;
-const int awsImageView:: signalMouseUp = 0x3;
-const int awsImageView:: signalMouseMoved = 0x4;
-
-const int awsImageView:: fsBump = 0x0;
-const int awsImageView:: fsSimple = 0x1;
-const int awsImageView:: fsRaised = 0x2;
-const int awsImageView:: fsSunken = 0x3;
-const int awsImageView:: fsFlat = 0x4;
-const int awsImageView:: fsNone = 0x5;
-const int awsImageView:: fsScaled = 0x8;
-const int awsImageView:: fsTiled = 0x10;
-const int awsImageView:: fsFixed = 0x20;
-
-const int awsImageView:: frameMask = 0x7;
-const int awsImageView:: imageMask = ~awsImageView::frameMask;
+const int awsImageView::fsBump = 0x0;
+const int awsImageView::fsSimple = 0x1;
+const int awsImageView::fsRaised = 0x2;
+const int awsImageView::fsSunken = 0x3;
+const int awsImageView::fsFlat = 0x4;
+const int awsImageView::fsNone = 0x5;
+const int awsImageView::fsScaled = 0x8;
+const int awsImageView::fsTiled = 0x10;
+const int awsImageView::fsFixed = 0x20;
+const int awsImageView::frameMask = 0x7;
+const int awsImageView::imageMask = ~awsImageView::frameMask;
 
 
-awsImageView::awsImageView () :
-  is_down(false),
-  mouse_is_over(false),
-  was_down(false),
-  img1(0),
-  img2(0),
-  draw_color(false),
-  color(-1),
-  frame_style(0),
-  alpha_level(92)
+awsImageView::awsImageView ()
+  : is_down (false),
+    mouse_is_over (false),
+    was_down (false),
+    img1 (0),
+    img2 (0),
+    draw_color (false),
+    color (-1),
+    frame_style (0),
+    alpha_level (92)
 {
 }
 
@@ -57,9 +74,9 @@ bool awsImageView::Setup (iAws *_wmgr, iAwsComponentNode *settings)
 
   iAwsPrefManager *pm = WindowManager ()->GetPrefMgr ();
 
-  pm->LookupIntKey ("OverlayTextureAlpha", alpha_level);  // global get
+  pm->LookupIntKey ("OverlayTextureAlpha", alpha_level); // Global get.
   pm->GetInt (settings, "Style", frame_style);
-  pm->GetInt (settings, "Alpha", alpha_level);            // local overrides, if present.
+  pm->GetInt (settings, "Alpha", alpha_level); // Local overrides, if present.
 
   iString *file = 0;
   pm->GetString (settings, "Image", file);
@@ -72,34 +89,33 @@ bool awsImageView::Setup (iAws *_wmgr, iAwsComponentNode *settings)
 
   img2 = pm->GetTexture ("Texture");
 
-
   unsigned char r,g,b;
-  if(pm->GetRGB(settings, "Color", r, g, b))
+  if (pm->GetRGB (settings, "Color", r, g, b))
   {
-	  draw_color = true;
-	  color = pm->FindColor(r,g,b);
+    draw_color = true;
+    color = pm->FindColor (r,g,b);
   }
-
-
   return true;
 }
 
-
 void awsImageView::SetColor(int color_index)
 {
-	if(color_index >= 0)
-	{
-		draw_color = true;
-		color = color_index;
-	}
-	else
-	{
-		draw_color = false;
-		color = -1;
-	}
+  if (color_index >= 0)
+  {
+    draw_color = true;
+    color = color_index;
+  }
+  else
+  {
+    draw_color = false;
+    color = -1;
+  }
 }
 
-int awsImageView::GetColor() { return color; }
+int awsImageView::GetColor()
+{
+  return color;
+}
 
 bool awsImageView::GetProperty (const char *name, void **parm)
 {
@@ -111,44 +127,48 @@ bool awsImageView::GetProperty (const char *name, void **parm)
 bool awsImageView::SetProperty (const char *name, void *parm)
 {
   if (awsComponent::SetProperty (name, parm)) return true;
-  if (strcmp(name, "Color") == 0)
+
+  if (strcmp (name, "Color") == 0)
   {
     color = (int)parm;
     return true;
   }
   else
-  if (strcmp(name, "Image") == 0)
   {
-    // Old img1 will stay in AWS cache
-    img1 = WindowManager ()->GetPrefMgr ()->GetTexture ((const char *)parm,
-                                                        (const char *)parm);
-    return true;
+    if (strcmp (name, "Image") == 0)
+    {
+      // Old img1 will stay in AWS cache.
+      img1 = WindowManager ()->GetPrefMgr ()->GetTexture (
+        (const char *)parm,
+        (const char *)parm);
+      return true;
+    }
   }
-
   return false;
 }
 
-void awsImageView::OnDraw (csRect /*clip*/)
+void awsImageView::OnDraw (csRect clip)
 {
   aws3DFrame frame3d;
 
-    frame3d.Setup(WindowManager(),img2, 255);
+  frame3d.Setup(WindowManager(),img2, 255);
   frame3d.Draw (
-      Frame (),
-      frame_style & frameMask,
-      Window()->Frame());
+    Frame (),
+    frame_style & frameMask,
+    Window ()->Frame ());
 
-  if(draw_color)
+  if (draw_color)
   {
-	  WindowManager ()->G2D()->DrawBox(ClientFrame().xmin,
-	                                   ClientFrame().ymin,
-									   ClientFrame().Width(),
-									   ClientFrame().Height(),
-                                       color);
-      return;
+    WindowManager ()->G2D()->DrawBox (
+      ClientFrame ().xmin,
+      ClientFrame().ymin,
+      ClientFrame().Width(),
+      ClientFrame().Height(),
+      color);
+    return;
   }
 
-  // now draw the image
+  // Now draw the image.
   iTextureHandle *img = (img1 ? img1 : img2);
   if (img)
   {
@@ -189,20 +209,21 @@ void awsImageView::OnDraw (csRect /*clip*/)
       break;
     }
 
-    g3d->DrawPixmap (img,
-                     r.xmin,
-                     r.ymin,
-                     r.Width (),
-                     r.Height (),
-                     t.xmin,
-                     t.ymin,
-                     t.Width (),
-                     t.Height (),
-                     0);
+    g3d->DrawPixmap (
+      img,
+      r.xmin,
+      r.ymin,
+      r.Width (),
+      r.Height (),
+      t.xmin,
+      t.ymin,
+      t.Width (),
+      t.Height (),
+      0);
   }
 }
 
-bool awsImageView::OnMouseDown (int, int, int)
+bool awsImageView::OnMouseDown (int button, int x, int y)
 {
   Broadcast (signalMouseDown);
 
@@ -214,7 +235,7 @@ bool awsImageView::OnMouseDown (int, int, int)
   return true;
 }
 
-bool awsImageView::OnMouseUp (int, int, int)
+bool awsImageView::OnMouseUp (int button, int x, int y)
 {
   Broadcast (signalMouseUp);
 
@@ -228,7 +249,7 @@ bool awsImageView::OnMouseUp (int, int, int)
   return true;
 }
 
-bool awsImageView::OnMouseMove (int, int, int)
+bool awsImageView::OnMouseMove (int button, int x, int y)
 {
   Broadcast (signalMouseMoved);
   return false;
@@ -251,11 +272,8 @@ bool awsImageView::OnMouseEnter ()
   return true;
 }
 
-/************************************* Command Button Factory ****************/
-
-awsImageViewFactory::awsImageViewFactory (
-  iAws *wmgr) :
-    awsComponentFactory(wmgr)
+awsImageViewFactory::awsImageViewFactory (iAws *wmgr)
+  : awsComponentFactory (wmgr)
 {
   Register ("Image View");
   RegisterConstant ("ivfsBump", awsImageView::fsBump);
@@ -270,17 +288,14 @@ awsImageViewFactory::awsImageViewFactory (
 
   RegisterConstant ("signalImageViewClicked", awsImageView::signalClicked);
   RegisterConstant ("signalImageViewMouseUp", awsImageView::signalMouseUp);
-  RegisterConstant (
-    "signalImageViewMouseDown",
-    awsImageView::signalMouseDown);
-  RegisterConstant (
-    "signalImageViewMouseMoved",
+  RegisterConstant ("signalImageViewMouseDown", awsImageView::signalMouseDown);
+  RegisterConstant ("signalImageViewMouseMoved",
     awsImageView::signalMouseMoved);
 }
 
 awsImageViewFactory::~awsImageViewFactory ()
 {
-  // empty
+  // Empty.
 }
 
 iAwsComponent *awsImageViewFactory::Create ()

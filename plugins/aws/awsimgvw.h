@@ -34,8 +34,8 @@ private:
   bool was_down;
 
   /// Holds the texture handle for the image we are viewing.
-  iTextureHandle *img1; // Via Image
-  iTextureHandle *img2; // Via Texture
+  iTextureHandle *img1; // Via Image.
+  iTextureHandle *img2; // Via Texture.
 
   /// True if we should draw a solid color instead.
   bool draw_color;
