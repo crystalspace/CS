@@ -17,7 +17,6 @@
 */
 
 #include "cssysdef.h"
-#include <GL/gl.h>
 #include "csutil/scf.h"
 #include "ogl_txtcache.h"
 #include "ogl_txtmgr.h"
@@ -28,6 +27,12 @@
 #include "ivideo/txtmgr.h"
 #include "imesh/thing/polygon.h"
 #include "isys/event.h"
+
+#if defined(CS_OPENGL_PATH)
+#include CS_OPENGL_PATH(gl.h)
+#else
+#include <GL/gl.h>
+#endif
 
 IMPLEMENT_IBASE (csOpenGLProcSoftware)
   IMPLEMENTS_INTERFACE (iGraphics3D)

@@ -9,15 +9,32 @@ The history order is reversed so that new features are at the top.
 	  functions:
 	    cscsByteSwap16bitBuffer()
 	    cscsByteSwap32bitBuffer()
+	- Eric Sunshine altered the OpenGL renderer so that it builds cleanly
+	  on MacOS/X.  The following changes were made:
+	    - Added a new preprocessor flag, CS_OPENGL_PATH, which indicates
+	      where OpenGL header files live.  If CS_OPENGL_PATH is defined,
+	      then header files are included from that directory rather than
+	      the standard "GL" directory.  This is needed on MacOS/X, since
+	      OpenGL headers live in a subdirectory named "OpenGL" rather than
+	      the standard "GL" as with most other platforms.
+	    - Added CFLAGS.GL3D and LIBS.OPENGL.SYSTEM to macosx.mak with
+	      appropriate values.
+	    - Added a NEXT.PLUGINS variable to the Apple/NeXT makefiles and
+	      defined it with the value "video/renderer/opengl" in macosx.mak
+	      so that the OpenGL renderer makefile is consulted when building
+	      on MacOS/X.
+	    - Added a definition of OPENGL_2D_DRIVER to next/csosdefs.h.
+	- Eric Sunshine fixed ogl_halo.cpp so that it no longer unnecessarily
+	  includes <windows.h>.
 24-Jun-2001
 	- Eric Sunshine repaired DemoSequenceLoader::LoadPath() so that it no
 	  longer allocates 10,000 element arrays of `float' and 'csVector3' on
 	  the stack, since such huge arrays are frequently unportable.  In this
 	  case, they blew the OpenStep stack, resulting in abnormal program
 	  termination.
-	- Eric Sunshine worked around an OpenStep compiler warning where it
-	  complained that csCameraPosition, csMaterialWrapper and
-	  csTextureWrapper had private destructors but no friends.
+	- Eric Sunshine worked around a complaint from the compiler about
+	  csCameraPosition, csMaterialWrapper and csTextureWrapper having
+	  private destructors but no friends.
 22-Jun-2001
 	- Fixed a bug in Walktest with the deletion of the legs/body
 	  collider. They were deleted with DecRef() but that is illegal

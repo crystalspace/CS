@@ -21,8 +21,6 @@
 #include "cssys/sysdriv.h"
 #include "csgeom/subrec.h"
 
-#include <GL/gl.h>
-
 #include "ogl_txtcache.h"
 #include "ogl_txtmgr.h"
 #include "ogl_g3dcom.h"

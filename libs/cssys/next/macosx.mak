@@ -32,7 +32,11 @@ NEXT.LIBS=
 NEXT.LFLAGS.GENERAL=-framework AppKit -framework Foundation
 NEXT.LFLAGS.EXE=
 NEXT.LFLAGS.DLL=-bundle -undefined suppress
+NEXT.PLUGINS=video/renderer/opengl
 
 NEXT.FRIEND=yes
 include libs/cssys/next/next.mak
 NEXT.FRIEND=no
+
+CFLAGS.GL3D=-D'CS_OPENGL_PATH(X)=<OpenGL/\#\#X\#\#>' -FOpenGL
+LIBS.OPENGL.SYSTEM=-framework OpenGL

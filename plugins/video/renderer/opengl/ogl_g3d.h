@@ -26,8 +26,6 @@
 // Expanded by Dan Ogles
 // Further expanded by Gary Haussmann
 
-#include <GL/gl.h>
-
 #include "csutil/scf.h"
 #include "ogl_g3dcom.h"
 #include "video/renderer/common/dtmesh.h"

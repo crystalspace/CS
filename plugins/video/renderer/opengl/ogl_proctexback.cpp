@@ -17,13 +17,18 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 #include "cssysdef.h"
-#include <GL/gl.h>
 #include "ogl_txtcache.h"
 #include "ogl_txtmgr.h"
 #include "ogl_proctexback.h"
 #include "ogl_g3dcom.h"
 #include "csgeom/polyclip.h"
 #include "isys/event.h"
+
+#if defined(CS_OPENGL_PATH)
+#include CS_OPENGL_PATH(gl.h)
+#else
+#include <GL/gl.h>
+#endif
 
 IMPLEMENT_IBASE (csOpenGLProcBackBuffer)
   IMPLEMENTS_INTERFACE (iGraphics3D)

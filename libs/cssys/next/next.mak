@@ -7,7 +7,7 @@
 ifeq ($(NEXT.FRIEND),yes)
 
 # Choose which drivers you want to build/use
-PLUGINS += video/canvas/next
+PLUGINS += $(NEXT.PLUGINS) video/canvas/next
 
 ifneq ($(NEXT.TARGET),)
   DESCRIPTION.$(NEXT.TARGET) := $(NEXT.DESCRIPTION)

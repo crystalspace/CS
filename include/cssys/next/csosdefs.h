@@ -74,6 +74,8 @@
 #undef  SOFTWARE_2D_DRIVER
 #define SOFTWARE_2D_DRIVER "crystalspace.graphics2d.next"
 
+#undef  OPENGL_2D_DRIVER
+#define OPENGL_2D_DRIVER   "crystalspace.graphics2d.glnext"
 
 //-----------------------------------------------------------------------------
 // NeXT does not supply strdup() so fake one up.

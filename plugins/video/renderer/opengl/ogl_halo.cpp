@@ -17,12 +17,10 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-/* This file is more or less a ripoff of Andrew Zabolotny's software halo renderer */
+/* This file is more or less a ripoff of Andrew Zabolotny's software
+   halo renderer */
 
 #include "cssysdef.h"
-#ifdef OS_WIN32
-#include <windows.h>
-#endif
 #include "qint.h"
 #include "csgeom/math2d.h"
 #include "csutil/util.h"

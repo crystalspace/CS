@@ -19,14 +19,17 @@
 #ifndef __OGL3DCOM_H__
 #define __OGL3DCOM_H__
 
-// GRAPH3D.H
 // csGraphics3DOGLCommon OpenGL rasterizer class.
 
 // Concieved by Jorrit Tyberghein and Gary Clark
 // Expanded by Dan Ogles
 // Further expanded by Gary Haussmann
 
+#if defined(CS_OPENGL_PATH)
+#include CS_OPENGL_PATH(gl.h)
+#else
 #include <GL/gl.h>
+#endif
 
 #include "csutil/scf.h"
 #include "csutil/cfgacc.h"

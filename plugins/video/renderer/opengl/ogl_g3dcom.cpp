@@ -46,8 +46,6 @@
 #include "csgfx/rgbpixel.h"
 #include "qsqrt.h"
 
-#include <GL/gl.h>
-
 #define SysPrintf System->Printf
 
 // uncomment the 'USE_MULTITEXTURE 1' define to enable code for
