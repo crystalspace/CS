@@ -5,10 +5,11 @@
 ############################################
 
 # The following include file should define all variables
-# needed for this makefile to work.
+# needed for this makefile to work. Please do not change
+# the include order unless you know what you are doing!
 include mk/user.mak
-include mk/common.mak
 -include config.mak
+include mk/common.mak
 
 .PHONY: doc api depend clean cleanlib cleandep distclean html pdf classpdf pdfbook cleandoc detex zips
 
@@ -74,6 +75,9 @@ LIBS=$(LIBS.EXE) $(Z_LIBS)
 
 ifeq ($(MAKE_DLL),yes)
   CFLAGS+=$(CFLAGS.DLL)
+endif
+ifeq ($(DO_ASM),no)
+  CFLAGS+=$(CFLAGS.D)NO_ASSEMBLER
 endif
 
 # Memory debugger
