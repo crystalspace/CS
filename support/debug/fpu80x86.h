@@ -67,7 +67,9 @@ static inline unsigned int _control87(unsigned int newcw, unsigned int mask)
 
 #else
 
+#if !defined(COMP_VC)
 static inline unsigned int _control87(unsigned int, unsigned int) { return 0; }
+#endif
 
 #endif
 
