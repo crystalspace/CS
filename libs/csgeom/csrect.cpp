@@ -184,3 +184,33 @@ void csRect::AddAdjanced (const csRect &rect)
   if (tmp.Area () > Area ())
     Set (tmp);
 }
+
+void 
+csRect::Join (const csRect &rect)
+{
+
+  xmin = MIN(rect.xmin, xmin);
+  ymin = MIN(rect.ymin, ymin);
+
+  xmax = MAX(rect.xmax, xmax);
+  ymax = MAX(rect.ymax, ymax);
+}
+
+void 
+csRect::Outset(int n)
+  {
+    xmin-=n;
+    ymin-=n;
+    xmax+=n;
+    ymax+=n;
+  }
+
+void 
+csRect::Inset(int n)
+  {
+    xmin+=n;
+    ymin+=n;
+    xmax-=n;
+    ymax-=n;
+  }
+
