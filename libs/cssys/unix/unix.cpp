@@ -29,6 +29,7 @@
 #include "igraph3d.h"
 
 //------------------------------------------------------ The System driver ---//
+void usleep(unsigned int useconds);
 
 SysSystemDriver::SysSystemDriver () : csSystemDriver ()
 {
@@ -54,6 +55,5 @@ void SysSystemDriver::Loop(void)
 
 void SysSystemDriver::Sleep (int SleepTime)
 {
-  int usleep(unsigned int useconds);
   usleep (SleepTime * 1000);
 }
