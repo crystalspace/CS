@@ -23,6 +23,8 @@ Short-term cleanups that need to be done:
 	  in common.mak.
 	- Siu-Hang Or sent a patch to fix another crasher in MazeD which
 	  occurred when adding 3D volumes to an already-existing world.
+	- Eric Sunshine imported Squawk version 12 from Seth Galbraith.  Eric
+	  also fixed a couple of new compilation warnings in Squawk.
 25-Aug-1999
 	- Andrew Zabolotny released a CrystalSpace-compliant version of aalib,
 	  the Ascii Art library.  He also updated a number of keyboard and
