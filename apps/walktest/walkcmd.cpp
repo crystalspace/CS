@@ -884,8 +884,8 @@ bool CommandHandler (const char *cmd, const char *arg)
     if (arg) cnt = ScanStr (arg, "%s,%d", txtname, &num);
     extern void add_particles_fountain (csSector* sector, char* txtname,
     	int num, const csVector3& origin);
-    if (cnt <= 1) num = 50;
-    if (cnt <= 0) strcpy (txtname, "green.gif");
+    if (cnt <= 1) num = 400;
+    if (cnt <= 0) strcpy (txtname, "spark.png");
     add_particles_fountain (Sys->view->GetCamera ()->GetSector (),
     	txtname, num, Sys->view->GetCamera ()->GetOrigin ()-
 	csVector3 (0, Sys->cfg_body_height, 0));

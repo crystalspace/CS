@@ -241,7 +241,9 @@ void add_particles_fountain (csSector* sector, char* txtname, int num,
       3.0, 0.2,
       0.0, 3.1415926/2.);
   exp->MoveToSector (sector);
-  exp->SetColor (csColor (.25,.25,.25));
+  exp->SetChangeRotation(7.5);
+  //exp->SetColor (csColor (.25,.25,.25));
+  exp->SetColor (csColor (.25,.35,.55));
 }
 
 //===========================================================================
