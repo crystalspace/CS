@@ -1,0 +1,289 @@
+<!doctype html public "-//w3c//dtd html 4.0 transitional//en">
+<html>
+<head>
+   <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+   <meta name="Author" content="Andrew Zabolotny">
+   <meta name="GENERATOR" content="Mozilla/4.61 [en] (OS/2; I) [Netscape]">
+   <title>Crystal Space Memory Debugger</title>
+</head>
+<body text="#FFFFCC" bgcolor="#464646" link="#33CCFF" vlink="#FFCCCC" alink="#FF0000">
+
+<center>
+<h1>
+Crystal Space Memory Debugger</h1></center>
+
+<center>by Andrew Zabolotny, &lt;bit@eltech.ru></center>
+
+<h2>
+Goals</h2>
+Memory debugging tool goals:
+<ul>
+<li>
+<font color="#99FF99">Help find memory leaks. In a such complex program
+like Crystal Space Engine is its often very hard to find memory leaks analytically.
+Most often you even won't observe that a memory leak occured, unless the
+leak is quite significant.</font></li>
+
+<li>
+<font color="#99FF99">Help find situations when a memory block is used
+after being freed. This doesn't happen too often, but if it happens, its
+quite dangerous.</font></li>
+
+<li>
+<font color="#99FF99">Help find usage of uninitialized memory.</font></li>
+
+<li>
+<font color="#99FF99">Help find situations when programs writes outside
+the bounds of the allocated memory block.</font></li>
+
+<li>
+<font color="#99FF99">Help gather some memory usage information about the
+program.</font></li>
+</ul>
+
+<h2>
+Usage</h2>
+To enable memory debugger you should first of all compile in debug mode.
+Not that it is impossible to use it in optimize mode (in fact, I've used
+it a couple of times in this mode) but you will get hex addresses instead
+of file name / function name / line number information.
+<br>Next, you don't need to recompile the engine from scratch, like you
+used to do with the old memory debugger (that used CHK() macros). You just
+work as usual and if you need the memory debugger, you recompile with the
+MEMDBG variable set to 1, for example this way:
+<blockquote><font color="#99FF99">make walk mode=debug MEMDBG=1</font></blockquote>
+This will just compile memdbg.cpp and link all other object files and libraries
+with this one. Linking against this file automatically enables the memory
+debugger.
+<br>Now you should create a map file for your executable. A map file is
+a text file that contains information about source files, functions and
+line numbers of your programs. For a file format reference see the following
+section.
+<br>The map file is created with the bin/memdbg.sh script. You do it this
+way:
+<blockquote><font color="#99FF99">bin/memdbg.sh ./walktest [options]</font></blockquote>
+This will create a file called "memdbg.map". You also can provide some
+options after giving the name of executable. These options tells memory
+debugger what tasks to perform. Here is a summary on each option (character
+case is significant!):
+<dl>
+<dl>
+<dt>
+<b><font color="#33CCFF"><font size=+1>a</font></font></b></dt>
+
+<dd>
+<font color="#99FF99">Fill memory after allocation with garbage?<br>
+This is highly recommended as it is not too expensive but allows to detect
+cases when memory is used without being initialized first.</font></dd>
+
+<dt>
+<b><font color="#33CCFF"><font size=+1>f</font></font></b></dt>
+
+<dd>
+<font color="#99FF99">Do we want to fill freed memory with garbage and
+leave it non-freed?<br>
+WARNING: This is quite expensive in memory terms!</font></dd>
+
+<dt>
+<b><font color="#33CCFF"><font size=+1>d</font></font></b></dt>
+
+<dd>
+<font color="#99FF99">Do we want debugger breakpoints when detecting serious
+erros?<br>
+The debugger will break inside operator new or delete right before exiting
+back to user program. By stepping a few you can detect the place where
+error occured.</font></dd>
+
+<dt>
+<b><font color="#33CCFF"><font size=+1>v</font></font></b></dt>
+
+<dd>
+<font color="#99FF99">Do we want memory debugger to print an information
+string each time new or delete is called?<br>
+It is recommended you to redirect stdout when using this flag as output
+to console will immensely slow down your program.</font></dd>
+
+<dt>
+<b><font color="#33CCFF"><font size=+1>s</font></font></b></dt>
+
+<dd>
+<font color="#99FF99">Do we want a summary sheet at the end of program?<br>
+The sheet will list the summary number of memory allocations, memory frees,
+the peak memory consumption and lots of other useful information.</font></dd>
+
+<dt>
+<b><font color="#33CCFF"><font size=+1>l</font></font></b></dt>
+
+<dd>
+<font color="#99FF99">Do we want a list of unfreed memory blocks at the
+end of program?<br>
+The list will also contain the location where the corresponding memory
+block was allocated.</font></dd>
+
+<dt>
+<b><font color="#33CCFF"><font size=+1>b</font></font></b></dt>
+
+<dd>
+<font color="#99FF99">Detect writes past the block bounds?<br>
+This is implemented by allocating slightly bigger blocks than actually
+requested, and by filling those inter-block spaces with some well-known
+value. When block is freed, the space between blocks is checked to contains
+same well-known value.</font></dd>
+
+<dt>
+<b><font color="#33CCFF"><font size=+1>L</font></font></b></dt>
+
+<dd>
+<font color="#99FF99">Redirect (append) output from console to a log file
+called memdbg.log.</font></dd>
+</dl>
+
+<p><br><font color="#CCFFFF">Default options are: aslbL</font>
+<br><font color="#CCFFFF">To enable extensive checking use: aslbLf</font>
+<br><font color="#CCFFFF">Enable all options: aslbLfdv</font>
+<p>Thus, to disable everything except the log file and the summary, you
+type:
+<blockquote><font color="#99FF99">bin/memdbg.sh ./walktest sL</font></blockquote>
+After you created the map file, just run your program as usual. If your
+program doesn't have a separate stdout stream (such as on DOS, OS/2, Windows,
+Mac) it is recommended that you always use log file; if you didn't you
+can still redirect the stdout to a file using the stdout redirection, if
+it is possible (./walktest >logfile).
+<br>If you will want later to change debugging options, you can load the
+map file into any text editor (that will handle such large files) and change
+the first line (that starts with a capital O).
+<br>If you did everything correctly, you should get similar references
+to locations:
+<dl>
+<pre><font color="#99FF99">+--------+----------+- Unfreed memory blocks ---------------------------------
+|&nbsp; size&nbsp; |&nbsp; address |location where block was allocated
++--------+----------+---------------------------------------------------------
+|&nbsp;&nbsp;&nbsp;&nbsp; 239|&nbsp;&nbsp; 0x89970|file /home/andy/CS/memdbg/test.cpp:28, func main</font></pre>
+</dl>
+If you get such text:
+<dl>
+<pre><font color="#99FF99">+--------+----------+- Unfreed memory blocks----------------------------------
+|&nbsp; size&nbsp; |&nbsp; address |location where block was allocated
++--------+----------+---------------------------------------------------------
+|&nbsp;&nbsp;&nbsp;&nbsp; 200|&nbsp;&nbsp; 0x32b70|unknown (0x10239)
+|&nbsp;&nbsp;&nbsp;&nbsp; 239|&nbsp;&nbsp; 0x87f50|unknown (0x10189)</font></pre>
+</dl>
+This means that the map file is either incorrect, or does not contain location
+information about the above addresses.
+<h2>
+Map file format</h2>
+Map file has a very simple format. Currently the map file is created by
+piping `nm' program output through an AWK script, but you can write other
+tools that create .map files. That's why I'll describe the format of map
+file in details. Even more details you can gather from the source code,
+as always :-)
+<br>The map file is a plain text file; lines that start with '#' or ';'
+are ignored. Otherwise each line starts with an letter that identifies
+which type of information is presented on that line. Here is a list of
+all identificators, what they mean and what information is expected on
+that line:
+<br>&nbsp;
+<dl>
+<dt>
+<b><font color="#33CCFF"><font size=+1>O [string]</font></font></b></dt>
+
+<dd>
+<font color="#99FF99">Memory Debugger [O]ptions.<br>
+Example: O aslbL</font></dd>
+
+<dt>
+<b><font color="#33CCFF"><font size=+1>S [hexnum] [string]</font></font></b></dt>
+
+<dd>
+<font color="#99FF99">[S]ource module start. The [hexnum] parameter defines
+the start address of the object module in hexadecimal; the [string] is
+just the source file name.<br>
+Example: S 10038 /home/andy/CS/memdbg/test.cpp</font></dd>
+
+<dt>
+<b><font color="#33CCFF"><font size=+1>F [hexnum] [string]</font></font></b></dt>
+
+<dd>
+<font color="#99FF99">[F]unction start. The [hexnum] parameter defines
+the hexadecimal function address; the [string] is the function name.</font></dd>
+
+<dd>
+<font color="#99FF99">Example: F 10370 output(char const *,...)</font></dd>
+
+<dt>
+<b><font color="#33CCFF"><font size=+1>L [hexnum] [decnum]</font></font></b></dt>
+
+<dd>
+<font color="#99FF99">This denotes a line number. The [hexnum] parameter
+is the hexadecimal address of the line, the [decnum] is the line number
+(in decimal).<br>
+Example: L 10071 11</font></dd>
+
+<dt>
+<b><font color="#33CCFF"><font size=+1>D [hexnum] [hexnum] A|F</font></font></b></dt>
+
+<dd>
+<font color="#99FF99">(Advanced users only :-) This command is not written
+by memdbg.sh script, it is inserted manually by you using a editor. The
+first hexadecimal number is the address of memory block, the second is
+the address inside your executable, A or F means to invoke a debug breakpoint
+either during allocation of free of that block. On x86 this is the `int
+3' instruction.<br>
+This feature can be used to track very specific bugs... I'll let your imagination
+work here :-)</font></dd>
+
+<dd>
+<font color="#99FF99">Example: D 32b70 10370 A</font></dd>
+</dl>
+
+<p><br>The addresses for S,F,L keywords should be sorted in increasing
+order, i.e. memdbg supposes that all lines are pre-sorted by increasing
+value of their address. Otherwise you will get very strange line references
+(or hex addresses like at the end of previous chapter).
+<h2>
+How it works.</h2>
+Here are some technical details about the functioning of the memory debugger.
+This can help understand you more detailed how it works, and I think this
+can help you use the debugger in a more productive fashion (also it will
+help you to not expect wonders from memory debugger :-)
+<br>The only trick used in memory debugger is used to get the address from
+where new/delete has been called. All CPUs that I know of (except maybe
+IBM 360/370 :-) use a stack for passing arguments, and the same stack is
+used to push the return address. Since all machines uses a top-to-bottom
+stack (i.e. stack increases in the direction of lower addresses), and also
+since ANSI C standard requires that the addresses of function arguments
+increase (that is, if you're defining a function void some(int a, int b)
+you can be absolutely sure that address of b is higher than address of
+a) it is a good guess to suppose that on most computers as of today upon
+the invocation of the new() and delete() routines the stack will look like
+this:
+<dl>
+<pre><font color="#99FF99">+-----------------+ higher addresses
+|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; arg2&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; |&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ^
++-----------------+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; |
+|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; arg1&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; |&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; |
++-----------------+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; |
+|&nbsp; return address |&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; |
++-----------------+ lower addresses</font></pre>
+</dl>
+This means that if we take the address of first argument of the procedure
+and go one machine word back, we'll get the address of the `return address'
+word. Now we peek it from there and voila! we have the return address.
+This is embedded into a macro that looks like this:
+<dl>
+<pre><font color="#99FF99">#define GET_CALL_ADDRESS(firstarg)&nbsp; \
+&nbsp; address addr = ((address *)&amp;firstarg) [-1];</font></pre>
+</dl>
+(`address' is a shortcut for `void *' type). In the case that on some machine
+getting the return address is somewhat different, we'll have to define
+a different GET_CALL_ADDRESS macro and nothing more.
+<br>In each new() or delete() call, we check whenever we have been initialized.
+If not, we call the initialization function that parses the .map file,
+sets the debugging options and so on. When program exits (this is done
+by declaring a dummy static variable at the very end of memory debugger
+module and the shutdown function being called from his destructor) the
+memory debugger checks for unfreed memory block, displays statistics and
+so on.</dl>
+
+</body>
+</html>
