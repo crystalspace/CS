@@ -43,6 +43,8 @@ chronological order.
 	  protected to public.
 	- Oktal updated AWS to use the new csInputDefinition.
 	- Luca fixed the InsertSorted method of the class csStringArray.
+	- Luca modified a "for (size_t i = 0" to "size_t i = 0; for (i"
+	  to make the VisualC++6 compiler users happy.
 9-Aug-2004
 	- Jorrit did a fix to csQrount() and other csQ... (except for
 	  csQint()).  In case CS_QINT_WORKAROUND was defined only csQint()

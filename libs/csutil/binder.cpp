@@ -172,12 +172,13 @@ bool csInputBinder::UnbindButton (unsigned cmd)
 
 void csInputBinder::UnbindAll ()
 {
-  for (size_t i = 0; i < axisArray.Length (); i++)
+  size_t i;
+  for (i = 0; i < axisArray.Length (); i++)
   {
     delete axisArray[i];
     axisArray[i] = 0;
   }
-  for (size_t i = 0; i < btnArray.Length (); i++)
+  for (i = 0; i < btnArray.Length (); i++)
   {
     delete btnArray[i];
     btnArray[i] = 0;
