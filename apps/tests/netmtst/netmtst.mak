@@ -16,7 +16,7 @@ ifeq ($(MAKESECTION),roottargets)
 
 all apps: netmantest
 
-netmantest: netman
+netmantest:
 	$(MAKE_APP)
 netmantestclean:
 	$(MAKE_CLEAN)
