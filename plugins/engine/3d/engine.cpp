@@ -2478,8 +2478,7 @@ void csEngine::GetNearbyObjectList (iSector* sector,
         for (j = 0 ; j < pc ; j++)
         {
           iPortal* portal = portals->GetPortal (j);
-	  const csVector3* world_vertices = portal->GetWorldVertices (
-	  	imw->GetMovable ());
+	  const csVector3* world_vertices = portal->GetWorldVertices ();
           const csPlane3& wor_plane = portal->GetWorldPlane ();
           // Can we see the portal?
           if (wor_plane.Classify (pos) < -0.001)
@@ -2582,8 +2581,7 @@ void csEngine::GetNearbyMeshList (iSector* sector,
         for (j = 0 ; j < pc ; j++)
         {
           iPortal* portal = portals->GetPortal (j);
-	  const csVector3* world_vertices = portal->GetWorldVertices (
-	  	imw->GetMovable ());
+	  const csVector3* world_vertices = portal->GetWorldVertices ();
           const csPlane3& wor_plane = portal->GetWorldPlane ();
           // Can we see the portal?
           if (wor_plane.Classify (pos) < -0.001)
@@ -3184,6 +3182,9 @@ csPtr<iMeshWrapper> csEngine::CreatePortalContainer (const char* name,
   csPortalContainer* pc = new csPortalContainer (this);
   csRef<iMeshWrapper> mesh = CreateMeshWrapper ((iMeshObject*)pc,
   	name, sector, pos);
+  csMeshWrapper* cmesh = ((csMeshWrapper::MeshWrapper*)(iMeshWrapper*)mesh)
+  	->GetCsMeshWrapper ();
+  pc->SetMeshWrapper (cmesh);
   pc->DecRef ();
   return csPtr<iMeshWrapper> (mesh);
 }

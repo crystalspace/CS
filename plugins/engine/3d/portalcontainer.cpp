@@ -27,6 +27,7 @@
 #include "iengine/rview.h"
 #include "iengine/camera.h"
 #include "plugins/engine/3d/portalcontainer.h"
+#include "plugins/engine/3d/meshobj.h"
 
 // ---------------------------------------------------------------------------
 // csPortalContainerPolyMeshHelper
@@ -115,6 +116,8 @@ csPortalContainer::csPortalContainer (iEngine* engine) :
   movable_nr = -1;
   movable_identity = false;
 
+  meshwrapper = 0;
+
   scfiPolygonMesh.SetPortalContainer (this);
   scfiPolygonMeshCD.SetPortalContainer (this);
   scfiPolygonMeshLOD.SetPortalContainer (this);
@@ -187,12 +190,19 @@ void csPortalContainer::RemovePortal (iPortal* portal)
 
 //------------------------- General ----------------------------------//
 
-void csPortalContainer::ObjectToWorld (iMovable* movable,
+void csPortalContainer::CheckMovable ()
+{
+  const csMovable& cmovable = meshwrapper->GetCsMovable ();
+  if (movable_nr == cmovable.GetUpdateNumber ()) return;
+  const csReversibleTransform& movtrans = cmovable.GetFullTransform ();
+  ObjectToWorld (cmovable, movtrans);
+}
+
+void csPortalContainer::ObjectToWorld (const csMovable& movable,
 	const csReversibleTransform& movtrans)
 {
-  if (movable_nr == movable->GetUpdateNumber ()) return;
-  movable_nr = movable->GetUpdateNumber ();
-  movable_identity = movable->IsFullTransformIdentity ();
+  movable_nr = movable.GetUpdateNumber ();
+  movable_identity = movable.IsFullTransformIdentity ();
   int i;
   world_vertices.SetLength (vertices.Length ());
   if (movable_identity)
@@ -819,9 +829,7 @@ void csPortalContainer::DrawOnePortal (
 void csPortalContainer::CastShadows (iMovable* movable, iFrustumView* fview)
 {
   Prepare ();
-
-  const csReversibleTransform& movtrans = movable->GetFullTransform ();
-  ObjectToWorld (movable, movtrans);
+  CheckMovable ();
 
   int i;
   for (i = 0 ; i < portals.Length () ; i++)
@@ -833,15 +841,17 @@ void csPortalContainer::CastShadows (iMovable* movable, iFrustumView* fview)
 
 //--------------------- For iMeshObject ------------------------------//
 
-bool csPortalContainer::DrawTest (iRenderView* rview, iMovable* movable)
+bool csPortalContainer::DrawTest (iRenderView* rview, iMovable*)
 {
   Prepare ();
 
   iCamera* camera = rview->GetCamera ();
+  const csMovable& cmovable = meshwrapper->GetCsMovable ();
   const csReversibleTransform& camtrans = camera->GetTransform ();
-  const csReversibleTransform& movtrans = movable->GetFullTransform ();
+  const csReversibleTransform& movtrans = cmovable.GetFullTransform ();
 
-  ObjectToWorld (movable, movtrans);
+  if (movable_nr != cmovable.GetUpdateNumber ())
+    ObjectToWorld (cmovable, movtrans);
 
   csSphere sphere;
   sphere.SetCenter (object_bbox.GetCenter ());
@@ -861,9 +871,6 @@ bool csPortalContainer::DrawTest (iRenderView* rview, iMovable* movable)
       return false;
   }
 
-#ifdef CS_USE_NEW_RENDERER
-  last_movable = movable;  
-#endif
   return true;
 }
 
@@ -892,11 +899,8 @@ bool csPortalContainer::Draw (iRenderView* rview, iMovable* movable,
   float shift_x = camera->GetShiftX ();
   float shift_y = camera->GetShiftY ();
 
-#ifdef CS_USE_NEW_RENDERER
-  const csReversibleTransform movtrans = last_movable->GetFullTransform ();
-#else
-  const csReversibleTransform& movtrans = movable->GetFullTransform ();
-#endif
+  const csReversibleTransform& movtrans = meshwrapper
+  	->GetCsMovable ().GetFullTransform ();
 
   int i;
   if (clip_plane || clip_portal || clip_z_plane || do_portal_plane || farplane)

@@ -11,6 +11,19 @@ chronological order.
 	  ISO engine plugins so that they once again build successfully
 	  following Anders Stenberg's rewrite of the shader variable system.
 	  Also eliminated some related compilation warnings.
+	- Jorrit put a pointer to the meshwrapper in csPortalContainer so
+	  that getting the movable is more correct and more efficient.
+	- Jorrit added an optimization to Dynavis where it would insert
+	  an inverted version of the portal clipper to the coverage buffer
+	  to improve culling.
+	- Jorrit added the 'toggle_invertedclipper' command to Dynavis to
+	  switch the new feature on/off (default on).
+	- Jorrit made all Dynavis switches static so that they operate on
+	  all instances of Dynavis at once.
+	- Jorrit fixed a bug in the NR texture manager for OpenGL. If the
+	  sourceType of the texture is equal to GL_UNSIGNED_SHORT_5_6_5
+	  (i.e. 16 bit) then it would allocate not enough memory to keep
+	  the image_data in.
 25-Feb-2004
 	- Fritz Elfert fixed the following lighting related crash in sprcal3d:
 	  Previously, csSpriteCal3DMeshObject managed a set of relevant lights

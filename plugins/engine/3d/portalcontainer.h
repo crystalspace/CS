@@ -30,6 +30,9 @@
 #include "iengine/shadcast.h"
 #include "ivideo/rendermesh.h"
 
+class csMeshWrapper;
+class csMovable;
+
 /**
  * A helper class for iPolygonMesh implementations used by csPortalContainer.
  */
@@ -156,8 +159,8 @@ private:
 
   csRenderMesh rmesh;
   csRenderMesh *rmeshPtr;
-  iMovable* last_movable;
   csFlags flags;
+  csMeshWrapper* meshwrapper;
 
 protected:
   /**
@@ -169,6 +172,10 @@ protected:
 public:
   /// Constructor.
   csPortalContainer (iEngine* engine);
+  void SetMeshWrapper (csMeshWrapper* meshwrapper)
+  {
+    csPortalContainer::meshwrapper = meshwrapper;
+  }
 
   uint32 GetDataNumber () const { return data_nr; }
   void Prepare ();
@@ -176,8 +183,11 @@ public:
   csDirtyAccessArray<csVector3>* GetWorldVertices () { return &world_vertices; }
   const csRefArray<csPortal>& GetPortals () const { return portals; }
 
+  /// Check if the object to world needs updating.
+  void CheckMovable ();
   /// Transform from object to world space.
-  void ObjectToWorld (iMovable* movable, const csReversibleTransform& movtrans);
+  void ObjectToWorld (const csMovable& movable,
+  	const csReversibleTransform& movtrans);
   /// Transform from world to camera space.
   void WorldToCamera (iCamera* camera, const csReversibleTransform& camtrans);
 

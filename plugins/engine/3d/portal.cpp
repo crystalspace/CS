@@ -68,13 +68,9 @@ const csVector3* csPortal::GetVertices () const
   return parent->GetVertices ()->GetArray ();
 }
 
-const csVector3* csPortal::GetWorldVertices (iMovable* movable)
+const csVector3* csPortal::GetWorldVertices ()
 {
-  if (movable)
-  {
-    const csReversibleTransform& movtrans = movable->GetFullTransform ();
-    parent->ObjectToWorld (movable, movtrans);
-  }
+  parent->CheckMovable ();
   return parent->GetWorldVertices ()->GetArray ();
 }
 
@@ -202,13 +198,9 @@ void csPortal::GetColorFilter (float &r, float &g, float &b) const
   b = filter_b;
 }
 
-const csPlane3& csPortal::GetWorldPlane (iMovable* movable)
+const csPlane3& csPortal::GetWorldPlane ()
 {
-  if (movable)
-  {
-    const csReversibleTransform& movtrans = movable->GetFullTransform ();
-    parent->ObjectToWorld (movable, movtrans);
-  }
+  parent->CheckMovable ();
   return world_plane;
 }
 
@@ -220,14 +212,9 @@ void csPortal::ComputeCameraPlane (const csReversibleTransform& t,
   t.Other2This (world_plane, cam_vert, camplane);
 }
 
-bool csPortal::PointOnPolygon (const csVector3& v,
-  	iMovable* movable)
+bool csPortal::PointOnPolygon (const csVector3& v)
 {
-  if (movable)
-  {
-    const csReversibleTransform& movtrans = movable->GetFullTransform ();
-    parent->ObjectToWorld (movable, movtrans);
-  }
+  parent->CheckMovable ();
   csDirtyAccessArray<csVector3>* vt = parent->GetWorldVertices ();
   // First check if point is on the plane.
   csPlane3 &pl = world_plane;

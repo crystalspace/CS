@@ -127,11 +127,10 @@ public:
   virtual void SetSector (iSector* s);
 
   virtual const csPlane3& GetObjectPlane () { return object_plane; }
-  virtual const csPlane3& GetWorldPlane (iMovable* movable = 0);
+  virtual const csPlane3& GetWorldPlane ();
   virtual void ComputeCameraPlane (const csReversibleTransform& t,
   	csPlane3& camplane);
-  virtual bool PointOnPolygon (const csVector3& point,
-  	iMovable* movable = 0);
+  virtual bool PointOnPolygon (const csVector3& point);
 
   void CastShadows (iMovable* movable, iFrustumView* fview);
 
@@ -145,7 +144,7 @@ public:
   virtual csFlags& GetFlags () { return flags; }
 
   virtual const csVector3* GetVertices () const;
-  virtual const csVector3* GetWorldVertices (iMovable* movable = 0);
+  virtual const csVector3* GetWorldVertices ();
   virtual int* GetVertexIndices () const;
   virtual int GetVertexIndicesCount () const;
 

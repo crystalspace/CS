@@ -36,6 +36,7 @@
 #include "csgeom/kdtree.h"
 #include "igeom/polymesh.h"
 #include "igeom/objmodel.h"
+#include "igeom/clip2d.h"
 #include "csutil/flags.h"
 #include "iutil/objreg.h"
 #include "ivideo/graph2d.h"
@@ -178,6 +179,16 @@ static inline int dist_nowritequeue ()
   return 12+(csFastrand () & 0x7);
 }
 
+bool csDynaVis::do_cull_frustum = true;
+int csDynaVis::do_cull_coverage = COVERAGE_OUTLINE;
+bool csDynaVis::do_cull_history = true;
+bool csDynaVis::do_cull_writequeue = true;
+bool csDynaVis::do_cull_ignoresmall = false;
+bool csDynaVis::do_cull_clampoccluder = false;
+bool csDynaVis::do_cull_vpt = true;
+bool csDynaVis::do_cull_outline_splatting = true;
+bool csDynaVis::do_insert_inverted_clipper = true;
+
 csDynaVis::csDynaVis (iBase *iParent) : visobj_wrappers (1000)
 {
   SCF_CONSTRUCT_IBASE (iParent);
@@ -195,14 +206,6 @@ csDynaVis::csDynaVis (iBase *iParent) : visobj_wrappers (1000)
 
   updating = false;
 
-  do_cull_frustum = true;
-  do_cull_coverage = COVERAGE_OUTLINE;
-  do_cull_history = true;
-  do_cull_writequeue = true;
-  do_cull_ignoresmall = false;
-  do_cull_clampoccluder = false;
-  do_cull_vpt = true;
-  do_cull_outline_splatting = true;
   do_freeze_vis = false;
 
   cfg_view_mode = VIEWMODE_STATS;
@@ -1446,17 +1449,31 @@ bool csDynaVis::VisTest (iRenderView* rview,
   csRenderContext* ctxt = rview->GetRenderContext ();
   csVector3* frust = ctxt->iview_frustum->frustum;
 
+  // Setup the five frustum planes made out of the four boundaries of
+  // the portal bounding box and the portal plane itself.
   const csReversibleTransform& trans = rview->GetCamera ()->GetTransform ();
   csVector3 o2tmult = trans.GetO2T () * trans.GetO2TTranslation ();
   data.frustum[0].Set (trans.GetT2O () * frust[0], - frust[0] * o2tmult);
   data.frustum[1].Set (trans.GetT2O () * frust[1], - frust[1] * o2tmult);
   data.frustum[2].Set (trans.GetT2O () * frust[2], - frust[2] * o2tmult);
   data.frustum[3].Set (trans.GetT2O () * frust[3], - frust[3] * o2tmult);
-
   csPlane3 pz0 = ctxt->clip_plane;
   pz0.Invert ();
   data.frustum[4] = trans.This2Other (pz0);
   uint32 frustum_mask = 0x1f;
+
+  // Using the last used portal, fill the coverage buffer with the
+  // inverted portal outline to improve culling.
+  if (do_insert_inverted_clipper)
+  {
+    iPortal* last_portal = rview->GetLastPortal ();
+    if (last_portal)
+    {
+      iClipper2D* clipper = rview->GetClipper ();
+      tcovbuf->InsertPolygonInverted (clipper->GetClipPoly (),
+    	  clipper->GetVertexCount (), .01);
+    }
+  }
 
 # ifdef CS_DEBUG
   if (do_state_dump)
@@ -2250,7 +2267,7 @@ void csDynaVis::Debug_Dump (iGraphics3D* g3d)
 
     char buf[200];
     sprintf (buf,
-        "FR%c COV%c HIS%c WQ%c VPT%c IS%c CO%c OS%c #visobj=%d #visnode=%d",
+        "FR%c COV%c HIS%c WQ%c VPT%c IS%c CO%c OS%c IC%c #visobj=%d #visnode=%d",
         do_cull_frustum ? '+' : '-',
 	do_cull_coverage == COVERAGE_OUTLINE ? 'o' :
 	do_cull_coverage == COVERAGE_POLYGON ? 'p' :
@@ -2261,6 +2278,7 @@ void csDynaVis::Debug_Dump (iGraphics3D* g3d)
 	do_cull_ignoresmall ? '+' : '-',
 	do_cull_clampoccluder ? '+' : '-',
 	do_cull_outline_splatting ? '+' : '-',
+	do_insert_inverted_clipper ? '+' : '-',
     	cnt_visible, cnt_node_visible);
     g2d->Write (fnt, 10, 5, col_fgtext, col_bgtext, buf);
 
@@ -2714,6 +2732,14 @@ bool csDynaVis::Debug_DebugCommand (const char* cmd)
     csReport (object_reg, CS_REPORTER_SEVERITY_NOTIFY, "crystalspace.dynavis",
     	"%s outline splatting!",
 	do_cull_outline_splatting ? "Enabled" : "Disabled");
+    return true;
+  }
+  else if (!strcmp (cmd, "toggle_invertedclipper"))
+  {
+    do_insert_inverted_clipper = !do_insert_inverted_clipper;
+    csReport (object_reg, CS_REPORTER_SEVERITY_NOTIFY, "crystalspace.dynavis",
+    	"%s inserting of inverted clipper!",
+	do_insert_inverted_clipper ? "Enabled" : "Disabled");
     return true;
   }
   else if (!strcmp (cmd, "toggle_history"))

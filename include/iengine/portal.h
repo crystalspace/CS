@@ -161,13 +161,8 @@ struct iPortal : public iBase
   /**
    * Get an array of world space vertices. Use this in combination
    * with GetVertexIndices() to find out where the portal is.
-   * Note! This function assumes the mesh containing this portal
-   * has previously been transformed to world space!
-   * The optional movable parameter can be used to recalculate the world
-   * plane if that is needed. If the movable parameter is not given then
-   * the last calculated world plane is used.
    */
-  virtual const csVector3* GetWorldVertices (iMovable* movable = 0) = 0;
+  virtual const csVector3* GetWorldVertices () = 0;
 
   /**
    * Get an array of vertex indices (indices in the array returned
@@ -187,13 +182,8 @@ struct iPortal : public iBase
 
   /**
    * Get the world space plane of this portal.
-   * Note! This function assumes the mesh containing this portal
-   * has previously been transformed to world space!
-   * The optional movable parameter can be used to recalculate the world
-   * plane if that is needed. If the movable parameter is not given then
-   * the last calculated world plane is used.
    */
-  virtual const csPlane3& GetWorldPlane (iMovable* movable = 0) = 0;
+  virtual const csPlane3& GetWorldPlane () = 0;
 
   /**
    * Calculate the camera space plane for this portal.
@@ -203,12 +193,9 @@ struct iPortal : public iBase
 
   /**
    * Test if a point is on the polygon represented by this portal. This
-   * test happens in world space. The optional movable is used to update
-   * the world space vertices if needed. Otherwise the last calculated vertices
-   * are used.
+   * test happens in world space.
    */
-  virtual bool PointOnPolygon (const csVector3& point,
-  	iMovable* movable = 0) = 0;
+  virtual bool PointOnPolygon (const csVector3& point) = 0;
 
   /**
    * Set the sector that this portal points too. To avoid circular

@@ -716,7 +716,7 @@ bool csGLTextureHandle::transform (iImageVector *ImageVector, csGLTexture *tex)
 	  break;
         case GL_UNSIGNED_SHORT_5_6_5:
 	  {
-	    image_data = new uint8 [n*2];
+	    image_data = new uint8 [n*2*d];
 	    unsigned short *ush = (unsigned short *)image_data;
             for (j=0; j < d; j++)
             {

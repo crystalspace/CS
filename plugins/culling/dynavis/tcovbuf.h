@@ -516,6 +516,11 @@ public:
   bool TestPolygon (csVector2* verts, int num_verts, float min_depth);
 
   /**
+   * Insert an inverted polygon in the coverage buffer.
+   */
+  void InsertPolygonInverted (csVector2* verts, int num_verts, float max_depth);
+
+  /**
    * Insert a polygon in the coverage buffer.
    * This function will not do any backface culling and it will work
    * perfectly in all orientations. Polygon has to be convex.

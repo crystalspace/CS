@@ -719,8 +719,7 @@ void csMeshWrapper::PlaceMesh ()
       iSector *dest_sector = portal->GetSector ();
       if (movable_sectors->Find (dest_sector) == -1)
       {
-	iMovable* movable = mesh->GetMovable ();
-        const csPlane3 &pl = portal->GetWorldPlane (movable);
+        const csPlane3 &pl = portal->GetWorldPlane ();
 
         float sqdist = csSquaredDist::PointPlane (sphere.GetCenter (), pl);
         if (sqdist <= max_sq_radius)
@@ -730,7 +729,7 @@ void csMeshWrapper::PlaceMesh ()
           // can use that to calculate the point on the portal plane.
           csVector3 testpoint = sphere.GetCenter () + pl.Normal () * qsqrt (
                   sqdist);
-          if (portal->PointOnPolygon (testpoint, movable))
+          if (portal->PointOnPolygon (testpoint))
             movable_sectors->Add (dest_sector);
         }
       }

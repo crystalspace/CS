@@ -2135,6 +2135,28 @@ bool csTiledCoverageBuffer::TestPolygon (csVector2* verts, int num_verts,
   return rc;
 }
 
+void csTiledCoverageBuffer::InsertPolygonInverted (csVector2* verts,
+	int num_verts, float max_depth)
+{
+  csBox2Int bbox;
+  if (!DrawPolygon (verts, num_verts, bbox))
+    return;
+
+  int tx, ty;
+
+  bool modified = true;
+  for (ty = 0 ; ty <= num_tile_rows-1 ; ty++)
+  {
+    csTileCol fvalue = TILECOL_FULL;
+    csCoverageTile* tile = GetTile (0, ty);
+    for (tx = 0 ; tx <= (width_po2 >> SHIFT_TILECOL)-1 ; tx++)
+    {
+      tile->Flush (fvalue, max_depth, modified);
+      tile++;
+    }
+  }
+}
+
 bool csTiledCoverageBuffer::InsertPolygon (csVector2* verts, int num_verts,
 	float max_depth)
 {

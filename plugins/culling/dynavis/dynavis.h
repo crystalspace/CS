@@ -179,14 +179,16 @@ private:
   int cnt_node_visible;
 
   // Various flags to enable/disable parts of the culling algorithm.
-  bool do_cull_frustum;
-  int do_cull_coverage;
-  bool do_cull_history;
-  bool do_cull_writequeue;
-  bool do_cull_ignoresmall;
-  bool do_cull_clampoccluder;
-  bool do_cull_vpt;
-  bool do_cull_outline_splatting;
+  static bool do_cull_frustum;
+  static int do_cull_coverage;
+  static bool do_cull_history;
+  static bool do_cull_writequeue;
+  static bool do_cull_ignoresmall;
+  static bool do_cull_clampoccluder;
+  static bool do_cull_vpt;
+  static bool do_cull_outline_splatting;
+  static bool do_insert_inverted_clipper;
+
   bool do_freeze_vis;
 
   // This hash set holds references to csVisibilityObjectWrapper instances
