@@ -45,6 +45,11 @@ window "Splash"
     Style: tbfsNormal
     Text: "Newuser"
     Disallow: "0123456789 "
+
+    connect 
+    {
+      signalTextBoxLostFocus -> testButtonSink::SetUserName
+    }
   }
 
   component "Password" is "Text Box"
@@ -53,7 +58,25 @@ window "Splash"
     Style: tbfsNormal
     Masked: Yes
     MaskChar: "*"
+	
+    connect 
+    {
+      signalTextBoxLostFocus -> testButtonSink::SetPassword
+    }
   }
+
+  component "Login" is "Command Button"
+  {
+    Frame: (252, 75) - (295, 95)
+    Style: bfsNormal
+    Caption: "Login"
+
+    connect 
+    {
+      signalCmdButtonClicked -> testButtonSink::Login
+    }
+  }
+
 }
 
 window "Another"
