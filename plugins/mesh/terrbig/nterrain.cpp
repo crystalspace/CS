@@ -618,9 +618,9 @@ bool csBigTerrainObject::ConvertImageToMapFile (iFile *input,
 	  csVector3(0,0,0) : heightmap[k-width].pos - heightmap[k].pos;
     csVector3 dn = (k+width >= image->GetSize ()) ?  
 	  csVector3 (0,0,0) : heightmap[k+width].pos - heightmap[k].pos;
-    csVector3 lt = (k%width - (k-1)%width != 1) ? 
+    csVector3 lt = (k%width == 0) ? 
 	  csVector3 (0,0,0) : heightmap[k-1].pos - heightmap[k].pos;
-    csVector3 rt = ((k+1)%width - k%width != 1) ? 
+    csVector3 rt = ((k+1)%width == 0) ? 
 	  csVector3 (0,0,0) : heightmap[k+1].pos - heightmap[k].pos;
 
     heightmap[k].norm = (up + dn + lt + rt) / 4.0;
