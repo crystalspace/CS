@@ -124,9 +124,83 @@ void csStatic::Draw ()
       case CSSTA_VCENTER: y = (bound.Height () - TextHeight ()) / 2; break;
       default:            return;
     } /* endswitch */
-    Text (x, y, textcolor, -1, text);
-  }
+    if (!(TextAlignment & CSSTA_WRAPMASK))
+      Text (x, y, textcolor, -1, text);
+    else
+    {
+      int lines_avail = bound.Height () / TextHeight ();
+      // remember where the lines start
+      char **starts = new char*[strlen (text)];
+      // count the lines
+      char s[2], *t, *p = strnew(text);
+      int i;
+      int rowstart, rowend; // area within bound we gonna write in
+      int line; // runs through the lines we write
+      int lines = 0; // total number of lines in text
+      int len;
+      t = strtok (p, "\n");
+      s[1] = '\0';
+      while (t)
+      {
+        starts[lines] = t;
+        lines++;
+	while ( *t )
+	{
+	  s[0] = *t;
+          len=0;
+	  while ( (len+=TextWidth (s)) <= bound.Width () && *++t ) s[0] = *t;
+	  if (*t) 
+	  { 
+	    starts[lines] = t;
+	    lines++;
+	  }
+	}
+	t = strtok (NULL, "\n");
+      }
 
+      // determine the starting line
+      switch (TextAlignment & CSSTA_VALIGNMASK)
+      {
+      case CSSTA_TOP:
+        rowstart = 0; rowend = MIN( lines, lines_avail);
+	line = rowend-1;
+	break;
+      case CSSTA_BOTTOM:  
+	rowstart = lines_avail - MIN ( lines_avail, lines); rowend = lines_avail;
+        line = lines-1;
+	break;
+      case CSSTA_VCENTER:
+	rowstart = MAX( 0, (lines_avail - lines)/2 );
+	rowend   = MIN( lines_avail, rowstart + lines );
+	line = lines - 1 - MAX (0, lines-lines_avail)/2;
+	break;
+      } /* endswitch */
+
+      strcpy (p, text);
+      // now draw every line
+      for (i=rowend-1; i>=rowstart; i--, line--)
+      {
+        if (line<lines-1)
+	 if ( *(starts[line+1]-1)=='\n' ) 
+	   *(starts[line+1]-1)='\0';
+	 else
+	   *(starts[line+1])='\0';
+        t = starts[ line ];
+	
+        switch (TextAlignment & CSSTA_HALIGNMASK)
+        {
+         case CSSTA_LEFT:    x = 0; break;
+         case CSSTA_RIGHT:   x = bound.Width () - TextWidth (t); break;
+         case CSSTA_HCENTER: x = (bound.Width () - TextWidth (t)) / 2; break;
+        } /* endswitch */
+        y = i * TextHeight ();
+        Text (x, y, textcolor, -1, t);
+      }
+      
+      delete [] p;
+      delete [] starts;
+    }
+  }
   csComponent::Draw ();
 }
 
