@@ -31,7 +31,7 @@ start:
 copy: $(BUILDDIR) $(BUILDDIR)/copy-stamp
 $(BUILDDIR)/copy-stamp:
 	echo "Copying files"
-	cd ../../..; find CS | grep -v CVS | cpio -pdumvB $(BUILDDIR)/crystalspace-$(VERSION).$(DATE)
+	cd ../../..; find CS | grep -v CVS | grep -v .cvsignore | cpio -pdumvB $(BUILDDIR)/crystalspace-$(VERSION).$(DATE)
 	touch $(BUILDDIR)/copy-stamp
 
 # To anonymous login, do it only one time is needed
