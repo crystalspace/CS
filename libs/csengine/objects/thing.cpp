@@ -769,9 +769,6 @@ cleanup:
   delete [] mesh.poly_texture;
 }
 
-// @@@ BUSY DEBUGGING SOMETHING! DON'T REMOVE UNLESS BUG IS FIXED!
-#define THING_DEBUG 0
-
 void* csThing::TestQueuePolygonArray (csPolygonInt** polygon, int num,
 	iRenderView* d, csPolygon2DQueue* poly_queue, bool pvs)
 {
@@ -786,7 +783,21 @@ void* csThing::TestQueuePolygonArray (csPolygonInt** polygon, int num,
   csPolygon2D* clip;
   iCamera* icam = d->GetCamera ();
   const csReversibleTransform& camtrans = icam->GetTransform ();
-  
+
+  // Normally visibility of objects in the bsp tree is handled by inserting
+  // the bounding box polygons of the object in the tree. However, this
+  // insertion will not modify the tree meaning that if we reach a bsp leaf
+  // we will just insert all remaining bounding box polygons in that leaf
+  // without further subdividing the leaf as would be needed for real
+  // bsp building.
+  //
+  // When doing visibility testing we traverse the tree from front to back
+  // and insert all polygons in the c-buffer. Bounding box polygons
+  // are not inserted but only tested to see if the object is visible or not.
+  //
+  // So this means that the bsp code should always traverse the bounding
+  // box polygons first before giving the real polygons.
+
   for (i = 0 ; i < num ; i++)
   {
     if (!csEngine::ProcessPolygon ()) return (void*)1;
@@ -801,9 +812,6 @@ void* csThing::TestQueuePolygonArray (csPolygonInt** polygon, int num,
       csBspPolygon* bsppol = (csBspPolygon*)polygon[i];
       csVisObjInfo* obj = bsppol->GetOriginator ();
       bool obj_vis = obj->visobj->IsVisible ();
-#if THING_DEBUG
-printf ("VISOBJ=%08lx visible=%d\n", obj->visobj, obj_vis); fflush (stdout);
-#endif
       csPolyTreeBBox* tbb = obj->bbox;
 
       // If the object is already marked visible then we don't have
@@ -814,9 +822,6 @@ printf ("VISOBJ=%08lx visible=%d\n", obj->visobj, obj_vis); fflush (stdout);
 	// is a csPolyTreeBBox instance.
         if (!tbb->IsTransformed ())
 	{
-#if THING_DEBUG
-printf ("tr\n"); fflush (stdout);
-#endif
 	  // The bbox of this object has not yet been transformed
 	  // to camera space.
 	  tbb->World2Camera (camtrans);
@@ -840,12 +845,6 @@ printf ("tr\n"); fflush (stdout);
 	       		num_verts, clip, icam->IsMirrored ()) 
 	          && clip->ClipAgainst (d->GetClipper ()) )
             {
-#if THING_DEBUG
-printf ("test polygon\n");
-for (int ii = 0 ; ii < clip->GetNumVertices () ; ii++)
-printf ("  %d %g,%g\n", ii, clip->GetVertices ()[ii].x, clip->GetVertices ()[ii].y);
-fflush (stdout);
-#endif
 	      if (c_buffer->TestPolygon (clip->GetVertices (),
 	  	   clip->GetNumVertices ()))
 	        mark_vis = true;
@@ -1772,9 +1771,6 @@ bool csThing::DrawFoggy (iRenderView* d, iMovable* movable)
 
 void csThing::RegisterVisObject (iVisibilityObject* visobj)
 {
-#if THING_DEBUG
-printf ("THING=%08lx VISOBJ=%08lx: RegisterVisObject\n", this, visobj); fflush (stdout);
-#endif
   csVisObjInfo* vinf = new csVisObjInfo ();
   vinf->visobj = visobj;
   iShadowCaster* shadcast = QUERY_INTERFACE (visobj, iShadowCaster);
@@ -1792,9 +1788,6 @@ printf ("THING=%08lx VISOBJ=%08lx: RegisterVisObject\n", this, visobj); fflush (
 
 void csThing::UnregisterVisObject (iVisibilityObject* visobj)
 {
-#if THING_DEBUG
-printf ("THING=%08lx VISOBJ=%08lx: UnregisterVisObject\n", this, visobj); fflush (stdout);
-#endif
   int idx;
   csVisObjInfo* vinf = NULL;
   for (idx = 0 ; idx < visobjects.Length () ; idx++)
@@ -1813,9 +1806,6 @@ printf ("THING=%08lx VISOBJ=%08lx: UnregisterVisObject\n", this, visobj); fflush
 void csThing::CheckVisUpdate (csVisObjInfo* vinf)
 {
   iVisibilityObject* visobj = vinf->visobj;
-#if THING_DEBUG
-printf ("THING=%08lx VISOBJ=%08lx: CheckVisUpdate\n", this, visobj); fflush (stdout);
-#endif
   iMovable* movable = visobj->GetMovable ();
   long movablenr = movable->GetUpdateNumber ();
   long shapenr = visobj->GetShapeNumber ();
@@ -1864,9 +1854,6 @@ bool csThing::VisTest (iRenderView* irview)
     for (i = 0 ; i < visobjects.Length () ; i++)
     {
       csVisObjInfo* vinf = (csVisObjInfo*)visobjects[i];
-#if THING_DEBUG
-printf ("THING=%08lx VISOBJ=%08lx: VisTest\n", this, vinf->visobj); fflush (stdout);
-#endif
       // First update visibility information if object has moved or
       // changed shape fundamentally.
       CheckVisUpdate (vinf);

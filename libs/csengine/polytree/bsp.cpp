@@ -376,6 +376,8 @@ void* csBspTree::Back2Front (csBspNode* node, const csVector3& pos,
     rc = func (thing, node->polygons.GetPolygons (),
     	node->polygons.GetNumPolygons (), node->polygons_on_splitter, data);
     if (rc) return rc;
+    // IMPORTANT: First the real polygons have to be traversed and
+    // then the bounding box polygons!!!
     rc = node->TraverseObjects (thing, pos, func, data);
     if (rc) return rc;
     rc = Back2Front (node->front, pos, func, data, cullfunc, culldata);
@@ -413,10 +415,12 @@ void* csBspTree::Front2Back (csBspNode* node, const csVector3& pos,
     // Front.
     rc = Front2Back (node->front, pos, func, data, cullfunc, culldata);
     if (rc) return rc;
+    // IMPORTANT: First the bounding box polygons have to be traversed
+    // before the polygons of this node!!!
+    rc = node->TraverseObjects (thing, pos, func, data);
+    if (rc) return rc;
     rc = func (thing, node->polygons.GetPolygons (),
     	node->polygons.GetNumPolygons (), node->polygons_on_splitter, data);
-    if (rc) return rc;
-    rc = node->TraverseObjects (thing, pos, func, data);
     if (rc) return rc;
     rc = Front2Back (node->back, pos, func, data, cullfunc, culldata);
     if (rc) return rc;
@@ -426,10 +430,10 @@ void* csBspTree::Front2Back (csBspNode* node, const csVector3& pos,
     // Back.
     rc = Front2Back (node->back, pos, func, data, cullfunc, culldata);
     if (rc) return rc;
+    rc = node->TraverseObjects (thing, pos, func, data);
+    if (rc) return rc;
     rc = func (thing, node->polygons.GetPolygons (),
     	node->polygons.GetNumPolygons (), node->polygons_on_splitter, data);
-    if (rc) return rc;
-    rc = node->TraverseObjects (thing, pos, func, data);
     if (rc) return rc;
     rc = Front2Back (node->front, pos, func, data, cullfunc, culldata);
     if (rc) return rc;

@@ -6,6 +6,17 @@ The history order is reversed so that new features are at the top.
 	  system for the terrfunc terrain engine and I tried to finish
 	  it but things are not yet working. So at the moment it is
 	  still disabled.
+	- Fixed a bad bug in the bsp traversal code with regards to object
+	  visibility testing. In the Front2Back code the bounding box polygons
+	  have to be traversed BEFORE the real polygons because they
+	  really are in front of the polygons of the node itself. When
+	  bounding box polygons are inserted in a bsp tree they will not
+	  cause bsp leafs to be split further. So perfect sorting is not
+	  guaranteed. Normally this does not matter as this is only used
+	  for visibility testing but we have to make sure that at least
+	  the real polygons are traversed after the bounding box polygons
+	  because the real polygons update the c-buffer and the bounding
+	  box polygons test against it.
 6-Jun-2001
 	- Removed support for the quadtree, coverage mask tree, coverage mask
 	  cube, and solid tree from CS. I parked the code locally and it will
