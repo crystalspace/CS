@@ -33,22 +33,22 @@ public:
   csMaterialWrapper* default_material;
   float default_texlen;
   CLights* default_lightx;
-  bool use_tex_set;
-  char* tex_set_name;
+  bool use_mat_set;
+  char* mat_set_name;
   csReversibleTransform hard_trans;
   bool do_hard_trans;
   
   ///
   PSLoadInfo () : default_material (NULL),
    default_texlen (1), default_lightx (NULL),
-   use_tex_set (false), tex_set_name (NULL),
+   use_mat_set (false), mat_set_name (NULL),
    do_hard_trans (false) {}
 
   void SetTextureSet (const char* name)
   {
-    if (tex_set_name) delete [] tex_set_name;
-    tex_set_name = new char [strlen (name) + 1];
-    strcpy (tex_set_name, name);
+    if (mat_set_name) delete [] mat_set_name;
+    mat_set_name = new char [strlen (name) + 1];
+    strcpy (mat_set_name, name);
   }   
 };
 

@@ -111,9 +111,9 @@ class csLoader
   /// Load a image and return an iImage object
   static iImage* load_image(const char* name);
   /// Parse and load a single texture
-  static void txt_process (char *name, char* buf, const char* prefix = NULL);
+  static void txt_process (char *name, char* buf);
   /// Parse and load a single material
-  static void mat_process (char *name, char* buf);
+  static void mat_process (char *name, char* buf, const char* prefix = NULL);
   /// Parse polygon template definition and return a new object
   static csPolygonTemplate* load_ptemplate (char* ptname, char* buf,
     csMaterialWrapper* default_material, float default_texlen,
@@ -159,16 +159,16 @@ class csLoader
 
   /**
    * Load all the texture descriptions from the world file
-   * (no actual images). If a prefix is given, all texture names will be
-   * prefixed with the corresponding string.
+   * (no actual images). 
    */
-  static bool LoadTextures (char* buf, const char* prefix = NULL);
+  static bool LoadTextures (char* buf);
 
   /**
    * Load all the material descriptions from the world file
-   * (no actual images).
+   * (no actual images).If a prefix is given, all material names will be
+   * prefixed with the corresponding string.
    */
-  static bool LoadMaterials (char* buf);
+  static bool LoadMaterials (char* buf, const char* prefix = NULL);
 
   /**
    * Load a library into given world.<p>
