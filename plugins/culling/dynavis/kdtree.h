@@ -59,6 +59,11 @@ public:
    * in the tree.
    */
   void ReplaceLeaf (csKDTree* old_leaf, csKDTree* new_leaf);
+
+  /**
+   * Find leaf.
+   */
+  int FindLeaf (csKDTree* leaf);
 };
 
 #define CS_KDTREE_AXISX 0
@@ -72,6 +77,14 @@ public:
  * removing of objects which will alter the tree dynamically.
  * The main purpose of this tree is to provide for an approximate
  * front to back ordering.
+ * <p>
+ * The KD-tree supports delayed insertion. When objects are inserted
+ * in the tree they are not immediatelly distributed over the
+ * nodes but instead they remain in the main node until it is really
+ * needed to distribute them. The advantage of this is that you can
+ * insert/remove a lot of objects in the tree and then do the distribution
+ * calculation only once. This is more efficient and it also generates
+ * a better tree as more information is available then.
  */
 class csKDTree : public iBase
 {
@@ -84,9 +97,21 @@ private:
   int split_axis;		// One of CS_KDTREE_AXIS?
   float split_location;		// Where is the split?
 
-  csKDTreeChild** objects;	// Objects in this node.
+  // Objects in this node. If this node also has children (child1
+  // and child2) then the objects here have to be moved to these
+  // children. The 'Distribute()' function will do that.
+  csKDTreeChild** objects;
   int num_objects;
   int max_objects;
+
+  // Disallow Distribute().
+  // If this flag is true it means that we cannot find a good split
+  // location for the current list of objects. So in that case we don't
+  // split at all and set this flag to true so that we will no longer
+  // attempt to distribute. Whenever objects are added or removed to this
+  // node this flag will be set to false again so that a new Distribute()
+  // attempt can be made. This situation should be rare though.
+  bool disallow_distribute;
 
   /// Physically add a child to this tree node.
   void AddObject (csKDTreeChild* obj);
@@ -99,26 +124,14 @@ private:
   void AddObject (const csBox3& bbox, csKDTreeChild* obj);
 
   /**
-   * Add an object to this leaf assuming there is only
-   * one object currently in this leaf and no children.
-   * 'child_new' is the reference to either 'child1' or
-   * 'child2' and will be the child containing the new
-   * object. 'child_old' is the reference to the other one
-   * and will be the child to which the current original
-   * object is moved. The current object in this leaf
-   * will be removed and this leaf will become a node.
-   */
-  void AddObjectToSingleChildLeaf (
-	csKDTree*& child_new, csKDTree*& child_old,
-	csKDTreeChild* obj_new);
-
-  /**
    * Find the best split position for a given axis. This will
    * return a good position depending on tree balancing (i.e. try
    * to have as many objects left as right) and also minimizing the
    * number of objects that are cut. It will return a quality
    * value which is 0 for very bad and 1 for very good. It will
    * also return the location to split in the 'split_loc' value.
+   * If this function returns a negative quality this means the
+   * split should not be performed at all.
    */
   float FindBestSplitLocation (int axis, float& split_loc);
 
@@ -128,6 +141,13 @@ private:
    * and split_location.
    */
   void DistributeLeafObjects ();
+
+  /**
+   * This function is called immediatelly after adding
+   * one object with the given bbox. It will update the
+   * bbox of the node correctly.
+   */
+  void UpdateBBox (const csBox3& bbox);
 
 public:
   /// Create a new empty KD-tree.
@@ -143,14 +163,40 @@ public:
   /**
    * Add an object to this kd-tree node.
    * Returns a csKDTreeChild pointer which represents the object
-   * inside the kd-tree.
+   * inside the kd-tree. Object addition is delayed. This function
+   * will not yet alter the structure of the kd-tree. Distribute()
+   * will do that (or Front2Back() / Back2Front()).
    */
   csKDTreeChild* AddObject (const csBox3& bbox, void* object);
+
+  /**
+   * Distribute all objects in this node to its children.
+   * This may also create new children if needed. Note that this
+   * will only distribute one level (this node) and will not
+   * recurse into the children.
+   */
+  void Distribute ();
+
+  /**
+   * Do a full distribution of this node and all children.
+   */
+  void FullDistribute ();
+
+  /**
+   * Do a full flatten of this node. This means that all
+   * objects are put back in the object list of this node and
+   * the children are removed.
+   */
+  void Flatten ();
 
   // Debugging functions.
   bool Debug_CheckTree (csString& str);
   iString* Debug_UnitTest ();
   void Debug_Dump (csString& str, int indent);
+  void Debug_Statistics (int& tot_objects,
+	int& tot_nodes, int& tot_leaves, int depth, int& max_depth,
+	float& balance_quality);
+  iString* Debug_Statistics ();
 
   struct DebugHelper : public iDebugHelper
   {

@@ -1,5 +1,17 @@
 The history order is reversed so that new features are at the top.
 
+3-May-2002
+	- Implemented delayed processing in the KD-tree. This means that
+	  when objects are added they are not automatically distributed
+	  to lower levels then. This happens later when really needed. This
+	  greatly increases efficiency of the generated tree as more
+	  information is available at the time you really want the tree
+	  to be generated. It is also more optimal as tree generation
+	  will be done less and more gradually as needed.
+	- Added a way to print statistics of the generated tree in
+	  the textual dump of the KD-tree.
+	- Extended the UnitTest() function of the KD-tree to print
+	  statistics about various stages of the process.
 2-May-2002
 	- Removed a warning in win32.cpp.
 	- Enabled console in debug mode again for Windows. I think that
