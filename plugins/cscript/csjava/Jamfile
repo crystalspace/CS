@@ -10,13 +10,15 @@ if $(JAVA.AVAILABLE) = "yes" && $(ANT) && $(JAVA) && $(JAVAC) && $(CMD.SWIG) &&
   # rather than _absolute_, path.  This causes it to look for $JAVACMD relative
   # to the current working directory, which fails fatally.  We work around the
   # problem by assigning JAVACMD the value of $(JAVA) which was discovered by
-  # the CS configure script.  This solution works because the $(JAVA) path
-  # recorded in Jamconfig is an MSYS-style, rather than DOS-style path (i.e.
-  # "/c/j2sdk/bin/java", instead of "c:/j2sdk/bin/java").  Our replacement
-  # JAVACMD is correctly recognized by MSYS's `exec' as an absolute path.
-  CSJAVA.ANT_PREPARE = "
-    JAVACMD=\"$(JAVA)\"
-    export JAVACMD" ;
+  # the CS configure script.  Furthermore, we forcibly transmogrify the path
+  # from DOS-style to MSYS-style if needed.  Our replacement JAVACMD is
+  # correctly recognized by MSYS's `exec' as an absolute path.
+  if $(TARGET.OS) = WIN32 && $(MSYSTEM)
+  {
+    CSJAVA.ANT_PREPARE = "
+      JAVACMD=`echo "$(JAVA)" | $(SED) 's,^\\([A-Za-z]\\):,/\\1,'`
+      export JAVACMD" ;
+  }
   
   if ! $(CSJAVA.MODULE.PREFIX) && ! $(CSJAVA.MODULE.SUFFIX)
   {

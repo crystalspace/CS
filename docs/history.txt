@@ -32,6 +32,12 @@ chronological order.
 	  interpreted these paths as relative, it looked for the 'java'
 	  executable at a location relative to the current working directory;
 	  with the result that the Ant invocation failed.
+	- Eric Sunshine improved the Java check in configure.ac so that it
+	  respects the environment variable JAVACMD when looking for the `java'
+	  command.  Also now searches $JAVA_HOME/bin _before_ searching $PATH
+	  for the `java' and `javac' commands.  This should help to ensure that
+	  the most desirable Java commands are found rather than the least
+	  desirable (which happens to be $WINDIR/system32/java.exe on Windows).
 24-Oct-2004
 	- Eric Sunshine simplified the 22-Oct-2004 change to DDS loader so that
 	  it no longer Clone()'s the image when returning a mipmap.  It is

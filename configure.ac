@@ -496,12 +496,13 @@ AC_DEFUN([CS_JAVA_FLAGS],
 		    $$1_cflags/$cs_java_platform"])
 	    $1_cflags=CS_PATH_NORMALIZE([$$1_cflags])])])])
 
+AS_IF([test -z "$JAVA" && test -n "$JAVACMD"], [JAVA="$JAVACMD"])
 AC_PATH_PROGS([JAVA], [java], [],
-    [$PATH$PATH_SEPARATOR$JAVA_HOME/bin$PATH_SEPARATOR$JAVA_HOME/jre/bin])
+    [$JAVA_HOME/bin$PATH_SEPARATOR$JAVA_HOME/jre/bin$PATH_SEPARATOR$PATH])
 CS_EMIT_BUILD_PROPERTY([JAVA], [$JAVA])
 
 AC_PATH_PROGS([JAVAC], [javac], [],
-    [$PATH$PATH_SEPARATOR$JAVA_HOME/bin$PATH_SEPARATOR$JAVA_HOME/jre/bin])
+    [$JAVA_HOME/bin$PATH_SEPARATOR$JAVA_HOME/jre/bin$PATH_SEPARATOR$PATH])
 CS_EMIT_BUILD_PROPERTY([JAVAC], [$JAVAC])
 
 AC_ARG_WITH([java], [AC_HELP_STRING([--with-java],
@@ -1501,7 +1502,7 @@ AS_IF([test -z "$with_vos"], [with_vos=yes])
 
 AS_IF([test "$with_vos" != no && test "$with_vos" != yes],
     [AS_IF([test -n "$PKG_CONFIG_PATH"],
-	[PKG_CONFIG_PATH="$PKG_CONFIG_PATH:$with_vos"],
+// 	[PKG_CONFIG_PATH="$PKG_CONFIG_PATH$PATH_SEPARATOR$with_vos"],
 	[PKG_CONFIG_PATH="$with_vos"])
     export PKG_CONFIG_PATH])
 AC_CHECK_TOOLS([PKGCONFIG], [pkg-config])
