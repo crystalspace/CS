@@ -103,6 +103,23 @@ struct iLightingManager;
 #define CS_CLIP_TOPLEVEL 2
 /** @} */
 
+/**
+ * Fog structure.
+ */
+struct csFog
+{
+  /// If true then fog is enabled.
+  bool enabled;
+  /// Density (0 is off).
+  float density;
+  /// Color (red).
+  float red;
+  /// Color (green).
+  float green;
+  /// Color (blue).
+  float blue;
+};
+
 /// Z-buffer modes
 enum csZBufMode
 {

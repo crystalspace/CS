@@ -157,7 +157,7 @@ void csGLRender3D::Report (int severity, const char* msg, ...)
   va_start (arg, msg);
   csRef<iReporter> rep (CS_QUERY_REGISTRY (object_reg, iReporter));
   if (rep)
-    rep->ReportV (severity, "crystalspace.render3d.opengl", msg, arg);
+    rep->ReportV (severity, "crystalspace.graphics3d.opengl", msg, arg);
   else
   {
     csPrintfV (msg, arg);

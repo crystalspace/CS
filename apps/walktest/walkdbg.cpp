@@ -38,6 +38,7 @@ extern WalkTest* Sys;
 
 void DrawZbuffer ()
 {
+#ifndef CS_USE_NEW_RENDERER
   int y, x;
   for (y = 0; y < FRAME_HEIGHT; y++)
   {
@@ -65,6 +66,7 @@ void DrawZbuffer ()
           *dest++ = (unsigned char)(*zbuf++ >> 16);
       }
   }
+#endif
 }
 
 void DrawPalette ()
@@ -164,6 +166,7 @@ void DrawDebugBoxSide (iCamera* cam, bool do3d,
     	const csVector3& v3, const csColor& c3,
     	const csVector3& v4, const csColor& c4)
 {
+#ifndef CS_USE_NEW_RENDERER
   G3DPolygonDPFX poly;
   csVector3 v;
   csVector2 persp;
@@ -260,6 +263,7 @@ void DrawDebugBoxSide (iCamera* cam, bool do3d,
     Gfx2D->DrawLine (poly.vertices[2].x, FRAME_HEIGHT-poly.vertices[2].y, poly.vertices[3].x, FRAME_HEIGHT-poly.vertices[3].y, color);
     Gfx2D->DrawLine (poly.vertices[3].x, FRAME_HEIGHT-poly.vertices[3].y, poly.vertices[0].x, FRAME_HEIGHT-poly.vertices[0].y, color);
   }
+#endif
 }
 
 void DrawDebugBox (iCamera* cam, bool do3d, const csBox3& box, float r, float b)

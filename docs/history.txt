@@ -10,6 +10,14 @@ chronological order.
 	- Eric Sunshine fixed problem in csHash where non-friend classes
 	  csHash::Iterator and GlobalIterator were accessing protected csHash
 	  members.
+	- Jorrit did the following changes related to the new renderer:
+	    - Renamed 'crystalspace.render3d.opengl' to
+	      'crystalspace.graphics3d.opengl'.
+	    - Added iCamera::GetHit() again. No idea why that was disabled.
+	    - Added csFog to render3d.h.
+	    - Enabled the fog stuff again in iSector. Support for this has
+	      to be disabled elsewhere.
+	    - Walktest now compiles and 'almost' runs using the new renderer.
 26-Aug-2003
         - Philip Wyett eliminated warning suggesting adding parentheses
           around truth value in csGLShaderFFP::LoadLayer (...);.

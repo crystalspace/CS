@@ -96,7 +96,7 @@ void csGLShader_ARB::Open()
   csRef<iShaderRenderInterface> sri = SCF_QUERY_INTERFACE(r, iShaderRenderInterface);
 
   csRef<iFactory> f = SCF_QUERY_INTERFACE (r, iFactory);
-  if (f != 0 && strcmp ("crystalspace.render3d.opengl", 
+  if (f != 0 && strcmp ("crystalspace.graphics3d.opengl", 
     f->QueryClassID ()) == 0)
     enable = true;
   else return;

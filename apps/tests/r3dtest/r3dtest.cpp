@@ -228,11 +228,7 @@ bool R3DTest::Initialize ()
 {
   if (!csInitializer::RequestPlugins (object_reg,
   	CS_REQUEST_VFS,
-#ifdef CS_USE_NEW_RENDERER
-        CS_REQUEST_PLUGIN ("crystalspace.render3d.opengl", iGraphics3D),
-#else
         CS_REQUEST_PLUGIN ("crystalspace.graphics3d.opengl", iGraphics3D),
-#endif
         CS_REQUEST_ENGINE,
 	CS_REQUEST_IMAGELOADER,
 	CS_REQUEST_LEVELLOADER,

@@ -4,7 +4,7 @@
   <scf>
     <classes>
       <class>
-        <name>crystalspace.render3d.opengl</name>
+        <name>crystalspace.graphics3d.opengl</name>
         <implementation>csGLRender3D</implementation>
         <description>OpenGL Render3D graphics driver for Crystal Space</description>
         <requires>

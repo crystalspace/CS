@@ -340,10 +340,12 @@ bool csCommandProcessor::perform (const char* cmd, const char* arg)
   }
   else if (!strcasecmp (cmd, "db_maxpol"))
   {
+#ifndef CS_USE_NEW_RENDERER
     long val = g3d->GetRenderState (G3DRENDERSTATE_MAXPOLYGONSTODRAW);
     int ival = (int)val;
     change_int (arg, &ival, "maximum polygons", 0, 2000000000);
     g3d->SetRenderState (G3DRENDERSTATE_MAXPOLYGONSTODRAW, (long)ival);
+#endif
   }
   else if (!strcasecmp (cmd, "db_procpol"))
   {

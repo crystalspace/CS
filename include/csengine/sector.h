@@ -258,10 +258,8 @@ private:
   /// Engine handle.
   csEngine* engine;
 
-#ifndef CS_USE_NEW_RENDERER
   /// Fog information.
   csFog fog;
-#endif // CS_USE_NEW_RENDERER
 
   /**
    * The visibility culler for this sector or 0 if none.
@@ -554,7 +552,6 @@ public:
   /// Get the engine for this sector.
   csEngine* GetEngine () const { return engine; }
 
-#ifndef CS_USE_NEW_RENDERER
   /// Return true if this has fog.
   bool HasFog () const { return fog.enabled; }
 
@@ -573,7 +570,6 @@ public:
 
   /// Disable fog.
   void DisableFog () { fog.enabled = false; }
-#endif // CS_USE_NEW_RENDERER
 
   SCF_DECLARE_IBASE_EXT (csObject);
 
@@ -628,7 +624,6 @@ public:
       { return scfParent->dynamic_ambient_color; }  
     virtual void CalculateSectorBBox (csBox3& bbox, bool do_meshes) const
       { scfParent->CalculateSectorBBox (bbox, do_meshes); }
-#ifndef CS_USE_NEW_RENDERER
     virtual bool HasFog () const
       { return scfParent->HasFog (); }
     virtual csFog *GetFog () const
@@ -637,7 +632,6 @@ public:
       { scfParent->SetFog (density, color); }
     virtual void DisableFog ()
       { scfParent->DisableFog (); }
-#endif // CS_USE_NEW_RENDERER
     virtual iPolygon3D* HitBeam (const csVector3& start, const csVector3& end,
     csVector3& isect);
     virtual iMeshWrapper* HitBeam (const csVector3& start, const csVector3& end,

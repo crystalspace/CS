@@ -1100,7 +1100,11 @@ void HandleDynLight (iDynLight* dyn)
 	  return;
 	}
       }
+#ifdef CS_USE_NEW_RENDERER
+      l->SetInfluenceRadius (es->radius);
+#else
       l->SetRadius (es->radius);
+#endif
       dyn->Setup ();
       break;
     }
