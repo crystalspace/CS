@@ -21,6 +21,8 @@ The history order has been reversed so that new features are at the top.
 	  anything.
 	- Fixed a bug in ball plugin if some setting was changed after
 	  already being initialized.
+	- Eric Sunshine removed some old COM (pre-SCF) goop from the Macintosh
+	  port.
 18-Jan-2001
 	- Wouter Wijngaards fixed Martin's stricmp() in cfgfile.cpp.
 	  stricmp is not portable, please use strcasecmp.
