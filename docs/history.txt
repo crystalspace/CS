@@ -9,6 +9,12 @@ The history order is reversed so that new features are at the top.
 	      to add support for multiple objects.
 	    - Added -vv option to do a very verbose output. With this option
 	      it will show all chunks in the 3DS files that it encounters.
+	    - Made level output a little more compatible with current CS
+	      world file syntax.
+	    - Removed unused -m option.
+	    - Removed unused -f option.
+	    - Renamed -l to -pl.
+	    - Added new -l to list all objects in 3ds file.
 26-Apr-2001
 	- Philip Wyett fixed gcc outputting Worm.dll and Dog.dll. Now
 	  outputs worm.dll and dog.dll.
