@@ -1,5 +1,13 @@
 The history order has been reversed so that new features are at the top.
 
+12-Dec-2000
+	- Michael Dale Long fixed the cctest console. Also did some
+	  cosmetic code cleanup. Funky console is now enabled again.
+	- Philip Wyett fixed a memory write error in the OpenGL texture
+	  cache. This was causing an exit memory write error when exiting
+	  'Blocks' in Windows.
+	- Rene Dudfield made sprite lighting settings local to sprites so
+	  that different sprites can use different settings.
 10-Dec-2000
 	- Eric Sunshine made the following changes to the project:
 	    - Finally eliminated the evil monolithic apps/support/static.cpp

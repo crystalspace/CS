@@ -36,10 +36,10 @@
 #include "iparticl.h"
 
 // Set the default lighting quality.
-// See header file for LIGHTING_* definitions.
-//#define DEFAULT_LIGHTING LIGHTING_HQ
-#define DEFAULT_LIGHTING LIGHTING_LQ
-//#define DEFAULT_LIGHTING LIGHTING_FAST
+// See header file for CS_SPR_LIGHTING_* definitions.
+//#define DEFAULT_LIGHTING CS_SPR_LIGHTING_HQ
+#define DEFAULT_LIGHTING CS_SPR_LIGHTING_LQ
+//#define DEFAULT_LIGHTING CS_SPR_LIGHTING_FAST
 
 
 //--------------------------------------------------------------------------
@@ -121,6 +121,8 @@ csSpriteTemplate::csSpriteTemplate ()
 
   tri_verts = NULL;
   do_tweening = true;
+  lighting_quality = DEFAULT_LIGHTING;
+  lighting_quality_config = CS_SPR_LIGHT_GLOBAL;
 }
 
 csSpriteTemplate::~csSpriteTemplate ()
@@ -160,6 +162,9 @@ csSprite3D* csSpriteTemplate::NewSprite (csObject* parent)
   spr = new csSprite3D (parent);
   spr->SetTemplate (this);
   spr->EnableTweening (do_tweening);
+  
+  // Set the quality config of the sprite to that of the template.
+  spr->SetLightingQualityConfig( GetLightingQualityConfig() );
   spr->SetAction ("default");
   spr->InitSprite ();
   return spr;
@@ -794,7 +799,7 @@ csTriangleMesh csSprite3D::mesh;
 float csSprite3D::cfg_lod_detail = 30;
 
 // Set the default lighting quality.
-int csSprite3D::lighting_quality = DEFAULT_LIGHTING;
+int csSprite3D::global_lighting_quality = DEFAULT_LIGHTING;
 
 int map (int* emerge_from, int idx, int num_verts)
 {
@@ -1327,13 +1332,13 @@ void csSprite3D::UpdateLighting (csLight** lights, int num_lights)
 
   // Make sure the normals are computed
   tpl->ComputeNormals (cur_action->GetFrame (cur_frame));
-  if (tween_ratio && lighting_quality != LIGHTING_FAST)
+  if (tween_ratio && GetLightingQuality() != CS_SPR_LIGHTING_FAST)
     tpl->ComputeNormals (cur_action->GetNextFrame (cur_frame));
 
   // Make sure that the color array is initialized.
   AddVertexColor (0, csColor (0, 0, 0));
 
-  if (lighting_quality != LIGHTING_FAST)
+  if (GetLightingQuality() != CS_SPR_LIGHTING_FAST)
   {
     csSector * sect = movable.GetSector (0);
     if (sect)
@@ -1351,16 +1356,25 @@ void csSprite3D::UpdateLighting (csLight** lights, int num_lights)
         vertex_colors [i].Set (rr, gg, bb);
     }
   }
-  else
-    ResetVertexColors();
+  
+// @@@
+// NOTE: lighting fast does not need to reset the vertex colors, it does this.
+// 
+//  else
+//    ResetVertexColors();
 
-  switch (lighting_quality)
+  switch (GetLightingQuality())
   {
-    case LIGHTING_HQ:   UpdateLightingHQ   (lights, num_lights); break;
-    case LIGHTING_LQ:   UpdateLightingLQ   (lights, num_lights); break;
-    case LIGHTING_FAST: UpdateLightingFast (lights, num_lights); break;
+    case CS_SPR_LIGHTING_HQ:   UpdateLightingHQ   (lights, num_lights); break;
+    case CS_SPR_LIGHTING_LQ:   UpdateLightingLQ   (lights, num_lights); break;
+    case CS_SPR_LIGHTING_FAST: UpdateLightingFast (lights, num_lights); break;
   }
 
+  // @@@
+  // I would like lighting fast to not bother clamping the colors.
+  //   Could we instead put some debug code in lighting fast to check if
+  //    in the application programmers app that the colors don't go
+  //    over 2.0?
   FixVertexColors ();  // Clamp all vertex colors to 2.0
 }
 

@@ -137,6 +137,36 @@ private:
   csVector delays;
 };
 
+
+/**
+ * Macros for the csSprite3D lighting levels.
+ */
+#define CS_SPR_LIGHTING_HQ 0
+#define CS_SPR_LIGHTING_LQ 1
+#define CS_SPR_LIGHTING_FAST 2
+
+
+
+/**
+ * Use the global value for determining which lighting level is used by the 
+ * sprite.
+ */
+#define CS_SPR_LIGHT_GLOBAL 0
+
+/**
+ * Use the sprites template lighting quality value for determining which 
+ * lighting level is used by the sprite.
+ */
+#define CS_SPR_LIGHT_TEMPLATE 1
+
+/**
+ * Use the lighting quality value local to the sprite for determining which 
+ * lighting level is used by the sprite.
+ */
+#define CS_SPR_LIGHT_LOCAL 2
+
+
+
 /**
  * A 3D sprite based on a triangle mesh with a single texture.
  * Animation is done with frames.
@@ -172,6 +202,15 @@ private:
 
   /// Enable tweening.
   bool do_tweening;
+  
+  /// The lighting_quality for this template.  See macros CS_SPR_LIGHTING_*
+  int lighting_quality;
+   
+  /**
+   * The lighting_quality_config for this template.  
+   * See macros CS_SPR_LIGHT_*
+   */
+  int lighting_quality_config;
 
   /// The base mesh is also the texture alignment mesh.
   csTriangleMesh* texel_mesh;
@@ -218,7 +257,33 @@ public:
 
   /// Is tweening enabled?
   bool IsTweeningEnabled () { return do_tweening; }
+   
+  /// Returns the lighting quality for this template.
+  int GetLightingQuality() { return lighting_quality; }
 
+  /// Sets the lighting quality for this template.  See CS_SPR_LIGHTING_* defs.
+  void SetLightingQuality(int quality) {lighting_quality = quality; }
+
+
+  /**
+   * Sets which lighting config variable that all new sprites created 
+   * from this template will use.
+   * The options are:
+   * <ul>
+   * <li>CS_SPR_LIGHT_GLOBAL (default)
+   * <li>CS_SPR_LIGHT_TEMPLATE
+   * <li>CS_SPR_LIGHT_LOCAL
+   * </ul>
+   */
+  void SetLightingQualityConfig (int config_flag)
+  { lighting_quality_config = config_flag; };
+   
+  /**
+   * Returns what this template is using for determining the lighting quality.
+   */
+  int GetLightingQualityConfig ()
+  { return lighting_quality_config; };
+   
   /**
    * Generate the collapse order.
    * This function will also reorder all the vertices in the template.
@@ -621,12 +686,7 @@ public:
   } scfiSprite;
 };
 
-/**
- * Macros for the csSprite3D lighting levels.
- */
-#define LIGHTING_HQ 0
-#define LIGHTING_LQ 1
-#define LIGHTING_FAST 2
+
 
 
 /**
@@ -649,13 +709,89 @@ public:
    * is done.
    */
   static float cfg_lod_detail;
+   
+private:
 
   /**
-   * Quality setting for sprite lighting. See the LIGHTING_* macros defined
-   *  in this header file for the different types of lighting.
+   * Quality setting for sprite lighting. See the CS_SPR_LIGHTING_* macros defined
+   * in this header file for the different types of lighting.  This is the 
+   * local setting.  It overrides the template, and global lighting settings.
+   */  
+  int local_lighting_quality;
+   
+  /**
+   * Used to determine where to look for the quality setting of the lighting.
+   * The possible values are:
+   * <ul>
+   * <li>CS_SPR_LIGHT_GLOBAL (default)
+   * <li>CS_SPR_LIGHT_TEMPLATE
+   * <li>CS_SPR_LIGHT_LOCAL
+   * </ul>
+   */  
+  int lighting_quality_config;
+  
+public:
+   
+  /**
+   * Quality setting for sprite lighting. See the CS_SPR_LIGHTING_* macros defined
+   * in this header file for the different types of lighting.  This is the 
+   * global setting that is used for all csSprite3Ds(unless the template or 
+   * the individual sprite overrides it).
    */
-  static int lighting_quality;
+  static int global_lighting_quality;
 
+  /**
+   * Returns the lighting quality level used by this sprite.
+   * See SPT_LIGHTING_* macros defined in this header for the different types
+   * of lighting.
+   */ 
+  int GetLightingQuality ()
+  {
+    switch (lighting_quality_config)
+    {
+      case CS_SPR_LIGHT_GLOBAL:      return global_lighting_quality; break;
+      case CS_SPR_LIGHT_TEMPLATE:    return tpl->GetLightingQuality(); break;
+      case CS_SPR_LIGHT_LOCAL:       return local_lighting_quality; break;
+      default:
+      {
+	lighting_quality_config = tpl->GetLightingQualityConfig();
+	return tpl->GetLightingQuality();
+      }
+    }
+  };
+   
+   /**
+    * Sets the local lighting quality for this sprite.  NOTE: you must use
+    * SetLightingQualityConfig (CS_SPR_LIGHT_LOCAL) for the sprite to use this.
+    */
+   void SetLocalLightingQuality(int lighting_quality)
+   { local_lighting_quality = lighting_quality; };
+   
+   /**
+    * Sets the global lighting quality for all csSprite3Ds.  NOTE: you must use
+    * SetLightingQualityConfig(CS_SPR_LIGHT_GLOBAL) for the sprite to use this.
+    */
+   void SetGlobalLightingQuality (int lighting_quality)
+   { global_lighting_quality = lighting_quality; };
+   
+   /**
+    * Sets which lighting config variable this sprite will use.
+    * The options are:
+    * <ul>
+    * <li>CS_SPR_LIGHT_GLOBAL (default)
+    * <li>CS_SPR_LIGHT_TEMPLATE
+    * <li>CS_SPR_LIGHT_LOCAL
+    * </ul>
+    */
+   void SetLightingQualityConfig(int config_flag)
+   { lighting_quality_config = config_flag; };
+   
+   /**
+    * Returns what this sprite is using for determining the lighting quality.
+    */
+   int GetLightingQualityConfig()
+   { return lighting_quality_config; };
+   
 private:
   /**
    * A mesh which contains a number of triangles as generated
