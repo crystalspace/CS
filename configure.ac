@@ -1712,7 +1712,7 @@ AS_IF([test $cs_cv_header_stdint_h = yes],
             #define __STDC_LIMIT_MACROS
             #include <stdint.h>],
             [(void)INT64_C(0x100000000)])],
-        [], [], [CS_HEADER_PROPERTY([CS_HAS_STDINT_H])])])
+        [], [C++], [CS_HEADER_PROPERTY([CS_HAS_STDINT_H])])])
 
 
 
