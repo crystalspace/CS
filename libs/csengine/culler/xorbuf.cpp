@@ -68,6 +68,7 @@ void csXORBuffer::Initialize ()
 
 bool csXORBuffer::IsFull ()
 {
+  return false;
 }
 
 void csXORBuffer::DrawLeftLine (int x1, int y1, int x2, int y2)
