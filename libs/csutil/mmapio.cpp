@@ -158,17 +158,7 @@ csMemoryMappedIO::CachePage(unsigned int page)
 
   CacheBlock *cp;
 
-  if (cache.inactive)
-  {
-    // Re-use a page off the inactive block.
-    cp = cache.inactive;
-    cache.inactive=cp->next;
-
-    // Insert it into the bucket.
-    cp->next=cache.blocks[bucket];
-    cache.blocks[bucket]=cp;
-  }
-  else if (cache_block_count < cache_max_size)
+  if (cache_block_count < cache_max_size)
   {
     cp = new CacheBlock;
     ++cache_block_count;
