@@ -1,7 +1,6 @@
 /*
-    Copyright (C) 1998, 1999 by Serguei 'Snaar' Narojnyi
-    Copyright (C) 1998, 1999 by Jorrit Tyberghein
-    Written by Serguei 'Snaar' Narojnyi
+    Copyright (C) 1999 by Eric Sunshine <sunshine@sunshineco.com>
+    Written by Eric Sunshine <sunshine@sunshineco.com>
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -18,102 +17,140 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __INETWORK_H__
-#define __INETWORK_H__
+#ifndef __CS_INETWORK_H__
+#define __CS_INETWORK_H__
 
 #include "csutil/scf.h"
-#include "isystem.h"
-#include "istring.h"
+#include "iplugin.h"
 
-#define CS_NET_CONNORIENTED	0
-#define CS_NET_CONNLESS		1
-
-enum csNetworkError
+enum csNetworkDriverError
 {
-  CS_NET_NO_ERROR=0,
-  CS_NET_NOT_INITIALIZED,
-  CS_NET_ALREADY_CONNECTED,
-  CS_NET_CANNOT_RESOLVE_NAME,
-  CS_NET_CANNOT_CONNECT,
-  CS_NET_NOT_CONNECTED,
-  CS_NET_CANNOT_SEND,
-  CS_NET_CANNOT_GET_VERSION,
-  CS_NET_WRONG_VERSION,
-  CS_NET_CANNOT_CLEANUP,
-  CS_NET_INVALID_SOCKET,
-  CS_NET_ALREADY_LISTENING,
-  CS_NET_CANNOT_BIND,
-  CS_NET_CANNOT_LISTEN,
-  CS_NET_LIMIT_REACHED,
-  CS_NET_INVALID_TYPE,
-  CS_NET_CANNOT_CREATE,
-  CS_NET_CANNOT_CLOSE,
-  CS_NET_NOT_LISTENING,
-  CS_NET_CANNON_GET_SOCKOPT,
-  CS_NET_CANNOT_ACCEPT,
-  CS_NET_CANNOT_SET_PARAMS,
-  CS_NET_CANNOT_RECEIVE
+  CS_NET_ERR_NO_ERROR,
+  CS_NET_ERR_CANNOT_RESOLVE_ADDRESS,
+  CS_NET_ERR_CANNOT_CONNECT,
+  CS_NET_ERR_CANNOT_SEND,
+  CS_NET_ERR_INVALID_SOCKET,
+  CS_NET_ERR_CANNOT_BIND,
+  CS_NET_ERR_CANNOT_LISTEN,
+  CS_NET_ERR_CANNOT_CREATE,
+  CS_NET_ERR_CANNOT_ACCEPT,
+  CS_NET_ERR_CANNOT_SET_BLOCKING_MODE,
+  CS_NET_ERR_CANNOT_RECEIVE,
+  CS_NET_ERR_CANNOT_PARSE_ADDRESS,
+  CS_NET_ERR_CANNOT_GET_VERSION,
+  CS_NET_ERR_WRONG_VERSION,
+  CS_NET_ERR_CANNOT_CLEANUP
 };
 
-struct csNetworkAddress
+struct csNetworkDriverCapabilities
 {
-  char hostnm[512];
-  int port;
+  bool ConnectionReliable;
+  bool ConnectionUnreliable;
+  bool BehaviorBlocking;
+  bool BehaviorNonBlocking;
 };
 
-struct csNetworkCaps
+
+SCF_VERSION (iNetworkEndPoint, 0, 0, 1);
+
+/**
+ * This is the network end-point interface for CS.  It represents one end of
+ * a network connection or potential connection (such as a listener).  All
+ * network end-points must implement this interface.
+ */
+struct iNetworkEndPoint : public iBase
 {
-  bool ConnOriented;
-  bool ConnLess;
-  unsigned int iMaxSockets;
+  /// Terminates the connection; destroying the object also auto-terminates.
+  virtual void Terminate() = 0;
+
+  /// Retrieve the code for the last error encountered.
+  virtual csNetworkDriverError GetLastError() const = 0;
 };
 
-/// This is a connection handle
-typedef unsigned int csNetHandle;
+
+SCF_VERSION (iNetworkConnection, 0, 0, 1);
+
+/**
+ * This is the network connection interface for CS.  It represents a single
+ * network connection.  All network connections must implement this interface.
+ */
+struct iNetworkConnection : public iNetworkEndPoint
+{
+  /// Send nbytes of data over the connection.
+  virtual bool Send(const void* data, size_t nbytes) = 0;
+
+  /// Receive data from the connection.  If the connection is in blocking
+  /// mode, then the function does not return until data has been read, an
+  /// error has occurred, or the connection was closed.  In non-blocking mode,
+  /// Receive returns immediately.  If data is available then it returns the
+  /// number of bytes (<= maxbytes) which was read.  If data is not available
+  /// and the connection is non-blocking, then it returns 0 and GetLastError()
+  /// returns CS_NET_ERR_NO_ERROR.
+  virtual size_t Receive(void* buff, size_t maxbytes) = 0;
+};
+
+
+SCF_VERSION (iNetworkListener, 0, 0, 1);
+
+/**
+ * This is the network listener interface for CS.  It represents a single
+ * network listening post.  All network listeners must implement this
+ * interface.
+ */
+struct iNetworkListener : public iNetworkEndPoint
+{
+  /// Accepts a connection request.  If the listener is in blocking mode, then
+  /// the function does not return until a connection has been established or
+  /// an error has occurred.  If in non-blocking mode, then it returns
+  /// immediately.  The return value is either an accepted connection or NULL.
+  /// If the connection is non-blocking, NULL is returned, and GetLastError()
+  /// returns CS_NET_ERR_NO_ERROR then no connection was pending.  Otherwise
+  /// an error occurred, and GetLastError() returns the appropriate error code.
+  virtual iNetworkConnection* Accept() = 0;
+};
+
 
 SCF_VERSION (iNetworkDriver, 0, 0, 1);
 
 /**
- * This is the network interface for CS.
- * All network drivers must implement this interface.
- * The standard implementation is csNetworkDriverNull.
+ * This is the network driver interface for CS.  It represents a plug-in
+ * network driver module.  All network drivers must implement this interface.
  */
-struct iNetworkDriver : public iBase
+struct iNetworkDriver : public iPlugIn
 {
-public:
+  /// Create a new network connection.  The 'target' parameter is driver
+  /// dependent.  For example, with a socket driver, the target might be
+  /// "host:port#"; with a modem driver it might be "comport:phone#"; etc.
+  /// The 'reliable' flag determines whether a reliable connection is made
+  /// (sometimes known as connection-oriented) or an unreliable one (sometimes
+  /// known as connectionless).  The 'blocking' flag determines whether
+  /// operations on the connection return immediately in all cases or wait
+  /// until the operation can be completed successfully.  Returns the new
+  /// connection object or NULL if the connection failed.
+  virtual iNetworkConnection* NewConnection(const char* target,
+    bool reliable, bool blocking) = 0;
 
-  virtual bool Initialize (iSystem *iSys) = 0;
+  /// Create a new network listener.  The 'source' parameter is driver
+  /// dependent.  For example, with a socket driver, the target might be
+  /// "port#"; with a modem driver it might be "comport"; etc.  The 'reliable'
+  /// determines whether or not a reliable connection is made.  The
+  /// 'blockingListener' flag determines whether or not the Accept() method
+  /// blocks while when called.  The 'blockingConnection' flag determines
+  /// whether or not methods in the resulting connection object block.
+  virtual iNetworkListener* NewListener( const char* source,
+    bool reliable, bool blockingListener, bool blockingConnection) = 0;
 
-  /// Open the network driver
+  /// Get network driver capabilities.  This function returns information
+  /// describing the capabilities of the driver.
+  virtual csNetworkDriverCapabilities GetCapabilities() const = 0;
+
+  /// Retrieve the code for the last error encountered.
+  virtual csNetworkDriverError GetLastError () const = 0;
+
+  // iPlugIn interface.
+  virtual bool Initialize (iSystem*) = 0;
   virtual bool Open () = 0;
-  /// Close the network driver
   virtual bool Close () = 0;
-
-  csNetHandle Spawn(csNetworkCaps *caps);
-
-  virtual bool Connect (csNetworkAddress *iNetAddress) = 0;
-
-  virtual void Disconnect (csNetHandle iHandle) = 0;
-
-  virtual void Send (csNetHandle iHandle, iString *iStr) = 0;
-
-  virtual void Receive (csNetHandle iHandle, iString *iStr) = 0;
-
-  virtual void SetListenState (csNetHandle iHandle, int iPort) = 0;
-
-  virtual void Accept (csNetHandle iListen, csNetHandle *iServer, csNetworkAddress *oAddress) = 0;
-
-  virtual void Kill (csNetHandle Handle) = 0;
-
-  virtual void KillAll () = 0;
-
-  virtual void GetDriverCaps (csNetworkCaps *oCaps) = 0;
-
-  virtual int GetLastError () = 0;
-
-//virtual void SetOnReceiveFunction (void (*iFunction) (void *), void *iParm) = 0;
-
-//virtual void (*) (void *) GetOnReceiveFunction () = 0;
 };
 
-#endif	//__INETWORK_H__
+#endif // __CS_INETWORK_H__
