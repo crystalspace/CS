@@ -24,6 +24,13 @@ The history order is reversed so that new features are at the top.
 	- Eric Sunshine merged msys.mak into win32gcc.mak in order to reduce
 	  future maintenance headaches.  msys.mak kept lagging behind
 	  win32gcc.mak.
+	- Eric Sunshine fixed the following problems with the Texinfo
+	  documentation:
+	    - Syntax error in mapfmt.txi.
+	    - Fixed to work with makeinfo program from the Mingw/MSYS
+	      distribution which complains if @ref{} and cousins are split over
+	      multiple lines.  The following files were affected: rain.txi,
+	      snow.txi, 3dsprite.txi, internal/platform/next.txi.
 5-Aug-2002
 	- Removed CS_GNUC_PRINTF macros with iGraphics2D->PerformExtension()
 	  since this doesn't make sense. PerformExtension() doesn't follow

@@ -13,8 +13,8 @@
 @email{jorrit.tyberghein@@uz.kuleuven.ac.be}.}
 
 Rain is a particle system that emulates rain.  Also see the general particle
-system documentation which is valid for all particle systems.  @xref{MeshObject
-PartSys}.
+system documentation which is valid for all particle systems.
+@xref{MeshObject PartSys}.
 
 @subsubheading Basic Structure
 

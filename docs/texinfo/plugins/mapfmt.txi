@@ -555,9 +555,9 @@ internal list first.
     @prodnext{@nonterm{start-position}}@*
     @prodnext{@nonterm{start-up}}@*
     @prodnext{@nonterm{start-forward}}@*
-@production{start-newsyntax, [ @nonterm{start-comp} @dots{} ]}
+@production{start-newsyntax, [ @nonterm{start-comp} @dots{} ]}@*
 @production{start-oldsyntax, @nonterm{sector-name} @COMMA{}
-    @nonterm{coordinate}}@
+    @nonterm{coordinate}}@*
 @production{start, @token{START}
     @LP{} @nonterm{start-oldsyntax} | @nonterm{start-newsyntax} @RP{}}
 

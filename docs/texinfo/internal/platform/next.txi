@@ -575,8 +575,8 @@ by the AppKit and WindowServer is encapsulated in the class
 @samp{NeXTFrameBuffer32}.  Just prior to flushing the image data to the
 display, @samp{NeXTFrameBuffer32} transmutes the pixel data into a format
 suitable for the AppKit.  It also ensures that the alpha byte is set to
-@code{0xff}, as explained in the video optimizations section, @ref{NeXT Video
-Optimization}.
+@code{0xff}, as explained in the video optimizations section,
+@ref{NeXT Video Optimization}.
 
 The 2D driver is automatically configured to generate 15-bit @sc{rgb} image
 data when running on machines configured for 12-, 15-, or 16-bit @sc{rgba}
@@ -586,12 +586,12 @@ class @samp{NeXTFrameBuffer15}.  In order to avoid time-consuming bit
 manipulation of image data, this class generates a translation table which
 equates each possible @sc{rgb}:555 color value with the corresponding
 @sc{rgba}:4444 color.  The alpha nybble of the translated color contains
-@code{0x0f} as explained in the video optimizations section, @ref{NeXT Video
-Optimization}.  To translate incoming @sc{rgb}:555 data to @sc{rgba}:4444,
-@samp{NeXTFrameBuffer15} enumerates over each color value in the incoming image
-data, looks up its corresponding @sc{rgba}:4444 value in the translation table
-and outputs that color.  This technique is both simple and reasonably
-efficient.
+@code{0x0f} as explained in the video optimizations section,
+@ref{NeXT Video Optimization}.  To translate incoming @sc{rgb}:555 data to
+@sc{rgba}:4444, @samp{NeXTFrameBuffer15} enumerates over each color value in
+the incoming image data, looks up its corresponding @sc{rgba}:4444 value in the
+translation table and outputs that color.  This technique is both simple and
+reasonably efficient.
 
 @node NeXT Dynamic Linking, NeXT Keymapping, NeXT Frame Buffer, NeXT Details
 @subsubsection Dynamic Linking

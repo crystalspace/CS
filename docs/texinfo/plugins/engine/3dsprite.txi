@@ -106,9 +106,9 @@ optimize.
 @node 3D Sprites Example 3, , 3D Sprites Example 2, 3D Sprites
 @subsubsection Shading
 
-Seperating the ends of the cylinder sprite for texturing (@pxref{3D Sprites
-Example 2}) has a fortunate side effect.  It seperates the surface normals of
-the vertices as well as the texture coordinates.
+Seperating the ends of the cylinder sprite for texturing
+(@pxref{3D Sprites Example 2}) has a fortunate side effect.  It seperates the
+surface normals of the vertices as well as the texture coordinates.
 
 Surface normals are used for shading the sprite.  Light colors each vertex
 based on the average normal of all of the triangles that share that vertex.

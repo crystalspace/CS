@@ -13,8 +13,8 @@
 @email{jorrit.tyberghein@@uz.kuleuven.ac.be}.}
 
 Snow is a particle system that emulates snow.  Also see the general particle
-system documentation which is valid for all particle systems.  @xref{MeshObject
-PartSys}.
+system documentation which is valid for all particle systems.
+@xref{MeshObject PartSys}.
 
 @subsubheading Basic Structure
 
