@@ -427,6 +427,10 @@ void dump_visible (csRenderView* /*rview*/, int type, void* entity)
 
 //------------------------------------------------------------------------
 
+//@@@
+int covtree_level = 1;
+bool do_covtree_dump = false;
+
 void WalkTest::DrawFrame (time_t elapsed_time, time_t current_time)
 {
   (void)elapsed_time; (void)current_time;
@@ -462,7 +466,7 @@ void WalkTest::DrawFrame (time_t elapsed_time, time_t current_time)
     // Apply lighting to all sprites
     light_statics ();
 
-    if (map_mode != MAP_ON) view->Draw ();
+    if (map_mode != MAP_ON && !do_covtree_dump) view->Draw ();
     // no need to clear screen anymore
     drawflags = 0;
   }
@@ -523,36 +527,44 @@ void WalkTest::DrawFrame (time_t elapsed_time, time_t current_time)
     }
 
     // White-board for debugging purposes.
-    if (true)
+    if (do_covtree_dump)
     {
       csCoverageMaskTree* covtree = Sys->world->GetCovtree ();
       if (covtree)
       {
         Gfx2D->Clear (0);
+#	if 0
+	covtree->GfxDump (Gfx2D, covtree_level);
+#	else
 	covtree->MakeEmpty ();
-	csPolygon2D poly;
-	poly.AddPerspective (csVector3 (-3.6, -2, 5));
-	poly.AddPerspective (csVector3 (-1, -2.6, 5));
-	poly.AddPerspective (csVector3 (-1, 0, 5));
-	poly.AddPerspective (csVector3 (-3, 0.3, 5));
-	covtree->InsertPolygon (poly.GetVertices (),
-		poly.GetNumVertices (), poly.GetBoundingBox ());
-	static int level = 0;
-	static time_t prev;
-	if (level == 0)
-	{
-	  prev = current_time;
-	  level = 1;
-	}
-	else if (current_time - prev > 5000)
-	{
-	  prev = current_time;
-	  level++;
-	  if (level > 4) level = 1;
-	}
-	covtree->GfxDump (Gfx2D, level);
-	poly.Draw (Gfx2D, 0xf800);
-	printf ("Dumping level %d\n", level);
+	csCamera* c = view->GetCamera ();
+	csPolygon2D poly1, poly2, poly3;
+	poly1.AddPerspective (c->Other2This (csVector3 (-1.6, 1, 5)));
+	poly1.AddPerspective (c->Other2This (csVector3 (1, 1.6, 5)));
+	poly1.AddPerspective (c->Other2This (csVector3 (1, -1, 5)));
+	poly1.AddPerspective (c->Other2This (csVector3 (-1, -1.3, 5)));
+	covtree->InsertPolygon (poly1.GetVertices (),
+		poly1.GetNumVertices (), poly1.GetBoundingBox ());
+	poly2.AddPerspective (c->Other2This (csVector3 (-1.5, .5, 6)));
+	poly2.AddPerspective (c->Other2This (csVector3 (.5, .5, 6)));
+	poly2.AddPerspective (c->Other2This (csVector3 (.5, -1.5, 6)));
+	poly2.AddPerspective (c->Other2This (csVector3 (-1.5, -1.5, 6)));
+	printf ("T2:%d ", covtree->TestPolygon (poly2.GetVertices (),
+		poly2.GetNumVertices (), poly2.GetBoundingBox ()));
+	printf ("P2:%d ", covtree->InsertPolygon (poly2.GetVertices (),
+		poly2.GetNumVertices (), poly2.GetBoundingBox ()));
+	poly3.AddPerspective (c->Other2This (csVector3 (-.5, .15, 7)));
+	poly3.AddPerspective (c->Other2This (csVector3 (1.5, .15, 7)));
+	poly3.AddPerspective (c->Other2This (csVector3 (1.5, -.5, 7)));
+	printf ("T3:%d ", covtree->TestPolygon (poly3.GetVertices (),
+		poly3.GetNumVertices (), poly3.GetBoundingBox ()));
+	printf ("P3:%d\n", covtree->InsertPolygon (poly3.GetVertices (),
+		poly3.GetNumVertices (), poly3.GetBoundingBox ()));
+	covtree->GfxDump (Gfx2D, covtree_level);
+	poly1.Draw (Gfx2D, 0xf800);
+	poly2.Draw (Gfx2D, 0x07e0);
+	poly3.Draw (Gfx2D, 0x008f);
+#	endif
       }
     }
 

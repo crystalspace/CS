@@ -1177,11 +1177,17 @@ static bool CommandHandler (char *cmd, char *arg)
   }
   else if (!strcasecmp (cmd, "debug1"))
   {
-    Sys->Printf (MSG_CONSOLE, "No debug1 implementation in this version.\n");
+    extern int covtree_level;
+    covtree_level++;
+    if (covtree_level > 5) covtree_level = 1;
+    printf ("covtree_level=%d\n", covtree_level);
+    //Sys->Printf (MSG_CONSOLE, "No debug1 implementation in this version.\n");
   }
   else if (!strcasecmp (cmd, "debug2"))
   {
-    Sys->Printf (MSG_CONSOLE, "No debug2 implementation in this version.\n");
+    extern bool do_covtree_dump;
+    do_covtree_dump = !do_covtree_dump;
+    //Sys->Printf (MSG_CONSOLE, "No debug2 implementation in this version.\n");
   }
   else if (!strcasecmp (cmd, "strafe_left"))
   {
