@@ -252,7 +252,7 @@ public:
     }
     virtual void GetColorFilter (float &r, float &g, float &b) const
     {
-      return scfParent->GetColorFilter (r, g, b);
+      scfParent->GetColorFilter (r, g, b);
     }
     virtual void SetWarp (const csMatrix3 &m_w, const csVector3 &v_w_before,
       const csVector3 &v_w_after)
