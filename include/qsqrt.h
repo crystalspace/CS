@@ -123,68 +123,6 @@ static inline float qisqrt (float x)
   return ret;
 }
 
-#elif !defined (CS_NO_QSQRT) && defined (COMP_MSVC)
-
-#pragma warning(disable:4035)               // re-enable below
-
-static float __sqrt_half = 0.5F;
-static float __sqrt_oneandhalf = 1.5F;
-
-static inline float __cdecl qsqrt (float x)
-{
-  __asm {
-		fld	[x]			// x
-		mov	eax,0be6f0000h
-		sub	eax,[x]
-		shr	eax,1
-		mov	[x],eax
-		fld	[__sqrt_half]		// x 0.5
-		fmul	st,st(1)		// x h
-		fld	[__sqrt_oneandhalf]	// x h 1.5
-		fld	[x]			// x h 1.5 a
-		fld	st			// x h 1.5 a a
-		fmul	st,st			// x h 1.5 a a*a
-		fmul	st,st(3)		// x h 1.5 a a*a*h
-		fsubr	st,st(2)		// x h 1.5 a 1.5-a*a*h
-		fmulp	st(1),st		// x h 1.5 a
-		fld	st			// x h 1.5 a a
-		fmul	st,st			// x h 1.5 a a*a
-		fmulp	st(3),st		// x a*a*h 1.5 a
-		fxch				// x a*a*h a 1.5
-		fsubrp	st(2),st		// x 1.5-a*a*h a
-		fmulp	st(1),st		// x a
-		fmulp	st(1),st		// a
-  }
-}
-
-static inline float __cdecl qisqrt (float x)
-{
-  __asm {
-		fld	[x]			// x
-		mov	eax,0be6f0000h
-		sub	eax,[x]
-		shr	eax,1
-		mov	[x],eax
-		fld	[__sqrt_half]		// x 0.5
-		fmulp	st(1),st		// h
-		fld	[__sqrt_oneandhalf]	// h 1.5
-		fld	[x]			// h 1.5 a
-		fld	st			// h 1.5 a a
-		fmul	st,st			// h 1.5 a a*a
-		fmul	st,st(3)		// h 1.5 a a*a*h
-		fsubr	st,st(2)		// h 1.5 a 1.5-a*a*h
-		fmulp	st(1),st		// h 1.5 a
-		fld	st			// h 1.5 a a
-		fmul	st,st			// h 1.5 a a*a
-		fmulp	st(3),st		// a*a*h 1.5 a
-		fxch				// a*a*h a 1.5
-		fsubrp	st(2),st		// 1.5-a*a*h a
-		fmulp	st(1),st		// a
-  }
-}
-
-#pragma warning(default:4035)
-
 #else
 
 #include <math.h>
