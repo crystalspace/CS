@@ -82,7 +82,7 @@ if test x$no_cs = x ; then
 fi
 
 if test x$no_cs != x ; then
-	enable_cstext=no
+	enable_cstest=no
 fi
 
 if test x$enable_cstest = xyes ; then
