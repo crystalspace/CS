@@ -1696,11 +1696,30 @@ void PreparePolygonFX (G3DPolygonDPFX* g3dpoly, csVector2* clipped_verts, int nu
   }
 }
 
+// Remove this for old fog
+#define USE_EXP_FOG
+
+// After such number of values fog density coefficient can be considered 0.
+#define FOG_EXP_TABLE_SIZE 1600
+static float *fog_exp_table = NULL;
+
+static void InitializeFogTable ()
+{
+  fog_exp_table = new float [FOG_EXP_TABLE_SIZE];
+  for (int i = 0; i < FOG_EXP_TABLE_SIZE; i++)
+    fog_exp_table [i] = exp (-float (i) / 256.);
+}
+
 #define SMALL_D 0.01
 void CalculateFogPolygon (csRenderView* rview, G3DPolygonDP& poly)
 {
   if (!rview->fog_info || poly.num < 3) { poly.use_fog = false; return; }
   poly.use_fog = true;
+
+#ifdef USE_EXP_FOG
+  if (!fog_exp_table)
+    InitializeFogTable ();
+#endif
 
   // Get the plane normal of the polygon. Using this we can calculate
   // '1/z' at every screen space point.
@@ -1766,7 +1785,18 @@ void CalculateFogPolygon (csRenderView* rview, G3DPolygonDP& poly)
       float denom = pl.norm.x*v.x + pl.norm.y*v.y + pl.norm.z*v.z;
       dist2 = v.Norm () * (-pl.DD / denom);
 
-      float I2 = ABS (dist2-dist1) * fog_info->fog->density;
+#ifdef USE_EXP_FOG
+      // Implement semi-exponential fog (linearily approximated)
+      UInt table_index = QRound ((100 * ABS (dist2 - dist1)) * fog_info->fog->density);
+      float I2;
+      if (table_index < FOG_EXP_TABLE_SIZE)
+        I2 = fog_exp_table [table_index];
+      else
+        I2 = 1.;
+#else
+      float I2 = ABS (dist2 - dist1) * fog_info->fog->density;
+#endif
+
       if (poly.fog_info[i].intensity)
       {
         // We already have a previous fog level. In this case we do some
@@ -1778,7 +1808,7 @@ void CalculateFogPolygon (csRenderView* rview, G3DPolygonDP& poly)
 	//	     P = polygon color
 	//	     C = result
 	float I1 = poly.fog_info[i].intensity;
-	poly.fog_info[i].intensity = I1 + I2 - I1*I2;
+	poly.fog_info[i].intensity = I1 + I2 - I1 * I2;
 	float fact = 1. / (I1 + I2 - I1*I2);
 	poly.fog_info[i].r = (I2*fog_info->fog->red + I1*poly.fog_info[i].r + I1*I2*poly.fog_info[i].r) * fact;
 	poly.fog_info[i].g = (I2*fog_info->fog->green + I1*poly.fog_info[i].g + I1*I2*poly.fog_info[i].g) * fact;
@@ -1803,6 +1833,11 @@ void CalculateFogPolygon (csRenderView* rview, G3DPolygonDPFX& poly)
 {
   if (!rview->fog_info || poly.num < 3) { poly.use_fog = false; return; }
   poly.use_fog = true;
+
+#ifdef USE_EXP_FOG
+  if (!fog_exp_table)
+    InitializeFogTable ();
+#endif
 
   float inv_aspect = poly.inv_aspect;
 
@@ -1839,7 +1874,18 @@ void CalculateFogPolygon (csRenderView* rview, G3DPolygonDPFX& poly)
       float denom = pl.norm.x*v.x + pl.norm.y*v.y + pl.norm.z*v.z;
       dist2 = v.Norm () * (-pl.DD / denom);
 
-      float I2 = ABS (dist2-dist1) * fog_info->fog->density;
+#ifdef USE_EXP_FOG
+      // Implement semi-exponential fog (linearily approximated)
+      UInt table_index = QRound ((100 * ABS (dist2 - dist1)) * fog_info->fog->density);
+      float I2;
+      if (table_index < FOG_EXP_TABLE_SIZE)
+        I2 = fog_exp_table [table_index];
+      else
+        I2 = 1.;
+#else
+      float I2 = ABS (dist2 - dist1) * fog_info->fog->density;
+#endif
+
       if (poly.fog_info[i].intensity)
       {
         // We already have a previous fog level. In this case we do some
