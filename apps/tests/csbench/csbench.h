@@ -32,6 +32,9 @@ struct iEngine;
 struct iLoader;
 struct iView;
 struct iSector;
+struct iShaderManager;
+struct iDocumentSystem;
+struct iGeneralMeshState;
 
 class CsBench
 {
@@ -45,13 +48,19 @@ private:
   csRef<iGraphics3D> g3d;
   csRef<iVFS> vfs;
   csRef<iVirtualClock> vc;
+  csRef<iShaderManager> shader_mgr;
+  csRef<iDocumentSystem> docsys;
   csRef<iCommandLineParser> cmdline;
   csRef<iView> view;
+  csRef<iGeneralMeshState> genmesh;
   iSector* room1;
   iSector* room2;
+  iMaterialWrapper* material;
 
   bool CreateGeometry ();
   void BenchMark (const char* name, const char* description);
+  iDocumentSystem* GetDocumentSystem ();
+  iShaderManager* GetShaderManager ();
 
 public:
   CsBench ();

@@ -6,6 +6,10 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+21-Jun-2004
+	- Jorrit attempted to add new tests to csbench to try out a shader
+	  with various techniques. Not sure if it works correctly yet though.
+	  Needs more testing.
 20-Jun-2004
 	- Christian Bayle adapted debian scripts to the new configuration
 	  options

@@ -19,6 +19,7 @@
 
 #include "cssysdef.h"
 #include "csutil/sysfunc.h"
+#include "csutil/xmltiny.h"
 #include "cstool/initapp.h"
 #include "csgeom/vector3.h"
 #include "apps/tests/csbench/csbench.h"
@@ -124,7 +125,7 @@ bool CsBench::CreateGeometry ()
         "Error loading 'stone4' texture!");
     return false;
   }
-  iMaterialWrapper* tm = engine->GetMaterialList ()->FindByName ("stone");
+  material = engine->GetMaterialList ()->FindByName ("stone");
 
   room2 = engine->CreateSector ("room2");
   csRef<iMeshWrapper> walls (engine->CreateSectorWallsMesh (room2, "walls"));
@@ -132,7 +133,7 @@ bool CsBench::CreateGeometry ()
     SCF_QUERY_INTERFACE (walls->GetMeshObject (), iThingState);
   csRef<iThingFactoryState> walls_state = ws->GetFactory ();
   walls_state->AddInsideBox (csVector3 (-5, -5, 5), csVector3 (5, 5, 15));
-  walls_state->SetPolygonMaterial (CS_POLYRANGE_LAST, tm);
+  walls_state->SetPolygonMaterial (CS_POLYRANGE_LAST, material);
   walls_state->SetPolygonTextureMapping (CS_POLYRANGE_LAST, 3);
 
   // Create our object.
@@ -172,9 +173,8 @@ bool CsBench::CreateGeometry ()
   // Now create an instance:
   csRef<iMeshWrapper> mesh =
     engine->CreateMeshWrapper (fact, "complex", room2, csVector3 (0, 0, 10.0));
-  csRef<iGeneralMeshState> meshstate = SCF_QUERY_INTERFACE (
-    mesh->GetMeshObject (), iGeneralMeshState);
-  meshstate->SetMaterialWrapper (tm);
+  genmesh = SCF_QUERY_INTERFACE (mesh->GetMeshObject (), iGeneralMeshState);
+  genmesh->SetMaterialWrapper (material);
 
   csRef<iLight> light;
   iLightList* ll = room2->GetLights ();
@@ -329,6 +329,28 @@ void CsBench::BenchMark (const char* name, const char* description)
   vfs->Sync ();
 }
 
+iShaderManager* CsBench::GetShaderManager ()
+{
+  if (!shader_mgr)
+  {
+    shader_mgr = CS_QUERY_REGISTRY (object_reg, iShaderManager);
+  }
+  return shader_mgr;
+}
+
+iDocumentSystem* CsBench::GetDocumentSystem ()
+{
+  if (!docsys)
+  {
+    docsys = CS_QUERY_REGISTRY(object_reg, iDocumentSystem);
+    if (docsys == 0)
+    {
+      docsys.AttachNew (new csTinyDocumentSystem ());
+    }
+  }
+  return docsys;
+}
+
 void CsBench::PerformTests ()
 {
   Report ("================================================================");
@@ -350,6 +372,38 @@ void CsBench::PerformTests ()
   BenchMark ("stencilclip", "Stencil clipping is used");
   g3d->SetOption ("StencilThreshold", "100000000");
   BenchMark ("planeclip", "glClipPlane clipping is used");
+
+  csRef<iDocument> shaderDoc = GetDocumentSystem ()->CreateDocument ();
+  csRef<iShaderCompiler> shcom = GetShaderManager ()->GetCompiler ("XMLShader");
+  char const* const shaderPath = "/shader/or_lighting.xml";
+  csRef<iFile> shaderFile = vfs->Open (shaderPath, VFS_FILE_READ);
+  shaderDoc->Parse (shaderFile);
+  csRef<iDocumentNode> shadernode = shaderDoc->GetRoot ()->GetNode ("shader");
+  const char* shadertypeName = shadernode->GetAttributeValue ("type");
+  csRef<iStringSet> strings = CS_QUERY_REGISTRY_TAG_INTERFACE (
+    object_reg, "crystalspace.shared.stringset", iStringSet);
+  csStringID shadertype = strings->Request (shadertypeName);
+  csRef<iShaderPriorityList> prilist = shcom->GetPriorities (shadernode);
+  int i;
+  for (i = 0 ; i < prilist->GetCount () ; i++)
+  {
+    int pri = prilist->GetPriority (i);
+    csRef<iShader> shader = shcom->CompileShader (shadernode, pri);
+    if (shader)
+    {
+      csRef<iMaterial> matinput = engine->CreateBaseMaterial (
+		      engine->GetTextureList ()->FindByName ("stone"));
+      matinput->SetShader (shadertype, shader);
+      iMaterialWrapper* mat = engine->GetMaterialList ()->NewMaterial (matinput);
+      mat->Register (g3d->GetTextureManager ());
+      genmesh->SetMaterialWrapper (mat);
+      char name[256];
+      sprintf (name, "%s_%d", "or_lighting", pri);
+      char description[256];
+      sprintf (description, "Shader %s with priority %d", "or_lighting", pri);
+      BenchMark (name, description);
+    }
+  }
 }
 
 /*---------------------------------------------------------------------*
