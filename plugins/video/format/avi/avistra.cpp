@@ -37,7 +37,9 @@ csAVIStreamAudio::csAVIStreamAudio (iBase *pBase)
 bool csAVIStreamAudio::Initialize (const csAVIFormat::AVIHeader *ph, 
 				   const csAVIFormat::StreamHeader *psh, 
 				   const csAVIFormat::AudioStreamFormat *pf, 
-				   UShort nStreamNumber, iSystem *pTheSystem)
+				   UShort nStreamNumber,
+				   UByte *pInitData, ULong nInitDataLen,
+				   char *pName, iSystem *pTheSystem)
 {
 
   (void)ph;
@@ -49,6 +51,7 @@ bool csAVIStreamAudio::Initialize (const csAVIFormat::AVIHeader *ph,
   strdesc.samplespersecond = pf->samplespersecond;
   strdesc.bitspersample = pf->bitspersample;
   strdesc.duration = psh->length / psh->scale;
+  strdesc.name = pName;
 
   delete pChunk;
   pChunk = new csAVIFormat::AVIDataChunk;
@@ -63,7 +66,7 @@ bool csAVIStreamAudio::Initialize (const csAVIFormat::AVIHeader *ph,
 
   bTimeSynced = false;
   // load the CODEC
-  return LoadCodec ();
+  return LoadCodec (pInitData, nInitDataLen);
 }
 
 csAVIStreamAudio::~csAVIStreamAudio ()
@@ -115,7 +118,7 @@ void csAVIStreamAudio::NextFrame ()
   */
 }
 
-bool csAVIStreamAudio::LoadCodec ()
+bool csAVIStreamAudio::LoadCodec (UByte *pInitData, ULong nInitDataLen)
 {
   // based on the codec id we try to load the apropriate codec
   iSCF *pSCF = QUERY_INTERFACE (pSystem, iSCF);
@@ -130,7 +133,7 @@ bool csAVIStreamAudio::LoadCodec ()
     if (pCodec)
     {
       // codec exists, now try to initialize it
-      if (pCodec->Initialize (&strdesc))
+      if (pCodec->Initialize (&strdesc, pInitData, nInitDataLen))
 	return true;
       else
       {

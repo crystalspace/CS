@@ -52,7 +52,7 @@ class csAVIStreamVideo : public iVideoStream
   void rgb_channel_2_rgba_interleave (char *data[3]);
   void rgba_channel_2_rgba_interleave (char *data[4]);
 
-  bool LoadCodec ();
+  bool LoadCodec (UByte *pInitData, ULong nInitDataLen);
   void makeMaterial ();
   bool NextFrameGetData ();
   void PrepImageArea ();
@@ -64,7 +64,9 @@ class csAVIStreamVideo : public iVideoStream
   bool Initialize (const csAVIFormat::AVIHeader *ph, 
 		   const csAVIFormat::StreamHeader *psh, 
 		   const csAVIFormat::VideoStreamFormat *pf, 
-		   UShort nStreamNumber, iSystem *pTheSystem);
+		   UShort nStreamNumber,
+		   UByte *pInitData, ULong nInitDataLen,
+		   char *pName, iSystem *pTheSystem);
   virtual ~csAVIStreamVideo ();
 
   // iStream

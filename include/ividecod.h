@@ -69,6 +69,10 @@ struct csStreamDescription
    * Codec id.
    */
   char codec[64];
+  /**
+   * stream name
+   */
+  const char *name;
   
 };
 
@@ -262,7 +266,7 @@ struct iCodec : public iBase
   /**
    * Send either video or audio stream description as input. The codec will cast it.
    */
-  virtual bool Initialize (csStreamDescription *desc) = 0;
+  virtual bool Initialize (csStreamDescription *desc, UByte *pInitData, ULong nInitDataLen)=0;
   virtual void GetCodecDescription (csCodecDescription &desc) = 0;
   virtual bool Decode (char *indata, ULong inlength, void *&outdata) = 0;
   virtual bool Encode (void *indata, char *outdata, ULong &outlength) = 0;

@@ -34,7 +34,7 @@ class csAVIStreamAudio : public iAudioStream
   iSystem *pSystem;
   iCodec *pCodec;
 
-  bool LoadCodec ();
+  bool LoadCodec (UByte *pInitData, ULong nInitDataLen);
 
  public:
   DECLARE_IBASE;
@@ -43,7 +43,9 @@ class csAVIStreamAudio : public iAudioStream
   bool Initialize (const csAVIFormat::AVIHeader *ph, 
 		   const csAVIFormat::StreamHeader *psh, 
 		   const csAVIFormat::AudioStreamFormat *pf, 
-		   UShort nStreamNumber, iSystem *pTheSystem);
+		   UShort nStreamNumber,
+		   UByte *pInitData, ULong nInitDataLen,
+		   char *pName, iSystem *pTheSystem);
   virtual ~csAVIStreamAudio ();
 
   // iStream

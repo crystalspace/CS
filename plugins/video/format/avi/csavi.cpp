@@ -286,6 +286,9 @@ bool csAVIFormat::ValidateStreams ()
 ULong csAVIFormat::CreateStream (StreamHeader *streamheader)
 {
   ULong n=0;
+  UByte *pCID=NULL;
+  char *pName = NULL;
+  ULong nCIDLen = 0;
 
   if (!strncmp (streamheader->type, "auds", 4))
   {
@@ -301,7 +304,31 @@ ULong csAVIFormat::CreateStream (StreamHeader *streamheader)
       audsf.Endian ();
       p += AVI_EVEN(strh.size);
       n = AVI_EVEN(strh.size) + len_hcl;
-      if (pAudioStream->Initialize (&aviheader, streamheader, &audsf, nAudio, pSystem))
+      // optionally follows a "strd" chunk containing codec specific data which is handed
+      // over to the codec 'as is'
+      memcpy (&strh, p, len_hcl);
+      strh.Endian ();
+      if (strh.Is (CHUNK_STRD))
+      {
+	p += len_hcl;
+	pCID = (UByte*)p;
+	nCIDLen = strh.size;
+	p += AVI_EVEN(strh.size);
+	n += AVI_EVEN(strh.size) + len_hcl;
+	memcpy (&strh, p, len_hcl);
+	strh.Endian ();
+      }
+      // here may come a "strn" chunk containing a zeroterminated string which is the name
+      // of the stream
+      if (strh.Is (CHUNK_STRN))
+      {
+	p += len_hcl;
+	pName = p;
+	p += AVI_EVEN(strh.size);
+	n += AVI_EVEN(strh.size) + len_hcl;
+      }
+      if (pAudioStream->Initialize (&aviheader, streamheader, &audsf, nAudio, 
+				    pCID, nCIDLen, pName, pSystem))
 	vStream.Push (pAudioStream);
       else
 	pAudioStream->DecRef ();
@@ -323,8 +350,32 @@ ULong csAVIFormat::CreateStream (StreamHeader *streamheader)
       vidsf.Endian ();
       p += AVI_EVEN(strh.size);
       n = AVI_EVEN(strh.size) + len_hcl;
-      if (pVideoStream->Initialize (&aviheader, streamheader, &vidsf, nVideo, pSystem))
-	vStream.Push (pVideoStream);
+      // optionally follows a "strd" chunk containing codec specific data which is handed
+      // over to the codec 'as is'
+      memcpy (&strh, p, len_hcl);
+      strh.Endian ();
+      if (strh.Is (CHUNK_STRD))
+      {
+	p += len_hcl;
+	pCID = (UByte*)p;
+	nCIDLen = strh.size;
+	p += AVI_EVEN(strh.size);
+	n += AVI_EVEN(strh.size) + len_hcl;
+	memcpy (&strh, p, len_hcl);
+	strh.Endian ();
+      }
+      // here may come a "strn" chunk containing a zeroterminated string which is the name
+      // of the stream
+      if (strh.Is (CHUNK_STRN))
+      {
+	p += len_hcl;
+	pName = p;
+	p += AVI_EVEN(strh.size);
+	n += AVI_EVEN(strh.size) + len_hcl;
+      }
+      if (pVideoStream->Initialize (&aviheader, streamheader, &vidsf, nVideo, 
+				    pCID, nCIDLen, pName, pSystem))
+      vStream.Push (pVideoStream);
       else
 	pVideoStream->DecRef ();
     }

@@ -48,7 +48,7 @@ csOpenDivX::~csOpenDivX ()
   delete [] vdata;
 }
 
-bool csOpenDivX::Initialize (csStreamDescription *desc)
+bool csOpenDivX::Initialize (csStreamDescription *desc, UByte *, ULong)
 {
   csVideoStreamDescription *vd = (csVideoStreamDescription *)desc;
   w = vd->width;

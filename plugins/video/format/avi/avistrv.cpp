@@ -44,9 +44,10 @@ csAVIStreamVideo::csAVIStreamVideo (iBase *pBase): memimage (1,1)
 bool csAVIStreamVideo::Initialize (const csAVIFormat::AVIHeader *ph, 
 				   const csAVIFormat::StreamHeader *psh, 
 				   const csAVIFormat::VideoStreamFormat *pf, 
-				   UShort nStreamNumber, iSystem *pTheSystem)
+				   UShort nStreamNumber, 
+				   UByte *pInitData, ULong nInitDataLen,
+				   char *pName, iSystem *pTheSystem)
 {
-
   strdesc.type = CS_STREAMTYPE_VIDEO;
   memcpy (strdesc.codec, psh->handler, 4);
   strdesc.codec[4] = '\0';
@@ -54,8 +55,9 @@ bool csAVIStreamVideo::Initialize (const csAVIFormat::AVIHeader *ph,
   strdesc.framecount = ph->framecount;
   strdesc.width = ph->width;
   strdesc.height = ph->height;
-  strdesc.framerate = 1000./ph->msecperframe; // @@@, this is wrong, gonna reread it on the MS site when DDoS is over
+  strdesc.framerate = psh->rate/psh->scale;
   strdesc.duration = psh->length / psh->scale;
+  strdesc.name = pName;
 
   delete pChunk;
   pChunk = new csAVIFormat::AVIDataChunk;
@@ -103,7 +105,7 @@ bool csAVIStreamVideo::Initialize (const csAVIFormat::AVIHeader *ph,
 
   if (pMaterial) pMaterial->DecRef ();
   pMaterial = NULL;
-  return LoadCodec ();
+  return LoadCodec (pInitData, nInitDataLen);
 }
 
 csAVIStreamVideo::~csAVIStreamVideo ()
@@ -385,7 +387,7 @@ void csAVIStreamVideo::makeMaterial ()
   pMaterial->Prepare ();
 }
 
-bool csAVIStreamVideo::LoadCodec ()
+bool csAVIStreamVideo::LoadCodec (UByte *pInitData, ULong nInitDataLen)
 {
   // based on the codec id we try to load the apropriate codec
   iSCF *pSCF = QUERY_INTERFACE (pSystem, iSCF);
@@ -400,7 +402,7 @@ bool csAVIStreamVideo::LoadCodec ()
     if (pCodec)
     {
       // codec exists, now try to initialize it
-      if (pCodec->Initialize (&strdesc))
+      if (pCodec->Initialize (&strdesc, pInitData, nInitDataLen))
       {
 	pCodec->GetCodecDescription (cdesc);
        	return true;
