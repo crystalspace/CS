@@ -8,6 +8,9 @@ chronological order.
 
 21-Aug-2004
 	- Jorrit added more leakguards to CS.
+        - Philip Wyett fixed attempts to load
+          "crystslspace.graphics3d.shader.soft" instead of the
+          correct "crystslspace.graphics3d.shader.software".
 20-Aug-2004
 	- Jorrit fixed a bug added yesterday in the font multiplexor that
 	  would cause crashes at exit.
