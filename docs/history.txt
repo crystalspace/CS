@@ -11,6 +11,23 @@ chronological order.
 	  functions return pointers to data instead of filling out supplied
 	  preallocated blocks). Also made it actually work, at least to some
 	  degree.
+	- res augmented csappframe with the DLL goop. Also changed it to not
+	  implement main(). The startup code is now in 
+	  csApplicationFramework::Main() and has to be called explicitly by
+	  the application.
+	- res augmented csgeom with the DLL goop.
+	- res fixed an oversight from adding DLL goop to csgfx.
+	- res augmented cstool with the DLL goop.
+	- res removed the csImage::dither variable.
+	- res fixed csutil/tree.h. csTree is purely inline but was declared as
+	  dllexport, causing missing symbols when csTree was used elsewhere.
+	- res hacked around the fact that cs_static_var_cleanup was defined in
+	  the app/plugins but used in the libs by using only one 
+	  cs_static_var_cleanup (contained in csutil) when building dynamic
+	  libs.
+	- res changed the nada reftracker to being not dllexported.
+	- res augmented csws with the DLL goop.
+	- res removed a superflouos csTriangle from the ASE plugin.
 17-Mar-2004
 	- Duhprey added a simple terraformer loader plugin
 	- Eric Sunshine fixed copy/paste error in terraformer loader makefile
