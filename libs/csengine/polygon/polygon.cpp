@@ -641,6 +641,15 @@ void csPolygon3D::CreateLightMaps (iGraphics3D* /*g3d*/)
       csWorld::current_world->MaxAspectRatio);
 }
 
+float csPolygon3D::GetArea()
+{
+  float area = 0.0;
+  // triangulize the polygon, triangles are (0,1,2), (0,2,3), (0,3,4), etc..
+  for(int i=0; i<vertices.GetNumVertices()-2; i++)
+    area += ABS(csMath3::Area3 ( Vwor(0), Vwor(i+1), Vwor(i+2) ));
+  return area / 2.0;
+}
+
 void csPolygon3D::SetTextureSpace (csPolyTxtPlane* txt_pl)
 {
   ComputeNormal ();

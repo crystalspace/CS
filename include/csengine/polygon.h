@@ -732,6 +732,9 @@ public:
   /// Mark visible (used by PVS).
   void MarkVisible () { pvs_vis_nr = csOctreeNode::pvs_cur_vis_nr; }
 
+  /// Calculates the area of the polygon.
+  float GetArea();
+
   /**
    * Get the cosinus factor. This factor is used
    * for lighting.
