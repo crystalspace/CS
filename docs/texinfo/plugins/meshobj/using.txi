@@ -33,7 +33,7 @@ statement) like this (this example uses the @dfn{fountain} plug-in to make a
 fountain):
 
 @example
-MESHOBJ 'fountainFactory' (
+MESHFACT 'fountainFactory' (
   PLUGIN ('crystalspace.mesh.loader.factory.fountain')
   PARAMS ()
 )
@@ -51,7 +51,7 @@ you only have to create one factory in order to make all fountains you need.
 But in some cases you may have to create multiple factories depending
 on the object characteristics you want.
 
-To place a fountain in some room (sector) you also use a @samp{MESHOBJ}
+To place a fountain in some room (sector) you use a @samp{MESHOBJ}
 statement, within the definition of a room or sector, like this:
 
 @example
