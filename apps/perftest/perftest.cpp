@@ -231,7 +231,7 @@ int main (int argc, char* argv[])
   // We want at least the minimal set of plugins
   System->RequestPlugin ("crystalspace.kernel.vfs:VFS");
   System->RequestPlugin ("crystalspace.graphics3d.software:VideoDriver");
-  System->RequestPlugin ("crystalspace.console.stdout:Console");
+  System->RequestPlugin ("crystalspace.console.output.standard:Console");
 
   // Initialize the main system. This will load all needed plug-ins
   // (3D, 2D, network, sound, ...) and initialize them.
