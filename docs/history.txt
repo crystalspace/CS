@@ -51,6 +51,11 @@ chronological order.
 	  shadow casting should happen either.
 	- Jorrit removed the usage of the collision detection mesh in case
 	  there is no shadow mesh (from the stencil shadower).
+	- Jorrit removed the new csPolyMeshTools which was badly placed (should
+	  be in csgeom instead of cstool) and which also was already there
+	  under the name csPolygonMeshTools :-)
+	  So I just moved the two functions in csPolyMeshTools to the
+	  already exsisting csPolygonMeshTools in csgeom.
 3-Sep-2003
 	- Peter Amstutz changed nullmesh to properly initialize it's
 	  bounding box to a legal (albeit extremely small) value.

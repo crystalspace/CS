@@ -29,6 +29,9 @@ class csVector3;
 class csPlane3;
 struct iPolygonMesh;
 
+#include "csutil/array.h"
+#include "csgeom/polymesh.h"
+
 /**
  * A definition of one edge.
  */
@@ -112,6 +115,22 @@ public:
 	int* outline_edges, int& num_outline_edges,
 	bool* outline_verts,
 	float& valid_radius);
+
+  /**
+   * Test whether a polygon mesh is closed.
+   * \remark This function works best if vertices are shared.
+   */
+  static bool IsMeshClosed (iPolygonMesh* polyMesh);
+
+  /**
+   * Close a polygon mesh.
+   * The current implementation is rather naive; it just returns all faces,
+   * but flipped.
+   * \remark Don't forget to delete[] the 'vertices' fields of the polygons
+   *   returned in \p newPolys when you're done.
+   */
+  static void CloseMesh (iPolygonMesh* polyMesh, 
+    csArray<csMeshedPolygon>& newPolys);
 };
 
 /** @} */
