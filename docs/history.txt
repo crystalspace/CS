@@ -15,6 +15,9 @@ chronological order.
 	  the compiler comlaining about converting -1 to unsigned int.
 	- Eric Sunshine improved the robustness of the new ALSA check in
 	  configure.ac.
+	- Eric Sunshine fixed copy/paste error in MSVC6 template files which
+	  caused Release_NR and Debug_NR configurations of all projects
+	  (applications, plugins, etc.) to appear to be static link libraries.
 14-Feb-2004
 	- Norman Kraemer added an ALSA sound driver.  It can be used if you
 	  disabled OSS emulation in your ALSA configuration.
