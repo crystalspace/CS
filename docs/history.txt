@@ -4,6 +4,10 @@ The history order has been reversed so that new features are at the top.
 	- Eric Sunshine replaced out-of-date crystalspace.console.stdout
 	  references in several programs (nstp, perfest, ttffnt) with new
 	  crystalspace.console.output.standard.
+	- Andrew Zabolotny fixed vshell so that it compiles again after
+	  Andrew's latest changes.
+	- Andrew also fixes system so that it is allowed to have
+	  apps with no config files. This fixes the crash bug in simple.
 2-Oct-2000
 	- Andrew Zabolotny did the following changes to CS:
 	    - Overhauled the csIniFile class. There is now a new
@@ -85,6 +89,12 @@ The history order has been reversed so that new features are at the top.
 	- Eric Sunshine fixed some compilation warnings in wave.cpp.
 	- Eric Sunshine fixed potential memory leak in memfile.cpp which was
 	  introduced by Andrew's Big Change(tm) today.
+	- Thomas Hieber did some fixes on various apps and libraries after
+	  Andrew's changes.
+	- Thomas added first real code for the gamecore plugin. Thomas
+	  also added project files for this plugin.
+	- Thomas did some fixes to the VC project files.
+	- Robert Bate updated the Mac project files.
 1-Oct-2000
 	- Since Martin fixed a bug in the sound code Blocks sound is now
 	  working so I enabled it by default.

@@ -26,6 +26,7 @@
 
 class OpenGLTextureCache;
 #define CsPrintf System->Printf
+
 /**
  * Basic OpenGL version of the 2D driver class
  * You can look at the openGLX graphics class as an example
