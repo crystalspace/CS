@@ -149,7 +149,7 @@ bool csFireFactoryLoader::Initialize (iObjectRegistry* object_reg)
   return true;
 }
 
-iBase* csFireFactoryLoader::Parse (const char* /*string*/,
+csPtr<iBase> csFireFactoryLoader::Parse (const char* /*string*/,
 	iLoaderContext*, iBase* /* context */)
 {
   iMeshObjectType* type = CS_QUERY_PLUGIN_CLASS (plugin_mgr,
@@ -162,10 +162,10 @@ iBase* csFireFactoryLoader::Parse (const char* /*string*/,
   }
   iMeshObjectFactory* fact = type->NewFactory ();
   type->DecRef ();
-  return fact;
+  return csPtr<iBase> (fact);
 }
 
-iBase* csFireFactoryLoader::Parse (iDocumentNode* /*node*/,
+csPtr<iBase> csFireFactoryLoader::Parse (iDocumentNode* /*node*/,
 	iLoaderContext*, iBase* /* context */)
 {
   iMeshObjectType* type = CS_QUERY_PLUGIN_CLASS (plugin_mgr,
@@ -178,7 +178,7 @@ iBase* csFireFactoryLoader::Parse (iDocumentNode* /*node*/,
   }
   iMeshObjectFactory* fact = type->NewFactory ();
   type->DecRef ();
-  return fact;
+  return csPtr<iBase> (fact);
 }
 
 //---------------------------------------------------------------------------
@@ -250,7 +250,7 @@ bool csFireLoader::Initialize (iObjectRegistry* object_reg)
   return true;
 }
 
-iBase* csFireLoader::Parse (const char* string, 
+csPtr<iBase> csFireLoader::Parse (const char* string, 
 			    iLoaderContext* ldr_context, iBase*)
 {
   CS_TOKEN_TABLE_START (commands)
@@ -288,7 +288,7 @@ iBase* csFireLoader::Parse (const char* string,
       // @@@ Error handling!
       if (partstate) partstate->DecRef ();
       if (firestate) firestate->DecRef ();
-      return NULL;
+      return csPtr<iBase> (NULL);
     }
     switch (cmd)
     {
@@ -359,7 +359,7 @@ iBase* csFireLoader::Parse (const char* string,
 	    // @@@ Error handling!
 	    if (partstate) partstate->DecRef ();
 	    if (firestate) firestate->DecRef ();
-	    return NULL;
+	    return csPtr<iBase> (NULL);
 	  }
 	  mesh = fact->GetMeshObjectFactory ()->NewInstance ();
           partstate = SCF_QUERY_INTERFACE (mesh, iParticleState);
@@ -377,7 +377,7 @@ iBase* csFireLoader::Parse (const char* string,
             mesh->DecRef ();
 	    if (partstate) partstate->DecRef ();
 	    if (firestate) firestate->DecRef ();
-            return NULL;
+            return csPtr<iBase> (NULL);
 	  }
 	  partstate->SetMaterialWrapper (mat);
 	}
@@ -406,10 +406,10 @@ iBase* csFireLoader::Parse (const char* string,
 
   if (partstate) partstate->DecRef ();
   if (firestate) firestate->DecRef ();
-  return mesh;
+  return csPtr<iBase> (mesh);
 }
 
-iBase* csFireLoader::Parse (iDocumentNode* node,
+csPtr<iBase> csFireLoader::Parse (iDocumentNode* node,
 			    iLoaderContext* ldr_context, iBase*)
 {
   csRef<iMeshObject> mesh;
@@ -429,7 +429,7 @@ iBase* csFireLoader::Parse (iDocumentNode* node,
 	{
 	  csColor color;
 	  if (!synldr->ParseColor (child, color))
-	    return NULL;
+	    return csPtr<iBase> (NULL);
 	  partstate->SetColor (color);
 	}
 	break;
@@ -445,7 +445,7 @@ iBase* csFireLoader::Parse (iDocumentNode* node,
 	{
 	  csBox3 box;
 	  if (!synldr->ParseBox (child, box))
-	    return NULL;
+	    return csPtr<iBase> (NULL);
 	  firestate->SetOrigin (box);
 	}
 	break;
@@ -453,7 +453,7 @@ iBase* csFireLoader::Parse (iDocumentNode* node,
 	{
 	  csVector3 origin;
 	  if (!synldr->ParseVector (child, origin))
-	    return NULL;
+	    return csPtr<iBase> (NULL);
 	  firestate->SetOrigin (origin);
 	}
 	break;
@@ -461,7 +461,7 @@ iBase* csFireLoader::Parse (iDocumentNode* node,
 	{
 	  csVector3 dir;
 	  if (!synldr->ParseVector (child, dir))
-	    return NULL;
+	    return csPtr<iBase> (NULL);
 	  firestate->SetDirection (dir);
 	}
 	break;
@@ -482,7 +482,7 @@ iBase* csFireLoader::Parse (iDocumentNode* node,
 	  {
       	    synldr->ReportError ("crystalspace.fireloader.parse.unknownfactory",
 		child, "Couldn't find factory '%s'!", factname);
-	    return NULL;
+	    return csPtr<iBase> (NULL);
 	  }
 	  mesh = fact->GetMeshObjectFactory ()->NewInstance ();
           partstate = SCF_QUERY_INTERFACE (mesh, iParticleState);
@@ -498,7 +498,7 @@ iBase* csFireLoader::Parse (iDocumentNode* node,
       	    synldr->ReportError (
 		"crystalspace.fireloader.parse.unknownmaterial",
 		child, "Couldn't find material '%s'!", matname);
-	    return NULL;
+	    return csPtr<iBase> (NULL);
 	  }
 	  partstate->SetMaterialWrapper (mat);
 	}
@@ -507,7 +507,7 @@ iBase* csFireLoader::Parse (iDocumentNode* node,
         {
 	  uint mode;
 	  if (!synldr->ParseMixmode (child, mode))
-	    return NULL;
+	    return csPtr<iBase> (NULL);
           partstate->SetMixMode (mode);
 	}
 	break;
@@ -515,7 +515,7 @@ iBase* csFireLoader::Parse (iDocumentNode* node,
         {
           bool do_lighting;
 	  if (!synldr->ParseBool (child, do_lighting, true))
-	    return NULL;
+	    return csPtr<iBase> (NULL);
           firestate->SetLighting (do_lighting);
         }
         break;
@@ -524,13 +524,13 @@ iBase* csFireLoader::Parse (iDocumentNode* node,
         break;
       default:
       	synldr->ReportBadToken (child);
-	return NULL;
+	return csPtr<iBase> (NULL);
     }
   }
 
   // Incref so that smart pointer doesn't release reference.
   if (mesh) mesh->IncRef ();
-  return mesh;
+  return csPtr<iBase> (mesh);
 }
 
 //---------------------------------------------------------------------------

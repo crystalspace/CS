@@ -2654,8 +2654,8 @@ csPtr<iMeshFactoryWrapper> csEngine::LoadMeshFactory (
 
   char *buf = **input;
   iLoaderContext* elctxt = CreateLoaderContext ();
-  iBase *mof = plug->Parse (
-      buf, elctxt, fact->GetMeshObjectFactory ());
+  csRef<iBase> mof (plug->Parse (
+      buf, elctxt, fact->GetMeshObjectFactory ()));
   elctxt->DecRef ();
   if (!mof)
   {
@@ -2663,7 +2663,8 @@ csPtr<iMeshFactoryWrapper> csEngine::LoadMeshFactory (
     return csPtr<iMeshFactoryWrapper> (NULL);
   }
 
-  iMeshObjectFactory *mof2 = SCF_QUERY_INTERFACE (mof, iMeshObjectFactory);
+  csRef<iMeshObjectFactory> mof2 (
+  	SCF_QUERY_INTERFACE (mof, iMeshObjectFactory));
   if (!mof2)
   {
     // @@@ ERROR?
@@ -2673,8 +2674,7 @@ csPtr<iMeshFactoryWrapper> csEngine::LoadMeshFactory (
 
   fact->SetMeshObjectFactory (mof2);
   mof2->SetLogicalParent (fact);
-  mof2->DecRef ();
-  mof->DecRef ();
+
   fact->IncRef (); // Avoid cleanup of smart pointer.
   return csPtr<iMeshFactoryWrapper> (fact);
 }
@@ -2710,8 +2710,7 @@ csPtr<iMeshWrapper> csEngine::LoadMeshWrapper (
 
   char *buf = **input;
   iLoaderContext* elctxt = CreateLoaderContext ();
-  iBase *mof = plug->Parse (
-      buf, elctxt, imw);
+  csRef<iBase> mof (plug->Parse (buf, elctxt, imw));
   elctxt->DecRef ();
   if (!mof)
   {
@@ -2720,8 +2719,8 @@ csPtr<iMeshWrapper> csEngine::LoadMeshWrapper (
     return csPtr<iMeshWrapper> (NULL);
   }
 
-  meshwrap->SetMeshObject ((iMeshObject *)mof);
-  mof->DecRef ();
+  csRef<iMeshObject> mof2 (SCF_QUERY_INTERFACE (mof, iMeshObject));
+  meshwrap->SetMeshObject (mof2);
   return csPtr<iMeshWrapper> (imw);
 }
 

@@ -295,11 +295,12 @@ struct iThingEnvironment : public iBase
    * If you don't use a name then there is no way to find the plane by name
    * later.
    */
-  virtual iPolyTxtPlane* CreatePolyTxtPlane (const char* name = NULL) = 0;
+  virtual csPtr<iPolyTxtPlane> CreatePolyTxtPlane (const char* name = NULL) = 0;
   /// Find a plane with the given name.
   virtual iPolyTxtPlane* FindPolyTxtPlane (const char* name) = 0;
   /// Create a bezier template with the given name.
-  virtual iCurveTemplate* CreateBezierTemplate (const char* name = NULL) = 0;
+  virtual csPtr<iCurveTemplate> CreateBezierTemplate (
+  	const char* name = NULL) = 0;
   /// Find a bezier template.
   virtual iCurveTemplate* FindCurveTemplate (const char *iName) = 0;
   /// Remove the given polygon texture mapping plane.

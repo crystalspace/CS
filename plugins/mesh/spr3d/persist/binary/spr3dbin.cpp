@@ -146,7 +146,7 @@ bool csSprite3DBinFactoryLoader::Initialize (iObjectRegistry* object_reg)
 /**
  * Loads a csSprite3DBinFactoryLoader
  */
-iBase* csSprite3DBinFactoryLoader::Parse (void* data,
+csPtr<iBase> csSprite3DBinFactoryLoader::Parse (void* data,
 				       iLoaderContext* ldr_context,
 				       iBase* context)
 {
@@ -162,7 +162,7 @@ iBase* csSprite3DBinFactoryLoader::Parse (void* data,
     ReportError (reporter,
 		"crystalspace.sprite3dbinfactoryloader.setup.objecttype",
 		"Could not load the sprite.3d mesh object plugin!");
-    return NULL;
+    return csPtr<iBase> (NULL);
   }
 
   // @@@ Temporary fix to allow to set actions for objects loaded
@@ -182,7 +182,6 @@ iBase* csSprite3DBinFactoryLoader::Parse (void* data,
   type->DecRef ();
   iSprite3DFactoryState* spr3dLook = SCF_QUERY_INTERFACE (fact,
   	iSprite3DFactoryState);
-
 
   char* p = (char*)data;
 
@@ -218,7 +217,7 @@ iBase* csSprite3DBinFactoryLoader::Parse (void* data,
 	"Couldn't find material named '%s'", mat_name);
     spr3dLook->DecRef ();
     fact->DecRef ();
-    return NULL;
+    return csPtr<iBase> (NULL);
   }
   spr3dLook->SetMaterialWrapper (mat);
   p += strlen(mat_name) + 1;
@@ -268,7 +267,7 @@ iBase* csSprite3DBinFactoryLoader::Parse (void* data,
 	    fr->GetName ());
 	spr3dLook->DecRef ();
 	fact->DecRef ();
-	return NULL;
+	return csPtr<iBase> (NULL);
       }
       spr3dLook->SetVertex (anm_idx, j, csVector3 (x, y, z));
       spr3dLook->SetTexel  (tex_idx, j, csVector2 (u, v));
@@ -282,7 +281,7 @@ iBase* csSprite3DBinFactoryLoader::Parse (void* data,
 	fr->GetName ());
       spr3dLook->DecRef ();
       fact->DecRef ();
-      return NULL;
+      return csPtr<iBase> (NULL);
     }
   }
 
@@ -318,7 +317,7 @@ iBase* csSprite3DBinFactoryLoader::Parse (void* data,
 	  fn, act->GetName ());
 	spr3dLook->DecRef ();
 	fact->DecRef ();
-	return NULL;
+	return csPtr<iBase> (NULL);
       }
 
       // Read the delay
@@ -348,9 +347,9 @@ iBase* csSprite3DBinFactoryLoader::Parse (void* data,
     char name[64];
     strcpy(name, p);
     p += strlen(name) + 1;
-    
+ 
     int a = convert_endian(*((int32 *)p)); p += sizeof(int);
-    
+ 
     iSpriteSocket* socket = spr3dLook->AddSocket();
     socket->SetName(name);
     socket->SetTriangleIndex(a);
@@ -366,7 +365,7 @@ iBase* csSprite3DBinFactoryLoader::Parse (void* data,
   spr3dLook->EnableTweening (*p++);
 
   spr3dLook->DecRef ();
-  return fact;
+  return csPtr<iBase> (fact);
 }
 
 //---------------------------------------------------------------------------

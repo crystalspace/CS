@@ -1075,8 +1075,8 @@ void csThing::HardTransform (const csReversibleTransform &t)
       // This plane is potentially shared. We have to make a duplicate
       // and modify all polygons to use this one. Note that this will
       // mean that potentially two planes exist with the same name.
-      iPolyTxtPlane *new_pl = csEngine::current_engine->thing_type->
-        CreatePolyTxtPlane (pl->QueryObject ()->GetName ());
+      csRef<iPolyTxtPlane> new_pl (csEngine::current_engine->thing_type->
+        CreatePolyTxtPlane (pl->QueryObject ()->GetName ()));
       csMatrix3 m;
       csVector3 v;
       pl->GetTextureSpace (m, v);
@@ -4186,11 +4186,12 @@ csPtr<iMeshObjectFactory> csThingObjectType::NewFactory ()
   return csPtr<iMeshObjectFactory> (ifact);
 }
 
-iPolyTxtPlane *csThingObjectType::CreatePolyTxtPlane (const char *name)
+csPtr<iPolyTxtPlane> csThingObjectType::CreatePolyTxtPlane (const char *name)
 {
   csPolyTxtPlane *pl = new csPolyTxtPlane ();
   planes.Push (pl);
   if (name) pl->SetName (name);
+  pl->IncRef ();
   return &(pl->scfiPolyTxtPlane);
 }
 
@@ -4202,17 +4203,12 @@ iPolyTxtPlane *csThingObjectType::FindPolyTxtPlane (const char *iName)
   return &(pl->scfiPolyTxtPlane);
 }
 
-iCurveTemplate *csThingObjectType::CreateBezierTemplate (const char *name)
+csPtr<iCurveTemplate> csThingObjectType::CreateBezierTemplate (const char *name)
 {
   csBezierTemplate *ptemplate = new csBezierTemplate ();
   if (name) ptemplate->SetName (name);
   curve_templates.Push (ptemplate);
-
-  iCurveTemplate *itmpl = SCF_QUERY_INTERFACE (
-      ptemplate,
-      iCurveTemplate);
-  itmpl->DecRef ();
-  return itmpl;
+  return SCF_QUERY_INTERFACE (ptemplate, iCurveTemplate);
 }
 
 iCurveTemplate *csThingObjectType::FindCurveTemplate (const char *iName)

@@ -49,11 +49,11 @@ public:
   bool Initialize (iObjectRegistry* p);
 
   /// Parse a given string and return a new object for it.
-  virtual iBase* Parse (const char* string, iLoaderContext* ldr_context,
+  virtual csPtr<iBase> Parse (const char* string, iLoaderContext* ldr_context,
   	iBase* context);
 
   /// Parse a given node and return a new object for it.
-  virtual iBase* Parse (iDocumentNode* node,
+  virtual csPtr<iBase> Parse (iDocumentNode* node,
     iLoaderContext* ldr_context, iBase* context);
 
   struct eiComponent : public iComponent
@@ -86,11 +86,11 @@ public:
   bool Initialize (iObjectRegistry* p);
 
   /// Parse a given string and return a new object for it.
-  virtual iBase* Parse (const char* string, iLoaderContext* ldr_context,
+  virtual csPtr<iBase> Parse (const char* string, iLoaderContext* ldr_context,
 	  iBase* context);
 
   /// Parse a given node and return a new object for it.
-  virtual iBase* Parse (iDocumentNode* node,
+  virtual csPtr<iBase> Parse (iDocumentNode* node,
     iLoaderContext* ldr_context, iBase* context);
 
   struct eiComponent : public iComponent

@@ -990,24 +990,22 @@ bool csIsoLoader::ParseMeshFactory(char *buf, const char *prefix)
           }
 
       	  // iMeshFactoryWrapper context.
-          iBase* mof = plug->Parse (params, GetLoaderContext(), mfw);
-	        if (!mof)
+          csRef<iBase> mof (plug->Parse (params, GetLoaderContext(), mfw));
+          if (!mof)
           {
             ReportError (tag, "Plugin loaded but cant parse PARAMS!");
 	          return false;
           }
-     	    iMeshObjectFactory* mof2 = SCF_QUERY_INTERFACE (mof,
-              iMeshObjectFactory);
-	        if (!mof2)
+     	  csRef<iMeshObjectFactory> mof2 (SCF_QUERY_INTERFACE (mof,
+              iMeshObjectFactory));
+	  if (!mof2)
           {
             ReportError (tag,
               "Returned object does not implement iMeshObjectFactory!");
 	          return false;
           }
-	        mfw->SetMeshObjectFactory (mof2);
-	        mof2->SetLogicalParent (mfw);
-	        mof2->DecRef ();
-	        mof->DecRef ();
+	  mfw->SetMeshObjectFactory (mof2);
+	  mof2->SetLogicalParent (mfw);
         }
         break;
 
@@ -1161,8 +1159,8 @@ bool csIsoLoader::ParseMeshObject (char* buf, const char* prefix)
 	          return false;
           }
 
-	        iBase* mo = plug->Parse (params, GetLoaderContext(), NULL);
-	        if (!mo)
+          csRef<iBase> mo (plug->Parse (params, GetLoaderContext(), NULL));
+	  if (!mo)
           {
             ReportError (tag,"Error in PARAMS() for %s.",prefix);
 	          return false;
@@ -1177,7 +1175,6 @@ bool csIsoLoader::ParseMeshObject (char* buf, const char* prefix)
 	          return false;
           }
           meshspr->SetMeshObject(meshobj);
-          mo->DecRef();
         }
         break;
 

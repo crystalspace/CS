@@ -169,7 +169,7 @@ bool csBallFactoryLoader::Initialize (iObjectRegistry* object_reg)
   return true;
 }
 
-iBase* csBallFactoryLoader::Parse (const char* /*string*/,
+csPtr<iBase> csBallFactoryLoader::Parse (const char* /*string*/,
 	iLoaderContext*, iBase* /* context */)
 {
   csRef<iMeshObjectType> type (CS_QUERY_PLUGIN_CLASS (plugin_mgr,
@@ -184,13 +184,15 @@ iBase* csBallFactoryLoader::Parse (const char* /*string*/,
     ReportError (reporter,
 		"crystalspace.ballfactoryloader.setup.objecttype",
 		"Could not load the ball mesh object plugin!");
-    return NULL;
+    return csPtr<iBase> (NULL);
   }
-  iMeshObjectFactory* fact = type->NewFactory ();
-  return fact;
+  csRef<iMeshObjectFactory> fact (type->NewFactory ());
+  // Incref so that smart pointer doesn't delete.
+  if (fact) fact->IncRef ();
+  return csPtr<iBase> (fact);
 }
 
-iBase* csBallFactoryLoader::Parse (iDocumentNode*,
+csPtr<iBase> csBallFactoryLoader::Parse (iDocumentNode*,
 			     iLoaderContext*, iBase*)
 {
   csRef<iMeshObjectType> type (CS_QUERY_PLUGIN_CLASS (plugin_mgr,
@@ -205,10 +207,12 @@ iBase* csBallFactoryLoader::Parse (iDocumentNode*,
     ReportError (reporter,
 		"crystalspace.ballfactoryloader.setup.objecttype",
 		"Could not load the ball mesh object plugin!");
-    return NULL;
+    return csPtr<iBase> (NULL);
   }
-  iMeshObjectFactory* fact = type->NewFactory ();
-  return fact;
+  csRef<iMeshObjectFactory> fact (type->NewFactory ());
+  // Incref so that smart pointer doesn't delete.
+  if (fact) fact->IncRef ();
+  return csPtr<iBase> (fact);
 }
 
 //---------------------------------------------------------------------------
@@ -281,7 +285,7 @@ bool csBallLoader::Initialize (iObjectRegistry* object_reg)
   return true;
 }
 
-iBase* csBallLoader::Parse (const char* string, 
+csPtr<iBase> csBallLoader::Parse (const char* string, 
 			    iLoaderContext* ldr_context, iBase*)
 {
   CS_TOKEN_TABLE_START (commands)
@@ -317,7 +321,7 @@ iBase* csBallLoader::Parse (const char* string,
 		"crystalspace.ballloader.parse.badformat",
 		"Bad format while parsing ball object!");
       if (ballstate) ballstate->DecRef ();
-      return NULL;
+      return csPtr<iBase> (NULL);
     }
     switch (cmd)
     {
@@ -387,7 +391,7 @@ iBase* csBallLoader::Parse (const char* string,
 		"crystalspace.ballloader.parse.unknownfactory",
 		"Couldn't find factory '%s'!", str);
 	    if (ballstate) ballstate->DecRef ();
-	    return NULL;
+	    return csPtr<iBase> (NULL);
 	  }
 	  mesh = fact->GetMeshObjectFactory ()->NewInstance ();
           ballstate = SCF_QUERY_INTERFACE (mesh, iBallState);
@@ -403,7 +407,7 @@ iBase* csBallLoader::Parse (const char* string,
 		"crystalspace.ballloader.parse.unknownmaterial",
 		"Couldn't find material '%s'!", str);
             mesh->DecRef ();
-            return NULL;
+            return csPtr<iBase> (NULL);
 	  }
 	  ballstate->SetMaterialWrapper (mat);
 	}
@@ -416,7 +420,7 @@ iBase* csBallLoader::Parse (const char* string,
 	  	"Error parsing mixmode!");
 	  if (ballstate) ballstate->DecRef ();
 	  mesh->DecRef ();
-	  return NULL;
+	  return csPtr<iBase> (NULL);
 	}
         ballstate->SetMixMode (mm);
 	break;
@@ -424,10 +428,10 @@ iBase* csBallLoader::Parse (const char* string,
   }
 
   if (ballstate) ballstate->DecRef ();
-  return mesh;
+  return csPtr<iBase> (mesh);
 }
 
-iBase* csBallLoader::Parse (iDocumentNode* node,
+csPtr<iBase> csBallLoader::Parse (iDocumentNode* node,
 			     iLoaderContext* ldr_context, iBase*)
 {
   csRef<iMeshObject> mesh;
@@ -446,7 +450,7 @@ iBase* csBallLoader::Parse (iDocumentNode* node,
 	{
 	  bool r;
 	  if (!synldr->ParseBool (child, r, true))
-	    return false;
+	    return csPtr<iBase> (NULL);
 	  ballstate->SetReversed (r);
 	}
 	break;
@@ -454,7 +458,7 @@ iBase* csBallLoader::Parse (iDocumentNode* node,
 	{
 	  bool r;
 	  if (!synldr->ParseBool (child, r, true))
-	    return false;
+	    return csPtr<iBase> (NULL);
 	  ballstate->SetTopOnly (r);
 	}
 	break;
@@ -462,7 +466,7 @@ iBase* csBallLoader::Parse (iDocumentNode* node,
 	{
 	  bool r;
 	  if (!synldr->ParseBool (child, r, true))
-	    return false;
+	    return csPtr<iBase> (NULL);
 	  ballstate->SetCylindricalMapping (r);
 	}
 	break;
@@ -470,7 +474,7 @@ iBase* csBallLoader::Parse (iDocumentNode* node,
 	{
 	  bool r;
 	  if (!synldr->ParseBool (child, r, true))
-	    return false;
+	    return csPtr<iBase> (NULL);
 	  ballstate->SetLighting (r);
 	}
 	break;
@@ -478,7 +482,7 @@ iBase* csBallLoader::Parse (iDocumentNode* node,
 	{
 	  csColor col;
 	  if (!synldr->ParseColor (child, col))
-	    return false;
+	    return csPtr<iBase> (NULL);
 	  ballstate->SetColor (col);
 	}
 	break;
@@ -486,7 +490,7 @@ iBase* csBallLoader::Parse (iDocumentNode* node,
 	{
 	  csVector3 rad;
 	  if (!synldr->ParseVector (child, rad))
-	    return false;
+	    return csPtr<iBase> (NULL);
 	  ballstate->SetRadius (rad.x, rad.y, rad.z);
 	}
 	break;
@@ -494,7 +498,7 @@ iBase* csBallLoader::Parse (iDocumentNode* node,
 	{
 	  csVector3 rad;
 	  if (!synldr->ParseVector (child, rad))
-	    return false;
+	    return csPtr<iBase> (NULL);
 	  ballstate->SetShift (rad.x, rad.y, rad.z);
 	}
 	break;
@@ -512,7 +516,7 @@ iBase* csBallLoader::Parse (iDocumentNode* node,
 	  {
       	    synldr->ReportError ("crystalspace.ballloader.parse.unknownfactory",
 		child, "Couldn't find factory '%s'!", factname);
-	    return NULL;
+	    return csPtr<iBase> (NULL);
 	  }
 	  mesh = fact->GetMeshObjectFactory ()->NewInstance ();
           ballstate = SCF_QUERY_INTERFACE (mesh, iBallState);
@@ -527,7 +531,7 @@ iBase* csBallLoader::Parse (iDocumentNode* node,
       	    synldr->ReportError (
 		"crystalspace.ballloader.parse.unknownmaterial",
 		child, "Couldn't find material '%s'!", matname);
-            return NULL;
+            return csPtr<iBase> (NULL);
 	  }
 	  ballstate->SetMaterialWrapper (mat);
 	}
@@ -536,19 +540,19 @@ iBase* csBallLoader::Parse (iDocumentNode* node,
 	{
 	  uint mm;
 	  if (!synldr->ParseMixmode (child, mm))
-	    return NULL;
+	    return csPtr<iBase> (NULL);
           ballstate->SetMixMode (mm);
 	}
 	break;
       default:
         synldr->ReportBadToken (child);
-	return NULL;
+	return csPtr<iBase> (NULL);
     }
   }
 
   // IncRef() because otherwise our smart pointer will clean things up.
   mesh->IncRef ();
-  return mesh;
+  return csPtr<iBase> (mesh);
 }
 
 

@@ -60,7 +60,7 @@ public:
   virtual bool Initialize (iObjectRegistry *object_reg);
 
   /// Parse data  and return a new object for it.
-  virtual iBase* Parse (void* data, 
+  virtual csPtr<iBase> Parse (void* data, 
     iLoaderContext* ldr_context, iBase* context);
 
   struct eiComponent : public iComponent

@@ -141,7 +141,7 @@ bool csRainFactoryLoader::Initialize (iObjectRegistry* object_reg)
   return true;
 }
 
-iBase* csRainFactoryLoader::Parse (const char* /*string*/,
+csPtr<iBase> csRainFactoryLoader::Parse (const char* /*string*/,
 	iLoaderContext*, iBase* /* context */)
 {
   iMeshObjectType* type = CS_QUERY_PLUGIN_CLASS (plugin_mgr,
@@ -154,10 +154,10 @@ iBase* csRainFactoryLoader::Parse (const char* /*string*/,
   }
   iMeshObjectFactory* fact = type->NewFactory ();
   type->DecRef ();
-  return fact;
+  return csPtr<iBase> (fact);
 }
 
-iBase* csRainFactoryLoader::Parse (iDocumentNode* /*node*/,
+csPtr<iBase> csRainFactoryLoader::Parse (iDocumentNode* /*node*/,
 	iLoaderContext*, iBase* /* context */)
 {
   iMeshObjectType* type = CS_QUERY_PLUGIN_CLASS (plugin_mgr,
@@ -170,7 +170,7 @@ iBase* csRainFactoryLoader::Parse (iDocumentNode* /*node*/,
   }
   iMeshObjectFactory* fact = type->NewFactory ();
   type->DecRef ();
-  return fact;
+  return csPtr<iBase> (fact);
 }
 
 //---------------------------------------------------------------------------
@@ -236,7 +236,7 @@ bool csRainLoader::Initialize (iObjectRegistry* object_reg)
   return true;
 }
 
-iBase* csRainLoader::Parse (const char* string,
+csPtr<iBase> csRainLoader::Parse (const char* string,
 	iLoaderContext* ldr_context, iBase*)
 {
   CS_TOKEN_TABLE_START (commands)
@@ -270,7 +270,7 @@ iBase* csRainLoader::Parse (const char* string,
       // @@@ Error handling!
       if (partstate) partstate->DecRef ();
       if (rainstate) rainstate->DecRef ();
-      return NULL;
+      return csPtr<iBase> (NULL);
     }
     switch (cmd)
     {
@@ -313,7 +313,7 @@ iBase* csRainLoader::Parse (const char* string,
 	    // @@@ Error handling!
 	    if (partstate) partstate->DecRef ();
 	    if (rainstate) rainstate->DecRef ();
-	    return NULL;
+	    return csPtr<iBase> (NULL);
 	  }
 	  mesh = fact->GetMeshObjectFactory ()->NewInstance ();
           partstate = SCF_QUERY_INTERFACE (mesh, iParticleState);
@@ -330,7 +330,7 @@ iBase* csRainLoader::Parse (const char* string,
             mesh->DecRef ();
 	    if (partstate) partstate->DecRef ();
 	    if (rainstate) rainstate->DecRef ();
-            return NULL;
+            return csPtr<iBase> (NULL);
 	  }
 	  partstate->SetMaterialWrapper (mat);
 	}
@@ -359,10 +359,10 @@ iBase* csRainLoader::Parse (const char* string,
 
   if (partstate) partstate->DecRef ();
   if (rainstate) rainstate->DecRef ();
-  return mesh;
+  return csPtr<iBase> (mesh);
 }
 
-iBase* csRainLoader::Parse (iDocumentNode* node,
+csPtr<iBase> csRainLoader::Parse (iDocumentNode* node,
 	iLoaderContext* ldr_context, iBase*)
 {
   csRef<iMeshObject> mesh;
@@ -382,7 +382,7 @@ iBase* csRainLoader::Parse (iDocumentNode* node,
 	{
 	  csColor color;
 	  if (!synldr->ParseColor (child, color))
-	    return NULL;
+	    return csPtr<iBase> (NULL);
 	  partstate->SetColor (color);
 	}
 	break;
@@ -398,7 +398,7 @@ iBase* csRainLoader::Parse (iDocumentNode* node,
 	{
 	  csBox3 box;
 	  if (!synldr->ParseBox (child, box))
-	    return NULL;
+	    return csPtr<iBase> (NULL);
 	  rainstate->SetBox (box.Min (), box.Max ());
 	}
 	break;
@@ -406,7 +406,7 @@ iBase* csRainLoader::Parse (iDocumentNode* node,
 	{
 	  csVector3 s;
 	  if (!synldr->ParseVector (child, s))
-	    return NULL;
+	    return csPtr<iBase> (NULL);
 	  rainstate->SetFallSpeed (s);
 	}
 	break;
@@ -419,7 +419,7 @@ iBase* csRainLoader::Parse (iDocumentNode* node,
       	    synldr->ReportError (
 		"crystalspace.rainloader.parse.unknownfactory",
 		child, "Couldn't find factory '%s'!", factname);
-	    return NULL;
+	    return csPtr<iBase> (NULL);
 	  }
 	  mesh = fact->GetMeshObjectFactory ()->NewInstance ();
           partstate = SCF_QUERY_INTERFACE (mesh, iParticleState);
@@ -435,7 +435,7 @@ iBase* csRainLoader::Parse (iDocumentNode* node,
       	    synldr->ReportError (
 		"crystalspace.rainloader.parse.unknownmaterial",
 		child, "Couldn't find material '%s'!", matname);
-            return NULL;
+            return csPtr<iBase> (NULL);
 	  }
 	  partstate->SetMaterialWrapper (mat);
 	}
@@ -444,7 +444,7 @@ iBase* csRainLoader::Parse (iDocumentNode* node,
 	{
 	  uint mode;
 	  if (!synldr->ParseMixmode (child, mode))
-	    return NULL;
+	    return csPtr<iBase> (NULL);
           partstate->SetMixMode (mode);
 	}
 	break;
@@ -452,7 +452,7 @@ iBase* csRainLoader::Parse (iDocumentNode* node,
         {
           bool do_lighting;
 	  if (!synldr->ParseBool (child, do_lighting, true))
-	    return NULL;
+	    return csPtr<iBase> (NULL);
           rainstate->SetLighting (do_lighting);
         }
         break;
@@ -461,13 +461,13 @@ iBase* csRainLoader::Parse (iDocumentNode* node,
         break;
       default:
 	synldr->ReportBadToken (child);
-	return NULL;
+	return csPtr<iBase> (NULL);
     }
   }
 
   // Incref to avoid smart pointer from releasing reference.
   if (mesh) mesh->IncRef ();
-  return mesh;
+  return csPtr<iBase> (mesh);
 }
 
 //---------------------------------------------------------------------------

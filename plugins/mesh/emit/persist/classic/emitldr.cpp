@@ -171,7 +171,7 @@ bool csEmitFactoryLoader::Initialize (iObjectRegistry* object_reg)
   return true;
 }
 
-iBase* csEmitFactoryLoader::Parse (const char* /*string*/,
+csPtr<iBase> csEmitFactoryLoader::Parse (const char* /*string*/,
 	iLoaderContext*, iBase* /* context */)
 {
   iMeshObjectType* type = CS_QUERY_PLUGIN_CLASS (plugin_mgr,
@@ -184,10 +184,10 @@ iBase* csEmitFactoryLoader::Parse (const char* /*string*/,
   }
   iMeshObjectFactory* fact = type->NewFactory ();
   type->DecRef ();
-  return fact;
+  return csPtr<iBase> (fact);
 }
 
-iBase* csEmitFactoryLoader::Parse (iDocumentNode* /*node*/,
+csPtr<iBase> csEmitFactoryLoader::Parse (iDocumentNode* /*node*/,
 	iLoaderContext*, iBase* /* context */)
 {
   iMeshObjectType* type = CS_QUERY_PLUGIN_CLASS (plugin_mgr,
@@ -200,7 +200,7 @@ iBase* csEmitFactoryLoader::Parse (iDocumentNode* /*node*/,
   }
   iMeshObjectFactory* fact = type->NewFactory ();
   type->DecRef ();
-  return fact;
+  return csPtr<iBase> (fact);
 }
 
 //---------------------------------------------------------------------------
@@ -573,7 +573,7 @@ iEmitGen3D* csEmitLoader::ParseEmit (iDocumentNode* node,
   return result;
 }
 
-iBase* csEmitLoader::Parse (const char* string, 
+csPtr<iBase> csEmitLoader::Parse (const char* string, 
 			    iLoaderContext* ldr_context, iBase*)
 {
   CS_TOKEN_TABLE_START (commands)
@@ -616,7 +616,7 @@ iBase* csEmitLoader::Parse (const char* string,
       SCF_DEC_REF (partstate);
       SCF_DEC_REF (emitstate);
       SCF_DEC_REF (emitfactorystate);
-      return NULL;
+      return csPtr<iBase> (NULL);
     }
     switch (cmd)
     {
@@ -631,7 +631,7 @@ iBase* csEmitLoader::Parse (const char* string,
             SCF_DEC_REF (partstate);
             SCF_DEC_REF (emitstate);
             SCF_DEC_REF (emitfactorystate);
-	    return NULL;
+	    return csPtr<iBase> (NULL);
 	  }
 	  mesh = fact->GetMeshObjectFactory ()->NewInstance ();
           partstate = SCF_QUERY_INTERFACE (mesh, iParticleState);
@@ -652,7 +652,7 @@ iBase* csEmitLoader::Parse (const char* string,
             SCF_DEC_REF (partstate);
             SCF_DEC_REF (emitstate);
             SCF_DEC_REF (emitfactorystate);
-            return NULL;
+            return csPtr<iBase> (NULL);
 	  }
 	  partstate->SetMaterialWrapper (mat);
 	}
@@ -749,10 +749,10 @@ iBase* csEmitLoader::Parse (const char* string,
   SCF_DEC_REF (partstate);
   SCF_DEC_REF (emitstate);
   SCF_DEC_REF (emitfactorystate);
-  return mesh;
+  return csPtr<iBase> (mesh);
 }
 
-iBase* csEmitLoader::Parse (iDocumentNode* node,
+csPtr<iBase> csEmitLoader::Parse (iDocumentNode* node,
 			    iLoaderContext* ldr_context, iBase*)
 {
   iEmitGen3D *emit;
@@ -778,7 +778,7 @@ iBase* csEmitLoader::Parse (iDocumentNode* node,
 	  {
 	    synldr->ReportError ("crystalspace.emitloader.parse",
 		child, "Cannot find factory '%s' for emit!", factname);
-	    return NULL;
+	    return csPtr<iBase> (NULL);
 	  }
 	  mesh = fact->GetMeshObjectFactory ()->NewInstance ();
           partstate = SCF_QUERY_INTERFACE (mesh, iParticleState);
@@ -795,7 +795,7 @@ iBase* csEmitLoader::Parse (iDocumentNode* node,
 	  {
 	    synldr->ReportError ("crystalspace.emitloader.parse",
 		child, "Cannot find material '%s' for emit!", matname);
-            return NULL;
+            return csPtr<iBase> (NULL);
 	  }
 	  partstate->SetMaterialWrapper (mat);
 	}
@@ -814,7 +814,7 @@ iBase* csEmitLoader::Parse (iDocumentNode* node,
 	{
 	  bool light = false;
 	  if (!synldr->ParseBool (child, light, true))
-	    return NULL;
+	    return csPtr<iBase> (NULL);
 	  emitstate->SetLighting (light);
 	}
 	break;
@@ -848,7 +848,7 @@ iBase* csEmitLoader::Parse (iDocumentNode* node,
 	  {
 	    synldr->ReportError ("crystalspace.emitloader.parse",
 		child, "Missing 'alpha' in 'aging'!");
-            return NULL;
+            return csPtr<iBase> (NULL);
 	  }
 	  alpha = alphanode->GetContentsValueAsFloat ();
 	  csRef<iDocumentNode> swirlnode = child->GetNode ("swirl");
@@ -856,7 +856,7 @@ iBase* csEmitLoader::Parse (iDocumentNode* node,
 	  {
 	    synldr->ReportError ("crystalspace.emitloader.parse",
 		child, "Missing 'swirl' in 'aging'!");
-            return NULL;
+            return csPtr<iBase> (NULL);
 	  }
 	  swirl = swirlnode->GetContentsValueAsFloat ();
 	  csRef<iDocumentNode> scalenode = child->GetNode ("scale");
@@ -864,7 +864,7 @@ iBase* csEmitLoader::Parse (iDocumentNode* node,
 	  {
 	    synldr->ReportError ("crystalspace.emitloader.parse",
 		child, "Missing 'scale' in 'aging'!");
-            return NULL;
+            return csPtr<iBase> (NULL);
 	  }
 	  scale = scalenode->GetContentsValueAsFloat ();
 	  csRef<iDocumentNode> rotspeednode = child->GetNode ("rotspeed");
@@ -872,7 +872,7 @@ iBase* csEmitLoader::Parse (iDocumentNode* node,
 	  {
 	    synldr->ReportError ("crystalspace.emitloader.parse",
 		child, "Missing 'rotspeed' in 'aging'!");
-            return NULL;
+            return csPtr<iBase> (NULL);
 	  }
 	  rotspeed = rotspeednode->GetContentsValueAsFloat ();
 	  csRef<iDocumentNode> timenode = child->GetNode ("time");
@@ -880,13 +880,13 @@ iBase* csEmitLoader::Parse (iDocumentNode* node,
 	  {
 	    synldr->ReportError ("crystalspace.emitloader.parse",
 		child, "Missing 'time' in 'aging'!");
-            return NULL;
+            return csPtr<iBase> (NULL);
 	  }
 	  time = timenode->GetContentsValueAsInt ();
 	  csRef<iDocumentNode> colornode = child->GetNode ("color");
 	  if (colornode)
 	    if (!synldr->ParseColor (colornode, col))
-	      return NULL;
+	      return csPtr<iBase> (NULL);
 	  emitstate->AddAge (time, col, alpha, swirl, rotspeed, scale);
 	}
 	break;
@@ -923,13 +923,13 @@ iBase* csEmitLoader::Parse (iDocumentNode* node,
 	break;
       default:
 	synldr->ReportBadToken (child);
-        return NULL;
+        return csPtr<iBase> (NULL);
     }
   }
 
   // Incref so smart pointer doesn't release.
   if (mesh) mesh->IncRef ();
-  return mesh;
+  return csPtr<iBase> (mesh);
 }
 
 //---------------------------------------------------------------------------

@@ -155,7 +155,7 @@ bool csBCTerrFactoryLoader::Initialize (iObjectRegistry *object_reg)
   return true;
 }
 
-iBase* csBCTerrFactoryLoader::Parse (const char* pString,
+csPtr<iBase> csBCTerrFactoryLoader::Parse (const char* pString,
   iLoaderContext* ldr_context, iBase* /* context */)
 {
   //printf("Terrain factory loader: Parsing\n");
@@ -169,7 +169,7 @@ iBase* csBCTerrFactoryLoader::Parse (const char* pString,
     if (!pType)
     {
       csReport (object_reg, CS_REPORTER_SEVERITY_NOTIFY,"Factory Loader","Couldn't Load Object Type");
-      return NULL;
+      return csPtr<iBase> (NULL);
     }
   }
   iMeshObjectFactory* pFactory = pType->NewFactory ();
@@ -180,7 +180,7 @@ iBase* csBCTerrFactoryLoader::Parse (const char* pString,
   {
     csReport (object_reg, CS_REPORTER_SEVERITY_NOTIFY,"Factory Loader","Couldn't Get State");
     pFactory->DecRef ();
-    return NULL;
+    return csPtr<iBase> (NULL);
   }
   // new loading stuff here
   CS_TOKEN_TABLE_START (commands)
@@ -204,7 +204,7 @@ iBase* csBCTerrFactoryLoader::Parse (const char* pString,
     if (!pParams)
     {
       // @@@ Error handling!
-      return NULL;
+      return csPtr<iBase> (NULL);
     }
     switch (cmd)
     {
@@ -227,12 +227,12 @@ iBase* csBCTerrFactoryLoader::Parse (const char* pString,
         {
           // @@@ Error handling!
           csReport (object_reg, CS_REPORTER_SEVERITY_NOTIFY,"Factory Loader","Couldn't Load Material");
-          return NULL;
+          return csPtr<iBase> (NULL);
         }
         /*if ( !mat->GetMaterialHandle () )
         {
           csReport (object_reg, CS_REPORTER_SEVERITY_NOTIFY,"Factory Loader","Couldn't Get Material Handle");
-          return NULL;
+          return csPtr<iBase> (NULL);
         }*/
         iState->SetDefaultMaterial (mat);
       }
@@ -274,10 +274,10 @@ iBase* csBCTerrFactoryLoader::Parse (const char* pString,
   }
   iState->DecRef ();
   //csReport (object_reg, CS_REPORTER_SEVERITY_NOTIFY,"Factory Loader","Created  Factory ");
-  return pFactory;
+  return csPtr<iBase> (pFactory);
 }
 
-iBase* csBCTerrFactoryLoader::Parse (iDocumentNode* node,
+csPtr<iBase> csBCTerrFactoryLoader::Parse (iDocumentNode* node,
   iLoaderContext* ldr_context, iBase* /* context */)
 {
   iMeshObjectType* pType = CS_QUERY_PLUGIN_CLASS (plugin_mgr,
@@ -290,19 +290,19 @@ iBase* csBCTerrFactoryLoader::Parse (iDocumentNode* node,
     {
       csReport (object_reg, CS_REPORTER_SEVERITY_NOTIFY, "Factory Loader",
       	"Couldn't Load Object Type");
-      return NULL;
+      return csPtr<iBase> (NULL);
     }
   }
 
   csRef<iMeshObjectFactory> pFactory (pType->NewFactory ());
   pType->DecRef ();
-  csRef<iBCTerrFactoryState> iState;
-  iState = SCF_QUERY_INTERFACE (pFactory, iBCTerrFactoryState);
+  csRef<iBCTerrFactoryState> iState (
+    SCF_QUERY_INTERFACE (pFactory, iBCTerrFactoryState));
   if (!iState)
   {
     csReport (object_reg, CS_REPORTER_SEVERITY_NOTIFY,
     	"Factory Loader", "Couldn't Get State");
-    return NULL;
+    return csPtr<iBase> (NULL);
   }
 
   csRef<iDocumentNodeIterator> it = node->GetNodes ();
@@ -330,6 +330,7 @@ iBase* csBCTerrFactoryLoader::Parse (iDocumentNode* node,
           {
       	    synldr->ReportError ("crystalspace.bcterrldr.parse.unknownmaterial",
 		  child, "Couldn't find material '%s'!", matname);
+	    return csPtr<iBase> (NULL);
           }
           iState->SetDefaultMaterial (mat);
         }
@@ -344,7 +345,7 @@ iBase* csBCTerrFactoryLoader::Parse (iDocumentNode* node,
 	  {
 	    synldr->ReportError ("crystalspace.bcterrldr.parse",
 	    	child, "Could not find 'distance' node!");
-	    return NULL;
+	    return csPtr<iBase> (NULL);
 	  }
           float distance = distnode->GetContentsValueAsFloat ();
 	  csRef<iDocumentNode> incnode = child->GetNode ("inc");
@@ -352,7 +353,7 @@ iBase* csBCTerrFactoryLoader::Parse (iDocumentNode* node,
 	  {
 	    synldr->ReportError ("crystalspace.bcterrldr.parse",
 	    	child, "Could not find 'inc' node!");
-	    return NULL;
+	    return csPtr<iBase> (NULL);
 	  }
           int inc = incnode->GetContentsValueAsInt ();
           iState->AddLOD (distance, inc);
@@ -365,7 +366,7 @@ iBase* csBCTerrFactoryLoader::Parse (iDocumentNode* node,
 	  {
 	    synldr->ReportError ("crystalspace.bcterrldr.parse",
 	    	child, "Could not find 'distance' node!");
-	    return NULL;
+	    return csPtr<iBase> (NULL);
 	  }
           float d = distnode->GetContentsValueAsFloat ();
 	  csRef<iDocumentNode> startnode = child->GetNode ("start");
@@ -373,7 +374,7 @@ iBase* csBCTerrFactoryLoader::Parse (iDocumentNode* node,
 	  {
 	    synldr->ReportError ("crystalspace.bcterrldr.parse",
 	    	child, "Could not find 'start' node!");
-	    return NULL;
+	    return csPtr<iBase> (NULL);
 	  }
           float s = startnode->GetContentsValueAsFloat ();
           iState->SetSystemDistance (s, d);
@@ -384,12 +385,12 @@ iBase* csBCTerrFactoryLoader::Parse (iDocumentNode* node,
         break;
       default:
         synldr->ReportBadToken (child);
-	return NULL;
+	return csPtr<iBase> (NULL);
     }
   }
   // To avoid smart pointer release.
   if (pFactory) pFactory->IncRef ();
-  return pFactory;
+  return csPtr<iBase> (pFactory);
 }
 
 
@@ -434,7 +435,7 @@ bool csBCTerrLoader::Initialize (iObjectRegistry* object_reg)
   return true;
 }
 
-iBase* csBCTerrLoader::Parse (const char* pString,
+csPtr<iBase> csBCTerrLoader::Parse (const char* pString,
   iLoaderContext* ldr_context, iBase* /* context */)
 {
   //printf("Terrain BC loader: Parse\n");
@@ -474,7 +475,7 @@ iBase* csBCTerrLoader::Parse (const char* pString,
     if (!pParams)
     {
       // @@@ Error handling!
-      return NULL;
+      return csPtr<iBase> (NULL);
     }
     switch (cmd)
     {
@@ -485,7 +486,7 @@ iBase* csBCTerrLoader::Parse (const char* pString,
         if (!iFactory)
         {
           // @@@ Error handling!
-          return NULL;
+          return csPtr<iBase> (NULL);
         }
         iTerrObj = iFactory->GetMeshObjectFactory()->NewInstance();
         iState = SCF_QUERY_INTERFACE (iTerrObj, iBCTerrState);
@@ -665,10 +666,10 @@ iBase* csBCTerrLoader::Parse (const char* pString,
     }
   }
   iState->DecRef ();
-  return iTerrObj;
+  return csPtr<iBase> (iTerrObj);
 }
 
-iBase* csBCTerrLoader::Parse (iDocumentNode* node,
+csPtr<iBase> csBCTerrLoader::Parse (iDocumentNode* node,
   iLoaderContext* ldr_context, iBase* /* context */)
 {
   csRef<iMeshObject> iTerrObj;
@@ -695,7 +696,7 @@ iBase* csBCTerrLoader::Parse (iDocumentNode* node,
           {
       	    synldr->ReportError ("crystalspace.bcterrldr.parse.unknownfactory",
 		    child, "Couldn't find factory '%s'!", factname);
-            return NULL;
+            return csPtr<iBase> (NULL);
           }
           iTerrObj = iFactory->GetMeshObjectFactory()->NewInstance();
           iState = SCF_QUERY_INTERFACE (iTerrObj, iBCTerrState);
@@ -734,13 +735,17 @@ iBase* csBCTerrLoader::Parse (iDocumentNode* node,
         {
           bool t = false, r = false, d = false, l = false;
 	  csRef<iDocumentNode> upnode = child->GetNode ("up");
-	  if (upnode) if (!synldr->ParseBool (upnode, t, true)) return NULL;
+	  if (upnode) if (!synldr->ParseBool (upnode, t, true))
+	    return csPtr<iBase> (NULL);
 	  csRef<iDocumentNode> downnode = child->GetNode ("down");
-	  if (downnode) if (!synldr->ParseBool (downnode, d, true)) return NULL;
+	  if (downnode) if (!synldr->ParseBool (downnode, d, true))
+	    return csPtr<iBase> (NULL);
 	  csRef<iDocumentNode> leftnode = child->GetNode ("left");
-	  if (leftnode) if (!synldr->ParseBool (leftnode, l, true)) return NULL;
+	  if (leftnode) if (!synldr->ParseBool (leftnode, l, true))
+	    return csPtr<iBase> (NULL);
 	  csRef<iDocumentNode> rightnode = child->GetNode ("right");
-	  if (rightnode) if (!synldr->ParseBool (rightnode, r, true)) return NULL;
+	  if (rightnode) if (!synldr->ParseBool (rightnode, r, true))
+	    return csPtr<iBase> (NULL);
           iState->DoFlatten (t, d,l,r);
         }
         break;
@@ -748,7 +753,7 @@ iBase* csBCTerrLoader::Parse (iDocumentNode* node,
         {
           csVector3 cp;
 	  if (!synldr->ParseVector (child, cp))
-	    return NULL;
+	    return csPtr<iBase> (NULL);
           iState->SetControlPoint (cp, cp_iter);
           cp_iter++;
         }
@@ -825,7 +830,7 @@ iBase* csBCTerrLoader::Parse (iDocumentNode* node,
       	      synldr->ReportError (
 	    	  "crystalspace.bcterrloader.parse",
 		  child, "'end' attribute missing!");
-              return NULL;
+              return csPtr<iBase> (NULL);
 	    }
 	    int end = attr->GetValueAsInt ();
 	    int i = 0;
@@ -848,7 +853,7 @@ iBase* csBCTerrLoader::Parse (iDocumentNode* node,
 	    {
 	      synldr->ReportError ("crystalspace.bcterrldr.parse",
 	        child, "Can't find material '%s'!", matname);
-	      return NULL;
+	      return csPtr<iBase> (NULL);
 	    }
             int x, z;
 	    x = child->GetAttributeValueAsInt ("x");
@@ -867,12 +872,12 @@ iBase* csBCTerrLoader::Parse (iDocumentNode* node,
         break;
       default:
         synldr->ReportBadToken (child);
-	return NULL;
+	return csPtr<iBase> (NULL);
     }
   }
   // To avoid smart pointer from releasing.
   if (iTerrObj) iTerrObj->IncRef ();
-  return iTerrObj;
+  return csPtr<iBase> (iTerrObj);
 }
 
 

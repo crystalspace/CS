@@ -143,7 +143,7 @@ bool csSnowFactoryLoader::Initialize (iObjectRegistry* object_reg)
   return true;
 }
 
-iBase* csSnowFactoryLoader::Parse (const char* /*string*/,
+csPtr<iBase> csSnowFactoryLoader::Parse (const char* /*string*/,
 	iLoaderContext*, iBase* /* context */)
 {
   iMeshObjectType* type = CS_QUERY_PLUGIN_CLASS (plugin_mgr,
@@ -156,10 +156,10 @@ iBase* csSnowFactoryLoader::Parse (const char* /*string*/,
   }
   iMeshObjectFactory* fact = type->NewFactory ();
   type->DecRef ();
-  return fact;
+  return csPtr<iBase> (fact);
 }
 
-iBase* csSnowFactoryLoader::Parse (iDocumentNode* /*node*/,
+csPtr<iBase> csSnowFactoryLoader::Parse (iDocumentNode* /*node*/,
 	iLoaderContext*, iBase* /* context */)
 {
   iMeshObjectType* type = CS_QUERY_PLUGIN_CLASS (plugin_mgr,
@@ -172,7 +172,7 @@ iBase* csSnowFactoryLoader::Parse (iDocumentNode* /*node*/,
   }
   iMeshObjectFactory* fact = type->NewFactory ();
   type->DecRef ();
-  return fact;
+  return csPtr<iBase> (fact);
 }
 
 //---------------------------------------------------------------------------
@@ -240,7 +240,7 @@ bool csSnowLoader::Initialize (iObjectRegistry* object_reg)
   return true;
 }
 
-iBase* csSnowLoader::Parse (const char* string,
+csPtr<iBase> csSnowLoader::Parse (const char* string,
 	iLoaderContext* ldr_context, iBase*)
 {
   CS_TOKEN_TABLE_START (commands)
@@ -275,7 +275,7 @@ iBase* csSnowLoader::Parse (const char* string,
       // @@@ Error handling!
       if (partstate) partstate->DecRef ();
       if (snowstate) snowstate->DecRef ();
-      return NULL;
+      return csPtr<iBase> (NULL);
     }
     switch (cmd)
     {
@@ -325,7 +325,7 @@ iBase* csSnowLoader::Parse (const char* string,
 	    // @@@ Error handling!
 	    if (partstate) partstate->DecRef ();
 	    if (snowstate) snowstate->DecRef ();
-	    return NULL;
+	    return csPtr<iBase> (NULL);
 	  }
 	  mesh = fact->GetMeshObjectFactory ()->NewInstance ();
           partstate = SCF_QUERY_INTERFACE (mesh, iParticleState);
@@ -342,7 +342,7 @@ iBase* csSnowLoader::Parse (const char* string,
             mesh->DecRef ();
 	    if (partstate) partstate->DecRef ();
 	    if (snowstate) snowstate->DecRef ();
-            return NULL;
+            return csPtr<iBase> (NULL);
 	  }
 	  partstate->SetMaterialWrapper (mat);
 	}
@@ -371,10 +371,10 @@ iBase* csSnowLoader::Parse (const char* string,
 
   if (partstate) partstate->DecRef ();
   if (snowstate) snowstate->DecRef ();
-  return mesh;
+  return csPtr<iBase> (mesh);
 }
 
-iBase* csSnowLoader::Parse (iDocumentNode* node,
+csPtr<iBase> csSnowLoader::Parse (iDocumentNode* node,
 	iLoaderContext* ldr_context, iBase*)
 {
   csRef<iMeshObject> mesh;
@@ -394,7 +394,7 @@ iBase* csSnowLoader::Parse (iDocumentNode* node,
 	{
 	  csColor color;
 	  if (!synldr->ParseColor (child, color))
-	    return NULL;
+	    return csPtr<iBase> (NULL);
 	  partstate->SetColor (color);
 	}
 	break;
@@ -410,7 +410,7 @@ iBase* csSnowLoader::Parse (iDocumentNode* node,
 	{
 	  csBox3 box;
 	  if (!synldr->ParseBox (child, box))
-	    return NULL;
+	    return csPtr<iBase> (NULL);
 	  snowstate->SetBox (box.Min (), box.Max ());
 	}
 	break;
@@ -418,7 +418,7 @@ iBase* csSnowLoader::Parse (iDocumentNode* node,
 	{
 	  csVector3 s;
 	  if (!synldr->ParseVector (child, s))
-	    return NULL;
+	    return csPtr<iBase> (NULL);
 	  snowstate->SetFallSpeed (s);
 	}
 	break;
@@ -434,7 +434,7 @@ iBase* csSnowLoader::Parse (iDocumentNode* node,
       	    synldr->ReportError (
 		"crystalspace.snowloader.parse.unknownfactory",
 		child, "Couldn't find factory '%s'!", factname);
-	    return NULL;
+	    return csPtr<iBase> (NULL);
 	  }
 	  mesh = fact->GetMeshObjectFactory ()->NewInstance ();
           partstate = SCF_QUERY_INTERFACE (mesh, iParticleState);
@@ -450,7 +450,7 @@ iBase* csSnowLoader::Parse (iDocumentNode* node,
       	    synldr->ReportError (
 		"crystalspace.snowloader.parse.unknownmaterial",
 		child, "Couldn't find material '%s'!", matname);
-            return NULL;
+            return csPtr<iBase> (NULL);
 	  }
 	  partstate->SetMaterialWrapper (mat);
 	}
@@ -459,7 +459,7 @@ iBase* csSnowLoader::Parse (iDocumentNode* node,
         {
 	  uint mode;
 	  if (!synldr->ParseMixmode (child, mode))
-	    return NULL;
+	    return csPtr<iBase> (NULL);
           partstate->SetMixMode (mode);
 	}
 	break;
@@ -467,7 +467,7 @@ iBase* csSnowLoader::Parse (iDocumentNode* node,
         {
           bool do_lighting;
 	  if (!synldr->ParseBool (child, do_lighting, true))
-	    return NULL;
+	    return csPtr<iBase> (NULL);
           snowstate->SetLighting (do_lighting);
         }
         break;
@@ -476,13 +476,13 @@ iBase* csSnowLoader::Parse (iDocumentNode* node,
         break;
       default:
 	synldr->ReportBadToken (child);
-        return NULL;
+        return csPtr<iBase> (NULL);
     }
   }
 
   // Incref to prevent smart pointer from releasing.
   if (mesh) mesh->IncRef ();
-  return mesh;
+  return csPtr<iBase> (mesh);
 }
 
 //---------------------------------------------------------------------------

@@ -1337,9 +1337,9 @@ public:
   /// New Factory.
   virtual csPtr<iMeshObjectFactory> NewFactory ();
 
-  iPolyTxtPlane* CreatePolyTxtPlane (const char* name = NULL);
+  csPtr<iPolyTxtPlane> CreatePolyTxtPlane (const char* name = NULL);
   iPolyTxtPlane* FindPolyTxtPlane (const char* name);
-  iCurveTemplate* CreateBezierTemplate (const char* name = NULL);
+  csPtr<iCurveTemplate> CreateBezierTemplate (const char* name = NULL);
   iCurveTemplate* FindCurveTemplate (const char *iName);
   void RemovePolyTxtPlane (iPolyTxtPlane* pl);
   void RemoveCurveTemplate (iCurveTemplate* ct);
@@ -1350,7 +1350,7 @@ public:
   struct eiThingEnvironment : public iThingEnvironment
   {
     SCF_DECLARE_EMBEDDED_IBASE(csThingObjectType);
-    virtual iPolyTxtPlane* CreatePolyTxtPlane (const char* name = NULL)
+    virtual csPtr<iPolyTxtPlane> CreatePolyTxtPlane (const char* name = NULL)
     {
       return scfParent->CreatePolyTxtPlane (name);
     }
@@ -1358,7 +1358,7 @@ public:
     {
       return scfParent->FindPolyTxtPlane (name);
     }
-    virtual iCurveTemplate* CreateBezierTemplate (const char* name = NULL)
+    virtual csPtr<iCurveTemplate> CreateBezierTemplate (const char* name = NULL)
     {
       return scfParent->CreateBezierTemplate (name);
     }

@@ -145,7 +145,7 @@ bool csMetaBallFactoryLoader::Initialize (iObjectRegistry* object_reg)
   return true;
 }
 
-iBase* csMetaBallFactoryLoader::Parse (const char* /*string*/,
+csPtr<iBase> csMetaBallFactoryLoader::Parse (const char* /*string*/,
 	iLoaderContext* , iBase* /* context */)
 {
   iMeshObjectType* type = CS_QUERY_PLUGIN_CLASS (plugin_mgr,
@@ -158,10 +158,10 @@ iBase* csMetaBallFactoryLoader::Parse (const char* /*string*/,
   }
   iMeshObjectFactory* fact = type->NewFactory ();
   type->DecRef ();
-  return fact;
+  return csPtr<iBase> (fact);
 }
 
-iBase* csMetaBallFactoryLoader::Parse (iDocumentNode*,
+csPtr<iBase> csMetaBallFactoryLoader::Parse (iDocumentNode*,
 	iLoaderContext* , iBase* /* context */)
 {
   iMeshObjectType* type = CS_QUERY_PLUGIN_CLASS (plugin_mgr,
@@ -174,7 +174,7 @@ iBase* csMetaBallFactoryLoader::Parse (iDocumentNode*,
   }
   iMeshObjectFactory* fact = type->NewFactory ();
   type->DecRef ();
-  return fact;
+  return csPtr<iBase> (fact);
 }
 
 //---------------------------------------------------------------------------
@@ -243,7 +243,7 @@ bool csMetaBallLoader::Initialize (iObjectRegistry* object_reg)
   return true;
 }
 
-iBase* csMetaBallLoader::Parse (const char* string,
+csPtr<iBase> csMetaBallLoader::Parse (const char* string,
 	iLoaderContext* ldr_context, iBase*)
 {
   CS_TOKEN_TABLE_START (commands)
@@ -277,7 +277,7 @@ iBase* csMetaBallLoader::Parse (const char* string,
     {
       // @@@ Error handling!
       if (ballstate) ballstate->DecRef ();
-      return NULL;
+      return csPtr<iBase> (NULL);
     }
     switch (cmd)
     {
@@ -336,7 +336,7 @@ iBase* csMetaBallLoader::Parse (const char* string,
 	  if (!fact)
 	  {
 	    // @@@ Error handling!
-	    return NULL;
+	    return csPtr<iBase> (NULL);
 	  }
 	  mesh = fact->GetMeshObjectFactory ()->NewInstance ();
 	  ballstate = SCF_QUERY_INTERFACE (mesh, iMetaBallState);
@@ -352,7 +352,7 @@ iBase* csMetaBallLoader::Parse (const char* string,
 	  {
             // @@@ Error handling!
             mesh->DecRef ();
-            return NULL;
+            return csPtr<iBase> (NULL);
 	  }
 	  ballstate->SetMaterial(mat);
 	}
@@ -373,10 +373,10 @@ iBase* csMetaBallLoader::Parse (const char* string,
   }
 
   if (ballstate) ballstate->DecRef ();
-  return mesh;
+  return csPtr<iBase> (mesh);
 }
 
-iBase* csMetaBallLoader::Parse (iDocumentNode* node,
+csPtr<iBase> csMetaBallLoader::Parse (iDocumentNode* node,
 	iLoaderContext* ldr_context, iBase*)
 {
   csRef<iMeshObject> mesh;
@@ -400,7 +400,7 @@ iBase* csMetaBallLoader::Parse (iDocumentNode* node,
     	    synldr->ReportError (
 		"crystalspace.metaballloader.parse",
 		child, "Please use 'factory' before 'isolevel'!");
-	    return NULL;
+	    return csPtr<iBase> (NULL);
 	  }
 	  mp->iso_level = child->GetContentsValueAsFloat ();
 	}
@@ -412,7 +412,7 @@ iBase* csMetaBallLoader::Parse (iDocumentNode* node,
     	    synldr->ReportError (
 		"crystalspace.metaballloader.parse",
 		child, "Please use 'factory' before 'charge'!");
-	    return NULL;
+	    return csPtr<iBase> (NULL);
 	  }
 	  mp->charge = child->GetContentsValueAsFloat ();
 	}
@@ -424,7 +424,7 @@ iBase* csMetaBallLoader::Parse (iDocumentNode* node,
     	    synldr->ReportError (
 		"crystalspace.metaballloader.parse",
 		child, "Please use 'factory' before 'number'!");
-	    return NULL;
+	    return csPtr<iBase> (NULL);
 	  }
 	  ballstate->SetMetaBallCount (child->GetContentsValueAsInt ());
 	}
@@ -436,7 +436,7 @@ iBase* csMetaBallLoader::Parse (iDocumentNode* node,
     	    synldr->ReportError (
 		"crystalspace.metaballloader.parse",
 		child, "Please use 'factory' before 'rate'!");
-	    return NULL;
+	    return csPtr<iBase> (NULL);
 	  }
 	  mp->rate = child->GetContentsValueAsFloat ();
 	}
@@ -448,11 +448,11 @@ iBase* csMetaBallLoader::Parse (iDocumentNode* node,
     	    synldr->ReportError (
 		"crystalspace.metaballloader.parse",
 		child, "Please use 'factory' before 'truemap'!");
-	    return NULL;
+	    return csPtr<iBase> (NULL);
 	  }
 	  bool m;
 	  if (!synldr->ParseBool (child, m, true))
-	    return NULL;
+	    return csPtr<iBase> (NULL);
 	  ballstate->SetQualityEnvironmentMapping (m);
 	}
 	break;
@@ -463,7 +463,7 @@ iBase* csMetaBallLoader::Parse (iDocumentNode* node,
     	    synldr->ReportError (
 		"crystalspace.metaballloader.parse",
 		child, "Please use 'factory' before 'texscale'!");
-	    return NULL;
+	    return csPtr<iBase> (NULL);
 	  }
 	  ballstate->SetEnvironmentMappingFactor (
 	  	child->GetContentsValueAsFloat ());
@@ -478,7 +478,7 @@ iBase* csMetaBallLoader::Parse (iDocumentNode* node,
     	    synldr->ReportError (
 		"crystalspace.metaballloader.parse",
 		child, "Can't find factory '%s'!", factname);
-	    return NULL;
+	    return csPtr<iBase> (NULL);
 	  }
 	  mesh = fact->GetMeshObjectFactory ()->NewInstance ();
           ballstate = SCF_QUERY_INTERFACE (mesh, iMetaBallState);
@@ -492,7 +492,7 @@ iBase* csMetaBallLoader::Parse (iDocumentNode* node,
     	    synldr->ReportError (
 		"crystalspace.metaballloader.parse",
 		child, "Please use 'factory' before 'material'!");
-	    return NULL;
+	    return csPtr<iBase> (NULL);
 	  }
 	  const char* matname = child->GetContentsValue ();
           iMaterialWrapper* mat = ldr_context->FindMaterial (matname);
@@ -501,7 +501,7 @@ iBase* csMetaBallLoader::Parse (iDocumentNode* node,
     	    synldr->ReportError (
 		"crystalspace.metaballloader.parse",
 		child, "Can't find material '%s'!", matname);
-            return NULL;
+            return csPtr<iBase> (NULL);
 	  }
 	  ballstate->SetMaterial (mat);
 	}
@@ -513,7 +513,7 @@ iBase* csMetaBallLoader::Parse (iDocumentNode* node,
     	    synldr->ReportError (
 		"crystalspace.metaballloader.parse",
 		child, "Please use 'factory' before 'mixmode'!");
-	    return NULL;
+	    return csPtr<iBase> (NULL);
 	  }
 	  uint mode;
 	  if (synldr->ParseMixmode (child, mode))
@@ -527,7 +527,7 @@ iBase* csMetaBallLoader::Parse (iDocumentNode* node,
     	    synldr->ReportError (
 		"crystalspace.metaballloader.parse",
 		child, "Please use 'factory' before 'lighting'!");
-	    return NULL;
+	    return csPtr<iBase> (NULL);
 	  }
 	  bool l;
 	  if (!synldr->ParseBool (child, l, true))
@@ -537,13 +537,13 @@ iBase* csMetaBallLoader::Parse (iDocumentNode* node,
 	break;
       default:
 	synldr->ReportBadToken (child);
-        return NULL;
+        return csPtr<iBase> (NULL);
     }
   }
 
   // Incref to avoid smart pointer release.
   if (mesh) mesh->IncRef ();
-  return mesh;
+  return csPtr<iBase> (mesh);
 }
 
 //---------------------------------------------------------------------------

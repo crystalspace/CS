@@ -1,5 +1,11 @@
 The history order is reversed so that new features are at the top.
 
+10-Sep-2002
+	- iLoaderPlugin and iBinaryLoaderPlugin->Parse() now return a
+	  csPtr.
+	- iThingEnvironment->CreateBezierTemplate() and CreatePolyTxtPlane()
+	  now return a csPtr and IncRef() the returned pointer (which
+	  they didn't do in the past).
 9-Sep-2002
 	- iTextureManager->RegisterTexture() and RegisterMaterial()
 	  now return csPtr. This also fixes several ref counting bugs

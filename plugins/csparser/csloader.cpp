@@ -403,12 +403,12 @@ bool csLoader::TestXml (const char* file, iDataBuffer* buf,
   return true;
 }
 
-iBase* csLoader::TestXmlPlugParse (iLoaderPlugin* plug, iDataBuffer* buf,
+csPtr<iBase> csLoader::TestXmlPlugParse (iLoaderPlugin* plug, iDataBuffer* buf,
   	iBase* context, const char* fname)
 {
   csRef<iDocument> doc;
   bool er = TestXml (fname, buf, doc);
-  if (!er) return NULL;
+  if (!er) return csPtr<iBase> (NULL);
   if (doc)
   {
     // First find the <params> node in the loaded file.
@@ -418,14 +418,15 @@ iBase* csLoader::TestXmlPlugParse (iLoaderPlugin* plug, iDataBuffer* buf,
       SyntaxService->ReportError (
 	      "crystalspace.maploader.load.plugin",
               doc->GetRoot (), "Could not find <params> in '%s'!", fname);
-      return NULL;
+      return csPtr<iBase> (NULL);
     }
     return plug->Parse (paramsnode, GetLoaderContext (), context);
   }
   else
   {
     ReportNotify ("crystalspace.maploader", 
-		    "Please convert your models to XML using cs2xml (file '%s')!", fname);
+	    "Please convert your models to XML using cs2xml (file '%s')!",
+	    fname);
     return plug->Parse ((char*)(buf->GetUint8 ()), GetLoaderContext (),
     	context);
   }
@@ -1089,8 +1090,8 @@ bool csLoader::LoadMeshObjectFactory (iMeshFactoryWrapper* stemp, char* buf,
 	  // We give here the iMeshObjectFactory as the context. If this
 	  // is a new factory this will be NULL. Otherwise it is possible
 	  // to append information to the already loaded factory.
-	  iBase* mof = plug->Parse (params, GetLoaderContext (),
-	  	stemp->GetMeshObjectFactory ());
+	  csRef<iBase> mof (plug->Parse (params, GetLoaderContext (),
+	  	stemp->GetMeshObjectFactory ()));
 	  if (!mof)
 	  {
             ReportError (
@@ -1111,7 +1112,6 @@ bool csLoader::LoadMeshObjectFactory (iMeshFactoryWrapper* stemp, char* buf,
 	    }
 	    stemp->SetMeshObjectFactory (mof2);
 	    mof2->SetLogicalParent (stemp);
-	    mof->DecRef ();
 	  }
 	}
         break;
@@ -1138,7 +1138,7 @@ bool csLoader::LoadMeshObjectFactory (iMeshFactoryWrapper* stemp, char* buf,
 	  // We give here the iMeshObjectFactory as the context. If this
 	  // is a new factory this will be NULL. Otherwise it is possible
 	  // to append information to the already loaded factory.
-	  iBase* mof;
+	  csRef<iBase> mof;
 	  if (plug)
 	    mof = TestXmlPlugParse (plug, buf, stemp->GetMeshObjectFactory (),
 	    	str);
@@ -1165,7 +1165,6 @@ bool csLoader::LoadMeshObjectFactory (iMeshFactoryWrapper* stemp, char* buf,
 	    }
 	    stemp->SetMeshObjectFactory (mof2);
 	    mof2->SetLogicalParent (stemp);
-	    mof->DecRef ();
 	  }
         }
         break;
@@ -1982,7 +1981,7 @@ bool csLoader::LoadMeshObject (iMeshWrapper* mesh, char* buf)
 	}
 	else
 	{
-	  iBase* mo = plug->Parse (params, GetLoaderContext (), NULL);
+	  csRef<iBase> mo (plug->Parse (params, GetLoaderContext (), NULL));
           if (mo)
           {
 	    csRef<iMeshObject> mo2 (SCF_QUERY_INTERFACE (mo, iMeshObject));
@@ -2003,7 +2002,6 @@ bool csLoader::LoadMeshObject (iMeshWrapper* mesh, char* buf)
 	      if (mfw)
 	        mesh->SetFactory (mfw);
 	    }
-            mo->DecRef ();
           }
           else
           {
@@ -2033,7 +2031,7 @@ bool csLoader::LoadMeshObject (iMeshWrapper* mesh, char* buf)
 	      "Error opening file '%s'!", str);
 	    return false;
 	  }
-	  iBase* mo;
+	  csRef<iBase> mo;
 	  if (plug)
 	    mo = TestXmlPlugParse (plug, buf, NULL, str);
 	  else
@@ -2059,7 +2057,6 @@ bool csLoader::LoadMeshObject (iMeshWrapper* mesh, char* buf)
 	      if (mfw)
 	        mesh->SetFactory (mfw);
 	    }
-            mo->DecRef ();
           }
           else
           {
@@ -2158,7 +2155,7 @@ bool csLoader::LoadAddOn (char* buf, iBase* context)
 	}
 	else
 	{
-	  plug->Parse (params, GetLoaderContext (), context);
+	  csRef<iBase> rc = plug->Parse (params, GetLoaderContext (), context);
 	}
         break;
 
@@ -3435,8 +3432,7 @@ bool csLoader::LoadMap (iDocumentNode* node)
         case XMLTOKEN_MESHFACT:
           {
 	    const char* name = child->GetAttributeValue ("name");
-            csRef<iMeshFactoryWrapper> t (csPtr<iMeshFactoryWrapper> (
-	    	Engine->CreateMeshFactory (name)));
+            csRef<iMeshFactoryWrapper> t (Engine->CreateMeshFactory (name));
 	    if (!t || !LoadMeshObjectFactory (t, child))
 	    {
 	      // Error is already reported.
@@ -3762,8 +3758,8 @@ bool csLoader::LoadMeshObjectFactory (iMeshFactoryWrapper* stemp,
 	  // We give here the iMeshObjectFactory as the context. If this
 	  // is a new factory this will be NULL. Otherwise it is possible
 	  // to append information to the already loaded factory.
-	  iBase* mof = plug->Parse (child, GetLoaderContext (),
-	  	stemp->GetMeshObjectFactory ());
+	  csRef<iBase> mof (plug->Parse (child, GetLoaderContext (),
+	  	stemp->GetMeshObjectFactory ()));
 	  if (!mof)
 	  {
 	    // Error is reported by plug->Parse().
@@ -3783,7 +3779,6 @@ bool csLoader::LoadMeshObjectFactory (iMeshFactoryWrapper* stemp,
 	    }
 	    stemp->SetMeshObjectFactory (mof2);
 	    mof2->SetLogicalParent (stemp);
-	    mof->DecRef ();
 	  }
 	}
         break;
@@ -3809,7 +3804,7 @@ bool csLoader::LoadMeshObjectFactory (iMeshFactoryWrapper* stemp,
 	  // We give here the iMeshObjectFactory as the context. If this
 	  // is a new factory this will be NULL. Otherwise it is possible
 	  // to append information to the already loaded factory.
-	  iBase* mof;
+	  csRef<iBase> mof;
 	  if (plug)
 	    mof = TestXmlPlugParse (plug, buf, stemp->GetMeshObjectFactory (),
 	    	child->GetContentsValue ());
@@ -3835,7 +3830,6 @@ bool csLoader::LoadMeshObjectFactory (iMeshFactoryWrapper* stemp,
 	    }
 	    stemp->SetMeshObjectFactory (mof2);
 	    mof2->SetLogicalParent (stemp);
-	    mof->DecRef ();
 	  }
         }
         break;
@@ -4490,7 +4484,7 @@ bool csLoader::LoadMeshObject (iMeshWrapper* mesh, iDocumentNode* node)
 	}
 	else
 	{
-	  iBase* mo = plug->Parse (child, GetLoaderContext (), NULL);
+	  csRef<iBase> mo (plug->Parse (child, GetLoaderContext (), NULL));
           if (mo)
           {
 	    csRef<iMeshObject> mo2 (SCF_QUERY_INTERFACE (mo, iMeshObject));
@@ -4511,7 +4505,6 @@ bool csLoader::LoadMeshObject (iMeshWrapper* mesh, iDocumentNode* node)
 	      if (mfw)
 	        mesh->SetFactory (mfw);
 	    }
-            mo->DecRef ();
           }
           else
           {
@@ -4547,7 +4540,7 @@ bool csLoader::LoadMeshObject (iMeshWrapper* mesh, iDocumentNode* node)
 	      child, "Error opening file '%s'!", fname);
 	    return false;
 	  }
-	  iBase* mo;
+	  csRef<iBase> mo;
 	  if (plug)
 	    mo = TestXmlPlugParse (plug, buf, NULL, fname);
 	  else
@@ -4573,7 +4566,6 @@ bool csLoader::LoadMeshObject (iMeshWrapper* mesh, iDocumentNode* node)
 	      if (mfw)
 	        mesh->SetFactory (mfw);
 	    }
-            mo->DecRef ();
           }
           else
           {
@@ -4655,8 +4647,8 @@ bool csLoader::LoadAddOn (iDocumentNode* node, iBase* context)
 	}
 	else
 	{
-	  if (!plug->Parse (child, GetLoaderContext (), context))
-	    return false;
+	  csRef<iBase> rc (plug->Parse (child, GetLoaderContext (), context));
+	  if (!rc) return false;
 	}
         break;
 
@@ -4688,10 +4680,16 @@ bool csLoader::LoadAddOn (iDocumentNode* node, iBase* context)
 	  }
 	  bool rc;
 	  if (plug)
-	    rc = TestXmlPlugParse (plug, buf, NULL, fname) != NULL;
+	  {
+	    csRef<iBase> ret (TestXmlPlugParse (plug, buf, NULL, fname));
+	    rc = (ret != NULL);
+	  }
 	  else
-	    rc = binplug->Parse ((void*)(buf->GetUint8 ()),
-	  	GetLoaderContext (), NULL) != NULL;
+	  {
+	    csRef<iBase> ret (binplug->Parse ((void*)(buf->GetUint8 ()),
+	  	GetLoaderContext (), NULL));
+	    rc = (ret != NULL);
+	  }
 	  if (!rc)
 	    return false;
 	}

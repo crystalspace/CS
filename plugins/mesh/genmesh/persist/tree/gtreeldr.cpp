@@ -657,7 +657,7 @@ bool csGeneralTreeFactoryLoader::Initialize (iObjectRegistry* object_reg)
   return true;
 }
 
-iBase* csGeneralTreeFactoryLoader::Parse (
+csPtr<iBase> csGeneralTreeFactoryLoader::Parse (
 	const char* string,
 	iLoaderContext* ldr_context, iBase* /* context */)
 {
@@ -683,7 +683,7 @@ iBase* csGeneralTreeFactoryLoader::Parse (
     ReportError (reporter,
 		"crystalspace.gentreefactoryloader.setup.objecttype",
 		"Could not load the general mesh object plugin!");
-    return NULL;
+    return csPtr<iBase> (NULL);
   }
   iMeshObjectFactory* fact = type->NewFactory ();
   type->DecRef ();
@@ -701,7 +701,7 @@ iBase* csGeneralTreeFactoryLoader::Parse (
 		"Bad format while parsing general mesh/tree factory!");
       state->DecRef ();
       fact->DecRef ();
-      return NULL;
+      return csPtr<iBase> (NULL);
     }
     switch (cmd)
     {
@@ -772,10 +772,10 @@ printf ("tri:%d vt:%d\n", construction->GetTriangleCount (),
   delete construction;
 
   state->DecRef ();
-  return fact;
+  return csPtr<iBase> (fact);
 }
 
-iBase* csGeneralTreeFactoryLoader::Parse (
+csPtr<iBase> csGeneralTreeFactoryLoader::Parse (
 	iDocumentNode* node,
 	iLoaderContext* ldr_context, iBase* /* context */)
 {
@@ -791,7 +791,7 @@ iBase* csGeneralTreeFactoryLoader::Parse (
     ReportError (reporter,
 		"crystalspace.gentreefactoryloader.setup.objecttype",
 		"Could not load the general mesh object plugin!");
-    return NULL;
+    return csPtr<iBase> (NULL);
   }
 
   csRef<iMeshObjectFactory> fact;
@@ -816,7 +816,7 @@ iBase* csGeneralTreeFactoryLoader::Parse (
         ReportError (reporter,
 		"crystalspace.gentreefactoryloader.parse.badformat",
 		"Unexpected token '%s' while parsing 'gentree'!");
-        return NULL;
+        return csPtr<iBase> (NULL);
     }
   }
 
@@ -883,7 +883,7 @@ printf ("tri:%d vt:%d\n", construction->GetTriangleCount (),
 
   // Incref to prevent smart pointer from deleting it.
   if (fact) fact->IncRef ();
-  return fact;
+  return csPtr<iBase> (fact);
 }
 
 //----------------------------------------------------------------------------

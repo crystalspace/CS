@@ -1225,7 +1225,7 @@ bool csTextSyntaxService::ParsePoly3d (
     {
       char buf[200];
       sprintf (buf, "__X_%g,%g__", v.x, tx_len.x);
-      iPolyTxtPlane* pl = te->FindPolyTxtPlane (buf);
+      csRef<iPolyTxtPlane> pl (te->FindPolyTxtPlane (buf));
       if (!pl)
       {
         pl = te->CreatePolyTxtPlane ();
@@ -1239,7 +1239,7 @@ bool csTextSyntaxService::ParsePoly3d (
     {
       char buf[200];
       sprintf (buf, "__Y_%g,%g__", v.y, tx_len.x);
-      iPolyTxtPlane* pl = te->FindPolyTxtPlane (buf);
+      csRef<iPolyTxtPlane> pl (te->FindPolyTxtPlane (buf));
       if (!pl)
       {
         pl = te->CreatePolyTxtPlane ();
@@ -1253,7 +1253,7 @@ bool csTextSyntaxService::ParsePoly3d (
     {
       char buf[200];
       sprintf (buf, "__Z_%g,%g__", v.z, tx_len.x);
-      iPolyTxtPlane* pl = te->FindPolyTxtPlane (buf);
+      csRef<iPolyTxtPlane> pl (te->FindPolyTxtPlane (buf));
       if (!pl)
       {
         pl = te->CreatePolyTxtPlane ();
@@ -2210,7 +2210,7 @@ bool csTextSyntaxService::ParsePoly3d (
     {
       char buf[200];
       sprintf (buf, "__X_%g,%g__", v.x, tx_len.x);
-      iPolyTxtPlane* pl = te->FindPolyTxtPlane (buf);
+      csRef<iPolyTxtPlane> pl (te->FindPolyTxtPlane (buf));
       if (!pl)
       {
         pl = te->CreatePolyTxtPlane ();
@@ -2224,7 +2224,7 @@ bool csTextSyntaxService::ParsePoly3d (
     {
       char buf[200];
       sprintf (buf, "__Y_%g,%g__", v.y, tx_len.x);
-      iPolyTxtPlane* pl = te->FindPolyTxtPlane (buf);
+      csRef<iPolyTxtPlane> pl (te->FindPolyTxtPlane (buf));
       if (!pl)
       {
         pl = te->CreatePolyTxtPlane ();
@@ -2238,7 +2238,7 @@ bool csTextSyntaxService::ParsePoly3d (
     {
       char buf[200];
       sprintf (buf, "__Z_%g,%g__", v.z, tx_len.x);
-      iPolyTxtPlane* pl = te->FindPolyTxtPlane (buf);
+      csRef<iPolyTxtPlane> pl (te->FindPolyTxtPlane (buf));
       if (!pl)
       {
         pl = te->CreatePolyTxtPlane ();

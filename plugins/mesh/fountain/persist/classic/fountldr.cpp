@@ -152,7 +152,7 @@ bool csFountainFactoryLoader::Initialize (iObjectRegistry* object_reg)
   return true;
 }
 
-iBase* csFountainFactoryLoader::Parse (const char* /*string*/,
+csPtr<iBase> csFountainFactoryLoader::Parse (const char* /*string*/,
 	iLoaderContext*, iBase* /* context */)
 {
   iMeshObjectType* type = CS_QUERY_PLUGIN_CLASS (plugin_mgr,
@@ -165,10 +165,10 @@ iBase* csFountainFactoryLoader::Parse (const char* /*string*/,
   }
   iMeshObjectFactory* fact = type->NewFactory ();
   type->DecRef ();
-  return fact;
+  return csPtr<iBase> (fact);
 }
 
-iBase* csFountainFactoryLoader::Parse (iDocumentNode* /*node*/,
+csPtr<iBase> csFountainFactoryLoader::Parse (iDocumentNode* /*node*/,
 	iLoaderContext*, iBase* /* context */)
 {
   iMeshObjectType* type = CS_QUERY_PLUGIN_CLASS (plugin_mgr,
@@ -181,7 +181,7 @@ iBase* csFountainFactoryLoader::Parse (iDocumentNode* /*node*/,
   }
   iMeshObjectFactory* fact = type->NewFactory ();
   type->DecRef ();
-  return fact;
+  return csPtr<iBase> (fact);
 }
 
 //---------------------------------------------------------------------------
@@ -254,7 +254,7 @@ bool csFountainLoader::Initialize (iObjectRegistry* object_reg)
   return true;
 }
 
-iBase* csFountainLoader::Parse (const char* string,
+csPtr<iBase> csFountainLoader::Parse (const char* string,
 	iLoaderContext* ldr_context, iBase*)
 {
   CS_TOKEN_TABLE_START (commands)
@@ -293,7 +293,7 @@ iBase* csFountainLoader::Parse (const char* string,
       // @@@ Error handling!
       if (partstate) partstate->DecRef ();
       if (fountstate) fountstate->DecRef ();
-      return NULL;
+      return csPtr<iBase> (NULL);
     }
     switch (cmd)
     {
@@ -369,7 +369,7 @@ iBase* csFountainLoader::Parse (const char* string,
 	    // @@@ Error handling!
 	    if (partstate) partstate->DecRef ();
 	    if (fountstate) fountstate->DecRef ();
-	    return NULL;
+	    return csPtr<iBase> (NULL);
 	  }
 	  mesh = fact->GetMeshObjectFactory ()->NewInstance ();
           partstate = SCF_QUERY_INTERFACE (mesh, iParticleState);
@@ -386,7 +386,7 @@ iBase* csFountainLoader::Parse (const char* string,
             mesh->DecRef ();
 	    if (partstate) partstate->DecRef ();
 	    if (fountstate) fountstate->DecRef ();
-            return NULL;
+            return csPtr<iBase> (NULL);
 	  }
 	  partstate->SetMaterialWrapper (mat);
 	}
@@ -415,10 +415,10 @@ iBase* csFountainLoader::Parse (const char* string,
 
   if (partstate) partstate->DecRef ();
   if (fountstate) fountstate->DecRef ();
-  return mesh;
+  return csPtr<iBase> (mesh);
 }
 
-iBase* csFountainLoader::Parse (iDocumentNode* node,
+csPtr<iBase> csFountainLoader::Parse (iDocumentNode* node,
 	iLoaderContext* ldr_context, iBase*)
 {
   csRef<iMeshObject> mesh;
@@ -438,7 +438,7 @@ iBase* csFountainLoader::Parse (iDocumentNode* node,
 	{
 	  csColor color;
 	  if (!synldr->ParseColor (child, color))
-	    return NULL;
+	    return csPtr<iBase> (NULL);
 	  partstate->SetColor (color);
 	}
 	break;
@@ -492,7 +492,7 @@ iBase* csFountainLoader::Parse (iDocumentNode* node,
       	    synldr->ReportError (
 		"crystalspace.fountloader.parse.unknownfactory",
 		child, "Couldn't find factory '%s'!", factname);
-	    return NULL;
+	    return csPtr<iBase> (NULL);
 	  }
 	  mesh = fact->GetMeshObjectFactory ()->NewInstance ();
           partstate = SCF_QUERY_INTERFACE (mesh, iParticleState);
@@ -508,7 +508,7 @@ iBase* csFountainLoader::Parse (iDocumentNode* node,
       	    synldr->ReportError (
 		"crystalspace.fountloader.parse.unknownmaterial",
 		child, "Couldn't find material '%s'!", matname);
-	    return NULL;
+	    return csPtr<iBase> (NULL);
 	  }
 	  partstate->SetMaterialWrapper (mat);
 	}
@@ -517,7 +517,7 @@ iBase* csFountainLoader::Parse (iDocumentNode* node,
         {
 	  uint mode;
 	  if (!synldr->ParseMixmode (child, mode))
-	    return NULL;
+	    return csPtr<iBase> (NULL);
           partstate->SetMixMode (mode);
 	}
 	break;
@@ -525,7 +525,7 @@ iBase* csFountainLoader::Parse (iDocumentNode* node,
         {
           bool do_lighting;
 	  if (!synldr->ParseBool (child, do_lighting, true))
-	    return NULL;
+	    return csPtr<iBase> (NULL);
           fountstate->SetLighting (do_lighting);
         }
         break;
@@ -534,13 +534,13 @@ iBase* csFountainLoader::Parse (iDocumentNode* node,
         break;
       default:
 	synldr->ReportBadToken (child);
-	return NULL;
+	return csPtr<iBase> (NULL);
     }
   }
 
   // Incref to prevent smart pointer from cleaning up.
   if (mesh) mesh->IncRef ();
-  return mesh;
+  return csPtr<iBase> (mesh);
 }
 
 //---------------------------------------------------------------------------

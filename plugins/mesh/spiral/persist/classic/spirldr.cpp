@@ -136,7 +136,7 @@ bool csSpiralFactoryLoader::Initialize (iObjectRegistry* object_reg)
   return true;
 }
 
-iBase* csSpiralFactoryLoader::Parse (const char* /*string*/,
+csPtr<iBase> csSpiralFactoryLoader::Parse (const char* /*string*/,
 	iLoaderContext*, iBase* /* context */)
 {
   iMeshObjectType* type = CS_QUERY_PLUGIN_CLASS (plugin_mgr,
@@ -149,10 +149,10 @@ iBase* csSpiralFactoryLoader::Parse (const char* /*string*/,
   }
   iMeshObjectFactory* fact = type->NewFactory ();
   type->DecRef ();
-  return fact;
+  return csPtr<iBase> (fact);
 }
 
-iBase* csSpiralFactoryLoader::Parse (iDocumentNode* /*node*/,
+csPtr<iBase> csSpiralFactoryLoader::Parse (iDocumentNode* /*node*/,
 	iLoaderContext*, iBase* /* context */)
 {
   iMeshObjectType* type = CS_QUERY_PLUGIN_CLASS (plugin_mgr,
@@ -165,7 +165,7 @@ iBase* csSpiralFactoryLoader::Parse (iDocumentNode* /*node*/,
   }
   iMeshObjectFactory* fact = type->NewFactory ();
   type->DecRef ();
-  return fact;
+  return csPtr<iBase> (fact);
 }
 
 //---------------------------------------------------------------------------
@@ -227,7 +227,7 @@ bool csSpiralLoader::Initialize (iObjectRegistry* object_reg)
   return true;
 }
 
-iBase* csSpiralLoader::Parse (const char* string,
+csPtr<iBase> csSpiralLoader::Parse (const char* string,
 	iLoaderContext* ldr_context, iBase*)
 {
   CS_TOKEN_TABLE_START (commands)
@@ -258,7 +258,7 @@ iBase* csSpiralLoader::Parse (const char* string,
       // @@@ Error handling!
       if (partstate) partstate->DecRef ();
       if (spiralstate) spiralstate->DecRef ();
-      return NULL;
+      return csPtr<iBase> (NULL);
     }
     switch (cmd)
     {
@@ -285,7 +285,7 @@ iBase* csSpiralLoader::Parse (const char* string,
 	    // @@@ Error handling!
 	    if (partstate) partstate->DecRef ();
 	    if (spiralstate) spiralstate->DecRef ();
-	    return NULL;
+	    return csPtr<iBase> (NULL);
 	  }
 	  mesh = fact->GetMeshObjectFactory ()->NewInstance ();
           partstate = SCF_QUERY_INTERFACE (mesh, iParticleState);
@@ -302,7 +302,7 @@ iBase* csSpiralLoader::Parse (const char* string,
             mesh->DecRef ();
 	    if (partstate) partstate->DecRef ();
 	    if (spiralstate) spiralstate->DecRef ();
-            return NULL;
+            return csPtr<iBase> (NULL);
 	  }
 	  partstate->SetMaterialWrapper (mat);
 	}
@@ -324,10 +324,10 @@ iBase* csSpiralLoader::Parse (const char* string,
 
   if (partstate) partstate->DecRef ();
   if (spiralstate) spiralstate->DecRef ();
-  return mesh;
+  return csPtr<iBase> (mesh);
 }
 
-iBase* csSpiralLoader::Parse (iDocumentNode* node,
+csPtr<iBase> csSpiralLoader::Parse (iDocumentNode* node,
 	iLoaderContext* ldr_context, iBase*)
 {
   csRef<iMeshObject> mesh;
@@ -347,7 +347,7 @@ iBase* csSpiralLoader::Parse (iDocumentNode* node,
 	{
 	  csColor color;
 	  if (!synldr->ParseColor (child, color))
-	    return NULL;
+	    return csPtr<iBase> (NULL);
 	  partstate->SetColor (color);
 	}
 	break;
@@ -355,7 +355,7 @@ iBase* csSpiralLoader::Parse (iDocumentNode* node,
 	{
 	  csVector3 s;
 	  if (!synldr->ParseVector (child, s))
-	    return NULL;
+	    return csPtr<iBase> (NULL);
 	  spiralstate->SetSource (s);
 	}
 	break;
@@ -368,7 +368,7 @@ iBase* csSpiralLoader::Parse (iDocumentNode* node,
       	    synldr->ReportError (
 		"crystalspace.ballloader.parse.unknownfactory",
 		child, "Couldn't find factory '%s'!", factname);
-	    return NULL;
+	    return csPtr<iBase> (NULL);
 	  }
 	  mesh = fact->GetMeshObjectFactory ()->NewInstance ();
           partstate = SCF_QUERY_INTERFACE (mesh, iParticleState);
@@ -384,7 +384,7 @@ iBase* csSpiralLoader::Parse (iDocumentNode* node,
       	    synldr->ReportError (
 		"crystalspace.ballloader.parse.unknownmaterial",
 		child, "Couldn't find material '%s'!", matname);
-            return NULL;
+            return csPtr<iBase> (NULL);
 	  }
 	  partstate->SetMaterialWrapper (mat);
 	}
@@ -393,7 +393,7 @@ iBase* csSpiralLoader::Parse (iDocumentNode* node,
 	{
 	  uint mode;
 	  if (!synldr->ParseMixmode (child, mode))
-	    return NULL;
+	    return csPtr<iBase> (NULL);
           partstate->SetMixMode (mode);
 	}
 	break;
@@ -402,13 +402,13 @@ iBase* csSpiralLoader::Parse (iDocumentNode* node,
         break;
       default:
 	synldr->ReportBadToken (child);
-	return NULL;
+	return csPtr<iBase> (NULL);
     }
   }
 
   // Incref to avoid smart pointer from cleaning up.
   if (mesh) mesh->IncRef ();
-  return mesh;
+  return csPtr<iBase> (mesh);
 }
 
 //---------------------------------------------------------------------------

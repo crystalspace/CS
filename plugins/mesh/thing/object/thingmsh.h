@@ -54,7 +54,7 @@ public:
   struct eiThingEnvironment : public iThingEnvironment
   {
     SCF_DECLARE_EMBEDDED_IBASE(csThingMeshObjectType);
-    virtual iPolyTxtPlane* CreatePolyTxtPlane (const char* name = NULL)
+    virtual csPtr<iPolyTxtPlane> CreatePolyTxtPlane (const char* name = NULL)
     {
       return scfParent->TE ()->CreatePolyTxtPlane (name);
     }
@@ -62,7 +62,7 @@ public:
     {
       return scfParent->TE ()->FindPolyTxtPlane (name);
     }
-    virtual iCurveTemplate* CreateBezierTemplate (const char* name = NULL)
+    virtual csPtr<iCurveTemplate> CreateBezierTemplate (const char* name = NULL)
     {
       return scfParent->TE ()->CreateBezierTemplate (name);
     }

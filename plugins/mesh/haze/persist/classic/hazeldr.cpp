@@ -276,7 +276,7 @@ static iHazeHull* ParseHull (csParser* parser, char* buf,
   return result;
 }
 
-iBase* csHazeFactoryLoader::Parse (const char* string,
+csPtr<iBase> csHazeFactoryLoader::Parse (const char* string,
 	iLoaderContext* ldr_context,
 	iBase* /* context */)
 {
@@ -318,7 +318,7 @@ iBase* csHazeFactoryLoader::Parse (const char* string,
     {
       // @@@ Error handling!
       if (hazefactorystate) hazefactorystate->DecRef ();
-      return NULL;
+      return csPtr<iBase> (NULL);
     }
     switch (cmd)
     {
@@ -331,7 +331,7 @@ iBase* csHazeFactoryLoader::Parse (const char* string,
 	    printf ("Could not find material '%s'!\n", str);
             // @@@ Error handling!
 	    if (hazefactorystate) hazefactorystate->DecRef ();
-            return NULL;
+            return csPtr<iBase> (NULL);
 	  }
 	  hazefactorystate->SetMaterialWrapper (mat);
 	}
@@ -365,10 +365,10 @@ iBase* csHazeFactoryLoader::Parse (const char* string,
 
   if (hazefactorystate) hazefactorystate->DecRef ();
   type->DecRef ();
-  return fact;
+  return csPtr<iBase> (fact);
 }
 
-iBase* csHazeFactoryLoader::Parse (iDocumentNode* node,
+csPtr<iBase> csHazeFactoryLoader::Parse (iDocumentNode* node,
 	iLoaderContext* ldr_context,
 	iBase* /* context */)
 {
@@ -407,7 +407,7 @@ iBase* csHazeFactoryLoader::Parse (iDocumentNode* node,
 	    synldr->ReportError (
 		"crystalspace.hazeloader.parse.badmaterial",
 		child, "Could not find material '%s'!", matname);
-            return NULL;
+            return csPtr<iBase> (NULL);
 	  }
 	  hazefactorystate->SetMaterialWrapper (mat);
 	}
@@ -416,18 +416,18 @@ iBase* csHazeFactoryLoader::Parse (iDocumentNode* node,
 	{
 	  uint mode;
 	  if (!synldr->ParseMixmode (child, mode))
-	    return NULL;
+	    return csPtr<iBase> (NULL);
           hazefactorystate->SetMixMode (mode);
 	}
 	break;
       case XMLTOKEN_ORIGIN:
 	if (!synldr->ParseVector (child, a))
-	  return NULL;
+	  return csPtr<iBase> (NULL);
         hazefactorystate->SetOrigin (a);
 	break;
       case XMLTOKEN_DIRECTIONAL:
 	if (!synldr->ParseVector (child, a))
-	  return NULL;
+	  return csPtr<iBase> (NULL);
         hazefactorystate->SetDirectional (a);
 	break;
       case XMLTOKEN_LAYER:
@@ -440,13 +440,13 @@ iBase* csHazeFactoryLoader::Parse (iDocumentNode* node,
 	break;
       default:
 	synldr->ReportBadToken (child);
-	return NULL;
+	return csPtr<iBase> (NULL);
     }
   }
 
   // Incref to make sure smart pointer doesn't release reference.
   if (fact) fact->IncRef ();
-  return fact;
+  return csPtr<iBase> (fact);
 }
 
 //---------------------------------------------------------------------------
@@ -574,7 +574,7 @@ bool csHazeLoader::Initialize (iObjectRegistry* object_reg)
   return true;
 }
 
-iBase* csHazeLoader::Parse (const char* string, 
+csPtr<iBase> csHazeLoader::Parse (const char* string, 
 			    iLoaderContext* ldr_context, iBase*)
 {
   CS_TOKEN_TABLE_START (commands)
@@ -605,7 +605,7 @@ iBase* csHazeLoader::Parse (const char* string,
     {
       // @@@ Error handling!
       if (hazestate) hazestate->DecRef ();
-      return NULL;
+      return csPtr<iBase> (NULL);
     }
     switch (cmd)
     {
@@ -617,7 +617,7 @@ iBase* csHazeLoader::Parse (const char* string,
 	  {
 	    // @@@ Error handling!
 	    if (hazestate) hazestate->DecRef ();
-	    return NULL;
+	    return csPtr<iBase> (NULL);
 	  }
 	  mesh = fact->GetMeshObjectFactory ()->NewInstance ();
           hazestate = SCF_QUERY_INTERFACE (mesh, iHazeState);
@@ -635,7 +635,7 @@ iBase* csHazeLoader::Parse (const char* string,
             // @@@ Error handling!
             mesh->DecRef ();
 	    if (hazestate) hazestate->DecRef ();
-            return NULL;
+            return csPtr<iBase> (NULL);
 	  }
 	  hazestate->SetMaterialWrapper (mat);
 	}
@@ -669,10 +669,10 @@ iBase* csHazeLoader::Parse (const char* string,
 
   if (hazestate) hazestate->DecRef ();
   if (hazefactorystate) hazefactorystate->DecRef ();
-  return mesh;
+  return csPtr<iBase> (mesh);
 }
 
-iBase* csHazeLoader::Parse (iDocumentNode* node,
+csPtr<iBase> csHazeLoader::Parse (iDocumentNode* node,
 			    iLoaderContext* ldr_context, iBase*)
 {
   csRef<iMeshObject> mesh;
@@ -698,7 +698,7 @@ iBase* csHazeLoader::Parse (iDocumentNode* node,
 	    synldr->ReportError (
 		"crystalspace.hazeloader.parse.badfactory",
 		child, "Could not find factory '%s'!", factname);
-	    return NULL;
+	    return csPtr<iBase> (NULL);
 	  }
 	  mesh = fact->GetMeshObjectFactory ()->NewInstance ();
           hazestate = SCF_QUERY_INTERFACE (mesh, iHazeState);
@@ -715,7 +715,7 @@ iBase* csHazeLoader::Parse (iDocumentNode* node,
 	    synldr->ReportError (
 		"crystalspace.hazeloader.parse.badmaterial",
 		child, "Could not find material '%s'!", matname);
-	    return NULL;
+	    return csPtr<iBase> (NULL);
 	  }
 	  hazestate->SetMaterialWrapper (mat);
 	}
@@ -724,18 +724,18 @@ iBase* csHazeLoader::Parse (iDocumentNode* node,
         {
 	  uint mode;
 	  if (!synldr->ParseMixmode (child, mode))
-	    return NULL;
+	    return csPtr<iBase> (NULL);
           hazestate->SetMixMode (mode);
 	}
 	break;
       case XMLTOKEN_ORIGIN:
         if (!synldr->ParseVector (child, a))
-	  return NULL;
+	  return csPtr<iBase> (NULL);
         hazestate->SetOrigin (a);
 	break;
       case XMLTOKEN_DIRECTIONAL:
         if (!synldr->ParseVector (child, a))
-	  return NULL;
+	  return csPtr<iBase> (NULL);
         hazestate->SetDirectional (a);
 	break;
       case XMLTOKEN_LAYER:
@@ -748,13 +748,13 @@ iBase* csHazeLoader::Parse (iDocumentNode* node,
 	break;
       default:
 	synldr->ReportBadToken (child);
-	return NULL;
+	return csPtr<iBase> (NULL);
     }
   }
 
   // Incref to prevent smart pointer from releasing it.
   if (mesh) mesh->IncRef ();
-  return mesh;
+  return csPtr<iBase> (mesh);
 }
 
 //---------------------------------------------------------------------------

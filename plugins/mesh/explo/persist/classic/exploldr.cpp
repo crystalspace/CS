@@ -152,7 +152,7 @@ bool csExplosionFactoryLoader::Initialize (iObjectRegistry* object_reg)
   return true;
 }
 
-iBase* csExplosionFactoryLoader::Parse (const char* /*string*/,
+csPtr<iBase> csExplosionFactoryLoader::Parse (const char* /*string*/,
 	iLoaderContext*, iBase* /* context */)
 {
   iMeshObjectType* type = CS_QUERY_PLUGIN_CLASS (plugin_mgr,
@@ -165,10 +165,10 @@ iBase* csExplosionFactoryLoader::Parse (const char* /*string*/,
   }
   iMeshObjectFactory* fact = type->NewFactory ();
   type->DecRef ();
-  return fact;
+  return csPtr<iBase> (fact);
 }
 
-iBase* csExplosionFactoryLoader::Parse (iDocumentNode* /*node*/,
+csPtr<iBase> csExplosionFactoryLoader::Parse (iDocumentNode* /*node*/,
 	iLoaderContext*, iBase* /* context */)
 {
   iMeshObjectType* type = CS_QUERY_PLUGIN_CLASS (plugin_mgr,
@@ -181,7 +181,7 @@ iBase* csExplosionFactoryLoader::Parse (iDocumentNode* /*node*/,
   }
   iMeshObjectFactory* fact = type->NewFactory ();
   type->DecRef ();
-  return fact;
+  return csPtr<iBase> (fact);
 }
 
 //---------------------------------------------------------------------------
@@ -253,7 +253,7 @@ bool csExplosionLoader::Initialize (iObjectRegistry* object_reg)
   return true;
 }
 
-iBase* csExplosionLoader::Parse (const char* string,
+csPtr<iBase> csExplosionLoader::Parse (const char* string,
 	iLoaderContext* ldr_context, iBase*)
 {
   CS_TOKEN_TABLE_START (commands)
@@ -292,7 +292,7 @@ iBase* csExplosionLoader::Parse (const char* string,
       // @@@ Error handling!
       if (partstate) partstate->DecRef ();
       if (explostate) explostate->DecRef ();
-      return NULL;
+      return csPtr<iBase> (NULL);
     }
     switch (cmd)
     {
@@ -326,7 +326,7 @@ iBase* csExplosionLoader::Parse (const char* string,
 	    // @@@ Error handling!
 	    if (partstate) partstate->DecRef ();
 	    if (explostate) explostate->DecRef ();
-	    return NULL;
+	    return csPtr<iBase> (NULL);
 	  }
 	  mesh = fact->GetMeshObjectFactory ()->NewInstance ();
           partstate = SCF_QUERY_INTERFACE (mesh, iParticleState);
@@ -343,7 +343,7 @@ iBase* csExplosionLoader::Parse (const char* string,
             mesh->DecRef ();
 	    if (partstate) partstate->DecRef ();
 	    if (explostate) explostate->DecRef ();
-            return NULL;
+            return csPtr<iBase> (NULL);
 	  }
 	  partstate->SetMaterialWrapper (mat);
 	}
@@ -414,10 +414,10 @@ iBase* csExplosionLoader::Parse (const char* string,
 
   if (partstate) partstate->DecRef ();
   if (explostate) explostate->DecRef ();
-  return mesh;
+  return csPtr<iBase> (mesh);
 }
 
-iBase* csExplosionLoader::Parse (iDocumentNode* node,
+csPtr<iBase> csExplosionLoader::Parse (iDocumentNode* node,
 	iLoaderContext* ldr_context, iBase*)
 {
   csRef<iMeshObject> mesh;
@@ -465,7 +465,7 @@ iBase* csExplosionLoader::Parse (iDocumentNode* node,
 	  {
       	    synldr->ReportError ("crystalspace.exploader.parse.unknownfactory",
 		child, "Couldn't find factory '%s'!", factname);
-	    return NULL;
+	    return csPtr<iBase> (NULL);
 	  }
 	  mesh = fact->GetMeshObjectFactory ()->NewInstance ();
           partstate = SCF_QUERY_INTERFACE (mesh, iParticleState);
@@ -480,7 +480,7 @@ iBase* csExplosionLoader::Parse (iDocumentNode* node,
 	  {
       	    synldr->ReportError ("crystalspace.exploader.parse.unknownmaterial",
 		child, "Couldn't find material '%s'!", matname);
-	    return NULL;
+	    return csPtr<iBase> (NULL);
 	  }
 	  partstate->SetMaterialWrapper (mat);
 	}
@@ -489,7 +489,7 @@ iBase* csExplosionLoader::Parse (iDocumentNode* node,
         {
 	  uint mode;
 	  if (!synldr->ParseMixmode (child, mode))
-	    return NULL;
+	    return csPtr<iBase> (NULL);
           partstate->SetMixMode (mode);
 	}
 	break;
@@ -497,7 +497,7 @@ iBase* csExplosionLoader::Parse (iDocumentNode* node,
         {
           bool do_lighting;
 	  if (!synldr->ParseBool (child, do_lighting, true))
-	    return NULL;
+	    return csPtr<iBase> (NULL);
           explostate->SetLighting (do_lighting);
         }
         break;
@@ -524,13 +524,13 @@ iBase* csExplosionLoader::Parse (iDocumentNode* node,
         break;
       default:
         synldr->ReportBadToken (child);
-	return NULL;
+	return csPtr<iBase> (NULL);
     }
   }
 
   // IncRef() to avoid smart pointer releasing mesh.
   if (mesh) mesh->IncRef ();
-  return mesh;
+  return csPtr<iBase> (mesh);
 }
 
 //---------------------------------------------------------------------------

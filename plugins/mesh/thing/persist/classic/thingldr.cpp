@@ -612,7 +612,7 @@ Nag to Jorrit about this feature if you want it.");
   return true;
 }
 
-iBase* csThingLoader::Parse (const char* string, 
+csPtr<iBase> csThingLoader::Parse (const char* string, 
 			     iLoaderContext* ldr_context, iBase*)
 {
   csParser* parser = ldr_context->GetParser ();
@@ -639,7 +639,7 @@ iBase* csThingLoader::Parse (const char* string,
   }
   thing_state->DecRef ();
   engine->DecRef ();
-  return fact;
+  return csPtr<iBase> (fact);
 }
 
 // XML versions: -------------------------------------------------
@@ -805,10 +805,10 @@ Nag to Jorrit about this feature if you want it.");
       case XMLTOKEN_CURVE:
         {
 	  const char* cname = child->GetContentsValue ();
-	  iThingEnvironment* te = SCF_QUERY_INTERFACE (engine->GetThingType (),
-	    iThingEnvironment);
+	  csRef<iThingEnvironment> te (
+	  	SCF_QUERY_INTERFACE (engine->GetThingType (),
+		iThingEnvironment));
 	  iCurveTemplate* ct = te->FindCurveTemplate (cname);
-	  te->DecRef ();
 	  iCurve* p = thing_state->CreateCurve (ct);
 	  p->QueryObject()->SetName (cname);
           if (!ct->GetMaterial ())
@@ -871,7 +871,7 @@ Nag to Jorrit about this feature if you want it.");
   return true;
 }
 
-iBase* csThingLoader::Parse (iDocumentNode* node,
+csPtr<iBase> csThingLoader::Parse (iDocumentNode* node,
 			     iLoaderContext* ldr_context, iBase*)
 {
   // Things only work with the real 3D engine and not with the iso engine.
@@ -895,7 +895,7 @@ iBase* csThingLoader::Parse (iDocumentNode* node,
   }
   thing_state->DecRef ();
   engine->DecRef ();
-  return fact;
+  return csPtr<iBase> (fact);
 }
 
 //---------------------------------------------------------------------------
@@ -974,7 +974,7 @@ bool csPlaneLoader::Initialize (iObjectRegistry* object_reg)
   return true;
 }
 
-iBase* csPlaneLoader::Parse (const char* string, 
+csPtr<iBase> csPlaneLoader::Parse (const char* string, 
 			     iLoaderContext* ldr_context, iBase* /*context*/)
 {
   CS_TOKEN_TABLE_START (commands)
@@ -997,14 +997,12 @@ iBase* csPlaneLoader::Parse (const char* string,
   csParser* parser = ldr_context->GetParser ();
 
   // Things only work with the real 3D engine and not with the iso engine.
-  iEngine* engine = CS_QUERY_REGISTRY (object_reg, iEngine);
+  csRef<iEngine> engine (CS_QUERY_REGISTRY (object_reg, iEngine));
   CS_ASSERT (engine != NULL);
 
-  iThingEnvironment* te = SCF_QUERY_INTERFACE (engine->GetThingType (),
-  	iThingEnvironment);
-  engine->DecRef ();
-  iPolyTxtPlane* ppl = te->CreatePolyTxtPlane ();
-  te->DecRef ();
+  csRef<iThingEnvironment> te (SCF_QUERY_INTERFACE (engine->GetThingType (),
+  	iThingEnvironment));
+  csRef<iPolyTxtPlane> ppl (te->CreatePolyTxtPlane ());
 
   bool tx1_given = false, tx2_given = false;
   csVector3 tx_orig (0, 0, 0), tx1 (0, 0, 0), tx2 (0, 0, 0);
@@ -1075,7 +1073,7 @@ iBase* csPlaneLoader::Parse (const char* string,
 	"crystalspace.planeloader.parse.badformat",
         "Token '%s' not found while parsing a plane!",
     	parser->GetLastOffender ());
-    return NULL;
+    return csPtr<iBase> (NULL);
   }
 
   if (tx1_given)
@@ -1106,27 +1104,26 @@ iBase* csPlaneLoader::Parse (const char* string,
       ReportError (reporter,
 	  "crystalspace.planeloader.parse.badplane",
           "Not supported!");
-      return NULL;
+      return csPtr<iBase> (NULL);
     }
   else
     ppl->SetTextureSpace (tx_matrix, tx_vector);
 
-  return ppl;
+  ppl->IncRef ();	// Prevent smart pointer from releasing.
+  return csPtr<iBase> (ppl);
 }
 
-iBase* csPlaneLoader::Parse (iDocumentNode* node,
+csPtr<iBase> csPlaneLoader::Parse (iDocumentNode* node,
 			     iLoaderContext* /*ldr_context*/,
 			     iBase* /*context*/)
 {
   // Things only work with the real 3D engine and not with the iso engine.
-  iEngine* engine = CS_QUERY_REGISTRY (object_reg, iEngine);
+  csRef<iEngine> engine (CS_QUERY_REGISTRY (object_reg, iEngine));
   CS_ASSERT (engine != NULL);
 
-  iThingEnvironment* te = SCF_QUERY_INTERFACE (engine->GetThingType (),
-  	iThingEnvironment);
-  engine->DecRef ();
-  iPolyTxtPlane* ppl = te->CreatePolyTxtPlane ();
-  te->DecRef ();
+  csRef<iThingEnvironment> te (SCF_QUERY_INTERFACE (engine->GetThingType (),
+  	iThingEnvironment));
+  csRef<iPolyTxtPlane> ppl (te->CreatePolyTxtPlane ());
 
   bool tx1_given = false, tx2_given = false;
   csVector3 tx_orig (0, 0, 0), tx1 (0, 0, 0), tx2 (0, 0, 0);
@@ -1189,7 +1186,7 @@ iBase* csPlaneLoader::Parse (iDocumentNode* node,
         break;
       default:
         synldr->ReportBadToken (child);
-	return NULL;
+	return csPtr<iBase> (NULL);
     }
   }
 
@@ -1221,12 +1218,13 @@ iBase* csPlaneLoader::Parse (iDocumentNode* node,
       synldr->ReportError (
 	  "crystalspace.planeloader.parse.badplane",
           node, "Not supported!");
-      return NULL;
+      return csPtr<iBase> (NULL);
     }
   else
     ppl->SetTextureSpace (tx_matrix, tx_vector);
 
-  return ppl;
+  ppl->IncRef ();	// Prevent smart pointer release.
+  return csPtr<iBase> (ppl);
 }
 
 //---------------------------------------------------------------------------
@@ -1284,7 +1282,7 @@ bool csBezierLoader::Initialize (iObjectRegistry* object_reg)
   return true;
 }
 
-iBase* csBezierLoader::Parse (const char* string, 
+csPtr<iBase> csBezierLoader::Parse (const char* string, 
 			      iLoaderContext* ldr_context, iBase* /*context*/)
 {
   CS_TOKEN_TABLE_START (commands)
@@ -1303,13 +1301,12 @@ iBase* csBezierLoader::Parse (const char* string,
   csParser* parser = ldr_context->GetParser ();
 
   // Things only work with the real 3D engine and not with the iso engine.
-  iEngine* engine = CS_QUERY_REGISTRY (object_reg, iEngine);
+  csRef<iEngine> engine (CS_QUERY_REGISTRY (object_reg, iEngine));
   CS_ASSERT (engine != NULL);
 
-  iThingEnvironment* te = SCF_QUERY_INTERFACE (engine->GetThingType (),
-	    iThingEnvironment);
-  iCurveTemplate* tmpl = te->CreateBezierTemplate ();
-  te->DecRef ();
+  csRef<iThingEnvironment> te (SCF_QUERY_INTERFACE (engine->GetThingType (),
+	    iThingEnvironment));
+  csRef<iCurveTemplate> tmpl (te->CreateBezierTemplate ());
 
   iMaterialWrapper* mat = NULL;
   char str[255];
@@ -1323,7 +1320,7 @@ iBase* csBezierLoader::Parse (const char* string,
 	  "crystalspace.bezierloader.parse.badformat",
           "Expected parameters instead of '%s'!", buf);
       engine->DecRef ();
-      return NULL;
+      return csPtr<iBase> (NULL);
     }
     switch (cmd)
     {
@@ -1341,7 +1338,7 @@ iBase* csBezierLoader::Parse (const char* string,
 	    "crystalspace.bezierloader.parse.material",
             "Couldn't find material named '%s'!", str);
           engine->DecRef ();
-          return NULL;
+          return csPtr<iBase> (NULL);
         }
         tmpl->SetMaterial (mat);
         break;
@@ -1356,26 +1353,26 @@ iBase* csBezierLoader::Parse (const char* string,
 	      "crystalspace.bezierloader.parse.vertices",
               "Wrong number of vertices to bezier! %d should be 9!", num);
             engine->DecRef ();
-            return NULL;
+            return csPtr<iBase> (NULL);
           }
           for (i = 0 ; i < num ; i++) tmpl->SetVertex (i, list[i]);
         }
         break;
     }
   }
-  engine->DecRef ();
   if (cmd == CS_PARSERR_TOKENNOTFOUND)
   {
     ReportError (reporter,
 	  "crystalspace.bezierloader.parse.badformat",
           "Token '%s' not found while parsing a bezier template!",
     	  parser->GetLastOffender ());
-    return NULL;
+    return csPtr<iBase> (NULL);
   }
-  return tmpl;
+  tmpl->IncRef ();	// Prevent smart pointer from releasing.
+  return csPtr<iBase> (tmpl);
 }
 
-iBase* csBezierLoader::Parse (iDocumentNode* node,
+csPtr<iBase> csBezierLoader::Parse (iDocumentNode* node,
 			      iLoaderContext* ldr_context, iBase* /*context*/)
 {
   // Things only work with the real 3D engine and not with the iso engine.
@@ -1383,10 +1380,9 @@ iBase* csBezierLoader::Parse (iDocumentNode* node,
   CS_ASSERT (engine != NULL);
   csRef<iSyntaxService> synldr (CS_QUERY_REGISTRY (object_reg, iSyntaxService));
 
-  iThingEnvironment* te = SCF_QUERY_INTERFACE (engine->GetThingType (),
-	    iThingEnvironment);
-  iCurveTemplate* tmpl = te->CreateBezierTemplate ();
-  te->DecRef ();
+  csRef<iThingEnvironment> te (SCF_QUERY_INTERFACE (engine->GetThingType (),
+	    iThingEnvironment));
+  csRef<iCurveTemplate> tmpl (te->CreateBezierTemplate ());
 
   iMaterialWrapper* mat = NULL;
 
@@ -1412,7 +1408,7 @@ iBase* csBezierLoader::Parse (iDocumentNode* node,
 	    synldr->ReportError (
 	      "crystalspace.bezierloader.parse.material",
               child, "Couldn't find material named '%s'!", matname);
-            return NULL;
+            return csPtr<iBase> (NULL);
           }
           tmpl->SetMaterial (mat);
 	}
@@ -1424,7 +1420,7 @@ iBase* csBezierLoader::Parse (iDocumentNode* node,
 	    synldr->ReportError (
 	      "crystalspace.bezierloader.parse.vertices",
               child, "Wrong number of vertices to bezier! Should be 9!");
-            return NULL;
+            return csPtr<iBase> (NULL);
           }
 	  tmpl->SetVertex (num_v, child->GetContentsValueAsInt ());
 	  num_v++;
@@ -1432,7 +1428,7 @@ iBase* csBezierLoader::Parse (iDocumentNode* node,
         break;
       default:
 	synldr->ReportBadToken (child);
-	return NULL;
+	return csPtr<iBase> (NULL);
     }
   }
   
@@ -1441,9 +1437,10 @@ iBase* csBezierLoader::Parse (iDocumentNode* node,
     synldr->ReportError (
       "crystalspace.bezierloader.parse.vertices",
       node, "Wrong number of vertices to bezier! %d should be 9!", num_v);
-    return NULL;
+    return csPtr<iBase> (NULL);
   }
-  return tmpl;
+  tmpl->IncRef ();	// Prevent smart pointer from releasing.
+  return csPtr<iBase> (tmpl);
 }
 
 //---------------------------------------------------------------------------

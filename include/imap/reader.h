@@ -36,11 +36,11 @@ SCF_VERSION (iLoaderPlugin, 0, 2, 0);
 struct iLoaderPlugin : public iBase
 {
   /// Parse a given string and return a new object for it.
-  virtual iBase* Parse (const char* string, iLoaderContext* ldr_context,
+  virtual csPtr<iBase> Parse (const char* string, iLoaderContext* ldr_context,
   	iBase* context) = 0;
 
   /// Parse a given XML node and return a new object for it.
-  virtual iBase* Parse (iDocumentNode* node, iLoaderContext* ldr_context,
+  virtual csPtr<iBase> Parse (iDocumentNode* node, iLoaderContext* ldr_context,
   	iBase* context) = 0;
 };
 
@@ -52,7 +52,7 @@ SCF_VERSION (iBinaryLoaderPlugin, 0, 0, 1);
 struct iBinaryLoaderPlugin : public iBase
 {
   /// Parse given data and return a new object for it.
-  virtual iBase* Parse (void* data, iLoaderContext* ldr_context,
+  virtual csPtr<iBase> Parse (void* data, iLoaderContext* ldr_context,
   	iBase* context) = 0;
 };
 

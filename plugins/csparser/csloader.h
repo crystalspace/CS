@@ -476,7 +476,7 @@ private:
    * XML and will call the XML Parse function in that case. Otherwise it
    * will call the old style Parse function.
    */
-  iBase* TestXmlPlugParse (iLoaderPlugin* plug, iDataBuffer* buf,
+  csPtr<iBase> TestXmlPlugParse (iLoaderPlugin* plug, iDataBuffer* buf,
   	iBase* context, const char* fname);
 
   /**

@@ -638,8 +638,8 @@ bool csMotionLoader::LoadMotion (iDocumentNode* node, iMotionTemplate* mot)
 }
 
 
-iBase* csMotionLoader::Parse (const char *string, iLoaderContext* ldr_context,
-	iBase* /* context */ )
+csPtr<iBase> csMotionLoader::Parse (const char *string,
+	iLoaderContext* ldr_context, iBase* /* context */ )
 {
   CS_TOKEN_TABLE_START(commands)
     CS_TOKEN_TABLE(FILE)
@@ -661,7 +661,7 @@ iBase* csMotionLoader::Parse (const char *string, iLoaderContext* ldr_context,
 	if (!params)
 	{
 	  printf("Expected parameters instead of '%s'\n", string);
-	  return NULL;
+	  return csPtr<iBase> (NULL);
 	}
 	switch (cmd)
 	{
@@ -691,13 +691,13 @@ iBase* csMotionLoader::Parse (const char *string, iLoaderContext* ldr_context,
 	  Report(CS_REPORTER_SEVERITY_ERROR,
 		  "Token '%s' not found while parsing the iMotionLoader plugin",
 			parser->GetLastOffender());
-	  return NULL;
+	  return csPtr<iBase> (NULL);
 	}
-	return this;
+	return csPtr<iBase> (this);
 }
 
-iBase* csMotionLoader::Parse (iDocumentNode* node, iLoaderContext* ldr_context,
-	iBase* /* context */ )
+csPtr<iBase> csMotionLoader::Parse (iDocumentNode* node,
+	iLoaderContext* ldr_context, iBase* /* context */ )
 {
   csRef<iDocumentNodeIterator> it = node->GetNodes ();
   while (it->HasNext ())
@@ -716,16 +716,16 @@ iBase* csMotionLoader::Parse (iDocumentNode* node, iLoaderContext* ldr_context,
 	  {
 	    m = motman->AddMotion (motname);
 	    if (!LoadMotion (child, m))
-	      return NULL;
+	      return csPtr<iBase> (NULL);
 	  }
 	}
 	break;
       default:
         synldr->ReportBadToken (child);
-	return NULL;
+	return csPtr<iBase> (NULL);
     }
   }
-  return this;
+  return csPtr<iBase> (this);
 }
 
 //=============================================================== Motion Saver

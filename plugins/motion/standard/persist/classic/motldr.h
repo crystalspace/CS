@@ -66,11 +66,11 @@ public:
   csMotionLoader (iBase *);
   virtual ~csMotionLoader();
   virtual bool Initialize( iObjectRegistry *object_reg);
-  virtual iBase* Parse (const char* string, 
+  virtual csPtr<iBase> Parse (const char* string, 
     iLoaderContext* ldr_context, iBase *context);
 
   /// Parse a given node and return a new object for it.
-  virtual iBase* Parse (iDocumentNode* node,
+  virtual csPtr<iBase> Parse (iDocumentNode* node,
     iLoaderContext* ldr_context, iBase* context);
 
   void Report (int severity, const char* msg, ...);
