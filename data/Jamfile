@@ -20,11 +20,13 @@ maps =
   terrainf ;
 for map in $(maps)
 {
-    local mapfiles = [ Wildcard $(map) : *.jpg *.png *.map *.tga world ] ;
+    local mapfiles =
+        [ Wildcard $(map) : *.jpg *.png *.map *.tga *.dds world ] ;
     InstallData $(mapfiles) : maps $(map) ;
 }
 
 SubInclude TOP data aws ;
 SubInclude TOP data config ;
+SubInclude TOP data cube ;
 SubInclude TOP data shader ;
 SubInclude TOP data varia ;

@@ -6,6 +6,9 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+1-Jul-2004
+	- Eric Sunshine augmented "jam install" so that CS/data/cube and
+	  CS/data/flarge/mosaic-detail.dds are also installed.
 30-Jun-2004
 	- Jorrit modified walktest so that the default 'perftest' command
 	  does 200 frames instead of 100. That is more accurate.
