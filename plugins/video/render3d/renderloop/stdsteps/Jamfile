@@ -3,7 +3,7 @@ SubDir TOP plugins video render3d renderloop stdsteps ;
 Plugin rendstep_std
 	: [ Wildcard *.cpp *.h ]
 ;
-LinkWith rendstep_std : renderstepcommon csgeom cssys csutil ;
+LinkWith rendstep_std : renderstepcommon csgeom cssys csutil csgfx ;
 
 Help rendstep_std : "Crystal Space standard render loop steps" ;
 
