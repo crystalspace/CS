@@ -75,6 +75,7 @@
 #include "csutil/objiter.h"
 #include "csutil/objpool.h"
 #include "csutil/objreg.h"
+#include "csutil/parasiticdatabuffer.h"
 #include "csutil/parray.h"
 #include "csutil/physfile.h"
 #include "csutil/plugldr.h"
