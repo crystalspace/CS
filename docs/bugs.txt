@@ -69,6 +69,10 @@ SOLUTION: Don't know (someone who manages Glide port just have to look,
 since OpenGL and DirectX have correct mapping)
 DIFFICULTY: Moderate?
 
+PROBLEM: Gouraud shaded tris not always correctly split by BSP tree.
+SOLUTION: Don't know yet.
+DIFFICULTY: moderate
+
 PROBLEM: No halos in 8-bit and 32-bit display mode.
 SOLUTION: 32-bit display mode is easy. It just
 needs to be done. 8-bit is another matter.

@@ -13,6 +13,26 @@ Short-term cleanups that need to be done:
 	- Check the dependencies of libraries/COM objects and try to find
 	  includes that don't belong there (like from csengine).
 
+12-Aug-1999
+	- Implemented an object pool for csLightPatch. This improves speed
+	  of dynamic lighting noticably.
+	- Fixed memory leak in CS (introduced recently). This also
+	  gives the performance improvement which we were expecting from
+	  creating the csTransformationManager but which we didn't
+	  really get.
+	- Avoided other large allocations at runtime by not allocating
+	  a lightmap copy everytime we have to check if dynamic lights
+	  altered a lightmap.
+	- Fixed an error in sprite lighting which causes unneeded
+	  reallocation and deletion of the sprite vertex color arrays.
+	  This is another performance enhancement.
+	- Added Dumper functions for the new pools.
+	- Crystal Space no longer crashes when you exit while a dynamic
+	  light is active.
+	- Fixed Squawk so that Open is called earlier. This caused a
+	  crash otherwise.
+	- Edge drawing works now too when c-buffer is enabled.
+	- Fixed Blocks so that dynamic gouraud shading works again.
 11-Aug-1999
 	- Only transform a polygon to camera space AFTER clipping instead
 	  of before. This improves performance slightly and also fixes
@@ -34,6 +54,13 @@ Short-term cleanups that need to be done:
 	  csPoly2D.
 	- csClipper now uses a polygon pool instead of creating new
 	  polygons every time we go through a portal.
+	- Changes from Robert Bate to update history and installation
+	  instructions for the Macintosh.
+	- Robert Bate updated the Macintosh project files.
+	- Andrew Zabolotny did some changes to Makefile. System configuration
+	  scripts can now autodetect additional drivers to build. For example,
+	  config script can detect whenever OpenGL headers/libs are installed
+	  and set DRIVERS.SYSTEM=c23d/glrender cs2d/glos2.
 	- Eric Sunshine worked around a NextStep compiler bug triggered by
 	  Jorrit's changes to the polygon code.  Specifically, the static
 	  csPolygon2DFactory instance in pol2d.cpp triggered a bug in the
