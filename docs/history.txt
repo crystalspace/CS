@@ -17,9 +17,20 @@ chronological order.
 	  is not enabled it will not call GetRelevantLights() from the
 	  light manager.
 	- Jorrit restored bugplug screenshot to put screenshot back to /this
-	  instead of /tmp. Having them in /tmp is very confusing as this
-	  will mix screenshots of different apps with no way to distinguish
-	  them.
+	  instead of /tmp.  Having them in /tmp is very confusing as this will
+	  mix screenshots of different apps with no way to distinguish them.
+	  [Note from Eric Sunshine: Placing them in /this is a bad idea since
+	  /this is unpredictable on some platforms.  For instance, on
+	  Macintosh, when you double-click to launch an application, /this is
+	  not under your control (it may be your home directory, or it may be
+	  /, or it may be within the application's wrapper directory).
+	  Likewise, on Windows, if you double-click to launch a directory,
+	  /this is entirely dependent upon whatever Windows thinks your current
+	  directory is at any given moment (which is often not known to the
+	  user).  In the long run, this should be changed back to use VFS /tmp
+	  since it is more reliable and safer.]
+	- Eric Sunshine updated movierec.txi HOWTO.  It still had a reference
+	  to the obsolete user.cfg.
 10-Feb-2004
 	- Eric Sunshine fixed CS/data/Jamfile so that it no longer tries to
 	  install the non-existent unifont.csf file.  (Bug reported by Frank

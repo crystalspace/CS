@@ -30,25 +30,15 @@ recompilation.  Just place the movie recorder plugin in the application's
 library directory.
 
 Like the BugPlug plugin, the movie recorder can be loaded and manipulated
-explicitly by an application or it can be loaded transparently into an existing
-application.  To load it transparently, you can add a line to
-@file{data/config/user.cfg} (this is really one line even though it appears
-wrapped over two lines in the printed output.):
-
-@iftex
-@example
-Global.System.Plugins.iMovieRecorder =
-  crystalspace.utilities.movierecorder
-@end example
-@end iftex
-@ifnottex
-@example
-Global.System.Plugins.iMovieRecorder = crystalspace.utilities.movierecorder
-@end example
-@end ifnottex
-
-@noindent
-The movie recorder plugin should now load automatically when your application
+explicitly by an application or it can be loaded transparently into any
+application automatically.  To load it transparently for all applications, you
+add a setting to your user-specific, application-neutral configuration
+(@pxref{Config Domains}).  To do this, in the @samp{CrystalSpace.Global}
+configuration domain, give the setting @samp{System.Plugins.iMovieRecorder} the
+value @samp{crystalspace.utilities.movierecorder}.  To find out how to do this
+for your particular platform, see the platform-specific intructions for
+manipulating configuration information (@pxref{Config PerUser}).  The movie
+recorder plugin should now load automatically when your application
 initializes.
 
 @subsubheading Using the Movie Recorder
