@@ -153,6 +153,7 @@ private:
    */
   void DisposeAll()
   {
+#if 0
     for (size_t i = blocks.Length(); i-- > 0; )
     {
       csBlock const& bl = blocks[i];
@@ -170,6 +171,7 @@ private:
     }
     blocks.Empty();
     firstfreeblock = (size_t)-1;
+#endif
   }
 
 public:
