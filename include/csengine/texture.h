@@ -164,9 +164,6 @@ public:
   {
     SCF_DECLARE_EMBEDDED_IBASE (csTextureWrapper);
 
-    virtual csTextureWrapper *GetPrivateObject()
-    {return scfParent;}
-
     virtual iObject *QueryObject();
     virtual iTextureWrapper *Clone () const
     { return &(new csTextureWrapper (*scfParent))->scfiTextureWrapper; }

@@ -25,6 +25,8 @@ The history order is reversed so that new features are at the top.
 	- Jorrit removed GetPrivateObject() in iMaterialWrapper and
 	  iMeshWrapper. They were no longer used. Also removed a few addditional
 	  GetPrivateObject() calls.
+	- Jorrit removed a GetPrivateObject() from csTextureWrapper that
+	  wasn't even reachable.
 	- Eric Sunshine eliminated several compilation warnings from
 	  win32/registrycfg.cpp.
 	- Eric Sunshine performed Phase Two of the elimination of the
