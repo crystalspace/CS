@@ -157,7 +157,7 @@ inline long QInt24 (float inval)
 #define QRound(x) (int ((x)+.5))
 #define QInt(x)   (int (x))
 #define QInt16(x) (int ((x)*65536.))
-#define QInt24(x) (int ((x)*16777216.)))
+#define QInt24(x) (int ((x)*16777216.))
 	
 #endif
 
