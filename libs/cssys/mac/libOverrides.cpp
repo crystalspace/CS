@@ -32,7 +32,13 @@
 #include <misc_io.h>
 #include <stat.h>
 #include <string.h>
+#ifdef __cplusplus 
+	extern "C" {
+#endif
 #include <fsp_fopen.h>
+#ifdef __cplusplus 
+}
+#endif
 #define SYSDEF_UNLINK
 #define SYSDEF_ACCESS
 #define SYSDEF_MKDIR
