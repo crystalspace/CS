@@ -322,9 +322,12 @@ DiskFile::DiskFile (int Mode, VfsNode *ParentNode, int RIndex,
   {
     if (fseek (file, 0, SEEK_END))
       CheckError ();
-    Size = ftell (file) + 1;
-    if (Size == 0)
+    Size = ftell (file);
+    if (Size == -1)
+    {
+      Size = 0;
       CheckError ();
+    }
     if (fseek (file, 0, SEEK_SET))
       CheckError ();
   }
@@ -385,7 +388,8 @@ void DiskFile::MakeDir (char *PathBase, char *PathSuffix)
 
 int DiskFile::GetStatus ()
 { 
-  clearerr (file);
+  if (file != 0)
+    clearerr (file);
   return csFile::GetStatus ();
 }
 
