@@ -61,6 +61,12 @@ struct iStaticPVSTree : public iBase
   virtual const csBox3& GetBoundingBox () const = 0;
 
   /**
+   * After building the KDtree this function must be called to make
+   * sure all node bounding boxes are ok.
+   */
+  virtual void UpdateBoundingBoxes () = 0;
+
+  /**
    * Set the minimal size to use for a node in the PVS tree. This minimal
    * size will be used to subdivide the node even if there are no more
    * static objects there. This can be useful in case dynamic objects
@@ -112,6 +118,11 @@ struct iStaticPVSTree : public iBase
    * Return the second child of a node.
    */
   virtual void* GetSecondChild (void* parent) const = 0;
+
+  /**
+   * Get the box for the given node.
+   */
+  virtual const csBox3& GetNodeBBox (void* node) const = 0;
 
   /**
    * Return the axis and split position of a node.

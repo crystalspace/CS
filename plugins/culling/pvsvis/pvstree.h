@@ -226,6 +226,10 @@ public:
   {
     return ((csStaticPVSNode*)parent)->child2;
   }
+  virtual const csBox3& GetNodeBBox (void* node) const
+  {
+    return ((csStaticPVSNode*)node)->GetNodeBBox ();
+  }
   virtual void GetAxisAndPosition (
   	void* node, int& axis, float& where) const
   {
@@ -243,6 +247,7 @@ public:
   {
     return root_box;
   }
+  virtual void UpdateBoundingBoxes ();
 
   virtual void SetMinimalNodeBox (const csVector3& bbox)
   {

@@ -496,6 +496,54 @@ bool csCoverageTile::FlushForEmpty (csTileCol& fvalue, float maxdepth)
   return modified;
 }
 
+bool csCoverageTile::FlushForEmptyNoDepth (csTileCol& fvalue)
+{
+  int i;
+  MakeEmptyQuick ();
+
+  bool modified = false;
+
+  // Special case. Tile is empty.
+  // In this special case we don't have to compare with the current contents
+  // of the tile since that is empty. We don't have to test for depth but just
+  // update it.
+  FlushOperations ();
+
+  // Now perform the XOR sweep and OR with main coverage buffer.
+  // fvalue will be the modified from left to right and will be
+  // OR-ed with the main buffer. In the mean time the coverage_cache
+  // buffer contents will be modified to be true wherever the
+  // coverage_cache actually modified the coverage buffer.
+  csTileCol* c = coverage;      
+  csTileCol* cc = coverage_cache;
+
+  // 'fulltest' will be used to test if the resulting tile is full.
+  // We will initialize it to full and then and it with every column. If
+  // 'fulltest' is still full after the loop then we know the tile is full.
+  csTileCol fulltest = TILECOL_FULL;
+
+  // Now do the depth update. Here we will use the coverage (instead of
+  // coverage_cache which is used in the general case) to see where we
+  // need to update the depth buffer.
+  for (i = 0 ; i < (NUM_TILECOL/8) ; i++)
+  {
+    csTileCol* c_end = c+8;
+    do
+    {
+      fvalue ^= *cc;
+      *c = fvalue;
+      if (fvalue) modified = true;
+      fulltest &= fvalue;
+      cc++;
+      c++;
+    }
+    while (c < c_end);
+  }
+
+  tile_full = (fulltest == TILECOL_FULL);
+  return modified;
+}
+
 bool csCoverageTile::FlushForFull (csTileCol& fvalue, float maxdepth)
 {
   if (maxdepth >= tile_max_depth)
@@ -794,6 +842,46 @@ bool csCoverageTile::Flush (csTileCol& fvalue, float maxdepth)
   }
 
   return FlushGeneral (fvalue, maxdepth);
+}
+
+bool csCoverageTile::FlushIgnoreDepth (csTileCol& fvalue)
+{
+  if (tile_full) return false;
+
+  if (num_operations == 0)
+  {
+    // If there are no operations in this tile then there are three
+    // special cases we can handle here.
+    if (fvalue == TILECOL_FULL)
+    {
+      // fvalue is full which means that the tile will be completely filled.
+      queue_tile_empty = false;
+      tile_full = true;
+      return true;
+    }
+    else if (fvalue == TILECOL_EMPTY)
+    {
+      // fvalue is empty which means that there is nothing to do here.
+      return false;
+    }
+    else
+    {
+      // We have a constant fvalue for the entire tile.
+      if (queue_tile_empty)
+      {
+        return FlushForEmptyNoDepth (fvalue);
+      }
+
+      return FlushNoDepth (fvalue);
+    }
+  }
+
+  if (queue_tile_empty)
+  {
+    return FlushForEmptyNoDepth (fvalue);
+  }
+
+  return FlushNoDepth (fvalue);
 }
 
 bool csCoverageTile::TestDepthFlushGeneral (csTileCol& fvalue, float mindepth)
@@ -2089,11 +2177,11 @@ void csTiledCoverageBuffer::InsertPolygonInverted (csVector2* verts,
 
   int tx, ty;
 
-  for (ty = 0 ; ty <= num_tile_rows-1 ; ty++)
+  for (ty = 0 ; ty < num_tile_rows ; ty++)
   {
     csTileCol fvalue = TILECOL_FULL;
     csCoverageTile* tile = GetTile (0, ty);
-    for (tx = 0 ; tx <= (width_po2 >> SHIFT_TILECOL)-1 ; tx++)
+    for (tx = 0 ; tx < (width_po2 >> SHIFT_TILECOL) ; tx++)
     {
       tile->Flush (fvalue, max_depth);
       tile++;
@@ -2110,13 +2198,13 @@ void csTiledCoverageBuffer::InsertPolygonInvertedNoDepth (csVector2* verts,
 
   int tx, ty;
 
-  for (ty = 0 ; ty <= num_tile_rows-1 ; ty++)
+  for (ty = 0 ; ty < num_tile_rows ; ty++)
   {
     csTileCol fvalue = TILECOL_FULL;
     csCoverageTile* tile = GetTile (0, ty);
-    for (tx = 0 ; tx <= (width_po2 >> SHIFT_TILECOL)-1 ; tx++)
+    for (tx = 0 ; tx < (width_po2 >> SHIFT_TILECOL) ; tx++)
     {
-      tile->FlushNoDepth (fvalue);
+      tile->FlushIgnoreDepth (fvalue);
       tile++;
     }
   }
@@ -2185,12 +2273,50 @@ int csTiledCoverageBuffer::InsertPolygonNoDepth (csVector2* verts,
       dr = (width_po2 >> SHIFT_TILECOL)-1;
     for (tx = dirty_left[ty] ; tx <= dr ; tx++)
     {
-      bool mod = tile->FlushNoDepth (fvalue);
+      bool mod = tile->FlushIgnoreDepth (fvalue);
       if (mod) modified++;
       tile++;
     }
   }
   return modified;
+}
+
+int csTiledCoverageBuffer::StatusNoDepth ()
+{
+  int tx, ty;
+  int count_full = 0;
+  int count_empty = 0;
+
+  for (ty = 0 ; ty <= num_tile_rows-1 ; ty++)
+  {
+    csCoverageTile* tile = GetTile (0, ty);
+    for (tx = 0 ; tx <= (width_po2 >> SHIFT_TILECOL)-1 ; tx++)
+    {
+      if (tile->IsFull ())
+      {
+        if (count_empty > 0)
+	{
+	  // We have a full tile but we also registered an empty
+	  // tile earlier. So return 0 for partially full.
+	  return 0;
+	}
+        count_full++;
+      }
+      else if (tile->IsEmpty ())
+      {
+        if (count_full > 0)
+	{
+	  // We have an empty tile but we also registered a full
+	  // tile earlier. So return 0 for partially full.
+	  return 0;
+	}
+        count_empty++;
+      }
+      tile++;
+    }
+  }
+  if (count_full > 0) return 1;
+  return -1;
 }
 
 int csTiledCoverageBuffer::InsertOutline (

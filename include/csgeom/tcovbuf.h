@@ -232,6 +232,13 @@ public:
   bool IsFull () const { return tile_full; }
 
   /**
+   * Return true if tile is surely empty.
+   * This can return false even if tile is empty. So don't 100%
+   * depend on this!
+   */
+  bool IsEmpty () const { return queue_tile_empty; }
+
+  /**
    * Add a general line operation to the operations queue.
    */
   void PushLine (int x1, int y1, int x2, int y2, int dx);
@@ -286,10 +293,21 @@ public:
   bool Flush (csTileCol& fvalue, float maxdepth);
 
   /**
+   * Version of Flush that ignores depth.
+   */
+  bool FlushIgnoreDepth (csTileCol& fvalue);
+
+  /**
    * Version of Flush that handles the case where the tile is empty.
    * Returns true if the tile was modified.
    */
   bool FlushForEmpty (csTileCol& fvalue, float maxdepth);
+
+  /**
+   * Version of Flush that handles the case where the tile is empty.
+   * Returns true if the tile was modified. This version ignores depth.
+   */
+  bool FlushForEmptyNoDepth (csTileCol& fvalue);
 
   /**
    * Version of Flush that handles the case where the tile is full.
@@ -357,7 +375,6 @@ public:
   	bool& do_depth_test);
 
   //-----------------------------------------------------------------
-
 
   /**
    * Perform a non-modifying flush and return true if Flush would
@@ -651,6 +668,13 @@ public:
    * screen buffer would not have been modified).
    */
   bool TestPoint (const csVector2& point, float min_depth);
+
+  /**
+   * Return status of coverage buffer (ignoring depth information).
+   * If this returns 1 the buffer is full. If it returns -1 the buffer
+   * is empty. If it returns 0 the buffer is partially full.
+   */
+  int StatusNoDepth ();
 
   // Debugging functions.
   csPtr<iString> Debug_UnitTest ();

@@ -121,6 +121,36 @@ private:
    */
   bool CastAreaShadow (const csBox3& source, const csPoly3D& polygon);
 
+  /**
+   * Cast shadows on the previously set up projection plane until the
+   * coverage buffer is full or we ran out of relevant polygons.
+   * This function will return 1 if the coverage buffer was full. That means
+   * that the destination cannot be seen from the source. This function will
+   * return -1 if the coverage buffer was competely empty. That means that
+   * the destination is fully visible and also children of the destination
+   * will be visible too (no need to traverse further).
+   * If the function returns 0 we have no information except that the
+   * destination is visible. So we have to test children.
+   */
+  int CastShadowsUntilFull (const csBox3& source);
+
+  /**
+   * Find all invisible nodes for the given source node by recursively
+   * traversing the destination node. This will update the set of
+   * invisible nodes.
+   */
+  void RecurseDestNodes (void* sourcenode, void* destnode,
+	csSet<void*>& invisible_nodes);
+
+
+  /**
+   * Traverse the kdtree for source nodes and calculate the visibility set
+   * for each of them. The set of invisible nodes are the nodes that are
+   * invisible for the parent of the source node. This set is given to this
+   * function as a copy so that it is ok to modify it.
+   */
+  void RecurseSourceNodes (void* sourcenode, csSet<void*> invisible_nodes);
+
 public:
   PVSCalcSector (PVSCalc* parent, iSector* sector, iPVSCuller* pvs);
   ~PVSCalcSector ();

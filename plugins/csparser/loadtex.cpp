@@ -335,7 +335,7 @@ csPtr<iBase> csCheckerTextureLoader::Parse (iDocumentNode* node,
   {
     ctx = csPtr<iTextureLoaderContext>
       (SCF_QUERY_INTERFACE (context, iTextureLoaderContext));
-    if (ctx) 
+    if (ctx)
     {
       if (ctx->HasSize())
       {

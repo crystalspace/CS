@@ -425,6 +425,12 @@ void csStaticPVSTree::MarkInvisible (const csVector3& pos, uint32 cur_timestamp)
   root->MarkInvisible (pos, cur_timestamp);
 }
 
+void csStaticPVSTree::UpdateBoundingBoxes ()
+{
+  if (root)
+    root->PropagateBBox (root_box);
+}
+
 void csStaticPVSTree::SetBoundingBox (const csBox3& bbox)
 {
   root_box = bbox;
@@ -432,7 +438,7 @@ void csStaticPVSTree::SetBoundingBox (const csBox3& bbox)
   // the root box.
   if (!node_minbox_set)
   {
-    node_minbox = (root_box.Max () - root_box.Min ()) / 5.0;
+    node_minbox = (root_box.Max () - root_box.Min ()) / 4.0;
   }
 
   if (root)

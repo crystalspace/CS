@@ -43,7 +43,7 @@ static int compare_points_on_xy (void const* p1, void const* p2)
 
 void csChainHull2D::SortXY (csVector2* points, int n)
 {
-  qsort (points, n, sizeof (csVector2*), compare_points_on_xy);
+  qsort (points, n, sizeof (csVector2), compare_points_on_xy);
 }
 
 int csChainHull2D::CalculatePresorted (csVector2* points, int n,

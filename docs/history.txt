@@ -25,6 +25,23 @@ chronological order.
 	  except that it no longer supports the bounding box.
 	- Jorrit finished implementation of CastAreaShadow() in pvscalc.
 	- res fixed a crash in csTextureHandle related to texture classes.
+	- Jorrit added iStaticPVSTree->GetNodeBBox() to query the bounding
+	  box of a node.
+	- Jorrit added csTiledCoverageBuffer->StatusNoDepth() to test the
+	  state of the coverage buffer.
+	- Jorrit added iStaticPVSTree->UpdateBoundingBoxes() to make sure
+	  that all bounding boxes in the tree are correct after creation
+	  of the tree. pvscalc must call this.
+	- Jorrit increased the default minimal node size a bit to make sure
+	  calculations go a bit faster.
+	- Jorrit fixed a bug in csChainHull2D::SortXY() that prevented
+	  proper sorting of the points. No csChainHull2D seems to work.
+	- Jorrit fixed the NoDepth() versions in the coverage buffer so that
+	  they work correctly now.
+	- Jorrit finished the basic PVS calculator. Now it is time to do
+	  testing. Initial tests seem to indicate that it is doing something.
+	  But calculation takes WAY too long for big maps (and even for small
+	  maps for that matter). This will have to be optimized a lot.
 10-Feb-2005
 	- Jorrit added csIntersect3::XPlane() and YPlane() to complement
 	  the already existing ZPlane(). Also added AxisPlane() which will

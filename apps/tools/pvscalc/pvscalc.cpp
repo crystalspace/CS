@@ -20,6 +20,11 @@
 
 CS_IMPLEMENT_APPLICATION
 
+//#define DB(x) printf##x
+#define DB(x)
+
+#define DBA(x) printf##x
+
 //-----------------------------------------------------------------------------
 
 PVSCalcSector::PVSCalcSector (PVSCalc* parent, iSector* sector, iPVSCuller* pvs)
@@ -189,7 +194,7 @@ void PVSCalcSector::CollectGeometry (iMeshWrapper* mesh,
   mesh->GetWorldBoundingBox (mbox);
   iMeshObject* meshobj = mesh->GetMeshObject ();
   iObjectModel* objmodel = meshobj->GetObjectModel ();
-  iPolygonMesh* polybase = objmodel->GetPolygonMeshBase ();
+  iPolygonMesh* polybase = objmodel->GetPolygonMeshViscull ();
 
   // Increase stats for all objects.
   allcount++;
@@ -216,17 +221,18 @@ void PVSCalcSector::CollectGeometry (iMeshWrapper* mesh,
     staticpcount += polybase->GetPolygonCount ();
     csReversibleTransform trans = mesh->GetMovable ()->GetFullTransform ();
     csVector3* vertices = polybase->GetVertices ();
-    csMeshedPolygon* polygons = polybase->GetPolygons ();
+    csMeshedPolygon* mp = polybase->GetPolygons ();
     int p, vt;
     for (p = 0 ; p < polybase->GetPolygonCount () ; p++)
     {
-      const csMeshedPolygon& poly = polygons[p];
+      const csMeshedPolygon& poly = mp[p];
       csPoly3D poly3d;
       for (vt = 0 ; vt < poly.num_vertices ; vt++)
       {
         csVector3 vwor = trans.This2Other (vertices[poly.vertices[vt]]);
         poly3d.AddVertex (vwor);
       }
+      polygons.Push (poly3d);
     }
   }
 
@@ -263,11 +269,12 @@ void PVSCalcSector::SortPolygonsOnSize ()
     poly_with_area pwa;
     pwa.idx = i;
     pwa.area = polygons[i].GetArea ();
+    polygons_with_area.Push (pwa);
   }
   polygons_with_area.Sort (compare_polygons_on_size);
   csArray<csPoly3D> sorted_polygons;
   for (i = 0 ; i < polygons_with_area.Length () ; i++)
-    sorted_polygons[i] = polygons[polygons_with_area[i].idx];
+    sorted_polygons.Push (polygons[polygons_with_area[i].idx]);
   polygons = sorted_polygons;
 }
 
@@ -404,7 +411,20 @@ bool PVSCalcSector::SetupProjectionPlane (const csBox3& source,
 
   // Now insert our hull outline inverted in the coverage buffer. That
   // will basically mask out all vertices outside the relevant area.
+  // Before we do that we have to transform the hull to coverage buffer
+  // space.
+  DB(("  Hull:\n"));
+  for (i = 0 ; i < (size_t)hull_points ; i++)
+  {
+    DB(("    N:%d (%g,%g)\n", i, hull[i].x, hull[i].y));
+    hull[i].x = (hull[i].x-plane.offset.x) * plane.scale.x;
+    hull[i].y = (hull[i].y-plane.offset.y) * plane.scale.y;
+    DB(("    C:%d (%g,%g)\n", i, hull[i].x, hull[i].y));
+  }
   plane.covbuf->InsertPolygonInvertedNoDepth (hull, hull_points);
+
+  //csRef<iString> str = plane.covbuf->Debug_Dump ();
+  //printf ("%s\n", str->GetData ());
 
   // We no longer need the hull points here.
   delete[] hull;
@@ -419,6 +439,14 @@ bool PVSCalcSector::SetupProjectionPlane (const csBox3& source,
 bool PVSCalcSector::CastAreaShadow (const csBox3& source,
 	const csPoly3D& polygon)
 {
+  DB(("  Polygon:"));
+  size_t j;
+  for (j = 0 ; j < polygon.GetVertexCount () ; j++)
+  {
+    DB((" (%g,%g,%g)", polygon[j].x, polygon[j].y, polygon[j].z));
+  }
+  DB(("\n"));
+
   // First we calculate the projection of the polygon on the shadow plane
   // as seen from the first point on the source box. That will be the start
   // for calculating the intersection of all those projections.
@@ -451,15 +479,139 @@ bool PVSCalcSector::CastAreaShadow (const csBox3& source,
       return false;
   }
 
+  DB(("    -> has valid shadow\n"));
+
   // Now 'poly_intersect' contains the intersection of all projected
   // polygons on the shadow plane. This is the area shadow and we will now
-  // insert that in the coverage buffer.
+  // insert that in the coverage buffer. But before we do that we first
+  // have to scale the 2D coordinates so that they match coverage buffer
+  // coordinates.
+  csVector2* pi_verts = poly_intersect.GetVertices ();
+  DB(("    -> covbuf poly:"));
+  for (i = 0 ; i < poly_intersect.GetVertexCount () ; i++)
+  {
+    pi_verts[i].x = (pi_verts[i].x-plane.offset.x) * plane.scale.x;
+    pi_verts[i].y = (pi_verts[i].y-plane.offset.y) * plane.scale.y;
+    DB((" (%g,%g)", pi_verts[i].x, pi_verts[i].y));
+  }
+  DB(("\n"));
   int nummod = plane.covbuf->InsertPolygonNoDepth (
-  	poly_intersect.GetVertices (), poly_intersect.GetVertexCount ());
+  	pi_verts, poly_intersect.GetVertexCount ());
+  DB(("    -> nummod = %d\n", nummod));
 
   // If nummod > 0 then we modified the coverage buffer and we return
   // true then.
   return nummod > 0;
+}
+
+int PVSCalcSector::CastShadowsUntilFull (const csBox3& source)
+{
+  // Start casting shadows starting with the biggest polygons.
+  size_t i;
+  int status = -1;	// Coverage buffer is now empty.
+  for (i = 0 ; i < polygons.Length () ; i++)
+  {
+    if (CastAreaShadow (source, polygons[i]))
+    {
+      // The shadow modified the coverage buffer. Test if our buffer is
+      // full now.
+      status = plane.covbuf->StatusNoDepth ();
+      if (status == 1)
+      {
+        // Yes! Coverage buffer is full. We can return early here.
+	return 1;
+      }
+    }
+  }
+
+  return status;
+}
+
+void PVSCalcSector::RecurseDestNodes (void* sourcenode, void* destnode,
+	csSet<void*>& invisible_nodes)
+{
+  // If sourcenode is equal to node then visibility is obvious. In that
+  // case we don't proceed since all children of node will also be visible
+  // (since they are contained in sourcenode then).
+  if (sourcenode == destnode) return;
+
+  // If the destination node is already in the set of invisible nodes
+  // then we don't have to proceed either. That means that the destination
+  // node is invisible for one of the parents of the sourcenode.
+  if (invisible_nodes.In (destnode)) return;
+
+  // Here we have to do the actual shadow casting to see if 'sourcenode'
+  // can see 'node'.
+  const csBox3& source = pvstree->GetNodeBBox (sourcenode);
+  const csBox3& dest = pvstree->GetNodeBBox (destnode);
+
+  // If the source node is contained in the destination node then
+  // we know the destination node is visible. However we do have to continue
+  // traversing to the children so we only skip the testing part.
+  if (!dest.Overlap (source))
+  {
+    // If the projection plane failed to set up we still have to test
+    // children.
+    if (SetupProjectionPlane (source, dest))
+    {
+      DB(("TEST (%g,%g,%g)-(%g,%g,%g) -> (%g,%g,%g)-(%g,%g,%g) plane=%d/%g\n",
+	source.MinX (), source.MinY (), source.MinZ (),
+	source.MaxX (), source.MaxY (), source.MaxZ (),
+	dest.MinX (), dest.MinY (), dest.MinZ (),
+	dest.MaxX (), dest.MaxY (), dest.MaxZ (), plane.axis, plane.where));
+
+      int level = CastShadowsUntilFull (source);
+      if (level == 1)
+      {
+        // The coverage buffer is full! This means the destination node
+        // cannot be seen from the source node.
+        invisible_nodes.Add (destnode);
+        pvstree->MarkInvisible (sourcenode, destnode);
+        DBA(("Marked invisible (%g,%g,%g)-(%g,%g,%g) to (%g,%g,%g)-(%g,%g,%g)\n",
+    	    source.MinX (), source.MinY (), source.MinZ (),
+    	    source.MaxX (), source.MaxY (), source.MaxZ (),
+    	    dest.MinX (), dest.MinY (), dest.MinZ (),
+    	    dest.MaxX (), dest.MaxY (), dest.MaxZ ()));
+
+        // If the destination node is invisible that automatically implies
+        // that the children are invisible too. No need to recurse further.
+        return;
+      }
+
+      if (level == -1)
+      {
+        // The coverage buffer is completely empty. In this case the
+        // destination node is visible from the source node and also we
+        // know that all children of the destination node will also be
+        // visible because the coverage buffer was not filled at all. There
+        // is no chance for shadowing. So we don't have to proceed here.
+        return;
+      }
+    }
+  }
+
+  // The destination node was visible and coverage buffer was partially
+  // full. This means that we have to proceed to test visibility for the
+  // children of the destination node.
+  void* child1 = pvstree->GetFirstChild (destnode);
+  if (child1) RecurseDestNodes (sourcenode, child1, invisible_nodes);
+  void* child2 = pvstree->GetSecondChild (destnode);
+  if (child2) RecurseDestNodes (sourcenode, child2, invisible_nodes);
+}
+
+void PVSCalcSector::RecurseSourceNodes (void* sourcenode,
+	csSet<void*> invisible_nodes)
+{
+  printf ("source node %p\n", sourcenode);
+  // We recurse through all destination nodes now. This will update the
+  // set of invisible_nodes.
+  RecurseDestNodes (sourcenode, pvstree->GetRootNode (), invisible_nodes);
+
+  // Traverse to the children to calculate visibility from there.
+  void* child1 = pvstree->GetFirstChild (sourcenode);
+  if (child1) RecurseSourceNodes (child1, invisible_nodes);
+  void* child2 = pvstree->GetSecondChild (sourcenode);
+  if (child2) RecurseSourceNodes (child2, invisible_nodes);
 }
 
 void PVSCalcSector::Calculate ()
@@ -491,6 +643,9 @@ void PVSCalcSector::Calculate ()
 	allpcount, staticpcount);
   }
 
+  // We sort polygons so that the polygons with the biggest area
+  // are in front of the list. That way we will first try to fill
+  // big polygons during visibility calculation.
   SortPolygonsOnSize ();
 
   parent->ReportInfo ("Total box (all geometry) %g,%g,%g  %g,%g,%g",
@@ -504,9 +659,26 @@ void PVSCalcSector::Calculate ()
   parent->ReportInfo( "%d static and %d total polygons",
   	staticpcount, allpcount);
 
+  // From all geometry (static and dynamic) we now build the KDtree
+  // that is the base for visibility culling.
   BuildKDTree ();
+  pvstree->UpdateBoundingBoxes ();
   parent->ReportInfo( "KDTree: max depth=%d, number of nodes=%d",
   	maxdepth, countnodes);
+
+  // Now it is time to calculate (in)visibility between all nodes. This
+  // happens in a recursive process where we first traverse source nodes
+  // in the tree from the root up. And for every such source nodes we
+  // again traverse the tree from the root up for the destination nodes.
+  // During this traversal we maintain a set of invisible nodes. These
+  // are the nodes that are certainly invisible for the parent of the source
+  // node that we're currently considering. That means that those nodes
+  // are automatically invisible for the children too and don't have
+  // to be considered anymore.
+  csSet<void*> invisible_nodes;
+  RecurseSourceNodes (pvstree->GetRootNode (), invisible_nodes);
+
+  // Write our KDTree with pvs.
   if (!pvstree->WriteOut ())
   {
     parent->ReportError ("Error writing out PVS cache!");
