@@ -114,7 +114,8 @@ public:
   bool IsLeaf () 
   { return children[0] == 0; }
 
-  void DrawTest (iRenderView *rview, uint32 frustum_mask);
+  void DrawTest (iRenderView *rview, uint32 frustum_mask, 
+                 csReversibleTransform &transform);
 
   bool detach;
 };

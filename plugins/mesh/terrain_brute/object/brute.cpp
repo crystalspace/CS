@@ -52,40 +52,6 @@ SCF_IMPLEMENT_EMBEDDED_IBASE (csTerrainObject::eiTerrainObjectState)
 SCF_IMPLEMENTS_INTERFACE (iTerrainObjectState)
 SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
-//------------------------------------------------------------------------
-
-/*struct DefaultFunction : public iTerrainFunction
-{
-  SCF_DECLARE_IBASE;
-  DefaultFunction () { SCF_CONSTRUCT_IBASE (0); }
-  virtual float GetHeight (float x, float y)
-  {
-    return 0;
-  }
-  virtual csVector3 GetNormal (float x, float y)
-  {
-    return csVector3 (0,1,0);
-  }
-  virtual csColor GetColor (float dx, float dy)
-  {
-    return csColor (1,1,1);
-  }
-  virtual csVector2 GetTexCoord (float dx, float dy)
-  {
-    return csVector2 (dx,dy);
-  }
-  virtual iMaterialWrapper *GetMaterial (int dx, int dy)
-  {
-    return 0;
-  }
-};
-
-SCF_IMPLEMENT_IBASE (DefaultFunction)
-SCF_IMPLEMENTS_INTERFACE (iTerrainFunction)
-SCF_IMPLEMENT_IBASE_END*/
-
-//------------------------------------------------------------------------
-
 csTerrBlock::csTerrBlock (csTerrainObject *terr)
 {
   parent = 0;
@@ -444,7 +410,8 @@ void csTerrBlock::CalcLOD (iRenderView *rview)
       children[i]->CalcLOD (rview);
 }
 
-void csTerrBlock::DrawTest (iRenderView *rview, uint32 frustum_mask)
+void csTerrBlock::DrawTest (iRenderView *rview, uint32 frustum_mask,
+                            csReversibleTransform &transform)
 {
   if (!built)
     return;
@@ -456,10 +423,10 @@ void csTerrBlock::DrawTest (iRenderView *rview, uint32 frustum_mask)
                     children[2]->built &&
                     children[3]->built)
   {
-    children[0]->DrawTest (rview, frustum_mask);
-    children[1]->DrawTest (rview, frustum_mask);
-    children[2]->DrawTest (rview, frustum_mask);
-    children[3]->DrawTest (rview, frustum_mask);
+    children[0]->DrawTest (rview, frustum_mask, transform);
+    children[1]->DrawTest (rview, frustum_mask, transform);
+    children[2]->DrawTest (rview, frustum_mask, transform);
+    children[3]->DrawTest (rview, frustum_mask, transform);
     return;
   }
 
@@ -556,7 +523,7 @@ void csTerrBlock::DrawTest (iRenderView *rview, uint32 frustum_mask)
     rm->clip_portal = clip_portal;
     rm->clip_plane = clip_plane;
     rm->clip_z_plane = clip_z_plane;
-    rm->object2camera = rview->GetCamera ()->GetTransform ();
+    rm->object2camera = transform;
     rm->indexstart = 0;
     rm->indexend = terr->numindices[idx];
     if (i==0)
@@ -943,7 +910,7 @@ bool csTerrainObject::DrawTest (iRenderView* rview, iMovable* movable,
   rview->SetupClipPlanes (tr_o2c, planes, frustum_mask);
 
   //rendermeshes.Empty ();
-  rootblock->DrawTest (rview, 0);
+  rootblock->DrawTest (rview, 0, tr_o2c);
 
   if (returnMeshes->Length () == 0)
     return false;
