@@ -415,7 +415,7 @@ public:
     if ((dest != 0) && (destSize != 0))
     {
       size_t len = MIN (destSize - 1, srcChars);
-      memcpy (dest, source, size * sizeof (wchar_t));
+      memcpy (dest, source, len * sizeof (wchar_t));
       *(dest + len) = 0;
     }
     return srcChars + 1;
@@ -520,7 +520,7 @@ public:
     if ((dest != 0) && (destSize != 0))
     {
       size_t len = MIN (destSize - 1, srcChars);
-      memcpy (dest, source, size * sizeof (wchar_t));
+      memcpy (dest, source, len * sizeof (wchar_t));
       *(dest + len) = 0;
     }
     return srcChars + 1;
@@ -551,7 +551,7 @@ public:
     if ((dest != 0) && (destSize != 0))
     {
       size_t len = MIN (destSize - 1, srcChars);
-      memcpy (dest, source, size * sizeof (wchar_t));
+      memcpy (dest, source, len * sizeof (wchar_t));
       *(dest + len) = 0;
     }
     return srcChars + 1;
