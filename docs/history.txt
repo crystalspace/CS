@@ -21,6 +21,8 @@ chronological order.
 	    * Changed the materialmap colors to... look better
 	  Some problems with materialmap was introduced though (in case it
 	  was not already there.) Seems to be problems related to terrain size
+	- Jorrit fixed a problem with the terrain loader when parsing
+	  booleans.
 5-May-2004
 	- Eric Sunshine worked around problem caused by Jam2.4/BoostJam
 	  work-around of 2-May-2004 for problem where Jam complained about

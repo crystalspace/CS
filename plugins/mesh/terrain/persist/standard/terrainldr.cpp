@@ -457,7 +457,7 @@ csPtr<iBase> csTerrainObjectLoader::Parse (iDocumentNode* node,
       case XMLTOKEN_STATICLIGHTING:
 	{
 	  bool staticLighting;
-	  if (!synldr->ParseBool (child, staticLighting, false))
+	  if (!synldr->ParseBool (child, staticLighting, true))
 	    return 0;
 	  state->SetStaticLighting (staticLighting);
 	}
@@ -465,7 +465,7 @@ csPtr<iBase> csTerrainObjectLoader::Parse (iDocumentNode* node,
       case XMLTOKEN_CASTSHADOWS:
 	{
 	  bool castShadows;
-	  if (!synldr->ParseBool (child, castShadows, false))
+	  if (!synldr->ParseBool (child, castShadows, true))
 	    return 0;
 	  state->SetCastShadows (castShadows);
 	}
