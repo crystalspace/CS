@@ -100,16 +100,22 @@ void csCamera::MoveWorld (const csVector3& v, bool cd)
 void csCamera::RotateWorld (const csVector3& v, float angle)
 {
   csVector3 u = v;
-  float ca, sa;
+  float ca, sa, omcaux, omcauy, omcauz, uxsa, uysa, uzsa;
   u = csVector3::Unit (u);
   ca = cos (angle);
   sa = sin (angle);
+  omcaux = (1-ca)*u.x;
+  omcauy = (1-ca)*u.y;
+  omcauz = (1-ca)*u.z;
+  uxsa = u.x*sa;
+  uysa = u.y*sa;
+  uzsa = u.z*sa;
   
   SetT2O ( 
-    csMatrix3 (
-      ca+(1-ca)*u.x*u.x,      u.x*u.y*(1-ca)-u.z*sa,  u.x*u.z*(1-ca)+u.y*sa,
-      u.x*u.y*(1-ca)+u.z*sa,  ca+(1-ca)*u.y*u.y,      u.y*u.z*(1-ca)-u.x*sa,
-      u.x*u.z*(1-ca)-u.y*sa,  u.y*u.z*(1-ca)+u.x*sa,  ca+(1-ca)*u.z*u.z)
+    csMatrix3(
+      u.x*omcaux+ca,    u.y*omcaux-uzsa,  u.z*omcaux+uysa,
+      u.x*omcauy+uzsa,  u.y*omcauy+ca,    u.z*omcauy-uxsa,
+      u.x*omcauz-uysa,  u.y*omcauz+uxsa,  u.z*omcauz+ca)
       * GetT2O ());
   cameranr = cur_cameranr++;
 }
@@ -117,16 +123,22 @@ void csCamera::RotateWorld (const csVector3& v, float angle)
 void csCamera::Rotate (const csVector3& v, float angle)
 {
   csVector3 u = v;
-  float ca, sa;
+  float ca, sa, omcaux, omcauy, omcauz, uxsa, uysa, uzsa;
   u = csVector3::Unit (u);
   ca = cos (angle);
   sa = sin (angle);
-  
+  omcaux = (1-ca)*u.x;
+  omcauy = (1-ca)*u.y;
+  omcauz = (1-ca)*u.z;
+  uxsa = u.x*sa;
+  uysa = u.y*sa;
+  uzsa = u.z*sa;
+
   SetT2O (GetT2O () *
     csMatrix3(
-      ca+(1-ca)*u.x*u.x,      u.x*u.y*(1-ca)-u.z*sa,  u.x*u.z*(1-ca)+u.y*sa,
-      u.x*u.y*(1-ca)+u.z*sa,  ca+(1-ca)*u.y*u.y,      u.y*u.z*(1-ca)-u.x*sa,
-      u.x*u.z*(1-ca)-u.y*sa,  u.y*u.z*(1-ca)+u.x*sa,  ca+(1-ca)*u.z*u.z)
+      u.x*omcaux+ca,    u.y*omcaux-uzsa,  u.z*omcaux+uysa,
+      u.x*omcauy+uzsa,  u.y*omcauy+ca,    u.z*omcauy-uxsa,
+      u.x*omcauz-uysa,  u.y*omcauz+uxsa,  u.z*omcauz+ca)
       );
   cameranr = cur_cameranr++;
 }
