@@ -110,4 +110,3 @@ bool csSoftShader_VP::Compile(csArray<iShaderVariableContext*> &staticContexts)
   // @@@ FIXME: Implement me.
   return true;
 }
- 
