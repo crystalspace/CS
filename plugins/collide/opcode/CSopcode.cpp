@@ -187,6 +187,7 @@ bool csOPCODECollideSystem::CollideRay (
   	iCollider* collider, const csReversibleTransform* trans,
 	const csVector3& start, const csVector3& end)
 {
+  if (!collider) return false;
   csOPCODECollider* col = (csOPCODECollider*) collider;
   ColCache.Model0 = col->m_pCollisionModel;
 

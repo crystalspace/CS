@@ -28,6 +28,8 @@ chronological order.
 	  Load() function because after loading a library you have no way
 	  of knowing what textures and materials are new so there was no way
 	  to register them.
+	- Jorrit fixed a bug in opcode. The new CollideRay() function would
+	  crash if there was no collider.
 8-Sep-2004
 	- Jorrit fixed a bug in all particle systems that depend on
 	  csNewParticleSystem (rain and fountain). 'camera_origin' was
