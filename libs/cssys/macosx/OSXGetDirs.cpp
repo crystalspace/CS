@@ -58,7 +58,7 @@ bool app_info(char const* argv0, csString& dir, csString& name, bool& is_gui)
     if (strcasecmp(apppath + n - ngrist, OSX_WRAPPER_GRIST) == 0) // GUI app.
     {
       is_gui = true;
-      apppath + n - ngrist = '\0';
+      *(apppath + n - ngrist) = '\0';
       slash = strrchr(apppath, PATH_SEPARATOR);
       CS_ASSERT( slash != 0 );
       *slash = '\0';
