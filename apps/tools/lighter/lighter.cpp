@@ -22,6 +22,8 @@
 #include "cstool/initapp.h"
 #include "csutil/cmdhelp.h"
 #include "iengine/engine.h"
+#include "iengine/sector.h"
+#include "iengine/light.h"
 #include "ivideo/graph2d.h"
 #include "ivideo/graph3d.h"
 #include "ivideo/natwin.h"
@@ -42,6 +44,7 @@
 
 #include "lighter.h"
 #include "litparsecfg.h"
+#include "litobjsel.h"
 
 CS_IMPLEMENT_APPLICATION
 
@@ -198,6 +201,130 @@ bool Lighter::SetMapDir (const char* map_dir)
   return true;
 }
 
+bool Lighter::LoadMaps ()
+{
+  csRef<iCommandLineParser> cmdline = CS_QUERY_REGISTRY (object_reg,
+  	  iCommandLineParser);
+
+  // First look for a cache: entry.
+  int cmd_idx = 0;
+  for (;;)
+  {
+    const char* val = cmdline->GetName (cmd_idx);
+    cmd_idx++;
+    if (!val) break;
+    if (strlen (val) > 7 && !strncmp ("cache:", val, 6))
+    {
+      val += 6;
+      if (!SetMapDir (val))
+        return Report ("Error setting map dir '%s'!", val);
+
+      // First we force a clear of the cache manager in the engine
+      // so that a new one will be made soon.
+      engine->SetCacheManager (0);
+      // And then we get the cache manager which will force it
+      // to be created based on current VFS dir.
+      engine->GetCacheManager ();
+      break;
+    }
+  }
+  
+  cmd_idx = 0;
+  int map_idx = 0;
+  for (;;)
+  {
+    const char* val = cmdline->GetName (cmd_idx);
+    cmd_idx++;
+    if (!val)
+    {
+      if (map_idx > 0)
+      {
+	// We already have one map so it is sufficient here.
+	break;
+      }
+      return Report ("Please give a level (either a zip file or a VFS dir)!");
+    }
+    if (strlen (val) > 7 && !strncmp ("cache:", val, 6))
+    {
+      // We already treated the cache entry so we just continue here.
+      continue;
+    }
+
+    if (!SetMapDir (val))
+      return Report ("Error setting map dir '%s'!", val);
+
+    // Load the level file which is called 'world'.
+    // Only clear engine for first level.
+    if (!loader->LoadMapFile ("world", map_idx == 0))
+      return Report ("Couldn't load level '%s'!", val);
+    map_idx++;
+  }
+
+  return true;
+}
+
+bool Lighter::ScanMesh (iMeshWrapper* mesh)
+{
+  if (litconfig.receivers_selector->SelectObject (mesh->QueryObject ()))
+  {
+    printf ("  Shadow receiver '%s'\n", mesh->QueryObject ()->GetName ()); fflush (stdout);
+  }
+  if (litconfig.casters_selector->SelectObject (mesh->QueryObject ()))
+  {
+    printf ("  Shadow caster '%s'\n", mesh->QueryObject ()->GetName ()); fflush (stdout);
+  }
+  int i;
+  iMeshList* ml = mesh->GetChildren ();
+  for (i = 0 ; i < ml->GetCount () ; i++)
+  {
+    iMeshWrapper* m = ml->Get (i);
+    if (!ScanMesh (m))
+      return false;
+  }
+  return true;
+}
+
+bool Lighter::ScanSector (iSector* sector)
+{
+  printf ("Processing sector '%s'\n", sector->QueryObject ()->GetName ()); fflush (stdout);
+  int i;
+  iMeshList* ml = sector->GetMeshes ();
+  for (i = 0 ; i < ml->GetCount () ; i++)
+  {
+    iMeshWrapper* m = ml->Get (i);
+    if (!ScanMesh (m))
+      return false;
+  }
+  iLightList* ll = sector->GetLights ();
+  for (i = 0 ; i < ll->GetCount () ; i++)
+  {
+    iLight* l = ll->Get (i);
+    if (litconfig.lights_selector->SelectObject (l->QueryObject ()))
+    {
+      printf ("  Add light '%s'\n", l->QueryObject ()->GetName ());
+      fflush (stdout);
+    }
+  }
+  return true;
+}
+
+bool Lighter::ScanWorld ()
+{
+  int i;
+  iSectorList* sl = engine->GetSectors ();
+  for (i = 0 ; i < sl->GetCount () ; i++)
+  {
+    iSector* s = sl->Get (i);
+    if (litconfig.sectors_selector->SelectObject (s->QueryObject ()))
+    {
+      if (!ScanSector (s))
+        return false;
+    }
+  }
+
+  return true;
+}
+
 bool Lighter::Initialize ()
 {
   if (!csInitializer::SetupConfigManager (object_reg, 0))
@@ -275,9 +402,7 @@ bool Lighter::Initialize ()
   // Setup font.
   iFontServer* fntsvr = g2d->GetFontServer ();
   if (fntsvr)
-  {
     font = fntsvr->LoadFont (CSFONT_COURIER);
-  }
   else
     font = 0;
 
@@ -289,73 +414,28 @@ bool Lighter::Initialize ()
   engine->SetLightingCacheMode (CS_ENGINE_CACHE_WRITE);
 
   litConfigParser parser (this, object_reg);
-  csRef<litMeshSelect> casters_selector;
-  csRef<litMeshSelect> receivers_selector;
-  if (!parser.ParseConfigFile ("/config/lighter.xml", casters_selector,
-  	receivers_selector))
+  if (!parser.ParseConfigFile ("/config/lighter.xml", litconfig))
     return false;
 
-  // First look for a cache: entry.
-  int cmd_idx = 0;
-  for (;;)
-  {
-    csRef<iCommandLineParser> cmdline (CS_QUERY_REGISTRY (object_reg,
-  	  iCommandLineParser));
-    const char* val = cmdline->GetName (cmd_idx);
-    cmd_idx++;
-    if (!val) break;
-    if (strlen (val) > 7 && !strncmp ("cache:", val, 6))
-    {
-      val += 6;
-      if (!SetMapDir (val))
-        return Report ("Error setting map dir '%s'!", val);
+  // If any of the selectors is not defined we will set it to 'all' to
+  // select everything.
+  if (litconfig.sectors_selector == 0)
+    litconfig.sectors_selector.AttachNew (new litObjectSelectAll ());
+  if (litconfig.lights_selector == 0)
+    litconfig.lights_selector.AttachNew (new litObjectSelectAll ());
+  if (litconfig.casters_selector == 0)
+    litconfig.casters_selector.AttachNew (new litObjectSelectAll ());
+  if (litconfig.receivers_selector == 0)
+    litconfig.receivers_selector.AttachNew (new litObjectSelectAll ());
 
-      // First we force a clear of the cache manager in the engine
-      // so that a new one will be made soon.
-      engine->SetCacheManager (0);
-      // And then we get the cache manager which will force it
-      // to be created based on current VFS dir.
-      engine->GetCacheManager ();
-      break;
-    }
-  }
-  
-  cmd_idx = 0;
-  int map_idx = 0;
-  for (;;)
-  {
-    csRef<iCommandLineParser> cmdline (CS_QUERY_REGISTRY (object_reg,
-  	  iCommandLineParser));
-    const char* val = cmdline->GetName (cmd_idx);
-    cmd_idx++;
-    if (!val)
-    {
-      if (map_idx > 0)
-      {
-	// We already have one map so it is sufficient here.
-	break;
-      }
-      return Report ("Please give a level (either a zip file or a VFS dir)!");
-    }
-    if (strlen (val) > 7 && !strncmp ("cache:", val, 6))
-    {
-      // We already treated the cache entry so we just continue here.
-      continue;
-    }
+  if (!LoadMaps ())
+    return false;
+  if (!ScanWorld ())
+    return false;
 
-    if (!SetMapDir (val))
-      return Report ("Error setting map dir '%s'!", val);
-
-    // Load the level file which is called 'world'.
-    // Only clear engine for first level.
-    if (!loader->LoadMapFile ("world", map_idx == 0))
-      return Report ("Couldn't load level '%s'!", val);
-    map_idx++;
-  }
-
-  csCsLightProgressMeter* meter = new csCsLightProgressMeter (320);
-  engine->Prepare (meter);
-  delete meter;
+  //csCsLightProgressMeter* meter = new csCsLightProgressMeter (320);
+  //engine->Prepare (meter);
+  //delete meter;
 
   return true;
 }

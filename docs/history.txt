@@ -8,6 +8,13 @@ chronological order.
 
 17-Aug-2004
 	- Jorrit did some more work on lighter config parsing.
+	- Jorrit did the following lighter changes:
+	    - Several fixes in the config parser.
+	    - Generalized the mesh selector class so that it is now useful
+	      for any kind of CS object. That way we can also implement the
+	      sector and light selector using that.
+	    - Started scanning the world and finding all appropriate objects.
+	    - Lots of fixes.
 16-Aug-2004
 	- Steven Geens added an example of how to view a cal3d file with
 	  viewmesh to the docs and how to load a cal3d file in code.

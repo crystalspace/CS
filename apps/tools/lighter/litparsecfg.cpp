@@ -29,87 +29,103 @@ litConfigParser::litConfigParser (Lighter* lighter, iObjectRegistry* object_reg)
   init_token_table (xmltokens);
 }
 
+csRef<iDocumentNode> litConfigParser::FindChildNode (iDocumentNode* node)
+{
+  csRef<iDocumentNodeIterator> it = node->GetNodes ();
+  while (it->HasNext ())
+  {
+    csRef<iDocumentNode> child = it->Next ();
+    if (child->GetType () != CS_NODE_ELEMENT) continue;
+    return child;
+  }
+  return 0;
+}
+
 bool litConfigParser::ParseMulti (iDocumentNode* multi_node,
-    litMeshSelectChildren* meshsel)
+    litObjectSelectChildren* objsel)
 {
   csRef<iDocumentNodeIterator> it = multi_node->GetNodes ();
   while (it->HasNext ())
   {
     csRef<iDocumentNode> child = it->Next ();
     if (child->GetType () != CS_NODE_ELEMENT) continue;
-    csRef<litMeshSelect> a;
-    if (!ParseMeshSelect (child, a))
+    csRef<litObjectSelect> a;
+    if (!ParseObjectSelect (child, a))
       return false;
-    meshsel->AddMeshSelect (a);
+    objsel->AddMeshSelect (a);
   }
   return true;
 }
 
-bool litConfigParser::ParseMeshSelect (iDocumentNode* meshsel_node,
-    csRef<litMeshSelect>& meshsel)
+bool litConfigParser::ParseObjectSelect (iDocumentNode* objsel_node,
+    csRef<litObjectSelect>& objsel)
 {
-  csRef<iDocumentNodeIterator> it = meshsel_node->GetNodes ();
-  while (it->HasNext ())
+  if (objsel_node == 0)
+    return lighter->Report ("Missing selector node!");
+  else
   {
-    csRef<iDocumentNode> child = it->Next ();
-    if (child->GetType () != CS_NODE_ELEMENT) continue;
-    const char* value = child->GetValue ();
+    const char* value = objsel_node->GetValue ();
     csStringID id = xmltokens.Request (value);
     switch (id)
     {
       case XMLTOKEN_AND:
-	meshsel.AttachNew (new litMeshSelectAnd ());
-	if (!ParseMulti (child, (litMeshSelectChildren*)(litMeshSelect*)meshsel))
+	objsel.AttachNew (new litObjectSelectAnd ());
+	if (!ParseMulti (objsel_node,
+		(litObjectSelectChildren*)(litObjectSelect*)objsel))
 	  return false;
 	return true;
       case XMLTOKEN_OR:
-	meshsel.AttachNew (new litMeshSelectOr ());
-	if (!ParseMulti (child, (litMeshSelectChildren*)(litMeshSelect*)meshsel))
+	objsel.AttachNew (new litObjectSelectOr ());
+	if (!ParseMulti (objsel_node,
+		(litObjectSelectChildren*)(litObjectSelect*)objsel))
 	  return false;
 	return true;
       case XMLTOKEN_NOT:
 	{
-	  csRef<litMeshSelect> a;
-	  if (!ParseMeshSelect (child, a))
+	  csRef<litObjectSelect> a;
+	  if (!ParseObjectSelect (FindChildNode (objsel_node), a))
 	    return false;
-	  meshsel.AttachNew (new litMeshSelectNot (a));
+	  objsel.AttachNew (new litObjectSelectNot (a));
 	}
 	return true;
       case XMLTOKEN_ALL:
-	meshsel.AttachNew (new litMeshSelectAll ());
+	objsel.AttachNew (new litObjectSelectAll ());
 	return true;
       case XMLTOKEN_STATICPOS:
-	meshsel.AttachNew (new litMeshSelectByMOFlags (CS_MESH_STATICPOS,
+	objsel.AttachNew (new litObjectSelectByMOFlags (CS_MESH_STATICPOS,
 	      CS_MESH_STATICPOS));
 	return true;
       case XMLTOKEN_STATICSHAPE:
-	meshsel.AttachNew (new litMeshSelectByMOFlags (CS_MESH_STATICSHAPE,
+	objsel.AttachNew (new litObjectSelectByMOFlags (CS_MESH_STATICSHAPE,
 	      CS_MESH_STATICSHAPE));
 	return true;
       case XMLTOKEN_STATIC:
-	meshsel.AttachNew (new litMeshSelectByMOFlags (
+	objsel.AttachNew (new litObjectSelectByMOFlags (
 	      CS_MESH_STATICSHAPE|CS_MESH_STATICPOS,
 	      CS_MESH_STATICSHAPE|CS_MESH_STATICPOS));
 	return true;
       case XMLTOKEN_NAME:
-	meshsel.AttachNew (new litMeshSelectByName (child->GetContentsValue ()));
+	objsel.AttachNew (new litObjectSelectByName (
+		objsel_node->GetContentsValue ()));
 	return true;
       case XMLTOKEN_REGEXP:
-	meshsel.AttachNew (new litMeshSelectByNameRE (child->GetContentsValue ()));
+	objsel.AttachNew (new litObjectSelectByNameRE (
+		objsel_node->GetContentsValue ()));
 	return true;
       case XMLTOKEN_TYPE:
-	meshsel.AttachNew (new litMeshSelectByType (child->GetContentsValue ()));
+	objsel.AttachNew (new litObjectSelectByType (
+		objsel_node->GetContentsValue ()));
 	return true;
       default:
         return lighter->Report ("Unknown token <%s> in mesh selector!", value);
     }
   }
-  return true;
+  CS_ASSERT (false);
+  return lighter->Report ("Missing mesh selector!");
 }
 
 bool litConfigParser::ParseLighter (iDocumentNode* lighter_node,
-  	csRef<litMeshSelect>& casters_selector,
-	csRef<litMeshSelect>& receivers_selector)
+	litConfig& litconfig)
 {
   csRef<iDocumentNodeIterator> it = lighter_node->GetNodes ();
   while (it->HasNext ())
@@ -120,12 +136,24 @@ bool litConfigParser::ParseLighter (iDocumentNode* lighter_node,
     csStringID id = xmltokens.Request (value);
     switch (id)
     {
+      case XMLTOKEN_SELECT_SECTORS:
+        if (!ParseObjectSelect (FindChildNode (child),
+		litconfig.sectors_selector))
+	  return false;
+        break;
+      case XMLTOKEN_SELECT_LIGHTS:
+        if (!ParseObjectSelect (FindChildNode (child),
+		litconfig.lights_selector))
+	  return false;
+        break;
       case XMLTOKEN_SELECT_CASTERS:
-        if (!ParseMeshSelect (child, casters_selector))
+        if (!ParseObjectSelect (FindChildNode (child),
+		litconfig.casters_selector))
 	  return false;
         break;
       case XMLTOKEN_SELECT_RECEIVERS:
-        if (!ParseMeshSelect (child, receivers_selector))
+        if (!ParseObjectSelect (FindChildNode (child),
+		litconfig.receivers_selector))
 	  return false;
         break;
       default:
@@ -136,8 +164,7 @@ bool litConfigParser::ParseLighter (iDocumentNode* lighter_node,
 }
 
 bool litConfigParser::ParseConfigFile (const char* vfsfile,
-  	csRef<litMeshSelect>& casters_selector,
-	csRef<litMeshSelect>& receivers_selector)
+	litConfig& litconfig)
 {
   csRef<iFile> databuff = lighter->vfs->Open (vfsfile, VFS_FILE_READ);
   if (!databuff || !databuff->GetSize ())
@@ -157,6 +184,6 @@ bool litConfigParser::ParseConfigFile (const char* vfsfile,
     return lighter->Report ("Config file '%s' does not start with <lighter>!",
     	vfsfile);
 
-  return ParseLighter (lighter_node, casters_selector, receivers_selector);
+  return ParseLighter (lighter_node, litconfig);
 }
 

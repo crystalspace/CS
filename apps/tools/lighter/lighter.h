@@ -21,6 +21,7 @@
 
 #include <stdarg.h>
 #include "ivaria/pmeter.h"
+#include "litconfig.h"
 
 struct iEngine;
 struct iLoader;
@@ -32,6 +33,7 @@ struct iTextureHandle;
 struct iObjectRegistry;
 struct iVirtualClock;
 struct iEvent;
+struct iSector;
 
 /**
  * Combined graphical and text progress meter.
@@ -121,12 +123,36 @@ public:
   iObjectRegistry* object_reg;
   csRef<iVirtualClock> vc;
 
+  /// Configuration.
+  litConfig litconfig;
+
   /**
    * Set the current VFS dir to the given map_dir.
    * This routine tries to be smart about mounting the dir.
    * Returns false on failure.
    */
   bool SetMapDir (const char* map_dir);
+
+  /**
+   * First load the map file(s) as given on the commandline.
+   */
+  bool LoadMaps ();
+
+  /**
+   * Scan this mesh.
+   */
+  bool ScanMesh (iMeshWrapper* mesh);
+
+  /**
+   * Scan this sector for objects, lights, portals, ...
+   */
+  bool ScanSector (iSector* sector);
+
+  /**
+   * Scan all loaded objects to find shadow receivers, shadow casters,
+   * lights, portals, ...
+   */
+  bool ScanWorld ();
 
 public:
   Lighter (iObjectRegistry* object_reg);

@@ -24,10 +24,11 @@
 #include "csutil/csstring.h"
 #include "iutil/vfs.h"
 #include "iutil/objreg.h"
-#include "litmeshsel.h"
+#include "litobjsel.h"
+#include "litconfig.h"
 
 struct iObjectRegistry;
-class litMeshSelect;
+class litObjectSelect;
 class Lighter;
 
 /**
@@ -43,13 +44,15 @@ private:
 #define CS_TOKEN_ITEM_FILE "apps/tools/lighter/lighter.tok"
 #include "cstool/tokenlist.h"
 
+  // Find the first element child.
+  csRef<iDocumentNode> FindChildNode (iDocumentNode* node);
+
   bool ParseMulti (iDocumentNode* multi_node,
-	litMeshSelectChildren* meshsel);
-  bool ParseMeshSelect (iDocumentNode* meshsel_node,
-  	csRef<litMeshSelect>& meshsel);
+	litObjectSelectChildren* objsel);
+  bool ParseObjectSelect (iDocumentNode* objsel_node,
+  	csRef<litObjectSelect>& objsel);
   bool ParseLighter (iDocumentNode* lighter_node,
-  	csRef<litMeshSelect>& casters_selector,
-	csRef<litMeshSelect>& receivers_selector);
+  	litConfig& litconfig);
 
 public:
   litConfigParser (Lighter* lighter, iObjectRegistry* object_reg);
@@ -60,8 +63,7 @@ public:
    * \return false on failure. Error will already be reported then.
    */
   bool ParseConfigFile (const char* vfsfile,
-  	csRef<litMeshSelect>& casters_selector,
-	csRef<litMeshSelect>& receivers_selector);
+  	litConfig& litconfig);
 };
 
 #endif // __LITPARSECFG_H__

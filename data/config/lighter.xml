@@ -1,20 +1,27 @@
 <lighter>
+
+  <select_sectors>
+    <all />
+  </select_sectors>
+
+  <select_lights>
+    <all />
+  </select_lights>
+
   <select_casters>
     <and>
       <all />
-      <staticpos />
-      <staticshape />
     </and>
   </select_casters>
+
   <select_receivers>
     <and>
       <or>
         <name>xxx</name>
 	<regexp>.*a.*</regexp>
       </or>
-      <not>
         <type>thing</type>
-      </not>
     </and>
   </select_receivers>
+
 </lighter>

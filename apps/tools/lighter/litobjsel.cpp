@@ -17,39 +17,55 @@
 */
 
 #include "cssysdef.h"
-#include "litmeshsel.h"
+#include "litobjsel.h"
 
-bool litMeshSelectAnd::SelectMesh (iMeshWrapper* mesh)
+bool litObjectSelectAnd::SelectObject (iObject* obj)
 {
   size_t i;
   for (i = 0 ; i < a.Length () ; i++)
   {
-    bool rc = a[i]->SelectMesh (mesh);
+    bool rc = a[i]->SelectObject (obj);
     if (!rc) return false;
   }
   return true;
 }
 
-bool litMeshSelectOr::SelectMesh (iMeshWrapper* mesh)
+bool litObjectSelectOr::SelectObject (iObject* obj)
 {
   size_t i;
   for (i = 0 ; i < a.Length () ; i++)
   {
-    bool rc = a[i]->SelectMesh (mesh);
+    bool rc = a[i]->SelectObject (obj);
     if (rc) return true;
   }
   return false;
 }
 
-bool litMeshSelectByType::SelectMesh (iMeshWrapper* mesh)
+bool litObjectSelectByMWFlags::SelectObject (iObject* obj)
 {
+  csRef<iMeshWrapper> mesh = SCF_QUERY_INTERFACE (obj, iMeshWrapper);
+  if (!mesh) return false;
+  return (mesh->GetFlags ().Get () & mask) == value;
+}
+
+bool litObjectSelectByMOFlags::SelectObject (iObject* obj)
+{
+  csRef<iMeshWrapper> mesh = SCF_QUERY_INTERFACE (obj, iMeshWrapper);
+  if (!mesh) return false;
+  return (mesh->GetMeshObject ()->GetFlags ().Get () & mask) == value;
+}
+
+bool litObjectSelectByType::SelectObject (iObject* obj)
+{
+  csRef<iMeshWrapper> mesh = SCF_QUERY_INTERFACE (obj, iMeshWrapper);
+  if (!mesh) return false;
   iMeshObjectFactory* factory = mesh->GetMeshObject ()->GetFactory ();
+  if (!factory) return false;
   iMeshObjectType* otype = factory->GetMeshObjectType ();
   csRef<iFactory> ifact = SCF_QUERY_INTERFACE (otype, iFactory);
   if (!ifact) return false;
-  printf ("%s\n", ifact->QueryDescription ()); fflush (stdout);
-  // @@@ Do strcmp.
-  return false;
+  return !strcmp (type, ifact->QueryClassID ()+strlen (
+  	"crystalspace.mesh.object."));
 }
 
 
