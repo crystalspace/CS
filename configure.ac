@@ -854,6 +854,7 @@ cs_pylib1="-l$cs_cv_python_base"
 cs_pylib2=`echo "-l$cs_cv_python_base" | sed 's/\.//g'`
 CS_CHECK_BUILD([if Python SDK is usable], [cs_cv_python],
     [AC_LANG_PROGRAM([#include <Python.h>],[Py_Initialize(); Py_Finalize();])],
+
     [CS_CREATE_TUPLE([],[],[$cs_pylib1]) CS_CREATE_TUPLE([],[],[$cs_pylib2])],
     [], [CS_MAKEFILE_BUILD_RESULT([cs_cv_python], [PYTHON])], [], [],
     [$cs_cv_python_base_cflags], [$cs_cv_python_base_lflags],
@@ -1085,11 +1086,17 @@ AS_IF([test "$no_x" != yes],
 # GLX extensions are supported and define the header property
 # CSGL_EXT_STATIC_ASSERTION if they are _not_ supported.
 #------------------------------------------------------------------------------
+m4_define([cs_define_int32],
+    [@%:@if !HAVE_TYPE_INT32
+    typedef long int32;
+    @%:@endif
+    ])
+
 AC_DEFUN([CS_CHECK_GL_PREPARE],
     [AC_REQUIRE([AC_PATH_X])
     AC_REQUIRE([AC_PATH_XTRA])
-    AC_CHECK_HEADERS([windows.h])
-    AC_CHECK_TYPE([int32], [AC_DEFINE([HAVE_TYPE_INT32])], [])])
+    AC_CHECK_TYPE([int32], [AC_DEFINE([HAVE_TYPE_INT32])], [])
+    AC_CHECK_HEADERS([windows.h], [], [], [cs_define_int32])])
 
 # CS_GL_INCLUDE(CPP-MACRO,FALLBACK,HEADER)
 AC_DEFUN([CS_GL_INCLUDE],

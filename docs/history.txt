@@ -7,6 +7,10 @@ The history order is reversed so that new features are at the top.
 	  each time SetAction is called, so the old behavior will still
 	  work normally, except when the the programmer explicitly tells
 	  it to go backwards.
+	- Eric Sunshine made another patch to the configure script to allow it
+	  to work with Jorrit's eerie hybrid installation on Windows where he
+	  has mismatched headers.  Now ensures that int32 is known prior to the
+	  windows.h test.
 6-Jan-2002
 	- Fixed a stupid bug in Dynavis. Dynavis wasn't correctly updating
 	  the kdtree when objects moved. The reason was that UpdateObjects()
