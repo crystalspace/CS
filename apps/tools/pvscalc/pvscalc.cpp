@@ -108,7 +108,7 @@ float PVSCalcSector::FindBestSplitLocation (int axis, float& where,
   // probably be a configurable parameter.
 
   // @@@ Is the routine below very efficient?
-# define FBSL_ATTEMPTS 20
+# define FBSL_ATTEMPTS 50
   float a;
   float best_qual = -2.0;
   float inv_num_objects = 1.0 / float (boxlist.Length ());
@@ -140,7 +140,7 @@ float PVSCalcSector::FindBestSplitLocation (int axis, float& where,
     {
       float qual_cut = 1.0 - (float (cut) * inv_num_objects);
       float qual_balance = 1.0 - (float (ABS (left-right)) * inv_num_objects);
-      qual = 3.0 * qual_cut + qual_balance;
+      qual = 6.0 * qual_cut + qual_balance;
     }
     if (qual > best_qual)
     {
@@ -318,6 +318,9 @@ static int compare_polygons_on_size (const poly_with_area& p1,
 void PVSCalcSector::SortPolygonsOnSize ()
 {
   csArray<poly_with_area> polygons_with_area;
+  double total_area = 0.0;
+  float min_area = 1000000000.0;
+  float max_area = -1.0f;
   size_t i;
   for (i = 0 ; i < polygons.Length () ; i++)
   {
@@ -325,12 +328,19 @@ void PVSCalcSector::SortPolygonsOnSize ()
     pwa.idx = i;
     pwa.area = polygons[i].GetArea ();
     polygons_with_area.Push (pwa);
+    if (pwa.area < min_area) min_area = pwa.area;
+    if (pwa.area > max_area) max_area = pwa.area;
+    total_area += double (pwa.area);
   }
   polygons_with_area.Sort (compare_polygons_on_size);
   csArray<csPoly3D> sorted_polygons;
   for (i = 0 ; i < polygons_with_area.Length () ; i++)
     sorted_polygons.Push (polygons[polygons_with_area[i].idx]);
   polygons = sorted_polygons;
+
+  parent->ReportInfo ("Average polygon area %g, min %g, max %g\n",
+  	float (total_area / polygons.Length ()),
+	min_area, max_area);
 }
 
 bool PVSCalcSector::FindShadowPlane (const csBox3& source, const csBox3& dest,

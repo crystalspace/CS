@@ -11,6 +11,16 @@ chronological order.
 	  so that it would be more amenable to experimentation. 
 	- Jorrit fixed a bug in pvscalc that would mess up the calculations
 	  for some boxes.
+	- Jorrit made the kdtree in pvscalc slightly more optimal by
+	  trying a bit more agressively when finding a good split location.
+	  Also changed quality measurement to give more weight to bad
+	  cuts. That improves the number of nodes in the tree (but makes
+	  it slightly less balanced).
+	- Jorrit added reporting of average, min, and max polygon size
+	  to pvscalc.
+	- Jorrit fixed a VERY stupid bug in genmesh. Apparently it forgot
+	  to register a polygon mesh for visibility culling. That means
+	  that genmeshes never participated as occluders.
 13-Feb-2005
 	- Peter Amstutz reorganized loading in the csVosA3DL plugin so
 	  that texture, material or geometry changes to 3D objects are
@@ -29,7 +39,7 @@ chronological order.
 	  shadow casting more correct as polygons that intersect the shadow
 	  plane or the source box should not be considered at all.
 	- Jorrit drastically improved the quality of the kdtree calculated
-	  by pvscalc. Insteaad of 5599 nodes for the pvstest level there are
+	  by pvscalc. Instead of 5599 nodes for the pvstest level there are
 	  now 246 nodes.
 11-Feb-2005
 	- Jorrit changed csBox3::ProjectOutline() to work with

@@ -1333,7 +1333,7 @@ csGenmeshMeshObjectFactory::csGenmeshMeshObjectFactory (iMeshObjectType *pParent
   scfiPolygonMesh.SetFactory (this);
   scfiObjectModel.SetPolygonMeshBase (&scfiPolygonMesh);
   scfiObjectModel.SetPolygonMeshColldet (&scfiPolygonMesh);
-  scfiObjectModel.SetPolygonMeshViscull (0);
+  scfiObjectModel.SetPolygonMeshViscull (&scfiPolygonMesh);
   scfiObjectModel.SetPolygonMeshShadows (&scfiPolygonMesh);
 
   logparent = 0;
