@@ -1,5 +1,5 @@
 @c -*-texinfo-*-
-@node Internal Workings, Map Creation, Level of Detail, csEngine
+@node Internal Workings, , Map Creation, csEngine
 @subsection The Engine Internals Explained
 @cindex Engine Internals
 
@@ -7,692 +7,793 @@
 @emph{Written by Jorrit Tyberghein,
 @email{jorrit.tyberghein@@uz.kuleuven.ac.be}. Last updated 30 April 2004.}
 
-In this section we will explain in some detail how the engine internally
-works. This section is mainly for people who are interested in learning
+This section explains, in some detail, how the engine works internally.
+This information is mainly for people who are interested in learning
 how the Crystal Space engine works internally and for people who want
-to contribute to the engine. The sources for the 3D engine can be found
-in @file{plugins/engine/3d}.
+to contribute to the engine proper. The sources for the 3D engine can be found
+in @file{CS/plugins/engine/3d}.
 
-Note: the discussion here is specific to how the engine works in relation
+Note: This discussion is specific to how the engine works in relation
 to the new renderer. The old renderer is still in Crystal Space at this moment
-but this discussion doesn't touch that.
+but this discussion does not bear upon it.
 
 @subsubheading Engine Data Structures
 
-In the following sections we will explain the various data structures that
-are used in the engine. Many of these data structures subclass from
-@code{csObject} which means that you can use them in your game to attach
+The following sections explain the various data structures that
+are used in the engine. Many of these data structures are subclasses of
+@samp{csObject}, which means that you can use them in your game to attach
 other game specific objects.
 
 @subsubheading Engine Data Structures: csEngine
 
-At the core of everything there is the @code{csEngine} class which implements
-the publicly viewable @code{iEngine} interface.
+At the core of everything there is the @samp{csEngine} class which implements
+the publicly viewable @samp{iEngine} interface.  The engine class implements
+the following interfaces:
 
-The engine class implements the following interfaces:
-@itemize
+@itemize @bullet
 @item
-@code{iEngine}: the main entry point for the engine.
+@code{iEngine}: The main entry point for the engine.
 @item
-@code{iObject}: use this to attach game specific data.
+@code{iObject}: Allows attachment of game-specific data.
 @end itemize
 
-The engine class maintains the following lists for different types of objects:
+The engine class maintains the following lists of different types of objects
+or operations:
 
-@itemize
+@itemize @bullet
 @item
-sectors: class @code{csSector}, interface @code{iSector}. As is explained
-in other parts of this manual a sector is simply an infinite region of space.
-There is always at least one sector, otherwise the engine can't really function.
+@code{sectors}: Class @samp{csSector}, interface @samp{iSector}. As explained
+in other parts of this manual, a sector is simply an infinite region of space.
+There is always at least one sector.
+
 @item
-mesh_factories: class @code{csMeshFactoryWrapper}, interface
-@code{iMeshFactoryWrapper}. Mesh factory wrappers contain templates for making
+@code{mesh_factories}: Class @samp{csMeshFactoryWrapper}, interface
+@samp{iMeshFactoryWrapper}. Mesh factory wrappers contain templates for making
 objects. A factory is not visible itself but you can create mesh objects
-from a factory and put them in sectors. Note that children of hierarchical
+from a factory and place them into sectors. Note that children of hierarchical
 mesh factories are not in this list.
+
 @item
-meshes: class @code{csMeshWrapper}, interface @code{iMeshWrapper}. These
+@code{meshes}: Class @samp{csMeshWrapper}, interface @samp{iMeshWrapper}. These
 are the actual mesh objects. Mesh objects are normally placed in sectors but
-every mesh will also be present in the list so that the engine can do
-maintenance on them. A mesh object that is not in any sector but only
-in this list will not be visible. Note that children of hierarchical
+every mesh will also be present in this list so that the engine can perform
+maintenance on them. A mesh object that is not in any sector, but only
+in this list, will not be visible. Note that children of hierarchical
 mesh objects are not in this list.
+
 @item
-collections: class @code{csCollection}, interface @code{iCollection}. A
-collection is a simple container for other objects (meshes, lights, @dots{}).
+@code{collections}: Class @samp{csCollection}, interface @samp{iCollection}. A
+collection is a simple container for other objects (meshes, lights, etc.).
 This can be useful for scripts.
+
 @item
-camera_positions: class @code{csCameraPosition}, interface
-@code{iCameraPosition}. If you define start positions in your map file then
-they will be put in this list.
+@code{camera_positions}: Class @samp{csCameraPosition}, interface
+@samp{iCameraPosition}. If you define start positions in your map file, then
+they will be placed into this list.
+
 @item
-regions: class @code{csRegion}, interface @code{iRegion}. Regions are
-a way to organize your objects. Every object (mesh, factory, material,
-light, sector, @dots{}) can be put in a region. Note that a region is not
+@code{regions}: Class @samp{csRegion}, interface @samp{iRegion}.  Regions
+provide a way to organize your objects.  Every object (mesh, factory, material,
+light, sector, etc.) can be placed into a region. Note that a region is not
 a geometrical concept. You can use one region to contain all materials,
-and another to contain all mesh objects for example. On the other hand, it is
-probably most useful to have regions that represent geometrical areas that
-you can then load and unload from the engine (useful for making huge maps).
+and another to contain all mesh objects, for example. On the other hand, it is
+probably most useful to have regions that represent geometrical areas which
+you can load and unload from the engine (useful for making huge maps).
+
 @item
-textures: class @code{csTextureWrapper}, interface @code{iTextureWrapper}.
-A texture is a processed image that can be used by the renderer.
+@code{textures}: Class @samp{csTextureWrapper}, interface
+@samp{iTextureWrapper}.  A texture is a processed image that can be used by the
+renderer.
+
 @item
-materials: class @code{csMaterialWrapper}, interface @code{iMaterialWrapper}.
-A material is a surface attribute for a mesh object. A material usually uses
-at least one texture but it is also possible to have materials that don't
-have textures.
+@code{materials}: Class @samp{csMaterialWrapper}, interface
+@samp{iMaterialWrapper}.  A material is a surface attribute for a mesh object.
+A material usually uses at least one texture but it is also possible to have
+materials that do not utilize textures at all.
+
 @item
-halos: class @code{csLightHalo}, interface @code{iHalo}. Halos and lensflares
-are in this list. This list contains all halos that were visible during
-frame rendering. After the entire frame has been rendered the engine can use
+@code{halos}: Class @samp{csLightHalo}, interface @samp{iHalo}.  Halos and lens
+flares are in this list.  This list contains all halos that were visible during
+frame rendering. After the entire frame has been rendered the engine uses
 this list to draw all halos that were visible.
+
 @item
-shared_variables: class @code{csSharedVariable}, interface
-@code{iSharedVariable}. The engine maintains a list of variables that can
-be used for the engine sequence manager and also for controlling @sc{lod} (level
-of detail).
+@code{shared_variables}: Class @samp{csSharedVariable}, interface
+@samp{iSharedVariable}. The engine maintains a list of variables that can
+be used for the engine sequence manager and also for controlling @sc{lod}
+(level of detail).
+
 @item
-cleanup: is an array that is used to keep track of items that we need
-to clean up (delete) when the engine is destroyed.
+@code{cleanup}: This is an array that keeps track of items that the engine must
+clean up (delete) when the engine itself is destroyed.
+
 @item
-render_priorities: this is a list of all render priorities supported by
-the engine. Render priorities are used to control in which order objects
+@code{render_priorities}: This is a list of all render priorities supported by
+the engine. Render priorities control in which order objects
 in a sector must be rendered.
+
 @item
-want_to_die (contains @code{iMeshWrapper}): this is a set of all objects
+@code{want_to_die}: This is a set of all @samp{iMeshWrapper} objects
 that want to die the next frame. The purpose of this lists is for mesh
-objects to initiate their own destruction (this can be useful for an
+objects to schedule their own destruction (this can be useful for an
 explosion mesh object for example). The mesh object cannot destroy itself
-as it would then remove its own instance and this could give bad results.
+since it would then remove its own instance and this would be problematic.
 @end itemize
 
-In addition to the lists above the engine also maintains the following
-important variables:
+In addition, the engine also maintains the following important variables:
 
-@itemize
+@itemize @bullet
 @item
-Strings (@code{iStringSet}): the string set interface is used for converting
-strings to numerical ID's. The renderer and shader systems uses these ID's
-for tagging types of items. Using numerical ID's is faster.
+@code{Strings}: Interface @samp{iStringSet}.  The string set interface is used
+for converting strings to numerical identifiers.  The renderer and shader
+systems uses these identifiers for tagging types of items since comparison of
+numerical identifiers is faster than comparison of string identifiers.
+
 @item
-cache_mgr (@code{iCacheManager}): this is the default cache manager that
-the engine maintains. The cache manager is responsible for storing data
-that is hard to compute. Mesh objects and other plugins may use the cache
-manager to store for example lightmaps and other stuff.
+@code{cache_mgr}: Interface @samp{iCacheManager}.  This is the default cache
+manager maintained by the engine.  The cache manager is responsible for storing
+data that is hard to compute.  Mesh objects and other plugins may use the cache
+manager to store, for example, lightmaps and other stuff.
+
 @item
-defaultRenderLoop (@code{iRenderLoop}): the default renderloop is used
-to control how objects are rendered in a sector in combination with shaders.
+@code{defaultRenderLoop}: Interface @samp{iRenderLoop}. The default renderloop
+controls how objects are rendered in a sector in combination with shaders.
 More on that later. Note that sectors can override the default renderloop.
+
 @item
-renderLoopManager (@code{csRenderLoopManager}): the renderloop manager
-is responsible for creating renderloops.
+@code{renderLoopManager}: Interface @samp{csRenderLoopManager}.  The renderloop
+manager is responsible for creating renderloops.
+
 @item
-render_context (@code{iTextureHandle}): this is used while rendering
-on a texture (i.e. when using @code{iGraphics3D::SetRenderTarget()}).
+@code{render_context}: Interface @samp{iTextureHandle}.  This is used while
+rendering on a texture (i.e.  when using @code{iGraphics3D::SetRenderTarget()}
+is in effect).
+
 @item
-default_shader (@code{iShader}): this is the default shader that is used
-on all materials that don't otherwise specify a shader.
+@code{default_shader}: Interface @samp{iShader}.  This is the default shader
+that is used on all materials which do not otherwise specify a shader.
+
 @item
-top_clipper (@code{csRenderView}): during rendering of a frame this variable
-points to the top level clipper that is used. More on how @code{csRenderView}
+@code{top_clipper}: Class @samp{csRenderView}.  During rendering of a frame
+this variable points at the top level clipper.  More on how @samp{csRenderView}
 works later.
 @end itemize
 
 @subsubheading Engine Data Structures: csSector
 
 A sector is one of the most important data structures in the engine.
-It is a container for other objects (mesh objects and lights).
-
+It is a container for other objects (meshes and lights).
 The sector class implements the following interfaces:
-@itemize
+
+@itemize @bullet
 @item
-@code{iSector}: the main entry point for the sector.
+@code{iSector}: The main entry point for the sector.
 @item
-@code{iObject}: use this to attach game specific data.
+@code{iObject}: Allows attachment of game-specific data.
 @end itemize
 
 The sector maintains the following lists:
 
-@itemize
+@itemize @bullet
 @item
-meshes (@code{iMeshWrapper}): this is a list of all mesh objects that are
-visible in this sector. Note that a mesh can be in multiple sectors at the
-same time (if it is crossing a portal boundary).
+@code{meshes}: Interface @samp{iMeshWrapper}.  This is a list of all mesh
+objects that are visible in this sector.  Note that a mesh can be in multiple
+sectors at the same time (if it is crossing a portal boundary).
+
 @item
-camera_meshes (@code{iMeshWrapper}): this list contains all meshes that have the
-@code{CS_ENTITY_CAMERA} flag set. These meshes have to be treated a bit
-differently (more on that later).
+@code{camera_meshes}: Interface @samp{iMeshWrapper}.  This list contains all
+meshes that have the @samp{CS_ENTITY_CAMERA} flag set.  These meshes have to be
+treated a bit differently (more on that later).
+
 @item
-portal_meshes (@code{iMeshWrapper}: is a set of meshes that have portals that
-leave from this sector. By using this set you can quickly find all sectors
-that are reachable from this sector (through portals).
+@code{portal_meshes}: Interface @samp{iMeshWrapper}.  This is a set of meshes
+that have portals which leave from this sector.  By using this set you can
+quickly find all sectors that are reachable from this sector (through portals).
+
 @item
-lights (@code{iLight}): is a list of all lights in this sector.
+@code{lights}: Interface @samp{iLight}.  This is a list of all lights in this
+sector.
+
 @item
-visibleMeshCache (@code{visibleMeshCacheHolder}): is a special list of caches
-for visibility. More on this later.
+@code{visibleMeshCache}: Class @samp{csSector::visibleMeshCacheHolder}.  This
+is a special list of caches for visibility.  More on this later.
+
 @item
-usedMeshLists (@code{csRenderMeshList}): is a list that is only there to clean
-up some data structures when the sector is destroyed. More on this later.
+@code{usedMeshLists}: Class @samp{csRenderMeshList}.  This is a list of data
+structures which need to be cleaned up when the sector itself is destroyed.
+More on this later.
 @end itemize
 
-In addition to those lists the sector also maintains the following important
-variables:
+In addition, the sector also maintains the following important variables:
 
-@itemize
+@itemize @bullet
 @item
-dynamic_ambient_color (@code{csColor}): this is the current dynamic ambient
-color that is added to all mesh objects in this sector.
+@code{dynamic_ambient_color}: Class @samp{csColor}.  This is the current
+dynamic ambient color that is added to all mesh objects in this sector.
+
 @item
-renderloop (@code{iRenderLoop}): the optional renderloop for this sector.
-If 0 then the engine renderloop will be used.
+@code{renderloop}: Interface @samp{iRenderLoop}.  The optional renderloop for
+this sector.  If null, then the engine's renderloop will be used.
+
 @item
-culler (@code{iVisibilityCuller}): every sector has a visibility culler
-(usually an instance of either @samp{Frustvis} or @samp{Dynavis}).
-@samp{Frustvis} is the default culler.
+@code{culler}: Interface @samp{iVisibilityCuller}.  Every sector has a
+visibility culler; usually an instance of either @dfn{Frustvis} or
+@dfn{Dynavis}.  Frustvis is the default culler.
+
 @item
-lights.kdtree (@code{csKDTree}): this kdtree helps to find lights based
-on some box in the sector. Every light is added to this tree with a bbox
-that is calculated from the center of the light and the influence radius.
-@item
+@code{lights::kdtree}: Class @samp{csKDTree}.  The @dfn{kdtree} helps to find
+lights based upon some box in the sector.  Every light is added to this tree
+with a @dfn{bbox} (bounding box) that is calculated from the center of the
+light and the influence radius.
 @end itemize
 
 @subsubheading Engine Data Structures: csMeshFactoryWrapper
 
-A @code{csMeshFactoryWrapper} is a wrapper class for the engine so that
-the engine can keep track of @code{iMeshObjectFactory} instances (these
-represent the real mesh object factories) and also add some more engine
-specific stuff.
-
+A @samp{csMeshFactoryWrapper} is a wrapper class which the engine uses to keep
+track of @code{iMeshObjectFactory} instances (these represent the real mesh
+object factories), and also stores some engine-specific information.
 The mesh factory wrapper class implements the following interfaces:
-@itemize
+
+@itemize @bullet
 @item
-@code{iMeshFactoryWrapper}: the main entry point for the factory wrapper.
+@code{iMeshFactoryWrapper}: The main entry point for the factory wrapper.
 @item
-@code{iObject}: use this to attach game specific data.
+@code{iObject}: Allows attachment of game-specific data.
 @end itemize
 
 A mesh factory wrapper maintains the following important variables:
 
-@itemize
+@itemize @bullet
 @item
-meshFact (@code{iMeshObjectFactory}): this is the actual mesh object factory.
+@code{meshFact}: Interface @samp{iMeshObjectFactory}.  This is the actual mesh
+object factory represented by this wrapper.
+
 @item
-parent (@code{iMeshFactoryWrapper}): mesh factories can be hierarchical. If
-they are then this variable will point to the parent. Otherwise it is 0.
+@code{parent}: Interface @samp{iMeshFactoryWrapper}.  Mesh factories can be
+hierarchical.  If they are, then this variable will point to the parent.
+Otherwise it is null.
+
 @item
-transform (@code{csReversibleTransform}): this transform is only used if
-this factory is a child of another factory. In that case it is the relative
-position of this child relative to the parent. This is used when instantiating
-mesh objects from a hierarchical factory to setup the initial transforms.
+@code{transform}: Class @samp{csReversibleTransform}.  This transform is only
+used if this factory is a child of another factory.  In that case it is the
+relative position of this child relative to the parent.  This is used when
+instantiating mesh objects from a hierarchical factory to set up the initial
+transforms.
+
 @item
-children (@code{csMeshFactoryFactoryList}): if this is a hierarchical mesh
-factory then the children are here.
+@code{children}: Class @samp{csMeshFactoryFactoryList}.  If this is a
+hierarchical mesh factory, then the children are listed here.
+
 @item
-static_lod (@code{csStaticLODFactoryMesh}): if this is a hierarchical factory
-with static lod then this field contains more information about that.
+@code{static_lod}: Class @samp{csStaticLODFactoryMesh}.  If this is a
+hierarchical factory with static @sc{lod} (level of detail), then this field
+contains more information about that.
 @end itemize
 
 @subsubheading Engine Data Structures: csMeshWrapper
 
-A @code{csMeshWrapper} is a wrapper class for the engine so that
-the engine can keep track of @code{iMeshObject} instances (these
-represent the real mesh objects) and also add some more engine
-specific stuff.
+A @samp{csMeshWrapper} is a wrapper class for the engine which allows it to
+keep track of an @samp{iMeshObject} instance (real mesh objects), and also
+stores some engine-specific information.  The mesh wrapper class implements the
+following interfaces:
 
-The mesh wrapper class implements the following interfaces:
-@itemize
+@itemize @bullet
 @item
-@code{iMeshWrapper}: the main entry point for the mesh object wrapper.
+@code{iMeshWrapper}: The main entry point for the mesh object wrapper.
 @item
-@code{iObject}: use this to attach game specific data.
+@code{iObject}: Allows attachment of game-specific data.
 @item
-@code{iVisibilityObject}: this interface is used by the visibility culling
-plugin. Mesh wrappers can be registered to the visibility culler that lives
-in a sector.
+@code{iVisibilityObject}: Used by the visibility culling plugin.  Mesh wrappers
+can be registered with the visibility culler that lives in a sector.
 @item
-@code{iImposter}: this is not yet implemented but it will be used for
-an imposter system.
+@code{iImposter}: Not yet implemented, but will be used for an imposter system.
 @end itemize
 
 A mesh object wrapper maintains the following important variables:
 
-@itemize
+@itemize @bullet
 @item
-meshobj (@code{iMeshObject}): this is the real mesh object.
+@code{meshobj}: Interface @samp{iMeshObject}. This is the actual mesh object
+represented by this wrapper.
+
 @item
-Parent and csParent (@code{iMeshWrapper} and @code{csMeshWrapper}): if the
-mesh is part of a hierarchical mesh then these fields will point to the
-parent mesh.
+@code{Parent} and @code{csParent}: Interface @samp{iMeshWrapper} and class
+@samp{csMeshWrapper}.  If the mesh is part of a hierarchical mesh, then these
+fields will point at the parent mesh.
+
 @item
-children (@code{csMeshMeshList}): is a list of children in case we have
-a hierarchical mesh object.
+@code{children}: Class @samp{csMeshMeshList}.  This is a list of children if
+this is a hierarchical mesh object.
+
 @item
-factory (@code{iMeshFactoryWrapper}): points to the factory that this
-mesh originated from (optional).
+@code{factory}: Interface @samp{iMeshFactoryWrapper}.  Points a the factory
+from which this mesh originated (optional).
+
 @item
-movable (@code{csMovable}): this important field contains information about
-where the mesh actually is. It maintains a list of sectors (a mesh can
-be in multiple sectors at once) and a current position and transform. It is
-also aware of the hierarchical nature of meshes so that you can ask the
-real position and the position relative to the parent.
+@code{movable}: Class @samp{csMovable}.  This important field contains
+information about where the mesh actually resides.  It maintains a list of
+sectors (a mesh can reside in multiple sectors at once) and a current position
+and transform.  It is also aware of the hierarchical nature of meshes so that
+you can ask the real position and the position relative to the parent.
+
 @item
-zbufMode (@code{csZBufMode}): the z-buffer mode to use for rendering this
-object (zfill, zuse, ztest, @dots{}).
+@code{zbufMode} Class @samp{csZBufMode}.  The z-buffer mode to use for
+rendering this object (zfill, zuse, ztest, etc.).
+
 @item
-render_priority (@code{int}): this is an integer indicating what render
-priority should be used for this mesh.
+@code{render_priority}: Type @samp{int}.  This is a number indicating this
+mesh's render priority.
+
 @item
-static_lod (@code{csStaticLODMesh}): if this mesh is the parent for a static
-lod mesh then this structure will contain more information about that.
+@code{static_lod}: Class @samp{csStaticLODMesh}.  If this mesh is the parent
+for a static @sc{lod} (level of detail) mesh, then this structure will contain
+more information about that.
+
 @item
-light_info (@code{iLightingInfo}): some meshes implement this interface.
-The engine needs this a lot so for optimization purposes we keep a pointer
-to that interface here (to avoid @code{SCF_QUERY_INTERFACE}).
+@code{light_info}: Interface @samp{iLightingInfo}.  Some meshes implement this
+interface.  The engine very often requires a pointer to the mesh's
+implementation of this interface.  As an optimization, it therefore maintains a
+pointer to that interface here in order to avoid @code{SCF_QUERY_INTERFACE()},
+which is somewhat time-consuming.
+
 @item
-shadow_receiver (@code{iShadowReceiver}): some meshes implement this interface.
-Again for optimization purposes we keep this here.
+@code{shadow_receiver}: Interface @samp{iShadowReceiver}.  Some meshes
+implement this interface.  Again, as an optimization, a pointer to this
+information is maintained.
+
 @item
-portal_container (@code{iPortalContainer}): a portal container is a special
-type of mesh that is maintained by the engine itself and contains portals
-to other sectors. This interface can also be obtained from the mesh object
-by using @code{SCF_QUERY_INTERFACE} but we keep it here for optimization
-purposes.
+@code{portal_container}: Interface @samp{iPortalContainer}.  A portal container
+is a special type of mesh which is maintained by the engine itself and which
+contains portals to other sectors.  This interface can also be obtained from
+the mesh object via @code{SCF_QUERY_INTERFACE()}, but it is also maintained
+here as an optimization.
+
 @item
-relevant_lights (@code{iLight}): this is used for dynamic lighting calculation
-and will keep a list of all lights that current affect this mesh.
+@code{relevant_lights}: Interface @samp{iLight}.  This is used for dynamic
+lighting calculation, and will contain a list of all lights that currently
+affect this mesh.
+
 @item
-relevant_lights_ref (@code{LightRef}): this is a mirror of relevant_lights.
-It uses a @code{csWeakRef} trick to be able to detect if a light has been
-removed or changed (weak references are automatically set to 0 as soon as
-the object the weak ref points too is deleted).
+@code{relevant_lights_ref}: Class @samp{csMeshWrapper::LightRef}.  This is a
+mirror of @samp{relevant_lights}.  It uses @samp{csWeakRef} as a trick for
+detecting if a light has been removed or changed.  (Weak references are
+automatically set to null as soon as the object to which the weak reference
+points is deleted.)
+
 @item
-several imposter variables: not yet implemented.
+Several imposter variables: not yet implemented.
 @end itemize
 
 @subsubheading Engine Data Structures: csRegion
 
-A region uses @code{csObject} to be able to hold all objects that are in the
-region.
+A region is a collection of objects.  It utilizes @samp{csObject} to hold all
+objects that are in the region.  The region class implements the following
+interfaces:
 
-The region class implements the following interfaces:
-@itemize
+@itemize @bullet
 @item
-@code{iRegion}: the main entry point for the region.
+@code{iRegion}: The main entry point for the region.
 @item
-@code{iObject}: use this to attach game specific data.
+@code{iObject}: Allows attachment of game-specific data.
 @end itemize
 
 @subsubheading Engine Data Structures: csTextureWrapper
 
-A texture wrapper is an engine object to keep track of the real
-textures from the renderers (@code{iTextureHandle}).
-
+A texture wrapper is an engine object which keeps track of the real
+textures from the renderers (@samp{iTextureHandle}).
 The texture wrapper class implements the following interfaces:
-@itemize
+
+@itemize @bullet
 @item
-@code{iTextureWrapper}: the main entry point for the texture wrapper.
+@code{iTextureWrapper}: The main entry point for the texture wrapper.
 @item
-@code{iObject}: use this to attach game specific data.
+@code{iObject}: Allows attachment of game-specific data.
 @end itemize
 
 A texture wrapper maintains the following important variables:
 
-@itemize
+@itemize @bullet
 @item
-image (@code{iImage}): this is the image that contains the original image
-data from disk. After preparing this texture (preparing in the context of
-making it ready for the renderer) the image is normally cleared unless
-keep_image is true.
+@code{image}: Interface @samp{iImage}.  This is the object which contains the
+original image data from disk.  After @dfn{preparing} this texture to make it
+suitable the renderer, the image is released (unless keep_image is true).
+
 @item
-keep_image (@code{bool}): to prevent the image from being cleared later
-you need to set this to true. Note that this increases the memory usage
-of a single texture a lot. So only do this if you still need the image
-data later.
+@code{keep_image}: Type @samp{bool}.  To prevent @samp{image} from being
+cleared, set this to true.  Note that this increases memory usage of a single
+texture, often dramatically, so only do this if the original image data will be
+needed at a later time.
+
 @item
-handle (@code{iTextureHandle}): this is the texture handle as returned
-by the renderer (via the @code{iTextureManager} interface).
+@code{handle}: Interface @samp{iTextureHandle}.  This is the texture handle as
+returned by the renderer (via the @code{iTextureManager} interface).
 @end itemize
 
 @subsubheading Engine Data Structures: csMaterialWrapper
 
-A material wrapper is an engine object to keep track of the real
-materials from the renderers (@code{iMaterialHandle}).
-
+A material wrapper is an engine object which keeps track of the real
+materials from the renderers (@samp{iMaterialHandle}).
 The material wrapper class implements the following interfaces:
-@itemize
+
+@itemize @bullet
 @item
-@code{iMaterialWrapper}: the main entry point for the material wrapper.
+@code{iMaterialWrapper}: The main entry point for the material wrapper.
 @item
-@code{iObject}: use this to attach game specific data.
+@code{iObject}: Allows attachment of game-specific data.
 @end itemize
 
 A material wrapper maintains the following important variables:
 
-@itemize
+@itemize @bullet
 @item
-material (@code{iMaterial}): this is the original representation of the
-material from which the @code{iMaterialHandle} was made.
+@code{material}: Interface @samp{iMaterial}.  This is the original
+representation of the material from which the @code{iMaterialHandle} was
+generated.
+
 @item
-matEngine (@code{iMaterialEngine}): this points to the engine specific
-material class (@code{csMaterial} implements both @code{iMaterial} and
-@code{iMaterialEngine}). The reason for this is that @code{iMaterial} is
-an interface that is not specific to the engine so we can't keep engine
-specific pointers there (like pointers to @code{iTextureWrapper}). So we
-keep them in the @code{iMaterialEngine} interface.
+@code{matEngine}: Interface @samp{iMaterialEngine}.  This points to the
+engine-specific material class (@samp{csMaterial}, which implements both
+@samp{iMaterial} and @samp{iMaterialEngine}).  The reason for the presence of
+this variable is that @samp{iMaterial} is an interface that is not specific to
+the engine so it is not possible to maintain engine-specific information there
+(such as a reference to an @samp{iTextureWrapper}).  Instead, such information
+is maintained in the @samp{iMaterialEngine} interface.
+
 @item
-handle (@code{iMaterialHandle}): this is the actual material handle
-as returned by the renderer (via the @code{iTextureManager} interface).
+@code{handle}: Interface @samp{iMaterialHandle}.  This is the actual material
+handle as returned by the renderer (via the @samp{iTextureManager} interface).
 @end itemize
 
 @subsubheading Engine Data Structures: csMovable
 
-The movable class is used by the @code{csMeshWrapper} class to keep track
-of where the mesh currently is.
-
+The movable class is used by the @samp{csMeshWrapper} class to keep track
+of the mesh's current location.
 The movable class implements the following interfaces:
-@itemize
+
+@itemize @bullet
 @item
-@code{iMovable}: the main entry point for the movable.
+@code{iMovable}: The main entry point for the movable.
 @end itemize
 
 A movable maintains the following important variables:
 
-@itemize
+@itemize @bullet
 @item
-obj (@code{csReversibleTransform}): the world to object transform for the
-mesh represented by this movable. For this transform @samp{This} represents
-object space and @samp{Other} represents world space.
+@code{obj}: Class @samp{csReversibleTransform}.  The world-to-object transform
+for the mesh represented by this movable.  For this transform @dfn{This}
+represents object space and @dfn{Other} represents world space.
+
 @item
-is_identity (@code{bool}): if the @samp{obj} transform above is an identity
-transform (i.e. doesn't move nor rotate the object) then we can do various
-optimizations. This flag keeps track of that state.
+@code{is_identity}: Type @samp{bool}.  If the @samp{obj} transform is an
+identity transform (i.e.  neither moves nor rotates the object) then it is
+possible to perform various optimizations.
+
 @item
-sectors (@code{csMovableSectorList}): this is a list of sectors for the
-mesh object. In many cases a mesh will only be in one sector but it is possible
-for a mesh to be in several sectors at once if the mesh happens to cross
-a portal boundary. Note that the application is responsible for adding a mesh
-to sectors. The engine will never do that.
+@code{sectors}: Class @samp{csMovableSectorList}.  This is a list of sectors in
+which the mesh object resides In many cases a mesh will only reside in only one
+sector, but it is possible for a mesh to be in several sectors at once if the
+mesh happens to cross a portal boundary.  Note that the application is
+responsible for adding a mesh to sectors.  The engine will never do so.
+
 @item
-listeners (@code{iMovableListener}): this is an array of listeners (pieces
-of code) that are interested in hearing when the movable changes (i.e. when
-the mesh moves).
+@code{listeners}: Interface @samp{iMovableListener}.  This is an array of
+listeners (pieces of code) interested in knowing when the movable changes (i.e.
+when the mesh moves).
+
 @item
-parent (@code{iMovable}): if the mesh is being used in a hierarchical mesh
-object then this will point to the movable of the parent mesh.
+@code{parent}: Interface @samp{iMovable}.  If the mesh is being used in a
+hierarchical mesh object, then this will point to the movable of the parent
+mesh.
+
 @item
-object (@code{csMeshWrapper}): this is the mesh for the movable.
+@code{object}: Class @samp{csMeshWrapper}. This is the mesh for the movable.
+
 @item
-updatenr (@code{long}): one way to get notified about movable updates is
-to register yourselves as a listener. Then you get called whenever the movable
-is updated. Another way is to keep track of the current updatenr. This number
-is updated everytime the movable is updated.
+@code{updatenr}: Type @samp{long}.  One way to get notified about movable
+updates is to register as a listener.  The listener will be called whenever the
+movable is updated.  Another way is to keep track of the current
+@samp{updatenr}.  This number is updated every time the movable is updated.
 @end itemize
 
 @subsubheading Engine Data Structures: csLight
 
-The light class is the representation of a light. Lights live in a sector.
-
+The light class is the representation of a light. A light lives in a sector.
 The light class implements the following interfaces:
-@itemize
+
+@itemize @bullet
 @item
-@code{iLight}: the main entry point for the light.
+@code{iLight}: The main entry point for the light.
 @item
-@code{iObject}: use this to attach game specific data.
+@code{iObject}: Allows attachment of game-specific data.
 @end itemize
 
 A light maintains the following important variables:
 
-@itemize
+@itemize @bullet
 @item
-light_id (@code{char*}): this is a 16-byte string (@sc{MD5} hash) which is
-used for caching light data. It is hopefully unique for a given light since
-it is calculated based on various light settings like the position, radius,
-sector, @dots{}.
+@code{light_id}: Type @samp{char*}.  This is a 16-byte string (@sc{md5} hash)
+which is used for caching light data.  It is, hopefully, unique for a given
+light since it is calculated from various light settings such as the position,
+radius, sector, etc.
+
 @item
-childnode (@code{csKDTreeChild}): lights are represented in a KD-tree that
-lives in the sector (see above). This child object is the representation of the
-light in that tree.
+@code{childnode}: Class @samp{csKDTreeChild}.  Lights are represented in a
+KD-tree that lives in the sector (see above).  This child object is the
+representation of the light in that tree.
+
 @item
-sector (@code{iSector}): the current sector of the light.
+@code{sector}: Interface @samp{iSector}. The current sector of the light.
+
 @item
-center (@code{csVector3}): the current position of the light.
+@code{center}: Class @samp{csVector3}. The current position of the light.
+
 @item
-color (@code{csColor}): the current color of the light.
+@code{color}: Class @samp{csColor}. The current color of the light.
+
 @item
-haso (@code{csHalo}): if the light has a halo then this field contains a
-pointer to that structure.
+@code{halo}: Class @samp{csHalo}.  If the light has a halo, then this field
+contains a pointer to that structure.
+
 @item
-dynamic_type (@code{int}): this represents the type of the light (dynamic,
-static, @dots{}).
+@code{dynamic_type}: Type @samp{int}.  This represents the type of the light
+(dynamic, static, etc.).
+
 @item
-attenunation (@code{int}): this is the kind of attenunation the light uses.
+@code{attenunation}: Type @samp{int}.  This is the kind of attenunation that
+the light uses.
+
 @item
-attenuationvec (@code{csVector3}): if the attenuation is @sc{clq} based then
-this will be the vector.
+@code{attenuationvec}: Class @samp{csVector3}.  If the attenuation is @sc{clq}
+based, then this will be the vector.
+
 @item
-influenceRadius (@code{float}): is the influence radius of the light. After
-this distance the light has almost no effect anymore.
+@code{influenceRadius}: Type @samp{float}.  This is the influence radius of the
+light.  Beyond this distance the light has almost no effect.
+
 @item
-lightnr (@code{uint32}): this number is used to detect light changes. The light
-class will update it whenever the light is moved or changes otherwise.
+@code{lightnr}: Type @samp{uint32}.  This number is used to detect light
+changes.  It will be updated whenever the light is moved or otherwise changes.
+
 @item
-light_cb_vector (@code{iLightCallback}): this is another way to get notified
-of light changes.
+@code{light_cb_vector}: Interface @samp{iLightCallback}.  This is another way
+to get notified of light changes.
+
 @item
-lightinginfos (@code{iLightingInfo}): this is a hash set with lighting info's
-that this light is currently affecting. When the light color changes (without
-the light moving) we simply have to tell this to all elements in the set.
+@code{lightinginfos}: Interface @samp{iLightingInfo}.  This is a hash set with
+lighting @dfn{info}'s which this light is currently affecting.  When the light
+color changes (without the light moving) the light class simply notifies every
+element of this set.
 @end itemize
 
 @subsubheading Engine Data Structures: csPortalContainer
 
-The portal container class is the representation of a portal container. It
+This is the representation of a portal container. It
 is the only mesh object that is implemented directly in the engine itself.
-A portal container is a collection of portals. i.e. every polygon in the
-portal container is a portal to another sector.
-
+A portal container is a collection of portals (i.e. every polygon in the
+portal container is a portal to another sector).
 The portal container class implements the following interfaces:
-@itemize
+
+@itemize @bullet
 @item
-@code{iMeshObject}: a portal container is a mesh object.
+@code{iMeshObject}: A portal container is a mesh object.
 @item
-@code{iPortalContainer}: the portal container specific API is here (this
+@code{iPortalContainer}: The portal container-specific @sc{api} (this
 is the state interface of the mesh object).
 @item
-@code{iShadowReceiver}: a portal container can receive shadows (and pass
+@code{iShadowReceiver}: A portal container can receive shadows (and pass
 them along to the destination sectors).
 @end itemize
 
 A portal container maintains the following important variables:
 
-@itemize
+@itemize @bullet
 @item
-portals (@code{csPortal}): this is a list of all portals in the portal
-container.
+@code{portals}: Class @samp{csPortal}.  This is a list of all portals in the
+portal container.
+
 @item
-data_nr (@code{uint32}): this number is increased with every significant
-change to the portal container.
+@code{data_nr}: Type @samp{uint32}.  This number is increased with each
+significant change to the portal container.
+
 @item
-vertices (@code{csVector3}): this is an array of vertices that are used
-by the portals in this container. These vertices are in object space.
+@code{vertices}: Class @samp{csVector3}.  This is an array of vertices that are
+used by the portals in this container.  These vertices are in object space.
+
 @item
-world_vertices (@code{csVector3}): this is an array of vertices in world
-space.
+@code{world_vertices}: Class @samp{csVector3}.  This is an array of vertices in
+world space.
+
 @item
-camera_vertices (@code{csVector3}): this is an array of vertices in camera
-space.
+@code{camera_vertices}: Class @samp{csVector3}.  This is an array of vertices
+in camera space.
+
 @item
-meshwrapper (@code{csMeshWrapper}): a pointer back to the mesh wrapper
-containing this portal container.
+@code{meshwrapper}: Class @samp{csMeshWrapper}.  A pointer back to the mesh
+wrapper containing this portal container.
 @end itemize
 
 @subsubheading Engine Data Structures: csRenderView
 
 This is a temporary data structure that is used during rendering. It will
-be discussed in more detail in the section about drawing a frame. Here
-we give a summary of the class.
-
+be discussed in more detail in the section about drawing a frame. Here is a
+brief summary of the class.
 The renderview class implements the following interfaces:
-@itemize
+
+@itemize @bullet
 @item
-@code{iRenderView}: the main entry point for the render view.
+@code{iRenderView}: The main entry point for the render view.
 @end itemize
 
 The renderview class maintains the following important variables:
 
-@itemize
+@itemize @bullet
 @item
-context_id (@code{uint32}): this is a field that is incremented with every
-new @code{csRenderView} instance (and also when a new render context
-is created) and is used so the engine can detect if two render contexts
-are the same or not (comparing on pointers is not valid since render contexts
-are reused).
+@code{context_id}: Type @samp{uint32}.  This is a field that is incremented
+with each new @code{csRenderView} instance (and also when a new render context
+is created), and is used so the engine can detect if two render contexts are
+the same (comparing on pointers is not valid since render contexts are reused).
+
 @item
-ctxt (@code{csRenderContext}): this is the current render context. There
-is one @code{csRenderView} instance that is used through the entire rendering
-of a frame but everytime a portal is traversed a new @code{csRenderContext}
-instance is created.
+@code{ctxt}: Class @samp{csRenderContext}.  This is the current render context.
+There is one @samp{csRenderView} instance that is used through the entire
+rendering of a frame but every time a portal is traversed a new
+@samp{csRenderContext} instance is created.
+
 @item
-original_camera (@code{iCamera}): this points to the original camera that
-was used when starting the rendering (i.e. the top level camera). Normally
-this camera will be constant unless there is a space warping portal (a portal
-that changes space, for example a mirror). In that case a new camera is created
-for the new render context.
+@code{original_camera}: Interface @samp{iCamera}.  This points at the original
+camera which was used when starting the rendering (i.e.  the top level camera).
+Normally, this camera will be constant unless there is a space warping portal
+(a portal that changes space; for example, a mirror).  In that case a new
+camera is created for the new render context.
 @end itemize
 
 @subsubheading Drawing a Frame
 
 When rendering a frame the base entry point is @code{iEngine::Draw()}. However,
-most applications don't call this function directly. Most applications will
-use @code{iView::Draw()} instead.
+most applications do not call this function directly. Most applications will
+invoke @code{iView::Draw()} instead.
 
-@code{iEngine::Draw()} has two parameters: the camera to use and the
-2D clipping area. When this function is called then engine will do the
-following steps:
+@code{iEngine::Draw()} accepts two arguments: the camera to use, and the
+2D clipping area. When this function is called then engine will perform the
+following steps in the order shown:
 
-@itemize
+@itemize @bullet
 @item
-First @samp{current_framenumber} is incremented so that the engine and other
-plugins can check the current framenumber to update per-frame caches for
+@samp{current_framenumber} is incremented so that the engine and other
+plugins can check the current frame number to update per-frame caches, for
 example.
+
 @item
-Then @code{csEngine::ControlMeshes()} is called. This function checks
-all meshes that want to die (the @samp{want_to_die} set) and destroys them.
+@code{csEngine::ControlMeshes()} is called. This function checks
+all meshes that want to die (the @samp{csEngine::want_to_die} set) and destroys
+them.
+
 @item
-Then a @code{csRenderView} instance is created and initializated with the
+A @samp{csRenderView} instance is created and initializated with the
 current camera and clipper.
+
 @item
-Then a few calls to @code{iGraphics3D} are done to ensure the clipper is
-set up right, among other things.
+A few @code{iGraphics3D} methods are invoked to ensure that the clipper is
+set up correctly, among other things.
+
 @item
-The engine then checks if the sector has a renderloop. If so it will use
-that. Otherwise it will use the default renderloop in the engine.
-It will call @code{iRenderLoop::Draw()}. We will proceed with that call
-below the description of this function. But this call basically proceeds
-with the recursive drawing of everything.
+The engine checks if the sector has a renderloop. If so, it will use it.
+Otherwise it will use the default renderloop in the engine.
+It will call @code{iRenderLoop::Draw()}, which will be described below.  The
+upshot of this method invocation is the recursive drawing of everything
+visible.
+
 @item
-After drawing everything we have to draw halos.
+Halos are drawn.
+
 @item
-And finally we reset the clipper in @code{iGraphics3D}.
+The clipper in @code{iGraphics3D} is reset.
 @end itemize
 
-@code{iRenderLoop::Draw()} is called for every sector in the recursion.
-First @code{csEngine::Draw()} will call it and it will be called again whenever
-we traverse a portal (see later). The following operations are done in this
-function:
+@code{iRenderLoop::Draw()} is called for every sector in the recursion.  It
+will first be invoked by @code{csEngine::Draw()}, and it will also be called
+again whenever portal traversal occurs (see below).  The following operations
+are performed by this function in the order shown:
 
-@itemize
+@itemize @bullet
 @item
-First @code{csRenderView::SetupClipPlanes()} is called. This function will
-setup the clipping planes for the current 2D portal boundary (2D clipper) and
+@code{csRenderView::SetupClipPlanes()} is invoked. This function will
+set up the clipping planes for the current 2D portal boundary (2D clipper) and
 the current camera (view frustum). The far plane and near clipping planes
 are also added if needed.
+
 @item
-Many of the shader stuff in CS depends on shader variables. There is a
-stack of shader variables that is maintained at each level. At the lowest
-level there is this renderloop. Here the variables from the shader manager
-itself are added on the stack. Currently there are no such variables yet
-but in the future one can imagine variables like the current frame number,
-and other globals. @code{iShaderManager::PushVariables()} will do that.
+Many of the shaders depend on @dfn{shader variables}.
+A stack of shader variables is maintained at each level. At the lowest
+level there is the renderloop. Here the variables from the shader manager
+itself are pushed onto the stack.  Presently, there are no variables at this
+level, but in the future one can imagine variables such as the current frame
+number, and other globals.  @code{iShaderManager::PushVariables()} performs
+this operation.
+
 @item
-Then @code{csSector::PrepareDraw()} is called. This function will first make
-sure the visibility culler plugin for the sector is there. Then it will
-set the current sector on the @code{csRenderView}. Next it will call all
-callbacks that are interested in hearing when this sector is traversed.
-One of the most important things this function does however, is moving all
-meshes that have the @code{CS_ENTITY_CAMERA} flag set so that their center
+@code{csSector::PrepareDraw()} is invoked. This function will first make
+sure the visibility culler plugin for the sector is present. Then, it will
+set the current sector on the @samp{csRenderView}. Next, it will call all
+@dfn{callbacks} that are interested in hearing when this sector is traversed.
+One of the most important things this function does however, is move all
+meshes that have the @samp{CS_ENTITY_CAMERA} flag set so that their center
 point is at the camera position.
+
 @item
-Now comes the crucial part of this function. It will now loop over all steps
-in this renderloop and perform them one by one. Every renderstep will
-render all meshes in the sector using some shadertype. More on this later.
-But this is the place where the meshes in this sector are actually rendered.
+It loops over all steps
+in this renderloop and perform them one by one. Each renderstep will
+render all meshes in the sector using some shader type (more on this later).
+This is the place where the meshes in this sector are actually rendered.
 It is also during rendering of meshes that portals are actually traversed.
-Note that typically only one renderstep will have portal traversal enabled.
+Note that, typically, only one renderstep will have portal traversal enabled.
+
 @item
-After doing all rendering of this sector the variables that were added
-here are popped from the stack again.
+After doing all rendering of this sector the shader variables that were added
+here are popped from the stack.
+
 @item
-Finally all halos in this sector are added to the engine queue so that the
-engine can draw them after the render recursion ends.
+All halos in this sector are added to the engine queue so that the
+engine can draw them after render recursion ends.
 @end itemize
 
-Now what actually happens during the perform of the rendersteps depends
-on how the renderloop is set up and how many rendersteps there are. I will
-explain here the default case of a single render step that uses the
-@samp{OR compatibility} shader type (this is the renderloop that is created
-by @code{iEngine::CreateDefaultRenderLoop()}). This render step is designed
-to be compatible with old renderer style levels that use lightmaps and
-no special shaders. It uses @code{CS_ZBUF_MESH} for this render step which
-means that the z-buf mode of the mesh itself will be used. It also disables
-Z-offset since there will only be one step. Z-offset is used to make sure
-that when using multi-texturing the polygons end up at exactly the same
-Z-distance (i.e. no z fighting occurs). The first step is always rendered
-using disabled z-offset. Subsequent steps should enable it to make sure they
-will render nicely on the previously rendered base. This render step also
+What actually occurs during invocation of the rendersteps depends upon how the
+renderloop is set up, and upon how many rendersteps there are.  What follows is
+an explanation of the default case of a single render step that uses the
+@emph{old-renderer compatibility} shader type (this is the renderloop that is
+created by @code{iEngine::CreateDefaultRenderLoop()}).  This render step is
+designed to be compatible with old renderer style maps that use lightmaps
+without no special shaders.  It uses @samp{CS_ZBUF_MESH} for this render step
+which means that the z-buf mode of the mesh itself will be used.  It also
+disables Z-offset since there will only be one step.  Z-offset is used to make
+sure that, when using multi-texturing, the polygons end up at exactly the same
+Z-distance (i.e. no z fighting occurs).  The first step is always rendered
+using disabled z-offset.  Subsequent steps should enable it to make sure they
+will render nicely on the previously rendered base.  This render step also
 enables portal traversal.
 
-The @code{iRenderStep::Perform()} resides in the generic render step plugin
-(@file{plugins/engine/renderloop/stdsteps}). This function will do the following
-things:
+@code{iRenderStep::Perform()} resides in the generic render step plugin which
+is located in the source tree at @file{CS/plugins/engine/renderloop/stdsteps}.
+This function performs the following tasks in the order shown:
 
-@itemize
+@itemize @bullet
 @item
-First the render step will ask the sector for all visible meshes (via
-@code{iSector::GetVisibleMeshes()}). I will go into more detail on this function
-in a later section.
+Obtains a list of all visible meshes (via @code{iSector::GetVisibleMeshes()})
+from the sector.  A later section will go into this step in more detail.
+
 @item
-After getting a @code{csRenderMeshList} with all visible meshes this
-function will first sort them based on render priority (and for some
-render priorities it will also sort on distance from the camera (i.e. alpha
-render priority)). In addition it will also sort on shaders so that meshes
-using the same shader are put together (that's more efficient for the
-renderer).
+After getting a @samp{csRenderMeshList} with all visible meshes, they are
+sorted based upon render priority (and for some render priorities it will also
+sort on distance from the camera---i.e. alpha render priority).  In addition
+it will also sort on shaders so that meshes using the same shader are put
+together (this is more efficient for the renderer).
+
 @item
-Then this function adds shader variables to the variable stack (remember
+Shader variables are added to the variable stack (remember
 we first had the shader variables from the shader manager itself, now we
-add another level of variables on that stack). The only variables that are
-currently added are the fog parameters of the current sector.
+add another level of variables on that stack).  Presently, the only variables
+added are the fog parameters of the current sector.
+
 @item
-Now it will start rendering the sorted and visible meshes. It will collect
+The sorted and visible meshes are rendered. It will collect
 all meshes with the same shader and then call @code{RenderMeshes()}.
 @code{RenderMeshes()} will first set the current settings for this step
 (like z-offset). Then it will get the number of passes for the given
 shader and render all meshes with that shader with the given pass. Note
-that the shader will also add variables to the stack at this point. In
+that the shader will also add variables to the stack at this point; in
 particular variables about the current object to camera transformation and
 the current material.
+
 @item
-If portaltraversal is enabled and the mesh is a portal container (this
-is indicated by the @code{csRenderMesh} having a portal field that is not 0)
-then the portal will be traversed here by calling
-@code{iPortalContainer::Draw()}. More on this later but this is the important
+If @samp{portaltraversal} is enabled and the mesh is a portal container (this
+is indicated by @samp{csRenderMesh} having a portal field that is not null),
+then the portal will be traversed by invoking
+@code{iPortalContainer::Draw()}. More on this later, but this is the important
 place where the recursion through portals occurs.
+
 @item
-Finally the settings for this step are restored again.
+The settings for this step are restored.
 @end itemize
 
-TODO: explain iSector::GetVisibleMeshes()
-TODO: explain iPortalContainer::Draw()
-
+@@@@@@TODO: Explain iSector::GetVisibleMeshes().
+@@@@@@TODO: Explain iPortalContainer::Draw().

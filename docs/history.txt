@@ -46,6 +46,10 @@ chronological order.
 	  processing for the configure-generated 'include/volatile.h', rather
 	  than performing the check manually.
 	- Jorrit added csddsimg to the walkall target. Walktest now needs it.
+	- Eric Sunshine performed a significant amount of Texinfo mark-up
+	  correction and cleanup in the new engine/internal.txi.  Also cleaned
+	  up the grammar and performed some re-writing to make the discussion
+	  more idiomatic.
 29-Apr-2004
 	- Marten fixed a bug in xmlshader where it assumed the syntax-service
 	  was already loaded.  Now it loads it if needed.
