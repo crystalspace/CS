@@ -103,7 +103,7 @@ private:
   bool discarded;
   bool discardable;
 
-  csListElement<csVARRenderBuffer*>* listEl;
+  csList<csVARRenderBuffer*>::Iterator listEl;
 
   csVARRenderBufferManager* bm;
 

@@ -286,46 +286,46 @@ void csVARRenderBufferManager::AddBlockInLRU(csVARRenderBuffer* buf)
 {
   if (buf->type == CS_BUF_STATIC)
   {
-    buf->listEl = staticList.prepend(buf);
+    buf->listEl = staticList.PushFront (buf);
     return;
   }
   else if (buf->type == CS_BUF_DYNAMIC)
   {
-    buf->listEl = dynamicList.prepend(buf);
+    buf->listEl = dynamicList.PushFront (buf);
     return;
   }
 }
 
 void csVARRenderBufferManager::RemoveBlockInLRU(csVARRenderBuffer* buf)
 {
-  if (buf->listEl == NULL) return;
+  if ((*buf->listEl) == NULL) return;
 
   if (buf->type == CS_BUF_STATIC)
   {
-    staticList.remove(buf->listEl);
+    staticList.Delete (buf->listEl);
     return;
   }
   else if (buf->type == CS_BUF_DYNAMIC)
   {
-    dynamicList.remove(buf->listEl);
+    dynamicList.Delete (buf->listEl);
     return;
   }
 }
 
 void csVARRenderBufferManager::TouchBlockInLRU(csVARRenderBuffer* buf)
 {
-  if (buf->listEl == NULL) return;
+  if ((*buf->listEl) == NULL) return;
 
   if (buf->type == CS_BUF_STATIC)
   {
-    staticList.remove(buf->listEl);
-    buf->listEl = staticList.prepend(buf);
+    staticList.Delete (buf->listEl);
+    buf->listEl = staticList.PushFront (buf);
     return;
   }
   else if (buf->type == CS_BUF_DYNAMIC)
   {
-    dynamicList.remove(buf->listEl);
-    buf->listEl = dynamicList.prepend(buf);
+    dynamicList.Delete (buf->listEl);
+    buf->listEl = dynamicList.PushFront (buf);
     return;
   }
 }
@@ -335,17 +335,17 @@ bool csVARRenderBufferManager::ReclaimMemory()
   csList<csVARRenderBuffer*>::Iterator dynamicIt(dynamicList, true);
   while(dynamicIt.HasPrevious())
   {
-    csVARRenderBuffer* b = dynamicIt--;
-    if(b->Discard())
+    if((*dynamicIt)->Discard())
       return true;
+    dynamicIt--;
   }
 
   csList<csVARRenderBuffer*>::Iterator staticIt(staticList, true);
   while(staticIt.HasPrevious())
   {
-    csVARRenderBuffer* b = staticIt--;
-    if(b->Discard())
+    if((*staticIt)->Discard())
       return true;
+    staticIt--;
   }
   return false;
 }
@@ -373,8 +373,6 @@ csVARRenderBuffer::csVARRenderBuffer(void *buffer, int size, CS_RENDERBUFFER_TYP
   locked = false;
   discarded = false;
   discardable = true;
-
-  listEl = NULL;
 
   memblock = new csVARMemoryBlock[MAXMEMORYBLOCKS];
   int i;
