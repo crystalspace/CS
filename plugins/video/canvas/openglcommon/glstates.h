@@ -50,10 +50,10 @@
     return enabled_##name; \
   }
 
-//#define MAX_LAYER 16
+#define CS_GL_MAX_LAYER 16
 
 #define IMPLEMENT_CACHED_BOOL_LAYER(name) \
-  bool enabled_##name[maxLayers]; \
+  bool enabled_##name[CS_GL_MAX_LAYER]; \
   void Enable_##name (int l = 0) \
   { \
     if (!enabled_##name[l]) \
@@ -76,7 +76,7 @@
   }
 
 #define IMPLEMENT_CACHED_BOOL_CURRENTLAYER(name) \
-  bool enabled_##name[maxLayers]; \
+  bool enabled_##name[CS_GL_MAX_LAYER]; \
   void Enable_##name () \
   { \
     if (!enabled_##name[currentUnit]) \
@@ -162,8 +162,6 @@
 class csGLStateCache
 {
 public:
-  const static int maxLayers = 16;
-
   csGLExtensionManager* extmgr;
 
   csGLStateCache (csGLExtensionManager* extmgr)
@@ -201,7 +199,7 @@ public:
     enabled_GL_TEXTURE_2D[0] = glIsEnabled (GL_TEXTURE_2D);
     enabled_GL_TEXTURE_3D[0] = glIsEnabled (GL_TEXTURE_3D);
     enabled_GL_TEXTURE_CUBE_MAP[0] = glIsEnabled (GL_TEXTURE_CUBE_MAP);
-    for (i = 1 ; i < maxLayers; i++)
+    for (i = 1 ; i < CS_GL_MAX_LAYER; i++)
     {
       enabled_GL_TEXTURE_1D[i] = enabled_GL_TEXTURE_1D[0];
       enabled_GL_TEXTURE_2D[i] = enabled_GL_TEXTURE_2D[0];
@@ -209,7 +207,7 @@ public:
       enabled_GL_TEXTURE_CUBE_MAP[i] = enabled_GL_TEXTURE_CUBE_MAP[0];
     }
 
-    memset (boundtexture, 0, maxLayers * sizeof (GLuint));
+    memset (boundtexture, 0, CS_GL_MAX_LAYER * sizeof (GLuint));
     currentUnit = 0;
   }
 
@@ -236,7 +234,7 @@ public:
   IMPLEMENT_CACHED_PARAMETER_3 (glStencilOp, StencilOp, GLenum, stencil_fail, GLenum, stencil_zfail, GLenum, stencil_zpass)
 
   // Special caches
-  GLuint boundtexture[maxLayers]; // 32 max texture layers
+  GLuint boundtexture[CS_GL_MAX_LAYER]; // 32 max texture layers
   int currentUnit;
   void SetTexture (GLenum target, GLuint texture)
   {
