@@ -88,7 +88,6 @@ PLUGINS.DYNAMIC += mesh/impexp/pov
 PLUGINS.DYNAMIC += mesh/impexp/spr
 #PLUGINS.DYNAMIC += mesh/impexp/3ds
 PLUGINS.DYNAMIC += font/server/fontplex
-#PLUGINS.DYNAMIC += font/server/freefont
 #PLUGINS.DYNAMIC += font/server/freefnt2
 PLUGINS.DYNAMIC += aws
 #PLUGINS.DYNAMIC += sound/loader/ogg
