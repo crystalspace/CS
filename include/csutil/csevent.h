@@ -22,6 +22,20 @@
 
 #include "iutil/event.h"
 #include "csutil/hashmapr.h"
+#include "cssys/csendian.h"
+
+#define CS_DATATYPE_INT8    0x00
+#define CS_DATATYPE_UINT8   0x01
+#define CS_DATATYPE_INT16   0x02
+#define CS_DATATYPE_UINT16  0x03
+#define CS_DATATYPE_INT32   0x04
+#define CS_DATATYPE_UINT32  0x05
+#define CS_DATATYPE_FLOAT   0x06
+#define CS_DATATYPE_DOUBLE  0x07
+#define CS_DATATYPE_BOOL    0x08
+#define CS_DATATYPE_STRING  0x09
+#define CS_DATATYPE_DATABUFFER 0x0a
+#define CS_DATATYPE_EVENT   0x0b
 
 /**
  * This class represents a system event.<p>
@@ -34,8 +48,22 @@ class csEvent : public iEvent
 {
 private:
   csHashMapReversible attributes;
+  
+  uint32 count;
 
   bool CheckForLoops(csEvent *current, csEvent *e);
+
+  bool FlattenCrystal(char *buffer);
+  bool FlattenMuscle(char *buffer);
+  bool FlattenXML(char *buffer);
+
+  uint32 FlattenSizeCrystal();
+  uint32 FlattenSizeMuscle();
+  uint32 FlattenSizeXML();
+  
+  bool UnflattenCrystal(const char *buffer, uint32 length);
+  bool UnflattenMuscle(const char *buffer, uint32 length);
+  bool UnflattenXML(const char *buffer, uint32 length);
 public:
   /// Empty initializer
   csEvent ();
@@ -94,8 +122,9 @@ public:
   virtual bool Remove(const char *name, int index = -1);
   virtual bool RemoveAll();
 
-  virtual char *Flatten(uint32 &size);
-  virtual bool Unflatten(const char *buffer);
+  virtual uint32 FlattenSize(int format = CS_CRYSTAL_PROTOCOL);
+  virtual bool Flatten(char *buffer, int format = CS_CRYSTAL_PROTOCOL);
+  virtual bool Unflatten(const char *buffer, uint32 length);
   
   virtual bool Print(int level = 0);
   
@@ -110,8 +139,9 @@ public:
  * there are the events that reside within it.
  */
  class csPoolEvent : public csEvent {
-     // make csEventQueue a friend such that
+     // make csEventQueue and csEvent as a friend class
      friend class csEventQueue;
+     friend class csEvent;
      private:
          // As per the XML pool, keep a reference to the pool container obejct
          // and this also allows our overridden DecRef() to place the event back

@@ -30,6 +30,11 @@
  * \addtogroup event_handling
  * @{ */
 
+
+#define CS_MUSCLE_PROTOCOL          1347235888L // 'PM00'
+#define CS_CRYSTAL_PROTOCOL         1129525296L // 'CS00'
+#define CS_XML_PROTOCOL             1481460784L // 'XML0'
+
 struct iEventHandler;
 
 struct iNetworkSocket2;
@@ -150,8 +155,10 @@ struct iEvent : public iBase
   
   virtual bool Print(int level = 0) = 0;
 
-  virtual char *Flatten(uint32 &size) = 0;
-  virtual bool Unflatten(const char *buffer) = 0;
+  // Note: The user is responsible for allocating and deallocating this memory
+  virtual uint32 FlattenSize(int format = CS_CRYSTAL_PROTOCOL) = 0;
+  virtual bool Flatten(char *buffer, int format = CS_CRYSTAL_PROTOCOL) = 0;
+  virtual bool Unflatten(const char *buffer, uint32 length) = 0;
 
 };
 
