@@ -20,7 +20,7 @@
 #define INITGUID
 
 #include "cssysdef.h"
-#icnlude "csutil/csstring.h"
+#include "csutil/csstring.h"
 #include <stdlib.h>
 #include <windows.h>
 
