@@ -1389,7 +1389,7 @@ void csTextSyntaxService::ReportV (const char* msgid, int severity,
     }
     n = n->GetParent ();
   }
-  if (nodepath != "")
+  if (nodepath.IsEmpty())
     csReport (object_reg, severity, msgid, "%s", (const char*)errmsg);
   else
     csReport (object_reg, severity, msgid, "%s\n[node: %s]",

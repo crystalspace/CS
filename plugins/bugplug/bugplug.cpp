@@ -1853,7 +1853,7 @@ bool csBugPlug::HandleEndFrame (iEvent& /*event*/)
       //cursor[edit_cursor] = 0;
       dispString.Truncate (edit_cursor);
       int cursor_w, cursor_h;
-      fnt->GetDimensions (dispString, cursor_w, cursor_h);
+      fnt->GetDimensions (dispString.GetDataSafe(), cursor_w, cursor_h);
       G2D->Write (fnt, x+5+cursor_w, y+5+fh+7, fgcolor, -1, "_");
     }
   }

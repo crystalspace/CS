@@ -11,6 +11,9 @@ chronological order.
 	  because it breaks screen clearing on his nVidia card. If this is
 	  to be enabled again then I propose it is enabled ONLY on cards
 	  that are known to give this problem. Not on all nVidia cards.
+	- res fixed an uninit member in csSimpleRenderMesh.
+	- res fixed a stupid condition reversion in cssynldr.
+	- res fixed a 0 string passed to iFont->GetDimensions() by bugplug.
 28-Mar-2005
 	- Marten changed how transforms are sent from meshobjects to the
 	  renderer.
