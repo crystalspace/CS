@@ -60,7 +60,7 @@ bool csEngineProcTex::Initialize (iGraphics3D *g3d, iEngine *engine,
   // create a procedural texture
   iImage *Image = new csImageMemory (256, 256);
   TexHandle = g3d->GetTextureManager ()->RegisterTexture (Image,
-    CS_TEXTURE_3D | CS_TEXTURE_NOMIPMAPS | CS_TEXTURE_PROC);
+    CS_TEXTURE_3D | CS_TEXTURE_NOMIPMAPS | CS_TEXTURE_PROC | CS_TEXTURE_PROC_ALONE_HINT);
   TexHandle->Prepare ();
   ptG3D = TexHandle->GetProcTextureInterface ();
 
