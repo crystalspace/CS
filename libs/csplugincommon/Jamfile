@@ -1,6 +1,8 @@
 SubDir TOP libs csplugincommon ;
 
 {
+  Description csplugincommon : "common plugin classes library" ;
+  
   local subs = 
     canvas
     imageloader
