@@ -1,7 +1,5 @@
 The history order has been reversed so that new features are at the top.
 
-REMOVE: itranman.h, tranman.h, tranman.cpp
-
 7-Mar-2001
 	- csThing::MergeTemplate() now works through object space coordinates
 	  all the time.
