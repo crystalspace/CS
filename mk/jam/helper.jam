@@ -349,21 +349,24 @@ rule MasterHeader
 }
 
 ##  DirectoryMasterHeaders dirs [ : pre-boilerplate [ : post-boilerplate
-##                              [ : options ]]]
+##                              [ : options [ : rejects ]]]]
 ##    A convenience wrapper around MasterHeader which generates a set of master
 ##    header files for each directory in 'dirs', which are assumed to be
 ##    subdirectories of the current directory. For each item in 'dirs', the
 ##    subdirectory is recursively scanned for files, and MasterHeader is
 ##    invoked with the gleaned file list. The generated header for a directory
-##    is emitted to the current directory; not within the subdirectory.
-##    'pre-boilerplate', 'post-boilerplate', and 'options' carry the same
-##    interpretation as for MasterHeader.
+##    is emitted to the current directory; not within the subdirectory.  The
+##    optional 'rejects' is a list of header files which should not be emitted
+##    to the synthesized master headers.  'pre-boilerplate',
+##    'post-boilerplate', and 'options' carry the same interpretation as for
+##    MasterHeader.
 rule DirectoryMasterHeaders
 {
   local dirs = $(1) ;
   local boilerpre = $(2) ;
   local boilerpost = $(3) ;
   local options = $(4) ;
+  local rejects = $(5) ;
   local masters ;
   local d ;
   for d in $(dirs)
@@ -372,6 +375,10 @@ rule DirectoryMasterHeaders
     {
       local SUBDIR = [ ConcatDirs $(SUBDIR) $(d) ] ; # Recurse from here...
       files = [ Recurse : .h : $(d) ] ;
+    }
+    if $(rejects)
+    {
+      files = [ Filter $(files) : $(rejects) ] ;
     }
     masters += [ MasterHeader $(d) : $(files) : $(boilerpre) : $(boilerpost) :
       $(options) ] ;
