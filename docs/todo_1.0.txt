@@ -158,6 +158,9 @@ API and Small Feature Additions:
 	     loading/reloading of worlds.
 	[F]  Support iPolygonMesh (for collision detection) in more
 	     mesh objects (like ball, cube, ...).
+	[V]  Support lighting of a thing mesh for lights in multiple
+	     sectors (and going through portals). i.e.
+	     iSector->ShineLights (iMeshWrapper).
 	[**] Add iCamera::SetFarPlane().
 
 Global Additions and Stuff:
