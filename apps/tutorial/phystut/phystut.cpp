@@ -99,13 +99,7 @@ void Simple::SetupFrame ()
   csTicks elapsed_time = vc->GetElapsedTicks ();
 
   // Now rotate the camera according to keyboard state
-  float speed = elapsed_time / 1000.0;
-
-  // Limit the speed to some stable (?) values.
-  if (speed <= 0)
-   speed = SMALL_EPSILON;
-  else if (speed > 10)
-   speed = 10;
+  const float speed = elapsed_time / 1000.0;
 
   iCamera* c = view->GetCamera();
   if (kbd->GetKeyState (CSKEY_RIGHT))
@@ -121,7 +115,10 @@ void Simple::SetupFrame ()
   if (kbd->GetKeyState (CSKEY_DOWN))
     c->Move (CS_VEC_BACKWARD * 5 * speed);
 
-  dyn->Step (speed);
+  // Step by 
+  const float stepSize = .01;
+  float step = speed;
+  while (step > 0) { dyn->Step (stepSize); step -= stepSize; }
 
   // Tell 3D driver we're going to display 3D things.
   if (!g3d->BeginDraw (engine->GetBeginDrawFlags () | CSDRAW_3DGRAPHICS))
@@ -365,12 +362,12 @@ bool Simple::Initialize (int argc, const char* const argv[])
   iStatLight* light;
   iLightList* ll = room->GetLights ();
 
-  light = engine->CreateLight (NULL, csVector3 (-3, 0, 0), 8,
+  light = engine->CreateLight (NULL, csVector3 (3, 0, 0), 8,
   	csColor (1, 0, 0), false);
   ll->Add (light->QueryLight ());
   light->DecRef ();
 
-  light = engine->CreateLight (NULL, csVector3 (3, 0,  0), 8,
+  light = engine->CreateLight (NULL, csVector3 (-3, 0,  0), 8,
   	csColor (0, 0, 1), false);
   ll->Add (light->QueryLight ());
   light->DecRef ();
