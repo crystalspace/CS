@@ -1,9 +1,9 @@
 /*****************************************************************************
   
   This code is provided as-is by Erik Namtvedt.
-  Help with the CEL interface was provided by May-Day.
+  Help with the CEL interface was provided by Norman Kraemer.
   Help with Win32 projects was provided by Philip Wyett.
-  Help with CS in general was provided by Jorrit T.
+  Help with CS in general was provided by Jorrit Tyberghein.
 
 *****************************************************************************/
 
