@@ -87,7 +87,7 @@ PLUGINS.DYNAMIC += mesh/impexp/spr
 #PLUGINS.DYNAMIC += mesh/impexp/3ds
 PLUGINS.DYNAMIC += font/server/fontplex
 #PLUGINS.DYNAMIC += font/server/freefont
-#PLUGINS.DYNAMIC += aws
+PLUGINS.DYNAMIC += aws
 
 #-----------------------------------------------------------------------------
 # Static Settings            *** TAKE NOTE ***

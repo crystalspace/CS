@@ -20,7 +20,7 @@
 *****************************************************************************/
 
 #include "ivaria/aws.h"
-#include "csutil/csdllist.h"
+#include "csutil/csvector.h"
 
 /*********************************************************************************************************************
 *                                                                                                                    *
@@ -29,10 +29,38 @@
 *    is listening or not.                                                                                            *
 *                                                                                                                    *
 *********************************************************************************************************************/
-class awsSigSrc : public iAwsSigSrc
+
+class awsSink : public iAwsSink
+{
+  struct TriggerMap
+  {
+    unsigned long name;
+    void (iBase::*trigger)(iAwsSource &source);
+
+    TriggerMap(unsigned long n, void (iBase::*t)(iAwsSource &source)):name(n), trigger(t) {};
+  };
+    
+  /// List of triggers registered.
+  csBasicVector triggers;
+
+public:
+  awsSink();
+  virtual ~awsSink();
+
+  /// Maps a trigger name to a trigger id
+  virtual unsigned long GetTriggerID(char *name);
+
+  /// Handles trigger events
+  virtual void HandleTrigger(int trigger, iAwsSource &source);
+
+  /// A sink should call this to register trigger events
+  virtual void RegisterTrigger(char *name, void (iBase::*Trigger)(iAwsSource &source));
+};
+
+class awsSource : public iAwsSource
 {
    /// contains a list of all slots that we have registered
-   csDLinkList slots;
+   csBasicVector slots;
 
    struct SlotSignalMap
    {
@@ -44,9 +72,9 @@ class awsSigSrc : public iAwsSigSrc
    };
 
 public:  
-    awsSigSrc();
+    awsSource();
 
-    virtual ~awsSigSrc();
+    virtual ~awsSource();
 
     /// Registers a slot for any one of the signals defined by a source.  Each sources's signals exist in it's own namespace
     virtual bool RegisterSlot(iAwsSlot *slot, unsigned long signal);
@@ -60,17 +88,30 @@ public:
 
 /**********************************************************************************************************************
 *                                                                                                                     *
-*   This implements the slot architecture.  Slots are sinks for signals.  Signals always have a source.  Slots may be *
-*  a sink for multiple signals from multiple sources.  It is up to the user to determine how to use his slots.  Slots *
-*  do not care.                                                                                                       *
+*   This implements the slot architecture.  Slots are conduits for signals.  Signals always have a source.  Slots may *
+*  be a conduit for multiple signals from multiple sources.  It is up to the user to determine how to use his slots.  *
+*  Slots do not care, other than they always activate a particular trigger of a particular sink.                      *
 *                                                                                                                     *
 **********************************************************************************************************************/
 class awsSlot : public iAwsSlot
 {
-   iBase *sink;
+   /// The sink that this slot manages.
+   iAwsSink *sink;
+   
+   /** A mapping between signals and triggers.  One signal may map to multiple triggers, or
+    * vice versa.  The mapping list is traversed everytime there is a signal emitted.  All
+    * mappings are evaluated and if they qualify, are activated. */
+   struct SignalTriggerMap
+   {
+     unsigned long signal;
+     unsigned long trigger;
+     unsigned long refs;
 
-   void (iBase::*Slot)(iBase &source, unsigned long signal);
+     SignalTriggerMap(unsigned long s, unsigned long t, unsigned long r):signal(s), trigger(t), refs(r) {};
+   };
 
+   csBasicVector stmap;
+  
 public:
   /// Does nothing
   awsSlot();
@@ -79,16 +120,16 @@ public:
   virtual ~awsSlot();
 
   /// Sets up the slot's sink
-  virtual void Initialize(iBase *sink, void (iBase::*_Slot)(iBase &source, unsigned long signal));
+  virtual void Initialize(iAwsSink *sink);
   
-  /// Connects the slot to a signal source
-  virtual void Connect(iAwsSigSrc &source, unsigned long signal);
+  /// Creates a connection from the source:signal to the sink:trigger specified.
+  virtual void Connect(iAwsSource &source, unsigned long signal, unsigned long trigger);
                                           
-  /// Disconnects the slot from a signal source
-  virtual void Disconnect(iAwsSigSrc &source, unsigned long signal);
+  /// Disconnects the slot from a signal source, also properly unmaps a signal::trigger binding.
+  virtual void Disconnect(iAwsSource &source, unsigned long signal, unsigned long trigger);
 
-  /// Emit a signal
-  virtual void Emit(iBase &source, unsigned long signal);
+  /// Emit a signal to activate all necessary triggers.
+  virtual void Emit(iAwsSource &source, unsigned long signal);
 };
 
 

@@ -47,7 +47,7 @@ SCF_VERSION (awsComponent, 0, 0, 1);
 *                                                                              
 *                                                                                                                         *
 **************************************************************************************************************************/
-class awsComponent : public awsSigSrc
+class awsComponent : public awsSource
 {
    /// The stored handle to the window manager, in case a component needs it.
    iAws  *wmgr;

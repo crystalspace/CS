@@ -1,9 +1,9 @@
 skin "Normal Windows"
 {
   Texture: 		"/aws/texture.png"
-  HighlightColor: 	100,180,200
-  ShadowColor:    	30,50,64
-  FillColor:      	100,120,150
+  HighlightColor: 	220,220,220
+  ShadowColor:    	128,128,128
+  FillColor:      	164,164,164
   TextDisabledColor:	128,128,0
   TextForeColor:	0,0,0
   TextBackColor:        255,255,255
@@ -41,21 +41,21 @@ window "Another"
 
   component "Red" is "Command Button"
   {
-    Frame: (20, 30) - (120, 50)
+    Frame: (20, 30) - (90, 50)
     Style: bfsNormal
     Caption: "Red"
   }
 
   component "Green" is "Command Button"
   {
-    Frame: (20, 60) - (120, 80)
+    Frame: (20, 60) - (90, 80)
     Style: bfsNormal
     Caption: "Green"
   }
 
   component "Blue" is "Command Button"
   {
-    Frame: (20, 90) - (120, 110)
+    Frame: (20, 90) - (90, 110)
     Style: bfsNormal
     Caption: "Blue"
   }

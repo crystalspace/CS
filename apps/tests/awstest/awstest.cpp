@@ -104,7 +104,7 @@ awsTest::awsTest()
   view = NULL;
   message[0] = 0;
 
-#ifdef 0
+#if 0
 
   // This code is used to perform dry runs on the csrectregion code.
 

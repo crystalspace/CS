@@ -9,7 +9,9 @@
 struct iAws;
 struct iAwsPrefs;
 struct iAwsSlot;
-struct iAwsSigSrc;
+struct iAwsSink;
+struct iAwsSource;
+struct iAwsSinkManager;
 
 class  awsWindow;
 class  awsComponent;
@@ -190,19 +192,45 @@ public:
 
 };
 
-SCF_VERSION (iAwsSigSrc, 0, 0, 1);
+SCF_VERSION (iAwsSinkManager, 0, 0, 1);
 
-struct iAwsSigSrc : public iBase
+struct iAwsSinkManager : public iBase
+{
+  /// Registers a sink by name for lookup.
+  virtual void RegisterSink(char *name, iAwsSink *sink)=0;
+
+  /// Finds a sink by name for connection.
+  virtual iAwsSink* FindSink(char *name)=0;
+  
+};
+
+SCF_VERSION (iAwsSink, 0, 0, 1);
+
+struct iAwsSink : public iBase
+{
+  /// Maps a trigger name to a trigger id
+  virtual unsigned long GetTriggerID(char *name)=0;  
+
+  /// Handles trigger events
+  virtual void HandleTrigger(int trigger_id, iAwsSource &source)=0;
+
+  /// A sink should call this to register trigger events
+  virtual void RegisterTrigger(char *name, void (iBase::*Trigger)(iAwsSource &source))=0;
+};
+
+
+SCF_VERSION (iAwsSource, 0, 0, 1);
+
+struct iAwsSource : public iBase
 {      
-    /// Registers a slot for any one of the signals defined by a source.  Each sources's signals exist in it's own namespace
-    virtual bool RegisterSlot(iAwsSlot *slot, unsigned long signal)=0;
+  /// Registers a slot for any one of the signals defined by a source.  Each sources's signals exist in it's own namespace
+  virtual bool RegisterSlot(iAwsSlot *slot, unsigned long signal)=0;
 
-    /// Unregisters a slot for a signal.
-    virtual bool UnregisterSlot(iAwsSlot *slot, unsigned long signal)=0;
+  /// Unregisters a slot for a signal.
+  virtual bool UnregisterSlot(iAwsSlot *slot, unsigned long signal)=0;
 
-    /// Broadcasts a signal to all slots that are interested.
-    virtual void Broadcast(unsigned long signal)=0;
-
+  /// Broadcasts a signal to all slots that are interested.
+  virtual void Broadcast(unsigned long signal)=0;
 };
 
 
@@ -213,35 +241,36 @@ struct iAwsSlot : public iBase
   /** This initializes a slot for a given component.  This slot may connect to any number of signal sources, and
    * all signals will be delivered back to this initialized slot.  Need only be intialized ONCE.
    */
-  virtual void Initialize(iBase *sink, void (iBase::*Slot)(iBase &source, unsigned long signal))=0;
+  virtual void Initialize(iAwsSink *sink)=0;
   
   /** Connect sets us up to receive signals from some other component.  You can connect to as many different sources 
     and signals as you'd like.  You may connect to multiple signals from the same source.
   */
-  virtual void Connect(iAwsSigSrc &source, unsigned long signal)=0;
+  virtual void Connect(iAwsSource &source, unsigned long signal, unsigned long trigger)=0;
   
   /**  Disconnects us from the specified source and signal.  This may happen automatically if the signal source
    *  goes away.  You will receive disconnect notification always (even if you request the disconnection.)
    */
-  virtual void Disconnect(iAwsSigSrc &source, unsigned long signal)=0;
+  virtual void Disconnect(iAwsSource &source, unsigned long signal, unsigned long trigger)=0;
 
   /** Invoked by a source to emit the signal to this slot's sink.
    */
   virtual void Emit(iBase &source, unsigned long signal)=0;
 };
 
+
 SCF_VERSION (iAwsComponentFactory, 0, 0, 1);
 
 struct iAwsComponentFactory : public iBase
 {
-    /// Returns a newly created component of the type this factory handles. 
-    virtual awsComponent *Create()=0;
+  /// Returns a newly created component of the type this factory handles. 
+  virtual awsComponent *Create()=0;
 
-    /// Registers this factory with the window manager
-    virtual void Register(char *type)=0;
+  /// Registers this factory with the window manager
+  virtual void Register(char *type)=0;
 
-    /// Registers constants for the parser so that we can construct right.
-    virtual void RegisterConstant(char *name, int value)=0;
+  /// Registers constants for the parser so that we can construct right.
+  virtual void RegisterConstant(char *name, int value)=0;
 };
 
 
