@@ -38,8 +38,8 @@ csProcWater::csProcWater () : csProcTexture()
   mat_w = 64;
   mat_h = 64;
 
-  texFlags = CS_TEXTURE_3D | CS_TEXTURE_PROC | CS_TEXTURE_NOMIPMAPS | 
-    CS_TEXTURE_PROC_ALONE_HINT;
+  texFlags = CS_TEXTURE_3D | CS_TEXTURE_PROC | CS_TEXTURE_NOMIPMAPS ;
+    //| CS_TEXTURE_PROC_ALONE_HINT;
 }
 
 csProcWater::~csProcWater ()
