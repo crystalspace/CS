@@ -28,7 +28,8 @@ SCF_VERSION (iMapNode, 0, 0, 1);
 
 /**
  * A node. This is an iObject that is bound to a position and a sector in
- * the world.
+ * the world. Nodes are typically created from a map file using the <node>
+ * attribute.
  */
 struct iMapNode : public iBase
 {

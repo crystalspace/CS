@@ -120,6 +120,12 @@ SCF_VERSION (iReporter, 0, 1, 0);
 
 /**
  * This is the interface for the error/message reporter plugin.
+ * Note. This plugin does not actually print out or display
+ * messages in any way. The reporter simply collects messages
+ * and sends them out to interested partners. Typically the
+ * standard reporter listener (iStandardReporterListener) is such
+ * a plugin. It will print out the messages that arrive
+ * on the reporter.
  */
 struct iReporter : public iBase
 {

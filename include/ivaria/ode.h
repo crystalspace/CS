@@ -49,7 +49,6 @@ SCF_VERSION (iODEDynamicState, 0, 0, 1);
  * This class exposes parameters specific to odedynam as an implementation
  * of iDynamics
  */
-
 struct iODEDynamicState : public iBase
 {
 
@@ -125,7 +124,6 @@ SCF_VERSION (iODEDynamicSystemState, 0, 0, 1);
  * of iDynamics.  In most cases SystemState should not be modified directly
  * unless you want the behavior of a specific system different from others.
  */
-
 struct iODEDynamicSystemState : public iBase
 {
   /**
@@ -204,8 +202,8 @@ SCF_VERSION (iODEJointState, 0, 0, 1);
 
 /**
  * TODO: Doc...
+ * @@@ Document me
  */
-
 enum ODEJointType
 {
   CS_ODE_JOINT_TYPE_BALL = dJointTypeBall,
@@ -219,6 +217,7 @@ enum ODEJointType
 };
 
 
+/// @@@ Document me.
 struct iODEJointState : public iBase
 {
   virtual ODEJointType GetType() = 0;

@@ -35,8 +35,6 @@ SCF_VERSION (iMovieRecorder, 0, 0, 1);
  */
 struct iMovieRecorder : public iBase
 {
-  //=========================================================================
-
   /// Start recording using the settings in the configuration system
   virtual void Start(void) = 0;
 
@@ -54,8 +52,6 @@ struct iMovieRecorder : public iBase
 
   /// Is the recording paused?
   virtual bool IsPaused(void) const = 0;
-
-  //=========================================================================
 };
 
 #endif // __CS_IVARIA_MOVIERECORDER_H__

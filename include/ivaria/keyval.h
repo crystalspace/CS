@@ -28,8 +28,9 @@ SCF_VERSION (iKeyValuePair, 0, 0, 1);
 
 /**
  * A Key Value pair. This object contains a 'key' string and a 'value' string.
- * The 'key' string is the same as the name of the object as returned from
- * the iObject.
+ * Typically key value pairs are specified in map files (using the <key> tag).
+ * They allow a game developer to tag game specific information to any Crystal
+ * Space object.
  */
 struct iKeyValuePair : public iBase
 {
