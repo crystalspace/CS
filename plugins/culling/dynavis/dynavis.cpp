@@ -1495,10 +1495,11 @@ struct IntersectSegment_Front2BackData
 {
   csSegment3 seg;
   csVector3 isect;
-  float sqdist;	// squared distance between seg.start and isect.
+  float sqdist;		// Squared distance between seg.start and isect.
   float r;
   iMeshWrapper* mesh;
   iPolygon3D* polygon;
+  csVector* vector;	// If not-null we need all objects.
 };
 
 static bool IntersectSegment_Front2Back (csKDTree* treenode, void* userdata,
@@ -1579,7 +1580,7 @@ static bool IntersectSegment_Front2Back (csKDTree* treenode, void* userdata,
 	    csVector3 obj_isect;
 	    float r;
 
-	    if (visobj_wrap->thing_state)
+	    if (!data->vector && visobj_wrap->thing_state)
 	    {
 	      iThingState* st = visobj_wrap->thing_state;
 	      iPolygon3D* p = st->IntersectSegment (
@@ -1600,10 +1601,14 @@ static bool IntersectSegment_Front2Back (csKDTree* treenode, void* userdata,
 	    }
 	    else
 	    {
-	      if (visobj_wrap->mesh->GetMeshObject ()->HitBeamOutline (obj_start,
-	      	obj_end, obj_isect, &r))
+	      if (visobj_wrap->mesh->GetMeshObject ()->HitBeamOutline (
+	      	obj_start, obj_end, obj_isect, &r))
 	      {
-	        if (r < data->r)
+	        if (data->vector)
+		{
+		  data->vector->Push (visobj_wrap->visobj);
+		}
+	        else if (r < data->r)
 		{
 		  data->r = r;
 		  data->polygon = NULL;
@@ -1638,6 +1643,7 @@ bool csDynaVis::IntersectSegment (const csVector3& start,
   data.r = 0;
   data.mesh = NULL;
   data.polygon = NULL;
+  data.vector = NULL;
   kdtree->Front2Back (start, IntersectSegment_Front2Back, (void*)&data);
 
   if (p_mesh) *p_mesh = data.mesh;
@@ -1646,6 +1652,23 @@ bool csDynaVis::IntersectSegment (const csVector3& start,
   isect = data.isect;
 
   return data.mesh != NULL;
+}
+
+csPtr<iVisibilityObjectIterator> csDynaVis::IntersectSegment (
+    const csVector3& start, const csVector3& end)
+{
+  UpdateObjects ();
+  current_visnr++;
+  IntersectSegment_Front2BackData data;
+  data.seg.Set (start, end);
+  data.r = 0;
+  data.mesh = NULL;
+  data.polygon = NULL;
+  data.vector = new csVector ();
+  kdtree->Front2Back (start, IntersectSegment_Front2Back, (void*)&data);
+
+  csDynVisObjIt* vobjit = new csDynVisObjIt (data.vector, NULL);
+  return csPtr<iVisibilityObjectIterator> (vobjit);
 }
 
 //======== CastShadows =====================================================

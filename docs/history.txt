@@ -25,6 +25,8 @@ The history order is reversed so that new features are at the top.
 	  affect it due to distance.
 	- Fixed a few printf related bugs in map2cs. Thanks to Wouter
 	  for reporting this.
+	- Added new IntersectSegment() routine to iVisibilityCuller which
+	  returns all objects that are intersected by the segment.
 13-Feb-2003
 	- Added another trivial case to csRect::ClipLine() making it a little
 	  bit safer again.
