@@ -137,6 +137,14 @@ csProcSky::~csProcSky()
 }
 
 
+void csProcSky::SetAnimated(bool anim, cs_time current_time)
+{
+  animated = anim;
+  if(animated && (current_time != 0)) {
+    old_time = current_time;
+  }
+}
+
 void csProcSky::Initialize()
 {
   /// init every octave
@@ -474,14 +482,17 @@ void csProcSky::DrawToTexture(csProcSkyTexture *skytex, cs_time current_time)
   // if the texture has no cache, make one
   if(!skytex->GetIntersect()) MakeIntersectCache(skytex);
   /// animate the octaves
-  int elapsed_time = int(current_time) - int(old_time);
-  if(elapsed_time > 0)
+  if(animated)
   {
-    for(i=0; i<nr_octaves; i++)
-      AnimOctave(i, elapsed_time);
-    windpos += winddir * (float(elapsed_time)*.001);
+    int elapsed_time = int(current_time) - int(old_time);
+    if(elapsed_time > 0)
+    {
+      for(i=0; i<nr_octaves; i++)
+        AnimOctave(i, elapsed_time);
+      windpos += winddir * (float(elapsed_time)*.001);
+    }
+    old_time = current_time;
   }
-  old_time = current_time;
 
   if (!skytex->GetG3D()->BeginDraw (CSDRAW_2DGRAPHICS))
     return;

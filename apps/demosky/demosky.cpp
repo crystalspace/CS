@@ -301,7 +301,7 @@ bool Simple::HandleEvent (iEvent &Event)
   if ((Event.Type == csevKeyDown) && (Event.Key.Code == 't'))
   {
     /// toggle animation
-    sky->SetAnimated( !sky->GetAnimated());
+    sky->SetAnimated( !sky->GetAnimated(), System->GetTime());
     return true;
   }
 
