@@ -35,7 +35,7 @@ class csVector3;
 class csBox3;
 class csSphere;
 
-SCF_VERSION (iVisibilityCuller, 0, 0, 6);
+SCF_VERSION (iVisibilityCuller, 0, 0, 7);
 
 /**
  * This interface represents a visibility culling system.
@@ -56,6 +56,7 @@ struct iVisibilityCuller : public iBase
    * If this visibility object also supports iShadowCaster and
    * this visibility culler supports shadow casting then it will
    * automatically get registered as a shadow caster as well.
+   * Same for iShadowReceiver.
    */
   virtual void RegisterVisObject (iVisibilityObject* visobj) = 0;
   /// Unregister a visibility object with this culler.
@@ -98,11 +99,6 @@ struct iVisibilityCuller : public iBase
    * Start casting shadows from a given point in space.
    */
   virtual void CastShadows (iFrustumView* fview) = 0;
-
-  /// Register a shadow receiver.
-  virtual void RegisterShadowReceiver (iShadowReceiver* receiver) = 0;
-  /// Unregister a shadow receiver.
-  virtual void UnregisterShadowReceiver (iShadowReceiver* receiver) = 0;
 };
 
 SCF_VERSION (iVisibilityObject, 0, 0, 6);

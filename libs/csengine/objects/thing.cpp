@@ -3456,16 +3456,6 @@ bool csThing::VisTest (const csSphere& sphere)
   return true;
 }
 
-void csThing::RegisterShadowReceiver (iShadowReceiver *receiver)
-{
-  (void)receiver;
-}
-
-void csThing::UnregisterShadowReceiver (iShadowReceiver *receiver)
-{
-  (void)receiver;
-}
-
 struct CheckFrustData
 {
   iFrustumView *fview;

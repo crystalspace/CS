@@ -5,6 +5,9 @@ The history order is reversed so that new features are at the top.
 	  parameter.
 	- Enabled the use of iShadowReceiver instead of iThingState
 	  by the lighting routines. csThing now implements iShadowReceiver.
+	- Removed RegisterShadowReceiver() (and unregister) from
+	  iVisibilityCuller. The culling system will have to detect this
+	  on its own by doing SCF_QUERY_INTERFACE.
 30-Jun-2002
 	- Thing mesh objects now implement iShadowCaster.
 	  csSector::CheckFrustum() will now use that instead of directly

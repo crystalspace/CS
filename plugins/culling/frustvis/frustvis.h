@@ -106,9 +106,6 @@ public:
   virtual bool SupportsShadowCasting () { return false; }
   virtual void CastShadows (iFrustumView* /*fview*/) { }
 
-  virtual void RegisterShadowReceiver (iShadowReceiver* /*receiver*/) { }
-  virtual void UnregisterShadowReceiver (iShadowReceiver* /*receiver*/) { }
-
   struct eiComponent : public iComponent
   {
     SCF_DECLARE_EMBEDDED_IBASE (csFrustumVis);

@@ -188,9 +188,6 @@ public:
   virtual bool SupportsShadowCasting () { return false; }
   virtual void CastShadows (iFrustumView* /*fview*/) { }
 
-  virtual void RegisterShadowReceiver (iShadowReceiver* /*receiver*/) { }
-  virtual void UnregisterShadowReceiver (iShadowReceiver* /*receiver*/) { }
-
   // Debugging functions.
   iString* Debug_UnitTest ();
   iString* Debug_StateTest ();
