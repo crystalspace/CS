@@ -132,9 +132,6 @@ struct iSector:public iBase {
 }
 
 struct iThing:public iPolygonSet {
-  void SetPosition (const csVector3 &iPos);
-  %name(SetSector) void SetPosition (iSector *iSec);
-  void SetTransform (const csMatrix3 &iMatrix);
 };
 
 struct iPolygon3D : public iBase {
