@@ -15,7 +15,7 @@
 # be built either define the environment variable PLUGINS or put a line similar
 # to those below into config.mak.
 PLUGINS += video/renderer video/canvas
-#PLUGINS += video/renderer/line video/renderer/null video/renderer/inf
+PLUGINS += video/renderer/line video/renderer/null video/renderer/inf
 PLUGINS += sound/loader sound/driver/nulldrv
 PLUGINS += simpcon
 PLUGINS += cscon 
