@@ -22,9 +22,8 @@ SHELL ?= "/bin/sh" ;
 # only use nasm on x86 for now...
 NASM.FLAGS += -f elf ;
 
-# disabled (Matze: I really think we should eanble this, regardless of the 1%
-# speed loss...)
-#PLUGIN.CFLAGS += -fPIC ;
+PLUGIN.CFLAGS += -fPIC ;
+LIBRARY.CFLAGS += -fPIC ;
 
 # The BFD tag name under which to embed meta-information into a plugin module.
 # This much match the name expected by csGetPluginMetadata() (bfdplugins.cpp).
