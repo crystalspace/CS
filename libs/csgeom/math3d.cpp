@@ -247,7 +247,12 @@ int csMath3::OuterPlanes (const csBox3& box1, const csBox3& box2,
         if (num_planes >= 8)
 	{
 	  printf ("INTERNAL ERROR! OuterPlanes returns too many planes!\n");
-	  fatal_exit (0, false);
+
+          //Thomas Hieber 2000-04-27: replaced fatal_exit with exit, because
+          //fatal_exit is defined in libs/system/system.cpp, and I don't think
+          //math3d.cpp should depend on this!
+          exit(0); 
+	  //fatal_exit (0, false);
 	}
 	planes[num_planes++] = pl;
       }
