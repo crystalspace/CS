@@ -751,8 +751,8 @@ void csRenderView::RestoreRenderContext (csRenderContext* original)
   csRenderContext* old_ctxt = ctxt;
   ctxt = original;
 
-  if (old_ctxt->icamera) old_ctxt->icamera->IncRef ();
-  if (old_ctxt->iview) old_ctxt->iview->IncRef ();
+  if (old_ctxt->icamera) old_ctxt->icamera->DecRef ();
+  if (old_ctxt->iview) old_ctxt->iview->DecRef ();
   delete old_ctxt;
 }
 
