@@ -16,12 +16,13 @@ Direct3D.
 @menu
 * Win32 General:: General Information
 * Win32 Compile:: Compiling CS
+* Win32 Rundemo:: Running the demo apps
 * Win32 Workspace:: Structure of the Workspace
 * Win32 User App:: Compiling your own Program using CS
 * Win32 FAQ:: Frequently Asked Questions (@sc{faq})
 @end menu
 
-@node Win32 General
+@node Win32 General, Win32 Compile, Win32, Win32
 @subsubsection General Information
 
 In addition to @file{zlib}, @file{libjpeg} and @file{libpng} you may also
@@ -44,7 +45,7 @@ any documentation or samples, you can get a minimum version of these
 
 @uref{http://www.multimania.com/noote/CrystalSpace}
 
-@node Win32 Compile
+@node Win32 Compile, Win32 Rundemo, Win32 General, Win32
 @subsubsection Compiling CS
 
 To compile Crystal Space, you'll have to perform the following steps.
@@ -65,7 +66,7 @@ After a while the compilation should finish with almost no warnings and no
 errors.
 @end enumerate
 
-@node Win32 Rundemo
+@node Win32 Rundemo, Win32 Workspace, Win32 Compile, Win32
 @subsubsection Running the demo apps
 
 The first app you should try is @emph{Walktest}. This program shows many of
@@ -86,7 +87,7 @@ You can now continue with the next platform-independent step. The remaining
 Windows-specific sections are only important when you want to compile your
 own application using CS.
 
-@node Win32 Workspace
+@node Win32 Workspace, Win32 User App, Win32 Rundemo, Win32
 @subsubsection Structure of the Workspace
 
 The Crystal Space workspace is divided into several projects.  They all exist
@@ -120,12 +121,12 @@ in @ref{Plug-In Drivers}.
 The @emph{Applications} are programs using some of these libraries, so they
 produce @file{.EXE} files.
 
-@node Win32 User App
+@node Win32 User App, Win32 FAQ, Win32 Workspace, Win32
 @subsubsection Compiling your own Program using CS
 
 @@@@@@
 
-@node Win32 FAQ, , Win32 Workspace, Win32
+@node Win32 FAQ, , Win32 User App, Win32
 @subsubsection Frequently Asked Questions (@sc{faq})
 
 This is the list of frequently asked questions for the Win32 port of Crsytal
