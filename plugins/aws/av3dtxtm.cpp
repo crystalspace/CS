@@ -225,6 +225,7 @@ csMaterialHandle::csMaterialHandle (
 
     material->GetReflection (diffuse, ambient, reflection);
     material->GetFlatColor (flat_color);
+#ifndef CS_USE_NEW_RENDERER
     num_texture_layers = material->GetTextureLayerCount ();
     if (num_texture_layers > 4) num_texture_layers = 4;
 
@@ -237,6 +238,7 @@ csMaterialHandle::csMaterialHandle (
         texture_layers[i].ushift != 0 ||
         texture_layers[i].vshift != 0;
     }
+#endif
   }
   (texman = parent)->IncRef ();
 }
