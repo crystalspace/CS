@@ -14,6 +14,8 @@ chronological order.
 	  it copies the 'attributes' field too.
 	- Jorrit enhanced the build instructions so they invite people to try
 	  out the new renderer first.
+	- Jorrit updated the FAQ. Removed a few outdated entries, fixed a
+	  few wrong statements, and clarified a few entries.
 6-Jun-2004
 	- Jorrit modified the Jamfile so that the isotest application
 	  is only build with new renderer.

@@ -48,34 +48,30 @@ need any of the following drivers.  Otherwise you will need the remaining
 items.
 
 @item
-A 3D rasterizer plug-in.  You can choose either the software renderer or else
-one of the hardware accelerated renderers.  You also have to choose the
-correct library for your system.  On and Windows (32 bit) this will be a
-@file{.DLL} file.  On most Unix systems this will be an @file{.so} file.
+Several plugins for those applications.  On and Windows (32 bit) plugins
+will be @file{.DLL} files.  On most Unix systems they will be @file{.so} files.
+If Crystal Space compiled successfullly then you will have a great deal of
+those plugins in the Crystal Space directory.
 
 @item
-A 2D graphics driver which is particular to your platform.  The 3D rasterizer
-displays its rendered images through the 2D graphics driver.
+You should also have the data directory which is included with Crystal
+Space. This directory contains various texture and data libraries (like
+@file{standard.zip} and @file{stdtex.zip}), data files for some of the
+applications (like the @samp{flarge} world file for @file{walktest}), 
+shader definitions in case you are running with the new renderer architecture,
+configuration files for various plugins in Crystal Space and a lot more.
 
 @item
-Many of the Crystal Space applications also need several other plugins. For
-example plugins which implement 3D sprites, particle systems, ... In general
-the Crystal Space distribution will contain source for all of them.
+Crystal Space applications also require a @file{vfs.cfg} configuration file
+which tells the virtual file system (@sc{vfs}) where everything is located.
 
 @item
-You should also have @file{standard.zip} which is a library of standard
-resources used and shared by several of the Crystal Space applications.  You
-should @emph{not} unpack this file.  Crystal Space reads from @sc{zip} files
-directly.
-
-@item
-Finally you need at least one map file.  The map file is also typically a
-@sc{zip} archive.  Possible map files, among others, are @file{flarge.zip},
-@file{maze.zip}, and @file{room.zip}).  In addition to these map files you
-also need the standard texture archive @file{stdtex.zip}. You should
-@emph{not} unpack these files.  Note that @file{standard.zip} is not a
-map file. All map files and related data files are usually
-located in the @file{data} directory.
+In addition to maps that are included in the data folder of Crystal Space
+itself (@samp{flarge} and @samp{partsys} for old renderer architecture,
+and @samp{particles}, @samp{terrain}, @samp{terrainf} and @samp{isotest}
+for the new renderer) you can also download additional maps for @file{walktest}.
+The map files included with Crystal Space are normal directories but
+Crystal Space can also read directly from @sc{zip} archives.
 @end itemize
 
 @item
@@ -166,8 +162,8 @@ with the @samp{-mode=} option.  @xref{Common Command Line Options}.
 are quite popular these days and can perform extremely well, especially when
 compared to Crystal Space's software renderer. Framerates of 100 fps and more
 are not uncommon if you have a properly configured OpenGL renderer. Note that
-by default Crystal Space does not use OpenGL. You have to use the
-@samp{-video=opengl} command-line option to enable OpenGL rendering.
+by default Crystal Space uses OpenGL. You have to use the
+@samp{-video=software} command-line option to go back to Software rendering.
 
 @item
 @strong{Q}: I'm using OpenGL with Crystal Space (via the @samp{-video=opengl}
@@ -300,14 +296,6 @@ them with @code{HardTransform}.
 function then the visibility culler doesn't know the object has moved.
 
 @item
-@strong{Q}: I'm trying to move some things around but this doesn't appear
-to work right.
-
-@strong{A}: For optization purposes things can't move by default. To
-enable the option to move them you must set the @code{CS_THING_MOVE_OCCASIONAL}
-flag using @code{iThingState->SetMovingOption()}.
-
-@item
 @strong{Q}: Why isn't my polygon lit correctly? It is simply full bright.
 
 @strong{A}: Both the software and OpenGL renderer have a limitation on
@@ -320,12 +308,14 @@ given texture is repeated four times on the polygon then you basically
 have a total texture of 256x256 which will be fine. For the OpenGL
 renderer the limitation is that a lightmap cannot be bigger than 256x256.
 Note that there will be a lightmap lumel for every 16x16 texels on the
-polygon. To avoid this limitation you basically have four possible
+polygon. To avoid this limitation you basically have five possible
 solutions: (1) split the polygon into smaller polygons, (2) use a smaller
 base texture (this will also reduce size of lightmap/lit texture), (3)
-decrease the number of times the texture is tiled on the polygon, and
-finally (4) use a low-resolution base texture and a high-resolution detail
-texture to add detail (this only works for OpenGL).
+decrease the number of times the texture is tiled on the polygon, (4)
+increase the size of the lumels (i.e. 32x32 instead of 16x16) by changing
+the @samp{lightmapcellsize} option in the world file, and finally (5) use a
+low-resolution base texture and a high-resolution detail texture to add detail
+(this only works for OpenGL).
 
 @item
 @strong{Q}: I added lights, and/or moved geometry in my level but they are not
