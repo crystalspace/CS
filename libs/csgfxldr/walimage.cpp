@@ -72,24 +72,24 @@ csImageFile* csWALImageLoader::LoadImage (UByte* iBuffer, ULong iSize, int iForm
 
 bool ImageWALFile::Load (UByte* iBuffer, ULong iSize)
 {
-  WALHeader *head = (WALHeader*)iBuffer;
-  head->width = little_endian_int (head->width);
-  head->height = little_endian_int (head->height);
-  head->offsets [0] = little_endian_int (head->offsets [0]);
-  head->offsets [3] = little_endian_int (head->offsets [3]);
+  WALHeader head = *(WALHeader *)iBuffer;
+  head.width = little_endian_int (head.width);
+  head.height = little_endian_int (head.height);
+  head.offsets [0] = little_endian_int (head.offsets [0]);
+  head.offsets [3] = little_endian_int (head.offsets [3]);
   
   // There's no id-tag in .WAL files, so the only way I know to check
   // if it's a wal, is to use this method. Hope it works
-  ULong chkfilesize = head->offsets [3] + ((head->height / 8) * (head->width / 8));
+  ULong chkfilesize = head.offsets [3] + ((head.height / 8) * (head.width / 8));
   if (chkfilesize != iSize)
     return false;
 
-  set_dimensions (head->width, head->height);
+  set_dimensions (head.width, head.height);
 
   // There are 4 mipmaps in a wal-file, but we just use the first and discard the rest
   UByte *buffer = new UByte [Width * Height];
 
-  memcpy (buffer, iBuffer + head->offsets[0], Width * Height);
+  memcpy (buffer, iBuffer + head.offsets[0], Width * Height);
   convert_8bit (buffer, (RGBcolor *)&WALpalette);
 
   return true;
