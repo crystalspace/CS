@@ -1,5 +1,15 @@
 The history order has been reversed so that new features are at the top.
 
+27-Mar-2001
+	- Philip Wyett eliminated VC6 compiler warning about empty control
+	  statement.
+	- Philip also did some code cleanup in the video plugins.
+	- Norman Kramer added precalculations in csCamera to save a few
+	  multiplications in Rotate and RotateWorld.
+	- Norman also made config file keys case insensitive.
+	- Wouter Wijngaards added end of line to canvas font server warning.
+26-Mar-2001
+	- Philip Wyett did some minor updates to the docs.
 25-Mar-2001
 	- Philip Wyett fixed null reference error in csconin.cpp under Windows.
 	- Eric Sunshine reverted above change to csconin.cpp by Philip Wyett
