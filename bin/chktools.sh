@@ -23,3 +23,13 @@ if [ -n "${MAKEDEP}" ]; then
   fi
 fi
 
+# do we have bison/flex
+BISONBIN=`which bison 2>&1 | grep -v "[Nn]o"`
+FLEXBIN=`which flex 2>&1 | grep -v "[Nn]o"`
+if [ -n "${FLEXBIN}" ]; then
+    echo "FLEXBIN = ${FLEXBIN}"
+fi
+if [ -n "${BISONBIN}" ]; then
+    echo "BISONBIN = ${BISONBIN}"
+fi
+

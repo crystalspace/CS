@@ -61,6 +61,16 @@ aws: $(OUTDIRS) $(AWS)
 $(AWS): $(OBJ.AWS) $(LIB.AWS)
 	$(DO.PLUGIN)
 
+ifneq (,$(FLEXBIN))
+ifneq (,$(BISONBIN))
+plugins/aws/sllex.cpp: plugins/aws/skinlang.flx
+	flex -L -Splugins/aws/flex.skl -t plugins/aws/skinlang.flx > plugins/aws/sllex.cpp
+
+plugins/aws/slparse.cpp plugins/aws/slparse.cpp.h: % : plugins/aws/skinlang.bsn
+	bison --no-lines -d -p aws -o plugins/aws/slparse.cpp plugins/aws/skinlang.bsn
+
+endif
+endif
 clean: awsclean
 awsclean:
 	-$(RM) $(AWS) $(OBJ.AWS)
