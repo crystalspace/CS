@@ -356,6 +356,8 @@ bool csSystemDriver::Initialize (int argc, const char* const argv[], const char 
 {
   // Initialize Shared Class Facility|
   char scfconfigpath [MAXPATHLEN + 1];
+
+#ifndef CS_STATIC_LINKED
   // Add both installpath and installpath/lib dirs to search for plugins
   GetInstallPath (scfconfigpath, sizeof (scfconfigpath));
   csAddLibraryPath (scfconfigpath);
@@ -364,6 +366,7 @@ bool csSystemDriver::Initialize (int argc, const char* const argv[], const char 
   scfconfigpath[scfconfiglen] = PATH_SEPARATOR;
   scfconfigpath[scfconfiglen+1] = 0;
   csAddLibraryPath (scfconfigpath);
+#endif
 
   // Find scf.cfg and initialize SCF
   GetInstallPath (scfconfigpath, sizeof (scfconfigpath));

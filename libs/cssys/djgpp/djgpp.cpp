@@ -133,6 +133,7 @@ void SysSystemDriver::NextFrame ()
     } /* endswitch */
     event_queue_tail = (event_queue_tail + 1) & EVENT_QUEUE_MASK;
   } /* endwhile */
+  csSystemDriver::NextFrame ();
 }
 
 bool SysSystemDriver::Open (const char *Title)
