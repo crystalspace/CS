@@ -1,6 +1,6 @@
 SubDir TOP plugins mesh sprcal3d object ;
 
-if $(HAS_CAL3D) = "yes"
+if $(CAL3D.AVAILABLE) = "yes"
 {
 Plugin sprcal3d
 	: [ Wildcard *.cpp *.h ]
