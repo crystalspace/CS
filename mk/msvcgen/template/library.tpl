@@ -67,8 +67,8 @@ PostBuild_Cmds=echo File is a lib, Copy skipped.
 # PROP Output_Dir "csdebug\bin\libs"
 # PROP Intermediate_Dir "csdebug\temp\%project%"
 # PROP Target_Dir ""
-# ADD BASE CPP /nologo /vmb /vms /W4 /Gm /G5 /Od /D "WIN32" /D "_DEBUG" /D "_LIB" /YX /FD /c
-# ADD CPP /nologo /vmb /vms /MTd /W4 /Gm /G5 /Od /I "..\.." /I "..\..\include\cssys\win32" /I "..\..\include" /I "..\..\libs" /I "..\..\support" /I "..\..\apps" /I "..\..\plugins" /D "_DEBUG" /D "_LIB" /D "WIN32" /D "_WINDOWS" /D "WIN32_VOLATILE" /D "__CRYSTAL_SPACE__" /D "CS_DEBUG" /YX /FD %cflags% /c
+# ADD BASE CPP /nologo /vmb /vms /W4 /Gm /G5 /ZI /Od /D "WIN32" /D "_DEBUG" /D "_LIB" /YX /FD /c
+# ADD CPP /nologo /vmb /vms /MTd /W4 /Gm /G5 /ZI /Od /I "..\.." /I "..\..\include\cssys\win32" /I "..\..\include" /I "..\..\libs" /I "..\..\support" /I "..\..\apps" /I "..\..\plugins" /D "_DEBUG" /D "_LIB" /D "WIN32" /D "_WINDOWS" /D "WIN32_VOLATILE" /D "__CRYSTAL_SPACE__" /D "CS_DEBUG" /YX /FD %cflags% /c
 # ADD BASE RSC /l 0x409 /d "_DEBUG"
 # ADD RSC /l 0x409 /d "_DEBUG"
 BSC32=bscmake.exe
