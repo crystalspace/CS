@@ -833,81 +833,122 @@ iRenderBuffer* csThingStatic::GetRenderBuffer (csStringID name)
 void csThingStatic::FillRenderMeshes (csGrowingArray<csRenderMesh*>& rmeshes,
     const csArray<RepMaterial>& repMaterials)
 {
-  int num_indices = 0;
+  csHashMap material_polys;
+  csHashSet materials;
+
+  int num_verts = 0, num_indices = 0, max_vc = 0;
   int i;
 
   for (i = 0; i < static_polygons.Length(); i++)
   {
     csPolygon3DStatic* poly = static_polygons.Get (i);
 
-    num_indices += poly->GetVertexCount ();
+    materials.Add ((csHashObject)poly->GetMaterialWrapper ());
+    material_polys.Put ((csHashKey)poly->GetMaterialWrapper (),
+      (csHashObject)poly);
+
+    int pvc = poly->GetVertexCount ();
+
+    num_verts += pvc;
+    num_indices += (pvc - 2) * 3;
+    max_vc = MAX (max_vc, pvc);
   }
 
   if (!vertex_buffer)
-    vertex_buffer = r3d->CreateRenderBuffer (num_indices * sizeof (csVector3), 
+    vertex_buffer = r3d->CreateRenderBuffer (num_verts * sizeof (csVector3), 
       CS_BUF_STATIC, CS_BUFCOMP_FLOAT, 3);
 
   csVector3* vertices = (csVector3*)vertex_buffer->Lock (CS_BUF_LOCK_NORMAL);
 
   if (!normal_buffer)
-    normal_buffer = r3d->CreateRenderBuffer (num_indices * sizeof (csVector3), 
+    normal_buffer = r3d->CreateRenderBuffer (num_verts * sizeof (csVector3), 
       CS_BUF_STATIC, CS_BUFCOMP_FLOAT, 3);
 
   csVector3* normals = (csVector3*)normal_buffer->Lock (CS_BUF_LOCK_NORMAL);
 
   if (!texel_buffer)
-    texel_buffer = r3d->CreateRenderBuffer (num_indices * sizeof (csVector2), 
+    texel_buffer = r3d->CreateRenderBuffer (num_verts * sizeof (csVector2), 
       CS_BUF_STATIC, CS_BUFCOMP_FLOAT, 2);
 
   csVector2* texels = (csVector2*)texel_buffer->Lock (CS_BUF_LOCK_NORMAL);
 
   if (!index_buffer)
     index_buffer = r3d->CreateRenderBuffer (num_indices  * sizeof (int), 
-      CS_BUF_STATIC, CS_BUFCOMP_INT, 1);
+      CS_BUF_STATIC, CS_BUFCOMP_UNSIGNED_INT, 1);
 
   int* indices = (int*)index_buffer->Lock (CS_BUF_LOCK_NORMAL);
-  
-  int index = 0;
-  for (i = 0; i < static_polygons.Length(); i++)
+
+  CS_ALLOC_STACK_ARRAY (int, pvIndices, max_vc);
+
+  int vindex = 0, iindex = 0;
+
+  csGlobalHashIterator matIt (materials.GetHashMap ());
+  while (matIt.HasNext ())
   {
-    csPolygon3DStatic* static_data = static_polygons.Get (i);
+    iMaterialWrapper* mat = (iMaterialWrapper*)matIt.Next ();
 
     csRenderMesh* rm = new csRenderMesh;
 
     rm->buffersource = this;
     rm->z_buf_mode = CS_ZBUF_USE;
     rm->mixmode = CS_FX_COPY; 
-    rm->indexstart = index;
-    rm->material = static_data->GetMaterialWrapper ();
-    rm->meshtype = CS_MESHTYPE_TRIANGLEFAN;
+    rm->material = mat;
+    rm->meshtype = CS_MESHTYPE_TRIANGLES;
 
-    int* poly_indices = static_data->GetVertexIndices ();
+    rm->indexstart = iindex;
 
-    csVector3 polynormal;
-    if (!smoothed)
+    csHashIterator polyIt  (&material_polys, (csHashKey)mat);
+    while (polyIt.HasNext ())
     {
-      polynormal = static_data->GetObjectPlane().Normal();
-      polynormal.Normalize();
-    }
-    csMatrix3 t_m;
-    csVector3 t_v;
-    static_data->GetTextureSpace (t_m, t_v);
+      csPolygon3DStatic* static_data = (csPolygon3DStatic*)polyIt.Next ();
 
-    int j;
-    for (j = static_data->GetVertexCount(); j-- > 0;)
-    {
-      int vidx = *poly_indices++;
-      *vertices++ = obj_verts[vidx];
-      if (smoothed)
-	*normals++ = obj_normals[vidx];
-      else
-	*normals++ = polynormal;
-      csVector3 t = (t_m * obj_verts[vidx] + t_v);
-      *texels++ = csVector2 (t.x, t.y);
-      *indices++ = index++;
+      int* poly_indices = static_data->GetVertexIndices ();
+
+      csVector3 polynormal;
+      if (!smoothed)
+      {
+	// hmm...
+	polynormal = -static_data->GetObjectPlane().Normal();
+      }
+
+      /*
+	To get the texture coordinates of a vertex, the coordinates
+	in object space have to be transformed to the texture space.
+	The Z part is simply dropped then.
+      */
+      csMatrix3 t_m;
+      csVector3 t_v;
+      static_data->MappingGetTextureSpace (t_m, t_v);
+      csTransform transform (t_m, t_v);
+
+      // First, fill the normal/texel/vertex buffers.
+      int j, vc = static_data->GetVertexCount();
+      for (j = 0; j < vc; j++)
+      {
+	int vidx = *poly_indices++;
+	*vertices++ = obj_verts[vidx];
+	if (smoothed)
+	  *normals++ = obj_normals[vidx];
+	else
+	  *normals++ = polynormal;
+	csVector3 t = transform.Other2This (obj_verts[vidx]);
+	*texels++ = csVector2 (t.x, t.y);
+
+	pvIndices[j] = vindex++;
+      }
+
+      // Triangulate poly.
+      for (j = 2; j < vc; j++)
+      {
+	*indices++ = pvIndices[0];
+	iindex++;
+	*indices++ = pvIndices[j - 1];
+	iindex++;
+	*indices++ = pvIndices[j];
+	iindex++;
+      }
     }
-   
-    rm->indexend = index;
+    rm->indexend = iindex;
 
     rmeshes.Push (rm);
   }
@@ -916,8 +957,6 @@ void csThingStatic::FillRenderMeshes (csGrowingArray<csRenderMesh*>& rmeshes,
   texel_buffer->Release ();
   normal_buffer->Release ();
   vertex_buffer->Release ();
-
-//  csHashMap mat_rms;
 }
 #endif // CS_USE_NEW_RENDERER
 

@@ -75,8 +75,21 @@ The history order is reversed so that new features are at the top.
 	  present changes have been tested. :-)
 	- Eric Sunshine eliminated a few instances of NULL which had creeped
 	  back into the project.
+	- res made the following changes to the new renderer system:
+	    - Index buffers aren't treated in a special way any more now. 
+	      Just your average vertex buffer.
+	    - Changed the internal implementation of render buffers a bit.
+	    - Renamed stencil shadow binary to 'rlsstencil' to fit in with the
+	      other renderstep plugins.
 	- Wouter added the option wfoNoDrag to aws windows, making the window
 	  non-draggable. Fixed fs3dMask constant to fit available values.
+	- res made the following changes to thing:
+	    - Polys are now triangulized as single triangles instead of tri 
+	      fans. That makes it possible to store multiple poylgons in a
+	      single rendermesh. Now one rendermesh per material is created.
+	    - Index buffer now uses UNSIGNED_INT instead of INT. The latter
+	      one doesn't seem to be liked by ATI's Cat3.4.
+	- res added a Jamfile for the stencil shadow renderstep.
 19-Jun-2003
 	- Oktal made the following changes to the Perl plugin and module:
 	    - Got rid of all the warnings in the Perl plugin and module,
