@@ -51,6 +51,13 @@ Short-term cleanups that need to be done:
 	      mirroring floor in old walktest and you will see).
 	- Removed some buggy debug code in the polygon clipper left over
 	  by Andrew.
+	- Martin Geisse provided new Texinfo conversions for the FAQ and SCF.
+	  He also rewrote some of the introduction for the Simple tutorial.
+	- Eric Sunshine did some additional mark-up work, made some
+	  corrections to Martin's conversions, and performed some further
+	  editing of the introduction to the tutorial.  He converted the
+	  To-Do section of the document into an Appendix instead of having it
+	  be just another section of the Contributing to CS chapter.
 19-Mar-2000
 	- Thomas Hieber added proper support for skyboxes in maps without
 	  manual sectoring.

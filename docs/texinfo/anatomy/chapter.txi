@@ -15,9 +15,6 @@ resides in LaTeX format.
 @anchor{VFS}
 Virtual File System (@sc{vfs})
 @item
-@anchor{SCF}
-Shared Class Facility (@sc{scf})
-@item
 Format of @emph{World} File
 @item
 Makefiles
@@ -45,4 +42,5 @@ Utility Library (@code{csutil})
 @imports{anatomy,dirhier.txi}
 @imports{anatomy,makefile.txi}
 @imports{anatomy,phyziks.txi}
+@imports{anatomy,scf.txi}
 @importss{anatomy,platform,details.txi}

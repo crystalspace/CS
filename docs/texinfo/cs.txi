@@ -17,7 +17,6 @@ For a list of available topics, see the
 @end html
 
 @quotation
-@anchor{FAQ}
 @anchor{History}
 @emph{Missing}: This paragraph acts as an anchor for missing cross-references
 to documentation which has not yet been written.  Please ignore this text.
@@ -35,3 +34,4 @@ to documentation which has not yet been written.  Please ignore this text.
 @imports{anatomy,chapter.txi}
 @imports{plugins,chapter.txi}
 @imports{contrib,chapter.txi}
+@imports{appendix,appendix.txi}

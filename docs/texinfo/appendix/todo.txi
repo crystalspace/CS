@@ -1,6 +1,6 @@
 @c -*-texinfo-*-
 @node Todo
-@section Todo
+@appendix To-Do List
 
 This file describes the bugs and missing features that are still in
 Crystal Space. The ultimate goal is to make this file empty :-)

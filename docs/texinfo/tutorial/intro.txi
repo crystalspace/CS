@@ -22,112 +22,119 @@ together and as such offer a flexible scheme of integration.
 
 If you are interested in developing a program using Crystal Space, then it
 is important to understand that Crystal Space is not a single monolithic
-module, but instead consists of several @dfn{libraries} and
+library, but instead consists of several @dfn{libraries} and
 @dfn{plug-in modules}.  This manual uses the term @dfn{module} for both
 libraries and plug-ins when the distinction between the two is not important.
 
-Libraries and plug-in modules provide facilities to applications.  A quick
-summary of how these facilities may be accessed is presented below.
+A plug-in module is similar to a library, but has some advantages over a 
+library.  All plug-ins can be accessed in a common fashion.  They have a 
+@emph{very} clear interface, and they can provide this interface even if they 
+are extracted to a DLL.  So they are the better solution as long as speed is 
+not the dictator of all decisions as in the math library (access to plug-in 
+functions uses virtual methods).  The main difference between the interface of 
+a library and a plug-in is that a library may use SCF and C++ classes; 
+plug-ins may only use SCF.  
 
-@table @asis
-@item Libraries
+@table @emph
+@item What is SCF?
+The main SCF object is the @emph{Interface}. An interface is the solution to
+strictly decouple the public methods of an object from their implementation.
+You only get a pointer to an abstract class with only virtual methods, called
+the interface, so your program doesn't know about the actual object behind
+the pointer. This object is called an @emph{Implementation} of the interface.
+You as the user of Crystal Space will call functions that create the actual
+object, but only return the interface. After that you can use the interface
+like a C++ object. When you don't need it anymore, don't @code{delete} it,
+but call @code{DecRef();}. When you pass a pointer to the interface to
+anywhere, call @code{AddRef();} from there, and @code{DecRef();} when you
+don't need the interface there anymore.
+
+As the user you'll only have to include a header that defines the interface,
+but not the implementation. Despite the obvious advantage of having a very
+clear structure in your code, there is the advantage that linking the
+interface to the implementation can be done at run-time, but more about this
+later.
+
+@item What are the characteristics of a library?
+A library is just a normal C++ library as you know them. A library can
+optionally provide SCF interfaces. In the case of a library this is just a
+way to define a clear structure. But as their main interface, libraries
+provide C++ classes.
+
+@item What are the characteristics of a plug-in?
+A plug-in, on the other side, will only provide SCF interfaces, no normal C++
+classes. This is part of the definition of a plug-in. A plug-in can be
+organized as static library or DLL; this only makes a small difference in
+how you use it in your program. As the user of Crystal Space, you have to do
+the following steps to use a plug-in:
+
 @itemize @bullet
 @item
-May provide C++ classes, functions and global variables.
+First, do all these steps for the dependencies (other plug-ins) that this
+plug-in relies on.
+
 @item
-May define @sc{scf} interfaces.
+Register the library that contains the plug-in.
+
+@item
+Load the plug-in. This will also initialize the plug-in. It will fail if you
+forgot any dependencies.
+
+@item
+Query the plug-in interface. This is an SCF interface, so you now have access
+to the functions of the plug-in.
 @end itemize
 
-@item Plug-In Modules
-@itemize @bullet
-@item
-May only define @sc{scf} interfaces.
-@end itemize
+@item How can I register the plug-in library?
+This depends on whether you have a static library or DLL. For a static
+library, put the line
+
+@example
+REGISTER_STATIC_LIBRARY (name)
+@end example
+
+at toplevel into one of your C++ files and link to the static library.
+For a DLL, use SCFREG at your command line:
+
+@example
+scfreg name.dll
+@end example
+
+Replace @file{.dll} by @file{.so} on Unix systems. @samp{name} is the name of
+the library, which is chosen by its author. The filename of DLLs is then
+@file{name.dll} or @file{name.so}. Note that it is possible that several
+plug-ins are stored in the same library. In this case you must
+@emph{register} the library only once, but you must @emph{load} all plug-ins
+(see next section).
+
+@item How can I load the plug-in?
+You must tell the system driver that you want to use this plugin. There are
+two ways how to do this. The first way is to add the following line in
+the @code{[PlugIns]} section in your config file:
+@samp{anything = pluginsymbol}.
+
+@samp{anything} can be anything (-: but you may not use the same
+@samp{anything} twice. It has no meaning. @samp{pluginsymbol} is the symbol
+the author has chosen for the plug-in, for example
+@samp{crystalspace.graphics3d.software}. It is a synonym for the
+implementation of the main plug-in interface.
+
+The other way is to call @code{YourSysDriver->RequestPlugin("pluginsymbol")}
+before calling @code{Initialize}.
+
+@item How can I query the plug-in interface?
+You can use @code{QUERY_INTERFACE(YourSysDriver,iSomething)} to get a pointer
+to the global instance of the plug-in (as a pointer to its interface, of
+course!). Returns @code{NULL} on failure.
+
+@item Conclusion
+To sum it up, SCF is mainly used to provide common interfaces for DLLs, but
+it can also be used by statically linked libraries. If you want to know how
+to write a plug-in yourself, you should read the SCF documentation. @xref{SCF}.
 @end table
 
-An @sc{scf} interface is an abstract contract which specifies a given set
-of messages to which any object which implements that interface may respond.
-It strictly decouple the interface from a module's implementation. This is
-easily done by giving you a pointer to an abstract C++ class. Its members are
-the interface methods, which must all be virtual, and no member variables.
-The implementation of these methods depends on the subclass of the object you
-got, but you don't have to know about it. This has two big advantages:
-
-@itemize @bullet
-@item
-The interface gets a clear structure, which does not depend on the
-implementation
-
-@item
-Several implementations get the same interface. You program is the same no
-matter which implementation you get because it only deals with the interface.
-Different implementations can be chosen at run-time, not compilation time.
-@end itemize
-
-The disadvantage is speed.  @sc{scf} interfaces are a bit slower that C++
-classes, so in some cases it is better to use C++ classes.  This is also
-better when an @sc{scf} interface is a bad solution.  This depends on the
-situation.  For example, the 3d math library, which deals with 3d vectors and
-matrices, can neither provide real interfaces, nor may it waste any time.
-
-Again, a library, like you know it, can make use of both normal C++ classes
-and functions, but it can also use @sc{scf} to provide such an interface.  And
-here is the big difference with plug-ins: They only provide SCF interfaces.
-If your interface is loaded as a dynamic library, you can at run-time exchange
-the implementation of a whole plug-in with another implementation, but the
-interface remains the same.  @sc{dll}s can only be used as plug-ins.
-
-There are actually three ways how a module can interfaced:
-
-@itemize
-@item
-A normal C++ library, like you probably know it. This is useful where speed
-is important. An example for this is the csGeom library.
-
-@item
-A statically linked plug-in. It is linked into the executable, but can only
-be accessed via SCF interfaces. This is just a cleaner way to organize
-statically linked libraries, and can be used if there is only one
-implementation for a plug-in interface. An example for this is the virtual
-file system.
-
-@item
-A dynamically linked plug-in. This is stored as @file{.so} or @file{.dll}
-file. It can only be accessed via SCF interfaces. This is useful when there
-are several implementations for one interface. An example for this is the
-3d rasterizer.
-@end itemize
-
-Both static and dynamic plug-ins are only loaded at startup if the line
-@samp{PluginType=PluginName} can be found in the @code{[PlugIns]} section of
-your config file. You may load only any number of plug-ins for each
-@samp{PluginType}, however in many cases it makes sense to load only a
-single plug-in of a certain type.
-
-Static plug-ins also require the line
-@example
-REGISTER_STATIC_LIBRARY (???)
-@end example
-in one of your C++ files (not inside a function body).
-
-Dynamic plug-ins must also be registered with the SCFReg utility.
-
-An example how @sc{scf} is used: The 3d rasterizer is used to provide polygon
-drawing functions.  Several implementations of this module exist, so it is
-best handled as a plug-in.  The different implementations exist as @sc{dll}s.
-The common interface for them is the abstract class @code{iGraphics3d}.  In
-the config file you tell Crystal Space to load the plugin @file{gl3d.so}.  In
-your main program you ask the system driver for the interface (iGraphics3d),
-and get this abstract class.  Your program does not have to know that the
-implementation of this interface is, in fact, the OpenGL renderer.  Because of
-this you can change the config file to load the sofware renderer instead, but
-you need not change your program.
-
-To sum it up, @sc{scf} is mainly used to provide common interfaces for
-@sc{dll}s, but it can also be used by statically linked libraries.  If you
-want to know how to write a plug-in yourself, you should read @ref{SCF}.
-
-A list of all modules can be found at @ref{Anatomy}.
+@xref{Anatomy}, for a list of all modules.  @xref{Plug-In Drivers}, for a list
+of all plug-in modules.
 
 Now that you have learned some basics about the Crystal Space environment,
 you can try writing your first program.

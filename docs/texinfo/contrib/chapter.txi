@@ -7,4 +7,3 @@
 @imports{contrib,coding.txi}
 @imports{contrib,cvs.txi}
 @imports{contrib,porting.txi}
-@imports{contrib,todo.txi}
