@@ -6,6 +6,17 @@ The history order is reversed so that new features are at the top.
 	- Fixed a bug with the ball mesh not clipping correctly to the
 	  screen boundaries. It appeared that the transformed bounding
 	  box was not calculated correctly.
+	- Michael H. Voase did the following:
+	  HitBeam updates:
+	    Fleshed out HitBeam interface. HitBeamBBox
+	    now does exactly that and returns the face number
+	    hit. The HitBeamOutline and HitBeamObject methods
+	    now line up with their names. Hitting the outline
+	    of a mesh object will return upon the first hit.
+	    HitBeamObject still returns the nearest hit, which
+	    means that it scans through all triangles looking
+	    for the closest hit. csSector::HitBeam() now uses
+	    the outline for faster processing.
 12-Aug-2001
 	- Eric Sunshine converted the Apple/NeXT ports over to the new
 	  platform-specific shared `helper' object paradigm as much as possible
