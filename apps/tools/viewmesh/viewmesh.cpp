@@ -246,7 +246,7 @@ bool ViewMesh::HandleEvent (iEvent& ev)
 	  switch (data->code)
 	  {
 	    case VIEWMESH_COMMAND_LOADMESH:
-	      if (!LoadSprite(filename,1))
+	      if (!LoadSprite(filename, scale))
 	      {
 		Printf (CS_REPORTER_SEVERITY_ERROR, "couldn't load mesh %s",
 		    filename);
@@ -308,7 +308,7 @@ bool ViewMesh::HandleEvent (iEvent& ev)
   return false;
 }
 
-bool ViewMesh::LoadSprite(const char *filename,float scale)
+bool ViewMesh::LoadSprite(const char *filename, float scale)
 {
   // grab the directory.
   char *path = new char[strlen(filename)+1];
@@ -341,10 +341,14 @@ bool ViewMesh::LoadSprite(const char *filename,float scale)
     engine->GetMeshes()->Remove(sprite);
   }
 
+  csMatrix3 scaling; scaling.Identity(); scaling *= scale;
+  csReversibleTransform rT;
+  rT.SetT2O (scaling);
+  imeshfactwrap->HardTransform (rT);
+
   sprite = engine->CreateMeshWrapper(
       imeshfactwrap, "MySprite", room,
       csVector3 (0, 10, 0));
-  csMatrix3 m; m.Identity(); m *= scale;
   csRef<iSprite3DState> spstate (SCF_QUERY_INTERFACE(sprite->GetMeshObject(),
       iSprite3DState));
   if (spstate)
@@ -687,7 +691,7 @@ bool ViewMesh::Initialize ()
   const char* texturefilename = cmdline->GetName (1);
   const char* texturename = cmdline->GetName (2);
   const char* scaleTxt = cmdline->GetOption("Scale");
-  float scale = 1;
+
   if (scaleTxt != NULL)
   {
     sscanf (scaleTxt, "%f", &scale);

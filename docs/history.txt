@@ -6,6 +6,11 @@ The history order is reversed so that new features are at the top.
 11-May-2003
 	- Oktal removed one of two instances of the same phony target,
 	  swigperl5gen, in the csperl5 makefile.
+	- groton (groton@gmx.net) added some code to viewmesh application in 
+	  order to allow the passing of the parameter -Scale=XX.XX through
+	  the command line (that option there was already there, but it
+	  was no implemented, i.e. the scale factor was always 1.0, whatever
+	  the value of XX.XX was).
 10-May-2003
 	- Philip Wyett eliminated the 88 double to float conversion compiler
           warnings in gtreeldr.cpp under MSVC 6.

@@ -48,6 +48,7 @@ private:
   csVector3 spritepos;
   csRef<iMeshObjectFactory> imeshfact;
   float move_sprite_speed;
+  float scale;
 
   csMenu *menu;
   csWindow *dialog;
