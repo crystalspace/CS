@@ -106,18 +106,30 @@ int converter::ivcon ( const char* input_filename, bool keep_log,
   else
   {
     iDataBuffer* buf = vfs->ReadFile (input_filename);
-    csString tmp_file ("convtemp.");
-    tmp_file += file_ext ((char*)input_filename);
-    csString tmp_path ("/this/");
-    tmp_path += tmp_file;
-    if (vfs->WriteFile (tmp_path, **buf, buf->GetSize ()))
+    if (buf == NULL)
     {
-      result = comline (tmp_file, create_output_file, output_filename);
-      vfs->DeleteFile (tmp_path);
+      fprintf (logfile, "VFS_CONVERSION - Error!\n");
+      fprintf (logfile, "  Can't read file %s\n", input_filename);
     }
-    else
-      fprintf ( logfile,  "VFS_CONVERSION - Error!\n" );
-    buf->DecRef ();
+    else 
+    {
+      csString tmp_file ("convtemp.");
+      tmp_file += file_ext ((char*)input_filename);
+      csString tmp_path ("/this/");
+      tmp_path += tmp_file;
+      if (vfs->WriteFile (tmp_path, **buf, buf->GetSize ()))
+      {
+        result = comline (tmp_file, create_output_file, output_filename);
+        vfs->DeleteFile (tmp_path);
+      }
+      else
+      {
+        fprintf (logfile, "VFS_CONVERSION - Error!\n");
+        fprintf (logfile, "  Can't write temporary file /this/convtemp.%s\n",
+          file_ext ((char*)input_filename));
+      }
+      buf->DecRef ();
+    }
   }
 
   if (keep_log)
