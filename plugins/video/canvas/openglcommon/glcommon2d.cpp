@@ -137,7 +137,8 @@ bool csGraphics2DGLCommon::Open ()
 
   if (ext.CS_GL_ARB_multisample)
   {
-    glGetIntegerv (GL_SAMPLES_ARB, &multiSamples);
+    GLint glmultisamp = (GLint)multiSamples;
+    glGetIntegerv (GL_SAMPLES_ARB, &glmultisamp);
 
     if (multiSamples)
     {

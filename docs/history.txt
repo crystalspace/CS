@@ -3,6 +3,9 @@ http://crystal.sourceforge.net/
 
 The history order is reversed so that new features are at the top.
 
+26-May-2003
+	- Eric Sunshine eliminated compilation warning about implicit
+	  conversion of (int*) to (GLint*) in glcommon2d.cpp.
 25-May-2003
 	- Jorrit optimized ball->HitBeamObject() considerably by moving an
 	  expensive operation out the inner loop. Same optimization for
