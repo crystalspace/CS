@@ -58,6 +58,8 @@ chronological order.
 	- res fixed some memory leaks in xmlshader.
 	- res fixed a compile error in bintree.h.
 	- res fixed bug 1033694 (missing objreg.h inclusion in docwrap.h).
+        - Andrew Craig fixed a bug in sprcal3d's SetMaterial function where
+          the render meshes were not updated for the new material.
 22-Sep-2004
 	- Jorrit changed the loader so that it only prints certain
 	  notifications if -verbose is given on the commandline. These
