@@ -2299,8 +2299,6 @@ void csGraphics3DOGLCommon::DrawTriangleMesh (G3DTriangleMesh& mesh)
   {
     tr_verts.SetLimit (num_vertices);
     uv_verts.SetLimit (num_vertices);
-    uv_mul_verts.SetLimit (num_vertices);
-    rgba_verts.SetLimit (num_vertices*4);
     color_verts.SetLimit (num_vertices);
   }
 
@@ -2502,6 +2500,9 @@ void csGraphics3DOGLCommon::DrawTriangleMesh (G3DTriangleMesh& mesh)
   {
     // special hack for transparent meshes
     if (mesh.fxmode & CS_FX_ALPHA)
+    {
+      if ((num_vertices*4) > rgba_verts.Limit ())
+        rgba_verts.SetLimit (num_vertices*4);
       for (k=0, i=0; i<num_vertices; i++)
       {
         rgba_verts[k++] = work_colors[i].red;
@@ -2509,6 +2510,7 @@ void csGraphics3DOGLCommon::DrawTriangleMesh (G3DTriangleMesh& mesh)
         rgba_verts[k++] = work_colors[i].blue;
 	rgba_verts[k++] = m_alpha;
       }
+    }
   }
   else
   {
@@ -2566,6 +2568,8 @@ void csGraphics3DOGLCommon::DrawTriangleMesh (G3DTriangleMesh& mesh)
       colstate_enabled = false;
       glDisableClientState (GL_COLOR_ARRAY);
     }
+    if (num_vertices > uv_mul_verts.Limit ())
+      uv_mul_verts.SetLimit (num_vertices);
     int j;
     for (j = 0 ; j < mat->GetNumTextureLayers () ; j++)
     {

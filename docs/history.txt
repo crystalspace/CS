@@ -1,5 +1,18 @@
 The history order is reversed so that new features are at the top.
 
+12-May-2001
+	- Thanks to Philip Wyett I fixed a bad bug in the OpenGL
+	  software clipper. Some arrays were not correctly sized to the
+	  number of clipped vertices (which could be more than the
+	  number of vertices). It now seems to work ok.
+	- Martin Geisse moved csLight accessor functions from csDynLight
+	  to csLight. They belong there, even if they are useless for
+	  static lights. Added missing accessor functions. Changed Blocks
+	  in several cases to use the engine through interfaces.
+	- Christopher Nelson added Dynamic Lexical Analyzer interface
+	  definition file.
+	- Christopher also added base regular expression and regular
+	  expression compiler objects (new cslexan plugin).
 11-May-2001
 	- Added additional HOWTO sections.
 	- Moved the FOG constants from OpenGL to ivideo/graph3d.h. They
