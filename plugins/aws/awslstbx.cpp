@@ -384,7 +384,7 @@ void awsListBox::InsertItem (void *owner, iAwsParmList &parmlist)
   row->cols = new awsListItem[lb->ncolumns];
   memset (row->cols, 0, sizeof (awsListItem) * lb->ncolumns);
 
-  parmlist.GetInt ("parent", (int *) &(row->parent));
+  parmlist.GetOpaque ("parent", (void **) &(row->parent));
   row->selectable = true;
   parmlist.GetBool ("selectable", &(row->selectable));
 
@@ -438,7 +438,7 @@ void awsListBox::InsertItem (void *owner, iAwsParmList &parmlist)
     lb->rows.Push (row);
 
   // Pass back the id of this row, in case they want it.
-  parmlist.AddInt ("id", (int)row);
+  parmlist.AddOpaque ("id", (void *)row);
 
   lb->map_dirty = true;
 }

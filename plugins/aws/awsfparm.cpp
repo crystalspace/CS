@@ -12,6 +12,7 @@ const int awsParmList:: STRINGVECTOR = 4;
 const int awsParmList:: RECT = 5;
 const int awsParmList:: POINT = 6;
 const int awsParmList:: BOOL = 7;
+const int awsParmList:: VOPAQUE = 8;
 
 SCF_IMPLEMENT_IBASE(awsParmList)
   SCF_IMPLEMENTS_INTERFACE(iAwsParmList)
@@ -144,6 +145,17 @@ void awsParmList::AddPoint (char *name, csPoint *value)
   parms.Push (pi);
 }
 
+void awsParmList::AddOpaque(char *name, void *value)
+{
+  parmItem *pi = new parmItem;
+
+  pi->name = NameToID (name);
+  pi->type = VOPAQUE;
+  pi->parm.v = value;
+
+  parms.Push (pi);
+}
+
 bool awsParmList::GetInt (char *name, int *value)
 {
   parmItem *pi = FindParm (name, INT);
@@ -242,6 +254,19 @@ bool awsParmList::GetPoint (char *name, csPoint **value)
   if (pi)
   {
     *value = pi->parm.p;
+    return true;
+  }
+
+  return false;
+}
+
+bool awsParmList::GetOpaque (char *name, void **value)
+{
+  parmItem *pi = FindParm (name, VOPAQUE);
+
+  if (pi)
+  {
+    *value = pi->parm.v;
     return true;
   }
 

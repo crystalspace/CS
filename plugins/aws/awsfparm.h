@@ -28,6 +28,7 @@ public:
   static const int RECT;
   static const int POINT;
   static const int BOOL;
+  static const int VOPAQUE;
 
   struct parmItem
   {
@@ -43,6 +44,7 @@ public:
       csStrVector *sv;
       csRect *r;
       csPoint *p;
+	  void *v;
     } parm;
   };
 private:
@@ -79,6 +81,12 @@ public:
   /// Adds a point to the parmeter list
   virtual void AddPoint (char *name, csPoint *value);
 
+  /** Adds an opaque, undefined value to the parm list. This is stored as a void *, but
+   * should never be assumed to be anything at all, except some value that fits in
+   * sizeof(void *)
+   */
+  virtual void AddOpaque (char *name, void *value);
+
   /// Returns the int named "name" in value.  True if it was found, otherwise false.
   virtual bool GetInt (char *name, int *value);
 
@@ -102,6 +110,9 @@ public:
 
   /// Returns the point named "name" in value.  True if it was found, otherwise false.
   virtual bool GetPoint (char *name, csPoint **value);
+
+  /// Returns the opaque value named "name" in value.  True if it was found, otherwise false.
+  virtual bool GetOpaque (char *name, void **value);
 
   /// Clears the parameter list
   virtual void Clear ();
