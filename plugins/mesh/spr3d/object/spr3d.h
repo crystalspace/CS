@@ -1534,6 +1534,9 @@ public:
 
     /// Cleanup.
     virtual void Cleanup () { delete[] polygons; polygons = NULL; }
+    
+    virtual bool IsDeformable () const { return false;  }
+    virtual uint32 GetChangeNumber() const { return 0; }
 
     PolyMesh () : polygons (NULL) { }
     virtual ~PolyMesh () { Cleanup (); }
