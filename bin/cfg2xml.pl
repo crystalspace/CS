@@ -528,7 +528,7 @@ Usage: $PROG_NAME [options] <file> ...
 Options:
     --root-name=<name>
                Name of root node.  This is the name of the node into which the
-               entire configuration hiearchy is placed.  Default is "config".
+               entire configuration hierarchy is placed.  Default is "config".
     --preserve-blank-lines
                Preserve blank lines from the input file in the output file.
                Blank lines are grouped together with comments and attached to
