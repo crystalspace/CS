@@ -1,5 +1,11 @@
 # This is a Jamconfig which contains definitions for msvcgen
 
+MASTER_JAMCONFIG = [ GLOB . : Jamconfig ] ;
+if $(MASTER_JAMCONFIG)
+{
+  include $(MASTER_JAMCONFIG) ;
+}
+
 # @@@ This is duplicated from $(TOP)/Jamconfig ...
 PACKAGE_NAME ?= "crystal" ;
 PACKAGE_VERSION ?= "0.97" ;
@@ -11,12 +17,12 @@ PACKAGE_COPYRIGHT ?= "Copyright (C)1998-2003 Jorrit Tyberghein and others" ;
 PACKAGE_VERSION_LIST ?= 0 97 ;
 
 # Target
-PERL = "perl" ;
+PERL ?= "perl" ;
 TARGET = "msvc" ;
 TARGET.OS = "WIN32" ;
 TARGET.PROCESSOR = "X86" ;
-MODE = "debug" ; # msvcgen will create rules for debug and optimize
-USE_PLUGINS = "yes" ;
+MODE ?= "debug" ; # msvcgen will create rules for debug and optimize
+USE_PLUGINS ?= "yes" ;
 USE_NEW_RENDERER ?= "no" ;
 
 # msvcgen flags
@@ -42,15 +48,15 @@ MSVC.LFLAGS.library = ;
 MSVC.CFLAGS.library = ;
 
 # common flags (ignored from msvcgen)
-PYTHON.CFLAGS = "" ;
-PYTHON.LFLAGS = "" ;
+PYTHON.CFLAGS ?= "" ;
+PYTHON.LFLAGS ?= "" ;
 
 # Tools (this won't be used in the msvcmakefiles but only for the msvcgen run)
-CMD.MKDIR = "mkdir" ;
-CMD.MKDIRS = "mkdir -p" ;
-NASM.AVAILABLE = "no" ;
-PERL5.AVAILABLE = "no" ;
-PYTHON.AVAILABLE = "no" ;
+CMD.MKDIR ?= "mkdir" ;
+CMD.MKDIRS ?= "mkdir -p" ;
+NASM.AVAILABLE ?= "no" ;
+PERL5.AVAILABLE ?= "no" ;
+PYTHON.AVAILABLE ?= "no" ;
 
 # Libraries
 PTHREAD.AVAILABLE = "no" ;

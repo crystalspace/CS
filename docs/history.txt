@@ -28,6 +28,14 @@ chronological order.
 	  Instead the code now uses csBlockAllocator.
 	- Eric Sunshine upgraded Jam's msvcgen.sh so that it can be invoked
 	  from a build directory which differs from the source directory.
+	- Eric Sunshine applied another ugly patch to msvcgen/Jamconfig to
+	  allow it to inherit platform-specific configuration properties from
+	  the generated Jamconfig instead of blindly using hard-coded values
+	  for items which it could not possibly guess correctly.  (In the
+	  future, as noted on numerous occassions previously, the entire ugly
+	  hack embodied by msvcgen.sh and msvcgen/Jamconfig must be retired.
+	  People should be able to build project files by invoking "jam
+	  -sMSVC_VERSION=7 msvcgen" directly.)
 19-Feb-2004
 	- res made the following changes:
 	    - A few minor cosmetic changes.
