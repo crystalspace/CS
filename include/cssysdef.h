@@ -375,8 +375,8 @@ extern void* operator new[] (size_t s, void* filename, int line);
 #      define CS_ASSERT(x)						\
          if (!(x))							\
          {								\
-           fprintf (stderr, __FILE__ ":%d: failed assertion '" #x "'\n",\
-             int(__LINE__));						\
+           fprintf (stderr, __FILE__ ":%d: failed assertion '%s'\n",\
+             int(__LINE__), #x );					\
            DEBUG_BREAK;							\
          }
 #    endif
