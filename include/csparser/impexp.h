@@ -142,10 +142,13 @@ float  cor3[3][MAX_COR3];
 float  cor3_normal[3][MAX_COR3];
 float  cor3_rgb[3][MAX_COR3];
 float  cor3_uv[2][MAX_COR3];
+float  temp_cor3[3][MAX_COR3];
+float  temp_cor3_uv[2][MAX_COR3];
 
 int    face[MAX_ORDER][MAX_FACE];
 int    face_flags[MAX_FACE];
 int    face_mat[MAX_ORDER][MAX_FACE];
+int    face_texnode[MAX_ORDER][MAX_FACE];
 float  face_normal[3][MAX_FACE];
 int    face_object[MAX_FACE];
 int    face_order[MAX_FACE];
@@ -162,12 +165,16 @@ float  normal_temp[3][MAX_ORDER*MAX_FACE];
 char   texmap_name[MAX_TEXMAP][81];
 float  transform_mat[4][4];
 float  vertex_normal[3][MAX_ORDER][MAX_FACE];
+float  vertex_uv[2][MAX_ORDER][MAX_FACE];
 float  vertex_rgb[3][MAX_ORDER][MAX_FACE];
 
 int    num_bad;
 int    num_color;
 int    num_comment;
 int    num_cor3;
+int    num_cor3_uv;
+int    temp_num_cor3;
+int    temp_num_cor3_uv;
 int    num_dup;
 int    num_face;
 int    num_group;
@@ -276,7 +283,7 @@ int                tds_write_u_short_int ( FILE *fileout, unsigned short int int
 int                txt_write ( FILE *fileout );
 int                vla_read ( FILE *filein );
 int                vla_write ( FILE *fileout );
-
+int                makeunique (int vidx, int vtidx);
 };
 
 class csConverter_FrameManipulator
