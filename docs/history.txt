@@ -15,6 +15,10 @@ The history order is reversed so that new features are at the top.
 	  of HitBeamOutline(). So this should give more accurate results.
 	- TinyXML improvements: only elements and document can have children
 	  now. This saves some memory again.
+	- Some cleanup and memory savings in TinyXML parser again.
+	- Made ReadText() more robust in case the text happens to be bigger
+	  then the fixed amount of the buffer. In that case we will
+	  start reallocating automatically.
 13-Mar-2003
 	- Received some documentation fixes with regards to 3D sprites
 	  from Simon Posnjak <simon.posnjak@siol.net>.

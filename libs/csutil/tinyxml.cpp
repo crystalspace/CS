@@ -966,7 +966,7 @@ void TiXmlText::StreamOut( TIXML_OSTREAM * stream ) const
 TiDocumentNode* TiXmlText::Clone() const
 {	
 	TiXmlText* clone = 0;
-	clone = new TiXmlText( "" );
+	clone = new TiXmlText( NULL );
 
 	if ( !clone )
 		return 0;

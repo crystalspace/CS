@@ -182,15 +182,66 @@ bool TiXmlBase::StringEqualIgnoreCase( const char* p,
 	return false;
 }
 
-const char* TiXmlBase::ReadText(	const char* p, 
-					char** text, 
-					bool trimWhiteSpace, 
-					const char* endTag)
+#define BUFSIZE 2000
+
+/**
+ * This is a growing string class that keeps an initial unallocated
+ * buffer to avoid memory allocation in the common case where the
+ * string is small.
+ */
+class GrowString
 {
-    char buf[10000];
-    char* ptext = buf;
+private:
+  char buf[BUFSIZE];
+  int max;
+  int len;
+  char* curbuf;
+  char* ptext;
+
+public:
+  GrowString ()
+  {
+    max = BUFSIZE;
+    len = 0;
+    curbuf = buf;
+    ptext = curbuf;
     *ptext = 0;
-    int len = 0;
+  }
+  ~GrowString ()
+  {
+    if (curbuf != buf) delete[] curbuf;
+  }
+
+  void AddChar (char c)
+  {
+    *ptext++ = c;
+    len++;
+    if (len >= max)
+    {
+      max += BUFSIZE;
+      char* newbuf = new char[max];
+      memcpy (newbuf, curbuf, len);
+      if (curbuf != buf) delete[] curbuf;
+      curbuf = newbuf;
+      ptext = curbuf+len;
+    }
+  }
+
+  char* GetNewCopy ()
+  {
+    char* copy = new char[len+1];
+    strcpy (copy, curbuf);
+    return copy;
+  }
+};
+
+
+const char* TiXmlBase::ReadText(const char* p, 
+				char** text, 
+				bool trimWhiteSpace, 
+				const char* endTag)
+{
+    GrowString buf;
 
 	if (!trimWhiteSpace		// certain tags always keep whitespace
 	    || !condenseWhiteSpace )	// if true, whitespace is always kept
@@ -200,9 +251,7 @@ const char* TiXmlBase::ReadText(	const char* p,
 		{
 			char c;
 			p = GetChar( p, &c );
-			*ptext++ = c;
-			len++;
-			//CS_ASSERT (len <= 10000);
+			buf.AddChar (c);
 		}
 	}
 	else
@@ -224,22 +273,17 @@ const char* TiXmlBase::ReadText(	const char* p,
 				// new character. Any whitespace just becomes a space.
 				if ( whitespace )
 				{
-					*ptext++ = ' ';
-					len++;
-					//CS_ASSERT (len <= 10000);
+					buf.AddChar (' ');
 					whitespace = false;
 				}
 				char c;
 				p = GetChar( p, &c );
-				*ptext++ = c;
-				len++;
-				//CS_ASSERT (len <= 10000);
+				buf.AddChar (c);
 			}
 		}
 	}
-	*ptext = 0;
-	*text = new char[len+1];
-	strcpy (*text, buf);
+	buf.AddChar (0);
+	*text = buf.GetNewCopy ();
 	return p + strlen( endTag );
 }
 
@@ -448,7 +492,7 @@ const char* TiXmlElement::ReadValue( TiDocument* document, const char* p )
 		if ( *p != '<' )
 		{
 			// Take what we have, make a text element.
-			TiXmlText* textNode = new TiXmlText( "" );
+			TiXmlText* textNode = new TiXmlText( NULL );
 
 			if ( !textNode )
 			{
@@ -465,7 +509,7 @@ const char* TiXmlElement::ReadValue( TiDocument* document, const char* p )
 		} 
                 else if ( StringEqual(p, "<![CDATA[") )
                 {
-                        TiXmlCData* cdataNode = new TiXmlCData( "" );
+                        TiXmlCData* cdataNode = new TiXmlCData( NULL );
 
 			if ( !cdataNode )
 			{
@@ -599,6 +643,7 @@ const char* TiDocumentAttribute::Parse( TiDocument* document, const char* p )
 		++p;
 		end = "\'";
 		char* pvalue;
+		delete[] value;
 		p = TiXmlBase::ReadText( p, &pvalue, false, end);
 		value = pvalue;
 	}
@@ -607,6 +652,7 @@ const char* TiDocumentAttribute::Parse( TiDocument* document, const char* p )
 		++p;
 		end = "\"";
 		char* pvalue;
+		delete[] value;
 		p = TiXmlBase::ReadText( p, &pvalue, false, end);
 		value = pvalue;
 	}
@@ -629,14 +675,15 @@ const char* TiDocumentAttribute::Parse( TiDocument* document, const char* p )
 
 const char* TiXmlText::Parse( TiDocument*, const char* p )
 {
-	value = "";
-
 	//TiDocument* doc = GetDocument();
 	bool ignoreWhite = true;
 //	if ( doc && !doc->IgnoreWhiteSpace() ) ignoreWhite = false;
 
 	const char* end = "<";
-	p = ReadText( p, &value, ignoreWhite, end);
+	char* pvalue;
+	delete[] value;
+	p = ReadText( p, &pvalue, ignoreWhite, end);
+	value = pvalue;
 	if ( p )
 		return p-1;	// don't truncate the '<'
 	return 0;
@@ -644,15 +691,16 @@ const char* TiXmlText::Parse( TiDocument*, const char* p )
 
 const char* TiXmlCData::Parse( TiDocument*, const char* p )
 {
-	value = "";
-
 	//TiDocument* doc = GetDocument();
 	bool ignoreWhite = false;
 //	if ( doc && !doc->IgnoreWhiteSpace() ) ignoreWhite = false;
         //skip the <![CDATA[ 
         p += 9;
 	const char* end = "]]>";
-	p = ReadText( p, &value, ignoreWhite, end);
+	char* pvalue;
+	delete[] value;
+	p = ReadText( p, &pvalue, ignoreWhite, end);
+	value = pvalue;
 	if ( p )
 		return p;
 	return 0;
@@ -719,7 +767,8 @@ const char* TiXmlDeclaration::Parse( TiDocument* document, const char* p )
 
 bool TiXmlText::Blank() const
 {
-	for ( unsigned i=0; i<value.length(); i++ )
+	int l = strlen (value);
+	for ( unsigned i=0; i<l; i++ )
 		if ( !isspace( value[i] ) )
 			return false;
 	return true;

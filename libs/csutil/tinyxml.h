@@ -672,255 +672,278 @@ private:
 };
 
 
-/**	An XML comment.
-*/
+/**
+ * An XML comment.
+ */
 class TiXmlComment : public TiDocumentNode
 {
 public:
-	/// Constructs an empty comment.
-	TiXmlComment() {}
-	virtual ~TiXmlComment()	{}
-	virtual int Type() const { return COMMENT; }
+  /// Constructs an empty comment.
+  TiXmlComment() {}
+  virtual ~TiXmlComment()	{}
+  virtual int Type() const { return COMMENT; }
 
-	// [internal use] Creates a new Element and returs it.
-	virtual TiDocumentNode* Clone() const;
-	// [internal use]
-	virtual void Print( FILE* cfile, int depth ) const;
-	virtual const char * Value () const { return value.c_str (); }
-	virtual void SetValue (const char * _value) { value = _value;}
+  // [internal use] Creates a new Element and returs it.
+  virtual TiDocumentNode* Clone() const;
+  // [internal use]
+  virtual void Print( FILE* cfile, int depth ) const;
+  virtual const char * Value () const { return value.c_str (); }
+  virtual void SetValue (const char * _value) { value = _value;}
 
 protected:
-	// used to be public
-	virtual void StreamOut( TIXML_OSTREAM * out ) const;
-	/*	[internal use]
-		Attribtue parsing starts: at the ! of the !--
-						 returns: next char past '>'
-	*/
-	virtual const char* Parse( TiDocument* document, const char* p );
-	TIXML_STRING	value;
+  // used to be public
+  virtual void StreamOut( TIXML_OSTREAM * out ) const;
+  /*	[internal use]
+   * Attribtue parsing starts: at the ! of the !--
+   * returns: next char past '>'
+   */
+  virtual const char* Parse( TiDocument* document, const char* p );
+
+  TIXML_STRING value;
 };
 
-
-/** XML text. Contained in an element.
-*/
+/**
+ * XML text. Contained in an element.
+ */
 class TiXmlText : public TiDocumentNode
 {
-	friend class TiXmlElement;
+  friend class TiXmlElement;
+
 public:
-	/// Constructor.
-	TiXmlText (const char * initValue)
-	{
-		SetValue( initValue );
-	}
-	virtual ~TiXmlText() {}
-	virtual int Type() const { return TEXT; }
-	virtual const char * Value () const { return value.c_str (); }
-	virtual void SetValue (const char * _value) { value = _value;}
+  /// Constructor.
+  TiXmlText (const char * initValue)
+  {
+    value = NULL;
+    SetValue( initValue );
+  }
+  virtual ~TiXmlText()
+  {
+    delete[] value;
+  }
+  virtual int Type() const { return TEXT; }
+  virtual const char * Value () const { return value; }
+  virtual void SetValue (const char * _value)
+  {
+    delete[] value;
+    if (_value)
+      value = csStrNew (_value);
+    else
+      value = NULL;
+  }
 
 protected :
-	// [internal use] Creates a new Element and returns it.
-	virtual TiDocumentNode* Clone() const;
-	// [internal use]
-	virtual void Print( FILE* cfile, int depth ) const;
-	virtual void StreamOut ( TIXML_OSTREAM * out ) const;
-	// [internal use]
-	bool Blank() const;	// returns true if all white space and new lines
-	/*	[internal use]
-			Attribtue parsing starts: First char of the text
-							 returns: next char past '>'
-		*/
-	virtual const char* Parse( TiDocument* document,  const char* p );
-	TIXML_STRING	value;
+  // [internal use] Creates a new Element and returns it.
+  virtual TiDocumentNode* Clone() const;
+  // [internal use]
+  virtual void Print( FILE* cfile, int depth ) const;
+  virtual void StreamOut ( TIXML_OSTREAM * out ) const;
+  // [internal use]
+  bool Blank() const;	// returns true if all white space and new lines
+  /*	[internal use]
+   * Attribtue parsing starts: First char of the text
+   * returns: next char past '>'
+   */
+  virtual const char* Parse( TiDocument* document,  const char* p );
+
+  char* value;
 };
 
-
-
-/** XML Cdata section. Contained in an element.
+/**
+ * XML Cdata section. Contained in an element.
  * Always start with <![CDATA[  and end with ]]>
-*/
+ */
 class TiXmlCData : public TiXmlText
 {
-	friend class TiXmlElement;
+  friend class TiXmlElement;
+
 public:
-	/// Constructor.
-	TiXmlCData (const char * initValue) : TiXmlText (initValue)
-	{
-		SetValue( initValue );
-	}
-	virtual ~TiXmlCData() {}
-	virtual int Type() const { return TEXT; }
-	virtual const char * Value () const { return value.c_str (); }
-	virtual void SetValue (const char * _value) { value = _value;}
+  /// Constructor.
+  TiXmlCData (const char * initValue) : TiXmlText (initValue)
+  {
+  }
+  virtual ~TiXmlCData() {}
 
 protected :
-	virtual const char* Parse( TiDocument* document,  const char* p );
-	//TIXML_STRING	value;
+  virtual const char* Parse( TiDocument* document,  const char* p );
 };
 
-/** In correct XML the declaration is the first entry in the file.
-	@verbatim
-		<?xml version="1.0" standalone="yes"?>
-	@endverbatim
-
-	TinyXml will happily read or write files without a declaration,
-	however. There are 3 possible attributes to the declaration:
-	version, encoding, and standalone.
-
-	Note: In this version of the code, the attributes are
-	handled as special cases, not generic attributes, simply
-	because there can only be at most 3 and they are always the same.
-*/
+/**
+ * In correct XML the declaration is the first entry in the file.
+ * @verbatim
+ * <?xml version="1.0" standalone="yes"?>
+ * @endverbatim
+ *
+ * TinyXml will happily read or write files without a declaration,
+ * however. There are 3 possible attributes to the declaration:
+ * version, encoding, and standalone.
+ *
+ * Note: In this version of the code, the attributes are
+ * handled as special cases, not generic attributes, simply
+ * because there can only be at most 3 and they are always the same.
+ */
 class TiXmlDeclaration : public TiDocumentNode
 {
 public:
-	/// Construct an empty declaration.
-	TiXmlDeclaration() { }
+  /// Construct an empty declaration.
+  TiXmlDeclaration() { }
 
-	/// Construct.
-	TiXmlDeclaration::TiXmlDeclaration( const char * _version,
+  /// Construct.
+  TiXmlDeclaration::TiXmlDeclaration( const char * _version,
 		const char * _encoding, const char * _standalone );
 
-	virtual ~TiXmlDeclaration()	{}
-	virtual int Type() const { return DECLARATION; }
+  virtual ~TiXmlDeclaration() {}
+  virtual int Type() const { return DECLARATION; }
 
-	/// Version. Will return empty if none was found.
-	const char * Version() const		{ return version.c_str (); }
-	/// Encoding. Will return empty if none was found.
-	const char * Encoding() const		{ return encoding.c_str (); }
-	/// Is this a standalone document?
-	const char * Standalone() const		{ return standalone.c_str (); }
+  /// Version. Will return empty if none was found.
+  const char * Version() const { return version.c_str (); }
+  /// Encoding. Will return empty if none was found.
+  const char * Encoding() const { return encoding.c_str (); }
+  /// Is this a standalone document?
+  const char * Standalone() const { return standalone.c_str (); }
 
-	// [internal use] Creates a new Element and returs it.
-	virtual TiDocumentNode* Clone() const;
-	// [internal use]
-	virtual void Print( FILE* cfile, int depth ) const;
-	virtual const char * Value () const { return value.c_str (); }
-	virtual void SetValue (const char * _value) { value = _value;}
+  // [internal use] Creates a new Element and returs it.
+  virtual TiDocumentNode* Clone() const;
+  // [internal use]
+  virtual void Print( FILE* cfile, int depth ) const;
+  virtual const char * Value () const { return value.c_str (); }
+  virtual void SetValue (const char * _value) { value = _value;}
 
 protected:
-	// used to be public
-	virtual void StreamOut ( TIXML_OSTREAM * out) const;
-	//	[internal use]
-	//	Attribtue parsing starts: next char past '<'
-	//					 returns: next char past '>'
-
-	virtual const char* Parse( TiDocument* document,  const char* p );
+  // used to be public
+  virtual void StreamOut ( TIXML_OSTREAM * out) const;
+  //	[internal use]
+  //	Attribtue parsing starts: next char past '<'
+  //					 returns: next char past '>'
+  virtual const char* Parse( TiDocument* document,  const char* p );
 
 private:
-	TIXML_STRING version;
-	TIXML_STRING encoding;
-	TIXML_STRING standalone;
-	TIXML_STRING	value;
+  TIXML_STRING version;
+  TIXML_STRING encoding;
+  TIXML_STRING standalone;
+  TIXML_STRING value;
 };
 
 
-/** Any tag that tinyXml doesn't recognize is save as an
-	unknown. It is a tag of text, but should not be modified.
-	It will be written back to the XML, unchanged, when the file
-	is saved.
-*/
+/**
+ * Any tag that tinyXml doesn't recognize is save as an
+ * unknown. It is a tag of text, but should not be modified.
+ * It will be written back to the XML, unchanged, when the file
+ * is saved.
+ */
 class TiXmlUnknown : public TiDocumentNode
 {
 public:
-	TiXmlUnknown() { }
-	virtual ~TiXmlUnknown() {}
-	virtual int Type() const { return UNKNOWN; }
+  TiXmlUnknown() { }
+  virtual ~TiXmlUnknown() {}
+  virtual int Type() const { return UNKNOWN; }
 
-	// [internal use]
-	virtual TiDocumentNode* Clone() const;
-	// [internal use]
-	virtual void Print( FILE* cfile, int depth ) const;
-	virtual const char * Value () const { return value.c_str (); }
-	virtual void SetValue (const char * _value) { value = _value;}
+  // [internal use]
+  virtual TiDocumentNode* Clone() const;
+  // [internal use]
+  virtual void Print( FILE* cfile, int depth ) const;
+  virtual const char * Value () const { return value.c_str (); }
+  virtual void SetValue (const char * _value) { value = _value;}
 protected:
-	// used to be public
-	virtual void StreamOut ( TIXML_OSTREAM * out ) const;
-	/*	[internal use]
-		Attribute parsing starts: First char of the text
-						 returns: next char past '>'
-	*/
-	virtual const char* Parse( TiDocument* document,  const char* p );
-	TIXML_STRING	value;
+  // used to be public
+  virtual void StreamOut ( TIXML_OSTREAM * out ) const;
+  /*	[internal use]
+   * Attribute parsing starts: First char of the text
+   * returns: next char past '>'
+   */
+  virtual const char* Parse( TiDocument* document,  const char* p );
+
+  TIXML_STRING value;
 };
 
 
-/** Always the top level node. A document binds together all the
-	XML pieces. It can be saved, loaded, and printed to the screen.
-	The 'value' of a document node is the xml file name.
-*/
+/**
+ * Always the top level node. A document binds together all the
+ * XML pieces. It can be saved, loaded, and printed to the screen.
+ * The 'value' of a document node is the xml file name.
+ */
 class TiDocument : public TiDocumentNodeChildren
 {
 public:
-	/// Interned strings.
-	csStringSet strings;
+  /// Interned strings.
+  csStringSet strings;
 
-	/// Create an empty document, that has no name.
-	TiDocument();
-	/// Create a document with a name. The name of the document is also the filename of the xml.
-	TiDocument( const char * documentName );
+  /// Create an empty document, that has no name.
+  TiDocument();
+  /**
+   * Create a document with a name. The name of the document is also the
+   * filename of the xml.
+   */
+  TiDocument( const char * documentName );
 
-	virtual ~TiDocument() {}
-	virtual int Type() const { return DOCUMENT; }
+  virtual ~TiDocument() {}
+  virtual int Type() const { return DOCUMENT; }
 
-	virtual const char * Value () const { return value.c_str (); }
-	virtual void SetValue (const char * _value) { value = _value;}
+  virtual const char * Value () const { return value.c_str (); }
+  virtual void SetValue (const char * _value) { value = _value;}
 
-	/** Load a file using the current document value.
-		Returns true if successful. Will delete any existing
-		document data before loading.
-	*/
-	bool LoadFile();
-	/// Save a file using the current document value. Returns true if successful.
-	bool SaveFile() const;
-	/// Load a file using the given filename. Returns true if successful.
-	bool LoadFile( const char * filename );
-	/// Save a file using the given filename. Returns true if successful.
-	bool SaveFile( const char * filename ) const;
+  /**
+   * Load a file using the current document value.
+   * Returns true if successful. Will delete any existing
+   * document data before loading.
+   */
+  bool LoadFile();
+  /// Save a file using the current document value. Returns true if successful.
+  bool SaveFile() const;
+  /// Load a file using the given filename. Returns true if successful.
+  bool LoadFile( const char * filename );
+  /// Save a file using the given filename. Returns true if successful.
+  bool SaveFile( const char * filename ) const;
 
-	/// Parse the given null terminated block of xml data.
-	virtual const char* Parse( TiDocument* document,  const char* p );
+  /// Parse the given null terminated block of xml data.
+  virtual const char* Parse( TiDocument* document,  const char* p );
 
-	/** Get the root element -- the only top level element -- of the document.
-		In well formed XML, there should only be one. TinyXml is tolerant of
-		multiple elements at the document level.
-	*/
-	TiXmlElement* RootElement() const		{ return FirstChildElement(); }
+  /**
+   * Get the root element -- the only top level element -- of the document.
+   * In well formed XML, there should only be one. TinyXml is tolerant of
+   * multiple elements at the document level.
+   */
+  TiXmlElement* RootElement() const { return FirstChildElement(); }
 
-	/// If, during parsing, a error occurs, Error will be set to true.
-	bool Error() const						{ return error; }
+  /// If, during parsing, a error occurs, Error will be set to true.
+  bool Error() const { return error; }
 
-	/// Contains a textual (english) description of the error if one occurs.
-	const char * ErrorDesc() const	{ return errorDesc.c_str (); }
+  /// Contains a textual (english) description of the error if one occurs.
+  const char * ErrorDesc() const { return errorDesc.c_str (); }
 
-	/** Generally, you probably want the error string ( ErrorDesc() ). But if you
-			prefer the ErrorId, this function will fetch it.
-		*/
-	const int ErrorId()	const				{ return errorId; }
+  /**
+   * Generally, you probably want the error string ( ErrorDesc() ). But if you
+   * prefer the ErrorId, this function will fetch it.
+   */
+  const int ErrorId() const { return errorId; }
 
-	/// If you have handled the error, it can be reset with this call.
-	void ClearError()						{ error = false; errorId = 0; errorDesc = ""; }
+  /// If you have handled the error, it can be reset with this call.
+  void ClearError() { error = false; errorId = 0; errorDesc = ""; }
 
-	/** Dump the document to standard out. */
-	void Print() const						{ Print( stdout, 0 ); }
+  /**
+   * Dump the document to standard out.
+   */
+  void Print() const { Print( stdout, 0 ); }
 
-	// [internal use]
-	virtual void Print( FILE* cfile, int depth = 0 ) const;
-	// [internal use]
-	void SetError( int err ) {		assert( err > 0 && err < TIXML_ERROR_STRING_COUNT );
-		error   = true;
-		errorId = err;
-	errorDesc = errorString[ errorId ]; }
+  // [internal use]
+  virtual void Print( FILE* cfile, int depth = 0 ) const;
+  // [internal use]
+  void SetError( int err )
+  {
+    error   = true;
+    errorId = err;
+    errorDesc = errorString[ errorId ];
+  }
 
 protected :
-	virtual void StreamOut ( TIXML_OSTREAM * out) const;
-	// [internal use]
-	virtual TiDocumentNode* Clone() const;
+  virtual void StreamOut ( TIXML_OSTREAM * out) const;
+  // [internal use]
+  virtual TiDocumentNode* Clone() const;
 
 private:
-	bool error;
-	int  errorId;
-	TIXML_STRING errorDesc;
-	TIXML_STRING	value;
+  bool error;
+  int  errorId;
+  TIXML_STRING errorDesc;
+  TIXML_STRING value;
 };
 
 #endif
