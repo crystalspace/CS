@@ -31,13 +31,13 @@ inline void csSymbolTable::SetParent (csSymbolTable *p)
   while ((s = (Symbol *) i.Next ())) SetSymbolSafe (s->Name, s->Val);
 }
 
-inline void csSymbolTable::PropogateSymbol (csStringID name, void *value)
+inline void csSymbolTable::PropagateSymbol (csStringID name, void *value)
 {
   for (int i = 0; i < Children.Length (); i++)
     Children[i]->SetSymbolSafe (name, value);
 }
 
-inline void csSymbolTable::PropogateDelete (csStringID name)
+inline void csSymbolTable::PropagateDelete (csStringID name)
 {
   for (int i = 0; i < Children.Length (); i++)
     Children[i]->DeleteSymbolSafe (name);
@@ -104,7 +104,7 @@ void csSymbolTable::SetSymbol (csStringID name, void *value)
   else
     Hash.Put (name, (csHashObject) new Symbol (name, value, true));
 
-  PropogateSymbol (name, value);
+  PropagateSymbol (name, value);
 }
 
 void csSymbolTable::SetSymbols (const csArray<csStringID> &names, csArray<void *> &values)
@@ -123,7 +123,7 @@ void csSymbolTable::SetSymbols (const csArray<csStringID> &names, csArray<void *
     else
       Hash.Put (name, (csHashObject) new Symbol (name, value, true));
 
-    PropogateSymbol (name, value);
+    PropagateSymbol (name, value);
   }
 }
 
@@ -143,7 +143,7 @@ void csSymbolTable::SetSymbols (csStringID *names, void **values, int len)
     else
       Hash.Put (name, (csHashObject) new Symbol (name, value, true));
 
-    PropogateSymbol (name, value);
+    PropagateSymbol (name, value);
   }
 }
 
@@ -153,7 +153,7 @@ bool csSymbolTable::DeleteSymbol (csStringID name)
   if (s && s->Auth)
   {
     Hash.DeleteAll (name);
-    PropogateDelete (name);
+    PropagateDelete (name);
     return true;
   }
   return false;
@@ -169,7 +169,7 @@ bool csSymbolTable::DeleteSymbols (const csArray<csStringID> &names)
     if (s && s->Auth)
     {
       Hash.DeleteAll (name);
-      PropogateDelete (name);
+      PropagateDelete (name);
     }
     else
       ok = false;
@@ -187,7 +187,7 @@ bool csSymbolTable::DeleteSymbols (csStringID *names, int len)
     if (s && s->Auth)
     {
       Hash.DeleteAll (name);
-      PropogateDelete (name);
+      PropagateDelete (name);
     }
     else
       ok = false;

@@ -45,10 +45,10 @@ protected:
   inline void SetParent (csSymbolTable *);
 
   /// Set the symbol in all children.
-  inline void PropogateSymbol (csStringID name, void *value);
+  inline void PropagateSymbol (csStringID name, void *value);
 
   /// Delete the symbol in all children.
-  inline void PropogateDelete (csStringID name);
+  inline void PropagateDelete (csStringID name);
 
   /// Same as SetSymbol only if there is not already a symbol with that name.
   inline void SetSymbolSafe (csStringID name, void *value);
