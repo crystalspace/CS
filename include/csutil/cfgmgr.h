@@ -46,7 +46,7 @@ public:
    * </ul>
    */
   csConfigManager(iConfigFile *DynamicDomain, bool Optimize);
-  /// delete this config manager
+  /// Delete this config manager.
   virtual ~csConfigManager();
 
   /// add a configuration domain
@@ -135,7 +135,12 @@ public:
   virtual bool Save (const char *iFileName, iVFS* = NULL);
 
   /// Delete all options and rewind all iterators.
-  virtual void Clear();
+  virtual void Clear ();
+
+  /**
+   * FlushRemoved() and delete all domains.
+   */
+  virtual void CleanUp ();
 
   /**
    * Enumerate selected keys.  If a subsection is given, only those keys which

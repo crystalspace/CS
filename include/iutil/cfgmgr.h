@@ -22,7 +22,7 @@
 #include "csutil/scf.h"
 #include "iutil/cfgfile.h"
 
-SCF_VERSION(iConfigManager, 0, 0, 1);
+SCF_VERSION(iConfigManager, 0, 0, 2);
 
 /**
  * The config manager is used to make a number of config file objects look
@@ -122,6 +122,11 @@ struct iConfigManager : public iConfigFile
 
   /// flush all removed config files (only required in optimize mode)
   virtual void FlushRemoved() = 0;
+
+  /**
+   * FlushRemoved() and delete all domains.
+   */
+  virtual void CleanUp () = 0;
 };
 
 #endif // __IUTIL_CFGMGR_H__

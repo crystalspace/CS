@@ -217,6 +217,11 @@ csConfigManager::csConfigManager(iConfigFile *dyn, bool opt)
 
 csConfigManager::~csConfigManager()
 {
+  CleanUp ();
+}
+
+void csConfigManager::CleanUp ()
+{
   FlushRemoved();
 
   csConfigDomain *i, *Next;
