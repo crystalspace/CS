@@ -71,7 +71,7 @@ int max_vertices;
 		csVector3 shift;
 int Xsize;
 int Ysize;
-float time;
+csTicks time;
 //---------------------drawing data
 csVector3* vertices;
 csVector2* texels;
