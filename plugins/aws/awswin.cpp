@@ -1,6 +1,5 @@
 #include "cssysdef.h"
 #include "awswin.h"
-#include "awsclip.h"
 #include "awslayot.h"
 #include "ivideo/graph2d.h"
 #include "ivideo/graph3d.h"
