@@ -51,9 +51,7 @@ enum
 class csRunnable
 {
 public:
-  /**
-   * Implement this interface and your implementation can be run in a thread.
-   */
+  /// Implement this method to allow your object to be run in a thread.
   virtual void Run () = 0;
 
   /* maybe we could add those for smoother exit/cancel/detroy operations
@@ -72,7 +70,7 @@ public:
 
 
 /**
- * A platform-independent thread object.
+ * Representation of a thread of executation.
  */
 class csThread : public csRefCount
 {
@@ -112,51 +110,133 @@ public:
 
 
 /**
- * A platform-independent mutual-exclusion object.
+ * A mutual-exclusion object.  A thread-safe lock.  Mutexes are often used to
+ * control access to one or more resources shared by multiple threads of
+ * execution.  A thread should access the shared resource(s) only after it has
+ * successfully locked the mutex; and it should unlock the mutex when it is
+ * done accessing the shared resource so that other threads may access it.
  */
 class csMutex : public csRefCount
 {
 public:
   /**
-   * This will create a Thread. Note that the mutexes on windows are always
-   * recursive (ie. the same thread is able to Lock the mutex multiple times)
-   * while on other platforms non recursive threads may be faster to implement.
-   * If you need recursive behaviour set needrecursive to true.
-   * Note: It seems Conditionals on linux only work with non-recursive
-   * mutexes.
+   * Create a mutex.  Note that the mutexes on Windows are always recursive
+   * (ie.  the same thread is able to Lock the mutex multiple times), while on
+   * other platforms non recursive threads may be the default since they are
+   * can be implemented more efficiently.  If you need recursive behaviour set
+   * needrecursive to true.  Note: It seems that "conditionals" on Linux only
+   * work with non-recursive mutexes.
    */
   static csRef<csMutex> Create (bool needrecursive = false);
+
+  /**
+   * Lock the mutex.  Suspends execution of the thread until the mutex can be
+   * locked.  Each LockWait() must be balanced by a call to Release().  Returns
+   * true if locking succeeded.  Returns false if locking failed for some
+   * catastrophic reason; check GetLastError().
+   */
   virtual bool LockWait() = 0;
+
+  /**
+   * Lock the mutex if not already locked by some other entity.  Does not
+   * suspend the thread waiting for the lock.  If lock succeeded, returns true.
+   * If lock failed, immediately returns false.  Each successful call to
+   * LockTry() must be balanced with a call to Release().
+   */
   virtual bool LockTry () = 0;
+
+  /**
+   * Unlock the mutex.  Each successful call to LockWait() or LockTry() must be
+   * balanced by a call to Release().  Returns true if unlocking succeeded.
+   * Returns false if unlocking failed for some catastrophic reason; check
+   * GetLastError().
+   */
   virtual bool Release () = 0;
+
+  /**
+   * Return the last error description, else 0 if there was none.
+   */
   virtual char const* GetLastError () = 0;
 };
 
 
 /**
- * A platform-independent semaphore object.
+ * A semaphore object.
  */
 class csSemaphore : public csRefCount
 {
 public:
-  static csRef<csSemaphore> Create (uint32 value);
+  /// Create a semaphore with some initial value.
+  static csRef<csSemaphore> Create (uint32 value = 0);
+
+  /**
+   * Lock the semaphore.  Suspends execution of the thread until the mutex can
+   * be locked.  Each LockWait() must be balanced by a call to Release().
+   * Returns true if locking succeeded.  Returns false if locking failed for
+   * some catastrophic reason; check GetLastError().
+   */
   virtual bool LockWait () = 0;
+
+  /**
+   * Lock the semaphore if not already locked by some other entity.  Does not
+   * suspend the thread waiting for the lock.  If lock succeeded, returns true.
+   * If lock failed, immediately returns false.  Each successful call to
+   * LockTry() must be balanced with a call to Release().
+   */
   virtual bool LockTry () = 0;
+
+  /**
+   * Unlock the semaphore.  Each successful call to LockWait() or LockTry()
+   * must be balanced by a call to Release().  Returns true if unlocking
+   * succeeded.  Returns false if unlocking failed for some catastrophic
+   * reason; check GetLastError().
+   */
   virtual bool Release () = 0;
+
+  /// Retrieve the present value of the semaphore.
   virtual uint32 Value () = 0;
+
+  /**
+   * Return the last error description, else 0 if there was none.
+   */
   virtual char const* GetLastError () = 0;
 };
 
 
 /**
- * A platform-independent condition object.
+ * A condition object.
  */
 class csCondition : public csRefCount
 {
 public:
+  /// Create a semaphore with specific condition attributes.
   static csRef<csCondition> Create (uint32 conditionAttributes = 0);
+
+  /**
+   * Wake up one or all threads waiting upon a change of condition.  If WakeAll
+   * is false, only one waiting thread will be awakened and given access to the
+   * associated mutex.  If WakeAll is true, all threads waiting on the
+   * condition will be awakened and will vie for the associated mutex.  Only
+   * one thread will win the mutex (thus gaining access to the condition); all
+   * other waiting threads will be re-suspended.
+   */
   virtual void Signal (bool WakeAll = false) = 0;
+
+  /**
+   * Wait for some change of condition.  Suspends the calling thread until some
+   * other thread invokes Signal() to notify a change of condition.  The caller
+   * must already hold a lock on the mutex before calling Wait(), and all
+   * threads waiting on the condition must be using the same mutex.  When
+   * called, Wait() releases the caller's lock on the mutex and suspends the
+   * caller's thread.  Upon return from Wait(), the caller's lock on the mutex
+   * is restored.  Returns true if the caller was wakened normally.  Returns
+   * false if the wait timed out.
+   */
   virtual bool Wait (csMutex*, csTicks timeout = 0) = 0;
+
+  /**
+   * Return the last error description, else 0 if there was none.
+   */
   virtual char const* GetLastError () = 0;
 };
 

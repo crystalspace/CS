@@ -34,6 +34,8 @@ chronological order.
 	  thus p->~T() should be safe.  If, however, we find that some
 	  compilers still complain about this notation, then we will have to
 	  pursue a more complicated solution.
+	- Eric Sunshine added a lot of missing Doxygen comments to csMutex,
+	  csSemaphore, and csCondition.
 18-Dec-2003
 	- Jorrit added two new methods to iAwsComponent. One to set the
 	  preferred size and one to clear it again. This way one can forcibly
