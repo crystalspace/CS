@@ -1,15 +1,26 @@
 /*
- *  Object converter/optimizer
- *  Author: Luca Pancallo
- */
+    Crystal Space 3ds2lev xml writer
+    Copyright (C) 2001,2002 by Luca Pancallo and Matze Braun
+
+    This library is free software; you can redistribute it and/or
+    modify it under the terms of the GNU Library General Public
+    License as published by the Free Software Foundation; either
+    version 2 of the License, or (at your option) any later version.
+
+    This library is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+    Library General Public License for more details.
+
+    You should have received a copy of the GNU Library General Public
+    License along with this library; if not, write to the Free
+    Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+*/
 #include "cssysdef.h"
+
 #include <stdlib.h>
 #include <ctype.h>
 #include <math.h>
-#include "3dsout.h"
-#include "3ds2lev.h"
-
-#include "csutil/datastrm.h"
 
 // includes for lib3ds
 #include <lib3ds/camera.h>
@@ -22,31 +33,32 @@
 #include <lib3ds/node.h>
 #include <lib3ds/vector.h>
 
-// ~end new implementation ---------
+#include <csutil/scfstr.h>
+
+#include "levelwriter.h"
 
 CS_IMPLEMENT_APPLICATION
 
-// Default object name to set as public label
-#define DEFNAME "world"
+enum
+{
+  FLAG_VERBOSE	= 0x0001,
+  FLAG_LIST     = 0x0002,    /* List all objects in this 3ds     */
+};
 
-float roundFloat (float f);
-
-int flags = 0;
-// middle looking output
-int looknice = 5;
-
-#define MODE_XYZ 0
-#define MODE_XZY 1
-#define MODE_YXZ 2
-#define MODE_YZX 3
-#define MODE_ZXY 4
-#define MODE_ZYX 5
-int mode_xyz = MODE_XYZ;
+enum xyzmode
+{
+  MODE_XYZ = 0,
+  MODE_XZY = 1,
+  MODE_YXZ = 2,
+  MODE_YZX = 3,
+  MODE_ZXY = 4,
+  MODE_ZYX = 5
+};
 
 /**
  * Simply switch x,y,z coord depending on the selected MODE_XYZ
  */
-void ConvertXYZ (float& x, float& y, float& z)
+void ConvertXYZ (xyzmode mode_xyz, float& x, float& y, float& z)
 {
   float sw;
   switch (mode_xyz)
@@ -65,7 +77,7 @@ void ConvertXYZ (float& x, float& y, float& z)
  * All vertexes and triangles are affected.
  * All lights are affected.
  */
-void Lib3dsConvertXYZ (Lib3dsFile* p3dsFile)
+void Lib3dsConvertXYZ (Lib3dsFile* p3dsFile, xyzmode mode)
 {
 
   // TODO: should be done for -center option. actually not supported.
@@ -94,7 +106,7 @@ void Lib3dsConvertXYZ (Lib3dsFile* p3dsFile)
         xyz = pCurPoint->pos;
 
         // Convert the vertex coords
-        ConvertXYZ (xyz[0], xyz[1], xyz[2]);
+        ConvertXYZ (mode, xyz[0], xyz[1], xyz[2]);
 
         // go to next vertex
         pCurPoint++;
@@ -110,7 +122,7 @@ void Lib3dsConvertXYZ (Lib3dsFile* p3dsFile)
       float v1 = pCurFace->points[0];
       float v2 = pCurFace->points[1];
       float v3 = pCurFace->points[2];
-      ConvertXYZ (v1, v2, v3);
+      ConvertXYZ (mode, v1, v2, v3);
       pCurFace->points[0] = (short unsigned int)v1;
       pCurFace->points[1] = (short unsigned int)v2;
       pCurFace->points[2] = (short unsigned int)v3;
@@ -127,151 +139,26 @@ void Lib3dsConvertXYZ (Lib3dsFile* p3dsFile)
   Lib3dsLight *pCurLight = p3dsFile->lights;
 
   while (pCurLight) {
-
-    ConvertXYZ (pCurLight->position[0], pCurLight->position[1], pCurLight->position[2]);
+    ConvertXYZ (mode, pCurLight->position[0], pCurLight->position[1], pCurLight->position[2]);
 
     pCurLight = pCurLight->next;
   }
-
 }
-
-
-/**
- * Actually not used: must be redone for Lib3dsFile
-void FindCentrePoints (H3dsScene * scene, Lib3dsFile* p3dsFile)
-{
-
-  float32 xmino= 1e30, ymino= 1e30, zmino= 1e30;
-  float32 xmaxo=-1e30, ymaxo=-1e30, zmaxo=-1e30;
-  int n, v;
-  for (n=0; n<scene->meshobjs; n++)
-  {
-    float32 xmin= 1e30, ymin= 1e30, zmin= 1e30;
-    float32 xmax=-1e30, ymax=-1e30, zmax=-1e30;
-    H3dsMeshObj * mo = &scene->meshobjlist[n];
-    for (v=0; v<mo->verts; v++)
-    {
-      H3dsVert * vrt=&mo->vertlist[v];
-      if (vrt->x > xmax) xmax=vrt->x;
-      if (vrt->x < xmin) xmin=vrt->x;
-      if (vrt->y > ymax) ymax=vrt->y;
-      if (vrt->y < ymin) ymin=vrt->y;
-      if (vrt->z > zmax) zmax=vrt->z;
-      if (vrt->z < zmin) zmin=vrt->z;
-    }
-    mo->centre.x = xmax-(xmax-xmin)*0.5;
-    mo->centre.y = ymax-(ymax-ymin)*0.5;
-    mo->centre.z = zmax-(zmax-zmin)*0.5;
-
-    if (mo->centre.x > xmaxo) xmaxo=mo->centre.x;
-    if (mo->centre.x < xmino) xmino=mo->centre.x;
-    if (mo->centre.y > ymaxo) ymaxo=mo->centre.y;
-    if (mo->centre.y < ymino) ymino=mo->centre.y;
-    if (mo->centre.z > zmaxo) zmaxo=mo->centre.z;
-    if (mo->centre.z < zmino) zmino=mo->centre.z;
-  }
-  scene->centre.x = xmaxo-(xmaxo-xmino)*0.5;
-  scene->centre.y = ymaxo-(ymaxo-ymino)*0.5;
-  scene->centre.z = zmaxo-(zmaxo-zmino)*0.5;
-}
-*/
-
-/**
- * Used by FindCentrePoints()
-void FindExchange (H3dsScene * scene, int find, int exchange)
-{
-  // Find all references to the 'find' vertice and replace
-  // them with references to the 'exchange' vertice
-  int o, f;
-  for (o=0; o<scene->meshobjs; o++)
-  {
-    H3dsMeshObj * mo = &scene->meshobjlist[o];
-    for (f=0; f<mo->faces; f++)
-    {
-      H3dsFace * fa = &mo->facelist[f];
-      if(fa->p0 == find) fa->p0 = exchange;
-      if(fa->p1 == find) fa->p1 = exchange;
-      if(fa->p2 == find) fa->p2 = exchange;
-    }
-  }
-}
- */
-
-/**
- * Actually not used: must be redone for Lib3dsFile
-void AdjustFaceIndexes (H3dsScene * scene)
-{
-  int m=0, f, n;
-  for (n=0; n<scene->meshobjs; n++)
-  {
-    H3dsMeshObj * mo = &scene->meshobjlist[n];
-    for (f=0; f<mo->faces; f++)
-    {
-      H3dsFace * fa = &mo->facelist[f];
-      fa->p0 += m;
-      fa->p1 += m;
-      fa->p2 += m;
-    }
-    m+=mo->verts;
-  }
-}
- */
-
-/**
- * Actually not used: must be redone for Lib3dsFile
-void CollectVertsAndMaps (H3dsScene * scene, H3dsMapVert * vrtmap)
-{
-  int vn=0, mn, v, n, m, mmn;
-  for (n=0; n<scene->meshobjs; n++)
-  {
-    H3dsMeshObj * mo = &scene->meshobjlist[n];
-    mn=vn;
-    for (v=0; v<mo->verts; v++)
-    {
-      vrtmap[vn].ix=mo->vertlist[v].ix;
-      vrtmap[vn].iy=mo->vertlist[v].iy;
-      vrtmap[vn].iz=mo->vertlist[v].iz;
-      vn++;
-    }
-    for (m=0; m<mo->maps; m++)
-    {
-      vrtmap[mn].iu=mo->maplist[m].u;
-      vrtmap[mn].iv=
-        (flags & FLAG_SWAP_V ? 1.-mo->maplist[m].v : mo->maplist[m].v);
-      mn++;
-    }
-    if (mn<vn)
-    {
-      if (flags & FLAG_VERBOSE)
-        fprintf(stderr, "%-14s missing mapping, set to zero...\n",
-            mo->name);
-      for (mmn=mn; mmn<vn; mmn++)
-      {
-        vrtmap[mmn].iu=0;
-        vrtmap[mmn].iv=0;
-      }
-    }
-  }
-}
- */
 
 /**
  * Main function
  */
 int main (int argc, char * argv[])
 {
-  char * infn=0, * outfn=0, * name=DEFNAME;
-  FILE * outf;
-  int n;
+  char * infn=0, * outfn=0;
   float xscale = 1, yscale = 1, zscale = 1;
   float xrelocate = 0, yrelocate = 0, zrelocate = 0;
+  xyzmode mode_xyz = MODE_XZY;
+  int flags = 0;
+  LevelWriter writer;
 
   flags = 0;
-  int modelnum = -1;
-  mode_xyz = MODE_XZY;
-  flags |= FLAG_SWAP_V; // default to lower left texture origin
-  /*flags |= FLAG_REMOVEDOUBLEVERTICES;
-  flags |= FLAG_COMBINEFACES;*/
+  writer.SetFlags (LevelWriter::FLAG_SWAP_V); // default to lower left texture origin
 
   argc--;
   argv++;
@@ -282,20 +169,16 @@ int main (int argc, char * argv[])
          "3D Studio native objectfile converter v2.0\n"
          "originally by Mats Byggmastar 1996 Espoo, Finland.\n"
 	 "This version is for Crystal Space and heavily modified by\n"
-	 "Jorrit Tyberghein and Luca Pancallo.\n"
-         "Use:  %s [params...] inputfile.3DS [outputfile]\n"
+	 "Jorrit Tyberghein, Luca Pancallo and Matze Braun.\n"
+         "Use:  %s [params...] inputfile.3ds\n"
                "params:\n"
-               " -o name   Object name (default '"DEFNAME"')\n"
+	       " -o file   Name of the output file\n"
                " -v        Verbose mode on\n"
-               " -vv       Very verbose mode on\n"
                " -l        Don't convert but list objects in 3ds file\n"
-	       " -n	   optimize (combine every two triangles into polys)\n"
-	       " -w level  Output nice level from 0 small to 10 best looking\n"
+	       " -c	   optimize (combine every two triangles into polys)\n"
                " -r x y z  Relocate objects (x,y,z = floats)\n"
                " -pl       Make polygons lit\n"
-               " -f        Don't ask for file overwrite (force)\n"
                " -3        Output 3D sprite instead of level\n"
-               " -m num    Output only one object from 3DS (use -l to list)\n"
 	       " -tl       Make texture origin lower left (default)\n"
 	       " -xyz      Convert model xyz -> CS xyz\n"
 	       " -xzy      Convert model xyz -> CS xzy (default)\n"
@@ -309,15 +192,19 @@ int main (int argc, char * argv[])
   }
 
   // Get the parameters and filenames
-  for (n=0; n<argc; n++)
+  for (int n=0; n<argc; n++)
   {
     if (argv[n][0] == '-' || argv[n][0] == '/')
     {
       switch (toupper(argv[n][1]))
       {
-        case 'O': if (n+1<argc) name=argv[++n];
-                  else { fprintf (stderr, "Missing object name!\n");
-                    return 1; }
+	case 'O': if (n+1<argc) 
+		    outfn=argv[++n];
+		  else
+		  { 
+	      	    fprintf (stderr, "Missing outputfile name!\n");
+      		    return 1;
+		  }
 		  break;
         case 'R': if (n+3<argc)
 		  {
@@ -346,27 +233,17 @@ int main (int argc, char * argv[])
         case 'P':
 	          if (toupper (argv[n][2]) == 'L')
 		  {
-		    flags |= FLAG_LIGHTING;
+		    writer.SetFlags (LevelWriter::FLAG_LIGHTING);
 		  }
 		  break;
-        case 'V': flags |= FLAG_VERBOSE;
-	          if (toupper (argv[n][2]) == 'V')
-		  {
-		    flags |= FLAG_VERYVERBOSE;
-		  }
+	case 'V': writer.SetFlags(LevelWriter::FLAG_VERBOSE);
+		  flags |= FLAG_VERBOSE;
 		  break;
         case 'T': if (toupper (argv[n][2]) == 'L')
-		    flags |= FLAG_SWAP_V;
+		    writer.SetFlags (LevelWriter::FLAG_SWAP_V);
 		  break;
-	case 'C': flags |= FLAG_CENTRE; break;
-	case 'F': flags |= FLAG_OVERWR; break;
-	case '3': flags |= FLAG_SPRITE; break;
+	case '3': writer.SetFlags (LevelWriter::FLAG_SPRITE); break;
 	case 'L': flags |= FLAG_LIST; break;
-        case 'M': if (n+1<argc) sscanf (argv[++n], "%d", &modelnum);
-                  else { fprintf (stderr, "Missing model number!\n");
-                    return 1; }
-		  flags |= FLAG_MODEL;
-		  break;
 	case 'X': if (toupper (argv[n][2]) == 'Y')
 		    mode_xyz = MODE_XYZ;
 		  else
@@ -382,14 +259,9 @@ int main (int argc, char * argv[])
 		  else
 		    mode_xyz = MODE_ZYX;
 		  break;
-	case 'N': 
-		  flags |= FLAG_COMBINEFACES;
-		  flags |= FLAG_REMOVEDOUBLEVERTICES;
-		  break;
-	case 'W':
-		  looknice = atoi(argv[++n]);
-		  if (looknice < 0 || looknice > 10)
-		    fprintf (stderr, "Bad param: looknice not in range 0-10\n");
+	case 'C': 
+		  writer.SetFlags(LevelWriter::FLAG_COMBINEFACES);
+		  writer.SetFlags(LevelWriter::FLAG_REMOVEDOUBLEVERTICES);
 		  break;
 	default:  fprintf (stderr, "Bad param: %s\n",argv[n]);
 		  return 1;
@@ -399,11 +271,9 @@ int main (int argc, char * argv[])
     {
       if (!infn)
         infn = argv[n];
-      else if (!outfn)
-        outfn = argv[n];
-      else
+      else 
       {
-	fprintf (stderr, "Too many filenames!\n");
+	fprintf (stderr, "Too many filenames (can only convert 1 file at once!\n");
         return 1;
       }
     }
@@ -417,107 +287,72 @@ int main (int argc, char * argv[])
 
   // <--------- finished parsing parameters ----------->
 
-
-  // <--------- opening input and output files--------->
-
   // Read inputfile
-  Lib3dsFile *p3dsFile = lib3ds_file_load(infn);
-  if (!p3dsFile ) {
+  Lib3dsFile* file3ds = lib3ds_file_load(infn);
+  if (!file3ds ) {
     fprintf (stderr, "Failed to open %s\n", infn);
     return 1;
   }
 
-  // Open, create or redirect outputfile
-  if (!(flags & FLAG_LIST) && outfn)
-  {
-    if ((outf = fopen(outfn, "r+b")) != 0)
-    {
-      if ((flags & FLAG_OVERWR) == 0)
-      {
-        fprintf (stderr, "%s exists; overwrite? [y/n] ", outfn);
-        fflush (stdout);
-        if (toupper(getc(stdin)) != 'Y')
-        {
-          fclose (outf);
-          //fclose (inf);
-          return 0;
-        }
-        fprintf (stderr, "\n");
-        fclose (outf);
-        if ((outf = fopen(outfn, "w+b")) == 0)
-        {
-          fprintf (stderr, "Unable to reopen %s\n", outfn);
-          //fclose (inf);
-          return 1;
-        }
-      }
-    }
-    else
-    {
-      if ((outf = fopen(outfn, "w+b")) == 0)
-      {
-        fprintf (stderr, "Unable to create %s\n", outfn);
-        //fclose (inf);
-        return 1;
-      }
-    }
-  }
-  else
-  {
-    // Use stdout if not binary output and no outputfile was specified.
-    outf = stdout;
-  }
-
-  // <--------- finished opening input and output files--------->
-
-  /* Centering: currently not supported
-  FindCentrePoints (scene);
-  if (flags & FLAG_CENTRE)
-    Move (scene, -scene->centre.x, -scene->centre.y, -scene->centre.z);
-  */
-
   // swap xyz if requested
   if (mode_xyz != MODE_XYZ)
-    Lib3dsConvertXYZ (p3dsFile);
+    Lib3dsConvertXYZ (file3ds, mode_xyz);
 
   // Print some interesting information about what we have
-  if (flags & FLAG_VERBOSE)
+  if (flags & FLAG_LIST || flags & FLAG_VERBOSE)
   {
     // fprintf (stderr, "3DS data size: %ld byte\n", size);
-    fprintf (stderr, "3DS name: %s\n", p3dsFile->name);
-    fprintf (stderr, "lights: %s\n", p3dsFile->lights ? "yes" : "no");
+    fprintf (stderr, "3DS name: %s\n", file3ds->name);
+    fprintf (stderr, "lights: %s\n", file3ds->lights ? "yes" : "no");
     fprintf (stderr, "object-name     faces vertices  maps  matrix\n");
 
     // set the current mesh to the first in the file
-    Lib3dsMesh *p3dsMesh = p3dsFile->meshes;
+    Lib3dsMesh* mesh3ds = file3ds->meshes;
     // as long as we have a valid mesh...
-    while( p3dsMesh )
+    while( mesh3ds )
     {
         // get the numbers in the current mesh
         fprintf(stderr, "===================================================\n");
         fprintf(stderr, "%-14s  %5ld  %5ld  %5d    %s\n",
-              p3dsMesh->name, p3dsMesh->faces, p3dsMesh->points, -1, " ");
+              mesh3ds->name, mesh3ds->faces, mesh3ds->points, -1, " ");
 
         // go to next mesh
-        p3dsMesh = p3dsMesh->next;
+        mesh3ds = mesh3ds->next;
     }
   }
 
-  // create writer
-  CSWriter writer(outf, p3dsFile);
-  writer.SetScale(xscale, yscale, zscale);
-  writer.SetTranslate(xrelocate, yrelocate, zrelocate);
+  // setup writer
+  writer.Set3dsFile (file3ds);
+  writer.SetScale (xscale, yscale, zscale);
+  writer.SetTranslate (xrelocate, yrelocate, zrelocate);
 
-  // Output data in CS format
-  if (!(flags & FLAG_LIST))
-  {
+  if (flags & FLAG_VERBOSE)
     fprintf (stderr, "Writing output in CS format...");
-    writer.WriteHeader ();
-    writer.WriteObjects (flags & FLAG_LIGHTING);
-    writer.WriteFooter ();
-
-    fprintf (stderr, "done! \n");
+  
+  csRef<iDocument> document = writer.WriteDocument ();
+  iString* str = new scfString;
+  document->Write (str);
+  
+  if (outfn)
+  {
+    // Write file to disk
+    FILE* outfile = fopen (outfn, "w");
+    if (!outfile)
+    {    
+      fprintf (stderr, "Couldn't open output file '%s'!\n", outfn);
+      return 1;
+    }
+    fwrite (str->GetData(), 1, str->Length(), outfile);
+    fclose (outfile);
   }
+  else
+  {
+    // Write file to stdout
+    printf ("%s", str->GetData());
+  }
+  
+  if (flags & FLAG_VERBOSE)
+    fprintf (stderr, "done! \n");
 
   return 0;
 }
