@@ -208,7 +208,7 @@ void csStarsMeshObject::DrawStarBox (iRenderView* rview,
     DrawPoint(rview, screenpos, starcolor, zbufmode);
     drawn++;
   }
-  printf("drawn is %d\n", drawn);
+  //printf("drawn is %d\n", drawn);
 
 }
 
