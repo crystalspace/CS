@@ -1,3 +1,21 @@
+/**************************************************************************
+    Copyright (C) 2003 by Christopher Nelson
+
+    This library is free software; you can redistribute it and/or
+    modify it under the terms of the GNU Library General Public
+    License as published by the Free Software Foundation; either
+    version 2 of the License, or (at your option) any later version.
+
+    This library is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+    Library General Public License for more details.
+
+    You should have received a copy of the GNU Library General Public
+    License along with this library; if not, write to the Free
+    Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+*****************************************************************************/
+
 #include "cssysdef.h"
 #include "iutil/string.h"
 #include "csutil/scfstr.h"
@@ -35,7 +53,7 @@ iAwsKey *awsKeyContainer::Find (unsigned long idname)
   int i;
   for (i = 0; i < children.Length (); ++i)
   {
-    iAwsKey *key = STATIC_CAST (iAwsKey *, children[i]);
+    iAwsKey *key = children[i];
 
     if (aws_debug)
       printf ("aws-debug: item %d=%lu ? %lu\n", i, key->Name (), idname);
@@ -66,19 +84,12 @@ void awsKeyContainer::Remove (const char* name)
 
 void awsKeyContainer::Remove (iAwsKey* key)
 {
-  children.Delete ((void*) key);
-  key->DecRef();
+  children.Delete (key);
 }
 
 void awsKeyContainer::RemoveAll ()
 {
-  int i;
-  for (i=0; i < children.Length (); i++)
-  {
-    iAwsKey *k= STATIC_CAST (iAwsKey *, children[i]);
-    children.Delete ((void*) k);
-    k->DecRef();
-  }
+  children.DeleteAll ();
 }
 
 void awsKeyContainer::Consume (iAwsKeyContainer *c)

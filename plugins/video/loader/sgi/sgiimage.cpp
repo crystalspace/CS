@@ -52,7 +52,7 @@ csSGIImageIO::csSGIImageIO (iBase *pParent)
   formats.Push (&formatlist[1]);
 }
 
-const csVector& csSGIImageIO::GetDescription ()
+const csImageIOFileFormatDescriptions& csSGIImageIO::GetDescription ()
 {
   return formats;
 }

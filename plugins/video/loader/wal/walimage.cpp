@@ -79,7 +79,7 @@ csWALImageIO::csWALImageIO (iBase *pParent)
   formats.Push (&formatlist[0]);
 }
 
-const csVector& csWALImageIO::GetDescription ()
+const csImageIOFileFormatDescriptions& csWALImageIO::GetDescription ()
 {
   return formats;
 }

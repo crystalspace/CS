@@ -93,15 +93,16 @@ bool csMultiplexImageIO::Initialize (iObjectRegistry *object_reg)
   return false;
 }
 
-void csMultiplexImageIO::StoreDesc (const csVector& format)
+void csMultiplexImageIO::StoreDesc (
+	const csImageIOFileFormatDescriptions& format)
 {
   // add the formats coming in to our ever growing list
   int i;
   for (i=0; i < format.Length (); i++)
-    formats.Push ((void*)format.Get (i));
+    formats.Push (format[i]);
 }
 
-const csVector& csMultiplexImageIO::GetDescription ()
+const csImageIOFileFormatDescriptions& csMultiplexImageIO::GetDescription ()
 {
   return formats;
 }

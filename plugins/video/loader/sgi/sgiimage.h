@@ -6,7 +6,6 @@
 #include "iutil/eventh.h"
 #include "iutil/comp.h"
 #include "iutil/databuff.h"
-#include "csutil/csvector.h"
 
 /**
  * The SGI image file format loader.
@@ -14,7 +13,7 @@
 class csSGIImageIO : public iImageIO
 {
  protected:
-  csVector formats;
+  csImageIOFileFormatDescriptions formats;
 
  public:
   SCF_DECLARE_IBASE;
@@ -22,7 +21,7 @@ class csSGIImageIO : public iImageIO
   csSGIImageIO (iBase *pParent);
   virtual ~csSGIImageIO () {}
 
-  virtual const csVector& GetDescription ();
+  virtual const csImageIOFileFormatDescriptions& GetDescription ();
   virtual csPtr<iImage> Load (uint8* iBuffer, uint32 iSize, int iFormat);
   virtual void SetDithering (bool iEnable);
   virtual csPtr<iDataBuffer> Save (iImage* image, const char* mime,

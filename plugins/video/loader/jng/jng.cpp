@@ -119,7 +119,7 @@ csJNGImageIO::csJNGImageIO (iBase *pParent)
   formats.Push (&formatlist[1]);
 }
 
-const csVector& csJNGImageIO::GetDescription ()
+const csImageIOFileFormatDescriptions& csJNGImageIO::GetDescription ()
 {
   return formats;
 }

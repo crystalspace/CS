@@ -81,7 +81,7 @@ public:
 			     const char *polyname);
   virtual  bool ParsePortal (iDocumentNode* node, iLoaderContext* ldr_context,
 		  	   iPolygon3DStatic* poly_3d,
-		  	   csVector &flags, bool &mirror,
+		  	   uint32 &flags, bool &mirror,
   			   bool& warp, int& msv,
 			   csMatrix3 &m, csVector3 &before,
 			   csVector3 &after);

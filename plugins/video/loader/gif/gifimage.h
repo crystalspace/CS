@@ -24,7 +24,6 @@
 #include "iutil/eventh.h"
 #include "iutil/comp.h"
 #include "iutil/databuff.h"
-#include "csutil/csvector.h"
 
 /**
  * The GIF image file format loader.
@@ -32,7 +31,7 @@
 class csGIFImageIO : public iImageIO
 {
  protected:
-  csVector formats;
+  csImageIOFileFormatDescriptions formats;
 
  public:
   SCF_DECLARE_IBASE;
@@ -40,7 +39,7 @@ class csGIFImageIO : public iImageIO
   csGIFImageIO (iBase *pParent);
   virtual ~csGIFImageIO () {}
 
-  virtual const csVector& GetDescription ();
+  virtual const csImageIOFileFormatDescriptions& GetDescription ();
   virtual csPtr<iImage> Load (uint8* iBuffer, uint32 iSize, int iFormat);
   virtual void SetDithering (bool iEnable);
   virtual csPtr<iDataBuffer> Save (iImage *image, const char *mime = 0,

@@ -48,7 +48,7 @@ bool csDDSImageIO::Initialize (iObjectRegistry* )
   return true;
 }
 
-const csVector& csDDSImageIO::GetDescription ()
+const csImageIOFileFormatDescriptions& csDDSImageIO::GetDescription ()
 {
   return formats;
 }

@@ -12,6 +12,13 @@ for each given day, however, are in normal (ascending) chronological order.
 	- Anders Stenberg added two new render steps. "target" and
 	  "fullscreenquad". (Apparantly I somehow failed to add them
 	  last time I claimed to do so.)
+	- Jorrit replaced the 'flags' vector in ParsePortal (syntax services)
+	  with a uint32 flags.
+	- Jorrit replaced the return vector of iImageIO->GetDescription()
+	  with an csArray (typedef csImageIOFileFormatDescriptions). Changed
+	  all image loading plugins accordingly.
+	- Jorrit replaced the basic vector return in
+	  iAwsKeyContainer::Children() with a const csRefArray<iAwsKey>.
 29-Jul-2003
 	- Jorrit made scfStringArray actually work by adding the needed
 	  SCF_CONSTRUCT stuff.

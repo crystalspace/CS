@@ -51,7 +51,7 @@ csGIFImageIO::csGIFImageIO (iBase *pParent)
   formats.Push (&formatlist[1]);
 }
 
-const csVector& csGIFImageIO::GetDescription ()
+const csImageIOFileFormatDescriptions& csGIFImageIO::GetDescription ()
 {
   return formats;
 }

@@ -26,7 +26,6 @@
 #include "igraphic/imageio.h"
 
 #include "csutil/refarr.h"
-#include "csutil/csvector.h"
 #include "dds.h"
 
 struct iObjectRegistry;
@@ -39,7 +38,7 @@ public:
   csDDSImageIO (iBase* parent);
   virtual ~csDDSImageIO ();
 
-  virtual const csVector& GetDescription ();
+  virtual const csImageIOFileFormatDescriptions& GetDescription ();
   virtual csPtr<iImage> Load (uint8* buffer, uint32 size, int format);
   virtual void SetDithering (bool dithering);
   virtual csPtr<iDataBuffer> Save (iImage* image, const char* mime,
@@ -50,7 +49,7 @@ public:
   virtual bool Initialize (iObjectRegistry* objreg);
 
 private:
-  csVector formats;
+  csImageIOFileFormatDescriptions formats;
 };
 
 class csDDSImageFile : public csImageFile

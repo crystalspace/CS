@@ -148,7 +148,7 @@ static int list_supported_formats (iObjectRegistry *r)
   const char *mask =
     "%-20s %-40s %-5s %-5s\n";
 
-  const csVector& descr = ImageLoader->GetDescription ();
+  const csImageIOFileFormatDescriptions& descr = ImageLoader->GetDescription ();
   int i;
   printf (mask, "MIME", "description", "load?", "save?");
   printf (mask, "----", "-----------", "-----", "-----");

@@ -127,7 +127,7 @@ csTGAImageIO::csTGAImageIO (iBase *pParent)
   formats.Push (&formatlist[5]);
 }
 
-const csVector& csTGAImageIO::GetDescription ()
+const csImageIOFileFormatDescriptions& csTGAImageIO::GetDescription ()
 {
   return formats;
 }

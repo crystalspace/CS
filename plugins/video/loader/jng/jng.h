@@ -26,7 +26,6 @@
 #include "iutil/comp.h"
 #include "iutil/databuff.h"
 #include "iutil/virtclk.h"
-#include "csutil/csvector.h"
 #include "csutil/memfile.h"
 
 /**
@@ -35,7 +34,7 @@
 class csJNGImageIO : public iImageIO
 {
  protected:
-  csVector formats;
+  csImageIOFileFormatDescriptions formats;
   iObjectRegistry* object_reg;
 
  private:
@@ -54,7 +53,7 @@ class csJNGImageIO : public iImageIO
   csJNGImageIO (iBase *pParent);
   virtual ~csJNGImageIO (){}
 
-  virtual const csVector& GetDescription ();
+  virtual const csImageIOFileFormatDescriptions& GetDescription ();
   virtual csPtr<iImage> Load (uint8* iBuffer, uint32 iSize, int iFormat);
   virtual void SetDithering (bool iEnable);
   virtual csPtr<iDataBuffer> Save (iImage *image, const char *mime = 0,

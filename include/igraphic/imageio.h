@@ -29,9 +29,9 @@
  */
 
 #include "csutil/scf.h"
+#include "csutil/array.h"
 struct iImage;
 struct iDataBuffer;
-class csVector;
 
 SCF_VERSION (iImageIO, 1, 0, 0);
 
@@ -51,6 +51,10 @@ struct csImageIOFileFormatDescription
   int cap;
 };
 
+/// Description for the array of file formats.
+typedef csArray<csImageIOFileFormatDescription*>
+	csImageIOFileFormatDescriptions;
+
 /**
  * The iImageIO interface is used to save and load graphic files.
  */
@@ -62,7 +66,7 @@ struct iImageIO : public iBase
   /**
    * Propagate the image fileformats handled by this plugin.
    */
-  virtual const csVector& GetDescription () = 0;
+  virtual const csImageIOFileFormatDescriptions& GetDescription () = 0;
 
   /**
    * Load an image from a buffer.<p>

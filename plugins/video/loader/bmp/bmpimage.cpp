@@ -159,7 +159,7 @@ csBMPImageIO::csBMPImageIO (iBase *pParent)
   formats.Push (&formatlist[2]);
 }
 
-const csVector& csBMPImageIO::GetDescription ()
+const csImageIOFileFormatDescriptions& csBMPImageIO::GetDescription ()
 {
   return formats;
 }

@@ -20,7 +20,6 @@
 #include "cssysdef.h"
 #include "syntxldr.h"
 #include "csutil/ref.h"
-#include "csutil/csvector.h"
 #include "csutil/cscolor.h"
 #include "csutil/scanstr.h"
 #include "csutil/util.h"
@@ -621,7 +620,7 @@ bool csTextSyntaxService::ParseTextureMapping (
 bool csTextSyntaxService::ParsePortal (
 	iDocumentNode* node, iLoaderContext* ldr_context,
 	iPolygon3DStatic* poly3d,
-	csVector &flags, bool &mirror, bool &warp, int& msv,
+	uint32 &flags, bool &mirror, bool &warp, int& msv,
 	csMatrix3 &m, csVector3 &before, csVector3 &after)
 {
   csRef<iDocumentNodeIterator> it = node->GetNodes ();
@@ -657,16 +656,16 @@ bool csTextSyntaxService::ParsePortal (
 	  return false;
         break;
       case XMLTOKEN_STATIC:
-        flags.Push ((void*)CS_PORTAL_STATICDEST);
+        flags |= CS_PORTAL_STATICDEST;
         break;
       case XMLTOKEN_FLOAT:
-        flags.Push ((void*)CS_PORTAL_FLOAT);
+        flags |= CS_PORTAL_FLOAT;
         break;
       case XMLTOKEN_ZFILL:
-        flags.Push ((void*)CS_PORTAL_ZFILL);
+        flags |= CS_PORTAL_ZFILL;
         break;
       case XMLTOKEN_CLIP:
-        flags.Push ((void*)CS_PORTAL_CLIPDEST);
+        flags |= CS_PORTAL_CLIPDEST;
         break;
       case XMLTOKEN_SECTOR:
 	{
@@ -796,7 +795,7 @@ bool csTextSyntaxService::ParsePoly3d (
           csMatrix3 m_w; m_w.Identity ();
           csVector3 v_w_before (0, 0, 0);
           csVector3 v_w_after (0, 0, 0);
-	  csVector flags;
+	  uint32 flags = 0;
 	  bool do_warp = false;
 	  int msv = -1;
 
@@ -804,8 +803,7 @@ bool csTextSyntaxService::ParsePoly3d (
 	      poly3d, flags, do_mirror, do_warp, msv,
 	      m_w, v_w_before, v_w_after))
 	  {
-	    for (int i = 0; i < flags.Length (); i++)
-	      poly3d->GetPortal ()->GetFlags ().Set ((uint)flags.Get (i));
+	    poly3d->GetPortal ()->GetFlags ().Set (flags);
 
 	    if (do_mirror)
 	    {

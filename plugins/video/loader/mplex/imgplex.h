@@ -25,7 +25,6 @@
 #include "iutil/comp.h"
 #include "iutil/databuff.h"
 #include "iutil/plugin.h"
-#include "csutil/csvector.h"
 #include "csutil/cfgacc.h"
 #include "csutil/refarr.h"
 
@@ -37,13 +36,13 @@ class csMultiplexImageIO : public iImageIO
 {
  protected:
   csRefArray<iImageIO> list;
-  csVector formats;
+  csImageIOFileFormatDescriptions formats;
   csConfigAccess config;
   csRef<iStringArray> classlist;
   csRef<iPluginManager> plugin_mgr;
   bool global_dither;
 
-  void StoreDesc (const csVector& format);
+  void StoreDesc (const csImageIOFileFormatDescriptions& format);
   /**
    * load the next plugin in the class list
    * returns true if more plugins are in the list
@@ -57,7 +56,7 @@ class csMultiplexImageIO : public iImageIO
   virtual ~csMultiplexImageIO ();
 
   virtual bool Initialize (iObjectRegistry*);
-  virtual const csVector& GetDescription ();
+  virtual const csImageIOFileFormatDescriptions& GetDescription ();
   virtual csPtr<iImage> Load (uint8* iBuffer, uint32 iSize, int iFormat);
   virtual void SetDithering (bool iEnable);
   virtual csPtr<iDataBuffer> Save (iImage *image, const char *mime = 0,

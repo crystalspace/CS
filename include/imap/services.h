@@ -29,7 +29,6 @@
 class csMatrix3;
 class csVector3;
 class csVector2;
-class csVector;
 class csColor;
 class csBox3;
 class csGradient;
@@ -53,7 +52,7 @@ struct iDocumentNode;
 #define CSTEX_UV_SHIFT 8 
 /** @} */
 
-SCF_VERSION (iSyntaxService, 1, 3, 0);
+SCF_VERSION (iSyntaxService, 1, 3, 1);
 
 /**
  * This component provides services for other loaders to easily parse
@@ -139,9 +138,9 @@ struct iSyntaxService : public iBase
    * Parses a portal definition specification.
    * flags: contains all flags found in the description.
    */
-  virtual  bool ParsePortal (iDocumentNode* node, iLoaderContext* ldr_context,
+  virtual bool ParsePortal (iDocumentNode* node, iLoaderContext* ldr_context,
 		  	   iPolygon3DStatic* poly3d,
-		  	   csVector &flags, bool &mirror,
+		  	   uint32 &flags, bool &mirror,
   			   bool& warp, int& msv,
 			   csMatrix3 &m, csVector3 &before,
 			   csVector3 &after) = 0;

@@ -24,9 +24,9 @@
  */
 
 #include "csutil/scf.h"
+#include "csutil/refarr.h"
 #include "csgeom/csrect.h"
 #include "csgeom/cspoint.h"
-#include "csutil/csvector.h"
 #include "iutil/string.h"
 
 struct iAws;
@@ -192,7 +192,7 @@ struct iAwsKeyContainer : public iAwsKey
   /// Looks up a key based on it's ID.
   virtual iAwsKey *Find (unsigned long id) = 0;
 
-  virtual csBasicVector &Children () = 0;
+  virtual const csRefArray<iAwsKey> &Children () = 0;
 
   /// Adds an item to the container
   virtual void Add (iAwsKey *key) = 0;
@@ -908,7 +908,7 @@ struct iAwsComponent : public iAwsSource
 
   /**
    * Add child to TabOrder
-   * Actually at this moment TabOrder is csVector that contains all children
+   * Actually at this moment TabOrder is an array that contains all children
    * of component ordered by their creation. 
    */ 
   virtual bool AddToTabOrder(iAwsComponent *child)=0;

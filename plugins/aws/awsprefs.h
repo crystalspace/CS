@@ -366,7 +366,7 @@ public:
 class awsKeyContainer : public awsKey, public iAwsKeyContainer
 {
   /// list of children in container.
-  csBasicVector children;
+  csRefArray<iAwsKey> children;
 
 public:
   SCF_DECLARE_IBASE_EXT(awsKey);
@@ -399,15 +399,15 @@ public:
   /// Looks up a key based on it's ID.
   iAwsKey *Find (unsigned long id);
 
-  csBasicVector &Children ()
+  const csRefArray<iAwsKey> &Children ()
   { return children; }
 
   /// Adds an item to the container
   void Add (iAwsKey *key)
-  { key->IncRef(); children.Push (key); }
+  { children.Push (key); }
   /// returns children number i
   iAwsKey* GetAt (int i)
-  { return (iAwsKey*) children[i]; }
+  { return children[i]; }
 
   /// returns number of childrens
   int Length ()
@@ -475,7 +475,7 @@ public:
   /// Looks up a key based on it's ID.
   iAwsKey *Find (unsigned long id) { return awsKeyContainer::Find(id); }
 
-  csBasicVector &Children ()
+  const csRefArray<iAwsKey> &Children ()
   { return awsKeyContainer::Children(); }
 
     /// Adds an item to the container

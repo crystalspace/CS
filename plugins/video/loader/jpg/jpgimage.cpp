@@ -87,7 +87,7 @@ csJPGImageIO::csJPGImageIO (iBase *pParent)
   formats.Push (&formatlist[1]);
 }
 
-const csVector& csJPGImageIO::GetDescription ()
+const csImageIOFileFormatDescriptions& csJPGImageIO::GetDescription ()
 {
   return formats;
 }
