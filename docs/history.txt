@@ -10,6 +10,8 @@ The history order has been reversed so that new features are at the top.
 	- Implemented first version of multi-pass PVS calculation.
 	  It is not yet very useful though because quality isn't high
 	  enough right now.
+	- Eric Sunshine fixed many additional compilation warnings in the
+	  terrain library; mostly reported by MSVC.
 17-May-2000
 	- Thomas Riemer added scaffolding functions to allow loading world
 	  into NetSpace world.
