@@ -63,6 +63,15 @@ Now just CD to your Crystal Space directory, run make and follow the
 instructions.
 
 
+ALLEGRO
+
+If you use Allegro graphics library (and want to use it in Crystal Space),
+you can use an alternative video driver. For this, you will have to add a line
+
+USE_ALLEGRO = yes
+
+to config.mak (after configuring as usual).
+
 BUGS
 
 The compiled libraries didn't work for me, so I made my own.  You can download
