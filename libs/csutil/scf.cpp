@@ -460,7 +460,7 @@ void csSCF::RegisterConfigClassList (iConfigFile *iConfig)
       while (iterator->Next ())
       {
         const char *data = iterator->GetStr ();
-        char *val = (char *)alloca (strlen (data) + 1);
+        ALLOC_STACK_ARRAY (val, char, strlen(data) + 1);
         strcpy (val, data);
         char *depend = strchr (val, ':');
         if (depend) *depend++ = 0;

@@ -706,13 +706,13 @@ void csQuantizeRemapDither (csRGBpixel *image, int pixels, int pixperline,
   uint8 *dst = outimage;
   count = pixels;
 
-  int *fserr = (int *)alloca (2 * 3 * (pixperline + 2) * sizeof (int));
+  ALLOC_STACK_ARRAY (fserr, int, (2 * 3 * (pixperline + 2)));
   memset (fserr, 0, 3 * (pixperline + 2) * sizeof (int));
   // odd/even row
   unsigned char odd = 0;
   while (count > 0)
   {
-    // The alogorithm implements the widely-known and used Floyd-Steinberg
+    // The algorithm implements the widely-known and used Floyd-Steinberg
     // error distribution - based dithering. The errors are distributed with
     // the following weights to the surrounding pixels:
     //

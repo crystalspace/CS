@@ -44,14 +44,14 @@ csLibraryHandle csLoadLibrary (const char* iName)
 
 void* csGetLibrarySymbol(csLibraryHandle Handle, const char* Name)
 {
-  void *ptr = GetProcAddress ((HMODULE)Handle, Name);
+  void *ptr = (void*)GetProcAddress ((HMODULE)Handle, Name);
   if (!ptr)
   {
     char *Name2;
     Name2 = new char [strlen (Name) + 2];
     strcpy (Name2, "_");
     strcat (Name2, Name);
-    ptr = GetProcAddress ((HMODULE)Handle, Name2);
+    ptr = (void*)GetProcAddress ((HMODULE)Handle, Name2);
     delete [] Name2;
   }
   return ptr;

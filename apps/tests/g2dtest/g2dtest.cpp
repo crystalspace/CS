@@ -879,7 +879,7 @@ int main (int argc, char *argv[])
       canvas = CS_SOFTWARE_2D_DRIVER;
     else if (strncmp ("crystalspace.", canvas, 13))
     {
-      char *tmp = (char *)alloca (strlen (canvas) + 25);
+      ALLOC_STACK_ARRAY (tmp, char, strlen (canvas) + 25);
       strcpy (tmp, "crystalspace.graphics2d.");
       strcat (tmp, canvas);
       canvas = tmp;

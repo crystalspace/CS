@@ -23,7 +23,7 @@ csGenerateNova (int iSize, int iSeed, int iNumSpokes, float iRoundness)
   const int radius = iSize / 2;
   const int center = radius;
 
-  float *spoke = (float *)alloca ((iNumSpokes + 2) * sizeof (float));
+  ALLOC_STACK_ARRAY (spoke, float, iNumSpokes + 2);
   int i;
   for (i = 0; i < iNumSpokes; i++)
     spoke [i] = rnd.Get ();//iRoundness + rnd.Get () * (1 - iRoundness);
