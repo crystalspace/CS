@@ -20,6 +20,18 @@ Short-term cleanups that need to be done:
 	  from Andrew's changes which manifested on OpenStep.
 	- Eric Sunshine worked around OpenStep compiler bugs triggered by
 	  several changes to the terrain library.
+	- Eric Sunshine eliminated the very lengthy pause and disk thrashing
+	  which occurred between the time "make" was typed and the time
+	  anything actually began to build.  The problem was caused by several
+	  unnecessary extensive scans of the CS directory tree for files which
+	  are only needed when building documentation.
+	- Eric Sunshine removed all of the documentation building targets and
+	  configuration information from the global makefiles (where it did
+	  not belong) and moved it into a new makefile "doc.mak".  The
+	  existing "doc" and "api" targets should continue to work correctly.
+	  However, the other documentation targets which Brandon added almost
+	  certainly do not work anymore and will probably require some
+	  tweaking by someone who actually has access to the required tools.
 3-Feb-2000
 	- Seth Galbraith changed sprite loading in csParser so that
 	  csSpriteTemplate::MergeTexels is now called to eliminate duplicate
