@@ -3604,7 +3604,7 @@ This history is "historical".  See "history.txt" for more recent entries.
 	      fixes all wonky unresolved externals at link time for external
 	      projects. Make the change in projects like Pinball etc and you
 	      will get successful compilation again.
-	    - Brought release build upto date.
+	    - Brought release build up to date.
 	    - Fixed MSVC/Windows runtime problems or possible problems in CS
 	      apps and plugins. CS no longer requires or uses the:
 	      /nodefaultlib:"libname"
@@ -5287,7 +5287,7 @@ This history is "historical".  See "history.txt" for more recent entries.
 	- Made BugPlug a little bit more friendly by showing a message
 	  when it is waiting for a key.
 14-Jun-2002
-	- Upto now BugPlug has always been a plugin with no own interface.
+	- Up to now BugPlug has always been a plugin with no own interface.
 	  So there was no way to talk with BugPlug. This has now changed.
 	  I added the iBugPlug interface. With this interface it will be
 	  possible to control various features of BugPlug.
@@ -15059,7 +15059,7 @@ Re-enabled use of cs_snprintf as all seems to be well again.
 	  "inline" when we ask for "inline".
 	- Michael Voase did the following:
 	    - Graph2D: Fixed procedural texture clip problem (introduced by
-	      my last patch). DrawPixeln() now checks upto and including the
+	      my last patch). DrawPixeln() now checks up to and including the
 	      bouding box values.
 	    - 2D drivers (Mac, linux, OS/2, opengl): Corrected SetClipRect()
 	      to set the correct parameters for the clipper.
@@ -38222,7 +38222,7 @@ Re-enabled use of cs_snprintf as all seems to be well again.
 	- Some fixes to BeOS port from David Huen.
 	- Fix to FreeBSD makefile from Brian Haskin.
 	- Applied fix from Thomas Hieber to fix various things for the
-	  Windows port. He also fixed MazeD upto the point that it compiles
+	  Windows port. He also fixed MazeD up to the point that it compiles
 	  and runs again (at least in software mode/16-bit color).
 	  However, I could not get it to run on Unix. It still crashes.
 	- Update to Macintosh port from Robert Bate (fixing things).
@@ -41341,7 +41341,7 @@ Re-enabled use of cs_snprintf as all seems to be well again.
 	  put a pointer there.
 17-Aug-1998
 	- Update to GGI port from Andrew Apted which brings this port
-	  uptodate to the latest changes in the LibGGI API.
+	  up-to-date to the latest changes in the LibGGI API.
 	- Patch from Ivan Avramovic to allow for more dynamic adding
 	  of image formats. Using his technique one could even add new
 	  image formats from within a game without having to recompile
@@ -42502,7 +42502,7 @@ Re-enabled use of cs_snprintf as all seems to be well again.
 	  in debug.txt for diagnostics.
 	- For some strange reason my GNU LIBC on my new Stampede Linux
 	  system seems not to support milliseconds for clock() and ftime()
-	  (they are only accurate upto a second). I don't know why this
+	  (they are only accurate up to a second). I don't know why this
 	  is and if this is considered normal. But I had to fix this by
 	  changing the linux and svgalib verson of timing.cpp. It now use
 	  times() which is a bit less accurate (100 times per second).
@@ -42590,7 +42590,7 @@ Re-enabled use of cs_snprintf as all seems to be well again.
 	  changes:
 	    - Console has been enhanced: it has a cursor, it works in 16-bit
 	      and Crystal Space does no longer render when the console is
-	      active. This last part greatly enhances the typing speed (upto
+	      active. This last part greatly enhances the typing speed (up to
 	      a point where the console will become unuseable on certain
 	      ports: see the README.Andrew from Andrew on how to fix this for
 	      some port).
