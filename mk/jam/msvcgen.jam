@@ -45,7 +45,7 @@
 MSVCGEN_BUILD_ROOT = [ ConcatDirs $(BUILDTOP) out ] ;
 
 rule msvcgen_build_dir
-{ return [ ConcatDirs $(MSVCGEN_BUILD_ROOT) msvcgen ] ; }
+{ return [ ConcatDirs $(MSVCGEN_BUILD_ROOT) mk ] ; }
 rule msvcgen_target_dir
 { return [ ConcatDirs [ msvcgen_build_dir ] visualc$(<) ] ; }
 rule msvcgen_fragment_dir
