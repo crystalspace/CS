@@ -160,6 +160,9 @@ public:
   virtual void LostFocus() { Reset(); }
   virtual void GainFocus() { RestoreKeys(); }
 
+  /// Fills in the 'cooked' key code of an event with only a 'raw' key code.
+  virtual csEventError SynthesizeCooked (iEvent *);
+
   /// iEventHandler implementation
   struct CS_CSUTIL_EXPORT eiEventHandler : public iEventHandler
   {

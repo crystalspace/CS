@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2003 by Mathew Sutcliffe <oktal@gmx.co.uk>
+    Copyright (C) 2003, 04 by Mathew Sutcliffe <oktal@gmx.co.uk>
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -23,70 +23,77 @@
 
 struct iEvent;
 struct iEventHandler;
+struct iConfigFile;
+class csInputDefinition;
 
-SCF_VERSION (iInputBinderPosition, 0, 0, 1);
+SCF_VERSION (iInputBinder, 0, 1, 0);
 
-/**
- * Represents the position of a mouse or joystick axis, shared between plugins.
- */
-struct iInputBinderPosition : public iBase
-{
-  /// Set the position; called by csInputBinder.
-  virtual void Set (int) = 0;
-  /// Get the position; called by the application.
-  virtual int Get () const = 0;
-};
-
-SCF_VERSION (iInputBinderBoolean, 0, 0, 1);
-
-/**
- * Represents the up or down state of a keyboard key or a mouse or joystick
- * button, shared between plugins.
- */
-struct iInputBinderBoolean : public iBase
-{
-  /// Set the state; called by csInputBinder.
-  virtual void Set (bool) = 0;
-  /// Get the state; called by the application.
-  virtual bool Get () const = 0;
-};
-
-SCF_VERSION (iInputBinder, 0, 0, 1);
-
-/**
- * Bind an input event to a pointer to a variable,
- * so that that variable will reflect the state of a given key, button or axis.
- */
+/// SCF interface for csInputBinder.
 struct iInputBinder : public iBase
 {
   /**
-   * Get a pointer to the embedded iEventHander
+   * Get a pointer to the embedded iEventHander.
+   *
    * This class can be registered with the event queue:
    * EventQueue->RegisterListener(InputBinder->QueryHandler (), CSMASK_Input);
    */
   virtual iEventHandler* QueryHandler () = 0;
 
-  /**
-   * Bind a bool to a keyboard key or mouse or joystick button status.
-   * If toggle is true, one press activates and the second deactivates.
-   * Otherwise, keydown activates and keyup deactivates.
-   */
-  virtual void Bind (iEvent&, iInputBinderBoolean*, bool toggle = false) = 0;
+  /// Returns the status of the given button command.
+  virtual bool Button (unsigned cmd) = 0;
+
+  /// Returns the position of the given axis command.
+  virtual int Axis (unsigned cmd) = 0;
 
   /**
-   * Bind two int's to the x and y axes of a mouse or joystick.
+   * Bind a button event to a button command.
+   *
+   * E.g. pass a keyboard, mouse button or joystick button definition to this
+   * method to bind to those particular buttons.
+   *
+   * Note that cmd is used as an array index so the numbers you use should be
+   * consecutive, starting with 0.
+   *
+   * If toggle is true, the status is toggled on keydown events. If it is
+   * false, status is set to 0 on keyup and 1 on keydown.
    */
-  virtual void Bind (iEvent&, iInputBinderPosition*) = 0;
+  virtual void BindButton (const csInputDefinition &def, unsigned cmd,
+    bool toggle = false) = 0;
 
   /**
-   * Remove a binding.
+   * Bind an axis motion event to an axis command.
+   *
+   * E.g. pass a mouse or joystick movement defintion to this method to bind to
+   * that particular axis.
+   *
+   * Note that cmd is used as an array index so the numbers you use should be
+   * consecutive, starting with 0.
+   *
+   * Movements will be multiplied by the sensitivity values. Remember you can
+   * use negative sensitivites to invert the mouse. The default values (~0) for
+   * the min and max parameters mean there will be no limit imposed on the
+   * cumulative movements.
+   *
+   * The wrap parameter specifies whether the value will jump to the other end
+   * of the range if it goes beyond the minimum or maximum value.
    */
-  virtual bool Unbind (iEvent&) = 0;
+  virtual void BindAxis (const csInputDefinition &def, unsigned cmd,
+    int sensitivity = 1, int min = ~0, int max = ~0, bool wrap = true) = 0;
 
-  /**
-   * Remove all bindings.
-   */
-  virtual bool UnbindAll() = 0;
+  /// Remove a binding.
+  virtual bool UnbindButton (unsigned cmd) = 0;
+
+  /// Remove a binding.
+  virtual bool UnbindAxis (unsigned cmd) = 0;
+
+  /// Remove all bindings.
+  virtual void UnbindAll() = 0;
+
+  /// Load bindings from a configuration file.
+  virtual void LoadConfig (iConfigFile *, const char *subsection = 0) = 0;
+
+  /// Save bindings to a configuration file.
+  virtual void SaveConfig (iConfigFile *, const char *subsection = 0) = 0;
 };
 
 #endif // __CS_IUTIL_BINDER_H__

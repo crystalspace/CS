@@ -20,6 +20,24 @@ chronological order.
 	  on string. This fixes a bug in VFS where it would sometimes fail
 	  to delete old entries and this could cause duplicate entries in a
 	  zip file (happened a lot with relight).
+	- Oktal added FindFirst and StartsWith methods to csString.
+	- Oktal fleshed out csInputDefinition and moved it from inpnames.h/cpp
+	  to inputdef.h/cpp.
+	- Oktal added a public SynthesizeCooked(iEvent*) method to the
+	  keyboard driver which fills in the cooked code of an event containing
+	  only a raw code.
+	- Oktal added a GetModifiers method to csKeyEventHelper which performs
+	  the opposite of GetModifiersBits, ie. it converts a bitmask back to
+	  a csKeyModifiers struct.
+	- Oktal added a CSKEY_MODIFIER_COMPARE macro to determine if two
+	  modifier bitmasks can be considered equal. Also added extra parens
+	  to some other macros in evdefs.h, for safety.
+	- Oktal made numerous changes to the input binder to make it a "nicer,"
+	  more generalised system. This includes the removal of
+	  iInputBinderPosition and iInputBinderBoolean. All bound variables are
+	  now accessible by numbered keys through methods in the binder.
+	  And it now binds to csInputDefinition's instead of iEvent's with a
+	  dodgy hash function.
 9-Aug-2004
 	- Jorrit did a fix to csQrount() and other csQ... (except for
 	  csQint()).  In case CS_QINT_WORKAROUND was defined only csQint()

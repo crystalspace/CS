@@ -430,6 +430,22 @@ void csKeyboardDriver::SynthesizeCooked (utf32_char codeRaw,
   }
 }
 
+csEventError csKeyboardDriver::SynthesizeCooked (iEvent *ev)
+{
+  utf32_char codeRaw, codeCooked;
+  csKeyModifiers mods;
+
+  csEventError err = ev->Retrieve ("keyCodeRaw", codeRaw);
+  if (err != csEventErrNone) return err;
+
+  SynthesizeCooked (codeRaw, mods, codeCooked);
+
+  ev->Add ("keyCodeCooked", codeCooked);
+  ev->Add ("keyModifiers", (void *) & mods, sizeof (mods));
+
+  return csEventErrNone;
+}
+
 void csKeyboardDriver::SetKeyState (utf32_char codeRaw, bool iDown,
 				    bool autoRepeat)
 {

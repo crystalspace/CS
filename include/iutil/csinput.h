@@ -152,6 +152,12 @@ struct iKeyboardDriver : public iBase
    * of any other composer.
    */
   virtual csPtr<iKeyComposer> CreateKeyComposer () = 0;
+
+  /**
+   * For an event that contains only a raw code, this adds cooked code and
+   * modifiers.
+   */
+  virtual csEventError SynthesizeCooked (iEvent *) = 0;
 };
 
 SCF_VERSION(iMouseDriver, 0, 0, 1);

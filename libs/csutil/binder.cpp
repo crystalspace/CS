@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2003 by Mathew Sutcliffe <oktal@gmx.co.uk>
+    Copyright (C) 2003, 04 by Mathew Sutcliffe <oktal@gmx.co.uk>
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -19,84 +19,9 @@
 #include "cssysdef.h"
 #include "csutil/csunicode.h"
 #include "csutil/binder.h"
-#include "iutil/event.h"
-#include "iutil/evdefs.h"
-#include "csutil/csevent.h"
 #include "csutil/event.h"
-
-struct csEvBind
-{
-  bool pos;
-  bool tgl;
-  bool up;
-  union
-  {
-    iInputBinderPosition *p;
-    iInputBinderBoolean *b;
-  };
-  csEvBind (iInputBinderPosition *pp)
-  {
-    p = pp;
-    if (p) p->IncRef ();
-    pos = true;
-    tgl = false;
-    up = false;
-  }
-  csEvBind (iInputBinderBoolean *bb, bool toggle)
-  {
-    b = bb;
-    if (b) b->IncRef ();
-    pos = false;
-    tgl = toggle;
-    up = true;
-  }
-  ~csEvBind ()
-  {
-    if (pos)
-      { if (p) p->DecRef (); }
-    else
-      { if (b) b->DecRef (); }
-  }
-};
-
-csHashKey csHashComputeEvent (iEvent* const ev)
-{
-  switch (ev->Type)
-  {
-    case csevKeyboard:
-      {
-	utf32_char codeRaw = csKeyEventHelper::GetRawCode(ev);
-	uint32 modifiers = csKeyEventHelper::GetModifiersBits(ev);	
-	// Since none of the other event types we're looking for
-	// will set the CSMASK_Keyboard bit, we can cram the modifer
-	// bits in the space between the event bit and the key
-	// code bits
-	return CSMASK_Keyboard | (modifiers << (csevKeyboard+1)) 
-		| (codeRaw << (csevKeyboard+csKeyModifierTypeLast+1));
-      }
-
-    case csevMouseMove:
-      return CSMASK_MouseMove
-        | ((abs (ev->Mouse.x) > abs (ev->Mouse.y) ? 0 : 1) << 16);
-
-    case csevMouseDown:
-    case csevMouseUp:
-      return CSMASK_MouseDown
-        | (ev->Mouse.Button << 16);
-
-    case csevJoystickMove:
-      return CSMASK_JoystickMove
-        | ((abs (ev->Joystick.x) > abs (ev->Joystick.y) ? 0 : 1) << 16);
-
-    case csevJoystickDown:
-    case csevJoystickUp:
-      return CSMASK_JoystickDown
-        | (ev->Joystick.Button << 16);
-
-    default:
-      return 0;
-  }
-}
+#include "csutil/csevent.h"
+#include "iutil/cfgfile.h"
 
 SCF_IMPLEMENT_IBASE (csInputBinder)
   SCF_IMPLEMENTS_INTERFACE (iInputBinder)
@@ -107,8 +32,9 @@ SCF_IMPLEMENT_EMBEDDED_IBASE (csInputBinder::eiEventHandler)
   SCF_IMPLEMENTS_INTERFACE (iEventHandler)
 SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
-csInputBinder::csInputBinder (iBase *parent, int size)
-  : Hash (size)
+csInputBinder::csInputBinder (iBase *parent, int btnSize, int axisSize)
+: axisHash (axisSize), axisArray (axisSize),
+  btnHash (btnSize), btnArray (btnSize)
 {
   SCF_CONSTRUCT_IBASE (parent);
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiEventHandler);
@@ -121,7 +47,7 @@ csInputBinder::~csInputBinder ()
   SCF_DESTRUCT_IBASE ();
 }
 
-inline bool csInputBinder::HandleEvent (iEvent &ev)
+bool csInputBinder::HandleEvent (iEvent &ev)
 {
   switch (ev.Type)
   {
@@ -131,129 +57,167 @@ inline bool csInputBinder::HandleEvent (iEvent &ev)
     case csevMouseUp:
     case csevJoystickUp:
     {
-      bool up = (ev.Type == csevMouseUp) || (ev.Type == csevJoystickUp) ||
+      bool down = (ev.Type == csevMouseDown) || (ev.Type == csevJoystickDown) ||
 	((ev.Type == csevKeyboard) && 
-	(csKeyEventHelper::GetEventType (&ev) == csKeyEventTypeUp));
-      csEvBind *bind = (csEvBind *) Hash.Get (csHashComputeEvent (&ev));
+	(csKeyEventHelper::GetEventType (&ev) == csKeyEventTypeDown));
 
-      if (bind && !bind->pos && bind->b)
+      BtnCmd *bind = btnHash.Get (csInputDefinition (& ev), 0);
+      if (! bind) return false;
+
+      if (bind->toggle)
       {
-	if (up)
-	{
-	  if (bind->tgl)
-	    bind->up = true;
-	  else
-	    bind->b->Set (false);
-	}
-	else
-	{
-	  if (bind->tgl)
-	  {
-	    if (bind->up)
-	    {
-	      bind->up = false;
-	      bind->b->Set (! bind->b->Get ());
-	    }
-	  }
-	  else
-	    bind->b->Set (true);
-	}
-        return true;
+        if (down) bind->down = ! bind->down;
       }
-      else
-        return false;
+      else bind->down = down;
+
+      return true;
     }
 
     case csevMouseMove:
-    {
-      csEvent evX (0, csevMouseMove, 1, 0, 0, 0);
-      csEvent evY (0, csevMouseMove, 0, 1, 0, 0);
-      csEvBind *bindx = (csEvBind *) Hash.Get (csHashComputeEvent (
-        &evX));
-      csEvBind *bindy = (csEvBind *) Hash.Get (csHashComputeEvent (
-        &evY));
-
-      bool ok = false;
-      if (bindx && bindx->pos)
-      {
-        ok = true;
-        bindx->p->Set (ev.Mouse.x);
-      }
-      if (bindy && bindy->pos)
-      {
-        ok = true;
-        bindy->p->Set (ev.Mouse.y);
-      }
-      return ok;
-    }
-
     case csevJoystickMove:
     {
-      csEvent evX (0, csevJoystickMove, ev.Joystick.number, 1, 0, 0, 0);
-      csEvent evY (0, csevJoystickMove, ev.Joystick.number, 0, 1, 0, 0);
-      csEvBind *bindx = (csEvBind *) Hash.Get (csHashComputeEvent (
-        &evX));
-      csEvBind *bindy = (csEvBind *) Hash.Get (csHashComputeEvent (
-        &evY));
+      for (int axis = 0; axis <= 1; axis++)
+      {
+        csInputDefinition def (& ev, axis);
+        AxisCmd *bind = axisHash.Get (def, 0);
+        if (! bind) return false;
 
-      bool ok = false;
-      if (bindx && bindx->pos)
-      {
-        ok = true;
-        bindx->p->Set (ev.Mouse.x);
+        int val = axis ? ev.Mouse.y : ev.Mouse.x;
+
+        bind->val = val;
       }
-      if (bindy && bindy->pos)
-      {
-        ok = true;
-        bindy->p->Set (ev.Mouse.y);
-      }
-      return ok;
+
+      return true;
     }
 
-    default:
-      break;
+    default: return false;
+  }
+}
+
+void csInputBinder::BindAxis (const csInputDefinition &def, unsigned cmd,
+  int sens)
+{
+  AxisCmd *bind = new AxisCmd (cmd, sens);
+  axisArray.GetExtend (cmd) = bind;
+  axisHash.Put (def, bind);
+}
+
+void csInputBinder::BindButton (const csInputDefinition &def, unsigned cmd,
+  bool toggle)
+{
+  BtnCmd *bind = new BtnCmd (cmd, toggle);
+  btnArray.GetExtend (cmd) = bind;
+  btnHash.Put (def, bind);
+}
+
+int csInputBinder::Axis (unsigned cmd)
+{
+  if (axisArray.Length () > cmd)
+  {
+    AxisCmd *bind = axisArray[cmd];
+    if (bind) return bind->val * bind->sens;
+  }
+  return 0;
+}
+
+bool csInputBinder::Button (unsigned cmd)
+{
+  if (btnArray.Length () > cmd)
+  {
+    BtnCmd *bind = btnArray[cmd];
+    if (bind) return bind->down;
   }
   return false;
 }
 
-void csInputBinder::Bind (iEvent &ev, iInputBinderBoolean *var, bool toggle)
+bool csInputBinder::UnbindAxis (unsigned cmd)
 {
-  Hash.Put (csHashComputeEvent (&ev),
-    (csHashObject) new csEvBind (var, toggle));
-}
+  if (axisArray.Length () <= cmd) return false;
+  AxisCmd *bind = axisArray[cmd];
+  if (! bind) return false;
 
-void csInputBinder::Bind (iEvent &ev, iInputBinderPosition *var)
-{
-  Hash.Put (csHashComputeEvent (&ev),
-    (csHashObject) new csEvBind (var));
-}
+  axisArray[cmd] = 0;
+  delete bind;
 
-bool csInputBinder::Unbind (iEvent &ev)
-{
-  csHashIterator iter (& Hash, csHashComputeEvent (&ev));
-  if (! iter.HasNext ()) return false;
+  csInputDefinition key;
+  AxisHash::GlobalIterator iter (axisHash.GetIterator ());
   while (iter.HasNext ())
-    delete (csEvBind *) iter.Next ();
-  Hash.DeleteAll (csHashComputeEvent (&ev));
+  {
+    if (bind == iter.NextNoAdvance (key)) break;
+    iter.Advance ();
+  }
+  if (iter.HasNext ()) axisHash.Delete (key, bind);
   return true;
 }
 
-bool csInputBinder::UnbindAll ()
+bool csInputBinder::UnbindButton (unsigned cmd)
 {
-  csGlobalHashIterator iter (& Hash);
-  if (! iter.HasNext ()) return false;
+  if (btnArray.Length () <= cmd) return false;
+  BtnCmd *bind = btnArray[cmd];
+  if (! bind) return false;
+
+  btnArray[cmd] = 0;
+  delete bind;
+
+  csInputDefinition key;
+  BtnHash::GlobalIterator iter (btnHash.GetIterator ());
   while (iter.HasNext ())
-    delete (csEvBind *) iter.Next ();
-  Hash.DeleteAll ();
+  {
+    if (bind == iter.NextNoAdvance (key)) break;
+    iter.Advance ();
+  }
+  if (iter.HasNext ()) btnHash.Delete (key, bind);
   return true;
 }
 
-SCF_IMPLEMENT_IBASE (csInputBinderPosition)
-  SCF_IMPLEMENTS_INTERFACE (iInputBinderPosition)
-SCF_IMPLEMENT_IBASE_END
+void csInputBinder::UnbindAll ()
+{
+  for (size_t i = 0; i < axisArray.Length (); i++)
+  {
+    delete axisArray[i];
+    axisArray[i] = 0;
+  }
+  for (size_t i = 0; i < btnArray.Length (); i++)
+  {
+    delete btnArray[i];
+    btnArray[i] = 0;
+  }
 
-SCF_IMPLEMENT_IBASE (csInputBinderBoolean)
-  SCF_IMPLEMENTS_INTERFACE (iInputBinderBoolean)
-SCF_IMPLEMENT_IBASE_END
+  axisHash.DeleteAll ();
+  btnHash.DeleteAll ();
+}
 
-//CS_IMPLEMENT_STATIC_VARIABLE_CLEANUP
+void csInputBinder::LoadConfig (iConfigFile *cfg, const char *subsection)
+{
+#if 0
+  csRef<iConfigIterator> iter = cfg->Enumerate (subsection);
+  while (iter->Next ())
+  {
+    const char *key = iter->GetKey (true);
+    int val = iter->GetInt ();
+
+    csInputDefinition def (key);
+    if (! def.IsValid ()) continue;
+
+    //TODO: BindButton or BindAxis (def, val) depending on def's type
+  }
+#endif
+}
+
+void csInputBinder::SaveConfig (iConfigFile *cfg, const char *subsection)
+{
+#if 0
+  AxisHash::GlobalIterator iter (axisHash.GetIterator ());
+  while (iter.HasNext ())
+  {
+    csString key (subsection ? subsection : "")
+    csInputDefinition def;
+    AxisCmd *cmd = iter.Next (def);
+    key.Append (def.AsString ());
+
+    int val = (int) axisArray.Find (cmd);
+
+    cfg->PutInt (key, val);
+  }
+#endif
+}

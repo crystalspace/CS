@@ -67,6 +67,14 @@ public:
    * \sa CSMASK_ALT etc.
    */
   static uint32 GetModifiersBits (const iEvent* event);
+  /**
+   * Convert a bitmask returned by GetModifiersBits back to a csKeyModifiers
+   * struct.
+   *
+   * Also works for the Modifiers members of the csEventMouseData and
+   * csEventJoystickData structs, if you cast them to uint32.
+   */
+  static void GetModifiers (uint32 mask, csKeyModifiers& modifiers);
 };
 /** @} */
  

@@ -246,6 +246,18 @@ size_t csString::FindFirst (char c, size_t pos) const
   return tmp - Data;
 }
 
+size_t csString::FindFirst (const char *c, size_t pos) const
+{
+  if (pos > Size || Data == 0)
+    return (size_t)-1;
+
+  char const* tmp = strpbrk(Data + pos, c);
+  if (!tmp)
+    return (size_t)-1;
+
+  return tmp - Data;
+}
+
 size_t csString::FindLast (char c, size_t pos) const
 {
   if (pos == (size_t)-1)

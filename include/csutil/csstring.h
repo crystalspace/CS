@@ -345,6 +345,14 @@ public:
   size_t FindFirst (char c, size_t p = 0) const;
 
   /**
+   * Find the first occurrence of any of a set of characters in the string.
+   * \param c Characters to locate.
+   * \param p Start position of search (default 0).
+   * \return First position of character, or (size_t)-1 if not found.
+   */
+  size_t FindFirst (const char *c, size_t p = 0) const;
+
+  /**
    * Find the last occurrence of a character in the string.
    * \param c Character to locate.
    * \param p Start position of reverse search.  Specify (size_t)-1 if you want
@@ -469,6 +477,60 @@ csString& Replace (TYPE s) { Size = 0; return Append(s); }
    */
   bool CompareNoCase (const char* iStr) const
   { return (strncasecmp (Data ? Data : "", iStr, Size) == 0); }
+
+  /**
+   * Check if this string starts with another one.
+   * \param iStr Other string.
+   * \return True if they are equal up to the length of iStr; false if not.
+   * \remarks The comparison is case-sensitive.
+   */
+  bool StartsWith (const csString& iStr) const
+  {
+    if (&iStr == this)
+      return true;
+    size_t const n = iStr.Length();
+    if (n > Size)
+      return false;
+    if (Size == 0 && n == 0)
+      return true;
+    return (memcmp (Data, iStr.GetData (), Size) == 0);
+  }
+
+  /**
+   * Check if this string starts with a null-terminated C- string.
+   * \param iStr Other string.
+   * \return True if they are equal up to the length of iStr; false if not.
+   * \remarks The comparison is case-sensitive.
+   */
+  bool StartsWith (const char* iStr) const
+  { return (strncmp (Data ? Data : "", iStr, strlen (iStr)) == 0); }
+
+  /**
+   * Check if this string begins with another one.
+   * \param iStr Other string.
+   * \return True if they are equal up to the length of iStr; false if not.
+   * \remarks The comparison is case-insensitive.
+   */
+  bool StartsWithNoCase (const csString& iStr) const
+  {
+    if (&iStr == this)
+      return true;
+    size_t const n = iStr.Length();
+    if (n > Size)
+      return false;
+    if (Size == 0 && n == 0)
+      return true;
+    return (strncasecmp (Data, iStr.GetData (), n) == 0);
+  }
+
+  /**
+   * Check if this string starts with a null-terminated C- string.
+   * \param iStr Other string.
+   * \return True if they are equal up to the length of iStr; false if not.
+   * \remarks The comparison is case-insensitive.
+   */
+  bool StartsWithNoCase (const char* iStr) const
+  { return (strncasecmp (Data ? Data : "", iStr, strlen (iStr)) == 0); }
 
   /**
    * Create an empty csString object.
