@@ -26,7 +26,7 @@ endif # ifeq ($(MAKESECTION),roottargets)
 #------------------------------------------------------------- postdefines ---#
 ifeq ($(MAKESECTION),postdefines)
 
-vpath %.cpp apps/tutorial/phys
+vpath %.cpp apps/tutorial/phystut
 
 PHYS.EXE = phys$(EXE)
 INC.PHYS = $(wildcard apps/tutorial/phystut/*.h)
