@@ -153,6 +153,9 @@ protected:
   /// Writes all the sector and everything inside of it.
   bool WriteSectors(csRef<iDocumentNode> node);
 
+  /// Writes the settings block
+  bool WriteSettings(csRef<iDocumentNode> node);
+
   /// Write the player start point
   bool WritePlayerStart(csRef<iDocumentNode> node);
 

@@ -169,12 +169,16 @@ bool CCSWorld::Write(csRef<iDocumentNode> root, CMapFile* pMap, const char * /*s
     int keyNum = pEntity->GetNumberOfKeyValuePairs();
     for (int i = 0; i < keyNum; i++) {
       CMapKeyValuePair*	newPair = pEntity->GetKeyValuePair(i);
-	  if (strcmp(newPair->GetKey(), "world_scale")==0 || strcmp(newPair->GetKey(), "archive")==0)
-		  continue;
+      if (strcmp(newPair->GetKey (), "world_scale")==0 
+       || strcmp(newPair->GetKey (), "archive")==0
+       || strcmp(newPair->GetKey (), "lightmapsize")==0
+       || strcmp(newPair->GetKey (), "ambient")==0
+       || strcmp(newPair->GetKey (), "clearscreen")==0)
+	continue;
 
       DocNode newKey = CreateNode (world, "key");
-	  newKey->SetAttribute("name", newPair->GetKey());
-	  newKey->SetAttribute("value", newPair->GetValue());
+      newKey->SetAttribute("name", newPair->GetKey());
+      newKey->SetAttribute("value", newPair->GetValue());
     }
   }
 
@@ -187,20 +191,7 @@ bool CCSWorld::Write(csRef<iDocumentNode> root, CMapFile* pMap, const char * /*s
   WritePlayerStart (world);
   WriteTextures (world);
   WriteLibs (world);
-
-  {
-    DocNode settings = CreateNode (world, "settings");
-    CreateNode(settings, "clearzbuf", "yes");
-
-    if (const char *lmcs = pEntity->GetValueOfKey ("lightmapcellsize"))
-    {
-      CreateNode(settings, "lightmapcellsize", lmcs);
-    }
-    if (const char *rloop = pEntity->GetValueOfKey ("renderloopname"))
-    {
-      CreateNode(settings, "renderloop", rloop);
-    }
-  }
+  WriteSettings(world);
 
   {
     DocNode renderpriorities = CreateNode (world, "renderpriorities");
@@ -743,6 +734,60 @@ bool CCSWorld::WritePlayerStart(csRef<iDocumentNode> node)
       }
     }
   }
+  return true;
+}
+
+bool CCSWorld::WriteSettings(csRef<iDocumentNode> node)
+{
+
+  CMapEntity* pEntity = GetWorldspawn();
+
+  DocNode settings = CreateNode (node, "settings");
+  CreateNode(settings, "clearzbuf", "yes");
+
+  if (const char *clsc = pEntity->GetValueOfKey ("clearscreen"))
+  {
+    if (strcmp(clsc, "yes")==0) {
+      CreateNode(settings, "clearscreen", "yes");
+    }
+  }
+
+  if (const char *mxlmsize = pEntity->GetValueOfKey ("lightmapsize"))
+  {
+    char dummy;
+    int w, h;
+
+    if (sscanf(mxlmsize, "%d %d%c", &w, &h, &dummy)==2) {
+      DocNode maxLightmap = CreateNode(settings, "maxlightmapsize");
+      maxLightmap->SetAttributeAsInt("horizontal", w);
+      maxLightmap->SetAttributeAsInt("vertical", h);
+    }
+  }
+
+  if (const char *ambient = pEntity->GetValueOfKey ("ambient"))
+  {
+    char dummy;
+    float r = 0.0;
+    float g = 0.0;
+    float b = 0.0;
+
+    if (sscanf(ambient, "%f %f %f%c", &r, &g, &b, &dummy)==3) {
+      DocNode amb = CreateNode(settings, "ambient");
+      amb->SetAttributeAsFloat("red", r);
+      amb->SetAttributeAsFloat("green", g);
+      amb->SetAttributeAsFloat("blue", b);
+    }
+  }
+
+  if (const char *lmcs = pEntity->GetValueOfKey ("lightmapcellsize"))
+  {
+    CreateNode(settings, "lightmapcellsize", lmcs);
+  }
+  if (const char *rloop = pEntity->GetValueOfKey ("renderloopname"))
+  {
+    CreateNode(settings, "renderloop", rloop);
+  }
+  
   return true;
 }
 

@@ -21,6 +21,8 @@ chronological order.
 	  returning a value in a function whose return value is void. He 
 	  also updated the doxygen's comment for the iMeshWrapper::GetFlags() 
 	  method.
+	- Aren Blondahl revised <settings> block in map2cs and added ambient
+	  lighting, clearscreen, and maxlightmapsize support to map2cs.
 9-Apr-2004
 	- Jorrit added iMeshWrapper->SetZBufModeRecursive(),
 	  SetFlagsRecursive(), and SetRenderPriorityRecursive(). These
