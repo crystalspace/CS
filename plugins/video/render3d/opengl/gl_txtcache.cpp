@@ -71,6 +71,7 @@ void csGLTextureCache::Unload (csTxtCacheData *d)
 csGLTextureCache::csGLTextureCache (int max_size,
   csGLRender3D* R3D)
 {
+  rstate_bilinearmap = true;
   cache_size = max_size;
   num = 0;
   head = tail = NULL;
