@@ -981,6 +981,13 @@ awsWindow::OnDraw(csRect clip)
             clipper.DrawPixmap(btxt,
                                Frame().xmin, Frame().ymin, btw, bth,
                                0, 0, btw, bth, 0);
+         if (view)
+		 {
+           g3d->BeginDraw(view->GetEngine ()->GetBeginDrawFlags () | CSDRAW_3DGRAPHICS);
+           view->Draw();
+           g3d->BeginDraw(CSDRAW_2DGRAPHICS);
+		 } //  end if view
+
 		 if (otxt!=NULL)          
             clipper.DrawPixmap(otxt,
                                Frame().xmin, Frame().ymin, otw, oth,
