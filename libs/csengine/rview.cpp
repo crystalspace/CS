@@ -23,6 +23,7 @@
 #include "csengine/polygon.h"
 #include "csengine/sector.h"
 #include "csgeom/polyclip.h"
+#include "csgeom/sphere.h"
 #include "ivideo/graph3d.h"
 #include "ivideo/vbufmgr.h"
 #include "igeom/clip2d.h"
@@ -562,24 +563,16 @@ void csRenderView::TestSphereFrustum (csRenderContextFrustum* frustum,
 }
 
 bool csRenderView::ClipBSphere (const csReversibleTransform& o2c,
-	const csVector3& center, float radius,
+	const csSphere& sphere,
 	int& clip_portal, int& clip_plane, int& clip_z_plane)
 {
   //------
   // First transform bounding sphere from object space to camera space
   // by using the given transform.
   //------
-  csVector3 tr_center = o2c.Other2This (center);
-  // @@@ It would be nice if we could quickly detect if a given
-  // transformation is orthonormal. In that case we don't need to transform
-  // the radius.
-  // To transform the radius we transform a vector with the radius
-  // relative to the transform.
-  csVector3 v_radius (radius);
-  v_radius = o2c.Other2ThisRelative (v_radius);
-  radius = v_radius.x;
-  if (radius < v_radius.y) radius = v_radius.y;
-  if (radius < v_radius.z) radius = v_radius.z;
+  csSphere tr_sphere = o2c.Other2This (sphere);
+  const csVector3& tr_center = tr_sphere.GetCenter ();
+  float radius = tr_sphere.GetRadius ();
 
   //------
   // Test if object is behind the camera plane.

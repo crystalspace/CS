@@ -1,5 +1,12 @@
 The history order is reversed so that new features are at the top.
 
+30-Aug-2001
+	- Added full transformation capabilities to csTransform and
+	  csReversibleTransform for the new csSphere class.
+	- Changed the ClipBSphere to work with csSphere instead of
+	  a center and a radius.
+	- Fixed iMeshWrapper::PlaceMesh() so that it now also works
+	  with transformations that scale the object.
 29-Aug-2001
 	- Andrew Zabolotny reports: OS/2 port strikes back :-)
 	    - Fixed csdive plugin.
@@ -75,6 +82,9 @@ The history order is reversed so that new features are at the top.
 	  but it will be extended to handle operations on bounding spheres.
 	  At this moment it has a function to calculate the union of two
 	  bounding spheres. This is untested however.
+	- Norman Kramer fixed a bug in the cubic spline code: in
+	  precalculation of derivates in cubic spline there was an access
+	  beyond the bounds of time_point which led to some funny results.
 28-Aug-2001
 	- Norman Kramer reported a fix for the freefont plugin.
 	- Added aws and ie3ds to mk/user.mak.

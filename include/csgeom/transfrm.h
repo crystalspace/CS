@@ -22,6 +22,7 @@
 
 #include "csgeom/matrix3.h"
 #include "csgeom/plane3.h"
+#include "csgeom/sphere.h"
 
 class csReversibleTransform;
 
@@ -130,6 +131,11 @@ public:
   	csPlane3& result) const;
 
   /**
+   * Convert a sphere in 'other' space to 'this' space.
+   */
+  csSphere Other2This (const csSphere& s) const;
+
+  /**
    * Apply a transformation to a 3D vector.
    */
   friend csVector3 operator* (const csVector3& v, const csTransform& t);
@@ -144,6 +150,12 @@ public:
   friend csPlane3 operator* (const csTransform& t, const csPlane3& p);
   /// Apply a transformation to a Plane.
   friend csPlane3& operator*= (csPlane3& p, const csTransform& t);
+  /// Apply a transformation to a sphere.
+  friend csSphere operator* (const csSphere& p, const csTransform& t);
+  /// Apply a transformation to a sphere.
+  friend csSphere operator* (const csTransform& t, const csSphere& p);
+  /// Apply a transformation to a sphere.
+  friend csSphere& operator*= (csSphere& p, const csTransform& t);
   /// Multiply a matrix with the transformation matrix.
   friend csMatrix3 operator* (const csMatrix3& m, const csTransform& t);
   /// Multiply a matrix with the transformation matrix.
@@ -268,6 +280,11 @@ public:
   	csPlane3& result) const;
 
   /**
+   * Convert a sphere in 'this' space to 'other' space.
+   */
+  csSphere This2Other (const csSphere& s) const;
+
+  /**
    * Rotate the transform by the angle (radians) around the given vector,
    * in other coordinates.
    * Note: this function rotates the transform, not the coordinate system.
@@ -310,6 +327,8 @@ public:
   friend csPlane3 operator/ (const csPlane3& p, const csReversibleTransform& t);
   /// Reverse a transformation on a Plane.
   friend csPlane3& operator/= (csPlane3& p, const csReversibleTransform& t);
+  /// Reverse a transformation on a sphere.
+  friend csSphere operator/ (const csSphere& p, const csReversibleTransform& t);
   /// Combine two transforms, with the rightmost being applied first.
   friend csReversibleTransform& operator*= (csReversibleTransform& t1,
                                           const csReversibleTransform& t2);

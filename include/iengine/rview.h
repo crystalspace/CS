@@ -37,6 +37,7 @@ struct csFog;
 class csRenderView;
 class csReversibleTransform;
 class csVector3;
+class csSphere;
 
 /**
  * Information for vertex based fog. There is an instance of this
@@ -177,7 +178,7 @@ public:
   int draw_rec_level;
 };
 
-SCF_VERSION (iRenderView, 0, 2, 0);
+SCF_VERSION (iRenderView, 0, 2, 1);
 
 /**
  * This interface represents all information needed to render
@@ -302,7 +303,7 @@ struct iRenderView : public iBase
    * DrawPolygonMesh.
    */
   virtual bool ClipBSphere (const csReversibleTransform& o2c,
-	const csVector3& center, float radius,
+  	const csSphere& sphere,
 	int& clip_portal, int& clip_plane, int& clip_z_plane) = 0;
 
   /**

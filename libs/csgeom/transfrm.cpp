@@ -90,6 +90,24 @@ void csTransform::Other2This (const csPlane3& p, const csVector3& point,
   result.DD = - (result.norm * point);
 }
 
+csSphere csTransform::Other2This (const csSphere& s) const
+{
+  csSphere news;
+  news.SetCenter (Other2This (s.GetCenter ()));
+  // @@@ It would be nice if we could quickly detect if a given
+  // transformation is orthonormal. In that case we don't need to transform
+  // the radius.
+  // To transform the radius we transform a vector with the radius
+  // relative to the transform.
+  csVector3 v_radius (s.GetRadius ());
+  v_radius = Other2ThisRelative (v_radius);
+  float radius = v_radius.x;
+  if (radius < v_radius.y) radius = v_radius.y;
+  if (radius < v_radius.z) radius = v_radius.z;
+  news.SetRadius (radius);
+  return news;
+}
+
 csVector3 operator* (const csVector3& v, const csTransform& t)
 { return t.Other2This (v); }
 
@@ -109,6 +127,29 @@ csPlane3& operator*= (csPlane3& p, const csTransform& t)
 {
   p.norm = t.m_o2t * p.norm;
   p.DD += p.norm * (t.m_o2t*t.v_o2t);
+  return p;
+}
+
+csSphere operator* (const csSphere& p, const csTransform& t)
+{ return t.Other2This (p); }
+
+csSphere operator* (const csTransform& t, const csSphere& p)
+{ return t.Other2This (p); }
+
+csSphere& operator*= (csSphere& p, const csTransform& t)
+{
+  p.SetCenter (t.Other2This (p.GetCenter ()));
+  // @@@ It would be nice if we could quickly detect if a given
+  // transformation is orthonormal. In that case we don't need to transform
+  // the radius.
+  // To transform the radius we transform a vector with the radius
+  // relative to the transform.
+  csVector3 v_radius (p.GetRadius ());
+  v_radius = t.Other2ThisRelative (v_radius);
+  float radius = v_radius.x;
+  if (radius < v_radius.y) radius = v_radius.y;
+  if (radius < v_radius.z) radius = v_radius.z;
+  p.SetRadius (radius);
   return p;
 }
 
@@ -142,6 +183,24 @@ csPlane3 csReversibleTransform::This2OtherRelative (const csPlane3& p) const
   return csPlane3 (newnorm, p.DD);
 }
 
+csSphere csReversibleTransform::This2Other (const csSphere& s) const
+{
+  csSphere news;
+  news.SetCenter (This2Other (s.GetCenter ()));
+  // @@@ It would be nice if we could quickly detect if a given
+  // transformation is orthonormal. In that case we don't need to transform
+  // the radius.
+  // To transform the radius we transform a vector with the radius
+  // relative to the transform.
+  csVector3 v_radius (s.GetRadius ());
+  v_radius = This2OtherRelative (v_radius);
+  float radius = v_radius.x;
+  if (radius < v_radius.y) radius = v_radius.y;
+  if (radius < v_radius.z) radius = v_radius.z;
+  news.SetRadius (radius);
+  return news;
+}
+
 csVector3 operator/ (const csVector3& v, const csReversibleTransform& t) 
 { return t.This2Other (v); }
 
@@ -149,6 +208,9 @@ csVector3& operator/= (csVector3& v, const csReversibleTransform& t)
 { v = t.This2Other (v); return v; }
 
 csPlane3 operator/ (const csPlane3& p, const csReversibleTransform& t)
+{ return t.This2Other (p); }
+
+csSphere operator/ (const csSphere& p, const csReversibleTransform& t)
 { return t.This2Other (p); }
 
 csPlane3& operator/= (csPlane3& p, const csReversibleTransform& t)

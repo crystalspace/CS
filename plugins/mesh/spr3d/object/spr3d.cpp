@@ -20,6 +20,7 @@
 #include "cssys/system.h"
 #include "spr3d.h"
 #include "csgeom/polyclip.h"
+#include "csgeom/sphere.h"
 #include "csutil/garray.h"
 #include "csutil/rng.h"
 #include "ivideo/graph3d.h"
@@ -938,13 +939,15 @@ bool csSprite3DMeshObject::DrawTest (iRenderView* rview, iMovable* movable)
     	* movable->GetFullTransform ().GetInverse ();
 
 #if 1
-  csVector3 center, radius;
-  GetRadius (radius, center);
+  csVector3 radius;
+  csSphere sphere;
+  GetRadius (radius, sphere.GetCenter ());
   float max_radius = radius.x;
   if (max_radius < radius.y) max_radius = radius.y;
   if (max_radius < radius.z) max_radius = radius.z;
+  sphere.SetRadius (max_radius);
   int clip_portal, clip_plane, clip_z_plane;
-  if (rview->ClipBSphere (tr_o2c, center, max_radius, clip_portal, clip_plane,
+  if (rview->ClipBSphere (tr_o2c, sphere, clip_portal, clip_plane,
   	clip_z_plane) == false)
     return false;
 #else

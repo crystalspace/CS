@@ -280,7 +280,7 @@ public:
    * DrawPolygonMesh.
    */
   virtual bool ClipBSphere (const csReversibleTransform& o2c,
-	const csVector3& center, float radius,
+  	const csSphere& sphere,
 	int& clip_portal, int& clip_plane, int& clip_z_plane);
   /**
    * Check if the screen bounding box of an object is visible in

@@ -22,6 +22,8 @@
 #include "cstypes.h"
 #include "vector3.h"
 
+class csTransform;
+
 /**
  * This class represents a sphere.
  */

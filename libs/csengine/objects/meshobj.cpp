@@ -17,6 +17,7 @@
 */
 
 #include "cssysdef.h"
+#include "csgeom/sphere.h"
 #include "csengine/sector.h"
 #include "csengine/meshobj.h"
 #include "csengine/light.h"
@@ -301,21 +302,19 @@ void csMeshWrapper::PlaceMesh ()
   iSectorList* movable_sectors = movable.GetSectors ();
   if (movable_sectors->GetSectorCount () == 0) return;	// Do nothing
 
-  csVector3 radius, center;
-  mesh->GetRadius (radius, center);
+  csSphere sphere;
+  csVector3 radius;
+  mesh->GetRadius (radius, sphere.GetCenter ());
   iSector* sector = movable_sectors->GetSector (0);
   movable.SetSector (sector);	// Make sure all other sectors are removed
 
-  // Transform the center from object to world space given the current
-  // movable. Note! @@@ We assume here the transformation is an orthonormal
-  // transformation which means that it cannot scale the object. In general
-  // it is a good idea to keep the movable transformation orthonormalu
-  // (especially for things like collision detection).
-  center = movable.GetFullTransform ().This2Other (center);
-
+  // Transform the sphere from object to world space.
   float max_radius = radius.x;
   if (max_radius < radius.y) max_radius = radius.y;
   if (max_radius < radius.z) max_radius = radius.z;
+  sphere.SetRadius (max_radius);
+  sphere *= movable.GetFullTransform ();
+  max_radius = sphere.GetRadius ();
   float max_sq_radius = max_radius * max_radius;
 
   // @@@ This function is currently ignoring children but that's
@@ -341,14 +340,15 @@ void csMeshWrapper::PlaceMesh ()
 	  iPolygon3D* portal_poly = thing->GetPortalPolygon (j);
 	  const csPlane3& pl = portal_poly->GetWorldPlane ();
 
-	  float sqdist = csSquaredDist::PointPlane (center, pl);
+	  float sqdist = csSquaredDist::PointPlane (sphere.GetCenter (), pl);
 	  if (sqdist <= max_sq_radius)
 	  {
 	    // Plane of portal is close enough.
 	    // If N is the normal of the portal plane then center-N
 	    // will be the point on the plane that is closest to 'center'.
 	    // We check if that point is inside the portal polygon.
-	    if (portal_poly->PointOnPolygon (center - pl.Normal ()))
+	    if (portal_poly->PointOnPolygon (sphere.GetCenter ()
+	    	- pl.Normal ()))
 	    {
 	      iPortal* portal = thing->GetPortal (j);
 	      iSector* dest_sector = portal->GetSector ();
