@@ -56,8 +56,10 @@ else
   TO_INSTALL.STATIC_LIBS += $(SNDSOFT)
 endif
 
-INC.SNDSOFT = $(wildcard plugins/sound/renderer/software/*.h)
-SRC.SNDSOFT = $(wildcard plugins/sound/renderer/software/*.cpp)
+INC.SNDSOFT = $(wildcard plugins/sound/renderer/software/*.h) \
+  $(wildcard plugins/sound/renderer/common/*.h)
+SRC.SNDSOFT = $(wildcard plugins/sound/renderer/software/*.cpp) \
+  $(wildcard plugins/sound/renderer/common/*.cpp)
 OBJ.SNDSOFT = $(addprefix $(OUT),$(notdir $(SRC.SNDSOFT:.cpp=$O)))
 DEP.SNDSOFT = CSUTIL CSGEOM CSSYS
 

@@ -39,8 +39,10 @@ else
   TO_INSTALL.STATIC_LIBS += $(SNDDS3D)
 endif
 
-INC.SNDDS3D = $(wildcard plugins/sound/renderer/ds3d/*.h)
-SRC.SNDDS3D = $(wildcard plugins/sound/renderer/ds3d/*.cpp)
+INC.SNDDS3D = $(wildcard plugins/sound/renderer/ds3d/*.h) \
+  $(wildcard plugins/sound/renderer/common/*.h)
+SRC.SNDDS3D = $(wildcard plugins/sound/renderer/ds3d/*.cpp) \
+  $(wildcard plugins/sound/renderer/common/*.cpp)
 OBJ.SNDDS3D = $(addprefix $(OUT),$(notdir $(SRC.SNDDS3D:.cpp=$O)))
 DEP.SNDDS3D = CSUTIL CSGEOM CSSYS
 

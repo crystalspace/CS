@@ -38,8 +38,10 @@ else
   TO_INSTALL.STATIC_LIBS += $(SNDEAX)
 endif
 
-INC.SNDEAX = $(wildcard plugins/sound/renderer/eax/*.h)
-SRC.SNDEAX = $(wildcard plugins/sound/renderer/eax/*.cpp)
+INC.SNDEAX = $(wildcard plugins/sound/renderer/eax/*.h) \
+  $(wildcard plugins/sound/renderer/common/*.h)
+SRC.SNDEAX = $(wildcard plugins/sound/renderer/eax/*.cpp) \
+  $(wildcard plugins/sound/renderer/common/*.cpp)
 OBJ.SNDEAX = $(addprefix $(OUT),$(notdir $(SRC.SNDEAX:.cpp=$O)))
 DEP.SNDEAX = CSUTIL CSGEOM CSSYS
 
