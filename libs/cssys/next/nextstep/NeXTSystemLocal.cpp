@@ -52,6 +52,7 @@ extern "Objective-C" {
 void NeXTSystemDriver::init_system()
     {
     NXApp = [Application new];
+    DPSSetDeadKeysEnabled( [NXApp context], 0 );
     controller = [[NeXTDelegate alloc] initWithDriver:this];
     [NXApp setDelegate:controller];
     Menu* const menu = NeXTMenuGenerate();
