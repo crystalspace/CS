@@ -89,7 +89,7 @@ void csParticlesPhysicsSimple::RemoveParticles (
 {
   particles_object *temp;
   int end = partobjects.Length () - 1;
-  for (int i=end;i>=0;i++) {
+  for (int i=end;i>=0;--i) {
     temp = partobjects[i];
     if (temp->particles == particles) {
       partobjects[i] = partobjects[end];

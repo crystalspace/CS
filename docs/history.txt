@@ -12,6 +12,8 @@ chronological order.
 	  three functions to iImage: Copy, CopyScale, and CopyTile. Only
 	  csImage implements those. The other implementations of iImage
 	  simply return false here.
+    - Andrew Robberts fixed a bug in particles simpphys where a for loop
+      iterated the wrong way.
 26-Nov-2004
 	- Eric Sunshine added capability to cscript/csperl5/Jamfile to create
 	  pure-Perl extension module `cspace' (Jam target `perl5mod'). This
