@@ -1,5 +1,5 @@
 @c -*-texinfo-*-
-@node map2cs, Squawk, Walktest, Applications
+@node map2cs, mdl2spr, Walktest, Applications
 @section Quake Map Converter (@code{map2cs})
 @cindex @file{map2cs}
 @cindex Quake Map Converter (@file{map2cs})

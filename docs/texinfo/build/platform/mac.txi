@@ -88,8 +88,6 @@ The Crystal Space Editor.
 A meta-balls demo application.
 @item Simple.mcp
 Simple Crystal Space application.
-@item Squawk.mcp
-A Crystal Space application.
 @item Walktest.mcp
 Another Simple Crystal Space application.
 @end table

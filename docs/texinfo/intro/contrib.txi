@@ -417,7 +417,7 @@ Seth Galbraith (@email{sgalbrai@@linknet.kitsap.lib.wa.us})
 Seth also contributed a nice missile and he fixed the texture bug in
 @file{mdl2spr}.  Seth is also a great source of suggestions and bug reports.
 Seth also updated the @sc{dos}/@sc{djgpp} documentation and the tutorial.  He
-also wrote the Squawk (@pxref{Squawk}) demo (using the skybox).  Seth also
+also wrote the Squawk (@emph{Squawk}) demo (using the skybox).  Seth also
 fixed the @code{csCamera} and @code{csView} classes so that the @sc{fov} is no
 longer static and it is also possible to recenter each view separately.  Seth
 added sprite vertex tweening and new lighting attenuation settings.  He also
