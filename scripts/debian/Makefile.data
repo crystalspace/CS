@@ -1,10 +1,20 @@
 BUILDDIR=$(HOME)/debian/crystal
 DATE=$(shell date '+%Y%m%d')
-VERSION=0.94
-TAG=R0_94_001
+VERSION=0.95
+TAG=R0_95_001
 MINOR=2
-SITE=ftp://sunsite.dk/projects/crystal/cs094/levels
-LEVELS=castle.zip dmburg.zip maze.zip room.zip mazedex.zip newsky.zip sydney.zip demodata.zip 
+SITE=ftp://sunsite.dk/projects/crystal/
+LEVELS=cs096/levels/demodata.zip \
+	cs096/levels/dmburg.zip \
+	cs096/levels/jngtest.zip \
+	cs096/levels/maze.zip \
+	cs096/levels/mazedex.zip \
+	cs096/levels/newsky.zip \
+	cs096/levels/room.zip \
+	cs096/levels/sydney.zip \
+	cs094/levels/demodata.zip \
+	cs094/levels/castle.zip \
+	cs094/levels/video.avi
 
 default: start wget debcopy debbuild
 
@@ -20,6 +30,9 @@ $(BUILDDIR)/wget-stamp: $(LEVELS)
 %.zip:
 	@cd $(BUILDDIR)/crystalspace-data-$(VERSION)/data; wget -nc -nd -nH $(SITE)/$@
 	cp ../../../homepage/img/$(shell basename $@ '.zip' ).jpg $(BUILDDIR)/crystalspace-data-$(VERSION)/data
+
+%.avi:
+	@cd $(BUILDDIR)/crystalspace-data-$(VERSION)/data; wget -nc -nd -nH $(SITE)/$@
 
 debcopy:
 	cd data ; find . | cpio -pdumvB $(BUILDDIR)/crystalspace-data-$(VERSION)/debian

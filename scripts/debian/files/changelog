@@ -1,3 +1,17 @@
+crystalspace (0.95-20021109) unstable; urgency=low
+
+  * Integrate NMU changes upstream (Next time please, when you NMU
+    send a patch, thanks)
+  * Fresh CVS snapshot
+
+ -- Christian Bayle <bayle@debian.org>  Sat,  9 Nov 2002 01:14:09 +0100
+
+crystalspace (0.94-20020502-3.1) unstable; urgency=low
+
+  * NMU to fix breakage caused by libvorbis0 split.
+
+ -- Christopher L Cheney <ccheney@debian.org>  Mon, 29 Jul 2002 23:00:00 -0500
+
 crystalspace (0.95-20020813) unstable; urgency=low
 
   * Updates to make compilation easier with recent CVS

@@ -1,3 +1,9 @@
+crystalspace-data (0.95-1) unstable; urgency=low
+
+  * New upstream datas
+
+ -- Christian Bayle <bayle@debian.org>  Sat,  9 Nov 2002 01:13:37 +0100
+
 crystalspace-data (0.94-2) unstable; urgency=low
 
   * Changed data (I completly missed the previous one)
