@@ -167,18 +167,16 @@ iObjectRegistry* csInitializer::CreateObjectRegistry ()
 
 iPluginManager* csInitializer::CreatePluginManager (iObjectRegistry* r)
 {
-  csPluginManager* plugmgr = new csPluginManager (r);
+  csRef<csPluginManager> plugmgr = new csPluginManager (r);
   r->Register (plugmgr, "iPluginManager");
-  plugmgr->DecRef ();
   return plugmgr;
 }
 
 iEventQueue* csInitializer::CreateEventQueue (iObjectRegistry* r)
 {
   // Register the shared event queue.
-  iEventQueue* q = new csEventQueue (r);
+  csRef<iEventQueue> q = new csEventQueue (r);
   r->Register (q, "iEventQueue");
-  q->DecRef();
   return q;
 }
 
@@ -200,28 +198,24 @@ bool csInitializer::CreateInputDrivers (iObjectRegistry* r)
 
 iVirtualClock* csInitializer::CreateVirtualClock (iObjectRegistry* r)
 {
-  csVirtualClock* vc = new csVirtualClock ();
+  csRef<csVirtualClock> vc = new csVirtualClock ();
   r->Register (vc, "iVirtualClock");
-  vc->DecRef ();
   return vc;
 }
 
 iCommandLineParser* csInitializer::CreateCommandLineParser(
   iObjectRegistry* r, int argc, char const* const argv[])
 {
-  iCommandLineParser* c = new csCommandLineParser (argc, argv);
+  csRef<iCommandLineParser> c = new csCommandLineParser (argc, argv);
   r->Register (c, "iCommandLineParser");
-  c->DecRef ();
   return c;
 }
 
 iConfigManager* csInitializer::CreateConfigManager (iObjectRegistry* r)
 {
-  iConfigFile* cfg = new csConfigFile ();
-  iConfigManager* Config = new csConfigManager (cfg, true);
+  csRef<iConfigFile> cfg = new csConfigFile ();
+  csRef<iConfigManager> Config = new csConfigManager (cfg, true);
   r->Register (Config, "iConfigManager");
-  Config->DecRef ();
-  cfg->DecRef ();
   return Config;
 }
 
