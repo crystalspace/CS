@@ -502,26 +502,39 @@ bool csIntersect3::IntersectTriangle (
   // 'isect' is the intersection of the segment and the
   // plane. Now we have to see if this intersection is
   // in the triangle.
-  //if (plane.D () > SMALL_EPSILON)   // Check if plane is not near origin.
-  //{
-    //if (csMath3::WhichSide3D (isect, tr3, tr1) > 0) return false;
-    //if (csMath3::WhichSide3D (isect, tr1, tr2) > 0) return false;
-    //if (csMath3::WhichSide3D (isect, tr2, tr3) > 0) return false;
-  //}
-  //else
+  int test1, test2, test3;
+
+  // Check if intersected plane is sufficiently away from origin.
+  // Note: don't use too small of an epsilon, or else
+  // we might try using WhichSide3D on a plane that is too
+  // close to the origin to yield accurate results.
+  if (plane.D () > EPSILON)
   {
-    // Bug fix for WichSide3D. Slower but valid.
+    test1 = csMath3::WhichSide3D (isect, tr3, tr1);
+    test2 = csMath3::WhichSide3D (isect, tr1, tr2);
+    test3 = csMath3::WhichSide3D (isect, tr2, tr3);
+  }
+  else  // shift plane because it is too close to origin
+  {
     csVector3 norm = plane.Normal ();
     csVector3 nsect = isect + norm;
     csVector3 ntr1 = tr1 + norm;
     csVector3 ntr2 = tr2 + norm;
     csVector3 ntr3 = tr3 + norm;
-    if (csMath3::WhichSide3D (nsect, ntr3, ntr1) > 0) return false;
-    if (csMath3::WhichSide3D (nsect, ntr1, ntr2) > 0) return false;
-    if (csMath3::WhichSide3D (nsect, ntr2, ntr3) > 0) return false;
+    test1 = csMath3::WhichSide3D (nsect, ntr3, ntr1);
+    test2 = csMath3::WhichSide3D (nsect, ntr1, ntr2);
+    test3 = csMath3::WhichSide3D (nsect, ntr2, ntr3);
   }
 
-  return true;
+  // Check if the point is on the same side of each plane.
+  // This works for both backface and frontface triangles.
+  // Return success if all WhichSide3D tests are either all -1 or all 1.
+  // Note: if we want to only check for one side of the triangle
+  // and we did a plane shift, we would need to check if the same
+  // face of the shifted plane is facing the origin (0,0,0).
+  // Shifting the plane often times causes us to look at the other
+  // side of the plane we are testing.
+  return (test1 == test2) && (test2 == test3) && (test1 != 0);
 }
 
 bool csIntersect3::Plane (

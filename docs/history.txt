@@ -29,6 +29,11 @@ chronological order.
 	- res tweaked the doxygen files to include paths relative to the 
 	  CS/include resp. CS directory. Also updated the layout of the 
 	  generated HTML files a bit.
+	- Chris Matuszewski fixed a bug in csIntersect3::IntersectTriangle that
+	  was causing it to fail in certain cases.  The new implementation
+	  returns a successful intersection for both frontface and backface
+	  triangles.  This fixes a previous problem with HitBeam not working
+	  correctly for genmesh objects.
 9-Nov-2003
 	- Rhad added functions to handle reversing some operations with
 	  particle emitters.  These take care of some simple situations where
