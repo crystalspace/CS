@@ -21,8 +21,8 @@
 #ifndef ctPointObj_H
 #define ctPointObj_H
 
-#include "ctphyzik/ctvector.h"
-#include "ctphyzik/phyztype.h"
+#include "csphyzik/ctvector.h"
+#include "csphyzik/phyztype.h"
 
 // A ctPointObj is the parent class of anything which acts like a point,
 // including point-masses and points (connectors) on larger objects.  Its

@@ -27,22 +27,22 @@
 // This is an Aristotelean (i.e. F=mv) point.
 class ctDampedPointMass : public ctPointObj, public ctEntity {
  protected:
-  int       mass;
+  int       m;
   ctVector3 x;
 
   // Temp vars for dealing with derivatives & solver
   ctVector3 v;
  public:
-  void set_mass(int newmass) { mass = newmass; }
-  int  mass(void) { return mass; }
+  void set_mass(int newmass) { m = newmass; }
+  int  mass(void) { return m; }
 
   // ctPointObj methods
   ctVector3 pos() { return x; }
   ctVector3 vel() { return v; }
-  void apply_force(ctVector3 force) { v += force / mass; }
+  void apply_force(ctVector3 force) { v += force / m; }
 
   // ctEntity methods
-  void init_state { v = ctVector3(0,0,0); }
+  void init_state() { v = ctVector3(0,0,0); }
   int get_state_size() { return 3; }
   int set_state(real *sa) {
     sa[0] = x[0]; sa[1] = x[1]; sa[2] = x[2];
@@ -56,25 +56,25 @@ class ctDampedPointMass : public ctPointObj, public ctEntity {
     sa[0] = v[0]; sa[1] = v[1]; sa[2] = v[2];
     return get_state_size();
   }
-}
+};
 
 // This is a Newtonian (i.e. F=ma) point.
 class ctPointMass : public ctPointObj, public ctEntity {
  protected:
-  int       mass;
+  int       m;
   ctVector3 x;
   ctVector3 v;
 
   // Temp vars for dealing with derivatives & solver
   ctVector3 F;
  public:
-  void set_mass(int newmass) { mass = newmass; }
-  int mass(void) { return mass; }
+  void set_mass(int newmass) { m = newmass; }
+  int mass(void) { return m; }
 
   // ctPointObj methods
   ctVector3 pos() { return x; }
   ctVector3 vel() { return v; }
-  void apply_force(ctVector3 force) { F += force / mass; }
+  void apply_force(ctVector3 force) { F += force / m; }
 
   // ctEntity methods
   void init_state() { F = ctVector3(0,0,0); }
