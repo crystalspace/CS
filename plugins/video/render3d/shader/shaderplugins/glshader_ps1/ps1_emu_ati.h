@@ -40,7 +40,7 @@ public:
   {
   }
 
-  bool LoadProgramStringToGL( const char* programstring );
+  bool LoadProgramStringToGL ();
 
   ////////////////////////////////////////////////////////////////////
   //                      iShaderProgram

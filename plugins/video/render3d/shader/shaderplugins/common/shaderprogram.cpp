@@ -36,6 +36,7 @@ csShaderProgram::csShaderProgram (iObjectRegistry* objectReg)
   SCF_CONSTRUCT_IBASE (0);
   InitCommonTokens (commonTokens);
 
+  description = 0;
   csShaderProgram::objectReg = objectReg;
   synsrv = CS_QUERY_REGISTRY (objectReg, iSyntaxService);
   strings = CS_QUERY_REGISTRY_TAG_INTERFACE (objectReg, 
@@ -44,6 +45,7 @@ csShaderProgram::csShaderProgram (iObjectRegistry* objectReg)
 
 csShaderProgram::~csShaderProgram ()
 {
+  delete[] description;
   SCF_DESTRUCT_IBASE();
 }
 
@@ -102,7 +104,8 @@ bool csShaderProgram::ParseCommon (iDocumentNode* child)
       break;
 
     case XMLTOKEN_DESCRIPTION:
-      description = child->GetContentsValue();
+      delete[] description;
+      description = csStrNew (child->GetContentsValue());
       break;
     case XMLTOKEN_SHADERVAR:
       {

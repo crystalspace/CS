@@ -18,6 +18,7 @@ Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
 #include "cssysdef.h"
 
+#include "csutil/databuf.h"
 #include "csutil/hashmap.h"
 #include "csutil/objreg.h"
 #include "csutil/ref.h"
@@ -39,10 +40,6 @@ Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "glshader_ps1.h"
 #include "ps1_emu_common.h"
 
-SCF_IMPLEMENT_IBASE(csShaderGLPS1_Common)
-SCF_IMPLEMENTS_INTERFACE(iShaderProgram)
-SCF_IMPLEMENT_IBASE_END
-
 void csShaderGLPS1_Common::Report (int severity, const char* msg, ...)
 {
   va_list args;
@@ -52,28 +49,10 @@ void csShaderGLPS1_Common::Report (int severity, const char* msg, ...)
   va_end (args);
 }
 
-void csShaderGLPS1_Common::BuildTokenHash()
-{
-  xmltokens.Register ("ps1fp", XMLTOKEN_PS1FP);
-  xmltokens.Register ("declare", XMLTOKEN_DECLARE);
-  xmltokens.Register ("variablemap", XMLTOKEN_VARIABLEMAP);
-  xmltokens.Register ("program", XMLTOKEN_PROGRAM);
-  xmltokens.Register ("description", XMLTOKEN_DESCRIPTION);
-
-  // Note: to avoid collision between the XMLTOKENs and the SV types,
-  // the XMLTOKENs start with 100
-  xmltokens.Register ("integer", csShaderVariable::INT);
-  xmltokens.Register ("float", csShaderVariable::FLOAT);
-  xmltokens.Register ("vector3", csShaderVariable::VECTOR3);
-  xmltokens.Register ("vector4", csShaderVariable::VECTOR4);
-}
-
-bool csShaderGLPS1_Common::Load(iDocumentNode* program)
+bool csShaderGLPS1_Common::Load (iDocumentNode* program)
 {
   if(!program)
     return false;
-
-  BuildTokenHash();
 
   csRef<iDocumentNode> variablesnode = program->GetNode("ps1fp");
   if (variablesnode)
@@ -83,73 +62,8 @@ bool csShaderGLPS1_Common::Load(iDocumentNode* program)
     {
       csRef<iDocumentNode> child = it->Next();
       if(child->GetType() != CS_NODE_ELEMENT) continue;
-      const char* value = child->GetValue ();
-      csStringID id = xmltokens.Request (value);
-      switch(id)
-      {
-        case XMLTOKEN_PROGRAM:
-          //save for later loading
-          programstring = csStrNew (child->GetContentsValue ());
-          break;
-        case XMLTOKEN_DESCRIPTION:
-	        description = csStrNew (child->GetContentsValue ());
-	        break;
-        case XMLTOKEN_DECLARE:
-          {
-            //create a new variable
-            csRef<csShaderVariable> var = csPtr<csShaderVariable>(
-              new csShaderVariable (strings->Request(
-	      	child->GetAttributeValue ("name"))));
-
-            // @@@ Will leak! Should do proper refcounting.
-            var->IncRef ();
-
-            csStringID idtype = xmltokens.Request (
-	    	      child->GetAttributeValue("type") );
-            var->SetType ((csShaderVariable::VariableType) idtype);
-            switch(idtype)
-            {
-              case csShaderVariable::INT:
-                var->SetValue (child->GetAttributeValueAsInt ("default"));
-                break;
-              case csShaderVariable::FLOAT:
-                var->SetValue (child->GetAttributeValueAsFloat ("default"));
-                break;
-              case csShaderVariable::VECTOR3:
-              {
-                const char* def = child->GetAttributeValue("default");
-                csVector3 v;
-                sscanf(def, "%f,%f,%f", &v.x, &v.y, &v.z);
-                var->SetValue( v );
-                break;
-              }
-              case csShaderVariable::VECTOR4:
-              {              
-                const char* def = child->GetAttributeValue("default");
-                csVector4 v;
-                sscanf(def, "%f,%f,%f,%f", &v.x, &v.y, &v.z, &v.w);
-                var->SetValue( v );
-                break;
-              }
-            }
-            AddVariable (var);
-          }
-          break;
-        case XMLTOKEN_VARIABLEMAP:
-          {
-            variablemap.Push (variablemapentry ());
-            int i = variablemap.Length ()-1;
-
-            variablemap[i].name = strings->Request (
-              child->GetAttributeValue("variable"));
-
-            variablemap[i].registernum = 
-              child->GetAttributeValueAsInt("register");
-          }
-          break;
-        default:
-          return false;
-      }
+      if (!ParseCommon (child))
+	return false;
     }
   }
 
@@ -159,16 +73,12 @@ bool csShaderGLPS1_Common::Load(iDocumentNode* program)
 bool csShaderGLPS1_Common::Load (const char* program, 
                             csArray<csShaderVarMapping> &mappings)
 {
-  programstring = csStrNew (program);
+  programBuffer.AttachNew (new csDataBuffer (csStrNew (program),
+    strlen (program)));
 
-  for (int m=0; m<mappings.Length (); ++m)
+  for (int i = 0; i < mappings.Length(); i++)
   {
-    variablemap.Push (variablemapentry ());
-    int i = variablemap.Length ()-1;
-
-    variablemap[i].name = mappings[m].name;
-
-    variablemap[i].registernum = atoi (mappings[m].destination);
+    variablemap.Push (VariableMapEntry (mappings[i]));
   }
 
   return true;
@@ -178,29 +88,34 @@ bool csShaderGLPS1_Common::Load (const char* program,
 bool csShaderGLPS1_Common::Compile(
 	csArray<iShaderVariableContext*> &staticContexts)
 {
-  csShaderVariable *var;
-  int i,j;
-
-  for (i = 0; i < variablemap.Length (); i++)
+  ResolveStaticVars (staticContexts);
+  
+  for (int i = 0; i < variablemap.Length (); i++)
   {
-    // Check if we've got it locally
-    var = svcontext.GetVariable(variablemap[i].name);
-    if (!var)
+    int dest;
+    if ((sscanf (variablemap[i].destination, "register %d", &dest) != 1) &&
+      (sscanf (variablemap[i].destination, "c%d", &dest) != 1))
     {
-      // If not, check the static contexts
-      for (j=0;j<staticContexts.Length();j++)
-      {
-        var = staticContexts[j]->GetVariable (variablemap[i].name);
-        if (var) break;
-      }
+      Report (CS_REPORTER_SEVERITY_WARNING, 
+	"Unknown variable destination %s", 
+	variablemap[i].destination.GetData());
+      continue;
     }
-    if (var)
+
+    if ((dest < 0) || (dest >= MAX_CONST_REGS))
     {
-      // We found it, so we add it as a static mapping
-      variablemap[i].statlink = var;
+      Report (CS_REPORTER_SEVERITY_WARNING, 
+	"Invalid constant register number %d, must be in range [0..%d]", 
+	dest, MAX_CONST_REGS);
+      continue;
     }
+
+    constantRegs[dest].statlink = variablemap[i].statlink;
+    constantRegs[dest].varID = variablemap[i].name;
   }
 
-  return LoadProgramStringToGL(programstring);
+  variablemap.DeleteAll();
+
+  return LoadProgramStringToGL();
 }
 

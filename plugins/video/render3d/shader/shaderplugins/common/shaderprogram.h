@@ -42,11 +42,12 @@ class csShaderProgram : public iShaderProgram
 {
 protected:
   csStringHash commonTokens;
-private:
 #define CS_INIT_TOKEN_TABLE_NAME InitCommonTokens
 #define CS_TOKEN_ITEM_FILE \
   "video/render3d/shader/shaderplugins/common/shaderprogram.tok"
 #include "cstool/tokenlist.h"
+#undef CS_TOKEN_ITEM_FILE
+#undef CS_INIT_TOKEN_TABLE_NAME
 
 protected:
   csRef<iObjectRegistry> objectReg;
@@ -67,9 +68,15 @@ protected:
       userInt = 0;
       userPtr = 0;
     }
+    VariableMapEntry (const csShaderVarMapping& other) :
+      csShaderVarMapping (other.name, other.destination)
+    {
+      userInt = 0;
+      userPtr = 0;
+    }
   };
 
-  csString description;
+  char* description;
   csArray<VariableMapEntry> variablemap;
   csRef<iDocumentNode> programNode;
   csRef<iFile> programFile;

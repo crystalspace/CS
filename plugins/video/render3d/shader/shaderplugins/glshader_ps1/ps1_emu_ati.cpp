@@ -62,23 +62,25 @@ void csShaderGLPS1_ATI::SetupState (csRenderMesh *mesh,
 {
   csGLExtensionManager *ext = shaderPlug->ext;
   // set variables
-  for(int i = 0; i < variablemap.Length(); ++i)
+  for (int i = 0; i < MAX_CONST_REGS; i++)
   {
-    // Check if it's statically linked
-    csRef<csShaderVariable> lvar = variablemap[i].statlink;
-    // If not, we check the stack
-    if (!lvar && (csStringID)variablemap[i].name < (csStringID)stacks.Length ()
-        && stacks[variablemap[i].name].Length () > 0)
-      lvar = stacks[variablemap[i].name].Top ();
+    csShaderVariable* lvar = constantRegs[i].statlink;
 
+    if (!lvar)
+    {
+      if (constantRegs[i].varID == csInvalidStringID) continue;
+
+      if ((csStringID)variablemap[i].name < (csStringID)stacks.Length ()
+	  && stacks[variablemap[i].name].Length () > 0)
+	lvar = stacks[variablemap[i].name].Top ();
+    }
+    
     if(lvar)
     {
       csVector4 v4;
       if (lvar->GetValue (v4))
       {
-        ext->glSetFragmentShaderConstantATI (
-          GL_CON_0_ATI + variablemap[i].registernum,
-          &v4.x);
+        ext->glSetFragmentShaderConstantATI (GL_CON_0_ATI + i, &v4.x);
       }
     }
   }
@@ -244,14 +246,16 @@ bool csShaderGLPS1_ATI::GetATIShaderCommand
 //#define DUMP_CONVERTER_OUTPUT
 #endif
 
-bool csShaderGLPS1_ATI::LoadProgramStringToGL (const char* programstring)
+bool csShaderGLPS1_ATI::LoadProgramStringToGL ()
 {
-  if(!programstring)
+  if (!programBuffer.IsValid())
+    programBuffer = GetProgramData();
+  if(!programBuffer.IsValid())
     return false;
 
   csPixelShaderParser parser (shaderPlug->object_reg);
 
-  if(!parser.ParseProgram (programstring)) return false;
+  if(!parser.ParseProgram (programBuffer)) return false;
 
   const csArray<csPSConstant> &constants = parser.GetConstants ();
 
@@ -259,24 +263,14 @@ bool csShaderGLPS1_ATI::LoadProgramStringToGL (const char* programstring)
 
   for(i=0;i<constants.Length();i++)
   {
-    const csPSConstant constant = constants.Get (i);
+    const csPSConstant& constant = constants.Get (i);
 
-    csString con_name;
-    con_name.Format("ps constant %d", i);
-    csStringID con_id = strings->Request(con_name);
-
-    //create a new variable
-    csRef<csShaderVariable> var = csPtr<csShaderVariable>(
-    new csShaderVariable (con_id));
-
+    csRef<csShaderVariable> var;
+    var.AttachNew (new csShaderVariable (csInvalidStringID));
     var->SetValue(constant.value);
 
-    variablemapentry& vmentry = 
-      variablemap[variablemap.Push (variablemapentry ())];
-
-    vmentry.name = con_id;
-    vmentry.registernum = constant.reg;
-    vmentry.statlink = var;
+    constantRegs[constant.reg].statlink = var;
+    constantRegs[constant.reg].varID = csInvalidStringID;
   }
 
   const csArray<csPSProgramInstruction>* instrs =

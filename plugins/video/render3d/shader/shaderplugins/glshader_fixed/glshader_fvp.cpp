@@ -44,25 +44,17 @@ Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "glshader_fvp.h"
 #include "glshader_fixed.h"
 
-SCF_IMPLEMENT_IBASE(csGLShaderFVP)
-  SCF_IMPLEMENTS_INTERFACE(iShaderProgram)
-SCF_IMPLEMENT_IBASE_END
-
-csGLShaderFVP::csGLShaderFVP (csGLShader_FIXED* shaderPlug)
+csGLShaderFVP::csGLShaderFVP (csGLShader_FIXED* shaderPlug) :
+  csShaderProgram (shaderPlug->object_reg)
 {
-  SCF_CONSTRUCT_IBASE (0);
   validProgram = true;
   csGLShaderFVP::shaderPlug = shaderPlug;
-  csGLShaderFVP::object_reg = shaderPlug->object_reg;
 
-  g3d = CS_QUERY_REGISTRY (object_reg, iGraphics3D);
-  strings = CS_QUERY_REGISTRY_TAG_INTERFACE (
-    object_reg, "crystalspace.shared.stringset", iStringSet);
+  init_token_table (tokens);
 }
 
 csGLShaderFVP::~csGLShaderFVP ()
 {
-  SCF_DESTRUCT_IBASE ();
 }
 
 void csGLShaderFVP::Activate ()
@@ -77,9 +69,6 @@ void csGLShaderFVP::SetupState (
   csRenderMesh *mesh, const csShaderVarStack &stacks)
 {
   int i;
-
-  //csRef<iStringSet> strings = CS_QUERY_REGISTRY_TAG_INTERFACE (
-    //object_reg, "crystalspace.shared.stringset", iStringSet);
 
   csRef<csShaderVariable> var;
 
@@ -295,21 +284,6 @@ void csGLShaderFVP::ResetState ()
   statecache->SetActiveTU (0);
 }
 
-void csGLShaderFVP::BuildTokenHash()
-{
-  xmltokens.Register("fixedvp",XMLTOKEN_FIXEDVP);
-  xmltokens.Register("declare",XMLTOKEN_DECLARE);
-  xmltokens.Register("constantcolor", XMLTOKEN_CONSTANT_COLOR);
-  xmltokens.Register("light", XMLTOKEN_LIGHT);
-  xmltokens.Register("ambient", XMLTOKEN_AMBIENT);
-  xmltokens.Register("texgen", XMLTOKEN_TEXGEN);
-
-
-  xmltokens.Register("integer", 100+csShaderVariable::INT);
-  xmltokens.Register("float", 100+csShaderVariable::FLOAT);
-  xmltokens.Register("vector3", 100+csShaderVariable::VECTOR3);
-}
-
 bool csGLShaderFVP::Load(iDocumentNode* program)
 {
   if (!program)
@@ -319,13 +293,8 @@ bool csGLShaderFVP::Load(iDocumentNode* program)
   ambientvar = csInvalidStringID;
   primcolvar = csInvalidStringID;
 
-  BuildTokenHash();
-
   csRef<iShaderManager> shadermgr = CS_QUERY_REGISTRY(
-  	object_reg, iShaderManager);
-  if (!strings)
-    strings = CS_QUERY_REGISTRY_TAG_INTERFACE (
-	object_reg, "crystalspace.shared.stringset", iStringSet);
+  	objectReg, iShaderManager);
 
   csRef<iDocumentNode> variablesnode = program->GetNode("fixedvp");
   if(variablesnode)
@@ -336,7 +305,7 @@ bool csGLShaderFVP::Load(iDocumentNode* program)
       csRef<iDocumentNode> child = it->Next();
       if(child->GetType() != CS_NODE_ELEMENT) continue;
       const char* value = child->GetValue ();
-      csStringID id = xmltokens.Request (value);
+      csStringID id = tokens.Request (value);
       switch(id)
       {
         case XMLTOKEN_LIGHT:
@@ -387,15 +356,17 @@ bool csGLShaderFVP::Load(iDocumentNode* program)
             }
           }
           break;
-        case XMLTOKEN_VERTEX_COLOR:
+        case XMLTOKEN_VERTEXCOLOR:
           {
+	    // @@@ Realize as var mapping?
             const char* str;
             if ((str = child->GetContentsValue ()) != 0)
               primcolvar = strings->Request (str);
           }
           break;
-        case XMLTOKEN_CONSTANT_COLOR:
+        case XMLTOKEN_CONSTANTCOLOR:
           {
+	    // @@@ Realize as var mapping?
             const char* str;
             if ((str = child->GetContentsValue ()) != 0)
             {
@@ -439,8 +410,21 @@ bool csGLShaderFVP::Load(iDocumentNode* program)
           }
           break;
         default:
-          break;
-        //return false;
+	  {
+	    switch (commonTokens.Request (value))
+	    {
+	      case XMLTOKEN_PROGRAM:
+	      case XMLTOKEN_VARIABLEMAP:
+	      case XMLTOKEN_SHADERVAR:
+		// Don't want those
+		synsrv->ReportBadToken (child);
+		return false;
+		break;
+	      default:
+		if (!ParseCommon (child))
+		  return false;
+	    }
+	  }
       }
     }
   }
@@ -453,7 +437,7 @@ bool csGLShaderFVP::Compile(csArray<iShaderVariableContext*> &staticContexts)
   shaderPlug->Open ();
 
   //get a statecache
-  csRef<iGraphics2D> g2d = CS_QUERY_REGISTRY (object_reg, iGraphics2D);
+  csRef<iGraphics2D> g2d = CS_QUERY_REGISTRY (objectReg, iGraphics2D);
   g2d->PerformExtension ("getstatecache", &statecache);
 
   int i, j;

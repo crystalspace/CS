@@ -92,14 +92,14 @@ public:
   csShaderGLPS1_NV (csGLShader_PS1* shaderPlug)
     : csShaderGLPS1_Common(shaderPlug) 
   {
-    tex_program_num = 0xffffffff;
+    tex_program_num = ~0;
   }
   virtual ~csShaderGLPS1_NV ()
   {
     glDeleteLists(program_num, 2);
   }
 
-  bool LoadProgramStringToGL( const char* programstring );
+  bool LoadProgramStringToGL ();
 
   ////////////////////////////////////////////////////////////////////
   //                      iShaderProgram

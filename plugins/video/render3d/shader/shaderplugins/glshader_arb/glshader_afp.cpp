@@ -154,7 +154,7 @@ bool csShaderGLAFP::LoadProgramStringToGL ()
       *(end-1) = 0;
 
     Report (CS_REPORTER_SEVERITY_WARNING, 
-      "Couldn't load fragment program \"%s\"", description.GetData());
+      "Couldn't load fragment program \"%s\"", description);
     Report (CS_REPORTER_SEVERITY_WARNING, "Program error at: \"%s\"", start);
     Report (CS_REPORTER_SEVERITY_WARNING, "Error string: '%s'", 
       programErrorString);
@@ -165,7 +165,7 @@ bool csShaderGLAFP::LoadProgramStringToGL ()
     if ((programErrorString != 0) && (*programErrorString != 0))
     {
       Report (CS_REPORTER_SEVERITY_WARNING, 
-	"Warning for fragment program \"%s\": '%s'", description.GetData(), 
+	"Warning for fragment program \"%s\": '%s'", description, 
 	programErrorString);
     }
   }
@@ -200,7 +200,7 @@ bool csShaderGLAFP::Compile(csArray<iShaderVariableContext*> &staticContexts)
 
   ResolveStaticVars (staticContexts);
 
-  for (int i = 0; i < variablemap.Length (); i++)
+  for (int i = 0; i < variablemap.Length ();)
   {
     int dest;
     if (sscanf (variablemap[i].destination, "register %d", &dest) != 1)
@@ -213,6 +213,7 @@ bool csShaderGLAFP::Compile(csArray<iShaderVariableContext*> &staticContexts)
     }
 
     variablemap[i].userInt = dest;
+    i++;
   }
 
   variablemap.ShrinkBestFit();

@@ -65,20 +65,22 @@ void csShaderGLPS1_NV::Deactivate()
 void csShaderGLPS1_NV::SetupState (csRenderMesh *mesh, 
 	const csShaderVarStack &stacks)
 {
-  int i;
-
   csGLExtensionManager *ext = shaderPlug->ext;
 
   // set variables
-  for(i = 0; i < variablemap.Length(); ++i)
+  for (int i = 0; i < MAX_CONST_REGS; i++)
   {
-    // Check if it's statically linked
-    csRef<csShaderVariable> lvar = variablemap[i].statlink;
-    // If not, we check the stack
-    if (!lvar && (csStringID)variablemap[i].name < (csStringID)stacks.Length ()
-        && stacks[variablemap[i].name].Length () > 0)
-      lvar = stacks[variablemap[i].name].Top ();
+    csShaderVariable* lvar = constantRegs[i].statlink;
 
+    if (!lvar)
+    {
+      if (constantRegs[i].varID == csInvalidStringID) continue;
+
+      if ((csStringID)variablemap[i].name < (csStringID)stacks.Length ()
+	  && stacks[variablemap[i].name].Length () > 0)
+	lvar = stacks[variablemap[i].name].Top ();
+    }
+    
     if(lvar)
     {
       csVector4 v4;
@@ -87,13 +89,13 @@ void csShaderGLPS1_NV::SetupState (csRenderMesh *mesh,
         for(int j=0;j<constant_pairs.Length ();j++)
         {
           nv_constant_pair &pair = constant_pairs.Get (j);
-          if(pair.first == variablemap[i].registernum)
+          if(pair.first == i)
           {
             ext->glCombinerStageParameterfvNV (
               GL_COMBINER0_NV + pair.stage, GL_CONSTANT_COLOR0_NV,
               &v4.x);
           }
-          if(pair.second == variablemap[i].registernum)
+          else if(pair.second == i)
           {
             ext->glCombinerStageParameterfvNV (
               GL_COMBINER0_NV + pair.stage, GL_CONSTANT_COLOR1_NV,
@@ -115,7 +117,7 @@ void csShaderGLPS1_NV::ResetState ()
 
 void csShaderGLPS1_NV::ActivateTextureShaders ()
 {
-  if(tex_program_num!=0xffffffff)
+  if(tex_program_num != ~0)
   {
     glCallList(tex_program_num);
     return;
@@ -302,15 +304,11 @@ bool csShaderGLPS1_NV::GetTextureShaderInstructions (
 
 csVector4 csShaderGLPS1_NV::GetConstantRegisterValue (int reg)
 {
-  for(int i = 0; i < variablemap.Length(); ++i)
+  if (constantRegs[reg].statlink)
   {
-    if(variablemap[i].registernum == reg)
-    {
-      if(!variablemap[i].statlink) break;
-      csVector4 value;
-      variablemap[i].statlink->GetValue(value);
-      return value;
-    }
+    csVector4 value;
+    constantRegs[reg].statlink->GetValue(value);
+    return value;
   }
   return csVector4 (0.0f,0.0f,0.0f,0.0f);
 }
@@ -583,14 +581,16 @@ bool csShaderGLPS1_NV::GetNVInstructions(csArray<nv_combiner_stage> &stages,
   return true;
 }
 
-bool csShaderGLPS1_NV::LoadProgramStringToGL (const char* programstring)
+bool csShaderGLPS1_NV::LoadProgramStringToGL ()
 {
-  if(!programstring)
+  if (!programBuffer.IsValid())
+    programBuffer = GetProgramData();
+  if(!programBuffer.IsValid())
     return false;
 
   csPixelShaderParser parser (shaderPlug->object_reg);
 
-  if(!parser.ParseProgram (programstring)) return false;
+  if(!parser.ParseProgram (programBuffer)) return false;
 
   const csArray<csPSConstant> &constants = parser.GetConstants ();
 
@@ -598,24 +598,14 @@ bool csShaderGLPS1_NV::LoadProgramStringToGL (const char* programstring)
 
   for(i=0;i<constants.Length();i++)
   {
-    const csPSConstant constant = constants.Get (i);
+    const csPSConstant& constant = constants.Get (i);
 
-    csString con_name;
-    con_name.Format("ps constant %d", i);
-    csStringID con_id = strings->Request(con_name);
-
-    //create a new variable
-    csRef<csShaderVariable> var = csPtr<csShaderVariable>(
-    new csShaderVariable (con_id));
-
+    csRef<csShaderVariable> var;
+    var.AttachNew (new csShaderVariable (csInvalidStringID));
     var->SetValue(constant.value);
 
-    variablemapentry& vmentry = 
-      variablemap[variablemap.Push (variablemapentry ())];
-
-    vmentry.name = con_id;
-    vmentry.registernum = constant.reg;
-    vmentry.statlink = var;
+    constantRegs[constant.reg].statlink = var;
+    constantRegs[constant.reg].varID = csInvalidStringID;
   }
 
   const csArray<csPSProgramInstruction> &instrs =

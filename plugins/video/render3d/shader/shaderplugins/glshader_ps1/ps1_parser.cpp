@@ -371,11 +371,12 @@ bool csPixelShaderParser::GetInstruction (const char *str,
   return true;
 }
 
-bool csPixelShaderParser::ParseProgram (const char *program)
+bool csPixelShaderParser::ParseProgram (iDataBuffer* program)
 {
   version = CS_PS_INVALID;
 
-  csString prog(program);
+  csString prog;
+  prog.Append ((char*)program->GetData(), program->GetSize());
 
   // Trim any leading/trailing blank lines
   prog.Trim ();

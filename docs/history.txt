@@ -68,6 +68,8 @@ chronological order.
 	- res augmented the R300 driver db entry to prefer clip planes.
 	- res re-activated reporting of a missing 'destination' report in the
 	  shader program <variablemap> parser.
+	- res changed the fixed and PS1 shader plugins to use the new shader
+	  plugin base class.
 1-Apr-2004
 	- Eric Sunshine fixed include/Jamfile so that it installs Swig (*.i)
 	  files.  These are needed by CEL, for instance.

@@ -22,6 +22,7 @@ Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "csgeom/vector4.h"
 #include "csutil/csstring.h"
 #include "csutil/strhash.h"
+#include "iutil/databuff.h"
 #include "iutil/objreg.h"
 #include "iutil/string.h"
 
@@ -81,7 +82,7 @@ public:
   csPixelShaderParser (iObjectRegistry *obj_reg);
   ~csPixelShaderParser ();
 
-  bool ParseProgram (const char *program);
+  bool ParseProgram (iDataBuffer* program);
   const csArray<csPSProgramInstruction> &GetParsedInstructionList ()
   { return program_instructions; }
   const csArray<csPSConstant> &GetConstants ()

@@ -24,42 +24,26 @@
 #include "csgfx/shadervar.h"
 #include "imap/services.h"
 #include "../../common/shaderplugin.h"
+#include "../common/shaderprogram.h"
 
 class csGLShader_FIXED;
 
-class csGLShaderFFP : public iShaderProgram
+class csGLShaderFFP : public csShaderProgram
 {
 private:
+  csStringHash tokens;
+#define CS_TOKEN_ITEM_FILE \
+  "video/render3d/shader/shaderplugins/glshader_fixed/glshader_ffp.tok"
+#include "cstool/tokenlist.h"
+#undef CS_TOKEN_ITEM_FILE
+
   csRef<iGraphics3D> g3d;
   csGLExtensionManager* ext;
-  csRef<iObjectRegistry> object_reg;
   csGLShader_FIXED* shaderPlug;
-
-  /// Parser for common stuff like MixModes, vectors, matrices, ...
-  csRef<iSyntaxService> SyntaxService;
 
   csGLStateCache* statecache;
 
-  char* programstring;
-
   bool validProgram;
-
-  // programloading stuff
-  enum
-  {
-    XMLTOKEN_LAYER = 1,
-    XMLTOKEN_COLORSOURCE,
-    XMLTOKEN_ENVIRONMENT,
-    XMLTOKEN_ALPHASOURCE,
-    XMLTOKEN_COLOROP,
-    XMLTOKEN_ALPHAOP,
-    XMLTOKEN_COLORSCALE,
-    XMLTOKEN_ALPHASCALE,
-  };
-
-  csStringHash xmltokens;
-
-  void BuildTokenHash();
 
   // Layers of multitexturing
   enum COLORSOURCE
@@ -142,9 +126,8 @@ private:
   bool LoadLayer(mtexlayer* layer, iDocumentNode* node);
   bool LoadEnvironment(mtexlayer* layer, iDocumentNode* node);
 
+  void BuildTokenHash();
 public:
-  SCF_DECLARE_IBASE;
-
   csGLShaderFFP(csGLShader_FIXED* shaderPlug);
   virtual ~csGLShaderFFP ();
 

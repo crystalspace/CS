@@ -49,69 +49,51 @@ Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 //                          csGLShaderFFP
 ////////////////////////////////////////////////////////////////////
 
-SCF_IMPLEMENT_IBASE(csGLShaderFFP)
-  SCF_IMPLEMENTS_INTERFACE(iShaderProgram)
-SCF_IMPLEMENT_IBASE_END
-
-csGLShaderFFP::csGLShaderFFP(csGLShader_FIXED* shaderPlug)
+csGLShaderFFP::csGLShaderFFP(csGLShader_FIXED* shaderPlug) :
+  csShaderProgram (shaderPlug->object_reg)
 {
-  SCF_CONSTRUCT_IBASE (0);
-
   csGLShaderFFP::shaderPlug = shaderPlug;
-  object_reg = shaderPlug->object_reg;
-  programstring = 0;
   validProgram = true;
 
-  SyntaxService = CS_QUERY_REGISTRY (object_reg, iSyntaxService);
+  BuildTokenHash();
 }
 
 csGLShaderFFP::~csGLShaderFFP ()
 {
   Deactivate();
-  if(programstring) delete programstring;
-  SCF_DESTRUCT_IBASE ();
 }
 
 void csGLShaderFFP::Report (int severity, const char* msg, ...)
 {
   va_list args;
   va_start (args, msg);
-  csReportV (object_reg, severity, "crystalspace.graphics3d.shader.fixed.fp", 
+  csReportV (objectReg, severity, "crystalspace.graphics3d.shader.fixed.fp", 
     msg, args);
   va_end (args);
 }
 
 void csGLShaderFFP::BuildTokenHash()
 {
-  xmltokens.Register ("alphaoperation", XMLTOKEN_ALPHAOP);
-  xmltokens.Register ("alphasource", XMLTOKEN_ALPHASOURCE);
-  xmltokens.Register ("coloroperation", XMLTOKEN_COLOROP);
-  xmltokens.Register ("colorsource", XMLTOKEN_COLORSOURCE);
-  xmltokens.Register ("layer", XMLTOKEN_LAYER);
-  xmltokens.Register ("environment", XMLTOKEN_ENVIRONMENT);
+  init_token_table (tokens);
 
-  xmltokens.Register("integer", 100+csShaderVariable::INT);
-  xmltokens.Register("float", 100+csShaderVariable::FLOAT);
-  xmltokens.Register("vector3", 100+csShaderVariable::VECTOR3);
-
-  xmltokens.Register("primary color", GL_PRIMARY_COLOR);
-  xmltokens.Register("texture", GL_TEXTURE);
-  xmltokens.Register("constant color", GL_CONSTANT_ARB);
-  xmltokens.Register("previous layer", GL_PREVIOUS_ARB);
+  tokens.Register("primary color", GL_PRIMARY_COLOR);
+  tokens.Register("texture", GL_TEXTURE);
+  tokens.Register("constant color", GL_CONSTANT_ARB);
+  tokens.Register("previous layer", GL_PREVIOUS_ARB);
   
-  xmltokens.Register("color", GL_SRC_COLOR);
-  xmltokens.Register("invertcolor", GL_ONE_MINUS_SRC_COLOR);
-  xmltokens.Register("alpha", GL_SRC_ALPHA);
-  xmltokens.Register("invertalpha", GL_ONE_MINUS_SRC_ALPHA);
+  tokens.Register("color", GL_SRC_COLOR);
+  tokens.Register("invertcolor", GL_ONE_MINUS_SRC_COLOR);
+  tokens.Register("alpha", GL_SRC_ALPHA);
+  tokens.Register("invertalpha", GL_ONE_MINUS_SRC_ALPHA);
 
-  xmltokens.Register("replace", GL_REPLACE);
-  xmltokens.Register("modulate", GL_MODULATE);
-  xmltokens.Register("add", GL_ADD);
-  xmltokens.Register("add signed", GL_ADD_SIGNED_ARB);
-  xmltokens.Register("interpolate", GL_INTERPOLATE_ARB);
-  xmltokens.Register("subtract", GL_SUBTRACT_ARB);
-  xmltokens.Register("dot3", GL_DOT3_RGB_ARB);
-  xmltokens.Register("dot3 alpha", GL_DOT3_RGBA_ARB);
+  tokens.Register("replace", GL_REPLACE);
+  tokens.Register("modulate", GL_MODULATE);
+  tokens.Register("add", GL_ADD);
+  tokens.Register("add signed", GL_ADD_SIGNED_ARB);
+  tokens.Register("interpolate", GL_INTERPOLATE_ARB);
+  tokens.Register("subtract", GL_SUBTRACT_ARB);
+  tokens.Register("dot3", GL_DOT3_RGB_ARB);
+  tokens.Register("dot3 alpha", GL_DOT3_RGBA_ARB);
 }
 
 
@@ -124,8 +106,6 @@ bool csGLShaderFFP::Load(iDocumentNode* node)
   if(!node)
     return false;
 
-  BuildTokenHash();
-
   csRef<iDocumentNode> mtexnode = node->GetNode("fixedfp");
   if(mtexnode)
   {
@@ -135,7 +115,7 @@ bool csGLShaderFFP::Load(iDocumentNode* node)
       csRef<iDocumentNode> child = it->Next();
       if(child->GetType() != CS_NODE_ELEMENT) continue;
       const char* value = child->GetValue ();
-      csStringID id = xmltokens.Request (value);
+      csStringID id = tokens.Request (value);
       switch(id)
       {
         case XMLTOKEN_LAYER:
@@ -146,6 +126,22 @@ bool csGLShaderFFP::Load(iDocumentNode* node)
             texlayers.Push (ml);
           }
           break;
+        default:
+	  {
+	    switch (commonTokens.Request (value))
+	    {
+	      case XMLTOKEN_PROGRAM:
+	      case XMLTOKEN_VARIABLEMAP:
+	      case XMLTOKEN_SHADERVAR:
+		// Don't want those
+		synsrv->ReportBadToken (child);
+		return false;
+		break;
+	      default:
+		if (!ParseCommon (child))
+		  return false;
+	    }
+	  }
       }
     } 
   }
@@ -163,7 +159,7 @@ bool csGLShaderFFP::LoadLayer(mtexlayer* layer, iDocumentNode* node)
   {
     csRef<iDocumentNode> child = it->Next();
     if(child->GetType() != CS_NODE_ELEMENT) continue;
-    csStringID id = xmltokens.Request(child->GetValue());
+    csStringID id = tokens.Request(child->GetValue());
     switch (id)
     {
       case XMLTOKEN_COLORSOURCE:
@@ -175,7 +171,7 @@ bool csGLShaderFFP::LoadLayer(mtexlayer* layer, iDocumentNode* node)
           const char* str = child->GetAttributeValue("source");
           if (str)
           {
-            int i = xmltokens.Request(str);
+            int i = tokens.Request(str);
             if(i == GL_PRIMARY_COLOR_ARB||i == GL_TEXTURE
 	    	||i == GL_CONSTANT_ARB||i==GL_PREVIOUS_ARB)
             {
@@ -183,7 +179,7 @@ bool csGLShaderFFP::LoadLayer(mtexlayer* layer, iDocumentNode* node)
             }
             else
             {
-              SyntaxService->Report ("crystalspace.graphics3d.shader.fixed",
+              synsrv->Report ("crystalspace.graphics3d.shader.fixed",
                 CS_REPORTER_SEVERITY_WARNING,
                 child, "Invalid color source: %s", str);
             }
@@ -192,7 +188,7 @@ bool csGLShaderFFP::LoadLayer(mtexlayer* layer, iDocumentNode* node)
           str = child->GetAttributeValue("modifier");
           if (str)
           {
-            int m = xmltokens.Request(str);
+            int m = tokens.Request(str);
             if(m == GL_SRC_COLOR ||m == GL_ONE_MINUS_SRC_COLOR
 	    	||m == GL_SRC_ALPHA||m == GL_ONE_MINUS_SRC_ALPHA)
             {
@@ -200,7 +196,7 @@ bool csGLShaderFFP::LoadLayer(mtexlayer* layer, iDocumentNode* node)
             }
             else
             {
-              SyntaxService->Report ("crystalspace.graphics3d.shader.fixed",
+              synsrv->Report ("crystalspace.graphics3d.shader.fixed",
                 CS_REPORTER_SEVERITY_WARNING,
                 child, "Invalid color modifier: %s", str);
             }
@@ -214,19 +210,19 @@ bool csGLShaderFFP::LoadLayer(mtexlayer* layer, iDocumentNode* node)
           if(num < 0 || num > 3 )
             continue;
 
-          int i = xmltokens.Request(child->GetAttributeValue("source"));
+          int i = tokens.Request(child->GetAttributeValue("source"));
           if(i == GL_PRIMARY_COLOR_ARB||i == GL_TEXTURE
 	  	||i == GL_CONSTANT_ARB||i==GL_PREVIOUS_ARB)
             layer->alphasource[num] = i;
 
-          int m = xmltokens.Request(child->GetAttributeValue("modifier"));
+          int m = tokens.Request(child->GetAttributeValue("modifier"));
           if(m == GL_SRC_ALPHA||m == GL_ONE_MINUS_SRC_ALPHA)
             layer->alphamod[num] = m;
         }
         break;
-      case XMLTOKEN_COLOROP:
+      case XMLTOKEN_COLOROPERATION:
         {
-          int o = xmltokens.Request(child->GetAttributeValue("operation"));
+          int o = tokens.Request(child->GetAttributeValue("operation"));
           if(o == GL_REPLACE|| o == GL_MODULATE||o == GL_ADD
 	  	||o == GL_ADD_SIGNED_ARB|| o == GL_INTERPOLATE_ARB
 		||o == GL_SUBTRACT_ARB||o == GL_DOT3_RGB_ARB
@@ -236,9 +232,9 @@ bool csGLShaderFFP::LoadLayer(mtexlayer* layer, iDocumentNode* node)
             layer->scale_rgb = child->GetAttributeValueAsFloat ("scale");
         }
         break;
-      case XMLTOKEN_ALPHAOP:
+      case XMLTOKEN_ALPHAOPERATION:
         {
-          int o = xmltokens.Request(child->GetAttributeValue("operation"));
+          int o = tokens.Request(child->GetAttributeValue("operation"));
           if(o == GL_REPLACE|| o == GL_MODULATE||o == GL_ADD
 	  	||o == GL_ADD_SIGNED_ARB|| o == GL_INTERPOLATE_ARB
 		||o == GL_SUBTRACT_ARB||o == GL_DOT3_RGB_ARB
@@ -248,6 +244,9 @@ bool csGLShaderFFP::LoadLayer(mtexlayer* layer, iDocumentNode* node)
             layer->scale_alpha = child->GetAttributeValueAsFloat ("scale");
         }
         break;
+      default:
+	synsrv->ReportBadToken (child);
+        return false;
     }
   }
   return true;
@@ -267,11 +266,11 @@ bool csGLShaderFFP::Compile(csArray<iShaderVariableContext*> &staticContexts)
   maxlayers = shaderPlug->texUnits;
 
   //get a statecache
-  csRef<iGraphics2D> g2d = CS_QUERY_REGISTRY (object_reg, iGraphics2D);
+  csRef<iGraphics2D> g2d = CS_QUERY_REGISTRY (objectReg, iGraphics2D);
   g2d->PerformExtension ("getstatecache", &statecache);
 
   //get extension-object
-  g3d = CS_QUERY_REGISTRY (object_reg, iGraphics3D);
+  g3d = CS_QUERY_REGISTRY (objectReg, iGraphics3D);
   csRef<iShaderRenderInterface> sri = 
     SCF_QUERY_INTERFACE (g3d, iShaderRenderInterface);
   if (!sri) return false;

@@ -24,26 +24,21 @@
 #include "csgfx/shadervar.h"
 #include "csutil/strhash.h"
 #include "../../common/shaderplugin.h"
+#include "../common/shaderprogram.h"
 
 class csGLShader_FIXED;
 
-class csGLShaderFVP : public iShaderProgram
+class csGLShaderFVP : public csShaderProgram
 {
 private:
-  csRef<iGraphics3D> g3d;
-  csRef<iStringSet> strings;
-  csGLShader_FIXED* shaderPlug;
+  csStringHash tokens;
+#define CS_TOKEN_ITEM_FILE \
+  "video/render3d/shader/shaderplugins/glshader_fixed/glshader_fvp.tok"
+#include "cstool/tokenlist.h"
+#undef CS_TOKEN_ITEM_FILE
 
-  enum
-  {
-    XMLTOKEN_FIXEDVP = 1,
-    XMLTOKEN_DECLARE,
-    XMLTOKEN_VERTEX_COLOR,
-    XMLTOKEN_CONSTANT_COLOR,
-    XMLTOKEN_LIGHT,
-    XMLTOKEN_AMBIENT,
-    XMLTOKEN_TEXGEN
-  };
+  csRef<iGraphics3D> g3d;
+  csGLShader_FIXED* shaderPlug;
 
   enum TEXGENMODE
   {
@@ -87,17 +82,8 @@ private:
   csStringID primcolvar;
   csRef<csShaderVariable> primcolVarRef;
 
-  csRef<iObjectRegistry> object_reg;
-
-  csStringHash xmltokens;
-
-  void BuildTokenHash();
-
   bool validProgram;
-
 public:
-  SCF_DECLARE_IBASE;
-
   csGLShaderFVP (csGLShader_FIXED* shaderPlug);
   virtual ~csGLShaderFVP ();
 
