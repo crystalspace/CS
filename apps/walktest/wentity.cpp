@@ -175,7 +175,7 @@ AnimPortalCallback::AnimPortalCallback ()
   SCF_CONSTRUCT_IBASE (NULL);
 }
 
-bool AnimPortalCallback::Traverse (iPortal* portal, iBase* context)
+bool AnimPortalCallback::Traverse (iPortal*, iBase* )
 {
   animportal->visible = true;
   return true;

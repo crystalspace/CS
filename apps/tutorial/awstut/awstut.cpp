@@ -94,21 +94,21 @@ static bool AwsEventHandler (iEvent& ev)
   }
 }
 
-void AwsTutorial::SetPass (void* awst, iAwsSource *source)
+void AwsTutorial::SetPass (void* awst, iAwsSource *)
 {
   AwsTutorial* tut = (AwsTutorial*)awst;
   (void)tut; // @@@ TODO
   printf ("SetPass\n"); fflush (stdout);
 }
 
-void AwsTutorial::SetUser (void* awst, iAwsSource *source)
+void AwsTutorial::SetUser (void* awst, iAwsSource *)
 {
   AwsTutorial* tut = (AwsTutorial*)awst;
   (void)tut; // @@@ TODO
   printf ("SetUser\n"); fflush (stdout);
 }
 
-void AwsTutorial::Login (void* awst, iAwsSource *source)
+void AwsTutorial::Login (void* awst, iAwsSource *)
 {
   AwsTutorial* tut = (AwsTutorial*)awst;
   (void)tut; // @@@ TODO

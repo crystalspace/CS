@@ -216,7 +216,7 @@ struct LightHeader
 
 bool csLightMap::ReadFromCache (
   iCacheManager* cache_mgr,
-  int id,
+  int /*id*/,
   int w,
   int h,
   csObject *obj,
@@ -390,7 +390,7 @@ bool csLightMap::ReadFromCache (
 
 void csLightMap::Cache (
   iCacheManager* cache_mgr,
-  int id,
+  int /*id*/,
   csPolygon3D *poly,
   csCurve *curve,
   csEngine *engine)
