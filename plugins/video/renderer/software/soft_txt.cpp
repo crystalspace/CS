@@ -523,6 +523,21 @@ csTextureManagerSoftware::~csTextureManagerSoftware ()
 
 void csTextureManagerSoftware::Clear ()
 {
+  int i;
+  for (i=textures.Length ()-1; i >= 0; i--)
+  {
+    csTextureHandleSoftware* txt = (csTextureHandleSoftware*)textures.Get (i);
+    UnregisterTexture (txt);
+    txt->DecRef ();
+  }
+
+  for (i=materials.Length ()-1; i >= 0; i--)
+  {
+    csMaterialHandle *mat = materials.Get (i);
+    UnregisterMaterial (mat);
+    mat->DecRef ();
+  }
+
   csTextureManager::Clear ();
   delete alpha_tables; alpha_tables = NULL;
 }

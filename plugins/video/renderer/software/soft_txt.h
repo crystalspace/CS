@@ -117,7 +117,9 @@ public:
   }
   /// Destroy the texture
   virtual ~csTextureSoftware ()
-  { delete [] bitmap; if (image) image->DecRef (); }
+  { 
+    delete [] bitmap; if (image) image->DecRef (); 
+  }
 
   /// Return a pointer to texture data
   uint8 *get_bitmap ()
