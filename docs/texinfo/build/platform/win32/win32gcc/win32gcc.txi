@@ -4,8 +4,8 @@
 
 @noindent
 @emph{Written by Eric Sunshine, @email{sunshine@@sunshineco.com}.  Originally
-written by Philip Wyett, @email{philipwyett@@dsl.pipex.com}.  Last updated 6
-January 2003.}
+written by Philip Wyett, @email{philipwyett@@dsl.pipex.com}.  Last updated 7
+February 2003.}
 
 These instructions are for building Crystal Space with MinGW, the
 @emph{Minimalist @sc{gnu} compiler for Windows}.
@@ -74,6 +74,9 @@ with the addition of several environment variables which are consulted when
 building Crystal Space.  If you are interested, see the @file{README} file in
 the @file{csmingwlibs} directory after installation for all the gory details.
 @end itemize
+
+@emph{Note}: If you ever install a new version of @sc{msys}, then you must also
+re-install the @file{csmingwlibs} package.
 
 @subsubheading Building Crystal Space
 

@@ -35,6 +35,13 @@ The history order is reversed so that new features are at the top.
 	  checks for a sufficiently recent lib3ds containing lib3ds/io.h which
 	  is required by the 3ds plugin but which is not present in older
 	  versions of lib3ds.
+	- Eric Sunshine made the following changes to the user manual:
+	    - Updated MacOS/X build/run instructions to tell user how to switch
+	      to software renderer.  (This used to explain how to use OpenGL,
+	      but OpenGL is now default.)
+	    - Updated Mingw build instructions to mention that csmingwlibs must
+	      be re-installed whenever a newer version of MSYS is installed.
+	    - Fixed `hbox' warnings from TeX.
 6-Feb-2003
 	- Removed Video.OpenGL.Caps.MaxTexWidth, MaxTexHeight, MinTexWidth,
 	  and MinTexHeight options in opengl.cfg. Instead there is now the
