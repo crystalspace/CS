@@ -130,31 +130,6 @@ void Cleanup ()
   csInitializer::DestroyApplication (object_reg);
 }
 
-iMeshWrapper* Demo::LoadObject (const char* objname, const char* filename,
-                                const char* /*classId*/, const char* loaderClassId,
-	iSector* sector, const csVector3& pos)
-{
-  iDataBuffer* databuf = myVFS->ReadFile (filename);
-  if (!databuf || !databuf->GetSize ())
-  {
-    if (databuf) databuf->DecRef ();
-    Report (CS_REPORTER_SEVERITY_ERROR, "Could not open file '%s' on VFS!",
-    	filename);
-    exit (0);
-  }
-  iMeshWrapper* obj = engine->LoadMeshWrapper (objname,
-  	loaderClassId, databuf, sector, pos);
-  databuf->DecRef ();
-  if (!obj)
-  {
-    Report (CS_REPORTER_SEVERITY_ERROR,
-    	"There was an error loading object from file '%s'!",
-	filename);
-    exit (0);
-  }
-  return obj;
-}
-
 static bool DemoEventHandler (iEvent& ev)
 {
   if (ev.Type == csevBroadcast && ev.Command.Code == cscmdProcess)

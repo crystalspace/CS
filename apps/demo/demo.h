@@ -73,9 +73,6 @@ public:
   int first_y;	// First y location where list of demo files start.
 
 private:
-  iMeshWrapper* LoadObject (const char* objname, const char* filename,
-	const char* classId, const char* loaderClassId,
-	iSector* sector, const csVector3& pos);
   void GfxWrite (int x, int y, int fg, int bg, char *str, ...);
   void FileWrite (iFile* file, char *str, ...);
 
