@@ -10,6 +10,9 @@ The history order is reversed so that new features are at the top.
 	- Fixed a compile error in csArray. Unfortunatelly this also breaks
 	  csArray as the destructor is no longer called for elements in the
 	  array. Needs a better fix.
+	- Renamed csArray::Delete(int n) to DeleteIndex() since otherwise
+	  it is impossible to make csArray<int> instances (since you then
+	  get a conflict with the two Delete() functions).
 8-Feb-2003
 	- Reverted the changes of res for packed rgb struct since they
 	  don't appear to work on linux (png image loader crashes).

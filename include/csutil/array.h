@@ -217,7 +217,7 @@ public:
   }
 
   /// Delete element number 'n' from vector.
-  bool Delete (int n)
+  bool DeleteIndex (int n)
   {
     if (n >= 0 && n < count)
     {
@@ -238,7 +238,7 @@ public:
   {
     int const n = Find (item);
     if (n >= 0)
-      return Delete(n);
+      return DeleteIndex (n);
     return false;
   }
 
