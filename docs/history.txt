@@ -37,6 +37,10 @@ chronological order.
 	- Eric Sunshine updated outdated information in the KDevelop HOWTO and
 	  fixed some incorrect examples.  Also updated the snap5 screenshot so
 	  that it no longer mentions the obsolete cssys library.
+	- Eric Sunshine fixed Jam build system bug where it failed to run
+	  `ranlib' on the installed libraries.  (Instead, it incorrectly
+	  invoked ranlib just after building the libraries, which is completely
+	  ineffectual.)
 31-Mar-2004
 	- Jorrit fixed a bug with iSector->HitBeamPortals(). It would not
 	  be able to register hits on meshes that don't return a polygon
