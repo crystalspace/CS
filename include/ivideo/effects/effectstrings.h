@@ -18,9 +18,9 @@
 
 /*
  * Do not add double include protection here! 
- *  CS\include\ivideo\effects\efstring.h  is the only file that should include this file and it MUST
- *  be able to include it twice or these strings will all be empty!
- *
+ * CS\include\ivideo\effects\efstring.h  is the only file that should
+ * include this file and it MUST be able to include it twice or these
+ * strings will all be empty!
  */
 
 

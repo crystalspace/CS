@@ -23,6 +23,7 @@ for each given day, however, are in normal (ascending) chronological order.
 	  plugins/video/canvas/xwindowcommon. These include files are common
 	  to all canvas implementations that use X-Windows but they don't
 	  need to be public.
+	- Jorrit did more Doxygen and indentation cleanups in include/ivideo.
 26-Jul-2003
 	- Wouter Wijngaards fixed the partedit awssink.cpp file, removed
 	  'static' from enums and put initializers for a constructor

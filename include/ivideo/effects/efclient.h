@@ -41,9 +41,9 @@ SCF_VERSION (iEffectClient, 0, 0, 1);
 struct iEffectClient : public iBase
 {
 public:
-
   /// Validate a technique
-  virtual bool Validate( iEffectDefinition* effect, iEffectTechnique* technique ) = 0;
+  virtual bool Validate( iEffectDefinition* effect,
+	iEffectTechnique* technique ) = 0;
 };
 
 /** @} */

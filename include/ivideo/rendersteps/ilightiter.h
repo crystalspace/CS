@@ -25,12 +25,14 @@
 
 SCF_VERSION (iLightIterRenderStep, 0, 0, 1);
 
+/// Document me!@@@
 struct iLightIterRenderStep : public iBase
 {
 };
 
 SCF_VERSION (iLightRenderStep, 0, 0, 1);
 
+/// Document me!@@@
 struct iLightRenderStep : public iBase
 {
   virtual void Perform (iRenderView* rview, iSector* sector,

@@ -25,6 +25,7 @@
 
 struct iEffectServer;
 
+/// Document me!@@@
 class csEffectStrings
 {
 public:

@@ -47,10 +47,11 @@ struct iShaderProgram;
 struct iShaderProgramPlugin;
 struct iShaderRenderInterface;
 
+SCF_VERSION (iShaderVariable, 0, 1, 0);
+
 /**
  * A variable stored in any of the shader-related classes.
  */
-SCF_VERSION (iShaderVariable, 0, 1, 0);
 struct iShaderVariable : public iBase
 {
   /// Types of variables
@@ -95,6 +96,7 @@ struct iShaderVariable : public iBase
 };
 
 SCF_VERSION (iShaderBranch, 0, 0, 1);
+
 /**
  * Any class that wants in on the shader variable system
  * must implement this interface.
@@ -113,16 +115,21 @@ struct iShaderBranch : public iBase
   /// Get the symbol table (used by the implementation to store the variables)
   virtual csSymbolTable* GetSymbolTable() = 0;
 
-  /// Get a symbol table from the array of symbol tables.
-  /// If there is only one symbol table, return that one.
+  /**
+   * Get a symbol table from the array of symbol tables.
+   * If there is only one symbol table, return that one.
+   */
   virtual csSymbolTable* GetSymbolTable(int index) = 0;
 
-  /// Select the current symbol table from the array of symbol tables.
-  /// If there is only one symbol table, this is a no-op.
+  /**
+   * Select the current symbol table from the array of symbol tables.
+   * If there is only one symbol table, this is a no-op.
+   */
   virtual void SelectSymbolTable(int index) = 0;
 };
 
 SCF_VERSION (iShaderManager, 0, 1, 0);
+
 /**
  * A manager for all shaders. Will only be one at a given time
  */
@@ -145,6 +152,8 @@ struct iShaderManager : iShaderBranch
 };
 
 SCF_VERSION (iShaderRenderInterface, 0,0,1);
+
+/// Document me!@@@
 struct iShaderRenderInterface : iBase
 {
   /// Get a implementationspecific object
@@ -152,6 +161,7 @@ struct iShaderRenderInterface : iBase
 };
 
 SCF_VERSION (iShader, 0,0,1);
+
 /**
  * Specific shader. Can/will be either render-specific or general
  */
@@ -171,7 +181,10 @@ struct iShader : iShaderBranch
   /// Retrieve the best technique in this shader
   virtual iShaderTechnique* GetBestTechnique() = 0;
 
-  /// Check if valid (normaly a shader is valid if there is at least one valid technique)
+  /**
+   * Check if valid (normaly a shader is valid if there is at least one
+   * valid technique)
+   */
   virtual bool IsValid() const = 0;
 
   /// Loads a shader from buffer
@@ -180,11 +193,15 @@ struct iShader : iShaderBranch
   /// Loads from a document-node
   virtual bool Load(iDocumentNode* node) = 0;
 
-  /// Prepares the shader for usage. Must be called before the shader is assigned to a material
+  /**
+   * Prepares the shader for usage. Must be called before the shader is
+   * assigned to a material.
+   */
   virtual bool Prepare() = 0;
 };
 
 SCF_VERSION(iShaderWrapper, 0, 0, 1);
+
 /**
  * A thin wrapper over iShader to do dynamic selection of which iMaterial
  * the shader is acting on.
@@ -199,6 +216,7 @@ struct iShaderWrapper : iShaderBranch
 };
 
 SCF_VERSION (iShaderTechnique, 0,0,1);
+
 /**
  * One specific technique used by shader.
  */
@@ -234,6 +252,7 @@ struct iShaderTechnique : iShaderBranch
 };
 
 SCF_VERSION (iShaderPass, 0,0,1);
+
 /**
  * Description of a single pass in  a shader
  */
@@ -294,6 +313,7 @@ struct iShaderPass : iShaderBranch
 };
 
 SCF_VERSION (iShaderProgram, 0,0,1);
+
 /** 
  * A shader-program is either a vertexprogram, fragmentprogram or any
  * other type of "program" utilizied by shader.
@@ -324,12 +344,16 @@ struct iShaderProgram : iShaderBranch
   /// Loads from a document-node
   virtual bool Load(iDocumentNode* node) = 0;
 
-  /// Prepares the shaderprogram for usage.
-  /// Must be called before the shader is assigned to a material.
+  /**
+   * Prepares the shaderprogram for usage.
+   * Must be called before the shader is assigned to a material.
+   */
   virtual bool Prepare() = 0;
 };
 
 SCF_VERSION(iShaderProgramPlugin, 0,0,1);
+
+/// Document me!@@@
 struct iShaderProgramPlugin : iBase
 {
   virtual csPtr<iShaderProgram> CreateProgram(const char* type) = 0;

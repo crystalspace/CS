@@ -51,8 +51,12 @@ public:
   /// Validate an effect.
   virtual bool Validate (iEffectDefinition* effect ) = 0;
 
-  /// Select the best technique in an effect, based on validity and quality settings.
-  virtual iEffectTechnique* SelectAppropriateTechnique (iEffectDefinition* effect ) = 0;
+  /**
+   * Select the best technique in an effect, based on validity and quality
+   * settings.
+   */
+  virtual iEffectTechnique* SelectAppropriateTechnique (
+  	iEffectDefinition* effect ) = 0;
 
   /// Get a effect based on it's name
   virtual iEffectDefinition* GetEffect (const char *s) = 0;

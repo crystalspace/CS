@@ -25,6 +25,7 @@ struct iSector;
 
 SCF_VERSION (iRenderStep, 0, 0, 1);
 
+/// Document me!@@@
 struct iRenderStep : public iBase
 {
   virtual void Perform (iRenderView* rview, iSector* sector) = 0;

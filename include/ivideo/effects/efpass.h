@@ -43,24 +43,23 @@ SCF_VERSION (iEffectPass, 0, 0, 1);
 struct iEffectPass : public iBase
 {
   /// Set a state float.
-  virtual void SetStateFloat( csStringID state, float value ) = 0;
+  virtual void SetStateFloat (csStringID state, float value) = 0;
   /// Set a state string.
-  virtual void SetStateString( csStringID state, csStringID value ) = 0;
+  virtual void SetStateString (csStringID state, csStringID value) = 0;
   /// Set a state opaque data.
-  virtual void SetStateOpaque( csStringID state, void *value ) = 0;
+  virtual void SetStateOpaque (csStringID state, void *value) = 0;
   /// Set a state vector4.
-  virtual void SetStateVector4( csStringID state, csEffectVector4 value) = 0;
+  virtual void SetStateVector4 (csStringID state, csEffectVector4 value) = 0;
 
   
   /// Get a state float.
-  virtual float GetStateFloat( csStringID state ) = 0;
+  virtual float GetStateFloat (csStringID state) = 0;
   /// Get a state string.
-  virtual csStringID GetStateString( csStringID state ) = 0;
+  virtual csStringID GetStateString (csStringID state) = 0;
   /// Get a state opaque data.
-  virtual void *GetStateOpaque( csStringID state ) = 0;
+  virtual void *GetStateOpaque (csStringID state) = 0;
   /// Get a state vector4.
-  virtual csEffectVector4 GetStateVector4( csStringID state) = 0;
-
+  virtual csEffectVector4 GetStateVector4 (csStringID state) = 0;
 
 
   /// Create a new layer.
