@@ -8,7 +8,7 @@ AC_PREREQ([2.54])
 # Initialize autoconf
 #----------------------------------------------------------------------------
 AC_INIT([#PROJECTNAME#], [#VERSION#], [#EMAIL#])
-CS_PACKAGEINFO([#LONGNAME#], [#Copyright#], [#Homepage#])
+CS_PACKAGEINFO([#LONGNAME#], [#COPYRIGHT#], [#HOMEPAGE#])
 AC_CONFIG_SRCDIR([mk/jam/build.jam])
 AC_CONFIG_AUX_DIR([mk/autoconf])
 AC_CANONICAL_HOST

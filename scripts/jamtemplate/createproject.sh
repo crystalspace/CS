@@ -122,7 +122,7 @@ function SetupFromTemplate
 	     | sed -e "s^#LONGNAME#^$LONGNAME^g" \
 	     | sed -e "s^#AUTHOR#^$AUTHOR^g" \
 	     | sed -e "s^#VERSION#^$VERSION^g" \
-	     | sed -e "s^#COPYRIGHT#^$VERSION^g" \
+	     | sed -e "s^#COPYRIGHT#^$COPYRIGHT^g" \
 	       > "$2"
 }
 
