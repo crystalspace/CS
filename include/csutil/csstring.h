@@ -165,8 +165,12 @@ public:
    *   if the string represents a null-pointer.
    * \remarks See the class description for a discussion about how and when the
    *   string will represent a null-pointer.
+   * \warning This returns a non-const pointer, so use this function with care!
+   * \deprecated Use the 'const' version of GetData() instead.
    */
-  char const* GetData () const
+  /*CS_DEPRECATED_METHOD*/ 
+    // @@@ GCC and VC always seem to prefer this GetData() and barf "deprecated".
+  char* GetData ()
   { return Data; }
 
   /**
@@ -175,10 +179,8 @@ public:
    *   if the string represents a null-pointer.
    * \remarks See the class description for a discussion about how and when the
    *   string will represent a null-pointer.
-   * \warning This returns a non-const pointer, so use this function with care!
-   * \deprecated Use the 'const' version of GetData() instead.
    */
-  char* GetData ()
+  char const* GetData () const
   { return Data; }
 
   /**

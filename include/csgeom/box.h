@@ -61,7 +61,7 @@ class csPoly2D;
 /** @} */
 
 /**
- * \name Indices of edges for cxBox2.
+ * \name Indices of edges for csBox2.
  * Index e+1 is opposite edge of e (with e even).
  * @{ */
 /// from min X, min Y to max X, min Y
@@ -505,7 +505,7 @@ public:
 /** @} */
 
 /**
- * \name Indices of edges for cxBox3.
+ * \name Indices of edges for csBox3.
  * Index e+1 is opposite edge of e (with e even).
  * @{ */
 /// from max X, min Y, min Z to min X, min Y, min Z

@@ -675,3 +675,25 @@ over those discovered later.
 Previously, @sc{vfs} stopped searching for configuration information at the
 first directory containing a file named @file{vfs.cfg}, and loaded only that
 file.
+
+@subheading @code{iEvent} Changes
+
+The @code{iEvent::Find()} method was renamed to @code{Retrieve()} and 
+possesses different return value semantics: more informaation than a simple
+@code{bool} is returned, however, in case of success @code{csEventErrNone}, 
+which has a value of 0, is returned. Hence @code{if}-statements to test whether
+retrieval of an attribute succeeded have to be changed, from:
+@example
+iEvent* ev;
+if (ev->Find (...))
+@{
+  /* ... */
+@}
+@end example
+To:
+iEvent* ev;
+if (ev->Retrieve (...) == csEventErrNone)
+@{
+  /* ... */
+@}
+@end example

@@ -162,7 +162,7 @@ struct iImage : public iBase
    * Check if image has a keycolour stored with it.
    * \deprecated Use HasKeyColor() instead.
    */
-  virtual bool HasKeycolor () const = 0;
+  CS_DEPRECATED_METHOD virtual bool HasKeycolor () const = 0;
 
   /// Get the keycolour stored with the image.
   virtual void GetKeyColor (int &r, int &g, int &b) const = 0;
@@ -171,7 +171,7 @@ struct iImage : public iBase
    * Get the keycolour stored with the image.
    * \deprecated Use GetKeyColor() instead.
    */
-  virtual void GetKeycolor (int &r, int &g, int &b) const = 0;
+  CS_DEPRECATED_METHOD virtual void GetKeycolor (int &r, int &g, int &b) const = 0;
 
   /**
    * Create a sharpened copy of the image.

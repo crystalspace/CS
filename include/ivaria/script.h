@@ -193,10 +193,11 @@ SCF_VERSION (iScript, 0, 0, 2);
 struct iScript : public iBase
 {
   /// This function is deprecated and should no longer be used.
-  virtual bool Initialize (iObjectRegistry *object_reg) = 0;
+  CS_DEPRECATED_METHOD virtual bool Initialize (iObjectRegistry *object_reg) = 0;
 
   /// This function is deprecated and should no longer be used.
-  virtual bool Store (const char* name, void* data, void* tag) = 0;
+  CS_DEPRECATED_METHOD virtual bool Store (const char* name, void* data, 
+    void* tag) = 0;
 
   /// Run some script in the scripting language.
   virtual bool RunText (const char *text) = 0;

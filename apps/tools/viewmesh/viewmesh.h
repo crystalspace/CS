@@ -53,7 +53,8 @@ private:
 
   csMenu *menu,*activemenu;
   csWindow *dialog;
-  csStringArray stateslist,actionlist,activelist,meshlist,morphanimationlist,socketlist;
+  csStringArray stateslist, actionlist, activelist, meshlist,
+    morphanimationlist, socketlist;
   enum { movenormal, moveorigin, rotateorigin } cammode;
 
   void UpdateSpritePosition(csTicks elapsed);
@@ -64,8 +65,8 @@ private:
    *                       want to attach to.
    * \param fileName The VFS path to the mesh we want to attach.
    */
-  bool AttachMeshToSocket (int socketNumber, char* fileName, float xrot,
-      	float yrot, float zrot);
+  bool AttachMeshToSocket (int socketNumber, const char* fileName, 
+    float xrot,	float yrot, float zrot);
   
   /**
    * Create the window for the rotation of a mesh attached to a slot.

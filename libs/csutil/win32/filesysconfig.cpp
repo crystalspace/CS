@@ -22,35 +22,33 @@
 #include "csutil/sysfunc.h"
 #include "shellstuff.h"
 
-static void ReplaceReserved (char* key)
+static void ReplaceReserved (csString& key, size_t offset)
 {
-  size_t len = (size_t)strlen (key);
-  size_t p;
-  while ((p = strcspn (key, "<>:\"\\/|*?")) < len)
-    *(key + p) = '_';
+  size_t p = offset;
+  while ((p = key.FindFirst ("<>:\"\\/|*?", p)) != (size_t)-1)
+    key[p] = '_';
 }
 
-static void ReplaceSeparators (char* key)
+static void ReplaceSeparators (csString& key, size_t offset)
 {
-  size_t len = (size_t)strlen (key);
-  size_t p;
-  while ((p = strcspn (key, ".")) < len)
-    *(key + p) = '\\';
+  size_t p = offset;
+  while ((p = key.FindFirst (".", p)) != (size_t)-1)
+    key[p] = '\\';
 }
 
-static void MakeDir (char* name)
+static void MakeDir (const char* name)
 {
   struct stat stats;
   if (stat (name, &stats) == 0)
     return;
 
-  char* bslash = strrchr (name, '\\');
+  const char* bslash = strrchr (name, '\\');
   if (!bslash)
     return;
-  *bslash = 0;
-  CS_ALLOC_STACK_ARRAY (char, upPath, strlen (name) + 1);
-  strcpy (upPath, name);
-  *bslash = '\\';
+  const size_t len = bslash - name;
+  CS_ALLOC_STACK_ARRAY (char, upPath, len + 1);
+  strncpy (upPath, name, len);
+  upPath[len] = 0;
 
   MakeDir (upPath);
   CreateDirectoryEx (upPath, name, 0);
@@ -61,14 +59,14 @@ csPtr<iConfigFile> csGetPlatformConfig (const char* Key)
   csString path = csGetPlatformConfigPath (Key);
   path << ".cfg";
 
-  char* bslash = strrchr (path.GetData(), '\\');
-  if (bslash)
-    *bslash = 0;
+  size_t bslash = path.FindLast ('\\');
+  if (bslash != (size_t)-1)
+    path[bslash] = 0;
   // @@@ Would be nicer if this was only done when the config file is really 
   // saved to disk.
   MakeDir (path.GetData());
-  if (bslash)
-    *bslash = '\\';
+  if (bslash != (size_t)-1)
+    path[bslash] = '\\';
 
   // Create/read a config file; okay if missing; will be created when written
   return new csConfigFile (path);
@@ -91,9 +89,9 @@ csString csGetPlatformConfigPath (const char* key)
   }
 
   path << appDataPath << "\\" << key;
-  char* rpKey = path.GetData() + strlen (appDataPath) + 1;
-  ReplaceReserved (rpKey);
-  ReplaceSeparators (rpKey);
+  const size_t adpl = strlen (appDataPath) + 1;
+  ReplaceReserved (path, adpl);
+  ReplaceSeparators (path, adpl);
   
   return path;
 }

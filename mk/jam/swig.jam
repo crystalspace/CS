@@ -42,6 +42,10 @@ if $(CMD.SWIG)
   # rather than `new sometype[n]' (at least gcc considers it illegal),
   # therefore, we transform the expression by dropping the parentheses.
   #
+  # (5) cs_pyth.cpp contains a macro "#define SWIG_init init_cspace". However,
+  # cs_pyth.cpp may reside in a shared lib, so we rather want the name 
+  # SWIG_init and define init_cspace as a simple forwared ourselves.
+  #
   # (Despite the fact that these customizations might seem project-specific,
   # they should be safe for all projects.)
   SWIG.SED_SCRIPT =
@@ -57,7 +61,8 @@ if $(CMD.SWIG)
     #endif\\
     \\1/g
     /\$Header:/d
-    s/new[ 	][ 	]*(\\([^)][^)]*\\))[ 	]*\\[/new \\1 [/g'" ;
+    s/new[ 	][ 	]*(\\([^)][^)]*\\))[ 	]*\\[/new \\1 [/g
+    /[ 	]*#[ 	]*define[ 	][ 	]*SWIG_init[ 	]*.*/d'" ;
 
   ## Swig targets : swigfile : language [ : swigflags [ : swigincdirs
   ##     [ : swigfiledir [ : frozendirs [ : tag [ : outdir ]]]]]]

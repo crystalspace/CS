@@ -111,6 +111,8 @@ struct iString : public iBase
    * \warning This returns a non-const pointer, so use this function with care!
    * \deprecated Use the 'const' version of GetData() instead.
    */
+  /*CS_DEPRECATED_METHOD*/ 
+    // @@@ GCC and VC always seem to prefer this GetData() and barf "deprecated".
   virtual char* GetData () = 0;
 
   /**

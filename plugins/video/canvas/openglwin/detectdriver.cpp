@@ -161,7 +161,8 @@ void csDetectDriver::DetermineDriverVersion()
     // Try appending ".dll"
     csString newName (DriverDLL);
     newName.Append (".dll");
-    verInfoSize = GetFileVersionInfoSizeA (newName.GetData(), &dummy);
+    verInfoSize = GetFileVersionInfoSizeA (
+      CS_CONST_CAST(char*,newName.GetData()), &dummy);
   }
   if (verInfoSize != 0)
   {

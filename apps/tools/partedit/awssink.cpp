@@ -1336,7 +1336,9 @@ void awsSink::FillGraphicFileList()
     pl=wmgr->CreateParmList();
 
     // Update the path display
-    GraphicSelectionData.iawscomponent_GraphicFileList->SetProperty("Column0Caption",GraphicSelectionData.currentdirectory->GetData());
+    GraphicSelectionData.iawscomponent_GraphicFileList->SetProperty 
+      ("Column0Caption", 
+      CS_CONST_CAST(char*, GraphicSelectionData.currentdirectory->GetData()));
 
     // Clear out list
     GraphicSelectionData.iawscomponent_GraphicFileList->Execute("ClearList");

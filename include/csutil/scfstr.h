@@ -87,6 +87,8 @@ public:
   virtual char const* GetData () const;
 
   /// Get a pointer to null-terminated character data.
+  /*CS_DEPRECATED_METHOD*/ 
+    // @@@ GCC and VC always seem to prefer this GetData() and barf "deprecated".
   virtual char* GetData ();
 
   /// Query string length

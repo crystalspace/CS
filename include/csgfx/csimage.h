@@ -191,7 +191,7 @@ public:
    * Check if image has a keycolour stored with it.
    * \deprecated Use HasKeyColor() instead.
    */
-  virtual bool HasKeycolor () const
+  CS_DEPRECATED_METHOD virtual bool HasKeycolor () const
   { return HasKeyColor() ; }
   /// Get the keycolour stored with the image.
   virtual void GetKeyColor (int &r, int &g, int &b) const;
@@ -199,7 +199,7 @@ public:
    * Get the keycolour stored with the image.
    * \deprecated Use GetKeyColor() instead.
    */
-  virtual void GetKeycolor (int &r, int &g, int &b) const
+  CS_DEPRECATED_METHOD virtual void GetKeycolor (int &r, int &g, int &b) const
   { GetKeyColor(r,g,b); }
   /// Create a sharpened copy of the image
   virtual csPtr<iImage> Sharpen (csRGBpixel *transp, int strength) const;

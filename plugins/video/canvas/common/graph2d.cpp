@@ -962,8 +962,9 @@ void csGraphics2D::AlertV (int type, const char* title, const char* okMsg,
     const char* msg, va_list arg)
 {
   (void)type; (void)title; (void)okMsg;
-  printf ("ALERT: ");
-  vprintf (msg, arg);
+  csPrintf ("ALERT: ");
+  csPrintfV (msg, arg);
+  csPrintf ("\n");
   fflush (stdout);
 }
 

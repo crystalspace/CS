@@ -127,7 +127,7 @@ bool csConsoleInput::HandleEvent (iEvent &Event)
 	      strCursorPos = 0;
 	      vCursorPos = 0;
 	      size_t slen = line.Length ();
-	      char* ch = line.GetData ();
+	      const char* ch = line.GetData ();
 	      while (*ch)
 	      {
 		size_t skip = csUnicodeTransform::UTF8Skip ((utf8_char*)ch, 
@@ -150,7 +150,7 @@ bool csConsoleInput::HandleEvent (iEvent &Event)
 	      strCursorPos = 0;
 	      vCursorPos = 0;
 	      size_t slen = line.Length ();
-	      char* ch = line.GetData ();
+	      const char* ch = line.GetData ();
 	      while (*ch)
 	      {
 		size_t skip = csUnicodeTransform::UTF8Skip ((utf8_char*)ch, 
@@ -190,7 +190,7 @@ bool csConsoleInput::HandleEvent (iEvent &Event)
 	      // Set cursor to end of line
 	      strCursorPos = 0;
 	      vCursorPos = 0;
-	      char* ch = line.GetData ();
+	      const char* ch = line.GetData ();
 	      size_t slen = line.Length ();
 	      while (*ch)
 	      {

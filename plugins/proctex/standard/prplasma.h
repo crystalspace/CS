@@ -28,7 +28,7 @@
 /**
  * Plasma.
  */
-class CS_CSTOOL_EXPORT csProcPlasma : public csProcTexture
+class csProcPlasma : public csProcTexture
 {
 private:
   /// palette

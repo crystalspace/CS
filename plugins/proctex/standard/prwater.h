@@ -28,7 +28,7 @@
 /**
  * Water.
  */
-class CS_CSTOOL_EXPORT csProcWater : public csProcTexture
+class csProcWater : public csProcTexture
 {
 private:
   /// palette

@@ -151,7 +151,7 @@ typedef class MD3Model {
   void ReportError (const char* description, ...);
   bool LoadMD3(void);
   bool LoadSkin(char *md3File);
-  char *GetFileName();
+  const char *GetFileName();
   bool ReadHeader(char **headerBuf);
   
  public:

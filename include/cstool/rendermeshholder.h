@@ -41,7 +41,7 @@ struct csRenderMesh;
  */
 class CS_CSTOOL_EXPORT csRenderMeshHolderSingle
 {
-  struct csRenderMeshPtr
+  struct CS_CSTOOL_EXPORT csRenderMeshPtr
   {
     csRenderMesh* ptr;
 

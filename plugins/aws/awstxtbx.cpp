@@ -141,7 +141,7 @@ bool awsTextBox::GetProperty (const char *name, void **parm)
 
   if (strcmp ("Text", name) == 0)
   {
-    char *st = 0;
+    const char *st = 0;
 
     if (text) st = text->GetData ();
 
@@ -151,7 +151,7 @@ bool awsTextBox::GetProperty (const char *name, void **parm)
   }
   else if (strcmp ("Disallow", name) == 0)
   {
-    char *st = 0;
+    const char *st = 0;
 
     if (disallow) st = disallow->GetData ();
 

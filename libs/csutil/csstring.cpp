@@ -295,7 +295,7 @@ size_t csString::FindLast (char c, size_t pos) const
 // is undefined.
 csString& csString::Downcase()
 {
-  char* p = GetData();
+  char* p = Data;
   if (p != 0)
   {
     char const* const pN = p + Length();
@@ -311,7 +311,7 @@ csString& csString::Downcase()
 // is undefined.
 csString& csString::Upcase()
 {
-  char* p = GetData();
+  char* p = Data;
   if (p != 0)
   {
     char const* const pN = p + Length();

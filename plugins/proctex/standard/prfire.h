@@ -33,7 +33,7 @@ struct csRGBcolor;
 /**
  * Fire.
  */
-class CS_CSTOOL_EXPORT csProcFire : public csProcTexture, public iFireTexture
+class csProcFire : public csProcTexture, public iFireTexture
 {
 private:
   /// Palette.

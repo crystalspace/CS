@@ -97,7 +97,7 @@ bool awsMenuEntry::GetProperty (const char* name, void **parm)
 	
   if (strcmp ("Caption", name) == 0)
   {
-    char *st = 0;
+    const char *st = 0;
     
     if (caption) st = caption->GetData ();
     
@@ -386,7 +386,7 @@ bool awsMenuBarEntry::GetProperty (const char* name, void **parm)
 
   if (strcmp ("Caption", name) == 0)
   {
-    char *st = 0;
+    const char *st = 0;
 
     if (caption) st = caption->GetData ();
 

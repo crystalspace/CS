@@ -55,7 +55,7 @@ CS_IMPLEMENT_APPLICATION
 void splitpath (const char *iPathName, char *oPath, size_t iPathSize,
 		char *oName, size_t iNameSize);
 char *stristr(const char *String, const char *Pattern);
-char *basename(char *path, char *base);
+char *basename(const char *path, char *base);
 char *filename(char *path, char *file);
 char *lowercase(char *str);
 
@@ -141,7 +141,7 @@ void MD3Model::Init(csRef < iVFS > *vfsRef)
   vfs = vfsRef;
 }
 
-char *MD3Model::GetFileName()
+const char *MD3Model::GetFileName()
 {
   return fileName.GetData();
 }
@@ -1150,7 +1150,7 @@ char *stristr(const char *String, const char *Pattern)
 
 /*----------------------------------------------------------------------------*/
 
-char *basename(char *path, char *base)
+char *basename(const char *path, char *base)
 {
   char *dir, *file;
   char *ptr, *point;

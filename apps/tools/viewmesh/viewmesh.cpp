@@ -68,6 +68,12 @@
 #include "iutil/plugin.h"
 #include "imap/writer.h"
 
+// Hack: work around problems caused by #defining 'new'
+#if defined(CS_EXTENSIVE_MEMDEBUG) || defined(CS_MEMORY_TRACKER)
+# undef new
+#endif
+#include <new>
+
 #include <cal3d/animcallback.h>
 
 CS_IMPLEMENT_APPLICATION
@@ -1107,7 +1113,7 @@ bool ViewMesh::Initialize ()
   return true;
 }
 
-bool ViewMesh::AttachMeshToSocket( int socketNumber, char* meshFile, 
+bool ViewMesh::AttachMeshToSocket( int socketNumber, const char* meshFile, 
                                    float xRot, float yRot, float zRot )
 {
   csRef<iSpriteCal3DState> cal3dstate(

@@ -221,7 +221,7 @@ public:
    * Add an element to the hash table, overwriting if the key already exists.
    * \deprecated Use PutUnique() instead.
    */
-  void PutFirst (const K& key, const T &value)
+  CS_DEPRECATED_METHOD void PutFirst (const K& key, const T &value)
   {
     PutUnique(key, value);
   }

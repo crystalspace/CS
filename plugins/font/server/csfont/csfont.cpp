@@ -47,7 +47,7 @@ SCF_IMPLEMENT_IBASE_END
 
 struct csFontDef
 {
-  char *Name;
+  const char* Name;
   int Height;
   int Baseline;
   uint8 *FontBitmap;
@@ -272,10 +272,8 @@ error:
       char *start = cur;
       while ((cur < end) && (*cur != ' '))
         cur++;
-      fontdefName.SetCapacity (cur - start);
+      fontdefName.Replace (start, cur - start);
       fontdef.Name = fontdefName.GetData ();
-      memcpy (fontdef.Name, start, cur - start);
-      fontdef.Name [cur - start] = 0;
     }
     else
     {

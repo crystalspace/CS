@@ -238,7 +238,7 @@ bool awsWindow::GetProperty (const char *name, void **parm)
 
   if (strcmp ("Title", name) == 0)
   {
-    char *st = 0;
+    const char *st = 0;
 
     if (title) st = title->GetData ();
 

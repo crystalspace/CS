@@ -31,7 +31,7 @@ class csProcSky;
 /**
  * A polygon of a sky.
  */
-class CS_CSTOOL_EXPORT csProcSkyTexture : public csProcTexture
+class csProcSkyTexture : public csProcTexture
 {
   /// the sky this is a part of
   csProcSky *sky;
@@ -97,7 +97,7 @@ public:
  * a sky, this represents a whole sphere of sky - so multiple polygons
  * can be rendered to.
  */
-class CS_CSTOOL_EXPORT csProcSky
+class csProcSky
 {
   /// the proc sky textures of this sky
   csProcSkyTexture *firstsky;

@@ -26,6 +26,25 @@ chronological order.
 		which they can use to getUserData in order to get their own 
 		application-specific data about which entity the callback is 
 		referring to.
+	- res made the following changes:
+	    - Fixed (or worked around in rare cases) uses of non-const
+	      csString::GetData().
+	    - Added macros to mark methods or types as deprecated. Compilers
+	      which support this will emit a warning when such a deprecated
+	      method is uses.
+	    - Marked some deprecated methods with above macro.
+	    - Changed csRenderMeshHolderSingle to use a block allocator instead
+	      of new/delete for allocated rendermeshes.
+	    - Fixed typos in csgeom/box.h.
+	    - Added a paragraph to the API mods section about the iEvent
+	      Find() to Retrieve() renaming a while back.
+	    - Fixed invalid use of CSTOOL_EXPORTS macro in stdpt plugin.
+	    - Made the Python glue reside in a shared lib for some more space
+	      efficiency. The glue code generates object code of significant
+	      size which can be shared between the Py module and plugin.
+	    - Updated cs-win32libs link.
+	    - Fixed viewmesh to compile with memory debugging or mem tracker
+	      enabled.
 7-Dec-2004
 	- Eric Sunshine added new Autoconf macros CS_CHECK_PROG(),
 	  CS_CHECK_PROGS(), CS_CHECK_TOOL(), CS_CHECK_TOOLS(), CS_PATH_PROG(),

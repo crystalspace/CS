@@ -136,41 +136,41 @@ void csArchive::ReadDirectory ()
 
   // First, make a list of all possible directory components.
   csString filename;
-  csSet<char*, csConstCharHashKeyHandler> dset;
+  csSet<csStrKey, csConstCharHashKeyHandler> dset;
   for (size_t i = 0, n = dir.Length(); i < n; i++)
   {
     ArchiveEntry const* e = dir.Get (i);
     filename = e->filename;
-    char* sep = filename.GetData();
-    while (sep)
+    size_t sep = 0;
+    while (sep < filename.Length())
     {
-      char* slash = strchr(sep, '/');
-      if (slash == 0)
-        slash = strchr (sep, CS_PATH_SEPARATOR);
+      size_t slash = filename.FindFirst ('/', sep);
+      if (slash == (size_t)-1)
+	slash = filename.FindFirst (CS_PATH_SEPARATOR, sep);
       sep = slash;
-      if (sep != 0)
+      if (sep != (size_t)-1)
       {
-        char const ch = *++sep;
-	*sep = 0;
-        if (!dset.In(filename.GetData()))
-          dset.AddNoTest(strdup(filename)); // String is freed below.
-        *sep = ch;
+        char const ch = filename[++sep];
+	filename[sep] = 0;
+        if (!dset.In (filename.GetData()))
+          dset.AddNoTest (csStrKey (filename)); 
+        filename[sep] = ch;
       }
     }
   }
 
   // Now, iterate over `dset' and create fake directory components.
-  csSet<char*, csConstCharHashKeyHandler>::GlobalIterator it = dset.GetIterator();
+  csSet<csStrKey, csConstCharHashKeyHandler>::GlobalIterator it = 
+    dset.GetIterator();
   while (it.HasNext())
   {
-    char* dname = it.Next();
+    const char* dname = it.Next();
     if (!FileExists (dname))
     {
       ArchiveEntry* f = CreateArchiveEntry(dname, 0, 0);
       f->faked = true;
       dir.InsertSorted (f, ArchiveEntryVector::Compare);
     }
-    free(dname); // Free string we allocated above and stored in `dset'.
   }
 }
 

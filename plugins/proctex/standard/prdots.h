@@ -27,7 +27,7 @@
 /**
  * Random dots (demonstration procedural texture).
  */
-class CS_CSTOOL_EXPORT csProcDots : public csProcTexture
+class csProcDots : public csProcTexture
 {
 private:
   /// palette

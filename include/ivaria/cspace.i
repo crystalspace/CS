@@ -98,6 +98,8 @@
 #define CS_CSUTIL_EXPORT
 #define CS_CSWS_EXPORT
 #define CS_LEAKGUARD_DECLARE(m)
+#define CS_DEPRECATED_METHOD
+#define CS_DEPRECATED_TYPE
 
 /* For debugging: If you need to debug the build commands for the scripting
  * modules, or if you need to debug or test certain small portions of the

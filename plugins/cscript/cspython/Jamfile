@@ -45,13 +45,20 @@ if $(PYTHON.AVAILABLE) = "yes"
   }
   InstallCSPythonPY $(cspacepy) : bindings python ;
 
+  Library cspycommon : $(common) : noinstall shared ;
+  LibDepends cspycommon : cstool csgfx csgeom csutil ;
+  ExternalLibs cspycommon : PYTHON ;
+  CFlags cspycommon :
+    [ FDefines SWIG_GLOBAL ]
+    $(COMPILER.C++FLAGS.WARNING.NO_UNUSED) 
+    $(COMPILER.C++FLAGS.WARNING.NO_UNINITIALIZED) ;
 
   #--------
   # cspython -- Crystal Space plugin
   #--------
   Description cspython : "Python plugin" ;
-  Plugin cspython : $(common) cspython.h cspython.cpp pytocs.h pytocs.cpp ;
-  LinkWith cspython : cstool csgfx csgeom csutil ;
+  Plugin cspython : cspython.h cspython.cpp pytocs.h pytocs.cpp ;
+  LinkWith cspython : cspycommon cstool csgfx csgeom csutil ;
   ExternalLibs cspython : PYTHON ;
   CFlags cspython :
     [ FDefines SWIG_GLOBAL ]
@@ -73,7 +80,8 @@ if $(PYTHON.AVAILABLE) = "yes"
   local commonobj = [ DoObjectGrist $(common:S=$(SUFOBJ)) ] ;
 
   local pythmodsrc = [ DoSourceGrist pythmod.cpp ] ;
-  local pythmodobj = $(commonobj) [ CompileObjects $(pythmodsrc) ] ;
+  #local pythmodobj = $(commonobj) [ CompileObjects $(pythmodsrc) ] ;
+  local pythmodobj = [ CompileObjects $(pythmodsrc) ] ;
 
   local pythmod = _cspace ;
   if $(PYTHON.MODULE_EXT)
@@ -88,7 +96,7 @@ if $(PYTHON.AVAILABLE) = "yes"
   pythmod_TARGET = $(pythmod) ;
   pythmod_SOURCES = $(pythmodsrc) ;
   pythmod_OBJECTS = $(pythmodobj) ;
-  LinkWith pythmod : cstool csgfx csgeom csutil ;
+  LinkWith pythmod : cspycommon cstool csgfx csgeom csutil ;
   ExternalLibs pythmod : PYTHON ;
   CFlags pythmod : $(PLUGIN.CFLAGS) ;
   LFlags pythmod : $(PLUGIN.LFLAGS) $(LINKLIBS) ;

@@ -20,23 +20,32 @@
 
 #include "cssysdef.h"
 
+#include "csutil/blockallocator.h"
 #include "cstool/rendermeshholder.h"
 #include "ivideo/rendermesh.h"
 
+struct RenderMeshBlockAlloc : public csBlockAllocator<csRenderMesh>
+{
+public:
+  RenderMeshBlockAlloc () : csBlockAllocator<csRenderMesh> (100) {}
+};
+CS_IMPLEMENT_STATIC_VAR (GetRMAlloc, RenderMeshBlockAlloc, ());
+
 csRenderMeshHolderSingle::csRenderMeshPtr::csRenderMeshPtr()
 {
-  ptr = new csRenderMesh;
+  ptr = GetRMAlloc()->Alloc();// new csRenderMesh;
 }
 
 csRenderMeshHolderSingle::csRenderMeshPtr::csRenderMeshPtr (
   csRenderMeshPtr const& other)
 {
-  ptr = new csRenderMesh (*other.ptr);
+  ptr = GetRMAlloc()->Alloc();
+  *ptr = *other.ptr;
 }
 
 csRenderMeshHolderSingle::csRenderMeshPtr::~csRenderMeshPtr()
 {
-  delete ptr;
+  GetRMAlloc()->Free (ptr);
 }
 
 csRenderMesh*& csRenderMeshHolderSingle::GetUnusedMesh (bool& created,
