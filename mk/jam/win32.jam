@@ -45,13 +45,7 @@ PLUGIN.LFLAGS = [ Filter $(PLUGIN.LFLAGS) : -shared ] ;
 # "jam all", so disable this feature.
 if $(OS) = "CYGWIN"
 {
-CMD.AR = "ar ru" ;
-NOARUPDATE = true ;
 NOARSCAN = true ;
-actions Archive
-{
-  $(CMD.AR) $(<) $(>)
-}
 }
 
 #----------------------------------------------------------------------------

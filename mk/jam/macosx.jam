@@ -1,6 +1,6 @@
 #==============================================================================
 # Jam configuration and actions for MacOS/X
-# Copyright (C) 2003,2004 by Eric Sunshine <sunshine@sunshineco.com>
+# Copyright (C) 2003-2005 by Eric Sunshine <sunshine@sunshineco.com>
 #
 #    This library is free software; you can redistribute it and/or modify it
 #    under the terms of the GNU Library General Public License as published by
@@ -38,13 +38,7 @@ RANLIB += "-s" ;
 
 # Experience seems to indicate that library scanning misbehaves on MacOS/X with
 # Jam 2.4, consequently we disable it.
-CMD.AR = "ar ru" ;
-NOARUPDATE = true ;
 NOARSCAN = true ;
-actions Archive
-{
-  $(CMD.AR) $(<) $(>)
-}
 
 #------------------------------------------------------------------------------
 # Public rules.
