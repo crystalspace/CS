@@ -16,6 +16,8 @@
   Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
+// test of CVS change 
+
 // G3D_D3D.CPP
 // csGraphics3DDirect3DDx6 implementation file
 // Written by Dan Ogles
