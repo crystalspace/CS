@@ -100,12 +100,12 @@ as background color, second is used to display text in window and so on.  By
 changing only the palette table we can change at once how all these components
 are looking.
 
-There is a number of pre-defined colors with names of the form 
-@samp{cs_Color_@var{XXX}}, for example @samp{cs_Color_Black}, 
-@samp{cs_Color_White} etc.  Components do not draw with 
-@samp{cs_Color_@var{XXX}} constants, they just indicate the index into their 
-palette.  All standard component palettes are contained in @file{cswspal.cpp} 
-and @file{cswspal.h} files.  
+There is a number of pre-defined colors with names of the form
+@samp{cs_Color_@var{XXX}}, for example @samp{cs_Color_Black},
+@samp{cs_Color_White} etc.  Components do not draw with
+@samp{cs_Color_@var{XXX}} constants, they just indicate the index into their
+palette.  All standard component palettes are contained in @file{cswspal.cpp}
+and @file{cswspal.h} files.
 
 @node CSWS Components, CSWS Events, CSWS Concepts, CSWS
 @subsection Components
@@ -224,9 +224,9 @@ non-filled rectangle.  Example: @code{Rect3D(0, 0, 4, 4)}.
 @item
 @code{ObliqueRect3D(@var{xmin}, @var{ymin}, @var{xmax}, @var{ymax}, @var{cornersize}, @var{darkindex}, @var{lightindex})}
 
-Draw a rectangle with oblique corners of given size.  For example, calling 
-@code{ObliqueRect3D(0, 0, 10, 7, 3)} draws an oblique rectangle such as the 
-following: 
+Draw a rectangle with oblique corners of given size.  For example, calling
+@code{ObliqueRect3D(0, 0, 10, 7, 3)} draws an oblique rectangle such as the
+following:
 
 @example
      0  1  2  3  4  5  6  7  8  9 ...
@@ -364,12 +364,12 @@ Contains the @dfn{dirty} rectangle.  If it is non-empty, the dirty area of
 component is redrawn just before the end-of-frame.
 
 @item int DragStyle
-Contains a combination of bits (defined by constants with names such as 
-@code{CS_DRAG_@var{XXX}}) that defines which sides of component can be dragged 
-with mouse when you call first the @code{csComponent::Drag()} method.  By 
-default it is equal to @samp{CS_DRAG_ALL}.  Note that if component won't call 
-@code{csComponent::Drag()} you won't be able to resize the component even if 
-@samp{DragStyle} is equal to @samp{CS_DRAG_ALL}.  
+Contains a combination of bits (defined by constants with names such as
+@code{CS_DRAG_@var{XXX}}) that defines which sides of component can be dragged
+with mouse when you call first the @code{csComponent::Drag()} method.  By
+default it is equal to @samp{CS_DRAG_ALL}.  Note that if component won't call
+@code{csComponent::Drag()} you won't be able to resize the component even if
+@samp{DragStyle} is equal to @samp{CS_DRAG_ALL}.
 
 @item csApp *app
 This is the ``main'' application object; the root of entire window tree.  It
@@ -448,7 +448,8 @@ example to check if the @kbd{@key{Alt}} modifier was pressed, and only this
 modifier you might use this code:
 
 @example
-if ((Event.Key.Modifiers & CSMASK_ALLSHIFTS) == CSMASK_ALT)
+if ((Event.Key.Modifiers & CSMASK_ALLSHIFTS) ==
+  CSMASK_ALT)
 @{
   @dots{} ALT + Event.Key.Code pressed @dots{}
 @}
@@ -543,8 +544,8 @@ app->InsertClipChild(menu);
 
 You should not assign directly to @samp{clipparent} variable since
 @code{InsertClipChild()} does much extra work.  For example it inserts the
-so-called ``clip children'' into component's clip child list, removes component
-from former @code{clipparent}'s ``clip children'' list and so on.
+so-called ``clip children'' into component's clip child list, removes
+component from former @code{clipparent}'s ``clip children'' list and so on.
 
 @subsubheading Partially Transparent Components
 
@@ -563,9 +564,9 @@ Mouse events for such components are considered ``eaten'' only if component's
 sent to the component placed below the transparent component.
 
 @item
-The output of windows below transparent components is not clipped.
-Instead the area of transparent component covered by output is invalidated
-so that it gets redrawn at the end of frame.
+The output of windows below transparent components is not clipped.  Instead
+the area of transparent component covered by output is invalidated so that it
+gets redrawn at the end of frame.
 @end itemize
 
 @node CSWS Tutorial, , CSWS Clipping, CSWS
