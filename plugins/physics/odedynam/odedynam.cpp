@@ -174,12 +174,13 @@ void csODEDynamics::NearCallback (void *data, dGeomID o1, dGeomID o2)
       float *f1 = (float *)dGeomGetData (contact[i].geom.g1);
       float *f2 = (float *)dGeomGetData (contact[i].geom.g2);
 
-      contact[i].surface.mode = dContactBounce | dContactSoftCFM | dContactSlip1 | dContactSlip2 | dContactApprox1;
+      contact[i].surface.mode = dContactBounce | dContactSoftCFM
+        | dContactSlip1 | dContactSlip2 | dContactApprox1;
       contact[i].surface.mu = f1[0]*f2[0];
       contact[i].surface.bounce = f1[1]*f2[1];
       contact[i].surface.bounce_vel = 0.1;
-	  contact[i].surface.slip1 = 0.3;
-	  contact[i].surface.slip2 = 0.3;
+      contact[i].surface.slip1 = SMALL_EPSILON;
+      contact[i].surface.slip2 = SMALL_EPSILON;
       contact[i].surface.soft_cfm = f1[2]*f2[2];
 
       dJointID c = dJointCreateContact ( ((csODEDynamicSystem*)data)
