@@ -12,6 +12,10 @@ The history order is reversed so that new features are at the top.
 	      should never be included by headers.)
 	    - Now compiles with compilers which do not natively support the C++
 	      `bool' type.
+	- Eric Sunshine improved efed.pl so that it prints a meaningful error
+	  message when the user specifies an invalid Perl regular-expression,
+	  rather than printing some apparently unrelated error message about an
+	  unknown function much later in the script.
 1-Jun-2001
 	- Michael Voasse fixed a couple of additional bugs in motion
 	  manager. Changed csAppliedFrameVector from TYPED_VECTOR to

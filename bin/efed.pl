@@ -32,7 +32,7 @@ use Getopt::Long;
 $Getopt::Long::ignorecase = 0;
 
 my $PROG_NAME = 'efed.pl';
-my $PROG_VERSION = 4;
+my $PROG_VERSION = 5;
 my $AUTHOR_NAME = 'Eric Sunshine';
 my $AUTHOR_EMAIL = 'sunshine@sunshineco.com';
 my $COPYRIGHT = "Copyright (C) 2000,2001 by $AUTHOR_NAME <$AUTHOR_EMAIL>";
@@ -142,6 +142,7 @@ sub synthesize {
     $s .= '$_[0] = $_;' if $apply_all; # Return edited string for s///, etc.
     $s .= ' return $n; }';
     eval $s;
+    fatal $@ if $@;
 }
 
 #------------------------------------------------------------------------------
