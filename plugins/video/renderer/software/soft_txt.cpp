@@ -486,8 +486,8 @@ csTextureManagerSoftware::~csTextureManagerSoftware ()
 {
   if (first_8bit_proc_tex) 
     first_8bit_proc_tex->DecRef ();
-
-  delete [] Scan.GlobalCMap;
+  if (!proc_txtmgr)
+    delete [] Scan.GlobalCMap;
   delete [] inv_cmap;
   delete [] lightmap_tables [0];
   if (lightmap_tables [1] != lightmap_tables [0])

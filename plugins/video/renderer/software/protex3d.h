@@ -61,7 +61,7 @@ public:
   virtual iTextureHandle *CreateOffScreenRenderer 
     (iGraphics3D *parent_g3d, iGraphics3D *partner_g3d, int width, int height, 
      void *buffer, csPixelFormat *ipfmt, int flags);
-  /// Converts mode
+  /// Converts mode from alone to shared.
   virtual void ConvertMode ();
 
 private:

@@ -622,9 +622,9 @@ void csWorld::PrepareTextures ()
   // Then register all materials to the texture manager.
   for (i = 0; i < materials->Length (); i++)
   {
-    csMaterialHandle *csth = materials->Get (i);
-    if (!csth->GetMaterialHandle ())
-      csth->Register (txtmgr);
+    csMaterialHandle *csmh = materials->Get (i);
+    if (!csmh->GetMaterialHandle ())
+      csmh->Register (txtmgr);
   }
 
   // Prepare all the materials.

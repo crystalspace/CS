@@ -297,10 +297,6 @@ then show the dimensions of this leaf on standard output.
 Start/stop recording camera movement. If you have a previous recording in
 memory then a the new camera movements will be appended.
 
-@item play
-Play a recording (if there is one). Note that a recording is only valid
-when played in the same (or VERY similar) level.
-
 @item clrrec
 Clear a recording.
 
@@ -308,7 +304,36 @@ Clear a recording.
 Load a recording from /this/record. Note that a recording is only valid
 when played in the same (or VERY similar) level.
 
+@item loadrec <file>
+With <file> option walktest attempts to load /this/<file>.rec
+
 @item saverec
 Save a recording to /this/record.
+
+@item saverec <file>
+Save a recording to /this/<file>.rec
+
+@item play
+Play a recording (if there is one). Note that a recording is only valid
+when played in the same (or VERY similar) level.
+
+@item play <file> 
+This outputs summary statistics for the demo  played to <file>.rps. 'rps' stands
+for Recorded Performance Statistics.
+
+@item play res, x, <file> 
+The 'res'(olution) option tells walktest to record statistics every 'x' frames 
+and output to <file>.rps.
+
+@item play break, x  
+The break option when compiled in debug mode will trip off a signal trap on 
+the 'x'th frame.  Useful once you take note of the frame number of something 
+interesting in a <file>.rps
+
+@item recsubperf <name> 
+Once a recording has begun this command is used to record the statistics of a 
+subsection of the demo and is reported as such in the outputted <file>.rps when 
+played back. To finish the subsection call the command again without an argument.
+Stands for 'rec(ord)sub(section)perf(ormance)'
 
 @end table

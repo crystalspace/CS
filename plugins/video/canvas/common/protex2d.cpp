@@ -44,6 +44,8 @@ csProcTextureSoft2D::~csProcTextureSoft2D ()
 {
   if (destroy_memory)
     delete [] Memory;
+  if (Depth == 8)
+    Palette = NULL;
 }
 
 iGraphics2D *csProcTextureSoft2D::CreateOffScreenCanvas 

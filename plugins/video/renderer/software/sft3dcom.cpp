@@ -787,19 +787,10 @@ void csGraphics3DSoftwareCommon::Close ()
     fog_buffers = n;
   }
 
-  if (tcache)
-  {
-    delete tcache;
-    tcache = NULL;
-  }
+  delete tcache; tcache = NULL;
   delete clipper; clipper = NULL;
+  delete texman; texman = NULL;
 
-//    csScan_Finalize ();
-  if (texman)
-  {
-    delete texman;
-    texman = NULL;
-  }
   delete [] z_buffer; z_buffer = NULL;
   delete [] smaller_buffer; smaller_buffer = NULL;
   delete [] line_table; line_table = NULL;
