@@ -1,6 +1,13 @@
 The history order has been reversed so that new features are at the top.
 
+18-Aug-2000
+	- Accidently left on PVS building. I wonder why nobody complained
+	  about dmburg needing several hours to start up :-)
 17-Aug-2000
+	- Martin Geisse fixed a bug in csloader related to sound.
+	- Martin also added the cssysdef.h include to getopt.cpp.
+	- Martin changed appvsh.dsp to binary in CVS.
+	- Martin cleaned up software sound a bit.
 	- Norman Kramer added a /lib/csws entry to a zip containing csws
 	  textures in power of 2 sizes (almost all - not the toolbar tho).
 	- Did some cleanup on terrain.cpp and also started support
