@@ -330,6 +330,7 @@ csHazeMeshObject::csHazeMeshObject (csHazeMeshObjectFactory* factory)
   current_features = 0;
   origin.Set(0,0,0);
   directional.Set(0,0,0);
+  bbox.StartBoundingBox();
 
   /// copy the factory settings
   origin = factory->GetOrigin();
@@ -353,9 +354,88 @@ void csHazeMeshObject::SetupObject ()
 {
   if (!initialized)
   {
+    bbox.StartBoundingBox( origin );
+    csVector3 pos;
+    for(int l=0; l<layers.Length(); l++)
+      for(int i=0; i<layers.GetLayer(l)->hull->GetVerticeCount(); i++)
+      {
+	layers.GetLayer(l)->hull->GetVertex(pos, i);
+        bbox.AddBoundingVertex( pos );
+      }
     initialized = true;
   }
 }
+
+
+void csHazeMeshObject::GetTransformedBoundingBox (long cameranr,
+        long movablenr, const csReversibleTransform& trans, csBox3& cbox)
+{
+  if (cur_cameranr == cameranr && cur_movablenr == movablenr)
+  {
+    cbox = camera_bbox;
+    return;
+  }
+  cur_cameranr = cameranr;
+  cur_movablenr = movablenr;
+
+  camera_bbox.StartBoundingBox (trans * bbox.GetCorner(0));
+  camera_bbox.AddBoundingVertexSmart (trans * bbox.GetCorner(1));
+  camera_bbox.AddBoundingVertexSmart (trans * bbox.GetCorner(2));
+  camera_bbox.AddBoundingVertexSmart (trans * bbox.GetCorner(3));
+  camera_bbox.AddBoundingVertexSmart (trans * bbox.GetCorner(4));
+  camera_bbox.AddBoundingVertexSmart (trans * bbox.GetCorner(5));
+  camera_bbox.AddBoundingVertexSmart (trans * bbox.GetCorner(6));
+  camera_bbox.AddBoundingVertexSmart (trans * bbox.GetCorner(7));
+
+  cbox = camera_bbox;
+}
+
+static void Perspective (const csVector3& v, csVector2& p, float fov,
+        float sx, float sy)
+{
+  float iz = fov / v.z;
+  p.x = v.x * iz + sx;
+  p.y = v.y * iz + sy;
+}
+
+float csHazeMeshObject::GetScreenBoundingBox (long cameranr,
+      long movablenr, float fov, float sx, float sy,
+      const csReversibleTransform& trans, csBox2& sbox, csBox3& cbox)
+{
+  csVector2 oneCorner;
+
+  GetTransformedBoundingBox (cameranr, movablenr, trans, cbox);
+
+  // if the entire bounding box is behind the camera, we're done
+  if ((cbox.MinZ () < 0) && (cbox.MaxZ () < 0))
+  {
+    return -1;
+  }
+
+  // Transform from camera to screen space.
+  if (cbox.MinZ () <= 0)
+  {
+    // Sprite is very close to camera.
+    // Just return a maximum bounding box.
+    sbox.Set (-10000, -10000, 10000, 10000);
+  }
+  else
+  {
+    Perspective (cbox.Max (), oneCorner, fov, sx, sy);
+    sbox.StartBoundingBox (oneCorner);
+    csVector3 v (cbox.MinX (), cbox.MinY (), cbox.MaxZ ());
+    Perspective (v, oneCorner, fov, sx, sy);
+    sbox.AddBoundingVertexSmart (oneCorner);
+    Perspective (cbox.Min (), oneCorner, fov, sx, sy);
+    sbox.AddBoundingVertexSmart (oneCorner);
+    v.Set (cbox.MaxX (), cbox.MaxY (), cbox.MinZ ());
+    Perspective (v, oneCorner, fov, sx, sy);
+    sbox.AddBoundingVertexSmart (oneCorner);
+  }
+
+  return cbox.MaxZ ();
+}
+
 
 bool csHazeMeshObject::DrawTest (iRenderView* rview, iMovable* movable)
 {
@@ -363,9 +443,26 @@ bool csHazeMeshObject::DrawTest (iRenderView* rview, iMovable* movable)
 
   if(layers.Length() <= 0) return false;
 
-  // Camera transformation for the single 'position' vector.
-  csVector3 cam = rview->GetCamera ()->GetTransform ().Other2This (movable->GetFullPosition ());
-  if (cam.z < SMALL_Z) return false;
+  //iGraphics3D* g3d = rview->GetGraphics3D ();
+  iCamera* camera = rview->GetCamera ();
+
+  csReversibleTransform tr_o2c = camera->GetTransform ()
+        * movable->GetFullTransform ().GetInverse ();
+  float fov = camera->GetFOV ();
+  float shiftx = camera->GetShiftX ();
+  float shifty = camera->GetShiftY ();
+  csBox2 sbox;
+  csBox3 cbox;
+
+  if (GetScreenBoundingBox (camera->GetCameraNumber (),
+        movable->GetUpdateNumber (), fov, shiftx, shifty,
+        tr_o2c, sbox, cbox) < 0)
+    return false;
+  int clip_portal, clip_plane, clip_z_plane;
+  if (rview->ClipBBox (sbox, cbox, clip_portal, clip_plane,
+        clip_z_plane) == false)
+    return false;
+
   return true;
 }
 
@@ -653,11 +750,10 @@ void csHazeMeshObject::DrawPoly(iRenderView *rview, iGraphics3D *g3d,
 
 }
 
-void csHazeMeshObject::GetObjectBoundingBox (csBox3& /*bbox*/, int /*type*/)
+void csHazeMeshObject::GetObjectBoundingBox (csBox3& retbbox, int /*type*/)
 {
   SetupObject ();
-  //@@@ TODO
-  //bbox = object_bbox;
+  retbbox = bbox;
 }
 
 void csHazeMeshObject::HardTransform (const csReversibleTransform& t)

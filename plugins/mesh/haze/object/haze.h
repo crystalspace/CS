@@ -186,6 +186,22 @@ class csHazeMeshObject : public iMeshObject
   /// Polygon.
   G3DPolygonDPFX g3dpolyfx;
 
+  /// bbox in object space
+  csBox3 bbox;
+  /**
+   * Camera space bounding box is cached here.
+   * GetCameraBoundingBox() will check the current camera number from the
+   * camera to see if it needs to recalculate this.
+   */
+  csBox3 camera_bbox;
+  csBox3 world_bbox;
+
+
+  /// Current camera number.
+  long cur_cameranr;
+  /// Current movable number.
+  long cur_movablenr;
+
   /// haze data
   csVector3 origin, directional;
   /// vector of csHazeLayer
@@ -198,6 +214,22 @@ class csHazeMeshObject : public iMeshObject
 
   /// Update lighting given a position.
   void UpdateLighting (iLight** lights, int num_lights, const csVector3& pos);
+
+  /// Get the bounding box in transformed space.
+  void GetTransformedBoundingBox (long cameranr, long movablenr,
+      const csReversibleTransform& trans, csBox3& cbox);
+  /**
+   * Get the coordinates of the bbox in screen coordinates.
+   * Fills in the boundingBox with the X and Y locations of the haze.
+   * Returns the max Z location of the haze, or -1 if not
+   * on-screen. If the haze is not on-screen, the X and Y values are not
+   * valid.
+   */
+  float GetScreenBoundingBox (long cameranr, long movablenr, float fov,
+        float sx, float sy,
+        const csReversibleTransform& trans, csBox2& sbox, csBox3& cbox);
+
+ 
 
 public:
   /// Constructor.
