@@ -554,6 +554,9 @@ public:
   /// Sets the font server that the preference manager uses
   virtual void SetFontServer(iFontServer *fntsvr)=0;
 
+  /// Set the default font that the preference manager uses
+  virtual void SetDefaultFont(iFont* font)=0;
+
   /// Sets the window manager that the preference manager uses
   virtual void SetWindowMgr(iAws *wmgr)=0;
 
