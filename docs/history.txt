@@ -24,6 +24,8 @@ The history order is reversed so that new features are at the top.
 	- Eric Sunshine fixed jng/jngio.mak and jng/Jamfile so that the JNG
 	  loader plugin once again builds.  It must now link against csgeom
 	  since it employs csRect.
+	- Oktal added iSprite2DState to the list of interfaces wrapped by
+	  cspace.i, and added a GetVertexByIndex function to it with %extend.
 12-May-2003
 	- Philip Wyett brought warning level in MSVC 7 project files down
           to 3 to match MSVC 6 ones. Also cleaned up 'group.tpl' for

@@ -185,7 +185,7 @@
 	INTERFACE_APPLY(iPolygonMesh)
 	INTERFACE_APPLY(iPolygonTexture)
 	INTERFACE_APPLY(iSCF)
-	INTERFACE_APPLY(iScript)
+//	INTERFACE_APPLY(iScript)
 	INTERFACE_APPLY(iSector)
 	INTERFACE_APPLY(iSectorList)
 	INTERFACE_APPLY(iSoundHandle)
@@ -194,6 +194,7 @@
 	INTERFACE_APPLY(iSoundWrapper)
 	INTERFACE_APPLY(iSoundDriver)
 	INTERFACE_APPLY(iSoundSource)
+	INTERFACE_APPLY(iSprite2DState)
 	INTERFACE_APPLY(iSprite3DState)
 	INTERFACE_APPLY(iStatLight)
 	INTERFACE_APPLY(iStream)
@@ -506,10 +507,19 @@ TYPEMAP_OUT_csWrapPtr
 
 %include "imesh/mdlconv.h"
 %include "imesh/object.h"
+%include "imesh/sprite2d.h"
 %include "imesh/sprite3d.h"
 %include "imesh/thing/thing.h"
 %include "imesh/thing/lightmap.h"
 %include "imesh/thing/polygon.h"
+
+%extend iSprite2DState
+{
+  csSprite2DVertex* GetVertexByIndex(int index)
+  {
+    return &(self->GetVertices()[index]);
+  }
+}
 
 %include "imap/parser.h"
 %include "imap/loader.h"
@@ -603,7 +613,7 @@ TYPEMAP_OUT_csWrapPtr
 %include "ivaria/collider.h"
 %include "ivaria/dynamics.h"
 %include "ivaria/conout.h"
-%include "ivaria/script.h"
+//%include "ivaria/script.h"
 %include "ivaria/engseq.h"
 
 %include "inetwork/netman.h"
