@@ -20,7 +20,6 @@
 
 PLUGINS += filesys/vfs
 PLUGINS += video/renderer/software
-PLUGINS += video/loader
 PLUGINS += font/server/csfont 
 PLUGINS += console/output/simple
 PLUGINS += console/input/standard
@@ -56,6 +55,14 @@ PLUGINS.DYNAMIC += font/server/fontplex
 PLUGINS.DYNAMIC += metaball
 PLUGINS.DYNAMIC += motion
 #PLUGINS.DYNAMIC += csgame/gamecore
+PLUGINS.DYNAMIC += video/loader/bmp
+PLUGINS.DYNAMIC += video/loader/gif
+PLUGINS.DYNAMIC += video/loader/tga
+PLUGINS.DYNAMIC += video/loader/sgi
+PLUGINS.DYNAMIC += video/loader/wal
+PLUGINS.DYNAMIC += video/loader/png
+PLUGINS.DYNAMIC += video/loader/jpg
+PLUGINS.DYNAMIC += video/loader/mplex
 
 #-----------------------------------------------------------------------------
 # Static Settings            *** TAKE NOTE ***
