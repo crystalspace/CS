@@ -20,6 +20,8 @@
 #ifndef __CS_REF_H__
 #define __CS_REF_H__
 
+#define CS_VOIDED_PTR 0xffffffff
+
 template <class T> class csRef;
 
 #if defined(CS_STRICT_SMART_POINTERS) && defined(CS_DEBUG)
@@ -59,7 +61,7 @@ public:
     // a function that returns a csPtr and not using the result
     // (or at least not assigning it to a csRef). This is a memory
     // leak and you should fix that.
-    CS_ASSERT (obj == (T*)0xffffffff);
+    CS_ASSERT (obj == (T*)CS_VOIDED_PTR);
   }
 #endif
 
@@ -67,7 +69,7 @@ public:
   {
     obj = copy.obj;
 #ifdef CS_TEST_VOIDPTRUSAGE
-    ((csPtr<T>&)copy).obj = (T*)0xffffffff;
+    ((csPtr<T>&)copy).obj = (T*)CS_VOIDED_PTR;
 #endif
   }
 
@@ -105,11 +107,11 @@ public:
   {
     obj = newobj.obj;
 #   ifdef CS_TEST_VOIDPTRUSAGE
-    CS_ASSERT (newobj.obj != (T*)0xffffffff);
+    CS_ASSERT (newobj.obj != (T*)CS_VOIDED_PTR);
 #   endif
     // The following line is outside the ifdef to make sure
     // we have binary compatibility.
-    ((csPtr<T>&)newobj).obj = (T*)0xffffffff;
+    ((csPtr<T>&)newobj).obj = (T*)CS_VOIDED_PTR;
   }
 
   /**
@@ -144,6 +146,10 @@ public:
    * Assign a csPtr to a smart pointer. Doesn't call IncRef() on
    * the object since it is assumed that the object in csPtr is already
    * IncRef()'ed.
+   * \remarks
+   * After this assignment, the csPtr<T> object is invalidated and cannot
+   * be used. You should not (and in fact cannot) decref the csPtr<T> after
+   * this assignment has been made.
    */
   csRef& operator = (const csPtr<T>& newobj)
   {
@@ -151,19 +157,27 @@ public:
     // First assign and then DecRef() of old object!
     obj = newobj.obj;
 #   ifdef CS_TEST_VOIDPTRUSAGE
-    CS_ASSERT (newobj.obj != (T*)0xffffffff);
+    CS_ASSERT (newobj.obj != (T*)CS_VOIDED_PTR);
 #   endif
     // The following line is outside the ifdef to make sure
     // we have binary compatibility.
-    ((csPtr<T>&)newobj).obj = (T*)0xffffffff;
+    ((csPtr<T>&)newobj).obj = (T*)CS_VOIDED_PTR;
     if (oldobj)
       oldobj->DecRef ();
     return *this;
   }
 
   /**
-   * Assign a raw object reference to this smart pointer.  This function
-   * calls the object's IncRef() method.
+   * Assign a raw object reference to this smart pointer.
+   * \remarks
+   * This function calls the object's IncRef() method. Because of this you
+   * should not assign a reference created with the new operator to a csRef
+   * object driectly. The following code will produce a memory leak:
+   * \code
+   * csRef<iEvent> event = new csEvent;
+   * \endcode
+   * If you are assigning a new object to a csRef, use AttachNew(T* newObj)
+   * instead.
    */
   csRef& operator = (T* newobj)
   {
@@ -176,11 +190,42 @@ public:
       // destructed forever (when ref=NULL is used for example).
       obj = newobj;
       if (newobj)
-	newobj->IncRef ();
+  newobj->IncRef ();
       if (oldobj)
-	oldobj->DecRef ();
+  oldobj->DecRef ();
     }
     return *this;
+  }
+
+  /**
+   * Assign an object reference created with the new operator to this smart
+   * pointer.
+   * \remarks
+   * This function allows you to assign an object pointer created with the
+   * \c new operator to the csRef object. Proper usage would be:
+   * \code
+   * csRef<iEvent> event;
+   * event.AttachNew (new csEvent);
+   * \endcode
+   * While not recommended, you can also use this function to assign a csPtr
+   * object or csRef object to the csRef. In both of these cases, using
+   * AttachNew is equivalent to performing a simple assignment using the
+   * \c = operator.
+   * \note
+   * Calling this function is equivalent to casting an object to a csPtr<T>
+   * and then assigning the csPtr<T> to the csRef, as follows:
+   * \code
+   * // Same effect as above code.
+   * csRef<iEvent> event = csPtr<iEvent> (new csEvent);
+   * \endcode
+   */
+  void AttachNew (csPtr<T> newObj)
+  {
+    // Note: The parameter usage of csPtr<T> instead of csPtr<T>& is
+    // deliberate and not to be considered a bug.
+
+    // Just Re-use csPtr assignment logic
+    *this = newObj;
   }
 
   /**
