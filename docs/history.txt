@@ -36,6 +36,10 @@ chronological order.
 	      SCF_IMPLEMENT_IBASE_WEAK (csMyClass)
 	         SCF_IMPLEMENTS_INTERFACE ...
 	      SCF_IMPLEMENT_IBASE_WEAK_END
+	- Jorrit added a new csTimerEvent class (untested). This class
+	  can schedule operations to be performed later. It is a very low
+	  overhead scheduler since it will actually only check all events
+	  if needed.
 8-Sep-2003
 	- Jorrit added csgfx to the stdsteps renderloop plugin (for Jam).
 	- Jorrit did the following changes to bring new and old renderer
