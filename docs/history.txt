@@ -14,8 +14,30 @@ Short-term cleanups that need to be done:
 	  includes that don't belong there (like from csengine).
 
 30-Aug-1999
+	- Changed csPolygonInt::Classify() to use a plane instead
+	  of another csPolygonInt. Also removed csPolygonInt::SamePlane()
+	  because it is not needed.
+	- Made csPlane::GetNormal() which is a const version of
+	  csPlane::Normal().
+	- csSector::UseStaticBSP() renamed to csSector::UseStaticTree().
+	- Created new apimod.txt document which will list all changes
+	  to the API between 0.14 and 0.16 when that is released.
+	  Please everyone try to keep this document up-to-date!
+	- Added csPolygonSet::GetBoundingBox(min_bbox, max_bbox).
+	- Modified hugeroom to use the octree. Everything seems to work
+	  but I haven't done any heavy testing yet. Node that this does
+	  not mean yet that we have octree visibility culling. It is now
+	  possible to use an octree instead of a bsp tree for organizing
+	  the polygons in the tree.
+	- Added csPortal::GetWarp().
 	- Eric Sunshine fixed a compilation problem in the BeOS port and also
 	  removed more unused code.
+29-Aug-1999
+	- Continued coding on octree.
+28-Aug-1999
+	- Started coding on octree. I created a general csPolygonTree
+	  parent which will be the parent of csBspTree and csOctree. In
+	  future it will also be the parent of csKdTree.
 26-Aug-1999
 	- Eric Sunshine renamed docs/changes.old to changes.txt since Jorrit
 	  recently brought it up to date.  Previously it was extremely out of
@@ -32,6 +54,7 @@ Short-term cleanups that need to be done:
 	- Andrew Zabolotny released a CrystalSpace-compliant version of aalib,
 	  the Ascii Art library.  He also updated a number of keyboard and
 	  display drivers.
+	- *** Release of 0.14_001 ***
 24-Aug-1999
 	- Jorrit fixed deletion of curve information in thing templates. It
 	  used the wrong type of 'delete []'.
