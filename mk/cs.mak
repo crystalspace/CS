@@ -76,9 +76,6 @@ LIBS=$(LIBS.EXE) $(Z_LIBS)
 ifeq ($(MAKE_DLL),yes)
   CFLAGS+=$(CFLAGS.DLL)
 endif
-ifeq ($(DO_ASM),no)
-  CFLAGS+=$(CFLAGS.D)NO_ASSEMBLER
-endif
 
 # Memory debugger
 ifdef MEMDBG
