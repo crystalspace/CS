@@ -29,6 +29,13 @@ typedef HRESULT (STDAPICALLTYPE* SHGETFOLDERPATHAPROC)(HWND hwndOwner,
 					      HANDLE hToken, 
 					      DWORD dwFlags, 
 					      LPCSTR pszPath);
+					      
+typedef HRESULT (STDAPICALLTYPE* SHGETFOLDERPATHWPROC) (HWND hwndOwner,
+                                                int nFolder,
+						HANDLE hToken,
+						DWORD dwFlags,
+						LPCSTR pszPath);
+
 
 #ifndef CSIDL_APPDATA 
 #define CSIDL_APPDATA			0x001a
@@ -52,15 +59,33 @@ GetShellFolderPath (int CSIDL, char* path)
   if(hinstDll)
   {
     SHGETFOLDERPATHAPROC SHGetFolderPathA;
+    // Somehow or another, an app (walktest) is requesting to load
+    // SHGetFolderPathW from shell32.dll.
+    // That function does not exist in shell32.dll for versions < 5.0.
+    // It does exist in shfolder.dll for versions < 5.0
+    // versions < 5.0 include NT4, Win98 and Win98SE
+    SHGETFOLDERPATHWPROC SHGetFolderPathW;
 
     SHGetFolderPathA = 
       (SHGETFOLDERPATHAPROC) GetProcAddress (hinstDll, "SHGetFolderPathA");
-
+      
     if (SHGetFolderPathA)
     {
-      result = (SHGetFolderPathA (0, CSIDL, 0, 
-	SHGFP_TYPE_CURRENT, path) == S_OK);
+      result = (SHGetFolderPathA (0, CSIDL, 0, SHGFP_TYPE_CURRENT, path) == S_OK);
     }
+      
+    SHGetFolderPathW =
+            (SHGETFOLDERPATHWPROC) GetProcAddress (hinstDll, "SHGetFolderPathW");       
+
+    if (SHGetFolderPathW == 0)
+    {
+        // If SHGetFolderPathW is not found in shfolder.dll 
+    }
+    else
+    {
+        result = (SHGetFolderPathW (0, CSIDL, 0, SHGFP_TYPE_CURRENT, path) == S_OK);
+     }
+
 
     FreeLibrary(hinstDll);
   }
