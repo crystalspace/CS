@@ -47,8 +47,6 @@ CSCONFIG.VMAJOR  := $(shell sed -e '/\#define[ 	][ 	]*CS_VERSION_MAJOR/!d' -e '/
 CSCONFIG.VMINOR  := $(shell sed -e '/\#define[ 	][ 	]*CS_VERSION_MINOR/!d' -e '/\#define[ 	][ 	]*CS_VERSION_MINOR/s/\(\#define[ 	][ 	]*CS_VERSION_MINOR[ 	][ 	]*"\)\([^\\"]*\)"\(.*\)/\2/' < $(CSCONFIG.VERFILE))
 CSCONFIG.RDATE   := $(shell sed -e '/\#define[ 	][ 	]*CS_RELEASE_DATE/!d'  -e '/\#define[ 	][ 	]*CS_RELEASE_DATE/s/\(\#define[ 	][ 	]*CS_RELEASE_DATE[ 	][ 	]*"\)\([^\\"]*\)"\(.*\)/\2/' < $(CSCONFIG.VERFILE))
 
-LFLAGS.DLL = -noconsole $@ foobar
-
 # Some makefile variables reference $@, and we want that reference to appear
 # verbatim in the synthesized makefile fragment.  Unfortunately, when these
 # variables are referenced inside the $(CSCONFIG.EXE) target, $(CSCONFIG.EXE)
