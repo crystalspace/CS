@@ -225,6 +225,7 @@ int csODEDynamics::CollideMeshMesh (dGeomID o1, dGeomID o2, int flags,
 
 /* defined in ode */
 extern int dCollideBP (const dxGeom *o1, const dxGeom *o2, int flags, dContactGeom *outcontacts, int skip);
+extern int dCollideCP (const dxGeom *o1, const dxGeom *o2, int flags, dContactGeom *outcontacts, int skip);
 
 CS_TYPEDEF_GROWING_ARRAY(csPolyMeshList, csMeshedPolygon);
 
@@ -247,7 +248,7 @@ int csODEDynamics::CollideMeshBox (dGeomID mesh, dGeomID box, int flags,
   dVector3 sides;
   dGeomBoxGetLengths (box, sides);
   // box is symetric.
-  csVector3 aabb(sides[0]/2, sides[1]/2, sides[2]);
+  csVector3 aabb(sides[0]/2, sides[1]/2, sides[2]/2);
   csBox3 boxbox(aabb, -aabb);
   csReversibleTransform boxt = GetGeomTransform (box);
 
@@ -327,6 +328,112 @@ int csODEDynamics::CollideMeshBox (dGeomID mesh, dGeomID box, int flags,
         out->depth = c->depth;
         out->g1 = mesh;
         out->g2 = box;
+        outcount ++;
+      }
+    }
+  }
+  return outcount;
+}
+
+int csODEDynamics::CollideMeshCylinder (dGeomID mesh, dGeomID cyl, int flags,
+	dContactGeom *outcontacts, int skip)
+{
+  /* need to check aabb's since GeomGroup doesn't */
+  dReal aabb1[6];
+  dReal aabb2[6];
+  dGeomGetAABB (mesh, aabb1);
+  dGeomGetAABB (cyl, aabb2);
+  if (aabb1[0] > aabb2[1] || aabb1[1] < aabb2[0] ||
+      aabb1[2] > aabb2[3] || aabb1[3] < aabb2[2] ||
+      aabb1[4] > aabb2[5] || aabb1[5] < aabb2[4]) {
+    return 0;
+  }
+  int N = flags & 0xFF;
+
+  // rotate everything so that box is axis aligned.
+  dReal length, radius;
+  dGeomCCylinderGetParams (cyl, &length, &radius);
+  // box is symetric.
+  csVector3 aabb(radius, radius, length/2);
+  csBox3 cylbox(aabb, -aabb);
+  csReversibleTransform cylt = GetGeomTransform (cyl);
+
+  iMeshWrapper *m = *(iMeshWrapper **)dGeomGetClassData (mesh);
+  CS_ASSERT (m);
+  iPolygonMesh *p = SCF_QUERY_INTERFACE (m->GetMeshObject(), iPolygonMesh);
+  csVector3 *vertex_table = p->GetVertices ();
+  csMeshedPolygon *polygon_list = p->GetPolygons ();
+
+  csReversibleTransform mesht = GetGeomTransform (mesh);
+
+  csPolyMeshList polycollide;
+  // test for overlap
+  int i, j, k;
+  for (i = 0; i < p->GetPolygonCount(); i ++) {
+    csBox3 polybox;
+    for (j = 0; j < polygon_list[i].num_vertices; j ++) {
+      polybox.AddBoundingVertex (cylt * (vertex_table[polygon_list[i].vertices[j]] / mesht));
+    }
+    // aabb poly against aabb box for overlap.
+    // Full collision later will weed out the rest;
+    if (polybox.Overlap (cylbox)) {
+      polycollide.Push (polygon_list[i]);
+    }
+  }
+  int outcount = 0;
+  // the value of N should be large, just in case.
+  for (i = 0; i < polycollide.Length() && outcount < N; i ++) {
+    csPlane3 plane(vertex_table[polycollide[i].vertices[0]] / mesht,
+      vertex_table[polycollide[i].vertices[1]] / mesht,
+      vertex_table[polycollide[i].vertices[2]] / mesht);
+    plane.Normalize ();
+    // dCollideBP only works if box center is on the outside of the plane
+    if (plane.Classify (cylt.GetOrigin()) < 0) {
+      continue;
+    } 
+    dGeomID odeplane = dCreatePlane(0,plane.norm.x, plane.norm.y, plane.norm.z,
+      -plane.DD);
+    dContactGeom tempcontacts[5];
+    int count = dCollideCP (cyl, odeplane, 5, tempcontacts, sizeof (dContactGeom));
+    dGeomDestroy (odeplane);
+    for (j = 0; j < count; j ++) {
+      dContactGeom *c = &tempcontacts[j];
+      csVector3 contactpos(c->pos[0], c->pos[1], c->pos[2]);
+      // make sure the point lies inside the polygon
+      int vcount = polycollide[i].num_vertices;
+      for (k = 0; k < vcount-1; k ++) {
+	int ind1 = polycollide[i].vertices[k];
+	int ind2 = polycollide[i].vertices[k+1];
+        csVector3 v1 = vertex_table[ind1] / mesht;
+        csVector3 v2 = vertex_table[ind2] / mesht;
+        csPlane3 edgeplane(v1, v2, v2 - plane.Normal());
+        edgeplane.Normalize();
+        if (edgeplane.Classify (contactpos) < 0) {
+          c->depth = -1;
+          break;
+        }
+      }
+      /* get the wrap around case */
+      int ind1 = polycollide[i].vertices[vcount-1];
+      int ind2 = polycollide[i].vertices[0];
+      csVector3 v1 = vertex_table[ind1] / mesht;
+      csVector3 v2 = vertex_table[ind2] / mesht;
+      csPlane3 edgeplane(v1, v2, v2 - plane.Normal());
+      edgeplane.Normalize();
+      if (edgeplane.Classify (contactpos) < 0) {
+          c->depth = -1;
+      }
+      if (c->depth >= 0) {
+        dContactGeom *out = (dContactGeom *)((char *)outcontacts + skip * outcount);
+        out->pos[0] = c->pos[0];
+        out->pos[1] = c->pos[1];
+        out->pos[2] = c->pos[2];
+        out->normal[0] = c->normal[0];
+        out->normal[1] = c->normal[1];
+        out->normal[2] = c->normal[2];
+        out->depth = c->depth;
+        out->g1 = mesh;
+        out->g2 = cyl;
         outcount ++;
       }
     }

@@ -112,6 +112,8 @@ public:
   	dContactGeom *contact, int skip);
   static int CollideMeshBox (dGeomID mesh, dGeomID box, int flags,
   	dContactGeom *contact, int skip);
+  static int CollideMeshCylinder (dGeomID mesh, dGeomID cyl, int flags,
+  	dContactGeom *contact, int skip);
   static int CollideMeshSphere (dGeomID mesh, dGeomID sphere, int flags,
   	dContactGeom *contact, int skip);
   static dColliderFn* CollideSelector (int num)
@@ -120,6 +122,8 @@ public:
       return &CollideMeshMesh;
     if (num == dBoxClass)
       return &CollideMeshBox;
+    if (num == dCCylinderClass)
+      return &CollideMeshCylinder;
     if (num == dSphereClass)
       return &CollideMeshSphere;
     return NULL;
