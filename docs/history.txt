@@ -9,7 +9,29 @@ The history order has been reversed so that new features are at the top.
 	- Fixed a severe bug with the octree. The vertices were not correctly
 	  transformed to camera space anymore!
 	- Continued further debugging work on the PVS.
+	- Samuel Humphreys did several changes to dtsimple. Mostly
+	  rearrangements for aesthetic reasons. Big improvement in software
+	  but still problems with OpenGL.
+	- Andrew Zabolotny added support for statically linking NULL 3D
+	  renderer.
+	- Andrew reverted back a recent change from Thomas which
+	  breaks SCF. Unused static variables are simply not included
+	  with GCC.
+	- Andrew also removed unneeded inclusion of math2d.h.
+	- Andrew fixed a serious bug in the DOS rawvideo driver that
+	  caused CS to crash on many videocards in many videomodes.
+	- Andrew fixed a BigBug{tm} in the line and null renderers. inv_cmap
+	  wasn't initialized to NULL.
+	- Andrew added support for dithered textures to the NULL 3D
+	  renderer.
+	- Robert Bate added 'class' after the friend declaration in
+	  csHashMap so that the file will compile with CW Pro5.
+	- Robert also did some changes so that some files will compile
+	  on both CW Pro5 and Pro5.
+	- Paul Garceau added the latest version of mingw.mak.
 28-Jun-2000
+	- Norman Kramer fixed FindFirstSelectedItem and FindAllSelectedItems
+	  in CSWS.
 	- Rene Dudfield <illumen@yahoo.com> contributed a set of Python
 	  scripts for Blender to convert Blender entities to CS objects.
 	  You can find them in CS/scripts/blender. There is also a README
@@ -27,6 +49,8 @@ The history order has been reversed so that new features are at the top.
 	- Eric Sunshine eliminated a few compilation warnings in wscs3d, and
 	  a linking problem on NextStep caused by (unnecessarily) including
 	  the simple.h header.
+	- Samuel Humphreys resolved texture mapping for the mirror stand
+	  in dtsimple.
 27-Jun-2000
 	- Samuel Humphreys fixed dtsimple:
 	    - Fixed the portal...it was the gouraud shading which broke it,
