@@ -382,13 +382,9 @@ if $(MSVCGEN_CONFIG_FILES)
   }
 }
 
-if ! $(TTREE)
-{
-  TTREE = [ ConcatDirs $(TOP) mk perl5 bin ttree ] ;
-  TT2LIB ?= [ ConcatDirs $(TOP) mk perl5 lib ] ;
-}
 PERL ?= perl ;
-RUN_TTREE ?= $(PERL) -I$(TT2LIB) "\"$(TTREE)\"" ;
+TTREE ?= ttree ;
+RUN_TTREE ?= $(PERL) "\"$(TTREE)\"" ;
 
 # Implementation note: The --strip-root directives are order-sensitive when the
 # build directory is the same as the source directory, in which case TOP is "."

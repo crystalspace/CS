@@ -54,6 +54,12 @@ chronological order.
 	- Eric Sunshine added a CS_CHECK_COMPILER_PIC() macro in checkpic.m4.
 	  This macro figures out how to enable PIC generation (position
 	  independent code) in the specified compiler.
+	- Eric Sunshine removed TemplateToolkit2 and AppConfig Perl modules
+	  re-distributions from CS/mk/perl5.  Very few people need to generate
+	  MSVC project files for CS, so this extra bulk is hardly warranted.
+	  Developers wanting to generate project files can install these Perl
+	  packages locally using normal Perl package installation mechanisms,
+	  such as CPAN (Unix) or PPM (Windows).
 2-Mar-2005
 	- Jorrit changed pvscalc to use the Description() method to print
 	  out boxes and vectors instead of the ugly B2F and other macros.
