@@ -26,6 +26,7 @@
 #include "cstool/keyval.h"
 #include "cstool/crossbld.h"
 #include "cstool/sndwrap.h"
+#include "cstool/mapnode.h"
 #include "csgfx/csimage.h"
 #include "csloader.h"
 
@@ -47,7 +48,6 @@
 #include "iengine/light.h"
 #include "iengine/statlght.h"
 #include "iengine/mesh.h"
-#include "iengine/mapnode.h"
 #include "ivideo/material.h"
 #include "igraphic/imageio.h"
 #include "isound/loader.h"
@@ -1682,7 +1682,7 @@ iMapNode* csLoader::ParseNode (char* name, char* buf, iSector* sec)
     CS_TOKEN_TABLE (POSITION)
   CS_TOKEN_TABLE_END
 
-  iMapNode* pNode = Engine->CreateMapNode (name);
+  iMapNode* pNode = &(new csMapNode (name))->scfiMapNode;
   pNode->SetSector (sec);
 
   long  cmd;

@@ -22,7 +22,7 @@
 #include "qint.h"
 #include "cssys/system.h"
 #include "csgeom/frustum.h"
-#include "iengine/view.h"
+#include "ivaria/view.h"
 #include "imesh/thing/polygon.h"
 #include "imesh/terrfunc.h"
 #include "cstool/impexp.h"

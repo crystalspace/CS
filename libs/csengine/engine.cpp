@@ -30,7 +30,6 @@
 #include "csengine/pol2d.h"
 #include "csengine/polytext.h"
 #include "csengine/thing.h"
-#include "csengine/csview.h"
 #include "csengine/meshobj.h"
 #include "csengine/cscoll.h"
 #include "csengine/sector.h"
@@ -43,7 +42,6 @@
 #include "csengine/lppool.h"
 #include "csengine/radiosty.h"
 #include "csengine/region.h"
-#include "csengine/mapnode.h"
 #include "csgeom/fastsqrt.h"
 #include "csgeom/polypool.h"
 #include "csgfx/csimage.h"
@@ -1975,6 +1973,11 @@ iCollection* csEngine::FindCollection (const char* iName,
   return &c->scfiCollection;
 }
 
+iCamera* csEngine::CreateCamera ()
+{
+  return &(new csCamera ())->scfiCamera;
+}
+
 iCollection* csEngine::CreateCollection (const char* iName)
 {
   csCollection *c = (csCollection *)collections.FindByName (iName);
@@ -1985,14 +1988,6 @@ iCollection* csEngine::CreateCollection (const char* iName)
   c->SetName(iName);
   collections.Push(c);
   return &(c->scfiCollection);
-}
-
-iView* csEngine::CreateView (iGraphics3D* g3d)
-{
-  csView* view = new csView (this, g3d);
-  iView* iview = SCF_QUERY_INTERFACE (view, iView);
-  iview->DecRef ();
-  return iview;
 }
 
 iStatLight* csEngine::CreateLight (const char* name,
@@ -2378,14 +2373,6 @@ void csEngine::SetContext (iGraphics3D* g3d)
 iClipper2D* csEngine::GetTopLevelClipper () const
 {
   return top_clipper;
-}
-
-iMapNode* csEngine::CreateMapNode (const char* name)
-{
-  csMapNode* mn = new csMapNode (name);
-  iMapNode* imn = SCF_QUERY_INTERFACE (mn, iMapNode);
-  imn->DecRef ();
-  return imn;
 }
 
 int csEngine::GetCollectionCount () const

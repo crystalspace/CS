@@ -28,6 +28,7 @@
 #include "cstool/prplasma.h"
 #include "cstool/prfire.h"
 #include "cstool/prwater.h"
+#include "cstool/csview.h"
 
 #include "ivideo/graph3d.h"
 #include "ivideo/txtmgr.h"
@@ -41,7 +42,6 @@
 #include "imesh/thing/ptextype.h"
 #include "imap/parser.h"
 #include "iengine/mesh.h"
-#include "iengine/view.h"
 #include "iengine/engine.h"
 #include "iengine/material.h"
 #include "iengine/texture.h"
@@ -467,7 +467,7 @@ bool BumpTest::Initialize (int argc, const char* const argv[],
   // You don't have to use csView as you can do the same by
   // manually creating a camera and a clipper but it makes things a little
   // easier.
-  view = engine->CreateView (myG3D);
+  view = new csView (engine, myG3D);
   view->GetCamera ()->SetSector (room);
   view->GetCamera ()->GetTransform ().SetOrigin (csVector3 (0, 5, -3));
   view->SetRectangle (0, 0, FrameWidth, FrameHeight);

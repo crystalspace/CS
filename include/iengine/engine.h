@@ -355,8 +355,8 @@ struct iEngine : public iBase
   /// Set lightmap cell size
   virtual void SetLightmapCellSize (int Size) = 0;
 
-  /// Create a new view on the engine.
-  virtual iView* CreateView (iGraphics3D* g3d) = 0;
+  /// Create a new camera.
+  virtual iCamera* CreateCamera () = 0;
   /// Create a static/pseudo-dynamic light. name can be NULL.
   virtual iStatLight* CreateLight (const char* name, const csVector3& pos,
   	float radius, const csColor& color, bool pseudoDyn) = 0;
@@ -518,9 +518,6 @@ struct iEngine : public iBase
 
   /// Set the drawing context
   virtual void SetContext (iGraphics3D*) = 0;
-
-  /// Create a map node.
-  virtual iMapNode* CreateMapNode (const char* name) = 0;
 };
 
 #endif // __IENGINE_ENGINE_H__

@@ -22,7 +22,7 @@
 
 #include "csgeom/vector3.h"
 #include "csutil/csobject.h"
-#include "iengine/mapnode.h"
+#include "ivaria/mapnode.h"
 
 /**
  * A node. This is an iObject that is bound to a position and a sector in

@@ -23,7 +23,7 @@
 #include "hugeroom.h"
 #include "wentity.h"
 #include "command.h"
-#include "iengine/view.h"
+#include "ivaria/view.h"
 #include "csutil/scanstr.h"
 #include "csutil/csstring.h"
 #include "csutil/util.h"

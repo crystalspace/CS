@@ -1056,8 +1056,8 @@ public:
   /// Create a new collection.
   virtual iCollection* CreateCollection (const char* iName);
 
-  /// Create a new view on the engine.
-  virtual iView* CreateView (iGraphics3D* g3d);
+  /// Create a new camera.
+  virtual iCamera* CreateCamera ();
 
   /// Create a static/pseudo-dynamic light.
   virtual iStatLight* CreateLight (const char* name,
@@ -1120,10 +1120,6 @@ public:
   	bool regionOnly = false) const;
 
   virtual iClipper2D* GetTopLevelClipper () const;
-
-  /// Create a map node.
-  virtual iMapNode* CreateMapNode (const char* name);
-  /// Create a key value pair.
 
   /// Get the number of collections in the engine
   virtual int GetCollectionCount () const;

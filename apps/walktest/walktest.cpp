@@ -27,7 +27,6 @@
 #include "command.h"
 #include "csgeom/frustum.h"
 #include "iengine/region.h"
-#include "iengine/view.h"
 #include "iengine/light.h"
 #include "iengine/motion.h"
 #include "cstool/impexp.h"
@@ -38,6 +37,7 @@
 #include "cssys/system.h"
 #include "cstool/cspixmap.h"
 #include "cstool/csfxscr.h"
+#include "cstool/csview.h"
 #include "csver.h"
 #include "qint.h"
 #include "iutil/cfgmgr.h"
@@ -1329,7 +1329,7 @@ bool WalkTest::Initialize (int argc, const char* const argv[],
   // You don't have to use csView as you can do the same by
   // manually creating a camera and a clipper but it makes things a little
   // easier.
-  view = Engine->CreateView (Gfx3D);
+  view = new csView (Engine, Gfx3D);
 
   // Get the collide system plugin.
   const char* p = GetConfig()->GetStr ("Walktest.Settings.CollDetPlugIn",

@@ -18,7 +18,7 @@
 */
 
 #include "cssysdef.h"
-#include "csengine/mapnode.h"
+#include "cstool/mapnode.h"
 #include "iengine/sector.h"
 #include "ivaria/keyval.h"
 

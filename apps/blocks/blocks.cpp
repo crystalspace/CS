@@ -34,6 +34,7 @@
 #include "csutil/csstring.h"
 #include "csutil/cscolor.h"
 #include "csgeom/textrans.h"
+#include "cstool/csview.h"
 
 #include "isys/vfs.h"
 #include "iutil/cfgmgr.h"
@@ -53,7 +54,6 @@
 #include "iengine/movable.h"
 #include "iengine/light.h"
 #include "iengine/dynlight.h"
-#include "iengine/view.h"
 #include "iengine/engine.h"
 #include "iengine/mesh.h"
 #include "iengine/camera.h"
@@ -3136,7 +3136,7 @@ int main (int argc, char* argv[])
   // manually creating a camera and a clipper but it makes things a little
   // easier.
 
-  Sys->view = Sys->engine->CreateView (Gfx3D);
+  Sys->view = new csView (Sys->engine, Gfx3D);
 
   // Create our world.
   Sys->Printf (CS_MSG_INITIALIZATION, "Creating world!...\n");

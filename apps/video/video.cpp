@@ -20,13 +20,13 @@
 #include "cssys/system.h"
 #include "apps/video/video.h"
 #include "csutil/cscolor.h"
+#include "cstool/csview.h"
 #include "ivideo/graph3d.h"
 #include "ivideo/txtmgr.h"
 #include "ivaria/conout.h"
 #include "imap/parser.h"
 #include "iengine/sector.h"
 #include "iengine/engine.h"
-#include "iengine/view.h"
 #include "iengine/camera.h"
 #include "iengine/light.h"
 #include "iengine/statlght.h"
@@ -226,7 +226,7 @@ bool Video::Initialize (int argc, const char* const argv[],
   // You don't have to use csView as you can do the same by
   // manually creating a camera and a clipper but it makes things a little
   // easier.
-  view = engine->CreateView (myG3D);
+  view = new csView (engine, myG3D);
   view->GetCamera ()->SetSector (room);
   view->GetCamera ()->GetTransform ().SetOrigin (csVector3 (0, 5, -3));
   view->SetRectangle (0, 0, FrameWidth, FrameHeight);

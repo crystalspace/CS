@@ -19,10 +19,10 @@
 #include "cssysdef.h"
 #include "cssys/system.h"
 #include "csutil/cscolor.h"
+#include "cstool/csview.h"
 #include "simple2.h"
 #include "iengine/sector.h"
 #include "iengine/engine.h"
-#include "iengine/view.h"
 #include "iengine/camera.h"
 #include "iengine/light.h"
 #include "iengine/texture.h"
@@ -198,7 +198,7 @@ bool Simple::Initialize (int argc, const char* const argv[],
   engine->Prepare ();
   Printf (CS_MSG_INITIALIZATION, "Created.\n");
 
-  view = engine->CreateView (g3d);
+  view = new csView (engine, g3d);
   view->GetCamera ()->SetSector (room);
   view->GetCamera ()->GetTransform ().SetOrigin (csVector3 (0, 5, -3));
   view->SetRectangle (0, 0, FrameWidth, FrameHeight);

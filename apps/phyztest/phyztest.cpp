@@ -21,7 +21,6 @@
 #include "apps/phyztest/phyztest.h"
 #include "csengine/sector.h"
 #include "csengine/engine.h"
-#include "csengine/csview.h"
 #include "csengine/camera.h"
 #include "csengine/light.h"
 #include "csengine/polygon.h"
@@ -32,6 +31,7 @@
 #include "imesh/sprite3d.h"
 #include "imap/parser.h"
 #include "cstool/collider.h"
+#include "cstool/csview.h"
 
 #include "csphyzik/phyziks.h"
 #include "csgeom/math3d.h"

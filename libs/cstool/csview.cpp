@@ -21,9 +21,9 @@
 #include "qint.h"
 #include "csgeom/polyclip.h"
 #include "csgeom/poly2d.h"
-#include "csengine/csview.h"
-#include "csengine/camera.h"
+#include "cstool/csview.h"
 #include "ivideo/graph3d.h"
+#include "iengine/camera.h"
 #include "iengine/sector.h"
 #include "iengine/engine.h"
 
@@ -38,7 +38,7 @@ csView::csView (iEngine *e, iGraphics3D* ig3d) :
 
   G3D->IncRef ();
   Engine->IncRef ();
-  Camera = &(new csCamera ())->scfiCamera;
+  Camera = e->CreateCamera ();
 
   OldWidth = G3D->GetWidth ();
   OldHeight = G3D->GetHeight ();

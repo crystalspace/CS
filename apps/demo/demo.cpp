@@ -22,6 +22,7 @@
 #include "csutil/cscolor.h"
 #include "csgeom/path.h"
 #include "cstool/csfxscr.h"
+#include "cstool/csview.h"
 #include "ivideo/graph3d.h"
 #include "ivideo/fontserv.h"
 #include "ivideo/graph2d.h"
@@ -30,7 +31,6 @@
 #include "iengine/engine.h"
 #include "iengine/sector.h"
 #include "iengine/light.h"
-#include "iengine/view.h"
 #include "iengine/camera.h"
 #include "iengine/mesh.h"
 #include "iengine/light.h"
@@ -815,7 +815,7 @@ bool Demo::Initialize (int argc, const char* const argv[],
 
   Printf (CS_MSG_INITIALIZATION, "--------------------------------------\n");
 
-  view = engine->CreateView (myG3D);
+  view = new csView (engine, myG3D);
   view->GetCamera ()->SetSector (room);
   view->GetCamera ()->GetTransform ().SetOrigin (csVector3 (0, 0, -900));
   view->GetCamera ()->GetTransform ().RotateThis (csVector3 (0, 1, 0), .8);

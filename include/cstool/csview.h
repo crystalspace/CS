@@ -20,7 +20,7 @@
 #ifndef __CS_CSVIEW_H__
 #define __CS_CSVIEW_H__
 
-#include "iengine/view.h"
+#include "ivaria/view.h"
 
 class csPoly2D;
 class csBox2;

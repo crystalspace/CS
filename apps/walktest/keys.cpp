@@ -23,7 +23,7 @@
 #include "infmaze.h"
 #include "hugeroom.h"
 #include "command.h"
-#include "iengine/view.h"
+#include "ivaria/view.h"
 #include "imesh/thing/polygon.h"
 #include "csutil/scanstr.h"
 #include "csutil/dataobj.h"

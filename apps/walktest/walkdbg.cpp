@@ -21,7 +21,7 @@
 #include "qint.h"
 #include "cssys/system.h"
 #include "csgeom/frustum.h"
-#include "iengine/view.h"
+#include "ivaria/view.h"
 #include "csgeom/csrect.h"
 #include "csutil/dataobj.h"
 #include "ivideo/graph2d.h"
