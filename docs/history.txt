@@ -14,6 +14,8 @@ Short-term cleanups that need to be done:
 	  includes that don't belong there (like from csengine).
 
 29-Sep-1999
+	- Added initial code base from Brandon Ehle for the CS scripting
+	  layer.
 	- Andrew Zabolotny made the following modifications:
 	  - Removed SystemDriver::fopen() method; outdated by the new virtual
 	    file system.  Respective port maintainers will have to remove
@@ -43,6 +45,9 @@ Short-term cleanups that need to be done:
 	  them (while given a warning at the same time).
 	- Fixed dynamic lights so that they work with BSP/octree split
 	  polygons.
+	- Started work on QuadTree implementation. Initially this is going
+	  to be used for lighting. Later we will experiment with this
+	  technique for rendering as well.
 27-Sep-1999
 	- Fixed bug in splitting of BSP polygons. It could happen that
 	  polygons were split to polygons with only one vertex. This bug
@@ -61,6 +66,11 @@ Short-term cleanups that need to be done:
 	  of MazeD. It is now not compilable.
 	- Andrew also added 'const' to many arguments that should be
 	  const.
+	- Some changes from Thomas Hieber (removal of warnings mostly).
+	- New DX6.1 renderer from Tristan McLure (added by Thomas Hieber
+	  to CVS).
+	- Brandon Ehle updated the VC project files (added by Thomas
+	  Hieber).
 26-Sep-1999
 	- Continued work on lighting using octree. It is already working
 	  reasonably well but there are still a few bugs. I also haven't
