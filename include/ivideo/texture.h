@@ -24,7 +24,7 @@
 
 struct iGraphics3D;
 
-SCF_VERSION (iTextureHandle, 2, 0, 1);
+SCF_VERSION (iTextureHandle, 2, 1, 1);
 
 /** 
  * A texture handle as returned by iTextureManager.
@@ -49,9 +49,23 @@ struct iTextureHandle : public iBase
   /**
    * Get the dimensions for a given mipmap level (0 to 3).
    * If the texture was registered just for 2D usage, mipmap levels above
-   * 0 will return false.
+   * 0 will return false. Note that the result of this function will
+   * be the size that the renderer uses for this texture. In most cases
+   * this corresponds to the size that was used to create this texture
+   * but some renderers have texture size limitations (like power of two)
+   * and in that case the size returned here will be the corrected size.
+   * You can get the original image size with GetOriginalDimensions().
    */
   virtual bool GetMipMapDimensions (int mipmap, int &mw, int &mh) = 0;
+
+  /**
+   * Return the original dimensions of the image used to create this texture.
+   * This is most often equal to GetMipMapDimensions (0, mw, mh) but in
+   * some cases the texture will have been resized in order to accomodate
+   * hardware restrictions (like power of two and maximum texture size).
+   * This function returns the uncorrected coordinates.
+   */
+  virtual void GetOriginalDimensions (int& mw, int& mh) = 0;
 
   /// Get the mean color.
   virtual void GetMeanColor (UByte &red, UByte &green, UByte &blue) = 0;

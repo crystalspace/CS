@@ -3546,6 +3546,23 @@ void csGraphics3DOGLCommon::DrawPixmap (iTextureHandle *hTex,
   lightmap_cache->Flush ();
   FlushDrawFog ();
 
+  // If original dimensions are different from current dimensions (because
+  // image has been scaled to conform to OpenGL texture size restrictions)
+  // we correct the input coordinates here.
+  int bitmapwidth = 0, bitmapheight = 0;
+  hTex->GetMipMapDimensions (0, bitmapwidth, bitmapheight);
+  csTextureHandleOpenGL *txt_mm = (csTextureHandleOpenGL *)
+  	hTex->GetPrivateObject ();
+  int owidth = txt_mm->orig_width;
+  int oheight = txt_mm->orig_height;
+  if (owidth != bitmapwidth || oheight != bitmapheight)
+  {
+    sx = sx * owidth / bitmapwidth;
+    sy = sy * oheight / bitmapheight;
+    sw = sw * owidth / bitmapwidth;
+    sh = sh * oheight / bitmapheight;
+  }
+
   int ClipX1, ClipY1, ClipX2, ClipY2;
   G2D->GetClipRect (ClipX1, ClipY1, ClipX2, ClipY2);
 
@@ -3587,7 +3604,6 @@ void csGraphics3DOGLCommon::DrawPixmap (iTextureHandle *hTex,
   texture_cache->Cache (hTex);
 
   // Get texture handle
-  csTextureHandleOpenGL *txt_mm = (csTextureHandleOpenGL *)hTex->GetPrivateObject ();
   GLuint texturehandle = ((csTxtCacheData *)txt_mm->GetCacheData ())->Handle;
 
   // as we are drawing in 2D, we disable some of the commonly used features
@@ -3606,9 +3622,6 @@ void csGraphics3DOGLCommon::DrawPixmap (iTextureHandle *hTex,
   glEnable (GL_TEXTURE_2D);
   glColor4f (1.0, 1.0, 1.0, Alpha ? (1.0 - BYTE_TO_FLOAT (Alpha)) : 1.0);
   glBindTexture (GL_TEXTURE_2D, texturehandle);
-
-  int bitmapwidth = 0, bitmapheight = 0;
-  hTex->GetMipMapDimensions (0, bitmapwidth, bitmapheight);
 
   // convert texture coords given above to normalized (0-1.0) texture
   // coordinates

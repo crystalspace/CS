@@ -26,9 +26,10 @@ csSimplePixmap::csSimplePixmap (iTextureHandle *hTexture)
   {
     int w,h;
     (hTex = hTexture)->IncRef ();
-    hTex->GetMipMapDimensions (0,w,h);
+    //hTex->GetMipMapDimensions (0,w,h);
+    hTex->GetOriginalDimensions (w,h);
     SetTextureRectangle (0, 0, w, h);
-  }  
+  }
 }
 
 csSimplePixmap::csSimplePixmap (iTextureHandle *hTexture, int x, int y, int w, int h)

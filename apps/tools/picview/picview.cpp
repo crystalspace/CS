@@ -1,0 +1,373 @@
+/*
+    Copyright (C) 2001 by Jorrit Tyberghein
+
+    This library is free software; you can redistribute it and/or
+    modify it under the terms of the GNU Library General Public
+    License as published by the Free Software Foundation; either
+    version 2 of the License, or (at your option) any later version.
+
+    This library is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+    Library General Public License for more details.
+
+    You should have received a copy of the GNU Library General Public
+    License along with this library; if not, write to the Free
+    Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+*/
+
+#define CS_SYSDEF_PROVIDE_PATH
+#include "cssysdef.h"
+#include "cssys/system.h"
+#include "cstool/csview.h"
+#include "cstool/initapp.h"
+#include "csutil/cscolor.h"
+#include "csutil/cmdline.h"
+#include "ivideo/graph3d.h"
+#include "ivideo/graph2d.h"
+#include "ivideo/natwin.h"
+#include "ivideo/txtmgr.h"
+#include "ivaria/conout.h"
+#include "iutil/event.h"
+#include "iutil/strvec.h"
+#include "picview.h"
+#include "imesh/object.h"
+#include "imesh/thing/polygon.h"
+#include "imesh/thing/thing.h"
+#include "iutil/objreg.h"
+#include "iutil/eventh.h"
+#include "iutil/comp.h"
+#include "iutil/strvec.h"
+#include "ivaria/reporter.h"
+#include "isys/plugin.h"
+#include "igraphic/imageio.h"
+
+CS_IMPLEMENT_APPLICATION
+
+//-----------------------------------------------------------------------------
+
+// The global system driver
+SysSystemDriver *System;
+
+
+ceImageView::ceImageView (csComponent *iParent, iGraphics3D *G3D)
+  	: csComponent (iParent)
+{
+  image = NULL;
+
+  SetState (CSS_SELECTABLE, true);
+  if (parent)
+    parent->SendCommand (cscmdWindowSetClient, (void *)this);
+}
+
+ceImageView::~ceImageView ()
+{
+  if (image) delete image;
+}
+
+bool ceImageView::SetRect (int xmin, int ymin, int xmax, int ymax)
+{
+  bool rc = csComponent::SetRect (xmin, ymin, xmax, ymax);
+
+  parent->LocalToGlobal (xmin, ymin);
+  parent->LocalToGlobal (xmax, ymax);
+  // Engine uses the upside down coordinate system
+  ymin = app->bound.Height () - ymin;
+  ymax = app->bound.Height () - ymax;
+
+  return rc;
+}
+
+bool ceImageView::HandleEvent (iEvent &Event)
+{
+  switch (Event.Type)
+  {
+    case csevBroadcast:
+      break;
+    case csevKeyDown:
+    case csevKeyUp:
+      break;
+  }
+  return csComponent::HandleEvent (Event);
+}
+
+void ceImageView::Draw ()
+{
+  if (image) Pixmap (image, 0, 0, bound.Width (), bound.Height ());
+}
+
+//-----------------------------------------------------------------------------
+
+bool ceControlWindow::HandleEvent (iEvent& Event)
+{
+  PicViewApp* ceapp = (PicViewApp*)app;
+  if (Event.Type == csevCommand)
+    switch (Event.Command.Code)
+    {
+      case cmdQuit:
+        app->SendCommand (cscmdQuit);
+        break;
+      case cmdFirst:
+	ceapp->LoadNextImage (1, -1);
+	return true;
+      case cmdPrev:
+	ceapp->LoadNextImage (0, -1);
+	return true;
+      case cmdNext:
+	ceapp->LoadNextImage (0, 1);
+	return true;
+    }
+  return csWindow::HandleEvent (Event);
+}
+
+/*---------------------------------------------------------------------*
+ * PicViewApp
+ *---------------------------------------------------------------------*/
+
+PicViewApp::PicViewApp (iObjectRegistry *object_reg, csSkin &skin)
+	: csApp (object_reg, skin)
+{
+  pG3D = NULL;
+  VFS = NULL;
+  image_loader = NULL;
+}
+
+PicViewApp::~PicViewApp ()
+{
+  if (pG3D) pG3D->DecRef ();
+  if (VFS) VFS->DecRef ();
+  if (image_loader) image_loader->DecRef ();
+}
+
+bool PicViewApp::Initialize ()
+{
+  if (!csApp::Initialize ())
+    return false;
+
+  iPluginManager* plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
+
+  image_loader = CS_LOAD_PLUGIN (plugin_mgr,
+    "crystalspace.graphic.image.io.multiplex",
+    "ImgLdr", iImageIO);
+  if (!image_loader)
+  {
+    csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
+    	"crystalspace.application.picview", "No image loader plugin!");
+    abort ();
+  }
+  
+  pG3D = CS_QUERY_PLUGIN (plugin_mgr, iGraphics3D);
+  // Disable double buffering since it kills performance
+  pG3D->GetDriver2D ()->DoubleBuffer (false);
+  iTextureManager* txtmgr = pG3D->GetTextureManager ();
+  txtmgr->SetVerbose (true);
+
+  // Initialize the texture manager
+  txtmgr->ResetPalette ();
+  
+  // Change to other directory before doing Prepare()
+  // because otherwise precalc_info file will be written into MazeD.zip
+  // The /tmp dir is fine for this.
+  VFS = CS_QUERY_PLUGIN_ID (plugin_mgr, CS_FUNCID_VFS, iVFS);
+  VFS->ChDir ("/tmp");
+  files = VFS->FindFiles ("/this/*");
+  cur_idx = 0;
+
+  txtmgr->SetPalette ();
+
+  //------------------------------- ok, now initialize the CSWS application ---
+
+  // Initialize the image window ...
+  csWindow *w = new csWindow (this, "3D View",
+    CSWS_DEFAULTVALUE & ~(CSWS_BUTCLOSE | CSWS_MENUBAR));
+  image_view = new ceImageView (w, pG3D);
+  image_window = w;
+  w->SetRect (140, 0, bound.Width (), bound.Height ());
+
+  w = new ceControlWindow (this, "", CSWS_DEFAULTVALUE & ~CSWS_MENUBAR);
+  w->SetRect (1, 50, 1+140, 50+320);
+  csComponent* d = new csDialog (w);
+  csButton* but;
+  but = new csButton (d, cmdFirst);
+  but->SetText ("First");
+  int y = 10;
+  but->SetPos (1, y); but->SetSize (130, 14); y += 15;
+
+  but = new csButton (d, cmdPrev);
+  but->SetText ("Prev");
+  but->SetPos (1, y); but->SetSize (130, 14); y += 15;
+
+  but = new csButton (d, cmdNext);
+  but->SetText ("Next");
+  but->SetPos (1, y); but->SetSize (130, 14); y += 15;
+
+  but = new csButton (d, cmdQuit);
+  but->SetText ("~Quit");
+  but->SetPos (1, y); but->SetSize (130, 14); y += 15;
+
+  y += 30;
+
+  label1 = new csButton (d, cmdNothing, CSBS_NODEFAULTBORDER|
+		  CSBS_TEXTBELOW, csbfsNone);
+  label1->SetText ("?");
+  label1->SetPos (0, y); label1->SetSize (130, 14); y += 15;
+  label2 = new csButton (d, cmdNothing, CSBS_NODEFAULTBORDER|
+		  CSBS_TEXTBELOW, csbfsNone);
+  label2->SetText ("?");
+  label2->SetPos (0, y); label2->SetSize (130, 14); y += 15;
+
+  return true;
+}
+
+bool PicViewApp::HandleEvent (iEvent &Event)
+{
+  switch (Event.Type)
+  {
+    case csevKeyDown:
+      switch (Event.Key.Code)
+      {
+        case 'q':
+        {
+          ShutDown ();
+          return true;
+        }
+      }
+      break;
+    case csevCommand:
+      if (Event.Command.Code == cscmdStopModal)
+      {
+	csComponent* d = GetTopModalComponent ();
+	int rc = (int)Event.Command.Info;
+	if (rc == cscmdCancel) { delete d; return true; }
+
+        if (GetTopModalUserdata ())
+	{
+          iMessageBoxData* mbd = SCF_QUERY_INTERFACE (GetTopModalUserdata (),
+		iMessageBoxData);
+	  if (mbd)
+	  {
+	    mbd->DecRef ();
+	    delete d;
+	    return true;
+	  }
+	}
+	return true;
+      }
+      break;
+  }
+  return csApp::HandleEvent (Event);
+}
+
+void PicViewApp::LoadNextImage (int idx, int step)
+{
+  iTextureManager* txtmgr = pG3D->GetTextureManager ();
+  int i;
+  if (idx) cur_idx = idx;
+  else cur_idx += step;
+  if (cur_idx < 0) cur_idx = files->Length ()-1;
+  if (cur_idx >= files->Length ()) cur_idx = 0;
+  i = cur_idx;
+  printf ("loading file '%s' (%d/%d)\n", files->Get (i), i+1, files->Length ());
+  char sbuf[255];
+  sprintf (sbuf, "%d/%d", i+1, files->Length ());
+  label1->SetText (sbuf);
+  sprintf (sbuf, "%s", files->Get (i));
+  label2->SetText (sbuf+6);
+  iDataBuffer* buf = VFS->ReadFile (files->Get (i));
+  if (!buf) return;
+  iImage* ifile = image_loader->Load (buf->GetUint8 (),
+		  buf->GetSize (), txtmgr->GetTextureFormat ());
+  buf->DecRef ();
+  if (image_view->image)
+  {
+    txtmgr->UnregisterTexture (image_view->image->GetTextureHandle ());
+    delete image_view->image;
+    image_view->image = NULL;
+    image_view->SetRect (0, 0, 5, 5);
+  }
+  if (ifile)
+  {
+    int w = ifile->GetWidth ();
+    int h = ifile->GetHeight ();
+    iTextureHandle* txt = txtmgr->RegisterTexture (ifile, CS_TEXTURE_2D);
+    txtmgr->ResetPalette ();
+    txtmgr->PrepareTextures ();
+    txtmgr->SetPalette ();
+    ifile->DecRef ();
+    csSimplePixmap* pm = new csSimplePixmap (txt);
+    image_view->image = pm;
+    //int w = pm->Width ();
+    //int h = pm->Height ();
+    int mw = image_window->bound.xmax - image_window->bound.xmin;
+    int mh = image_window->bound.ymax - image_window->bound.ymin;
+    while (w > mw || h > mh)
+    {
+      w = w*90/100;
+      h = h*90/100;
+    }
+  printf ("size is %d %d\n", w, h);
+    image_view->SetRect (0, 0, w, h);
+  }
+  image_view->Invalidate ();
+}
+
+/*---------------------------------------------------------------------*
+ * Main function
+ *---------------------------------------------------------------------*/
+CSWS_SKIN_DECLARE_DEFAULT (DefaultSkin);
+
+int main (int argc, char* argv[])
+{
+  SysSystemDriver *Sys = new SysSystemDriver;
+  System = Sys;
+  srand (time (NULL));
+
+  iObjectRegistry* object_reg = System->GetObjectRegistry ();
+  iCommandLineParser* cmdline = CS_QUERY_REGISTRY (object_reg,
+  	iCommandLineParser);
+  cmdline->AddOption ("mode", "1024x768");
+  System->RequestPlugin ("crystalspace.kernel.vfs:VFS");
+  System->RequestPlugin ("crystalspace.font.server.default:FontServer");
+  System->RequestPlugin ("crystalspace.graphic.image.io.multiplex:ImageLoader");
+  System->RequestPlugin ("crystalspace.graphics3d.software:VideoDriver");
+
+  if (!System->Initialize (argc, argv, NULL))
+  {
+    printf ("System not initialized !\n");
+    delete System;
+    return -1;
+  }    
+  if (!csInitializeApplication (object_reg))
+  {
+    printf ("couldn't init app! (plugins missing?)\n");
+    delete System;
+    return -1;
+  }
+
+  iGraphics3D* g3d = CS_QUERY_REGISTRY (object_reg, iGraphics3D);
+  iNativeWindow* nw = g3d->GetDriver2D ()->GetNativeWindow ();
+  if (nw) nw->SetTitle ("Crystal Space Picture Viewer");
+
+  if (!System->Open ())
+  {
+    printf ("Could not open system !\n");
+    delete System;
+    return -1;
+  }
+  // Create our main class.
+  
+  PicViewApp *theApp = new PicViewApp (object_reg, DefaultSkin);
+
+  // Initialize the main system. This will load all needed plug-ins
+  // (3D, 2D, network, sound, ...) and initialize them.
+  if (theApp->Initialize ())
+    System->Loop ();
+  else
+    csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
+    	"crystalspace.application.picview", "Error initializing system!");
+
+  delete theApp;
+  
+  delete System;
+  return 0;
+}

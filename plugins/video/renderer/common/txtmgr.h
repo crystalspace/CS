@@ -136,6 +136,10 @@ public:
    * for 3D usage.
    */
   virtual bool GetMipMapDimensions (int mm, int& w, int& h);
+  virtual void GetOriginalDimensions (int& w, int& h)
+  {
+    GetMipMapDimensions (0, w, h);
+  }
 
   /// Get the mean color.
   virtual void GetMeanColor (UByte &r, UByte &g, UByte &b);

@@ -1,5 +1,32 @@
 The history order is reversed so that new features are at the top.
 
+27-Sep-2001
+	- The alphamap for textures in the software renderer was not cleaned
+	  up at destruction.
+	- Added iTextureHandle::GetOriginalDimensions() which returns the
+	  dimensions of the image used to create the texture. This is
+	  most often equal to GetMipMapDimensions(0) but in some cases
+	  hardware restrictions require that the texture is resized (i.e.
+	  maximum texture size or power of two).
+	- Implemented GetOriginalDimensions() in default texture manager
+	  for all 3D renderers and added a specialized implementation
+	  in OpenGL renderer because there the resize of textures can
+	  happen in some cases.
+	- Fixed csSimplePixmap to use GetOriginalDimensions() instead
+	  of GetMipMapDimensions().
+	- Fixed csWSTexture (CSWS) to use GetOriginalDimensions() instead
+	  of GetMipMapDimensions().
+	- Fixed OpenGL::DrawPixmap() so that it correctly scales the image
+	  to display when the image was resized.
+	- All the above changes make sure that pixmaps now behave the same
+	  with software and OpenGL even if the image for the pixmap has
+	  sizes that are not OpenGL conformant. In the past this was not
+	  the case.
+	- Added apps/tools/picview which is a primitive application to
+	  show images. Currently it doesn't accept commandline arguments
+	  but just lets you go over all images in a directory. Future
+	  enhancements are going to be useful and the layout for the
+	  button window must be improved.
 26-Sep-2001
 	- Added the following new initialization functions to initapp (cstool
 	  library):

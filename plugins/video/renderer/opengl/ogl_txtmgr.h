@@ -89,6 +89,13 @@ public:
   /// Adjust size, mipmap, create procedural texture etc
   void InitTexture (csTextureManagerOpenGL *texman, csPixelFormat *pfmt);
 
+  /// Override from csTextureHandle.
+  virtual void GetOriginalDimensions (int& w, int& h)
+  {
+    w = orig_width;
+    h = orig_height;
+  }
+
   /// Create a new texture object
   virtual csTexture *NewTexture (iImage *Image);
   /// Compute the mean color for the just-created texture

@@ -153,7 +153,8 @@ int csWSTexture::GetWidth ()
   else if (Handle)
   {
     int bw, bh;
-    Handle->GetMipMapDimensions (0, bw, bh);
+    //Handle->GetMipMapDimensions (0, bw, bh);
+    Handle->GetOriginalDimensions (bw, bh);
     return bw;
   }
   return 0;
@@ -166,7 +167,8 @@ int csWSTexture::GetHeight ()
   else if (Handle)
   {
     int bw, bh;
-    Handle->GetMipMapDimensions (0, bw, bh);
+    //Handle->GetMipMapDimensions (0, bw, bh);
+    Handle->GetOriginalDimensions (bw, bh);
     return bh;
   }
   return 0;

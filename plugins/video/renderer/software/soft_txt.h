@@ -120,6 +120,7 @@ public:
   virtual ~csTextureSoftware ()
   { 
     delete [] bitmap; 
+    delete [] alphamap; 
     if (image) image->DecRef (); 
   }
 
