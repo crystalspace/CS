@@ -24,6 +24,11 @@ The history order is reversed so that new features are at the top.
 	  time you called that function.
 	- Bounding box is not correctly updated after doing HardTransform() on
 	  a 3D sprite.
+	- Added OnDestroy() to iLightCallback.
+	- The comments in iLightCallback indicated that it was safe to
+	  remove the callback from inside the callback itself. But this
+	  was actually not true. Changed the loops in light code to make
+	  it really safe.
 7-Jan-2002
 	- Keith Fulton added SetReverseAction to the Sprite3d so that
 	  they can walk backwards without defining a new action.  Call this

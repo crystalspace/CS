@@ -80,7 +80,7 @@ struct iFlareHalo;
 #define CS_ATTN_REALISTIC 3
 /** @} */
 
-SCF_VERSION (iLightCallback, 0, 1, 0);
+SCF_VERSION (iLightCallback, 0, 1, 1);
 
 /**
  * Set a callback which is called when this light color is changed.
@@ -108,10 +108,16 @@ struct iLightCallback : public iBase
   virtual void OnSectorChange (iSector* newsector) = 0;
 
   /**
-   * Radius will be changed. It is safe to delete this callback
-   * in this function.
+   * Radius will be changed.
+   * It is safe to delete this callback in this function.
    */
   virtual void OnRadiusChange (float newradius) = 0;
+
+  /**
+   * Light will be destroyed.
+   * It is safe to delete this callback in this function.
+   */
+  virtual void OnDestroy () = 0;
 };
 
 

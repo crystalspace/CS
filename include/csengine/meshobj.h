@@ -145,7 +145,6 @@ class csMeshWrapper : public csObject
   friend class csMovableSectorList;
 
 protected:
-
   /// The parent mesh object, or NULL
   iMeshWrapper *Parent;
 
@@ -164,12 +163,14 @@ protected:
   /// Flags to use for defered lighting.
   int defered_lighting_flags;
 
+ 
+
   /**
    * This value indicates the last time that was used to do animation.
    * If 0 then we haven't done animation yet. We compare this value
    * with the value returned by engine->GetLastAnimationTime() to see
    * if we need to call meshobj->NextFrame() again.
-  */
+   */
   csTicks last_anim_time;
 
   /**

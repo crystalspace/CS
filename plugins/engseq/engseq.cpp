@@ -1328,6 +1328,7 @@ public:
   virtual void OnPositionChange (const csVector3&) { }
   virtual void OnSectorChange (iSector*) { }
   virtual void OnRadiusChange (float) { }
+  virtual void OnDestroy () { }
 };
 
 SCF_IMPLEMENT_IBASE (csTriggerLightCallback)

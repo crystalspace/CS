@@ -71,6 +71,14 @@ csLight::csLight (
 
 csLight::~csLight ()
 {
+  int i;
+  for (i = 0; i < light_cb_vector.Length (); )
+  {
+    iLightCallback* cb = light_cb_vector[i];
+    cb->OnDestroy ();
+    if (cb == light_cb_vector[i]) i++;
+  }
+
   if (flags.Check (CS_LIGHT_ACTIVEHALO))
     csEngine::current_engine->RemoveHalo (this);
   delete halo;
@@ -118,10 +126,13 @@ const csVector3 &csLight::Light::GetCenter ()
 void csLight::SetCenter (const csVector3 &pos)
 {
   int i;
-  for (i = 0; i < light_cb_vector.Length (); i++)
+  for (i = 0; i < light_cb_vector.Length (); )
   {
-    ((iLightCallback *)light_cb_vector[i])->OnPositionChange (pos);
+    iLightCallback* cb = light_cb_vector[i];
+    cb->OnPositionChange (pos);
+    if (cb == light_cb_vector[i]) i++;
   }
+
   center = pos;
   lightnr++;
 }
@@ -139,11 +150,13 @@ iSector *csLight::Light::GetSector ()
 void csLight::SetSector (csSector* sector)
 {
   int i;
-  for (i = 0; i < light_cb_vector.Length (); i++)
+  for (i = 0; i < light_cb_vector.Length (); )
   {
-    ((iLightCallback *)light_cb_vector[i])->OnSectorChange (
-    	&(sector->scfiSector));
+    iLightCallback* cb = light_cb_vector[i];
+    cb->OnSectorChange (&(sector->scfiSector));
+    if (cb == light_cb_vector[i]) i++;
   }
+
   csLight::sector = sector;
   lightnr++;
 }
@@ -171,9 +184,11 @@ float csLight::Light::GetInverseRadius ()
 void csLight::SetRadius (float radius)
 {
   int i;
-  for (i = 0; i < light_cb_vector.Length (); i++)
+  for (i = 0; i < light_cb_vector.Length (); )
   {
-    ((iLightCallback *)light_cb_vector[i])->OnRadiusChange (radius);
+    iLightCallback* cb = light_cb_vector[i];
+    cb->OnRadiusChange (radius);
+    if (cb == light_cb_vector[i]) i++;
   }
   dist = radius;
   sqdist = dist*dist;
@@ -194,9 +209,11 @@ const csColor &csLight::Light::GetColor ()
 void csLight::SetColor (const csColor& col) 
 {
   int i;
-  for (i = 0; i < light_cb_vector.Length (); i++)
+  for (i = 0; i < light_cb_vector.Length (); )
   {
-    ((iLightCallback *)light_cb_vector[i])->OnColorChange (col);
+    iLightCallback* cb = light_cb_vector[i];
+    cb->OnColorChange (col);
+    if (cb == light_cb_vector[i]) i++;
   }
 
   color = col; 
