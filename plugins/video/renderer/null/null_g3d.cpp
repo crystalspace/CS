@@ -158,15 +158,6 @@ void csGraphics3DNull::SetPerspectiveCenter (int x, int y)
   height2 = y;
 }
 
-void csGraphics3DNull::SetClipper (csVector2* /*vertices*/, int /*num_vertices*/)
-{
-}
-
-void csGraphics3DNull::GetClipper (csVector2* /*vertices*/, int& num_vertices)
-{
-  num_vertices = 0;
-}
-
 bool csGraphics3DNull::BeginDraw (int DrawFlags)
 {
   if ((G2D->GetWidth() != width) || 
