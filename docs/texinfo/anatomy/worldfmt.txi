@@ -7,8 +7,8 @@ Crystal Space world file format. The second section gives a few hints
 about what everything means.
 
 @menu
-* WorldFmt Syntax:: World Format Syntax
-* WorldFmt Hints:: Some Hints
+* WorldFmt Syntax:: Syntax
+* WorldFmt Hints:: Hints
 @end menu
 
 @node WorldFmt Syntax, WorldFmt Hints, World File Format, World File Format
