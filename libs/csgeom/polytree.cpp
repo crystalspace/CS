@@ -168,3 +168,30 @@ void csPolygonTree::IntersectSphere (csArray<int>& polyidx, const csVector3& cen
   }
 }
 
+static int intsort (void const* item1,
+	void const* item2)
+{
+  int i1 = *(int*)item1;
+  int i2 = *(int*)item2;
+  if (i1 < i2) return -1;
+  else if (i2 < i1) return 1;
+  else return 0;
+}
+
+void csPolygonTree::RemoveDoubles (csArray<int>& polyidx)
+{
+  polyidx.Sort (intsort);
+  int i;
+  int i1 = 0;
+  int prev = -1;
+  for (i = 0 ; i < polyidx.Length () ; i++)
+  {
+    if (polyidx[i] != prev)
+    {
+      polyidx[i1++] = polyidx[i];
+      prev = polyidx[i];
+    }
+  }
+  polyidx.Truncate (i1);
+}
+

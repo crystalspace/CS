@@ -545,6 +545,7 @@ int csODEDynamics::CollideMeshSphere (dGeomID mesh, dGeomID sphere, int flags,
   csPolygonTree* tree = mi->tree;
   csArray<int> polyidx;
   tree->IntersectSphere (polyidx, center, rad*rad);
+  tree->RemoveDoubles (polyidx);
   for (int i = 0; i < polyidx.Length () && outcount < N; i ++)
   {
     csMeshedPolygon& poly = polygon_list[polyidx[i]];

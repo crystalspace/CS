@@ -31,6 +31,8 @@ chronological order.
 		ODE Message 3: LCP internal error, s <= 0 (s=0.0000e+000)
 	  But otherwise things look very normal. I got a speed increase from
 	  1 fps to 150 fps :-)
+	- Jorrit fixed the bug with the internal ODE error. The problem was
+	  duplicate polygons in the polygon tree intersection routines.
 17-Aug-2003
 	- Jorrit fixed a bug in csIntersect3::IntersectTriangle(). In
 	  some cases it would fail to register a hit.

@@ -74,6 +74,9 @@ public:
   /// Hit a sphere with this tree and return the polygons that intersect.
   void IntersectSphere (csArray<int>& polyidx, const csVector3& center,
   	float sqradius);
+
+  /// Remove doubles in the list of polygons.
+  void RemoveDoubles (csArray<int>& polyidx);
 };
 
 #endif // __CS_POLYTREE_H__
