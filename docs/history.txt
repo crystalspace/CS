@@ -40,7 +40,6 @@ The history order is reversed so that new features are at the top.
 	- Michael Voase did the following:
             - Fixed walktest crasher in line 3d caused
 	      by proctex (ignoring PrepareAnim() failure)
-	- Norman Kramer fixed compilation error in csrectrg.cpp.
 	- Eric Sunshine made the following changes to the project:
 	    - Removed all event related code and functionality from
 	      csSystemDriver and the cssys library as part of the continuing
@@ -175,6 +174,30 @@ The history order is reversed so that new features are at the top.
 	  Fixed a couple of error message typos (said ball instead of surface).
 	- Eric Sunshine eliminated a warning in datastrm.cpp regarding
 	  undeclared function isspace().
+	- Martin Geisse made the following changes:
+	    - Added the MDL converter to scf.cfg.
+	    - Moved the OBJ importer and exporter to its plugin.
+	    - Added LookChar, ReadTextInt, ReadTextFloat and SkipWhitespace
+	      to csDataStream and fixed a bug in GetString.
+	- Norman Kramer fixed compilation error in csrectrg.cpp by adding
+	  'const' to Exclude parameter. In addition in Include made the
+	  reference to the region members non-const since they are changed in
+	  the chopEdgeIntersection routine (gcc did choke on that).
+	- Norman also added ctype.h include to the OBJ importer plugin.
+	- Norman added missing argument to CS_QUERY_REGISTRY in xwindow.cpp.
+	- Norman fixed the double window problem in case the softdriver was
+	  requested via RequestPlugin but then overriden on the commandline
+	  via -video option. A more general solution is still needed for this
+	  as this solution is specific to the 3D driver.
+	- Philip Wyett added a return value to Initialize() in csSystemDriver.
+	- Philip fixed link error with OBJ importer.
+	- Philip did a blind fix on app g2dtest. Currently cannot test as
+	  no CS app compiled with MSVC runs because of crashers on execute at
+	  the moment.
+	- Philip Wyett did a fix for crashers in graph2d.cpp. Now instead of
+	  doing a CS_ASSERT on the un-initialezed member "iObjectRegisrty*
+	  object_reg" to performing it on the function parameter
+	  "iObjectRegistry* r".
 25-Aug-2001
 	- Extended iPolygonBuffer to have more specific support for
 	  lightmapped polygons. This means that iPolygonBuffer will be more
@@ -203,6 +226,12 @@ The history order is reversed so that new features are at the top.
 	  (one example: 31.6 FPS -> 32.6 FPS).
 	- Extended the test in csThing::DrawTest() to also include frustum
 	  clipping. This also gives a small additional speed increase.
+	- Martin Geisse made the following changes:
+	    - Moved the MDL importer to its plugin. It compiles but is not
+	      yet tested.
+	    - Added csDataStream::Skip().
+	    - Changed the Push() method of growing arrays to return the
+	      index of the pushed element.
 24-Aug-2001
 	- Philip Wyett tried to fix the metaballs plugin from crashing.
 	- Fixed metaballs plugin so that it really works again now.  This
@@ -245,6 +274,21 @@ The history order is reversed so that new features are at the top.
 	  is present or not.  This means that the right version of QInt() will
 	  automatically be selected after you do 'make linux' (or 'make
 	  win32gcc' whatever).
+	- Christopher Nelson did the following:
+	  Added csRectRegion: a class for optimal sets of rectangles, supports
+	  including and excluding of non-contigous rectangular spaces. The
+	  region itself is non-contiguous, but operations can only be
+	  performed on rectangular areas.
+	  A rect region is a class that implements splittable 2d rectangles.
+	  The region may be composed of one or more rectangles that do not
+	  need to occupy the same area. The idea being that you need to be
+	  able to have a number of disparate rectangular regions for updates.
+	  This class uses csRect for nearly all rectangle operations.
+	  To use you can Include and Exclude rectangles from this region.
+	  When finished, this class will have a list of optimal rectangles
+	  that occupy a region. If used properly, it will result in faster
+	  overall painting performance, since several areas will not
+	  require overwriting.
 23-Aug-2001
 	- Fog should now work for the metaballs plugin.
 	- Started work on vertex buffer support in the 3D renderers.  There is
