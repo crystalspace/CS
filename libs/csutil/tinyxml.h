@@ -488,9 +488,6 @@ public:
 
 	virtual TiDocumentNode* Clone() const = 0;
 
-	void  SetUserData( void* user )			{ userData = user; }
-	void* GetUserData()						{ return userData; }
-
 protected:
 	TiDocumentNode( NodeType type );
 
@@ -505,7 +502,7 @@ protected:
 	// Figure out what is at *p, and parse it. Returns null if it is not an xml node.
 	TiDocumentNode* Identify( const char* start );
 	void CopyToClone( TiDocumentNode* target ) const	{ target->SetValue (value.c_str() );
-												  target->userData = userData; }
+												  }
 
 	// Internal Value function returning a TIXML_STRING
 	TIXML_STRING SValue() const	{ return value ; }
@@ -520,7 +517,6 @@ protected:
 
 	TiDocumentNode*		prev;
 	TiDocumentNode*		next;
-	void*			userData;
 };
 
 

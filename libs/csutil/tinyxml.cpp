@@ -129,7 +129,6 @@ TiDocumentNode::TiDocumentNode( NodeType _type )
 	lastChild = 0;
 	prev = 0;
 	next = 0;
-	userData = 0;
 }
 
 
