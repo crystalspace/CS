@@ -4305,7 +4305,7 @@ chronological order.
 	  works around conflicts caused by both modules having source files of
 	  the same name.
 	- res fixed a copy'n'paste bug in the rain mesh object, pointed out
-	  by Jochen Mönch <powermonk@users.sourceforge.net>
+	  by Jochen Munch <powermonk@users.sourceforge.net>
 	- Eric Sunshine fixed bug in msvcgen.pl where the prefixes specified
 	  via --strip-root were not being applied to the value of the
 	  %metafile% pseudo-variable.
@@ -8787,7 +8787,7 @@ chronological order.
 	    - Reverted Duhpreys changes to genmesh as they don't work.
 	- Marten Svanfeldt fixed a bug in glshader_mtex which made a shader
 	  valid even if it had to many layers.
-	- Rudolf Putocek picked up where Eric Sunshine left off and converted
+	- Rudolf Potucek picked up where Eric Sunshine left off and converted
 	  the remaining makefiles in CS/apps so that object-files for a module
 	  are placed in a module-specific object-file directory, rather than in
 	  the common out/PLATFORM/CPU/mode directory.  This change corrects the
@@ -10016,7 +10016,7 @@ chronological order.
 	    - Updates by Rene Jager <renej.frog@yucom.be>:
 	      Test examples for using CrystalSpace from within Python.
 	      simpcd.py now plays sound on collision.
-	- Frank Ricther noted that some sequences reference themselves.  Added
+	- Frank Richter noted that some sequences reference themselves.  Added
 	  comments to world file about that fact.
 	- Added a missing call to SetMirrored() in the old OpenGL renderer
 	  in EffectDrawTriangleMesh(). This fixes a few problems with
