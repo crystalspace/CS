@@ -1,5 +1,11 @@
 The history order has been reversed so that new features are at the top.
 
+4-Oct-2000
+	- Philip Wyett did some small changes to the VC project files.
+	- Added a change from Luca Pancallo to 3ds2lev so that floating
+	  point values near zero are better printed.
+	- Added '-l' option to 3ds2lev. If you use that option the
+	  LIGHTING(no) will not be added.
 3-Oct-2000
 	- Fixed a bug in the 3dslev convertor where it would accidently
 	  remove small polygons.
@@ -27,6 +33,11 @@ The history order has been reversed so that new features are at the top.
 	- Eric Sunshine fixed compilation errors in these files following
 	  Andrew's big changes: blocks.cpp, inputcmd.cpp, map.cpp,
 	  metasys.cpp, perftest.cpp.
+	- Thomas Hieber did further changes to icsgame.h and the gamecore
+	  plugin.
+	- Thomas Hieber removed Crystal Shooter project file.
+	- Wouter Wijngaards fixed radiosity when there are no polygons
+	  to light.
 2-Oct-2000
 	- Andrew Zabolotny did the following changes to CS:
 	    - Overhauled the csIniFile class. There is now a new
