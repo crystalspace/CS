@@ -23,7 +23,6 @@
 #include "cscom/com.h"
 #include "csgeom/math2d.h"
 #include "csgeom/math3d.h"
-#include "csengine/basic/fog.h" //@@@???
 #include "soft_g3d.h"
 #include "scan.h"
 #include "tcache.h"
@@ -37,7 +36,7 @@
 #include "ilghtmap.h"
 
 #if defined (DO_MMX)
-#  include "cs3d/software/i386/cpuid.h"
+#  include "i386/cpuid.h"
 #endif
 
 //-------------------------- The indices into arrays of scanline routines ------
@@ -973,16 +972,19 @@ HRESULT csGraphics3DSoftware::DrawPolygonFlat (G3DPolygonDPF& poly)
 	if (++scanR2 >= poly.num)
 	  scanR2 = 0;
 
+        leave = false;
         fyR = QRound (poly.vertices [scanR2].sy);
+        if (sy <= fyR)
+          continue;
+
         float dyR = (poly.vertices [scanR1].sy - poly.vertices [scanR2].sy);
         if (dyR > 0)
         {
           sxR = poly.vertices [scanR1].sx;
           dxR = (poly.vertices [scanR2].sx - sxR) / dyR;
           // horizontal pixel correction
-          sxR += dxR * (poly.vertices [scanR1].sy - ((float)sy - 0.5));
+          sxR += dxR * (poly.vertices [scanR1].sy - (float (sy) - 0.5));
         } /* endif */
-        leave = false;
       } /* endif */
       if (sy <= fyL)
       {
@@ -990,24 +992,27 @@ HRESULT csGraphics3DSoftware::DrawPolygonFlat (G3DPolygonDPF& poly)
 	if (--scanL2 < 0)
 	  scanL2 = poly.num - 1;
 
+        leave = false;
         fyL = QRound (poly.vertices [scanL2].sy);
+        if (sy <= fyL)
+          continue;
+
         float dyL = (poly.vertices [scanL1].sy - poly.vertices [scanL2].sy);
         if (dyL)
         {
           sxL = poly.vertices [scanL1].sx;
           dxL = (poly.vertices [scanL2].sx - sxL) / dyL;
           // horizontal pixel correction
-          sxL += dxL * (poly.vertices [scanL1].sy - ((float)sy - 0.5));
+          sxL += dxL * (poly.vertices [scanL1].sy - (float (sy) - 0.5));
         } /* endif */
-        leave = false;
       } /* endif */
     } while (!leave); /* enddo */
 
     // Steps for interpolating vertically over scanlines.
     float vd_inv_z = - dxL * M + N;
 
-    float cx = (sxL - (float)width2);
-    float cy = ((sy - 0.5) - height2);
+    float cx = (sxL - float (width2));
+    float cy = (float (sy) - 0.5 - float (height2));
     float inv_z = M * cx + N * cy + O;
 
     // Find the trapezoid top (or bottom in inverted Y coordinates)
@@ -1283,12 +1288,6 @@ STDMETHODIMP csGraphics3DSoftware::DrawPolygon (G3DPolygonDP& poly)
     if ((scan_index < 0) || !(dscan = ScanProc [scan_index]))
       goto finish;              // nothing to do
 
-  int scanL1, scanL2, scanR1, scanR2;   // scan vertex left/right start/final
-  float sxL, sxR, dxL, dxR;             // scanline X left/right and deltas
-  int sy, fyL, fyR;                     // scanline Y, final Y left, final Y right
-  int xL, xR;
-  int screenY;
-
   // If sub-texture optimization is enabled we will convert the 2D screen polygon
   // to texture space and then triangulate this texture polygon to cache all
   // needed sub-textures.
@@ -1309,8 +1308,20 @@ STDMETHODIMP csGraphics3DSoftware::DrawPolygon (G3DPolygonDP& poly)
     float min_u = 0, max_u = 0, min_v = 0, max_v = 0;
     for (int vertex = 0; vertex < poly.num; vertex++)
     {
-      float cx = QRound (poly.vertices [vertex].sx - width2);
-      float cy = (QRound (poly.vertices [vertex].sy) - 0.5) - height2;
+      float cx = poly.vertices [vertex].sx - float (width2);
+      // apply sub-pixel correction
+      int nextvert = (vertex == 0) ? poly.num - 1 : vertex - 1;
+      float y1 = poly.vertices [vertex].sy;
+      float y2 = poly.vertices [nextvert].sy;
+      int iy = QRound (y1);
+      if (iy != QRound (y2))
+      {
+        float dx = (poly.vertices [nextvert].sx - poly.vertices [vertex].sx) / (y1 - y2);
+        cx += dx * (poly.vertices [vertex].sy - (float (iy) - 0.5));
+      } /* endif */
+      cx = float (QRound (cx));
+
+      float cy = (float (iy) - 0.5) - float (height2);
       float inv_z = M * cx + N * cy + O;
       float u_div_z = J1 * cx + J2 * cy + J3;
       float v_div_z = K1 * cx + K2 * cy + K3;
@@ -1346,6 +1357,12 @@ STDMETHODIMP csGraphics3DSoftware::DrawPolygon (G3DPolygonDP& poly)
   // Using this we effectively partition our polygon in trapezoids
   // with at most two triangles (one at the top and one at the bottom).
 
+  int scanL1, scanL2, scanR1, scanR2;   // scan vertex left/right start/final
+  float sxL, sxR, dxL, dxR;             // scanline X left/right and deltas
+  int sy, fyL, fyR;                     // scanline Y, final Y left, final Y right
+  int xL, xR;
+  int screenY;
+
   sxL = sxR = dxL = dxR = 0;            // avoid GCC warnings about "uninitialized variables"
   scanL2 = scanR2 = max_i;
   sy = fyL = fyR = QRound (poly.vertices [scanL2].sy);
@@ -1368,16 +1385,19 @@ STDMETHODIMP csGraphics3DSoftware::DrawPolygon (G3DPolygonDP& poly)
 	if (++scanR2 >= poly.num)
 	  scanR2 = 0;
 
+        leave = false;
         fyR = QRound (poly.vertices [scanR2].sy);
+        if (sy <= fyR)
+          continue;
+
         float dyR = (poly.vertices [scanR1].sy - poly.vertices [scanR2].sy);
         if (dyR > 0)
         {
           sxR = poly.vertices [scanR1].sx;
           dxR = (poly.vertices [scanR2].sx - sxR) / dyR;
           // horizontal pixel correction
-          sxR += dxR * (poly.vertices [scanR1].sy - ((float)sy - 0.5));
+          sxR += dxR * (poly.vertices [scanR1].sy - (float (sy) - 0.5));
         } /* endif */
-        leave = false;
       } /* endif */
       if (sy <= fyL)
       {
@@ -1385,16 +1405,19 @@ STDMETHODIMP csGraphics3DSoftware::DrawPolygon (G3DPolygonDP& poly)
 	if (--scanL2 < 0)
 	  scanL2 = poly.num - 1;
 
+        leave = false;
         fyL = QRound (poly.vertices [scanL2].sy);
+        if (sy <= fyL)
+          continue;
+
         float dyL = (poly.vertices [scanL1].sy - poly.vertices [scanL2].sy);
         if (dyL)
         {
           sxL = poly.vertices [scanL1].sx;
           dxL = (poly.vertices [scanL2].sx - sxL) / dyL;
           // horizontal pixel correction
-          sxL += dxL * (poly.vertices [scanL1].sy - ((float)sy - 0.5));
+          sxL += dxL * (poly.vertices [scanL1].sy - (float (sy) - 0.5));
         } /* endif */
-        leave = false;
       } /* endif */
     } while (!leave); /* enddo */
 
@@ -1403,8 +1426,8 @@ STDMETHODIMP csGraphics3DSoftware::DrawPolygon (G3DPolygonDP& poly)
     float vd_u_div_z = - dxL * J1 + J2;
     float vd_v_div_z = - dxL * K1 + K2;
 
-    float cx = (sxL - width2);
-    float cy = ((sy - 0.5) - height2);
+    float cx = (sxL - float (width2));
+    float cy = (float (sy) - 0.5 - float (height2));
     float inv_z = M * cx + N * cy + O;
     float u_div_z = J1 * cx + J2 * cy + J3;
     float v_div_z = K1 * cx + K2 * cy + K3;
@@ -1705,16 +1728,19 @@ STDMETHODIMP csGraphics3DSoftware::AddFogPolygon (CS_ID id, G3DPolygonAFP& poly,
 	if (++scanR2 >= poly.num)
 	  scanR2 = 0;
 
+        leave = false;
         fyR = QRound (poly.vertices [scanR2].sy);
+        if (sy <= fyR)
+          continue;
+
         float dyR = (poly.vertices [scanR1].sy - poly.vertices [scanR2].sy);
         if (dyR > 0)
         {
           sxR = poly.vertices [scanR1].sx;
           dxR = (poly.vertices [scanR2].sx - sxR) / dyR;
           // horizontal pixel correction
-          sxR += dxR * (poly.vertices [scanR1].sy - ((float)sy - 0.5));
+          sxR += dxR * (poly.vertices [scanR1].sy - (float (sy) - 0.5));
         } /* endif */
-        leave = false;
       } /* endif */
       if (sy <= fyL)
       {
@@ -1722,24 +1748,27 @@ STDMETHODIMP csGraphics3DSoftware::AddFogPolygon (CS_ID id, G3DPolygonAFP& poly,
 	if (--scanL2 < 0)
 	  scanL2 = poly.num - 1;
 
+        leave = false;
         fyL = QRound (poly.vertices [scanL2].sy);
+        if (sy <= fyL)
+          continue;
+
         float dyL = (poly.vertices [scanL1].sy - poly.vertices [scanL2].sy);
         if (dyL)
         {
           sxL = poly.vertices [scanL1].sx;
           dxL = (poly.vertices [scanL2].sx - sxL) / dyL;
           // horizontal pixel correction
-          sxL += dxL * (poly.vertices [scanL1].sy - ((float)sy - 0.5));
+          sxL += dxL * (poly.vertices [scanL1].sy - (float (sy) - 0.5));
         } /* endif */
-        leave = false;
       } /* endif */
     } while (!leave); /* enddo */
 
     // Steps for interpolating vertically over scanlines.
     float vd_inv_z = - dxL * M + N;
 
-    float cx = (sxL - (float)width2);
-    float cy = ((sy - 0.5) - height2);
+    float cx = (sxL - float (width2));
+    float cy = (float (sy) - 0.5 - float (height2));
     float inv_z = M * cx + N * cy + O;
 
     // Find the trapezoid top (or bottom in inverted Y coordinates)
@@ -2016,9 +2045,6 @@ STDMETHODIMP csGraphics3DSoftware::DrawPolygonQuick (G3DPolygonDPQ& poly)
       leave = true;
       if (sy <= fyR)
       {
-        //-----
-        // Right side needs to be advanced.
-        //-----
         // Check first if polygon has been finished
         if (scanR2 == bot)
           goto finish;
@@ -2027,11 +2053,10 @@ STDMETHODIMP csGraphics3DSoftware::DrawPolygonQuick (G3DPolygonDPQ& poly)
 	  scanR2 = 0;
 
         leave = false;
-	int newFY = QRound (poly.vertices [scanR2].sy);
-	if (newFY == fyR)
+        fyR = QRound (poly.vertices [scanR2].sy);
+        if (sy <= fyR)
 	  continue;
 
-        fyR = newFY;
         float dyR = poly.vertices [scanR1].sy - poly.vertices [scanR2].sy;
         if (dyR > 0)
         {
@@ -2044,9 +2069,6 @@ STDMETHODIMP csGraphics3DSoftware::DrawPolygonQuick (G3DPolygonDPQ& poly)
       } /* endif */
       if (sy <= fyL)
       {
-        //-----
-        // Left side needs to be advanced.
-        //-----
         if (scanL2 == bot)
           goto finish;
         scanL1 = scanL2;
@@ -2054,11 +2076,10 @@ STDMETHODIMP csGraphics3DSoftware::DrawPolygonQuick (G3DPolygonDPQ& poly)
 	  scanL2 = poly.num - 1;
 
         leave = false;
-	int newFY = QRound (poly.vertices [scanL2].sy);
-	if (newFY == fyL)
+        fyL = QRound (poly.vertices [scanL2].sy);
+	if (sy <= fyL)
 	  continue;
 
-        fyL = newFY;
         float dyL = poly.vertices [scanL1].sy - poly.vertices [scanL2].sy;
         if (dyL > 0)
         {
@@ -2079,7 +2100,7 @@ STDMETHODIMP csGraphics3DSoftware::DrawPolygonQuick (G3DPolygonDPQ& poly)
           xL = QInt16 (poly.vertices [scanL1].sx);
 
           // horizontal pixel correction
-          float deltaY = poly.vertices [scanL1].sy - ((float)sy - 0.5);
+          float deltaY = poly.vertices [scanL1].sy - (float (sy) - 0.5);
           float deltaX = (dxdyL / 65536.) * deltaY;
           xL += QInt16 (deltaX);
 
@@ -2474,21 +2495,18 @@ STDMETHODIMP csGraphics3DSoftware::DrawPolygonFX(G3DPolygonDPFX& poly)
       leave = true;
       if (sy <= fyR)
       {
-        //-----
-        // Right side needs to be advanced.
-        //-----
         // Check first if polygon has been finished
         if (scanR2 == bot)
           goto finish;
         scanR1 = scanR2;
-        scanR2 = (scanR2 + 1) % poly.num;
+	if (++scanR2 >= poly.num)
+	  scanR2 = 0;
 
-        // Do we have a flat bottom?
-        //@@@ this looks like it needs to be rethought -- A.Z.
-        if (fabs (poly.vertices [scanR2].sy - poly.vertices [top].sy) < EPS)
-          continue;
+        leave = false;
+	fyR = QRound (poly.vertices [scanR2].sy);
+	if (sy <= fyR)
+	  continue;
 
-        fyR = QRound (poly.vertices [scanR2].sy);
         float dyR = poly.vertices [scanR1].sy - poly.vertices [scanR2].sy;
         if (dyR > 0)
         {
@@ -2498,24 +2516,20 @@ STDMETHODIMP csGraphics3DSoftware::DrawPolygonFX(G3DPolygonDPFX& poly)
           xR += QRound (dxdyR * (poly.vertices [scanR1].sy -
             ((float)QRound (poly.vertices [scanR1].sy) - 0.5)));
         } /* endif */
-        leave = false;
       } /* endif */
       if (sy <= fyL)
       {
-        //-----
-        // Left side needs to be advanced.
-        //-----
         if (scanL2 == bot)
           goto finish;
         scanL1 = scanL2;
-        scanL2 = (scanL2 - 1 + poly.num) % poly.num;
+	if (--scanL2 < 0)
+	  scanL2 = poly.num - 1;
 
-        // Do we have a flat bottom?
-        //@@@ this looks like it needs to be rethought -- A.Z.
-        if (fabs (poly.vertices [scanL2].sy - poly.vertices [top].sy) < EPS)
-          continue;
+        leave = false;
+	fyL = QRound (poly.vertices [scanL2].sy);
+	if (sy <= fyL)
+	  continue;
 
-        fyL = QRound (poly.vertices [scanL2].sy);
         float dyL = poly.vertices [scanL1].sy - poly.vertices [scanL2].sy;
         if (dyL > 0)
         {
@@ -2536,7 +2550,7 @@ STDMETHODIMP csGraphics3DSoftware::DrawPolygonFX(G3DPolygonDPFX& poly)
           xL = QInt16 (poly.vertices [scanL1].sx);
 
           // horizontal pixel correction
-          float deltaY = poly.vertices [scanL1].sy - ((float)sy - 0.5);
+          float deltaY = poly.vertices [scanL1].sy - (float (sy) - 0.5);
           float deltaX = (dxdyL / 65536.) * deltaY;
           xL += QInt16 (deltaX);
 
