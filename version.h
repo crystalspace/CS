@@ -27,7 +27,7 @@
 #  define OS_VERSION "Amiga"
 #elif defined(OS_WIN32)
 #  define OS_VERSION "Win32"
-#elif defined(OS_Windows_NT)
+#elif defined(OS_NT4)
 #  define OS_VERSION "WinNT4"
 #elif defined(OS_OS2)
 #  define OS_VERSION "OS/2"
