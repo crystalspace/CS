@@ -104,6 +104,9 @@ void csTerrainQuad::ComputeExtent(const csVector3& campos, const csBox3& bbox,
   left = right = idx[0];
   for(int i=1; i<4; i++)
   {
+    // already included?
+    if( (right-idx[i])%horsize <= (right-left)%horsize )
+      continue;
     // extend the directions, by adding this angle to existing range.
     int ldiff = (left - idx[i] + horsize) % horsize;
     int rdiff = (idx[i] - right + horsize) % horsize;
