@@ -58,13 +58,13 @@ ifeq ($(MAKESECTION),defines)
 LIBS.EXE=
 
 # Where can the Zlib library be found on this system?
-Z_LIBS=-Llibs/zlib -lz
+Z_LIBS= -lz
 
 # Where can the PNG library be found on this system?
-PNG_LIBS=-Llibs/libpng -lpng
+PNG_LIBS= -lpng
 
 # Where can the JPG library be found on this system?
-JPG_LIBS=-Llibs/libjpeg -ljpeg
+JPG_LIBS= -ljpeg
 
 # Where can the optional sound libraries be found on this system?
 SOUND_LIBS=
@@ -232,9 +232,9 @@ SRC.SYS_CSSYS = libs/cssys/win32/printf.cpp \
   libs/cssys/win32/timing.cpp libs/cssys/win32/dir.cpp \
   libs/cssys/win32/win32.cpp libs/cssys/win32/loadlib.cpp \
   libs/cssys/general/getopt.cpp
-#
-# Disabled exeentry.cpp as it was generating duplicate ModuleHandle references
-#SRC.SYS_CSSYS_EXE=libs/cssys/win32/exeentry.cpp
+
+SRC.SYS_CSSYS_EXE=libs/cssys/win32/exeentry.cpp
+
 SRC.SYS_CSSYS_DLL=libs/cssys/win32/dllentry.cpp
 
 
