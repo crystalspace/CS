@@ -25,7 +25,7 @@
 #include "csutil/cscolor.h"
 #include "csutil/util.h"
 
-#include "csfx/prwater.h"
+#include "cstl/prwater.h"
 
 /// the implementation of the plasma texture
 csProcWater::csProcWater () : csProcTexture()

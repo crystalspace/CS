@@ -7,6 +7,9 @@ The history order is reversed so that new features are at the top.
 	  on curve drawing setup was done every frame for every thing
 	  that is drawn. This code is totally unneeded in most cases
 	  (except if there really is a curve).
+	- Renamed csfx to cstool. This is to prepare for addition
+	  of additional features which are not really special
+	  effects.
 	- Eric Sunshine fixed a problem with the rlecodec makefile where the
 	  SCF.STATIC was given an incorrect value.  This caused linking to fail
 	  when USE_PLUGINS was set to `no'.

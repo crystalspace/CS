@@ -32,7 +32,7 @@
 #include "iengine/material.h"
 #include "iengine/engine.h"
 
-#include "csfx/proctex.h"
+#include "cstool/proctex.h"
 
 csProcTexture::csProcTexture ()
 {

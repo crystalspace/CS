@@ -31,7 +31,7 @@ BLOCKS.EXE = blocks$(EXE)
 INC.BLOCKS = $(wildcard apps/blocks/*.h)
 SRC.BLOCKS = $(wildcard apps/blocks/*.cpp)
 OBJ.BLOCKS = $(addprefix $(OUT),$(notdir $(SRC.BLOCKS:.cpp=$O)))
-DEP.BLOCKS = CSPARSER CSFX CSENGINE CSFX CSGFX CSUTIL CSSYS CSGEOM CSUTIL
+DEP.BLOCKS = CSPARSER CSTOOL CSENGINE CSTOOL CSGFX CSUTIL CSSYS CSGEOM CSUTIL
 LIB.BLOCKS = $(foreach d,$(DEP.BLOCKS),$($d.LIB))
 CFG.BLOCKS = data/config/blocks.cfg
 

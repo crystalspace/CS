@@ -108,7 +108,7 @@ struct iEvent;
 #include "cssys/csevent.h"		// Event class
 #include "cssys/cseventq.h"		// Event Queue class
 #include "cssys/csinput.h"		// Keyboard codes
-#include "csfx/cspixmap.h"		// 2D sprites
+#include "cstool/cspixmap.h"		// 2D sprites
 #include "csgfxppl.h"			// Graphics pipeline
 #include "cskeyacc.h"			// Keyboard accelerator class
 #include "cscomp.h"			// Windowing System Component

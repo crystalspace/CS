@@ -25,7 +25,7 @@
 #include "csutil/cscolor.h"
 #include "csutil/util.h"
 
-#include "csfx/prfire.h"
+#include "cstool/prfire.h"
 
 /// the implementation of the plasma texture
 csProcFire::csProcFire () : csProcTexture()

@@ -17,7 +17,7 @@
 */
 
 #include "cssysdef.h"
-#include "csfx/prsky.h"
+#include "cstool/prsky.h"
 #include "ivideo/graph2d.h"
 #include "ivideo/graph3d.h"
 #include "ivideo/txtmgr.h"

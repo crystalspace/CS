@@ -40,7 +40,7 @@
 #include "csparser/crossbld.h"
 #include "csgeom/math3d.h"
 #include "cssys/system.h"
-#include "csfx/cspixmap.h"
+#include "cstool/cspixmap.h"
 #include "qint.h"
 #include "ivideo/graph3d.h"
 #include "ivideo/graph2d.h"

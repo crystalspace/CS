@@ -17,7 +17,7 @@
 */
 
 #include "cssysdef.h"
-#include "csfx/cspixmap.h"
+#include "cstool/cspixmap.h"
 
 csSimplePixmap::csSimplePixmap (iTextureHandle *hTexture)
 {

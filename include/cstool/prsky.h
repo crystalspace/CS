@@ -22,7 +22,7 @@
 #include "csgeom/math3d.h"
 #include "csgfx/rgbpixel.h"
 #include "csutil/cscolor.h"
-#include "csfx/proctex.h"
+#include "cstool/proctex.h"
 
 class csProcSky;
 

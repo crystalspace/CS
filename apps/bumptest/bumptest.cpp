@@ -23,11 +23,11 @@
 
 #include "cssys/system.h"
 #include "csgeom/transfrm.h"
-#include "csfx/proctex.h"
-#include "csfx/prdots.h"
-#include "csfx/prplasma.h"
-#include "csfx/prfire.h"
-#include "csfx/prwater.h"
+#include "cstool/proctex.h"
+#include "cstool/prdots.h"
+#include "cstool/prplasma.h"
+#include "cstool/prfire.h"
+#include "cstool/prwater.h"
 
 #include "ivideo/graph3d.h"
 #include "ivideo/txtmgr.h"

@@ -47,7 +47,7 @@
 #include "csgeom/math3d.h"
 #include "cssys/system.h"
 #include "cssys/csendian.h"
-#include "csfx/cspixmap.h"
+#include "cstool/cspixmap.h"
 #include "qint.h"
 #include "isound/handle.h"
 #include "isound/source.h"

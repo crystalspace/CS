@@ -21,7 +21,7 @@
 #include "demoseq.h"
 #include "csutil/cscolor.h"
 #include "csgeom/path.h"
-#include "csfx/csfxscr.h"
+#include "cstool/csfxscr.h"
 #include "ivideo/graph3d.h"
 #include "ivideo/fontserv.h"
 #include "ivideo/graph2d.h"

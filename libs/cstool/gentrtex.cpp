@@ -17,7 +17,7 @@
 */
 
 #include "cssysdef.h"
-#include "csfx/gentrtex.h"
+#include "cstool/gentrtex.h"
 #include "csutil/cscolor.h"
 #include "igraphic/image.h"
 #include "csgfx/rgbpixel.h"

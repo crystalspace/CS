@@ -24,7 +24,7 @@
 #include "csutil/cscolor.h"
 #include "csutil/util.h"
 
-#include "csfx/prdots.h"
+#include "cstool/prdots.h"
 
 /// the implementation of the plasma texture
 csProcDots::csProcDots () : csProcTexture()

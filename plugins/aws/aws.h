@@ -20,7 +20,7 @@
 #include "ivaria/aws.h"
 #include "isys/plugin.h"
 #include "csgeom/csrect.h"
-#include "csfx/proctex.h"
+#include "cstool/proctex.h"
 #include "ivideo/graph2d.h"
 #include "ivideo/graph3d.h"
 #include "awscomp.h"

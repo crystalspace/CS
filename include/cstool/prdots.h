@@ -20,7 +20,7 @@
 #define __PROCDOTSTEX_H__
 
 #include "csutil/cscolor.h"
-#include "csfx/proctex.h"
+#include "cstool/proctex.h"
 
 /**
  *  Random dots (demonstration procedural texture).

@@ -21,7 +21,7 @@
 #define __PROCFIRETEX_H__
 
 #include "csutil/cscolor.h"
-#include "csfx/proctex.h"
+#include "cstool/proctex.h"
 
 /**
  *  Plasma.

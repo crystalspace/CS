@@ -21,7 +21,7 @@
 #define __CSANIM2D_H__
 
 #include "csutil/csvector.h"
-#include "csfx/cspixmap.h"
+#include "cstool/cspixmap.h"
 
 struct iGraphics3D;
 class csPixmap;

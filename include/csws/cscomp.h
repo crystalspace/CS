@@ -23,7 +23,7 @@
 #include "csgeom/csrect.h"
 #include "csutil/csbase.h"
 #include "csutil/csobjvec.h"
-#include "csfx/cspixmap.h"
+#include "cstool/cspixmap.h"
 #include "cswspal.h"
 #include "ivideo/graph2d.h"
 #include "ivideo/fontserv.h"

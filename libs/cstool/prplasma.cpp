@@ -25,7 +25,7 @@
 #include "csutil/cscolor.h"
 #include "csutil/util.h"
 
-#include "csfx/prplasma.h"
+#include "cstool/prplasma.h"
 
 /// the implementation of the plasma texture
 csProcPlasma::csProcPlasma () : csProcTexture()

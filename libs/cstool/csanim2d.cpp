@@ -18,7 +18,7 @@
 */
 
 #include "cssysdef.h"
-#include "csfx/csanim2d.h"
+#include "cstool/csanim2d.h"
 #include "ivideo/graph3d.h"
 
 csAnimationTemplate::csAnimationTemplate() {

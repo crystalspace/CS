@@ -38,7 +38,7 @@
 #include "imesh/particle.h"
 #include "csutil/cscolor.h"
 #include "csgeom/path.h"
-#include "csfx/csfxscr.h"
+#include "cstool/csfxscr.h"
 
 //-----------------------------------------------------------------------------
 
