@@ -272,6 +272,12 @@ inline void csVector::QuickSort (int Mode)
     return true;							\
   END_TYPED_VECTOR_EXT
 
+/// This is a special version of typed vectors that don't delete their elements
+#define DECLARE_TYPED_VECTOR_NODELETE(NAME,TYPE)			\
+  BEGIN_TYPED_VECTOR_EXT (NAME,TYPE,obj)				\
+    return true;							\
+  END_TYPED_VECTOR_EXT
+
 /// This is a special version of typed vectors for SCF objects
 #define DECLARE_TYPED_SCF_VECTOR(NAME,TYPE)				\
   BEGIN_TYPED_VECTOR_EXT (NAME,TYPE,obj)				\
