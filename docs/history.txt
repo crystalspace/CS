@@ -10,6 +10,9 @@ chronological order.
 	- Jorrit fixed a bug in iSector->HitBeamPortals(). It would not
 	  initialize the mesh to 0 which could cause bad errors in some
 	  cases.
+	- Eric Sunshine fixed copy/paste error in win32/csosdefs.h.  It defined
+	  CS_IMPORT_SYM as __declspec(dllexport) rather than as
+	  __declspec(dllimport).  Also fixed a few minor issues in csexport.h.
 15-Mar-2004
 	- Anders Stenberg added a first version of a TerraFormer plugin. It
 	  will be responsible for feeding data to other plugins like terrain

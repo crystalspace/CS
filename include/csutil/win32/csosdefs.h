@@ -24,7 +24,7 @@
   #undef CS_EXPORT_SYM
   #undef CS_IMPORT_SYM
   #define CS_EXPORT_SYM __declspec(dllexport)
-  #define CS_IMPORT_SYM __declspec(dllexport)
+  #define CS_IMPORT_SYM __declspec(dllimport)
 #endif // CS_BUILD_SHARED_LIBS
 
 #if defined(COMP_VC)
