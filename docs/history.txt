@@ -39,6 +39,7 @@ The history order is reversed so that new features are at the top.
 	- Eric Sunshine fixed the lib3ds test in configure.ac so that it no
 	  longer assumes unconditionally that libm.a is present.  Not all
 	  platforms have libm.a
+	- Eric Sunshine removed scftutor for lack of obvious usefulness.
 27-Jan-2003
 	- Restored number of super lightmaps in OpenGL to 10 again. Apparently
 	  16 was too much for cards with less texture memory. We have to find
