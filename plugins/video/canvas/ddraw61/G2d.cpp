@@ -618,6 +618,8 @@ HRESULT csGraphics2DDDraw6::RestoreAll()
 unsigned char *csGraphics2DDDraw6::LockBackBuf()
 {
   DDSURFACEDESC2 ddsd;
+  ddsd.lpSurface = NULL;
+
   HRESULT ret=DDERR_WASSTILLDRAWING;
 
   if (m_bLocked)

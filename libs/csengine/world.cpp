@@ -990,13 +990,13 @@ int csWorld::GetNearbyLights (csSector* sector, const csVector3& pos, ULong flag
 
 //---------------------------------------------------------------------------
 
-STDMETHODIMP csWorld::GetSpriteTemplate(IString *name, ISpriteTemplate** itmpl) {
+STDMETHODIMP csWorld::GetSpriteTemplate(IString* /*name*/, ISpriteTemplate** /*itmpl*/) {
 //	*itmpl=GetSpriteTemplate(csSTR(name))->GetISpriteTemplate();
 
 	return S_OK;
 }
 
-STDMETHODIMP csWorld::PushSpriteTemplate(ISpriteTemplate* itmpl) {
+STDMETHODIMP csWorld::PushSpriteTemplate(ISpriteTemplate* /*itmpl*/) {
 //	sprite_templates.Push(GET_PARENT(SpriteTemplate, tmpl));
 
 	return S_OK;

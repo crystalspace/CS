@@ -195,8 +195,10 @@ IExtension* ExtensionInfo::GetIExtension() {
 //Loadup plugin if we need to
 	if(!Plugin) {
 		HRESULT hr=csCoCreateInstance(clsid, NULL, CLSCTX_INPROC_SERVER, IID_IExtension, (void**)&Plugin);
-		if(FAILED(hr));
+		if(FAILED(hr))
+		{
 //			System->Printf(MSG_WARNING, "Couldn't load the IExtension: %s of %s with %s\n", Name, Type, GuidToStr(clsid).GetData()); 
+		}
 	}
 	return Plugin;
 }
