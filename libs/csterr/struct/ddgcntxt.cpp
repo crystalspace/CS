@@ -198,7 +198,6 @@ void ddgContext::itransformation( ddgMatrix4 *matinv)
 
 void ddgContext::updateClippingInfo(void)
 {
-	ddgPlane3 *_frustrum3dx = new ddgPlane3[6];
 #ifdef DDG
 	extractPlanesFromMatrix(_frustrum3d);
 #else

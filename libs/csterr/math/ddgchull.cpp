@@ -240,7 +240,7 @@ ddgCHullSet::~ddgCHullSet(void)
 
 ddgInside ddgCHull2::clip( ddgRect2 *rect, bool occluder)
 {
-	bool o = occluder;
+	(void)occluder;
 	ddgAssert(noLines > 0 && noLines < 20);
 	static ddgVector2 minPt(0,0), maxPt(0,0);
 
