@@ -180,6 +180,20 @@ rule MsvcCFlags1 { }
 rule MsvcLFlags { MsvcLFlags1 $(1) : $(2) : $(3) ; }
 rule MsvcLFlags1 { }
 
+## MsvcGenName target : name
+##   Assign an MSVC project name to 'target'.  Normally, the project name is
+##   'target' with a prefix of "app", "grp", "lib", "plg", or "wks", depending
+##   upon the target's type.  The MsvcGenName rule allows you to override the
+##   default name.  This rule must be invoked prior to the Application,
+##   Library, Plugin, or MsvcGenWorkspace rule for 'target' in order for 'name'
+##   to be accepted.  As an alternative to invoking this rule, if you wish to
+##   change the default prefixes used by all targets you can use the MsvcConfig
+##   rule to set the MSVC.PREFIX.appcon, MSVC.PREFIX.appgui, MSVC.PREFIX.group,
+##   MSVC.PREFIX.library, MSVC.PREFIX.plugin, and MSVC.PREFIX.workspace
+##   variables to whatever values you like.
+rule MsvcGenName { MsvcGenName1 $(1) : $(2) ; }
+rule MsvcGenName1 { }
+
 #------------------------------------------------------------------------------
 # Private utility rules. Common to all phases.
 
@@ -464,6 +478,13 @@ MSVC.CFLAGS_DEBUG.library ?= ;
 MSVC.DEFINES.library ?= ;
 MSVC.DEFINES_DEBUG.library ?= ;
 
+MSVC.PREFIX.appgui    ?= app ;
+MSVC.PREFIX.appcon    ?= app ;
+MSVC.PREFIX.plugin    ?= plg ;
+MSVC.PREFIX.library   ?= lib ;
+MSVC.PREFIX.group     ?= grp ;
+MSVC.PREFIX.workspace ?= wks ;
+
 SetProperty build : projgen : msvc ;
 SetProperty build : projgen_version : $(MSVC_VERSION) ;
 
@@ -473,6 +494,16 @@ rule MsvcRmTemps
   {
     RmTemps $(<) : $(>) ;
   }
+}
+
+# MsvcAddPrefix name : type
+rule MsvcAddPrefix
+{
+  local name = $(1) ;
+  local type = $(2) ;
+  local prefix = $(MSVC.PREFIX.$(type)) ;
+  if $(prefix) { name = "$(prefix)$(name)" ; }
+  return $(name) ;
 }
 
 #----------------------------------------------------------------------------
@@ -499,9 +530,10 @@ rule MsvcGenWorkspace1
   local name = $(1) ;
   local accepts = $(2) ;
   local rejects = $(3) ;
-  local wksname = "wks$(name)" ;
   local builddir = [ msvcgen_build_dir $(MSVC_VERSION) ] ;
   local workdir = [ msvcgen_work_dir $(MSVC_VERSION) ] ;
+  local wksname = $(MSVC.NAME_OVERRIDE.$(name)) ;
+  if ! $(wksname) { wksname = [ MsvcAddPrefix $(name) : workspace ] ; }
 
   MSVC.WORKSPACES += $(name) ;
 
@@ -566,6 +598,13 @@ rule MsvcGenTemplateDir1
   MSVCGEN_TEMPLATEDIR = [ Property msvcgen : templatedir ] ;
 }
 
+## MsvcGenName target : name
+##   (See documentation above.)
+rule MsvcGenName1
+{
+  MSVC.NAME_OVERRIDE.$(<) = $(>) ;
+}
+
 ## MsvcProject target : type : target-with-ext : sources
 ##   Create a project file for 'target', which is the project's raw name.
 ##   'sources' is a list of files comprising the target.
@@ -580,21 +619,12 @@ rule MsvcProject
   local builddir = [ msvcgen_build_dir $(MSVC_VERSION) ] ;
   local workdir = [ msvcgen_work_dir $(MSVC_VERSION) ] ;
 
-  local msvcname ;
-  switch $(type)
+  local msvcname = $(MSVC.NAME_OVERRIDE.$(rawname)) ;
+  if ! $(msvcname)
   {
-    case appgui :
-      msvcname = app$(rawname) ;
-    case appcon :
-      msvcname = app$(rawname) ;
-    case plugin :
-      msvcname = plg$(rawname) ;
-    case library :
-      msvcname = lib$(rawname) ;
-    case group :
-      msvcname = grp$(rawname) ;
-    case * :
-      exit "Unknown msvc projecttype: $(type) specified!" ;
+    msvcname = [ MsvcAddPrefix $(rawname) : $(type) ] ;
+Echo "rawname" $(rawname) "type" $(type) "prefix" $(MSVC.PREFIX.$(type))
+"msvcname" $(msvcname) ;
   }
   $(rawname)_MSVCNAME = $(msvcname) ;
       

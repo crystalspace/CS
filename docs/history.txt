@@ -6,6 +6,22 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+27-Oct-2004
+	- Eric Sunshine added two mechanisms to msvcgen allowing clients to
+	  have control over the generated project name:
+	    - The new MsvcGenName rule allows the project name to be set on a
+	      per-target basis. It must be invoked before the corresponding
+	      Application, Library, Plugin, or MsvcGenWorkspace rule.
+	    - MsvcGenConfig can be used to set any of the new variables which
+	      control the prefix assigned to project names based upon the raw
+	      target name.  Any of the following variables can be set by the
+	      client:
+		MSVC.PREFIX.appcon    (default "app")
+		MSVC.PREFIX.appgui    (default "app")
+		MSVC.PREFIX.group     (default "grp")
+		MSVC.PREFIX.library   (default "lib")
+		MSVC.PREFIX.plugin    (default "plg")
+		MSVC.PREFIX.workspace (default "wks")
 26-Oct-2004
 	- Eric Sunshine added an optional argument to iDocument::Parse() which
 	  controls whether or not whitespace in CS_NODE_TEXT nodes is
