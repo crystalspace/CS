@@ -261,6 +261,36 @@ void Dumper::dump (csPolygon2D* p, char* name)
     CsPrintf (MSG_DEBUG_0, "        v[%d]: (%f,%f)\n", i, p->vertices[i].x, p->vertices[i].y);
 }
 
+
+void Dumper::dump (csOctree* tree, csOctreeNode* node, int indent)
+{
+  if (!node) return;
+  int i;
+  char spaces[256];
+  for (i = 0 ; i < indent ; i++) spaces[i] = ' ';
+  spaces[indent] = 0;
+  const csBox3& b = node->GetBox ();
+  const csVector3& c = node->GetCenter ();
+  CsPrintf (MSG_DEBUG_0, "%sbbox=%f,%f,%f %f,%f,%f.\n", spaces,
+	b.MinX (), b.MinY (), b.MinZ (), b.MaxX (), b.MaxY (), b.MaxZ ());
+  CsPrintf (MSG_DEBUG_0, "%scenter=%f,%f,%f.\n", spaces, c.x, c.y, c.z);
+  if (node->GetMiniBsp ())
+  {
+    CsPrintf (MSG_DEBUG_0, "%s BSP\n", spaces);
+    dump (node->GetMiniBsp (), (csBspNode*)(node->GetMiniBsp ()->root), indent+2);
+  }
+  for (i = 0 ; i < 8 ; i++)
+  {
+    CsPrintf (MSG_DEBUG_0, "%s Child %d:\n", spaces, i);
+    dump (tree, (csOctreeNode*)(node->children[i]), indent+2);
+  }
+}
+
+void Dumper::dump (csOctree* tree)
+{
+  dump (tree, (csOctreeNode*)(tree->root), 0);
+}
+
 void Dumper::dump (csBspTree* tree, csBspNode* node, int indent)
 {
   if (!node) return;
@@ -268,7 +298,8 @@ void Dumper::dump (csBspTree* tree, csBspNode* node, int indent)
   char spaces[256];
   for (i = 0 ; i < indent ; i++) spaces[i] = ' ';
   spaces[indent] = 0;
-  CsPrintf (MSG_DEBUG_0, "%sThere are %d polygons in this node.\n", spaces, node->polygons.GetNumPolygons ());
+  CsPrintf (MSG_DEBUG_0, "%sThere are %d polygons in this node (pol split=%d).\n",
+  	spaces, node->polygons.GetNumPolygons (), node->polygons_on_splitter);
   CsPrintf (MSG_DEBUG_0, "%s Front:\n", spaces);
   dump (tree, node->front, indent+2);
   CsPrintf (MSG_DEBUG_0, "%s Back:\n", spaces);

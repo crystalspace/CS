@@ -36,6 +36,8 @@ class csSector;
 class csWorld;
 class csSpriteTemplate;
 class csSprite3D;
+class csOctree;
+class csOctreeNode;
 class csBspTree;
 class csBspTree2D;
 class csBspNode;
@@ -60,6 +62,7 @@ class Dumper
 {
 private:
   static void dump (csBspTree* tree, csBspNode* node, int indent);
+  static void dump (csOctree* tree, csOctreeNode* node, int indent);
   static void dump (csBspTree2D* tree, csBspNode2D* node, int indent);
   static void dump (csQuadtreeNode* node, char* buf, int bufdim,
   	int depth, int x1, int y1, int x2, int y2);
@@ -88,6 +91,7 @@ public:
   static void dump (csSprite3D* s);
   static void dump (csBspTree* tree);
   static void dump (csBspTree2D* tree);
+  static void dump (csOctree* tree);
   static void dump (csPolygonClipper* clipper, char* name);
   static void dump (csFrustum* frustum, char* name);
   static void dump (csPoly2DPool* pool, char* name);

@@ -436,13 +436,13 @@ bool csPolygon3D::Covers (csPolygonInt* covered)
   for (i = 0 ; i < totest->vertices.GetNumVertices () ; i++)
   {
     if ((!csMath3::Visible (totest->Vwor (i), this_plane))
-    	&& this_plane.Classify (totest->Vwor (i)) != 0)
+    	&& ABS (this_plane.Classify (totest->Vwor (i))) >= SMALL_EPSILON)
     {
       int j;
       for (j = 0 ; j < vertices.GetNumVertices () ; j++)
       {
         if ((csMath3::Visible (Vwor (j), test_plane))
-    	    && test_plane.Classify (Vwor (j)) != 0)
+    	    && ABS (test_plane.Classify (Vwor (j))) >= SMALL_EPSILON)
 	{
 	  return true;
 	}

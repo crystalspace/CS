@@ -16,6 +16,15 @@ The history order has been reversed so that new features are at the top.
 	  Later we can use this QAD PVS to optimize building the real PVS
 	  because nodes marked visible by the QAD PVS do not need to be
 	  tested.
+	- Added Dumper::dump() for csOctree.
+	- Martin Geisse converted more docs to TexInfo format.
+	- Norman Kramer adjusted vpath for oss.mak so that it compiles
+	  again.
+	- Fixed a small potential problem with the polygon Covers
+	  function. It compared a float to 0 which seems to be a little
+	  system dependent. I made the test more robust. The effect
+	  of this bug was that the generated octree could be different
+	  on various platforms.
 21-May-2000
 	- Performance optimizations to terrain engine from Alex Pfaffe.
 	- Fixed big bug in PVS building which could cause significant
