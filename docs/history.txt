@@ -1,5 +1,9 @@
 The history order is reversed so that new features are at the top.
 
+24-Nov-2002
+	- Thanks to groton I managed to fix the bug that newsky crashes
+	  with recent versions of CS. The reason was that the default
+	  visibility culler was not initialized.
 23-Nov-2002
 	- Removed the meta manager again. This is a totally unneeded
 	  addition since it is already possible to attach name/value

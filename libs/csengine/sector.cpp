@@ -351,6 +351,7 @@ csPolygon3D *csSector::IntersectSegment (
 
   csReversibleTransform movtrans;
 
+  GetVisibilityCuller ();
   csBox3 b (start);
   b.AddBoundingVertexSmart (end);
   csRef<iVisibilityObjectIterator> visit = culler->VisTest (b);
