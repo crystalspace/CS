@@ -2227,10 +2227,173 @@ finish:
   return S_OK;
 }
 
-STDMETHODIMP csGraphics3DSoftware::StartPolygonFX(ITextureHandle* handle, DPFXMixMode mode, bool gouroud)
+STDMETHODIMP csGraphics3DSoftware::StartPolygonFX(ITextureHandle* handle, DPFXMixMode mode, bool gouraud)
 {
-  //This implementation is pretty wrong, but at least, it will show something on the screen
-  return StartPolygonQuick(handle, gouroud);
+  //The following code definitely is a MESS: I just copied it from StartPolygonQuick, and did some
+  //changes to allow drawing of transparent textures. (ColorKeying)
+  //This urgently needs some cleanup! - Thomas Hieber, June, 20th, 1999
+
+  csTextureMMSoftware* txt_mm;
+  csTexture* txt_unl;
+  pqinfo.textured = true;
+  if (!do_lighting) gouraud = false;
+  if (!do_textured) pqinfo.textured = false;
+  if (!handle) pqinfo.textured = false;
+  pqinfo.do_gouraud = gouraud || !handle;
+
+  int itw, ith;
+
+  if (handle)
+  {
+    txt_mm = (csTextureMMSoftware*)GetcsTextureMMFromITextureHandle (handle);
+    txt_unl = txt_mm->get_texture (0);
+    pqinfo.bm = txt_unl->get_bitmap8 ();
+    itw = txt_unl->get_width ();
+    ith = txt_unl->get_height ();
+    pqinfo.shf_w = txt_unl->get_w_shift ();
+
+    pqinfo.tw = (float)itw; 
+    pqinfo.th = (float)ith; 
+    pqinfo.twfp = QInt16 (pqinfo.tw);
+    pqinfo.thfp = QInt16 (pqinfo.th);
+  }
+
+  IGraphicsInfo* piGI;
+
+  //@@@ CAN BE OPTIMIZED!!!
+  VERIFY_SUCCESS (m_piG2D->QueryInterface( (REFIID)IID_IGraphicsInfo, (void**)&piGI));
+  piGI->GetPixelBytes (pqinfo.pixelbytes);
+  csPixelFormat pfmt;
+  piGI->GetPixelFormat (&pfmt);
+  FINAL_RELEASE (piGI);
+
+  Scan::alpha_mask = txtmgr->alpha_mask;
+
+  pqinfo.redFact = (1<<pfmt.RedBits)-1; // 32 for 555, 64 for 565, and 256 for 888 mode.
+  pqinfo.greenFact = (1<<pfmt.GreenBits)-1;
+  pqinfo.blueFact = (1<<pfmt.BlueBits)-1;
+  pqinfo.greenBits = pfmt.GreenBits;
+
+  // Select draw scanline routine
+  pqinfo.drawline = NULL;
+  pqinfo.drawline_gouraud = NULL;
+
+  if (pqinfo.pixelbytes == 2)
+  {
+    TextureTablesPalette* lt_pal = txtmgr->lt_pal;
+    Scan16::pal_table = lt_pal->pal_to_true;
+
+    if (!pqinfo.textured)
+    {
+      if (pqinfo.do_gouraud)
+      {
+        if (z_buf_mode == ZBuf_Use)
+          if (pqinfo.greenBits == 5)
+            pqinfo.drawline_gouraud = Scan16::draw_pi_scanline_flat_gouraud_555;
+          else
+            pqinfo.drawline_gouraud = Scan16::draw_pi_scanline_flat_gouraud_565;
+        else
+          if (pqinfo.greenBits == 5)
+            pqinfo.drawline_gouraud = Scan16::draw_pi_scanline_flat_gouraud_zfill_555;
+          else
+            pqinfo.drawline_gouraud = Scan16::draw_pi_scanline_flat_gouraud_zfill_565;
+      }
+      else
+      {
+        if (z_buf_mode == ZBuf_Use)
+          pqinfo.drawline = Scan16::draw_pi_scanline_flat;
+        else
+          pqinfo.drawline = Scan16::draw_pi_scanline_flat_zfill;
+      }
+    }
+    else
+    {
+      if (gouraud)
+      {
+        if (z_buf_mode == ZBuf_Use)
+          if (pqinfo.greenBits == 5)
+            pqinfo.drawline_gouraud = Scan16::draw_pi_scanline_transp_gouraud_555;
+            //pqinfo.drawline_gouraud = Scan16::draw_pi_scanline_gouraud_555;
+          else
+            pqinfo.drawline_gouraud = Scan16::draw_pi_scanline_transp_gouraud_565;
+            //pqinfo.drawline_gouraud = Scan16::draw_pi_scanline_gouraud_565;
+        else
+          if (pqinfo.greenBits == 5)
+            pqinfo.drawline_gouraud = Scan16::draw_pi_scanline_transp_gouraud_555;
+            //pqinfo.drawline_gouraud = Scan16::draw_pi_scanline_gouraud_zfill_555;
+          else
+            pqinfo.drawline_gouraud = Scan16::draw_pi_scanline_transp_gouraud_565;
+            //pqinfo.drawline_gouraud = Scan16::draw_pi_scanline_gouraud_zfill_565;
+      }
+      else
+      {
+        if (z_buf_mode == ZBuf_Use)
+        {
+#         if defined(DO_MMX) && !defined(NO_ASSEMBLER)
+            // if (cpu_mmx && do_mmx)
+            // drawline = Scan16::mmx_draw_pi_scanline;
+            // else
+#         endif
+          pqinfo.drawline = Scan16::draw_pi_scanline;
+        }
+        else
+          pqinfo.drawline = Scan16::draw_pi_scanline_zfill;
+      }
+    }
+  }
+  else if (pqinfo.pixelbytes == 4)
+  {
+    if (!pqinfo.textured)
+    {
+      if (pqinfo.do_gouraud)
+      {
+        if (z_buf_mode == ZBuf_Use)
+          pqinfo.drawline_gouraud = Scan32::draw_pi_scanline_flat_gouraud;
+        else
+          pqinfo.drawline_gouraud = Scan32::draw_pi_scanline_flat_gouraud_zfill;
+      }
+      else
+      {
+        if (z_buf_mode == ZBuf_Use)
+          pqinfo.drawline = Scan32::draw_pi_scanline_flat;
+        else
+          pqinfo.drawline = Scan32::draw_pi_scanline_flat_zfill;
+      }
+    }
+    else
+    {
+      if (gouraud)
+      {
+        if (z_buf_mode == ZBuf_Use)
+          pqinfo.drawline_gouraud = Scan32::draw_pi_scanline_gouraud;
+        else
+          pqinfo.drawline_gouraud = Scan32::draw_pi_scanline_gouraud_zfill;
+      }
+      else
+      {
+        if (z_buf_mode == ZBuf_Use)
+          pqinfo.drawline = Scan32::draw_pi_scanline;
+        else
+          pqinfo.drawline = Scan32::draw_pi_scanline_zfill;
+      }
+    }
+  }
+  else
+  {
+    if (!handle) return S_OK;   // Not implemented yet@@@
+    if (z_buf_mode == ZBuf_Use)
+    {
+#     if defined(DO_MMX) && !defined(NO_ASSEMBLER)
+      if (cpu_mmx && do_mmx)
+        pqinfo.drawline = Scan::mmx_draw_pi_scanline;
+      else
+#     endif
+      pqinfo.drawline = Scan::draw_pi_scanline;
+    }
+    else
+      pqinfo.drawline = Scan::draw_pi_scanline_zfill;
+  }
+  return S_OK;
 }
 
 STDMETHODIMP csGraphics3DSoftware::FinishPolygonFX()
