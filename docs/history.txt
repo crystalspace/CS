@@ -15,7 +15,7 @@ chronological order.
 	  but to use SetSector instead. This method has been removed.
 	- John Harger finally implemented the cylinder emitter type in 
 	  particles. 
-	- res fixed teh movie recorder to emit a proper warning when the movie
+	- res fixed the movie recorder to emit a proper warning when the movie
 	  couldn't be created.
 7-Mar-2004
 	- Jorrit added a db_mesh_name field to csRenderMesh (but only
