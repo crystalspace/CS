@@ -138,9 +138,9 @@ bool awsRadButton::HandleEvent (iEvent &Event)
     case csevGroupOff:
       if (is_on)
       {
+		Broadcast (signalClicked);
         is_on = false;
         Invalidate ();
-        Broadcast (signalClicked);
       }
 
       return true;
