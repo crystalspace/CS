@@ -6,6 +6,7 @@
 #include "csutil/scfstr.h"
 #include "csutil/csevent.h"
 #include "iutil/evdefs.h"
+#include "csutil/snprintf.h"
 #include "aws3dfrm.h"
 
 #include <stdio.h>
@@ -265,16 +266,60 @@ void awsBarChart::OnDraw (csRect clip)
       alpha_level);
 
   // Now draw chart!
-  int bw = inner_frame.Width() / items.Length();
-  int bh = inner_frame.Height() / items.Length();
-  int i;
+  int tw=0, th=0;
+  int i, maxtxtlen=0;
   float max=0.0001;
+  char buf[32];
 
   for(i=0; i<items.Length(); ++i)
   {
     BarItem *bi = (BarItem *)items[i];
 
-    if (max < bi->value) max=bi->value;
+    if (max < bi->value) 
+    {
+      max=bi->value;
+      cs_snprintf(buf, 32, "%0.2f", max);
+    }
+  }
+
+  WindowManager ()->GetPrefMgr ()->GetDefaultFont ()->GetDimensions (
+        buf,
+        tw, 
+        th);
+
+  // Setup some variables
+  int bw = inner_frame.Width() / items.Length();
+  int bh = inner_frame.Height() / items.Length();
+
+  if (!(chart_options & coVerticalChart))
+  {    
+    inner_frame.xmin += tw+4;
+
+    int x = inner_frame.xmin + insets.xmin+1;
+    int sy = inner_frame.ymin + insets.ymin+1;
+    int ey = inner_frame.ymax - insets.ymax+1;
+    int dh = (th + (th>>1)) + 2;
+
+    float dv = (dh * max) / inner_frame.Height();
+    float cv = max;
+    
+    g2d->DrawLine(x, sy,  x, ey, 0);
+    
+    for(i=sy; i<ey; i+=dh, cv-=dv)
+    {
+      cs_snprintf(buf, 32, "%0.2f", cv);
+      g2d->DrawLine(x-3, i,  x+1, i, 0);
+      g2d->Write(WindowManager ()->GetPrefMgr ()->GetDefaultFont (),
+        x - tw - 5,
+        i,
+        WindowManager ()->GetPrefMgr ()->GetColor (AC_TEXTFORE),
+        -1,
+        buf);
+      
+    }
+
+    inner_frame.xmin+=2;
+    bw = inner_frame.Width() / items.Length();
   }
 
   for(i=0; i<items.Length(); ++i)
