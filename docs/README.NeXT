@@ -444,6 +444,11 @@ efficient.
 ---------------
 This is a list of items which are planned for future releases of this project.
 
+    o I have discovered that OpenStep does not reliably return images with the
+      same bits-per-sample when -[NSBitmapImageRep initWithFocusedViewRect:]
+      is used.  Thus, I see no reason to rely on the Window Server's suggestion
+      for preferred depth any longer.  May as well simplify the code by once
+      again using +[NSWindow defaultDepthLimit].
     o Possibly only flush only part of the frame buffer to the display in
       csGraphics2D::Print() rather than the entire frame buffer.  Be careful,
       though.  The current technique of flushing the entire frame buffer takes
