@@ -26,9 +26,9 @@
 #include "iengine/light.h"
 #include "iengine/renderloop.h"
 #include "iengine/viscull.h"
-#include "ivideo/rendersteps/irenderstep.h"
-#include "ivideo/rendersteps/igeneric.h"
-#include "ivideo/rendersteps/ilightiter.h"
+#include "iengine/rendersteps/irenderstep.h"
+#include "iengine/rendersteps/igeneric.h"
+#include "iengine/rendersteps/ilightiter.h"
 #include "ivideo/shader/shader.h"
 
 #include "cstool/rendermeshlist.h"

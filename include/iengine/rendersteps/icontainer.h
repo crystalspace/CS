@@ -18,25 +18,23 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __CS_IVIDEO_RENDERSTEPS_ILIGHTITER_H__
-#define __CS_IVIDEO_RENDERSTEPS_ILIGHTITER_H__
+#ifndef __CS_IENGINE_RENDERSTEPS_ICONTAINER_H__
+#define __CS_IENGINE_RENDERSTEPS_ICONTAINER_H__
 
 #include "csutil/scf.h"
 
-SCF_VERSION (iLightIterRenderStep, 0, 0, 1);
+struct iRenderStep;
 
-/// Document me!@@@
-struct iLightIterRenderStep : public iBase
+SCF_VERSION (iRenderStepContainer, 0, 0, 1);
+
+/**
+ * Container for render steps.
+ * \todo Add more step management methods.
+ */
+struct iRenderStepContainer : public iBase
 {
-};
-
-SCF_VERSION (iLightRenderStep, 0, 0, 1);
-
-/// Document me!@@@
-struct iLightRenderStep : public iBase
-{
-  virtual void Perform (iRenderView* rview, iSector* sector,
-    iLight* light) = 0;
+  virtual int AddStep (iRenderStep* step) = 0;
+  virtual int GetStepCount () = 0;
 };
 
 #endif

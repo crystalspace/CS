@@ -29,7 +29,7 @@
 #include "iutil/strset.h"
 #include "ivideo/graph3d.h"
 #include "ivideo/shader/shader.h"
-#include "ivideo/rendersteps/irenderstep.h"
+#include "iengine/rendersteps/irenderstep.h"
 
 class csEngine;
 class csRenderView;

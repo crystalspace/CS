@@ -26,8 +26,8 @@
 #include "iengine/renderloop.h"
 #include "imap/services.h"
 #include "ivaria/reporter.h"
-#include "ivideo/rendersteps/irenderstep.h"
-#include "ivideo/rendersteps/icontainer.h"
+#include "iengine/rendersteps/irenderstep.h"
+#include "iengine/rendersteps/icontainer.h"
 
 #include "rlloader.h"
 

@@ -23,7 +23,7 @@
 #include "csutil/scf.h"
 #include "iutil/comp.h"
 #include "iutil/objreg.h"
-#include "ivideo/rendersteps/irsfact.h"
+#include "iengine/rendersteps/irsfact.h"
 
 class csBaseRenderStepType : public iComponent, public iRenderStepType
 {

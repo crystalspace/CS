@@ -24,7 +24,7 @@
 #include "iutil/plugin.h"
 #include "iengine/engine.h"
 #include "iengine/renderloop.h"
-#include "ivideo/rendersteps/irenderstep.h"
+#include "iengine/rendersteps/irenderstep.h"
 #include "imap/services.h"
 #include "imap/reader.h"
 #include "ivaria/reporter.h"

@@ -25,7 +25,7 @@
 #include "csutil/csstring.h"
 #include "iengine/light.h"
 #include "iengine/renderloop.h"
-#include "ivideo/rendersteps/irenderstep.h"
+#include "iengine/rendersteps/irenderstep.h"
 #include "ivideo/shader/shader.h"
 
 #include "../common/basesteptype.h"

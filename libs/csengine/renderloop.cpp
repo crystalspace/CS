@@ -29,8 +29,8 @@
 #include "iutil/document.h"
 #include "iutil/vfs.h"
 #include "iengine/material.h"
-#include "ivideo/rendersteps/irsfact.h"
-#include "ivideo/rendersteps/igeneric.h"
+#include "iengine/rendersteps/irsfact.h"
+#include "iengine/rendersteps/igeneric.h"
 #include "imap/reader.h"
 
 #include "csgfx/rgbpixel.h"

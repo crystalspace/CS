@@ -24,8 +24,8 @@
 #include "csutil/scf.h"
 #include "csutil/csstring.h"
 #include "iengine/renderloop.h"
-#include "ivideo/rendersteps/icontainer.h"
-#include "ivideo/rendersteps/irenderstep.h"
+#include "iengine/rendersteps/icontainer.h"
+#include "iengine/rendersteps/irenderstep.h"
 #include "ivideo/shader/shader.h"
 
 #include "../common/basesteptype.h"

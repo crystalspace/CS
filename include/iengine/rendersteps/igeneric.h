@@ -17,18 +17,33 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __CS_IVIDEO_RENDERSTEPS_IRENDERSTEP_H__
-#define __CS_IVIDEO_RENDERSTEPS_IRENDERSTEP_H__
+#ifndef __CS_IENGINE_RENDERSTEPS_IGENERIC_H__
+#define __CS_IENGINE_RENDERSTEPS_IGENERIC_H__
 
-struct iRenderView;
-struct iSector;
+#include "iutil/strset.h"
+#include "ivideo/graph3d.h"
 
-SCF_VERSION (iRenderStep, 0, 0, 1);
+SCF_VERSION (iGenericRenderStep, 0, 0, 1);
 
-/// Document me!@@@
-struct iRenderStep : public iBase
+/**
+ * A generic render step.
+ */
+struct iGenericRenderStep : public iBase
 {
-  virtual void Perform (iRenderView* rview, iSector* sector) = 0;
+  /// Set shader type.
+  virtual void SetShaderType (const char* type) = 0;
+  /// Get shader type.
+  virtual const char* GetShaderType () = 0;
+
+  /// Set Z offset flag.
+  virtual void SetZOffset (bool zOffset) = 0;
+  /// Get Z offset flag.
+  virtual bool GetZOffset () = 0;
+
+  /// Set Z buffer mode.
+  virtual void SetZBufMode (csZBufMode zmode) = 0;
+  /// Get Z buffer mode.
+  virtual csZBufMode GetZBufMode () = 0;
 };
 
 #endif

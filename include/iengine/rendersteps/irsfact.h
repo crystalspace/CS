@@ -1,5 +1,4 @@
 /*
-    Crystal Space 3D engine
     Copyright (C) 2003 by Jorrit Tyberghein
 	      (C) 2003 by Frank Richter
 
@@ -18,23 +17,48 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __CS_IVIDEO_RENDERSTEPS_ICONTAINER_H__
-#define __CS_IVIDEO_RENDERSTEPS_ICONTAINER_H__
+#ifndef __CS_IENGINE_RENDERSTEPS_ITEXFACT_H__
+#define __CS_IENGINE_RENDERSTEPS_ITEXFACT_H__
 
+/**\file
+ * Render step factory.
+ */
+
+/**
+ * \addtogroup gfx3d
+ * @{ */
+ 
 #include "csutil/scf.h"
 
 struct iRenderStep;
 
-SCF_VERSION (iRenderStepContainer, 0, 0, 1);
+SCF_VERSION (iRenderStepFactory, 0, 0, 1);
 
 /**
- * Container for render steps.
- * \todo Add more step management methods.
+ * Interface to a render step factory.
  */
-struct iRenderStepContainer : public iBase
+struct iRenderStepFactory : public iBase
 {
-  virtual int AddStep (iRenderStep* step) = 0;
-  virtual int GetStepCount () = 0;
+  /**
+   * Create a new render step with the selected parameters.
+   */
+  virtual csPtr<iRenderStep> Create () = 0;
 };
+
+SCF_VERSION (iRenderStepType, 0, 0, 1);
+
+/**
+ * Render step type.
+ * Interface used to create instances of iRenderStepFactory.
+ */
+struct iRenderStepType : public iBase
+{
+  /**
+   * Create a new instance of a render step factory.
+   */
+  virtual csPtr<iRenderStepFactory> NewFactory() = 0;
+};
+
+/** @} */
 
 #endif

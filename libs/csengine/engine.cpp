@@ -73,9 +73,9 @@
 #include "ivideo/graph3d.h"
 #include "igeom/clip2d.h"
 
-#include "ivideo/rendersteps/irenderstep.h"
-#include "ivideo/rendersteps/irsfact.h"
-#include "ivideo/rendersteps/igeneric.h"
+#include "iengine/rendersteps/irenderstep.h"
+#include "iengine/rendersteps/irsfact.h"
+#include "iengine/rendersteps/igeneric.h"
 
 //---------------------------------------------------------------------------
 void csEngine::Report (const char *description, ...)

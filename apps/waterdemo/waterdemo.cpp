@@ -60,9 +60,9 @@
 #  include "ivideo/shader/shader.h"
 #  include "ivideo/rndbuf.h"
 #  include "iengine/renderloop.h"
-#  include "ivideo/rendersteps/irenderstep.h"
-#  include "ivideo/rendersteps/irsfact.h"
-#  include "ivideo/rendersteps/igeneric.h"
+#  include "iengine/rendersteps/irenderstep.h"
+#  include "iengine/rendersteps/irsfact.h"
+#  include "iengine/rendersteps/igeneric.h"
 #endif
 #include "cstool/csview.h"
 #include "csgfx/csimgvec.h"

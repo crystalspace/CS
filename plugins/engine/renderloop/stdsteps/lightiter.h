@@ -23,8 +23,8 @@
 #include "csutil/scf.h"
 #include "csutil/csstring.h"
 #include "iengine/renderloop.h"
-#include "ivideo/rendersteps/irenderstep.h"
-#include "ivideo/rendersteps/ilightiter.h"
+#include "iengine/rendersteps/irenderstep.h"
+#include "iengine/rendersteps/ilightiter.h"
 #include "ivideo/shader/shader.h"
 
 #include "../common/basesteptype.h"

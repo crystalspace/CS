@@ -30,7 +30,7 @@
  * @{ */
 
 #include "csutil/scf.h"
-#include "ivideo/rendersteps/icontainer.h"
+#include "iengine/rendersteps/icontainer.h"
 
 struct iCamera;
 struct iClipper2D;
