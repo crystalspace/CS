@@ -57,7 +57,7 @@
 
 csPtr<iConfigFile> csGetPlatformConfig (const char* key)
 {
-  csString fname = csGetPlatformConfigName (key);
+  csString fname = csGetPlatformConfigPath (key);
   csString dir (fname);
   size_t slash = dir.FindLast (CS_PATH_SEPARATOR);
   if (slash != (size_t)-1)
