@@ -637,7 +637,8 @@ void csThing::DrawOnePolygon (csPolygon3D* p, csPolygon2D* poly,
 	if (filtered) poly->DrawFilled (d, p, keep_plane, zMode);
 	if (is_this_fog)
 	  poly->AddFogPolygon (d->GetGraphics3D (), p, keep_plane,
-	  	icam->IsMirrored (), d->GetThisSector ()->GetID (),
+	  	icam->IsMirrored (), d->GetThisSector ()->QueryObject ()
+			->GetID (),
 		CS_FOG_BACK);
 	// Here we z-fill the portal contents to make sure that sprites
 	// that are drawn outside of this portal cannot accidently cross

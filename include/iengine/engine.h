@@ -168,12 +168,12 @@ struct iEngine : public iPlugIn
    * Query the format to load textures (usually this depends on texture
    * manager)
    */
-  virtual int GetTextureFormat () = 0;
+  virtual int GetTextureFormat () const = 0;
 
   /**
    * Return true if engine want to use PVS.
    */
-  virtual bool IsPVS () = 0;
+  virtual bool IsPVS () const = 0;
 
   /**
    * Create or select a new region (name can be NULL for the default main
@@ -184,9 +184,9 @@ struct iEngine : public iPlugIn
    * Get a reference to the current region (or NULL if the default main
    * region is selected).
    */
-  virtual iRegion* GetCurrentRegion () = 0;
+  virtual iRegion* GetCurrentRegion () const = 0;
   /// Find a region by name
-  virtual iRegion* FindRegion (const char *name) = 0;
+  virtual iRegion* FindRegion (const char *name) const = 0;
 
   /**
    * Create or select a new object library (name can be NULL for engine).
@@ -259,9 +259,9 @@ struct iEngine : public iPlugIn
       const char* name) = 0;
 
   /// Query number of sectors in engine
-  virtual int GetSectorCount () = 0;
+  virtual int GetSectorCount () const = 0;
   /// Get a sector by index
-  virtual iSector *GetSector (int iIndex) = 0;
+  virtual iSector *GetSector (int iIndex) const = 0;
   /**
    * Find a sector by name. If regionOnly is true then the returned
    * sector will belong to the current region. Note that this is different
@@ -269,7 +269,8 @@ struct iEngine : public iPlugIn
    * return sectors that belong in a region but are not connected to the
    * engine.
    */
-  virtual iSector *FindSector (const char *iName, bool regionOnly = false) = 0;
+  virtual iSector *FindSector (const char *iName, bool regionOnly = false)
+  	const = 0;
   /// Delete a sector
   virtual void DeleteSector (iSector *) = 0;
 
@@ -281,7 +282,7 @@ struct iEngine : public iPlugIn
    * engine.
    */
   virtual iMeshWrapper *FindMeshObject (const char *iName,
-  	bool regionOnly = false) = 0;
+  	bool regionOnly = false) const = 0;
 
   /**
    * Delete a mesh factory by name. ONLY call this when you're sure
@@ -298,7 +299,7 @@ struct iEngine : public iPlugIn
    * engine.
    */
   virtual iMeshFactoryWrapper *FindMeshFactory (const char *iName,
-  	bool regionOnly = false) = 0;
+  	bool regionOnly = false) const = 0;
   /**
    * Find a terrain object by name. If regionOnly is true then the returned
    * mesh object will belong to the current region. Note that this is different
@@ -307,7 +308,7 @@ struct iEngine : public iPlugIn
    * engine.
    */
   virtual iTerrainWrapper *FindTerrainObject (const char *iName,
-  	bool regionOnly = false) = 0;
+  	bool regionOnly = false) const = 0;
   /**
    * Find a terrain factory by name. If regionOnly is true then the returned
    * factory will belong to the current region. Note that this is different
@@ -316,7 +317,7 @@ struct iEngine : public iPlugIn
    * engine.
    */
   virtual iTerrainFactoryWrapper *FindTerrainFactory (const char *iName,
-  	bool regionOnly = false) = 0;
+  	bool regionOnly = false) const = 0;
   /**
    * Find a texture by name. If regionOnly is true then the returned
    * texture will belong to the current region. Note that this is different
@@ -325,7 +326,7 @@ struct iEngine : public iPlugIn
    * engine.
    */
   virtual iTextureWrapper* FindTexture (const char* iName,
-  	bool regionOnly = false) = 0;
+  	bool regionOnly = false) const = 0;
   /**
    * Find a material by name. If regionOnly is true then the returned
    * material will belong to the current region. Note that this is different
@@ -334,7 +335,7 @@ struct iEngine : public iPlugIn
    * engine.
    */
   virtual iMaterialWrapper* FindMaterial (const char* iName,
-  	bool regionOnly = false) = 0;
+  	bool regionOnly = false) const = 0;
   /**
    * Find a camera position by name. If regionOnly is true then the returned
    * campos will belong to the current region. Note that this is different
@@ -343,7 +344,7 @@ struct iEngine : public iPlugIn
    * to the engine.
    */
   virtual iCameraPosition* FindCameraPosition (const char* iName,
-  	bool regionOnly = false) = 0;
+  	bool regionOnly = false) const = 0;
   /**
    * Find a collection by name. If regionOnly is true then the returned
    * collection will belong to the current region. Note that this is different
@@ -352,7 +353,7 @@ struct iEngine : public iPlugIn
    * to the engine.
    */
   virtual iCollection* FindCollection (const char* iName,
-  	bool regionOnly = false) = 0;
+  	bool regionOnly = false) const = 0;
 
   /// Create a new collection.
   virtual iCollection* CreateCollection (const char* iName) = 0;
@@ -360,10 +361,10 @@ struct iEngine : public iPlugIn
   /// Enable/disable the lighting cache.
   virtual void EnableLightingCache (bool do_cache) = 0;
   /// Return true if lighting cache is enabled.
-  virtual bool IsLightingCacheEnabled () = 0;
+  virtual bool IsLightingCacheEnabled () const = 0;
 
   /// Return the current lightmap cell size
-  virtual int GetLightmapCellSize () = 0;
+  virtual int GetLightmapCellSize () const = 0;
   /// Set lightmap cell size
   virtual void SetLightmapCellSize (int Size) = 0;
 
@@ -373,7 +374,8 @@ struct iEngine : public iPlugIn
   virtual iStatLight* CreateLight (const char* name, const csVector3& pos,
   	float radius, const csColor& color, bool pseudoDyn) = 0;
   /// Find a static/pseudo-dynamic light by name.
-  virtual iStatLight* FindLight (const char *Name, bool RegionOnly = false) = 0;
+  virtual iStatLight* FindLight (const char *Name, bool RegionOnly = false)
+    const = 0;
   /// Create a dynamic light.
   virtual iDynLight* CreateDynLight (const csVector3& pos, float radius,
   	const csColor& color) = 0;
@@ -385,19 +387,19 @@ struct iEngine : public iPlugIn
    * from the application. These flags must be or-ed with optional other
    * flags that the application might be interested in.
    */
-  virtual int GetBeginDrawFlags () = 0;
+  virtual int GetBeginDrawFlags () const = 0;
 
   /**
    * Get the current engine mode.
    * If called between SetEngineMode() and the first Draw() it is
    * possible that this mode will still be CS_ENGINE_AUTODETECT.
    */
-  virtual int GetEngineMode () = 0;
+  virtual int GetEngineMode () const = 0;
 
   /**
    * Get the top-level clipper.
    */
-  virtual iClipper2D* GetTopLevelClipper () = 0;
+  virtual iClipper2D* GetTopLevelClipper () const = 0;
 
   /**
    * Conveniance function to create a mesh factory from a given type.
@@ -453,14 +455,14 @@ struct iEngine : public iPlugIn
 	iDataBuffer* input, iSector* sector, const csVector3& pos) = 0;
 
   /// return the number of mesh objects
-  virtual int GetNumMeshObjects () = 0;
+  virtual int GetNumMeshObjects () const = 0;
   /// return a mesh object by index
-  virtual iMeshWrapper *GetMeshObject (int n) = 0;
+  virtual iMeshWrapper *GetMeshObject (int n) const = 0;
 
   /// return the number of mesh factories
-  virtual int GetNumMeshFactories () = 0;
+  virtual int GetNumMeshFactories () const = 0;
   /// return a mesh object by index
-  virtual iMeshFactoryWrapper *GetMeshFactory (int n) = 0;
+  virtual iMeshFactoryWrapper *GetMeshFactory (int n) const = 0;
 
   /**
    * Conveniance function to create a terrain factory from a given type.
@@ -506,7 +508,7 @@ struct iEngine : public iPlugIn
    * planes are managed by the thing plugin.
    */
   virtual iPolyTxtPlane* FindPolyTxtPlane (const char *iName,
-  	bool regionOnly = false) = 0;
+  	bool regionOnly = false) const = 0;
 
   /**
    * @@@ Temporary function to create a bezier template. This is temporary
@@ -518,34 +520,29 @@ struct iEngine : public iPlugIn
    * planes are managed by the thing plugin.
    */
   virtual iCurveTemplate* FindCurveTemplate (const char *iName,
-  	bool regionOnly = false) = 0;
+  	bool regionOnly = false) const = 0;
 
   /// @@@ Temporary function until things are moved to a plugin.
-  virtual iMeshObjectType* GetThingType () = 0;
-
-  /// @@@ Temporary function until things are moved to a plugin.
-  virtual int GetNumPolyTxtPlanes () = 0;
-  /// @@@ Temporary function until things are moved to a plugin.
-  virtual iPolyTxtPlane* GetPolyTxtPlane (int idx) = 0;
+  virtual iMeshObjectType* GetThingType () const = 0;
 
   /// Get the number of collections in the engine
-  virtual int GetNumCollections () = 0;
+  virtual int GetNumCollections () const = 0;
   /// Get a collection by its index
-  virtual iCollection* GetCollection (int idx) = 0;
+  virtual iCollection* GetCollection (int idx) const = 0;
 
   /// Get the number of camera positions in the engine
-  virtual int GetNumCameraPositions () = 0;
+  virtual int GetNumCameraPositions () const = 0;
   /// Get a camera position by its index
-  virtual iCameraPosition* GetCameraPosition (int idx) = 0;
+  virtual iCameraPosition* GetCameraPosition (int idx) const = 0;
 
   /**
    * Get the list of all textures.
    */
-  virtual iTextureList* GetTextureList () = 0;
+  virtual iTextureList* GetTextureList () const = 0;
   /**
    * Get the list of all materials.
    */
-  virtual iMaterialList* GetMaterialList () = 0;
+  virtual iMaterialList* GetMaterialList () const = 0;
 
   /**
    * Advance the frames of all objects given the current time.

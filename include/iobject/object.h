@@ -71,7 +71,7 @@ struct iObjectIterator;
   ((Interface*)(object)->GetChild (scfID_##Interface, VERSION_##Interface, name, true))
 
 
-SCF_VERSION (iObject, 0, 1, 0);
+SCF_VERSION (iObject, 0, 2, 0);
 
 /**
  * This interface is an SCF interface for encapsulating csObject.
@@ -83,6 +83,9 @@ struct iObject : public iBase
 
   /// Query object name
   virtual const char *GetName () const = 0;
+
+  /// Get the unique ID associated with this object.
+  virtual CS_ID GetID () const = 0;
 
   /// Returns the parent iObject.
   virtual iObject* GetObjectParentI () const = 0;

@@ -198,7 +198,7 @@ void csSector::RelinkMesh (csMeshWrapper* mesh)
   queue->Push ((csSome)mesh);
 }
 
-csMeshWrapper* csSector::GetMesh (const char* name)
+csMeshWrapper* csSector::GetMesh (const char* name) const
 {
   int i;
   for (i = 0 ; i < meshes.Length () ; i++)
@@ -223,7 +223,7 @@ void csSector::UnlinkCollection (csCollection* col)
   if (idx != -1) collections.Delete (idx);
 }
 
-csCollection* csSector::GetCollection (const char* name)
+csCollection* csSector::GetCollection (const char* name) const
 {
   int i;
   for (i = 0 ; i < collections.Length () ; i++)
@@ -249,7 +249,7 @@ void csSector::UnlinkLight (csStatLight* light)
   if (idx != -1) { lights[idx] = NULL; lights.Delete (idx); }
 }
 
-csStatLight* csSector::FindLight (float x, float y, float z, float dist)
+csStatLight* csSector::FindLight (float x, float y, float z, float dist) const
 {
   int i;
   for (i = 0 ; i < lights.Length () ; i++)
@@ -264,7 +264,7 @@ csStatLight* csSector::FindLight (float x, float y, float z, float dist)
   return NULL;
 }
 
-csStatLight* csSector::FindLight (unsigned long id)
+csStatLight* csSector::FindLight (unsigned long id) const
 {
   int i;
   for (i = 0 ; i < lights.Length () ; i++)
@@ -292,7 +292,7 @@ void csSector::UnlinkTerrain (csTerrainWrapper *pTerrain)
   }
 }
 
-csTerrainWrapper* csSector::GetTerrain (const char* name)
+csTerrainWrapper* csSector::GetTerrain (const char* name) const
 {
   int i;
   for (i = 0 ; i < terrains.Length () ; i++)
@@ -1174,7 +1174,7 @@ void csSector::ShineLights (iMeshWrapper* mesh, csProgressPulse* pulse)
 }
 
 void csSector::CalculateSectorBBox (csBox3& bbox,
-	bool do_meshes, bool /*do_terrain*/)
+	bool do_meshes, bool /*do_terrain*/) const
 {
   bbox.StartBoundingBox ();
   csBox3 b;
@@ -1191,7 +1191,7 @@ void csSector::CalculateSectorBBox (csBox3& bbox,
 
 //---------------------------------------------------------------------------
 
-iMeshWrapper *csSector::eiSector::GetMesh (int n)
+iMeshWrapper *csSector::eiSector::GetMesh (int n) const
 {
   return &scfParent->GetMesh (n)->scfiMeshWrapper;
 }
@@ -1201,18 +1201,18 @@ void csSector::eiSector::AddMesh (iMeshWrapper *pMesh)
   scfParent->AddMesh (pMesh->GetPrivateObject ());
 }
 
-iMeshWrapper *csSector::eiSector::GetMesh (const char *name)
+iMeshWrapper *csSector::eiSector::GetMesh (const char *name) const
 {
   csMeshWrapper *mw = scfParent->GetMesh (name);
   return mw ? &mw->scfiMeshWrapper : NULL;
 }
 
-iTerrainWrapper *csSector::eiSector::GetTerrain (int n)
+iTerrainWrapper *csSector::eiSector::GetTerrain (int n) const
 {
   return &scfParent->GetTerrain (n)->scfiTerrainWrapper;
 }
 
-iTerrainWrapper *csSector::eiSector::GetTerrain (const char *name)
+iTerrainWrapper *csSector::eiSector::GetTerrain (const char *name) const
 {
   csTerrainWrapper *tw = scfParent->GetTerrain (name);
   return tw ? &tw->scfiTerrainWrapper : NULL;
@@ -1228,12 +1228,13 @@ void csSector::eiSector::AddLight (iStatLight *light)
   scfParent->AddLight (light->GetPrivateObject ());
 }
 
-iStatLight *csSector::eiSector::FindLight (float x, float y, float z, float dist)
+iStatLight *csSector::eiSector::FindLight (float x, float y, float z,
+	float dist) const
 {
   return &scfParent->FindLight (x, y, z, dist)->scfiStatLight;
 }
 
-iCollection* csSector::eiSector::GetCollection (int n)
+iCollection* csSector::eiSector::GetCollection (int n) const
 {
   return &(scfParent->GetCollection (n)->scfiCollection);
 }
@@ -1243,7 +1244,7 @@ void csSector::eiSector::AddCollection (iCollection* col)
   scfParent->AddCollection ((csCollection*)(col->GetPrivateObject ()));
 }
 
-iCollection* csSector::eiSector::GetCollection (const char *name)
+iCollection* csSector::eiSector::GetCollection (const char *name) const
 {
   csCollection* tw = (csCollection*)(scfParent->GetCollection (name));
   return tw ? &tw->scfiCollection : NULL;
@@ -1254,12 +1255,12 @@ void csSector::eiSector::UnlinkCollection (iCollection* col)
   scfParent->UnlinkCollection ((csCollection*)(col->GetPrivateObject ()));
 }
 
-iStatLight* csSector::eiSector::GetLight (int n)
+iStatLight* csSector::eiSector::GetLight (int n) const
 {
   return &(scfParent->GetLight (n)->scfiStatLight);
 }
 
-iStatLight* csSector::eiSector::GetLight (const char *name)
+iStatLight* csSector::eiSector::GetLight (const char *name) const
 {
   csStatLight* tw = scfParent->GetLight (name);
   return tw ? &tw->scfiStatLight : NULL;

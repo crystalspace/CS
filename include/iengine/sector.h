@@ -55,61 +55,59 @@ struct iSector : public iBase
   /// Get the iObject for this sector.
   virtual iObject *QueryObject() = 0;
 
-  /// Get the ID of this sector.
-  virtual CS_ID GetID () = 0;
-
   /// Has this sector fog?
-  virtual bool HasFog () = 0;
+  virtual bool HasFog () const = 0;
   /// Return the fog structure (even if fog is disabled)
-  virtual csFog *GetFog () = 0;
+  virtual csFog *GetFog () const = 0;
   /// Fill the fog structure with the given values
   virtual void SetFog (float density, const csColor& color) = 0;
   /// Disable fog in this sector
   virtual void DisableFog () = 0;
 
   /// Return the number of mesh objects in this sector.
-  virtual int GetMeshCount () = 0;
+  virtual int GetMeshCount () const = 0;
   /// Return a mesh wrapper by index.
-  virtual iMeshWrapper *GetMesh (int n) = 0;
+  virtual iMeshWrapper *GetMesh (int n) const = 0;
   /// Add a mesh object to this sector.
   virtual void AddMesh (iMeshWrapper *pMesh) = 0;
   /// Find a mesh object by name.
-  virtual iMeshWrapper *GetMesh (const char *name) = 0;
+  virtual iMeshWrapper *GetMesh (const char *name) const = 0;
   /// Unlink a mesh object.
   virtual void UnlinkMesh (iMeshWrapper *pMesh) = 0;
 
   /// Return the number of terrain objects in this sector.
-  virtual int GetTerrainCount () = 0;
+  virtual int GetTerrainCount () const = 0;
   /// Return a terrain wrapper by index.
-  virtual iTerrainWrapper *GetTerrain (int n) = 0;
+  virtual iTerrainWrapper *GetTerrain (int n) const = 0;
   /// Add a terrain object to this sector.
   virtual void AddTerrain (iTerrainWrapper *pTerrain) = 0;
   /// Find a terrain object by name.
-  virtual iTerrainWrapper *GetTerrain (const char *name) = 0;
+  virtual iTerrainWrapper *GetTerrain (const char *name) const = 0;
   /// Unlink a terrain object.
   virtual void UnlinkTerrain (iTerrainWrapper *pTerrain) = 0;
 
   /// Return the number of collection objects in this sector.
-  virtual int GetCollectionCount () = 0;
+  virtual int GetCollectionCount () const = 0;
   /// Return a collection by index.
-  virtual iCollection *GetCollection (int n) = 0;
+  virtual iCollection *GetCollection (int n) const = 0;
   /// Add a collection to this sector.
   virtual void AddCollection (iCollection* col) = 0;
   /// Find a collection by name.
-  virtual iCollection *GetCollection (const char *name) = 0;
+  virtual iCollection *GetCollection (const char *name) const = 0;
   /// Unlink a collection.
   virtual void UnlinkCollection (iCollection* col) = 0;
 
   /// Return the number of lights in this sector.
-  virtual int GetLightCount () = 0;
+  virtual int GetLightCount () const = 0;
   /// Return a light by index.
-  virtual iStatLight *GetLight (int n) = 0;
+  virtual iStatLight *GetLight (int n) const = 0;
   /// Return a light by name.
-  virtual iStatLight *GetLight (const char* name) = 0;
+  virtual iStatLight *GetLight (const char* name) const = 0;
   /// Add a static or pseudo-dynamic light to this sector.
   virtual void AddLight (iStatLight *light) = 0;
   /// Find a light with the given position and radius.
-  virtual iStatLight *FindLight (float x, float y, float z, float dist) = 0;
+  virtual iStatLight *FindLight (float x, float y, float z, float dist)
+    const = 0;
 
   /**
    * Init the lightmaps for all polygons in this sector. If this
@@ -141,7 +139,7 @@ struct iSector : public iBase
    * in the sector one by one and compute a bounding box from that.
    */
   virtual void CalculateSectorBBox (csBox3& bbox,
-  	bool do_meshes, bool do_terrain) = 0;
+  	bool do_meshes, bool do_terrain) const = 0;
 
   /**
    * Use the specified mesh object as the visibility culler for
@@ -152,12 +150,12 @@ struct iSector : public iBase
    * Get the visibility culler that is used for this sector.
    * NULL if none.
    */
-  virtual iVisibilityCuller* GetVisibilityCuller () = 0;
+  virtual iVisibilityCuller* GetVisibilityCuller () const = 0;
 
   /**
    * Get the current draw recursion level.
    */
-  virtual int GetRecLevel () = 0;
+  virtual int GetRecLevel () const = 0;
 
   /**
    * Follow a beam from start to end and return the first polygon that

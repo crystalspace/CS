@@ -68,7 +68,7 @@ public:
   { return Name; }
 
   /// Get the unique ID associated with this object
-  CS_ID GetID () const
+  virtual CS_ID GetID () const
   { return csid; }
 
   /// Returns the parent csObject. Implemented in csPObject class.

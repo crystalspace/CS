@@ -12,6 +12,16 @@ The history order is reversed so that new features are at the top.
 	  get a pointer to them.
 	  Norman did a lot of changes everywhere to accomodate the changes
 	  above.
+	- Added a lot of 'const' qualifiers to many functions in csEngine
+	  and iEngine.
+	- Removed a few obsolete functions from iEngine having to do with
+	  polygon texture planes.
+	- Added 'const' to functions in csNamedObjVector.
+	- Removed iSector::GetID().
+	- Added iObject::GetID().
+	- Added a lot of 'const' qualifiers to many functions in csSector
+	  and iSector.
+	- Fixed a warning in keyval.
 4-Jun-2001
 	- Added csTransform This2OtherRelative() and Other2ThisRelative()
 	  which operate on csPlane3.

@@ -503,7 +503,7 @@ private:
    * and the given vector.
    */
   csObject* FindObjectInRegion (csRegion* region,
-	csNamedObjVector& vector, const char* name);
+	const csNamedObjVector& vector, const char* name) const;
 
 public:
   /**
@@ -568,7 +568,7 @@ public:
   /// Query the iObject for the engine.
   virtual iObject *QueryObject();
   /// Query the csObject for the engine.
-  inline csObject *QueryCsObject () {return &scfiObject;}
+  inline csObject *QueryCsObject () { return &scfiObject; }
 
   /**
    * Prepare the engine. This function must be called after
@@ -613,7 +613,7 @@ public:
    * Get the pointer to the radiosity object (used with step-by-step
    * debugging).
    */
-  csRadiosity* GetRadiosity () { return rad_debug; }
+  csRadiosity* GetRadiosity () const { return rad_debug; }
 
   /**
    * Invalidate all lightmaps. This can be called after doing
@@ -639,14 +639,14 @@ public:
    * If called between SetEngineMode() and the first Draw() it is
    * possible that this mode will still be CS_ENGINE_AUTODETECT.
    */
-  virtual int GetEngineMode () { return engine_mode; }
+  virtual int GetEngineMode () const { return engine_mode; }
 
   /**
    * Get the required flags for 3D->BeginDraw() which should be called
    * from the application. These flags must be or-ed with optional other
    * flags that the application might be interested in.
    */
-  virtual int GetBeginDrawFlags ()
+  virtual int GetBeginDrawFlags () const
   {
     if (engine_mode == CS_ENGINE_ZBUFFER)
       return CSDRAW_CLEARZBUFFER;
@@ -657,7 +657,7 @@ public:
   /**
    * Get the last animation time.
    */
-  cs_time GetLastAnimationTime () { return nextframe_pending; }
+  cs_time GetLastAnimationTime () const { return nextframe_pending; }
 
   /**
    * Set the culler to use in CS_ENGINE_FRONT2BACK mode.
@@ -668,7 +668,7 @@ public:
   /**
    * Get the current culler.
    */
-  int GetCuller ()
+  int GetCuller () const
   {
     if (c_buffer) return CS_CULLER_CBUFFER;
     else if (covtree) return CS_CULLER_COVTREE;
@@ -678,32 +678,32 @@ public:
   /**
    * Return 3D quadtree (or NULL if not used).
    */
-  csQuadTree3D* GetQuad3D () { return quad3d; }
+  csQuadTree3D* GetQuad3D () const { return quad3d; }
 
   /**
    * Return c-buffer (or NULL if not used).
    */
-  csCBuffer* GetCBuffer () { return c_buffer; }
+  csCBuffer* GetCBuffer () const { return c_buffer; }
 
   /**
    * Return coverage mask tree (or NULL if not used).
    */
-  csCoverageMaskTree* GetCovtree () { return covtree; }
+  csCoverageMaskTree* GetCovtree () const { return covtree; }
 
   /**
    * Return the lookup table used for the coverage mask tree.
    */
-  csCovMaskLUT* GetCovMaskLUT () { return covtree_lut; }
+  csCovMaskLUT* GetCovMaskLUT () const { return covtree_lut; }
 
   /**
    * Return coverage mask cube.
    */
-  csCovcube* GetCovcube () { return covcube; }
+  csCovcube* GetCovcube () const { return covcube; }
 
   /**
    * Return cbuffer cube.
    */
-  csCBufferCube* GetCBufCube () { return cbufcube; }
+  csCBufferCube* GetCBufCube () const { return cbufcube; }
 
   /**
    * Enable PVS.
@@ -718,7 +718,7 @@ public:
   /**
    * Is PVS enabled?
    */
-  virtual bool IsPVS () { return use_pvs; }
+  virtual bool IsPVS () const { return use_pvs; }
 
   /**
    * Use only PVS for culling. This flag only makes sense when
@@ -767,10 +767,10 @@ public:
   void EnableLightingCache (bool en);
 
   /// Return true if lighting cache is enabled.
-  bool IsLightingCacheEnabled () { return do_lighting_cache; }
+  bool IsLightingCacheEnabled () const { return do_lighting_cache; }
 
   /// Return current lightmap cell size
-  virtual int GetLightmapCellSize ();
+  virtual int GetLightmapCellSize () const;
   /// Set lightmap cell size
   virtual void SetLightmapCellSize (int Size);
 
@@ -796,12 +796,12 @@ public:
   /**
    * Return the object managing all loaded textures.
    */
-  csTextureList* GetTextures () { return textures; }
+  csTextureList* GetTextures () const { return textures; }
 
   /**
    * Return the object managing all loaded materials.
    */
-  csMaterialList* GetMaterials () { return materials; }
+  csMaterialList* GetMaterials () const { return materials; }
 
   /**
    * Create a base material.
@@ -810,8 +810,8 @@ public:
   virtual iMaterial* CreateBaseMaterial (iTextureWrapper* txt,
   	int num_layers, iTextureWrapper** wrappers, csTextureLayer* layers);
 
-  virtual iMaterialList* GetMaterialList ();
-  virtual iTextureList* GetTextureList ();
+  virtual iMaterialList* GetMaterialList () const;
+  virtual iTextureList* GetTextureList () const;
 
   /**
    * Create a empty sector with given name.
@@ -846,7 +846,7 @@ public:
   /**
    * Return the first dynamic light in this engine.
    */
-  csDynLight* GetFirstDynLight () { return first_dyn_lights; }
+  csDynLight* GetFirstDynLight () const { return first_dyn_lights; }
 
   /**
    * This routine returns all lights which might affect an object
@@ -921,17 +921,17 @@ public:
    * given position. This function scans all sectors and locates
    * the first one which statisfies that criterium.
    */
-  csStatLight* FindCsLight (float x, float y, float z, float dist);
+  csStatLight* FindCsLight (float x, float y, float z, float dist) const;
 
   /**
    * Find the light with the given light id.
    */
-  csStatLight* FindCsLight (unsigned long id);
+  csStatLight* FindCsLight (unsigned long id) const;
 
   /**
    * Find the light with the given name.
    */
-  csStatLight* FindCsLight (const char* name, bool regionOnly = false);
+  csStatLight* FindCsLight (const char* name, bool regionOnly = false) const;
 
   /**
    * Advance the frames of all objects given the current time.
@@ -988,7 +988,7 @@ public:
    * Get a reference to the current region (or NULL if the default main
    * region is selected).
    */
-  csRegion* GetCsCurrentRegion ()
+  csRegion* GetCsCurrentRegion () const
   {
     return region;
   }
@@ -999,9 +999,11 @@ public:
   void AddToCurrentRegion (csObject* obj);
 
   /// Find a loaded texture by name.
-  csTextureWrapper* FindCsTexture (const char* iName, bool regionOnly = false);
+  csTextureWrapper* FindCsTexture (const char* iName, bool regionOnly = false)
+    const;
   /// Find a loaded material by name.
-  csMaterialWrapper* FindCsMaterial (const char* iName, bool regionOnly = false);
+  csMaterialWrapper* FindCsMaterial (const char* iName,
+  	bool regionOnly = false) const;
 
   /// Register a new render priority.
   virtual void RegisterRenderPriority (const char* name, long priority);
@@ -1020,7 +1022,7 @@ public:
 
   /// @@@ Temporary until things move to their own mesh plugin system.
   csThingObjectType* thing_type;
-  virtual iMeshObjectType* GetThingType ()
+  virtual iMeshObjectType* GetThingType () const
   {
     return (iMeshObjectType*)thing_type;
   }
@@ -1044,7 +1046,7 @@ public:
   virtual csEngine *GetCsEngine () { return this; };
 
   /// Query the format to load textures (usually this depends on texture manager)
-  virtual int GetTextureFormat ();
+  virtual int GetTextureFormat () const;
 
   /**
    * Create or select a new region (name can be NULL for the default main
@@ -1056,10 +1058,10 @@ public:
    * Get a reference to the current region (or NULL if the default main
    * region is selected).
    */
-  virtual iRegion* GetCurrentRegion ();
+  virtual iRegion* GetCurrentRegion () const;
 
   /// find a region by name
-  virtual iRegion* FindRegion (const char *name);
+  virtual iRegion* FindRegion (const char *name) const;
 
   /**
    * Create or select a new object library (name can be NULL for engine).
@@ -1091,43 +1093,44 @@ public:
   virtual iSector *CreateSector (const char *iName, bool link = true);
 
   /// Query number of sectors in engine
-  virtual int GetSectorCount ()
+  virtual int GetSectorCount () const
   { return sectors.Length (); }
   /// Get a sector by index
-  virtual iSector *GetSector (int iIndex);
+  virtual iSector *GetSector (int iIndex) const;
   /// Find a sector by name
-  virtual iSector *FindSector (const char *iName, bool regionOnly = false);
+  virtual iSector *FindSector (const char *iName, bool regionOnly = false)
+    const;
   /// Delete a sector
   virtual void DeleteSector (iSector *Sector);
 
   /// Find a mesh by name
   virtual iMeshWrapper *FindMeshObject (const char *iName,
-  	bool regionOnly = false);
+  	bool regionOnly = false) const;
   /// Find a mesh factory by name
   virtual iMeshFactoryWrapper *FindMeshFactory (const char *iName,
-  	bool regionOnly = false);
+  	bool regionOnly = false) const;
   /// Delete a mesh factory by name
   virtual void DeleteMeshFactory (const char* iName, bool regionOnly = false);
 
   /// Find a terrain by name
   virtual iTerrainWrapper *FindTerrainObject (const char *iName,
-  	bool regionOnly = false);
+  	bool regionOnly = false) const;
   /// Find a terrain factory by name
   virtual iTerrainFactoryWrapper *FindTerrainFactory (const char *iName,
-  	bool regionOnly);
+  	bool regionOnly) const;
 
   /// Find a loaded texture by name.
   virtual iTextureWrapper* FindTexture (const char* iName,
-  	bool regionOnly = false);
+  	bool regionOnly = false) const;
   /// Find a loaded material by name.
   virtual iMaterialWrapper* FindMaterial (const char* iName,
-  	bool regionOnly = false);
+  	bool regionOnly = false) const;
   /// Find a loaded camera position by name.
   virtual iCameraPosition* FindCameraPosition (const char* iName,
-  	bool regionOnly = false);
+  	bool regionOnly = false) const;
   /// Find a collection by name
   virtual iCollection* FindCollection (const char* iName,
-  	bool regionOnly = false);
+  	bool regionOnly = false) const;
   /// Create a new collection.
   virtual iCollection* CreateCollection (const char* iName);
 
@@ -1139,7 +1142,8 @@ public:
   	const csVector3& pos, float radius,
   	const csColor& color, bool pseudoDyn);
   /// Find a static/pseudo-dynamic light by name.
-  virtual iStatLight* FindLight (const char *Name, bool RegionOnly = false);
+  virtual iStatLight* FindLight (const char *Name, bool RegionOnly = false)
+    const;
   /// Create a dynamic light.
   virtual iDynLight* CreateDynLight (const csVector3& pos, float radius,
   	const csColor& color);
@@ -1177,14 +1181,14 @@ public:
 	iDataBuffer* input, iSector* sector, const csVector3& pos);
 
   /// return the number of mesh objects
-  virtual int GetNumMeshObjects ();
+  virtual int GetNumMeshObjects () const;
   /// return a mesh object by index
-  virtual iMeshWrapper *GetMeshObject (int n);
+  virtual iMeshWrapper *GetMeshObject (int n) const;
 
   /// return the number of mesh factories
-  virtual int GetNumMeshFactories ();
+  virtual int GetNumMeshFactories () const;
   /// return a mesh factory by index
-  virtual iMeshFactoryWrapper *GetMeshFactory (int n);
+  virtual iMeshFactoryWrapper *GetMeshFactory (int n) const;
 
   /// Create a terrain factory wrapper from a terrain plugin
   virtual iTerrainFactoryWrapper* CreateTerrainFactory (const char* pClassId,
@@ -1207,12 +1211,12 @@ public:
 
   virtual iPolyTxtPlane* CreatePolyTxtPlane (const char* name = NULL);
   virtual iPolyTxtPlane* FindPolyTxtPlane (const char* name,
-  	bool regionOnly = false);
+  	bool regionOnly = false) const;
   virtual iCurveTemplate* CreateBezierTemplate (const char* name = NULL);
   virtual iCurveTemplate* FindCurveTemplate (const char *iName,
-  	bool regionOnly = false);
+  	bool regionOnly = false) const;
 
-  virtual iClipper2D* GetTopLevelClipper ();
+  virtual iClipper2D* GetTopLevelClipper () const;
 
   /// Create a map node.
   virtual iMapNode* CreateMapNode (const char* name);
@@ -1220,20 +1224,15 @@ public:
   virtual iKeyValuePair* CreateKeyValuePair (const char* key,
   	const char* value);
 
-  /// @@@ Temporary function until things are moved to a plugin.
-  virtual int GetNumPolyTxtPlanes ();
-  /// @@@ Temporary function until things are moved to a plugin.
-  virtual iPolyTxtPlane* GetPolyTxtPlane (int idx);
-
   /// Get the number of collections in the engine
-  virtual int GetNumCollections ();
+  virtual int GetNumCollections () const;
   /// Get a collection by its index
-  virtual iCollection* GetCollection (int idx);
+  virtual iCollection* GetCollection (int idx) const;
 
   /// Get the number of camera positions in the engine
-  virtual int GetNumCameraPositions ();
+  virtual int GetNumCameraPositions () const;
   /// Get a camera position by its index
-  virtual iCameraPosition* GetCameraPosition (int idx);
+  virtual iCameraPosition* GetCameraPosition (int idx) const;
 
   //--------------------- iConfig interface implementation --------------------
 

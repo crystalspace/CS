@@ -21,7 +21,7 @@
 #include "csobject/nobjvec.h"
 #include "csobject/csobject.h"
 
-csObject *csNamedObjVector::FindByName (const char* name)
+csObject *csNamedObjVector::FindByName (const char* name) const
 {
   csObject* o;
   int i;

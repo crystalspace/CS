@@ -787,7 +787,7 @@ void csEngine::EnableLightingCache (bool en)
   else do_force_relight = false;
 }
 
-int csEngine::GetLightmapCellSize ()
+int csEngine::GetLightmapCellSize () const
 {
   return csLightMap::lightcell_size;
 }
@@ -1343,6 +1343,7 @@ void csEngine::RemoveHalo (csLight* Light)
 }
 
 csStatLight* csEngine::FindCsLight (float x, float y, float z, float dist)
+  const
 {
   csStatLight* l;
   int sn = sectors.Length ();
@@ -1356,7 +1357,7 @@ csStatLight* csEngine::FindCsLight (float x, float y, float z, float dist)
   return NULL;
 }
 
-csStatLight* csEngine::FindCsLight (unsigned long light_id)
+csStatLight* csEngine::FindCsLight (unsigned long light_id) const
 {
   csStatLight* l;
   int sn = sectors.Length ();
@@ -1370,7 +1371,7 @@ csStatLight* csEngine::FindCsLight (unsigned long light_id)
   return NULL;
 }
 
-csStatLight* csEngine::FindCsLight (const char* name, bool /*regionOnly*/)
+csStatLight* csEngine::FindCsLight (const char* name, bool /*regionOnly*/) const
 {
   //@@@### regionOnly
   csStatLight* l;
@@ -1385,7 +1386,7 @@ csStatLight* csEngine::FindCsLight (const char* name, bool /*regionOnly*/)
   return NULL;
 }
 
-iStatLight* csEngine::FindLight (const char* name, bool regionOnly)
+iStatLight* csEngine::FindLight (const char* name, bool regionOnly) const
 {
   return &FindCsLight(name, regionOnly)->scfiStatLight;
 }
@@ -1664,7 +1665,7 @@ csObjectIt* csEngine::GetNearbyObjects (csSector* sector,
   return it;
 }
 
-int csEngine::GetTextureFormat ()
+int csEngine::GetTextureFormat () const
 {
   iTextureManager* txtmgr = G3D->GetTextureManager ();
   return txtmgr->GetTextureFormat ();
@@ -1687,12 +1688,12 @@ void csEngine::SelectRegion (const char *iName)
   }
 }
 
-iRegion* csEngine::GetCurrentRegion ()
+iRegion* csEngine::GetCurrentRegion () const
 {
   return region ? &region->scfiRegion : NULL;
 }
 
-iRegion* csEngine::FindRegion (const char *name)
+iRegion* csEngine::FindRegion (const char *name) const
 {
   csRegion *r = (csRegion*)regions.FindByName (name);
   return r ? &r->scfiRegion : NULL;
@@ -1908,13 +1909,13 @@ iSector* csEngine::CreateSector (const char *iName, bool link)
   return s;
 }
 
-iSector *csEngine::GetSector (int iIndex)
+iSector *csEngine::GetSector (int iIndex) const
 {
   return &((csSector *)sectors.Get (iIndex))->scfiSector;
 }
 
 csObject* csEngine::FindObjectInRegion (csRegion* region,
-	csNamedObjVector& vector, const char* name)
+	const csNamedObjVector& vector, const char* name) const
 {
   for (int i = vector.Length () - 1; i >= 0; i--)
   {
@@ -1927,7 +1928,7 @@ csObject* csEngine::FindObjectInRegion (csRegion* region,
   return NULL;
 }
 
-iSector *csEngine::FindSector (const char *iName, bool regionOnly)
+iSector *csEngine::FindSector (const char *iName, bool regionOnly) const
 {
   csSector* sec;
   if (regionOnly && region)
@@ -1944,6 +1945,7 @@ void csEngine::DeleteSector (iSector *Sector)
 }
 
 iMeshWrapper *csEngine::FindMeshObject (const char *iName, bool regionOnly)
+  const
 {
   csMeshWrapper* mesh;
   if (regionOnly && region)
@@ -1956,7 +1958,8 @@ iMeshWrapper *csEngine::FindMeshObject (const char *iName, bool regionOnly)
   return imesh;
 }
 
-iMeshFactoryWrapper *csEngine::FindMeshFactory (const char *iName, bool regionOnly)
+iMeshFactoryWrapper *csEngine::FindMeshFactory (const char *iName,
+  bool regionOnly) const
 {
   csMeshFactoryWrapper* fact;
   if (regionOnly && region)
@@ -1968,7 +1971,8 @@ iMeshFactoryWrapper *csEngine::FindMeshFactory (const char *iName, bool regionOn
   return ifact;
 }
 
-iTerrainWrapper *csEngine::FindTerrainObject (const char *iName, bool regionOnly)
+iTerrainWrapper *csEngine::FindTerrainObject (const char *iName,
+  bool regionOnly) const
 {
   csTerrainWrapper *pTerrain;
 
@@ -1984,7 +1988,8 @@ iTerrainWrapper *csEngine::FindTerrainObject (const char *iName, bool regionOnly
   return iTerrain;
 }
 
-iTerrainFactoryWrapper *csEngine::FindTerrainFactory (const char *iName, bool regionOnly)
+iTerrainFactoryWrapper *csEngine::FindTerrainFactory (const char *iName,
+  bool regionOnly) const
 {
   csTerrainFactoryWrapper *pFactory;
   if (regionOnly && region)
@@ -2022,17 +2027,18 @@ iMaterial* csEngine::CreateBaseMaterial (iTextureWrapper* txt,
   return imat;
 }
 
-iTextureList* csEngine::GetTextureList ()
+iTextureList* csEngine::GetTextureList () const
 {
   return &(GetTextures ()->scfiTextureList);
 }
 
-iMaterialList* csEngine::GetMaterialList ()
+iMaterialList* csEngine::GetMaterialList () const
 {
   return &(GetMaterials ()->scfiMaterialList);
 }
 
-iMaterialWrapper* csEngine::FindMaterial (const char* iName, bool regionOnly)
+iMaterialWrapper* csEngine::FindMaterial (const char* iName,
+  bool regionOnly) const
 {
   csMaterialWrapper* wr;
   if (regionOnly && region)
@@ -2044,7 +2050,8 @@ iMaterialWrapper* csEngine::FindMaterial (const char* iName, bool regionOnly)
   return iwr;
 }
 
-csMaterialWrapper* csEngine::FindCsMaterial (const char* iName, bool regionOnly)
+csMaterialWrapper* csEngine::FindCsMaterial (const char* iName,
+  bool regionOnly) const
 {
   csMaterialWrapper* wr;
   if (regionOnly && region)
@@ -2054,7 +2061,8 @@ csMaterialWrapper* csEngine::FindCsMaterial (const char* iName, bool regionOnly)
   return wr;
 }
 
-iTextureWrapper* csEngine::FindTexture (const char* iName, bool regionOnly)
+iTextureWrapper* csEngine::FindTexture (const char* iName,
+  bool regionOnly) const
 {
   csTextureWrapper* wr;
   if (regionOnly && region)
@@ -2065,7 +2073,8 @@ iTextureWrapper* csEngine::FindTexture (const char* iName, bool regionOnly)
   return &wr->scfiTextureWrapper;
 }
 
-csTextureWrapper* csEngine::FindCsTexture (const char* iName, bool regionOnly)
+csTextureWrapper* csEngine::FindCsTexture (const char* iName,
+  bool regionOnly) const
 {
   csTextureWrapper* wr;
   if (regionOnly && region)
@@ -2075,7 +2084,8 @@ csTextureWrapper* csEngine::FindCsTexture (const char* iName, bool regionOnly)
   return wr;
 }
 
-iCameraPosition* csEngine::FindCameraPosition (const char* iName, bool regionOnly)
+iCameraPosition* csEngine::FindCameraPosition (const char* iName,
+  bool regionOnly) const
 {
   csCameraPosition* wr;
   if (regionOnly && region)
@@ -2086,7 +2096,8 @@ iCameraPosition* csEngine::FindCameraPosition (const char* iName, bool regionOnl
   return &wr->scfiCameraPosition;
 }
 
-iCollection* csEngine::FindCollection (const char* iName, bool regionOnly)
+iCollection* csEngine::FindCollection (const char* iName,
+  bool regionOnly) const
 {
   csCollection* c;
   if (regionOnly && region)
@@ -2313,22 +2324,22 @@ iMeshWrapper* csEngine::CreateMeshObject (const char* name)
   return &meshwrap->scfiMeshWrapper;
 }
 
-int csEngine::GetNumMeshObjects ()
+int csEngine::GetNumMeshObjects () const
 {
   return meshes.Length ();
 }
 
-iMeshWrapper *csEngine::GetMeshObject (int n)
+iMeshWrapper *csEngine::GetMeshObject (int n) const
 {
   return &((csMeshWrapper*)meshes.Get(n))->scfiMeshWrapper;
 }
 
-int csEngine::GetNumMeshFactories ()
+int csEngine::GetNumMeshFactories () const
 {
   return mesh_factories.Length ();
 }
 
-iMeshFactoryWrapper *csEngine::GetMeshFactory (int n)
+iMeshFactoryWrapper *csEngine::GetMeshFactory (int n) const
 {
   return &((csMeshFactoryWrapper*)mesh_factories.Get(n))->
   	scfiMeshFactoryWrapper;
@@ -2439,7 +2450,8 @@ iPolyTxtPlane* csEngine::CreatePolyTxtPlane (const char* name)
   return &(pl->scfiPolyTxtPlane);
 }
 
-iPolyTxtPlane* csEngine::FindPolyTxtPlane (const char *iName, bool regionOnly)
+iPolyTxtPlane* csEngine::FindPolyTxtPlane (const char *iName,
+  bool regionOnly) const
 {
   csPolyTxtPlane* pl;
   if (regionOnly && region)
@@ -2461,7 +2473,7 @@ iCurveTemplate* csEngine::CreateBezierTemplate (const char* name)
 }
 
 iCurveTemplate* csEngine::FindCurveTemplate (const char *iName,
-	bool regionOnly)
+	bool regionOnly) const
 {
   csCurveTemplate* pl;
   if (regionOnly && region)
@@ -2605,7 +2617,7 @@ void csEngine::SetContext (iGraphics3D* g3d)
   }
 }
 
-iClipper2D* csEngine::GetTopLevelClipper ()
+iClipper2D* csEngine::GetTopLevelClipper () const
 {
   return top_clipper;
 }
@@ -2627,32 +2639,22 @@ iKeyValuePair* csEngine::CreateKeyValuePair (const char* key,
   return ikey;
 }
 
-int csEngine::GetNumPolyTxtPlanes ()
-{
-  return planes.Length ();
-}
-
-iPolyTxtPlane* csEngine::GetPolyTxtPlane (int idx)
-{
-  return &((csPolyTxtPlane*)planes.Get(idx))->scfiPolyTxtPlane;
-}
-
-int csEngine::GetNumCollections ()
+int csEngine::GetNumCollections () const
 {
   return collections.Length ();
 }
 
-iCollection* csEngine::GetCollection (int idx)
+iCollection* csEngine::GetCollection (int idx) const
 {
   return &((csCollection*)collections.Get(idx))->scfiCollection;
 }
 
-int csEngine::GetNumCameraPositions ()
+int csEngine::GetNumCameraPositions () const
 {
   return camera_positions.Length ();
 }
 
-iCameraPosition* csEngine::GetCameraPosition (int idx)
+iCameraPosition* csEngine::GetCameraPosition (int idx) const
 {
   return &((csCameraPosition*)camera_positions.Get(idx))->scfiCameraPosition;
 }

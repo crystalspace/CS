@@ -176,7 +176,7 @@ public:
   /**
    * Get the number of meshes in this sector.
    */
-  int GetMeshCount ()
+  int GetMeshCount () const
   {
     return meshes.Length ();
   }
@@ -184,7 +184,7 @@ public:
   /**
    * Get the specified mesh.
    */
-  csMeshWrapper* GetMesh (int idx)
+  csMeshWrapper* GetMesh (int idx) const
   {
     return (csMeshWrapper*)meshes[idx];
   }
@@ -192,7 +192,7 @@ public:
   /**
    * Find the given mesh by name.
    */
-  csMeshWrapper* GetMesh (const char* name);
+  csMeshWrapper* GetMesh (const char* name) const;
 
   //----------------------------------------------------------------------
   // Collection manipulation functions
@@ -211,7 +211,7 @@ public:
   /**
    * Get the number of collections in this sector.
    */
-  int GetCollectionCount ()
+  int GetCollectionCount () const
   {
     return collections.Length ();
   }
@@ -219,7 +219,7 @@ public:
   /**
    * Get the specified collection.
    */
-  csCollection* GetCollection (int idx)
+  csCollection* GetCollection (int idx) const
   {
     return (csCollection*)collections[idx];
   }
@@ -227,7 +227,7 @@ public:
   /**
    * Find a collection with the given name.
    */
-  csCollection* GetCollection (const char* name);
+  csCollection* GetCollection (const char* name) const;
 
   //----------------------------------------------------------------------
   // Light manipulation functions
@@ -246,7 +246,7 @@ public:
   /**
    * Get the number of lights in this sector.
    */
-  int GetLightCount ()
+  int GetLightCount () const
   {
     return lights.Length ();
   }
@@ -254,7 +254,7 @@ public:
   /**
    * Get the specified light.
    */
-  csStatLight* GetLight (int idx)
+  csStatLight* GetLight (int idx) const
   {
     return (csStatLight*)lights[idx];
   }
@@ -262,7 +262,7 @@ public:
   /**
    * Find a light with the given name.
    */
-  csStatLight* GetLight (const char* name)
+  csStatLight* GetLight (const char* name) const
   {
     return (csStatLight*)lights.FindByName (name);
   }
@@ -270,12 +270,12 @@ public:
   /**
    * Find a light with the given position and radius.
    */
-  csStatLight* FindLight (float x, float y, float z, float dist);
+  csStatLight* FindLight (float x, float y, float z, float dist) const;
 
   /**
    * Find the light with the given object id.
    */
-  csStatLight* FindLight (unsigned long id);
+  csStatLight* FindLight (unsigned long id) const;
 
   //----------------------------------------------------------------------
   // Terrain manipulation functions
@@ -294,7 +294,7 @@ public:
   /**
    * Get the number of terrains in this sector.
    */
-  int GetTerrainCount ()
+  int GetTerrainCount () const
   {
     return terrains.Length ();
   }
@@ -302,7 +302,7 @@ public:
   /**
    * Get the specified terrain.
    */
-  csTerrainWrapper* GetTerrain (int idx)
+  csTerrainWrapper* GetTerrain (int idx) const
   {
     return (csTerrainWrapper*)terrains[idx];
   }
@@ -310,7 +310,7 @@ public:
   /**
    * Find a terrain with the given name.
    */
-  csTerrainWrapper* GetTerrain (const char* name);
+  csTerrainWrapper* GetTerrain (const char* name) const;
 
   //----------------------------------------------------------------------
   // Visibility Stuff
@@ -319,7 +319,7 @@ public:
   /**
    * Get the mesh which implements the visibility culler.
    */
-  csMeshWrapper* GetCullerMesh () { return culler_mesh; }
+  csMeshWrapper* GetCullerMesh () const { return culler_mesh; }
 
   /**
    * Look for the mesh object and see if it implements iVisibilityCuller.
@@ -331,7 +331,7 @@ public:
    * Get the visibility culler that is used for this sector.
    * NULL if none.
    */
-  iVisibilityCuller* GetVisibilityCuller () { return culler; }
+  iVisibilityCuller* GetVisibilityCuller () const { return culler; }
 
   //----------------------------------------------------------------------
   // Drawing
@@ -438,7 +438,8 @@ public:
    * This function is not very efficient as it will traverse all objects
    * in the sector one by one and compute a bounding box from that.
    */
-  void CalculateSectorBBox (csBox3& bbox, bool do_meshes, bool do_terrain);
+  void CalculateSectorBBox (csBox3& bbox, bool do_meshes, bool do_terrain)
+    const;
 
   //------------------------------------------------
   // Everything for setting up the lighting system.
@@ -485,10 +486,10 @@ public:
   //----------------------------------------------------------------------
 
   /// Get the engine for this sector.
-  csEngine* GetEngine () { return engine; }
+  csEngine* GetEngine () const { return engine; }
 
   /// Return true if this has fog.
-  bool HasFog () { return fog.enabled; }
+  bool HasFog () const { return fog.enabled; }
 
   /// Return fog structure.
   csFog& GetFog () { return fog; }
@@ -517,44 +518,47 @@ public:
     { return (csSector*)scfParent; }
     virtual iObject *QueryObject()
     { return scfParent; }
-    virtual int GetRecLevel () { return scfParent->draw_busy; }
+    virtual int GetRecLevel () const { return scfParent->draw_busy; }
     virtual void SetVisibilityCuller (const char *Name)
     {
       scfParent->UseCuller (Name);
     }
-    virtual iVisibilityCuller* GetVisibilityCuller ()
+    virtual iVisibilityCuller* GetVisibilityCuller () const
     {
       return scfParent->GetVisibilityCuller ();
     }
 
-    virtual int GetMeshCount () { return scfParent->GetMeshCount (); }
-    virtual iMeshWrapper *GetMesh (int n);
+    virtual int GetMeshCount () const { return scfParent->GetMeshCount (); }
+    virtual iMeshWrapper *GetMesh (int n) const;
     virtual void AddMesh (iMeshWrapper *pMesh);
-    virtual iMeshWrapper *GetMesh (const char *name);
+    virtual iMeshWrapper *GetMesh (const char *name) const;
     virtual void UnlinkMesh (iMeshWrapper *pMesh)
     { scfParent->UnlinkMesh (pMesh->GetPrivateObject ()); }
 
-    virtual int GetTerrainCount () { return scfParent->GetTerrainCount (); }
-    virtual iTerrainWrapper *GetTerrain (int n);
+    virtual int GetTerrainCount () const
+    {
+      return scfParent->GetTerrainCount ();
+    }
+    virtual iTerrainWrapper *GetTerrain (int n) const;
     virtual void AddTerrain (iTerrainWrapper *pTerrain);
-    virtual iTerrainWrapper *GetTerrain (const char *name);
+    virtual iTerrainWrapper *GetTerrain (const char *name) const;
     virtual void UnlinkTerrain (iTerrainWrapper *pTerrain)
     { scfParent->UnlinkTerrain (pTerrain->GetPrivateObject ()); }
 
-    virtual int GetCollectionCount ()
+    virtual int GetCollectionCount () const
     {
       return scfParent->GetCollectionCount ();
     }
-    virtual iCollection* GetCollection (int n);
+    virtual iCollection* GetCollection (int n) const;
     virtual void AddCollection (iCollection* col);
-    virtual iCollection* GetCollection (const char *name);
+    virtual iCollection* GetCollection (const char *name) const;
     virtual void UnlinkCollection (iCollection* col);
 
     virtual void AddLight (iStatLight *light);
-    virtual int GetLightCount () { return scfParent->GetLightCount (); }
-    virtual iStatLight *GetLight (int n);
-    virtual iStatLight *GetLight (const char* name);
-    virtual iStatLight *FindLight (float x, float y, float z, float dist);
+    virtual int GetLightCount () const { return scfParent->GetLightCount (); }
+    virtual iStatLight *GetLight (int n) const;
+    virtual iStatLight *GetLight (const char* name) const;
+    virtual iStatLight *FindLight (float x, float y, float z, float dist) const;
     virtual void InitLightMaps (bool do_cache)
     { scfParent->InitLightMaps (do_cache); }
     virtual void ShineLights ()
@@ -567,12 +571,11 @@ public:
     { scfParent->CacheLightMaps (); }
 
     virtual void CalculateSectorBBox (csBox3& bbox, bool do_meshes,
-  	bool do_terrain)
+  	bool do_terrain) const
     { scfParent->CalculateSectorBBox (bbox, do_meshes, do_terrain); }
-    virtual CS_ID GetID () { return scfParent->GetID (); }
 
-    virtual bool HasFog () { return scfParent->HasFog (); }
-    virtual csFog *GetFog () { return &scfParent->fog; }
+    virtual bool HasFog () const { return scfParent->HasFog (); }
+    virtual csFog *GetFog () const { return &scfParent->fog; }
     virtual void SetFog (float density, const csColor& color)
     { scfParent->SetFog (density, color); }
     virtual void DisableFog ()

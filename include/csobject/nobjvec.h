@@ -38,7 +38,7 @@ public:
     csObjVector (ilimit, ithreshold) {}
 
   /// Find an item in this vector by name and returns it (or NULL if not found)
-  csObject *FindByName (const char* iName);
+  csObject *FindByName (const char* iName) const;
 
   /// Compare two objects by their names
   virtual int Compare (csSome Item1, csSome Item2, int Mode) const;

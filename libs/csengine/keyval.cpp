@@ -99,7 +99,7 @@ iSector* csMapNode::MapNode::GetSector () const
 //---------------------------------------------------------------------------
 
 csNodeIterator::csNodeIterator (iSector* pSector, const char* classname)
-  : Classname (classname), Iterator (NULL), CurrentNode (NULL)
+  : Iterator (NULL), Classname (classname), CurrentNode (NULL)
 {
   Reset (pSector, Classname);
 }
