@@ -7,6 +7,12 @@ The history order is reversed so that new features are at the top.
 	- Fixed a bug in the engine with frustums. Frustums used csRef now
 	  but there was still one case where a manual DecRef() was done.
 	  This caused crashes when firing missiles.
+	- Fixed another csFrustum::DecRef() in the thing plugin.
+	- Changed csArray::SetCapacity() so that it will now correctly
+	  construct new elements using the default constructor. Previously it
+	  was not doing that which made the routine not better than
+	  SetLengthUnsafe(). In addition SetCapacity() can now also decrease
+	  the capacity (it will behave like Truncate() in that case).
 24-Apr-2003
 	- Eric Sunshine made the following changes:
 	    - Improved robustness of --with-x check for Darwin/Macintosh, since
@@ -20,7 +26,6 @@ The history order is reversed so that new features are at the top.
 	      reasons.  First, they crashed and burned horribly on MacOS/X.
 	      Second, they were using non-portable features which are not
 	      present in older sed implementations.
-24-Apr-2003
 	- Fixed a compile error in lview.h.
 	- Fixed another compile error in bezier mesh.
 	- Greatly optimized the CS hashmap. Now it is several factors faster

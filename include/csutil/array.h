@@ -180,14 +180,22 @@ public:
   }
 
   /**
-   * Set vector capacity to approximately 'n' elements.  Never sets the
-   * capacity to fewer than the current number of elements in the array.  See
-   * Truncate() if you need to adjust the number of actual array elements.
+   * Set vector capacity to 'n' elements.
+   * This will correctly construct new items with the default constructor
+   * if the new capacity is higher then the old, and it will properly destruct
+   * items if the new capacity is lower.
    */
   void SetCapacity (int n)
   {
     if (n > Length())
+    {
+      int old_len = Length ();
       SetLengthUnsafe(n);
+      int i;
+      for (i = old_len ; i < n ; i++)
+        ConstructElement (i, T ());
+    }
+    else Truncate (n);
   }
 
   /**

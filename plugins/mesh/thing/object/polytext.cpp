@@ -278,9 +278,9 @@ static bool CanCastShadow (
    * the two polygons. These are the criteria we now use in this test.
    */
   if (FindSeparatingPlane (
-    shadow_poly, shadow_poly->GetStaticData ()->GetVertexCount (), 
-  poly, poly->GetStaticData ()->GetVertexCount (),
-  lightpos))
+      shadow_poly, shadow_poly->GetStaticData ()->GetVertexCount (), 
+      poly, poly->GetStaticData ()->GetVertexCount (),
+      lightpos))
     return false;
 
   // If we couldn't find a separating plane between poly1 and p then
@@ -467,8 +467,8 @@ void csPolyTexture::FillLightMap (
       }
       else
       {
-  shad_pl = csPoly3D::ComputePlane (shadow_frust->GetVertices (),
-    shadow_frust->GetVertexCount ());
+	shad_pl = csPoly3D::ComputePlane (shadow_frust->GetVertices (),
+	shadow_frust->GetVertexCount ());
       }
       if (csMath3::PlanesClose (base_pl, shad_pl)) continue;
 
@@ -481,11 +481,10 @@ void csPolyTexture::FillLightMap (
       if (new_shadow)
       {
         // Test if two polygons can cast shadows on each other.
-  // Note: we use the base polygons here because that is a stronger
-  // test which is more likely to give a better result.
+	// Note: we use the base polygons here because that is a stronger
+	// test which is more likely to give a better result.
         if (shad_poly && !CanCastShadow (shad_poly, base_poly, lightpos))
         {
-          new_shadow->DecRef ();
           continue;
         }
 
@@ -758,7 +757,7 @@ b:
             cosinus = 1;
 
           float brightness = cosinus * light->QueryLight ()
-      ->GetBrightnessAtDistance (d);
+		->GetBrightnessAtDistance (d);
 
           if (color.red > 0)
           {
@@ -849,7 +848,7 @@ void csPolyTexture::UpdateFromShadowBitmap (
       if (!smap)
       {
         smap = lm->NewShadowMap (light, mapping->w, mapping->h);
-  created = true;
+	created = true;
       }
 
       unsigned char *shadowmap = smap->GetArray ();
@@ -870,9 +869,9 @@ void csPolyTexture::UpdateFromShadowBitmap (
       if (!relevant && created)
       {
         // The shadow map is just created but it is not relevant (i.e.
-  // the light really doesn't affect it).
-  // In that case we simply delete it again.
-  lm->DelShadowMap (smap);
+	// the light really doesn't affect it).
+	// In that case we simply delete it again.
+	lm->DelShadowMap (smap);
       }
       else
       {
