@@ -338,7 +338,6 @@ struct iPolygon3DStatic : public iBase
   void SetAlpha (int iAlpha);
   void CreatePlane (const csVector3 &iOrigin,
     const csMatrix3 &iMatrix);
-  bool SetPlane (const char *iName);
   void SetTextureSpace (csVector3& v_orig, csVector3& v1, float len1);
 };
 

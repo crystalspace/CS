@@ -40,6 +40,7 @@ The history order is reversed so that new features are at the top.
 	  Fixed using same technique as used for bugplug.mak and iso.mak.  We
 	  need to apply this fix to all such makefiles (presently, all
 	  application makefiles).
+	- Fixed python plugin for latest thing changes.
 26-Mar-2003
 	- Fixed a bug with the new OpenPortal() implementation in OpenGL
 	  renderer.  It was not setting/restoring the stencil in all cases.

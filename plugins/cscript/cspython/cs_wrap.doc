@@ -545,8 +545,6 @@ SetAlpha(iAlpha)
 
 CreatePlane(iOrigin,iMatrix)
 
-SetPlane(iName)
-
 SetTextureSpace(v_orig,v1,len1)
 
 1.27.  class iPolygon3D
