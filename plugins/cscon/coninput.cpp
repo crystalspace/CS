@@ -138,7 +138,8 @@ bool csConsoleInput::HandleEvent(csEvent &event)
 	  // Copy the line to the current line
 	  buffer->DeleteLine(buffer->GetCurLine());
 	  line = buffer->WriteLine();
-	  line->Append(*buffer->GetLine(history));
+	  if (buffer->GetLine(history))
+            line->Append(*buffer->GetLine(history));
 	  history = buffer->GetCurLine();
 	}
 
