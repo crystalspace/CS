@@ -18545,7 +18545,7 @@ echo "$as_me:$LINENO: result: $cs_cv_prog_objc" >&5
 echo "${ECHO_T}$cs_cv_prog_objc" >&6
 	cs_makefile_text="${cs_makefile_text}OBJC = $cs_cv_prog_objc -c
 "
-	cs_jamconfig_text="${cs_jamconfig_text}CMD.OCC ?= \"$cs_cv_prog_objc\" ;
+	cs_jamconfig_text="${cs_jamconfig_text}CMD.OBJC ?= \"$cs_cv_prog_objc\" ;
 "
 	echo "$as_me:$LINENO: checking for Objective-C++ compiler" >&5
 echo $ECHO_N "checking for Objective-C++ compiler... $ECHO_C" >&6
@@ -18558,7 +18558,7 @@ echo "$as_me:$LINENO: result: $cs_cv_prog_objcxx" >&5
 echo "${ECHO_T}$cs_cv_prog_objcxx" >&6
 	cs_makefile_text="${cs_makefile_text}OBJCXX = $cs_cv_prog_objcxx -c
 "
-	cs_jamconfig_text="${cs_jamconfig_text}CMD.OC++ ?= \"$cs_cv_prog_objcxx\" ;
+	cs_jamconfig_text="${cs_jamconfig_text}CMD.OBJC++ ?= \"$cs_cv_prog_objcxx\" ;
 "
 fi
 

@@ -1,40 +1,40 @@
 #============================================================================
-# Rules for compiling Objective-C files
+# Rules for compiling Objective-C and Objective-C++ files
 #============================================================================
 
-if $(CMD.OCC)
+if $(CMD.OBJC)
 {
 
-rule OCc
+rule ObjC
 {
   Depends $(<) : $(>) ;
 
-  OCCFLAGS on $(>) += $(OCCFLAGS) $(CCFLAGS) $(OPTIM) ;
+  OBJCFLAGS on $(>) += $(OBJCFLAGS) $(CCFLAGS) $(OPTIM) ;
   CCHDRS on $(<) = [ on $(<) FIncludes $(HDRS) ] ;
   CCDEFS on $(<) = [ on $(<) FDefines $(DEFINES) ] ;
 }
-RegisterFileType OCc : .m ;
+RegisterFileType ObjC : .m ;
 
-actions OCc
+actions ObjC
 {
   $(CMD.OBJC) -c -o $(<) $(OBJCFLAGS) $(CCDEFS) $(CCHDRS) $(>)
 }
 }
 
-if $(CMD.OC++)
+if $(CMD.OBJC++)
 {
-rule OC++
+rule ObjC++
 {
   Depends $(<) : $(>) ;
   
-  OC++FLAGS on $(>) += $(OC++FLAGS) $(C++FLAGS) $(OPTIM) ;
+  OBJC++FLAGS on $(>) += $(OBJC++FLAGS) $(C++FLAGS) $(OPTIM) ;
   CCHDRS on $(<) = [ on $(<) FIncludes $(HDRS) ] ;
   CCDEFS on $(<) = [ on $(<) FDefines $(DEFINES) ] ;
 }
-RegisterFileType OC++ : .mm ;
+RegisterFileType ObjC++ : .mm .M ;
 
-actions OC++
+actions ObjC++
 {
-  $(CMD.OC++) -c -o $(<) $(OBJC++FLAGS) $(CCDEFS) $(CCHDRS) $(>)
+  $(CMD.OBJC++) -c -o $(<) $(OBJC++FLAGS) $(CCDEFS) $(CCHDRS) $(>)
 }
 }

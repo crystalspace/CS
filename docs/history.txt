@@ -31,6 +31,13 @@ The history order is reversed so that new features are at the top.
 		<attenuation c="0" l="0.1" q="0" />
 	- Eric Sunshine fixed the PrintHelp action in help.jam so that "jam
 	  help" works even on platforms which do not have a printf command.
+	- Eric Sunshine fixed inconsistencies in Jam build system which
+	  resulted in failure to compile Objective-C (and Objective-C++) source
+	  files.  Problem was inconsistent naming of variable and rules;
+	  somtimes used OCc, but other times used ObjC.  Now uses ObjC and
+	  ObjC++ uniformly (since those are the common and well understood
+	  abbreviations).  Also added .M as registered file type for
+	  Objective-C++.
 12-Apr-2003
 	- Rhad fixed a couple potential deadlock and mutex issues in
 	  the ds3d sound renderer plugin. Also fixed similar issues in

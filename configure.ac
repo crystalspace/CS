@@ -1750,11 +1750,11 @@ AC_DEFUN([_CS_CHECK_HOST_DARWIN],
 	AC_CACHE_CHECK([for Objective-C compiler], [cs_cv_prog_objc],
 	    [cs_cv_prog_objc="$CC"])
 	CS_MAKEFILE_PROPERTY([OBJC], [$cs_cv_prog_objc -c])
-	CS_JAMCONFIG_PROPERTY([CMD.OCC], [$cs_cv_prog_objc])
+	CS_JAMCONFIG_PROPERTY([CMD.OBJC], [$cs_cv_prog_objc])
 	AC_CACHE_CHECK([for Objective-C++ compiler], [cs_cv_prog_objcxx],
 	    [cs_cv_prog_objcxx="$CXX"])
 	CS_MAKEFILE_PROPERTY([OBJCXX], [$cs_cv_prog_objcxx -c])
-	CS_JAMCONFIG_PROPERTY([CMD.OC++], [$cs_cv_prog_objcxx])])])
+	CS_JAMCONFIG_PROPERTY([CMD.OBJC++], [$cs_cv_prog_objcxx])])])
 
 CS_CHECK_HOST
 
