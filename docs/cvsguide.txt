@@ -5,7 +5,7 @@ manage it's code base, there are some rules you need to keep in mind if
 you are going to be making changes of ANY sort to the CVS source tree.
 
 First of all, here's how to access the repository.  The CVSROOT is
-:pserver:anonymous@207.225.208.168:/usr/cvs
+:pserver:anonymous@216.160.239.81:/usr/cvs
 
 Once you've logged in, checkout the module "crystal" to download the
 source code to the CS directory.  See the documentation for your CVS
