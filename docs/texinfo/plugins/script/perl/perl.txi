@@ -98,16 +98,16 @@ is expected. Currently the interfaces that support this feature are
 
 @example
 package MyPerlEventHandler;
-use Exporter;
 @ISA = qw{ cspace::iEventHandler };
 sub new
 {
+  $x = {};
   bless ($x, "MyPerlEventHandler");
-  return $x = 1;
+  return $x;
 }
 sub HandleEvent
 {
-  ($self, $ev) = @_;
+  ($self, $event) = @_;
   # your event handler here...
 }
 
