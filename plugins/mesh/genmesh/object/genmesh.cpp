@@ -45,6 +45,7 @@
 #include "iutil/cache.h"
 #include "iutil/object.h"
 #include "iutil/cmdline.h"
+#include "iutil/strset.h"
 
 #include "qsqrt.h"
 
@@ -152,8 +153,11 @@ csGenmeshMeshObject::csGenmeshMeshObject (csGenmeshMeshObjectFactory* factory)
 
 #ifdef CS_USE_NEW_RENDERER
   r3d = CS_QUERY_REGISTRY (factory->object_reg, iRender3D);
+  csRef<iStringSet> strings = 
+    CS_QUERY_REGISTRY_TAG_INTERFACE (factory->object_reg, 
+    "crystalspace.renderer.stringset", iStringSet);
   shadow_index_buffer = NULL;
-  shadow_index_name = r3d->GetStringContainer ()->Request ("indices");
+  shadow_index_name = strings->Request ("indices");
 #endif
 }
 
@@ -1325,13 +1329,16 @@ csGenmeshMeshObjectFactory::csGenmeshMeshObjectFactory (iBase *pParent,
 
   r3d = CS_QUERY_REGISTRY (object_reg, iRender3D);
 
-  vertex_name = r3d->GetStringContainer ()->Request ("vertices");
-  shadow_vertex_name = r3d->GetStringContainer ()->Request ("shadow vertices");
-  texel_name = r3d->GetStringContainer ()->Request ("texture coordinates");
-  normal_name = r3d->GetStringContainer ()->Request ("normals");
-  trinormal_name = r3d->GetStringContainer ()->Request ("shadow normals");
-  color_name = r3d->GetStringContainer ()->Request ("colors");
-  index_name = r3d->GetStringContainer ()->Request ("indices");
+  csRef<iStringSet> strings = 
+    CS_QUERY_REGISTRY_TAG_INTERFACE (object_reg, 
+    "crystalspace.renderer.stringset", iStringSet);
+  vertex_name = strings->Request ("vertices");
+  shadow_vertex_name = strings->Request ("shadow vertices");
+  texel_name = strings->Request ("texture coordinates");
+  normal_name = strings->Request ("normals");
+  trinormal_name = strings->Request ("shadow normals");
+  color_name = strings->Request ("colors");
+  index_name = strings->Request ("indices");
 
   autonormals = false;
   mesh_vertices_dirty_flag = false;
@@ -2198,7 +2205,11 @@ bool csGenmeshMeshObjectFactory::AddStream (const char *name,
   csRenderBufferComponentType component_type, int component_size)
 {
   csRef<iRender3D> r3d = CS_QUERY_REGISTRY (object_reg, iRender3D);
-  anon_names.Push(r3d->GetStringContainer ()->Request (name));
+
+  csRef<iStringSet> strings = 
+    CS_QUERY_REGISTRY_TAG_INTERFACE (object_reg, 
+    "crystalspace.renderer.stringset", iStringSet);
+  anon_names.Push(strings->Request (name));
   int size = 0;
   switch (component_type)
   {
@@ -2238,8 +2249,10 @@ bool csGenmeshMeshObjectFactory::AddStream (const char *name,
 bool csGenmeshMeshObjectFactory::SetStreamComponent (const char *name,
 	int index, int component, float value)
 {
-  csRef<iRender3D> r3d = CS_QUERY_REGISTRY (object_reg, iRender3D);
-  csStringID nameid = r3d->GetStringContainer ()->Request (name);
+  csRef<iStringSet> strings = 
+    CS_QUERY_REGISTRY_TAG_INTERFACE (object_reg, 
+    "crystalspace.renderer.stringset", iStringSet);
+  csStringID nameid = strings->Request (name);
   int i;
   for (i = 0; i < anon_names.Length(); i ++)
   {
@@ -2256,8 +2269,10 @@ bool csGenmeshMeshObjectFactory::SetStreamComponent (const char *name,
 bool csGenmeshMeshObjectFactory::SetStreamComponent (const char *name,
 	int index, int component, int value)
 {
-  csRef<iRender3D> r3d = CS_QUERY_REGISTRY (object_reg, iRender3D);
-  csStringID nameid = r3d->GetStringContainer ()->Request (name);
+  csRef<iStringSet> strings = 
+    CS_QUERY_REGISTRY_TAG_INTERFACE (object_reg, 
+    "crystalspace.renderer.stringset", iStringSet);
+  csStringID nameid = strings->Request (name);
   int i;
   for (i = 0; i < anon_names.Length(); i ++)
   {
@@ -2273,8 +2288,10 @@ bool csGenmeshMeshObjectFactory::SetStreamComponent (const char *name,
 
 bool csGenmeshMeshObjectFactory::SetStream (const char *name, float *value)
 {
-  csRef<iRender3D> r3d = CS_QUERY_REGISTRY (object_reg, iRender3D);
-  csStringID nameid = r3d->GetStringContainer ()->Request (name);
+  csRef<iStringSet> strings = 
+    CS_QUERY_REGISTRY_TAG_INTERFACE (object_reg, 
+    "crystalspace.renderer.stringset", iStringSet);
+  csStringID nameid = strings->Request (name);
   int i;
   for (i = 0; i < anon_names.Length(); i ++)
   {
@@ -2290,8 +2307,10 @@ bool csGenmeshMeshObjectFactory::SetStream (const char *name, float *value)
 
 bool csGenmeshMeshObjectFactory::SetStream (const char *name, int *value)
 {
-  csRef<iRender3D> r3d = CS_QUERY_REGISTRY (object_reg, iRender3D);
-  csStringID nameid = r3d->GetStringContainer ()->Request (name);
+  csRef<iStringSet> strings = 
+    CS_QUERY_REGISTRY_TAG_INTERFACE (object_reg, 
+    "crystalspace.renderer.stringset", iStringSet);
+  csStringID nameid = strings->Request (name);
   int i;
   for (i = 0; i < anon_names.Length(); i ++)
   {
