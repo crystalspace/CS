@@ -48,6 +48,8 @@ public:
 
   DECLARE_IBASE;
 
+  bool is_double_buffered;
+
   /// Constructor does little, most initialization stuff happens in Initialize()
   csGraphics2DGLCommon (iBase *iParent);
 
@@ -116,6 +118,12 @@ public:
   virtual csImageArea *SaveArea (int x, int y, int w, int h);
   /// Restore a subarea of screen saved with SaveArea()
   virtual void RestoreArea (csImageArea *Area, bool Free = true);
+
+  /// Get the double buffer state
+  virtual bool GetDoubleBufferState () { return is_double_buffered; }
+  /// Enable or disable double buffering; returns success status
+  virtual bool DoubleBuffer (bool Enable) 
+  { is_double_buffered = Enable; return true; }
 
   //------------------------- iEventPlug interface ---------------------------//
 

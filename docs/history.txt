@@ -48,8 +48,13 @@ The history order has been reversed so that new features are at the top.
 	      items (when you switch directories).
 	    - Re-generated the color wheel bitmap to size 128x128 rather
 	      than 129x129. This leaded to small changes in code as well.
+	    - Added error reporting for OS/2 loadlib.cpp.
+	    - Some fixes for OpenGL canvases. CSWS now looks better
+	      but still bad.
 	- Increased CS version number to 0.17r001 to indicate the new
 	  release which is going to happen soon.
+	- Put back the double buffer stuff in openglcommon which Andrew
+	  removed.
 30-Aug-2000
      	- Andrew Zabolotny:
 	    - Some fixes to MazeD. Now it works, but is unusabled due to
