@@ -3,6 +3,10 @@ http://crystal.sourceforge.net/
 
 The history order is reversed so that new features are at the top.
 
+3-Max-2003
+	- Matze changed -Wno-unused-function and -Wno-unused-label flags to
+	  -Wno-unused in aws Jamfile. Seems gcc2.9x doesn't like the first 2
+	  flags.
 2-May-2003
 	- Eric Sunshine augmented jobber.pl to make it possible to associate
 	  multiple directories with a single "target" (in @TARGETS).  All of
