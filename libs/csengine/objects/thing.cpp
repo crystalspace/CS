@@ -65,6 +65,7 @@ SCF_IMPLEMENT_IBASE_EXT(csThing)
   SCF_IMPLEMENTS_EMBEDDED_INTERFACE(iObjectModel)
   SCF_IMPLEMENTS_EMBEDDED_INTERFACE(iPolygonMesh)
   SCF_IMPLEMENTS_EMBEDDED_INTERFACE(iVisibilityCuller)
+  SCF_IMPLEMENTS_EMBEDDED_INTERFACE(iShadowCaster)
   SCF_IMPLEMENTS_EMBEDDED_INTERFACE(iMeshObject)
   SCF_IMPLEMENTS_EMBEDDED_INTERFACE(iMeshObjectFactory)
 SCF_IMPLEMENT_IBASE_EXT_END
@@ -89,6 +90,10 @@ SCF_IMPLEMENT_EMBEDDED_IBASE (csThing::VisCull)
   SCF_IMPLEMENTS_INTERFACE(iVisibilityCuller)
 SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
+SCF_IMPLEMENT_EMBEDDED_IBASE (csThing::ShadowCaster)
+  SCF_IMPLEMENTS_INTERFACE(iShadowCaster)
+SCF_IMPLEMENT_EMBEDDED_IBASE_END
+
 SCF_IMPLEMENT_EMBEDDED_IBASE (csThing::MeshObject)
   SCF_IMPLEMENTS_INTERFACE(iMeshObject)
 SCF_IMPLEMENT_EMBEDDED_IBASE_END
@@ -109,6 +114,7 @@ csThing::csThing (iBase *parent) :
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiObjectModel);
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiPolygonMesh);
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiVisibilityCuller);
+  SCF_CONSTRUCT_EMBEDDED_IBASE (scfiShadowCaster);
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiMeshObject);
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiMeshObjectFactory);
   DG_TYPE (this, "csThing");
@@ -2041,7 +2047,7 @@ void *csThing::TestQueuePolygonArray (
 // shadows.
 void csThing::AppendShadows (
   iShadowBlockList *shadows,
-  csVector3 &origin)
+  const csVector3 &origin)
 {
   iShadowBlock *list = shadows->NewShadowBlock (
       polygons.Length ());

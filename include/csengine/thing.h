@@ -33,6 +33,7 @@
 #include "iengine/viscull.h"
 #include "iengine/mesh.h"
 #include "iengine/rview.h"
+#include "iengine/shadcast.h"
 #include "imesh/thing/thing.h"
 #include "imesh/object.h"
 #include "imesh/lighting.h"
@@ -913,13 +914,10 @@ public:
   void CheckFrustum (iFrustumView* lview, iMovable* movable);
 
   /**
-   * Return a list of shadow frustums which extend from
+   * Append a list of shadow frustums which extend from
    * this thing. The origin is the position of the light.
-   * Note that this function uses camera space coordinates and
-   * thus assumes that this thing is transformed to the
-   * origin of the light.
    */
-  void AppendShadows (iShadowBlockList* shadows, csVector3& origin);
+  void AppendShadows (iShadowBlockList* shadows, const csVector3& origin);
 
   //----------------------------------------------------------------------
   // Transformation
@@ -1208,6 +1206,17 @@ public:
     }
   } scfiVisibilityCuller;
   friend struct VisCull;
+
+  //-------------------- iShadowCaster interface implementation ----------
+  struct ShadowCaster : public iShadowCaster
+  {
+    SCF_DECLARE_EMBEDDED_IBASE (csThing);
+    virtual void AppendShadows (iShadowBlockList* shadows, const csVector3& origin)
+    {
+      scfParent->AppendShadows (shadows, origin);
+    }
+  } scfiShadowCaster;
+  friend struct ShadowCaster;
 
   //------------------------- iObjectModel implementation ----------------
   class ObjectModel : public iObjectModel

@@ -137,7 +137,7 @@ private:
 
 public:
   /// Create a new empty list.
-  csShadowBlock (uint32 region = -1, int max_shadows = 30,
+  csShadowBlock (uint32 region = (uint32)~0, int max_shadows = 30,
   	int delta = 30);
 
   /// Destroy the list and release all shadow references.

@@ -1011,26 +1011,18 @@ void csSector::RealCheckFrustum (iFrustumView *lview)
       for (i = 0; i < num_visible_objects; i++)
       {
         // @@@ unify with other mesh objects as soon as possible
-        // @@@ Also use shadow caster interface to append shadows!
         csObject *o = visible_objects[i];
         csMeshWrapper *mesh = (csMeshWrapper *)o;
 
-        // @@@ should not be known in engine.
-        // @@@ UGLY
-        iThingState *ithing = SCF_QUERY_INTERFACE_FAST (
+        iShadowCaster *shadcast = SCF_QUERY_INTERFACE_FAST (
             mesh->GetMeshObject (),
-            iThingState);
-        if (ithing)
+            iShadowCaster);
+        if (shadcast)
         {
-          csThing *sp = (csThing *) (ithing->GetPrivateObject ());
-
           // Only if the thing has right flags do we consider it for shadows.
           if (lview->CheckShadowMask (mesh->flags.Get ()))
-            sp->AppendShadows (
-                &(mesh->GetMovable ().scfiMovable),
-                shadows,
-                center);
-          ithing->DecRef ();
+            shadcast->AppendShadows (shadows, center);
+          shadcast->DecRef ();
         }
       }
     }
