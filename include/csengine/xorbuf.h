@@ -21,9 +21,11 @@
 
 #include "csgeom/vector2.h"
 #include "csgeom/math2d.h"
+#include "iutil/dbghelp.h"
 
 struct iGraphics2D;
 struct iGraphics3D;
+class csString;
 
 /**
  * A 2D bounding box with integer coordinates.
@@ -41,7 +43,7 @@ public:
  * arranged in rows. For example, a 128x128 bitmap is represented
  * by 4 rows of 128 ints. Every int represents a column of 32 pixels.
  */
-class csXORBuffer
+class csXORBuffer : public iBase
 {
 private:
   int width, height;
@@ -51,44 +53,24 @@ private:
   int bufsize;
   uint32* scr_buffer;	// The total screen buffer.
   uint32* buffer;	// The buffer for a single polygon.
-  bool debug_mode;
   int* partcols;	// For every row the number of partial columns.
 
-  /**
-   * Draw a single debug line (used by DrawPolygonDebug).
-   */
-  void Debug_DrawLine (iGraphics2D* g2d, float x1, float y1, float x2, float y2,
-  	int col, float l, int zoom);
-
-public:
-  /// Create a new XOR buffer with the given dimensions.
-  csXORBuffer (int w, int h);
-  /// Destroy the XOR buffer.
-  ~csXORBuffer ();
+  bool Debug_ExtensiveTest (int num_iterations, csVector2* verts,
+  	int& num_verts);
+  bool Debug_TestOneIteration (csString& str);
 
   /**
    * Initialize the XOR polygon buffer to empty.
-   * This function is normally not called by user code.
    */
   void InitializePolygonBuffer ();
 
   /**
    * Initialize the XOR polygon buffer to empty.
-   * This function is normally not called by user code.
    */
   void InitializePolygonBuffer (const csBox2Int& bbox);
 
-  /// Initialize the XOR buffer to empty.
-  void Initialize ();
-
-  /// Set debug mode on/off.
-  void SetDebugMode (bool db) { debug_mode = db; }
-  /// Get debug mode.
-  bool IsDebugMode () const { return debug_mode; }
-
   /**
    * Draw a left-side line on the XOR buffer.
-   * This function is normally not called by user code.
    * Normally a line is rendered upto but NOT including x2,y2 (i.e. the
    * scanline at y2 is ignored). With yfurther==1 you can go to y2. This
    * is useful for the lowest lines.
@@ -97,7 +79,6 @@ public:
 
   /**
    * Draw a right-side line on the XOR buffer.
-   * This function is normally not called by user code.
    * Normally a line is rendered upto but NOT including x2,y2 (i.e. the
    * scanline at y2 is ignored). With yfurther==1 you can go to y2. This
    * is useful for the lowest lines.
@@ -108,12 +89,31 @@ public:
    * Draw a polygon on the XOR buffer.
    * This function will not do any backface culling and it will work
    * perfectly in all orientations. Polygon has to be convex.
-   * This function is normally not called by user code.
    * The optional 'shift' parameter indicates how many pixels the
    * polygon will be extended horizontally.
+   * Returns false if polygon is outside screen.
    */
-  void DrawPolygon (csVector2* verts, int num_verts, csBox2Int& bbox,
+  bool DrawPolygon (csVector2* verts, int num_verts, csBox2Int& bbox,
   	int shift = 0);
+
+  /**
+   * Do a XOR sweep on the entire buffer.
+   */
+  void XORSweep ();
+
+public:
+  /// Create a new XOR buffer with the given dimensions.
+  csXORBuffer (int w, int h);
+  /// Destroy the XOR buffer.
+  virtual ~csXORBuffer ();
+
+  /// Setup XOR buffer for given size.
+  void Setup (int w, int h);
+
+  SCF_DECLARE_IBASE;
+
+  /// Initialize the XOR buffer to empty.
+  void Initialize ();
 
   /**
    * Insert a polygon in the XOR buffer.
@@ -138,55 +138,49 @@ public:
   bool TestPolygon (csVector2* verts, int num_verts);
 
   /**
-   * Do a XOR sweep on the entire buffer.
-   * This function is normally not called by user code.
-   */
-  void XORSweep ();
-
-  /**
    * Return true if entire screen buffer is full.
    */
   bool IsFull ();
 
-  /**
-   * Do a graphical dump of the XOR buffer contents on screen.
-   */
-  void Debug_Dump (iGraphics2D* g2d, iGraphics3D* g3d, int zoom = 1);
+  // Debugging functions.
+  iString* Debug_UnitTest ();
+  csTicks Debug_Benchmark (int num_iterations);
+  void Debug_Dump (iGraphics3D* g3d, int zoom = 1);
 
-  /**
-   * Do a graphical dump of the XOR screen buffer contents on screen.
-   */
-  void Debug_DumpScr (iGraphics2D* g2d, iGraphics3D* g3d, int zoom = 1);
-
-  /**
-   * Draw a polygon on g2d for debugging purposes.
-   * Usually called after GfxDump() to match the xor'ed polygon
-   * with the real polygon.
-   */
-  void Debug_DrawPolygon (iGraphics2D* g2d, iGraphics3D* g3d,
-  	csVector2* verts, int num_verts, int zoom = 1);
-
-  /**
-   * This is a special test routine that just runs a
-   * specified number of iterations and tries to find illegal
-   * renderings. It works by rendering random polygons on the
-   * XOR buffer and testing if a fill produces pixels at the
-   * last column. This should never happen. If there was an
-   * error before the iterations were finished this function will
-   * return false and put the offending polygon in 'verts/num_verts'.
-   * 'verts' should point to an array of vectors with at least room
-   * for 6 vertices.
-   */
-  bool Debug_ExtensiveTest (int num_iterations, csVector2* verts,
-  	int& num_verts);
-
-  /**
-   * This test routine will do an extensive unit test of the XOR
-   * buffer. It will return false if there was an error. Some details
-   * about error will be put on standard output. It will also time the
-   * execution so you can use it for benchmarking too.
-   */
-  static bool Debug_UnitTest (int num_iterations = 1);
+  struct DebugHelper : public iDebugHelper
+  {
+    SCF_DECLARE_EMBEDDED_IBASE (csXORBuffer);
+    virtual int GetSupportedTests () const
+    {
+      return CS_DBGHELP_UNITTTEST |
+      	     CS_DBGHELP_BENCHMARK |
+	     CS_DBGHELP_GFXDUMP;
+    }
+    virtual iString* UnitTest ()
+    {
+      return scfParent->Debug_UnitTest ();
+    }
+    virtual iString* StateTest ()
+    {
+      return NULL;
+    }
+    virtual csTicks Benchmark (int num_iterations)
+    {
+      return scfParent->Debug_Benchmark (num_iterations);
+    }
+    virtual iString* Dump ()
+    {
+      return NULL;
+    }
+    virtual void Dump (iGraphics3D* g3d)
+    {
+      scfParent->Debug_Dump (g3d, 1);
+    }
+    virtual bool DebugCommand (const char*)
+    {
+      return false;
+    }
+  } scfiDebugHelper;
 };
 
 #endif // __CS_XORBUF_H__

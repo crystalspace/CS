@@ -1,5 +1,39 @@
 The history order is reversed so that new features are at the top.
 
+30-Apr-2002
+	- Added a new iDebugHelper interface in iutil. This interface defines
+	  a consistant interface for debugging CS modules. It has the following
+	  features (all features are optional so some module doesn't have
+	  to implement them all):
+	    - Unit testing: this is basically an extensive test of the module
+	      to ensure it is working properly.
+	    - State testing: this is a consistency check that can be used
+	      at run-time to ensure the current state of the object is
+	      consistent.
+	    - Benchmark: runs a benchmark for this module.
+	    - Text dump: allows for a text-based dump of the internal
+	      state of the object.
+	    - Graphical dump: allows for a single-frame graphical dump
+	      of the internal state of the object.
+	    - Sending specific debug commands to a module. This way a
+	      module can implement additional commands (string based) to
+	      enable or otherwise perform additional debugging operations.
+	- Implemented iDebugHelper in csXORBuffer. The debug helper of
+	  csXORBuffer implements unit testing, benchmarking, and
+	  graphical dump.
+	- Cleaned up the unittest application a bit. It also uses the
+	  new iDebugHelper interface now.
+	- The unit tester is already useful. It showed a bug with certain
+	  kinds of polygons in the XOR buffer. Fixed now.
+	- Fixed a crash bug in the XOR buffer with polygons that are
+	  completely out of bounds of the buffer.
+	- Modified the engine to implement iDebugHelper and removed
+	  the ad-hoc iEngine::DebugCommand(). The debug helper of the engine
+	  currently only supports DebugCommand() though.
+	- Fixed BugPlug for the DebugCommand() change in the engine.
+	- Added new 'enginestate' command to BugPlug. This will call the
+	  iDebugHelper::StateTest() function of the engine and report
+	  the results. Assigned shift-e to this command by default.
 29-Apr-2002
 	- Eric Sunshine renamed OSXDelegate2D_CGBLit.h to
 	  OSXDelegate2D_CGBlit.h (notice the case distinction) so that #include

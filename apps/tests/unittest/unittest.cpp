@@ -22,6 +22,7 @@
 #include "unittest.h"
 #include "csengine/engine.h"
 #include "csengine/xorbuf.h"
+#include "iutil/string.h"
 
 //------------------------------------------------- We need the 3D engine -----
 
@@ -42,6 +43,37 @@ UnitTest::~UnitTest ()
 {
 }
 
+static void Test (iBase* obj, const char* name)
+{
+  iDebugHelper* dbghelp = SCF_QUERY_INTERFACE (obj, iDebugHelper);
+  if (dbghelp)
+  {
+    iString* str = dbghelp->UnitTest ();
+    if (str)
+    {
+      printf ("%s unit testing failed!\n", name);
+      printf ("%s\n", str->GetData ());
+      str->DecRef ();
+    }
+    else
+    {
+      printf ("%s unit testing succeeded!\n", name);
+    }
+    dbghelp->DecRef ();
+  }
+}
+
+static void Benchmark (iBase* obj, const char* name)
+{
+  iDebugHelper* dbghelp = SCF_QUERY_INTERFACE (obj, iDebugHelper);
+  if (dbghelp)
+  {
+    csTicks t = dbghelp->Benchmark (10000);
+    printf ("Benchmarking %s: %d ms\n", name, t);
+    dbghelp->DecRef ();
+  }
+}
+
 /*---------------------------------------------------------------------*
  * Main function
  *---------------------------------------------------------------------*/
@@ -50,8 +82,10 @@ int main (int argc, char* argv[])
   // Initialize the random number generator
   srand (time (NULL));
 
-  bool rc = csXORBuffer::Debug_UnitTest (10000);
-  printf ("csXORBuffer unit testing %s\n", rc ? "succeeded." : "failed!");
+  csXORBuffer* buf = new csXORBuffer (640, 480);
+  Test (buf, "csXORBuffer");
+  //Benchmark (buf, "csXORBuffer");
+  delete buf;
 
   return 0;
 }

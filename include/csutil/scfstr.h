@@ -50,6 +50,12 @@ public:
   /// Destroy a scfString object
   virtual ~scfString () {}
 
+  /// Get the pointer to the internal csString.
+  const csString& GetCsString () const { return s; }
+
+  /// Get the pointer to the internal csString.
+  csString& GetCsString () { return s; }
+
   /// Set string capacity to NewSize characters (plus one for ending NULL)
   virtual void SetCapacity (size_t NewSize);
 

@@ -33,6 +33,7 @@
 #include "csutil/debug.h"
 #include "iutil/plugin.h"
 #include "iutil/vfs.h"
+#include "iutil/string.h"
 #include "iutil/event.h"
 #include "ivideo/graph3d.h"
 #include "ivideo/graph2d.h"
@@ -55,6 +56,7 @@
 #include "iutil/comp.h"
 #include "iutil/eventq.h"
 #include "iutil/objreg.h"
+#include "iutil/dbghelp.h"
 #include "qint.h"
 
 CS_IMPLEMENT_PLUGIN
@@ -503,8 +505,56 @@ bool csBugPlug::EatKey (iEvent& event)
 	csDebuggingGraph::Dump (object_reg);
         break;
       case DEBUGCMD_ENGINECMD:
-        Report (CS_REPORTER_SEVERITY_NOTIFY, "Engine command: %s", args);
-	Engine->DebugCommand (args);
+	{
+	  iDebugHelper* dbghelp = SCF_QUERY_INTERFACE (Engine, iDebugHelper);
+	  if (dbghelp)
+	  {
+	    if (dbghelp->DebugCommand (args))
+	    {
+              Report (CS_REPORTER_SEVERITY_NOTIFY,
+	        "Engine command '%s' performed.", args);
+	    }
+	    else
+	    {
+              Report (CS_REPORTER_SEVERITY_NOTIFY,
+	        "Engine command '%s' not supported!", args);
+	    }
+	    dbghelp->DecRef ();
+	  }
+	}
+        break;
+      case DEBUGCMD_ENGINESTATE:
+	{
+	  iDebugHelper* dbghelp = SCF_QUERY_INTERFACE (Engine, iDebugHelper);
+	  if (dbghelp)
+	  {
+	    if (dbghelp->GetSupportedTests () & CS_DBGHELP_STATETEST)
+	    {
+	      iString* rc = dbghelp->StateTest ();
+	      if (rc)
+	      {
+                Report (CS_REPORTER_SEVERITY_NOTIFY,
+	          "Engine StateTest() failed:");
+                Report (CS_REPORTER_SEVERITY_DEBUG,
+	          "Engine StateTest() failed:");
+                Report (CS_REPORTER_SEVERITY_DEBUG,
+		  rc->GetData ());
+	        rc->DecRef ();
+	      }
+	      else
+	      {
+                Report (CS_REPORTER_SEVERITY_NOTIFY,
+	          "Engine StateTest() succeeded!");
+	      }
+	    }
+	    else
+	    {
+              Report (CS_REPORTER_SEVERITY_NOTIFY,
+	        "Engine doesn't support StateTest()!");
+	    }
+	    dbghelp->DecRef ();
+	  }
+	}
         break;
       case DEBUGCMD_HELP:
         Report (CS_REPORTER_SEVERITY_NOTIFY, "Sorry, cannot help you yet.");
@@ -920,6 +970,7 @@ int csBugPlug::GetCommandCode (const char* cmd, char* args)
   if (!strcmp (cmd, "meshrad"))		return DEBUGCMD_MESHRAD;
   if (!strcmp (cmd, "debuggraph"))	return DEBUGCMD_DEBUGGRAPH;
   if (!strcmp (cmd, "enginecmd"))	return DEBUGCMD_ENGINECMD;
+  if (!strcmp (cmd, "enginestate"))	return DEBUGCMD_ENGINESTATE;
 
   return DEBUGCMD_UNKNOWN;
 }

@@ -780,10 +780,15 @@ SCF_IMPLEMENT_IBASE(csEngine)
   SCF_IMPLEMENTS_EMBEDDED_INTERFACE(iComponent)
   SCF_IMPLEMENTS_EMBEDDED_INTERFACE(iConfig)
   SCF_IMPLEMENTS_EMBEDDED_INTERFACE(iObject)
+  SCF_IMPLEMENTS_EMBEDDED_INTERFACE(iDebugHelper)
 SCF_IMPLEMENT_IBASE_END
 
 SCF_IMPLEMENT_EMBEDDED_IBASE (csEngine::eiComponent)
   SCF_IMPLEMENTS_INTERFACE(iComponent)
+SCF_IMPLEMENT_EMBEDDED_IBASE_END
+
+SCF_IMPLEMENT_EMBEDDED_IBASE (csEngine::DebugHelper)
+  SCF_IMPLEMENTS_INTERFACE(iDebugHelper)
 SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 SCF_IMPLEMENT_EMBEDDED_IBASE
@@ -812,6 +817,7 @@ csEngine::csEngine (iBase *iParent) :
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiComponent);
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiConfig);
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiObject);
+  SCF_CONSTRUCT_EMBEDDED_IBASE (scfiDebugHelper);
   DG_TYPE (&scfiObject, "csEngine");
   engine_mode = CS_ENGINE_AUTODETECT;
   first_dyn_lights = NULL;
@@ -3119,7 +3125,7 @@ void csEngine::GetAmbientLight (csColor &c) const
   c.blue = csLight::ambient_blue / 255.0f;
 }
 
-void csEngine::DebugCommand (const char* cmd)
+bool csEngine::DebugCommand (const char* cmd)
 {
   if (!strcasecmp (cmd, "toggle_xorbuf"))
   {
@@ -3129,6 +3135,7 @@ void csEngine::DebugCommand (const char* cmd)
     else
       Report ("Engine is using c-buffer.");
     InitCuller ();
+    return true;
   }
   else if (!strcasecmp (cmd, "toggle_cullstat"))
   {
@@ -3142,7 +3149,9 @@ void csEngine::DebugCommand (const char* cmd)
 #   else
     Report ("toggle_cullstat is only available in debug mode!");
 #   endif
+    return true;
   }
+  return false;
 }
 
 //-------------------End-Multi-Context-Support--------------------------------

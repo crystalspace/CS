@@ -95,6 +95,7 @@ class csShadow;
 #define DEBUGCMD_MESHRAD	1023	// How RADIUS of selected mesh
 #define DEBUGCMD_DEBUGGRAPH	1024	// Do a dump of the debug graph
 #define DEBUGCMD_ENGINECMD	1025	// General engine DebugCommand() (arg)
+#define DEBUGCMD_ENGINESTATE	1026	// Test engine state.
 
 /**
  * For key mappings.

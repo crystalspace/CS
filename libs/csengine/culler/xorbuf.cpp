@@ -17,6 +17,8 @@
 */
 #include "cssysdef.h"
 #include "cssys/sysfunc.h"
+#include "csutil/scfstr.h"
+#include "iutil/string.h"
 #include "qint.h"
 #include "qsqrt.h"
 #include "csgeom/math3d.h"
@@ -27,8 +29,39 @@
 
 //---------------------------------------------------------------------------
 
+SCF_IMPLEMENT_IBASE (csXORBuffer)
+  SCF_IMPLEMENTS_EMBEDDED_INTERFACE(iDebugHelper)
+SCF_IMPLEMENT_IBASE_END
+
+SCF_IMPLEMENT_EMBEDDED_IBASE (csXORBuffer::DebugHelper)
+  SCF_IMPLEMENTS_INTERFACE(iDebugHelper)
+SCF_IMPLEMENT_EMBEDDED_IBASE_END
+
 csXORBuffer::csXORBuffer (int w, int h)
 {
+  SCF_CONSTRUCT_IBASE (NULL);
+  SCF_CONSTRUCT_EMBEDDED_IBASE (scfiDebugHelper);
+
+  buffer = NULL;
+  scr_buffer = NULL;
+  partcols = NULL;
+
+  Setup (w, h);
+}
+
+csXORBuffer::~csXORBuffer ()
+{
+  delete[] buffer;
+  delete[] scr_buffer;
+  delete[] partcols;
+}
+
+void csXORBuffer::Setup (int w, int h)
+{
+  delete[] buffer;
+  delete[] scr_buffer;
+  delete[] partcols;
+
   width = w;
   height = h;
   numrows = (h+31)/32;
@@ -42,21 +75,10 @@ csXORBuffer::csXORBuffer (int w, int h)
   }
 
   bufsize = width_po2 * numrows;
-  printf ("width=%d height=%d width_po2=%d w_shift=%d bufsize=%d numrows=%d\n",
-  width, height, width_po2, w_shift, bufsize, numrows); fflush (stdout);
 
   buffer = new uint32[bufsize];
   scr_buffer = new uint32[bufsize];
   partcols = new int[numrows];
-
-  debug_mode = false;
-}
-
-csXORBuffer::~csXORBuffer ()
-{
-  delete[] buffer;
-  delete[] scr_buffer;
-  delete[] partcols;
 }
 
 void csXORBuffer::InitializePolygonBuffer ()
@@ -391,7 +413,7 @@ void csXORBuffer::DrawRightLine (int x1, int y1, int x2, int y2, int yfurther)
   }
 }
 
-void csXORBuffer::DrawPolygon (csVector2* verts, int num_verts,
+bool csXORBuffer::DrawPolygon (csVector2* verts, int num_verts,
 	csBox2Int& bbox, int shift)
 {
   int i, j;
@@ -429,6 +451,11 @@ void csXORBuffer::DrawPolygon (csVector2* verts, int num_verts,
     }
   }
 
+  if (bbox.maxx <= 0) return false;
+  if (bbox.maxy <= 0) return false;
+  if (bbox.minx >= width) return false;
+  if (bbox.miny >= height) return false;
+
   InitializePolygonBuffer (bbox);
 
   //---------
@@ -454,13 +481,8 @@ void csXORBuffer::DrawPolygon (csVector2* verts, int num_verts,
   {
     if (ya[i] != ya[j])
     {
-      if (debug_mode)
-      {
-        printf ("R{%d,%d} (%d,%d) - (%d,%d)\n",
-	  i, j, xa[i], ya[i], xa[j], ya[j]);
-      }
       DrawRightLine (xa[i]+shift, ya[i], xa[j]+shift, ya[j],
-      	j == bot_vt ? 1 : 0);
+      	ya[j] == bbox.maxy ? 1 : 0);
     }
     i = j;
     j = (j+num_verts+dir)%num_verts;
@@ -477,17 +499,13 @@ void csXORBuffer::DrawPolygon (csVector2* verts, int num_verts,
   {
     if (ya[i] != ya[j])
     {
-      if (debug_mode)
-      {
-        printf ("L{%d,%d} (%d,%d) - (%d,%d)\n",
-	  i, j, xa[i], ya[i], xa[j], ya[j]);
-      }
       DrawLeftLine (xa[i]-shift, ya[i], xa[j]-shift, ya[j],
-      	j == bot_vt ? 1 : 0);
+      	ya[j] == bbox.maxy ? 1 : 0);
     }
     i = j;
     j = (j+num_verts+dir)%num_verts;
   }
+  return true;
 }
 
 void csXORBuffer::XORSweep ()
@@ -502,7 +520,6 @@ void csXORBuffer::XORSweep ()
     {
       first ^= *buf;
       *buf++ = first;
-      // @@@ Optimize to stop when 'first' becomes 0 again after being non-null.
     }
   }
 }
@@ -510,7 +527,8 @@ void csXORBuffer::XORSweep ()
 bool csXORBuffer::InsertPolygon (csVector2* verts, int num_verts, bool negative)
 {
   csBox2Int bbox;
-  DrawPolygon (verts, num_verts, bbox, 1);
+  if (!DrawPolygon (verts, num_verts, bbox, 1))
+    return false;
 
   // In this routine we render the polygon to the polygon buffer
   // and then we simulate (but don't actually perform for optimization
@@ -581,7 +599,8 @@ bool csXORBuffer::InsertPolygon (csVector2* verts, int num_verts, bool negative)
 bool csXORBuffer::TestPolygon (csVector2* verts, int num_verts)
 {
   csBox2Int bbox;
-  DrawPolygon (verts, num_verts, bbox, 0);
+  if (!DrawPolygon (verts, num_verts, bbox, 0))
+    return false;
 
   int i, x;
   uint32* buf;
@@ -646,30 +665,9 @@ static void DrawZoomedPixel (iGraphics2D* g2d, int x, int y, int col, int zoom)
   }
 }
 
-void csXORBuffer::Debug_Dump (iGraphics2D* g2d, iGraphics3D* g3d, int zoom)
-{
-  iTextureManager *txtmgr = g3d->GetTextureManager ();
-  int col = txtmgr->FindRGB (200, 200, 200);
-  int x, y, i;
-  for (i = 0 ; i < numrows ; i++)
-  {
-    uint32* row = &buffer[i<<w_shift];
-    for (x = 0 ; x < width ; x++)
-    {
-      uint32 c = *row++;
-      int yy = i*32;
-      for (y = 0 ; y < 32 ; y++)
-      {
-        DrawZoomedPixel (g2d, x, yy, (c & 1) ? col : 0, zoom);
-	c = c >> 1;
-	yy++;
-      }
-    }
-  }
-}
-
-void csXORBuffer::Debug_DumpScr (iGraphics2D* g2d, iGraphics3D* g3d, int zoom)
-{
+void csXORBuffer::Debug_Dump (iGraphics3D* g3d, int zoom)
+{ 
+  iGraphics2D* g2d = g3d->GetDriver2D ();
   iTextureManager *txtmgr = g3d->GetTextureManager ();
   int col = txtmgr->FindRGB (200, 200, 200);
   int x, y, i;
@@ -687,37 +685,6 @@ void csXORBuffer::Debug_DumpScr (iGraphics2D* g2d, iGraphics3D* g3d, int zoom)
 	yy++;
       }
     }
-  }
-}
-
-void csXORBuffer::Debug_DrawLine (iGraphics2D* g2d,
-	float x1, float y1, float x2, float y2, int col, float l,
-	int zoom)
-{
-  int i;
-  int il = QInt (l);
-  for (i = 0 ; i <= il ; i++)
-  {
-    float x = x1 + float (i) * (x2-x1) / l;
-    float y = y1 + float (i) * (y2-y1) / l;
-    DrawZoomedPixel (g2d, QInt (x), QInt (y), col, zoom);
-  }
-}
-
-void csXORBuffer::Debug_DrawPolygon (iGraphics2D* g2d, iGraphics3D* g3d,
-	csVector2* verts, int num_verts, int zoom)
-{
-  iTextureManager *txtmgr = g3d->GetTextureManager ();
-  int col = txtmgr->FindRGB (255, 0, 255);
-  int i;
-  for (i = 0 ; i < num_verts ; i++)
-  {
-    int j = (i+1) % num_verts;
-    float dx = verts[j].x - verts[i].x;
-    float dy = verts[j].y - verts[i].y;
-    float l = dx*dx + dy*dy;
-    Debug_DrawLine (g2d, verts[i].x, verts[i].y,
-    	verts[j].x, verts[j].y, col, qsqrt (l), zoom);
   }
 }
 
@@ -745,6 +712,7 @@ bool csXORBuffer::Debug_ExtensiveTest (int num_iterations, csVector2* verts,
 	break;
     }
     csBox2Int bbox;
+    InitializePolygonBuffer ();
     DrawPolygon (verts, num_verts, bbox);
     XORSweep ();
 
@@ -761,145 +729,181 @@ bool csXORBuffer::Debug_ExtensiveTest (int num_iterations, csVector2* verts,
 #define XOR_ASSERT(test,msg) \
   if (!(test)) \
   { \
-    printf ("XOR_ASSERT(%d,%s): %s\n", int(__LINE__), #msg, #test); \
-    fflush (stdout); \
+    str.Format ("csXORBuffer failure (%d,%s): %s\n", int(__LINE__), \
+    	#msg, #test); \
     return false; \
   }
 
-bool csXORBuffer::Debug_UnitTest (int num_iterations)
+bool csXORBuffer::Debug_TestOneIteration (csString& str)
 {
-  csXORBuffer* b = new csXORBuffer (640, 480);
   csVector2 poly[6];
+  Initialize ();
+  poly[0].Set (5, 5);
+  poly[1].Set (635, 5);
+  poly[2].Set (635, 475);
+  poly[3].Set (5, 475);
+  XOR_ASSERT (InsertPolygon (poly, 4, true) == true, neg);
+  poly[0].Set (-100, -100);
+  poly[1].Set (7, 7);
+  poly[2].Set (-100, -40);
+  XOR_ASSERT (TestPolygon (poly, 3) == true, t1);
+  poly[0].Set (1, 1);
+  poly[1].Set (3, 1);
+  poly[2].Set (2, 3);
+  XOR_ASSERT (TestPolygon (poly, 3) == false, t2);
+  poly[0].Set (633, 472);
+  poly[1].Set (638, 475);
+  poly[2].Set (635, 478);
+  XOR_ASSERT (TestPolygon (poly, 3) == true, t3);
+  poly[0].Set (100, 100);
+  poly[1].Set (150, 101);
+  poly[2].Set (150, 101);
+  poly[3].Set (100, 105);
+  XOR_ASSERT (TestPolygon (poly, 4) == true, t4);
+  poly[0].Set (100, 0);
+  poly[1].Set (150, 1);
+  poly[2].Set (150, 1);
+  poly[3].Set (100, 4);
+  XOR_ASSERT (TestPolygon (poly, 4) == false, t5);
+  poly[0].Set (160, 120);
+  poly[1].Set (80, 240);
+  poly[2].Set (160, 360);
+  poly[3].Set (240, 240);
+  XOR_ASSERT (InsertPolygon (poly, 4) == true, i6);
+  poly[0].Set (240, 120);
+  poly[1].Set (320, 240);
+  poly[2].Set (240, 360);
+  poly[3].Set (160, 240);
+  XOR_ASSERT (InsertPolygon (poly, 4) == true, i7);
+  poly[0].Set (330, 240);
+  poly[1].Set (340, 241);
+  poly[2].Set (339, 249);
+  poly[3].Set (331, 248);
+  XOR_ASSERT (TestPolygon (poly, 4) == true, t8);
+  poly[0].Set (150, 230);
+  poly[1].Set (250, 230);
+  poly[2].Set (250, 250);
+  poly[3].Set (150, 250);
+  XOR_ASSERT (InsertPolygon (poly, 4) == false, i9);
+  poly[0].Set (160, 120);
+  poly[1].Set (240, 120);
+  poly[2].Set (320, 240);
+  poly[3].Set (240, 360);
+  poly[4].Set (160, 360);
+  XOR_ASSERT (InsertPolygon (poly, 5) == true, i10);
+  poly[0].Set (330, 240);
+  poly[1].Set (340, 241);
+  poly[2].Set (339, 249);
+  poly[3].Set (331, 248);
+  XOR_ASSERT (TestPolygon (poly, 4) == true, t11);
+  poly[0].Set (400, -200);
+  poly[1].Set (410, -200);
+  poly[2].Set (410, 1000);
+  poly[3].Set (400, 1000);
+  XOR_ASSERT (InsertPolygon (poly, 4) == true, i12);
+  poly[0].Set (420, -200);
+  poly[1].Set (430, -200);
+  poly[2].Set (430, 1000);
+  poly[3].Set (420, 1000);
+  XOR_ASSERT (InsertPolygon (poly, 4) == true, i13);
+  poly[0].Set (410, -200);
+  poly[1].Set (420, -200);
+  poly[2].Set (420, 1000);
+  poly[3].Set (410, 1000);
+  XOR_ASSERT (TestPolygon (poly, 4) == true, t14);
+  poly[0].Set (410, -200);
+  poly[1].Set (420, -200);
+  poly[2].Set (420, 1000);
+  poly[3].Set (410, 1000);
+  XOR_ASSERT (InsertPolygon (poly, 4) == true, i15);
+  poly[0].Set (410, -200);
+  poly[1].Set (420, -200);
+  poly[2].Set (420, 1000);
+  poly[3].Set (410, 1000);
+  XOR_ASSERT (TestPolygon (poly, 4) == false, t16);
+  XOR_ASSERT (IsFull () == false, f17);
+  poly[0].Set (-10000, -10000);
+  poly[1].Set (10000, -10000);
+  poly[2].Set (10000, 10000);
+  poly[3].Set (-100000, 10000);
+  XOR_ASSERT (TestPolygon (poly, 4) == true, t17);
+  poly[0].Set (0, 0);
+  poly[1].Set (640, 0);
+  poly[2].Set (640, 120);
+  poly[3].Set (0, 120);
+  XOR_ASSERT (InsertPolygon (poly, 4) == true, i18);
+  poly[0].Set (0, 120);
+  poly[1].Set (640, 120);
+  poly[2].Set (640, 240);
+  poly[3].Set (0, 240);
+  XOR_ASSERT (InsertPolygon (poly, 4) == true, i19);
+  poly[0].Set (0, 240);
+  poly[1].Set (640, 240);
+  poly[2].Set (640, 360);
+  poly[3].Set (0, 360);
+  XOR_ASSERT (InsertPolygon (poly, 4) == true, i20);
+  XOR_ASSERT (IsFull () == false, f21);
+  poly[0].Set (0, 360);
+  poly[1].Set (640, 360);
+  poly[2].Set (640, 480);
+  poly[3].Set (0, 480);
+  XOR_ASSERT (InsertPolygon (poly, 4) == true, i22);
+  XOR_ASSERT (IsFull () == true, f23);
+  poly[0].Set (-10000, -10000);
+  poly[1].Set (10000, -10000);
+  poly[2].Set (10000, 10000);
+  poly[3].Set (-100000, 10000);
+  XOR_ASSERT (TestPolygon (poly, 4) == false, t24);
+  poly[0].Set (330, 240);
+  poly[1].Set (340, 241);
+  poly[2].Set (339, 249);
+  poly[3].Set (331, 248);
+  XOR_ASSERT (TestPolygon (poly, 4) == false, t25);
+  return true;
+}
+
+iString* csXORBuffer::Debug_UnitTest ()
+{
+  Setup (640, 480);
+
+  scfString* rc = new scfString ();
+  if (!Debug_TestOneIteration (rc->GetCsString ()))
+  {
+    return rc;
+  }
+
+  csVector2 verts[6];
+  int num_verts;
+  if (!Debug_ExtensiveTest (10000, verts, num_verts))
+  {
+    rc->GetCsString ().Append ("csXORBuffer failure:\n");
+    csString sub;
+    int i;
+    for (i = 0 ; i < num_verts ; i++)
+    {
+      sub.Format ("  (%g,%g)\n", verts[i].x, verts[i].y);
+      rc->GetCsString ().Append (sub);
+    }
+    return rc;
+  }
+
+  rc->DecRef ();
+  return NULL;
+}
+
+csTicks csXORBuffer::Debug_Benchmark (int num_iterations)
+{
+  Setup (640, 480);
+
   csTicks start = csGetTicks ();
+  scfString* rc = new scfString ();
   int i;
   for (i = 0 ; i < num_iterations ; i++)
   {
-    b->Initialize ();
-    poly[0].Set (5, 5);
-    poly[1].Set (635, 5);
-    poly[2].Set (635, 475);
-    poly[3].Set (5, 475);
-    XOR_ASSERT (b->InsertPolygon (poly, 4, true) == true, neg);
-    poly[0].Set (-100, -100);
-    poly[1].Set (7, 7);
-    poly[2].Set (-100, -40);
-    XOR_ASSERT (b->TestPolygon (poly, 3) == true, t1);
-    poly[0].Set (1, 1);
-    poly[1].Set (3, 1);
-    poly[2].Set (2, 3);
-    XOR_ASSERT (b->TestPolygon (poly, 3) == false, t2);
-    poly[0].Set (633, 472);
-    poly[1].Set (638, 475);
-    poly[2].Set (635, 478);
-    XOR_ASSERT (b->TestPolygon (poly, 3) == true, t3);
-    poly[0].Set (100, 100);
-    poly[1].Set (150, 101);
-    poly[2].Set (150, 101);
-    poly[3].Set (100, 105);
-    XOR_ASSERT (b->TestPolygon (poly, 4) == true, t4);
-    poly[0].Set (100, 0);
-    poly[1].Set (150, 1);
-    poly[2].Set (150, 1);
-    poly[3].Set (100, 4);
-    XOR_ASSERT (b->TestPolygon (poly, 4) == false, t5);
-    poly[0].Set (160, 120);
-    poly[1].Set (80, 240);
-    poly[2].Set (160, 360);
-    poly[3].Set (240, 240);
-    XOR_ASSERT (b->InsertPolygon (poly, 4) == true, i6);
-    poly[0].Set (240, 120);
-    poly[1].Set (320, 240);
-    poly[2].Set (240, 360);
-    poly[3].Set (160, 240);
-    XOR_ASSERT (b->InsertPolygon (poly, 4) == true, i7);
-    poly[0].Set (330, 240);
-    poly[1].Set (340, 241);
-    poly[2].Set (339, 249);
-    poly[3].Set (331, 248);
-    XOR_ASSERT (b->TestPolygon (poly, 4) == true, t8);
-    poly[0].Set (150, 230);
-    poly[1].Set (250, 230);
-    poly[2].Set (250, 250);
-    poly[3].Set (150, 250);
-    XOR_ASSERT (b->InsertPolygon (poly, 4) == false, i9);
-    poly[0].Set (160, 120);
-    poly[1].Set (240, 120);
-    poly[2].Set (320, 240);
-    poly[3].Set (240, 360);
-    poly[4].Set (160, 360);
-    XOR_ASSERT (b->InsertPolygon (poly, 5) == true, i10);
-    poly[0].Set (330, 240);
-    poly[1].Set (340, 241);
-    poly[2].Set (339, 249);
-    poly[3].Set (331, 248);
-    XOR_ASSERT (b->TestPolygon (poly, 4) == true, t11);
-    poly[0].Set (400, -200);
-    poly[1].Set (410, -200);
-    poly[2].Set (410, 1000);
-    poly[3].Set (400, 1000);
-    XOR_ASSERT (b->InsertPolygon (poly, 4) == true, i12);
-    poly[0].Set (420, -200);
-    poly[1].Set (430, -200);
-    poly[2].Set (430, 1000);
-    poly[3].Set (420, 1000);
-    XOR_ASSERT (b->InsertPolygon (poly, 4) == true, i13);
-    poly[0].Set (410, -200);
-    poly[1].Set (420, -200);
-    poly[2].Set (420, 1000);
-    poly[3].Set (410, 1000);
-    XOR_ASSERT (b->TestPolygon (poly, 4) == true, t14);
-    poly[0].Set (410, -200);
-    poly[1].Set (420, -200);
-    poly[2].Set (420, 1000);
-    poly[3].Set (410, 1000);
-    XOR_ASSERT (b->InsertPolygon (poly, 4) == true, i15);
-    poly[0].Set (410, -200);
-    poly[1].Set (420, -200);
-    poly[2].Set (420, 1000);
-    poly[3].Set (410, 1000);
-    XOR_ASSERT (b->TestPolygon (poly, 4) == false, t16);
-    XOR_ASSERT (b->IsFull () == false, f17);
-    poly[0].Set (-10000, -10000);
-    poly[1].Set (10000, -10000);
-    poly[2].Set (10000, 10000);
-    poly[3].Set (-100000, 10000);
-    XOR_ASSERT (b->TestPolygon (poly, 4) == true, t17);
-    poly[0].Set (0, 0);
-    poly[1].Set (640, 0);
-    poly[2].Set (640, 120);
-    poly[3].Set (0, 120);
-    XOR_ASSERT (b->InsertPolygon (poly, 4) == true, i18);
-    poly[0].Set (0, 120);
-    poly[1].Set (640, 120);
-    poly[2].Set (640, 240);
-    poly[3].Set (0, 240);
-    XOR_ASSERT (b->InsertPolygon (poly, 4) == true, i19);
-    poly[0].Set (0, 240);
-    poly[1].Set (640, 240);
-    poly[2].Set (640, 360);
-    poly[3].Set (0, 360);
-    XOR_ASSERT (b->InsertPolygon (poly, 4) == true, i20);
-    XOR_ASSERT (b->IsFull () == false, f21);
-    poly[0].Set (0, 360);
-    poly[1].Set (640, 360);
-    poly[2].Set (640, 480);
-    poly[3].Set (0, 480);
-    XOR_ASSERT (b->InsertPolygon (poly, 4) == true, i22);
-    XOR_ASSERT (b->IsFull () == true, f23);
-    poly[0].Set (-10000, -10000);
-    poly[1].Set (10000, -10000);
-    poly[2].Set (10000, 10000);
-    poly[3].Set (-100000, 10000);
-    XOR_ASSERT (b->TestPolygon (poly, 4) == false, t24);
-    poly[0].Set (330, 240);
-    poly[1].Set (340, 241);
-    poly[2].Set (339, 249);
-    poly[3].Set (331, 248);
-    XOR_ASSERT (b->TestPolygon (poly, 4) == false, t25);
+    Debug_TestOneIteration (rc->GetCsString ());
   }
   csTicks end = csGetTicks ();
-  printf ("Total time %d\n", end-start);
-  delete b;
-  return true;
+  rc->DecRef ();
+  return end-start;
 }
 

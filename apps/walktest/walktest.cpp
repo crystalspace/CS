@@ -79,8 +79,6 @@
 #include "csengine/stats.h"
 #include "csengine/light.h"
 
-#define XORDEBUG 0
-
 #if defined(OS_DOS) || defined(OS_WIN32) || defined (OS_OS2)
 #  include <io.h>
 #elif defined(OS_UNIX)
@@ -353,111 +351,8 @@ void WalkTest::Help ()
 //-----------------------------------------------------------------------------
 extern bool CommandHandler (const char *cmd, const char *arg);
 
-#if XORDEBUG
-#include "csengine/xorbuf.h"
-#endif
-
 void WalkTest::SetupFrame ()
 {
-#if XORDEBUG
-  // Tell 3D driver we're going to display 3D things.
-  if (!Gfx3D->BeginDraw (CSDRAW_2DGRAPHICS))
-    return;
-  static int cnt = 0;
-  csXORBuffer* buf = new csXORBuffer (256, 256);
-  static csVector2 poly[6];
-#if 0
-  buf->InitializePolygonBuffer ();
-  cnt++;
-  switch (((cnt >> 6) & 3))
-  {
-    case 0:
-      buf->DrawRightLine (181, 30, 233, 96);
-      break;
-    case 1:
-      buf->DrawRightLine (233, 96, 103, 97);
-      break;
-    case 2:
-      buf->DrawLeftLine (181, 30, 103, 97);
-      break;
-    case 3:
-      buf->DrawRightLine (181, 30, 233, 96);
-      buf->DrawRightLine (233, 96, 103, 97);
-      buf->DrawLeftLine (181, 30, 103, 97);
-      buf->XORSweep ();
-      break;
-  }
-  buf->GfxDump (Gfx3D->GetDriver2D (), Gfx3D, 2);
-#elif 0
-  static int num_verts;
-  static bool did_test = false;
-  if (did_test)
-  {
-    if (num_verts != -1)
-    {
-      buf->InitializePolygonBuffer ();
-      buf->SetDebugMode (true);
-      csBox2Int bb;
-      buf->DrawPolygon (poly, num_verts, bb);
-      cnt++;
-      switch (((cnt >> 6) & 3))
-      {
-        case 0:
-          buf->Debug_Dump (Gfx3D->GetDriver2D (), Gfx3D);
-          buf->Debug_DrawPolygon (Gfx3D->GetDriver2D (), Gfx3D, poly, num_verts);
-          break;
-        case 1:
-          buf->XORSweep ();
-          buf->Debug_Dump (Gfx3D->GetDriver2D (), Gfx3D);
-          buf->Debug_DrawPolygon (Gfx3D->GetDriver2D (), Gfx3D, poly, num_verts);
-	  break;
-        case 2:
-          buf->Debug_Dump (Gfx3D->GetDriver2D (), Gfx3D);
-	  break;
-        case 3:
-          buf->XORSweep ();
-          buf->Debug_Dump (Gfx3D->GetDriver2D (), Gfx3D);
-	  break;
-      }
-    }
-    return;
-  }
-  if (buf->Debug_ExtensiveTest (10000000, poly, num_verts))
-    num_verts = -1;
-  did_test = true;
-#else
-  buf->Initialize ();
-  static float ox = 0;
-  static float oy = 0;
-  static float dx = 1;
-  static float dy = .63;
-  static csVector2 poly2[6];
-  poly[3].Set (128+ox, 10+oy);
-  poly[2].Set (150+ox, 200+oy);
-  poly[1].Set (130+ox, 210+oy);
-  poly[0].Set (10+ox, 30+oy);
-
-  poly2[0].Set (140, 90);
-  poly2[1].Set (150, 140);
-  poly2[2].Set (130, 160);
-  poly2[3].Set (120, 100);
-
-  printf ("rc1 %d\n", buf->InsertPolygon (poly, 4, true));
-  printf ("rc2 %d\n", buf->InsertPolygon (poly2, 4));
-  buf->Debug_DumpScr (Gfx3D->GetDriver2D (), Gfx3D);
-  ox += dx;
-  oy += dy;
-  if (ox < -200 || oy < -200 || ox > 200 || oy > 200)
-  {
-    float old_dx = dx;
-    dx = -dy;
-    dy = old_dx;
-    ox += dx;
-    oy += dy;
-  }
-#endif
-  delete buf;
-#else
   csTicks elapsed_time, current_time;
   elapsed_time = vc->GetElapsedTicks ();
   current_time = vc->GetCurrentTicks ();
@@ -501,7 +396,6 @@ void WalkTest::SetupFrame ()
     char buf[256];
     if (csCommandProcessor::get_script_line (buf, 255)) csCommandProcessor::perform_line (buf);
   }
-#endif
 }
 
 void WalkTest::FinishFrame ()

@@ -173,7 +173,7 @@ struct iDrawFuncCallback : public iBase
 };
 
 
-SCF_VERSION (iEngine, 0, 7, 6);
+SCF_VERSION (iEngine, 0, 7, 7);
 
 /**
  * This interface is the main interface to the 3D engine.
@@ -699,12 +699,6 @@ struct iEngine : public iBase
    * Get the cache manager that the engine is currently using.
    */
   virtual iCacheManager* GetCacheManager () = 0;
-
-  /**
-   * Perform a debugging command. This can be used by an external
-   * debugging utility (like bugplug) to perform debug commands.
-   */
-  virtual void DebugCommand (const char* cmd) = 0;
 };
 
 #endif // __IENGINE_ENGINE_H__

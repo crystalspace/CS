@@ -36,6 +36,7 @@
 #include "iengine/collectn.h"
 #include "iengine/campos.h"
 #include "ivideo/graph3d.h"
+#include "iutil/dbghelp.h"
 
 class csRegion;
 class csRadiosity;
@@ -67,6 +68,7 @@ struct iProgressMeter;
 struct iObjectRegistry;
 struct iVirtualClock;
 struct iCacheManager;
+struct iString;
 
 SCF_DECLARE_FAST_INTERFACE (iEngine)
 SCF_DECLARE_FAST_INTERFACE (iSector)
@@ -1093,7 +1095,7 @@ public:
   virtual iCollection* FindCollection (const char* name,
   	iRegion* region = NULL);
 
-  virtual void DebugCommand (const char* cmd);
+  bool DebugCommand (const char* cmd);
 
   //----------------------- iCacheManager implementation ---------------------
 
@@ -1178,6 +1180,24 @@ private:
   {
     SCF_DECLARE_EMBEDDED_IBASE (csEngine);
   } scfiObject;
+
+  struct DebugHelper : public iDebugHelper
+  {
+    SCF_DECLARE_EMBEDDED_IBASE (csEngine);
+    virtual int GetSupportedTests () const
+    {
+      return 0;
+    }
+    virtual iString* UnitTest () { return NULL; }
+    virtual iString* StateTest () { return NULL; }
+    virtual csTicks Benchmark (int) { return 0; }
+    virtual iString* Dump () { return NULL; }
+    virtual void Dump (iGraphics3D*) { }
+    virtual bool DebugCommand (const char* cmd)
+    {
+      return scfParent->DebugCommand (cmd);
+    }
+  } scfiDebugHelper;
 };
 
 #endif // __CS_ENGINE_H__
