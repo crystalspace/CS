@@ -323,11 +323,11 @@ void csPoly2D::ExtendConvex (const csPoly2D& other, int this_edge)
   pl.Set (vertices[(this_edge-1+num_vertices)%num_vertices],
   	vertices[this_edge]);
   other.ClipPlane (pl, other1);
-  if (other1.GetNumVertices () < 0) return;	// Nothing to be done.
+  if (other1.GetNumVertices () <= 0) return;	// Nothing to be done.
   csPoly2D other2;
   pl.Set (vertices[this_edge2], vertices[(this_edge2+1)%num_vertices]);
   other1.ClipPlane (pl, other2);
-  if (other2.GetNumVertices () < 0) return;	// Nothing to be done.
+  if (other2.GetNumVertices () <= 0) return;	// Nothing to be done.
 
   // Find the common edge in this new polygon.
   int other_edge = -1, other_edge2 = -1;

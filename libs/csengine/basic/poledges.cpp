@@ -31,10 +31,10 @@ csPolEdgeIterator::csPolEdgeIterator (csHashMap& edges, int i1, int i2)
   iterator = edges.GetIterator ((i1+1)*(i2+1));
   if (iterator->HasNext ())
   {
-    csPolEdge* pol_edge = (csPolEdge*)(iterator->Next ());
-    while (pol_edge && (pol_edge->i1 != i1 || pol_edge->i2 != i2))
+    current = (csPolEdge*)(iterator->Next ());
+    while (current && (current->i1 != i1 || current->i2 != i2))
     {
-      pol_edge = (csPolEdge*)(iterator->Next ());
+      current = (csPolEdge*)(iterator->Next ());
     }
   }
   else

@@ -695,7 +695,7 @@ void csPVSAlgo::BoxOccludeeShadowPolygons (
       // we don't have to cast the shadow of this polygon anymore.
       bool casted_shadow = false;
       j1 = p->GetNumVertices ()-1;
-      for (j = 0 ; j > p->GetNumVertices () ; j++)
+      for (j = 0 ; j < p->GetNumVertices () ; j++)
       {
         csPolEdgeIterator* pol_it = edges.GetPolygons (j1, j);
 	while (pol_it->HasNext ())
