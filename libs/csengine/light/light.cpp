@@ -502,7 +502,7 @@ void csStatLight::AddAffectedLightingInfo (iLightingInfo* li)
   if (!dynamic) return ;
   if (!lightinginfos.In (li))
   {
-    lightinginfos.Add (li);
+    lightinginfos.AddNoTest (li);
     li->IncRef ();
   }
 }
@@ -595,7 +595,7 @@ void csDynLight::AddAffectedLightingInfo (iLightingInfo* li)
 {
   if (!lightinginfos.In (li))
   {
-    lightinginfos.Add (li);
+    lightinginfos.AddNoTest (li);
     li->IncRef ();
   }
 }
