@@ -23,7 +23,6 @@
 #include "csutil/parser.h"
 
 // A string containing white spaces (' ', '\t', '\n', '\r')
-static const char *kTokenEnd = " \t\n\r;(\'\"";
 static const char *kWhiteSpace = " \t\n\r";
 static char last_offender[255];
 static int parser_line;
