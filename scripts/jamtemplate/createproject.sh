@@ -64,7 +64,8 @@ Crystal Space external Project Template
 
 This script will generate a basic Crystal Space project for you, complete
 with configuration(autoconf) and build system(jam). The project will be created
-in the current directory. If you don't want that press CTRL+C now!
+in a subdirectory of the current directory. You can always abort the script with
+CTRL+C.
 
 __EOF__
 
@@ -155,6 +156,7 @@ Application $PROJECTNAME
 	: [ Wildcard *.cpp *.h ]
 ;
 ExternalLibs $PROJECTNAME : CRYSTAL ;
+Help $PROJECTNAME : "$LONGNAME" ;
 __END__
 
 cat > "$PROJECTNAME/src/main.cpp" << __END__

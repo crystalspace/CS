@@ -43,6 +43,7 @@ The history order is reversed so that new features are at the top.
 	    - Replace use of GetForegroundWindow() in DirectSound3D renderer
 	      with above (bug 751779).
 	    - Fixed scfString::FindLast() not returning a value.
+	- Matze improved the introduction message in createproject.sh
 9-Jun-2003
 	- Jorrit made a new csStringArray class.
 	- res made the following changes:
