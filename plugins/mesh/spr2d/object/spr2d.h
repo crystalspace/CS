@@ -91,8 +91,6 @@ private:
 
   /// Temporary camera space vector between DrawTest() and Draw().
   csVector3 cam;
-  /// Polygon.
-  G3DPolygonDPFX g3dpolyfx;
 
   /**
    * Setup this object. This function will check if setup is needed.
@@ -295,6 +293,10 @@ private:
    * the given colors.
    */
   bool lighting;
+
+public:
+  /// Polygon.
+  G3DPolygonDPFX g3dpolyfx;
 
 public:
   /// Constructor.

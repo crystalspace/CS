@@ -319,6 +319,7 @@ bool csSprite2DMeshObject::Draw (iRenderView* rview, iMovable* /*movable*/,
 
   material->Visit ();
 
+  G3DPolygonDPFX& g3dpolyfx = factory->g3dpolyfx;
   g3dpolyfx.num = vertices.Length ();
   g3dpolyfx.mat_handle = mat;
   g3dpolyfx.mat_handle->GetTexture ()->GetMeanColor (g3dpolyfx.flat_color_r,

@@ -1,5 +1,11 @@
 The history order is reversed so that new features are at the top.
 
+22-Nov-2002
+	- All spr2d instances used to have their own local copy of
+	  G3DPolygonDPFX. Since this structure is more than 4K big I decided
+	  to move this to the factory so that all instances created from
+	  a factory reuse the same structure. For particle systems this
+	  is a huge memory improvement.
 21-Nov-2002
 	- Fixed CastShadows() implementation in Dynavis and Frustvis
 	  so that it shadow casting is now correct (I hope).
