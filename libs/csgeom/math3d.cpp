@@ -815,6 +815,34 @@ int csIntersect3::BoxSegment (
   return -1;
 }
 
+bool csIntersect3::BoxFrustum (const csBox3& box, csPlane3* f,
+	uint32 inClipMask, uint32& outClipMask)
+{
+  csVector3 m = box.GetCenter ();
+  csVector3 d = box.Max ()-m;		// Half-diagonal.
+  uint32 mk = 1;
+  outClipMask = 0;
+
+  // Loop for all active planes.
+  while (mk <= inClipMask)
+  {
+    if (inClipMask & mk)
+    {
+      // This is an active clip plane.
+      float NP = (float)(d.x*fabs(f->A ())+d.y*fabs(f->B ())+d.z*fabs(f->C ()));
+      float MP = f->Classify (m);
+      if ((MP+NP) < 0.0f) return false;       // behind clip plane
+      if ((MP-NP) < 0.0f) outClipMask |= mk;
+    }
+    mk += mk;
+    f++;
+  }
+  return true;	// There is an intersection.
+}
+
+
+//-------------------------------------------------------------------------
+
 SCF_IMPLEMENT_IBASE (csGeomDebugHelper)
   SCF_IMPLEMENTS_INTERFACE(iDebugHelper)
 SCF_IMPLEMENT_IBASE_END

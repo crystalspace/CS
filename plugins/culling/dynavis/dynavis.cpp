@@ -19,18 +19,22 @@
 #include <string.h>
 #include "cssysdef.h"
 #include "csver.h"
+#include "cssys/sysfunc.h"
 #include "csutil/scf.h"
 #include "csutil/util.h"
 #include "csutil/scfstr.h"
 #include "csgeom/matrix3.h"
+#include "csgeom/math3d.h"
 #include "iutil/objreg.h"
 #include "ivideo/graph2d.h"
 #include "ivideo/graph3d.h"
 #include "ivideo/txtmgr.h"
+#include "ivideo/fontserv.h"
 #include "iengine/movable.h"
 #include "iengine/rview.h"
 #include "iengine/camera.h"
 #include "iutil/object.h"
+#include "ivaria/reporter.h"
 #include "dynavis.h"
 #include "kdtree.h"
 #include "covbuf.h"
@@ -67,6 +71,13 @@ csDynaVis::csDynaVis (iBase *iParent)
   kdtree = NULL;
   covbuf = NULL;
   debug_camera = NULL;
+
+  stats_cnt_vistest = 0;
+  stats_total_vistest_time = 0;
+  stats_total_notvistest_time = 0;
+
+  do_cull_frustum = true;
+  cfg_view_mode = VIEWMODE_STATS;
 }
 
 csDynaVis::~csDynaVis ()
@@ -228,67 +239,64 @@ void csDynaVis::ProjectBBox (iCamera* camera, const csBox3& bbox, csBox2& sbox)
   sbox.AddBoundingVertexSmart (oneCorner);
 }
 
-bool csDynaVis::TestNodeVisibility (csKDTree* treenode, iRenderView* rview,
-  	const csVector3& pos)
-{
-  const csBox3& node_bbox = treenode->GetNodeBBox ();
-  if (node_bbox.Contains (pos)) return true;
-
-  if (node_bbox.Contains (pos))
-  {
-    return true;
-  }
-
-  // First clip to frustum.
-  bool l = planeL.Classify (node_bbox.GetCorner (0)) >= 0 ||
-	   planeL.Classify (node_bbox.GetCorner (1)) >= 0 ||
-	   planeL.Classify (node_bbox.GetCorner (2)) >= 0 ||
-	   planeL.Classify (node_bbox.GetCorner (3)) >= 0 ||
-	   planeL.Classify (node_bbox.GetCorner (4)) >= 0 ||
-	   planeL.Classify (node_bbox.GetCorner (5)) >= 0 ||
-	   planeL.Classify (node_bbox.GetCorner (6)) >= 0 ||
-	   planeL.Classify (node_bbox.GetCorner (7)) >= 0;
-  if (!l) return false;
-
-  bool r = planeR.Classify (node_bbox.GetCorner (0)) >= 0 ||
-	   planeR.Classify (node_bbox.GetCorner (1)) >= 0 ||
-	   planeR.Classify (node_bbox.GetCorner (2)) >= 0 ||
-	   planeR.Classify (node_bbox.GetCorner (3)) >= 0 ||
-	   planeR.Classify (node_bbox.GetCorner (4)) >= 0 ||
-	   planeR.Classify (node_bbox.GetCorner (5)) >= 0 ||
-	   planeR.Classify (node_bbox.GetCorner (6)) >= 0 ||
-	   planeR.Classify (node_bbox.GetCorner (7)) >= 0;
-  if (!r) return false;
-
-  bool u = planeU.Classify (node_bbox.GetCorner (0)) >= 0 ||
-	   planeU.Classify (node_bbox.GetCorner (1)) >= 0 ||
-	   planeU.Classify (node_bbox.GetCorner (2)) >= 0 ||
-	   planeU.Classify (node_bbox.GetCorner (3)) >= 0 ||
-	   planeU.Classify (node_bbox.GetCorner (4)) >= 0 ||
-	   planeU.Classify (node_bbox.GetCorner (5)) >= 0 ||
-	   planeU.Classify (node_bbox.GetCorner (6)) >= 0 ||
-	   planeU.Classify (node_bbox.GetCorner (7)) >= 0;
-  if (!u) return false;
-
-  bool d = planeU.Classify (node_bbox.GetCorner (0)) >= 0 ||
-	   planeU.Classify (node_bbox.GetCorner (1)) >= 0 ||
-	   planeU.Classify (node_bbox.GetCorner (2)) >= 0 ||
-	   planeU.Classify (node_bbox.GetCorner (3)) >= 0 ||
-	   planeU.Classify (node_bbox.GetCorner (4)) >= 0 ||
-	   planeU.Classify (node_bbox.GetCorner (5)) >= 0 ||
-	   planeU.Classify (node_bbox.GetCorner (6)) >= 0 ||
-	   planeU.Classify (node_bbox.GetCorner (7)) >= 0;
-  if (!d) return false;
-
-  return true;
-}
-
 struct VisTest_Front2BackData
 {
   csVector3 pos;
   iRenderView* rview;
   csDynaVis* dynavis;
+
+  // During VisTest() we use the current frustum as five planes.
+  // Associated with this frustum we also have a clip mask which
+  // is maintained recursively during VisTest() and indicates the
+  // planes that are still active for the current kd-tree node.
+  csPlane3 frustum[32];
+  uint32 frustum_mask;
 };
+
+bool csDynaVis::TestNodeVisibility (csKDTree* treenode,
+	VisTest_Front2BackData* data)
+{
+  const csBox3& node_bbox = treenode->GetNodeBBox ();
+  const csVector3& pos = data->pos;
+
+  if (node_bbox.Contains (pos)) return true;
+
+  if (do_cull_frustum)
+  {
+    uint32 new_mask;
+    if (!csIntersect3::BoxFrustum (node_bbox, data->frustum, data->frustum_mask,
+    	new_mask))
+      return false;
+    // In VisTest_Front2Back() this is later restored when recursing back to
+    // higher level.
+    data->frustum_mask = new_mask;
+  }
+
+  return true;
+}
+
+bool csDynaVis::TestObjectVisibility (csVisibilityObjectWrapper* obj,
+  	VisTest_Front2BackData* data)
+{
+  if (!obj->visobj->IsVisible ())
+  {
+    uint32 new_mask;
+    if (do_cull_frustum &&
+		!csIntersect3::BoxFrustum (obj->child->GetBBox (),
+		  data->frustum, data->frustum_mask, new_mask))
+    {
+      obj->reason = INVISIBLE_FRUSTUM;
+      return false;
+    }
+    else
+    {
+      obj->visobj->MarkVisible ();
+      obj->reason = VISIBLE;
+      return true;
+    }
+  }
+  return true;
+}
 
 static bool VisTest_Front2Back (csKDTree* treenode, void* userdata,
 	uint32 cur_timestamp)
@@ -296,15 +304,26 @@ static bool VisTest_Front2Back (csKDTree* treenode, void* userdata,
   VisTest_Front2BackData* data = (VisTest_Front2BackData*)userdata;
   csDynaVis* dynavis = data->dynavis;
 
+  // Visible or not...
+  bool vis = false;
+
+  // Remember current frustum mask.
+  uint32 old_frustum_mask = data->frustum_mask;
+
   // In the first part of this test we are going to test if the node
   // itself is visible. If it is not then we don't need to continue.
-  if (!dynavis->TestNodeVisibility (treenode, data->rview, data->pos))
-    return false;
+  if (!dynavis->TestNodeVisibility (treenode, data))
+  {
+    vis = false;
+    goto end;
+  }
 
   treenode->Distribute ();
 
-  int num_objects = treenode->GetObjectCount ();
-  csKDTreeChild** objects = treenode->GetObjects ();
+  int num_objects;
+  csKDTreeChild** objects;
+  num_objects = treenode->GetObjectCount ();
+  objects = treenode->GetObjects ();
   int i;
   for (i = 0 ; i < num_objects ; i++)
   {
@@ -313,16 +332,24 @@ static bool VisTest_Front2Back (csKDTree* treenode, void* userdata,
       objects[i]->timestamp = cur_timestamp;
       csVisibilityObjectWrapper* visobj_wrap = (csVisibilityObjectWrapper*)
       	objects[i]->GetObject ();
-      visobj_wrap->visobj->MarkVisible ();
-      visobj_wrap->reason = VISIBLE;
+      dynavis->TestObjectVisibility (visobj_wrap, data);
     }
   }
 
-  return true;
+  vis = true;
+
+end:
+  // Restore the frustum mask.
+  data->frustum_mask = old_frustum_mask;
+
+  return vis;
 }
 
 bool csDynaVis::VisTest (iRenderView* rview)
 {
+  // Statistics and debugging.
+  static csTicks t2 = 0;
+  csTicks t1 = csGetTicks ();
   debug_camera = rview->GetOriginalCamera ();
 
   // Initialize the coverage buffer to all empty.
@@ -330,6 +357,9 @@ bool csDynaVis::VisTest (iRenderView* rview)
 
   // Update all objects (mark them invisible and update in kdtree if needed).
   UpdateObjects ();
+
+  // Data for the vis tester.
+  VisTest_Front2BackData data;
 
   // First get the current view frustum from the rview.
   float lx, rx, ty, by;
@@ -344,19 +374,27 @@ bool csDynaVis::VisTest (iRenderView* rview)
   p1 = trans.This2Other (p1);
   p2 = trans.This2Other (p2);
   p3 = trans.This2Other (p3);
-  planeL.Set (origin, p0, p1);
-  planeU.Set (origin, p1, p2);
-  planeR.Set (origin, p2, p3);
-  planeD.Set (origin, p3, p0);
+  //data.frustum[0].Set (origin, p0, p1);
+  data.frustum[0].Set (origin, p0, p1);
+  data.frustum[1].Set (origin, p2, p3);
+  data.frustum[2].Set (origin, p1, p2);
+  data.frustum[3].Set (origin, p3, p0);
+  data.frustum_mask = 0xf;
 
   // The big routine: traverse from front to back and mark all objects
   // visible that are visible. In the mean time also update the coverage
   // buffer for further culling.
-  VisTest_Front2BackData data;
   data.pos = rview->GetCamera ()->GetTransform ().GetOrigin ();
   data.rview = rview;
   data.dynavis = this;
   kdtree->Front2Back (data.pos, VisTest_Front2Back, (void*)&data);
+
+  // Conclude statistics.
+  if (t2 != 0)
+    stats_total_notvistest_time += t1-t2;
+  t2 = csGetTicks ();
+  stats_total_vistest_time += t2-t1;
+  stats_cnt_vistest++;
 
   return true;
 }
@@ -409,96 +447,158 @@ void csDynaVis::Debug_Dump (iGraphics3D* g3d)
   struct color { int r, g, b; };
   static color reason_colors[] =
   {
-    { 64, 64, 64 },
+    { 48, 48, 48 },
+    { 64, 90, 64 },
     { 255, 255, 255 }
   };
 
   if (debug_camera)
   {
+    csTicks t1 = csGetTicks ();
+
     iGraphics2D* g2d = g3d->GetDriver2D ();
+    iFontServer* fntsvr = g2d->GetFontServer ();
+    iFont* fnt = NULL;
+    if (fntsvr)
+    {
+      fnt = fntsvr->GetFont (0);
+      if (fnt == NULL)
+      {
+        fnt = fntsvr->LoadFont (CSFONT_COURIER);
+      }
+    }
+
     iTextureManager* txtmgr = g3d->GetTextureManager ();
     g3d->BeginDraw (CSDRAW_2DGRAPHICS);
     int col_cam = txtmgr->FindRGB (0, 255, 0);
-    int i;
-    int reason_cols[LAST_REASON];
-    for (i = 0 ; i < LAST_REASON ; i++)
+    int col_fgtext = txtmgr->FindRGB (0, 0, 0);
+    int col_bgtext = txtmgr->FindRGB (255, 255, 255);
+
+    char buf[200];
+    float average_vistest_time = stats_total_vistest_time
+    	/ float (stats_cnt_vistest);
+    float average_notvistest_time = stats_total_notvistest_time
+    	/ float (stats_cnt_vistest-1);
+    sprintf (buf,
+    	"  cnt:%d vistest:%1.2g notvistest:%1.2g tot:%1.2g cull:%1.2g%%  ",
+    	stats_cnt_vistest,
+	average_vistest_time,
+	average_notvistest_time,
+	average_vistest_time+average_notvistest_time,
+	average_vistest_time * 100.0
+		/ (average_vistest_time+average_notvistest_time));
+    g2d->Write (fnt, 10, 5, col_fgtext, col_bgtext, buf);
+
+    if (cfg_view_mode == VIEWMODE_STATSOVERLAY)
     {
-      reason_cols[i] = txtmgr->FindRGB (reason_colors[i].r,
-      	reason_colors[i].g, reason_colors[i].b);
+      int i;
+      int reason_cols[LAST_REASON];
+      for (i = 0 ; i < LAST_REASON ; i++)
+      {
+        reason_cols[i] = txtmgr->FindRGB (reason_colors[i].r,
+      	  reason_colors[i].g, reason_colors[i].b);
+      }
+      csReversibleTransform trans = debug_camera->GetTransform ();
+      trans = csTransform (csYRotMatrix3 (-PI/2.0), csVector3 (0)) * trans;
+      float fov = g3d->GetPerspectiveAspect ();
+      int sx, sy;
+      g3d->GetPerspectiveCenter (sx, sy);
+
+      csVector3 view_origin;
+      // This is the z at which we want to view the origin.
+      view_origin.z = 50;
+      // The x,y values are then calculated with inverse perspective
+      // projection given that we want the view origin to be visualized
+      // at view_persp_x and view_persp_y.
+      float view_persp_x = sx;
+      float view_persp_y = sy;
+      view_origin.x = (view_persp_x-sx) * view_origin.z / fov;
+      view_origin.y = (view_persp_y-sy) * view_origin.z / fov;
+      trans.SetOrigin (trans.This2Other (-view_origin));
+
+      csVector3 trans_origin = trans.Other2This (
+    	  debug_camera->GetTransform ().GetOrigin ());
+      csVector2 to;
+      Perspective (trans_origin, to, fov, sx, sy);
+      g2d->DrawLine (to.x-3,  to.y-3, to.x+3,  to.y+3, col_cam);
+      g2d->DrawLine (to.x+3,  to.y-3, to.x-3,  to.y+3, col_cam);
+      g2d->DrawLine (to.x,    to.y,   to.x+30, to.y,   col_cam);
+      g2d->DrawLine (to.x+30, to.y,   to.x+24, to.y-4, col_cam);
+      g2d->DrawLine (to.x+30, to.y,   to.x+24, to.y+4, col_cam);
+
+      for (i = 0 ; i < visobj_vector.Length () ; i++)
+      {
+        csVisibilityObjectWrapper* visobj_wrap = (csVisibilityObjectWrapper*)
+    	  visobj_vector[i];
+        int col = reason_cols[visobj_wrap->reason];
+        const csBox3& b = visobj_wrap->child->GetBBox ();
+        g3d->DrawLine (
+      	  trans.Other2This (b.GetCorner (CS_BOX_CORNER_xyz)),
+      	  trans.Other2This (b.GetCorner (CS_BOX_CORNER_Xyz)), fov, col);
+        g3d->DrawLine (
+      	  trans.Other2This (b.GetCorner (CS_BOX_CORNER_xyz)),
+      	  trans.Other2This (b.GetCorner (CS_BOX_CORNER_xYz)), fov, col);
+        g3d->DrawLine (
+      	  trans.Other2This (b.GetCorner (CS_BOX_CORNER_xyz)),
+      	  trans.Other2This (b.GetCorner (CS_BOX_CORNER_xyZ)), fov, col);
+        g3d->DrawLine (
+      	  trans.Other2This (b.GetCorner (CS_BOX_CORNER_XYZ)),
+      	  trans.Other2This (b.GetCorner (CS_BOX_CORNER_xYZ)), fov, col);
+        g3d->DrawLine (
+      	  trans.Other2This (b.GetCorner (CS_BOX_CORNER_XYZ)),
+      	  trans.Other2This (b.GetCorner (CS_BOX_CORNER_XyZ)), fov, col);
+        g3d->DrawLine (
+      	  trans.Other2This (b.GetCorner (CS_BOX_CORNER_XYZ)),
+      	  trans.Other2This (b.GetCorner (CS_BOX_CORNER_XYz)), fov, col);
+        g3d->DrawLine (
+      	  trans.Other2This (b.GetCorner (CS_BOX_CORNER_Xyz)),
+      	  trans.Other2This (b.GetCorner (CS_BOX_CORNER_XYz)), fov, col);
+        g3d->DrawLine (
+      	  trans.Other2This (b.GetCorner (CS_BOX_CORNER_Xyz)),
+      	  trans.Other2This (b.GetCorner (CS_BOX_CORNER_XyZ)), fov, col);
+        g3d->DrawLine (
+      	  trans.Other2This (b.GetCorner (CS_BOX_CORNER_xYz)),
+      	  trans.Other2This (b.GetCorner (CS_BOX_CORNER_xYZ)), fov, col);
+        g3d->DrawLine (
+      	  trans.Other2This (b.GetCorner (CS_BOX_CORNER_xYz)),
+      	  trans.Other2This (b.GetCorner (CS_BOX_CORNER_XYz)), fov, col);
+        g3d->DrawLine (
+      	  trans.Other2This (b.GetCorner (CS_BOX_CORNER_xyZ)),
+      	  trans.Other2This (b.GetCorner (CS_BOX_CORNER_XyZ)), fov, col);
+        g3d->DrawLine (
+      	  trans.Other2This (b.GetCorner (CS_BOX_CORNER_xyZ)),
+      	  trans.Other2This (b.GetCorner (CS_BOX_CORNER_xYZ)), fov, col);
+      }
     }
 
-    csReversibleTransform trans = debug_camera->GetTransform ();
-    trans = csTransform (csYRotMatrix3 (-PI/2.0), csVector3 (0)) * trans;
-    float fov = g3d->GetPerspectiveAspect ();
-    int sx, sy;
-    g3d->GetPerspectiveCenter (sx, sy);
-
-    csVector3 view_origin;
-    // This is the z at which we want to view the origin.
-    view_origin.z = 50;
-    // The x,y values are then calculated with inverse perspective
-    // projection given that we want the view origin to be visualized
-    // at view_persp_x and view_persp_y.
-    float view_persp_x = sx;
-    float view_persp_y = sy;
-    view_origin.x = (view_persp_x-sx) * view_origin.z / fov;
-    view_origin.y = (view_persp_y-sy) * view_origin.z / fov;
-    trans.SetOrigin (trans.This2Other (-view_origin));
-
-    csVector3 trans_origin = trans.Other2This (
-    	debug_camera->GetTransform ().GetOrigin ());
-    csVector2 to;
-    Perspective (trans_origin, to, fov, sx, sy);
-    g2d->DrawLine (to.x-3,  to.y-3, to.x+3,  to.y+3, col_cam);
-    g2d->DrawLine (to.x+3,  to.y-3, to.x-3,  to.y+3, col_cam);
-    g2d->DrawLine (to.x,    to.y,   to.x+30, to.y,   col_cam);
-    g2d->DrawLine (to.x+30, to.y,   to.x+24, to.y-4, col_cam);
-    g2d->DrawLine (to.x+30, to.y,   to.x+24, to.y+4, col_cam);
-
-    for (i = 0 ; i < visobj_vector.Length () ; i++)
-    {
-      csVisibilityObjectWrapper* visobj_wrap = (csVisibilityObjectWrapper*)
-    	visobj_vector[i];
-      int col = reason_cols[visobj_wrap->reason];
-      const csBox3& b = visobj_wrap->child->GetBBox ();
-      g3d->DrawLine (
-      	trans.Other2This (b.GetCorner (CS_BOX_CORNER_xyz)),
-      	trans.Other2This (b.GetCorner (CS_BOX_CORNER_Xyz)), fov, col);
-      g3d->DrawLine (
-      	trans.Other2This (b.GetCorner (CS_BOX_CORNER_xyz)),
-      	trans.Other2This (b.GetCorner (CS_BOX_CORNER_xYz)), fov, col);
-      g3d->DrawLine (
-      	trans.Other2This (b.GetCorner (CS_BOX_CORNER_xyz)),
-      	trans.Other2This (b.GetCorner (CS_BOX_CORNER_xyZ)), fov, col);
-      g3d->DrawLine (
-      	trans.Other2This (b.GetCorner (CS_BOX_CORNER_XYZ)),
-      	trans.Other2This (b.GetCorner (CS_BOX_CORNER_xYZ)), fov, col);
-      g3d->DrawLine (
-      	trans.Other2This (b.GetCorner (CS_BOX_CORNER_XYZ)),
-      	trans.Other2This (b.GetCorner (CS_BOX_CORNER_XyZ)), fov, col);
-      g3d->DrawLine (
-      	trans.Other2This (b.GetCorner (CS_BOX_CORNER_XYZ)),
-      	trans.Other2This (b.GetCorner (CS_BOX_CORNER_XYz)), fov, col);
-      g3d->DrawLine (
-      	trans.Other2This (b.GetCorner (CS_BOX_CORNER_Xyz)),
-      	trans.Other2This (b.GetCorner (CS_BOX_CORNER_XYz)), fov, col);
-      g3d->DrawLine (
-      	trans.Other2This (b.GetCorner (CS_BOX_CORNER_Xyz)),
-      	trans.Other2This (b.GetCorner (CS_BOX_CORNER_XyZ)), fov, col);
-      g3d->DrawLine (
-      	trans.Other2This (b.GetCorner (CS_BOX_CORNER_xYz)),
-      	trans.Other2This (b.GetCorner (CS_BOX_CORNER_xYZ)), fov, col);
-      g3d->DrawLine (
-      	trans.Other2This (b.GetCorner (CS_BOX_CORNER_xYz)),
-      	trans.Other2This (b.GetCorner (CS_BOX_CORNER_XYz)), fov, col);
-      g3d->DrawLine (
-      	trans.Other2This (b.GetCorner (CS_BOX_CORNER_xyZ)),
-      	trans.Other2This (b.GetCorner (CS_BOX_CORNER_XyZ)), fov, col);
-      g3d->DrawLine (
-      	trans.Other2This (b.GetCorner (CS_BOX_CORNER_xyZ)),
-      	trans.Other2This (b.GetCorner (CS_BOX_CORNER_xYZ)), fov, col);
-    }
+    // Try to correct for the time taken to print this debug info.
+    csTicks t2 = csGetTicks ();
+    stats_total_notvistest_time -= t2-t1;
   }
+}
+
+bool csDynaVis::Debug_DebugCommand (const char* cmd)
+{
+  if (!strcmp (cmd, "toggle_frustum"))
+  {
+    do_cull_frustum = !do_cull_frustum;
+    csReport (object_reg, CS_REPORTER_SEVERITY_NOTIFY,
+    	"%s frustum culling!", do_cull_frustum ? "Enabled" : "Disabled");
+    return true;
+  }
+  else if (!strcmp (cmd, "cycle_view"))
+  {
+    cfg_view_mode++;
+    if (cfg_view_mode > VIEWMODE_STATSOVERLAY)
+      cfg_view_mode = VIEWMODE_STATS;
+    csReport (object_reg, CS_REPORTER_SEVERITY_NOTIFY,
+    	"View mode %s",
+		cfg_view_mode == VIEWMODE_STATS ? "statistics only" :
+		cfg_view_mode == VIEWMODE_STATSOVERLAY ? "statistics and map" :
+		"?");
+    return true;
+  }
+  return false;
 }
 
 csTicks csDynaVis::Debug_Benchmark (int num_iterations)

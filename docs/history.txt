@@ -1,5 +1,23 @@
 The history order is reversed so that new features are at the top.
 
+16-May-2002
+	- Added a very efficient AABB/frustum intersection tester which
+	  has an associated clipmask to avoid testing planes that are no
+	  longer active. Thanks to Ville Miettinen from Hybrid Graphics
+	  for giving this algorithm to me. The routine is
+	  csIntersect3::BoxFrustum().
+	- Implemented frustum culling in Dynavis with BoxFrustum().
+	- Also enabled frustum culling for individual objects.
+	- Added timing statistics to the debug view of Dynavis so that
+	  we can see how many time is spent in the culling part versus
+	  the rendering part.
+	- Dynavis now implements the 'toggle_frustum' command so you can
+	  toggle on/off frustum culling. The '1' key in Bugplug is
+	  assigned to that command by default.
+	- Dynavis now implements 'cycle_view' command so you can cycle
+	  between different debug views. Currently two views are supported:
+	  statistics only or statistics + outline overlay. By default
+	  shift-v is assigned to this command in Bugplug.
 15-May-2002
 	- Fixed a bad bug in csKDTree::Front2Back().
 	- Fixed a bug in the bounding box insertion in the KD-tree.

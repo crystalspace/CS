@@ -448,6 +448,18 @@ public:
    */
   static int BoxSegment (const csBox3& box, const csSegment3& segment,
   	csVector3& isect, float* pr = NULL);
+
+  /**
+   * Intersect an AABB with a frustum. The frustum may contain up to
+   * 32 planes. Active planes are defined using the 'inClipMask'. It will
+   * return true if AABB is visible in frustum. If the AABB intersects
+   * with the frustum then 'outClipMask' will contain the mask for all planes
+   * intersecting with the AABB. This can be used as 'inClipMask' for subsequent
+   * frustum tests with children of the AABB (i.e. other AABB inside
+   * this AABB).
+   */
+  static bool BoxFrustum (const csBox3& box, csPlane3* frustum,
+  	uint32 inClipMask, uint32& outClipMask);
 };
 
 /**

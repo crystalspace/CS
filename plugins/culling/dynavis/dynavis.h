@@ -34,9 +34,15 @@ class csCoverageBuffer;
 enum csVisReason
 {
   INVISIBLE_PARENT = 0,	// Invisible because some parent node is invisible.
+  INVISIBLE_FRUSTUM,	// Invisible because object outside frustum.
   VISIBLE,		// Just visible.
   LAST_REASON
 };
+
+#define VIEWMODE_STATS 0
+#define VIEWMODE_STATSOVERLAY 1
+
+struct VisTest_Front2BackData;
 
 /**
  * This object is a wrapper for an iVisibilityObject from the engine.
@@ -65,8 +71,18 @@ private:
   // For Debug_Dump(g3d): keep the last original camera.
   iCamera* debug_camera;
 
-  // During VisTest() we keep the current frustum as planes.
-  csPlane3 planeL, planeR, planeU, planeD;
+  // For statistics. Count the number of times VisTest() was called.
+  int stats_cnt_vistest;
+  // For statistics. Count the total time we spend in VisTest().
+  csTicks stats_total_vistest_time;
+  // For statistics. Count the total time we do NOT spend in VisTest().
+  csTicks stats_total_notvistest_time;
+
+  // Various flags to enable/disable parts of the culling algorithm.
+  bool do_cull_frustum;
+
+  // View mode for debugging (one of VIEWMODE_... constants).
+  int cfg_view_mode;
 
   // Scan all objects, mark them as invisible and check if they
   // have moved since last frame (and update them in the kdtree then).
@@ -84,8 +100,13 @@ public:
   virtual bool Initialize (iObjectRegistry *object_reg);
 
   // Test visibility for the given node. Returns true if visible.
-  bool TestNodeVisibility (csKDTree* treenode, iRenderView* rview,
-  	const csVector3& pos);
+  // This function will also modify the frustum_mask in 'data'. So
+  // take care to restore this later if you recurse down.
+  bool TestNodeVisibility (csKDTree* treenode, VisTest_Front2BackData* data);
+
+  // Test visibility for the given object. Returns true if visible.
+  bool TestObjectVisibility (csVisibilityObjectWrapper* obj,
+  	VisTest_Front2BackData* data);
 
   virtual void Setup (const char* name);
   virtual void RegisterVisObject (iVisibilityObject* visobj);
@@ -106,6 +127,7 @@ public:
   iString* Debug_Dump ();
   void Debug_Dump (iGraphics3D* g3d);
   csTicks Debug_Benchmark (int num_iterations);
+  bool Debug_DebugCommand (const char* cmd);
 
   struct eiComponent : public iComponent
   {
@@ -143,9 +165,9 @@ public:
     {
       scfParent->Debug_Dump (g3d);
     }
-    virtual bool DebugCommand (const char*)
+    virtual bool DebugCommand (const char* cmd)
     {
-      return false;
+      return scfParent->Debug_DebugCommand (cmd);
     }
   } scfiDebugHelper;
 };
