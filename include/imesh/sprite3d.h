@@ -290,7 +290,7 @@ struct iSprite3DFactoryState : public iBase
 SCF_VERSION (iSprite3DState, 0, 0, 5);
 
 /**
- * This interface describes the API for the 2D sprite mesh object.
+ * This interface describes the API for the 3D sprite mesh object.
  */
 struct iSprite3DState : public iBase
 {
