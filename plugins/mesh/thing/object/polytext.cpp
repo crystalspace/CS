@@ -1415,14 +1415,12 @@ void csShadowBitmap::UpdateLightMap (
 	else
 	{
 	  normal.x = normal.y = normal.z = 0.0f;
-	  float weight;
 	  for (act = 0; act < vCount ; act++)
 	  {
 	    if (distances[act] < 0.001f)
-	      weight = 1.0f;
+	      normal += nearestNormals[act];
 	    else
-	      weight = shortestDistance / distances[act];
-	    normal += weight*nearestNormals[act];
+	      normal += shortestDistance * nearestNormals[act] / distances[act];
 	  }
 	}
 
