@@ -73,7 +73,8 @@ void csShaderVariableContext::PopVariables
   for (int i=0; i<variables.Length (); ++i)
   {
     csStringID name = variables[i]->GetName ();
-    if (stacks[name].Length () > 0)
+    if ((stacks.Length () > (int)name) && // @@@ Why is this needed?
+      (stacks[name].Length () > 0))
       stacks[name].Pop ();
   }
 }
