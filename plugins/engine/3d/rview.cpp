@@ -875,7 +875,9 @@ void csRenderView::CalculateClipSettings (
   else
     clip_z_plane = CS_CLIP_NOT;
 
-  if (frustum_mask & 0x20)
+  // Only if we really need an exact clip plane will we set clip_plane
+  // to needed (depending on frustum mask).
+  if (ctxt->do_clip_plane && (frustum_mask & 0x20))
     clip_plane = CS_CLIP_NEEDED;
   else
     clip_plane = CS_CLIP_NOT;
@@ -975,19 +977,15 @@ void csRenderView::SetupClipPlanes ()
   clip_planes[3].Set (tr.GetT2O() * frust[3].norm, -frust[3].norm*o2tmult);
   csPlane3 pz0 (0, 0, 1, 0);	// Inverted!!!.
   clip_planes[4] = tr.This2Other (pz0);
-  if (ctxt->do_clip_plane)
-  {
-    // We have a real near clipping plane. In that case
-    // we add both the Z=0 plane and the near clipping plane.
-    csPlane3 pznear = ctxt->clip_plane;
-    pznear.Invert ();
-    clip_planes[5] = tr.This2Other (pznear);
-    ctxt->clip_planes_mask = 0x3f;
-  }
-  else
-  {
-    ctxt->clip_planes_mask = 0x1f;
-  }
+
+  // Even if we don't need the clip plane we will still add it to the
+  // frustum_mask so that the cullers will use it to trivially reject
+  // objects and nodes.
+  csPlane3 pznear = ctxt->clip_plane;
+  pznear.Invert ();
+  clip_planes[5] = tr.This2Other (pznear);
+  ctxt->clip_planes_mask = 0x3f;
+
   csPlane3 *far_plane = ctxt->icamera->GetFarPlane ();
   if (far_plane)
   {
@@ -1008,19 +1006,15 @@ void csRenderView::SetupClipPlanes (const csReversibleTransform& tr_o2c,
   planes[3].Set (tr_o2c.GetT2O() * frust[3].norm, -frust[3].norm*o2tmult);
   csPlane3 pz0 (0, 0, 1, 0);	// Inverted!!!.
   planes[4] = tr_o2c.This2Other (pz0);
-  if (ctxt->do_clip_plane)
-  {
-    // We have a real near clipping plane. In that case
-    // we add both the Z=0 plane and the near clipping plane.
-    csPlane3 pznear = ctxt->clip_plane;
-    pznear.Invert ();
-    planes[5] = tr_o2c.This2Other (pznear);
-    frustum_mask = 0x3f;
-  }
-  else
-  {
-    frustum_mask = 0x1f;
-  }
+
+  // Even if we don't need the clip plane we will still add it to the
+  // frustum_mask so that the cullers will use it to trivially reject
+  // objects and nodes.
+  csPlane3 pznear = ctxt->clip_plane;
+  pznear.Invert ();
+  planes[5] = tr_o2c.This2Other (pznear);
+  frustum_mask = 0x3f;
+
   csPlane3 *far_plane = ctxt->icamera->GetFarPlane ();
   if (far_plane)
   {
@@ -1053,7 +1047,9 @@ bool csRenderView::ClipBBox (
   else
     clip_z_plane = CS_CLIP_NOT;
 
-  if (outClipMask & 0x20)
+  // Only if we really need an exact clip plane will we set clip_plane
+  // to needed (depending on frustum mask).
+  if (ctxt->do_clip_plane && (outClipMask & 0x20))
     clip_plane = CS_CLIP_NEEDED;
   else
     clip_plane = CS_CLIP_NOT;
