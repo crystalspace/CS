@@ -74,9 +74,19 @@ csQuaternion csQuaternion::Slerp (
   float slerp) const
 {
   double omega, cosom, invsinom, scale0, scale1;
-
+  
+  csQuaternion quato(quat2);
+  
+  // decide if one of the quaternions is backwards
+  double a = (x-quat2.x)*(x-quat2.x) + (y-quat2.y)*(y-quat2.y) + (z-quat2.z)*(z-quat2.z) + (r-quat2.r)*(r-quat2.r);
+  double b = (x+quat2.x)*(x+quat2.x) + (y+quat2.y)*(y+quat2.y) + (z+quat2.z)*(z+quat2.z) + (r+quat2.r)*(r+quat2.r);
+  if (a > b) 
+  {
+      quato.Negate();
+  }
+  
   // Calculate dot between quats
-  cosom = x * quat2.x + y * quat2.y + z * quat2.z + r * quat2.r;
+  cosom = x * quato.x + y * quato.y + z * quato.z + r * quato.r;
 
   // Make sure the two quaternions are not exactly opposite? (within a little
   // slop).
@@ -100,10 +110,10 @@ csQuaternion csQuaternion::Slerp (
     }
 
     return csQuaternion (
-        scale0 * r + scale1 * quat2.r,
-        scale0 * x + scale1 * quat2.x,
-        scale0 * y + scale1 * quat2.y,
-        scale0 * z + scale1 * quat2.z);
+        scale0 * r + scale1 * quato.r,
+        scale0 * x + scale1 * quato.x,
+        scale0 * y + scale1 * quato.y,
+        scale0 * z + scale1 * quato.z);
   }
 
   // The quaternions are nearly opposite so to avoid a divided by zero error
@@ -111,10 +121,10 @@ csQuaternion csQuaternion::Slerp (
   scale0 = sin ((1.0f - slerp) * PI);
   scale1 = sin (slerp * PI);
   return csQuaternion (
-      scale0 * r + scale1 * quat2.z,
-      scale0 * x + scale1 * -quat2.y,
-      scale0 * y + scale1 * quat2.x,
-      scale0 * z + scale1 * -quat2.r);
+      scale0 * r + scale1 * quato.z,
+      scale0 * x + scale1 * -quato.y,
+      scale0 * y + scale1 * quato.x,
+      scale0 * z + scale1 * -quato.r);
 }
 
 
