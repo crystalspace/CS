@@ -999,7 +999,7 @@ awsPopupMenuFactory::awsPopupMenuFactory (iAws *wmgr)
 
 awsPopupMenuFactory::~awsPopupMenuFactory ()
 {
-  }
+}
 
 iAwsComponent* awsPopupMenuFactory::Create ()
 {

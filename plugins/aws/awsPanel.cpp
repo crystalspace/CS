@@ -52,13 +52,13 @@ awsPanel::~awsPanel ()
 
 bool awsPanel::Setup (iAws *_wmgr, iAwsComponentNode *settings)
 {
-	if (!awsComponent::Setup (_wmgr, settings)) return false;
+  if (!awsComponent::Setup (_wmgr, settings)) return false;
 
-	iAwsPrefManager* pm = WindowManager ()->GetPrefMgr ();
-	pm->GetInt (settings, "Style", style);
-	pm->LookupIntKey ("OverlayTextureAlpha", bkg_alpha);
-	pm->GetInt (settings, "Alpha", bkg_alpha);
-	bkg = pm->GetTexture  ("Texture");
+  iAwsPrefManager* pm = WindowManager ()->GetPrefMgr ();
+  pm->GetInt (settings, "Style", style);
+  pm->LookupIntKey ("OverlayTextureAlpha", bkg_alpha);
+  pm->GetInt (settings, "Alpha", bkg_alpha);
+  bkg = pm->GetTexture  ("Texture");
 
   iString *tn1 = 0, *tn2 = 0;
 
@@ -82,28 +82,28 @@ bool awsPanel::Setup (iAws *_wmgr, iAwsComponentNode *settings)
   // These properties get stored with the frame drawer for convenience.
   int _focusable = 0;
   pm->GetInt (settings, "Focusable", _focusable);
-	focusable = _focusable;
+  focusable = _focusable;
 
   frame_drawer.Setup (WindowManager (), bkg, bkg_alpha, ovl, ovl_alpha);
 
-	return true;
+  return true;
 }
 
 void awsPanel::OnDraw (csRect clip)
 {
-	// If the child exclude region is dirty, refresh it.
-	if (todraw_dirty)
-	{
-		todraw.makeEmpty ();
-		todraw.Include (ClientFrame ());
-		for (iAwsComponent* cmp = GetTopChild (); cmp; cmp = cmp->ComponentBelow ())
-		{
-			if (cmp->Flags () & AWSF_CMP_ALWAYSERASE) continue;
+  // If the child exclude region is dirty, refresh it.
+  if (todraw_dirty)
+  {
+    todraw.makeEmpty ();
+    todraw.Include (ClientFrame ());
+    for (iAwsComponent* cmp = GetTopChild (); cmp; cmp = cmp->ComponentBelow ())
+    {
+      if (cmp->Flags () & AWSF_CMP_ALWAYSERASE) continue;
       if (cmp->isHidden ()) continue;
-			todraw.Exclude (cmp->Frame ());
-		}
-		todraw_dirty = false;
-	}
+      todraw.Exclude (cmp->Frame ());
+    }
+    todraw_dirty = false;
+  }
 
   csRect bkg_align = Window ()->Frame ();
   csRect ovl_align = Window ()->Frame ();
@@ -116,48 +116,48 @@ void awsPanel::OnDraw (csRect clip)
     ovl_align.xmin = Frame ().xmin - bm_ovlsub.xmin;
     ovl_align.ymin = Frame ().ymin - bm_ovlsub.ymin;
   }
-	frame_drawer.Draw (Frame (), style, bkg_align, ovl_align, &todraw);
+  frame_drawer.Draw (Frame (), style, bkg_align, ovl_align, &todraw);
 }
 
 void awsPanel::AddChild (iAwsComponent* cmp)
 {
-	todraw_dirty = true;
-	awsComponent::AddChild (cmp);
+  todraw_dirty = true;
+  awsComponent::AddChild (cmp);
 }
 
 void awsPanel::RemoveChild (iAwsComponent* cmp)
 {
-	todraw_dirty = true;
-	awsComponent::RemoveChild (cmp);
+  todraw_dirty = true;
+  awsComponent::RemoveChild (cmp);
 }
 
 void awsPanel::Move (int delta_x, int delta_y)
 {
-	todraw_dirty = true;
-	awsComponent::Move (delta_x, delta_y);
+  todraw_dirty = true;
+  awsComponent::Move (delta_x, delta_y);
 }
 
 csRect awsPanel::getInsets ()
 {
-	return frame_drawer.GetInsets (style);
+  return frame_drawer.GetInsets (style);
 }
 
 void awsPanel::OnChildMoved ()
 {
-	todraw_dirty = true;
+  todraw_dirty = true;
 }
 
 void awsPanel::OnResized ()
 {
-	todraw_dirty = true;
+  todraw_dirty = true;
 }
 
 void awsPanel::OnChildShow ()
 {
-	todraw_dirty = true;
+  todraw_dirty = true;
 }
 
 void awsPanel::OnChildHide ()
 {
-	todraw_dirty = true;
+  todraw_dirty = true;
 }
