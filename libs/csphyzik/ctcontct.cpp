@@ -176,6 +176,9 @@ int i;
 // modifies c_df.
 void ctFastContactSolver::fdirection( real *c_df, int row, int c_num, ctMatrixN &A, int *Czero_a, int C_top, int *NCzero_f, int NC_top )
 {
+  (void) NCzero_f;
+  (void) NC_top;
+
 int i,j,k,z;
 int Acc_dimen = C_top;
 

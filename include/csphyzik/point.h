@@ -47,7 +47,7 @@ class ctConstPoint : public ctPointObj {
   ctVector3 pos() { return x; }
   ctVector3 vel() { return ctVector3(0.0, 0.0, 0.0); }
 
-  void apply_force(ctVector3 force) {}
+  void apply_force(ctVector3 /*force*/) {}
 };
 
 #endif
