@@ -39,6 +39,10 @@ The history order is reversed so that new features are at the top.
 	  cloth plugin.
 	- Eric Sunshine fixed an infinite loop bug in
 	  csEffectDefinition::GetTopmostVariableID().
+	- Eric Sunshine worked around an assembler limitation on MacOS/X where
+	  it was unable to deal with a large switch() statement in blocks.cpp
+	  since it couldn't encode the jump offset in 16-bits.  (There appears
+	  to be no way to instruct the assembler to use 32-bit offsets.)
 12-Sep-2002
 	- Fixed a crash at exit bug in Blocks.
 	- Fixed stupid bug in star loader that crashed csdemo.

@@ -994,78 +994,109 @@ again:
   }
 }
 
+void Blocks::add_demo_b (float x, float y, float z)
+{
+  add_cube_thing (demo_room, -1, 0, -2, x, y, z, cube_tmpl);
+  add_cube_thing (demo_room, -1, 0, -1, x, y, z, cube_tmpl);
+  add_cube_thing (demo_room, -1, 0,  0, x, y, z, cube_tmpl);
+  add_cube_thing (demo_room, -1, 0,  1, x, y, z, cube_tmpl);
+  add_cube_thing (demo_room, -1, 0,  2, x, y, z, cube_tmpl);
+  add_cube_thing (demo_room,  0, 0, -2, x, y, z, cube_tmpl);
+  add_cube_thing (demo_room,  0, 0,  0, x, y, z, cube_tmpl);
+  add_cube_thing (demo_room,  0, 0,  2, x, y, z, cube_tmpl);
+  add_cube_thing (demo_room,  1, 0, -1, x, y, z, cube_tmpl);
+  add_cube_thing (demo_room,  1, 0,  1, x, y, z, cube_tmpl);
+}
+
+void Blocks::add_demo_l (float x, float y, float z)
+{
+  add_cube_thing (demo_room, -1, 0, -2, x, y, z, cube_tmpl);
+  add_cube_thing (demo_room, -1, 0, -1, x, y, z, cube_tmpl);
+  add_cube_thing (demo_room, -1, 0,  0, x, y, z, cube_tmpl);
+  add_cube_thing (demo_room, -1, 0,  1, x, y, z, cube_tmpl);
+  add_cube_thing (demo_room, -1, 0,  2, x, y, z, cube_tmpl);
+  add_cube_thing (demo_room,  0, 0,  -2, x, y, z, cube_tmpl);
+  add_cube_thing (demo_room,  1, 0,  -2, x, y, z, cube_tmpl);
+}
+
+void Blocks::add_demo_o (float x, float y, float z)
+{
+  add_cube_thing (demo_room, -1, 0, -2, x, y, z, cube_tmpl);
+  add_cube_thing (demo_room, -1, 0, -1, x, y, z, cube_tmpl);
+  add_cube_thing (demo_room, -1, 0,  0, x, y, z, cube_tmpl);
+  add_cube_thing (demo_room, -1, 0,  1, x, y, z, cube_tmpl);
+  add_cube_thing (demo_room, -1, 0,  2, x, y, z, cube_tmpl);
+  add_cube_thing (demo_room,  0, 0, -2, x, y, z, cube_tmpl);
+  add_cube_thing (demo_room,  0, 0,  2, x, y, z, cube_tmpl);
+  add_cube_thing (demo_room,  1, 0, -2, x, y, z, cube_tmpl);
+  add_cube_thing (demo_room,  1, 0, -1, x, y, z, cube_tmpl);
+  add_cube_thing (demo_room,  1, 0,  0, x, y, z, cube_tmpl);
+  add_cube_thing (demo_room,  1, 0,  1, x, y, z, cube_tmpl);
+  add_cube_thing (demo_room,  1, 0,  2, x, y, z, cube_tmpl);
+}
+
+void Blocks::add_demo_c (float x, float y, float z)
+{
+  add_cube_thing (demo_room, -1, 0, -1, x, y, z, cube_tmpl);
+  add_cube_thing (demo_room, -1, 0,  0, x, y, z, cube_tmpl);
+  add_cube_thing (demo_room, -1, 0,  1, x, y, z, cube_tmpl);
+  add_cube_thing (demo_room,  0, 0, -2, x, y, z, cube_tmpl);
+  add_cube_thing (demo_room,  0, 0,  2, x, y, z, cube_tmpl);
+  add_cube_thing (demo_room,  1, 0, -2, x, y, z, cube_tmpl);
+  add_cube_thing (demo_room,  1, 0,  2, x, y, z, cube_tmpl);
+}
+
+void Blocks::add_demo_k (float x, float y, float z)
+{
+  add_cube_thing (demo_room, -1, 0, -2, x, y, z, cube_tmpl);
+  add_cube_thing (demo_room, -1, 0, -1, x, y, z, cube_tmpl);
+  add_cube_thing (demo_room, -1, 0,  0, x, y, z, cube_tmpl);
+  add_cube_thing (demo_room, -1, 0,  1, x, y, z, cube_tmpl);
+  add_cube_thing (demo_room, -1, 0,  2, x, y, z, cube_tmpl);
+  add_cube_thing (demo_room,  0, 0, -1, x, y, z, cube_tmpl);
+  add_cube_thing (demo_room,  0, 0,  1, x, y, z, cube_tmpl);
+  add_cube_thing (demo_room,  1, 0, -2, x, y, z, cube_tmpl);
+  add_cube_thing (demo_room,  1, 0,  2, x, y, z, cube_tmpl);
+}
+
+void Blocks::add_demo_s (float x, float y, float z)
+{
+  add_cube_thing (demo_room,  1, 0, -1, x, y, z, cube_tmpl);
+  add_cube_thing (demo_room,  1, 0,  0, x, y, z, cube_tmpl);
+  add_cube_thing (demo_room,  1, 0,  2, x, y, z, cube_tmpl);
+  add_cube_thing (demo_room,  0, 0, -2, x, y, z, cube_tmpl);
+  add_cube_thing (demo_room,  0, 0,  0, x, y, z, cube_tmpl);
+  add_cube_thing (demo_room,  0, 0,  2, x, y, z, cube_tmpl);
+  add_cube_thing (demo_room, -1, 0, -2, x, y, z, cube_tmpl);
+  add_cube_thing (demo_room, -1, 0,  0, x, y, z, cube_tmpl);
+  add_cube_thing (demo_room, -1, 0,  1, x, y, z, cube_tmpl);
+}
+
 void Blocks::start_demo_shape (BlShapeType type, float x, float y, float z)
 {
   shift_rotate.Set (0, 0, 0);
   switch (type)
   {
     case SHAPE_DEMO_B:
-      add_cube_thing (demo_room, -1, 0, -2, x, y, z, cube_tmpl);
-      add_cube_thing (demo_room, -1, 0, -1, x, y, z, cube_tmpl);
-      add_cube_thing (demo_room, -1, 0,  0, x, y, z, cube_tmpl);
-      add_cube_thing (demo_room, -1, 0,  1, x, y, z, cube_tmpl);
-      add_cube_thing (demo_room, -1, 0,  2, x, y, z, cube_tmpl);
-      add_cube_thing (demo_room,  0, 0, -2, x, y, z, cube_tmpl);
-      add_cube_thing (demo_room,  0, 0,  0, x, y, z, cube_tmpl);
-      add_cube_thing (demo_room,  0, 0,  2, x, y, z, cube_tmpl);
-      add_cube_thing (demo_room,  1, 0, -1, x, y, z, cube_tmpl);
-      add_cube_thing (demo_room,  1, 0,  1, x, y, z, cube_tmpl);
+      add_demo_b (x, y, z);
       break;
     case SHAPE_DEMO_L:
-      add_cube_thing (demo_room, -1, 0, -2, x, y, z, cube_tmpl);
-      add_cube_thing (demo_room, -1, 0, -1, x, y, z, cube_tmpl);
-      add_cube_thing (demo_room, -1, 0,  0, x, y, z, cube_tmpl);
-      add_cube_thing (demo_room, -1, 0,  1, x, y, z, cube_tmpl);
-      add_cube_thing (demo_room, -1, 0,  2, x, y, z, cube_tmpl);
-      add_cube_thing (demo_room,  0, 0,  -2, x, y, z, cube_tmpl);
-      add_cube_thing (demo_room,  1, 0,  -2, x, y, z, cube_tmpl);
+      add_demo_l (x, y, z);
       break;
     case SHAPE_DEMO_O:
-      add_cube_thing (demo_room, -1, 0, -2, x, y, z, cube_tmpl);
-      add_cube_thing (demo_room, -1, 0, -1, x, y, z, cube_tmpl);
-      add_cube_thing (demo_room, -1, 0,  0, x, y, z, cube_tmpl);
-      add_cube_thing (demo_room, -1, 0,  1, x, y, z, cube_tmpl);
-      add_cube_thing (demo_room, -1, 0,  2, x, y, z, cube_tmpl);
-      add_cube_thing (demo_room,  0, 0, -2, x, y, z, cube_tmpl);
-      add_cube_thing (demo_room,  0, 0,  2, x, y, z, cube_tmpl);
-      add_cube_thing (demo_room,  1, 0, -2, x, y, z, cube_tmpl);
-      add_cube_thing (demo_room,  1, 0, -1, x, y, z, cube_tmpl);
-      add_cube_thing (demo_room,  1, 0,  0, x, y, z, cube_tmpl);
-      add_cube_thing (demo_room,  1, 0,  1, x, y, z, cube_tmpl);
-      add_cube_thing (demo_room,  1, 0,  2, x, y, z, cube_tmpl);
+      add_demo_o (x, y, z);
       break;
     case SHAPE_DEMO_C:
-      add_cube_thing (demo_room, -1, 0, -1, x, y, z, cube_tmpl);
-      add_cube_thing (demo_room, -1, 0,  0, x, y, z, cube_tmpl);
-      add_cube_thing (demo_room, -1, 0,  1, x, y, z, cube_tmpl);
-      add_cube_thing (demo_room,  0, 0, -2, x, y, z, cube_tmpl);
-      add_cube_thing (demo_room,  0, 0,  2, x, y, z, cube_tmpl);
-      add_cube_thing (demo_room,  1, 0, -2, x, y, z, cube_tmpl);
-      add_cube_thing (demo_room,  1, 0,  2, x, y, z, cube_tmpl);
+      add_demo_c (x, y, z);
       break;
     case SHAPE_DEMO_K:
-      add_cube_thing (demo_room, -1, 0, -2, x, y, z, cube_tmpl);
-      add_cube_thing (demo_room, -1, 0, -1, x, y, z, cube_tmpl);
-      add_cube_thing (demo_room, -1, 0,  0, x, y, z, cube_tmpl);
-      add_cube_thing (demo_room, -1, 0,  1, x, y, z, cube_tmpl);
-      add_cube_thing (demo_room, -1, 0,  2, x, y, z, cube_tmpl);
-      add_cube_thing (demo_room,  0, 0, -1, x, y, z, cube_tmpl);
-      add_cube_thing (demo_room,  0, 0,  1, x, y, z, cube_tmpl);
-      add_cube_thing (demo_room,  1, 0, -2, x, y, z, cube_tmpl);
-      add_cube_thing (demo_room,  1, 0,  2, x, y, z, cube_tmpl);
+      add_demo_k (x, y, z);
       break;
     case SHAPE_DEMO_S:
-      add_cube_thing (demo_room,  1, 0, -1, x, y, z, cube_tmpl);
-      add_cube_thing (demo_room,  1, 0,  0, x, y, z, cube_tmpl);
-      add_cube_thing (demo_room,  1, 0,  2, x, y, z, cube_tmpl);
-      add_cube_thing (demo_room,  0, 0, -2, x, y, z, cube_tmpl);
-      add_cube_thing (demo_room,  0, 0,  0, x, y, z, cube_tmpl);
-      add_cube_thing (demo_room,  0, 0,  2, x, y, z, cube_tmpl);
-      add_cube_thing (demo_room, -1, 0, -2, x, y, z, cube_tmpl);
-      add_cube_thing (demo_room, -1, 0,  0, x, y, z, cube_tmpl);
-      add_cube_thing (demo_room, -1, 0,  1, x, y, z, cube_tmpl);
+      add_demo_s (x, y, z);
       break;
-    default: break;
+    default:
+      break;
   }
 }
 

@@ -436,6 +436,12 @@ public:
   void StartNewShape ();
   // For demo purposes.
   void start_demo_shape (BlShapeType type, float x, float y, float z);
+  void add_demo_b (float x, float y, float z);
+  void add_demo_l (float x, float y, float z);
+  void add_demo_o (float x, float y, float z);
+  void add_demo_c (float x, float y, float z);
+  void add_demo_k (float x, float y, float z);
+  void add_demo_s (float x, float y, float z);
 
   void move_shape_internal (int dx, int dy, int dz);
   void rotate_shape_internal (const csMatrix3& rot);
