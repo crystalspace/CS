@@ -88,6 +88,7 @@ private:
   ///
   int GetTextureIdx (char* name);
 
+public:
   /// Add a texture
   void AddTexture (csTextureHandle* tm);
 
