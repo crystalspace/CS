@@ -20,8 +20,8 @@
 #define __CS_LIGHTMAP_H__
 
 #include "csutil/scf.h"
+#include "csutil/sarray.h"
 #include "csgfx/rgbpixel.h"
-#include "csgfx/rgbmap.h"
 #include "imesh/thing/lightmap.h"
 
 class csPolyTexture;
@@ -32,39 +32,20 @@ class csLight;
 class csEngine;
 class csDelayedLightingInfo;
 class csObject;
+struct iLight;
 
-/**
- * This is a shadow-map for a pseudo-dynamic light.
- */
-class csShadowMap
+CS_DECLARE_STATIC_ARRAY (csRGBMap, csRGBpixel);
+CS_DECLARE_STATIC_ARRAY (csShadowMapHelper, unsigned char);
+
+class csShadowMap : public csShadowMapHelper
 {
-  ///
-  friend class csLightMap;
-  ///
-  friend class csPolyTexture;
-  friend class csCurve;
+public:
+  iLight *Light;
+  csShadowMap *next;
 
-private:
-  csShadowMap* next;
-  unsigned char* map;
-
-  /**
-   * The pseudo-dynamic light.
-   */
-  csLight* light;
-
-  ///
   csShadowMap ();
-  ///
-  virtual ~csShadowMap ();
-
-  ///
-  unsigned char* GetShadowMap () { return map; }
-
-  ///
-  void Alloc (csLight* light, int w, int h);
-  ///
-  void CopyLightMap (csShadowMap* source, int size);
+  void Alloc (iLight *l, int w, int h);
+  void Copy (const csShadowMap *other);
 };
 
 /**

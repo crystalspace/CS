@@ -768,11 +768,11 @@ void csPolyTexture::FillLightMap (csFrustumView& lview)
     }
     else
       first_time = false;
-    ShadowMap = smap->map;
+    ShadowMap = smap->GetArray ();
   }
   else
   {
-    LightMap = lm->GetStaticMap ().GetMap ();
+    LightMap = lm->GetStaticMap ().GetArray ();
   }
 
   // From: T = Mwt * (W - Vwt)
@@ -878,7 +878,7 @@ void csPolyTexture::ShineDynLightMap (csLightPatch* lp)
 
   csRGBMap& remap = lm->GetRealMap ();
   csDynLight* light = (csDynLight*)(lp->GetLight ());
-  csRGBpixel* map = remap.GetMap ();
+  csRGBpixel* map = remap.GetArray ();
 
   int i;
   float miny = 1000000, maxy = -1000000;

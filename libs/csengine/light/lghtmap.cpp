@@ -30,38 +30,22 @@
 
 csShadowMap::csShadowMap ()
 {
-  map = NULL;
+  Light = NULL;
 }
 
-csShadowMap::~csShadowMap ()
+void csShadowMap::Alloc (iLight* l, int w, int h)
 {
-  delete [] map;
-}
-
-#define lightcell_size	csLightMap::lightcell_size
-#define lightcell_shift	csLightMap::lightcell_shift
-
-void csShadowMap::Alloc (csLight*, int w, int h)
-{
-  delete [] map; map = NULL;
-
+  Light = l;
   int lw = csLightMap::CalcLightMapWidth (w);
   int lh = csLightMap::CalcLightMapHeight (h);
-
-  long lm_size = lw * lh;
-  map = new unsigned char [lm_size];
-  memset (map, 0, lm_size);
+  csShadowMapHelper::Alloc (lw * lh);
+  memset (GetArray (), 0, GetSize ());
 }
 
-#undef lightcell_size
-#undef lightcell_shift
-
-void csShadowMap::CopyLightMap (csShadowMap *source, int size)
+void csShadowMap::Copy (const csShadowMap *source)
 {
-  if (map) delete [] map;
-  map = new unsigned char [size];
-  memcpy (map, source->map, size);
-  light = source->light;
+  csShadowMapHelper::Copy (source);
+  Light = source->Light;
 }
 
 //---------------------------------------------------------------------------
@@ -110,11 +94,11 @@ void csLightMap::DelShadowMap (csShadowMap* smap)
 csShadowMap *csLightMap::NewShadowMap (csLight* light, int w, int h)
 {
   csShadowMap *smap = new csShadowMap ();
-  smap->light = light;
+  smap->Light = &light->scfiLight;
   smap->next = first_smap;
   first_smap = smap;
 
-  smap->Alloc (light, w, h);
+  smap->Alloc (&light->scfiLight, w, h);
 
   iStatLight *slight = SCF_QUERY_INTERFACE_FAST (light, iStatLight);
   slight->GetPrivateObject ()->RegisterLightMap (this);
@@ -128,7 +112,7 @@ csShadowMap* csLightMap::FindShadowMap (csLight* light)
   csShadowMap* smap = first_smap;
   while (smap)
   {
-    if (smap->light == light) return smap;
+    if (smap->Light == &light->scfiLight) return smap;
     smap = smap->next;
   }
   return NULL;
@@ -150,7 +134,7 @@ void csLightMap::Alloc (int w, int h, int r, int g, int b)
   static_lm.Alloc (lm_size);
   real_lm.Alloc (lm_size);
 
-  csRGBpixel* map = static_lm.GetMap ();
+  csRGBpixel* map = static_lm.GetArray ();
   csRGBpixel def (r, g, b);
   // don't know why, but the previous implementation did this:
   def.alpha = 128;
@@ -183,7 +167,7 @@ void csLightMap::CopyLightMap (csLightMap* source)
     smap2 = new csShadowMap ();
     smap2->next = first_smap;
     first_smap = smap2;
-    smap2->CopyLightMap (smap, lm_size);
+    smap2->Copy (smap);
     smap = smap->next;
   }
 }
@@ -291,7 +275,7 @@ bool csLightMap::ReadFromCache (int id, int w, int h,
   static_lm.Clear ();
 
   static_lm.Alloc (lm_size);
-  memcpy (static_lm.GetMap (), d, lm_size * 4);
+  memcpy (static_lm.GetArray (), d, lm_size * 4);
   d += lm_size * 4;
 
   data->DecRef ();
@@ -320,7 +304,7 @@ bool csLightMap::ReadFromCache (int id, int w, int h,
     if (light)
     {
       csShadowMap* smap = NewShadowMap (light, w, h);
-      memcpy (smap->map, d, lm_size);
+      memcpy (smap->GetArray (), d, lm_size);
     }
     else
     {
@@ -378,7 +362,7 @@ void csLightMap::Cache (int id, csPolygon3D* poly,
   l = ps.lm_size; cf->Write ((char*)&l, sizeof (l));
   l = ps.lm_cnt;  cf->Write ((char*)&l, sizeof (l));
 
-  if (static_lm.GetMap ()) cf->Write ((char*)static_lm.GetMap (), lm_size*4);
+  if (static_lm.GetArray ()) cf->Write ((char*)static_lm.GetArray (), lm_size*4);
 
   // close the file
   cf->DecRef ();
@@ -406,13 +390,13 @@ void csLightMap::Cache (int id, csPolygon3D* poly,
     cf->Write ((char*)&l, 4);
     while (smap)
     {
-      csLight* light = smap->light;
-      if (smap->map)
+      csLight* light = smap->Light->GetPrivateObject ();
+      if (smap->GetArray ())
       {
         LightSave ls;
 	ls.light_id = convert_endian (light->GetLightID ());
         cf->Write ((char*)&ls.light_id, sizeof (ls.light_id));
-        cf->Write ((char*)(smap->map), lm_size);
+        cf->Write ((char*)(smap->GetArray ()), lm_size);
       }
       smap = smap->next;
     }
@@ -432,7 +416,7 @@ bool csLightMap::UpdateRealLightMap ()
   // there were any changes.
   //---
 
-  memcpy (real_lm.GetMap (), static_lm.GetMap (), 4 * lm_size);
+  memcpy (real_lm.GetArray (), static_lm.GetArray (), 4 * lm_size);
 
   //---
   // Then add all pseudo-dynamic lights.
@@ -450,13 +434,13 @@ bool csLightMap::UpdateRealLightMap ()
     // Color mode.
     do
     {
-      map = real_lm.GetMap ();
-      light = smap->light;
+      map = real_lm.GetArray ();
+      light = smap->Light->GetPrivateObject ();
       red = light->GetColor ().red;
       green = light->GetColor ().green;
       blue = light->GetColor ().blue;
       csLight::CorrectForNocolor (&red, &green, &blue);
-      p = smap->map;
+      p = smap->GetArray ();
       last_p = p+lm_size;
       do
       {
@@ -488,7 +472,7 @@ void csLightMap::ConvertToMixingMode ()
   mer = 0;
   meg = 0;
   meb = 0;
-  csRGBpixel *map = static_lm.GetMap ();
+  csRGBpixel *map = static_lm.GetArray ();
   for (i = 0 ; i < lm_size ; i++)
   {
     mer += map->red;
@@ -542,18 +526,18 @@ void csLightMap::ConvertFor3dDriver (bool requirePO2, int maxAspect)
  
   // Allocate new data and transform old to new.
   static_lm.Alloc (lm_size);
-  ResizeMap2 (o_stat.GetMap (), oldw, oldh, static_lm.GetMap (), lwidth, lheight);
+  ResizeMap2 (o_stat.GetArray (), oldw, oldh, static_lm.GetArray (), lwidth, lheight);
 
   real_lm.Alloc (lm_size);
-  ResizeMap2 (o_real.GetMap (), oldw, oldh, real_lm.GetMap (), lwidth, lheight);
+  ResizeMap2 (o_real.GetArray (), oldw, oldh, real_lm.GetArray (), lwidth, lheight);
 
   // Convert all shadowmaps.
   csShadowMap* smap = first_smap;
   while (smap)
   {
-    unsigned char* old_map = smap->map;
-    smap->map = new unsigned char [lm_size];
-    ResizeMap (old_map, oldw, oldh, smap->map, lwidth, lheight);
+    unsigned char* old_map = smap->GetArray ();
+    smap->TakeOver (new unsigned char [lm_size], smap->GetSize (), false);
+    ResizeMap (old_map, oldw, oldh, smap->GetArray (), lwidth, lheight);
     delete [] old_map;
     smap = smap->next;
   }
@@ -561,6 +545,6 @@ void csLightMap::ConvertFor3dDriver (bool requirePO2, int maxAspect)
 
 csRGBpixel *csLightMap::GetMapData ()
 {
-  return GetRealMap ().GetMap ();
+  return GetRealMap ().GetArray ();
 }
 

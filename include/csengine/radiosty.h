@@ -100,9 +100,9 @@ public:
   void Copy (csRGBMap& other, int size)
   {
     Clear ();
-    if (other.GetMap()) { 
+    if (other.GetArray()) { 
       Alloc (size); 
-      csRGBpixel* m = other.GetMap ();
+      csRGBpixel* m = other.GetArray ();
       for(int i=0; i<size; i++)
       {
         GetRed()[i] = m[i].red;
@@ -118,7 +118,7 @@ public:
     other.Clear ();
     if (GetMap()) { 
       other.Alloc (size); 
-      csRGBpixel* m = other.GetMap ();
+      csRGBpixel* m = other.GetArray ();
       for(int i=0; i<size; i++)
       {
         m[i].red = (unsigned char)GetRed()[i];

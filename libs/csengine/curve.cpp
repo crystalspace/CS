@@ -68,7 +68,7 @@ csCurveTesselated::~csCurveTesselated ()
 void csCurveTesselated::UpdateColors (csLightMap* LightMap)
 {
   csRGBMap& rgbmap = LightMap->GetRealMap ();
-  csRGBpixel* map = rgbmap.GetMap ();
+  csRGBpixel* map = rgbmap.GetArray ();
   int lm_width = LightMap->GetWidth ();
   int lm_height = LightMap->GetWidth ();
 
@@ -195,7 +195,7 @@ void csCurve::ShineDynLight (csLightPatch* lp)
 
   csColor color = light->GetColor() * NORMAL_LIGHT_LEVEL;
 
-  csRGBpixel *map = LightMap->GetRealMap().GetMap ();
+  csRGBpixel *map = LightMap->GetRealMap().GetArray ();
 
   int lval;
   float cosfact = csPolyTexture::cfg_cosinus_factor;
@@ -381,11 +381,11 @@ void csCurve::CalculateLighting (csFrustumView& lview)
       {
         smap = LightMap->NewShadowMap(light, CURVE_LM_SIZE, CURVE_LM_SIZE );
       }
-      ShadowMap = smap->map;
+      ShadowMap = smap->GetArray ();
     }
     else
     {
-      Lightmap = LightMap->GetStaticMap ().GetMap ();
+      Lightmap = LightMap->GetStaticMap ().GetArray ();
       color = linfo.GetColor () * NORMAL_LIGHT_LEVEL;
     }
 
