@@ -19,6 +19,8 @@ chronological order.
 	- Jorrit removed CollidePath() from iCollideSystem and instead
 	  added that function to csColliderHelper. It is not specific to any
 	  CD system so it fits better in csColliderHelper.
+	- aarobber added a Clone function to iMeshObject.  None of them are
+	  currently implemented and will return 0.
 2-Jun-2004
 	- Jorrit reverted the change from Andres Freund that checks on the
 	  presence of <params> in a mesh object. There are cases where

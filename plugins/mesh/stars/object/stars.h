@@ -128,6 +128,7 @@ public:
 
   virtual iMeshObjectFactory* GetFactory () const { return factory; }
   virtual csFlags& GetFlags () { return flags; }
+  virtual iMeshObject* Clone () { return 0; }
   virtual bool DrawTest (iRenderView* rview, iMovable* movable,
   	uint32 frustum_mask);
   virtual csRenderMesh **GetRenderMeshes (int &n, iRenderView*,
@@ -288,4 +289,3 @@ public:
 };
 
 #endif // __CS_STARS_H__
-

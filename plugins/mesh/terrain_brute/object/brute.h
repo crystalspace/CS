@@ -348,6 +348,7 @@ public:
     { return false; }
 
   virtual csFlags& GetFlags () { return flags; }
+  virtual iMeshObject* Clone () { return 0; }
 
   virtual iMeshObjectFactory* GetFactory () const { return pFactory; }
 
@@ -616,4 +617,3 @@ public:
 };
 
 #endif // __CS_TERRFUNC_H__
-

@@ -368,6 +368,7 @@ public:
 
   /// Does some pre-draw work (buffers all vertices to be drawn, draw will render these.)
   virtual csFlags& GetFlags () { return flags; }
+  virtual iMeshObject* Clone () { return 0; }
   virtual bool DrawTest (iRenderView* rview, iMovable* movable,
   	uint32 frustum_mask);
   virtual csRenderMesh** GetRenderMeshes (int& n, iRenderView*,

@@ -769,6 +769,7 @@ public:
     SCF_DECLARE_EMBEDDED_IBASE (csBezierMesh);
     virtual iMeshObjectFactory* GetFactory () const;
     virtual csFlags& GetFlags () { return scfParent->object_flags; }
+    virtual iMeshObject* Clone () { return 0; }
     virtual bool DrawTest (iRenderView* rview, iMovable* movable,
     	uint32 frustum_mask)
     {

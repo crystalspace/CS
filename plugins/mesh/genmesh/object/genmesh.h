@@ -226,6 +226,7 @@ public:
     return (iMeshObjectFactory*)factory;
   }
   virtual csFlags& GetFlags () { return flags; }
+  virtual iMeshObject* Clone () { return 0; }
   virtual bool DrawTest (iRenderView* rview, iMovable* movable,
   	uint32 frustum_mask);
   virtual bool Draw (iRenderView* rview, iMovable* movable, csZBufMode mode);
@@ -933,4 +934,3 @@ public:
 };
 
 #endif // __CS_GENMESH_H__
-

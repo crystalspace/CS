@@ -204,6 +204,7 @@ public:
   virtual ~csChunkLodTerrainFactory ();
 
   virtual csFlags& GetFlags () { return flags; }
+  virtual iMeshObject* Clone () { return 0; }
   virtual csPtr<iMeshObject> NewInstance ();
   virtual void HardTransform (const csReversibleTransform&) { }
   virtual bool SupportsHardTransform () const { return false; }
@@ -362,6 +363,7 @@ public:
   }
 
   virtual csFlags& GetFlags () { return flags; }
+  virtual iMeshObject* Clone () { return 0; }
 
   /**
    * Does all pre-render calculation.  Determines which LOD children in the 

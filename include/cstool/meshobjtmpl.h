@@ -93,6 +93,12 @@ public:
   virtual iMeshObjectFactory* GetFactory () const = 0;
 
   /**
+   * See imesh/object.h for specification. The default implementation
+   * does nothing and returns 0.
+   */
+  virtual iMeshObject* Clone () { return 0; }
+  
+  /**
    * See imesh/object.h for specification.
    */
   virtual csFlags& GetFlags () { return flags; }

@@ -118,6 +118,11 @@ struct iMeshObject : public iBase
   virtual csFlags& GetFlags () = 0;
 
   /**
+   * Creates a copy of this object and returns the clone.
+   */
+  virtual iMeshObject* Clone () = 0;
+  
+  /**
    * First part of Draw. The engine will call this DrawTest() before
    * calling Draw() so DrawTest() can (if needed) remember computationally
    * expensive data. If DrawTest() returns false the engine will not
@@ -381,4 +386,3 @@ struct iMeshObjectType : public iBase
 };
 
 #endif // __CS_IMESH_OBJECT_H__
-
