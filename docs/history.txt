@@ -7,7 +7,7 @@ individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
 2-Sep-2003
-	- Philip Wyett re-applied the Erics Sunshines Cygwin __argc __argv
+	- Philip Wyett re-applied the Eric Sunshines Cygwin __argc __argv
           fix in win32.cpp, which was overwritten by the old version
           by another dev.
 1-Sep-2003
