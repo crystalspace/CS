@@ -31,6 +31,39 @@ The history order has been reversed so that new features are at the top.
 	- Paul Garceau did some changes to terrain renderer to set default
 	  for P-III to zero (for the SIMD code that is in the terrain engine).
 	- Wouter Wijngaards did some further debugging on radiosity.
+	- Eric Sunshine reverted Paul's change to ddgUtil::DetectSIMD() since
+	  it broke Alex's DDG.  Re-implemented it in a fashion which should
+	  work for everyone.
+	- Eric Sunshine reverted Paul's change to the #includes of ddgutil.cpp
+	  since they broke the terrain library for all other Windows compilers.
+	  Reimplemented his change in a way which won't break other stuff.
+	- Eric Sunshine reverted Paul's change to ddg.h since it unnecessarily
+	  complicated the already complicated conditional compilation
+	  controls.  Re-implemented Paul's change in a much simpler fashion
+	  and also simplified the rest of the conditional compilation controls
+	  at the same time.
+	- Eric Sunshine reverted Paul's changes to the volatile.h generation
+	  code in the makefiles for several reasons:
+	    o He changed the semantic meaning of MAKE_VOLATILE_H, making it
+	      less flexible, order dependent, and less robust.  That is, after
+	      his change, one had to be very careful about the context in
+	      which MAKE_VOLATILE_H was used, whereas previously no such
+	      restriction applied.
+	    o He added a large section of copy/paste code to mingw.mak which
+	      unnecessarily increased maintenance costs and fragility.
+	    o Most of the changes were simply unnecessary.  It appears that
+	      much of the trouble was caused by a misplaced definition of $".
+	  My fixes were twofold.  Fist I corrected the $" problem so that it
+	  is in scope in the proper contexts.  Second, I further generalized
+	  and abstracted the actual emission of volatile.h so that
+	  platform-specific makefiles can intercede at all points of the
+	  process, if necessary.  Having accomplished this, I added very
+	  simple special-case code to mingw.mak to perform the transformations
+	  on volatile.h which Paul required.  This allowed me to eliminate all
+	  the copy/paste code which he had added while still retaining
+	  flexibility.
+	- Eric Sunshine updated documentation to reflect fact that WalkTest
+	  now requires that new "rapid" plug-in exist at run-time.
 25-May-2000
 	- Moved initialization of 2D culler cube into CheckFrustum.
 	  This fixes radiosity. As it was now it simply could not work

@@ -61,4 +61,4 @@ NEXT.FRIEND=no
 override DO.MAKE.VOLATILE=\
   $(subst volatile.t,volatile.tmp,\
   $(subst volatile.tm,volatile.t,\
-  $(subst volatile.tmp,volatile.t,$(MAKE_VOLATILE_H))))
+  $(subst volatile.tmp,volatile.t,$(VOLATILE_H.ALL))))
