@@ -11,6 +11,8 @@ chronological order.
 	  SCF stuff EXCEPT inherit from iBase. This is an old bug but for
 	  some reason this only causes crashes on linux with a static build
 	  and new renderer enabled and while using profile mode???
+	- Jorrit modified csMovableSectorList so it no longer uses
+	  embedding to implement iSectorList.
 21-Oct-2003
 	- Rhad added UI for Initial Speed and Initial Acceleration to partedit.
 	- Eric Sunshine made the following configuration-related changes:

@@ -30,7 +30,7 @@ class csMovable;
 class csMeshWrapper;
 
 /// A list of sectors as the movable uses it
-class csMovableSectorList : public iBase, public csRefArrayObject<iSector>
+class csMovableSectorList : public iSectorList, public csRefArrayObject<iSector>
 {
 private:
   csMovable* movable;
@@ -44,20 +44,14 @@ public:
 
   bool PrepareSector (iSector* item);
 
-  class SectorList : public iSectorList
-  {
-  public:
-    SCF_DECLARE_EMBEDDED_IBASE (csMovableSectorList);
-
-    virtual int GetCount () const;
-    virtual iSector *Get (int n) const;
-    virtual int Add (iSector *obj);
-    virtual bool Remove (iSector *obj);
-    virtual bool Remove (int n);
-    virtual void RemoveAll ();
-    virtual int Find (iSector *obj) const;
-    virtual iSector *FindByName (const char *Name) const;
-  } scfiSectorList;
+  virtual int GetCount () const { return Length (); }
+  virtual iSector *Get (int n) const { return (*this)[n]; }
+  virtual int Add (iSector *obj);
+  virtual bool Remove (iSector *obj);
+  virtual bool Remove (int n);
+  virtual void RemoveAll ();
+  virtual int Find (iSector *obj) const;
+  virtual iSector *FindByName (const char *Name) const;
 };
 
 /**
@@ -142,7 +136,7 @@ public:
   iSectorList *GetSectors ()
   {
     if (parent) return parent->GetSectors ();
-    else return &sectors.scfiSectorList;
+    else return (iSectorList*)&sectors;
   }
 
   /**

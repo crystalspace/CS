@@ -24,17 +24,12 @@
 
 //---------------------------------------------------------------------------
 SCF_IMPLEMENT_IBASE(csMovableSectorList)
-  SCF_IMPLEMENTS_EMBEDDED_INTERFACE(iSectorList)
-SCF_IMPLEMENT_IBASE_END
-
-SCF_IMPLEMENT_EMBEDDED_IBASE (csMovableSectorList::SectorList)
   SCF_IMPLEMENTS_INTERFACE(iSectorList)
-SCF_IMPLEMENT_EMBEDDED_IBASE_END
+SCF_IMPLEMENT_IBASE_END
 
 csMovableSectorList::csMovableSectorList ()
 {
   SCF_CONSTRUCT_IBASE (0);
-  SCF_CONSTRUCT_EMBEDDED_IBASE (scfiSectorList);
   movable = 0;
 }
 
@@ -57,45 +52,35 @@ bool csMovableSectorList::PrepareSector (iSector* sector)
   return true;
 }
 
-int csMovableSectorList::SectorList::GetCount () const
+int csMovableSectorList::Add (iSector *obj)
 {
-  return scfParent->Length ();
+  if (!PrepareSector (obj)) return -1;
+  return Push (obj);
 }
 
-iSector *csMovableSectorList::SectorList::Get (int n) const
+bool csMovableSectorList::Remove (iSector *obj)
 {
-  return scfParent->Get (n);
+  return Delete (obj);
 }
 
-int csMovableSectorList::SectorList::Add (iSector *obj)
+bool csMovableSectorList::Remove (int n)
 {
-  if (!scfParent->PrepareSector (obj)) return -1;
-  return scfParent->Push (obj);
+  return DeleteIndex (n);
 }
 
-bool csMovableSectorList::SectorList::Remove (iSector *obj)
+void csMovableSectorList::RemoveAll ()
 {
-  return scfParent->Delete (obj);
+  DeleteAll ();
 }
 
-bool csMovableSectorList::SectorList::Remove (int n)
+int csMovableSectorList::Find (iSector *obj) const
 {
-  return scfParent->DeleteIndex (n);
+  return csRefArrayObject<iSector>::Find (obj);
 }
 
-void csMovableSectorList::SectorList::RemoveAll ()
+iSector *csMovableSectorList::FindByName (const char *Name) const
 {
-  scfParent->DeleteAll ();
-}
-
-int csMovableSectorList::SectorList::Find (iSector *obj) const
-{
-  return scfParent->Find (obj);
-}
-
-iSector *csMovableSectorList::SectorList::FindByName (const char *Name) const
-{
-  return scfParent->FindByName (Name);
+  return csRefArrayObject<iSector>::FindByName (Name);
 }
 
 //---------------------------------------------------------------------------
