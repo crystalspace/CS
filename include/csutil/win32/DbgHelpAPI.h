@@ -3,6 +3,9 @@
   Unfortunately, dbghelp.h isn't included in MinGW. So all that's needed goes here.
  */
 
+#ifndef __CSUTIL_DEBGHELPAPI_H__
+#define __CSUTIL_DEBGHELPAPI_H__
+
 enum ADDRESS_MODE
 {
   AddrMode1616,
@@ -386,3 +389,5 @@ typedef MINIDUMP_DIRECTORY* PMINIDUMP_DIRECTORY;
 #define CS_API_FUNCTIONS	"csutil/win32/DbgHelpAPI.fun"
 
 #include "APIdeclare.inc"
+
+#endif //__CSUTIL_DEBGHELPAPI_H__
