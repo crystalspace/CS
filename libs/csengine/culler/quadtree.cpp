@@ -27,11 +27,6 @@
 
 bool BoxEntirelyInPolygon (csVector2* verts, int num_verts, const csBox2& bbox)
 {
-  printf("  BoxInPoly %d %d %d %d \n",
-          csPoly2D::In (verts, num_verts, bbox.GetCorner (0)) ,
-          csPoly2D::In (verts, num_verts, bbox.GetCorner (1)) ,
-          csPoly2D::In (verts, num_verts, bbox.GetCorner (2)) ,
-          csPoly2D::In (verts, num_verts, bbox.GetCorner (3)));
   return (csPoly2D::In (verts, num_verts, bbox.GetCorner (0)) &&
           csPoly2D::In (verts, num_verts, bbox.GetCorner (1)) &&
           csPoly2D::In (verts, num_verts, bbox.GetCorner (2)) &&
@@ -105,7 +100,7 @@ csQuadTree :: csQuadTree (const csBox2& the_box, int the_depth)
   {
     states = new unsigned char[state_size];
     /// and every node is EMPTY at the start
-    memset(states, CS_QUAD_ALL_EMPTY, state_size);  
+    memset(states, CS_QUAD_ALL_UNKNOWN, state_size);  
   }
   else states = NULL;
 }
@@ -303,6 +298,7 @@ int csQuadTree :: insert_polygon_func (csQuadTree* pObj,
   /// So, the polygon bbox overlaps this node. How much?
   ///----------------------------------------------------
 
+  if(0)
   printf("Depth %d Checking node %d+%d %d,%d (%d)\n", node_pos->depth, 
     node_pos->offset, node_pos->bytepos, node_pos->node_x, node_pos->node_y,
     node_state);
@@ -313,7 +309,6 @@ int csQuadTree :: insert_polygon_func (csQuadTree* pObj,
     info.pol_bbox->Contains(node_bbox) &&
     BoxEntirelyInPolygon(info.verts, info.num_verts, node_bbox))
   {
-    printf("  =FULL\n");
     if(!info.test_only)
       pObj->SetNodeState(node_pos, CS_QUAD_FULL);
     /// mark children (if any) as unknown, since they should not be reached.
@@ -331,7 +326,6 @@ int csQuadTree :: insert_polygon_func (csQuadTree* pObj,
     || node_bbox.Intersect(info.verts, info.num_verts))
   { 
     int old_node_state = node_state;
-    printf("  =PARTIAL\n");
     // so it overlaps a bit.
     if(node_state == CS_QUAD_EMPTY && node_pos->depth < pObj->max_depth)
     {
@@ -361,7 +355,6 @@ int csQuadTree :: insert_polygon_func (csQuadTree* pObj,
   }
   /// polygon bound overlaps, but polygon itself does not intersect us
   /// i.e. the polygon is not in this node. No change, nothing added here.
-  printf("  =No_overlap\n");
   return CS_QUAD_NOCHANGE;
 }
 

@@ -37,6 +37,7 @@
 #define CS_QUAD_FULL 3
 #define CS_QUAD_ALL_EMPTY 0x0 /* because CS_QUAD_EMPTY == 0 */
 #define CS_QUAD_ALL_FULL 0xFF /* because CS_QUAD_FULL == 3 */
+#define CS_QUAD_ALL_UNKNOWN 0xAA /* because CS_QUAD_FULL == 2 */
 
 class csQuadTree;
 class Dumper;
@@ -260,12 +261,12 @@ public:
    *  Give depth of the node-plane to test on, the x and y integer node coords
    *  of the topleft corner of the rectangle, and it's width and height.
    *  Returns true if and only if all nodes at that spot are CS_QUAD_FULL.
-   *  NOTE: not implemented, since the tree may not be correct at a depth.
-   *    since higher level FULL nodes do not propagate this down.
+   *  Note: You must have called PropagateDown() before using this method.
    */
   //bool TestRectangle(int depth, int x, int y, int w, int h);
-  //propagate down() function?
-  //sift_up() function?
+
+  //propagate down() function.
+  //sift_up() function.
   
 
   
