@@ -17,7 +17,7 @@
 */
 
 #include "cssysdef.h"
-#include "plugins/mesh/object/spr3d/spr3d.h"
+#include "plugins/mesh/spr3d/object/spr3d.h"
 #include "csgeom/polyclip.h"
 #include "csutil/garray.h"
 #include "csutil/rng.h"
