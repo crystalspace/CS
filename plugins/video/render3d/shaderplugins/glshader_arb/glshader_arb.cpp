@@ -32,6 +32,8 @@ Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
 #include "../../opengl/glextmanager.h"
 
+#include "glshader_avp.h"
+
 #include "glshader_arb.h"
 
 
@@ -79,6 +81,15 @@ bool csGLShader_ARB::SupportType(const char* type)
 
 csPtr<iShaderProgram> csGLShader_ARB::CreateShaderProgram(const char* programstring, void* parameters, const char* type)
 {
+  if( strcasecmp(type, "gl_arb_vp") == 0)
+  {
+    csShaderGLAVP* myshader = new csShaderGLAVP(object_reg, ext);
+    if(myshader->LoadProgram(programstring))
+      return (iShaderProgram*) myshader;
+  }
+  else if (false)
+  {
+  }
   return NULL;
 }
 
