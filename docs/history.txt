@@ -13,10 +13,16 @@ Short-term cleanups that need to be done:
 	  includes that don't belong there (like from csengine).
 
 22-Feb-2000
-	- Gary Haussmann fixed another mipmap bug in the OpenGL
-	  rasterizer. The problem was that the maximum mipmap level
-	  required is actually MAX(log2(width),log2(height)), whereas
-	  I thought it was MIN( ... , ... ) instead.
+	- Gary Haussmann fixed another mipmap bug in the OpenGL rasterizer.
+	  The problem was that the maximum mipmap level required is actually
+	  MAX(log2(width),log2(height)), whereas he thought it was
+	  MIN(...,...) instead.
+	- Eric Sunshine began untangling the amazing interdependencies between
+	  csPhyziks header files in order to allow articula.cpp to compile.
+	- Eric Sunshine made further tweaks to csPhyziks to allow the
+	  templated linked-list to build on OpenStep.  Mostly this involved
+	  moving instance variables to the top of class declarations so that
+	  the compiler has seen them before inline methods refer to them.
 21-Feb-2000
 	- Martin Geisse submitted more Texinfo conversions of the LaTeX files
 	  from newdoc.  These files still need a lot of work, but it is a
