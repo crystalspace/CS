@@ -770,6 +770,8 @@ int csEngine:: lightcache_mode = CS_ENGINE_CACHE_READ;
 int csEngine:: lightmap_quality = 3;
 bool csEngine:: do_force_revis = false;
 bool csEngine:: do_rad_debug = false;
+int csEngine:: max_lightmap_w = 0;
+int csEngine:: max_lightmap_h = 0;
 
 SCF_IMPLEMENT_IBASE(csEngine)
   SCF_IMPLEMENTS_INTERFACE(iEngine)
@@ -835,6 +837,10 @@ csEngine::csEngine (iBase *iParent) :
   nextframe_pending = 0;
   virtual_clock = NULL;
   cache_mgr = NULL;
+  default_max_lightmap_w = 256;
+  default_max_lightmap_h = 256;
+  default_lightmap_cell_size = 16;
+  default_clear_zbuf = false;
 
   cbufcube = new csCBufferCube (1024);
   InitCuller ();
@@ -1256,7 +1262,14 @@ int csEngine::GetLightmapCellSize () const
 
 void csEngine::SetLightmapCellSize (int Size)
 {
-  csLightMap::lightcell_size = Size;
+  csLightMap::SetLightCellSize (Size);
+}
+
+void csEngine::ResetWorldSpecificSettings()
+{
+  SetClearZBuf(default_clear_zbuf);
+  SetLightmapCellSize(default_lightmap_cell_size);
+  SetMaxLightmapSize(default_max_lightmap_w, default_max_lightmap_h);
 }
 
 void csEngine::InitCuller ()
@@ -2022,11 +2035,18 @@ iCollection* csEngine::FindCollection (const char* name,
 
 void csEngine::ReadConfig (iConfigFile *Config)
 {
-  csLightMap::SetLightCellSize (
-      Config->GetInt ("Engine.Lighting.LightmapSize", 16));
+  default_lightmap_cell_size = 
+    Config->GetInt ("Engine.Lighting.LightmapSize", default_lightmap_cell_size);
+  csLightMap::SetLightCellSize (default_lightmap_cell_size);
   csEngine::lightmap_quality = Config->GetInt (
       "Engine.Lighting.LightmapQuality",
       3);
+  default_max_lightmap_w = 
+    Config->GetInt ("Engine.Lighting.MaxLightmapWidth", default_max_lightmap_w);
+  max_lightmap_w = default_max_lightmap_w;
+  default_max_lightmap_h = 
+    Config->GetInt ("Engine.Lighting.MaxLightmapHeight", default_max_lightmap_h);
+  max_lightmap_h = default_max_lightmap_h;
 
   csLight::ambient_red = Config->GetInt (
       "Engine.Lighting.Ambient.Red",
@@ -2092,6 +2112,10 @@ void csEngine::ReadConfig (iConfigFile *Config)
   csRadiosity::source_patch_size = Config->GetInt (
       "Engine.Lighting.Radiosity.SourcePatchSize",
       csRadiosity::source_patch_size);
+
+  default_clear_zbuf = 
+    Config->GetBool ("Engine.ClearZBuffer", default_clear_zbuf);
+  clear_zbuf = default_clear_zbuf;
 }
 
 struct LightAndDist

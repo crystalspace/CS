@@ -885,10 +885,11 @@ void csPolygon3D::Finish ()
   {
     int lmw = csLightMap::CalcLightMapWidth (lmi->tex->w_orig);
     int lmh = csLightMap::CalcLightMapHeight (lmi->tex->h);
-    if ((lmw > 256) || (lmh > 256))
+    if ((lmw > csEngine::max_lightmap_w) || (lmh > csEngine::max_lightmap_h))
     {
-      csEngine::current_engine->Report ("Oversize lightmap (%dx%d) "
-        "for polygon '%s'", lmw, lmh, GetName());
+      csEngine::current_engine->Report ("Oversize lightmap (%dx%d > %dx%d) "
+        "for polygon '%s'", lmw, lmh, 
+	csEngine::max_lightmap_w, csEngine::max_lightmap_h, GetName());
     }
     else
     {
