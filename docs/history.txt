@@ -30,6 +30,8 @@ The history order is reversed so that new features are at the top.
 	- He also added a call to AC_CHECK_BISON in configure.ac to ensure
 	  only for bison 1.35 and above config vars will be emitted for make
 	  and jam configuration
+	- Matze added a MakeLocate jamrule for jam version 2.4. This avoids
+	  the "bla depends on itself" warnings.
 23-Apr-2003
 	- Removed iPluginManager->GetPluginCount() and GetPlugin() since
 	  those two functions cannot be used in a thread-safe way. The
