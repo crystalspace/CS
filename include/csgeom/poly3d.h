@@ -27,7 +27,7 @@
 
 #include "csextern.h"
 
-#include "csutil/array.h"
+#include "csutil/garray.h"
 #include "csgeom/math3d.h"
 
 // Values returned by classify.
@@ -45,11 +45,7 @@ class CS_CSGEOM_EXPORT csPoly3D
 {
 protected:
   /// The 3D vertices.
-  csVector3* vertices;
-  ///
-  int num_vertices;
-  ///
-  int max_vertices;
+  csDirtyAccessArray<csVector3> vertices;
 
 public:
   /**
@@ -71,20 +67,25 @@ public:
   /**
    * Get the number of vertices.
    */
-  int GetVertexCount () const { return num_vertices; }
+  int GetVertexCount () const { return vertices.Length (); }
 
   /**
    * Get the array with all vertices.
    */
-  csVector3* GetVertices () const { return vertices; }
+  const csVector3* GetVertices () const { return vertices.GetArray (); }
+
+  /**
+   * Get the array with all vertices.
+   */
+  csVector3* GetVertices () { return vertices.GetArray (); }
 
   /**
    * Get the specified vertex.
    */
-  csVector3* GetVertex (int i) const
+  const csVector3* GetVertex (int i) const
   {
-    if (i<0 || i>=num_vertices) return 0;
-    return &vertices[i];
+    if (i<0 || i>=(int)vertices.Length ()) return 0;
+    return &(vertices.GetArray ()[i]);
   }
 
   /**
@@ -92,30 +93,29 @@ public:
    */
   csVector3& operator[] (int i)
   {
-    CS_ASSERT (i >= 0 && i < num_vertices);
     return vertices[i];
   }
 
   /**
    * Get the specified vertex.
    */
-  csVector3& operator[] (int i) const
+  const csVector3& operator[] (int i) const
   {
-    CS_ASSERT (i >= 0 && i < num_vertices);
     return vertices[i];
   }
 
   /**
    * Get the first vertex.
    */
-  csVector3* GetFirst () const
-  { if (num_vertices<=0) return 0;  else return vertices; }
+  const csVector3* GetFirst () const
+  { if (vertices.Length ()<=0) return 0;  else return vertices.GetArray (); }
 
   /**
    * Get the last vertex.
    */
-  csVector3* GetLast () const
-  { if (num_vertices<=0) return 0; else return &vertices[num_vertices-1]; }
+  const csVector3* GetLast () const
+  { if (vertices.Length ()<=0) return 0; else return &(vertices.GetArray ())[
+    	vertices.Length ()-1]; }
 
   /**
    * Test if this vector is inside the polygon.
@@ -135,7 +135,7 @@ public:
   /**
    * Set the number of vertices.
    */
-  void SetVertexCount (int n) { MakeRoom (n); num_vertices = n; }
+  void SetVertexCount (int n) { vertices.SetLength (n); }
 
   /**
    * Add a vertex (3D) to the polygon.
@@ -155,7 +155,7 @@ public:
   void SetVertices (csVector3 const* v, int num)
   {
     MakeRoom (num);
-    memcpy (vertices, v, (num_vertices = num) * sizeof (csVector3));
+    memcpy (vertices.GetArray (), v, num * sizeof (csVector3));
   }
 
   /**
@@ -214,7 +214,7 @@ public:
    * returnes CS_POL_BACK. Otherwise it returns CS_POL_SPLIT_NEEDED.
    */
   static int Classify (const csPlane3& pl,
-  	csVector3* vertices, int num_vertices);
+  	const csVector3* vertices, int num_vertices);
 
   /**
    * Classify this polygon with regards to a plane.
@@ -225,7 +225,7 @@ public:
    */
   int Classify (const csPlane3& pl) const
   {
-    return Classify (pl, vertices, num_vertices);
+    return Classify (pl, vertices.GetArray (), vertices.Length ());
   }
 
   /// Same as Classify() but for X plane only.
@@ -262,7 +262,7 @@ public:
   /// Compute the normal of this polygon.
   csVector3 ComputeNormal () const
   {
-    return ComputeNormal (vertices, num_vertices);
+    return ComputeNormal (vertices.GetArray (), vertices.Length ());
   }
 
   /// Compute the plane of a polygon.
@@ -274,7 +274,7 @@ public:
   /// Compute the plane of this polygon.
   csPlane3 ComputePlane () const
   {
-    return ComputePlane (vertices, num_vertices);
+    return ComputePlane (vertices.GetArray (), vertices.Length ());
   }
 
   /**

@@ -23,35 +23,29 @@
 csPoly3D::csPoly3D (int start_size)
 {
   CS_ASSERT (start_size > 0);
-  max_vertices = start_size;
-  vertices = new csVector3[max_vertices];
+  vertices.SetLength (start_size);
   MakeEmpty ();
 }
 
 csPoly3D::csPoly3D (const csPoly3D &copy)
 {
-  max_vertices = copy.max_vertices;
-  CS_ASSERT (max_vertices > 0);
-  vertices = new csVector3[max_vertices];
-  num_vertices = copy.num_vertices;
-  memcpy (vertices, copy.vertices, sizeof (csVector3) * num_vertices);
+  vertices = copy.vertices;
 }
 
 csPoly3D::~csPoly3D ()
 {
-  delete[] vertices;
 }
 
 void csPoly3D::MakeEmpty ()
 {
-  num_vertices = 0;
+  vertices.SetLength (0);
 }
 
 bool csPoly3D::In (const csVector3 &v) const
 {
-  int i, i1;
-  i1 = num_vertices - 1;
-  for (i = 0; i < num_vertices; i++)
+  size_t i, i1;
+  i1 = vertices.Length () - 1;
+  for (i = 0; i < vertices.Length (); i++)
   {
     if (csMath3::WhichSide3D (v, vertices[i1], vertices[i]) < 0)
       return false;
@@ -76,25 +70,12 @@ bool csPoly3D::In (csVector3 *poly, int num_poly, const csVector3 &v)
 
 void csPoly3D::MakeRoom (int new_max)
 {
-  if (new_max <= max_vertices) return ;
-  CS_ASSERT (new_max > 0);
-
-  csVector3 *new_vertices = new csVector3[new_max];
-  memcpy (new_vertices, vertices, num_vertices * sizeof (csVector3));
-  delete[] vertices;
-  vertices = new_vertices;
-  max_vertices = new_max;
+  vertices.SetCapacity (new_max);
 }
 
 int csPoly3D::AddVertex (float x, float y, float z)
 {
-  CS_ASSERT (vertices != 0);
-  if (num_vertices >= max_vertices) MakeRoom (max_vertices + 5);
-  vertices[num_vertices].x = x;
-  vertices[num_vertices].y = y;
-  vertices[num_vertices].z = z;
-  num_vertices++;
-  return num_vertices - 1;
+  return vertices.Push (csVector3 (x, y, z));
 }
 
 bool csPoly3D::ProjectXPlane (
@@ -107,8 +88,8 @@ bool csPoly3D::ProjectXPlane (
   csVector2 p;
   csVector3 v;
   float x_dist = plane_x - point.x;
-  int i;
-  for (i = 0; i < num_vertices; i++)
+  size_t i;
+  for (i = 0; i < vertices.Length (); i++)
   {
     v = vertices[i] - point;
     if (ABS (v.x) < SMALL_EPSILON) return false;
@@ -130,8 +111,8 @@ bool csPoly3D::ProjectYPlane (
   csVector2 p;
   csVector3 v;
   float y_dist = plane_y - point.y;
-  int i;
-  for (i = 0; i < num_vertices; i++)
+  size_t i;
+  for (i = 0; i < vertices.Length (); i++)
   {
     v = vertices[i] - point;
     if (ABS (v.y) < SMALL_EPSILON) return false;
@@ -153,8 +134,8 @@ bool csPoly3D::ProjectZPlane (
   csVector2 p;
   csVector3 v;
   float z_dist = plane_z - point.z;
-  int i;
-  for (i = 0; i < num_vertices; i++)
+  size_t i;
+  for (i = 0; i < vertices.Length (); i++)
   {
     v = vertices[i] - point;
     if (ABS (v.z) < SMALL_EPSILON) return false;
@@ -168,7 +149,7 @@ bool csPoly3D::ProjectZPlane (
 
 int csPoly3D::Classify (
   const csPlane3 &pl,
-  csVector3 *vertices,
+  const csVector3 *vertices,
   int num_vertices)
 {
   int i;
@@ -192,10 +173,10 @@ int csPoly3D::Classify (
 
 int csPoly3D::ClassifyX (float x) const
 {
-  int i;
+  size_t i;
   int front = 0, back = 0;
 
-  for (i = 0; i < num_vertices; i++)
+  for (i = 0; i < vertices.Length (); i++)
   {
     float xx = vertices[i].x - x;
     if (xx < -EPSILON)
@@ -211,10 +192,10 @@ int csPoly3D::ClassifyX (float x) const
 
 int csPoly3D::ClassifyY (float y) const
 {
-  int i;
+  size_t i;
   int front = 0, back = 0;
 
-  for (i = 0; i < num_vertices; i++)
+  for (i = 0; i < vertices.Length (); i++)
   {
     float yy = vertices[i].y - y;
     if (yy < -EPSILON)
@@ -230,10 +211,10 @@ int csPoly3D::ClassifyY (float y) const
 
 int csPoly3D::ClassifyZ (float z) const
 {
-  int i;
+  size_t i;
   int front = 0, back = 0;
 
-  for (i = 0; i < num_vertices; i++)
+  for (i = 0; i < vertices.Length (); i++)
   {
     float zz = vertices[i].z - z;
     if (zz < -EPSILON)
@@ -257,12 +238,12 @@ void csPoly3D::SplitWithPlane (
 
   csVector3 ptB;
   float sideA, sideB;
-  csVector3 ptA = vertices[num_vertices - 1];
+  csVector3 ptA = vertices[vertices.Length () - 1];
   sideA = split_plane.Classify (ptA);
   if (ABS (sideA) < SMALL_EPSILON) sideA = 0;
 
   int i;
-  for (i = -1; ++i < num_vertices;)
+  for (i = -1; ++i < (int)vertices.Length ();)
   {
     ptB = vertices[i];
     sideB = split_plane.Classify (ptB);
@@ -325,12 +306,12 @@ void csPoly3D::CutToPlane (const csPlane3 &split_plane)
 
   csVector3 ptB;
   float sideA, sideB;
-  csVector3 ptA = old.vertices[old.num_vertices - 1];
+  csVector3 ptA = old.vertices[old.vertices.Length () - 1];
   sideA = split_plane.Classify (ptA);
   if (ABS (sideA) < SMALL_EPSILON) sideA = 0;
 
   int i;
-  for (i = -1; ++i < old.num_vertices;)
+  for (i = -1; ++i < (int)old.vertices.Length ();)
   {
     ptB = old.vertices[i];
     sideB = split_plane.Classify (ptB);
@@ -391,12 +372,12 @@ void csPoly3D::SplitWithPlaneX (
 
   csVector3 ptB;
   float sideA, sideB;
-  csVector3 ptA = vertices[num_vertices - 1];
+  csVector3 ptA = vertices[vertices.Length () - 1];
   sideA = ptA.x - x;
   if (ABS (sideA) < SMALL_EPSILON) sideA = 0;
 
   int i;
-  for (i = -1; ++i < num_vertices;)
+  for (i = -1; ++i < (int)vertices.Length ();)
   {
     ptB = vertices[i];
     sideB = ptB.x - x;
@@ -460,12 +441,12 @@ void csPoly3D::SplitWithPlaneY (
 
   csVector3 ptB;
   float sideA, sideB;
-  csVector3 ptA = vertices[num_vertices - 1];
+  csVector3 ptA = vertices[vertices.Length () - 1];
   sideA = ptA.y - y;
   if (ABS (sideA) < SMALL_EPSILON) sideA = 0;
 
   int i;
-  for (i = -1; ++i < num_vertices;)
+  for (i = -1; ++i < (int)vertices.Length ();)
   {
     ptB = vertices[i];
     sideB = ptB.y - y;
@@ -529,12 +510,12 @@ void csPoly3D::SplitWithPlaneZ (
 
   csVector3 ptB;
   float sideA, sideB;
-  csVector3 ptA = vertices[num_vertices - 1];
+  csVector3 ptA = vertices[vertices.Length () - 1];
   sideA = ptA.z - z;
   if (ABS (sideA) < SMALL_EPSILON) sideA = 0;
 
   int i;
-  for (i = -1; ++i < num_vertices;)
+  for (i = -1; ++i < (int)vertices.Length ();)
   {
     ptB = vertices[i];
     sideB = ptB.z - z;
@@ -591,18 +572,17 @@ void csPoly3D::SplitWithPlaneZ (
 //---------------------------------------------------------------------------
 int csVector3Array::AddVertexSmart (float x, float y, float z)
 {
-  int i;
-  for (i = 0; i < num_vertices; i++)
+  size_t i;
+  for (i = 0; i < vertices.Length (); i++)
   {
     if (
-      ABS (x - vertices[i].x) < SMALL_EPSILON &&
-      ABS (y - vertices[i].y) < SMALL_EPSILON &&
-      ABS (z - vertices[i].z) < SMALL_EPSILON)
+        ABS (x - vertices[i].x) < SMALL_EPSILON &&
+        ABS (y - vertices[i].y) < SMALL_EPSILON &&
+        ABS (z - vertices[i].z) < SMALL_EPSILON)
       return i;
   }
 
-  AddVertex (x, y, z);
-  return num_vertices - 1;
+  return AddVertex (x, y, z);
 }
 
 csVector3 csPoly3D::ComputeNormal (const csVector3 *vertices, int num)
@@ -662,8 +642,8 @@ float csPoly3D::GetArea () const
   float area = 0.0f;
 
   // triangulize the polygon, triangles are (0,1,2), (0,2,3), (0,3,4), etc..
-  int i;
-  for (i = 0; i < num_vertices - 2; i++)
+  size_t i;
+  for (i = 0; i < vertices.Length () - 2; i++)
     area += csMath3::DoubleArea3 (vertices[0], vertices[i + 1],
     	vertices[i + 2]);
   return area / 2.0f;
@@ -671,10 +651,10 @@ float csPoly3D::GetArea () const
 
 csVector3 csPoly3D::GetCenter () const
 {
-  int i;
+  size_t i;
   csBox3 bbox;
   bbox.StartBoundingBox (vertices[0]);
-  for (i = 1; i < num_vertices; i++)
+  for (i = 1; i < vertices.Length (); i++)
     bbox.AddBoundingVertexSmart (vertices[i]);
   return bbox.GetCenter ();
 }

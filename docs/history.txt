@@ -14,6 +14,10 @@ chronological order.
 	- Jorrit fixed a leak in genmesh with shader variable contexts. This
 	  caused many other things to leak.
 	- Erotoman fixed bug in lightning mesh.
+	- Jorrit rewrote csPoly3D so it now uses csArray instead of the
+	  custom code for growing array. This should also considerably
+	  speed up csPoly3D (and thus loading of sprites which makes
+	  heavy use of csPoly3D).
 21-Aug-2004
 	- Jorrit added more leakguards to CS.
         - Philip Wyett fixed attempts to load
