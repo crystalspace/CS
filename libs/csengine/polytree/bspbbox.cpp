@@ -48,8 +48,8 @@ void csBspPolygon::Dump ()
   for (i = 0; i < polygon.GetVertexCount (); i++)
   {
     j = polygon[i];
-    printf (
-      "  vt %d:(%f,%f,%f) cam:(%f,%f,%f)\n",
+    csEngine::current_engine->Report (
+      "  vt %d:(%f,%f,%f) cam:(%f,%f,%f)",
       i,
       verts[j].x,
       verts[j].y,

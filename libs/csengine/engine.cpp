@@ -75,6 +75,8 @@ void csEngine::Report (const char *description, ...)
   va_list arg;
   va_start (arg, description);
 
+  if (!Reporter) Reporter = CS_QUERY_REGISTRY (object_reg, iReporter);
+  
   if (Reporter)
   {
     Reporter->ReportV (
@@ -97,6 +99,8 @@ void csEngine::Warn (const char *description, ...)
   va_list arg;
   va_start (arg, description);
 
+  if (!Reporter) Reporter = CS_QUERY_REGISTRY (object_reg, iReporter);
+
   if (Reporter)
   {
     Reporter->ReportV (
@@ -118,6 +122,8 @@ void csEngine::ReportBug (const char *description, ...)
 {
   va_list arg;
   va_start (arg, description);
+
+  if (!Reporter) Reporter = CS_QUERY_REGISTRY (object_reg, iReporter);
 
   if (Reporter)
   {

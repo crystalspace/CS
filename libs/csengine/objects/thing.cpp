@@ -2874,7 +2874,7 @@ void *csThing::TestQueuePolygons (
     (d->FindRenderContextData ((void *)thing));
   if (!pvi)
   {
-    printf ("INTERNAL ERROR! polygon queue is missing!!!\n");
+    csEngine::current_engine->ReportBug ("INTERNAL ERROR! polygon queue is missing!!!");
     fflush (stdout);
     DEBUG_BREAK;
   }
@@ -2943,7 +2943,7 @@ bool csThing::Draw (iRenderView *rview, iMovable *movable, csZBufMode zMode)
         (rview->FindRenderContextData ((void *)this));
       if (!pvi)
       {
-        printf ("INTERNAL ERROR! polygon queue is missing!!!\n");
+        csEngine::current_engine->ReportBug ("INTERNAL ERROR! polygon queue is missing!!!");
         fflush (stdout);
         DEBUG_BREAK;
       }

@@ -750,8 +750,7 @@ void csBspTree::Cache (iFile* cf, csBspNode *node,
 
   if (cnt_same != node->polygons.GetPolygonCount ())
   {
-    printf ("INTERNAL ERROR!\n");
-    fflush (stdout);
+    csEngine::current_engine->Warn ("INTERNAL ERROR! cnt_same != node->polygons.GetPolygonCount ()");
   }
 
   if (node->front) Cache (cf, (csBspNode *)node->front, front_poly,

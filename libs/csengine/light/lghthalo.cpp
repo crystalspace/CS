@@ -523,14 +523,14 @@ void csLightFlareHalo::ProcessFlareComponent (
   dpfx.use_fog = false;
   if (!comp->image)
   {
-    printf ("INTERNAL ERROR: flare used without material.\n");
+    csEngine::current_engine->Warn ("INTERNAL ERROR: flare used without material.");
     return ;
   }
 
   dpfx.mat_handle = comp->image->GetMaterialHandle ();
   if (!dpfx.mat_handle)
   {
-    printf ("INTERNAL ERROR: flare used without valid material handle.\n");
+    csEngine::current_engine->Warn ("INTERNAL ERROR: flare used without valid material handle.");
     return ;
   }
 

@@ -48,7 +48,7 @@ void csPolygonTreeNode::UnlinkStub (csPolygonStub *ps)
     else if (todo_stubs == ps)
       todo_stubs = ps->next_tree;
     else
-      printf ("INTERNAL ERROR! Stub not in todo or stub list!\n");
+      csEngine::current_engine->Warn ("INTERNAL ERROR! Stub not in todo or stub list!");
   }
 
   ps->prev_tree = ps->next_tree = NULL;

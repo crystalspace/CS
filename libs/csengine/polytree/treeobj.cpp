@@ -16,6 +16,7 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 #include "cssysdef.h"
+#include "csengine/engine.h"
 #include "csengine/treeobj.h"
 #include "csengine/bspbbox.h"
 #include "csengine/polytree.h"
@@ -115,7 +116,7 @@ void csPolygonStubPool::Free (csPolygonStub *ps)
 
 void csPolygonStubPool::Dump ()
 {
-  int cnt;
+  int cnt, freecnt;
   cnt = 0;
 
   PoolObj *po = alloced;
@@ -125,16 +126,15 @@ void csPolygonStubPool::Dump ()
     po = po->next;
   }
 
-  printf ("ObjStub pool: %d allocated, ", cnt);
-  cnt = 0;
+  freecnt = 0;
   po = freed;
   while (po)
   {
-    cnt++;
+    freecnt++;
     po = po->next;
   }
 
-  printf ("%d freed.\n", cnt);
+  csEngine::current_engine->Report ("ObjStub pool: %d allocated, %d freed.", cnt, freecnt);
 }
 
 //------------------------------------------------------------------------

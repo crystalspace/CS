@@ -182,7 +182,7 @@ void csCBufferLine::Dump ()
   csCBufferSpan *span = first_span;
   while (span)
   {
-    printf ("  empty = %d-%d\n", span->startx, span->endx);
+    csEngine::current_engine->Report ("  empty = %d-%d", span->startx, span->endx);
     span = span->next;
   }
 }
