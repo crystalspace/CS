@@ -894,7 +894,10 @@ protected:
   char internalBuffer[LEN];
   virtual void SetCapacityInternal (size_t NewSize, bool extraSpace)
   {
-    char* oldBuf = (MaxSize > LEN) ? Data : 0;
+    // @@@ TEMPORARILY DISABLED!
+    //char* oldBuf = (MaxSize > LEN) ? Data : 0;
+    char* oldBuf = Data;
+
     char* newBuf;
     // @@@ TEMPORARILY DISABLED!
     if (false) //(NewSize < LEN)
