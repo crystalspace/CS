@@ -1,6 +1,104 @@
 If you want to get a more detailed listing of changes have a look
 at docs/history.txt.
 
+CHANGES FROM 0.12 to 0.14
+-------------------------
+
+- 3D Sound system has been rewritten to use COM.
+
+- 3D Rasterizers have been modified greatly. Textures are now
+  managed by the 3D rasterizer internally. There is also a new
+  DrawPolygonFX routine which replaces the old DrawPolygonQuick.
+  DrawPolygonFX is much more general and has more features. You can
+  now do flat shading and gouraud shading (without texture) for
+  example.
+
+- Almost all features in the 3D Rasterizers also support 2*SRC*DST
+  correctly. 2*SRC*DST is the prefered blending mode which Crystal Space
+  uses for lighting.
+
+- The OpenGL and Direct3D rasterizers have been updated greatly. They now
+  work much better than before and almost implement all functionality
+  that the software rasterizer has. Halo's are still missing. The console
+  also works now for those rasterizers. OpenGL is a lot faster.
+
+- Support for vertex based volumetric fog in OpenGL and Direct3D.
+
+- The software rasterizer has also improved a lot. For example, fog is
+  now MUCH faster which makes it usable. Other routines have also improved
+  in speed. The software renderer can now also use assembly code with the
+  NASM assembler.
+
+- The 3D engine has been cleaned up considerably. A lot of obsolete
+  or badly designed classes have been removed or rewritten. A new
+  csgeom library works together with csengine to have a clean seperation
+  of what is 3D geometry and what is 3D engine specific.
+
+- Many bugs in the engine have now been fixed.
+
+- Work has started on a very ambitious new visibility system. In addition
+  to portals and sectors you can now use the c-buffer (coverage buffer) in
+  combination with a BSP tree. This is only the beginning. I also plan to
+  add octrees and/or kd-trees for much improved culling. For hardware
+  geometry acceleration I also plan to replace the c-buffer with a quad-tree.
+  This will make Crystal Space very good for city like landscapes.
+
+- New LOD system for 3D triangle mesh sprites. It is based on progressive
+  meshes with edge collapsing and vertex morphing.
+
+- New skeletal sprite animation system. To see the new skeletal sprites
+  you should try out the 'addskel' and 'addghost' commands on the console.
+
+- Sprites are now lighted using gouraud shading!
+
+- In general many classes and method names have been renamed to the
+  new naming convention. A class always looks like this: 'csThisClass'
+  while a method name looks like this: 'ThisMethod'.
+
+- Much better and improved directory structure. Crystal Space is now more
+  a collection of libraries and tools. The goal is that those libraries
+  are as seperate as possible. For example: you should be able to use the
+  Crystal Space geometry library without having to require anything else.
+  With this new directory structure there is also a much better makefile
+  system.
+
+- One of the new libraries that has been created is the csobject library
+  which is a general object management system. Crystal Space uses it for
+  many important 3D engine classes but you can use it as well for your
+  own game objects. The system is general and hierarchical. You can easily
+  add any type of object to any other object.
+
+- Another new library is the 'csgame' library which is used by Crystal
+  Shooter. It contains game specific code which is not general enough
+  to go to Crystal Space itself.
+
+- Crystal Space now has the ability to read MD2 and 3DS objects directly.
+  Many other formats will follow. The system is very general.
+
+- MUCH better precalculation of the lightmaps. Now there are no more
+  black borders and lightmaps look much smoother too.
+
+- Curved surfaces are lighted now (using lightmaps).
+
+- Lighting system has been rewritten totally. It is much more efficient,
+  easier to read and has less bugs. Things can also optionally cast shadows
+  for dynamic lights.
+
+- Better movement system in WalkTest. We now have gravity and good
+  collision detection. You can also jump :-)
+
+- Many new console commands to test various things. The movement system
+  in WalkTest is also configurable via 'autoexec.cfg'.
+
+- MazeD is still not finished but many updates have happened and work
+  is going very well.
+
+- Various changes and improvements to many ports: Linux, OS/2, BeOS,
+  Macintosh, DOS, Windows, NextStep, ... and to the rest of Crystal
+  Space. It is too much to mention here (see history.txt for a very
+  detailed listing).
+
+
 CHANGES FROM 0.10 to 0.12
 -------------------------
 
