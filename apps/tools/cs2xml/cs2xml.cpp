@@ -21,11 +21,11 @@
 
 #include "cssysdef.h"
 #include "cs2xml.h"
+#include "parser.h"
 #include "csgeom/vector3.h"
 #include "csgeom/vector2.h"
 #include "csutil/cscolor.h"
 #include "csutil/util.h"
-#include "csutil/parser.h"
 #include "csutil/indprint.h"
 #include "csutil/scanstr.h"
 #include "csutil/csstring.h"

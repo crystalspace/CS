@@ -19,9 +19,9 @@
 
 #include "cssysdef.h"
 #include "csgeom/math3d.h"
-#include "csutil/parser.h"
 #include "csutil/scanstr.h"
 #include "csutil/cscolor.h"
+#include "csutil/util.h"
 #include "exploldr.h"
 #include "imesh/object.h"
 #include "iengine/mesh.h"
@@ -43,23 +43,6 @@
 #include "ivaria/reporter.h"
 
 CS_IMPLEMENT_PLUGIN
-
-CS_TOKEN_DEF_START
-  CS_TOKEN_DEF (CENTER)
-  CS_TOKEN_DEF (COLOR)
-  CS_TOKEN_DEF (FACTORY)
-  CS_TOKEN_DEF (FADE)
-  CS_TOKEN_DEF (LIGHTING)
-  CS_TOKEN_DEF (MATERIAL)
-  CS_TOKEN_DEF (MIXMODE)
-  CS_TOKEN_DEF (NUMBER)
-  CS_TOKEN_DEF (NRSIDES)
-  CS_TOKEN_DEF (PARTRADIUS)
-  CS_TOKEN_DEF (PUSH)
-  CS_TOKEN_DEF (SPREADPOS)
-  CS_TOKEN_DEF (SPREADSPEED)
-  CS_TOKEN_DEF (SPREADACCEL)
-CS_TOKEN_DEF_END
 
 enum
 {
@@ -149,22 +132,6 @@ bool csExplosionFactoryLoader::Initialize (iObjectRegistry* object_reg)
   return true;
 }
 
-csPtr<iBase> csExplosionFactoryLoader::Parse (const char* /*string*/,
-	iLoaderContext*, iBase* /* context */)
-{
-  csRef<iPluginManager> plugin_mgr (CS_QUERY_REGISTRY (object_reg,
-  	iPluginManager));
-  csRef<iMeshObjectType> type (CS_QUERY_PLUGIN_CLASS (plugin_mgr,
-  	"crystalspace.mesh.object.explosion", iMeshObjectType));
-  if (!type)
-  {
-    type = CS_LOAD_PLUGIN (plugin_mgr, "crystalspace.mesh.object.explosion",
-    	iMeshObjectType);
-  }
-  csRef<iMeshObjectFactory> fact (type->NewFactory ());
-  return csPtr<iBase> (fact);
-}
-
 csPtr<iBase> csExplosionFactoryLoader::Parse (iDocumentNode* /*node*/,
 	iLoaderContext*, iBase* /* context */)
 {
@@ -238,161 +205,6 @@ bool csExplosionLoader::Initialize (iObjectRegistry* object_reg)
   xmltokens.Register ("spreadaccel", XMLTOKEN_SPREADACCEL);
 
   return true;
-}
-
-csPtr<iBase> csExplosionLoader::Parse (const char* string,
-	iLoaderContext* ldr_context, iBase*)
-{
-  CS_TOKEN_TABLE_START (commands)
-    CS_TOKEN_TABLE (CENTER)
-    CS_TOKEN_TABLE (COLOR)
-    CS_TOKEN_TABLE (FACTORY)
-    CS_TOKEN_TABLE (FADE)
-    CS_TOKEN_TABLE (LIGHTING)
-    CS_TOKEN_TABLE (MATERIAL)
-    CS_TOKEN_TABLE (MIXMODE)
-    CS_TOKEN_TABLE (NUMBER)
-    CS_TOKEN_TABLE (NRSIDES)
-    CS_TOKEN_TABLE (PARTRADIUS)
-    CS_TOKEN_TABLE (PUSH)
-    CS_TOKEN_TABLE (SPREADPOS)
-    CS_TOKEN_TABLE (SPREADSPEED)
-    CS_TOKEN_TABLE (SPREADACCEL)
-  CS_TOKEN_TABLE_END
-
-  char* name;
-  long cmd;
-  char* params;
-  char str[255];
-
-  csRef<iMeshObject> mesh;
-  csRef<iParticleState> partstate;
-  csRef<iExplosionState> explostate;
-
-  csParser* parser = ldr_context->GetParser ();
-
-  char* buf = (char*)string;
-  while ((cmd = parser->GetObject (&buf, commands, &name, &params)) > 0)
-  {
-    if (!params)
-    {
-      // @@@ Error handling!
-      return NULL;
-    }
-    switch (cmd)
-    {
-      case CS_TOKEN_COLOR:
-	{
-	  csColor color;
-	  csScanStr (params, "%f,%f,%f", &color.red, &color.green, &color.blue);
-	  partstate->SetColor (color);
-	}
-	break;
-      case CS_TOKEN_CENTER:
-	{
-	  csVector3 center;
-	  csScanStr (params, "%f,%f,%f", &center.x, &center.y, &center.z);
-	  explostate->SetCenter (center);
-	}
-	break;
-      case CS_TOKEN_PUSH:
-	{
-	  csVector3 push;
-	  csScanStr (params, "%f,%f,%f", &push.x, &push.y, &push.z);
-	  explostate->SetPush (push);
-	}
-	break;
-      case CS_TOKEN_FACTORY:
-	{
-          csScanStr (params, "%s", str);
-	  iMeshFactoryWrapper* fact = ldr_context->FindMeshFactory (str);
-	  if (!fact)
-	  {
-	    // @@@ Error handling!
-	    return NULL;
-	  }
-	  mesh = fact->GetMeshObjectFactory ()->NewInstance ();
-          partstate = SCF_QUERY_INTERFACE (mesh, iParticleState);
-          explostate = SCF_QUERY_INTERFACE (mesh, iExplosionState);
-	}
-	break;
-      case CS_TOKEN_MATERIAL:
-	{
-          csScanStr (params, "%s", str);
-          iMaterialWrapper* mat = ldr_context->FindMaterial (str);
-	  if (!mat)
-	  {
-            // @@@ Error handling!
-            return NULL;
-	  }
-	  partstate->SetMaterialWrapper (mat);
-	}
-	break;
-      case CS_TOKEN_MIXMODE:
-	uint mode;
-	if (synldr->ParseMixmode (parser, params, mode))
-          partstate->SetMixMode (mode);
-	break;
-      case CS_TOKEN_LIGHTING:
-        {
-          bool do_lighting;
-          csScanStr (params, "%b", &do_lighting);
-          explostate->SetLighting (do_lighting);
-        }
-        break;
-      case CS_TOKEN_NUMBER:
-        {
-          int nr;
-          csScanStr (params, "%d", &nr);
-          explostate->SetParticleCount (nr);
-        }
-        break;
-      case CS_TOKEN_NRSIDES:
-        {
-          int nr;
-          csScanStr (params, "%d", &nr);
-          explostate->SetNrSides (nr);
-        }
-        break;
-      case CS_TOKEN_FADE:
-        {
-          int f;
-          csScanStr (params, "%d", &f);
-          explostate->SetFadeSprites (f);
-        }
-        break;
-      case CS_TOKEN_PARTRADIUS:
-        {
-          float f;
-          csScanStr (params, "%f", &f);
-          explostate->SetPartRadius (f);
-        }
-        break;
-      case CS_TOKEN_SPREADPOS:
-        {
-          float f;
-          csScanStr (params, "%f", &f);
-          explostate->SetSpreadPos (f);
-        }
-        break;
-      case CS_TOKEN_SPREADSPEED:
-        {
-          float f;
-          csScanStr (params, "%f", &f);
-          explostate->SetSpreadSpeed (f);
-        }
-        break;
-      case CS_TOKEN_SPREADACCEL:
-        {
-          float f;
-          csScanStr (params, "%f", &f);
-          explostate->SetSpreadAcceleration (f);
-        }
-        break;
-    }
-  }
-
-  return csPtr<iBase> (mesh);
 }
 
 csPtr<iBase> csExplosionLoader::Parse (iDocumentNode* node,

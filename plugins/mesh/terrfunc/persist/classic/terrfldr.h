@@ -48,10 +48,6 @@ public:
 
   bool Initialize (iObjectRegistry* p);
 
-  /// Parse a given string and return a new object for it.
-  virtual csPtr<iBase> Parse (const char* string, 
-    iLoaderContext* ldr_context, iBase* context);
-
   /// Parse a given node and return a new object for it.
   virtual csPtr<iBase> Parse (iDocumentNode* node,
     iLoaderContext* ldr_context, iBase* context);
@@ -85,10 +81,6 @@ public:
   virtual ~csTerrFuncLoader ();
 
   bool Initialize (iObjectRegistry* p);
-
-  /// Parse a given string and return a new object for it.
-  virtual csPtr<iBase> Parse (const char* string, 
-    iLoaderContext* ldr_context,  iBase* context);
 
   /// Parse a given node and return a new object for it.
   virtual csPtr<iBase> Parse (iDocumentNode* node,

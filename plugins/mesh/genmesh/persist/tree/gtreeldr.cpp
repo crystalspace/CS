@@ -19,7 +19,6 @@
 #include "cssysdef.h"
 #include "cssys/sysfunc.h"
 #include "csgeom/math3d.h"
-#include "csutil/parser.h"
 #include "csutil/scanstr.h"
 #include "csutil/cscolor.h"
 #include "gtreeldr.h"
@@ -41,10 +40,6 @@
 #include "imap/ldrctxt.h"
 
 CS_IMPLEMENT_PLUGIN
-
-CS_TOKEN_DEF_START
-  CS_TOKEN_DEF (HEIGHT)
-CS_TOKEN_DEF_END
 
 enum
 {
@@ -649,121 +644,6 @@ bool csGeneralTreeFactoryLoader::Initialize (iObjectRegistry* object_reg)
   xmltokens.Register ("height", XMLTOKEN_HEIGHT);
 
   return true;
-}
-
-csPtr<iBase> csGeneralTreeFactoryLoader::Parse (
-	const char* string,
-	iLoaderContext* ldr_context, iBase* /* context */)
-{
-  CS_TOKEN_TABLE_START (commands)
-    CS_TOKEN_TABLE (HEIGHT)
-  CS_TOKEN_TABLE_END
-
-  char* name;
-  long cmd;
-  char* params;
-
-  csParser* parser = ldr_context->GetParser ();
-
-  csRef<iPluginManager> plugin_mgr (CS_QUERY_REGISTRY (object_reg,
-  	iPluginManager));
-  csRef<iMeshObjectType> type (CS_QUERY_PLUGIN_CLASS (plugin_mgr,
-  	"crystalspace.mesh.object.genmesh", iMeshObjectType));
-  if (!type)
-  {
-    type = CS_LOAD_PLUGIN (plugin_mgr, "crystalspace.mesh.object.genmesh",
-    	iMeshObjectType);
-  }
-  if (!type)
-  {
-    ReportError (reporter,
-		"crystalspace.gentreefactoryloader.setup.objecttype",
-		"Could not load the general mesh object plugin!");
-    return NULL;
-  }
-  csRef<iMeshObjectFactory> fact (type->NewFactory ());
-  csRef<iGeneralFactoryState> state (SCF_QUERY_INTERFACE (fact,
-  	iGeneralFactoryState));
-
-  char* buf = (char*)string;
-  while ((cmd = parser->GetObject (&buf, commands, &name, &params)) > 0)
-  {
-    if (!params)
-    {
-      ReportError (reporter,
-		"crystalspace.gentreefactoryloader.parse.badformat",
-		"Bad format while parsing general mesh/tree factory!");
-      return NULL;
-    }
-    switch (cmd)
-    {
-      case CS_TOKEN_HEIGHT:
-	break;
-    }
-  }
-
-  csConstruction* construction = new csConstruction ();
-  csVector3 vertices[6];
-#if 0
-  int j = 0;
-  vertices[j++].Set (-.1, 0, .1);
-  vertices[j++].Set (.1, 0, .1);
-  vertices[j++].Set (.1, 0, -.1);
-  vertices[j++].Set (-.1, 0, -.1);
-  construction->SetupInitialVertices (4, vertices);
-  int vtidx[6];
-  j = 0;
-  vtidx[j++] = 0;
-  vtidx[j++] = 1;
-  vtidx[j++] = 2;
-  vtidx[j++] = 3;
-  construction->AddConstructionObject (0, csReversibleTransform (),
-  	4, vtidx, 0, co_tree);
-#else
-  int j = 0;
-  vertices[j++].Set (-.1, 0, 0);
-  vertices[j++].Set (-.03, 0, .07);
-  vertices[j++].Set (.03, 0, .07);
-  vertices[j++].Set (.1, 0, 0);
-  vertices[j++].Set (.03, 0, -.07);
-  vertices[j++].Set (-.03, 0, -.07);
-  construction->SetupInitialVertices (6, vertices);
-  int vtidx[6];
-  j = 0;
-  vtidx[j++] = 0;
-  vtidx[j++] = 1;
-  vtidx[j++] = 2;
-  vtidx[j++] = 3;
-  vtidx[j++] = 4;
-  vtidx[j++] = 5;
-  construction->AddConstructionObject (0, csReversibleTransform (),
-  	6, vtidx, 0, co_tree);
-#endif
-printf ("tri:%d vt:%d\n", construction->GetTriangleCount (),
-		construction->GetVertexCount ());
-
-  state->SetVertexCount (construction->GetVertexCount ());
-  csVector3* vt = state->GetVertices ();
-  memcpy (vt, construction->GetVertices (),
-  	construction->GetVertexCount ()*sizeof (csVector3));
-  csVector2* tx = state->GetTexels ();
-  int i;
-  for (i = 0 ; i < construction->GetVertexCount () ; i++)
-  {
-    const csVector3& v = vt[i];
-    csVector2& uv = tx[i];
-    // This is a bit like 3D texture mapping.
-    uv.x = fmod (10.*fabs (v.x+v.z), 1.)/2.;
-    uv.y = fmod (fabs (v.y), 1.);
-    if (int (v.y) & 1) uv.y = 1-uv.y;
-  }
-  state->SetTriangleCount (construction->GetTriangleCount ());
-  memcpy (state->GetTriangles (), construction->GetTriangles (),
-  	construction->GetTriangleCount ()*sizeof (csTriangle));
-  state->CalculateNormals ();
-  delete construction;
-
-  return csPtr<iBase> (fact);
 }
 
 csPtr<iBase> csGeneralTreeFactoryLoader::Parse (

@@ -19,9 +19,9 @@
 
 #include "cssysdef.h"
 #include "csgeom/math3d.h"
-#include "csutil/parser.h"
 #include "csutil/scanstr.h"
 #include "csutil/cscolor.h"
+#include "csutil/util.h"
 #include "mballldr.h"
 #include "imesh/object.h"
 #include "iengine/mesh.h"
@@ -42,21 +42,6 @@
 #include "ivaria/reporter.h"
 
 CS_IMPLEMENT_PLUGIN
-
-CS_TOKEN_DEF_START
-  CS_TOKEN_DEF (LIGHTING)
-  CS_TOKEN_DEF (ISO_LEVEL)
-  CS_TOKEN_DEF (CHARGE)
-  CS_TOKEN_DEF (NUMBER)
-  CS_TOKEN_DEF (TRUE_MAP)
-  CS_TOKEN_DEF (TEX_SCALE)
-  CS_TOKEN_DEF (RATE)
-
-  CS_TOKEN_DEF (MATERIAL)
-  CS_TOKEN_DEF (FACTORY)
-  CS_TOKEN_DEF (MIXMODE)
-  CS_TOKEN_DEF (SHIFT)
-CS_TOKEN_DEF_END
 
 enum
 {
@@ -142,22 +127,6 @@ bool csMetaBallFactoryLoader::Initialize (iObjectRegistry* object_reg)
   return true;
 }
 
-csPtr<iBase> csMetaBallFactoryLoader::Parse (const char* /*string*/,
-	iLoaderContext* , iBase* /* context */)
-{
-  csRef<iPluginManager> plugin_mgr (CS_QUERY_REGISTRY (object_reg,
-  	iPluginManager));
-  csRef<iMeshObjectType> type (CS_QUERY_PLUGIN_CLASS (plugin_mgr,
-  	"crystalspace.mesh.object.metaball", iMeshObjectType));
-  if (!type)
-  {
-    type = CS_LOAD_PLUGIN (plugin_mgr, "crystalspace.mesh.object.metaball",
-    	iMeshObjectType);
-  }
-  csRef<iMeshObjectFactory> fact (type->NewFactory ());
-  return csPtr<iBase> (fact);
-}
-
 csPtr<iBase> csMetaBallFactoryLoader::Parse (iDocumentNode*,
 	iLoaderContext* , iBase* /* context */)
 {
@@ -229,136 +198,6 @@ bool csMetaBallLoader::Initialize (iObjectRegistry* object_reg)
   xmltokens.Register ("mixmode", XMLTOKEN_MIXMODE);
   xmltokens.Register ("shift", XMLTOKEN_SHIFT);
   return true;
-}
-
-csPtr<iBase> csMetaBallLoader::Parse (const char* string,
-	iLoaderContext* ldr_context, iBase*)
-{
-  CS_TOKEN_TABLE_START (commands)
-    CS_TOKEN_TABLE (MATERIAL)
-    CS_TOKEN_TABLE (FACTORY)
-    CS_TOKEN_TABLE (MIXMODE)
-    CS_TOKEN_TABLE (LIGHTING)
-	CS_TOKEN_TABLE (ISO_LEVEL)
-	CS_TOKEN_TABLE (CHARGE)
-	CS_TOKEN_TABLE (NUMBER)
-	CS_TOKEN_TABLE (RATE)
-	CS_TOKEN_TABLE (TRUE_MAP)
-	CS_TOKEN_TABLE (TEX_SCALE)
-  CS_TOKEN_TABLE_END
-
-  char* name;
-  long cmd;
-  char* params;
-  char str[255];
-
-  csRef<iMeshObject> mesh;
-  csRef<iMetaBallState> ballstate;
-  MetaParameters* mp = NULL;
-
-  csParser* parser = ldr_context->GetParser ();
-
-  char* buf = (char*)string;
-  while ((cmd = parser->GetObject (&buf, commands, &name, &params)) > 0)
-  {
-    if (!params)
-    {
-      // @@@ Error handling!
-      return NULL;
-    }
-    switch (cmd)
-    {
-      case CS_TOKEN_ISO_LEVEL:
-	{
-	  if (!mp) { printf("Please set FACTORY before ISO_LEVEL\n"); return NULL; }
-	  float f;
-	  csScanStr (params, "%f", &f);
-	  mp->iso_level = f;
-	}
-	break;
-      case CS_TOKEN_CHARGE:
-	{
-	  if (!mp) { printf("Please set FACTORY before CHARGE\n"); return NULL; }
-	  float f;
-	  csScanStr (params, "%f", &f);
-	  mp->charge = f;
-	}
-	break;
-      case CS_TOKEN_NUMBER:
-	{
-	  if (!ballstate) { printf("Please set FACTORY before NUMBER\n"); return NULL; }
-	  int r;
-	  csScanStr (params, "%d", &r);
-	  ballstate->SetMetaBallCount (r);
-	}
-	break;
-      case CS_TOKEN_RATE:
-	{
-	  if (!mp) { printf("Please set FACTORY before RATE\n"); return NULL; }
-	  float r;
-	  csScanStr (params, "%f", &r);
-	  mp->rate = r;
-	}
-	break;
-      case CS_TOKEN_TRUE_MAP:
-	{
-	  if (!ballstate) { printf("Please set FACTORY before TRUE_MAP\n"); return NULL; }
-	  bool m;
-	  csScanStr (params, "%b", &m);
-	  ballstate->SetQualityEnvironmentMapping (m);
-	}
-	break;
-      case CS_TOKEN_TEX_SCALE:
-	{
-	  if (!ballstate) { printf("Please set FACTORY before TEX_SCALE\n"); return NULL; }
-	  float s;
-	  csScanStr (params, "%f", &s);
-	  ballstate->SetEnvironmentMappingFactor(s);
-	}
-	break;
-      case CS_TOKEN_FACTORY:
-	{
-	  csScanStr (params, "%s", str);
-	  iMeshFactoryWrapper* fact = ldr_context->FindMeshFactory (str);
-	  if (!fact)
-	  {
-	    // @@@ Error handling!
-	    return NULL;
-	  }
-	  mesh = fact->GetMeshObjectFactory ()->NewInstance ();
-	  ballstate = SCF_QUERY_INTERFACE (mesh, iMetaBallState);
-	  mp = ballstate->GetParameters();
-	}
-	break;
-      case CS_TOKEN_MATERIAL:
-	{
-	  if (!ballstate) { printf("Please set FACTORY before MATERIAL\n"); return NULL; }
-          csScanStr (params, "%s", str);
-          iMaterialWrapper* mat = ldr_context->FindMaterial (str);
-	  if (!mat)
-	  {
-            // @@@ Error handling!
-            return NULL;
-	  }
-	  ballstate->SetMaterial(mat);
-	}
-	break;
-      case CS_TOKEN_MIXMODE:
-		if (!ballstate) { printf("Please set FACTORY before MIXMODE\n"); return NULL; }
-	uint mode;
-	if (synldr->ParseMixmode (parser, params, mode))
-	  ballstate->SetMixMode (mode);
-	break;
-	  case CS_TOKEN_LIGHTING:
-		if (!ballstate) { printf("Please set FACTORY before MIXMODE\n"); return NULL; }
-		bool l;
-		csScanStr(params, "%b", &l);
-		ballstate->SetLighting(l);
-	break;
-    }
-  }
-
-  return csPtr<iBase> (mesh);
 }
 
 csPtr<iBase> csMetaBallLoader::Parse (iDocumentNode* node,

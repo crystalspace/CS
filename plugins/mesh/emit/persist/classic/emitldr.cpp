@@ -19,9 +19,9 @@
 
 #include "cssysdef.h"
 #include "csgeom/math3d.h"
-#include "csutil/parser.h"
 #include "csutil/scanstr.h"
 #include "csutil/cscolor.h"
+#include "csutil/util.h"
 #include "emitldr.h"
 #include "imesh/object.h"
 #include "iengine/mesh.h"
@@ -43,33 +43,6 @@
 #include "ivaria/reporter.h"
 
 CS_IMPLEMENT_PLUGIN
-
-CS_TOKEN_DEF_START
-  CS_TOKEN_DEF (AGING)
-  CS_TOKEN_DEF (ATTRACTORFORCE)
-  CS_TOKEN_DEF (ATTRACTOR)
-  CS_TOKEN_DEF (EMITBOX)
-  CS_TOKEN_DEF (EMITCONE)
-  CS_TOKEN_DEF (EMITCYLINDERTANGENT)
-  CS_TOKEN_DEF (EMITCYLINDER)
-  CS_TOKEN_DEF (EMITFIXED)
-  CS_TOKEN_DEF (EMITLINE)
-  CS_TOKEN_DEF (EMITMIX)
-  CS_TOKEN_DEF (EMITSPHERETANGENT)
-  CS_TOKEN_DEF (EMITSPHERE)
-  CS_TOKEN_DEF (FACTORY)
-  CS_TOKEN_DEF (LIGHTING)
-  CS_TOKEN_DEF (MATERIAL)
-  CS_TOKEN_DEF (MIXMODE)
-  CS_TOKEN_DEF (NUMBER)
-  CS_TOKEN_DEF (RECTPARTICLES)
-  CS_TOKEN_DEF (REGULARPARTICLES)
-  CS_TOKEN_DEF (STARTACCEL)
-  CS_TOKEN_DEF (STARTPOS)
-  CS_TOKEN_DEF (STARTSPEED)
-  CS_TOKEN_DEF (TOTALTIME)
-  CS_TOKEN_DEF (WEIGHT)
-CS_TOKEN_DEF_END
 
 enum
 {
@@ -168,23 +141,6 @@ bool csEmitFactoryLoader::Initialize (iObjectRegistry* object_reg)
   return true;
 }
 
-csPtr<iBase> csEmitFactoryLoader::Parse (const char* /*string*/,
-	iLoaderContext*, iBase* /* context */)
-{
-  csRef<iPluginManager> plugin_mgr (CS_QUERY_REGISTRY (object_reg,
-		iPluginManager));
-  csRef<iMeshObjectType> type (CS_QUERY_PLUGIN_CLASS (plugin_mgr,
-  	"crystalspace.mesh.object.emit", iMeshObjectType));
-  if (!type)
-  {
-    type = CS_LOAD_PLUGIN (plugin_mgr, "crystalspace.mesh.object.emit",
-    	iMeshObjectType);
-    printf ("Load TYPE plugin crystalspace.mesh.object.emit\n");
-  }
-  csRef<iMeshObjectFactory> fact (type->NewFactory ());
-  return csPtr<iBase> (fact);
-}
-
 csPtr<iBase> csEmitFactoryLoader::Parse (iDocumentNode* /*node*/,
 	iLoaderContext*, iBase* /* context */)
 {
@@ -270,134 +226,6 @@ bool csEmitLoader::Initialize (iObjectRegistry* object_reg)
   xmltokens.Register ("totaltime", XMLTOKEN_TOTALTIME);
   xmltokens.Register ("weight", XMLTOKEN_WEIGHT);
   return true;
-}
-
-static iEmitGen3D* ParseEmit (csParser* parser, char* buf, 
-			      iEmitFactoryState *fstate, float* weight)
-{
-  CS_TOKEN_TABLE_START (emits)
-    CS_TOKEN_TABLE (WEIGHT)
-    CS_TOKEN_TABLE (EMITBOX)
-    CS_TOKEN_TABLE (EMITCONE)
-    CS_TOKEN_TABLE (EMITCYLINDERTANGENT)
-    CS_TOKEN_TABLE (EMITCYLINDER)
-    CS_TOKEN_TABLE (EMITFIXED)
-    CS_TOKEN_TABLE (EMITLINE)
-    CS_TOKEN_TABLE (EMITMIX)
-    CS_TOKEN_TABLE (EMITSPHERETANGENT)
-    CS_TOKEN_TABLE (EMITSPHERE)
-  CS_TOKEN_TABLE_END
-
-  char* name;
-  long cmd;
-  char* params;
-
-  iEmitGen3D* result = 0;
-  iEmitMix *emix = 0;
-  csVector3 a,b;
-  float p,q,r,s,t;
-  if (weight) *weight = 1.;
-
-  while ((cmd = parser->GetObject (&buf, emits, &name, &params)) > 0)
-  {
-    if (!params)
-    {
-      printf ("Expected parameters instead of '%s'!\n", buf);
-      return 0;
-    }
-    switch (cmd)
-    {
-      case CS_TOKEN_WEIGHT:
-	if (weight == NULL)
-	{
-	  printf ("WEIGHT cannot be given in this context!\n");
-	  return 0;
-	}
-        csScanStr (params, "%f", weight);
-	break;
-      case CS_TOKEN_EMITFIXED:
-        {
-          csScanStr (params, "%f,%f,%f", &a.x, &a.y, &a.z);
-	  iEmitFixed *efixed = fstate->CreateFixed();
-	  efixed->SetValue(a);
-	  result = efixed;
-	}
-	break;
-      case CS_TOKEN_EMITBOX:
-        {
-          csScanStr (params, "%f,%f,%f,%f,%f,%f", &a.x, &a.y, &a.z,
-	    &b.x, &b.y, &b.z);
-	  iEmitBox *ebox = fstate->CreateBox();
-	  ebox->SetContent(a, b);
-	  result = ebox;
-	}
-	break;
-      case CS_TOKEN_EMITSPHERE:
-        {
-          csScanStr (params, "%f,%f,%f,%f,%f", &a.x, &a.y, &a.z, &p, &q);
-	  iEmitSphere *esphere = fstate->CreateSphere();
-	  esphere->SetContent(a, p, q);
-	  result = esphere;
-	}
-	break;
-      case CS_TOKEN_EMITCONE:
-        {
-          csScanStr (params, "%f,%f,%f,%f,%f,%f,%f,%f", &a.x, &a.y, &a.z,
-	    &p, &q, &r, &s, &t);
-	  iEmitCone *econe = fstate->CreateCone();
-	  econe->SetContent(a, p, q, r, s, t);
-	  result = econe;
-	}
-	break;
-      case CS_TOKEN_EMITMIX:
-        {
-	  if(!emix) emix = fstate->CreateMix();
-	  float amt;
-	  iEmitGen3D *gen;
-	  gen = ParseEmit(parser, params, fstate, &amt);
-	  emix->AddEmitter(amt, gen);
-	  SCF_DEC_REF (gen);
-	  result = emix;
-	}
-	break;
-      case CS_TOKEN_EMITLINE:
-        {
-          csScanStr (params, "%f,%f,%f,%f,%f,%f", &a.x, &a.y, &a.z,
-	    &b.x, &b.y, &b.z);
-	  iEmitLine *eline = fstate->CreateLine();
-	  eline->SetContent(a, b);
-	  result = eline;
-	}
-	break;
-      case CS_TOKEN_EMITCYLINDER:
-        {
-          csScanStr (params, "%f,%f,%f,%f,%f,%f,%f,%f", &a.x, &a.y, &a.z,
-	    &b.x, &b.y, &b.z, &p, &q);
-	  iEmitCylinder *ecyl = fstate->CreateCylinder();
-	  ecyl->SetContent(a, b, p, q);
-	  result = ecyl;
-	}
-	break;
-      case CS_TOKEN_EMITCYLINDERTANGENT:
-        {
-          csScanStr (params, "%f,%f,%f,%f,%f,%f,%f,%f", &a.x, &a.y, &a.z,
-	    &b.x, &b.y, &b.z, &p, &q);
-	  iEmitCylinderTangent *ecyltan = fstate->CreateCylinderTangent();
-	  ecyltan->SetContent(a, b, p, q);
-	  result = ecyltan;
-	}
-	break;
-      case CS_TOKEN_EMITSPHERETANGENT:
-        {
-          csScanStr (params, "%f,%f,%f,%f,%f", &a.x, &a.y, &a.z, &p, &q);
-	  iEmitSphereTangent *espheretan = fstate->CreateSphereTangent();
-	  espheretan->SetContent(a, p, q);
-	  result = espheretan;
-	}
-	break;
-    }
-  }
-  return result;
 }
 
 iEmitGen3D* csEmitLoader::ParseEmit (iDocumentNode* node,
@@ -560,170 +388,6 @@ iEmitGen3D* csEmitLoader::ParseEmit (iDocumentNode* node,
     }
   }
   return result;
-}
-
-csPtr<iBase> csEmitLoader::Parse (const char* string, 
-			    iLoaderContext* ldr_context, iBase*)
-{
-  CS_TOKEN_TABLE_START (commands)
-    CS_TOKEN_TABLE (AGING)
-    CS_TOKEN_TABLE (ATTRACTORFORCE)
-    CS_TOKEN_TABLE (ATTRACTOR)
-    CS_TOKEN_TABLE (FACTORY)
-    CS_TOKEN_TABLE (LIGHTING)
-    CS_TOKEN_TABLE (MATERIAL)
-    CS_TOKEN_TABLE (MIXMODE)
-    CS_TOKEN_TABLE (NUMBER)
-    CS_TOKEN_TABLE (RECTPARTICLES)
-    CS_TOKEN_TABLE (REGULARPARTICLES)
-    CS_TOKEN_TABLE (STARTACCEL)
-    CS_TOKEN_TABLE (STARTPOS)
-    CS_TOKEN_TABLE (STARTSPEED)
-    CS_TOKEN_TABLE (TOTALTIME)
-  CS_TOKEN_TABLE_END
-
-  char* name;
-  long cmd;
-  char* params;
-  char str[255];
-
-  iEmitGen3D *emit;
-  csRef<iMeshObject> mesh;
-  csRef<iParticleState> partstate;
-  csRef<iEmitFactoryState> emitfactorystate;
-  csRef<iEmitState> emitstate;
-
-  csParser* parser = ldr_context->GetParser ();
-
-  char* buf = (char*)string;
-  while ((cmd = parser->GetObject (&buf, commands, &name, &params)) > 0)
-  {
-    if (!params)
-    {
-      // @@@ Error handling!
-      return NULL;
-    }
-    switch (cmd)
-    {
-      case CS_TOKEN_FACTORY:
-	{
-          csScanStr (params, "%s", str);
-	  iMeshFactoryWrapper* fact = ldr_context->FindMeshFactory (str);
-	  if (!fact)
-	  {
-	    // @@@ Error handling!
-	    return NULL;
-	  }
-	  mesh = fact->GetMeshObjectFactory ()->NewInstance ();
-          partstate = SCF_QUERY_INTERFACE (mesh, iParticleState);
-          emitstate = SCF_QUERY_INTERFACE (mesh, iEmitState);
-	  emitfactorystate = SCF_QUERY_INTERFACE (fact->GetMeshObjectFactory(),
-	    iEmitFactoryState);
-	}
-	break;
-      case CS_TOKEN_MATERIAL:
-	{
-          csScanStr (params, "%s", str);
-          iMaterialWrapper* mat = ldr_context->FindMaterial (str);
-	  if (!mat)
-	  {
-	    printf ("Could not find material '%s'!\n", str);
-            // @@@ Error handling!
-            return NULL;
-	  }
-	  partstate->SetMaterialWrapper (mat);
-	}
-	break;
-      case CS_TOKEN_MIXMODE:
-	uint mode;
-	if (synldr->ParseMixmode (parser, params, mode))
-          partstate->SetMixMode (mode);
-	break;
-      case CS_TOKEN_NUMBER:
-	{
-	  int num = 10;
-          csScanStr (params, "%d", &num);
-	  emitstate->SetParticleCount (num);
-	}
-	break;
-      case CS_TOKEN_LIGHTING:
-	{
-	  bool light = false;
-          csScanStr (params, "%b", &light);
-	  emitstate->SetLighting (light);
-	}
-	break;
-      case CS_TOKEN_TOTALTIME:
-	{
-	  int totaltime = 100;
-          csScanStr (params, "%d", &totaltime);
-	  emitstate->SetParticleTime (totaltime);
-	}
-	break;
-      case CS_TOKEN_RECTPARTICLES:
-	{
-	  float w,h;
-          csScanStr (params, "%f,%f", &w, &h);
-	  emitstate->SetRectParticles (w, h);
-	}
-	break;
-      case CS_TOKEN_REGULARPARTICLES:
-	{
-	  int sides;
-	  float radius;
-          csScanStr (params, "%d,%f", &sides, &radius);
-	  emitstate->SetRegularParticles (sides, radius);
-	}
-	break;
-      case CS_TOKEN_AGING:
-        {
-	  int time;
-	  csColor col;
-	  float alpha, swirl, rotspeed, scale;
-          csScanStr (params, "%d,%f,%f,%f,%f,%f,%f,%f", &time, &col.red,
-	    &col.green, &col.blue, &alpha, &swirl, &rotspeed, &scale);
-	  emitstate->AddAge (time, col, alpha, swirl, rotspeed, scale);
-	}
-	break;
-      case CS_TOKEN_STARTPOS:
-	{
-	  emit = ::ParseEmit(parser, params, emitfactorystate, NULL);
-	  emitstate->SetStartPosEmit (emit);
-	  SCF_DEC_REF (emit);
-	}
-	break;
-      case CS_TOKEN_STARTSPEED:
-	{
-	  emit = ::ParseEmit(parser, params, emitfactorystate, NULL);
-	  emitstate->SetStartSpeedEmit (emit);
-	  SCF_DEC_REF (emit);
-	}
-	break;
-      case CS_TOKEN_STARTACCEL:
-	{
-	  emit = ::ParseEmit(parser, params, emitfactorystate, NULL);
-	  emitstate->SetStartAccelEmit (emit);
-	  SCF_DEC_REF (emit);
-	}
-	break;
-      case CS_TOKEN_ATTRACTORFORCE:
-	{
-	  float force;
-          csScanStr (params, "%f", &force);
-	  emitstate->SetAttractorForce (force);
-	}
-	break;
-      case CS_TOKEN_ATTRACTOR:
-	{
-	  emit = ::ParseEmit(parser, params, emitfactorystate, NULL);
-	  emitstate->SetAttractorEmit (emit);
-	  SCF_DEC_REF (emit);
-	}
-	break;
-    }
-  }
-
-  return csPtr<iBase> (mesh);
 }
 
 csPtr<iBase> csEmitLoader::Parse (iDocumentNode* node,

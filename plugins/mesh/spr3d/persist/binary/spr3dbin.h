@@ -42,10 +42,6 @@ private:
   csRef<iSyntaxService> synldr;
   csRef<iReporter> reporter;
 
-  // Load a skeleton.
-  bool LoadSkeleton (csParser* parser, iReporter* reporter, 
-    iSkeletonLimb* limb, char* buf);
-
 public:
   SCF_DECLARE_IBASE;
 

@@ -19,7 +19,6 @@
 #include "cssysdef.h"
 #include "cssys/sysfunc.h"
 #include "csgeom/math3d.h"
-#include "csutil/parser.h"
 #include "csutil/scanstr.h"
 #include "csutil/cscolor.h"
 #include "starldr.h"
@@ -41,15 +40,6 @@
 #include "imap/ldrctxt.h"
 
 CS_IMPLEMENT_PLUGIN
-
-CS_TOKEN_DEF_START
-  CS_TOKEN_DEF (BOX)
-  CS_TOKEN_DEF (COLOR)
-  CS_TOKEN_DEF (MAXCOLOR)
-  CS_TOKEN_DEF (DENSITY)
-  CS_TOKEN_DEF (MAXDISTANCE)
-  CS_TOKEN_DEF (FACTORY)
-CS_TOKEN_DEF_END
 
 enum
 {
@@ -151,29 +141,6 @@ bool csStarFactoryLoader::Initialize (iObjectRegistry* object_reg)
   return true;
 }
 
-csPtr<iBase> csStarFactoryLoader::Parse (const char* /*string*/,
-	iLoaderContext*, iBase* /* context */)
-{
-  csRef<iPluginManager> plugin_mgr (CS_QUERY_REGISTRY (object_reg,
-  	iPluginManager));
-  csRef<iMeshObjectType> type (CS_QUERY_PLUGIN_CLASS (plugin_mgr,
-  	"crystalspace.mesh.object.stars", iMeshObjectType));
-  if (!type)
-  {
-    type = CS_LOAD_PLUGIN (plugin_mgr, "crystalspace.mesh.object.stars",
-    	iMeshObjectType);
-  }
-  if (!type)
-  {
-    ReportError (reporter,
-		"crystalspace.starfactoryloader.setup.objecttype",
-		"Could not load the stars mesh object plugin!");
-    return NULL;
-  }
-  csRef<iMeshObjectFactory> fact (type->NewFactory ());
-  return csPtr<iBase> (fact);
-}
-
 csPtr<iBase> csStarFactoryLoader::Parse (iDocumentNode* /*node*/,
 	iLoaderContext*, iBase* /* context */)
 {
@@ -249,98 +216,6 @@ bool csStarLoader::Initialize (iObjectRegistry* object_reg)
   xmltokens.Register ("factory", XMLTOKEN_FACTORY);
 
   return true;
-}
-
-csPtr<iBase> csStarLoader::Parse (const char* string,
-	iLoaderContext* ldr_context, iBase*)
-{
-  CS_TOKEN_TABLE_START (commands)
-    CS_TOKEN_TABLE (BOX)
-    CS_TOKEN_TABLE (COLOR)
-    CS_TOKEN_TABLE (MAXCOLOR)
-    CS_TOKEN_TABLE (DENSITY)
-    CS_TOKEN_TABLE (MAXDISTANCE)
-    CS_TOKEN_TABLE (FACTORY)
-  CS_TOKEN_TABLE_END
-
-  char* name;
-  long cmd;
-  char* params;
-  char str[255];
-
-  csRef<iMeshObject> mesh;
-  csRef<iStarsState> starstate;
-
-  csParser* parser = ldr_context->GetParser ();
-  
-  char* buf = (char*)string;
-  while ((cmd = parser->GetObject (&buf, commands, &name, &params)) > 0)
-  {
-    if (!params)
-    {
-      ReportError (reporter,
-		"crystalspace.starloader.parse.badformat",
-		"Bad format while parsing star object!");
-      return NULL;
-    }
-    switch (cmd)
-    {
-      case CS_TOKEN_BOX:
-	{
-	  csVector3 v1, v2;
-	  csScanStr (params, "%f,%f,%f,%f,%f,%f",
-	    &v1.x, &v1.y, &v1.z,
-	    &v2.x, &v2.y, &v2.z);
-	  starstate->SetBox (csBox3 (v1, v2));
-	}
-	break;
-      case CS_TOKEN_COLOR:
-	{
-	  csColor col;
-	  csScanStr (params, "%f,%f,%f", &col.red, &col.green, &col.blue);
-	  starstate->SetColor (col);
-	}
-	break;
-      case CS_TOKEN_MAXCOLOR:
-	{
-	  csColor col;
-	  csScanStr (params, "%f,%f,%f", &col.red, &col.green, &col.blue);
-	  starstate->SetMaxColor (col);
-	}
-	break;
-      case CS_TOKEN_DENSITY:
-	{
-	  float d;
-	  csScanStr (params, "%f", &d);
-	  starstate->SetDensity (d);
-	}
-	break;
-      case CS_TOKEN_MAXDISTANCE:
-	{
-	  float d;
-	  csScanStr (params, "%f", &d);
-	  starstate->SetMaxDistance (d);
-	}
-	break;
-      case CS_TOKEN_FACTORY:
-	{
-          csScanStr (params, "%s", str);
-	  iMeshFactoryWrapper* fact = ldr_context->FindMeshFactory (str);
-	  if (!fact)
-	  {
-      	    ReportError (reporter,
-		"crystalspace.starloader.parse.unknownfactory",
-		"Couldn't find factory '%s'!", str);
-	    return NULL;
-	  }
-	  mesh = fact->GetMeshObjectFactory ()->NewInstance ();
-          starstate = SCF_QUERY_INTERFACE (mesh, iStarsState);
-	}
-	break;
-    }
-  }
-
-  return csPtr<iBase> (mesh);
 }
 
 csPtr<iBase> csStarLoader::Parse (iDocumentNode* node,

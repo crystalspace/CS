@@ -23,7 +23,6 @@
 #include "imap/writer.h"
 #include "iutil/eventh.h"
 #include "iutil/comp.h"
-#include "csutil/parser.h"
 #include "csutil/strhash.h"
 
 class csVector3;
@@ -55,19 +54,15 @@ private:
 public:
   SCF_DECLARE_IBASE;
 
-  bool LoadBone (csParser* parser, iMotionTemplate* mot, int bone, char* buf);
   bool LoadBone (iDocumentNode* node, iMotionTemplate* mot, int bone);
 
   iMotionTemplate* LoadMotion ( const char *fname );
-  bool LoadMotion (csParser* parser, iMotionTemplate *mot, char *buf );
   bool LoadMotion (iDocumentNode* node, iMotionTemplate *mot);
 
   /// Constructor
   csMotionLoader (iBase *);
   virtual ~csMotionLoader();
   virtual bool Initialize( iObjectRegistry *object_reg);
-  virtual csPtr<iBase> Parse (const char* string, 
-    iLoaderContext* ldr_context, iBase *context);
 
   /// Parse a given node and return a new object for it.
   virtual csPtr<iBase> Parse (iDocumentNode* node,

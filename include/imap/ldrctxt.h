@@ -29,7 +29,6 @@ struct iMaterialWrapper;
 struct iMeshFactoryWrapper;
 struct iMeshWrapper;
 struct iSector;
-class csParser;
 struct iTextureWrapper;
 
 SCF_VERSION (iLoaderContext, 0, 0, 3);
@@ -57,8 +56,6 @@ struct iLoaderContext : public iBase
   virtual iMeshFactoryWrapper* FindMeshFactory (const char* name) = 0;
   /// Find a mesh object.
   virtual iMeshWrapper* FindMeshObject (const char* name) = 0;
-  /// Returns the parser used.
-  virtual csParser* GetParser () = 0;
   /// Find a texture. 
   virtual iTextureWrapper* FindTexture (const char* name) = 0;
 };

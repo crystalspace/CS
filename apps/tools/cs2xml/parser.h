@@ -16,8 +16,8 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __CS_PARSER_H__
-#define __CS_PARSER_H__
+#ifndef __CS_CS2XML_PARSER_H__
+#define __CS_CS2XML_PARSER_H__
 
 #include "csutil/csvector.h"
 #include "csutil/util.h"
@@ -268,5 +268,5 @@ public:
   char *GetAssignmentText (char **buf);
 };
 
-#endif // __CS_PARSER_H__
+#endif // __CS_CS2XML_PARSER_H__
 

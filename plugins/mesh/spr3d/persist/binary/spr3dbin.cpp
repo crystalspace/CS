@@ -32,7 +32,6 @@
 #include "csgeom/matrix3.h"
 #include "csgeom/quaterni.h"
 #include "csgeom/transfrm.h"
-#include "csutil/parser.h"
 #include "csutil/scanstr.h"
 #include "imesh/object.h"
 #include "iengine/mesh.h"

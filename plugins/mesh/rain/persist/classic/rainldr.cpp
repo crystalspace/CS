@@ -19,9 +19,9 @@
 
 #include "cssysdef.h"
 #include "csgeom/math3d.h"
-#include "csutil/parser.h"
 #include "csutil/scanstr.h"
 #include "csutil/cscolor.h"
+#include "csutil/util.h"
 #include "rainldr.h"
 #include "imesh/object.h"
 #include "iengine/mesh.h"
@@ -43,18 +43,6 @@
 #include "ivaria/reporter.h"
 
 CS_IMPLEMENT_PLUGIN
-
-CS_TOKEN_DEF_START
-  CS_TOKEN_DEF (COLOR)
-  CS_TOKEN_DEF (DROPSIZE)
-  CS_TOKEN_DEF (FACTORY)
-  CS_TOKEN_DEF (FALLSPEED)
-  CS_TOKEN_DEF (LIGHTING)
-  CS_TOKEN_DEF (MATERIAL)
-  CS_TOKEN_DEF (MIXMODE)
-  CS_TOKEN_DEF (NUMBER)
-  CS_TOKEN_DEF (BOX)
-CS_TOKEN_DEF_END
 
 enum
 {
@@ -139,22 +127,6 @@ bool csRainFactoryLoader::Initialize (iObjectRegistry* object_reg)
   return true;
 }
 
-csPtr<iBase> csRainFactoryLoader::Parse (const char* /*string*/,
-	iLoaderContext*, iBase* /* context */)
-{
-  csRef<iPluginManager> plugin_mgr (CS_QUERY_REGISTRY (object_reg,
-  	iPluginManager));
-  csRef<iMeshObjectType> type (CS_QUERY_PLUGIN_CLASS (plugin_mgr,
-  	"crystalspace.mesh.object.rain", iMeshObjectType));
-  if (!type)
-  {
-    type = CS_LOAD_PLUGIN (plugin_mgr, "crystalspace.mesh.object.rain",
-    	iMeshObjectType);
-  }
-  csRef<iMeshObjectFactory> fact (type->NewFactory ());
-  return csPtr<iBase> (fact);
-}
-
 csPtr<iBase> csRainFactoryLoader::Parse (iDocumentNode* /*node*/,
 	iLoaderContext*, iBase* /* context */)
 {
@@ -223,123 +195,6 @@ bool csRainLoader::Initialize (iObjectRegistry* object_reg)
   xmltokens.Register ("box", XMLTOKEN_BOX);
   xmltokens.Register ("colldet", XMLTOKEN_COLLDET);
   return true;
-}
-
-csPtr<iBase> csRainLoader::Parse (const char* string,
-	iLoaderContext* ldr_context, iBase*)
-{
-  CS_TOKEN_TABLE_START (commands)
-    CS_TOKEN_TABLE (MATERIAL)
-    CS_TOKEN_TABLE (FACTORY)
-    CS_TOKEN_TABLE (FALLSPEED)
-    CS_TOKEN_TABLE (BOX)
-    CS_TOKEN_TABLE (COLOR)
-    CS_TOKEN_TABLE (DROPSIZE)
-    CS_TOKEN_TABLE (LIGHTING)
-    CS_TOKEN_TABLE (NUMBER)
-    CS_TOKEN_TABLE (MIXMODE)
-  CS_TOKEN_TABLE_END
-
-  char* name;
-  long cmd;
-  char* params;
-  char str[255];
-
-  csRef<iMeshObject> mesh;
-  csRef<iParticleState> partstate;
-  csRef<iRainState> rainstate;
-
-  csParser* parser = ldr_context->GetParser ();
-
-  char* buf = (char*)string;
-  while ((cmd = parser->GetObject (&buf, commands, &name, &params)) > 0)
-  {
-    if (!params)
-    {
-      // @@@ Error handling!
-      return NULL;
-    }
-    switch (cmd)
-    {
-      case CS_TOKEN_COLOR:
-	{
-	  csColor color;
-	  csScanStr(params, "%f,%f,%f", &color.red, &color.green, &color.blue);
-	  partstate->SetColor (color);
-	}
-	break;
-      case CS_TOKEN_DROPSIZE:
-	{
-	  float dw, dh;
-	  csScanStr (params, "%f,%f", &dw, &dh);
-	  rainstate->SetDropSize (dw, dh);
-	}
-	break;
-      case CS_TOKEN_BOX:
-	{
-	  csVector3 minbox, maxbox;
-	  csScanStr (params, "%f,%f,%f,%f,%f,%f",
-	      	&minbox.x, &minbox.y, &minbox.z,
-	      	&maxbox.x, &maxbox.y, &maxbox.z);
-	  rainstate->SetBox (minbox, maxbox);
-	}
-	break;
-      case CS_TOKEN_FALLSPEED:
-	{
-	  csVector3 s;
-	  csScanStr (params, "%f,%f,%f", &s.x, &s.y, &s.z);
-	  rainstate->SetFallSpeed (s);
-	}
-	break;
-      case CS_TOKEN_FACTORY:
-	{
-          csScanStr (params, "%s", str);
-	  iMeshFactoryWrapper* fact = ldr_context->FindMeshFactory (str);
-	  if (!fact)
-	  {
-	    // @@@ Error handling!
-	    return NULL;
-	  }
-	  mesh = fact->GetMeshObjectFactory ()->NewInstance ();
-          partstate = SCF_QUERY_INTERFACE (mesh, iParticleState);
-          rainstate = SCF_QUERY_INTERFACE (mesh, iRainState);
-	}
-	break;
-      case CS_TOKEN_MATERIAL:
-	{
-          csScanStr (params, "%s", str);
-          iMaterialWrapper* mat = ldr_context->FindMaterial (str);
-	  if (!mat)
-	  {
-            // @@@ Error handling!
-            return NULL;
-	  }
-	  partstate->SetMaterialWrapper (mat);
-	}
-	break;
-      case CS_TOKEN_MIXMODE:
-	uint mode;
-	if (synldr->ParseMixmode (parser, params, mode))
-          partstate->SetMixMode (mode);
-	break;
-      case CS_TOKEN_LIGHTING:
-        {
-          bool do_lighting;
-          csScanStr (params, "%b", &do_lighting);
-          rainstate->SetLighting (do_lighting);
-        }
-        break;
-      case CS_TOKEN_NUMBER:
-        {
-          int nr;
-          csScanStr (params, "%d", &nr);
-          rainstate->SetParticleCount (nr);
-        }
-        break;
-    }
-  }
-
-  return csPtr<iBase> (mesh);
 }
 
 csPtr<iBase> csRainLoader::Parse (iDocumentNode* node,

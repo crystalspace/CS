@@ -28,18 +28,14 @@
 struct iLoaderContext;
 struct iDocumentNode;
 
-SCF_VERSION (iLoaderPlugin, 0, 2, 0);
+SCF_VERSION (iLoaderPlugin, 0, 2, 1);
 
 /**
  * This is a plugin for the loader based on document tree.
  */
 struct iLoaderPlugin : public iBase
 {
-  /// Parse a given string and return a new object for it.
-  virtual csPtr<iBase> Parse (const char* string, iLoaderContext* ldr_context,
-  	iBase* context) = 0;
-
-  /// Parse a given XML node and return a new object for it.
+  /// Parse a given document node and return a new object for it.
   virtual csPtr<iBase> Parse (iDocumentNode* node, iLoaderContext* ldr_context,
   	iBase* context) = 0;
 };

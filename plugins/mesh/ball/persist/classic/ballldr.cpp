@@ -20,9 +20,9 @@
 #include "cssysdef.h"
 #include "cssys/sysfunc.h"
 #include "csgeom/math3d.h"
-#include "csutil/parser.h"
 #include "csutil/scanstr.h"
 #include "csutil/cscolor.h"
+#include "csutil/util.h"
 #include "ballldr.h"
 #include "imesh/object.h"
 #include "iengine/mesh.h"
@@ -44,20 +44,6 @@
 #include "imap/ldrctxt.h"
 
 CS_IMPLEMENT_PLUGIN
-
-CS_TOKEN_DEF_START
-  CS_TOKEN_DEF (LIGHTING)
-  CS_TOKEN_DEF (COLOR)
-  CS_TOKEN_DEF (NUMRIM)
-  CS_TOKEN_DEF (MATERIAL)
-  CS_TOKEN_DEF (FACTORY)
-  CS_TOKEN_DEF (MIXMODE)
-  CS_TOKEN_DEF (RADIUS)
-  CS_TOKEN_DEF (SHIFT)
-  CS_TOKEN_DEF (REVERSED)
-  CS_TOKEN_DEF (TOPONLY)
-  CS_TOKEN_DEF (CYLINDRICAL)
-CS_TOKEN_DEF_END
 
 enum
 {
@@ -164,29 +150,6 @@ bool csBallFactoryLoader::Initialize (iObjectRegistry* object_reg)
   return true;
 }
 
-csPtr<iBase> csBallFactoryLoader::Parse (const char* /*string*/,
-	iLoaderContext*, iBase* /* context */)
-{
-  csRef<iPluginManager> plugin_mgr (
-  	CS_QUERY_REGISTRY (object_reg, iPluginManager));
-  csRef<iMeshObjectType> type (CS_QUERY_PLUGIN_CLASS (plugin_mgr,
-  	"crystalspace.mesh.object.ball", iMeshObjectType));
-  if (!type)
-  {
-    type = CS_LOAD_PLUGIN (plugin_mgr, "crystalspace.mesh.object.ball",
-    	iMeshObjectType);
-  }
-  if (!type)
-  {
-    ReportError (reporter,
-		"crystalspace.ballfactoryloader.setup.objecttype",
-		"Could not load the ball mesh object plugin!");
-    return NULL;
-  }
-  csRef<iMeshObjectFactory> fact (type->NewFactory ());
-  return csPtr<iBase> (fact);
-}
-
 csPtr<iBase> csBallFactoryLoader::Parse (iDocumentNode*,
 			     iLoaderContext*, iBase*)
 {
@@ -266,146 +229,6 @@ bool csBallLoader::Initialize (iObjectRegistry* object_reg)
   xmltokens.Register ("toponly", XMLTOKEN_TOPONLY);
   xmltokens.Register ("cylindrical", XMLTOKEN_CYLINDRICAL);
   return true;
-}
-
-csPtr<iBase> csBallLoader::Parse (const char* string, 
-			    iLoaderContext* ldr_context, iBase*)
-{
-  CS_TOKEN_TABLE_START (commands)
-    CS_TOKEN_TABLE (MATERIAL)
-    CS_TOKEN_TABLE (FACTORY)
-    CS_TOKEN_TABLE (NUMRIM)
-    CS_TOKEN_TABLE (RADIUS)
-    CS_TOKEN_TABLE (SHIFT)
-    CS_TOKEN_TABLE (MIXMODE)
-    CS_TOKEN_TABLE (REVERSED)
-    CS_TOKEN_TABLE (TOPONLY)
-    CS_TOKEN_TABLE (LIGHTING)
-    CS_TOKEN_TABLE (COLOR)
-    CS_TOKEN_TABLE (CYLINDRICAL)
-  CS_TOKEN_TABLE_END
-
-  char* name;
-  long cmd;
-  char* params;
-  char str[255];
-
-  csRef<iMeshObject> mesh;
-  csRef<iBallState> ballstate;
-
-  csParser *parser = ldr_context->GetParser ();
-
-  char* buf = (char*)string;
-  while ((cmd = parser->GetObject (&buf, commands, &name, &params)) > 0)
-  {
-    if (!params)
-    {
-      ReportError (reporter,
-		"crystalspace.ballloader.parse.badformat",
-		"Bad format while parsing ball object!");
-      return NULL;
-    }
-    switch (cmd)
-    {
-      case CS_TOKEN_REVERSED:
-	{
-	  bool r;
-	  csScanStr (params, "%b", &r);
-	  ballstate->SetReversed (r);
-	}
-	break;
-      case CS_TOKEN_TOPONLY:
-	{
-	  bool r;
-	  csScanStr (params, "%b", &r);
-	  ballstate->SetTopOnly (r);
-	}
-	break;
-      case CS_TOKEN_CYLINDRICAL:
-	{
-	  bool r;
-	  csScanStr (params, "%b", &r);
-	  ballstate->SetCylindricalMapping (r);
-	}
-	break;
-      case CS_TOKEN_LIGHTING:
-	{
-	  bool r;
-	  csScanStr (params, "%b", &r);
-	  ballstate->SetLighting (r);
-	}
-	break;
-      case CS_TOKEN_COLOR:
-	{
-	  csColor col;
-	  csScanStr (params, "%f,%f,%f", &col.red, &col.green, &col.blue);
-	  ballstate->SetColor (col);
-	}
-	break;
-      case CS_TOKEN_RADIUS:
-	{
-	  float x, y, z;
-	  csScanStr (params, "%f,%f,%f", &x, &y, &z);
-	  ballstate->SetRadius (x, y, z);
-	}
-	break;
-      case CS_TOKEN_SHIFT:
-	{
-	  float x, y, z;
-	  csScanStr (params, "%f,%f,%f", &x, &y, &z);
-	  ballstate->SetShift (x, y, z);
-	}
-	break;
-      case CS_TOKEN_NUMRIM:
-	{
-	  int f;
-	  csScanStr (params, "%d", &f);
-	  ballstate->SetRimVertices (f);
-	}
-	break;
-      case CS_TOKEN_FACTORY:
-	{
-          csScanStr (params, "%s", str);
-	  iMeshFactoryWrapper* fact = ldr_context->FindMeshFactory (str);
-	  if (!fact)
-	  {
-      	    ReportError (reporter,
-		"crystalspace.ballloader.parse.unknownfactory",
-		"Couldn't find factory '%s'!", str);
-	    return NULL;
-	  }
-	  mesh = fact->GetMeshObjectFactory ()->NewInstance ();
-          ballstate = SCF_QUERY_INTERFACE (mesh, iBallState);
-	}
-	break;
-      case CS_TOKEN_MATERIAL:
-	{
-          csScanStr (params, "%s", str);
-          iMaterialWrapper* mat = ldr_context->FindMaterial (str);
-	  if (!mat)
-	  {
-      	    ReportError (reporter,
-		"crystalspace.ballloader.parse.unknownmaterial",
-		"Couldn't find material '%s'!", str);
-            return NULL;
-	  }
-	  ballstate->SetMaterialWrapper (mat);
-	}
-	break;
-      case CS_TOKEN_MIXMODE:
-	uint mm;
-	if (!synldr->ParseMixmode (parser, params, mm))
-	{
-	  ReportError (reporter, "crystalspace.ballloader.parse.mixmode",
-	  	"Error parsing mixmode!");
-	  return NULL;
-	}
-        ballstate->SetMixMode (mm);
-	break;
-    }
-  }
-
-  return csPtr<iBase> (mesh);
 }
 
 csPtr<iBase> csBallLoader::Parse (iDocumentNode* node,

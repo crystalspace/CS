@@ -21,7 +21,6 @@
 #include "demoldr.h"
 #include "demoseq.h"
 #include "demoop.h"
-#include "csutil/parser.h"
 #include "csutil/scanstr.h"
 #include "csgeom/vector3.h"
 #include "csgeom/path.h"

@@ -48,7 +48,7 @@
 #include "csutil/cfgacc.h"
 #include "csutil/debug.h"
 #include "csutil/vfscache.h"
-#include "csutil/parser.h"
+#include "csutil/xmltiny.h"
 #include "igraphic/image.h"
 #include "igraphic/imageio.h"
 #include "ivideo/halo.h"
@@ -2532,7 +2532,6 @@ class EngineLoaderContext : public iLoaderContext
 private:
   iEngine* Engine;
   iRegion* region;
-  csParser parser;
 
 public:
   EngineLoaderContext (iEngine* Engine, iRegion* region);
@@ -2544,7 +2543,6 @@ public:
   virtual iMaterialWrapper* FindMaterial (const char* name);
   virtual iMeshFactoryWrapper* FindMeshFactory (const char* name);
   virtual iMeshWrapper* FindMeshObject (const char* name);
-  virtual csParser* GetParser ();
   virtual iTextureWrapper* FindTexture (const char* name);
 };
 
@@ -2584,11 +2582,6 @@ iMeshWrapper* EngineLoaderContext::FindMeshObject (const char* name)
   return Engine->FindMeshObject (name, region);
 }
 
-csParser* EngineLoaderContext::GetParser ()
-{
-  return &parser;
-}
-
 iTextureWrapper* EngineLoaderContext::FindTexture (const char* name)
 {
   return Engine->FindTexture (name, region);
@@ -2608,6 +2601,17 @@ csPtr<iMeshFactoryWrapper> csEngine::LoadMeshFactory (
   const char *loaderClassId,
   iDataBuffer *input)
 {
+  csRef<iDocumentSystem> xml (
+    	CS_QUERY_REGISTRY (object_reg, iDocumentSystem));
+  if (!xml) xml = csPtr<iDocumentSystem> (new csTinyDocumentSystem ());
+  csRef<iDocument> doc = xml->CreateDocument ();
+  const char* error = doc->Parse (input);
+  if (error != NULL)
+  {
+    // @@@ Report error?
+    return NULL;
+  }
+
   csRef<iPluginManager> plugin_mgr (
   	CS_QUERY_REGISTRY (object_reg, iPluginManager));
   csRef<iLoaderPlugin> plug (CS_QUERY_PLUGIN_CLASS (
@@ -2621,10 +2625,9 @@ csPtr<iMeshFactoryWrapper> csEngine::LoadMeshFactory (
   csRef<iMeshFactoryWrapper> fact (CreateMeshFactory (name));
   if (!fact) return NULL;
 
-  char *buf = **input;
   csRef<iLoaderContext> elctxt (CreateLoaderContext ());
   csRef<iBase> mof (plug->Parse (
-      buf, elctxt, fact->GetMeshObjectFactory ()));
+      doc->GetRoot (), elctxt, fact->GetMeshObjectFactory ()));
   if (!mof)
   {
     GetMeshFactories ()->Remove (fact);
@@ -2653,6 +2656,17 @@ csPtr<iMeshWrapper> csEngine::LoadMeshWrapper (
   iSector *sector,
   const csVector3 &pos)
 {
+  csRef<iDocumentSystem> xml (
+    	CS_QUERY_REGISTRY (object_reg, iDocumentSystem));
+  if (!xml) xml = csPtr<iDocumentSystem> (new csTinyDocumentSystem ());
+  csRef<iDocument> doc = xml->CreateDocument ();
+  const char* error = doc->Parse (input);
+  if (error != NULL)
+  {
+    // @@@ Report error?
+    return NULL;
+  }
+
   csRef<iPluginManager> plugin_mgr (
   	CS_QUERY_REGISTRY (object_reg, iPluginManager));
   csRef<iLoaderPlugin> plug (CS_QUERY_PLUGIN_CLASS (
@@ -2675,9 +2689,8 @@ csPtr<iMeshWrapper> csEngine::LoadMeshWrapper (
     meshwrap->GetMovable ().UpdateMove ();
   }
 
-  char *buf = **input;
   csRef<iLoaderContext> elctxt (CreateLoaderContext ());
-  csRef<iBase> mof (plug->Parse (buf, elctxt, imw));
+  csRef<iBase> mof (plug->Parse (doc->GetRoot (), elctxt, imw));
   if (!mof)
   {
     GetMeshes ()->Remove (imw);

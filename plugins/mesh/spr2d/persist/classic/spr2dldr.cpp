@@ -20,8 +20,8 @@
 #include "cssysdef.h"
 #include "cssys/sysfunc.h"
 #include "csgeom/math3d.h"
-#include "csutil/parser.h"
 #include "csutil/scanstr.h"
+#include "csutil/util.h"
 #include "spr2dldr.h"
 #include "imesh/object.h"
 #include "iengine/mesh.h"
@@ -42,20 +42,6 @@
 #include "imap/ldrctxt.h"
 
 CS_IMPLEMENT_PLUGIN
-
-CS_TOKEN_DEF_START
-  CS_TOKEN_DEF (UVANIMATION)
-  CS_TOKEN_DEF (FRAME)
-
-  CS_TOKEN_DEF (COLORS)
-  CS_TOKEN_DEF (FACTORY)
-  CS_TOKEN_DEF (LIGHTING)
-  CS_TOKEN_DEF (MATERIAL)
-  CS_TOKEN_DEF (MIXMODE)
-  CS_TOKEN_DEF (UV)
-  CS_TOKEN_DEF (VERTICES)
-  CS_TOKEN_DEF (ANIMATE)
-CS_TOKEN_DEF_END
 
 enum
 {
@@ -172,57 +158,10 @@ bool csSprite2DFactoryLoader::Initialize (iObjectRegistry* object_reg)
   return true;
 }
 
-static void ParseAnim (csParser* parser, iReporter* reporter, 
-		       iSprite2DFactoryState* spr2dLook, 
-		       const char *animname, char *buf)
-{
-  CS_TOKEN_TABLE_START (commands)
-    CS_TOKEN_TABLE (FRAME)
-  CS_TOKEN_TABLE_END
-
-  char* name;
-  long cmd;
-  char* params;
-  float verts[200];
-  int duration;
-
-  iSprite2DUVAnimation *ani = spr2dLook->CreateUVAnimation ();
-  ani->SetName (animname);
-
-  while ((cmd = parser->GetObject (&buf, commands, &name, &params)) > 0)
-  {
-    if (!params)
-    {
-      ReportError (reporter,
-		"crystalspace.sprite2dfactoryloader.parse.badtoken",
-		"Expected FRAME instead of '%s'!", buf);
-      return;
-    }
-    switch (cmd)
-    {
-      case CS_TOKEN_FRAME:
-	{
-	  int num;
-          csScanStr (params, "%d, %F", &duration, &verts, &num);
-	  iSprite2DUVAnimationFrame *frame = ani->CreateFrame (-1);
-	  frame->SetFrameData (name, duration, num/2, verts);
-	}
-	break;
-    }
-  }
-  if (cmd == CS_PARSERR_TOKENNOTFOUND)
-  {
-    ReportError (reporter,
-		"crystalspace.sprite2dfactoryloader.parse.badtoken",
-		"Token '%s' not found while parsing FRAME!",
-		parser->GetLastOffender ());
-    return;
-  }
-}
-
-bool csSprite2DFactoryLoader::ParseAnim (iDocumentNode* node, iReporter* reporter, 
-		       iSprite2DFactoryState* spr2dLook, 
-		       const char *animname)
+bool csSprite2DFactoryLoader::ParseAnim (iDocumentNode* node,
+	iReporter* reporter, 
+	iSprite2DFactoryState* spr2dLook, 
+	const char *animname)
 {
   int maxv = 200;
   float* verts = new float[maxv];
@@ -286,95 +225,6 @@ bool csSprite2DFactoryLoader::ParseAnim (iDocumentNode* node, iReporter* reporte
   }
   delete[] verts;
   return true;
-}
-
-csPtr<iBase> csSprite2DFactoryLoader::Parse (const char* string,
-	iLoaderContext* ldr_context, iBase* /* context */)
-{
-  CS_TOKEN_TABLE_START (commands)
-    CS_TOKEN_TABLE (LIGHTING)
-    CS_TOKEN_TABLE (MATERIAL)
-    CS_TOKEN_TABLE (MIXMODE)
-    CS_TOKEN_TABLE (UVANIMATION)
-  CS_TOKEN_TABLE_END
-
-  char* name;
-  long cmd;
-  char* params;
-  char str[255];
-
-  csParser* parser = ldr_context->GetParser ();
-
-  csRef<iPluginManager> plugin_mgr (CS_QUERY_REGISTRY (object_reg,
-  	iPluginManager));
-  csRef<iMeshObjectType> type (CS_QUERY_PLUGIN_CLASS (plugin_mgr,
-  	"crystalspace.mesh.object.sprite.2d", iMeshObjectType));
-  if (!type)
-  {
-    type = CS_LOAD_PLUGIN (plugin_mgr, "crystalspace.mesh.object.sprite.2d",
-    	iMeshObjectType);
-  }
-  if (!type)
-  {
-    ReportError (reporter,
-		"crystalspace.sprite2dfactoryloader.setup.objecttype",
-		"Could not load the sprite.2d mesh object plugin!");
-    return NULL;
-  }
-  csRef<iMeshObjectFactory> fact (type->NewFactory ());
-  csRef<iSprite2DFactoryState> spr2dLook (SCF_QUERY_INTERFACE (fact,
-  	iSprite2DFactoryState));
-
-  char* buf = (char*)string;
-  while ((cmd = parser->GetObject (&buf, commands, &name, &params)) > 0)
-  {
-    if (!params)
-    {
-      ReportError (reporter,
-		"crystalspace.sprite2dfactoryloader.parse.badformat",
-		"Bad format while parsing sprite2d factory!");
-      return NULL;
-    }
-    switch (cmd)
-    {
-      case CS_TOKEN_MATERIAL:
-	{
-          csScanStr (params, "%s", str);
-          iMaterialWrapper* mat = ldr_context->FindMaterial (str);
-	  if (!mat)
-	  {
-	    ReportError (reporter,
-		"crystalspace.sprite2dfactoryloader.parse.unknownmaterial",
-		"Couldn't find material named '%s'", str);
-            return NULL;
-	  }
-	  spr2dLook->SetMaterialWrapper (mat);
-	}
-	break;
-      case CS_TOKEN_LIGHTING:
-        {
-          bool do_lighting;
-          csScanStr (params, "%b", &do_lighting);
-          spr2dLook->SetLighting (do_lighting);
-        }
-	break;
-      case CS_TOKEN_MIXMODE:
-        {
-	  uint mm;
-	  if (!synldr->ParseMixmode (parser, params, mm))
-	    return NULL;
-          spr2dLook->SetMixMode (mm);
-	}
-	break;
-      case CS_TOKEN_UVANIMATION:
-	{
-	  ::ParseAnim (parser, reporter, spr2dLook, name, params);
-	}
-        break;
-    }
-  }
-
-  return csPtr<iBase> (fact);
 }
 
 csPtr<iBase> csSprite2DFactoryLoader::Parse (iDocumentNode* node,
@@ -520,159 +370,6 @@ bool csSprite2DLoader::Initialize (iObjectRegistry* object_reg)
   xmltokens.Register ("v", XMLTOKEN_V);
   xmltokens.Register ("animate", XMLTOKEN_ANIMATE);
   return true;
-}
-
-csPtr<iBase> csSprite2DLoader::Parse (const char* string,
-				iLoaderContext* ldr_context, iBase*)
-{
-  CS_TOKEN_TABLE_START (commands)
-    CS_TOKEN_TABLE (FACTORY)
-    CS_TOKEN_TABLE (VERTICES)
-    CS_TOKEN_TABLE (UV)
-    CS_TOKEN_TABLE (MATERIAL)
-    CS_TOKEN_TABLE (MIXMODE)
-    CS_TOKEN_TABLE (COLORS)
-    CS_TOKEN_TABLE (LIGHTING)
-    CS_TOKEN_TABLE (ANIMATE)
-  CS_TOKEN_TABLE_END
-
-  char* name;
-  long cmd;
-  char* params;
-  char str[255];
-
-  csRef<iMeshObject> mesh;
-  csRef<iSprite2DState> spr2dLook;
-  csColoredVertices* verts = NULL;
-
-  csParser* parser = ldr_context->GetParser ();
-
-  char* buf = (char*)string;
-  while ((cmd = parser->GetObject (&buf, commands, &name, &params)) > 0)
-  {
-    if (!params)
-    {
-      ReportError (reporter,
-		"crystalspace.sprite2dloader.parse.badformat",
-		"Bad format while parsing sprite2d!");
-      return NULL;
-    }
-    switch (cmd)
-    {
-      case CS_TOKEN_FACTORY:
-	{
-          csScanStr (params, "%s", str);
-	  iMeshFactoryWrapper* fact = ldr_context->FindMeshFactory (str);
-	  if (!fact)
-	  {
-      	    ReportError (reporter,
-		"crystalspace.sprite2dloader.parse.unknownfactory",
-		"Couldn't find factory '%s'!", str);
-	    return NULL;
-	  }
-	  mesh = fact->GetMeshObjectFactory ()->NewInstance ();
-          spr2dLook = SCF_QUERY_INTERFACE (mesh, iSprite2DState);
-	  verts = &(spr2dLook->GetVertices ());
-	}
-	break;
-      case CS_TOKEN_MATERIAL:
-	{
-          csScanStr (params, "%s", str);
-          iMaterialWrapper* mat = ldr_context->FindMaterial (str);
-	  if (!mat)
-	  {
-      	    ReportError (reporter,
-		"crystalspace.sprite2dloader.parse.unknownmaterial",
-		"Couldn't find material '%s'!", str);
-            return NULL;
-	  }
-	  spr2dLook->SetMaterialWrapper (mat);
-	}
-	break;
-      case CS_TOKEN_MIXMODE:
-        {
-	  uint mm;
-	  if (!synldr->ParseMixmode (parser, params, mm))
-	    return NULL;
-          spr2dLook->SetMixMode (mm);
-	}
-	break;
-      case CS_TOKEN_VERTICES:
-        {
-          float list[100];
-	  int num;
-          csScanStr (params, "%F", list, &num);
-	  num /= 2;
-	  verts->SetLength (num);
-	  int i;
-          for (i = 0 ; i < num ; i++)
-	  {
-	    (*verts)[i].pos.x = list[i*2+0];
-	    (*verts)[i].pos.y = list[i*2+1];
-	    (*verts)[i].color_init.Set (0, 0, 0);
-	    (*verts)[i].color.Set (0, 0, 0);
-	  }
-        }
-        break;
-      case CS_TOKEN_UV:
-        {
-          float list[100];
-	  int num;
-          csScanStr (params, "%F", list, &num);
-	  num /= 2;
-	  verts->SetLength (num);
-	  int i;
-          for (i = 0 ; i < num ; i++)
-	  {
-	    (*verts)[i].u = list[i*2+0];
-	    (*verts)[i].v = list[i*2+1];
-	  }
-        }
-        break;
-      case CS_TOKEN_LIGHTING:
-        {
-          bool do_lighting;
-          csScanStr (params, "%b", &do_lighting);
-          spr2dLook->SetLighting (do_lighting);
-        }
-        break;
-      case CS_TOKEN_COLORS:
-        {
-          float list[100];
-	  int num;
-          csScanStr (params, "%F", list, &num);
-	  num /= 3;
-	  verts->SetLength (num);
-	  int i;
-          for (i = 0 ; i < num ; i++)
-	  {
-	    (*verts)[i].color_init.red = list[i*3+0];
-	    (*verts)[i].color_init.green = list[i*3+1];
-	    (*verts)[i].color_init.blue = list[i*3+2];
-	  }
-        }
-        break;
-      case CS_TOKEN_ANIMATE:
-        {
-          bool loop;
-	  int type;
-          csScanStr (params, "%s, %d, %b", str, &type, &loop);
-	  iSprite2DUVAnimation *ani = spr2dLook->GetUVAnimation (str);
-	  if (ani)
-	    spr2dLook->SetUVAnimation (str, type, loop);
-	  else
-    	  {
-	    ReportError (reporter,
-		"crystalspace.sprite2dloader.parse.uvanim",
-		"UVAnimation '%s' not found!", str);
-	    return NULL;
-	  }
-        }
-        break;
-    }
-  }
-
-  return csPtr<iBase> (mesh);
 }
 
 csPtr<iBase> csSprite2DLoader::Parse (iDocumentNode* node,

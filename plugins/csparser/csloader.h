@@ -27,7 +27,6 @@
 #include "csutil/csvector.h"
 #include "csutil/util.h"
 #include "csutil/strhash.h"
-#include "csutil/parser.h"
 #include "csgeom/quaterni.h"
 #include "iutil/plugin.h"
 #include "imap/services.h"
@@ -216,8 +215,6 @@ private:
   iLoaderContext* GetLoaderContext ();
   csStringHash xmltokens;
 
-  /// the current parser
-  csParser parser;
   /// Parser for common stuff like MixModes
   csRef<iSyntaxService> SyntaxService;
 
@@ -278,118 +275,7 @@ private:
   /// Statistics
   class csLoaderStats *Stats;
 
-  /// -----------------------------------------------------------------------
-
-  /// Parse a quaternion definition
-  bool ParseQuaternion (char* buf, csQuaternion &q);
-  /// Parse a color definition
-  bool ParseColor (char *buf, csRGBcolor &c);
-  /// Parse a color definition
-  bool ParseColor (char *buf, csColor &c);
-
-  /// Parse a list of textures and add them to the engine.
-  bool ParseTextureList (char* buf);
-  /**
-   * Parse a list of materials and add them to the engine. If a prefix is
-   * given, all material names will be prefixed with the corresponding string.
-   */
-  bool ParseMaterialList (char* buf, const char* prefix = NULL);
-  /// Parse a texture definition and add the texture to the engine
-  iTextureWrapper* ParseTexture (char *name, char* buf);
-  /// Parse a proc texture definition and add the texture to the engine
-  iTextureWrapper* ParseProcTex (char *name, char* buf);
-  /// Parse a material definition and add the material to the engine
-  iMaterialWrapper* ParseMaterial (char *name, char* buf, const char* prefix = NULL);
-  /// Parse a collection definition and add the collection to the engine
-  iCollection* ParseCollection (char* name, char* buf);
-  /// Parse a camera position.
-  bool ParseStart (char* buf, iCameraPosition* campos);
-  /// Parse a static light definition and add the light to the engine
-  iStatLight* ParseStatlight (char* name, char* buf);
-  /// Parse a key definition and add the key to the given object
-  iKeyValuePair* ParseKey (char* buf, iObject* pParent);
-  /// Parse a map node definition and add the node to the given sector
-  iMapNode* ParseNode (char* name, char* buf, iSector* sec);
-  /// Parse a sector definition and add the sector to the engine
-  iSector* ParseSector (char* name, char* buf);
-
-  /// -----------------------------------------------------------------------
-
-  /// For heightgen.
-  csGenerateImageTexture* ParseHeightgenTexture (char* buf);
-  /// For heightgen.
-  csGenerateImageValue* ParseHeightgenValue (char* buf);
-  /// Parse and load a height texture
-  bool ParseHeightgen (char* buf);
-
-  /**
-   * Load a LOD control object.
-   */
-  bool LoadLodControl (iLODControl* lodctrl, char* buf);
-
-  /**
-   * Load a Mesh Object Factory from the map file.
-   * If the transformation pointer is given then this is for a hierarchical
-   * mesh object factory and the transformation will be filled in with
-   * the relative transform (from MOVE keyword).
-   */
-  bool LoadMeshObjectFactory (iMeshFactoryWrapper* meshFact, char* buf,
-  	csReversibleTransform* transf = NULL);
-
-  /**
-   * Load the mesh object from the map file.
-   */
-  bool LoadMeshObject (iMeshWrapper* mesh, char* buf);
-
-  /**
-   * Load the mesh object from the map file.
-   * This version will parse FACTORY statement to directly create
-   * a mesh from a factory.
-   */
-  iMeshWrapper* LoadMeshObjectFromFactory (char* buf);
-
-  /**
-   * Load a plugin in general.
-   */
-  bool LoadAddOn (char* buf, iBase* context);
-
-  /**
-   * Load the render priority section.
-   */
-  bool LoadRenderPriorities (char* buf);
-
-  /**
-   * Load the settings section.
-   */
-  bool LoadSettings (char* buf);
-
-  /**
-   * Load sounds from a SOUNDS(...) argument.
-   * This function is normally called automatically by the parser.
-   */
-  bool LoadSounds (char* buf);
-
-
-  /**
-   * Load all the plugin descriptions from the map file
-   * (the plugins are not actually loaded yet).
-   */
-  bool LoadPlugins (char* buf);
-
-  /**
-   * Load a library into given engine.<p>
-   * A library is just a map file that contains just mesh factories,
-   * thing templates, sounds and textures.
-   */
-  bool LoadLibrary (char* buf);
-
-  /// Load map from a memory buffer
-  bool LoadMap (char* buf);
-
-  //========================================================================
-  // New XML versions of all functions accepting char*. Soon these
-  // will be the only ones remaining.
-  //========================================================================
+  //------------------------------------------------------------------------
 
   /// Parse a quaternion definition
   bool ParseQuaternion (iDocumentNode* node, csQuaternion &q);
@@ -430,7 +316,6 @@ private:
    * Parsse a list of effects and add them to the effectsystem. If effectsystem
    * isn't loaded, ignore all this 
    */
-  /// Parse a effectlist and att them to the effectserver
   bool ParseEffectList (iDocumentNode * node);
   /// Parse single effect
   bool ParseEffect (iDocumentNode * node, iEffectServer* pParent);
@@ -459,8 +344,8 @@ private:
    * mesh object factory and the transformation will be filled in with
    * the relative transform (from MOVE keyword).
    */
-  bool LoadMeshObjectFactory (iMeshFactoryWrapper* meshFact, iDocumentNode* node,
-  	csReversibleTransform* transf = NULL);
+  bool LoadMeshObjectFactory (iMeshFactoryWrapper* meshFact,
+  	iDocumentNode* node, csReversibleTransform* transf = NULL);
 
   /**
    * Load the mesh object from the map file.
@@ -530,13 +415,6 @@ private:
   csPtr<iBase> TestXmlPlugParse (iLoaderPlugin* plug, iDataBuffer* buf,
   	iBase* context, const char* fname);
 
-  /**
-   * Print an error about an unknown token. 'object' is the type of object
-   * that was just being parsed, e.g. "a sector". This function will get
-   * the unknown token from csGetLastOffender ().
-   */
-  void TokenError (const char *Object);
-
   /// Report any error.
   void ReportError (const char* id, const char* description, ...);
   /// Report a notification.
@@ -549,7 +427,9 @@ private:
   void ReportNotify2 (const char* id, const char* description, ...);
 
   /// Report a warning.
-  void ReportWarning (const char* id, iDocumentNode* node, const char* description, ...);
+  void ReportWarning (const char* id, iDocumentNode* node,
+  	const char* description, ...);
+
 public:
   /********** iLoader implementation **********/
   SCF_DECLARE_IBASE;

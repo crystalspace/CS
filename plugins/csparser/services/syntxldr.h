@@ -64,33 +64,6 @@ public:
 
   bool Initialize (iObjectRegistry* object_reg);
 
-  virtual bool ParseMatrix (csParser* parser, char *buffer, csMatrix3 &m);
-  virtual bool ParseVector (csParser* parser, char *buffer, csVector3 &v);
-  virtual bool ParseMixmode (csParser* parser, char *buffer, uint &mixmode);
-  virtual bool ParseShading (csParser* parser, char *buf, int &shading);
-  virtual bool ParseTexture (
-  	csParser* parser, 
-	char *buf, const csVector3* vref, uint &texspec,
-	csVector3 &tx_orig, csVector3 &tx1, csVector3 &tx2, csVector3 &len,
-	csMatrix3 &tx_m, csVector3 &tx_v,
-	csVector2 &uv_shift,
-	int &idx1, csVector2 &uv1,
-	int &idx2, csVector2 &uv2,
-	int &idx3, csVector2 &uv3,
-	char *plane, const char *polyname);
-
-  virtual  bool ParseWarp (csParser* parser, 
-			   char *buf, csVector &flags, bool &mirror,
-  			   bool& warp, int& msv,
-			   csMatrix3 &m, csVector3 &before, csVector3 &after);
-
-  virtual bool ParsePoly3d (csParser* parser, 
-			    iLoaderContext* ldr_context,
-  			    iEngine* engine, iPolygon3D* poly3d, char* buf,
-			    float default_texlen,
-			    iThingState* thing_state, int vt_offset);
-
-
   virtual const char* MatrixToText (
   	const csMatrix3 &m, int indent, bool newline=true);
   virtual const char* VectorToText (

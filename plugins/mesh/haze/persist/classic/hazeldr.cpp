@@ -19,9 +19,9 @@
 
 #include "cssysdef.h"
 #include "csgeom/math3d.h"
-#include "csutil/parser.h"
 #include "csutil/scanstr.h"
 #include "csutil/cscolor.h"
+#include "csutil/util.h"
 #include "hazeldr.h"
 #include "imesh/object.h"
 #include "iengine/mesh.h"
@@ -43,18 +43,6 @@
 #include "ivaria/reporter.h"
 
 CS_IMPLEMENT_PLUGIN
-
-CS_TOKEN_DEF_START
-  CS_TOKEN_DEF (DIRECTIONAL)
-  CS_TOKEN_DEF (FACTORY)
-  CS_TOKEN_DEF (HAZEBOX)
-  CS_TOKEN_DEF (HAZECONE)
-  CS_TOKEN_DEF (LAYER)
-  CS_TOKEN_DEF (MATERIAL)
-  CS_TOKEN_DEF (MIXMODE)
-  CS_TOKEN_DEF (ORIGIN)
-  CS_TOKEN_DEF (SCALE)
-CS_TOKEN_DEF_END
 
 enum
 {
@@ -207,157 +195,6 @@ static iHazeHull* ParseHull (csStringHash& xmltokens, iReporter* reporter,
   }
   result->IncRef ();	// Prevent smart pointer release.
   return result;
-}
-
-static iHazeHull* ParseHull (csParser* parser, char* buf, 
-			     iHazeFactoryState *fstate, float &s)
-{
-  CS_TOKEN_TABLE_START (emits)
-    CS_TOKEN_TABLE (HAZEBOX)
-    CS_TOKEN_TABLE (HAZECONE)
-    CS_TOKEN_TABLE (SCALE)
-  CS_TOKEN_TABLE_END
-
-  char* name;
-  long cmd;
-  char* params;
-
-  csRef<iHazeHull> result;
-  csVector3 a,b;
-  int number;
-  float p,q;
-
-  csRef<iHazeHullCreation> hullcreate (SCF_QUERY_INTERFACE(fstate,
-    iHazeHullCreation));
-
-  while ((cmd = parser->GetObject (&buf, emits, &name, &params)) > 0)
-  {
-    if (!params)
-    {
-      printf ("Expected parameters instead of '%s'!\n", buf);
-      return 0;
-    }
-    switch (cmd)
-    {
-      case CS_TOKEN_HAZEBOX:
-        {
-          csScanStr (params, "%f,%f,%f,%f,%f,%f", &a.x, &a.y, &a.z,
-	    &b.x, &b.y, &b.z);
-	  iHazeHullBox *ebox = hullcreate->CreateBox(a, b);
-	  result = SCF_QUERY_INTERFACE(ebox, iHazeHull);
-	  CS_ASSERT(result);
-          ebox->DecRef();
-	}
-	break;
-      case CS_TOKEN_HAZECONE:
-        {
-          csScanStr (params, "%d, %f,%f,%f,%f,%f,%f, %f, %f", &number,
-	    &a.x, &a.y, &a.z, &b.x, &b.y, &b.z, &p, &q);
-	  iHazeHullCone *econe = hullcreate->CreateCone(number, a, b, p, q);
-	  result = SCF_QUERY_INTERFACE(econe, iHazeHull);
-	  CS_ASSERT(result);
-          econe->DecRef();
-	}
-	break;
-      case CS_TOKEN_SCALE:
-        {
-          csScanStr (params, "%f", &s);
-	}
-	break;
-    }
-  }
-  result->IncRef ();	// Prevent smart pointer release.
-  return result;
-}
-
-csPtr<iBase> csHazeFactoryLoader::Parse (const char* string,
-	iLoaderContext* ldr_context,
-	iBase* /* context */)
-{
-  CS_TOKEN_TABLE_START (commands)
-    CS_TOKEN_TABLE (DIRECTIONAL)
-    CS_TOKEN_TABLE (FACTORY)
-    CS_TOKEN_TABLE (LAYER)
-    CS_TOKEN_TABLE (MATERIAL)
-    CS_TOKEN_TABLE (MIXMODE)
-    CS_TOKEN_TABLE (ORIGIN)
-  CS_TOKEN_TABLE_END
-
-  char* name;
-  long cmd;
-  char* params;
-  char str[255];
-
-  csVector3 a;
-
-  csParser* parser = ldr_context->GetParser ();
-
-  csRef<iPluginManager> plugin_mgr (CS_QUERY_REGISTRY (object_reg,
-  	iPluginManager));
-  csRef<iMeshObjectType> type (CS_QUERY_PLUGIN_CLASS (plugin_mgr,
-  	"crystalspace.mesh.object.haze", iMeshObjectType));
-  if (!type)
-  {
-    type = CS_LOAD_PLUGIN (plugin_mgr, "crystalspace.mesh.object.haze",
-    	iMeshObjectType);
-    printf ("Load TYPE plugin crystalspace.mesh.object.haze\n");
-  }
-  csRef<iMeshObjectFactory> fact (type->NewFactory ());
-  csRef<iHazeFactoryState> hazefactorystate (SCF_QUERY_INTERFACE(
-    fact, iHazeFactoryState));
-  CS_ASSERT(hazefactorystate);
-
-  char* buf = (char*)string;
-  while ((cmd = parser->GetObject (&buf, commands, &name, &params)) > 0)
-  {
-    if (!params)
-    {
-      // @@@ Error handling!
-      return NULL;
-    }
-    switch (cmd)
-    {
-      case CS_TOKEN_MATERIAL:
-	{
-          csScanStr (params, "%s", str);
-          iMaterialWrapper* mat = ldr_context->FindMaterial (str);
-	  if (!mat)
-	  {
-	    printf ("Could not find material '%s'!\n", str);
-            // @@@ Error handling!
-            return NULL;
-	  }
-	  hazefactorystate->SetMaterialWrapper (mat);
-	}
-	break;
-      case CS_TOKEN_MIXMODE:
-	uint mode;
-	if (synldr->ParseMixmode (parser, params, mode))
-          hazefactorystate->SetMixMode (mode);
-	break;
-      case CS_TOKEN_ORIGIN:
-        {
-          csScanStr (params, "%f,%f,%f", &a.x, &a.y, &a.z);
-          hazefactorystate->SetOrigin (a);
-	}
-	break;
-      case CS_TOKEN_DIRECTIONAL:
-        {
-          csScanStr (params, "%f,%f,%f", &a.x, &a.y, &a.z);
-          hazefactorystate->SetDirectional (a);
-	}
-	break;
-      case CS_TOKEN_LAYER:
-        {
-	  float layerscale = 1.0;
-	  iHazeHull *hull = ParseHull(parser, params, hazefactorystate, layerscale);
-          hazefactorystate->AddLayer (hull, layerscale);
-	}
-	break;
-    }
-  }
-
-  return csPtr<iBase> (fact);
 }
 
 csPtr<iBase> csHazeFactoryLoader::Parse (iDocumentNode* node,
@@ -549,98 +386,6 @@ bool csHazeLoader::Initialize (iObjectRegistry* object_reg)
   xmltokens.Register ("origin", XMLTOKEN_ORIGIN);
   xmltokens.Register ("scale", XMLTOKEN_SCALE);
   return true;
-}
-
-csPtr<iBase> csHazeLoader::Parse (const char* string, 
-			    iLoaderContext* ldr_context, iBase*)
-{
-  CS_TOKEN_TABLE_START (commands)
-    CS_TOKEN_TABLE (DIRECTIONAL)
-    CS_TOKEN_TABLE (FACTORY)
-    CS_TOKEN_TABLE (LAYER)
-    CS_TOKEN_TABLE (MATERIAL)
-    CS_TOKEN_TABLE (MIXMODE)
-    CS_TOKEN_TABLE (ORIGIN)
-  CS_TOKEN_TABLE_END
-
-  char* name;
-  long cmd;
-  char* params;
-  char str[255];
-
-  csRef<iMeshObject> mesh;
-  csRef<iHazeFactoryState> hazefactorystate;
-  csRef<iHazeState> hazestate;
-  csVector3 a;
-
-  csParser* parser = ldr_context->GetParser ();
-
-  char* buf = (char*)string;
-  while ((cmd = parser->GetObject (&buf, commands, &name, &params)) > 0)
-  {
-    if (!params)
-    {
-      // @@@ Error handling!
-      return NULL;
-    }
-    switch (cmd)
-    {
-      case CS_TOKEN_FACTORY:
-	{
-          csScanStr (params, "%s", str);
-	  iMeshFactoryWrapper* fact = ldr_context->FindMeshFactory (str);
-	  if (!fact)
-	  {
-	    // @@@ Error handling!
-	    return NULL;
-	  }
-	  mesh = fact->GetMeshObjectFactory ()->NewInstance ();
-          hazestate = SCF_QUERY_INTERFACE (mesh, iHazeState);
-	  hazefactorystate = SCF_QUERY_INTERFACE(fact->GetMeshObjectFactory(),
-	    iHazeFactoryState);
-	}
-	break;
-      case CS_TOKEN_MATERIAL:
-	{
-          csScanStr (params, "%s", str);
-          iMaterialWrapper* mat = ldr_context->FindMaterial (str);
-	  if (!mat)
-	  {
-	    printf ("Could not find material '%s'!\n", str);
-            // @@@ Error handling!
-            return NULL;
-	  }
-	  hazestate->SetMaterialWrapper (mat);
-	}
-	break;
-      case CS_TOKEN_MIXMODE:
-	uint mode;
-	if (synldr->ParseMixmode (parser, params, mode))
-          hazestate->SetMixMode (mode);
-	break;
-      case CS_TOKEN_ORIGIN:
-        {
-          csScanStr (params, "%f,%f,%f", &a.x, &a.y, &a.z);
-          hazestate->SetOrigin (a);
-	}
-	break;
-      case CS_TOKEN_DIRECTIONAL:
-        {
-          csScanStr (params, "%f,%f,%f", &a.x, &a.y, &a.z);
-          hazestate->SetDirectional (a);
-	}
-	break;
-      case CS_TOKEN_LAYER:
-        {
-	  float layerscale = 1.0;
-	  iHazeHull *hull = ParseHull(parser, params, hazefactorystate, layerscale);
-          hazestate->AddLayer (hull, layerscale);
-	}
-	break;
-    }
-  }
-
-  return csPtr<iBase> (mesh);
 }
 
 csPtr<iBase> csHazeLoader::Parse (iDocumentNode* node,

@@ -20,7 +20,7 @@
 #include <string.h>
 #include <stdlib.h>
 #include "cssysdef.h"
-#include "csutil/parser.h"
+#include "parser.h"
 
 // A string containing white spaces (' ', '\t', '\n', '\r')
 static const char *kWhiteSpace = " \t\n\r";

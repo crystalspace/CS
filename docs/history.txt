@@ -2,6 +2,9 @@ The history order is reversed so that new features are at the top.
 
 19-Sep-2002
 	- Fixed some memory leaks in csInitializer.
+	- Completely removed support for the old format from CS. All is XML
+	  now. The csParser class has also been removed from csutil
+	  library and is now in cs2xml tool only.
 18-Sep-2002
 	- Fixed several memory leaks in CS introduced by the new csPtr(csRef)
 	  constructor added yesterday.

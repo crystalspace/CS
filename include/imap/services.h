@@ -30,7 +30,6 @@ class csMatrix3;
 class csVector3;
 class csVector2;
 class csVector;
-class csParser;
 class csColor;
 class csBox3;
 struct iPolygon3D;
@@ -61,79 +60,6 @@ SCF_VERSION (iSyntaxService, 1, 1, 4);
  */
 struct iSyntaxService : public iBase
 {
-  /**
-   * Parse a MATRIX description. Returns true if successful.
-   */
-  virtual bool ParseMatrix (csParser* parser, char *buffer, csMatrix3 &m) = 0;
-
-  /**
-   * Parse a VECTOR description. Returns true if successful.
-   */
-  virtual bool ParseVector (csParser* parser, char *buffer, csVector3 &v) = 0;
-
-  /**
-   * Parse a MIXMODE description. Returns true if successful.
-   */
-  virtual bool ParseMixmode (csParser* parser, char *buffer, uint &mixmode) = 0;
-
-  /**
-   * Parse a SHADING description. Returns true if successful.
-   */
-  virtual bool ParseShading (csParser* parser, char *buf, int &shading) = 0;
-
-  /**
-   * Parse a texture description.
-   * <ul>
-   * <li>vref: is the array containing vertices which can be referenced
-   *     by indices in the description.
-   * <li>texspec: describes the data found for the texture transformation.
-   *     It consists of or'ed CSTEX_.
-   * <li>tx_orig, tx1, tx2, len: texture transformation is given by 3
-   *     points describing a 3d space (third vector is implicitly given to
-   *     be perpendicular on the 2 vectors described by the 3 points),
-   * <li>width and height of the texture.
-   * <li>tx_m and tx_v: if texture transformation is given explicitly by
-   *     matrix/vector.
-   * <li>uv_shift: contains UV_SHIFT value.
-   * <li>idx? and uv?: if texture mapping is given explicitly by defining
-   *     the u,v coordinate that belongs to vertex idx? of the polygon.
-   * <li>plane: is the name of a plane defining the texture transformation.
-   * <li>polyname: name of polygon to which this texture description belongs.
-   *     This is used to make errormessages more verbose.
-   * </ul>
-   * \sa #CSTEX_UV
-   */
-  virtual bool ParseTexture (csParser* parser, 
-  			     char *buf, const csVector3* vref, uint &texspec,
-			     csVector3 &tx_orig, csVector3 &tx1,
-			     csVector3 &tx2, csVector3 &len,
-			     csMatrix3 &tx_m, csVector3 &tx_v,
-			     csVector2 &uv_shift,
-			     int &idx1, csVector2 &uv1,
-			     int &idx2, csVector2 &uv2,
-			     int &idx3, csVector2 &uv3,
-			     char *plane, const char *polyname) = 0;
-
-  /**
-   * Parses a WARP () specification.
-   * flags: contains all flags found in the description.
-   */
-  virtual  bool ParseWarp (csParser* parser, 
-  			   char *buf, csVector &flags, bool &mirror,
-  			   bool& warp, int& msv,
-			   csMatrix3 &m, csVector3 &before,
-			   csVector3 &after) = 0;
-
-
-  /**
-   * Parses a POLYGON.
-   */
-  virtual bool ParsePoly3d (csParser* parser, 
-   			    iLoaderContext* ldr_context,
-  			    iEngine* engine, iPolygon3D* poly3d, char* buf,
-			    float default_texlen,
-			    iThingState* thing_state, int vt_offset) = 0;
-
   /**
    * Transform the matrix into its textual representation.
    * <ul>
@@ -182,11 +108,6 @@ struct iSyntaxService : public iBase
   virtual const char* MixmodeToText (uint mixmode, int indent,
   	bool newline=true) = 0;
 
-  //========================================================================
-  // New XML versions of all functions accepting char*. Soon these
-  // will be the only ones remaining.
-  //========================================================================
-
   /**
    * Parse the value of this node and return a boolean depending
    * on this value. The following mapping happens (case insensitive):
@@ -201,7 +122,8 @@ struct iSyntaxService : public iBase
    * <li>(everyting else) -> error
    * </ul>
    */
-  virtual bool ParseBool (iDocumentNode* node, bool& result, bool def_result) = 0;
+  virtual bool ParseBool (iDocumentNode* node, bool& result,
+  	bool def_result) = 0;
   
   /**
    * Parse a matrix description. Returns true if successful.

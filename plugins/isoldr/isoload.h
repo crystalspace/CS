@@ -23,7 +23,6 @@
 #include "csutil/csvector.h"
 #include "csutil/util.h"
 #include "csutil/plugldr.h"
-#include "csutil/parser.h"
 #include "csutil/strhash.h"
 
 #include "iutil/eventh.h"
@@ -67,8 +66,6 @@ private:
   bool TestXml (const char* file, iDataBuffer* buf,
 	csRef<iDocument>& doc);
 
-  csParser parser;
-
   // csLoadedPluginVector Cut & Paste from - csloader.h
   // Perhaps theres a better way to do this ??
   class csLoadedPluginVector : public csVector
@@ -106,42 +103,8 @@ private:
   virtual iMaterialWrapper* FindMaterial (const char *iName);
   /// Find a mesh factory
   virtual iMeshFactoryWrapper* FindMeshFactory (const char *iName);
-  /// Returns true if params is not null, displays error
-  /// via iReporter otherwise & returns false
-  bool CheckParams(char* params, const char* tag, char* data);
-  /// Displays error & returns false if an invalid token was found
-  bool CheckToken(int cmd, const char* tag, char* data);
-  /// Traditional TokenError routine
-  void TokenError (const char *Object);
 
   //---- End Helpers ----
-
-  // 
-  bool LoadMap (char* buf);
-  /// Loads plugins
-  bool LoadPlugins (char* buf);
-  /// Parses START definition - (sets iIsoView to POSITION)
-  bool ParseStart(char* buf, const char* prefix);
-  /// Parses GRID definition
-  bool ParseGrid (char* buf, const char* prefix);
-  /// Parses GRIDS definition (a list of GRID)
-  bool ParseGridList (char* buf, const char* prefix);
-  /// Parses MATERIALS definition (a list of MATERIAL)
-  /// Note that the MATERIAL definition is much simpler
-  /// in the iso engine because it has no textures.
-  bool ParseMaterialList (char* buf, const char* prefix);
-  /// Parse a LIGHT definition - a light belongs to a GRID
-  bool ParseLight (char* buf, const char* prefix);
-  /// Parse a TILE2D defintiion (for tiling an area on a GRID)
-  bool ParseTile2D (char* buf, const char* prefix);
-  /// Parse a PLUGINS defintion - This code copied from
-  /// csparser/plgldr.cpp and class defintions changed to csIsoLoader
-  bool ParsePluginList (char* buf, const char* prefix);
-  /// Parse a basic MESHFACTORY definition.
-  bool ParseMeshFactory (char* buf, const char* prefix);
-  /// Parse a basic MESHOBJ definition (uses iLoaderPlugin to
-  /// load plugins)
-  bool ParseMeshObject (char* buf, const char* prefix);
 
   // 
   bool LoadMap (iDocumentNode* node);
@@ -161,8 +124,10 @@ private:
   bool ParseLight (iDocumentNode* node, const char* prefix);
   /// Parse a TILE2D defintiion (for tiling an area on a GRID)
   bool ParseTile2D (iDocumentNode* node, const char* prefix);
-  /// Parse a PLUGINS defintion - This code copied from
-  /// csparser/plgldr.cpp and class defintions changed to csIsoLoader
+  /**
+   * Parse a PLUGINS defintion - This code copied from
+   * csparser/plgldr.cpp and class defintions changed to csIsoLoader
+   */
   bool ParsePluginList (iDocumentNode* node, const char* prefix);
   /// Parse a basic MESHFACTORY definition.
   bool ParseMeshFactory (iDocumentNode* node, const char* prefix);

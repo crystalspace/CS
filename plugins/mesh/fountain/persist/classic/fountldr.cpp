@@ -19,9 +19,9 @@
 
 #include "cssysdef.h"
 #include "csgeom/math3d.h"
-#include "csutil/parser.h"
 #include "csutil/scanstr.h"
 #include "csutil/cscolor.h"
+#include "csutil/util.h"
 #include "fountldr.h"
 #include "imesh/object.h"
 #include "iengine/mesh.h"
@@ -43,23 +43,6 @@
 #include "ivaria/reporter.h"
 
 CS_IMPLEMENT_PLUGIN
-
-CS_TOKEN_DEF_START
-  CS_TOKEN_DEF (ACCEL)
-  CS_TOKEN_DEF (AZIMUTH)
-  CS_TOKEN_DEF (COLOR)
-  CS_TOKEN_DEF (DROPSIZE)
-  CS_TOKEN_DEF (ELEVATION)
-  CS_TOKEN_DEF (FACTORY)
-  CS_TOKEN_DEF (FALLTIME)
-  CS_TOKEN_DEF (LIGHTING)
-  CS_TOKEN_DEF (MATERIAL)
-  CS_TOKEN_DEF (MIXMODE)
-  CS_TOKEN_DEF (NUMBER)
-  CS_TOKEN_DEF (OPENING)
-  CS_TOKEN_DEF (ORIGIN)
-  CS_TOKEN_DEF (SPEED)
-CS_TOKEN_DEF_END
 
 enum
 {
@@ -149,22 +132,6 @@ bool csFountainFactoryLoader::Initialize (iObjectRegistry* object_reg)
   return true;
 }
 
-csPtr<iBase> csFountainFactoryLoader::Parse (const char* /*string*/,
-	iLoaderContext*, iBase* /* context */)
-{
-  csRef<iPluginManager> plugin_mgr (CS_QUERY_REGISTRY (object_reg,
-  	iPluginManager));
-  csRef<iMeshObjectType> type (CS_QUERY_PLUGIN_CLASS (plugin_mgr,
-  	"crystalspace.mesh.object.fountain", iMeshObjectType));
-  if (!type)
-  {
-    type = CS_LOAD_PLUGIN (plugin_mgr, "crystalspace.mesh.object.fountain",
-    	iMeshObjectType);
-  }
-  csRef<iMeshObjectFactory> fact (type->NewFactory ());
-  return csPtr<iBase> (fact);
-}
-
 csPtr<iBase> csFountainFactoryLoader::Parse (iDocumentNode* /*node*/,
 	iLoaderContext*, iBase* /* context */)
 {
@@ -239,161 +206,6 @@ bool csFountainLoader::Initialize (iObjectRegistry* object_reg)
   xmltokens.Register ("origin", XMLTOKEN_ORIGIN);
   xmltokens.Register ("speed", XMLTOKEN_SPEED);
   return true;
-}
-
-csPtr<iBase> csFountainLoader::Parse (const char* string,
-	iLoaderContext* ldr_context, iBase*)
-{
-  CS_TOKEN_TABLE_START (commands)
-    CS_TOKEN_TABLE (MATERIAL)
-    CS_TOKEN_TABLE (FACTORY)
-    CS_TOKEN_TABLE (ORIGIN)
-    CS_TOKEN_TABLE (ACCEL)
-    CS_TOKEN_TABLE (SPEED)
-    CS_TOKEN_TABLE (FALLTIME)
-    CS_TOKEN_TABLE (COLOR)
-    CS_TOKEN_TABLE (OPENING)
-    CS_TOKEN_TABLE (AZIMUTH)
-    CS_TOKEN_TABLE (ELEVATION)
-    CS_TOKEN_TABLE (DROPSIZE)
-    CS_TOKEN_TABLE (LIGHTING)
-    CS_TOKEN_TABLE (NUMBER)
-    CS_TOKEN_TABLE (MIXMODE)
-  CS_TOKEN_TABLE_END
-
-  char* name;
-  long cmd;
-  char* params;
-  char str[255];
-
-  csRef<iMeshObject> mesh;
-  csRef<iParticleState> partstate;
-  csRef<iFountainState> fountstate;
-
-  csParser* parser = ldr_context->GetParser ();
-
-  char* buf = (char*)string;
-  while ((cmd = parser->GetObject (&buf, commands, &name, &params)) > 0)
-  {
-    if (!params)
-    {
-      // @@@ Error handling!
-      return NULL;
-    }
-    switch (cmd)
-    {
-      case CS_TOKEN_COLOR:
-	{
-	  csColor color;
-	  csScanStr (params, "%f,%f,%f", &color.red, &color.green, &color.blue);
-	  partstate->SetColor (color);
-	}
-	break;
-      case CS_TOKEN_DROPSIZE:
-	{
-	  float dw, dh;
-	  csScanStr (params, "%f,%f", &dw, &dh);
-	  fountstate->SetDropSize (dw, dh);
-	}
-	break;
-      case CS_TOKEN_ORIGIN:
-	{
-	  csVector3 origin;
-	  csScanStr (params, "%f,%f,%f", &origin.x, &origin.y, &origin.z);
-	  fountstate->SetOrigin (origin);
-	}
-	break;
-      case CS_TOKEN_ACCEL:
-	{
-	  csVector3 accel;
-	  csScanStr (params, "%f,%f,%f", &accel.x, &accel.y, &accel.z);
-	  fountstate->SetAcceleration (accel);
-	}
-	break;
-      case CS_TOKEN_SPEED:
-	{
-	  float f;
-	  csScanStr (params, "%f", &f);
-	  fountstate->SetSpeed (f);
-	}
-	break;
-      case CS_TOKEN_OPENING:
-	{
-	  float f;
-	  csScanStr (params, "%f", &f);
-	  fountstate->SetOpening (f);
-	}
-	break;
-      case CS_TOKEN_AZIMUTH:
-	{
-	  float f;
-	  csScanStr (params, "%f", &f);
-	  fountstate->SetAzimuth (f);
-	}
-	break;
-      case CS_TOKEN_ELEVATION:
-	{
-	  float f;
-	  csScanStr (params, "%f", &f);
-	  fountstate->SetElevation (f);
-	}
-	break;
-      case CS_TOKEN_FALLTIME:
-	{
-	  float f;
-	  csScanStr (params, "%f", &f);
-	  fountstate->SetFallTime (f);
-	}
-	break;
-      case CS_TOKEN_FACTORY:
-	{
-          csScanStr (params, "%s", str);
-	  iMeshFactoryWrapper* fact = ldr_context->FindMeshFactory (str);
-	  if (!fact)
-	  {
-	    // @@@ Error handling!
-	    return NULL;
-	  }
-	  mesh = fact->GetMeshObjectFactory ()->NewInstance ();
-          partstate = SCF_QUERY_INTERFACE (mesh, iParticleState);
-          fountstate = SCF_QUERY_INTERFACE (mesh, iFountainState);
-	}
-	break;
-      case CS_TOKEN_MATERIAL:
-	{
-          csScanStr (params, "%s", str);
-          iMaterialWrapper* mat = ldr_context->FindMaterial (str);
-	  if (!mat)
-	  {
-            // @@@ Error handling!
-            return NULL;
-	  }
-	  partstate->SetMaterialWrapper (mat);
-	}
-	break;
-      case CS_TOKEN_MIXMODE:
-	uint mode;
-	if (synldr->ParseMixmode (parser, params, mode))
-          partstate->SetMixMode (mode);
-	break;
-      case CS_TOKEN_LIGHTING:
-        {
-          bool do_lighting;
-          csScanStr (params, "%b", &do_lighting);
-          fountstate->SetLighting (do_lighting);
-        }
-        break;
-      case CS_TOKEN_NUMBER:
-        {
-          int nr;
-          csScanStr (params, "%d", &nr);
-          fountstate->SetParticleCount (nr);
-        }
-        break;
-    }
-  }
-
-  return csPtr<iBase> (mesh);
 }
 
 csPtr<iBase> csFountainLoader::Parse (iDocumentNode* node,

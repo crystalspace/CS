@@ -350,7 +350,6 @@
 #include "csutil/objiter.h"
 #include "csutil/objpool.h"
 #include "csutil/objreg.h"
-#include "csutil/parser.h"
 #include "csutil/plugldr.h"
 #include "csutil/plugmgr.h"
 #include "csutil/prfxcfg.h"

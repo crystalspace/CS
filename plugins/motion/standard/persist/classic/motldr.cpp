@@ -33,36 +33,11 @@
 
 #include "csgeom/transfrm.h"
 #include "csgeom/quaterni.h"
-#include "csutil/parser.h"
 #include "csutil/scanstr.h"
 
 //#define MOTION_DEBUG
 
 CS_IMPLEMENT_PLUGIN
-
-CS_TOKEN_DEF_START
-  CS_TOKEN_DEF(BONE)
-  CS_TOKEN_DEF(EULER)
-  CS_TOKEN_DEF(FILE)
-  CS_TOKEN_DEF(FRAME)
-  CS_TOKEN_DEF(DURATION)
-  CS_TOKEN_DEF(IDENTITY)
-  CS_TOKEN_DEF(LOOP)
-  CS_TOKEN_DEF(LOOPCOUNT)
-  CS_TOKEN_DEF(LOOPFLIP)
-  CS_TOKEN_DEF(MATRIX)
-  CS_TOKEN_DEF(MOTION)
-  CS_TOKEN_DEF(POS)
-  CS_TOKEN_DEF(Q)
-  CS_TOKEN_DEF(ROT_X)
-  CS_TOKEN_DEF(ROT_Y)
-  CS_TOKEN_DEF(ROT_Z)
-  CS_TOKEN_DEF(ROT)
-  CS_TOKEN_DEF(SCALE_X)
-  CS_TOKEN_DEF(SCALE_Y)
-  CS_TOKEN_DEF(SCALE_Z)
-  CS_TOKEN_DEF(SCALE)
-CS_TOKEN_DEF_END
 
 enum
 {
@@ -159,111 +134,6 @@ bool csMotionLoader::Initialize (iObjectRegistry* object_reg)
   return true;
 }
 
-static bool load_matrix (csParser *parser, char* buf, csMatrix3 &m)
-{
-  CS_TOKEN_TABLE_START(commands)
-    CS_TOKEN_TABLE(IDENTITY)
-    CS_TOKEN_TABLE(ROT_X)
-    CS_TOKEN_TABLE(ROT_Y)
-    CS_TOKEN_TABLE(ROT_Z)
-    CS_TOKEN_TABLE(ROT)
-    CS_TOKEN_TABLE(SCALE_X)
-    CS_TOKEN_TABLE(SCALE_Y)
-    CS_TOKEN_TABLE(SCALE_Z)
-    CS_TOKEN_TABLE(SCALE)
-  CS_TOKEN_TABLE_END
-
-  char* params;
-  int cmd, num;
-  float angle;
-  float scaler;
-  float list[30];
-  const csMatrix3 identity;
-
-  while ((cmd = parser->GetCommand (&buf, commands, &params)) > 0)
-  {
-    switch (cmd)
-    {
-      case CS_TOKEN_IDENTITY:
-        m = identity;
-        break;
-      case CS_TOKEN_ROT_X:
-        csScanStr (params, "%f", &angle);
-        m *= csXRotMatrix3 (angle);
-        break;
-      case CS_TOKEN_ROT_Y:
-        csScanStr (params, "%f", &angle);
-        m *= csYRotMatrix3 (angle);
-        break;
-      case CS_TOKEN_ROT_Z:
-        csScanStr (params, "%f", &angle);
-        m *= csZRotMatrix3 (angle);
-        break;
-      case CS_TOKEN_ROT:
-        csScanStr (params, "%F", list, &num);
-        if (num == 3)
-        {
-          m *= csXRotMatrix3 (list[0]);
-          m *= csZRotMatrix3 (list[2]);
-          m *= csYRotMatrix3 (list[1]);
-        }
-        else
-	  printf ("Badly formed rotation: '%s'\n", params);
-        break;
-      case CS_TOKEN_SCALE_X:
-        csScanStr (params, "%f", &scaler);
-        m *= csXScaleMatrix3(scaler);
-        break;
-      case CS_TOKEN_SCALE_Y:
-        csScanStr (params, "%f", &scaler);
-        m *= csYScaleMatrix3(scaler);
-        break;
-      case CS_TOKEN_SCALE_Z:
-        csScanStr (params, "%f", &scaler);
-        m *= csZScaleMatrix3(scaler);
-        break;
-      case CS_TOKEN_SCALE:
-        csScanStr (params, "%F", list, &num);
-        if (num == 1)      // One scaler; applied to entire matrix.
-	  m *= list[0];
-        else if (num == 3) // Three scalers; applied to X, Y, Z individually.
-	  m *= csMatrix3 (list[0],0,0,0,list[1],0,0,0,list[2]);
-        else
-	  printf ("Badly formed scale: '%s'\n", params);
-        break;
-    }
-  }
-  if (cmd == CS_PARSERR_TOKENNOTFOUND)
-  {
-    // Neither SCALE, ROT, nor IDENTITY, so matrix may contain a single scaler
-    // or the nine values of a 3x3 matrix.
-    csScanStr (buf, "%F", list, &num);
-    if (num == 1)
-      m = csMatrix3 () * list[0];
-    else if (num == 9)
-      m = csMatrix3 (
-        list[0], list[1], list[2],
-        list[3], list[4], list[5],
-        list[6], list[7], list[8]);
-    else
-      printf ("Badly formed matrix '%s'\n", buf);
-  }
-  return true;
-}
-
-static bool load_vector (char* buf, csVector3 &v)
-{
-  csScanStr (buf, "%f,%f,%f", &v.x, &v.y, &v.z);
-  return true;
-}
-
-static bool load_quaternion (char* buf, csQuaternion &q)
-{
-  csScanStr (buf, "%f,%f,%f,%f", &q.x, &q.y, &q.z, &q.r);
-  return true;
-}
-
-
 //=========================================================== Load Motion
 
 void csMotionLoader::Report (int severity, const char* msg, ...)
@@ -279,110 +149,6 @@ void csMotionLoader::Report (int severity, const char* msg, ...)
     csPrintf ("\n");
   }
   va_end (arg);
-}
-
-iMotionTemplate* csMotionLoader::LoadMotion (const char* fname )
-{
-  csRef<iDataBuffer> databuff (vfs->ReadFile (fname));
-
-  if (!databuff || !databuff->GetSize ())
-  {
-    Report (CS_REPORTER_SEVERITY_ERROR,
-    	"Could not open motion file \"%s\" on VFS!", fname);
-    return NULL;
-  }
-
-  CS_TOKEN_TABLE_START (tokens)
-    CS_TOKEN_TABLE (MOTION)
-  CS_TOKEN_TABLE_END
-
-  char *name, *data;
-  char *buf = **databuff;
-  long cmd;
-  csParser parser;
-
-  if ((cmd = parser.GetObject (&buf, tokens, &name, &data)) > 0)
-  {
-    if (!data)
-    {
-      Report (CS_REPORTER_SEVERITY_ERROR, "Expected parameters instead of '%s'!", buf);
-      return NULL;
-    }
-
-    if (!motman)
-      Report (CS_REPORTER_SEVERITY_ERROR, "No motion manager loaded!");
-    else
-    {
-      iMotionTemplate* m = motman->FindMotionByName (name);
-      if (!m)
-      {
-	m = motman->AddMotion (name);
-	if (LoadMotion (&parser, m, data))
-	  return m;
-	else
-	{
-	  m->DecRef ();
-	  return NULL;
-	}
-      }
-    }
-  }
-  return NULL;
-}
-
-bool load_transform (csParser* parser, char* buf, csVector3 &v, csQuaternion &q) {
-  CS_TOKEN_TABLE_START (tok_anim)
-    CS_TOKEN_TABLE (POS)
-    CS_TOKEN_TABLE (ROT)
-  CS_TOKEN_TABLE_END
-
-  CS_TOKEN_TABLE_START (tok_rot)
-    CS_TOKEN_TABLE (EULER)
-    CS_TOKEN_TABLE (MATRIX)
-    CS_TOKEN_TABLE (Q)
-  CS_TOKEN_TABLE_END
-
-  char* name;
-  long cmd;
-  char* params;
-  char* params2;
-
-  while ( (cmd = parser->GetObject (&buf, tok_anim, &name, &params))>0 ) {
-    switch ( cmd ) {
-      case CS_TOKEN_POS: {
-        load_vector(params, v);
-        break;
-      }
-      case CS_TOKEN_ROT:
-        while ( (cmd = parser->GetObject (&params, tok_rot, &name, &params2))>0 ) {
-          switch ( cmd ) {
-            case CS_TOKEN_Q: {
-                load_quaternion(params2, q);
-                break;
-              }
-//TODO Implement me
-            case CS_TOKEN_MATRIX: {
-		csMatrix3 m;
-                load_matrix(parser, params2, m);
-//		q.Set(m);
-                break;
-              }
-            case CS_TOKEN_EULER: {
-                csVector3 euler;
-                load_vector(params2, euler);
-                q.SetWithEuler(euler);
-                break;
-              }
-          }
-        }
-        break;
-    }
-  }
-  if (cmd == CS_PARSERR_TOKENNOTFOUND)
-  {
-    return false;
-  }
-  return true;
 }
 
 bool csMotionLoader::load_transform (iDocumentNode* node, csVector3 &v,
@@ -440,46 +206,6 @@ bool csMotionLoader::load_transform (iDocumentNode* node, csVector3 &v,
   return true;
 }
 
-bool csMotionLoader::LoadBone (csParser* parser, iMotionTemplate* mot, int bone, char* buf)
-{
-  CS_TOKEN_TABLE_START (tok_bone)
-    CS_TOKEN_TABLE (FRAME)
-  CS_TOKEN_TABLE_END
-
-  char* name;
-  long cmd;
-  char* params;
-
-  while((cmd = parser->GetObject (&buf, tok_bone, &name, &params))>0)
-  {
-    if (!params)
-    {
-      Report (CS_REPORTER_SEVERITY_ERROR, "Expected parameters instead of '%s'!", buf);
-      return false;
-    }
-    switch ( cmd )
-    {
-      case CS_TOKEN_FRAME:
-      {
-        float frametime;
-        csScanStr(name, "%f", &frametime);
-        csVector3 v(0,0,0);
-        csQuaternion q(1,0,0,0);
-        ::load_transform(parser, params, v, q);
-        mot->AddFrameBone(bone, frametime, v, q);
-        break;
-      }
-    }
-  }
-  if (cmd == CS_PARSERR_TOKENNOTFOUND)
-  {
-    Report (CS_REPORTER_SEVERITY_ERROR, "Token '%s' not found while parsing the a sprite template!",
-        parser->GetLastOffender ());
-    return false;
-  }
-  return true;
-}
-
 bool csMotionLoader::LoadBone (iDocumentNode* node, iMotionTemplate* mot,
 	int bone)
 {
@@ -505,71 +231,6 @@ bool csMotionLoader::LoadBone (iDocumentNode* node, iMotionTemplate* mot,
         synldr->ReportBadToken (child);
 	return false;
     }
-  }
-  return true;
-}
-
-bool csMotionLoader::LoadMotion (csParser* parser, iMotionTemplate* mot, char* buf)
-{
-  CS_TOKEN_TABLE_START (tok_commands)
-    CS_TOKEN_TABLE (DURATION)
-    CS_TOKEN_TABLE (BONE)
-  CS_TOKEN_TABLE_END
-
-  CS_TOKEN_TABLE_START (tok_duration)
-    CS_TOKEN_TABLE (LOOP)
-    CS_TOKEN_TABLE (LOOPCOUNT)
-    CS_TOKEN_TABLE (LOOPFLIP)
-  CS_TOKEN_TABLE_END
-
-  char* name;
-  long cmd;
-  char* params;
-  char* params2;
-
-  while ((cmd = parser->GetObject (&buf, tok_commands, &name, &params)) > 0)
-  {
-    if (!params)
-    {
-      Report (CS_REPORTER_SEVERITY_ERROR, "Expected parameters instead of '%s'!", buf);
-      return false;
-    }
-    switch (cmd)
-    {
-      case CS_TOKEN_DURATION: {
-        float duration=0.0f;
-        csScanStr(name, "%f", &duration);
-        mot->SetDuration(duration);
-        while ( (cmd = parser->GetObject (&params, tok_duration, &name, &params2))>0 ) {
-          switch ( cmd ) {
-            case CS_TOKEN_LOOP:
-              mot->SetLoopCount(-1);
-              break;
-            case CS_TOKEN_LOOPFLIP:
-              mot->SetLoopFlip(1);
-              break;
-            case CS_TOKEN_LOOPCOUNT: {
-              int loopcount=0;
-              csScanStr(name, "%d", &loopcount);
-              mot->SetLoopCount(loopcount);
-              break;
-            }
-          }
-        }
-        break;
-      }
-      case CS_TOKEN_BONE: {
-        int bone=mot->AddBone(name);
-        LoadBone(parser, mot, bone, params);
-        break;
-      }
-    }
-  }
-  if (cmd == CS_PARSERR_TOKENNOTFOUND)
-  {
-    Report (CS_REPORTER_SEVERITY_ERROR, "Token '%s' not found while parsing the a sprite template!",
-        parser->GetLastOffender ());
-    return false;
   }
   return true;
 }
@@ -632,64 +293,6 @@ bool csMotionLoader::LoadMotion (iDocumentNode* node, iMotionTemplate* mot)
   return true;
 }
 
-
-csPtr<iBase> csMotionLoader::Parse (const char *string,
-	iLoaderContext* ldr_context, iBase* /* context */ )
-{
-  CS_TOKEN_TABLE_START(commands)
-    CS_TOKEN_TABLE(FILE)
-    CS_TOKEN_TABLE(MOTION)
-  CS_TOKEN_TABLE_END
-
-  char *name;
-  long cmd;
-  char *params;
-  char str[255];
-  char *buf = (char *) string;
-  str[0] = '\0';
-  iMotionTemplate *m;
-
-  csParser* parser = ldr_context->GetParser ();
-
-  while (( cmd = parser->GetObject ( &buf, commands, &name, &params )) > 0)
-  {
-	if (!params)
-	{
-	  printf("Expected parameters instead of '%s'\n", string);
-	  return NULL;
-	}
-	switch (cmd)
-	{
-          case CS_TOKEN_MOTION:
-          {
-	    m = motman->FindMotionByName (name);
-	    if (!m)
-	    {
-		  m = motman->AddMotion (name);
-		  LoadMotion (parser, m, params);
-	    }
-	  }
-	  break;
-	  case CS_TOKEN_FILE:
-	  {
-		m = LoadMotion(params);
-		if (!m)
-		{
-		  printf("Failed to load motion file '%s' from VFS\n",params);
-		}
-	  }
-	  break;
-	}
-  }
-	if (cmd == CS_PARSERR_TOKENNOTFOUND)
-	{
-	  Report(CS_REPORTER_SEVERITY_ERROR,
-		  "Token '%s' not found while parsing the iMotionLoader plugin",
-			parser->GetLastOffender());
-	  return NULL;
-	}
-	return csPtr<iBase> (this);
-}
 
 csPtr<iBase> csMotionLoader::Parse (iDocumentNode* node,
 	iLoaderContext* ldr_context, iBase* /* context */ )
