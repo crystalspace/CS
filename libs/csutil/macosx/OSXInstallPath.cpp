@@ -29,14 +29,15 @@
 #include "OSXInstallPath.h"
 #include <stdio.h>
 #include <stdlib.h>
+#include <unistd.h>
 
 //-----------------------------------------------------------------------------
 // is_config_dir
 //-----------------------------------------------------------------------------
 static bool is_config_dir(csString path)
 {
-  if (!path.IsEmpty() && path[path.Length() - 1] != CS_PATH_SEPARATOR)
-    path << CS_PATH_SEPARATOR;
+  if (!path.IsEmpty() && path[path.Length() - 1] != PATH_SEPARATOR)
+    path << PATH_SEPARATOR;
   path << "vfs.cfg";
   return (access(path, F_OK) == 0);
 }
@@ -52,9 +53,9 @@ static bool test_config_dir(csString path)
     if (is_config_dir(path))
       return true;
 
-    if (path[path.Length() - 1] != CS_PATH_SEPARATOR)
-      path << CS_PATH_SEPARATOR;
-    path << "etc" << CS_PATH_SEPARATOR << CS_PACKAGE_NAME;
+    if (path[path.Length() - 1] != PATH_SEPARATOR)
+      path << PATH_SEPARATOR;
+    path << "etc" << PATH_SEPARATOR << CS_PACKAGE_NAME;
     if (is_config_dir(path))
       return true;
   }
@@ -71,7 +72,7 @@ csString csGetConfigPath()
   char buff[FILENAME_MAX];
   char* env;
 
-  if (OSXGetInstallPath(buff, FILENAME_MAX, CS_PATH_SEPARATOR))
+  if (OSXGetInstallPath(buff, FILENAME_MAX, PATH_SEPARATOR))
     candidates.Push(buff);
   if ((env = getenv("CRYSTAL")) != 0 && *env != '\0')
     candidates.Push(env);
