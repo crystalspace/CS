@@ -45,7 +45,7 @@ of the current dependencies here. @xref{External Libraries}
 @table @emph
 @item The Netwide Assembler
 @sc{nasm} is used by Crystal Space on certain platforms for assembly language
-routines (@url{http://nasm.2y.net/}).
+routines, for performance enhancement (@url{http://nasm.2y.net/}).
 
 @item @sc{ascii} Art Library
 aalib is used for 2D rendering in text mode.  Currently a modified version of
@@ -60,7 +60,7 @@ libpng is used for loading Portable Network Graphics image files
 (@url{http://www.libpng.org/pub/png/libpng.html}).
 
 @item @sc{jpeg} Library
-libjpeg is used for loading Joint Photographics Experts Group image files
+libjpeg is used for loading @emph{Joint Photographics Experts Group} image files
 (@url{http://www.ijg.org/files/}).
 @end table
 
