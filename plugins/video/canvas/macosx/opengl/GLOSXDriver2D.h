@@ -15,18 +15,23 @@
 
 #if defined(__cplusplus)
 
-
 #include "cssys/macosx/OSXAssistant.h"
+#include "csutil/scf.h"
 #include "video/canvas/openglcommon/glcommon2d.h"
+#include "video/canvas/openglcommon/iogl.h"
 
 #include "OSXDelegate2D_OpenGL.h"
 
 #include <CoreFoundation/CoreFoundation.h>
 
+#import <mach-o/dyld.h>
+#import <stdlib.h>
+#import <string.h>
 
 
 class GLOSXDriver2D : public csGraphics2DGLCommon, public OSXDriver2D {
 public:
+    SCF_DECLARE_IBASE_EXT (csGraphics2DGLCommon);
     // Constructor
     GLOSXDriver2D(iBase *p);
 
@@ -59,6 +64,25 @@ public:
 
     // Toggle between fullscreen/windowed mode
     virtual bool ToggleFullscreen();
+
+    struct eiOpenGLInterface : public iOpenGLInterface
+    {
+	SCF_DECLARE_EMBEDDED_IBASE (GLOSXDriver2D);
+	virtual void *GetProcAddress (const char *name) {
+	    // Get the address of a procedure (for OGL use.)
+	    NSSymbol symbol;
+	    char *symbolName;
+	    // Prepend a '_' for the Unix C symbol mangling convention
+	    symbolName = (char *)malloc (strlen (name) + 2);
+	    strcpy(symbolName + 1, name);
+	    symbolName[0] = '_';
+	    symbol = NULL;
+	    if (NSIsSymbolNameDefined (symbolName))
+		symbol = NSLookupAndBindSymbol (symbolName);
+	    free (symbolName);
+	    return symbol ? NSAddressOfSymbol (symbol) : NULL;
+	}
+    } scfiOpenGLInterface;
     
 protected:
 
@@ -68,6 +92,8 @@ protected:
     // OpenGL context for drawing
     CGLContextObj context;
 };
+
+
 
 #endif // __cplusplus
 
