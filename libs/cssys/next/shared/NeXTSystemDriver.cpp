@@ -23,20 +23,9 @@
 #include "version.h"
 #include "csutil/inifile.h"
 
-//-----------------------------------------------------------------------------
-// SCF interface to NeXT-specific csSystemDriver.
-//-----------------------------------------------------------------------------
-
-void *SysSystemDriver::QueryInterface (const char *iInterfaceID, int iVersion)
-{
-  IMPLEMENTS_EMBEDDED_INTERFACE (iNeXTSystemDriver)
-  return csSystemDriver::QueryInterface (iInterfaceID, iVersion);
-}
-
 IMPLEMENT_EMBEDDED_IBASE(NeXTSystemDriver::NeXTSystemInterface)
   IMPLEMENTS_INTERFACE(iNeXTSystemDriver)
 IMPLEMENT_EMBEDDED_IBASE_END
-
 
 //-----------------------------------------------------------------------------
 // Constructor
@@ -62,10 +51,20 @@ NeXTSystemDriver::~NeXTSystemDriver()
 
 
 //-----------------------------------------------------------------------------
+// QueryInterface
+//-----------------------------------------------------------------------------
+void* NeXTSystemDriver::QueryInterface( char const*iInterfaceID, int iVersion )
+    {
+    IMPLEMENTS_INTERFACE_COMMON(iNeXTSystemDriver, &scfiNeXTSystemDriver)
+    return csSystemDriver::QueryInterface (iInterfaceID, iVersion);
+    }
+
+
+//-----------------------------------------------------------------------------
 // Initialize
 //-----------------------------------------------------------------------------
-bool NeXTSystemDriver::Initialize(int argc, char const* const argv[],
-    char const* cfgfile)
+bool NeXTSystemDriver::Initialize( int argc, char const* const argv[],
+    char const* cfgfile )
     {
     next_config = new csIniFile( "next.cfg" );
     init_system();
