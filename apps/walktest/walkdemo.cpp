@@ -1206,6 +1206,7 @@ void AttachRandomLight (iDynLight* light)
 // not test if the mesh is visible or not.
 void light_statics ()
 {
+#if 0
   iEngine* e = Sys->view->GetEngine ();
   iMeshList* meshes = e->GetMeshes ();
   int i;
@@ -1224,6 +1225,7 @@ void light_statics ()
     }
     sp->DeferUpdateLighting (CS_NLIGHT_STATIC|CS_NLIGHT_DYNAMIC, 10);
   }
+#endif
 }
 
 //===========================================================================

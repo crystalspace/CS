@@ -41,6 +41,10 @@ The history order is reversed so that new features are at the top.
 	- Got a patch from James Baicoianu <james@baicoianu.com> which
 	  implements iPolygonMesh for the ball mesh object so it can be used
 	  for collision detection
+	- Removed the very inefficient 'light_statics' from walktest. This
+	  function needs to be done differently (i.e. DeferUpdateLighting()
+	  should be automatic). On large levels (i.e. PlaneShift levels) this
+	  function was second in the top (profiling).
 12-Feb-2003
 	- Performed several optimizations on the tinyxml parser. Hopefully
 	  it is now a little faster.
