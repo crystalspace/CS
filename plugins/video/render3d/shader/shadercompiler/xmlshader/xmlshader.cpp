@@ -57,6 +57,7 @@ csXMLShaderCompiler::csXMLShaderCompiler(iBase* parent)
 csXMLShaderCompiler::~csXMLShaderCompiler()
 {
   delete[] fail_reason;
+  SCF_DESTRUCT_IBASE();
 }
 
 void csXMLShaderCompiler::SetFailReason (const char* reason)
@@ -83,8 +84,8 @@ bool csXMLShaderCompiler::Initialize (iObjectRegistry* object_reg)
 
   g3d = CS_QUERY_REGISTRY (object_reg, iGraphics3D);
   synldr = CS_QUERY_REGISTRY (object_reg, iSyntaxService);
-  csRef<iCommandLineParser> cmdline = CS_QUERY_REGISTRY (
-  	object_reg, iCommandLineParser);
+  csRef<iCommandLineParser> cmdline =
+    CS_QUERY_REGISTRY (object_reg, iCommandLineParser);
   if (cmdline)
     do_verbose = (cmdline->GetOption ("verbose") != 0);
   else
@@ -109,7 +110,7 @@ int csXMLShaderCompiler::CompareTechniqueKeeper (void const* item1,
 csPtr<iShader> csXMLShaderCompiler::CompileShader (iDocumentNode *templ)
 {
   if (!ValidateTemplate (templ))
-    return csPtr<iShader> (0);
+    return 0;
 
   csRef<iDocumentNodeIterator> it = templ->GetNodes();
 
@@ -138,7 +139,7 @@ csPtr<iShader> csXMLShaderCompiler::CompileShader (iDocumentNode *templ)
   {
     techniqueKeeper tk = techIt.Next();
     shader = CompileTechnique (tk.node, shaderName, templ);
-    if (shader != 0)
+    if (shader.IsValid())
     {
       if (do_verbose)
 	Report (CS_REPORTER_SEVERITY_NOTIFY,
@@ -156,14 +157,15 @@ csPtr<iShader> csXMLShaderCompiler::CompileShader (iDocumentNode *templ)
     }
   }
 
-  if (shader == 0)
+  if (!shader.IsValid())
   {
     // @@@ Or a warning instead?
     Report (CS_REPORTER_SEVERITY_WARNING,
       "No technique validated for shader '%s'", shaderName);
   }
 
-  return csPtr<iShader> (csRef<iShader> (shader));
+  csRef<iShader> ishader(shader);
+  return csPtr<iShader>(ishader);
 }
 
 csPtr<csXMLShader> csXMLShaderCompiler::CompileTechnique (
@@ -235,7 +237,6 @@ csPtr<csXMLShader> csXMLShaderCompiler::CompileTechnique (
       return 0;
     }
   }
-
 
   return csPtr<csXMLShader> (newShader);
 }
@@ -448,7 +449,7 @@ bool csXMLShaderCompiler::LoadPass (iDocumentNode *node,
     {
       //int a = CS_VATTRIB_IS_SPECIFIC (attrib) ? 
       //attrib - CS_VATTRIB_SPECIFIC_FIRST : attrib;
-      csStringID varID = strings->Request (mapping->GetAttributeValue ("name"));
+      csStringID varID = strings->Request (mapping->GetAttributeValue("name"));
       pass->bufferID[pass->bufferCount] = varID; //MUST HAVE STRINGS
       pass->bufferGeneric[pass->bufferCount] = CS_VATTRIB_IS_GENERIC (attrib);
 
@@ -497,7 +498,7 @@ bool csXMLShaderCompiler::LoadPass (iDocumentNode *node,
   {
     csRef<iDocumentNode> mapping = it->Next ();
     if (mapping->GetType() != CS_NODE_ELEMENT) continue;
-    if (mapping->GetAttribute ("name") && mapping->GetAttribute ("destination"))
+    if (mapping->GetAttribute("name") && mapping->GetAttribute("destination"))
     {
       const char* dest = mapping->GetAttributeValue ("destination");
       char unitName[8];
@@ -513,7 +514,7 @@ bool csXMLShaderCompiler::LoadPass (iDocumentNode *node,
 	}
       }
       if (texUnit < 0) continue;
-      csStringID varID = strings->Request (mapping->GetAttributeValue ("name"));
+      csStringID varID = strings->Request (mapping->GetAttributeValue("name"));
       pass->textureID[texUnit] = varID;
       //pass->textureUnits[pass->textureCount] = texUnit;
 
@@ -550,8 +551,8 @@ bool csXMLShaderCompiler::LoadPass (iDocumentNode *node,
 }
 
 bool csXMLShaderCompiler::LoadSVBlock (iDocumentNode *node,
-                                       csShaderVariableContextHelper *staticVariables,
-                                       csShaderVariableProxyList *dynamicVariables)
+  csShaderVariableContextHelper *staticVariables,
+  csShaderVariableProxyList *dynamicVariables)
 {
   (void)dynamicVariables;
   csRef<csShaderVariable> svVar;
@@ -699,7 +700,8 @@ bool csXMLShaderCompiler::IsTemplateToCompiler(iDocumentNode *templ)
     return false;
   }
 
-  //Check that we have children, no children == not a template to this one at least
+  //Check that we have children, no children == not a template to this one at
+  //least.
   if (!templ->GetNodes()->HasNext()) return false;
 
   //Ok, passed check. We will try to validate it
@@ -799,17 +801,20 @@ bool csXMLShader::SetupPass (csRenderMesh *mesh,
   int i;
   for(i=0;i<dynamicDomains.Length();i++)
   {
-    varsFilled += dynamicDomains[i]->FillVariableList (&thispass->dynamicVariables);
+    varsFilled +=
+      dynamicDomains[i]->FillVariableList (&thispass->dynamicVariables);
     if (varsFilled>=thispass->dynamicVariables.Length ())
       break;
   }
   
-  /*for(i = 0; i < thispass->dynamicVariables.Length (); i++)
+#if 0
+  for(i = 0; i < thispass->dynamicVariables.Length (); i++)
   {
     *((csRef<csShaderVariable>*)thispass->dynamicVariables.Get(i).userData) = 
       thispass->dynamicVariables.Get(i).shaderVariable;
     thispass->dynamicVariables.Get(i).shaderVariable = 0;
-  }*/
+  }
+#endif
 
   //now map our buffers. all refs should be set
   for (i = 0; i < thispass->bufferCount; i++)

@@ -10,7 +10,7 @@ chronological order.
 	- Jorrit added a csArray::GetIndex() function which will return the
 	  index of an element in the array (as input you give a pointer to
 	  the element in the array).
-	- Fritz Elfert fixed several msvc6 compiler warnings.
+	- Fritz Elfert eliminated several MSVC6 compiler warnings.
 	- Jorrit removed the index from every polygon. The polygons are
 	  now stored in a csArray<csPolygon3D> instead of a
 	  csArray<csPolygon3D*>. This saves memory and also makes polygon
@@ -44,6 +44,10 @@ chronological order.
 	  bug in which it was unconditionally referencing mk/visualc7, despite
 	  the fact that MSVC_VERSION might be "6".  Also fixed a couple other
 	  minor bugs, and did a bit of cleanup.
+	- Eric Sunshine fixed problem in csXMLShaderCompiler::CompileShader()
+	  where some compilers considered return expression ambiguous.  Also
+	  fixed bug in ~csXMLShaderCompiler where it failed to invoke
+	  SCF_DESTRUCT_IBASE().
 19-Feb-2004
 	- res made the following changes:
 	    - A few minor cosmetic changes.
