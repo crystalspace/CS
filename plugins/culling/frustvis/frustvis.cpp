@@ -332,13 +332,7 @@ struct FrustTest_Front2BackData
 {
   csVector3 pos;
   iRenderView* rview;
-
-  // During VisTest() we use the current frustum as five planes.
-  // Associated with this frustum we also have a clip mask which
-  // is maintained recursively during VisTest() and indicates the
-  // planes that are still active for the current kd-tree node.
-  csPlane3 frustum[32];
-
+  csPlane3* frustum;
   // this is the callback to call when we discover a visible node
   iVisibilityCullerListener* viscallback;
 };
@@ -373,7 +367,7 @@ bool csFrustumVis::TestObjectVisibility (csFrustVisObjectWrapper* obj,
   const csBox3& obj_bbox = obj->child->GetBBox ();
   if (obj_bbox.Contains (data->pos))
   {
-    data->viscallback->ObjectVisible (obj->visobj, obj->mesh);
+    data->viscallback->ObjectVisible (obj->visobj, obj->mesh, frustum_mask);
     return true;
   }
   
@@ -384,7 +378,7 @@ bool csFrustumVis::TestObjectVisibility (csFrustVisObjectWrapper* obj,
     return false;
   }
 
-  data->viscallback->ObjectVisible (obj->visobj, obj->mesh);
+  data->viscallback->ObjectVisible (obj->visobj, obj->mesh, new_mask);
 
   return true;
 }
@@ -406,7 +400,7 @@ static void CallVisibilityCallbacksForSubtree (csKDTree* treenode,
       	objects[i]->GetObject ();
       iMeshWrapper* mesh = visobj_wrap->mesh;
       if (!(mesh && mesh->GetFlags ().Check (CS_ENTITY_INVISIBLEMESH)))
-        data->viscallback->ObjectVisible (visobj_wrap->visobj, mesh);
+        data->viscallback->ObjectVisible (visobj_wrap->visobj, mesh, 0);
     }
   }
 
@@ -480,19 +474,8 @@ bool csFrustumVis::VisTest (iRenderView* rview,
 
   // First get the current view frustum from the rview.
   csRenderContext* ctxt = rview->GetRenderContext ();
-  csPlane3* frust = ctxt->frustum;
-
-  const csReversibleTransform& trans = rview->GetCamera ()->GetTransform ();
-  csVector3 o2tmult = trans.GetO2T () * trans.GetO2TTranslation ();
-  data.frustum[0].Set (trans.GetT2O() * frust[0].norm, -frust[0].norm*o2tmult);
-  data.frustum[1].Set (trans.GetT2O() * frust[1].norm, -frust[1].norm*o2tmult);
-  data.frustum[2].Set (trans.GetT2O() * frust[2].norm, -frust[2].norm*o2tmult);
-  data.frustum[3].Set (trans.GetT2O() * frust[3].norm, -frust[3].norm*o2tmult);
-
-  csPlane3 pz0 = ctxt->clip_plane;
-  pz0.Invert ();
-  data.frustum[4] = trans.This2Other (pz0);
-  uint32 frustum_mask = 0x1f;
+  data.frustum = ctxt->clip_planes;
+  uint32 frustum_mask = ctxt->clip_planes_mask;
 
   // The big routine: traverse from front to back and mark all objects
   // visible that are visible.
@@ -561,7 +544,7 @@ static bool FrustTestPlanes_Front2Back (csKDTree* treenode,
 	if (data->viscallback)
 	{
 	  data->viscallback->ObjectVisible (visobj_wrap->visobj, 
-	      visobj_wrap->mesh);
+	      visobj_wrap->mesh, new_mask2);
 	}
 	else
 	{
@@ -755,7 +738,7 @@ static bool FrustTestSphere_Front2Back (csKDTree* treenode,
 	if (data->viscallback)
 	{
 	  data->viscallback->ObjectVisible (
-	    visobj_wrap->visobj, visobj_wrap->mesh);
+	    visobj_wrap->visobj, visobj_wrap->mesh, 0xff);
 	}
 	else
 	{

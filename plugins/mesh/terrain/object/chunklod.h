@@ -306,7 +306,7 @@ public:
 
   /// Returns the mesh, ready for rendering
   virtual csRenderMesh** GetRenderMeshes (int &n, iRenderView* rview,
-  	iMovable* movable);
+  	iMovable* movable, uint32 frustum_mask);
 
   virtual void SetVisibleCallback (iMeshObjectDrawCallback* cb) { vis_cb = cb; }
   virtual iMeshObjectDrawCallback* GetVisibleCallback () const

@@ -506,11 +506,6 @@ struct iMeshWrapper : public iBase
   virtual void RemoveMeshFromStaticLOD (iMeshWrapper* mesh) = 0;
 
   /**
-   * Returns the render mesh.
-   */
-  virtual csRenderMesh** GetRenderMeshes (int& n, iRenderView* rview, 
-    iMovable*) = 0;
-  /**
    * Draws the shadow buffer pass.  This sets of the stencil for the lights
    */
   virtual void DrawShadow (iRenderView* rview, iLight *light) = 0;

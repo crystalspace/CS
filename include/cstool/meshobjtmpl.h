@@ -109,7 +109,8 @@ public:
    * @@@ Note: in future it would be better that the default implementation
    * does nothing as this function has to be implemented by mesh objects.
    */
-  virtual csRenderMesh** GetRenderMeshes (int& num, iRenderView*, iMovable*)
+  virtual csRenderMesh** GetRenderMeshes (int& num, iRenderView*, iMovable*,
+  	uint32)
   {
     num = 0;
     return 0;

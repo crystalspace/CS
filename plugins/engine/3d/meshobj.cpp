@@ -361,7 +361,8 @@ void csMeshWrapper::Draw (iRenderView *rview)
 }
 
 csRenderMesh** csMeshWrapper::GetRenderMeshes (int& n, iRenderView* rview, 
-                                               iMovable* mov)
+                                               iMovable* mov,
+					       uint32 frustum_mask)
 {
 //  iMeshWrapper *meshwrap = &scfiMeshWrapper;
 
@@ -403,7 +404,7 @@ csRenderMesh** csMeshWrapper::GetRenderMeshes (int& n, iRenderView* rview,
       parent = parent->csParent;
     }
     
-    return meshobj->GetRenderMeshes (n, rview, mov);
+    return meshobj->GetRenderMeshes (n, rview, mov, frustum_mask);
 /*  }
   return 0;*/
 

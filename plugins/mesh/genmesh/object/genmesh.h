@@ -229,7 +229,7 @@ public:
   virtual bool DrawTest (iRenderView* rview, iMovable* movable);
   virtual bool Draw (iRenderView* rview, iMovable* movable, csZBufMode mode);
   virtual csRenderMesh** GetRenderMeshes (int &n, iRenderView* rview, 
-    iMovable* movable);
+    iMovable* movable, uint32 frustum_mask);
   virtual void SetVisibleCallback (iMeshObjectDrawCallback* cb)
   {
     if (cb) cb->IncRef ();

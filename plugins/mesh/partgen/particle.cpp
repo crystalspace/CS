@@ -526,8 +526,9 @@ bool csNewParticleSystem::Draw (iRenderView* rview, iMovable* mov,
   return true;
 }
 
-csRenderMesh **csNewParticleSystem::GetRenderMeshes (int &num, iRenderView* rview, 
-                                                     iMovable* movable)
+csRenderMesh **csNewParticleSystem::GetRenderMeshes (int &num,
+	iRenderView* rview, 
+	iMovable* movable, uint32 frustum_mask)
 {
 #ifdef CS_USE_NEW_RENDERER
   num = 0;

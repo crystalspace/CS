@@ -228,7 +228,7 @@ public:
   	csVector3& isect, float* pr, int* polygon_idx = 0);
 
   virtual csRenderMesh** GetRenderMeshes (int& num, iRenderView* rview, 
-    iMovable* movable);
+    iMovable* movable, uint32 frustum_mask);
 
   //--------------------- For csMeshObject ------------------------------//
   virtual void GetObjectBoundingBox (csBox3& bbox, int)

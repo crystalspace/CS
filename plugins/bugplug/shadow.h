@@ -121,7 +121,7 @@ public:
   virtual bool DrawTest (iRenderView* rview, iMovable* movable);
   virtual bool Draw (iRenderView*, iMovable*, csZBufMode);
   virtual csRenderMesh** GetRenderMeshes (int& n, iRenderView* rview, 
-    iMovable* movable) { n = 0; return 0; }
+    iMovable* movable, uint32) { n = 0; return 0; }
   virtual void SetVisibleCallback (iMeshObjectDrawCallback*) { }
   virtual iMeshObjectDrawCallback* GetVisibleCallback () const { return 0; }
   virtual void NextFrame (csTicks, const csVector3& /*pos*/) { }

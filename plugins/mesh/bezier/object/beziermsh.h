@@ -770,8 +770,8 @@ public:
     {
       return scfParent->DrawTest (rview, movable);
     }
-    virtual csRenderMesh **GetRenderMeshes (int &n, iRenderView* rview, 
-      iMovable* movable) { n = 0; return 0; }
+    virtual csRenderMesh **GetRenderMeshes (int &n, iRenderView*, 
+      iMovable*, uint32) { n = 0; return 0; }
     virtual bool Draw (iRenderView* rview, iMovable* movable,
     	csZBufMode zMode)
     {

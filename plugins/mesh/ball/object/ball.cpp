@@ -686,7 +686,8 @@ void csBallMeshObject::UpdateBufferSV()
 #endif // CS_USE_NEW_RENDERER
 
 csRenderMesh **csBallMeshObject::GetRenderMeshes (int &num, iRenderView* rview, 
-                                                  iMovable* movable)
+                                                  iMovable* movable,
+						  uint32 frustum_mask)
 {
 #ifdef CS_USE_NEW_RENDERER
   SetupObject ();

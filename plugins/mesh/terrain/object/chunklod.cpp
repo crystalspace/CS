@@ -928,7 +928,7 @@ bool csChunkLodTerrainObject::DrawTest (iRenderView* rview, iMovable* movable)
 
 csRenderMesh** csChunkLodTerrainObject::GetRenderMeshes (
 	int &n, iRenderView* rview, 
-	iMovable* movable)
+	iMovable* movable, uint32 frustum_mask)
 {
   if (!DrawTest (rview, movable))
   {

@@ -1741,8 +1741,9 @@ bool csSprite3DMeshObject::Draw (iRenderView* rview, iMovable* /*movable*/,
   return true;
 }
 
-csRenderMesh** csSprite3DMeshObject::GetRenderMeshes (int& n, iRenderView* rview, 
-                                                      iMovable* movable)
+csRenderMesh** csSprite3DMeshObject::GetRenderMeshes (int& n,
+	iRenderView* rview, 
+	iMovable* movable, uint32 frustum_mask)
 {
 #ifdef CS_USE_NEW_RENDERER
   SetupObject ();

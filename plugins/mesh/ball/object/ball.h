@@ -248,7 +248,7 @@ public:
   int GetVertexCount () { SetupObject(); return num_ball_vertices; }
   csVector3* GetVertices () { SetupObject (); return ball_vertices; }
   virtual csRenderMesh **GetRenderMeshes (int &num, iRenderView* rview, 
-    iMovable* movable);
+    iMovable* movable, uint32 frustum_mask);
 
 #ifndef CS_USE_NEW_RENDERER
   int GetTriangleCount () { SetupObject(); return top_mesh.num_triangles; }

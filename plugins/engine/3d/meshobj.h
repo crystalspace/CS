@@ -451,7 +451,7 @@ public:
    * then it can be drawn fully here.
    */
   csRenderMesh** GetRenderMeshes (int& num, iRenderView* rview,
-  	iMovable* movable);
+  	iMovable* movable, uint32 frustum_mask);
   /// This pass sets up the shadow stencil buffer
   void DrawShadow (iRenderView* rview, iLight* light);
   /// This pass draws the diffuse lit mesh
@@ -784,11 +784,6 @@ public:
     virtual void AddMeshToStaticLOD (int lod, iMeshWrapper* mesh)
     {
       scfParent->AddMeshToStaticLOD (lod, mesh);
-    }
-    virtual csRenderMesh** GetRenderMeshes (int& num, iRenderView* rview, 
-      iMovable*) 
-    {
-      return scfParent->GetRenderMeshes (num, rview, 0);
     }
     virtual void DrawShadow (iRenderView* rview, iLight* light)
     {

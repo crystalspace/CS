@@ -76,7 +76,7 @@ struct iParticle : public iBase
 
   /// Get the rendermesh(es) of this particle.
   virtual csRenderMesh** GetRenderMeshes (int& n, iRenderView* rview, 
-    iMovable* movable) = 0;
+    iMovable* movable, uint32 frustum_mask) = 0;
 };
 
 #endif // __CS_IMESH_PARTICLE_H__

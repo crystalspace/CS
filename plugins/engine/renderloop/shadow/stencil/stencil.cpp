@@ -720,7 +720,7 @@ csStencilShadowStep::ShadowDrawVisCallback::~ShadowDrawVisCallback ()
 }
 
 void csStencilShadowStep::ShadowDrawVisCallback::ObjectVisible (
-  iVisibilityObject *visobject, iMeshWrapper *mesh)
+  iVisibilityObject *visobject, iMeshWrapper *mesh, uint32 /*frustum_mask*/)
 {
   parent->shadowMeshes.Push (mesh);
 }

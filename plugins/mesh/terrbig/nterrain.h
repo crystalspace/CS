@@ -369,8 +369,8 @@ public:
   /// Does some pre-draw work (buffers all vertices to be drawn, draw will render these.)
   virtual csFlags& GetFlags () { return flags; }
   virtual bool DrawTest (iRenderView* rview, iMovable* movable);
-  virtual csRenderMesh** GetRenderMeshes (int& n, iRenderView* rview, 
-    iMovable* movable) { n = 0; return 0; }
+  virtual csRenderMesh** GetRenderMeshes (int& n, iRenderView*,
+    iMovable*, uint32) { n = 0; return 0; }
 
   /// Update lighting on the terrain.
   void UpdateLighting (const csArray<iLight*>& lights, iMovable* movable);

@@ -59,12 +59,10 @@ bool csSpider::DrawTest (iRenderView* rview, iMovable*)
 }
 
 csRenderMesh** csSpider::GetRenderMeshes (int& n, iRenderView* rview, 
-    iMovable* movable) 
+    iMovable* movable, uint32)
 { 
   if (!camera)
-  {
     camera = rview->GetCamera ();
-  }
   n = 0; 
   return 0; 
 }

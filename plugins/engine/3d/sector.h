@@ -481,15 +481,16 @@ public:
   {
     iRenderView* rview;
     SCF_DECLARE_EMBEDDED_IBASE (csSector);
-    virtual void ObjectVisible (iVisibilityObject *visobj, iMeshWrapper *mesh)
+    virtual void ObjectVisible (iVisibilityObject *visobj, iMeshWrapper *mesh,
+    	uint32 frustum_mask)
     {
-      scfParent->ObjectVisible (rview, visobj, mesh);
+      scfParent->ObjectVisible (rview, visobj, mesh, frustum_mask);
     }
   } scfiVisibilityCullerListener;
 
   void ObjectVisible (iRenderView* rview, iVisibilityObject *visobj,
-  	iMeshWrapper *mesh);
-  void MarkMeshAndChildrenVisible (iMeshWrapper* mesh);
+  	iMeshWrapper *mesh, uint32 frustum_mask);
+  void MarkMeshAndChildrenVisible (iMeshWrapper* mesh, uint32 frustum_mask);
 
   //------------------------- iSector interface -------------------------------
   struct eiSector : public iSector

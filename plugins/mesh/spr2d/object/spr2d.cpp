@@ -443,7 +443,8 @@ bool csSprite2DMeshObject::Draw (iRenderView* rview, iMovable* /*movable*/,
 csRenderMesh** csSprite2DMeshObject::GetRenderMeshes (int &n, 
 						      iRenderView* rview, 
 						      iMovable* movable, 
-						      csVector3 offset) 
+						      uint32 frustum_mask,
+						      csVector3 offset)
 {
 #ifdef CS_USE_NEW_RENDERER
   SetupObject ();
@@ -682,10 +683,9 @@ void csSprite2DMeshObject::Particle::Draw (iRenderView* rview,
 }
     
 csRenderMesh** csSprite2DMeshObject::Particle::GetRenderMeshes (int& n, 
-								iRenderView* rview, 
-								iMovable* movable)
+	iRenderView* rview, iMovable* movable, uint32 frustum_mask)
 {
-  return scfParent->GetRenderMeshes (n, rview, movable, part_pos);
+  return scfParent->GetRenderMeshes (n, rview, movable, frustum_mask, part_pos);
 }
 
 void csSprite2DMeshObject::Particle::SetColor (const csColor& col)

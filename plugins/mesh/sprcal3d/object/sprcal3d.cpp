@@ -1434,8 +1434,8 @@ bool csSpriteCal3DMeshObject::DrawTest (iRenderView* rview, iMovable* movable)
 }
 
 csRenderMesh** csSpriteCal3DMeshObject::GetRenderMeshes (int &n, 
-							 iRenderView* rview,
-							 iMovable* movable)
+	iRenderView* rview,
+	iMovable* movable, uint32 frustum_mask)
 {
 #ifndef CS_USE_NEW_RENDERER
   n = 0;

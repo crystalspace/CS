@@ -464,7 +464,7 @@ iRenderBuffer *csParticlesObject::GetRenderBuffer (csStringID name)
 }
 
 csRenderMesh** csParticlesObject::GetRenderMeshes (int& n, iRenderView* rview, 
-  iMovable* movable)
+  iMovable* movable, uint32 frustum_mask)
 {
   iCamera* cam = rview->GetCamera ();
 

@@ -162,7 +162,7 @@ public:
     virtual ~ShadowDrawVisCallback ();
 
     virtual void ObjectVisible (iVisibilityObject *visobject, 
-      iMeshWrapper *mesh);
+      iMeshWrapper *mesh, uint32 frustum_mask);
   } shadowDrawVisCallback;
   friend struct ShadowDrawVisCallback;
 };

@@ -170,11 +170,11 @@ public:
   virtual csFlags& GetFlags () { return flags; }
   virtual bool DrawTest (iRenderView* rview, iMovable* movable);
   csRenderMesh **GetRenderMeshes (int &n, iRenderView* rview, 
-    iMovable* movable, csVector3 offset);
+    iMovable* movable, uint32 frustum_mask, csVector3 offset);
   virtual csRenderMesh **GetRenderMeshes (int &n, iRenderView* rview, 
-    iMovable* movable)
+    iMovable* movable, uint32 frustum_mask)
   {
-    return GetRenderMeshes (n, rview, movable, csVector3 (0.0f));
+    return GetRenderMeshes (n, rview, movable, frustum_mask, csVector3 (0.0f));
   }
   virtual bool Draw (iRenderView* rview, iMovable* movable, csZBufMode mode);
   virtual void SetVisibleCallback (iMeshObjectDrawCallback* cb)
@@ -294,7 +294,7 @@ public:
     virtual void Draw (iRenderView* rview,
     	const csReversibleTransform& transform, csZBufMode mode);
     virtual csRenderMesh** GetRenderMeshes (int& n, iRenderView* rview, 
-      iMovable* movable);
+      iMovable* movable, uint32 frustum_mask);
     virtual void UpdateLighting (const csArray<iLight*>& lights,
 	const csReversibleTransform& transform);
   } scfiParticle;

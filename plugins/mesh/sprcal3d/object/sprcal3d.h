@@ -683,7 +683,7 @@ public:
   virtual csFlags& GetFlags () { return flags; }
   virtual bool DrawTest (iRenderView* rview, iMovable* movable);
   virtual csRenderMesh **GetRenderMeshes (int &n, iRenderView* rview,
-    iMovable* movable);
+    iMovable* movable, uint32 frustum_mask);
   virtual bool Draw (iRenderView* rview, iMovable* movable, csZBufMode mode);
   virtual void SetVisibleCallback (iMeshObjectDrawCallback* cb)
   {

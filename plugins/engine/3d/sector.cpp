@@ -266,7 +266,8 @@ iVisibilityCuller* csSector::GetVisibilityCuller ()
 }
 
 // OR only!
-void csSector::MarkMeshAndChildrenVisible (iMeshWrapper* mesh)
+void csSector::MarkMeshAndChildrenVisible (iMeshWrapper* mesh,
+	uint32 frustum_mask)
 {
   csMeshWrapper* cmesh = ((csMeshWrapper::MeshWrapper*)mesh)
     	->GetCsMeshWrapper ();
@@ -276,13 +277,13 @@ void csSector::MarkMeshAndChildrenVisible (iMeshWrapper* mesh)
   for (i = 0 ; i < children.GetCount () ; i++)
   {
     iMeshWrapper* child = children.Get (i);
-    MarkMeshAndChildrenVisible (child);
+    MarkMeshAndChildrenVisible (child, frustum_mask);
   }
 }
 
 // OR only!
 void csSector::ObjectVisible (iRenderView* rview,
-	iVisibilityObject *visobj, iMeshWrapper *mesh)
+	iVisibilityObject *visobj, iMeshWrapper *mesh, uint32 frustum_mask)
 {
   visobj->SetVisibilityNumber (current_visnr);
   csMeshWrapper* cmesh = ((csMeshWrapper::MeshWrapper*)mesh)
@@ -295,7 +296,7 @@ void csSector::ObjectVisible (iRenderView* rview,
     csArray<iMeshWrapper*>& meshes = static_lod->GetMeshesForLOD (lod);
     int i;
     for (i = 0 ; i < meshes.Length () ; i++)
-      MarkMeshAndChildrenVisible (meshes[i]);
+      MarkMeshAndChildrenVisible (meshes[i], frustum_mask);
   }
 }
 
@@ -321,21 +322,21 @@ public:
     this->rview = rview;
   }
 
-  void MarkMeshAndChildrenVisible (iMeshWrapper* mesh)
+  void MarkMeshAndChildrenVisible (iMeshWrapper* mesh, uint32 frustum_mask)
   {
     csMeshWrapper* cmesh = ((csMeshWrapper::MeshWrapper*)mesh)
     	  ->GetCsMeshWrapper ();
-    ObjectVisible (cmesh);
+    ObjectVisible (cmesh, frustum_mask);
     int i;
     const csMeshMeshList& children = cmesh->GetChildren ();
     for (i = 0 ; i < children.GetCount () ; i++)
     {
       iMeshWrapper* child = children.Get (i);
-      MarkMeshAndChildrenVisible (child);
+      MarkMeshAndChildrenVisible (child, frustum_mask);
     }
   }
 
-  void ObjectVisible (csMeshWrapper* cmesh)
+  void ObjectVisible (csMeshWrapper* cmesh, uint32 frustum_mask)
   {
     csStaticLODMesh* static_lod = cmesh->GetStaticLODMesh ();
     if (static_lod)
@@ -345,12 +346,12 @@ public:
       csArray<iMeshWrapper*>& meshes = static_lod->GetMeshesForLOD (lod);
       int i;
       for (i = 0 ; i < meshes.Length () ; i++)
-        MarkMeshAndChildrenVisible (meshes[i]);
+        MarkMeshAndChildrenVisible (meshes[i], frustum_mask);
     }
 
     int num;
     csRenderMesh** meshes = cmesh->GetRenderMeshes (num, rview, 
-      &(cmesh->GetCsMovable ()).scfiMovable);
+      &(cmesh->GetCsMovable ()).scfiMovable, frustum_mask);
 #ifdef CS_DEBUG
     int i;
     for (i = 0 ; i < num ; i++)
@@ -365,14 +366,15 @@ public:
     }
   }
 
-  virtual void ObjectVisible (iVisibilityObject*, iMeshWrapper *mesh)
+  virtual void ObjectVisible (iVisibilityObject*, iMeshWrapper *mesh,
+  	uint32 frustum_mask)
   {
     if (privMeshlist == 0)
       return;
 
     csMeshWrapper* cmesh = ((csMeshWrapper::MeshWrapper*)mesh)
     	->GetCsMeshWrapper ();
-    ObjectVisible (cmesh);
+    ObjectVisible (cmesh, frustum_mask);
   }
 
 private:
@@ -815,6 +817,8 @@ mov_trans.SetOrigin (csVector3 (0));
 void csSector::Draw (iRenderView *rview)
 {
 #ifndef CS_USE_NEW_RENDERER
+  ((csRenderView*)rview)->SetupClipPlanes ();
+
   PrepareDraw (rview);
   iCamera *icam = rview->GetCamera ();
   int i;

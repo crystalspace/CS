@@ -69,10 +69,13 @@ struct iVisibilityCullerListener : public iBase
 {
   /**
    * This function is called whenever the visibilty culler discovers a new
-   * visible mesh. 
+   * visible mesh.  The frustum_mask is a mask that is compatible with
+   * the current set of clip planes in the iRenderView. The mask will be
+   * true for every relevant plane. This can be used to further optimize
+   * clipping testing.
    */
   virtual void ObjectVisible (iVisibilityObject *visobject, 
-    iMeshWrapper *mesh) = 0;
+    iMeshWrapper *mesh, uint32 frustum_mask) = 0;
 };
 
 SCF_VERSION (iVisibilityCuller, 0, 4, 0);

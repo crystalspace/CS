@@ -1075,8 +1075,8 @@ public:
   } scfiShadowReceiver;
   friend struct ShadowReceiver;
 
-  virtual csRenderMesh **GetRenderMeshes (int &num, iRenderView* rview, 
-    iMovable* movabl);
+  csRenderMesh **GetRenderMeshes (int &num, iRenderView* rview, 
+    iMovable* movable, uint32 frustum_mask);
 
   //-------------------- iMeshObject interface implementation ----------
   struct MeshObject : public iMeshObject
@@ -1094,9 +1094,9 @@ public:
       return scfParent->Draw (rview, movable, zMode);
     }
     virtual csRenderMesh** GetRenderMeshes (int &n, iRenderView* rview, 
-      iMovable* movable)
+      iMovable* movable, uint32 frustum_mask)
     {
-      return scfParent->GetRenderMeshes (n, rview, movable);
+      return scfParent->GetRenderMeshes (n, rview, movable, frustum_mask);
     }
     virtual void SetVisibleCallback (iMeshObjectDrawCallback* /*cb*/) { }
     virtual iMeshObjectDrawCallback* GetVisibleCallback () const

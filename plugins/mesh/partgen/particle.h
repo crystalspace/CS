@@ -188,7 +188,7 @@ public:
   /// quick visibility test
   virtual bool DrawTest (iRenderView* rview, iMovable* movable);
   virtual csRenderMesh** GetRenderMeshes (int& n, iRenderView* rview, 
-    iMovable* movable);
+    iMovable* movable, uint32 frustum_mask);
 
   /// update lighting info
   void UpdateLighting (const csArray<iLight*>&, iMovable*);

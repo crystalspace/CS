@@ -142,7 +142,7 @@ csPortalContainer::~csPortalContainer ()
 }
 
 csRenderMesh** csPortalContainer::GetRenderMeshes (int& num,
-	iRenderView* rview, iMovable* movable)
+	iRenderView* rview, iMovable* movable, uint32 frustum_mask)
 {
   Prepare ();
 

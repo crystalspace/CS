@@ -310,7 +310,8 @@ bool csParticleSystem::DrawTest (iRenderView* rview, iMovable* movable)
 }
 
 csRenderMesh** csParticleSystem::GetRenderMeshes (int& n, iRenderView* rview, 
-						  iMovable* movable)
+						  iMovable* movable,
+						  uint32 frustum_mask)
 {
   if (!DrawTest (rview, movable))
   {
@@ -325,7 +326,8 @@ csRenderMesh** csParticleSystem::GetRenderMeshes (int& n, iRenderView* rview,
   {
     int partMeshNum;
     csRenderMesh** partMeshes = 
-      GetParticle (i)->GetRenderMeshes (partMeshNum, rview, movable);
+      GetParticle (i)->GetRenderMeshes (partMeshNum, rview, movable,
+      	frustum_mask);
 
     if (partMeshes != 0)
     {

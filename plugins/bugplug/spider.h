@@ -95,7 +95,7 @@ public:
   virtual bool DrawTest (iRenderView* rview, iMovable* movable);
   virtual bool Draw (iRenderView*, iMovable*, csZBufMode) { return false; }
   virtual csRenderMesh** GetRenderMeshes (int& n, iRenderView* rview, 
-    iMovable* movable);
+    iMovable* movable, uint32 frustum_mask);
   virtual void SetVisibleCallback (iMeshObjectDrawCallback*) { }
   virtual iMeshObjectDrawCallback* GetVisibleCallback () const { return 0; }
   virtual void NextFrame (csTicks, const csVector3& /*pos*/) { }

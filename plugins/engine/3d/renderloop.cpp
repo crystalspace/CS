@@ -35,6 +35,7 @@
 
 #include "csgfx/rgbpixel.h"
 #include "plugins/engine/3d/engine.h"
+#include "plugins/engine/3d/rview.h"
 #include "csutil/xmltiny.h"
 
 //---------------------------------------------------------------------------
@@ -123,6 +124,8 @@ void csRenderLoop::Draw (iRenderView *rview, iSector *s)
   //if (s) s->Draw (&rview);
   if (s)
   {
+    ((csRenderView*)rview)->SetupClipPlanes ();
+
     csShaderVarStack &varStack = shadermanager->GetShaderVariableStack ();
     shadermanager->PushVariables (varStack);
     

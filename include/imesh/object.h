@@ -136,10 +136,13 @@ struct iMeshObject : public iBase
   	csZBufMode zbufMode) = 0;
 
   /**
-   * For NR: @@@ document me!!!
+   * Returns the set of render meshes.
+   * The frustum_mask is given by the culler and contains a mask with
+   * all relevant planes for the given object. These planes correspond
+   * with the clip planes kept by iRenderView.
    */
   virtual csRenderMesh** GetRenderMeshes (int& num, iRenderView* rview, 
-    iMovable* movable) = 0;
+    iMovable* movable, uint32 frustum_mask) = 0;
 
   /**
    * Register a callback to the mesh object which will be called

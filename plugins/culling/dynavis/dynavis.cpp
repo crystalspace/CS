@@ -513,13 +513,7 @@ struct VisTest_Front2BackData
   csVector3 pos;
   iRenderView* rview;
   csDynaVis* dynavis;
-
-  // During VisTest() we use the current frustum as five planes.
-  // Associated with this frustum we also have a clip mask which
-  // is maintained recursively during VisTest() and indicates the
-  // planes that are still active for the current kd-tree node.
-  csPlane3 frustum[32];
-
+  csPlane3* frustum;
   // this is the callback to call when we discover a visible node
   iVisibilityCullerListener* viscallback;
 };
@@ -1069,7 +1063,8 @@ bool csDynaVis::TestWriteQueueRelevance (float min_depth,
 
 void csDynaVis::TestSinglePolygonVisibility (csVisibilityObjectWrapper* obj,
   	VisTest_Front2BackData* data, iCamera* camera, bool& vis,
-	csBox2& sbox, float& min_depth, float& max_depth)
+	csBox2& sbox, float& min_depth, float& max_depth,
+	uint32 frustum_mask)
 {
   float fov = camera->GetFOV ();
   float sx = camera->GetShiftX ();
@@ -1151,7 +1146,8 @@ void csDynaVis::TestSinglePolygonVisibility (csVisibilityObjectWrapper* obj,
 	// Point is visible. So we know the entire object is visible.
 	obj->MarkVisible (VISIBLE_VPT, dist_history (), 0, current_vistest_nr,
 	      	  history_frame_cnt);
-	data->viscallback->ObjectVisible (obj->visobj, obj->mesh);
+	data->viscallback->ObjectVisible (obj->visobj, obj->mesh,
+		frustum_mask);
 	cnt_visible++;
 	return;
       }
@@ -1233,7 +1229,7 @@ void csDynaVis::TestSinglePolygonVisibility (csVisibilityObjectWrapper* obj,
   // Object is visible so we should write it to the coverage buffer.
   obj->MarkVisible (VISIBLE, dist_history (), dist_nowritequeue (),
   	current_vistest_nr, history_frame_cnt);
-  data->viscallback->ObjectVisible (obj->visobj, obj->mesh);
+  data->viscallback->ObjectVisible (obj->visobj, obj->mesh, frustum_mask);
   cnt_visible++;
 
   return;
@@ -1264,7 +1260,7 @@ bool csDynaVis::TestObjectVisibility (csVisibilityObjectWrapper* obj,
   iMovable* movable = obj->visobj->GetMovable ();
   csOBBFrozen frozen_obb;
 
-  uint32 new_mask2;
+  uint32 new_mask2 = frustum_mask;
   bool vis = false;
   // Before we do anything else we test history culling (if enabled)
   // and also if the position of the camera is inside the bounding box.
@@ -1278,7 +1274,7 @@ bool csDynaVis::TestObjectVisibility (csVisibilityObjectWrapper* obj,
   else if (do_cull_history && hist->vis_cnt >= history_frame_cnt)
   {
     obj->MarkVisibleForHistory (current_vistest_nr, history_frame_cnt);
-    data->viscallback->ObjectVisible (obj->visobj, obj->mesh);
+    data->viscallback->ObjectVisible (obj->visobj, obj->mesh, new_mask2);
     cnt_visible++;
     vis = true;
   }
@@ -1286,7 +1282,7 @@ bool csDynaVis::TestObjectVisibility (csVisibilityObjectWrapper* obj,
   {
     obj->MarkVisible (VISIBLE_INSIDE, dist_history (), 0, current_vistest_nr,
 		      history_frame_cnt);
-    data->viscallback->ObjectVisible (obj->visobj, obj->mesh);
+    data->viscallback->ObjectVisible (obj->visobj, obj->mesh, new_mask2);
     cnt_visible++;
     vis = true;
   }
@@ -1303,7 +1299,7 @@ bool csDynaVis::TestObjectVisibility (csVisibilityObjectWrapper* obj,
   if (obj->model->IsSinglePolygon ())
   {
     TestSinglePolygonVisibility (obj, data, camera, vis,
-    	sbox, min_depth, max_depth);
+    	sbox, min_depth, max_depth, new_mask2);
     goto end;
   }
 
@@ -1370,7 +1366,7 @@ bool csDynaVis::TestObjectVisibility (csVisibilityObjectWrapper* obj,
 	  // Point is visible. So we know the entire object is visible.
 	  obj->MarkVisible (VISIBLE_VPT, dist_history (), 0, current_vistest_nr,
 	      	  history_frame_cnt);
-	  data->viscallback->ObjectVisible (obj->visobj, obj->mesh);
+	  data->viscallback->ObjectVisible (obj->visobj, obj->mesh, new_mask2);
 	  cnt_visible++;
 	  goto end;
 	}
@@ -1497,7 +1493,7 @@ bool csDynaVis::TestObjectVisibility (csVisibilityObjectWrapper* obj,
   // Object is visible so we should write it to the coverage buffer.
   obj->MarkVisible (VISIBLE, dist_history (), dist_nowritequeue (),
   	current_vistest_nr, history_frame_cnt);
-  data->viscallback->ObjectVisible (obj->visobj, obj->mesh);
+  data->viscallback->ObjectVisible (obj->visobj, obj->mesh, new_mask2);
   cnt_visible++;
 
 end:
@@ -1619,7 +1615,8 @@ bool csDynaVis::VisTest (iRenderView* rview,
       if (visobj_wrap->history->history_frame_cnt == history_frame_cnt-1)
       {
 	visobj_wrap->history->history_frame_cnt = history_frame_cnt;
-        viscallback->ObjectVisible (visobj_wrap->visobj, visobj_wrap->mesh);
+        viscallback->ObjectVisible (visobj_wrap->visobj, visobj_wrap->mesh,
+		0xff);
       }
     }
     return true;
@@ -1642,20 +1639,8 @@ bool csDynaVis::VisTest (iRenderView* rview,
   VisTest_Front2BackData data;
 
   csRenderContext* ctxt = rview->GetRenderContext ();
-  csPlane3* frust = ctxt->frustum;
-
-  // Setup the five frustum planes made out of the four boundaries of
-  // the portal bounding box and the portal plane itself.
-  const csReversibleTransform& trans = rview->GetCamera ()->GetTransform ();
-  csVector3 o2tmult = trans.GetO2T () * trans.GetO2TTranslation ();
-  data.frustum[0].Set (trans.GetT2O() * frust[0].norm, -frust[0].norm*o2tmult);
-  data.frustum[1].Set (trans.GetT2O() * frust[1].norm, -frust[1].norm*o2tmult);
-  data.frustum[2].Set (trans.GetT2O() * frust[2].norm, -frust[2].norm*o2tmult);
-  data.frustum[3].Set (trans.GetT2O() * frust[3].norm, -frust[3].norm*o2tmult);
-  csPlane3 pz0 = ctxt->clip_plane;
-  pz0.Invert ();
-  data.frustum[4] = trans.This2Other (pz0);
-  uint32 frustum_mask = 0x1f;
+  data.frustum = ctxt->clip_planes;
+  uint32 frustum_mask = ctxt->clip_planes_mask;
 
   // Using the last used portal, fill the coverage buffer with the
   // inverted portal outline to improve culling.
@@ -1763,7 +1748,7 @@ static bool VisTestPlanes_Front2Back (csKDTree* treenode,
 	  if (data->viscallback)
 	  {
 	    data->viscallback->ObjectVisible (visobj_wrap->visobj,
-	      visobj_wrap->mesh);
+	      visobj_wrap->mesh, new_mask2);
 	  }
 	  else
 	  {
@@ -1959,7 +1944,7 @@ static bool VisTestSphere_Front2Back (csKDTree* treenode, void* userdata,
 	if (data->viscallback)
 	{
 	  data->viscallback->ObjectVisible (visobj_wrap->visobj,
-	  	visobj_wrap->mesh);
+	  	visobj_wrap->mesh, 0xff);
 	}
 	else
 	{
