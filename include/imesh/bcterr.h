@@ -36,7 +36,7 @@ class csBox3;
 
 
 
-SCF_VERSION (iBCTerrState, 0, 0, 2);
+SCF_VERSION (iBCTerrState, 0, 0, 3);
 
 /**
  * This interface describes the API for the Bezier Curve terrain object.
@@ -85,9 +85,14 @@ struct iBCTerrState : public iBase
   virtual void PreBuild () = 0;
   /// Build the mesh, prepare mesh for material calls
   virtual void Build () = 0;
+  /// Length of control point array
+  virtual int GetControlLength () = 0;
+  /// Get control point.  iter: Starts at 0 and stops at GetControlLength () - 1.
+  /// return true if successful
+  virtual bool GetControlPoint (int iter, csVector3 &point) = 0;
 };
 
-SCF_VERSION (iBCTerrFactoryState, 0, 0, 2);
+SCF_VERSION (iBCTerrFactoryState, 0, 0, 3);
 
 /**
  * This interface describes the API for the Bezier Curve terrain Factory object.
@@ -122,9 +127,9 @@ struct iBCTerrFactoryState : public iBase
   virtual iMaterialWrapper* GetDefaultMaterial () = 0;
   /// Get number of LOD levels
   virtual int GetUserLOD () = 0;
-  virtual float GetSystemDistance () = 0;
+  virtual void GetSystemDistance (float &start, float &dist) = 0;
   /// Set distance shared edge usage stops
-  virtual void SetSystemDistance (float new_dist) = 0;
+  virtual void SetSystemDistance (float start, float new_dist) = 0;
 };
 
 #endif // __IMESH_BCTERR_H_
