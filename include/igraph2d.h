@@ -101,7 +101,7 @@ struct csPixelFormat
    * Currently only masks for 16-bit/15-bit colors are supported.
    * Ignore the Mask and Shift fields of this structure if PalEntries != 0.
    */
-  long RedMask, GreenMask, BlueMask;
+  ULong RedMask, GreenMask, BlueMask;
   /// The shifts to extract the color information from a pixel (truecolor mode only).
   int RedShift, GreenShift, BlueShift;
   /// The number of significant bits for every color.
