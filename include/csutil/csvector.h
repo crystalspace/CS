@@ -24,16 +24,11 @@
 #include "cstypes.h"
 
 /**
- * Thomas Hieber, 2000-08-03
- * This class was introduced, to make a more lightweight base class
- * for containers. It contains no virtual functions and defaults
- * to not preallocate any memory. It contains all the basic
- * functionality of csVector, but none of the gimmicks.
- * This class is intentionally not derived from csBase to avoid 
- * getting a virtual destructor! (we don't need that any way, because
- * I doubt anybody will use a class derived from csBasicVector, and
- * then use a pointer to a BasicVector to delete it. Nothing will change
- * for classes derived from csVector by this!
+ * This is a lightweight base class for containers.  It contains no virtual
+ * functions and, by default, does not preallocate any memory.  It contains all
+ * the basic functionality of the derived csVector class, but none of the
+ * gimmicks.  This class intentionally does not derived from csBase in order to
+ * avoid getting a virtual destructor.
  */
 class csBasicVector
 {
@@ -48,6 +43,7 @@ public:
    */
   csBasicVector (int ilimit = 0, int ithreshold = 0);
   
+  /// Destroy the container but none of the objects to which it points.
   ~csBasicVector();
 
   /// Get a reference to n-th element
@@ -84,13 +80,13 @@ public:
 
 /**
  * csVector is an abstract class which can hold an unlimited array
- * of unspecified (void *) data. Since this is a basic object, it does
- * not presume anything about its elements, so FreeItem () is
- * effectively a NOP. If you want vector elements to free automatically
+ * of unspecified (void*) data. Since this is a basic object, it does
+ * not presume anything about its elements, so FreeItem() is
+ * effectively a no-op. If you want vector elements to free automatically
  * occupied memory upon vector destruction you should create a derived
- * class which should provide its own FreeItem () method (see csStrVector
+ * class which should provide its own FreeItem() method (see csStrVector
  * for a example).<p>
- * Note that FreeItem method returns a boolean value which is the success
+ * Note that FreeItem() returns a boolean value which is the success
  * status. This is used in Delete() and DeleteAll() to decide whenever
  * an element can be really deleted - if the element has a good reason to
  * stay 'sticky' it can return false from FreeItem().
@@ -105,7 +101,7 @@ public:
   csVector (int ilimit = 8, int ithreshold = 16) 
     : csBasicVector(ilimit, ithreshold) {}
 
-  /// Destroy the vector object
+  /// Destroy the vector object.
   virtual ~csVector () {}
 
   /// Find a element by key (using CompareKey method)
@@ -152,10 +148,7 @@ inline csSome& csBasicVector::operator [] (int n) const
 inline csSome& csBasicVector::Get (int n) const
 {
   CS_ASSERT (n >= 0);
-  // Disabled the following assert because it causes
-  // problems in some of the lighting code that assumes
-  // that Get also automatically extends the array.
-  //CS_ASSERT (n < count);
+  CS_ASSERT (n < count);
   return (root [n]);
 }
 

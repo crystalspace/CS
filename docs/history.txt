@@ -59,6 +59,17 @@ The history order has been reversed so that new features are at the top.
 	       believe tiling will work with at least the OpenGL driver
 	       without any change; alpha is not implemented yet but its
 	       easy to implement.
+	- Eric Sunshine reverted Jorrit's change to csVector::Get().  I (Eric)
+	  had already removed the offending CS_ASSERT() call in the previous
+	  revision of csvector.h.  Jorrit actually removed the wrong one.  It
+	  could not have been the source of the problem he was experiencing
+	  since Get() is a 'const' method and does not alter the array at all.
+	  If Jorrit's code was indeed using this 'const' method to access
+	  beyond the end of the array, then that represents an actual bug in
+	  the calling code, and needs to be fixed.  The Get() method has never
+	  automatically extended the array for out-of-bounds indexes; only the
+	  non-const version of operator[] does so.
+	- Eric Sunshine updated the class comments in csvector.h.
 11-Oct-2000
 	- Thomas Hieber did the first preliminary integrated of the XML
 	  parser for the gamecore library.
