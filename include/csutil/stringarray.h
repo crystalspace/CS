@@ -216,6 +216,16 @@ public:
     root [count - 1] = csStrNew (what);
     return (count - 1);
   }
+  /// Push a printf-style string onto the list (makes copy of string after formatting).
+  int FormatPush (char const * fmt, ...)
+  {
+    char str[1000];
+    va_list args;
+    va_start(args, fmt);
+    vsprintf(str, fmt, args);
+    va_end(args);
+    return Push(str);
+  }
 
   /**
    * Push a element on 'top' of vector if it is not already there
