@@ -48,7 +48,7 @@ else
   SRC.ZOO += $(SRC.DOG) $(SRC.WORM)
 endif
 
-LIB.SCFTUTOR = $(CSUTIL.LIB) $(CSSYS.LIB)
+LIB.SCFTUTOR = $(CSUTIL.LIB) $(CSSYS.LIB) $(CSUTIL.LIB)
 
 endif # ifeq ($(MAKESECTION),postdefines)
 
