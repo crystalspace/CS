@@ -51,7 +51,7 @@ bool csGraphics2DGLX::Initialize (iSystem *pSystem)
   if (!csGraphics2DGLCommon::Initialize (pSystem))
     return false;
 
-  iConfigFileNew *config = pSystem->CreateConfigNew ("/config/opengl.cfg" );
+  iConfigFileNew *config = pSystem->CreateSeparateConfig ("/config/opengl.cfg" );
 
   dispdriver = NULL;
   const char *strDriver;
