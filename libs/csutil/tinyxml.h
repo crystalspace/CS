@@ -108,6 +108,7 @@ class TiXmlUnknown;
 class TiDocumentAttribute;
 class TiXmlText;
 class TiXmlDeclaration;
+class GrowString;
 
 	enum
 	{
@@ -190,17 +191,13 @@ public:
    * a pointer just past the last character of the name,
    * or 0 if the function has an error.
    */
-  static const char* ReadName( const char* p, TIXML_STRING* name );
   static const char* ReadName( const char* p, char* name );
 
   /**
    * Reads text. Returns a pointer past the given end tag.
    * Wickedly complex options, but it keeps the (sensitive) code in one place.
    */
-  static const char* ReadText(	const char* in, TIXML_STRING* text,
-				bool ignoreWhiteSpace,
-				const char* endTag);
-  static const char* ReadText(	const char* in, char** text,
+  static const char* ReadText(	const char* in, GrowString& buf,
 				bool ignoreWhiteSpace,
 				const char* endTag);
 
@@ -679,16 +676,23 @@ class TiXmlComment : public TiDocumentNode
 {
 public:
   /// Constructs an empty comment.
-  TiXmlComment() {}
-  virtual ~TiXmlComment()	{}
+  TiXmlComment() { value = NULL; }
+  virtual ~TiXmlComment() { delete[] value; }
   virtual int Type() const { return COMMENT; }
 
   // [internal use] Creates a new Element and returs it.
   virtual TiDocumentNode* Clone() const;
   // [internal use]
   virtual void Print( FILE* cfile, int depth ) const;
-  virtual const char * Value () const { return value.c_str (); }
-  virtual void SetValue (const char * _value) { value = _value;}
+  virtual const char * Value () const { return value; }
+  virtual void SetValue (const char * _value)
+  {
+    delete[] value;
+    if (_value)
+      value = csStrNew (_value);
+    else
+      value = NULL;
+  }
 
 protected:
   // used to be public
@@ -699,7 +703,7 @@ protected:
    */
   virtual const char* Parse( TiDocument* document, const char* p );
 
-  TIXML_STRING value;
+  char* value;
 };
 
 /**
@@ -711,25 +715,20 @@ class TiXmlText : public TiDocumentNode
 
 public:
   /// Constructor.
-  TiXmlText (const char * initValue)
+  TiXmlText ()
   {
     value = NULL;
-    SetValue( initValue );
   }
   virtual ~TiXmlText()
   {
-    delete[] value;
   }
   virtual int Type() const { return TEXT; }
   virtual const char * Value () const { return value; }
-  virtual void SetValue (const char * _value)
+  void SetValueRegistered (const char * _value)
   {
-    delete[] value;
-    if (_value)
-      value = csStrNew (_value);
-    else
-      value = NULL;
+    value = _value;
   }
+  virtual void SetValue (const char * _value);
 
 protected :
   // [internal use] Creates a new Element and returns it.
@@ -745,7 +744,7 @@ protected :
    */
   virtual const char* Parse( TiDocument* document,  const char* p );
 
-  char* value;
+  const char* value;
 };
 
 /**
@@ -758,7 +757,7 @@ class TiXmlCData : public TiXmlText
 
 public:
   /// Constructor.
-  TiXmlCData (const char * initValue) : TiXmlText (initValue)
+  TiXmlCData () : TiXmlText ()
   {
   }
   virtual ~TiXmlCData() {}

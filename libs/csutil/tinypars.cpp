@@ -72,32 +72,6 @@ const char* TiXmlBase::ReadName( const char* p, char* name)
   return 0;
 }
 
-const char* TiXmlBase::ReadName( const char* p, TIXML_STRING * name )
-{
-	*name = "";
-	//assert( p );
-
-	// Names start with letters or underscores.
-	// After that, they can be letters, underscores, numbers,
-	// hyphens, or colons. (Colons are valid ony for namespaces,
-	// but tinyxml can't tell namespaces from names.)
-	if (*p 
-		 && ( isalpha( (unsigned char) *p ) || *p == '_' ) )
-	{
-		while(*p
-				&&	(		isalnum( (unsigned char ) *p ) 
-						 || *p == '_'
-						 || *p == '-'
-						 || *p == ':' ) )
-		{
-			(*name) += *p;
-			++p;
-		}
-		return p;
-	}
-	return 0;
-}
-
 const char* TiXmlBase::GetEntity( const char* p, char* value )
 {
 	// Presume an entity, and pull it out.
@@ -233,16 +207,19 @@ public:
     strcpy (copy, curbuf);
     return copy;
   }
+
+  const char* GetThisCopy () const
+  {
+    return curbuf;
+  }
 };
 
 
 const char* TiXmlBase::ReadText(const char* p, 
-				char** text, 
+				GrowString& buf,
 				bool trimWhiteSpace, 
 				const char* endTag)
 {
-    GrowString buf;
-
 	if (!trimWhiteSpace		// certain tags always keep whitespace
 	    || !condenseWhiteSpace )	// if true, whitespace is always kept
 	{
@@ -283,63 +260,6 @@ const char* TiXmlBase::ReadText(const char* p,
 		}
 	}
 	buf.AddChar (0);
-	*text = buf.GetNewCopy ();
-	return p + strlen( endTag );
-}
-
-const char* TiXmlBase::ReadText(	const char* p, 
-					TIXML_STRING * text, 
-					bool trimWhiteSpace, 
-					const char* endTag)
-{
-    *text = "";
-	if (!trimWhiteSpace		// certain tags always keep whitespace
-	    || !condenseWhiteSpace )	// if true, whitespace is always kept
-	{
-		// Keep all the white space.
-		while (	   p && *p
-				&& !StringEqual ( p, endTag)
-			  )
-		{
-			char c;
-			p = GetChar( p, &c );
-            (* text) += c;
-		}
-	}
-	else
-	{
-		bool whitespace = false;
-
-		// Remove leading white space:
-		p = SkipWhiteSpace( p );
-		while (	   p && *p
-				&& !StringEqual ( p, endTag) )
-		{
-			if ( *p == '\r' || *p == '\n' )
-			{
-				whitespace = true;
-				++p;
-			}
-			else if ( isspace( *p ) )
-			{
-				whitespace = true;
-				++p;
-			}
-			else
-			{
-				// If we've found whitespace, add it before the
-				// new character. Any whitespace just becomes a space.
-				if ( whitespace )
-				{
-               (* text) += ' ';
-					whitespace = false;
-				}
-				char c;
-				p = GetChar( p, &c );
-            (* text) += c;
-			}
-		}
-	}
 	return p + strlen( endTag );
 }
 
@@ -492,7 +412,7 @@ const char* TiXmlElement::ReadValue( TiDocument* document, const char* p )
 		if ( *p != '<' )
 		{
 			// Take what we have, make a text element.
-			TiXmlText* textNode = new TiXmlText( NULL );
+			TiXmlText* textNode = new TiXmlText();
 
 			if ( !textNode )
 			{
@@ -509,7 +429,7 @@ const char* TiXmlElement::ReadValue( TiDocument* document, const char* p )
 		} 
                 else if ( StringEqual(p, "<![CDATA[") )
                 {
-                        TiXmlCData* cdataNode = new TiXmlCData( NULL );
+                        TiXmlCData* cdataNode = new TiXmlCData( );
 
 			if ( !cdataNode )
 			{
@@ -585,8 +505,6 @@ const char* TiXmlUnknown::Parse( TiDocument* document, const char* p )
 
 const char* TiXmlComment::Parse( TiDocument* document, const char* p )
 {
-	value = "";
-
 	p = SkipWhiteSpace( p );
 	const char* startTag = "<!--";
 	const char* endTag   = "-->";
@@ -597,7 +515,10 @@ const char* TiXmlComment::Parse( TiDocument* document, const char* p )
 		return 0;
 	}
 	p += strlen( startTag );
-	p = ReadText( p, &value, false, endTag);
+	delete[] value;
+	GrowString buf;
+	p = ReadText( p, buf, false, endTag);
+	value = buf.GetNewCopy ();
 	return p;
 }
 
@@ -638,58 +559,56 @@ const char* TiDocumentAttribute::Parse( TiDocument* document, const char* p )
 	
 	const char* end;
 
+	delete[] value;
+	GrowString buf;
 	if ( *p == '\'' )
 	{
 		++p;
 		end = "\'";
-		char* pvalue;
-		delete[] value;
-		p = TiXmlBase::ReadText( p, &pvalue, false, end);
-		value = pvalue;
+		p = TiXmlBase::ReadText( p, buf, false, end);
 	}
 	else if ( *p == '"' )
 	{
 		++p;
 		end = "\"";
-		char* pvalue;
-		delete[] value;
-		p = TiXmlBase::ReadText( p, &pvalue, false, end);
-		value = pvalue;
+		p = TiXmlBase::ReadText( p, buf, false, end);
 	}
 	else
 	{
 		// All attribute values should be in single or double quotes.
 		// But this is such a common error that the parser will try
 		// its best, even without them.
-		value = "";
 		while (    p && *p										// existence
-				&& !isspace( *p ) && *p != '\n' && *p != '\r'	// whitespace
-				&& *p != '/' && *p != '>' )						// tag end
+				&& !isspace( *p ) && *p != '/' && *p != '>' )						// tag end
 		{
-			value += *p;
+			buf.AddChar (*p);
 			++p;
 		}
 	}
+	value = buf.GetNewCopy ();
 	return p;
 }
 
-const char* TiXmlText::Parse( TiDocument*, const char* p )
+const char* TiXmlText::Parse( TiDocument* document, const char* p )
 {
 	//TiDocument* doc = GetDocument();
 	bool ignoreWhite = true;
 //	if ( doc && !doc->IgnoreWhiteSpace() ) ignoreWhite = false;
 
 	const char* end = "<";
-	char* pvalue;
-	delete[] value;
-	p = ReadText( p, &pvalue, ignoreWhite, end);
-	value = pvalue;
+	GrowString buf;
+	p = ReadText( p, buf, ignoreWhite, end);
+
+	csStringID value_id = document->strings.Request (buf.GetThisCopy ());
+	const char* reg_value = document->strings.Request (value_id);
+	SetValueRegistered (reg_value);
+
 	if ( p )
 		return p-1;	// don't truncate the '<'
 	return 0;
 }
 
-const char* TiXmlCData::Parse( TiDocument*, const char* p )
+const char* TiXmlCData::Parse( TiDocument* document, const char* p )
 {
 	//TiDocument* doc = GetDocument();
 	bool ignoreWhite = false;
@@ -697,10 +616,13 @@ const char* TiXmlCData::Parse( TiDocument*, const char* p )
         //skip the <![CDATA[ 
         p += 9;
 	const char* end = "]]>";
-	char* pvalue;
-	delete[] value;
-	p = ReadText( p, &pvalue, ignoreWhite, end);
-	value = pvalue;
+	GrowString buf;
+	p = ReadText( p, buf, ignoreWhite, end);
+
+	csStringID value_id = document->strings.Request (buf.GetThisCopy ());
+	const char* reg_value = document->strings.Request (value_id);
+	SetValueRegistered (reg_value);
+
 	if ( p )
 		return p;
 	return 0;
@@ -767,7 +689,7 @@ const char* TiXmlDeclaration::Parse( TiDocument* document, const char* p )
 
 bool TiXmlText::Blank() const
 {
-	int l = strlen (value);
+	unsigned int l = strlen (value);
 	for ( unsigned i=0; i<l; i++ )
 		if ( !isspace( value[i] ) )
 			return false;

@@ -713,13 +713,13 @@ TiDocumentNode* TiXmlElement::Clone() const
 }
 
 
-TiDocument::TiDocument() : strings (431)
+TiDocument::TiDocument() : strings (3541)
 {
 	error = false;
 	//	ignoreWhiteSpace = true;
 }
 
-TiDocument::TiDocument( const char * documentName ) : strings (431)
+TiDocument::TiDocument( const char * documentName ) : strings (3541)
 {
 	//	ignoreWhiteSpace = true;
 	value = documentName;
@@ -927,7 +927,7 @@ void TiXmlComment::Print( FILE* cfile, int depth ) const
 	{
 		fputs( "    ", cfile );
 	}
-	fprintf( cfile, "<!--%s-->", value.c_str () );
+	fprintf( cfile, "<!--%s-->", value );
 }
 
 void TiXmlComment::StreamOut( TIXML_OSTREAM * stream ) const
@@ -949,6 +949,21 @@ TiDocumentNode* TiXmlComment::Clone() const
 }
 
 
+void TiXmlText::SetValue (const char * name)
+{
+  if (name == NULL)
+  {
+    value = NULL;
+  }
+  else
+  {
+    TiDocument* document = GetDocument ();
+    csStringID name_id = document->strings.Request (name);
+    const char* reg_name = document->strings.Request (name_id);
+    value = reg_name;
+  }
+}
+
 void TiXmlText::Print( FILE* cfile, int /*depth*/ ) const
 {
 	TIXML_STRING buffer;
@@ -966,7 +981,7 @@ void TiXmlText::StreamOut( TIXML_OSTREAM * stream ) const
 TiDocumentNode* TiXmlText::Clone() const
 {	
 	TiXmlText* clone = 0;
-	clone = new TiXmlText( NULL );
+	clone = new TiXmlText();
 
 	if ( !clone )
 		return 0;

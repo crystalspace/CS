@@ -329,7 +329,7 @@ csRef<iDocumentNode> csTinyXmlNode::CreateNodeBefore (csDocumentNodeType type,
       break;
     case CS_NODE_TEXT:
       {
-        TiXmlText el (NULL);
+        TiXmlText el;
 	if (before)
 	  child = node_children->InsertBeforeChild (
 	  	((csTinyXmlNode*)(iDocumentNode*)before)->GetTiNode (),

@@ -19,6 +19,8 @@ The history order is reversed so that new features are at the top.
 	- Made ReadText() more robust in case the text happens to be bigger
 	  then the fixed amount of the buffer. In that case we will
 	  start reallocating automatically.
+	- Further optimizations and cleanup. Text and CData nodes will now
+	  also use interned strings.
 13-Mar-2003
 	- Received some documentation fixes with regards to 3D sprites
 	  from Simon Posnjak <simon.posnjak@siol.net>.
