@@ -94,7 +94,6 @@ typedef __int64 int64;
 #else
 // we're happy and can simply use stdint.h
 #define __STDC_CONSTANT_MACROS
-#define __STDC_LIMIT_MACROS
 #include <stdint.h>
 typedef uint8_t uint8;
 typedef int8_t int8;

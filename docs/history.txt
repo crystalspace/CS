@@ -6,6 +6,8 @@ The history order is reversed so that new features are at the top.
 10-Apr-2003
 	- Fixed a compile error in binary XML reader. I wonder if people
 	  compile after changing something...
+	- Reverted endian changes from res again because they cause a
+	  compile error with mingw/msys.
 9-Apr-2003
         - Rhad fixed OpenAL compile with compilers other than MSVC.
           - Changed FillMemory() to memset()
