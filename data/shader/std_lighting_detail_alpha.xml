@@ -70,7 +70,7 @@
       <texture name="tex detail" destination="unit 0" />
       <vp plugin="glfixed">
         <fixedvp>
-          <texmatrix destination="unit 0">
+          <texmatrix layer="0">
             <scale type="shadervar">detail texture scale</scale>
           </texmatrix>
           <constantcolor layer="0" type="shadervar">detail texture color</constantcolor>
