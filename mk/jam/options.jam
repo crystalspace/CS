@@ -10,6 +10,7 @@
 rule CheckOptions
 {
   local i ;
+
   for i in $(>)
   {
     if ! [ IsElem $(i) : $(<) ]

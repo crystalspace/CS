@@ -1,6 +1,6 @@
 SubDir TOP libs cssys ;
 
-CSSYS_SRC = "" ;
+CSSYS_SRC = ;
 
 switch $(TARGET.OS)
 {

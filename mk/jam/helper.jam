@@ -37,7 +37,7 @@ rule IncludeDir
 
 rule SearchSubdir
 {
-    echo Warning: SearchSubDir is deprecated now (just delete it from your Jamfile) ;
+    echo "Warning: SearchSubDir is deprecated now (just delete it from your Jamfile)" ;
 }
 
 ##  Wildcard [ dir : ] patterns
