@@ -67,9 +67,12 @@ libs_l=false
 
 includedeps()
 {
+#we have to rememver vars here because on older shells $1,$2... are global
     id_all=$@
     id_first=$1
     id_second=$2
+    shift
+    id_rest=$@
 
 # already had all dependencies of this lib? then exit
     case " $ALREADY_TESTED " in
@@ -102,14 +105,13 @@ includedeps()
 
 addlib()
 {
-    al_first=$1
     # Lib already in list?
     case " $the_libs " in
-	*\ ${al_first}\ *) return;;
+	*\ $1\ *) return;;
 	*) ;;
     esac
 
-    the_libs="${al_first} $the_libs"
+    the_libs="$1 $the_libs"
 
     # loop till all dependencies are resolved
     loop=true
