@@ -9,6 +9,9 @@ The history order is reversed so that new features are at the top.
 	- Jorrit removed a comment about csPDelArray<T> being deprecated
 	  from the documentation. csArray<T> nor csRefArray<T> can provide
 	  the functionality given by csPDelArray<T>.
+	- Jorrit fixed the include file in the collision detection howto and
+	  also replaced the use of SCF_QUERY_INTERFACE for the iPolygonMesh
+	  with the proper usage of GetObjectModel().
 20-Jul-2003
 	- Jorrit forgot to link the new howto into the howto chapter.
 	- Jorrit fixed a small note about curves in the thing mesh object

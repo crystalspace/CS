@@ -62,15 +62,17 @@ for a mesh:
 @example
 csRef<iCollider> MyGame::InitCollider (iMeshWrapper* mesh)
 @{
-  csRef<iPolygonMesh> polmesh =
-    SCF_QUERY_INTERFACE(mesh->GetMeshObject(), iPolygonMesh);
+  iPolygonMesh* polmesh = mesh->GetMeshObject ()->GetObjectModel ()
+	->GetPolygonMeshColldet ();
   if (polmesh)
   @{
     csRef<iCollider> cd = cd_sys->CreateCollider (polmesh);
     return cd;
   @}
   else
-    return NULL;
+  @{
+    return 0;
+  @}
 @}
 @end example
 
@@ -94,15 +96,17 @@ above:
 @example
 bool MyGame::InitCollider (iMeshWrapper* mesh)
 @{
-  csRef<iPolygonMesh> polmesh =
-    SCF_QUERY_INTERFACE(mesh->GetMeshObject(), iPolygonMesh);
+  iPolygonMesh* polmesh = mesh->GetMeshObject ()->GetObjectModel ()
+	->GetPolygonMeshColldet ();
   if (polmesh)
   @{
     new csColliderWrapper(mesh->QueryObject(), cd_sys, polmesh);
     return true;
   @}
   else
+  @{
     return false;
+  @}
 @}
 @end example
 
@@ -234,7 +238,7 @@ The include files useful for this section are:
 #include "iutil/object.h"
 #include "iutil/plugin.h"
 #include "ivaria/collider.h"
-#include "ivaria/polymesh.h"
+#include "igeom/polymesh.h"
 #include "iengine/mesh.h"
 #include "cstool/collider.h"
 @end example
