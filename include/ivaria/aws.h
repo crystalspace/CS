@@ -19,6 +19,7 @@ struct  iGraphics2D;
 struct  iGraphics3D;
 struct  iEngine;
 struct  iTextureManager;
+struct  iObjectRegistry;
 
 const   bool aws_debug=false;  // set to true to turn on debugging printf's
        
@@ -75,6 +76,10 @@ SCF_VERSION (iAwsPrefs, 0, 0, 1);
 struct iAwsPrefs : public iBase
 {
 public:
+
+  /// Performs whatever initialization is needed
+  virtual void Setup(iObjectRegistry *object_reg)=0;   
+
   /// Invokes the definition parser to load definition files
   virtual void Load(const char *def_file)=0;
 
