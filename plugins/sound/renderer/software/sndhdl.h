@@ -34,6 +34,12 @@ public:
   void Unregister();
   virtual void vUpdate(void *buf, long NumSamples);
   virtual csPtr<iSoundSource> CreateSource(int Mode3d);
+
+  virtual void IncSourceCount();
+  virtual void DecSourceCount();
+
+private:
+  int source_count;
 };
 
 #endif // __CS_SNDHDLSOFTWARE_H__

@@ -13,6 +13,10 @@ chronological order.
 	- Added an event to trigger buffer filling instead of timeslice
 	  based filling.
 	- Background thread is now set to time critical priority.
+	- Rhad applied more fixes to software sound renderer.
+	  - Fixed crash when source was deleted while background thread was reading sound data related to the source.
+	  - Fixed sound plays at full volume when beyond maxdistance.
+	  - Added assertion on handle destruction if sources are still associated with the handle.
 1-Oct-2004
 	- Rhad added Get,set MinimumDistance and MaximumDistance interface
 	  functions to the iSoundSource interface

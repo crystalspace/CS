@@ -50,10 +50,14 @@ csSoundSourceSoftware::csSoundSourceSoftware(csSoundRenderSoftware *srdr,
   mutex_RenderLock=csMutex::Create(true);
   SetMinimumDistance(1.0f);
   SetMaximumDistance(SOUND_DISTANCE_INFINITE);
+
+  SoundHandle->IncSourceCount();
 }
 
 csSoundSourceSoftware::~csSoundSourceSoftware()
 {
+  Stop();
+  SoundHandle->DecSourceCount();
   SCF_DESTRUCT_IBASE();
 }
 
@@ -228,7 +232,10 @@ void csSoundSourceSoftware::Prepare(float BaseVolume)
   if (MaximumDistance != SOUND_DISTANCE_INFINITE)
   {
     if (DistL > MaximumDistance && DistR > MaximumDistance)
+    {
+      CalcVolL = CalcVolR = 0;
       return;
+    }
   }
 
   // Normalize the Ear-to-sound vectors used for direction factor calculations

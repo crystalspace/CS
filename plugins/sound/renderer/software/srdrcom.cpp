@@ -299,6 +299,7 @@ float csSoundRenderSoftware::GetVolume()
 
 void csSoundRenderSoftware::AddSource(csSoundSourceSoftware *src)
 {
+  csScopedMutexLock lock(mixing);
   Sources.Push(src);
   src->IncRef();
   data->Signal (true);

@@ -27,11 +27,13 @@ csSoundHandleSoftware::csSoundHandleSoftware(csSoundRenderSoftware *srdr, iSound
   SoundRender = srdr;
   SoundRender->IncRef();
   Registered = true;
+  source_count=0;
 }
 
 csSoundHandleSoftware::~csSoundHandleSoftware()
 {
   SoundRender->DecRef();
+  CS_ASSERT(source_count==0);
 }
 
 void csSoundHandleSoftware::Unregister()
@@ -50,10 +52,21 @@ void csSoundHandleSoftware::vUpdate(void *buf, long Num)
 {
   for (size_t i=0; i<SoundRender->Sources.Length(); i++)
   {
-    csSoundSourceSoftware *src = (csSoundSourceSoftware*)SoundRender->
-      Sources.Get(i);
+    csSoundSourceSoftware *src = SoundRender->Sources.Get(i);
     if (src->SoundHandle==this && src->Active)
       src->WriteBuffer(buf, SoundRender->memory, Num);
   }
 }
+
+void csSoundHandleSoftware::IncSourceCount()
+{
+  source_count++;
+}
+
+void csSoundHandleSoftware::DecSourceCount()
+{
+  source_count--;
+  CS_ASSERT(source_count>=0);
+}
+
 
