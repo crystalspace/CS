@@ -39,6 +39,11 @@ chronological order.
 	  both anim cycles and anim actions.  With a nicer GUI, viewmesh
 	  would now come close to duplicating the functionality of the
 	  "official" cal3d cally demo.
+	- Jorrit did more array changes:
+	    - Moved code of copy constructors to csArrayBase. Needed to
+	      complete the 'Construct' methods for all element handlers.
+	    - Added various assignment operators using the same new code.
+	    - Moved destructor (DeleteAll() call) to csArrayBase.
 4-Aug-2003
 	- Oktal added the following to csutil:
 	    - A template class, csHash<T>, intended to replace csHashMap soon.

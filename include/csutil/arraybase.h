@@ -79,6 +79,7 @@ protected:
    */
   void TransferTo (csArrayBase<T, ElementHandler>& destination)
   {
+    if (&destination == this) return;
     destination.DeleteAll ();
     destination.root = root;
     destination.count = count;
@@ -88,10 +89,26 @@ protected:
     capacity = count = 0;
   }
 
+  /// Copy from one array to this.
+  void CopyFrom (const csArrayBase<T, ElementHandler>& source)
+  {
+    if (&source == this) return;
+    DeleteAll ();
+    threshold = source.threshold;
+    SetLengthUnsafe (source.Length ());
+    for (int i=0 ; i<source.Length() ; i++)
+      ElementHandler::Construct (root + i, source[i]);
+  }
+
 public:
   /// This function prototype is used for Sort()
   typedef int ArraySortCompareFunction (void const* item1,
 	void const* item2);
+
+  ~csArrayBase ()
+  {
+    DeleteAll ();
+  }
 
   /// return the number of elements in the Array
   int Length () const

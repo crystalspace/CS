@@ -29,6 +29,9 @@ class csRefArrayElementHandler
 public:
   static void Construct (T* address, T const& src)
   {
+    // Clear before setting. We don't know if the memory is properly 0.
+    memset (address, 0, sizeof (T));
+    *address = src;
   }
 
   static void Destroy (T* address)
@@ -85,33 +88,27 @@ public:
   }
 
   /// Copy constructor.
-  csRefArray (const csRefArray<T>& source)
+  csRefArray (const csRefArray& source)
   {
-    capacity = source.capacity;
-    threshold = source.threshold;
-    root = (csRef<T>*)calloc (capacity, sizeof(csRef<T>));
-    count = source.Length ();
-    for (int i = 0 ; i < count ; i++)
-      root [i] = source[i];
+    ArraySuper::CopyFrom ((ArraySuper&)source);
   }
   
+  /// Assignment operator.
+  csRefArray<T>& operator= (const csRefArray& other)
+  {
+    ArraySuper::CopyFrom ((ArraySuper&)other);
+    return *this;
+  }
+
   /**
    * Transfer the entire contents of one array to the other. The end
    * result will be that this array will be completely empty and the
    * other array will have all items that originally were in this array.
    * This operation is very efficient.
    */
-  void TransferTo (csRefArray<T>& destination)
+  void TransferTo (csRefArray& destination)
   {
     ArraySuper::TransferTo ((ArraySuper&)destination);
-  }
-
-  /**
-   * Destroy the container and release all contained references.
-   */
-  ~csRefArray ()
-  {
-    DeleteAll ();
   }
 
   /// Get a reference.

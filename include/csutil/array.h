@@ -96,16 +96,17 @@ public:
   {
   }
 
-  /// Copy constructor just copies all data.
-  csArray (const csArray& other)
+  /// Copy constructor.
+  csArray (const csArray& source)
   {
-    count = 0;
-    capacity = 0;
-    threshold = other.threshold;
-    root = 0;
-    SetLengthUnsafe (other.Length ());
-    for (int i=0 ; i<other.Length() ; i++)
-      ElementHandler::Construct (root + i, other[i]);
+    ArraySuper::CopyFrom ((ArraySuper&)source);
+  }
+  
+  /// Assignment operator.
+  csArray<T>& operator= (const csArray& other)
+  {
+    ArraySuper::CopyFrom ((ArraySuper&)other);
+    return *this;
   }
 
   /**
@@ -114,22 +115,9 @@ public:
    * other array will have all items that originally were in this array.
    * This operation is very efficient.
    */
-  void TransferTo (csArray<T>& destination)
+  void TransferTo (csArray& destination)
   {
     ArraySuper::TransferTo ((ArraySuper&)destination);
-  }
-
-  /// Assignment operator.
-  csArray<T>& operator= (const csArray& other)
-  {
-    if (&other == this)
-      return *this;
-
-    DeleteAll ();
-    SetLengthUnsafe (other.Length ());
-    for (int i=0 ; i<other.Length() ; i++)
-      ElementHandler::Construct (root + i, other[i]);
-    return *this;
   }
 
   /**
@@ -152,12 +140,6 @@ public:
       for (int i = old_len ; i < n ; i++)
         ElementHandler::Construct (root + i, what);
     }
-  }
-
-  /// Destroy the container.
-  ~csArray ()
-  {
-    DeleteAll ();
   }
 
   /// Get an element (non-const).

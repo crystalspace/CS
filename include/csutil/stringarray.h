@@ -30,6 +30,7 @@ class csStringArrayElementHandler
 public:
   static void Construct (T* address, T const& src)
   {
+    *address = csStrNew (src);
   }
 
   static void Destroy (T* address)
@@ -84,12 +85,17 @@ public:
   {
   }
 
-  /**
-   * Destroy the container.
-   */
-  ~csStringArray ()
+  /// Copy constructor.
+  csStringArray (const csStringArray& source)
   {
-    DeleteAll ();
+    ArraySuper::CopyFrom ((ArraySuper&)source);
+  }
+
+  /// Assignment operator.
+  csStringArray& operator= (const csStringArray& other)
+  {
+    ArraySuper::CopyFrom ((ArraySuper&)other);
+    return *this;
   }
 
   /**

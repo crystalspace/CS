@@ -28,6 +28,7 @@ class csPDelArrayElementHandler
 public:
   static void Construct (T* address, T const& src)
   {
+    *address = new T (*src);
   }
 
   static void Destroy (T* address)
@@ -90,20 +91,12 @@ public:
   }
 
   /**
-   * Destroy the container.
-   */
-  ~csPDelArray ()
-  {
-    DeleteAll ();
-  }
-
-  /**
    * Transfer the entire contents of one array to the other. The end
    * result will be that this array will be completely empty and the
    * other array will have all items that originally were in this array.
    * This operation is very efficient.
    */
-  void TransferTo (csPDelArray<T>& destination)
+  void TransferTo (csPDelArray& destination)
   {
     ArraySuper::TransferTo ((ArraySuper&)destination);
   }
