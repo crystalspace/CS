@@ -406,6 +406,14 @@ public:
     //SCF_DECLARE_EMBEDDED_IBASE (csGenmeshMeshObject);
     SCF_DECLARE_IBASE;
     csGenmeshMeshObject* parent;
+    eiShaderVariableAccessor ()
+    {
+      SCF_CONSTRUCT_IBASE (0);
+    }
+    virtual ~eiShaderVariableAccessor ()
+    {
+      SCF_DESTRUCT_IBASE ();
+    }
     eiShaderVariableAccessor (csGenmeshMeshObject* parent)
     {
       eiShaderVariableAccessor::parent = parent;
@@ -868,6 +876,14 @@ public:
     //SCF_DECLARE_EMBEDDED_IBASE (csGenmeshMeshObjectFactory);
     SCF_DECLARE_IBASE;
     csGenmeshMeshObjectFactory* parent;
+    eiShaderVariableAccessor ()
+    {
+      SCF_CONSTRUCT_IBASE (0);
+    }
+    virtual ~eiShaderVariableAccessor ()
+    {
+      SCF_DESTRUCT_IBASE ();
+    }
     eiShaderVariableAccessor (csGenmeshMeshObjectFactory* parent)
     {
       eiShaderVariableAccessor::parent = parent;

@@ -12,6 +12,11 @@ chronological order.
 	  (These methods should always return a zero-length C-string when the
 	  csString is empty; they should never return null.)
 	- Eric Sunshine updated Doxygen comments for csStringHash.
+	- Jorrit fixed an initialization error in the NR OpenGL renderer
+	  with the new clipportal_dirty flag. Please people! Initialize
+	  your variables!!!!!
+	- Jorrit fixed missing SCF_CONSTRUCT_IBASE in the
+	  eiShaderVariableAccessor instances of genmesh.
 13-Apr-2004
 	- Jorrit changed the PreferClipPlane default to enabled for the new
 	  renderer. Now clipping planes are enabled by default and only

@@ -136,6 +136,7 @@ csGLGraphics3D::csGLGraphics3D (iBase *parent)
 
   shadow_stencil_enabled = false;
   clipping_stencil_enabled = false;
+  clipportal_dirty = true;
 }
 
 csGLGraphics3D::~csGLGraphics3D()
