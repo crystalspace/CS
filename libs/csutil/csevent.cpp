@@ -80,6 +80,42 @@ csEvent::csEvent (csTicks iTime, int eType, int cCode, void *cInfo)
     Flags = CSEF_BROADCAST;
 }
 
+csEvent::csEvent (csEvent const& e)
+{
+  Type = e.Type;
+  Category = e.Category;
+  SubCategory = e.SubCategory;
+  Flags = e.Flags;
+  Time = e.Time;
+
+  if ((Type & CSMASK_Keyboard) != 0)
+  {
+    Key.Code = e.Key.Code;
+    Key.Char = e.Key.Char;
+    Key.Modifiers = e.Key.Modifiers;
+  }
+  else if ((Type & CSMASK_Mouse) != 0)
+  {
+    Mouse.x = e.Mouse.x;
+    Mouse.y = e.Mouse.y;
+    Mouse.Button = e.Mouse.Button;
+    Mouse.Modifiers = e.Mouse.Modifiers;
+  }
+  else if ((Type & CSMASK_Joystick) != 0)
+  {
+    Joystick.number = e.Joystick.number;
+    Joystick.x = e.Joystick.x;
+    Joystick.y = e.Joystick.y;
+    Joystick.Button = e.Joystick.Button;
+    Joystick.Modifiers = e.Joystick.Modifiers;
+  }
+  else
+  {
+    Command.Code = e.Command.Code;
+    Command.Info = e.Command.Info;
+  }
+}
+
 csEvent::~csEvent ()
 {
 }

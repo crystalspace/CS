@@ -34,6 +34,12 @@ public:
   /// Empty initializer
   csEvent ();
 
+  /**
+   * Cloning constructor.  Note that for command style events, this performs
+   * only a shallow copy of the `Info' attribute.
+   */
+  csEvent (csEvent const&);
+
   /// Create a keyboard event object
   csEvent (csTicks, int type, int kcode, int kchar, int modifiers);
 
