@@ -40,6 +40,58 @@ csWsTest *app;                        // The main Windowing System object
 
 //-----------------------------------------------------------------------------
 
+class cspExtDialog : public csDialog
+{
+public:
+  cspExtDialog (csComponent *iParent) : csDialog (iParent)
+  { SetColor (CSPAL_DIALOG_BACKGROUND, cs_Color_Brown_L); }
+  virtual bool HandleEvent (csEvent &Event)
+  {
+    csNotebook *nb = (csNotebook *)parent;
+    if (Event.Type == csevCommand)
+      switch (Event.Command.Code)
+      {
+        case cscmdRadioButtonSelected:
+          switch (((csRadioButton *)Event.Command.Info)->id)
+          {
+            case 9990:
+              nb->SetStyle ((nb->GetStyle () & ~CSNBS_TABPOS_MASK) | CSNBS_TABPOS_TOP);
+              break;
+            case 9991:
+              nb->SetStyle ((nb->GetStyle () & ~CSNBS_TABPOS_MASK) | CSNBS_TABPOS_BOTTOM);
+              break;
+            case 9992:
+              nb->SetStyle ((nb->GetStyle () & ~CSNBS_TABPOS_MASK) | CSNBS_TABPOS_LEFT);
+              break;
+            case 9993:
+              nb->SetStyle ((nb->GetStyle () & ~CSNBS_TABPOS_MASK) | CSNBS_TABPOS_RIGHT);
+              break;
+          }
+          break;
+        case cscmdCheckBoxSwitched:
+        {
+          csCheckBox *cb = (csCheckBox *)Event.Command.Info;
+          int mask = (cb->id == 9980) ? CSNBS_PAGEFRAME :
+                     (cb->id == 9981) ? CSNBS_PAGEINFO :
+                     (cb->id == 9982) ? CSNBS_THINTABS : 0;
+          if (mask)
+          {
+            int style = nb->GetStyle ();
+            if (cb->SendCommand (cscmdCheckBoxQuery))
+              style |= mask;
+            else
+              style &= ~mask;
+            nb->SetStyle (style);
+          }
+          return true;
+        }
+      }
+    return csDialog::HandleEvent (Event);
+  }
+};
+
+//-----------------------------------------------------------------------------
+
 // Scroll bar class default palette
 static int palette_csWsTest[] =
 {
@@ -210,56 +262,6 @@ bool csWsTest::InitialSetup (int argc, const char* const argv[],
 
 void csWsTest::NotebookDialog ()
 {
-  class cspExtDialog : public csDialog
-  {
-  public:
-    cspExtDialog (csComponent *iParent) : csDialog (iParent)
-    { SetColor (CSPAL_DIALOG_BACKGROUND, cs_Color_Brown_L); }
-    virtual bool HandleEvent (csEvent &Event)
-    {
-      csNotebook *nb = (csNotebook *)parent;
-      if (Event.Type == csevCommand)
-        switch (Event.Command.Code)
-        {
-          case cscmdRadioButtonSelected:
-            switch (((csRadioButton *)Event.Command.Info)->id)
-            {
-              case 9990:
-                nb->SetStyle ((nb->GetStyle () & ~CSNBS_TABPOS_MASK) | CSNBS_TABPOS_TOP);
-                break;
-              case 9991:
-                nb->SetStyle ((nb->GetStyle () & ~CSNBS_TABPOS_MASK) | CSNBS_TABPOS_BOTTOM);
-                break;
-              case 9992:
-                nb->SetStyle ((nb->GetStyle () & ~CSNBS_TABPOS_MASK) | CSNBS_TABPOS_LEFT);
-                break;
-              case 9993:
-                nb->SetStyle ((nb->GetStyle () & ~CSNBS_TABPOS_MASK) | CSNBS_TABPOS_RIGHT);
-                break;
-            }
-            break;
-          case cscmdCheckBoxSwitched:
-          {
-            csCheckBox *cb = (csCheckBox *)Event.Command.Info;
-            int mask = (cb->id == 9980) ? CSNBS_PAGEFRAME :
-                       (cb->id == 9981) ? CSNBS_PAGEINFO :
-                       (cb->id == 9982) ? CSNBS_THINTABS : 0;
-            if (mask)
-            {
-              int style = nb->GetStyle ();
-              if (cb->SendCommand (cscmdCheckBoxQuery))
-                style |= mask;
-              else
-                style &= ~mask;
-              nb->SetStyle (style);
-            }
-            return true;
-          }
-        }
-      return csDialog::HandleEvent (Event);
-    }
-  };
-
   // create a window
   csComponent *window = new csWindow (this, "Notebook test",
     CSWS_BUTSYSMENU | CSWS_TITLEBAR | CSWS_BUTHIDE | CSWS_BUTCLOSE |
