@@ -135,6 +135,8 @@ The history order is reversed so that new features are at the top.
 	      the 3D renderer crash with a BUS error on address 0x0 when the 3D
 	      renderer tries to load the 2D canvas.  I will look into this
 	      problem shortly.)
+	- Eric Sunshine eliminated a couple "unused variable" warnings from
+	  perftest.cpp.
 11-Oct-2001
 	- Moved the plugin manager implementation out of the system driver
 	  into csPluginManager (in csutil/plugmgr.h). Modified

@@ -175,7 +175,6 @@ bool PerfTest::Initialize (int argc, const char* const argv[],
 
   // The virtual clock.
   vc = CS_QUERY_REGISTRY (object_reg, iVirtualClock);
-  iPluginManager* plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
   iCommandLineParser* cmdline = CS_QUERY_REGISTRY (object_reg,
   	iCommandLineParser);
 
@@ -320,7 +319,6 @@ void PerfTest::SetupFrame ()
   if (needs_setup)
   {
     if (!myG3D->BeginDraw (CSDRAW_2DGRAPHICS)) return;
-    iPluginManager* plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
     iConsoleOutput *Console = CS_QUERY_REGISTRY (object_reg, iConsoleOutput);
     if (Console)
     {
