@@ -30,7 +30,6 @@ endif # ifeq ($(MAKESECTION),roottargets)
 ifeq ($(MAKESECTION),postdefines)
 
 # Local CFLAGS and libraries
-CFLAGS.GLX2D+=-I$(X11_PATH)/include
 LIBS._GLX2D+=-L$(X11_PATH)/lib -lXext -lX11
 
 ifeq ($(USE_MESA),1)
@@ -42,6 +41,8 @@ ifeq ($(USE_MESA),1)
 else
   LIBS._GLX2D+=-lGL
 endif
+
+CFLAGS.GLX2D+=-I$(X11_PATH)/include
 
 # The 2D GLX driver
 ifeq ($(USE_DLL),yes)

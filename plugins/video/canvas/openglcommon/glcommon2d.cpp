@@ -58,9 +58,9 @@ csGraphics2DGLCommon::~csGraphics2DGLCommon ()
 bool csGraphics2DGLCommon::Open(char *Title)
 {
   if (glGetString (GL_RENDERER))
-    CsPrintf (MSG_INITIALIZATION, "(Renderer v%s) ", glGetString(GL_RENDERER) );
+    CsPrintf (MSG_INITIALIZATION, "Renderer %s ", glGetString(GL_RENDERER) );
   if (glGetString (GL_VERSION))
-    CsPrintf (MSG_INITIALIZATION, "(OpenGL v%s)", glGetString(GL_VERSION));
+    CsPrintf (MSG_INITIALIZATION, "Version %s", glGetString(GL_VERSION));
   CsPrintf (MSG_INITIALIZATION, "\n");
 
   // Open your graphic interface
@@ -96,10 +96,10 @@ void csGraphics2DGLCommon::Close(void)
 {
   // Close your graphic interface
   csGraphics2D::Close ();
-//  CHKB (delete [] Memory);
-  CHKB (delete LocalFontServer);
+//  CHK (delete [] Memory);
+  CHK (delete LocalFontServer);
   LocalFontServer = NULL;
-  CHKB (delete texture_cache);
+  CHK (delete texture_cache);
   texture_cache = NULL;
 }
 
@@ -226,10 +226,13 @@ void csGraphics2DGLCommon::DrawSpriteGL (ITextureHandle *hTex, int sx, int sy,
   cachedata = txt_mm->get_hicolorcache ();
   GLuint texturehandle = *( (GLuint *) (cachedata->pData) );
 
+  // as we are drawing in 2D, we disable some of the commonly used features
+  // for fancy 3D drawing
   glShadeModel(GL_FLAT);
-  glEnable(GL_TEXTURE_2D);
-  glColor4f(1.,1.,1.,1.);
+  glDisable (GL_DEPTH_TEST);
 
+  // if the texture has transparent bits, we have to tweak the
+  // OpenGL blend mode so that it handles the transparent pixels correctly
   if (txt_mm->get_transparent())
   {
     glEnable (GL_BLEND);
@@ -237,7 +240,9 @@ void csGraphics2DGLCommon::DrawSpriteGL (ITextureHandle *hTex, int sx, int sy,
   }
   else
     glDisable (GL_BLEND);
-  glDisable (GL_DEPTH_TEST);
+
+  glEnable(GL_TEXTURE_2D);
+  glColor4f(1.,1.,1.,1.);
   glBindTexture(GL_TEXTURE_2D,texturehandle);
   
   int bitmapwidth=0, bitmapheight=0;
@@ -250,7 +255,7 @@ void csGraphics2DGLCommon::DrawSpriteGL (ITextureHandle *hTex, int sx, int sy,
   nty1 = ty/bitmapheight;
   nty2 = (ty+th)/bitmapheight;
 
-  // draw the bitmap
+  // draw the bitmap - we could use GL_QUADS, but why?
   glBegin(GL_TRIANGLE_FAN);
   glTexCoord2f(ntx1,nty1);
   glVertex2i(sx,Height-sy-1);

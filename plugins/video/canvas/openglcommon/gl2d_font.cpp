@@ -19,30 +19,41 @@
 #include <stdarg.h>
 #include <stdlib.h>
 #include <stdio.h>
+
 #include "sysdef.h"
 #include "cs2d/common/graph2d.h"
 #include "isystem.h"
 #include "csutil/util.h"
+
 #include "cs2d/openglcommon/gl2d_font.h"
 
-// we need a definition of GLFontInfo, declared in the header file
+/// we need a definition of GLFontInfo, declared in the header file
 class csGraphics2DOpenGLFontServer::GLFontInfo
 {
   public:
-
+    /** Constructor.  Pass in a CS font, which will be analyzed and
+     *  used to build a texture holding all the characters */ 
     GLFontInfo(FontDef &newfont);
+
+    /** destructor.  Destroys the texture that holds the font characters. */
     ~GLFontInfo() {
         glDeleteTextures(1,&mTexture_Handle);
 	}
 
+    /** call this to draw a character.  The character is drawn on the
+     *  screen using the current color, and a transform is applied
+     *  to the modelview matrix to shift to the right.  This is
+     *  such that the next call to DrawCharacter
+     *  will draw a character in the next cell over; that way you can
+     *  make repeated calls without having to manually position each character */
     void DrawCharacter(unsigned char characterindex);
 
   private:
 
-    // handle referring to the texture used for this font
+    /// handle referring to the texture used for this font
     GLuint mTexture_Handle;
 
-    // size of characters in the texture, in texture coordinates
+    /// size of characters in the texture, in texture coordinates
     float mTexture_CharacterWidth;
     float mTexture_CharacterHeight;
 
@@ -96,8 +107,9 @@ csGraphics2DOpenGLFontServer::GLFontInfo::GLFontInfo(FontDef &newfont)
     // build bitmap data in a format proper for OpenGL
     // each pixel has 1 byte intensity + 1 byte alpha
     unsigned int basepixelsize=1;
-    unsigned char *fontbitmapdata = 
-    	new unsigned char [ basetexturewidth * basetextureheight * basepixelsize ];
+    unsigned char *fontbitmapdata;
+    CHK (fontbitmapdata = 
+    	new unsigned char [ basetexturewidth * basetextureheight * basepixelsize ] );
 
     // transform each CS character onto a small rectangular section
     // of the fontbitmap we have allocated for this font
@@ -147,7 +159,7 @@ csGraphics2DOpenGLFontServer::GLFontInfo::GLFontInfo(FontDef &newfont)
 		0 /*border*/,
     		GL_LUMINANCE,GL_UNSIGNED_BYTE,fontbitmapdata);
 
-    delete [] fontbitmapdata;
+    CHK ( delete [] fontbitmapdata );
 }
 
 void csGraphics2DOpenGLFontServer::GLFontInfo::DrawCharacter(unsigned char characterindex)
@@ -204,9 +216,9 @@ csGraphics2DOpenGLFontServer::~csGraphics2DOpenGLFontServer()
       // cycle through all loaded fonts
       for (int index=0; index < mFont_Count; index++)
       {
-        CHKB ( delete mFont_Information_Array[index] );
+        CHK ( delete mFont_Information_Array[index] );
       }
-      CHKB ( delete [] mFont_Information_Array );
+      CHK ( delete [] mFont_Information_Array );
     }
 }
 
@@ -220,42 +232,16 @@ void csGraphics2DOpenGLFontServer::BuildFont(FontDef &newfont)
     // need another spot in the array of handles
     if (mFont_Information_Array != NULL)
     {
-    	GLFontInfo **newhandles = new (GLFontInfo *)[mFont_Count+1];
+    	GLFontInfo **newhandles;
+	CHK ( newhandles = new (GLFontInfo *)[mFont_Count+1] );
 	for (int index=0; index < mFont_Count; index++)
 		newhandles[index] = mFont_Information_Array[index];
 	
-        delete[] mFont_Information_Array;
+        CHK ( delete[] mFont_Information_Array );
 	mFont_Information_Array = newhandles;
     }
     else
-    	mFont_Information_Array = new (GLFontInfo *)[1];
-
-#if 0
-    int charwidth = newfont.Width;
-    for (int characterindex=0; characterindex<128; characterindex++)
-    {
-
-	// if the FontDef member IndividualWidth is non-NULL, we
-	// need to extract the character width of each character
-	// separately from that member, otherwise the width is
-	// the same for all characters
-
-	if (newfont.IndividualWidth != NULL)
-	    charwidth = newfont.IndividualWidth[characterindex];
-
-	// copy into the flip buffer -- see flipbuffer declaration for
-	// the reason behind this code!
-
-	basebuffer = newfont.FontBitmap + characterindex*newfont.BytesPerChar;
-	for (int wordindex=0; wordindex < newfont.Height; wordindex++)
-	{
-	    for (int charindex=0; charindex < wordsize; charindex++)
-	    	flipbuffer[wordindex*wordsize+charindex] =
-			basebuffer[(newfont.Height-wordindex-1)*wordsize+charindex];
-	}
-
-    }
-#endif
+    	CHK ( mFont_Information_Array = new (GLFontInfo *)[1] );
 
     mFont_Information_Array[mFont_Count] = new GLFontInfo(newfont);
 
@@ -269,7 +255,7 @@ void csGraphics2DOpenGLFontServer::AddFont(FontDef &addme)
 }
 
 /** Print some characters (finally!)  This is basically a wrapper
- * around glListBase() and glCallList() invocations */
+ * around repeated calls to WriteCharacter */
 void csGraphics2DOpenGLFontServer::WriteCharacters(char *writeme, int fontnumber)
 {
     // do some error checking
@@ -286,7 +272,7 @@ void csGraphics2DOpenGLFontServer::WriteCharacters(char *writeme, int fontnumber
 }
 
 /** Print a character. This is basically a wrapper
- * around glListBase() and glCallList() invocations */
+ * around calls to the GLFontInfo method WriteCharacter() */
 void csGraphics2DOpenGLFontServer::WriteCharacter(char writeme, int fontnumber)
 {
     // do some error checking
@@ -295,10 +281,6 @@ void csGraphics2DOpenGLFontServer::WriteCharacter(char writeme, int fontnumber)
     if (fontnumber >= mFont_Count)
         fontnumber = 0;
 
-    //printf("font %d, char %d, list %d",
-    //		fontnumber, writeme, Font_Offsets[fontnumber] + writeme);
-
     mFont_Information_Array[fontnumber]->DrawCharacter(writeme);
-
 }
 
