@@ -569,7 +569,6 @@ iPolygon3D *csSector::IntersectSphere (
  */
 void csSector::Draw (iRenderView *rview)
 {
-#ifndef CS_USE_NEW_RENDERER
   draw_busy++;
 
   // Make sure the visibility culler is loaded.
@@ -586,6 +585,44 @@ void csSector::Draw (iRenderView *rview)
     cb->Traverse (&scfiSector, rview);
     i--;
   }
+
+  // Here we check all render queues to see if there is a render queue
+  // that has the 'do_camera' flag set. If so then we check all meshes
+  // in that render queue to see if there is one that has CS_ENTITY_CAMERA
+  // set. If so we move that mesh to the right position.
+  for (i = 0 ; i < RenderQueues.GetQueueCount () ; i++)
+  {
+    if (csEngine::current_engine->GetRenderPriorityCamera (i))
+    {
+      csMeshVectorNodelete* mv = RenderQueues.GetQueue (i);
+      if (mv)
+      {
+        int j;
+	for (j = 0 ; j < mv->Length () ; j++)
+	{
+	  iMeshWrapper* m = mv->Get (j);
+	  if (m->GetFlags ().Check (CS_ENTITY_CAMERA))
+	  {
+	    iMovable* mov = m->GetMovable ();
+	    // Temporarily move the object to the current camera.
+	    csReversibleTransform &mov_trans = mov->GetTransform ();
+// @@@ TEMPORARY: now CS_ENTITY_CAMERA only works at 0,0,0 position.
+mov_trans.SetOrigin (csVector3 (0));
+	    csVector3 old_movable_pos = mov_trans.GetOrigin ();
+	    iCamera *orig_cam = rview->GetOriginalCamera ();
+	    csOrthoTransform &orig_trans = orig_cam->GetTransform ();
+	    csVector3 v = orig_trans.GetO2TTranslation ();
+	    mov_trans.SetOrigin (mov_trans.GetOrigin () + v);
+	    mov->UpdateMove ();
+    //mov_trans.SetOrigin (old_movable_pos);
+    //movable.UpdateMove ();
+	  }
+	}
+      }
+    }
+  }
+
+#ifndef CS_USE_NEW_RENDERER
 
   G3D_FOGMETHOD fogmethod = G3DFOGMETHOD_NONE;
 
@@ -685,22 +722,22 @@ void csSector::Draw (iRenderView *rview)
     delete[] objects;
 #else
 
-	csLightList alllights;
+    csLightList alllights;
     csRef<iSectorList> secs = csEngine::current_engine->GetSectors ();
 	int i;
     for (i = secs->GetCount () - 1; i >= 0; i --)
-	{
-	  csRef<iLightList> seclights = secs->Get(i)->GetLights ();
+    {
+      csRef<iLightList> seclights = secs->Get(i)->GetLights ();
       for (int j = seclights->GetCount() - 1; j >= 0; j --)
-	  {
-		// Sphere check against rview before adding it.
-		csSphere s = csSphere (seclights->Get(j)->GetCenter (), 
+      {
+	// Sphere check against rview before adding it.
+	csSphere s = csSphere (seclights->Get(j)->GetCenter (), 
 		  seclights->Get(j)->GetRadius());
         if (rview->TestBSphere (rview->GetCamera()->GetTransform(), s))
 	      alllights.Add (seclights->Get(j));
         // else { light isn't visible anyway }
-	  }
-	}
+      }
+    }
 
     r3d->EnableZOffset ();
     DrawZ (rview);
@@ -708,7 +745,8 @@ void csSector::Draw (iRenderView *rview)
     for (i = alllights.GetCount () - 1; i >= 0; i--) 
     {
       r3d->SetObjectToCamera (&rview->GetCamera ()->GetTransform ());
-      r3d->SetLightParameter (0, CS_LIGHTPARAM_POSITION, alllights.Get (i)->GetCenter ());
+      r3d->SetLightParameter (0, CS_LIGHTPARAM_POSITION,
+      	alllights.Get (i)->GetCenter ());
       r3d->DisableColorWrite ();
       r3d->SetShadowState (CS_SHADOW_VOLUME_BEGIN);
       DrawShadow (rview, alllights.Get (i));
@@ -794,7 +832,8 @@ void csSector::DrawZ (iRenderView* rview)
   // look if meshes from the previous sector should be drawn
   bool draw_prev_sector = false;
 
-  if (prev_sector) {
+  if (prev_sector)
+  {
     draw_prev_sector = 
       rview->GetPortalPolygon ()->IsTransparent () ||
       rview->GetPortalPolygon ()->GetPortal ()->GetFlags ().Check (
@@ -802,7 +841,8 @@ void csSector::DrawZ (iRenderView* rview)
   }
 
   objects = RenderQueues.SortAll (rview, num_objects, current_visnr);
-  for (i = 0; i < num_objects; i ++) {
+  for (i = 0; i < num_objects; i ++)
+  {
     iMeshWrapper *sp = objects[i];
     if (
           !prev_sector ||

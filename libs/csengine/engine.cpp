@@ -882,18 +882,23 @@ iObject *csEngine::QueryObject ()
 void csEngine::RegisterRenderPriority (
   const char *name,
   long priority,
-  int rendsort)
+  int rendsort,
+  bool do_camera)
 {
   int i;
 
   // If our priority goes over the number of defined priorities
   // then we have to initialize.
   if (priority + 1 >= render_priority_sortflags.Limit ())
+  {
     render_priority_sortflags.SetLimit (priority + 2);
+    render_priority_cameraflags.SetLimit (priority + 2);
+  }
   for (i = render_priorities.Length (); i <= priority; i++)
   {
     render_priorities[i] = NULL;
     render_priority_sortflags[i] = CS_RENDPRI_NONE;
+    render_priority_cameraflags[i] = false;
   }
 
   char *n = (char *)render_priorities[priority];
@@ -901,6 +906,7 @@ void csEngine::RegisterRenderPriority (
   n = csStrNew (name);
   render_priorities[priority] = n;
   render_priority_sortflags[priority] = rendsort;
+  render_priority_cameraflags[priority] = do_camera;
   if (!strcmp (name, "sky"))
     render_priority_sky = priority;
   else if (!strcmp (name, "wall"))
@@ -921,6 +927,28 @@ long csEngine::GetRenderPriority (const char *name) const
   }
 
   return 0;
+}
+
+void csEngine::SetRenderPriorityCamera (long priority, bool do_camera)
+{
+  render_priority_cameraflags[priority] = do_camera;
+}
+
+bool csEngine::GetRenderPriorityCamera (const char *name) const
+{
+  int i;
+  for (i = 0; i < render_priorities.Length (); i++)
+  {
+    char *n = (char *)render_priorities[i];
+    if (n && !strcmp (name, n)) return render_priority_cameraflags[i];
+  }
+
+  return false;
+}
+
+bool csEngine::GetRenderPriorityCamera (long priority) const
+{
+  return render_priority_cameraflags[priority];
 }
 
 int csEngine::GetRenderPrioritySorting (const char *name) const
@@ -951,7 +979,8 @@ void csEngine::ClearRenderPriorities ()
 
   render_priorities.DeleteAll ();
   render_priority_sortflags.SetLimit (0);
-  RegisterRenderPriority ("sky", 2);
+  render_priority_cameraflags.SetLimit (0);
+  RegisterRenderPriority ("sky", 2, true);
   RegisterRenderPriority ("wall", 4);
   RegisterRenderPriority ("object", 6);
   RegisterRenderPriority ("alpha", 8, CS_RENDPRI_BACK2FRONT);

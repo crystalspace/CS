@@ -37,6 +37,14 @@ void csRenderQueueSet::Add (iMeshWrapper *mesh)
 {
   long pri = mesh->GetRenderPriority ();
 
+  // If the CS_ENTITY_CAMERA flag is set we automatically mark
+  // the render priority with the camera flag.
+  bool do_camera = mesh->GetFlags ().Check (CS_ENTITY_CAMERA);
+  if (do_camera)
+  {
+    csEngine::current_engine->SetRenderPriorityCamera (pri, do_camera);
+  }
+
   // look if the desired priority queue exists, and possibly
   // extend the list of queues
   if (pri >= Queues.Length ())

@@ -1,5 +1,26 @@
 The history order is reversed so that new features are at the top.
 
+24-Jan-2003
+	- Added the notion of 'camera' flag to a render priority. When this
+	  flag is true the engine will scan all objects in this render
+	  priority to see if any of them has the CS_ENTITY_CAMERA flag set.
+	  If that's the case it will automatically correct the position of
+	  that object based on the current camera position (during rendering).
+	- Added various API functions in CS to get/set this render priority
+	  flag.
+	- Added <camera> keyword for parsing render priorities so that you
+	  can manually set this flag. If you don't specify render priorities
+	  in your map then the 'sky' render priority will automatically have
+	  this flag set.
+	- When a mesh object with CS_ENTITY_CAMERA is added to a sector it
+	  will automatically cause the render priority of that object
+	  to be tagged with the correct do_camera flag. This is done to ensure
+	  backwards compatibility.
+	- When rendering the sector will now scan all objects that are in
+	  a render queue with camera flag set and that have CS_ENTITY_CAMERA
+	  set and will move them to the new location. At this moment this
+	  only works for objects that are always at 0,0,0 position. This
+	  is also usually the case. This solves the bug in csdemo.
 23-Jan-2003
 	- Fixed genmesh so it compiles again.
 	- Fixed effects plugin so it compiles again.

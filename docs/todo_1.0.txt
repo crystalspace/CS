@@ -25,7 +25,7 @@ Bugs to fix:
 	     is choking up the system.  Without the lightmap pass, he says
 	     performance is excellent.  Jorrit suspects that this might be
 	     caused by texture swapping.
-	[S]  CAMERA entity bug and vis culling causes bizarre HOM effects and
+	[**] CAMERA entity bug and vis culling causes bizarre HOM effects and
 	     disappearing/reappearing stars in csdemo.  Also probably affects
 	     other programs and maps, in which sudden and drastic pops in
 	     rendering occur.

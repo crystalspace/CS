@@ -216,6 +216,7 @@ void csMeshWrapper::Draw (iRenderView *rview)
   if (flags.Check (CS_ENTITY_INVISIBLE)) return ;
   if (flags.Check (CS_ENTITY_CAMERA))
   {
+#if 0
     // Temporarily move the object to the camera.
     csReversibleTransform &mov_trans = movable.GetTransform ();
     csVector3 old_movable_pos = mov_trans.GetOrigin ();
@@ -224,9 +225,12 @@ void csMeshWrapper::Draw (iRenderView *rview)
     csVector3 v = orig_trans.GetO2TTranslation ();
     mov_trans.SetOrigin (mov_trans.GetOrigin () + v);
     movable.UpdateMove ();
+#endif
     DrawInt (rview);
+#if 0
     mov_trans.SetOrigin (old_movable_pos);
     movable.UpdateMove ();
+#endif
   }
   else
     DrawInt (rview);

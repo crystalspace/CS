@@ -139,7 +139,7 @@ struct iSharedVariableList;
 #define CS_RENDPRI_FRONT2BACK 2
 /** @} */
 
-SCF_VERSION (iEngine, 0, 13, 2);
+SCF_VERSION (iEngine, 0, 14, 0);
 
 /**
  * This interface is the main interface to the 3D engine.
@@ -226,11 +226,19 @@ struct iEngine : public iBase
    *     camera viewpoint).
    * <li>#CS_RENDPRI_BACK2FRONT: sort objects back to front.
    * </ul>
+   * If 'do_camera' is true then this render priority will be scanned
+   * for objects that have CS_ENTITY_CAMERA flag set.
    */
   virtual void RegisterRenderPriority (const char* name, long priority,
-  	int rendsort = CS_RENDPRI_NONE) = 0;
+  	int rendsort = CS_RENDPRI_NONE, bool do_camera = false) = 0;
   /// Get a render priority by name.
   virtual long GetRenderPriority (const char* name) const = 0;
+  /// Set the render priority camera flag.
+  virtual void SetRenderPriorityCamera (long priority, bool do_camera) = 0;
+  /// Get the render priority camera flag.
+  virtual bool GetRenderPriorityCamera (const char* name) const = 0;
+  /// Get the render priority camera flag.
+  virtual bool GetRenderPriorityCamera (long priority) const = 0;
   /// Get the render priority sorting flag.
   virtual int GetRenderPrioritySorting (const char* name) const = 0;
   /// Get the render priority sorting flag.

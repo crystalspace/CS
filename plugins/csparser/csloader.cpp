@@ -2312,6 +2312,12 @@ bool csLoader::LoadRenderPriorities (iDocumentNode* node)
 	  return false;
 	}
 	long pri = levelnode->GetContentsValueAsInt ();
+
+	bool do_camera = false;
+	csRef<iDocumentNode> cameranode = child->GetNode ("camera");
+	if (cameranode)
+	  do_camera = true;
+
 	int rendsort = CS_RENDPRI_NONE;
 	csRef<iDocumentNode> sortnode = child->GetNode ("sort");
 	if (sortnode)
@@ -2338,7 +2344,7 @@ bool csLoader::LoadRenderPriorities (iDocumentNode* node)
 	    return false;
 	  }
 	}
-	Engine->RegisterRenderPriority (name, pri, rendsort);
+	Engine->RegisterRenderPriority (name, pri, rendsort, do_camera);
         break;
       }
       default:

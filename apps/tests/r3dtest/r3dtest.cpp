@@ -286,7 +286,7 @@ bool R3DTest::Initialize ()
   mat->QueryObject ()->SetName ("shadow extruder");
 
   // Change this path to something /Anders Stenberg
-  vfs->Mount ("/lev/testrender", "testrender.zip");
+  vfs->Mount ("/lev/testrender", "faerie.zip");
   vfs->ChDir ("/lev/testrender");
   loader->LoadMapFile ("world", false);
 
