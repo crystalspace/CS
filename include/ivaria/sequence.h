@@ -61,6 +61,18 @@ struct iSequenceCondition : public iBase
   virtual bool Condition (csTicks dt, iBase* params) = 0;
 };
 
+struct csSequenceOp
+{
+  csSequenceOp* next, * prev;
+  csTicks time;
+  csRef<iBase> params;
+  csRef<iSequenceOperation> operation;
+
+  csSequenceOp () { }
+  ~csSequenceOp () { }
+};
+
+
 SCF_VERSION (iSequence, 0, 0, 2);
 
 /**
@@ -71,6 +83,11 @@ SCF_VERSION (iSequence, 0, 0, 2);
  */
 struct iSequence : public iBase
 {
+  /**
+   * Ugly but necessary for sequence to self-modify
+   */
+  virtual csSequenceOp* GetFirstSequence () = 0;
+
   /**
    * Add an operation to this sequence. This function will call IncRef()
    * on the operation.

@@ -236,6 +236,12 @@ struct iSequenceWrapper : public iBase
 		  const csColor& color, csTicks duration) = 0;
 
   /**
+   * Operation: Delay executation of the rest of the script by a random
+   * time between min and max msec.
+   */
+  virtual void AddOperationRandomDelay(csTicks time,int min, int max) = 0;
+
+  /**
    * Operation: set a mesh color.
    */
   virtual void AddOperationSetMeshColor (csTicks time, iParameterESM* mesh,
