@@ -35,9 +35,9 @@ FormatMessage (FORMAT_MESSAGE_ALLOCATE_BUFFER | \
 
 #define CS_TEST(x) if(!(x)) {CS_GET_SYSERROR(); CS_SHOW_ERROR;}
 
-csMutex* csMutex::Create ()
+csPtr<csMutex> csMutex::Create ()
 {
-  return new csWinMutex ();
+  return csPtr<csMutex>(new csWinMutex ());
 }
 
 csWinMutex::csWinMutex ()
@@ -92,9 +92,9 @@ const char* csWinMutex::GetLastError ()
 }
 
 
-csSemaphore* csSemaphore::Create (uint32 value)
+csPtr<csSemaphore> csSemaphore::Create (uint32 value)
 {
-  return new csWinSemaphore (value);
+  return csPtr<csSemaphore>(new csWinSemaphore (value));
 }
 
 csWinSemaphore::csWinSemaphore (uint32 value)
@@ -153,9 +153,9 @@ const char* csWinSemaphore::GetLastError ()
   return (const char*)lasterr;
 }
 
-csCondition* csCondition::Create (uint32 conditionAttributes)
+csPtr<csCondition> csCondition::Create (uint32 conditionAttributes)
 {
-  return new csWinCondition (conditionAttributes);
+  return csPtr<csCondition>(new csWinCondition (conditionAttributes));
 }
 
 csWinCondition::csWinCondition (uint32 /*conditionAttributes*/)
@@ -205,9 +205,9 @@ const char* csWinCondition::GetLastError ()
   return (const char*)lasterr;
 }
 
-csThread* csThread::Create (iRunnable *runnable, uint32 options)
+csPtr<csThread> csThread::Create (iRunnable *runnable, uint32 options)
 {
-  return new csWinThread (runnable, options);
+  return csPtr<csThread>(new csWinThread (runnable, options));
 }
 
 csWinThread::csWinThread (iRunnable *runnable, uint32 /*options*/)
