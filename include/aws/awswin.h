@@ -102,21 +102,17 @@ private:
     { return comp.WindowManager(); }
 
     /// Get's the window that this component resides in.
-    virtual iAwsWindow *Window()
-    { return comp.Window(); }
-    
+    virtual iAwsWindow *Window();
+        
     /// Get's the parent component of this component;
-    virtual iAwsComponent *Parent()
-    { return comp.Parent(); }
-
+    virtual iAwsComponent *Parent();
+    
     /// Sets the window that this component resides in.
-    virtual void SetWindow(iAwsWindow *win)
-    { comp.SetWindow(win); }
-
+    virtual void SetWindow(iAwsWindow *win);
+    
     /// Sets the parent component of this component;
-    virtual void SetParent(iAwsComponent *parent)
-    { comp.SetParent(parent); }
-
+    virtual void SetParent(iAwsComponent *parent);
+    
     ////////////// Component declarations for embedded wrappers ///////////////////////////////
 
     /// Invalidation routine: allow the component to be redrawn when you call this
