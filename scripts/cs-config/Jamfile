@@ -16,7 +16,7 @@ makeout="$(LOCATE.OBJECTS)"
 version="$(PACKAGE.VERSION)"
 longversion="$(PACKAGE.STRING)"
 # try to determine if we're in a source or installed CS version
-if [ -e \${prefix}/include/cssysdef.h ] ; then
+if [ -r \${prefix}/include/cssysdef.h ] ; then
   includedir="\${prefix}/include"
 else
   includedir="$(INSTALLDIR.INCLUDE)"
