@@ -43,8 +43,8 @@ clean: csconfigclean
 # create out/csconfig.tmp for the makevars that need to be transferred
 $(CSCONFIG.EXE):
 	@echo Generating cs-config script...
-	@echo $"# Crystal Space config make variables for $(DESCRIPTION.$(TARGET)).$" > csconfig.tmp
-	@echo $"# Note: automatically generated. $" >> csconfig.tmp
+	@echo $"# Crystal Space config make variables for $(DESCRIPTION.$(TARGET)).$" > out/csconfig.tmp
+	@echo $"# Note: automatically generated. $" >> out/csconfig.tmp
 	@echo $"EXE=$(EXE)$" >> out/csconfig.tmp
 	@echo $"DLL=$(DLL)$" >> out/csconfig.tmp
 	@echo $"LFLAGS.EXE=$(LFLAGS.EXE")$" >> out/csconfig.tmp
@@ -65,7 +65,7 @@ endif
 	$(RM) out/csconfig.tmp
 
 csconfigclean:
-	-$(RM) $(CSCONFIG.EXE)
+	-$(RM) $(CSCONFIG.EXE) out/csconfig.tmp
 
 endif
 
