@@ -32,14 +32,19 @@ csImageVector::~csImageVector()
   // image references are 0'd in ~csRefArray
 }
 
-void csImageVector::AddImage(csRef<iImage> img, int index)
+void csImageVector::AddImage(csRef<iImage> img)
 {
-  image[index] = img;
+  image.Push (img);
+}
+
+void csImageVector::InsertImage(csRef<iImage> img, int index)
+{
+  image.Insert (index, img);
 }
 
 void csImageVector::operator += (csRef<iImage> img)
 {
-  image[image.Length()] = img;
+  image.Push (img);
 }
 
 csRef<iImage> &csImageVector::GetImage(int index)
@@ -55,6 +60,11 @@ csRef<iImage> &csImageVector::operator[](int index)
 int csImageVector::Length()
 {
   return image.Length();
+}
+
+void csImageVector::DeleteIndex(int index)
+{
+  image.DeleteIndex (index);
 }
 
 void csImageVector::RemoveAll()

@@ -115,7 +115,7 @@ void csSymbolTable::SetSymbol (csStringID name, iBase *value)
     s->Auth = true;
   }
   else
-    Hash.Put (s->Name, new Symbol (name, value, true));
+    Hash.Put (name, new Symbol (name, value, true));
 
   PropagateSymbol (name, value);
 }

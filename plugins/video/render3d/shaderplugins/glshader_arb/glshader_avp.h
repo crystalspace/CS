@@ -70,10 +70,12 @@ public:
     this->object_reg = objreg;
     this->ext = ext;
     programstring = 0;
+    symtab = new csSymbolTable;
   }
   virtual ~csShaderGLAVP ()
   {
-    delete programstring;
+    delete[] programstring;
+    delete symtab;
   }
 
   bool LoadProgramStringToGL( const char* programstring );

@@ -217,7 +217,7 @@ csShader::csShader(csShaderManager* owner, iObjectRegistry* reg)
   SCF_CONSTRUCT_IBASE( 0 );
   this->name = 0;
   variables = new csHashMap();
-  techniques = new csArray<csShaderTechnique*>();
+  techniques = new csArray<iShaderTechnique*>();
   parent = owner;
   objectreg = reg;
 
@@ -229,7 +229,7 @@ csShader::csShader(const char* name, csShaderManager* owner, iObjectRegistry* re
   SCF_CONSTRUCT_IBASE( 0 );
   csShader::name = 0;
   variables = new csHashMap();
-  techniques = new csArray<csShaderTechnique*>();
+  techniques = new csArray<iShaderTechnique*>();
   parent = owner;
   objectreg = reg;
   SetName(name);

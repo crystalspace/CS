@@ -28,14 +28,18 @@
 #include "csutil/ref.h"
 struct iImage;
 
-SCF_VERSION (iImageVector, 0, 0, 1);
+SCF_VERSION (iImageVector, 0, 1, 0);
 
 struct iImageVector : public iBase
 {
   /**
-  * Add an Image to the Vector at specified index
-  */
-  virtual void AddImage(csRef<iImage> img, int index) = 0;
+   * Add an Image to the Vector
+   */
+  virtual void AddImage(csRef<iImage> img) = 0;
+  /**
+   * Insert an Image into the Vector at specified index
+   */
+  virtual void InsertImage(csRef<iImage> img, int index) = 0;
   /**
   * Add an Image to the End of the Vector
   */
@@ -52,6 +56,10 @@ struct iImageVector : public iBase
   * Get Image Count
   */
   virtual int Length() = 0;
+  /**
+   * Remove a specific index
+   */
+  virtual void DeleteIndex(int index) = 0;
   /**
   * Remove All Images
   */

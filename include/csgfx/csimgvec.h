@@ -37,9 +37,13 @@ public:
 
   SCF_DECLARE_IBASE;
   /**
-  * Add an Image to the Vector at specified index
+  * Add an Image to the Vector
   */
-  virtual void AddImage(csRef<iImage> img, int index);
+  virtual void AddImage (csRef<iImage> img);
+  /**
+  * Insert an Image into the Vector at specified index
+  */
+  virtual void InsertImage (csRef<iImage> img, int index);
   /**
   * Add an Image to the End of the Vector
   */
@@ -56,6 +60,10 @@ public:
   * Get Image Count
   */
   virtual int Length();
+  /**
+   * Remove a specific index
+   */
+  virtual void DeleteIndex(int index);
   /**
   * Remove All Images
   */

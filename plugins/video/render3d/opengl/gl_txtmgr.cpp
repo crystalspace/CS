@@ -78,7 +78,7 @@ csGLTextureHandle::csGLTextureHandle (iImage* image, int flags, int target, int 
 
   images = new csImageVector();
   image->IncRef();
-  images->AddImage(image,0);
+  images->AddImage(image);
 
   this->flags = flags;
   transp = false;
@@ -579,7 +579,14 @@ void csGLTextureHandle::CreateMipMaps()
       {
 	cimg = cimg->Sharpen (tc, txtmgr->sharpen_mipmaps);
       }
-      (*thisImages)[i] = cimg;
+      if (i >= thisImages->Length ())
+      {
+        thisImages->AddImage (cimg);
+      }
+      else
+      {
+	(*thisImages)[i] = cimg;
+      }
     }
 
     csGLTexture* ntex = NewTexture ((*thisImages)[0], true);
@@ -982,7 +989,7 @@ void csGLTextureManager::Clear()
 void csGLTextureManager::UnregisterMaterial (csGLMaterialHandle* handle)
 {
   int idx = materials.Find (handle);
-  if (idx >= 0) materials.Delete (idx);
+  if (idx >= 0) materials.DeleteIndex (idx);
 }
 
 csPtr<iTextureHandle> csGLTextureManager::RegisterTexture (iImage *image, int flags)

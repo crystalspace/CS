@@ -11,6 +11,7 @@ chronological order.
 	  csRefArray->csArray change.
 	- Eric Sunshine patched mk/install.mak to ensure that the `uninst'
 	  object file directory exists at "make install" time.
+	- res updated the new renderer to respect the recent array changes.
 5-Aug-2003
 	- Jorrit fixed metaball.mak. Was missing a CSUTIL dependency after
 	  CSSYS.
