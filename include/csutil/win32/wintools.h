@@ -27,6 +27,7 @@
 #include "csutil/csunicode.h"
 #include "csutil/util.h"
 #include <winnls.h> // contains MultiByteToWideChar()/WideCharToMultiByte()
+#include "sanity.inc"
 
 /**
  * Convert an ANSI string to a wide string.

@@ -220,6 +220,7 @@ struct MINIDUMP_THREAD_EX_CALLBACK
 typedef MINIDUMP_THREAD_EX_CALLBACK* PMINIDUMP_THREAD_EX_CALLBACK;
 
 #include <winver.h>
+#include "sanity.inc"
 
 struct MINIDUMP_MODULE_CALLBACK 
 {  

@@ -136,7 +136,6 @@
 #endif
 
 %{
-
 #include "iaws/aws.h"
 #include "imap/saver.h"
 #include "ivaria/reporter.h"
@@ -147,13 +146,6 @@
 #include "csutil/xmltiny.h"
 #include "igeom/objmodel.h"
 #include "iengine/portalcontainer.h"
-
-// Mark Gossage: somewhere in winuser.h there are a couple of #defines to
-// rename RegisterClass and UnregisterClass (which are windoze fns).
-// They also accidentally rename the iSCF fns too.
-#undef RegisterClass
-#undef UnregisterClass
-
 %}
 
 // The following list holds all the interfaces that are handled correctly.

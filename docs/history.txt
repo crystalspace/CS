@@ -21,6 +21,11 @@ chronological order.
 	  not have the appropriate "debug" tag, thus causing important
 	  debugging configuration to be omitted from the synthesized project
 	  files.
+	- Eric Sunshine added include/csutil/win32/sanity.inc which #undefines
+	  several Win32 API macros which pollute the global preprocessor
+	  namespace, and which interfere with CS's own method and function
+	  names. This file is now included by the various csutil/win32 headers
+	  after all Win32 API have been included.
 18-Sep-2004
 	- Eric Sunshine changed the executable subsystem type in the MSVC
 	  project files for GUI applications from "windows" to "console". This

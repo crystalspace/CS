@@ -207,11 +207,6 @@
 #define WINGDIAPI DECLSPEC_IMPORT
 #endif
 
-#undef min
-#undef max
-#undef DeleteFile
-#undef Yield
-
 /*
   LONG_PTR is used in the Win32 canvases, but it's only defined in newer 
   Platform or DirectX SDKs (in BaseTsd.h).
@@ -538,5 +533,7 @@ CS_EXPORTED_FUNCTION const char* plugin_compiler()                     \
 #endif // CS_IMPLEMENT_PLATFORM_PLUGIN
 
 #endif // CS_STATIC_LINKED
+
+#include "sanity.inc"
 
 #endif // __CS_CSOSDEFS_H__
