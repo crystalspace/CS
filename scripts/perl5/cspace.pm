@@ -9061,6 +9061,10 @@ package cspace::csGraphics3DCaps;
 *swig_MaxAspectRatio_set = *cspacec::csGraphics3DCaps_MaxAspectRatio_set;
 *swig_SupportsPointSprites_get = *cspacec::csGraphics3DCaps_SupportsPointSprites_get;
 *swig_SupportsPointSprites_set = *cspacec::csGraphics3DCaps_SupportsPointSprites_set;
+*swig_DestinationAlpha_get = *cspacec::csGraphics3DCaps_DestinationAlpha_get;
+*swig_DestinationAlpha_set = *cspacec::csGraphics3DCaps_DestinationAlpha_set;
+*swig_StencilShadows_get = *cspacec::csGraphics3DCaps_StencilShadows_get;
+*swig_StencilShadows_set = *cspacec::csGraphics3DCaps_StencilShadows_set;
 sub new {
     my $pkg = shift;
     my $self = cspacec::new_csGraphics3DCaps(@_);
