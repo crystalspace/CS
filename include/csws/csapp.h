@@ -34,7 +34,7 @@
 #include "isys/event.h"
 
 class csSkin;
-struct iImageLoader;
+struct iImageIO;
 
 /**
  * Application's background styles
@@ -118,7 +118,7 @@ public:
   /// The font server
   iFontServer *FontServer;
   /// The image loader
-  iImageLoader *ImageLoader;
+  iImageIO *ImageLoader;
   /// Application's adaptive palette
   int Pal [cs_Color_Last];
   /// The component that captured the mouse

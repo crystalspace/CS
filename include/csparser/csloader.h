@@ -27,7 +27,7 @@
 #include "csutil/util.h"
 #include "csgeom/quaterni.h"
 
-struct iImageLoader;
+struct iImageIO;
 struct iSoundLoader;
 struct iEngine;
 struct iVFS;
@@ -207,7 +207,7 @@ public:
   // virtual file system
   iVFS *VFS;
   // image loader
-  iImageLoader *ImageLoader;
+  iImageIO *ImageLoader;
   // sound loader
   iSoundLoader *SoundLoader;
   // engine
