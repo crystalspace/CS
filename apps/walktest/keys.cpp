@@ -2290,7 +2290,7 @@ csSprite3D *FindNextClosestSprite(csSprite3D *baseSprite, csCamera *camera, csVe
   float closestZLocation;
   csSprite3D *closestSprite;
   csSprite3D *nextSprite;
-  csBox screenBoundingBox;
+  csBox2 screenBoundingBox;
 
   if (baseSprite)
   {

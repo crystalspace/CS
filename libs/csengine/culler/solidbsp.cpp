@@ -741,11 +741,13 @@ void csSolidBsp::GfxDump (csSolidBspNode* node, iGraphics2D* ig2d, int depth,
 
   csPlane2& sp = node->splitter;
   const csVector2& spc = node->split_center;
-  csVector2 v1, v2;
+  csSegment2 seg;
 
-  if (sp.IntersectPolygon (&poly, v1, v2))
+  if (csIntersect2::IntersectPolygon (sp, &poly, seg))
   {
     int col = depth == 1 ? yellow : white;
+    const csVector2& v1 = seg.Start ();
+    const csVector2& v2 = seg.End ();
     ig2d->DrawLine (v1.x, height-v1.y, v2.x, height-v2.y, col);
     csVector2 dir = sp.norm;
     dir /= dir.Norm ();

@@ -19,6 +19,7 @@
 #ifndef POLYPLANE_H
 #define POLYPLANE_H
 
+#include "csgeom/math3d.h"
 #include "csgeom/transfrm.h"
 
 class Dumper;
@@ -39,11 +40,11 @@ class csPolyPlane
 
 private:
   /// The object space plane equation (this is fixed).
-  csPlane plane_obj;
+  csPlane3 plane_obj;
   /// The world space plane equation.
-  csPlane plane_wor;
+  csPlane3 plane_wor;
   /// The camera space plane equation.
-  csPlane plane_cam;
+  csPlane3 plane_cam;
   /// Reference count.
   int ref_count;
 
@@ -145,17 +146,17 @@ public:
   /**
    * Get the object version of the plane.
    */
-  csPlane& GetObjectPlane () { return plane_obj; }
+  csPlane3& GetObjectPlane () { return plane_obj; }
 
   /**
    * Get the world version of the plane.
    */
-  csPlane& GetWorldPlane () { return plane_wor; }
+  csPlane3& GetWorldPlane () { return plane_wor; }
 
   /**
    * Get the camera version of the plane.
    */
-  csPlane& GetCameraPlane () { return plane_cam; }
+  csPlane3& GetCameraPlane () { return plane_cam; }
 
   /**
    * Get the normal in object space.

@@ -22,8 +22,8 @@
 class csMatrix3;
 class csVector3;
 class csVector2;
-class csPlane;
-class csBox;
+class csPlane3;
+class csBox2;
 class csCamera;
 class csPolyTxtPlane;
 class csPolyTreeObject;
@@ -71,8 +71,8 @@ public:
   static void dump (csMatrix3* m, char* name);
   static void dump (csVector3* v, char* name);
   static void dump (csVector2* v, char* name);
-  static void dump (csPlane* p);
-  static void dump (csBox* b);
+  static void dump (csPlane3* p);
+  static void dump (csBox2* b);
   static void dump (csCamera* c);
   static void dump (csPolyTxtPlane* p);
   static void dump (csPolygon2D* p, char* name);

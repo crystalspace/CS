@@ -120,7 +120,7 @@ int csQuadtreePersp::TestPoint (const csVector3& point)
 
 csQuadcube::csQuadcube (int depth)
 {
-  csBox box (-1, -1, 1, 1);
+  csBox2 box (-1, -1, 1, 1);
 
   CHK (trees[0] = new csQuadtreePersp (box, depth));
   CHK (trees[1] = new csQuadtreePersp (box, depth));

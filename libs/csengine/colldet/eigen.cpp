@@ -19,7 +19,7 @@
 #include <math.h>
 #include "sysdef.h"
 #include "qint.h"
-#include "csgeom/math3d.h"
+#include "csgeom/matrix3.h"
 
 //---------------------------------------------------------------------------
 

@@ -21,6 +21,8 @@
 
 #include "csobject/pobject.h"
 #include "csgeom/math3d.h"
+#include "csgeom/matrix3.h"
+#include "csgeom/vector3.h"
 
 class csTransform;
 

@@ -128,6 +128,9 @@ void csOctree::Build ()
 
   CHK (root = new csOctreeNode);
 
+  // Initialize the random generator to a fixed value to make
+  // sure we get the same octree everytime (easier for debugging).
+  srand (12345);
   Build ((csOctreeNode*)root, bbox.Min (), bbox.Max (), polygons, num);
 
   CHK (delete [] polygons);
@@ -140,6 +143,9 @@ void csOctree::Build (csPolygonInt** polygons, int num)
   CHK (csPolygonInt** new_polygons = new csPolygonInt* [num]);
   int i;
   for (i = 0 ; i < num ; i++) new_polygons[i] = polygons[i];
+  // Initialize the random generator to a fixed value to make
+  // sure we get the same octree everytime (easier for debugging).
+  srand (12345);
   Build ((csOctreeNode*)root, bbox.Min (), bbox.Max (), new_polygons, num);
   CHK (delete [] new_polygons);
 }
@@ -652,7 +658,7 @@ bool BuildPVSOctreeNode (csPolygonTree* /*tree*/, csPolygonTreeNode* node,
       {
         // csPolygon3D.
 	csPolygon3D* p = (csPolygon3D*)polygon;
-	csPlane* plane = p->GetPolyPlane ();
+	csPlane3* plane = p->GetPolyPlane ();
 	for (cor_num = 0 ; cor_num < 8 ; cor_num++)
 	{
 	  csVector3 corner = onode->GetBox ().GetCorner (cor_num);

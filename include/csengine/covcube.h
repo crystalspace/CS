@@ -40,7 +40,7 @@ private:
 
 public:
   /// Constructor.
-  csCoverageMaskTreePersp (csCovMaskLUT* lut, const csBox& box)
+  csCoverageMaskTreePersp (csCovMaskLUT* lut, const csBox2& box)
   	: csCoverageMaskTree (lut, box) { }
 
   /**

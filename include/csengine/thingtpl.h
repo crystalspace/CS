@@ -19,8 +19,8 @@
 #ifndef THINGTPL_H
 #define THINGTPL_H
 
-#include "csgeom/math3d.h"
-#include "csgeom/math2d.h"  // texel coords
+#include "csgeom/vector2.h"
+#include "csgeom/matrix3.h"
 #include "csobject/csobject.h"
 #include "csutil/cscolor.h"
 #include "csengine/arrays.h"

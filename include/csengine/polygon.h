@@ -645,7 +645,7 @@ public:
   /**
    * Return the world-space plane of this polygon.
    */
-  csPlane* GetPolyPlane () { return &plane->GetWorldPlane (); }
+  csPlane3* GetPolyPlane () { return &plane->GetWorldPlane (); }
 
   /**
    * Get the vertices.
@@ -968,7 +968,7 @@ public:
    * This function will also discard all shadow frustrums which start at
    * the same plane as the given plane.
    */
-  bool MarkRelevantShadowFrustrums (csLightView& lview, csPlane& plane);
+  bool MarkRelevantShadowFrustrums (csLightView& lview, csPlane3& plane);
 
   /**
    * Check visibility of this polygon with the given csLightView
@@ -1018,7 +1018,7 @@ public:
    * If 'cw' is true the polygon has to be oriented clockwise in order to be
    * visible. Otherwise it is the other way around.
    */
-  bool ClipToPlane (csPlane* portal_plane, const csVector3& v_w2c,
+  bool ClipToPlane (csPlane3* portal_plane, const csVector3& v_w2c,
   	csVector3*& pverts, int& num_verts, bool cw = true);
 
   /**
@@ -1044,7 +1044,7 @@ public:
    * is completely back of the given plane it returnes POL_BACK. Otherwise it
    * returns POL_SPLIT_NEEDED.
    */
-  int Classify (const csPlane& pl);
+  int Classify (const csPlane3& pl);
 
   /// Same as Classify() but for X plane only.
   int ClassifyX (float x);
@@ -1062,7 +1062,7 @@ public:
    * This function is mainly used by the BSP splitter.
    */
   void SplitWithPlane (csPolygonInt** front, csPolygonInt** back,
-  	const csPlane& plane);
+  	const csPlane3& plane);
 
   /**
    * Check if this polygon covers the other polygon from any viewpoint

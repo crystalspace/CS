@@ -18,6 +18,7 @@
 
 #include <math.h>
 #include "sysdef.h"
+#include "csgeom/math3d.h"
 #include "csengine/textrans.h"
 
 //---------------------------------------------------------------------------

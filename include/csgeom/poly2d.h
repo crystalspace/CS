@@ -42,7 +42,7 @@ protected:
   int max_vertices;
 
   /// A 2D bounding box that is maintained automatically.
-  csBox bbox;
+  csBox2 bbox;
 
 public:
   /**
@@ -143,7 +143,7 @@ public:
   void UpdateBoundingBox ();
 
   /// Get the bounding box (in 2D space) for this polygon.
-  csBox& GetBoundingBox () { return bbox; }
+  csBox2& GetBoundingBox () { return bbox; }
 
   /**
    * Clipping routines. They return false if the resulting polygon is not

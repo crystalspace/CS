@@ -83,12 +83,12 @@ public:
 			const csVector3& v1, float len1,
 			const csVector3& v2, float len2);
   ///
-  void SetTextureSpace (const csPlane& plane_wor,
+  void SetTextureSpace (const csPlane3& plane_wor,
   			float xo, float yo, float zo,
 			float x1, float y1, float z1,
 			float len);
   ///
-  void SetTextureSpace (const csPlane& plane_wor,
+  void SetTextureSpace (const csPlane3& plane_wor,
   			const csVector3& v_orig,
   			const csVector3& v1, float len);
   ///

@@ -38,7 +38,7 @@ private:
 
 public:
   /// Constructor.
-  csQuadtreePersp (const csBox& box, int depth) : csQuadtree (box, depth) { }
+  csQuadtreePersp (const csBox2& box, int depth) : csQuadtree (box, depth) { }
 
   /**
    * Insert a polygon/frustrum into the quad-tree.

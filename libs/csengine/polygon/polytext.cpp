@@ -21,6 +21,7 @@
 #define SYSDEF_ALLOCA
 #include "sysdef.h"
 #include "qint.h"
+#include "csgeom/fastsqrt.h"
 #include "csutil/bitset.h"
 #include "csengine/polytext.h"
 #include "csengine/polyplan.h"
@@ -677,7 +678,7 @@ void csPolyTexture::FillLightMap (csLightView& lview)
         d = csSquaredDist::PointPoint (lview.light_frustrum->GetOrigin (), v2);
         if (d >= light->GetSquaredRadius ()) continue;
 
-        d = sqrt (d);
+        d = FastSqrt (d);
         hit = true;
         l1 = mapR[uv];
 
@@ -971,7 +972,7 @@ b:      if (scanL2 == MinIndex) goto finish;
 	  d = csSquaredDist::PointPoint (light->GetCenter (), v2);
 
 	  if (d >= light->GetSquaredRadius ()) continue;
-	  d = sqrt (d);
+	  d = FastSqrt (d);
 
 	  //@@@ This is only right if we don't allow reflections for dynamic lights
 	  float cosinus = (v2-light->GetCenter ())*polygon->GetPolyPlane ()->Normal ();

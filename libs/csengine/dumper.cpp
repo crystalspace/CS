@@ -63,13 +63,13 @@ void Dumper::dump (csVector2* v, char* name)
   CsPrintf (MSG_DEBUG_0, "Vector '%s': (%f,%f)\n", name, v->x, v->y);
 }
 
-void Dumper::dump (csPlane* p)
+void Dumper::dump (csPlane3* p)
 {
   CsPrintf (MSG_DEBUG_0, "A=%2.2f B=%2.2f C=%2.2f D=%2.2f\n",
             p->norm.x, p->norm.y, p->norm.z, p->DD);
 }
 
-void Dumper::dump (csBox* b)
+void Dumper::dump (csBox2* b)
 {
   CsPrintf (MSG_DEBUG_0, "(%2.2f,%2.2f)-(%2.2f,%2.2f)",
   	b->MinX (), b->MinY (), b->MaxX (), b->MaxY ());

@@ -721,7 +721,7 @@ public:
    * If the sprite is not on-screen, the X and Y values are
    * not valid.
    */
-  float GetScreenBoundingBox (const csCamera& camtrans, csBox& boundingBox);
+  float GetScreenBoundingBox (const csCamera& camtrans, csBox2& boundingBox);
 
   /**
    * Draw this sprite given a camera transformation.

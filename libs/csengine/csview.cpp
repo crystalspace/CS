@@ -64,7 +64,7 @@ void csView::SetRectangle (int x, int y, int w, int h)
 
   CHK (delete view);  view = NULL;
   CHK (delete bview);
-  CHK (bview = new csBox (x, y, x + w - 1, y + h - 1));
+  CHK (bview = new csBox2 (x, y, x + w - 1, y + h - 1));
   CHK (delete clipper); clipper = NULL;
 }
 
@@ -101,7 +101,7 @@ void csView::Draw ()
       ymax = QRound (yscale * (bview->MaxY() + 1));
       CHK (delete bview);
     }
-    CHK (bview = new csBox (xmin, ymin, xmax - 1, ymax - 1));
+    CHK (bview = new csBox2 (xmin, ymin, xmax - 1, ymax - 1));
     CHK (delete clipper);
     clipper = NULL;
   }

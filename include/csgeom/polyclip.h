@@ -105,7 +105,7 @@ public:
    * Returns one of CS_CLIP_XXX values defined above.
    */
   virtual UByte Clip (csVector2 *InPolygon, int InCount,
-    csVector2 *OutPolygon, int &OutCount, csBox &BoundingBox) = 0;
+    csVector2 *OutPolygon, int &OutCount, csBox2 &BoundingBox) = 0;
 
   /**
    * Same as above but provides additional information on each output
@@ -126,7 +126,7 @@ public:
    * <li> 0 if box is partially visible.
    * <li> 1 if box is entirely visible.
    */
-  virtual int ClassifyBox (csBox &box) = 0;
+  virtual int ClassifyBox (csBox2 &box) = 0;
 
   /// Return true if given point is inside (or on bound) of clipper polygon.
   virtual bool IsInside (float x, float y) = 0;
@@ -142,7 +142,7 @@ public:
   virtual csVector2 *GetClipPoly () = 0;
 
   /// Wrapper function: clip a polygon in-place.
-  UByte Clip (csVector2 *InPolygon, int &InOutCount, csBox &BoundingBox);
+  UByte Clip (csVector2 *InPolygon, int &InOutCount, csBox2 &BoundingBox);
   
   /// most recent Clipresult
   UByte LastClipResult () { return mrClipping; }
@@ -155,7 +155,7 @@ public:
 class csBoxClipper : public csClipper
 {
   /// The clipping region
-  csBox region;
+  csBox2 region;
   /// The vertices of clipping region (for GetClipPoly ())
   csVector2 ClipBox [4];
 
@@ -170,7 +170,7 @@ class csBoxClipper : public csClipper
 
 public:
   /// Initializes the clipper object to the given bounding region.
-  csBoxClipper (const csBox& b) : region (b)
+  csBoxClipper (const csBox2& b) : region (b)
   { InitClipBox (); }
   /// Initializes the clipper object to a rectangle with the given coords.
   csBoxClipper (float x1, float y1, float x2, float y2) : region (x1,y1,x2,y2)
@@ -182,14 +182,14 @@ public:
 
   /// Clip and compute the bounding box
   virtual UByte Clip (csVector2 *InPolygon, int InCount,
-    csVector2 *OutPolygon, int &OutCount, csBox &BoundingBox);
+    csVector2 *OutPolygon, int &OutCount, csBox2 &BoundingBox);
 
   /// Clip and return additional information about each vertex
   virtual UByte Clip (csVector2 *InPolygon, int InCount,
     csVector2 *OutPolygon, int &OutCount, csVertexStatus *OutStatus);
 
   /// Classify some bounding box against this clipper.
-  virtual int ClassifyBox (csBox &box);
+  virtual int ClassifyBox (csBox2 &box);
 
   /// Return true if given point is inside (or on bound) of clipper polygon.
   virtual bool IsInside (float x, float y)
@@ -227,7 +227,7 @@ class csPolygonClipper : public csClipper
   /// Number of vertices in clipper polygon
   int ClipPolyVertices;
   /// Clipping polygon bounding box
-  csBox ClipBox;
+  csBox2 ClipBox;
 
   /// Prepare clipping line equations
   void Prepare ();
@@ -248,14 +248,14 @@ public:
 
   /// Clip and compute the bounding box
   virtual UByte Clip (csVector2 *InPolygon, int InCount,
-    csVector2 *OutPolygon, int &OutCount, csBox &BoundingBox);
+    csVector2 *OutPolygon, int &OutCount, csBox2 &BoundingBox);
 
   /// Clip and return additional information about each vertex
   virtual UByte Clip (csVector2 *InPolygon, int InCount,
     csVector2 *OutPolygon, int &OutCount, csVertexStatus *OutStatus);
 
   /// Classify some bounding box against this clipper.
-  virtual int ClassifyBox (csBox &box);
+  virtual int ClassifyBox (csBox2 &box);
 
   /// Return true if given point is inside (or on bound) of clipper polygon.
   virtual bool IsInside (float x, float y);

@@ -168,7 +168,7 @@ int csBspTree::SelectSplitter (csPolygonInt** polygons, bool* was_splitter, int 
     for (i = 0 ; i < num ; i++)
     {
       if (was_splitter[i]) continue;
-      csPlane* plane_i = polygons[i]->GetPolyPlane ();
+      csPlane3* plane_i = polygons[i]->GetPolyPlane ();
       int cnt = 1;
       for (j = i+1 ; j < num ; j++)
       {

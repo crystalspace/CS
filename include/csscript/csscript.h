@@ -19,7 +19,7 @@
 #ifndef csScript_H
 #define csScript_H
 
-#include "csgeom/math3d.h"
+#include "csgeom/matrix3.h"
 #include "csobject/csobject.h"
 
 class csScript;

@@ -125,7 +125,7 @@ int csCoverageMaskTreePersp::TestPoint (const csVector3& point)
 csCovcube::csCovcube (csCovMaskLUT* lut)
 {
   //@@@Depends on coverage mask tree depth.
-  csBox box (0, 0, 1024, 1024);
+  csBox2 box (0, 0, 1024, 1024);
 
   CHK (trees[0] = new csCoverageMaskTreePersp (lut, box));
   CHK (trees[1] = new csCoverageMaskTreePersp (lut, box));

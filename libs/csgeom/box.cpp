@@ -23,7 +23,7 @@
 
 //---------------------------------------------------------------------------
 
-csVector2 csBox::GetCorner (int corner) const
+csVector2 csBox2::GetCorner (int corner) const
 {
   switch (corner)
   {
@@ -35,7 +35,7 @@ csVector2 csBox::GetCorner (int corner) const
   return csVector2 (0, 0);
 }
 
-csBox& csBox::operator+= (const csBox& box)
+csBox2& csBox2::operator+= (const csBox2& box)
 {
   if (box.minbox.x < minbox.x) minbox.x = box.minbox.x;
   if (box.minbox.y < minbox.y) minbox.y = box.minbox.y;
@@ -44,7 +44,7 @@ csBox& csBox::operator+= (const csBox& box)
   return *this;
 }
 
-csBox& csBox::operator+= (const csVector2& point)
+csBox2& csBox2::operator+= (const csVector2& point)
 {
   if (point.x < minbox.x) minbox.x = point.x;
   if (point.x > maxbox.x) maxbox.x = point.x;
@@ -53,7 +53,7 @@ csBox& csBox::operator+= (const csVector2& point)
   return *this;
 }
 
-csBox& csBox::operator*= (const csBox& box)
+csBox2& csBox2::operator*= (const csBox2& box)
 {
   if (box.minbox.x > minbox.x) minbox.x = box.minbox.x;
   if (box.minbox.y > minbox.y) minbox.y = box.minbox.y;
@@ -62,55 +62,55 @@ csBox& csBox::operator*= (const csBox& box)
   return *this;
 }
 
-csBox operator+ (const csBox& box1, const csBox& box2)
+csBox2 operator+ (const csBox2& box1, const csBox2& box2)
 {
-  return csBox( MIN(box1.minbox.x,box2.minbox.x), MIN(box1.minbox.y,box2.minbox.y),
+  return csBox2( MIN(box1.minbox.x,box2.minbox.x), MIN(box1.minbox.y,box2.minbox.y),
               MAX(box1.maxbox.x,box2.maxbox.x), MAX(box1.maxbox.y,box2.maxbox.y) );
 }
 
-csBox operator+ (const csBox& box, const csVector2& point)
+csBox2 operator+ (const csBox2& box, const csVector2& point)
 {
-  return csBox( MIN(box.minbox.x,point.x), MIN(box.minbox.y,point.y),
+  return csBox2( MIN(box.minbox.x,point.x), MIN(box.minbox.y,point.y),
               MAX(box.maxbox.x,point.x), MAX(box.maxbox.y,point.y) );
 }
 
-csBox operator* (const csBox& box1, const csBox& box2)
+csBox2 operator* (const csBox2& box1, const csBox2& box2)
 {
-  return csBox( MAX(box1.minbox.x,box2.minbox.x), MAX(box1.minbox.y,box2.minbox.y),
+  return csBox2( MAX(box1.minbox.x,box2.minbox.x), MAX(box1.minbox.y,box2.minbox.y),
               MIN(box1.maxbox.x,box2.maxbox.x), MIN(box1.maxbox.y,box2.maxbox.y) );
 }
 
-bool operator== (const csBox& box1, const csBox& box2)
+bool operator== (const csBox2& box1, const csBox2& box2)
 {
   return ( (box1.minbox.x == box2.minbox.x) && (box1.minbox.y == box2.minbox.y) &&
            (box1.maxbox.x == box2.maxbox.x) && (box1.maxbox.y == box2.maxbox.y) );
 }
 
-bool operator!= (const csBox& box1, const csBox& box2)
+bool operator!= (const csBox2& box1, const csBox2& box2)
 {
   return ( (box1.minbox.x != box2.minbox.x) || (box1.minbox.y != box2.minbox.y) ||
            (box1.maxbox.x != box2.maxbox.x) || (box1.maxbox.y != box2.maxbox.y) );
 }
 
-bool operator< (const csBox& box1, const csBox& box2)
+bool operator< (const csBox2& box1, const csBox2& box2)
 {
   return ( (box1.minbox.x >= box2.minbox.x) && (box1.minbox.y >= box2.minbox.y) &&
            (box1.maxbox.x <= box2.maxbox.x) && (box1.maxbox.y <= box2.maxbox.y) );
 }
 
-bool operator> (const csBox& box1, const csBox& box2)
+bool operator> (const csBox2& box1, const csBox2& box2)
 {
   return ( (box2.minbox.x >= box1.minbox.x) && (box2.minbox.y >= box1.minbox.y) &&
            (box2.maxbox.x <= box1.maxbox.x) && (box2.maxbox.y <= box1.maxbox.y) );
 }
 
-bool operator< (const csVector2& point, const csBox& box)
+bool operator< (const csVector2& point, const csBox2& box)
 {
   return ( (point.x >= box.minbox.x) && (point.x <= box.maxbox.x) &&
            (point.y >= box.minbox.y) && (point.y <= box.maxbox.y) );
 }
 
-bool csBox::Intersect (float minx, float miny, float maxx, float maxy,
+bool csBox2::Intersect (float minx, float miny, float maxx, float maxy,
     csVector2* poly, int num_poly)
 {
   int i, i1;

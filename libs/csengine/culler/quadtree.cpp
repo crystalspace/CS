@@ -34,13 +34,13 @@ csQuadtreeNode::~csQuadtreeNode ()
 
 //--------------------------------------------------------------------------
 
-void csQuadtree::Build (csQuadtreeNode* node, const csBox& box, int depth)
+void csQuadtree::Build (csQuadtreeNode* node, const csBox2& box, int depth)
 {
   node->SetCenter ((box.Min () + box.Max ())/2);
   if (depth <= 0) return;
   const csVector2& center = node->GetCenter ();
 
-  csBox childbox;
+  csBox2 childbox;
 
   CHK (node->children = new csQuadtreeNode [4]);
 
@@ -59,7 +59,7 @@ void csQuadtree::Build (csQuadtreeNode* node, const csBox& box, int depth)
   Build (&children[3], childbox, depth-1);
 }
 
-csQuadtree::csQuadtree (const csBox& box, int depth)
+csQuadtree::csQuadtree (const csBox2& box, int depth)
 {
   bbox = box;
   CHK (root = new csQuadtreeNode ());
@@ -71,7 +71,7 @@ csQuadtree::~csQuadtree ()
   CHK (delete root);
 }
 
-bool BoxEntirelyInPolygon (csVector2* verts, int num_verts, const csBox& bbox)
+bool BoxEntirelyInPolygon (csVector2* verts, int num_verts, const csBox2& bbox)
 {
   return (csPoly2D::In (verts, num_verts, bbox.GetCorner (0)) &&
           csPoly2D::In (verts, num_verts, bbox.GetCorner (1)) &&
@@ -81,7 +81,7 @@ bool BoxEntirelyInPolygon (csVector2* verts, int num_verts, const csBox& bbox)
 
 bool csQuadtree::InsertPolygon (csQuadtreeNode* node,
 	csVector2* verts, int num_verts,
-	const csBox& cur_bbox, const csBox& pol_bbox)
+	const csBox2& cur_bbox, const csBox2& pol_bbox)
 {
   // If node is completely full already then nothing can happen.
   if (node->GetState () == CS_QUAD_FULL) return false;
@@ -105,7 +105,7 @@ bool csQuadtree::InsertPolygon (csQuadtreeNode* node,
     children[3].SetState (CS_QUAD_EMPTY);
   }
 
-  csBox childbox;
+  csBox2 childbox;
   const csVector2& center = node->GetCenter ();
   bool vis, rc1, rc2, rc3, rc4;
   csVector2 v;
@@ -147,7 +147,7 @@ bool csQuadtree::InsertPolygon (csQuadtreeNode* node,
     else if (pol_bbox.MaxX () <= center.x && pol_bbox.MinX () >= cur_bbox.MinX ()) vis = true;
     else if (pol_bbox.MaxY () <= center.y && pol_bbox.MinY () >= cur_bbox.MinY ()) vis = true;
     // Most general case: just do the intersection test for the area and the polygon.
-    else vis = csBox::Intersect (cur_bbox.Min (), center, verts, num_verts);
+    else vis = csBox2::Intersect (cur_bbox.Min (), center, verts, num_verts);
 
     if (vis)
     {
@@ -177,7 +177,7 @@ bool csQuadtree::InsertPolygon (csQuadtreeNode* node,
     else if (pol_bbox.MinX () >= center.x && pol_bbox.MaxY () <= center.y) vis = true;
     else if (pol_bbox.MinX () >= center.x && pol_bbox.MaxX () <= cur_bbox.MaxX ()) vis = true;
     else if (pol_bbox.MaxY () <= center.y && pol_bbox.MinY () >= cur_bbox.MinY ()) vis = true;
-    else vis = csBox::Intersect (center.x, cur_bbox.MinY (), cur_bbox.MaxX (), center.y, verts, num_verts);
+    else vis = csBox2::Intersect (center.x, cur_bbox.MinY (), cur_bbox.MaxX (), center.y, verts, num_verts);
 
     if (vis)
     {
@@ -205,7 +205,7 @@ bool csQuadtree::InsertPolygon (csQuadtreeNode* node,
     else if (pol_bbox.MinX () >= center.x && pol_bbox.MinY () >= center.y) vis = true;
     else if (pol_bbox.MinX () >= center.x && pol_bbox.MaxX () <= cur_bbox.MaxX ()) vis = true;
     else if (pol_bbox.MinY () >= center.y && pol_bbox.MaxY () <= cur_bbox.MaxY ()) vis = true;
-    else vis = csBox::Intersect (center, cur_bbox.Max (), verts, num_verts);
+    else vis = csBox2::Intersect (center, cur_bbox.Max (), verts, num_verts);
 
     if (vis)
     {
@@ -231,7 +231,7 @@ bool csQuadtree::InsertPolygon (csQuadtreeNode* node,
     else if (pol_bbox.MaxX () <= center.x && pol_bbox.MinY () >= center.y) vis = true;
     else if (pol_bbox.MaxX () <= center.x && pol_bbox.MinX () >= cur_bbox.MinX ()) vis = true;
     else if (pol_bbox.MinY () >= center.y && pol_bbox.MaxY () <= cur_bbox.MaxY ()) vis = true;
-    else vis = csBox::Intersect (cur_bbox.MinX (), center.y, center.x, cur_bbox.MaxY (), verts, num_verts);
+    else vis = csBox2::Intersect (cur_bbox.MinX (), center.y, center.x, cur_bbox.MaxY (), verts, num_verts);
 
     if (vis)
     {
@@ -267,7 +267,7 @@ bool csQuadtree::InsertPolygon (csQuadtreeNode* node,
   return false;
 }
 
-bool csQuadtree::InsertPolygon (csVector2* verts, int num_verts, const csBox& pol_bbox)
+bool csQuadtree::InsertPolygon (csVector2* verts, int num_verts, const csBox2& pol_bbox)
 {
   // If root is already full then there is nothing that can happen further.
   if (root->GetState () == CS_QUAD_FULL) return false;
@@ -295,7 +295,7 @@ bool csQuadtree::InsertPolygon (csVector2* verts, int num_verts, const csBox& po
 
 bool csQuadtree::TestPolygon (csQuadtreeNode* node,
 	csVector2* verts, int num_verts,
-	const csBox& cur_bbox, const csBox& pol_bbox)
+	const csBox2& cur_bbox, const csBox2& pol_bbox)
 {
   // If node is completely full already then nothing can happen.
   if (node->GetState () == CS_QUAD_FULL) return false;
@@ -307,7 +307,7 @@ bool csQuadtree::TestPolygon (csQuadtreeNode* node,
   // This is an optimization which is not entirely correct@@@
   if (!children) return false;
 
-  csBox childbox;
+  csBox2 childbox;
   const csVector2& center = node->GetCenter ();
   bool vis;
   csVector2 v;
@@ -348,7 +348,7 @@ bool csQuadtree::TestPolygon (csQuadtreeNode* node,
     else if (pol_bbox.MaxX () <= center.x && pol_bbox.MinX () >= cur_bbox.MinX ()) vis = true;
     else if (pol_bbox.MaxY () <= center.y && pol_bbox.MinY () >= cur_bbox.MinY ()) vis = true;
     // Most general case: just do the intersection test for the area and the polygon.
-    else vis = csBox::Intersect (cur_bbox.Min (), center, verts, num_verts);
+    else vis = csBox2::Intersect (cur_bbox.Min (), center, verts, num_verts);
 
     if (vis)
     {
@@ -378,7 +378,7 @@ bool csQuadtree::TestPolygon (csQuadtreeNode* node,
     else if (pol_bbox.MinX () >= center.x && pol_bbox.MaxY () <= center.y) vis = true;
     else if (pol_bbox.MinX () >= center.x && pol_bbox.MaxX () <= cur_bbox.MaxX ()) vis = true;
     else if (pol_bbox.MaxY () <= center.y && pol_bbox.MinY () >= cur_bbox.MinY ()) vis = true;
-    else vis = csBox::Intersect (center.x, cur_bbox.MinY (), cur_bbox.MaxX (), center.y, verts, num_verts);
+    else vis = csBox2::Intersect (center.x, cur_bbox.MinY (), cur_bbox.MaxX (), center.y, verts, num_verts);
 
     if (vis)
     {
@@ -405,7 +405,7 @@ bool csQuadtree::TestPolygon (csQuadtreeNode* node,
     else if (pol_bbox.MinX () >= center.x && pol_bbox.MinY () >= center.y) vis = true;
     else if (pol_bbox.MinX () >= center.x && pol_bbox.MaxX () <= cur_bbox.MaxX ()) vis = true;
     else if (pol_bbox.MinY () >= center.y && pol_bbox.MaxY () <= cur_bbox.MaxY ()) vis = true;
-    else vis = csBox::Intersect (center, cur_bbox.Max (), verts, num_verts);
+    else vis = csBox2::Intersect (center, cur_bbox.Max (), verts, num_verts);
 
     if (vis)
     {
@@ -430,7 +430,7 @@ bool csQuadtree::TestPolygon (csQuadtreeNode* node,
     else if (pol_bbox.MaxX () <= center.x && pol_bbox.MinY () >= center.y) vis = true;
     else if (pol_bbox.MaxX () <= center.x && pol_bbox.MinX () >= cur_bbox.MinX ()) vis = true;
     else if (pol_bbox.MinY () >= center.y && pol_bbox.MaxY () <= cur_bbox.MaxY ()) vis = true;
-    else vis = csBox::Intersect (cur_bbox.MinX (), center.y, center.x, cur_bbox.MaxY (), verts, num_verts);
+    else vis = csBox2::Intersect (cur_bbox.MinX (), center.y, center.x, cur_bbox.MaxY (), verts, num_verts);
 
     if (vis)
     {
@@ -451,7 +451,7 @@ bool csQuadtree::TestPolygon (csQuadtreeNode* node,
   return false;
 }
 
-bool csQuadtree::TestPolygon (csVector2* verts, int num_verts, const csBox& pol_bbox)
+bool csQuadtree::TestPolygon (csVector2* verts, int num_verts, const csBox2& pol_bbox)
 {
   // If root is already full then there is nothing that can happen further.
   if (root->GetState () == CS_QUAD_FULL) return false;

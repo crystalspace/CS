@@ -46,7 +46,7 @@ private:
   int orig_width, orig_height;
 
   // Clipping rectangle.
-  csBox *bview;
+  csBox2 *bview;
   // Clipping region.
   csPolygon2D *view;
 

@@ -441,7 +441,7 @@ void csPolygonSet::DrawPolygonArray (csPolygonInt** polygon, int num,
     p = (csPolygon3D*)polygon[i];
     if (p->dont_draw) continue;
     p->CamUpdate ();
-    if (p->ClipToPlane (d->do_clip_plane ? &d->clip_plane : (csPlane*)NULL,
+    if (p->ClipToPlane (d->do_clip_plane ? &d->clip_plane : (csPlane3*)NULL,
 	 	d->GetOrigin (), verts, num_verts)) //@@@Use pool for verts?
     {
       if (!d->UseFarPlane() || d->GetFarPlane()->ClipPolygon (verts, num_verts))
@@ -498,7 +498,7 @@ void* csPolygonSet::TestQueuePolygonArray (csPolygonInt** polygon, int num,
         // Then test against the c-buffer to see if it is visible.
         clip = (csPolygon2D*)(render_pool->Alloc ());
         if ( bsppol->ClipToPlane (d->do_clip_plane ? &d->clip_plane :
-		(csPlane*)NULL, d->GetOrigin (), verts, num_verts) &&
+		(csPlane3*)NULL, d->GetOrigin (), verts, num_verts) &&
              bsppol->DoPerspective (*d, verts, num_verts, clip,
 	 	d->IsMirrored ()) &&
              clip->ClipAgainst (d->view) )
@@ -538,7 +538,7 @@ void* csPolygonSet::TestQueuePolygonArray (csPolygonInt** polygon, int num,
       clip = (csPolygon2D*)(render_pool->Alloc ());
       visible = false;
       if ( !p->dont_draw &&
-           p->ClipToPlane (d->do_clip_plane ? &d->clip_plane : (csPlane*)NULL,
+           p->ClipToPlane (d->do_clip_plane ? &d->clip_plane : (csPlane3*)NULL,
 	 	  d->GetOrigin (), verts, num_verts) &&
            p->DoPerspective (*d, verts, num_verts, clip, NULL,
 	 	  d->IsMirrored ())  &&
@@ -630,7 +630,7 @@ csFrustrumList* csPolygonSet::GetShadows (csSector* sector, csVector3& origin)
     frust->sector = sector;
     frust->draw_busy = sector->draw_busy;
     list->AddFirst (frust);
-    csPlane pl = p->GetPlane ()->GetWorldPlane ();
+    csPlane3 pl = p->GetPlane ()->GetWorldPlane ();
     pl.DD += origin * pl.norm;
     pl.Invert ();
     frust->SetBackPlane (pl);

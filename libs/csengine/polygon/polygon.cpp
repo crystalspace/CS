@@ -356,7 +356,7 @@ void csPolygon3D::SetPortal (csPortal* prt)
 }
 
 void csPolygon3D::SplitWithPlane (csPolygonInt** poly1, csPolygonInt** poly2,
-				  const csPlane& plane)
+				  const csPlane3& plane)
 {
   CHK (csPolygon3D* np1 = new csPolygon3D (*this));
   CHK (csPolygon3D* np2 = new csPolygon3D (*this));
@@ -435,8 +435,8 @@ bool csPolygon3D::Covers (csPolygonInt* covered)
   // there is a vertex of this polygon that is in front of the 'totest'
   // polygon. If that is the case then we return true.
 
-  csPlane& this_plane = plane->GetWorldPlane ();
-  csPlane& test_plane = totest->plane->GetWorldPlane ();
+  csPlane3& this_plane = plane->GetWorldPlane ();
+  csPlane3& test_plane = totest->plane->GetWorldPlane ();
   int i;
   for (i = 0 ; i < totest->vertices.GetNumVertices () ; i++)
   {
@@ -477,7 +477,7 @@ bool csPolygon3D::IsTransparent ()
   return GetTextureHandle ()->GetTransparent ();
 }
 
-int csPolygon3D::Classify (const csPlane& pl)
+int csPolygon3D::Classify (const csPlane3& pl)
 {
   if (GetPolyPlane () == &pl) return POL_SAME_PLANE;
   if (csMath3::PlanesEqual (pl, *GetPolyPlane ())) return POL_SAME_PLANE;
@@ -957,7 +957,7 @@ bool csPolygon3D::ClipFrustrum (csVector3& center, csVector3* frustrum,
   return ClipPoly (frustrum, num_frustrum, mirror, new_frustrum, new_num_frustrum);
 }
 
-bool csPolygon3D::ClipToPlane (csPlane* portal_plane, const csVector3& v_w2c,
+bool csPolygon3D::ClipToPlane (csPlane3* portal_plane, const csVector3& v_w2c,
 	csVector3*& pverts, int& num_verts, bool cw)
 {
   int i, i1;
@@ -1310,7 +1310,7 @@ bool csPolygon3D::IntersectRay (const csVector3& start, const csVector3& end)
 {
   // First we do backface culling on the polygon with respect to
   // the starting point of the beam.
-  csPlane& pl = plane->GetWorldPlane ();
+  csPlane3& pl = plane->GetWorldPlane ();
   float dot1 = pl.D () + pl.A ()*start.x + pl.B ()*start.y + pl.C ()*start.z;
   if (dot1 > 0) return false;
 
@@ -1478,7 +1478,7 @@ void csPolygon3D::FillLightMap (csLightView& lview)
 }
 
 bool csPolygon3D::MarkRelevantShadowFrustrums (csLightView& lview,
-	csPlane& plane)
+	csPlane3& plane)
 {
   // @@@ Currently this function only checks if a shadow frustrum is inside
   // the light frustrum. There is no checking done if shadow frustrums obscure
@@ -1593,7 +1593,7 @@ void csPolygon3D::CalculateLighting (csLightView* lview)
       csLightMapped* lmi = GetLightMapInfo ();
       if (po || new_lview.dynamic || (lmi && !lmi->lightmap_up_to_date))
       {
-        csPlane poly_plane = *GetPolyPlane ();
+        csPlane3 poly_plane = *GetPolyPlane ();
         // First translate plane to center of frustrum.
         poly_plane.DD += poly_plane.norm * center;
         poly_plane.Invert ();

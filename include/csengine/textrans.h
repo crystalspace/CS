@@ -19,7 +19,7 @@
 #ifndef TEXTRANS_H
 #define TEXTRANS_H
 
-#include "csgeom/math3d.h"
+#include "csgeom/matrix3.h"
 
 /**
  * This is a static class which encapsulates a few functions

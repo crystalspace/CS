@@ -49,7 +49,7 @@ void csBspPolygon::Dump ()
   }
 }
 
-int csBspPolygon::Classify (const csPlane& pl)
+int csBspPolygon::Classify (const csPlane3& pl)
 {
   if (GetPolyPlane () == &pl) return POL_SAME_PLANE;
   if (csMath3::PlanesEqual (pl, *GetPolyPlane ())) return POL_SAME_PLANE;
@@ -123,7 +123,7 @@ int csBspPolygon::ClassifyZ (float z)
 
 
 void csBspPolygon::SplitWithPlane (csPolygonInt** poly1, csPolygonInt** poly2,
-				  const csPlane& split_plane)
+				  const csPlane3& split_plane)
 {
   csBspPolygon* np1 = (csBspPolygon*)poly_pool.Alloc ();
   csBspPolygon* np2 = (csBspPolygon*)poly_pool.Alloc ();
@@ -423,7 +423,7 @@ void csBspPolygon::Transform (const csTransform& trans)
   plane.Normalize ();
 }
 
-bool csBspPolygon::ClipToPlane (csPlane* portal_plane, const csVector3& v_w2c,
+bool csBspPolygon::ClipToPlane (csPlane3* portal_plane, const csVector3& v_w2c,
 	csVector3*& pverts, int& num_verts, bool cw)
 {
   int i, i1, cnt_vis;
@@ -599,7 +599,7 @@ bool csBspPolygon::DoPerspective (const csTransform& trans,
      if (ABS(ex) < SMALL_EPSILON && ABS(ey) < SMALL_EPSILON)
      {
       // Uncommon special case:  polygon passes through origin.
-      csPlane cam_plane = trans.Other2This (plane);
+      csPlane3 cam_plane = trans.Other2This (plane);
       ex = cam_plane.A();
       ey = cam_plane.B();
       if (ABS(ex) < SMALL_EPSILON && ABS(ey) < SMALL_EPSILON)
@@ -641,7 +641,7 @@ bool csBspPolygon::DoPerspective (const csTransform& trans,
      if (ABS(rx) < SMALL_EPSILON && ABS(ry) < SMALL_EPSILON)
      {
       // Uncommon special case:  polygon passes through origin.
-      csPlane cam_plane = trans.Other2This (plane);
+      csPlane3 cam_plane = trans.Other2This (plane);
       rx = cam_plane.A();
       ry = cam_plane.B();
       if (ABS(rx) < SMALL_EPSILON && ABS(ry) < SMALL_EPSILON)

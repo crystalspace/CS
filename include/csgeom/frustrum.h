@@ -43,7 +43,7 @@ private:
   int num_vertices;
   int max_vertices;
 
-  csPlane* backplane;
+  csPlane3* backplane;
 
   /**
    * If true we have a total wide frustrum. A frustrum like
@@ -74,7 +74,7 @@ public:
    * The polygon is given relative to the origin 'o'.
    * If the given polygon is NULL then we create an empty frustrum.
    */
-  csFrustrum (csVector3& o, csVector3* verts, int num_verts, csPlane* backp = NULL);
+  csFrustrum (csVector3& o, csVector3* verts, int num_verts, csPlane3* backp = NULL);
 
   /// Copy constructor.
   csFrustrum (const csFrustrum &copy);
@@ -104,12 +104,12 @@ public:
    * be reused/freed later. The plane should be specified relative
    * to the origin point.
    */
-  void SetBackPlane (csPlane& plane);
+  void SetBackPlane (csPlane3& plane);
 
   /**
    * Get the back plane.
    */
-  csPlane* GetBackPlane () { return backplane; }
+  csPlane3* GetBackPlane () { return backplane; }
 
   /**
    * Remove the back plane of this frustrum.
@@ -154,7 +154,7 @@ public:
    * Note that this clips the polygon which forms the frustrum. It does
    * not clip the frustrum itself.
    */
-  void ClipPolyToPlane (csPlane* plane);
+  void ClipPolyToPlane (csPlane3* plane);
 
   /**
    * Intersect with another frustrum. The other frustrum
@@ -224,7 +224,7 @@ public:
    * checks if point is in front of given plane.
    */
   static bool Contains (csVector3* frustrum, int num_frust,
-  	const csPlane& plane, const csVector3& point);
+  	const csPlane3& plane, const csVector3& point);
 
   /// Return true if frustrum is empty.
   bool IsEmpty () const { return !wide && vertices == NULL; }

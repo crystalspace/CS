@@ -62,7 +62,7 @@ private:
   bool polygons_on_splitter;
 
   /// The splitter plane.
-  csPlane splitter;
+  csPlane3 splitter;
 
   /// The front node.
   csBspNode* front;

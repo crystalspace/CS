@@ -71,7 +71,7 @@ public:
   /**
    * Return the plane of this polygon.
    */
-  virtual csPlane* GetPolyPlane () = 0;
+  virtual csPlane3* GetPolyPlane () = 0;
 
   /**
    * Classify this polygon with regards to a plane (in world space). If this poly
@@ -80,28 +80,28 @@ public:
    * is completely back of the given plane it returnes POL_BACK. Otherwise it
    * returns POL_SPLIT_NEEDED.
    */
-  virtual int Classify (const csPlane& pl) = 0;
+  virtual int Classify (const csPlane3& pl) = 0;
 
   /**
    * Classify to X plane. The default implementation just calls Classify()
    * above with a constructed plane but this function can be overridden
    * for more efficiency.
    */
-  virtual int ClassifyX (float x) { return Classify (csPlane (1, 0, 0, -x)); }
+  virtual int ClassifyX (float x) { return Classify (csPlane3 (1, 0, 0, -x)); }
 
   /**
    * Classify to Y plane. The default implementation just calls Classify()
    * above with a constructed plane but this function can be overridden
    * for more efficiency.
    */
-  virtual int ClassifyY (float y) { return Classify (csPlane (0, 1, 0, -y)); }
+  virtual int ClassifyY (float y) { return Classify (csPlane3 (0, 1, 0, -y)); }
 
   /**
    * Classify to Z plane. The default implementation just calls Classify()
    * above with a constructed plane but this function can be overridden
    * for more efficiency.
    */
-  virtual int ClassifyZ (float z) { return Classify (csPlane (0, 0, 1, -z)); }
+  virtual int ClassifyZ (float z) { return Classify (csPlane3 (0, 0, 1, -z)); }
 
   /**
    * Split this polygon with the given plane (A,B,C,D) and return the
@@ -111,7 +111,7 @@ public:
    * and 'back' the positive side.
    */
   virtual void SplitWithPlane (csPolygonInt** front, csPolygonInt** back,
-  	const csPlane& plane) = 0;
+  	const csPlane3& plane) = 0;
 
   /**
    * Split this polygon with the X plane. Default implementation just
@@ -121,7 +121,7 @@ public:
   virtual void SplitWithPlaneX (csPolygonInt** front, csPolygonInt** back,
   	float x)
   {
-    SplitWithPlane (front, back, csPlane (1, 0, 0, -x));
+    SplitWithPlane (front, back, csPlane3 (1, 0, 0, -x));
   }
 
   /**
@@ -132,7 +132,7 @@ public:
   virtual void SplitWithPlaneY (csPolygonInt** front, csPolygonInt** back,
   	float y)
   {
-    SplitWithPlane (front, back, csPlane (0, 1, 0, -y));
+    SplitWithPlane (front, back, csPlane3 (0, 1, 0, -y));
   }
 
   /**
@@ -143,7 +143,7 @@ public:
   virtual void SplitWithPlaneZ (csPolygonInt** front, csPolygonInt** back,
   	float z)
   {
-    SplitWithPlane (front, back, csPlane (0, 0, 1, -z));
+    SplitWithPlane (front, back, csPlane3 (0, 0, 1, -z));
   }
 
   /**

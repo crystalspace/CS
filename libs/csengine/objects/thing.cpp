@@ -407,7 +407,7 @@ void csThing::DrawFoggy (csRenderView& d)
       bool front = p->GetPlane ()->VisibleFromPoint (d.GetOrigin ());
 
       if (!front &&
-        p->ClipToPlane (d.do_clip_plane ? &d.clip_plane : (csPlane*)NULL, d.GetOrigin (),
+        p->ClipToPlane (d.do_clip_plane ? &d.clip_plane : (csPlane3*)NULL, d.GetOrigin (),
               verts, num_verts, false) &&
         p->DoPerspective (d, verts, num_verts, clip, orig_triangle, d.IsMirrored ()) &&
         clip->ClipAgainst (d.view))
@@ -436,7 +436,7 @@ void csThing::DrawFoggy (csRenderView& d)
       bool front = p->GetPlane ()->VisibleFromPoint (d.GetOrigin ());
 
       if (front &&
-        p->ClipToPlane (d.do_clip_plane ? &d.clip_plane : (csPlane*)NULL,
+        p->ClipToPlane (d.do_clip_plane ? &d.clip_plane : (csPlane3*)NULL,
 		d.GetOrigin (), verts, num_verts, true) &&
         p->DoPerspective (d, verts, num_verts, clip, orig_triangle,
 		d.IsMirrored ()) &&

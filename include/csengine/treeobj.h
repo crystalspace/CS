@@ -207,7 +207,7 @@ public:
   void SplitWithPlane (csPolygonStub* stub,
   	csPolygonStub** stub_on, csPolygonStub** stub_front,
 	csPolygonStub** stub_back,
-	const csPlane& plane);
+	const csPlane3& plane);
 
   /**
    * Split the given stub with an X plane.

@@ -118,7 +118,7 @@ csCBufferCube::csCBufferCube (int dim)
   CHK (trees[3] = new csCBufferPersp (0, dim-1, dim));
   CHK (trees[4] = new csCBufferPersp (0, dim-1, dim));
   CHK (trees[5] = new csCBufferPersp (0, dim-1, dim));
-  csBox b (0, 0, dim, dim);
+  csBox2 b (0, 0, dim, dim);
   CHK (clipper = new csBoxClipper (b));
 }
 

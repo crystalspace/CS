@@ -180,7 +180,7 @@ void csWfPolygon::Prepare ()
 
 bool csWfPolygon::IsVisible (csCamera* camera)
 {
-  return csPlane::Classify (A, B, C, D, camera->GetOrigin ()) < 0;
+  return csPlane3::Classify (A, B, C, D, camera->GetOrigin ()) < 0;
 }
 
 void csWfPolygon::Draw (iGraphics3D* g, csCamera* c)

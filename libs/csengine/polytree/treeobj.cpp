@@ -62,7 +62,7 @@ void csPolyTreeObject::LinkStub (csPolygonStub* ps)
 void csPolyTreeObject::SplitWithPlane (csPolygonStub* stub,
   	csPolygonStub** p_stub_on, csPolygonStub** p_stub_front,
 	csPolygonStub** p_stub_back,
-	const csPlane& plane)
+	const csPlane3& plane)
 {
   csPolygonStub* stub_on, * stub_front, * stub_back;
   stub_front = stub_pool.Alloc ();

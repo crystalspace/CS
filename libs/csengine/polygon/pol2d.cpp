@@ -474,14 +474,14 @@ void CalculateFogPolygon (csRenderView* rview, G3DPolygonDP& poly)
       float dist1, dist2;
       if (fog_info->has_incoming_plane)
       {
-	const csPlane& pl = fog_info->incoming_plane;
+	const csPlane3& pl = fog_info->incoming_plane;
 	float denom = pl.norm.x*v.x + pl.norm.y*v.y + pl.norm.z*v.z;
 	//dist1 = v.Norm () * (-pl.DD / denom);
 	dist1 = v.z * (-pl.DD / denom);
       }
       else
         dist1 = 0;
-      const csPlane& pl = fog_info->outgoing_plane;
+      const csPlane3& pl = fog_info->outgoing_plane;
       float denom = pl.norm.x*v.x + pl.norm.y*v.y + pl.norm.z*v.z;
       //dist2 = v.Norm () * (-pl.DD / denom);
       dist2 = v.z * (-pl.DD / denom);
@@ -565,7 +565,7 @@ void CalculateFogPolygon (csRenderView* rview, G3DPolygonDPFX& poly)
       float dist1, dist2;
       if (fog_info->has_incoming_plane)
       {
-	const csPlane& pl = fog_info->incoming_plane;
+	const csPlane3& pl = fog_info->incoming_plane;
 	float denom = pl.norm.x*v.x + pl.norm.y*v.y + pl.norm.z*v.z;
 	//dist1 = v.Norm () * (-pl.DD / denom);
         dist1 = v.z * (-pl.DD / denom);
@@ -575,7 +575,7 @@ void CalculateFogPolygon (csRenderView* rview, G3DPolygonDPFX& poly)
       //@@@ assume all FX polygons have no outgoing plane
       if (!rview->added_fog_info)
       {
-        const csPlane& pl = fog_info->outgoing_plane;
+        const csPlane3& pl = fog_info->outgoing_plane;
         float denom = pl.norm.x*v.x + pl.norm.y*v.y + pl.norm.z*v.z;
         //dist2 = v.Norm () * (-pl.DD / denom);
         dist2 = v.z * (-pl.DD / denom);
@@ -675,7 +675,7 @@ void CalculateFogMesh (csRenderView* rview, csTransform* tr_o2c,
       float dist1, dist2;
       if (fog_info->has_incoming_plane)
       {
-	const csPlane& pl = fog_info->incoming_plane;
+	const csPlane3& pl = fog_info->incoming_plane;
 	float denom = pl.norm.x*v.x + pl.norm.y*v.y + pl.norm.z*v.z;
 	//dist1 = v.Norm () * (-pl.DD / denom);
         dist1 = v.z * (-pl.DD / denom);
@@ -685,7 +685,7 @@ void CalculateFogMesh (csRenderView* rview, csTransform* tr_o2c,
       //@@@ assume all FX polygons have no outgoing plane
       if (!rview->added_fog_info)
       {
-        const csPlane& pl = fog_info->outgoing_plane;
+        const csPlane3& pl = fog_info->outgoing_plane;
         float denom = pl.norm.x*v.x + pl.norm.y*v.y + pl.norm.z*v.z;
         //dist2 = v.Norm () * (-pl.DD / denom);
         dist2 = v.z * (-pl.DD / denom);

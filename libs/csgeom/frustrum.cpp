@@ -29,7 +29,8 @@ void csFrustrum::Clear ()
   mirrored = false;
 }
 
-csFrustrum::csFrustrum (csVector3& o, csVector3* verts, int num_verts, csPlane* backp)
+csFrustrum::csFrustrum (csVector3& o, csVector3* verts, int num_verts,
+	csPlane3* backp)
 {
   origin = o;
   num_vertices = num_verts;
@@ -45,7 +46,7 @@ csFrustrum::csFrustrum (csVector3& o, csVector3* verts, int num_verts, csPlane* 
 
   if (backp)
   {
-    CHK (backplane = new csPlane (*backp));
+    CHK (backplane = new csPlane3 (*backp));
   }
   else backplane = NULL;
 }
@@ -66,15 +67,15 @@ csFrustrum::csFrustrum (const csFrustrum &copy)
 
   if (copy.backplane)
   {
-    CHK (backplane = new csPlane (*copy.backplane));
+    CHK (backplane = new csPlane3 (*copy.backplane));
   }
   else backplane = NULL;
 }
 
-void csFrustrum::SetBackPlane (csPlane& plane)
+void csFrustrum::SetBackPlane (csPlane3& plane)
 {
   CHK (delete backplane);
-  CHK (backplane = new csPlane (plane));
+  CHK (backplane = new csPlane3 (plane));
 }
 
 void csFrustrum::RemoveBackPlane ()
@@ -122,7 +123,7 @@ void csFrustrum::Transform (csTransform* trans)
   if (backplane) (*backplane) *= (*trans);
 }
 
-void csFrustrum::ClipPolyToPlane (csPlane* plane)
+void csFrustrum::ClipPolyToPlane (csPlane3* plane)
 {
   // First classify all vertices of the current polygon with regards to this
   // plane.
@@ -348,7 +349,7 @@ bool csFrustrum::Contains (csVector3* frustrum, int num_frust, const csVector3& 
 }
 
 bool csFrustrum::Contains (csVector3* frustrum, int num_frust,
-	const csPlane& plane, const csVector3& point)
+	const csPlane3& plane, const csVector3& point)
 {
   if (!csMath3::Visible (point, plane)) return false;
   int i, i1;

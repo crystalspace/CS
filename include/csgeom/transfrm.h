@@ -20,7 +20,8 @@
 #ifndef TRANSFORM_H
 #define TRANSFORM_H
 
-#include "csgeom/math3d.h"
+#include "csgeom/matrix3.h"
+#include "csgeom/plane3.h"
 
 class csReversibleTransform;
 
@@ -116,14 +117,14 @@ public:
   /**
    * Convert a plane in 'other' space to 'this' space.
    */
-  csPlane Other2This (const csPlane& p) const;
+  csPlane3 Other2This (const csPlane3& p) const;
 
   /**
    * Convert a plane in 'other' space to 'this' space. This is an optimized version
    * for which a point on the new plane is known (point). The result
    * is stored in 'result'.
    */
-  void Other2This (const csPlane& p, const csVector3& point, csPlane& result) const;
+  void Other2This (const csPlane3& p, const csVector3& point, csPlane3& result) const;
 
   /**
    * Apply a transformation to a 3D vector.
@@ -135,11 +136,11 @@ public:
   /// Apply a transformation to a 3D vector.
   friend csVector3& operator*= (csVector3& v, const csTransform& t);
   /// Apply a transformation to a Plane.
-  friend csPlane operator* (const csPlane& p, const csTransform& t);
+  friend csPlane3 operator* (const csPlane3& p, const csTransform& t);
   /// Apply a transformation to a Plane.
-  friend csPlane operator* (const csTransform& t, const csPlane& p);
+  friend csPlane3 operator* (const csTransform& t, const csPlane3& p);
   /// Apply a transformation to a Plane.
-  friend csPlane& operator*= (csPlane& p, const csTransform& t);
+  friend csPlane3& operator*= (csPlane3& p, const csTransform& t);
   /// Multiply a matrix with the transformation matrix.
   friend csMatrix3 operator* (const csMatrix3& m, const csTransform& t);
   /// Multiply a matrix with the transformation matrix.
@@ -155,7 +156,7 @@ public:
    * This function will return a csTransform which represents a reflection
    * across the plane pl.
    */
-  static csTransform GetReflect (const csPlane& pl);
+  static csTransform GetReflect (const csPlane3& pl);
 };
 
 /**
@@ -244,23 +245,23 @@ public:
   /**
    * Convert a plane in 'this' space to 'other' space.
    */
-  csPlane This2Other (const csPlane& p) const;
+  csPlane3 This2Other (const csPlane3& p) const;
 
   /**
    * Convert a plane in 'this' space to 'other' space. This is an optimized version
    * for which a point on the new plane is known (point). The result
    * is stored in 'result'.
    */
-  void This2Other (const csPlane& p, const csVector3& point, csPlane& result) const;
+  void This2Other (const csPlane3& p, const csVector3& point, csPlane3& result) const;
 
   /// Reverse a transformation on a 3D vector.
   friend csVector3 operator/ (const csVector3& v, const csReversibleTransform& t); 
   /// Reverse a transformation on a 3D vector.
   friend csVector3& operator/= (csVector3& v, const csReversibleTransform& t); 
   /// Reverse a transformation on a Plane.
-  friend csPlane operator/ (const csPlane& p, const csReversibleTransform& t);
+  friend csPlane3 operator/ (const csPlane3& p, const csReversibleTransform& t);
   /// Reverse a transformation on a Plane.
-  friend csPlane& operator/= (csPlane& p, const csReversibleTransform& t);
+  friend csPlane3& operator/= (csPlane3& p, const csReversibleTransform& t);
   /// Combine two transforms, with the rightmost being applied first.
   friend csReversibleTransform& operator*= (csReversibleTransform& t1,
                                           const csReversibleTransform& t2);

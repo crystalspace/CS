@@ -23,7 +23,7 @@
 
 //---------------------------------------------------------------------------
 
-csTransform csTransform::GetReflect (const csPlane& pl)
+csTransform csTransform::GetReflect (const csPlane3& pl)
 {
   // Suppose that n is the plane normal in the direction of th reflection.
   // Suppose that u is the unit vector in the direction of the reflection
@@ -52,7 +52,7 @@ csTransform csTransform::GetReflect (const csPlane& pl)
 
 //---------------------------------------------------------------------------
 
-csPlane csTransform::Other2This (const csPlane& p) const
+csPlane3 csTransform::Other2This (const csPlane3& p) const
 {
   csVector3 newnorm = m_o2t*p.norm;
 // let N represent norm <A,B,C>, and X represent point <x,y,z>
@@ -73,11 +73,11 @@ csPlane csTransform::Other2This (const csPlane& p) const
 // Since N' is a rotation of N, (N'*N') = (N*N), thus
 //  D' = D + N'*(M*V)
 //
-  return csPlane (newnorm, p.DD + newnorm * (m_o2t*v_o2t) );
+  return csPlane3 (newnorm, p.DD + newnorm * (m_o2t*v_o2t) );
 }
 
-void csTransform::Other2This (const csPlane& p, const csVector3& point,
-                           csPlane& result) const
+void csTransform::Other2This (const csPlane3& p, const csVector3& point,
+                           csPlane3& result) const
 {
   result.norm = m_o2t*p.norm;
   result.DD = - (result.norm * point);
@@ -92,13 +92,13 @@ csVector3 operator* (const csTransform& t, const csVector3& v)
 csVector3& operator*= (csVector3& v, const csTransform& t)
 { v = t.Other2This (v); return v; }
 
-csPlane operator* (const csPlane& p, const csTransform& t)
+csPlane3 operator* (const csPlane3& p, const csTransform& t)
 { return t.Other2This (p); }
 
-csPlane operator* (const csTransform& t, const csPlane& p)
+csPlane3 operator* (const csTransform& t, const csPlane3& p)
 { return t.Other2This (p); }
 
-csPlane& operator*= (csPlane& p, const csTransform& t)
+csPlane3& operator*= (csPlane3& p, const csTransform& t)
 {
   p.norm = t.m_o2t * p.norm;
   p.DD += p.norm * (t.m_o2t*t.v_o2t);
@@ -116,14 +116,14 @@ csMatrix3& operator*= (csMatrix3& m, const csTransform& t)
 
 //---------------------------------------------------------------------------
 
-csPlane csReversibleTransform::This2Other (const csPlane& p) const
+csPlane3 csReversibleTransform::This2Other (const csPlane3& p) const
 {
   csVector3 newnorm = m_t2o * p.norm;
-  return csPlane (newnorm, p.DD - p.norm * (m_o2t*v_o2t) );
+  return csPlane3 (newnorm, p.DD - p.norm * (m_o2t*v_o2t) );
 }
 
-void csReversibleTransform::This2Other (const csPlane& p, const csVector3& point,
-                           csPlane& result) const
+void csReversibleTransform::This2Other (const csPlane3& p, const csVector3& point,
+                           csPlane3& result) const
 {
   result.norm = m_t2o*p.norm;
   result.DD = - (result.norm * point);
@@ -135,10 +135,10 @@ csVector3 operator/ (const csVector3& v, const csReversibleTransform& t)
 csVector3& operator/= (csVector3& v, const csReversibleTransform& t) 
 { v = t.This2Other (v); return v; }
 
-csPlane operator/ (const csPlane& p, const csReversibleTransform& t)
+csPlane3 operator/ (const csPlane3& p, const csReversibleTransform& t)
 { return t.This2Other (p); }
 
-csPlane& operator/= (csPlane& p, const csReversibleTransform& t)
+csPlane3& operator/= (csPlane3& p, const csReversibleTransform& t)
 {
   p.DD -= p.norm * (t.m_o2t*t.v_o2t);
   p.norm = t.m_t2o * p.norm;

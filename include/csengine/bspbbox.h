@@ -53,7 +53,7 @@ private:
   /// The 3D polygon.
   csPolyIndexed polygon;
   /// The plane.
-  csPlane plane;
+  csPlane3 plane;
   /// The parent.
   csPolyTreeBBox* parent;
   /// The original object for which this polygon is a bounding box polygon.
@@ -103,13 +103,13 @@ public:
   virtual csPolygonInt* GetUnsplitPolygon () { return NULL; }
 
   /// Set the plane for this polygon.
-  void SetPolyPlane (const csPlane& pl) { plane = pl; }
+  void SetPolyPlane (const csPlane3& pl) { plane = pl; }
 
   /// Return the plane of this polygon.
-  csPlane* GetPolyPlane () { return &plane; }
+  csPlane3* GetPolyPlane () { return &plane; }
 
   /// Classify a polygon with regards to this one.
-  int Classify (const csPlane& pl);
+  int Classify (const csPlane3& pl);
 
   /// Same as Classify() but for X plane only.
   int ClassifyX (float x);
@@ -122,7 +122,7 @@ public:
 
   /// Split this polygon with the given plane (A,B,C,D).
   void SplitWithPlane (csPolygonInt** front, csPolygonInt** back,
-  	const csPlane& split_plane);
+  	const csPlane3& split_plane);
 
   /// Split this polygon to the x-plane.
   void SplitWithPlaneX (csPolygonInt** front, csPolygonInt** back, float x);
@@ -145,7 +145,7 @@ public:
    * @@@ NOTE @@@ This function is almost identical to the one in
    * csPolygon3D. It should be possible to reuse that code.
    */
-  bool ClipToPlane (csPlane* portal_plane, const csVector3& v_w2c,
+  bool ClipToPlane (csPlane3* portal_plane, const csVector3& v_w2c,
 	csVector3*& pverts, int& num_verts, bool cw = true);
 
   /**

@@ -1007,7 +1007,7 @@ void csSprite3D::UpdatePolyTreeBBox ()
   poly->GetPolygon ().AddVertex (pt_XYz);
   poly->GetPolygon ().AddVertex (pt_Xyz);
   poly->GetPolygon ().AddVertex (pt_xyz);
-  poly->SetPolyPlane (csPlane (0, 0, 1, -b.MinZ ()));
+  poly->SetPolyPlane (csPlane3 (0, 0, 1, -b.MinZ ()));
   poly->Transform (trans);
 
   poly = (csBspPolygon*)csBspPolygon::poly_pool.Alloc ();
@@ -1017,7 +1017,7 @@ void csSprite3D::UpdatePolyTreeBBox ()
   poly->GetPolygon ().AddVertex (pt_XYZ);
   poly->GetPolygon ().AddVertex (pt_XyZ);
   poly->GetPolygon ().AddVertex (pt_Xyz);
-  poly->SetPolyPlane (csPlane (-1, 0, 0, b.MaxX ()));
+  poly->SetPolyPlane (csPlane3 (-1, 0, 0, b.MaxX ()));
   poly->Transform (trans);
 
   poly = (csBspPolygon*)csBspPolygon::poly_pool.Alloc ();
@@ -1027,7 +1027,7 @@ void csSprite3D::UpdatePolyTreeBBox ()
   poly->GetPolygon ().AddVertex (pt_xYZ);
   poly->GetPolygon ().AddVertex (pt_xyZ);
   poly->GetPolygon ().AddVertex (pt_XyZ);
-  poly->SetPolyPlane (csPlane (0, 0, -1, b.MaxZ ()));
+  poly->SetPolyPlane (csPlane3 (0, 0, -1, b.MaxZ ()));
   poly->Transform (trans);
 
   poly = (csBspPolygon*)csBspPolygon::poly_pool.Alloc ();
@@ -1037,7 +1037,7 @@ void csSprite3D::UpdatePolyTreeBBox ()
   poly->GetPolygon ().AddVertex (pt_xYz);
   poly->GetPolygon ().AddVertex (pt_xyz);
   poly->GetPolygon ().AddVertex (pt_xyZ);
-  poly->SetPolyPlane (csPlane (1, 0, 0, -b.MinX ()));
+  poly->SetPolyPlane (csPlane3 (1, 0, 0, -b.MinX ()));
   poly->Transform (trans);
 
   poly = (csBspPolygon*)csBspPolygon::poly_pool.Alloc ();
@@ -1047,7 +1047,7 @@ void csSprite3D::UpdatePolyTreeBBox ()
   poly->GetPolygon ().AddVertex (pt_XYZ);
   poly->GetPolygon ().AddVertex (pt_XYz);
   poly->GetPolygon ().AddVertex (pt_xYz);
-  poly->SetPolyPlane (csPlane (0, -1, 0, b.MaxY ()));
+  poly->SetPolyPlane (csPlane3 (0, -1, 0, b.MaxY ()));
   poly->Transform (trans);
 
   poly = (csBspPolygon*)csBspPolygon::poly_pool.Alloc ();
@@ -1057,7 +1057,7 @@ void csSprite3D::UpdatePolyTreeBBox ()
   poly->GetPolygon ().AddVertex (pt_Xyz);
   poly->GetPolygon ().AddVertex (pt_XyZ);
   poly->GetPolygon ().AddVertex (pt_xyZ);
-  poly->SetPolyPlane (csPlane (0, 1, 0, -b.MinY ()));
+  poly->SetPolyPlane (csPlane3 (0, 1, 0, -b.MinY ()));
   poly->Transform (trans);
 
   // Here we need to insert in trees where this sprite lives.
@@ -1120,7 +1120,7 @@ void csSprite3D::GetCameraBoundingBox (const csCamera& camtrans, csBox3& cbox)
   cbox = camera_bbox;
 }
 
-float csSprite3D::GetScreenBoundingBox (const csCamera& camtrans, csBox& boundingBox)
+float csSprite3D::GetScreenBoundingBox (const csCamera& camtrans, csBox2& boundingBox)
 {
   csVector2   oneCorner;
   csBox3      cbox;
@@ -1179,7 +1179,7 @@ void csSprite3D::Draw (csRenderView& rview)
   //	2. box is entirely visible -> sprite is visible and need not be clipped.
   //	3. box is partially visible -> sprite is visible and needs to be clipped
   //	   if rview has do_clip_plane set to true.
-  csBox bbox;
+  csBox2 bbox;
   if (GetScreenBoundingBox (rview, bbox) < 0) return;	// Not visible.
   //@@@ Debug output: this should be an optional feature for WalkTest.
   //{
@@ -1533,8 +1533,8 @@ void csSprite3D::UpdateLightingLQ (csLight** lights, int num_lights, csVector3* 
 
     csVector3 obj_light_pos = m_world2obj * (wor_light_pos + v_obj2world);
     float obj_sq_dist = csSquaredDist::PointPoint (obj_light_pos, obj_center);
-    float obj_dist = sqrt (obj_sq_dist);
-    float wor_dist = sqrt (wor_sq_dist);
+    float obj_dist = FastSqrt (obj_sq_dist);
+    float wor_dist = FastSqrt (wor_sq_dist);
 
     for (j = 0 ; j < tpl->GetNumTexels () ; j++)
     {
@@ -1600,9 +1600,9 @@ void csSprite3D::UpdateLightingHQ (csLight** lights, int num_lights, csVector3* 
       {
         color = light_color;
         if (obj_sq_dist >= SMALL_EPSILON)
-          cosinus /= sqrt (obj_sq_dist);
+          cosinus /= FastSqrt (obj_sq_dist);
         if (cosinus < 1)
-          color *= cosinus * lights[i]->GetBrightnessAtDistance (sqrt (wor_sq_dist));
+          color *= cosinus * lights[i]->GetBrightnessAtDistance (FastSqrt (wor_sq_dist));
         AddVertexColor (j, color);
       }
     }

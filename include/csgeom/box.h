@@ -21,8 +21,8 @@
 #define __CS_BOX_H
 
 #include "types.h"	// for bool
-#include "math2d.h"
-#include "math3d.h"
+#include "vector2.h"
+#include "vector3.h"
 
 /**
  * The maximum value that a coordinate in the bounding box can use.
@@ -37,7 +37,7 @@
  * (-CS_BOUNDINGBOX_MAXVALUE, CS_BOUNDINGBOX_MAXVALUE).  It is not
  * recommended to use points outside of this range.
  */
-class csBox
+class csBox2
 {
 protected:
   /// The top-left coordinate of the bounding box.
@@ -113,7 +113,7 @@ public:
   }
 
   /// Test if this box overlaps with the given box.
-  bool Overlap (const csBox& box) const
+  bool Overlap (const csBox2& box) const
   {
     if (maxbox.x < box.minbox.x || minbox.x > box.maxbox.x) return false;
     if (maxbox.y < box.minbox.y || minbox.y > box.maxbox.y) return false;
@@ -177,7 +177,7 @@ public:
   }
 
   //-----
-  // Maintenance Note: The csBox constructors and Set() appear at this point
+  // Maintenance Note: The csBox2 constructors and Set() appear at this point
   // in the file, rather than earlier, in order to appease the OpenStep 4.2
   // compiler.  Specifically, the problem is that the compiler botches code
   // generation if an unseen method (which is later declared inline) is
@@ -191,14 +191,14 @@ public:
   //-----
 
   /// Initialize this box to empty.
-  csBox () : minbox (CS_BOUNDINGBOX_MAXVALUE, CS_BOUNDINGBOX_MAXVALUE),
+  csBox2 () : minbox (CS_BOUNDINGBOX_MAXVALUE, CS_BOUNDINGBOX_MAXVALUE),
 	     maxbox (-CS_BOUNDINGBOX_MAXVALUE, -CS_BOUNDINGBOX_MAXVALUE) {}
 
   /// Initialize this box with one point.
-  csBox (const csVector2& v) : minbox (v.x, v.y), maxbox (v.x, v.y) {}
+  csBox2 (const csVector2& v) : minbox (v.x, v.y), maxbox (v.x, v.y) {}
 
   /// Initialize this box with the given values.
-  csBox (float x1, float y1, float x2, float y2) :
+  csBox2 (float x1, float y1, float x2, float y2) :
     minbox (x1, y1), maxbox (x2, y2)
   { if (Empty ()) StartBoundingBox (); }
 
@@ -217,29 +217,29 @@ public:
   }
 
   /// Compute the union of two bounding boxes.
-  csBox& operator+= (const csBox& box);
+  csBox2& operator+= (const csBox2& box);
   /// Compute the union of a point with this bounding box.
-  csBox& operator+= (const csVector2& point);
+  csBox2& operator+= (const csVector2& point);
   /// Compute the intersection of two bounding boxes.
-  csBox& operator*= (const csBox& box);
+  csBox2& operator*= (const csBox2& box);
 
   /// Compute the union of two bounding boxes.
-  friend csBox operator+ (const csBox& box1, const csBox& box2);
+  friend csBox2 operator+ (const csBox2& box1, const csBox2& box2);
   /// Compute the union of a bounding box and a point.
-  friend csBox operator+ (const csBox& box, const csVector2& point);
+  friend csBox2 operator+ (const csBox2& box, const csVector2& point);
   /// Compute the intersection of two bounding boxes.
-  friend csBox operator* (const csBox& box1, const csBox& box2);
+  friend csBox2 operator* (const csBox2& box1, const csBox2& box2);
 
   /// Tests if two bounding boxes are equal.
-  friend bool operator== (const csBox& box1, const csBox& box2);
+  friend bool operator== (const csBox2& box1, const csBox2& box2);
   /// Tests if two bounding boxes are unequal.
-  friend bool operator!= (const csBox& box1, const csBox& box2);
+  friend bool operator!= (const csBox2& box1, const csBox2& box2);
   /// Tests if box1 is a subset of box2.
-  friend bool operator< (const csBox& box1, const csBox& box2);
+  friend bool operator< (const csBox2& box1, const csBox2& box2);
   /// Tests if box1 is a superset of box2.
-  friend bool operator> (const csBox& box1, const csBox& box2);
+  friend bool operator> (const csBox2& box1, const csBox2& box2);
   /// Tests if a point is contained in a box.
-  friend bool operator< (const csVector2& point, const csBox& box);
+  friend bool operator< (const csVector2& point, const csBox2& box);
 };
 
 /**

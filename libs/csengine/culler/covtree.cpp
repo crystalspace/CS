@@ -1199,7 +1199,7 @@ printf ("5: %lu (%dx%d)\n", (unsigned long)sizeof(csCovTreeNode5), csCovTreeNode
 #endif
 }
 
-csCoverageMaskTree::csCoverageMaskTree (csCovMaskLUT* lut, const csBox& box)
+csCoverageMaskTree::csCoverageMaskTree (csCovMaskLUT* lut, const csBox2& box)
 {
   calc_size (); //@@@ Debug
   this->lut = lut;
@@ -1265,7 +1265,7 @@ void csCoverageMaskTree::UpdatePolygonInverted (csVector2* verts, int num_verts)
 }
 
 bool csCoverageMaskTree::InsertPolygon (csVector2* verts, int num_verts,
-	const csBox& pol_bbox)
+	const csBox2& pol_bbox)
 {
   // @@@ Configurable!
 # if defined(CS_CM_8x8)
@@ -1289,7 +1289,7 @@ bool csCoverageMaskTree::InsertPolygon (csVector2* verts, int num_verts,
 }
 
 bool csCoverageMaskTree::TestPolygon (csVector2* verts, int num_verts,
-	const csBox& pol_bbox) const
+	const csBox2& pol_bbox) const
 {
   // @@@ Configurable!
 # if defined(CS_CM_8x8)

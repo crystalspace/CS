@@ -67,9 +67,9 @@ public:
   csFogInfo* next;
 
   /// The incoming plane (plane of the portal).
-  csPlane incoming_plane;
+  csPlane3 incoming_plane;
   /// The outgoing plane (also of a portal).
-  csPlane outgoing_plane;
+  csPlane3 outgoing_plane;
   /// If this is false then there is no incoming plane (the current sector has fog and is not being drawn through a portal).
   bool has_incoming_plane;
 
@@ -110,7 +110,7 @@ public:
    * This variable holds the plane of the portal through which the camera
    * is looking.
    */
-  csPlane clip_plane;
+  csPlane3 clip_plane;
 
   /**
    * If true then we clip all objects to 'clip_plane'. In principle
@@ -175,7 +175,7 @@ public:
   ///
   void SetView (csClipper* v) { view = v; }
   ///
-  void SetClipPlane (csPlane& p) { clip_plane = p; }
+  void SetClipPlane (csPlane3& p) { clip_plane = p; }
   /// Set the view frustrum at z=1.
   void SetFrustrum (float lx, float rx, float ty, float by)
   {

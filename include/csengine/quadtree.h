@@ -87,21 +87,21 @@ private:
   /// The root of the tree.
   csQuadtreeNode* root;
   /// The bounding box of the entire tree.
-  csBox bbox;
+  csBox2 bbox;
 
 private:
   /// Build the tree with a given depth.
-  void Build (csQuadtreeNode* node, const csBox& box, int depth);
+  void Build (csQuadtreeNode* node, const csBox2& box, int depth);
 
   /// Insert a polygon in the node.
   bool InsertPolygon (csQuadtreeNode* node,
 	csVector2* verts, int num_verts,
-	const csBox& cur_bbox, const csBox& pol_bbox);
+	const csBox2& cur_bbox, const csBox2& pol_bbox);
 
   /// Test a polygon in the node.
   bool TestPolygon (csQuadtreeNode* node,
 	csVector2* verts, int num_verts,
-	const csBox& cur_bbox, const csBox& pol_bbox);
+	const csBox2& cur_bbox, const csBox2& pol_bbox);
 
   /// Test a point in the node.
   int TestPoint (csQuadtreeNode* node, const csVector2& point);
@@ -110,7 +110,7 @@ public:
   /**
    * Create an empty tree with the given box.
    */
-  csQuadtree (const csBox& box, int depth);
+  csQuadtree (const csBox2& box, int depth);
 
   /**
    * Destroy the whole quadtree.
@@ -133,14 +133,14 @@ public:
    * polygon were visible.
    */
   bool InsertPolygon (csVector2* verts, int num_verts,
-  	const csBox& pol_bbox);
+  	const csBox2& pol_bbox);
 
   /**
    * Test for polygon visibility with the quad-tree.
    * Return true if polygon is visible.
    */
   bool TestPolygon (csVector2* verts, int num_verts,
-  	const csBox& pol_bbox);
+  	const csBox2& pol_bbox);
 
   /**
    * Test if a given point is visible in the quad-tree.

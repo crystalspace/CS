@@ -29,7 +29,7 @@
 csPoly2DPool csClipper::polypool (csPoly2DFactory::SharedFactory ());
 
 UByte csClipper::Clip (csVector2 *InPolygon, int &InOutCount,
-  csBox &BoundingBox)
+  csBox2 &BoundingBox)
 {
   csVector2 TempPoly [MAX_OUTPUT_VERTICES];
   UByte rc = Clip (InPolygon, InOutCount, TempPoly, InOutCount, BoundingBox);
@@ -40,7 +40,7 @@ UByte csClipper::Clip (csVector2 *InPolygon, int &InOutCount,
 
 //---------------------------------------------------------------------------
 
-int csBoxClipper::ClassifyBox (csBox &box)
+int csBoxClipper::ClassifyBox (csBox2 &box)
 {
   if (!region.Overlap (box))
     return -1;
@@ -71,7 +71,7 @@ UByte csBoxClipper::Clip (csVector2 *InPolygon, int InCount,
 }
 
 UByte csBoxClipper::Clip (csVector2 *InPolygon, int InCount,
-  csVector2 *OutPolygon, int &OutCount, csBox &BoundingBox)
+  csVector2 *OutPolygon, int &OutCount, csBox2 &BoundingBox)
 {
   if (!region.Overlap (BoundingBox))
     return false;
@@ -169,7 +169,7 @@ void csPolygonClipper::Prepare ()
   } /* endfor */
 }
 
-int csPolygonClipper::ClassifyBox (csBox &box)
+int csPolygonClipper::ClassifyBox (csBox2 &box)
 {
   //@@ THIS IS WRONG!
   // NEEDS A RETHINK
@@ -211,7 +211,7 @@ UByte csPolygonClipper::Clip (csVector2 *InPolygon, int InCount,
 }
 
 UByte csPolygonClipper::Clip (csVector2 *InPolygon, int InCount,
-  csVector2 *OutPolygon, int &OutCount, csBox &BoundingBox)
+  csVector2 *OutPolygon, int &OutCount, csBox2 &BoundingBox)
 {
   if (!ClipBox.Overlap (BoundingBox))
     return false;

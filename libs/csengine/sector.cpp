@@ -1027,11 +1027,15 @@ void* CalculateLightingPolygonsFB (csSector*,
     else vis = cc->TestPolygon (poly, p->GetNumVertices ());
 #else
     if (p->GetPortal ())
+    {
       if (cb) vis = cb->TestPolygon (poly, p->GetNumVertices ());
       else vis = cc->TestPolygon (poly, p->GetNumVertices ());
+    }
     else
+    {
       if (cb) vis = cb->InsertPolygon (poly, p->GetNumVertices ());
       else vis = cc->InsertPolygon (poly, p->GetNumVertices ());
+    }
 #endif
     if (vis)
     {
@@ -1052,7 +1056,7 @@ void* CalculateLightingPolygonsFB (csSector*,
 
       csShadowFrustrum* frust;
       CHK (frust = new csShadowFrustrum (center));
-      csPlane pl = p->GetPlane ()->GetWorldPlane ();
+      csPlane3 pl = p->GetPlane ()->GetWorldPlane ();
       pl.DD += center * pl.norm;
       pl.Invert ();
       frust->SetBackPlane (pl);
@@ -1124,10 +1128,13 @@ bool CullOctreeNodeLighting (csPolygonTree* tree, csPolygonTreeNode* node,
       outline[i] -= center;
     csCBufferCube* cb = csWorld::current_world->GetCBufCube ();
     csCovcube* cc = csWorld::current_world->GetCovcube ();
-    if (cb && !cb->TestPolygon (outline, num_outline))
+    if (cb)
     {
-      count_cull_quad++;
-      return false;
+      if (!cb->TestPolygon (outline, num_outline))
+      {
+        count_cull_quad++;
+        return false;
+      }
     }
     else if (cc && !cc->TestPolygon (outline, num_outline))
     {

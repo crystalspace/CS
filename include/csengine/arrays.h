@@ -89,8 +89,7 @@ public:
 /**
  * An dynamic array of csPolygon3D objects.
  * The difference with the above class is that this class
- * does not free the polygons (the above doesn't either but
- * that's a bug :-)
+ * does not free the polygons.
  */
 class csPolygonArrayNoFree : public csVector
 {

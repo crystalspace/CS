@@ -6,6 +6,30 @@ The history order has been reversed so that new features are at the top.
 	- Restored DrawPixmap in OpenGL which Gary Haussmann accidently
 	  removed.
 	- Some further debugging on the c-buffer cube.
+	- Made sure that the octree used by CS is always the same
+	  by doing 'srand (12345)' before generating the octree. This
+	  makes debugging a lot easier.
+	- Added new csSegment2/csSegment3 to csgeom. There are a 2D and
+	  a 3D line segment. Modified csgeom to use segments when
+	  appropriate.
+	- Changed csBox to csBox2 to be more consistant with the
+	  other 2D/3D classes in csgeom. Also renamed csPlane to csPlane3.
+	- Split of csVector2 and csVector3 in new files vector2/vector3
+	  instead of math2/math3.
+	- Split of csMatrix2 and csMatrix3 in new files matrix2/matrix3
+	  instead of math2/math3.
+	- Split of csPlane2 and csPlane3 in new files plane2/plane3
+	  instead of math2/math3.
+	- Moved IntersectPolygon from csPlane2 to csIntersect2 to join
+	  the other intersection routines there.
+	- Switched to FastSqrt for sprites after discovering that FastSqrt
+	  is nearly three times faster compared to sqrt on my computer.
+	- Also switched to FastSqrt for lightmap calculation.
+	- Added new csBspTree2D to csengine. This is a pure 2D BSP
+	  tree for manipulating segments. This will be used to try out
+	  a new technique to select an optimal (or near optimal) splitter
+	  point for the octree. I have observed that this point can make
+	  a big difference on performance.
 3-Apr-2000
 	- Andrew Zabolotny did the following changes:
 	    - Fixed the problem with gfxldr crashing in plugins. Removing

@@ -19,7 +19,7 @@
 #ifndef CSCOLL_H
 #define CSCOLL_H
 
-#include "csgeom/math3d.h"
+#include "csgeom/matrix3.h"
 #include "csobject/csobject.h"
 #include "csutil/csvector.h"
 

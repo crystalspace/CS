@@ -404,7 +404,7 @@ void csWorld::EnableCovtree (bool en)
     CHK (delete solidbsp); solidbsp = NULL;
     CHK (delete c_buffer); c_buffer = NULL;
     if (covtree) return;
-    csBox box (0, 0, frame_width, frame_height);
+    csBox2 box (0, 0, frame_width, frame_height);
     if (!covtree_lut)
     {
       CHK (covtree_lut = new csCovMaskLUT (16));
@@ -825,7 +825,7 @@ bool csWorld::CheckConsistency ()
       csVector3 normal;
       float D;
       csMath3::CalcPlane (p->Vobj (0), p->Vobj (1), p->Vobj (2), normal, D);
-      csPlane pl (normal, D);
+      csPlane3 pl (normal, D);
       int i;
       for (i = 3 ; i < p->GetNumVertices () ; i++)
       {

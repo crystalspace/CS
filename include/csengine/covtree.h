@@ -45,13 +45,13 @@ private:
    */
   void* tree;
   /// The bounding box of the entire tree.
-  csBox bbox;
+  csBox2 bbox;
   /// The coverage mask lookup table.
   csCovMaskLUT* lut;
 
 public:
   /// Create a new tree for the given box.
-  csCoverageMaskTree (csCovMaskLUT* lut, const csBox& box);
+  csCoverageMaskTree (csCovMaskLUT* lut, const csBox2& box);
 
   /// Destructor.
   virtual ~csCoverageMaskTree ();
@@ -69,14 +69,14 @@ public:
    * polygon were visible.
    */
   bool InsertPolygon (csVector2* verts, int num_verts,
-  	const csBox& pol_bbox);
+  	const csBox2& pol_bbox);
 
   /**
    * Test for polygon visibility with the coverage mask tree.
    * Return true if polygon is visible.
    */
   bool TestPolygon (csVector2* verts, int num_verts,
-  	const csBox& pol_bbox) const;
+  	const csBox2& pol_bbox) const;
 
   /// Make the tree empty.
   void MakeEmpty ();

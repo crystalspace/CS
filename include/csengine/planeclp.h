@@ -24,9 +24,9 @@
 #include "csutil/garray.h"
 
 /**
- * A special version of csPlane which can clip polygons.
+ * A special version of csPlane3 which can clip polygons.
  */
-class csPlaneClip : public csPlane
+class csPlaneClip : public csPlane3
 {
 protected:
   DECLARE_GROWING_ARRAY(verts, csVector3);
@@ -36,14 +36,14 @@ protected:
 public:
   /// Initialize the plane.
   csPlaneClip (const csVector3& plane_norm, float d = 0) :
-    csPlane(plane_norm, d) { init(100); }
+    csPlane3(plane_norm, d) { init(100); }
 
   /// Initialize the plane
-  csPlaneClip (float d = 0) : csPlane(0, 0, -1, d) { init(100); }
+  csPlaneClip (float d = 0) : csPlane3(0, 0, -1, d) { init(100); }
 
   /// Initialize the plane.
   csPlaneClip (float a, float b, float c, float d = 0) :
-    csPlane(a,b,c,d) { init(100); }
+    csPlane3(a,b,c,d) { init(100); }
 
   /**
    * Clip the polygon in pverts (having num_verts vertices) to this plane.
