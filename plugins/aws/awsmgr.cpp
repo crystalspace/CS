@@ -21,6 +21,7 @@
 #include "iutil/comp.h"
 #include "iutil/objreg.h"
 #include "iutil/event.h"
+#include "iutil/virtclk.h"
 #include "ivaria/reporter.h"
 #include "csutil/csevent.h"
 
@@ -299,7 +300,7 @@ iAwsCanvas *awsManager::CreateDefaultCanvas (
   return canvas;
 }*/
 
-void awsManager::CreateTransition(iAwsComponent *win, unsigned transition_type, float step_size)
+void awsManager::CreateTransition(iAwsComponent *win, unsigned transition_type, csTicks duration)
 {
   if (win==0) return;
 
@@ -308,7 +309,7 @@ void awsManager::CreateTransition(iAwsComponent *win, unsigned transition_type, 
   int h = G2D()->GetHeight();
   
   t->morph=0.0;
-  t->morph_step=step_size;
+  t->morph_duration=duration;
   t->transition_type=transition_type;
   t->win=win;
   
@@ -363,14 +364,14 @@ void awsManager::CreateTransition(iAwsComponent *win, unsigned transition_type, 
   transitions.Push(t);
 }
 
-void awsManager::CreateTransitionEx(iAwsComponent *win, unsigned transition_type, float step_size, csRect &user)
+void awsManager::CreateTransitionEx(iAwsComponent *win, unsigned transition_type, csTicks duration, csRect &user)
 {
   if (win==0) return;
 
   awsWindowTransition *t = new awsWindowTransition;
   
   t->morph=0.0;
-  t->morph_step=step_size;
+  t->morph_duration=duration;
   t->transition_type=transition_type;
   t->win=win;
   
@@ -480,7 +481,12 @@ bool awsManager::PerformTransition(iAwsComponent *win)
   }
   else
   {
-    t->morph+=t->morph_step;
+    // Get the elapsed time and calculate the transition progress
+    csTicks elapsed_time;
+    csRef<iVirtualClock> vc (CS_QUERY_REGISTRY (object_reg, iVirtualClock));
+    elapsed_time = vc->GetElapsedTicks ();
+  
+    t->morph += ((float)elapsed_time / t->morph_duration);
     if (t->morph>1.0)
       t->morph=1.0;
   }

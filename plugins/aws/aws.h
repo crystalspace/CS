@@ -56,7 +56,7 @@ struct awsWindowTransition
   float morph;
 
   /// The size of steps to take
-  float morph_step;
+  csTicks morph_duration;
 
   /// The window we're dealing with
   iAwsComponent *win;
@@ -310,10 +310,10 @@ public:
   virtual iAwsParmList *CreateParmList ();
 
   /// Creates and enables a transition for a window
-  virtual void CreateTransition(iAwsComponent *win, unsigned transition_type, float step_size=0.1);
+  virtual void CreateTransition(iAwsComponent *win, unsigned transition_type, csTicks duration=250);
 
   /// Creates and enables a transition for a window
-  virtual void CreateTransitionEx(iAwsComponent *win, unsigned transition_type, float step_size, csRect &user);
+  virtual void CreateTransitionEx(iAwsComponent *win, unsigned transition_type, csTicks duration, csRect &user);
 
 public:
   /// Set the contexts however you want

@@ -12,6 +12,10 @@ chronological order.
 	  but don't raise the alpha of non-KCed pixels to 255, which gave
 	  problems with alpha transparency in AWS (which sets a keycolor on
 	  all images.)
+	- Chris Matuszewski changed AWS component transitions to use a delay
+	  parameter specified in csTicks instead of using a step_size parameter.
+	  This approach has the benefit of making the transitions take the same
+	  amount of time on computers with different processor speeds.
 6-Nov-2003
 	- res bumped the version of the iGraphics2D interface and updated
 	  some doxygen comments in include/graph2d.h. (Basically the 

@@ -243,7 +243,7 @@ struct iAwsComponentNode : public iAwsKeyContainer
  * \addtogroup aws
  * @{ */
 
-SCF_VERSION (iAws, 0, 2, 2);
+SCF_VERSION (iAws, 0, 2, 3);
 
 /// Interface for the window manager.
 struct iAws : public iBase
@@ -386,7 +386,7 @@ public:
    * \sa \ref aws_window_trans
    */
   virtual void CreateTransition(iAwsComponent *win, unsigned transition_type,
-  	float step_size=0.1)=0;
+  	csTicks duration=250)=0;
 
   /**
    * Creates and enables a transition for a window, using a user specified
@@ -395,7 +395,7 @@ public:
    * \sa \ref aws_window_trans
    */
   virtual void CreateTransitionEx(iAwsComponent *win,
-  	unsigned transition_type, float step_size, csRect &user)=0;
+  	unsigned transition_type, csTicks duration, csRect &user)=0;
 
   /**
    * Sets one or more flags for different operating modes. 
