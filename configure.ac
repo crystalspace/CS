@@ -766,19 +766,26 @@ for p in sys.path: print p'])`
 #------------------------------------------------------------------------------
 AC_DEFUN([CS_JAVA_HEADER_PATH],
     [AC_REQUIRE([AC_CANONICAL_HOST])
-    cs_java_inc=''
-    AS_IF([test -n "$$1"],
-	[cs_java_dir=`AS_DIRNAME([$$1])`
-	cs_java_dir=`AS_DIRNAME([$cs_java_dir])`])
-    AS_IF([test -z "$cs_java_dir"], [cs_java_dir="$JAVA_HOME"])
-    AS_IF([test -n "$cs_java_dir"],
-	cs_java_inc="-I$cs_java_dir/include"
-	[case $host_os in
-	    mingw*|cygwin*) cs_java_platform=win32 ;;
-	    *) cs_java_platform=`echo $host_os|sed 's/^\([[^-]]*\).*$/\1/'` ;;
-	esac
-	AS_IF([test -n "$cs_java_platform"],
-	    [cs_java_inc="$cs_java_inc $cs_java_inc/$cs_java_platform"])])])
+    AC_REQUIRE([CS_CHECK_HOST])
+    AS_IF([test x$cs_host_macosx = xyes && # Not cross-building for Darwin.
+	test -r "/System/Library/Frameworks/JavaVM.framework/Headers"],
+	[cs_java_inc="-I/System/Library/Frameworks/JavaVM.framework/Headers"],
+	[AS_IF([test -n "$JAVA_HOME"],
+	    [cs_java_dir="$JAVA_HOME"],
+	    [AS_IF([test -n "$$1"],
+		[cs_java_dir=`AS_DIRNAME([$$1])`
+		cs_java_dir=`AS_DIRNAME([$cs_java_dir])`],
+		[cs_java_dir=''])])
+	AS_IF([test -n "$cs_java_dir"],
+	    [cs_java_inc="-I$cs_java_dir/include"
+	    case $host_os in
+		mingw*|cygwin*) cs_java_platform=win32 ;;
+		*) cs_java_platform=\
+		    `echo $host_os|sed 's/^\([[^-]]*\).*$/\1/'` ;;
+	    esac
+	    AS_IF([test -n "$cs_java_platform"],
+		[cs_java_inc=\
+		    "$cs_java_inc $cs_java_inc/$cs_java_platform"])])])])
 
 AC_PATH_PROGS([JAVA], [java], [], [$PATH:$JAVA_HOME/bin:$JAVA_HOME/jre/bin])
 CS_BUILD_PROPERTY([JAVA], [$JAVA])

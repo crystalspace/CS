@@ -43,6 +43,8 @@ chronological order.
 	- Eric Sunshine fixed bug in scripts/cs-config/Makefile.template where
 	  it incorrectly defined DO.EXEC rather than DO.EXE, thus causing the
 	  build to fail.
+	- Eric Sunshine augmented the Java SDK usability test in configure.ac
+	  so that it succeeds on MacOS/X.
 21-Mar-2004
 	- Luca Cappa committed the res fix to the problem regarding the lack
 	  of the regex.c file in the CSUtil library. The problem was 
