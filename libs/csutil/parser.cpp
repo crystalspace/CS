@@ -24,6 +24,7 @@
 
 // A string containing white spaces (' ', '\t', '\n', '\r')
 static const char *kWhiteSpace = " \t\n\r";
+static const char *kTokenEnd = " \t\n\r;(\'\"";
 static char last_offender[255];
 static int parser_line;
 
@@ -31,7 +32,7 @@ char* csGetLastOffender () { return last_offender; }
 int   csGetParserLine   () { return parser_line;   }
 void  csResetParserLine () { parser_line = 1;      }
 
-long csGetObject (char **buf, csTokenDesc * tokens, char **name, char **data)
+long csGetObject (char **buf, csTokenVector * tokens, char **name, char **data)
 {
   csSkipCharacters (buf, kWhiteSpace);
 
@@ -48,18 +49,16 @@ long csGetObject (char **buf, csTokenDesc * tokens, char **name, char **data)
 
   // find the token.
   // for now just use brute force.  Improve later.
-  while (tokens->id != 0)
+  int i=0;
+  for (i=0; i < tokens->Length ()-1; i++)
   {
-    if (!strncasecmp (tokens->token, *buf, strlen (tokens->token)))
+    if (!strncasecmp (tokens->Get (i)->token, *buf, strlen (tokens->Get (i)->token)))
     {
-      // here we could be matching PART of a string
-      // we could detect this here or the token list
-      // could just have the longer tokens first in the list
       break;
     }
-    ++tokens;
   }
-  if (tokens->id == 0)
+  
+  if (i+1 == tokens->Length ())
   {
     char *p = strchr (*buf, '\n');
     if (p) *p = 0;
@@ -67,7 +66,7 @@ long csGetObject (char **buf, csTokenDesc * tokens, char **name, char **data)
     return CS_PARSERR_TOKENNOTFOUND;
   }
   // skip the token
-  *buf += strlen (tokens->token);
+  *buf += strlen (tokens->Get (i)->token);
   csSkipCharacters (buf, kWhiteSpace);
 
   // get optional name
@@ -80,10 +79,10 @@ long csGetObject (char **buf, csTokenDesc * tokens, char **name, char **data)
   else
     *data = csGetSubText (buf, '(', ')');
 
-  return tokens->id;
+  return tokens->Get (i)->id;
 }
 
-long csGetCommand (char **buf, csTokenDesc * tokens, char **params)
+long csGetCommand (char **buf, csTokenVector * tokens, char **params)
 {
   char *name;
   return csGetObject (buf, tokens, &name, params);
@@ -153,3 +152,4 @@ char *csGetAssignmentText (char **buf)
     ++*buf;
   return result;
 }
+

@@ -19,6 +19,9 @@
 #ifndef __CS_PARSER_H__
 #define __CS_PARSER_H__
 
+#include "csutil/csvector.h"
+#include "csutil/util.h"
+
 /**
  * Structure to describe a single token in a token table that is passed
  * to most token-parsing functions.
@@ -28,7 +31,42 @@ struct csTokenDesc
   /// value returned when token is matched
   long	id;
   /// token to match
-  char	*token;
+  char *token;
+  csTokenDesc (){id=0; token=NULL;}
+  ~csTokenDesc ()
+  {delete [] token;}
+};
+
+class csTokenVector : public csVector
+{
+  public:
+    virtual ~csTokenVector () {DeleteAll ();}
+    virtual bool FreeItem (csSome Item){ delete (csTokenDesc*)Item; return true;}
+    virtual csTokenDesc* Get (int idx) const {return (csTokenDesc*)csVector::Get (idx);}
+    virtual int Compare (csSome Item1, csSome Item2, int Mode=0) const
+    { (void)Mode;
+      csTokenDesc *td1 = (csTokenDesc*)Item1;
+      csTokenDesc *td2 = (csTokenDesc*)Item2;
+      int l1 = (td1->token ? strlen(td1->token) : 0);
+      int l2 = (td2->token ? strlen(td2->token) : 0);
+      return l1 > l2 ? -1 : l1 < l2 ? 1 : 0;
+    }
+    virtual int CompareKey (csSome Item1, csConstSome Key, int Mode=0) const
+    { (void)Mode;
+      csTokenDesc *td1 = (csTokenDesc*)Item1;
+      csTokenDesc *td2 = (csTokenDesc*)Key;
+      int l1 = (td1->token ? strlen(td1->token) : 0);
+      int l2 = (td2->token ? strlen(td2->token) : 0);
+      return l1 > l2 ? -1 : l1 < l2 ? 1 : 0;
+    }
+    csTokenVector *Push (int id, const char *name)
+    {
+      csTokenDesc *td = new csTokenDesc;
+      td->id = id;
+      td->token = (name ? csStrNew (name) : NULL);
+      InsertSorted (td);
+      return this;
+    }
 };
 
 /**
@@ -82,13 +120,13 @@ struct csTokenDesc
     CS_TOKEN_TOTAL_COUNT		\
   };
 #define CS_TOKEN_TABLE_START(name)	\
-  static csTokenDesc name [] =		\
-  {
+  csTokenVector name ## _hlp, *name;        \
+  name = &name ## _hlp;			\
+  name->
 #define CS_TOKEN_TABLE(name)		\
-    { CS_TOKEN_ ## name, #name },
+    Push (CS_TOKEN_ ## name, #name )->
 #define CS_TOKEN_TABLE_END		\
-    { 0, 0 }				\
-  };
+    Push (0, NULL);
 
 #define CS_PARSERR_EOF			-2
 #define CS_PARSERR_TOKENNOTFOUND	-1
@@ -124,7 +162,7 @@ char* csGetLastOffender ();
  * <p>returns CS_PARSERR_TOKENNOTFOUND on error.
  * <p>returns CS_PARSERR_EOF on EOF.
  */
-long csGetObject(char **buf, csTokenDesc *tokens, char **name, char **data);
+long csGetObject(char **buf, csTokenVector *tokens, char **name, char **data);
 /**
  * Pass in a pointer to a buffer of text. This pointer is modified to point
  * to the text after the command description. The token id for the command is
@@ -141,7 +179,7 @@ long csGetObject(char **buf, csTokenDesc *tokens, char **name, char **data);
  *   LIGHT=1
  * </code>
  */
-long csGetCommand(char **buf, csTokenDesc *tokens, char **params);
+long csGetCommand(char **buf, csTokenVector *tokens, char **params);
 /**
  * Returns the string of text between the open and close characters.
  * Modifies the buffer. Moves the buffer pointer to after the last delimiter.
