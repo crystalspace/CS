@@ -185,11 +185,11 @@ bool csCursorConverter::ConvertTo8bpp (iImage* image, uint8*& pixels,
   else
   {
     int tr = 255, tg = 0, tb = 255;
-    if (image->HasKeycolor ())
-      image->GetKeycolor (tr, tg, tb);
+    if (image->HasKeyColor ())
+      image->GetKeyColor (tr, tg, tb);
     transp.Set (tr, tg, tb);
   }
-  myImage->SetKeycolor (transp.red, transp.green, transp.blue);
+  myImage->SetKeyColor (transp.red, transp.green, transp.blue);
 
   myImage->SetFormat (CS_IMGFMT_PALETTED8 
     | (image->GetFormat () & ~CS_IMGFMT_MASK));
@@ -198,7 +198,7 @@ bool csCursorConverter::ConvertTo8bpp (iImage* image, uint8*& pixels,
     // copy over the original palette
     memcpy (myImage->GetPalette(), image->GetPalette(), 
       sizeof (csRGBpixel) * 256);
-    myImage->ApplyKeycolor ();
+    myImage->ApplyKeyColor ();
   }
 
   if (myImage->GetFormat () & CS_IMGFMT_ALPHA)

@@ -110,17 +110,17 @@ csImageFile::~csImageFile ()
   SCF_DESTRUCT_IBASE ();
 }
 
-int csImageFile::GetWidth ()
+int csImageFile::GetWidth () const
 {
   return Width;
 }
 
-int csImageFile::GetHeight ()
+int csImageFile::GetHeight () const
 {
   return Height;
 }
 
-int csImageFile::GetSize ()
+int csImageFile::GetSize () const
 {
   return Width * Height;
 }
@@ -136,12 +136,12 @@ void csImageFile::SetName (const char *iName)
   fName = csStrNew (iName);
 }
 
-const char *csImageFile::GetName ()
+const char *csImageFile::GetName () const
 {
   return fName;
 }
 
-int csImageFile::GetFormat ()
+int csImageFile::GetFormat () const
 {
   return Format;
 }
@@ -328,7 +328,7 @@ csPtr<iImage> csImageFile::MipMap (int steps, csRGBpixel *transp)
   return csPtr<iImage> (nimg);
 }
 
-csPtr<iImage> csImageFile::Sharpen (csRGBpixel *transp, int strength)
+csPtr<iImage> csImageFile::Sharpen (csRGBpixel *transp, int strength) const
 {
 /*
 
@@ -453,12 +453,12 @@ void csImageFile::CheckAlpha ()
   }
 }
 
-bool csImageFile::HasKeycolor ()
+bool csImageFile::HasKeyColor () const
 {
   return has_keycolour ? true : false;
 }
 
-void csImageFile::GetKeycolor (int &r, int &g, int &b)
+void csImageFile::GetKeyColor (int &r, int &g, int &b) const
 {
   r = keycolour.red;
   g = keycolour.green;
@@ -613,7 +613,7 @@ void csImageFile::SetFormat (int iFormat)
   }
 }
 
-csPtr<iImage> csImageFile::Clone ()
+csPtr<iImage> csImageFile::Clone () const
 {
   csRef<csImageFile> nimg = csPtr<csImageFile> (new csImageFile (Format));
   nimg->Width = Width;
@@ -657,7 +657,7 @@ csPtr<iImage> csImageFile::Clone ()
   return csPtr<iImage> (nimg);
 }
 
-csPtr<iImage> csImageFile::Crop ( int x, int y, int width, int height )
+csPtr<iImage> csImageFile::Crop ( int x, int y, int width, int height ) const
 {
   if ( x+width > Width || y+height > Height ) return 0;
   csRef<csImageFile> nimg = csPtr<csImageFile> (new csImageFile (Format));
@@ -706,7 +706,7 @@ csPtr<iImage> csImageFile::Crop ( int x, int y, int width, int height )
   return csPtr<iImage> (nimg);
 }
 
-int csImageFile::HasMipmaps()
+int csImageFile::HasMipmaps() const
 {
   return 0;
 }

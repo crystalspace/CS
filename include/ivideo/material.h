@@ -148,7 +148,7 @@ struct iMaterial : public iShaderVariableContext
    * will return the mean texture color.
    */
   virtual void GetFlatColor (csRGBpixel &oColor, 
-    bool useTextureMean = true) = 0;
+    bool useTextureMean = true) const = 0;
   /**
    * Set the flat shading color.
    */
@@ -158,7 +158,7 @@ struct iMaterial : public iShaderVariableContext
    * Get light reflection parameters for this material.
    */
   virtual void GetReflection (
-    float &oDiffuse, float &oAmbient, float &oReflection) = 0;
+    float &oDiffuse, float &oAmbient, float &oReflection) const = 0;
   /**
    * Set the reflection parameters.
    */
@@ -201,13 +201,13 @@ struct iMaterialHandle : public iBase
    * Get the flat color. If the material has a texture assigned, this
    * will return the mean texture color.
    */
-  virtual void GetFlatColor (csRGBpixel &oColor) = 0;
+  virtual void GetFlatColor (csRGBpixel &oColor) const = 0;
 
   /**
    * Get light reflection parameters for this material.
    */
   virtual void GetReflection (float &oDiffuse, float &oAmbient,
-  	float &oReflection) = 0;
+  	float &oReflection) const = 0;
 };
 
 /** @} */

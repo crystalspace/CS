@@ -12,6 +12,8 @@ chronological order.
 	      crystalspace.mesh.object.nullmesh -->
 	          crystalspace.mesh.object.null
 	      crystalspace.graphics2d.null2d --> crystalspace.graphics2d.null
+	- Eric Sunshine added a lot of missing `const' qualifiers to many
+	  methods in a number of SCF interfaces (mostly video-related).
 30-Oct-2004
 	- res improved the Win32 custom cursor cleanup a bit.
 	- res fixed a crash in the software sound renderer source, where a 

@@ -103,12 +103,12 @@ struct iTextureWrapper : public iBase
   /// Set the transparent color.
   virtual void SetKeyColor (int red, int green, int blue) = 0;
   /// Query the transparent color.
-  virtual void GetKeyColor (int &red, int &green, int &blue) = 0;
+  virtual void GetKeyColor (int &red, int &green, int &blue) const = 0;
 
   /// Set the flags which are used to register the texture
   virtual void SetFlags (int flags) = 0;
   /// Return the flags which are used to register the texture
-  virtual int GetFlags () = 0;
+  virtual int GetFlags () const = 0;
 
   /// Register the texture with the texture manager
   virtual void Register (iTextureManager *txtmng) = 0;
@@ -124,7 +124,7 @@ struct iTextureWrapper : public iBase
    * Get the use callback. If there are multiple use callbacks you can
    * use this function to chain.
    */
-  virtual iTextureCallback* GetUseCallback () = 0;
+  virtual iTextureCallback* GetUseCallback () const = 0;
 
   /**
    * Visit this texture. This should be called by the engine right

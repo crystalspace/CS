@@ -95,7 +95,7 @@ protected:
   // Are we visible? Can be 'false' if animated w/ 'always animate'.
   bool visible;
 
-  bool GetAlwaysAnimate ();
+  bool GetAlwaysAnimate () const;
   void SetAlwaysAnimate (bool enable);
 
   struct eiTextureWrapper : public iTextureWrapper
@@ -108,12 +108,12 @@ protected:
     virtual void SetTextureHandle (iTextureHandle *tex);
     virtual iTextureHandle* GetTextureHandle ();
     virtual void SetKeyColor (int red, int green, int blue);
-    virtual void GetKeyColor (int &red, int &green, int &blue);
+    virtual void GetKeyColor (int &red, int &green, int &blue) const;
     virtual void SetFlags (int flags);
-    virtual int GetFlags ();
+    virtual int GetFlags () const;
     virtual void Register (iTextureManager *txtmng);
     virtual void SetUseCallback (iTextureCallback* callback);
-    virtual iTextureCallback* GetUseCallback ();
+    virtual iTextureCallback* GetUseCallback () const;
     virtual void Visit ();
     virtual bool IsVisitRequired () const;
     virtual void SetKeepImage (bool k);
@@ -125,7 +125,7 @@ protected:
   {
     SCF_DECLARE_EMBEDDED_IBASE(csProcTexture);
 
-    virtual bool GetAlwaysAnimate ();
+    virtual bool GetAlwaysAnimate () const;
     virtual void SetAlwaysAnimate (bool enable);
     virtual iTextureFactory* GetFactory();
   } scfiProcTexture;
@@ -207,7 +207,7 @@ public:
   virtual void Animate (csTicks current_time) = 0;
 
   /// get dimension
-  virtual void GetDimension (int &w, int &h)
+  virtual void GetDimension (int &w, int &h) const
   { w = mat_w; h = mat_h; }
 
   static int GetRandom (int max)
@@ -217,10 +217,8 @@ public:
 
   /// Get the texture corresponding with this procedural texture.
   iTextureWrapper* GetTextureWrapper ()
-  { return &scfiTextureWrapper; /*return tex;*/ }
+  { return &scfiTextureWrapper; }
 
 };
 
-
 #endif // __CS_PROCTEX_H__
-

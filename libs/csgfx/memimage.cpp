@@ -109,18 +109,18 @@ void csImageMemory::Rescale (int NewWidth, int NewHeight)
     csImageFile::Rescale (NewWidth, NewHeight);
 }
 
-void csImageMemory::SetKeycolor (int r, int g, int b)
+void csImageMemory::SetKeyColor (int r, int g, int b)
 {
   has_keycolour = true;
   keycolour.Set (r, g, b);
 }
 
-void csImageMemory::ClearKeycolor ()
+void csImageMemory::ClearKeyColor ()
 {
   has_keycolour = false;
 }
 
-void csImageMemory::ApplyKeycolor ()
+void csImageMemory::ApplyKeyColor ()
 {
   if (has_keycolour 
     && ((Format & CS_IMGFMT_MASK) == CS_IMGFMT_PALETTED8))

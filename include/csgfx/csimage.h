@@ -130,11 +130,11 @@ public:
    */
   virtual void *GetImageData ();
   /// Query image width
-  virtual int GetWidth ();
+  virtual int GetWidth () const;
   /// Query image height
-  virtual int GetHeight ();
+  virtual int GetHeight () const;
   /// Query image size in bytes
-  virtual int GetSize ();
+  virtual int GetSize () const;
 
   /// Rescale the image to the given size
   virtual void Rescale (int newwidth, int newheight);
@@ -154,9 +154,9 @@ public:
   /// Set image file name
   virtual void SetName (const char *iName);
   /// Get image file name
-  virtual const char *GetName ();
+  virtual const char *GetName () const;
   /// Get image format
-  virtual int GetFormat ();
+  virtual int GetFormat () const;
   /// Get image palette (or 0 if no palette)
   virtual csRGBpixel *GetPalette ();
   /// Get alpha map for image
@@ -164,18 +164,31 @@ public:
   /// Convert the image to another format
   virtual void SetFormat (int iFormat);
   /// Create yet another image and copy this one into the new image.
-  virtual csPtr<iImage> Clone ();
+  virtual csPtr<iImage> Clone () const;
   /// Create another image and copy a subpart of this image into the new image.
-  virtual csPtr<iImage> Crop (int x, int y, int width, int height);
+  virtual csPtr<iImage> Crop (int x, int y, int width, int height) const;
   /// Check if all alpha values are "non-transparent" and if so, discard alpha
   virtual void CheckAlpha ();
-  /// check if image has a keycolour stored with it
-  virtual bool HasKeycolor ();
-  /// get the keycolour stored with the image.
-  virtual void GetKeycolor (int &r, int &g, int &b);
+  /// Check if image has a keycolour stored with it.
+  virtual bool HasKeyColor () const;
+  /**
+   * Check if image has a keycolour stored with it.
+   * \deprecated Use HasKeyColor() instead.
+   */
+  virtual bool HasKeycolor () const
+  { return HasKeyColor() ; }
+  /// Get the keycolour stored with the image.
+  virtual void GetKeyColor (int &r, int &g, int &b) const;
+  /**
+   * Get the keycolour stored with the image.
+   * \deprecated Use GetKeyColor() instead.
+   */
+  virtual void GetKeycolor (int &r, int &g, int &b) const
+  { return GetKeyColor(r,g,b); }
   /// Create a sharpened copy of the image
-  virtual csPtr<iImage> Sharpen (csRGBpixel *transp, int strength);
-  virtual int HasMipmaps ();
+  virtual csPtr<iImage> Sharpen (csRGBpixel *transp, int strength) const;
+  /// Check if image has mipmaps.
+  virtual int HasMipmaps () const;
 };
 
 #endif // __CS_IMAGE_H__

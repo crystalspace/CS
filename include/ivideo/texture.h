@@ -55,7 +55,7 @@ SCF_VERSION (iTextureHandle, 2, 2, 3);
 struct iTextureHandle : public iBase
 {
   /// Retrieve the flags set for this texture
-  virtual int GetFlags () = 0;
+  virtual int GetFlags () const = 0;
 
   /// Enable key color
   virtual void SetKeyColor (bool Enable) = 0;
@@ -64,10 +64,10 @@ struct iTextureHandle : public iBase
   virtual void SetKeyColor (uint8 red, uint8 green, uint8 blue) = 0;
 
   /// Get the key color status (false if disabled, true if enabled).
-  virtual bool GetKeyColor () = 0;
+  virtual bool GetKeyColor () const = 0;
 
   /// Get the key color
-  virtual void GetKeyColor (uint8 &red, uint8 &green, uint8 &blue) = 0;
+  virtual void GetKeyColor (uint8 &red, uint8 &green, uint8 &blue) const = 0;
 
   /**
    * Get the dimensions for a given mipmap level (0 to 3).
@@ -141,7 +141,7 @@ struct iTextureHandle : public iBase
 #endif // CS_USE_NEW_RENDERER
 
   /// Get the mean color.
-  virtual void GetMeanColor (uint8 &red, uint8 &green, uint8 &blue) = 0;
+  virtual void GetMeanColor (uint8 &red, uint8 &green, uint8 &blue) const = 0;
 
   /// Get data associated internally with this texture by texture cache
   virtual void *GetCacheData () = 0;
@@ -160,7 +160,7 @@ struct iTextureHandle : public iBase
    * This depends both on whenever the original image had an alpha channel
    * and of the fact whenever the renderer supports alpha maps at all.
    */
-  virtual bool GetAlphaMap () = 0;
+  virtual bool GetAlphaMap () const = 0;
 
   /**
    * Get a canvas instance which is suitable for rendering on this
@@ -169,7 +169,8 @@ struct iTextureHandle : public iBase
    */
   virtual iGraphics2D* GetCanvas () = 0;
 
-  virtual csAlphaMode::AlphaType GetAlphaType () = 0;
+  /// Get the type of alpha associated with the texture.
+  virtual csAlphaMode::AlphaType GetAlphaType () const = 0;
 
   /**
    * Precache this texture. This might free up temporary memory and

@@ -68,10 +68,10 @@ public:
   /// Set whenever texture has transparent holes or not
   void SetKeyColor (bool iEnable);
   /// Get texture transparent color
-  void GetKeyColor (int &oR, int &oG, int &oB)
+  void GetKeyColor (int &oR, int &oG, int &oB) const
   { oR = tr; oG = tg; oB = tb; }
   /// Query whenever texture has transparent areas
-  bool HasKeyColor ()
+  bool HasKeyColor () const
   { return HasKey; }
   /// Register the texture with texture manager
   void Register (iTextureManager *iTexMan);

@@ -21,7 +21,6 @@
 #define __CS_MEMIMAGE_H__
 
 #include "csextern.h"
-
 #include "csimage.h"
 
 /**
@@ -72,16 +71,18 @@ public:
   virtual void Rescale (int NewWidth, int NewHeight);
 
   /// Set the keycolor
-  virtual void SetKeycolor (int r, int g, int b);
+  virtual void SetKeyColor (int r, int g, int b);
+  virtual void SetKeycolor (int r, int g, int b) { SetKeyColor(r,g,b); }
   /// Remove the keycolor
-  virtual void ClearKeycolor ();
+  virtual void ClearKeyColor ();
+  virtual void ClearKeycolor () { ClearKeyColor(); }
 
   /**
    * Apply the keycolor, that is, set all pixels which match the
    * keycolor to 0.
    */
-  virtual void ApplyKeycolor ();
+  virtual void ApplyKeyColor ();
+  virtual void ApplyKeycolor () { ApplyKeyColor(); }
 };
-
 
 #endif // __CS_MEMIMAGE_H__

@@ -36,25 +36,26 @@ public:
 
   SCF_DECLARE_IBASE;
 
-  csGLScreenShot (csGraphics2DGLCommon* G2D);
+  csGLScreenShot (csGraphics2DGLCommon*);
   virtual ~csGLScreenShot ();
 
   virtual void *GetImageData ()
   { return Data; }
-  virtual int GetWidth ()
+  virtual int GetWidth () const
   { return Width; }
-  virtual int GetHeight ()
+  virtual int GetHeight () const
   { return Height; }
-  virtual int GetSize () { return 0; }
-  virtual void Rescale (int NewWidth, int NewHeight)
-  { (void) NewWidth; (void) NewHeight; }
-  virtual csPtr<iImage> MipMap (int step, csRGBpixel *transp)
-  { (void)step; (void)transp; return 0; }
+  virtual int GetSize () const
+  { return 0; }
+  virtual void Rescale (int, int)
+  { }
+  virtual csPtr<iImage> MipMap (int, csRGBpixel*)
+  { return 0; }
   virtual void SetName (const char *iName)
   { (void) iName; }
-  virtual const char *GetName ()
+  virtual const char *GetName () const
   { return 0; }
-  virtual int GetFormat ()
+  virtual int GetFormat () const
   { return Format; }
   virtual csRGBpixel *GetPalette ()
   { return 0; }
@@ -62,23 +63,25 @@ public:
   { return 0; }
   virtual void SetFormat (int /*iFormat*/)
   { }
-  virtual csPtr<iImage> Clone ()
+  virtual csPtr<iImage> Clone () const
   { return 0; }
-  virtual csPtr<iImage> Crop (int , int , int , int )
+  virtual csPtr<iImage> Crop (int, int, int, int) const
   { return 0; }
   virtual void CheckAlpha ()
   { }
-  virtual bool HasKeycolor ()
+  virtual bool HasKeyColor () const
   { return 0; }
-  virtual void GetKeycolor (int &r, int &g, int &b)
-  { r=0;g=0;b=0; }
-  virtual csPtr<iImage> Sharpen (csRGBpixel *transp, int strength)
-  { transp = 0; strength = 0; return 0; }
-
-  virtual int HasMipmaps ()
+  virtual bool HasKeycolor () const
+  { return HasKeyColor(); }
+  virtual void GetKeyColor (int &r, int &g, int &b) const
+  { r=0; g=0; b=0; }
+  virtual void GetKeycolor (int &r, int &g, int &b) const
+  { GetKeyColor(r,g,b); }
+  virtual csPtr<iImage> Sharpen (csRGBpixel*, int) const
   { return 0; }
-
-  void SetData (void* data);
+  virtual int HasMipmaps () const
+  { return 0; }
+  void SetData (void*);
 };
 
 #endif

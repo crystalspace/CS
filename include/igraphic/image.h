@@ -79,11 +79,11 @@ struct iImage : public iBase
    */
   virtual void *GetImageData () = 0;
   /// Query image width
-  virtual int GetWidth () = 0;
+  virtual int GetWidth () const = 0;
   /// Query image height
-  virtual int GetHeight () = 0;
+  virtual int GetHeight () const = 0;
   /// Query image size in bytes
-  virtual int GetSize () = 0;
+  virtual int GetSize () const = 0;
 
   /// Rescale the image to the given size
   virtual void Rescale (int NewWidth, int NewHeight) = 0;
@@ -103,10 +103,10 @@ struct iImage : public iBase
   /// Set image file name
   virtual void SetName (const char *iName) = 0;
   /// Get image file name
-  virtual const char *GetName () = 0;
+  virtual const char *GetName () const = 0;
 
   /// Qyery image format (see CS_IMGFMT_XXX above)
-  virtual int GetFormat () = 0;
+  virtual int GetFormat () const = 0;
   /// Get image palette (or 0 if no palette)
   virtual csRGBpixel *GetPalette () = 0;
   /**
@@ -128,32 +128,48 @@ struct iImage : public iBase
   virtual void SetFormat (int iFormat) = 0;
 
   /// Create yet another image and copy this one into the new image.
-  virtual csPtr<iImage> Clone () = 0;
+  virtual csPtr<iImage> Clone () const = 0;
 
-  /// Create a new image and copy a subpart of the actual image into the new image.
-  virtual csPtr<iImage> Crop (int x, int y, int width, int height) = 0;
+  /**
+   * Create a new image and copy a subpart of the actual image into the new
+   * image.
+   */
+  virtual csPtr<iImage> Crop (int x, int y, int width, int height) const = 0;
 
   /// Check if all alpha values are "non-transparent" and if so, discard alpha
   virtual void CheckAlpha () = 0;
 
-  /// check if image has a keycolour stored with it
-  virtual bool HasKeycolor () = 0;
+  /// Check if image has a keycolour stored with it.
+  virtual bool HasKeyColor () const = 0;
 
-  /// get the keycolour stored with the image.
-  virtual void GetKeycolor (int &r, int &g, int &b) = 0;
+  /**
+   * Check if image has a keycolour stored with it.
+   * \deprecated Use HasKeyColor() instead.
+   */
+  virtual bool HasKeycolor () const = 0;
+
+  /// Get the keycolour stored with the image.
+  virtual void GetKeyColor (int &r, int &g, int &b) const = 0;
+
+  /**
+   * Get the keycolour stored with the image.
+   * \deprecated Use GetKeyColor() instead.
+   */
+  virtual void GetKeycolor (int &r, int &g, int &b) const = 0;
 
   /**
    * Create a sharpened copy of the image.
-   * The effect of 'strength' differs from image to image. Values around 128-512 
-   * give good results. On really blurry images values up to 1024 or 2048 can be 
-   * used.
+   * The effect of 'strength' differs from image to image. Values around
+   * 128-512 give good results. On really blurry images values up to 1024 or
+   * 2048 can be used.
    */
-  virtual csPtr<iImage> Sharpen (csRGBpixel *transp, int strength) = 0;
+  virtual csPtr<iImage> Sharpen (csRGBpixel *transp, int strength) const = 0;
 
-  /** Returns the number of mipmaps contained in the image (in case there
-   * exist any precalculated mipmaps.
+  /**
+   * Returns the number of mipmaps contained in the image (in case there exist
+   * any precalculated mipmaps.
    */
-  virtual int HasMipmaps () = 0;
+  virtual int HasMipmaps () const = 0;
 };
 
 /** @} */

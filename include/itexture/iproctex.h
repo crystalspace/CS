@@ -40,7 +40,7 @@ SCF_VERSION (iProcTexture, 0, 0, 1);
 struct iProcTexture : public iBase
 {
   /// Get the 'always animate' flag.
-  virtual bool GetAlwaysAnimate () = 0;
+  virtual bool GetAlwaysAnimate () const = 0;
   /// Set the 'always animate' flag.
   virtual void SetAlwaysAnimate (bool enable) = 0;
   /// Returns the texturefactor that created this proctexture.

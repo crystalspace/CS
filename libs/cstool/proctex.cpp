@@ -256,7 +256,7 @@ iMaterialWrapper* csProcTexture::Initialize (iObjectRegistry * object_reg,
   return mat;
 }
 
-bool csProcTexture::GetAlwaysAnimate ()
+bool csProcTexture::GetAlwaysAnimate () const
 {
   return always_animate;
 }
@@ -311,7 +311,7 @@ void csProcTexture::eiTextureWrapper::SetKeyColor (int red, int green, int blue)
   scfParent->tex->SetKeyColor (red, green, blue);
 }
 
-void csProcTexture::eiTextureWrapper::GetKeyColor (int &red, int &green, int &blue)
+void csProcTexture::eiTextureWrapper::GetKeyColor (int &red, int &green, int &blue) const
 {
   scfParent->tex->GetKeyColor (red, green, blue);
 }
@@ -321,7 +321,7 @@ void csProcTexture::eiTextureWrapper::SetFlags (int flags)
   scfParent->tex->SetFlags (flags);
 }
 
-int csProcTexture::eiTextureWrapper::GetFlags ()
+int csProcTexture::eiTextureWrapper::GetFlags () const
 {
   return scfParent->tex->GetFlags();
 }
@@ -336,7 +336,7 @@ void csProcTexture::eiTextureWrapper::SetUseCallback (iTextureCallback* callback
   scfParent->tex->SetUseCallback (callback);
 }
 
-iTextureCallback* csProcTexture::eiTextureWrapper::GetUseCallback ()
+iTextureCallback* csProcTexture::eiTextureWrapper::GetUseCallback () const
 {
   return scfParent->tex->GetUseCallback();
 }
@@ -367,7 +367,7 @@ SCF_IMPLEMENT_EMBEDDED_IBASE (csProcTexture::eiProcTexture)
   SCF_IMPLEMENTS_INTERFACE (iProcTexture)
 SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
-bool csProcTexture::eiProcTexture::GetAlwaysAnimate ()
+bool csProcTexture::eiProcTexture::GetAlwaysAnimate () const
 {
   return scfParent->GetAlwaysAnimate();
 }

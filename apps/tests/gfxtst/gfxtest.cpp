@@ -468,12 +468,12 @@ static bool process_file (const char *fname)
       ifile->SetFormat (format | CS_IMGFMT_ALPHA);
 
       // merge keycolor into alpha
-      if (ifile->HasKeycolor())
+      if (ifile->HasKeyColor())
       {
 	int pixels = ifile->GetWidth() * ifile->GetHeight();
 
 	int key_r, key_g, key_b;
-	ifile->GetKeycolor (key_r, key_g, key_b);
+	ifile->GetKeyColor (key_r, key_g, key_b);
 	csRGBcolor key (key_r, key_g, key_b);
 
 	int i;

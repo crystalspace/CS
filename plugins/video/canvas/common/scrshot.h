@@ -38,13 +38,13 @@ public:
   virtual void *GetImageData ()
   { return Data; }
   /// Query image width
-  virtual int GetWidth ()
+  virtual int GetWidth () const
   { return Width; }
   /// Query image height
-  virtual int GetHeight ()
+  virtual int GetHeight () const
   { return Height; }
   /// Query image size in bytes
-  virtual int GetSize () { return 0; }
+  virtual int GetSize () const { return 0; }
   /// Rescale the image to the given size
   virtual void Rescale (int NewWidth, int NewHeight)
   { (void) NewWidth; (void) NewHeight; }
@@ -55,10 +55,10 @@ public:
   virtual void SetName (const char *iName)
   { (void) iName; }
   /// Get image file name
-  virtual const char *GetName ()
+  virtual const char *GetName () const
   { return 0; }
   /// Qyery image format (see CS_IMGFMT_XXX above)
-  virtual int GetFormat ()
+  virtual int GetFormat () const
   { return Format; }
   /// Get image palette (or 0 if no palette)
   virtual csRGBpixel *GetPalette ()
@@ -70,25 +70,29 @@ public:
   virtual void SetFormat (int /*iFormat*/)
   { }
   /// Create yet another image and copy this one into the new image.
-  virtual csPtr<iImage> Clone ()
+  virtual csPtr<iImage> Clone () const
   { return 0; }
   /// Create another image holding a subimage of current image
-  virtual csPtr<iImage> Crop (int , int , int , int )
+  virtual csPtr<iImage> Crop (int, int, int, int) const
   { return 0; }
   /// Check if the alpha channel is valid
   virtual void CheckAlpha ()
   { }
-  /// check if image has a keycolour stored with it
-  virtual bool HasKeycolor ()
+  /// Check if image has a keycolour stored with it.
+  virtual bool HasKeyColor () const
   { return 0; }
-  /// get the keycolour stored with the image.
-  virtual void GetKeycolor (int &r, int &g, int &b)
+  virtual bool HasKeycolor () const
+  { return HasKeyColor(); }
+  /// Get the keycolour stored with the image.
+  virtual void GetKeyColor (int &r, int &g, int &b) const
   { r=0;g=0;b=0; }
-  /// sharpen the image
-  virtual csPtr<iImage> Sharpen (csRGBpixel *transp, int strength)
+  virtual void GetKeycolor (int &r, int &g, int &b) const
+  { GetKeyColor(r,g,b); }
+  /// Sharpen the image.
+  virtual csPtr<iImage> Sharpen (csRGBpixel *transp, int strength) const
   { transp = 0; strength = 0; return 0; }
-
-  virtual int HasMipmaps ()
+  /// Has mipmaps.
+  virtual int HasMipmaps () const
   { return 0; }
 };
 

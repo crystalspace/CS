@@ -959,7 +959,7 @@ TYPEMAP_OUT_csWrapPtr
 %include "ivideo/halo.h"
 
 %include "ivideo/shader/shader.h"
-%rename(GetKeyColorStatus) iTextureHandle::GetKeyColor();
+%rename(GetKeyColorStatus) iTextureHandle::GetKeyColor() const;
 %include "ivideo/texture.h"
 
 %include "ivideo/txtmgr.h"
