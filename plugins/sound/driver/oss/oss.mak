@@ -59,7 +59,7 @@ ossdrv: $(OUTDIRS) $(SNDOSS)
 $(SNDOSS): $(OBJ.SNDOSS) $(LIB.SNDOSS)
 	$(DO.PLUGIN)
 
-clean: ossclean
+clean: ossdrvclean
 ossdrvclean:
 	$(RM) $(SNDOSS) $(OBJ.SNDOSS)
 
