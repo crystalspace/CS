@@ -29,6 +29,8 @@ chronological order.
 	  some places.
 	- res added a dependency on crystalspace.graphic.image.io. to the
 	  cscursor plugin.
+	- res fixed a memory overwrite and a double-delete in the win32 cursor
+	  code.
 8-Jan-2005
 	- Marten completly rewrote the way renderbuffers are sent from the
 	  mesh into renderer. Also changed the syntax of buffermappings a bit.

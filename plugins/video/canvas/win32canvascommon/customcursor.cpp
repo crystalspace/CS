@@ -258,6 +258,7 @@ csWin32CustomCursors::CachedCursor csWin32CustomCursors::CreateCursor(
       }
       delete[] pixels; pixels = alignedPixels;
     }
+    delete[] palette;
   }
 
   HDC hClientDC	= GetDC (0);
@@ -299,7 +300,7 @@ csWin32CustomCursors::CachedCursor csWin32CustomCursors::CreateCursor(
     else
     {
       csRGBpixel* imageData = (csRGBpixel*)imageRGB->GetImageData();
-      pixels = new uint8[imgH * destScanlineSize];
+      uint8* pixels = new uint8[imgH * destScanlineSize];
       memset (pixels, 0, imgH * destScanlineSize);
       
       for (int y = 0; y < imgH; y++)
@@ -316,7 +317,8 @@ csWin32CustomCursors::CachedCursor csWin32CustomCursors::CreateCursor(
           else
             *dest <<= 1;
         }
-        *dest <<= 7 - (imgW % 8);
+	if ((imgW % 8) != 0)
+	  *dest <<= 7 - (imgW % 8);
       }
       ANDbitmap = CreateBitmap (imgW, imgH, 1, 1, pixels);
       delete[] pixels;
@@ -344,7 +346,6 @@ csWin32CustomCursors::CachedCursor csWin32CustomCursors::CreateCursor(
   if (XORbitmap) DeleteObject (XORbitmap);
   free (bmpInfoMem);
   delete[] pixels;
-  delete[] palette;
   delete[] pixelsRGB;
 
   return CachedCursor (hCursor, true);
