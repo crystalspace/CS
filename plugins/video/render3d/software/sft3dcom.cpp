@@ -4205,7 +4205,8 @@ void csSoftwareGraphics3DCommon::DrawPolysMesh (csRenderMesh* mesh,
   csShaderVariable* texLightmapSV = stacks[string_texture_lightmap].Top ();
   iTextureHandle* lmh = 0;
   texLightmapSV->GetValue (lmh);
-  CS_ASSERT(("Mesh did not supply lightmap", lmh));
+  if (!lmh) return; // @@@ FIXME
+  //CS_ASSERT(("Mesh did not supply lightmap", lmh));
   csSoftSuperLightmap* slm = 
     (csSoftSuperLightmap*)((csSoftwareTextureHandle*)lmh->GetCacheData());
 
@@ -4439,8 +4440,10 @@ void csSoftwareGraphics3DCommon::DrawMesh (csRenderMesh* mesh,
   // point to an array of camera vertices.
   csVector3* f1 = (csVector3*)locks[CS_VATTRIB_POSITION - 
     CS_VATTRIB_SPECIFIC_FIRST];
+  if (!f1) return; // @@@ FIXME
   csVector2* uv1 = (csVector2*)locks[CS_VATTRIB_TEXCOORD - 
     CS_VATTRIB_SPECIFIC_FIRST];
+  if (!uv1) return; // @@@ FIXME
   csVector3* work_verts;
   csVector2* work_uv_verts;
   csColor* work_col;
