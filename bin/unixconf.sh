@@ -131,8 +131,8 @@ echo "#include <stdio.h>
 #include <stddef.h>
 #include <float.h>" >conftest.cpp
 
-${CXX} -c -H conftest.cpp &>conftest._
-bin/includes.awk conftest._
+${CXX} -c -H conftest.cpp >conftest._ 2>&1
+gawk -f bin/includes.awk conftest._
 
 # Remove dummy remains
 rm -f conftest.cpp conftest.o conftest._
