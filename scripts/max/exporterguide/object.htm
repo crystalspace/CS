@@ -8,17 +8,28 @@
   case, properties are case sensitive.</p>
   
 <table border="1" cellspacing="0">
-  <tr>
+  <tr> 
     <td>title</td>
     <td>description</td>
     <td>options</td>
     <td>defaults</td>
   </tr>
+  <tr>
+    <td><b>Player Barrier</b></td>
+    <td>If you need one object to be invisible and to block players (they can't 
+      pass through it), then define the object as a &quot;player barrier&quot;.</td>
+    <td>
+      <ul>
+        <li> PLAYERBARRIER=yes</li>
+      </ul>
+    </td>
+    <td>NO</td>
+  </tr>
   <tr> 
     <td><b>Smooth</b></td>
     <td> Changes lightmap so the object will appear more round, if the object 
       is not exposed to a light, it will not look rounded.<br>
-      Default is no smooth. You can activate that with:
+      Default is no smooth. You can activate that with: 
       <p></p>
       <ul>
       </ul>
@@ -28,7 +39,7 @@
     </td>
     <td>NO</td>
   </tr>
-  <tr>
+  <tr> 
     <td> 
       <p><b>No Shadows</b>: 
     </td>
@@ -44,7 +55,7 @@
     </td>
     <td>YES</td>
   </tr>
-  <tr>
+  <tr> 
     <td> 
       <p><b>Lighting</b>: 
     </td>
@@ -61,8 +72,8 @@
     <td>YES</td>
   </tr>
   <tr> 
-    <td>
-      <p><b>Collision Detection</b>:
+    <td> 
+      <p><b>Collision Detection</b>: 
     </td>
     <td> Normally you can't pass through objects, they will collide with other 
       objects and stop them. You can disable collision detection so you can move 
@@ -78,7 +89,7 @@
   </tr>
   <tr> 
     <td> 
-      <p><b>Invisible faces:</b>
+      <p><b>Invisible faces:</b> 
     </td>
     <td> You can set some faces to be invisible in CS. Imagine you have a box, 
       but you want 1 face to be invisible. You can surely remove that face, but 
@@ -87,14 +98,14 @@
       effect. To set a face as invisible, create a new material with texture "csinvisible.tga" 
       (this IS case-sensitive) and assign it to the faces you want to be invisible. 
     </td>
-    <td>Those faces will be flagged as LIGHTING=no and INVISIBLE=yes.
+    <td>Those faces will be flagged as LIGHTING=no and INVISIBLE=yes. 
       <p></p>
     </td>
     <td>NA</td>
   </tr>
   <tr> 
-    <td>
-      <p><b>Transparency:</b>
+    <td> 
+      <p><b>Transparency:</b> 
     </td>
     <td> 
       <p>WARNING 1: All polygons of the object should have alpha texture, you 
@@ -115,33 +126,32 @@
     </td>
     <td>NO</td>
   </tr>
-  <tr>
+  <tr> 
     <td><b>Transparency, Multiple:</b></td>
     <td>If the object is made of many plane, some of which can be seen as overlapping 
       by the player (like two parallel planes one after the other). Used for trees 
       for example. Remember that <b>triangles</b> cannot intersect, if you need 
       a intersecting planes, just split the plane into triangles along the intersections.</td>
-	  
     <td>Only for <b>genmesh</b>:<br>
       TRANSPMULTIPLE=yes</td>
     <td>NO</td>
   </tr>
   <tr> 
-    <td>
-      <p><b>Sky:</b>
+    <td> 
+      <p><b>Sky:</b> 
     </td>
     <td> Sky objects must have a different rendering priority in CS, to set an 
       object as a sky object (like the bounding box of your level) name it with 
-      prefix "_sky_". Example: _sky_box01.
+      prefix "_sky_". Example: _sky_box01. 
       <p></p>
     </td>
   </tr>
   <tr> 
-    <td>
-      <p><b>Disable Culing</b>:
+    <td> 
+      <p><b>Disable Culing</b>: 
     </td>
     <td> If you set this property to off the object will not be considered for 
-      visibility culling purposes. Default is on.
+      visibility culling purposes. Default is on. 
       <p></p>
       <ul>
       </ul>
@@ -153,10 +163,10 @@
   </tr>
   <tr> 
     <td> 
-      <p><b>Only for Culling:</b>
+      <p><b>Only for Culling:</b> 
     </td>
     <td> If you set this property the object will be used only for culling purposes, 
-      so the object will be invisible.
+      so the object will be invisible. 
       <p></p>
       <ul>
       </ul>

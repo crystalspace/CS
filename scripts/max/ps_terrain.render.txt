@@ -1,0 +1,52 @@
+
+  <renderpriorities>
+    <priority name="sky">
+      <level>1</level>
+      <sort>NONE</sort>
+      <camera />
+    </priority>
+    <priority name="mirror">
+      <level>2</level>
+      <sort>FRONT2BACK</sort>
+    </priority>
+    <priority name="wall">
+      <level>3</level>
+      <sort>NONE</sort>
+    </priority>
+    <priority name="object">
+      <level>4</level>
+      <sort>NONE</sort>
+    </priority>
+    <priority name="alpha">
+      <level>5</level>
+      <sort>BACK2FRONT</sort>
+    </priority>
+  </renderpriorities>
+
+  <addon>
+    <plugin>crystalspace.renderloop.loop.loader</plugin>
+    <params>
+      <name>myLoop</name>
+      <steps>
+        <!-- ambient lighting -->
+        <step plugin="crystalspace.renderloop.step.generic">
+          <shadertype>ambient</shadertype>
+          <zoffset>yes</zoffset>
+	  <portaltraversal/>
+          <zuse />
+        </step>
+        <!-- draws terrain splatting -->
+        <step plugin="crystalspace.renderloop.step.generic">
+          <shadertype>terrain splat</shadertype>
+          <zoffset>no</zoffset>
+          <zuse />
+        </step>
+        <!-- draws geometry -->
+        <step plugin="crystalspace.renderloop.step.generic">
+          <shadertype>standard</shadertype>
+          <zoffset>no</zoffset>
+          <zmesh />
+        </step>
+      </steps>
+    </params>
+  </addon>
