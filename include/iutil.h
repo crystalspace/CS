@@ -33,6 +33,7 @@
 #include "iutil/event.h"
 #include "iutil/eventh.h"
 #include "iutil/eventq.h"
+#include "iutil/job.h"
 #include "iutil/memdebug.h"
 #include "iutil/object.h"
 #include "iutil/objreg.h"
