@@ -153,12 +153,13 @@ void csCubeMeshObject::SetupObject ()
     vertices[6].Set (-sx,  sy,  sz);
     vertices[7].Set ( sx,  sy,  sz);
     int i;
-    object_bbox.StartBoundingBox ();
+    object_bbox.StartBoundingBox (vertices[0]);
+    object_bbox.AddBoundingVertex (vertices[7]);
+	
     for (i = 0 ; i < 8 ; i++)
     {
       normals[i] = vertices[i]; normals[i].Normalize ();
       vertices[i] += shift;
-      object_bbox.AddBoundingVertex (vertices[i]);
     }
     uv[0].Set (0, 0);
     uv[1].Set (1, 0);
@@ -349,6 +350,35 @@ void csCubeMeshObject::HardTransform (const csReversibleTransform& t)
   initialized = false;
   shapenr++;
 }
+
+bool csCubeMeshObject::HitBeamObject(const csVector3& start,
+  const csVector3& end, csVector3& isect, float *pr)
+{
+  // @@@ We might consider checking to a lower LOD version only.
+  // This function is not very fast if the bounding box test succeeds.
+  // Plagarism notice: Ripped form Sprite3D.
+  csSegment3 seg (start, end);
+  if (!csIntersect3::BoxSegment (object_bbox, seg, isect, pr))
+    return false;
+  int i;
+  csVector3 *vrt = mesh.vertices[0];
+  csTriangle *tr = mesh.triangles;
+  for (i = 0 ; i < 12 ; i++)
+  {
+    if (csIntersect3::IntersectTriangle (vrt[tr[i].a], vrt[tr[i].b],
+    	vrt[tr[i].c], seg, isect))
+    {
+      if (pr)
+      {
+        *pr = qsqrt (csSquaredDist::PointPoint (start, isect) /
+		csSquaredDist::PointPoint (start, end));
+      }
+      return true;
+    }
+  }
+  return false;
+}
+
 
 //----------------------------------------------------------------------
 

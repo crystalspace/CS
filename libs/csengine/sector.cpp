@@ -345,6 +345,7 @@ csObject* csSector::HitBeam (const csVector3& start, const csVector3& end, csVec
 {
   float r, best_mesh_r = 10000000000.;
   csMeshWrapper* near_mesh = NULL;
+  csVector3 tsect;
 
   // First check all meshes in this sector.
   int i;
@@ -356,7 +357,8 @@ csObject* csSector::HitBeam (const csVector3& start, const csVector3& end, csVec
       if (r < best_mesh_r)
       {
         best_mesh_r = r;
-	near_mesh = mesh;
+		near_mesh = mesh;
+		tsect = isect;
       }
     }
   }
@@ -383,6 +385,7 @@ csObject* csSector::HitBeam (const csVector3& start, const csVector3& end, csVec
   }
   // The mesh is closer (or there is no mesh).
   if (polygonPtr) *polygonPtr = NULL;
+  isect = tsect;
   return (csObject*)near_mesh;
 }
 

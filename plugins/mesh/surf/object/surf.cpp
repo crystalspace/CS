@@ -31,6 +31,8 @@
 #include "iengine/light.h"
 #include "qsqrt.h"
 
+//#define SURF_DEBUG
+
 CS_IMPLEMENT_PLUGIN
 
 SCF_IMPLEMENT_IBASE (csSurfMeshObject)
@@ -61,6 +63,7 @@ csSurfMeshObject::csSurfMeshObject (iMeshObjectFactory* factory)
   mesh.texels[0] = NULL;
   mesh.triangles = NULL;
   mesh.vertex_fog = NULL;
+  corner[0] = corner[1] = corner[2] = corner[3] = csVector3(0,0,0);
   shapenr = 0;
   do_lighting = true;
   color.red = 0;
@@ -90,16 +93,10 @@ void csSurfMeshObject::GetTransformedBoundingBox (long cameranr,
   }
   cur_cameranr = cameranr;
   cur_movablenr = movablenr;
-
-  camera_bbox.StartBoundingBox (trans * object_bbox.GetCorner (0));
-  camera_bbox.AddBoundingVertexSmart (trans * object_bbox.GetCorner (1));
-  camera_bbox.AddBoundingVertexSmart (trans * object_bbox.GetCorner (2));
-  camera_bbox.AddBoundingVertexSmart (trans * object_bbox.GetCorner (3));
-  camera_bbox.AddBoundingVertexSmart (trans * object_bbox.GetCorner (4));
-  camera_bbox.AddBoundingVertexSmart (trans * object_bbox.GetCorner (5));
-  camera_bbox.AddBoundingVertexSmart (trans * object_bbox.GetCorner (6));
-  camera_bbox.AddBoundingVertexSmart (trans * object_bbox.GetCorner (7));
-
+  camera_bbox.StartBoundingBox (trans * corner[0]);
+  camera_bbox.AddBoundingVertexSmart (trans * corner[1]);
+  camera_bbox.AddBoundingVertexSmart (trans * corner[2]);
+  camera_bbox.AddBoundingVertexSmart (trans * corner[3]);
   cbox = camera_bbox;
 }
 
@@ -171,6 +168,12 @@ void csSurfMeshObject::GenerateSurface (G3DTriangleMesh& mesh)
       num_vertices++;
     }
   }
+  // Using the last values used in loop
+  corner[0] = topleft;
+  corner[1] = csVector3( topleft.x, ry, topleft.z);
+  corner[2] = csVector3( rx, ry, topleft.z);
+  corner[3] = csVector3( rx, topleft.y, topleft.z);
+
   int num_triangles = 0;
   int i = 0;
   for (y = 0 ; y < yres ; y++)
@@ -211,10 +214,10 @@ void csSurfMeshObject::GenerateSurface (G3DTriangleMesh& mesh)
 
 void csSurfMeshObject::RecalcObjectBBox ()
 {
-  object_bbox.StartBoundingBox (mesh.vertices[0][0]);
+  object_bbox.StartBoundingBox (corner[0]);
   int i;
-  for (i = 1 ; i < mesh.num_vertices ; i++)
-    object_bbox.AddBoundingVertexSmart (mesh.vertices[0][i]);
+  for (i = 1 ; i < 3 ; i++)
+    object_bbox.AddBoundingVertexSmart (corner[i]);
   float xx = object_bbox.MaxX ()-object_bbox.MinX (); xx /= 2.;
   float yy = object_bbox.MaxY ()-object_bbox.MinY (); yy /= 2.;
   float zz = object_bbox.MaxZ ()-object_bbox.MinZ (); zz /= 2.;
@@ -405,10 +408,48 @@ void csSurfMeshObject::HardTransform (const csReversibleTransform& t)
   int i;
   for (i = 0 ; i < mesh.num_vertices ; i++)
     mesh.vertices[0][i] = t.This2Other (mesh.vertices[0][i]);
+  for (i = 0; i < 4; i++ )
+	corner[i] = t.This2Other(corner[i]);
   RecalcObjectBBox ();
   RecalcSurfaceNormal ();
   shapenr++;
 }
+
+bool csSurfMeshObject::HitBeamObject(const csVector3& start,
+  const csVector3& end, csVector3& isect, float *pr)
+{
+  // The real corners of the surface are cached during generation to
+  // improve performance.
+
+  csSegment3 seg (start, end);
+#ifdef SURF_DEBUG
+  printf("Surface:Hit Beam Object\n");
+  printf("Debug:\n");
+  printf("Top: (%f,%f,%f) to (%f,%f,%f)\n",
+	corner[0].x, corner[0].y, corner[0].z,
+	corner[1].x, corner[1].y, corner[1].z);
+  printf("Bottom: (%f,%f,%f) to (%f,%f,%f)\n",
+	corner[2].x, corner[2].y, corner[2].z,
+	corner[3].x, corner[3].y, corner[3].z);
+#endif
+
+    if (csIntersect3::IntersectTriangle (corner[0], corner[2], corner[1], seg, isect) 
+	  || csIntersect3::IntersectTriangle (corner[0], corner[3], corner[2], seg, isect))
+    {
+      if (pr)
+      {
+        *pr = qsqrt (csSquaredDist::PointPoint (start, isect) /
+		csSquaredDist::PointPoint (start, end));
+      }
+#ifdef SURF_DEBUG
+      printf("Surface:Hit Beam Object: HIT! intersect : (%f,%f,%f)\n",
+        isect.x, isect.y, isect.z);
+#endif
+      return true;
+    }
+  return false;
+}
+
 
 //----------------------------------------------------------------------
 
