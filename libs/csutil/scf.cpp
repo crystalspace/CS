@@ -200,7 +200,7 @@ scfFactory::scfFactory (const scfClassInfo *iClassInfo)
   CONSTRUCT_IBASE (NULL);
   ClassID = strnew (iClassInfo->ClassID);
   ClassInfo = iClassInfo;
-  Dependencies = iClassInfo->Dependencies;
+  Dependencies = strnew (iClassInfo->Dependencies);
 #ifndef CS_STATIC_LINKED
   LibraryName = NULL;
   Library = NULL;
