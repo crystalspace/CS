@@ -21,7 +21,21 @@
 
 #include "csutil/scf.h"
 
-SCF_VERSION (iCamera, 0, 0, 1);
+#define VEC_FORWARD   csVector3(0,0,1)
+#define VEC_BACKWARD  csVector3(0,0,-1)
+#define VEC_RIGHT     csVector3(1,0,0)
+#define VEC_LEFT      csVector3(-1,0,0)
+#define VEC_UP        csVector3(0,1,0)
+#define VEC_DOWN      csVector3(0,-1,0)
+
+#define VEC_ROT_RIGHT  csVector3(0,1,0)
+#define VEC_ROT_LEFT   csVector3(0,-1,0)
+#define VEC_TILT_RIGHT (-csVector3(0,0,1))
+#define VEC_TILT_LEFT  (-csVector3(0,0,-1))
+#define VEC_TILT_UP    (-csVector3(1,0,0))
+#define VEC_TILT_DOWN  (-csVector3(-1,0,0))
+
+SCF_VERSION (iCamera, 0, 0, 2);
 
 /// temporary - subject to change
 struct iCamera : public iBase
@@ -30,6 +44,85 @@ struct iCamera : public iBase
   virtual float GetAspect () = 0;
   ///
   virtual float GetInvAspect () = 0;
+  /**
+   * Sets the absolute position of the camera inside the sector.
+   * Vector 'v' is in world space coordinates. This function does
+   * not check if the vector is really in the current sector. In
+   * fact it is legal to set the position outside the sector
+   * boundaries.
+   */
+  virtual void SetPosition (const csVector3& v) = 0;
+  /**
+   * Moves the camera a relative amount in world coordinates.
+   * If 'cd' is true then collision detection with objects and things
+   * inside the sector is active. Otherwise you can walk through objects
+   * (but portals will still be correctly checked).
+   */
+  virtual void MoveWorld (const csVector3& v, bool cd = true) = 0;
+
+  /**
+   * Moves the camera a relative amount in camera coordinates.
+   */
+  virtual void Move (const csVector3& v, bool cd = true) = 0;
+
+  /**
+   * Moves the camera a relative amount in world coordinates,
+   * ignoring portals and walls. This is used by the wireframe
+   * class. In general this is useful by any camera model that
+   * doesn't want to restrict its movement by portals and
+   * sector boundaries.
+   */
+  virtual void MoveWorldUnrestricted (const csVector3& v) = 0;
+
+  /**
+   * Moves the camera a relative amount in camera coordinates,
+   * ignoring portals and walls. This is used by the wireframe
+   * class. In general this is useful by any camera model that
+   * doesn't want to restrict its movement by portals and
+   * sector boundaries.
+   */
+  virtual void MoveUnrestricted (const csVector3& v) = 0;
+
+  /**
+   * Rotate the camera by the angle (radians) around the given vector,
+   * in world coordinates.
+   * Note: this function rotates the camera, not the coordinate system.
+   */
+  virtual void RotateWorld (const csVector3& v, float angle) = 0;
+
+  /**
+   * Rotate the camera by the angle (radians) around the given vector,
+   * in camera coordinates.
+   * Note: this function rotates the camera, not the coordinate system.
+   */
+  virtual void Rotate (const csVector3& v, float angle) = 0;
+
+  /**
+   * Use the given transformation matrix, in worldspace,
+   * to reorient the camera.
+   * Note: this function rotates the camera, not the coordinate system.
+   */
+  virtual void RotateWorld (const csMatrix3& m)  = 0;
+
+  /**
+   * Use the given transformation matrix, in camera space,
+   * to reorient the camera.
+   * Note: this function rotates the camera, not the coordinate system.
+   */
+  virtual void Rotate (const csMatrix3& m)  = 0;
+
+  /**
+   * Have the camera look at the given (x,y,z) point, using up as
+   * the up-vector. 'v' should be given relative to the position
+   * of the camera.
+   */
+  virtual void LookAt (const csVector3& v, const csVector3& up) = 0;
+
+  /**
+   * Eliminate roundoff error by snapping the camera orientation to a
+   * grid of density n
+   */
+  virtual void Correct (int n) = 0;
 };
 
 #endif

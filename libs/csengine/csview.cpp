@@ -24,10 +24,22 @@
 #include "csengine/pol2d.h"
 #include "csengine/camera.h"
 #include "igraph3d.h"
+#include "isector.h"
 #include "qint.h"
+
+IMPLEMENT_IBASE (csView)
+  IMPLEMENTS_INTERFACE (iBase)
+  IMPLEMENTS_EMBEDDED_INTERFACE (iView)
+IMPLEMENT_IBASE_END
+
+IMPLEMENT_EMBEDDED_IBASE (csView::View)
+  IMPLEMENTS_INTERFACE (iView)
+IMPLEMENT_EMBEDDED_IBASE_END
 
 csView::csView (csEngine *e, iGraphics3D* ig3d)
 {
+  CONSTRUCT_IBASE (NULL);
+  CONSTRUCT_EMBEDDED_IBASE (scfiView);
   bview = NULL;
   engine = e;
   (G3D = ig3d)->IncRef ();
@@ -178,3 +190,19 @@ void csView::SetPerspectiveCenter (float x, float y)
 {
   camera->SetPerspectiveCenter (x, y);
 }
+
+void csView::View::SetSector (iSector* sector)
+{
+  scfParent->SetSector (sector->GetPrivateObject ());
+}
+
+iCamera* csView::View::GetCamera ()
+{
+  return (iCamera*)scfParent->GetCamera ();
+}
+
+void csView::View::SetCamera (iCamera* camera)
+{
+  scfParent->SetCamera ((csCamera*)camera);
+}
+

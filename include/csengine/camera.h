@@ -24,20 +24,6 @@
 #include "icamera.h"
 #include "csengine/planeclp.h"
 
-#define VEC_FORWARD   csVector3(0,0,1)
-#define VEC_BACKWARD  csVector3(0,0,-1)
-#define VEC_RIGHT     csVector3(1,0,0)
-#define VEC_LEFT      csVector3(-1,0,0)
-#define VEC_UP        csVector3(0,1,0)
-#define VEC_DOWN      csVector3(0,-1,0)
-
-#define VEC_ROT_RIGHT  csVector3(0,1,0)
-#define VEC_ROT_LEFT   csVector3(0,-1,0)
-#define VEC_TILT_RIGHT (-csVector3(0,0,1))
-#define VEC_TILT_LEFT  (-csVector3(0,0,-1))
-#define VEC_TILT_UP    (-csVector3(1,0,0))
-#define VEC_TILT_DOWN  (-csVector3(-1,0,0))
-
 class csSector;
 class csPolygon3D;
 class Vertex;
@@ -179,7 +165,7 @@ public:
    * fact it is legal to set the position outside the sector
    * boundaries.
    */
-  inline void SetPosition (const csVector3& v) { SetOrigin (v); }
+  virtual void SetPosition (const csVector3& v) { SetOrigin (v); }
 
   /**
    * Set the world to camera transformation matrix.
@@ -229,12 +215,12 @@ public:
    * inside the sector is active. Otherwise you can walk through objects
    * (but portals will still be correctly checked).
    */
-  void MoveWorld (const csVector3& v, bool cd = true);
+  virtual void MoveWorld (const csVector3& v, bool cd = true);
 
   /**
    * Moves the camera a relative amount in camera coordinates.
    */
-  void Move (const csVector3& v, bool cd = true) { MoveWorld (m_t2o * v, cd); }
+  virtual void Move (const csVector3& v, bool cd = true) { MoveWorld (m_t2o * v, cd); }
 
   /**
    * Moves the camera a relative amount in world coordinates,
@@ -243,7 +229,7 @@ public:
    * doesn't want to restrict its movement by portals and
    * sector boundaries.
    */
-  void MoveWorldUnrestricted (const csVector3& v) { v_o2t += v; }
+  virtual void MoveWorldUnrestricted (const csVector3& v) { v_o2t += v; }
 
   /**
    * Moves the camera a relative amount in camera coordinates,
@@ -252,48 +238,48 @@ public:
    * doesn't want to restrict its movement by portals and
    * sector boundaries.
    */
-  void MoveUnrestricted (const csVector3& v) { v_o2t += m_t2o * v; }
+  virtual void MoveUnrestricted (const csVector3& v) { v_o2t += m_t2o * v; }
 
   /**
    * Rotate the camera by the angle (radians) around the given vector,
    * in world coordinates.
    * Note: this function rotates the camera, not the coordinate system.
    */
-  void RotateWorld (const csVector3& v, float angle);
+  virtual void RotateWorld (const csVector3& v, float angle);
 
   /**
    * Rotate the camera by the angle (radians) around the given vector,
    * in camera coordinates.
    * Note: this function rotates the camera, not the coordinate system.
    */
-  void Rotate (const csVector3& v, float angle);
+  virtual void Rotate (const csVector3& v, float angle);
 
   /**
    * Use the given transformation matrix, in worldspace,
    * to reorient the camera.
    * Note: this function rotates the camera, not the coordinate system.
    */
-  void RotateWorld (const csMatrix3& m) { SetT2O (m * m_t2o); }
+  virtual void RotateWorld (const csMatrix3& m) { SetT2O (m * m_t2o); }
 
   /**
    * Use the given transformation matrix, in camera space,
    * to reorient the camera.
    * Note: this function rotates the camera, not the coordinate system.
    */
-  void Rotate (const csMatrix3& m) { SetT2O (m_t2o * m); }
+  virtual void Rotate (const csMatrix3& m) { SetT2O (m_t2o * m); }
 
   /**
    * Have the camera look at the given (x,y,z) point, using up as
    * the up-vector. 'v' should be given relative to the position
    * of the camera.
    */
-  void LookAt (const csVector3& v, const csVector3& up);
+  virtual void LookAt (const csVector3& v, const csVector3& up);
 
   /**
    * Eliminate roundoff error by snapping the camera orientation to a
    * grid of density n
    */
-  void Correct (int n);
+  virtual void Correct (int n);
 
   /// Change the shift for perspective correction.
   void SetPerspectiveCenter (float x, float y) { shift_x = x; shift_y = y; }
@@ -325,8 +311,5 @@ private:
   ///
   void Correct (int n, float* vals[]);
 };
-
-#define GetICameraFromCamera(a)  &a->m_xCamera
-#define GetCameraFromICamera(a)  ((csCamera*)((size_t)a - offsetof(csCamera, m_xCamera)))
 
 #endif // __CS_CAMERA_H__

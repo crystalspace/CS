@@ -26,6 +26,7 @@ struct iSector;
 struct iThing;
 struct iSprite;
 struct iSpriteTemplate;
+struct iTextureWrapper;
 struct iMaterialWrapper;
 struct iObject;
 
@@ -83,6 +84,8 @@ struct iRegion : public iBase
   virtual iSprite *FindSprite (const char *iName) = 0;
   /// Find a sprite template in this region by name
   virtual iSpriteTemplate *FindSpriteTemplate (const char *iName) = 0;
+  /// Find a texture in this region by name
+  virtual iTextureWrapper *FindTexture (const char *iName) = 0;
   /// Find a material in this region by name
   virtual iMaterialWrapper *FindMaterial (const char *iName) = 0;
 

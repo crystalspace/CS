@@ -32,6 +32,7 @@
 #include "csengine/pol2d.h"
 #include "csengine/polytext.h"
 #include "csengine/thing.h"
+#include "csengine/csview.h"
 #include "csengine/cssprite.h"
 #include "csengine/csspr2d.h"
 #include "csengine/cscoll.h"
@@ -1867,7 +1868,7 @@ void csEngine::DeleteAll ()
   Clear ();
 }
 
-bool csEngine::CreateTexture (const char *iName, const char *iFileName,
+iTextureWrapper* csEngine::CreateTexture (const char *iName, const char *iFileName,
   csColor *iTransp, int iFlags)
 {
   // First of all, load the image file
@@ -1877,7 +1878,7 @@ bool csEngine::CreateTexture (const char *iName, const char *iFileName,
     if (data) data->DecRef ();
     CsPrintf (MSG_WARNING, "Cannot read image file \"%s\" from VFS\n",
       iFileName);
-    return false;
+    return NULL;
   }
 
   iImage *ifile = csImageLoader::Load (data->GetUint8 (), data->GetSize (),
@@ -1887,7 +1888,7 @@ bool csEngine::CreateTexture (const char *iName, const char *iFileName,
   if (!ifile)
   {
     CsPrintf (MSG_WARNING, "Unknown image file format: \"%s\"\n", iFileName);
-    return false;
+    return NULL;
   }
 
   iDataBuffer *xname = VFS->ExpandPath (iFileName);
@@ -1911,7 +1912,15 @@ bool csEngine::CreateTexture (const char *iName, const char *iFileName,
     tex->SetKeyColor (QInt (iTransp->red * 255.2),
       QInt (iTransp->green * 255.2), QInt (iTransp->blue * 255.2));
 
-  return true;
+  return (iTextureWrapper*)tex;
+}
+
+iMaterialWrapper* csEngine::CreateMaterial (const char *iName, iTextureWrapper* texture)
+{
+  csMaterial* mat = new csMaterial ((csTextureWrapper*)texture);
+  csMaterialWrapper* wrapper = materials->NewMaterial (mat);
+  wrapper->SetName (iName);
+  return (iMaterialWrapper*)wrapper;
 }
 
 bool csEngine::CreateCamera (const char *iName, const char *iSector,
@@ -2063,8 +2072,37 @@ iMaterialWrapper* csEngine::FindMaterial (const char* iName, bool regionOnly)
   }
   else
   {
-    return (iMaterialWrapper*)materials->FindByName (iName);
+    csMaterialWrapper* wr = materials->FindByName (iName);
+    return (iMaterialWrapper*)wr;
   }
+}
+
+iTextureWrapper* csEngine::FindTexture (const char* iName, bool regionOnly)
+{
+  if (regionOnly && region)
+  {
+    return region->FindTexture (iName);
+  }
+  else
+  {
+    csTextureWrapper* wr = textures->FindByName (iName);
+    return (iTextureWrapper*)wr;
+  }
+}
+
+iView* csEngine::CreateView (iGraphics3D* g3d)
+{
+  csView* view = new csView (this, g3d);
+  iView* iview = QUERY_INTERFACE (view, iView);
+  return iview;
+}
+
+iStatLight* csEngine::CreateLight (const csVector3& pos, float radius,
+  	const csColor& color, bool pseudoDyn)
+{
+  csStatLight* light = new csStatLight (pos.x, pos.y, pos.z, radius,
+  	color.red, color.green, color.blue, pseudoDyn);
+  return QUERY_INTERFACE (light, iStatLight);
 }
 
 //----------------Begin-Multi-Context-Support------------------------------

@@ -20,13 +20,31 @@
 #ifndef __IVIEW_H__
 #define __IVIEW_H__
 
-SCF_VERSION (iView, 0, 0, 1);
+#include "csutil/scf.h"
+
+SCF_VERSION (iView, 0, 0, 2);
+
+struct iCamera;
+struct iSector;
 
 /**
-  Document me
+ * The iView class encapsulates the top-level Crystal Space
+ * renderer interface. It is basicly a camera and a clipper.
  */
 struct iView : public iBase {
-
+  /// Set sector for this view.
+  virtual void SetSector (iSector* sector) = 0;
+  /// Get current camera.
+  virtual iCamera* GetCamera () = 0;
+  /// Set current camera.
+  virtual void SetCamera (iCamera* c) = 0;
+  /// Clear clipping polygon.
+  virtual void ClearView () = 0;
+  /// Set clipping rectangle.
+  virtual void SetRectangle (int x, int y, int w, int h) = 0;
+  /// Draw 3D world as seen from the camera.
+  virtual void Draw () = 0;
 };
 
 #endif
+

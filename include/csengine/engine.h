@@ -651,7 +651,7 @@ public:
    * the texture manager (the texture manager should have them
    * locally now).
    */
-  bool Prepare ();
+  virtual bool Prepare ();
 
   /**
    * Set the maximum number of polygons to process in
@@ -720,7 +720,7 @@ public:
    * from the application. These flags must be or-ed with optional other
    * flags that the application might be interested in.
    */
-  int GetBeginDrawFlags ()
+  virtual int GetBeginDrawFlags ()
   {
     if (engine_mode == CS_ENGINE_ZBUFFER)
       return CSDRAW_CLEARZBUFFER;
@@ -1115,8 +1115,10 @@ public:
   virtual void DeleteAll ();
 
   /// Register a texture to be loaded during Prepare()
-  virtual bool CreateTexture (const char *iName, const char *iFileName,
+  virtual iTextureWrapper* CreateTexture (const char *iName, const char *iFileName,
     csColor *iTransp, int iFlags);
+  /// Register a material to be loaded during Prepare()
+  virtual iMaterialWrapper* CreateMaterial (const char *iName, iTextureWrapper* texture);
   /// Create a named camera position object
   virtual bool CreateCamera (const char *iName, const char *iSector,
     const csVector3 &iPos, const csVector3 &iForward, const csVector3 &iUpward);
@@ -1149,8 +1151,17 @@ public:
   /// Find a sprite template by name
   virtual iSpriteTemplate *FindSpriteTemplate (const char *iName, bool regionOnly = false);
 
+  /// Find a loaded texture by name.
+  virtual iTextureWrapper* FindTexture (const char* iName, bool regionOnly = false);
   /// Find a loaded material by name.
   virtual iMaterialWrapper* FindMaterial (const char* iName, bool regionOnly = false);
+
+  /// Create a new view on the engine.
+  virtual iView* CreateView (iGraphics3D* g3d);
+
+  /// Create a static/pseudo-dynamic light.
+  virtual iStatLight* CreateLight (const csVector3& pos, float radius,
+  	const csColor& color, bool pseudoDyn);
 
   //--------------------- iConfig interface implementation --------------------
 

@@ -29,13 +29,17 @@ class csMatrix3;
 class csColor;
 
 struct iSector;
+struct iStatLight;
 struct iThing;
 struct iSprite;
 struct iSpriteTemplate;
 struct iMaterialWrapper;
+struct iTextureWrapper;
 struct iRegion;
+struct iView;
+struct iGraphics3D;
 
-SCF_VERSION (iEngine, 0, 1, 3);
+SCF_VERSION (iEngine, 0, 1, 5);
 
 /**
  * This interface is the main interface to the 3D engine.
@@ -49,6 +53,16 @@ struct iEngine : public iPlugIn
    * complete.
    */
   virtual csEngine *GetCsEngine () = 0;
+
+  /**
+   * Prepare the engine. This function must be called after
+   * you loaded/created the world. It will prepare all lightmaps
+   * for use and also free all images that were loaded for
+   * the texture manager (the texture manager should have them
+   * locally now).
+   */
+  virtual bool Prepare () = 0;
+
   /**
    * Query the format to load textures (usually this depends on texture
    * manager)
@@ -78,8 +92,10 @@ struct iEngine : public iPlugIn
   virtual void DeleteAll () = 0;
 
   /// Register a texture to be loaded during Prepare()
-  virtual bool CreateTexture (const char *iName, const char *iFileName,
+  virtual iTextureWrapper* CreateTexture (const char *iName, const char *iFileName,
     csColor *iTransp, int iFlags) = 0;
+  /// Register a material to be loaded during Prepare()
+  virtual iMaterialWrapper* CreateMaterial (const char *iName, iTextureWrapper* texture) = 0;
   /// Create a named camera position object
   virtual bool CreateCamera (const char *iName, const char *iSector,
     const csVector3 &iPos, const csVector3 &iForward,
@@ -117,8 +133,23 @@ struct iEngine : public iPlugIn
   /// Return true if lighting cache is enabled.
   virtual bool IsLightingCacheEnabled () = 0;
 
+  /// Find a loaded texture.
+  virtual iTextureWrapper* FindTexture (const char* iName, bool regionOnly = false) = 0;
   /// Find a loaded material.
   virtual iMaterialWrapper* FindMaterial (const char* iName, bool regionOnly = false) = 0;
+
+  /// Create a new view on the engine.
+  virtual iView* CreateView (iGraphics3D* g3d) = 0;
+  /// Create a static/pseudo-dynamic light.
+  virtual iStatLight* CreateLight (const csVector3& pos, float radius,
+  	const csColor& color, bool pseudoDyn) = 0;
+
+  /**
+   * Get the required flags for 3D->BeginDraw() which should be called
+   * from the application. These flags must be or-ed with optional other
+   * flags that the application might be interested in.
+   */
+  virtual int GetBeginDrawFlags () = 0;
 };
 
 #endif // __IENGINE_H__

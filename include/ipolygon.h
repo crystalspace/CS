@@ -41,7 +41,7 @@ class csColor;
  */
 #define CS_POLY_LIGHTING	0x00000001
 
-SCF_VERSION (iPolygon3D, 0, 1, 3);
+SCF_VERSION (iPolygon3D, 0, 1, 4);
 
 /**
  * This is the interface to 3D polygons.

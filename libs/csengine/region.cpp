@@ -362,6 +362,15 @@ iSpriteTemplate* csRegion::FindSpriteTemplate (const char *iName)
   return (iSpriteTemplate*)obj;
 }
 
+iTextureWrapper* csRegion::FindTexture (const char *iName)
+{
+  csObject* obj = FindObject (iName, csTextureWrapper::Type, false);
+  if (!obj) return NULL;
+  // Cast two times to avoid problems with multi-inherit.
+  csTextureWrapper* wrapper = (csTextureWrapper*)obj;
+  return (iTextureWrapper*)wrapper;
+}
+
 iMaterialWrapper* csRegion::FindMaterial (const char *iName)
 {
   csObject* obj = FindObject (iName, csMaterialWrapper::Type, false);

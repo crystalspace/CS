@@ -116,6 +116,8 @@ public:
   virtual iSprite *FindSprite (const char *iName);
   /// Find a sprite template in this region by name
   virtual iSpriteTemplate *FindSpriteTemplate (const char *iName);
+  /// Find a texture in this region by name
+  virtual iTextureWrapper *FindTexture (const char *iName);
   /// Find a material in this region by name
   virtual iMaterialWrapper *FindMaterial (const char *iName);
 

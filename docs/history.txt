@@ -1,6 +1,22 @@
 The history order has been reversed so that new features are at the top.
 
+13-Dec-2000
+	- Did a little further work on the engine SCF interfaces:
+	    - Added iEngine/csEngine::FindTexture().
+	    - Added iEngine/csEngine::CreateMaterial().
+	    - Added iRegion/csRegion::FindTexture().
+	    - Changed FindTexture/FindMaterial to return the pointer
+	      to the texture/material on success instead of boolean.
+	    - Added iView::Draw().
+	    - Moved several defines for vectors in csCamera to iCamera.
+	    - Added iEngine::GetBeginDrawFlags().
+	    - Added iEngine::CreateLight.
+	- The result of the SCF changes today and yesterday is that
+	  simplep (the version of simple that uses the engine plugin) is
+	  actually able to create geometry and show it.
 12-Dec-2000
+	- Thomas Hieber added two files to gamecore plugin which he
+	  forgot to add in the past.
 	- Michael Dale Long fixed the cctest console. Also did some
 	  cosmetic code cleanup. Funky console is now enabled again.
 	- Philip Wyett fixed a memory write error in the OpenGL texture
@@ -25,6 +41,12 @@ The history order has been reversed so that new features are at the top.
 	  the portals in the other levels don't seem to be correct.
 	  'portal sydney' is the only one which seems to work nicely
 	  from flarge.
+	- Did a little further work on the engine SCF interfaces:
+	    - Added Prepare() to iEngine.
+	    - csView now extends the already existing but empty iView.
+	    - Added a few methods to iView.
+	    - Added CreateView() to iEngine.
+	    - Added lots of functions from csCamera to iCamera.
 10-Dec-2000
 	- Eric Sunshine made the following changes to the project:
 	    - Finally eliminated the evil monolithic apps/support/static.cpp

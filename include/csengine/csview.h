@@ -23,6 +23,7 @@
 #include "csutil/csbase.h"
 #include "csgeom/math2d.h"
 #include "csgeom/box.h"
+#include "iview.h"
 
 class csPolygon2D;
 class csCamera;
@@ -35,7 +36,7 @@ struct iGraphics3D;
  * The csView class encapsulates the top-level Crystal Space
  * renderer interface. It is basicly a camera and a clipper.
  */
-class csView : public csBase
+class csView : public csBase, public iBase
 {
 private:
   // csClipper.
@@ -74,9 +75,9 @@ public:
   void SetCamera (csCamera* c) { camera = c; }
 
   /// Clear clipping polygon.
-  void ClearView ();
+  virtual void ClearView ();
   /// Set clipping rectangle.
-  void SetRectangle (int x, int y, int w, int h);
+  virtual void SetRectangle (int x, int y, int w, int h);
   /// Set Context
   void SetContext (iGraphics3D *ig3d);
   /// Add a vertex to clipping polygon (non-rectangular clipping).
@@ -95,6 +96,29 @@ public:
    * Change the shift for perspective correction.
    */
   void SetPerspectiveCenter (float x, float y);
+
+  DECLARE_IBASE;
+
+  //------------------------- iView implementation -----------------------//
+  struct View : public iView
+  {
+    DECLARE_EMBEDDED_IBASE (csView);
+    virtual void SetSector (iSector* sector);
+    virtual iCamera* GetCamera ();
+    virtual void SetCamera (iCamera* c);
+    virtual void ClearView ()
+    {
+      scfParent->ClearView ();
+    }
+    virtual void SetRectangle (int x, int y, int w, int h)
+    {
+      scfParent->SetRectangle (x, y, w, h);
+    }
+    virtual void Draw ()
+    {
+      return scfParent->Draw ();
+    }
+  } scfiView;
 };
 
 #endif // __CS_CSVIEW_H__
