@@ -24,6 +24,9 @@ The history order is reversed so that new features are at the top.
 	  required (OpenGL renderer).
 	- Increased the number of super lightmaps from 10 to 16 for OpenGL.
 	- Improved setting of use_lazy_clipping flag a bit.
+	- Fixed the memory leak in csPolygonMeshTools for real using
+	  the proper CS_IMPLEMENT_STATIC_VAR instead of the non-portable
+	  dependency on global constructors/destructors.
 22-Jan-2003
 	- Made iEngine->CreateDynLight() a bit more efficient by avoiding
 	  the SCF_QUERY_INTERFACE.
