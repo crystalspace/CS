@@ -158,10 +158,6 @@ void csTextureMMSoftware::convert_to_internal_global (csTextureManagerSoftware* 
 void csTextureMMSoftware::convert_to_internal_24bit (csTextureManagerSoftware *texman,
   iImage* imfile, unsigned char* bm)
 {
-  int rs24 = texman->pixel_format ().RedShift;
-  int gs24 = texman->pixel_format ().GreenShift;
-  int bs24 = texman->pixel_format ().BlueShift;
-
   int s = imfile->GetSize ();
   RGBPixel* bmsrc = (RGBPixel *)imfile->GetImageData ();
   ULong *bml = (ULong*)bm;
@@ -197,6 +193,14 @@ void csTextureMMSoftware::remap_texture (csTextureManager* texman)
   if (!ifile) return;
 
   csTextureManagerSoftware* psoft = (csTextureManagerSoftware*)texman;
+
+  const csPixelFormat &pfmt = psoft->pixel_format ();
+  if (pfmt.PixelBytes == 4)
+  {
+    rs24 = pfmt.RedShift;
+    gs24 = pfmt.GreenShift;
+    bs24 = pfmt.BlueShift;
+  }
 
   if (for_2d ())
     if (psoft->get_display_depth () == 8)

@@ -23,6 +23,11 @@ Short-term cleanups that need to be done:
 	  templated linked-list to build on OpenStep.  Mostly this involved
 	  moving instance variables to the top of class declarations so that
 	  the compiler has seen them before inline methods refer to them.
+	- Eric Sunshine fixed a bug in the software texture manager which was
+	  introduced several weeks ago and which afflicted 32-bit color mode.
+	  The problem was that creation of mipmap level 0 did not respect the
+	  csPixelFormat properties of the target system, thus resulting in
+	  corrupted colors on some platforms.
 21-Feb-2000
 	- Martin Geisse submitted more Texinfo conversions of the LaTeX files
 	  from newdoc.  These files still need a lot of work, but it is a
