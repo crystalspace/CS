@@ -19,6 +19,15 @@ The history order is reversed so that new features are at the top.
 	    new char [strlen (title+1)];
 	  instead of:
 	    new char [strlen (title)+1];
+	- Fixed the VERY VERY bad bug in the isometric engine which could
+	  cause crashes when using the isometric engine in combination with
+	  the OpenGL renderer. The problem was that the fake iRenderView
+	  which is used by the iso engine didn't correctly implement
+	  the functions CalculateFogPolygon() and CalculateFogMesh(). This
+	  functions are at least supposed to initialize the 'fog' variables
+	  in the polygon/meshes to false. Otherwise the OpenGL renderer
+	  will think fog has to be used. This caused no problem for all iso
+	  stuff itself but it did cause problems for external mesh objects.
 	- Michael H. Voase did the following:
 	  HitBeam updates:
 	    Fleshed out HitBeam interface. HitBeamBBox

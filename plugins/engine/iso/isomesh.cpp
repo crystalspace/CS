@@ -174,9 +174,12 @@ public:
   virtual bool AddedFogInfo () {return false;}
   virtual void ResetFogInfo () {}
   virtual iCamera* GetCamera () {return fakecam;}
-  virtual void CalculateFogPolygon (G3DPolygonDP& ) {}
-  virtual void CalculateFogPolygon (G3DPolygonDPFX& ) {}
-  virtual void CalculateFogMesh (const csTransform& , G3DTriangleMesh& ) {}
+  virtual void CalculateFogPolygon (G3DPolygonDP& poly) { poly.use_fog = false; }
+  virtual void CalculateFogPolygon (G3DPolygonDPFX& poly) { poly.use_fog = false; }
+  virtual void CalculateFogMesh (const csTransform& , G3DTriangleMesh& mesh)
+  {
+    mesh.do_fog = false;
+  }
   virtual bool ClipBBox (const csBox2& sbox, const csBox3& /*cbox*/,
           int& clip_portal, int& clip_plane, int& clip_z_plane) 
   {
