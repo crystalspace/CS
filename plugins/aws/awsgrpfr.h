@@ -74,6 +74,10 @@ public:
 
   /// Returns the named TYPE of the component, like "Radio Button", etc.
   virtual char *Type ();
+
+  /// Gets the insets of the frame depending on what style it's in.
+  virtual csRect getInsets();
+
 public:
   SCF_DECLARE_IBASE;
 

@@ -191,6 +191,26 @@ bool awsGroupFrame::OnGainFocus ()
   return false;
 }
 
+csRect awsGroupFrame::getInsets()
+{
+  switch(frame_style)
+  {
+  case fsBump:
+    return csRect(4,4,4,4);
+
+  case fsFlat:
+  case fsSimple:
+    return csRect(1,1,1,1);
+
+  case fsRaised:
+  case fsSunken:
+    return csRect(2,2,2,2);
+  
+  case fsNone:
+    return csRect(0,0,0,0);
+  }
+}
+
 /************************************* Command Button Factory ****************/
 SCF_IMPLEMENT_IBASE(awsGroupFrameFactory)
   SCF_IMPLEMENTS_INTERFACE(iAwsComponentFactory)
