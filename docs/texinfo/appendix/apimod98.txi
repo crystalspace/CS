@@ -771,7 +771,7 @@ Plugin modules can export multiple named @sc{scf} classes.  Each exported class
 is represented by a @code{<class>} node within the @code{<classes>} group.  The
 @code{<name>} node of a @code{<class>} is the class' @sc{scf} name.  The
 @code{<implementation>} node references the C++ class which actually implements
-the named @sc{scf} class.  This is the same name that is privided as an
+the named @sc{scf} class.  This is the same name that is provided as an
 argument to the @code{SCF_IMPLEMENT_FACTORY()} macro.  When an @sc{scf} class
 depends upon other @sc{scf} classes, the dependencies are indicated via the
 optional @code{<requires>} group, which contains one @code{<class>} node per
