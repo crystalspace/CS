@@ -49,7 +49,7 @@ class csXExtSHM : public iXExtSHM
   int screen_num;
 
   XShmSegmentInfo shmi;
-  XImage shm_image;
+  XImage *shm_image;
 
   int Width, Height;
 

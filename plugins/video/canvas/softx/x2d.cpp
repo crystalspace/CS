@@ -62,14 +62,19 @@ csGraphics2DXLib::csGraphics2DXLib (iBase *iParent) :
 
 csGraphics2DXLib::~csGraphics2DXLib(void)
 {
+  if (xshm)
+  {
+    xshm->DecRef (); // decref before we close the win since we use the dpy in xshm
+    xshm = NULL;
+  }
+
   Close();
+
   delete [] sim_lt8;
   delete [] sim_lt16;
 
   if (EventOutlet)
       EventOutlet->DecRef();
-  if (xshm)
-    xshm->DecRef ();
   if (xwin)
     xwin->DecRef ();
 }
@@ -192,10 +197,13 @@ void csGraphics2DXLib::Close ()
 {
   if (!is_open) return;
 
+  if (xshm)
+    xshm->DestroyMemory (); // decref before we close the win since we use the dpy in xshm
+
   if (xwin)
     xwin->Close ();
 
-  if (Memory && sim_depth)
+  if (Memory && sim_depth && !xshm)
   {
     delete [] Memory;
     Memory = NULL;

@@ -50,18 +50,19 @@ csXExtSHM::csXExtSHM (iBase* parent)
   dpy = NULL;
   screen_num = 0;
   Width = Height = 0;
+  shm_image = NULL;
+  shmi.shmaddr = (char*) -1;
+  shmi.shmid = -1;
 }
 
 csXExtSHM::~csXExtSHM ()
 {
-
+  DestroyMemory ();
 }
 
 bool csXExtSHM::Initialize (iObjectRegistry *object_reg)
 {
   this->object_reg = object_reg;
-
-
   return true;
 }
 
@@ -90,28 +91,31 @@ unsigned char *csXExtSHM::CreateMemory (int Width, int Height)
   int disp_depth = DefaultDepth(dpy,screen_num);
   int bitmap_pad = (disp_depth + 7) / 8;
 
+  DestroyMemory ();
   bitmap_pad = (bitmap_pad == 3) ? 32 : bitmap_pad*8;
 
-  XImage *xim = XShmCreateImage(dpy, DefaultVisual(dpy,screen_num),
-				disp_depth,
-				ZPixmap, 0,
-				&shmi, Width, Height);
-  if (!xim)
+  shm_image = XShmCreateImage(dpy, DefaultVisual(dpy,screen_num),
+                              disp_depth,
+                              ZPixmap, 0,
+                              &shmi, Width, Height);
+  if (!shm_image)
   {
     Report (CS_REPORTER_SEVERITY_ERROR, "XShmCreateImage failed!");
     return NULL;
   }
-  shm_image = *xim;
-  shmi.shmid = shmget (IPC_PRIVATE, xim->bytes_per_line*xim->height,
-		       IPC_CREAT | 0777);
+  shmi.shmid = shmget (IPC_PRIVATE, 
+                       shm_image->bytes_per_line*shm_image->height,
+                       IPC_CREAT | 0777);
   if (shmi.shmid == -1)
   {
+    DestroyMemory ();
     Report (CS_REPORTER_SEVERITY_ERROR, "shmget failed!");
     return NULL;
   }
-  shmi.shmaddr = (char*)shmat (shmi.shmid, 0, 0);
+  shm_image->data = shmi.shmaddr = (char*)shmat (shmi.shmid, 0, 0);
   if (shmi.shmaddr == (char*) -1)
   {
+    DestroyMemory ();
     Report (CS_REPORTER_SEVERITY_ERROR, "shmat failed!");
     return NULL;
   }
@@ -123,8 +127,7 @@ unsigned char *csXExtSHM::CreateMemory (int Width, int Height)
   XSync (dpy, False);
   shmctl (shmi.shmid, IPC_RMID, 0);
 
-  shm_image.data = shmi.shmaddr;
-  shm_image.obdata = (char *)&shmi;
+  shm_image->obdata = (char *)&shmi;
 
   this->Width = Width;
   this->Height = Height;
@@ -134,21 +137,35 @@ unsigned char *csXExtSHM::CreateMemory (int Width, int Height)
 
 void csXExtSHM::DestroyMemory ()
 {
-  XShmDetach (dpy, &shmi);
-  shmdt (shmi.shmaddr);
+  if (shmi.shmaddr != (char*) -1)
+    XShmDetach (dpy, &shmi);
+  
+  if (shm_image)
+    XDestroyImage (shm_image);
+
+  if (shmi.shmaddr != (char*) -1)
+    shmdt (shmi.shmaddr);
+
+  
+  if (shmi.shmid != -1)
+    shmctl (shmi.shmid, IPC_RMID, 0);
+  
+  shmi.shmaddr = (char*) -1;
+  shmi.shmid = -1;
+  shm_image = NULL;
 }
 
 void csXExtSHM::Print (Window window, GC gc, csRect *area)
 {
   if (area)
-    XShmPutImage (dpy, window, gc, &shm_image,
+    XShmPutImage (dpy, window, gc, shm_image,
 		  area->xmin, area->ymin, area->xmin, area->ymin,
 		  area->Width (), area->Height (),
 		  False);
   else
     XShmPutImage (dpy,
 		  window, gc,
-		  &shm_image,
+		  shm_image,
 		  0, 0, 0, 0, Width, Height,
 		  False);
   XSync (dpy, False);
