@@ -439,7 +439,7 @@ csPtr<iBase> csSpriteCal3DFactoryLoader::Parse (iDocumentNode* node,
 	static bool styleReminder = true;
 	if (styleReminder)
 	{
-	  synldr->Report (crystalspace.mesh.loader.factory.sprite.cal3d, 
+	  synldr->Report ("crystalspace.mesh.loader.factory.sprite.cal3d", 
 	    CS_REPORTER_SEVERITY_NOTIFY, child, 
 	    "Material definitions in meshes is not considered good style, "
 	    "if you need to define a mesh and material at the same time use "
