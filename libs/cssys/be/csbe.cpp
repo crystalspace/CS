@@ -269,7 +269,7 @@ void SysSystemDriver::SetSystemDefaults ()
   //FULL_SCREEN = false;
   if (config)
   {
-    SimDepth = config->GetYesNo ("VideoDriver", "SIMULATE_DEPTH", SimDepth);
+    SimDepth = config->GetInt ("VideoDriver", "SIMULATE_DEPTH", SimDepth);
 //  UseDW = config->GetYesNo ("VideoDriver", "DIRECT_WINDOW", 0);
 //  HardwareCursor = config->GetYesNo ("VideoDriver", "SYS_MOUSE_CURSOR", 1);
   }
