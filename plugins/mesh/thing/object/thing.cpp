@@ -756,6 +756,47 @@ csPtr<iMeshObject> csThingStatic::NewInstance ()
   return csPtr<iMeshObject> (&thing->scfiMeshObject);
 }
 
+void csThingStatic::GetBoundingBox (csBox3 &box)
+{
+  int i;
+
+  if (obj_bbox_valid)
+  {
+    box = obj_bbox;
+    return ;
+  }
+
+  obj_bbox_valid = true;
+
+  if (!obj_verts)
+  {
+    obj_bbox.Set (0, 0, 0, 0, 0, 0);
+    box = obj_bbox;
+    return ;
+  }
+
+  if (num_vertices > 0)
+  {
+    obj_bbox.StartBoundingBox (obj_verts[0]);
+    for (i = 1; i < num_vertices; i++)
+    {
+      obj_bbox.AddBoundingVertexSmart (obj_verts[i]);
+    }
+  }
+
+  obj_radius = (obj_bbox.Max () - obj_bbox.Min ()) * 0.5f;
+  max_obj_radius = qsqrt (csSquaredDist::PointPoint (
+  	obj_bbox.Max (), obj_bbox.Min ())) * 0.5f;
+  box = obj_bbox;
+}
+
+void csThingStatic::GetRadius (csVector3 &rad, csVector3 &cent)
+{
+  csBox3 b;
+  GetBoundingBox (b);
+  rad = obj_radius;
+  cent = b.GetCenter ();
+}
 
 //----------------------------------------------------------------------------
 
@@ -834,7 +875,7 @@ csThing::~csThing ()
 char* csThing::GenerateCacheName ()
 {
   csBox3 b;
-  GetBoundingBox (b);
+  static_data->GetBoundingBox (b);
 
   csMemFile mf;
   int32 l;
@@ -1489,12 +1530,11 @@ void csThing::DrawPolygonArrayDPM (
   G3DPolygonMesh mesh;
   csVector3 radius;
   csSphere sphere;
-  GetRadius (radius, sphere.GetCenter ());
+  static_data->GetRadius (radius, sphere.GetCenter ());
   float max_radius = radius.x;
   if (max_radius < radius.y) max_radius = radius.y;
   if (max_radius < radius.z) max_radius = radius.z;
   sphere.SetRadius (max_radius);
-  int clip_portal, clip_plane, clip_z_plane;
   if (rview->ClipBSphere (tr_o2c, sphere, mesh.clip_portal, mesh.clip_plane,
   	mesh.clip_z_plane) == false)
     return;	// Not visible.
@@ -1574,54 +1614,12 @@ void csThing::AppendShadows (
   }
 }
 
-void csThing::GetRadius (csVector3 &rad, csVector3 &cent)
-{
-  csBox3 b;
-  GetBoundingBox (b);
-  rad = static_data->obj_radius;
-  cent = b.GetCenter ();
-}
-
-void csThing::GetBoundingBox (csBox3 &box)
-{
-  int i;
-
-  if (static_data->obj_bbox_valid)
-  {
-    box = static_data->obj_bbox;
-    return ;
-  }
-
-  static_data->obj_bbox_valid = true;
-
-  if (!static_data->obj_verts)
-  {
-    static_data->obj_bbox.Set (0, 0, 0, 0, 0, 0);
-    box = static_data->obj_bbox;
-    return ;
-  }
-
-  if (static_data->num_vertices > 0)
-  {
-    static_data->obj_bbox.StartBoundingBox (static_data->obj_verts[0]);
-    for (i = 1; i < static_data->num_vertices; i++)
-    {
-      static_data->obj_bbox.AddBoundingVertexSmart (static_data->obj_verts[i]);
-    }
-  }
-
-  static_data->obj_radius = (static_data->obj_bbox.Max () - static_data->obj_bbox.Min ()) * 0.5f;
-  static_data->max_obj_radius = qsqrt (csSquaredDist::PointPoint (
-  	static_data->obj_bbox.Max (), static_data->obj_bbox.Min ())) * 0.5f;
-  box = static_data->obj_bbox;
-}
-
 void csThing::GetBoundingBox (iMovable *movable, csBox3 &box)
 {
   if (wor_bbox_movablenr != movable->GetUpdateNumber ())
   {
     // First make sure obj_bbox is valid.
-    GetBoundingBox (box);
+    static_data->GetBoundingBox (box);
     wor_bbox_movablenr = movable->GetUpdateNumber ();
     csBox3& obj_bbox = static_data->obj_bbox;
 
@@ -1757,9 +1755,8 @@ bool csThing::DrawTest (iRenderView *rview, iMovable *movable)
   cached_movable = movable;
   WorUpdate ();
 
-#if 1
   csBox3 b;
-  GetBoundingBox (b);
+  static_data->GetBoundingBox (b);
 
   csSphere sphere;
   sphere.SetCenter (b.GetCenter ());
@@ -1777,43 +1774,6 @@ bool csThing::DrawTest (iRenderView *rview, iMovable *movable)
     bool rc = rview->TestBSphere (camtrans, sphere);
     return rc;
   }
-
-#else
-  csBox3 b;
-  GetBoundingBox (b);
-
-  csVector3 center = b.GetCenter ();
-  float maxradius = max_obj_radius;
-  if (can_move) center = movable->GetFullTransform ().This2Other (center);
-  center = camtrans.Other2This (center);
-  if (center.z + maxradius < 0) return false;
-
-  //-----
-  // If the camera location (origin in camera space) is inside the
-  // bounding sphere then the object is certainly visible.
-  //-----
-  if (
-    ABS (center.x) <= maxradius &&
-    ABS (center.y) <= maxradius &&
-    ABS (center.z) <= maxradius)
-    return true;
-
-  //-----
-  // Also do frustum checking.
-  //-----
-  float lx, rx, ty, by;
-  rview->GetFrustum (lx, rx, ty, by);
-  lx *= center.z;
-  if (center.x + maxradius < lx) return false;
-  rx *= center.z;
-  if (center.x - maxradius > rx) return false;
-  ty *= center.z;
-  if (center.y + maxradius < ty) return false;
-  by *= center.z;
-  if (center.y - maxradius > by) return false;
-
-  return true;
-#endif
 }
 
 bool csThing::Draw (iRenderView *rview, iMovable *movable, csZBufMode zMode)

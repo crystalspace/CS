@@ -44,6 +44,8 @@ The history order is reversed so that new features are at the top.
 	  a static compile.
 	- Fixed a major bug in csThingStatic::Prepare() which caused massive
 	  performance degradation. Now it should be better :-)
+	- Small optimization, moved GetBoundingBox() and GetRadius() from
+	  csThing to csThingStatic. Less pointer dereferencing needed then.
 9-Apr-2003
         - Rhad fixed OpenAL compile with compilers other than MSVC.
           - Changed FillMemory() to memset()

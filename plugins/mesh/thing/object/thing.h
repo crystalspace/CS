@@ -221,6 +221,17 @@ public:
   /// Clone this static data in a seperate instance.
   csPtr<csThingStatic> Clone ();
 
+  /**
+   * Get the bounding box in object space for this polygon set.
+   * This is calculated based on the oriented bounding box.
+   */
+  void GetBoundingBox (csBox3& box);
+
+  /**
+   * Get the radius in object space for this polygon set.
+   */
+  void GetRadius (csVector3& rad, csVector3& cent);
+
   //----------------------------------------------------------------------
   // Vertex handling functions
   //----------------------------------------------------------------------
@@ -614,20 +625,9 @@ public:
   //----------------------------------------------------------------------
 
   /**
-   * Get the bounding box in object space for this polygon set.
-   * This is calculated based on the oriented bounding box.
-   */
-  void GetBoundingBox (csBox3& box);
-
-  /**
    * Get the bounding box for this object given some transformation (movable).
    */
   void GetBoundingBox (iMovable* movable, csBox3& box);
-
-  /**
-   * Get the radius in object space for this polygon set.
-   */
-  void GetRadius (csVector3& rad, csVector3& cent);
 
   /**
    * Get a write object for a vis culling system.
@@ -904,11 +904,11 @@ public:
     virtual void GetObjectBoundingBox (csBox3& bbox,
     	int /*type = CS_BBOX_NORMAL*/)
     {
-      scfParent->GetBoundingBox (bbox);
+      scfParent->static_data->GetBoundingBox (bbox);
     }
     virtual void GetRadius (csVector3& rad, csVector3& cent)
     {
-      scfParent->GetRadius (rad, cent);
+      scfParent->static_data->GetRadius (rad, cent);
     }
     virtual void AddListener (iObjectModelListener* listener)
     {
