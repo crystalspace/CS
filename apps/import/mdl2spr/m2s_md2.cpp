@@ -380,7 +380,7 @@ bool Md2::WriteSPR(const char* spritename, float scaleMdl, int delayMdl,
         for (j = strlen(frames[i].name)-1; j > 1; j--)
           if (!isdigit(frames[i].name[j]))
             break;
-        if(strlen(frames[i].name) > j + 3)
+        if(strlen(frames[i].name) > (unsigned int) j + 3)
         {
             base_action=j + 2;
         }
