@@ -153,7 +153,7 @@ void csLight::SetSector (csSector* sector)
   for (i = 0; i < light_cb_vector.Length (); )
   {
     iLightCallback* cb = light_cb_vector[i];
-    cb->OnSectorChange (&(sector->scfiSector));
+    cb->OnSectorChange (sector ? &(sector->scfiSector) : NULL);
     if (cb == light_cb_vector[i]) i++;
   }
 
