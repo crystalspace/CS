@@ -141,6 +141,8 @@ public:
 	void closeEdge(void);
 	/// Initialize with a sin curve
 	void sin(void);
+	/// Read terrain data from PGM data.
+	bool readPGM(char* data, int desired_max);
 
 };
 
