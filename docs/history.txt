@@ -1,5 +1,10 @@
 The history order has been reversed so that new features are at the top.
 
+19-May-2000
+	- Alex Pfaffe did various changes to terrain engine again.
+	- Various small changes to csTerrain to help Alex integrate his
+	  engine again.
+	- Frank O'Connor fixed Win32 release build.
 18-May-2000
 	- Frank O'Connor added __CRYSTAL_SPACE__ define to VC project file.
 	- Another small terrain update from Alex Pfaffe.
@@ -18,6 +23,12 @@ The history order has been reversed so that new features are at the top.
 	- Eric Sunshine had to re-add some special case code to scfreg.mak in
 	  order to allow all plugins to register correctly on NeXT.  In
 	  particular, csclear and csnsmgr were having difficulty.
+	- Wouter Wijngaards fixed an array bounds bug in radiosity.
+	- Norman Kramer fixed a non-const with rvalue assignment.
+	- Added csPoly3D::ComputePlane() and csPoly3D::ComputeNormal().
+	- Further work on PVS solid boundary optimization. This optimization
+	  seems to work very well. Quality of PVS improved considerably
+	  (still not enough!).
 17-May-2000
 	- Thomas Riemer added scaffolding functions to allow loading world
 	  into NetSpace world.
