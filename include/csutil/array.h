@@ -44,7 +44,7 @@ public:
   static void InitRegion (T* address, int count)
   {
     for (int i = 0 ; i < count ; i++)
-      Construct (root + i, T ());
+      Construct (address + i, T ());
   }
 };
 
