@@ -50,31 +50,6 @@ void* csGetLibrarySymbol (csLibraryHandle Handle, char const* iName);
 bool csUnloadLibrary (csLibraryHandle Handle);
 
 /**
- * Add one element to shared library search path;
- * the path should end in '/' or whatever the path separator is,
- * that is, it should be immediately prependable to shared library name.
- */
-void csAddLibraryPath (char const* iPath);
-
-/**
- * Find a shared library in library search path and load it.
- * Same as csLoadLibrary except that you give just the name of the
- * module, without any prefix/suffix.
- */
-csLibraryHandle csFindLoadLibrary (char const* iModule);
-
-/**
- * Same but you give the possible suffix and prefix. This is usually called
- * by the system-dependent implementation of csFindLoadLibrary, and not
- * by the user. iPrefix can be either 0 or something like "lib";
- * the routine tries both with (if it is not 0) and without prefix.
- * Same about iSuffix - it can be something like ".dll" or ".so", but
- * not 0 (because all OSes use some suffix for shared libs).
- */
-csLibraryHandle csFindLoadLibrary (char const* iPrefix,
-  char const* iName, char const* iSuffix);
-
-/**
  * Print out the latest dynamic loader error.
  * This is not strictly required (and on some platforms its just a empty
  * routine) but sometimes it helps to find problems.
@@ -119,10 +94,9 @@ csRef<iStrVector> csScanPluginDir (const char* dir,
  * Accepts the same parameters as csScanPluginDir(), with the exception of
  * \p dirs.
  */				
-csRef<iStrVector> csScanPluginDirs (char** dirs, 
+csRef<iStrVector> csScanPluginDirs (csPluginPath* dirs, 
 				    csRef<iStrVector>& plugins,
-				    csRefArray<iDocument>& metadata,
-				    bool recursive = true);
+				    csRefArray<iDocument>& metadata);
 
 /**
  * Query plugin metadata.

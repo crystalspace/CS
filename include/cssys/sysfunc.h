@@ -96,10 +96,27 @@ csTicks csGetTicks ();
  */
 char* csGetConfigPath ();
 
+/**
+ * This structure contains information about a plugin path.
+ */
+struct csPluginPath
+{
+  /**
+   * The actual path.
+   * Has to be allocated with csStrNew() or new[].
+   */
+  char* path;
+  /// Whether this path should be recursively scanned for plugins.
+  bool scanRecursive;
+  
+  csPluginPath () : path(0), scanRecursive(false) {}
+  ~csPluginPath () { delete[] path; }
+};
+
 /** Get a list of directories where plugins are installed
  * You're responsible to free the array with delete[] after using it.
  */
-char** csGetPluginPaths ();
+csPluginPath* csGetPluginPaths ();
 
 /**
  * This function will freeze your application for given number of 1/1000
@@ -125,10 +142,11 @@ csString csGetUsername();
 
 /**
  * Get a platform-specific config object.
- * The data is stored in a platform-specific manner - e.g. the Registry on
- * Windows.
+ * The data is stored in a platform-specific manner - e.g. in "Documents and
+ * Settings\Application Data" on Windows, or $HOME on Unix.
  * \param key Used to distinguish different stored configurations.
- * \return A config 'file'. Might return 0 on some platforms.
+ * \return A config 'file'. Might return 0 on some platforms or in case an
+ *   error occured.
  */
 csPtr<iConfigFile> csGetPlatformConfig (const char* key);
 

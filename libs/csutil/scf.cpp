@@ -47,8 +47,8 @@ class csSCF : public iSCF
 {
 private:
   csRef<csMutex> mutex;
-  void RegisterClasses (char const* pluginname, iDocumentNode* scfnode);
 
+  void RegisterClassesInt (char const* pluginPath, iDocumentNode* scfnode);
 public:
   SCF_DECLARE_IBASE;
 
@@ -62,6 +62,8 @@ public:
 
   virtual void RegisterClasses (iDocument*);
   virtual void RegisterClasses (char const*);
+  virtual void RegisterClasses (char const* pluginPath, 
+    iDocument* scfnode);
   virtual bool RegisterClass (const char *iClassID,
     const char *iLibraryName, const char *iFactoryClass,
     const char *Description, const char *Dependencies = 0);
@@ -151,7 +153,7 @@ scfSharedLibrary::scfSharedLibrary (const char *lib, const char *core)
   RefCount = 0;
   LibraryName = csStrNew (lib);
   FuncCoreName = csStrNew (core);
-  LibraryHandle = csFindLoadLibrary (LibraryName);
+  LibraryHandle = csLoadLibrary (LibraryName);
 
   if (LibraryHandle != 0)
   {
@@ -408,7 +410,7 @@ SCF_IMPLEMENT_IBASE (csSCF);
   SCF_IMPLEMENTS_INTERFACE (iSCF);
 SCF_IMPLEMENT_IBASE_END;
 
-void scfInitialize (char** pluginPaths)
+void scfInitialize (csPluginPath* pluginPaths)
 {
   if (!PrivateSCF)
     PrivateSCF = new csSCF ();
@@ -425,37 +427,26 @@ void scfInitialize (char** pluginPaths)
     freePaths = true;
   }
 
-  //@@@
-  for (int i=0; pluginPaths[i]!=0; i++)
-  {
-    csString temp = pluginPaths[i];
-    temp += PATH_SEPARATOR;
-    csAddLibraryPath(temp);
-  }
-  
   csRef<iStrVector> messages = 
     csScanPluginDirs (pluginPaths, plugins, metadata);
 
+  int j;
   if ((messages != 0) && (messages->Length() > 0))
   {
-    for (int j = 0; j < messages->Length(); j++)
+    for (j = 0; j < messages->Length(); j++)
     {
       fprintf(stderr,
 	"%s\n", messages->Get (j));
     }
   }
 
-  for (int j = 0; j < metadata.Length(); j++)
+  for (j = 0; j < metadata.Length(); j++)
   {
-    PrivateSCF->RegisterClasses (metadata[j]);
+    PrivateSCF->RegisterClasses (plugins->Get (j), metadata[j]);
   }
 
   if (freePaths)
   {
-    for (int i = 0; pluginPaths[i] != 0; i++)
-    {
-      delete[] pluginPaths[i];
-    }
     delete[] pluginPaths;
   }
 #endif
@@ -504,6 +495,12 @@ void csSCF::RegisterClasses (char const* xml)
 
 void csSCF::RegisterClasses (iDocument* doc)
 {
+  RegisterClasses (0, doc);
+}
+
+void csSCF::RegisterClasses (char const* pluginPath, 
+    iDocument* doc)
+{
   if (doc)
   {
     csRef<iDocumentNode> rootnode = doc->GetRoot();
@@ -512,17 +509,11 @@ void csSCF::RegisterClasses (iDocument* doc)
       csRef<iDocumentNode> pluginnode = rootnode->GetNode("plugin");
       if (pluginnode)
       {
-        csRef<iDocumentNode> namenode = pluginnode->GetNode("name");
-	if (namenode)
-	{
-	  csRef<iDocumentNode> scfnode = pluginnode->GetNode("scf");
-	  if (scfnode.IsValid())
-	    RegisterClasses(namenode->GetContentsValue(), scfnode);
-	  else
-	    fprintf(stderr, "csSCF::RegisterClasses: Missing <scf> node.\n");
-	}
+	csRef<iDocumentNode> scfnode = pluginnode->GetNode("scf");
+	if (scfnode.IsValid())
+	  RegisterClassesInt (pluginPath, scfnode);
 	else
-	  fprintf(stderr, "csSCF::RegisterClasses: Missing <name> node.\n");
+	  fprintf(stderr, "csSCF::RegisterClasses: Missing <scf> node.\n");
       }
       else
         fprintf(stderr,
@@ -537,7 +528,7 @@ static char const* get_node_value(csRef<iDocumentNode> parent, char const* key)
   return node.IsValid() ? node->GetContentsValue() : "";
 }
 
-void csSCF::RegisterClasses (char const* pluginname, iDocumentNode* scfnode)
+void csSCF::RegisterClassesInt (char const* pluginPath, iDocumentNode* scfnode)
 {
   csRef<iDocumentNode> classesnode = scfnode->GetNode("classes");
   if (classesnode)
@@ -568,7 +559,7 @@ void csSCF::RegisterClasses (char const* pluginname, iDocumentNode* scfnode)
       }
 
       char const* pdepend = (depend.IsEmpty() ? 0 : depend.GetData());
-      RegisterClass(classname, pluginname, imp, desc, pdepend);
+      RegisterClass(classname, pluginPath, imp, desc, pdepend);
     }
   }
 }

@@ -70,7 +70,10 @@ GetRegistryInstallPath (const HKEY parentKey, char *oInstallPath, size_t iBuffer
 // ensures that the path as no trailing path delimiter
 static inline char* NewPathWOTrailingDelim (const char *path)
 {
-  char *newPath = csStrNew (path);
+  char longPath[MAX_PATH];
+  GetLongPathName (path, longPath, sizeof (longPath));
+
+  char *newPath = csStrNew (longPath);
   if (strlen(path) > 0)
   {
     char *end = &newPath[strlen(newPath) - 1];
@@ -79,15 +82,6 @@ static inline char* NewPathWOTrailingDelim (const char *path)
   }
   return newPath;
 }
-
-// cache configuration path
-struct _CfgPath {
-  char* path;
-  _CfgPath() { path = 0; };
-  ~_CfgPath() { if (path) delete[] path; };
-};
-
-CS_IMPLEMENT_STATIC_VAR (getCachedCfgPath, _CfgPath, ())
 
 static inline char* FindConfigPath ()
 {
@@ -164,6 +158,16 @@ static inline char* FindConfigPath ()
   return csStrNew (path);
 }
 
+// cache configuration path
+struct _CfgPath {
+  char* path;
+
+  _CfgPath() : path(0) { };
+  ~_CfgPath() { delete[] path; };
+};
+
+CS_IMPLEMENT_STATIC_VAR (getCachedCfgPath, _CfgPath, ())
+
 char* csGetConfigPath ()
 {
   _CfgPath *cachedCfgPath = getCachedCfgPath();
@@ -174,19 +178,39 @@ char* csGetConfigPath ()
   return csStrNew (cachedCfgPath->path);
 }
 
-char** csGetPluginPaths ()
+csPluginPath* csGetPluginPaths ()
 {
-  char** paths = new char* [4];
+  csPluginPath* paths = new csPluginPath [5];
 
   char* configpath = csGetConfigPath ();
   char* temp = new char[MAX_PATH];
   strncpy (temp, configpath, MAX_PATH);
   strcat (temp, "\\lib");
     
-  paths[0] = temp;
-  paths[1] = configpath;
-  paths[2] = csStrNew (".");
-  paths[3] = 0;
+  char appPath [MAX_PATH + 1];
+  GetModuleFileName (0, appPath, sizeof (appPath) - 1);
+  char* slash = strrchr (appPath, '\\');
+  if (slash) *slash = 0;
+
+  int i = 0;
+  paths[i].scanRecursive = true;
+  paths[i++].path = temp;
+  paths[i++].path = configpath;
+  if (strcasecmp (configpath, appPath) != 0)
+  {
+    paths[i].scanRecursive = true;
+    paths[i++].path = csStrNew (appPath);
+  }
+
+  char curPath [MAX_PATH + 1];
+  GetFullPathName (".", sizeof (curPath), curPath, 0);
+  if ((strcasecmp (configpath, appPath) != 0) && 
+    (strcasecmp (configpath, curPath) != 0))
+  {
+    paths[i].scanRecursive = true;
+    paths[i++].path = csStrNew (curPath);
+  }
+  paths[i++].path = 0;
 
   return paths;
 }

@@ -21,6 +21,7 @@
 #define CS_SYSDEF_PROVIDE_DIR
 #include "cssysdef.h"
 #include "cssys/csshlib.h"
+#include "cssys/sysfunc.h"
 #include "csutil/csstring.h"
 #include "csutil/csstrvec.h"
 #include "csutil/physfile.h"
@@ -161,10 +162,9 @@ csRef<iStrVector> csScanPluginDir (const char* dir,
   return csPtr<iStrVector> (messages);
 }
 
-csRef<iStrVector> csScanPluginDirs (char** dirs, 
+csRef<iStrVector> csScanPluginDirs (csPluginPath* dirs, 
 				    csRef<iStrVector>& plugins,
-				    csRefArray<iDocument>& metadata,
-				    bool recursive)
+				    csRefArray<iDocument>& metadata)
 {
   iStrVector* messages = 0;
 
@@ -180,17 +180,17 @@ csRef<iStrVector> csScanPluginDirs (char** dirs,
   csRef<iDocumentSystem> docsys = csPtr<iDocumentSystem>
     (new csTinyDocumentSystem ());
 
-  for (int i = 0; dirs[i] != 0; i++)
+  for (int i = 0; dirs[i].path != 0; i++)
   {
     iStrVector* dirMessages = 0;
-    InternalScanPluginDir (dirMessages, docsys, dirs[i], plugins, 
-      metadata, recursive);
+    InternalScanPluginDir (dirMessages, docsys, dirs[i].path, plugins, 
+      metadata, dirs[i].scanRecursive);
     
     if (dirMessages != 0)
     {
       csString tmp;
       tmp.Format ("The following error(s) occured while scanning '%s':",
-	dirs[i]);
+	dirs[i].path);
 
       AppendStrVecString (messages, tmp);
 

@@ -28,6 +28,8 @@
  * \addtogroup scf
  * @{ */
 
+struct csPluginPath;
+
 #include "csutil/ref.h"
 
 /**
@@ -646,12 +648,9 @@ inline static scfInterfaceID Name##_scfGetID ()				\
  * different set of directories each time).  
  * \param pluginPaths Directories that will be scanned for plugins. If this
  *   parameter is 0, the paths returned by csGetPluginPaths() will be scanned.
- * \param freePaths If true, the items of freePaths and freePaths itself will
- *   be delete[]d.
- * \remark The path list is ignored for static builds. However, it will still
- *   be delete[]d, if requested.
+ * \remark The path list is ignored for static builds. 
  */
-extern void scfInitialize (char** pluginPaths = 0);
+extern void scfInitialize (csPluginPath* pluginPaths = 0);
 
 /**
  * This function checks whenever an interface is compatible with given version.
@@ -697,17 +696,22 @@ struct iSCF : public iBase
 #endif
 
   /**
-   * Read additional class descriptions from the given iDocument.  This does
-   * the same as additional calls to scfInitialize ().
+   * Read additional class descriptions from the given iDocument.  
    */
-  virtual void RegisterClasses (iDocument*) = 0;
+  virtual void RegisterClasses (iDocument* metadata) = 0;
 
   /**
    * A convenience wrapper for RegisterClasses(iDocument).  Assumes that the
    * string input argument is XML, which it wraps in an iDocument and then
    * passes to RegisterClasses(iDocument).
    */
-  virtual void RegisterClasses (char const*) = 0;
+  virtual void RegisterClasses (char const* xml) = 0;
+
+  /**
+   * Read additional class descriptions from the given iDocument.  
+   */
+  virtual void RegisterClasses (const char* pluginPath, 
+    iDocument* metadata) = 0;
 
   /**
    * Check whenever the class is present in SCF registry.
@@ -824,7 +828,7 @@ struct iSCF : public iBase
 
 SCF_VERSION (iFactory, 0, 0, 1);
 SCF_VERSION (iBase, 0, 1, 0);
-SCF_VERSION (iSCF, 0, 1, 0);
+SCF_VERSION (iSCF, 0, 2, 0);
 
 /* @} */
 

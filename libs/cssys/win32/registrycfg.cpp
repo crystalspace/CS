@@ -21,45 +21,31 @@
 
 #include "csutil/util.h"
 
-#include "registrycfg.h"
+#include "cssys/win32/registrycfg.h"
 
-csPtr<iConfigFile> csGetPlatformConfig (const char* key)
-{
-  csRegistryConfig* cfg = new csRegistryConfig ();
-  if (!cfg->Open (key))
-  {
-    delete cfg; cfg = 0;
-  }
-  return csPtr<iConfigFile> (cfg);
-}
-
-SCF_IMPLEMENT_IBASE (csRegistryConfig)
+SCF_IMPLEMENT_IBASE (csWin32RegistryConfig)
   SCF_IMPLEMENTS_INTERFACE (iConfigFile)
 SCF_IMPLEMENT_IBASE_END
 
-csRegistryConfig::csRegistryConfig ()
+csWin32RegistryConfig::csWin32RegistryConfig ()
 {
   SCF_CONSTRUCT_IBASE (0);
 
   Prefix = 0;
   hKey = 0;
   Key = 0;
+  hKeyParent = HKEY_CURRENT_USER;
   status = new rcStatus ();
   writeAccess = false;
 }
 
-csRegistryConfig::~csRegistryConfig()
+csWin32RegistryConfig::~csWin32RegistryConfig()
 {
+  Close();
   delete status;
-  delete[] Key;
-
-  if (hKey != 0)
-  {
-    RegCloseKey (hKey);
-  }
 }
 
-void csRegistryConfig::ReplaceSeparators (char* key) const
+void csWin32RegistryConfig::ReplaceSeparators (char* key) const
 {
   size_t len = (size_t)strlen (key);
   size_t p;
@@ -69,8 +55,8 @@ void csRegistryConfig::ReplaceSeparators (char* key) const
   }
 }
 
-bool csRegistryConfig::TryOpen (HKEY& regKey, DWORD access, 
-				const char* keyName, bool create)
+bool csWin32RegistryConfig::TryOpen (HKEY parent, HKEY& regKey, DWORD access, 
+			             const char* keyName, bool create)
 {
   regKey = 0;
 
@@ -84,63 +70,77 @@ bool csRegistryConfig::TryOpen (HKEY& regKey, DWORD access,
     Key = csStrNew (keyName);
   }
 
-  CS_ALLOC_STACK_ARRAY (char, key, 9 + strlen (Key) + 1); // 9 = Length "Software\"
+/*  CS_ALLOC_STACK_ARRAY (char, key, 9 + strlen (Key) + 1); // 9 = Length "Software\"
   sprintf (key, "Software\\%s", Key);
-  ReplaceSeparators (key);
+  ReplaceSeparators (key);*/
 
+  hKeyParent = parent;
   LONG err;
   if (create)
   {
-    err = RegCreateKeyEx (HKEY_CURRENT_USER,
-      key, 0, 0, 0, 
+    err = RegCreateKeyEx (parent,
+      Key/*key*/, 0, 0, 0, 
       access, 
       0, &regKey, 0);
   }
   else
   {
-    err = RegOpenKeyEx (HKEY_CURRENT_USER,
-      key, 0, access, &regKey);
+    err = RegOpenKeyEx (parent,
+      Key/*key*/, 0, access, &regKey);
   }
 
-  return true;
+  return (err == ERROR_SUCCESS);
 }
 
-bool csRegistryConfig::Open (const char* Key)
+bool csWin32RegistryConfig::Open (const char* Key, HKEY parent)
 {
-  return TryOpen (hKey, KEY_READ, Key, false);
+  Close();
+  writeAccess = false;
+  return TryOpen (parent, hKey, KEY_READ, Key, false);
 }
 
-const char* csRegistryConfig::GetFileName () const
+void csWin32RegistryConfig::Close ()
+{
+  delete[] Key; Key = 0;
+
+  if (hKey != 0)
+  {
+    RegCloseKey (hKey);
+    hKey = 0;
+  }
+}
+
+const char* csWin32RegistryConfig::GetFileName () const
 {
   return "Win32Registry";
 }
 
-iVFS* csRegistryConfig::GetVFS () const
+iVFS* csWin32RegistryConfig::GetVFS () const
 {
   return 0;
 }
 
-void csRegistryConfig::SetFileName (const char*, iVFS*)
+void csWin32RegistryConfig::SetFileName (const char*, iVFS*)
 {
 }
 
-bool csRegistryConfig::Load (const char* iFileName, iVFS*, bool Merge,
+bool csWin32RegistryConfig::Load (const char* iFileName, iVFS*, bool Merge,
     bool NewWins)
 {
   return true;
 }
 
-bool csRegistryConfig::Save ()
+bool csWin32RegistryConfig::Save ()
 {
   return true;
 }
 
-bool csRegistryConfig::Save (const char *iFileName, iVFS*)
+bool csWin32RegistryConfig::Save (const char *iFileName, iVFS*)
 {
   return true;
 }
 
-void csRegistryConfig::Clear ()
+void csWin32RegistryConfig::Clear ()
 {
   int i;
   for (i = 0; i < iters.Length(); i++)
@@ -166,16 +166,16 @@ void csRegistryConfig::Clear ()
   }
 }
 
-csPtr<iConfigIterator> csRegistryConfig::Enumerate (const char *Subsection)
+csPtr<iConfigIterator> csWin32RegistryConfig::Enumerate (const char *Subsection)
 {
   if (!SubsectionExists (Subsection)) return 0;
 
-  csRegistryIterator* it = new csRegistryIterator (this, Subsection);
+  csWin32RegistryIterator* it = new csWin32RegistryIterator (this, Subsection);
   iters.Push (it);
   return it;
 }
 
-bool csRegistryConfig::KeyExists (const char *Key) const
+bool csWin32RegistryConfig::KeyExists (const char *Key) const
 {
   if (hKey == 0) return false;
 
@@ -185,7 +185,7 @@ bool csRegistryConfig::KeyExists (const char *Key) const
   return (err == ERROR_SUCCESS);
 }
 
-bool csRegistryConfig::SubsectionExists (const char *Subsection) const
+bool csWin32RegistryConfig::SubsectionExists (const char *Subsection) const
 {
   if (hKey == 0) return false;
 
@@ -214,7 +214,7 @@ bool csRegistryConfig::SubsectionExists (const char *Subsection) const
   return false;
 }
 
-bool csRegistryConfig::InternalGetValue (const char* Key,
+bool csWin32RegistryConfig::InternalGetValue (const char* Key,
     DWORD& type, Block_O_Mem& data) const
 {
   DWORD datasize;
@@ -231,7 +231,7 @@ bool csRegistryConfig::InternalGetValue (const char* Key,
   return (err == ERROR_SUCCESS);
 }
 
-int csRegistryConfig::RegToInt (DWORD type, Block_O_Mem& data, int Def) const
+int csWin32RegistryConfig::RegToInt (DWORD type, Block_O_Mem& data, int Def) const
 {
   int n, v;
   switch (type)
@@ -251,7 +251,7 @@ int csRegistryConfig::RegToInt (DWORD type, Block_O_Mem& data, int Def) const
   }
 }
 
-float csRegistryConfig::RegToFloat (DWORD type, Block_O_Mem& data, float Def) const
+float csWin32RegistryConfig::RegToFloat (DWORD type, Block_O_Mem& data, float Def) const
 {
   int n;
   float v;
@@ -273,7 +273,7 @@ float csRegistryConfig::RegToFloat (DWORD type, Block_O_Mem& data, float Def) co
   }
 }
 
-const char* csRegistryConfig::RegToStr (DWORD type, Block_O_Mem& data,
+const char* csWin32RegistryConfig::RegToStr (DWORD type, Block_O_Mem& data,
 					const char* Def) const
 {
   char buf[64];
@@ -295,7 +295,7 @@ const char* csRegistryConfig::RegToStr (DWORD type, Block_O_Mem& data,
   }
 }
 
-bool csRegistryConfig::RegToBool (DWORD type, Block_O_Mem& data,
+bool csWin32RegistryConfig::RegToBool (DWORD type, Block_O_Mem& data,
 				  bool Def) const
 {
   switch (type)
@@ -318,14 +318,14 @@ bool csRegistryConfig::RegToBool (DWORD type, Block_O_Mem& data,
   }
 }
 
-bool csRegistryConfig::WriteAccess()
+bool csWin32RegistryConfig::WriteAccess()
 {
   if (writeAccess) return true;
 
   RegCloseKey (hKey);
-  if (!TryOpen (hKey, KEY_READ | KEY_WRITE, Key, true))
+  if (!TryOpen (hKeyParent, hKey, KEY_READ | KEY_WRITE, Key, true))
   {
-    TryOpen (hKey, KEY_READ, Key, false);
+    TryOpen (hKeyParent, hKey, KEY_READ, Key, false);
     return false;
   }
   else
@@ -335,7 +335,7 @@ bool csRegistryConfig::WriteAccess()
   }
 }
 
-int csRegistryConfig::GetInt (const char *Key, int Def) const
+int csWin32RegistryConfig::GetInt (const char *Key, int Def) const
 {
   if (hKey == 0) return Def;
 
@@ -352,7 +352,7 @@ int csRegistryConfig::GetInt (const char *Key, int Def) const
   }
 }
 
-float csRegistryConfig::GetFloat (const char *Key, float Def) const
+float csWin32RegistryConfig::GetFloat (const char *Key, float Def) const
 {
   if (hKey == 0) return Def;
 
@@ -369,7 +369,7 @@ float csRegistryConfig::GetFloat (const char *Key, float Def) const
   }
 }
 
-const char *csRegistryConfig::GetStr (const char *Key, const char *Def) const
+const char *csWin32RegistryConfig::GetStr (const char *Key, const char *Def) const
 {
   if (hKey == 0) return Def;
 
@@ -386,7 +386,7 @@ const char *csRegistryConfig::GetStr (const char *Key, const char *Def) const
   }
 }
 
-bool csRegistryConfig::GetBool (const char *Key, bool Def) const
+bool csWin32RegistryConfig::GetBool (const char *Key, bool Def) const
 {
   if (hKey == 0) return Def;
 
@@ -403,12 +403,12 @@ bool csRegistryConfig::GetBool (const char *Key, bool Def) const
   }
 }
 
-const char *csRegistryConfig::GetComment (const char *Key) const
+const char *csWin32RegistryConfig::GetComment (const char *Key) const
 {
   return 0;
 }
 
-bool csRegistryConfig::InternalSetValue (const char* Key,
+bool csWin32RegistryConfig::InternalSetValue (const char* Key,
     DWORD type, const void* data, DWORD datasize)
 {
   if (!WriteAccess()) return false;
@@ -419,7 +419,7 @@ bool csRegistryConfig::InternalSetValue (const char* Key,
   return (err == ERROR_SUCCESS);
 }
 
-void csRegistryConfig::SetStr (const char *Key, const char *Val)
+void csWin32RegistryConfig::SetStr (const char *Key, const char *Val)
 {
   if (Val == 0)
     DeleteKey (Key);
@@ -427,12 +427,12 @@ void csRegistryConfig::SetStr (const char *Key, const char *Val)
     InternalSetValue (Key, REG_SZ, Val, strlen (Val) + 1);
 }
 
-void csRegistryConfig::SetInt (const char *Key, int Value)
+void csWin32RegistryConfig::SetInt (const char *Key, int Value)
 {
   InternalSetValue (Key, REG_DWORD, &Value, sizeof (Value));
 }
 
-void csRegistryConfig::SetFloat (const char *Key, float Value)
+void csWin32RegistryConfig::SetFloat (const char *Key, float Value)
 {
   //InternalSetValue (Key, REG_BINARY, &Value, sizeof (Value));
   // for better readability:
@@ -441,38 +441,38 @@ void csRegistryConfig::SetFloat (const char *Key, float Value)
   InternalSetValue (Key, REG_SZ, buf, strlen (buf) + 1);
 }
 
-void csRegistryConfig::SetBool (const char *Key, bool Value)
+void csWin32RegistryConfig::SetBool (const char *Key, bool Value)
 {
   int i = (Value ? 1 : 0);
   InternalSetValue (Key, REG_DWORD, &i, sizeof (i));
 }
 
-bool csRegistryConfig::SetComment (const char *Key, const char *Text)
+bool csWin32RegistryConfig::SetComment (const char *Key, const char *Text)
 {
   return false;
 }
 
-void csRegistryConfig::DeleteKey (const char *Key)
+void csWin32RegistryConfig::DeleteKey (const char *Key)
 {
   if (!WriteAccess()) return;
 
   RegDeleteValue (hKey, Key);
 }
 
-const char *csRegistryConfig::GetEOFComment () const
+const char *csWin32RegistryConfig::GetEOFComment () const
 {
   return 0;
 }
 
-void csRegistryConfig::SetEOFComment (const char *Text)
+void csWin32RegistryConfig::SetEOFComment (const char *Text)
 {
 }
 
-SCF_IMPLEMENT_IBASE (csRegistryIterator)
+SCF_IMPLEMENT_IBASE (csWin32RegistryIterator)
   SCF_IMPLEMENTS_INTERFACE (iConfigIterator)
 SCF_IMPLEMENT_IBASE_END
 
-csRegistryIterator::csRegistryIterator (csRegistryConfig* Owner, 
+csWin32RegistryIterator::csWin32RegistryIterator (csWin32RegistryConfig* Owner, 
   const char* Subsection)
 {
   SCF_CONSTRUCT_IBASE (0);
@@ -486,30 +486,30 @@ csRegistryIterator::csRegistryIterator (csRegistryConfig* Owner,
   EnumIndex = 0;
 }
 
-csRegistryIterator::~csRegistryIterator()
+csWin32RegistryIterator::~csWin32RegistryIterator()
 {
   owner->iters.Delete (this);
   delete[] SubsectionName;
   delete status;
 }
 
-iConfigFile* csRegistryIterator::GetConfigFile () const
+iConfigFile* csWin32RegistryIterator::GetConfigFile () const
 {
   return owner;
 }
 
-const char *csRegistryIterator::GetSubsection () const
+const char *csWin32RegistryIterator::GetSubsection () const
 {
   return SubsectionName;
 }
 
-void csRegistryIterator::Rewind ()
+void csWin32RegistryIterator::Rewind ()
 {
   EnumIndex = 0;
 }
 
 // navigate though the reg key to the next value entry
-bool csRegistryIterator::Next()
+bool csWin32RegistryIterator::Next()
 {
   LONG err;
 
@@ -534,7 +534,7 @@ bool csRegistryIterator::Next()
   while (true);
 }
 
-const char *csRegistryIterator::GetKey (bool Local) const
+const char *csWin32RegistryIterator::GetKey (bool Local) const
 {
   char Name[256];
   DWORD namelen = sizeof (Name);
@@ -553,8 +553,8 @@ const char *csRegistryIterator::GetKey (bool Local) const
   return (Local ? (str + strlen (SubsectionName)) : str);
 }
 
-bool csRegistryIterator::GetCurrentData (DWORD& type, 
-  csRegistryConfig::Block_O_Mem& data) const
+bool csWin32RegistryIterator::GetCurrentData (DWORD& type, 
+  csWin32RegistryConfig::Block_O_Mem& data) const
 {
   DWORD datasize;
   char Name[256];
@@ -577,12 +577,12 @@ bool csRegistryIterator::GetCurrentData (DWORD& type,
   return true;
 }
 
-int csRegistryIterator::GetInt () const
+int csWin32RegistryIterator::GetInt () const
 {
   const int Def = 0;
 
   DWORD type;
-  csRegistryConfig::Block_O_Mem data;
+  csWin32RegistryConfig::Block_O_Mem data;
 
   if (!GetCurrentData (type, data))
     return Def;
@@ -590,12 +590,12 @@ int csRegistryIterator::GetInt () const
   return owner->RegToInt (type, data, Def);
 }
 
-float csRegistryIterator::GetFloat () const
+float csWin32RegistryIterator::GetFloat () const
 {
   const float Def = 0.0f;
 
   DWORD type;
-  csRegistryConfig::Block_O_Mem data;
+  csWin32RegistryConfig::Block_O_Mem data;
 
   if (!GetCurrentData (type, data))
     return Def;
@@ -603,12 +603,12 @@ float csRegistryIterator::GetFloat () const
   return owner->RegToFloat (type, data, Def);
 }
 
-const char *csRegistryIterator::GetStr () const
+const char *csWin32RegistryIterator::GetStr () const
 {
   const char* Def = "";
 
   DWORD type;
-  csRegistryConfig::Block_O_Mem data;
+  csWin32RegistryConfig::Block_O_Mem data;
 
   if (!GetCurrentData (type, data))
     return Def;
@@ -616,12 +616,12 @@ const char *csRegistryIterator::GetStr () const
   return owner->RegToStr (type, data, Def);
 }
 
-bool csRegistryIterator::GetBool () const
+bool csWin32RegistryIterator::GetBool () const
 {
   const bool Def = false;
 
   DWORD type;
-  csRegistryConfig::Block_O_Mem data;
+  csWin32RegistryConfig::Block_O_Mem data;
 
   if (!GetCurrentData (type, data))
     return Def;
@@ -629,7 +629,7 @@ bool csRegistryIterator::GetBool () const
   return owner->RegToBool (type, data, Def);
 }
 
-const char *csRegistryIterator::GetComment () const
+const char *csWin32RegistryIterator::GetComment () const
 {
   return 0;
 }

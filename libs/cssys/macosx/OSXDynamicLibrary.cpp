@@ -67,15 +67,6 @@ static OSXPluginArray& get_loaded_plugins()
 
 
 //-----------------------------------------------------------------------------
-// csFindLoadLibrary
-//-----------------------------------------------------------------------------
-csLibraryHandle csFindLoadLibrary(char const* name)
-{
-  return csFindLoadLibrary(0, name, ".csbundle");
-}
-
-
-//-----------------------------------------------------------------------------
 // csLoadLibrary
 //	*NOTE* Both successful and unsuccessful load requests are cached in the
 //	loaded-plugins list so that we can quickly give the correct response if
@@ -83,15 +74,31 @@ csLibraryHandle csFindLoadLibrary(char const* name)
 //-----------------------------------------------------------------------------
 csLibraryHandle csLoadLibrary(char const* path)
 {
+  // iName will have an ".csplugin" suffix
+  int nameLen = strlen (iName);
+  char* binName = new char[nameLen + 7];
+  strcpy (binName, iName);
+  
+  if ((nameLen >= 7) && 
+    (strcasecmp (binName + nameLen - 7, ".csplugin") == 0))
+  {
+    strcpy (binName + nameLen - 7, ".csbundle");
+  }
+  else if ((nameLen >= 3) && 
+    (strcasecmp (binName + nameLen - 7, ".csbundle") != 0))
+  {
+    strcat (binName, ".csbundle");
+  }
+
   csLibraryHandle handle = 0;
   OSXPluginArray& loaded_plugins = get_loaded_plugins();
-  int const n = loaded_plugins.FindSortedKey(path);
+  int const n = loaded_plugins.FindSortedKey(binName);
   if (n >= 0)
     handle = ((OSXPluginEntry*)loaded_plugins[n])->handle;
   else
   {
-    handle = (csLibraryHandle)OSXLoadLibrary(path);
-    loaded_plugins.InsertSorted(new OSXPluginEntry(handle, path)); // *NOTE*
+    handle = (csLibraryHandle)OSXLoadLibrary(binName);
+    loaded_plugins.InsertSorted(new OSXPluginEntry(handle, binName)); // *NOTE*
   }
   return handle;
 }

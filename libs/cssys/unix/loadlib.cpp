@@ -30,31 +30,29 @@
 #  define DLOPEN_MODE   RTLD_LAZY// | RTLD_GLOBAL
 #endif
 
-csLibraryHandle csFindLoadLibrary (const char *iName)
-{
-  // Upon initialization add the current directory to the
-  // list of paths searched for plugins
-  static bool init_done = false;
-  if (!init_done)
-  {
-    init_done = true;
-    extern bool findlib_search_nodir;
-    findlib_search_nodir = false;
-    char path [1255];
-    getcwd (path, sizeof (path));
-    strcat (path, "/");
-    csAddLibraryPath (path);
-  }
-
-  csLibraryHandle handle = csFindLoadLibrary ("", iName, ".so");
-  if (handle == 0)
-    handle = csFindLoadLibrary ("lib", iName, ".so");
-  return handle;
-}
-
 csLibraryHandle csLoadLibrary (const char* iName)
 {
-  return dlopen (iName, DLOPEN_MODE);
+  // iName will have an ".csplugin" suffix
+  int nameLen = strlen (iName);
+  char* binName = new char[nameLen + 3];
+  strcpy (binName, iName);
+  
+  if ((nameLen >= 7) && 
+    (strcasecmp (binName + nameLen - 7, ".csplugin") == 0))
+  {
+    strcpy (binName + nameLen - 7, ".so");
+  }
+  else if ((nameLen >= 3) && 
+    (strcasecmp (binName + nameLen - 3, ".so") != 0))
+  {
+    strcat (binName, ".so");
+  }
+  
+  csLibraryHandle lib = dlopen (binName, DLOPEN_MODE);
+  
+  delete[] binName;
+  
+  return lib;
 }
 
 void csPrintLibraryError (const char *iModule)

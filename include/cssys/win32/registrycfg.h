@@ -27,17 +27,18 @@
 
 #include <windows.h>
 
-class csRegistryIterator;
+class csWin32RegistryIterator;
 
 /**
  * An iConfigFile, storing the settings in the Windows registry.
  */
-class csRegistryConfig : public iConfigFile
+class csWin32RegistryConfig : public iConfigFile
 {
 private:
-  friend class csRegistryIterator;
+  friend class csWin32RegistryIterator;
 
   HKEY hKey;
+  HKEY hKeyParent;
   char* Prefix;
   // whether this key is opened w/ write access.
   bool writeAccess;
@@ -49,12 +50,13 @@ private:
   } rcStatus;
   rcStatus* status;
 
-  csPArray<csRegistryIterator> iters;
+  csPArray<csWin32RegistryIterator> iters;
 
   // convert CS "x.y.z" keys to registry "x\y\z"
   void ReplaceSeparators (char* key) const;
 
-  bool TryOpen (HKEY& regKey, DWORD access, const char* keyName, bool create);
+  bool TryOpen (HKEY parent, HKEY& regKey, DWORD access, const char* keyName, 
+    bool create);
 
   // convenience class, used to delete[] a buffer on function return
   struct Block_O_Mem
@@ -87,10 +89,24 @@ private:
 public:
   SCF_DECLARE_IBASE;
 
-  csRegistryConfig ();
-  virtual ~csRegistryConfig();
+  csWin32RegistryConfig ();
+  virtual ~csWin32RegistryConfig();
 
-  bool Open (const char* Key);
+  /**
+   * Open a registry key.
+   * This will open the key named \p Key as a subkey of \p parent.
+   * \remark The key must be the full path, e.g. "Software\CrystalSpace".
+   * \remark If \p parent is none of the default HKEY_ roots, the key must
+   *   remain open as long as a registry config object isn't Close()d.
+   */
+  bool Open (const char* Key, HKEY parent = HKEY_CURRENT_USER);
+  /**
+   * Close the current registry key.
+   * Use this if you want reuse a registry config object at a later time but
+   * want to free it's resources for the time being.
+   * \remark This is called automatically on destruction or Open().
+   */
+  void Close ();
 
   virtual const char* GetFileName () const;
   virtual iVFS* GetVFS () const;
@@ -125,9 +141,9 @@ public:
 /**
  * Iterates over a registry key subkeys and values.
  */
-class csRegistryIterator : public iConfigIterator
+class csWin32RegistryIterator : public iConfigIterator
 {
-  csRef<csRegistryConfig> owner;
+  csRef<csWin32RegistryConfig> owner;
 
   typedef struct 
   {
@@ -141,13 +157,13 @@ class csRegistryIterator : public iConfigIterator
 
   // shortcut to RegEnumValue/RegQueryValueEx
   bool GetCurrentData (DWORD& type, 
-    csRegistryConfig::Block_O_Mem& data) const;
+    csWin32RegistryConfig::Block_O_Mem& data) const;
 public:
   SCF_DECLARE_IBASE;
 
-  csRegistryIterator (csRegistryConfig* Owner, 
+  csWin32RegistryIterator (csWin32RegistryConfig* Owner, 
     const char* Subsection);
-  virtual ~csRegistryIterator();
+  virtual ~csWin32RegistryIterator();
 
   virtual iConfigFile *GetConfigFile () const;
   virtual const char *GetSubsection () const;

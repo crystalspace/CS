@@ -26,7 +26,6 @@
 
 #include "shellstuff.h"
 
-#if 0
 static void ReplaceReserved (char* key)
 {
   size_t len = (size_t)strlen (key);
@@ -73,24 +72,11 @@ csPtr<iConfigFile> csGetPlatformConfig(const char* Key)
   if (!GetShellFolderPath (CSIDL_APPDATA, appDataPath))
   {
     // fall back to My Documents
-    if (!GetShellFolderPath (CSIDL_APPDATA, appDataPath))
+    if (!GetShellFolderPath (CSIDL_PERSONAL, appDataPath))
     {
       // fail
       return 0;
     }
-  }
-
-  /*
-    @@@ kludge: To avoid "app data" pollution, prepend
-    a "CrystalSpaceApp" to Keys that don't have a 
-    separator char (.). It's assumed that keys that 
-    contain such separator use some kind of hierarchy, 
-    e.g "<Maker>.<Application>". People really should make 
-    app IDs in this style.
-   */
-  if (!strchr (Key, '.'))
-  {
-    strcat (appDataPath, "\\CrystalSpace");
   }
 
   CS_ALLOC_STACK_ARRAY (char, realPath, 
@@ -103,6 +89,8 @@ csPtr<iConfigFile> csGetPlatformConfig(const char* Key)
 
   char* bslash = strrchr (realPath, '\\');
   if (bslash) *bslash = 0;
+  // @@@ Would be nicer if this was only done when the cfg file is really 
+  //     saved to disk.
   MakeDir (realPath);
   if (bslash) *bslash = '\\';
 
@@ -115,4 +103,3 @@ csPtr<iConfigFile> csGetPlatformConfig(const char* Key)
     
   return csPtr<iConfigFile> (configfile);
 }
-#endif

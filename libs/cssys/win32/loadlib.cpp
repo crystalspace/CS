@@ -18,6 +18,7 @@
 
 #include "cssysdef.h"
 #include "cssys/csshlib.h"
+#include "cssys/sysfunc.h"
 #ifdef __CYGWIN__
 #include <sys/cygwin.h>
 #endif
@@ -34,32 +35,15 @@ static csStrVector ErrorMessages;
 
 #define LOADLIBEX_FLAGS		    LOAD_WITH_ALTERED_SEARCH_PATH
 
-csLibraryHandle csFindLoadLibrary (const char *iName)
-{
-  ErrorMessages.DeleteAll();
-  return csFindLoadLibrary (0, iName, ".dll");
-}
-
 csLibraryHandle csLoadLibrary (const char* iName)
 {
   csLibraryHandle handle;
   DWORD errorCode;
 
-#ifndef __CYGWIN__
   handle = LoadLibraryEx (iName, 0, LOADLIBEX_FLAGS);
   errorCode = GetLastError();
-#else
-  // Cygwin wants to have Win32 paths not Unix paths.
-  char *tmp=new char[1024];
-  if (cygwin_conv_to_win32_path (iName,tmp))
-  {
-    ErrorMessages.Push(
-	csStrNew("LoadLibraryEx() Cygwin/Win32 path conversion failed."));
-    delete[] tmp;
-    return 0;
-  }
- handle = LoadLibraryEx (tmp, 0, LOADLIBEX_FLAGS);
 
+#ifdef __CYGWIN__
  // A load attempt might fail if the DLL depends implicitly upon some other
  // DLLs which reside in the Cygwin /bin directory.  To deal with this case, we
  // add the Cygwin /bin directory to the PATH environment variable and retry.
@@ -78,14 +62,12 @@ csLibraryHandle csLoadLibrary (const char* iName)
      return 0;
    }
    SetEnvironmentVariable("PATH", DLLDIR);
-   handle = LoadLibraryEx (tmp, 0, LOADLIBEX_FLAGS);
+   handle = LoadLibraryEx (iName, 0, LOADLIBEX_FLAGS);
    errorCode = GetLastError();
    SetEnvironmentVariable("PATH", OLD_PATH);
    delete[] DLLDIR;
    delete[] OLD_PATH;
  }
-
-  delete[] tmp;
 #endif
 
   if (handle == 0)
@@ -152,7 +134,7 @@ bool csUnloadLibrary (csLibraryHandle Handle)
 {
 #if defined(CS_EXTENSIVE_MEMDEBUG) && defined(COMP_VC)
   // Why not? - Because the source file information
-  // for would leaked objects get lost
+  // for leaked objects would get lost
   return true;
 #else
   return FreeLibrary ((HMODULE)Handle)!=0;
@@ -265,16 +247,6 @@ void InternalScanPluginDir (iStrVector*& messages,
 			    csRefArray<iDocument>& metadata,
 			    bool recursive)
 {
-  // @@@ ugly hack!
-#ifdef COMP_VC
-  char* cfgpath = csGetConfigPath();
-  if ((strcasecmp (dir, cfgpath) == 0) || (strcmp (dir, ".") == 0))
-  {
-    recursive = false;
-  }
-  delete[] cfgpath;
-#endif
-
   csString filemask;
   filemask << dir << PATH_SEPARATOR << "*.*";
 
@@ -367,10 +339,9 @@ csRef<iStrVector> csScanPluginDir (const char* dir,
   return csPtr<iStrVector> (messages);
 }
 
-csRef<iStrVector> csScanPluginDirs (char** dirs, 
+csRef<iStrVector> csScanPluginDirs (csPluginPath* dirs, 
 				    csRef<iStrVector>& plugins,
-				    csRefArray<iDocument>& metadata,
-				    bool recursive)
+				    csRefArray<iDocument>& metadata)
 {
   iStrVector* messages = 0;
 
@@ -386,17 +357,17 @@ csRef<iStrVector> csScanPluginDirs (char** dirs,
   csRef<iDocumentSystem> docsys = csPtr<iDocumentSystem>
     (new csTinyDocumentSystem ());
 
-  for (int i = 0; dirs[i] != 0; i++)
+  for (int i = 0; dirs[i].path != 0; i++)
   {
     iStrVector* dirMessages = 0;
-    InternalScanPluginDir (dirMessages, docsys, dirs[i], plugins, 
-      metadata, recursive);
+    InternalScanPluginDir (dirMessages, docsys, dirs[i].path, 
+      plugins, metadata, dirs[i].scanRecursive);
     
     if (dirMessages != 0)
     {
       csString tmp;
       tmp.Format ("The following error(s) occured while scanning '%s':",
-	dirs[i]);
+	dirs[i].path);
 
       AppendStrVecString (messages, tmp);
 
