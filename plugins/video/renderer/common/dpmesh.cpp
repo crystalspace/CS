@@ -165,7 +165,9 @@ void DefaultDrawPolygonMesh (G3DPolygonMesh& mesh, iGraphics3D *piG3D,
     work_verts = tr_verts->GetArray();
   }
   else
+  {
     work_verts = f1;
+  }
 
   // Perspective project the vertices
   for (i = 0 ; i < num_vertices ; i++)
@@ -196,6 +198,10 @@ void DefaultDrawPolygonMesh (G3DPolygonMesh& mesh, iGraphics3D *piG3D,
   for (i = 0 ; i < num_polygons ; i++)
   {
     const csPolArrayPolygon& pol = polbuf->GetPolygon (i);
+
+    float cl = pol.normal.Classify (o2c.GetOrigin ());
+    if ((mesh.do_mirror && cl <= 0) || ((!mesh.do_mirror) && cl >= 0)) continue;
+
     poly.num = pol.num_vertices;
     CS_ASSERT (pol.mat_index >= 0 && pol.mat_index
     	< polbuf->GetMaterialCount ());

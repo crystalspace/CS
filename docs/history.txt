@@ -25,6 +25,11 @@ The history order is reversed so that new features are at the top.
 	- Changed Video.OpenGL.SuperLightMapNum to SuperLightMapNum0,
 	  SuperLightMapNum1, SuperLightMapNum2, and SuperLightMapNum3.
 	  With these you can set the sizes of the four queues.
+	- Software renderer implementation of DrawPolygonMesh now does
+	  backface culling. This makes it a LOT faster and now performance
+	  compares to old style single-polygon drawing.
+	- Because of this optimization I reduced the FastMeshThresshold to
+	  10 by default now.
 	- Eric Sunshine made the following changes to configure's OpenGL tests:
 	    - Now checks for opengl32 and cousins before libGL and libMesaGL.
 	      Hopefully this will work around problems experienced by Cygwin
