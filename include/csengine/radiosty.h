@@ -48,6 +48,10 @@ private:
   csRGBLightMap *deltamap;
   /// the lumels covered by this polygon
   float *lumel_coverage_map;
+  /// to convert lumels to world coords.
+  csVector3 lumel_origin, lumel_x_axis, lumel_y_axis;
+  /// the area of one lumel of the polygon
+  float one_lumel_area;
 
 public:
   csRadPoly(csPolygon3D *original);
@@ -56,20 +60,20 @@ public:
   /// for queueing of polys to shoot their light
   inline float GetPriority() { return total_unshot_light; }
   /// get area size of polygon, precomputed
-  inline float GetArea() { return area; }
+  inline float GetArea() const { return area; }
   /// get normal vector for polygon 
-  const csVector3& GetNormal() {return polygon->GetPolyPlane()->Normal();}
+  const csVector3& GetNormal() const {return polygon->GetPolyPlane()->Normal();}
   /// Get diffuse reflection value for polygon. 0.55-0.75 is nice.
-  inline float GetDiffuse() { return 0.7; }
+  inline float GetDiffuse() const { return 0.7; }
 
   /// get original csPolgyon3D for this radpoly
-  inline csPolygon3D *GetPolygon3D() { return polygon; }
+  inline csPolygon3D *GetPolygon3D() const { return polygon; }
   /// get width of lightmap and deltamap
-  inline int GetWidth() { return width; }
+  inline int GetWidth() const{ return width; }
   /// get height of lightmap and deltamap
-  inline int GetHeight() { return height; }
+  inline int GetHeight() const { return height; }
   /// get size of lightmap and deltamap
-  inline int GetSize() { return size; }
+  inline int GetSize() const { return size; }
   /// check if a delta lumel is zero
   inline bool DeltaIsZero(int suv)
   { return !(deltamap->GetRed()[suv] || deltamap->GetGreen()[suv] || 
@@ -81,8 +85,15 @@ public:
   inline float GetLumelCoverage(int suv)
   { return lumel_coverage_map[suv]; }
 
-  /// Get world coordinates for a lumel
+  /// Get world coordinates for a lumel -- slow method
   void GetLumelWorldCoords(csVector3& res, int x, int y);
+  /// Setup fast lumel to world coords - uses GetLumelWorldCoords
+  void SetupQuickLumel2World();
+  /// Quick getting lumel to world coords;
+  inline void QuickLumel2World(csVector3& res, int x, int y)
+  { res = lumel_origin + x* lumel_x_axis + y * lumel_y_axis; }
+  /// get area of one lumel in world space
+  inline float GetOneLumelArea() const { return one_lumel_area; }
   /** 
    * computes new priority value, summing the light unshot.
    * Note: Do no touch the variable total_unshot_light without 
@@ -93,7 +104,8 @@ public:
    * Add a fraction to delta map of lumel from given source RadPoly.
    * suv is index in src, ruv is index in maps of this poly.
    */
-  void AddDelta(csRadPoly *src, int suv, int ruv, float fraction);
+  void AddDelta(csRadPoly *src, int suv, int ruv, float fraction, 
+    const csColor& filtercolor);
 
   /** 
    * light has been shot, copy delta to lightmap, clear delta, 
@@ -118,6 +130,12 @@ public:
    *  you have to delete[] it.
    */
   float *ComputeLumelCoverage();
+
+  /**
+   *  Compute the texture map at the size of the lumel map.
+   *  Gets the texture, and scales down. You must delete the map.
+   */
+  csRGBLightMap *ComputeTextureLumelSized();
   
   /// Get a RadPoly when you have a csPolygon3D (only type we attach to)
   static csRadPoly* GetRadPoly(csPolygon3D &object);
@@ -166,6 +184,8 @@ class csRadList {
 private:
   /// does the actual work
   csRadTree *tree;
+  /// number of elements
+  int num;
 
 public:
   /// create
@@ -184,6 +204,8 @@ public:
   /// traverse in some order.
   void Traverse( void (*func)( csRadPoly * ) ) 
   { if(tree) tree->TraverseInOrder(func); }
+  /// get the number of elements in the list
+  inline int GetNumElements() { return num; }
 };
 
 /**
@@ -200,6 +222,8 @@ private:
   csProgressMeter *meter;
   /// the probably highest priority, starting priority.
   float start_priority;
+  /// the number of iterations done.
+  int iterations;
 
   /// Shooting info
   /// lightness factor, built up to form_factor * diffuse * area.
@@ -216,6 +240,11 @@ private:
   float source_patch_area;
   /// index into source maps
   int src_uv; 
+  /// texture map of source polygon - reasonably quick to compute, saves
+  /// a lot of space.
+  csRGBLightMap *texturemap;
+  /// color of source lumel for multiplying delta's with.
+  csColor src_lumel_color;
 
 public:
   /// create all radiosity data.
