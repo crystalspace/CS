@@ -28,6 +28,9 @@ The history order is reversed so that new features are at the top.
 	    - Added -xyz, -xzy, -yxz, -yzx, -zxy, and -zyx commandline options
 	      to change the order of the x,y,z components from 3DS to CS.
 	      Default is -xyz.
+	- Probably fixed a bug in the csdemo sequence manager with regards
+	  to time-warping. Not sure though. This is complicated stuff and
+	  I'll have to look a little closer at it.
 26-Apr-2001
 	- Philip Wyett fixed gcc outputting Worm.dll and Dog.dll. Now
 	  outputs worm.dll and dog.dll.

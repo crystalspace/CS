@@ -60,7 +60,7 @@ class PathForMesh
 {
 public:
   csNamedPath* path;
-  iMeshWrapper* mesh;
+  iMeshWrapper* mesh;	// If NULL this path controls a camera.
   cs_time total_path_time;
   cs_time start_path_time;
 };
@@ -110,11 +110,6 @@ private:
   //=====
   csVector paths;
   csVector pathForMesh;	// PathForMesh objects.
-  // Camera path handling.
-  bool do_camera_path;
-  csNamedPath* camera_path;
-  cs_time total_camera_path_time;
-  cs_time start_camera_path_time;
 
   //=====
   // For rotation.
@@ -188,7 +183,7 @@ public:
    * For debugging, draw all active paths on screen. Draw the
    * path with the given name highlighted.
    */
-  void DebugDrawPaths (cs_time current_time,
+  void DebugDrawPaths (iCamera* camera, cs_time current_time,
 	const char* hilight, const csVector2& tl,
 	const csVector2& br, int selpoint);
 
@@ -202,6 +197,16 @@ public:
    */
   csNamedPath* GetSelectedPath (const char* hilight, cs_time& start,
   	cs_time& total);
+
+  /**
+   * Select first path.
+   */
+  void SelectFirstPath (char* hilight);
+
+  /**
+   * Select last path.
+   */
+  void SelectLastPath (char* hilight);
 
   /**
    * Select previous path.
@@ -225,18 +230,19 @@ public:
   	cs_time total_fade_time, cs_time already_elapsed);
 
   /**
-   * Setup the camera path.
+   * Setup a path. If mesh == NULL we are setting up a path for the camera.
    */
-  void SetupCameraPath (csNamedPath* path, cs_time total_camera_path_time,
-  	cs_time already_elapsed);
-  
-  /**
-   * Setup a path for a mesh.
-   */
-  void SetupMeshPath (csNamedPath* path, iMeshWrapper* mesh,
+  void SetupPath (csNamedPath* path, iMeshWrapper* mesh,
   	cs_time total_path_time,
   	cs_time already_elapsed);
-  
+
+  /**
+   * See if some path is already running. If so then replace the object
+   * that is attached to the running path with this one (mesh can be NULL
+   * for the camera).
+   */
+  void ReplacePathObject (csNamedPath* path, iMeshWrapper* mesh);
+
   /**
    * Register a named path with the sequencer.
    */
@@ -257,29 +263,6 @@ public:
       if (!strcmp (p->GetName (), name)) return p;
     }
     return NULL;
-  }
-
-  /**
-   * Get the path which is currently controlling the camera.
-   */
-  csNamedPath* GetCameraPath () { return camera_path; }
-
-  /**
-   * Get the current index of the camera path (0..1).
-   */
-  float GetCameraIndex (cs_time current_time)
-  {
-    return float (current_time - start_camera_path_time)
-    	/ float (total_camera_path_time);
-  }
-
-  /**
-   * Get the absolute time point which corresponds to the camera path
-   * index (0..1).
-   */
-  cs_time GetCameraTimePoint (float r)
-  {
-    return cs_time (r * total_camera_path_time + start_camera_path_time);
   }
 };
 

@@ -150,6 +150,27 @@ void Demo::SetupFactories ()
   LoadFactory ("fighter", "/data/demo/objects/fighter",
   	"crystalspace.mesh.object.sprite.3d",
 	"crystalspace.mesh.loader.factory.sprite.3d");
+  LoadFactory ("ss1_dummy", "/data/demo/objects/ss1_dummy",
+  	"crystalspace.mesh.object.sprite.3d",
+	"crystalspace.mesh.loader.factory.sprite.3d");
+  LoadFactory ("ss1_tower", "/data/demo/objects/ss1_tower",
+  	"crystalspace.mesh.object.sprite.3d",
+	"crystalspace.mesh.loader.factory.sprite.3d");
+  LoadFactory ("ss1_spoke", "/data/demo/objects/ss1_spoke",
+  	"crystalspace.mesh.object.sprite.3d",
+	"crystalspace.mesh.loader.factory.sprite.3d");
+  LoadFactory ("ss1_dome", "/data/demo/objects/ss1_dome",
+  	"crystalspace.mesh.object.sprite.3d",
+	"crystalspace.mesh.loader.factory.sprite.3d");
+  LoadFactory ("ss1_tail", "/data/demo/objects/ss1_tail",
+  	"crystalspace.mesh.object.sprite.3d",
+	"crystalspace.mesh.loader.factory.sprite.3d");
+  LoadFactory ("ss1_arm1", "/data/demo/objects/ss1_arm1",
+  	"crystalspace.mesh.object.sprite.3d",
+	"crystalspace.mesh.loader.factory.sprite.3d");
+  LoadFactory ("ss1_pod1", "/data/demo/objects/ss1_pod1",
+  	"crystalspace.mesh.object.sprite.3d",
+	"crystalspace.mesh.loader.factory.sprite.3d");
   LoadFactory ("laser", "/data/demo/objects/laser",
   	"crystalspace.mesh.object.sprite.3d",
 	"crystalspace.mesh.loader.factory.sprite.3d");
@@ -190,6 +211,7 @@ void Demo::SetupMaterials ()
   LoadMaterial ("nebula_u", "/data/demo/textures/nebula_u.png");
   LoadMaterial ("stars", "/data/demo/textures/stars.png");
   LoadMaterial ("starcross", "/data/demo/textures/starcross2.jpg");
+  LoadMaterial ("fighter", "/data/demo/textures/camo.png");
 }
 
 static void SetTexSpace (iPolygon3D* poly, 
@@ -477,6 +499,9 @@ void Demo::SetupObjects ()
   spr3d->SetRenderPriority (engine->GetRenderPriority ("object"));
   spr3d->SetZBufMode (CS_ZBUF_USE);
   spr3d->DeferUpdateLighting (CS_NLIGHT_STATIC|CS_NLIGHT_DYNAMIC, 10);
+  s3d = QUERY_INTERFACE (spr3d->GetMeshObject (), iSprite3DState);
+  s3d->SetBaseColor (csColor (.15, .15, .15));
+  s3d->DecRef ();
   iMeshWrapper* tail = LoadObject ("FighterTail1",
   	"/data/demo/objects/fightertail",
   	"crystalspace.mesh.object.fire",
@@ -491,6 +516,9 @@ void Demo::SetupObjects ()
   spr3d->SetRenderPriority (engine->GetRenderPriority ("object"));
   spr3d->SetZBufMode (CS_ZBUF_USE);
   spr3d->DeferUpdateLighting (CS_NLIGHT_STATIC|CS_NLIGHT_DYNAMIC, 10);
+  s3d = QUERY_INTERFACE (spr3d->GetMeshObject (), iSprite3DState);
+  s3d->SetBaseColor (csColor (.15, .15, .15));
+  s3d->DecRef ();
   tail = LoadObject ("FighterTail2",
   	"/data/demo/objects/fightertail",
   	"crystalspace.mesh.object.fire",
@@ -533,6 +561,70 @@ void Demo::SetupObjects ()
   s3d->SetBaseColor (csColor (.1, .1, 1));
   s3d->DecRef ();
 
+  //=====
+  // Setup the space station.
+  //=====
+
+  spr3d = engine->CreateMeshObject (
+  	engine->FindMeshFactory ("ss1_dummy"), "Station1",
+  	NULL, csVector3 (0));
+  spr3d->SetRenderPriority (engine->GetRenderPriority ("object"));
+  spr3d->SetZBufMode (CS_ZBUF_USE);
+
+  iMeshWrapper* spr3d_tower = engine->CreateMeshObject (
+  	engine->FindMeshFactory ("ss1_tower"), "SS1_Tower",
+  	NULL, csVector3 (0));
+  spr3d_tower->SetRenderPriority (engine->GetRenderPriority ("object"));
+  spr3d_tower->SetZBufMode (CS_ZBUF_USE);
+  spr3d->AddChild (spr3d_tower);
+
+  iMeshWrapper* spr3d_spoke = engine->CreateMeshObject (
+  	engine->FindMeshFactory ("ss1_spoke"), "SS1_Spoke",
+  	NULL, csVector3 (0));
+  spr3d_spoke->SetRenderPriority (engine->GetRenderPriority ("object"));
+  spr3d_spoke->SetZBufMode (CS_ZBUF_USE);
+  spr3d->AddChild (spr3d_spoke);
+
+  iMeshWrapper* spr3d_dome = engine->CreateMeshObject (
+  	engine->FindMeshFactory ("ss1_dome"), "SS1_Dome",
+  	NULL, csVector3 (0));
+  spr3d_dome->SetRenderPriority (engine->GetRenderPriority ("object"));
+  spr3d_dome->SetZBufMode (CS_ZBUF_USE);
+  spr3d->AddChild (spr3d_dome);
+
+  iMeshWrapper* spr3d_tail = engine->CreateMeshObject (
+  	engine->FindMeshFactory ("ss1_tail"), "SS1_Tail",
+  	NULL, csVector3 (0));
+  spr3d_tail->SetRenderPriority (engine->GetRenderPriority ("object"));
+  spr3d_tail->SetZBufMode (CS_ZBUF_USE);
+  spr3d->AddChild (spr3d_tail);
+
+  iMeshWrapper* spr3d_arm = engine->CreateMeshObject (
+  	engine->FindMeshFactory ("ss1_arm1"), "SS1_Arm1",
+  	NULL, csVector3 (0));
+  spr3d_arm->SetRenderPriority (engine->GetRenderPriority ("object"));
+  spr3d_arm->SetZBufMode (CS_ZBUF_USE);
+  spr3d->AddChild (spr3d_arm);
+
+  spr3d_arm = engine->CreateMeshObject (
+  	engine->FindMeshFactory ("ss1_arm1"), "SS1_Arm1",
+  	NULL, csVector3 (0));
+  spr3d_arm->SetRenderPriority (engine->GetRenderPriority ("object"));
+  spr3d_arm->SetZBufMode (CS_ZBUF_USE);
+  spr3d->AddChild (spr3d_arm);
+  spr3d_arm->GetMovable ()->GetTransform ().RotateThis (csVector3 (0, 1, 0),
+  	M_PI/2.);
+  spr3d_arm->GetMovable ()->UpdateMove ();
+
+  iMeshWrapper* spr3d_pod1 = engine->CreateMeshObject (
+  	engine->FindMeshFactory ("ss1_pod1"), "SS1_Pod1",
+  	NULL, csVector3 (0));
+  spr3d_pod1->SetRenderPriority (engine->GetRenderPriority ("object"));
+  spr3d_pod1->SetZBufMode (CS_ZBUF_USE);
+  spr3d->AddChild (spr3d_pod1);
+
+  //=====
+
   iMeshWrapper* spr2d;
   iSprite2DState* s2d;
   iParticle* part;
@@ -543,10 +635,21 @@ void Demo::SetupObjects ()
   spr2d->SetZBufMode (CS_ZBUF_TEST);
   s2d = QUERY_INTERFACE (spr2d->GetMeshObject (), iSprite2DState);
   s2d->CreateRegularVertices (4, true);
-  //csColoredVertices& verts = s2d->GetVertices ();
   s2d->DecRef ();
   part = QUERY_INTERFACE (spr2d->GetMeshObject (), iParticle);
-  part->ScaleBy (10);
+  part->ScaleBy (5);
+  part->DecRef ();
+
+  spr2d = engine->CreateMeshObject (
+  	engine->FindMeshFactory ("photonTorpedo"), "PhotonTorpedo2",
+  	NULL, csVector3 (0));
+  spr2d->SetRenderPriority (engine->GetRenderPriority ("alpha"));
+  spr2d->SetZBufMode (CS_ZBUF_TEST);
+  s2d = QUERY_INTERFACE (spr2d->GetMeshObject (), iSprite2DState);
+  s2d->CreateRegularVertices (4, true);
+  s2d->DecRef ();
+  part = QUERY_INTERFACE (spr2d->GetMeshObject (), iParticle);
+  part->ScaleBy (5);
   part->DecRef ();
 }
 
@@ -764,7 +867,7 @@ void Demo::NextFrame ()
   else if (map_enabled < MAP_EDIT)
     seqmgr->Draw2DEffects (G2D, current_time);
   if (map_enabled >= MAP_OVERLAY)
-    seqmgr->DebugDrawPaths (current_time, map_selpath,
+    seqmgr->DebugDrawPaths (view->GetCamera (), current_time, map_selpath,
     	map_tl, map_br, map_selpoint);
   if (map_enabled == MAP_EDIT)
     DrawEditInfo ();

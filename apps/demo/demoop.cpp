@@ -63,9 +63,20 @@ void RotatePartOp::Do (cs_time dt)
   	total_rotate_time, dt);
 }
 
-CameraPathOp::CameraPathOp (cs_time t, const char* pathName) :
-	total_camera_path_time (t)
+AttachOp::AttachOp (const char* meshName, const char* pathName)
 {
+  if (meshName)
+  {
+    mesh = DemoSequenceManager::demo->engine->FindMeshObject (meshName);
+    if (!mesh)
+    {
+      DemoSequenceManager::demo->Printf (MSG_FATAL_ERROR,
+    	  "Can't find mesh '%s'\n", meshName);
+      exit (0);
+    }
+  }
+  else
+    mesh = NULL;
   path = DemoSequenceManager::demoseq->FindPath (pathName);
   if (!path)
   {
@@ -75,22 +86,26 @@ CameraPathOp::CameraPathOp (cs_time t, const char* pathName) :
   }
 }
 
-void CameraPathOp::Do (cs_time dt)
+void AttachOp::Do (cs_time dt)
 {
-  DemoSequenceManager::demoseq->SetupCameraPath (path,
-  	total_camera_path_time, dt);
+  DemoSequenceManager::demoseq->ReplacePathObject (path, mesh);
 }
 
-MeshPathOp::MeshPathOp (cs_time t, const char* meshName, const char* pathName)
+PathOp::PathOp (cs_time t, const char* meshName, const char* pathName)
 {
   total_path_time = t;
-  mesh = DemoSequenceManager::demo->engine->FindMeshObject (meshName);
-  if (!mesh)
+  if (meshName)
   {
-    DemoSequenceManager::demo->Printf (MSG_FATAL_ERROR,
-    	"Can't find mesh '%s'\n", meshName);
-    exit (0);
+    mesh = DemoSequenceManager::demo->engine->FindMeshObject (meshName);
+    if (!mesh)
+    {
+      DemoSequenceManager::demo->Printf (MSG_FATAL_ERROR,
+    	  "Can't find mesh '%s'\n", meshName);
+      exit (0);
+    }
   }
+  else
+    mesh = NULL;
   path = DemoSequenceManager::demoseq->FindPath (pathName);
   if (!path)
   {
@@ -100,9 +115,9 @@ MeshPathOp::MeshPathOp (cs_time t, const char* meshName, const char* pathName)
   }
 }
 
-void MeshPathOp::Do (cs_time dt)
+void PathOp::Do (cs_time dt)
 {
-  DemoSequenceManager::demoseq->SetupMeshPath (path, mesh,
+  DemoSequenceManager::demoseq->SetupPath (path, mesh,
   	total_path_time, dt);
 }
 

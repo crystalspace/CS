@@ -57,7 +57,6 @@ DemoSequenceManager::DemoSequenceManager (Demo* demo)
     exit (0);
   }
 
-  do_camera_path = false;
   do_fade = false;
   fade_value = 0;
   suspended = true;
@@ -133,7 +132,6 @@ void DemoSequenceManager::Resume ()
     // so that it appears as if we just go on from here.
     cs_time dt = demo->GetTime ()-suspend_time;
     start_fade_time += dt;
-    start_camera_path_time += dt;
     int i;
     for (i = 0 ; i < pathForMesh.Length () ; i++)
     {
@@ -152,7 +150,6 @@ void DemoSequenceManager::Restart (const char* sequenceFileName)
 {
   Clear ();
   if (main_sequence) { main_sequence->DecRef (); main_sequence = NULL; }
-  do_camera_path = false;
   do_fade = false;
   fade_value = 0;
   suspended = true;
@@ -166,7 +163,6 @@ void DemoSequenceManager::TimeWarp (cs_time dt, bool restart)
   if (int (dt) < 0 && restart)
   {
     Clear ();
-    do_camera_path = false;
     do_fade = false;
     fade_value = 0;
     seqmgr->RunSequence (0, main_sequence);
@@ -184,10 +180,13 @@ void DemoSequenceManager::TimeWarp (cs_time dt, bool restart)
   }
 #endif
 
+  // Temporarily resume everything to make sure our data is ok.
+  bool sus = suspended;
+  Resume ();
+
   // Now we correct all time information in the sequencer
   // so that it appears as if we just go on from here.
   start_fade_time -= dt;
-  start_camera_path_time -= dt;
   int i;
   for (i = 0 ; i < pathForMesh.Length () ; i++)
   {
@@ -200,11 +199,10 @@ void DemoSequenceManager::TimeWarp (cs_time dt, bool restart)
     pfm->start_time -= dt;
   }
 
-  if (suspended)
-  {
-    Resume ();
-    suspend_one_frame = true;
-  }
+  // If we were suspended we say to the sequence manager to
+  // suspend after one frame again. But we will have to go on
+  // one frame to update the screen.
+  if (sus) suspend_one_frame = true;
 
   seqmgr->TimeWarp (dt, false);
   if (seqmgr->IsEmpty ())
@@ -212,8 +210,7 @@ void DemoSequenceManager::TimeWarp (cs_time dt, bool restart)
     // If the sequence manager is empty we insert the main sequence
     // again.
     seqmgr->RunSequence (0, main_sequence);
-    if (suspended) main_start_time = suspend_time;
-    else main_start_time = demo->GetTime ();
+    main_start_time = demo->GetTime ();
   }
 }
 
@@ -264,17 +261,22 @@ void DemoSequenceManager::SetupFade (float start_fade, float end_fade,
   }
 }
 
-void DemoSequenceManager::SetupCameraPath (csNamedPath* path,
-	cs_time total_camera_path_time,
-  	cs_time already_elapsed)
+void DemoSequenceManager::ReplacePathObject (csNamedPath* path,
+	iMeshWrapper* mesh)
 {
-  DemoSequenceManager::total_camera_path_time = total_camera_path_time;
-  start_camera_path_time = demo->GetTime ()-already_elapsed;
-  camera_path = path;
-  do_camera_path = true;
+  int i;
+  for (i = 0 ; i < pathForMesh.Length () ; i++)
+  {
+    PathForMesh* pfm = (PathForMesh*)pathForMesh[i];
+    if (pfm->path == path)
+    {
+      pfm->mesh = mesh;
+      return;
+    }
+  }
 }
 
-void DemoSequenceManager::SetupMeshPath (csNamedPath* path,
+void DemoSequenceManager::SetupPath (csNamedPath* path,
 	iMeshWrapper* mesh,
 	cs_time total_path_time,
   	cs_time already_elapsed)
@@ -309,11 +311,19 @@ void DemoSequenceManager::ControlPaths (iCamera* camera, cs_time current_time,
     pfm->path->GetInterpolatedPosition (pos);
     pfm->path->GetInterpolatedUp (up);
     pfm->path->GetInterpolatedForward (forward);
-    iMovable* movable = pfm->mesh->GetMovable ();
-    movable->SetPosition (pos);
-    movable->GetTransform ().LookAt (forward.Unit (), up.Unit ());
-    movable->UpdateMove ();
-    pfm->mesh->DeferUpdateLighting (CS_NLIGHT_STATIC|CS_NLIGHT_DYNAMIC, 10);
+    if (pfm->mesh)
+    {
+      iMovable* movable = pfm->mesh->GetMovable ();
+      movable->SetPosition (pos);
+      movable->GetTransform ().LookAt (forward.Unit (), up.Unit ());
+      movable->UpdateMove ();
+      pfm->mesh->DeferUpdateLighting (CS_NLIGHT_STATIC|CS_NLIGHT_DYNAMIC, 10);
+    }
+    else
+    {
+      camera->SetPosition (pos);
+      camera->GetTransform ().LookAt (forward.Unit (), up.Unit ());
+    }
     if (!do_path)
     {
       delete pfm;
@@ -321,23 +331,6 @@ void DemoSequenceManager::ControlPaths (iCamera* camera, cs_time current_time,
       len--;
     }
     else i++;
-  }
-
-  if (do_camera_path)
-  {
-    float r = GetCameraIndex (current_time);
-    if (r >= 1)
-    {
-      r = 1;
-      do_camera_path = false;
-    }
-    camera_path->Calculate (r);
-    csVector3 pos, up, forward;
-    camera_path->GetInterpolatedPosition (pos);
-    camera_path->GetInterpolatedUp (up);
-    camera_path->GetInterpolatedForward (forward);
-    camera->SetPosition (pos);
-    camera->GetTransform ().LookAt (forward.Unit (), up.Unit ());
   }
 
   i = 0;
@@ -378,28 +371,21 @@ void DemoSequenceManager::DebugPositionObjects (iCamera* camera)
       pfm->path->GetInterpolatedPosition (pos);
       pfm->path->GetInterpolatedUp (up);
       pfm->path->GetInterpolatedForward (forward);
-      iMovable* movable = pfm->mesh->GetMovable ();
-      movable->SetPosition (pos);
-      movable->GetTransform ().LookAt (forward.Unit (), up.Unit ());
-      movable->UpdateMove ();
-      pfm->mesh->DeferUpdateLighting (CS_NLIGHT_STATIC|CS_NLIGHT_DYNAMIC, 10);
+      if (pfm->mesh)
+      {
+        iMovable* movable = pfm->mesh->GetMovable ();
+        movable->SetPosition (pos);
+        movable->GetTransform ().LookAt (forward.Unit (), up.Unit ());
+        movable->UpdateMove ();
+        pfm->mesh->DeferUpdateLighting (CS_NLIGHT_STATIC|CS_NLIGHT_DYNAMIC, 10);
+      }
+      else
+      {
+        camera->SetPosition (pos);
+        camera->GetTransform ().LookAt (forward.Unit (), up.Unit ());
+      }
     }
     i++;
-  }
-
-  if (do_camera_path)
-  {
-    float r = GetCameraIndex (suspend_time);
-    if (r >= 0 && r <= 1)
-    {
-      camera_path->Calculate (r);
-      csVector3 pos, up, forward;
-      camera_path->GetInterpolatedPosition (pos);
-      camera_path->GetInterpolatedUp (up);
-      camera_path->GetInterpolatedForward (forward);
-      camera->SetPosition (pos);
-      camera->GetTransform ().LookAt (forward.Unit (), up.Unit ());
-    }
   }
 }
 
@@ -479,7 +465,8 @@ void DemoSequenceManager::DrawSelPoint (
   }
 }
 
-void DemoSequenceManager::DebugDrawPaths (cs_time current_time,
+void DemoSequenceManager::DebugDrawPaths (iCamera* camera,
+	cs_time current_time,
 	const char* hilight, const csVector2& tl, const csVector2& br,
 	int selpoint)
 {
@@ -494,6 +481,14 @@ void DemoSequenceManager::DebugDrawPaths (cs_time current_time,
   demo->G2D->DrawLine (0, dim, dim, dim, demo->col_cyan);
   demo->G2D->DrawLine (0, 0, 0, dim, demo->col_cyan);
   demo->G2D->DrawLine (dim, 0, dim, dim, demo->col_cyan);
+
+  //=====
+  // Draw the current camera.
+  //=====
+  csVector3 campos = camera->GetTransform ().GetOrigin ();
+  csVector3 camfwd = camera->GetTransform ().This2Other (csVector3 (0, 0, 1)) -
+  	campos;
+  DrawSelPoint (campos, camfwd, tl, br, dim, demo->col_green, 20);
 
   //=====
   // Get the current selected path.
@@ -518,11 +513,6 @@ void DemoSequenceManager::DebugDrawPaths (cs_time current_time,
     bool hi = (pfm->path == selnp);
     DebugDrawPath (pfm->path, hi, tl, br, selpoint);
     i++;
-  }
-  if (do_camera_path && camera_path)
-  {
-    bool hi = (camera_path == selnp);
-    DebugDrawPath (camera_path, hi, tl, br, selpoint);
   }
 
   //=====
@@ -570,34 +560,22 @@ void DemoSequenceManager::DebugDrawPaths (cs_time current_time,
 
     i++;
   }
+}
 
-  if (do_camera_path && camera_path)
+void DemoSequenceManager::SelectFirstPath (char* hilight)
+{
+  if (pathForMesh.Length () > 0)
   {
-    bool hi = (camera_path == selnp);
-    cs_time ct = current_time;
-    if (suspended) ct = suspend_time;
-    float r = GetCameraIndex (ct);
-    if (r >= 1) r = 1;
-    camera_path->Calculate (r);
-    csVector3 pos, forward;
-    camera_path->GetInterpolatedPosition (pos);
-    camera_path->GetInterpolatedForward (forward);
-    DrawSelPoint (pos, forward, tl, br, dim, demo->col_yellow, 20);
+    strcpy (hilight, ((PathForMesh*)pathForMesh[0])->path->GetName ());
+  }
+}
 
-    // If there is a hilighted path and we are not busy drawing the hilighted
-    // path then we will draw an additional point on this path to indicate
-    // where this path will be when the selected path is at the selected point.
-    if (!hi && selnp)
-    {
-      r = GetCameraIndex (seltime);
-      if (r >= 0 && r <= 1)
-      {
-	camera_path->Calculate (r);
-	camera_path->GetInterpolatedPosition (pos);
-	camera_path->GetInterpolatedForward (forward);
-        DrawSelPoint (pos, forward, tl, br, dim, demo->col_cyan, 10);
-      }
-    }
+void DemoSequenceManager::SelectLastPath (char* hilight)
+{
+  if (pathForMesh.Length () > 0)
+  {
+    strcpy (hilight, ((PathForMesh*)pathForMesh[
+      pathForMesh.Length ()-1])->path->GetName ());
   }
 }
 
@@ -606,35 +584,28 @@ void DemoSequenceManager::SelectPreviousPath (char* hilight)
   csNamedPath* np = GetSelectedPath (hilight);
   if (!np)
   {
-    if (camera_path) strcpy (hilight, camera_path->GetName ());
+    SelectLastPath (hilight);
     return;
   }
-  if (np == camera_path) return;
-  else
+  int i;
+  for (i = 0 ; i < pathForMesh.Length () ; i++)
   {
-    int i;
-    for (i = 0 ; i < pathForMesh.Length () ; i++)
+    PathForMesh* pfm = (PathForMesh*)pathForMesh[i];
+    if (pfm->path == np)
     {
-      PathForMesh* pfm = (PathForMesh*)pathForMesh[i];
-      if (pfm->path == np)
-      {
-        if (i == 0)
-	{
-	  if (camera_path) strcpy (hilight, camera_path->GetName ());
-	  return;
-	}
-	else
-	{
-          pfm = (PathForMesh*)pathForMesh[i-1];
-	  strcpy (hilight, pfm->path->GetName ());
-	}
+      if (i == 0)
 	return;
+      else
+      {
+        pfm = (PathForMesh*)pathForMesh[i-1];
+	strcpy (hilight, pfm->path->GetName ());
       }
+      return;
     }
-    // We can't find the path. Switch back to camera.
-    if (camera_path) strcpy (hilight, camera_path->GetName ());
-    return;
   }
+  // We can't find the path. Switch back to last path.
+  SelectLastPath (hilight);
+  return;
 }
 
 void DemoSequenceManager::SelectNextPath (char* hilight)
@@ -642,37 +613,26 @@ void DemoSequenceManager::SelectNextPath (char* hilight)
   csNamedPath* np = GetSelectedPath (hilight);
   if (!np)
   {
-    if (camera_path) strcpy (hilight, camera_path->GetName ());
+    SelectFirstPath (hilight);
     return;
   }
-  if (np == camera_path)
+  int i;
+  for (i = 0 ; i < pathForMesh.Length () ; i++)
   {
-    // Fetch the first non-camera path.
-    if (pathForMesh.Length () <= 0) return;	// Do nothing.
-    PathForMesh* pfm = (PathForMesh*)pathForMesh[0];
-    strcpy (hilight, pfm->path->GetName ());
-    return;
-  }
-  else
-  {
-    int i;
-    for (i = 0 ; i < pathForMesh.Length () ; i++)
+    PathForMesh* pfm = (PathForMesh*)pathForMesh[i];
+    if (pfm->path == np)
     {
-      PathForMesh* pfm = (PathForMesh*)pathForMesh[i];
-      if (pfm->path == np)
+      if (i != pathForMesh.Length ()-1)
       {
-        if (i != pathForMesh.Length ()-1)
-	{
-          pfm = (PathForMesh*)pathForMesh[i+1];
-	  strcpy (hilight, pfm->path->GetName ());
-	}
-	return;
+        pfm = (PathForMesh*)pathForMesh[i+1];
+	strcpy (hilight, pfm->path->GetName ());
       }
+      return;
     }
-    // We can't find the path. Switch back to camera.
-    if (camera_path) strcpy (hilight, camera_path->GetName ());
-    return;
   }
+  // We can't find the path. Switch back to first path.
+  SelectFirstPath (hilight);
+  return;
 }
 
 csNamedPath* DemoSequenceManager::GetSelectedPath (const char* hilight)
@@ -684,17 +644,6 @@ csNamedPath* DemoSequenceManager::GetSelectedPath (const char* hilight)
 csNamedPath* DemoSequenceManager::GetSelectedPath (const char* hilight,
 	cs_time& start, cs_time& total)
 {
-  if (do_camera_path && camera_path)
-  {
-    bool hi = (hilight && !strcmp (camera_path->GetName (), hilight));
-    if (hi)
-    {
-      start = start_camera_path_time;
-      total = total_camera_path_time;
-      return camera_path;
-    }
-  }
-
   int i = 0;
   int len = pathForMesh.Length ();
   while (i < len)

@@ -609,6 +609,7 @@ void WalkTest::MouseClick2Handler(iEvent &Event)
 {
   csVector3 v;
   csVector2 p (Event.Mouse.x, FRAME_HEIGHT-Event.Mouse.y);
+
   view->GetCamera ()->InvPerspective (p, 1, v);
   csVector3 vw = view->GetCamera ()->Camera2World (v);
 

@@ -98,20 +98,6 @@ public:
 };
 
 /**
- * An operation to attach a path to the camera.
- */
-class CameraPathOp : public StandardOp
-{
-private:
-  csNamedPath* path;
-  cs_time total_camera_path_time;
-
-public:
-  CameraPathOp (cs_time t, const char* pathName);
-  virtual void Do (cs_time dt);
-};
-
-/**
  * An operation to show and move a mesh object.
  */
 class SetupMeshOp : public StandardOp
@@ -153,9 +139,23 @@ public:
 };
 
 /**
- * An operation to attach a path to a mesh object.
+ * An operation to attach an object to an already running path.
  */
-class MeshPathOp : public StandardOp
+class AttachOp : public StandardOp
+{
+private:
+  iMeshWrapper* mesh;
+  csNamedPath* path;
+
+public:
+  AttachOp (const char* meshName, const char* pathName);
+  virtual void Do (cs_time dt);
+};
+
+/**
+ * An operation to attach a path to an object (mesh or camera).
+ */
+class PathOp : public StandardOp
 {
 private:
   iMeshWrapper* mesh;
@@ -163,7 +163,7 @@ private:
   cs_time total_path_time;
 
 public:
-  MeshPathOp (cs_time t, const char* meshName, const char* pathName);
+  PathOp (cs_time t, const char* meshName, const char* pathName);
   virtual void Do (cs_time dt);
 };
 

@@ -30,6 +30,7 @@
 
 // Define all tokens used through this file
 CS_TOKEN_DEF_START
+  CS_TOKEN_DEF (ATTACH)
   CS_TOKEN_DEF (DECLARESEQUENCE)
   CS_TOKEN_DEF (RUNSEQUENCE)
   CS_TOKEN_DEF (SEQUENCE)
@@ -38,8 +39,6 @@ CS_TOKEN_DEF_START
   CS_TOKEN_DEF (SETUPMESH)
   CS_TOKEN_DEF (SHOWMESH)
   CS_TOKEN_DEF (HIDEMESH)
-  CS_TOKEN_DEF (PATHMESH)
-  CS_TOKEN_DEF (PATHCAMERA)
   CS_TOKEN_DEF (PATH)
   CS_TOKEN_DEF (FILE)
   CS_TOKEN_DEF (TEST)
@@ -106,8 +105,8 @@ void DemoSequenceLoader::LoadSequence (char* buf, iSequence* seq)
     CS_TOKEN_TABLE (SETUPMESH)
     CS_TOKEN_TABLE (SHOWMESH)
     CS_TOKEN_TABLE (HIDEMESH)
-    CS_TOKEN_TABLE (PATHMESH)
-    CS_TOKEN_TABLE (PATHCAMERA)
+    CS_TOKEN_TABLE (ATTACH)
+    CS_TOKEN_TABLE (PATH)
     CS_TOKEN_TABLE (TEST)
     CS_TOKEN_TABLE (DELAY)
     CS_TOKEN_TABLE (FADE)
@@ -173,23 +172,27 @@ void DemoSequenceLoader::LoadSequence (char* buf, iSequence* seq)
 	op->DecRef ();
 	break;
       }
-      case CS_TOKEN_PATHMESH:
+      case CS_TOKEN_ATTACH:
+      {
+        char meshName[100];
+	char pathName[100];
+	ScanStr (params, "%s,%s", meshName, pathName);
+	char* name = meshName;
+	if (!strcmp ("camera", meshName)) name = NULL;
+        AttachOp* op = new AttachOp (name, pathName);
+	seq->AddOperation (cur_time, op);
+	op->DecRef ();
+	break;
+      }
+      case CS_TOKEN_PATH:
       {
         char meshName[100];
 	char pathName[100];
 	cs_time t;
 	ScanStr (params, "%d,%s,%s", &t, meshName, pathName);
-        MeshPathOp* op = new MeshPathOp (t, meshName, pathName);
-	seq->AddOperation (cur_time, op);
-	op->DecRef ();
-	break;
-      }
-      case CS_TOKEN_PATHCAMERA:
-      {
-	char pathName[100];
-	cs_time t;
-	ScanStr (params, "%d,%s", &t, pathName);
-        CameraPathOp* op = new CameraPathOp (t, pathName);
+	char* name = meshName;
+	if (!strcmp ("camera", meshName)) name = NULL;
+        PathOp* op = new PathOp (t, name, pathName);
 	seq->AddOperation (cur_time, op);
 	op->DecRef ();
 	break;
