@@ -5,6 +5,21 @@ he history order is reversed so that new features are at the top.
 	  iMeshFactoryWrapper instead of iMeshObjectFactory.
 	  It also no longer does an incref on the returned factory if
 	  the factory already existed.
+	- Added iEngine::SetClearZBuf() and GetClearZBuf(). With these
+	  functions you can let GetBeginDrawFlags() return that the Z-buffer
+	  has to be cleared every frame.
+	- Added a new SETTINGS section in the map loader. This block will
+	  be used to contain level specific settings for the engine and
+	  other plugins. At this moment this block can only contain the
+	  CLEARZBUF(yes/no) keyword which will call SetClearZBuf() with
+	  the given parameter. Using this new keyword it is now possible
+	  to make levels that don't have any other way to initialize the
+	  Z-buffer. Normal CS levels should initialize the Z-buffer themselves
+	  by making sure that the outer polygons of the level are rendered
+	  with ZFILL mode. Sometimes this is not possible, or sometimes it
+	  would be more efficient to let the hardware clear the Z-buffer
+	  in one go and then use the Z-buffer (i.e. for space type levels).
+	  That's why this flag is useful.
 14-Jan-2002
 	- Matt Reda added 3 OSX drivers (2 canvases and an audio driver)
 	  and updated various Makefiles to support these changes.

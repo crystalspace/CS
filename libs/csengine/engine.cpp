@@ -722,6 +722,7 @@ csEngine::csEngine (iBase *iParent) : sectors (true)
   use_pvs = false;
   use_pvs_only = false;
   freeze_pvs = false;
+  clear_zbuf = false;
   engine_states = NULL;
   rad_debug = NULL;
   nextframe_pending = 0;
@@ -1495,6 +1496,7 @@ void csEngine::StartDraw (iCamera* c, iClipper2D* view, csRenderView& rview)
 
 void csEngine::Draw (iCamera* c, iClipper2D* view)
 {
+//printf ("=====================\n");
   ControlMeshes ();
 
   csRenderView rview (c, view, G3D, G2D);

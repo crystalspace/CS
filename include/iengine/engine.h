@@ -171,7 +171,7 @@ struct iDrawFuncCallback : public iBase
 };
 
 
-SCF_VERSION (iEngine, 0, 6, 6);
+SCF_VERSION (iEngine, 0, 7, 0);
 
 /**
  * This interface is the main interface to the 3D engine.
@@ -365,9 +365,27 @@ struct iEngine : public iBase
   virtual void RemoveDynLight (iDynLight*) = 0;
 
   /**
+   * Require that the Z-buffer is cleared every frame. The engine
+   * itself will not use this setting but will only return the
+   * correct flag in GetBeginDrawFlags() so that the Z-buffer is actually
+   * cleared. Note that this requires that the application actually
+   * uses GetBeginDrawFlags() in the call to g3d->BeginDraw() (which it should).
+   * By default this flag is false. It is useful to set this flag to true
+   * if you have a level that doesn't itself have another way to initialize
+   * the Z-buffer.
+   */
+  virtual void SetClearZBuf (bool yesno) = 0;
+
+  /**
+   * Get the value of the clear Z-buffer flag set with SetClearZBuf().
+   */
+  virtual bool GetClearZBuf () const = 0;
+
+  /**
    * Get the required flags for 3D->BeginDraw() which should be called
    * from the application. These flags must be or-ed with optional other
-   * flags that the application might be interested in.
+   * flags that the application might be interested in. Use SetClearZBuf()
+   * to let this function return that the Z-buffer must be cleared.
    */
   virtual int GetBeginDrawFlags () const = 0;
 

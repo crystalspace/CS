@@ -397,6 +397,9 @@ private:
   /// Frozen PVS position.
   csVector3 freeze_pvs_pos;
 
+  /// Clear the Z-buffer every frame.
+  bool clear_zbuf;
+
   /**
    * If this nextframe_pending is not 0 then a call of NextFrame
    * has happened. As soon as some object is visible (DrawTest() returns
@@ -579,6 +582,13 @@ public:
    */
   virtual int GetEngineMode () const { return engine_mode; }
 
+  virtual void SetClearZBuf (bool yesno)
+  {
+    clear_zbuf = yesno;
+  }
+
+  virtual bool GetClearZBuf () const { return clear_zbuf; }
+
   /**
    * Get the required flags for 3D->BeginDraw() which should be called
    * from the application. These flags must be or-ed with optional other
@@ -586,7 +596,7 @@ public:
    */
   virtual int GetBeginDrawFlags () const
   {
-    if (engine_mode == CS_ENGINE_ZBUFFER)
+    if (clear_zbuf || engine_mode == CS_ENGINE_ZBUFFER)
       return CSDRAW_CLEARZBUFFER;
     else
       return 0;

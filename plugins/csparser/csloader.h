@@ -209,6 +209,11 @@ private:
   bool LoadRenderPriorities (char* buf);
 
   /**
+   * Load the settings section.
+   */
+  bool LoadSettings (char* buf);
+
+  /**
    * Load sounds from a SOUNDS(...) argument.
    * This function is normally called automatically by the parser.
    */

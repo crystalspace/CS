@@ -94,6 +94,7 @@ CS_TOKEN_DEF_START
   CS_TOKEN_DEF (ATTENUATION)
   CS_TOKEN_DEF (CAMERA)
   CS_TOKEN_DEF (CENTER)
+  CS_TOKEN_DEF (CLEARZBUF)
   CS_TOKEN_DEF (COLLECTION)
   CS_TOKEN_DEF (COLOR)
   CS_TOKEN_DEF (CONVEX)
@@ -132,6 +133,7 @@ CS_TOKEN_DEF_START
   CS_TOKEN_DEF (REGION)
   CS_TOKEN_DEF (RENDERPRIORITIES)
   CS_TOKEN_DEF (SECTOR)
+  CS_TOKEN_DEF (SETTINGS)
   CS_TOKEN_DEF (SOUND)
   CS_TOKEN_DEF (SOUNDS)
   CS_TOKEN_DEF (START)
@@ -301,6 +303,7 @@ bool csLoader::LoadMap (char* buf)
     CS_TOKEN_TABLE (KEY)
     CS_TOKEN_TABLE (REGION)
     CS_TOKEN_TABLE (RENDERPRIORITIES)
+    CS_TOKEN_TABLE (SETTINGS)
     CS_TOKEN_TABLE (PLUGINS)
   CS_TOKEN_TABLE_END
 
@@ -330,6 +333,10 @@ bool csLoader::LoadMap (char* buf)
       }
       switch (cmd)
       {
+        case CS_TOKEN_SETTINGS:
+	  if (!LoadSettings (params))
+	    return false;
+	  break;
         case CS_TOKEN_RENDERPRIORITIES:
 	  Engine->ClearRenderPriorities ();
 	  if (!LoadRenderPriorities (params))
@@ -1815,6 +1822,48 @@ bool csLoader::LoadAddOn (char* buf, iBase* context)
   if (cmd == CS_PARSERR_TOKENNOTFOUND)
   {
     TokenError ("an add-on");
+    return false;
+  }
+
+  return true;
+}
+
+//---------------------------------------------------------------------------
+
+bool csLoader::LoadSettings (char* buf)
+{
+  CS_TOKEN_TABLE_START (commands)
+    CS_TOKEN_TABLE (CLEARZBUF)
+  CS_TOKEN_TABLE_END
+
+  char* name;
+  long cmd;
+  char* params;
+
+  while ((cmd = csGetObject (&buf, commands, &name, &params)) > 0)
+  {
+    if (!params)
+    {
+      ReportError (
+	  "crystalspace.maploader.parse.badformat",
+	  "Expected parameters instead of '%s' while parsing settings!",
+	  buf);
+      return false;
+    }
+    switch (cmd)
+    {
+      case CS_TOKEN_CLEARZBUF:
+      {
+        bool yesno;
+	csScanStr (params, "%b", &yesno);
+	Engine->SetClearZBuf (yesno);
+        break;
+      }
+    }
+  }
+  if (cmd == CS_PARSERR_TOKENNOTFOUND)
+  {
+    TokenError ("the settings");
     return false;
   }
 
