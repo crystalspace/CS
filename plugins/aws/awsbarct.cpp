@@ -369,6 +369,9 @@ void awsBarChart::OnDraw (csRect clip)
   int bw = inner_frame.Width() /  (max_items==0 ? count_items : max_items);
   int bh = inner_frame.Height() / (max_items==0 ? count_items : max_items);
 
+  if (bw<1) bw=1;
+  if (bh<1) bh=1;
+
   for(i=count_items-1; i>=0; --i)
   {
     BarItem *bi = &items[i];

@@ -295,6 +295,23 @@ void awsTextBox::OnDraw (csRect clip)
             alpha_level);
       }
       break;
+
+    case fsBitmap:
+      if (bkg)
+      {
+        g3d->DrawPixmap (
+            bkg,
+            Frame ().xmin,
+            Frame ().ymin,
+            Frame ().Width (), 
+            Frame ().Height (),
+            0,
+            0,
+            Frame ().Width (),
+            Frame ().Height (),
+            alpha_level);
+      }
+      break;
   }
 
   // Draw the caption, if there is one and the style permits it.
@@ -317,39 +334,43 @@ void awsTextBox::OnDraw (csRect clip)
         text->GetData () + start,
         Frame ().Width () - 10);
 
-    // Check to see if we're getting wierd.
-    start = cursor - mcc;
-    if (start < 0) start = 0;
-
-    // Make the text the right length
-    scfString tmp (text->GetData () + start);
-    tmp.Truncate (mcc);
-
-    // Get the size of the text
-    WindowManager ()->GetPrefMgr ()->GetDefaultFont ()->GetDimensions (
-        tmp.GetData (),
-        tw,
-        th);
-
-    // Calculate the center
-    tx = 4;
-    ty = (Frame ().Height () >> 1) - (th >> 1);
-
-    // Draw the text
-    g2d->Write (
-        WindowManager ()->GetPrefMgr ()->GetDefaultFont (),
-        Frame ().xmin + tx,
-        Frame ().ymin + ty,
-        WindowManager ()->GetPrefMgr ()->GetColor (AC_TEXTFORE),
-        -1,
-        tmp.GetData ());
-
-    if (should_mask && maskchar && saved)
+    if (mcc) 
     {
-      text->Clear ();
-      text->Append (saved);
-      saved->Clear ();
-      saved->DecRef ();
+
+      // Check to see if we're getting wierd.
+      start = cursor - mcc;
+      if (start < 0) start = 0;
+
+      // Make the text the right length
+      scfString tmp (text->GetData () + start);
+      tmp.Truncate (mcc);
+
+      // Get the size of the text
+      WindowManager ()->GetPrefMgr ()->GetDefaultFont ()->GetDimensions (
+	  tmp.GetData (),
+	  tw,
+	  th);
+
+      // Calculate the center
+      tx = 4;
+      ty = (Frame ().Height () >> 1) - (th >> 1);
+
+      // Draw the text
+      g2d->Write (
+	  WindowManager ()->GetPrefMgr ()->GetDefaultFont (),
+	  Frame ().xmin + tx,
+	  Frame ().ymin + ty,
+	  WindowManager ()->GetPrefMgr ()->GetColor (AC_TEXTFORE),
+	  -1,
+	  tmp.GetData ());
+
+      if (should_mask && maskchar && saved)
+      {
+	text->Clear ();
+	text->Append (saved);
+	saved->Clear ();
+	saved->DecRef ();
+      }
     }
 
     if (has_focus && blink)

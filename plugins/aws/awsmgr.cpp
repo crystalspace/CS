@@ -654,9 +654,11 @@ iAwsWindow *awsManager::CreateWindowFrom (char *defname)
     csRect r = win->getInsets ();
     r.xmin += win->Frame ().xmin;
     r.ymin += win->Frame ().ymin;
-    RecursiveLayoutChildren (win);
+    RecursiveLayoutChildren (win, false);
     win->MoveChildren (r.xmin, r.ymin);
   }
+  else
+    RecursiveLayoutChildren (win, true);
 
   return win;
 }
@@ -730,7 +732,7 @@ void awsManager::CreateChildrenFromDef (
   }           // end for count of keys
 }
 
-void awsManager::RecursiveLayoutChildren (iAwsComponent *comp)
+void awsManager::RecursiveLayoutChildren (iAwsComponent *comp, bool move_kids)
 {
   if (comp->Layout ()) comp->Layout ()->LayoutComponents ();
   if (!comp->HasChildren ()) return ;
@@ -740,8 +742,11 @@ void awsManager::RecursiveLayoutChildren (iAwsComponent *comp)
   {
     iAwsComponent *child = comp->GetChildAt (i);
 
-    RecursiveLayoutChildren (child);
+    RecursiveLayoutChildren (child, comp->Layout()!=NULL);
   }
+
+  if (comp->Layout())
+      comp->MoveChildren(comp->Frame().xmin, comp->Frame().ymin);
 }
 
 void awsManager::CaptureMouse (iAwsComponent *comp)

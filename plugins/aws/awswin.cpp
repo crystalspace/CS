@@ -51,6 +51,8 @@ awsWindow::awsWindow () :
   frame_style(fsNormal),
   frame_options(foControl | foZoom | foClose | foTitle | foGrip | foRoundBorder),
   title(NULL),
+  bkg_alpha(0),
+  ovl_alpha(0),
   resizing_mode(false),
   moving_mode(false),
   minp(50, 5, 50 + 13, 5 + 11),
@@ -131,6 +133,10 @@ bool awsWindow::Setup (iAws *_wmgr, awsComponentNode *settings)
 
     if (tn1) btxt = pm->GetTexture (tn1->GetData (), tn1->GetData ());
     if (tn2) otxt = pm->GetTexture (tn2->GetData (), tn2->GetData ());
+
+    pm->GetInt(settings, "BackgroundAlpha", bkg_alpha);
+    pm->GetInt(settings, "OverlayAlpha", ovl_alpha);
+
   }
 
   // Arrange control rects
@@ -429,7 +435,7 @@ bool awsWindow::OnMouseUp (int button, int x, int y)
       // Fix frame
       Frame ().Set (unzoomed_frame);
 
-      if (Layout ()) RecursiveLayoutChildren (this);
+      if (Layout ()) RecursiveLayoutChildren (this, false);
 
       // Fix kids
       MoveChildren (unzoomed_frame.xmin + insets.xmin, delta_y + insets.ymin);
@@ -456,7 +462,7 @@ bool awsWindow::OnMouseUp (int button, int x, int y)
 
       if (Layout ())
       {
-        RecursiveLayoutChildren (this);
+        RecursiveLayoutChildren (this, false);
         MoveChildren (insets.xmin, insets.ymin);
       }
       else
@@ -554,7 +560,7 @@ bool awsWindow::OnMouseMove (int button, int x, int y)
     if (Layout ())
     {
       csRect r (this->getInsets ());
-      RecursiveLayoutChildren (this);
+      RecursiveLayoutChildren (this, false);
       MoveChildren (Frame ().xmin + r.xmin, Frame ().ymin + r.ymin);
     }
 
@@ -1227,7 +1233,7 @@ void awsWindow::OnDraw (csRect clip)
             0,
             btw,
             bth,
-            0);
+            bkg_alpha);
       if (view)
       {
         g3d->BeginDraw (
@@ -1246,7 +1252,7 @@ void awsWindow::OnDraw (csRect clip)
             0,
             otw,
             oth,
-            0);
+            ovl_alpha);
 
       break;
 
@@ -1445,7 +1451,7 @@ void awsWindow::SetLayout (awsLayoutManager *l)
   comp.SetLayout (l);
 }
 
-void awsWindow::RecursiveLayoutChildren (iAwsComponent *cmp)
+void awsWindow::RecursiveLayoutChildren (iAwsComponent *cmp, bool move_kids)
 {
   if (cmp->Layout ()) cmp->Layout ()->LayoutComponents ();
   if (!cmp->HasChildren ()) return ;
@@ -1455,6 +1461,6 @@ void awsWindow::RecursiveLayoutChildren (iAwsComponent *cmp)
   {
     iAwsComponent *child = cmp->GetChildAt (i);
 
-    RecursiveLayoutChildren (child);
+    RecursiveLayoutChildren (child, cmp->Layout()==0);
   }
 }

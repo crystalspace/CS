@@ -134,6 +134,8 @@ void awsStatusBar::OnDraw (csRect clip)
       bkg,
       alpha_level);
 
+  if (status==0.0) return;
+
   // Get the normal inset for this item.
   insets=getInsets();
   

@@ -524,12 +524,12 @@ void awsCmdButton::OnDraw (csRect clip)
 
         g3d->DrawPixmap (
             tex[texindex],
-            0,
-            0,
-            w,
-            h,
             Frame ().xmin,
             Frame ().ymin,
+            w,
+            h,
+            0,
+	    0,
             w,
             h,
             alpha_level);
@@ -545,20 +545,36 @@ csRect awsCmdButton::getPreferredSize ()
 
 csRect awsCmdButton::getMinimumSize ()
 {
-  int tw = 0, th = 0;
-
-  if (caption)
+  if (frame_style==fsBitmap)
   {
-    // Get the size of the text
-    WindowManager ()->GetPrefMgr ()->GetDefaultFont ()->GetDimensions (
-        caption->GetData (),
-        tw,
-        th);
+    int texindex;
+    int w, h;
+
+    if (is_down)
+      texindex = 2;
+    else if (mouse_is_over)
+      texindex = 1;
+    else
+      texindex = 0;
+
+    tex[texindex]->GetOriginalDimensions (w, h);
+
+    return csRect(0,0,w,h);
   }
-
-  if (frame_style == fsNormal && tex[2])
+  else if (frame_style == fsNormal && tex[2])
   {
+    int tw = 0, th = 0;
     int img_w = 0, img_h = 0;
+
+    if (caption)
+    {
+      // Get the size of the text
+      WindowManager ()->GetPrefMgr ()->GetDefaultFont ()->GetDimensions (
+	  caption->GetData (),
+	  tw,
+	  th);
+    }
+
     tex[2]->GetOriginalDimensions (img_w, img_h);
     
     if (icon_align == iconLeft || icon_align == iconRight)
@@ -571,10 +587,26 @@ csRect awsCmdButton::getMinimumSize ()
       th += img_h + 2;
       tw = MAX(tw, img_w);
     }
+
+    return csRect (0, 0, tw + 6 + (tw >> 2), th + 6 + (th >> 1));
+
   }
+  else
+  {
+    int tw = 0, th = 0;
 
+    if (caption)
+    {
+      // Get the size of the text
+      WindowManager ()->GetPrefMgr ()->GetDefaultFont ()->GetDimensions (
+	  caption->GetData (),
+	  tw,
+	  th);
+    }
 
-  return csRect (0, 0, tw + 6 + (tw >> 2), th + 6 + (th >> 1));
+     return csRect (0, 0, tw + 6 + (tw >> 2), th + 6 + (th >> 1));
+
+  }
 }
 
 bool awsCmdButton::OnMouseDown (int, int, int)
@@ -611,7 +643,7 @@ bool awsCmdButton::OnMouseUp (int, int, int)
 
 bool awsCmdButton::OnMouseMove (int, int, int)
 {
-  return false;
+  return true;
 }
 
 bool awsCmdButton::OnMouseClick (int, int, int)
@@ -648,12 +680,12 @@ bool awsCmdButton::OnKeypress (int, int)
 
 bool awsCmdButton::OnLostFocus ()
 {
-  return false;
+  return true;
 }
 
 bool awsCmdButton::OnGainFocus ()
 {
-  return false;
+  return true;
 }
 
 /************************************* Command Button Factory ****************/

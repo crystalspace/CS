@@ -77,6 +77,12 @@ private:
   /// The alpha level for the overlay of the global texture
   int alpha_level;
 
+  /// The alpha level for the background bitmap
+  int bkg_alpha;
+
+  /// The alpha level for the overlay bitmap
+  int ovl_alpha;
+
   /// True if we are currently resizing
   bool resizing_mode;
 
@@ -125,7 +131,7 @@ private:
   virtual void SetParent (iAwsComponent *parent);
 
   /// Lays out children.
-  void RecursiveLayoutChildren (iAwsComponent *cmp);
+  void RecursiveLayoutChildren (iAwsComponent *cmp, bool move_kids=false);
 
   ////////////// Component declarations for embedded wrappers ///////////////////////////////
   //
