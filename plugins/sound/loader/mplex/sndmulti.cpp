@@ -51,7 +51,7 @@ public:
   virtual bool Initialize (iObjectRegistry *object_reg);
 
   // Load a sound file from the raw data.
-  virtual iSoundData *LoadSound(void *Data, unsigned long Size) const;
+  virtual csPtr<iSoundData> LoadSound(void *Data, unsigned long Size) const;
 
   struct eiComponent : public iComponent
   {
@@ -142,14 +142,14 @@ bool csSoundLoaderMultiplexer::Initialize(iObjectRegistry *object_reg)
   return true;
 }
 
-iSoundData*
+csPtr<iSoundData>
 csSoundLoaderMultiplexer::LoadSound(void *Data, unsigned long Size) const
 {
   for (long i=0;i<Loaders.Length();i++)
   {
     iSoundLoader *Ldr=(iSoundLoader*)(Loaders.Get(i));
-    iSoundData *snd=Ldr->LoadSound(Data, Size);
-    if (snd) return snd;
+    iSoundData* snd=Ldr->LoadSound(Data, Size);
+    if (snd) return csPtr<iSoundData> (snd);
   }
-  return NULL;
+  return csPtr<iSoundData> (NULL);
 }

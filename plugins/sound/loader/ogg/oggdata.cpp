@@ -197,12 +197,12 @@ public:
     SCF_CONSTRUCT_EMBEDDED_IBASE (scfiComponent);
   }
 
-  virtual iSoundData *LoadSound (void *Buffer, unsigned long Size) const
+  virtual csPtr<iSoundData> LoadSound (void *Buffer, unsigned long Size) const
   {
     csOggSoundData *sd=NULL;
     if (csOggSoundData::IsOgg (Buffer, Size))
       sd = new csOggSoundData ((iBase*)this, (uint8*)Buffer, Size);
-    return sd;
+    return csPtr<iSoundData> (sd);
   }
 };
 

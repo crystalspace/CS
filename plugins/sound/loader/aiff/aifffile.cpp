@@ -52,7 +52,7 @@ public:
     SCF_CONSTRUCT_IBASE(p);
     SCF_CONSTRUCT_EMBEDDED_IBASE(scfiComponent);
   }
-  virtual iSoundData *LoadSound(void *Buffer, unsigned long Size) const;
+  virtual csPtr<iSoundData> LoadSound(void *Buffer, unsigned long Size) const;
 };
 
 SCF_IMPLEMENT_IBASE(csSoundLoader_AIFF)
@@ -82,7 +82,7 @@ SCF_EXPORT_CLASS_TABLE_END
 #define addStream(x) {if((index+x)>size) {goto exit_read;} else {index+=x;}}
 #define Stream buf[index]
 
-iSoundData*
+csPtr<iSoundData>
 csSoundLoader_AIFF::LoadSound(void* databuf, unsigned long size) const
 {
   uint8 *buf = (uint8*) databuf;
@@ -220,5 +220,5 @@ exit_read:
   delete [] data;
 
 exit_ok:
-  return sb;
+  return csPtr<iSoundData> (sb);
 }

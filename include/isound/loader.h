@@ -20,6 +20,7 @@
 #define __ISOUND_LOADER_H__
 
 #include "csutil/scf.h"
+#include "csutil/ref.h"
 
 struct iSoundData;
 struct csSoundFormat;
@@ -32,7 +33,7 @@ SCF_VERSION (iSoundLoader, 1, 0, 0);
 struct iSoundLoader : public iBase
 {
   /// Create a sound object from raw input data.
-  virtual iSoundData *LoadSound(void *Data, unsigned long Size) const = 0;
+  virtual csPtr<iSoundData> LoadSound(void *Data, unsigned long Size) const = 0;
 };
 
 #endif // __ISOUND_LOADER_H__

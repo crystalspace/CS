@@ -334,12 +334,12 @@ public:
     SCF_CONSTRUCT_EMBEDDED_IBASE (scfiComponent);
   }
 
-  virtual iSoundData *LoadSound (void *Buffer, unsigned long Size) const
+  virtual csPtr<iSoundData> LoadSound (void *Buffer, unsigned long Size) const
   {
     csModSoundData *sd=NULL;
     if (csModSoundData::IsMod (Buffer, Size))
       sd = new csModSoundData ((iBase*)this, (uint8*)Buffer, Size);
-    return sd;
+    return csPtr<iSoundData> (sd);
   }
 };
 

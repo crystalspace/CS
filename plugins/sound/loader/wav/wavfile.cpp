@@ -113,7 +113,7 @@ public:
     SCF_CONSTRUCT_IBASE(p);
     SCF_CONSTRUCT_EMBEDDED_IBASE(scfiComponent);
   }
-  virtual iSoundData *LoadSound(void *Buffer, unsigned long Size) const;
+  virtual csPtr<iSoundData> LoadSound(void *Buffer, unsigned long Size) const;
 };
 
 SCF_IMPLEMENT_IBASE(csSoundLoader_WAV)
@@ -160,7 +160,8 @@ struct _WAVchk
   unsigned long len; // length of chunk after this 8 bytes of header
 } wavchk;
 
-iSoundData* csSoundLoader_WAV::LoadSound (void* databuf, uint32 size) const
+csPtr<iSoundData>
+csSoundLoader_WAV::LoadSound (void* databuf, uint32 size) const
 {
   uint8* buf = (uint8*) databuf;
   csSoundFormat format;
@@ -288,3 +289,4 @@ iSoundData* csSoundLoader_WAV::LoadSound (void* databuf, uint32 size) const
 
   return rawSound;
 }
+
