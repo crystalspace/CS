@@ -231,33 +231,33 @@ void csGenmeshMeshObject::UpdateLighting (iLight** lights, int num_lights,
     // @@@ it is not effiecient to do this all the time.
 
   // Do the lighting.
-  csVector3 obj_center (0);
   csReversibleTransform trans = movable->GetFullTransform ();
-  csVector3 wor_center = trans.This2Other (obj_center);
+  // the object center in world coordinates. "0" because the object
+  // center in object space is obviously at (0,0,0).
+  csVector3 wor_center = trans.This2Other (0);
   csColor color;
   for (l = 0 ; l < num_lights ; l++)
   {
     iLight* li = lights[l];
     // Compute light position in object coordinates
     csVector3 wor_light_pos = li->GetCenter ();
-    float wor_sq_dist = csSquaredDist::PointPoint (wor_light_pos, wor_center);
-    if (wor_sq_dist >= li->GetSquaredRadius ()) continue;
-
     csVector3 obj_light_pos = trans.Other2This (wor_light_pos);
-    float obj_sq_dist = csSquaredDist::PointPoint (obj_light_pos, obj_center);
+    float obj_sq_dist = csSquaredDist::PointPoint (obj_light_pos, 0);
+    if (obj_sq_dist >= li->GetSquaredRadius ()) continue;
+
     float in_obj_dist = (obj_sq_dist >= SMALL_EPSILON)?qisqrt (obj_sq_dist):1.0f;
 
-    csVector3 obj_light_dir = (obj_light_pos - obj_center);
-
     csColor light_color = li->GetColor () * (256. / CS_NORMAL_LIGHT_LEVEL)
-      * li->GetBrightnessAtDistance (qsqrt (wor_sq_dist));
+      * li->GetBrightnessAtDistance (qsqrt (obj_sq_dist));
 
     for (i = 0 ; i < factory->GetVertexCount () ; i++)
     {
       csVector3 normal = normals[i];
       float cosinus;
       if (obj_sq_dist < SMALL_EPSILON) cosinus = 1;
-      else cosinus = obj_light_dir * normal;
+      else cosinus = obj_light_pos * normal;
+      // because the vector from the object center to the light center
+      // in object space is equal to the position of the light
 
       if (cosinus > 0)
       {
