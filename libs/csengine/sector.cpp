@@ -415,7 +415,7 @@ void csSector::Draw (csRenderView& rview)
     // In those cases we draw the sprite anyway. @@@ Note that we should
     // draw it clipped (in 3D) to the portal polygon. This is currently not
     // done.
-    csSector* previous_sector = rview.portal_polygon ? rview.portal_polygon->GetSector () : NULL;
+    csSector* previous_sector = rview.portal_polygon ? rview.portal_polygon->GetSector () : (csSector*)NULL;
     for (i = 0 ; i < sprites.Length () ; i++)
     {
       csSprite3D* sp3d = (csSprite3D*)sprites[i];
