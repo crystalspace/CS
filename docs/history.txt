@@ -1,5 +1,8 @@
 The history order is reversed so that new features are at the top.
 
+4-May-2001
+	- Philip Wyett fixed the signed/unsigned warnings in the
+	  sequence manager.
 3-May-2001
 	- Wouter Wijngaards did the following:
 	  added a class that can generate iImages for terrain textures on
@@ -78,6 +81,7 @@ The history order is reversed so that new features are at the top.
 	- Changed terrfunc terrain plugin to be more clever about clipping
 	  now. This also means that the bug with disappearing polygons
 	  in front of the camera is now completely gone (touch wood!).
+	- Philip Wyett fixed compile errors with null 3D renderer.
 2-May-2001
 	- Fixed the color bug in OpenGL DrawTriangleMesh with multi-
 	  texturing.
