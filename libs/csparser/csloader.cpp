@@ -1195,7 +1195,7 @@ bool csLoader::LoadPlugins (char* buf)
     {
       case CS_TOKEN_PLUGIN:
 	ScanStr (params, "%s", str);
-	loaded_plugins.NewPlugIn (name, str, NULL);
+	loaded_plugins.NewPlugIn (name, str);
         break;
     }
   }
@@ -1437,39 +1437,90 @@ bool csLoader::LoadSounds (char* buf)
 
 //---------------------------------------------------------------------------
 
-// @@@ MEMORY LEAK!!! We should unload all the plugins we load here.
-
-iPlugIn* csLoader::csLoadedPluginVector::FindPlugIn (const char* name,
-	const char* classID)
+struct csLoaderPluginRec
 {
-  LoadedPlugin* pl = FindPlugInPrivate (name);
-  if (!pl) return NULL;
-  if (!pl->plugin)
+  char* ShortName;
+  char* ClassID;
+  iLoaderPlugIn* Plugin;
+  
+  csLoaderPluginRec (const char* iShortName,
+	const char *iClassID, iLoaderPlugIn *iPlugin)
+  { 
+    if (iShortName) ShortName = strnew (iShortName);
+    else ShortName = NULL;
+    ClassID = strnew (iClassID);
+    Plugin = iPlugin; 
+  }
+
+  ~csLoaderPluginRec ()
+  { 
+    delete [] ShortName; 
+    delete [] ClassID; 
+    if (Plugin) {
+      System->UnloadPlugIn(Plugin);
+      Plugin->DecRef ();
+    }
+  }                                                                                  
+};
+
+csLoader::csLoadedPluginVector::csLoadedPluginVector (
+	int iLimit, int iThresh) : csVector (iLimit, iThresh)
+{
+}
+
+csLoader::csLoadedPluginVector::~csLoadedPluginVector ()
+{
+  DeleteAll ();
+}
+
+bool csLoader::csLoadedPluginVector::FreeItem (csSome Item)
+{
+  delete (csLoaderPluginRec*)Item;
+  return true;
+}
+
+csLoaderPluginRec* csLoader::csLoadedPluginVector::FindPlugInRec (
+	const char* name)
+{
+  int i;
+  for (i=0 ; i<Length () ; i++) 
   {
-    // First load the plugin.
-    pl->plugin = LOAD_PLUGIN (System, pl->name, classID, iLoaderPlugIn);
+    csLoaderPluginRec* pl = (csLoaderPluginRec*)Get (i);
+    if (pl->ShortName && !strcmp (name, pl->ShortName)) 
+      return pl;
+    if (!strcmp (name, pl->ClassID)) 
+      return pl;
   }
-  return pl->plugin;
+  return NULL;
 }
 
-csLoader::LoadedPlugin::LoadedPlugin (const char* shortName,
-	const char *theName, iPlugIn *thePlugin)
-{ 
-  if (shortName) short_name = strnew (shortName);
-  else short_name = NULL;
-  name = strnew (theName);
-  plugin = thePlugin; 
+iLoaderPlugIn* csLoader::csLoadedPluginVector::GetPluginFromRec (
+	csLoaderPluginRec *rec, const char *FuncID)
+{
+  if (!rec->Plugin)
+    rec->Plugin = LOAD_PLUGIN (System, rec->ClassID, FuncID, iLoaderPlugIn);
+  return rec->Plugin;
 }
 
-csLoader::LoadedPlugin::~LoadedPlugin ()
-{ 
-  delete [] short_name; 
-  delete [] name; 
-  if (plugin) {
-    System->UnloadPlugIn(plugin);
-    plugin->DecRef ();
-  }
-}                                                                                  
+iLoaderPlugIn* csLoader::csLoadedPluginVector::FindPlugIn (
+	const char* Name, const char* FuncID)
+{
+  // look if there is already a loading record for this plugin
+  csLoaderPluginRec* pl = FindPlugInRec (Name);
+  if (pl)
+    return GetPluginFromRec(pl, FuncID);
+
+  // create a new loading record
+  NewPlugIn (NULL, Name);
+  return GetPluginFromRec((csLoaderPluginRec*)Get(Length()-1), FuncID);
+}
+
+void csLoader::csLoadedPluginVector::NewPlugIn
+	(const char *ShortName, const char *ClassID)
+{
+  Push (new csLoaderPluginRec (ShortName, ClassID, NULL));
+}
+
 //---------------------------------------------------------------------------
 
 csMeshFactoryWrapper* csLoader::LoadMeshObjectFactory (const char* fname)
@@ -1624,13 +1675,7 @@ bool csLoader::LoadMeshObjectFactory (csMeshFactoryWrapper* stemp, char* buf)
       case CS_TOKEN_PLUGIN:
 	{
 	  ScanStr (params, "%s", str);
-	  plug = (iLoaderPlugIn*)loaded_plugins.FindPlugIn (str, "MeshLdr");
-	  if (!plug)
-	  {
-	    printf ("Plugin '%s' loaded!\n", str);
-	    plug = LOAD_PLUGIN (System, str, "MeshLdr", iLoaderPlugIn);
-	    if (plug) loaded_plugins.NewPlugIn (NULL, str, plug);
-	  }
+	  plug = loaded_plugins.FindPlugIn (str, "MeshLdr");
 	}
         break;
     }
@@ -1839,13 +1884,7 @@ bool csLoader::LoadMeshObject (csMeshWrapper* mesh, char* buf, csSector* sector)
       case CS_TOKEN_PLUGIN:
 	{
 	  ScanStr (params, "%s", str);
-	  plug = (iLoaderPlugIn*)loaded_plugins.FindPlugIn (str, "MeshLdr");
-	  if (!plug)
-	  {
-	    printf ("Plugin '%s' loaded!\n", str);
-	    plug = LOAD_PLUGIN (System, str, "MeshLdr", iLoaderPlugIn);
-	    if (plug) loaded_plugins.NewPlugIn (NULL, str, plug);
-	  }
+	  plug = loaded_plugins.FindPlugIn (str, "MeshLdr");
 	}
         break;
     }
@@ -1929,15 +1968,7 @@ bool csLoader::LoadTerrainObjectFactory (csTerrainFactoryWrapper* pWrapper,
       case CS_TOKEN_PLUGIN:
 	{
 	  ScanStr (params, "%s", pStr);
-	  iPlugIn = (iLoaderPlugIn*)loaded_plugins.FindPlugIn (pStr,
-	  	"TerrainLdr");
-	  if (!iPlugIn)
-	  {
-	    printf ("Plugin '%s' loaded!\n", pStr);
-	    iPlugIn = LOAD_PLUGIN (System, pStr, "TerrainLdr", iLoaderPlugIn);
-	    if (iPlugIn)
-              loaded_plugins.NewPlugIn (NULL, pStr, iPlugIn);
-	  }
+	  iPlugIn = loaded_plugins.FindPlugIn (pStr, "TerrainLdr");
 	}
         break;
     }
@@ -2022,15 +2053,7 @@ bool csLoader::LoadTerrainObject (csTerrainWrapper *pWrapper,
       case CS_TOKEN_PLUGIN:
 	{
 	  ScanStr (params, "%s", pStr);
-	  iPlugIn = (iLoaderPlugIn*)loaded_plugins.FindPlugIn (pStr,
-	  	"TerrainLdr");
-	  if (!iPlugIn)
-	  {
-	    printf ("Plugin '%s' loaded!\n", pStr);
-	    iPlugIn = LOAD_PLUGIN (System, pStr, "TerrainLdr", iLoaderPlugIn);
-	    if (iPlugIn)
-              loaded_plugins.NewPlugIn (NULL, pStr, iPlugIn);
-	  }
+	  iPlugIn = loaded_plugins.FindPlugIn (pStr, "TerrainLdr");
 	}
         break;
     }
@@ -2090,13 +2113,7 @@ bool csLoader::LoadAddOn (char* buf, iBase* context)
       case CS_TOKEN_PLUGIN:
 	{
 	  ScanStr (params, "%s", str);
-	  plug = (iLoaderPlugIn*)loaded_plugins.FindPlugIn (str, "Loader");
-	  if (!plug)
-	  {
-	    printf ("Plugin '%s' loaded!\n", str);
-	    plug = LOAD_PLUGIN (System, str, "Loader", iLoaderPlugIn);
-	    if (plug) loaded_plugins.NewPlugIn (NULL, str, plug);
-	  }
+	  plug = loaded_plugins.FindPlugIn (str, "Loader");
 	}
         break;
     }

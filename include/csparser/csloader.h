@@ -33,6 +33,7 @@ struct iEngine;
 struct iVFS;
 struct iGraphics3D;
 struct iSoundRender;
+struct iLoaderPlugIn;
 
 struct csRGBcolor;
 struct iMotion;
@@ -66,44 +67,24 @@ class csTerrainWrapper;
  */
 class csLoader : public iLoaderNew
 {
-  struct LoadedPlugin
-  {
-    LoadedPlugin (const char* shortName, const char *theName,
-    	iPlugIn *thePlugin);
-    ~LoadedPlugin ();
-    char* short_name;
-    char* name;
-    iPlugIn* plugin;
-  };
-  
   class csLoadedPluginVector : public csVector
   {
-    private:
-      LoadedPlugin* FindPlugInPrivate (const char* name)
-      {
-        int i;
-        for (i=0 ; i<Length () ; i++) 
-	{
-	  LoadedPlugin* pl = (LoadedPlugin*)Get (i);
-	  if (pl->short_name && !strcmp (name, pl->short_name)) 
-	    return pl;
-	  if (!strcmp (name, pl->name)) 
-	    return pl;
-	}
-	return NULL;
-      }
-    public:
-      csLoadedPluginVector (int iLimit = 8, int iThresh = 16)
-      	: csVector (iLimit, iThresh) {}
-      ~csLoadedPluginVector () { DeleteAll (); }
-      
-      virtual bool FreeItem (csSome Item)
-      { delete (LoadedPlugin*)Item; return true;}
-  
-      iPlugIn* FindPlugIn (const char* name, const char* classID);
-      
-      void NewPlugIn (char* short_name, char* name, iPlugIn* plugin)
-      { Push (new LoadedPlugin (short_name, name, plugin)); }
+  private:
+    // Find a loader plugin record
+    struct csLoaderPluginRec* FindPlugInRec (const char* name);
+    // Return the loader plugin from a record, possibly loading the plugin now
+    iLoaderPlugIn* GetPluginFromRec (csLoaderPluginRec *rec, const char *FuncID);
+  public:
+    // constructor
+    csLoadedPluginVector (int iLimit = 8, int iThresh = 16);
+    // destructor
+    ~csLoadedPluginVector ();
+    // delete a plugin record
+    virtual bool FreeItem (csSome Item);
+    // find a plugin by its name or load it if it doesn't exist
+    iLoaderPlugIn* FindPlugIn (const char* Name, const char* FuncID);
+    // add a new plugin record
+    void NewPlugIn (const char* ShortName, const char* ClassID);
   };
   
   /// List of loaded plugins
