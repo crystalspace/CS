@@ -22,7 +22,7 @@
 
 #include "iengine/view.h"
 
-class csPolygon2D;
+class csPoly2D;
 class csBox2;
 
 /**
