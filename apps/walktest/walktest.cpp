@@ -550,44 +550,14 @@ int CollisionDetect(csCollider *c,csSector* sp,csTransform *cdt)
 
 template <class T> inline int sign(T p) {return p>0?1:p<0?-1:0;}
 
-void WalkTest::PrepareFrame (long elapsed_time, long current_time)
+void DoGravity (csVector3& pos, csVector3& vel)
 {
-  (void)elapsed_time; (void)current_time;
-
-  CLights::LightIdle (); // SJI
-
-  if(do_cd)
-  {
-    if(!player_spawned)
-    {
-      CreateColliders();
-      player_spawned=true;
-    }
-
-    pos=view->GetCamera()->GetOrigin();
-
-    for(int repeats=0;repeats<((elapsed_time)/25.0+0.5);repeats++)
-    {
-      if (move_3d)
-      {
-        // If we are moving in 3d then don't do any camera correction.
-      }
-      else
-      {
-        view->GetCamera()->SetT2O(csMatrix3());
-        view->GetCamera()->RotateWorld(csVector3(0,1,0),angle_y);
-        if(!do_gravity)
-          view->GetCamera()->Rotate(csVector3(1,0,0),angle_x);
-      }
-
-      csVector3 vel=view->GetCamera()->GetT2O()*velocity;
-
       csVector3 new_pos=pos+vel;
       csMatrix3 m;
       csOrthoTransform test (m, new_pos);
 
       csSector *n[MAXSECTORSOCCUPIED];
-      int num_sectors=FindSectors(new_pos,4*body->GetBbox()->d,view->GetCamera()->GetSector(),n);
+      int num_sectors=FindSectors(new_pos,4*Sys->body->GetBbox()->d,Sys->view->GetCamera()->GetSector(),n);
 
       num_our_cd=0;
       csCollider::firstHit=false;
@@ -596,7 +566,7 @@ void WalkTest::PrepareFrame (long elapsed_time, long current_time)
       csCollider::CollideReset();
 
       for(;num_sectors--;)
-        hits+=CollisionDetect(body,n[num_sectors],&test);
+        hits+=CollisionDetect(Sys->body,n[num_sectors],&test);
 
       for(int j=0;j<hits;j++)
       {
@@ -611,7 +581,7 @@ void WalkTest::PrepareFrame (long elapsed_time, long current_time)
       new_pos=pos+vel;
       test=csOrthoTransform(csMatrix3(),new_pos);
 
-      num_sectors=FindSectors(new_pos,4*legs->GetBbox()->d,view->GetCamera()->GetSector(),n);
+      num_sectors=FindSectors(new_pos,4*Sys->legs->GetBbox()->d,Sys->view->GetCamera()->GetSector(),n);
 
       num_our_cd=0;
       csCollider::firstHit=false;
@@ -621,12 +591,12 @@ void WalkTest::PrepareFrame (long elapsed_time, long current_time)
       csCollider::CollideReset();
 
       for(;num_sectors--;)
-        hit+=CollisionDetect(legs,n[num_sectors],&test);
+        hit+=CollisionDetect(Sys->legs,n[num_sectors],&test);
 
       if(!hit)
       {
-        on_ground=false;
-        if(do_gravity&&!move_3d)
+        Sys->on_ground=false;
+        if(Sys->do_gravity&&!Sys->move_3d)
           vel.y-=0.004;
       }
       else
@@ -670,14 +640,58 @@ void WalkTest::PrepareFrame (long elapsed_time, long current_time)
           if(vel.y<0)
             vel.y=0;
         }
-        on_ground=true;
+        Sys->on_ground=true;
       }
 
       pos=new_pos;
-      new_pos-=view->GetCamera()->GetOrigin();
-      view->GetCamera()->MoveWorld(new_pos);
+      new_pos-=Sys->view->GetCamera()->GetOrigin();
+      Sys->view->GetCamera()->MoveWorld(new_pos);
 
-      velocity=view->GetCamera()->GetO2T()*vel;
+      Sys->velocity=Sys->view->GetCamera()->GetO2T()*vel;
+}
+
+void WalkTest::PrepareFrame (long elapsed_time, long current_time)
+{
+  (void)elapsed_time; (void)current_time;
+
+  CLights::LightIdle (); // SJI
+
+  if(do_cd)
+  {
+    if(!player_spawned)
+    {
+      CreateColliders();
+      player_spawned=true;
+    }
+
+    pos=view->GetCamera()->GetOrigin();
+
+    for(int repeats=0;repeats<((elapsed_time)/25.0+0.5);repeats++)
+    {
+      if (move_3d)
+      {
+        // If we are moving in 3d then don't do any camera correction.
+      }
+      else
+      {
+        view->GetCamera()->SetT2O(csMatrix3());
+        view->GetCamera()->RotateWorld(csVector3(0,1,0),angle_y);
+        if(!do_gravity)
+          view->GetCamera()->Rotate(csVector3(1,0,0),angle_x);
+      }
+
+      csVector3 vel=view->GetCamera()->GetT2O()*velocity;
+
+      static bool check_once = false;
+      if (ABS (vel.x) < SMALL_EPSILON && ABS (vel.y) < SMALL_EPSILON && ABS (vel.z) < SMALL_EPSILON)
+      {
+        // If we don't move we don't have to do the collision detection tests.
+	// However, we need to do it once to make sure that we are standing
+	// on solid ground. So we first set 'check_once' to true to enable
+	// one more test.
+	if (check_once == false) { check_once = true; DoGravity (pos, vel); }
+      }
+      else { check_once = false; DoGravity (pos, vel); }
 
       if(do_gravity&&!move_3d)
         view->GetCamera()->Rotate(csVector3(1,0,0),angle_x);

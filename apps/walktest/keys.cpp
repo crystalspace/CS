@@ -345,6 +345,7 @@ char* keyname (csKeyMap* map)
 {
   static char buf[100];
   buf[0] = 0;
+  if (map->need_status) strcat (buf, "status-");
   if (map->shift) strcat (buf, "shift-");
   if (map->ctrl) strcat (buf, "ctrl-");
   if (map->alt) strcat (buf, "alt-");
@@ -395,7 +396,8 @@ csKeyMap* find_mapping (char* keyname)
   csKeyMap* m = mapping;
   while (m)
   {
-    if (map.key == m->key && map.shift == m->shift && map.ctrl == m->ctrl && map.alt == m->alt)
+    if (map.key == m->key && map.shift == m->shift && map.ctrl == m->ctrl && map.alt == m->alt
+    	&& map.need_status == m->need_status)
       return m;
     m = m->next;
   }
@@ -496,7 +498,7 @@ static bool CommandHandler (char *cmd, char *arg)
   else if (!strcasecmp (cmd, "zbuf"))
     Command::change_boolean (arg, &Sys->do_show_z, "zbuf");
   else if (!strcasecmp (cmd, "move3d"))
-    Command::change_boolean (arg, &WalkTest::move_3d, "move3d");
+    Command::change_boolean (arg, &Sys->move_3d, "move3d");
   else if (!strcasecmp (cmd, "freelook"))
     Command::change_boolean (arg, &Sys->do_freelook, "freelook");
   else if (!strcasecmp (cmd, "stats"))
@@ -572,43 +574,51 @@ static bool CommandHandler (char *cmd, char *arg)
   }
   else if (!strcasecmp (cmd, "strafe_left"))
   {
-    if (Sys->move_3d) Sys->imm_left (.05, false, false);
-    else Sys->strafe(-1*safe_atof(arg),0);
+    float f = safe_atof (arg);
+    if (Sys->move_3d) { if (f) Sys->imm_left (.05, false, false); }
+    else Sys->strafe(-1*f,0);
   }
   else if (!strcasecmp (cmd, "strafe_right"))
   {
-    if (Sys->move_3d) Sys->imm_right (.05, false, false);
-    else Sys->strafe(1*safe_atof(arg),0);
+    float f = safe_atof (arg);
+    if (Sys->move_3d) { if (f) Sys->imm_right (.05, false, false); }
+    else Sys->strafe(1*f,0);
   }
   else if (!strcasecmp (cmd, "step_forward"))
   {
-    if (Sys->move_3d) Sys->imm_forward (.05, false, false);
-    else Sys->step(1*safe_atof(arg),0);
+    float f = safe_atof (arg);
+    if (Sys->move_3d) { if (f) Sys->imm_forward (.05, false, false); }
+    else Sys->step(1*f,0);
   }
   else if (!strcasecmp (cmd, "step_backward"))
   {
-    if (Sys->move_3d) Sys->imm_backward (.05, false, false);
-    else Sys->step(-1*safe_atof(arg),0);
+    float f = safe_atof (arg);
+    if (Sys->move_3d) { if (f) Sys->imm_backward (.05, false, false); }
+    else Sys->step(-1*f,0);
   }
   else if (!strcasecmp (cmd, "rotate_left"))
   {
-    if (Sys->move_3d) Sys->imm_rot_left_camera (.05, false, false);
-    else Sys->rotate(-1*safe_atof(arg),0);
+    float f = safe_atof (arg);
+    if (Sys->move_3d) { if (f) Sys->imm_rot_left_camera (.05, false, false); }
+    else Sys->rotate(-1*f,0);
   }
   else if (!strcasecmp (cmd, "rotate_right"))
   {
-    if (Sys->move_3d) Sys->imm_rot_right_camera (.05, false, false);
-    else Sys->rotate(1*safe_atof(arg),0);
+    float f = safe_atof (arg);
+    if (Sys->move_3d) { if (f) Sys->imm_rot_right_camera (.05, false, false); }
+    else Sys->rotate(1*f,0);
   }
   else if (!strcasecmp (cmd, "look_up"))
   {
-    if (Sys->move_3d) Sys->imm_rot_left_xaxis (.05, false, false);
-    else Sys->look(1*safe_atof(arg),0);
+    float f = safe_atof (arg);
+    if (Sys->move_3d) { if (f) Sys->imm_rot_right_xaxis (.05, false, false); }
+    else Sys->look(-1*f,0);
   }
   else if (!strcasecmp (cmd, "look_down"))
   {
-    if (Sys->move_3d) Sys->imm_rot_right_xaxis (.05, false, false);
-    else Sys->look(-1*safe_atof(arg),0);
+    float f = safe_atof (arg);
+    if (Sys->move_3d) { if (f) Sys->imm_rot_left_xaxis (.05, false, false); }
+    else Sys->look(1*f,0);
   }
   else if (!strcasecmp (cmd, "jump")) {if(Sys->do_gravity&&Sys->on_ground) Sys->velocity.y=0.08;}
   else if (!strcasecmp (cmd, "i_forward"))
