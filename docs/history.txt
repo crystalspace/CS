@@ -25,6 +25,12 @@ chronological order.
 	  beginning, but a minor oversight placed it in the CS plugin
 	  directory. Reported by Michael Franz Aigner
 	  <crystal-space@amfranz.com>.
+	- Eric Sunshine corrected a number of problems in the msvcgen templates
+	  in CS/scripts/jamtemplate which were copied from 'crystalcore': (1)
+	  removed incorrect and unnecessary defines; (2) removed incorrect
+	  library paths; (3) removed incorrect library references; (3) removed
+	  unused build modes; (4) fixed incorrect paths; (5) general cleanup
+	  and unification.
 14-May-2004
 	- Eric Sunshine worked around VS.NET warning C4345 in blockallocator.h.
 	- Eric Sunshine augmented the Jam check in configure.ac so that it now

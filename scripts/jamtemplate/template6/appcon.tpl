@@ -42,19 +42,19 @@ RSC=rc.exe
 # PROP Ignore_Export_Lib 0
 # PROP Target_Dir ""
 # ADD BASE CPP /nologo /vmb /vms /Gy /GF /W3 /Gm /G5 /Ob2 /Og /Oi /Ot /Oy /D "WIN32" /D "NDEBUG" /D "_CONSOLE" /D "_MBCS" /FD /c
-# ADD CPP /nologo /MD /W3 /Gm /GX /G5 /Ob2 /Og /Oi /Ot /Oy /I "." /D "NDEBUG" /D "_MT" /D "_CONSOLE" /D "_MBCS" /D "WIN32" /D "_WINDOWS" /D "WIN32_VOLATILE" /D "__CRYSTAL_SPACE__" /D "CS_STRICT_SMART_POINTERS" /D "CS_USE_NEW_RENDERER" /FD %cflags% /c
+# ADD CPP /nologo /MD /W3 /Gm /GX /G5 /Ob2 /Og /Oi /Ot /Oy /I "." /D "NDEBUG" /D "_MT" /D "_CONSOLE" /D "_MBCS" /D "WIN32" /D "_WINDOWS" /D "WIN32_VOLATILE" /D "__CRYSTAL_SPACE__" /FD %cflags% /c
 # ADD BASE RSC /l 0x409 /d "NDEBUG" 
-# ADD RSC /l 0x409 /d "NDEBUG" /i "..\..\include\csutil\win32" /i "..\..\include\cssys\win32" /i "..\..\include" /fo".\release\temp\%project%\%project%.res"
+# ADD RSC /l 0x409 /d "NDEBUG" /fo".\release\temp\%project%\%project%.res"
 BSC32=bscmake.exe
 # ADD BASE BSC32 /nologo
 # ADD BSC32 /nologo
 LINK32=link.exe
 # ADD BASE LINK32 user32.lib advapi32.lib /nologo /subsystem:console /machine:I386
-# ADD LINK32 shell32.lib gdi32.lib user32.lib advapi32.lib %libs% /nologo /subsystem:console /machine:I386 /out:"release\temp\%project%\%target%" /libpath:"..\..\libs\csutil\win32\libs" /libpath:"..\..\libs\cssys\win32\libs" %lflags% /OPT:NOREF
+# ADD LINK32 shell32.lib gdi32.lib user32.lib advapi32.lib %libs% /nologo /subsystem:console /machine:I386 /out:"release\temp\%project%\%target%" %lflags% /OPT:NOREF
 # Begin Special Build Tool
 TargetPath".\release\temp\%project%\%target%"
 SOURCE="$(InputPath)"
-PostBuild_Cmds=echo Moving output to CS root.	copy "$(TargetPath)"  ..\..	echo Moving output to MSVC Release Bin.	copy "$(TargetPath)"  release\bin
+PostBuild_Cmds=echo Moving output to build root.	copy "$(TargetPath)" ..
 # End Special Build Tool
 
 !ELSEIF  "$(CFG)" == "%project% - Win32 Debug"
@@ -71,19 +71,19 @@ PostBuild_Cmds=echo Moving output to CS root.	copy "$(TargetPath)"  ..\..	echo M
 # PROP Ignore_Export_Lib 1
 # PROP Target_Dir ""
 # ADD BASE CPP /nologo /vmb /vms /W3 /Gm /G5 /ZI /Od /D "WIN32" /D "_DEBUG" /D "_CONSOLE" /D "_MBCS" /FD /c
-# ADD CPP /nologo /vmb /vms /MDd /W3 /Gm /GR /GX /G5 /ZI /Od /I "." /D "_DEBUG" /D "_MT" /D "WIN32" /D "_CONSOLE" /D "_MBCS" /D "WIN32_VOLATILE" /D "__CRYSTAL_SPACE__" /D "CS_DEBUG" /D "CS_STRICT_SMART_POINTERS" /D "CS_USE_NEW_RENDERER" /FD %debugcflags% /c
+# ADD CPP /nologo /vmb /vms /MDd /W3 /Gm /GR /GX /G5 /ZI /Od /I "." /D "_DEBUG" /D "_MT" /D "WIN32" /D "_CONSOLE" /D "_MBCS" /D "WIN32_VOLATILE" /D "__CRYSTAL_SPACE__" /D "CS_DEBUG" /FD %debugcflags% /c
 # ADD BASE RSC /l 0x409 /d "_DEBUG" 
-# ADD RSC /l 0x409 /d "_DEBUG" /d "CS_DEBUG" /i "..\..\include\csutil\win32" /i "..\..\include\cssys\win32" /i "..\..\include" /fo".\debug\temp\%project%\%project%.res"
+# ADD RSC /l 0x409 /d "_DEBUG" /d "CS_DEBUG" /fo".\debug\temp\%project%\%project%.res"
 BSC32=bscmake.exe
 # ADD BASE BSC32 /nologo
 # ADD BSC32 /nologo
 LINK32=link.exe
 # ADD BASE LINK32 user32.lib advapi32.lib /nologo /subsystem:console /debug /machine:I386 /pdbtype:sept
-# ADD LINK32 shell32.lib gdi32.lib user32.lib advapi32.lib %debuglibs% /nologo /subsystem:console /debug /machine:I386 /out:"debug\temp\%project%\%target%" /pdbtype:sept /libpath:"..\..\libs\csutil\win32\libs" /libpath:"..\..\libs\cssys\win32\libs" %debuglflags%
+# ADD LINK32 shell32.lib gdi32.lib user32.lib advapi32.lib %debuglibs% /nologo /subsystem:console /debug /machine:I386 /out:"debug\temp\%project%\%target%" /pdbtype:sept %debuglflags%
 # Begin Special Build Tool
 TargetPath=".\debug\temp\%project%\%target%"
 SOURCE="$(InputPath)"
-PostBuild_Cmds=echo Moving output to CS root.	copy "$(TargetPath)"  ..\..	echo Moving output to MSVC Debug Bin.	copy "$(TargetPath)"  debug\bin
+PostBuild_Cmds=echo Moving output to build root.	copy "$(TargetPath)" ..
 # End Special Build Tool
 
 !ENDIF 

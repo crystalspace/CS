@@ -24,7 +24,7 @@
 				OptimizeForProcessor="1"
 				AdditionalOptions="%debugcflags%"
 				AdditionalIncludeDirectories="."
-				PreprocessorDefinitions="_DEBUG,WIN32,_CONSOLE,WIN32_VOLATILE,__CRYSTAL_SPACE__,CS_DEBUG,CS_STRICT_SMART_POINTERS;CS_USE_NEW_RENDERER"
+				PreprocessorDefinitions="_DEBUG,WIN32,_CONSOLE,WIN32_VOLATILE,__CRYSTAL_SPACE__,CS_DEBUG"
 				MinimalRebuild="TRUE"
 				RuntimeLibrary="3"
 				RuntimeTypeInfo="TRUE"
@@ -58,10 +58,8 @@
 				TypeLibraryName=".\debug\temp\%project%/%project%.tlb"/>
 			<Tool
 				Name="VCPostBuildEventTool"
-				CommandLine="echo Moving output to CS root.
-copy &quot;$(TargetPath)&quot;  ..\..
-echo Moving output to MSVC Debug Bin.
-copy &quot;$(TargetPath)&quot;  debug\bin
+				CommandLine="echo Moving output to build root.
+copy &quot;$(TargetPath)&quot; ..
 "/>
 			<Tool
 				Name="VCPreBuildEventTool"/>
@@ -96,7 +94,7 @@ copy &quot;$(TargetPath)&quot;  debug\bin
 				OptimizeForProcessor="1"
 				AdditionalOptions="%cflags%"
 				AdditionalIncludeDirectories="."
-				PreprocessorDefinitions="NDEBUG,_CONSOLE,WIN32,_WINDOWS,WIN32_VOLATILE,__CRYSTAL_SPACE__,CS_STRICT_SMART_POINTERS;CS_USE_NEW_RENDERER"
+				PreprocessorDefinitions="NDEBUG,_CONSOLE,WIN32,_WINDOWS,WIN32_VOLATILE,__CRYSTAL_SPACE__"
 				RuntimeLibrary="2"
 				PrecompiledHeaderFile=".\release\temp\%project%/%project%.pch"
 				AssemblerListingLocation=".\release\temp\%project%/"
@@ -125,10 +123,8 @@ copy &quot;$(TargetPath)&quot;  debug\bin
 				TypeLibraryName=".\release\temp\%project%/%project%.tlb"/>
 			<Tool
 				Name="VCPostBuildEventTool"
-				CommandLine="echo Moving output to CS root.
-copy &quot;$(TargetPath)&quot;  ..\..
-echo Moving output to MSVC Release Bin.
-copy &quot;$(TargetPath)&quot;  release\bin
+				CommandLine="echo Moving output to build root.
+copy &quot;$(TargetPath)&quot; ..
 "/>
 			<Tool
 				Name="VCPreBuildEventTool"/>

@@ -1,4 +1,4 @@
 # Begin Source File
 
-SOURCE=..\..\%file%
+SOURCE=..\%file%
 # End Source File

@@ -28,7 +28,7 @@
 				OptimizeForProcessor="1"
 				AdditionalOptions="%cflags%"
 				AdditionalIncludeDirectories=""
-				PreprocessorDefinitions="NDEBUG,_LIB,WIN32,_WINDOWS,WIN32_VOLATILE,__CRYSTAL_SPACE__,CS_STRICT_SMART_POINTERS;CS_USE_NEW_RENDERER"
+				PreprocessorDefinitions="NDEBUG,_LIB,WIN32,_WINDOWS,WIN32_VOLATILE,__CRYSTAL_SPACE__"
 				StringPooling="TRUE"
 				RuntimeLibrary="2"
 				EnableFunctionLevelLinking="TRUE"
@@ -63,10 +63,8 @@
 				Name="VCMIDLTool"/>
 			<Tool
 				Name="VCPostBuildEventTool"
-				CommandLine="echo Moving output to CS root.
-copy &quot;$(TargetPath)&quot;  ..\..
-echo Moving output to MSVC Release Bin.
-copy &quot;$(TargetPath)&quot;  release\bin
+				CommandLine="echo Moving output to build root.
+copy &quot;$(TargetPath)&quot; ..
 "/>
 			<Tool
 				Name="VCPreBuildEventTool"/>
@@ -93,7 +91,7 @@ copy &quot;$(TargetPath)&quot;  release\bin
 				OptimizeForProcessor="1"
 				AdditionalOptions="%debugcflags%"
 				AdditionalIncludeDirectories=""
-				PreprocessorDefinitions="_DEBUG,_LIB,WIN32,_WINDOWS,WIN32_VOLATILE,__CRYSTAL_SPACE__,CS_DEBUG,CS_STRICT_SMART_POINTERS;CS_USE_NEW_RENDERER"
+				PreprocessorDefinitions="_DEBUG,_LIB,WIN32,_WINDOWS,WIN32_VOLATILE,__CRYSTAL_SPACE__,CS_DEBUG"
 				MinimalRebuild="TRUE"
 				RuntimeLibrary="3"
 				RuntimeTypeInfo="TRUE"
@@ -130,10 +128,8 @@ copy &quot;$(TargetPath)&quot;  release\bin
 				Name="VCMIDLTool"/>
 			<Tool
 				Name="VCPostBuildEventTool"
-				CommandLine="echo Moving output to CS root.
-copy &quot;$(TargetPath)&quot;  ..\..
-echo Moving output to MSVC Debug Bin.
-copy &quot;$(TargetPath)&quot;  debug\bin
+				CommandLine="echo Moving output to build root.
+copy &quot;$(TargetPath)&quot; ..
 "/>
 			<Tool
 				Name="VCPreBuildEventTool"/>
