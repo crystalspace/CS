@@ -54,7 +54,7 @@ if ($action=="") {
 		"E-Mail: $emailmangled\n".
 		"Topic:  $theme\n".
 		"File:   $HTTP_REFERER\n".
-		"Time:   ".strftime("%a, %d %b %G (%H:%M UTC)",$newentry->date)." (".$newentry->date.")\n".
+		"Time:   ".gmstrftime("%a, %d %b %G (%H:%M UTC)",$newentry->date)." (".$newentry->date.")\n".
 		"Comment:\n".
 		stripslashes($texttext));
         }
@@ -128,7 +128,7 @@ function printEntries()
 	print "<td align=\"right\"><b>\n";
 	if ($e->date != 0)
 	{
-	    print strftime("%a, %d %b %G (%H:%M UTC)", $e->date) . "<br>\n";
+	    print gmstrftime("%a, %d %b %G (%H:%M UTC)", $e->date) . "<br>\n";
 	}
 	print "</b></td></tr>\n";
 	print "</table>\n";
