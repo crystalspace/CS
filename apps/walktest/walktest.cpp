@@ -323,28 +323,29 @@ void WalkTest::MoveSystems (cs_time elapsed_time, cs_time current_time)
   // First move the sky.
   if (anim_sky)
   {
+    csMovable& move = anim_sky->GetMovable ();
     switch (anim_sky_rot)
     {
       case 0:
 	{
           csXRotMatrix3 mat (anim_sky_speed * 2. * M_PI * (float)elapsed_time/1000.);
-          anim_sky->Transform (mat);
+          move.Transform (mat);
 	  break;
 	}
       case 1:
 	{
           csYRotMatrix3 mat (anim_sky_speed * 2. * M_PI * (float)elapsed_time/1000.);
-          anim_sky->Transform (mat);
+          move.Transform (mat);
 	  break;
 	}
       case 2:
 	{
           csZRotMatrix3 mat (anim_sky_speed * 2. * M_PI * (float)elapsed_time/1000.);
-          anim_sky->Transform (mat);
+          move.Transform (mat);
 	  break;
 	}
     }
-    anim_sky->Transform ();
+    anim_sky->UpdateMove ();
   }
 
   // Update all busy entities.

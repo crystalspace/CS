@@ -704,9 +704,9 @@ void move_ghost (csSprite3D* spr)
 
   // Create a transformation 'test' which indicates where the ghost
   // is moving too.
-  const csVector3& pos = spr->GetW2TTranslation ();
+  const csVector3& pos = spr->GetPosition ();
   csVector3 vel (0, 0, .1);
-  vel = spr->GetW2T () * vel;
+  vel = spr->GetTransform ().GetO2T () * vel;
   csVector3 new_pos = pos+vel;
   csMatrix3 m;
   csOrthoTransform test (m, new_pos);

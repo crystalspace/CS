@@ -424,7 +424,7 @@ void csSprite::RemoveFromSectors ()
   }
 }
 
-csNamedObjVector& csSprite::GetSectors ()
+csVector& csSprite::GetSectors ()
 {
   if (parent->GetType () == csWorld::Type) return sectors;
   else if (parent->GetType () >= csSprite::Type)
@@ -528,9 +528,6 @@ csSprite3D::csSprite3D (csObject* theParent) : csSprite (theParent), bbox (NULL)
   CONSTRUCT_EMBEDDED_IBASE (scfiPolygonMesh);
   bbox.SetOwner (this);
   ptree_obj = &bbox;
-  v_obj2world.x = 0;
-  v_obj2world.y = 0;
-  v_obj2world.z = 0;
   cur_frame = 0;
   tpl = NULL;
   force_otherskin = false;
@@ -564,58 +561,25 @@ csSprite3D::~csSprite3D ()
 
 void csSprite3D::SetPosition (const csVector3& p)
 {
-  v_obj2world = p;
+  obj.SetOrigin (p);
   UpdateInPolygonTrees ();
 }
 
 void csSprite3D::SetTransform (const csMatrix3& matrix)
 {
-  m_obj2world = matrix;
-  m_world2obj = m_obj2world.GetInverse ();
+  obj.SetT2O (matrix);
   UpdateInPolygonTrees ();
 }
 
 void csSprite3D::MovePosition (const csVector3& rel)
 {
-  v_obj2world += rel;
+  obj.Translate (rel);
   UpdateInPolygonTrees ();
-}
-
-bool csSprite3D::SetPositionSector (const csVector3 &move_to)
-{
-  csVector3 old_place(-v_obj2world);
-  csOrthoTransform OldPos (csMatrix3(1,0,0,0,1,0,0,0,1), old_place);
-
-  csVector3 new_pos     = move_to;
-  csSector* pNewSector;//  = currentSector;
-
-  bool mirror = false;
-  pNewSector = GetSector (0)->FollowSegment (OldPos, new_pos, mirror);
-
-  if (pNewSector &&
-      ABS (new_pos.x-move_to.x) < SMALL_EPSILON &&
-      ABS (new_pos.y-move_to.y) < SMALL_EPSILON &&
-      ABS (new_pos.z-move_to.z) < SMALL_EPSILON)
-  {
-    MoveToSector(pNewSector);
-    //Move(new_pos);
-/*  v_obj2world=-move_to;//-new_pos;*/
-    v_obj2world=new_pos;
-    UpdateInPolygonTrees ();
-    return true;
-  }
-  else
-  {
-    return false; //Object would leave space...
-  }
 }
 
 void csSprite3D::Transform (const csMatrix3& matrix)
 {
-  csMatrix3 m = matrix;
-  m *= m_obj2world;
-  m_obj2world = m;
-  m_world2obj = m_obj2world.GetInverse ();
+  obj.SetT2O (matrix * obj.GetT2O ());
   UpdateInPolygonTrees ();
 }
 
@@ -644,20 +608,20 @@ void csSprite3D::SetMaterial (const char* name, csMaterialList* materials)
 
 void csSprite3D::ScaleBy (float factor)
 {
-  csMatrix3 trans = m_obj2world; // this is the one to change
+  csMatrix3 trans = obj.GetT2O ();
   trans.m11 *= factor;
   trans.m22 *= factor;
   trans.m33 *= factor;
-  SetTransform(trans);
+  SetTransform (trans);
 }
 
 
-void csSprite3D::Rotate(float angle)
+void csSprite3D::Rotate (float angle)
 {
   csZRotMatrix3 rotz(angle);
-  Transform(rotz);
+  Transform (rotz);
   csXRotMatrix3 rotx(angle);
-  Transform(rotx);
+  Transform (rotx);
 }
 
 
@@ -773,7 +737,7 @@ void csSprite3D::UpdateInPolygonTrees ()
   // moving in normal convex sectors.
   int i;
   csPolygonTree* tree = NULL;
-  csNamedObjVector& sects = GetSectors ();
+  csVector& sects = GetSectors ();
   for (i = 0 ; i < sects.Length () ; i++)
   {
     tree = ((csSector*)sects[i])->GetStaticTree ();
@@ -786,7 +750,8 @@ void csSprite3D::UpdateInPolygonTrees ()
 
   // This transform should be part of the sprite class and not just calculated
   // every time we need it. @@@!!!
-  csTransform trans = csTransform (m_obj2world, m_world2obj * -v_obj2world);
+  //csTransform trans = csTransform (m_obj2world, m_world2obj * -v_obj2world);
+  csTransform trans = obj.GetInverse ();
 
   bbox.Update (b, trans, this);
 
@@ -834,8 +799,9 @@ void csSprite3D::GetCameraBoundingBox (const csCamera& camtrans, csBox3& cbox)
   }
   camera_cookie = cur_cookie;
 
-  csTransform trans = camtrans * csTransform (m_obj2world,
-  	m_world2obj * -v_obj2world);
+  csTransform trans = camtrans * obj.GetInverse ();
+  //csTransform trans = camtrans * csTransform (m_obj2world,
+  	//m_world2obj * -v_obj2world);
   if (skeleton_state)
   {
     skeleton_state->ComputeBoundingBox (trans, camera_bbox);
@@ -951,7 +917,7 @@ void csSprite3D::Draw (csRenderView& rview)
   }
 
   UpdateWorkTables (tpl->GetNumTexels());
-  UpdateDeferedLighting (GetW2TTranslation ());
+  UpdateDeferedLighting (GetPosition ());
 
   csFrame * cframe = cur_action->GetFrame (cur_frame);
 
@@ -968,7 +934,8 @@ void csSprite3D::Draw (csRenderView& rview)
   // ->
   //   C = Mwc * (Mow * O - Vow - Vwc)
   //   C = Mwc * Mow * O - Mwc * (Vow + Vwc)
-  csReversibleTransform tr_o2c = rview * csTransform (m_obj2world, m_world2obj * -v_obj2world);
+  csReversibleTransform tr_o2c = rview * obj.GetInverse ();
+  //csReversibleTransform tr_o2c = rview * csTransform (m_obj2world, m_world2obj * -v_obj2world);
   rview.g3d->SetObjectToCamera (&tr_o2c);
   rview.g3d->SetClipper (rview.view->GetClipPoly (), rview.view->GetNumVertices ());
   // @@@ This should only be done when aspect changes...
@@ -1125,8 +1092,6 @@ void csSprite3D::InitSprite ()
 
   last_time = csWorld::System->GetTime ();
 
-  m_world2obj = m_obj2world.GetInverse ();
-
   MixMode = CS_FX_COPY;
 }
 
@@ -1262,7 +1227,7 @@ void csSprite3D::UpdateLightingLQ (csLight** lights, int num_lights, csVector3* 
   csBox3 obox;
   GetObjectBoundingBox (obox);
   csVector3 obj_center = (obox.Min () + obox.Max ()) / 2;
-  csVector3 wor_center = m_obj2world * obj_center + v_obj2world;
+  csVector3 wor_center = obj.This2Other (obj_center);
   csColor color;
 
   for (i = 0 ; i < num_lights ; i++)
@@ -1275,7 +1240,7 @@ void csSprite3D::UpdateLightingLQ (csLight** lights, int num_lights, csVector3* 
     float wor_sq_dist = csSquaredDist::PointPoint (wor_light_pos, wor_center);
     if (wor_sq_dist >= sq_light_radius) continue;
 
-    csVector3 obj_light_pos = m_world2obj * (wor_light_pos - v_obj2world);
+    csVector3 obj_light_pos = obj.Other2This (wor_light_pos);
     float obj_sq_dist = csSquaredDist::PointPoint (obj_light_pos, obj_center);
     float obj_dist = FastSqrt (obj_sq_dist);
     float wor_dist = FastSqrt (wor_sq_dist);
@@ -1320,12 +1285,12 @@ void csSprite3D::UpdateLightingHQ (csLight** lights, int num_lights, csVector3* 
 
     // Compute light position in object coordinates
     csVector3 wor_light_pos = lights [i]->GetCenter ();
-    csVector3 obj_light_pos = m_world2obj * (wor_light_pos - v_obj2world);
+    csVector3 obj_light_pos = obj.Other2This (wor_light_pos);
 
     for (j = 0 ; j < tpl->GetNumTexels () ; j++)
     {
       csVector3& obj_vertex = object_vertices[j];
-      csVector3 wor_vertex = m_obj2world * obj_vertex + v_obj2world;
+      csVector3 wor_vertex = obj.This2Other (obj_vertex);
 
       // @@@ We have the distance in object space. Can't we use
       // that to calculate the distance in world space as well?

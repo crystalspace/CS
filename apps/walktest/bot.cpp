@@ -50,7 +50,7 @@ void Bot::set_bot_move (const csVector3& v)
 
 void Bot::move (cs_time elapsed_time)
 {
-  csOrthoTransform old_pos (GetW2T (), follow);
+  csOrthoTransform old_pos (GetTransform ().GetO2T (), follow);
   csVector3 rd = (8.*(float)elapsed_time)/1000. * d;
   follow += rd;
   csVector3 new_pos = follow;
@@ -78,7 +78,7 @@ void Bot::move (cs_time elapsed_time)
     d = d.Unit ();
   }
 
-  csVector3 old_p = GetW2TTranslation ();
+  csVector3 old_p = GetPosition ();
   csVector3 dir = follow-old_p;
   dir.Normalize ();
   csVector3 new_p = old_p + ((3.*(float)elapsed_time)/1000.)*dir;
@@ -86,7 +86,7 @@ void Bot::move (cs_time elapsed_time)
 
   s = GetSector (0);
   mirror = false;
-  csOrthoTransform old_pos2 (GetW2T (), old_p);
+  csOrthoTransform old_pos2 (GetTransform ().GetO2T (), old_p);
   s = s->FollowSegment (old_pos2, new_p, mirror);
   if (s)
   {

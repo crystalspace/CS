@@ -225,8 +225,8 @@ void Dumper::dump (csSprite3D* s)
   CsPrintf (MSG_DEBUG_0, "Dump sprite '%s' id=%ld:\n", 
     s->GetName (), s->GetID ());
   dump (s->tpl);
-  dump (&s->m_obj2world, "Object->world");
-  dump (&s->v_obj2world, "Object->world");
+  //dump (&s->m_obj2world, "Object->world");
+  //dump (&s->v_obj2world, "Object->world");
 #if 0
   int i;
   CsPrintf (MSG_DEBUG_0, "Last transformed frame:\n");

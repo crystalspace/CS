@@ -93,7 +93,7 @@ void HugeRoom::create_wall (csSector* sector, csPolygonSet* thing,
     }
 }
 
-csPolygon3D* HugeRoom::create_polygon (csSector* sector, csPolygonSet* thing,
+csPolygon3D* HugeRoom::create_polygon (csSector*, csPolygonSet* thing,
 	const csVector3& p1, const csVector3& p2, const csVector3& p3,
 	int txt)
 {
@@ -113,7 +113,7 @@ csPolygon3D* HugeRoom::create_polygon (csSector* sector, csPolygonSet* thing,
   sprintf (polname, "p%d", pol_nr);
   p->SetName (polname); 
   pol_nr++;
-  p->SetSector (sector);
+  //p->SetSector (sector);
   p->SetParent (thing);
   thing->AddPolygon (p);
 
@@ -201,13 +201,14 @@ csThing* HugeRoom::create_thing (csSector* sector, const csVector3& pos)
   }
 #endif
 
-  thing->SetSector (sector);
+  csMovable& move = thing->GetMovable ();
+  move.SetSector (sector);
   sector->AddThing (thing);
   csReversibleTransform obj;
   obj.SetT2O (csMatrix3 ());
   obj.SetOrigin (pos);
-  thing->SetTransform (obj);
-  thing->Transform ();
+  move.SetTransform (obj);
+  thing->UpdateMove ();
 
   return thing;
 }
@@ -237,13 +238,14 @@ csThing* HugeRoom::create_building (csSector* sector, const csVector3& pos,
   create_wall (sector, thing, p5, p8, p4, p1, hor_div, ver_div, txt);	// Left
   create_wall (sector, thing, p6, p5, p1, p2, hor_div, ver_div, txt);	// Back
 
-  thing->SetSector (sector);
+  csMovable& move = thing->GetMovable ();
+  move.SetSector (sector);
   sector->AddThing (thing);
   csReversibleTransform obj;
   obj.SetT2O (csYRotMatrix3 (angle_y));
   obj.SetOrigin (pos);
-  thing->SetTransform (obj);
-  thing->Transform ();
+  move.SetTransform (obj);
+  thing->UpdateMove ();
 
   return thing;
 }
@@ -405,9 +407,9 @@ csSector* HugeRoom::create_huge_world (csWorld* world)
   	csVector3 (wall_dim, -wall_dim+1, wall_dim),
   	csVector3 (wall_dim, -wall_dim+1, -wall_dim),
 	csVector3 (-wall_dim, -wall_dim+1, -wall_dim), 40, 40, 0);
-  floorthing->SetSector (room);
+  floorthing->GetMovable ().SetSector (room);
   room->AddThing (floorthing);
-  floorthing->Transform ();
+  floorthing->UpdateMove ();
 #elif !defined(ROOM_SMALL)
   csThing* floorthing = new csThing (world);
   floorthing->SetName ("floor"); 
@@ -415,9 +417,9 @@ csSector* HugeRoom::create_huge_world (csWorld* world)
   	csVector3 (3, -1, -3), csVector3 (-3, -1, -3), 4, 4, 0);
   create_wall (room, floorthing, csVector3 (-3, -1, -3), csVector3 (3, -1, -3),
   	csVector3 (3, -1, 3), csVector3 (-3, -1, 3), 4, 4, 0);
-  floorthing->SetSector (room);
+  floorthing->GetMovable ().SetSector (room);
   room->AddThing (floorthing);
-  floorthing->Transform ();
+  floorthing->UpdateMove ();
 #endif
 
   create_wall (room, room,

@@ -1,5 +1,19 @@
 The history order has been reversed so that new features are at the top.
 
+28-Aug-2000
+	- Added GetPosition() to csMovable and iMovable.
+	- Fixed a bad bug in sprites. When a sprite was deleted it
+	  could potentially delete it's parent sector with it. Not very
+	  good :-)  I fixed this by changing the csNamedObjVector of
+	  sectors to a normal csVector.
+	- Removed csSprite3D::GetW2TTranslation(). This function is obsolete
+	  and exactly the same as csSprite3D::GetPosition().
+	- Similarly removed csSprite3D::GetW2T() and GetT2W() and replaced
+	  with the more general GetTransform().
+	- Removed csSprite3D::SetPositionSector() since this function
+	  needs to be implemented in csMovable and using a better
+	  algorithm. It wasn't used anyway.
+	- Fixed documentation for csCamera::LookAt() a little.
 27-Aug-2000
 	- Made new iMovable interface and let csMovable implement it (through
 	  embedding).

@@ -81,7 +81,7 @@ void csParticleSystem::UpdateInPolygonTrees ()
   // moving in normal convex sectors.
   int i;
   csPolygonTree* tree = NULL;
-  csNamedObjVector& sects = GetSectors ();
+  csVector& sects = GetSectors ();
   for (i = 0 ; i < sects.Length () ; i++)
   {
     tree = ((csSector*)sects[i])->GetStaticTree ();
