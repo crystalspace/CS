@@ -59,9 +59,15 @@ bool csPython::Initialize(iSystem* iSys) {
   Py_Initialize();
   InitPytocs();
 
+  char path[256];
+  iSys->GetInstallPath (path, 255);
+  if (path[0] == 0) strcpy (path, "./");
+
   if(!LoadModule("sys"))
     return 0;
-  if(!RunText("sys.path.append('./scripts/python/')"))
+  char cmd[512];
+  sprintf (cmd, "sys.path.append('%sscripts/python/')", path);
+  if(!RunText(cmd))
     return 0;
   if(!LoadModule("cshelper"))
     return 0;

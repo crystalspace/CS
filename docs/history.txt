@@ -20,6 +20,11 @@ The history order has been reversed so that new features are at the top.
 	  scripts/python/pysimp.py to see how this works.
 	- SWIG generates a file called cs_wrap.doc. I also added this file
 	  to CVS since it is useful to read and not everybody has SWIG.
+	- cspython plugin now also looks at the install path with
+	  iSystem->GetInstallPath() to see where it should load the standard
+	  CS Python support scripts (i.e. in scripts/python). So this means
+	  that it is easier to use Python from external applications (games
+	  outside of the CS directory structure).
 4-Oct-2000
 	- Norman Kramer updated config access in freefont plugin according
 	  to Andrew's latest changes.
