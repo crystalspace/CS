@@ -213,8 +213,8 @@ const char* csBinaryDocAttribute::GetValue ()
 	if (vsptr != attrPtr)
 	{
   	  char buf[50];
-	  cs_snprintf (buf, sizeof (buf) - 1, "%d", 
-	    little_endian_long (attrPtr->value));
+	  cs_snprintf (buf, sizeof (buf) - 1, "%u", 
+	    (unsigned int)little_endian_long (attrPtr->value));
 	  delete[] vstr; 
 	  vstr = csStrNew (buf);
 	  vsptr = attrPtr;
@@ -827,8 +827,8 @@ const char* csBinaryDocNode::nodeValueStr (csBdNode* nodeData)
 	if (vsptr != nodeData)
 	{
   	  char buf[50];
-	  cs_snprintf (buf, sizeof (buf) - 1, "%d", 
-	    little_endian_long (nodeData->value));
+	  cs_snprintf (buf, sizeof (buf) - 1, "%u", 
+	    (unsigned int)little_endian_long (nodeData->value));
 	  delete[] vstr; 
 	  vstr = csStrNew (buf);
 	  vsptr = nodeData;

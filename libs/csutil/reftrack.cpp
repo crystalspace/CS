@@ -242,7 +242,7 @@ void csRefTracker::ReportOnObj (void* obj, RefInfo* info)
   if (!okay)
   {
     csPrintf ("object %.8x (%s), refcount %d, %s\n",
-      (uint32)obj, 
+      (unsigned int)obj, 
       info->descr ? info->descr : "<unknown>",
       info->refCount,
       info->destructed ? "destructed" : "not destructed");
@@ -250,7 +250,7 @@ void csRefTracker::ReportOnObj (void* obj, RefInfo* info)
     {
       csPrintf ("%s by %.8x from %d\n",
 	(info->actions[i].type == Increased) ? "Increase" : "Decrease",
-	(uint32)info->actions[i].tag,
+	(unsigned int)info->actions[i].tag,
 	info->actions[i].refCount);
       if (info->actions[i].stack != 0)
 	info->actions[i].stack->Print ();

@@ -207,7 +207,7 @@ public:
       {
 	if (opt.sourcecode)
 	{
-	  buf.Format ("{0x%06x, %d},\n", firstConsecChar, numConsecChars);
+	  buf.Format ("{0x%06x, %d},\n", (unsigned int)firstConsecChar, numConsecChars);
 	  fCharRanges.Write (buf.GetData(), buf.Length ());
 	}
 	else
@@ -236,7 +236,7 @@ public:
 
       if (opt.sourcecode)
       {
-	buf.Format ("%d,\t// %8x\n", gMetrics.advance, c);
+	buf.Format ("%d,\t// %8x\n", gMetrics.advance, (unsigned int)c);
 	fGlyphAdvances.Write (buf.GetData (), buf.Length ());
       }
       else
@@ -262,7 +262,7 @@ public:
 	    buf.Format ("0x%02x,", bitmap->GetUint8 () [i]);
 	    fBitmapData.Write (buf.GetData (), buf.Length ());
 	  }
-	  buf.Format ("\t// %8x\n", c);
+	  buf.Format ("\t// %8x\n", (unsigned int)c);
 	  fBitmapData.Write (buf.GetData (), buf.Length ());
 	}
 	else
@@ -277,7 +277,7 @@ public:
       if (opt.sourcecode)
       {
 	buf.Format ("{%d, %d, %d, %d},\t// %8x\n", metrics.width, metrics.height,
-	  metrics.left, metrics.top, c);
+	  metrics.left, metrics.top, (unsigned int)c);
 	fBitmapMetrics.Write (buf.GetData(), buf.Length ());
       }
       else
@@ -308,7 +308,7 @@ public:
 	    buf.Format ("0x%02x,", alphaBitmap->GetUint8 () [i]);
 	    fAlphaData.Write (buf.GetData (), buf.Length ());
 	  }
-	  buf.Format ("\t// %8x\n", c);
+	  buf.Format ("\t// %8x\n", (unsigned int)c);
 	  fAlphaData.Write (buf.GetData (), buf.Length ());
 	}
 	else
@@ -323,7 +323,7 @@ public:
       if (opt.sourcecode)
       {
 	buf.Format ("{%d, %d, %d, %d},\t// %8x\n", metrics.width, metrics.height,
-	  metrics.left, metrics.top, c);
+	  metrics.left, metrics.top, (unsigned int)c);
 	fAlphaMetrics.Write (buf.GetData(), buf.Length ());
       }
       else
@@ -349,7 +349,7 @@ public:
     {
       if (opt.sourcecode)
       {
-	buf.Format ("{0x%06x, %d},\n", firstConsecChar, numConsecChars);
+	buf.Format ("{0x%06x, %d},\n", (unsigned int)firstConsecChar, numConsecChars);
 	fCharRanges.Write (buf.GetData(), buf.Length ());
       }
       else
