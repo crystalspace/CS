@@ -883,5 +883,4 @@ Removed @code{csMeshWrapper::GetChildren()}.  Instead use
 @code{csMeshWrapper::AddChild()} and @code{csMeshWrapper::RemoveChild()}.
 
 Renamed @code{csFilenameMatches()} to @code{csGlobMatches()} (from
-@samp{csutil} library.
-
+@file{csutil} library).
