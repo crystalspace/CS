@@ -26,6 +26,7 @@
 #include "csengine/curve.h"
 #include "csengine/polytext.h"
 #include "csengine/lghtmap.h"
+#include "csengine/lview.h"
 
 class csEngine;
 class csPolygon3D;
@@ -33,7 +34,6 @@ class csLightMap;
 class csRGBLightMap;
 class csProgressMeter;
 class csProgressPulse;
-class csFrustumView;
 class csShadowFrustum;
 
 /// computes x ** (2 ** y), using only y multiplies.
