@@ -22,7 +22,7 @@ the following:
 
 @example
 cvs -z4 -q login
-(Logging in to anonymous@@cvs.crystal.sourceforge.net)
+(Logging in to anonymous@@cvs.sourceforge.net)
 *****CVS exited normally with code 0*****
 @end example
 

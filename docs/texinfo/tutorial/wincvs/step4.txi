@@ -25,7 +25,7 @@ to @emph{"passwd" file on the cvs server"} and the @sc{cvsroot} setting to
 the following value:
 
 @example
-:pserver:anonymous@@cvs.crystal.sourceforge.net:/cvsroot/crystal
+:pserver:anonymous@@cvs.sourceforge.net:/cvsroot/crystal
 @end example
 
 @end ifinfo
@@ -63,7 +63,7 @@ appear.
 
 @example
 NEW CVSROOT:
-:pserver:anonymous@@cvs.crystal.sourceforge.net:/cvsroot/crystal
+:pserver:anonymous@@cvs.sourceforge.net:/cvsroot/crystal
 (password authentication)
 @end example
 
@@ -71,6 +71,6 @@ Developers with write access to the server, will see something similar:
 
 @example
 NEW CVSROOT:
-:ext:jorrit@@cvs.crystal.sourceforge.net:/cvsroot/crystal
+:ext:myusername@@cvs.sourceforge.net:/cvsroot/crystal
 (ssh authentication)
 @end example

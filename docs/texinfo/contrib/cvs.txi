@@ -13,7 +13,7 @@ First off, to access the @sc{cvs} repository anonymously, use this
 @code{CVSROOT} setting:
 
 @example
-:pserver:anonymous@@cvs.crystal.sourceforge.net:/cvsroot/crystal
+:pserver:anonymous@@cvs.sourceforge.net:/cvsroot/crystal
 @end example
 
 The password for the @samp{anonymous} account is the empty string---that is,
