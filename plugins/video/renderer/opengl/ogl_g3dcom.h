@@ -43,6 +43,15 @@ class OpenGLTextureCache;
 class OpenGLLightmapCache;
 struct iClipper2D;
 
+/// OpenGL capabilities
+struct csOpenGLCaps
+{
+  // Can we use stencil buffer?
+  bool use_stencil;
+  // Do we have broken driver that requires clipping to screen boundaries?
+  bool need_screen_clipping;
+};
+
 ///
 class csGraphics3DOGLCommon : public iGraphics3D
 {
@@ -141,6 +150,11 @@ private:
 
 protected:
   friend class csOpenGLHalo;
+
+  /**
+   * OpenGL capabilities.
+   */
+  csOpenGLCaps GLCaps;
 
   /**
    * handle of a local 1D alpha-blend texture; this texture holds an

@@ -4,6 +4,12 @@ The history order is reversed so that new features are at the top.
 	- Added 'strserv' to walkall target.
 	- Fixed OpenGL multiply mode. It was using GL_DECAL when it should
 	  use GL_MODULATE.
+	- Added two new options to OpenGL config file (data/config/opengl.cfg):
+	  Video.OpenGL.Caps.Stencil and Video.OpenGL.Caps.NeedScreenClipping.
+	  Stencil is false by default but you can set it to true if you have
+	  support for hardware stencil buffer. NeedScreenClipping if false
+	  by default but you can set it to true if you experience bad
+	  crashes with OpenGL.
 6-May-2001
 	- Martin Geisse made the following changes:
 	    - csengine now depends on the string server. All apps have

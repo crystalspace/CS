@@ -60,10 +60,6 @@
 // removed eventually, when all platforms have been updated.
 //#define USE_EXTENSIONS 1
 
-// Define the following if you want to use an experimental stencil buffer
-// feature.
-//#define USE_STENCIL 1
-
 // ---------------------------------------------------------------------------
 
 // if you figure out how to support OpenGL extensions on your
@@ -269,6 +265,9 @@ bool csGraphics3DOGLCommon::NewInitialize (iSystem * iSys)
   Caps.NeedsPO2Maps = config->GetBool("Video.OpenGL.Caps.NeedsPO2Maps", true);
   Caps.MaxAspectRatio = config->GetInt("Video.OpenGL.Caps.MaxAspectRatio", 
     32768);
+  GLCaps.use_stencil = config->GetBool ("Video.OpenGL.Caps.Stencil", false);
+  GLCaps.need_screen_clipping =
+  	config->GetBool ("Video.OpenGL.Caps.NeedScreenClipping", false);
 
   m_renderstate.alphablend = true;
   m_renderstate.mipmap = 0;
@@ -586,8 +585,7 @@ void csGraphics3DOGLCommon::SetClipper (iClipper2D* clip, int cliptype)
   }
 #endif
 
-#if USE_STENCIL
-  if (clipper && true/*use_clipper*/)
+  if (clipper && GLCaps.use_stencil)
   {
     // First set up the stencil area.
     glEnable (GL_STENCIL_TEST);
@@ -609,7 +607,6 @@ void csGraphics3DOGLCommon::SetClipper (iClipper2D* clip, int cliptype)
     glEnd ();
     glDisable (GL_STENCIL_TEST);
   }
-#endif
 }
 
 bool csGraphics3DOGLCommon::BeginDraw (int DrawFlags)
@@ -1622,31 +1619,38 @@ void csGraphics3DOGLCommon::DrawTriangleMesh (G3DTriangleMesh& mesh)
   if (mesh.clip_portal != CS_CLIP_NOT &&
       (mesh.clip_portal == CS_CLIP_NEEDED && cliptype != CS_CLIPPER_OPTIONAL))
     want_clipping = true;
-  // @@@ Temporary: for this case I would like to use the z-buffer border
-  // around the toplevel portal.
   if (mesh.clip_portal == CS_CLIP_TOPLEVEL)
-    want_clipping = true;
+  {
+    // If we have broken hardware/OpenGL driver then we will clip anyway.
+    if (GLCaps.need_screen_clipping)
+      want_clipping = true;
+    else
+    {
+      // @@@ Temporary: for this case I would like to use the z-buffer border
+      // around the toplevel portal.
+    }
+  }
   // @@@ Temporary.
   if (mesh.clip_plane == CS_CLIP_NEEDED)
     want_clipping = true;
   if (want_clipping)
   {
-#if USE_STENCIL
-    if (true)
+    if (GLCaps.use_stencil)
     {
       // Use the stencil area.
       glEnable (GL_STENCIL_TEST);
       glStencilFunc (GL_EQUAL, 1, 1);
       glStencilOp (GL_KEEP, GL_KEEP, GL_KEEP);
     }
-#else
-#   if !NEW_CLIP
-    // If we have no stencil buffer then we just use the default version.
-    DefaultDrawTriangleMesh (mesh, this, o2c, clipper, cliptype, aspect,
-    	width2, height2);
-    return;
-#   endif
-#endif
+    else
+    {
+#     if !NEW_CLIP
+      // If we have no stencil buffer then we just use the default version.
+      DefaultDrawTriangleMesh (mesh, this, o2c, clipper, cliptype, aspect,
+    	  width2, height2);
+      return;
+#     endif
+    }
   }
 
   int i,k;
@@ -2002,15 +2006,10 @@ void csGraphics3DOGLCommon::DrawTriangleMesh (G3DTriangleMesh& mesh)
   glMatrixMode (GL_PROJECTION);
   glPopMatrix ();
 
-#if USE_STENCIL
-  if (want_clipping)
+  if (GLCaps.use_stencil && want_clipping)
   {
-    if (true)
-    {
-      glDisable (GL_STENCIL_TEST);
-    }
+    glDisable (GL_STENCIL_TEST);
   }
-#endif
 }
 
 
