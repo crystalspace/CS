@@ -30,6 +30,15 @@
 
 CS_IMPLEMENT_APPLICATION
 
+static void printCode(FILE* s, int rc)
+{
+  fprintf(s, "The code example is replaced by a program.\n");
+  fprintf(s, "Look in /apps/tests/mottest\n");
+  exit(rc);
+}
+      
+
+
 static void usage(FILE* s, int rc)
 {
   fprintf(s, "Usage: milk2spr <option> [model-file] [sprite-name]\n[sprite-name] without the trailing .lib\n");
@@ -37,18 +46,10 @@ static void usage(FILE* s, int rc)
   fprintf(s, "  -h : help (this page)\n");
   fprintf(s, "  -d <float> : duration of a frame in seconds (default %f)\n",FRAME_DURATION_DEFAULT);
   printCode(s,rc);
-  exit(rc);
 }
 
 static void fatal_usage() { usage(stderr, -1); }
 static void okay_usage()  { usage(stdout,  0); }
-
-static void printCode(FILE* s, int rc)
-{
-  fprintf(s, "The code example is replaced by a program.\n");
-  fprintf(s, "Look in /apps/tests/mottest\n");
-  exit(rc);
-}
 
 int main(int argc,char *argv[])
 {
