@@ -15,7 +15,11 @@ rule IncludeDir
 {
   if $(>)
   {
-    HDRS on $($(<)_TARGET) += $(SUBDIR)/$(>) ;
+    local o ;
+    for o in $($(<)_OBJECTS)
+    {
+	CCHDRS on $(o) += [ FIncludes $(SUBDIR)/$(>) ] ;
+    }
   }
   else
   {
