@@ -132,7 +132,11 @@ define LIBREF.BODY
   sed 's:\\:\\\\:g;s:":\\":g;s:\(.*\):"\1":' < $(INF.$(strip $(UPCASE_V))) >>$(SRC.LIBREF)
   echo $";$">>$(SRC.LIBREF)
   echo $"SCF_REGISTER_STATIC_LIBRARY($r,$(r)_metainfo)$">>$(SRC.LIBREF)
-  sed '/<implementation>/!d;s:[ 	]*<implementation>\(..*\)</implementation>:  SCF_REGISTER_FACTORY_FUNC(\1):g' < $(INF.$(strip $(UPCASE_V))) >>$(SRC.LIBREF)
+  #sed '/<implementation>/!d;s:[ 	]*<implementation>\(..*\)</implementation>:  SCF_REGISTER_FACTORY_FUNC(\1):g' < $(INF.$(strip $(UPCASE_V))) >>$(SRC.LIBREF)
+  sed '/<implementation>/!d;s:[ 	]*<implementation>\(..*\)</implementation>:  #ifndef \1_FACTORY_REGISTERED \
+  #define \1_FACTORY_REGISTERED \
+    SCF_REGISTER_FACTORY_FUNC(\1) \
+  #endif:g' < $(INF.$(strip $(UPCASE_V))) >>$(SRC.LIBREF)
   echo $"$">>$(SRC.LIBREF)
 
 endef

@@ -112,6 +112,10 @@ csLightIterRenderStepFactory::csLightIterRenderStepFactory (
   csLightIterRenderStepFactory::object_reg = object_reg;
 }
 
+csLightIterRenderStepFactory::~csLightIterRenderStepFactory ()
+{
+}
+
 csPtr<iRenderStep> csLightIterRenderStepFactory::Create ()
 {
   return csPtr<iRenderStep> 
@@ -130,6 +134,10 @@ csLightIterRenderStep::csLightIterRenderStep (
   iObjectRegistry* object_reg)
 {
   SCF_CONSTRUCT_IBASE(0);
+}
+
+csLightIterRenderStep::~csLightIterRenderStep ()
+{
 }
 
 void csLightIterRenderStep::Perform (iRenderView* rview, iSector* sector)

@@ -22,6 +22,7 @@
 
 #include "csutil/ref.h"
 #include "csutil/refarr.h"
+#include "iutil/string.h"
 #include "iutil/strvec.h"
 
 typedef void* csLibraryHandle;
@@ -102,10 +103,31 @@ bool csGetLoadLibraryVerbose();
  * \param dir Directory to scan.
  * \param plugins Native file names.
  * \param metadata Metadata.
+ * \param recursive Recursively scan all subdirectories.
+ * \remark It is the responsibility of the caller to do any cleaning
+ *   of \p metadata and \p plugins, if desired.
+ * \remark \p plugins can be 0, a string vector will be created in this case.
  * \return If any errors occured, a vector of error descriptions.
  */
-csRef<iStrVector> csScanPluginsDir (const char* dir, 
+csRef<iStrVector> csScanPluginDir (const char* dir, 
+				   csRef<iStrVector>& plugins,
+				   csRefArray<iDocument>& metadata,
+				   bool recursive = true);
+
+/**
+ * Scan some given directories for plugins.
+ * Accepts the same parameters as csScanPluginDir(), with the exception of
+ * \p dirs.
+ */				
+csRef<iStrVector> csScanPluginDirs (char** dirs, 
 				    csRef<iStrVector>& plugins,
-				    csRefArray<iDocument>& metadata);
+				    csRefArray<iDocument>& metadata,
+				    bool recursive = true);
+
+/**
+ * Query plugin metadata.
+ */
+csRef<iString> csGetPluginMetadata (const char* fullPath, 
+				    csRef<iDocument>& metadata);
 
 #endif // __CS_CSSHLIB_H__

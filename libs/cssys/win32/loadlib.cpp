@@ -256,20 +256,25 @@ csRef<iString> csGetPluginMetadata (const char* fullPath,
   return InternalGetPluginMetadata (fullPath, metadata, docsys);
 }
 
-csRef<iStrVector> csScanPluginsDir (const char* dir, 
-				    csRef<iStrVector>& plugins,
-				    csRefArray<iDocument>& metadata)
-{
-  iStrVector* messages = 0;
+extern char* csGetConfigPath ();
 
-  plugins.AttachNew (new scfStrVector ());
-  metadata.DeleteAll ();
+void InternalScanPluginDir (iStrVector*& messages,
+			    iDocumentSystem* docsys,
+			    const char* dir, 
+			    csRef<iStrVector>& plugins,
+			    csRefArray<iDocument>& metadata,
+			    bool recursive)
+{
+  // @@@ ugly hack!
+#ifdef COMP_VC
+  if ((strcasecmp (dir, csGetConfigPath()) == 0) || (strcmp (dir, ".") == 0))
+  {
+    recursive = false;
+  }
+#endif
 
   csString filemask;
-  filemask << dir << PATH_SEPARATOR << "*.dll";
-  
-  csRef<iDocumentSystem> docsys = csPtr<iDocumentSystem>
-    (new csTinyDocumentSystem ());
+  filemask << dir << PATH_SEPARATOR << "*.*";
 
   WIN32_FIND_DATA findData;
   HANDLE hSearch = FindFirstFile (filemask, &findData);
@@ -280,17 +285,45 @@ csRef<iStrVector> csScanPluginsDir (const char* dir,
       csString fullPath;
       fullPath << dir << PATH_SEPARATOR << findData.cFileName;
 
-      csRef<iDocument> doc;
-      csRef<iString> error = InternalGetPluginMetadata (
-	fullPath, doc, docsys);
-      if (error == 0)
+      if (findData.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)
       {
-	plugins->Push (csStrNew (fullPath));
-	metadata.Push (doc);
+	if (recursive && (strcmp (findData.cFileName, ".") != 0)
+	  && (strcmp (findData.cFileName, "..") != 0))
+	{
+	  iStrVector* subdirMessages = 0;
+
+	  InternalScanPluginDir (subdirMessages, docsys, fullPath,
+	    plugins, metadata, recursive);
+
+	  if (subdirMessages != 0)
+	  {
+	    for (int i = 0; i < subdirMessages->Length(); i++)
+	    {
+	      AppendStrVecString (messages, subdirMessages->Get (i));
+	    }
+
+	    subdirMessages->DecRef();
+	  }
+	}
       }
       else
       {
-	AppendStrVecString (messages, error->GetData ());
+	char* ext = strrchr (fullPath, '.');
+        if (ext && (strcasecmp (ext, ".dll") == 0))
+	{
+	  csRef<iDocument> doc;
+	  csRef<iString> error = InternalGetPluginMetadata (
+	    fullPath, doc, docsys);
+	  if (error == 0)
+	  {
+	    plugins->Push (csStrNew (fullPath));
+	    metadata.Push (doc);
+	  }
+	  else
+	  {
+	    AppendStrVecString (messages, error->GetData ());
+	  }
+	}
       }
     }
     while (FindNextFile (hSearch, &findData));
@@ -309,6 +342,68 @@ csRef<iStrVector> csScanPluginsDir (const char* dir,
       AppendWin32Error ("FindFirst() call failed",
 	errorCode,
 	messages);
+    }
+  }
+}
+
+csRef<iStrVector> csScanPluginDir (const char* dir, 
+				   csRef<iStrVector>& plugins,
+				   csRefArray<iDocument>& metadata,
+				   bool recursive)
+{
+  iStrVector* messages = 0;
+
+  if (!plugins)
+    plugins.AttachNew (new scfStrVector ());
+
+  csRef<iDocumentSystem> docsys = csPtr<iDocumentSystem>
+    (new csTinyDocumentSystem ());
+
+  InternalScanPluginDir (messages, docsys, dir, plugins, metadata, 
+    recursive);
+	 
+  return csPtr<iStrVector> (messages);
+}
+
+csRef<iStrVector> csScanPluginDirs (char** dirs, 
+				    csRef<iStrVector>& plugins,
+				    csRefArray<iDocument>& metadata,
+				    bool recursive)
+{
+  iStrVector* messages = 0;
+
+  if (!plugins)
+    plugins.AttachNew (new scfStrVector ());
+
+  /*
+    TinyXML documents hold references to the document system.
+    So we have to create a new csTinyDocumentSystem (). Using just
+    'csTinyDocumentSystem docsys' would result in a crash when the
+    documents try to DecRef() to already destructed document system.
+   */
+  csRef<iDocumentSystem> docsys = csPtr<iDocumentSystem>
+    (new csTinyDocumentSystem ());
+
+  for (int i = 0; dirs[i] != 0; i++)
+  {
+    iStrVector* dirMessages = 0;
+    InternalScanPluginDir (dirMessages, docsys, dirs[i], plugins, 
+      metadata, recursive);
+    
+    if (dirMessages != 0)
+    {
+      csString tmp;
+      tmp.Format ("The following error(s) occured while scanning '%s':",
+	dirs[i]);
+
+      AppendStrVecString (messages, tmp);
+
+      for (int j = 0; j < dirMessages->Length(); j++)
+      {
+	tmp.Format (" %s", dirMessages->Get (j));
+	AppendStrVecString (messages, tmp);
+      }
+      dirMessages->DecRef();
     }
   }
 	 

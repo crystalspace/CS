@@ -1,0 +1,9 @@
+SubDir TOP plugins video render3d renderloop loader ;
+
+Plugin rlloader
+	: [ Wildcard *.cpp *.h ]
+;
+LinkWith rlloader : renderstepcommon cssys csutil ;
+
+Help rlloader : "Crystal Space render loop loader" ;
+

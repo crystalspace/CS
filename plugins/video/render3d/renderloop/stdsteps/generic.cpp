@@ -123,6 +123,10 @@ csGenericRenderStepFactory::csGenericRenderStepFactory (
   csGenericRenderStepFactory::object_reg = object_reg;
 }
 
+csGenericRenderStepFactory::~csGenericRenderStepFactory ()
+{
+}
+
 csPtr<iRenderStep> csGenericRenderStepFactory::Create ()
 {
   return csPtr<iRenderStep> 
@@ -148,6 +152,10 @@ csGenericRenderStep::csGenericRenderStep (
   shadertype = 0;
   zOffset = false;
   zmode = CS_ZBUF_USE;
+}
+
+csGenericRenderStep::~csGenericRenderStep ()
+{
 }
 
 void csGenericRenderStep::RenderMeshes (iRender3D* r3d,
@@ -199,7 +207,7 @@ void csGenericRenderStep::Perform (iRenderView* rview, iSector* sector)
   CS_ALLOC_STACK_ARRAY (csRenderMesh*, sameShaderMeshes, meshnum);
   int numSSM = 0;
   iShader* shader = 0;
-  iLightList* lights = sector->GetLights();
+  //iLightList* lights = sector->GetLights();
 
   int i;
 

@@ -651,7 +651,7 @@ inline static scfInterfaceID Name##_scfGetID ()				\
  * \remark The path list is ignored for static builds. However, it will still
  *   be delete[]d, if requested.
  */
-extern void scfInitialize (char** pluginPaths = 0, bool freePaths = true);
+extern void scfInitialize (char** pluginPaths = 0);
 
 /**
  * This function checks whenever an interface is compatible with given version.

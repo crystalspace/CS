@@ -39,19 +39,52 @@ static void AppendStrVecString (iStrVector*& strings, const char* str)
   strings->Push (csStrNew (str));
 }
 
-// Scan a directory for .csplugin files
-csRef<iStrVector> csScanPluginsDir (const char* dir, 
-				    csRef<iStrVector>& plugins,
-				    csRefArray<iDocument>& metadata)
+static csRef<iString> InternalGetPluginMetadata (const char* fullPath, 
+						 csRef<iDocument>& metadata,
+						 iDocumentSystem* docsys)
 {
-  iStrVector* messages = 0;
+  iString* result = 0;
+
+  csPhysicalFile file (fullPath, "rb");
+
+  csRef<iDocument> doc = docsys->CreateDocument();
+  char const* errmsg = doc->Parse (&file/*Buffer*/);
+  if (errmsg == 0)
+  {
+    metadata = doc;
+  }
+  else
+  {
+    metadata = 0;
+
+    csString errstr;
+    errstr.Format ("Error parsing metadata from %s: %s",
+      fullPath, errmsg);
+
+    result = new scfString (errstr);
+  }
+
+  //delete[] Buffer;
+	  
+  return csPtr<iString> (result);
+}
   
-  plugins.AttachNew (new scfStrVector ());
-  metadata.DeleteAll ();
-    
-  csRef<iDocumentSystem> docsys (
-    csPtr<iDocumentSystem> (new csTinyDocumentSystem ()));
-  
+csRef<iString> csGetPluginMetadata (const char* fullPath, 
+				    csRef<iDocument>& metadata)
+{
+  csRef<iDocumentSystem> docsys = csPtr<iDocumentSystem>
+    (new csTinyDocumentSystem ());
+  return InternalGetPluginMetadata (fullPath, metadata, docsys);
+}
+
+// Scan a directory for .csplugin files
+void InternalScanPluginDir (iStrVector*& messages,
+			    iDocumentSystem* docsys,
+			    const char* dir, 
+			    csRef<iStrVector>& plugins,
+			    csRefArray<iDocument>& metadata,
+			    bool recursive)
+{
   struct dirent* de;
   DIR* dh = opendir(dir);
   if (dh != 0)
@@ -65,71 +98,109 @@ csRef<iStrVector> csScanPluginsDir (const char* dir,
         {
 	  csString scffilepath;
 	  scffilepath << dir << PATH_SEPARATOR << de->d_name;
-	  //csPhysicalFile file(scffilepath, "rb");
-
-          FILE* file = fopen(scffilepath , "rb");          
-
-          // fopen HACK:
-	  /*
-	     [res] 
-	      One user (Charlls) got weird linking errors. This hack is here
-	      to have the stuff working at least, until the problem is 
-	      properly sorted out.
-		g++ -L/usr/local/lib -lpthread  -Lout/UNIX/X86/optimize  -o 
-		  csdemo out/UNIX/X86/optimize/apps/demo/demo.o 
-		  out/UNIX/X86/optimize/apps/demo/demoldr.o 
-		  out/UNIX/X86/optimize/apps/demo/demoop.o 
-		  out/UNIX/X86/optimize/apps/demo/demoseq.o -lcsgfx -lcsutil 
-		  -lcstool -lcssys -lcsgeom -lcsutil -lcssys -ldl -lm -lnsl
-		out/UNIX/X86/optimize/libcssys.a(scanplugins.o)(.text+0x231): 
-		  In function `csScanPluginsDir(char const*, 
-		  csRef<iStrVector>&, csRefArray<iDocument>&)':
-		: undefined reference to 
-		  `csPhysicalFile::csPhysicalFile[in-charge](char const*, 
-		  char const*)'
-		out/UNIX/X86/optimize/libcssys.a(scanplugins.o)(.text+0x310): 
-		  In function `csScanPluginsDir(char const*, 
-		  csRef<iStrVector>&, csRefArray<iDocument>&)':
-		  : undefined reference to `csPhysicalFile::~csPhysicalFile 
-		  [in-charge]()'
-		collect2: ld returned 1 exit status
-		make[1]: *** [csdemo] Error 1
-	   */
-
-          fseek( file , 0 , SEEK_END );
-          int i = ftell( file );
-          fseek( file , 0 , SEEK_SET );
-          //null-terminated
-          char*  Buffer = new char [ i+1 ];
-          Buffer[ i ]='\0';
-          fread( Buffer , 1 , i , file );                
 	  
-	  fclose (file);
-	  
-          // End of fopen HACK          
-
-	  csRef<iDocument> doc = docsys->CreateDocument();
-	  char const* errmsg = doc->Parse( Buffer );
-	  
-	  delete[] Buffer;
-	  
-	  if (errmsg == 0)
+	  csRef<iDocument> doc;
+	  csRef<iString> error = InternalGetPluginMetadata (
+	    scffilepath, doc, docsys);
+	    
+	  if (error == 0)
 	  {
 	    metadata.Push (doc);
 	    plugins->Push (csStrNew (scffilepath));
 	  }  
 	  else
 	  {
-	    csString errstr;
-	    errstr.Format ("csInitializer::InitializeSCF: "
-	      "Error parsing %s: %s\n", scffilepath.GetData(), errmsg);
-	    
-	    AppendStrVecString (messages, errstr);
+	    AppendStrVecString (messages, error->GetData ());
 	  }
         }
+	else
+	{
+	  if (recursive && (strcmp (de->d_name, ".") != 0)
+	    && (strcmp (de->d_name, "..") != 0))
+	  {
+	    iStrVector* subdirMessages = 0;
+	    
+	    csString scffilepath;
+	    scffilepath << dir << PATH_SEPARATOR << de->d_name;
+	  
+	    InternalScanPluginDir (subdirMessages, docsys, scffilepath,
+	      plugins, metadata, recursive);
+  
+	    if (subdirMessages != 0)
+	    {
+	      for (int i = 0; i < subdirMessages->Length(); i++)
+	      {
+		AppendStrVecString (messages, subdirMessages->Get (i));
+	      }
+	      subdirMessages->DecRef();
+	    }
+	  }
+	}
       }
     }
     closedir(dh);
+  }
+}
+
+csRef<iStrVector> csScanPluginDir (const char* dir, 
+				   csRef<iStrVector>& plugins,
+				   csRefArray<iDocument>& metadata,
+				   bool recursive)
+{
+  iStrVector* messages = 0;
+
+  if (!plugins)
+    plugins.AttachNew (new scfStrVector ());
+
+  csRef<iDocumentSystem> docsys = csPtr<iDocumentSystem>
+    (new csTinyDocumentSystem ());
+
+  InternalScanPluginDir (messages, docsys, dir, plugins, metadata, 
+    recursive);
+	 
+  return csPtr<iStrVector> (messages);
+}
+
+csRef<iStrVector> csScanPluginDirs (char** dirs, 
+				    csRef<iStrVector>& plugins,
+				    csRefArray<iDocument>& metadata,
+				    bool recursive)
+{
+  iStrVector* messages = 0;
+
+  if (!plugins)
+    plugins.AttachNew (new scfStrVector ());
+
+  /*
+    TinyXML documents hold references to the document system.
+    So we have to create a new csTinyDocumentSystem (). Using just
+    'csTinyDocumentSystem docsys' would result in a crash when the
+    documents try to DecRef() to already destructed document system.
+   */
+  csRef<iDocumentSystem> docsys = csPtr<iDocumentSystem>
+    (new csTinyDocumentSystem ());
+
+  for (int i = 0; dirs[i] != 0; i++)
+  {
+    iStrVector* dirMessages = 0;
+    InternalScanPluginDir (dirMessages, docsys, dirs[i], plugins, 
+      metadata, recursive);
+    
+    if (dirMessages != 0)
+    {
+      csString tmp;
+      tmp.Format ("The following error(s) occured while scanning '%s':",
+	dirs[i]);
+
+      AppendStrVecString (messages, tmp);
+
+      for (int i = 0; i < dirMessages->Length(); i++)
+      {
+	tmp.Format (" %s", dirMessages->Get (i));
+	AppendStrVecString (messages, tmp);
+      }
+      dirMessages->DecRef();
+    }
   }
 	 
   return csPtr<iStrVector> (messages);

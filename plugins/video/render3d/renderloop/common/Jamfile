@@ -1,0 +1,7 @@
+SubDir TOP plugins video render3d renderloop common ;
+
+Library renderstepcommon
+	: [ Wildcard *.cpp *.h ]
+	: noinstall
+;
+

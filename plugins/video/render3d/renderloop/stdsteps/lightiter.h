@@ -64,6 +64,7 @@ public:
   SCF_DECLARE_IBASE;
 
   csLightIterRenderStepFactory (iObjectRegistry* object_reg);
+  virtual ~csLightIterRenderStepFactory ();
 
   virtual csPtr<iRenderStep> Create ();
 };
@@ -78,6 +79,7 @@ public:
   SCF_DECLARE_IBASE;
 
   csLightIterRenderStep (iObjectRegistry* object_reg);
+  virtual ~csLightIterRenderStep ();
 
   virtual void Perform (iRenderView* rview, iSector* sector);
 

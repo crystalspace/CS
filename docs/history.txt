@@ -4,7 +4,8 @@ http://crystal.sourceforge.net/
 The history order is reversed so that new features are at the top.
 
 15-Jun-2003
-        - Boyan added property "Image" that can be set in AWS component "Image View".
+        - Boyan added property "Image" that can be set in AWS component "Image 
+	  View".
 	- Oktal rearranged the documentation of the scripting language stuff
 	  in the manual, and added Perl docs.
 	- Oktal moved from cspace.i to pythpre.i the rename directive of
@@ -27,6 +28,13 @@ The history order is reversed so that new features are at the top.
 	      MSVC and once in GCC inline assembly. The reason for this is speed.
 	      It could have been written in NASM as a separate function, but the 
 	      overhead for the functioncall is too big.
+	- res added a work around for a static linking problem to static.mak.
+	- res renamed csScanPluginsDir() to csScanPluginDir(), added
+	  csScanPluginDirs(), and implemented a general csGetPluginMetadata().
+	- res removed the fopen() hack.
+	- res added Jamfiles for the render loop loader/standard rendersteps
+	  along with some minor compile fixes.
+	- res updated the MSVC6 makefile templates.
 14-Jun-2003
 	- Jorrit got a fix from Arthur K. (nemerle@lsk.pl) for two memory
 	  leaks in AWS.

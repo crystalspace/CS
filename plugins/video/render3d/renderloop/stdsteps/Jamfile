@@ -1,0 +1,9 @@
+SubDir TOP plugins video render3d renderloop stdsteps ;
+
+Plugin rlsstd
+	: [ Wildcard *.cpp *.h ]
+;
+LinkWith rlsstd : renderstepcommon csgeom cssys csutil ;
+
+Help rlsstd : "Crystal Space standard render loop steps" ;
+

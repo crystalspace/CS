@@ -408,7 +408,7 @@ SCF_IMPLEMENT_IBASE (csSCF);
   SCF_IMPLEMENTS_INTERFACE (iSCF);
 SCF_IMPLEMENT_IBASE_END;
 
-void scfInitialize (char** pluginPaths, bool freePaths)
+void scfInitialize (char** pluginPaths)
 {
   if (!PrivateSCF)
     PrivateSCF = new csSCF ();
@@ -418,43 +418,41 @@ void scfInitialize (char** pluginPaths, bool freePaths)
   csRef<iStrVector> plugins;
   csRefArray<iDocument> metadata;
 
+  bool freePaths = false;
   if (!pluginPaths)
   {
     pluginPaths = csGetPluginPaths ();
     freePaths = true;
   }
+
+  //@@@
   for (int i=0; pluginPaths[i]!=0; i++)
   {
     csString temp = pluginPaths[i];
     temp += PATH_SEPARATOR;
     csAddLibraryPath(temp);
+  }
+  
+  csRef<iStrVector> messages = 
+    csScanPluginDirs (pluginPaths, plugins, metadata);
 
-    csRef<iStrVector> messages = 
-      csScanPluginsDir (pluginPaths[i], plugins, metadata);
-
-    if ((messages != 0) && (messages->Length() > 0))
+  if ((messages != 0) && (messages->Length() > 0))
+  {
+    for (int j = 0; j < messages->Length(); j++)
     {
       fprintf(stderr,
-	"The following error(s) occured while scanning '%s':\n", pluginPaths[i]);
-      for (int j = 0; j < messages->Length(); j++)
-      {
-	fprintf(stderr,
-	  " %s\n", messages->Get (j));
-      }
+	"%s\n", messages->Get (j));
     }
-
-    for (int j = 0; j < metadata.Length(); j++)
-    {
-      PrivateSCF->RegisterClasses (metadata[j]);
-    }
-
-    if (freePaths) delete[] pluginPaths[i];
   }
-  if (freePaths) delete[] pluginPaths;
-#else
-  if (pluginPaths && freePaths)
+
+  for (int j = 0; j < metadata.Length(); j++)
   {
-    for (int i=0; pluginPaths[i]!=0; i++)
+    PrivateSCF->RegisterClasses (metadata[j]);
+  }
+
+  if (freePaths)
+  {
+    for (int i = 0; pluginPaths[i] != 0; i++)
     {
       delete[] pluginPaths[i];
     }
