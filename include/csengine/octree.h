@@ -53,6 +53,12 @@ private:
   csBox3 bbox;
   /// Center point for this node.
   csVector3 center;
+  /**
+   * If true then this is a leaf.
+   * If a node has no polygons then it will also be a leaf
+   * but there will be no mini-bsp.
+   */
+  bool leaf;
   /// Mini-bsp tree (in this case there are no children).
   csBspTree* minibsp;
   /**
@@ -94,6 +100,9 @@ private:
 public:
   /// Return true if node is empty.
   bool IsEmpty ();
+
+  /// Return true if node is leaf.
+  bool IsLeaf () { return leaf; }
 
   /// Get center.
   const csVector3& GetCenter () const { return center; }

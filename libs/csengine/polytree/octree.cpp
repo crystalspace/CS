@@ -32,6 +32,7 @@ csOctreeNode::csOctreeNode ()
     children[i] = NULL;
   minibsp = NULL;
   minibsp_verts = NULL;
+  leaf = false;
 }
 
 csOctreeNode::~csOctreeNode ()
@@ -166,6 +167,18 @@ void csOctree::ProcessTodo (csOctreeNode* node)
     return;
   }
 
+  if (node->IsLeaf ())
+  {
+    // A leaf but no children. @@@ We should probably create children here?
+    while (node->todo_stubs)
+    {
+      stub = node->todo_stubs;
+      node->UnlinkStub (stub);	// Unlink from todo list.
+      node->LinkStub (stub);
+    }
+    return;
+  }
+
   const csVector3& center = node->GetCenter ();
   while (node->todo_stubs)
   {
@@ -289,6 +302,11 @@ void csOctree::Build (csOctreeNode* node, const csVector3& bmin,
 {
   node->SetBox (bmin, bmax);
 
+  if (num == 0)
+  {
+    return;
+  }
+
   if (num <= bsp_num)
   {
     csBspTree* bsp;
@@ -334,20 +352,21 @@ void csOctree::Build (csOctreeNode* node, const csVector3& bmin,
 
   for (i = 0 ; i < 8 ; i++)
   {
-    if (idx[i])
-    {
-      csVector3 new_bmin;
-      csVector3 new_bmax;
-      CHK (node->children[i] = new csOctreeNode);
-      if (i & 4) { new_bmin.x = center.x; new_bmax.x = bmax.x; }
-      else { new_bmin.x = bmin.x; new_bmax.x = center.x; }
-      if (i & 2) { new_bmin.y = center.y; new_bmax.y = bmax.y; }
-      else { new_bmin.y = bmin.y; new_bmax.y = center.y; }
-      if (i & 1) { new_bmin.z = center.z; new_bmax.z = bmax.z; }
-      else { new_bmin.z = bmin.z; new_bmax.z = center.z; }
-      Build ((csOctreeNode*)node->children[i], new_bmin, new_bmax,
-      	polys[i], idx[i]);
-    }
+    // Even if there are no polygons in the node we create
+    // a child octree node because some of the visibility stuff
+    // depends on that (i.e. adding dynamic objects).
+    CHK (node->children[i] = new csOctreeNode);
+    csVector3 new_bmin;
+    csVector3 new_bmax;
+    if (i & 4) { new_bmin.x = center.x; new_bmax.x = bmax.x; }
+    else { new_bmin.x = bmin.x; new_bmax.x = center.x; }
+    if (i & 2) { new_bmin.y = center.y; new_bmax.y = bmax.y; }
+    else { new_bmin.y = bmin.y; new_bmax.y = center.y; }
+    if (i & 1) { new_bmin.z = center.z; new_bmax.z = bmax.z; }
+    else { new_bmin.z = bmin.z; new_bmax.z = center.z; }
+    Build ((csOctreeNode*)node->children[i], new_bmin, new_bmax,
+    	polys[i], idx[i]);
+
     CHK (delete [] polys[i]);
   }
 }
@@ -447,6 +466,7 @@ void* csOctree::Back2Front (csOctreeNode* node, const csVector3& pos,
 
   if (node->GetMiniBsp ())
     return node->GetMiniBsp ()->Back2Front (pos, func, data, cullfunc, culldata);
+  if (node->IsLeaf ()) return NULL;
 
   void* rc = NULL;
   const csVector3& center = node->GetCenter ();
@@ -485,6 +505,7 @@ void* csOctree::Front2Back (csOctreeNode* node, const csVector3& pos,
 
   if (node->GetMiniBsp ())
     return node->GetMiniBsp ()->Front2Back (pos, func, data, cullfunc, culldata);
+  if (node->IsLeaf ()) return NULL;
 
   void* rc = NULL;
   const csVector3& center = node->GetCenter ();

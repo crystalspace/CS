@@ -26,6 +26,9 @@ Short-term cleanups that need to be done:
 	  crashes in some cases.
 	- Some small cleanup/changes to csTerrain and terrain engine.
 	- WalkTest now deletes csView at exit.
+	- Fixed bug with adding of dynamic objects to octree. Now sprites
+	  should work well in levels containing STATBSP statement. They
+	  were broken for some time.
 20-Feb-2000
 	- csPolygonSet now also holds a pointer to the parent container and
 	  checks if the parent is NULL before being added to a parent. This
