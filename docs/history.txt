@@ -23,6 +23,11 @@ The history order is reversed so that new features are at the top.
 	  concatenating string in source, templates are read from the disk,
 	  containing placeholders for the actual stuff. This makes maintenance
 	  of the generator code somewhat easier.
+	- groton (groton@gmx.net) added the including of the file multimon.h
+	  to the file directdetection.cpp for MSVC6 compiler (so that ddraw canvas
+	  plugin compiles fine also if no DirectX SDK has been installed, ie on a
+	  plain MSVC6 installation).
+	
 26-May-2003
 	- Eric Sunshine eliminated compilation warning about implicit
 	  conversion of (int*) to (GLint*) in glcommon2d.cpp.

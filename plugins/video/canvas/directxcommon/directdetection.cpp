@@ -24,9 +24,16 @@
 #include <stdlib.h>
 #include <windows.h>
 
-#if (DIRECTDRAW_VERSION < 0x0700) && !defined(SM_CMONITORS)
-#define SM_CMONITORS
+
+//
+//To compile this canvas on a plain MSVC6 compiler
+//without any DirectX SDK installed, this #include below
+//is required (and it does not hurt if there is an SDK
+//installed anyway). groton
+#ifdef COMP_VC
+#include <multimon.h>
 #endif
+
 #include <ddraw.h>
 
 #include <d3d.h>
