@@ -63,18 +63,59 @@ Short-term cleanups that need to be done:
 	  registration instead of deregistration.
 	- Eric Sunshine eliminated a compiler warning in csloader.cpp.
 	- Eric Sunshine fixed some bugs in cygnus.mak.
+	- Thomas Hieber fixed Map2CS by adding COM stuff. This is not an
+	  ideal situation however.
+	- Thomas also made MazeD compilable on Win/MSVC.
+	- Thomas also fixed terrain engine for Win/VC by adding sysdef.h
+	  in all source files.
+	- Added 'clrlights' console command which clears all pseudo-dynamic
+	  lights to black.
+	- Added 'setlight' console command which sets the color of the
+	  currently selected light. This needs to be a pseudo-dynamic light
+	  otherwise nothing will happen.
 	- Thomas Hieber brought the MSVC port up to date with respect to all
 	  of the recent modifications by others (Alex, Andrew, Eric).
-	- Thomas Hieber ported the terrain library to MSVC.
 5-Oct-1999
 	- Received landscape engine code from Alex Pfaffe. It is not
 	  fully integrated yet. I prepared it so that it compiles
 	  ok but that's it.
-	- Andrew Zabolotny checked in another round of improvments to MazeD,
-	  which he is in the process of updating.
+	- Brandon Ehle added IBase, IID_IBase, csStringList, and
+	  csInifile STRList support.
+	- Brandon also added initial code for the plug-in system.
+	- Brandon also fixed csString for COM propagation and
+	  added csStringList.
+	- Brandon added a cygnus makefile target (copy of linux.mak)
+	  and fixed cygnus.mak for .dll, .exe, and .lib extensions.
+	- Finally Brandon added initial code for cspython.
+	- Seth Galbraith did some fixes on various makefiles with
+	  regards to the new landscape code.
+	- Michael Dale Long also fixed some bugs with regards to the
+	  new terrain engine.
+	- Andrew Zabolotny did a large patch on MazeD again:
+	    - Window layouts are now working (four different layouts,
+	      saved into .cfg file).
+	    - Modified "maximize" button so that maximized window won't
+	      cover popup menu and tool bars.
+	    - "letter" keys now selects first next available entry in
+	      file list.
+	    - loading of worlds now works.
+	    - fixed lots of bugs in handling sprite frames.
+	    - fixed bug in loading things without templates (todo:
+	      sprites without templates).
+	    - arrow keys now rotate draft view; alt+arrows pan view;
+	      +ctrl = slow.
+	    - added some handy entries to each draft window's system menu.
+	    - many other things.
+	  Added ClearScripts() and ClearScript(char *) methods to the
+	  ScriptList class.
 4-Oct-1999
 	- Continued work on quadcube/quadtree lighting. It is almost
 	  working but there are still a few problems here and there.
+	- Seth Galbraith changed the model import routines to accept
+	  a csVFS object pointer as a parameter. This allows apps
+	  to load .mdl models using VFS but it doesn't work yet with
+	  the csLoader class.
+	- Updates to Win/VC project files from Nathaniel Saint Martin.
 3-Oct-1999
 	- Continued work on quadcube/quadtree lighting. It is almost
 	  working but there are still a few problems here and there.
