@@ -64,7 +64,7 @@ void csMovable::MovePosition (const csVector3& rel)
   obj.Translate (rel);
 }
 
-void csMovable::Transform (csMatrix3& matrix)
+void csMovable::Transform (const csMatrix3& matrix)
 {
   obj.SetT2O (matrix * obj.GetT2O ());
 }

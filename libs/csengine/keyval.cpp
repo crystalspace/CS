@@ -35,6 +35,12 @@ csKeyValuePair::~csKeyValuePair ()
   delete [] m_Value;
 }
 
+void csKeyValuePair::SetValue (const char* value)
+{
+  delete[] m_Value;
+  m_Value = strnew (value);
+}
+
 const char *csKeyValuePair::GetValue (csObject *pObject, const char *key)
 {
   csKeyValueIterator Iter (pObject);

@@ -1,6 +1,9 @@
 The history order has been reversed so that new features are at the top.
 
 11-Oct-2000
+	- Some small changes from Michael Robellard <miker@vetechno.com>:
+	    - New SetValue in csKeyValuePair.
+	    - Added 'const' to csMovable::Transform.
 	- Philip Wyett fixed a bug in csapp.cpp. He removed 'const'
 	  from 'const char* filename'.
 	- Philip also updated the VC project files to conform to recent

@@ -179,7 +179,7 @@ public:
   /**
    * Relative transform.
    */
-  void Transform (csMatrix3& matrix);
+  void Transform (const csMatrix3& matrix);
 
   /**
    * After all movement has been done you need to

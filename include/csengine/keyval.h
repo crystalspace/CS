@@ -47,6 +47,9 @@ public:
   /// Get the value of a key in an object. (shortcut)
   static const char *GetValue (csObject *pObject, const char *key);
 
+  /// Set the value of a key in an object.
+  void SetValue (const char* value);
+
 private:
   char *m_Value;
   CSOBJTYPE;
