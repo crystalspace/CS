@@ -39,8 +39,8 @@
 // This is a private class used to track all postponed lighting references
 // for a lightmap that is shared by several polygons. See the large comment
 // before csPolyTexture::GetLightmapBounds for details.
-// A object of this type is inserted into original polygon, so that no extra
-// storage except that provided by csObject is required.
+// An object of this type is inserted into original polygon, so that no
+// extra storage except that provided by csObject is required.
 class csDelayedLightingInfo : public csFrustumViewCleanup
 {
   struct LightViewInfo
@@ -85,12 +85,17 @@ class csDelayedLightingInfo : public csFrustumViewCleanup
             DEBUG_BREAK;
         }
         else
-          poly = (prev_poly = poly)->GetNextShare ();
+	{
+	  prev_poly = poly;
+          poly = poly->GetNextShare ();
+        }
       }
     }
 
     int GetShadowCount ()
-    { return shadows.GetShadowCount (); }
+    {
+      return shadows.GetShadowCount ();
+    }
 
     iShadowIterator* GetShadowIterator ()
     {
@@ -115,15 +120,22 @@ public:
 
   // Return total number of shadows
   int GetShadowCount ()
-  { return lvlist.Get (lvlist.Length () - 1)->GetShadowCount (); }
+  {
+    int l = lvlist.Length ();
+    if (!l) return 0;
+    return lvlist.Get (l-1)->GetShadowCount ();
+  }
   // Get iterator to iterate over all shadows.
   iShadowIterator* GetShadowIterator ()
   {
-    return lvlist.Get (lvlist.Length () - 1)->GetShadowIterator ();
+    int l = lvlist.Length ();
+    if (!l) return NULL;
+    return lvlist.Get (l-1)->GetShadowIterator ();
   }
 
   // Collect a reference from given frustum to our lightmap
-  bool Collect (csFrustumView *lview, csFrustumContext* ctxt, csPolygon3D *poly);
+  bool Collect (csFrustumView *lview, csFrustumContext* ctxt,
+  	csPolygon3D *poly);
 
   // Delete the top lighting info on the stack.
   bool FinishLightView ();
@@ -154,26 +166,28 @@ bool csDelayedLightingInfo::Collect (csFrustumView *lview,
   // cannot be deleted (and another one created on the same address) without
   // the frustum being removed from lvlist (this is done from the cleanup
   // callback, called from frustumview destructor).
-  if (!lvlist.Length () ||
-    lvlist.Get (lvlist.Length () - 1)->frustum != lview ||
-    lvlist.Get (lvlist.Length () - 1)->ctxt != ctxt)
+  int l = lvlist.Length ();
+  if (!l ||
+    lvlist.Get (l-1)->frustum != lview ||
+    lvlist.Get (l-1)->ctxt != ctxt)
   {
 #ifdef CS_DEBUG
     // Check if this frustum has been seen EARLIER: if so, this means that
     // during the destruction of frustum views that are "on top" of it
     // ProcessDelayedLightMaps() has not been called.
-    for (int i = lvlist.Length () - 2; i >= 0; i--)
+    for (int i = l-2; i >= 0; i--)
       if (lvlist.Get (i)->frustum == lview && lvlist.Get (i)->ctxt == ctxt)
         DEBUG_BREAK;
 #endif
     // Create a new light frustum info structure
     lvlist.Push (new LightViewInfo (lview, ctxt, next,
     	poly->GetBasePolygon ()));
+    l++;
     // Register with that frustumview for cleanup
     ctxt->RegisterCleanup (this);
   }
 
-  LightViewInfo *lvi = lvlist.Get (lvlist.Length () - 1);
+  LightViewInfo *lvi = lvlist.Get (l-1);
 
   // Check if this polygon is one of those that shares the lightmap
   csPolygon3D *cur_poly = lvi->unlit_poly, *prev_poly = NULL;
@@ -191,10 +205,11 @@ bool csDelayedLightingInfo::Collect (csFrustumView *lview,
       orig_poly->SetNextShare (poly);
       break;
     }
-    cur_poly = (prev_poly = cur_poly)->GetNextShare ();
+    prev_poly = cur_poly;
+    cur_poly = cur_poly->GetNextShare ();
   }
 
-  // We should never cleanly quit ot of loop. If it is so, it means
+  // We should never cleanly quit of loop. If it is so, it means
   // we have a polygon that is not on share list (which means something
   // went wrong).
   CS_ASSERT (cur_poly);

@@ -277,7 +277,6 @@ csPolygon3D::csPolygon3D (csMaterialWrapper* material) : csPolygonInt (),
 
   //sector = NULL;
   orig_poly = NULL;
-  txt_share_list = NULL;
 
   flags.SetAll (CS_POLY_LIGHTING | CS_POLY_COLLDET);
 

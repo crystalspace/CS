@@ -12,12 +12,18 @@ The history order is reversed so that new features are at the top.
 	- Renamed csPoly3D::SetGetVertexCount() to SetVertexCount().
 	- Renamed csPoly2D::SetGetVertexCount() to SetVertexCount().
 	- Renamed csWfPolygon::SetGetVertexCount() to SetVertexCount().
-	- Fixed a signficant bug in the transformation of bounding boxes
+	- Fixed a significant bug in the transformation of bounding boxes
 	  in the octree. It could happen that it was not updated enough.
 	  Now it uses the camera number to see if it needs updating those
 	  vertices and it will also make sure the number of vertices in the
 	  camera array is the same as the number of vertices in the object
 	  array.
+	- Fixed a bug in CheckFrustum() code. Detail objects would not
+	  be correctly treated by the visible_set csHashSet.
+	- Fixed another bug in CheckFrustum(). The visibility objects would
+	  not be correctly initialized which means that the initial lighting
+	  step would not be able to see them (i.e. detail objects got no
+	  lighting).
 8-Jul-2001
 	- Fixed a bug in the destructor of the emit particle system
 	  which could cause crashes at exit.
