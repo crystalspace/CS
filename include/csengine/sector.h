@@ -313,7 +313,7 @@ public:
   /// Second pass
   void DrawShadow (iRenderView* rview, iLight *light);
   /// Third pass
-  void DrawLight (iRenderView* rview, iLight *light);
+  void DrawLight (iRenderView* rview, iLight *light, bool drawAfter = false);
 #endif
 
   //----------------------------------------------------------------------

@@ -794,6 +794,12 @@ void csSector::Draw (iRenderView *rview)
       DrawLight (rview, alllights.Get(i));
       r3d->SetShadowState (CS_SHADOW_VOLUME_FINISH);
     }
+
+    for (i = alllights.GetCount () - 1; i >= 0; i--) 
+    {
+      DrawLight (rview, alllights.Get(i), true);
+    }
+
     
     delete[] objects;
     draw_busy --;
@@ -911,7 +917,7 @@ void csSector::DrawShadow (iRenderView* rview, iLight* light)
   csVector3 cameraXVec = ct.This2Other (csVector3 (1,0,0));
   csVector3 cameraYVec = ct.This2Other (csVector3 (0,1,0));
 
-  csPlane3* planes = new csPlane3[6];
+  csPlane3* planes = new csPlane3[5];
   planes[0] = csPlane3(midbottom, lightPos, midbottom + cameraXVec);
   planes[1] = csPlane3(midtop, lightPos, midtop - cameraXVec);
   planes[2] = csPlane3(midleft, lightPos, midleft + cameraYVec);
@@ -920,15 +926,15 @@ void csSector::DrawShadow (iRenderView* rview, iLight* light)
   if (lightBehindCamera)
   {
     planes[4] = csPlane3(camPos,cameraYVec, cameraXVec );
-    planes[5] = csPlane3(lightPos,cameraYVec, cameraXVec );
+    //planes[5] = csPlane3(lightPos,cameraYVec, cameraXVec );
   }
   else
   {
     planes[4] = csPlane3(camPos,cameraXVec, cameraYVec );
-    planes[5] = csPlane3(lightPos,cameraXVec, cameraYVec );
+    //planes[5] = csPlane3(lightPos,cameraXVec, cameraYVec );
   }
 
-  csRef<iVisibilityObjectIterator> objInShadow = culler->VisTest (planes, 6);
+  csRef<iVisibilityObjectIterator> objInShadow = culler->VisTest (planes, 5);
 
   while (!objInShadow->IsFinished() )
   {
@@ -992,14 +998,15 @@ void csSector::DrawShadow (iRenderView* rview, iLight* light)
   //printf ("%x - %d\n",(int)light, number);
 }
 
-void csSector::DrawLight (iRenderView* rview, iLight* light)
+void csSector::DrawLight (iRenderView* rview, iLight* light, bool drawAfter)
 {
   int i;
   for (i = 0; i < num_objects; i ++) {
     iMeshWrapper *sp = objects[i];
     if (sp)
     {
-      sp->DrawLight (rview, light);
+      if (sp->GetDrawAfterShadow () == drawAfter)
+        sp->DrawLight (rview, light);
     }
   }
   //delete [] objects;

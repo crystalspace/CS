@@ -88,6 +88,7 @@ csMeshWrapper::csMeshWrapper (
   imposter_mesh = NULL;
 #ifdef CS_USE_NEW_RENDERER
   cast_hardware_shadow = true;
+  draw_after_fancy_stuff = false;
 #endif
 }
 
@@ -118,6 +119,7 @@ csMeshWrapper::csMeshWrapper (iMeshWrapper *theParent) :
   children.SetMesh (this);
 #ifdef CS_USE_NEW_RENDERER
   cast_hardware_shadow = true;
+  draw_after_fancy_stuff = false;
 #endif
 }
 
@@ -278,6 +280,16 @@ void csMeshWrapper::DrawLight (iRenderView* rview, iLight* light)
 void csMeshWrapper::CastHardwareShadow (bool castShadow)
 {
   cast_hardware_shadow = castShadow;
+}
+
+void csMeshWrapper::SetDrawAfterShadow (bool drawAfter)
+{
+  draw_after_fancy_stuff = drawAfter;
+}
+
+bool csMeshWrapper::GetDrawAfterShadow ()
+{
+  return draw_after_fancy_stuff;
 }
 #endif // CS_USE_NEW_RENDERER
 

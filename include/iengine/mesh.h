@@ -388,6 +388,14 @@ struct iMeshWrapper : public iBase
    * Enable/disable hardware based shadows alltogheter
    */ 
   virtual void CastHardwareShadow (bool castShadow) = 0;
+  /**
+   * Sets so that the meshobject is rendered after all fancy HW-shadow-stuff
+   */
+  virtual void SetDrawAfterShadow (bool drawAfter) = 0;
+  /** 
+   * Get if the meshobject is rendered after all fancy HW-shadow-stuff
+   */
+  virtual bool GetDrawAfterShadow () = 0;
 #endif
 };
 

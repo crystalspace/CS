@@ -173,6 +173,8 @@ protected:
   bool in_light;
   /// Should we draw anything in drawshadow at all?
   bool cast_hardware_shadow;
+  /// should we draw last
+  bool draw_after_fancy_stuff;
 #endif
 
   /**
@@ -380,6 +382,10 @@ public:
   void DrawLight (iRenderView* rview, iLight* light);
   ///Enable/disable hardware based shadows alltogheter
   void CastHardwareShadow (bool castShadow);
+  /// Sets so that the meshobject is rendered after all fancy HW-shadow-stuff
+  void SetDrawAfterShadow (bool drawAfter);
+  /// Get if the meshobject is rendered after all fancy HW-shadow-stuff
+  bool GetDrawAfterShadow ();
 #endif
 
   /**
@@ -698,6 +704,14 @@ public:
         virtual void CastHardwareShadow (bool castShadow) 
         {
           scfParent->CastHardwareShadow (castShadow);
+        }
+        virtual void SetDrawAfterShadow (bool drawAfter)
+        {
+          scfParent->SetDrawAfterShadow (drawAfter);
+        }
+        virtual bool GetDrawAfterShadow ()
+        {
+          return scfParent->GetDrawAfterShadow ();
         }
 #endif
   } scfiMeshWrapper;
