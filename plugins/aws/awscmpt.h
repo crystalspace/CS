@@ -288,9 +288,9 @@ public:
     virtual uint32 *GetZBuffAt (int, int)                             { return NULL; }
     virtual void DumpCache ()                                         { }
     virtual void ClearCache ()                                        { }
-    virtual void RemoveFromCache (iPolygonTexture *
+    virtual void RemoveFromCache (iPolygonTexture *  /*poly_texture*/ )  { }
+    bool IsLightmapOK (iPolygonTexture *)                             {return false;}
 
-    /*poly_texture*/ )  { }
     virtual int GetWidth ()                                           { return width; }
     virtual int GetHeight ()                                          { return height; }
     virtual void SetPerspectiveCenter (int x, int y);
