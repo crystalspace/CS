@@ -69,14 +69,26 @@ bool csConsoleInput::HandleEvent(csEvent &event)
 	NewLine();
 	break;
       case CSKEY_BACKSPACE:
-	// Delete the last character in the current line
-	line = buffer->WriteLine();
-	line->SetSize(line->Length()-2);
-	break;
+	{
+	  int cx;
+	  line = buffer->WriteLine();
+	  /* Backspace will only handle deleting last character if it can't
+	   * retrieve the cursor position from the console!!! */
+	  if(piConsole) {
+	    int cy;
+	    piConsole->GetCursorPos(cx, cy);
+	  } else
+	    cx = line->Length();
+	  // Delete the last character in the current line
+	  if(cx>0)
+	    line->DeleteAt(cx-1);
+	  break;
+	}
       default:
 	// Append the character to the current line
 	line = buffer->WriteLine();
 	line->Append((char) event.Key.Code);
+	break;
       }
     }
   }

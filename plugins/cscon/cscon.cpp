@@ -121,8 +121,12 @@ void csConsole::PutText(const char *text)
       curline = NULL;
       break;
     case '\b':
-      curline = buffer->WriteLine();
-      curline->SetSize(curline->Length()-2);
+      // @@@ Should we handle backspaces to previous lines?  Probably...
+      if(cx>0) {
+	// Delete the character before the cursor, and move the cursor back
+	curline = buffer->WriteLine();
+	curline->DeleteAt(--cx);
+      }
       break;
     case '\t':
       // Print 4-space tabs

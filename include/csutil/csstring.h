@@ -108,6 +108,9 @@ public:
     return Data [iPos];
   }
 
+  /// Delete iCount characters at iPos
+  csString &DeleteAt (size_t iPos, size_t iCount = 1);
+
   /// Insert another string into this one at position iPos
   csString &Insert (size_t iPos, const csString &iStr);
 

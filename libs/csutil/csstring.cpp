@@ -37,6 +37,18 @@ void csString::SetSize (size_t NewSize)
     Size = MaxSize, Data [Size] = 0;
 }
 
+csString &csString::DeleteAt (size_t iPos, size_t iCount)
+{
+#ifdef DEBUG
+  if ( (iPos > Size) || (iPos + iCount > Size) )
+    STR_FATAL (("Tried to delete characters beyond the end of the string!\n"))
+#endif
+  memmove(Data + iPos, Data + iPos + iCount, Size - (iPos + iCount));
+  Size = Size - iCount;
+  Data[Size] = 0;
+  return *this;
+}
+
 csString &csString::Insert (size_t iPos, const csString &iStr)
 {
 #ifdef DEBUG
