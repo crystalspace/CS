@@ -7,7 +7,9 @@
 #include <stdlib.h>
 #include <stdarg.h>
 
+#ifndef __CYSTALSPACE__
 #define __CYSTALSPACE__
+#endif
 #ifdef __CYSTALSPACE__
 #include "sysdef.h"
 #include "cssys/system.h"
@@ -35,6 +37,7 @@
 #define logf Printf
 #define log Printf
 // only takes two args....
+#define DEBUGLOGF2( A, B, C )  csSystemDriver::Printf( MSG_DEBUG_1, A, B, C )
 #define DEBUGLOGF( A, B )  csSystemDriver::Printf( MSG_DEBUG_1, A, B )
 #define DEBUGLOG( A )  csSystemDriver::Printf( MSG_DEBUG_1, A )
 #else
