@@ -31,15 +31,6 @@ Clean distclean : Jamconfig Jamfile
 CleanDir distclean : autom4te.cache ;
 Depends distclean : clean ;
 
-# When build directory differs from source directory, also remove `include'
-# directory created by configure.
-conftmpfiles = [ GLOB include : * ] ;
-conftmpfiles = [ Filter $(conftmpfiles:BS) : . .. volatile.h ] ;
-if ! $(conftmpfiles)
-{
-  CleanDir distclean : include ;
-}
-
 Clean maintainerclean : aclocal.m4 configure configure.scan ;
 Depends maintainerclean : distclean ;
 
@@ -54,3 +45,16 @@ SubInclude TOP apps ;
 SubInclude TOP docs ;
 SubInclude TOP include ;
 SubInclude TOP scripts ;
+
+# When build directory differs from source directory, also arrange for
+# 'distclean' to remove the $(BUILDDIR)/include directory created by
+# configure, and ensure that 'install' installs the generated
+# $(BUILDDIR)/include/volatile.h.  (We do this last because we invoke the
+# ScanHeaders rule defined by $(TOP)/include/Jamfile.)
+buildheaders = [ GLOB include : * ] ;
+buildheaders = [ Filter $(buildheaders:BS) : . .. volatile.h ] ;
+if ! $(buildheaders)
+{
+  CleanDir distclean : include ;
+  ScanHeaders $(BUILDTOP) ;
+}

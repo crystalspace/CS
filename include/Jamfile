@@ -25,10 +25,3 @@ rule ScanHeaders
 }
 
 ScanHeaders $(TOP) ;
-
-# If build directory differs from source directory, we must take special care
-# to also install the generated $(BUILDTOP)/include/volatile.h.
-if $(TOP) != "."
-{
-  ScanHeaders $(BUILDTOP) ;
-}
