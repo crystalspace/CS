@@ -48,18 +48,18 @@ class csSkelAnimControlRunnable;
 /**
  * Vertex information for a bone.
  */
-struct ac_vertex_data
+struct sac_vertex_data
 {
-	int idx;
-	float weight;
-	float col_weight;
-	csVector3 pos;
+  int idx;
+  float weight;
+  float col_weight;
+  csVector3 pos;
 };
 
 /**
  * Bone information for a vertex.
  */
-struct ac_bone_data
+struct sac_bone_data
 {
 	int idx;
 	int v_idx;
@@ -90,7 +90,7 @@ class csSkelBone : public iGenMeshSkeletonBone
 {
 private:
 	char* name;
-	csArray<ac_vertex_data> vertices;
+	csArray<sac_vertex_data> vertices;
 	csSkelBone* parent;
 	csRefArray<csSkelBone> bones;
 	csReversibleTransform transform;
@@ -142,7 +142,7 @@ public:
 
 	void CopyFrom (csSkelBone *other);
 	void AddVertex (int idx, float weight, float col_weight);
-	csArray<ac_vertex_data>& GetVertexData () { return vertices; }
+	csArray<sac_vertex_data>& GetVertexData () { return vertices; }
 	void AddBone (csRef<csSkelBone> & bone) { bones.Push (bone); }
 	csRefArray<csSkelBone>& GetBones () { return bones; }
 
@@ -180,7 +180,7 @@ public:
 /**
  * Possible opcodes for instructions in a script.
  */
-enum ac_opcode
+enum sac_opcode
 {
 	AC_STOP,
 	AC_DELAY,
@@ -195,9 +195,9 @@ enum ac_opcode
  * A script instruction with the parameter data for that instruction.
  * Every script has an array of these.
  */
-struct ac_instruction
+struct sac_instruction
 {
-	ac_opcode opcode;
+	sac_opcode opcode;
 	union
 	{
 		struct
@@ -229,19 +229,19 @@ class csSkelAnimControlScript
 {
 private:
 	char* name;
-	csArray<ac_instruction> instructions;
+	csArray<sac_instruction> instructions;
 	csTicks time;
 public:
 
 	csSkelAnimControlScript (const char* name);
 	~csSkelAnimControlScript () { delete[] name; }
 
-	ac_instruction& AddInstruction (ac_opcode opcode);
-	const ac_instruction& GetInstruction (size_t idx) const
+	sac_instruction& AddInstruction (sac_opcode opcode);
+	const sac_instruction& GetInstruction (size_t idx) const
 	{
 		return instructions[idx];
 	}
-	const csArray<ac_instruction>& GetInstructions () const
+	const csArray<sac_instruction>& GetInstructions () const
 	{
 		return instructions;
 	}
@@ -254,7 +254,7 @@ public:
 /**
  * A running rotate operation.
  */
-struct ac_rotate_execution
+struct sac_rotate_execution
 {
 	csSkelBone* bone;
 	csTicks final;
@@ -267,7 +267,7 @@ struct ac_rotate_execution
 /**
  * A running movement operation.
  */
-struct ac_move_execution
+struct sac_move_execution
 {
 	csSkelBone* bone;
 	csTicks final;
@@ -289,9 +289,9 @@ private:
 	float time_factor;
 
 	// Current movement operations.
-	csArray<ac_move_execution> moves;
+	csArray<sac_move_execution> moves;
 	// Current rotate operations.
-	csArray<ac_rotate_execution> rotates;
+	csArray<sac_rotate_execution> rotates;
 	// Current delay operation.
 	struct del
 	{
@@ -434,7 +434,7 @@ private:
 
 	// This is a table that contains a mapping for every vertex to the bones
 	// that contain that vertex.
-	csArray<csArray<ac_bone_data> > bones_vertices;
+	csArray<csArray<sac_bone_data> > bones_vertices;
 	void UpdateBonesMapping ();
 
 	const char* ParseBone (iDocumentNode* node, csSkelBone* parent);
@@ -469,7 +469,7 @@ public:
 
 	csRefArray<csSkelBone>& GetBones () { return bones; }
 	csArray<size_t>& GetParentBones () { return parent_bones; }
-	csArray<csArray<ac_bone_data> >& GetBonesVerticesMapping () { return bones_vertices; }
+	csArray<csArray<sac_bone_data> >& GetBonesVerticesMapping () { return bones_vertices; }
 
 	SCF_DECLARE_IBASE;
 

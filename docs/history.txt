@@ -11,6 +11,11 @@ chronological order.
 	  VC8 (yay forward compatibility).
 	- res made a small optimization to the static plugin registration;
 	  the metadata is put into a separate section on MSVC.
+	- res fixed a problem occuring with static linking on MSVC: gmeshanim
+	  and gmeshskelanim both use a data structure named 'ac_vertex_data', 
+	  but differently sized. However, for csArray<>s etc. VC uses the same 
+	  code - which can't end well. Renamed the gmeshskelanim 'ac_*' structs
+	  to 'sac_*'.
 20-Feb-2005
 	- res made the following changes:
 	    - Added a flag that is set via a variable indicating whether the

@@ -299,11 +299,12 @@ void csSkelBone::UpdatePosition (float posx, float posy, float posz)
 
 void csSkelBone::CopyFrom (csSkelBone *other)
 {
+	CS_ASSERT(other != this);
 	name = csStrNew (other->GetName ());
 	parent = 0;
 	for (size_t i = 0; i < other->GetVertexData ().Length (); i++)
 	{
-		ac_vertex_data v_data (other->GetVertexData ().Get (i));
+		sac_vertex_data v_data (other->GetVertexData ().Get (i));
 		vertices.Push (v_data);
 	}
 
@@ -337,7 +338,7 @@ void csSkelBone::GetSkinBox (csBox3 &box, csVector3 &center)
 
 void csSkelBone::AddVertex (int idx, float weight, float col_weight)
 {
-	ac_vertex_data vt;
+	sac_vertex_data vt;
 	vt.idx = idx;
 	vt.weight = weight;
 	vt.col_weight = col_weight;
@@ -390,9 +391,9 @@ csSkelAnimControlScript::csSkelAnimControlScript (const char* name)
 	time = 0;
 }
 
-ac_instruction& csSkelAnimControlScript::AddInstruction (ac_opcode opcode)
+sac_instruction& csSkelAnimControlScript::AddInstruction (sac_opcode opcode)
 {
-	ac_instruction instr;
+	sac_instruction instr;
 	size_t idx = instructions.Push (instr);
 	instructions[idx].opcode = opcode;
 	return instructions[idx];
@@ -434,7 +435,7 @@ bool csSkelAnimControlRunnable::Do (csTicks current, bool& stop)
 	while (i > 0)
 	{
 		i--;
-		ac_move_execution& m = moves[i];
+		sac_move_execution& m = moves[i];
 		csVector3 current_pos;
 		if (current < m.final)
 		{
@@ -458,7 +459,7 @@ bool csSkelAnimControlRunnable::Do (csTicks current, bool& stop)
 	while (i > 0)
 	{
 		i--;
-		ac_rotate_execution& m = rotates[i];
+		sac_rotate_execution& m = rotates[i];
 		float angle;
 		if (current < m.final)
 		{
@@ -485,12 +486,12 @@ bool csSkelAnimControlRunnable::Do (csTicks current, bool& stop)
 		delay.final = current;
 	}
 
-	const csArray<ac_instruction>& instructions = script->GetInstructions ();
+	const csArray<sac_instruction>& instructions = script->GetInstructions ();
 
 	bool loop = true;
 	while (loop)
 	{
-		const ac_instruction& inst = instructions[current_instruction];
+		const sac_instruction& inst = instructions[current_instruction];
 		current_instruction++;
 		switch (inst.opcode)
 		{
@@ -515,7 +516,7 @@ bool csSkelAnimControlRunnable::Do (csTicks current, bool& stop)
 			{
 				if (bones[inst.movement.bone_id]->GetMode () != BM_NONE)
 				{
-					ac_rotate_execution m;
+					sac_rotate_execution m;
 					csTicks duration = (csTicks) ( (float)inst.rotate.duration*time_factor);
 					m.final = delay.final + duration;
 					m.bone = bones[inst.rotate.bone_id];
@@ -550,7 +551,7 @@ bool csSkelAnimControlRunnable::Do (csTicks current, bool& stop)
 			{
 				if (bones[inst.movement.bone_id]->GetMode () != BM_NONE)
 				{
-					ac_move_execution m;
+					sac_move_execution m;
 					csTicks duration = (csTicks) ( (float)inst.movement.duration*time_factor);
 					m.final = delay.final + duration;
 					m.bone = bones[inst.movement.bone_id];
@@ -711,14 +712,14 @@ void csGenmeshSkelAnimationControl::TransformVerticesToBones (const csVector3* v
 	for (i = 0 ; i < parent_bones.Length () ; i++)
 		bones[parent_bones[i]]->UpdateBones ();
 
-	csArray<csArray<ac_bone_data> >& bones_vertices = factory->GetBonesVerticesMapping ();
+	csArray<csArray<sac_bone_data> >& bones_vertices = factory->GetBonesVerticesMapping ();
 	for (i = 0 ; i < (size_t)num_verts ; i++)
 	{
 		if (i >= bones_vertices.Length ())
 			animated_verts[i] = verts[i];
 		else
 		{
-			csArray<ac_bone_data>& vtgr = bones_vertices[i];
+			csArray<sac_bone_data>& vtgr = bones_vertices[i];
 			if (vtgr.Length () == 0)
 			{
 				animated_verts[i] = verts[i];
@@ -727,9 +728,9 @@ void csGenmeshSkelAnimationControl::TransformVerticesToBones (const csVector3* v
 			{
 				for (size_t j = 0 ; j < vtgr.Length () ; j++)
 				{
-					ac_bone_data & g_data = vtgr[j];
-					csRef<csSkelBone> bone = bones[vtgr[j].idx];
-					ac_vertex_data & v_data = bone->GetVertexData ()[g_data.v_idx];
+					sac_bone_data & g_data = vtgr[j];
+					csRef<csSkelBone> bone = bones[g_data.idx];
+					sac_vertex_data& v_data = bone->GetVertexData ()[g_data.v_idx];
 					csReversibleTransform& transform = bone->GetFullTransform ();
 					v_data.pos = transform.Other2This (verts[i]);
 				}
@@ -775,14 +776,14 @@ const csVector3* csGenmeshSkelAnimationControl::UpdateVertices (csTicks current,
 			}
 		}
 		
-		csArray<csArray<ac_bone_data> >& bones_vertices = factory->GetBonesVerticesMapping ();
+		csArray<csArray<sac_bone_data> >& bones_vertices = factory->GetBonesVerticesMapping ();
 		for (i = 0 ; i < (size_t)num_verts ; i++)
 		{
 			if (i >= bones_vertices.Length ())
 				animated_verts[i] = verts[i];
 			else
 			{
-				csArray<ac_bone_data>& vtgr = bones_vertices[i];
+				csArray<sac_bone_data>& vtgr = bones_vertices[i];
 				if (vtgr.Length () == 0)
 				{
 					animated_verts[i] = verts[i];
@@ -793,9 +794,9 @@ const csVector3* csGenmeshSkelAnimationControl::UpdateVertices (csTicks current,
 					float total_weight = 0;
 					for (size_t j = 0 ; j < vtgr.Length () ; j++)
 					{
-						ac_bone_data & g_data = vtgr[j];
+						sac_bone_data & g_data = vtgr[j];
 						csRef<csSkelBone> bone = bones[g_data.idx];
-						ac_vertex_data & v_data = bone->GetVertexData ()[g_data.v_idx];
+						sac_vertex_data& v_data = bone->GetVertexData ()[g_data.v_idx];
 						csReversibleTransform& transform = bone->GetFullTransform ();
 						total_weight += v_data.weight;
 						orig += v_data.weight * transform.This2Other (v_data.pos);
@@ -931,14 +932,14 @@ void csGenmeshSkelAnimationControlFactory::UpdateBonesMapping ()
 	for (i = 0 ; i < bones.Length () ; i++)
 	{
 		csSkelBone* g = bones[i];
-		const csArray<ac_vertex_data>& vtdata = g->GetVertexData ();
+		const csArray<sac_vertex_data>& vtdata = g->GetVertexData ();
 		size_t j;
 		for (j = 0 ; j < vtdata.Length () ; j++)
 		{
 			if (vtdata[j].weight > SMALL_EPSILON)
 			{
-				csArray<ac_bone_data>& vertices = bones_vertices.GetExtend (vtdata[j].idx);
-				ac_bone_data gd;
+				csArray<sac_bone_data>& vertices = bones_vertices.GetExtend (vtdata[j].idx);
+				sac_bone_data gd;
 				gd.idx = i;
 				gd.v_idx = j;
 				vertices.Push (gd); // Push bone index.
@@ -1109,7 +1110,7 @@ const char* csGenmeshSkelAnimationControlFactory::ParseScript (iDocumentNode* no
 					if (!bonename) return "Missing bone name for <move>!";
 					size_t bone_id = FindBoneIndex (bonename);
 					if (bone_id == (size_t)~0) return "Can't find bone for <move>!";
-					ac_instruction& instr = ad.script->AddInstruction (AC_MOVE);
+					sac_instruction& instr = ad.script->AddInstruction (AC_MOVE);
 					instr.movement.bone_id = bone_id;
 					instr.movement.duration = child->GetAttributeValueAsInt ("duration");
 					instr.movement.posx = child->GetAttributeValueAsFloat ("x");
@@ -1124,7 +1125,7 @@ const char* csGenmeshSkelAnimationControlFactory::ParseScript (iDocumentNode* no
 					if (!bonename) return "Missing bone name for <rotx>!";
 					size_t bone_id = FindBoneIndex (bonename);
 					if (bone_id == (size_t)~0) return "Can't find bone for <rotx>!";
-					ac_instruction& instr = ad.script->AddInstruction (AC_ROTX);
+					sac_instruction& instr = ad.script->AddInstruction (AC_ROTX);
 					instr.rotate.bone_id = bone_id;
 					instr.rotate.duration = child->GetAttributeValueAsInt ("duration");
 					instr.rotate.angle = child->GetAttributeValueAsFloat ("angle");
@@ -1137,7 +1138,7 @@ const char* csGenmeshSkelAnimationControlFactory::ParseScript (iDocumentNode* no
 					if (!bonename) return "Missing bone name for <roty>!";
 					size_t bone_id = FindBoneIndex (bonename);
 					if (bone_id == (size_t)~0) return "Can't find bone for <roty>!";
-					ac_instruction& instr = ad.script->AddInstruction (AC_ROTY);
+					sac_instruction& instr = ad.script->AddInstruction (AC_ROTY);
 					instr.rotate.bone_id = bone_id;
 					instr.rotate.duration = child->GetAttributeValueAsInt ("duration");
 					instr.rotate.angle = child->GetAttributeValueAsFloat ("angle");
@@ -1150,7 +1151,7 @@ const char* csGenmeshSkelAnimationControlFactory::ParseScript (iDocumentNode* no
 					if (!bonename) return "Missing bone name for <rotz>!";
 					size_t bone_id = FindBoneIndex (bonename);
 					if (bone_id == (size_t)~0) return "Can't find bone for <rotz>!";
-					ac_instruction& instr = ad.script->AddInstruction (AC_ROTZ);
+					sac_instruction& instr = ad.script->AddInstruction (AC_ROTZ);
 					instr.rotate.bone_id = bone_id;
 					instr.rotate.duration = child->GetAttributeValueAsInt ("duration");
 					instr.rotate.angle = child->GetAttributeValueAsFloat ("angle");
@@ -1159,7 +1160,7 @@ const char* csGenmeshSkelAnimationControlFactory::ParseScript (iDocumentNode* no
 				break;
 			case XMLTOKEN_DELAY:
 				{
-					ac_instruction& instr = ad.script->AddInstruction (AC_DELAY);
+					sac_instruction& instr = ad.script->AddInstruction (AC_DELAY);
 					instr.delay.time = child->GetAttributeValueAsInt ("time");
 					ad.script->GetTime () += instr.delay.time;
 				}
