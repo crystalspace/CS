@@ -203,7 +203,7 @@ bool csGraphics2D::Open ()
   for (i = 0, addr = 0; i < Height; i++, addr += bpl)
     LineAddress[i] = addr;
 
-  SetClipRect (0, 0, Width, Height);
+  SetClipRect (0, 0, Width - 1, Height - 1);
   return true;
 }
 
