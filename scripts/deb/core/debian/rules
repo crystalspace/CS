@@ -50,10 +50,13 @@ configure-stamp:
 #	perl -pi -e "s/#TO_INSTALL/TO_INSTALL/" $(CURDIR)/CS/cache.mak
 	# Activating scripts
 	chmod +x $(CURDIR)/debian/createmenus
+	chmod +x $(CURDIR)/debian/createconf
 	chmod +x $(CURDIR)/debian/addmissing
 	chmod +x $(CURDIR)/debian/automan
 	# Creating menus
 	$(CURDIR)/debian/createmenus $(CURDIR)
+	# Creating conffiles
+	$(CURDIR)/debian/createconf $(CURDIR)
 
 	touch configure-stamp
 
