@@ -94,7 +94,7 @@ void csPrintLibraryError (const char *iModule)
   fprintf(stderr, "ERROR (%s):\n", iModule);
   while((str = (char*)ErrorMessages.Pop()) != NULL)
   {
-    fprintf (stderr, "    %s", str);
+    fprintf (stderr, "  %s", str);
     delete[] str;
   }
 }
