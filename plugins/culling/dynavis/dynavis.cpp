@@ -170,7 +170,7 @@ csDynaVis::csDynaVis (iBase *iParent)
   debug_camera = 0;
   model_mgr = new csObjectModelManager ();
   write_queue = new csWriteQueue ();
-  current_visnr = 1;
+  current_vistest_nr = 1;
   history_frame_cnt = 2;
   vistest_objects_inuse = false;
 
@@ -437,6 +437,9 @@ struct VisTest_Front2BackData
   // is maintained recursively during VisTest() and indicates the
   // planes that are still active for the current kd-tree node.
   csPlane3 frustum[32];
+
+  // this is the callback to call when we discover a visible node
+  iVisibilityCullerListner* viscallback;
 };
 
 bool csDynaVis::TestNodeVisibility (csKDTree* treenode,
@@ -914,12 +917,13 @@ bool csDynaVis::TestObjectVisibility (csVisibilityObjectWrapper* obj,
 
   csVisibilityObjectHistory* hist = obj->history;
 
-  if (obj->visobj->GetVisibilityNumber () != current_visnr)
+  if (obj->last_visible_vistestnr != current_vistest_nr)
   {
     if (do_cull_history && hist->vis_cnt > 0)
     {
-      obj->MarkVisible (VISIBLE_HISTORY, hist->vis_cnt-1, current_visnr,
+      obj->MarkVisible (VISIBLE_HISTORY, hist->vis_cnt-1, current_vistest_nr,
 		      history_frame_cnt);
+      data->viscallback->ObjectVisible (obj->visobj, obj->mesh);
       do_write_object = true;
       goto end;
     }
@@ -928,8 +932,9 @@ bool csDynaVis::TestObjectVisibility (csVisibilityObjectWrapper* obj,
     const csVector3& pos = data->pos;
     if (obj_bbox.Contains (pos))
     {
-      obj->MarkVisible (VISIBLE_INSIDE, RAND_HISTORY, current_visnr,
+      obj->MarkVisible (VISIBLE_INSIDE, RAND_HISTORY, current_vistest_nr,
 		      history_frame_cnt);
+      data->viscallback->ObjectVisible (obj->visobj, obj->mesh);
       do_write_object = true;
       goto end;
     }
@@ -1049,7 +1054,8 @@ bool csDynaVis::TestObjectVisibility (csVisibilityObjectWrapper* obj,
     //---------------------------------------------------------------
 
     // Object is visible so we should write it to the coverage buffer.
-    obj->MarkVisible (VISIBLE, RAND_HISTORY, current_visnr, history_frame_cnt);
+    obj->MarkVisible (VISIBLE, RAND_HISTORY, current_vistest_nr, history_frame_cnt);
+    data->viscallback->ObjectVisible (obj->visobj, obj->mesh);
     do_write_object = true;
   }
 
@@ -1148,10 +1154,14 @@ static bool VisTest_Front2Back (csKDTree* treenode, void* userdata,
   return true;
 }
 
-bool csDynaVis::VisTest (iRenderView* rview)
+bool csDynaVis::VisTest (iRenderView* rview, iVisibilityCullerListner *viscallback)
 {
+  // just make sure we have a callback
+  if (0 == viscallback)
+    return false;
+
   UpdateObjects ();
-  current_visnr++;
+  current_vistest_nr++;
   history_frame_cnt++;	// Only for history culling.
 
   // Statistics and debugging.
@@ -1176,7 +1186,8 @@ bool csDynaVis::VisTest (iRenderView* rview)
       if (visobj_wrap->history->history_frame_cnt == history_frame_cnt-1)
       {
 	visobj_wrap->history->history_frame_cnt = history_frame_cnt;
-        visobj->SetVisibilityNumber (current_visnr);
+        //visobj->SetVisibilityNumber (current_visnr);
+        viscallback->ObjectVisible (visobj_wrap->visobj, visobj_wrap->mesh);
       }
     }
     return true;
@@ -1237,6 +1248,7 @@ bool csDynaVis::VisTest (iRenderView* rview)
   data.pos = rview->GetCamera ()->GetTransform ().GetOrigin ();
   data.rview = rview;
   data.dynavis = this;
+  data.viscallback = viscallback;
   kdtree->Front2Back (data.pos, VisTest_Front2Back, (void*)&data, frustum_mask);
 
   // Conclude statistics.
@@ -1255,8 +1267,10 @@ bool csDynaVis::VisTest (iRenderView* rview)
 
 struct VisTestPlanes_Front2BackData
 {
+  uint32 current_vistest_nr;
   uint32 current_visnr;
   csArray<iVisibilityObject*>* vistest_objects;
+
   // During VisTest() we use the current frustum as five planes.
   // Associated with this frustum we also have a clip mask which
   // is maintained recursively during VisTest() and indicates the
@@ -1295,14 +1309,14 @@ static bool VisTestPlanes_Front2Back (csKDTree* treenode,
       objects[i]->timestamp = cur_timestamp;
       csVisibilityObjectWrapper* visobj_wrap = (csVisibilityObjectWrapper*)
       	objects[i]->GetObject ();
-      if (visobj_wrap->visobj->GetVisibilityNumber () != data->current_visnr)
+      if (visobj_wrap->last_visible_vistestnr != data->current_vistest_nr)
       {
 	const csBox3& obj_bbox = visobj_wrap->child->GetBBox ();
 	uint32 new_mask2;
 	if (csIntersect3::BoxFrustum (obj_bbox, data->frustum,
 		frustum_mask, new_mask2))
 	{
-	  visobj_wrap->visobj->SetVisibilityNumber (data->current_visnr);
+	  visobj_wrap->last_visible_vistestnr = data->current_vistest_nr;
 	  data->vistest_objects->Push (visobj_wrap->visobj);
 	}
       }
@@ -1316,7 +1330,7 @@ csPtr<iVisibilityObjectIterator> csDynaVis::VisTest (csPlane3* planes,
 	int num_planes)
 {
   UpdateObjects ();
-  current_visnr++;
+  current_vistest_nr++;
 
   csArray<iVisibilityObject*>* v;
   if (vistest_objects_inuse)
@@ -1332,7 +1346,7 @@ csPtr<iVisibilityObjectIterator> csDynaVis::VisTest (csPlane3* planes,
   }
   
   VisTestPlanes_Front2BackData data;
-  data.current_visnr = current_visnr;
+//  data.current_visnr = current_visnr;
   data.vistest_objects = v;
   data.frustum = planes;
   uint32 frustum_mask = (1 << num_planes)-1;
@@ -1349,7 +1363,7 @@ csPtr<iVisibilityObjectIterator> csDynaVis::VisTest (csPlane3* planes,
 
 struct VisTestBox_Front2BackData
 {
-  uint32 current_visnr;
+  uint32 current_vistestnr;
   csBox3 box;
   csArray<iVisibilityObject*>* vistest_objects;
 };
@@ -1388,7 +1402,7 @@ static bool VisTestBox_Front2Back (csKDTree* treenode, void* userdata,
       const csBox3& obj_bbox = visobj_wrap->child->GetBBox ();
       if (obj_bbox.TestIntersect (data->box))
       {
-	visobj_wrap->visobj->SetVisibilityNumber (data->current_visnr);
+	visobj_wrap->last_visible_vistestnr = data->current_vistestnr;
 	data->vistest_objects->Push (visobj_wrap->visobj);
       }
     }
@@ -1400,7 +1414,7 @@ static bool VisTestBox_Front2Back (csKDTree* treenode, void* userdata,
 csPtr<iVisibilityObjectIterator> csDynaVis::VisTest (const csBox3& box)
 {
   UpdateObjects ();
-  current_visnr++;
+  current_vistest_nr++;
 
   csArray<iVisibilityObject*>* v;
   if (vistest_objects_inuse)
@@ -1417,7 +1431,7 @@ csPtr<iVisibilityObjectIterator> csDynaVis::VisTest (const csBox3& box)
 
   VisTestBox_Front2BackData data;
   data.box = box;
-  data.current_visnr = current_visnr;
+  data.current_vistestnr = current_vistest_nr;
   data.vistest_objects = v;
   kdtree->Front2Back (box.GetCenter (), VisTestBox_Front2Back, (void*)&data,
   	0);
@@ -1431,7 +1445,7 @@ csPtr<iVisibilityObjectIterator> csDynaVis::VisTest (const csBox3& box)
 
 struct VisTestSphere_Front2BackData
 {
-  uint32 current_visnr;
+  uint32 current_vistestnr;
   csVector3 pos;
   float sqradius;
   csArray<iVisibilityObject*>* vistest_objects;
@@ -1471,7 +1485,7 @@ static bool VisTestSphere_Front2Back (csKDTree* treenode, void* userdata,
       const csBox3& obj_bbox = visobj_wrap->child->GetBBox ();
       if (csIntersect3::BoxSphere (obj_bbox, data->pos, data->sqradius))
       {
-	visobj_wrap->visobj->SetVisibilityNumber (data->current_visnr);
+	visobj_wrap->last_visible_vistestnr = data->current_vistestnr;
 	data->vistest_objects->Push (visobj_wrap->visobj);
       }
     }
@@ -1483,7 +1497,7 @@ static bool VisTestSphere_Front2Back (csKDTree* treenode, void* userdata,
 csPtr<iVisibilityObjectIterator> csDynaVis::VisTest (const csSphere& sphere)
 {
   UpdateObjects ();
-  current_visnr++;
+  current_vistest_nr++;
 
   csArray<iVisibilityObject*>* v;
   if (vistest_objects_inuse)
@@ -1500,7 +1514,7 @@ csPtr<iVisibilityObjectIterator> csDynaVis::VisTest (const csSphere& sphere)
 
 
   VisTestSphere_Front2BackData data;
-  data.current_visnr = current_visnr;
+  data.current_vistestnr = current_vistest_nr;
   data.vistest_objects = v;
   data.pos = sphere.GetCenter ();
   data.sqradius = sphere.GetRadius () * sphere.GetRadius ();
@@ -1662,7 +1676,7 @@ bool csDynaVis::IntersectSegment (const csVector3& start,
     iMeshWrapper** p_mesh, iPolygon3D** poly, bool accurate)
 {
   UpdateObjects ();
-  current_visnr++;
+  current_vistest_nr++;
 
   IntersectSegment_Front2BackData data;
   data.seg.Set (start, end);
@@ -1686,7 +1700,7 @@ csPtr<iVisibilityObjectIterator> csDynaVis::IntersectSegment (
     const csVector3& start, const csVector3& end, bool accurate)
 {
   UpdateObjects ();
-  current_visnr++;
+  current_vistest_nr++;
   IntersectSegment_Front2BackData data;
   data.seg.Set (start, end);
   data.sqdist = 10000000000.0;
@@ -1713,7 +1727,7 @@ struct ShadObj
 
 struct CastShadows_Front2BackData
 {
-  uint32 current_visnr;
+  uint32 current_vistestnr;
   iFrustumView* fview;
   csPlane3 planes[32];
   ShadObj* shadobjs;
@@ -1807,9 +1821,9 @@ static bool CastShadows_Front2Back (csKDTree* treenode, void* userdata,
 void csDynaVis::CastShadows (iFrustumView* fview)
 {
   UpdateObjects ();
-  current_visnr++;
+  current_vistest_nr++;
   CastShadows_Front2BackData data;
-  data.current_visnr = current_visnr;
+  data.current_vistestnr = current_vistest_nr;
   data.fview = fview;
 
   const csVector3& center = fview->GetFrustumContext ()->GetLightFrustum ()
@@ -2078,7 +2092,7 @@ void csDynaVis::Debug_Dump (iGraphics3D* g3d)
       {
 	csVisibilityObjectWrapper* visobj_wrap = visobj_vector[i];
 	iVisibilityObject* visobj = visobj_wrap->visobj;
-        if (visobj->GetVisibilityNumber () == current_visnr)
+        if (visobj_wrap->last_visible_vistestnr == current_vistest_nr)
 	{
 	  // Only render outline if visible.
           const csReversibleTransform& camtrans = debug_camera->GetTransform ();
@@ -2467,7 +2481,7 @@ bool csDynaVis::Debug_DebugCommand (const char* cmd)
         excul->GetObjectStatus (visobj_wrap, vispix, totpix);
 	if (vispix)
 	{
-	  visobj_wrap->visobj->SetVisibilityNumber (current_visnr);
+	  visobj_wrap->last_visible_vistestnr = current_vistest_nr;
           visobj_wrap->history->history_frame_cnt = 1;	//@@@
         }
       }

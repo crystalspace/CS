@@ -57,6 +57,8 @@ public:
   long update_number;	// Last used update_number from movable.
   long shape_number;	// Last used shape_number from model.
 
+  uint32 last_visible_vistest_nr;
+
   // Optional data for shadows. Both fields can be 0.
   csRef<iMeshWrapper> mesh;
   csRef<iShadowCaster> caster;
@@ -96,7 +98,7 @@ private:
   csKDTree* kdtree;
   csPDelArray<csFrustVisObjectWrapper> visobj_vector;
   int scr_width, scr_height;	// Screen dimensions.
-  uint32 current_visnr;
+  uint32 current_vistest_nr;
 
   // This hash set holds references to csFrustVisObjectWrapper instances
   // that require updating in the culler.
@@ -134,13 +136,14 @@ public:
   void AddObjectToUpdateQueue (csFrustVisObjectWrapper* visobj_wrap);
 
   // Update one object in FrustVis. This is called whenever the movable
-  // or object model changes.
+  //   or object model changes.
   void UpdateObject (csFrustVisObjectWrapper* visobj_wrap);
 
   virtual void Setup (const char* name);
   virtual void RegisterVisObject (iVisibilityObject* visobj);
   virtual void UnregisterVisObject (iVisibilityObject* visobj);
-  virtual bool VisTest (iRenderView* rview);
+  virtual bool VisTest (iRenderView* rview, 
+    iVisibilityCullerListner* viscallback);
   virtual csPtr<iVisibilityObjectIterator> VisTest (const csBox3& box);
   virtual csPtr<iVisibilityObjectIterator> VisTest (const csSphere& sphere);
   virtual csPtr<iVisibilityObjectIterator> VisTest (csPlane3* planes,
@@ -152,7 +155,7 @@ public:
     iMeshWrapper** p_mesh = 0, iPolygon3D** poly = 0,
     bool accurate = false);
   virtual void CastShadows (iFrustumView* fview);
-  virtual uint32 GetCurrentVisibilityNumber () const { return current_visnr; }
+  //virtual uint32 GetCurrentVisibilityNumber () const { return current_visnr; }
 
   struct eiComponent : public iComponent
   {

@@ -80,6 +80,8 @@ public:
   bool hint_badoccluder;
   bool hint_goodoccluder;
 
+  uint32 last_visible_vistestnr;
+
   csVisibilityObjectHistory* history;
   // Optional data for shadows. Both fields can be 0.
   csRef<iMeshWrapper> mesh;
@@ -97,10 +99,11 @@ public:
     history->DecRef ();
   }
 
-  void MarkVisible (csVisReason reason, int cnt, uint32 current_visnr,
+  void MarkVisible (csVisReason reason, int cnt, uint32 current_vistest_nr,
 		uint32 history_frame_cnt)
   {
-    visobj->SetVisibilityNumber (current_visnr);
+    //visobj->SetVisibilityNumber (current_visnr);
+    last_visible_vistestnr = current_vistest_nr;
     history->reason = reason;
     history->vis_cnt = cnt;
     if (history_frame_cnt != 0)
@@ -136,7 +139,7 @@ private:
   csObjectModelManager* model_mgr;
   csWriteQueue* write_queue;
   int scr_width, scr_height;	// Screen dimensions.
-  uint32 current_visnr;
+  uint32 current_vistest_nr;
 
   // For Debug_Dump(g3d): keep the last original camera.
   iCamera* debug_camera;
@@ -229,7 +232,7 @@ public:
   virtual void Setup (const char* name);
   virtual void RegisterVisObject (iVisibilityObject* visobj);
   virtual void UnregisterVisObject (iVisibilityObject* visobj);
-  virtual bool VisTest (iRenderView* rview);
+  virtual bool VisTest (iRenderView* rview, iVisibilityCullerListner *viscallback);
   virtual csPtr<iVisibilityObjectIterator> VisTest (const csBox3& box);
   virtual csPtr<iVisibilityObjectIterator> VisTest (const csSphere& sphere);
   virtual csPtr<iVisibilityObjectIterator> VisTest (csPlane3* planes,
@@ -241,7 +244,7 @@ public:
     iMeshWrapper** p_mesh = 0, iPolygon3D** poly = 0,
     bool accurate = false);
   virtual void CastShadows (iFrustumView* fview);
-  virtual uint32 GetCurrentVisibilityNumber () const { return current_visnr; }
+  //virtual uint32 GetCurrentVisibilityNumber () const { return current_visnr; }
 
   // Debugging functions.
   csPtr<iString> Debug_UnitTest ();

@@ -148,7 +148,7 @@ csFrustumVis::csFrustumVis (iBase *iParent)
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiComponent);
   object_reg = 0;
   kdtree = 0;
-  current_visnr = 1;
+  current_vistest_nr = 1;
   vistest_objects_inuse = false;
   updating = false;
 }
@@ -335,6 +335,9 @@ struct FrustTest_Front2BackData
   // is maintained recursively during VisTest() and indicates the
   // planes that are still active for the current kd-tree node.
   csPlane3 frustum[32];
+
+  // this is the callback to call when we discover a visible node
+  iVisibilityCullerListner* viscallback;
 };
 
 bool csFrustumVis::TestNodeVisibility (csKDTree* treenode,
@@ -360,12 +363,13 @@ bool csFrustumVis::TestNodeVisibility (csKDTree* treenode,
 bool csFrustumVis::TestObjectVisibility (csFrustVisObjectWrapper* obj,
   	FrustTest_Front2BackData* data, uint32 frustum_mask)
 {
-  if (obj->visobj->GetVisibilityNumber () != current_visnr)
+  if (obj->last_visible_vistest_nr != current_vistest_nr)
   {
     const csBox3& obj_bbox = obj->child->GetBBox ();
     if (obj_bbox.Contains (data->pos))
     {
-      obj->visobj->SetVisibilityNumber (current_visnr);
+      //obj->visobj->SetVisibilityNumber (current_visnr);
+      data->viscallback->ObjectVisible (obj->visobj, obj->mesh);
       return true;
     }
   
@@ -376,7 +380,8 @@ bool csFrustumVis::TestObjectVisibility (csFrustVisObjectWrapper* obj,
       return false;
     }
 
-    obj->visobj->SetVisibilityNumber (current_visnr);
+    //obj->visobj->SetVisibilityNumber (current_visnr);
+    data->viscallback->ObjectVisible (obj->visobj, obj->mesh);
   }
 
   return true;
@@ -416,10 +421,15 @@ static bool FrustTest_Front2Back (csKDTree* treenode, void* userdata,
   return true;
 }
 
-bool csFrustumVis::VisTest (iRenderView* rview)
+bool csFrustumVis::VisTest (iRenderView* rview, 
+                            iVisibilityCullerListner* viscallback)
 {
+  // just make sure we have a callback
+  if (0 == viscallback)
+    return false;
+
   UpdateObjects ();
-  current_visnr++;
+  current_vistest_nr++;
 
   // Data for the vis tester.
   FrustTest_Front2BackData data;
@@ -441,6 +451,7 @@ bool csFrustumVis::VisTest (iRenderView* rview)
   data.pos = rview->GetCamera ()->GetTransform ().GetOrigin ();
   data.rview = rview;
   data.frustvis = this;
+  data.viscallback = viscallback;
   kdtree->Front2Back (data.pos, FrustTest_Front2Back, (void*)&data,
   	0xf);	// 0xf == frustum_mask for four planes.
 
@@ -451,8 +462,10 @@ bool csFrustumVis::VisTest (iRenderView* rview)
 
 struct FrustTestPlanes_Front2BackData
 {
-  uint32 current_visnr;
+
+  uint32 current_vistest_nr;
   csArray<iVisibilityObject*>* vistest_objects;
+
   // During VisTest() we use the current frustum as five planes.
   // Associated with this frustum we also have a clip mask which
   // is maintained recursively during VisTest() and indicates the
@@ -492,14 +505,14 @@ static bool FrustTestPlanes_Front2Back (csKDTree* treenode,
       objects[i]->timestamp = cur_timestamp;
       csFrustVisObjectWrapper* visobj_wrap = (csFrustVisObjectWrapper*)
       	objects[i]->GetObject ();
-      if (visobj_wrap->visobj->GetVisibilityNumber () != data->current_visnr)
+      if (visobj_wrap->last_visible_vistest_nr != data->current_vistest_nr)
       {
 	const csBox3& obj_bbox = visobj_wrap->child->GetBBox ();
 	uint32 new_mask2;
 	if (csIntersect3::BoxFrustum (obj_bbox, data->frustum,
 		frustum_mask, new_mask2))
 	{
-	  visobj_wrap->visobj->SetVisibilityNumber (data->current_visnr);
+	  visobj_wrap->last_visible_vistest_nr  = data->current_vistest_nr ;
 	  data->vistest_objects->Push (visobj_wrap->visobj);
 	}
       }
@@ -513,7 +526,7 @@ csPtr<iVisibilityObjectIterator> csFrustumVis::VisTest (csPlane3* planes,
 	int num_planes)
 {
   UpdateObjects ();
-  current_visnr++;
+  current_vistest_nr++;
 
   csArray<iVisibilityObject*>* v;
   if (vistest_objects_inuse)
@@ -529,7 +542,7 @@ csPtr<iVisibilityObjectIterator> csFrustumVis::VisTest (csPlane3* planes,
   }
   
   FrustTestPlanes_Front2BackData data;
-  data.current_visnr = current_visnr;
+  data.current_vistest_nr = current_vistest_nr;
   data.vistest_objects = v;
   data.frustum = planes;
   uint32 frustum_mask = (1 << num_planes)-1;
@@ -546,7 +559,7 @@ csPtr<iVisibilityObjectIterator> csFrustumVis::VisTest (csPlane3* planes,
 
 struct FrustTestBox_Front2BackData
 {
-  uint32 current_visnr;
+  uint32 current_vistest_nr;
   csBox3 box;
   csArray<iVisibilityObject*>* vistest_objects;
 };
@@ -585,7 +598,7 @@ static bool FrustTestBox_Front2Back (csKDTree* treenode, void* userdata,
       const csBox3& obj_bbox = visobj_wrap->child->GetBBox ();
       if (obj_bbox.TestIntersect (data->box))
       {
-	visobj_wrap->visobj->SetVisibilityNumber (data->current_visnr);
+	visobj_wrap->last_visible_vistest_nr = data->current_vistest_nr;
 	data->vistest_objects->Push (visobj_wrap->visobj);
       }
     }
@@ -597,7 +610,7 @@ static bool FrustTestBox_Front2Back (csKDTree* treenode, void* userdata,
 csPtr<iVisibilityObjectIterator> csFrustumVis::VisTest (const csBox3& box)
 {
   UpdateObjects ();
-  current_visnr++;
+  current_vistest_nr++;
 
   csArray<iVisibilityObject*>* v;
   if (vistest_objects_inuse)
@@ -613,7 +626,7 @@ csPtr<iVisibilityObjectIterator> csFrustumVis::VisTest (const csBox3& box)
   }
   
   FrustTestBox_Front2BackData data;
-  data.current_visnr = current_visnr;
+  data.current_vistest_nr = current_vistest_nr;
   data.box = box;
   data.vistest_objects = v;
   kdtree->Front2Back (box.GetCenter (), FrustTestBox_Front2Back, (void*)&data,
@@ -628,7 +641,7 @@ csPtr<iVisibilityObjectIterator> csFrustumVis::VisTest (const csBox3& box)
 
 struct FrustTestSphere_Front2BackData
 {
-  uint32 current_visnr;
+  uint32 current_vistest_nr;
   csVector3 pos;
   float sqradius;
   csArray<iVisibilityObject*>* vistest_objects;
@@ -669,7 +682,7 @@ static bool FrustTestSphere_Front2Back (csKDTree* treenode,
       const csBox3& obj_bbox = visobj_wrap->child->GetBBox ();
       if (csIntersect3::BoxSphere (obj_bbox, data->pos, data->sqradius))
       {
-	visobj_wrap->visobj->SetVisibilityNumber (data->current_visnr);
+	visobj_wrap->last_visible_vistest_nr = data->current_vistest_nr;
 	data->vistest_objects->Push (visobj_wrap->visobj);
       }
     }
@@ -681,7 +694,7 @@ static bool FrustTestSphere_Front2Back (csKDTree* treenode,
 csPtr<iVisibilityObjectIterator> csFrustumVis::VisTest (const csSphere& sphere)
 {
   UpdateObjects ();
-  current_visnr++;
+  current_vistest_nr++;
 
   csArray<iVisibilityObject*>* v;
   if (vistest_objects_inuse)
@@ -697,7 +710,7 @@ csPtr<iVisibilityObjectIterator> csFrustumVis::VisTest (const csSphere& sphere)
   }
 
   FrustTestSphere_Front2BackData data;
-  data.current_visnr = current_visnr;
+  data.current_vistest_nr = current_vistest_nr;
   data.pos = sphere.GetCenter ();
   data.sqradius = sphere.GetRadius () * sphere.GetRadius ();
   data.vistest_objects = v;
@@ -858,7 +871,7 @@ bool csFrustumVis::IntersectSegment (const csVector3& start,
     iMeshWrapper** p_mesh, iPolygon3D** poly, bool accurate)
 {
   UpdateObjects ();
-  current_visnr++;
+  current_vistest_nr++;
   IntersectSegment_Front2BackData data;
   data.seg.Set (start, end);
   data.sqdist = 10000000000.0;
@@ -881,7 +894,7 @@ csPtr<iVisibilityObjectIterator> csFrustumVis::IntersectSegment (
     const csVector3& start, const csVector3& end, bool accurate)
 {
   UpdateObjects ();
-  current_visnr++;
+  current_vistest_nr++;
   IntersectSegment_Front2BackData data;
   data.seg.Set (start, end);
   data.sqdist = 10000000000.0;
@@ -908,7 +921,7 @@ struct ShadObj
 
 struct CastShadows_Front2BackData
 {
-  uint32 current_visnr;
+  uint32 current_vistest_nr;
   iFrustumView* fview;
   csPlane3 planes[32];
   ShadObj* shadobjs;
@@ -1001,9 +1014,9 @@ static bool CastShadows_Front2Back (csKDTree* treenode, void* userdata,
 void csFrustumVis::CastShadows (iFrustumView* fview)
 {
   UpdateObjects ();
-  current_visnr++;
+  current_vistest_nr++;
   CastShadows_Front2BackData data;
-  data.current_visnr = current_visnr;
+  data.current_vistest_nr = current_vistest_nr;
   data.fview = fview;
 
   const csVector3& center = fview->GetFrustumContext ()->GetLightFrustum ()

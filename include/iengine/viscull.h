@@ -59,6 +59,23 @@ struct iVisibilityObjectIterator : public iBase
   virtual void Reset () = 0;
 };
 
+
+SCF_VERSION (iVisibilityCullerListner, 0, 0, 1);
+
+/**
+ * Implement this interface when you want to get notified about visible
+ * objects detected by the visibility cullers.
+ */
+struct iVisibilityCullerListner : public iBase
+{
+  /**
+   * This function is called whenever the visibilty culler discovers a new
+   * visible mesh. 
+   */
+  virtual void ObjectVisible (iVisibilityObject *visobject, 
+    iMeshWrapper *mesh) = 0;
+};
+
 SCF_VERSION (iVisibilityCuller, 0, 3, 2);
 
 /**
@@ -91,7 +108,8 @@ struct iVisibilityCuller : public iBase
    * mark all visible objects. If this function returns false then
    * all objects are visible.
    */
-  virtual bool VisTest (iRenderView* irview) = 0;
+  virtual bool VisTest (iRenderView* irview, 
+    iVisibilityCullerListner* viscallback) = 0;
 
   /**
    * Mark all objects as visible that intersect with the given bounding
@@ -152,7 +170,7 @@ struct iVisibilityCuller : public iBase
    * iVisibilityObject->GetVisibilityNumber(). If equal then the object
    * was visible.
    */
-  virtual uint32 GetCurrentVisibilityNumber () const = 0;
+  //virtual uint32 GetCurrentVisibilityNumber () const = 0;
 };
 
 /** \name GetCullerFlags() flags

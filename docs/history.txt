@@ -10,6 +10,12 @@ chronological order.
 	- Luca added the CSTOOL library dependency to maya2spr makefile.
 	- Luca reverted his latest commit because the cstool library is not 
 	  required by maya2spr.
+	- Marten Svanfeldt commited a change to the cullers. Now 
+	  VisTest(iRenderView) takes an additional parameter, a callback to be
+	  called for all visible objects. The visnr have also been made internal
+	  to the culler (it is used to optimize culling). With the current
+	  renderer/engine implementation this callback sets a number on each mesh
+	  to be used when creating the rendering meshlist.
 22-Aug-2003
 	- Oktal fixed a couple of typos in the Perl plugin, and fixed a bit of
 	  const correctness in iScriptObject.

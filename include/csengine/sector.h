@@ -205,6 +205,11 @@ private:
   csSectorMeshList meshes;
 
 
+  /**
+   * Visibilty number for last VisTest call
+   */
+  uint32 current_visnr;
+
 #ifdef CS_USE_NEW_RENDERER  
   friend class csRenderMeshList;
 
@@ -580,6 +585,19 @@ public:
     virtual void RemoveReference (iReference* ref);
   } scfiReferencedObject;
   friend struct ReferencedObject;
+
+  //--------------------- iVisibilityCullerListner interface ------------------
+  struct eiVisCullListner : public iVisibilityCullerListner
+  {
+    SCF_DECLARE_EMBEDDED_IBASE (csSector);
+    virtual void ObjectVisible (iVisibilityObject *visobj, iMeshWrapper *mesh)
+      { scfParent->ObjectVisible (visobj, mesh);  }
+  } scfiVisibilityCullerListner;
+
+  void ObjectVisible (iVisibilityObject *visobj, iMeshWrapper *mesh)
+  {
+    visobj->SetVisibilityNumber (current_visnr);
+  }
 
   //------------------------- iSector interface -------------------------------
   struct eiSector : public iSector
