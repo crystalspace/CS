@@ -47,6 +47,10 @@ Short-term cleanups that need to be done:
 		TEXTURE 'red ball' (FILE (/lib/tex/redball.gif)o
 		MIPMAP(no) DITHER(yes))
 	      Dithering is now by default off in soft3d.cfg.
+	    - Fixed the bug with close things disappearing when texelflt
+	      is on. Removed "texfilt" command, use "bilinear" and
+	      "trilinear" commands instead. Also removed some useless
+	      G3DRENDERSTATE's.
 	- Fixed line renderer because Andrew broke it a little.
 	- Fixed bug in engine/software combination. If a polygon is deleted
 	  it will now call a new G3D->RemoveFromCache() function so that
