@@ -20,9 +20,10 @@ The history order is reversed so that new features are at the top.
 	- Marten Svanfeldt fixed the light/shadow culling using the new version
 	  of VisTest.
 	- Marten Svanfeldt / Anders Stenberg made these changes
-	    - The way buffers are activated. Now you use iRender3D::ActivateBuffer
-	    - The way textures are activated. Added iRender3D::ActivateTexture
-	    - Streammapping in the shaders
+	    - The way buffers are activated. Now you use
+	      iRender3D::ActivateBuffer.
+	    - The way textures are activated. Added iRender3D::ActivateTexture.
+	    - Streammapping in the shaders.
 26-Feb-2003
 	- Christian Bayle added some missing dependancy to enable to compile
   	  libs as shared
@@ -96,6 +97,11 @@ The history order is reversed so that new features are at the top.
 	    - Added two example PPL-shaders. They both need some special
 	      attenuationmaps and material setup.
 	    - Fixed a bug in genmesh anonymous stream loading.
+	- Gregory Block did the following:
+	  Checking in a fix for gcc 3.1 users whose cpp will *not* behave as
+	  expected as requested by this shell script.
+	  For gcc 3.x users, please enable the option below, and disable the
+	  cpp line.
 25-Feb-2003
 	- Marten Svanfeldt made these changes:
 	    - Fixed a bug in the light/shadow culling.
