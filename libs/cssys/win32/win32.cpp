@@ -482,46 +482,50 @@ bool csPlatformStartup(iObjectRegistry* r)
 
   char installDir[MAX_PATH];
   csGetInstallPath(installDir, sizeof(installDir));
-  ToLower (installDir, installDir);
   size_t idlen = strlen(installDir);
-  idlen--;
-  installDir[idlen] = 0;
+  // csGetInstallDir() might return "" (current dir)
+  if (idlen != 0)
+  {
+    ToLower (installDir, installDir);
+    idlen--;
+    installDir[idlen] = 0;
   
-  const char* path = getenv("PATH");
-  if (path)
-  {
-    char *mypath = new char[strlen(path) + 1];
-    ToLower (mypath, path);
-
-    char* ppos = strstr (mypath, installDir);
-    while (!gotpath && ppos)
+    const char* path = getenv("PATH");
+    if (path)
     {
-      char* npos = strchr (ppos, ';');
-      if (npos) *npos = 0;
+      char *mypath = new char[strlen(path) + 1];
+      ToLower (mypath, path);
 
-      if ((strlen (ppos) == idlen) || (strlen (ppos) == idlen+1))
+      char* ppos = strstr (mypath, installDir);
+      while (!gotpath && ppos)
       {
-	if (ppos[idlen] == '\\') ppos[idlen] = 0;
-	if (!strcmp (ppos, installDir))
-	{
-	  // found it
-	  gotpath = true;
-	}
-      }
-      ppos = npos ? strstr (npos+1, installDir) : NULL;
-    }
-    delete[] mypath;
-  }
+        char* npos = strchr (ppos, ';');
+        if (npos) *npos = 0;
 
-  if (!gotpath)
-  {
-    // put CRYSTAL path into PATH environment.
-    char *newpath = new char[(path?strlen(path):0) + strlen(installDir) + 2];
-    strcpy (newpath, installDir);
-    strcat (newpath, ";");
-    if (path) strcat (newpath, path);
-    SetEnvironmentVariable ("PATH", newpath);
-    delete[] newpath;
+        if ((strlen (ppos) == idlen) || (strlen (ppos) == idlen+1))
+        {
+	  if (ppos[idlen] == '\\') ppos[idlen] = 0;
+	  if (!strcmp (ppos, installDir))
+	  {
+	    // found it
+	    gotpath = true;
+	  }
+        }
+        ppos = npos ? strstr (npos+1, installDir) : NULL;
+      }
+      delete[] mypath;
+    }
+
+    if (!gotpath)
+    {
+      // put CRYSTAL path into PATH environment.
+      char *newpath = new char[(path?strlen(path):0) + strlen(installDir) + 2];
+      strcpy (newpath, installDir);
+      strcat (newpath, ";");
+      if (path) strcat (newpath, path);
+      SetEnvironmentVariable ("PATH", newpath);
+      delete[] newpath;
+    }
   }
 
   Win32Assistant* a = new Win32Assistant(r);
