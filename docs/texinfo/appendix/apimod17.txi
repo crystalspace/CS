@@ -2,7 +2,7 @@
 @node ApiMods17, History, Todo, Top
 @appendix Convert From One CS Release to Another
 @cindex Converting API
-@cindex @sc{API}
+@cindex @code{API}
 
 @emph{Node}: This document tries to help developers do the transition from
 one version of CS to another. At this moment CS is still beta so we don't
@@ -30,8 +30,8 @@ This version explains how to go from 0.16 to 0.17.
 @cindex elapsed time
 @cindex current time
 
-@code{csSystemDriver::NextFrame} no longer has the @sc{elapsed_time}
-and @sc{current_time} parameters. So you have to change the prototype of
+@code{csSystemDriver::NextFrame} no longer has the @code{elapsed_time}
+and @code{current_time} parameters. So you have to change the prototype of
 your own subclassed version of @code{NextFrame} and call the following
 three lines in the order below (only if you need the elapsed and current
 time of course):
@@ -52,7 +52,7 @@ void ...::NextFrame ()
 @cindex iEvent
 
 The prototype of @code{csSystemDriver::HandleEvent} has changed
-from a @sc{csEvent} parameter to a @sc{iEvent} parameter. Update your
+from a @code{csEvent} parameter to a @code{iEvent} parameter. Update your
 subclassed versions if you have any.
 
 @node API Materials, API CD, API HandleEvent, 
@@ -76,16 +76,16 @@ SetTexture/GetTexture renamed to SetMaterial/GetMaterial in many places.
 SetTextureHandle/GetTextureHandle renamed to SetMaterialWrapper/GetMaterialWrapper.
 @end itemize
 
-In general in most places where you used to use @sc{SetTexture} or @sc{GetTexture}
+In general in most places where you used to use @code{SetTexture} or @code{GetTexture}
 you now need to use the material versions. There are few places where you
 handle directly with textures as the material system sits on top of that
 and is what you should use.
 
-@sc{csWorld} also has a @sc{GetMaterials} function which you probably should
-use wherever you used @sc{GetTextures} in the past.
+@code{csWorld} also has a @code{GetMaterials} function which you probably should
+use wherever you used @code{GetTextures} in the past.
 
 The @code{csLoader::LoadTexture} routine is a bit special. As before it
-loads a texture (and returns a @sc{csTextureWrapper}) but it also adds
+loads a texture (and returns a @code{csTextureWrapper}) but it also adds
 a material with the same name to the material list. You can then fetch
 that material from that list. So something like this:
 
@@ -121,17 +121,17 @@ if (!collide_system)
 This code loads the rapid collision detection plugin by default (which
 is the only one we have now) but it also reads an entry from your config
 file so that the user can possibly change it. If you don't want that
-then you can just hardcode the @sc{p} pointer to the RAPID plugin.
+then you can just hardcode the @code{p} pointer to the RAPID plugin.
 
-Note that you need to remember @sc{collide_system} somewhere where
+Note that you need to remember @code{collide_system} somewhere where
 it can be accessed by the routines that need to do the collision
 detection.
 
-Then the class @sc{csRAPIDCollider} has been removed from csengine.
-Instead there is @sc{csCollider}. This class encapsulates an @sc{iCollider}
-(which is something that is returned from the @sc{collide_system}).
+Then the class @code{csRAPIDCollider} has been removed from csengine.
+Instead there is @code{csCollider}. This class encapsulates an @code{iCollider}
+(which is something that is returned from the @code{collide_system}).
 This is the easiest way to use the new collision detection system as it
-more closely resembles what was possible with @sc{csRAPIDCollider}.
+more closely resembles what was possible with @code{csRAPIDCollider}.
 To make a csCollider you can use the following code:
 
 @example
@@ -139,10 +139,10 @@ iPolygonMesh* mesh = QUERY_INTERFACE (object, iPolygonMesh);
 csCollider* collider = new csCollider (*object, collide_system, mesh);
 @end example
 
-@sc{object} can be a sector, sprite, thing, or your own object that
-supports the @sc{iPolygonMesh} interface. The new collider will be
-attached (through the @sc{csObject} system) to the object. This is similar
-to what happened with the old @sc{csRAPIDCollider} class.
+@code{object} can be a sector, sprite, thing, or your own object that
+supports the @code{iPolygonMesh} interface. The new collider will be
+attached (through the @code{csObject} system) to the object. This is similar
+to what happened with the old @code{csRAPIDCollider} class.
 
 To do collision detection you need to find the colliders (or have
 them stored somewhere) and then you can do:
@@ -158,8 +158,8 @@ or:
 bool rc = col1->Collide (*object2, trans1, trans2);
 @end example
 
-With @sc{col1} and @sc{col2} are the colliders (@sc{csCollider})
-and object2 is the second object. @sc{trans1} and @sc{trans2} are
+With @code{col1} and @code{col2} are the colliders (@code{csCollider})
+and object2 is the second object. @code{trans1} and @code{trans2} are
 the respective transformations.
 
 Note that before you call this you probably want to initialize the
@@ -173,8 +173,8 @@ collide_system->SetOneHitOnly (true/false);
 The argument for the second function depends on wether or not you
 are interested in receiving more than one hit.
 
-Note that @sc{ResetCollisionPairs} is important. Every call
-to @sc{Collide} will add additional collision pairs to this array.
+Note that @code{ResetCollisionPairs} is important. Every call
+to @code{Collide} will add additional collision pairs to this array.
 So you have to reset it if you are no longer interested in that.
 
 Note that @code{csRAPIDCollider::Report} is gone. If you want that
@@ -185,24 +185,24 @@ functionality you have to do it on your own (which is not difficult).
 @cindex texture mapping
 
 Changed the way engine defines and uses texturing. There are
-four polygon texturing types now: @sc{POLYTXT_NONE} (no texturing,
+four polygon texturing types now: @code{POLYTXT_NONE} (no texturing,
 useful when using materials without textures -- it defines no
-texturing parameters at all thus saves memory), @sc{POLYTXT_FLAT}
+texturing parameters at all thus saves memory), @code{POLYTXT_FLAT}
 (flat-shading, only the angle between light and polygon
-normal is considered if @sc{CS_POLY_LIGHTING} flag is set, and
+normal is considered if @code{CS_POLY_LIGHTING} flag is set, and
 entire polygon is painted with one lighting value; every
-vertex has an U/V pair associated), @sc{POLYTXT_GOURAUD} (every
+vertex has an U/V pair associated), @code{POLYTXT_GOURAUD} (every
 polygon vertex has a color and those colors are interpolated
-across scanlines) and finally @sc{POLYTXT_LIGHTMAP} (a polygon
+across scanlines) and finally @code{POLYTXT_LIGHTMAP} (a polygon
 which has an associated lightmap and a texture plane). Now
 it is possible to define and use objects which have flat-color
 but still receive light with Gouraud as well as without
 Gouraud interpolation; in general this open a whole new area
 for experimenting.
 
-In practice this means that @sc{csGouraudShaded} has gone and is
-now replaced with @sc{csPolyTexGouraud}. @sc{csLightMapped} has also
-gone and is replaced with @sc{csPolyTexLightMap}.
+In practice this means that @code{csGouraudShaded} has gone and is
+now replaced with @code{csPolyTexGouraud}. @code{csLightMapped} has also
+gone and is replaced with @code{csPolyTexLightMap}.
 
 @node API Sound, , API Texture Mapping, 
 @subsection Sound Changes
@@ -230,7 +230,7 @@ you may use them, but I don't think they are useful).
 To load a sound, you have to:
 @itemize @bullet
 @item
-Load the file buffer from the @sc{vfs}.
+Load the file buffer from the @code{vfs}.
 
 @item
 Ask the sound renderer for the format descriptor (@code{csSoundFormat}
