@@ -23,7 +23,7 @@
 #include "cssys/csshlib.h"
 
 
-csLibraryHandle csLoadLibrary( const char* iName )
+csLibraryHandle csLoadLibrary( const char *installpath, const char* iName )
 {
 	CFragConnectionID libID;
 	OSErr	theError;

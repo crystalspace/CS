@@ -32,17 +32,23 @@
 
 /**
  * We try to find the library in the following sequence:
+ * <installpath>lib/<iName>.so, <installpath>lib/lib<iName>.so,
  * <iName>.so, lib<iName>.so, <cwd><iName>.so, <cwd>lib<iName>.so
  */
-csLibraryHandle csLoadLibrary (const char* iName)
+csLibraryHandle csLoadLibrary (const char *installpath, const char* iName)
 {
   csString Error;
   csLibraryHandle Handle;
-  for (int Try = 0; Try < 4; Try++)
+  for (int Try = 0; Try < 6; Try++)
   {
     char name [1255];
     name [0] = 0;
-    if (Try >= 2)
+    if ( Try <= 1 )
+    {
+      strcat (name, installpath);
+      strcat (name, "lib/");
+    }
+    else if (Try >= 4)
     {
       getcwd (name, sizeof (name));
       strcat (name, "/");

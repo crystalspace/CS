@@ -152,7 +152,7 @@ static __attribute__((constructor)) void _dlinit ()
   dlsetres (_dlerrh);
 }
 
-csLibraryHandle csLoadLibrary (const char* iName)
+csLibraryHandle csLoadLibrary (const char *installpath, const char* iName)
 {
   char name [260];
   strcat (strcpy (name, iName), ".dxe");

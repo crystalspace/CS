@@ -23,7 +23,7 @@
 #include "cssys/csshlib.h"
 #include "csutil/csstring.h"
 
-csLibraryHandle csLoadLibrary (const char* name)
+csLibraryHandle csLoadLibrary (const char *installpath, const char* name)
 {
   csString s(name);
   s += ".plugin";

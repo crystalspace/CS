@@ -28,7 +28,7 @@ extern "C" int DosFreeModule (csLibraryHandle ModuleHandle);
 extern "C" int DosQueryProcAddr (csLibraryHandle ModuleHandle,
   unsigned long Ordinal, const char *FunctionName, void *FunctionAddress);
 
-csLibraryHandle csLoadLibrary (const char* iName)
+csLibraryHandle csLoadLibrary (const char *installpath, const char* iName)
 {
   char name [260];
   strcat (strcpy (name, iName), ".dll");
