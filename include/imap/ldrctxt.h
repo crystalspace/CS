@@ -29,6 +29,7 @@ struct iMaterialWrapper;
 struct iMeshFactoryWrapper;
 struct iMeshWrapper;
 struct iSector;
+struct iRegion;
 struct iTextureWrapper;
 struct iLight;
 

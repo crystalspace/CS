@@ -51,6 +51,7 @@ The history order is reversed so that new features are at the top.
 	- Jorrit did some updates to the documentation to avoid the word
 	  'region' where something else is meant.
 	- Jorrit fixed iso loader after his latest changes.
+	- Jorrit fixed motion loader after his latest changes.
 	- Wouter fixed reference leaks in Aws for iGraphics2D/3D and font
 	  manager.
 19-Jun-2003
