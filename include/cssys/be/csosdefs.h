@@ -20,15 +20,15 @@
 #define __CSOSDEFS_H__
 
 // The 2D graphics driver used by software renderer on this platform
-#define SOFTWARE_2D_DRIVER_BEOS "crystalspace.graphics2d.be"
+#define CS_SOFTWARE_2D_DRIVER_BEOS "crystalspace.graphics2d.be"
 
-#define SOFTWARE_2D_DRIVER SOFTWARE_2D_DRIVER_BEOS
+#define CS_SOFTWARE_2D_DRIVER CS_SOFTWARE_2D_DRIVER_BEOS
 
 // The 2D graphics driver used by OpenGL renderer
-#define OPENGL_2D_DRIVER "crystalspace.graphics2d.glbe"
+#define CS_OPENGL_2D_DRIVER "crystalspace.graphics2d.glbe"
 
 // The 2D graphics driver used by Glide renderer
-#define GLIDE_2D_DRIVER "crystalspace.graphics2d.glide.be.2"
+#define CS_GLIDE_2D_DRIVER "crystalspace.graphics2d.glide.be.2"
 
 // BeOS param.h unconditionally defines MAX and MIN, so we must remove the
 // definitions set up by csdefs.h in order to avoid redifinition warnings.
@@ -46,19 +46,19 @@
 #undef SCF_EXPORT_FUNCTION
 #define SCF_EXPORT_FUNCTION extern "C" __declspec(dllexport)
 
-#if defined (SYSDEF_DIR)
+#if defined (CS_SYSDEF_PROVIDE_DIR)
 #  define __NEED_GENERIC_ISDIR
 #endif
 
-#if defined(SYSDEF_SOCKETS)
+#if defined(CS_SYSDEF_PROVIDE_SOCKETS)
 #  include <socket.h>
 #  define CS_CLOSESOCKET closesocket
 #  define CS_USE_FAKE_SOCKLEN_TYPE
 #endif
 
-#if defined(SYSDEF_SELECT)
+#if defined(CS_SYSDEF_PROVIDE_SELECT)
 #  include <socket.h>
-#  undef SYSDEF_SELECT
+#  undef CS_SYSDEF_PROVIDE_SELECT
 #endif
 
 #include <ByteOrder.h>

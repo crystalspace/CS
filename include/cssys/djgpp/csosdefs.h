@@ -21,9 +21,9 @@
 #define __CSOSDEFS_H__
 
 // The 2D graphics driver used by software renderer on this platform
-#define SOFTWARE_2D_DRIVER "crystalspace.graphics2d.dosraw"
+#define CS_SOFTWARE_2D_DRIVER "crystalspace.graphics2d.dosraw"
 
-#if defined (SYSDEF_GETCWD)
+#if defined (CS_SYSDEF_PROVIDE_GETCWD)
 #  include <dos.h>
 char _getdrive ()
 {
@@ -38,10 +38,10 @@ void _chdrive (char drive)
 }                  
 #endif
 
-#if defined (SYSDEF_GETCWD) || defined (SYSDEF_ACCESS)
+#if defined (CS_SYSDEF_PROVIDE_GETCWD) || defined (CS_SYSDEF_PROVIDE_ACCESS)
 #  include <unistd.h>
-#  undef SYSDEF_GETCWD
-#  undef SYSDEF_ACCESS
+#  undef CS_SYSDEF_PROVIDE_GETCWD
+#  undef CS_SYSDEF_PROVIDE_ACCESS
 static inline char *djgpp_getcwd (char *buf, size_t size)
 {
   char *out = getcwd (buf, size);
@@ -52,7 +52,7 @@ static inline char *djgpp_getcwd (char *buf, size_t size)
 #  define getcwd djgpp_getcwd
 #endif
 
-#if defined (SYSDEF_DIR)
+#if defined (CS_SYSDEF_PROVIDE_DIR)
 #  define __NEED_GENERIC_ISDIR
 #endif
 

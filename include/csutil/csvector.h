@@ -194,7 +194,7 @@ inline void csVector::QuickSort (int Mode)
  * in SCF vectors, all methods that have a 'DeleteIt' parameter for
  * usual typed vectors, and methods that return 'insecure' references. <p>
  */
-#define DECLARE_TYPED_VECTOR_HELPER(NAME,TYPE)				\
+#define CS_DECLARE_TYPED_VECTOR_HELPER(NAME,TYPE)			\
     inline NAME (int ilimit = 16, int ithreshold = 16) :		\
       csVector (ilimit, ithreshold) {}					\
     virtual ~NAME ()							\
@@ -228,17 +228,17 @@ inline void csVector::QuickSort (int Mode)
  * destruction. However, you must define FreeTypedItem() yourself.
  *
  * Usage:
- *   BEGIN_TYPED_VECTOR(NAME,TYPE)
+ *   CS_BEGIN_TYPED_VECTOR(NAME,TYPE)
  *     user-defined FreeTypedItem() here
  *     any other user-defined methods
- *   FINISH_TYPED_VECTOR(TYPE)
+ *   CS_FINISH_TYPED_VECTOR(TYPE)
  *
  * Parameters:
  *   NAME - Name of the new vector class.
  *   TYPE - Data type to which this vector refer.
  *          The TYPE should be possible to cast to (void *) and back.
  */
-#define BEGIN_TYPED_VECTOR(NAME,TYPE)					\
+#define CS_BEGIN_TYPED_VECTOR(NAME,TYPE)				\
   class NAME : private csVector						\
   {									\
   public:								\
@@ -246,7 +246,7 @@ inline void csVector::QuickSort (int Mode)
     { return csVector::Delete (n, FreeIt); }				\
     inline void DeleteAll (bool FreeThem = true)			\
     { csVector::DeleteAll (FreeThem); }					\
-    DECLARE_TYPED_VECTOR_HELPER (NAME, TYPE)				\
+    CS_DECLARE_TYPED_VECTOR_HELPER (NAME, TYPE)				\
     inline TYPE *& operator [] (int n)					\
     { return (TYPE *&)csVector::operator [] (n); }			\
     inline TYPE *& operator [] (int n) const				\
@@ -264,7 +264,7 @@ inline void csVector::QuickSort (int Mode)
     inline TYPE **GetArray ()						\
     { return (TYPE**)root; }
 
-#define FINISH_TYPED_VECTOR(TYPE)					\
+#define CS_FINISH_TYPED_VECTOR(TYPE)					\
     virtual bool FreeItem (csSome Item)					\
     { return FreeTypedItem ((TYPE *)Item); }				\
   }
@@ -274,21 +274,21 @@ inline void csVector::QuickSort (int Mode)
  * of this vector are of type TYPE. The elements are automatically deleted
  * on either Delete() or DeleteAll() or upon vector destruction.
  */
-#define DECLARE_TYPED_VECTOR(NAME,TYPE)					\
-  BEGIN_TYPED_VECTOR (NAME,TYPE)					\
+#define CS_DECLARE_TYPED_VECTOR(NAME,TYPE)				\
+  CS_BEGIN_TYPED_VECTOR (NAME,TYPE)					\
     inline bool FreeTypedItem (TYPE* obj)				\
     { delete obj; return true; }					\
-  FINISH_TYPED_VECTOR (TYPE)
+  CS_FINISH_TYPED_VECTOR (TYPE)
 
 /**
  * Declares a new vector type NAME as a subclass of csVector. Elements of
  * this vector are of type TYPE. The elements are not deleted by this vector.
  */
-#define DECLARE_TYPED_VECTOR_NODELETE(NAME,TYPE)			\
-  BEGIN_TYPED_VECTOR (NAME,TYPE)					\
+#define CS_DECLARE_TYPED_VECTOR_NODELETE(NAME,TYPE)			\
+  CS_BEGIN_TYPED_VECTOR (NAME,TYPE)					\
     inline bool FreeTypedItem (TYPE* obj)				\
     { return true; }							\
-  FINISH_TYPED_VECTOR (TYPE)
+  CS_FINISH_TYPED_VECTOR (TYPE)
 
 /**
  * This is a special version of typed vectors that contain SCF objects. The
@@ -298,7 +298,7 @@ inline void csVector::QuickSort (int Mode)
  * you call Pop(), you do usually not have a pointer to the object, so you can
  * not IncRef() it before.
  */
-#define DECLARE_TYPED_SCF_VECTOR(NAME,TYPE)				\
+#define CS_DECLARE_TYPED_IBASE_VECTOR(NAME,TYPE)			\
   class NAME : private csVector						\
   {									\
   public:								\
@@ -306,7 +306,7 @@ inline void csVector::QuickSort (int Mode)
     { return csVector::Delete (n, true); }				\
     inline void DeleteAll ()						\
     { csVector::DeleteAll (true); }					\
-    DECLARE_TYPED_VECTOR_HELPER (NAME, TYPE)				\
+    CS_DECLARE_TYPED_VECTOR_HELPER (NAME, TYPE)				\
     inline TYPE *operator [] (int n) const				\
     { return (TYPE *)csVector::operator [] (n); }			\
     inline TYPE *Get (int n) const					\
@@ -316,7 +316,8 @@ inline void csVector::QuickSort (int Mode)
     inline bool Insert (int n, TYPE *Item)				\
     { Item->IncRef (); return csVector::Insert (n, (csSome)Item); }	\
     inline int InsertSorted (TYPE *Item, int *oEqual = NULL, int Mode = 0) \
-    { Item->IncRef (); return csVector::InsertSorted ((csSome)Item, oEqual, Mode); } \
+    { Item->IncRef (); 							\
+      return csVector::InsertSorted ((csSome)Item, oEqual, Mode); }	\
     inline bool Replace (int n, TYPE *what)				\
     { what->IncRef (); return csVector::Replace(n, (csSome)what, true); } \
     virtual bool FreeItem (csSome Item)					\

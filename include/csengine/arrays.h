@@ -28,16 +28,16 @@ class csPolygonInt;
 class csPolygon3D;
 
 /// A dynamic array of csCurve objects
-BEGIN_TYPED_VECTOR (csCurvesArray, csCurve);
+CS_BEGIN_TYPED_VECTOR (csCurvesArray, csCurve);
   bool FreeTypedItem (csCurve* obj);
   virtual int CompareKey (csSome Item, csConstSome Key, int Mode) const;
-FINISH_TYPED_VECTOR (csCurve);
+CS_FINISH_TYPED_VECTOR (csCurve);
 
 /// A dynamic array of csLightHalo objects
-BEGIN_TYPED_VECTOR (csHaloArray, csLightHalo);
+CS_BEGIN_TYPED_VECTOR (csHaloArray, csLightHalo);
   bool FreeTypedItem (csLightHalo* obj);
   virtual int CompareKey (csSome Item, csConstSome Key, int Mode) const;
-FINISH_TYPED_VECTOR (csLightHalo);
+CS_FINISH_TYPED_VECTOR (csLightHalo);
 
 /**
  * An dynamic array of csPolygon3D objects.

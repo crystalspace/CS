@@ -18,7 +18,7 @@
 
 #include <stdarg.h>
 
-#define SYSDEF_SOFTWARE2D
+#define CS_SYSDEF_PROVIDE_SOFTWARE2D
 #include "cssysdef.h"
 #include "qint.h"
 #include "csgeom/math2d.h"
@@ -44,11 +44,11 @@ static char* get_line_2d_driver ()
   if (getenv ("DISPLAY"))
     return "crystalspace.graphics2d.linex2d";
   else
-    return SOFTWARE_2D_DRIVER;
+    return CS_SOFTWARE_2D_DRIVER;
 }
-#define LINE_SOFTWARE_2D_DRIVER get_line_2d_driver()
+#define LINE_CS_SOFTWARE_2D_DRIVER get_line_2d_driver()
 #else
-#define LINE_SOFTWARE_2D_DRIVER SOFTWARE_2D_DRIVER
+#define LINE_CS_SOFTWARE_2D_DRIVER CS_SOFTWARE_2D_DRIVER
 #endif
 
 ///---------------------------------------------------------------------------
@@ -111,7 +111,7 @@ bool csGraphics3DLine::Initialize (iSystem *iSys)
 
   const char *driver = iSys->GetOptionCL ("canvas");
   if (!driver)
-    driver = config->GetStr ("Video.Line.Canvas", LINE_SOFTWARE_2D_DRIVER);
+    driver = config->GetStr ("Video.Line.Canvas", LINE_CS_SOFTWARE_2D_DRIVER);
 
   G2D = CS_LOAD_PLUGIN (System, driver, NULL, iGraphics2D);
   if (!G2D)

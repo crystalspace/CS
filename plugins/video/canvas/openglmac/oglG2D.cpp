@@ -40,7 +40,7 @@
 SCF_IMPLEMENT_FACTORY (csGraphics2DOpenGL)
 
 SCF_EXPORT_CLASS_TABLE (Driver2DGL)
-  SCF_EXPORT_CLASS_DEP (csGraphics2DOpenGL, OPENGL_2D_DRIVER,
+  SCF_EXPORT_CLASS_DEP (csGraphics2DOpenGL, CS_OPENGL_2D_DRIVER,
     "Crystal Space OpenGL 2D driver for Macintosh", "crystalspace.font.server.")
 SCF_EXPORT_CLASS_TABLE_END
 

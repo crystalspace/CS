@@ -16,7 +16,7 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#define SYSDEF_ALLOCA
+#define CS_SYSDEF_PROVIDE_ALLOCA
 #include "cssysdef.h"
 #include "isomesh.h"
 #include "ivideo/graph3d.h"

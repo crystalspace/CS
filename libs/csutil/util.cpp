@@ -21,8 +21,8 @@
 #include <stdarg.h>
 #include <string.h>
 
-#define SYSDEF_PATH
-#define SYSDEF_GETCWD
+#define CS_SYSDEF_PROVIDE_PATH
+#define CS_SYSDEF_PROVIDE_GETCWD
 #include "cssysdef.h"
 
 // return a random number from minRange to maxRange inclusive

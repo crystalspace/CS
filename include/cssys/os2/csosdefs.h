@@ -25,15 +25,15 @@
 #define strncasecmp strnicmp
 
 // The 2D graphics driver used by OpenGL renderer
-#define OPENGL_2D_DRIVER "crystalspace.graphics2d.glos2"
+#define CS_OPENGL_2D_DRIVER "crystalspace.graphics2d.glos2"
 // OpenGL/2 does not support alpha-mapped textures correctly
 #define OPENGL_BITMAP_FONT
 
 // The 2D graphics driver used by software renderer on this platform
-#ifdef SYSDEF_SOFTWARE2D
+#ifdef CS_SYSDEF_PROVIDE_SOFTWARE2D
 #  define INCL_DOS
 #  include <os2.h>
-#  define SOFTWARE_2D_DRIVER get_software_2d_driver ()
+#  define CS_SOFTWARE_2D_DRIVER get_software_2d_driver ()
    static inline char *get_software_2d_driver ()
    {
      PTIB tb; PPIB pb; char *display;
@@ -47,7 +47,7 @@
    }
 #endif
 
-#if defined (SYSDEF_PATH) || defined (SYSDEF_DIR)
+#if defined (CS_SYSDEF_PROVIDE_PATH) || defined (CS_SYSDEF_PROVIDE_DIR)
 #  include <sys/types.h>
 #  if defined (__EMX__)
 #    include <dirent.h>
@@ -56,7 +56,7 @@
 #  endif
 #endif
 
-#ifdef SYSDEF_TEMP
+#ifdef CS_SYSDEF_PROVIDE_TEMP
 #  include <process.h>
 #  include <stdlib.h>
 #  if defined (COMP_WCC)
@@ -83,7 +83,7 @@
    }
 #endif
 
-#ifdef SYSDEF_GETCWD
+#ifdef CS_SYSDEF_PROVIDE_GETCWD
 #  if defined (__EMX__)
 #    include <stdlib.h>
 #    define getcwd os2_getcwd
@@ -102,10 +102,10 @@
 #  elif defined (COMP_WCC)
 #    include <direct.h>
 #  endif
-#  undef SYSDEF_GETCWD
+#  undef CS_SYSDEF_PROVIDE_GETCWD
 #endif
 
-#ifdef SYSDEF_DIR
+#ifdef CS_SYSDEF_PROVIDE_DIR
 #  if defined (_A_SUBDIR) && !defined (A_DIR)
 #    define A_DIR _A_SUBDIR
 #  endif
@@ -116,23 +116,23 @@
    }
 #endif
 
-#ifdef SYSDEF_MKDIR
+#ifdef CS_SYSDEF_PROVIDE_MKDIR
 #  if defined (__EMX__)
 #    define MKDIR(path) mkdir (path, 0755)
 #  else
 #    define MKDIR(path) _mkdir (path)
 #  endif
-#  undef SYSDEF_MKDIR
-#endif // SYSDEF_MKDIR
+#  undef CS_SYSDEF_PROVIDE_MKDIR
+#endif // CS_SYSDEF_PROVIDE_MKDIR
 
-#ifdef SYSDEF_SOCKETS
+#ifdef CS_SYSDEF_PROVIDE_SOCKETS
 #  include <sys/ioctl.h>
 #  include <sys/so_ioctl.h>
 #  include <sys/time.h>
 #  define CS_USE_FAKE_SOCKLEN_TYPE
 #endif
 
-#ifdef SYSDEF_ACCESS
+#ifdef CS_SYSDEF_PROVIDE_ACCESS
 #  include <io.h>
 #endif
 

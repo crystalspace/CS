@@ -39,9 +39,9 @@
 #ifdef __cplusplus 
 }
 #endif
-#define SYSDEF_UNLINK
-#define SYSDEF_ACCESS
-#define SYSDEF_MKDIR
+#define CS_SYSDEF_PROVIDE_UNLINK
+#define CS_SYSDEF_PROVIDE_ACCESS
+#define CS_SYSDEF_PROVIDE_MKDIR
 #include "cssysdef.h"
 
 #include <Files.h>

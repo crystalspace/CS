@@ -19,7 +19,7 @@
 
 #include <stdlib.h>
 #include <string.h>
-#define SYSDEF_PATH
+#define CS_SYSDEF_PROVIDE_PATH
 #include "cssysdef.h"
 #include "cssys/system.h"
 

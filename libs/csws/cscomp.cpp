@@ -20,8 +20,8 @@
 #include <stddef.h>
 #include <ctype.h>
 
-#define SYSDEF_ALLOCA
-#define SYSDEF_CASE
+#define CS_SYSDEF_PROVIDE_ALLOCA
+#define CS_SYSDEF_PROVIDE_CASE
 #include "cssysdef.h"
 #include "cstool/cspixmap.h"
 #include "cssys/csinput.h"

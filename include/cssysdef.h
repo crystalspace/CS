@@ -33,39 +33,39 @@
 
     The following variables can be defined:
 
-    #define SYSDEF_CASE
+    #define CS_SYSDEF_PROVIDE_CASE
       Define the UPPERCASE() and LOWERCASE() macros.
 
-    #define SYSDEF_PATH
+    #define CS_SYSDEF_PROVIDE_PATH
       Include definition of PATH_SEPARATOR character, MAXPATHLEN and
       APPEND_SLASH macros.
 
-    #define SYSDEF_MKDIR
+    #define CS_SYSDEF_PROVIDE_MKDIR
       Include definition for MKDIR()
 
-    #define SYSDEF_GETCWD
+    #define CS_SYSDEF_PROVIDE_GETCWD
       Include definition for getcwd()
 
-    #define SYSDEF_TEMP
+    #define CS_SYSDEF_PROVIDE_TEMP
       Include definitions for TEMP_DIR and TEMP_FILE.
 
-    #define SYSDEF_DIR
+    #define CS_SYSDEF_PROVIDE_DIR
       Include definitions required for opendir(), readdir(), closedir()
       and isdir().
  
-    #define SYSDEF_UNLINK
+    #define CS_SYSDEF_PROVIDE_UNLINK
       Include definitions required for unlink()
 
-    #define SYSDEF_ACCESS
+    #define CS_SYSDEF_PROVIDE_ACCESS
       Include definitions required for access()
 
-    #define SYSDEF_ALLOCA
+    #define CS_SYSDEF_PROVIDE_ALLOCA
       Include definition for alloca() and ALLOC_STACK_ARRAY()
 
-    #define SYSDEF_GETOPT
+    #define CS_SYSDEF_PROVIDE_GETOPT
       For getopt() and GNU getopt_long()
 
-    #define SYSDEF_SOCKETS
+    #define CS_SYSDEF_PROVIDE_SOCKETS
       For TCP/IP sockets definitions.  Specifically, should define the
       following macros, constants, typedefs, and prototypes:
 	inet_addr(), gethostbyname(), ntohl(), etc.
@@ -78,19 +78,19 @@
 	CS_IOCTLSOCKET -- name of "ioctl" function for sockets
 	CS_GETSOCKETERROR -- name of function or variable for socket error code
 	
-    #define SYSDEF_SELECT
+    #define CS_SYSDEF_PROVIDE_SELECT
       Includes definitions required for select(), FD_* macros, and
       struct timeval.
 
-    The system-dependent include files can undefine some or all SYSDEF_xxx
-    macros to avoid further definitions in this file. For example, if a
-    system-dependent file defines everything needed for SYSDEF_GETOPT it
-    should #undefine SYSDEF_GETOPT to avoid including util/gnu/getopt.h
-    at the bottom of this file.
+    The system-dependent include files can undefine some or all
+    CS_SYSDEF_PROVIDE_xxx macros to avoid further definitions in this file.
+    For example, if a system-dependent file defines everything needed for
+    CS_SYSDEF_PROVIDE_GETOPT it should #undefine CS_SYSDEF_PROVIDE_GETOPT to
+    avoid including util/gnu/getopt.h at the bottom of this file.
 */
 
-#if defined (SYSDEF_DIR) && !defined (SYSDEF_PATH)
-#  define SYSDEF_PATH
+#if defined (CS_SYSDEF_PROVIDE_DIR) && !defined (CS_SYSDEF_PROVIDE_PATH)
+#  define CS_SYSDEF_PROVIDE_PATH
 #endif
 
 /*
@@ -103,7 +103,7 @@
  * configuration files may override these.
  */
 
-#ifdef SYSDEF_CASE
+#ifdef CS_SYSDEF_PROVIDE_CASE
 // Convert a character to upper case
 #  ifndef UPPERCASE
 #    define UPPERCASE(c) ((c >= 'a' && c <= 'z') ? c - ('a' - 'A') : c)
@@ -112,9 +112,9 @@
 #  ifndef LOWERCASE
 #    define LOWERCASE(c) ((c >= 'A' && c <= 'Z') ? c + ('a' - 'A') : c)
 #  endif
-#endif // SYSDEF_CASE
+#endif // CS_SYSDEF_PROVIDE_CASE
 
-#ifdef SYSDEF_PATH
+#ifdef CS_SYSDEF_PROVIDE_PATH
 // Path separator character
 #  ifndef PATH_SEPARATOR
 #    if defined(OS_MACOS) || defined(__CYGWIN32__)
@@ -141,9 +141,9 @@
        str[len++] = PATH_SEPARATOR;		\
        str[len] = 0;				\
      } /* endif */
-#endif // SYSDEF_PATH
+#endif // CS_SYSDEF_PROVIDE_PATH
 
-#ifdef SYSDEF_TEMP
+#ifdef CS_SYSDEF_PROVIDE_TEMP
 // Directory for temporary files
 #  ifndef TEMP_DIR
 #    if defined(OS_UNIX)
@@ -161,9 +161,9 @@
 #      define TEMP_FILE "$cs$.tmp"
 #    endif
 #  endif
-#endif // SYSDEF_TEMP
+#endif // CS_SYSDEF_PROVIDE_TEMP
 
-#ifdef SYSDEF_MKDIR
+#ifdef CS_SYSDEF_PROVIDE_MKDIR
 // How to make a directory (not entire path, only the last on the path)
 #  ifndef MKDIR
 #    if defined(OS_WIN32) || (defined(OS_DOS) && !defined(COMP_GCC))
@@ -172,9 +172,9 @@
 #      define MKDIR(path) mkdir (path, 0755)
 #    endif
 #  endif
-#endif // SYSDEF_MKDIR
+#endif // CS_SYSDEF_PROVIDE_MKDIR
 
-#ifdef SYSDEF_GETCWD
+#ifdef CS_SYSDEF_PROVIDE_GETCWD
 #  if defined(OS_MACOS)
 #    include <unix.h>
 #  else
@@ -182,9 +182,9 @@
 #      include <unistd.h>
 #    endif
 #  endif
-#endif // SYSDEF_GETCWD
+#endif // CS_SYSDEF_PROVIDE_GETCWD
 
-#ifdef SYSDEF_DIR
+#ifdef CS_SYSDEF_PROVIDE_DIR
 // For systems without opendir()
 // COMP_GCC has opendir, readdir 
 # if !defined(COMP_GCC) || defined(OS_PS2)
@@ -235,9 +235,9 @@
        return ((st.st_mode & S_IFMT) == S_IFDIR);
      }
 #  endif
-#endif // SYSDEF_DIR
+#endif // CS_SYSDEF_PROVIDE_DIR
 
-#ifdef SYSDEF_UNLINK
+#ifdef CS_SYSDEF_PROVIDE_UNLINK
 #  if defined (OS_MACOS)
 #    include <unix.h>
 #  else
@@ -247,7 +247,7 @@
 #  endif
 #endif
 
-#ifdef SYSDEF_ALLOCA
+#ifdef CS_SYSDEF_PROVIDE_ALLOCA
 // Prototypes for dynamic stack memory allocation
 #  if defined (COMP_VC) || defined(COMP_BC) || \
      (defined(COMP_GCC) && defined(OS_WIN32))
@@ -271,7 +271,7 @@
 #  endif
 #endif
 
-#ifdef SYSDEF_ACCESS
+#ifdef CS_SYSDEF_PROVIDE_ACCESS
 #  if !defined (OS_MACOS) && !defined(COMP_VC) && !defined(COMP_BC)
 #    include <unistd.h>
 #  endif
@@ -286,14 +286,14 @@
 #  endif
 #endif
 
-#ifdef SYSDEF_GETOPT
+#ifdef CS_SYSDEF_PROVIDE_GETOPT
 #  ifndef __STDC__
 #    define __STDC__ 1
 #  endif
 #  include "cssys/getopt.h"
 #endif
 
-#ifdef SYSDEF_SOCKETS
+#ifdef CS_SYSDEF_PROVIDE_SOCKETS
 #  if !defined (OS_MACOS)
 #    include <unistd.h>
 #  endif
@@ -327,7 +327,7 @@
 #  endif
 #endif
 
-#ifdef SYSDEF_SELECT
+#ifdef CS_SYSDEF_PROVIDE_SELECT
 #  include <sys/select.h>
 #endif
 

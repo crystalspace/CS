@@ -25,8 +25,8 @@
 #include "imesh/mdlconv.h"
 #include "imesh/mdldata.h"
 
-DECLARE_TYPED_VECTOR_NODELETE (csModelConverterVector, iModelConverter);
-DECLARE_TYPED_VECTOR_NODELETE (csStringVector, csString);
+CS_DECLARE_TYPED_VECTOR_NODELETE (csModelConverterVector, iModelConverter);
+CS_DECLARE_TYPED_VECTOR_NODELETE (csStringVector, csString);
 
 class csModelConverterMultiplexer : iModelConverter
 {

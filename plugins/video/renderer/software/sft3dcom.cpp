@@ -18,7 +18,7 @@
 
 #include <stdarg.h>
 
-#define SYSDEF_SOFTWARE2D
+#define CS_SYSDEF_PROVIDE_SOFTWARE2D
 #include "cssysdef.h"
 #include "qint.h"
 #include "csgeom/math2d.h"

@@ -164,7 +164,7 @@ class csNotebook : public csComponent
   /// The first visible tab and the active tab
   int firsttab, activetab;
   /// This array contains the per-page information
-  DECLARE_TYPED_VECTOR (cspPageDataVector, cspPageData) pages;
+  CS_DECLARE_TYPED_VECTOR (cspPageDataVector, cspPageData) pages;
 
 public:
   /// Create a notebook component with given parent and style

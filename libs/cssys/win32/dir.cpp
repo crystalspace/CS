@@ -16,7 +16,7 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#define SYSDEF_DIR
+#define CS_SYSDEF_PROVIDE_DIR
 #include "cssysdef.h"
 #include "cssys/system.h"
 #include "cssys/win32/win32.h"

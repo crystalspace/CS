@@ -243,11 +243,11 @@ private:
   /// The base mesh is also the texture alignment mesh.
   csTriangleMesh2* texel_mesh;
   /// The array of texels
-  DECLARE_TYPED_VECTOR (csTexelsVector,csPoly2D) texels;
+  CS_DECLARE_TYPED_VECTOR (csTexelsVector,csPoly2D) texels;
   /// The vertices
-  DECLARE_TYPED_VECTOR (csVerticesVector,csPoly3D) vertices;
+  CS_DECLARE_TYPED_VECTOR (csVerticesVector,csPoly3D) vertices;
   /// The normals
-  DECLARE_TYPED_VECTOR (csNormalsVector,csPoly3D) normals;
+  CS_DECLARE_TYPED_VECTOR (csNormalsVector,csPoly3D) normals;
 
   /**
    * Connectivity information for this sprite template.

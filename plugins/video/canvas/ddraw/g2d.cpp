@@ -43,7 +43,7 @@ CS_IMPLEMENT_PLUGIN
 SCF_IMPLEMENT_FACTORY (csGraphics2DDDraw3)
 
 SCF_EXPORT_CLASS_TABLE (csddraw)
-  SCF_EXPORT_CLASS_DEP (csGraphics2DDDraw3, SOFTWARE_2D_DRIVER,
+  SCF_EXPORT_CLASS_DEP (csGraphics2DDDraw3, CS_SOFTWARE_2D_DRIVER,
     "Crystal Space 2D DirectDraw driver", "crystalspace.font.server.")
 SCF_EXPORT_CLASS_TABLE_END
 

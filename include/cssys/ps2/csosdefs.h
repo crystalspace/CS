@@ -22,25 +22,17 @@
 #include <math.h>
 
 // The 2D graphics driver used by the software renderer
-#define SOFTWARE_2D_DRIVER_PS2 "crystalspace.graphics2d.ps2d"
-#define SOFTWARE_2D_DRIVER SOFTWARE_2D_DRIVER_PS2
+#define CS_SOFTWARE_2D_DRIVER_PS2 "crystalspace.graphics2d.ps2d"
+#define CS_SOFTWARE_2D_DRIVER CS_SOFTWARE_2D_DRIVER_PS2
 
 // The 2D graphics driver used by OpenGL renderer
-#define OPENGL_2D_DRIVER "crystalspace.graphics2d.ps2d"
+#define CS_OPENGL_2D_DRIVER "crystalspace.graphics2d.ps2d"
 
-// The 2D graphics driver used by Glide renderer
-#define GLIDE_2D_DRIVER	"crystalspace.graphics2d.glide.x.2"
-
-// The 2D graphics driver used by Glide renderer Version 3
-#define GLIDE_2D_DRIVER_V3 "crystalspace.graphics2d.glide.x.3"
-// The sound driver
-#define SOUND_DRIVER "crystalspace.sound.driver.oss"
-
-#if defined (SYSDEF_DIR)
+#if defined (CS_SYSDEF_PROVIDE_DIR)
 #  define __NEED_GENERIC_ISDIR
 #endif
 
-#if defined (SYSDEF_SOCKETS) && defined (OS_SOLARIS)
+#if defined (CS_SYSDEF_PROVIDE_SOCKETS) && defined (OS_SOLARIS)
 extern "C" unsigned long inet_addr(const char*);
 #endif
 

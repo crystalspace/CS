@@ -1,6 +1,6 @@
 /*
     This header file contains all definitions needed for compatibility issues
-    Most of them should be defined only if corresponding SYSDEF_XXX macro is
+    Most of them should be defined only if corresponding CS_SYSDEF_PROVIDE_XXX macro is
     defined (see system/cssysdef.h)
  */
 #ifndef __CSOSDEFS_H__
@@ -19,41 +19,39 @@ char *strdup (const char *str);
 #undef SCF_EXPORT_FUNCTION
 #define SCF_EXPORT_FUNCTION extern "C" __declspec(export)
 
-#ifdef SYSDEF_ACCESS
+#ifdef CS_SYSDEF_PROVIDE_ACCESS
 # if __MWERKS__>=0x2400
 # include <unistd.h>
 # else
 int access (const char *path, int mode);
 # endif
-#endif // SYSDEF_ACCESS
+#endif // CS_SYSDEF_PROVIDE_ACCESS
 
 #ifdef __cplusplus
 }
 #endif
 
 // The 2D graphics driver used by software renderer on this platform
-#define SOFTWARE_2D_DRIVER	"crystalspace.graphics2d.macintosh"
-#define OPENGL_2D_DRIVER	"crystalspace.graphics2d.glmac"
-#define GLIDE_2D_DRIVER		"crystalspace.graphics3d.glide.2x"
-#define RAVE_2D_DRIVER		"crystalspace.graphics3d.rave"
+#define CS_SOFTWARE_2D_DRIVER	"crystalspace.graphics2d.macintosh"
+#define CS_OPENGL_2D_DRIVER	"crystalspace.graphics2d.glmac"
 
 // Sound driver
-#define SOUND_DRIVER            "crystalspace.sound.driver.macintosh"
+#define CS_SOUND_DRIVER            "crystalspace.sound.driver.macintosh"
 
-#if defined (SYSDEF_DIR)
+#if defined (CS_SYSDEF_PROVIDE_DIR)
 #  define __NEED_GENERIC_ISDIR
 #endif
 
 // WHM CW6 fix
-#if defined (SYSDEF_GETCWD) || defined (SYSDEF_UNLINK)
+#if defined (CS_SYSDEF_PROVIDE_GETCWD) || defined (CS_SYSDEF_PROVIDE_UNLINK)
 #if __MWERKS__>=0x2400
 #include <unistd.h>
 #endif
 #endif
 
-#if defined (SYSDEF_SELECT)
+#if defined (CS_SYSDEF_PROVIDE_SELECT)
 typedef unsigned long fd_set;
-#undef SYSDEF_SELECT
+#undef CS_SYSDEF_PROVIDE_SELECT
 #endif
 
 #if defined (PROC_M68K) || defined (PROC_POWERPC)

@@ -65,18 +65,18 @@
 #endif
 
 // The 2D graphics driver used by software renderer on this platform
-#define SOFTWARE_2D_DRIVER "crystalspace.graphics2d.directdraw"
-#define OPENGL_2D_DRIVER "crystalspace.graphics2d.glwin32"
-#define GLIDE_2D_DRIVER	"crystalspace.graphics2d.glidewin"
+#define CS_SOFTWARE_2D_DRIVER "crystalspace.graphics2d.directdraw"
+#define CS_OPENGL_2D_DRIVER "crystalspace.graphics2d.glwin32"
+#define CS_GLIDE_2D_DRIVER	"crystalspace.graphics2d.glidewin"
 
 // The sound driver
-#define SOUND_DRIVER "crystalspace.sound.driver.waveout"
+#define CS_SOUND_DRIVER "crystalspace.sound.driver.waveout"
 
 // SCF symbol export facility.
 #undef SCF_EXPORT_FUNCTION
 #define SCF_EXPORT_FUNCTION extern "C" __declspec(dllexport)
 
-#if defined (SYSDEF_DIR) || defined (SYSDEF_GETCWD) || defined (SYSDEF_MKDIR)
+#if defined (CS_SYSDEF_PROVIDE_DIR) || defined (CS_SYSDEF_PROVIDE_GETCWD) || defined (CS_SYSDEF_PROVIDE_MKDIR)
 #  include <direct.h>
 #  if defined(COMP_BC) || defined(COMP_GCC)
 #    ifdef __CYGWIN32__
@@ -98,7 +98,7 @@
 #endif
 
 // Maximal path length
-#ifdef SYSDEF_PATH
+#ifdef CS_SYSDEF_PROVIDE_PATH
 #  ifndef MAXPATHLEN
 #    ifdef _MAX_FNAME
 #      define MAXPATHLEN _MAX_FNAME
@@ -110,7 +110,7 @@
 
 // COMP_GCC has generic opendir(), readdir(), closedir()
 
-#if defined(SYSDEF_DIR) || defined(SYSDEF_PATH)
+#if defined(CS_SYSDEF_PROVIDE_DIR) || defined(CS_SYSDEF_PROVIDE_PATH)
 // Directory read functions
 # if !defined(COMP_GCC)	  
 #  if !defined(COMP_BC)
@@ -145,7 +145,7 @@
 # endif
 #endif
 
-#ifdef SYSDEF_PATH
+#ifdef CS_SYSDEF_PROVIDE_PATH
 #  if defined(COMP_BC) || defined(COMP_GCC)
 #    define __NEED_GENERIC_ISDIR
 #  else
@@ -158,7 +158,7 @@
 #  endif
 #endif
 
-#ifdef SYSDEF_SOCKETS
+#ifdef CS_SYSDEF_PROVIDE_SOCKETS
    typedef int socklen_t;
    typedef SOCKET csNetworkSocket;
 #  define CS_NET_SOCKET_INVALID INVALID_SOCKET
@@ -166,14 +166,14 @@
 #  define CS_CLOSESOCKET closesocket
 #  define EWOULDBLOCK WSAEWOULDBLOCK
 #  define CS_GETSOCKETERROR ::WSAGetLastError()
-#  undef SYSDEF_SOCKETS
+#  undef CS_SYSDEF_PROVIDE_SOCKETS
 #endif
 
-#ifdef SYSDEF_SELECT
-#  undef SYSDEF_SELECT
+#ifdef CS_SYSDEF_PROVIDE_SELECT
+#  undef CS_SYSDEF_PROVIDE_SELECT
 #endif
 
-#ifdef SYSDEF_ACCESS
+#ifdef CS_SYSDEF_PROVIDE_ACCESS
 #  include <io.h>
 #endif
 
@@ -183,7 +183,7 @@
 #  define GETPID() _getpid()
 #endif
 
-#ifdef SYSDEF_TEMP
+#ifdef CS_SYSDEF_PROVIDE_TEMP
 #  include <process.h>
 #  define TEMP_FILE "%x.cs", GETPID()
 #  define TEMP_DIR win32_tempdir()
@@ -197,7 +197,7 @@
        return tmp;
      return "";
    }
-#endif // SYSDEF_TEMP
+#endif // CS_SYSDEF_PROVIDE_TEMP
 
 // The Microsoft Visual C compiler miserably crashes on boxclip.inc
 // because of memcpy(). This is a replacement for memcpy() which is

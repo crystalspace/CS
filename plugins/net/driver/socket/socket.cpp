@@ -17,7 +17,7 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#define SYSDEF_SOCKETS
+#define CS_SYSDEF_PROVIDE_SOCKETS
 #include "cssysdef.h"
 #include "socket.h"
 #include "isys/system.h"

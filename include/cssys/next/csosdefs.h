@@ -71,11 +71,11 @@
 //-----------------------------------------------------------------------------
 // The 2D graphics driver used by the software renderer on this platform.
 //-----------------------------------------------------------------------------
-#undef  SOFTWARE_2D_DRIVER
-#define SOFTWARE_2D_DRIVER "crystalspace.graphics2d.next"
+#undef  CS_SOFTWARE_2D_DRIVER
+#define CS_SOFTWARE_2D_DRIVER "crystalspace.graphics2d.next"
 
-#undef  OPENGL_2D_DRIVER
-#define OPENGL_2D_DRIVER   "crystalspace.graphics2d.glnext"
+#undef  CS_OPENGL_2D_DRIVER
+#define CS_OPENGL_2D_DRIVER   "crystalspace.graphics2d.glnext"
 
 //-----------------------------------------------------------------------------
 // NeXT does not supply strdup() so fake one up.
@@ -103,22 +103,22 @@ static inline char* strdup(char const* s)
 // several Crystal Space classes which have methods named Free(), so we must
 // #undef it.
 //-----------------------------------------------------------------------------
-#if defined(SYSDEF_GETCWD)  || \
-    defined(SYSDEF_SOCKETS) || \
-    defined(SYSDEF_SELECT)  || \
-    defined(SYSDEF_ACCESS)
+#if defined(CS_SYSDEF_PROVIDE_GETCWD)  || \
+    defined(CS_SYSDEF_PROVIDE_SOCKETS) || \
+    defined(CS_SYSDEF_PROVIDE_SELECT)  || \
+    defined(CS_SYSDEF_PROVIDE_ACCESS)
 #include <libc.h>
 #undef Free
 #endif
 
-#if defined(SYSDEF_SOCKETS)
+#if defined(CS_SYSDEF_PROVIDE_SOCKETS)
 #define CS_USE_FAKE_SOCKLEN_TYPE
 #endif
 
-#if defined(SYSDEF_SELECT)
+#if defined(CS_SYSDEF_PROVIDE_SELECT)
 #include <string.h> // For memset()
 #define bzero(b,len) memset(b,0,len) /* bzero used by FD_ZERO */
-#undef SYSDEF_SELECT
+#undef CS_SYSDEF_PROVIDE_SELECT
 #endif
 
 
@@ -129,8 +129,8 @@ static inline char* strdup(char const* s)
     defined(OS_NEXT_OPENSTEP) || \
     defined(OS_NEXT_MACOSXS)
 
-#if defined(SYSDEF_GETCWD)
-#undef SYSDEF_GETCWD
+#if defined(CS_SYSDEF_PROVIDE_GETCWD)
+#undef CS_SYSDEF_PROVIDE_GETCWD
 
 #include <sys/param.h>
 
@@ -147,14 +147,14 @@ static inline char* getcwd(char* p, size_t size)
   return r;
 }
 
-#endif // SYSDEF_GETCWD
+#endif // CS_SYSDEF_PROVIDE_GETCWD
 #endif // OS_NEXT_NEXTSTEP || OS_NEXT_OPENSTEP || OS_NEXT_MACOSXS
 
 
 //-----------------------------------------------------------------------------
 // NeXT does not properly support Posix 'dirent', so fake it with 'direct'.
 //-----------------------------------------------------------------------------
-#ifdef SYSDEF_DIR
+#ifdef CS_SYSDEF_PROVIDE_DIR
 
 #ifdef _POSIX_SOURCE
 #  undef _POSIX_SOURCE
@@ -167,17 +167,17 @@ static inline char* getcwd(char* p, size_t size)
 #define dirent direct
 
 #define __NEED_GENERIC_ISDIR
-#endif // SYSDEF_DIR
+#endif // CS_SYSDEF_PROVIDE_DIR
 
 
 //-----------------------------------------------------------------------------
 // NeXT uses built-in alloca().
 //-----------------------------------------------------------------------------
-#ifdef SYSDEF_ALLOCA
-#undef SYSDEF_ALLOCA
+#ifdef CS_SYSDEF_PROVIDE_ALLOCA
+#undef CS_SYSDEF_PROVIDE_ALLOCA
 #define	alloca(x) __builtin_alloca(x)
 #define ALLOC_STACK_ARRAY(var,type,size) type var[size]
-#endif // SYSDEF_ALLOCA
+#endif // CS_SYSDEF_PROVIDE_ALLOCA
 
 
 //-----------------------------------------------------------------------------

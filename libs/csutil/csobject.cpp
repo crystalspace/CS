@@ -25,7 +25,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-DECLARE_TYPED_VECTOR_NODELETE (csObjectContainer, iObject);
+CS_DECLARE_TYPED_VECTOR_NODELETE (csObjectContainer, iObject);
 
 /*** Object Iterators ***/
 

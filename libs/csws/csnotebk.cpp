@@ -17,8 +17,8 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#define SYSDEF_ALLOCA
-#define SYSDEF_CASE
+#define CS_SYSDEF_PROVIDE_ALLOCA
+#define CS_SYSDEF_PROVIDE_CASE
 #include "cssysdef.h"
 #include "csws/csapp.h"
 #include "csws/csnotebk.h"

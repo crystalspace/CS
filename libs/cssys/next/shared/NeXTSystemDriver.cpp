@@ -18,7 +18,7 @@
 //	the platform-specific portion of the system driver.
 //
 //-----------------------------------------------------------------------------
-#define SYSDEF_PATH
+#define CS_SYSDEF_PROVIDE_PATH
 #include "cssysdef.h"
 #include "cssys/next/NeXTSystemDriver.h"
 #include "cssys/csshlib.h"

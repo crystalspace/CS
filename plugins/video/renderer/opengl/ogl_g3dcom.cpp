@@ -209,7 +209,7 @@ bool csGraphics3DOGLCommon::NewInitialize ()
 
   const char *driver = System->GetOptionCL ("canvas");
   if (!driver)
-    driver = config->GetStr ("Video.OpenGL.Canvas", OPENGL_2D_DRIVER);
+    driver = config->GetStr ("Video.OpenGL.Canvas", CS_OPENGL_2D_DRIVER);
 
   G2D = CS_LOAD_PLUGIN (System, driver, NULL, iGraphics2D);
   if (!G2D)

@@ -64,7 +64,7 @@ CS_IMPLEMENT_PLUGIN
 #define GLIDE_DESC "Glide v3 3D graphics driver for Crystal Space"
 #define GR_WDEPTHVALUE_NEAREST m_wminmax[0]
 #define GR_WDEPTHVALUE_FARTHEST m_wminmax[1]
-#define GLIDE_2D GLIDE_2D_DRIVER_V3
+#define GLIDE_2D CS_GLIDE_2D_DRIVER_V3
 
 #else
 
@@ -72,7 +72,7 @@ CS_IMPLEMENT_PLUGIN
 #define GLIDE_CLASSID "crystalspace.graphics3d.glide.2"
 #define GLIDE_DESC "Glide v2 3D graphics driver for Crystal Space"
 #define GR_FOG_WITH_TABLE_ON_Q GR_FOG_WITH_TABLE
-#define GLIDE_2D GLIDE_2D_DRIVER
+#define GLIDE_2D CS_GLIDE_2D_DRIVER
 
 #endif
 

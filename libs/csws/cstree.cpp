@@ -18,7 +18,7 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#define SYSDEF_CASE
+#define CS_SYSDEF_PROVIDE_CASE
 #include "cssysdef.h"
 #include "csws/cstree.h"
 #include "csws/cstimer.h"

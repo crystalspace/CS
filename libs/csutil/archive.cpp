@@ -20,11 +20,11 @@
 #include <string.h>
 #include <sys/types.h>
 #include <sys/stat.h>
-#define SYSDEF_DIR
-#define SYSDEF_PATH
-#define SYSDEF_TEMP
-#define SYSDEF_UNLINK
-#define SYSDEF_ACCESS
+#define CS_SYSDEF_PROVIDE_DIR
+#define CS_SYSDEF_PROVIDE_PATH
+#define CS_SYSDEF_PROVIDE_TEMP
+#define CS_SYSDEF_PROVIDE_UNLINK
+#define CS_SYSDEF_PROVIDE_ACCESS
 #include "cssysdef.h"
 #include "cssys/csendian.h"
 #include "csutil/util.h"

@@ -289,7 +289,7 @@ public:
   /// Debugging level (0 = no debug, 1 = normal debug, 2 = verbose debug)
   int debug_level;
   /// List of all options for all plug-in modules.
-  DECLARE_TYPED_VECTOR (csOptionVector, csPluginOption) OptionList;
+  CS_DECLARE_TYPED_VECTOR (csOptionVector, csPluginOption) OptionList;
   /// The collection of all options specified on command line
   csCommandLineOptions CommandLine;
   /// The list of raw filenames on the command line (i.e. without any switches)

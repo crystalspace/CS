@@ -38,7 +38,7 @@ CS_IMPLEMENT_PLUGIN
 SCF_IMPLEMENT_FACTORY(csSoundDriverMac);
 
 SCF_EXPORT_CLASS_TABLE (snddrv)
-	SCF_EXPORT_CLASS (csSoundDriverMac, SOUND_DRIVER,
+	SCF_EXPORT_CLASS (csSoundDriverMac, CS_SOUND_DRIVER,
 		"Crystal Space Sound driver for Macintosh")
 SCF_EXPORT_CLASS_TABLE_END
 

@@ -119,7 +119,7 @@ private:
   iSystem *System;
 
   // A list of csDefaultFont pointers.
-  DECLARE_TYPED_VECTOR (csFontList, csDefaultFont) fonts;
+  CS_DECLARE_TYPED_VECTOR (csFontList, csDefaultFont) fonts;
 
   /// read a font file from vfs
   csDefaultFont *ReadFontFile(const char *file);

@@ -307,7 +307,7 @@ class csGridBagLayout : public csLayout2
     int x, y;
   };
 
-  DECLARE_TYPED_VECTOR(CellHolderArrayT, CellHolder);
+  CS_DECLARE_TYPED_VECTOR(CellHolderArrayT, CellHolder);
 
  public:
   csGridBagLayout (csComponent *pParent);

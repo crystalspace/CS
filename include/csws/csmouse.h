@@ -78,7 +78,7 @@ private:
   /// The application object
   csApp *app;
   /// The array of pointers
-  DECLARE_TYPED_VECTOR (csPointerArray, csMousePointer) Pointers;
+  CS_DECLARE_TYPED_VECTOR (csPointerArray, csMousePointer) Pointers;
   /// Current active mouse cursor (system cursor if NULL)
   csMousePointer *ActiveCursor;
   /// Cursor texture

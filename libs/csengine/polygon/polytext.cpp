@@ -17,7 +17,7 @@
 */
 
 #include <math.h>
-#define SYSDEF_ALLOCA
+#define CS_SYSDEF_PROVIDE_ALLOCA
 #include "cssysdef.h"
 #include "qint.h"
 #include "qsqrt.h"
@@ -104,7 +104,7 @@ class csDelayedLightingInfo : public csFrustumViewCleanup
   };
 
   // The list of lightviewinfo structures
-  DECLARE_TYPED_VECTOR (LightViewVector, LightViewInfo) lvlist;
+  CS_DECLARE_TYPED_VECTOR (LightViewVector, LightViewInfo) lvlist;
 
   // The polygon texture we are filling
   csPolyTexture *polytex;

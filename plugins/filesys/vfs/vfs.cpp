@@ -21,11 +21,11 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 
-#define SYSDEF_PATH
-#define SYSDEF_DIR
-#define SYSDEF_ACCESS
-#define SYSDEF_MKDIR
-#define SYSDEF_UNLINK
+#define CS_SYSDEF_PROVIDE_PATH
+#define CS_SYSDEF_PROVIDE_DIR
+#define CS_SYSDEF_PROVIDE_ACCESS
+#define CS_SYSDEF_PROVIDE_MKDIR
+#define CS_SYSDEF_PROVIDE_UNLINK
 #include "cssysdef.h"
 #include "vfs.h"
 #include "csutil/archive.h"

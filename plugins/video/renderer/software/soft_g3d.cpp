@@ -18,7 +18,7 @@
 
 #include <stdarg.h>
 
-#define SYSDEF_SOFTWARE2D
+#define CS_SYSDEF_PROVIDE_SOFTWARE2D
 #include "cssysdef.h"
 #include "soft_g3d.h"
 #include "protex3d.h"
@@ -70,7 +70,7 @@ bool csGraphics3DSoftware::Initialize (iSystem *iSys)
   NewInitialize ();
   const char *driver = iSys->GetOptionCL ("canvas");
   if (!driver)
-    driver = config->GetStr ("Video.Software.Canvas", SOFTWARE_2D_DRIVER);
+    driver = config->GetStr ("Video.Software.Canvas", CS_SOFTWARE_2D_DRIVER);
   G2D = CS_LOAD_PLUGIN (System, driver, NULL, iGraphics2D);
   return G2D ? true : false;
 }

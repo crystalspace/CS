@@ -19,7 +19,7 @@
 
 #include <math.h>
 
-#define SYSDEF_ALLOCA
+#define CS_SYSDEF_PROVIDE_ALLOCA
 #include "cssysdef.h"
 #include "qint.h"
 #include "csgeom/vector2.h"

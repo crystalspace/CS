@@ -118,8 +118,8 @@ class csMetaGen : public iMeshObjectFactory
   TexelArray *tex;
   int current_texels;
 
-  DECLARE_TYPED_VECTOR(MetaBoneVector,MetaBone) bones;
-  DECLARE_TYPED_VECTOR(MetaFieldVector, MetaField) fields;
+  CS_DECLARE_TYPED_VECTOR(MetaBoneVector,MetaBone) bones;
+  CS_DECLARE_TYPED_VECTOR(MetaFieldVector, MetaField) fields;
 
   bool cache_ready;
   bool asin_table_ready;

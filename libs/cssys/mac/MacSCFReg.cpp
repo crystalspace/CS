@@ -34,7 +34,7 @@
 #include <Windows.h>
 #include <stdio.h>
 #include <SIOUX.h>
-#define SYSDEF_PATH
+#define CS_SYSDEF_PROVIDE_PATH
 #include "cssysdef.h"
 #include "cssys/csshlib.h"
 #include "csutil/scf.h"

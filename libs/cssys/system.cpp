@@ -20,8 +20,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#define SYSDEF_ALLOCA
-#define SYSDEF_PATH
+#define CS_SYSDEF_PROVIDE_ALLOCA
+#define CS_SYSDEF_PROVIDE_PATH
 #include "cssysdef.h"
 #include "cssys/system.h"
 #include "cssys/sysdriv.h"

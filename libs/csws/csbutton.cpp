@@ -19,7 +19,7 @@
 
 #include <string.h>
 
-#define SYSDEF_CASE
+#define CS_SYSDEF_PROVIDE_CASE
 #include "cssysdef.h"
 #include "csws/cscomp.h"
 #include "csws/csapp.h"

@@ -18,7 +18,7 @@
 
 #include <stdarg.h>
 
-#define SYSDEF_SOFTWARE2D
+#define CS_SYSDEF_PROVIDE_SOFTWARE2D
 #include "cssysdef.h"
 #include "qint.h"
 #include "null_g3d.h"
@@ -84,7 +84,7 @@ bool csGraphics3DNull::Initialize (iSystem *iSys)
 
   const char *driver = iSys->GetOptionCL ("canvas");
   if (!driver)
-    driver = config->GetStr ("Video.Null.Canvas", SOFTWARE_2D_DRIVER);
+    driver = config->GetStr ("Video.Null.Canvas", CS_SOFTWARE_2D_DRIVER);
 
   G2D = CS_LOAD_PLUGIN (System, driver, NULL, iGraphics2D);
   if (!G2D)

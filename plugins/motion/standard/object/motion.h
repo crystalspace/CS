@@ -66,7 +66,7 @@ struct csFrameSet
   csMotionFrame *frames;
 };
 
-DECLARE_TYPED_VECTOR( csAppliedFrameVector, csAppliedFrame );
+CS_DECLARE_TYPED_VECTOR( csAppliedFrameVector, csAppliedFrame );
 
 class csMotion : public iMotion
 {
@@ -83,7 +83,7 @@ public:
   csVector3* translate;
   int numtranslate;
 
-  DECLARE_TYPED_VECTOR( csFrameSetVector, csFrameSet ) framesets;
+  CS_DECLARE_TYPED_VECTOR( csFrameSetVector, csFrameSet ) framesets;
 
   SCF_DECLARE_IBASE;
 
@@ -102,7 +102,7 @@ public:
   unsigned int GetHash() { return hash; }
 };
 
-DECLARE_TYPED_VECTOR(csMotionVectorBase, csMotion);
+CS_DECLARE_TYPED_VECTOR(csMotionVectorBase, csMotion);
 
 class csMotionVector : public csMotionVectorBase
 {
@@ -133,7 +133,7 @@ struct csAppliedMotion
   csAppliedFrameVector frames;
 };
 
-DECLARE_TYPED_VECTOR_NODELETE(csAppliedMotionVector,csAppliedMotion); 
+CS_DECLARE_TYPED_VECTOR_NODELETE(csAppliedMotionVector,csAppliedMotion); 
 
 class csMotionManager : public iMotionManager
 {

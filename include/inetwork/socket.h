@@ -23,7 +23,7 @@
 #include "inetwork/driver.h"
 
 //-----------------------------------------------------------------------------
-// Files including this file must also #define SYSDEF_SOCKETS before
+// Files including this file must also #define CS_SYSDEF_PROVIDE_SOCKETS before
 // including cssysdef.h
 //-----------------------------------------------------------------------------
 

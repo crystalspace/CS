@@ -19,8 +19,8 @@
 
 #include <stdarg.h>
 
-#define SYSDEF_PATH
-#define SYSDEF_DIR
+#define CS_SYSDEF_PROVIDE_PATH
+#define CS_SYSDEF_PROVIDE_DIR
 #include "cssysdef.h"
 #include "csws/cswsutil.h"
 #include "csws/csstddlg.h"

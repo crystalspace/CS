@@ -67,7 +67,7 @@ CS_IMPLEMENT_PLUGIN
 SCF_IMPLEMENT_FACTORY (csGraphics2DMac)
 
 SCF_EXPORT_CLASS_TABLE (Driver2D)
-    SCF_EXPORT_CLASS_DEP (csGraphics2DMac, SOFTWARE_2D_DRIVER,
+    SCF_EXPORT_CLASS_DEP (csGraphics2DMac, CS_SOFTWARE_2D_DRIVER,
         "Crystal Space 2D driver for Macintosh", "crystalspace.font.server.")
 SCF_EXPORT_CLASS_TABLE_END
 

@@ -77,8 +77,8 @@ bool csSoundRenderSoftware::Initialize (iSystem *iSys)
   Config.AddConfig(System, "/config/sound.cfg");
 
   // load the sound driver plug-in
-#ifdef SOUND_DRIVER
-  char *drv = SOUND_DRIVER;   // "crystalspace.sound.driver.xxx"
+#ifdef CS_SOUND_DRIVER
+  char *drv = CS_SOUND_DRIVER;   // "crystalspace.sound.driver.xxx"
 #else
   char *drv = "crystalspace.sound.driver.null";
 #endif

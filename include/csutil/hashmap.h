@@ -42,9 +42,9 @@ struct csHashElement
 };
 
 /// a vector of csHashElements
-DECLARE_TYPED_VECTOR (csHashBucket, csHashElement);
+CS_DECLARE_TYPED_VECTOR (csHashBucket, csHashElement);
 /// a vector of csHashBuckets
-DECLARE_TYPED_VECTOR (csHashBucketVector, csHashBucket);
+CS_DECLARE_TYPED_VECTOR (csHashBucketVector, csHashBucket);
 
 /**
  * An iterator to iterate over elements in the hashmap.
