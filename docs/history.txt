@@ -2366,7 +2366,7 @@ chronological order.
 	  SCF_IMPLEMENT_EMBEDDED_IBASE_END.
 	- Jorrit fixed a stupid bug he introduced with his more recent
 	  changes.
-	- Eric Sunshined moved getopt.h include to bottom of css.h since it
+	- Eric Sunshine moved getopt.h include to bottom of css.h since it
 	  aliases getopt to __getopt on some platforms, which causes problems
 	  for other includes (for instance, on MacOS/X, it is reported that it
 	  was breaking <unistd.h> in some fashion).
@@ -5691,7 +5691,7 @@ chronological order.
 	- Jorrit updated authors a bit (added Troy Chard and enhanced entry
 	  of Boyan slightly).
 	- Jorrit fixed a crash bug in walktest mouse selection code.
-	- Eric Sunshined fixed bug in Matze's recent changes to the Jam build
+	- Eric Sunshine fixed bug in Matze's recent changes to the Jam build
 	  facility which caused installation of console applications to fail on
 	  MacOS/X.  (It attempted to install them as fully wrapped GUI
 	  applications.)
