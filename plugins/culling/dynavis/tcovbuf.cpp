@@ -50,7 +50,7 @@ void csCoverageTile::MakePrecalcTables ()
     for (j = 0 ; j <= i ; j++)
       precalc_start_lines[i].XorBit (j);
     precalc_end_lines[i].Empty ();
-    for (j = i ; j <= 63 ; j++)
+    for (j = i ; j < 64 ; j++)
       precalc_end_lines[i].XorBit (j);
   }
 }
@@ -143,9 +143,9 @@ void csCoverageTile::FlushOperations ()
     {
       CS_ASSERT (op.x1 >= 0 && op.x1 <= (32<<16));
       CS_ASSERT (op.y1 >= 0);
-      CS_ASSERT (op.y1 <= 63);
+      CS_ASSERT (op.y1 < 64);
       CS_ASSERT (op.y2 >= 0);
-      CS_ASSERT (op.y2 <= 63);
+      CS_ASSERT (op.y2 < 64);
       int y1, y2;
       if (op.y1 < op.y2) { y1 = op.y1; y2 = op.y2; }
       else { y1 = op.y2; y2 = op.y1; }
@@ -162,9 +162,9 @@ void csCoverageTile::FlushOperations ()
       CS_ASSERT (op.x1 >= 0 && op.x1 <= (32<<16));
       CS_ASSERT (op.x2 >= 0 && op.x2 <= (32<<16));
       CS_ASSERT (op.y1 >= 0);
-      CS_ASSERT (op.y1 <= 63);
+      CS_ASSERT (op.y1 < 64);
       CS_ASSERT (op.y2 >= 0);
-      CS_ASSERT (op.y2 <= 63);
+      CS_ASSERT (op.y2 < 64);
       int x1, y1, x2, y2;
       if (op.y1 < op.y2) { x1 = op.x1; y1 = op.y1; x2 = op.x2; y2 = op.y2; }
       else { x1 = op.x2; y1 = op.y2; x2 = op.x1; y2 = op.y1; }
@@ -214,9 +214,9 @@ void csCoverageTile::Flush (csBits64& fvalue, float maxdepth)
         // We can ignore the x value of the line here. So VLINE and
 	// LINE are equivalent in this case.
 	CS_ASSERT (op.y1 >= 0);
-	CS_ASSERT (op.y1 <= 63);
+	CS_ASSERT (op.y1 < 64);
 	CS_ASSERT (op.y2 >= 0);
-	CS_ASSERT (op.y2 <= 63);
+	CS_ASSERT (op.y2 < 64);
 	int y1, y2;
 	if (op.y1 < op.y2) { y1 = op.y1; y2 = op.y2; }
 	else { y1 = op.y2; y2 = op.y1; }
@@ -246,13 +246,13 @@ void csCoverageTile::Flush (csBits64& fvalue, float maxdepth)
       tile_full = true;	// Assume full for now.
       csBits64* cc = coverage_cache;
       csBits64* c = coverage;
-#ifdef PROC_X86
+#if defined(PROC_X86)
       if (csTiledCoverageBuffer::use_mmx)
       {
 
         csBits64 allOnes; allOnes.Full ();
         // csBits64 temp;
-#ifdef COMP_VC
+  #if defined(COMP_VC)
         int i = (int) &this->tile_full;
         __asm
         {
@@ -311,7 +311,7 @@ fillCol:
           emms
         }
 
-#else if COMP_GCC
+  #elif defined(COMP_GCC)
         csBits64 *fvalueTemp = &fvalue;
         __asm__  (
           "pushl %%eax                 \n"
@@ -363,10 +363,12 @@ fillCol:
           : "g" (cc), "g" (c), "g" (fvalueTemp), "g" (tile_full), "g" (allOnes)
           : "eax", "ecx", "esi", "edi", "edx");
         //fvalue = fvalueTemp;
-#endif //COMP_
+  #else
+    #error Unsupported compiler. Please contact CS development team for details.
+  #endif // End of COMP_VC, COMP_GCC or ELSE.
       }
       else
-#endif //_x86_
+#endif // End of PROC_X86
       {
         for (i = 0 ; i < 32 ; i++)
         {
@@ -393,13 +395,13 @@ fillCol:
       csBits64* cc = coverage_cache;
       csBits64* c = coverage;      
 
-#ifdef PROC_X86
+#if defined(PROC_X86)
       if (csTiledCoverageBuffer::use_mmx)
       {
         
         csBits64 allOnes; allOnes.Full ();
         // csBits64 temp;
-    #ifdef COMP_VC
+  #if defined(COMP_VC)
         int i = (int) &this->tile_full;
         __asm
         {
@@ -460,7 +462,7 @@ fillCol2:
           emms
         }
 
-  #else if COMP_GCC
+  #elif defined(COMP_GCC)
         csBits64 *fvalueTemp = &fvalue;
         __asm__  (
           "pushl %%eax                 \n"
@@ -512,10 +514,12 @@ fillCol2:
           : "g" (cc), "g" (c), "g" (fvalueTemp), "g" (tile_full), "g" (allOnes)
           : "eax", "ecx", "esi", "edi", "edx");
           //fvalue = fvalueTemp;
-    #endif //COMP_
+  #else
+    #error Unsupported compiler. Please contact CS development team for details.
+  #endif // End of COMP_VC, COMP_GCC or ELSE.
       }
       else
-#endif //_x86_
+#endif // End of PROC_X86
       {  
         for (i = 0 ; i < 32 ; i++)
         {
@@ -937,10 +941,10 @@ csTiledCoverageBuffer::csTiledCoverageBuffer (int w, int h)
   bugplug = 0;
 
   Setup (w, h);
-#ifdef PROC_X86
+#if defined(PROC_X86)
   use_mmx = csProcessorCapability::HasMMX ();
   //printf ("use_mmx=%d\n", use_mmx); fflush (stdout);
-#endif
+#endif // End of PROC_X86
 }
 
 csTiledCoverageBuffer::~csTiledCoverageBuffer ()
@@ -1859,7 +1863,7 @@ static void DrawZoomedPixel (iGraphics2D* g2d, int x, int y, int col, int zoom)
     g2d->DrawPixel (x+2, y+2, col);
   }
 }
-#endif
+#endif // End of THIS_IS_UNUSED
 
 csPtr<iString> csTiledCoverageBuffer::Debug_Dump ()
 {
@@ -1989,4 +1993,3 @@ csTicks csTiledCoverageBuffer::Debug_Benchmark (int /*num_iterations*/)
   csTicks end = csGetTicks ();
   return end-start;
 }
-

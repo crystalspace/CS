@@ -6,6 +6,11 @@ The history order is reversed so that new features are at the top.
 21-Jun-2003
         - Philip Wyett updated win32.mak to reflect changes/additions in
           the general cssys library affecting MSVC port(s).
+        - Philip Wyett eliminated the warnings about the #ifdef's in
+          tcovbuf.cpp by adding an #else case with #error message for
+          un-supported x86 compilers.
+            - Also changed all foo <= 63 to foo < 64 to add some
+              consistency and make for easier reading of the file.
 20-Jun-2003
 	- Marten fixed an error in the inline assembly in tcovbuf.cpp 
 	  which prevented it from compiling on msvc6
