@@ -9,9 +9,15 @@ W - Wishlist (the build also works without this feature)
 
 [H] There are no rules for building the pure Perl5 module yet (only the Perl5
     plugin works).
+[H] msvcgen.jam: The overriding LinkWith rule should fully resolve the library
+    dependencies for a target, just as the overridden rule does.  For instance,
+    if "LibDepends D : A B C" has been invoked, then all generated project
+    files which depend upon D should also autoamtically depend upon A, B, and
+    C.
+[H] msvcgen.jam: Provide rules to copy the generated files back to the source
+    tree upon explicit request so that they can be committed to the CVS
+    respository if desired.
 
-[M] Upgrade jamtemplate/createproject.sh so that it can optionally set up
-    msvcgen support (6 and/or 7) for the newly created project.
 [M] Add a Jamfile for cscript/csjava.
 [M] Figure out how to create MSVC project files for the pure Python and pure
     Perl extension modules.
@@ -41,9 +47,6 @@ W - Wishlist (the build also works without this feature)
 [L] msvcgen.jam: When modules reference sources or headers outside of the local
     source directory via some number of ".."'s, these resources appear as
     "../../foo/bar/../../this/module" in the generated project file.
-[L] msvcgen.jam: Provide rules to copy the generated files back to the source
-    tree upon explicit request so that they can be committed to the CVS
-    respository if desired.
 [L] Eliminate the need for the documentation-building shell scripts; the ones
     which copy image files from docs/texinfo/* into the build directory.  Jam
     is sufficiently expressive that it should be able to handle the
@@ -81,6 +84,8 @@ W - Wishlist (the build also works without this feature)
     with a message telling that you should rerun configure, or at least emit a
     big warning?
 
+[*] Upgrade jamtemplate/createproject.sh so that it can optionally set up
+    msvcgen support (6 and/or 7) for the newly created project.
 [*] msvcgen.jam: Generalize so that external projects can take advantage of
     this facility.  For instance, stop assuming that "../.." is always suitable
     for reaching the root of the project tree from the location of the project
