@@ -392,6 +392,11 @@
             <t v1="2" v2="7" v3="6" />
             <autonormals />
         </params>
+	    <hardmove>
+                <matrix>
+                    <scale x=".3" y=".3" z=".3" />
+                </matrix>
+	    </hardmove>
     </meshfact>
     <meshfact name="paramsFileTest">
         <plugin>spr3dFact</plugin>
@@ -5762,7 +5767,7 @@
                 <material>mosaic</material>
             </params>
             <move>
-                <v x="-1.5" y="0.3" z="14" />
+                <v x="-1.5" y="-.7" z="14" />
             </move>
         </meshobj>
         <meshobj name="sprSkel">
