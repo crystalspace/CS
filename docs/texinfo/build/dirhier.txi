@@ -5,7 +5,8 @@
 @cindex Hierarchy, Directory
 
 @noindent
-@emph{Written by Thomas Hieber, @email{thieber@@gmx.net}.}
+@emph{Written by Thomas Hieber, @email{thieber@@gmx.net}. Updated by Chris
+Forno, @email{jcore@@arbornet.org}, on 2002-06-21.}
 
 This section is intended to explain the general CS directory structure. It
 lists all the directories, however some may be missing from your copy of 
@@ -146,7 +147,7 @@ BeOS
 @item CS/libs/cssys/djgpp
 @sc{dos} using the @sc{djgpp} compiler
 @item CS/libs/cssys/next
-MacOS/X, MacOS/X Server 1.0 (Rhapsody), OpenStep, NextStep
+MacOS/X, MacOS/X Server 1.0 (Rhapsody), NeXTSTEP, OPENSTEP
 @item CS/libs/cssys/os2
 @sc{os/2}
 @item CS/libs/cssys/unix
@@ -193,159 +194,309 @@ Alternate Windowing System
 @item CS/plugins/bugplug
 Crystal Space Debugger
 
-@item CS/plugins/csparser
-A plugin which parses @sc{ascii} map files and imports the map into the
-3D engine.
-
-@item CS/plugins/video/canvas
-The 2D driver component which manages creation of the Crystal Space window
-used for rendering and also supports limited 2D drawing capabilities
-(including 2D pixmaps).  It can be used standalone but it is currently very
-limited and not very useful (this may change in the future).  There are several
-implementations of this component.  All are specific to some 3D Rasterizer
-(for example, the OpenGL 3D Rasterizer on Unix requires the OpenGL 2D XLib
-Driver).
-
-@table @code
-@item CS/plugins/video/canvas/common
-Common code for 2D drivers
-@item CS/plugins/video/canvas/be
-BeOS version
-@item CS/plugins/video/canvas/csdive
-@sc{os}/2 version
-@item CS/plugins/video/canvas/ddraw
-Win32 using Direct Draw
-@item CS/plugins/video/canvas/ddraw61
-Win32 using Direct Draw (DirectX 6.1)
-@item CS/plugins/video/canvas/dosraw
-@sc{dos}
-@item CS/plugins/video/canvas/ggi
-Unix, using @sc{ggi}
-@item CS/plugins/video/canvas/softx
-Unix, using X
-@item CS/plugins/video/canvas/svgalib
-Unix, using @sc{svga}lib
-@item CS/plugins/video/canvas/next
-MacOS/X, MacOS/X Server, OpenStep, NextStep
-@item CS/plugins/video/canvas/openglcommon
-Common code for all OpenGL 2D drivers
-@item CS/plugins/video/canvas/openglbe
-OpenGL 2D driver for BeOS
-@item CS/plugins/video/canvas/openglos2
-OpenGL 2D driver for @sc{os}/2
-@item CS/plugins/video/canvas/openglwin
-OpenGL 2D driver for Win32
-@item CS/plugins/video/canvas/openglx
-OpenGL 2D driver for Unix/X Windows
-@end table
-
-@item CS/plugins/video/renderer
-The 3D rasterizer component is required by the 3D engine but may also be
-used in a standalone environment.  It requires a 2D Driver to function.  
-There are currently several classes of this component which correspond 
-to particular @sc{api}s: software, OpenGL, and Direct3D.  Some rasterizers 
-are operating system independent, such as OpenGL and software.  Some 
-rasterizer technology is only available on certain operating systems, 
-such as DirectX.
-
-@table @code
-@item CS/plugins/video/renderer/common
-Common code for 3D rasterizers
-@item CS/plugins/video/renderer/direct3d61
-Direct3D rasterizer using DirectX 6.1
-@item CS/plugins/video/renderer/opengl
-3D rasterizer using OpenGL
-@item CS/plugins/video/renderer/software
-Software based rasterizer
-@item CS/plugins/video/renderer/line
-A vector based rasterizer (draws only lines)
-@item CS/plugins/video/renderer/inf
-The @emph{infinite} rasterizer (draws nothing at all)
-@item CS/plugins/video/renderer/null
-The @emph{null} rasterizer (required to work with 2D graphics only)
-@end table
-
-@item CS/plugins/video/format
-Support for playing video files on a texture.
-@end table
-
-@item CS/plugins/net/driver
-Network drivers.  The only existing driver is a @sc{bsd} socket-based
-@sc{tcp/ip} driver.
-
-@item CS/plugins/cscript/cspython
-@sc{Python} scripting module.
-
-@item CS/plugins/sequence
-This is the sequence manager which is useful for managing timed sequences
-of events such as for demos.
-
-@item CS/plugins/bugplug
-@sc{BugPlug} is a small plugin that gives debugging facilities to any
-Crystal Space application. Just load the plugin and it works.
-
 @item CS/plugins/collide/rapid
 This is the @sc{rapid} collision detection plugin. In the future we may
 have other collision detection plugins in the @file{CS/plugins/collide}
 directory.
 
+@item CS/plugins/console
+Various console plugins for input/output. A console is typically overlayed
+on top of the 3D display.
+
+@item CS/plugins/cscript
+The Crystal Script plugins. Crystal Script plugins allow programmers to
+interact with the Crystal Space engine in a scripting language.
+
+@table @code
+@item CS/plugins/cscript/cslua
+Lua @sc{swig} interface
+
+@item CS/plugins/cscript/cspython
+Python @sc{swig} interface
+@end table
+
+@item CS/plugins/cslexan
+A lexical analyzer which can be used to break text into tokens.
+
+@item CS/plugins/csparser
+A plugin which parses @sc{ascii} map files and imports the map into the
+3D engine.
+
+@table @code
+@item CS/plugins/csparser/services
+Crystal Space format loader services (for @sc{cs} World loading).
+@end table
+
+@item CS/plugins/culling
+visibility culling plug-ins
+
+@table @code
+@item CS/plugins/culling/dynavis
+Dynavis visibility culling system
+@end table
+
+@item CS/plugins/device
+hardware device plugins
+
+@table @code
+@item CS/plugins/device/joystick
+joystick input support (currently only for Linux)
+@end table
+
+@item CS/plugins/engine
+The engine plugin: the preferred method of interfacing with the Crystal Space
+engine.
+
+@table @code
 @item CS/plugins/engine/3d
-If you want to use the engine as a plugin then this directory contains
-the needed support. Using the engine as a plugin is the perferred method. 
+The main 3D engine
 
 @item CS/plugins/engine/iso
 This is an alternative engine used in Crystal Space. It gives an isometric view
 instead of a real 3D view. Mesh objects can also work with this engine
 with a few limitations (mostly regarding size).
+@end table
+
+@item CS/plugins/filesys
+filesystem-related plugins
+
+@table @code
+@item CS/plugins/filesys/vfs
+the Virtual Filesystem Plugin, or @sc{vfs} (@xref{VFS})
+@end table
+
+@item CS/plugins/font
+a collection of font servers
+
+@table @code
+@item CS/plugins/font/server/csfont
+standard (bitmapped) Crystal Space font server
+@item CS/plugins/font/server/freefont
+FreeType (version 2) font server
+@item CS/plugins/font/server/fontplex
+font server multiplexer
+@end table
+
+@item CS/plugins/isoldr
+the old isometric world loader plug-in
+
+@item CS/plugins/mesh
+Various mesh object implementations (@xref{MeshObject}). For every mesh object
+there is typically one implementation in @file{object/} and one or more
+loader/saver plugins in @file{persist/}. @file{persist/classic/} is the loader
+in Crystal Space format.
+
+@item CS/plugins/motion
+Skeletal Motion
+
+@item CS/plugins/net
+Network Communications
+
+@table @code
+@item CS/plugins/net/driver/ensocket
+Ensocket Network Driver
+
+@item CS/plugins/net/driver/socket
+@sc{bsd} Sockets Network Driver
+@end table
+
+@item CS/plugins/perfstat
+Performance Statistics
+
+@item CS/plugins/physics
+Plug-ins relating to the physics of motion
+
+@table @code
+@item CS/plugins/physics/odedynam
+@sc{ode} Dynamics
+@end table
+
+@item CS/plugins/reporter
+Reporter
+
+@item CS/plugins/sequence
+This is the sequence manager which is useful for managing timed sequences
+of events such as for demos.
+
+@item CS/plugins/sound
+Sound Plugins
 
 @table @code
 @item CS/plugins/sound/driver
-System dependent sound drivers.  There are currently drivers for Macintosh,
-@sc{oss} (Unix), and Windows.
+System-dependent sound drivers.
 
 @table @code
+@item CS/plugins/sound/driver/coreaudio
+CoreAudio Sound Driver (MacOS/X)
 @item CS/plugins/sound/driver/oss
-Sound driver for Unix
+Open Sound System (@sc{oss}) Sound Driver (@sc{unix})
 @item CS/plugins/sound/driver/waveoutsd
-Sound driver for Win32
+WaveOut Sound Driver (win32)
 @end table
 
 @item CS/plugins/sound/loader
 Loaders for various sound file formats.
+
 @item CS/plugins/sound/renderer
-Support for 3D sound (@sc{ds3d} or @sc{software} only at the moment).
-@end table
 
 @table @code
-@item CS/plugins/console
-Various console plugins for input/output. A console is typically overlayed
-on top of the 3D display.
+@item CS/plugins/sound/renderer/arts
+aRts Sound Renderer
+
+@item CS/plugins/sound/renderer/common
+common sound rendering routines
+
+@item CS/plugins/sound/renderer/ds3d
+DirectSound 3D Sound Renderer
+
+@item CS/plugins/sound/renderer/eax
+@sc{eax} Sound Renderer
+
+@item CS/plugins/sound/renderer/software
+Software Sound Renderer
 @end table
+
+@end table
+
+@item CS/plugins/stdrep
+Standard Report Listener
+
+@item CS/plugins/video
+All plugins directly related to rendering to a video surface
 
 @table @code
-@item CS/plugins/mesh
-Various mesh object implementations.  @xref{MeshObject}.
-For every mesh object there is typically one implementation in @sc{object}
-and one or more loader/saver plugins in @sc{persist}. @sc{persist/classic}
-is the loader in Crystal Space format.
-@end table
+@item CS/plugins/video/canvas
+The 2D driver component which manages creation of the Crystal Space window
+used for rendering and also supports limited 2D drawing capabilities
+(including 2D pixmaps). It can be used standalone but it is currently very
+limited and not very useful (this may change in the future).
 
 @table @code
-@item CS/plugins/font/server/csfont
-Standard Crystal Space font server.
-@item CS/plugins/font/server/freefont
-Freefont font server.
-@item CS/plugins/font/server/fontplex
-Font server multiplexer.
+@item CS/plugins/video/canvas/allegro
+Allegro (@url{http://www.talula.demon.co.uk/allegro/}) Game Library
+
+@item CS/plugins/video/canvas/asciiart
+@sc{ascii} Art Library
+
+@item CS/plugins/video/canvas/be
+BeOS Driver
+
+@item CS/plugins/video/canvas/common
+common code for 2D drivers
+
+@item CS/plugins/video/canvas/csdive
+@sc{os/2} @sc{dive} Driver
+
+@item CS/plugins/video/canvas/ddraw
+win32 DirectDraw Driver
+
+@item CS/plugins/video/canvas/ddraw8
+win32 DirectDraw (version 8) Driver
+
+@item CS/plugins/video/canvas/directxcommon
+common DirectX (win32) code
+
+@item CS/plugins/video/canvas/dosraw
+@sc{dos} graphics (@sc{bios}-level)
+
+@item CS/plugins/video/canvas/linex
+X11 Line3D Driver
+
+@item CS/plugins/video/canvas/macosx
+MacOS/X Driver (CoreGraphics and OpenGL)
+
+@item CS/plugins/video/canvas/memory
+Memory Driver (render a scene directly to memory)
+
+@item CS/plugins/video/canvas/next
+NeXTSTEP and @sc{openstep} Drivers
+
+@item CS/plugins/video/canvas/null2d
+@sc{null} 2D Driver
+
+@item CS/plugins/video/canvas/openglcommon
+common code for all OpenGL 2D drivers
+
+@item CS/plugins/video/canvas/openglbe
+OpenGL 2D driver for BeOS
+
+@item CS/plugins/video/canvas/openglos2
+OpenGL 2D driver for @sc{os/2}
+
+@item CS/plugins/video/canvas/openglwin
+OpenGL 2D driver for win32
+
+@item CS/plugins/video/canvas/openglx
+OpenGL 2D driver for X11
+
+@item CS/plugins/video/canvas/softx
+X11 software 2D driver
+
+@item CS/plugins/video/canvas/svgalib
+SVGAlib
+
+@item CS/plugins/video/canvas/xextf86vm
+X-Extension Driver (X11)
+
+@item CS/plugins/video/canvas/xextshm
+@sc{MIT} X-Extension Shared Memory Driver (X11)
+
+@item CS/plugins/video/canvas/xwindow
+X Window Driver
 @end table
 
-@item CS/support
-Support routines.
+@item CS/plugins/video/format
+code for playing video files on a surface
 
 @table @code
-@item CS/support/debug
-Support routines for extensive memory checking.
-@item CS/support/gnu
-Replacement for @file{bison.simple}, which is missing on some systems.
+@item CS/plugins/video/format/avi
+Audio-Video Interlace format
+
+@item CS/plugins/video/format/codecs
+video codecs for various formats (currently only @sc{avi})
+
+@table @code
+@item CS/plugins/video/format/codecs/divx4
+DivX ;-) Version 4
+
+@item CS/plugins/video/format/codecs/opendivx
+OpenDivX
+
+@item CS/plugins/video/format/codecs/rle
+Run-Length Encoded
 @end table
+
+@end table
+
+@item CS/plugins/video/loader
+loaders for various graphics file formats
+
+@item CS/plugins/video/renderer
+The 3D rasterizer component is required by the 3D engine but may also be
+used in a standalone environment.  It requires a 2D Driver to function.  
+
+@table @code
+@item CS/plugins/video/renderer/common
+common code for 3D rasterizers
+
+@item CS/plugins/video/renderer/inf
+infinite 3D renderer
+
+@item CS/plugins/video/renderer/line
+line 3D renderer
+
+@item CS/plugins/video/renderer/null
+@sc{null} renderer (required to work with 2D graphics only)
+
+@item CS/plugins/video/renderer/opengl
+OpenGL Renderer
+
+@item CS/plugins/video/renderer/software
+software (non-accelerated) renderer
+@end table
+
+@end table
+
+@end table
+
 @end table

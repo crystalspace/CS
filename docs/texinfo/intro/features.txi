@@ -3,7 +3,7 @@
 @section Feature List
 @cindex Features
 
-@emph{Last updated by Chris Forno, @email{jcore@@arbornet.org} on 2002-06-19.
+@emph{Last updated by Chris Forno, @email{jcore@@arbornet.org}, on 2002-06-21.
 Please feel free to add comments or email me if any of the information here is
 incorrect or out-of-date.}
 
@@ -33,7 +33,7 @@ Linux, @sc{gnu/hurd}
 MacOS/X, MacOS/X Server 1.0 (Rhapsody)
 
 @item
-OpenStep, NextStep
+OPENSTEP, NeXTSTEP
 
 @item
 @sc{os/2}
