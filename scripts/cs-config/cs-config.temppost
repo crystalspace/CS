@@ -230,7 +230,7 @@ while test $# -gt 0; do
     *)
 	findcexfile "$1"
 	if test -z "$CEXFILE"; then
-	    echo "Unknown lib: $1"
+	    echo "Unknown lib: $1" 1>&2
             usage 1 1>&2
 	    exit 1
 	fi
