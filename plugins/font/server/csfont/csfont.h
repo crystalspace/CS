@@ -22,7 +22,7 @@
 
 #include "ifontsrv.h"
 #include "csutil/csvector.h"
-class iSystem;
+struct iSystem;
 
 struct csFontDef
 {
