@@ -70,6 +70,8 @@ chronological order.
 	  NotFile for the target which copied the generated Bison/Flex files
 	  back to the source directory.  Also added a Help invocation for this
 	  target.
+	- Eric Sunshine fixed aws/Jamfile so that it utilizes the portable
+	  FIncludes rule rather than hard-coding -I directives.
 14-Apr-2004
 	- Eric Sunshine fixed bugs in csString where GetData() and the (char
 	  const*) operator would incorrectly return a null pointer at times.
