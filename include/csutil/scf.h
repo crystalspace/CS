@@ -107,6 +107,7 @@ struct iBase
  * to declare the minimal functionality required by iBase interface.
  */
 #define DECLARE_IBASE							\
+  int scfRefCount;		/* Reference counter */			\
   DECLARE_EMBEDDED_IBASE (iBase)
 
 /**
@@ -115,7 +116,6 @@ struct iBase
  */
 #define DECLARE_EMBEDDED_IBASE(OuterClass)				\
 public:									\
-  int scfRefCount;		/* Reference counter */			\
   OuterClass *scfParent;	/* The parent object */			\
   virtual void IncRef ();						\
   virtual void DecRef ();						\
@@ -136,11 +136,11 @@ public:									\
  * The CONSTRUCT_EMBEDDED_IBASE macro should be invoked inside the
  * constructor of an exported class that has exported embedded interfaces
  * (not inside the constructor of the embedded interface).
- * The macro will zero the reference count and initialize the pointer
- * to the parent object (to the object this one is embedded into).
+ * The macro will and initialize the pointer to the parent object
+ * (to the object this one is embedded into).
  */
 #define CONSTRUCT_EMBEDDED_IBASE(Interface)				\
-  Interface.scfRefCount = 0; Interface.scfParent = this;
+  Interface.scfParent = this;
 
 /**
  * The following macro should be used within the C++ source module that
@@ -151,18 +151,16 @@ public:									\
 void Class::IncRef ()							\
 {									\
   SCF_TRACE (("  (%s *)%p->IncRef (%d)\n", #Class, this, scfRefCount + 1));\
-  if (scfParent)							\
-    scfParent->IncRef ();						\
   scfRefCount++;							\
 }									\
 void Class::DecRef ()							\
 {									\
   scfRefCount--;							\
-  if (scfParent)							\
-    scfParent->DecRef ();						\
   if (scfRefCount <= 0)							\
   {									\
     SCF_TRACE (("  delete (%s *)%p\n", #Class, this));			\
+    if (scfParent)							\
+      scfParent->DecRef ();						\
     delete this;							\
   }									\
   else									\
@@ -176,8 +174,8 @@ void *Class::QueryInterface (uint32 iInterfaceID, int iVersion)		\
 /**
  * IMPLEMENT_EMBEDDED_IBASE should be used to implement embedded
  * interfaces derived from iBase. It differs from IMPLEMENT_IBASE
- * because embedded interface doesn't have to delete the object
- * when its reference count reaches zero.
+ * because embedded interface don't have reference counts themselves, but
+ * instead use the reference count of their parent object.
  */
 #define IMPLEMENT_EMBEDDED_IBASE(Class)					\
 void Class::IncRef ()							\
@@ -185,11 +183,9 @@ void Class::IncRef ()							\
   SCF_TRACE (("  (%s *)%p->IncRef (%d)\n", #Class, this, scfRefCount + 1));\
   if (scfParent)							\
     scfParent->IncRef ();						\
-  scfRefCount++;							\
 }									\
 void Class::DecRef ()							\
 {									\
-  scfRefCount--;							\
   if (scfParent)							\
     scfParent->DecRef ();						\
   SCF_TRACE (("  (%s *)%p->DecRef (%d)\n", #Class, this, scfRefCount));	\
