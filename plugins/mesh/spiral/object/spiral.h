@@ -32,14 +32,24 @@
  * This class has a set of particles that act like a spiraling
  * particle fountain.
  */
-class csSpiralMeshObject : public csNewtonianParticleSystem
+class csSpiralMeshObject : public csParticleSystem
 {
 protected:
-  int max;
-  int time_before_new_particle; // needs to be signed.
-  csVector3 source;
+  int number;
+  float part_time;
+  float time_left; // from previous update
+  csVector3 source; // x,y,z
+  csVector3 part_source; // cached source: radius, height, angle
+  csVector3 part_random; // radius, height, angle
   int last_reuse;
+  csVector3 * part_pos; // pos:   radius, height, angle
+  csVector3 part_speed; // speed: radius, height, angle
+  float * part_age;
+  float part_width, part_height;
 
+  void SetPosition(int index);
+  int FindOldest();
+  void RestartParticle (int index, float pre_move);
   void SetupObject ();
 
 public:
@@ -52,24 +62,66 @@ public:
   void SetParticleCount (int num)
   {
     initialized = false;
-    max = num;
+    number = num;
     scfiObjectModel.ShapeChanged ();
   }
   /// Get the number of particles.
-  int GetParticleCount () const { return max; }
+  int GetParticleCount () const { return number; }
 
-  /// Set the source.
-  void SetSource (const csVector3& source)
+  void SetParticleSize (float partwidth, float partheight)
   {
-    initialized = false;
-    csSpiralMeshObject::source = source;
-    scfiObjectModel.ShapeChanged ();
+    part_width = partwidth;
+    part_height = partheight;
   }
+
+  void GetParticleSize (float& partwidth, float& partheight) const
+  {
+    partwidth = part_width;
+    partheight = part_height;
+  }
+  
+  /// Set the source.
+  void SetSource (const csVector3& source);
+
   /// Get the source.
   const csVector3& GetSource () const { return source; }
 
   /// Update the particle system.
   virtual void Update (csTicks elapsed_time);
+
+  void SetParticleTime (csTicks ttl)
+  {
+      part_time = ttl/1000.0;
+  }
+  
+  csTicks GetParticleTime () const
+  {
+      return (csTicks)(part_time*1000);
+  }
+  void SetRadialSpeed (float speed)
+  {
+    part_speed.x = speed;
+  }
+  float GetRadialSpeed () const
+  {
+    return part_speed.x;
+  }
+  void SetRotationSpeed (float speed)
+  {
+    part_speed.z = speed;
+  }
+  float GetRotationSpeed () const
+  {
+    return part_speed.z;
+  }
+  void SetClimbSpeed (float speed)
+  {
+    part_speed.y = speed;
+  }
+  float GetClimbSpeed () const
+  {
+    return part_speed.y;
+  }
 
   /// For iMeshObject.
   virtual void HardTransform (const csReversibleTransform& t);
@@ -85,17 +137,57 @@ public:
     {
       scfParent->SetParticleCount (num);
     }
-    virtual void SetSource (const csVector3& source)
-    {
-      scfParent->SetSource (source);
-    }
     virtual int GetParticleCount () const
     {
       return scfParent->GetParticleCount();
     }
+    virtual void SetParticleSize (float partwidth, float partheight)
+    {
+        scfParent->SetParticleSize( partwidth, partheight );
+    }
+    virtual void GetParticleSize (float& partwidth, float& partheight) const
+    {
+        scfParent->GetParticleSize(partwidth, partheight);
+    }
+    virtual void SetSource (const csVector3& source)
+    {
+      scfParent->SetSource (source);
+    }
     virtual const csVector3& GetSource () const
     {
       return scfParent->GetSource();
+    }
+    virtual void SetParticleTime (csTicks ttl)
+    {
+      scfParent->SetParticleTime (ttl);
+    }
+    virtual csTicks GetParticleTime () const
+    {
+      return scfParent->GetParticleTime();
+    }
+    virtual void SetRadialSpeed (float speed)
+    {
+      scfParent->SetRadialSpeed (speed);
+    }
+    virtual float GetRadialSpeed () const
+    {
+      return scfParent->GetRadialSpeed();
+    }
+    virtual void SetRotationSpeed (float speed)
+    {
+      scfParent->SetRotationSpeed (speed);
+    }
+    virtual float GetRotationSpeed () const
+    {
+      return scfParent->GetRotationSpeed();
+    }
+    virtual void SetClimbSpeed (float speed)
+    {
+      scfParent->SetClimbSpeed (speed);
+    }
+    virtual float GetClimbSpeed () const
+    {
+      return scfParent->GetClimbSpeed();
     }
   } scfiSpiralState;
   friend class SpiralState;

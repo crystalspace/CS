@@ -51,7 +51,12 @@ enum
   XMLTOKEN_MATERIAL,
   XMLTOKEN_MIXMODE,
   XMLTOKEN_NUMBER,
-  XMLTOKEN_SOURCE
+  XMLTOKEN_SOURCE,
+  XMLTOKEN_PARTICLESIZE,
+  XMLTOKEN_PARTICLETIME,
+  XMLTOKEN_RADIALSPEED,
+  XMLTOKEN_ROTATIONSPEED,
+  XMLTOKEN_CLIMBSPEED
 };
 
 SCF_IMPLEMENT_IBASE (csSpiralFactoryLoader)
@@ -174,6 +179,11 @@ bool csSpiralLoader::Initialize (iObjectRegistry* object_reg)
   xmltokens.Register ("mixmode", XMLTOKEN_MIXMODE);
   xmltokens.Register ("number", XMLTOKEN_NUMBER);
   xmltokens.Register ("source", XMLTOKEN_SOURCE);
+  xmltokens.Register ("particlesize", XMLTOKEN_PARTICLESIZE);
+  xmltokens.Register ("particletime", XMLTOKEN_PARTICLETIME);
+  xmltokens.Register ("radialspeed", XMLTOKEN_RADIALSPEED);
+  xmltokens.Register ("rotationspeed", XMLTOKEN_ROTATIONSPEED);
+  xmltokens.Register ("climbspeed", XMLTOKEN_CLIMBSPEED);
   return true;
 }
 
@@ -249,6 +259,27 @@ csPtr<iBase> csSpiralLoader::Parse (iDocumentNode* node,
 	break;
       case XMLTOKEN_NUMBER:
         spiralstate->SetParticleCount (child->GetContentsValueAsInt ());
+        break;
+      case XMLTOKEN_PARTICLESIZE:
+        {
+            
+	  float dw, dh;
+	  dw = child->GetAttributeValueAsFloat ("w");
+	  dh = child->GetAttributeValueAsFloat ("h");
+          spiralstate->SetParticleSize (dw, dh);
+        }
+        break;
+      case XMLTOKEN_PARTICLETIME:
+        spiralstate->SetParticleTime (child->GetContentsValueAsInt ());
+        break;
+      case XMLTOKEN_RADIALSPEED:
+        spiralstate->SetRadialSpeed (child->GetContentsValueAsFloat ());
+        break;
+      case XMLTOKEN_ROTATIONSPEED:
+        spiralstate->SetRotationSpeed (child->GetContentsValueAsFloat ());
+        break;
+      case XMLTOKEN_CLIMBSPEED:
+        spiralstate->SetClimbSpeed (child->GetContentsValueAsFloat ());
         break;
       default:
 	synldr->ReportBadToken (child);

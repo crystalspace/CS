@@ -43,14 +43,17 @@ void csSpiralMeshObject::SetupObject ()
   {
     initialized = true;
     RemoveParticles ();
+    delete[] part_pos;
+    delete[] part_age;
+    part_pos = new csVector3[number];
+    part_age = new float[number];
 
-    SetCount(max);
-    time_before_new_particle = 0;
-    last_reuse = 0;
-    float radius = 10.0; // guessed radius of the spiral;
-    float height = 10.0; // guessed height
-    bbox.Set(source - csVector3(-radius,0,-radius),
-      source + csVector3(+radius, +height, +radius) );
+    csVector3 dim = part_speed*part_time;
+
+    float fradius = dim.x;
+    float height = dim.y;
+    bbox.Set(source - csVector3(fradius,0,fradius),
+      source + csVector3(fradius, height, fradius) );
 
     // Calculate the maximum radius.
     csVector3 size = bbox.Max () - bbox.Min ();
@@ -60,71 +63,114 @@ void csSpiralMeshObject::SetupObject ()
     float a = max_size/2.;
     radius = qsqrt (a*a + a*a);
 
+    // create particles
+    int i;
+    for (i=0 ; i<number ; i++)
+    {
+      RestartParticle(FindOldest(), (part_time / float(number)) * float(number-i));
+    }
+
+    time_left = 0.0;
+    last_reuse = 0;
     SetupColor ();
     SetupMixMode ();
   }
 }
 
 csSpiralMeshObject::csSpiralMeshObject (iObjectRegistry* object_reg,
-  iMeshObjectFactory* factory) : csNewtonianParticleSystem (object_reg, factory)
+  iMeshObjectFactory* factory) : csParticleSystem (object_reg, factory)
 {
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiSpiralState);
-  max = 50;
+  number = 50;
   source.Set (0, 0, 0);
-  time_before_new_particle = 0;
+  part_source.Set (0, 0, 0);
+  part_time = 5.0; // @@@ PARAMETER
   last_reuse = 0;
+  part_pos = NULL;
+  part_speed.Set(0.1,0.2,3.14);
+  part_age = NULL;
+  part_width = .02;
+  part_height = .02;
+  part_random.Set(.03, .03, 0.03);
 }
 
 csSpiralMeshObject::~csSpiralMeshObject()
 {
 }
 
+void csSpiralMeshObject::SetPosition(int index)
+{
+  csVector3 pos;
+  float radius = part_pos[index].x;
+  float height = part_pos[index].y;
+  float angle  = part_pos[index].z;
+    
+  pos = csVector3(cos(angle)*radius,height,sin(angle)*radius);
+  
+  GetParticle(index)->SetPosition(pos);
+}
+
+void csSpiralMeshObject::RestartParticle (int index, float pre_move)
+{
+  part_pos[index] = GetRandomDirection(part_random, // @@@ PARAMETER 
+                                       part_source);
+  part_pos[index] += part_speed*pre_move;
+  SetPosition(index);
+}
+
+int csSpiralMeshObject::FindOldest ()
+{
+  int num = GetNumParticles ();
+  int part_idx;
+  if (num >= number)
+  {
+    part_idx = last_reuse;
+    last_reuse = (last_reuse+1)%number;
+  }
+  else
+  {
+    AppendRectSprite (part_width, part_height, mat, false);	// @@@ PARAMETER
+    part_idx = GetNumParticles ()-1;
+    GetParticle(part_idx)->SetMixMode(MixMode);
+  }
+  return part_idx;
+}
+
+
+void csSpiralMeshObject::SetSource (const csVector3& source)  
+{
+  initialized = false;
+  csSpiralMeshObject::source = source;
+  part_source.Set( qsqrt(source.x*source.x+source.z*source.z),
+                  source.y,
+                  atan2(source.x,-source.z));
+  scfiObjectModel.ShapeChanged ();
+}
+
 void csSpiralMeshObject::Update (csTicks elapsed_time)
 {
   SetupObject ();
+  csParticleSystem::Update (elapsed_time);
+  float delta_t = elapsed_time / 1000.0f; // in seconds
+
+  // Update position
   int i;
-  // Update the acceleration vectors first.
   for (i=0 ; i < particles.Length () ; i++)
   {
-    // Take a 2D vector between 'source' and 'part_speed' as seen from above
-    // and rotate it 90 degrees. This gives angle_vec which will be the
-    // acceleration.
-    csVector2 angle_vec (part_speed[i].z, -part_speed[i].x);
-    float n = angle_vec.Norm ();
-    if (ABS (n) > SMALL_EPSILON)
-      angle_vec /= n;
-    float delta_t = elapsed_time / 1000.0; // in seconds
-    angle_vec *= delta_t * 2.;
-    SetSpeed (i, part_speed[i]+csVector3 (angle_vec.x, 0, angle_vec.y));
-  }
-
-  time_before_new_particle -= elapsed_time;
-  while (time_before_new_particle < 0)
+    part_pos[i] += part_speed* delta_t;
+    SetPosition (i);
+    part_age[i] += delta_t;
+  } 
+   
+  // restart a number of particles
+  float intersperse = part_time / (float)number;
+  float todo_time = delta_t + time_left;
+  while (todo_time > intersperse)
   {
-    time_before_new_particle += 15;	// @@@ PARAMETER
-    int num = GetNumParticles ();
-    int part_idx;
-    if (num >= max)
-    {
-      part_idx = last_reuse;
-      last_reuse = (last_reuse+1)%max;
-    }
-    else
-    {
-      AppendRegularSprite (3, .02, mat, false);	// @@@ PARAMETER
-      part_idx = GetNumParticles ()-1;
-      //GetParticle (part_idx)->MoveToSector (this_sector);
-    }
-    iParticle* part = GetParticle (part_idx);
-    part->SetPosition (source);
-    csVector3 dir;
-    dir = GetRandomDirection(csVector3(.01, .01, .01), csVector3(.1, .3, .1));
-
-    SetSpeed (part_idx, dir);
-    SetAccel (part_idx, csVector3 (0));
-    part->MovePosition( -(float)time_before_new_particle / 1000.0 * dir);
+    RestartParticle (FindOldest (), todo_time);
+    todo_time -= intersperse;
   }
-  csNewtonianParticleSystem::Update (elapsed_time);
+  time_left = todo_time;
 }
 
 void csSpiralMeshObject::HardTransform (const csReversibleTransform& t)

@@ -6,6 +6,18 @@ The history order is reversed so that new features are at the top.
 17-Jul-2003
         - Philip Wyett fixed broken glrender3d makefile. OBJ.GLRENDER3D should
           have had OUT.GLRENDER3D not DIR.GLRENDER3D.
+	- Jorrit committed a patch from Anders Reggestad to the spiral
+	  particle system. Here is his log: This is more or less a complete
+	  rewrite of the not working spiral system thats currently in CS. The
+	  old system have big problems with bbox, and when outside view for a
+	  period of time the whole thing will explode when entering view
+	  again. (Particle systems isn't updated when out of view, nice
+	  optimalization, but fatal for the old spiral system.) Rewrote the
+	  system to rebuild when reentering view (Like done in the fountain
+	  and explotion system). Added some new parameters to control the
+	  look of the system.
+	  Anders was also so nice to update the documentation for his changes.
+	  If only everyone would do that!
 16-Jul-2003
 	- Anders Stenberg made the following new renderer additions and fixes:
 	  - Made AWS work. (Added some stub functions to comply with interface 
