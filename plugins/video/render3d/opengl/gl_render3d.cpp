@@ -1578,6 +1578,7 @@ bool csGLGraphics3D::ActivateBuffers (csVertexAttrib *attribs,
 void csGLGraphics3D::DeactivateBuffers (csVertexAttrib *attribs, unsigned int count)
 {
   if (vboManager) vboManager->DeactivateVBO ();
+  unsigned int i;
   if (!attribs)
   {
     //disable all
@@ -1585,7 +1586,6 @@ void csGLGraphics3D::DeactivateBuffers (csVertexAttrib *attribs, unsigned int co
     statecache->Disable_GL_NORMAL_ARRAY ();
     statecache->Disable_GL_COLOR_ARRAY ();
     statecache->Disable_GL_TEXTURE_COORD_ARRAY ();
-    unsigned int i;
     if (ext->CS_GL_ARB_multitexture)
     {
       for (i = 0; i < CS_GL_MAX_LAYER; i++)
