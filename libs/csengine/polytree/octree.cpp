@@ -20,6 +20,7 @@
 #include "csengine/polyint.h"
 #include "csengine/octree.h"
 #include "csengine/bsp.h"
+#include "csengine/bsp2d.h"
 #include "csengine/treeobj.h"
 #include "csengine/sector.h"
 #include "csengine/world.h"
@@ -267,6 +268,61 @@ float randflt ()
   return ((float)rand ()) / (float)RAND_MAX;
 }
 
+void AddPolygonTo2DBSP (const csPlane3& plane, csBspTree2D* bsp2d,
+	csPolygon3D* p)
+{
+  // We know the octree can currently only contain csPolygon3D
+  // because it's the static octree.
+  csPoly3D poly;
+  int i;
+  for (i = 0 ; i < p->GetNumVertices () ; i++)
+    poly.AddVertex (p->Vwor (i));
+  csSegment3 segment;
+  if (csIntersect3::IntersectPolygon (plane, &poly, segment))
+  {
+    const csVector3& v1 = segment.Start ();
+    const csVector3& v2 = segment.End ();
+    csVector2 s1 (v1.y, v1.z);
+    csVector2 s2 (v2.y, v2.z);
+    csSegment2* seg2;
+    // @@@ This test is probably very naive. The problem
+    // is that IntersectPolygon returns a un-ordered segment.
+    // i.e. start or end have no real meaning. For the 2D bsp
+    // tree we need an ordered segment. So we classify (0,0,0)
+    // in 3D to the polygon and (0,0) in 2D to the segment and
+    // see if they have the same direction. If not we swap
+    // the segment.
+    csPlane2 pl (s1, s2);
+    float cl3d = p->GetPolyPlane ()->Classify (csVector3 (0));
+    float cl2d = pl.Classify (csVector2 (0, 0));
+    if ((cl3d < 0 && cl2d < 0) || (cl3d > 0 && cl2d > 0))
+    {
+      CHK (seg2 = new csSegment2 (s1, s2));
+    }
+    else
+    {
+      CHK (seg2 = new csSegment2 (s2, s1));
+    }
+    bsp2d->Add (seg2);
+  }
+}
+
+struct TestSolidData
+{
+  csVector2 pos;
+  bool is_solid;
+};
+
+void* TestSolid (csSegment2** segments, int num, void* data)
+{
+  if (num == 0) return NULL; // Continue.
+  TestSolidData* d = (TestSolidData*)data;
+  csPlane2 plane (*segments[0]);
+  if (plane.Classify (d->pos) < 0) d->is_solid = true;
+  else d->is_solid = false;
+  return (void*)1;	// Stop recursion.
+}
+
 void csOctree::ChooseBestCenter (csOctreeNode* node,
 	csPolygonInt** polygons, int num)
 {
@@ -303,7 +359,7 @@ void csOctree::ChooseBestCenter (csOctreeNode* node,
   // @@@ Choose based on vertices in polygons!
 #elif 0
   // @@@ Choose one axis at a time instead of all three together!
-#elif 0
+#elif 1
   // @@@ Choose while trying to maximize the area of solid space
   // This will improve occlusion!
   // One way to do this:
@@ -321,6 +377,91 @@ void csOctree::ChooseBestCenter (csOctreeNode* node,
   //      subtract all open space areas and so we have a total solid space
   //      approx.
   //    - Take the plane with most solid space.
+  
+  // Try a few x-planes first.
+  float x, y, z;
+  TestSolidData tdata;
+  int count_solid;
+  int max_solid = -1000;
+  for (x = orig.x-xsize/2 ; x < orig.x+xsize/2 ; x += xsize/50)
+  {
+    csPlane3 plane (1, 0, 0, -x);
+    // First create a 2D bsp tree for all intersections of the
+    // polygons in the node with the chosen plane.
+    CHK (csBspTree2D* bsp2d = new csBspTree2D ());
+    for (j = 0 ; j < num ; j++)
+      if (polygons[j]->ClassifyX (x) == POL_SPLIT_NEEDED)
+	AddPolygonTo2DBSP (plane, bsp2d, (csPolygon3D*)polygons[j]);
+    // Given the calculated 2D bsp tree we will now try to see
+    // how much space is solid and how much space is open. We use
+    // a simple (but not very accurate) heuristic for this.
+    // We just take a number of samples and find the first segment
+    // for every of those samples. We then see if we are in front
+    // or behind the sample. If behind then we are in solid space.
+    // Otherwise we are in open space.
+    count_solid = 0;
+    for (tdata.pos.x = bmin.y+ysize ; tdata.pos.x < bmax.y-ysize ; tdata.pos.x += ysize/5)
+      for (tdata.pos.y = bmin.z+zsize ; tdata.pos.y < bmax.z-zsize ; tdata.pos.y += zsize/5)
+      {
+        bsp2d->Front2Back (tdata.pos, TestSolid, (void*)&tdata);
+	if (tdata.is_solid) count_solid++;
+      }
+    if (count_solid > max_solid)
+    {
+      max_solid = count_solid;
+      best_center.x = x;
+    }
+
+    CHK (delete bsp2d);
+  }
+
+  // Try y planes.
+  max_solid = -1000;
+  for (y = orig.y-ysize/2 ; y < orig.y+ysize/2 ; y += ysize/50)
+  {
+    csPlane3 plane (0, 1, 0, -y);
+    CHK (csBspTree2D* bsp2d = new csBspTree2D ());
+    for (j = 0 ; j < num ; j++)
+      if (polygons[j]->ClassifyY (y) == POL_SPLIT_NEEDED)
+	AddPolygonTo2DBSP (plane, bsp2d, (csPolygon3D*)polygons[j]);
+    count_solid = 0;
+    for (tdata.pos.x = bmin.x+xsize ; tdata.pos.x < bmax.x-xsize ; tdata.pos.x += xsize/5)
+      for (tdata.pos.y = bmin.z+zsize ; tdata.pos.y < bmax.z-zsize ; tdata.pos.y += zsize/5)
+      {
+        bsp2d->Front2Back (tdata.pos, TestSolid, (void*)&tdata);
+	if (tdata.is_solid) count_solid++;
+      }
+    if (count_solid > max_solid)
+    {
+      max_solid = count_solid;
+      best_center.y = y;
+    }
+    CHK (delete bsp2d);
+  }
+
+  // Try z planes.
+  max_solid = -1000;
+  for (z = orig.z-zsize/2 ; z < orig.z+zsize/2 ; z += zsize/50)
+  {
+    csPlane3 plane (0, 0, 1, -z);
+    CHK (csBspTree2D* bsp2d = new csBspTree2D ());
+    for (j = 0 ; j < num ; j++)
+      if (polygons[j]->ClassifyZ (z) == POL_SPLIT_NEEDED)
+	AddPolygonTo2DBSP (plane, bsp2d, (csPolygon3D*)polygons[j]);
+    count_solid = 0;
+    for (tdata.pos.x = bmin.x+xsize ; tdata.pos.x < bmax.x-xsize ; tdata.pos.x += xsize/5)
+      for (tdata.pos.y = bmin.y+ysize ; tdata.pos.y < bmax.y-ysize ; tdata.pos.y += ysize/5)
+      {
+        bsp2d->Front2Back (tdata.pos, TestSolid, (void*)&tdata);
+	if (tdata.is_solid) count_solid++;
+      }
+    if (count_solid > max_solid)
+    {
+      max_solid = count_solid;
+      best_center.z = z;
+    }
+    CHK (delete bsp2d);
+  }
 #else
   for (i = 0 ; i < 500 ; i++)
   {

@@ -33,6 +33,7 @@
 #include "csgeom/segment.h"
 
 class csDVector3;
+class csPoly3D;
 
 inline float fSqr (float f)
 {
@@ -225,6 +226,15 @@ public:
 class csIntersect3
 {
 public:
+  /**
+   * Intersect a plane with a 3D polygon and return
+   * the line segment corresponding with this intersection.
+   * Returns true if there is an intersection. If false
+   * then 'segment' will not be valid.
+   */
+  static bool IntersectPolygon (const csPlane3& plane, csPoly3D* poly,
+  	csSegment3& segment);
+
   /**
    * Intersect a 3D segment with a plane.  Returns true if there is an
    * intersection, with the intersection point returned in isect.

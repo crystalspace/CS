@@ -24,6 +24,8 @@
 #include "csgeom/math3d.h"
 #include "csgeom/math3d_d.h"
 #include "csgeom/matrix3.h"
+#include "csgeom/poly3d.h"
+#include "csgeom/segment.h"
 
 //---------------------------------------------------------------------------
 
@@ -253,6 +255,38 @@ float csSquaredDist::PointPoly (const csVector3& p, csVector3 *V, int n,
 }
 
 //---------------------------------------------------------------------------
+
+bool csIntersect3::IntersectPolygon (const csPlane3& plane,
+	csPoly3D* poly, csSegment3& seg)
+{
+  csVector3& v1 = seg.Start ();
+  csVector3& v2 = seg.End ();
+  int i, i1;
+  float c, c1;
+  csVector3 isect;
+  float dist;
+  i1 = poly->GetNumVertices ()-1;
+  c1 = plane.Classify ((*poly)[i1]);
+  bool found_v1 = false;
+  bool found_v2 = false;
+  for (i = 0 ; i < poly->GetNumVertices () ; i++)
+  {
+    c = plane.Classify ((*poly)[i]);
+    if ((c < 0 && c1 > 0) || (c1 < 0 && c > 0))
+    {
+      csIntersect3::Plane ((*poly)[i1], (*poly)[i],
+      	  plane, isect, dist);
+      if (!found_v1) { v1 = isect; found_v1 = true; }
+      else { v2 = isect; found_v2 = true; break; }
+    }
+
+    i1 = i;
+    c1 = c;
+  }
+  if (!found_v1) return false;
+  if (!found_v2) v2 = v1;
+  return true;
+}
 
 void csIntersect3::Plane(const csVector3& u, const csVector3& v,
                          const csVector3& normal, const csVector3& a,

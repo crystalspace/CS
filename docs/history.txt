@@ -30,6 +30,11 @@ The history order has been reversed so that new features are at the top.
 	  a new technique to select an optimal (or near optimal) splitter
 	  point for the octree. I have observed that this point can make
 	  a big difference on performance.
+	- Fixed a bug in csSegmentArray. Forgot to add a virtual
+	  destructor implementation.
+	- Implemented way to try to improve octree generation by testing
+	  for solid space intersection. Still have to investigate if it
+	  is actually working ok though.
 3-Apr-2000
 	- Andrew Zabolotny did the following changes:
 	    - Fixed the problem with gfxldr crashing in plugins. Removing

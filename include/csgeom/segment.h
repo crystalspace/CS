@@ -38,6 +38,8 @@ public:
   csSegment2 (const csVector2& s, const csVector2& e) { start = s; end = e; }
   /// Make a new uninitialized segment.
   csSegment2 () { }
+  /// Destructor.
+  ~csSegment2 () { }
 
   /// Set segment to given values.
   void Set (const csVector2& s, const csVector2& e)

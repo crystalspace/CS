@@ -109,6 +109,11 @@ private:
   void Build (csBspNode2D* node, csSegment2** segments, int num);
 
   /**
+   * Add one segment to the tree.
+   */
+  void Add (csBspNode2D* node, csSegment2* segment);
+
+  /**
    * Select a splitter from a list of segments and return the index.
    */
   int SelectSplitter (csSegment2** segments, int num);
@@ -143,6 +148,13 @@ public:
   {
     Build (segments.GetArray (), segments.Length ());
   }
+
+  /**
+   * Add one segment to the tree. The segment will be freed
+   * by this tree at some point. So don't depend on the given pointer
+   * anymore.
+   */
+  void Add (csSegment2* segment);
 
   /// Traverse the tree from back to front starting at the root and 'pos'.
   void* Back2Front (const csVector2& pos, csTree2DVisitFunc* func, void* data);
