@@ -375,7 +375,7 @@ public:
   int CollisionDetect (csTransform *p);
 
 // Take a block index value and convert it to an x,y value
-  inline void Index2Block( int index, int &x, int& y)
+  inline void Index2Block( int index, int& x, int& y)
 	{ x = index % blockxy; y = index / blockxy; }
 // Take a block x,y vaue and convert it to an index
   inline void Block2Index( int x, int y, int& index )
