@@ -20,6 +20,18 @@ The history order is reversed so that new features are at the top.
 	  it gets compiled as C++, rather than C).
 	- Eric Sunshine renamed vd.m4 to progver.m4 since it provides the
 	  AC_CHECK_PROG_VERSION() (not some macro named VD).
+	- Finally fixed a bad bug which caused levels that use Dynavis to
+	  be lit wrong. The reason was that Dynavis access the thing data
+	  at an early stage at which point materials and textures haven't
+	  been registered yet. Accessing the thing data causes the thing
+	  to 'Prepare' itself and if that happens with the texture not yet
+	  prepared the thing will assume the texture is 64x64. Of course
+	  that may turn out to be completely wrong but all future lighting
+	  calculations will still be based on that wrong value. I solved this
+	  by not setting 'prepared' to true when a missing texture is found.
+	  This will force the thing to be prepared again later at which
+	  point the texture is most likely present.
+	- Fixed a missing initialization of logparent in csThingStatic.
 	- Eric Sunshine made the following changes to progver.m4 and
 	  configure.ac:
 	    - Performed some cleanup of CS_CHECK_PROG_VERSION() and its support

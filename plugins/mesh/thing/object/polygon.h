@@ -259,8 +259,12 @@ public:
   /**
    * Calculate the bounding box in (u,v) space for the lighted texture.
    * This is used in case of lightmapping.
+   * <br>
+   * This function returns false if the texture handle was not present yet.
+   * In that case the initialization is not completely correct yet and has
+   * to be redone later when the texture is prepared.
    */
-  void CreateBoundingTextureBox ();
+  bool CreateBoundingTextureBox ();
 
   /**
    * After the plane normal and the texture matrices have been set
@@ -271,8 +275,12 @@ public:
    * You also need to call this function if you make a copy of a
    * polygon (using the copy constructor) or if you change the vertices
    * in a polygon.
+   * <br>
+   * This function returns false if the texture handle was not present yet.
+   * In that case the initialization is not completely correct yet and has
+   * to be redone later when the texture is prepared.
    */
-  void Finish ();
+  bool Finish ();
 
   /**
    * If the polygon is a portal this will set the sector

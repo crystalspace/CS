@@ -141,6 +141,7 @@ csThingStatic::csThingStatic (iBase* parent, csThingObjectType* thing_type)
 
   prepared = false;
   cosinus_factor = -1;
+  logparent = NULL;
 }
 
 csThingStatic::~csThingStatic ()
@@ -179,7 +180,11 @@ void csThingStatic::Prepare ()
   for (i = 0; i < static_polygons.Length (); i++)
   {
     sp = static_polygons.Get (i);
-    sp->Finish ();
+    // If a Finish() call returns false this means the textures are not
+    // completely ready yet. In that case we set 'prepared' to false
+    // again so that we force a new prepare later.
+    if (!sp->Finish ())
+      prepared = false;
     if (sp->GetPortal ())
       portal_polygons.Push (i);
   }
@@ -1049,7 +1054,6 @@ void csThing::Prepare ()
 	p->SetParent (this);
 	polygons.Push (p);
 	p->SetMaterial (FindRealMaterial (ps->GetMaterialWrapper ()));
-	p->RefreshFromStaticData ();
 	p->Finish ();
       }
     }
@@ -1096,7 +1100,6 @@ void csThing::Prepare ()
     p->SetParent (this);
     polygons.Push (p);
     p->SetMaterial (FindRealMaterial (ps->GetMaterialWrapper ()));
-    p->RefreshFromStaticData ();
     p->Finish ();
   }
 }

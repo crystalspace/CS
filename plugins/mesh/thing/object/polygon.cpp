@@ -519,8 +519,9 @@ void csPolygon3DStatic::HardTransform (const csReversibleTransform &t)
   }
 }
 
-void csPolygon3DStatic::CreateBoundingTextureBox ()
+bool csPolygon3DStatic::CreateBoundingTextureBox ()
 {
+  bool rc = true;
   if (!mapping)
     mapping = thing_static->thing_type->blk_lightmapmapping.Alloc ();
 
@@ -552,9 +553,14 @@ void csPolygon3DStatic::CreateBoundingTextureBox ()
   int ww, hh;
   iMaterialHandle* mat_handle = GetMaterialHandle ();
   if (mat_handle && mat_handle->GetTexture ())
+  {
     mat_handle->GetTexture ()->GetMipMapDimensions (0, ww, hh);
+  }
   else
+  {
     ww = hh = 64;
+    rc = false;
+  }
   mapping->Imin_u = QRound (min_u * ww);
   mapping->Imin_v = QRound (min_v * hh);
   int Imax_u = QRound (max_u * ww);
@@ -573,15 +579,17 @@ void csPolygon3DStatic::CreateBoundingTextureBox ()
 
   mapping->fdu = min_u * ww;
   mapping->fdv = min_v * hh;
+  return rc;
 }
 
 #define TEXW(t) ((t)->w_orig)
 #define TEXH(t) ((t)->h)
 
-void csPolygon3DStatic::Finish ()
+bool csPolygon3DStatic::Finish ()
 {
-#ifndef CS_USE_NEW_RENDERER
+  bool rc = true;
 
+#ifndef CS_USE_NEW_RENDERER
   if (thing_static->flags.Check (CS_ENTITY_NOLIGHTING))
     flags.Reset (CS_POLY_LIGHTING);
 
@@ -591,13 +599,13 @@ void csPolygon3DStatic::Finish ()
       !material->GetMaterialHandle ()->GetTexture ()))
     {
       EnableTextureMapping (false);
-      return ;
+      return true;
     }
-    CreateBoundingTextureBox ();
+    rc = CreateBoundingTextureBox ();
   }
   else
   {
-    return;
+    return true;
   }
 
   if (portal)
@@ -613,11 +621,12 @@ void csPolygon3DStatic::Finish ()
     {
       thing_static->thing_type->Notify ("Oversize lightmap (%dx%d > %dx%d) "
         "for polygon '%s'", lmw, lmh, 
-  max_lmw, max_lmh, GetName());
+	max_lmw, max_lmh, GetName());
     }
   }
 
 #endif // CS_USE_NEW_RENDERER
+  return rc;
 }
 
 float csPolygon3DStatic::GetArea ()
