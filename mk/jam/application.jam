@@ -99,7 +99,8 @@ rule Application
 
   if ! [ IsElem notest : $(options) ]
   {
-    UnitTest $(<) ;
+    # @@@ Disabled for now; see docs/todo_jam.txt
+    #UnitTest $(<) ;
   }
 }
 

@@ -22,6 +22,14 @@ chronological order.
 	  TrXmlElement::ReadValue() where they unconditionally stripped leading
 	  whitepsace from text and cdata nodes even if the client asked for
 	  whitespace to be preserved.
+	- Eric Sunshine fixed unit-testing for CS/libs following the
+	  consolidation of libraries into crystalspace.lib so that `jam check'
+	  actually runs tests from the various t/ subdirectories of CS/libs
+	  once again.
+	- Eric Sunshine disabled automatic UnitTest rule invocation for
+	  Application (application.jam) and Plugin (plugin.jam) targets for now
+	  since unit-testing for these types of targets needs to be thought-out
+	  more thoroughly. See CS/docs/jam_todo.txt for details.
 28-Mar-2005
 	- Marten changed how transforms are sent from meshobjects to the
 	  renderer.

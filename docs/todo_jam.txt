@@ -7,6 +7,9 @@ L - Low Priority (only minor function loss)
 W - Wishlist (the build also works without this feature)
 * - Completed
 
+[H] msvcgen.jam: Provide rules to copy the generated files back to the source
+    tree upon explicit request so that they can be committed to the CVS
+    respository if desired.
 [H] We need a rule for making platform-specific shared libraries which are not
     CS plugins. This is needed, for instance, by the pythmod, perl5mod, and
     javamod targets which create pure scripting extension modules (shared
@@ -16,9 +19,6 @@ W - Wishlist (the build also works without this feature)
     a lot of copy/paste, is difficult to maintain, and is fragile because it
     relies upon internal knowledge of the Plugin rule and the low-level
     platform-specific SystemFoo rules invoked by the Plugin rule.
-[H] msvcgen.jam: Provide rules to copy the generated files back to the source
-    tree upon explicit request so that they can be committed to the CVS
-    respository if desired.
 
 [M] Figure out how to create MSVC project files for the pure Python and pure
     Perl extension modules.
@@ -41,6 +41,31 @@ W - Wishlist (the build also works without this feature)
     generation. The rule should probably accept a third argument which provides
     fine-grained control over the scope or disposition of the invocation.
 
+[L] The UnitTest rule needs to be re-engineered so that it no longer provides
+    the capability of consolidating unittests from unrelated directories into a
+    monolithic test program (when the user invokes one of the directory-based
+    `check' targets). Although this feature has a high "coolness" factor,
+    creating a monolithic test program can result in symbolic conflicts. For
+    instance, if the simple1, simple2, and simpmap programs all define a class
+    named `Simple', then trying to combine all of those objects into a
+    monolithic test program would fail. Therefore, the test programs need to
+    remain separate, however it would be nice to consolidate the results of the
+    invocations of the individual test programs so that the output can be
+    viewed all together, and also, the failure of a test program should not
+    prevent remaining test programs from running.
+[L] The UnitTest framework needs to be thought-out more thoroughly with regards
+    to applications and plugins. One problem with trying to link object files
+    from an application or plugin into a unit test program is that there will
+    be multiple main() functions (one from the application or plugin itself and
+    one from the unit test driver program). How should this situation be
+    handled? Should the client be responsible for moving the application's or
+    plugin's main() function into a separate compilation unit which does not
+    get linked into the unit test program?  Should the UnitTest framework
+    attempt somehow to mask the application's or plugin's main() by #defining
+    it to something other and then compiling that particular source a second
+    time specifically for inclusion in the unit test program? Once this issue
+    is resolved, re-enable invocations of UnitTest in the Application and
+    Plugin rules.
 [L] Jorrit reports that with the command "jam -sMODE=profile walktest_static",
     dynavis/debug/static/dynavis.o gets compiled twice.
 [L] msvcgen.jam: Consider overhauling the "configuration" file handling rule so

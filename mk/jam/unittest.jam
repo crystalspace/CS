@@ -27,7 +27,7 @@ if $(UNITTEST_VERBOSE) = yes
   UNITTEST_RUNFLAGS += "--verbose" ;
 }
 
-## UnitTest module [ : testdir [ : extensions ] ]
+## UnitTest module [ : testdirs [ : extensions ] ]
 ##
 ## This rule provides a dynamic unit testing framework which utilizes CppUnit
 ## (http://cpptest.sourceforge.net/).  The invocation:
@@ -35,10 +35,10 @@ if $(UNITTEST_VERBOSE) = yes
 ##    UnitTest <module> ;
 ##
 ## sets up unit testing support for `module' if $(SUBDIR)/t/ exists for
-## `module' and contains test fragment files (*.t) and/or header (*.h)
-## files. If `testdir' is provided, then it is the name of the directory to
-## scan for test fragments instead of `t/'. If `extensions' is provided, then
-## it is a list of file extensions for which to search instead of `.t'.
+## `module' and contains test fragment files (*.t) and/or header (*.h) files.
+## If `testdirs' is provided, then it is a list of directory to scan for test
+## fragments instead of `t/'. If `extensions' is provided, then it is a list of
+## file extensions for which to search instead of `.t'.
 ##
 ## It is safe to invoke this rule for modules which do not have a `t/'
 ## subdirectory, in which case the rule invocation is silently ignored. The
@@ -152,61 +152,65 @@ if $(UNITTEST_VERBOSE) = yes
 rule UnitTest
 {
   local mod = $(1) ;
-  local testdir = $(2) ;
+  local testdirs = $(2) ;
   local exts = $(3) ;
-  if ! $(testdir) { testdir = t ; }
+  if ! $(testdirs) { testdirs = t ; }
   if ! $(exts) { exts = .t ; }
 
   local test_clean = [ UnitTestNameClean $(mod) ] ;
   local oldsubdir = $(SUBDIR_TOKENS) ;
 
-  SubDir TOP $(oldsubdir) $(testdir)  ;
-
-  local tests_obj ;
-  local tests   = [ Recurse : $(exts) ] ;
-  local headers = [ Recurse : .h .hpp .hxx .H ] ;
-  if $(tests) || $(headers)
+  local testdir ;
+  for testdir in $(testdirs)
   {
-    tests = [ DoSourceGrist $(tests) ] ;
-    SEARCH on $(tests) = $(SEARCH_SOURCE) ;
+    SubDir TOP $(oldsubdir) $(testdir)  ;
 
-    local tests_src = $(tests:S=.cpp) ;
-    MakeLocate $(tests_src) : $(LOCATE_TARGET) ;
-    Clean $(test_clean) : $(tests_src) ;
-
-    # For each fragment (*.t), create a C++ wrapper. Automatically register
-    # subclasses of CppUnit::TestFixture.
-    local i ;
-    for i in $(tests)
+    local tests_obj ;
+    local tests   = [ Recurse : $(exts) ] ;
+    local headers = [ Recurse : .h .hpp .hxx .H ] ;
+    if $(tests) || $(headers)
     {
-      Includes $(i:S=.cpp) : $(i) ;
-      UnitTestSource $(i:S=.cpp) : $(i) ;
+      tests = [ DoSourceGrist $(tests) ] ;
+      SEARCH on $(tests) = $(SEARCH_SOURCE) ;
+
+      local tests_src = $(tests:S=.cpp) ;
+      MakeLocate $(tests_src) : $(LOCATE_TARGET) ;
+      Clean $(test_clean) : $(tests_src) ;
+
+      # For each fragment (*.t), create a C++ wrapper. Automatically register
+      # subclasses of CppUnit::TestFixture.
+      local i ;
+      for i in $(tests)
+      {
+	Includes $(i:S=.cpp) : $(i) ;
+	UnitTestSource $(i:S=.cpp) : $(i) ;
+      }
+
+      # Also search for CppUnit::TestFixture subclasses in headers (*.h) and
+      # synthesize a C++ wrapper which registers them.
+      if $(headers)
+      {
+	headers = [ DoSourceGrist $(headers) ] ;
+	SEARCH on $(headers) = $(SEARCH_SOURCE) ;
+	local suitereg = [ DoSourceGrist __suitereg.cpp ] ;
+	MakeLocate $(suitereg) : $(LOCATE_TARGET) ;
+	UnitTestSource $(suitereg) : $(headers) ;
+	Includes $(suitereg) : $(headers) ;
+	tests_src += $(suitereg) ;
+      }
+
+      # Compile all synthesized sources.
+      tests_obj = [ CompileObjects $(tests_src) ] ;
+      CCHDRS on $(tests_obj) += [ FIncludes $(SEARCH_SOURCE) ] ;
+      C++FLAGS on $(tests_obj) += $(COMPILER.C++FLAGS.EXCEPTIONS.ENABLE)
+	$(CPPUNIT.CFLAGS) ;
+      Clean $(test_clean) : $(tests_obj) ;
+
+      # Create the driver for "check_module".
+      UnitTestDriver $(mod) : $(tests_obj) ;
+      # Dynamically create the drivers for all parent directories.
+      UnitTestDynamicTargets $(mod) : $(tests_obj) : $(oldsubdir) ;
     }
-
-    # Also search for CppUnit::TestFixture subclasses in headers (*.h) and
-    # synthesize a C++ wrapper which registers them.
-    if $(headers)
-    {
-      headers = [ DoSourceGrist $(headers) ] ;
-      SEARCH on $(headers) = $(SEARCH_SOURCE) ;
-      local suitereg = [ DoSourceGrist __suitereg.cpp ] ;
-      MakeLocate $(suitereg) : $(LOCATE_TARGET) ;
-      UnitTestSource $(suitereg) : $(headers) ;
-      Includes $(suitereg) : $(headers) ;
-      tests_src += $(suitereg) ;
-    }
-
-    # Compile all synthesized sources.
-    tests_obj = [ CompileObjects $(tests_src) ] ;
-    CCHDRS on $(tests_obj) += [ FIncludes $(SEARCH_SOURCE) ] ;
-    C++FLAGS on $(tests_obj) += $(COMPILER.C++FLAGS.EXCEPTIONS.ENABLE)
-      $(CPPUNIT.CFLAGS) ;
-    Clean $(test_clean) : $(tests_obj) ;
-
-    # Create the driver for "check_module".
-    UnitTestDriver $(mod) : $(tests_obj) ;
-    # Dynamically create the drivers for all parent directories.
-    UnitTestDynamicTargets $(mod) : $(tests_obj) : $(oldsubdir) ;
   }
 
   SubDir TOP $(oldsubdir) ;

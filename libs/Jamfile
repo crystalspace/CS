@@ -1,8 +1,22 @@
 SubDir TOP libs ;
 
 CSLIB.SOURCES = ;
+CSLIB.TESTS = ;
 CSLIB.ROOT = $(SUBDIR_TOKENS) ;
 CSLIB.DECLARED = no ;
+
+## CsLibAddTestDir dirs, reparent
+##   Convenience rule for use by subdirectories of this directory and their
+##   children.  Adds a list of test directories within the child directory to
+##   the list of directories containing unit tests for the master
+##   crystalspace.lib target.  `reparent' is a list of tokens representing the
+##   relative path from this directory down to the child directory.
+rule CsLibAddTestDir
+{
+  local dirs = $(1) ;
+  local reparent = [ ConcatDirs $(2) ] ;
+  CSLIB.TESTS += $(dirs:R=$(reparent)) ;
+}
 
 ## CsLibAddFiles files, reparent
 ##   Convenience rule for use by subdirectories of this directory and their
@@ -44,8 +58,10 @@ rule CsLibAddWild
 ##   for a like-named directory in the public header tree. Adds all discovered
 ##   files to the master crystalspace.lib target. Most child directories can
 ##   simply invoke this rule with no arguments in order to become citizens of
-##   crystalspace.lib.  `rejects' is a list of files (rooted at this directory)
-##   which should not be given citizenship in crystalspace.lib.
+##   crystalspace.lib. `rejects' is a list of files (rooted at this directory)
+##   which should not be given citizenship in crystalspace.lib. If the child
+##   directory contains a unit-testing subdirectory named `t/', then it is
+##   incorporated into the unit tests for the master crystalspace.lib.
 rule CsLibAddModule
 {
   local rejects = $(1) ;
@@ -55,6 +71,7 @@ rule CsLibAddModule
   local incpat = *.h *.hpp *.hxx *.H ;
 
   CsLibAddWild $(srcpat) $(incpat) : $(modname) : $(rejects) ;
+  CsLibAddTestDir t : $(modname) ;
 
   local oldsubdir = $(SUBDIR_TOKENS) ;
   SubDir TOP include $(modname) ;
@@ -71,7 +88,8 @@ SubInclude TOP libs csplugincommon ;
 SubDir TOP libs ;
 
 Description crystalspace : "Crystal Space library" ;
-Library crystalspace : $(CSLIB.SOURCES) : shared ;
+Library crystalspace : $(CSLIB.SOURCES) : shared notest ;
+UnitTest crystalspace : $(CSLIB.TESTS) ;
 CFlags crystalspace : [ FDefines CS_CRYSTALSPACE_LIB ] ;
 MsvcDefine crystalspace : CS_CRYSTALSPACE_LIB $(CSLIB.MSVC_DEFINES) ;
 if $(CSLIB.CFLAGS)
