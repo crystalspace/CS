@@ -51,12 +51,11 @@ SCF_IMPLEMENT_IBASE_EXT_END
 
 csGraphics2DXLib::csGraphics2DXLib (iBase *iParent) :
   csGraphics2D (iParent), xwin (NULL), xshm (NULL),  xim (NULL), 
-  dpy (NULL), cmap (0), resize (false),
+  dpy (NULL), cmap (0), real_Memory (NULL),
   sim_lt8 (NULL), sim_lt16 (NULL)
 {
   xwin = NULL;
   xshm = NULL;
-  resize_w = resize_h = 0;
   EventOutlet = NULL;
 }
 
@@ -97,10 +96,8 @@ bool csGraphics2DXLib::Initialize (iObjectRegistry *object_reg)
   xwin = CS_LOAD_PLUGIN (plugin_mgr, CS_XWIN_SCF_ID, NULL, iXWindow);
   if (!xwin)
     return false;
-
   dpy = xwin->GetDisplay ();
   screen_num = xwin->GetScreen ();
-  xwin->SetCanvas ((iGraphics2D *)this);
 
   bool do_shm;
   // Query system settings
@@ -148,6 +145,7 @@ bool csGraphics2DXLib::Open()
 
   xwin->SetVisualInfo (&xvis);
   xwin->SetColormap (cmap);
+  xwin->SetCanvas ((iGraphics2D *)this);
 
   if (!xwin->Open ())
   {
@@ -887,6 +885,9 @@ bool csGraphics2DXLib::TryAllocateMemory ()
 
 bool csGraphics2DXLib::Resize (int width, int height)
 {
+  if (!is_open)
+    return csGraphics2D::Resize (width, height);
+
   if (!AllowResizing)
     return false;
 

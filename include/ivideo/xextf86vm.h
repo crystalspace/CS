@@ -31,12 +31,14 @@ SCF_VERSION (iXExtF86VM, 1, 0, 0);
 struct iXExtF86VM : public iBase
 {
   /// Open Video Mode plugin
-  virtual void Open (Display *dpy, int screen_num, 
+  virtual bool Open (Display *dpy, int screen_num, 
 		     XVisualInfo *xvis, Colormap cmap) = 0;
   /// Finish
   virtual void Close () = 0;
-  /// Set whether in full screen mode
-  virtual void SetFullScreen (Window ctx_win, Window wm_win, bool yesno) = 0;
+  /// Set the context window and its parent window while in windowed mode
+  virtual void SetWindows (Window ctx_win, Window wm_win) = 0;
+  /// Set whether in full screen mode, returns whether status changes
+  virtual bool SetFullScreen (bool yesno) = 0;
   /// Query full screen status
   virtual bool IsFullScreen () = 0;
   /// While in full screen jump to next higher resolution mode

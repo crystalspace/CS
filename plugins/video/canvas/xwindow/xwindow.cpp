@@ -323,8 +323,8 @@ bool csXWindow::Open ()
 
   if (xf86vm)
   {
-    xf86vm->Open (dpy, screen_num, xvis, cmap);
-    SetVideoMode (xf86vm->IsFullScreen (), false, false);
+    xf86vm->SetWindows (ctx_win, wm_win);
+    return xf86vm->Open (dpy, screen_num, xvis, cmap);
   }
   return true;
 }
@@ -334,20 +334,24 @@ void csXWindow::SetVideoMode (bool full, bool up, bool down)
   if (xf86vm)
   {
     int w, h;
-    xf86vm->SetFullScreen (ctx_win, wm_win, full);
+    if (!xf86vm->SetFullScreen (full) && !up && !down)
+      return;
 
-    if (full && up)
-      xf86vm->IncVideoMode ();
-    if (full && down)
-      xf86vm->DecVideoMode ();
-
-    xf86vm->GetDimensions (w, h);
-    if (w != wm_width || h != wm_height)
+    if (ctx_win && wm_win)
     {
-      wm_width = w;
-      wm_height = h;
-      if (Canvas->Resize (wm_width, wm_height))
-	XResizeWindow (dpy, ctx_win, wm_width, wm_height);
+      if (full && up)
+	xf86vm->IncVideoMode ();
+      if (full && down)
+	xf86vm->DecVideoMode ();
+
+      xf86vm->GetDimensions (w, h);
+      if (w != wm_width || h != wm_height)
+      {
+	wm_width = w;
+	wm_height = h;
+	if (Canvas->Resize (wm_width, wm_height))
+	  XResizeWindow (dpy, ctx_win, wm_width, wm_height);
+      }
     }
   }
 }

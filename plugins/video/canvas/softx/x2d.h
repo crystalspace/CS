@@ -48,9 +48,6 @@ class csGraphics2DXLib : public csGraphics2D, public iEventPlug
   // Window colormap
   Colormap cmap;
 
-  bool resize;
-  int resize_w, resize_h;
-
   // Everything for simulated depth
   int sim_depth;
   csPixelFormat real_pfmt;	// Contains the real pfmt is simulating stuff

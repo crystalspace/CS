@@ -42,6 +42,8 @@ class csXExtF86VM : public iXExtF86VM
   int screen_num;
   /// The Full Screen Window
   Window fs_win;
+  /// The context window and its parent window while in windowed mode
+  Window ctx_win, wm_win; 
   /// Is Full Screen ?
   bool full_screen;
   /// The dimensions
@@ -60,8 +62,8 @@ class csXExtF86VM : public iXExtF86VM
 		   XF86VidModeModeInfo *from_mode, 
 		   bool lock, int vp_x, int vp_y);
 
-  void EnterFullScreen (Window ctx_win, Window wm_win);
-  void LeaveFullScreen (Window ctx_win, Window wm_win);
+  void EnterFullScreen ();
+  void LeaveFullScreen ();
   void ChangeVideoMode (int zoom);
 public:
   SCF_DECLARE_IBASE;
@@ -73,11 +75,12 @@ public:
   void Report (int severity, const char* msg, ...);
 
 
-  virtual void Open (Display *dpy, int screen_num, 
+  virtual bool Open (Display *dpy, int screen_num, 
 		     XVisualInfo *xvis, Colormap cmap);
   virtual void Close ();
-
-  virtual void SetFullScreen (Window ctx_win, Window wm_win, bool yesno);
+  virtual void SetWindows (Window ctx_win, Window wm_win)
+    { this->ctx_win = ctx_win; this->wm_win = wm_win; }
+  virtual bool SetFullScreen (bool yesno);
   virtual bool IsFullScreen ()
     { return full_screen; }
 

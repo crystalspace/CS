@@ -95,7 +95,6 @@ bool csGraphics2DLineXLib::Initialize (iObjectRegistry *object_reg)
   }
   dpy = xwin->GetDisplay ();
   screen_num = xwin->GetScreen ();
-  xwin->SetCanvas ((iGraphics2D *)this);
 
   // Do a trick: unload the system font server since its useless for us
   iPlugin *fs = CS_QUERY_PLUGIN_ID (plugin_mgr, CS_FUNCID_FONTSERVER, iPlugin);
@@ -138,6 +137,7 @@ bool csGraphics2DLineXLib::Open()
 
   xwin->SetVisualInfo (&xvis);
   xwin->SetColormap (cmap);
+  xwin->SetCanvas ((iGraphics2D *)this);
 
   if (!xwin->Open ())
   {
@@ -426,6 +426,8 @@ void csGraphics2DLineXLib::SetRGB (int i, int r, int g, int b)
 
 bool csGraphics2DLineXLib::Resize (int width, int height)
 {
+  if (!is_open)
+    return csGraphics2D::Resize (width, height);
   if (!AllowResizing)
     return false;
   if (!csGraphics2D::Resize (width, height))

@@ -74,6 +74,7 @@ csGraphics2D::csGraphics2D (iBase* parent)
   is_open = false;
   win_title = csStrNew ("Crystal Space Application");
   object_reg = NULL;
+  AllowResizing = false;
 }
 
 bool csGraphics2D::Initialize (iObjectRegistry* object_reg)
@@ -679,6 +680,15 @@ void csGraphics2D::SetTitle (const char* title)
 
 bool csGraphics2D::Resize (int w, int h)
 {
+  if (!LineAddress)
+  {
+    // Still in Initialization phase, configuring size of canvas
+    Width = w;
+    Height = h;
+    SetClipRect (0, 0, Width - 1, Height - 1);
+    return true;
+  }
+
   if (!AllowResizing)
     return false;
 
@@ -745,9 +755,7 @@ bool csGraphics2D::CanvasConfig::SetOption (int id, csVariant* value)
       const char* buf = value->GetString ();
       int wres, hres;
       if (sscanf (buf, "%dx%d", &wres, &hres) == 2)
-      {
         scfParent->Resize (wres, hres);
-      }
       break;
     }
     default: return false;

@@ -101,7 +101,6 @@ bool csGraphics2DGLX::Initialize (iObjectRegistry *object_reg)
 
   dpy = xwin->GetDisplay ();
   screen_num = xwin->GetScreen ();
-  xwin->SetCanvas ((iGraphics2D *)this);
 
   // The texture manager only needs to know this:
   pfmt.PalEntries = 0;
@@ -139,6 +138,7 @@ bool csGraphics2DGLX::Open()
 
   xwin->SetColormap (cmap);
   xwin->SetVisualInfo (xvis);
+  xwin->SetCanvas ((iGraphics2D *)this);
 
   if (!xwin->Open ())
   {
@@ -353,6 +353,12 @@ void csGraphics2DGLX::Print (csRect * /*area*/)
 
 bool csGraphics2DGLX::Resize (int width, int height)
 {
+  if (!is_open)
+  {
+    Width = width;
+    Height = height;
+    return true;
+  }
   if (!AllowResizing)
     return false;
   Width = width;

@@ -51,6 +51,7 @@ csXExtF86VM::csXExtF86VM (iBase* parent)
   dpy = NULL;
   screen_num = 0;
   width = height = 0;
+  fs_win = wm_win = ctx_win = 0;
 }
 
 csXExtF86VM::~csXExtF86VM ()
@@ -83,9 +84,15 @@ void csXExtF86VM::Report (int severity, const char* msg, ...)
   va_end (arg);
 }
 
-void csXExtF86VM::Open (Display *dpy, int screen_num, 
+bool csXExtF86VM::Open (Display *dpy, int screen_num, 
 			XVisualInfo *xvis, Colormap cmap)
 {
+  if (!ctx_win || !wm_win)
+  {
+    Report (CS_REPORTER_SEVERITY_ERROR, "No Windows Set\n");
+    return false;
+  }
+    
   this->dpy = dpy;
   this->screen_num = screen_num;
   unsigned long cw_fs_mask  = (CWOverrideRedirect | 
@@ -112,24 +119,42 @@ void csXExtF86VM::Open (Display *dpy, int screen_num,
   XStoreName (dpy, fs_win, "Full Screen");
   XSetWindowBackground (dpy, fs_win, BlackPixel (dpy, screen_num));
   XSelectInput (dpy, fs_win, 0);
+
+  if (full_screen)
+  {
+    full_screen = false;
+    EnterFullScreen ();
+    return full_screen;
+  }
+  return true;
 }
 
 void csXExtF86VM::Close ()
 {
+  ctx_win = wm_win = 0;
   if (full_screen)
-    LeaveFullScreen ((Window)0, (Window) 0);
+    LeaveFullScreen ();
   XDestroyWindow (dpy, fs_win);
   fs_win = 0;
 }
 
-void csXExtF86VM::SetFullScreen (Window ctx_win, Window wm_win, bool yesno)
+bool csXExtF86VM::SetFullScreen (bool yesno)
 {
-  if (full_screen == yesno)
-    return;
-  if (yesno)
-    EnterFullScreen (ctx_win, wm_win);
-  else
-    LeaveFullScreen (ctx_win, wm_win);
+  if (!ctx_win)
+  { 
+    // In initialization phase and configuring
+    full_screen = yesno;
+    return false;
+  }
+  if (full_screen != yesno)
+  {  
+    if (yesno)
+      EnterFullScreen ();
+    else
+      LeaveFullScreen ();
+    return (full_screen == yesno);
+  }
+  return false;
 }
 
 static Bool GetModeInfo (Display *dpy, int scr, XF86VidModeModeInfo *info)
@@ -211,7 +236,6 @@ bool csXExtF86VM::SwitchMode (XF86VidModeModeInfo *to_mode,
   if (to_mode->hdisplay != from_mode->hdisplay ||
       to_mode->vdisplay != from_mode->vdisplay)
   {
-    // switch to non-fullscreen mode
     if (!XF86VidModeSwitchToMode (dpy, screen_num, to_mode))
     {
       Report (CS_REPORTER_SEVERITY_ERROR, "Unable to restore mode %dx%d",
@@ -223,7 +247,7 @@ bool csXExtF86VM::SwitchMode (XF86VidModeModeInfo *to_mode,
   return true;
 }
 
-void csXExtF86VM::EnterFullScreen (Window ctx_win, Window wm_win)
+void csXExtF86VM::EnterFullScreen ()
 {
   XWindowAttributes wa;
   // only switch if needed
@@ -273,7 +297,7 @@ void csXExtF86VM::EnterFullScreen (Window ctx_win, Window wm_win)
   }
 }
 
-void csXExtF86VM::LeaveFullScreen (Window ctx_win, Window wm_win)
+void csXExtF86VM::LeaveFullScreen ()
 {
   XWindowAttributes wa;
   XF86VidModeModeInfo mode;
@@ -299,8 +323,6 @@ void csXExtF86VM::LeaveFullScreen (Window ctx_win, Window wm_win)
     XReparentWindow (dpy, ctx_win, wm_win, 0, 0);
     width = wa.width;
     height = wa.height;
-//      XResizeWindow (dpy, ctx_win, wa.width, wa.height);
-    // restore pointer location
     XWarpPointer (dpy, None, ctx_win, 
 		  0, 0, 0, 0, 
 		  wa.width >> 1,
