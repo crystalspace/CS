@@ -166,6 +166,78 @@ csCurveTesselated* csBezier::Tesselate (int res)
   return previous_tesselation;
 }
 
+void csCurve::GetCameraBoundingBox (const csTransform& obj2cam, csBox3& cbox)
+{
+  csBox3 box;
+  GetObjectBoundingBox (box);
+  cbox.StartBoundingBox (obj2cam * box.GetCorner (0));
+  cbox.AddBoundingVertexSmart (obj2cam * box.GetCorner (1));
+  cbox.AddBoundingVertexSmart (obj2cam * box.GetCorner (2));
+  cbox.AddBoundingVertexSmart (obj2cam * box.GetCorner (3));
+  cbox.AddBoundingVertexSmart (obj2cam * box.GetCorner (4));
+  cbox.AddBoundingVertexSmart (obj2cam * box.GetCorner (5));
+  cbox.AddBoundingVertexSmart (obj2cam * box.GetCorner (6));
+  cbox.AddBoundingVertexSmart (obj2cam * box.GetCorner (7));
+}
+
+float csCurve::GetScreenBoundingBox (const csTransform& obj2cam,
+	const csCamera& camtrans,
+	csBox2& boundingBox)
+{
+  csVector2   oneCorner;
+  csBox3      cbox;
+
+  // @@@ Note. The bounding box created by this function greatly
+  // exagerates the real bounding box. However, this function
+  // needs to be fast. I'm not sure how to do this more accuratelly.
+
+  GetCameraBoundingBox (obj2cam, cbox);
+
+  // if the entire bounding box is behind the camera, we're done
+  if ((cbox.MinZ () < 0) && (cbox.MaxZ () < 0))
+    return -1;
+
+  // Transform from camera to screen space.
+  if (cbox.MinZ () <= 0)
+  {
+    // Sprite is very close to camera.
+    // Just return a maximum bounding box.
+    boundingBox.Set (-10000, -10000, 10000, 10000);
+  }
+  else
+  {
+    oneCorner.x = cbox.MaxX () / cbox.MaxZ () * camtrans.GetFOV () + camtrans.GetShiftX ();
+    oneCorner.y = cbox.MaxY () / cbox.MaxZ () * camtrans.GetFOV () + camtrans.GetShiftY ();
+    boundingBox.StartBoundingBox (oneCorner);
+    oneCorner.x = cbox.MinX () / cbox.MaxZ () * camtrans.GetFOV () + camtrans.GetShiftX ();
+    oneCorner.y = cbox.MinY () / cbox.MaxZ () * camtrans.GetFOV () + camtrans.GetShiftY ();
+    boundingBox.AddBoundingVertexSmart (oneCorner);
+    oneCorner.x = cbox.MinX () / cbox.MinZ () * camtrans.GetFOV () + camtrans.GetShiftX ();
+    oneCorner.y = cbox.MinY () / cbox.MinZ () * camtrans.GetFOV () + camtrans.GetShiftY ();
+    boundingBox.AddBoundingVertexSmart (oneCorner);
+    oneCorner.x = cbox.MaxX () / cbox.MinZ () * camtrans.GetFOV () + camtrans.GetShiftX ();
+    oneCorner.y = cbox.MaxY () / cbox.MinZ () * camtrans.GetFOV () + camtrans.GetShiftY ();
+    boundingBox.AddBoundingVertexSmart (oneCorner);
+  }
+
+  return cbox.MaxZ ();
+}
+
+void csBezier::GetObjectBoundingBox (csBox3& bbox)
+{
+  // @@@ This algo uses the control points to compute
+  // the bounding box. Is this right?
+  if (!valid_bbox)
+  {
+    valid_bbox = true;
+    object_bbox.StartBoundingBox ();
+    int i,j;
+    for (i=0 ; i<3 ; i++)
+      for (j=0 ; j<3 ; j++)
+        object_bbox.AddBoundingVertex (points[i][j]);
+  }
+  bbox = object_bbox;
+}
 
 csCurve::~csCurve ()
 {
@@ -358,14 +430,15 @@ void csCurve::CacheLightMaps (csPolygonSet* owner, int index)
 csBezier::csBezier (csBezierTemplate* parent_tmpl) : csCurve (parent_tmpl) 
 {
   int i,j;
-  for (i=0;i<3;i++)
-    for (j=0;j<3;j++)
-      {
-	texture_coords[i][j].x = (0.5*i);
-	texture_coords[i][j].y = (0.5*j);
-      }
+  for (i=0 ; i<3 ; i++)
+    for (j=0 ; j<3 ; j++)
+    {
+      texture_coords[i][j].x = (0.5*i);
+      texture_coords[i][j].y = (0.5*j);
+    }
   previous_tesselation = NULL;
   previous_resolution = -1;
+  valid_bbox = false;
 }
 
 csBezier::~csBezier ()
@@ -373,15 +446,15 @@ csBezier::~csBezier ()
   delete previous_tesselation;
 }
 
-void csBezier::SetControlPoint(int index, int control_id)
+void csBezier::SetControlPoint (int index, int control_id)
 {
   GetControlPoint(index) = parent->CurveVertex (control_id);
   GetTextureCoord(index) = parent->CurveTexel (control_id);
-	cpt[index][0] = GetControlPoint(index).x;
-	cpt[index][1] = GetControlPoint(index).y;
-	cpt[index][2] = GetControlPoint(index).z;
-	cpt[index][3] = GetTextureCoord(index).x;
-	cpt[index][4] = GetTextureCoord(index).y;
+  cpt[index][0] = GetControlPoint(index).x;
+  cpt[index][1] = GetControlPoint(index).y;
+  cpt[index][2] = GetControlPoint(index).z;
+  cpt[index][3] = GetTextureCoord(index).x;
+  cpt[index][4] = GetTextureCoord(index).y;
 }
 
 
@@ -424,15 +497,13 @@ csBezierTemplate::csBezierTemplate ()
 {
   parent = NULL;
   int i;
-  for (i=0;i<9;i++)
-    {
-      ver_id[i]=0;
-    }
+  for (i=0 ; i<9 ; i++)
+    ver_id[i] = 0;
 }
 
 void csBezierTemplate::SetVertex (int index, int ver_ind)
 {
-  ver_id[index]=ver_ind;
+  ver_id[index] = ver_ind;
 }
 int csBezierTemplate::GetVertex (int index) 
 {

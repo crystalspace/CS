@@ -15,6 +15,13 @@ The history order has been reversed so that new features are at the top.
 	  changes.
 	- Removed AddBoundingPolygons from csCurve because it is obsolete
 	  and needs to be implemented otherwise.
+	- Added GetObjectBoundingBox(), GetCameraBoundingBox(), and
+	  GetScreenBoundingBox() to csCurve. This is now used to cull
+	  away curved surfaces that are off-screen or off-portal and
+	  to indicate if they should be clipped. This should greatly
+	  speed up curved surfaces now and use DrawTriangleMesh to its
+	  (current) fullest potential.
+	- Implemented vertex fog for curved surfaces too.
 	- Eric Sunshine repaired the Dungeon plug-in following Martin's fix
 	  to Eric's fix.  Martin's fix triggered an internal compiler error on
 	  NextStep, so Eric re-fixed it in a manner which should suit everyone.

@@ -23,6 +23,7 @@
 #include "csutil/csvector.h"
 #include "csgeom/math3d.h"
 #include "csgeom/math2d.h"
+#include "csgeom/box.h"
 #include "csengine/bezier.h"
 #include "csengine/texture.h"
 #include "csengine/lghtmap.h"
@@ -150,6 +151,28 @@ public:
   ///
   void SetTextureHandle (csTextureHandle* h) { cstxt = h; }
 
+  /// Return a bounding box in object space for this curve.
+  virtual void GetObjectBoundingBox (csBox3& bbox) = 0;
+
+  /**
+   * Get a bounding box in camera space. This function
+   * uses the object bounding box so it will exagerate the real
+   * bounding box a little.
+   */
+  void GetCameraBoundingBox (const csTransform& obj2cam, csBox3& cbox);
+
+  /**
+   * Get a bounding box in screen space.
+   * This function will use GetCameraBoundingBox().
+   * It will fill in the boundingBox with the X and Y locations
+   * of the curve.  Returns the max Z location of the curve,
+   * or -1 if the curve is not on-screen.
+   * If the curve is not on-screen, the X and Y values are
+   * not valid.
+   */
+  float GetScreenBoundingBox (const csTransform& obj2cam,
+  	const csCamera& camtrans, csBox2& boundingBox);
+
   /**
    * Lighting support. If IsLightable returns true, PosInSpace and Normal should
    * calculate accurate positions and normals for the beziers, regardless of the
@@ -244,6 +267,11 @@ private:
   csCurveTesselated* previous_tesselation;
   int previous_resolution;
 
+  /// Object space bounding box.
+  csBox3 object_bbox;
+  /// If true then the object bbox is valid.
+  bool valid_bbox;
+
 public:
   ///
   csBezier (csBezierTemplate* parent_tmpl);
@@ -252,6 +280,9 @@ public:
 
   /// Tesselate this curve.
   virtual csCurveTesselated* Tesselate (int res);
+
+  /// Return a bounding box in object space for this curve.
+  virtual void GetObjectBoundingBox (csBox3& bbox);
 
   /// Load a curve from disk.
   void Load (char* buf);

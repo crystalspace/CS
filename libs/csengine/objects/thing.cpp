@@ -203,6 +203,37 @@ void csThing::DrawCurves (csRenderView& rview, bool use_z_buf)
   {
     c = curves.Get (i);
 
+    // Test visibility of entire curve by clipping bounding box against clipper.
+    // There are three possibilities:
+    //	1. box is not visible -> curve is not visible.
+    //	2. box is entirely visible -> curve is visible and need not be clipped.
+    //	3. box is partially visible -> curve is visible and needs to be clipped
+    //	   if rview has do_clip_plane set to true.
+    csBox2 bbox;
+    if (c->GetScreenBoundingBox (obj_cam, rview, bbox) < 0) continue;	// Not visible.
+    // Test if we need and should clip to the current portal.
+    int box_class;
+    box_class = rview.view->ClassifyBox (bbox);
+    if (box_class == -1) continue; // Not visible.
+    bool do_clip = false;
+    if (rview.do_clip_plane || rview.do_clip_frustum)
+    {
+      if (box_class == 0) do_clip = true;
+    }
+
+    // If we don't need to clip to the current portal then we
+    // test if we need to clip to the top-level portal.
+    // Top-level clipping is always required unless we are totally
+    // within the top-level frustum.
+    // IF it is decided that we need to clip here then we still
+    // clip to the inner portal. We have to do clipping anyway so
+    // why not do it to the smallest possible clip area.
+    if (!do_clip)
+    {
+      box_class = csWorld::current_world->top_clipper->ClassifyBox (bbox);
+      if (box_class == 0) do_clip = true;
+    }
+
     // If we have a dirty lightmap recombine the curves and the shadow maps.
     bool updated_lm = c->lightmap->UpdateRealLightMap();
 
@@ -226,7 +257,7 @@ void csThing::DrawCurves (csRenderView& rview, bool use_z_buf)
     mesh.vertex_colors[0] = tess->GetColors ();
     mesh.num_triangles = tess->GetNumTriangles ();
     mesh.triangles = tess->GetTriangles ();
-    mesh.do_clip = true;	// @@@
+    mesh.do_clip = do_clip;
     mesh.vertex_fog = fog_verts.GetArray ();
     bool gouraud = !!c->lightmap;
     mesh.fxmode = CS_FX_COPY | (gouraud ? CS_FX_GOURAUD : 0);
@@ -236,6 +267,10 @@ void csThing::DrawCurves (csRenderView& rview, bool use_z_buf)
       CsPrintf (MSG_STDOUT, "Warning! Curve without texture!\n");
       continue;
     }
+    extern void CalculateFogMesh (csRenderView* rview, csTransform* tr_o2c,
+	  G3DTriangleMesh& mesh);
+    CalculateFogMesh (&rview, &obj_cam, mesh);
+
     if (!rview.callback)
       rview.g3d->DrawTriangleMesh (mesh);
   }
