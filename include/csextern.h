@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 1998 by Jorrit Tyberghein
+    Copyright (C) 2004 by Jorrit Tyberghein
     Written by John Harger <jharger AT users.sourceforge.net>
 
     This library is free software; you can redistribute it and/or
@@ -19,6 +19,14 @@
 
 #ifndef __CS_CSEXTERN_H__
 #define __CS_CSEXTERN_H__
+
+// Defaults for platforms that do not define their own.
+#ifndef CS_EXPORT_SYM
+  #define CS_EXPORT_SYM
+#endif
+#ifndef CS_IMPORT_SYM
+  #define CS_IMPORT_SYM
+#endif
 
 #ifdef CS_CSUTIL_LIB
   #define CS_CSUTIL_EXPORT CS_EXPORT_SYM
