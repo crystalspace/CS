@@ -1,7 +1,7 @@
 
 
-//Depending on the Colorformat, we have different masks and shiftvalues 
-//to get the accrding values for rgb:
+// Depending on the Colorformat, we have different masks and shiftvalues 
+// to get the accrding values for rgb:
 #undef REDSHIFT
 #undef GREENSHIFT
 #undef GREENMASK
@@ -187,7 +187,6 @@ void PI_SCANFUNC (void *dest, int len,
 #endif
   } /* endwhile */
 }
-
 
 #undef PI_SCANFUNC
 #undef ZUSE
