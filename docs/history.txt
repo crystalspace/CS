@@ -13,6 +13,11 @@ chronological order.
 	  than being hardcoded to recognize only the literal strings "make" and
 	  "jam".  (For backward compatibility, the "make" and "jam" emit
 	  targets are still recognized.)
+	- Eric Sunshine generalized the CS_OUTPUT_INSTALLDIRS() macro in
+	  installdirs.m4 so that it can work with any suitable emitter macro,
+	  rather than being hardcoded to always use CS_JAMCONFIG_PROPERTY()
+	  (though it still defaults to CS_JAMCONFIG_PROPERTY() if an emitter is
+	  not specified).
 12-May-2004
 	- Jorrit added iMaterial->GetTextureLayerCount() and GetTextureLayer()
 	  to NR too (but with an empty implementation) so that we can get

@@ -35575,52 +35575,50 @@ cs_jamconfig_text="${cs_jamconfig_text}PACKAGE_NAME ?= \"$PACKAGE_NAME\" ;
     done
 
 
-# Handle the case when no prefix is given. And the special case when a path
-# contains more than 2 slashes, these paths seem to be correct but jam fails
+# Handle the case when no prefix is given, and the special case when a path
+# contains more than 2 slashes, these paths seem to be correct but Jam fails
 # on them.
 if test $prefix = NONE; then
-  jam_prefix="$ac_default_prefix"
+  cs_install_prefix="$ac_default_prefix"
 else
-  jam_prefix=`echo "$prefix" | sed -e 's:///*:/:g'`
+  cs_install_prefix=`echo "$prefix" | sed -e 's:///*:/:g'`
 fi
 
 if test $exec_prefix = NONE; then
-  jam_exec_prefix="\$(prefix)"
+  cs_install_exec_prefix="\$(prefix)"
 else
-  jam_exec_prefix=`echo "$exec_prefix" | sed -e 's:///*:/:g'`
+  cs_install_exec_prefix=`echo "$exec_prefix" | sed -e 's:///*:/:g'`
 fi
 
 
-cs_jamconfig_text="${cs_jamconfig_text}prefix ?= \"`echo "$jam_prefix" | sed -e 's/\${\([a-zA-Z_][a-zA-Z_]*\)}/$(\1)/g' -e 's/\\\\/\\\\\\\\/g'`\" ;
+cs_jamconfig_text="${cs_jamconfig_text}prefix ?= \"`echo "$cs_install_prefix" | sed 's/\${\([a-zA-Z_][a-zA-Z_]*\)}/$(\1)/g;s/\\\\/\\\\\\\\/g'`\" ;
 "
-cs_jamconfig_text="${cs_jamconfig_text}exec_prefix ?= \"`echo "$jam_exec_prefix" | sed -e 's/\${\([a-zA-Z_][a-zA-Z_]*\)}/$(\1)/g' -e 's/\\\\/\\\\\\\\/g'`\" ;
+cs_jamconfig_text="${cs_jamconfig_text}exec_prefix ?= \"`echo "$cs_install_exec_prefix" | sed 's/\${\([a-zA-Z_][a-zA-Z_]*\)}/$(\1)/g;s/\\\\/\\\\\\\\/g'`\" ;
 "
-
-cs_jamconfig_text="${cs_jamconfig_text}bindir ?= \"`echo "$bindir" | sed -e 's/\${\([a-zA-Z_][a-zA-Z_]*\)}/$(\1)/g' -e 's/\\\\/\\\\\\\\/g'`\" ;
+cs_jamconfig_text="${cs_jamconfig_text}bindir ?= \"`echo "$bindir" | sed 's/\${\([a-zA-Z_][a-zA-Z_]*\)}/$(\1)/g;s/\\\\/\\\\\\\\/g'`\" ;
 "
-cs_jamconfig_text="${cs_jamconfig_text}sbindir ?= \"`echo "$sbindir" | sed -e 's/\${\([a-zA-Z_][a-zA-Z_]*\)}/$(\1)/g' -e 's/\\\\/\\\\\\\\/g'`\" ;
+cs_jamconfig_text="${cs_jamconfig_text}sbindir ?= \"`echo "$sbindir" | sed 's/\${\([a-zA-Z_][a-zA-Z_]*\)}/$(\1)/g;s/\\\\/\\\\\\\\/g'`\" ;
 "
-cs_jamconfig_text="${cs_jamconfig_text}libexecdir ?= \"`echo "$libexecdir" | sed -e 's/\${\([a-zA-Z_][a-zA-Z_]*\)}/$(\1)/g' -e 's/\\\\/\\\\\\\\/g'`\" ;
+cs_jamconfig_text="${cs_jamconfig_text}libexecdir ?= \"`echo "$libexecdir" | sed 's/\${\([a-zA-Z_][a-zA-Z_]*\)}/$(\1)/g;s/\\\\/\\\\\\\\/g'`\" ;
 "
-cs_jamconfig_text="${cs_jamconfig_text}datadir ?= \"`echo "$datadir" | sed -e 's/\${\([a-zA-Z_][a-zA-Z_]*\)}/$(\1)/g' -e 's/\\\\/\\\\\\\\/g'`\" ;
+cs_jamconfig_text="${cs_jamconfig_text}datadir ?= \"`echo "$datadir" | sed 's/\${\([a-zA-Z_][a-zA-Z_]*\)}/$(\1)/g;s/\\\\/\\\\\\\\/g'`\" ;
 "
-cs_jamconfig_text="${cs_jamconfig_text}sysconfdir ?= \"`echo "$sysconfdir" | sed -e 's/\${\([a-zA-Z_][a-zA-Z_]*\)}/$(\1)/g' -e 's/\\\\/\\\\\\\\/g'`\" ;
+cs_jamconfig_text="${cs_jamconfig_text}sysconfdir ?= \"`echo "$sysconfdir" | sed 's/\${\([a-zA-Z_][a-zA-Z_]*\)}/$(\1)/g;s/\\\\/\\\\\\\\/g'`\" ;
 "
-cs_jamconfig_text="${cs_jamconfig_text}sharedstatedir ?= \"`echo "$sharedstatedir" | sed -e 's/\${\([a-zA-Z_][a-zA-Z_]*\)}/$(\1)/g' -e 's/\\\\/\\\\\\\\/g'`\" ;
+cs_jamconfig_text="${cs_jamconfig_text}sharedstatedir ?= \"`echo "$sharedstatedir" | sed 's/\${\([a-zA-Z_][a-zA-Z_]*\)}/$(\1)/g;s/\\\\/\\\\\\\\/g'`\" ;
 "
-cs_jamconfig_text="${cs_jamconfig_text}localstatedir ?= \"`echo "$localstatedir" | sed -e 's/\${\([a-zA-Z_][a-zA-Z_]*\)}/$(\1)/g' -e 's/\\\\/\\\\\\\\/g'`\" ;
+cs_jamconfig_text="${cs_jamconfig_text}localstatedir ?= \"`echo "$localstatedir" | sed 's/\${\([a-zA-Z_][a-zA-Z_]*\)}/$(\1)/g;s/\\\\/\\\\\\\\/g'`\" ;
 "
-cs_jamconfig_text="${cs_jamconfig_text}libdir ?= \"`echo "$libdir" | sed -e 's/\${\([a-zA-Z_][a-zA-Z_]*\)}/$(\1)/g' -e 's/\\\\/\\\\\\\\/g'`\" ;
+cs_jamconfig_text="${cs_jamconfig_text}libdir ?= \"`echo "$libdir" | sed 's/\${\([a-zA-Z_][a-zA-Z_]*\)}/$(\1)/g;s/\\\\/\\\\\\\\/g'`\" ;
 "
-cs_jamconfig_text="${cs_jamconfig_text}includedir ?= \"`echo "$includedir" | sed -e 's/\${\([a-zA-Z_][a-zA-Z_]*\)}/$(\1)/g' -e 's/\\\\/\\\\\\\\/g'`\" ;
+cs_jamconfig_text="${cs_jamconfig_text}includedir ?= \"`echo "$includedir" | sed 's/\${\([a-zA-Z_][a-zA-Z_]*\)}/$(\1)/g;s/\\\\/\\\\\\\\/g'`\" ;
 "
-cs_jamconfig_text="${cs_jamconfig_text}oldincludedir ?= \"`echo "$oldincludedir" | sed -e 's/\${\([a-zA-Z_][a-zA-Z_]*\)}/$(\1)/g' -e 's/\\\\/\\\\\\\\/g'`\" ;
+cs_jamconfig_text="${cs_jamconfig_text}oldincludedir ?= \"`echo "$oldincludedir" | sed 's/\${\([a-zA-Z_][a-zA-Z_]*\)}/$(\1)/g;s/\\\\/\\\\\\\\/g'`\" ;
 "
-cs_jamconfig_text="${cs_jamconfig_text}infodir ?= \"`echo "$infodir" | sed -e 's/\${\([a-zA-Z_][a-zA-Z_]*\)}/$(\1)/g' -e 's/\\\\/\\\\\\\\/g'`\" ;
+cs_jamconfig_text="${cs_jamconfig_text}infodir ?= \"`echo "$infodir" | sed 's/\${\([a-zA-Z_][a-zA-Z_]*\)}/$(\1)/g;s/\\\\/\\\\\\\\/g'`\" ;
 "
-cs_jamconfig_text="${cs_jamconfig_text}mandir ?= \"`echo "$mandir" | sed -e 's/\${\([a-zA-Z_][a-zA-Z_]*\)}/$(\1)/g' -e 's/\\\\/\\\\\\\\/g'`\" ;
+cs_jamconfig_text="${cs_jamconfig_text}mandir ?= \"`echo "$mandir" | sed 's/\${\([a-zA-Z_][a-zA-Z_]*\)}/$(\1)/g;s/\\\\/\\\\\\\\/g'`\" ;
 "
-
 
 
 
