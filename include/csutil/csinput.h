@@ -35,6 +35,7 @@
 #include "iutil/comp.h"
 struct iEvent;
 struct iEventQueue;
+struct iEventHandler;
 struct iObjectRegistry;
 
 /**
@@ -49,19 +50,14 @@ protected:
   iEventQueue* GetEventQueue();
   virtual void LostFocus() = 0;
   virtual void Post(iEvent*);
-private:
-  struct FocusListener : public iEventHandler
-  {
-    csInputDriver* Parent;
-    SCF_DECLARE_IBASE;
-    FocusListener() { SCF_CONSTRUCT_IBASE(0); }
-    virtual bool HandleEvent(iEvent&);
-  };
-  friend struct FocusListener;
-  FocusListener Listener;
-  iEventQueue* Queue;
+  virtual bool HandleEvent (iEvent &event);
+
+  iEventHandler *Listener;
   void StartListening();
   void StopListening();
+
+private:
+  iEventQueue* Queue;
 };
 
 /**
@@ -103,6 +99,13 @@ public:
 private:
   /// Application lost focus.
   virtual void LostFocus() { Reset(); }
+
+  struct eiEventHandler : public iEventHandler
+  {
+    SCF_DECLARE_EMBEDDED_IBASE (csKeyboardDriver);
+    virtual bool HandleEvent(iEvent &ev) { return scfParent->HandleEvent (ev); }
+  } scfiEventHandler;
+  friend struct eiEventHandler;
 };
 
 /**
@@ -165,6 +168,13 @@ public:
 private:
   /// Application lost focus.
   virtual void LostFocus() { Reset(); }
+
+  struct eiEventHandler : public iEventHandler
+  {
+    SCF_DECLARE_EMBEDDED_IBASE (csMouseDriver);
+    virtual bool HandleEvent(iEvent &ev) { return scfParent->HandleEvent (ev); }
+  } scfiEventHandler;
+  friend struct eiEventHandler;
 };
 
 /**
@@ -214,6 +224,13 @@ public:
 private:
   /// Application lost focus.
   virtual void LostFocus() { Reset(); }
+
+  struct eiEventHandler : public iEventHandler
+  {
+    SCF_DECLARE_EMBEDDED_IBASE (csJoystickDriver);
+    virtual bool HandleEvent(iEvent &ev) { return scfParent->HandleEvent (ev); }
+  } scfiEventHandler;
+  friend struct eiEventHandler;
 };
 
 #endif // __CS_CSINPUT_H__
