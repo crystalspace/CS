@@ -50,7 +50,7 @@ csThreadJobQueue::csThreadJobQueue()
   queueRunnable.AttachNew (new QueueRunnable (sharedData));
   queueThread = csThread::Create (queueRunnable);
   bool res = queueThread->Start();
-  CS_ASSERT (res);
+  CS_ASSERT (res); (void)res;
 }
 
 csThreadJobQueue::~csThreadJobQueue()
