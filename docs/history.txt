@@ -6,6 +6,7 @@ The history order is reversed so that new features are at the top.
 27-Jun-2003
 	- res augmented r3dtest to accept a map to load as a command line
 	  parameter.
+	- res renamed stencil.csplugin to the correct rlsstencil.csplugin.
 25-Jun-2003
 	- Oktal manually applied a patch to cssocket that was intended for
 	  ensocket, submitted by Ladislav Foldyna.
