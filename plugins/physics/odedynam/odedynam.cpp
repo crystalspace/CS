@@ -691,7 +691,7 @@ csODEBodyGroup::csODEBodyGroup (csODEDynamicSystem* sys)
 csODEBodyGroup::~csODEBodyGroup ()
 {
   for (int i = 0; i < bodies.Length(); i ++) {
-    ((csODERigidBody *)bodies[i])->UnsetGroup ();
+    ((csODERigidBody *)(iRigidBody*)bodies[i])->UnsetGroup ();
   }
 }
 
@@ -704,7 +704,7 @@ void csODEBodyGroup::AddBody (iRigidBody *body)
 
 void csODEBodyGroup::RemoveBody (iRigidBody *body)
 {
-  bodies.Delete (body, true);
+  bodies.Delete (body);
   ((csODERigidBody *)(body->QueryObject()))->UnsetGroup ();
 }
 

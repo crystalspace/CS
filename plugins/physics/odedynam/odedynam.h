@@ -218,6 +218,8 @@ public:
   virtual iDynamicsMoveCallback* GetDefaultMoveCallback () { return move_cb; }
 };
 
+class csODERigidBody;
+
 /**
  * odedynam implementation of iBodyGroup.  This will set a 
  * variable inside the body which will be compared against 
@@ -225,7 +227,7 @@ public:
  */
 class csODEBodyGroup : public iBodyGroup
 {
-  csObjVector bodies;
+  csRefArray<iRigidBody> bodies;
 
   csODEDynamicSystem* system;
  
