@@ -17,67 +17,68 @@
 */
 
 /*
-	SWIG interface for Crystal Space
+  SWIG interface for Crystal Space
 
-	This file includes scripting language specific SWIG files.
-	Search for 'pythpre' (pre-include phase) and 'pythpost' (post-include
-	phase) for places where to include files for new scripting languages.
+  This file includes scripting language specific SWIG files.  Search for
+  'pythpre' (pre-include phase) and 'pythpost' (post-include phase) for places
+  where to include files for new scripting languages.
 
-	Python (renej_frog@users.sourceforge.net):
-		Used for the new "cspython" plugin based on python 2.2
-		including almost complete access to CS.
+  Python (renej_frog@users.sourceforge.net):
+    Used for the new "cspython" plugin based on python 2.2 including almost
+    complete access to CS.
 
-		Additionally, provides CS as a python 2.2 module name "cspace".
-		To use this, make sure cspace.py and _cspace.so in directory
-		$CRYSTAL/scripts/python can be found by python; and don't
-		forget to set the CRYSTAL environment variable.  See
-		$CRYSTAL/scripts/python/pysimpcd.py for an example of usage.
+    Additionally, provides CS as a python 2.2 module name "cspace".  To use
+    this, make sure cspace.py and _cspace.so in directory
+    $CRYSTAL/scripts/python can be found by python; and don't forget to set the
+    CRYSTAL environment variable.  See $CRYSTAL/scripts/python/pysimpcd.py for
+    an example of usage.
 
-	Perl (oktal@gmx.co.uk):
-		Used for the "csperl5" plugin based on perl 5.8 including
-		access to most parts of CS (although some ealier versions are
-		probably supported).
+  Perl (oktal@gmx.co.uk):
+    Used for the "csperl5" plugin based on perl 5.8 including access to most
+    parts of CS (although some ealier versions are probably supported).
 
-		Additionally, provices CS as a perl 5.8 module name "cspace".
-		Make sure the directory containing cspace.pm and cspace.so,
-		$CRYSTAL/scripts/perl5, is in perl's @INC array.
+    Additionally, provices CS as a perl 5.8 module name "cspace".  Make sure
+    the directory containing cspace.pm and cspace.so, $CRYSTAL/scripts/perl5,
+    is in perl's @INC array.
 
-    Java (renej_frog@users.sourceforge.net):
-        A wrapper for using CS from Java is provided: crystalspace.jar
-        and libcsjava.so.
+  Java (renej_frog@users.sourceforge.net):
+    A wrapper for using CS from Java is provided: crystalspace.jar and
+    libcsjava.so.
 
-	Note:
-		Tested with swig 1.3.17 and up, swig 1.1 won't work!
+  Note:
+    Tested with swig 1.3.17 and up, swig 1.1 won't work!
 
-	Thanks to:
-		Norman Kramer <norman@users.sourceforge.net> who made me think
-			about sequence of declarations in SWIG file.
-		Mark Gossage <mark@gossage.cjb.net> who made me think about
-			preventing handling of smart pointers by SWIG to reduce
-			size of generated code.
-		Mat Sutcliffe <oktal@gmx.co.uk> for input, Perl includes,
-			and wrapping SCF and other macros.
+  Thanks to:
+    Norman Kramer <norman@users.sourceforge.net> who made me think
+      about sequence of declarations in SWIG file.
+    Mark Gossage <mark@gossage.cjb.net> who made me think about
+      preventing handling of smart pointers by SWIG to reduce
+      size of generated code.
+    Mat Sutcliffe <oktal@gmx.co.uk> for input, Perl includes,
+      and wrapping SCF and other macros.
+    Eric Sunshine <sunshine@sunshineco.com> for all the hours spent tracking
+      down and fixing bugs.
 */
 
 /*
-	SWIG's preprocessor can be used to "replace" a macro by a function
-	in the target scripting language using the following:
+  SWIG's preprocessor can be used to "replace" a macro by a function in the
+  target scripting language using the following:
 
-	In C header file:
+  In C header file:
 
-		#define X(arg) ...
+    #define X(arg) ...
 
-	which as a function would have the prototype:
+  which as a function would have the prototype:
 
-		int X (int i);
+    int X (int i);
 
-	Now in the SWIG *.i file do:
+  Now in the SWIG *.i file do:
 
-		#define _X(a) X(a)
-		#undef X
-		int _X (int i);
+    #define _X(a) X(a)
+    #undef X
+    int _X (int i);
 
-	and there will be a "X" function in the scripting language available.
+  and there will be a "X" function in the scripting language available.
 */
 
 %module cspace
@@ -124,7 +125,7 @@
 #endif
 
 #ifdef SWIGPERL5
-	%include "ivaria/perl1st.i"
+%include "ivaria/perl1st.i"
 #endif
 
 %{
@@ -132,130 +133,130 @@
 %}
 
 // The following list holds all the interfaces that are handled correctly.
-// If you have problems, first check if the interface in question is in
-// this list. Please keep the list sorted alphabetically.
+// If you have problems, first check if the interface in question is in this
+// list. Please keep the list sorted alphabetically.
 #ifndef CS_MINI_SWIG
 %define APPLY_FOR_EACH_INTERFACE
-	INTERFACE_APPLY(iAws)
-	INTERFACE_APPLY(iAwsKey)
-	INTERFACE_APPLY(iAudioStream)
-	INTERFACE_APPLY(iBase)
-	INTERFACE_APPLY(iBallState)
-	INTERFACE_APPLY(iBinaryLoaderPlugin)
-	INTERFACE_APPLY(iBodyGroup)
-	INTERFACE_APPLY(iCamera)
-	INTERFACE_APPLY(iCameraPosition)
-	INTERFACE_APPLY(iCacheManager)
-	INTERFACE_APPLY(iCollider)
-	INTERFACE_APPLY(iCollideSystem)
-	INTERFACE_APPLY(iComponent)
-	INTERFACE_APPLY(iConfigFile)
-	INTERFACE_APPLY(iConfigIterator)
-	INTERFACE_APPLY(iConfigManager)
-	INTERFACE_APPLY(iDataBuffer)
-	INTERFACE_APPLY(iDebugHelper)
-	INTERFACE_APPLY(iDocument)
-	INTERFACE_APPLY(iDocumentSystem)
-	INTERFACE_APPLY(iDynamics)
-	INTERFACE_APPLY(iDynamicSystem)
-	INTERFACE_APPLY(iEngine)
-	INTERFACE_APPLY(iEvent)
-	INTERFACE_APPLY(iEventHandler)
-	INTERFACE_APPLY(iEventQueue)
-	INTERFACE_APPLY(iFactory)
-	INTERFACE_APPLY(iFile)
-	INTERFACE_APPLY(iFont)
-	INTERFACE_APPLY(iFontServer)
-	INTERFACE_APPLY(iFrustumView)
-	INTERFACE_APPLY(iFrustumViewUserdata)
-	INTERFACE_APPLY(iGeneralFactoryState)
-	INTERFACE_APPLY(iGeneralMeshState)
-	INTERFACE_APPLY(iGraphics3D)
-	INTERFACE_APPLY(iGraphics2D)
-	INTERFACE_APPLY(iHalo)
-	INTERFACE_APPLY(iImage)
-	INTERFACE_APPLY(iImageIO)
-	INTERFACE_APPLY(iJoint)
-	INTERFACE_APPLY(iKeyboardDriver)
-        INTERFACE_APPLY(iLight)
-	INTERFACE_APPLY(iLightList)
-	INTERFACE_APPLY(iLoader)
-	INTERFACE_APPLY(iLoaderPlugin)
-	INTERFACE_APPLY(iMaterial)
-	INTERFACE_APPLY(iMaterialWrapper)
-	INTERFACE_APPLY(iMeshFactoryWrapper)
-	INTERFACE_APPLY(iMeshObject)
-	INTERFACE_APPLY(iMeshObjectFactory)
-	INTERFACE_APPLY(iMeshObjectType)
-	INTERFACE_APPLY(iMeshWrapper)
-	INTERFACE_APPLY(iMeshWrapperIterator)
-	INTERFACE_APPLY(iModelConverter)
-	INTERFACE_APPLY(iMouseDriver)
-	INTERFACE_APPLY(iMovable)
-	INTERFACE_APPLY(iMovableListener)
-	INTERFACE_APPLY(iObject)
-	INTERFACE_APPLY(iObjectModel)
-	INTERFACE_APPLY(iObjectModelListener)
-	INTERFACE_APPLY(iObjectRegistry)
-	INTERFACE_APPLY(iPluginManager)
-	INTERFACE_APPLY(iPolygonMesh)
-	INTERFACE_APPLY(iPortal)
-	INTERFACE_APPLY(iPortalContainer)
-	INTERFACE_APPLY(iReporter)
-	INTERFACE_APPLY(iReporterIterator)
-	INTERFACE_APPLY(iReporterListener)
-	INTERFACE_APPLY(iSCF)
-	INTERFACE_APPLY(iScript)
-	INTERFACE_APPLY(iScriptObject)
-	INTERFACE_APPLY(iSector)
-	INTERFACE_APPLY(iSectorList)
-	INTERFACE_APPLY(iSoundHandle)
-	INTERFACE_APPLY(iSoundLoader)
-	INTERFACE_APPLY(iSoundRender)
-	INTERFACE_APPLY(iSoundWrapper)
-	INTERFACE_APPLY(iSoundDriver)
-	INTERFACE_APPLY(iSoundSource)
-	INTERFACE_APPLY(iSprite2DState)
-	INTERFACE_APPLY(iSprite3DState)
-	INTERFACE_APPLY(iSpriteCal3DState)
-	INTERFACE_APPLY(iStandardReporterListener)
-	INTERFACE_APPLY(iStream)
-	INTERFACE_APPLY(iStreamIterator)
-	INTERFACE_APPLY(iStreamFormat)
-	INTERFACE_APPLY(iString)
-	INTERFACE_APPLY(iStringArray)
-	INTERFACE_APPLY(iTextureHandle)
-	INTERFACE_APPLY(iTextureList)
-	INTERFACE_APPLY(iTextureManager)
-	INTERFACE_APPLY(iTextureWrapper)
-	INTERFACE_APPLY(iThingState)
-	INTERFACE_APPLY(iVFS)
-	INTERFACE_APPLY(iVideoStream)
-	INTERFACE_APPLY(iView)
-	INTERFACE_APPLY(iVirtualClock)
-	INTERFACE_APPLY(iVisibilityCuller)
+  INTERFACE_APPLY(iAws)
+  INTERFACE_APPLY(iAwsKey)
+  INTERFACE_APPLY(iAudioStream)
+  INTERFACE_APPLY(iBase)
+  INTERFACE_APPLY(iBallState)
+  INTERFACE_APPLY(iBinaryLoaderPlugin)
+  INTERFACE_APPLY(iBodyGroup)
+  INTERFACE_APPLY(iCamera)
+  INTERFACE_APPLY(iCameraPosition)
+  INTERFACE_APPLY(iCacheManager)
+  INTERFACE_APPLY(iCollider)
+  INTERFACE_APPLY(iCollideSystem)
+  INTERFACE_APPLY(iComponent)
+  INTERFACE_APPLY(iConfigFile)
+  INTERFACE_APPLY(iConfigIterator)
+  INTERFACE_APPLY(iConfigManager)
+  INTERFACE_APPLY(iDataBuffer)
+  INTERFACE_APPLY(iDebugHelper)
+  INTERFACE_APPLY(iDocument)
+  INTERFACE_APPLY(iDocumentSystem)
+  INTERFACE_APPLY(iDynamics)
+  INTERFACE_APPLY(iDynamicSystem)
+  INTERFACE_APPLY(iEngine)
+  INTERFACE_APPLY(iEvent)
+  INTERFACE_APPLY(iEventHandler)
+  INTERFACE_APPLY(iEventQueue)
+  INTERFACE_APPLY(iFactory)
+  INTERFACE_APPLY(iFile)
+  INTERFACE_APPLY(iFont)
+  INTERFACE_APPLY(iFontServer)
+  INTERFACE_APPLY(iFrustumView)
+  INTERFACE_APPLY(iFrustumViewUserdata)
+  INTERFACE_APPLY(iGeneralFactoryState)
+  INTERFACE_APPLY(iGeneralMeshState)
+  INTERFACE_APPLY(iGraphics3D)
+  INTERFACE_APPLY(iGraphics2D)
+  INTERFACE_APPLY(iHalo)
+  INTERFACE_APPLY(iImage)
+  INTERFACE_APPLY(iImageIO)
+  INTERFACE_APPLY(iJoint)
+  INTERFACE_APPLY(iKeyboardDriver)
+  INTERFACE_APPLY(iLight)
+  INTERFACE_APPLY(iLightList)
+  INTERFACE_APPLY(iLoader)
+  INTERFACE_APPLY(iLoaderPlugin)
+  INTERFACE_APPLY(iMaterial)
+  INTERFACE_APPLY(iMaterialWrapper)
+  INTERFACE_APPLY(iMeshFactoryWrapper)
+  INTERFACE_APPLY(iMeshObject)
+  INTERFACE_APPLY(iMeshObjectFactory)
+  INTERFACE_APPLY(iMeshObjectType)
+  INTERFACE_APPLY(iMeshWrapper)
+  INTERFACE_APPLY(iMeshWrapperIterator)
+  INTERFACE_APPLY(iModelConverter)
+  INTERFACE_APPLY(iMouseDriver)
+  INTERFACE_APPLY(iMovable)
+  INTERFACE_APPLY(iMovableListener)
+  INTERFACE_APPLY(iObject)
+  INTERFACE_APPLY(iObjectModel)
+  INTERFACE_APPLY(iObjectModelListener)
+  INTERFACE_APPLY(iObjectRegistry)
+  INTERFACE_APPLY(iPluginManager)
+  INTERFACE_APPLY(iPolygonMesh)
+  INTERFACE_APPLY(iPortal)
+  INTERFACE_APPLY(iPortalContainer)
+  INTERFACE_APPLY(iReporter)
+  INTERFACE_APPLY(iReporterIterator)
+  INTERFACE_APPLY(iReporterListener)
+  INTERFACE_APPLY(iSCF)
+  INTERFACE_APPLY(iScript)
+  INTERFACE_APPLY(iScriptObject)
+  INTERFACE_APPLY(iSector)
+  INTERFACE_APPLY(iSectorList)
+  INTERFACE_APPLY(iSoundHandle)
+  INTERFACE_APPLY(iSoundLoader)
+  INTERFACE_APPLY(iSoundRender)
+  INTERFACE_APPLY(iSoundWrapper)
+  INTERFACE_APPLY(iSoundDriver)
+  INTERFACE_APPLY(iSoundSource)
+  INTERFACE_APPLY(iSprite2DState)
+  INTERFACE_APPLY(iSprite3DState)
+  INTERFACE_APPLY(iSpriteCal3DState)
+  INTERFACE_APPLY(iStandardReporterListener)
+  INTERFACE_APPLY(iStream)
+  INTERFACE_APPLY(iStreamIterator)
+  INTERFACE_APPLY(iStreamFormat)
+  INTERFACE_APPLY(iString)
+  INTERFACE_APPLY(iStringArray)
+  INTERFACE_APPLY(iTextureHandle)
+  INTERFACE_APPLY(iTextureList)
+  INTERFACE_APPLY(iTextureManager)
+  INTERFACE_APPLY(iTextureWrapper)
+  INTERFACE_APPLY(iThingState)
+  INTERFACE_APPLY(iVFS)
+  INTERFACE_APPLY(iVideoStream)
+  INTERFACE_APPLY(iView)
+  INTERFACE_APPLY(iVirtualClock)
+  INTERFACE_APPLY(iVisibilityCuller)
 %enddef
 #else // CS_MINI_SWIG
 #ifndef CS_MICRO_SWIG
 %define APPLY_FOR_EACH_INTERFACE
-	INTERFACE_APPLY(iBase)
-	INTERFACE_APPLY(iEvent)
-	INTERFACE_APPLY(iEventHandler)
-	INTERFACE_APPLY(iEventQueue)
-	INTERFACE_APPLY(iFont)
-	INTERFACE_APPLY(iFontServer)
-	INTERFACE_APPLY(iGraphics3D)
-	INTERFACE_APPLY(iGraphics2D)
-	INTERFACE_APPLY(iObjectRegistry)
-	INTERFACE_APPLY(iSCF)
-        INTERFACE_APPLY(iVFS)
+  INTERFACE_APPLY(iBase)
+  INTERFACE_APPLY(iEvent)
+  INTERFACE_APPLY(iEventHandler)
+  INTERFACE_APPLY(iEventQueue)
+  INTERFACE_APPLY(iFont)
+  INTERFACE_APPLY(iFontServer)
+  INTERFACE_APPLY(iGraphics3D)
+  INTERFACE_APPLY(iGraphics2D)
+  INTERFACE_APPLY(iObjectRegistry)
+  INTERFACE_APPLY(iSCF)
+  INTERFACE_APPLY(iVFS)
 %enddef
 #else // CS_MICRO_SWIG
 %define APPLY_FOR_EACH_INTERFACE
-	INTERFACE_APPLY(iBase)
-	INTERFACE_APPLY(iObjectRegistry)
-	INTERFACE_APPLY(iSCF)
-        INTERFACE_APPLY(iVFS)
+  INTERFACE_APPLY(iBase)
+  INTERFACE_APPLY(iObjectRegistry)
+  INTERFACE_APPLY(iSCF)
+  INTERFACE_APPLY(iVFS)
 %enddef
 #endif // CS_MICRO_SWIG
 #endif // CS_MINI_SWIG
@@ -370,44 +371,44 @@
 %immutable csWrapPtr::Type;
 %inline %{
 
-	// This pointer wrapper can be used to prevent code-bloat by macros
-	// acting as template functions.  Examples are SCF_QUERY_INTERFACE()
-	// and CS_QUERY_REGISTRY(). Note that this works only if you're not
-	// using virtual inheritance.  Also note that CS should never need to
-	// use virtual inheritance as long as it has SCF.
-	//
-	// Ref - A managed reference to the iBase pointer of the wrapped
-	//    interface.
-	// VoidPtr - A raw pointer to the address of the the specified SCF
-	//    interface after performing a dynamic cast from iBase. This
-	//    address may differ from the iBase address (as a result of normal
-	//    C++ casting behavior where objects and inheritence are
-	//    involved). This is the actual value which the higher-level
-	//    scripting objects wrap; they do not wrap the iBase pointer.  This
-	//    member is assigned only by very specialized functions which
-	//    already know, or which can compute, the raw interface address,
-	//    such as iBase::_DynamicCast(), and the various FOO_QUERY_BAR()
-	//    macros.
-	// Type
-	//    The SCF interface name which this pointer represents (for
-	//    instance, "iEngine").
+  // This pointer wrapper can be used to prevent code-bloat by macros
+  // acting as template functions.  Examples are SCF_QUERY_INTERFACE()
+  // and CS_QUERY_REGISTRY(). Note that this works only if you're not
+  // using virtual inheritance.  Also note that CS should never need to
+  // use virtual inheritance as long as it has SCF.
+  //
+  // Ref - A managed reference to the iBase pointer of the wrapped
+  //    interface.
+  // VoidPtr - A raw pointer to the address of the the specified SCF
+  //    interface after performing a dynamic cast from iBase. This
+  //    address may differ from the iBase address (as a result of normal
+  //    C++ casting behavior where objects and inheritence are
+  //    involved). This is the actual value which the higher-level
+  //    scripting objects wrap; they do not wrap the iBase pointer.  This
+  //    member is assigned only by very specialized functions which
+  //    already know, or which can compute, the raw interface address,
+  //    such as iBase::_DynamicCast(), and the various FOO_QUERY_BAR()
+  //    macros.
+  // Type
+  //    The SCF interface name which this pointer represents (for
+  //    instance, "iEngine").
 
-	struct csWrapPtr
-	{
-	  csRef<iBase> Ref;
-	  void *VoidPtr;
-	  const char *Type;
-	  csWrapPtr (const char *t, iBase *r)
-		: Ref (r), VoidPtr (0), Type (t) {}
-	  csWrapPtr (const char *t, csPtr<iBase> r)
-		: Ref (r), VoidPtr (0), Type (t) {}
-	  csWrapPtr (const char *t, csRef<iBase> r)
-		: Ref (r), VoidPtr (0), Type (t) {}
-	  csWrapPtr (const char *t, void *p)
-		: VoidPtr (p), Type (t) {}
-	  csWrapPtr (const csWrapPtr &p)
-		: Ref (p.Ref), VoidPtr (p.VoidPtr), Type (p.Type) {}
-	};
+  struct csWrapPtr
+  {
+    csRef<iBase> Ref;
+    void *VoidPtr;
+    const char *Type;
+    csWrapPtr (const char *t, iBase *r)
+    : Ref (r), VoidPtr (0), Type (t) {}
+    csWrapPtr (const char *t, csPtr<iBase> r)
+    : Ref (r), VoidPtr (0), Type (t) {}
+    csWrapPtr (const char *t, csRef<iBase> r)
+    : Ref (r), VoidPtr (0), Type (t) {}
+    csWrapPtr (const char *t, void *p)
+    : VoidPtr (p), Type (t) {}
+    csWrapPtr (const csWrapPtr &p)
+    : Ref (p.Ref), VoidPtr (p.VoidPtr), Type (p.Type) {}
+  };
 
 %}
 
@@ -423,35 +424,27 @@
 #define TYPEMAP_OUTARG_ARRAY_PTR_CNT(a,b,c)
 
 #if defined(SWIGPYTHON)
-	%include "ivaria/pythpre.i"
+  %include "ivaria/pythpre.i"
 #elif defined(SWIGPERL5)
-	%include "ivaria/perlpre.i"
+  %include "ivaria/perlpre.i"
 #elif defined(SWIGRUBY)
-	%include "ivaria/rubypre.i"
+  %include "ivaria/rubypre.i"
 #elif defined(SWIGTCL8)
-	%include "ivaria/tclpre.i"
+  %include "ivaria/tclpre.i"
 #elif defined(SWIGJAVA)
-	%include "ivaria/javapre.i"
+  %include "ivaria/javapre.i"
 #endif
 
 // Handle arrays as input arguments.
-TYPEMAP_IN_ARRAY_CNT_PTR(
-	(int num_layers, iTextureWrapper ** wrappers), /**/
-)
-TYPEMAP_IN_ARRAY_PTR_CNT(
-	(csVector2 * InPolygon, int InCount), *
-)
-TYPEMAP_IN_ARRAY_PTR_CNT(
-	(csVector3* vertices, int num_vertices), *
-)
-TYPEMAP_IN_ARRAY_PTR_CNT(
-	(csVector3* vertices, int num), *
-)
+TYPEMAP_IN_ARRAY_CNT_PTR((int num_layers, iTextureWrapper ** wrappers), /**/)
+TYPEMAP_IN_ARRAY_PTR_CNT((csVector2 * InPolygon, int InCount), *)
+TYPEMAP_IN_ARRAY_PTR_CNT((csVector3* vertices, int num_vertices), *)
+TYPEMAP_IN_ARRAY_PTR_CNT((csVector3* vertices, int num), *)
 
 // Handle arrays as output arguments.
 TYPEMAP_OUTARG_ARRAY_PTR_CNT(
-	(csVector2 * OutPolygon, int & OutCount),
-	new csVector2[MAX_OUTPUT_VERTICES], *
+  (csVector2 * OutPolygon, int & OutCount),
+  new csVector2[MAX_OUTPUT_VERTICES], *
 )
 
 %ignore csPtr::csPtr;
@@ -463,13 +456,10 @@ TYPEMAP_OUTARG_ARRAY_PTR_CNT(
 %include "csutil/ref.h"
 
 %define INTERFACE_PRE(T)
-
-	%nodefault T;
-
-	TYPEMAP_OUT_csRef(T)
-	TYPEMAP_OUT_csPtr(T)
-	TYPEMAP_OUT_csRefArray(T)
-
+  %nodefault T;
+  TYPEMAP_OUT_csRef(T)
+  TYPEMAP_OUT_csPtr(T)
+  TYPEMAP_OUT_csRefArray(T)
 %enddef
 
 #undef INTERFACE_APPLY
@@ -478,14 +468,12 @@ APPLY_FOR_EACH_INTERFACE
 
 TYPEMAP_OUT_csWrapPtr
 
-// Inclusion of CS headers.
-// The sequence of %include-ing the CS headers can be crucial!
-// The scheme is as follows: %ignore'd functions and types are placed
-// before actual inclusion, as are "local" %typemap's (like default).
-// After %include-ing the header resets can be done; for example
-// resetting the %typemap(default). The %extend-ing and extra code takes
-// place after all %include's are done, mentioning the header(s) it is
-// related to.
+// Inclusion of CS headers.  The sequence of %include-ing the CS headers can be
+// crucial!  The scheme is as follows: %ignore'd functions and types are placed
+// before actual inclusion, as are "local" %typemap's (like default).  After
+// %include-ing the header resets can be done; for example resetting the
+// %typemap(default). The %extend-ing and extra code takes place after all
+// %include's are done, mentioning the header(s) it is related to.
 
 %ignore csArray::Capacity;
 %ignore csArray::DefaultCompare;
@@ -804,9 +792,12 @@ TYPEMAP_OUT_csWrapPtr
 
 %ignore csInitializer::RequestPlugins(iObjectRegistry*, ...);
 %ignore csInitializer::RequestPluginsV;
-%rename (_RequestPlugins) csInitializer::RequestPlugins(iObjectRegistry*, csArray<csPluginRequest> const&);
-%ignore csInitializer::SetupEventHandler(iObjectRegistry*, csEventHandlerFunc, unsigned int);
-%rename(_SetupEventHandler) csInitializer::SetupEventHandler(iObjectRegistry*, iEventHandler *, unsigned int);
+%rename (_RequestPlugins) csInitializer::RequestPlugins(iObjectRegistry*,
+  csArray<csPluginRequest> const&);
+%ignore csInitializer::SetupEventHandler(iObjectRegistry*, csEventHandlerFunc,
+  unsigned int);
+%rename(_SetupEventHandler) csInitializer::SetupEventHandler(iObjectRegistry*,
+  iEventHandler *, unsigned int);
 %typemap(default) const char * configName { $1 = 0; }
 %include "cstool/initapp.h"
 %typemap(default) const char * configName;
@@ -908,7 +899,7 @@ TYPEMAP_OUT_csWrapPtr
 %rename(RetrieveDouble) iEvent::Retrieve(const char *, double &) const;
 %rename(RetrieveString) iEvent::Retrieve(const char *, char **) const;
 %rename(RetrieveBool) iEvent::Retrieve(const char *, bool &) const;
-%rename(RetrieveVoidPtr) iEvent::Retrieve(const char *, void **, size_t &) const;
+%rename(RetrieveVoidPtr) iEvent::Retrieve(const char*, void**, size_t&) const;
 #pragma SWIG nowarn=312; // nested union not supported
 
 %include "iutil/event.h"
@@ -987,7 +978,7 @@ TYPEMAP_OUT_csWrapPtr
 %rename(FloatCall) *::Call(const char*, float&, const char*, ...);
 %rename(DoubleCall) *::Call(const char*, double&, const char*, ...);
 %rename(StringCall) *::Call(const char*, char**, const char*, ...);
-%rename(ObjectCall) *::Call(const char*, csRef<iScriptObject>&, const char*, ...);
+%rename(ObjectCall) *::Call(const char*,csRef<iScriptObject>&,const char*,...);
 %rename(StoreInt) iScript::Store(const char*, int);
 %rename(StoreFloat) iScript::Store(const char*, float);
 %rename(StoreDouble) iScript::Store(const char*, double);
@@ -1023,14 +1014,11 @@ TYPEMAP_OUT_csWrapPtr
 #endif // CS_MINI_SWIG
 
 %define INTERFACE_POST(T)
-
-	%extend T
-	{
-		virtual ~ T () { if (self) self->DecRef (); }
-		static int scfGetVersion()
-		{ return scfInterface<T>::GetVersion(); }
-	}
-
+  %extend T
+  {
+    virtual ~T() { if (self) self->DecRef(); }
+    static int scfGetVersion() { return scfInterface<T>::GetVersion(); }
+  }
 %enddef
 
 #undef INTERFACE_APPLY
@@ -1041,8 +1029,7 @@ APPLY_FOR_EACH_INTERFACE
 // "dynamic_cast<T*>(self)". For now, this is not necessary because
 // classic C casts are used all over the place in CS. Note that for
 // readability it might be better to use "static_cast<T*>(self)".
-%define CAST_FROM_BASE(T)
-	else if (!strcmp(to_name, #T)) ptr = (void*)(T*)self;
+%define CAST_FROM_BASE(T) else if (!strcmp(to_name, #T)) ptr = (void*)(T*)self;
 %enddef
 #undef INTERFACE_APPLY
 #define INTERFACE_APPLY(x) CAST_FROM_BASE(x)
@@ -1050,14 +1037,14 @@ APPLY_FOR_EACH_INTERFACE
 // csutil/scf.h
 %extend iBase
 {
-	csWrapPtr _DynamicCast (const char * to_name)
-	{
-		void * ptr;
-		if (!to_name || !to_name[0] || !self) ptr = 0;
-		APPLY_FOR_EACH_INTERFACE
-		else ptr = 0;
-		return csWrapPtr(to_name, ptr);
-	}
+  csWrapPtr _DynamicCast (const char * to_name)
+  {
+    void* ptr;
+    if (!to_name || !to_name[0] || !self) ptr = 0;
+    APPLY_FOR_EACH_INTERFACE
+    else ptr = 0;
+    return csWrapPtr(to_name, ptr);
+  }
 }
 
 #undef CAST_FROM_BASE
@@ -1067,62 +1054,43 @@ APPLY_FOR_EACH_INTERFACE
 %extend iSprite2DState
 {
   csSprite2DVertex* GetVertexByIndex(int index)
-  {
-    return &(self->GetVertices()[index]);
-  }
+  { return &(self->GetVertices()[index]); }
 
   int GetVertexCount()
-  {
-    return self->GetVertices().Length();
-  }
+  { return self->GetVertices().Length(); }
 }
 
 // imesh/genmesh.h
 %extend iGeneralFactoryState
 {
   csVector3 *GetVertexByIndex(int index)
-  {
-    return &(self->GetVertices()[index]);
-  }
+  { return &(self->GetVertices()[index]); }
 
   csVector2 *GetTexelByIndex(int index)
-  {
-    return &(self->GetTexels()[index]);
-  }
+  { return &(self->GetTexels()[index]); }
 
   csVector3 *GetNormalByIndex(int index)
-  {
-    return &(self->GetNormals()[index]);
-  }
+  { return &(self->GetNormals()[index]); }
 
   csTriangle *GetTriangleByIndex(int index)
-  {
-    return &(self->GetTriangles()[index]);
-  }
+  { return &(self->GetTriangles()[index]); }
 
   csColor *GetColorByIndex(int index)
-  {
-    return &(self->GetColors()[index]);
-  }
+  { return &(self->GetColors()[index]); }
 }
 
 // iaws/aws.h
 %extend iAws
 {
-       bool SetupCanvas (iGraphics2D *g2d=0, iGraphics3D *g3d=0)
-       {
-         return self->SetupCanvas(0, g2d, g3d);
-       }
+  bool SetupCanvas (iGraphics2D *g2d=0, iGraphics3D *g3d=0)
+  { return self->SetupCanvas(0, g2d, g3d); }
 }
-
 
 // iutil/csinput.h
 %extend iKeyboardDriver
 {
-	bool GetKeyState (const char * key)
-	{
-		return self->GetKeyState ((int) key[0]);
-	}
+  bool GetKeyState (const char * key)
+  { return self->GetKeyState ((int) key[0]); }
 }
 #endif // CS_MINI_SWIG
 
@@ -1130,19 +1098,19 @@ APPLY_FOR_EACH_INTERFACE
 // iutil/event.h
 %extend iEvent
 {
-	const csEventMouseData Mouse;
-	const csEventJoystickData Joystick;
-	const csEventCommandData Command;
+  const csEventMouseData Mouse;
+  const csEventJoystickData Joystick;
+  const csEventCommandData Command;
 }
 
 // iutil/event.h
 %{
-	csEventMouseData * iEvent_Mouse_get (iEvent * event)
-		{ return &event->Mouse; }
-	csEventJoystickData * iEvent_Joystick_get (iEvent * event)
-		{ return &event->Joystick; }
-	csEventCommandData * iEvent_Command_get (iEvent * event)
-		{ return &event->Command; }
+  csEventMouseData * iEvent_Mouse_get (iEvent * event)
+    { return &event->Mouse; }
+  csEventJoystickData * iEvent_Joystick_get (iEvent * event)
+    { return &event->Joystick; }
+  csEventCommandData * iEvent_Command_get (iEvent * event)
+    { return &event->Command; }
 %}
 
 // iutil/evdefs.h
@@ -1174,10 +1142,8 @@ csPtr<iBase> _CS_LOAD_PLUGIN_ALWAYS (iPluginManager *, const char *);
 // ivaria/collider.h
 %extend iCollideSystem
 {
-	csCollisionPair * GetCollisionPairByIndex (int index)
-	{
-		return self->GetCollisionPairs() + index;
-	}
+  csCollisionPair * GetCollisionPairByIndex (int index)
+  { return self->GetCollisionPairs() + index; }
 }
 #endif // CS_MINI_SWIG
 
@@ -1194,190 +1160,137 @@ uint _CS_FX_SETALPHA_INT (uint);
 #ifndef CS_MINI_SWIG
 // csgeom/vector2.h csgeom/vector3.h
 %define VECTOR_OBJECT_FUNCTIONS(V)
-	V operator + (const V & v) const
-		{ return *self + v; }
-	V operator - (const V & v) const
-		{ return *self - v; }
-	float operator * (const V & v) const
-		{ return *self * v; }
-	V operator * (float f) const
-		{ return *self * f; }
-	V operator / (float f) const
-		{ return *self * f; }
-	bool operator == (const V & v) const
-		{ return *self == v; }
-	bool operator != (const V & v) const
-		{ return *self != v; }
-	bool operator < (float f) const
-		{ return *self < f; }
-	bool operator > (float f) const
-		{ return f > *self; }
+  V operator + (const V & v) const { return *self + v; }
+  V operator - (const V & v) const { return *self - v; }
+  float operator * (const V & v) const { return *self * v; }
+  V operator * (float f) const { return *self * f; }
+  V operator / (float f) const { return *self * f; }
+  bool operator == (const V & v) const { return *self == v; }
+  bool operator != (const V & v) const { return *self != v; }
+  bool operator < (float f) const { return *self < f; }
+  bool operator > (float f) const { return f > *self; }
 %enddef
-
 
 // csgeom/vector2.h
 %extend csVector2
 {
-	VECTOR_OBJECT_FUNCTIONS(csVector2)
+  VECTOR_OBJECT_FUNCTIONS(csVector2)
 }
 
 // csgeom/vector3.h
 %extend csVector3
 {
-	VECTOR_OBJECT_FUNCTIONS(csVector3)
-
-	csVector3 & operator *= (const csTransform & t)
-		{ return *self *= t; }
-	csVector3 & operator /= (const csReversibleTransform & t)
-		{ return *self /= t; }
-	csVector3 operator / (const csReversibleTransform & t)
-		{ return *self / t; }
-	csVector3 project (const csVector3 & what) const
-		{ return what << *self; }
+  VECTOR_OBJECT_FUNCTIONS(csVector3)
+  csVector3& operator *=(const csTransform& t) { return *self *= t; }
+  csVector3& operator /=(const csReversibleTransform& t) { return *self /= t; }
+  csVector3 operator /(const csReversibleTransform& t) { return *self / t; }
+  csVector3 project(const csVector3& what) const { return what << *self; }
 }
 
-
 %define BOX_OBJECT_FUNCTIONS(B)
-	B operator + (const B & b) const
-		{ return *self + b; }
-	B operator * (const B & b ) const
-		{ return *self * b; }
-	bool operator != (const B & b ) const
-		{ return *self != b; }
-	bool operator < (const B & b ) const
-		{ return *self < b; }
-	bool operator > (const B & b ) const
-		{ return b > *self; }
+  B operator + (const B & b) const { return *self + b; }
+  B operator * (const B & b ) const { return *self * b; }
+  bool operator != (const B & b ) const { return *self != b; }
+  bool operator < (const B & b ) const { return *self < b; }
+  bool operator > (const B & b ) const { return b > *self; }
 %enddef
 
 //csgeom/box.h
 %extend csBox2
 {
   BOX_OBJECT_FUNCTIONS(csBox2)
-
-  csBox2 operator + (const csVector2 & point) const
-                { return *self + point; }
-  bool operator < ( const csVector2 & point ) const
-                { return point < *self; }
+  csBox2 operator + (const csVector2 & point) const { return *self + point; }
+  bool operator < ( const csVector2 & point ) const { return point < *self; }
 }
 
 %extend csBox3
 {
   BOX_OBJECT_FUNCTIONS(csBox3)
-
-  csBox3 operator + (const csVector3 & point) const
-                { return *self + point; }
-  bool operator < ( const csVector3 & point ) const
-                { return point < *self; }
+  csBox3 operator + (const csVector3 & point) const { return *self + point; }
+  bool operator < ( const csVector3 & point ) const { return point < *self; }
 
 }
 
 // csgeom/plane3.h
 %extend csPlane3
 {
-	csPlane3 & operator *= (const csTransform & t)
-		{ return *self *= t; }
-	csPlane3 & operator /= (const csReversibleTransform & t)
-		{ return *self /= t; }
-	csPlane3 operator / (const csReversibleTransform & t)
-		{ return *self / t; }
+  csPlane3& operator *=(const csTransform& t) { return *self *= t; }
+  csPlane3& operator /=(const csReversibleTransform& t) { return *self /= t; }
+  csPlane3 operator /(const csReversibleTransform& t) { return *self / t; }
 }
 
 // csgeom/sphere.h
 %extend csSphere
 {
-	csSphere & operator *= (const csTransform & t)
-		{ return *self *= t; }
-	csSphere operator / (const csReversibleTransform & t)
-		{ return *self / t; }
+  csSphere & operator *= (const csTransform & t) { return *self *= t; }
+  csSphere operator / (const csReversibleTransform & t) { return *self / t; }
 }
 
 // csgeom/matrix3.h
 %extend csMatrix3
 {
-	csMatrix3 operator + (const csMatrix3 & m)
-		{ return *self + m; }
-	csMatrix3 operator - (const csMatrix3 & m)
-		{ return *self - m; }
-	csMatrix3 operator * (const csMatrix3 & m)
-		{ return *self * m; }
-	csVector3 operator * (const csVector3 & v)
-		{ return *self * v; }
-	csMatrix3 operator * (float f)
-		{ return *self * f; }
-	csMatrix3 operator / (float f)
-		{ return *self / f; }
-	bool operator == (const csMatrix3 & m) const
-		{ return *self == m; }
-	bool operator != (const csMatrix3 & m) const
-		{ return *self != m; }
-	bool operator < (float f) const
-		{ return *self < f; }
-	csMatrix3 operator * (const csTransform & t) const
-		{ return *self * t; }
-	csMatrix3 & operator *= (const csTransform & t)
-		{ return *self *= t; }
+  csMatrix3 operator + (const csMatrix3 & m) { return *self + m; }
+  csMatrix3 operator - (const csMatrix3 & m) { return *self - m; }
+  csMatrix3 operator * (const csMatrix3 & m) { return *self * m; }
+  csVector3 operator * (const csVector3 & v) { return *self * v; }
+  csMatrix3 operator * (float f) { return *self * f; }
+  csMatrix3 operator / (float f) { return *self / f; }
+  bool operator == (const csMatrix3 & m) const { return *self == m; }
+  bool operator != (const csMatrix3 & m) const { return *self != m; }
+  bool operator < (float f) const { return *self < f; }
+  csMatrix3 operator * (const csTransform & t) const { return *self * t; }
+  csMatrix3 & operator *= (const csTransform & t) { return *self *= t; }
 }
 
 // csgeom/transfrm.h
 %extend csTransform
 {
-	csVector3 operator * (const csVector3 & v) const
-		{ return *self * v; } 
-	csPlane3 operator * (const csPlane3 & p) const
-		{ return *self * p; } 
-	csSphere operator * (const csSphere & s) const
-		{ return *self * s; } 
-	csMatrix3 operator * (const csMatrix3 & m) const
-		{ return *self * m; } 
-	csTransform operator * (const csReversibleTransform & t) const
-		{ return *self * t; } 
+  csVector3 operator * (const csVector3 & v) const { return *self * v; } 
+  csPlane3 operator * (const csPlane3 & p) const { return *self * p; } 
+  csSphere operator * (const csSphere & s) const { return *self * s; } 
+  csMatrix3 operator * (const csMatrix3 & m) const { return *self * m; } 
+  csTransform operator * (const csReversibleTransform & t) const
+    { return *self * t; } 
 }
 
 // csgeom/transfrm.h
 %extend csReversibleTransform
 {
-	csReversibleTransform & operator *= (const csReversibleTransform & t)
-		{ return *self *= t; }
-	csReversibleTransform operator * (const csReversibleTransform & t)
-		{ return *self * t; }
-	csReversibleTransform & operator /= (const csReversibleTransform & t)
-		{ return *self /= t; }
-	csReversibleTransform operator / (const csReversibleTransform & t)
-		{ return *self / t; }
+  csReversibleTransform & operator *= (const csReversibleTransform & t)
+    { return *self *= t; }
+  csReversibleTransform operator * (const csReversibleTransform & t)
+    { return *self * t; }
+  csReversibleTransform & operator /= (const csReversibleTransform & t)
+    { return *self /= t; }
+  csReversibleTransform operator / (const csReversibleTransform & t)
+    { return *self / t; }
 }
 
 // csutil/cscolor.h
 %extend csColor
 {
-	csColor operator + (const csColor & c) const
-		{ return *self + c; }
-	csColor operator - (const csColor & c) const
-		{ return *self - c; }
-	csColor operator * (float f) const
-		{ return *self * f; }
+  csColor operator + (const csColor & c) const { return *self + c; }
+  csColor operator - (const csColor & c) const { return *self - c; }
+  csColor operator * (float f) const { return *self * f; }
 }
 
 // csgeom/quaterni.h
 %extend csQuaternion
 {
-	csQuaternion operator + (const csQuaternion& q)
-		{ return *self + q; }
-	csQuaternion operator - (const csQuaternion& q)
-		{ return *self - q; }
-	csQuaternion operator * (const csQuaternion& q)
-		{ return *self * q; }
+  csQuaternion operator + (const csQuaternion& q) { return *self + q; }
+  csQuaternion operator - (const csQuaternion& q) { return *self - q; }
+  csQuaternion operator * (const csQuaternion& q) { return *self * q; }
 }
 #endif // CS_MINI_SWIG
 
 #if defined(SWIGPYTHON)
-	%include "ivaria/pythpost.i"
+  %include "ivaria/pythpost.i"
 #elif defined(SWIGPERL5)
-	%include "ivaria/perlpost.i"
+  %include "ivaria/perlpost.i"
 #elif defined(SWIGRUBY)
-	%include "ivaria/rubypost.i"
+  %include "ivaria/rubypost.i"
 #elif defined(SWIGTCL8)
-	%include "ivaria/tclpost.i"
+  %include "ivaria/tclpost.i"
 #elif defined(SWIGJAVA)
-	%include "ivaria/javapost.i"
+  %include "ivaria/javapost.i"
 #endif
