@@ -153,13 +153,17 @@ void csGraphics2DDOSRAW::Initialize ()
   // Tell videosystem not to wait vertical retrace during page flip
   VS.WaitVRetrace (false);
 
+  long rm, gm, bm;
   if (!VS.FindMode (Width, Height, Depth, pfmt.PalEntries,
-        pfmt.RedMask, pfmt.GreenMask, pfmt.BlueMask))
+        rm, gm, bm))
   {
     CsPrintf (MSG_FATAL_ERROR, "Cannot find a suitable videomode match\n");
     exit (-1);
   }
 
+  pfmt.RedMask = (ULong)rm;
+  pfmt.GreenMask = (ULong)gm;
+  pfmt.BlueMask = (ULong)bm;
   pfmt.PixelBytes = (Depth + 7) / 8;
   complete_pixel_format();
 }
