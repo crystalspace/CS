@@ -50,6 +50,10 @@ endif
 
 CFLAGS.GL3D+=-I$(X11_PATH)/include
 
+else
+
+LIBS.LOCAL.GL3D+=$(OPENGL.LIBS.DEFINED)
+
 endif # OPENGL.LIBS.DEFINED
 
 # The 3D OpenGL driver
