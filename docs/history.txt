@@ -10,6 +10,8 @@ The history order is reversed so that new features are at the top.
 	  they don't have OpenGL installed.  There is no valid reason for
 	  yelling at and confusing people just because an optional component is
 	  absent.
+	- Fixed curved surfaces so that they render again after Norman
+	  removed the call to GetBezierCache().
 	- Eric Sunshine eliminated several overfull and underfull `hbox'
 	  warnings reported by TeX for msdos.txi and qtaws.txi.
 28-Mar-2002

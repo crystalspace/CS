@@ -30,10 +30,11 @@
 #include "ivideo/graph3d.h"
 #include "ivideo/vbufmgr.h"
 
+CS_IMPLEMENT_STATIC_VAR(GetBezierCache,csBezier2,())
+
 struct csCoverageMatrix
 {
   // Each float corresponds to a lightmap grid cell and contains
-
   // the area of light cell that is covered by light.
   float *coverage;
   int width, height;
@@ -164,6 +165,9 @@ csCurve::csCurve (csCurveTemplate *parent_tmpl) :
   vbuf = NULL;
   vbufmgr = NULL;
   SetupVertexBuffer ();
+
+  // Call to make sure csBezier2 is properly initialized.
+  GetBezierCache ();
 }
 
 csCurve::~csCurve ()
@@ -767,9 +771,7 @@ float csCurve::GetScreenBoundingBox (
   float shift_y = camera->GetShiftY ();
 
   // @@@ Note. The bounding box created by this function greatly
-
   // exagerates the real bounding box. However, this function
-
   // needs to be fast. I'm not sure how to do this more accuratelly.
   GetCameraBoundingBox (obj2cam, cbox);
 
@@ -780,7 +782,6 @@ float csCurve::GetScreenBoundingBox (
   if (cbox.MinZ () <= 0)
   {
     // Sprite is very close to camera.
-
     // Just return a maximum bounding box.
     boundingBox.Set (-10000, -10000, 10000, 10000);
   }
@@ -803,7 +804,6 @@ float csCurve::GetScreenBoundingBox (
 }
 
 // Default IsLightable returns false, because we don't know how to calculate
-
 // x,y,z and normals for the curve by default
 bool csCurve::IsLightable ()
 {
@@ -811,32 +811,18 @@ bool csCurve::IsLightable ()
 }
 
 // Default PosInSpace does nothing
-void csCurve::PosInSpace (csVector3 &
-
-/*vec*/, double
-
-/*u*/, double
-
-/*v*/ )
+void csCurve::PosInSpace (csVector3 &/*vec*/, double/*u*/, double/*v*/ )
 {
   return ;
 }
 
 // Default Normal does nothing
-void csCurve::Normal (csVector3 &
-
-/*vec*/, double
-
-/*u*/, double
-
-/*v*/ )
+void csCurve::Normal (csVector3 &/*vec*/, double/*u*/, double/*v*/ )
 {
   return ;
 }
 
-void csCurve::HardTransform (const csReversibleTransform &
-
-/*trans*/ )
+void csCurve::HardTransform (const csReversibleTransform &/*trans*/ )
 {
   /// @@@ where must the transformation be used???
   int i;
@@ -889,11 +875,6 @@ void csCurveTemplate::SetMaterial (iMaterialWrapper *m)
 }
 
 // --- code for Bezier curves follows ----------------------------------------
-
-// Initialize the cache for Bezier curves
-CS_IMPLEMENT_STATIC_VAR(GetBezierCache,csBezier2,())
-
-// static csBezier2 &bezierCache = *GetBezierCache ();
 
 // This SCF goop should not be necessary, but without it, the buggy NextStep
 // compiler incorrectly calls csObject::QueryInterface() rather than correctly
@@ -984,7 +965,6 @@ csCurveTesselated *csBezierCurve::Tesselate (
 void csBezierCurve::GetObjectBoundingBox (csBox3 &bbox)
 {
   // @@@ This algo uses the control points to compute
-
   // the bounding box. Is this right?
   if (!valid_bbox)
   {
