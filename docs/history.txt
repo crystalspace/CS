@@ -6,6 +6,10 @@ The history order is reversed so that new features are at the top.
 	  '}' for an @emph directive in msdos.txi.
 	- Eric Sunshine fixed formatting of the help message for memory.mak and
 	  isoload.mak.
+	- Eric Sunshine fixed chkogl.sh so that it no longer yells at people if
+	  they don't have OpenGL installed.  There is no valid reason for
+	  yelling at and confusing people just because an optional component is
+	  absent.
 28-Mar-2002
 	- Reverted part of 'res' changes to the lightmap checker because
 	  they cause big problems.

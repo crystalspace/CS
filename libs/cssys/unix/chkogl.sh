@@ -8,7 +8,7 @@ elif [ -d /usr/include/GL ]; then
 elif [ -d /usr/openwin/include/GL ]; then
   INC_OPENGL_PATH="/usr/openwin/include"
 else
-  echo "$0: Cannot find the OpenGL include directory!" >&2
+  INC_OPENGL_PATH="/usr/include"
 fi
 
 cat << EOF > gltest.cpp
@@ -16,10 +16,10 @@ cat << EOF > gltest.cpp
 #include <GL/glx.h>
 int main()
 {
- (void*)glXGetProcAddressARB((const GLubyte *)"YoMama");
- return 0;
+  (void*)glXGetProcAddressARB((const GLubyte *)"YoMama");
+  return 0;
 }
 EOF
 ${CXX} -c gltest.cpp -I${INC_OPENGL_PATH} 2>/dev/null || echo "CSGL_EXT_STATIC_ASSERTION=yes"
 
-rm -f gltest.cpp gltest.o
+rm -f gltest.*
