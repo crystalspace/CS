@@ -25,7 +25,8 @@
 #include "iglide2d.h"
 #include <glide.h>
 
-/** This is the base implemementation for the glide 2D driver.
+/**
+ * This is the base implemementation for the glide 2D driver.
  *  Platform specific implementations inherit from this one.
  */
 class csGraphics2DGlideCommon : public csGraphics2D, public iGraphics2DGlide
@@ -70,7 +71,7 @@ protected:
   void DrawCursor ();
   
 public:
-  SCF_DECLARE_IBASE;
+  SCF_DECLARE_IBASE_EXT(csGraphics2D);
 
   /** Constructor initializes System member.. LocalFontServer and
    *  texture_cache are initialized in Open() */

@@ -30,20 +30,19 @@ CS_IMPLEMENT_PLUGIN
 SCF_IMPLEMENT_FACTORY (csGraphics2DMGL)
 
 SCF_EXPORT_CLASS_TABLE (mgl2d)
-  SCF_EXPORT_CLASS_DEP (csGraphics2DMGL, "crystalspace.graphics2d.mgl",
-    "SciTech MGL 2D graphics driver for Crystal Space", "crystalspace.font.server.")
+  SCF_EXPORT_CLASS_DEP (csGraphics2DMGL,
+    "crystalspace.graphics2d.mgl",
+    "SciTech MGL 2D graphics driver for Crystal Space",
+    "crystalspace.font.server.")
 SCF_EXPORT_CLASS_TABLE_END
 
-SCF_IMPLEMENT_IBASE (csGraphics2DMGL)
-  SCF_IMPLEMENTS_INTERFACE (iPlugIn)
-  SCF_IMPLEMENTS_INTERFACE (iGraphics2D)
+SCF_IMPLEMENT_IBASE_EXT (csGraphics2DMGL)
   SCF_IMPLEMENTS_INTERFACE (iEventPlug)
-SCF_IMPLEMENT_IBASE_END
+SCF_IMPLEMENT_IBASE_EXT_END
 
 // csGraphics2DMGL functions
-csGraphics2DMGL::csGraphics2DMGL (iBase *iParent) : csGraphics2D ()
+csGraphics2DMGL::csGraphics2DMGL (iBase *iParent) : csGraphics2D (iParent)
 {
-  SCF_CONSTRUCT_IBASE (iParent);
   dc = backdc = NULL;
   joybutt = 0;
   EventOutlet = NULL;
@@ -72,7 +71,8 @@ bool csGraphics2DMGL::Initialize (iSystem *pSystem)
 
   if (Depth != 8 && Depth != 15 && Depth != 16 && Depth != 32)
   {
-    System->Printf (CS_MSG_FATAL_ERROR, "Invalid color bit depth (%d)!\n", Depth);
+    System->Printf (CS_MSG_FATAL_ERROR,
+      "Invalid color bit depth (%d)!\n", Depth);
     return false;
   }
 
@@ -85,7 +85,8 @@ bool csGraphics2DMGL::Initialize (iSystem *pSystem)
   video_mode = MGL_findMode (Width, Height, Depth);
   if (video_mode == -1)
   {
-    System->Printf (CS_MSG_FATAL_ERROR, "The mode %dx%dx%d is not available (%s)!\n",
+    System->Printf (CS_MSG_FATAL_ERROR,
+      "The mode %dx%dx%d is not available (%s)!\n",
       Width, Height, Depth, MGL_errorMsg (MGL_result ()));
     return false;
   }
@@ -94,7 +95,7 @@ bool csGraphics2DMGL::Initialize (iSystem *pSystem)
   do_hwmouse = Config->GetBool ("Video.SystemMouseCursor", true);
 
   // Tell system driver to call us on every frame
-  System->CallOnEvents (this, CSMASK_Nothing);
+  System->CallOnEvents (&scfiPlugIn, CSMASK_Nothing);
   // Create the event outlet
   EventOutlet = System->CreateEventOutlet (this);
 
@@ -135,7 +136,7 @@ bool csGraphics2DMGL::Open (const char *Title)
   // We don't need more than three pages
   if (numPages > 3) numPages = 3;
 
-  if ((dc = MGL_createDisplayDC (video_mode, numPages, MGL_DEFAULT_REFRESH)) == NULL)
+  if ((dc = MGL_createDisplayDC(video_mode,numPages,MGL_DEFAULT_REFRESH)) == 0)
   {
     System->Printf (CS_MSG_FATAL_ERROR, "%s\n", MGL_errorMsg (MGL_result ()));
     return false;
@@ -167,7 +168,7 @@ bool csGraphics2DMGL::Open (const char *Title)
     _DrawPixel = DrawPixel32;
     _WriteString = WriteString32;
     _GetPixelAt = GetPixelAt32;
-  } /* endif */
+  }
 
   // Reset member variables
   videoPage = 0;
@@ -478,7 +479,8 @@ acceleration). Thus this routine is disabled for now (unfortunately MGL 4.x
 had a routine called MGL_lineCoordFX that uses fixed-point 16.16 coordinates,
 but in MGL 5.0 the routine suddenly disappeared).
 
-void csGraphics2DMGL::DrawLine (float x1, float y1, float x2, float y2, int color)
+void csGraphics2DMGL::DrawLine (float x1, float y1, float x2, float y2,
+  int color)
 {
   MGL_setColor (color);
   MGL_lineCoord (QInt (x1), QInt (y1), QInt (x2), QInt (y2));

@@ -43,19 +43,27 @@ SCF_EXPORT_CLASS_TABLE_END;
 
 SCF_IMPLEMENT_IBASE(csSoundRenderDS3D)
   SCF_IMPLEMENTS_INTERFACE(iSoundRender)
-  SCF_IMPLEMENTS_INTERFACE(iPlugIn)
+  SCF_IMPLEMENTS_EMBEDDED_INTERFACE(iPlugIn)
 SCF_IMPLEMENT_IBASE_END;
 
-csSoundRenderDS3D::csSoundRenderDS3D(iBase *piBase) {
+SCF_IMPLEMENT_EMBEDDED_IBASE (csSoundRenderDS3D::eiPlugIn)
+  SCF_IMPLEMENTS_INTERFACE (iPlugIn)
+SCF_IMPLEMENT_EMBEDDED_IBASE_END
+
+csSoundRenderDS3D::csSoundRenderDS3D(iBase *piBase)
+{
   SCF_CONSTRUCT_IBASE(piBase);
+  SCF_CONSTRUCT_EMBEDDED_IBASE(scfiPlugIn);
   Listener = NULL;
   AudioRenderer = NULL;
   System = NULL;
 }
 
-bool csSoundRenderDS3D::Initialize(iSystem *iSys) {
+bool csSoundRenderDS3D::Initialize(iSystem *iSys)
+{
   System = iSys;
-  System->CallOnEvents(this, CSMASK_Command | CSMASK_Broadcast | CSMASK_Nothing);
+  System->CallOnEvents(&scfiPlugIn,
+    CSMASK_Command | CSMASK_Broadcast | CSMASK_Nothing);
   LoadFormat.Bits = -1;
   LoadFormat.Freq = -1;
   LoadFormat.Channels = -1;
@@ -63,18 +71,21 @@ bool csSoundRenderDS3D::Initialize(iSystem *iSys) {
   return true;
 }
 
-csSoundRenderDS3D::~csSoundRenderDS3D() {
+csSoundRenderDS3D::~csSoundRenderDS3D()
+{
   Close();
 }
 
 bool csSoundRenderDS3D::Open()
 {
-  System->Printf (CS_MSG_INITIALIZATION, "SoundRender DirectSound3D selected\n");
+  System->Printf(CS_MSG_INITIALIZATION,"SoundRender DirectSound3D selected\n");
   
   HRESULT r;
-  if (!AudioRenderer) {
+  if (!AudioRenderer)
+  {
     r = DirectSoundCreate(NULL, &AudioRenderer, NULL);
-    if (r != DS_OK) {
+    if (r != DS_OK)
+    {
       System->Printf(CS_MSG_FATAL_ERROR, "Error : Cannot Initialize "
         "DirectSound3D (%s).\n", GetError(r));
       Close();
@@ -83,7 +94,8 @@ bool csSoundRenderDS3D::Open()
   
     DWORD dwLevel = DSSCL_EXCLUSIVE;
     r = AudioRenderer->SetCooperativeLevel(GetForegroundWindow(), dwLevel);
-    if (r != DS_OK) {
+    if (r != DS_OK)
+    {
       System->Printf(CS_MSG_FATAL_ERROR, "Error : Cannot Set "
         "Cooperative Level (%s).\n", GetError(r));
       Close();
@@ -91,7 +103,8 @@ bool csSoundRenderDS3D::Open()
     }
   }
 
-  if (!Listener) {
+  if (!Listener)
+  {
     Listener = new csSoundListenerDS3D(this);
     if (!Listener->Initialize(this)) return false;
   }
@@ -112,7 +125,8 @@ void csSoundRenderDS3D::Close()
   while (ActiveSources.Length()>0)
     ((iSoundSource*)ActiveSources.Get(0))->Stop();
 
-  while (SoundHandles.Length()>0) {
+  while (SoundHandles.Length()>0)
+  {
     csSoundHandleDS3D *hdl = (csSoundHandleDS3D *)SoundHandles.Pop();
     hdl->Unregister();
     hdl->DecRef();
@@ -135,7 +149,6 @@ void csSoundRenderDS3D::SetVolume(float vol)
 float csSoundRenderDS3D::GetVolume()
 {
   if (!Listener) return 0;
-
   long dsvol;
   int a = Listener->PrimaryBuffer->GetVolume(&dsvol);
   return (float)(dsvol-DSBVOLUME_MIN)/(float)(DSBVOLUME_MAX-DSBVOLUME_MIN);
@@ -145,7 +158,6 @@ iSoundHandle *csSoundRenderDS3D::RegisterSound(iSoundData *snd)
 {
   if (!snd) return NULL;
   if (!snd->Initialize(&LoadFormat)) return NULL;
-
   csSoundHandleDS3D *hdl = new csSoundHandleDS3D(this, snd);
   SoundHandles.Push(hdl);
   return hdl;
@@ -154,7 +166,8 @@ iSoundHandle *csSoundRenderDS3D::RegisterSound(iSoundData *snd)
 void csSoundRenderDS3D::UnregisterSound(iSoundHandle *snd)
 {
   int n = SoundHandles.Find(snd);
-  if (n != -1) {
+  if (n != -1)
+  {
     csSoundHandleDS3D *hdl = (csSoundHandleDS3D *)snd;
     SoundHandles.Delete(n);
     hdl->Unregister();
@@ -162,11 +175,13 @@ void csSoundRenderDS3D::UnregisterSound(iSoundHandle *snd)
   }
 }
 
-iSoundListener *csSoundRenderDS3D::GetListener() {
+iSoundListener *csSoundRenderDS3D::GetListener()
+{
   return Listener;
 }
 
-void csSoundRenderDS3D::Update() {
+void csSoundRenderDS3D::Update()
+{
   int i;
   cs_time et, ct;
   System->GetElapsedTime(et, ct);
@@ -175,44 +190,55 @@ void csSoundRenderDS3D::Update() {
 
   Listener->Prepare();
 
-  for (i=0;i<SoundHandles.Length();i++) {
+  for (i=0;i<SoundHandles.Length();i++)
+  {
     csSoundHandleDS3D *hdl = (csSoundHandleDS3D*)SoundHandles.Get(i);
     hdl->Update_Time(ETime);
   }
 
-  for (i=0;i<ActiveSources.Length();i++) {
+  for (i=0;i<ActiveSources.Length();i++)
+  {
     csSoundSourceDS3D *src = (csSoundSourceDS3D*)ActiveSources.Get(i);
-    if (!src->IsPlaying()) {
+    if (!src->IsPlaying())
+    {
       ActiveSources.Delete(i);
       i--;
     }
   }
 }
 
-void csSoundRenderDS3D::MixingFunction() {
+void csSoundRenderDS3D::MixingFunction()
+{
 }
 
-void csSoundRenderDS3D::SetDirty() {
+void csSoundRenderDS3D::SetDirty()
+{
   Listener->Dirty = true;
 }
 
-void csSoundRenderDS3D::AddSource(csSoundSourceDS3D *src) {
-  if (ActiveSources.Find(src)==-1) {
+void csSoundRenderDS3D::AddSource(csSoundSourceDS3D *src)
+{
+  if (ActiveSources.Find(src)==-1)
+  {
     src->IncRef();
     ActiveSources.Push(src);
   }
 }
 
-void csSoundRenderDS3D::RemoveSource(csSoundSourceDS3D *src) {
+void csSoundRenderDS3D::RemoveSource(csSoundSourceDS3D *src)
+{
   int n=ActiveSources.Find(src);
-  if (n!=-1) {
+  if (n!=-1)
+  {
     ActiveSources.Delete(n);
     src->DecRef();
   }
 }
 
-const char *csSoundRenderDS3D::GetError(HRESULT r) {
-  switch (r) {
+const char *csSoundRenderDS3D::GetError(HRESULT r)
+{
+  switch (r)
+  {
     case DS_OK: return "success";
     case DSERR_ALLOCATED: return "the resource is already allocated";
     case DSERR_ALREADYINITIALIZED: return "the object is already initialized";
@@ -220,8 +246,8 @@ const char *csSoundRenderDS3D::GetError(HRESULT r) {
     case DSERR_BUFFERLOST: return "the buffer memory has been lost";
     case DSERR_CONTROLUNAVAIL: return "the requested control "
       "(volume, pan, ...) is not available";
-    case DSERR_INVALIDCALL: return "this function is not valid for the current "
-      "state of this object";
+    case DSERR_INVALIDCALL:
+      return "this function is not valid for the current state of this object";
     case DSERR_INVALIDPARAM: return "an invalid parameter was passed to the "
       "returning function";
     case DSERR_NOAGGREGATION: return "the object does not support aggregation";
@@ -239,8 +265,10 @@ const char *csSoundRenderDS3D::GetError(HRESULT r) {
 
 bool csSoundRenderDS3D::HandleEvent (iEvent &e)
 {
-  if (e.Type == csevCommand || e.Type == csevBroadcast) {
-    switch (e.Command.Code) {
+  if (e.Type == csevCommand || e.Type == csevBroadcast)
+  {
+    switch (e.Command.Code)
+    {
     case cscmdPreProcess:
       Update();
       break;
@@ -254,4 +282,3 @@ bool csSoundRenderDS3D::HandleEvent (iEvent &e)
   }
   return false;
 }
-

@@ -57,23 +57,39 @@ CS_TOKEN_DEF_END
 
 SCF_IMPLEMENT_IBASE (csSurfFactoryLoader)
   SCF_IMPLEMENTS_INTERFACE (iLoaderPlugIn)
-  SCF_IMPLEMENTS_INTERFACE (iPlugIn)
+  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iPlugIn)
 SCF_IMPLEMENT_IBASE_END
+
+SCF_IMPLEMENT_EMBEDDED_IBASE (csSurfFactoryLoader::eiPlugIn)
+  SCF_IMPLEMENTS_INTERFACE (iPlugIn)
+SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 SCF_IMPLEMENT_IBASE (csSurfFactorySaver)
   SCF_IMPLEMENTS_INTERFACE (iSaverPlugIn)
-  SCF_IMPLEMENTS_INTERFACE (iPlugIn)
+  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iPlugIn)
 SCF_IMPLEMENT_IBASE_END
+
+SCF_IMPLEMENT_EMBEDDED_IBASE (csSurfFactorySaver::eiPlugIn)
+  SCF_IMPLEMENTS_INTERFACE (iPlugIn)
+SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 SCF_IMPLEMENT_IBASE (csSurfLoader)
   SCF_IMPLEMENTS_INTERFACE (iLoaderPlugIn)
-  SCF_IMPLEMENTS_INTERFACE (iPlugIn)
+  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iPlugIn)
 SCF_IMPLEMENT_IBASE_END
+
+SCF_IMPLEMENT_EMBEDDED_IBASE (csSurfLoader::eiPlugIn)
+  SCF_IMPLEMENTS_INTERFACE (iPlugIn)
+SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 SCF_IMPLEMENT_IBASE (csSurfSaver)
   SCF_IMPLEMENTS_INTERFACE (iSaverPlugIn)
-  SCF_IMPLEMENTS_INTERFACE (iPlugIn)
+  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iPlugIn)
 SCF_IMPLEMENT_IBASE_END
+
+SCF_IMPLEMENT_EMBEDDED_IBASE (csSurfSaver::eiPlugIn)
+  SCF_IMPLEMENTS_INTERFACE (iPlugIn)
+SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 SCF_IMPLEMENT_FACTORY (csSurfFactoryLoader)
 SCF_IMPLEMENT_FACTORY (csSurfFactorySaver)
@@ -81,29 +97,28 @@ SCF_IMPLEMENT_FACTORY (csSurfLoader)
 SCF_IMPLEMENT_FACTORY (csSurfSaver)
 
 SCF_EXPORT_CLASS_TABLE (surfldr)
-  SCF_EXPORT_CLASS (csSurfFactoryLoader, "crystalspace.mesh.loader.factory.surface",
+  SCF_EXPORT_CLASS (csSurfFactoryLoader,
+    "crystalspace.mesh.loader.factory.surface",
     "Crystal Space Surface Factory Loader")
-  SCF_EXPORT_CLASS (csSurfFactorySaver, "crystalspace.mesh.saver.factory.surface",
+  SCF_EXPORT_CLASS (csSurfFactorySaver,
+    "crystalspace.mesh.saver.factory.surface",
     "Crystal Space Surface Factory Saver")
-  SCF_EXPORT_CLASS (csSurfLoader, "crystalspace.mesh.loader.surface",
+  SCF_EXPORT_CLASS (csSurfLoader,
+    "crystalspace.mesh.loader.surface",
     "Crystal Space Surface Mesh Loader")
-  SCF_EXPORT_CLASS (csSurfSaver, "crystalspace.mesh.saver.surface",
+  SCF_EXPORT_CLASS (csSurfSaver,
+    "crystalspace.mesh.saver.surface",
     "Crystal Space Surface Mesh Saver")
 SCF_EXPORT_CLASS_TABLE_END
 
 csSurfFactoryLoader::csSurfFactoryLoader (iBase* pParent)
 {
   SCF_CONSTRUCT_IBASE (pParent);
+  SCF_CONSTRUCT_EMBEDDED_IBASE(scfiPlugIn);
 }
 
 csSurfFactoryLoader::~csSurfFactoryLoader ()
 {
-}
-
-bool csSurfFactoryLoader::Initialize (iSystem* system)
-{
-  sys = system;
-  return true;
 }
 
 iBase* csSurfFactoryLoader::Parse (const char* /*string*/,
@@ -127,16 +142,11 @@ iBase* csSurfFactoryLoader::Parse (const char* /*string*/,
 csSurfFactorySaver::csSurfFactorySaver (iBase* pParent)
 {
   SCF_CONSTRUCT_IBASE (pParent);
+  SCF_CONSTRUCT_EMBEDDED_IBASE(scfiPlugIn);
 }
 
 csSurfFactorySaver::~csSurfFactorySaver ()
 {
-}
-
-bool csSurfFactorySaver::Initialize (iSystem* system)
-{
-  sys = system;
-  return true;
 }
 
 #define MAXLINE 100 /* max number of chars per line... */
@@ -152,16 +162,11 @@ void csSurfFactorySaver::WriteDown (iBase* /*obj*/, iStrVector * /*str*/,
 csSurfLoader::csSurfLoader (iBase* pParent)
 {
   SCF_CONSTRUCT_IBASE (pParent);
+  SCF_CONSTRUCT_EMBEDDED_IBASE(scfiPlugIn);
 }
 
 csSurfLoader::~csSurfLoader ()
 {
-}
-
-bool csSurfLoader::Initialize (iSystem* system)
-{
-  sys = system;
-  return true;
 }
 
 static UInt ParseMixmode (char* buf)
@@ -207,7 +212,8 @@ static UInt ParseMixmode (char* buf)
   }
   if (cmd == CS_PARSERR_TOKENNOTFOUND)
   {
-    printf ("Token '%s' not found while parsing the modes!\n", csGetLastOffender ());
+    printf ("Token '%s' not found while parsing the modes!\n",
+      csGetLastOffender ());
     return 0;
   }
   return Mixmode;
@@ -326,16 +332,11 @@ iBase* csSurfLoader::Parse (const char* string, iEngine* engine,
 csSurfSaver::csSurfSaver (iBase* pParent)
 {
   SCF_CONSTRUCT_IBASE (pParent);
+  SCF_CONSTRUCT_EMBEDDED_IBASE(scfiPlugIn);
 }
 
 csSurfSaver::~csSurfSaver ()
 {
-}
-
-bool csSurfSaver::Initialize (iSystem* system)
-{
-  sys = system;
-  return true;
 }
 
 static void WriteMixmode(iStrVector *str, UInt mixmode)
@@ -410,6 +411,3 @@ void csSurfSaver::WriteDown (iBase* obj, iStrVector *str,
   state->DecRef();
 
 }
-
-//---------------------------------------------------------------------------
-

@@ -19,7 +19,7 @@
 #include <stdarg.h>
 
 #include "cssysdef.h"
-#include "video/canvas/svgalib/svga.h"
+#include "svga.h"
 #include "csgeom/csrect.h"
 #include "cssys/csinput.h"
 #include "isys/system.h"
@@ -49,20 +49,19 @@ static unsigned short ScanCodeToChar[128] =
 SCF_IMPLEMENT_FACTORY (csGraphics2DSVGALib)
 
 SCF_EXPORT_CLASS_TABLE (svga2d)
-  SCF_EXPORT_CLASS_DEP (csGraphics2DSVGALib, "crystalspace.graphics2d.svgalib",
-    "SVGALib 2D graphics driver for Crystal Space", "crystalspace.font.server.")
+  SCF_EXPORT_CLASS_DEP (csGraphics2DSVGALib,
+    "crystalspace.graphics2d.svgalib",
+    "SVGALib 2D graphics driver for Crystal Space",
+    "crystalspace.font.server.")
 SCF_EXPORT_CLASS_TABLE_END
 
-SCF_IMPLEMENT_IBASE (csGraphics2DSVGALib)
-  SCF_IMPLEMENTS_INTERFACE (iPlugIn)
-  SCF_IMPLEMENTS_INTERFACE (iGraphics2D)
+SCF_IMPLEMENT_IBASE_EXT (csGraphics2DSVGALib)
   SCF_IMPLEMENTS_INTERFACE (iEventPlug)
-SCF_IMPLEMENT_IBASE_END
+SCF_IMPLEMENT_IBASE_EXT_END
 
 // csGraphics2DSVGALib functions
-csGraphics2DSVGALib::csGraphics2DSVGALib(iBase *iParent) : csGraphics2D ()
+csGraphics2DSVGALib::csGraphics2DSVGALib(iBase *p) : csGraphics2D (p)
 {
-  SCF_CONSTRUCT_IBASE (iParent);
   EventOutlet = NULL;
 }
 
@@ -75,8 +74,8 @@ bool csGraphics2DSVGALib::Initialize (iSystem *pSystem)
 
   // SVGALIB Starts here
 
-  CsPrintf (CS_MSG_INITIALIZATION, "Crystal Space Linux/SVGALIB version.\n");
-  CsPrintf (CS_MSG_INITIALIZATION,  "Using %dx%dx%d resolution.\n\n", Width, Height, Depth);
+  CsPrintf (CS_MSG_INITIALIZATION, "Crystal Space Linux/SVGALIB version.\n"
+    "Using %dx%dx%d resolution.\n\n", Width, Height, Depth);
 
   gl_copyscreen (&physicalscreen);
 
@@ -133,7 +132,7 @@ bool csGraphics2DSVGALib::Initialize (iSystem *pSystem)
   memset (keydown, 0, sizeof (keydown));
 
   // Tell system driver to call us on every frame
-  System->CallOnEvents (this, CSMASK_Nothing);
+  System->CallOnEvents (&scfiPlugIn, CSMASK_Nothing);
   // Create the event outlet
   EventOutlet = System->CreateEventOutlet (this);
 
@@ -186,7 +185,8 @@ bool csGraphics2DSVGALib::Open(const char *Title)
 
   if ((vgamode==-1) || (vga_setmode (vgamode) == -1))
   {
-    CsPrintf (CS_MSG_FATAL_ERROR, "Specified screenmode %s is not available!\n", modestr);
+    CsPrintf (CS_MSG_FATAL_ERROR,
+      "Specified screenmode %s is not available!\n", modestr);
     return false;
   }
 
@@ -227,7 +227,9 @@ bool csGraphics2DSVGALib::HandleEvent (iEvent &/*Event*/)
   bool alt   = keyboard_keypressed (SCANCODE_LEFTALT)
             || keyboard_keypressed (SCANCODE_RIGHTALT);
   bool ctrl  = keyboard_keypressed (SCANCODE_LEFTCONTROL);
-  int state = (shift ? CSMASK_SHIFT : 0) | (alt ? CSMASK_ALT : 0) | (ctrl ? CSMASK_CTRL : 0);
+  int state = (shift ? CSMASK_SHIFT : 0) |
+              (alt   ? CSMASK_ALT   : 0) |
+	      (ctrl  ? CSMASK_CTRL  : 0);
 */
   for (unsigned int scancode = 0; scancode < 128; scancode++)
   {

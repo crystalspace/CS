@@ -22,6 +22,7 @@
 
 #include "imap/reader.h"
 #include "imap/writer.h"
+#include "isys/plugin.h"
 
 struct iEngine;
 struct iSystem;
@@ -37,6 +38,8 @@ private:
   iReporter* reporter;
 
 public:
+  SCF_DECLARE_IBASE;
+
   /// Constructor.
   csSprite2DFactoryLoader (iBase*);
 
@@ -46,12 +49,15 @@ public:
   /// Register plugin with the system driver
   virtual bool Initialize (iSystem *pSystem);
 
-public:
-  //------------------------ iLoaderPlugIn implementation --------------
-  SCF_DECLARE_IBASE;
-
   /// Parse a given string and return a new object for it.
   virtual iBase* Parse (const char* string, iEngine* engine, iBase* context);
+
+  struct eiPlugIn : public iPlugIn
+  {
+    SCF_DECLARE_EMBEDDED_IBASE(csSprite2DFactoryLoader);
+    virtual bool Initialize (iSystem* p) { return scfParent->Initialize(p); }
+    virtual bool HandleEvent (iEvent&) { return false; }
+  } scfiPlugIn;
 };
 
 /**
@@ -64,6 +70,8 @@ private:
   iReporter* reporter;
 
 public:
+  SCF_DECLARE_IBASE;
+
   /// Constructor.
   csSprite2DFactorySaver (iBase*);
 
@@ -73,12 +81,15 @@ public:
   /// Register plugin with the system driver
   virtual bool Initialize (iSystem *pSystem);
 
-public:
-  //------------------------ iSaverPlugIn implementation --------------
-  SCF_DECLARE_IBASE;
-
   /// Write down given object and add to string vector.
   virtual void WriteDown (iBase *obj, iStrVector *str, iEngine* engine);
+
+  struct eiPlugIn : public iPlugIn
+  {
+    SCF_DECLARE_EMBEDDED_IBASE(csSprite2DFactorySaver);
+    virtual bool Initialize (iSystem* p) { return scfParent->Initialize(p); }
+    virtual bool HandleEvent (iEvent&) { return false; }
+  } scfiPlugIn;
 };
 
 /**
@@ -91,6 +102,8 @@ private:
   iReporter* reporter;
 
 public:
+  SCF_DECLARE_IBASE;
+
   /// Constructor.
   csSprite2DLoader (iBase*);
 
@@ -100,12 +113,15 @@ public:
   /// Register plugin with the system driver
   virtual bool Initialize (iSystem *pSystem);
 
-public:
-  //------------------------ iLoaderPlugIn implementation --------------
-  SCF_DECLARE_IBASE;
-
   /// Parse a given string and return a new object for it.
   virtual iBase* Parse (const char* string, iEngine* engine, iBase* context);
+
+  struct eiPlugIn : public iPlugIn
+  {
+    SCF_DECLARE_EMBEDDED_IBASE(csSprite2DLoader);
+    virtual bool Initialize (iSystem* p) { return scfParent->Initialize(p); }
+    virtual bool HandleEvent (iEvent&) { return false; }
+  } scfiPlugIn;
 };
 
 /**
@@ -118,6 +134,8 @@ private:
   iReporter* reporter;
 
 public:
+  SCF_DECLARE_IBASE;
+
   /// Constructor.
   csSprite2DSaver (iBase*);
 
@@ -127,14 +145,15 @@ public:
   /// Register plugin with the system driver
   virtual bool Initialize (iSystem *pSystem);
 
-public:
-  //------------------------ iSaverPlugIn implementation --------------
-  SCF_DECLARE_IBASE;
-
   /// Write down given object and add to string vector.
   virtual void WriteDown (iBase *obj, iStrVector *str, iEngine* engine);
+
+  struct eiPlugIn : public iPlugIn
+  {
+    SCF_DECLARE_EMBEDDED_IBASE(csSprite2DSaver);
+    virtual bool Initialize (iSystem* p) { return scfParent->Initialize(p); }
+    virtual bool HandleEvent (iEvent&) { return false; }
+  } scfiPlugIn;
 };
 
-
 #endif // _SPR2DLDR_H_
-

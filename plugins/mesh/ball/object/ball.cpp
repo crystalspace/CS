@@ -5,12 +5,12 @@
     modify it under the terms of the GNU Library General Public
     License as published by the Free Software Foundation; either
     version 2 of the License, or (at your option) any later version.
-  
+
     This library is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
     Library General Public License for more details.
-  
+
     You should have received a copy of the GNU Library General Public
     License along with this library; if not, write to the Free
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
@@ -97,8 +97,10 @@ void csBallMeshObject::GetTransformedBoundingBox (long cameranr,
   cur_cameranr = cameranr;
   cur_movablenr = movablenr;
 
-  camera_bbox.StartBoundingBox (trans * csVector3 (-radiusx, -radiusy, -radiusz) + shift);
-  camera_bbox.AddBoundingVertexSmart (trans * csVector3 ( radiusx,  radiusy,  radiusz) + shift);
+  camera_bbox.StartBoundingBox (
+    trans * csVector3 (-radiusx, -radiusy, -radiusz) + shift);
+  camera_bbox.AddBoundingVertexSmart (
+    trans * csVector3 ( radiusx,  radiusy,  radiusz) + shift);
 
   cbox = camera_bbox;
 }
@@ -412,8 +414,10 @@ void csBallMeshObject::SetupObject ()
     top_mesh.vertex_fog = NULL;
 
     GenerateSphere (verts_circle, top_mesh, top_normals);
-    object_bbox.StartBoundingBox (csVector3 (-radiusx, -radiusy, -radiusz) + shift);
-    object_bbox.AddBoundingVertexSmart (csVector3 ( radiusx,  radiusy,  radiusz) + shift);
+    object_bbox.StartBoundingBox (
+      csVector3 (-radiusx, -radiusy, -radiusz) + shift);
+    object_bbox.AddBoundingVertexSmart (
+      csVector3 ( radiusx,  radiusy,  radiusz) + shift);
     top_mesh.morph_factor = 0;
     top_mesh.num_vertices_pool = 1;
     top_mesh.do_morph_texels = false;
@@ -572,8 +576,8 @@ void csBallMeshObject::HardTransform (const csReversibleTransform& t)
   shapenr++;
 }
 
-bool csBallMeshObject::HitBeamObject( const csVector3& start, const csVector3& end, 
-  csVector3& isect, float *pr)
+bool csBallMeshObject::HitBeamObject(const csVector3& start,
+  const csVector3& end, csVector3& isect, float *pr)
 {
   // @@@ We might consider checking to a lower LOD version only.
   // This function is not very fast if the bounding box test succeeds.
@@ -609,14 +613,14 @@ bool csBallMeshObject::HitBeamObject( const csVector3& start, const csVector3& e
 		csSquaredDist::PointPoint (start, end));
       }
 #ifdef CS_DEBUG
-	  printf("Ball:Hit Beam Object: HIT! intersect : (%f,%f,%f)\n",isect.x,isect.y,isect.z);
+      printf("Ball:Hit Beam Object: HIT! intersect : (%f,%f,%f)\n",i
+        sect.x, isect.y, isect.z);
 #endif
       return true;
     }
   }
   return false;
 }
-
 
 //----------------------------------------------------------------------
 
@@ -645,8 +649,12 @@ iMeshObject* csBallMeshObjectFactory::NewInstance ()
 
 SCF_IMPLEMENT_IBASE (csBallMeshObjectType)
   SCF_IMPLEMENTS_INTERFACE (iMeshObjectType)
-  SCF_IMPLEMENTS_INTERFACE (iPlugIn)
+  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iPlugIn)
 SCF_IMPLEMENT_IBASE_END
+
+SCF_IMPLEMENT_EMBEDDED_IBASE (csBallMeshObjectType::eiPlugIn)
+  SCF_IMPLEMENTS_INTERFACE (iPlugIn)
+SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 SCF_IMPLEMENT_FACTORY (csBallMeshObjectType)
 
@@ -658,15 +666,11 @@ SCF_EXPORT_CLASS_TABLE_END
 csBallMeshObjectType::csBallMeshObjectType (iBase* pParent)
 {
   SCF_CONSTRUCT_IBASE (pParent);
+  SCF_CONSTRUCT_EMBEDDED_IBASE(scfiPlugIn);
 }
 
 csBallMeshObjectType::~csBallMeshObjectType ()
 {
-}
-
-bool csBallMeshObjectType::Initialize (iSystem*)
-{
-  return true;
 }
 
 iMeshObjectFactory* csBallMeshObjectType::NewFactory ()
@@ -676,4 +680,3 @@ iMeshObjectFactory* csBallMeshObjectType::NewFactory ()
   ifact->DecRef ();
   return ifact;
 }
-

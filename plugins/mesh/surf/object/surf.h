@@ -25,6 +25,7 @@
 #include "imesh/object.h"
 #include "imesh/surf.h"
 #include "ivideo/graph3d.h"
+#include "isys/plugin.h"
 
 #define ALL_FEATURES (CS_OBJECT_FEATURE_LIGHTING)
 
@@ -140,7 +141,7 @@ public:
   /// Get the color.
   csColor GetColor () const { return color; }
 
-  ///------------------------ iMeshObject implementation ------------------------
+  //----------------------- iMeshObject implementation ------------------------
   SCF_DECLARE_IBASE;
 
   virtual iMeshObjectFactory* GetFactory () const { return factory; }
@@ -279,25 +280,27 @@ public:
 class csSurfMeshObjectType : public iMeshObjectType
 {
 public:
+  SCF_DECLARE_IBASE;
+
   /// Constructor.
   csSurfMeshObjectType (iBase*);
-
   /// Destructor.
   virtual ~csSurfMeshObjectType ();
 
-  /// Register plugin with the system driver
-  virtual bool Initialize (iSystem *pSystem);
-
-  //------------------------ iMeshObjectType implementation --------------
-  SCF_DECLARE_IBASE;
-
   /// New factory.
   virtual iMeshObjectFactory* NewFactory ();
+  // Get features.
   virtual uint32 GetFeatures () const
   {
     return ALL_FEATURES;
   }
+
+  struct eiPlugIn : public iPlugIn
+  {
+    SCF_DECLARE_EMBEDDED_IBASE(csSurfMeshObjectType);
+    virtual bool Initialize (iSystem*) { return true; }
+    virtual bool HandleEvent (iEvent&) { return false; }
+  } scfiPlugIn;
 };
 
 #endif // _SURF_H_
-

@@ -19,7 +19,6 @@
 #ifndef __IVARIA_PERFSTAT_H__
 #define __IVARIA_PERFSTAT_H__
 
-#include "isys/plugin.h"
 #include "csutil/scf.h"
 
 SCF_VERSION (iPerfStats, 0, 0, 1);
@@ -29,7 +28,7 @@ SCF_VERSION (iPerfStats, 0, 0, 1);
  * This plugin tracks and records all kinds of useful information
  * while the program is running.
  */
-struct iPerfStats : public iPlugIn
+struct iPerfStats : public iBase
 {
   /// Set whether paused. Returns previous status
   virtual bool Pause (bool pause) = 0;
@@ -72,8 +71,8 @@ struct iPerfStats : public iPlugIn
   virtual void PrintSectionStats (int sysflags) = 0;
 
   /**
-   * Print the subsections current stats, where sysflags is CS_MSG_STDOUT etc as 
-   * defined in iSystem.h
+   * Print the subsections current stats, where sysflags is CS_MSG_STDOUT etc
+   * as defined in iSystem.h
    */
   virtual void PrintSubsectionStats (int sysflags) = 0;
 

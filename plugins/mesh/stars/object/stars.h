@@ -25,6 +25,7 @@
 #include "imesh/object.h"
 #include "imesh/stars.h"
 #include "ivideo/graph3d.h"
+#include "isys/plugin.h"
 
 #define ALL_FEATURES (0)
 
@@ -226,24 +227,27 @@ public:
 class csStarsMeshObjectType : public iMeshObjectType
 {
 public:
+  SCF_DECLARE_IBASE;
+
   /// Constructor.
   csStarsMeshObjectType (iBase*);
-
   /// Destructor.
   virtual ~csStarsMeshObjectType ();
 
-  /// Register plugin with the system driver
-  virtual bool Initialize (iSystem *pSystem);
-
-  //------------------------ iMeshObjectType implementation --------------
-  SCF_DECLARE_IBASE;
-
   /// New factory.
   virtual iMeshObjectFactory* NewFactory ();
+  /// Get features.
   virtual uint32 GetFeatures () const
   {
     return ALL_FEATURES;
   }
+
+  struct eiPlugIn : public iPlugIn
+  {
+    SCF_DECLARE_EMBEDDED_IBASE(csStarsMeshObjectType);
+    virtual bool Initialize (iSystem*) { return true; }
+    virtual bool HandleEvent (iEvent&) { return false; }
+  } scfiPlugIn;
 };
 
 #endif // _STARS_H_

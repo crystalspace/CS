@@ -18,16 +18,14 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __SOUND_DRIVER_MAC_H__
-#define __SOUND_DRIVER_MAC_H__
-
-// SoundDriver.H
-// csSoundDriverMac class.
+#ifndef __CS_MACSDRV_H__
+#define __CS_MACSDRV_H__
 
 #include <Sound.h>
 
 #include "csutil/scf.h"
 #include "isound/driver.h"
+#include "isys/plugin.h"
 #include "isys/system.h"
 
 class csSoundDriverMac : public iSoundDriver
@@ -47,7 +45,7 @@ public:
   virtual ~csSoundDriverMac();
   virtual bool Initialize(iSystem *iSys);
   
-  virtual bool Open(iSoundRender *render, int frequency, bool bit16, bool stereo);
+  virtual bool Open(iSoundRender *, int frequency, bool bit16, bool stereo);
   virtual void Close();
 	
   virtual void LockMemory(void **mem, int *memsize);
@@ -58,8 +56,16 @@ public:
   virtual int  GetFrequency();
   virtual bool IsHandleVoidSound();
  
-  void SndDoubleBackProc( SndChannelPtr channel, SndDoubleBufferPtr doubleBuffer );
+  void SndDoubleBackProc(SndChannelPtr, SndDoubleBufferPtr);
   
+  struct eiPlugIn : public iPlugIn
+  {
+    SCF_DECLARE_EMBEDDED_IBASE(csSoundDriverMac);
+    virtual bool Initialize (iSystem* p)
+    { scfParent->m_piSystem = p; return true; }
+    virtual bool HandleEvent (iEvent&) { return false; }
+  } scfiPlugIn;
+
  private:
   SndDoubleBufferHeader	mSoundDBHeader;
   SndDoubleBuffer		mSoundDoubleBuffer;
@@ -72,5 +78,4 @@ public:
   long	mBuffersFilled;
 };
 
-#endif	//__SOUND_DRIVER_MAC_H__
-
+#endif // __CS_MACSDRV_H__

@@ -23,7 +23,6 @@
 #include "csutil/scf.h"
 #include "csgeom/vector3.h"
 #include "csgeom/transfrm.h"
-#include "isys/plugin.h"
 #include "isys/vfs.h"
 
 struct iEntity;
@@ -871,7 +870,7 @@ SCF_VERSION (iGameCore, 0, 1, 0);
 /**
  * The csgame core plugin itself
  */
-struct iGameCore : public iPlugIn
+struct iGameCore : public iBase
 {
 
 //Temporary hack, to avoid the need to implement any of these interfaces.

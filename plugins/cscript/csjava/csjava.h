@@ -21,11 +21,13 @@
 #define __CSJAVA_H__
 
 #include "ivaria/script.h"
+#include "isys/plugin.h"
 #include "isys/system.h"
 #include "cssys/csinput.h"
 #include "csutil/csvector.h"
 
-class csJava:public iScript {
+class csJava : public iScript
+{
 public:
   csJava(iBase *iParent);
   virtual ~csJava();
@@ -34,21 +36,22 @@ public:
   int Mode;
   void* Storage;
 
-  bool Initialize(iSystem* iSys);
   bool RunText(const char *Text);
   bool LoadModule(const char *Text);
 	bool Store(const char* type, const char* name, void* data);
-
   void ShowError();
   void Print(bool Error, const char *msg);
 
   SCF_DECLARE_IBASE;
+
+  struct eiPlugIn : public iPlugIn
+  {
+    SCF_DECLARE_EMBEDDED_IBASE(csJava);
+    virtual bool Initialize (iSystem*) { return true; }
+    virtual bool HandleEvent (iEvent&) { return false; }
+  } scfiPlugIn;
 };
 
 extern csJava *thisclass;
+
 #endif
-
-
-
-
-

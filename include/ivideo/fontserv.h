@@ -20,7 +20,6 @@
 #define __IVIDEO_FONTSERV_H__
 
 #include "csutil/scf.h"
-#include "isys/plugin.h"
 
 /*
  * Some alias names for basic fonts.
@@ -127,7 +126,7 @@ SCF_VERSION (iFontServer, 2, 0, 0);
  * may contain the fonts hardcoded; in this case the
  * font path is really a identifier.
  */
-struct iFontServer : public iPlugIn
+struct iFontServer : public iBase
 {
   /**
    * Load a font by name.

@@ -60,23 +60,39 @@ CS_TOKEN_DEF_END
 
 SCF_IMPLEMENT_IBASE (csRainFactoryLoader)
   SCF_IMPLEMENTS_INTERFACE (iLoaderPlugIn)
-  SCF_IMPLEMENTS_INTERFACE (iPlugIn)
+  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iPlugIn)
 SCF_IMPLEMENT_IBASE_END
+
+SCF_IMPLEMENT_EMBEDDED_IBASE (csRainFactoryLoader::eiPlugIn)
+  SCF_IMPLEMENTS_INTERFACE (iPlugIn)
+SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 SCF_IMPLEMENT_IBASE (csRainFactorySaver)
   SCF_IMPLEMENTS_INTERFACE (iSaverPlugIn)
-  SCF_IMPLEMENTS_INTERFACE (iPlugIn)
+  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iPlugIn)
 SCF_IMPLEMENT_IBASE_END
+
+SCF_IMPLEMENT_EMBEDDED_IBASE (csRainFactorySaver::eiPlugIn)
+  SCF_IMPLEMENTS_INTERFACE (iPlugIn)
+SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 SCF_IMPLEMENT_IBASE (csRainLoader)
   SCF_IMPLEMENTS_INTERFACE (iLoaderPlugIn)
-  SCF_IMPLEMENTS_INTERFACE (iPlugIn)
+  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iPlugIn)
 SCF_IMPLEMENT_IBASE_END
+
+SCF_IMPLEMENT_EMBEDDED_IBASE (csRainLoader::eiPlugIn)
+  SCF_IMPLEMENTS_INTERFACE (iPlugIn)
+SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 SCF_IMPLEMENT_IBASE (csRainSaver)
   SCF_IMPLEMENTS_INTERFACE (iSaverPlugIn)
-  SCF_IMPLEMENTS_INTERFACE (iPlugIn)
+  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iPlugIn)
 SCF_IMPLEMENT_IBASE_END
+
+SCF_IMPLEMENT_EMBEDDED_IBASE (csRainSaver::eiPlugIn)
+  SCF_IMPLEMENTS_INTERFACE (iPlugIn)
+SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 SCF_IMPLEMENT_FACTORY (csRainFactoryLoader)
 SCF_IMPLEMENT_FACTORY (csRainFactorySaver)
@@ -84,7 +100,8 @@ SCF_IMPLEMENT_FACTORY (csRainLoader)
 SCF_IMPLEMENT_FACTORY (csRainSaver)
 
 SCF_EXPORT_CLASS_TABLE (rainldr)
-  SCF_EXPORT_CLASS (csRainFactoryLoader, "crystalspace.mesh.loader.factory.rain",
+  SCF_EXPORT_CLASS (csRainFactoryLoader,
+    "crystalspace.mesh.loader.factory.rain",
     "Crystal Space Rain Factory Loader")
   SCF_EXPORT_CLASS (csRainFactorySaver, "crystalspace.mesh.saver.factory.rain",
     "Crystal Space Rain Factory Saver")
@@ -97,16 +114,11 @@ SCF_EXPORT_CLASS_TABLE_END
 csRainFactoryLoader::csRainFactoryLoader (iBase* pParent)
 {
   SCF_CONSTRUCT_IBASE (pParent);
+  SCF_CONSTRUCT_EMBEDDED_IBASE(scfiPlugIn);
 }
 
 csRainFactoryLoader::~csRainFactoryLoader ()
 {
-}
-
-bool csRainFactoryLoader::Initialize (iSystem* system)
-{
-  sys = system;
-  return true;
 }
 
 iBase* csRainFactoryLoader::Parse (const char* /*string*/,
@@ -129,16 +141,11 @@ iBase* csRainFactoryLoader::Parse (const char* /*string*/,
 csRainFactorySaver::csRainFactorySaver (iBase* pParent)
 {
   SCF_CONSTRUCT_IBASE (pParent);
+  SCF_CONSTRUCT_EMBEDDED_IBASE(scfiPlugIn);
 }
 
 csRainFactorySaver::~csRainFactorySaver ()
 {
-}
-
-bool csRainFactorySaver::Initialize (iSystem* system)
-{
-  sys = system;
-  return true;
 }
 
 #define MAXLINE 100 /* max number of chars per line... */
@@ -171,16 +178,11 @@ void csRainFactorySaver::WriteDown (iBase* /*obj*/, iStrVector * /*str*/,
 csRainLoader::csRainLoader (iBase* pParent)
 {
   SCF_CONSTRUCT_IBASE (pParent);
+  SCF_CONSTRUCT_EMBEDDED_IBASE(scfiPlugIn);
 }
 
 csRainLoader::~csRainLoader ()
 {
-}
-
-bool csRainLoader::Initialize (iSystem* system)
-{
-  sys = system;
-  return true;
 }
 
 static UInt ParseMixmode (char* buf)
@@ -275,7 +277,7 @@ iBase* csRainLoader::Parse (const char* string, iEngine* engine,
       case CS_TOKEN_COLOR:
 	{
 	  csColor color;
-	  csScanStr (params, "%f,%f,%f", &color.red, &color.green, &color.blue);
+	  csScanStr(params, "%f,%f,%f", &color.red, &color.green, &color.blue);
 	  partstate->SetColor (color);
 	}
 	break;
@@ -364,16 +366,11 @@ iBase* csRainLoader::Parse (const char* string, iEngine* engine,
 csRainSaver::csRainSaver (iBase* pParent)
 {
   SCF_CONSTRUCT_IBASE (pParent);
+  SCF_CONSTRUCT_EMBEDDED_IBASE(scfiPlugIn);
 }
 
 csRainSaver::~csRainSaver ()
 {
-}
-
-bool csRainSaver::Initialize (iSystem* system)
-{
-  sys = system;
-  return true;
 }
 
 void csRainSaver::WriteDown (iBase* obj, iStrVector *str,
@@ -420,6 +417,3 @@ void csRainSaver::WriteDown (iBase* obj, iStrVector *str,
   partstate->DecRef();
   state->DecRef();
 }
-
-
-//---------------------------------------------------------------------------

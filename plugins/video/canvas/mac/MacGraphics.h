@@ -29,8 +29,6 @@
 /// Macintosh version.
 class csGraphics2DMac : public csGraphics2D, public iMacGraphics
 {
-  friend class csGraphics3DSoftware;
-
 public:
 	 					 csGraphics2DMac(iBase *iParent);
 	virtual 			~csGraphics2DMac();
@@ -64,7 +62,7 @@ public:
  	virtual void		PauseDisplayContext( void );
  	virtual void		ActivateDisplayContext( void );
 
-	SCF_DECLARE_IBASE;
+	SCF_DECLARE_IBASE_EXT(csGraphics2D);
 
 protected:
 	WindowPtr			mMainWindow;

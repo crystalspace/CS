@@ -56,17 +56,23 @@ CS_TOKEN_DEF_START
   CS_TOKEN_DEF(V)
 CS_TOKEN_DEF_END
 
-
 SCF_IMPLEMENT_IBASE (csMotionLoader)
   SCF_IMPLEMENTS_INTERFACE (iLoaderPlugIn)
-  SCF_IMPLEMENTS_INTERFACE (iPlugIn)
+  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iPlugIn)
 SCF_IMPLEMENT_IBASE_END
+
+SCF_IMPLEMENT_EMBEDDED_IBASE (csMotionLoader::eiPlugIn)
+  SCF_IMPLEMENTS_INTERFACE (iPlugIn)
+SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 SCF_IMPLEMENT_IBASE (csMotionSaver)
   SCF_IMPLEMENTS_INTERFACE (iSaverPlugIn)
-  SCF_IMPLEMENTS_INTERFACE (iPlugIn)
+  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iPlugIn)
 SCF_IMPLEMENT_IBASE_END
 
+SCF_IMPLEMENT_EMBEDDED_IBASE (csMotionSaver::eiPlugIn)
+  SCF_IMPLEMENTS_INTERFACE (iPlugIn)
+SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 SCF_IMPLEMENT_FACTORY (csMotionLoader)
 SCF_IMPLEMENT_FACTORY (csMotionSaver)
@@ -81,6 +87,7 @@ SCF_EXPORT_CLASS_TABLE_END
 csMotionLoader::csMotionLoader(iBase *iParent)
 {
   SCF_CONSTRUCT_IBASE (iParent);
+  SCF_CONSTRUCT_EMBEDDED_IBASE(scfiPlugIn);
   sys=NULL;
 }
 
@@ -458,16 +465,11 @@ CS_TOKEN_TABLE_END
 csMotionSaver::csMotionSaver( iBase* base )
 {
   SCF_CONSTRUCT_IBASE (base);
+  SCF_CONSTRUCT_EMBEDDED_IBASE(scfiPlugIn);
 }
 
 csMotionSaver::~csMotionSaver()
 {
-}
-
-bool csMotionSaver::Initialize( iSystem* system )
-{
-  sys = system;
-  return true;
 }
 
 void csMotionSaver::WriteDown ( iBase* /* obj */, iStrVector* /* string */, iEngine* /* engine */)

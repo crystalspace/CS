@@ -16,27 +16,23 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __LINEX2D_H__
-#define __LINEX2D_H__
+#ifndef __CS_PS2D_H__
+#define __CS_PS2D_H__
 
-#include "csutil/scf.h"
 #include "video/canvas/common/graph2d.h"
 #include "isys/event.h"
 
-/// XLIB version.
 class csGraphics2Dps2 : public csGraphics2D, public iEventPlug
 {
-
-  // The event outlet
   iEventOutlet *EventOutlet;
 
 public:
-  SCF_DECLARE_IBASE;
+  SCF_DECLARE_IBASE_EXT(csGraphics2D);
 
-  csGraphics2Dps2 (iBase *iParent);
+  csGraphics2Dps2 (iBase*);
   virtual ~csGraphics2Dps2 ();
 
-  virtual bool Initialize (iSystem *pSystem);
+  virtual bool Initialize (iSystem*;
   virtual bool Open (const char *Title);
   virtual void Close ();
 
@@ -49,8 +45,6 @@ public:
   virtual void Clear (int color);
   virtual void Write (int x, int y, int fg, int bg, const char *text);
 
-  virtual bool PerformExtension (const char* iCommand, ...);
-
   /// Set mouse position.
   virtual bool SetMousePosition (int x, int y);
 
@@ -62,12 +56,11 @@ public:
 
   virtual unsigned char *GetPixelAt (int x, int y);
 
-  //------------------------- iEventPlug interface ---------------------------//
-
+  //------------------------ iEventPlug interface ---------------------------//
   virtual unsigned GetPotentiallyConflictingEvents ()
   { return CSEVTYPE_Keyboard | CSEVTYPE_Mouse; }
   virtual unsigned QueryEventPriority (unsigned /*iType*/)
   { return 150; }
 };
 
-#endif // __LINEX2D_H__
+#endif // __CS_PS2D_H__

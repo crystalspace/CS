@@ -29,14 +29,11 @@ CS_IMPLEMENT_PLUGIN
 SCF_IMPLEMENT_FACTORY (csGraphics2DBeGlide)
 
 SCF_EXPORT_CLASS_TABLE (glidebe2d)
-  SCF_EXPORT_CLASS_DEP (csGraphics2DBeGlide, "crystalspace.graphics2d.glide.be.2",
-    "Crystal Space Glide2 2D driver for BeOS", "crystalspace.font.server.")
+  SCF_EXPORT_CLASS_DEP (csGraphics2DBeGlide,
+    "crystalspace.graphics2d.glide.be.2",
+    "Crystal Space Glide2 2D driver for BeOS",
+    "crystalspace.font.server.")
 SCF_EXPORT_CLASS_TABLE_END
-
-SCF_IMPLEMENT_IBASE (csGraphics2DBeGlide)
-  SCF_IMPLEMENTS_INTERFACE (iPlugIn)
-  SCF_IMPLEMENTS_INTERFACE (iGraphics2D)
-SCF_IMPLEMENT_IBASE_END
 
 csGraphics2DBeGlide::csGraphics2DBeGlide(iBase* p) :
   superclass(p), view(0), window(0), bitmap(0)

@@ -155,7 +155,7 @@ void csEmitSphere::GetValue(csVector3& value, csVector3 & /*given*/)
   // slow but gives a good even spreading
   //while(1)
   //{
-    //value.Set (GetRandomFloat(-max,max), GetRandomFloat(-max,max), 
+    //value.Set (GetRandomFloat(-max,max), GetRandomFloat(-max,max),
       //GetRandomFloat(-max,max));
     //float dist = value.SquaredNorm();
     //if( (min*min <= dist) && (dist <= max*max) )
@@ -196,7 +196,7 @@ csEmitCone::~csEmitCone()
 void csEmitCone::GetValue(csVector3& value, csVector3 & /*given*/)
 {
   csVector3 dest(GetRandomFloat(min, max), 0, 0);
-  /// from fountain code 
+  /// from fountain code
 
   // now make it shoot to a circle in the x direction
   float rotz_open = 2.0 * aperture * (rand() / (1.0+RAND_MAX)) - aperture;
@@ -205,7 +205,7 @@ void csEmitCone::GetValue(csVector3& value, csVector3 & /*given*/)
   float rot_around = 2.0 * PI * (rand() / (1.0+RAND_MAX));
   csXRotMatrix3 xaround(rot_around);
   dest = xaround * dest;
-  // now dest point to somewhere in a circular cur of a sphere around the 
+  // now dest point to somewhere in a circular cur of a sphere around the
   // x axis.
 
   // direct the fountain to the users dirction
@@ -440,7 +440,7 @@ void csEmitCylinderTangent::GetValue(csVector3& value, csVector3 &given)
   value = direction * amount;
 }
 
-void csEmitCylinderTangent::SetContent(const csVector3& start, 
+void csEmitCylinderTangent::SetContent(const csVector3& start,
  const csVector3& end, float min, float max)
 {
   csEmitCylinderTangent::start = start;
@@ -487,7 +487,7 @@ void csEmitSphereTangent::GetValue(csVector3& value, csVector3 & given)
   value = oncirc * amount;
 }
 
-void csEmitSphereTangent::SetContent(const csVector3& center, 
+void csEmitSphereTangent::SetContent(const csVector3& center,
  float min, float max)
 {
   csEmitSphereTangent::center = center;
@@ -537,7 +537,7 @@ void csEmitMeshObject::SetupObject ()
     {
       if(using_rect_sprites)
         AppendRectSprite (drop_width, drop_height, mat, lighted_particles);
-      else AppendRegularSprite (drop_sides, drop_radius, mat, 
+      else AppendRegularSprite (drop_sides, drop_radius, mat,
         lighted_particles);
       StartParticle(i);
       /// age each particle randomly, to spread out particles over ages.
@@ -549,7 +549,7 @@ void csEmitMeshObject::SetupObject ()
   }
 }
 
-csEmitMeshObject::csEmitMeshObject (iSystem* system, 
+csEmitMeshObject::csEmitMeshObject (iSystem* system,
   iMeshObjectFactory* factory)
 	: csParticleSystem (system, factory)
 {
@@ -756,7 +756,7 @@ void csEmitMeshObject::Update (cs_time elapsed_time)
       int afterstart = (ages[i] + elapsed_time) % timetolive;
       StartParticle(i);
       // move a little after start
-      MoveAgeParticle(i, afterstart, afterstart/1000.); 
+      MoveAgeParticle(i, afterstart, afterstart/1000.);
     }
     else
     {
@@ -794,7 +794,7 @@ void csEmitMeshObject::AddAge(int time, const csColor& color, float alpha,
 }
 
 
-void csEmitMeshObject::GetAgingMoment(int i, int& time, csColor& color, 
+void csEmitMeshObject::GetAgingMoment(int i, int& time, csColor& color,
   float &alpha, float& swirl, float& rotspeed, float& scale)
 {
   int n = 0;
@@ -825,11 +825,11 @@ SCF_IMPLEMENT_EMBEDDED_IBASE (csEmitMeshObjectFactory::EmitFactoryState)
   SCF_IMPLEMENTS_INTERFACE (iEmitFactoryState)
 SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
-csEmitMeshObjectFactory::csEmitMeshObjectFactory (iBase *pParent, iSystem* system)
+csEmitMeshObjectFactory::csEmitMeshObjectFactory (iBase *p, iSystem* s)
 {
-  SCF_CONSTRUCT_IBASE (pParent);
+  SCF_CONSTRUCT_IBASE (p);
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiEmitFactoryState);
-  csEmitMeshObjectFactory::system = system;
+  system = s;
 }
 
 csEmitMeshObjectFactory::~csEmitMeshObjectFactory ()
@@ -838,7 +838,8 @@ csEmitMeshObjectFactory::~csEmitMeshObjectFactory ()
 
 iMeshObject* csEmitMeshObjectFactory::NewInstance ()
 {
-  csEmitMeshObject* cm = new csEmitMeshObject (system, (iMeshObjectFactory*)this);
+  csEmitMeshObject* cm =
+    new csEmitMeshObject (system, (iMeshObjectFactory*)this);
   iMeshObject* im = SCF_QUERY_INTERFACE (cm, iMeshObject);
   im->DecRef ();
   return im;
@@ -848,8 +849,12 @@ iMeshObject* csEmitMeshObjectFactory::NewInstance ()
 
 SCF_IMPLEMENT_IBASE (csEmitMeshObjectType)
   SCF_IMPLEMENTS_INTERFACE (iMeshObjectType)
-  SCF_IMPLEMENTS_INTERFACE (iPlugIn)
+  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iPlugIn)
 SCF_IMPLEMENT_IBASE_END
+
+SCF_IMPLEMENT_EMBEDDED_IBASE (csEmitMeshObjectType::eiPlugIn)
+  SCF_IMPLEMENTS_INTERFACE (iPlugIn)
+SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 SCF_IMPLEMENT_FACTORY (csEmitMeshObjectType)
 
@@ -861,16 +866,11 @@ SCF_EXPORT_CLASS_TABLE_END
 csEmitMeshObjectType::csEmitMeshObjectType (iBase* pParent)
 {
   SCF_CONSTRUCT_IBASE (pParent);
+  SCF_CONSTRUCT_EMBEDDED_IBASE(scfiPlugIn);
 }
 
 csEmitMeshObjectType::~csEmitMeshObjectType ()
 {
-}
-
-bool csEmitMeshObjectType::Initialize (iSystem* system)
-{
-  csEmitMeshObjectType::system = system;
-  return true;
 }
 
 iMeshObjectFactory* csEmitMeshObjectType::NewFactory ()
@@ -880,4 +880,3 @@ iMeshObjectFactory* csEmitMeshObjectType::NewFactory ()
   ifact->DecRef ();
   return ifact;
 }
-

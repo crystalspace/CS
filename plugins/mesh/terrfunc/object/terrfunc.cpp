@@ -1,16 +1,16 @@
 /*
     Copyright (C) 1999-2001 by Jorrit Tyberghein
-  
+
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
     License as published by the Free Software Foundation; either
     version 2 of the License, or (at your option) any later version.
-  
+
     This library is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
     Library General Public License for more details.
-  
+
     You should have received a copy of the GNU Library General Public
     License along with this library; if not, write to the Free
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
@@ -285,7 +285,7 @@ public:
    * Calculate the minimal cost of collapsing this vertex to some other.
    * Also remember which other vertex was selected for collapsing to.
    */
-  void CalculateCost (csTriangleVertices* vertices, csTerrFuncObject* terrfunc);
+  void CalculateCost(csTriangleVertices* vertices, csTerrFuncObject* terrfunc);
 };
 
 /*
@@ -328,7 +328,7 @@ void csTriangleVertex::AddTriangle (int idx)
     int* new_con_triangles = new int [max_con_triangles+4];
     if (con_triangles)
     {
-      memcpy (new_con_triangles, con_triangles, sizeof (int)*max_con_triangles);
+      memcpy(new_con_triangles, con_triangles, sizeof (int)*max_con_triangles);
       delete [] con_triangles;
     }
     con_triangles = new_con_triangles;
@@ -408,8 +408,8 @@ void csTriangleVertex::CalculateCost (csTriangleVertices* vertices,
   float this_height = vv.y;
   if (!at_hor_edge && !at_ver_edge)
     this_height = terrfunc->height_func (terrfunc->height_func_data,
-  	vertices->GetVertex (idx).dx,
-  	vertices->GetVertex (idx).dy) * terrfunc->scale.y + terrfunc->topleft.y;
+      vertices->GetVertex (idx).dx,
+      vertices->GetVertex (idx).dy) * terrfunc->scale.y + terrfunc->topleft.y;
   for (i = 0 ; i < num_con_vertices ; i++)
   {
     // Consider collapsing to vertex i.
@@ -492,9 +492,10 @@ void csTriangleVertex::CalculateCost (csTriangleVertices* vertices,
     //  |  *a,b          and is clipped at c, where v[0]
     //  | /              can be either a, b or c. In other words when
     //  |/               the single vertex is not 'top' and clipped.
-    // /|*c              
-    //  |                The '-= EPSILON' for both left and right 
-    //  y     fig. 2     is fairly arbitrary, this probably needs to be refined.
+    // /|*c
+    //  |                The '-= EPSILON' for both left and right
+    //  y     fig. 2     is fairly arbitrary, this probably needs to be
+    //                   refined.
     if (v[top] == v[_vbl]) v[_vbl].x -= EPSILON;
     if (v[top] == v[_vbr]) v[_vbr].x -= EPSILON;
     if (v[_vbr] == v[_vbl]) v[_vbl].x -= EPSILON;//@@@
@@ -504,7 +505,7 @@ void csTriangleVertex::CalculateCost (csTriangleVertices* vertices,
     int vtl = top, vtr = top, vbl = _vbl, vbr = _vbr;
     float x = this_pos.x;
     float y = this_pos.y;
-    int ry = QRound (y); 
+    int ry = QRound (y);
     if (ry > QRound (v[vbl].y))
     {
       vtl = vbl;
@@ -515,7 +516,8 @@ void csTriangleVertex::CalculateCost (csTriangleVertices* vertices,
       vtr = vbr;
       if (++vbr > 2) vbr = 0;
     }
-//printf ("a: vbl=%d v[vbl].y=%g vtl=%d v[vtl].y=%g y=%g\n", vbl, v[vbl].y, vtl, v[vtl].y, y);
+//printf ("a: vbl=%d v[vbl].y=%g vtl=%d v[vtl].y=%g y=%g\n",
+//vbl, v[vbl].y, vtl, v[vtl].y, y);
 //printf ("a: v[vbl].x=%g v[vtl].x=%g x=%g\n", v[vbl].x, v[vtl].x, x);
     // Now interpolate the height.
     float tL, tR, xL, xR, tX;
@@ -583,7 +585,7 @@ csTriangleVertices::csTriangleVertices (const G3DTriangleMesh& mesh,
     csVector3 v = mesh.vertices[0][i] - terrfunc->topleft;
     box.AddBoundingVertex (csVector2 (v.x, v.z));
   }
-  
+
   // Build connectivity information for all vertices in this mesh.
   csTriangle* triangles = mesh.triangles;
   for (i = 0 ; i < num_vertices ; i++)
@@ -825,14 +827,14 @@ void csTerrFuncObject::ComputeNormals (const G3DTriangleMesh& mesh,
       n = normal_func (normal_func_data, dx, dy);
     else
     {
-      v[0].Set (-.1, height_func (height_func_data, dx-inv_totx, dy-inv_toty), -.1);
-      v[1].Set (  0, height_func (height_func_data, dx, dy-inv_toty), -.1);
-      v[2].Set ( .1, height_func (height_func_data, dx+inv_totx, dy-inv_toty), -.1);
-      v[3].Set ( .1, height_func (height_func_data, dx+inv_totx, dy), 0);
-      v[4].Set ( .1, height_func (height_func_data, dx+inv_totx, dy+inv_toty),  .1);
-      v[5].Set (  0, height_func (height_func_data, dx, dy+inv_toty),  .1);
-      v[6].Set (-.1, height_func (height_func_data, dx-inv_totx, dy+inv_toty),  .1);
-      v[7].Set (-.1, height_func (height_func_data, dx-inv_totx, dy), 0);
+      v[0].Set(-.1, height_func(height_func_data, dx-inv_totx, dy-inv_toty), -.1);
+      v[1].Set(  0, height_func(height_func_data, dx, dy-inv_toty), -.1);
+      v[2].Set( .1, height_func(height_func_data, dx+inv_totx, dy-inv_toty), -.1);
+      v[3].Set( .1, height_func(height_func_data, dx+inv_totx, dy), 0);
+      v[4].Set( .1, height_func(height_func_data, dx+inv_totx, dy+inv_toty),  .1);
+      v[5].Set(  0, height_func(height_func_data, dx, dy+inv_toty),  .1);
+      v[6].Set(-.1, height_func(height_func_data, dx-inv_totx, dy+inv_toty),  .1);
+      v[7].Set(-.1, height_func(height_func_data, dx-inv_totx, dy), 0);
       n.Set (0, 0, 0);
       int j1, j;
       j1 = 7;
@@ -1093,7 +1095,7 @@ void csTerrFuncObject::SetupObject ()
 	blocks[blidx].center = tl;
       }
     }
-    
+
     int lod;
     for (lod = 0 ; lod < 4 ; lod++)
     {
@@ -1129,7 +1131,7 @@ void csTerrFuncObject::SetupObject ()
 
 void csTerrFuncObject::RecomputeShadowMap ()
 {
-  
+
 }
 
 void csTerrFuncObject::RecomputeLighting (int lod, int bx, int by)
@@ -1365,8 +1367,12 @@ iMeshObject* csTerrFuncObjectFactory::NewInstance ()
 
 SCF_IMPLEMENT_IBASE (csTerrFuncObjectType)
   SCF_IMPLEMENTS_INTERFACE (iMeshObjectType)
-  SCF_IMPLEMENTS_INTERFACE (iPlugIn)
+  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iPlugIn)
 SCF_IMPLEMENT_IBASE_END
+
+SCF_IMPLEMENT_EMBEDDED_IBASE (csTerrFuncObjectType::eiPlugIn)
+  SCF_IMPLEMENTS_INTERFACE (iPlugIn)
+SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 SCF_IMPLEMENT_FACTORY (csTerrFuncObjectType)
 
@@ -1378,16 +1384,11 @@ SCF_EXPORT_CLASS_TABLE_END
 csTerrFuncObjectType::csTerrFuncObjectType (iBase* pParent)
 {
   SCF_CONSTRUCT_IBASE (pParent);
+  SCF_CONSTRUCT_EMBEDDED_IBASE(scfiPlugIn);
 }
 
 csTerrFuncObjectType::~csTerrFuncObjectType ()
 {
-}
-
-bool csTerrFuncObjectType::Initialize (iSystem *pSys)
-{
-  pSystem = pSys;
-  return true;
 }
 
 iMeshObjectFactory* csTerrFuncObjectType::NewFactory()
@@ -1400,4 +1401,3 @@ uint32 csTerrFuncObjectType::GetFeatures () const
 {
   return 0;
 }
-

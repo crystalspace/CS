@@ -22,6 +22,7 @@
 #include "csutil/util.h"
 #include "csutil/csvector.h"
 #include "ivaria/perfstat.h"
+#include "isys/plugin.h"
 
 struct iSystem;
 struct iEngine;
@@ -190,6 +191,13 @@ protected:
    */
   virtual void DebugSetBreak (int frame_num)
   { break_frame = frame_num; }
+
+  struct eiPlugIn : public iPlugIn
+  {
+    SCF_DECLARE_EMBEDDED_IBASE(csPerfStats);
+    virtual bool Initialize (iSystem* p) { return scfParent->Initialize(p); }
+    virtual bool HandleEvent (iEvent& e) { return scfParent->HandleEvent(e); }
+  } scfiPlugIn;
 };
 
 #endif // __CS_PERFSTAT_H__

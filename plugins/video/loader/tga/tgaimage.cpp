@@ -40,8 +40,12 @@ CS_IMPLEMENT_PLUGIN
 
 SCF_IMPLEMENT_IBASE (csTGAImageIO)
   SCF_IMPLEMENTS_INTERFACE (iImageIO)
-  SCF_IMPLEMENTS_INTERFACE (iPlugIn)
+  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iPlugIn)
 SCF_IMPLEMENT_IBASE_END
+
+SCF_IMPLEMENT_EMBEDDED_IBASE (csTGAImageIO::eiPlugIn)
+  SCF_IMPLEMENTS_INTERFACE (iPlugIn)
+SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 SCF_IMPLEMENT_FACTORY (csTGAImageIO);
 
@@ -115,17 +119,13 @@ static iImageIO::FileFormatDescription formatlist[6] =
 csTGAImageIO::csTGAImageIO (iBase *pParent)
 {
   SCF_CONSTRUCT_IBASE (pParent);
+  SCF_CONSTRUCT_EMBEDDED_IBASE(scfiPlugIn);
   formats.Push (&formatlist[0]);
   formats.Push (&formatlist[1]);
   formats.Push (&formatlist[2]);
   formats.Push (&formatlist[3]);
   formats.Push (&formatlist[4]);
   formats.Push (&formatlist[5]);
-}
-
-bool csTGAImageIO::Initialize (iSystem *)
-{
-  return true;
 }
 
 const csVector& csTGAImageIO::GetDescription ()

@@ -102,23 +102,39 @@ static void ReportError (iReporter* reporter, const char* id,
 
 SCF_IMPLEMENT_IBASE (csSprite3DFactoryLoader)
   SCF_IMPLEMENTS_INTERFACE (iLoaderPlugIn)
-  SCF_IMPLEMENTS_INTERFACE (iPlugIn)
+  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iPlugIn)
 SCF_IMPLEMENT_IBASE_END
+
+SCF_IMPLEMENT_EMBEDDED_IBASE (csSprite3DFactoryLoader::eiPlugIn)
+  SCF_IMPLEMENTS_INTERFACE (iPlugIn)
+SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 SCF_IMPLEMENT_IBASE (csSprite3DFactorySaver)
   SCF_IMPLEMENTS_INTERFACE (iSaverPlugIn)
-  SCF_IMPLEMENTS_INTERFACE (iPlugIn)
+  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iPlugIn)
 SCF_IMPLEMENT_IBASE_END
+
+SCF_IMPLEMENT_EMBEDDED_IBASE (csSprite3DFactorySaver::eiPlugIn)
+  SCF_IMPLEMENTS_INTERFACE (iPlugIn)
+SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 SCF_IMPLEMENT_IBASE (csSprite3DLoader)
   SCF_IMPLEMENTS_INTERFACE (iLoaderPlugIn)
-  SCF_IMPLEMENTS_INTERFACE (iPlugIn)
+  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iPlugIn)
 SCF_IMPLEMENT_IBASE_END
+
+SCF_IMPLEMENT_EMBEDDED_IBASE (csSprite3DLoader::eiPlugIn)
+  SCF_IMPLEMENTS_INTERFACE (iPlugIn)
+SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 SCF_IMPLEMENT_IBASE (csSprite3DSaver)
   SCF_IMPLEMENTS_INTERFACE (iSaverPlugIn)
-  SCF_IMPLEMENTS_INTERFACE (iPlugIn)
+  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iPlugIn)
 SCF_IMPLEMENT_IBASE_END
+
+SCF_IMPLEMENT_EMBEDDED_IBASE (csSprite3DSaver::eiPlugIn)
+  SCF_IMPLEMENTS_INTERFACE (iPlugIn)
+SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 SCF_IMPLEMENT_FACTORY (csSprite3DFactoryLoader)
 SCF_IMPLEMENT_FACTORY (csSprite3DFactorySaver)
@@ -141,6 +157,7 @@ SCF_EXPORT_CLASS_TABLE_END
 csSprite3DFactoryLoader::csSprite3DFactoryLoader (iBase* pParent)
 {
   SCF_CONSTRUCT_IBASE (pParent);
+  SCF_CONSTRUCT_EMBEDDED_IBASE(scfiPlugIn);
   reporter = NULL;
 }
 
@@ -375,12 +392,12 @@ bool csSprite3DFactoryLoader::LoadSkeleton (iReporter* reporter,
           char* params2;
 	  csMatrix3 m;
 	  csVector3 v (0, 0, 0);
-          while ((cmd = csGetObject (&params, tok_matvec, &xname, &params2)) > 0)
+          while ((cmd = csGetObject(&params,tok_matvec,&xname,&params2)) > 0)
           {
     	    if (!params2)
     	    {
 	      ReportError (reporter,
-	       "crystalspace.sprite3dfactoryloader.parse.skeleton.badtransform",
+	      "crystalspace.sprite3dfactoryloader.parse.skeleton.badtransform",
 		"Bad format while parsing skeleton transform!");
 	      con->DecRef ();
 	      return false;
@@ -693,6 +710,7 @@ iBase* csSprite3DFactoryLoader::Parse (const char* string, iEngine* engine,
 csSprite3DFactorySaver::csSprite3DFactorySaver (iBase* pParent)
 {
   SCF_CONSTRUCT_IBASE (pParent);
+  SCF_CONSTRUCT_EMBEDDED_IBASE(scfiPlugIn);
   reporter = NULL;
 }
 
@@ -776,7 +794,8 @@ void csSprite3DFactorySaver::SaveSkeleton (iSkeletonLimb* limb,
 void csSprite3DFactorySaver::WriteDown (iBase* obj, iStrVector * str,
   iEngine* /*engine*/)
 {
-  iSprite3DFactoryState *state = SCF_QUERY_INTERFACE (obj, iSprite3DFactoryState);
+  iSprite3DFactoryState *state =
+    SCF_QUERY_INTERFACE (obj, iSprite3DFactoryState);
   char buf[MAXLINE];
 
   sprintf(buf, "MATERIAL (%s)\n", state->GetMaterialWrapper()->
@@ -853,6 +872,7 @@ void csSprite3DFactorySaver::WriteDown (iBase* obj, iStrVector * str,
 csSprite3DLoader::csSprite3DLoader (iBase* pParent)
 {
   SCF_CONSTRUCT_IBASE (pParent);
+  SCF_CONSTRUCT_EMBEDDED_IBASE(scfiPlugIn);
   reporter = NULL;
 }
 
@@ -1035,6 +1055,7 @@ iBase* csSprite3DLoader::Parse (const char* string, iEngine* engine,
 csSprite3DSaver::csSprite3DSaver (iBase* pParent)
 {
   SCF_CONSTRUCT_IBASE (pParent);
+  SCF_CONSTRUCT_EMBEDDED_IBASE(scfiPlugIn);
   reporter = NULL;
 }
 
@@ -1090,5 +1111,3 @@ void csSprite3DSaver::WriteDown (iBase* obj, iStrVector *str,
   factstate->DecRef();
   state->DecRef();
 }
-
-//---------------------------------------------------------------------------

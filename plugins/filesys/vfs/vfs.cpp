@@ -1121,8 +1121,12 @@ int csVFS::VfsVector::CompareKey (csSome Item, csConstSome Key, int Mode) const
 
 SCF_IMPLEMENT_IBASE (csVFS)
   SCF_IMPLEMENTS_INTERFACE (iVFS)
-  SCF_IMPLEMENTS_INTERFACE (iPlugIn)
+  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iPlugIn)
 SCF_IMPLEMENT_IBASE_END
+
+SCF_IMPLEMENT_EMBEDDED_IBASE (csVFS::eiPlugIn)
+  SCF_IMPLEMENTS_INTERFACE (iPlugIn)
+SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 SCF_IMPLEMENT_FACTORY (csVFS)
 
@@ -1135,6 +1139,7 @@ csVFS::csVFS (iBase *iParent) : dirstack (8, 8)
 {
   System = NULL;
   SCF_CONSTRUCT_IBASE (iParent);
+  SCF_CONSTRUCT_EMBEDDED_IBASE(scfiPlugIn);
   cwd = new char [2];
   cwd [0] = VFS_PATH_SEPARATOR;
   cwd [1] = 0;

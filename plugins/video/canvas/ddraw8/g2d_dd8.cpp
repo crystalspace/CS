@@ -22,7 +22,7 @@
 #include "g2d_dd8.h"
 #include "isys/system.h"
 
-#ifndef DD_FALSE 
+#ifndef DD_FALSE
   #define DD_FALSE S_FALSE
 #endif
 
@@ -40,14 +40,12 @@ SCF_EXPORT_CLASS_TABLE (ddraw8)
     "DirectDraw DX8 2D graphics driver for Crystal Space", "crystalspace.font.server.")
 SCF_EXPORT_CLASS_TABLE_END
 
-SCF_IMPLEMENT_IBASE (csGraphics2DDDraw8)
-  SCF_IMPLEMENTS_INTERFACE (iPlugIn)
-  SCF_IMPLEMENTS_INTERFACE (iGraphics2D)
-  SCF_IMPLEMENTS_INTERFACE (iGraphics2DDDraw8)
+SCF_IMPLEMENT_IBASE_EXT (csGraphics2DDDraw8)
+  SCF_IMPLEMENTS_INTERFACE_EXT (iGraphics2DDDraw8)
 SCF_IMPLEMENT_IBASE_END
 
-csGraphics2DDDraw8::csGraphics2DDDraw8 (iBase *iParent) : 
-  csGraphics2D (),
+csGraphics2DDDraw8::csGraphics2DDDraw8 (iBase *iParent) :
+  csGraphics2D (iParent),
   m_lpDD7 (NULL),
   m_lpddsPrimary (NULL),
   m_lpddsBack (NULL),
@@ -64,7 +62,6 @@ csGraphics2DDDraw8::csGraphics2DDDraw8 (iBase *iParent) :
   m_bDoubleBuffer (false),
   m_bAllowWindowed (false)
 {
-  SCF_CONSTRUCT_IBASE (iParent);
   m_hInstance = GetModuleHandle (NULL);
   D3DCallback = NULL;
 }
@@ -129,7 +126,7 @@ bool csGraphics2DDDraw8::Open (const char *Title)
     DDetection.checkDevices3D ();
     DirectDevice = DDetection.findBestDevice3D (FullScreen);
   }
-  
+
   if (DirectDevice == NULL)
   {
     InitFail (DD_FALSE, "Error creating DirectDevice\n");
@@ -139,10 +136,10 @@ bool csGraphics2DDDraw8::Open (const char *Title)
   LPGUID pGuid = NULL;
   if (!DirectDevice->IsPrimary2D)
     pGuid = &DirectDevice->Guid2D;
-  
+
   System->Printf (CS_MSG_INITIALIZATION, "Using DirectDraw %s (%s)\n",
     DirectDevice->DeviceDescription2D, DirectDevice->DeviceName2D);
-  
+
   // Create a DD object for either the primary device or the secondary.
   HRESULT ddrval;
   LPDIRECTDRAW lpDD;
@@ -315,7 +312,7 @@ void csGraphics2DDDraw8::Print (csRect* area)
       case DDERR_SURFACELOST:
         if (m_lpddsPrimary->Restore () != DD_OK)
           loop = false;
-        if (m_lpddsBack 
+        if (m_lpddsBack
          && m_lpddsBack->IsLost () != DD_OK
          && m_lpddsBack->Restore () != DD_OK)
           loop = false;
@@ -373,7 +370,7 @@ void csGraphics2DDDraw8::Refresh (RECT &rect)
       case DDERR_SURFACELOST:
         if (m_lpddsPrimary->Restore () != DD_OK)
           loop = false;
-        if (m_lpddsBack 
+        if (m_lpddsBack
          && m_lpddsBack->IsLost () != DD_OK
          && m_lpddsBack->Restore () != DD_OK)
           loop = false;
@@ -391,7 +388,7 @@ void csGraphics2DDDraw8::Refresh (RECT &rect)
 void csGraphics2DDDraw8::SetColorPalette ()
 {
   HRESULT ret;
-  
+
   if ((Depth == 8) && m_bPaletteChanged)
   {
     m_bPaletteChanged = false;
@@ -401,23 +398,23 @@ void csGraphics2DDDraw8::SetColorPalette ()
       m_lpddPal->Release ();
       m_lpddPal = NULL;
     }
-    
+
     ret = m_lpDD7->CreatePalette (DDPCAPS_8BIT, (PALETTEENTRY *)Palette, &m_lpddPal, NULL);
     if (ret == DD_OK) m_lpddsPrimary->SetPalette (m_lpddPal);
-    
+
     if (!FullScreen)
     {
       HPALETTE oldPal;
       HDC dc = GetDC(NULL);
-      
+
       SetSystemPaletteUse (dc, SYSPAL_NOSTATIC);
       PostMessage (HWND_BROADCAST, WM_SYSCOLORCHANGE, 0, 0);
-      
+
       CreateIdentityPalette (Palette);
       ClearSystemPalette ();
-      
+
       oldPal = SelectPalette (dc, m_hWndPalette, FALSE);
-      
+
       RealizePalette (dc);
       SelectPalette (dc, oldPal, FALSE);
       ReleaseDC (NULL, dc);
@@ -548,7 +545,7 @@ HRESULT csGraphics2DDDraw8::InitSurfaces ()
 
     if (DirectDevice->Only2D)
       ddsd.ddsCaps.dwCaps |= DDSCAPS_SYSTEMMEMORY;
-    else 
+    else
       ddsd.ddsCaps.dwCaps |= DDSCAPS_3DDEVICE | DDSCAPS_VIDEOMEMORY;
 
     if ((ddrval = m_lpDD7->CreateSurface (&ddsd, &m_lpddsBack, NULL)) != DD_OK)

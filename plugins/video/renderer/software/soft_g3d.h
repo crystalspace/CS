@@ -20,31 +20,31 @@
 #define __CS_SOFT_G3D_H__
 
 #include "iutil/config.h"
+#include "isys/plugin.h"
 #include "sft3dcom.h"
 
 /// Software 3D renderer
 class csGraphics3DSoftware : public csGraphics3DSoftwareCommon
 {
 public:
-  SCF_DECLARE_IBASE;
+  SCF_DECLARE_IBASE_EXT(csGraphics3DSoftwareCommon);
   /// Constructor
-  csGraphics3DSoftware (iBase *iParent);
+  csGraphics3DSoftware (iBase*);
   /// Destructor
   virtual ~csGraphics3DSoftware ();
-  /// Initialize
-  virtual bool Initialize (iSystem *iSys);
-  /// Open
+  /// Initialize iPlugIn.
+  virtual bool Initialize (iSystem*);
+  /// Open a canvas.
   virtual bool Open (const char *Title);
 
-  ///------------------- iConfig interface implementation -------------------
-  struct csSoftConfig : public iConfig
+  struct eiSoftConfig : public iConfig
   {
     SCF_DECLARE_EMBEDDED_IBASE (csGraphics3DSoftware);
-    virtual bool GetOptionDescription (int idx, csOptionDescription *option);
+    virtual bool GetOptionDescription (int idx, csOptionDescription*);
     virtual bool SetOption (int id, csVariant* value);
     virtual bool GetOption (int id, csVariant* value);
   } scfiConfig;
-  friend struct csSoftConfig;
+  friend struct eiSoftConfig;
 };
 
 #endif // __CS_SOFT_G3D_H__

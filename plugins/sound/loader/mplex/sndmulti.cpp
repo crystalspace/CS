@@ -19,8 +19,8 @@
 #include "cssysdef.h"
 #include "isound/data.h"
 #include "isound/loader.h"
+#include "isys/plugin.h"
 #include "isys/system.h"
-#include "isys/vfs.h"
 #include "iutil/strvec.h"
 #include "csutil/csvector.h"
 
@@ -28,24 +28,32 @@
 
 CS_IMPLEMENT_PLUGIN
 
-class csSoundLoaderMultiplexer : public iSoundLoader {
+class csSoundLoaderMultiplexer : public iSoundLoader
+{
 private:
   csVector Loaders;
 
 public:
   SCF_DECLARE_IBASE;
 
-  // constructor
+  // Constructor
   csSoundLoaderMultiplexer(iBase *iParent);
 
-  // destructor
+  // Destructor
   virtual ~csSoundLoaderMultiplexer();
 
   // Initialize the Sound Loader.
   virtual bool Initialize (iSystem *sys);
 
-  // Load a sound file from the VFS.
+  // Load a sound file from the raw data.
   virtual iSoundData *LoadSound(void *Data, unsigned long Size) const;
+
+  struct eiPlugIn : public iPlugIn
+  {
+    SCF_DECLARE_EMBEDDED_IBASE(csSoundLoaderMultiplexer);
+    virtual bool Initialize (iSystem* p) { return scfParent->Initialize(p); }
+    virtual bool HandleEvent (iEvent&) { return false; }
+  } scfiPlugIn;
 };
 
 SCF_IMPLEMENT_FACTORY(csSoundLoaderMultiplexer);
@@ -57,15 +65,23 @@ SCF_EXPORT_CLASS_TABLE_END;
 
 SCF_IMPLEMENT_IBASE(csSoundLoaderMultiplexer)
   SCF_IMPLEMENTS_INTERFACE(iSoundLoader)
-  SCF_IMPLEMENTS_INTERFACE(iPlugIn)
+  SCF_IMPLEMENTS_EMBEDDED_INTERFACE(iPlugIn)
 SCF_IMPLEMENT_IBASE_END;
 
-csSoundLoaderMultiplexer::csSoundLoaderMultiplexer(iBase *iParent) {
+SCF_IMPLEMENT_EMBEDDED_IBASE (csSoundLoaderMultiplexer::eiPlugIn)
+  SCF_IMPLEMENTS_INTERFACE (iPlugIn)
+SCF_IMPLEMENT_EMBEDDED_IBASE_END
+
+csSoundLoaderMultiplexer::csSoundLoaderMultiplexer(iBase *iParent)
+{
   SCF_CONSTRUCT_IBASE(iParent);
+  SCF_CONSTRUCT_EMBEDDED_IBASE(scfiPlugIn);
 }
 
-csSoundLoaderMultiplexer::~csSoundLoaderMultiplexer() {
-  for (long i=0; i<Loaders.Length(); i++) {
+csSoundLoaderMultiplexer::~csSoundLoaderMultiplexer()
+{
+  for (long i=0; i<Loaders.Length(); i++)
+  {
     iSoundLoader *ldr=(iSoundLoader*)(Loaders.Get(i));
     ldr->DecRef();
   }

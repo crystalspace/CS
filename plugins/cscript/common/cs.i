@@ -107,9 +107,8 @@ public:
   virtual iMaterialHandle* GetMaterialHandle () = 0;
 };
 
-struct iGraphics3D:public iPlugIn
+struct iGraphics3D:public iBase
 {
-  bool Initialize (iSystem *pSystem);
   bool Open (const char *Title);
   void Close ();
   void SetDimensions (int width, int height);
@@ -258,7 +257,7 @@ struct iCameraPosition : public iBase
 {
 };
 
-struct iEngine : public iPlugIn
+struct iEngine : public iBase
 {
   virtual int GetTextureFormat () = 0;
   virtual void SelectLibrary (const char *iName) = 0;

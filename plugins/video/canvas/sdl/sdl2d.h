@@ -22,7 +22,6 @@
 
 #include "csutil/scf.h"
 #include "video/canvas/common/graph2d.h"
-#include "cssys/unix/unix.h"
 #include "isys/event.h"
 
 #include <SDL.h>
@@ -31,29 +30,22 @@
 /// SDL version.
 class csGraphics2DSDL : public csGraphics2D, public iEventPlug
 {
-  ///
-  virtual bool PerformExtension (const char* args);
-
 public:
-
   SDL_Surface *screen;
   int size_mem;
   bool opened;
   int shutdown;
   unsigned char *membuffer;
   SDL_mutex *th_lock;
-  
   iEventOutlet *EventOutlet;
-  
-private:
-  
-  virtual int translate_key(SDL_Event *ev);
 
+private:
+  virtual int translate_key(SDL_Event *ev);
   /// fixup: to keep library in memory.
-  void fixlibrary(); 
-  
+  void fixlibrary();
+
 public:
-  SCF_DECLARE_IBASE;
+  SCF_DECLARE_IBASE_EXT(csGraphics2D);
 
   csGraphics2DSDL (iBase *iParent);
   virtual ~csGraphics2DSDL ();
@@ -71,16 +63,15 @@ public:
 
   /// Called on every frame by system driver
   virtual bool HandleEvent (iEvent &Event);
-  
-  virtual bool SetMousePosition (int x, int y);  
+
+  virtual bool SetMousePosition (int x, int y);
   virtual bool SetMouseCursor (csMouseCursorID iShape);
-  
-  
+
   virtual unsigned GetPotentiallyConflictingEvents ()
     { return CSEVTYPE_Keyboard | CSEVTYPE_Mouse; }
-    
+
   virtual unsigned QueryEventPriority (unsigned /*iType*/)
-    { return 150; } 
+    { return 150; }
 };
 
 #endif // __CS_SDL2D_H__

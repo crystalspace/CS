@@ -180,7 +180,7 @@ static void LitVertex( const csVector3 &n, csColor &c )
 
 bool csMetaBall::DrawTest( iRenderView* rview, iMovable* movable)
 {
-// This is basically a ripped of version of drawtest from the 
+// This is basically a ripped of version of drawtest from the
 // ball mesh object.
 
   iGraphics3D *g3d = rview->GetGraphics3D();
@@ -192,7 +192,7 @@ bool csMetaBall::DrawTest( iRenderView* rview, iMovable* movable)
   float shfty = cam->GetShiftY();
   csBox2 sbox;
   csBox3 cbox;
-  if ( GetScreenBoundingBox( cam->GetCameraNumber(), 
+  if ( GetScreenBoundingBox( cam->GetCameraNumber(),
 	movable->GetUpdateNumber(), fov, shftx,shfty, tr_o2c, sbox, cbox ) < 0)
 	return false;
   int clip_portal, clip_plane, clip_z_plane;
@@ -248,19 +248,19 @@ void csMetaBall::CreateBoundingBox()
   miny = maxy = meta_balls[0].center.y;
   minz = maxz = meta_balls[0].center.z;
   csBox3 bb;
-  
+
   int maxxi = 0, maxyi = 0, maxzi = 0, minxi = 0, minyi = 0, minzi = 0;
-  
+
   for ( int i = 0; i < mesh.num_vertices; i++ )
   {
 	if ( mesh.vertices[0][i].x < minx ) {minx = mesh.vertices[0][i].x; minxi = i; }
 	else
 	if ( mesh.vertices[0][i].x > maxx ) {maxx = mesh.vertices[0][i].x; maxxi = i; }
-	
+
 	if ( mesh.vertices[0][i].y < miny ) {miny = mesh.vertices[0][i].y; minyi = i; }
 	else
 	if ( mesh.vertices[0][i].y > maxy ) {maxy = mesh.vertices[0][i].y; maxyi = i; }
-	
+
 	if ( mesh.vertices[0][i].z < minz ) {minz = mesh.vertices[0][i].z; minzi = i; }
 	else
 	if ( mesh.vertices[0][i].z > maxz ) {maxz = mesh.vertices[0][i].z; maxzi = i; }
@@ -288,7 +288,7 @@ float csMetaBall::GetScreenBoundingBox( long cam_num, long mov_num,
 {
   csVector2 one_corner;
   GetTransformedBoundingBox( cam_num, mov_num, trans, cbox );
-  if ((cbox.MinZ() < 0) && (cbox.MaxZ() < 0)) 
+  if ((cbox.MinZ() < 0) && (cbox.MaxZ() < 0))
 	return -1.0;
   if (cbox.MinZ() <= 0)
 	sbox.Set(-10000,-10000,10000,10000);
@@ -305,7 +305,7 @@ float csMetaBall::GetScreenBoundingBox( long cam_num, long mov_num,
   }
   return cbox.MaxZ();
 }
-void csMetaBall::GetTransformedBoundingBox( long cam_num, long move_num, 
+void csMetaBall::GetTransformedBoundingBox( long cam_num, long move_num,
 		const csReversibleTransform& trans, csBox3& cbox)
 {
   if ((cur_camera_num == cam_num) && (cur_movable_num == move_num))
@@ -320,7 +320,7 @@ void csMetaBall::GetTransformedBoundingBox( long cam_num, long move_num,
   cbox = camera_bbox;
 }
 
-bool csMetaBall::HitBeamObject( const csVector3& start, const csVector3& end, 
+bool csMetaBall::HitBeamObject( const csVector3& start, const csVector3& end,
   csVector3& isect, float *pr)
 {
   // @@@ We might consider checking to a lower LOD version only.
@@ -377,7 +377,7 @@ void csMetaBall::NextFrame( cs_time )
 #endif
 
 //----------------------------------------------------------------
-// Calculate meta balls is the core of the meta ball engine. 
+// Calculate meta balls is the core of the meta ball engine.
 // Everything in this module is basically housekeeping routines,
 // except for InitTables, which sets up the correct tables for the
 // resolution used.
@@ -394,7 +394,7 @@ void csMetaBall::NextFrame( cs_time )
 	mesh.triangles[i].a = num + 2;
 	mesh.triangles[i].b = num + 1;
 	mesh.triangles[i].c = num;
-	
+
 	for ( j = 0; j < 3; j++ )
 	{
 	  m = num + j;
@@ -450,7 +450,7 @@ bool csMetaBall::Draw( iRenderView* rview, iMovable* /* movable */,
   {
 	csTriangle tr = mesh.triangles[i];
 	printf("TRIANGLE(%d,%d,%d) ; %d\n",tr.a,tr.b,tr.c,i);
-  } 
+  }
   printf("Finished dump =============================================\n");
 #endif
 
@@ -484,8 +484,12 @@ iMeshObject* csMetaBallFactory::NewInstance()
 
 SCF_IMPLEMENT_IBASE (csMetaBallType)
   SCF_IMPLEMENTS_INTERFACE (iMeshObjectType)
-  SCF_IMPLEMENTS_INTERFACE (iPlugIn)
+  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iPlugIn)
 SCF_IMPLEMENT_IBASE_END
+
+SCF_IMPLEMENT_EMBEDDED_IBASE (csMetaBallType::eiPlugIn)
+  SCF_IMPLEMENTS_INTERFACE (iPlugIn)
+SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 SCF_IMPLEMENT_FACTORY (csMetaBallType)
 
@@ -497,14 +501,11 @@ SCF_EXPORT_CLASS_TABLE_END
 csMetaBallType::csMetaBallType( iBase *par )
 {
   SCF_CONSTRUCT_IBASE (par);
-}
-csMetaBallType::~csMetaBallType()
-{
+  SCF_CONSTRUCT_EMBEDDED_IBASE(scfiPlugIn);
 }
 
-bool csMetaBallType::Initialize( iSystem* )
+csMetaBallType::~csMetaBallType()
 {
-  return true;
 }
 
 iMeshObjectFactory* csMetaBallType::NewFactory()

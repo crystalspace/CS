@@ -17,7 +17,6 @@
  */
 
 #include <stdarg.h>
-
 #include <stdio.h>
 #include <ctype.h>
 
@@ -107,11 +106,23 @@ static DECLARE_GROWING_ARRAY_REF (clipped_fog, G3DFogInfo);
  Method implementations
 =========================================================================*/
 
+SCF_IMPLEMENT_IBASE(csGraphics3DOGLCommon)
+  SCF_IMPLEMENTS_INTERFACE(iGraphics3D)
+  SCF_IMPLEMENTS_EMBEDDED_INTERFACE(iPlugIn)
+SCF_IMPLEMENT_IBASE_END
+
+SCF_IMPLEMENT_EMBEDDED_IBASE (csGraphics3DOGLCommon::eiPlugIn)
+  SCF_IMPLEMENTS_INTERFACE (iPlugIn)
+SCF_IMPLEMENT_EMBEDDED_IBASE_END
+
 csGraphics3DOGLCommon* csGraphics3DOGLCommon::ogl_g3d = NULL;
 
-csGraphics3DOGLCommon::csGraphics3DOGLCommon ():
+csGraphics3DOGLCommon::csGraphics3DOGLCommon (iBase* parent):
   G2D (NULL), System (NULL)
 {
+  SCF_CONSTRUCT_IBASE (parent);
+  SCF_CONSTRUCT_EMBEDDED_IBASE(scfiPlugIn);
+
   ogl_g3d = this;
   texture_cache = NULL;
   lightmap_cache = NULL;
@@ -186,13 +197,17 @@ csGraphics3DOGLCommon::~csGraphics3DOGLCommon ()
   clipped_fog.DecRef ();
 }
 
-bool csGraphics3DOGLCommon::NewInitialize (iSystem * iSys)
+bool csGraphics3DOGLCommon::Initialize (iSystem* p)
 {
-  System = iSys;
+  System = p;
+  return true;
+}
 
+bool csGraphics3DOGLCommon::NewInitialize ()
+{
   config.AddConfig(System, "/config/opengl.cfg");
 
-  const char *driver = iSys->GetOptionCL ("canvas");
+  const char *driver = System->GetOptionCL ("canvas");
   if (!driver)
     driver = config->GetStr ("Video.OpenGL.Canvas", OPENGL_2D_DRIVER);
 

@@ -21,6 +21,7 @@
 #define __CS_SOCKET_H__
 
 #include "inetwork/socket.h"
+#include "isys/plugin.h"
 
 class csSocketEndPoint
 {
@@ -95,8 +96,6 @@ protected:
 public:
   csSocketDriver(iBase*);
   virtual ~csSocketDriver();
-  virtual bool Initialize(iSystem*);
-  virtual bool HandleEvent (iEvent &/*Event*/);
   void Open();
   void Close();
   virtual csNetworkDriverCapabilities GetCapabilities() const;
@@ -119,6 +118,14 @@ public:
     bool reliable, bool blockingListener, bool blockingConnection);
 
   SCF_DECLARE_IBASE;
+
+  struct eiPlugIn : public iPlugIn
+  {
+    SCF_DECLARE_EMBEDDED_IBASE(csSocketDriver);
+    virtual bool Initialize (iSystem*);
+    virtual bool HandleEvent (iEvent&);
+  } scfiPlugIn;
+  friend struct eiPlugIn;
 };
 
 #endif // __CS_SOCKET_H__

@@ -31,26 +31,15 @@
 #include "video/renderer/common/dtmesh.h"
 #include "video/renderer/common/dpmesh.h"
 #include "isys/plugin.h"
-
 struct iGraphics3D;
 
-///
 class csGraphics3DOpenGL : public csGraphics3DOGLCommon
 {
 public:
-  SCF_DECLARE_IBASE;
-  ///
-  csGraphics3DOpenGL (iBase *iParent);
-  ///
+  csGraphics3DOpenGL (iBase*);
   virtual ~csGraphics3DOpenGL ();
-
-  ///
-  virtual bool Initialize (iSystem *iSys);
-  ///
-  virtual bool Open(const char *Title);
-  ///
-  virtual void Close();
-
+  virtual bool Initialize (iSystem*);
+  virtual bool Open(const char* title);
 };
 
 #endif

@@ -22,12 +22,9 @@
 
 #include "csutil/scf.h"
 #include "csgeom/vector3.h"
-#include "isys/plugin.h"
 
 struct iPolygonMesh;
 class csTransform;
-
-SCF_VERSION (iCollider, 0, 1, 0);
 
 /**
  * A structure used to return collision pairs.
@@ -37,6 +34,8 @@ struct csCollisionPair
   csVector3 a1, b1, c1;	// First triangle
   csVector3 a2, b2, c2;	// Second triangle
 };
+
+SCF_VERSION (iCollider, 0, 1, 0);
 
 /**
  * A collider.
@@ -55,7 +54,7 @@ SCF_VERSION (iCollideSystem, 0, 0, 1);
  * collision detection world. It uses the geometry data as given by
  * iPolygonMesh.
  */
-struct iCollideSystem : public iPlugIn
+struct iCollideSystem : public iBase
 {
   /// Create an iCollider for the given geometry.
   virtual iCollider* CreateCollider (iPolygonMesh* mesh) = 0;

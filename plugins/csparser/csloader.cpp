@@ -1759,8 +1759,12 @@ iMeshWrapper * csLoader::LoadMeshObject (const char* fname)
 
 SCF_IMPLEMENT_IBASE(csLoader);
   SCF_IMPLEMENTS_INTERFACE(iLoader);
-  SCF_IMPLEMENTS_INTERFACE(iPlugIn);
+  SCF_IMPLEMENTS_EMBEDDED_INTERFACE(iPlugIn);
 SCF_IMPLEMENT_IBASE_END;
+
+SCF_IMPLEMENT_EMBEDDED_IBASE (csLoader::eiPlugIn)
+  SCF_IMPLEMENTS_INTERFACE (iPlugIn)
+SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 SCF_IMPLEMENT_FACTORY(csLoader);
 
@@ -1778,6 +1782,7 @@ CS_IMPLEMENT_PLUGIN
 csLoader::csLoader(iBase *p)
 {
   SCF_CONSTRUCT_IBASE(p);
+  SCF_CONSTRUCT_EMBEDDED_IBASE(scfiPlugIn);
 
   System = NULL;
   VFS = NULL;
@@ -1805,10 +1810,10 @@ csLoader::~csLoader()
   delete Stats;
 }
 
-#define GET_PLUGIN(var, func, intf, msgname)				\
-  var = CS_QUERY_PLUGIN_ID(System, func, intf);				\
-  if (var)								\
-    System->Printf(CS_MSG_INITIALIZATION,				\
+#define GET_PLUGIN(var, func, intf, msgname)	\
+  var = CS_QUERY_PLUGIN_ID(System, func, intf);	\
+  if (var)					\
+    System->Printf(CS_MSG_INITIALIZATION,	\
       "  "msgname" available to the loader.\n");
 
 bool csLoader::Initialize(iSystem *iSys)

@@ -27,9 +27,13 @@
 CS_IMPLEMENT_PLUGIN
 
 SCF_IMPLEMENT_IBASE (csMotionManager)
-  SCF_IMPLEMENTS_INTERFACE (iPlugIn)
   SCF_IMPLEMENTS_INTERFACE (iMotionManager)
+  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iPlugIn)
 SCF_IMPLEMENT_IBASE_END
+
+SCF_IMPLEMENT_EMBEDDED_IBASE (csMotionManager::eiPlugIn)
+  SCF_IMPLEMENTS_INTERFACE (iPlugIn)
+SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 SCF_IMPLEMENT_FACTORY (csMotionManager)
 
@@ -41,6 +45,7 @@ SCF_EXPORT_CLASS_TABLE_END
 csMotionManager::csMotionManager(iBase *iParent)
 {
   SCF_CONSTRUCT_IBASE (iParent);
+  SCF_CONSTRUCT_EMBEDDED_IBASE(scfiPlugIn);
   oldtime=0;
   iSys=NULL;
 }
@@ -106,7 +111,7 @@ void csMotionManager::DeleteMotion( const char *name )
   }
 }
 
-iSkeletonBone *FindBone ( iSkeletonBone *bone, unsigned int hash )
+iSkeletonBone *csFindBone ( iSkeletonBone *bone, unsigned int hash )
 {
   const char *name = bone->GetName();
   if (name)
@@ -117,14 +122,14 @@ iSkeletonBone *FindBone ( iSkeletonBone *bone, unsigned int hash )
   iSkeletonBone* child = bone->GetChildren();
   while ( child )
   {
-	iSkeletonBone *newbone = FindBone ( child, hash );
+	iSkeletonBone *newbone = csFindBone ( child, hash );
 	if (newbone) return newbone;
 	  else child = child->GetNext();
   }
   return NULL;
 }
 
-int FindFrameSet ( csMotion *mot, unsigned int hash )
+int csFindFrameSet ( csMotion *mot, unsigned int hash )
 {
   for (int i = 0; i < mot->framesets.Length(); i++ )
 	if ( mot->framesets[i]->name == hash ) return i;
@@ -163,7 +168,7 @@ void csMotionManager::CompileMotion ( csAppliedMotion *mot )
 	{
 	  for ( j = 0; j < numlink; j++ )
 	  {
-		iSkeletonBone *bone = FindBone( mot->skel, frs->frames[i].qaffector[j] );
+		iSkeletonBone *bone = csFindBone( mot->skel, frs->frames[i].qaffector[j] );
 		if (bone)
 		{
 		  if (fr->numqlinks)
@@ -188,7 +193,7 @@ void csMotionManager::CompileMotion ( csAppliedMotion *mot )
 	{
 	  for ( j = 0; j < numlink; j++ )
 	  {
-		iSkeletonBone *bone = FindBone( mot->skel, frs->frames[i].maffector[j] );
+		iSkeletonBone *bone = csFindBone( mot->skel, frs->frames[i].maffector[j] );
 		if (bone)
 		{
 		  if (fr->nummlinks)
@@ -213,7 +218,7 @@ void csMotionManager::CompileMotion ( csAppliedMotion *mot )
 	{
 	  for ( j = 0; j < numlink; j++ )
 	  {
-		iSkeletonBone *bone = FindBone( mot->skel, frs->frames[i].vaffector[j] );
+		iSkeletonBone *bone = csFindBone( mot->skel, frs->frames[i].vaffector[j] );
 		if (bone)
 		{
 		  if (fr->numvlinks)
@@ -261,7 +266,7 @@ int csMotionManager::ApplyMotion(iSkeletonBone *skel, const char* motion, const 
 	return -1;
   }
 
-  if ((fs_num = FindFrameSet(newmotion, csHashCompute(frameset))) < 0) 
+  if ((fs_num = csFindFrameSet(newmotion, csHashCompute(frameset))) < 0) 
   {
 	printf("csMotionManager: Cannot find frameset :`%s' ( motion: `%s' skelbone: `%s')\n",
 	  frameset, motion, skel->GetName());

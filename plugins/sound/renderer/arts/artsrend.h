@@ -21,6 +21,7 @@
 
 #include "isound/renderer.h"
 #include "isound/listener.h"
+#include "isys/plugin.h"
 #include "artshndl.h"
 #include "csutil/csvector.h"
 
@@ -47,7 +48,7 @@ class csArtsRenderer : public iSoundRender, public iSoundListener
       csArtsHandle *h2 = (csArtsHandle *)Key;
       return (h1 < h2 ? -1 : h1 > h2 ? 1 : 0);
     }
-    csArtsHandle *Get (int idx) const {return (csArtsHandle *)csVector::Get(idx);}
+    csArtsHandle *Get (int i) const { return (csArtsHandle*)csVector::Get(i); }
     bool FreeItem (csSome Item){delete (csArtsHandle *)Item; return true;}
   };
 
@@ -130,6 +131,12 @@ public:
   virtual csSoundEnvironment GetEnvironment ()
   {return environment;}
 
+  struct eiPlugIn : public iPlugIn
+  {
+    SCF_DECLARE_EMBEDDED_IBASE(csArtsRenderer);
+    virtual bool Initialize (iSystem* p) { return scfParent->Initialize(p); }
+    virtual bool HandleEvent (iEvent&) { return false; }
+  } scfiPlugIn;
 };
 
 #endif

@@ -21,6 +21,7 @@
 
 #include "ivaria/iso.h"
 #include "isomater.h"
+#include "isys/plugin.h"
 #include "csutil/csvector.h"
 #include "csutil/csobject.h"
 
@@ -91,7 +92,8 @@ public:
 /**
  * This class implements the isometric engine.
 */
-class csIsoEngine : public iIsoEngine {
+class csIsoEngine : public iIsoEngine
+{
 private:
   /// the system
   iSystem* system;
@@ -122,6 +124,13 @@ public:
   virtual bool Initialize (iSystem* p);
   /// Intercept events
   virtual bool HandleEvent (iEvent& e);
+
+  struct eiPlugIn : public iPlugIn
+  {
+    SCF_DECLARE_EMBEDDED_IBASE(csIsoEngine);
+    virtual bool Initialize (iSystem* p) { return scfParent->Initialize(p); }
+    virtual bool HandleEvent (iEvent& e) { return scfParent->HandleEvent(e); }
+  } scfiPlugIn;
 
   //----- iIsoEngine ---------------------------------------------------
   virtual iSystem* GetSystem() const {return system;}

@@ -21,7 +21,6 @@
 
 #include "csutil/scf.h"
 #include "csgeom/box.h"
-#include "isys/plugin.h"
 #include "ivideo/graph3d.h"
 
 struct iMeshObject;
@@ -277,7 +276,7 @@ SCF_VERSION (iMeshObjectType, 0, 0, 2);
  * this plugin the user can create instances of mesh object factories
  * which can then be used to create instances of mesh objects.
  */
-struct iMeshObjectType : public iPlugIn
+struct iMeshObjectType : public iBase
 {
   /// Create an instance of iMeshObjectFactory.
   virtual iMeshObjectFactory* NewFactory () = 0;

@@ -21,6 +21,7 @@
 
 #include "csgfx/csimage.h"
 #include "igraphic/imageio.h"
+#include "isys/plugin.h"
 #include "iutil/databuff.h"
 #include "csutil/csvector.h"
 
@@ -38,12 +39,18 @@ class csWALImageIO : public iImageIO
   csWALImageIO (iBase *pParent);
   virtual ~csWALImageIO (){}
 
-  virtual bool Initialize (iSystem *pSystem);
   virtual const csVector& GetDescription ();
   virtual iImage *Load (UByte* iBuffer, ULong iSize, int iFormat);
   virtual void SetDithering (bool iEnable);
   virtual iDataBuffer *Save (iImage *image, const char *mime = NULL); 
   virtual iDataBuffer *Save (iImage *image, iImageIO::FileFormatDescription *format = NULL);
+
+  struct eiPlugIn : public iPlugIn
+  {
+    SCF_DECLARE_EMBEDDED_IBASE(csWALImageIO);
+    virtual bool Initialize (iSystem*) { return true; }
+    virtual bool HandleEvent (iEvent&) { return false; }
+  } scfiPlugIn;
 };
 
 /**

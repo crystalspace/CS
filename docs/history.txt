@@ -9,6 +9,38 @@ The history order is reversed so that new features are at the top.
 	- Added 'csparser' to 'make walkall' target.
 	- Fix to python plugin for csparser.
 	- Fixed the balls in csdemo.
+	- Eric Sunshine repaired a bad assumption which plagued most SCF
+	  interfaces implemented by plugin modules.  The problem was that most
+	  such interfaces inherited from iPlugIn rather than iBase.  This made
+	  the potentially invalid assumption that these interfaces would always
+	  be implemented as plugin modules.  The reason that this is an invalid
+	  assumption is that the packaging into a plugin is merely an
+	  implementation detail.  For instance, since the iImageIO interface
+	  was derived from iPlugIn, all image loaders were expected to
+	  implement HandleEvent(), which is a rather silly requirement for an
+	  image loader.  All interfaces which were inheriting from iPlugIn now
+	  instead inherit from iBase.  Actual plugin modules now directly
+	  implement iPlugIn, as well as implementing the various interfaces
+	  which used to be derived from iPlugIn.
+	- Eric Sunshine fixed a number of canvas implementations which were
+	  using SCF_DECLARE_IBASE() and SCF_IMPLEMENT_IBASE() rather than the
+	  _EXT() versions.
+	- Eric Sunshine fixed a number of 2D canvases which implemented
+	  iEventPlug but neglected to mention iEventPlug in the
+	  SCF_IMPLEMENT_IBASE() block.
+	- Eric Sunshine eliminated the cscmdConsoleStatusChange event and
+	  re-implemented this notification facility via an SCF class named
+	  iConsoleWatcher.
+	- Eric Sunshine augmented `haspython.sh' so that it now also checks
+	  /usr/local/python in addition to /usr and /usr/local.
+	- Eric Sunshine changed the `soft' makefile target to `soft3d' to be
+	  consistent with other renderer targets such as `gl3d', `null3d', and
+	  `line3d'; and to disambiguate from the "software" sound renderer.
+	  Also changed `infinite' target to `inf3d'.
+	- Eric Sunshine renamed FindBone() and FindFrameSet() to csFindBone()
+	  and csFindFrameSet() in order to avoid pollution of the global
+	  namespace.
+	- Eric Sunshine removed the obsolete igraphic/loader.h header.
 28-Jun-2001
 	- Fixed error handling in spr2dldr (for mixmode) a little.
 	- Added error reporting to ballldr (using reporter plugin).

@@ -24,8 +24,6 @@
 #include "null_g3d.h"
 #include "null_txt.h"
 #include "iutil/cfgfile.h"
-#include "imesh/thing/polygon.h"	//@@@
-#include "imesh/thing/lightmap.h"	//@@@
 #include "isys/system.h"
 #include "ivideo/graph2d.h"
 
@@ -43,13 +41,18 @@ SCF_EXPORT_CLASS_TABLE (null3d)
 SCF_EXPORT_CLASS_TABLE_END
 
 SCF_IMPLEMENT_IBASE (csGraphics3DNull)
-  SCF_IMPLEMENTS_INTERFACE (iPlugIn)
   SCF_IMPLEMENTS_INTERFACE (iGraphics3D)
+  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iPlugIn)
 SCF_IMPLEMENT_IBASE_END
+
+SCF_IMPLEMENT_EMBEDDED_IBASE (csGraphics3DNull::eiPlugIn)
+  SCF_IMPLEMENTS_INTERFACE (iPlugIn)
+SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 csGraphics3DNull::csGraphics3DNull (iBase *iParent) : G2D (NULL)
 {
   SCF_CONSTRUCT_IBASE (iParent);
+  SCF_CONSTRUCT_EMBEDDED_IBASE(scfiPlugIn);
 
   texman = NULL;
 
@@ -227,7 +230,7 @@ long csGraphics3DNull::GetRenderState (G3D_RENDERSTATEOPTION op)
   }
 }
 
-void csGraphics3DNull::DrawLine (const csVector3& /*v1*/, const csVector3& /*v2*/,
+void csGraphics3DNull::DrawLine (const csVector3&, const csVector3&,
   float /*fov*/, int /*color*/)
 {
 }

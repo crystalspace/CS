@@ -24,6 +24,7 @@
 #include "csutil/cscolor.h"
 #include "plugins/mesh/partgen/partgen.h"
 #include "imesh/emit.h"
+#include "isys/plugin.h"
 
 struct iMaterialWrapper;
 
@@ -261,22 +262,22 @@ public:
   /// get ttl
   int GetParticleTime () const { return timetolive; }
   /// set startposemit
-  void SetStartPosEmit(iEmitGen3D *emit) 
+  void SetStartPosEmit(iEmitGen3D *emit)
   {startpos = emit; if(startpos) startpos->IncRef();}
   /// get startposemit
   iEmitGen3D* GetStartPosEmit() const {return startpos;}
   /// set startspeedemit
-  void SetStartSpeedEmit(iEmitGen3D *emit) 
+  void SetStartSpeedEmit(iEmitGen3D *emit)
   {startspeed = emit; if(startspeed) startspeed->IncRef();}
   /// get startspeedemit
   iEmitGen3D* GetStartSpeedEmit() const {return startspeed;}
   /// set startaccelemit
-  void SetStartAccelEmit(iEmitGen3D *emit) 
+  void SetStartAccelEmit(iEmitGen3D *emit)
   {startaccel = emit; if(startaccel) startaccel->IncRef();}
   /// get startemit
   iEmitGen3D* GetStartAccelEmit() const {return startaccel;}
   /// set startaccelemit
-  void SetAttractorEmit(iEmitGen3D *emit) 
+  void SetAttractorEmit(iEmitGen3D *emit)
   {attractor = emit; if(attractor) attractor->IncRef();}
   /// get startemit
   iEmitGen3D* GetAttractorEmit() const {return attractor;}
@@ -303,7 +304,7 @@ public:
   /// is using rects?
   bool UsingRectParticles() const { return using_rect_sprites; }
   /// get rect size
-  void GetRectParticles(float &w, float &h) const 
+  void GetRectParticles(float &w, float &h) const
   { w = drop_width; h = drop_height; }
   /// get regular shape
   void GetRegularParticles(int& n, float& radius) const
@@ -326,7 +327,7 @@ public:
     { scfParent->SetParticleCount (num); }
     virtual void SetLighting (bool l)
     { scfParent->SetLighting (l); }
-    virtual int GetParticleCount () const 
+    virtual int GetParticleCount () const
     { return scfParent->GetParticleCount(); }
     virtual bool GetLighting () const
     { return scfParent->GetLighting(); }
@@ -334,37 +335,37 @@ public:
     { scfParent->SetParticleTime (l); }
     virtual int GetParticleTime () const
     { return scfParent->GetParticleTime(); }
-    virtual void SetStartPosEmit(iEmitGen3D *emit) 
+    virtual void SetStartPosEmit(iEmitGen3D *emit)
     { scfParent->SetStartPosEmit(emit); }
     virtual iEmitGen3D* GetStartPosEmit() const
     { return scfParent->GetStartPosEmit(); }
-    virtual void SetStartSpeedEmit(iEmitGen3D *emit) 
+    virtual void SetStartSpeedEmit(iEmitGen3D *emit)
     { scfParent->SetStartSpeedEmit(emit); }
     virtual iEmitGen3D* GetStartSpeedEmit() const
     { return scfParent->GetStartSpeedEmit(); }
-    virtual void SetStartAccelEmit(iEmitGen3D *emit) 
+    virtual void SetStartAccelEmit(iEmitGen3D *emit)
     { scfParent->SetStartAccelEmit(emit); }
     virtual iEmitGen3D* GetStartAccelEmit() const
     { return scfParent->GetStartAccelEmit(); }
-    virtual void SetAttractorEmit(iEmitGen3D *emit) 
+    virtual void SetAttractorEmit(iEmitGen3D *emit)
     { scfParent->SetAttractorEmit(emit); }
     virtual iEmitGen3D* GetAttractorEmit() const
     { return scfParent->GetAttractorEmit(); }
     virtual void SetAttractorForce(float f) {scfParent->SetAttractorForce(f);}
-    virtual float GetAttractorForce() const 
+    virtual float GetAttractorForce() const
     {return scfParent->GetAttractorForce();}
     virtual int GetAgingCount() const { return scfParent->GetAgingCount();}
     virtual void AddAge(int time, const csColor& color, float alpha,
         float swirl, float rotspeed, float scale)
     { scfParent->AddAge(time, color, alpha, swirl, rotspeed, scale);}
     virtual void GetAgingMoment(int i, int& time, csColor& color, float &alpha,
-        float& swirl, float& rotspeed, float& scale) 
+        float& swirl, float& rotspeed, float& scale)
     {scfParent->GetAgingMoment(i, time, color, alpha, swirl, rotspeed, scale);}
     virtual void SetRectParticles(float w, float h)
     { scfParent->SetRectParticles(w,h); }
     virtual void SetRegularParticles(int s, float r)
     { scfParent->SetRegularParticles(s,r); }
-    virtual bool UsingRectParticles() const 
+    virtual bool UsingRectParticles() const
     { return scfParent->UsingRectParticles(); }
     virtual void GetRectParticles(float &w, float &h) const
     { scfParent->GetRectParticles(w,h); }
@@ -406,16 +407,16 @@ public:
     virtual iEmitCone* CreateCone() {return new csEmitCone(scfParent);}
     virtual iEmitMix* CreateMix() {return new csEmitMix(scfParent);}
     virtual iEmitLine* CreateLine() {return new csEmitLine(scfParent);}
-    virtual iEmitCylinder* CreateCylinder() 
+    virtual iEmitCylinder* CreateCylinder()
       {return new csEmitCylinder(scfParent);}
-    virtual iEmitSphereTangent* CreateSphereTangent() 
+    virtual iEmitSphereTangent* CreateSphereTangent()
       {return new csEmitSphereTangent(scfParent);}
-    virtual iEmitCylinderTangent* CreateCylinderTangent() 
+    virtual iEmitCylinderTangent* CreateCylinderTangent()
       {return new csEmitCylinderTangent(scfParent);}
   } scfiEmitFactoryState;
   friend class EmitFactoryState;
 };
- 
+
 /**
  * Emit type. This is the plugin you have to use to create instances
  * of csEmitMeshObjectFactory.
@@ -426,26 +427,28 @@ private:
   iSystem* system;
 
 public:
-  /// Constructor.
-  csEmitMeshObjectType (iBase*);
-
-  /// Destructor.
-  virtual ~csEmitMeshObjectType ();
-
-  /// Register plugin with the system driver
-  virtual bool Initialize (iSystem *pSystem);
-
-  //------------------------ iMeshObjectType implementation --------------
   SCF_DECLARE_IBASE;
 
+  /// Constructor.
+  csEmitMeshObjectType (iBase*);
+  /// Destructor.
+  virtual ~csEmitMeshObjectType ();
   /// Draw.
   virtual iMeshObjectFactory* NewFactory ();
+  /// Get features.
   virtual uint32 GetFeatures () const
   {
     return ALL_FEATURES;
   }
+
+  struct eiPlugIn : public iPlugIn
+  {
+    SCF_DECLARE_EMBEDDED_IBASE(csEmitMeshObjectType);
+    virtual bool Initialize (iSystem* p)
+    { scfParent->system = p; return true; }
+    virtual bool HandleEvent (iEvent&) { return false; }
+  } scfiPlugIn;
+  friend struct eiPlugIn;
 };
 
-
 #endif // __CS_EMIT_H__
-

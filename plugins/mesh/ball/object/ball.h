@@ -5,12 +5,12 @@
     modify it under the terms of the GNU Library General Public
     License as published by the Free Software Foundation; either
     version 2 of the License, or (at your option) any later version.
-  
+
     This library is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
     Library General Public License for more details.
-  
+
     You should have received a copy of the GNU Library General Public
     License along with this library; if not, write to the Free
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
@@ -25,6 +25,7 @@
 #include "imesh/object.h"
 #include "imesh/ball.h"
 #include "ivideo/graph3d.h"
+#include "isys/plugin.h"
 
 struct iMaterialWrapper;
 class csBallMeshObjectFactory;
@@ -107,7 +108,7 @@ public:
   /// Get mixmode.
   UInt GetMixMode () const { return MixMode; }
   void SetRadius (float radiusx, float radiusy, float radiusz);
-  void GetRadius (float& radx, float& rady, float& radz) const 
+  void GetRadius (float& radx, float& rady, float& radz) const
   { radx=radiusx; rady=radiusy; radz=radiusz; }
   void SetShift (float shiftx, float shifty, float shiftz)
   {
@@ -168,7 +169,7 @@ public:
     return cyl_mapping;
   }
 
-  ///------------------------ iMeshObject implementation ------------------------
+  //----------------------- iMeshObject implementation ------------------------
   SCF_DECLARE_IBASE;
 
   virtual iMeshObjectFactory* GetFactory () const { return factory; }
@@ -217,7 +218,7 @@ public:
       scfParent->SetRadius (radiusx, radiusy, radiusz);
     }
     virtual void GetRadius (float& radx, float& rady, float& radz) const
-    { 
+    {
       scfParent->GetRadius (radx, rady, radz);
     }
     virtual void SetShift (float shiftx, float shifty, float shiftz)
@@ -225,7 +226,7 @@ public:
       scfParent->SetShift (shiftx, shifty, shiftz);
     }
     virtual const csVector3& GetShift () const
-    { 
+    {
       return scfParent->GetShift ();
     }
     virtual void SetRimVertices (int num)
@@ -291,25 +292,26 @@ public:
 class csBallMeshObjectType : public iMeshObjectType
 {
 public:
-  /// Constructor.
-  csBallMeshObjectType (iBase*);
-
-  /// Destructor.
-  virtual ~csBallMeshObjectType ();
-
-  /// Register plugin with the system driver
-  virtual bool Initialize (iSystem *pSystem);
-
-  //------------------------ iMeshObjectType implementation --------------
   SCF_DECLARE_IBASE;
 
+  /// Constructor.
+  csBallMeshObjectType (iBase*);
+  /// Destructor.
+  virtual ~csBallMeshObjectType ();
   /// Draw.
   virtual iMeshObjectFactory* NewFactory ();
+  /// Get features.
   virtual uint32 GetFeatures () const
   {
     return ALL_FEATURES;
   }
+
+  struct eiPlugIn : public iPlugIn
+  {
+    SCF_DECLARE_EMBEDDED_IBASE(csBallMeshObjectType);
+    virtual bool Initialize (iSystem*) { return true; }
+    virtual bool HandleEvent (iEvent&) { return false; }
+  } scfiPlugIn;
 };
 
 #endif // _BALL_H_
-

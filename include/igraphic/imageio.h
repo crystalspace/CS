@@ -19,7 +19,7 @@
 #ifndef __IGRAPHIC_IMAGEIO_H__
 #define __IGRAPHIC_IMAGEIO_H__
 
-#include "isys/plugin.h"
+#include "csutil/scf.h"
 struct iImage;
 struct iDataBuffer;
 class csVector;
@@ -33,7 +33,7 @@ SCF_VERSION (iImageIO, 0, 0, 1);
 #define CS_IMAGEIO_LOAD 1
 #define CS_IMAGEIO_SAVE 2
 
-struct iImageIO : public iPlugIn
+struct iImageIO : public iBase
 {
   struct FileFormatDescription
   {
@@ -84,4 +84,3 @@ struct iImageIO : public iPlugIn
 };
 
 #endif // __IGRAPHIC_IMAGEIO_H__
-

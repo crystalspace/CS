@@ -23,8 +23,8 @@
 #include "csutil/scf.h"
 #include "ivideo/graph2d.h"
 #include "ivideo/fontserv.h"
+#include "isys/plugin.h"
 
-///
 #define CsPrintf System->Printf
 
 /**
@@ -63,17 +63,24 @@ public:
   csRGBpixel *Palette;
   /// true if some palette entry is already allocated
   bool PaletteAlloc[256];
-  // The counter that is incremented inside BeginDraw and decremented in FinishDraw
+  /**
+   * The counter that is incremented inside BeginDraw and decremented in
+   * FinishDraw().
+   */
   int FrameBufferLocked;
 
 public:
+  SCF_DECLARE_IBASE;
+
   /// Create csGraphics2D object
-  csGraphics2D ();
+  csGraphics2D (iBase*);
   /// Destroy csGraphics2D object
   virtual ~csGraphics2D ();
 
   /// Initialize the plugin
-  virtual bool Initialize (iSystem *pSystem);
+  virtual bool Initialize (iSystem*);
+  /// Event handler for plugin.
+  virtual bool HandleEvent (iEvent&);
 
   /// (*) Open graphics system (set videomode, open window etc)
   virtual bool Open (const char *Title);
@@ -125,8 +132,8 @@ public:
   /// (*) Set a color index to given R,G,B (0..255) values
   virtual void SetRGB (int i, int r, int g, int b);
   /// Write a text string into the back buffer
-  virtual void Write (iFont *font, int x, int y, int fg, int bg, const char *text)
-  { _WriteString (this, font, x, y, fg, bg, text); }
+  virtual void Write (iFont *font , int x, int y, int fg, int bg,
+    const char *text) { _WriteString (this, font, x, y, fg, bg, text); }
   /// Write a single character
   void (*_WriteString) (csGraphics2D *This, iFont *font, int x, int y,
     int fg, int bg, const char *text);
@@ -229,6 +236,13 @@ public:
 
   /// Enable/disable canvas resize
   virtual void AllowCanvasResize (bool /*iAllow*/) { }
+
+  struct eiPlugIn : public iPlugIn
+  {
+    SCF_DECLARE_EMBEDDED_IBASE(csGraphics2D);
+    virtual bool Initialize (iSystem* p) { return scfParent->Initialize(p); }
+    virtual bool HandleEvent (iEvent& e) { return scfParent->HandleEvent(e); }
+  } scfiPlugIn;
 
 protected:
   /**

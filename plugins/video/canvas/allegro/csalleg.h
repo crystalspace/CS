@@ -48,7 +48,7 @@ class csGraphics2DAlleg : public csGraphics2D, public iEventPlug
   bool kbd_hook_active, mouse_hook_active;
 
 public:
-  SCF_DECLARE_IBASE;
+  SCF_DECLARE_IBASE_EXT(csGraphics2D);
 
   csGraphics2DAlleg (iBase *iParent);
   virtual ~csGraphics2DAlleg ();
@@ -73,7 +73,7 @@ public:
    */
   virtual void DoubleBlit (BITMAP *src, BITMAP *dst, int sw, int sh);
 
-  //------------------------- iEventPlug interface ---------------------------//
+  //------------------------ iEventPlug interface ---------------------------//
 
   virtual unsigned GetPotentiallyConflictingEvents ()
   { return CSEVTYPE_Keyboard | CSEVTYPE_Mouse; }

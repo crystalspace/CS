@@ -6,12 +6,12 @@
     modify it under the terms of the GNU Library General Public
     License as published by the Free Software Foundation; either
     version 2 of the License, or (at your option) any later version.
-  
+
     This library is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
     Library General Public License for more details.
-  
+
     You should have received a copy of the GNU Library General Public
     License along with this library; if not, write to the Free
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
@@ -62,23 +62,39 @@ CS_TOKEN_DEF_END
 
 SCF_IMPLEMENT_IBASE (csBallFactoryLoader)
   SCF_IMPLEMENTS_INTERFACE (iLoaderPlugIn)
-  SCF_IMPLEMENTS_INTERFACE (iPlugIn)
+  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iPlugIn)
 SCF_IMPLEMENT_IBASE_END
+
+SCF_IMPLEMENT_EMBEDDED_IBASE (csBallFactoryLoader::eiPlugIn)
+  SCF_IMPLEMENTS_INTERFACE (iPlugIn)
+SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 SCF_IMPLEMENT_IBASE (csBallFactorySaver)
   SCF_IMPLEMENTS_INTERFACE (iSaverPlugIn)
-  SCF_IMPLEMENTS_INTERFACE (iPlugIn)
+  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iPlugIn)
 SCF_IMPLEMENT_IBASE_END
+
+SCF_IMPLEMENT_EMBEDDED_IBASE (csBallFactorySaver::eiPlugIn)
+  SCF_IMPLEMENTS_INTERFACE (iPlugIn)
+SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 SCF_IMPLEMENT_IBASE (csBallLoader)
   SCF_IMPLEMENTS_INTERFACE (iLoaderPlugIn)
-  SCF_IMPLEMENTS_INTERFACE (iPlugIn)
+  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iPlugIn)
 SCF_IMPLEMENT_IBASE_END
+
+SCF_IMPLEMENT_EMBEDDED_IBASE (csBallLoader::eiPlugIn)
+  SCF_IMPLEMENTS_INTERFACE (iPlugIn)
+SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 SCF_IMPLEMENT_IBASE (csBallSaver)
   SCF_IMPLEMENTS_INTERFACE (iSaverPlugIn)
-  SCF_IMPLEMENTS_INTERFACE (iPlugIn)
+  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iPlugIn)
 SCF_IMPLEMENT_IBASE_END
+
+SCF_IMPLEMENT_EMBEDDED_IBASE (csBallSaver::eiPlugIn)
+  SCF_IMPLEMENTS_INTERFACE (iPlugIn)
+SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 SCF_IMPLEMENT_FACTORY (csBallFactoryLoader)
 SCF_IMPLEMENT_FACTORY (csBallFactorySaver)
@@ -86,7 +102,8 @@ SCF_IMPLEMENT_FACTORY (csBallLoader)
 SCF_IMPLEMENT_FACTORY (csBallSaver)
 
 SCF_EXPORT_CLASS_TABLE (ballldr)
-  SCF_EXPORT_CLASS (csBallFactoryLoader, "crystalspace.mesh.loader.factory.ball",
+  SCF_EXPORT_CLASS (csBallFactoryLoader,
+    "crystalspace.mesh.loader.factory.ball",
     "Crystal Space Ball Factory Loader")
   SCF_EXPORT_CLASS (csBallFactorySaver, "crystalspace.mesh.saver.factory.ball",
     "Crystal Space Ball Factory Saver")
@@ -120,6 +137,7 @@ static void ReportError (iReporter* reporter, const char* id,
 csBallFactoryLoader::csBallFactoryLoader (iBase* pParent)
 {
   SCF_CONSTRUCT_IBASE (pParent);
+  SCF_CONSTRUCT_EMBEDDED_IBASE(scfiPlugIn);
   reporter = NULL;
 }
 
@@ -162,6 +180,7 @@ iBase* csBallFactoryLoader::Parse (const char* /*string*/,
 csBallFactorySaver::csBallFactorySaver (iBase* pParent)
 {
   SCF_CONSTRUCT_IBASE (pParent);
+  SCF_CONSTRUCT_EMBEDDED_IBASE(scfiPlugIn);
   reporter = NULL;
 }
 
@@ -190,6 +209,7 @@ void csBallFactorySaver::WriteDown (iBase* /*obj*/, iStrVector * /*str*/,
 csBallLoader::csBallLoader (iBase* pParent)
 {
   SCF_CONSTRUCT_IBASE (pParent);
+  SCF_CONSTRUCT_EMBEDDED_IBASE(scfiPlugIn);
   reporter = NULL;
 }
 
@@ -406,10 +426,10 @@ iBase* csBallLoader::Parse (const char* string, iEngine* engine,
 
 //---------------------------------------------------------------------------
 
-
 csBallSaver::csBallSaver (iBase* pParent)
 {
   SCF_CONSTRUCT_IBASE (pParent);
+  SCF_CONSTRUCT_EMBEDDED_IBASE(scfiPlugIn);
   reporter = NULL;
 }
 
@@ -449,7 +469,7 @@ void csBallSaver::WriteDown (iBase* obj, iStrVector *str,
   iMeshObject *mesh = SCF_QUERY_INTERFACE(obj, iMeshObject);
   if(!mesh)
   {
-    printf("Error: non-mesh given to %s.\n", 
+    printf("Error: non-mesh given to %s.\n",
       fact->QueryDescription () );
     fact->DecRef();
     return;
@@ -457,7 +477,7 @@ void csBallSaver::WriteDown (iBase* obj, iStrVector *str,
   iBallState *state = SCF_QUERY_INTERFACE(obj, iBallState);
   if(!state)
   {
-    printf("Error: invalid mesh given to %s.\n", 
+    printf("Error: invalid mesh given to %s.\n",
       fact->QueryDescription () );
     fact->DecRef();
     mesh->DecRef();
@@ -479,7 +499,7 @@ void csBallSaver::WriteDown (iBase* obj, iStrVector *str,
   state->GetRadius(x, y, z);
   sprintf(buf, "RADIUS (%g, %g, %g)\n", x, y, z);
   str->Push(csStrNew(buf));
-  sprintf(buf, "SHIFT (%g, %g, %g)\n", state->GetShift ().x, 
+  sprintf(buf, "SHIFT (%g, %g, %g)\n", state->GetShift ().x,
     state->GetShift ().y, state->GetShift ().z);
   str->Push(csStrNew(buf));
   sprintf(buf, "NUMRIM (%d)\n", state->GetRimVertices());
@@ -504,6 +524,3 @@ void csBallSaver::WriteDown (iBase* obj, iStrVector *str,
   state->DecRef();
 
 }
-
-//---------------------------------------------------------------------------
-

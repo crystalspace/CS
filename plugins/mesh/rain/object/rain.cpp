@@ -71,8 +71,8 @@ void csRainMeshObject::SetupObject ()
   }
 }
 
-csRainMeshObject::csRainMeshObject (iSystem* system, iMeshObjectFactory* factory)
-	: csParticleSystem (system, factory)
+csRainMeshObject::csRainMeshObject (iSystem* system,
+  iMeshObjectFactory* factory) : csParticleSystem (system, factory)
 {
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiRainState);
   part_pos = NULL;
@@ -141,10 +141,10 @@ SCF_IMPLEMENT_IBASE (csRainMeshObjectFactory)
   SCF_IMPLEMENTS_INTERFACE (iMeshObjectFactory)
 SCF_IMPLEMENT_IBASE_END
 
-csRainMeshObjectFactory::csRainMeshObjectFactory (iBase *pParent, iSystem* system)
+csRainMeshObjectFactory::csRainMeshObjectFactory (iBase* p, iSystem* s)
 {
-  SCF_CONSTRUCT_IBASE (pParent);
-  csRainMeshObjectFactory::system = system;
+  SCF_CONSTRUCT_IBASE (p);
+  system = s;
 }
 
 csRainMeshObjectFactory::~csRainMeshObjectFactory ()
@@ -153,7 +153,8 @@ csRainMeshObjectFactory::~csRainMeshObjectFactory ()
 
 iMeshObject* csRainMeshObjectFactory::NewInstance ()
 {
-  csRainMeshObject* cm = new csRainMeshObject (system, (iMeshObjectFactory*)this);
+  csRainMeshObject* cm =
+    new csRainMeshObject (system, (iMeshObjectFactory*)this);
   iMeshObject* im = SCF_QUERY_INTERFACE (cm, iMeshObject);
   im->DecRef ();
   return im;
@@ -163,8 +164,12 @@ iMeshObject* csRainMeshObjectFactory::NewInstance ()
 
 SCF_IMPLEMENT_IBASE (csRainMeshObjectType)
   SCF_IMPLEMENTS_INTERFACE (iMeshObjectType)
-  SCF_IMPLEMENTS_INTERFACE (iPlugIn)
+  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iPlugIn)
 SCF_IMPLEMENT_IBASE_END
+
+SCF_IMPLEMENT_EMBEDDED_IBASE (csRainMeshObjectType::eiPlugIn)
+  SCF_IMPLEMENTS_INTERFACE (iPlugIn)
+SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 SCF_IMPLEMENT_FACTORY (csRainMeshObjectType)
 
@@ -176,16 +181,11 @@ SCF_EXPORT_CLASS_TABLE_END
 csRainMeshObjectType::csRainMeshObjectType (iBase* pParent)
 {
   SCF_CONSTRUCT_IBASE (pParent);
+  SCF_CONSTRUCT_EMBEDDED_IBASE(scfiPlugIn);
 }
 
 csRainMeshObjectType::~csRainMeshObjectType ()
 {
-}
-
-bool csRainMeshObjectType::Initialize (iSystem* system)
-{
-  csRainMeshObjectType::system = system;
-  return true;
 }
 
 iMeshObjectFactory* csRainMeshObjectType::NewFactory ()
@@ -195,4 +195,3 @@ iMeshObjectFactory* csRainMeshObjectType::NewFactory ()
   ifact->DecRef ();
   return ifact;
 }
-

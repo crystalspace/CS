@@ -21,6 +21,7 @@
 #define __CSCONIN_H__
 
 #include "ivaria/conin.h"
+#include "ivaria/conout.h"
 #include "isys/plugin.h"
 #include "csutil/csstrvec.h"
 
@@ -101,6 +102,14 @@ public:
     virtual bool Initialize (iSystem* p) { return scfParent->Initialize(p); }
     virtual bool HandleEvent (iEvent& e) { return scfParent->HandleEvent(e); }
   } scfiPlugIn;
+
+  // Implement iConsoleWatcher interface.
+  struct eiConsoleWatcher : public iConsoleWatcher
+  {
+    SCF_DECLARE_EMBEDDED_IBASE(csConsoleInput);
+    virtual void ConsoleVisibilityChanged(iConsoleOutput*, bool visible);
+  } scfiConsoleWatcher;
+  friend struct eiConsoleWatcher;
 };
 
 #endif // __CSCONIN_H__

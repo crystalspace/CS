@@ -33,15 +33,9 @@ SCF_EXPORT_CLASS_TABLE (be2d)
     "Crystal Space 2D driver for BeOS", "crystalspace.font.server.")
 SCF_EXPORT_CLASS_TABLE_END
 
-SCF_IMPLEMENT_IBASE (csGraphics2DBeLib)
-  SCF_IMPLEMENTS_INTERFACE (iPlugIn)
-  SCF_IMPLEMENTS_INTERFACE (iGraphics2D)
-SCF_IMPLEMENT_IBASE_END
-
 csGraphics2DBeLib::csGraphics2DBeLib (iBase* p) :
-  superclass(), view(0), window(0), bitmap(0)
+  superclass(p), view(0), window(0), bitmap(0)
 {
-  SCF_CONSTRUCT_IBASE(p);
 }
 
 csGraphics2DBeLib::~csGraphics2DBeLib()

@@ -25,9 +25,10 @@
 #include "csutil/csvector.h"
 #include "imesh/object.h"
 #include "imesh/sprite2d.h"
+#include "imesh/particle.h"
 #include "ivideo/graph3d.h"
 #include "iutil/config.h"
-#include "imesh/particle.h"
+#include "isys/plugin.h"
 #include "spr2duv.h"
 
 #define ALL_FEATURES (CS_OBJECT_FEATURE_LIGHTING|CS_OBJECT_FEATURE_ANIMATION)
@@ -324,25 +325,26 @@ class csSprite2DMeshObjectFactory : public iMeshObjectFactory
 class csSprite2DMeshObjectType : public iMeshObjectType
 {
 public:
-  /// Constructor.
-  csSprite2DMeshObjectType (iBase*);
-
-  /// Destructor.
-  virtual ~csSprite2DMeshObjectType ();
-
-  /// Register plugin with the system driver
-  virtual bool Initialize (iSystem *pSystem);
-
-  //------------------------ iMeshObjectType implementation --------------
   SCF_DECLARE_IBASE;
 
+  /// Constructor.
+  csSprite2DMeshObjectType (iBase*);
+  /// Destructor.
+  virtual ~csSprite2DMeshObjectType ();
   /// New Factory.
   virtual iMeshObjectFactory* NewFactory ();
+  /// Get features.
   virtual uint32 GetFeatures () const
   {
     return ALL_FEATURES;
   }
+
+  struct eiPlugIn : public iPlugIn
+  {
+    SCF_DECLARE_EMBEDDED_IBASE(csSprite2DMeshObjectType);
+    virtual bool Initialize (iSystem*) { return true; }
+    virtual bool HandleEvent (iEvent&) { return false; }
+  } scfiPlugIn;
 };
 
 #endif // _SPR2D_H_
-

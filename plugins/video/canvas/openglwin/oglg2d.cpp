@@ -120,7 +120,7 @@ SCF_EXPORT_CLASS_TABLE_END
 
 ///// Windowed-mode palette stuff //////
 
-struct {
+static struct {
   WORD Version;
   WORD NumberOfEntries;
   PALETTEENTRY aEntries[256];
@@ -130,9 +130,9 @@ struct {
     256
 };
 
-HPALETTE hWndPalette=NULL;
+static HPALETTE hWndPalette=NULL;
 
-void ClearSystemPalette()
+static void ClearSystemPalette()
 {
   struct 
   {
@@ -170,8 +170,7 @@ void ClearSystemPalette()
   ReleaseDC(NULL, hdc);
 }
 
-
-void CreateIdentityPalette(csRGBpixel *p)
+static void CreateIdentityPalette(csRGBpixel *p)
 {
   int i;
   struct {
@@ -476,4 +475,3 @@ bool csGraphics2DOpenGL::SetMousePosition (int x, int y)
 
   return true;
 }
-

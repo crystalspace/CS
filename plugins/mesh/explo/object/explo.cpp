@@ -68,9 +68,9 @@ void csExploMeshObject::SetupObject ()
       {
         part_speed[i] = push + spread_speed * GetRandomDirection();
         part_accel[i] = (pos - center) * spread_accel * GetRandomDirection();
-        if (part_speed[i].SquaredNorm() > sqmaxspeed) 
+        if (part_speed[i].SquaredNorm() > sqmaxspeed)
           sqmaxspeed = part_speed[i].SquaredNorm();
-        if (part_accel[i].SquaredNorm() > sqmaxaccel) 
+        if (part_accel[i].SquaredNorm() > sqmaxaccel)
           sqmaxaccel = part_accel[i].SquaredNorm();
       }
       bbox.AddBoundingVertexSmart(pos+bbox_radius);
@@ -85,8 +85,8 @@ void csExploMeshObject::SetupObject ()
   }
 }
 
-csExploMeshObject::csExploMeshObject (iSystem* system, iMeshObjectFactory* factory)
-	: csNewtonianParticleSystem (system, factory)
+csExploMeshObject::csExploMeshObject (iSystem* system,
+  iMeshObjectFactory* factory) : csNewtonianParticleSystem (system, factory)
 {
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiExplosionState);
   /// defaults
@@ -170,10 +170,10 @@ SCF_IMPLEMENT_IBASE (csExploMeshObjectFactory)
   SCF_IMPLEMENTS_INTERFACE (iMeshObjectFactory)
 SCF_IMPLEMENT_IBASE_END
 
-csExploMeshObjectFactory::csExploMeshObjectFactory (iBase *pParent, iSystem* system)
+csExploMeshObjectFactory::csExploMeshObjectFactory (iBase *p, iSystem* s)
 {
-  SCF_CONSTRUCT_IBASE (pParent);
-  csExploMeshObjectFactory::system = system;
+  SCF_CONSTRUCT_IBASE (p);
+  system = s;
 }
 
 csExploMeshObjectFactory::~csExploMeshObjectFactory ()
@@ -182,7 +182,8 @@ csExploMeshObjectFactory::~csExploMeshObjectFactory ()
 
 iMeshObject* csExploMeshObjectFactory::NewInstance ()
 {
-  csExploMeshObject* cm = new csExploMeshObject (system, (iMeshObjectFactory*)this);
+  csExploMeshObject* cm =
+    new csExploMeshObject (system, (iMeshObjectFactory*)this);
   iMeshObject* im = SCF_QUERY_INTERFACE (cm, iMeshObject);
   im->DecRef ();
   return im;
@@ -192,29 +193,29 @@ iMeshObject* csExploMeshObjectFactory::NewInstance ()
 
 SCF_IMPLEMENT_IBASE (csExploMeshObjectType)
   SCF_IMPLEMENTS_INTERFACE (iMeshObjectType)
-  SCF_IMPLEMENTS_INTERFACE (iPlugIn)
+  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iPlugIn)
 SCF_IMPLEMENT_IBASE_END
+
+SCF_IMPLEMENT_EMBEDDED_IBASE (csExploMeshObjectType::eiPlugIn)
+  SCF_IMPLEMENTS_INTERFACE (iPlugIn)
+SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 SCF_IMPLEMENT_FACTORY (csExploMeshObjectType)
 
 SCF_EXPORT_CLASS_TABLE (explo)
-  SCF_EXPORT_CLASS (csExploMeshObjectType, "crystalspace.mesh.object.explosion",
+  SCF_EXPORT_CLASS (csExploMeshObjectType,
+    "crystalspace.mesh.object.explosion",
     "Crystal Space Explosion Mesh Type")
 SCF_EXPORT_CLASS_TABLE_END
 
 csExploMeshObjectType::csExploMeshObjectType (iBase* pParent)
 {
   SCF_CONSTRUCT_IBASE (pParent);
+  SCF_CONSTRUCT_EMBEDDED_IBASE(scfiPlugIn);
 }
 
 csExploMeshObjectType::~csExploMeshObjectType ()
 {
-}
-
-bool csExploMeshObjectType::Initialize (iSystem* system)
-{
-  csExploMeshObjectType::system = system;
-  return true;
 }
 
 iMeshObjectFactory* csExploMeshObjectType::NewFactory ()
@@ -224,4 +225,3 @@ iMeshObjectFactory* csExploMeshObjectType::NewFactory ()
   ifact->DecRef ();
   return ifact;
 }
-

@@ -70,7 +70,7 @@ class csGraphics2DOS2DIVE : public csGraphics2D, public iEventPlug
   iEventOutlet *EventOutlet;
 
 public:
-  SCF_DECLARE_IBASE;
+  SCF_DECLARE_IBASE_EXT(csGraphics2D);
 
   csGraphics2DOS2DIVE (iBase *iParent);
   virtual ~csGraphics2DOS2DIVE ();
@@ -96,7 +96,7 @@ public:
 
   virtual bool HandleEvent (iEvent &Event);
 
-  //------------------------- iEventPlug interface ---------------------------//
+  //------------------------ iEventPlug interface ---------------------------//
 
   virtual unsigned GetPotentiallyConflictingEvents ()
   { return CSEVTYPE_Keyboard | CSEVTYPE_Mouse; }
@@ -105,7 +105,8 @@ public:
 
 private:
   static void KeyboardHandlerStub (void *Self, unsigned char ScanCode,
-    unsigned char CharCode, bool Down, unsigned char RepeatCount, int ShiftFlags);
+    unsigned char CharCode, bool Down, unsigned char RepeatCount,
+    int ShiftFlags);
   static void MouseHandlerStub (void *Self, int Button, bool Down,
     int x, int y, int ShiftFlags);
   static void FocusHandlerStub (void *Self, bool Enable);

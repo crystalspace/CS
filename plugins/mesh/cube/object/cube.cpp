@@ -5,12 +5,12 @@
     modify it under the terms of the GNU Library General Public
     License as published by the Free Software Foundation; either
     version 2 of the License, or (at your option) any later version.
-  
+
     This library is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
     Library General Public License for more details.
-  
+
     You should have received a copy of the GNU Library General Public
     License along with this library; if not, write to the Free
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
@@ -389,9 +389,13 @@ iMeshObject* csCubeMeshObjectFactory::NewInstance ()
 
 SCF_IMPLEMENT_IBASE (csCubeMeshObjectType)
   SCF_IMPLEMENTS_INTERFACE (iMeshObjectType)
-  SCF_IMPLEMENTS_INTERFACE (iPlugIn)
+  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iPlugIn)
   SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iConfig)
 SCF_IMPLEMENT_IBASE_END
+
+SCF_IMPLEMENT_EMBEDDED_IBASE (csCubeMeshObjectType::eiPlugIn)
+  SCF_IMPLEMENTS_INTERFACE (iPlugIn)
+SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 SCF_IMPLEMENT_EMBEDDED_IBASE (csCubeMeshObjectType::csCubeConfig)
   SCF_IMPLEMENTS_INTERFACE (iConfig)
@@ -407,6 +411,7 @@ SCF_EXPORT_CLASS_TABLE_END
 csCubeMeshObjectType::csCubeMeshObjectType (iBase* pParent)
 {
   SCF_CONSTRUCT_IBASE (pParent);
+  SCF_CONSTRUCT_EMBEDDED_IBASE (scfiPlugIn);
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiConfig);
   default_sizex = 1;
   default_sizey = 1;
@@ -417,11 +422,6 @@ csCubeMeshObjectType::csCubeMeshObjectType (iBase* pParent)
 
 csCubeMeshObjectType::~csCubeMeshObjectType ()
 {
-}
-
-bool csCubeMeshObjectType::Initialize (iSystem*)
-{
-  return true;
 }
 
 iMeshObjectFactory* csCubeMeshObjectType::NewFactory ()

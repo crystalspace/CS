@@ -165,10 +165,10 @@ private:
 
   void ClearBufferUnderTop();  
 public:
+  SCF_DECLARE_IBASE;
+
   /// The Glide texture manager
   csTextureManagerGlide* txtmgr; 
-
-  SCF_DECLARE_IBASE;
 
   /// The constructor. Pass all arguments to this.
   csGraphics3DGlide (iBase* iParent);
@@ -311,6 +311,13 @@ public:
   /// Draw a 2D sprite
   virtual void DrawPixmap (iTextureHandle *hTex, int sx, int sy, int sw, int sh,
     int tx, int ty, int tw, int th, uint8 Alpha);
+
+  struct eiPlugIn : public iPlugIn
+  {
+    SCF_DECLARE_EMBEDDED_IBASE(csGraphics3DGlide);
+    virtual bool Initialize (iSystem* p) { return scfParent->Initialize(p); }
+    virtual bool HandleEvent (iEvent&) { return false; }
+  } scfiPlugIn;
 
 private:
   /// board selected

@@ -29,10 +29,15 @@ CS_IMPLEMENT_PLUGIN
 SCF_IMPLEMENT_IBASE (csConsoleInput)
   SCF_IMPLEMENTS_INTERFACE (iConsoleInput)
   SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iPlugIn)
+  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iConsoleWatcher)
 SCF_IMPLEMENT_IBASE_END
 
 SCF_IMPLEMENT_EMBEDDED_IBASE (csConsoleInput::eiPlugIn)
   SCF_IMPLEMENTS_INTERFACE (iPlugIn)
+SCF_IMPLEMENT_EMBEDDED_IBASE_END
+
+SCF_IMPLEMENT_EMBEDDED_IBASE (csConsoleInput::eiConsoleWatcher)
+  SCF_IMPLEMENTS_INTERFACE (iConsoleWatcher)
 SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 SCF_IMPLEMENT_FACTORY (csConsoleInput)
@@ -46,6 +51,7 @@ csConsoleInput::csConsoleInput (iBase *iParent) : History (16, 16)
 {
   SCF_CONSTRUCT_IBASE (iParent);
   SCF_CONSTRUCT_EMBEDDED_IBASE(scfiPlugIn);
+  SCF_CONSTRUCT_EMBEDDED_IBASE(scfiConsoleWatcher);
   Callback = NULL;
   Console = NULL;
   Prompt = NULL;
@@ -65,7 +71,7 @@ csConsoleInput::~csConsoleInput ()
 
   if (Console)
   {
-    Console->RegisterPlugin (NULL);
+    Console->RegisterWatcher (NULL);
     Console->DecRef ();
   }
 }
@@ -78,14 +84,17 @@ bool csConsoleInput::Initialize (iSystem *iSys)
   return true;
 }
 
+void csConsoleInput::eiConsoleWatcher::ConsoleVisibilityChanged(
+  iConsoleOutput*, bool visible)
+{
+  if (visible)
+    scfParent->Refresh();
+}
+
 bool csConsoleInput::HandleEvent (iEvent &Event)
 {
   switch (Event.Type)
   {
-    case csevBroadcast:
-      if (Event.Command.Code == cscmdConsoleStatusChange)
-        Refresh ();
-      return true;
     case csevKeyDown:
       switch (Event.Key.Code)
       {
@@ -191,13 +200,13 @@ void csConsoleInput::Bind (iConsoleOutput *iCon)
   if (Console)
   {
     Console->DecRef ();
-    Console->RegisterPlugin (NULL);
+    Console->RegisterWatcher (NULL);
   }
   Console = iCon;
   if (Console)
   {
     Console->IncRef ();
-    Console->RegisterPlugin (&scfiPlugIn);
+    Console->RegisterWatcher (&scfiConsoleWatcher);
   }
   delete [] line;
   linemax = Console->GetMaxLineWidth ();

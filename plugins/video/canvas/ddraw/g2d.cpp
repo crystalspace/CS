@@ -19,7 +19,7 @@
 #include "cssysdef.h"
 #include "csutil/scf.h"
 #include "csutil/csstring.h"
-#include "video/canvas/ddraw/g2d.h"
+#include "g2d.h"
 #include "video/canvas/directxcommon/directdetection.h"
 #include "csgeom/csrect.h"
 #include "csutil/util.h"
@@ -47,13 +47,8 @@ SCF_EXPORT_CLASS_TABLE (csddraw)
     "Crystal Space 2D DirectDraw driver", "crystalspace.font.server.")
 SCF_EXPORT_CLASS_TABLE_END
 
-SCF_IMPLEMENT_IBASE (csGraphics2DDDraw3)
-  SCF_IMPLEMENTS_INTERFACE (iPlugIn)
-  SCF_IMPLEMENTS_INTERFACE (iGraphics2D)
-SCF_IMPLEMENT_IBASE_END
-
 csGraphics2DDDraw3::csGraphics2DDDraw3(iBase *iParent) :
-  csGraphics2D (),
+  csGraphics2D (iParent),
   m_lpDD (NULL),
   m_lpddsPrimary (NULL),
   m_lpddsBack (NULL),
@@ -67,7 +62,6 @@ csGraphics2DDDraw3::csGraphics2DDDraw3(iBase *iParent) :
   m_bDoubleBuffer (false),
   m_bAllowWindowed (false)
 {
-  SCF_CONSTRUCT_IBASE (iParent);
   m_hInstance = GetModuleHandle (NULL);
 }
 

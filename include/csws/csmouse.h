@@ -26,6 +26,7 @@
 #include "csws/csgfxppl.h"
 
 class csMouse;
+struct iEvent;
 
 /**
  * This class encapsulates mouse pointer

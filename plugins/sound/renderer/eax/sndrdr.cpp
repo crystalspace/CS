@@ -44,25 +44,31 @@ SCF_EXPORT_CLASS_TABLE_END;
 
 SCF_IMPLEMENT_IBASE(csSoundRenderEAX)
   SCF_IMPLEMENTS_INTERFACE(iSoundRender)
-  SCF_IMPLEMENTS_INTERFACE(iPlugIn)
+  SCF_IMPLEMENTS_EMBEDDED_INTERFACE(iPlugIn)
 SCF_IMPLEMENT_IBASE_END;
 
-csSoundRenderEAX::csSoundRenderEAX(iBase *piBase) {
+SCF_IMPLEMENT_EMBEDDED_IBASE (csSoundRenderEAX::eiPlugIn)
+  SCF_IMPLEMENTS_INTERFACE (iPlugIn)
+SCF_IMPLEMENT_EMBEDDED_IBASE_END
+
+csSoundRenderEAX::csSoundRenderEAX(iBase *piBase)
+{
   SCF_CONSTRUCT_IBASE(piBase);
+  SCF_CONSTRUCT_EMBEDDED_IBASE(scfiPlugIn);
   Listener = NULL;
   AudioRenderer = NULL;
   System = NULL;
 }
 
-bool csSoundRenderEAX::Initialize(iSystem *iSys) {
+bool csSoundRenderEAX::Initialize(iSystem *iSys)
+{
   (System = iSys)->IncRef();
-  System->CallOnEvents(this, CSMASK_Command | CSMASK_Broadcast | CSMASK_Nothing);
+  System->CallOnEvents(&scfiPlugIn,
+    CSMASK_Command | CSMASK_Broadcast | CSMASK_Nothing);
   LoadFormat.Bits = -1;
   LoadFormat.Freq = -1;
   LoadFormat.Channels = -1;
-
   Config.AddConfig(iSys, "/config/sound.cfg");
-
   return true;
 }
 
@@ -72,12 +78,14 @@ csSoundRenderEAX::~csSoundRenderEAX() {
 
 bool csSoundRenderEAX::Open()
 {
-  System->Printf (CS_MSG_INITIALIZATION, "SoundRender DirectSound3D selected\n");
+  System->Printf(CS_MSG_INITIALIZATION,"SoundRender DirectSound3D selected\n");
   
   HRESULT r;
-  if (!AudioRenderer) {
+  if (!AudioRenderer)
+  {
     r = DirectSoundCreate(NULL, &AudioRenderer, NULL);
-    if (r != DS_OK) {
+    if (r != DS_OK)
+    {
       System->Printf(CS_MSG_FATAL_ERROR, "Error : Cannot Initialize "
         "DirectSound3D (%s).\n", GetError(r));
       Close();
@@ -86,7 +94,8 @@ bool csSoundRenderEAX::Open()
   
     DWORD dwLevel = DSSCL_EXCLUSIVE;
     r = AudioRenderer->SetCooperativeLevel(GetForegroundWindow(), dwLevel);
-    if (r != DS_OK) {
+    if (r != DS_OK)
+    {
       System->Printf(CS_MSG_FATAL_ERROR, "Error : Cannot Set "
         "Cooperative Level (%s).\n", GetError(r));
       Close();
@@ -94,7 +103,8 @@ bool csSoundRenderEAX::Open()
     }
   }
 
-  if (!Listener) {
+  if (!Listener)
+  {
     Listener = new csSoundListenerEAX(this);
     if (!Listener->Initialize(this)) return false;
   }
@@ -125,7 +135,6 @@ void csSoundRenderEAX::SetVolume(float vol)
 float csSoundRenderEAX::GetVolume()
 {
   if (!Listener) return 0;
-
   long dsvol;
   int a = Listener->PrimaryBuffer->GetVolume(&dsvol);
   return (float)(dsvol-DSBVOLUME_MIN)/(float)(DSBVOLUME_MAX-DSBVOLUME_MIN);
@@ -133,59 +142,74 @@ float csSoundRenderEAX::GetVolume()
 
 IMPLEMENT_SOUNDRENDER_CONVENIENCE_METHODS(csSoundRenderEAX);
 
-iSoundSource *csSoundRenderEAX::CreateSource(iSoundStream *snd, int mode3d) {
+iSoundSource *csSoundRenderEAX::CreateSource(iSoundStream *snd, int mode3d)
+{
   if (!snd) return NULL;
   csSoundSourceEAX *src = new csSoundSourceEAX(this);
-  if (!src->Initialize(this, snd, mode3d)) {
+  if (!src->Initialize(this, snd, mode3d))
+  {
     src->DecRef();
     return NULL;
   } else return src;
 }
 
-iSoundListener *csSoundRenderEAX::GetListener() {
+iSoundListener *csSoundRenderEAX::GetListener()
+{
   return Listener;
 }
 
-void csSoundRenderEAX::Update() {
+void csSoundRenderEAX::Update()
+{
   Listener->Prepare();
 
-  for (int i=0;i<ActiveSources.Length();i++) {
+  for (int i=0;i<ActiveSources.Length();i++)
+  {
     csSoundSourceEAX *src = (csSoundSourceEAX*)ActiveSources.Get(i);
-    if (!src->IsPlaying()) {
+    if (!src->IsPlaying())
+    {
       ActiveSources.Delete(i);
       i--;
     } else src->Update();
   }
 }
 
-const csSoundFormat *csSoundRenderEAX::GetLoadFormat() {
+const csSoundFormat *csSoundRenderEAX::GetLoadFormat()
+{
   return &LoadFormat;
 }
 
-void csSoundRenderEAX::MixingFunction() {
+void csSoundRenderEAX::MixingFunction()
+{
 }
 
-void csSoundRenderEAX::SetDirty() {
+void csSoundRenderEAX::SetDirty()
+{
   Listener->Dirty = true;
 }
 
-void csSoundRenderEAX::AddSource(csSoundSourceEAX *src) {
-  if (ActiveSources.Find(src)==-1) {
+void csSoundRenderEAX::AddSource(csSoundSourceEAX *src)
+{
+  if (ActiveSources.Find(src)==-1)
+  {
     src->IncRef();
     ActiveSources.Push(src);
   }
 }
 
-void csSoundRenderEAX::RemoveSource(csSoundSourceEAX *src) {
+void csSoundRenderEAX::RemoveSource(csSoundSourceEAX *src)
+{
   int n=ActiveSources.Find(src);
-  if (n!=-1) {
+  if (n!=-1)
+  {
     ActiveSources.Delete(n);
     src->DecRef();
   }
 }
 
-const char *csSoundRenderEAX::GetError(HRESULT r) {
-  switch (r) {
+const char *csSoundRenderEAX::GetError(HRESULT r)
+{
+  switch (r)
+  {
     case DS_OK: return "success";
     case DSERR_ALLOCATED: return "the resource is already allocated";
     case DSERR_ALREADYINITIALIZED: return "the object is already initialized";
@@ -193,8 +217,8 @@ const char *csSoundRenderEAX::GetError(HRESULT r) {
     case DSERR_BUFFERLOST: return "the buffer memory has been lost";
     case DSERR_CONTROLUNAVAIL: return "the requested control "
       "(volume, pan, ...) is not available";
-    case DSERR_INVALIDCALL: return "this function is not valid for the current "
-      "state of this object";
+    case DSERR_INVALIDCALL:
+      return "this function is not valid for the current state of this object";
     case DSERR_INVALIDPARAM: return "an invalid parameter was passed to the "
       "returning function";
     case DSERR_NOAGGREGATION: return "the object does not support aggregation";
@@ -212,8 +236,10 @@ const char *csSoundRenderEAX::GetError(HRESULT r) {
 
 bool csSoundRenderEAX::HandleEvent (iEvent &e)
 {
-  if (e.Type == csevCommand || e.Type == csevBroadcast) {
-    switch (e.Command.Code) {
+  if (e.Type == csevCommand || e.Type == csevBroadcast)
+  {
+    switch (e.Command.Code)
+    {
     case cscmdPreProcess:
       Update();
       break;
@@ -227,4 +253,3 @@ bool csSoundRenderEAX::HandleEvent (iEvent &e)
   }
   return false;
 }
-

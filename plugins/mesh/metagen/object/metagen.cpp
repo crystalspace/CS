@@ -113,8 +113,9 @@ bool csMetaGen::InitArcSineTable(void)
 
   asin_table = (float *)malloc(sizeof(float) * asin_table_res * 2 + 1 );
   if (!asin_table) {
-	printf("ERROR: MetaGen - failed to allocate arc sine table, out of memeory\n");
-	return false;
+    printf("ERROR: MetaGen failed to allocate arc=sine table; "
+      "out of memeory\n");
+    return false;
   }
   if (asin_table_res)
 	FillArcSineTable();
@@ -223,20 +224,20 @@ void csMetaGen::GetObjectBoundingBox(csBox3& bbox, int )
 // post processing with a sorted vertex list,  I can use
 // the first and last vertex for the X extremities. For
 // the Y values, I use the scope of the rendering field.
-// The Z vlue is a little harder- I still scan the list... 
+// The Z vlue is a little harder- I still scan the list...
 
 void csMetaGen::CreateBoundingBoxLinear( int bone )
 {
-  csVector3 start, finish; 
+  csVector3 start, finish;
   float zmin,zmax,y;
-  zmin = zmax = int(GetResZ()/2) * stepz + ZStart; 
+  zmin = zmax = int(GetResZ()/2) * stepz + ZStart;
   csVector3* vrt = verts->v;
 
   start.x = vrt[0].x; finish.x = vrt[current_vertices - 1].x;
   y = _2coordY(bones[bone]->start_slice); start.y = y;
   y = _2coordY(bones[bone]->start_slice + bones[bone]->num_slices);
   finish.y = y;
-  
+
   for ( int i = 0; i < current_vertices; i++)
   {
 	if ( vrt[i].z < zmin ) zmin = vrt[i].z;
@@ -246,17 +247,17 @@ void csMetaGen::CreateBoundingBoxLinear( int bone )
   start.z = zmin; finish.z = zmax;
   object_bbox.StartBoundingBox(start);
   object_bbox.AddBoundingVertexSmart(finish);
-  
+
 }
 
 void csMetaGen::CreateBoundingBoxBlob( int /* bone */)
 {
   csVector3 start, finish; csVector3 *vrt = verts->v;
   start.x = vrt[0].x; finish.x = vrt[current_vertices - 1].x;
-  
+
   object_bbox.StartBoundingBox(vrt[0]);
   object_bbox.AddBoundingVertexSmart(vrt[current_vertices - 1]);
-  
+
 }
 
 // Data addition calls. ------------------------------------------------
@@ -270,7 +271,7 @@ void csMetaGen::CreateBone( int start, float iso_lev)
   mb->iso_level = iso_lev;
   bones.Push(mb);
 }
-    
+
 void csMetaGen::AddSlice( bool endcap )
 {
   MetaBone* mb = bones[bones.Length() - 1];
@@ -282,7 +283,7 @@ void csMetaGen::AddSlice( bool endcap )
   mb->slices[n]->is_endcap = endcap;
   mb->slices[n]->num_charges = 0;
   mb->slices[n]->charges = NULL;
-  
+
   mb->num_slices++;
 }
 
@@ -294,21 +295,21 @@ void csMetaGen::AddCharge( csVector2 pos, float charge )
 
   slc->charges = (!slc->charges) ? (SliceCharge *)malloc(sizeof(SliceCharge)) :
 	(SliceCharge *)realloc( slc->charges, sizeof(SliceCharge) * ( n + 1 ));
-	
+
   slc->charges[n].charge = charge;
   slc->charges[n].pos = pos;
-  
+
   slc->num_charges++;
 }
 //------------- Now do the fields and balls
 
 void csMetaGen::CreateField( float iso_level )
 {
-  MetaField *fld = (MetaField *)malloc( sizeof(MetaField)); 
+  MetaField *fld = (MetaField *)malloc( sizeof(MetaField));
   fld->iso_level = iso_level;
   fld->points = NULL;
   fld->num_points = 0;
-  fields.Push(fld); 
+  fields.Push(fld);
 }
 
 void csMetaGen::AddPoint( csVector3 pos, float charge )
@@ -397,7 +398,7 @@ recurse:
 static int SqueezeList( csVector3 *v, int *map, int max )
 {
   int i = 0, j = 1; map[0] = 0;
-  
+
   while (1) {
 	csVector3 t = v[i];
 	while ((j < max) && ((t - v[j]) < SMALL_EPSILON))
@@ -414,12 +415,13 @@ static int SqueezeList( csVector3 *v, int *map, int max )
 		v[i] = v[j];
 	  }
   }
-  return i+1; 
+  return i+1;
 }
 
-static void RemoveSplinters( csVector3* vrt, csTriangle* trs, int num, float disc )
+static void RemoveSplinters(
+  csVector3* vrt, csTriangle* trs, int num, float disc )
 {
-  int i; 
+  int i;
   csVector3 v;
   for ( i=0; i < num; i++ )
   {
@@ -428,19 +430,19 @@ static void RemoveSplinters( csVector3* vrt, csTriangle* trs, int num, float dis
 //	  printf("Compressing splinter %d and %d\n",j,j+1);
 	  v = (vrt[trs[i].a] + vrt[trs[i].b])/2;
 	  vrt[trs[i].a] = vrt[trs[i].b] = v;
-	} 
+	}
 	if ((vrt[trs[i].b] - vrt[trs[i].c]) < disc)
 	{
 //	  printf("Compressing splinter %d and %d\n",j+1,j+2);
 	  v = (vrt[trs[i].b] + vrt[trs[i].c])/2;
 	  vrt[trs[i].b] = vrt[trs[i].c] = v;
-	} 
+	}
 	if ((vrt[trs[i].a] - vrt[trs[i].c]) < disc)
 	{
 //	  printf("Compressing splinter %d and %d\n",j,j+2);
 	  v = (vrt[trs[i].a] + vrt[trs[i].c])/2;
 	  vrt[trs[i].a] = vrt[trs[i].c] = v;
-	} 
+	}
   }
 }
 
@@ -462,7 +464,7 @@ void csMetaGen::CleanupSurface()
 	map[i] = i;
 
   QuickSort( vrt, map, 0, current_vertices - 1);
-  
+
   for ( i = 0; i < current_vertices; i++ )
 	map2[map[i]] = i;
 
@@ -483,7 +485,7 @@ void csMetaGen::CleanupSurface()
 	{
 	  trigs->t[current_triangles] = tr;
 	  current_triangles++;
-	} 
+	}
   }
 
 // This doesnt do a true distance check. I dont really care either
@@ -502,9 +504,9 @@ void csMetaGen::CleanupSurface()
 
   current_vertices = SqueezeList(vrt, map2, current_vertices);
 
-  j = 0; csTriangle *tr2 = trigs->t; 
+  j = 0; csTriangle *tr2 = trigs->t;
   for ( i = 0; i < current_triangles; i++)
-  { 
+  {
 	map[j++] = tr2[i].a;
 	map[j++] = tr2[i].b;
 	map[j++] = tr2[i].c;
@@ -521,7 +523,7 @@ void csMetaGen::CleanupSurface()
 	{
 	  trigs->t[current_triangles] = tr;
 	  current_triangles++;
-	} 
+	}
   }
   free(map); free(map2); free(map3);
 }
@@ -532,7 +534,7 @@ int csMetaGen::GenerateLinearSurface( int bone_index )
 {
 
   if (!verts) return 0;
-  current_vertices = vertices_tesselated = 
+  current_vertices = vertices_tesselated =
 	CalcLinSurf(bones[bone_index]);
   printf(";Calc lin surface completed %d\n",vertices_tesselated);
   if (!vertices_tesselated) return 0;
@@ -556,23 +558,23 @@ int csMetaGen::GenerateLinearSurface( int bone_index )
   tex = (TexelArray *)malloc(sizeof(TexelArray));
   tex->v = (csVector2 *)malloc(sizeof(csVector2) * current_vertices );
   tex->num_texels = current_texels = current_vertices;
-  
+
   csVector3 tx_start = object_bbox.GetCenter();
   float cent_x = tx_start.x, cent_z = tx_start.z;
   float min_y = object_bbox.MinY(), lx, lz, t;
   float iylen = object_bbox.MaxY() - min_y;
   if ( iylen < SMALL_EPSILON ) iylen = 100000; else iylen = 1/iylen;
   for (i = 0; i < current_vertices; i++)
-  {  	
-	// Texturing. Simple texturing, v is calculated as the 
+  {
+	// Texturing. Simple texturing, v is calculated as the
 	// proportion of how far the vertex is down the length
 	// and the u is calculated on the rotational displacement
 	// around the x,y center of the bounding box.
 	// The texture is mapped from the +x axis to the -x axis
 	// with the back being the reverse of the front.
 	// This is limited but nominally useful.
-	
-	  t = 0.0;  
+
+	  t = 0.0;
 	  tex->v[i].y = (vrt[i].y - min_y) * iylen;
 	  lx = vrt[i].x - cent_x;
 	  lz = vrt[i].z - cent_z;
@@ -585,7 +587,7 @@ int csMetaGen::GenerateLinearSurface( int bone_index )
 int csMetaGen::GenerateFieldSurface( int field_index )
 {
   int i,j,m;
-  current_vertices = vertices_tesselated = 
+  current_vertices = vertices_tesselated =
 	CalcBlobSurf(fields[field_index]);
   printf(";Calc Field surface completed %d\n",vertices_tesselated);
   if (!vertices_tesselated) return 0;
@@ -601,7 +603,7 @@ int csMetaGen::GenerateFieldSurface( int field_index )
   tex->v = (csVector2 *)malloc(sizeof(csVector2) * current_vertices );
   tex->num_texels = current_texels = current_vertices;
 
-  csVector3* vrt = verts->v; 
+  csVector3* vrt = verts->v;
   MetaField* mf = fields[field_index];
   PointCharge p;
   m = mf->num_points;
@@ -647,7 +649,7 @@ void csMetaGen::SetMaxVertices( int limit )
 {
   if (limit > 0)
   {
-	if (!verts) 
+	if (!verts)
 	{
 	  verts = (VertArray *) malloc(sizeof(VertArray));
 	  verts->max_vertices = 0;
@@ -712,8 +714,12 @@ csTriangle* csMetaGen::GetTriangles()
 
 SCF_IMPLEMENT_IBASE (csMetaGenType)
   SCF_IMPLEMENTS_INTERFACE (iMeshObjectType)
-  SCF_IMPLEMENTS_INTERFACE (iPlugIn)
+  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iPlugIn)
 SCF_IMPLEMENT_IBASE_END
+
+SCF_IMPLEMENT_EMBEDDED_IBASE (csMetaGenType::eiPlugIn)
+  SCF_IMPLEMENTS_INTERFACE (iPlugIn)
+SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 SCF_IMPLEMENT_FACTORY (csMetaGenType)
 
@@ -725,15 +731,11 @@ SCF_EXPORT_CLASS_TABLE_END
 csMetaGenType::csMetaGenType( iBase *par )
 {
   SCF_CONSTRUCT_IBASE (par);
+  SCF_CONSTRUCT_EMBEDDED_IBASE(scfiPlugIn);
 }
 
 csMetaGenType::~csMetaGenType()
 {
-}
-
-bool csMetaGenType::Initialize( iSystem* )
-{
-  return true;
 }
 
 iMeshObjectFactory* csMetaGenType::NewFactory()
@@ -743,4 +745,3 @@ iMeshObjectFactory* csMetaGenType::NewFactory()
   ifact->DecRef();
   return ifact;
 }
- 

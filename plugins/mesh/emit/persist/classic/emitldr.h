@@ -6,12 +6,12 @@
     modify it under the terms of the GNU Library General Public
     License as published by the Free Software Foundation; either
     version 2 of the License, or (at your option) any later version.
-  
+
     This library is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
     Library General Public License for more details.
-  
+
     You should have received a copy of the GNU Library General Public
     License along with this library; if not, write to the Free
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
@@ -22,6 +22,7 @@
 
 #include "imap/reader.h"
 #include "imap/writer.h"
+#include "isys/plugin.h"
 
 struct iEngine;
 struct iSystem;
@@ -35,21 +36,24 @@ private:
   iSystem* sys;
 
 public:
+  SCF_DECLARE_IBASE;
+
   /// Constructor.
   csEmitFactoryLoader (iBase*);
 
   /// Destructor.
   virtual ~csEmitFactoryLoader ();
 
-  /// Register plugin with the system driver
-  virtual bool Initialize (iSystem *pSystem);
-
-public:
-  //------------------------ iLoaderPlugIn implementation --------------
-  SCF_DECLARE_IBASE;
-
   /// Parse a given string and return a new object for it.
   virtual iBase* Parse (const char* string, iEngine* engine, iBase* context);
+
+  struct eiPlugIn : public iPlugIn
+  {
+    SCF_DECLARE_EMBEDDED_IBASE(csEmitFactoryLoader);
+    virtual bool Initialize (iSystem* p) { scfParent->sys = p; return true; }
+    virtual bool HandleEvent (iEvent&) { return false; }
+  } scfiPlugIn;
+  friend struct eiPlugIn;
 };
 
 /**
@@ -61,21 +65,24 @@ private:
   iSystem* sys;
 
 public:
+  SCF_DECLARE_IBASE;
+
   /// Constructor.
   csEmitFactorySaver (iBase*);
 
   /// Destructor.
   virtual ~csEmitFactorySaver ();
 
-  /// Register plugin with the system driver
-  virtual bool Initialize (iSystem *pSystem);
-
-public:
-  //------------------------ iSaverPlugIn implementation --------------
-  SCF_DECLARE_IBASE;
-
   /// Write down given object and add to string vector.
   virtual void WriteDown (iBase *obj, iStrVector *str, iEngine* engine);
+
+  struct eiPlugIn : public iPlugIn
+  {
+    SCF_DECLARE_EMBEDDED_IBASE(csEmitFactorySaver);
+    virtual bool Initialize (iSystem* p) { scfParent->sys = p; return true; }
+    virtual bool HandleEvent (iEvent&) { return false; }
+  } scfiPlugIn;
+  friend struct eiPlugIn;
 };
 
 /**
@@ -87,21 +94,24 @@ private:
   iSystem* sys;
 
 public:
+  SCF_DECLARE_IBASE;
+
   /// Constructor.
   csEmitLoader (iBase*);
 
   /// Destructor.
   virtual ~csEmitLoader ();
 
-  /// Register plugin with the system driver
-  virtual bool Initialize (iSystem *pSystem);
-
-public:
-  //------------------------ iLoaderPlugIn implementation --------------
-  SCF_DECLARE_IBASE;
-
   /// Parse a given string and return a new object for it.
   virtual iBase* Parse (const char* string, iEngine* engine, iBase* context);
+
+  struct eiPlugIn : public iPlugIn
+  {
+    SCF_DECLARE_EMBEDDED_IBASE(csEmitLoader);
+    virtual bool Initialize (iSystem* p) { scfParent->sys = p; return true; }
+    virtual bool HandleEvent (iEvent&) { return false; }
+  } scfiPlugIn;
+  friend struct eiPlugIn;
 };
 
 /**
@@ -113,22 +123,24 @@ private:
   iSystem* sys;
 
 public:
+  SCF_DECLARE_IBASE;
+
   /// Constructor.
   csEmitSaver (iBase*);
 
   /// Destructor.
   virtual ~csEmitSaver ();
 
-  /// Register plugin with the system driver
-  virtual bool Initialize (iSystem *pSystem);
-
-public:
-  //------------------------ iSaverPlugIn implementation --------------
-  SCF_DECLARE_IBASE;
-
   /// Write down given object and add to string vector.
   virtual void WriteDown (iBase *obj, iStrVector *str, iEngine* engine);
+
+  struct eiPlugIn : public iPlugIn
+  {
+    SCF_DECLARE_EMBEDDED_IBASE(csEmitSaver);
+    virtual bool Initialize (iSystem* p) { scfParent->sys = p; return true; }
+    virtual bool HandleEvent (iEvent&) { return false; }
+  } scfiPlugIn;
+  friend struct eiPlugIn;
 };
 
 #endif // _EMITLDR_H_
-

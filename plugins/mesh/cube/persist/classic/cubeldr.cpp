@@ -6,12 +6,12 @@
     modify it under the terms of the GNU Library General Public
     License as published by the Free Software Foundation; either
     version 2 of the License, or (at your option) any later version.
-  
+
     This library is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
     Library General Public License for more details.
-  
+
     You should have received a copy of the GNU Library General Public
     License along with this library; if not, write to the Free
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
@@ -54,23 +54,39 @@ CS_TOKEN_DEF_END
 
 SCF_IMPLEMENT_IBASE (csCubeFactoryLoader)
   SCF_IMPLEMENTS_INTERFACE (iLoaderPlugIn)
-  SCF_IMPLEMENTS_INTERFACE (iPlugIn)
+  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iPlugIn)
 SCF_IMPLEMENT_IBASE_END
+
+SCF_IMPLEMENT_EMBEDDED_IBASE (csCubeFactoryLoader::eiPlugIn)
+  SCF_IMPLEMENTS_INTERFACE (iPlugIn)
+SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 SCF_IMPLEMENT_IBASE (csCubeFactorySaver)
   SCF_IMPLEMENTS_INTERFACE (iSaverPlugIn)
-  SCF_IMPLEMENTS_INTERFACE (iPlugIn)
+  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iPlugIn)
 SCF_IMPLEMENT_IBASE_END
+
+SCF_IMPLEMENT_EMBEDDED_IBASE (csCubeFactorySaver::eiPlugIn)
+  SCF_IMPLEMENTS_INTERFACE (iPlugIn)
+SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 SCF_IMPLEMENT_IBASE (csCubeLoader)
   SCF_IMPLEMENTS_INTERFACE (iLoaderPlugIn)
-  SCF_IMPLEMENTS_INTERFACE (iPlugIn)
+  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iPlugIn)
 SCF_IMPLEMENT_IBASE_END
+
+SCF_IMPLEMENT_EMBEDDED_IBASE (csCubeLoader::eiPlugIn)
+  SCF_IMPLEMENTS_INTERFACE (iPlugIn)
+SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 SCF_IMPLEMENT_IBASE (csCubeSaver)
   SCF_IMPLEMENTS_INTERFACE (iSaverPlugIn)
-  SCF_IMPLEMENTS_INTERFACE (iPlugIn)
+  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iPlugIn)
 SCF_IMPLEMENT_IBASE_END
+
+SCF_IMPLEMENT_EMBEDDED_IBASE (csCubeSaver::eiPlugIn)
+  SCF_IMPLEMENTS_INTERFACE (iPlugIn)
+SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 SCF_IMPLEMENT_FACTORY (csCubeFactoryLoader)
 SCF_IMPLEMENT_FACTORY (csCubeFactorySaver)
@@ -78,7 +94,8 @@ SCF_IMPLEMENT_FACTORY (csCubeLoader)
 SCF_IMPLEMENT_FACTORY (csCubeSaver)
 
 SCF_EXPORT_CLASS_TABLE (cubeldr)
-  SCF_EXPORT_CLASS (csCubeFactoryLoader, "crystalspace.mesh.loader.factory.cube",
+  SCF_EXPORT_CLASS (csCubeFactoryLoader,
+    "crystalspace.mesh.loader.factory.cube",
     "Crystal Space Cube Mesh Factory Loader")
   SCF_EXPORT_CLASS (csCubeFactorySaver, "crystalspace.mesh.saver.factory.cube",
     "Crystal Space Cube Mesh Factory Saver")
@@ -91,16 +108,11 @@ SCF_EXPORT_CLASS_TABLE_END
 csCubeFactoryLoader::csCubeFactoryLoader (iBase* pParent)
 {
   SCF_CONSTRUCT_IBASE (pParent);
+  SCF_CONSTRUCT_EMBEDDED_IBASE(scfiPlugIn);
 }
 
 csCubeFactoryLoader::~csCubeFactoryLoader ()
 {
-}
-
-bool csCubeFactoryLoader::Initialize (iSystem* system)
-{
-  sys = system;
-  return true;
 }
 
 static UInt ParseMixmode (char* buf)
@@ -146,7 +158,8 @@ static UInt ParseMixmode (char* buf)
   }
   if (cmd == CS_PARSERR_TOKENNOTFOUND)
   {
-    printf ("Token '%s' not found while parsing the modes!\n", csGetLastOffender ());
+    printf ("Token '%s' not found while parsing the modes!\n",
+      csGetLastOffender ());
     return 0;
   }
   return Mixmode;
@@ -235,16 +248,11 @@ iBase* csCubeFactoryLoader::Parse (const char* string, iEngine* engine,
 csCubeFactorySaver::csCubeFactorySaver (iBase* pParent)
 {
   SCF_CONSTRUCT_IBASE (pParent);
+  SCF_CONSTRUCT_EMBEDDED_IBASE(scfiPlugIn);
 }
 
 csCubeFactorySaver::~csCubeFactorySaver ()
 {
-}
-
-bool csCubeFactorySaver::Initialize (iSystem* system)
-{
-  sys = system;
-  return true;
 }
 
 #define MAXLINE 100 /* max number of chars per line... */
@@ -279,7 +287,7 @@ void csCubeFactorySaver::WriteDown (iBase* obj, iStrVector * str,
     fact->DecRef();
     return;
   }
-  
+
   if(cubelook->GetMixMode() != CS_FX_COPY)
   {
     WriteMixmode(str, cubelook->GetMixMode());
@@ -295,7 +303,7 @@ void csCubeFactorySaver::WriteDown (iBase* obj, iStrVector * str,
   sprintf(buf, "SHIFT (%g, %g, %g)\n", cubelook->GetShiftX (),
     cubelook->GetShiftY (), cubelook->GetShiftZ ());
   str->Push(csStrNew(buf));
-  
+
   cubelook->DecRef();
   fact->DecRef();
 }
@@ -305,16 +313,11 @@ void csCubeFactorySaver::WriteDown (iBase* obj, iStrVector * str,
 csCubeLoader::csCubeLoader (iBase* pParent)
 {
   SCF_CONSTRUCT_IBASE (pParent);
+  SCF_CONSTRUCT_EMBEDDED_IBASE(scfiPlugIn);
 }
 
 csCubeLoader::~csCubeLoader ()
 {
-}
-
-bool csCubeLoader::Initialize (iSystem* system)
-{
-  sys = system;
-  return true;
 }
 
 iBase* csCubeLoader::Parse (const char* string, iEngine* engine,
@@ -366,16 +369,11 @@ iBase* csCubeLoader::Parse (const char* string, iEngine* engine,
 csCubeSaver::csCubeSaver (iBase* pParent)
 {
   SCF_CONSTRUCT_IBASE (pParent);
+  SCF_CONSTRUCT_EMBEDDED_IBASE(scfiPlugIn);
 }
 
 csCubeSaver::~csCubeSaver ()
 {
-}
-
-bool csCubeSaver::Initialize (iSystem* system)
-{
-  sys = system;
-  return true;
 }
 
 void csCubeSaver::WriteDown (iBase* /*obj*/, iStrVector *str,
@@ -389,6 +387,3 @@ void csCubeSaver::WriteDown (iBase* /*obj*/, iStrVector *str,
   str->Push(csStrNew(buf));
   fact->DecRef();
 }
-
-//---------------------------------------------------------------------------
-

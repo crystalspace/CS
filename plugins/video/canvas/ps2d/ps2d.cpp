@@ -18,11 +18,7 @@
 
 #include <stdarg.h>
 #include "cssysdef.h"
-#include "csutil/scf.h"
-#include "csutil/csstring.h"
 #include "video/canvas/ps2d/ps2d.h"
-#include "video/canvas/common/scancode.h"
-#include "csgeom/csrect.h"
 #include "isys/system.h"
 
 #include "SDL/SDL.h"
@@ -37,17 +33,13 @@ SCF_EXPORT_CLASS_TABLE (ps2d)
     "Playstation 2 2D graphics driver (ps2d) for Crystal Space")
 SCF_EXPORT_CLASS_TABLE_END
 
-SCF_IMPLEMENT_IBASE (csGraphics2Dps2)
-  SCF_IMPLEMENTS_INTERFACE (iPlugIn)
-  SCF_IMPLEMENTS_INTERFACE (iGraphics2D)
+SCF_IMPLEMENT_IBASE_EXT (csGraphics2Dps2)
   SCF_IMPLEMENTS_INTERFACE (iEventPlug)
-SCF_IMPLEMENT_IBASE_END
+SCF_IMPLEMENT_IBASE_EXT_END
 
 csGraphics2Dps2::csGraphics2Dps2 (iBase *iParent) :
-  csGraphics2D ()
+  csGraphics2D (iParent)
 {
-  SCF_CONSTRUCT_IBASE (iParent);
-
   EventOutlet = NULL;
 }
 
@@ -58,7 +50,7 @@ csGraphics2Dps2::csGraphics2Dps2 (iBase *iParent) :
 #define VIRTUAL_WIDTH 640
 #define VIRTUAL_HEIGHT 480
 
-unsigned char framebuffer[VIRTUAL_WIDTH*VIRTUAL_HEIGHT];
+static unsigned char framebuffer[VIRTUAL_WIDTH*VIRTUAL_HEIGHT];
 
 unsigned char *csGraphics2Dps2::GetPixelAt (int x, int y) {
   return &framebuffer[x+(y*VIRTUAL_WIDTH)];
@@ -66,16 +58,12 @@ unsigned char *csGraphics2Dps2::GetPixelAt (int x, int y) {
 
 bool csGraphics2Dps2::Initialize (iSystem *pSystem)
 {
-  printf("csGraphics2Dps2::Initialize\n");
-
   if (!csGraphics2D::Initialize (pSystem))
     return false;
-
   // Tell system driver to call us on every frame
-  System->CallOnEvents (this, CSMASK_Nothing);
+  System->CallOnEvents (&scfiPlugIn, CSMASK_Nothing);
   // Create the event outlet
   EventOutlet = System->CreateEventOutlet (this);
-
   return true;
 }
 
@@ -109,7 +97,6 @@ void csGraphics2Dps2::Close ()
 bool csGraphics2Dps2::BeginDraw ()
 {
   csGraphics2D::BeginDraw ();
-
   return true;
 }
 
@@ -118,17 +105,14 @@ void csGraphics2Dps2::FinishDraw ()
   csGraphics2D::FinishDraw ();
 }
 
-bool csGraphics2Dps2::PerformExtension (const char *iCommand, ...) {
-  return true;
+void csGraphics2Dps2::Print (csRect* /*area*/)
+{
+  SDL_GL_SwapBuffers();
 }
 
-void csGraphics2Dps2::Print (csRect* /*area*/) {
-//	printf("print\n");
-
-    SDL_GL_SwapBuffers();
-}
-
-void csGraphics2Dps2::DrawLine (float x1, float y1, float x2, float y2, int color) {
+void csGraphics2Dps2::DrawLine (float x1, float y1, float x2, float y2,
+  int color)
+{
 /*
     glBegin(GL_LINE);
     glDisable(GL_TEXTURE_2D);
@@ -139,22 +123,24 @@ void csGraphics2Dps2::DrawLine (float x1, float y1, float x2, float y2, int colo
 */
 }
 
-void csGraphics2Dps2::Write (int x, int y, int fg, int bg, const char *text) {
-//	printf("write\n");
+void csGraphics2Dps2::Write (int x, int y, int fg, int bg, const char *text)
+{
 }
 
-void csGraphics2Dps2::Clear (int color) {
-//	printf("clear\n");
-/*	for(int i=0; i<VIRTUAL_WIDTH*VIRTUAL_HEIGHT; i++) {
-		framebuffer[i]=color;
-	}*/
-    memset(framebuffer, color, VIRTUAL_WIDTH*VIRTUAL_HEIGHT);
+void csGraphics2Dps2::Clear (int color)
+{
+/*
+  for(int i=0; i<VIRTUAL_WIDTH*VIRTUAL_HEIGHT; i++)
+  {
+    framebuffer[i]=color;
+  }
+*/
+  memset(framebuffer, color, VIRTUAL_WIDTH*VIRTUAL_HEIGHT);
 }
 
-void csGraphics2Dps2::SetRGB (int i, int r, int g, int b) {
+void csGraphics2Dps2::SetRGB (int i, int r, int g, int b)
+{
   csGraphics2D::SetRGB (i, r, g, b);
-
-//  printf("setrgb\n");
 }
 
 bool csGraphics2Dps2::SetMousePosition (int x, int y)
@@ -167,7 +153,7 @@ bool csGraphics2Dps2::SetMouseCursor (csMouseCursorID iShape)
   return true;
 }
 
-int translate_key (SDL_Event *ev)
+static int translate_key (SDL_Event *ev)
 {
   switch(ev->key.keysym.sym)
   {
@@ -237,10 +223,10 @@ int translate_key (SDL_Event *ev)
   }
 }
 
-bool csGraphics2Dps2::HandleEvent (iEvent &/*Event*/)
+bool csGraphics2Dps2::HandleEvent (iEvent&)
 {
   SDL_Event ev;
-  while ( SDL_PollEvent(&ev) )
+  while (SDL_PollEvent(&ev))
   {
     switch (ev.type)
     {
@@ -269,11 +255,10 @@ bool csGraphics2Dps2::HandleEvent (iEvent &/*Event*/)
                                           0;
 
           if (btn)
-            EventOutlet->Mouse ( btn, (bool)(ev.type==SDL_MOUSEBUTTONDOWN),
+            EventOutlet->Mouse (btn, (bool)(ev.type==SDL_MOUSEBUTTONDOWN),
                                  ev.button.x, ev.button.y);
       }
     }
   }
   return false;
 }
-

@@ -61,23 +61,39 @@ CS_TOKEN_DEF_END
 
 SCF_IMPLEMENT_IBASE (csMetaBallFactoryLoader)
   SCF_IMPLEMENTS_INTERFACE (iLoaderPlugIn)
-  SCF_IMPLEMENTS_INTERFACE (iPlugIn)
+  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iPlugIn)
 SCF_IMPLEMENT_IBASE_END
+
+SCF_IMPLEMENT_EMBEDDED_IBASE (csMetaBallFactoryLoader::eiPlugIn)
+  SCF_IMPLEMENTS_INTERFACE (iPlugIn)
+SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 SCF_IMPLEMENT_IBASE (csMetaBallFactorySaver)
   SCF_IMPLEMENTS_INTERFACE (iSaverPlugIn)
-  SCF_IMPLEMENTS_INTERFACE (iPlugIn)
+  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iPlugIn)
 SCF_IMPLEMENT_IBASE_END
+
+SCF_IMPLEMENT_EMBEDDED_IBASE (csMetaBallFactorySaver::eiPlugIn)
+  SCF_IMPLEMENTS_INTERFACE (iPlugIn)
+SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 SCF_IMPLEMENT_IBASE (csMetaBallLoader)
   SCF_IMPLEMENTS_INTERFACE (iLoaderPlugIn)
-  SCF_IMPLEMENTS_INTERFACE (iPlugIn)
+  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iPlugIn)
 SCF_IMPLEMENT_IBASE_END
+
+SCF_IMPLEMENT_EMBEDDED_IBASE (csMetaBallLoader::eiPlugIn)
+  SCF_IMPLEMENTS_INTERFACE (iPlugIn)
+SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 SCF_IMPLEMENT_IBASE (csMetaBallSaver)
   SCF_IMPLEMENTS_INTERFACE (iSaverPlugIn)
-  SCF_IMPLEMENTS_INTERFACE (iPlugIn)
+  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iPlugIn)
 SCF_IMPLEMENT_IBASE_END
+
+SCF_IMPLEMENT_EMBEDDED_IBASE (csMetaBallSaver::eiPlugIn)
+  SCF_IMPLEMENTS_INTERFACE (iPlugIn)
+SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 SCF_IMPLEMENT_FACTORY (csMetaBallFactoryLoader)
 SCF_IMPLEMENT_FACTORY (csMetaBallFactorySaver)
@@ -98,16 +114,11 @@ SCF_EXPORT_CLASS_TABLE_END
 csMetaBallFactoryLoader::csMetaBallFactoryLoader (iBase* pParent)
 {
   SCF_CONSTRUCT_IBASE (pParent);
+  SCF_CONSTRUCT_EMBEDDED_IBASE(scfiPlugIn);
 }
 
 csMetaBallFactoryLoader::~csMetaBallFactoryLoader ()
 {
-}
-
-bool csMetaBallFactoryLoader::Initialize (iSystem* system)
-{
-  sys = system;
-  return true;
 }
 
 iBase* csMetaBallFactoryLoader::Parse (const char* /*string*/,
@@ -131,16 +142,11 @@ iBase* csMetaBallFactoryLoader::Parse (const char* /*string*/,
 csMetaBallFactorySaver::csMetaBallFactorySaver (iBase* pParent)
 {
   SCF_CONSTRUCT_IBASE (pParent);
+  SCF_CONSTRUCT_EMBEDDED_IBASE(scfiPlugIn);
 }
 
 csMetaBallFactorySaver::~csMetaBallFactorySaver ()
 {
-}
-
-bool csMetaBallFactorySaver::Initialize (iSystem* system)
-{
-  sys = system;
-  return true;
 }
 
 #define MAXLINE 100 /* max number of chars per line... */
@@ -156,16 +162,11 @@ void csMetaBallFactorySaver::WriteDown (iBase* /*obj*/, iStrVector * /*str*/,
 csMetaBallLoader::csMetaBallLoader (iBase* pParent)
 {
   SCF_CONSTRUCT_IBASE (pParent);
+  SCF_CONSTRUCT_EMBEDDED_IBASE(scfiPlugIn);
 }
 
 csMetaBallLoader::~csMetaBallLoader ()
 {
-}
-
-bool csMetaBallLoader::Initialize (iSystem* system)
-{
-  sys = system;
-  return true;
 }
 
 static UInt ParseMixmode (char* buf)
@@ -355,16 +356,11 @@ iBase* csMetaBallLoader::Parse (const char* string, iEngine* engine,
 csMetaBallSaver::csMetaBallSaver (iBase* pParent)
 {
   SCF_CONSTRUCT_IBASE (pParent);
+  SCF_CONSTRUCT_EMBEDDED_IBASE(scfiPlugIn);
 }
 
 csMetaBallSaver::~csMetaBallSaver ()
 {
-}
-
-bool csMetaBallSaver::Initialize (iSystem* system)
-{
-  sys = system;
-  return true;
 }
 
 static void WriteMixmode(iStrVector *str, UInt mixmode)
@@ -441,8 +437,4 @@ void csMetaBallSaver::WriteDown (iBase* obj, iStrVector *str,
   fact->DecRef();
   mesh->DecRef();
   state->DecRef();
-
 }
-
-//---------------------------------------------------------------------------
-

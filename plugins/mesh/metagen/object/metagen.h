@@ -29,6 +29,7 @@
 #include "csgeom/tesselat.h"
 #include "imesh/object.h"
 #include "imesh/metagen.h"
+#include "isys/plugin.h"
 #include "csutil/csvector.h"
 #include "csutil/cscolor.h"
 
@@ -232,9 +233,9 @@ public:
   void _2coord( int x, int y, int z, csVector3 &r);
   int check_cell_assume_inside (const csTesselator::GridCell &c);
   void CreateLighting ( iLight **, int, iMovable *);
-  const int GetResX();
-  const int GetResY();
-  const int GetResZ();
+  int GetResX();
+  int GetResY();
+  int GetResZ();
   void RemapVertices( int* mapping, int num );
   void CleanupSurface();
 
@@ -338,18 +339,22 @@ public:
 class csMetaGenType : public iMeshObjectType
 {
 public:
+  SCF_DECLARE_IBASE;
 
   csMetaGenType ( iBase * );
   virtual ~csMetaGenType();
-  virtual bool Initialize ( iSystem *sys );
-
-  SCF_DECLARE_IBASE;
-
   virtual iMeshObjectFactory* NewFactory();
   virtual uint32 GetFeatures () const
   {
     return ALL_FEATURES;
   }
+
+  struct eiPlugIn : public iPlugIn
+  {
+    SCF_DECLARE_EMBEDDED_IBASE(csMetaGenType);
+    virtual bool Initialize (iSystem*) { return true; }
+    virtual bool HandleEvent (iEvent&) { return false; }
+  } scfiPlugIn;
 };
 
 #endif // __METAGEN_H__

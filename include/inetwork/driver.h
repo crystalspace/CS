@@ -21,7 +21,6 @@
 #define __INETWORK_DRIVER_H__
 
 #include "csutil/scf.h"
-#include "isys/plugin.h"
 
 /**
  * Potential network driver error codes.
@@ -126,7 +125,7 @@ SCF_VERSION (iNetworkDriver, 0, 0, 1);
  * This is the network driver interface for CS.  It represents a plug-in
  * network driver module.  All network drivers must implement this interface.
  */
-struct iNetworkDriver : public iPlugIn
+struct iNetworkDriver : public iBase
 {
   /**
    * Create a new network connection.  The 'target' parameter is driver
@@ -162,9 +161,6 @@ struct iNetworkDriver : public iPlugIn
 
   /// Retrieve the code for the last error encountered.
   virtual csNetworkDriverError GetLastError() const = 0;
-
-  // iPlugIn interface.
-  virtual bool Initialize(iSystem*) = 0;
 };
 
 #endif // __INETWORK_DRIVER_H__

@@ -27,9 +27,13 @@ CS_IMPLEMENT_PLUGIN
 
 SCF_IMPLEMENT_IBASE (csArtsRenderer)
   SCF_IMPLEMENTS_INTERFACE (iSoundRender)
-  SCF_IMPLEMENTS_INTERFACE (iPlugIn)
   SCF_IMPLEMENTS_INTERFACE (iSoundListener)
+  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iPlugIn)
 SCF_IMPLEMENT_IBASE_END
+
+SCF_IMPLEMENT_EMBEDDED_IBASE (csArtsRenderer::eiPlugIn)
+  SCF_IMPLEMENTS_INTERFACE (iPlugIn)
+SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 SCF_IMPLEMENT_FACTORY (csArtsRenderer);
 
@@ -41,6 +45,7 @@ SCF_EXPORT_CLASS_TABLE_END
 csArtsRenderer::csArtsRenderer (iBase *pParent)
 {
   SCF_CONSTRUCT_IBASE (pParent);
+  SCF_CONSTRUCT_EMBEDDED_IBASE(scfiPlugIn);
   dispatcher = NULL;
   bInit = false;
   SetVolume (1.0f);
@@ -63,15 +68,12 @@ bool csArtsRenderer::Initialize (iSystem *iSys)
   dispatcher = new Arts::Dispatcher;
   server = Arts::Reference (ARTS_SIMPLESOUNDSERVER);
   if (server.isNull ())
-  {
-    iSys->Printf (CS_MSG_WARNING, "Couldn't get a reference to the soundserver !\n");
-    iSys->Printf (CS_MSG_WARNING, 
-		  "Check whether you have the aRts server running (usually called \"artsd\")\n");
-  }
+    iSys->Printf (CS_MSG_WARNING,
+      "Couldn't get a reference to the soundserver !\n"
+      "Check whether you have the Arts server running "
+      "(usually called \"artsd\")\n");
   else
-  {
     bInit = true;
-  }
   return bInit;
 }
 
@@ -91,14 +93,13 @@ void csArtsRenderer::SetVolume (float vol)
 {
   if (bInit)
   {
-    /// Skip through all the soundobjects we handed out and set the volume for each.
-    /// Note that we could just insert a stereovolume control on the servers effect stack.
-    /// The upside would be easier handling here, the downside is we would modify the 
-    /// volume of other sounds too, like the napstered mp3 playing in the background.
-
+    // Skip through all the soundobjects we handed out and set the volume for
+    // each.  Note that we could just insert a stereovolume control on the
+    // servers effect stack.  The upside would be easier handling here, the
+    // downside is we would modify the volume of other sounds too, like the
+    // napstered mp3 playing in the background.
     for (int i=0; i<vObject.Length (); i++)
       vObject.Get(i)->SetVolume (vol);
-
   }
   volume = vol;
 }
@@ -150,7 +151,7 @@ iSoundListener *csArtsRenderer::GetListener ()
   return this;
 }
 
-void csArtsRenderer::SetDirection (const csVector3 &Front, const csVector3 &Top)
+void csArtsRenderer::SetDirection(const csVector3 &Front, const csVector3 &Top)
 {
   if (bInit)
   {
@@ -264,4 +265,3 @@ void csArtsRenderer::SetEnvironment (csSoundEnvironment env)
   SetDopplerFactor (enviro[n].doppFact);
   environment = env;
 }
-

@@ -27,6 +27,7 @@
 #include "csengine/thing.h"
 #include "csutil/csobject.h"
 #include "ivideo/graph3d.h"
+#include "isys/plugin.h"
 #include "isys/system.h"
 #include "iengine/engine.h"
 #include "iutil/config.h"
@@ -954,6 +955,13 @@ public:
 
   /// We need to handle some events
   virtual bool HandleEvent (iEvent &Event);
+
+  struct eiPlugIn : public iPlugIn
+  {
+    SCF_DECLARE_EMBEDDED_IBASE(csEngine);
+    virtual bool Initialize (iSystem* p) { return scfParent->Initialize(p); }
+    virtual bool HandleEvent (iEvent& e) { return scfParent->HandleEvent(e); }
+  } scfiPlugIn;
 
   //--------------------- iEngine interface implementation --------------------
 

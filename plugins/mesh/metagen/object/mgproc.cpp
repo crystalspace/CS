@@ -375,17 +375,17 @@ int csMetaGen::CalcLinSurf( MetaBone* bone )
   return _tess;
 }
 
-const int csMetaGen::GetResX()
+int csMetaGen::GetResX()
 {
   return RES_X;
 }
 
-const int csMetaGen::GetResY()
+int csMetaGen::GetResY()
 {
   return RES_Y;
 }
 
-const int csMetaGen::GetResZ()
+int csMetaGen::GetResZ()
 {
   return RES_Z;
 }

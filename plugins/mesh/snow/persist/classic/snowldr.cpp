@@ -61,23 +61,39 @@ CS_TOKEN_DEF_END
 
 SCF_IMPLEMENT_IBASE (csSnowFactoryLoader)
   SCF_IMPLEMENTS_INTERFACE (iLoaderPlugIn)
-  SCF_IMPLEMENTS_INTERFACE (iPlugIn)
+  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iPlugIn)
 SCF_IMPLEMENT_IBASE_END
+
+SCF_IMPLEMENT_EMBEDDED_IBASE (csSnowFactoryLoader::eiPlugIn)
+  SCF_IMPLEMENTS_INTERFACE (iPlugIn)
+SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 SCF_IMPLEMENT_IBASE (csSnowFactorySaver)
   SCF_IMPLEMENTS_INTERFACE (iSaverPlugIn)
-  SCF_IMPLEMENTS_INTERFACE (iPlugIn)
+  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iPlugIn)
 SCF_IMPLEMENT_IBASE_END
+
+SCF_IMPLEMENT_EMBEDDED_IBASE (csSnowFactorySaver::eiPlugIn)
+  SCF_IMPLEMENTS_INTERFACE (iPlugIn)
+SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 SCF_IMPLEMENT_IBASE (csSnowLoader)
   SCF_IMPLEMENTS_INTERFACE (iLoaderPlugIn)
-  SCF_IMPLEMENTS_INTERFACE (iPlugIn)
+  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iPlugIn)
 SCF_IMPLEMENT_IBASE_END
+
+SCF_IMPLEMENT_EMBEDDED_IBASE (csSnowLoader::eiPlugIn)
+  SCF_IMPLEMENTS_INTERFACE (iPlugIn)
+SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 SCF_IMPLEMENT_IBASE (csSnowSaver)
   SCF_IMPLEMENTS_INTERFACE (iSaverPlugIn)
-  SCF_IMPLEMENTS_INTERFACE (iPlugIn)
+  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iPlugIn)
 SCF_IMPLEMENT_IBASE_END
+
+SCF_IMPLEMENT_EMBEDDED_IBASE (csSnowSaver::eiPlugIn)
+  SCF_IMPLEMENTS_INTERFACE (iPlugIn)
+SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 SCF_IMPLEMENT_FACTORY (csSnowFactoryLoader)
 SCF_IMPLEMENT_FACTORY (csSnowFactorySaver)
@@ -85,7 +101,8 @@ SCF_IMPLEMENT_FACTORY (csSnowLoader)
 SCF_IMPLEMENT_FACTORY (csSnowSaver)
 
 SCF_EXPORT_CLASS_TABLE (snowldr)
-  SCF_EXPORT_CLASS (csSnowFactoryLoader, "crystalspace.mesh.loader.factory.snow",
+  SCF_EXPORT_CLASS (csSnowFactoryLoader,
+    "crystalspace.mesh.loader.factory.snow",
     "Crystal Space Snow Factory Loader")
   SCF_EXPORT_CLASS (csSnowFactorySaver, "crystalspace.mesh.saver.factory.snow",
     "Crystal Space Snow Factory Saver")
@@ -98,16 +115,11 @@ SCF_EXPORT_CLASS_TABLE_END
 csSnowFactoryLoader::csSnowFactoryLoader (iBase* pParent)
 {
   SCF_CONSTRUCT_IBASE (pParent);
+  SCF_CONSTRUCT_EMBEDDED_IBASE(scfiPlugIn);
 }
 
 csSnowFactoryLoader::~csSnowFactoryLoader ()
 {
-}
-
-bool csSnowFactoryLoader::Initialize (iSystem* system)
-{
-  sys = system;
-  return true;
 }
 
 iBase* csSnowFactoryLoader::Parse (const char* /*string*/,
@@ -131,16 +143,11 @@ iBase* csSnowFactoryLoader::Parse (const char* /*string*/,
 csSnowFactorySaver::csSnowFactorySaver (iBase* pParent)
 {
   SCF_CONSTRUCT_IBASE (pParent);
+  SCF_CONSTRUCT_EMBEDDED_IBASE(scfiPlugIn);
 }
 
 csSnowFactorySaver::~csSnowFactorySaver ()
 {
-}
-
-bool csSnowFactorySaver::Initialize (iSystem* system)
-{
-  sys = system;
-  return true;
 }
 
 #define MAXLINE 100 /* max number of chars per line... */
@@ -173,16 +180,11 @@ void csSnowFactorySaver::WriteDown (iBase* /*obj*/, iStrVector * /*str*/,
 csSnowLoader::csSnowLoader (iBase* pParent)
 {
   SCF_CONSTRUCT_IBASE (pParent);
+  SCF_CONSTRUCT_EMBEDDED_IBASE(scfiPlugIn);
 }
 
 csSnowLoader::~csSnowLoader ()
 {
-}
-
-bool csSnowLoader::Initialize (iSystem* system)
-{
-  sys = system;
-  return true;
 }
 
 static UInt ParseMixmode (char* buf)
@@ -278,7 +280,7 @@ iBase* csSnowLoader::Parse (const char* string, iEngine* engine,
       case CS_TOKEN_COLOR:
 	{
 	  csColor color;
-	  csScanStr (params, "%f,%f,%f", &color.red, &color.green, &color.blue);
+	  csScanStr(params, "%f,%f,%f", &color.red, &color.green, &color.blue);
 	  partstate->SetColor (color);
 	}
 	break;
@@ -374,16 +376,11 @@ iBase* csSnowLoader::Parse (const char* string, iEngine* engine,
 csSnowSaver::csSnowSaver (iBase* pParent)
 {
   SCF_CONSTRUCT_IBASE (pParent);
+  SCF_CONSTRUCT_EMBEDDED_IBASE(scfiPlugIn);
 }
 
 csSnowSaver::~csSnowSaver ()
 {
-}
-
-bool csSnowSaver::Initialize (iSystem* system)
-{
-  sys = system;
-  return true;
 }
 
 void csSnowSaver::WriteDown (iBase* obj, iStrVector *str,
@@ -431,7 +428,3 @@ void csSnowSaver::WriteDown (iBase* obj, iStrVector *str,
   partstate->DecRef();
   state->DecRef();
 }
-
-
-//---------------------------------------------------------------------------
-

@@ -27,21 +27,21 @@ struct csLoaderPluginRec
   char* ShortName;
   char* ClassID;
   iLoaderPlugIn* Plugin;
-  
+
   csLoaderPluginRec (const char* iShortName,
 	const char *iClassID, iLoaderPlugIn *iPlugin)
-  { 
+  {
     if (iShortName) ShortName = csStrNew (iShortName);
     else ShortName = NULL;
     ClassID = csStrNew (iClassID);
-    Plugin = iPlugin; 
+    Plugin = iPlugin;
   }
 
   ~csLoaderPluginRec ()
-  { 
-    delete [] ShortName; 
-    delete [] ClassID; 
-  }                                                                                  
+  {
+    delete [] ShortName;
+    delete [] ClassID;
+  }
 };
 
 csLoader::csLoadedPluginVector::csLoadedPluginVector (
@@ -58,8 +58,17 @@ csLoader::csLoadedPluginVector::~csLoadedPluginVector ()
 bool csLoader::csLoadedPluginVector::FreeItem (csSome Item)
 {
   csLoaderPluginRec *rec = (csLoaderPluginRec*)Item;
-  if (rec->Plugin) {
-    if (System) System->UnloadPlugIn(rec->Plugin);
+  if (rec->Plugin)
+  {
+    if (System)
+    {
+      iPlugIn* p = SCF_QUERY_INTERFACE(rec->Plugin, iPlugIn);
+      if (p)
+      {
+        System->UnloadPlugIn(p);
+	p->DecRef();
+      }
+    }
     rec->Plugin->DecRef ();
   }
   delete rec;
@@ -70,12 +79,12 @@ csLoaderPluginRec* csLoader::csLoadedPluginVector::FindPlugInRec (
 	const char* name)
 {
   int i;
-  for (i=0 ; i<Length () ; i++) 
+  for (i=0 ; i<Length () ; i++)
   {
     csLoaderPluginRec* pl = (csLoaderPluginRec*)Get (i);
-    if (pl->ShortName && !strcmp (name, pl->ShortName)) 
+    if (pl->ShortName && !strcmp (name, pl->ShortName))
       return pl;
-    if (!strcmp (name, pl->ClassID)) 
+    if (!strcmp (name, pl->ClassID))
       return pl;
   }
   return NULL;

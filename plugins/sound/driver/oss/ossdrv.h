@@ -19,14 +19,12 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __SOUND_DRIVER_OSS_H__
-#define __SOUND_DRIVER_OSS_H__
-
-// SoundDriver.H
-// csSoundDriverOSS class.
+#ifndef __CS_OSSDRV_H__
+#define __CS_OSSDRV_H__
 
 #include "csutil/scf.h"
 #include "isound/driver.h"
+#include "isys/plugin.h"
 
 #include <sys/types.h>
 #include <sys/ipc.h>
@@ -35,29 +33,27 @@
 #include <sys/msg.h>
 #include <sys/time.h>
 
-
 #define SOUND_DEVICE "/dev/dsp"
 
 extern bool AudioDeviceBlocked();
 
-/// audio device
+/// Audio device.
 class AudioDevice
 {
 public:
-
   AudioDevice();
 
-  /// opens device with specified params
-  bool Open(int& frequency, bool& bit16, bool& stereo, int& fragments, int& block_size );
+  /// Open device with specified parameters.
+  bool Open(int& frequency, bool& bit16, bool& stereo, int& fragments,
+    int& block_size);
 
-  /// close device
+  /// Close device.
   void Close();
-  void Play( unsigned char *snddata, int len );
+  /// Play sound.
+  void Play(unsigned char *snddata, int len);
 
 private:
-
   int audio;
-
 };
 
 class csSoundDriverOSS : public iSoundDriver
@@ -92,6 +88,14 @@ public:
   int GetFrequency();
   bool IsHandleVoidSound();
   
+  struct eiPlugIn : public iPlugIn
+  {
+    SCF_DECLARE_EMBEDDED_IBASE(csSoundDriverOSS);
+    virtual bool Initialize (iSystem* p)
+    { scfParent->m_piSystem = p; return true; }
+    virtual bool HandleEvent (iEvent&) { return false; }
+  } scfiPlugIn;
+
 private:
   // used to setup timer when background=true (not currently used)
   bool SetupTimer( int nTimesPerSecond );
@@ -100,9 +104,8 @@ private:
   struct sigaction oldact;
   struct itimerval otime;
   bool bTimerInstalled, bSignalInstalled;
- public:
+public:
   iSoundRender *m_piSoundRender;
 };
 
-#endif	//__SOUND_DRIVER_OSS_H__
-
+#endif // __CS_OSSDRV_H__

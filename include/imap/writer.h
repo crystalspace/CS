@@ -21,7 +21,6 @@
 #define __IMAP_SAVER_H__
 
 #include "csutil/scf.h"
-#include "isys/plugin.h"
 
 struct iEngine;
 struct iStrVector;
@@ -31,14 +30,14 @@ SCF_VERSION (iSaverPlugIn, 0, 0, 1);
 /**
  * This is a plugin to save with.
  */
-struct iSaverPlugIn : public iPlugIn
+struct iSaverPlugIn : public iBase
 {
   /** 
    *  Take a given object and push description onto the given string vector.
    *  Concatenating the strings in the vector will create the saved text.
    *  Or write them to a file consequtively.
    */
-  virtual void WriteDown (iBase *obj, iStrVector *str, iEngine* engine) = 0;
+  virtual void WriteDown (iBase* obj, iStrVector* str, iEngine*) = 0;
 };
 
 #endif

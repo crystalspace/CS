@@ -59,10 +59,9 @@ class csOpenGLProcSoftware : public iGraphics3D
 
   /**
    * This function is called when we are in alone_mode but the most recent
-   * software procedural texture isn't. This requires that all of the procedural
-   * textures take up the new mode.
-   * In practice however it will be rarely that procedural textures are not in 
-   * alone mode.
+   * software procedural texture isn't.  This requires that all of the
+   * procedural textures take up the new mode.  In practice however it will be
+   * rarely that procedural textures are not in alone mode.
    */
   void ConvertAloneMode ();
 
@@ -87,21 +86,27 @@ class csOpenGLProcSoftware : public iGraphics3D
    */
   bool alone_mode;
 
-  /// A vector of opengl texture handles and their software texture counterparts
+  /**
+   * A vector of opengl texture handles and their software texture
+   * counterparts.
+   */
   TxtHandleVector *txts_vector;
 
   csOpenGLProcSoftware (iBase * pParent);
   virtual ~csOpenGLProcSoftware ();
 
   /// Prepare.
-  bool Prepare 
-    (csGraphics3DOGLCommon *parent_g3d, csOpenGLProcSoftware *partner_tex, 
-    csTextureHandleOpenGL *tex, csPixelFormat *pfmt, void *buffer, bool alone_hint);
+  bool Prepare (
+    csGraphics3DOGLCommon *parent_g3d,
+    csOpenGLProcSoftware *partner_tex, 
+    csTextureHandleOpenGL *tex,
+    csPixelFormat *pfmt,
+    void *buffer,
+    bool alone_hint);
 
-  virtual bool Initialize (iSystem * /*pSystem*/){ return false; }
-  virtual bool Open (const char * /*Title*/){ return false; }
+  virtual bool Open (const char*){ return false; }
   virtual void Close () {}
-  virtual void SetDimensions (int /*width*/, int /*height*/){}
+  virtual void SetDimensions (int, int) {}
 
   virtual bool BeginDraw (int DrawFlags);
   virtual void FinishDraw ();
@@ -157,7 +162,7 @@ class csOpenGLProcSoftware : public iGraphics3D
   virtual iTextureManager *GetTextureManager ();
   virtual iHalo *CreateHalo (float iR, float iG, float iB, 
 			     unsigned char *iAlpha, int iWidth, int iHeight);
-  virtual void DrawPixmap (iTextureHandle *hTex, int sx, int sy, int sw, int sh,
+  virtual void DrawPixmap (iTextureHandle*, int sx, int sy, int sw, int sh,
     int tx, int ty, int tw, int th, uint8 Alpha);
 };
 
@@ -169,9 +174,9 @@ class csOpenGLProcSoftware2D : public iGraphics2D
   int ConvertColour (int col)
   {
     return soft_texman->FindRGB 
-      (((col & gl_pfmt->RedMask) >> gl_pfmt->RedShift) << (8-gl_pfmt->RedBits),
-       ((col&gl_pfmt->GreenMask) >> gl_pfmt->GreenShift) << (8-gl_pfmt->GreenBits),
-       ((col & gl_pfmt->BlueMask) >> gl_pfmt->BlueShift) << (8-gl_pfmt->BlueBits));
+      (((col&gl_pfmt->RedMask  )>>gl_pfmt->RedShift  )<<(8-gl_pfmt->RedBits  ),
+       ((col&gl_pfmt->GreenMask)>>gl_pfmt->GreenShift)<<(8-gl_pfmt->GreenBits),
+       ((col&gl_pfmt->BlueMask )>>gl_pfmt->BlueShift )<<(8-gl_pfmt->BlueBits));
   }
 
   iTextureManager *soft_texman;
@@ -190,12 +195,7 @@ class csOpenGLProcSoftware2D : public iGraphics2D
 
   virtual ~csOpenGLProcSoftware2D () {};
 
-  virtual bool Initialize (iSystem* /*System*/)
-  { return false; }
-
-  virtual bool Open (const char* /*Title*/)
-  { return false; }
-
+  virtual bool Open (const char*) { return false; }
   virtual void Close () {};
 
   virtual void SetClipRect (int nMinX, int nMinY, int nMaxX, int nMaxY)
@@ -262,10 +262,10 @@ class csOpenGLProcSoftware2D : public iGraphics2D
   virtual void SetRGB (int i, int r, int g, int b)
   { g2d->SetRGB (i, r, g, b); }
   ///
-  virtual void Write (iFont *font, int x, int y, int fg, int bg, const char *str)
+  virtual void Write (iFont *font, int x, int y, int fg, int bg, const char *s)
   { 
     int cbg = (bg == -1) ? ConvertColour (bg) : bg;
-    g2d->Write (font, x, y, ConvertColour (fg), cbg, str);
+    g2d->Write (font, x, y, ConvertColour (fg), cbg, s);
   }
 
   virtual bool PerformExtension (const char *args)
@@ -314,4 +314,5 @@ class csOpenGLProcSoftware2D : public iGraphics2D
   virtual iFontServer *GetFontServer ()
   { return g2d->GetFontServer (); }
 };
+
 #endif // _OGL_PROCEXSOFT_H_

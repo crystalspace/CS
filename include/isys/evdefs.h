@@ -337,15 +337,6 @@ enum
   cscmdCommandLineHelp,
 
   /**
-   * This message is sent to the client associated with a console
-   * when console visibility status changes.
-   *<pre>
-   * IN: (iConsoleOutput *) the console object
-   *</pre>
-   */
-  cscmdConsoleStatusChange,
-
-  /**
    * This event is broadcasted by the texture manaher when the SetPalette
    * method is called.
    *<pre>

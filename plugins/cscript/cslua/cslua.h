@@ -21,11 +21,12 @@
 #define __CSPYTHON_H__
 
 #include "ivaria/script.h"
+#include "isys/plugin.h"
 #include "isys/system.h"
 #include "cssys/csinput.h"
 #include "csutil/csvector.h"
 
-class csLua:public iScript {
+class csLua : public iScript {
 public:
   csLua(iBase *iParent);
   virtual ~csLua();
@@ -38,11 +39,18 @@ public:
   bool RunText(const char *Text);
   bool LoadModule(const char *Text);
   bool Store(const char* type, const char* name, void* data);
-
   void ShowError();
   void Print(bool Error, const char *msg);
 
   SCF_DECLARE_IBASE;
+
+  // Implement iPlugIn interface.
+  struct eiPlugIn : public iPlugIn
+  {
+    SCF_DECLARE_EMBEDDED_IBASE(csLua);
+    virtual bool Initialize (iSystem* p) { return scfParent->Initialize(p); }
+    virtual bool HandleEvent (iEvent&) { return false; }
+  } scfiPlugIn;
 };
 
 extern csLua *thisclass;

@@ -39,7 +39,7 @@ private:
   virtual int translate_key(ggi_event *ev);
 
 public:
-  SCF_DECLARE_IBASE;
+  SCF_DECLARE_IBASE_EXT(csGraphics2D);
 
   csGraphics2DGGI (iBase *iParent);
   virtual ~csGraphics2DGGI ();
@@ -56,7 +56,7 @@ public:
   /// Called on every frame by system driver
   virtual bool HandleEvent (iEvent &Event);
 
-  //------------------------- iEventPlug interface ---------------------------//
+  //------------------------ iEventPlug interface ---------------------------//
 
   virtual unsigned GetPotentiallyConflictingEvents ()
   { return CSEVTYPE_Keyboard | CSEVTYPE_Mouse; }

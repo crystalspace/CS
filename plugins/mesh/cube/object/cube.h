@@ -5,12 +5,12 @@
     modify it under the terms of the GNU Library General Public
     License as published by the Free Software Foundation; either
     version 2 of the License, or (at your option) any later version.
-  
+
     This library is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
     Library General Public License for more details.
-  
+
     You should have received a copy of the GNU Library General Public
     License along with this library; if not, write to the Free
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
@@ -26,6 +26,7 @@
 #include "imesh/cube.h"
 #include "ivideo/graph3d.h"
 #include "iutil/config.h"
+#include "isys/plugin.h"
 
 struct iMaterialWrapper;
 class csCubeMeshObjectFactory;
@@ -95,7 +96,7 @@ public:
   	float fov, float sx, float sy,
 	const csReversibleTransform& trans, csBox2& sbox, csBox3& cbox);
 
-  ///------------------------ iMeshObject implementation ------------------------
+  //----------------------- iMeshObject implementation ------------------------
   SCF_DECLARE_IBASE;
 
   virtual iMeshObjectFactory* GetFactory () const { return ifactory; }
@@ -226,26 +227,21 @@ private:
   UInt default_MixMode;
 
 public:
-  /// Constructor.
-  csCubeMeshObjectType (iBase*);
-
-  /// Destructor.
-  virtual ~csCubeMeshObjectType ();
-
-  /// Register plugin with the system driver
-  virtual bool Initialize (iSystem *pSystem);
-
-  //------------------------ iMeshObjectType implementation --------------
   SCF_DECLARE_IBASE;
 
+  /// Constructor.
+  csCubeMeshObjectType (iBase*);
+  /// Destructor.
+  virtual ~csCubeMeshObjectType ();
   /// Draw.
   virtual iMeshObjectFactory* NewFactory ();
+  /// Get features.
   virtual uint32 GetFeatures () const
   {
     return ALL_FEATURES;
   }
 
-  ///------------------- iConfig interface implementation -------------------
+  //------------------- iConfig interface implementation -------------------
   struct csCubeConfig : public iConfig
   {
     SCF_DECLARE_EMBEDDED_IBASE (csCubeMeshObjectType);
@@ -254,7 +250,14 @@ public:
     virtual bool GetOption (int id, csVariant* value);
   } scfiConfig;
   friend struct csCubeConfig;
+
+  //------------------- iPlugIn interface implementation -------------------
+  struct eiPlugIn : public iPlugIn
+  {
+    SCF_DECLARE_EMBEDDED_IBASE(csCubeMeshObjectType);
+    virtual bool Initialize (iSystem*) { return true; }
+    virtual bool HandleEvent (iEvent&) { return false; }
+  } scfiPlugIn;
 };
 
 #endif // _CUBE_H_
-

@@ -216,9 +216,21 @@ int csGraphics3DSoftwareCommon::filter_bf = 1;
 #define SCANPROC_PI_TILE_TEX_GOUFXKEY_ZTEST  0x27
 
 ///---------------------------------------------------------------------------
-csGraphics3DSoftwareCommon::csGraphics3DSoftwareCommon () :
+SCF_IMPLEMENT_IBASE(csGraphics3DSoftwareCommon)
+  SCF_IMPLEMENTS_INTERFACE(iGraphics3D)
+  SCF_IMPLEMENTS_EMBEDDED_INTERFACE(iPlugIn)
+SCF_IMPLEMENT_IBASE_END
+
+SCF_IMPLEMENT_EMBEDDED_IBASE (csGraphics3DSoftwareCommon::eiPlugIn)
+  SCF_IMPLEMENTS_INTERFACE (iPlugIn)
+SCF_IMPLEMENT_EMBEDDED_IBASE_END
+
+csGraphics3DSoftwareCommon::csGraphics3DSoftwareCommon (iBase* parent) :
   G2D (NULL)
 {
+  SCF_CONSTRUCT_IBASE (parent);
+  SCF_CONSTRUCT_EMBEDDED_IBASE(scfiPlugIn);
+
   tcache = NULL;
   texman = NULL;
 
@@ -271,6 +283,12 @@ csGraphics3DSoftwareCommon::~csGraphics3DSoftwareCommon ()
   if (G2D) G2D->DecRef ();
   if (partner) partner->DecRef ();
   if (clipper) { clipper->DecRef (); clipper = NULL; cliptype = CS_CLIPPER_NONE; }
+}
+
+bool csGraphics3DSoftwareCommon::Initialize (iSystem* p)
+{
+  System = p;
+  return true;
 }
 
 void csGraphics3DSoftwareCommon::NewInitialize ()

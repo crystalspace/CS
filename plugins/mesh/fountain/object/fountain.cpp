@@ -54,7 +54,7 @@ void csFountainMeshObject::SetupObject ()
 
     float fradius = 10.0; // guessed radius of the fountain
     float height = 10.0; // guessed height
-    bbox.Set(origin - csVector3(-fradius,0,-fradius), 
+    bbox.Set(origin - csVector3(-fradius,0,-fradius),
       origin + csVector3(+fradius, +height, +fradius) );
 
     // Calculate the maximum radius.
@@ -80,8 +80,8 @@ void csFountainMeshObject::SetupObject ()
   }
 }
 
-csFountainMeshObject::csFountainMeshObject (iSystem* system, iMeshObjectFactory* factory)
-	: csParticleSystem (system, factory)
+csFountainMeshObject::csFountainMeshObject (iSystem* system,
+  iMeshObjectFactory* factory) : csParticleSystem (system, factory)
 {
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiFountainState);
   part_pos = NULL;
@@ -116,7 +116,7 @@ void csFountainMeshObject::RestartParticle (int index, float pre_move)
   float rot_around = 2.0 * PI * (rand() / (1.0+RAND_MAX));
   csXRotMatrix3 xaround(rot_around);
   dest = xaround * dest;
-  // now dest point to somewhere in a circular cur of a sphere around the 
+  // now dest point to somewhere in a circular cur of a sphere around the
   // x axis.
 
   // direct the fountain to the users dirction
@@ -157,7 +157,7 @@ void csFountainMeshObject::Update (cs_time elapsed_time)
   {
     part_speed[i] += accel * delta_t;
     part_pos[i] += part_speed[i] * delta_t;
-    GetParticle(i)->SetPosition (part_pos[i]); 
+    GetParticle(i)->SetPosition (part_pos[i]);
     part_age[i] += delta_t;
   }
 
@@ -185,10 +185,10 @@ SCF_IMPLEMENT_IBASE (csFountainMeshObjectFactory)
   SCF_IMPLEMENTS_INTERFACE (iMeshObjectFactory)
 SCF_IMPLEMENT_IBASE_END
 
-csFountainMeshObjectFactory::csFountainMeshObjectFactory (iBase *pParent, iSystem* system)
+csFountainMeshObjectFactory::csFountainMeshObjectFactory (iBase *p, iSystem* s)
 {
-  SCF_CONSTRUCT_IBASE (pParent);
-  csFountainMeshObjectFactory::system = system;
+  SCF_CONSTRUCT_IBASE (p);
+  system = s;
 }
 
 csFountainMeshObjectFactory::~csFountainMeshObjectFactory ()
@@ -197,7 +197,8 @@ csFountainMeshObjectFactory::~csFountainMeshObjectFactory ()
 
 iMeshObject* csFountainMeshObjectFactory::NewInstance ()
 {
-  csFountainMeshObject* cm = new csFountainMeshObject (system, (iMeshObjectFactory*)this);
+  csFountainMeshObject* cm =
+    new csFountainMeshObject (system, (iMeshObjectFactory*)this);
   iMeshObject* im = SCF_QUERY_INTERFACE (cm, iMeshObject);
   im->DecRef ();
   return im;
@@ -207,36 +208,36 @@ iMeshObject* csFountainMeshObjectFactory::NewInstance ()
 
 SCF_IMPLEMENT_IBASE (csFountainMeshObjectType)
   SCF_IMPLEMENTS_INTERFACE (iMeshObjectType)
-  SCF_IMPLEMENTS_INTERFACE (iPlugIn)
+  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iPlugIn)
 SCF_IMPLEMENT_IBASE_END
+
+SCF_IMPLEMENT_EMBEDDED_IBASE (csFountainMeshObjectType::eiPlugIn)
+  SCF_IMPLEMENTS_INTERFACE (iPlugIn)
+SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 SCF_IMPLEMENT_FACTORY (csFountainMeshObjectType)
 
 SCF_EXPORT_CLASS_TABLE (fountain)
-  SCF_EXPORT_CLASS (csFountainMeshObjectType, "crystalspace.mesh.object.fountain",
+  SCF_EXPORT_CLASS (csFountainMeshObjectType,
+    "crystalspace.mesh.object.fountain",
     "Crystal Space Fountain Mesh Type")
 SCF_EXPORT_CLASS_TABLE_END
 
 csFountainMeshObjectType::csFountainMeshObjectType (iBase* pParent)
 {
   SCF_CONSTRUCT_IBASE (pParent);
+  SCF_CONSTRUCT_EMBEDDED_IBASE(scfiPlugIn);
 }
 
 csFountainMeshObjectType::~csFountainMeshObjectType ()
 {
 }
 
-bool csFountainMeshObjectType::Initialize (iSystem* system)
-{
-  csFountainMeshObjectType::system = system;
-  return true;
-}
-
 iMeshObjectFactory* csFountainMeshObjectType::NewFactory ()
 {
-  csFountainMeshObjectFactory* cm = new csFountainMeshObjectFactory (this, system);
+  csFountainMeshObjectFactory* cm =
+    new csFountainMeshObjectFactory (this, system);
   iMeshObjectFactory* ifact = SCF_QUERY_INTERFACE (cm, iMeshObjectFactory);
   ifact->DecRef ();
   return ifact;
 }
-

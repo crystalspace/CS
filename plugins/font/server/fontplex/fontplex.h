@@ -23,6 +23,7 @@
 #define __FONTPLEX_H__
 
 #include "ivideo/fontserv.h"
+#include "isys/plugin.h"
 #include "csutil/csvector.h"
 
 /**
@@ -83,6 +84,13 @@ public:
    * through all indices starting from 0 until you get NULL.
    */
   virtual iFont *GetFont (int iIndex);
+
+  struct eiPlugIn : public iPlugIn
+  {
+    SCF_DECLARE_EMBEDDED_IBASE(csFontServerMultiplexor);
+    virtual bool Initialize (iSystem* p) { return scfParent->Initialize(p); }
+    virtual bool HandleEvent (iEvent&) { return false; }
+  } scfiPlugIn;
 };
 
 #endif // __FONTPLEX_H__

@@ -21,7 +21,6 @@
 #define __IENGINE_ENGINE_H__
 
 #include "csutil/scf.h"
-#include "isys/plugin.h"
 #include "csgeom/vector3.h"
 
 class csEngine;
@@ -139,7 +138,7 @@ SCF_VERSION (iEngine, 0, 1, 32);
  * The engine is responsible for creating new engine-specific objects
  * such as sectors, things, sprites and so on.
  */
-struct iEngine : public iPlugIn
+struct iEngine : public iBase
 {
   /**
    * @@@KLUDGE: This will no longer be needed once the iEngine interface is

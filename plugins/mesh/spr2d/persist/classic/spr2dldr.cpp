@@ -60,23 +60,39 @@ CS_TOKEN_DEF_END
 
 SCF_IMPLEMENT_IBASE (csSprite2DFactoryLoader)
   SCF_IMPLEMENTS_INTERFACE (iLoaderPlugIn)
-  SCF_IMPLEMENTS_INTERFACE (iPlugIn)
+  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iPlugIn)
 SCF_IMPLEMENT_IBASE_END
+
+SCF_IMPLEMENT_EMBEDDED_IBASE (csSprite2DFactoryLoader::eiPlugIn)
+  SCF_IMPLEMENTS_INTERFACE (iPlugIn)
+SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 SCF_IMPLEMENT_IBASE (csSprite2DFactorySaver)
   SCF_IMPLEMENTS_INTERFACE (iSaverPlugIn)
-  SCF_IMPLEMENTS_INTERFACE (iPlugIn)
+  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iPlugIn)
 SCF_IMPLEMENT_IBASE_END
+
+SCF_IMPLEMENT_EMBEDDED_IBASE (csSprite2DFactorySaver::eiPlugIn)
+  SCF_IMPLEMENTS_INTERFACE (iPlugIn)
+SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 SCF_IMPLEMENT_IBASE (csSprite2DLoader)
   SCF_IMPLEMENTS_INTERFACE (iLoaderPlugIn)
-  SCF_IMPLEMENTS_INTERFACE (iPlugIn)
+  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iPlugIn)
 SCF_IMPLEMENT_IBASE_END
+
+SCF_IMPLEMENT_EMBEDDED_IBASE (csSprite2DLoader::eiPlugIn)
+  SCF_IMPLEMENTS_INTERFACE (iPlugIn)
+SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 SCF_IMPLEMENT_IBASE (csSprite2DSaver)
   SCF_IMPLEMENTS_INTERFACE (iSaverPlugIn)
-  SCF_IMPLEMENTS_INTERFACE (iPlugIn)
+  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iPlugIn)
 SCF_IMPLEMENT_IBASE_END
+
+SCF_IMPLEMENT_EMBEDDED_IBASE (csSprite2DSaver::eiPlugIn)
+  SCF_IMPLEMENTS_INTERFACE (iPlugIn)
+SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 SCF_IMPLEMENT_FACTORY (csSprite2DFactoryLoader)
 SCF_IMPLEMENT_FACTORY (csSprite2DFactorySaver)
@@ -120,6 +136,7 @@ static void ReportError (iReporter* reporter, const char* id,
 csSprite2DFactoryLoader::csSprite2DFactoryLoader (iBase* pParent)
 {
   SCF_CONSTRUCT_IBASE (pParent);
+  SCF_CONSTRUCT_EMBEDDED_IBASE(scfiPlugIn);
   reporter = NULL;
 }
 
@@ -335,6 +352,7 @@ iBase* csSprite2DFactoryLoader::Parse (const char* string, iEngine* engine,
 csSprite2DFactorySaver::csSprite2DFactorySaver (iBase* pParent)
 {
   SCF_CONSTRUCT_IBASE (pParent);
+  SCF_CONSTRUCT_EMBEDDED_IBASE(scfiPlugIn);
   reporter = NULL;
 }
 
@@ -373,7 +391,8 @@ static void WriteMixmode(iStrVector *str, UInt mixmode)
 void csSprite2DFactorySaver::WriteDown (iBase* obj, iStrVector * str,
   iEngine* /*engine*/)
 {
-  iSprite2DFactoryState *state = SCF_QUERY_INTERFACE (obj, iSprite2DFactoryState);
+  iSprite2DFactoryState *state =
+    SCF_QUERY_INTERFACE (obj, iSprite2DFactoryState);
   char buf[MAXLINE];
 
   sprintf(buf, "MATERIAL (%s)\n", state->GetMaterialWrapper()->
@@ -393,6 +412,7 @@ void csSprite2DFactorySaver::WriteDown (iBase* obj, iStrVector * str,
 csSprite2DLoader::csSprite2DLoader (iBase* pParent)
 {
   SCF_CONSTRUCT_IBASE (pParent);
+  SCF_CONSTRUCT_EMBEDDED_IBASE(scfiPlugIn);
   reporter = NULL;
 }
 
@@ -577,6 +597,7 @@ iBase* csSprite2DLoader::Parse (const char* string, iEngine* engine,
 csSprite2DSaver::csSprite2DSaver (iBase* pParent)
 {
   SCF_CONSTRUCT_IBASE (pParent);
+  SCF_CONSTRUCT_EMBEDDED_IBASE(scfiPlugIn);
   reporter = NULL;
 }
 
@@ -645,6 +666,3 @@ void csSprite2DSaver::WriteDown (iBase* obj, iStrVector *str,
   fact->DecRef();
   state->DecRef();
 }
-
-//---------------------------------------------------------------------------
-

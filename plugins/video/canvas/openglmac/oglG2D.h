@@ -60,7 +60,7 @@ public:
 
 	int mGraphicsReady;
 
-	SCF_DECLARE_IBASE;
+	SCF_DECLARE_IBASE_EXT(csGraphics2DGLCommon);
 
 protected:
 	CWindowPtr			mMainWindow;

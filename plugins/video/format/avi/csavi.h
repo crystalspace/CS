@@ -20,6 +20,7 @@
 #define _CSAVI_H_
 
 #include "ivideo/codec.h"
+#include "isys/plugin.h"
 #include "isys/vfs.h"
 #include "csutil/csvector.h"
 #include "cssys/csendian.h"
@@ -291,7 +292,6 @@ class csAVIFormat : public iStreamFormat
   char *startframepos; // right before 1st LIST within movi LIST
   bool no_recl;
 
-
   hcl fileheader;
   hcl hdrl, strl;
   hcl avih, strh, avichunk;
@@ -327,5 +327,12 @@ class csAVIFormat : public iStreamFormat
   virtual void NextFrame ();
   virtual bool Load (iFile *pVideoData);
   virtual void Unload ();
+
+  struct eiPlugIn : public iPlugIn
+  {
+    SCF_DECLARE_EMBEDDED_IBASE(csAVIFormat);
+    virtual bool Initialize (iSystem* p) { return scfParent->Initialize(p); }
+    virtual bool HandleEvent (iEvent&) { return false; }
+  } scfiPlugIn;
 };
 #endif

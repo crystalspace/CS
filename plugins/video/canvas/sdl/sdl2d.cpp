@@ -62,10 +62,9 @@ SCF_EXPORT_CLASS_TABLE (sdl2d)
     "SDL 2D graphics driver for Crystal Space", "crystalspace.font.server.")
 SCF_EXPORT_CLASS_TABLE_END
 
-SCF_IMPLEMENT_IBASE (csGraphics2DSDL)
-  SCF_IMPLEMENTS_INTERFACE (iPlugIn)
-  SCF_IMPLEMENTS_INTERFACE (iGraphics2D)
-SCF_IMPLEMENT_IBASE_END
+SCF_IMPLEMENT_IBASE_EXT (csGraphics2DSDL)
+  SCF_IMPLEMENTS_INTERFACE (iEventPlug)
+SCF_IMPLEMENT_IBASE_EXT_END
 
 #if SHADE_BUF
 #include "util/img.inc"
@@ -183,10 +182,9 @@ static int drawing_thread(void *_owner)
 #endif
 
 // csGraphics2DSDL functions
-csGraphics2DSDL::csGraphics2DSDL(iBase *iParent) : csGraphics2D ()
+csGraphics2DSDL::csGraphics2DSDL(iBase *iParent) : csGraphics2D (iParent)
 {
-    SCF_CONSTRUCT_IBASE (iParent);
-    EventOutlet = NULL;
+  EventOutlet = NULL;
 }
 
 //fixup:
@@ -233,7 +231,8 @@ bool csGraphics2DSDL::Initialize (iSystem *pSystem)
     //make library persistent
     fixlibrary();
 
-    CsPrintf (CS_MSG_INITIALIZATION,  "Defaults to %dx%dx%d resolution.\n", Width, Height, Depth);
+    CsPrintf (CS_MSG_INITIALIZATION,
+      "Defaults to %dx%dx%d resolution.\n", Width, Height, Depth);
 
     Memory = NULL;
 
@@ -292,8 +291,10 @@ bool csGraphics2DSDL::Open(const char *Title)
   // Open your graphic interface
   if (!csGraphics2D::Open (Title)) return false;
 
-  if (SDL_Init(SDL_INIT_VIDEO|SDL_INIT_NOPARACHUTE) < 0) {
-    CsPrintf (CS_MSG_FATAL_ERROR, "Couldn't initialize SDL: %s\n", SDL_GetError());
+  if (SDL_Init(SDL_INIT_VIDEO|SDL_INIT_NOPARACHUTE) < 0)
+  {
+    CsPrintf (CS_MSG_FATAL_ERROR,
+      "Couldn't initialize SDL: %s\n", SDL_GetError());
     exit (1);
   }
 
@@ -310,8 +311,10 @@ bool csGraphics2DSDL::Open(const char *Title)
 
 #if SHADE_BUF
   cursorNo = csmcNone;
-  *((char **)&Memory) = new char[(size_mem=Width*Height*screen->format->BytesPerPixel)+128];
-  *((char **)&membuffer) = new char[(size_mem=Width*Height*screen->format->BytesPerPixel)+128];
+  *((char **)&Memory) =
+    new char[(size_mem=Width*Height*screen->format->BytesPerPixel)+128];
+  *((char **)&membuffer) =
+    new char[(size_mem=Width*Height*screen->format->BytesPerPixel)+128];
   init_surfaces();
   Scurrent = NULL;
   th_lock = SDL_CreateMutex();
@@ -358,7 +361,7 @@ bool csGraphics2DSDL::Open(const char *Title)
 
   pfmt.complete ();
   Clear(0);
-  System->CallOnEvents (this, CSMASK_Nothing);
+  System->CallOnEvents (&scfiPlugIn, CSMASK_Nothing);
 
   if (!EventOutlet)
     EventOutlet = System->CreateEventOutlet (this);
@@ -466,7 +469,7 @@ int csGraphics2DSDL::translate_key (SDL_Event *ev)
   }
 }
 
-bool csGraphics2DSDL::HandleEvent (iEvent &/*Event*/)
+bool csGraphics2DSDL::HandleEvent (iEvent&)
 {
   SDL_Event ev;
   while ( SDL_PollEvent(&ev) )
@@ -520,7 +523,8 @@ void csGraphics2DSDL::Print (csRect *area)
         (area->ymin==0)&&(area->ymax==Height)))
     SDL_Flip(screen);
   else
-    SDL_UpdateRect(screen, area->xmin, area->ymin, area->Width (), area->Height ());
+    SDL_UpdateRect(
+      screen, area->xmin, area->ymin, area->Width (), area->Height ());
 #endif
 }
 
@@ -611,13 +615,4 @@ bool csGraphics2DSDL::SetMouseCursor (csMouseCursorID iShape)
     return false;
 #endif
   }
-}
-
-//fixup: for SDL
-int main(int argc,char *argv)
-{
-  (void)argc;
-  (void)argv;
-  fprintf(stderr,"sdl2d: unexpected entry to main()\n");
-  return 0;
 }

@@ -24,6 +24,7 @@
 #include "cssysdef.h"
 #include "csutil/util.h"
 #include "isound/loader.h"
+#include "isys/plugin.h"
 #include "../common/soundraw.h"
 #include "../common/sndload.h"
 
@@ -33,7 +34,8 @@ CS_IMPLEMENT_PLUGIN
 // support 8 and 16 bits PCM (RIFF)
 
 /* ====================================
-   short description of wav-file-format (from www.wotsit.org, look there for details)
+   short description of wav-file-format
+   (from www.wotsit.org, look there for details)
    ====================================
 
   WAV-data is contained within the RIFF-file-format. This file format
@@ -100,19 +102,28 @@ class csSoundLoader_WAV : public iSoundLoader
 public:
   SCF_DECLARE_IBASE;
 
+  struct eiPlugIn : public iPlugIn
+  {
+    SCF_DECLARE_EMBEDDED_IBASE(csSoundLoader_WAV);
+    virtual bool Initialize (iSystem*) { return true; }
+    virtual bool HandleEvent (iEvent&) { return false; }
+  } scfiPlugIn;
+
   csSoundLoader_WAV(iBase *p) {
     SCF_CONSTRUCT_IBASE(p);
-  }
-  virtual bool Initialize(iSystem *) {
-    return true;
+    SCF_CONSTRUCT_EMBEDDED_IBASE(scfiPlugIn);
   }
   virtual iSoundData *LoadSound(void *Buffer, unsigned long Size) const;
 };
 
 SCF_IMPLEMENT_IBASE(csSoundLoader_WAV)
   SCF_IMPLEMENTS_INTERFACE(iSoundLoader)
-  SCF_IMPLEMENTS_INTERFACE(iPlugIn)
+  SCF_IMPLEMENTS_EMBEDDED_INTERFACE(iPlugIn)
 SCF_IMPLEMENT_IBASE_END;
+
+SCF_IMPLEMENT_EMBEDDED_IBASE (csSoundLoader_WAV::eiPlugIn)
+  SCF_IMPLEMENTS_INTERFACE (iPlugIn)
+SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 SCF_IMPLEMENT_FACTORY(csSoundLoader_WAV);
 
@@ -120,7 +131,6 @@ SCF_EXPORT_CLASS_TABLE (sndwav)
 SCF_EXPORT_CLASS (csSoundLoader_WAV,
   "crystalspace.sound.loader.wav", "WAV Sound Loader")
 SCF_EXPORT_CLASS_TABLE_END;
-
 
 // header of the RIFF-chunk
 struct _RIFFchk
@@ -149,8 +159,6 @@ struct _WAVchk
   char chunk_id[4]; // for wav-data-chunk this is always "data"
   unsigned long len; // length of chunk after this 8 bytes of header
 } wavchk;
-
-
 
 iSoundData* csSoundLoader_WAV::LoadSound (void* databuf, ULong size) const
 {
@@ -187,7 +195,8 @@ iSoundData* csSoundLoader_WAV::LoadSound (void* databuf, ULong size) const
   bool found = false; // true, if format-chunk was found
   for ( ;
        (found == false) && ((index + sizeof (fmtchk)) < size) ;
-       index += fmtchk.len + 8 // +8, because chunk_id + len are not counted in len
+       // +8, because chunk_id + len are not counted in len
+       index += fmtchk.len + 8
       )
   {
     if (memcpy(&fmtchk, &buf[index], sizeof (fmtchk)) == NULL)
@@ -230,7 +239,8 @@ iSoundData* csSoundLoader_WAV::LoadSound (void* databuf, ULong size) const
   found = false; // true, if wav-data-chunk was found
   for ( ;
        (found == false) && ((index + sizeof (wavchk)) < size) ;
-       index += wavchk.len + 8 // +8, because chunk_id and len are not counted in len
+       // +8, because chunk_id and len are not counted in len
+       index += wavchk.len + 8
       )
   {
     if (memcpy(&wavchk, &buf[index], sizeof (wavchk)) == NULL)
@@ -262,7 +272,7 @@ iSoundData* csSoundLoader_WAV::LoadSound (void* databuf, ULong size) const
     return NULL;
   }
   
-  #ifdef CS_BIG_ENDIAN // @@@ correct?
+  #ifdef CS_BIG_ENDIAN
   if (fmtchk.bits_per_sample == 16)
     csByteSwap16bitBuffer ( (unsigned short*)data, wavchk.len / 2);
   #endif // CS_BIG_ENDIAN

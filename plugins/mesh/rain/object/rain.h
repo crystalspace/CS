@@ -24,6 +24,7 @@
 #include "csutil/cscolor.h"
 #include "plugins/mesh/partgen/partgen.h"
 #include "imesh/rain.h"
+#include "isys/plugin.h"
 
 struct iMaterialWrapper;
 
@@ -184,26 +185,29 @@ private:
   iSystem* system;
 
 public:
+  SCF_DECLARE_IBASE;
+
   /// Constructor.
   csRainMeshObjectType (iBase*);
-
   /// Destructor.
   virtual ~csRainMeshObjectType ();
 
-  /// Register plugin with the system driver
-  virtual bool Initialize (iSystem *pSystem);
-
-  //------------------------ iMeshObjectType implementation --------------
-  SCF_DECLARE_IBASE;
-
   /// Draw.
   virtual iMeshObjectFactory* NewFactory ();
+  /// Get features.
   virtual uint32 GetFeatures () const
   {
     return ALL_FEATURES;
   }
+
+  struct eiPlugIn : public iPlugIn
+  {
+    SCF_DECLARE_EMBEDDED_IBASE(csRainMeshObjectType);
+    virtual bool Initialize (iSystem* p)
+    { scfParent->system = p; return true; }
+    virtual bool HandleEvent (iEvent&) { return false; }
+  } scfiPlugIn;
+  friend struct eiPlugIn;
 };
 
-
 #endif // __CS_RAIN_H__
-

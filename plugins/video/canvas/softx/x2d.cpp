@@ -36,18 +36,14 @@ SCF_EXPORT_CLASS_TABLE (x2d)
     "X-Windows 2D graphics driver for Crystal Space", "crystalspace.font.server.")
 SCF_EXPORT_CLASS_TABLE_END
 
-SCF_IMPLEMENT_IBASE (csGraphics2DXLib)
-  SCF_IMPLEMENTS_INTERFACE (iPlugIn)
-  SCF_IMPLEMENTS_INTERFACE (iGraphics2D)
+SCF_IMPLEMENT_IBASE_EXT (csGraphics2DXLib)
   SCF_IMPLEMENTS_INTERFACE (iEventPlug)
-SCF_IMPLEMENT_IBASE_END
+SCF_IMPLEMENT_IBASE_EXT_END
 
 csGraphics2DXLib::csGraphics2DXLib (iBase *iParent) :
-  csGraphics2D (), dpy (NULL), xim (NULL), cmap (0),
+  csGraphics2D (iParent), dpy (NULL), xim (NULL), cmap (0),
   sim_lt8 (NULL), sim_lt16 (NULL), currently_full_screen (false)
 {
-  SCF_CONSTRUCT_IBASE (iParent);
-
   EmptyMouseCursor = 0;
   memset (&MouseCursor, 0, sizeof (MouseCursor));
   leader_window = window = 0;
@@ -252,7 +248,7 @@ bool csGraphics2DXLib::Initialize (iSystem *pSystem)
   memset (MouseCursor, 0, sizeof (MouseCursor));
 
   // Tell system driver to call us on every frame
-  System->CallOnEvents (this, CSMASK_Nothing);
+  System->CallOnEvents (&scfiPlugIn, CSMASK_Nothing);
   // Create the event outlet
   EventOutlet = System->CreateEventOutlet (this);
 
@@ -535,7 +531,7 @@ struct palent
   int cnt;
 };
 
-int cmp_palent (const void* p1, const void* p2)
+static int cmp_palent (const void* p1, const void* p2)
 {
   const palent* pe1 = (palent*)p1;
   const palent* pe2 = (palent*)p2;
@@ -547,7 +543,7 @@ int cmp_palent (const void* p1, const void* p2)
     return 0;
 }
 
-int find_rgb_palent (palent* pe, int r, int g, int b)
+static int find_rgb_palent (palent* pe, int r, int g, int b)
 {
   int i, min, mindist;
   mindist = 1000*256*256;

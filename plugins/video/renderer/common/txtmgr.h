@@ -33,6 +33,8 @@ class csTexture;
 class csTextureManager;
 struct iImage;
 struct iConfigFile;
+struct iGraphics2D;
+struct iSystem;
 
 /**
  * This class is the top-level representation of a texture.
@@ -109,7 +111,7 @@ public:
   /// Compute the mean color for the just-created texture
   virtual void ComputeMeanColor () = 0;
 
-  ///---------------------- iTextureHandle implementation ----------------------
+  ///--------------------- iTextureHandle implementation ----------------------
   SCF_DECLARE_IBASE;
 
   /// Enable transparent color
@@ -118,7 +120,10 @@ public:
   /// Set the transparent color.
   virtual void SetKeyColor (UByte red, UByte green, UByte blue);
 
-  /// Get the transparent status (false if no transparency, true if transparency).
+  /**
+   * Get the transparent status (false if no transparency, true if
+   * transparency).
+   */
   virtual bool GetKeyColor ();
 
   /// Get the transparent color
@@ -258,7 +263,7 @@ public:
   bool TextureLayerTranslated (int idx)
   { return texture_layer_translate[idx]; }
 
-  ///---------------------- iMaterialHandle implementation ----------------------
+  //--------------------- iMaterialHandle implementation ----------------------
   SCF_DECLARE_IBASE;
 
   /**
@@ -275,7 +280,8 @@ public:
   /**
    * Get light reflection parameters for this material.
    */
-  virtual void GetReflection (float &oDiffuse, float &oAmbient, float &oReflection)
+  virtual void GetReflection (float &oDiffuse, float &oAmbient,
+    float &oReflection)
   { oDiffuse = diffuse; oAmbient = ambient; oReflection = reflection; }
 
   /**
@@ -300,7 +306,7 @@ protected:
   {
   public:
     // Initialize the array
-    csTexVector (int iLimit, int iDelta) : csVector (iLimit, iDelta) 
+    csTexVector (int iLimit, int iDelta) : csVector (iLimit, iDelta)
     { }
     // Shortcut to avoid typecasts
     csTextureHandle *Get (int index)
@@ -315,7 +321,7 @@ protected:
   {
   public:
     // Initialize the array
-    csMatVector (int iLimit, int iDelta) : csVector (iLimit, iDelta) 
+    csMatVector (int iLimit, int iDelta) : csVector (iLimit, iDelta)
     { }
     // Shortcut to avoid typecasts
     csMaterialHandle *Get (int index)
@@ -353,9 +359,9 @@ public:
 
   /// Clear (free) all textures
   virtual void Clear ()
-  { 
-    textures.DeleteAll (); 
-    materials.DeleteAll (); 
+  {
+    textures.DeleteAll ();
+    materials.DeleteAll ();
   }
 
   /// Toggle verbose mode

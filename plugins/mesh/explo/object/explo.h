@@ -24,6 +24,7 @@
 #include "csutil/cscolor.h"
 #include "plugins/mesh/partgen/partgen.h"
 #include "imesh/explode.h"
+#include "isys/plugin.h"
 
 struct iMaterialWrapper;
 struct iSector;
@@ -68,8 +69,8 @@ protected:
 
 public:
   /**
-   * Give number of particles and center. 
-   * push is speed added to all particles (i.e. speed of object being 
+   * Give number of particles and center.
+   * push is speed added to all particles (i.e. speed of object being
    * destroyed for example, or a wind pushing all particles in a direction),
    * give a material to use as well,
    * nr_sides is the number of sides of every particle polygon.
@@ -154,10 +155,10 @@ public:
   /// Get the spread acceleration.
   float GetSpreadAcceleration () const {return spread_accel;}
   /**
-   * Set particles to be scaled to nothing starting at fade_particles msec 
+   * Set particles to be scaled to nothing starting at fade_particles msec
    * before self-destruct.
    */
-  void SetFadeSprites (cs_time fade_time) 
+  void SetFadeSprites (cs_time fade_time)
   { scale_particles = true; fade_particles = fade_time; }
   /// See if particles are faded (returns true), and returns fade time too.
   bool GetFadeSprites (cs_time& fade_time) const
@@ -193,7 +194,7 @@ public:
     {
       scfParent->SetParticleCount (num);
     }
-    virtual int GetParticleCount () const 
+    virtual int GetParticleCount () const
     {
       return scfParent->GetParticleCount();
     }
@@ -201,7 +202,7 @@ public:
     {
       scfParent->SetCenter (center);
     }
-    virtual const csVector3 &GetCenter () const 
+    virtual const csVector3 &GetCenter () const
     {
       return scfParent->GetCenter ();
     }
@@ -209,7 +210,7 @@ public:
     {
       scfParent->SetLighting (l);
     }
-    virtual bool GetLighting () const 
+    virtual bool GetLighting () const
     {
       return scfParent->GetLighting ();
     }
@@ -217,7 +218,7 @@ public:
     {
       scfParent->SetPush (push);
     }
-    virtual const csVector3 &GetPush () const 
+    virtual const csVector3 &GetPush () const
     {
       return scfParent->GetPush ();
     }
@@ -225,7 +226,7 @@ public:
     {
       scfParent->SetNrSides (nr_sides);
     }
-    virtual int GetNrSides () const 
+    virtual int GetNrSides () const
     {
       return scfParent->GetNrSides();
     }
@@ -233,7 +234,7 @@ public:
     {
       scfParent->SetPartRadius (part_radius);
     }
-    virtual float GetPartRadius () const 
+    virtual float GetPartRadius () const
     {
       return scfParent->GetPartRadius ();
     }
@@ -241,7 +242,7 @@ public:
     {
       scfParent->SetSpreadPos (spread_pos);
     }
-    virtual float GetSpreadPos () const 
+    virtual float GetSpreadPos () const
     {
       return scfParent->GetSpreadPos ();
     }
@@ -249,7 +250,7 @@ public:
     {
       scfParent->SetSpreadSpeed (spread_speed);
     }
-    virtual float GetSpreadSpeed () const 
+    virtual float GetSpreadSpeed () const
     {
       return scfParent->GetSpreadSpeed ();
     }
@@ -257,7 +258,7 @@ public:
     {
       scfParent->SetSpreadAcceleration (spread_accel);
     }
-    virtual float GetSpreadAcceleration () const 
+    virtual float GetSpreadAcceleration () const
     {
       return scfParent->GetSpreadAcceleration ();
     }
@@ -265,7 +266,7 @@ public:
     {
       scfParent->SetFadeSprites (fade_time);
     }
-    virtual bool GetFadeSprites (cs_time& fade_time) const 
+    virtual bool GetFadeSprites (cs_time& fade_time) const
     {
       return scfParent->GetFadeSprites (fade_time);
     }
@@ -299,7 +300,7 @@ public:
   virtual void HardTransform (const csReversibleTransform&) { }
   virtual bool SupportsHardTransform () const { return false; }
 };
- 
+
 /**
  * Explosion type. This is the plugin you have to use to create instances
  * of csExploMeshObjectFactory.
@@ -310,26 +311,28 @@ private:
   iSystem* system;
 
 public:
-  /// Constructor.
-  csExploMeshObjectType (iBase*);
-
-  /// Destructor.
-  virtual ~csExploMeshObjectType ();
-
-  /// Register plugin with the system driver
-  virtual bool Initialize (iSystem *pSystem);
-
-  //------------------------ iMeshObjectType implementation --------------
   SCF_DECLARE_IBASE;
 
+  /// Constructor.
+  csExploMeshObjectType (iBase*);
+  /// Destructor.
+  virtual ~csExploMeshObjectType ();
   /// Draw.
   virtual iMeshObjectFactory* NewFactory ();
+  /// Get features.
   virtual uint32 GetFeatures () const
   {
     return ALL_FEATURES;
   }
+
+  struct eiPlugIn : public iPlugIn
+  {
+    SCF_DECLARE_EMBEDDED_IBASE(csExploMeshObjectType);
+    virtual bool Initialize (iSystem* p)
+    { scfParent->system = p; return true; }
+    virtual bool HandleEvent (iEvent&) { return false; }
+  } scfiPlugIn;
+  friend struct eiPlugIn;
 };
 
-
 #endif // __CS_EXPLOSION_H__
-

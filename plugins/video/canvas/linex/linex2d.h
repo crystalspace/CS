@@ -22,6 +22,7 @@
 #include "csutil/scf.h"
 #include "video/canvas/common/graph2d.h"
 #include "isys/event.h"
+#include "isys/plugin.h"
 
 #define XK_MISCELLANY 1
 #include <X11/Xlib.h>
@@ -80,7 +81,7 @@ public:
   // The display context
   static Display* dpy;
 
-  SCF_DECLARE_IBASE;
+  SCF_DECLARE_IBASE_EXT(csGraphics2D);
 
   csGraphics2DLineXLib (iBase *iParent);
   virtual ~csGraphics2DLineXLib ();
@@ -96,7 +97,7 @@ public:
 
   virtual void DrawLine (float x1, float y1, float x2, float y2, int color);
   virtual void Clear (int color);
-  virtual void Write (iFont *font, int x, int y, int fg, int bg, const char *text);
+  virtual void Write (iFont*, int x, int y, int fg, int bg, const char *text);
   virtual void DrawBox (int x, int y, int w, int h, int color);
 
   virtual bool PerformExtension (const char* iCommand, ...);
@@ -118,7 +119,7 @@ public:
   void DeAllocateMemory ();
   bool ReallocateMemory ();
 
-  //------------------------- iEventPlug interface ---------------------------//
+  //------------------------ iEventPlug interface ---------------------------//
 
   virtual unsigned GetPotentiallyConflictingEvents ()
   { return CSEVTYPE_Keyboard | CSEVTYPE_Mouse; }
@@ -168,6 +169,13 @@ public:
   { return font.xfont ? 1 : 0; }
   virtual iFont *GetFont (int iIndex)
   { (void)iIndex; return font.xfont ? &font : (iFont*)NULL; }
+
+  struct eiPlugIn : public iPlugIn
+  {
+    SCF_DECLARE_EMBEDDED_IBASE(csLineX2DFontServer);
+    virtual bool Initialize (iSystem* p) { return scfParent->Initialize(p); }
+    virtual bool HandleEvent (iEvent&) { return false; }
+  } scfiPlugIn;
 };
 
 #endif // __LINEX2D_H__

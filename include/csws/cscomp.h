@@ -30,6 +30,7 @@
 class csApp;
 class csSkin;
 class csSkinSlice;
+struct iEvent;
 
 // this is where we store all the csRect for calculating visible areas and clipping in
 DECLARE_TYPED_VECTOR (cswsRectVector, csRect);

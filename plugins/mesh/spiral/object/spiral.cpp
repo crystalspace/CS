@@ -65,8 +65,8 @@ void csSpiralMeshObject::SetupObject ()
   }
 }
 
-csSpiralMeshObject::csSpiralMeshObject (iSystem* system, iMeshObjectFactory* factory)
-	: csNewtonianParticleSystem (system, factory)
+csSpiralMeshObject::csSpiralMeshObject (iSystem* system,
+  iMeshObjectFactory* factory) : csNewtonianParticleSystem (system, factory)
 {
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiSpiralState);
   max = 50;
@@ -78,7 +78,6 @@ csSpiralMeshObject::csSpiralMeshObject (iSystem* system, iMeshObjectFactory* fac
 csSpiralMeshObject::~csSpiralMeshObject()
 {
 }
-
 
 void csSpiralMeshObject::Update (cs_time elapsed_time)
 {
@@ -119,7 +118,7 @@ void csSpiralMeshObject::Update (cs_time elapsed_time)
     iParticle* part = GetParticle (part_idx);
     part->SetPosition (source);
     csVector3 dir;
-    dir = GetRandomDirection (csVector3 (.01, .01, .01), csVector3 (.1, .3, .1));
+    dir = GetRandomDirection(csVector3(.01, .01, .01), csVector3(.1, .3, .1));
 
     SetSpeed (part_idx, dir);
     SetAccel (part_idx, csVector3 (0));
@@ -141,10 +140,10 @@ SCF_IMPLEMENT_IBASE (csSpiralMeshObjectFactory)
   SCF_IMPLEMENTS_INTERFACE (iMeshObjectFactory)
 SCF_IMPLEMENT_IBASE_END
 
-csSpiralMeshObjectFactory::csSpiralMeshObjectFactory (iBase *pParent, iSystem* system)
+csSpiralMeshObjectFactory::csSpiralMeshObjectFactory (iBase *p, iSystem* s)
 {
-  SCF_CONSTRUCT_IBASE (pParent);
-  csSpiralMeshObjectFactory::system = system;
+  SCF_CONSTRUCT_IBASE (p);
+  system = s;
 }
 
 csSpiralMeshObjectFactory::~csSpiralMeshObjectFactory ()
@@ -153,7 +152,8 @@ csSpiralMeshObjectFactory::~csSpiralMeshObjectFactory ()
 
 iMeshObject* csSpiralMeshObjectFactory::NewInstance ()
 {
-  csSpiralMeshObject* cm = new csSpiralMeshObject (system, (iMeshObjectFactory*)this);
+  csSpiralMeshObject* cm =
+    new csSpiralMeshObject (system, (iMeshObjectFactory*)this);
   iMeshObject* im = SCF_QUERY_INTERFACE (cm, iMeshObject);
   im->DecRef ();
   return im;
@@ -163,8 +163,12 @@ iMeshObject* csSpiralMeshObjectFactory::NewInstance ()
 
 SCF_IMPLEMENT_IBASE (csSpiralMeshObjectType)
   SCF_IMPLEMENTS_INTERFACE (iMeshObjectType)
-  SCF_IMPLEMENTS_INTERFACE (iPlugIn)
+  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iPlugIn)
 SCF_IMPLEMENT_IBASE_END
+
+SCF_IMPLEMENT_EMBEDDED_IBASE (csSpiralMeshObjectType::eiPlugIn)
+  SCF_IMPLEMENTS_INTERFACE (iPlugIn)
+SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 SCF_IMPLEMENT_FACTORY (csSpiralMeshObjectType)
 
@@ -176,16 +180,11 @@ SCF_EXPORT_CLASS_TABLE_END
 csSpiralMeshObjectType::csSpiralMeshObjectType (iBase* pParent)
 {
   SCF_CONSTRUCT_IBASE (pParent);
+  SCF_CONSTRUCT_EMBEDDED_IBASE(scfiPlugIn);
 }
 
 csSpiralMeshObjectType::~csSpiralMeshObjectType ()
 {
-}
-
-bool csSpiralMeshObjectType::Initialize (iSystem* system)
-{
-  csSpiralMeshObjectType::system = system;
-  return true;
 }
 
 iMeshObjectFactory* csSpiralMeshObjectType::NewFactory ()
@@ -195,4 +194,3 @@ iMeshObjectFactory* csSpiralMeshObjectType::NewFactory ()
   ifact->DecRef ();
   return ifact;
 }
-

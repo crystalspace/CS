@@ -122,33 +122,57 @@ CS_TOKEN_DEF_END
 
 SCF_IMPLEMENT_IBASE (csThingLoader)
   SCF_IMPLEMENTS_INTERFACE (iLoaderPlugIn)
-  SCF_IMPLEMENTS_INTERFACE (iPlugIn)
+  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iPlugIn)
 SCF_IMPLEMENT_IBASE_END
+
+SCF_IMPLEMENT_EMBEDDED_IBASE (csThingLoader::eiPlugIn)
+  SCF_IMPLEMENTS_INTERFACE (iPlugIn)
+SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 SCF_IMPLEMENT_IBASE (csThingSaver)
   SCF_IMPLEMENTS_INTERFACE (iSaverPlugIn)
-  SCF_IMPLEMENTS_INTERFACE (iPlugIn)
+  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iPlugIn)
 SCF_IMPLEMENT_IBASE_END
+
+SCF_IMPLEMENT_EMBEDDED_IBASE (csThingSaver::eiPlugIn)
+  SCF_IMPLEMENTS_INTERFACE (iPlugIn)
+SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 SCF_IMPLEMENT_IBASE (csPlaneLoader)
   SCF_IMPLEMENTS_INTERFACE (iLoaderPlugIn)
-  SCF_IMPLEMENTS_INTERFACE (iPlugIn)
+  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iPlugIn)
 SCF_IMPLEMENT_IBASE_END
+
+SCF_IMPLEMENT_EMBEDDED_IBASE (csPlaneLoader::eiPlugIn)
+  SCF_IMPLEMENTS_INTERFACE (iPlugIn)
+SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 SCF_IMPLEMENT_IBASE (csPlaneSaver)
   SCF_IMPLEMENTS_INTERFACE (iSaverPlugIn)
-  SCF_IMPLEMENTS_INTERFACE (iPlugIn)
+  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iPlugIn)
 SCF_IMPLEMENT_IBASE_END
+
+SCF_IMPLEMENT_EMBEDDED_IBASE (csPlaneSaver::eiPlugIn)
+  SCF_IMPLEMENTS_INTERFACE (iPlugIn)
+SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 SCF_IMPLEMENT_IBASE (csBezierLoader)
   SCF_IMPLEMENTS_INTERFACE (iLoaderPlugIn)
-  SCF_IMPLEMENTS_INTERFACE (iPlugIn)
+  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iPlugIn)
 SCF_IMPLEMENT_IBASE_END
+
+SCF_IMPLEMENT_EMBEDDED_IBASE (csBezierLoader::eiPlugIn)
+  SCF_IMPLEMENTS_INTERFACE (iPlugIn)
+SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 SCF_IMPLEMENT_IBASE (csBezierSaver)
   SCF_IMPLEMENTS_INTERFACE (iSaverPlugIn)
-  SCF_IMPLEMENTS_INTERFACE (iPlugIn)
+  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iPlugIn)
 SCF_IMPLEMENT_IBASE_END
+
+SCF_IMPLEMENT_EMBEDDED_IBASE (csBezierSaver::eiPlugIn)
+  SCF_IMPLEMENTS_INTERFACE (iPlugIn)
+SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 SCF_IMPLEMENT_FACTORY (csThingLoader)
 SCF_IMPLEMENT_FACTORY (csThingSaver)
@@ -183,16 +207,11 @@ SCF_EXPORT_CLASS_TABLE_END
 csThingLoader::csThingLoader (iBase* pParent)
 {
   SCF_CONSTRUCT_IBASE (pParent);
+  SCF_CONSTRUCT_EMBEDDED_IBASE(scfiPlugIn);
 }
 
 csThingLoader::~csThingLoader ()
 {
-}
-
-bool csThingLoader::Initialize (iSystem* system)
-{
-  sys = system;
-  return true;
 }
 
 class ThingLoadInfo
@@ -483,7 +502,8 @@ static iPolygon3D* load_poly3d (iEngine* engine, char* polyname, char* buf,
     {
       case CS_TOKEN_MATERIAL:
         csScanStr (params, "%s", str);
-        mat = engine->FindMaterial (str/*@@@, onlyRegion*/); //@@@ REGION SUPPORT?
+	//@@@ REGION SUPPORT? (below)
+        mat = engine->FindMaterial (str/*@@@, onlyRegion*/);
         if (mat == NULL)
         {
           printf ("Couldn't find material named '%s'!\n", str);
@@ -577,7 +597,7 @@ static iPolygon3D* load_poly3d (iEngine* engine, char* polyname, char* buf,
         }
         break;
       case CS_TOKEN_TEXTURE:
-        while ((cmd = csGetObject (&params, tex_commands, &name, &params2)) > 0)
+        while ((cmd = csGetObject(&params, tex_commands, &name, &params2)) > 0)
         {
     	  if (!params2)
     	  {
@@ -1062,7 +1082,8 @@ Nag to Jorrit about this feature if you want it.\n");
         {
 	  char cname[100];
 	  csScanStr (params, "%s", cname);
-	  iCurveTemplate* ct = engine->FindCurveTemplate (cname/* @@@ Onlyregion?*/);
+	  iCurveTemplate* ct =
+	    engine->FindCurveTemplate (cname/* @@@ Onlyregion?*/);
 	  iCurve* p = thing_state->CreateCurve (ct);
 	  p->QueryObject()->SetName (name);
           if (!ct->GetMaterial ())
@@ -1157,16 +1178,11 @@ iBase* csThingLoader::Parse (const char* string, iEngine* engine,
 csThingSaver::csThingSaver (iBase* pParent)
 {
   SCF_CONSTRUCT_IBASE (pParent);
+  SCF_CONSTRUCT_EMBEDDED_IBASE(scfiPlugIn);
 }
 
 csThingSaver::~csThingSaver ()
 {
-}
-
-bool csThingSaver::Initialize (iSystem* system)
-{
-  sys = system;
-  return true;
 }
 
 void csThingSaver::WriteDown (iBase* /*obj*/, iStrVector *str,
@@ -1186,16 +1202,11 @@ void csThingSaver::WriteDown (iBase* /*obj*/, iStrVector *str,
 csPlaneLoader::csPlaneLoader (iBase* pParent)
 {
   SCF_CONSTRUCT_IBASE (pParent);
+  SCF_CONSTRUCT_EMBEDDED_IBASE(scfiPlugIn);
 }
 
 csPlaneLoader::~csPlaneLoader ()
 {
-}
-
-bool csPlaneLoader::Initialize (iSystem* system)
-{
-  sys = system;
-  return true;
 }
 
 iBase* csPlaneLoader::Parse (const char* string, iEngine* engine,
@@ -1322,16 +1333,11 @@ iBase* csPlaneLoader::Parse (const char* string, iEngine* engine,
 csPlaneSaver::csPlaneSaver (iBase* pParent)
 {
   SCF_CONSTRUCT_IBASE (pParent);
+  SCF_CONSTRUCT_EMBEDDED_IBASE(scfiPlugIn);
 }
 
 csPlaneSaver::~csPlaneSaver ()
 {
-}
-
-bool csPlaneSaver::Initialize (iSystem* system)
-{
-  sys = system;
-  return true;
 }
 
 void csPlaneSaver::WriteDown (iBase* /*obj*/, iStrVector* /*str*/,
@@ -1344,16 +1350,11 @@ void csPlaneSaver::WriteDown (iBase* /*obj*/, iStrVector* /*str*/,
 csBezierLoader::csBezierLoader (iBase* pParent)
 {
   SCF_CONSTRUCT_IBASE (pParent);
+  SCF_CONSTRUCT_EMBEDDED_IBASE(scfiPlugIn);
 }
 
 csBezierLoader::~csBezierLoader ()
 {
-}
-
-bool csBezierLoader::Initialize (iSystem* system)
-{
-  sys = system;
-  return true;
 }
 
 iBase* csBezierLoader::Parse (const char* string, iEngine* engine,
@@ -1392,7 +1393,8 @@ iBase* csBezierLoader::Parse (const char* string, iEngine* engine,
         break;
       case CS_TOKEN_MATERIAL:
         csScanStr (params, "%s", str);
-        mat = engine->FindMaterial (str/*@@@, onlyRegion*/); //@@@ REGION SUPPORT?
+	//@@@ REGION SUPPORT? (below)
+        mat = engine->FindMaterial (str/*@@@, onlyRegion*/);
         if (mat == NULL)
         {
           printf ("Couldn't find material named '%s'!\n", str);
@@ -1428,22 +1430,14 @@ iBase* csBezierLoader::Parse (const char* string, iEngine* engine,
 csBezierSaver::csBezierSaver (iBase* pParent)
 {
   SCF_CONSTRUCT_IBASE (pParent);
+  SCF_CONSTRUCT_EMBEDDED_IBASE(scfiPlugIn);
 }
 
 csBezierSaver::~csBezierSaver ()
 {
 }
 
-bool csBezierSaver::Initialize (iSystem* system)
-{
-  sys = system;
-  return true;
-}
-
 void csBezierSaver::WriteDown (iBase* /*obj*/, iStrVector* /*str*/,
   iEngine* /*engine*/)
 {
 }
-
-
-//---------------------------------------------------------------------------

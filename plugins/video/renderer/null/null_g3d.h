@@ -35,7 +35,7 @@ class csReversibleTransform;
 struct iGraphics2D;
 struct iConfigFile;
 
-///
+/// The Null renderer.
 class csGraphics3DNull : public iGraphics3D
 {
   /// Z Buffer mode to use while rendering next polygon.
@@ -248,6 +248,13 @@ public:
    */
   virtual void DrawPixmap (iTextureHandle*, int, int, int, int, int, int,
     int, int, uint8);
+
+  struct eiPlugIn : public iPlugIn
+  {
+    SCF_DECLARE_EMBEDDED_IBASE(csGraphics3DNull);
+    virtual bool Initialize (iSystem* p) { return scfParent->Initialize(p); }
+    virtual bool HandleEvent (iEvent&) { return false; }
+  } scfiPlugIn;
 };
 
 #endif // __NULL_G3D_H__

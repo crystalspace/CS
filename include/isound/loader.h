@@ -19,7 +19,7 @@
 #ifndef __ISOUND_LOADER_H__
 #define __ISOUND_LOADER_H__
 
-#include "isys/plugin.h"
+#include "csutil/scf.h"
 
 struct iSoundData;
 struct csSoundFormat;
@@ -27,15 +27,11 @@ struct csSoundFormat;
 SCF_VERSION (iSoundLoader, 1, 0, 0);
 
 /**
- * The sound loader plugin is used to load sound files from the VFS and
- * create sound data objects from it.
+ * The sound loader is used to load sound files given a raw input data stream.
  */
-struct iSoundLoader : public iPlugIn
+struct iSoundLoader : public iBase
 {
-  /// Initialize the Sound Loader.
-  virtual bool Initialize (iSystem *sys) = 0;
-
-  /// Load a sound file from the VFS.
+  /// Create a sound object from raw input data.
   virtual iSoundData *LoadSound(void *Data, unsigned long Size) const = 0;
 };
 

@@ -28,10 +28,7 @@
 class csGraphics2DDDraw3 : public csGraphics2D
 {
 public:
-  SCF_DECLARE_IBASE;
-
   csGraphics2DDDraw3 (iBase *iParent);
-  // Uses3D is currently not specified
   virtual ~csGraphics2DDDraw3 ();
   
   virtual bool Initialize (iSystem *pSystem);

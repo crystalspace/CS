@@ -24,7 +24,6 @@
 #include <vgakeyboard.h>
 #include <vgamouse.h>
 
-#include "csutil/scf.h"
 #include "video/canvas/common/graph2d.h"
 #include "isys/event.h"
 
@@ -45,14 +44,14 @@ class csGraphics2DSVGALib : public csGraphics2D, public iEventPlug
   iEventOutlet *EventOutlet;
   
 public:
-  SCF_DECLARE_IBASE;
+  SCF_DECLARE_IBASE_EXT(csGraphics2D);
 
-  csGraphics2DSVGALib (iBase *iParent);
+  csGraphics2DSVGALib (iBase*);
   virtual ~csGraphics2DSVGALib ();
 
   virtual bool Open (const char *Title);
   virtual void Close ();
-  virtual bool Initialize (iSystem *pSystem);
+  virtual bool Initialize (iSystem*);
 
   virtual bool BeginDraw () { return (Memory != NULL); }
   virtual bool DoubleBuffer (bool /*Enable*/) { return true; }
@@ -64,7 +63,7 @@ public:
   /// Called on every frame by system driver
   virtual bool HandleEvent (iEvent &Event);
 
-  //------------------------- iEventPlug interface ---------------------------//
+  //------------------------ iEventPlug interface ---------------------------//
 
   virtual unsigned GetPotentiallyConflictingEvents ()
   { return CSEVTYPE_Keyboard | CSEVTYPE_Mouse; }

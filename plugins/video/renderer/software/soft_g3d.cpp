@@ -29,30 +29,33 @@
 CS_IMPLEMENT_PLUGIN
 
 SCF_IMPLEMENT_FACTORY (csGraphics3DSoftware)
-SCF_IMPLEMENT_FACTORY (csSoftProcTexture3D)
+SCF_DECLARE_FACTORY (csSoftProcTexture3D)
 
 SCF_EXPORT_CLASS_TABLE (soft3d)
-  SCF_EXPORT_CLASS_DEP (csGraphics3DSoftware, "crystalspace.graphics3d.software",
-    "Software 3D graphics driver for Crystal Space", "crystalspace.font.server.")
+  SCF_EXPORT_CLASS_DEP (csGraphics3DSoftware,
+    "crystalspace.graphics3d.software",
+    "Software 3D graphics driver for Crystal Space",
+    "crystalspace.font.server.")
   SCF_EXPORT_CLASS (csSoftProcTexture3D, 
     "crystalspace.graphics3d.software.offscreen",
     "Software 3D off screen driver")
 SCF_EXPORT_CLASS_TABLE_END
 
-SCF_IMPLEMENT_IBASE (csGraphics3DSoftware)
-  SCF_IMPLEMENTS_INTERFACE (iGraphics3D)
-  SCF_IMPLEMENTS_INTERFACE (iPlugIn)
+SCF_IMPLEMENT_IBASE_EXT (csGraphics3DSoftware)
   SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iConfig)
-SCF_IMPLEMENT_IBASE_END
+SCF_IMPLEMENT_IBASE_EXT_END
+
+SCF_IMPLEMENT_EMBEDDED_IBASE (csGraphics3DSoftware::eiSoftConfig)
+  SCF_IMPLEMENTS_INTERFACE (iConfig)
+SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 #define SysPrintf System->Printf
 
 csGraphics3DSoftware::csGraphics3DSoftware (iBase *iParent)
-  : csGraphics3DSoftwareCommon ()
+  : csGraphics3DSoftwareCommon (iParent)
 {
-  is_for_procedural_textures = false;
-  SCF_CONSTRUCT_IBASE (iParent);
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiConfig);
+  is_for_procedural_textures = false;
   csScan_Initialize ();
 }
 
@@ -63,16 +66,12 @@ csGraphics3DSoftware::~csGraphics3DSoftware ()
 
 bool csGraphics3DSoftware::Initialize (iSystem *iSys)
 {
-  System = iSys;
-
+  csGraphics3DSoftwareCommon::Initialize(iSys);
   NewInitialize ();
-
   const char *driver = iSys->GetOptionCL ("canvas");
   if (!driver)
     driver = config->GetStr ("Video.Software.Canvas", SOFTWARE_2D_DRIVER);
-
   G2D = CS_LOAD_PLUGIN (System, driver, NULL, iGraphics2D);
-
   return G2D ? true : false;
 }
 
@@ -89,12 +88,12 @@ bool csGraphics3DSoftware::Open (const char *Title)
 
   if (pfmt.PixelBytes == 4)
     SysPrintf (CS_MSG_INITIALIZATION, 
-	  "Using truecolor mode with %d bytes per pixel and %d:%d:%d RGB mode.\n",
-          pfmt.PixelBytes, pfmt.RedBits, pfmt.GreenBits, pfmt.BlueBits);
+      "Using truecolor mode with %d bytes per pixel and %d:%d:%d RGB mode.\n",
+      pfmt.PixelBytes, pfmt.RedBits, pfmt.GreenBits, pfmt.BlueBits);
   else if (pfmt.PixelBytes == 2)
     SysPrintf (CS_MSG_INITIALIZATION, 
-	   "Using truecolor mode with %d bytes per pixel and %d:%d:%d RGB mode.\n",
-	   pfmt.PixelBytes, pfmt.RedBits, pfmt.GreenBits, pfmt.BlueBits);
+      "Using truecolor mode with %d bytes per pixel and %d:%d:%d RGB mode.\n",
+      pfmt.PixelBytes, pfmt.RedBits, pfmt.GreenBits, pfmt.BlueBits);
   else
     SysPrintf (CS_MSG_INITIALIZATION, 
 	       "Using palette mode with 1 byte per pixel (256 colors).\n");
@@ -103,10 +102,6 @@ bool csGraphics3DSoftware::Open (const char *Title)
 }
 
 //---------------------------------------------------------------------------
-
-SCF_IMPLEMENT_EMBEDDED_IBASE (csGraphics3DSoftware::csSoftConfig)
-  SCF_IMPLEMENTS_INTERFACE (iConfig)
-SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 #define NUM_OPTIONS 8
 
@@ -122,7 +117,7 @@ static const csOptionDescription config_options [NUM_OPTIONS] =
   { 7, "smaller", "Smaller rendering", CSVAR_BOOL },
 };
 
-bool csGraphics3DSoftware::csSoftConfig::SetOption (int id, csVariant* value)
+bool csGraphics3DSoftware::eiSoftConfig::SetOption (int id, csVariant* value)
 {
   if (value->type != config_options[id].type)
     return false;
@@ -144,7 +139,7 @@ bool csGraphics3DSoftware::csSoftConfig::SetOption (int id, csVariant* value)
   return true;
 }
 
-bool csGraphics3DSoftware::csSoftConfig::GetOption (int id, csVariant* value)
+bool csGraphics3DSoftware::eiSoftConfig::GetOption (int id, csVariant* value)
 {
   value->type = config_options[id].type;
   switch (id)
@@ -164,7 +159,7 @@ bool csGraphics3DSoftware::csSoftConfig::GetOption (int id, csVariant* value)
   return true;
 }
 
-bool csGraphics3DSoftware::csSoftConfig::GetOptionDescription
+bool csGraphics3DSoftware::eiSoftConfig::GetOptionDescription
   (int idx, csOptionDescription* option)
 {
   if (idx < 0 || idx >= NUM_OPTIONS)

@@ -88,7 +88,7 @@ class csGraphics2DMGL : public csGraphics2D, public iEventPlug
   iEventOutlet *EventOutlet;
 
 public:
-  SCF_DECLARE_IBASE;
+  SCF_DECLARE_IBASE_EXT(csGraphics2D);
 
   /// Initialize the 2D graphics context
   csGraphics2DMGL (iBase *iParent);

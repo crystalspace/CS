@@ -6,12 +6,12 @@
     modify it under the terms of the GNU Library General Public
     License as published by the Free Software Foundation; either
     version 2 of the License, or (at your option) any later version.
-  
+
     This library is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
     Library General Public License for more details.
-  
+
     You should have received a copy of the GNU Library General Public
     License along with this library; if not, write to the Free
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
@@ -64,23 +64,39 @@ CS_TOKEN_DEF_END
 
 SCF_IMPLEMENT_IBASE (csFireFactoryLoader)
   SCF_IMPLEMENTS_INTERFACE (iLoaderPlugIn)
-  SCF_IMPLEMENTS_INTERFACE (iPlugIn)
+  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iPlugIn)
 SCF_IMPLEMENT_IBASE_END
+
+SCF_IMPLEMENT_EMBEDDED_IBASE (csFireFactoryLoader::eiPlugIn)
+  SCF_IMPLEMENTS_INTERFACE (iPlugIn)
+SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 SCF_IMPLEMENT_IBASE (csFireFactorySaver)
   SCF_IMPLEMENTS_INTERFACE (iSaverPlugIn)
-  SCF_IMPLEMENTS_INTERFACE (iPlugIn)
+  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iPlugIn)
 SCF_IMPLEMENT_IBASE_END
+
+SCF_IMPLEMENT_EMBEDDED_IBASE (csFireFactorySaver::eiPlugIn)
+  SCF_IMPLEMENTS_INTERFACE (iPlugIn)
+SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 SCF_IMPLEMENT_IBASE (csFireLoader)
   SCF_IMPLEMENTS_INTERFACE (iLoaderPlugIn)
-  SCF_IMPLEMENTS_INTERFACE (iPlugIn)
+  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iPlugIn)
 SCF_IMPLEMENT_IBASE_END
+
+SCF_IMPLEMENT_EMBEDDED_IBASE (csFireLoader::eiPlugIn)
+  SCF_IMPLEMENTS_INTERFACE (iPlugIn)
+SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 SCF_IMPLEMENT_IBASE (csFireSaver)
   SCF_IMPLEMENTS_INTERFACE (iSaverPlugIn)
-  SCF_IMPLEMENTS_INTERFACE (iPlugIn)
+  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iPlugIn)
 SCF_IMPLEMENT_IBASE_END
+
+SCF_IMPLEMENT_EMBEDDED_IBASE (csFireSaver::eiPlugIn)
+  SCF_IMPLEMENTS_INTERFACE (iPlugIn)
+SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 SCF_IMPLEMENT_FACTORY (csFireFactoryLoader)
 SCF_IMPLEMENT_FACTORY (csFireFactorySaver)
@@ -88,7 +104,8 @@ SCF_IMPLEMENT_FACTORY (csFireLoader)
 SCF_IMPLEMENT_FACTORY (csFireSaver)
 
 SCF_EXPORT_CLASS_TABLE (fireldr)
-  SCF_EXPORT_CLASS (csFireFactoryLoader, "crystalspace.mesh.loader.factory.fire",
+  SCF_EXPORT_CLASS (csFireFactoryLoader,
+    "crystalspace.mesh.loader.factory.fire",
     "Crystal Space Fire Factory Loader")
   SCF_EXPORT_CLASS (csFireFactorySaver, "crystalspace.mesh.saver.factory.fire",
     "Crystal Space Fire Factory Saver")
@@ -101,16 +118,11 @@ SCF_EXPORT_CLASS_TABLE_END
 csFireFactoryLoader::csFireFactoryLoader (iBase* pParent)
 {
   SCF_CONSTRUCT_IBASE (pParent);
+  SCF_CONSTRUCT_EMBEDDED_IBASE(scfiPlugIn);
 }
 
 csFireFactoryLoader::~csFireFactoryLoader ()
 {
-}
-
-bool csFireFactoryLoader::Initialize (iSystem* system)
-{
-  sys = system;
-  return true;
 }
 
 iBase* csFireFactoryLoader::Parse (const char* /*string*/,
@@ -134,16 +146,11 @@ iBase* csFireFactoryLoader::Parse (const char* /*string*/,
 csFireFactorySaver::csFireFactorySaver (iBase* pParent)
 {
   SCF_CONSTRUCT_IBASE (pParent);
+  SCF_CONSTRUCT_EMBEDDED_IBASE(scfiPlugIn);
 }
 
 csFireFactorySaver::~csFireFactorySaver ()
 {
-}
-
-bool csFireFactorySaver::Initialize (iSystem* system)
-{
-  sys = system;
-  return true;
 }
 
 #define MAXLINE 100 /* max number of chars per line... */
@@ -177,16 +184,11 @@ void csFireFactorySaver::WriteDown (iBase* /*obj*/, iStrVector * /*str*/,
 csFireLoader::csFireLoader (iBase* pParent)
 {
   SCF_CONSTRUCT_IBASE (pParent);
+  SCF_CONSTRUCT_EMBEDDED_IBASE(scfiPlugIn);
 }
 
 csFireLoader::~csFireLoader ()
 {
-}
-
-bool csFireLoader::Initialize (iSystem* system)
-{
-  sys = system;
-  return true;
 }
 
 static UInt ParseMixmode (char* buf)
@@ -285,7 +287,7 @@ iBase* csFireLoader::Parse (const char* string, iEngine* engine,
       case CS_TOKEN_COLOR:
 	{
 	  csColor color;
-	  csScanStr (params, "%f,%f,%f", &color.red, &color.green, &color.blue);
+	  csScanStr(params, "%f,%f,%f", &color.red, &color.green, &color.blue);
 	  partstate->SetColor (color);
 	}
 	break;
@@ -404,16 +406,11 @@ iBase* csFireLoader::Parse (const char* string, iEngine* engine,
 csFireSaver::csFireSaver (iBase* pParent)
 {
   SCF_CONSTRUCT_IBASE (pParent);
+  SCF_CONSTRUCT_EMBEDDED_IBASE(scfiPlugIn);
 }
 
 csFireSaver::~csFireSaver ()
 {
-}
-
-bool csFireSaver::Initialize (iSystem* system)
-{
-  sys = system;
-  return true;
 }
 
 void csFireSaver::WriteDown (iBase* obj, iStrVector *str,
@@ -472,6 +469,3 @@ void csFireSaver::WriteDown (iBase* obj, iStrVector *str,
   partstate->DecRef();
   state->DecRef();
 }
-
-//---------------------------------------------------------------------------
-

@@ -20,20 +20,19 @@
 #define __PROTEX2D_H__
 
 #include "csutil/scf.h"
-#include "video/canvas/common/graph2d.h"
+#include "graph2d.h"
 
 struct iSystem;
 
 class csProcTextureSoft2D : public csGraphics2D
 {
 public:
-  SCF_DECLARE_IBASE;
-
   // For 16bit procedural textures sharing texture manager
   csRGBpixel *image_buffer;
 
-  // Under certain circumstances, this class allocates its own memory, this flag
-  // indicates whether or not this is the case and hence our responsibility.
+  // Under certain circumstances, this class allocates its own memory, this
+  // flag indicates whether or not this is the case and hence our
+  // responsibility.
   bool destroy_memory;
 
   csProcTextureSoft2D (iSystem *isys);

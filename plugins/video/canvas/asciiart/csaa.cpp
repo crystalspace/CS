@@ -31,27 +31,25 @@
 
 #include "csaa.h"
 
-//----------------------------------------------------------- csGraphics2DAA ---
+//---------------------------------------------------------- csGraphics2DAA ---
 
 CS_IMPLEMENT_PLUGIN
 
 SCF_IMPLEMENT_FACTORY (csGraphics2DAA)
 
 SCF_EXPORT_CLASS_TABLE (asciiart)
-  SCF_EXPORT_CLASS_DEP (csGraphics2DAA, "crystalspace.graphics2d.asciiart",
-    "Ascii Art 2D graphics driver for Crystal Space", "crystalspace.font.server.")
+  SCF_EXPORT_CLASS_DEP (csGraphics2DAA,
+    "crystalspace.graphics2d.asciiart",
+    "Ascii Art 2D graphics driver for Crystal Space",
+    "crystalspace.font.server.")
 SCF_EXPORT_CLASS_TABLE_END
 
-SCF_IMPLEMENT_IBASE (csGraphics2DAA)
-  SCF_IMPLEMENTS_INTERFACE (iPlugIn)
-  SCF_IMPLEMENTS_INTERFACE (iGraphics2D)
+SCF_IMPLEMENT_IBASE_EXT (csGraphics2DAA)
   SCF_IMPLEMENTS_INTERFACE (iEventPlug)
-SCF_IMPLEMENT_IBASE_END
+SCF_IMPLEMENT_IBASE_EXT_END
 
-csGraphics2DAA::csGraphics2DAA (iBase *iParent) :
-  csGraphics2D ()
+csGraphics2DAA::csGraphics2DAA (iBase *iParent) : csGraphics2D (iParent)
 {
-  SCF_CONSTRUCT_IBASE (iParent);
   context = NULL;
   EventOutlet = NULL;
 }
@@ -191,7 +189,7 @@ void csGraphics2DAA::Print (csRect *area)
   aa_renderpalette (context, palette, &aa_defrenderparams, sx1, sy1, sx2, sy2);
   aa_flush (context);
 
-  /* Get all events from keyboard and mouse and put them into the system queue */
+  /* Get all events from keyboard and mouse and put them into system queue */
   int event;
   while ((event = aa_getevent (context, 0)) != AA_NONE)
     switch (event)

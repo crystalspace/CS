@@ -22,7 +22,6 @@
 #define __ISOUND_DRIVER_H__
 
 #include "csutil/scf.h"
-#include "isys/plugin.h"
 
 struct iSoundRender;
 
@@ -33,10 +32,10 @@ SCF_VERSION (iSoundDriver, 0, 0, 1);
  * that is used by the software sound renderer. The sound driver is
  * responsible for playing a single stream of samples.
  */
-struct iSoundDriver : public iPlugIn
+struct iSoundDriver : public iBase
 {
   /// Open the sound render
-  virtual bool Open (iSoundRender *render, int frequency, bool bit16, bool stereo) = 0;
+  virtual bool Open(iSoundRender*, int frequency, bool bit16, bool stereo) = 0;
   /// Close the sound render
   virtual void Close () = 0;
   /// Lock and Get Sound Memory Buffer

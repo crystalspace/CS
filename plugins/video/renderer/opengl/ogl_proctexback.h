@@ -19,7 +19,7 @@
 
 /**
  * This is an hardware accelerated procedural texture renderer for opengl based
- * on Normans Glide implementation:
+ * on Norman's Glide implementation:
  *
  * And here is the basic idea:
  * On call of a BeginDraw we copy the texture in question into the backbuffer.
@@ -63,17 +63,11 @@ class csOpenGLProcBackBuffer : public csGraphics3DOGLCommon
   char *buffer;
 
  public:
-  SCF_DECLARE_IBASE;
-
-  csOpenGLProcBackBuffer (iBase *parent);
-
+  csOpenGLProcBackBuffer (iBase*);
   virtual ~csOpenGLProcBackBuffer ();
 
   void Prepare (csGraphics3DOGLCommon *g3d, csTextureHandleOpenGL *tex, 
 		csPixelFormat *ipfmt, bool bpersistent);
-
-  virtual bool Initialize (iSystem* /*System*/)
-  { return false; }
 
   virtual bool Open (const char* /*Title*/)
   { return false; }
@@ -93,8 +87,6 @@ class csOpenGLProcBackBuffer : public csGraphics3DOGLCommon
 // We do all this just to intercept a few calls. Mostly to transform 
 // y co-ordinates to a native opengl screen co-ordinate system, but also
 // to be able to report the correct texture width and height of this context.
-
-
 class csOpenGLProcBackBuffer2D : public iGraphics2D
 {
   iGraphics2D *g2d;
@@ -106,21 +98,13 @@ class csOpenGLProcBackBuffer2D : public iGraphics2D
 
   csOpenGLProcBackBuffer2D (iGraphics2D *ig2d, int iwidth, int iheight, 
 			    csPixelFormat *ipfmt);  
-
   virtual ~csOpenGLProcBackBuffer2D ();
 
-  virtual bool Initialize (iSystem* /*System*/)
-  { return false; }
-
-  virtual bool Open (const char* /*Title*/)
-  { return false; }
-
+  virtual bool Open (const char*) { return false; }
   virtual void Close () {}
 
-  ///?
   virtual void SetClipRect (int nMinX, int nMinY, int nMaxX, int nMaxY)
   { g2d->SetClipRect (nMinX, nMinY, nMaxX, nMaxY); }
-  ///?
   virtual void GetClipRect (int& nMinX, int& nMinY, int& nMaxX, int& nMaxY)
   { g2d->GetClipRect (nMinX, nMinY, nMaxX, nMaxY); }
 
@@ -149,21 +133,13 @@ class csOpenGLProcBackBuffer2D : public iGraphics2D
   { g2d->ClearAll (color); }
 
   virtual void DrawLine (float x1, float y1, float x2, float y2, int color);
-
-
   virtual void DrawBox (int x, int y, int w, int h, int color);
 
-  ///?
   virtual bool ClipLine (float& x1, float& y1, float& x2, float& y2,
     int xmin, int ymin, int xmax, int ymax)
   { return g2d->ClipLine (x1, y1, x2, y2, xmin, ymin, xmax, ymax); }
-  ///
   virtual void DrawPixel (int x, int y, int color);
-
-  ///
   virtual unsigned char *GetPixelAt (int x, int y);
-
-  ///
   virtual csImageArea *SaveArea (int x, int y, int w, int h);
 
   virtual void RestoreArea (csImageArea *Area, bool Free)
@@ -180,8 +156,8 @@ class csOpenGLProcBackBuffer2D : public iGraphics2D
 
   virtual void SetRGB (int i, int r, int g, int b)
   { g2d->SetRGB (i, r, g, b); }
-  ///
-  virtual void Write (iFont *font, int x, int y, int fg, int bg, const char *str);
+
+  virtual void Write (iFont*, int x, int y, int fg, int bg, const char *str);
 
   virtual bool PerformExtension (const char *args)
   { return g2d->PerformExtension (args); }
@@ -191,10 +167,8 @@ class csOpenGLProcBackBuffer2D : public iGraphics2D
 
   virtual csPixelFormat *GetPixelFormat ()
   { return g2d->GetPixelFormat (); }
-  ///
-  virtual int GetWidth ();
 
-  ///
+  virtual int GetWidth ();
   virtual int GetHeight ();
 
   virtual bool GetFullScreen ()
@@ -206,7 +180,6 @@ class csOpenGLProcBackBuffer2D : public iGraphics2D
   virtual csRGBpixel *GetPalette ()
   { return g2d->GetPalette (); }
 
-  ///
   virtual void GetPixel (int x, int y, UByte &oR, UByte &oG, UByte &oB);
 
   virtual iImage *ScreenShot () 
@@ -228,6 +201,5 @@ class csOpenGLProcBackBuffer2D : public iGraphics2D
   virtual iFontServer *GetFontServer ()
   { return g2d->GetFontServer (); }
 };
-
 
 #endif // _OGL_PROCTEXBACK_H_

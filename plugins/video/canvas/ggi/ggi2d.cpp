@@ -20,7 +20,7 @@
 
 #include "cssysdef.h"
 #include "csutil/scf.h"
-#include "video/canvas/ggi/ggi2d.h"
+#include "ggi2d.h"
 #include "csgeom/csrect.h"
 #include "cssys/csinput.h"
 #include "isys/system.h"
@@ -36,16 +36,13 @@ SCF_EXPORT_CLASS_TABLE (ggi2d)
     "GGI 2D graphics driver for Crystal Space", "crystalspace.font.server.")
 SCF_EXPORT_CLASS_TABLE_END
 
-SCF_IMPLEMENT_IBASE (csGraphics2DGGI)
-  SCF_IMPLEMENTS_INTERFACE (iPlugIn)
-  SCF_IMPLEMENTS_INTERFACE (iGraphics2D)
+SCF_IMPLEMENT_IBASE_EXT (csGraphics2DGGI)
   SCF_IMPLEMENTS_INTERFACE (iEventPlug)
-SCF_IMPLEMENT_IBASE_END
+SCF_IMPLEMENT_IBASE_EXT_END
 
 // csGraphics2DGGI functions
-csGraphics2DGGI::csGraphics2DGGI(iBase *iParent) : csGraphics2D ()
+csGraphics2DGGI::csGraphics2DGGI(iBase *iParent) : csGraphics2D (iParent)
 {
-  SCF_CONSTRUCT_IBASE (iParent);
   EventOutlet = NULL;
 }
 
@@ -59,8 +56,8 @@ bool csGraphics2DGGI::Initialize (iSystem *pSystem)
 
   // GGI Starts here
 
-  CsPrintf (CS_MSG_INITIALIZATION, "Crystal Space GGI version.\n");
-  CsPrintf (CS_MSG_INITIALIZATION,  "Using %dx%dx%d resolution.\n\n", Width, Height, Depth);
+  CsPrintf (CS_MSG_INITIALIZATION, "Crystal Space GGI version.\n"
+    "Using %dx%dx%d resolution.\n\n", Width, Height, Depth);
 
   Memory = NULL;
 
@@ -153,7 +150,7 @@ bool csGraphics2DGGI::Initialize (iSystem *pSystem)
   pfmt.complete ();
 
   // Tell system driver to call us on every frame
-  System->CallOnEvents (this, CSMASK_Nothing);
+  System->CallOnEvents (&scfiPlugIn, CSMASK_Nothing);
   // Create the event outlet
   EventOutlet = System->CreateEventOutlet (this);
 

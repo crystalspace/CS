@@ -19,17 +19,15 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __SOUND_RENDER_SOFTWARE_H__
-#define __SOUND_RENDER_SOFTWARE_H__
-
-// SoundRender.H
-// csSoundRenderSoftware class.
+#ifndef __CS_SRDRCOM_H__
+#define __CS_SRDRCOM_H__
 
 #include "csutil/scf.h"
 #include "csutil/csvector.h"
 #include "csutil/cfgacc.h"
 #include "isound/data.h"
 #include "isound/renderer.h"
+#include "isys/plugin.h"
 
 struct iSoundDriver;
 struct iConfigFile;
@@ -38,10 +36,10 @@ class csSoundSourceSoftware;
 
 class csSoundRenderSoftware : public iSoundRender
 {
-friend class csSoundSourceSoftware;
+  friend class csSoundSourceSoftware;
 public:
   SCF_DECLARE_IBASE;
-  // the system driver
+  // The system driver.
   iSystem *System;
 
   csSoundRenderSoftware(iBase *piBase);
@@ -59,14 +57,14 @@ public:
   virtual void MixingFunction ();
   virtual bool HandleEvent (iEvent &e);
 
-  void Update();
+  void Update ();
   bool Open ();
   void Close ();
 
   // add a sound source
-  void AddSource(csSoundSourceSoftware *src);
+  void AddSource(csSoundSourceSoftware *);
   // remove a sound source
-  void RemoveSource(csSoundSourceSoftware *src);
+  void RemoveSource(csSoundSourceSoftware *);
 
   // is 16 bit mode device
   bool is16Bits();
@@ -105,7 +103,13 @@ public:
 
   // previous time the sound handles were updated
   cs_time LastTime;
+
+  struct eiPlugIn : public iPlugIn
+  {
+    SCF_DECLARE_EMBEDDED_IBASE(csSoundRenderSoftware);
+    virtual bool Initialize (iSystem* p) { return scfParent->Initialize(p); }
+    virtual bool HandleEvent (iEvent& e) { return scfParent->HandleEvent(e); }
+  } scfiPlugIn;
 };
 
-#endif
-
+#endif // __CS_SRDRCOM_H__

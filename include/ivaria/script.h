@@ -20,7 +20,6 @@
 #define __IVARIA_SCRIPT_H__
 
 #include "csutil/scf.h"
-#include "isys/plugin.h"
 
 struct iSystem;
 
@@ -29,7 +28,7 @@ SCF_VERSION (iScript, 0, 0, 1);
 /**
  * @@@ Please document iScript with Doxygen comments.
  */
-struct iScript : public iPlugIn
+struct iScript : public iBase
 {
   /// Initialize
   virtual bool Initialize (iSystem *iSys) = 0;

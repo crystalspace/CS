@@ -54,16 +54,12 @@ SCF_EXPORT_CLASS_TABLE (alleg2d)
     "Allegro 2D graphics driver for Crystal Space", "crystalspace.font.server.")
 SCF_EXPORT_CLASS_TABLE_END
 
-SCF_IMPLEMENT_IBASE (csGraphics2DAlleg)
-  SCF_IMPLEMENTS_INTERFACE (iPlugIn)
-  SCF_IMPLEMENTS_INTERFACE (iGraphics2D)
+SCF_IMPLEMENT_IBASE_EXT (csGraphics2DAlleg)
   SCF_IMPLEMENTS_INTERFACE (iEventPlug)
-SCF_IMPLEMENT_IBASE_END
+SCF_IMPLEMENT_IBASE_EXT_END
 
-csGraphics2DAlleg::csGraphics2DAlleg (iBase *iParent) :
-  csGraphics2D ()
+csGraphics2DAlleg::csGraphics2DAlleg (iBase *iParent) : csGraphics2D (iParent)
 {
-  SCF_CONSTRUCT_IBASE (iParent);
   EventOutlet = NULL;
   hook_kbd = hook_mouse = true;
   kbd_hook_active = mouse_hook_active = false;
@@ -113,7 +109,7 @@ bool csGraphics2DAlleg::Initialize (iSystem *pSystem)
 
   Font = 0;
   Memory = NULL;
-  System->CallOnEvents (this, CSMASK_Nothing);
+  System->CallOnEvents (&scfiPlugIn, CSMASK_Nothing);
   EventOutlet = System->CreateEventOutlet (this);
   return true;
 }
@@ -428,11 +424,3 @@ void csGraphics2DAlleg::EnableEvents (unsigned iType, bool iEnable)
     }
   }
 }
-
-#ifdef main
-int main (void)
-{
-  return 0;
-}
-END_OF_MAIN ()
-#endif /* main */

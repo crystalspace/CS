@@ -35,8 +35,10 @@ CS_IMPLEMENT_PLUGIN
 SCF_IMPLEMENT_FACTORY (csGraphics2DGlideX)
 
 SCF_EXPORT_CLASS_TABLE (glidx2d3)
-  SCF_EXPORT_CLASS_DEP (csGraphics2DGlideX, "crystalspace.graphics2d.glide.x.3",
-    "Glide V3/X 2D graphics driver for Crystal Space", "crystalspace.font.server.")
+  SCF_EXPORT_CLASS_DEP (csGraphics2DGlideX,
+    "crystalspace.graphics2d.glide.x.3",
+    "Glide V3/X 2D graphics driver for Crystal Space",
+    "crystalspace.font.server.")
 SCF_EXPORT_CLASS_TABLE_END
 
 #else
@@ -44,15 +46,17 @@ SCF_EXPORT_CLASS_TABLE_END
 SCF_IMPLEMENT_FACTORY (csGraphics2DGlideX)
 
 SCF_EXPORT_CLASS_TABLE (glidx2d2)
-  SCF_EXPORT_CLASS_DEP (csGraphics2DGlideX, "crystalspace.graphics2d.glide.x.2",
-    "Glide V2/X 2D graphics driver for Crystal Space", "crystalspace.font.server.")
+  SCF_EXPORT_CLASS_DEP (csGraphics2DGlideX,
+    "crystalspace.graphics2d.glide.x.2",
+    "Glide V2/X 2D graphics driver for Crystal Space",
+    "crystalspace.font.server.")
 SCF_EXPORT_CLASS_TABLE_END
 
 #endif
 
-SCF_IMPLEMENT_IBASE (csGraphics2DGlideX)
+SCF_IMPLEMENT_IBASE_EXT (csGraphics2DGlideX)
   SCF_IMPLEMENTS_INTERFACE (iEventPlug)
-SCF_IMPLEMENT_IBASE_END
+SCF_IMPLEMENT_IBASE_EXT_END
 
 csGraphics2DGlideX* thisPtr=NULL;
 
@@ -96,7 +100,6 @@ bool csGraphics2DGlideX::Initialize (iSystem *pSystem)
 
   // Determine visual information.
   //Visual* visual = DefaultVisual (dpy, screen_num);
-
   
   // calculate CS's pixel format structure. 565
   pfmt.PixelBytes = 2;
@@ -104,11 +107,9 @@ bool csGraphics2DGlideX::Initialize (iSystem *pSystem)
   pfmt.RedMask = (1+2+4+8+16)<<11;
   pfmt.GreenMask = (1+2+4+8+16+32)<<5;
   pfmt.BlueMask = (1+2+4+8+16);
-    
   pfmt.complete ();
 
-
-	/* 
+/* 
   pfmt.RedMask = 0xf00;//visual->red_mask;
   pfmt.GreenMask = 0xf0;//visual->green_mask;
   pfmt.BlueMask = 0xf;//visual->blue_mask;
@@ -120,18 +121,17 @@ bool csGraphics2DGlideX::Initialize (iSystem *pSystem)
     pfmt.PixelBytes = 1;		// Palette mode
   else
     pfmt.PixelBytes = 2;		// Truecolor mode
-	*/
+*/
 
   CsPrintf (CS_MSG_INITIALIZATION, "Video driver Glide/X version ");
   CsPrintf (CS_MSG_INITIALIZATION, "\n");
  
   // Tell system driver to call us on every frame
-  System->CallOnEvents (this, CSMASK_Nothing);
+  System->CallOnEvents (&scfiPlugIn, CSMASK_Nothing);
   // Create the event outlet
   EventOutlet = System->CreateEventOutlet (this);
 
   GraphicsReady = 1;  
-
   return true;
 }
 
@@ -166,15 +166,14 @@ bool csGraphics2DGlideX::Open(const char *Title)
   XSetGraphicsExposures (dpy, gc, False);
   XSetWindowAttributes attr;
   attr.event_mask = ExposureMask | KeyPressMask | KeyReleaseMask |
-       FocusChangeMask | PointerMotionMask | ButtonPressMask | ButtonReleaseMask 
-       | StructureNotifyMask;
+       FocusChangeMask | PointerMotionMask | ButtonPressMask |
+       ButtonReleaseMask | StructureNotifyMask;
   XChangeWindowAttributes (dpy, window, CWEventMask, &attr);
 
   // Intern WM_DELETE_WINDOW and set window manager protocol
   // (Needed to catch user using window manager "delete window" button)
   wm_delete_window = XInternAtom (dpy, "WM_DELETE_WINDOW", False);
   XSetWMProtocols (dpy, window, &wm_delete_window, 1);
-
 
   // Wait for expose event (why not ?)
   XEvent event;
@@ -194,7 +193,6 @@ bool csGraphics2DGlideX::Open(const char *Title)
       if (do_shm && !XShmQueryExtension (dpy))
       {
         do_shm = false;
-        //CsPrintf (CS_MSG_INITIALIZATION, "Shm extension not available on display!\n");
         printf ("Shm extension not available on display!\n");
       }
       if (do_shm)
@@ -206,8 +204,8 @@ bool csGraphics2DGlideX::Open(const char *Title)
         shmi.readOnly = FALSE;
         XShmAttach (dpy, &shmi);
 
-        // Delete memory segment. The memory stays available until the last client
-        // detaches from it.
+        // Delete memory segment.  The memory stays available until the last
+        // client detaches from it.
         XSync (dpy, False);
         shmctl (shmi.shmid, IPC_RMID, 0);
 
@@ -224,7 +222,6 @@ bool csGraphics2DGlideX::Open(const char *Title)
   }
 
   SetMousePosition( Width/2, Height/2 );
-
   return true;
 }
 
@@ -236,10 +233,8 @@ void csGraphics2DGlideX::Close(void)
     window = 0;
   }
   
-  
   if (m_DoGlideInWindow)
   {
-
 #ifdef DO_SHM
     shmdt(shmi.shmaddr);
 #else
@@ -252,7 +247,6 @@ void csGraphics2DGlideX::Close(void)
     unsetenv("SSTV2_VGA_PASS");
   } 
 
-  // Close your graphic interface
   csGraphics2DGlideCommon::Close ();
 }
 
@@ -265,23 +259,21 @@ void csGraphics2DGlideX::Print (csRect *area)
   csGraphics2DGlideCommon::Print( area );
 }
 
-
 // simplification of the Mesa FXgetImage() function
 void csGraphics2DGlideX::FXgetImage()
 {
-
   // we only handle 16bit 
-   if (Depth==16) 
-   {    
-          grLfbReadRegion( m_drawbuffer,       
+  if (Depth==16) 
+  {    
+    grLfbReadRegion( m_drawbuffer,       
                       0, 0,
                       Width, Height,
                       Width * 2,
                       xim->data);         
-   }
+  }
 
-   // now put image in window...
-   XPutImage (dpy, window, gc, xim, 0, 0, 0, 0, Width, Height);
+  // now put image in window...
+  XPutImage (dpy, window, gc, xim, 0, 0, 0, 0, Width, Height);
 }
 
 bool csGraphics2DGlideX::SetMouseCursor (csMouseCursorID iShape)
@@ -359,7 +351,8 @@ bool csGraphics2DGlideX::HandleEvent (iEvent &/*Event*/)
         // Neat trick: look in event queue if we have KeyPress events ahead
 	// with same keycode. If this is the case, discard the KeyUp event
 	// in favour of KeyDown since this is most (sure?) an autorepeat
-        XCheckIfEvent (event.xkey.display, &event, CheckKeyPress, (XPointer)&event);
+        XCheckIfEvent (event.xkey.display, &event, CheckKeyPress,
+	  (XPointer)&event);
         down = (event.type == KeyPress);
         charcount = XLookupString ((XKeyEvent *)&event, charcode,
           sizeof (charcode), &key, NULL);
@@ -431,16 +424,18 @@ bool csGraphics2DGlideX::HandleEvent (iEvent &/*Event*/)
           case XK_KP_Begin:   key = CSKEY_CENTER; break;
           default:            key = (key <= 127) ? ScanCodeToChar [key] : 0;
         }
-	EventOutlet->Key (key, charcount == 1 ? uint8 (charcode [0]) : 0, down);
+	EventOutlet->Key(key, charcount == 1 ? uint8 (charcode [0]) : 0, down);
         break;
       case FocusIn:
       case FocusOut:
-        EventOutlet->Broadcast (cscmdFocusChanged, (void *)(event.type == FocusIn));
+        EventOutlet->Broadcast (
+	  cscmdFocusChanged, (void *)(event.type == FocusIn));
         break;
       case Expose:
       {
         csRect rect (event.xexpose.x, event.xexpose.y,
-	  event.xexpose.x + event.xexpose.width, event.xexpose.y + event.xexpose.height);
+	  event.xexpose.x + event.xexpose.width,
+	  event.xexpose.y + event.xexpose.height);
 	Print (&rect);
         break;
       }
@@ -450,5 +445,3 @@ bool csGraphics2DGlideX::HandleEvent (iEvent &/*Event*/)
     }
   return false;
 }
-
-

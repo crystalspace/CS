@@ -20,6 +20,7 @@
 #define _TERRFLDR_H_
 
 #include "imap/reader.h"
+#include "isys/plugin.h"
 
 struct iEngine;
 struct iSystem;
@@ -33,21 +34,24 @@ private:
   iSystem* pSystem;
 
 public:
+  SCF_DECLARE_IBASE;
+
   /// Constructor.
   csTerrFuncFactoryLoader (iBase*);
-
   /// Destructor.
   virtual ~csTerrFuncFactoryLoader ();
 
-  /// Register plugin with the system driver
-  virtual bool Initialize (iSystem *pSys);
-
-public:
-  //------------------------ iLoaderPlugIn implementation --------------
-  SCF_DECLARE_IBASE;
-
   /// Parse a given string and return a new object for it.
   virtual iBase* Parse (const char* string, iEngine* engine, iBase* context);
+
+  struct eiPlugIn : public iPlugIn
+  {
+    SCF_DECLARE_EMBEDDED_IBASE(csTerrFuncFactoryLoader);
+    virtual bool Initialize (iSystem* p)
+    { scfParent->pSystem = p; return true; }
+    virtual bool HandleEvent (iEvent&) { return false; }
+  } scfiPlugIn;
+  friend struct eiPlugIn;
 };
 
 /**
@@ -59,22 +63,24 @@ private:
   iSystem* pSystem;
 
 public:
+  SCF_DECLARE_IBASE;
+
   /// Constructor.
   csTerrFuncLoader (iBase*);
-
   /// Destructor.
   virtual ~csTerrFuncLoader ();
 
-  /// Register plugin with the system driver
-  virtual bool Initialize (iSystem *pSys);
-
-public:
-  //------------------------ iLoaderPlugIn implementation --------------
-  SCF_DECLARE_IBASE;
-
   /// Parse a given string and return a new object for it.
   virtual iBase* Parse (const char* string, iEngine* engine, iBase* context);
+
+  struct eiPlugIn : public iPlugIn
+  {
+    SCF_DECLARE_EMBEDDED_IBASE(csTerrFuncLoader);
+    virtual bool Initialize (iSystem* p)
+    { scfParent->pSystem = p; return true; }
+    virtual bool HandleEvent (iEvent&) { return false; }
+  } scfiPlugIn;
+  friend struct eiPlugIn;
 };
 
 #endif // _TERRFLDR_H_
-

@@ -24,6 +24,7 @@
 #include "csutil/cscolor.h"
 #include "plugins/mesh/partgen/partgen.h"
 #include "imesh/spiral.h"
+#include "isys/plugin.h"
 
 /**
  * This class has a set of particles that act like a spiraling
@@ -125,25 +126,27 @@ private:
   iSystem* system;
 
 public:
+  SCF_DECLARE_IBASE;
+
   /// Constructor.
   csSpiralMeshObjectType (iBase*);
 
   /// Destructor.
   virtual ~csSpiralMeshObjectType ();
 
-  /// Register plugin with the system driver
-  virtual bool Initialize (iSystem *pSystem);
-
-  //------------------------ iMeshObjectType implementation --------------
-  SCF_DECLARE_IBASE;
-
   virtual iMeshObjectFactory* NewFactory ();
   virtual uint32 GetFeatures () const
   {
     return ALL_FEATURES;
   }
+
+  struct eiPlugIn : public iPlugIn
+  {
+    SCF_DECLARE_EMBEDDED_IBASE(csSpiralMeshObjectType);
+    virtual bool Initialize(iSystem* p) { scfParent->system = p; return true; }
+    virtual bool HandleEvent(iEvent&) { return false; }
+  } scfiPlugIn;
+  friend struct eiPlugIn;
 };
 
-
 #endif // __CS_SPIRAL_H__
-

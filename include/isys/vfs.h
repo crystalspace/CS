@@ -21,7 +21,6 @@
 #define __ISYS_VFS_H__
 
 #include "csutil/scf.h"
-#include "isys/plugin.h"
 #include "iutil/databuff.h"
 
 // forward declarations
@@ -134,11 +133,8 @@ SCF_VERSION (iVFS, 0, 0, 4);
  * only a list of file names; no fancy things like file size, time etc
  * (file size can be determined after opening it for reading).
  */
-struct iVFS : public iPlugIn
+struct iVFS : public iBase
 {
-  /// Initialize the Virtual File System plugin
-  virtual bool Initialize (iSystem *iSys) = 0;
-
   /// Set current working directory
   virtual bool ChDir (const char *Path) = 0;
   /// Get current working directory
@@ -154,12 +150,16 @@ struct iVFS : public iPlugIn
    * 'currend virtual directory'. Return a new iString object.
    * If IsDir is true, expanded path ends in an '/', otherwise no.
    */
-  virtual iDataBuffer *ExpandPath (const char *Path, bool IsDir = false) const = 0;
+  virtual iDataBuffer *ExpandPath (
+    const char *Path, bool IsDir = false) const = 0;
 
   /// Check whenever a file exists
   virtual bool Exists (const char *Path) const = 0;
 
-  /// Find all files in a virtual directory and return an array with their names
+  /**
+   * Find all files in a virtual directory and return an array with their
+   * names.
+   */
   virtual iStrVector *FindFiles (const char *Path) const = 0;
   /// Replacement for standard fopen()
   virtual iFile *Open (const char *FileName, int Mode) = 0;
@@ -172,7 +172,7 @@ struct iVFS : public iPlugIn
    */
   virtual iDataBuffer *ReadFile (const char *FileName) = 0;
   /// Write an entire file in one pass.
-  virtual bool WriteFile (const char *FileName, const char *Data, size_t Size) = 0;
+  virtual bool WriteFile (const char *Name, const char *Data, size_t Size) = 0;
 
   /// Delete a file on VFS
   virtual bool DeleteFile (const char *FileName) = 0;

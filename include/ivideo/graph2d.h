@@ -21,7 +21,6 @@
 
 #include "csutil/scf.h"
 #include "csgfx/rgbpixel.h"
-#include "isys/plugin.h"
 #include "ivideo/texture.h"
 #include "iengine/texture.h"
 #include "ivideo/cursor.h"
@@ -37,12 +36,15 @@ struct iFont;
 struct csPixelFormat
 {
   /**
-   * The masks to extract the color information from a pixel (truecolor mode only).
-   * Currently only masks for 16-bit/15-bit colors are supported.
+   * The masks to extract the color information from a pixel (truecolor mode
+   * only).  Currently only masks for 16-bit/15-bit colors are supported.
    * Ignore the Mask and Shift fields of this structure if PalEntries != 0.
    */
   ULong RedMask, GreenMask, BlueMask;
-  /// The shifts to extract the color information from a pixel (truecolor mode only).
+  /**
+   * The shifts to extract the color information from a pixel (truecolor mode
+   * only).
+   */
   int RedShift, GreenShift, BlueShift;
   /// The number of significant bits for every color.
   int RedBits, GreenBits, BlueBits;
@@ -104,7 +106,7 @@ SCF_VERSION (iGraphics2D, 2, 0, 0);
  * for all 2D operations such as creating the window, switching pages,
  * returning pixel format and so on.
  */
-struct iGraphics2D : public iPlugIn
+struct iGraphics2D : public iBase
 {
   /// Open the device.
   virtual bool Open (const char *Title) = 0;
@@ -159,7 +161,7 @@ struct iGraphics2D : public iPlugIn
   virtual void SetClipRect (int nMinX, int nMinY, int nMaxX, int nMaxY) = 0;
 
   /// Retrieve clipping rectangle
-  virtual void GetClipRect (int& nMinX, int& nMinY, int& nMaxX, int& nMaxY) = 0;
+  virtual void GetClipRect(int& nMinX, int& nMinY, int& nMaxX, int& nMaxY) = 0;
 
   /**
    * This routine should be called before any draw operations.
@@ -184,7 +186,7 @@ struct iGraphics2D : public iPlugIn
   virtual void ClearAll (int color) = 0;
 
   /// Draw a line.
-  virtual void DrawLine (float x1, float y1, float x2, float y2, int color) = 0;
+  virtual void DrawLine(float x1, float y1, float x2, float y2, int color) = 0;
 
   /// Draw a box
   virtual void DrawBox (int x, int y, int w, int h, int color) = 0;

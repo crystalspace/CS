@@ -21,13 +21,14 @@
 
 #include "sft3dcom.h"
 #include "ivideo/sproctxt.h"
+#include "isys/plugin.h"
 
 class csTextureHandleSoftware;
 class csTextureCacheSoftware;
 
-class csSoftProcTexture3D : public csGraphics3DSoftwareCommon, 
-			    public iSoftProcTexture
+class csSoftProcTexture3D : public csGraphics3DSoftwareCommon
 {
+private:
   /// Whether sharing resources
   bool sharing;
   /// True when it is necessary to reprepare a texture each update.
@@ -38,9 +39,11 @@ class csSoftProcTexture3D : public csGraphics3DSoftwareCommon,
   csTextureHandleSoftware *parent_tex_mm;
   /// The main gfx contexts texture cache
   csTextureCacheSoftware *main_tcache;
+  /// The partner.
+  csGraphics3DSoftwareCommon* partner;
 
 public:
-  SCF_DECLARE_IBASE;
+  SCF_DECLARE_IBASE_EXT(csGraphics3DSoftwareCommon);
 
   csSoftProcTexture3D (iBase *iParent);
   virtual ~csSoftProcTexture3D ();
@@ -48,22 +51,28 @@ public:
   bool Prepare (csTextureManagerSoftware *main_texman, 
 		csTextureHandleSoftware *tex_mm, 
 		void *buffer, uint8 *bitmap);
-
-  virtual bool Initialize (iSystem *iSys);
-
   virtual void Print (csRect *area);
 
-  //----------------------------------------------------------------------------
-  /// The entry interface for other than software drivers..
-  /// implementation of iSoftProcTexture
+  /**
+   * The entry interface for other than software drivers..
+   * implementation of iSoftProcTexture.
+   */
   virtual iTextureHandle *CreateOffScreenRenderer 
     (iGraphics3D *parent_g3d, iGraphics3D *partner_g3d, int width, int height, 
      void *buffer, csPixelFormat *ipfmt, int flags);
   /// Converts mode from alone to shared.
-  virtual void ConvertMode ();
 
-private:
-  csGraphics3DSoftwareCommon* partner;
+  struct eiSoftProcTexture : public iSoftProcTexture
+  {
+    SCF_DECLARE_EMBEDDED_IBASE(csSoftProcTexture3D);
+    virtual iTextureHandle *CreateOffScreenRenderer 
+    (iGraphics3D *parent_g3d, iGraphics3D *partner_g3d, int width, int height, 
+     void *buffer, csPixelFormat *ipfmt, int flags)
+    { return scfParent->CreateOffScreenRenderer(parent_g3d, partner_g3d,
+      width, height, buffer, ipfmt, flags); }
+    virtual void ConvertMode () { scfParent->reprepare = true; }
+  } scfiSoftProcTexture;
+  friend struct eiSoftProcTexture;
 };
 
 #endif // __CS_PROTEX3D_H__

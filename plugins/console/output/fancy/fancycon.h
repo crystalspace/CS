@@ -100,7 +100,8 @@ public:
   virtual void AutoUpdate (bool b) { auto_update = b; base->AutoUpdate(b); }
   virtual void SetCursorPos (int p) { base->SetCursorPos(p); }
   virtual int GetMaxLineWidth () { return base->GetMaxLineWidth(); }
-  virtual void RegisterPlugin (iPlugIn *p) { base->RegisterPlugin(p); }
+  virtual void RegisterWatcher (iConsoleWatcher *p)
+    { base->RegisterWatcher(p); }
   virtual bool ConsoleExtension (const char *command, ...);
   virtual bool ConsoleExtensionV (const char *iCommand, va_list);
 

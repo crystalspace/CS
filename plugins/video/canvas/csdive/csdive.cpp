@@ -54,19 +54,16 @@ SCF_EXPORT_CLASS_TABLE (csdive)
     "OS/2 DIVE 2D graphics driver for Crystal Space", "crystalspace.font.server.")
 SCF_EXPORT_CLASS_TABLE_END
 
-SCF_IMPLEMENT_IBASE (csGraphics2DOS2DIVE)
-  SCF_IMPLEMENTS_INTERFACE (iPlugIn)
-  SCF_IMPLEMENTS_INTERFACE (iGraphics2D)
+SCF_IMPLEMENT_IBASE_EXT (csGraphics2DOS2DIVE)
   SCF_IMPLEMENTS_INTERFACE (iEventPlug)
-SCF_IMPLEMENT_IBASE_END
+SCF_IMPLEMENT_IBASE_EXT_END
 
 csGraphics2DOS2DIVE::csGraphics2DOS2DIVE (iBase *iParent) :
-  csGraphics2D (),
+  csGraphics2D (iParent),
   dblbuff (true), HardwareCursor (true),
   WindowX (INT_MIN), WindowY (INT_MIN),
   WindowWidth (-1), WindowHeight (-1)
 {
-  SCF_CONSTRUCT_IBASE (iParent);
   // Initialize module handle
 #ifdef CS_STATIC_LINKED
   gdMH = NULLHANDLE;

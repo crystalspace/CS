@@ -16,32 +16,23 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef I_DD8_H
-#define I_DD8_H
+#ifndef __CS_I_DD8_H__
+#define __CS_I_DD8_H__
 
 #include <ddraw.h>
-
 #include "csutil/scf.h"
 
 SCF_VERSION (iGraphics2DDDraw8, 0, 0, 1);
 
 struct iGraphics2DDDraw8 : public iBase
 {
-
   virtual void GetDirectDrawDriver (LPDIRECTDRAW7* lplpDirectDraw) = 0;
-
   virtual void GetDirectDrawPrimary (LPDIRECTDRAWSURFACE7* lplpDirectDrawPrimary) = 0;
-
   virtual void GetDirectDrawBackBuffer (LPDIRECTDRAWSURFACE7* lplpDirectDrawBackBuffer) = 0;
-
   virtual void GetDirectDetection (IDirectDetectionInternal** lplpDDetection) = 0;
-
   virtual void SetColorPalette (void) = 0;
-
   virtual void SetFor3D(bool For3D) = 0;
-
   virtual void SetModeSwitchCallback (void (*Callback) (void *), void *Data) = 0;
-
 };
 
-#endif // End of I_DD8_H
+#endif // __CS_I_DD8_H__

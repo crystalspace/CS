@@ -46,24 +46,25 @@ csRapidCollider::~csRapidCollider ()
 
 SCF_IMPLEMENT_IBASE (csRapidCollideSystem)
   SCF_IMPLEMENTS_INTERFACE (iCollideSystem)
-  SCF_IMPLEMENTS_INTERFACE (iPlugIn)
+  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iPlugIn)
 SCF_IMPLEMENT_IBASE_END
+
+SCF_IMPLEMENT_EMBEDDED_IBASE (csRapidCollideSystem::eiPlugIn)
+  SCF_IMPLEMENTS_INTERFACE (iPlugIn)
+SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 SCF_IMPLEMENT_FACTORY (csRapidCollideSystem)
 
 SCF_EXPORT_CLASS_TABLE (rapid)
-  SCF_EXPORT_CLASS (csRapidCollideSystem, "crystalspace.collisiondetection.rapid",
+  SCF_EXPORT_CLASS (csRapidCollideSystem,
+    "crystalspace.collisiondetection.rapid",
     "Crystal Space RAPID CD System")
 SCF_EXPORT_CLASS_TABLE_END
 
 csRapidCollideSystem::csRapidCollideSystem (iBase *pParent)
 {
   SCF_CONSTRUCT_IBASE (pParent);
-}
-
-bool csRapidCollideSystem::Initialize (iSystem*)
-{
-  return true;
+  SCF_CONSTRUCT_EMBEDDED_IBASE(scfiPlugIn);
 }
 
 iCollider* csRapidCollideSystem::CreateCollider (iPolygonMesh* mesh)
@@ -72,8 +73,8 @@ iCollider* csRapidCollideSystem::CreateCollider (iPolygonMesh* mesh)
   return col;
 }
 
-bool csRapidCollideSystem::Collide (iCollider* collider1, const csTransform* trans1,
-  	iCollider* collider2, const csTransform* trans2)
+bool csRapidCollideSystem::Collide (iCollider* collider1,
+  const csTransform* trans1, iCollider* collider2, const csTransform* trans2)
 {
   csRapidCollider* col1 = (csRapidCollider*)collider1;
   csRapidCollider* col2 = (csRapidCollider*)collider2;
@@ -96,4 +97,3 @@ void csRapidCollideSystem::ResetCollisionPairs ()
   csRAPIDCollider::CollideReset ();
   csRAPIDCollider::numHits = 0;
 }
-

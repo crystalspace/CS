@@ -53,13 +53,21 @@ CS_TOKEN_DEF_END
 
 SCF_IMPLEMENT_IBASE (csTerrFuncFactoryLoader)
   SCF_IMPLEMENTS_INTERFACE (iLoaderPlugIn)
-  SCF_IMPLEMENTS_INTERFACE (iPlugIn)
+  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iPlugIn)
 SCF_IMPLEMENT_IBASE_END
+
+SCF_IMPLEMENT_EMBEDDED_IBASE (csTerrFuncFactoryLoader::eiPlugIn)
+  SCF_IMPLEMENTS_INTERFACE (iPlugIn)
+SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 SCF_IMPLEMENT_IBASE (csTerrFuncLoader)
   SCF_IMPLEMENTS_INTERFACE (iLoaderPlugIn)
-  SCF_IMPLEMENTS_INTERFACE (iPlugIn)
+  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iPlugIn)
 SCF_IMPLEMENT_IBASE_END
+
+SCF_IMPLEMENT_EMBEDDED_IBASE (csTerrFuncLoader::eiPlugIn)
+  SCF_IMPLEMENTS_INTERFACE (iPlugIn)
+SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 SCF_IMPLEMENT_FACTORY (csTerrFuncFactoryLoader)
 SCF_IMPLEMENT_FACTORY (csTerrFuncLoader)
@@ -75,16 +83,11 @@ SCF_EXPORT_CLASS_TABLE_END
 csTerrFuncFactoryLoader::csTerrFuncFactoryLoader (iBase* pParent)
 {
   SCF_CONSTRUCT_IBASE (pParent);
+  SCF_CONSTRUCT_EMBEDDED_IBASE(scfiPlugIn);
 }
 
 csTerrFuncFactoryLoader::~csTerrFuncFactoryLoader ()
 {
-}
-
-bool csTerrFuncFactoryLoader::Initialize (iSystem* pSys)
-{
-  pSystem = pSys;
-  return true;
 }
 
 iBase* csTerrFuncFactoryLoader::Parse (const char* /*string*/,
@@ -108,16 +111,11 @@ iBase* csTerrFuncFactoryLoader::Parse (const char* /*string*/,
 csTerrFuncLoader::csTerrFuncLoader (iBase* pParent)
 {
   SCF_CONSTRUCT_IBASE (pParent);
+  SCF_CONSTRUCT_EMBEDDED_IBASE(scfiPlugIn);
 }
 
 csTerrFuncLoader::~csTerrFuncLoader ()
 {
-}
-
-bool csTerrFuncLoader::Initialize (iSystem* pSys)
-{
-  pSystem = pSys;
-  return true;
 }
 
 iBase* csTerrFuncLoader::Parse (const char* pString, iEngine *iEngine,

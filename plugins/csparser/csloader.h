@@ -21,7 +21,7 @@
 #define __CS_CSLOADER_H__
 
 #include "imap/parser.h"
-
+#include "isys/plugin.h"
 #include "csutil/csvector.h"
 #include "csutil/util.h"
 #include "csgeom/quaterni.h"
@@ -265,6 +265,13 @@ public:
 
   virtual iMeshFactoryWrapper* LoadMeshObjectFactory (const char* fname);
   virtual iMeshWrapper* LoadMeshObject (const char* fname);
+
+  struct eiPlugIn : public iPlugIn
+  {
+    SCF_DECLARE_EMBEDDED_IBASE(csLoader);
+    virtual bool Initialize (iSystem* p) { return scfParent->Initialize(p); }
+    virtual bool HandleEvent (iEvent&) { return false; }
+  } scfiPlugIn;
 };
 
 #endif // __CS_CSLOADER_H__

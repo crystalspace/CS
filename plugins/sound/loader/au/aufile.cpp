@@ -23,6 +23,7 @@
 
 #include "cssysdef.h"
 #include "isound/loader.h"
+#include "isys/plugin.h"
 #include "../common/soundraw.h"
 #include "../common/sndload.h"
 
@@ -37,19 +38,29 @@ class csSoundLoader_AU : public iSoundLoader
 public:
   SCF_DECLARE_IBASE;
 
-  csSoundLoader_AU(iBase *p) {
+  struct eiPlugIn : public iPlugIn
+  {
+    SCF_DECLARE_EMBEDDED_IBASE(csSoundLoader_AU);
+    virtual bool Initialize (iSystem*) { return true; }
+    virtual bool HandleEvent (iEvent&) { return false; }
+  } scfiPlugIn;
+
+  csSoundLoader_AU(iBase *p)
+  {
     SCF_CONSTRUCT_IBASE(p);
-  }
-  virtual bool Initialize(iSystem *) {
-    return true;
+    SCF_CONSTRUCT_EMBEDDED_IBASE(scfiPlugIn);
   }
   virtual iSoundData *LoadSound(void *Buffer, unsigned long Size) const;
 };
 
 SCF_IMPLEMENT_IBASE(csSoundLoader_AU)
   SCF_IMPLEMENTS_INTERFACE(iSoundLoader)
-  SCF_IMPLEMENTS_INTERFACE(iPlugIn)
+  SCF_IMPLEMENTS_EMBEDDED_INTERFACE(iPlugIn)
 SCF_IMPLEMENT_IBASE_END;
+
+SCF_IMPLEMENT_EMBEDDED_IBASE (csSoundLoader_AU::eiPlugIn)
+  SCF_IMPLEMENTS_INTERFACE (iPlugIn)
+SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 SCF_IMPLEMENT_FACTORY(csSoundLoader_AU);
 
@@ -67,7 +78,8 @@ SCF_EXPORT_CLASS_TABLE_END;
 #define addStream(x) {if((index+x)>size) {goto exit_read;} else {index+=x;}}
 #define Stream buf[index]
 
-iSoundData *csSoundLoader_AU::LoadSound(void *databuf, ULong size) const {
+iSoundData *csSoundLoader_AU::LoadSound(void *databuf, ULong size) const
+{
   UByte *buf = (UByte*) databuf;
   unsigned long index=0;
   csSoundDataRaw *sb= NULL;
@@ -126,7 +138,8 @@ iSoundData *csSoundLoader_AU::LoadSound(void *databuf, ULong size) const {
     while(i<nbytes)
     {
       dummy0 = Stream; addStream(1);
-       // datas are stored in unsigned 8 bit but mixer engine only support signed 8 bit
+      // datas are stored in unsigned 8 bit but mixer engine only support
+      // signed 8 bit
       *ptr++=dummy0-128;
       i++;
     }

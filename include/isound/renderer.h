@@ -21,7 +21,6 @@
 #ifndef __ISOUND_RENDERER_H__
 #define __ISOUND_RENDERER_H__
 
-#include "isys/plugin.h"
 #include "isound/source.h"
 
 struct iSoundListener;
@@ -43,7 +42,7 @@ SCF_VERSION (iSoundRender, 1, 0, 0);
  * Before you can play a sound, you must first register it and get a sound
  * handle. <p>
  */
-struct iSoundRender : public iPlugIn
+struct iSoundRender : public iBase
 {
 public:
   /// Set Volume [0, 1]

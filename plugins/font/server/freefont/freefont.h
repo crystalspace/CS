@@ -19,8 +19,9 @@
 #ifndef __CS_FREEFONT_H__
 #define __CS_FREEFONT_H__
 
-#include "isys/system.h"
 #include "ivideo/fontserv.h"
+#include "isys/system.h"
+#include "isys/plugin.h"
 #include "csutil/csvector.h"
 #include "csutil/util.h"
 #include "csutil/cfgacc.h"
@@ -220,6 +221,13 @@ public:
    * through all indices starting from 0 until you get NULL.
    */
   virtual iFont *GetFont (int iIndex);
+
+  struct eiPlugIn : public iPlugIn
+  {
+    SCF_DECLARE_EMBEDDED_IBASE(csFreeTypeServer);
+    virtual bool Initialize (iSystem* p) { return scfParent->Initialize(p); }
+    virtual bool HandleEvent (iEvent&) { return false; }
+  } scfiPlugIn;
 };
 
 #endif // __CS_FREEFONT_H__

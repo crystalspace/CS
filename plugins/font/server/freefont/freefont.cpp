@@ -35,13 +35,18 @@ SCF_EXPORT_CLASS_TABLE (freefont)
 SCF_EXPORT_CLASS_TABLE_END
 
 SCF_IMPLEMENT_IBASE (csFreeTypeServer)
-  SCF_IMPLEMENTS_INTERFACE (iPlugIn)
   SCF_IMPLEMENTS_INTERFACE (iFontServer)
+  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iPlugIn)
 SCF_IMPLEMENT_IBASE_END
+
+SCF_IMPLEMENT_EMBEDDED_IBASE (csFreeTypeServer::eiPlugIn)
+  SCF_IMPLEMENTS_INTERFACE (iPlugIn)
+SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 csFreeTypeServer::csFreeTypeServer (iBase *pParent)
 {
   SCF_CONSTRUCT_IBASE (pParent);
+  SCF_CONSTRUCT_EMBEDDED_IBASE(scfiPlugIn);
   VFS = NULL;
 }
 
@@ -254,7 +259,8 @@ bool csFreeTypeFont::Load (csFreeTypeServer *server)
   while (i < prop.num_CharMaps)
   {
     if ((error = TT_Get_CharMap_ID (face, i, &pID, &eID)))
-      server->System->Printf(CS_MSG_WARNING,"Get_CharMap_ID: error %d.\n",error);
+      server->System->Printf(CS_MSG_WARNING,
+        "Get_CharMap_ID: error %d.\n",error);
     if (server->platformID == pID && server->encodingID == eID)
       break;
     i++;
@@ -269,11 +275,12 @@ bool csFreeTypeFont::Load (csFreeTypeServer *server)
 
     if ((error = TT_Get_CharMap_ID (face, 0, &pID, &eID)))
     {
-      server->System->Printf(CS_MSG_WARNING,"Get_CahrMap_ID: error %d.\n",error);
+      server->System->Printf(CS_MSG_WARNING,
+        "Get_CahrMap_ID: error %d.\n",error);
       return false;
     }
-    server->System->Printf (CS_MSG_INITIALIZATION, "Will instead use encoding %d"
-      " for platform %d.\n", eID, pID);
+    server->System->Printf (CS_MSG_INITIALIZATION,
+      "Will instead use encoding %d for platform %d.\n", eID, pID);
     i = 0;
   }
 

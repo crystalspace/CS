@@ -27,6 +27,7 @@
 #include "csgeom/tesselat.h"
 #include "imesh/object.h"
 #include "imesh/metaball.h"
+#include "isys/plugin.h"
 
 #define ALL_FEATURES (CS_OBJECT_FEATURE_LIGHTING|CS_OBJECT_FEATURE_ANIMATION)
 
@@ -76,7 +77,7 @@ class csMetaBall : public iMeshObject
 
 public:
   SCF_DECLARE_IBASE;
-  
+
   csMetaBall (iMeshObjectFactory *fact);
   virtual ~csMetaBall ();
   virtual bool Initialize ();
@@ -114,7 +115,7 @@ public:
 
   virtual iMeshObjectFactory * GetFactory() const { return factory; }
   virtual bool DrawTest ( iRenderView* rview, iMovable* movable );
-  virtual void UpdateLighting ( iLight** lights, int num_lights, 
+  virtual void UpdateLighting ( iLight** lights, int num_lights,
 	  iMovable* movable );
   virtual bool Draw ( iRenderView* rview, iMovable* movable,
 	  csZBufMode mode );
@@ -124,20 +125,21 @@ public:
     if (vis_cb) vis_cb->DecRef ();
     vis_cb = cb;
   }
-  virtual iMeshObjectDrawCallback* GetVisibleCallback() const { return vis_cb; }
+  virtual iMeshObjectDrawCallback* GetVisibleCallback() const
+  { return vis_cb; }
   float GetScreenBoundingBox( long cam_num, long mov_num,
-		float fov, float sx, float sy, const csReversibleTransform& trans,
-		csBox2& sbox, csBox3& cbox );
-  void GetTransformedBoundingBox( long cam_num, long move_num, 
-		const csReversibleTransform& trans, csBox3& cbox);
+    float fov, float sx, float sy, const csReversibleTransform& trans,
+    csBox2& sbox, csBox3& cbox );
+  void GetTransformedBoundingBox( long cam_num, long move_num,
+    const csReversibleTransform& trans, csBox3& cbox);
   void CreateBoundingBox();
-  virtual void GetObjectBoundingBox ( csBox3& bbox, int type = CS_BBOX_NORMAL );  
+  virtual void GetObjectBoundingBox ( csBox3& bbox, int type = CS_BBOX_NORMAL );
   virtual void NextFrame( cs_time /* current_time */ );
   virtual bool WantToDie() const { return false; }
   virtual void HardTransform( const csReversibleTransform &t );
   virtual bool SupportsHardTransform() const { return false; }
   virtual bool HitBeamObject( const csVector3&, const csVector3&,
-	  csVector3 &, float *);
+    csVector3 &, float *);
   virtual long GetShapeNumber() const { return shape_num; }
   virtual csVector3 GetRadius() { return rad; }
   virtual UInt GetMixMode() { return MixMode; }
@@ -161,37 +163,36 @@ public:
 ///-------------------- Meta Ball state implementation
   class MetaBallState : public iMetaBallState
   {
-	SCF_DECLARE_EMBEDDED_IBASE(csMetaBall);
+    SCF_DECLARE_EMBEDDED_IBASE(csMetaBall);
 
-	virtual int GetMetaBallCount() 
-	  { return scfParent->GetMetaBallCount(); }
-	virtual void SetMetaBallCount( int num )
-	  { scfParent->SetMetaBallCount( num ); }
-	virtual void SetQualityEnvironmentMapping ( bool tog )
-	  { scfParent->SetQualityEnvironmentMapping( tog ); }
-	virtual bool GetQualityEnvironmentMapping()
-	  { return scfParent->GetQualityEnvironmentMapping(); }
-	virtual float GetEnvironmentMappingFactor()
-	  { return scfParent->GetEnvironmentMappingFactor(); }
-	virtual void SetEnvironmentMappingFactor(float env )
-	  { scfParent->SetEnvironmentMappingFactor( env ); }
-	virtual MetaParameters *GetParameters()
-	  { return scfParent->GetParameters(); }
-	virtual void SetMaterial ( iMaterialWrapper *mat )
-	  { scfParent->SetMaterial(mat); }
-	virtual int ReportTriangleCount()
-	  { return scfParent->ReportTriangleCount(); }
-	virtual UInt GetMixMode ()
-	  { return scfParent->GetMixMode(); }
-	virtual void SetMixMode( UInt mode )
-	  { scfParent->SetMixMode( mode ); }
-	virtual bool IsLighting() 
-	  { return scfParent->IsLighting(); }
-	virtual void SetLighting(bool set) 
-	  { scfParent->SetLighting(set); }
-	virtual iMaterialWrapper* GetMaterial()
-	  { return scfParent->GetMaterial(); }
-	
+    virtual int GetMetaBallCount()
+      { return scfParent->GetMetaBallCount(); }
+    virtual void SetMetaBallCount( int num )
+      { scfParent->SetMetaBallCount( num ); }
+    virtual void SetQualityEnvironmentMapping ( bool tog )
+      { scfParent->SetQualityEnvironmentMapping( tog ); }
+    virtual bool GetQualityEnvironmentMapping()
+      { return scfParent->GetQualityEnvironmentMapping(); }
+    virtual float GetEnvironmentMappingFactor()
+      { return scfParent->GetEnvironmentMappingFactor(); }
+    virtual void SetEnvironmentMappingFactor(float env )
+      { scfParent->SetEnvironmentMappingFactor( env ); }
+    virtual MetaParameters *GetParameters()
+      { return scfParent->GetParameters(); }
+    virtual void SetMaterial ( iMaterialWrapper *mat )
+      { scfParent->SetMaterial(mat); }
+    virtual int ReportTriangleCount()
+      { return scfParent->ReportTriangleCount(); }
+    virtual UInt GetMixMode ()
+      { return scfParent->GetMixMode(); }
+    virtual void SetMixMode( UInt mode )
+      { scfParent->SetMixMode( mode ); }
+    virtual bool IsLighting()
+      { return scfParent->IsLighting(); }
+    virtual void SetLighting(bool set)
+      { scfParent->SetLighting(set); }
+    virtual iMaterialWrapper* GetMaterial()
+      { return scfParent->GetMaterial(); }
   } scfiMetaBallState;
   friend class MetaBallState;
 };
@@ -209,25 +210,29 @@ public:
 
 
 /*
- *	MetaBall type. Use this plugin to create instances of  
+ *	MetaBall type. Use this plugin to create instances of
  *	csMetaBallMeshObjectFactory.
  */
 
 class csMetaBallType : public iMeshObjectType
 {
 public:
+  SCF_DECLARE_IBASE;
 
   csMetaBallType ( iBase * );
   virtual ~csMetaBallType();
-  virtual bool Initialize ( iSystem *sys );
-  
-  SCF_DECLARE_IBASE;
-  
   virtual iMeshObjectFactory* NewFactory();
   virtual uint32 GetFeatures () const
   {
     return ALL_FEATURES;
   }
+
+  struct eiPlugIn : public iPlugIn
+  {
+    SCF_DECLARE_EMBEDDED_IBASE(csMetaBallType);
+    virtual bool Initialize (iSystem*) { return true; }
+    virtual bool HandleEvent (iEvent&) { return false; }
+  } scfiPlugIn;
 };
 
 #endif // __META_H__

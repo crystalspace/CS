@@ -22,7 +22,6 @@
 
 #include "csutil/scf.h"
 #include "csgeom/plane3.h"
-#include "isys/plugin.h"
 
 class csMatrix3;
 class csVector3;
@@ -70,22 +69,24 @@ struct csPixelFormat;
  * Mix modes for DrawPolygonFX ()
  * The constants below can be ORed together if they belong to different masks.
  */ 
-#define CS_FX_MASK_MIXMODE	0xF0000000	// SRC/DST mixing mode mask
-#define CS_FX_COPY		0x00000000	// =SRC
-#define CS_FX_MULTIPLY		0x10000000	// =SRC*DST
-#define CS_FX_MULTIPLY2		0x20000000	// =2*SRC*DST
-#define CS_FX_ADD		0x30000000	// =SRC+DST
-#define CS_FX_ALPHA		0x40000000	// =(1-alpha)*SRC + alpha*DST
-#define CS_FX_TRANSPARENT	0x50000000	// =DST
-#define CS_FX_KEYCOLOR		0x08000000	// color 0 is transparent
-#define CS_FX_GOURAUD		0x04000000	// Gouraud shading
-#define CS_FX_TILING		0x02000000	// Tiling
-#define CS_FX_MASK_ALPHA	0x000000FF	// alpha = 0..FF (opaque..transparent)
+#define CS_FX_MASK_MIXMODE 0xF0000000 // SRC/DST mixing mode mask
+#define CS_FX_COPY         0x00000000 // =SRC
+#define CS_FX_MULTIPLY     0x10000000 // =SRC*DST
+#define CS_FX_MULTIPLY2    0x20000000 // =2*SRC*DST
+#define CS_FX_ADD          0x30000000 // =SRC+DST
+#define CS_FX_ALPHA        0x40000000 // =(1-alpha)*SRC + alpha*DST
+#define CS_FX_TRANSPARENT  0x50000000 // =DST
+#define CS_FX_KEYCOLOR     0x08000000 // color 0 is transparent
+#define CS_FX_GOURAUD      0x04000000 // Gouraud shading
+#define CS_FX_TILING       0x02000000 // Tiling
+#define CS_FX_MASK_ALPHA   0x000000FF // alpha = 0..FF (opaque..transparent)
 
 /// Macro for setting of alpha bits into mixmode (alpha between 0 and 1).
-#define CS_FX_SETALPHA(alpha)	(CS_FX_ALPHA | uint (alpha * CS_FX_MASK_ALPHA))
+#define CS_FX_SETALPHA(alpha) \
+  (CS_FX_ALPHA | uint (alpha * CS_FX_MASK_ALPHA))
 /// Macro for setting of alpha bits into mixmode (alpha between 0 and 255).
-#define CS_FX_SETALPHA_INT(alpha) (CS_FX_ALPHA | uint (alpha & CS_FX_MASK_ALPHA))
+#define CS_FX_SETALPHA_INT(alpha) \
+  (CS_FX_ALPHA | uint (alpha & CS_FX_MASK_ALPHA))
 
 /// Vertex Structure for use with G3DPolygonDP and G3DPolygonDFP
 class G3DVertex
@@ -511,19 +512,16 @@ struct csFog
   float blue;
 };
 
-SCF_VERSION (iGraphics3D, 4, 2, 2);
+SCF_VERSION (iGraphics3D, 5, 0, 0);
 
 /**
  * This is the standard 3D graphics interface.
- * All 3D graphics rasterizer servers for Crystal Space
- * should implement this interface, as well as the iGraphics2D interface.
- * The standard implementation is csGraphics3DSoftware.
+ * All 3D graphics rasterizer servers for Crystal Space should implement this
+ * interface, as well as the iGraphics2D interface.  The standard
+ * implementation is csGraphics3DSoftware.
  */
-struct iGraphics3D : public iPlugIn
+struct iGraphics3D : public iBase
 {
-  /// Initialize the 3D graphics system.
-  virtual bool Initialize (iSystem *pSystem) = 0;
-
   /// Open the 3D graphics display.
   virtual bool Open (const char *Title) = 0;
   /// Close the 3D graphics display.
@@ -725,12 +723,12 @@ struct iGraphics3D : public iPlugIn
    * (e.g. the texture is tiled). The Alpha parameter defines the
    * transparency of the drawing operation, 0 means opaque, 255 means
    * fully transparent.<p>
-   * <b>WARNING: TILING WORKS ONLY WITH TEXTURES THAT HAVE POWER-OF-TWO SIZES!</b>
-   * That is, both width and height should be a power of two, although not
-   * neccessarily equal.
+   * <b>WARNING: Tiling works only with textures that have power-of-two
+   * sizes!</b> That is, both width and height should be a power-of-two,
+   * although not neccessarily equal.
    */
-  virtual void DrawPixmap (iTextureHandle *hTex, int sx, int sy, int sw, int sh,
-    int tx, int ty, int tw, int th, uint8 Alpha = 0) = 0;
+  virtual void DrawPixmap (iTextureHandle *hTex, int sx, int sy,
+    int sw, int sh, int tx, int ty, int tw, int th, uint8 Alpha = 0) = 0;
 
   /// Get the texture manager: do NOT increment the refcount of texture manager
   virtual iTextureManager *GetTextureManager () = 0;
@@ -747,7 +745,6 @@ struct iGraphics3D : public iPlugIn
    * (csPolygon3D destructor will do that).
    */
   virtual void RemoveFromCache (iPolygonTexture* poly_texture) = 0;
-
 };
 
 #endif // __IVIDEO_GRAPH3D_H__

@@ -21,7 +21,6 @@
 #define __IVARIA_DUNGEON_H__
 
 #include "csutil/scf.h"
-#include "isys/plugin.h"
 
 /**
  * These are the options you can set for one randomizer. You should not alter
@@ -65,20 +64,17 @@ SCF_VERSION (iDungeon, 2, 0, 0);
  *    will fill the NumAreaTemplates and AreaTemplateNames fields of the
  *    statistics.  Calling this function more than once will overwrite the old
  *    data.
- * <li>3. Call CreateWorld.  This will run the randomizer and create the world, as
- *    well as fill the remaining fields of the statistics.  You can run it
- *    again if you don't like the result.
- * <li>4. Call WriteWorld to save the generated world in CS map file format.  This
- *    will first clear the precalculated stuff (optionally), then write the
- *    map text file into the given virtual directory and finally copy the
+ * <li>3.  Call CreateWorld.  This will run the randomizer and create the
+ *    world, as well as fill the remaining fields of the statistics.  You can
+ *    run it again if you don't like the result.
+ * <li>4.  Call WriteWorld to save the generated world in CS map file format.
+ *    This will first clear the precalculated stuff (optionally), then write
+ *    the map text file into the given virtual directory and finally copy the
  *    textures (optionally).
  * </ul>
  */
-struct iDungeon : public iPlugIn
+struct iDungeon : public iBase
 {
-  /// Plugin initialization.
-  virtual bool Initialize (iSystem *sys) = 0;
-
   /// Set a randomizer option.
   virtual void SetOption (int opt,int value) = 0;
 

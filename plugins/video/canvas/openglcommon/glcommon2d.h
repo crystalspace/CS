@@ -52,15 +52,18 @@ class csGraphics2DGLCommon : public csGraphics2D, public iEventPlug
   void setGLColorfromint (int color);
 
 public:
+  SCF_DECLARE_IBASE_EXT(csGraphics2D);
+
   /// The event plug object
   iEventOutlet *EventOutlet;
 
-  SCF_DECLARE_IBASE;
-
-  /// Constructor does little, most initialization stuff happens in Initialize()
+  /**
+   * Constructor does little, most initialization stuff happens in
+   * Initialize().
+   */
   csGraphics2DGLCommon (iBase *iParent);
 
-  /// Clear font cache etc
+  /// Clear font cache etc.
   virtual ~csGraphics2DGLCommon ();
 
   /*
@@ -109,7 +112,7 @@ public:
   /// Draw a pixel
   virtual void DrawPixel (int x, int y, int color);
   /// Write a text string
-  virtual void Write (iFont *font, int x, int y, int fg, int bg, const char *text);
+  virtual void Write (iFont*, int x, int y, int fg, int bg, const char *text);
 
   /**
    * Get address of video RAM at given x,y coordinates.
@@ -140,7 +143,7 @@ public:
   /// Perform extension commands
   virtual bool PerformExtension (const char* iCommand, ...);
 
-  //------------------------- iEventPlug interface ---------------------------//
+  //------------------------ iEventPlug interface ---------------------------//
 
   virtual unsigned GetPotentiallyConflictingEvents ()
   { return CSEVTYPE_Keyboard | CSEVTYPE_Mouse; }

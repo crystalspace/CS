@@ -30,16 +30,11 @@
 #include <GL/gl.h>
 #endif
 
-SCF_IMPLEMENT_IBASE (csOpenGLProcBackBuffer)
-  SCF_IMPLEMENTS_INTERFACE (iGraphics3D)
-SCF_IMPLEMENT_IBASE_END;
-
 #define SysPrintf System->Printf
 
 csOpenGLProcBackBuffer::csOpenGLProcBackBuffer (iBase *parent) :
-  csGraphics3DOGLCommon ()
+  csGraphics3DOGLCommon (parent)
 { 
-  SCF_CONSTRUCT_IBASE (parent);
   tex_mm = NULL; 
   g3d = NULL;
   rstate_bilinearmap = false;

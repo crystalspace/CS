@@ -42,7 +42,7 @@ class csGraphics2DAA : public csGraphics2D, public iEventPlug
   iEventOutlet *EventOutlet;
 
 public:
-  SCF_DECLARE_IBASE;
+  SCF_DECLARE_IBASE_EXT(csGraphics2D);
 
   csGraphics2DAA (iBase *iParent);
   virtual ~csGraphics2DAA ();
@@ -63,10 +63,10 @@ public:
   virtual bool SetMouseCursor (csMouseCursorID iShape);
 
   virtual iGraphics2D *CreateOffScreenCanvas (int /*width*/, int /*height*/, 
-     csPixelFormat */*pfmt*/, void */*buffer*/, csRGBpixel */*palette*/, int /*pal_size*/)
+     csPixelFormat*, void* /*buffer*/, csRGBpixel*, int /*pal_size*/)
   { return NULL; }
 
-  //------------------------- iEventPlug interface ---------------------------//
+  //------------------------ iEventPlug interface ---------------------------//
 
   virtual unsigned GetPotentiallyConflictingEvents ()
   { return CSEVTYPE_Keyboard | CSEVTYPE_Mouse; }

@@ -19,21 +19,12 @@
 #include <stdarg.h>
 #include "cssysdef.h"
 #include "protex2d.h"
-#include "csutil/scf.h"
 #include "csgeom/csrect.h"
 #include "isys/system.h"
 #include "isys/event.h"
 
-SCF_IMPLEMENT_IBASE (csProcTextureSoft2D)
-  SCF_IMPLEMENTS_INTERFACE (iPlugIn)
-  SCF_IMPLEMENTS_INTERFACE (iGraphics2D)
-SCF_IMPLEMENT_IBASE_END
-
-// csProcTextureSoft2D functions
-csProcTextureSoft2D::csProcTextureSoft2D (iSystem *isys) :
-  csGraphics2D ()
+csProcTextureSoft2D::csProcTextureSoft2D (iSystem *isys) : csGraphics2D (NULL)
 {
-  SCF_CONSTRUCT_IBASE (NULL);
   System = isys;
   image_buffer = NULL;
   destroy_memory = false;

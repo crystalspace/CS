@@ -26,23 +26,23 @@
 #include "csgfx/rgbpixel.h"
 #include "ivideo/texture.h"
 
-SCF_DECLARE_FACTORY (csSoftProcTexture3D)
+SCF_IMPLEMENT_FACTORY (csSoftProcTexture3D)
 
-SCF_IMPLEMENT_IBASE (csSoftProcTexture3D)
-  SCF_IMPLEMENTS_INTERFACE (iPlugIn)
-  SCF_IMPLEMENTS_INTERFACE (iGraphics3D)
+SCF_IMPLEMENT_IBASE_EXT (csSoftProcTexture3D)
+  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iSoftProcTexture)
+SCF_IMPLEMENT_IBASE_EXT_END
+
+SCF_IMPLEMENT_EMBEDDED_IBASE (csSoftProcTexture3D::eiSoftProcTexture)
   SCF_IMPLEMENTS_INTERFACE (iSoftProcTexture)
-SCF_IMPLEMENT_IBASE_END
+SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 csSoftProcTexture3D::csSoftProcTexture3D (iBase *iParent)
-  : csGraphics3DSoftwareCommon ()
+  : csGraphics3DSoftwareCommon (iParent)
 {
+  SCF_CONSTRUCT_EMBEDDED_IBASE(scfiSoftProcTexture);
   is_for_procedural_textures = true;
-  SCF_CONSTRUCT_IBASE (iParent);
   soft_tex_mm = NULL;
   parent_tex_mm = NULL;
-  System = NULL;
-  G2D = NULL;
   reprepare = false;
 }
 
@@ -54,12 +54,6 @@ csSoftProcTexture3D::~csSoftProcTexture3D ()
     tcache = NULL;
     texman = NULL;
   }
-}
-
-bool csSoftProcTexture3D::Initialize (iSystem *iSys)
-{
-  System = iSys;
-  return true;
 }
 
 void csSoftProcTexture3D::Print (csRect *area)
@@ -75,7 +69,8 @@ void csSoftProcTexture3D::Print (csRect *area)
     main_tcache->uncache_texture (0, (iTextureHandle*)parent_tex_mm);
 }
 
-bool csSoftProcTexture3D::Prepare (csTextureManagerSoftware *main_texman, csTextureHandleSoftware *tex_mm, void *buffer,  uint8 *bitmap)
+bool csSoftProcTexture3D::Prepare (csTextureManagerSoftware *main_texman,
+  csTextureHandleSoftware *tex_mm, void *buffer,  uint8 *bitmap)
 {
   csGraphics3DSoftwareCommon* parent_g3d = main_texman->G3D;
   iGraphics2D *g2d = parent_g3d->GetDriver2D ();
@@ -198,22 +193,22 @@ iTextureHandle *csSoftProcTexture3D::CreateOffScreenRenderer
    void *buffer, csPixelFormat *ipfmt, int flags)
 {
   // Always in 32bit
-  // Here we create additional images for this texture which are registered as 
-  // procedural textures with our own texture manager. This way if the procedural
-  // texture is written to with itself, this texture manager will know about it
-  // and act accordingly. This is done for both alone and sharing procedural
-  // textures. In the case of the alone procedural texture it will never be 
-  // utilised unless a sharing procedural texture is introduced into the 
-  // system in which case the previous alone procedural textures are all converted
-  // to sharing ones.
+  // Here we create additional images for this texture which are registered as
+  // procedural textures with our own texture manager.  This way if the
+  // procedural texture is written to with itself, this texture manager will
+  // know about it and act accordingly.  This is done for both alone and
+  // sharing procedural textures.  In the case of the alone procedural texture
+  // it will never be utilised unless a sharing procedural texture is
+  // introduced into the system in which case the previous alone procedural
+  // textures are all converted to sharing ones.
 
   // If this is a sharing procedural texture then the texture needs repreparing
   // each update.
   if ((flags & CS_TEXTURE_PROC_ALONE_HINT) !=  CS_TEXTURE_PROC_ALONE_HINT)
     reprepare = true;
 
-  G2D = parent_g3d->GetDriver2D ()->CreateOffScreenCanvas (width, height, buffer, 
-							   false, ipfmt, NULL, 0);
+  G2D = parent_g3d->GetDriver2D ()->CreateOffScreenCanvas (
+    width, height, buffer, false, ipfmt, NULL, 0);
 
   if (!G2D)
   {
@@ -253,9 +248,4 @@ iTextureHandle *csSoftProcTexture3D::CreateOffScreenRenderer
 
   // Return the software texture managers handle for this procedural texture.
   return soft_tex_mm;
-}
-
-void csSoftProcTexture3D::ConvertMode ()
-{
-  reprepare = true;
 }

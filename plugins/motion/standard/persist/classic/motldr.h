@@ -21,6 +21,7 @@
 
 #include "imap/reader.h"
 #include "imap/writer.h"
+#include "isys/plugin.h"
 
 struct iEngine;
 struct iSystem;
@@ -34,7 +35,6 @@ struct iMotion;
  *
  */
 
-///
 class csMotionLoader : public iLoaderPlugIn
 {
 private:
@@ -43,20 +43,23 @@ private:
   iMotionManager *motman;
   
 public:
+  SCF_DECLARE_IBASE;
 
   iMotion* LoadMotion ( const char *fname );
   bool LoadMotion ( iMotion *mot, char *buf );
 
   /// Constructor
   csMotionLoader (iBase *);
-  
   virtual ~csMotionLoader();
-  
   virtual bool Initialize( iSystem *Sys);
-
-  SCF_DECLARE_IBASE;
-
   virtual iBase* Parse( const char* string, iEngine *engine, iBase *context );
+
+  struct eiPlugIn : public iPlugIn
+  {
+    SCF_DECLARE_EMBEDDED_IBASE(csMotionLoader);
+    virtual bool Initialize (iSystem* p) { return scfParent->Initialize(p); }
+    virtual bool HandleEvent (iEvent&) { return false; }
+  } scfiPlugIn;
 };
 
 class csMotionSaver : public iSaverPlugIn
@@ -65,19 +68,19 @@ private:
   iSystem *sys;
 
 public:
-
-  csMotionSaver (iBase *);
-  
-  virtual ~csMotionSaver ();
-  
-  virtual bool Initialize ( iSystem *system );
-  
   SCF_DECLARE_IBASE;
   
+  csMotionSaver (iBase *);
+  virtual ~csMotionSaver ();
   virtual void WriteDown ( iBase *obj, iStrVector *string, iEngine *engine );
   
+  struct eiPlugIn : public iPlugIn
+  {
+    SCF_DECLARE_EMBEDDED_IBASE(csMotionSaver);
+    virtual bool Initialize (iSystem* p) { scfParent->sys = p; return true; }
+    virtual bool HandleEvent (iEvent&) { return false; }
+  } scfiPlugIn;
+  friend struct eiPlugIn;
 };
 
 #endif
-
-

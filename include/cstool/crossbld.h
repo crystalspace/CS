@@ -34,6 +34,7 @@ struct iThingState;
 struct iTextureWrapper;
 struct iEngine;
 struct iImage;
+struct iSystem;
 
 /**
  * The general cross builder interface.  All cross builders inherit from

@@ -463,6 +463,8 @@ protected:
   int DrawMode;
 
 public:
+  SCF_DECLARE_IBASE;
+
   /// The maximum texture size
   GLint max_texture_size;
   /// The texture cache.
@@ -485,22 +487,24 @@ public:
   /// The System interface. 
   iSystem* System;
 
-  ///
-  csGraphics3DOGLCommon ();
-  ///
+  /// Constructor.
+  csGraphics3DOGLCommon (iBase*);
+  /// Destructor.
   virtual ~csGraphics3DOGLCommon ();
 
-  ///
-  bool NewInitialize (iSystem *iSys);
+  /// Initialization for iPlugin.  Sets System pointer.
+  virtual bool Initialize (iSystem*);
+  /// Common initialization for subclasses.
+  bool NewInitialize ();
   /// Initialize from the state data of another driver of this type
   void SharedInitialize (csGraphics3DOGLCommon *d);
-  ///
+  /// Common canvas opening method.
   bool NewOpen (const char *Title);
   /// Open from the state data of another driver of this type
   void SharedOpen (csGraphics3DOGLCommon *d);
   /// Helper function
   void CommonOpen ();
-  ///
+  /// Common canvas close.
   virtual void Close ();
 
   /// Change the dimensions of the display.
@@ -736,6 +740,13 @@ public:
 
   // Extension flags
   bool ARB_multitexture;
+
+  struct eiPlugIn : public iPlugIn
+  {
+    SCF_DECLARE_EMBEDDED_IBASE(csGraphics3DOGLCommon);
+    virtual bool Initialize (iSystem* p) { return scfParent->Initialize(p); }
+    virtual bool HandleEvent (iEvent&) { return false; }
+  } scfiPlugIn;
 };
 
 #endif // __OGL3DCOM_H__

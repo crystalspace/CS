@@ -20,6 +20,7 @@
 #define _RAPID_H_
 
 #include "ivaria/collider.h"
+#include "isys/plugin.h"
 #include "rapcol.h"
 
 /**
@@ -61,9 +62,6 @@ public:
 
   /// Create the plugin object
   csRapidCollideSystem (iBase *pParent);
-
-  /// Register plugin with the system driver
-  virtual bool Initialize (iSystem *pSystem);
 
   /// Create an iCollider for the given geometry.
   virtual iCollider* CreateCollider (iPolygonMesh* mesh);
@@ -109,6 +107,13 @@ public:
   {
     return csRAPIDCollider::GetFirstHit ();
   }
+
+  struct eiPlugIn : public iPlugIn
+  {
+    SCF_DECLARE_EMBEDDED_IBASE(csRapidCollideSystem);
+    virtual bool Initialize (iSystem*) { return true; }
+    virtual bool HandleEvent (iEvent&) { return false; }
+  } scfiPlugIn;
 };
 
 #endif // _RAPID_H_

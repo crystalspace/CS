@@ -23,7 +23,6 @@
 //-----------------------------------------------------------------------------
 #if defined(__cplusplus)
 
-#include "csutil/scf.h"
 #include "video/canvas/common/graph2d.h"
 #include "NeXTDelegate2D.h"
 class NeXTFrameBuffer;
@@ -44,7 +43,7 @@ protected:
   void usage_summary() const;
 
 public:
-  NeXTDriver2D(iBase*);
+  NeXTDriver2D(iBase* p) : superclass(p), controller(0), frame_buffer(0) {}
   virtual ~NeXTDriver2D();
   virtual bool Initialize(iSystem*);
   virtual bool Open(char const* title);
@@ -55,7 +54,6 @@ public:
 
   bool system_extension(char const* msg, void* = 0, void* = 0) const;
   void user_close() const;
-  SCF_DECLARE_IBASE;
 };
 
 #else // __cplusplus

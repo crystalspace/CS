@@ -18,14 +18,12 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __SOUND_RENDER_DS3D_H__
-#define __SOUND_RENDER_DS3D_H__
-
-// SoundRender.H
-// csSoundRenderDS3D class.
+#ifndef __CS_SNDRDR_H__
+#define __CS_SNDRDR_H__
 
 #include "isound/data.h"
 #include "isound/renderer.h"
+#include "isys/plugin.h"
 #include "csutil/csvector.h"
 #include "csutil/cfgacc.h"
 #include "dsound.h"
@@ -69,6 +67,13 @@ public:
   csVector SoundHandles;
   csConfigAccess Config;
   cs_time LastTime;
+
+  struct eiPlugIn : public iPlugIn
+  {
+    SCF_DECLARE_EMBEDDED_IBASE(csSoundRenderDS3D);
+    virtual bool Initialize (iSystem* p) { return scfParent->Initialize(p); }
+    virtual bool HandleEvent (iEvent& e) { return scfParent->HandleEvent(e); }
+  } scfiPlugIn;
 };
 
-#endif	//__SOUND_RENDER_DS3D_H__
+#endif // __CS_SNDRDR_H__

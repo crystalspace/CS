@@ -42,21 +42,6 @@ SCF_EXPORT_CLASS_TABLE(next2d)
     "crystalspace.font.server.")
 SCF_EXPORT_CLASS_TABLE_END
 
-SCF_IMPLEMENT_IBASE(NeXTDriver2D)
-  SCF_IMPLEMENTS_INTERFACE(iPlugIn)
-  SCF_IMPLEMENTS_INTERFACE(iGraphics2D)
-SCF_IMPLEMENT_IBASE_END
-
-//-----------------------------------------------------------------------------
-// Constructor
-//-----------------------------------------------------------------------------
-NeXTDriver2D::NeXTDriver2D(iBase* p) :
-csGraphics2D(), controller(0), frame_buffer(0)
-{
-  SCF_CONSTRUCT_IBASE(p);
-}
-
-
 //-----------------------------------------------------------------------------
 // Destructor
 //-----------------------------------------------------------------------------
@@ -78,7 +63,7 @@ bool NeXTDriver2D::Initialize(iSystem* s)
   bool ok = superclass::Initialize(s);
   if (ok)
   {
-    s->CallOnEvents(this, CSMASK_Broadcast);
+    s->CallOnEvents(&scfiPlugIn, CSMASK_Broadcast);
     controller = NeXTDelegate2D_new(this);
     ok = init_driver(get_desired_depth());
   }

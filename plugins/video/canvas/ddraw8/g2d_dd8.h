@@ -16,8 +16,8 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef G2D_DD8_H
-#define G2D_DD8_H
+#ifndef __CS_G2D_DD8_H__
+#define __CS_G2D_DD8_H__
 
 #include <ddraw.h>
 
@@ -30,7 +30,7 @@ class csGraphics2DDDraw8 : public csGraphics2D, public iGraphics2DDDraw8
 {
 
 public:
-  SCF_DECLARE_IBASE;
+  SCF_DECLARE_IBASE_EXT(csGraphics2D);
 
 protected:
 
@@ -40,7 +40,7 @@ protected:
   LPDIRECTDRAWSURFACE7 m_lpddsBackLeft; // For stereo mode (Not implemented yet)
   LPDIRECTDRAWCLIPPER  m_lpddClipper;
   LPDIRECTDRAWPALETTE  m_lpddPal;
-  
+
   RECT m_rcWindow;
   HWND m_hWnd;
   HINSTANCE m_hInstance;
@@ -59,7 +59,7 @@ protected:
 
   void (*D3DCallback) (void *);
   void *D3DCallbackData;
-  
+
   static long FAR PASCAL WindowProc (HWND hWnd, UINT message,
     WPARAM wParam, LPARAM lParam);
   HRESULT InitSurfaces ();
@@ -71,7 +71,6 @@ protected:
   void Refresh (RECT &rect);
 
 public:
-
   csGraphics2DDDraw8 (iBase *iParent);
   virtual ~csGraphics2DDDraw8 (void);
 
@@ -79,14 +78,13 @@ public:
 
   virtual bool Open (const char *Title);
   virtual void Close ();
-  
+
   virtual void Print (csRect *area = NULL);
-  
   virtual void SetRGB(int i, int r, int g, int b);
- 
+
   virtual bool BeginDraw();
   virtual void FinishDraw();
-  
+
   virtual bool SetMouseCursor (csMouseCursorID iShape);
   virtual bool SetMousePosition (int x, int y);
   virtual int  GetPage ();
@@ -94,24 +92,14 @@ public:
   virtual bool GetDoubleBufferState ();
   virtual bool PerformExtension (const char *iCommand, ...);
 
-  //
-  // Interface
-  //
-
+  // iGraphics2DDDraw8
   virtual void GetDirectDrawDriver (LPDIRECTDRAW7* lplpDirectDraw);
-
   virtual void GetDirectDrawPrimary (LPDIRECTDRAWSURFACE7* lplpDirectDrawPrimary);
-
   virtual void GetDirectDrawBackBuffer (LPDIRECTDRAWSURFACE7* lplpDirectDrawBackBuffer);
-
   virtual void GetDirectDetection (IDirectDetectionInternal** lplpDDetection);
-
   virtual void SetColorPalette ();
-
   virtual void SetFor3D(bool For3D);
-
   virtual void SetModeSwitchCallback (void (*Callback) (void *), void *Data);
-
 };
 
-#endif // End of G2D_DD8_H
+#endif // __CS_G2D_DD8_H__

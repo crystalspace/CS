@@ -25,16 +25,13 @@
 #include "isys/system.h"
 #include "qint.h"
 
-SCF_IMPLEMENT_IBASE (csGraphics2DGLCommon)
-  SCF_IMPLEMENTS_INTERFACE (iPlugIn)
-  SCF_IMPLEMENTS_INTERFACE (iGraphics2D)
-SCF_IMPLEMENT_IBASE_END
+SCF_IMPLEMENT_IBASE_EXT (csGraphics2DGLCommon)
+  SCF_IMPLEMENTS_INTERFACE (iEventPlug)
+SCF_IMPLEMENT_IBASE_EXT_END
 
 csGraphics2DGLCommon::csGraphics2DGLCommon (iBase *iParent) :
-  csGraphics2D (),
-  FontCache (NULL)
+  csGraphics2D (iParent), FontCache (NULL)
 {
-  SCF_CONSTRUCT_IBASE (iParent);
   EventOutlet = NULL;
 }
 
@@ -217,7 +214,7 @@ void csGraphics2DGLCommon::DrawBox (int x, int y, int w, int h, int color)
   if (y + h > ClipY2)
     h = ClipY2 - y;
   if ((w <= 0) || (h <= 0))
-    return;                                                                                        
+    return;
 
   y = Height - y;
   // prepare for 2D drawing--so we need no fancy GL effects!
@@ -243,10 +240,11 @@ void csGraphics2DGLCommon::DrawPixel (int x, int y, int color)
     glBegin (GL_POINTS);
     glVertex2i (x, Height - y);
     glEnd ();
-  }    
+  }
 }
 
-void csGraphics2DGLCommon::Write (iFont *font, int x, int y, int fg, int bg, const char *text)
+void csGraphics2DGLCommon::Write (iFont *font, int x, int y, int fg, int bg,
+  const char *text)
 {
   glDisable (GL_TEXTURE_2D);
 
@@ -314,12 +312,12 @@ csImageArea *csGraphics2DGLCommon::SaveArea (int x, int y, int w, int h)
       type = GL_UNSIGNED_BYTE;
       break;
 #ifdef GL_VERSION_1_2
-    case 2:  
+    case 2:
       format = GL_RGB;
       type = GL_UNSIGNED_SHORT_5_6_5;
       break;
 #endif
-    case 4:  
+    case 4:
       format = GL_RGBA;
       type = GL_UNSIGNED_BYTE;
       break;
@@ -347,12 +345,12 @@ void csGraphics2DGLCommon::RestoreArea (csImageArea *Area, bool Free)
         type = GL_UNSIGNED_BYTE;
         break;
 #ifdef GL_VERSION_1_2
-      case 2:  
+      case 2:
         format = GL_RGB;
         type = GL_UNSIGNED_SHORT_5_6_5;
         break;
 #endif
-      case 4:  
+      case 4:
         format = GL_RGBA;
         type = GL_UNSIGNED_BYTE;
         break;
@@ -430,7 +428,5 @@ bool csGraphics2DGLCommon::PerformExtension (const char* iCommand, ...)
     glFinish ();
     return true;
   }
-
   return false;
 }
-

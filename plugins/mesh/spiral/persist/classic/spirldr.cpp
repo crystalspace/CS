@@ -57,23 +57,39 @@ CS_TOKEN_DEF_END
 
 SCF_IMPLEMENT_IBASE (csSpiralFactoryLoader)
   SCF_IMPLEMENTS_INTERFACE (iLoaderPlugIn)
-  SCF_IMPLEMENTS_INTERFACE (iPlugIn)
+  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iPlugIn)
 SCF_IMPLEMENT_IBASE_END
+
+SCF_IMPLEMENT_EMBEDDED_IBASE (csSpiralFactoryLoader::eiPlugIn)
+  SCF_IMPLEMENTS_INTERFACE (iPlugIn)
+SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 SCF_IMPLEMENT_IBASE (csSpiralFactorySaver)
   SCF_IMPLEMENTS_INTERFACE (iSaverPlugIn)
-  SCF_IMPLEMENTS_INTERFACE (iPlugIn)
+  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iPlugIn)
 SCF_IMPLEMENT_IBASE_END
+
+SCF_IMPLEMENT_EMBEDDED_IBASE (csSpiralFactorySaver::eiPlugIn)
+  SCF_IMPLEMENTS_INTERFACE (iPlugIn)
+SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 SCF_IMPLEMENT_IBASE (csSpiralLoader)
   SCF_IMPLEMENTS_INTERFACE (iLoaderPlugIn)
-  SCF_IMPLEMENTS_INTERFACE (iPlugIn)
+  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iPlugIn)
 SCF_IMPLEMENT_IBASE_END
+
+SCF_IMPLEMENT_EMBEDDED_IBASE (csSpiralLoader::eiPlugIn)
+  SCF_IMPLEMENTS_INTERFACE (iPlugIn)
+SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 SCF_IMPLEMENT_IBASE (csSpiralSaver)
   SCF_IMPLEMENTS_INTERFACE (iSaverPlugIn)
-  SCF_IMPLEMENTS_INTERFACE (iPlugIn)
+  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iPlugIn)
 SCF_IMPLEMENT_IBASE_END
+
+SCF_IMPLEMENT_EMBEDDED_IBASE (csSpiralSaver::eiPlugIn)
+  SCF_IMPLEMENTS_INTERFACE (iPlugIn)
+SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 SCF_IMPLEMENT_FACTORY (csSpiralFactoryLoader)
 SCF_IMPLEMENT_FACTORY (csSpiralFactorySaver)
@@ -84,7 +100,8 @@ SCF_EXPORT_CLASS_TABLE (spirldr)
   SCF_EXPORT_CLASS (csSpiralFactoryLoader,
   	"crystalspace.mesh.loader.factory.spiral",
 	"Crystal Space Spiral Factory Loader")
-  SCF_EXPORT_CLASS (csSpiralFactorySaver, "crystalspace.mesh.saver.factory.spiral",
+  SCF_EXPORT_CLASS (csSpiralFactorySaver,
+    "crystalspace.mesh.saver.factory.spiral",
     "Crystal Space Spiral Factory Saver")
   SCF_EXPORT_CLASS (csSpiralLoader, "crystalspace.mesh.loader.spiral",
     "Crystal Space Spiral Mesh Loader")
@@ -95,16 +112,11 @@ SCF_EXPORT_CLASS_TABLE_END
 csSpiralFactoryLoader::csSpiralFactoryLoader (iBase* pParent)
 {
   SCF_CONSTRUCT_IBASE (pParent);
+  SCF_CONSTRUCT_EMBEDDED_IBASE(scfiPlugIn);
 }
 
 csSpiralFactoryLoader::~csSpiralFactoryLoader ()
 {
-}
-
-bool csSpiralFactoryLoader::Initialize (iSystem* system)
-{
-  sys = system;
-  return true;
 }
 
 iBase* csSpiralFactoryLoader::Parse (const char* /*string*/,
@@ -127,16 +139,11 @@ iBase* csSpiralFactoryLoader::Parse (const char* /*string*/,
 csSpiralFactorySaver::csSpiralFactorySaver (iBase* pParent)
 {
   SCF_CONSTRUCT_IBASE (pParent);
+  SCF_CONSTRUCT_EMBEDDED_IBASE(scfiPlugIn);
 }
 
 csSpiralFactorySaver::~csSpiralFactorySaver ()
 {
-}
-
-bool csSpiralFactorySaver::Initialize (iSystem* system)
-{
-  sys = system;
-  return true;
 }
 
 #define MAXLINE 100 /* max number of chars per line... */
@@ -168,16 +175,11 @@ void csSpiralFactorySaver::WriteDown (iBase* /*obj*/, iStrVector * /*str*/,
 csSpiralLoader::csSpiralLoader (iBase* pParent)
 {
   SCF_CONSTRUCT_IBASE (pParent);
+  SCF_CONSTRUCT_EMBEDDED_IBASE(scfiPlugIn);
 }
 
 csSpiralLoader::~csSpiralLoader ()
 {
-}
-
-bool csSpiralLoader::Initialize (iSystem* system)
-{
-  sys = system;
-  return true;
 }
 
 static UInt ParseMixmode (char* buf)
@@ -269,7 +271,7 @@ iBase* csSpiralLoader::Parse (const char* string, iEngine* engine,
       case CS_TOKEN_COLOR:
 	{
 	  csColor color;
-	  csScanStr (params, "%f,%f,%f", &color.red, &color.green, &color.blue);
+	  csScanStr(params, "%f,%f,%f", &color.red, &color.green, &color.blue);
 	  partstate->SetColor (color);
 	}
 	break;
@@ -335,16 +337,11 @@ iBase* csSpiralLoader::Parse (const char* string, iEngine* engine,
 csSpiralSaver::csSpiralSaver (iBase* pParent)
 {
   SCF_CONSTRUCT_IBASE (pParent);
+  SCF_CONSTRUCT_EMBEDDED_IBASE(scfiPlugIn);
 }
 
 csSpiralSaver::~csSpiralSaver ()
 {
-}
-
-bool csSpiralSaver::Initialize (iSystem* system)
-{
-  sys = system;
-  return true;
 }
 
 void csSpiralSaver::WriteDown (iBase* obj, iStrVector *str,
@@ -381,5 +378,3 @@ void csSpiralSaver::WriteDown (iBase* obj, iStrVector *str,
   partstate->DecRef();
   state->DecRef();
 }
-
-//---------------------------------------------------------------------------

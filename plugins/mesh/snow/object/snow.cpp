@@ -74,8 +74,8 @@ void csSnowMeshObject::SetupObject ()
   }
 }
 
-csSnowMeshObject::csSnowMeshObject (iSystem* system, iMeshObjectFactory* factory)
-	: csParticleSystem (system, factory)
+csSnowMeshObject::csSnowMeshObject (iSystem* system,
+  iMeshObjectFactory* factory) : csParticleSystem (system, factory)
 {
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiSnowState);
   part_pos = NULL;
@@ -153,10 +153,10 @@ SCF_IMPLEMENT_IBASE (csSnowMeshObjectFactory)
   SCF_IMPLEMENTS_INTERFACE (iMeshObjectFactory)
 SCF_IMPLEMENT_IBASE_END
 
-csSnowMeshObjectFactory::csSnowMeshObjectFactory (iBase *pParent,iSystem* system)
+csSnowMeshObjectFactory::csSnowMeshObjectFactory (iBase* p, iSystem* s)
 {
-  SCF_CONSTRUCT_IBASE (pParent);
-  csSnowMeshObjectFactory::system = system;
+  SCF_CONSTRUCT_IBASE (p);
+  system = s;
 }
 
 csSnowMeshObjectFactory::~csSnowMeshObjectFactory ()
@@ -165,7 +165,8 @@ csSnowMeshObjectFactory::~csSnowMeshObjectFactory ()
 
 iMeshObject* csSnowMeshObjectFactory::NewInstance ()
 {
-  csSnowMeshObject* cm = new csSnowMeshObject (system, (iMeshObjectFactory*)this);
+  csSnowMeshObject* cm =
+    new csSnowMeshObject (system, (iMeshObjectFactory*)this);
   iMeshObject* im = SCF_QUERY_INTERFACE (cm, iMeshObject);
   im->DecRef ();
   return im;
@@ -175,8 +176,12 @@ iMeshObject* csSnowMeshObjectFactory::NewInstance ()
 
 SCF_IMPLEMENT_IBASE (csSnowMeshObjectType)
   SCF_IMPLEMENTS_INTERFACE (iMeshObjectType)
-  SCF_IMPLEMENTS_INTERFACE (iPlugIn)
+  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iPlugIn)
 SCF_IMPLEMENT_IBASE_END
+
+SCF_IMPLEMENT_EMBEDDED_IBASE (csSnowMeshObjectType::eiPlugIn)
+  SCF_IMPLEMENTS_INTERFACE (iPlugIn)
+SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 SCF_IMPLEMENT_FACTORY (csSnowMeshObjectType)
 
@@ -188,16 +193,11 @@ SCF_EXPORT_CLASS_TABLE_END
 csSnowMeshObjectType::csSnowMeshObjectType (iBase* pParent)
 {
   SCF_CONSTRUCT_IBASE (pParent);
+  SCF_CONSTRUCT_EMBEDDED_IBASE(scfiPlugIn);
 }
 
 csSnowMeshObjectType::~csSnowMeshObjectType ()
 {
-}
-
-bool csSnowMeshObjectType::Initialize (iSystem* system)
-{
-  csSnowMeshObjectType::system = system;
-  return true;
 }
 
 iMeshObjectFactory* csSnowMeshObjectType::NewFactory ()
@@ -207,4 +207,3 @@ iMeshObjectFactory* csSnowMeshObjectType::NewFactory ()
   ifact->DecRef ();
   return ifact;
 }
-

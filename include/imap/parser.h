@@ -20,7 +20,7 @@
 #ifndef __IMAP_PARSER_H__
 #define __IMAP_PARSER_H__
 
-#include "isys/plugin.h"
+#include "csutil/scf.h"
 #include "ivideo/txtmgr.h"
 #include "igraphic/image.h"
 
@@ -48,7 +48,7 @@ SCF_VERSION (iLoader, 0, 0, 1);
 /**
  * This interface will replace iLoader somewhere in the future.
  */
-struct iLoader : public iPlugIn
+struct iLoader : public iBase
 {
   /// Set loader mode (see CS_LOADER_XXX flags above)
   virtual void SetMode (int iFlags) = 0;
@@ -59,7 +59,8 @@ struct iLoader : public iPlugIn
    * renderer. If no video renderer exists, this function fails. You may also
    * request an alternate format to override the above sequence.
    */
-  virtual iImage *LoadImage (const char* Filename, int Format = CS_IMGFMT_INVALID) = 0;
+  virtual iImage *LoadImage (const char* Filename,
+    int Format = CS_IMGFMT_INVALID) = 0;
   /**
    * Load an image as with LoadImage() and create a texture handle from it.
    * The 'Flags' parameter accepts the flags described in ivideo/txtmgr.h.

@@ -20,8 +20,8 @@
 #include <stdarg.h>
 #include <stdlib.h>
 #include "cssysdef.h"
-#include "video/canvas/common/graph2d.h"
-#include "video/canvas/common/protex2d.h"
+#include "graph2d.h"
+#include "protex2d.h"
 #include "qint.h"
 #include "scrshot.h"
 #include "isys/system.h"
@@ -29,8 +29,19 @@
 #include "ivideo/texture.h"
 #include "iengine/texture.h"
 
-csGraphics2D::csGraphics2D ()
+SCF_IMPLEMENT_IBASE(csGraphics2D)
+  SCF_IMPLEMENTS_INTERFACE(iGraphics2D)
+  SCF_IMPLEMENTS_EMBEDDED_INTERFACE(iPlugIn)
+SCF_IMPLEMENT_IBASE_END
+
+SCF_IMPLEMENT_EMBEDDED_IBASE (csGraphics2D::eiPlugIn)
+  SCF_IMPLEMENTS_INTERFACE (iPlugIn)
+SCF_IMPLEMENT_EMBEDDED_IBASE_END
+
+csGraphics2D::csGraphics2D (iBase* parent)
 {
+  SCF_CONSTRUCT_IBASE (parent);
+  SCF_CONSTRUCT_EMBEDDED_IBASE(scfiPlugIn);
   Memory = NULL;
   FontServer = NULL;
   LineAddress = NULL;
@@ -45,11 +56,11 @@ bool csGraphics2D::Initialize (iSystem* pSystem)
 
   // Get the font server: A missing font server is NOT an error
   if (!FontServer)
-    FontServer = CS_QUERY_PLUGIN_ID (System, CS_FUNCID_FONTSERVER, iFontServer);
+    FontServer = CS_QUERY_PLUGIN_ID(System, CS_FUNCID_FONTSERVER, iFontServer);
 #ifdef CS_DEBUG
   if (!FontServer)
-    System->Printf (CS_MSG_WARNING, "WARNING: Canvas driver couldn't find a "
-      "font server plugin!\n"
+    System->Printf (CS_MSG_WARNING,
+      "WARNING: Canvas driver couldn't find a font server plugin!\n"
       "This is normal if you don't want one (warning displays only in "
       "debug mode)\n");
 #endif
@@ -80,6 +91,8 @@ csGraphics2D::~csGraphics2D ()
   Close ();
   delete [] Palette;
 }
+
+bool csGraphics2D::HandleEvent(iEvent&) { return false; }
 
 bool csGraphics2D::Open (const char *Title)
 {

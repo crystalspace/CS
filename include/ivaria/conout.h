@@ -24,6 +24,7 @@
 #include "isys/plugin.h"
 
 class csRect;
+struct iConsoleOutput;
 struct iTextureManager;
 struct iFont;
 
@@ -42,6 +43,19 @@ enum
   csConNormalCursor,
   csConInsertCursor
 };
+
+SCF_VERSION (iConsoleWatcher, 0, 0, 1);
+
+/**
+ * This interface is implemented by objects interested in knowing when the
+ * console's visibility status has changed.
+ */
+struct iConsoleWatcher : public iBase
+{
+  /// Called when the watched console's visibility status changes.
+  virtual void ConsoleVisibilityChanged(iConsoleOutput*, bool visible) = 0;
+};
+
 
 SCF_VERSION (iConsoleOutput, 2, 0, 0);
 
@@ -140,7 +154,7 @@ struct iConsoleOutput : public iBase
    * Tell console that this object should be notified when console 
    * visibility status changes.
    */
-  virtual void RegisterPlugin (iPlugIn *iClient) = 0;
+  virtual void RegisterWatcher (iConsoleWatcher*) = 0;
 
   /// Implement simple extension commands.
   virtual bool ConsoleExtension (const char *iCommand, ...) = 0;

@@ -37,6 +37,7 @@
 SCF_IMPLEMENT_IBASE (csOpenGLProcSoftware)
   SCF_IMPLEMENTS_INTERFACE (iGraphics3D)
 SCF_IMPLEMENT_IBASE_END;
+
 SCF_IMPLEMENT_IBASE (csOpenGLProcSoftware2D)
   SCF_IMPLEMENTS_INTERFACE (iGraphics2D)
 SCF_IMPLEMENT_IBASE_END;
@@ -148,9 +149,7 @@ void TxtHandleVector::AddTextureHandles (iTextureHandle *soft,
   Push (new txt_handles (soft, ogl));
 }
 
-
-
-//-------------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 
 csOpenGLProcSoftware::csOpenGLProcSoftware (iBase * pParent)
 { 
@@ -195,9 +194,12 @@ void csOpenGLProcSoftware::ConvertAloneMode ()
   isoft_proc->ConvertMode ();
 }
 
-bool csOpenGLProcSoftware::Prepare
- (csGraphics3DOGLCommon *parent_g3d, csOpenGLProcSoftware *head_soft_tex,
-  csTextureHandleOpenGL *tex, csPixelFormat *ipfmt, void *buffer, bool alone_hint)
+bool csOpenGLProcSoftware::Prepare(
+  csGraphics3DOGLCommon *parent_g3d,
+  csOpenGLProcSoftware *head_soft_tex,
+  csTextureHandleOpenGL *tex,
+  csPixelFormat *ipfmt,
+  void *buffer,bool alone_hint)
 { 
   // We generate a 32 bit pfmt taking into account endianness and whether
   // frame buffer is RGB or BGR...there must be a better way...
@@ -337,7 +339,6 @@ void csOpenGLProcSoftware::Print (csRect *area)
   }
   g3d->Print (area);
 }
-
 
 iGraphics2D *csOpenGLProcSoftware::GetDriver2D ()
 { 

@@ -531,10 +531,7 @@ void csConsoleOutput::SetVisible (bool iShow)
 {
   visible = iShow;
   if (Client)
-  {
-    csEvent e(System->GetTime(),csevBroadcast,cscmdConsoleStatusChange,this);
-    Client->HandleEvent (e);
-  }
+    Client->ConsoleVisibilityChanged(this, iShow);
   invalid.Set (size);
 }
 

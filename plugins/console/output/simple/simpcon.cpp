@@ -122,7 +122,8 @@ bool csSimpleConsole::Initialize (iSystem *iSys)
     fontname = buf;
   iFontServer *fs = G2D->GetFontServer ();
   if (!fs)
-    System->Printf(CS_MSG_FATAL_ERROR,"Console: No font server plug-in loaded!\n");
+    System->Printf(CS_MSG_FATAL_ERROR,
+      "Console: No font server plug-in loaded!\n");
   else
     console_font = fs->LoadFont (fontname);
   if (!console_font)
@@ -457,10 +458,7 @@ void csSimpleConsole::SetVisible (bool iShow)
 {
   ConsoleMode = iShow ? CONSOLE_MODE : MESSAGE_MODE;
   if (Client)
-  {
-    csEvent e(System->GetTime(), csevBroadcast, cscmdConsoleStatusChange, this);
-    Client->HandleEvent (e);
-  }
+    Client->ConsoleVisibilityChanged(this, iShow);
   InvalidAll = true;
 }
 

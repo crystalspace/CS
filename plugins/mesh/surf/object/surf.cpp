@@ -437,8 +437,12 @@ iMeshObject* csSurfMeshObjectFactory::NewInstance ()
 
 SCF_IMPLEMENT_IBASE (csSurfMeshObjectType)
   SCF_IMPLEMENTS_INTERFACE (iMeshObjectType)
-  SCF_IMPLEMENTS_INTERFACE (iPlugIn)
+  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iPlugIn)
 SCF_IMPLEMENT_IBASE_END
+
+SCF_IMPLEMENT_EMBEDDED_IBASE (csSurfMeshObjectType::eiPlugIn)
+  SCF_IMPLEMENTS_INTERFACE (iPlugIn)
+SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 SCF_IMPLEMENT_FACTORY (csSurfMeshObjectType)
 
@@ -450,15 +454,11 @@ SCF_EXPORT_CLASS_TABLE_END
 csSurfMeshObjectType::csSurfMeshObjectType (iBase* pParent)
 {
   SCF_CONSTRUCT_IBASE (pParent);
+  SCF_CONSTRUCT_EMBEDDED_IBASE(scfiPlugIn);
 }
 
 csSurfMeshObjectType::~csSurfMeshObjectType ()
 {
-}
-
-bool csSurfMeshObjectType::Initialize (iSystem*)
-{
-  return true;
 }
 
 iMeshObjectFactory* csSurfMeshObjectType::NewFactory ()
@@ -468,4 +468,3 @@ iMeshObjectFactory* csSurfMeshObjectType::NewFactory ()
   ifact->DecRef ();
   return ifact;
 }
-

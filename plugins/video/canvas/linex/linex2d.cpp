@@ -40,19 +40,24 @@ SCF_EXPORT_CLASS_TABLE (linex2d)
     "Private X-Windows font server for LineX2D canvas")
 SCF_EXPORT_CLASS_TABLE_END
 
-SCF_IMPLEMENT_IBASE (csGraphics2DLineXLib)
-  SCF_IMPLEMENTS_INTERFACE (iPlugIn)
-  SCF_IMPLEMENTS_INTERFACE (iGraphics2D)
+SCF_IMPLEMENT_IBASE_EXT (csGraphics2DLineXLib)
   SCF_IMPLEMENTS_INTERFACE (iEventPlug)
+SCF_IMPLEMENT_IBASE_EXT_END
+
+SCF_IMPLEMENT_IBASE (csLineX2DFontServer)
+  SCF_IMPLEMENTS_INTERFACE (iFontServer)
+  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iPlugIn)
 SCF_IMPLEMENT_IBASE_END
+
+SCF_IMPLEMENT_EMBEDDED_IBASE (csLineX2DFontServer::eiPlugIn)
+  SCF_IMPLEMENTS_INTERFACE (iPlugIn)
+SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 Display *csGraphics2DLineXLib::dpy = NULL;
 
 csGraphics2DLineXLib::csGraphics2DLineXLib (iBase *iParent) :
-  csGraphics2D (), cmap (0), currently_full_screen (false)
+  csGraphics2D (iParent), cmap (0), currently_full_screen (false)
 {
-  SCF_CONSTRUCT_IBASE (iParent);
-
   EmptyMouseCursor = 0;
   memset (&MouseCursor, 0, sizeof (MouseCursor));
   leader_window = window = 0;
@@ -163,7 +168,7 @@ bool csGraphics2DLineXLib::Initialize (iSystem *pSystem)
   memset (MouseCursor, 0, sizeof (MouseCursor));
 
   // Tell system driver to call us on every frame
-  System->CallOnEvents (this, CSMASK_Nothing);
+  System->CallOnEvents (&scfiPlugIn, CSMASK_Nothing);
   // Create the event outlet
   EventOutlet = System->CreateEventOutlet (this);
 
@@ -887,14 +892,10 @@ int csLineX2DFontServer::csLineX2DFont::GetLength (const char *text, int maxwidt
 
 //----------
 
-SCF_IMPLEMENT_IBASE (csLineX2DFontServer)
-  SCF_IMPLEMENTS_INTERFACE (iPlugIn)
-  SCF_IMPLEMENTS_INTERFACE (iFontServer)
-SCF_IMPLEMENT_IBASE_END
-
 csLineX2DFontServer::csLineX2DFontServer (iBase *iParent)
 {
   SCF_CONSTRUCT_IBASE (iParent);
+  SCF_CONSTRUCT_EMBEDDED_IBASE(scfiPlugIn);
   font.xfont = NULL;
 }
 

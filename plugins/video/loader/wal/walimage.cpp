@@ -40,8 +40,12 @@ CS_IMPLEMENT_PLUGIN
 
 SCF_IMPLEMENT_IBASE (csWALImageIO)
   SCF_IMPLEMENTS_INTERFACE (iImageIO)
-  SCF_IMPLEMENTS_INTERFACE (iPlugIn)
+  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iPlugIn)
 SCF_IMPLEMENT_IBASE_END
+
+SCF_IMPLEMENT_EMBEDDED_IBASE (csWALImageIO::eiPlugIn)
+  SCF_IMPLEMENTS_INTERFACE (iPlugIn)
+SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 SCF_IMPLEMENT_FACTORY (csWALImageIO);
 
@@ -72,12 +76,8 @@ static iImageIO::FileFormatDescription formatlist[1] =
 csWALImageIO::csWALImageIO (iBase *pParent)
 {
   SCF_CONSTRUCT_IBASE (pParent);
+  SCF_CONSTRUCT_EMBEDDED_IBASE(scfiPlugIn);
   formats.Push (&formatlist[0]);
-}
-
-bool csWALImageIO::Initialize (iSystem *)
-{
-  return true;
 }
 
 const csVector& csWALImageIO::GetDescription ()

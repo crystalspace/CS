@@ -206,6 +206,8 @@ protected:
   	bool use_fog);
 
 public:
+  SCF_DECLARE_IBASE;
+
   /**
    * Low-level 2D graphics layer.
    * csGraphics3DSoftwareCommon is in charge of creating and managing this.
@@ -248,11 +250,16 @@ public:
 
   // An experimental filter feature.
   static int filter_bf;
+
   /// Setup scanline drawing routines according to current bpp and setup flags
-
-  csGraphics3DSoftwareCommon ();
-
+  csGraphics3DSoftwareCommon (iBase* parent);
+  /// Destructor.
   virtual ~csGraphics3DSoftwareCommon ();
+
+  /**
+   * Initialization method required by iPlugin interface.  Sets System pointer.
+   */
+  virtual bool Initialize (iSystem*);
 
   /// Initialize new state from config file
   void NewInitialize ();
@@ -263,6 +270,7 @@ public:
    */
   void SharedInitialize (csGraphics3DSoftwareCommon *p);
 
+  /// Open a canvas with given title.
   virtual bool Open (const char *Title);
 
   /// Gathers all that has to be done when opening from scratch.
@@ -457,6 +465,13 @@ public:
    */
   virtual void DrawPixmap (iTextureHandle *hTex, int sx, int sy, int sw,
     int sh, int tx, int ty, int tw, int th, uint8 Alpha);
+
+  struct eiPlugIn : public iPlugIn
+  {
+    SCF_DECLARE_EMBEDDED_IBASE(csGraphics3DSoftwareCommon);
+    virtual bool Initialize (iSystem* p) { return scfParent->Initialize(p); }
+    virtual bool HandleEvent (iEvent&) { return false; }
+  } scfiPlugIn;
 };
 
 #endif // __SFT3DCOM_H__

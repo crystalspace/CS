@@ -19,13 +19,12 @@
 #ifndef __IVIDEO_CODEC_H__
 #define __IVIDEO_CODEC_H__
 
-/**
+/*
  * This is an interface for playing video.
  */
 
 #include "csutil/scf.h"
 #include "isys/system.h"
-#include "isys/plugin.h"
 
 struct iMaterialHandle;
 struct iFile;
@@ -34,6 +33,9 @@ struct iVideoStream;
 struct iAudioStream;
 struct iCodec;
 
+/**
+ * Stream format capability enumeration.
+ */
 enum csStreamFormatCap
 {
   /**
@@ -59,6 +61,9 @@ enum csStreamFormatCap
 #define CS_STREAMTYPE_MIDI 3
 #define CS_STREAMTYPE_TEXT 4
 
+/**
+ * Stream description structure.
+ */
 struct csStreamDescription
 {
   /**
@@ -73,9 +78,11 @@ struct csStreamDescription
    * stream name
    */
   const char *name;
-  
 };
 
+/**
+ * Video stream description structure.
+ */
 struct csVideoStreamDescription : public csStreamDescription
 {
   /**
@@ -100,6 +107,9 @@ struct csVideoStreamDescription : public csStreamDescription
   SLong duration;
 };
 
+/**
+ * Audio stream description structure.
+ */
 struct csAudioStreamDescription : public csStreamDescription
 {
   UShort formattag;
@@ -120,7 +130,11 @@ struct iStreamIterator : public iBase
 };
 
 SCF_VERSION (iStreamFormat, 0, 0, 1);
-struct iStreamFormat : public iPlugIn
+
+/**
+ * Stream format.
+ */
+struct iStreamFormat : public iBase
 {
   /**
    * Retrieve the decoder capabilities.
@@ -135,10 +149,10 @@ struct iStreamFormat : public iPlugIn
    */
   virtual void Select (iAudioStream *pAudio, iVideoStream *pVideo) = 0;
   /** 
-   * Call this in your main loop between BeginDraw and EndDraw. This will decode the next frame
-   * from the video and draw it to the rectangle set in SetRect ().
-   * This is an convenience function only. You achieve the same results by calling this explicitly
-   * for the streams to play.
+   * Call this in your main loop between BeginDraw and EndDraw.  This will
+   * decode the next frame from the video and draw it to the rectangle set in
+   * SetRect ().  This is an convenience function only.  You achieve the same
+   * results by calling this explicitly for the streams to play.
    */
   virtual void NextFrame () = 0;
   /**
@@ -146,13 +160,18 @@ struct iStreamFormat : public iPlugIn
    */
   virtual bool Load (iFile *pVideoData) = 0;
   /**
-   * Unload this video. All streams become invalid. This is automatically called by Load ().
-   * Prior to the final DecRef of this plugin you have to call this yourself.
+   * Unload this video.  All streams become invalid.  This is automatically
+   * called by Load ().  Prior to the final DecRef of this plugin you have to
+   * call this yourself.
    */
   virtual void Unload () = 0;
 };
 
 SCF_VERSION (iStream, 0, 0, 1);
+
+/**
+ * A stream.
+ */
 struct iStream : public iBase
 {
   /**
@@ -160,9 +179,9 @@ struct iStream : public iBase
    */
   virtual void GetStreamDescription (csStreamDescription &desc) = 0;
   /**
-   * Next frame to be examined at frameindex. Note that <frame> does not necessarily mean
-   * a video frame. It is the datachunk a stream is separated into by the underlying protocol/format
-   * like RIFF for instance.
+   * Next frame to be examined at frameindex.  Note that <frame> does not
+   * necessarily mean a video frame.  It is the datachunk a stream is separated
+   * into by the underlying protocol/format like RIFF for instance.
    */
   virtual bool GotoFrame (ULong frameindex) = 0;
   /**
@@ -182,6 +201,10 @@ struct iStream : public iBase
 };
 
 SCF_VERSION (iVideoStream, 0, 0, 1);
+
+/**
+ * A video stream.
+ */
 struct iVideoStream : public iStream
 {
   /**
@@ -193,8 +216,8 @@ struct iVideoStream : public iStream
    */
   virtual bool SetRect (int x, int y, int w, int h) = 0;
   /**
-   * Set the blendingmode that is used to combine this frame with the data in the framebuffer
-   * Use the usual CS_FX_* values. The default is CS_FX_COPY.
+   * Set the blendingmode that is used to combine this frame with the data in
+   * the framebuffer Use the usual CS_FX_* values.  The default is CS_FX_COPY.
    */
   virtual bool SetFXMode (UInt mode) = 0;
   /**
@@ -205,6 +228,10 @@ struct iVideoStream : public iStream
 };
 
 SCF_VERSION (iAudioStream, 0, 0, 1);
+
+/**
+ * An audio stream.
+ */
 struct iAudioStream : public iStream
 {
   /**
@@ -214,18 +241,13 @@ struct iAudioStream : public iStream
 };
 
 /**
- * This is the core encoder or decoder. It will be loaded by the videodecoder.
- * For instance the AVI videodecoder is able to load various codecs based on the format the video
- * was saved in.
+ * Formats for videodata.
+ * CHANNEL means all data of one kind in a row, like all red first then all
+ * green etc.  INTERLEAVED means all components of one point in a row, for
+ * instance 1st byte is red component of pixel 0, 2nd byte is green component
+ * of pixel 0 etc.
  */
 
-/**
- * CHANNEL means all data of one kind in a row, like all red first then all green etc.
- * INTERLEAVED means all components of one point in a row, for instance 1st byte is red component 
- * of pixel 0, 2nd byte is green component of pixel 0 etc.
- */
-
-/// formats for videodata
 #define CS_CODECFORMAT_RGB_CHANNEL       1
 #define CS_CODECFORMAT_RGBA_CHANNEL      2
 #define CS_CODECFORMAT_YUV_CHANNEL       3
@@ -233,9 +255,12 @@ struct iAudioStream : public iStream
 #define CS_CODECFORMAT_RGBA_INTERLEAVED  5
 #define CS_CODECFORMAT_YUV_INTERLEAVED   6
 
-/// formats for audiodata
+/// Formats for audiodata
 #define CS_CODECFORMAT_PCM
 
+/**
+ * Codec description structure.
+ */
 struct csCodecDescription
 {
   /**

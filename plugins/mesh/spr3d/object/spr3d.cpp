@@ -1591,9 +1591,13 @@ iSkeletonState* csSprite3DMeshObject::Sprite3DState::GetSkeletonState () const
 
 SCF_IMPLEMENT_IBASE (csSprite3DMeshObjectType)
   SCF_IMPLEMENTS_INTERFACE (iMeshObjectType)
-  SCF_IMPLEMENTS_INTERFACE (iPlugIn)
+  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iPlugIn)
   SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iConfig)
 SCF_IMPLEMENT_IBASE_END
+
+SCF_IMPLEMENT_EMBEDDED_IBASE (csSprite3DMeshObjectType::eiPlugIn)
+  SCF_IMPLEMENTS_INTERFACE (iPlugIn)
+SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 SCF_IMPLEMENT_EMBEDDED_IBASE (csSprite3DMeshObjectType::csSprite3DConfig)
   SCF_IMPLEMENTS_INTERFACE (iConfig)
@@ -1609,17 +1613,12 @@ SCF_EXPORT_CLASS_TABLE_END
 csSprite3DMeshObjectType::csSprite3DMeshObjectType (iBase* pParent)
 {
   SCF_CONSTRUCT_IBASE (pParent);
+  SCF_CONSTRUCT_EMBEDDED_IBASE (scfiPlugIn);
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiConfig);
 }
 
 csSprite3DMeshObjectType::~csSprite3DMeshObjectType ()
 {
-}
-
-bool csSprite3DMeshObjectType::Initialize (iSystem* pSystem)
-{
-  System = pSystem;
-  return true;
 }
 
 iMeshObjectFactory* csSprite3DMeshObjectType::NewFactory ()

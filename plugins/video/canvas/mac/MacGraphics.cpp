@@ -71,21 +71,17 @@ SCF_EXPORT_CLASS_TABLE (Driver2D)
         "Crystal Space 2D driver for Macintosh", "crystalspace.font.server.")
 SCF_EXPORT_CLASS_TABLE_END
 
-SCF_IMPLEMENT_IBASE(csGraphics2DMac)
-    SCF_IMPLEMENTS_INTERFACE(iPlugIn)
-    SCF_IMPLEMENTS_INTERFACE(iGraphics2D)
+SCF_IMPLEMENT_IBASE_EXT(csGraphics2DMac)
     SCF_IMPLEMENTS_INTERFACE(iMacGraphics)
-SCF_IMPLEMENT_IBASE_END
+SCF_IMPLEMENT_IBASE_EXT_END
 
 
 /*----------------------------------------------------------------
 	Construct a graphics object.  This object provides a place on
 	screen to draw, and a place offscreen to render into.
 ----------------------------------------------------------------*/
-csGraphics2DMac::csGraphics2DMac(iBase *iParent)
+csGraphics2DMac::csGraphics2DMac(iBase *iParent) : csGraphics2D(iParent)
 {
-	SCF_CONSTRUCT_IBASE(iParent);
-
 	mMainWindow = NULL;
 	mColorTable = NULL;
 	mOffscreen = NULL;

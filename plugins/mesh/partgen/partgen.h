@@ -35,6 +35,7 @@ struct iMeshObjectFactory;
 struct iMaterialWrapper;
 struct iMovable;
 struct iRenderView;
+struct iSystem;
 
 /**
  * This class represents a particle system. It is a set of iParticles.

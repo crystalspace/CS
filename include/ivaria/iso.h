@@ -20,7 +20,6 @@
 #define __IISO_H__
 
 #include "csutil/scf.h"
-#include "isys/plugin.h"
 #include "csutil/cscolor.h"
 #include "csutil/flags.h"
 #include "csgeom/csrect.h"
@@ -57,7 +56,7 @@ SCF_VERSION (iIsoEngine, 0, 0, 1);
 /**
  * SCF Interface to the isometric engine.
 */
-struct iIsoEngine : public iPlugIn
+struct iIsoEngine : public iBase
 {
   /// Get the system
   virtual iSystem* GetSystem() const = 0;
@@ -129,7 +128,6 @@ struct iIsoEngine : public iPlugIn
   virtual iMeshObjectFactory *FindMeshFactory(const char *name) = 0;
   /// remove a mesh factory
   virtual void RemoveMeshFactory(const char *name) = 0;
-
 };
 
 SCF_VERSION (iIsoWorld, 0, 0, 1);
@@ -340,7 +338,8 @@ struct iIsoView : public iBase
    * near the given position (in world space). The renderview is also used.
    * This is a very partial implementation of iCamera. For Internal Use!
    */
-  virtual iCamera* GetFakeCamera(const csVector3& center, iIsoRenderView *rview) = 0;
+  virtual iCamera* GetFakeCamera(const csVector3& center,
+    iIsoRenderView *rview) = 0;
 };
 
 SCF_VERSION (iIsoRenderView, 0, 0, 1);

@@ -74,7 +74,7 @@ private:
   /// Clear input on next character flag
   bool ClearInput;
   /// The client that should be notified
-  iPlugIn *Client;
+  iConsoleWatcher *Client;
   /// Is the entire view invalid?
   bool InvalidAll;
 
@@ -198,7 +198,7 @@ public:
    * Tell console that this object should be notified when console 
    * visibility status changes.
    */
-  virtual void RegisterPlugin (iPlugIn *iClient)
+  virtual void RegisterWatcher (iConsoleWatcher* iClient)
   { Client = iClient; }
 
   /// Implement simple extension commands.

@@ -21,6 +21,7 @@
 
 #include "csgfx/csimage.h"
 #include "igraphic/imageio.h"
+#include "isys/plugin.h"
 #include "iutil/databuff.h"
 #include "csutil/csvector.h"
 #include "csutil/cfgacc.h"
@@ -43,12 +44,19 @@ class csMultiplexImageIO : public iImageIO
   csMultiplexImageIO (iBase *pParent);
   virtual ~csMultiplexImageIO ();
 
-  virtual bool Initialize (iSystem *pSystem);
+  virtual bool Initialize (iSystem*);
   virtual const csVector& GetDescription ();
   virtual iImage *Load (UByte* iBuffer, ULong iSize, int iFormat);
   virtual void SetDithering (bool iEnable);
   virtual iDataBuffer *Save (iImage *image, const char *mime = NULL); 
   virtual iDataBuffer *Save (iImage *image, iImageIO::FileFormatDescription *format = NULL);
+
+  struct eiPlugIn : public iPlugIn
+  {
+    SCF_DECLARE_EMBEDDED_IBASE(csMultiplexImageIO);
+    virtual bool Initialize (iSystem* p) { return scfParent->Initialize(p); }
+    virtual bool HandleEvent (iEvent&) { return false; }
+  } scfiPlugIn;
 };
 
 #endif // __IMGMULTIPLEX_H__

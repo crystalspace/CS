@@ -32,8 +32,6 @@ class csGraphics2DDOSRAW : public csGraphics2D
   bool PaletteChanged;
 
 public:
-  SCF_DECLARE_IBASE;
-
   csGraphics2DDOSRAW (iBase *iParent);
   virtual ~csGraphics2DDOSRAW ();
 

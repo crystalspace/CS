@@ -204,6 +204,13 @@ public:
    */
   virtual iDataBuffer *GetRealPath (const char *FileName);
 
+  struct eiPlugIn : public iPlugIn
+  {
+    SCF_DECLARE_EMBEDDED_IBASE(csVFS);
+    virtual bool Initialize (iSystem* p) { return scfParent->Initialize(p); }
+    virtual bool HandleEvent (iEvent&) { return false; }
+  } scfiPlugIn;
+
 private:
   /// Same as ExpandPath() but with less overhead
   char *_ExpandPath (const char *Path, bool IsDir = false) const;

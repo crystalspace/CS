@@ -40,7 +40,6 @@
 #  include <sys/shm.h>
 #endif /* DO_SHM */
 
-/// XLIB version.
 class csGraphics2DGlideX : public csGraphics2DGlideCommon, public iEventPlug
 {
 private:
@@ -76,7 +75,7 @@ private:
   iEventOutlet *EventOutlet;
 
 public:
-  SCF_DECLARE_IBASE;
+  SCF_DECLARE_IBASE_EXT(csGraphics2DGlideCommon);
 
   csGraphics2DGlideX (iBase *iParent);
   virtual ~csGraphics2DGlideX ();
@@ -97,7 +96,7 @@ public:
   /// Called on every frame by system driver
   virtual bool HandleEvent (iEvent &Event);
 
-  //------------------------- iEventPlug interface ---------------------------//
+  //------------------------ iEventPlug interface ---------------------------//
 
   virtual unsigned GetPotentiallyConflictingEvents ()
   { return CSEVTYPE_Keyboard | CSEVTYPE_Mouse; }

@@ -19,7 +19,6 @@
 #ifndef __X2D_H__
 #define __X2D_H__
 
-#include "csutil/scf.h"
 #include "video/canvas/common/graph2d.h"
 #include "isys/event.h"
 
@@ -99,12 +98,12 @@ class csGraphics2DXLib : public csGraphics2D, public iEventPlug
   iEventOutlet *EventOutlet;
 
 public:
-  SCF_DECLARE_IBASE;
+  SCF_DECLARE_IBASE_EXT(csGraphics2D);
 
-  csGraphics2DXLib (iBase *iParent);
+  csGraphics2DXLib (iBase*);
   virtual ~csGraphics2DXLib ();
 
-  virtual bool Initialize (iSystem *pSystem);
+  virtual bool Initialize (iSystem*);
   virtual bool Open (const char *Title);
   virtual void Close ();
 
@@ -148,7 +147,7 @@ public:
 
   virtual void AllowCanvasResize (bool iAllow);
 
-  //------------------------- iEventPlug interface ---------------------------//
+  //------------------------ iEventPlug interface ---------------------------//
 
   virtual unsigned GetPotentiallyConflictingEvents ()
   { return CSEVTYPE_Keyboard | CSEVTYPE_Mouse; }

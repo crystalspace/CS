@@ -39,8 +39,6 @@ protected:
   BRect screen_frame;
   
 public:
-  SCF_DECLARE_IBASE;
-
   csGraphics2DBeLib(iBase*);
   virtual ~csGraphics2DBeLib();
 

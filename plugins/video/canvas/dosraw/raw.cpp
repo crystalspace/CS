@@ -21,7 +21,7 @@
 
 #include <stdarg.h>
 #include "cssysdef.h"
-#include "video/canvas/dosraw/raw.h"
+#include "raw.h"
 #include "csgeom/csrect.h"
 #include "isys/system.h"
 
@@ -40,15 +40,8 @@ SCF_EXPORT_CLASS_TABLE (dosraw)
     "DOS/DJGPP 2D graphics driver for Crystal Space", "crystalspace.font.server.")
 SCF_EXPORT_CLASS_TABLE_END
 
-SCF_IMPLEMENT_IBASE (csGraphics2DDOSRAW)
-  SCF_IMPLEMENTS_INTERFACE (iPlugIn)
-  SCF_IMPLEMENTS_INTERFACE (iGraphics2D)
-SCF_IMPLEMENT_IBASE_END
-
-csGraphics2DDOSRAW::csGraphics2DDOSRAW (iBase *iParent) :
-  csGraphics2D ()
+csGraphics2DDOSRAW::csGraphics2DDOSRAW (iBase *p) : csGraphics2D (p)
 {
-  SCF_CONSTRUCT_IBASE (iParent);
   Memory = NULL;
 }
 

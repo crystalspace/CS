@@ -1,16 +1,16 @@
 /*
     Copyright (C) 2001 by Jorrit Tyberghein
-  
+
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
     License as published by the Free Software Foundation; either
     version 2 of the License, or (at your option) any later version.
-  
+
     This library is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
     Library General Public License for more details.
-  
+
     You should have received a copy of the GNU Library General Public
     License along with this library; if not, write to the Free
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
@@ -25,6 +25,7 @@
 #include "iengine/mesh.h"
 #include "imesh/object.h"
 #include "imesh/terrfunc.h"
+#include "isys/plugin.h"
 
 struct iEngine;
 struct iMaterialWrapper;
@@ -167,7 +168,7 @@ private:
    * Compute all bounding boxes.
    */
   void ComputeBBoxes ();
-  
+
   /**
    * Allocate normal array and compute normals for one mesh and put
    * result in pNormals.
@@ -560,7 +561,7 @@ public:
 };
 
 /**
- * Factory for terrain. 
+ * Factory for terrain.
  */
 class csTerrFuncObjectFactory : public iMeshObjectFactory
 {
@@ -592,17 +593,12 @@ private:
   iSystem *pSystem;
 
 public:
+  SCF_DECLARE_IBASE;
+
   /// Constructor.
   csTerrFuncObjectType (iBase*);
-
   /// Destructor.
   virtual ~csTerrFuncObjectType ();
-
-  /// Register plugin with the system driver
-  virtual bool Initialize (iSystem *pSys);
-
-  //---------------------- iMeshObjectType implementation --------------
-  SCF_DECLARE_IBASE;
 
   /// Draw.
   virtual iMeshObjectFactory* NewFactory ();
@@ -610,6 +606,14 @@ public:
   /// get supported object features
   virtual uint32 GetFeatures () const;
 
+  struct eiPlugIn : public iPlugIn
+  {
+    SCF_DECLARE_EMBEDDED_IBASE(csTerrFuncObjectType);
+    virtual bool Initialize (iSystem* p)
+    { scfParent->pSystem = p; return true; }
+    virtual bool HandleEvent (iEvent&) { return false; }
+  } scfiPlugIn;
+  friend struct eiPlugIn;
 };
 
 #endif // __CS_TERRFUNC_H__

@@ -18,15 +18,13 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __SOUND_DRIVER_WAVEOUT_H__
-#define __SOUND_DRIVER_WAVEOUT_H__
-
-// SoundDriver.H
-// csSoundDriverWaveOut class.
+#ifndef __CS_WODRV_H__
+#define __CS_WODRV_H__
 
 #include "csutil/scf.h"
 #include "csutil/cfgacc.h"
 #include "isound/driver.h"
+#include "isys/plugin.h"
 #include "isys/system.h"
 
 class csSoundDriverWaveOut : public iSoundDriver
@@ -35,13 +33,12 @@ public:
   SCF_DECLARE_IBASE;
 	
   csSoundDriverWaveOut(iBase *piBase);
-	
   virtual ~csSoundDriverWaveOut();
 
-  // implementation of interface for iPlugin
+  // Implementation of interface for iPlugin
   virtual bool Initialize (iSystem *iSys);
   virtual bool HandleEvent (iEvent &e);
-  virtual bool Open(iSoundRender *render, int frequency, bool bit16, bool stereo);
+  virtual bool Open(iSoundRender*, int frequency, bool bit16, bool stereo);
   virtual void Close();
   virtual void LockMemory(void **mem, int *memsize);
   virtual void UnlockMemory();
@@ -53,6 +50,13 @@ public:
 
   const char *GetMMError(MMRESULT code);
 	
+  struct eiPlugIn : public iPlugIn
+  {
+    SCF_DECLARE_EMBEDDED_IBASE(csSoundDriverWaveOut);
+    virtual bool Initialize (iSystem* p) { return scfParent->Initialize(p); }
+    virtual bool HandleEvent (iEvent& e) { return scfParent->HandleEvent(e); }
+  } scfiPlugIn;
+
 protected:
   // system driver
   iSystem *System;
@@ -93,5 +97,4 @@ protected:
   DWORD OldVolume;
 };
 
-#endif	//__SOUND_DRIVER_WAVEOUT_H__
-
+#endif // __CS_WODRV_H__

@@ -24,8 +24,8 @@
 #include "csgeom/math2d.h"
 #include "csgeom/math3d.h"
 #include "csgeom/polyclip.h"
-#include "video/renderer/line/line_g3d.h"
-#include "video/renderer/line/line_txt.h"
+#include "line_g3d.h"
+#include "line_txt.h"
 #include "iutil/cfgfile.h"
 #include "isys/system.h"
 #include "ivideo/graph2d.h"
@@ -61,14 +61,23 @@ SCF_EXPORT_CLASS_TABLE (line3d)
 SCF_EXPORT_CLASS_TABLE_END
 
 SCF_IMPLEMENT_IBASE (csGraphics3DLine)
-  SCF_IMPLEMENTS_INTERFACE (iPlugIn)
   SCF_IMPLEMENTS_INTERFACE (iGraphics3D)
+  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iPlugIn)
   SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iConfig)
 SCF_IMPLEMENT_IBASE_END
+
+SCF_IMPLEMENT_EMBEDDED_IBASE (csGraphics3DLine::eiPlugIn)
+  SCF_IMPLEMENTS_INTERFACE (iPlugIn)
+SCF_IMPLEMENT_EMBEDDED_IBASE_END
+
+SCF_IMPLEMENT_EMBEDDED_IBASE (csGraphics3DLine::eiLineConfig)
+  SCF_IMPLEMENTS_INTERFACE (iConfig)
+SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 csGraphics3DLine::csGraphics3DLine (iBase *iParent) : G2D (NULL)
 {
   SCF_CONSTRUCT_IBASE (iParent);
+  SCF_CONSTRUCT_EMBEDDED_IBASE (scfiPlugIn);
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiConfig);
 
   clipper = NULL;
@@ -248,9 +257,12 @@ void csGraphics3DLine::DrawPolygon (G3DPolygonDP& poly)
 
   for (i = 0 ; i < poly.num ; i++)
   {
-    G2D->DrawLine (poly.vertices[i].sx, height-poly.vertices[i].sy,
-    	poly.vertices[(i+1)%poly.num].sx, height-poly.vertices[(i+1)%poly.num].sy,
-	color);
+    G2D->DrawLine (
+      poly.vertices[i].sx,
+      height-poly.vertices[i].sy,
+      poly.vertices[(i+1)%poly.num].sx,
+      height-poly.vertices[(i+1)%poly.num].sy,
+      color);
   }
 }
 
@@ -277,9 +289,12 @@ void csGraphics3DLine::DrawPolygonFX (G3DPolygonDPFX& poly)
 
   for (i = 0 ; i < poly.num ; i++)
   {
-    G2D->DrawLine (poly.vertices[i].sx, height-poly.vertices[i].sy,
-    	poly.vertices[(i+1)%poly.num].sx, height-poly.vertices[(i+1)%poly.num].sy,
-	color);
+    G2D->DrawLine (
+      poly.vertices[i].sx,
+      height-poly.vertices[i].sy,
+      poly.vertices[(i+1)%poly.num].sx,
+      height-poly.vertices[(i+1)%poly.num].sy,
+      color);
   }
 }
 
@@ -351,10 +366,6 @@ void csGraphics3DLine::DrawLine (const csVector3& v1, const csVector3& v2,
 
 //---------------------------------------------------------------------------
 
-SCF_IMPLEMENT_EMBEDDED_IBASE (csGraphics3DLine::csLineConfig)
-  SCF_IMPLEMENTS_INTERFACE (iConfig)
-SCF_IMPLEMENT_EMBEDDED_IBASE_END
-
 #define NUM_OPTIONS 1
 
 static const csOptionDescription config_options [NUM_OPTIONS] =
@@ -362,7 +373,7 @@ static const csOptionDescription config_options [NUM_OPTIONS] =
   { 0, "dummy", "Dummy", CSVAR_BOOL },
 };
 
-bool csGraphics3DLine::csLineConfig::SetOption (int id, csVariant* value)
+bool csGraphics3DLine::eiLineConfig::SetOption (int id, csVariant* value)
 {
   if (value->type != config_options[id].type)
     return false;
@@ -374,7 +385,7 @@ bool csGraphics3DLine::csLineConfig::SetOption (int id, csVariant* value)
   return true;
 }
 
-bool csGraphics3DLine::csLineConfig::GetOption (int id, csVariant* value)
+bool csGraphics3DLine::eiLineConfig::GetOption (int id, csVariant* value)
 {
   value->type = config_options[id].type;
   switch (id)
@@ -385,7 +396,7 @@ bool csGraphics3DLine::csLineConfig::GetOption (int id, csVariant* value)
   return true;
 }
 
-bool csGraphics3DLine::csLineConfig::GetOptionDescription
+bool csGraphics3DLine::eiLineConfig::GetOptionDescription
   (int idx, csOptionDescription* option)
 {
   if (idx < 0 || idx >= NUM_OPTIONS)

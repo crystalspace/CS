@@ -36,7 +36,7 @@
 struct iGraphics2D;
 struct iConfigFile;
 
-///
+/// Line renderer.
 class csGraphics3DLine : public iGraphics3D
 {
   /// Z Buffer mode to use while rendering next polygon.
@@ -244,7 +244,8 @@ public:
   /// Draw a polygon mesh.
   virtual void DrawPolygonMesh (G3DPolygonMesh& mesh)
   {
-    DefaultDrawPolygonMesh (mesh, this, o2c, clipper, aspect, inv_aspect, width2, height2);
+    DefaultDrawPolygonMesh (mesh, this, o2c, clipper, aspect, inv_aspect,
+      width2, height2);
   }
 
   /// Get the iGraphics2D driver.
@@ -270,15 +271,21 @@ public:
     int, int, uint8)
   { }
 
-  ///------------------- iConfig interface implementation -------------------
-  struct csLineConfig : public iConfig
+  struct eiPlugIn : public iPlugIn
+  {
+    SCF_DECLARE_EMBEDDED_IBASE(csGraphics3DLine);
+    virtual bool Initialize (iSystem* p) { return scfParent->Initialize(p); }
+    virtual bool HandleEvent (iEvent&) { return false; }
+  } scfiPlugIn;
+
+  struct eiLineConfig : public iConfig
   {
     SCF_DECLARE_EMBEDDED_IBASE (csGraphics3DLine);
     virtual bool GetOptionDescription (int idx, csOptionDescription *option);
     virtual bool SetOption (int id, csVariant* value);
     virtual bool GetOption (int id, csVariant* value);
   } scfiConfig;
-  friend struct csLineConfig;
+  friend struct eiLineConfig;
 };
 
 #endif // __LINE_G3D_H__

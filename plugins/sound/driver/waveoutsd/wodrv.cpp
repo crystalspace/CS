@@ -39,13 +39,18 @@ SCF_EXPORT_CLASS_TABLE (sndwaveout)
 SCF_EXPORT_CLASS_TABLE_END
 
 SCF_IMPLEMENT_IBASE(csSoundDriverWaveOut)
-  SCF_IMPLEMENTS_INTERFACE(iPlugIn)
   SCF_IMPLEMENTS_INTERFACE(iSoundDriver)
+  SCF_IMPLEMENTS_EMBEDDED_INTERFACE(iPlugIn)
 SCF_IMPLEMENT_IBASE_END
+
+SCF_IMPLEMENT_EMBEDDED_IBASE (csConsoleOutput::eiPlugIn)
+  SCF_IMPLEMENTS_INTERFACE (iPlugIn)
+SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 csSoundDriverWaveOut::csSoundDriverWaveOut(iBase *piBase)
 {
   SCF_CONSTRUCT_IBASE(piBase);
+  SCF_CONSTRUCT_EMBEDDED_IBASE(scfiPlugIn);
 
   System = NULL;
   SoundRender = NULL;
@@ -61,12 +66,13 @@ csSoundDriverWaveOut::~csSoundDriverWaveOut()
 bool csSoundDriverWaveOut::Initialize (iSystem *iSys)
 {
   System = iSys;
-  System->CallOnEvents(this, csevCommand | csevBroadcast);
+  System->CallOnEvents(&scfiPlugIn, csevCommand | csevBroadcast);
   Config.AddConfig(System, "/config/sound.cfg");
   return true;
 }
 
-bool csSoundDriverWaveOut::Open(iSoundRender *render, int frequency, bool bit16, bool stereo)
+bool csSoundDriverWaveOut::Open(iSoundRender *render, int frequency,
+  bool bit16, bool stereo)
 {
   System->Printf (CS_MSG_INITIALIZATION, "Wave-Out Sound Driver selected.\n");
   ActivateSoundProc = false;
@@ -185,7 +191,7 @@ bool csSoundDriverWaveOut::HandleEvent(iEvent &e)
     {
       SoundBlock *Block = (SoundBlock*)BlocksToDelete.Pop();
       MMRESULT res;
-      res = waveOutUnprepareHeader(WaveOut, Block->WaveHeader, sizeof(WAVEHDR));
+      res = waveOutUnprepareHeader(WaveOut, Block->WaveHeader,sizeof(WAVEHDR));
       if (res != MMSYSERR_NOERROR) System->Printf(CS_MSG_WARNING,
         "cannot unprepare wave-out header (%s).\n", GetMMError(res));
 
@@ -309,4 +315,3 @@ const char *csSoundDriverWaveOut::GetMMError(MMRESULT r) {
     return "unknown MM error";
   }
 }
-

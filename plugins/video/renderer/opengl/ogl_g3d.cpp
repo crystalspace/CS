@@ -56,41 +56,32 @@
 CS_IMPLEMENT_PLUGIN
 
 SCF_IMPLEMENT_FACTORY (csGraphics3DOpenGL)
-  SCF_EXPORT_CLASS_TABLE (gl3d)
+
+SCF_EXPORT_CLASS_TABLE (gl3d)
   SCF_EXPORT_CLASS_DEP (csGraphics3DOpenGL, "crystalspace.graphics3d.opengl",
     "OpenGL 3D graphics driver for Crystal Space", "crystalspace.font.server.")
 SCF_EXPORT_CLASS_TABLE_END
-
-SCF_IMPLEMENT_IBASE (csGraphics3DOpenGL)
-  SCF_IMPLEMENTS_INTERFACE (iPlugIn)
-  SCF_IMPLEMENTS_INTERFACE (iGraphics3D)
-SCF_IMPLEMENT_IBASE_END
 
 /*=========================================================================
  Method implementations
 =========================================================================*/
 
-csGraphics3DOpenGL::csGraphics3DOpenGL (iBase *iParent) :
-  csGraphics3DOGLCommon ()
+csGraphics3DOpenGL::csGraphics3DOpenGL (iBase *p) :
+  csGraphics3DOGLCommon (p)
 {
-  SCF_CONSTRUCT_IBASE (iParent);
 }
 
 csGraphics3DOpenGL::~csGraphics3DOpenGL ()
 {
 }
 
-bool csGraphics3DOpenGL::Initialize (iSystem * iSys)
+bool csGraphics3DOpenGL::Initialize (iSystem* p)
 {
-  return NewInitialize (iSys);
+  csGraphics3DOGLCommon::Initialize(p);
+  return NewInitialize ();
 }
 
-bool csGraphics3DOpenGL::Open (const char *Title)
+bool csGraphics3DOpenGL::Open (const char* p)
 {
-  return NewOpen (Title);
-}
-
-void csGraphics3DOpenGL::Close ()
-{
-  csGraphics3DOGLCommon::Close ();
+  return NewOpen (p);
 }

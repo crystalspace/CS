@@ -20,7 +20,6 @@
 #define __IMAP_LOADER_H__
 
 #include "csutil/scf.h"
-#include "isys/plugin.h"
 
 struct iEngine;
 
@@ -29,10 +28,10 @@ SCF_VERSION (iLoaderPlugIn, 0, 0, 2);
 /**
  * This is a plugin for the loader.
  */
-struct iLoaderPlugIn : public iPlugIn
+struct iLoaderPlugIn : public iBase
 {
   /// Parse a given string and return a new object for it.
-  virtual iBase* Parse (const char* string, iEngine* engine, iBase* context) = 0;
+  virtual iBase* Parse (const char* string, iEngine*, iBase* context) = 0;
 };
 
 #endif

@@ -44,17 +44,13 @@ SCF_EXPORT_CLASS_TABLE (Driver2DGL)
     "Crystal Space OpenGL 2D driver for Macintosh", "crystalspace.font.server.")
 SCF_EXPORT_CLASS_TABLE_END
 
-SCF_IMPLEMENT_IBASE (csGraphics2DOpenGL)
-  SCF_IMPLEMENTS_INTERFACE (iPlugIn)
-  SCF_IMPLEMENTS_INTERFACE (iGraphics2D)
+SCF_IMPLEMENT_IBASE_EXT (csGraphics2DOpenGL)
   SCF_IMPLEMENTS_INTERFACE (iMacGraphics)
-SCF_IMPLEMENT_IBASE_END
+SCF_IMPLEMENT_IBASE_EXT_END
 
 csGraphics2DOpenGL::csGraphics2DOpenGL(iBase* iParent) : 
                    csGraphics2DGLCommon (iParent)
 {
-	SCF_CONSTRUCT_IBASE(iParent);
-
 	mMainWindow = NULL;
 	mColorTable = NULL;
 	mGLContext = NULL;

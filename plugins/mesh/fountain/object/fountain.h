@@ -24,16 +24,17 @@
 #include "csutil/cscolor.h"
 #include "plugins/mesh/partgen/partgen.h"
 #include "imesh/fountain.h"
+#include "isys/plugin.h"
 
 struct iMaterialWrapper;
 
 /**
- * A Fountain particle system. Each x msec n particles shoot out of a spout, 
+ * A Fountain particle system. Each x msec n particles shoot out of a spout,
  * falling down after that. Thus some particles may not reach the floor if
  * x is too small. If n is too small you will see not many particles.
  * Note that the 'spout' means the spot where the fountain originates.
  * Also you know that after fall_time, a particle has reached
- * sin(elevation)*speed*fall_time + accel.y*fall_time*fall_time + spot.y 
+ * sin(elevation)*speed*fall_time + accel.y*fall_time*fall_time + spot.y
  * i.e. the world y height of the pool of the fountain.
  */
 class csFountainMeshObject : public csParticleSystem
@@ -277,7 +278,7 @@ public:
   virtual void HardTransform (const csReversibleTransform&) { }
   virtual bool SupportsHardTransform () const { return false; }
 };
- 
+
 /**
  * Fountain type. This is the plugin you have to use to create instances
  * of csFountainMeshObjectFactory.
@@ -288,24 +289,28 @@ private:
   iSystem* system;
 
 public:
-  /// Constructor.
-  csFountainMeshObjectType (iBase*);
-
-  /// Destructor.
-  virtual ~csFountainMeshObjectType ();
-
-  /// Register plugin with the system driver
-  virtual bool Initialize (iSystem *pSystem);
-
-  //------------------------ iMeshObjectType implementation --------------
   SCF_DECLARE_IBASE;
 
+  /// Constructor.
+  csFountainMeshObjectType (iBase*);
+  /// Destructor.
+  virtual ~csFountainMeshObjectType ();
   /// Draw.
   virtual iMeshObjectFactory* NewFactory ();
+  // Get features.
   virtual uint32 GetFeatures () const
   {
     return ALL_FEATURES;
   }
+
+  struct eiPlugIn : public iPlugIn
+  {
+    SCF_DECLARE_EMBEDDED_IBASE(csFountainMeshObjectType);
+    virtual bool Initialize (iSystem* p)
+    { scfParent->system = p; return true; }
+    virtual bool HandleEvent (iEvent&) { return false; }
+  } scfiPlugIn;
+  friend struct eiPlugIn;
 };
 
 

@@ -290,8 +290,12 @@ iMeshObject* csFireMeshObjectFactory::NewInstance ()
 
 SCF_IMPLEMENT_IBASE (csFireMeshObjectType)
   SCF_IMPLEMENTS_INTERFACE (iMeshObjectType)
-  SCF_IMPLEMENTS_INTERFACE (iPlugIn)
+  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iPlugIn)
 SCF_IMPLEMENT_IBASE_END
+
+SCF_IMPLEMENT_EMBEDDED_IBASE (csFireMeshObjectType::eiPlugIn)
+  SCF_IMPLEMENTS_INTERFACE (iPlugIn)
+SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 SCF_IMPLEMENT_FACTORY (csFireMeshObjectType)
 
@@ -303,16 +307,11 @@ SCF_EXPORT_CLASS_TABLE_END
 csFireMeshObjectType::csFireMeshObjectType (iBase* pParent)
 {
   SCF_CONSTRUCT_IBASE (pParent);
+  SCF_CONSTRUCT_EMBEDDED_IBASE(scfiPlugIn);
 }
 
 csFireMeshObjectType::~csFireMeshObjectType ()
 {
-}
-
-bool csFireMeshObjectType::Initialize (iSystem* system)
-{
-  csFireMeshObjectType::system = system;
-  return true;
 }
 
 iMeshObjectFactory* csFireMeshObjectType::NewFactory ()

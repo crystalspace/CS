@@ -41,23 +41,36 @@ SCF_IMPLEMENT_FACTORY (csGraphics3DInfinite)
 SCF_IMPLEMENT_FACTORY (csGraphics2DInfinite)
 
 SCF_EXPORT_CLASS_TABLE (inf3d)
-  SCF_EXPORT_CLASS_DEP (csGraphics3DInfinite, "crystalspace.graphics3d.infinite",
-    "Infinite 3D graphics driver for Crystal Space", "crystalspace.font.server.")
-  SCF_EXPORT_CLASS_DEP (csGraphics2DInfinite, "crystalspace.graphics2d.infinite",
-    "Infinite 2D graphics driver for Crystal Space", "crystalspace.font.server.")
+  SCF_EXPORT_CLASS_DEP (csGraphics3DInfinite,
+    "crystalspace.graphics3d.infinite",
+    "Infinite 3D graphics driver for Crystal Space",
+    "crystalspace.font.server.")
+  SCF_EXPORT_CLASS_DEP (csGraphics2DInfinite,
+    "crystalspace.graphics2d.infinite",
+    "Infinite 2D graphics driver for Crystal Space",
+    "crystalspace.font.server.")
 SCF_EXPORT_CLASS_TABLE_END
 
 SCF_IMPLEMENT_IBASE (csGraphics3DInfinite)
-  SCF_IMPLEMENTS_INTERFACE (iPlugIn)
   SCF_IMPLEMENTS_INTERFACE (iGraphics3D)
+  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iPlugIn)
   SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iConfig)
 SCF_IMPLEMENT_IBASE_END
+
+SCF_IMPLEMENT_EMBEDDED_IBASE (csGraphics3DInfinite::eiPlugIn)
+  SCF_IMPLEMENTS_INTERFACE (iPlugIn)
+SCF_IMPLEMENT_EMBEDDED_IBASE_END
+
+SCF_IMPLEMENT_EMBEDDED_IBASE (csGraphics3DInfinite::eiInfiniteConfig)
+  SCF_IMPLEMENTS_INTERFACE (iConfig)
+SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 csGraphics3DInfinite::csGraphics3DInfinite (iBase *iParent) :
   G2D (NULL)
 {
   SCF_CONSTRUCT_IBASE (iParent);
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiConfig);
+  SCF_CONSTRUCT_EMBEDDED_IBASE(scfiPlugIn);
 
   clipper = NULL;
   texman = NULL;
@@ -104,7 +117,8 @@ bool csGraphics3DInfinite::Initialize (iSystem *iSys)
 
   width = height = -1;
 
-  G2D = CS_LOAD_PLUGIN (System, "crystalspace.graphics2d.infinite", NULL, iGraphics2D);
+  G2D = CS_LOAD_PLUGIN (System, "crystalspace.graphics2d.infinite",
+    NULL, iGraphics2D);
   if (!G2D)
     return false;
 
@@ -133,11 +147,8 @@ bool csGraphics3DInfinite::Open (const char *Title)
   texman->SetPixelFormat (pfmt);
 
   SetDimensions (nWidth, nHeight);
-
-  SysPrintf (CS_MSG_INITIALIZATION, "Using virtual mode %dx%d.\n", width, height);
-
+  SysPrintf(CS_MSG_INITIALIZATION,"Using virtual mode %dx%d.\n",width,height);
   z_buf_mode = CS_ZBUF_NONE;
-
   return true;
 }
 
@@ -266,7 +277,8 @@ void csGraphics3DInfinite::DrawTriangleMesh (G3DTriangleMesh& mesh)
   else
   {
     in_mesh = true;
-    DefaultDrawTriangleMesh (mesh, this, o2c, clipper, cliptype, aspect, width2, height2);
+    DefaultDrawTriangleMesh (mesh, this, o2c, clipper, cliptype, aspect,
+      width2, height2);
     in_mesh = false;
   }
 }
@@ -281,7 +293,8 @@ void csGraphics3DInfinite::DrawPolygonMesh (G3DPolygonMesh& mesh)
   else
   {
     in_mesh = true;
-    DefaultDrawPolygonMesh (mesh, this, o2c, clipper, aspect, inv_aspect, width2, height2);
+    DefaultDrawPolygonMesh (mesh, this, o2c, clipper, aspect, inv_aspect,
+      width2, height2);
     in_mesh = false;
   }
 }
@@ -356,15 +369,12 @@ long csGraphics3DInfinite::GetRenderState (G3D_RENDERSTATEOPTION op)
   }
 }
 
-void csGraphics3DInfinite::DrawLine (const csVector3&, const csVector3&, float, int)
+void
+csGraphics3DInfinite::DrawLine (const csVector3&, const csVector3&, float, int)
 {
 }
 
 //---------------------------------------------------------------------------
-
-SCF_IMPLEMENT_EMBEDDED_IBASE (csGraphics3DInfinite::csInfiniteConfig)
-  SCF_IMPLEMENTS_INTERFACE (iConfig)
-SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 #define NUM_OPTIONS 2
 
@@ -374,7 +384,8 @@ static const csOptionDescription config_options [NUM_OPTIONS] =
   { 1, "fastmesh", "Enable fast mesh emulation", CSVAR_BOOL },
 };
 
-bool csGraphics3DInfinite::csInfiniteConfig::SetOption (int id, csVariant* value)
+bool
+csGraphics3DInfinite::eiInfiniteConfig::SetOption (int id, csVariant* value)
 {
   if (value->type != config_options[id].type)
     return false;
@@ -387,7 +398,8 @@ bool csGraphics3DInfinite::csInfiniteConfig::SetOption (int id, csVariant* value
   return true;
 }
 
-bool csGraphics3DInfinite::csInfiniteConfig::GetOption (int id, csVariant* value)
+bool
+csGraphics3DInfinite::eiInfiniteConfig::GetOption (int id, csVariant* value)
 {
   value->type = config_options[id].type;
   switch (id)
@@ -399,7 +411,7 @@ bool csGraphics3DInfinite::csInfiniteConfig::GetOption (int id, csVariant* value
   return true;
 }
 
-bool csGraphics3DInfinite::csInfiniteConfig::GetOptionDescription
+bool csGraphics3DInfinite::eiInfiniteConfig::GetOptionDescription
   (int idx, csOptionDescription* option)
 {
   if (idx < 0 || idx >= NUM_OPTIONS)
@@ -410,18 +422,7 @@ bool csGraphics3DInfinite::csInfiniteConfig::GetOptionDescription
 
 //====================================================================
 
-SCF_IMPLEMENT_IBASE (csGraphics2DInfinite)
-  SCF_IMPLEMENTS_INTERFACE (iPlugIn)
-  SCF_IMPLEMENTS_INTERFACE (iGraphics2D)
-SCF_IMPLEMENT_IBASE_END
-
 // csGraphics2DInfinite functions
-csGraphics2DInfinite::csGraphics2DInfinite (iBase *iParent) :
-  csGraphics2D ()
-{
-  SCF_CONSTRUCT_IBASE (iParent);
-}
-
 bool csGraphics2DInfinite::Initialize (iSystem *pSystem)
 {
   if (!csGraphics2D::Initialize (pSystem))

@@ -2,26 +2,26 @@
 # to build the 3D infinite rendering driver -- inf3d
 
 # Driver description
-DESCRIPTION.infinite = Crystal Space infinite 3D renderer
+DESCRIPTION.inf3d = Crystal Space infinite 3D renderer
 
 #------------------------------------------------------------- rootdefines ---#
 ifeq ($(MAKESECTION),rootdefines)
 
 # Driver-specific help commands
 DRIVERHELP += \
-  $(NEWLINE)echo $"  make infinite     Make the $(DESCRIPTION.infinite)$"
+  $(NEWLINE)echo $"  make inf3d        Make the $(DESCRIPTION.inf3d)$"
 
 endif # ifeq ($(MAKESECTION),rootdefines)
 
 #------------------------------------------------------------- roottargets ---#
 ifeq ($(MAKESECTION),roottargets)
 
-.PHONY: infinite
-all plugins drivers drivers3d: infinite
+.PHONY: inf3d
+all plugins drivers drivers3d: inf3d
 
-infinite:
+inf3d:
 	$(MAKE_TARGET) MAKE_DLL=yes
-infiniteclean:
+inf3dclean:
 	$(MAKE_CLEAN)
 
 endif # ifeq ($(MAKESECTION),roottargets)
@@ -64,18 +64,18 @@ endif # ifeq ($(MAKESECTION),postdefines)
 #----------------------------------------------------------------- targets ---#
 ifeq ($(MAKESECTION),targets)
 
-.PHONY: infinite infiniteclean
+.PHONY: inf3d inf3dclean
 
 # Chain rules
 all: $(INF3D)
-clean: infiniteclean
+clean: inf3dclean
 
-infinite: $(OUTDIRS) $(INF3D)
+inf3d: $(OUTDIRS) $(INF3D)
 
 $(INF3D): $(OBJ.INF3D) $(LIB.INF3D)
 	$(DO.PLUGIN)
 
-infiniteclean:
+inf3dclean:
 	$(RM) $(INF3D) $(OBJ.INF3D)
 
 ifdef DO_DEPEND

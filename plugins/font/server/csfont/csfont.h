@@ -22,6 +22,7 @@
 #define __CSFONT_H__
 
 #include "ivideo/fontserv.h"
+#include "isys/plugin.h"
 #include "csutil/csvector.h"
 
 struct iSystem;
@@ -131,9 +132,6 @@ public:
   /// destroy it
   virtual ~csDefaultFontServer ();
 
-  /// Register plugin with the system driver
-  virtual bool Initialize (iSystem *pSystem);
-
   /**
    * Load a font by name.
    * Returns a new iFont object or NULL on failure.
@@ -158,6 +156,14 @@ public:
 
   /// This function is called by iFont objects when they are destroyed
   void NotifyDelete (csDefaultFont *font);
+
+  struct eiPlugIn : public iPlugIn
+  {
+    SCF_DECLARE_EMBEDDED_IBASE(csDefaultFontServer);
+    virtual bool Initialize(iSystem* p) { scfParent->System = p; return true; }
+    virtual bool HandleEvent(iEvent&) { return false; }
+  } scfiPlugIn;
+  friend struct eiPlugIn;
 };
 
 #endif // __CSFONT_H__

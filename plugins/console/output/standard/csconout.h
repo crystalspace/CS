@@ -138,7 +138,7 @@ public:
    * Tell console that this object should be notified when console 
    * visibility status changes.
    */
-  virtual void RegisterPlugin (iPlugIn *iClient)
+  virtual void RegisterWatcher (iConsoleWatcher* iClient)
   { Client = iClient; }
 
   /// Implement simple extension commands.
@@ -178,7 +178,7 @@ private:
   bool auto_update;
   bool system_ready;
   bool visible;
-  iPlugIn *Client;
+  iConsoleWatcher *Client;
 
   //  Foreground and background colors
   csRGBcolor fg_rgb;

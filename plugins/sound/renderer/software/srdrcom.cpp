@@ -38,18 +38,24 @@ CS_IMPLEMENT_PLUGIN
 SCF_IMPLEMENT_FACTORY (csSoundRenderSoftware)
 
 SCF_EXPORT_CLASS_TABLE (sndsoft)
-  SCF_EXPORT_CLASS (csSoundRenderSoftware, "crystalspace.sound.render.software",
+  SCF_EXPORT_CLASS (csSoundRenderSoftware,
+    "crystalspace.sound.render.software",
     "Software Sound Renderer for Crystal Space")
 SCF_EXPORT_CLASS_TABLE_END
 
 SCF_IMPLEMENT_IBASE(csSoundRenderSoftware)
 	SCF_IMPLEMENTS_INTERFACE(iSoundRender)
-	SCF_IMPLEMENTS_INTERFACE(iPlugIn)
+	SCF_IMPLEMENTS_EMBEDDED_INTERFACE(iPlugIn)
 SCF_IMPLEMENT_IBASE_END;
+
+SCF_IMPLEMENT_EMBEDDED_IBASE (csSoundRenderSoftware::eiPlugIn)
+  SCF_IMPLEMENTS_INTERFACE (iPlugIn)
+SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 csSoundRenderSoftware::csSoundRenderSoftware(iBase* piBase) : Listener(NULL)
 {
   SCF_CONSTRUCT_IBASE(piBase);
+  SCF_CONSTRUCT_EMBEDDED_IBASE(scfiPlugIn);
   System = NULL;
   SoundDriver = NULL;
   Listener = NULL;
@@ -64,7 +70,8 @@ bool csSoundRenderSoftware::Initialize (iSystem *iSys)
   System = iSys;
 
   // set event callback
-  System->CallOnEvents(this, CSMASK_Command | CSMASK_Broadcast | CSMASK_Nothing);
+  System->CallOnEvents(&scfiPlugIn,
+    CSMASK_Command | CSMASK_Broadcast | CSMASK_Nothing);
 
   // read the config file
   Config.AddConfig(System, "/config/sound.cfg");
@@ -78,8 +85,8 @@ bool csSoundRenderSoftware::Initialize (iSystem *iSys)
 
   SoundDriver = CS_LOAD_PLUGIN (System, drv, NULL, iSoundDriver);
   if (!SoundDriver) {	
-    System->Printf(CS_MSG_INITIALIZATION, "csSoundRenderSoftware::Initialize(): "
-      "cannot load sound driver: %s\n", drv);
+    System->Printf(CS_MSG_INITIALIZATION,
+      "csSoundRenderSoftware: Failed to load sound driver: %s\n", drv);
     return false;
   }
 

@@ -29,15 +29,13 @@
 #include "video/canvas/common/graph2d.h"
 #include "inf_txt.h"
 #include "iutil/config.h"
-#include "ivideo/graph2d.h"
 #include "ivideo/graph3d.h"
 #include "ivideo/halo.h"
 #include "isys/plugin.h"
 
-struct iGraphics2D;
 struct iConfigFile;
 
-///
+/// Infinite 3D renderer.
 class csGraphics3DInfinite : public iGraphics3D
 {
   /// Z Buffer mode to use while rendering next polygon.
@@ -159,7 +157,8 @@ public:
   virtual void CloseFogObject (CS_ID) { }
 
   /// Draw a line in camera space.
-  virtual void DrawLine (const csVector3& v1, const csVector3& v2, float fov, int color);
+  virtual void DrawLine (const csVector3& v1, const csVector3& v2, float fov,
+    int color);
 
   /// Draw a polygon with special effects.
   virtual void DrawPolygonFX (G3DPolygonDPFX& poly);
@@ -291,27 +290,31 @@ public:
     int, int, uint8)
   { }
 
-  ///------------------- iConfig interface implementation -------------------
-  struct csInfiniteConfig : public iConfig
+  struct eiPlugIn : public iPlugIn
+  {
+    SCF_DECLARE_EMBEDDED_IBASE(csGraphics3DInfinite);
+    virtual bool Initialize (iSystem* p) { return scfParent->Initialize(p); }
+    virtual bool HandleEvent (iEvent&) { return false; }
+  } scfiPlugIn;
+
+  struct eiInfiniteConfig : public iConfig
   {
     SCF_DECLARE_EMBEDDED_IBASE (csGraphics3DInfinite);
     virtual bool GetOptionDescription (int idx, csOptionDescription *option);
     virtual bool SetOption (int id, csVariant* value);
     virtual bool GetOption (int id, csVariant* value);
   } scfiConfig;
-  friend struct csInfiniteConfig;
+  friend struct eiInfiniteConfig;
 };
 
 /// Infinite version.
 class csGraphics2DInfinite : public csGraphics2D
 {
 public:
-  SCF_DECLARE_IBASE;
-
-  csGraphics2DInfinite (iBase *iParent);
+  csGraphics2DInfinite (iBase* p) : csGraphics2D(p) {}
   virtual ~csGraphics2DInfinite ();
 
-  virtual bool Initialize (iSystem *pSystem);
+  virtual bool Initialize (iSystem*);
   virtual bool Open (const char *Title) { return csGraphics2D::Open (Title); }
   virtual void Close () { csGraphics2D::Close (); }
 
@@ -327,6 +330,5 @@ public:
   virtual bool SetMousePosition (int, int) { return true; }
   virtual bool SetMouseCursor (csMouseCursorID) { return true; }
 };
-
 
 #endif // __INF_G3D_H__

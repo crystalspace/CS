@@ -6,12 +6,12 @@
     modify it under the terms of the GNU Library General Public
     License as published by the Free Software Foundation; either
     version 2 of the License, or (at your option) any later version.
-  
+
     This library is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
     Library General Public License for more details.
-  
+
     You should have received a copy of the GNU Library General Public
     License along with this library; if not, write to the Free
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
@@ -75,23 +75,39 @@ CS_TOKEN_DEF_END
 
 SCF_IMPLEMENT_IBASE (csEmitFactoryLoader)
   SCF_IMPLEMENTS_INTERFACE (iLoaderPlugIn)
-  SCF_IMPLEMENTS_INTERFACE (iPlugIn)
+  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iPlugIn)
 SCF_IMPLEMENT_IBASE_END
+
+SCF_IMPLEMENT_EMBEDDED_IBASE (csEmitFactoryLoader::eiPlugIn)
+  SCF_IMPLEMENTS_INTERFACE (iPlugIn)
+SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 SCF_IMPLEMENT_IBASE (csEmitFactorySaver)
   SCF_IMPLEMENTS_INTERFACE (iSaverPlugIn)
-  SCF_IMPLEMENTS_INTERFACE (iPlugIn)
+  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iPlugIn)
 SCF_IMPLEMENT_IBASE_END
+
+SCF_IMPLEMENT_EMBEDDED_IBASE (csEmitFactorySaver::eiPlugIn)
+  SCF_IMPLEMENTS_INTERFACE (iPlugIn)
+SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 SCF_IMPLEMENT_IBASE (csEmitLoader)
   SCF_IMPLEMENTS_INTERFACE (iLoaderPlugIn)
-  SCF_IMPLEMENTS_INTERFACE (iPlugIn)
+  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iPlugIn)
 SCF_IMPLEMENT_IBASE_END
+
+SCF_IMPLEMENT_EMBEDDED_IBASE (csEmitLoader::eiPlugIn)
+  SCF_IMPLEMENTS_INTERFACE (iPlugIn)
+SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 SCF_IMPLEMENT_IBASE (csEmitSaver)
   SCF_IMPLEMENTS_INTERFACE (iSaverPlugIn)
-  SCF_IMPLEMENTS_INTERFACE (iPlugIn)
+  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iPlugIn)
 SCF_IMPLEMENT_IBASE_END
+
+SCF_IMPLEMENT_EMBEDDED_IBASE (csEmitSaver::eiPlugIn)
+  SCF_IMPLEMENTS_INTERFACE (iPlugIn)
+SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 SCF_IMPLEMENT_FACTORY (csEmitFactoryLoader)
 SCF_IMPLEMENT_FACTORY (csEmitFactorySaver)
@@ -99,7 +115,8 @@ SCF_IMPLEMENT_FACTORY (csEmitLoader)
 SCF_IMPLEMENT_FACTORY (csEmitSaver)
 
 SCF_EXPORT_CLASS_TABLE (emitldr)
-  SCF_EXPORT_CLASS (csEmitFactoryLoader, "crystalspace.mesh.loader.factory.emit",
+  SCF_EXPORT_CLASS (csEmitFactoryLoader,
+    "crystalspace.mesh.loader.factory.emit",
     "Crystal Space Emit Factory Loader")
   SCF_EXPORT_CLASS (csEmitFactorySaver, "crystalspace.mesh.saver.factory.emit",
     "Crystal Space Emit Factory Saver")
@@ -112,16 +129,11 @@ SCF_EXPORT_CLASS_TABLE_END
 csEmitFactoryLoader::csEmitFactoryLoader (iBase* pParent)
 {
   SCF_CONSTRUCT_IBASE (pParent);
+  SCF_CONSTRUCT_EMBEDDED_IBASE(scfiPlugIn);
 }
 
 csEmitFactoryLoader::~csEmitFactoryLoader ()
 {
-}
-
-bool csEmitFactoryLoader::Initialize (iSystem* system)
-{
-  sys = system;
-  return true;
 }
 
 iBase* csEmitFactoryLoader::Parse (const char* /*string*/,
@@ -145,16 +157,11 @@ iBase* csEmitFactoryLoader::Parse (const char* /*string*/,
 csEmitFactorySaver::csEmitFactorySaver (iBase* pParent)
 {
   SCF_CONSTRUCT_IBASE (pParent);
+  SCF_CONSTRUCT_EMBEDDED_IBASE(scfiPlugIn);
 }
 
 csEmitFactorySaver::~csEmitFactorySaver ()
 {
-}
-
-bool csEmitFactorySaver::Initialize (iSystem* system)
-{
-  sys = system;
-  return true;
 }
 
 #define MAXLINE 100 /* max number of chars per line... */
@@ -188,16 +195,11 @@ void csEmitFactorySaver::WriteDown (iBase* /*obj*/, iStrVector * /*str*/,
 csEmitLoader::csEmitLoader (iBase* pParent)
 {
   SCF_CONSTRUCT_IBASE (pParent);
+  SCF_CONSTRUCT_EMBEDDED_IBASE(scfiPlugIn);
 }
 
 csEmitLoader::~csEmitLoader ()
 {
-}
-
-bool csEmitLoader::Initialize (iSystem* system)
-{
-  sys = system;
-  return true;
 }
 
 static UInt ParseMixmode (char* buf)
@@ -304,7 +306,7 @@ static iEmitGen3D* ParseEmit (char* buf, iEmitFactoryState *fstate,
 	break;
       case CS_TOKEN_EMITBOX:
         {
-          csScanStr (params, "%f,%f,%f,%f,%f,%f", &a.x, &a.y, &a.z, 
+          csScanStr (params, "%f,%f,%f,%f,%f,%f", &a.x, &a.y, &a.z,
 	    &b.x, &b.y, &b.z);
 	  iEmitBox *ebox = fstate->CreateBox();
 	  ebox->SetContent(a, b);
@@ -321,7 +323,7 @@ static iEmitGen3D* ParseEmit (char* buf, iEmitFactoryState *fstate,
 	break;
       case CS_TOKEN_EMITCONE:
         {
-          csScanStr (params, "%f,%f,%f,%f,%f,%f", &a.x, &a.y, &a.z, 
+          csScanStr (params, "%f,%f,%f,%f,%f,%f", &a.x, &a.y, &a.z,
 	    &p, &q, &r, &s, &t);
 	  iEmitCone *econe = fstate->CreateCone();
 	  econe->SetContent(a, p, q, r, s, t);
@@ -340,7 +342,7 @@ static iEmitGen3D* ParseEmit (char* buf, iEmitFactoryState *fstate,
 	break;
       case CS_TOKEN_EMITLINE:
         {
-          csScanStr (params, "%f,%f,%f,%f,%f,%f", &a.x, &a.y, &a.z, 
+          csScanStr (params, "%f,%f,%f,%f,%f,%f", &a.x, &a.y, &a.z,
 	    &b.x, &b.y, &b.z);
 	  iEmitLine *eline = fstate->CreateLine();
 	  eline->SetContent(a, b);
@@ -349,7 +351,7 @@ static iEmitGen3D* ParseEmit (char* buf, iEmitFactoryState *fstate,
 	break;
       case CS_TOKEN_EMITCYLINDER:
         {
-          csScanStr (params, "%f,%f,%f,%f,%f,%f,%f,%f", &a.x, &a.y, &a.z, 
+          csScanStr (params, "%f,%f,%f,%f,%f,%f,%f,%f", &a.x, &a.y, &a.z,
 	    &b.x, &b.y, &b.z, &p, &q);
 	  iEmitCylinder *ecyl = fstate->CreateCylinder();
 	  ecyl->SetContent(a, b, p, q);
@@ -358,7 +360,7 @@ static iEmitGen3D* ParseEmit (char* buf, iEmitFactoryState *fstate,
 	break;
       case CS_TOKEN_EMITCYLINDERTANGENT:
         {
-          csScanStr (params, "%f,%f,%f,%f,%f,%f,%f,%f", &a.x, &a.y, &a.z, 
+          csScanStr (params, "%f,%f,%f,%f,%f,%f,%f,%f", &a.x, &a.y, &a.z,
 	    &b.x, &b.y, &b.z, &p, &q);
 	  iEmitCylinderTangent *ecyltan = fstate->CreateCylinderTangent();
 	  ecyltan->SetContent(a, b, p, q);
@@ -553,18 +555,12 @@ iBase* csEmitLoader::Parse (const char* string, iEngine* engine,
 csEmitSaver::csEmitSaver (iBase* pParent)
 {
   SCF_CONSTRUCT_IBASE (pParent);
+  SCF_CONSTRUCT_EMBEDDED_IBASE(scfiPlugIn);
 }
 
 csEmitSaver::~csEmitSaver ()
 {
 }
-
-bool csEmitSaver::Initialize (iSystem* system)
-{
-  sys = system;
-  return true;
-}
-
 
 /// write emitter to string
 static void WriteEmit(iStrVector *str, iEmitGen3D *emit)
@@ -604,7 +600,7 @@ static void WriteEmit(iStrVector *str, iEmitGen3D *emit)
   if(econe)
   {
     econe->GetContent(a, p, q, r, s, t);
-    sprintf(buf, "  EMITCONE(%g,%g,%g, %g, %g, %g, %g, %g)\n", a.x,a.y,a.z, 
+    sprintf(buf, "  EMITCONE(%g,%g,%g, %g, %g, %g, %g, %g)\n", a.x,a.y,a.z,
       p, q, r, s, t);
     str->Push(csStrNew(buf));
     econe->DecRef();
@@ -639,23 +635,25 @@ static void WriteEmit(iStrVector *str, iEmitGen3D *emit)
   if(ecyl)
   {
     ecyl->GetContent(a, b, p, q);
-    sprintf(buf, "  EMITCYLINDER(%g,%g,%g, %g,%g,%g, %g, %g)\n", a.x,a.y,a.z, 
+    sprintf(buf, "  EMITCYLINDER(%g,%g,%g, %g,%g,%g, %g, %g)\n", a.x,a.y,a.z,
       b.x,b.y,b.z, p, q);
     str->Push(csStrNew(buf));
     ecyl->DecRef();
     return;
   }
-  iEmitCylinderTangent *ecyltan = SCF_QUERY_INTERFACE(emit, iEmitCylinderTangent);
+  iEmitCylinderTangent *ecyltan =
+    SCF_QUERY_INTERFACE(emit, iEmitCylinderTangent);
   if(ecyltan)
   {
     ecyltan->GetContent(a, b, p, q);
-    sprintf(buf, "  EMITCYLINDERTANGENT(%g,%g,%g, %g,%g,%g, %g, %g)\n", 
+    sprintf(buf, "  EMITCYLINDERTANGENT(%g,%g,%g, %g,%g,%g, %g, %g)\n",
       a.x,a.y,a.z, b.x,b.y,b.z, p, q);
     str->Push(csStrNew(buf));
     ecyltan->DecRef();
     return;
   }
-  iEmitSphereTangent *espheretan = SCF_QUERY_INTERFACE(emit, iEmitSphereTangent);
+  iEmitSphereTangent *espheretan =
+    SCF_QUERY_INTERFACE(emit, iEmitSphereTangent);
   if(espheretan)
   {
     espheretan->GetContent(a, p, q);
@@ -698,7 +696,7 @@ void csEmitSaver::WriteDown (iBase* obj, iStrVector *str,
     float w,h; state->GetRectParticles(w,h);
     sprintf(buf, "RECTPARTICLES (%g, %g)\n", w, h);
   }
-  else 
+  else
   {
     int n; float r; state->GetRegularParticles(n, r);
     sprintf(buf, "REGULARPARTICLES (%d, %g)\n", n, r);
@@ -708,7 +706,7 @@ void csEmitSaver::WriteDown (iBase* obj, iStrVector *str,
   str->Push(csStrNew("STARTPOS(\n"));
   WriteEmit(str, state->GetStartPosEmit());
   str->Push(csStrNew(")\n"));
-  
+
   str->Push(csStrNew("STARTSPEED(\n"));
   WriteEmit(str, state->GetStartSpeedEmit());
   str->Push(csStrNew(")\n"));
@@ -741,6 +739,3 @@ void csEmitSaver::WriteDown (iBase* obj, iStrVector *str,
   partstate->DecRef();
   state->DecRef();
 }
-
-//---------------------------------------------------------------------------
-

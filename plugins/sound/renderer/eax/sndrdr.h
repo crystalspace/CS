@@ -18,14 +18,12 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __SOUND_RENDER_EAX_H__
-#define __SOUND_RENDER_EAX_H__
-
-// SoundRender.H
-// csSoundRenderEAX class.
+#ifndef __CS_SNDRDR_H__
+#define __CS_SNDRDR_H__
 
 #include "isound/data.h"
 #include "isound/renderer.h"
+#include "isys/plugin.h"
 #include "csutil/csvector.h"
 #include "csutil/cfgacc.h"
 
@@ -64,6 +62,13 @@ public:
 
   const char *GetError(HRESULT result);
 
+  struct eiPlugIn : public iPlugIn
+  {
+    SCF_DECLARE_EMBEDDED_IBASE(csSoundRenderEAX);
+    virtual bool Initialize (iSystem* p) { return scfParent->Initialize(p); }
+    virtual bool HandleEvent (iEvent& e) { return scfParent->HandleEvent(e); }
+  } scfiPlugIn;
+
 public:
   LPDIRECTSOUND AudioRenderer;
   iSystem *System;
@@ -73,4 +78,4 @@ public:
   csConfigAccess Config;
 };
 
-#endif	//__SOUND_RENDER_EAX_H__
+#endif// __CS_SNDRDR_H__

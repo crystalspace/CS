@@ -28,20 +28,16 @@
 #include "iengine/texture.h"
 #include "glidcurs.h"
 
-SCF_IMPLEMENT_IBASE (csGraphics2DGlideCommon)
-  SCF_IMPLEMENTS_INTERFACE (iPlugIn)
-  SCF_IMPLEMENTS_INTERFACE (iGraphics2D)
+SCF_IMPLEMENT_IBASE_EXT (csGraphics2DGlideCommon)
   SCF_IMPLEMENTS_INTERFACE (iGraphics2DGlide)
-SCF_IMPLEMENT_IBASE_END
+SCF_IMPLEMENT_IBASE_EXT_END
 
 bool csGraphics2DGlideCommon::locked = false;
 
 // csGraphics2DGlideCommon function
 csGraphics2DGlideCommon::csGraphics2DGlideCommon (iBase *iParent) :
-  csGraphics2D ()
+  csGraphics2D (iParent)
 {
-  (void)iParent;
-  SCF_CONSTRUCT_IBASE (NULL);
   SetVRetrace( false );
   cursorBmp=mcBack=NULL;
   nCursor=nCurCursor=mcCols=mcRows=0;
