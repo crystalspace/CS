@@ -47,6 +47,14 @@ chronological order.
 	  corresponding SCF_CONSTRUCT_IBASE() invocations in CS/apps.
 	- Marten Svanfeldt fixed a bug with shadervars in material which didn't
 	  get loaded as they should.
+	- Duhprey did the following:
+	  - Implemented scattering in the chunklod and shaders
+	  - Added splatting lod and other optimizations
+	  - Modified terrain level to use scattering by default
+	  - Added larger heightmap file (not default) to terrain level
+	  - Added collision detection to walktest
+	  - Added a general scattering shader for object that aren't terrain
+	    (light_scattering replaces light_bumpmap for outdoor lighting)
 2-Nov-2003
 	- Eric Sunshine performed project-wide spelling corrections:
 	    seperate    --> separate
