@@ -914,12 +914,6 @@ public:
   virtual void RemoveTerrain (iTerrainWrapper *pTerrain);
 
   /**
-   * Unlink a collection from the engine (but do not delete it).
-   * It is also removed from all sectors.
-   */
-  void UnlinkCollection (csCollection* collection);
-
-  /**
    * Unlink and delete a collection from the engine.
    * It is also removed from all sectors.
    */
