@@ -28,6 +28,7 @@
 #include "iengine/material.h"
 #include "imesh/object.h"
 #include "isys/system.h"
+#include "qint.h"
 
 #include "iengine/movable.h"
 #include "iengine/rview.h"
@@ -170,15 +171,19 @@ public:
   virtual void CalculateFogPolygon (G3DPolygonDP& ) {}
   virtual void CalculateFogPolygon (G3DPolygonDPFX& ) {}
   virtual void CalculateFogMesh (const csTransform& , G3DTriangleMesh& ) {}
-  virtual bool ClipBBox (const csBox2& /*sbox*/, const csBox3& /*cbox*/,
+  virtual bool ClipBBox (const csBox2& sbox, const csBox3& /*cbox*/,
           int& clip_portal, int& clip_plane, int& clip_z_plane) 
   {
-    // could clip more efficiently
-    // @@@ WARNING! This is potentially unsafe. A mesh that must be clipped
-    // MUST be clipped!
-    clip_portal = false;
-    clip_plane = false;
-    clip_z_plane = false;
+    clip_plane = CS_CLIP_NOT;
+    /// test if chance that we must clip to a portal -> or the Toplevel clipper
+    /// better: only if it crosses that.
+    const csRect& rect = isorview->GetView()->GetRect();
+    if( (rect.xmin <= QInt(sbox.MinX())) || (rect.xmax >= QInt(sbox.MaxX())) ||
+        (rect.ymin <= QInt(sbox.MinY())) || (rect.ymax >= QInt(sbox.MaxY())) )
+      clip_portal = CS_CLIP_TOPLEVEL;
+    else clip_portal = CS_CLIP_NOT;
+    /// test if z becomes negative, should never happen
+    clip_z_plane = CS_CLIP_NOT;
     return true;
   }
 
