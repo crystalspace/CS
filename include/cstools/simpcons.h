@@ -130,6 +130,7 @@ public:
   virtual const csString *GetText(int = -1) const { return NULL; } /* Not supported */
   virtual void DeleteText(int = 0, int = -1) { } /* Not supported */
   virtual void Draw(csRect *rect = NULL) { Print(rect); }
+  virtual void Draw3D(csRect *rect = NULL) {}
   virtual void SetBufferSize(int lines) { SetMaxLines(lines); }
   virtual void CacheColors(iTextureManager *txtmgr) { SetupColors(txtmgr); }
   virtual void GetForeground(int &red, int &green, int &blue) const { red = console_fg_r; green = console_fg_g; blue = console_fg_b; }

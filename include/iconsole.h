@@ -78,6 +78,9 @@ struct iConsole : public iPlugIn
   /// Update the console on the window.
   virtual void Draw(csRect *rect = NULL) = 0;
 
+  /// Update the 3D part of the console on the window.
+  virtual void Draw3D(csRect *rect = NULL) = 0;
+
   /// Return true if console is active  !DEPRECATED!
   virtual bool IsActive() const = 0;
 
