@@ -19,6 +19,12 @@ The history order is reversed so that new features are at the top.
 	  within the physical filesystem.  It is essentially the complement of
 	  virtual iFile implementations for VFS, and the antithesis of
 	  csMemFile.
+	- Jorrit removed several usages of GetPrivateObject() in the engine.
+	  Not all usages could be removed however. The ones that were removed
+	  now were the easy ones.
+	- Jorrit removed GetPrivateObject() in iMaterialWrapper and
+	  iMeshWrapper. They were no longer used. Also removed a few addditional
+	  GetPrivateObject() calls.
 	- Eric Sunshine eliminated several compilation warnings from
 	  win32/registrycfg.cpp.
 	- Eric Sunshine performed Phase Two of the elimination of the

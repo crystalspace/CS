@@ -45,8 +45,6 @@ SCF_VERSION (iMaterialWrapper, 0, 0, 4);
  */
 struct iMaterialWrapper : public iBase
 {
-  /// @@@Ugly.
-  virtual csMaterialWrapper* GetPrivateObject () = 0;
   /// Get the iObject for this material.
   virtual iObject *QueryObject() = 0;
 

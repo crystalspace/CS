@@ -552,10 +552,6 @@ public:
   struct MeshWrapper : public iMeshWrapper
   {
     SCF_DECLARE_EMBEDDED_IBASE (csMeshWrapper);
-    virtual csMeshWrapper* GetPrivateObject ()
-    {
-      return (csMeshWrapper*)scfParent;
-    }
     virtual iObject *QueryObject ()
     {
       return scfParent;
@@ -575,6 +571,10 @@ public:
     virtual iShadowReceiver* GetShadowReceiver () const
     {
       return scfParent->shadow_receiver;
+    }
+    virtual uint32 GetVisibilityNumber () const
+    {
+      return scfParent->GetVisibilityNumber ();
     }
     virtual iMeshFactoryWrapper* GetFactory () const
     {

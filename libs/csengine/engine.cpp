@@ -832,8 +832,6 @@ void csEngine::DeleteAll ()
   halos.DeleteAll ();
   collections.DeleteAll ();
 
-  int i;
-
   GetMeshes ()->RemoveAll ();
   mesh_factories.RemoveAll ();
   sectors.RemoveAll ();
@@ -2091,7 +2089,7 @@ int csEngine::GetNearbyLights (
     csDynLight *dl = first_dyn_lights;
     while (dl)
     {
-      if (&(dl->GetSector ()->scfiSector) == sector)
+      if (dl->GetSector () == sector)
       {
         sqdist = csSquaredDist::PointPoint (pos, dl->GetCenter ());
 #ifdef CS_USE_NEW_RENDERER
@@ -2166,7 +2164,7 @@ int csEngine::GetNearbyLights (
     csDynLight *dl = first_dyn_lights;
     while (dl)
     {
-      if (&(dl->GetSector ()->scfiSector) == sector)
+      if (dl->GetSector () == sector)
       {
         csBox3 b (box.Min () - dl->GetCenter (), box.Max () - dl->GetCenter ());
         sqdist = b.SquaredOriginDist ();

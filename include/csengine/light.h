@@ -36,10 +36,10 @@ class csDynLight;
 class csHalo;
 class csPolygon3D;
 class csCurve;
-class csSector;
 class csKDTreeChild;
 struct iMeshWrapper;
 struct iLightingInfo;
+struct iSector;
 
 /**
  * Superclass of all positional lights.
@@ -57,7 +57,7 @@ private:
 
 protected:
   /// Home sector of the light.
-  csSector* sector;
+  iSector* sector;
   /// Position of the light.
   csVector3 center;
 #ifndef CS_USE_NEW_RENDERER
@@ -169,12 +169,12 @@ public:
   /**
    * Set the current sector for this light.
    */
-  virtual void SetSector (csSector* sector);
+  virtual void SetSector (iSector* sector);
 
   /**
    * Get the current sector for this light.
    */
-  csSector* GetSector () const { return sector; }
+  iSector* GetSector () const { return sector; }
 
   /**
    * Set the center position.
@@ -338,8 +338,8 @@ public:
     {
       scfParent->SetCenter (pos);
     }
-    virtual iSector *GetSector ();
-    virtual void SetSector (iSector* sector);
+    virtual iSector *GetSector () { return scfParent->GetSector (); }
+    virtual void SetSector (iSector* sector) { scfParent->SetSector (sector); }
 #ifndef CS_USE_NEW_RENDERER
     virtual float GetRadius () { return scfParent->GetRadius (); }
     virtual float GetSquaredRadius () { return scfParent->GetSquaredRadius (); }

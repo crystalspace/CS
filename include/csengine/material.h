@@ -222,8 +222,6 @@ public:
   struct MaterialWrapper : public iMaterialWrapper
   {
     SCF_DECLARE_EMBEDDED_IBASE (csMaterialWrapper);
-    virtual csMaterialWrapper* GetPrivateObject ()
-    { return (csMaterialWrapper*)scfParent; }
     virtual iObject *QueryObject()
     { return scfParent; }
     virtual iMaterialWrapper *Clone () const

@@ -134,7 +134,7 @@ iMeshWrapper** csRenderQueueSet::SortAll (iRenderView* rview,
       for (int i = 0 ; i < v->Length () ; i++)
       {
         iMeshWrapper *sp = v->Get (i);
-        if (sp->GetPrivateObject ()->GetVisibilityNumber () == current_visnr)
+        if (sp->GetVisibilityNumber () == current_visnr)
         {
           meshes[tot_num++] = sp;
         }

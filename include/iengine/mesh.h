@@ -122,7 +122,7 @@ struct iMeshDrawCallback : public iBase
 };
 
 
-SCF_VERSION (iMeshWrapper, 0, 4, 0);
+SCF_VERSION (iMeshWrapper, 0, 5, 0);
 
 /**
  * A mesh wrapper is an engine-level object that wraps around an actual
@@ -138,8 +138,6 @@ SCF_VERSION (iMeshWrapper, 0, 4, 0);
  */
 struct iMeshWrapper : public iBase
 {
-  /// UGLY!!!@@@
-  virtual csMeshWrapper* GetPrivateObject () = 0;
   /**
    * Get the iObject for this mesh object. This can be used to get the
    * name of the mesh wrapper and also to attach other user objects
@@ -159,6 +157,7 @@ struct iMeshWrapper : public iBase
    * to calling SCF_QUERY_INTERFACE on the mesh object for iLightingInfo.
    */
   virtual iLightingInfo* GetLightingInfo () const = 0;
+
   /**
    * Get the optional shadow receiver that is implemented
    * by this mesh object. If the mesh object doesn't implement it
@@ -166,6 +165,12 @@ struct iMeshWrapper : public iBase
    * to calling SCF_QUERY_INTERFACE on the mesh object for iShadowReceiver.
    */
   virtual iShadowReceiver* GetShadowReceiver () const = 0;
+
+  /**
+   * Optimization to avoid having to do SCF_QUERY_INTERFACE for
+   * iVisibilityObject.
+   */
+  virtual uint GetVisibilityNumber () const = 0;
 
   /// Get the parent factory.
   virtual iMeshFactoryWrapper *GetFactory () const = 0;

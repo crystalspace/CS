@@ -108,8 +108,9 @@ const char* csLight::GenerateUniqueID ()
   mf.Write ("light", 5);
   if (sector)
   {
-    if (sector->GetName ())
-      mf.Write (sector->GetName (), strlen (sector->GetName ()));
+    if (sector->QueryObject ()->GetName ())
+      mf.Write (sector->QueryObject ()->GetName (),
+      	strlen (sector->QueryObject ()->GetName ()));
   }
 
   int32 l;
@@ -176,28 +177,18 @@ void csLight::SetCenter (const csVector3 &pos)
   lightnr++;
 }
 
-iSector *csLight::Light::GetSector ()
-{
-  return &scfParent->GetSector ()->scfiSector;
-}
-
-void csLight::SetSector (csSector* sector)
+void csLight::SetSector (iSector* sector)
 {
   int i = light_cb_vector.Length ()-1;
   while (i >= 0)
   {
     iLightCallback* cb = light_cb_vector[i];
-    cb->OnSectorChange (&scfiLight, sector ? &(sector->scfiSector) : NULL);
+    cb->OnSectorChange (&scfiLight, sector);
     i--;
   }
 
   csLight::sector = sector;
   lightnr++;
-}
-
-void csLight::Light::SetSector (iSector *sector)
-{
-  scfParent->SetSector (sector ? sector->GetPrivateObject () : NULL);
 }
 
 #ifndef CS_USE_NEW_RENDERER
