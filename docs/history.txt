@@ -3,6 +3,9 @@ http://crystal.sourceforge.net/
 
 The history order is reversed so that new features are at the top.
 
+12-Jul-2003
+	- Jorrit applied a fix to the fountain bounding box creation
+	  code as supplied by Anders Reggestad.
 11-Jul-2003
 	- Jorrit added a convenience csPolygonMeshCube class which represents
 	  an easy way to make a cube collider.

@@ -54,7 +54,7 @@ void csFountainMeshObject::SetupObject ()
 
     float fradius = 10.0; // guessed radius of the fountain
     float height = 10.0; // guessed height
-    bbox.Set(origin - csVector3(-fradius,0,-fradius),
+    bbox.Set(origin - csVector3(fradius,0,fradius),
       origin + csVector3(+fradius, +height, +fradius) );
 
     // Calculate the maximum radius.
