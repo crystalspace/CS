@@ -37,6 +37,18 @@
 
 #include "video/canvas/openglcommon/glextmanager.h"
 
+//---------------------------------------------------------------------------
+
+class csRLMAlloc : public csBlockAllocator<csGLRendererLightmap>
+{
+public:
+  csRLMAlloc () : csBlockAllocator<csGLRendererLightmap> (512) { }
+};
+
+CS_IMPLEMENT_STATIC_VAR (GetRLMAlloc, csRLMAlloc, ());
+
+//---------------------------------------------------------------------------
+
 class csOFSCbOpenGL : public iOffscreenCanvasCallback
 {
 private:
@@ -1533,7 +1545,7 @@ void csGLSuperLightmap::DecRef ()
 }
 
 csGLSuperLightmap::csGLSuperLightmap (csGLTextureManager* txtmgr, 
-				      int width, int height) : RLMs(32)
+				      int width, int height)
 {
   SCF_CONSTRUCT_IBASE (0);
   w = width; h = height;
@@ -1629,14 +1641,14 @@ void csGLSuperLightmap::FreeRLM (csGLRendererLightmap* rlm)
   // causing an assertion in block allocator (due to how BA frees items and
   // the safety assertions on BA destruction.)
   scfRefCount++;
-  RLMs.Free (rlm);
+  GetRLMAlloc ()->Free (rlm);
   DecRef ();
 }
 
 csPtr<iRendererLightmap> csGLSuperLightmap::RegisterLightmap (int left, int top,
 	int width, int height)
 {
-  csGLRendererLightmap* rlm = RLMs.Alloc ();
+  csGLRendererLightmap* rlm = GetRLMAlloc ()->Alloc ();
   rlm->slm = this;
   rlm->rect.Set (left, top, left + width, top + height);
 

@@ -32,6 +32,9 @@ chronological order.
 	- Eric Sunshine completely overhauled the Texinfo formatting in the new
 	  sprcal3d.txi so that it formats properly on the printed page, and
 	  rewrote much of the discussion.
+	- Jorrit changed the lightmap allocator in the OpenGL renderer to
+	  use a global block allocator instead of one per superlightmap.
+	  Also did this optimization to the NR OpenGL renderer.
 12-Feb-2004
 	- Jorrit did several documentation enhancements:
 	    - Added a link to the new level building section in the

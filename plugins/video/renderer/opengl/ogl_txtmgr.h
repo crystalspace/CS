@@ -200,9 +200,6 @@ class csGLSuperLightmap : public iSuperLightmap
   /// Number of lightmaps on this SLM.
   int numRLMs;
 
-  /// Allocator for lightmaps on this SLM.
-  csBlockAllocator<csGLRendererLightmap> RLMs;
-
   /// Actually create the GL texture.
   void CreateTexture ();
   /// Remove the GL texture.

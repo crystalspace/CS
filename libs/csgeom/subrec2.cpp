@@ -134,7 +134,7 @@ public:
 class csSubRectAlloc : public csBlockAllocator<csSubRect2>
 {
 public:
-  csSubRectAlloc () : csBlockAllocator<csSubRect2> (100) { }
+  csSubRectAlloc () : csBlockAllocator<csSubRect2> (2000) { }
 };
 
 CS_IMPLEMENT_STATIC_VAR (GetSubRecAlloc, csSubRectAlloc, ());
