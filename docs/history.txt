@@ -41,6 +41,14 @@ chronological order.
 	  older compilers will destroy the temporary csString returned by
 	  Description() before the result of GetData() is used by
 	  printf(). This will typically result in a crash.
+	- Eric Sunshine updated the msvcgen workspace templates so that the
+	  project dependency lists are now sorted. This will ensure that the
+	  same list of dependencies always generates the same workspace file
+	  regardless of the order in which the dependencies were declared.
+	  This is an important consideration for jobber.pl, for instance, which
+	  could be fooled into thinking that the project files were outdated if
+	  the wildcard operation returned the same list of files in different
+	  orders on different runs.
 1-Mar-2005
 	- res fixed the use of 'return' in a void method in glrender3d.cpp.
 	- Marten fixed a bug related to attenuation of lights in r3dtest. 

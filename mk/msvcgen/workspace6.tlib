@@ -41,7 +41,7 @@ Package=<5>
 
 Package=<4>
 {{{
-[% FOREACH dep IN filter(my.doc.$project).split('\|') -%]
+[% FOREACH dep IN filter(my.doc.$project).split('\|').sort -%]
     Begin Project Dependency
     Project_Dep_Name [% dep %]
     End Project Dependency

@@ -45,7 +45,7 @@ Global
 	EndGlobalSection
 	GlobalSection(ProjectDependencies) = postSolution
 [% FOREACH project IN projects; g = guids.$project; n = 0 -%]
-[% FOREACH dep IN filter(my.doc.$project).split('\|') -%]
+[% FOREACH dep IN filter(my.doc.$project).split('\|').sort -%]
 		{[% g %]}.[% n; n = n + 1 %] = {[% guids.$dep %]}
 [% END -%]
 [% END -%]
