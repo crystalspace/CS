@@ -79,7 +79,7 @@ public:
 static scfLibraryVector *LibraryRegistry = 0;
 
 /// A object of this class represents a shared library
-class scfSharedLibrary : public csBase
+class scfSharedLibrary : public iBase
 {
   friend class scfLibraryVector;
   // Shared library name
@@ -98,6 +98,10 @@ public:
   /// Destroy a shared library object
   virtual ~scfSharedLibrary ();
 
+  ///
+  virtual void *QueryInterface (scfInterfaceID iInterfaceID, int iVersion)
+  { return this;}
+  
   /// Check if library object is okay
   bool ok ()
   { return (LibraryHandle != NULL) && (ClassTable != NULL); }

@@ -19,10 +19,11 @@
 
 #include "cssysdef.h"
 #include "csutil/csobjvec.h"
+#include "csutil/scf.h"
 
 bool csObjVector::FreeItem (csSome Item)
 {
-  delete (csBase *) Item;
+  if (Item) ((iBase *) Item)->DecRef ();
   return true;
 }
 
