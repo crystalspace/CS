@@ -5,7 +5,7 @@
 */
 
 #include "cssysdef.h"
-#include "csfx/csanim2d.h"
+#include "csfx/anim2d.h"
 #include "igraph2d.h"
 #include "igraph3d.h"
 #include "itexture.h"
