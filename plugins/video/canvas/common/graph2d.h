@@ -206,6 +206,11 @@ public:
   /// Free storage allocated for a subarea of screen
   virtual void FreeArea (csImageArea *Area);
 
+private:
+    /// helper function for ClipLine()
+  bool CLIPt(float denom, float num, float& tE, float& tL);
+public:
+
   /**
    * Clip a line against given rectangle
    * Function returns true if line is not visible
@@ -343,7 +348,7 @@ protected:
   // Virtual Alert function so it can be overridden by subclasses
   // of csGraphics2D.
   virtual void AlertV (int type, const char* title, const char* okMsg,
-  	const char* msg, va_list args);
+    const char* msg, va_list args);
   // Virtual SetTitle function so it can be overridden by subclasses
   // of csGraphics2D.
   virtual void SetTitle (const char* title);
@@ -361,9 +366,9 @@ protected:
   {
     SCF_DECLARE_EMBEDDED_IBASE (csGraphics2D);
     virtual void Alert (int type, const char* title, const char* okMsg,
-    	const char* msg, ...);
+        const char* msg, ...);
     virtual void AlertV (int type, const char* title, const char* okMsg,
-    	const char* msg, va_list arg)
+        const char* msg, va_list arg)
     {
       scfParent->AlertV (type, title, okMsg, msg, arg);
     }

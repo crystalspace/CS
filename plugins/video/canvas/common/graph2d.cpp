@@ -340,24 +340,24 @@ void csGraphics2D::DrawLine (float x1, float y1, float x2, float y2, int color)
     // delta Y can be negative
     int deltay = (fy2 - fy1) / (fx2 - fx1 + 1);
 
-#define H_LINE(pixtype)						\
-  {								\
+#define H_LINE(pixtype)                     \
+  {                             \
     int x, y;  \
-    for (x = fx1, y = fy1 + deltay / 2; x <= fx2; x++)	\
-    {								\
-      pixtype *p = (pixtype *)(Memory +				\
-        (x * sizeof (pixtype) + LineAddress [y >> 16]));	\
-      *p = color; y += deltay;					\
-    }								\
+    for (x = fx1, y = fy1 + deltay / 2; x <= fx2; x++)  \
+    {                               \
+      pixtype *p = (pixtype *)(Memory +             \
+        (x * sizeof (pixtype) + LineAddress [y >> 16]));    \
+      *p = color; y += deltay;                  \
+    }                               \
   }
 
-/*#define H_LINE(pixtype)						\
-  {								\
+/*#define H_LINE(pixtype)                       \
+  {                             \
     int x, y;  \
-    for (x = fx1, y = fy1 + deltay / 2; x <= fx2; x++)	\
-    {								\
-      DrawPixel(x, (y>>16), color); y += deltay;					\
-    }								\ */
+    for (x = fx1, y = fy1 + deltay / 2; x <= fx2; x++)  \
+    {                               \
+      DrawPixel(x, (y>>16), color); y += deltay;                    \
+    }                               \ */
 
     switch (pfmt.PixelBytes)
     {
@@ -382,25 +382,25 @@ void csGraphics2D::DrawLine (float x1, float y1, float x2, float y2, int color)
     // delta X can be negative
     int deltax = (fx2 - fx1) / (fy2 - fy1 + 1);
 
-#define V_LINE(pixtype)						\
-  {								\
+#define V_LINE(pixtype)                     \
+  {                             \
     int x, y; \
-    for (x = fx1 + deltax / 2, y = fy1; y <= fy2; y++)	\
-    {								\
-      pixtype *p = (pixtype *)(Memory +				\
-        ((x >> 16) * sizeof (pixtype) + LineAddress [y]));	\
-      *p = color; x += deltax;					\
-    }								\
+    for (x = fx1 + deltax / 2, y = fy1; y <= fy2; y++)  \
+    {                               \
+      pixtype *p = (pixtype *)(Memory +             \
+        ((x >> 16) * sizeof (pixtype) + LineAddress [y]));  \
+      *p = color; x += deltax;                  \
+    }                               \
   }
 
-/*#define V_LINE(pixtype)						\
-  {								\
+/*#define V_LINE(pixtype)                       \
+  {                             \
     int x, y; \
-    for (x = fx1 + deltax / 2, y = fy1; y <= fy2; y++)	\
-    {								\
+    for (x = fx1 + deltax / 2, y = fy1; y <= fy2; y++)  \
+    {                               \
       DrawPixel((x>>16), y, color); \
       x += deltax; \
-    }								\
+    }                               \
   }*/
 
     switch (pfmt.PixelBytes)
@@ -486,76 +486,60 @@ void csGraphics2D::GetClipRect (int &xmin, int &ymin, int &xmax, int &ymax)
   ymin = ClipY1; ymax = ClipY2;
 }
 
-// This algorithm has been borrowed about eight years ago from a book on
-// computer graphics, I believe its author was R.Wilson or something alike.
-// It was first converted from ASM to Pascal, and now I converted it to C :-)
-bool csGraphics2D::ClipLine (float &x1, float &y1, float &x2, float &y2,
-  int xmin, int ymin, int xmax, int ymax)
+/* helper function for ClipLine below */
+bool csGraphics2D::CLIPt(float denom, float num, float& tE, float& tL)
 {
-  float fxmin = xmin;
-  float fxmax = xmax-EPSILON;
-  float fymin = ymin;
-  float fymax = ymax-EPSILON;
+    float t;
 
-#define CLIP_LEFT   0x01
-#define CLIP_TOP    0x02
-#define CLIP_RIGHT  0x04
-#define CLIP_BOTTOM 0x08
-
-
-#define SetOutCodes(u, x, y)                \
-  u = 0;                                    \
-  if (x < fxmin) u |= CLIP_LEFT;            \
-  if (y < fymin) u |= CLIP_TOP;             \
-  if (x > fxmax) u |= CLIP_RIGHT;           \
-  if (y > fymax) u |= CLIP_BOTTOM;
-
-#define FSWAP(a,b) { float __tmp__ = a; a = b; b = __tmp__; }
-#define CSWAP(a,b) { char __tmp__ = a; a = b; b = __tmp__; }
-
-  char ocu1,ocu2;
-  SetOutCodes (ocu1, x1, y1);
-  SetOutCodes (ocu2, x2, y2);
-
-  bool Inside,Outside;
-  Inside  = (ocu1 | ocu2) == 0;
-  Outside = (ocu1 & ocu2) != 0;
-
-  while ((!Outside) && (!Inside))
-  {
-    if (ocu1 == 0)                      // swap endpoints if necessary
-    {                                   // so that (x1,y1) needs to be clipped
-      FSWAP (x1, x2);
-      FSWAP (y1, y2);
-      CSWAP (ocu1, ocu2);
-    }
-    if (ocu1 & CLIP_LEFT)               // clip left
-    {
-      y1 = y1 + ((y2 - y1) * (fxmin - x1)) / (x2 - x1);
-      x1 = fxmin;
-    }
-    else if (ocu1 & CLIP_TOP)           // clip above
-    {
-      x1 = x1 + ((x2 - x1) * (fymin - y1)) / (y2 - y1);
-      y1 = fymin;
-    }
-    else if (ocu1 & CLIP_RIGHT)         // clip right
-    {
-      y1 = y1 + ((y2 - y1) * (fxmax - x1)) / (x2 - x1);
-      x1 = fxmax;
-    }
-    else if (ocu1 & CLIP_BOTTOM)        // clip below
-    {
-      x1 = x1 + ((x2 - x1) * (fymax - y1)) / (y2 - y1);
-      y1 = fymax;
-    }
-    SetOutCodes (ocu1, x1, y1);         // update for (x1,y1)
-    Inside  = (ocu1 | ocu2) == 0;
-    Outside = (ocu1 & ocu2) != 0;
-  }
-
-  return Outside;
+    if(denom > 0) {
+        t = num / denom;
+        if(t > tL) return false;
+        else if(t > tE) tE = t;
+    } else if(denom < 0) {
+        t = num / denom;
+        if(t < tE) return false;
+        else tL = t;
+    } else if(num > 0) return false;
+    return true;
 }
+
+/* This function and the next one were taken
+   from _Computer Graphics: Principals and Practice_ (2nd ed)
+   by Foley et al
+   This implements the Liang-Barsky efficient parametric
+   line-clipping algorithm
+*/
+bool csGraphics2D::ClipLine (float &x0, float &y0, float &x1, float &y1,
+                             int xmin, int ymin, int xmax, int ymax)
+{
+    float dx = x1 - x0;
+    float dy = y1 - y0;
+    bool visible = false;
+
+    if(dx == 0 && dy == 0 && x0 >= xmin && y0 >= ymin && x0 < xmax && y0 < ymax) {
+        visible = true;
+    } else {
+        float tE = 0.0;
+        float tL = 1.0;
+        if(CLIPt(dx, xmin - x0, tE, tL))
+            if(CLIPt(-dx, x0 - xmax, tE, tL))
+                if(CLIPt(dy, ymin - y0, tE, tL))
+                    if(CLIPt(-dy, y0 - ymax, tE, tL))
+                    {
+                        visible = true;
+                        if(tL < 1.0) {
+                            x1 = x0 + tL * dx;
+                            y1 = y0 + tL * dy;
+                        }
+                        if(tE > 0) {
+                            x0 += tE * dx;
+                            y0 += tE * dy;
+                        }
+                    }
+    }
+    return !visible;
+}
+
 
 csImageArea *csGraphics2D::SaveArea (int x, int y, int w, int h)
 {
@@ -703,11 +687,11 @@ iGraphics2D *csGraphics2D::CreateOffScreenCanvas
   CS_ASSERT (object_reg != NULL);
   csProcTextureSoft2D *tex = new csProcTextureSoft2D (object_reg);
   return tex->CreateOffScreenCanvas (width, height, buffer, alone_hint,
-				     pfmt, palette, pal_size);
+                     pfmt, palette, pal_size);
 }
 
 void csGraphics2D::AlertV (int type, const char* title, const char* okMsg,
-	const char* msg, va_list arg)
+    const char* msg, va_list arg)
 {
   (void)type; (void)title; (void)okMsg;
   printf ("ALERT: ");
@@ -716,7 +700,7 @@ void csGraphics2D::AlertV (int type, const char* title, const char* okMsg,
 }
 
 void csGraphics2D::NativeWindowManager::Alert (int type,
-	const char* title, const char* okMsg, const char* msg, ...)
+    const char* title, const char* okMsg, const char* msg, ...)
 {
   va_list arg;
   va_start (arg, msg);
