@@ -243,9 +243,9 @@ bool cswinCallStack::GetFunctionName (size_t num, csString& str)
 
   if (symbolInfo->Name[0] != 0)
   {
-    str.Format ("[%p] (%s)%s+0x%llx", (void*)entries[num].instrPtr,
+    str.Format ("[%p] (%s)%s+0x" PRIx64, (void*)entries[num].instrPtr,
       (module.ImageName[0] != 0) ? module.ImageName : "<unknown>",
-      symbolInfo->Name, (longlong)displace);
+      symbolInfo->Name, displace);
   }
   else
   {

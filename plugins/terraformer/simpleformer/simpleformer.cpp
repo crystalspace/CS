@@ -353,13 +353,13 @@ void csSimpleFormer::SetHeightmap (iImage *heightmap)
     {
       for (x = 0; x < width; ++x)
       {
-        // Grab height from R,G,B (is effectively a 24-bit number)
+        // Grab height from R,G,B (triplet is effectively a 24-bit number)
         // We're reversing Y to later get negative Y in heightmap image 
         // to positive Z in terrain - sampler space has an inverted Y
 	// axis in comparison to image space.
-	int h = data[x+y*width].red * 65536 + data[x+y*width].green * 256 +
-	  data[x+y*width].blue;
-        heightData[x+(height-y-1)*width] = (float)h/1677215.0;
+	const csRGBpixel& heixel = data[x+y*width];
+	int h = heixel.red * 65536 + heixel.green * 256 + heixel.blue;
+        heightData[x+(height-y-1)*width] = (float)h/16777215.0;
       }
     }
   }
