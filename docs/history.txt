@@ -6,6 +6,9 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+11-Mar-2005
+	- Jorrit fixed the simple2 tutorial in the documentation so that it
+	  explicitly states that you shouldn't use the scale.
 10-Mar-2005
 	- Fixed flarge so that the name of the 'fire' texture plugin
 	  no longer conflicts with the name of the 'fire' mesh loader plugin
