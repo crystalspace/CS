@@ -65,6 +65,7 @@
 #include "iutil/cfgmgr.h"
 #include "iutil/databuff.h"
 #include "imap/reader.h"
+#include "ivaria/strserv.h"
 
 //---------------------------------------------------------------------------
 
@@ -385,7 +386,8 @@ IMPLEMENT_FACTORY (csEngine)
 EXPORT_CLASS_TABLE (engine)
   EXPORT_CLASS_DEP (csEngine, "crystalspace.engine.core",
     "Crystal Space 3D Engine",
-      "crystalspace.kernel., crystalspace.graphics3d., crystalspace.graphic.image.io.")
+      "crystalspace.kernel., crystalspace.graphics3d., crystalspace.graphic.image.io.,"
+      "crystalspace.string.server")
 EXPORT_CLASS_TABLE_END
 
 csEngine::csEngine (iBase *iParent) : csObject (), camera_positions (16, 16)
@@ -480,6 +482,18 @@ bool csEngine::Initialize (iSystem* sys)
 #endif
 
   System = sys;
+
+  // initialize RTTI system
+  iStringServer *StrServ =
+    QUERY_PLUGIN_ID (sys, CS_FUNCID_STRSERV, iStringServer);
+  if (!StrServ)
+  {
+    CsPrintf (MSG_FATAL_ERROR, "Failed to initialize engine: no string server.\n");
+    return false;
+  }
+  // ...
+  StrServ->DecRef ();
+
 
   if (!(G3D = QUERY_PLUGIN_ID (sys, CS_FUNCID_VIDEO, iGraphics3D)))
     return false;

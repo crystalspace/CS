@@ -70,6 +70,9 @@ IMPLEMENT_IBASE (csObject)
   IMPLEMENTS_INTERFACE (iObject)
 IMPLEMENT_IBASE_END
 
+IMPLEMENT_OBJECT_INTERFACE (csObject)
+IMPLEMENT_OBJECT_INTERFACE_END
+
 csObject::csObject () : csBase (), iObject (), children (NULL), Name (NULL)
 {
   CONSTRUCT_IBASE (NULL);

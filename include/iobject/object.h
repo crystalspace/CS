@@ -20,6 +20,7 @@
 #define __IOBJECT_OBJECT_H__
 
 #include "csutil/scf.h"
+#include "iobject/rtti.h"
 
 class csObject;
 
@@ -47,6 +48,8 @@ struct iObject : public iBase
 
   /// Deletes the given object, removing it from the object tree
   virtual void ObjRemove (iObject *obj) = 0;
+
+  DECLARE_ABSTRACT_OBJECT_INTERFACE;
 };
 
 #endif

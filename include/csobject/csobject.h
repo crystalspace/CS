@@ -122,6 +122,7 @@ public:
   virtual void ObjRemove (iObject *obj);
 
   CSOBJTYPE;
+  DECLARE_OBJECT_INTERFACE;
   DECLARE_IBASE;
 };
 

@@ -104,6 +104,8 @@
 #define CS_FUNCID_ENGINE	"Engine"
 /// Skeleton Animation
 #define CS_FUNCID_MOTION	"MotionManager"
+/// String Server
+#define CS_FUNCID_STRSERV	"StringServer"
 
 /**
  * Query a pointer to some plugin through the System interface.
