@@ -270,7 +270,7 @@ void csWindow::Draw ()
     case cswfsNone:
       break;
     case cswfsThin:
-      thwin->DrawBorder(*this,csthfsThin,bw,bh,di,di);
+      thwin->DrawBorder(*this,csthfsThin,bw,bh,li,di);
       break;
     case cswfs3D:
     {
@@ -290,6 +290,9 @@ void csWindow::Draw ()
     case cswfsTheme:
       CS_ASSERT (true);
       break;
+    default:
+      //      fprintf(stderr,"Unknown Frame Style! %d\n",FrameStyle);
+      CS_ASSERT(true);
   } /* endswitch */
 
   if (!GetState (CSS_TRANSPARENT))
@@ -561,6 +564,7 @@ void csWindow::ThemeChanged ()
       CS_ASSERT (true);
       break;
     } /* endswitch */
+    //    fprintf(stderr,"csWindow(%8p) bw = %d:%d bh = %d:%d FrameStyle = %d\n",this,BorderWidth,bw,BorderHeight,bh,FrameStyle);
     if (ThemeActive.BorderWidth == 1) BorderWidth = bw;
     if (ThemeActive.BorderWidth == 1) BorderHeight = bh;
   }

@@ -115,6 +115,9 @@ void csTheme::DrawBorder (csComponent &comp, int FrameStyle, int &bw, int &bh,
       comp.Sprite2DTiledShifted (pixmap, bwi, bh, comp.bound.Width (),
         bhi, bwi, bh);
       break;
+    default:
+      //      fprintf(stderr,"Unknown Frame Style! %d\n",FrameStyle);
+      CS_ASSERT(true);
   } /* endswitch */
 }
 
@@ -219,29 +222,17 @@ void csTheme::GetBorderSize (csComponent &comp, int FrameStyle, int &bw, int &bh
   switch (FrameStyle)
   {
     case csthfsOblique:
-      if (comp.bound.Height () >= 6)
-      {
         bh = bw = 3;
         break;
-      } // otherwise fallback to a smaller frame.
     case csthfsThickRect:
-      if (comp.bound.Height () >= 6)
-      {
         bh = bw = 3;
         break;
-      } // otherwise fallback to a smaller frame
     case csthfsThinRect:
-      if (comp.bound.Height () >= 4)
-      {
         bh = bw = 2;
         break;
-      } // otherwise fallback to a smaller frame
     case csthfsThin:
-      if (comp.bound.Height () >= 2)
-      {
         bw = bh = 1;
         break;
-      } // otherwise fallback to no frame.
     case csthfsNone:
       bw = bh = 0;
       break;
