@@ -118,15 +118,9 @@ bool csTerrain::drawTriangle( ddgTBinTree *bt, ddgVBIndex tvc, ddgVArray *vbuf )
 	int cnt;
 	for (cnt = 0; cnt < 3; cnt++)
 	{
-		i[cnt] = bt->vbufferIndex(tv[cnt]);
-
-		if (!i[cnt])
-		{
-			bt->vertex(tv[cnt],&p[cnt]);
-			bt->textureC(tv[cnt],&t[cnt]);
-			i[cnt] = vbuf->pushVT(&p[cnt],&t[cnt]);
-			bt->vbufferIndex(tv[cnt],i[cnt]);
-		}
+		bt->vertex(tv[cnt],&p[cnt]);
+		bt->textureC(tv[cnt],&t[cnt]);
+		i[cnt] = vbuf->pushVT(&p[cnt],&t[cnt]);
 	}
     // Record that these vertices are in the buffer.
     vbuf->pushTriangle(i[0],i[1],i[2]);
@@ -139,67 +133,35 @@ void csTerrain::Draw (csRenderView& rview, bool /*use_z_buf*/)
   bool modified = true;
   // Get matrices in OpenGL form
 
-  unsigned int i = 0, s = 0;
+  unsigned int i = 0, s = 0, d = 0;
   ddgTBinTree *bt;
 
+  // Currently the CS version of the terrain engine uses a clipping
+  // wedge base on the position, the field of view, the forward vector and
+  // the far clip distance.  It is a 2D clipping in the XZ plane.
+  //
+  // The DDG engine uses clipping agains 2 or 5 clipping planes
+  // which match the true clipping planes as set by the projection
+  // matrix.
   const csMatrix3& orientation = rview.GetO2T ();
 
-  // set up coordinate transform
-  ddgMatrix4 &mm = *context->transformation();
- 
-  mm[0] = 1.0;
-  mm[5] = 1.0;
-  mm[10] = 1.0;
-  mm[15] = 1.0;
-
-  mm[0] = orientation.m11;
-  mm[1] = orientation.m21;
-  mm[2] = orientation.m31;
-
-  mm[4] = orientation.m12;
-  mm[5] = orientation.m22;
-  mm[6] = orientation.m32;
-
-  mm[8] = orientation.m13;
-  mm[9] = orientation.m23;
-  mm[10] = orientation.m33;
-
   const csVector3& translation = rview.GetO2TTranslation();
-
-  mm[3] = translation.x;
-  mm[7] = translation.y;
-  mm[11] = translation.z;
-
-  mm[12] = mm[13] = mm[14] = 0;
+  // JORRIT: I need the camera's foward facing vector in world space.
+  // I dont think this is working...
+  const csVector3 wforward(1,0,0);
+  const csVector3 cforward = wforward * rview;
+  ddgVector3 f(cforward.x,cforward.y,cforward.z);
+  // Hard code for now to show initial view.
+  f.set(0,0,1);
+  f.normalize();
 
   ddgControl *control = context->control();
   control->position(translation.x, translation.y, translation.z);
  
-  ddgMatrix4 &pm = *context->projection();
-  
-  float rnear = 1.0;
-  float rfar = 10.0;
-  pm[0] = 2 *rnear/ (rview.rightx - rview.leftx);
-  pm[1] = 0;
-  pm[2] = (rview.rightx + rview.leftx)/ (rview.rightx - rview.leftx);
-  pm[3] = 0;
-
-  pm[4] = 0;
-  pm[5] = 2 *rnear/ (rview.topy - rview.boty);
-  pm[6] = (rview.topy + rview.boty)/(rview.topy - rview.boty);
-  pm[7] = 0;
-
-  pm[8] = 0;
-  pm[9] = 0;
-  pm[10] = -1 * (rfar + rnear)/ (rfar - rnear);
-  pm[11] = -2 * rnear * rfar /(rfar - rnear);
-
-  pm[12] = 0;
-  pm[13] = 0;
-  pm[14] = -1;
-  pm[15] = 0;
-
-  context->extractPlanes(context->frustrum());
+  context->forward(&f);
+  // JORRIT: rview.GetFOV() returns 480 I need the real field of view.
+  context->fov(90);
+  // context->extractPlanes(context->frustrum());
   // Optimize the mesh w.r.t. the current viewing location.
   modified = mesh->calculate(context);
 
@@ -246,7 +208,7 @@ void csTerrain::Draw (csRenderView& rview, bool /*use_z_buf*/)
 	g3dmesh.num_vertices_pool = 1;
 	g3dmesh.num_textures = 1;
 	g3dmesh.use_vertex_color = false;
-	g3dmesh.do_clip = true;	// DEBUG THIS LATER
+	g3dmesh.do_clip = false;	// DEBUG THIS LATER
 	g3dmesh.do_mirror = rview.IsMirrored ();
 	g3dmesh.do_morph_texels = false;
 	g3dmesh.do_morph_colors = false;
@@ -265,22 +227,21 @@ void csTerrain::Draw (csRenderView& rview, bool /*use_z_buf*/)
   s = 0;
   while (i < mesh->getBinTreeNo())
   {
-	if (_textureMap && (i%2 == 0) && _textureMap[i/2])
-	  g3dmesh.txt_handle[0] = _textureMap[i/2]->GetTextureHandle ();
-
-	if ((bt = mesh->getBinTree(i)) && (bt->visTriangle() > 0))
+	d = mesh->getBinTree(i)->visTriangle() + mesh->getBinTree(i+1)->visTriangle();
+	if (d > 0)
 	{
+      if (_textureMap && _textureMap[i/2])
+	    g3dmesh.txt_handle[0] = _textureMap[i/2]->GetTextureHandle ();
 	  // Render this bintree.
-      g3dmesh.num_triangles = bt->visTriangle(); // number of triangles
+      g3dmesh.num_triangles = d; // number of triangles
       g3dmesh.triangles = (csTriangle *) &(vbuf->ibuf[s*3]);	// pointer to array of csTriangle for all triangles
-
+	  // Render this bintree.
       rview.g3d->DrawTriangleMesh (g3dmesh);
 	  // Increment the starting offset by the number of triangles that were in this block.
-	  s = s+bt->visTriangle();
+	  s = s+d;
 	}
-	i++;
+	i = i+2;
   }
-
 }
 
 // If we hit this terrain adjust our position to be on top of it.
