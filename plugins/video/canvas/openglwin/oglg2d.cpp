@@ -323,14 +323,6 @@ bool csGraphics2DOpenGL::Open()
   DEVMODE dmode;
   LONG ti;
 
-  // Ugly hack needed to work around an interference between the 3dfx opengl 
-  // driver on voodoo cards <= 2 and the win32 console window
-  if (GetFullScreen() && config->GetBool("Video.OpenGL.Win32.DisableConsoleWindow", false) ) 
-  {
-    m_piWin32Assistant->DisableConsole();
-    Report (CS_REPORTER_SEVERITY_NOTIFY, "*** Disabled Win32 console window to avoid OpenGL interference.");
-  }
-
   // create the window.
   DWORD exStyle = 0;
   DWORD style = WINDOW_STYLE;
@@ -547,4 +539,22 @@ bool csGraphics2DOpenGL::SetMousePosition (int x, int y)
 
   return true;
 }
+
+bool csGraphics2DOpenGL::PerformExtensionV (char const* command, va_list args)
+{
+  if (!strcasecmp (command, "configureopengl"))
+  {
+    // Ugly hack needed to work around an interference between the 3dfx opengl 
+    // driver on voodoo cards <= 2 and the win32 console window
+    if (GetFullScreen() && config->GetBool("Video.OpenGL.Win32.DisableConsoleWindow", false) ) 
+    {
+      m_piWin32Assistant->DisableConsole();
+      Report (CS_REPORTER_SEVERITY_NOTIFY, "*** Disabled Win32 console window to avoid OpenGL interference.");
+    }
+    csGraphics2DGLCommon::PerformExtensionV (command, args);
+    return true;
+  }
+  return csGraphics2DGLCommon::PerformExtensionV (command, args);
+}
+
 

@@ -59,6 +59,8 @@ public:
   virtual bool SetMouseCursor (csMouseCursorID iShape);
   virtual bool SetMousePosition (int x, int y);
 
+  virtual bool PerformExtensionV (char const* command, va_list);
+
   int m_nGraphicsReady;
 
   /**
