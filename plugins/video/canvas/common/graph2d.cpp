@@ -427,15 +427,15 @@ void csGraphics2D::Blit (int x, int y, int w, int h,
     case 1:
       while (h)
       {
-    register uint8 *vram = GetPixelAt (x, y);
-    int w2 = w;
-    d = data;
-    while (w2 > 0)
-    {
-      r = *d++; g = *d++; b = *d++; d++;
-      *vram++ = FindRGB (r, g, b);
-      w2--;
-    }
+	register uint8 *vram = GetPixelAt (x, y);
+	int w2 = w;
+	d = data;
+	while (w2 > 0)
+	{
+	  r = *d++; g = *d++; b = *d++; d++;
+	  *vram++ = FindRGB (r, g, b);
+	  w2--;
+	}
         data += 4*orig_w;
         y++; h--;
       }
@@ -444,14 +444,14 @@ void csGraphics2D::Blit (int x, int y, int w, int h,
       while (h)
       {
         register uint16 *vram = (uint16 *)GetPixelAt (x, y);
-    int w2 = w;
-    d = data;
-    while (w2 > 0)
-    {
-      r = *d++; g = *d++; b = *d++; d++;
-      *vram++ = FindRGB (r, g, b);
-      w2--;
-    }
+	int w2 = w;
+	d = data;
+	while (w2 > 0)
+	{
+	  r = *d++; g = *d++; b = *d++; d++;
+	  *vram++ = FindRGB (r, g, b);
+	  w2--;
+	}
         data += 4*orig_w;
         y++; h--;
       } /* endwhile */
@@ -460,14 +460,14 @@ void csGraphics2D::Blit (int x, int y, int w, int h,
       while (h)
       {
         register uint32 *vram = (uint32 *)GetPixelAt (x, y);
-    int w2 = w;
-    d = data;
-    while (w2 > 0)
-    {
-      r = *d++; g = *d++; b = *d++; a = *d++;
-      *vram++ = FindRGB (r, g, b) | (a<<24);
-      w2--;
-    }
+	int w2 = w;
+	d = data;
+	while (w2 > 0)
+	{
+	  r = *d++; g = *d++; b = *d++; a = *d++;
+	  *vram++ = FindRGB (r, g, b) | (a<<24);
+	  w2--;
+	}
         data += 4*orig_w;
         y++; h--;
       } /* endwhile */

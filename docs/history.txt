@@ -20,6 +20,9 @@ chronological order.
 	  real problem has been corrected.
 	- Jorrit fixed a bug in thing which would sometimes reset the
 	  cached movable to 0 at the wrong place.
+	- Jorrit fixed a bug in thing and allocation of three-vertex
+	  polygons. This bug would cause too many memory allocations and
+	  memory leaks at exit.
 14-Oct-2003
 	- Eric Sunshine fixed typographical error in constant expression in
 	  cssys/general/platformconfig.cpp: S_IWGRPS_IXGRP --> S_IWGRP|S_IXGRP.

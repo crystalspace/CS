@@ -94,6 +94,9 @@ void csPolygon3DStatic::SetNumVertices (int count)
 {
   int old_count = polygon_data.num_vertices;
   if (old_count == count) return;
+  if (old_count >= 1 && old_count <= 3 && count >= 1 && count <= 3) return;
+  if (old_count >= 7 && old_count <= 20 && count >= 7 && count <= 20) return;
+  if (old_count >= 21 && count >= 21) return;
 
   int* old_data = polygon_data.vertices;
   polygon_data.num_vertices = count;
@@ -106,8 +109,6 @@ void csPolygon3DStatic::SetNumVertices (int count)
     case 1:
     case 2:
     case 3:
-      if (old_count < 1 || old_count > 3)
-        polygon_data.vertices = t->blk_polidx3.Alloc ()->ar;
       polygon_data.vertices = t->blk_polidx3.Alloc ()->ar;
       break;
     case 4:
@@ -148,8 +149,7 @@ void csPolygon3DStatic::SetNumVertices (int count)
       case 1:
       case 2:
       case 3:
-        if (count < 1 || count > 3)
-          t->blk_polidx3.Free ((intar3*)old_data);
+        t->blk_polidx3.Free ((intar3*)old_data);
 	break;
       case 4: t->blk_polidx4.Free ((intar4*)old_data); break;
       case 5: t->blk_polidx5->Free ((intar5*)old_data); break;
