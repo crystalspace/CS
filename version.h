@@ -1,10 +1,6 @@
 #ifndef VERSION_H
 #define VERSION_H
 
-#ifndef __SYSDEFS_H__
-#include "sysdef.h"
-#endif
-
 #define CS_VERSION	"0.15"
 #define CS_SUBVERSION	"002"
 #define RELEASE_DATE	"Wed, 23-Feb-2000"
