@@ -41,6 +41,10 @@ chronological order.
 	  However, it also requires a manual CloseHandle(), which is done
 	  at destruction time. Thus, threads that don't run any more should be 
 	  destructed as soon as possible.
+	- Troy in odedynam, added DestroyGeoms() to RigidBody and 
+	  DynamicSystem destructors.  Allows rigidbodies to be removed from 
+	  system w/out crashing ODE.  Also added call to delete polytree, 
+          taking care of memory leak from polytree optimization.
 17-Aug-2003
 	- Jorrit fixed a bug in csIntersect3::IntersectTriangle(). In
 	  some cases it would fail to register a hit.
