@@ -343,7 +343,7 @@ void GLFontCache::Write (iFont *font, int x, int y, const char *text)
   glTranslatef (x, y, 0);
 
   statecache->EnableState (GL_TEXTURE_2D);
-  glShadeModel (GL_FLAT);
+  statecache->SetShadeModel (GL_FLAT);
   glTexEnvf (GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
 
   statecache->EnableState (GL_BLEND);
