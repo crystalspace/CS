@@ -254,7 +254,7 @@ csParSysExplosion :: csParSysExplosion(int number_p,
   for(i=0; i<number_p; i++)
   {
     //AppendRectSprite(0.5, 0.5, txt);
-    AppendRegularSprite(16, 0.5, txt);
+    AppendRegularSprite(16, 0.25, txt);
     pos = center + GetRandomDirection() * spread_pos;
     part_2d[i]->SetMove( pos );
     part_speed[i] = push + spread_speed * GetRandomDirection();
