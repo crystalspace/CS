@@ -69,6 +69,8 @@ chronological order.
 	  causing compile errors.
 	- Eric Sunshine fixed CS_TEXT_CACHE_OUTPUT() in textcache.m4 to do a
 	  better job of cleaning up after itself.
+	- Jorrit disabled the use of fputws for now until we find out a way
+	  to discover buggy implementations of fputws.
 13-Apr-2004
 	- Jorrit changed the PreferClipPlane default to enabled for the new
 	  renderer. Now clipping planes are enabled by default and only
