@@ -21,6 +21,7 @@
 #define __CS_INETWORK_DRIVER_H__
 
 #include "csutil/scf.h"
+#include "csutil/ref.h"
 
 /**
  * Potential network driver error codes.
@@ -46,6 +47,8 @@ enum csNetworkDriverError
 
 /**
  * Network driver capabilities structure.
+ * This is deprecated since the reliable flag is deprecated,
+ * and all drivers should support blocking and non-blocking.
  */
 struct csNetworkDriverCapabilities
 {
@@ -97,7 +100,7 @@ struct iNetworkConnection : public iNetworkEndPoint
 };
 
 
-SCF_VERSION (iNetworkListener, 0, 0, 1);
+SCF_VERSION (iNetworkListener, 0, 0, 2);
 
 /**
  * This is the network listener interface for CS.  It represents a single
@@ -115,11 +118,11 @@ struct iNetworkListener : public iNetworkEndPoint
    * returns CS_NET_ERR_NO_ERROR then no connection was pending.  Otherwise
    * an error occurred, and GetLastError() returns the appropriate error code.
    */
-  virtual iNetworkConnection* Accept() = 0;
+  virtual csPtr<iNetworkConnection> Accept() = 0;
 };
 
 
-SCF_VERSION (iNetworkDriver, 0, 0, 1);
+SCF_VERSION (iNetworkDriver, 0, 0, 2);
 
 /**
  * This is the network driver interface for CS.  It represents a plug-in
@@ -130,36 +133,41 @@ struct iNetworkDriver : public iBase
   /**
    * Create a new network connection.  The 'target' parameter is driver
    * dependent.  For example, with a socket driver, the target might be
-   * "host:port#"; with a modem driver it might be "comport:phone#"; etc.
-   * The 'reliable' flag determines whether a reliable connection is made
-   * (sometimes known as connection-oriented) or an unreliable one (sometimes
-   * known as connectionless).  The 'blocking' flag determines whether
-   * operations on the connection return immediately in all cases or wait
-   * until the operation can be completed successfully.  Returns the new
-   * connection object or NULL if the connection failed.
+   * "host:port/protocol"; with a modem driver it might be
+   * "Device:PhoneNumber"; etc. The 'reliable' flag determines whether a
+   * reliable connection is made (sometimes known as connection-oriented)
+   * or an unreliable one (sometimes known as connectionless).  The 'blocking'
+   * flag determines whether operations on the connection return immediately
+   * in all cases or wait until the operation can be completed successfully.
+   * Returns the new connection object or NULL if the connection failed.
    */
-  virtual iNetworkConnection* NewConnection(const char* target,
-    bool reliable, bool blocking) = 0;
+  virtual csPtr<iNetworkConnection> NewConnection(const char* target,
+    bool reliable = true, bool blocking = false) = 0;
 
   /**
    * Create a new network listener.  The 'source' parameter is driver
-   * dependent.  For example, with a socket driver, the target might be
-   * "port#"; with a modem driver it might be "comport"; etc.  The 'reliable'
-   * determines whether or not a reliable connection is made.  The
-   * 'blockingListener' flag determines whether or not the Accept() method
-   * blocks while when called.  The 'blockingConnection' flag determines
+   * dependent.  For example, with a socket driver, the source might be
+   * "port/protocol"; with a modem driver it might be "comport"; etc.
+   * The 'reliable' determines whether or not a reliable connection is made.
+   * The 'blockingListener' flag determines whether or not the Accept() method
+   * blocks while being called.  The 'blockingConnection' flag determines
    * whether or not methods in the resulting connection object block.
    */
-  virtual iNetworkListener* NewListener(const char* source,
-    bool reliable, bool blockingListener, bool blockingConnection) = 0;
+  virtual csPtr<iNetworkListener> NewListener(const char* source,
+    bool reliable = true, bool blockingListener = false,
+    bool blockingConnection = false) = 0;
 
   /**
    * Get network driver capabilities.  This function returns information
    * describing the capabilities of the driver.
+   * This function is deprecated since the reliable flag is deprecated,
+   * and all drivers should support blocking and non-blocking.
    */
   virtual csNetworkDriverCapabilities GetCapabilities() const = 0;
 
-  /// Retrieve the code for the last error encountered.
+  /**
+   *  Retrieve the code for the last error encountered.
+   */
   virtual csNetworkDriverError GetLastError() const = 0;
 };
 

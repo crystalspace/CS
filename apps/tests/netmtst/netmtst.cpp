@@ -54,7 +54,7 @@ class SendPacket : public iNetworkPacket
 
   void SetData (char d []) { data = d; }
 
-  virtual bool Read (csDataStream &stream) { return false; }
+  virtual bool Read (csDataStream &st, iNetworkSocket2 *so) { return false; }
   virtual char* Write (size_t &size)
   {
     size = strlen (data);
@@ -70,7 +70,7 @@ SCF_IMPLEMENT_IBASE_END
 
 class RecvPacket : public iNetworkPacket
 {
-  char data [256];
+  int8 data [256];
   unsigned position;
 
   public:
@@ -82,9 +82,9 @@ class RecvPacket : public iNetworkPacket
   }
   virtual ~RecvPacket () {}
 
-  const char* GetData () { return data; }
+  const int8* GetData () { return data; }
 
-  virtual bool Read (csDataStream &stream)
+  virtual bool Read (csDataStream &stream, iNetworkSocket2 *sock)
   {
     while (stream.ReadInt8 (data [position])) position++;
     if (position >= strlen (testdata))
@@ -115,7 +115,7 @@ bool HandleEvent (iEvent &ev)
   return true;
 }
 
-int main (int argc, char *argv[]/*, char *env[]*/)
+int main (int argc, char *argv[])
 {
   objreg = csInitializer::CreateEnvironment (argc, argv);
   if (! objreg)

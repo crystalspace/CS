@@ -127,15 +127,27 @@ csSocketConnection::csSocketConnection(
 
 bool csSocketConnection::Send(const void* data, size_t nbytes)
 {
-  bool ok = false;
+  size_t totalsent = 0;
   if (ValidateSocket())
   {
-    if (send(Socket, (char*)data, nbytes, 0) != -1)
-      ok = true;
-    else
-      LastError = CS_NET_ERR_CANNOT_SEND;
+    do
+    {
+      size_t sent = send(Socket, (char*)data + totalsent, nbytes, 0);
+      if (sent == (size_t)-1)
+      {
+        LastError = CS_NET_ERR_CANNOT_SEND;
+        return false;
+      }
+      totalsent += sent;
+    }
+    while (totalsent < nbytes);
+    return true;
   }
-  return ok;
+  else
+  {
+    LastError = CS_NET_ERR_INVALID_SOCKET;
+    return false;
+  }
 }
 
 size_t csSocketConnection::Receive(void* buff, size_t maxbytes)
@@ -161,7 +173,8 @@ csNetworkSocket csSocketConnection::csSocket::GetSocket() const
 // csSocketListener -----------------------------------------------------------
 
 csSocketListener::csSocketListener(iBase* p, csNetworkSocket s,
-  unsigned short port, bool blockingListener, bool blockingConnection) :
+  unsigned short port, bool reliable, bool blockingListener,
+  bool blockingConnection) :
   csSocketEndPoint(s, blockingListener), BlockingConnection(blockingConnection)
 {
   SCF_CONSTRUCT_IBASE(p);
@@ -175,7 +188,7 @@ csSocketListener::csSocketListener(iBase* p, csNetworkSocket s,
   bool ok = false;
   if (bind(Socket, (struct sockaddr*)&addr, sizeof(addr)) == -1)
     LastError = CS_NET_ERR_CANNOT_BIND;
-  else if (listen(Socket, CS_NET_LISTEN_QUEUE_SIZE) == -1)
+  else if (reliable && listen(Socket, CS_NET_LISTEN_QUEUE_SIZE) == -1)
     LastError = CS_NET_ERR_CANNOT_LISTEN;
   else
     ok = true;
@@ -184,7 +197,7 @@ csSocketListener::csSocketListener(iBase* p, csNetworkSocket s,
     CloseSocket();
 }
 
-iNetworkConnection* csSocketListener::Accept()
+csPtr<iNetworkConnection> csSocketListener::Accept()
 {
   iNetworkConnection* connection = NULL;
   if (ValidateSocket())
@@ -197,7 +210,7 @@ iNetworkConnection* csSocketListener::Accept()
     else if (CS_GETSOCKETERROR != EWOULDBLOCK)
       LastError = CS_NET_ERR_CANNOT_ACCEPT;
   }
-  return connection;
+  return csPtr<iNetworkConnection> (connection);
 }
 
 csNetworkSocket csSocketListener::csSocket::GetSocket() const
@@ -265,20 +278,27 @@ unsigned long csSocketDriver::ResolveAddress(const char* host)
   return address;
 }
 
-iNetworkConnection* csSocketDriver::NewConnection(
+csPtr<iNetworkConnection> csSocketDriver::NewConnection(
   const char* target, bool reliable, bool blocking)
 {
   ClearError();
   iNetworkConnection* connection = NULL;
-  if (target != NULL) // Unparse target "host:port#".
+  if (target != NULL)
   {
     char* host = NULL;
     unsigned short port = 0;
     const char* p = strchr(target, ':');
+    const char* proto = strchr(target, '/');
     if (p != NULL)
     {
       host = strdup(target);
       host[p - target] = '\0';
+      if (proto)
+      {
+        host[proto - target] = '\0';
+        if (strcasecmp (proto + 1, "tcp")) reliable = true;
+        else if (strcasecmp (proto + 1, "udp")) reliable = false;
+      }
       port = atoi(p + 1);
     }
 
@@ -307,25 +327,33 @@ iNetworkConnection* csSocketDriver::NewConnection(
     if (host != NULL)
       free(host);
   }
-  return connection;
+  return csPtr<iNetworkConnection> (connection);
 }
 
-iNetworkListener* csSocketDriver::NewListener(const char* source,
+csPtr<iNetworkListener> csSocketDriver::NewListener(const char* source,
   bool reliable, bool blockingListener, bool blockingConnection)
 {
   ClearError();
   iNetworkListener* listener = NULL;
+
+  const char* proto = strchr(source, '/');
+  if (proto)
+  {
+    if (strcasecmp (proto + 1, "tcp")) reliable = true;
+    else if (strcasecmp (proto + 1, "udp")) reliable = false;
+  }
   const unsigned short port = atoi(source);
   if (port == 0)
     LastError = CS_NET_ERR_CANNOT_PARSE_ADDRESS;
+
   else
   {
     csNetworkSocket s = CreateSocket(reliable);
     if (s != CS_NET_SOCKET_INVALID)
-      listener = new csSocketListener(this, s, port, blockingListener,
-        blockingConnection);
+      listener = new csSocketListener(this, s, port, reliable,
+        blockingListener, blockingConnection);
   }
-  return listener;
+  return csPtr<iNetworkListener> (listener);
 }
 
 csNetworkDriverCapabilities csSocketDriver::GetCapabilities() const

@@ -87,7 +87,7 @@ inline bool csNetworkManager::HandleEvent (iEvent &ev)
       iNetworkSocket2 *sock = (iNetworkSocket2 *) listeners.Get (i);
       iNetworkSocket2 *newsock = sock->Accept ();
       if (newsock) RegisterConnectedSocket
-        (newsock, ((iNetworkPacket *) packets.Get ((int) newsock))->New ());
+        (newsock, ((iNetworkPacket *) packets.Get ((int) sock))->New ());
 
       Poll (sock, ev.Time);
     }
@@ -95,7 +95,11 @@ inline bool csNetworkManager::HandleEvent (iEvent &ev)
     for ((i = connections.Length ())--; i >= 0; i--)
     {
       iNetworkSocket2 *sock = (iNetworkSocket2 *) connections.Get (i);
-      Poll (sock, ev.Time);
+
+      if (sock->IsConnected ())
+        Poll (sock, ev.Time);
+      else
+        UnregisterConnectedSocket (sock);
     }
 
     return true;
@@ -116,7 +120,7 @@ inline void csNetworkManager::Poll (iNetworkSocket2 *sock, csTicks t)
   {
     string->Append (buf, len);
     csDataStream stream (string->GetData (), string->Length (), false);
-    bool post = packet->Read (stream);
+    bool post = packet->Read (stream, sock);
 
     if (post)
     {

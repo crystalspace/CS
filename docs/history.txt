@@ -1,5 +1,75 @@
 The history order is reversed so that new features are at the top.
 
+5-Apr-2003
+	- Eric Sunshine applied update from Oktal: Fixed a problem with the
+	  cssocket plugin where it would only send the first packet of a
+	  transmission that is split up into multiple packets.
+2-Apr-2003
+	- Eric Sunshine applied update from Oktal to the socket driver:
+	    - Target and source string arguments to iNetworkDriver::
+	      NewConnection() and NewListener() respectively, now take an
+	      optional suffix, "/tcp" or "/udp".
+	    - That means that the reliable flags are now deprecated.
+	    - Switched to csPtr in appropriate places.
+	    - Fixed WaitForConnection in the ensocket driver; it was failing
+	      for UDP sockets.
+28-Mar-2003
+	- Eric Sunshine fixed the following problems with the ensocket driver.
+	  These problems were identified via simple visual inspection (not via
+	  testing).
+	    - Fixed bug: In non-blocking mode, csNetworkSocket2::Recv() would
+	      ignore the requested number of bytes and always read only a
+	      single byte.
+	    - Fixed bug: csNetworkSocket2 constructor was setting socket_ready
+	      to true even if socket set up failed.
+	    - Fixed bug: Closing the socket failed to clear socket_ready.
+	    - Fixed bug: csNetworkDriver2 constructor was setting last_error to
+	      wrong error code if if WSAStartup() failed.
+	    - Fixed numerous problems where the "last error" code was being
+	      mismanaged, which made it almost completely pointless for clients
+	      to call csNetworkSocket2::LastError() since the result was
+	      usually incorrect.
+	    - Fixed bug: csNetworkSocket2::Send() was not honoring contract;
+	      failed to return -1 in all cases upon error.
+	    - Fixed several problems with incorrect checking of return codes
+	      from socket functions; was mixing up -1, 0, 1 as return codes.
+	    - Fixed bugs where csNetworkSocket2 read/write methods immediately
+	      reported failure for datagram sockets if the socket was not
+	      "connected", even though these operations are valid for
+	      non-connected datagram sockets.
+	    - Fixed bug: csNetworkSocket2::Accept() was leaking a file
+	      descriptor.
+	    - Fixed bug: csNetworkSocket2:Connect() ignored requests to connect
+	      a datagram socket even though this operation is valid.
+	    - Fixed bug: In blocking mode, csNetworkSocket2::ReadLine() failed
+	      to respect then buffer size specified by the client, and would
+	      happily trash memory beyond the end of the supplied buffer.
+	    - Fixed bug: In non-blocking mode, csNetworkSocket2::ReadLine()
+	      would only read a single byte of data per invocation.  Now it
+	      consumes as much data as available (up to end-of-line) before
+	      returning.
+	    - Eliminated unnecessary copying of received "line" in
+	      csNetworkSocket2::ReadLine().
+	    - Performed some refactoring of the code to simplify and eliminate
+	      redundancy.
+	    - Purged unnecessary junk from headers which polluted the global
+	      namespace.
+	    - Repaired a lot of Doxygen comment problems in headers.
+	    - Added missing `const' qualifiers.
+	    - Eliminated the convoluted and obfuscated fd_maskset and fd_list[]
+	      instance variables and related logic from csNetworkSocket2.
+	      These were an unnecessary complication.
+	    - Eliminated the unnecessary sin_size, addr_len, and host_ent
+	      instance variables.
+	    - Fixed bugs reported by David van Laatum <david@daboyz.dyndns.org>
+	      where csNetworkSocket2 methods were not taking EWOULDBLOCK into
+	      account for non-blocking connections.  Instead, EWOULDBLOCK was
+	      being interpreted as a "disconnect" error.
+	    - Applied behavioral change, from David van Laatum: Accepted
+	      connections now inherit the blocking mode of the parent rather
+	      than being set to block unconditionally.  (This matches the
+	      behavior of the older `socket' driver in
+	      CS/plugins/net/driver/socket.)
 24-Mar-2003
 	- Eric Sunshine made the following changes to project configuration:
 	    - Fixed configure.ac bug: Was adding cs_gl_plat_cflags,
@@ -34,6 +104,10 @@ The history order is reversed so that new features are at the top.
 	  characters (by using unsigned rather than signed character indexes).
 	  Also important, this patch prevents negative-indexed accesses of the
 	  glyphs[] array.
+23-Mar-2003
+	- Eric Sunshine applied update from Oktal: Update to the network
+	  manager API and fixed a few problems in the plugin, including a
+	  redundant call to Poll() and a segfault.
 19-Mar-2003
 	- Eric Sunshine applied a patch to unix.mak to work around problem with
 	  recent Gentoo Linux in which some libc symbols were not resolved when
