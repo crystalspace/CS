@@ -7,6 +7,8 @@ L - Low Priority (only minor function loss)
 W - Wishlist (the build also works without this feature)
 * - Completed
 
+[H] msvcgen.jam: Updated to respect the new ApplicationIconDefault and
+    ApplicationIcon rules.
 [H] There are no rules for building the pure Perl5 module yet (only the Perl5
     plugin works).
 
@@ -56,8 +58,8 @@ W - Wishlist (the build also works without this feature)
     directory to the build directory.  These files are fully incorporated into
     the generated documentation files as part of the conversion, and are not
     needed after conversion has completed.
-[L] The Texi2DVI, Texi2PS, and Texi2PDF need to be augmented to maintain the
-    TeX .log so that it can be reviewed for problems by the user.  Also, it
+[L] The Texi2DVI, Texi2PS, and Texi2PDF rules need to be augmented to maintain
+    the TeX .log so that it can be reviewed for problems by the user.  Also, it
     might be wise to scan the file for common problems, such as error messages
     (denoted by "!") and warnings (such as the common 'hbox' warning) and
     present those messages to the user.
