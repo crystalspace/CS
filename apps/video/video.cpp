@@ -287,11 +287,11 @@ bool Video::Initialize (int argc, const char* const argv[],
 	  csVideoStreamDescription desc;
 	  pVStream->GetStreamDescription (desc);
 	  Report (CS_REPORTER_SEVERITY_NOTIFY, "======= video stream data ======");
-	  Report (CS_REPORTER_SEVERITY_NOTIFY, "Colordepth     : %d", desc.colordepth);
-	  Report (CS_REPORTER_SEVERITY_NOTIFY, "Framecount     : %ld", desc.framecount);
+	  Report (CS_REPORTER_SEVERITY_NOTIFY, "Colordepth     : %" PRId8, desc.colordepth);
+	  Report (CS_REPORTER_SEVERITY_NOTIFY, "Framecount     : %" PRId32, desc.framecount);
 	  Report (CS_REPORTER_SEVERITY_NOTIFY, "Width x Height : %d x %d", desc.width, desc.height);
 	  Report (CS_REPORTER_SEVERITY_NOTIFY, "Framerate      : %g", desc.framerate);
-	  Report (CS_REPORTER_SEVERITY_NOTIFY, "Duration       : %ld", desc.duration);
+	  Report (CS_REPORTER_SEVERITY_NOTIFY, "Duration       : %" PRId32, desc.duration);
 	  Report (CS_REPORTER_SEVERITY_NOTIFY, "CODEC          : %s", desc.codec);
 	  Report (CS_REPORTER_SEVERITY_NOTIFY, "================================");
 

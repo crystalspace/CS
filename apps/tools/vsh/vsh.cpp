@@ -294,9 +294,9 @@ static void cmd_ls (char *args)
         size_t fs;
         if (!VFS->GetFileSize (fname, fs))
           fs = 0;
-        csPrintf ("[%02d:%02d:%02d %02d-%02d-%04d]%9lu %s\n",
+        csPrintf ("[%02d:%02d:%02d %02d-%02d-%04d]%9zu %s\n",
 	  ft.hour, ft.min, ft.sec,
-          ft.day, ft.mon + 1, ft.year, (unsigned long)fs, fname);
+          ft.day, ft.mon + 1, ft.year, fs, fname);
       }
       else
       {

@@ -427,9 +427,9 @@ void csMovieRecorder::Stop(void)
 	"Video recording statistics for %s:\n"
 	" Number of frames: %d\n"
 	" Time spent for:\n"
-	"  encoding image data - total: %.3fs, per frame: %d min/%g avg/%d max ms\n"
-	"  writing encoded data - total: %.3fs, per frame: %d min/%g avg/%d max ms\n"
-	"  drawing frame - total: %.3fs, per frame: %d min/%g avg/%d max ms\n"
+	"  encoding image data - total: %.3fs, per frame: %zu min/%g avg/%zu max ms\n"
+	"  writing encoded data - total: %.3fs, per frame: %zu min/%g avg/%zu max ms\n"
+	"  drawing frame - total: %.3fs, per frame: %zu min/%g avg/%zu max ms\n"
 	"\n"
 	" Frame time in relation to real time: x%.4f\n"
 	" Theoretical video FPS recordable in real-time: %.2f\n",

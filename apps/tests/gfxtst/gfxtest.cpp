@@ -260,7 +260,7 @@ static bool process_file (const char *fname)
   fseek (f, 0, SEEK_SET);
 
   if (opt.verbose)
-    printf ("Reading %ld bytes from file\n", (long)fsize);
+    printf ("Reading %zu bytes from file\n", fsize);
 
   csRef<iDataBuffer> buf;
   {
@@ -294,8 +294,8 @@ static bool process_file (const char *fname)
 
   if (opt.verbose || opt.info)
   {
-    printf ("Image size: %d x %d pixels, %lu bytes\n", ifile->GetWidth (),
-      ifile->GetHeight (), (unsigned long)csImageTools::ComputeDataSize(ifile));
+    printf ("Image size: %d x %d pixels, %zu bytes\n", ifile->GetWidth (),
+      ifile->GetHeight (), csImageTools::ComputeDataSize(ifile));
     int fmt = ifile->GetFormat ();
     printf ("Image format: %s, alpha channel: %s\n",
       (fmt & CS_IMGFMT_MASK) == CS_IMGFMT_NONE ? "none" :

@@ -85,13 +85,13 @@ void WriteMapToFile (FILE* file, const CharMap& map, const char* varPref)
     const CharMap::CharMapping curMapping = map.mappings[i];
     if (curMapping.to.Length() == 1)
     {
-      fprintf (file, "  {0x%.4x, 0x%.4x},\n", curMapping.from, 
-	curMapping.to[0]);
+      fprintf (file, "  {0x%.4" PRIx32 ", 0x%.4" PRIx32 "},\n",
+	curMapping.from, curMapping.to[0]);
     }
     else
     {
       uint toVal = (curMapping.to.Length() << 24) | auxdata.Length();
-      fprintf (file, "  {0x%.4x, 0x%.4x},\n", curMapping.from, toVal);
+      fprintf (file, "  {0x%.4" PRIx32 ", 0x%.4x},\n", curMapping.from, toVal);
       for (size_t j = 0; j < curMapping.to.Length(); j++)
       {
 	utf16_char toEnc[CS_UC_MAX_UTF16_ENCODED];
@@ -109,7 +109,7 @@ void WriteMapToFile (FILE* file, const CharMap& map, const char* varPref)
   {
     for (size_t i = 0; i < auxdata.Length(); i++)
     {
-      fprintf (file, "  0x%.4x,\n", auxdata[i]);
+      fprintf (file, "  0x%.4" PRIx16 ",\n", auxdata[i]);
     }
   }
   fprintf (file, "};\n");

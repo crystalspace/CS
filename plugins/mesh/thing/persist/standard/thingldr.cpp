@@ -914,8 +914,8 @@ bool csThingLoader::ParsePoly3d (
     {
       synldr->ReportError ("crystalspace.thingldr.polygon", rb.node,
 	"Render buffer element count does not match polygon vertex count: "
-	"%u != %u", (uint)rb.buf->GetElementCount(), 
-	(uint)vertices_to_add.Length());
+	"%zu != %zu", rb.buf->GetElementCount(), 
+	vertices_to_add.Length());
       return false;
     }
     if (!thing_fact_state->AddPolygonRenderBuffer (CS_POLYINDEX_LAST, 

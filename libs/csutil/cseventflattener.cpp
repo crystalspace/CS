@@ -421,7 +421,7 @@ csEventFlattenerError csEventFlattener::Unflatten (iEvent* event,
   ui32 = csConvertEndian(ui32);
   if (ui32 != CS_CRYSTAL_PROTOCOL)
   {
-    //printf("protocol version invalid: %X\n", ui32);
+    //printf("protocol version invalid: %" PRIX32 "\n", ui32);
     return csEventFlattenerErrorWrongFormat;
   }
   b.Read((char *)&ui64, sizeof(uint64));

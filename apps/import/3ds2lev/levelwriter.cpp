@@ -594,7 +594,7 @@ void LevelWriter::WriteFaces(iDocumentNode* paramsnode,
      
       // TODO: a map debug mode could output names for triangles...
       // pnode->SetAttribute ("name", 
-      // WriteL ("'x%d_%d'  (", numMesh, f);
+      // WriteL ("'x%u_%u'  (", numMesh, f);
       
       unsigned short* ppp = mesh->faceL[f].points; 
       int poly[1000];

@@ -446,7 +446,7 @@ void csGLTextureHandle::CreateMipMaps()
   for (i=0; i < subImageCount; i++)
   {
     csDebugImageWriter::DebugImageWrite (image->GetSubImage (i),
-      "/tmp/mipdebug/%p_%d_0.png", this, i);
+      "/tmp/mipdebug/%p_%zu_0.png", this, i);
   }
 #endif
   if (texFlags.Check (CS_TEXTURE_NOMIPMAPS))
@@ -512,7 +512,7 @@ void csGLTextureHandle::CreateMipMaps()
 	}
   #ifdef MIPMAP_DEBUG
 	csDebugImageWriter::DebugImageWrite (cimg,
-	  "/tmp/mipdebug/%p_%d_%d.png", this, i, nMip);
+	  "/tmp/mipdebug/%p_%zu_%d.png", this, i, nMip);
   #endif
 	thisImage = cimg;
 	if (mipskip != 0) mipskip--;
@@ -1383,7 +1383,7 @@ void csGLTextureManager::DumpSuperLightmaps (iVFS* VFS, iImageIO* iio,
       }
       else
       {
-	outfn.Format ("%s%lu.png", dir, (unsigned long)i);
+	outfn.Format ("%s%zu.png", dir, i);
 	if (!VFS->WriteFile (outfn, (char*)buf->GetInt8 (), buf->GetSize ()))
 	{
 	  G3D->Report (CS_REPORTER_SEVERITY_WARNING,

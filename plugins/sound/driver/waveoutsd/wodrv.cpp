@@ -245,7 +245,7 @@ void csSoundDriverWaveOut::EnumerateAvailableDevices()
   WAVEOUTCAPS devcaps;
 
   num_devs=waveOutGetNumDevs();
-  Report (CS_REPORTER_SEVERITY_NOTIFY, "%d WaveOut audio output devices available:",num_devs);
+  Report (CS_REPORTER_SEVERITY_NOTIFY, "%u WaveOut audio output devices available:",num_devs);
 
   //Sound.WaveOut.DeviceIndexOverride
   for (current_dev=0;current_dev<num_devs;current_dev++)
@@ -264,9 +264,9 @@ void csSoundDriverWaveOut::EnumerateAvailableDevices()
 
       // If it's still valid, this is the selected device
       if (waveout_device_index == current_dev)
-        Report (CS_REPORTER_SEVERITY_NOTIFY, "Device %d : %s (SELECTED)",current_dev,devcaps.szPname);
+        Report (CS_REPORTER_SEVERITY_NOTIFY, "Device %u : %s (SELECTED)",current_dev,devcaps.szPname);
       else
-        Report (CS_REPORTER_SEVERITY_NOTIFY, "Device %d : %s (%s)",current_dev,devcaps.szPname,device_valid?"SUPPORTED":"NOT SUPPORTED");
+        Report (CS_REPORTER_SEVERITY_NOTIFY, "Device %u : %s (%s)",current_dev,devcaps.szPname,device_valid?"SUPPORTED":"NOT SUPPORTED");
     }
   }
   if (num_devs>1)

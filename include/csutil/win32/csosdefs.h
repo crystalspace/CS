@@ -386,7 +386,7 @@ struct dirent
 #  define CS_TEMP_DIR  "/tmp"
 #else
 #  include <process.h>
-#  define CS_TEMP_FILE "%x.cs", GETPID()
+#  define CS_TEMP_FILE "%x.cs", (int)GETPID()
 #  define CS_TEMP_DIR win32_tempdir()
    // This is the function called by CS_TEMP_DIR macro
    static inline char *win32_tempdir()

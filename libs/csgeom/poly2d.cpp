@@ -352,13 +352,13 @@ void csPoly2D::ExtendConvex (const csPoly2D &other, size_t i1)
   if (!((vertices[i2] - other[j1]) < EPSILON))
   {
     for (i = 0; i < GetVertexCount (); i++)
-      csPrintf ("  orig %lu: %f,%f\n",
-		(unsigned long)i, (*this)[i].x, (*this)[i].y);
+      csPrintf ("  orig %zu: %f,%f\n",
+		i, (*this)[i].x, (*this)[i].y);
     for (i = 0; i < other.GetVertexCount (); i++)
-      csPrintf ("  other %lu: %f,%f\n",
-		(unsigned long)i, other[i].x, other[i].y);
-    csPrintf ("  i1=%lu i2=%lu j1=%lu j2=%lu\n", (unsigned long)i1,
-	      (unsigned long)i2, (unsigned long)j1, (unsigned long)j2);
+      csPrintf ("  other %zu: %f,%f\n",
+		i, other[i].x, other[i].y);
+    csPrintf ("  i1=%zu i2=%zu j1=%zu j2=%zu\n", i1,
+	      i2, j1, j2);
     CS_ASSERT (false);
   }
 
@@ -399,13 +399,13 @@ void csPoly2D::ExtendConvex (const csPoly2D &other, size_t i1)
     {
       csPrintf ("INTERNAL ERROR! Looping forever!\n");
       for (i = 0; i < orig.GetVertexCount (); i++)
-        csPrintf ("  orig %lu: %f,%f\n",
-		  (unsigned long)i, orig[i].x, orig[i].y);
+        csPrintf ("  orig %zu: %f,%f\n",
+		  i, orig[i].x, orig[i].y);
       for (i = 0; i < other.GetVertexCount (); i++)
-        csPrintf ("  other %lu: %f,%f\n",
-		  (unsigned long)i, other[i].x, other[i].y);
-      csPrintf ("  i1=%lu i2=%lu j1=%lu j2=%lu\n", (unsigned long)i1,
-		(unsigned long)i2, (unsigned long)j1, (unsigned long)j2);
+        csPrintf ("  other %zu: %f,%f\n",
+		  i, other[i].x, other[i].y);
+      csPrintf ("  i1=%zu i2=%zu j1=%zu j2=%zu\n", i1,
+		i2, j1, j2);
       CS_ASSERT (false);
     }
   }

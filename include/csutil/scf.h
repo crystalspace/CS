@@ -47,7 +47,7 @@ typedef unsigned long scfInterfaceID;
 #ifdef SCF_DEBUG
 #  define SCF_TRACE(x)							\
    {									\
-     printf ("SCF [%s:%d]:\n", __FILE__, __LINE__);			\
+     printf ("SCF [%s:%d]:\n", __FILE__, (int)__LINE__);			\
      printf x; SCF_PRINT_CALL_ADDRESS					\
    }
 #else
@@ -283,7 +283,7 @@ int Class::GetRefCount ()						\
 #define SCF_IMPLEMENT_IBASE_QUERY(Class)				\
 void *Class::QueryInterface (scfInterfaceID iInterfaceID, int iVersion)	\
 {									\
-  SCF_TRACE (("  (%s *)%p->QueryInterface (%u, %08X)\n",		\
+  SCF_TRACE (("  (%s *)%p->QueryInterface (%lu, %08X)\n",		\
     #Class, this, iInterfaceID, iVersion));
 
 /**
@@ -378,7 +378,7 @@ void Class::RemoveRefOwner (iBase** ref_owner)				\
 #define SCF_IMPLEMENT_EMBEDDED_IBASE_QUERY(Class)			\
 void *Class::QueryInterface (scfInterfaceID iInterfaceID, int iVersion)	\
 {									\
-  SCF_TRACE (("  (%s *)%p->QueryInterface (%u, %08X)\n",		\
+  SCF_TRACE (("  (%s *)%p->QueryInterface (%lu, %08X)\n",		\
     #Class, this, iInterfaceID, iVersion));
 
 /**

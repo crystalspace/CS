@@ -827,7 +827,7 @@ bool csGraphics2DGLCommon::DebugCommand (const char* cmdstr)
       }
       else
       {
-	outfn.Format ("%s%lu.png", dir, (unsigned long)i);
+	outfn.Format ("%s%zu.png", dir, i);
 	if (!vfs->WriteFile (outfn, (char*)buf->GetInt8 (), buf->GetSize ()))
 	{
 	  csReport (object_reg, CS_REPORTER_SEVERITY_WARNING,

@@ -1050,11 +1050,11 @@ void csShaderConditionResolver::DumpConditionNode (csRealConditionNode* node,
     Indent (level);
     if (node->variant != csArrayItemNotFound)
     {
-      csPrintf ("variant: %lu\n", (unsigned long)node->variant);
+      csPrintf ("variant: %zu\n", node->variant);
     }
     else
     {
-      csPrintf ("condition: %lu\n", (unsigned long)node->condition);
+      csPrintf ("condition: %zu\n", node->condition);
       Indent (level);
       csPrintf ("True node: ");
       DumpConditionNode (node->trueNode, level + 1);
@@ -1455,8 +1455,8 @@ size_t csXMLShader::GetTicket (const csRenderMeshModes& modes,
 	docsys.AttachNew (new csTinyDocumentSystem);
 	csRef<iDocument> newdoc = docsys->CreateDocument();
 	CloneNode (shaderSource, newdoc->CreateRoot());
-	newdoc->Write (compiler->vfs, csString().Format ("/tmp/shader/%p_%lu.xml",
-	  this, (unsigned long)vi));
+	newdoc->Write (compiler->vfs, csString().Format ("/tmp/shader/%p_%zu.xml",
+	  this, vi));
       }
 #endif
 
@@ -1476,7 +1476,7 @@ size_t csXMLShader::GetTicket (const csRenderMeshModes& modes,
 	{
 	  if (compiler->do_verbose)
 	    compiler->Report (CS_REPORTER_SEVERITY_NOTIFY,
-	      "Shader '%s': Technique with priority %d succeeds!",
+	      "Shader '%s': Technique with priority %u succeeds!",
 	      GetName(), tk.priority);
 	  var.tech = tech;
 	  break;
@@ -1486,7 +1486,7 @@ size_t csXMLShader::GetTicket (const csRenderMeshModes& modes,
 	  if (compiler->do_verbose)
 	  {
 	    compiler->Report (CS_REPORTER_SEVERITY_NOTIFY,
-	      "Shader '%s': Technique with priority %d fails. Reason: %s.",
+	      "Shader '%s': Technique with priority %u fails. Reason: %s.",
 	      GetName(), tk.priority, tech->GetFailReason());
 	  }
 	  delete tech;
@@ -1529,7 +1529,7 @@ void csXMLShader::DumpStats (csString& str)
   if (resolver->GetVariantCount () == 0)
     str.Replace ("unvarying");
   else
-    str.Format ("%lu variations", (unsigned long)resolver->GetVariantCount ());
+    str.Format ("%zu variations", resolver->GetVariantCount ());
 }
 
 csRef<iDocumentNode> csXMLShader::LoadProgramFile (const char* filename)

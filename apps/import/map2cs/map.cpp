@@ -139,9 +139,9 @@ bool CMapFile::Read(const char* filename, const char* configfile)
   }
 
   printf("Map contains:\n");
-  printf("%lu Entites\n", (unsigned long)m_Entities.Length());
-  printf("%lu Brushes\n", (unsigned long)m_NumBrushes);
-  printf("%lu Unique planes\n", (unsigned long)m_Planes.Length());
+  printf("%zu Entites\n", m_Entities.Length());
+  printf("%zu Brushes\n", m_NumBrushes);
+  printf("%zu Unique planes\n", m_Planes.Length());
   return true;
 }
 

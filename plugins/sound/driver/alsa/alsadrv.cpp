@@ -124,7 +124,7 @@ bool csSoundDriverALSA::AudioDevice::Open(int& frequency, bool& bit16, bool& ste
     csReport (object_reg, CS_REPORTER_SEVERITY_WARNING,
 	      "crystalspace.sound.alsa", 
 	      "The rate %d Hz is not supported by your hardware (%s).\n"
-	      " ==> Using %d Hz instead.\n", 
+	      " ==> Using %u Hz instead.\n", 
 	      frequency, pcm_name, rate);
     frequency = rate;
   }

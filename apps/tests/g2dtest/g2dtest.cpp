@@ -757,7 +757,12 @@ void G2DTestSystemDriver::DrawContextInfoScreen ()
   if (pfmt.PalEntries)
     sprintf (pixfmt, "not available");
   else
-    sprintf (pixfmt, "R[%08X] G[%08X] B[%08X] A[%08X]", pfmt.RedMask, pfmt.GreenMask, pfmt.BlueMask, pfmt.AlphaMask);
+    sprintf (pixfmt,
+      "R[%08" PRIX32 "] "
+      "G[%08" PRIX32 "] "
+      "B[%08" PRIX32 "] "
+      "A[%08" PRIX32 "]",
+      pfmt.RedMask, pfmt.GreenMask, pfmt.BlueMask, pfmt.AlphaMask);
   WriteCentered (0, 16*0, gray,  -1, "R/G/B/A masks: %s", pixfmt);
 
   WriteCentered (0, 16*1, gray,  -1, "More than one backbuffer available: %s",
@@ -944,11 +949,11 @@ void G2DTestSystemDriver::DrawAlphaTestScreen ()
   for (i = 0; i < 6; i++)
   {
     const uint8 alpha = (i * 51);
-    str.Format ("FG has alpha %d", alpha);
+    str.Format ("FG has alpha %" PRIu8 , alpha);
     myG2D->Write (font, 320, y, MakeColor (255, 255, 255, alpha), 
       black, str);
     y += th;
-    str.Format ("BG has alpha %d", alpha);
+    str.Format ("BG has alpha %" PRIu8, alpha);
     myG2D->Write (font, 320, y, white, MakeColor (0, 0, 0, alpha), 
       str);
     y += th;

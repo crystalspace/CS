@@ -243,9 +243,9 @@ bool cswinCallStack::GetFunctionName (size_t num, csString& str)
 
   if (symbolInfo->Name[0] != 0)
   {
-    str.Format ("[%p] (%s)%s+0x%llx", (void*)entries[num].instrPtr,
+    str.Format ("[%p] (%s)%s+0x%" PRIx64, (void*)entries[num].instrPtr,
       (module.ImageName[0] != 0) ? module.ImageName : "<unknown>",
-      symbolInfo->Name, (ulonglong)displace);
+      symbolInfo->Name, displace);
   }
   else
   {
@@ -267,7 +267,7 @@ bool cswinCallStack::GetLineNumber (size_t num, csString& str)
   if (DbgHelp::SymGetLineFromAddr64 (symInit.GetSymProcessHandle (), 
     entries[num].instrPtr, &displacement, &line))
   {
-    str.Format ("%s:%u", line.FileName, (uint)line.LineNumber);
+    str.Format ("%s:%" PRIu32, line.FileName, line.LineNumber);
     return true;
   }
   return false;

@@ -78,7 +78,7 @@ static void Benchmark (iBase* obj, const char* name, int num_iterations)
   if (dbghelp && (dbghelp->GetSupportedTests () & CS_DBGHELP_BENCHMARK))
   {
     csTicks t = dbghelp->Benchmark (num_iterations);
-    printf ("Benchmarking %s: %d ms\n", name, t);
+    printf ("Benchmarking %s: %u ms\n", name, t);
   }
   else
     printf ("%s benchmark not performed (object doesn't support it).\n", name);

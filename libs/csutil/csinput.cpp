@@ -466,7 +466,7 @@ const char* csKeyboardDriver::GetKeycodeString (utf32_char code)
   if (str != 0) return str;
 
   static char genName[13];
-  sprintf (genName, "[%lu]", (unsigned long)code);
+  sprintf (genName, "[%" PRIu32 "]", code);
   return genName;
 #endif
   return 0;

@@ -7,6 +7,24 @@ individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
 4-Apr-2005
+	- mdmkolbe changed the definitions of u32, ush and uch in
+	  include/csutil/zip.h to be uint32, uint16 and uint8 and
+	  changed md5_word_t and md5_byte_t in include/csutil/csmd5.h
+	  to be uint32 and uint8.
+	- mdmkolbe changed the printf-like integer format strings to match
+	  the following.  Formats for floats and strings were not changed.
+		int i; unsigned u;
+		printf("%d %X %u", i, i, u);
+
+		short s; unsigned short us;
+		long l; unsigned long l;
+		printf("%hd %hu %ld %lu", s, us, l, ul);
+
+		uint32 u32; size_t size; ptrdiff_t diff; int a, b; bool b;
+		printf("%" PRId32 " %zu %td %td %d", u32, size, diff, &a - &b, (int) b);
+
+		intptr_t ip; int *p;
+		printf("%p %p", ip, p);
 	- res made the following changes:
 	    - Changed some internals of shader program variable mappings; now
 	      use the "ProgramParam" struct (variable maps now also support
@@ -30,6 +48,24 @@ chronological order.
 	      custom "PoolRecycle()" method.
 	    - Added missing CS_CRYSTALSPACE_EXPORT to csMemoryPool.
 	    - Updates for upcoming cs-win32libs release 010.
+	- mdmkolbe changed the definitions of u32, ush and uch in
+	  include/csutil/zip.h to be uint32, uint16 and uint8 and
+	  changed md5_word_t and md5_byte_t in include/csutil/csmd5.h
+	  to be uint32 and uint8.
+	- mdmkolbe changed the printf-like integer format strings to match
+	  the following.  Formats for floats and strings were not changed.
+	    int i; unsigned u;
+	    printf("%d %X %u", i, i, u);
+	
+	    short s; unsigned short us;
+	    long l; unsigned long l;
+	    printf("%hd %hu %ld %lu", s, us, l, ul);
+	
+	    uint32 u32; size_t size; ptrdiff_t diff; int a, b; bool b;
+	    printf("%" PRId32 " %zu %td %td %d", u32, size, diff, &a - &b, (int) b);
+	
+	    intptr_t ip; int *p;
+	    printf("%p %p", ip, p);
 3-Apr-2005
 	- Eric Sunshine updated csBlockAllocator<> so that it automatically
 	  destroys contained objects at its own destruction time rather than
@@ -308,6 +344,8 @@ chronological order.
 	  few parameters to csReport().
 	- res fixed a the std_foo shaders for the recent xmlshader changes.
 	- res fixed a crash with the terrain level.
+
+
 	- res fixed a crash when using the std_lighting_detail shader.
 	- Eric Sunshine merged the csutil, csgeom, csgfx, cstool, csws, and
 	  csplugincommon libraries into a single physical link library named

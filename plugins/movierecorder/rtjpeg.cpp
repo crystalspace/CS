@@ -172,7 +172,7 @@ int RTjpeg_b2s(int16 *data, int8 *strm, uint8 bt8)
 
   int ii;
   for (ii=0; ii < 64; ii++) {
-    fprintf(stdout, "%d ", data[RTjpeg_ZZ[ii]]);
+    fprintf(stdout, "%" PRId16 " ", data[RTjpeg_ZZ[ii]]);
   }
   fprintf(stdout, "\n\n");
 
@@ -318,7 +318,7 @@ BAUCHWEH:
 int i;
 fprintf(stdout, "\nco = '%d'\n", co);
  for (i=0; i < co+2; i++) {
-   fprintf(stdout, "%d ", strm[i]);
+   fprintf(stdout, "%" PRId8 " ", strm[i]);
  }
 fprintf(stdout, "\n\n");
 }
@@ -463,7 +463,7 @@ AUTOBAHN:
 #ifdef SHOWBLOCK
 fprintf(stdout, "\nci = '%d'\n", ci);
  for (i=0; i < 64; i++) {
-   fprintf(stdout, "%d ", data[RTjpeg_ZZ[i]]);
+   fprintf(stdout, "%" PRId16 " ", data[RTjpeg_ZZ[i]]);
  }
 fprintf(stdout, "\n\n");
 #endif
@@ -482,7 +482,7 @@ int RTjpeg_b2s(int16 *data, int8 *strm, uint8 bt8)
 
   int ii;
   for (ii=0; ii < 64; ii++) {
-    fprintf(stdout, "%d ", data[RTjpeg_ZZ[ii]]);
+    fprintf(stdout, "%" PRId16 " ", data[RTjpeg_ZZ[ii]]);
   }
   fprintf(stdout, "\n\n");
 
@@ -3395,7 +3395,7 @@ int RTjpeg_mcompressYUV422(int8 *sp, unsigned char *bp, uint16 lmask, uint16 cma
   bp2+=RTjpeg_width<<2;
   bp3+=RTjpeg_width<<2;
  }
- // printf ("%d\n", block - RTjpeg_old);
+ // printf ("%td\n", block - RTjpeg_old);
 #ifdef MMX
  emms();
 #endif
@@ -3428,7 +3428,7 @@ int RTjpeg_mcompress8(int8 *sp, unsigned char *bp, uint16 lmask)
    if(RTjpeg_bcomp(block, &RTjpeg_lmask))
    {
     *((uint8 *)sp++)=255;
-//    printf("* %d ", sp[-1]);
+//    printf("* %" PRId8 " ", sp[-1]);
    } else sp+=RTjpeg_b2s(RTjpeg_block, sp, RTjpeg_lb8);
    block+=64;
   }

@@ -324,7 +324,7 @@ bool csGraphics2DGLX::CreateVisuals ()
   else
     pfmt.PixelBytes = 2;
 
-  Report (CS_REPORTER_SEVERITY_NOTIFY, "Visual ID: %x, %dbit %s",
+  Report (CS_REPORTER_SEVERITY_NOTIFY, "Visual ID: %p, %dbit %s",
     xvis->visualid, Depth, visual_class_name (xvis->c_class));
 
   int ctype, frame_buffer_depth, size_depth_buffer, level;

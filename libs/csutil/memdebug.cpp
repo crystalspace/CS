@@ -273,8 +273,8 @@ static MemEntry* FindMemEntry (char* mem)
 //=======================================================
 static void ShowBlockInfo (MemEntry& me)
 {
-  printf ("BLOCK: start=%08lx size=%d freed=%d\n", (long)me.start,
-  	me.size, me.freed);
+  printf ("BLOCK: start=%08p size=%zu freed=%d\n", me.start,
+  	me.size, (int)me.freed);
 # ifdef CS_EXTENSIVE_MEMDEBUG_IMPLEMENT
   printf ("       alloced at '%s' %d\n", me.alloc_file, me.alloc_line);
 # endif
@@ -287,7 +287,7 @@ static void ShowBlockInfo (MemEntry& me)
 //=======================================================
 static void MemoryCheck ()
 {
-  printf ("Checking memory (age=%ld)...\n", global_age); fflush (stdout);
+  printf ("Checking memory (age=%lu)...\n", global_age); fflush (stdout);
   int i;
   for (i = 0 ; i < first_free_idx ; i++)
   {
@@ -327,7 +327,7 @@ static void MemoryCheck ()
 	  if (me.start[j] != (char)DETECT_FREE)
 	  {
 	    ShowBlockInfo (me);
-	    printf ("CHK: Freed memory is used at offset (%d)!\n", j);
+	    printf ("CHK: Freed memory is used at offset (%u)!\n", j);
 	    fflush (stdout);
 	    DEBUG_BREAK;
 	  }
@@ -398,7 +398,7 @@ void* operator new (size_t s)
   global_age++;
   if (global_age % DETECT_CHECK_MEMORY == 0) MemoryCheck ();
 #endif
-  if (s <= 0) DumpError ("BAD SIZE in new %d\n", s, 0);
+  if (s <= 0) DumpError ("BAD SIZE in new %zu\n", s, 0);
   char* rc = (char*)malloc (s+4+DETECT_WALL+DETECT_WALL);
   memcpy (rc, DETECT, DETECT_WALL);
   memcpy (rc+DETECT_WALL, &s, 4);
@@ -429,7 +429,7 @@ void* operator new[] (size_t s)
   global_age++;
   if (global_age % DETECT_CHECK_MEMORY == 0) MemoryCheck ();
 #endif
-  if (s <= 0) DumpError ("BAD SIZE in new[] %d\n", s, 0);
+  if (s <= 0) DumpError ("BAD SIZE in new[] %zu\n", s, 0);
   char* rc = (char*)malloc (s+4+DETECT_WALL+DETECT_WALL);
   memcpy (rc, DETECTAR, DETECT_WALL);
   memcpy (rc+DETECT_WALL, &s, 4);
@@ -555,7 +555,7 @@ void* operator new (size_t s, void* filename, int line)
   uint32* rc = (uint32*)malloc (s+8);
   *rc++ = 0xdeadbeef;
   *rc++ = s;
-  printf ("+ %p %d %d %s\n", &alloc_total, alloc_total, alloc_cnt, filename);
+  printf ("+ %p %zu %zu %s\n", &alloc_total, alloc_total, alloc_cnt, filename);
   fflush (stdout);
   return (void*)rc;
 }
@@ -566,7 +566,7 @@ void* operator new[] (size_t s, void* filename, int line)
   uint32* rc = (uint32*)malloc (s+8);
   *rc++ = 0xdeadbeef;
   *rc++ = s;
-  printf ("+ %p %d %d %s\n", &alloc_total, alloc_total, alloc_cnt, filename);
+  printf ("+ %p %zu %zu %s\n", &alloc_total, alloc_total, alloc_cnt, filename);
   fflush (stdout);
   return (void*)rc;
 }
@@ -579,7 +579,7 @@ void operator delete (void* p)
     alloc_total -= rc[1];
     alloc_cnt--;
     free ((void*)rc);
-    printf ("- %p %d %d\n", &alloc_total, alloc_total, alloc_cnt);
+    printf ("- %p %zu %zu\n", &alloc_total, alloc_total, alloc_cnt);
   }
 }
 void operator delete[] (void* p)
@@ -591,7 +591,7 @@ void operator delete[] (void* p)
     alloc_total -= rc[1];
     alloc_cnt--;
     free ((void*)rc);
-    printf ("- %p %d %d\n", &alloc_total, alloc_total, alloc_cnt);
+    printf ("- %p %zu %zu\n", &alloc_total, alloc_total, alloc_cnt);
   }
 }
 #endif	// CS_EXTENSIVE_MEMDEBUG_IMPLEMENT
@@ -609,7 +609,7 @@ void* operator new (size_t s, void* filename, int line)
 {
   alloc_total += s;
   alloc_cnt++;
-  if (s > 1000) { printf ("new s=%d tot=%d/%d file=%s line=%d\n",
+  if (s > 1000) { printf ("new s=%zu tot=%zu/%zu file=%s line=%d\n",
   	s, alloc_total, alloc_cnt, filename, line); fflush (stdout); }
   return (void*)malloc (s);
 }
@@ -617,7 +617,7 @@ void* operator new[] (size_t s, void* filename, int line)
 {
   alloc_total += s;
   alloc_cnt++;
-  if (s > 1000) { printf ("new[] s=%d tot=%d/%d file=%s line=%d\n",
+  if (s > 1000) { printf ("new[] s=%zu tot=%zu/%zu file=%s line=%d\n",
   	s, alloc_total, alloc_cnt, filename, line); fflush (stdout); }
   return (void*)malloc (s);
 }
@@ -776,14 +776,14 @@ public:
       MemTrackerInfo* mti = mti_table[i];
       if (!summary_only)
       {
-        printf ("    %8d %8d %8d %8d %s\n", mti->current_alloc,
+        printf ("    %8zu %8zu %8d %8d %s\n", mti->current_alloc,
     	    mti->max_alloc, mti->current_count, mti->max_count,
 	    mti->file);
       }
       total_current_alloc += mti->current_alloc;
       total_current_count += mti->current_count;
     }
-    printf ("total_alloc=%d total_count=%d Module=%s\n",
+    printf ("total_alloc=%zu total_count=%d Module=%s\n",
     	total_current_alloc, total_current_count, Class);
     fflush (stdout);
   }

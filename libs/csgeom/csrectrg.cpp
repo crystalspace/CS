@@ -93,7 +93,7 @@ void csRectRegion::fragmentContainedRect (csRect &r1t, csRect &r2t)
   edges |= (r1.xmax == r2.xmax ? RX : 0);
   edges |= (r1.ymax == r2.ymax ? BY : 0);
 
-  //printf("csrectrgn: fragmenting with rule %d\n", edges);
+  //printf("csrectrgn: fragmenting with rule %u\n", edges);
   //printf("\t%d,%d,%d,%d\n", r1.xmin, r1.ymin, r1.xmax, r1.ymax);
   //printf("\t%d,%d,%d,%d\n", r2.xmin, r2.ymin, r2.xmax, r2.ymax);
   switch (edges)

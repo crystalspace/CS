@@ -206,8 +206,8 @@ static void AppendWin32Error (const char* text,
   char *buf = cswinGetErrorMessage (errorCode);
 
   csString errorMsg;
-  errorMsg.Format ("%s: %s [%.8x]", text, buf, 
-    (unsigned)errorCode);
+  errorMsg.Format ("%s: %s [%.8" PRIx32 "]", text, buf, 
+    errorCode);
   AppendStrVecString (strings, errorMsg);
   delete[] buf;
 }

@@ -189,7 +189,7 @@ const char* csPS1xTo14Converter::GetTempReg (int oldReg, size_t instrIndex,
   }
 
   if (newReg == -1)
-    return SetLastError ("(%d): Could not find register to alias r%d",
+    return SetLastError ("(%zu): Could not find register to alias r%d",
       instrIndex, oldReg);
 
   if (usedBits & BIT_RGB) tempRegisterMap[oldReg][0] = newReg;
@@ -217,7 +217,7 @@ const char* csPS1xTo14Converter::AddInstruction (
     case CS_PS_INS_TEXDEPTH:
     case CS_PS_INS_TEXLD:
       // PS1.4 only instructions
-      return SetLastError ("PS1.4 only instruction '%s'(%d)",
+      return SetLastError ("PS1.4 only instruction '%s'(%zu)",
 	GetInstructionName (instr.instruction), instrIndex);
 
     case CS_PS_INS_ADD:
@@ -238,7 +238,7 @@ const char* csPS1xTo14Converter::AddInstruction (
       return AddTEX (instr, instrIndex);
 
     default:
-      return SetLastError ("Instruction '%s'(%d) not supported yet",
+      return SetLastError ("Instruction '%s'(%zu) not supported yet",
 	GetInstructionName (instr.instruction), instrIndex);
   }
 
@@ -267,7 +267,7 @@ const char* csPS1xTo14Converter::AddArithmetic (
     {
       if ((tempRegisterMap[newInstr.src_reg_num[i]][0] == -1) ||
 	(tempRegisterMap[newInstr.src_reg_num[i]][1] == -1))
-	return SetLastError ("%s(%d): Temp register %d hasn't been "
+	return SetLastError ("%s(%zu): Temp register %d hasn't been "
 	  "assigned yet", GetInstructionName (instr.instruction), 
 	  instrIndex, newInstr.src_reg_num[i]);
 
@@ -325,7 +325,7 @@ const char* csPS1xTo14Converter::AddTEX (const csPSProgramInstruction &instr,
 {
   if (instr.dest_reg != CS_PS_REG_TEX)
   {
-    return SetLastError ("%s (%d): Destination is not a texture register",
+    return SetLastError ("%s (%zu): Destination is not a texture register",
       GetInstructionName (instr.instruction), instrIndex);
   }
 

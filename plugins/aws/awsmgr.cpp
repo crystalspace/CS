@@ -717,7 +717,7 @@ void awsManager::Redraw ()
 #ifdef DEBUG_MANAGER
     printf ("aws-debug: consider window: %p\n", curwin);
     printf (
-	"aws-debug: redraw tag: %d/%d\n",
+	"aws-debug: redraw tag: %u/%u\n",
 	curwin->RedrawTag (),
 	redraw_tag);
 #endif

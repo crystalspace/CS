@@ -857,7 +857,7 @@ csPtr<iString> csKDTree::Debug_UnitTest ()
   scfString* rc = new scfString ();
   csString& str = rc->GetCsString ();
 
-  str.Format ("Seed %d\n", seed);
+  str.Format ("Seed %zu\n", seed);
 
   //=================
   // Test if after Clear() the tree is sufficiently empty :-)
@@ -1144,10 +1144,10 @@ csTicks csKDTree::Debug_Benchmark (int num_iterations)
 
   csTicks pass4 = csGetTicks ();
 
-  printf ("Creating the tree:        %d ms\n", pass1-pass0);
-  printf ("Unoptimized Front2Back:   %d ms\n", pass2-pass1);
-  printf ("Flatten + FullDistribute: %d ms\n", pass3-pass2);
-  printf ("Optimized Front2Back:     %d ms\n", pass4-pass3);
+  printf ("Creating the tree:        %zu ms\n", pass1-pass0);
+  printf ("Unoptimized Front2Back:   %zu ms\n", pass2-pass1);
+  printf ("Flatten + FullDistribute: %zu ms\n", pass3-pass2);
+  printf ("Optimized Front2Back:     %zu ms\n", pass4-pass3);
 
   return pass4-pass0;
 }
@@ -1216,7 +1216,7 @@ void csKDTree::Debug_Dump (csString& str, int indent)
   csRef<iString> stats = Debug_Statistics ();
   ss.Format ("%s KDT disallow_dist=%d\n%s     node_bbox=(%g,%g,%g)-(%g,%g,%g)\n%s %s",
   	spaces,
-	disallow_distribute,
+	(int)disallow_distribute,
   	spaces, GetNodeBBox ().MinX (), GetNodeBBox ().MinY (),
 	GetNodeBBox ().MinZ (), GetNodeBBox ().MaxX (),
 	GetNodeBBox ().MaxY (), GetNodeBBox ().MaxZ (),

@@ -630,7 +630,7 @@ void Demo::DrawEditInfo ()
     GfxWrite (ww, hh, col_black, col_white, "U(%.2g,%.2g,%.2g)",
     	up.x, up.y, up.z); hh += fh;
     float t = np->GetTimeValue (map_selpoint);
-    csTicks tms = int (t*total);
+    csTicks tms = csTicks (t*total);
     GfxWrite (ww, hh, col_black, col_white, "tot time %d ms", total); hh += fh;
     GfxWrite (ww, hh, col_black, col_white, "rel time %d ms", tms); hh += fh;
     GfxWrite (ww, hh, col_black, col_white, "Left Path Info:"); hh += fh;
@@ -642,7 +642,7 @@ void Demo::DrawEditInfo ()
       float t1 = np->GetTimeValue (map_selpoint-1);
       float dr = t-t1;
       float speed = (float) fabs (dr) / d;
-      csTicks tms1 = int (t1*total);
+      csTicks tms1 = csTicks (t1*total);
       GfxWrite (ww+20, hh, col_black, col_white, "len %g", d); hh += fh;
       GfxWrite (ww+20, hh, col_black, col_white, "dr %g", dr); hh += fh;
       GfxWrite (ww+20, hh, col_black, col_white, "speed %g", speed); hh += fh;
@@ -658,7 +658,7 @@ void Demo::DrawEditInfo ()
       float dr = t1-t;
       float d = csQsqrt (csSquaredDist::PointPoint (v, v1));
       float speed = (float) fabs (dr) / d;
-      csTicks tms1 = int (t1*total);
+      csTicks tms1 = csTicks (t1*total);
       GfxWrite (ww+20, hh, col_black, col_white, "len %g", d); hh += fh;
       GfxWrite (ww+20, hh, col_black, col_white, "dr %g", dr); hh += fh;
       GfxWrite (ww+20, hh, col_black, col_white, "speed %g", speed); hh += fh;

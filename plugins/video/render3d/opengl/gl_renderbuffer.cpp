@@ -285,9 +285,9 @@ void csGLVBOBufferManager::DumpStats ()
   Report (CS_REPORTER_SEVERITY_DEBUG, "-------------------------------------------");
   Report (CS_REPORTER_SEVERITY_DEBUG, " VBO statistics ");
   Report (CS_REPORTER_SEVERITY_DEBUG, "-------------------------------------------");
-  Report (CS_REPORTER_SEVERITY_DEBUG, "Vertex storage: %d MB (%d byte)", 
+  Report (CS_REPORTER_SEVERITY_DEBUG, "Vertex storage: %zu MB (%zu byte)", 
     vertexBuffer.size/(1024*1024), vertexBuffer.size);
-  Report (CS_REPORTER_SEVERITY_DEBUG, "Index storage:  %d MB (%d byte)", 
+  Report (CS_REPORTER_SEVERITY_DEBUG, "Index storage:  %zu MB (%zu byte)", 
     indexBuffer.size/(1024*1024), indexBuffer.size);
   
   if (superVerbose)
@@ -301,7 +301,7 @@ void csGLVBOBufferManager::DumpStats ()
     
     for (i=0;i<VBO_NUMBER_OF_SLOTS;i++)
     {
-      Report (CS_REPORTER_SEVERITY_DEBUG, " %8d %5d   %8d    %5d   %5d  %5d",
+      Report (CS_REPORTER_SEVERITY_DEBUG, " %8zu %5u   %8zu    %5u   %5u  %5u",
         vertexBuffer.slots[i].slotSize, vertexBuffer.slots[i].totalCount,
         vertexBuffer.slots[i].slotSize * vertexBuffer.slots[i].totalCount,
         vertexBuffer.slots[i].usedSlots, vertexBuffer.slots[i].slotsActivatedLastFrame,
@@ -309,7 +309,7 @@ void csGLVBOBufferManager::DumpStats ()
       countTotal += vertexBuffer.slots[i].totalCount;
     }
     Report (CS_REPORTER_SEVERITY_DEBUG, "-------------------------------------------");
-    Report (CS_REPORTER_SEVERITY_DEBUG, " Total:   %5d   %8d",
+    Report (CS_REPORTER_SEVERITY_DEBUG, " Total:   %5u   %8zu",
       countTotal, vertexBuffer.size);
     Report (CS_REPORTER_SEVERITY_DEBUG, "-------------------------------------------");
 
@@ -322,7 +322,7 @@ void csGLVBOBufferManager::DumpStats ()
 
     for (i=0;i<VBO_NUMBER_OF_SLOTS;i++)
     {
-      Report (CS_REPORTER_SEVERITY_DEBUG, " %8d %5d   %8d    %5d   %5d  %5d",
+      Report (CS_REPORTER_SEVERITY_DEBUG, " %8zu %5u   %8zu    %5u   %5u  %5u",
         indexBuffer.slots[i].slotSize, indexBuffer.slots[i].totalCount,
         indexBuffer.slots[i].slotSize * indexBuffer.slots[i].totalCount,
         indexBuffer.slots[i].usedSlots, indexBuffer.slots[i].slotsActivatedLastFrame,
@@ -330,7 +330,7 @@ void csGLVBOBufferManager::DumpStats ()
       countTotal += indexBuffer.slots[i].totalCount;
     }
     Report (CS_REPORTER_SEVERITY_DEBUG, "-------------------------------------------");
-    Report (CS_REPORTER_SEVERITY_DEBUG, " Total:   %5d   %8d",
+    Report (CS_REPORTER_SEVERITY_DEBUG, " Total:   %5u   %8zu",
       countTotal, indexBuffer.size);
     Report (CS_REPORTER_SEVERITY_DEBUG, "-------------------------------------------");
 

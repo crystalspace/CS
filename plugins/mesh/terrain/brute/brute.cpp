@@ -1683,8 +1683,8 @@ void csTerrainObject::CastShadows (iMovable* movable, iFrustumView* fview)
     {
       if (i % 10000 == 0)
       {
-	printf ("%lu out of %lu\n", (unsigned long)i,
-	  (unsigned long)staticLights.Length ());
+	printf ("%zu out of %zu\n", i,
+	  staticLights.Length ());
 	fflush (stdout);
       }
     }

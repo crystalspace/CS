@@ -142,7 +142,7 @@ csSoundSourceOpenAL::~csSoundSourceOpenAL()
         alDeleteBuffers(1,&use_buffer);
 #ifdef OPENAL_DEBUG_BUFFERS
         Report (CS_REPORTER_SEVERITY_WARNING,
-          "Source destructing. Deleted buffer %d!",use_buffer);
+          "Source destructing. Deleted buffer %u!",use_buffer);
 #endif
       }
       release_count++;
@@ -504,7 +504,7 @@ void csSoundSourceOpenAL::WatchBufferEnd()
 #ifdef OPENAL_DEBUG_BUFFERS
       alGetSourcei (source, AL_BUFFERS_QUEUED, &queued);
       Report (CS_REPORTER_SEVERITY_WARNING,
-        "WatchBufferEnd() Deleted buffer %d.  %d buffers remain queued.",use_buffer,queued);
+        "WatchBufferEnd() Deleted buffer %u.  %d buffers remain queued.",use_buffer,queued);
 #endif
     }
     release_count++;
@@ -512,7 +512,7 @@ void csSoundSourceOpenAL::WatchBufferEnd()
 #ifdef OPENAL_DEBUG_BUFFERS
   if (lasterror==AL_NO_ERROR && use_buffer==last_buffer)
     Report (CS_REPORTER_SEVERITY_WARNING,
-    "Aborted on double-unqueued buffer %d! Check www.openal.org for a new OpenAL version!",use_buffer);
+    "Aborted on double-unqueued buffer %u! Check www.openal.org for a new OpenAL version!",use_buffer);
 #endif
   SoundRender->mutex_OpenAL->Release();
 }
@@ -572,7 +572,7 @@ void csSoundSourceOpenAL::Write(void *Data, unsigned long NumBytes)
       alDeleteBuffers(1,&use_buffer);
 #ifdef OPENAL_DEBUG_BUFFERS
       Report (CS_REPORTER_SEVERITY_WARNING,
-        "Deleted buffer %d!",use_buffer);
+        "Deleted buffer %u!",use_buffer);
 #endif
     }
     release_count++;
@@ -580,7 +580,7 @@ void csSoundSourceOpenAL::Write(void *Data, unsigned long NumBytes)
 #ifdef OPENAL_DEBUG_BUFFERS
   if (lasterror==AL_NO_ERROR && use_buffer==last_buffer)
     Report (CS_REPORTER_SEVERITY_WARNING,
-    "Aborted on double-unqueued buffer %d! Check www.openal.org for a new OpenAL version!",use_buffer);
+    "Aborted on double-unqueued buffer %u! Check www.openal.org for a new OpenAL version!",use_buffer);
 #endif
 
   // Create a new buffer to send this data in

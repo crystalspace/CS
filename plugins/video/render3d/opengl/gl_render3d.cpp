@@ -840,7 +840,7 @@ bool csGLGraphics3D::Open ()
 	  "VBO is supported and always used.");
       else
         Report (CS_REPORTER_SEVERITY_NOTIFY,
-	  "VBO is supported and only used for buffers > %d bytes.",
+	  "VBO is supported and only used for buffers > %zu bytes.",
 	  vbo_thresshold);
     }
     else

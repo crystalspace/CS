@@ -1276,7 +1276,7 @@ bool CommandHandler (const char *cmd, const char *arg)
 	      	"%sLONG=%ld", buf, var.GetLong ());
 		break;
 	      case CSVAR_BOOL: Sys->Report (CS_REPORTER_SEVERITY_NOTIFY,
-	      	"%sBOOL=%d", buf, var.GetBool ());
+	      	"%sBOOL=%d", buf, (int)var.GetBool ());
 	        break;
 	      case CSVAR_CMD: Sys->Report (CS_REPORTER_SEVERITY_NOTIFY,
 	      	"%sCMD", buf);
@@ -2157,7 +2157,7 @@ bool CommandHandler (const char *cmd, const char *arg)
 
     bool rnd;
     float r, g, b, radius, thing_shadows;
-    if (arg && csScanStr (arg, "%f,%f,%f,%f,%d", &r, &g, &b, &radius,
+    if (arg && csScanStr (arg, "%f,%f,%f,%f,%f", &r, &g, &b, &radius,
     	&thing_shadows) == 5)
     {
       dyn = Sys->view->GetEngine ()->CreateLight ("", pos,

@@ -368,8 +368,8 @@ csRGBMap *csRadElement::ComputeTextureLumelSized ()
   for(int y=0; y<height; y++)
   {
     for(int x=0; x<width; x++, uv++)
-      printf("%2.2x%2.2x%2.2x ", map->GetRed()[uv], map->GetGreen()[uv],
-        map->GetBlue()[uv]);
+      printf("%2.2x%2.2x%2.2x ", (int)map->GetRed()[uv], (int)map->GetGreen()[uv],
+        (int)map->GetBlue()[uv]);
     printf("\n");
   }
   */
@@ -1059,7 +1059,7 @@ void csRadiosity::DoRadiosity ()
   csRadElement *shoot;
 
   csEngine::current_engine->Report (
-      "Calculating radiosity (%d lightmaps).",
+      "Calculating radiosity (%zu lightmaps).",
       list->GetElementCount ());
   if (meter) meter->Restart ();
   shoot = list->PopHighest ();
@@ -1459,12 +1459,12 @@ void csRadiosity::ShootRadiosityToElement (csRadElement *dest)
   csRadPoly *rp_src = (csRadPoly *)shoot_src;
   csRadPoly *rp_dest = (csRadPoly *)dest;
   csEngine::current_engine->Report (
-      "Shooting from RadPoly %x (%s in %s sz %d) to %x (%s in %s sz %d).",
-      (int)shoot_src,
+      "Shooting from RadPoly %p (%s in %s sz %zu) to %p (%s in %s sz %zu).",
+      shoot_src,
       rp_src->GetPolygon3D ()->GetName (),
       rp_src->GetSector ()->GetName (),
       shoot_src->GetSize (),
-      (int)dest,
+      dest,
       rp_dest->GetPolygon3D ()->GetName (),
       rp_dest->GetSector ()->GetName (),
       dest->GetSize ());

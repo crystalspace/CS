@@ -879,7 +879,7 @@ void PVSCalcSector::CollectGeometry (iMeshWrapper* mesh,
     bool convex = csPolygonMeshTools::IsMeshConvex (polybase);
     if (convex || closed)
     printf ("closed=%d convex=%d mesh=%s poly=%d %s\n",
-     closed, convex, mesh->QueryObject ()->GetName (),
+     (int)closed, (int)convex, mesh->QueryObject ()->GetName (),
      polybase->GetPolygonCount (), (closed && convex) ?  "BOTH" : "");
 
     // Increase stats for static objects.
@@ -1154,10 +1154,10 @@ bool PVSCalcSector::SetupProjectionPlane (const csBox3& source,
   DB(("  Hull:\n"));
   for (i = 0 ; i < (size_t)hull_points ; i++)
   {
-    DB(("    N:%d (%s)\n", i, intern_str(hull[i].Description())));
+    DB(("    N:%zu (%s)\n", i, intern_str(hull[i].Description())));
     hull[i].x = (hull[i].x-plane.offset.x) * plane.scale.x;
     hull[i].y = (hull[i].y-plane.offset.y) * plane.scale.y;
-    DB(("    C:%d (%s)\n", i, intern_str(hull[i].Description())));
+    DB(("    C:%zu (%s)\n", i, intern_str(hull[i].Description())));
   }
   plane.covbuf->InsertPolygonInvertedNoDepth (hull, hull_points);
 
@@ -1280,7 +1280,7 @@ bool PVSCalcSector::CastAreaShadow (const csBox3& source,
 int PVSCalcSector::CastShadowsUntilFullAdjacent (
 	const csArray<csPoly3DAxis>& axis_polygons)
 {
-  DB(("  Cast Axis Polygons #poly=%d (plane %d/%g)\n",
+  DB(("  Cast Axis Polygons #poly=%zu (plane %d/%g)\n",
   	axis_polygons.Length (),plane.axis, plane.where));
 
   size_t i;
@@ -1586,7 +1586,7 @@ void PVSCalcSector::RecurseSourceNodes (PVSCalcNode* sourcenode,
   csTicks remaining = (csTicks)(average * nodecounter);
   float cull_quality = 100.0 * float (total_invisnodes) /
   	float (1 + total_visnodes + total_invisnodes);
-  printf ("\n#n=%d cnt=%d (tot=%ds rem=%ds avg=%gms) (cq=%g%%) ",
+  printf ("\n#n=%d cnt=%d (tot=%us rem=%us avg=%gms) (cq=%g%%) ",
   	sourcenode->represented_nodes, nodecounter,
 	totaltime / 1000, remaining / 1000, average,
 	cull_quality);
@@ -1669,11 +1669,11 @@ void PVSCalcSector::Calculate (bool do_quick)
   	staticbox.MaxX (), staticbox.MaxY (), staticbox.MaxZ ());
   parent->ReportInfo( "%d static and %d total objects",
   	staticcount, allcount);
-  parent->ReportInfo ("%d static, %d meta, and %d total polygons",
+  parent->ReportInfo ("%d static, %zu meta, and %d total polygons",
   	staticpcount, meta_polygons.Length (), allpcount);
-  parent->ReportInfo ("%d static polygons have area larger then %g",
+  parent->ReportInfo ("%zu static polygons have area larger then %g",
   	polygons.Length (), min_polygon_area);
-  parent->ReportInfo ("Aligned polygons: x %d, y %d, and z %d",
+  parent->ReportInfo ("Aligned polygons: x %zu, y %zu, and z %zu",
   	axis_polygons[CS_AXIS_X].Length (),
   	axis_polygons[CS_AXIS_Y].Length (),
   	axis_polygons[CS_AXIS_Z].Length ());

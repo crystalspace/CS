@@ -376,7 +376,7 @@ csString csMD5::Digest::HexString() const
 {
   char buff[DigestLen * 2 + 1]; // Two hex characters per digest element.
   for (int i = 0; i < DigestLen; i++)
-    sprintf(buff + (i * 2), "%02x", data[i]);
+    sprintf(buff + (i * 2), "%02" PRIx8, data[i]);
   buff[ sizeof(buff) - 1 ] = '\0';
   csString s(buff);
   return s;

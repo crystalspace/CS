@@ -78,9 +78,9 @@ class CS_CRYSTALSPACE_EXPORT csMD5
 {
 public:
   /// 8-bit byte
-  typedef unsigned char md5_byte_t;
+  typedef uint8 md5_byte_t;
   /// 32-bit word
-  typedef unsigned int md5_word_t;
+  typedef uint32 md5_word_t;
 
   /** \internal
    * Define the state of the MD5 Algorithm.

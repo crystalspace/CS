@@ -422,7 +422,7 @@ bool csShaderExpression::eval_const(cons *& head)
 
   if ((oper >= OP_LIMIT || oper <= OP_INVALID))
   {
-    DEBUG_PRINTF("Unknown operator type in optimizer: %i.\n", oper);
+    DEBUG_PRINTF("Unknown operator type in optimizer: %d.\n", oper);
 
     return false;
   }    
@@ -519,7 +519,7 @@ bool csShaderExpression::eval_const(cons *& head)
 	break;
 
       default:
-	DEBUG_PRINTF("Unknown type in optimizer for argument: %i.\n", cell->car.type);
+	DEBUG_PRINTF("Unknown type in optimizer for argument: %" PRIu8 ".\n", cell->car.type);
         
 	return false;
     }
@@ -613,7 +613,7 @@ bool csShaderExpression::eval_const(cons *& head)
 	  break;
 
 	default:
-	  DEBUG_PRINTF("Unknown type-id: %i\n", cell->car.type);
+	  DEBUG_PRINTF("Unknown type-id: %" PRIu8 "\n", cell->car.type);
 
 	  return false;
 	}
@@ -653,7 +653,7 @@ bool csShaderExpression::eval_const(cons *& head)
 
     if (argcount < optimize_arg_table[oper].min_args || argcount > optimize_arg_table[oper].max_args)
     {
-      DEBUG_PRINTF("Incorrect # of args (%i) to operator %s.\n", argcount, 
+      DEBUG_PRINTF("Incorrect # of args (%d) to operator %s.\n", argcount, 
 	sexptokens.Request(oper));
 
       return false;
@@ -711,7 +711,7 @@ bool csShaderExpression::eval_variable(csShaderVariable * var, oper_arg & out)
       break;
 
     default:
-      DEBUG_PRINTF("Unknown type %i in shader variable, not usable in an expression.\n", type);
+      DEBUG_PRINTF("Unknown type %d in shader variable, not usable in an expression.\n", (int)type);
       return false;
   }
   
@@ -754,7 +754,7 @@ bool csShaderExpression::eval_argument(const oper_arg & arg, csShaderVariable * 
       break;
     
     default:
-      DEBUG_PRINTF("Unknown type %i when converting arg to shader variable.\n", arg.type);
+      DEBUG_PRINTF("Unknown type %" PRIu8 " when converting arg to shader variable.\n", arg.type);
       return false;
   }
 
@@ -816,7 +816,7 @@ bool csShaderExpression::eval_oper(int oper, oper_arg arg1, oper_arg arg2, oper_
     case OP_INT_SELT34: return eval_selt34(arg1, arg2, output);
 
     default:
-      DEBUG_PRINTF("Unknown multi-arg operator %s (%i).\n", sexptokens.Request(oper), oper);
+      DEBUG_PRINTF("Unknown multi-arg operator %s (%d).\n", sexptokens.Request(oper), oper);
   }
 
   return false;
@@ -857,7 +857,7 @@ bool csShaderExpression::eval_oper(int oper, oper_arg arg1, oper_arg & output)
     case OP_INT_LOAD: return eval_load(arg1, output);
       
     default:
-      DEBUG_PRINTF("Unknown single-arg operator %s (%i).\n", sexptokens.Request(oper), oper);
+      DEBUG_PRINTF("Unknown single-arg operator %s (%d).\n", sexptokens.Request(oper), oper);
   }
    
   return false;
@@ -871,7 +871,7 @@ bool csShaderExpression::eval_oper(int oper, oper_arg & output)
     case OP_FUNC_FRAME: return eval_frame(output);
 
     default:
-      DEBUG_PRINTF("Unknown single-arg operator %s (%i).\n", sexptokens.Request(oper), oper);
+      DEBUG_PRINTF("Unknown single-arg operator %s (%d).\n", sexptokens.Request(oper), oper);
   }
    
   return false;
@@ -899,7 +899,7 @@ bool csShaderExpression::eval_add(const oper_arg & arg1, const oper_arg & arg2, 
   } 
   else 
   {
-    DEBUG_PRINTF("Invalid types for operator, %s(%i) + %s(%i).\n", 
+    DEBUG_PRINTF("Invalid types for operator, %s(%" PRIu8 ") + %s(%" PRIu8 ").\n", 
       get_type_name(arg1.type), arg1.type, get_type_name(arg2.type), 
       arg2.type);
 
@@ -1470,7 +1470,7 @@ bool csShaderExpression::parse_sexp_atom(const char *& text, cons * head) {
     else if (args == 2)
       head->car.type = TYPE_VECTOR2;
     else {
-      DEBUG_PRINTF("Odd number of elements in parsed vector: %i.\n", args);
+      DEBUG_PRINTF("Odd number of elements in parsed vector: %d.\n", args);
 
       return false;
     }
@@ -1528,8 +1528,8 @@ bool csShaderExpression::parse_xml_atom(oper_arg & arg, csStringID type, const c
 
       if (*tmp)
       {
-        DEBUG_PRINTF("Error parsing float at position %d.\n",
-	  int(tmp - val_str));
+        DEBUG_PRINTF("Error parsing float at position %td.\n",
+	  tmp - val_str);
 
         return false;
       }
@@ -1933,11 +1933,11 @@ void csShaderExpression::print_ops(const oper_array & ops) const
 	break;
 
       case TYPE_ACCUM:
-	csPrintf (" ACC%i", op.arg1.acc);
+	csPrintf (" ACC%d", op.arg1.acc);
 	break;
 	
       default:
-	csPrintf (" #<unknown type %i>", op.arg1.type);
+	csPrintf (" #<unknown type %" PRIu8 ">", op.arg1.type);
       }
       
     }
@@ -1967,14 +1967,14 @@ void csShaderExpression::print_ops(const oper_array & ops) const
 	break;
 
       case TYPE_ACCUM:
-	csPrintf (",ACC%i", op.arg2.acc);
+	csPrintf (",ACC%d", op.arg2.acc);
 	break;
 	
       default:
-	csPrintf (",#<unknown type %i>", op.arg2.type);
+	csPrintf (",#<unknown type %" PRIu8 ">", op.arg2.type);
       }
     }
 
-    csPrintf (" -> ACC%i\n", op.acc);
+    csPrintf (" -> ACC%d\n", op.acc);
   }
 }

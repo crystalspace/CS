@@ -110,7 +110,7 @@ void ReportLibmngError (iObjectRegistry *object_reg, mng_handle hMNG, char* msg)
     &extra2, &errortext);
 
   Report (object_reg, CS_REPORTER_SEVERITY_WARNING,
-    "%s: %s (severity %d, chunkname %.8x, chunkseq %d, %.8x, %.8x)",
+    "%s: %s (severity %" PRId8 ", chunkname %.8" PRIx32 ", chunkseq %" PRIu32 ", %.8" PRIx32 ", %.8" PRIx32 ")",
     msg, errortext, severity, chunkname, chunkseq, extra1, extra2);
 }
 

@@ -491,7 +491,7 @@ void CMapPolygon::DumpPolyinfo(CMapTexturedPlane*             pBaseplane,
     {
       if (m_Planes[j] == planes[i])
       {
-        printf("%lu ", (unsigned long)i);
+        printf("%zu ", i);
       }
     }
   }

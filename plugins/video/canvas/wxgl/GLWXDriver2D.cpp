@@ -238,7 +238,7 @@ bool csGraphics2DWX::Open()
       DWORD error = GetLastError();
       char* msg = cswinGetErrorMessage (error);
       Report (CS_REPORTER_SEVERITY_ERROR,
-	"DescribePixelFormat failed: %s [%ul]",
+	"DescribePixelFormat failed: %s [%" PRId32 "]",
 	msg, error);
       delete[] msg;
     }
@@ -277,7 +277,7 @@ bool csGraphics2DWX::Open()
     else
       pfmt.PixelBytes = 2;
 
-    Report (CS_REPORTER_SEVERITY_NOTIFY, "Visual ID: %x, %dbit %s",
+    Report (CS_REPORTER_SEVERITY_NOTIFY, "Visual ID: %lx, %dbit %s",
       xvis->visualid, Depth, visual_class_name (xvis->c_class));
 
     int ctype, frame_buffer_depth, size_depth_buffer, level;
@@ -501,7 +501,7 @@ void csGLCanvas::OnEraseBackground(wxEraseEvent& WXUNUSED(event))
 
 void csGLCanvas::OnMouseEvent( wxMouseEvent& event )
 {
-  // printf("got mouse event %i %i\n", event.GetX(), event.GetY());
+  // printf("got mouse event %ld %ld\n", event.GetX(), event.GetY());
 
   if(event.GetEventType() == wxEVT_MOTION)
   {
@@ -648,7 +648,7 @@ void csGLCanvas::EmitKeyEvent(wxKeyEvent& event, bool down)
   long wxkey = event.GetKeyCode();
   long cskey_raw = 0, cskey_cooked = 0;
 
-  // printf("got key %s event %i\n", (down ? "down" : "up"), wxkey);
+  // printf("got key %s event %ld\n", (down ? "down" : "up"), wxkey);
 
   if((wxkey >= '!' && wxkey <= '/')
 	  || (wxkey >= '0' && wxkey <= '9')

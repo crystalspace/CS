@@ -158,7 +158,7 @@ bool csLinuxJoystick::Init ()
       ioctl (fd, JSIOCGNAME(128), name);
 
       Report (CS_REPORTER_SEVERITY_NOTIFY,
-              "Joystick number %d (%s) has %d axes and %d buttons.\n"
+              "Joystick number %d (%s) has %hhu axes and %hhu buttons.\n"
 	      "Driver version is %d.%d.%d.\n",
 	      n + 1, name, axes, buttons,
 	      version >> 16, (version >> 8) & 0xff, version & 0xff);

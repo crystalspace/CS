@@ -37,9 +37,9 @@ iAwsKey *awsKeyContainer::Find (unsigned long idname) const
 {
   if (aws_debug)
     printf (
-      "aws-debug: searching for %lu (%lu items)\n",
+      "aws-debug: searching for %lu (%zu items)\n",
       idname,
-      (unsigned long)children.Length ());
+      children.Length ());
 
   size_t i;
   for (i = 0; i < children.Length (); ++i)
@@ -47,7 +47,7 @@ iAwsKey *awsKeyContainer::Find (unsigned long idname) const
     iAwsKey *key = children[i];
 
     if (aws_debug)
-      printf ("aws-debug: item %lu=%lu ? %lu\n", (unsigned long)i,
+      printf ("aws-debug: item %zu=%lu ? %lu\n", i,
 	      key->Name (), idname);
 
     if (key && key->Name () == idname) return key;
@@ -89,9 +89,9 @@ void awsKeyContainer::Consume (iAwsKeyContainer *c)
   if (aws_debug)
   {
     printf (
-      "aws-debug: Consuming %d items (%lu items currently).\n",
+      "aws-debug: Consuming %d items (%zu items currently).\n",
       c->Length (),
-      (unsigned long)children.Length ());
+      children.Length ());
   }
 
   int i;
@@ -111,8 +111,8 @@ void awsKeyContainer::Consume (iAwsKeyContainer *c)
   }
 
   if (aws_debug)
-    printf ("aws-debug: Now contains %lu items.\n",
-	    (unsigned long)children.Length ());
+    printf ("aws-debug: Now contains %zu items.\n",
+	    children.Length ());
 
   /**
    * Do NOT delete awsKeyContainer!  This is NOT a memory leak! The

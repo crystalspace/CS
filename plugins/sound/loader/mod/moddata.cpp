@@ -38,7 +38,7 @@ static int cs_modreader_seek (MREADER* mr, long offset, int whence)
   size_t newpos = (whence == SEEK_SET ? offset :
 		 whence == SEEK_CUR ? r->ds.pos + offset : r->ds.length + offset);
 
-  //  printf("pos = %ld -> seek %ld -> pos = %ld\n",r->ds.pos, offset, newpos);
+  //  printf("pos = %zu -> seek %ld -> pos = %zu\n",r->ds.pos, offset, newpos);
   if (newpos > r->ds.length)
     return -1;
   else
@@ -64,7 +64,7 @@ static int cs_modreader_read (MREADER* mr, void *dest, size_t length)
 
   r->ds.pos += (long)maxsize;
 
-  //  printf ("%ld %ld %d\n", r->ds.pos, r->ds.length, length);
+  //  printf ("%zu %zu %zu\n", r->ds.pos, r->ds.length, length);
   return (int)maxsize;
 }
 
@@ -291,7 +291,7 @@ void *csModSoundData::ReadStreamed(long &NumSamples)
 
     size_t samples = bytes_left / ((fmt.Bits >> 3) * fmt.Channels);
 
-    //    printf ("returning %d samples\n", samples);
+    //    printf ("returning %zu samples\n", samples);
 
     if (samples > (size_t)NumSamples)
     {

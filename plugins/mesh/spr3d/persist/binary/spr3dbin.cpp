@@ -187,7 +187,7 @@ csPtr<iBase> csSprite3DBinFactoryLoader::Parse (void* data,
   {
     ReportError (reporter,
 	"crystalspace.sprite3dbinfactoryloader.setup.objecttype",
-	"Unexpected format version %d.%d!", 
+	"Unexpected format version %" PRIu8 ".%" PRIu8 "!", 
 	(uint8)*p, (uint8)*(p+1));
     return 0;
   }

@@ -1948,8 +1948,8 @@ void LevTool::Main ()
 	for (i = 0 ; i <= 50 ; i++)
 	{
 	  sum += counts[i];
-	  printf ("  %3lu%% #local=%-5d #<=thissize=%d\n",
-		  (unsigned long)(i * 2), counts[i], sum);
+	  printf ("  %3zu%% #local=%-5d #<=thissize=%d\n",
+		  (i * 2), counts[i], sum);
 	}
 	fflush (stdout);
       }

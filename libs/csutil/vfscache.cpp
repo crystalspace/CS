@@ -66,7 +66,7 @@ void csVfsCacheManager::CacheName (char* buf, const char* type,
       sprintf (buf, "%s/%s", type, scope);
   }
   else
-    sprintf (buf, "%s/%s/%u", type, scope, (uint)id);
+    sprintf (buf, "%s/%s/%" PRIu32 , type, scope, id);
 }
 
 void csVfsCacheManager::SetCurrentType (const char* type)

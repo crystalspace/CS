@@ -1108,7 +1108,7 @@ void csDynaVis::AppendWriteQueue (iVisibilityObject* visobj,
       printf (
 	    "AppendWriteQueue of object %s (depth=%g) (good occluder=%d)\n",
       	    iobj->GetName () ? iobj->GetName () : "<noname>",
-	    depth, obj->hint_goodoccluder);
+	    depth, (int)obj->hint_goodoccluder);
     }
   }
 # endif
@@ -3343,8 +3343,8 @@ bool csDynaVis::Debug_DebugCommand (const char* cmd)
 
         csRef<iObject> iobj (
 		SCF_QUERY_INTERFACE (visobj_wrap->visobj, iObject));
-        printf ("  obj(%lu,'%s')  vis=%s   vispix=%d totpix=%d      %s\n",
-      	  (unsigned long)i,
+        printf ("  obj(%zu,'%s')  vis=%s   vispix=%d totpix=%d      %s\n",
+      	  i,
 	  (iobj && iobj->GetName ()) ? iobj->GetName () : "?",
 	  visobj_wrap->history->reason == INVISIBLE_PARENT ? "invis parent" :
 	  visobj_wrap->history->reason == INVISIBLE_FRUSTUM ? "invis frustum" :
@@ -3380,7 +3380,7 @@ csTicks csDynaVis::Debug_Benchmark (int num_iterations)
   if (dbghelp)
   {
     csTicks r = dbghelp->Benchmark (num_iterations);
-    printf ("kdtree:   %d ms\n", r);
+    printf ("kdtree:   %zu ms\n", r);
     rc += r;
   }
   delete kdtree;

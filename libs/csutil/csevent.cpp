@@ -451,20 +451,12 @@ bool csEvent::Print (int level)
     {
         
       IndentLevel(level); 
-#ifdef CS_COMPILER_GCC
-      csPrintf (" Value: %lld\n", (long long int) object->intVal);
-#else
-      csPrintf (" Value: %lu\n", (long) object->intVal);
-#endif
+      csPrintf (" Value: %" PRId64 "\n", object->intVal);
     }
     else if (object->type == csEventAttrUInt)
     {
       IndentLevel(level);
-#ifdef CS_COMPILER_GCC
-      csPrintf (" Value: %llu\n", (unsigned long long int) object->intVal);
-#else
-      csPrintf (" Value %ld\n", (unsigned long) object->intVal);
-#endif
+      csPrintf (" Value: %" PRIu64 "\n", (ulonglong) object->intVal);
     }
     else if (object->type == csEventAttrFloat)
     {
@@ -474,8 +466,7 @@ bool csEvent::Print (int level)
     else if (object->type == csEventAttrDatabuffer)
     {
       IndentLevel(level); csPrintf(" Value: 0x%p\n", object->bufferVal);
-      IndentLevel(level); csPrintf(" Length: %lu\n",
-				   (unsigned long)object->dataSize);
+      IndentLevel(level); csPrintf(" Length: %zu\n", object->dataSize);
     }
   }
 

@@ -375,7 +375,7 @@ bool csFreeType2Font::GetGlyphMetrics (utf32_char c, csGlyphMetrics& metrics)
 
   FT_Activate_Size (size);
   if (server->FreetypeError (FT_Load_Glyph (face->face, ci, FT_LOAD_DEFAULT),
-    "Could not load glyph %d for %s", ci, name))
+    "Could not load glyph %u for %s", ci, name))
   {
     return false;
   }
@@ -396,7 +396,7 @@ csPtr<iDataBuffer> csFreeType2Font::GetGlyphBitmap (utf32_char c,
 
   if (server->FreetypeError (FT_Load_Glyph (face->face, ci, 
     FT_LOAD_RENDER | FT_LOAD_MONOCHROME | FT_LOAD_TARGET_MONO),
-    "Could not load glyph %d for %s", ci, name))
+    "Could not load glyph %u for %s", ci, name))
   {
     return 0;
   }
@@ -442,7 +442,7 @@ csPtr<iDataBuffer> csFreeType2Font::GetGlyphAlphaBitmap (utf32_char c,
 
   if (server->FreetypeError (FT_Load_Glyph (face->face, ci, 
     FT_LOAD_RENDER | FT_RENDER_MODE_NORMAL),
-    "Could not load glyph %d for %s", ci, name))
+    "Could not load glyph %u for %s", ci, name))
   {
     return 0;
   }
@@ -491,7 +491,7 @@ void csFreeType2Font::GetDimensions (const char *text, int &oW, int &oH, int &de
   int defW = 0;
   if (!server->FreetypeError (FT_Load_Glyph (face->face, 0, 
     FT_LOAD_DEFAULT),
-    "Could not load glyph %d for %s", 0, name))
+    "Could not load glyph %u for %s", 0, name))
   {
     defW = (face->face->glyph->advance.x >> 6);
   }
@@ -520,7 +520,7 @@ void csFreeType2Font::GetDimensions (const char *text, int &oW, int &oH, int &de
 
     if (!server->FreetypeError (FT_Load_Glyph (face->face, ci, 
       FT_LOAD_DEFAULT),
-      "Could not load glyph %d for %s", ci, name))
+      "Could not load glyph %u for %s", ci, name))
     {
       csGlyphMetrics metrics;
       metrics.advance = (face->face->glyph->advance.x >> 6);
@@ -551,7 +551,7 @@ int csFreeType2Font::GetLength (const char *text, int maxwidth)
   int defW = 0;
   if (!server->FreetypeError (FT_Load_Glyph (face->face, 0, 
     FT_LOAD_DEFAULT),
-    "Could not load glyph %d for %s", 0, name))
+    "Could not load glyph %u for %s", 0, name))
   {
     defW = (face->face->glyph->advance.x >> 6);
   }
@@ -577,7 +577,7 @@ int csFreeType2Font::GetLength (const char *text, int maxwidth)
 
       if (!server->FreetypeError (FT_Load_Glyph (face->face, ci, 
 	FT_LOAD_DEFAULT),
-	"Could not load glyph %d for %s", ci, name))
+	"Could not load glyph %u for %s", ci, name))
       {
 	csGlyphMetrics metrics;
 	metrics.advance = (face->face->glyph->advance.x >> 6);

@@ -273,8 +273,8 @@ bool awsPrefManager::Load (const char *def_file)
     return false;
   }
 
-  int ncw = (int)win_defs.Length();
-  int ncs = (int)skin_defs.Length();
+  size_t ncw = win_defs.Length();
+  size_t ncs = skin_defs.Length();
 
   if (awsparse (wmgr))
   {
@@ -283,9 +283,9 @@ bool awsPrefManager::Load (const char *def_file)
   }
 
   printf (
-    "\tload successful (%lu windows, %lu skins loaded.)\n",
-    (unsigned long)(win_defs.Length() - ncw),
-    (unsigned long)(skin_defs.Length() - ncs));
+    "\tload successful (%zu windows, %zu skins loaded.)\n",
+    win_defs.Length() - ncw,
+    skin_defs.Length() - ncs);
 
   return true;
 }

@@ -1205,7 +1205,7 @@ csPtr<iString> csCoverageTile::Debug_Dump ()
 
   csString ss;
   ss.Format ("full=%d queue_empty=%d\n",
-  	tile_full, queue_tile_empty);
+  	(int)tile_full, (int)queue_tile_empty);
   str.Append (ss);
   // @@@ FIXME
   ss.Format ("  d %g,%g,%g,%g\n", depth[0], depth[1], depth[2], depth[3]);

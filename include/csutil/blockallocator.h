@@ -415,7 +415,7 @@ public:
   void Dump ()
   {
     int i;
-    printf ("=============================\nelsize = %d\n", elsize);
+    printf ("=============================\nelsize = %zu\n", elsize);
     for (i = 0 ; i < blocks.Length () ; i++)
     {
       printf ("Block %d\n", i);
@@ -423,7 +423,7 @@ public:
       char* m = (char*)blocks[i].memory;
       while (fl)
       {
-        printf ("  free %d %d\n", (((char*)fl) - m) / elsize, fl->numfree);
+        printf ("  free %td %zu\n", (((char*)fl) - m) / elsize, fl->numfree);
 	fl = fl->next;
       }
     }

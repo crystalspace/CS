@@ -557,7 +557,7 @@ static void DumpSubTree (int indent, const char* type, uint32 link_timestamp,
   {
     // We already encountered this object in this recursion. So we just
     // put a short-hand here.
-    csPrintf ("%s%s(%u) %p <-\n", spaces, type, (uint)link_timestamp, 
+    csPrintf ("%s%s(%" PRIu32 ") %p <-\n", spaces, type, link_timestamp, 
       el->object);
     return;
   }
@@ -565,7 +565,7 @@ static void DumpSubTree (int indent, const char* type, uint32 link_timestamp,
   // Show the ref count if it is an scf interface. If the object
   // is no longer used then show '?' instead of ref count to avoid
   // calling an invalid pointer.
-  csPrintf ("%s%s(%u) %p(", spaces, type, (uint)link_timestamp, el->object);
+  csPrintf ("%s%s(%" PRIu32 ") %p(", spaces, type, link_timestamp, el->object);
   if (el->scf)
   {
     if (el->used)
@@ -576,9 +576,9 @@ static void DumpSubTree (int indent, const char* type, uint32 link_timestamp,
   else if (!el->used)
     printf ("-");
   if (el->type)
-    printf ("t%u) %s(%s)", (uint)el->timestamp, el->type, el->description);
+    printf ("t%" PRIu32 ") %s(%s)", el->timestamp, el->type, el->description);
   else
-    printf ("t%u) %s", (uint)el->timestamp, el->description);
+    printf ("t%" PRIu32 ") %s", el->timestamp, el->description);
 
   // If the object is used but the link to this object was created
   // BEFORE the object (i.e. timestamps) then this is at least very
@@ -605,7 +605,7 @@ static void DumpSubTree (int indent, const char* type, uint32 link_timestamp,
   else
   {
     el->marker = true;
-    printf (" (%s,%d) #p=%d #c=%d\n",
+    printf (" (%s,%d) #p=%" PRIu16 " #c=%" PRIu16 "\n",
     	el->file, el->linenr, el->num_parents, el->num_children);
     if (el->num_parents + el->num_children > 0)
     {

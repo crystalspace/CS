@@ -190,7 +190,7 @@ bool csWindowsJoystick::Init ()
       if (FAILED (hr))
       {
 	Report (CS_REPORTER_SEVERITY_WARNING, 
-	  "Can't retrieve device information for #%d: error %.8x", i, hr);
+	  "Can't retrieve device information for #%zu: error %.8lx", i, hr);
       }
       else
       {
@@ -228,12 +228,12 @@ bool csWindowsJoystick::Init ()
       }
     }
     Report (CS_REPORTER_SEVERITY_NOTIFY,
-      "DirectInput Joystick plugin loaded; %d joysticks", njoys);
+      "DirectInput Joystick plugin loaded; %zu joysticks", njoys);
   } 
   else
   {
     Report (CS_REPORTER_SEVERITY_ERROR, "Joystick plugin: can't retrieve "
-      "Direct Input interface: error %.8x", hr);
+      "Direct Input interface: error %.8lx", hr);
   }
 
   return eq && EventOutlet;

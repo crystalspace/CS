@@ -217,7 +217,7 @@ bool csStencil2ShadowCacheEntry::CalculateEdges()
       if ((((edges[j]->v1 == edges[i]->v1) && (edges[j]->v2 == edges[i]->v2)) ||
       ((edges[j]->v1 == edges[i]->v2) && (edges[j]->v2 == edges[i]->v1))) && (i != j))
       {
-      printf("\n\tsame index: %d", j);
+      printf("\n\tsame index: %zu", j);
       }
       }
       */
@@ -522,7 +522,7 @@ void csStencil2ShadowStep::ModelInFrustum(csVector3 &light_pos, float shadow_len
         break;
       }
     }
-    //printf("front=%d sides=%d back=%d\n", front_cap_in_frustum, extrusion_in_frustum, back_cap_in_frustum);
+    //printf("front=%d sides=%d back=%d\n", (int)front_cap_in_frustum, (int)extrusion_in_frustum, (int)back_cap_in_frustum);
 }
 
 

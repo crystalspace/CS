@@ -232,11 +232,11 @@ const char* csCurveLightMap::ReadFromCache (
   {
     if (ps.lm_cnt != pswanted.lm_cnt)
       sprintf (error_buf,
-      	"Cached lightmap header mismatch (got cnt=%d, expected %d)!",
+      	"Cached lightmap header mismatch (got cnt=%" PRId32 ", expected %" PRId32 ")!",
 	ps.lm_cnt, pswanted.lm_cnt);
     else if (ps.lm_size != pswanted.lm_size)
       sprintf (error_buf,
-      	"Cached lightmap base texture mismatch (got size=%d, expected %d)!",
+      	"Cached lightmap base texture mismatch (got size=%" PRId32 ", expected %" PRId32 ")!",
 	ps.lm_size, pswanted.lm_size);
   }
   if (*error_buf)

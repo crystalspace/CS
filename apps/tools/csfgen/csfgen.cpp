@@ -111,7 +111,7 @@ static bool Display (iFontServer *fs, iFont *font)
       continue;
 
     CS_ALLOC_STACK_ARRAY(char, lineText, metrics.width);
-    printf ("---- Character: %u\n", c);
+    printf ("---- Character: %" PRIu32 "\n", c);
     for (l = 0; l < metrics.height; l++)
     {
       uint8* line = bitmap->GetUint8 () + l * ((metrics.width + 7) / 8);
@@ -191,7 +191,7 @@ public:
       fprintf (out, "CSF [Font=%s.%d Height=%d Ascent=%d Descent=%d "
 	"HasCharRanges=1 HasBitmapMetrics=1 HasGlyphAdvance=1",
 	fontname, opt.fontsize, maxheight, font->GetAscent (), font->GetDescent ());
-      fprintf (out, " Alpha=%d", opt.do_alpha);
+      fprintf (out, " Alpha=%d", (int)opt.do_alpha);
       fprintf (out, "]\n");
     }
   }
@@ -207,7 +207,7 @@ public:
       {
 	if (opt.sourcecode)
 	{
-	  buf.Format ("{0x%06x, %d},\n", (unsigned int)firstConsecChar, numConsecChars);
+	  buf.Format ("{0x%06" PRIx32 ", %d},\n", firstConsecChar, numConsecChars);
 	  fCharRanges.Write (buf.GetData(), buf.Length ());
 	}
 	else
@@ -228,7 +228,7 @@ public:
       if (opt.verbose)
       {
 	if (numGlyphs == 0) printf ("character ");
-	printf ("%d%s", c, (c < lastglyph - 1) ? "," : "\n");
+	printf ("%" PRIu32 "%s", c, (c < lastglyph - 1) ? "," : "\n");
       }
 
       csGlyphMetrics gMetrics;
@@ -236,7 +236,7 @@ public:
 
       if (opt.sourcecode)
       {
-	buf.Format ("%d,\t// %8x\n", gMetrics.advance, (unsigned int)c);
+	buf.Format ("%d,\t// %8" PRIx32 "\n", gMetrics.advance, c);
 	fGlyphAdvances.Write (buf.GetData (), buf.Length ());
       }
       else
@@ -259,10 +259,10 @@ public:
 	  fBitmapData.Write ("  ", 2);
 	  for (i = 0; i < bpc; i++)
 	  {
-	    buf.Format ("0x%02x,", bitmap->GetUint8 () [i]);
+	    buf.Format ("0x%02" PRIx8 ",", bitmap->GetUint8 () [i]);
 	    fBitmapData.Write (buf.GetData (), buf.Length ());
 	  }
-	  buf.Format ("\t// %8x\n", (unsigned int)c);
+	  buf.Format ("\t// %8" PRIx32 "\n", c);
 	  fBitmapData.Write (buf.GetData (), buf.Length ());
 	}
 	else
@@ -276,8 +276,8 @@ public:
       }
       if (opt.sourcecode)
       {
-	buf.Format ("{%d, %d, %d, %d},\t// %8x\n", metrics.width, metrics.height,
-	  metrics.left, metrics.top, (unsigned int)c);
+	buf.Format ("{%d, %d, %d, %d},\t// %8" PRIx32 "\n", metrics.width, metrics.height,
+	  metrics.left, metrics.top, c);
 	fBitmapMetrics.Write (buf.GetData(), buf.Length ());
       }
       else
@@ -305,10 +305,10 @@ public:
 	  fAlphaData.Write ("  ", 2);
 	  for (i = 0; i < bpc; i++)
 	  {
-	    buf.Format ("0x%02x,", alphaBitmap->GetUint8 () [i]);
+	    buf.Format ("0x%02" PRIx8 ",", alphaBitmap->GetUint8 () [i]);
 	    fAlphaData.Write (buf.GetData (), buf.Length ());
 	  }
-	  buf.Format ("\t// %8x\n", (unsigned int)c);
+	  buf.Format ("\t// %8" PRIx32 "\n", c);
 	  fAlphaData.Write (buf.GetData (), buf.Length ());
 	}
 	else
@@ -322,8 +322,8 @@ public:
       }
       if (opt.sourcecode)
       {
-	buf.Format ("{%d, %d, %d, %d},\t// %8x\n", metrics.width, metrics.height,
-	  metrics.left, metrics.top, (unsigned int)c);
+	buf.Format ("{%d, %d, %d, %d},\t// %8" PRIx32 "\n", metrics.width, metrics.height,
+	  metrics.left, metrics.top, c);
 	fAlphaMetrics.Write (buf.GetData(), buf.Length ());
       }
       else
@@ -349,7 +349,7 @@ public:
     {
       if (opt.sourcecode)
       {
-	buf.Format ("{0x%06x, %d},\n", (unsigned int)firstConsecChar, numConsecChars);
+	buf.Format ("{0x%06" PRIx32 ", %d},\n", firstConsecChar, numConsecChars);
 	fCharRanges.Write (buf.GetData(), buf.Length ());
       }
       else
@@ -561,7 +561,7 @@ int main (int argc, char* argv[])
   lastglyph = opt.first + opt.glyphs;
   if (lastglyph > 1114111)
   {
-    fprintf (stderr, "WARNING: Last glyph = %d, limiting to 1114111\n", lastglyph);
+    fprintf (stderr, "WARNING: Last glyph = %" PRIu32 ", limiting to 1114111\n", lastglyph);
     lastglyph = 1114111;
     opt.glyphs = 1114111 - opt.first;
   }

@@ -1722,7 +1722,7 @@ void ViewMesh::StdDlgDirSelect (intptr_t awst, iAwsSource *s)
   if (csString("..") == *text)
   {
     size_t i = newpath->Slice(0,newpath->Length()-1)->FindLast('/')+1;
-    printf("%lu", (unsigned long)i);
+    printf("%zu", i);
     newpath = newpath->Slice(0,i);
   }
   else

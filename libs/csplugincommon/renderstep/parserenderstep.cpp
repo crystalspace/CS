@@ -131,8 +131,8 @@ bool csRenderStepParser::ParseRenderSteps (iRenderStepContainer* container,
 	      synldr->ReportError (
 		"crystalspace.renderloop.steps.parser",
 		node,
-		"Render step container refused to add step. (%lu)",
-		(unsigned long)idx);
+		"Render step container refused to add step. (%zu)",
+		idx);
 	    }					  
 	  }
 	}

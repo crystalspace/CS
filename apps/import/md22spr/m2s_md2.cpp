@@ -427,7 +427,7 @@ bool Md2::WriteSPR(const char* spritename, float scaleMdl, int delayMdl,
   printf("Generate Triangles\n");
   short const* tri = triangles;
   for (i = 0; i < nbtriangles; i++, tri += 3)
-    fprintf(f, "\t\t<t v1=\"%d\" v2=\"%d\" v3=\"%d\"/>\n", *tri, *(tri + 1), *(tri + 2));
+    fprintf(f, "\t\t<t v1=\"%hd\" v2=\"%hd\" v3=\"%hd\"/>\n", *tri, *(tri + 1), *(tri + 2));
 
   fprintf(f, "\t</params>\n</meshfact>\n");
   fclose(f);

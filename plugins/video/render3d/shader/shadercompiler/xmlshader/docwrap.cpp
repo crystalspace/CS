@@ -195,7 +195,7 @@ void csWrappedDocumentNode::ProcessWrappedNode (NodeProcessingState* state,
 		newWrapper.child->condition = csCondAlwaysFalse;
 	      }
 #ifdef DUMP_CONDITION_IDS
-	      csPrintf ("condition %s = %lu\n", 
+	      csPrintf ("condition %s = %zu\n", 
 		csString().Append (valStart, valLen).GetDataSafe (),
 		newWrapper.child->condition);
 #endif
@@ -305,7 +305,7 @@ void csWrappedDocumentNode::ProcessWrappedNode (NodeProcessingState* state,
 		    result);
 		}
 #ifdef DUMP_CONDITION_IDS
-	      csPrintf ("condition %s = %lu\n", 
+	      csPrintf ("condition %s = %zu\n", 
 		csString().Append (valStart, valLen).GetDataSafe (),
 		newWrapper.child->condition);
 #endif

@@ -235,7 +235,7 @@ bool csXExtF86VM::SwitchMode (XF86VidModeModeInfo *to_mode,
   {
     if (!XF86VidModeSwitchToMode (dpy, screen_num, to_mode))
     {
-      Report (CS_REPORTER_SEVERITY_ERROR, "Unable to restore mode %dx%d",
+      Report (CS_REPORTER_SEVERITY_ERROR, "Unable to restore mode %hux%hu",
 	      to_mode->hdisplay, to_mode->vdisplay);
       return false;
     }
@@ -256,7 +256,7 @@ void csXExtF86VM::EnterFullScreen ()
   FindBestMode (wa.width, wa.height);
 
   #ifdef CS_DEBUG
-    printf ("Entering fullscreen: win %d, %d to fs_mode %d, %d\n\n",
+    printf ("Entering fullscreen: win %d, %d to fs_mode %hu, %hu\n\n",
       wa.width, wa.height, fs_mode.hdisplay, fs_mode.vdisplay);
   #endif
         

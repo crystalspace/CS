@@ -2866,7 +2866,7 @@ bool csThingObjectType::Initialize (iObjectRegistry *object_reg)
   if (csThingObjectType::do_verbose)
   {
     Notify ("Lightmap quality=%d", csThing::lightmap_quality);
-    Notify ("Lightmapping enabled=%d", csThing::lightmap_enabled);
+    Notify ("Lightmapping enabled=%d", (int)csThing::lightmap_enabled);
   }
 
   stringset = CS_QUERY_REGISTRY_TAG_INTERFACE (
@@ -2982,7 +2982,7 @@ bool csThingObjectType::eiConfig::SetOption (int id, csVariant *value)
       csThing::lightmap_enabled = value->GetBool ();
       if (csThingObjectType::do_verbose)
 	scfParent->Notify ("Lightmapping enabled=%d",
-		csThing::lightmap_enabled);
+		(int)csThing::lightmap_enabled);
       break;
     default:
       return false;

@@ -272,7 +272,7 @@ iImage *csGenerateImage::Generate(int totalw, int totalh,
       /// compute color
       tex->GetColor(col, pos.x, pos.y);
       pix.Set(csQint(col.red*255.),csQint(col.green*255.),csQint(col.blue*255.));
-      //if(x==0)printf("Set pixel %3d, %3d to %3d %3d %3d\n", x, y,
+      //if(x==0)printf("Set pixel %3d, %3d to %3g %3g %3g\n", x, y,
         //col.red, col.green, col.blue);
       /// set pixel
       *destpix = pix;

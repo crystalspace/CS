@@ -145,7 +145,7 @@ int main(int argc,char *argv[])
 
       case 'd':
         delayMdl = get_int(i, argc, argv);
-        printf("Frame delay set to %i.\n", delayMdl);
+        printf("Frame delay set to %d.\n", delayMdl);
         break;
 
       case 'x':
@@ -171,7 +171,7 @@ int main(int argc,char *argv[])
 
       case 'f':
         maxFrames = get_int(i, argc, argv);
-        printf("Max Frames set to %i.\n", maxFrames);
+        printf("Max Frames set to %d.\n", maxFrames);
         break;
 
       default:

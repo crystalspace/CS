@@ -257,7 +257,7 @@ bool CMapParser::ReadNextToken (csString& str)
     strncpy(tokenBegin, strStart, sizeof(tokenBegin)-1);
     tokenBegin[sizeof(tokenBegin)] = '\0';
 
-    ReportError("Token (\"%s\"...) too long, max. length %d", tokenBegin, (char*)maxlen);
+    ReportError("Token (\"%s\"...) too long, max. length %d", tokenBegin, maxlen);
     return false;
   }
 

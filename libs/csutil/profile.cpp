@@ -68,7 +68,8 @@ void csProfiler::Dump ()
   {
     const csProfileInfo& pi = profile_info[i];
     if (*pi.ptr_count > 0)
-      printf ("%d %d(%d/%d) %g %s/%s %d\n", *pi.ptr_count, *pi.ptr_time,
+      printf ("%" PRIu32 " %" PRIu32 "(%" PRIu32 "/%" PRIu32 ") %g %s/%s %d\n",
+        *pi.ptr_count, *pi.ptr_time,
         *pi.ptr_timemin, *pi.ptr_timemax,
     	float (*pi.ptr_time) / float (*pi.ptr_count),
     	pi.token, pi.file, pi.line);

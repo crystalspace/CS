@@ -133,7 +133,7 @@ const char* csExpressionTokenizer::Tokenize (const char* string, size_t len,
 	}
 	else
 	{
-	  return SetLastError ("Unexpected character '%c' (%d)",
+	  return SetLastError ("Unexpected character '%c' (%" PRId8 ")",
 	    *string, *string);
 	}
 	break;

@@ -72,7 +72,7 @@ bool csAVIStreamVideo::Initialize (const csAVIFormat::AVIHeader *ph,
   pChunk = new csAVIFormat::AVIDataChunk;
   pChunk->currentframe = -1;
   pChunk->currentframepos = 0;
-  sprintf (pChunk->id, "%02dd%c", nStreamNumber, pf->compression == 0 ? 'b' : 'c');
+  sprintf (pChunk->id, "%02" PRIu16 "d%c", nStreamNumber, pf->compression == 0 ? 'b' : 'c');
   pChunk->id[4] = '\0';
 
   nStream = nStreamNumber;

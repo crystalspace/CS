@@ -2317,7 +2317,7 @@ void csBugPlug::Dump (iEngine* engine)
 void csBugPlug::Dump (iSector* sector)
 {
   const char* sn = sector->QueryObject ()->GetName ();
-  Report (CS_REPORTER_SEVERITY_DEBUG, "    Sector '%s' (%08lx)",
+  Report (CS_REPORTER_SEVERITY_DEBUG, "    Sector '%s' (%08p)",
   	sn ? sn : "?", sector);
   Report (CS_REPORTER_SEVERITY_DEBUG, "    %d meshes, %d lights",
   	sector->GetMeshes ()->GetCount (),
@@ -2327,7 +2327,7 @@ void csBugPlug::Dump (iSector* sector)
   {
     iMeshWrapper* mesh = sector->GetMeshes ()->Get (i);
     const char* n = mesh->QueryObject ()->GetName ();
-    Report (CS_REPORTER_SEVERITY_DEBUG, "        Mesh '%s' (%08lx)",
+    Report (CS_REPORTER_SEVERITY_DEBUG, "        Mesh '%s' (%08p)",
     	n ? n : "?", mesh);
   }
 }
@@ -2335,7 +2335,7 @@ void csBugPlug::Dump (iSector* sector)
 void csBugPlug::Dump (int indent, iMeshWrapper* mesh)
 {
   const char* mn = mesh->QueryObject ()->GetName ();
-  Report (CS_REPORTER_SEVERITY_DEBUG, "%*s    Mesh wrapper '%s' (%08lx)", 
+  Report (CS_REPORTER_SEVERITY_DEBUG, "%*s    Mesh wrapper '%s' (%08p)", 
     indent, "", mn ? mn : "?", mesh);
   iMeshObject* obj = mesh->GetMeshObject ();
   if (!obj)
@@ -2386,7 +2386,7 @@ void csBugPlug::Dump (int indent, iMeshWrapper* mesh)
 void csBugPlug::Dump (iMeshFactoryWrapper* meshfact)
 {
   const char* mn = meshfact->QueryObject ()->GetName ();
-  Report (CS_REPORTER_SEVERITY_DEBUG, "        Mesh factory wrapper '%s' (%08lx)",
+  Report (CS_REPORTER_SEVERITY_DEBUG, "        Mesh factory wrapper '%s' (%08p)",
   	mn ? mn : "?", meshfact);
 }
 
@@ -2448,8 +2448,8 @@ void csBugPlug::Dump (iCamera* c)
   csPlane3* far_plane = c->GetFarPlane ();
   Report (CS_REPORTER_SEVERITY_DEBUG,
   	"Camera: %s (mirror=%d, fov=%d, fovangle=%g,",
-  	sn, c->IsMirrored (), c->GetFOV (), c->GetFOVAngle ());
-  Report (CS_REPORTER_SEVERITY_DEBUG, "    shiftx=%g shifty=%g camnr=%d)",
+  	sn, (int)c->IsMirrored (), (int)c->GetFOV (), c->GetFOVAngle ());
+  Report (CS_REPORTER_SEVERITY_DEBUG, "    shiftx=%g shifty=%g camnr=%ld)",
   	c->GetShiftX (), c->GetShiftY (), c->GetCameraNumber ());
   if (far_plane)
     Report (CS_REPORTER_SEVERITY_DEBUG, "    far_plane=(%g,%g,%g,%g)",

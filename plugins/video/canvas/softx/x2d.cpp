@@ -160,7 +160,7 @@ bool csGraphics2DXLib::Open()
   if (xshm)
     Report (CS_REPORTER_SEVERITY_NOTIFY, "(Using SHM extension plugin)");
 
-  Report (CS_REPORTER_SEVERITY_NOTIFY, "Using %d bit %sColor visual",
+  Report (CS_REPORTER_SEVERITY_NOTIFY, "Using %u bit %sColor visual",
               xvis.depth, (xvis.visual->c_class == PseudoColor) ? "Pseudo" : "True");
 
   // Open your graphic interface

@@ -341,7 +341,7 @@ bool csShaderGLPS1_NV::GetNVInstructions (csPixelShaderParser& parser,
       csString instrStr;
       parser.GetInstructionString (inst, instrStr);
       Report(CS_REPORTER_SEVERITY_WARNING,
-        "Register Combiners doesn't support one or more modifiers for '%s' (%d).",
+        "Register Combiners doesn't support one or more modifiers for '%s' (%zu).",
 	instrStr.GetData(), i);
       return false;
     }
@@ -656,7 +656,7 @@ bool csShaderGLPS1_NV::LoadProgramStringToGL ()
       if(glGetError() == GL_INVALID_OPERATION)
       {
         Report(CS_REPORTER_SEVERITY_ERROR,
-          "glCombinerInputNV #%d returned GL_INVALID_OPERATION on stage %d!",
+          "glCombinerInputNV #%zu returned GL_INVALID_OPERATION on stage %zu!",
           j, i);
         return false;
       }
@@ -668,7 +668,7 @@ bool csShaderGLPS1_NV::LoadProgramStringToGL ()
     if(glGetError() == GL_INVALID_OPERATION)
     {
       Report(CS_REPORTER_SEVERITY_ERROR,
-        "glCombinerOutputNV returned GL_INVALID_OPERATION on stage %d!",
+        "glCombinerOutputNV returned GL_INVALID_OPERATION on stage %zu!",
         i);
       return false;
     }

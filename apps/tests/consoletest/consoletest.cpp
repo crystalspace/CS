@@ -67,6 +67,7 @@ int main (int argc, char* argv[])
   csPrintf (" %s\n", charStr);
   csPrintf (" %ls\n", wcharStr);
   char const* bogus = " (some) bogus formats: %bogus %- 0#10.2y %jd %kd\n";
+  // The 123 should replace the only valid format in the string (i.e. the %jd).
   csPrintf (bogus, (intmax_t)123);
 
   csPrintf ("\n");
