@@ -25,6 +25,7 @@ class csVector3;
 class csMatrix3;
 class csThing;
 struct iSector;
+struct iMovable;
 
 SCF_VERSION (iThing, 0, 0, 2);
 
