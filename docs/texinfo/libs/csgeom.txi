@@ -1,4 +1,4 @@
-@node csGeom, CSWS, SCF, Facilities
+@node csGeom, , SCF, Facilities
 @section Geometry Module (@code{csGeom})
 @cindex csGeom
 @cindex Module, csGeom
