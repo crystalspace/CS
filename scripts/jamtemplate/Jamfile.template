@@ -1,5 +1,7 @@
-SubDir TOP ;
+TOP ?= "@top_srcdir@" ;
+BUILDTOP ?= "@top_builddir@" ;
 
+SubDir TOP ;
 CleanDir clean :
     out ;
 Clean distclean :
@@ -8,7 +10,8 @@ Clean distclean :
     config.log
     config.status
     config.cache
-    Jamconfig ;
+    Jamconfig
+    Jamfile ;
 CleanDir distclean :
     autom4te.cache ;
 Depends distclean : clean ;

@@ -100,7 +100,7 @@ CS_EMIT_PACKAGEINFO
 #----------------------------------------------------------------------------
 CS_EMIT_BUILD_PROPERTY([JAMCONFIG_READ], [yes])
 CS_JAMCONFIG_OUTPUT([Jamconfig])
-CS_INIT_JAMFILE
+AC_CONFIG_FILES([Jamfile])
 AC_OUTPUT
 
 AC_MSG_NOTICE([

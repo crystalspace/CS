@@ -143,7 +143,7 @@ cp -pr "$TEMPLATEDIR/template7" "$PROJECTNAME/mk/msvcgen"
 Instantiate "$TEMPLATEDIR/autogen.template" "$PROJECTNAME/autogen.sh"
 Instantiate "$TEMPLATEDIR/config-msvc.template" "$PROJECTNAME/config-msvc.h"
 Instantiate "$TEMPLATEDIR/configure.template" "$PROJECTNAME/configure.ac"
-Instantiate "$TEMPLATEDIR/Jamfile.template" "$PROJECTNAME/Jamfile"
+Instantiate "$TEMPLATEDIR/Jamfile.template" "$PROJECTNAME/Jamfile.in"
 Instantiate "$TEMPLATEDIR/Jamfile-src.template" "$PROJECTNAME/src/Jamfile"
 Instantiate "$TEMPLATEDIR/Jamrules.template" "$PROJECTNAME/Jamrules"
 Instantiate "$TEMPLATEDIR/main.template" "$PROJECTNAME/src/main.cpp"
@@ -152,7 +152,6 @@ Instantiate "$TEMPLATEDIR/projheader.template" \
 Instantiate "$TEMPLATEDIR/README.template" "$PROJECTNAME/README"
 Instantiate "$TEMPLATEDIR/README-msvc.template" "$PROJECTNAME/msvc/README"
 
-cp -p "$TEMPLATEDIR/initjamfile.m4" "$PROJECTNAME/mk/autoconf"
 cp -p "$TEMPLATEDIR/cs_check_host.m4" "$PROJECTNAME/mk/autoconf"
 
 chmod +x "$PROJECTNAME/autogen.sh"

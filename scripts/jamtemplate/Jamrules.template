@@ -1,5 +1,9 @@
-# Include config
-BUILDTOP ?= $(TOP) ;
+if ! $(BUILDTOP)
+{
+BUILDTOP = . ;
+}
+
+# Include configuration.
 JAMCONFIG ?= $(BUILDTOP)/Jamconfig ;
 include $(JAMCONFIG) ;
 if ! $(JAMCONFIG_READ)

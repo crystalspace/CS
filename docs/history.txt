@@ -13,6 +13,14 @@ chronological order.
 	  "setglcontext" which allows it to set it's GL context as the current
 	  (useful if CS is used alongside other GL stuff).
 	- res augmented the glx canvas with "setglcontext" support.
+	- Eric Sunshine changed jamtemplate so that it synthesizes a Jamfile.in
+	  rather than a Jamfile. The synthesized configure script creates a
+	  Jamfile from Jamfile.in at project configuration time. This scheme is
+	  more normalized, more standardized, requires less special-case
+	  handling (there is now no difference between building in the source
+	  tree or at some other location), and makes the 'distclean' target
+	  100% accurate (previously, it would leak a Jamfile if the build
+	  directory differed from the source directory).
 18-May-2004
 	- Eric Sunshine made the following change to msvcgen.jam:
 	    - Fixed bug in LinkWith where, though Frank changed it to properly
