@@ -89,7 +89,7 @@ static float f_shift_x[8]={0,step_x,step_x,0,0,step_x,step_x,0};
 static float f_shift_y[8]={step_y,step_y,step_y,step_y,0,0,0,0};
 static float f_shift_z[8]={step_z,step_z,0,0,step_z,step_z,0,0};
 
-void GenCell(int x,int y,int z,GridCell &c)
+void GenCell(int x,int y,int z,csTesselator::GridCell &c)
 {
   csVector3 base;
   _2coord(x,y,z,base);
@@ -98,7 +98,7 @@ void GenCell(int x,int y,int z,GridCell &c)
     c.p[i]=base+csVector3(f_shift_x[i],f_shift_y[i],f_shift_z[i]);
 }
 
-void csMetaBall::FillCell(int _x,int _y,int _z,GridCell &c)
+void csMetaBall::FillCell(int _x,int _y,int _z,csTesselator::GridCell &c)
 {
   for(int i=0;i<8;i++)
   {
@@ -116,7 +116,7 @@ void csMetaBall::FillCell(int _x,int _y,int _z,GridCell &c)
   }
 }
 
-int csMetaBall::check_cell_assume_inside(const GridCell &c)
+int csMetaBall::check_cell_assume_inside(const csTesselator::GridCell &c)
 {
   int i,flag;
 
@@ -131,7 +131,7 @@ int csMetaBall::check_cell_assume_inside(const GridCell &c)
 }
 
 static int _x,_y,_z;
-static GridCell _cell;
+static csTesselator::GridCell _cell;
 
 void csMetaBall::CalculateBlob(int dx,int dy,int dz)
 {
@@ -162,7 +162,8 @@ void csMetaBall::CalculateBlob(int dx,int dy,int dz)
     
     FillCell(_x,_y,_z,_cell);
 
-    int num=Tesselate(_cell, mesh.vertices[0] + vertices_tesselated);
+    int num =
+      csTesselator::Tesselate(_cell, mesh.vertices[0] + vertices_tesselated);
 
     if(!num)
       goto skip;
@@ -200,7 +201,7 @@ void csMetaBall::CalculateMetaBalls(void)
 
     _2int(meta_balls[i].center,x,y,z);
 
-    GridCell cell;
+    csTesselator::GridCell cell;
     GenCell(x,y,z,cell);
     FillCell(x,y,z,cell);
 

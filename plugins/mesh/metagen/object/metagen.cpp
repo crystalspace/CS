@@ -1,7 +1,6 @@
 /*
     Metagen Renderer
-	
-	Copyright (C) 2001 by Michael H. Voase
+    Copyright (C) 2001 by Michael H. Voase
     Copyright (C) 1999 by Denis Dmitriev
 
     This library is free software; you can redistribute it and/or
@@ -38,7 +37,6 @@
 #include "isys/system.h"
 #include "qsqrt.h"
 #include "metagen.h"
-
 
 CS_IMPLEMENT_PLUGIN
 
@@ -725,6 +723,7 @@ csMetaGenType::csMetaGenType( iBase *par )
 {
   CONSTRUCT_IBASE (par);
 }
+
 csMetaGenType::~csMetaGenType()
 {
 }

@@ -2,14 +2,14 @@
 # to build the metagen plug-in.
 
 # Plug-in description
-DESCRIPTION.metagen = Crystal Space MetaGen mesh factory
+DESCRIPTION.metagen = MetaGen mesh factory
 
 #------------------------------------------------------------- rootdefines ---#
 ifeq ($(MAKESECTION),rootdefines)
 
 # Driver-specific help commands
 PLUGINHELP += \
-  $(NEWLINE)echo $"  make metagen     Make the $(DESCRIPTION.metagen)$"
+  $(NEWLINE)echo $"  make metagen      Make the $(DESCRIPTION.metagen)$"
 
 endif # ifeq ($(MAKESECTION),rootdefines)
 
@@ -31,12 +31,12 @@ ifeq ($(MAKESECTION),postdefines)
 
 vpath %.cpp plugins/mesh/metagen/object
 
-ifeq ($(USE_SHARED_PLUGINS),yes)
+ifeq ($(USE_PLUGINS),yes)
   METAGEN = $(OUTDLL)metagen$(DLL)
   LIB.METAGEN = $(foreach d,$(DEP.METAGEN),$($d.LIB))
   TO_INSTALL.DYNAMIC_LIBS += $(METAGEN)
 else
-  METAGEN = $(OUT)$(LIB_PREFIX)meta$(LIB)
+  METAGEN = $(OUT)$(LIB_PREFIX)metagen$(LIB)
   DEP.EXE += $(METAGEN)
   SCF.STATIC += metagen
   TO_INSTALL.STATIC_LIBS += $(METAGEN)

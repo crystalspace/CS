@@ -24,6 +24,7 @@
 #include <stdarg.h>
 #include "csgeom/math2d.h"
 #include "csgeom/math3d.h"
+#include "csgeom/tesselat.h"
 #include "imesh/object.h"
 #include "imesh/metaball.h"
 
@@ -36,15 +37,6 @@ struct iGraphics3D;
 struct iGraphics2D;
 struct iMaterialWrapper;
 struct iMeshObject;
-struct GridCell;
-
-#if 0
-{
-   csVector3 p[8];
-   float val[8];
-   GridCell() {} // NextStep 3.3 compiler barfs without this.
-};
-#endif
 
 struct MetaBall
 {
@@ -112,13 +104,12 @@ public:
   { return mesh.num_triangles; }
 
 // Where the real work gets done....
-//  int Tesselate (const GridCell &grid,csVector3 *verts);
   void CalculateMetaBalls (void);
   void CalculateBlob (int x, int y, int z);
-  void FillCell (int x, int y, int z, GridCell &c);
+  void FillCell (int x, int y, int z, csTesselator::GridCell &c);
   float map (float x);
   float potential (const csVector3 &p);
-  int check_cell_assume_inside (const GridCell &c);
+  int check_cell_assume_inside (const csTesselator::GridCell &c);
   void InitTables (void);
 ///-------------------- iMeshObject implementation --------------
 

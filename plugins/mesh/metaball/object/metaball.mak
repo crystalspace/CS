@@ -36,7 +36,7 @@ ifeq ($(USE_PLUGINS),yes)
   LIB.METABALL = $(foreach d,$(DEP.METABALL),$($d.LIB))
   TO_INSTALL.DYNAMIC_LIBS += $(METABALL)
 else
-  METABALL = $(OUT)$(LIB_PREFIX)meta$(LIB)
+  METABALL = $(OUT)$(LIB_PREFIX)metaball$(LIB)
   DEP.EXE += $(METABALL)
   SCF.STATIC += metaball
   TO_INSTALL.STATIC_LIBS += $(METABALL)

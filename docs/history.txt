@@ -22,6 +22,27 @@ The history order is reversed so that new features are at the top.
 	- Eric Sunshine expanded several sections in apimod19.txi.
 	- Eric Sunshine added a discussion of CS_IMPLEMENT_APPLICATION and
 	  CS_IMPLEMENT_PLUGIN to apimod19.txi.
+	- Eric Sunshine made the following changes to the new tesselator
+	  facility in csGeom:
+	    - Reworked the file comments so as to be Doxygen compatible.
+	    - In order to avoid global namespace pollution, wrapped a class
+	      named csTesselator around the bare structure name GridCell and
+	      the bare function Tesselate().
+	    - Removed ttables.h from CS/include/csgeom.  The information in
+	      this file is merely an implementation detail of the tesselator
+	      and didn't belong in a plubic include directory.  Moved the
+	      contents of this file directly into tesselat.cpp since it merely
+	      defines two static tables used by the implementation.
+	- Eric Sunshine made the following changes to the MetaGen facility:
+	    - Moved the EnvMappingModes type and the constants TRUE_ENV_MAP
+	      and FAKE_ENV_MAP inside iMetaGen interface rather than allowing
+	      them to pollute the global namespace.
+	    - Fixed several bugs in metagen.mak, including one which caused it
+	      to use the wrong commands when building the plugin module itself
+	      (.so, .dll, etc.); and which consequently prevented the plugin
+	      from building on some platforms (Mingw, NextStep, etc.).
+	    - Fixed the module description in the makefile's DESCRIPTION
+	      variable.
 17-Jun-2001
 	- Fixed a bug in 'facedown'/'faceup' commands (walktest). Reported
 	  by Thiago Ramon.

@@ -108,7 +108,7 @@ static float f_shift_x[8];
 static float f_shift_y[8];
 static float f_shift_z[8];
 
-void csMetaGen::GenCell( int x, int y, int z, GridCell &c)
+void csMetaGen::GenCell( int x, int y, int z, csTesselator::GridCell &c)
 {
   csVector3 base;
   _2coord(x,y,z,base);
@@ -117,7 +117,7 @@ void csMetaGen::GenCell( int x, int y, int z, GridCell &c)
 		f_shift_y[i], f_shift_z[i]);
 }
 
-void csMetaGen::FillCell(int _x,int _y,int _z,GridCell &c)
+void csMetaGen::FillCell(int _x,int _y,int _z,csTesselator::GridCell &c)
 {
   for(int i=0;i<8;i++)
   {
@@ -135,7 +135,7 @@ void csMetaGen::FillCell(int _x,int _y,int _z,GridCell &c)
   }
 }
 
-void csMetaGen::FillCellSlice(int _x,int _y,int _z,GridCell &c)
+void csMetaGen::FillCellSlice(int _x,int _y,int _z,csTesselator::GridCell &c)
 {
 	int i;
 	for(i=0; i<8; i++)
@@ -154,7 +154,7 @@ void csMetaGen::FillCellSlice(int _x,int _y,int _z,GridCell &c)
 	}
 }
 
-int csMetaGen::check_cell_assume_inside(const GridCell &c)
+int csMetaGen::check_cell_assume_inside(const csTesselator::GridCell &c)
 {
   int i,flag;
 
@@ -169,7 +169,7 @@ int csMetaGen::check_cell_assume_inside(const GridCell &c)
 }
 
 static int _x,_y,_z;
-static GridCell _cell;
+static csTesselator::GridCell _cell;
 
 void csMetaGen::BlobCalc(int dx,int dy,int dz)
 {
@@ -200,7 +200,7 @@ void csMetaGen::BlobCalc(int dx,int dy,int dz)
     
     FillCell(_x,_y,_z,_cell);
 
-    int num=Tesselate(_cell, _verts + _tess);
+    int num=csTesselator::Tesselate(_cell, _verts + _tess);
 
     if(!num)
       goto skip;
@@ -249,7 +249,7 @@ void csMetaGen::RingCalc(int dx,int dz)
       _cell.p[i]+=dv;
     
     FillCellSlice(_x,_y,_z,_cell);
-    int num = Tesselate(_cell, _verts + _tess);
+    int num = csTesselator::Tesselate(_cell, _verts + _tess);
 
     if(!num)
       goto skip;
@@ -299,7 +299,7 @@ int csMetaGen::CalcBlobSurf(MetaField *field)
 	if (pc.charge <= 0) continue;
 	_2int(pc.pos[i],x,y,z);
 
-  	GridCell cell;
+  	csTesselator::GridCell cell;
   	GenCell(x,y,z,cell);
   	FillCell(x,y,z,cell);
 
@@ -352,7 +352,7 @@ int csMetaGen::CalcLinSurf( MetaBone* bone )
 	{
 	  SliceCharge c = m->charges[j];
   	  _2int2(c.pos, x, z);
-  	  GridCell cell;
+  	  csTesselator::GridCell cell;
   	  GenCell( x,y,z, cell );
   	  FillCellSlice( x,y,z,cell );
   	  while(!check_cell_assume_inside(cell))

@@ -1,6 +1,6 @@
 /*
     Metagen
-	Copyright (C) 2001 by Michael H. Voase
+    Copyright (C) 2001 by Michael H. Voase
     Copyright (C) 1999 by Denis Dmitriev
     Pluggified (c) 2000 by Samuel Humphreys
 
@@ -29,12 +29,12 @@ class csVector3;
 class csColor;
 struct csTriangle;
 
-enum EnvMappingModes    {TRUE_ENV_MAP,FAKE_ENV_MAP};
-
 SCF_VERSION (iMetaGen, 0, 0, 1 );
 
 struct iMetaGen : iBase
 {
+  enum EnvMappingModes { TRUE_ENV_MAP, FAKE_ENV_MAP };
+
   virtual int GenerateLinearSurface( int bone_index ) = 0;
 	
   virtual int GenerateFieldSurface( int field_index ) = 0;
