@@ -96,16 +96,9 @@ class csMemoryMappedIO
     unsigned char *data;
   };
 
-  struct SimpleHash
-  {
-    /// Hash table for active blocks
-    CacheBlock *blocks[csmmioDefaultHashSize];
-    
-    /// List of inactive blocks
-    CacheBlock *inactive;
-
-  } cache;
-
+  /// Hash table for active blocks
+  CacheBlock *cache[csmmioDefaultHashSize];
+  
 #else
 
   /// Holds information specific to the platform for hardware paging.
