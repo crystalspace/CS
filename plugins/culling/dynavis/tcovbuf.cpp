@@ -582,7 +582,7 @@ csPtr<iString> csCoverageTile::Debug_Dump ()
   csString& str = rc->GetCsString ();
 
   csString ss;
-  ss.Format ("full=%d queue_empty=%d blocks_full=%08lx blocks_part=%08lx\n",
+  ss.Format ("full=%d queue_empty=%d blocks_full=%08x blocks_part=%08x\n",
   	tile_full, queue_tile_empty, blocks_full, blocks_partial);
   str.Append (ss);
   ss.Format ("  d %g,%g,%g,%g\n", depth[0], depth[1], depth[2], depth[3]);
