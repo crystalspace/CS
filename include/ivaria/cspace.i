@@ -537,6 +537,8 @@ TYPEMAP_OUT_csWrapPtr
 
 %ignore operator* (const csColor &, float);
 %ignore operator* (float , const csColor &);
+%ignore operator* (const csColor &, const csColor &);
+%ignore operator/ (const csColor &, float);
 %ignore operator+ (const csColor &, const csColor &);
 %ignore operator- (const csColor &, const csColor &);
 %include "csutil/cscolor.h"

@@ -82,18 +82,18 @@ public:
   /// Subtract given R,G,B components from color.
   void Subtract (float r, float g, float b)
   { red -= r; green -= g; blue -= b; }
-  /// Divide a color by a scalar.
-  inline friend csColor operator/ (const csColor& v, float f)
-  { f = 1.0f/f; return csColor(v.red*f, v.green*f, v.blue*f); }
-  /// Multiply two colors.
-  inline friend csColor operator* (const csColor& v1, const csColor& v2)
-  {
-    return csColor (v1.red * v2.red,
-    		    v1.green * v2.green,
-		    v1.blue * v2.blue);
-  }
-
 };
+
+/// Divide a color by a scalar.
+inline csColor operator/ (const csColor& v, float f)
+{ f = 1.0f/f; return csColor(v.red*f, v.green*f, v.blue*f); }
+/// Multiply two colors.
+inline csColor operator* (const csColor& v1, const csColor& v2)
+{
+  return csColor (v1.red * v2.red,
+  		  v1.green * v2.green,
+		  v1.blue * v2.blue);
+}
 
 /**
  * A class used to represent a color in RGBA space.
