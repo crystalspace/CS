@@ -6,6 +6,21 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+28-Nov-2004
+	- Eric Sunshine made the new-renderer the default. Users wanting to use
+	  the old-renderer must select it manually.
+	    - The configure script now responds to --enable-old-renderer. The
+	      --enable-new-renderer option has been retired.
+	    - msvcgen now publishes wkstypical and wksoldrenderer along with
+	      build modes Release, Debug, Release_OR, and Debug_OR. The
+	      wksnewrenderer workspace, and build modes Release_NR and Debug_NR
+	      have been retired.
+	    - There is a new preprocessor symbol CS_USE_OLD_RENDERER. The
+	      symbol CS_USE_NEW_RENDERER has been retired.
+	    - The Jam build variable USE_OLD_RENDERER replaces the retired
+	      USE_NEW_RENDERER. Likewise, the Jam property {build:oldrenderer}
+	      replaces the retired {build:newrenderer}.
+	- Eric Sunshine eliminated numerous compilation warnings.
 27-Nov-2004
 	- Jorrit did a few minor changes to foliage. Nothing significant.
 	- Jorrit submitted a patch from Marc Prüßmeier which adds the following
@@ -29,19 +44,6 @@ chronological order.
 		- All shaders aren't updated to support fog, only the 
 		  standard or_lighting, best technique.
 	- res renamed FogRamp() to csFogRamp().
-	- Eric Sunshine made the new-renderer the default. Users wanting to use
-	  the old-renderer must select it manually.
-	    - The configure script now responds to --enable-old-renderer. The
-	      --enable-new-renderer option has been retired.
-	    - msvcgen now publishes wkstypical and wksoldrenderer along with
-	      build modes Release, Debug, Release_OR, and Debug_OR. The
-	      wksnewrenderer workspace, and build modes Release_NR and Debug_NR
-	      have been retired.
-	    - There is a new preprocessor symbol CS_USE_OLD_RENDERER. The
-	      symbol CS_USE_NEW_RENDERER has been retired.
-	    - The Jam build variable USE_OLD_RENDERER replaces the retired
-	      USE_NEW_RENDERER. Likewise, the Jam property {build:oldrenderer}
-	      replaces the retired {build:newrenderer}.
 26-Nov-2004
 	- Eric Sunshine added capability to cscript/csperl5/Jamfile to create
 	  pure-Perl extension module `cspace' (Jam target `perl5mod'). This
