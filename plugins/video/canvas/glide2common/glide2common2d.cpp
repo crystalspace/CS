@@ -229,7 +229,7 @@ void csGraphics2DGlideCommon::DrawPixel (int x, int y, int color)
   }
 }
 
-void csGraphics2DGlideCommon::WriteStringGlide (csGraphics2D *This, int x, int y, int fg, int bg, char c)
+void csGraphics2DGlideCommon::WriteStringGlide (csGraphics2D *This, int x, int y, int fg, int bg, const char *c)
 {
   This->WriteString16 (This, x,y,fg,bg,c);
 }
