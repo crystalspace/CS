@@ -345,6 +345,8 @@ public:
   void AddConditionInSector (iSector* sector, bool insideonly,
 		  const csBox3* box, const csSphere* sphere);
   void AddConditionMeshClick (iMeshWrapper* mesh);
+  void AddConditionLightChange (iLight *whichlight, 
+				int oper,csColor& col);
   void AddConditionManual ();
 
   void SetEnabled (bool en) { enabled = en; }
@@ -411,6 +413,12 @@ public:
     {
       scfParent->AddConditionMeshClick (mesh);
     }
+    virtual void AddConditionLightChange (iLight *whichlight, 
+					  int oper,csColor& col)
+    {
+      scfParent->AddConditionLightChange(whichlight,oper,col);
+    }
+
     virtual void AddConditionManual ()
     {
       scfParent->AddConditionManual ();

@@ -1209,6 +1209,64 @@ SCF_IMPLEMENT_IBASE_END
 //---------------------------------------------------------------------------
 
 /**
+ * Callback that will activate trigger when light crosses threshold value.
+ */
+class csTriggerLightCallback : public iLightCallback
+{
+private:
+  csSequenceTrigger* trigger;
+  int operation;  /* 0=always, 1= <color, 2= >color */
+  csColor trigger_color,last_color;
+  unsigned int framenr;
+
+public:
+  csTriggerLightCallback (csSequenceTrigger* trigger,
+	int oper, csColor& col)
+  {
+    SCF_CONSTRUCT_IBASE (NULL);
+    csTriggerLightCallback::trigger = trigger;
+    operation = oper;
+    trigger_color = col;
+    framenr = 0;
+  }
+  virtual ~csTriggerLightCallback () { }
+
+  SCF_DECLARE_IBASE;
+
+  float AverageColor(const csColor& col)
+  {
+      return (col.red + col.blue + col.green)/3;
+  }
+
+  virtual void OnColorChange (const csColor& col)
+  {
+      uint32 global_framenr = trigger->GetEngineSequenceManager ()
+      	->GetGlobalFrameNr ();
+      if (framenr != global_framenr)
+      {
+        if (operation == 1) // new color less than trigger color
+	{
+	    if ( AverageColor (col) >= AverageColor (trigger_color) )
+		return;
+	}
+	else if (operation == 2)
+	{
+	    if ( AverageColor (col) <= AverageColor (trigger_color) )
+		return;
+	}
+        framenr = global_framenr;
+	trigger->Fire ();
+      }
+  }
+};
+
+SCF_IMPLEMENT_IBASE (csTriggerLightCallback)
+  SCF_IMPLEMENTS_INTERFACE (iLightCallback)
+SCF_IMPLEMENT_IBASE_END
+
+//---------------------------------------------------------------------------
+
+/**
  * Cleanup a sector callback.
  */
 class csConditionCleanupSectorCB : public csConditionCleanup
@@ -1228,6 +1286,32 @@ public:
     if (sector && cb)
     {
       sector->RemoveSectorCallback (cb);
+    }
+  }
+};
+
+//---------------------------------------------------------------------------
+
+/**
+ * Cleanup a light callback.
+ */
+class csConditionCleanupLightCB : public csConditionCleanup
+{
+private:
+  csRef<iLight> mylight;
+  csRef<iLightCallback> cb;
+
+public:
+  csConditionCleanupLightCB (iLight* light, iLightCallback* cb)
+  {
+    mylight = light;
+    csConditionCleanupLightCB::cb = cb;
+  }
+  virtual void Cleanup ()
+  {
+    if (mylight && cb)
+    {
+      mylight->RemoveLightCallback (cb);
     }
   }
 };
@@ -1282,6 +1366,23 @@ void csSequenceTrigger::AddConditionMeshClick (iMeshWrapper* mesh)
 {
   eseqmgr->RegisterMeshTrigger (this);
   click_mesh = mesh;
+  total_conditions++;
+}
+
+void csSequenceTrigger::AddConditionLightChange (iLight *whichlight, 
+						 int oper,csColor& col)
+{
+  csTriggerLightCallback* trig = new csTriggerLightCallback (this,
+							     oper, col);
+  whichlight->SetLightCallback (trig);
+
+  csConditionCleanupLightCB* cleanup = new csConditionCleanupLightCB (
+  	whichlight, trig);
+  condition_cleanups.Push (cleanup);
+ 
+  cleanup->DecRef ();
+  trig->DecRef ();
+
   total_conditions++;
 }
 
