@@ -29,6 +29,11 @@ The history order is reversed so that new features are at the top.
 	  csInitializer::SetupConfigManager() and out of reach of mortal 
 	  beings. Also changed OS/X makefile to use the Unix platform
 	  configuration (in lack of a special OS/X variant.)
+	- Matze modified the csConfigManager to save the config when in it's
+	  destructor and to report some errors in case of failure.
+	- Matze fixed a bug in csConfigFile: It was setting Dirty=false
+	  if SaveNow failed.
+	- Matze also fixed a bug in unix config code.
 10-Jun-2003
         - Philip Wyett eliminated signed/unsigned mismatch warning in
           function csString::SubString ().

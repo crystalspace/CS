@@ -33,7 +33,7 @@ csPtr<iConfigFile> csGetPlatformConfig(const char* key)
   // construct directory and filename of the config file
   char fname[1000];
   char dir[1000];
-  cs_snprintf(dir, 1000, "%s/.crystal", getenv("HOME"));
+  cs_snprintf(dir, 1000, "%s/.crystal", home);
   cs_snprintf(fname, 1000, "%s/%s.cfg", dir, key);
 
   // try to create the directory (we assume that $HOME is already created)

@@ -440,9 +440,14 @@ bool csConfigFile::Load(const char* fName, iVFS *vfs, bool Merge, bool NewWins)
 
 bool csConfigFile::Save()
 {
-  if (!Dirty) return true;
+  if (!Dirty)
+    return true;
+  
+  if (!SaveNow(Filename, VFS))
+    return false;
+  
   Dirty = false;
-  return SaveNow(Filename, VFS);
+  return true;
 }
 
 bool csConfigFile::Save(const char *file, iVFS *vfs)
@@ -455,10 +460,13 @@ bool csConfigFile::Save(const char *file, iVFS *vfs)
   if (Filename && strcmp(Filename, file)==0 && VFS==vfs)
   {
     if (!Dirty) return true;
-    Dirty = false;
   }
 
-  return SaveNow(file, vfs);
+  if (!SaveNow(file, vfs))
+    return false;
+
+  Dirty = false;
+  return true;
 }
 
 void WriteComment(csString &Filedata, const char *s)

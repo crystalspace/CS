@@ -213,6 +213,11 @@ csConfigManager::csConfigManager(iConfigFile *dyn, bool opt)
 
 csConfigManager::~csConfigManager()
 {
+  // save our config.
+  if (!Save()) {
+    printf("Couldn't save config to '%s'.\n",
+	    DynamicDomain->Cfg->GetFileName());
+  }
   CleanUp ();
 }
 
