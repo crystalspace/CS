@@ -28,8 +28,9 @@
 #endif
 
 #ifdef COMP_BC
-#define stricmp strcasecmp
-#define strnicmp strncasecmp
+#  ifndef __CSOSDEFS_H__
+#     error csosdefs.h should be included before win32.h
+#  endif
 #endif
 
 #include "csutil/scf.h"

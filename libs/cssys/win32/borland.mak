@@ -120,10 +120,10 @@ SRC.SYS_CSSYS_EXE=libs/cssys/win32/exeentry.cpp
 SRC.SYS_CSSYS_DLL=libs/cssys/win32/dllentry.cpp
 
 # The C compiler
-CC=bcc32 -c
+CC=bcc32 -c -DOS_WIN32
 
 # The C++ compiler
-CXX=bcc32 -c
+CXX=bcc32 -c -DOS_WIN32
 
 # The linker.
 LINK=bcc32
