@@ -1,5 +1,4 @@
 /*
-    Crystal Space graphics library: vector class interface
     Copyright (C) 1998,1999,2000 by Andrew Zabolotny <bit@eltech.ru>
 
     This library is free software; you can redistribute it and/or
@@ -17,12 +16,10 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-
 #ifndef __CS_RGB_VECTOR_H__
 #define __CS_RGB_VECTOR_H__
 
 #include "csextern.h"
-
 #include "csutil/array.h"
 #include "csgfx/rgbpixel.h"
 
@@ -35,10 +32,8 @@ class csRGBVector : public csArray<csRGBcolor*>
 {
 public:
   /// Compare two csRGBcolor structs.
-  static int Compare (void const* item1, void const* item2)
+  static int Compare (csRGBcolor* const& i1, csRGBcolor* const& i2)
   {
-    csRGBcolor* i1 = (csRGBcolor*)item1;
-    csRGBcolor* i2 = (csRGBcolor*)item2;
     if ((*i1)==(*i2))
       return 0;
     else if(i1->red < i2->red &&
@@ -50,20 +45,10 @@ public:
   }
 
   /// Compare a key (csRGBcolor struct) with a csRGBcolor struct
-  static int CompareKey (csRGBcolor* const& i1, void* key)
+  static int CompareKey (csRGBcolor* const& c, csRGBcolor const& key)
   {
-    const csRGBcolor* i2 = CS_REINTERPRET_CAST(const csRGBcolor*, key);
-
-    if ((*i1)==(*i2))
-      return 0;
-    else if(i1->red < i2->red &&
-	    i1->green < i2->green &&
-	    i1->blue < i2->blue)
-      return -1;
-    else
-      return 1;
+    return Compare(c, CS_CONST_CAST(csRGBcolor*,&key));
   }
-
 };
 
 #endif // __CS_RGB_VECTOR_H__

@@ -299,10 +299,10 @@ protected:
   {
   public:
     animVector () : csArray<csSprite2DUVAnimation*> (8, 16){}
-    static int CompareKey (csSprite2DUVAnimation* const& f1, void* key)
+    static int CompareKey (csSprite2DUVAnimation* const& item,
+			   char const* const& key)
     {
-      const char *f2 = (const char *)key;
-      return strcmp (f1->GetName (), f2);
+      return strcmp (item->GetName (), key);
     }
   };
 
@@ -358,7 +358,7 @@ public:
   }
   iSprite2DUVAnimation *GetUVAnimation (const char *name)
   {
-    int idx = vAnims.FindKey ((void*) name, vAnims.CompareKey);
+    int idx = vAnims.FindKey (name, vAnims.CompareKey);
     return (iSprite2DUVAnimation *)(idx != -1 ? vAnims.Get (idx) : 0);
   }
   iSprite2DUVAnimation *GetUVAnimation (int idx)

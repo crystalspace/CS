@@ -136,9 +136,9 @@ int csFontCache::KnownFontArrayCompareItems (
 }
 
 int csFontCache::KnownFontArrayCompareToKey (
-  KnownFont* const& item1, void* item2)
+  KnownFont* const& item1, iFont* const& item2)
 {
-  return ((iFont*)item1->font - (iFont*)item2);
+  return (item1->font - item2);
 }
 
 csFontCache::KnownFont* csFontCache::GetCachedFont (iFont* font)

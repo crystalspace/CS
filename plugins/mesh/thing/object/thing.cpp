@@ -1109,7 +1109,7 @@ void csThingStatic::FillRenderMeshes (
 
 int csThingStatic::FindPolygonByName (const char* name)
 {
-  return static_polygons.FindKey ((void*)name, static_polygons.CompareKey);
+  return static_polygons.FindKey (name, static_polygons.CompareKey);
 }
 
 int csThingStatic::GetRealIndex (int requested_index) const
@@ -2010,8 +2010,8 @@ struct MatPol
   csPolygon3D *poly;
 };
 
-static int ComparePointer (void const* item1,
-	void const* item2)
+static int ComparePointer (iMaterialWrapper* const& item1,
+			   iMaterialWrapper* const& item2)
 {
   if (item1 < item2) return -1;
   if (item1 > item2) return 1;
@@ -2714,8 +2714,8 @@ csRenderMesh **csThing::GetRenderMeshes (int &num, iRenderView* rview,
     for(i = 0; i < rmHolderList.Length(); i++)
     {
       rmH = rmHolderList[i];
-      csRenderMesh *m = rmH->renderMeshes[0];
-      if (rmH->renderMeshes.Length() == 0 || rmH->renderMeshes[0]->inUse == false)
+      if (rmH->renderMeshes.Length() == 0 ||
+	  rmH->renderMeshes[0]->inUse == false)
       {
         rmHolderListIndex = i;
         break;

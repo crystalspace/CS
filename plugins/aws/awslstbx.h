@@ -107,10 +107,10 @@ public:
   awsListRowVector () : local_sortcol (0) { }
 
   /// Compare two array elements in given Mode.
-  static int Compare (awsListRow* const& Item1, awsListRow* const& Item2);
+  static int Compare (awsListRow* const&, awsListRow* const&);
 
   /// Compare entry with a key.
-  static int CompareKey (awsListRow* const& Item, void* Key);
+  static int CompareKey (awsListRow* const&, iString* const& Key);
 
   /// Set the sort column.
   void SetSortCol (int sc) { local_sortcol = sc; }

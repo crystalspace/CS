@@ -49,24 +49,25 @@ protected:
     csEventJoystickData j;
   };
 
-  /* @@@ Not implemented, but prolly useful
+  /* @@@ Not implemented, but probably useful.
   int CompareModifiers (const csKeyModifiers& m1, 
-    const csKeyModifiers& m2, uint32 honorModifiers);*/
+    const csKeyModifiers& m2, uint32 honorModifiers) const;*/
+
 public:
   csInputDefinition ();
   csInputDefinition (iEvent* event);
 
   void SetHonoredModifiers (uint32 honorModifiers = CSMASK_ALLSHIFTS);
-  uint32 GetHonoredModifiers ();
+  uint32 GetHonoredModifiers () const;
 
   bool Parse (const char* string, bool useCooked = true);
-  csString GetDescription ();
+  csString GetDescription () const;
   bool FromEvent (iEvent* event, bool useCookedKey = true);
 
-  uint32 ComputeHash ();
+  uint32 ComputeHash () const;
   static uint32 ComputeEventHash (iEvent* event);
-  int Compare (const csInputDefinition& def);
-  int Compare (iEvent* event);
+  int Compare (csInputDefinition const&) const;
+  int Compare (iEvent*) const;
 };
 
 /**

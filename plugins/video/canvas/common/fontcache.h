@@ -154,7 +154,7 @@ protected:
   static int KnownFontArrayCompareItems (KnownFont* const& item1, 
     KnownFont* const& item2);
   static int KnownFontArrayCompareToKey (KnownFont* const& item1, 
-    void* item2);
+    iFont* const& item2);
 
   /// Cache canvas-dependent information for a specific font/glyph pair.
   virtual GlyphCacheData* InternalCacheGlyph (KnownFont* font,

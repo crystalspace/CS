@@ -1430,9 +1430,9 @@ bool VfsNode::GetFileSize (const char *Suffix, size_t &oSize)
 
 // ----------------------------------------------------------- VfsVector --- //
 
-int csVFS::VfsVector::Compare (void const* Item1, void const* Item2)
+int csVFS::VfsVector::Compare (VfsNode* const& Item1, VfsNode* const& Item2)
 {
-  return strcmp ((*(VfsNode **)Item1)->VPath, (*(VfsNode **)Item2)->VPath);
+  return strcmp (Item1->VPath, Item2->VPath);
 }
 
 // --------------------------------------------------------------- csVFS --- //

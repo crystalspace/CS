@@ -171,18 +171,18 @@ protected:
 
     static int CompareButton (tabEntry* const& te1, tabEntry* const& te2)
     {
-      return (te1->button < te2->button ? -1 : te1->button>te2->button ? 1 : 0);
+      return te1->button < te2->button ? -1 : te1->button>te2->button ? 1 : 0;
     }
 
-    static int CompareKeyComp (tabEntry* const& te1, void* Key)
+    static int CompareKeyComp (tabEntry* const& te1,
+			       iAwsComponent* const& comp)
     {
-      iAwsComponent *comp = (iAwsComponent *)Key;
       return (te1->comp < comp ? -1 : te1->comp > comp ? 1 : 0);
     }
 
-    static int CompareKeyButton (tabEntry* const& te1, void* Key)
+    static int CompareKeyButton (tabEntry* const& te1,
+				 awsNotebookButton* const& button)
     {
-      awsNotebookButton *button = (awsNotebookButton *)Key;
       return (te1->button < button ? -1 : te1->button > button ? 1 : 0);
     }
   };

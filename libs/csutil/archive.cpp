@@ -172,7 +172,7 @@ void csArchive::ReadDirectory ()
     {
       ArchiveEntry* f = CreateArchiveEntry(dname, 0, 0);
       f->faked = true;
-      dir.InsertSorted (f, dir.Compare);
+      dir.InsertSorted (f, ArchiveEntryVector::Compare);
     }
     free(dname); // Free string we allocated above and stored in `dset'.
   }
@@ -312,7 +312,7 @@ csArchive::ArchiveEntry *csArchive::InsertEntry (const char *name,
 {
   int dupentry;
   ArchiveEntry *e = new ArchiveEntry (name, cdfh);
-  dir.InsertSorted (e, dir.Compare, &dupentry);
+  dir.InsertSorted (e, ArchiveEntryVector::Compare, &dupentry);
   if (dupentry >= 0)
     dir.DeleteIndex (dupentry);
   return e;
@@ -351,7 +351,7 @@ void csArchive::Dir () const
 
 void *csArchive::FindName (const char *name) const
 {
-  int idx = dir.FindSortedKey ((void*)name, dir.CompareKey);
+  int idx = dir.FindSortedKey (name, ArchiveEntryVector::CompareKey);
   if (idx < 0)
     return 0;
   return dir.Get (idx);
@@ -462,7 +462,7 @@ char *csArchive::ReadEntry (FILE *infile, ArchiveEntry * f)
 void *csArchive::NewFile (const char *name, size_t size, bool pack)
 {
   DeleteFile (name);
-  int idx = lazy.FindKey ((void*)name, dir.CompareKey);
+  int idx = lazy.FindKey (name, ArchiveEntryVector::CompareKey);
   ArchiveEntry *f;
   if (idx >= 0)
   {
@@ -751,7 +751,7 @@ void csArchive::UpdateDirectory ()
   {
     ArchiveEntry *e = lazy.Get (n);
     e->FreeBuffer ();
-    dir.InsertSorted (e, dir.Compare);
+    dir.InsertSorted (e, ArchiveEntryVector::Compare);
     lazy.Put (n, 0);
   }
   lazy.DeleteAll ();
@@ -759,7 +759,7 @@ void csArchive::UpdateDirectory ()
 
 bool csArchive::IsDeleted (const char *name) const
 {
-  return (del.FindSortedKey ((char*)name) >= 0);
+  return (del.FindSortedKey (name) >= 0);
 }
 
 void csArchive::UnpackTime (ush zdate, ush ztime, csFileTime & rtime) const

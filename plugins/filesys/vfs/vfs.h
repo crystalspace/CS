@@ -116,7 +116,7 @@ private:
   class VfsVector : public csPDelArray<VfsNode>
   {
   public:
-    static int Compare (void const* Item1, void const* Item2);
+    static int Compare (VfsNode* const&, VfsNode* const&);
   } NodeList;
 
   // Current working directory (in fact, the automaticaly-added prefix path)

@@ -30,9 +30,6 @@
 #include <typeinfo>
 #endif
 
-/// This function prototype is used for Sort()
-typedef int ArraySortCompareFunction (void const* item1, void const* item2);
-
 /**
  * The default element handler for csArray.
  */
@@ -224,10 +221,24 @@ private:
   }
 
 public:
-  /// This function prototype is used for csArray::InsertSorted()
-  typedef int ArrayCompareFunction (T const& item1, T const& item2);
-  /// This function prototype is used for csArray::FindKey()
-  typedef int ArrayCompareKeyFunction (T const& item1, void* item2);
+  /**
+   * This default key comparison function is used by csArray::FindKey() in the
+   * simplest case when the key type is the same as the array element type.
+   */
+  int DefaultCompareKey(T const& record, T const& key)
+  {
+    if (record < key) return -1;
+    else if (record > key) return 1;
+    else return 0;
+  }
+
+  /// The default element comparison function for Sort() and InsertSorted().
+  static int DefaultCompare (T const &item1, T const &item2)
+  {
+    if (item1 < item2) return -1;
+    else if (item1 > item2) return 1;
+    else return 0;
+  }
 
   /**
    * Initialize object to have initial capacity of 'icapacity' elements, and to
@@ -402,14 +413,15 @@ public:
   /**
    * Find an element based on some key.
    */
-  int FindKey (void* key, ArrayCompareKeyFunction* comparekey) const
+  template <class K>
+  int FindKey (K const& key,
+    int (*comparekey)(T const&, K const&) = DefaultCompareKey) const
   {
     for (int i = 0 ; i < Length () ; i++)
       if (comparekey (root[i], key) == 0)
         return i;
     return -1;
   }
-
 
   /// Push an element onto the tail end of the array. Returns index of element.
   int Push (T const& what)
@@ -480,29 +492,14 @@ public:
     return sect;
   }
 
-  /// The default ArrayCompareFunction for InsertSorted()
-  static int DefaultCompare (T const &item1, T const &item2)
-  {
-    if (item1 < item2) return -1;
-    else if (item1 > item2) return 1;
-    else return 0;
-  }
-
-  /// The default ArrayCompareKeyFunction for FindKey()
-  static int DefaultCompareKey (T const &item1, void* p)
-  {
-    T const& item2 = *(T const*)p;
-    if (item1 < item2) return -1;
-    else if (item1 > item2) return 1;
-    else return 0;
-  }
-
   /**
-   * Find an element based on some key, using a csArrayCompareKeyFunction.
+   * Find an element based on some key, using a comparison function.
    * The array must be sorted. Returns -1 if element does not exist.
    */
-  int FindSortedKey (void* key, ArrayCompareKeyFunction* comparekey
-    = DefaultCompareKey, int* candidate = 0) const
+  template <class K>
+  int FindSortedKey (K const& key,
+    int (*comparekey)(T const&, K const&) = DefaultCompareKey,
+    int* candidate = 0) const
   {
     int m = 0, l = 0, r = Length () - 1;
     while (l <= r)
@@ -525,11 +522,12 @@ public:
   }
 
   /**
-   * Insert an element at a sorted position, using a csArrayCompareFunction.
-   * Assumes array is already sorted.
+   * Insert an element at a sorted position, using an element comparison
+   * function.  Assumes array is already sorted.
    */
-  int InsertSorted (const T &item, ArrayCompareFunction* compare
-    = DefaultCompare, int* equal_index = 0)
+  int InsertSorted (const T& item,
+    int (*compare)(T const&, T const&) = DefaultCompare,
+    int* equal_index = 0)
   {
     int m = 0, l = 0, r = Length () - 1;
     while (l <= r)
@@ -578,9 +576,10 @@ public:
   /**
    * Sort array.
    */
-  void Sort (ArraySortCompareFunction* compare)
+  void Sort (int (*compare)(T const&, T const&))
   {
-    qsort (root, Length (), sizeof (T), compare);
+    qsort (root, Length (), sizeof (T),
+      (int (*)(void const*, void const*))compare);
   }
 
   /**

@@ -51,7 +51,7 @@ class csParticlesPhysicsSimple : public iParticlesPhysics
 
   void StepPhysics (float elapsed_time, particles_object *part);
   particles_object *FindParticles(iParticlesObjectState *p);
-  static int ZSort(void const *item1, void const *item2);
+  static int ZSort(csParticlesData const&, csParticlesData const&);
 
 public:
   SCF_DECLARE_IBASE;

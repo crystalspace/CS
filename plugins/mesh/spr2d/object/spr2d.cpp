@@ -552,7 +552,7 @@ void csSprite2DMeshObject::PreGetShaderVariableValue (csShaderVariable* variable
     {
       size_t texelSize = sizeof (float) * vertices.Length() * 2;
       if (!texel_buffer.IsValid() ||
-	(texel_buffer->GetSize() != texelSize))
+	(size_t)texel_buffer->GetSize() != texelSize)
       {
 	texel_buffer.AttachNew (factory->g3d->CreateRenderBuffer (
 	  texelSize, CS_BUF_STATIC, 
@@ -577,7 +577,7 @@ void csSprite2DMeshObject::PreGetShaderVariableValue (csShaderVariable* variable
     {
       size_t color_size = sizeof (float) * vertices.Length() * 3;
       if (!color_buffer.IsValid() ||
-	(color_buffer->GetSize() != color_size))
+	(size_t)color_buffer->GetSize() != color_size)
       {
 	color_buffer.AttachNew (factory->g3d->CreateRenderBuffer (
 	  color_size, CS_BUF_STATIC, 
@@ -600,7 +600,7 @@ void csSprite2DMeshObject::PreGetShaderVariableValue (csShaderVariable* variable
     {
       size_t vertices_size = sizeof (float) * vertices.Length() * 3;
       if (!vertex_buffer.IsValid() ||
-	(vertex_buffer->GetSize() != vertices_size))
+	(size_t)vertex_buffer->GetSize() != vertices_size)
       {
 	vertex_buffer.AttachNew (factory->g3d->CreateRenderBuffer (
 	  vertices_size, CS_BUF_STATIC, 

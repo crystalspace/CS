@@ -431,11 +431,10 @@ csParticlesPhysicsSimple::particles_object*
   return NULL;
 }
 
-int csParticlesPhysicsSimple::ZSort (void const *item1, void const *item2)
+int csParticlesPhysicsSimple::ZSort (csParticlesData const& i1,
+				     csParticlesData const& i2)
 {
-  csParticlesData* i1 = (csParticlesData*)item1;
-  csParticlesData* i2 = (csParticlesData*)item2;
-  if (i1->sort < i2->sort) return 1;
+  if (i1.sort < i2.sort) return 1;
   return -1;
 }
 

@@ -262,8 +262,8 @@ void csGenericRenderStep::Perform (iRenderView* rview, iSector* sector,
 
   //construct a cameraplane
   csVector4 fogPlane;
-  iPortal *lastPortal = rview->GetLastPortal();
-  /*if(lastPortal)
+  /*iPortal *lastPortal = rview->GetLastPortal();
+  if(lastPortal)
   {
     csPlane3 plane;
     lastPortal->ComputeCameraPlane(rview->GetCamera()->GetTransform(), plane);

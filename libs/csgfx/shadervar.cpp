@@ -57,8 +57,8 @@ csShaderVariable& csShaderVariable::operator= (csShaderVariable& copyFrom)
 	copyFrom.GetValue (val);  SetValue (val);
       }
       break;
-    case FLOAT:
-    case COLOR:
+    case FLOAT: // Stored in VectorValue.
+    case COLOR: // Ditto.
     case VECTOR2:
     case VECTOR3:
     case VECTOR4:
@@ -66,6 +66,12 @@ csShaderVariable& csShaderVariable::operator= (csShaderVariable& copyFrom)
 	csVector4 v; 
 	copyFrom.GetValue (v); SetValue (v);
 	Type = copyFrom.Type;
+      }
+      break;
+    case MATRIX:
+      {
+	csMatrix3 v;
+	copyFrom.GetValue(v); SetValue(v);
       }
       break;
   }

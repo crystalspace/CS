@@ -87,12 +87,8 @@ void csRenderMeshList::Empty ()
   }
 }
 
-static int SortMeshMaterial (void const* item1,
-                             void const* item2)
+static int SortMeshMaterial (csRenderMesh* const& m1, csRenderMesh* const& m2)
 {
-  csRenderMesh* m1 = *(csRenderMesh**) item1;
-  csRenderMesh* m2 = *(csRenderMesh**) item2;
-
   if (m1->portal != 0 && m2->portal == 0)
     return 1;
   else if (m2->portal != 0 && m1->portal == 0)
@@ -111,34 +107,26 @@ static int SortMeshMaterial (void const* item1,
   return 0;
 }
 
-static int SortMeshBack2Front (void const* item1,
-                        void const* item2)
+static int SortMeshBack2Front(csRenderMesh* const& m1, csRenderMesh* const& m2)
 {
-  csRenderMesh* m1 = *(csRenderMesh**) item1;
-  csRenderMesh* m2 = *(csRenderMesh**) item2;
-
   const csReversibleTransform& t1 = m1->object2camera;
   const csReversibleTransform& t2 = m2->object2camera;
   if (t1.GetOrigin ().z < t2.GetOrigin().z)
     return -1;
   else if (t1.GetOrigin ().z > t2.GetOrigin().z)
     return 1;
-  return SortMeshMaterial (item1, item2);
+  return SortMeshMaterial (m1, m2);
 }
 
-static int SortMeshFront2Back (void const* item1,
-                        void const* item2)
+static int SortMeshFront2Back(csRenderMesh* const& m1, csRenderMesh* const& m2)
 {
-  csRenderMesh* m1 = *(csRenderMesh**) item1;
-  csRenderMesh* m2 = *(csRenderMesh**) item2;
-
   const csReversibleTransform& t1 = m1->object2camera;
   const csReversibleTransform& t2 = m2->object2camera;
   if (t1.GetOrigin ().z < t2.GetOrigin().z)
     return 1;
   else if (t1.GetOrigin ().z > t2.GetOrigin().z)
     return -1;
-  return SortMeshMaterial (item1, item2);
+  return SortMeshMaterial (m1, m2);
 }
 
 int csRenderMeshList::SortMeshLists ()

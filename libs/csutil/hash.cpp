@@ -19,23 +19,23 @@
 #include "cssysdef.h"
 #include "csutil/hash.h"
 
-inline uint32 rotate_bits_right_3 (uint32 h)
+inline unsigned int rotate_bits_right_3 (unsigned int h)
 {
   return (h >> 3) | (h << 29);
 }
 
-uint32 csHashCompute (char const* s, int n)
+unsigned int csHashCompute (char const* s, int n)
 {
-  uint32 h = 0;
+  unsigned int h = 0;
   char const* slim = s + n;
   while (s < slim)
     h = rotate_bits_right_3(h) + *s++;
   return h;
 }
 
-uint32 csHashCompute (char const* s)
+unsigned int csHashCompute (char const* s)
 {
-  uint32 h = 0;
+  unsigned int h = 0;
   while (*s != 0)
     h = rotate_bits_right_3(h) + *s++;
   return h;

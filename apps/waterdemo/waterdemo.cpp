@@ -182,9 +182,7 @@ void csWaterDemo::SetupFrame ()
     return;
   console->Draw2D ();
 
-  //
   //Display a little very informative message.
-  iTextureManager* txtmgr = r3d->GetTextureManager ();
   int glyphWidth, glyphHeight;
   font->GetMaxSize (glyphWidth, glyphHeight);
   int white = r3d->GetDriver2D ()->FindRGB (255, 255, 255);

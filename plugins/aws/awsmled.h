@@ -45,12 +45,12 @@ protected:
   public:
     static int Compare (mlEvent* const& Item1, mlEvent* const& Item2)
     {
-      return (Item1->inputDef.Compare (Item2->inputDef));
+      return Item1->inputDef.Compare (Item2->inputDef);
     }
 
-    static int CompareEvent (mlEvent* const& Item, void* Key)
+    static int CompareEvent (mlEvent* const& Item, iEvent* const& Key)
     {
-      return (Item->inputDef.Compare ((iEvent*)Key));
+      return Item->inputDef.Compare (Key);
     }
 
     bool Add (const csInputDefinition &e, void (awsMultiLineEdit::*ring) ())

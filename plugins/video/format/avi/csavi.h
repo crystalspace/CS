@@ -91,9 +91,8 @@ class csAVIFormat : public iStreamFormat
       {
         return (i1->id < i2->id ? -1 : i1->id > i2->id ? 1 : 0);
       }
-      static int CompareKey (StreamIdx* const& i1, void* key)
+      static int CompareKey (StreamIdx* const& i1, uint32 const& id)
       {
-	uint32 id = (uint32)key;
         return (i1->id < id ? -1 : i1->id > id ? 1 : 0);
       }
     };

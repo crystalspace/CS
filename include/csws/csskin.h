@@ -120,6 +120,7 @@ public:
 
 /*
   @@@ Hack:
+  When CS_CSWS_EXPORT is configured for exporting from a shared library,
   VC refuses to compile csSkin if it inherits from 
   csPDelArray<csSkinSlice>, as csSkinSlice contains abstract methods.
   Work around this by inheriting from csSkinSliceNonAbstr instead which
@@ -127,6 +128,7 @@ public:
  */
 class CS_CSWS_EXPORT csSkinSliceNonAbstr : public csSkinSlice
 {
+public:
   virtual const char *GetName () const { return 0; };
   virtual void Draw (csComponent &This) {};
 };
@@ -172,10 +174,11 @@ public:
   virtual ~csSkin () { }
 
   /// Compare a item from this array with some key
-  static int CompareKey (csSkinSlice* const& Item, void* Key);
+  static int CompareKey (csSkinSliceNonAbstr* const&, char const* const& Key);
 
   /// Compare two items from this array
-  static int Compare (csSkinSlice* const& Item1, csSkinSlice* const& Item2);
+  static int Compare (csSkinSliceNonAbstr* const&,
+		      csSkinSliceNonAbstr* const&);
 
   /// Apply this skin to some component and all components inserted into it
   void Apply (csComponent *iComp);
@@ -187,11 +190,12 @@ public:
   virtual void Deinitialize ();
 
   /// Utility function: get a skin-specific string from csws config file
-  const char *GetConfigStr (const char *iSection, const char *iKey, const char *iDefault);
+  const char *GetConfigStr (const char *iSection, const char *iKey,
+			    const char *iDefault);
   /// Same but get a boolean value
   bool GetConfigYesNo (const char *iSection, const char *iKey, bool iDefault);
 
-  /// Utility function: read background from given section with given key prefix
+  /// Utility: Read background from given section with given key prefix.
   void Load (csBackground &oBack, const char *iSection, const char *iPrefix);
 
 private:
@@ -343,8 +347,7 @@ public:
  * name, e.g. "Button", "Window" and so on.
  */
 #define CSWS_SKIN_SLICE(comp)	\
-      InsertSorted ((csSkinSliceNonAbstr*)new cs##comp##Skin, \
-	(csSkin::ArrayCompareFunction*)Compare);
+      InsertSorted ((csSkinSliceNonAbstr*)new cs##comp##Skin, Compare);
 
 /**
  * Finish the definition of a skin.

@@ -158,7 +158,7 @@ csSparseGrid::csGridRow::csGridRow (int theCol)
 
 void csSparseGrid::csGridRow::SetAt (int col, void* data)
 {
-  int key = FindSortedKey ((void*)col, CompareKey);
+  int key = FindSortedKey (col, CompareKey);
   if (key == -1 && data)
     key = InsertSorted (new csGridRowEntry (col, data), Compare);
   else
@@ -169,14 +169,15 @@ void csSparseGrid::csGridRow::SetAt (int col, void* data)
 }
 
 int csSparseGrid::csGridRow::Compare (csGridRowEntry* const& Item1,
-	csGridRowEntry* const& Item2)
+				      csGridRowEntry* const& Item2)
 {
   return (Item1->col < Item2->col ? -1 : Item1->col > Item2->col ? 1 : 0);
 }
 
-int csSparseGrid::csGridRow::CompareKey (csGridRowEntry* const& Item1, void* Key)
+int csSparseGrid::csGridRow::CompareKey (csGridRowEntry* const& Item1,
+					 int const& Key)
 {
-  return (Item1->col < (int)Key ? -1 : Item1->col > (int)Key ? 1 : 0);
+  return (Item1->col < Key ? -1 : Item1->col > Key ? 1 : 0);
 }
 
 /******************************************************************************

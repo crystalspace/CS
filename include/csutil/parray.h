@@ -53,21 +53,19 @@ public:
 template <class T>
 class csPDelArray : public csArray<T*, csPDelArrayElementHandler<T*> >
 {
-private:
-  csPDelArray (const csPDelArray&) {}
-  csPDelArray& operator= (const csPDelArray&) { return *this; }
-
   typedef csArray<T*, csPDelArrayElementHandler<T*> > superclass;
+
+private:
+  csPDelArray (const csPDelArray&);            // Illegal; unimplemented.
+  csPDelArray& operator= (const csPDelArray&); // Illegal; unimplemented.
 
 public:
   /**
    * Initialize object to hold initially 'ilimit' elements, and increase
    * storage by 'ithreshold' each time the upper bound is exceeded.
    */
-  csPDelArray (int ilimit = 0, int ithreshold = 0)
-  	: csArray<T*, csPDelArrayElementHandler<T*> > (ilimit, ithreshold)
-  {
-  }
+  csPDelArray (int ilimit = 0, int ithreshold = 0) :
+    csArray<T*, csPDelArrayElementHandler<T*> > (ilimit, ithreshold) {}
 
   /**
    * Get and clear the element 'n' from vector. This spot in the array
@@ -129,7 +127,41 @@ public:
   {
     superclass::SetLength(n);
   }
+
+  /// Find an element based on some key.
+  template <class K>
+  int FindKey (K const& key, int(*comparekey)(T* const&, K const&)) const
+  {
+    return superclass::FindKey (key, comparekey);
+  }
+
+  /**
+   * Find an element based on some key, using a comparison function.
+   * The array must be sorted. Returns -1 if element does not exist.
+   */
+  template <class K>
+  int FindSortedKey (K const& key,
+    int (*comparekey)(T* const&, K const&), int* candidate = 0) const
+  {
+    return superclass::FindSortedKey (key, comparekey, candidate);
+  }
+
+  /**
+   * Insert an element at a sorted position, using an element comparison
+   * function.  Assumes array is already sorted.
+   */
+  int InsertSorted (T const* item,
+    int (*compare)(T* const&, T* const&),
+    int* equal_index = 0)
+  {
+    return superclass::InsertSorted((T*)item, compare, equal_index);
+  }
+
+  /// Sort array.
+  void Sort (int (*compare)(T* const&, T* const&))
+  {
+    superclass::Sort(compare);
+  }
 };
 
 #endif // __CS_PTRARR_H__
-

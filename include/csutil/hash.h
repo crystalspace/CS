@@ -28,7 +28,7 @@
  * Note that these keys are non-unique; some dissimilar strings may generate
  * the same key. For unique keys, see csStringSet.
  */
-CS_CSUTIL_EXPORT uint32 csHashCompute (char const*);
+CS_CSUTIL_EXPORT unsigned int csHashCompute (char const*);
 
 /**
  * Compute a hash key for a string of a given length.
@@ -36,7 +36,7 @@ CS_CSUTIL_EXPORT uint32 csHashCompute (char const*);
  * Note that these keys are non-unique; some dissimilar strings may generate
  * the same key. For unique keys, see csStringSet.
  */
-CS_CSUTIL_EXPORT uint32 csHashCompute (char const*, int length);
+CS_CSUTIL_EXPORT unsigned int csHashCompute (char const*, int length);
 
 /**
  * A hash key handler for integral types and types that can be casted to such.
@@ -45,9 +45,9 @@ template <class T>
 class csIntegralHashKeyHandler
 {
 public:
-  static uint32 ComputeHash (const T& key)
+  static unsigned int ComputeHash (const T& key)
   {
-    return (uint32)key;
+    return (unsigned int)key;
   }
 
   static bool CompareKeys (const T& key1, const T& key2)
@@ -60,7 +60,7 @@ public:
  * A generic hash table class,
  * which grows dynamically and whose buckets are unsorted arrays.
  */
-template <class T, class K = uint32, 
+template <class T, class K = unsigned int, 
   class KeyHandler = csIntegralHashKeyHandler<K> > 
 class csHash
 {

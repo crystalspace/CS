@@ -477,7 +477,7 @@ void csInputDefinition::SetHonoredModifiers (uint32 honorModifiers)
   modifiersHonored = honorModifiers;
 }
 
-uint32 csInputDefinition::GetHonoredModifiers ()
+uint32 csInputDefinition::GetHonoredModifiers () const
 {
   return modifiersHonored;
 }
@@ -549,7 +549,7 @@ bool csInputDefinition::Parse (const char* string, bool useCooked)
   return true;
 }
 
-csString csInputDefinition::GetDescription ()
+csString csInputDefinition::GetDescription () const
 {
   // @@@ Implement me
   return "";
@@ -634,7 +634,7 @@ bool csInputDefinition::FromEvent (iEvent* event, bool useCookedKey)
   return false;
 }
 
-uint32 csInputDefinition::ComputeHash ()
+uint32 csInputDefinition::ComputeHash () const
 {
   // @@@ Implement me
   return 0;
@@ -656,7 +656,7 @@ static utf32_char RawToCooked (utf32_char raw)
   return 0;
 }
 
-int csInputDefinition::Compare (const csInputDefinition& def)
+int csInputDefinition::Compare (const csInputDefinition& def) const
 {
   int d = containedType - def.containedType;
   
@@ -747,7 +747,7 @@ int csInputDefinition::Compare (const csInputDefinition& def)
   return d;
 }
 
-int csInputDefinition::Compare (iEvent* event)
+int csInputDefinition::Compare (iEvent* event) const
 {
   /*
     @@@ Very similar to Compare (const csInputDefinition&)

@@ -567,7 +567,7 @@ void cspFileDialog::Reread ()
     }
   }
 
-  dirs.Sort (&csStringArray::CaseInsensitiveCompareSort);
+  dirs.Sort (false);
   for (i = 0, n = dirs.Length(); i < n; i++)
   {
     csListBoxItem *lbi = new csListBoxItem (dp, dirs.Get(i));
@@ -575,7 +575,7 @@ void cspFileDialog::Reread ()
     lbi->SetOffset (level * 6);
   }
 
-  files.Sort (&csStringArray::CaseInsensitiveCompareSort);
+  files.Sort (false);
   for (i = 0, n = files.Length(); i < n; i++)
     (void)new csListBoxItem (fp, files.Get(i));
 

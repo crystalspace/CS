@@ -207,7 +207,8 @@ private:
     unsigned int priority;
   };
 
-  static int CompareTechniqueKeeper(void const* item1, void const* item2);
+  static int CompareTechniqueKeeper(techniqueKeeper const&,
+				    techniqueKeeper const&);
   
   // load one technique, and create shader from it
   csPtr<csXMLShader> CompileTechnique (iDocumentNode *node, 

@@ -581,19 +581,19 @@ This could be transformed roughly to the following class:
 class MyVector : public csPDelArray<MyType>
 @{
 public:
-  static int Compare (MyType const* i1, MyType const* i2)
+  static int Compare (MyType const& i1, MyType const& i2)
   @{
     @dots{}
   @}
-  static int CompareKey (MyType const* i, void* key)
+  static int CompareKey (MyType const& i, MyKey const& key)
   @{
     @dots{}
   @}
 @};
 @end example
 
-In the calls to @code{InsertSorted()}, @code{FindKey()}, etc., you would then
-pass in one of the static functions to use.
+In the calls to @code{InsertSorted()}, @code{FindKey()}, etc., you then
+pass in one of the static functions to drive the comparison.
 
 @subheading Hash and Set Templates
 @cindex @code{csHash}

@@ -60,7 +60,7 @@ public:
   void FreeItem (csPolygon3DStatic* Item);
 
   /// Find a polygon by name
-  static int CompareKey (csPolygon3DStatic* const& Item, void* Key);
+  static int CompareKey (csPolygon3DStatic* const&, char const* const& Key);
 };
 
 /**

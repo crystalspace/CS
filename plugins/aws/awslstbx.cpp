@@ -89,7 +89,8 @@ int awsListRowVector::sortcol = 0;
 int awsListRowVector::Compare (awsListRow* const& r1, awsListRow* const& r2)
 {
   if (r1->cols[sortcol].text && r2->cols[sortcol].text)
-    return strcmp (r1->cols[sortcol].text->GetData (), r2->cols[sortcol].text->GetData ());
+    return strcmp (r1->cols[sortcol].text->GetData (),
+		   r2->cols[sortcol].text->GetData ());
   else if (r1->cols[sortcol].text)
     return 1;
   else if (r2->cols[sortcol].text)
@@ -98,12 +99,10 @@ int awsListRowVector::Compare (awsListRow* const& r1, awsListRow* const& r2)
     return 0;
 }
 
-int awsListRowVector::CompareKey (
-  awsListRow* const& r1,
-  void* Key)
+int awsListRowVector::CompareKey (awsListRow* const& r1, iString* const& Key)
 {
   if (r1->cols[sortcol].text)
-    return strcmp (r1->cols[sortcol].text->GetData (), ((iString *)Key)->GetData ());
+    return strcmp (r1->cols[sortcol].text->GetData (), Key->GetData ());
   else
     return -1;
 }

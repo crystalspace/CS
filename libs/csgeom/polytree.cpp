@@ -168,11 +168,8 @@ void csPolygonTree::IntersectSphere (csArray<int>& polyidx,
   }
 }
 
-static int intsort (void const* item1,
-	void const* item2)
+static int intsort (int const& i1, int const& i2)
 {
-  int i1 = *(int*)item1;
-  int i2 = *(int*)item2;
   if (i1 < i2) return -1;
   else if (i2 < i1) return 1;
   else return 0;

@@ -119,7 +119,7 @@ csPtr<iBase> csSimpleFormerLoader::Parse (iDocumentNode* node,
         {
           synldr->ReportError ("crystalspace.terraformer.simple.loader",
             child, "Error reading in image file for heightmap '%s'", image);
-          return false;
+          return 0;
         }
         state->SetHeightmap (map);
         break;
@@ -131,7 +131,7 @@ csPtr<iBase> csSimpleFormerLoader::Parse (iDocumentNode* node,
         {
           synldr->ReportError ("crystalspace.terraformer.simple.loader",
             child, "Error parsing scale vector");
-          return false;
+          return 0;
         }
         state->SetScale (v);
         break;
@@ -143,7 +143,7 @@ csPtr<iBase> csSimpleFormerLoader::Parse (iDocumentNode* node,
         {
           synldr->ReportError ("crystalspace.terraformer.simple.loader",
             child, "Error parsing scale vector");
-          return false;
+          return 0;
         }
         state->SetOffset (v);
         break;

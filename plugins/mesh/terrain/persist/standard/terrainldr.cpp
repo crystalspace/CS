@@ -143,7 +143,7 @@ csPtr<iBase> csTerrainFactoryLoader::Parse (iDocumentNode* node,
         {
           synldr->ReportError ("crystalspace.terrain.factory.loader",
             child, "Error processing terrain scale");
-          return false;
+          return 0;
         }
 	state->SetScale (v);
         break;

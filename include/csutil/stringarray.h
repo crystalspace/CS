@@ -61,42 +61,34 @@ public:
   {
   }
 
-  static int CaseSensitiveCompareKey (char const* const& item1, void* p)
+  static int CaseSensitiveCompareKey (char const* const& s,
+				      char const* const& k)
   {
-    char const* item2 = (char const*)p;
+    return strcmp (s, k);
+  }
+
+  static int CaseInsensitiveCompareKey (char const* const& s,
+					char const* const& k)
+  {
+    return strcasecmp (s, k);
+  }
+
+  static int CaseSensitiveCompare (const char* const &item1,
+				   const char* const &item2)
+  {
     return strcmp (item1, item2);
   }
 
-  static int CaseInsensitiveCompareKey (char const* const& item1, void* p)
-  {
-    char const* item2 = (char const*)p;
-    return strcasecmp (item1, item2);
-  }
-
-  static int CaseSensitiveCompare (const char* const &item1, const char* const &item2)
-  {
-    return strcmp (item1, item2);
-  }
-
-  static int CaseInsensitiveCompare (const char* const &item1, const char* const &item2)
+  static int CaseInsensitiveCompare (const char* const &item1,
+				     const char* const &item2)
   {
     return strcasecmp (item1, item2);
   }
 
-  static int CaseSensitiveCompareSort (void const* item1, void const* item2)
-  {
-    return strcmp (*(char const**)item1, *(char const**)item2);
-  }
-
-  static int CaseInsensitiveCompareSort (void const* item1, void const* item2)
-  {
-    return strcasecmp (*(char const**)item1, *(char const**)item2);
-  }
-  
   /**
    * Sort array based on case sensitive string compare function.
    */
-  void Sort (ArraySortCompareFunction* compare)
+  void Sort (int (*compare)(char const* const&, char const* const&))
   {
     superclass::Sort (compare);
   }
@@ -104,17 +96,21 @@ public:
   /**
    * Sort array based on case sensitive string compare function.
    */
-  void Sort ()
+  void Sort (bool case_sensitive = true)
   {
-    superclass::Sort (CaseSensitiveCompareSort);
+    if (case_sensitive)
+      superclass::Sort (CaseSensitiveCompare);
+    else
+      superclass::Sort (CaseInsensitiveCompare);
   }
 
   /**
    * Find an element based on some key, using a csArrayCompareKeyFunction.
    * The array must be sorted. Returns -1 if element does not exist.
    */
-  int FindSortedKey (void* key, ArrayCompareKeyFunction* comparekey
-    = CaseSensitiveCompareKey, int* candidate = 0) const
+  int FindSortedKey (char const* key,
+    int (*comparekey)(char const* const& s, char const* const& k) =
+    CaseSensitiveCompareKey, int* candidate = 0) const
   {
     return superclass::FindSortedKey(key, comparekey, candidate);
   }
@@ -161,8 +157,9 @@ public:
    * Insert a string element at a sorted position, using a specialized
    * csArrayCompareFunction. Assumes array is already sorted.
    */
-  int InsertSorted (const char* const &newstr, ArrayCompareFunction* compare
-    = CaseSensitiveCompare, int* equal_index = 0)
+  int InsertSorted (const char* const &newstr,
+    int (*compare)(char const* const&, char const* const&) =
+    CaseSensitiveCompare, int* equal_index = 0)
   {
     return superclass::InsertSorted(newstr, compare, equal_index);
   }

@@ -98,11 +98,10 @@ protected:
   {
   public:
     frameVector () : csArray<csSprite2DUVAnimationFrame*> (8, 16){}
-    static int CompareKey (csSprite2DUVAnimationFrame* const& f1,
-    	void* key)
+    static int CompareKey (csSprite2DUVAnimationFrame* const& item,
+			   char const* const& key)
     {
-      const char *f2 = (const char *)key;
-      return strcmp (f1->GetName (), f2);
+      return strcmp (item->GetName (), key);
     }
   };
 

@@ -105,7 +105,7 @@ public:
   /// Compare two hints (by csComponent's)
   static int Compare (void* const& Item1, void* const& Item2);
   /// Compare a hint with a csComponent
-  static int CompareKey (void* const& Item, void* key);
+  static int CompareKey (void* const& Item, csComponent* const& key);
   /// Add a new hint
   void Add (const char *iText, csComponent *iComp);
   /// Remove the hint (if any) associated with this component

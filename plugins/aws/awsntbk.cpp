@@ -1051,7 +1051,7 @@ void awsNotebookButtonBar::Activate (int idx)
 void awsNotebookButtonBar::ActivateTab (void *sk, iAwsSource *source)
 {
   awsNotebookButtonBar *bb = (awsNotebookButtonBar *)sk;
-  int idx = bb->vTabs.FindKey ((void*)source->GetComponent (),
+  int idx = bb->vTabs.FindKey ((awsNotebookButton*)source->GetComponent (),
   	bb->vTabs.CompareKeyButton);
   if (idx != -1 && bb->active != idx)
   {

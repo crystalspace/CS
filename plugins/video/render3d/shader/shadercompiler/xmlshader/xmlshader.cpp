@@ -90,15 +90,12 @@ bool csXMLShaderCompiler::Initialize (iObjectRegistry* object_reg)
   return true;
 }
 
-int csXMLShaderCompiler::CompareTechniqueKeeper (void const* item1,
-	void const* item2)
+int csXMLShaderCompiler::CompareTechniqueKeeper (
+  techniqueKeeper const& t1, techniqueKeeper const& t2)
 {
-  techniqueKeeper *t1, *t2;
-  t1 = (techniqueKeeper*) item1;
-  t2 = (techniqueKeeper*) item2;
-  if (t1->priority < t2->priority)
+  if (t1.priority < t2.priority)
     return 1;
-  else if (t1->priority > t2->priority)
+  else if (t1.priority > t2.priority)
     return -1;
   return 0;
 }

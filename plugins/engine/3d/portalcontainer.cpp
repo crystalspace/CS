@@ -751,6 +751,7 @@ bool csPortalContainer::DoPerspective (
   return true;
 }
 
+#ifndef CS_USE_NEW_RENDERER
 static void FillZBuf (
   const csPoly2D& poly,
   iRenderView *rview,
@@ -824,6 +825,7 @@ static void AddFogPolygon (
   g3d->SetRenderState (G3DRENDERSTATE_ZBUFFERMODE, CS_ZBUF_NONE);
   g3d->DrawFogPolygon (id, g3dpoly, fogtype);
 }
+#endif
 
 void csPortalContainer::DrawOnePortal (
   csPortal* po,

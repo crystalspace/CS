@@ -109,11 +109,9 @@ static int compare_bones (csMotionBone* const& mb1, csMotionBone* const& mb2)
   return id1-id2;
 }
 
-static int comparekey_bones (csMotionBone* const& mb, void* key)
+static int comparekey_bones (csMotionBone* const& mb, unsigned int const& key)
 {
-  unsigned int id1 = mb->GetHash ();
-  unsigned int id2 = (unsigned int)key;
-  return id1-id2;
+  return mb->GetHash() - key;
 }
 
 int csMotionTemplate::AddBone (const char* name)
@@ -128,7 +126,7 @@ int csMotionTemplate::AddBone (const char* name)
 
 int csMotionTemplate::FindBoneByName (const char* name)
 {
-  return bones.FindSortedKey ((void*)csHashCompute(name), comparekey_bones);
+  return bones.FindSortedKey (csHashCompute(name), comparekey_bones);
 }
 
 //TODO Make sure bones are sorted by time
@@ -456,24 +454,22 @@ bool csMotionManager::Initialize (iObjectRegistry* object_reg)
 }
 
 static int compare_motions (csMotionTemplate* const& mb1,
-	csMotionTemplate* const& mb2)
+			    csMotionTemplate* const& mb2)
 {
   unsigned int id1 = mb1->GetHash ();
   unsigned int id2 = mb2->GetHash ();
   return id1-id2;
 }
 
-static int comparekey_motions (csMotionTemplate* const& mb, void* key)
+static int comparekey_motions (csMotionTemplate* const& mb,
+			       unsigned int const& key)
 {
-  unsigned int id1 = mb->GetHash ();
-  unsigned int id2 = (unsigned int)key;
-  return id1-id2;
+  return mb->GetHash() - key;
 }
 
 csMotionTemplate* csMotionManager::FindMotionTemplateByName (const char* name)
 {
-  int index = motions.FindSortedKey ((void*)csHashCompute(name),
-  	comparekey_motions);
+  int index = motions.FindSortedKey (csHashCompute(name), comparekey_motions);
   if (index == -1)
     return 0;
   return motions.Get(index);
@@ -501,14 +497,15 @@ void csMotionManager::DeleteMotion( iMotionTemplate* motiontemp )
 }
 
 static int compare_skeleton (csMotionController* const& mb1,
-	csMotionController* const& mb2)
+			     csMotionController* const& mb2)
 {
   unsigned int id1 = (unsigned int)mb1->GetSkeleton ();
   unsigned int id2 = (unsigned int)mb2->GetSkeleton ();
   return id1-id2;
 }
 
-static int comparekey_skeleton (csMotionController* const& mb, void* key)
+static int comparekey_skeleton (csMotionController* const& mb,
+				iSkeletonBone* const& key)
 {
   unsigned int id1 = (unsigned int)mb->GetSkeleton ();
   unsigned int id2 = (unsigned int)key;
@@ -535,14 +532,14 @@ csMotionController* csMotionManager::AddMotionController (iSkeletonBone *skel)
   return mc;
 }
 
-void csMotionManager::DeleteController( iMotionController* inst )
+void csMotionManager::DeleteController(iMotionController* inst)
 {
   MOT_DPRINTF(("DeleteController(%p) %p\n", inst, inst->GetSkeleton()));
-
   controllers.Delete ((csMotionController*)inst);
 }
 
-void csMotionManager::UpdateController (csMotionController *controller, float timedelta)
+void csMotionManager::UpdateController (csMotionController *controller,
+					float timedelta)
 {
   controller->Update (timedelta);
 }

@@ -171,7 +171,7 @@ csWSTexVector::csWSTexVector () : csPDelArray<csWSTexture> (16, 16)
 {
 }
 
-int csWSTexVector::CompareKey (csWSTexture* const& Item, void* Key)
+int csWSTexVector::CompareKey (csWSTexture* const& t, char const* const& name)
 {
-  return strcmp (Item->GetName (), (char *)Key);
+  return strcmp (t->GetName (), name);
 }

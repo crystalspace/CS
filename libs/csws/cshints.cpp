@@ -204,10 +204,9 @@ int csHintManager::Compare (void* const& Item1, void* const& Item2)
   return (ts1->comp < ts2->comp) ? -1 : (ts1->comp > ts2->comp) ? +1 : 0;
 }
 
-int csHintManager::CompareKey (void* const& Item, void* key)
+int csHintManager::CompareKey (void* const& Item, csComponent* const& comp)
 {
   HintStore *ts = (HintStore *)Item;
-  csComponent *comp = (csComponent *)key;
   return (ts->comp < comp) ? -1 : (ts->comp > comp) ? +1 : 0;
 }
 
