@@ -1,7 +1,9 @@
 #ifndef __CS_MEMORY_MAPPED_IO__
 #define __CS_MEMORY_MAPPED_IO__
 
-#include "csutil/bitarray.h"
+#ifndef CS_HAS_MEMORY_MAPPED_IO
+ #include "csutil/bitarray.h"
+#endif
 
 /*******************************************************************
 
