@@ -1,5 +1,8 @@
 The history order has been reversed so that new features are at the top.
 
+28-Oct-2000
+	- Changed iCollideSystem::Collide to accept 'const' transform
+	  pointers.
 27-Oct-2000
 	- Added GetSector(idx) to the swig interface file (cs.i) so that
 	  Python scripts can use it.

@@ -149,8 +149,8 @@ csRAPIDCollider::~csRAPIDCollider(void)
 }
 
 bool csRAPIDCollider::Collide (csRAPIDCollider &otherCollider, 
-                               csTransform *pTransform1, 
-                               csTransform *pTransform2)
+                               const csTransform *pTransform1, 
+                               const csTransform *pTransform2)
 {
   csRAPIDCollider *pRAPIDCollider2 = (csRAPIDCollider *)&otherCollider;
   if (pRAPIDCollider2 == this) return false;

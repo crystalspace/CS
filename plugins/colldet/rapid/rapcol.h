@@ -93,8 +93,8 @@ public:
    * not false is returned.
    */
   bool Collide (csRAPIDCollider &pOtherCollider,
-                        csTransform *pThisTransform = NULL,
-                        csTransform *pOtherTransform = NULL);
+                        const csTransform *pThisTransform = NULL,
+                        const csTransform *pOtherTransform = NULL);
 
   /// Query the array with collisions (and their count).
   static csCollisionPair *GetCollisions ();

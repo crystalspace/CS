@@ -73,8 +73,8 @@ public:
    * This is only supported for iCollider objects created by
    * this plugin.
    */
-  virtual bool Collide (iCollider* collider1, csTransform* trans1,
-  	iCollider* collider2, csTransform* trans2);
+  virtual bool Collide (iCollider* collider1, const csTransform* trans1,
+  	iCollider* collider2, const csTransform* trans2);
 
   /**
    * Get pointer to current array of collision pairs.

@@ -69,8 +69,8 @@ struct iCollideSystem : public iPlugIn
    * with ResetCollisionPairs. Every call to Collide will
    * add to that array.
    */
-  virtual bool Collide (iCollider* collider1, csTransform* trans1,
-  	iCollider* collider2, csTransform* trans2) = 0;
+  virtual bool Collide (iCollider* collider1, const csTransform* trans1,
+  	iCollider* collider2, const csTransform* trans2) = 0;
 
   /**
    * Get pointer to current array of collision pairs.
