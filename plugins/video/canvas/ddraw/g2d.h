@@ -56,7 +56,7 @@ public:
   virtual bool GetDoubleBufferState ();
 
 protected:
-  static long FAR PASCAL WindowProc (HWND hWnd, UINT message,
+  static LRESULT CALLBACK WindowProc (HWND hWnd, UINT message,
     WPARAM wParam, LPARAM lParam);
 
   LPDIRECTDRAW m_lpDD;

@@ -414,7 +414,7 @@ private:
   iEventOutlet* EventOutlet;
   void SetWinCursor (HCURSOR);
   iEventOutlet* GetEventOutlet();
-  static long FAR PASCAL WindowProc (HWND hWnd, UINT message,
+  static LRESULT CALLBACK WindowProc (HWND hWnd, UINT message,
     WPARAM wParam, LPARAM lParam);
 #ifdef DO_DINPUT_KEYBOARD
   HANDLE m_hEvent;
@@ -742,7 +742,7 @@ static void WinKeyTrans (WPARAM wParam, bool down, iEventOutlet* outlet)
 }
 #endif
 
-long WINAPI Win32Assistant::WindowProc (HWND hWnd, UINT message,
+LRESULT CALLBACK Win32Assistant::WindowProc (HWND hWnd, UINT message,
   WPARAM wParam, LPARAM lParam)
 {
   switch (message)
@@ -763,7 +763,7 @@ long WINAPI Win32Assistant::WindowProc (HWND hWnd, UINT message,
       break;
     case WM_DESTROY:
       PostQuitMessage (0);
-      break;
+      return 0L;
 #ifndef DO_DINPUT_KEYBOARD
     case WM_SYSCHAR:
     case WM_CHAR:

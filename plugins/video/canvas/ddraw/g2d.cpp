@@ -132,8 +132,7 @@ bool csGraphics2DDDraw3::Open ()
   ASSERT (m_hWnd);
 
   // Subclass the window
-  m_OldWndProc = (WNDPROC)GetWindowLong (m_hWnd, GWL_WNDPROC);
-  SetWindowLong (m_hWnd, GWL_WNDPROC, (LONG)&WindowProc);
+  m_OldWndProc = (WNDPROC)(m_hWnd, GWL_WNDPROC, (LONG) WindowProc);
   SetWindowLong (m_hWnd, GWL_USERDATA, (LONG)this);
 
   // Decide whenever we allow windowed mode at all
@@ -808,7 +807,7 @@ bool csGraphics2DDDraw3::CreateIdentityPalette (csRGBpixel *p)
   return true;
 }
 
-long FAR PASCAL csGraphics2DDDraw3::WindowProc (HWND hWnd, UINT message,
+LRESULT CALLBACK csGraphics2DDDraw3::WindowProc (HWND hWnd, UINT message,
   WPARAM wParam, LPARAM lParam)
 {
   csGraphics2DDDraw3 *This = (csGraphics2DDDraw3 *)GetWindowLong (hWnd, GWL_USERDATA);
@@ -843,5 +842,5 @@ long FAR PASCAL csGraphics2DDDraw3::WindowProc (HWND hWnd, UINT message,
         return TRUE;
       break;
   }
-  return This->m_OldWndProc (hWnd, message, wParam, lParam);
+  return CallWindowProc (This->m_OldWndProc, hWnd, message, wParam, lParam);
 }
