@@ -501,15 +501,18 @@
 ; Example:
 ;   scanproc 32,scan_tex_zfil,0,scanloop_tex
 ;-----======xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx======-----
-%define		scanloop_tex_args 8
+%define		scanloop_tex_args 12
 %macro		scanloop_tex_init 0
 		tloc	%$and_w		; texture width mask
 		tloc	%$and_h		; texture height mask
+		tloc	%$paltable	; 8->32 conversion table
 
 		mov	eax,and_h
 		mov	ecx,and_w
+		mov	ebp,PaletteTable
 		mov	%$and_h,eax
 		mov	%$and_w,ecx
+		mov	%$paltable,ebp
 %endmacro
 %macro		scanloop_tex_body 0
 	%ifdef PIC
@@ -528,7 +531,7 @@
 
 ;  do
 ;  {
-;    *_dest++ = srcTex[((uu>>16)&ander_w) + ((vv>>shifter_h)&ander_h)];
+;    *_dest++ = Scan.PaletteTable[srcTex[((uu>>16)&ander_w) + ((vv>>shifter_h)&ander_h)]];
 ;    uu += duu;
 ;    vv += dvv;
 ;  }
@@ -541,13 +544,15 @@
 		and	ebp,%$and_w	; ebp = (uu >> 16) & and_w	; 6/2
 		and	edx,%$and_h	; edx = (vv >> shf_h) & and_h	; 6/2
 		add	ebp,edx						; 8
-		mov	edx,%$duu	; edx = duu			; 8
-		mov	ebp,[esi+ebp*4]					; 9
-		add	eax,edx						; 9
-		mov	[edi],ebp					; 10
-		add	edi,4						; 10
-		cmp	edi,%$destend					; 11
-		jb	%$sloop						; 11
+		xor	edx,edx						; 8
+		mov	dl,[esi+ebp]					; 9
+		mov	ebp,%$paltable					; 9
+		add	eax,%$duu					; 10/2
+		mov	dx,[ebp+edx*4]					; 10
+		mov	[edi],dx					; 12
+		add	edi,2						; 12
+		cmp	edi,%$destend					; 13
+		jb	%$sloop						; 13
 
 %$sexit:
 	%ifdef PIC

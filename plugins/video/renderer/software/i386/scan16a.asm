@@ -528,12 +528,12 @@
 ; ECX	shf_h		EBP	--//scratch//--
 ; EDX	--//scratch//--
 
-;  do									\
-;  {									\
-;    *_dest++ = Scan.PaletteTable[srcTex[((uu>>16)&ander_w) + ((vv>>shifter_h)&ander_h)]];\
-;    uu += duu;								\
-;    vv += dvv;								\
-;  }									\
+;  do
+;  {
+;    *_dest++ = Scan.PaletteTable[srcTex[((uu>>16)&ander_w) + ((vv>>shifter_h)&ander_h)]];
+;    uu += duu;
+;    vv += dvv;
+;  }
 ;  while (_dest <= _destend)
 %$sloop:	mov	edx,ebx		; edx = vv			; 0
 		mov	ebp,eax		; ebp = uu			; 0

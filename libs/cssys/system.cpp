@@ -793,6 +793,7 @@ void csSystemDriver::Help ()
   Printf (MSG_STDOUT, "  -help              this help\n");
   Printf (MSG_STDOUT, "  -mode=<w>x<y>      set resolution (default=%dx%d)\n", FrameWidth, FrameHeight);
   Printf (MSG_STDOUT, "  -depth=<d>         set depth (default=%d bpp)\n", Depth);
+  Printf (MSG_STDOUT, "  -[no]fs            use fullscreen videomode if available (default=%s)\n", FullScreen ? "yes" : "no");
   Printf (MSG_STDOUT, "  -video=<s>         the 3D rendering driver (opengl, glide, software, ...)\n");
   Printf (MSG_STDOUT, "  -canvas=<s>        the 2D canvas driver (asciiart, x2d, ...)\n");
   Printf (MSG_STDOUT, "  -plugin=<s>        load the plugin after all others\n");
