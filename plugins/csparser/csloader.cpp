@@ -120,6 +120,7 @@ CS_TOKEN_DEF_START
   CS_TOKEN_DEF (MATERIALS)
   CS_TOKEN_DEF (MATRIX)
   CS_TOKEN_DEF (MESHFACT)
+  CS_TOKEN_DEF (MESHLIB)
   CS_TOKEN_DEF (MESHOBJ)
   CS_TOKEN_DEF (MESHREF)
   CS_TOKEN_DEF (MOVE)
@@ -579,6 +580,8 @@ bool csLoader::LoadLibrary (char* buf)
     CS_TOKEN_TABLE (TEXTURES)
     CS_TOKEN_TABLE (MATERIALS)
     CS_TOKEN_TABLE (MESHFACT)
+    CS_TOKEN_TABLE (MESHOBJ)
+    CS_TOKEN_TABLE (MESHREF)
     CS_TOKEN_TABLE (SOUNDS)
   CS_TOKEN_TABLE_END
 
@@ -621,6 +624,37 @@ bool csLoader::LoadLibrary (char* buf)
           if (!LoadSounds (params))
             return false;
           break;
+        case CS_TOKEN_MESHREF:
+          {
+            iMeshWrapper* mesh = LoadMeshObjectFromFactory (params);
+            if (!mesh)
+	    {
+      	      ReportError (
+	      	  "crystalspace.maploader.load.meshobject",
+		  "Could not load mesh object '%s' in library!",
+		  name);
+	      return false;
+	    }
+	    mesh->QueryObject ()->SetName (name);
+	    Engine->GetMeshes ()->Add (mesh);
+	    //mesh->DecRef ();
+          }
+          break;
+        case CS_TOKEN_MESHOBJ:
+          {
+	    iMeshWrapper* mesh = Engine->CreateMeshWrapper (name);
+            if (!LoadMeshObject (mesh, params))
+	    {
+      	      ReportError (
+	      	  "crystalspace.maploader.load.meshobject",
+		  "Could not load mesh object '%s' in library!",
+		  name);
+	      mesh->DecRef ();
+	      return false;
+	    }
+	    //mesh->DecRef ();
+          }
+          break;
         case CS_TOKEN_MESHFACT:
           {
             iMeshFactoryWrapper* t = Engine->CreateMeshFactory (name);
@@ -630,9 +664,9 @@ bool csLoader::LoadLibrary (char* buf)
 	      {
 		t->DecRef ();
 		ReportError (
-			     "crystalspace.maploader.load.library.meshfactory",
-			     "Could not load mesh object factory '%s' in library!",
-			     name);
+		     "crystalspace.maploader.load.library.meshfactory",
+		     "Could not load mesh object factory '%s' in library!",
+		     name);
 		return false;
 	      }
 	      t->DecRef ();
@@ -2787,6 +2821,7 @@ iSector* csLoader::ParseSector (char* secname, char* buf)
     CS_TOKEN_TABLE (LIGHT)
     CS_TOKEN_TABLE (MESHOBJ)
     CS_TOKEN_TABLE (MESHREF)
+    CS_TOKEN_TABLE (MESHLIB)
     CS_TOKEN_TABLE (NODE)
     CS_TOKEN_TABLE (KEY)
   CS_TOKEN_TABLE_END
@@ -2865,6 +2900,38 @@ iSector* csLoader::ParseSector (char* secname, char* buf)
           mesh->GetMovable ()->SetSector (sector);
 	  mesh->GetMovable ()->UpdateMove ();
 	  mesh->DecRef ();
+        }
+        break;
+      case CS_TOKEN_MESHLIB:
+        {
+	  iMeshWrapper* mesh = Engine->GetMeshes ()->FindByName (name);
+	  if (!mesh)
+	  {
+      	    ReportError (
+	      	"crystalspace.maploader.load.meshobject",
+		"Could not find mesh object '%s' in sector '%s' for MESHLIB!",
+		name, secname ? secname : "<noname>");
+	    return NULL;
+	  }
+	  if (mesh->GetMovable ()->GetSectors ()->GetCount () > 0)
+	  {
+      	    ReportError (
+	      	"crystalspace.maploader.load.meshobject",
+		"Mesh '%s' is already in another sector in sector '%s'!",
+		name, secname ? secname : "<noname>");
+	    return NULL;
+	  }
+          if (!LoadMeshObject (mesh, params))
+	  {
+      	    ReportError (
+	      	"crystalspace.maploader.load.meshobject",
+		"Could not load mesh object '%s' in sector '%s'!",
+		name, secname ? secname : "<noname>");
+	    return NULL;
+	  }
+	  mesh->DeferUpdateLighting (CS_NLIGHT_STATIC|CS_NLIGHT_DYNAMIC, 10);
+          mesh->GetMovable ()->SetSector (sector);
+	  mesh->GetMovable ()->UpdateMove ();
         }
         break;
       case CS_TOKEN_LIGHT:

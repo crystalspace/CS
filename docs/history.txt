@@ -9,6 +9,54 @@ The history order is reversed so that new features are at the top.
 	  a high polygon count. Don't use it on an entire level because
 	  then the mesh will have to be clipped and this degrades performance
 	  again.
+	- Optimized the new DrawPolygonMesh() a little.
+	- It is now possible to also add mesh objects to libraries.
+	  Previously only mesh factory could be added. This means that you can
+	  now say MESHOBJ or MESHREF from within a LIBRARY. The meaning of
+	  this is a bit special. What will happen is that the mesh objects
+	  are created like they would have been created inside a sector. But
+	  they are not added to any sector. They are only added to the engine
+	  list of meshes (engine->GetMeshes()).
+	- Added a new keyword 'MESHLIB' that can be used in a sector to
+	  refer to a mesh object from a library. What this will do is try
+	  to find a mesh object with the given name from a previously loaded
+	  library. Then it will link that mesh object to that sector.
+	  Note that you can not duplicate objects this way. There is still
+	  only one mesh object and after you used MESHLIB to link it to a
+	  sector it is in use. Inside MESHLIB you can do everything that
+	  you can do in a MESHOBJ statement. So you can specify the MOVE
+	  or HARDMOVE for example. PARAMS and PLUGIN are also possible but
+	  should not be used as the mesh object is already defined in
+	  the library.
+	  This new feature is useful for creating worlds that are made
+	  from multiple libraries. For example, you can have a library for
+	  every building in your world and then make one world file that
+	  combines them all. This would look something like this:
+	    WORLD (
+	      ...
+	      LIBRARY '/lib/gamedata/building1' ()
+	      SECTOR 'building1Sector' (
+	        MESHLIB 'building1Obj' (
+		  HARDMOVE (...)
+		)
+	      )
+	      LIBRARY '/lib/gamedata/building2' ()
+	      SECTOR 'building2Sector' (
+	        MESHLIB 'building2ObjPart1' (
+		  HARDMOVE (...)
+		)
+	        MESHLIB 'building2ObjPart2' (
+		  HARDMOVE (...)
+		)
+	      )
+	      ...
+	    )
+	  In this example we have two libraries for two buildings. The
+	  first library contains a MESHOBJ with name 'building1Obj'.
+	  The sector that is defined after that will pick up that mesh object
+	  by using MESHLIB and then use HARDMOVE to position it elsewhere.
+	  The second library contains two mesh objects which are then put
+	  in the next sector.
 18-Feb-2002
 	- Added experimental code to allow video mode selection using
 	  AWS. This does not work yet and the API is subject to change
