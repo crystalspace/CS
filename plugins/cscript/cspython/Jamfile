@@ -56,9 +56,8 @@ if $(PYTHON.AVAILABLE) = "yes"
   #--------
   # pythmod -- Pure Python module
   #--------
-  Description pythmod : "pure Python module" ;
-
-  local desc = [ Description pythmod ] ;
+  local desc = "pure Python module" ;
+  Description pythmod : $(desc) ;
   Help pythmod : "Build the $(desc)" ;
 
   # Plugin rule above already invokes CompileObject for $(common). We do not
