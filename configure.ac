@@ -1628,22 +1628,6 @@ AS_IF([test $enable_plugins != yes], [CS_HEADER_PROPERTY([CS_STATIC_LINKED])])
 
 
 #------------------------------------------------------------------------------
-# Determine if smart pointer strictness should be enforced.
-#------------------------------------------------------------------------------
-AC_MSG_CHECKING([if enforcing smart pointer strictness])
-AC_ARG_ENABLE([strict-smart-pointers],
-    [AC_HELP_STRING([--enable-strict-smart-pointers],
-	[enable strict smart pointers (default YES); when enabled, csPtr<T>
-	returned from functions can only be assigned to csRef<T>; when
-	disabled, csPtr<T> can also be assigned to T*, but client is then
-	responsible for invoking DecRef()])], [], [enable_smart_pointers=yes])
-AC_MSG_RESULT([$enable_smart_pointers])
-AS_IF([test $enable_smart_pointers = yes],
-    [CS_HEADER_PROPERTY([CS_STRICT_SMART_POINTERS])])
-
-
-
-#------------------------------------------------------------------------------
 # Determine if extensive memory debugger should be enabled.
 #------------------------------------------------------------------------------
 AC_MSG_CHECKING([whether to use extensive memory debugger])

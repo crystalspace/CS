@@ -24,7 +24,7 @@
 
 template <class T> class csRef;
 
-#if defined(CS_STRICT_SMART_POINTERS) && defined(CS_DEBUG)
+#if defined(CS_DEBUG)
 #  define CS_TEST_VOIDPTRUSAGE
 #else
 #  undef CS_TEST_VOIDPTRUSAGE
@@ -72,10 +72,6 @@ public:
     ((csPtr<T>&)copy).obj = (T*)CS_VOIDED_PTR;
 #endif
   }
-
-#if !defined(CS_STRICT_SMART_POINTERS)
-  operator T* () const { return obj; }
-#endif
 };
 
 /**

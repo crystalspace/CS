@@ -100,6 +100,7 @@ PLUGINS += csparser/services
 PLUGINS += cssaver
 PLUGINS += sequence
 PLUGINS += engseq
+PLUGINS += documentsystem/xmlread
 
 PLUGINS.DYNAMIC += engine/iso
 PLUGINS.DYNAMIC += isoldr
@@ -153,7 +154,6 @@ endif
 
 PLUGINS.DYNAMIC += documentsystem/binary
 PLUGINS.DYNAMIC += documentsystem/xmltiny
-PLUGINS.DYNAMIC += documentsystem/xmlread
 PLUGINS.DYNAMIC += documentsystem/dsplex
 
 #PLUGINS.DYNAMIC += video/render3d/opengl

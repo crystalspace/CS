@@ -881,12 +881,6 @@ Optional Features:
                           `debug', `profile' (default OPTIMIZE)
   --enable-plugins        create plugin modules instead of static link
                           libraries (default YES)
-  --enable-strict-smart-pointers
-                          enable strict smart pointers (default YES); when
-                          enabled, csPtr<T> returned from functions can only
-                          be assigned to csRef<T>; when disabled, csPtr<T> can
-                          also be assigned to T*, but client is then
-                          responsible for invoking DecRef()
   --enable-extensive-memory-debugger
                           enable the extensive memory debugger which catches
                           common memory management mistakes (default NO)
@@ -21595,28 +21589,6 @@ cs_makefile_text="${cs_makefile_text}USE_PLUGINS = $enable_plugins
 "
 if test $enable_plugins != yes; then
   cs_header_text="${cs_header_text}#define CS_STATIC_LINKED
-"
-fi
-
-
-
-
-#------------------------------------------------------------------------------
-# Determine if smart pointer strictness should be enforced.
-#------------------------------------------------------------------------------
-echo "$as_me:$LINENO: checking if enforcing smart pointer strictness" >&5
-echo $ECHO_N "checking if enforcing smart pointer strictness... $ECHO_C" >&6
-# Check whether --enable-strict-smart-pointers or --disable-strict-smart-pointers was given.
-if test "${enable_strict_smart_pointers+set}" = set; then
-  enableval="$enable_strict_smart_pointers"
-
-else
-  enable_smart_pointers=yes
-fi;
-echo "$as_me:$LINENO: result: $enable_smart_pointers" >&5
-echo "${ECHO_T}$enable_smart_pointers" >&6
-if test $enable_smart_pointers = yes; then
-  cs_header_text="${cs_header_text}#define CS_STRICT_SMART_POINTERS
 "
 fi
 

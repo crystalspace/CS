@@ -39,6 +39,8 @@ The history order is reversed so that new features are at the top.
 	  auto-updating is disabled! Note that this is enabled by default.
 	- The csconout output console is also thread-safe under the
 	  same restrictions as simpcon.
+	- Removed the STRICT_SMART_POINTERS flag. This is now on in all cases.
+	  People should have converted to smart pointers by now.
 17-Apr-2003
 	- Fixed a bug in the common polygon buffer implementation where it
 	  was incrementing the ref count on poly_texture without testing if

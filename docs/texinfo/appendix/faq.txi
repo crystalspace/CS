@@ -380,61 +380,7 @@ instance instead. You can get this instance with @code{mesh->GetMeshObject()}.
 @strong{Q}: I do not understand when I have to use @code{DecRef()} and when
 not.  Can you explain this reference counting to me?
 
-@strong{A1}: This answer is not valid if CS_STRICT_SMART_POINTERS
-flag is set (which is set by default in recent versions of CS). If you
-have this flag set then refer to answer 2 of this question.
-Reference counting keeps track of how many times
-the object is referenced throughout the system. The owner of a reference
-is also responsible for cleaning up that reference later. You are not
-responsible for cleaning up references owned by other modules (like the
-engine). In general you should do @code{DecRef()} in the following
-cases:
-
-@itemize @bullet
-@item
-On the pointer returned by the following macros:
-@itemize @bullet
-@item
-@code{SCF_QUERY_INTERFACE()}
-@item
-@code{SCF_QUERY_INTERFACE_SAFE()}
-@item
-@code{CS_QUERY_REGISTRY()}
-@item
-@code{CS_QUERY_REGISTRY_TAG()}
-@item
-@code{CS_QUERY_REGISTRY_TAG_INTERFACE()}
-@item
-@code{CS_LOAD_PLUGIN()}
-@item
-@code{CS_QUERY_PLUGIN_ID()}
-@item
-@code{CS_QUERY_PLUGIN_CLASS()}
-@end itemize
-@item
-On a pointer on which you explicitly did @code{IncRef()}.
-@item
-On an object that you allocated yourselves (which inherits
-from @code{iBase} or another @sc{scf} interface).
-@end itemize
-
-You should do @code{DecRef()} when you no longer need the pointer.
-In some cases you can do it immediately after using the pointer like
-in this example:
-@example
-iThingState* st =
-  SCF_QUERY_INTERFACE (mesh->GetMeshObject (), iThingState);
-if (st)
-@{
-  st->blabla @dots{};
-  st->DecRef ();
-@}
-@end example
-
-In other cases you can store the pointer in a global class (your application
-class) and call @code{DecRef()} just before the application exits.
-
-@strong{A2}: In recent versions of Crystal Space we now have a new
+@strong{A}: In recent versions of Crystal Space we now have a new
 @code{csRef} class which implements a kind of smart pointer. Smart pointers
 make it easier for you to keep track of references. They will automatically
 @code{DecRef()} when they are ready. Here is an example of their usage:
@@ -447,15 +393,10 @@ if (st)
 @}
 @end example
 
-If you compare this to the last example in answer one you can see that
-the code is roughly the same. You can use the @samp{st} variable just like
+You can use the @samp{st} variable just like
 you would use the normal @code{iThingState} reference. The only difference
-is that you don't have to take care of calling @code{DecRef}.
-
-In very recent versions of CS the CS_STRICT_SMART_POINTERS flag is set
-which means that the only way to actually use the result of macros
-like @code{SCF_QUERY_INTERFACE} and others is to assign them to a
-@code{csRef}. @xref{HOWTO Smart Pointers}.
+with code that doesn't use smart pointers is that you don't have to take
+care of calling @code{DecRef}. @xref{HOWTO Smart Pointers}.
 
 @item
 @strong{Q}: My objects are rendered incorrectly.  It seems as if parts of it

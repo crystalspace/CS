@@ -183,20 +183,6 @@ view = new csView (@dots{});  // Don't do this!
 @emph{Never} use a @code{csPtr} to store something. @emph{Never} pass
 @code{csPtr} instances as parameters to some other function.
 
-@subsubheading What About STRICT_SMART_POINTERS?
-
-In @file{mk/user.mak} there is an option @samp{STRICT_SMART_POINTERS}.
-This option is currently no by default. When you set this to yes then
-it is no longer possible to assign @code{csPtr} to normal pointers.
-The only thing you can do with @code{csPtr} then is to assign it to
-a @code{csRef}. Since that is the intended use it is highly recommended
-that this flag is set to yes. Since Crystal Space itself is not yet
-smart pointer clean right now it has to be set to no.
-
-In future it is possible that @code{csPtr} is removed. Making sure
-you set that flag to yes will ensure that your code will not break
-when we make that change.
-
 @subsubheading To Clarify: What to do With a Function Return Value?
 
 In the current Crystal Space API there are now three possible return
@@ -214,11 +200,7 @@ The function returns a @code{csPtr}. In this case you can assign it
 to a @code{csRef} which will inherit the reference from the @code{csPtr} (i.e.
 the reference count is not incremented). When the @code{csRef} is destroyed
 the reference count is decremented. So functions returning @code{csPtr}
-actually transfer a reference to the caller. If @samp{STRICT_SMART_POINTERS}
-is NOT enabled then you can also assign the result of a @code{csPtr} returning
-function to a normal pointer. In that case nothing will happen and the
-caller is responsible for decrementing the reference count later. This
-corresponds to old style API usage.
+actually transfer a reference to the caller.
 @item
 The function returns a @code{csRef}. In this case you can assign
 it to another @code{csRef} which will work correctly with regards
@@ -247,9 +229,8 @@ it ignores the returned mesh wrapper:
 engine->CreateMeshWrapper (@dots{});	// Don't do this!
 @end example
 
-Note that if you have enabled @samp{STRICT_SMART_POINTERS} and you
-are in debug mode then CS will add a runtime test for this bad usage
-(i.e. your program will crash when you use something like the above).
+Note that if you are in debug mode then CS will add a runtime test for this
+bad usage (i.e. your program will crash when you use something like the above).
 
 @subsubheading Warning About IncRef and DecRef!
 
