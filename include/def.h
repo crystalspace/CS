@@ -26,6 +26,15 @@
 #include "types.h"
 #include "debug/memory.h"
 
+// Include volatile.h which contains the volatile configuration macros
+#if defined (WIN32_VOLATILE)
+#  include "cssys/win32/volatile.h"
+#elif defined (MACOS_VOLATILE)
+#  include "cssys/mac/volatile.h"
+#else
+#  include "volatile.h"
+#endif
+
 //---------------------------------------------------------------
 // Define the appropriate PROC_ flag for the current architecture
 // for NextStep/OpenStep/Rhapsody multi-architecture binary (MAB)
