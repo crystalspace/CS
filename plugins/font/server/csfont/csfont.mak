@@ -1,12 +1,13 @@
-DESCRIPTION.csfont = Andrews Amazing Font System (Crystal Space default font renderer)
+DESCRIPTION.csfont = Crystal Space default font renderer
 
-#-------------------------------------------------------------- rootdefines ---#
+#------------------------------------------------------------- rootdefines ---#
 ifeq ($(MAKESECTION),rootdefines)
 
-PLUGINHELP+=$(NEWLINE)echo $"  make csfont     Make the $(DESCRIPTION.csfont)$"
+PLUGINHELP += \
+  $(NEWLINE)echo $"  make csfont       Make the $(DESCRIPTION.csfont)$"
 
 endif # ifeq ($(MAKESECTION),rootdefines)
-#-------------------------------------------------------------- roottargets ---#
+#------------------------------------------------------------- roottargets ---#
 ifeq ($(MAKESECTION),roottargets)
 
 .PHONY: csfont csfontclean
@@ -17,7 +18,7 @@ csfont:
 	$(MAKE_TARGET) MAKE_DLL=yes
 
 endif # ifeq ($(MAKESECTION),roottargets)
-#-------------------------------------------------------------- postdefines ---#
+#------------------------------------------------------------- postdefines ---#
 ifeq ($(MAKESECTION),postdefines)
 
 CFLAGS.CSFONT+=
@@ -39,7 +40,7 @@ CFLAGS.STATIC_SCF+=$(CFLAGS.D)SCL_CSFONT
 endif
 
 endif # ifeq ($(MAKESECTION),postdefines)
-#------------------------------------------------------------------ targets ---#
+#----------------------------------------------------------------- targets ---#
 ifeq ($(MAKESECTION),targets)
 
 .PHONY: csfont csfontclean
@@ -67,4 +68,3 @@ else
 endif
 
 endif # ifeq ($(MAKESECTION),targets)
-
