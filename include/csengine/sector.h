@@ -209,6 +209,16 @@ public:
     { return &(meshes.scfiMeshList); }
 
   /**
+   * Register a mesh and all children to the visibility culler.
+   */
+  void RegisterMeshToCuller (iMeshWrapper* mesh);
+
+  /**
+   * Unregister a mesh and all children from the visibility culler.
+   */
+  void UnregisterMeshToCuller (iMeshWrapper* mesh);
+
+  /**
    * Prepare a mesh for rendering. This function is called for all meshes that
    * are added to the sector.
    */

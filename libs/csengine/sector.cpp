@@ -168,35 +168,50 @@ void csSector::CleanupReferences ()
 }
 
 //----------------------------------------------------------------------
+
+void csSector::RegisterMeshToCuller (iMeshWrapper* mesh)
+{
+  csRef<iVisibilityObject> vo (SCF_QUERY_INTERFACE (mesh,
+        iVisibilityObject));
+  culler->RegisterVisObject (vo);
+  int i;
+  iMeshList* ml = mesh->GetChildren ();
+  for (i = 0 ; i < ml->GetCount () ; i++)
+  {
+    iMeshWrapper* child = ml->Get (i);
+    RegisterMeshToCuller (child);
+  }
+}
+
+void csSector::UnregisterMeshToCuller (iMeshWrapper* mesh)
+{
+  csRef<iVisibilityObject> vo (SCF_QUERY_INTERFACE (mesh,
+        iVisibilityObject));
+  culler->UnregisterVisObject (vo);
+  int i;
+  iMeshList* ml = mesh->GetChildren ();
+  for (i = 0 ; i < ml->GetCount () ; i++)
+  {
+    iMeshWrapper* child = ml->Get (i);
+    UnregisterMeshToCuller (child);
+  }
+}
+
 void csSector::PrepareMesh (iMeshWrapper *mesh)
 {
   RenderQueues.Add (mesh);
-
-  if (culler)
-  {
-    csRef<iVisibilityObject> vo (SCF_QUERY_INTERFACE (
-        mesh,
-        iVisibilityObject));
-    culler->RegisterVisObject (vo);
-  }
+  if (culler) RegisterMeshToCuller (mesh);
 }
 
 void csSector::UnprepareMesh (iMeshWrapper *mesh)
 {
   RenderQueues.Remove (mesh);
-
-  if (culler)
-  {
-    csRef<iVisibilityObject> vo (SCF_QUERY_INTERFACE (
-        mesh,
-        iVisibilityObject));
-    culler->UnregisterVisObject (vo);
-  }
+  if (culler) UnregisterMeshToCuller (mesh);
 }
 
 void csSector::RelinkMesh (iMeshWrapper *mesh)
 {
-  // @@@ this function would be a lot faster of the previous
+  // @@@ this function would be a lot faster if the previous
   // priority was known!
   RenderQueues.RemoveUnknownPriority (mesh);
   RenderQueues.Add (mesh);
@@ -227,11 +242,9 @@ bool csSector::UseCuller (const char *meshname)
   int i;
   for (i = 0; i < meshes.Length (); i++)
   {
-    iMeshWrapper *th = meshes.Get (i);
-    th->GetMovable ()->UpdateMove ();
-
-    csRef<iVisibilityObject> vo (SCF_QUERY_INTERFACE (th, iVisibilityObject));
-    culler->RegisterVisObject (vo);
+    iMeshWrapper* m = meshes.Get (i);
+    m->GetMovable ()->UpdateMove ();
+    RegisterMeshToCuller (m);
   }
   return true;
 }
@@ -260,11 +273,9 @@ bool csSector::UseCullerPlugin (const char *plugname)
   int i;
   for (i = 0; i < meshes.Length (); i++)
   {
-    iMeshWrapper *th = meshes.Get (i);
-    th->GetMovable ()->UpdateMove ();
-
-    csRef<iVisibilityObject> vo (SCF_QUERY_INTERFACE (th, iVisibilityObject));
-    culler->RegisterVisObject (vo);
+    iMeshWrapper* m = meshes.Get (i);
+    m->GetMovable ()->UpdateMove ();
+    RegisterMeshToCuller (m);
   }
   return true;
 }
