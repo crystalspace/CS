@@ -329,7 +329,7 @@ void csGLPolygonRenderer::FogAccesor::PreGetValue (csShaderVariable *variable)
 {
   //get the variables we need
   csShaderVariable *sv;
-  CS_SHADERVAR_STACK& svStack = renderer->shadermanager->GetShaderVariableStack();
+  csShaderVarStack& svStack = renderer->shadermanager->GetShaderVariableStack();
 
   csMatrix3 transMatrix;
   csVector3 transVector;
