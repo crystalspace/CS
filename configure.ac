@@ -967,17 +967,18 @@ AS_IF([test $cs_cv_libgl = yes],
 # headers in /usr/include/directx.
 #------------------------------------------------------------------------------
 AC_CHECK_TYPE([int32], [AC_DEFINE([HAVE_TYPE_INT32])], [])
-CS_CHECK_BUILD([for DirectDraw], [cs_cv_libddraw],
+CS_CHECK_BUILD([for DirectX], [cs_cv_libdirectx],
     [AC_LANG_PROGRAM(
 	[@%:@if !HAVE_TYPE_INT32
 	typedef long int32;
 	@%:@endif
 	@%:@include <windows.h>
-	@%:@include <ddraw.h>],
-	[DirectDrawCreate(0,0,0)])],
+	@%:@include <ddraw.h>
+	@%:@include <dsound.h>],
+	[DirectDrawCreate(0,0,0); DirectSoundCreate(0,0,0)])],
     [CS_CREATE_TUPLE([],[],[-lddraw]) \
-    CS_CREATE_TUPLE([-I/usr/include/directx],[],[-lddraw])], [],
-    [CS_EMIT_BUILD_RESULT([cs_cv_libddraw], [DDRAW])])
+    CS_CREATE_TUPLE([-I/usr/include/directx],[],[-lddraw -ldsound])], [],
+    [CS_EMIT_BUILD_RESULT([cs_cv_libdirectx], [DIRECTX])])
 
 
 

@@ -20,6 +20,10 @@
 #ifndef __CS_CSSHLIB_H__
 #define __CS_CSSHLIB_H__
 
+#include "csutil/ref.h"
+#include "csutil/refarr.h"
+#include "iutil/strvec.h"
+
 typedef void* csLibraryHandle;
 
 /**
@@ -91,5 +95,17 @@ void csSetLoadLibraryVerbose(bool);
  * Query if failed dynamic library loads generate verbose messages.
  */
 bool csGetLoadLibraryVerbose();
+
+/**
+ * Scan a given directory for plugins and return a list of the plugin
+ * native file names and their respective metadata.
+ * \param dir Directory to scan.
+ * \param plugins Native file names.
+ * \param metadata Metadata.
+ * \return If any errors occured, a vector of error descriptions.
+ */
+csRef<iStrVector> csScanPluginsDir (const char* dir, 
+				    csRef<iStrVector>& plugins,
+				    csRefArray<iDocument>& metadata);
 
 #endif // __CS_CSSHLIB_H__

@@ -1,12 +1,12 @@
 SubDir TOP plugins video canvas directxcommon ;
 
-if $(DDRAW.AVAILABLE) = "yes"
+if $(DIRECTX.AVAILABLE) = "yes"
 {
 
 Library directxcommon
 	: [ Wildcard *.cpp *.h ]
 	: noinstall
 ;
-CFlags directxcommon : $(DDRAW.CFLAGS) ;
+CFlags directxcommon : $(DIRECTX.CFLAGS) ;
 
 }

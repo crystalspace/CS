@@ -62,7 +62,11 @@ actions GenerateStaticPluginRegistry
     sed 's:\\:\\\\:g;s:":\\":g;s:\(.*\):"\1":' < $x >>$(<)
     echo ";" >> $(<)
     echo "SCF_REGISTER_STATIC_LIBRARY($n,${n}_metainfo)" >>$(<)
-    sed '/<implementation>/!d;s:[ 	]*<implementation>\(..*\)</implementation>:  SCF_REGISTER_FACTORY_FUNC(\1):g' < $x >>$(<)
+#    sed '/<implementation>/!d;s:[ 	]*<implementation>\(..*\)</implementation>:  SCF_REGISTER_FACTORY_FUNC(\1):g' < $x >>$(<)
+    sed '/<implementation>/!d;s:[ 	]*<implementation>\(..*\)</implementation>:  #ifndef \1_FACTORY_REGISTERED \
+  #define \1_FACTORY_REGISTERED \
+    SCF_REGISTER_FACTORY_FUNC(\1) \
+  #endif:g' < $x >>$(<)
     echo "" >>$(<)
   done
 }

@@ -6,6 +6,23 @@ The history order is reversed so that new features are at the top.
 14-Jun-2003
 	- Jorrit got a fix from Arthur K. (nemerle@lsk.pl) for two memory
 	  leaks in AWS.
+	- res changed the way how SCF plugin scanning works:
+	    - Moved scanning invokation to scfInitialize().
+	    - A platform-dependent function, csScanPluginsDir(), returns
+	      plugin filenames and metadata.
+	    - Such a function is provided for Win32. For unix and macosx,
+	      the "old" function that scans for .csplugin files is used.
+	- res made the following changes:
+	    - The DirectDraw configure time test now also tests for 
+	      DirectSound, and thus changed the makefile var nomenclature to
+	      "DirectX".
+	    - Slight changed the way DLLs are loaded on Win32: now 
+	      LoadLibraryEx() is used with a flag which causes Windows to 
+	      first look for the actual file in the specified directory.
+	    - On Win32, plugin metadata is now contained inside the DLL.
+	- res worked around problems with static linking. Specifically, it was
+	  assumed that a factory function is always only used for a single
+	  class. This is not always the case (e.g. the bezier loader.)
 13-Jun-2003
 	- Oktal renamed the function AutoLoad slightly, to avoid conflict with
 	  the Windows API identifier of the same name, in perlpost.i.

@@ -16,6 +16,7 @@ PLUGINS += video/canvas/openglwin
 endif
 
 PLUGINS += sound/driver/waveoutsd
+PLUGINS += sound/renderer/ds3d
 
 #----------------------------------------------------------------- defines ---#
 ifeq ($(MAKESECTION),defines)
@@ -145,12 +146,15 @@ MAKEMETADATA = $(RUN_SCRIPT) $(SRCDIR)/libs/cssys/win32/mkmetadatares.sh
 #    $(COMMAND_DELIM) \
 # Also add $(OUT)/$(@:$(DLL)=-meta.rc) add the end of the $(MERGERES) command.
 
-DO.SHARED.PLUGIN.PREAMBLE += \
+DO.SHARED.PLUGIN.PREAMBLE = \
   $(MAKEVERSIONINFO) $(OUT)/$(@:$(DLL)=-version.rc) \
     "$(DESCRIPTION.$(TARGET.RAW))" \
     "$(SRCDIR)/include/csver.h" $(COMMAND_DELIM) \
+  $(MAKEMETADATA) $(OUT)/$(@:$(DLL)=-meta.rc) $(INF.$(TARGET.RAW.UPCASE)) \
+    $(COMMAND_DELIM) \
   $(MERGERES) $(OUT)/$(@:$(DLL)=-rsrc.rc) $(SRCDIR) $(SRCDIR) \
-    $(OUT)/$(@:$(DLL)=-version.rc) $($@.WINRSRC) $(COMMAND_DELIM) \
+    $(OUT)/$(@:$(DLL)=-version.rc) $($@.WINRSRC) $(OUT)/$(@:$(DLL)=-meta.rc) \
+    $(COMMAND_DELIM) \
   $(COMPILE_RES) -i $(OUT)/$(@:$(DLL)=-rsrc.rc) --include-dir "$(SRCDIR)/include" \
     -o $(OUT)/$(@:$(DLL)=-rsrc.o) $(COMMAND_DELIM) \
   echo "EXPORTS" > $(OUT)/$(TARGET.RAW).def $(COMMAND_DELIM) \

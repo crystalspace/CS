@@ -102,55 +102,9 @@ iObjectRegistry* csInitializer::CreateEnvironment (
   return reg;
 }
 
-// Scan a directory for .csplugin files
-static void ScanScfDir (const char* dir)
-{
-  struct dirent* de;
-  DIR* dh = opendir(dir);
-  if (dh != 0)
-  {
-    while ((de = readdir(dh)) != 0)
-    {
-      if (!isdir(dir, de))
-      {
-        int const n = strlen(de->d_name);
-        if (n >= 9 && strcasecmp(de->d_name + n - 9, ".csplugin") == 0)
-        {
-	  csString scffilepath;
-	  scffilepath << dir << PATH_SEPARATOR << de->d_name;
-	  csPhysicalFile file(scffilepath, "rb");
-	  csTinyDocumentSystem docsys;
-	  csRef<iDocument> doc = docsys.CreateDocument();
-	  char const* errmsg = doc->Parse(&file);
-	  if (errmsg == 0)
-	    scfInitialize(doc);
-	  else
-	    fprintf(stderr, "csInitializer::InitializeSCF: "
-	      "Error parsing %s: %s\n", scffilepath.GetData(), errmsg);
-        }
-      }
-    }
-    closedir(dh);
-  }
-}
-
 bool csInitializer::InitializeSCF ()
 {
   scfInitialize();
-
-#ifndef CS_STATIC_LINKED
-  // Search plugins in pluginpaths
-  char** pluginpaths = csGetPluginPaths ();
-  for (int i=0; pluginpaths[i]!=0; i++)
-  {
-    csString temp = pluginpaths[i];
-    temp += PATH_SEPARATOR;
-    csAddLibraryPath(temp);
-    ScanScfDir (pluginpaths[i]);
-    delete[] pluginpaths[i];
-  }
-  delete[] pluginpaths;
-#endif
 
   return true;
 }

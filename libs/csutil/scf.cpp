@@ -18,6 +18,7 @@
 */
 #include "cssysdef.h"
 #include "cssys/csshlib.h"
+#include "cssys/sysfunc.h"
 #include "csutil/csstring.h"
 #include "csutil/csvector.h"
 #include "csutil/memfile.h"
@@ -407,12 +408,59 @@ SCF_IMPLEMENT_IBASE (csSCF);
   SCF_IMPLEMENTS_INTERFACE (iSCF);
 SCF_IMPLEMENT_IBASE_END;
 
-void scfInitialize (iDocument* doc)
+void scfInitialize (char** pluginPaths, bool freePaths)
 {
   if (!PrivateSCF)
     PrivateSCF = new csSCF ();
-  if (doc)
-    PrivateSCF->RegisterClasses (doc);
+
+#ifndef CS_STATIC_LINKED
+  // Search plugins in pluginpaths
+  csRef<iStrVector> plugins;
+  csRefArray<iDocument> metadata;
+
+  if (!pluginPaths)
+  {
+    pluginPaths = csGetPluginPaths ();
+    freePaths = true;
+  }
+  for (int i=0; pluginPaths[i]!=0; i++)
+  {
+    csString temp = pluginPaths[i];
+    temp += PATH_SEPARATOR;
+    csAddLibraryPath(temp);
+
+    csRef<iStrVector> messages = 
+      csScanPluginsDir (pluginPaths[i], plugins, metadata);
+
+    if ((messages != 0) && (messages->Length() > 0))
+    {
+      fprintf(stderr,
+	"The following error(s) occured while scanning '%s':\n", pluginPaths[i]);
+      for (int j = 0; j < messages->Length(); j++)
+      {
+	fprintf(stderr,
+	  " %s\n", messages->Get (j));
+      }
+    }
+
+    for (int j = 0; j < metadata.Length(); j++)
+    {
+      PrivateSCF->RegisterClasses (metadata[j]);
+    }
+
+    if (freePaths) delete[] pluginPaths[i];
+  }
+  if (freePaths) delete[] pluginPaths;
+#else
+  if (pluginPaths && freePaths)
+  {
+    for (int i=0; pluginPaths[i]!=0; i++)
+    {
+      delete[] pluginPaths[i];
+    }
+    delete[] pluginPaths;
+  }
+#endif
 }
 
 csSCF::csSCF ()
@@ -621,7 +669,13 @@ bool csSCF::RegisterFactoryFunc (scfFactoryFunc Func, const char *FactClass)
         fact->CreateFunc = Func;
 	ok = true;
       }
-      break;
+      //break;
+      /*
+        Don't break!
+	Some factory functions are used for more than 1 class,
+	so EVERY factory class has to be checked...
+	Horribly inefficient!
+       */
     }
   }
   return ok;

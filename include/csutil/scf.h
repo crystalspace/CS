@@ -636,15 +636,22 @@ inline static scfInterfaceID Name##_scfGetID ()				\
   Interface##_scfGetID (), Interface##_VERSION)))
 
 /**
- * This function should be called to initialize client SCF library.  If you
- * provide an iDocument, the SCF-related registry section will be read from it.
- * The root node within the document should be named "plugin", and the
- * SCF-related information should be in a child node of the root named "scf".
+ * This function should be called to initialize client SCF library.  
+ * If a number of plugin paths are provided, the directories will be
+ * scanned for plugins and their SCF-related registry data will be retrieved.
+ * The root node within the registry data document should be named "plugin", 
+ * and the SCF-related information should be in a child node of the root 
+ * named "scf".
  * It is legal to call scfInitialize more than once (possibly providing a
- * different iDocument each time).  If you don't specify this parameter, this
- * argument is ignored.
+ * different set of directories each time).  
+ * \param pluginPaths Directories that will be scanned for plugins. If this
+ *   parameter is 0, the paths returned by csGetPluginPaths() will be scanned.
+ * \param freePaths If true, the items of freePaths and freePaths itself will
+ *   be delete[]d.
+ * \remark The path list is ignored for static builds. However, it will still
+ *   be delete[]d, if requested.
  */
-extern void scfInitialize (iDocument* = 0);
+extern void scfInitialize (char** pluginPaths = 0, bool freePaths = true);
 
 /**
  * This function checks whenever an interface is compatible with given version.

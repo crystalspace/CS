@@ -320,9 +320,15 @@ MSVC.MAKEVERRC.plugin  = $(MSVC.MAKEVERRC.COMMAND)
 MSVC.MAKEVERRC.library =
 MSVC.MAKEVERRC.group   =
 
+MSVC.MAKEMETARC.appgui  = 
+MSVC.MAKEMETARC.appcon  = 
+MSVC.MAKEMETARC.plugin  = $(MSVC.MAKEMETARC.COMMAND)
+MSVC.MAKEMETARC.library =
+MSVC.MAKEMETARC.group   =
+
 MSVC.MERGERC.appgui  = $(MSVC.MERGERC.COMMAND)
 MSVC.MERGERC.appcon  = $(MSVC.MERGERC.COMMAND)
-MSVC.MERGERC.plugin  = $(MSVC.MERGERC.COMMAND)
+MSVC.MERGERC.plugin  = $(MSVC.MERGERCMETA.COMMAND)
 MSVC.MERGERC.library =
 MSVC.MERGERC.group   =
 
@@ -360,6 +366,7 @@ MSVC.VERSIONRC.OUT.NAME = $(MSVC.OUT.DIR)/$(MSVC.PROJECT).$(MSVC.EXT.RESOURCES)
 MSVC.VERSIONRC.CVS = $(MSVC.VERSIONRC.CVS.$(DSP.$*.TYPE))
 MSVC.VERSIONRC.OUT = $(MSVC.VERSIONRC.OUT.$(DSP.$*.TYPE))
 MSVC.VERSIONRC.TEMP = $(MSVC.OUT.FRAGMENT)/version.tmp
+MSVC.METARC.TEMP = $(MSVC.OUT.FRAGMENT)/meta.tmp
 
 # Module name/description for project.rc.
 MSVC.VERSIONDESC = $(DESCRIPTION.$(DSP.$*.NAME))
@@ -367,12 +374,18 @@ MSVC.VERSIONDESC = $(DESCRIPTION.$(DSP.$*.NAME))
 # Command to generate the project.rc file.
 MSVC.MAKEVERRC.COMMAND = $(RUN_SCRIPT) $(SRCDIR)/libs/cssys/win32/mkverres.sh \
   '$(MSVC.VERSIONRC.TEMP)' '$(MSVC.VERSIONDESC)' '$(SRCDIR)/include/csver.h'
+MSVC.MAKEMETARC.COMMAND = $(RUN_SCRIPT) $(SRCDIR)/libs/cssys/win32/mkmetadatares.sh \
+  '$(MSVC.METARC.TEMP)' '$(INF.$*)'
 MSVC.MERGERC.COMMAND = $(RUN_SCRIPT) $(SRCDIR)/libs/cssys/win32/mergeres.sh \
   '$(MSVC.VERSIONRC.OUT)' '$(SRCDIR)' '../..' '$(MSVC.VERSIONRC.TEMP)' \
   '$($($*.EXE).WINRSRC)'
+MSVC.MERGERCMETA.COMMAND = $(RUN_SCRIPT) $(SRCDIR)/libs/cssys/win32/mergeres.sh \
+  '$(MSVC.VERSIONRC.OUT)' '$(SRCDIR)' '../..' '$(MSVC.VERSIONRC.TEMP)' \
+  '$($($*.EXE).WINRSRC)' '$(MSVC.METARC.TEMP)'
 
 # Command to generate the project.rc file for a given project.
 MSVC.MAKEVERRC = $(MSVC.MAKEVERRC.$(DSP.$*.TYPE))
+MSVC.MAKEMETARC = $(MSVC.MAKEMETARC.$(DSP.$*.TYPE))
 MSVC.MERGERC = $(MSVC.MERGERC.$(DSP.$*.TYPE))
 
 # Macro to compose entire list of resources which comprise a project.
@@ -480,6 +493,7 @@ $(MSVC.OUT.DIR) $(MSVC.OUT.FRAGMENT): $(MSVC.OUT.BASE)
 # Build a project project file and an associated DSW/SLN fragment file.
 %.MAKEPROJECT:
 	$(MSVC.SILENT)$(MSVC.MAKEVERRC)
+	$(MSVC.SILENT)$(MSVC.MAKEMETARC)
 	$(MSVC.SILENT)$(MSVC.MERGERC)
 	$(MSVC.SILENT)$(MSVCGEN) \
 	--quiet \
