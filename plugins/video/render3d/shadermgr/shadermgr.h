@@ -25,6 +25,7 @@
 #include "csutil/scf.h"
 #include "csutil/objreg.h"
 #include "csutil/csstring.h"
+#include "csgfx/symtable.h"
 
 #include "iutil/event.h"
 #include "iutil/eventh.h"
@@ -38,6 +39,21 @@
 // (These are undeffed at end of shadermgr.cpp. Ugly?)
 #define STREAMMAX 16  // @@@ Hardcoded max streams to 16 
 #define TEXMAX 16  // @@@ Hardcoded max texture units to 16
+
+class csShaderWrapper : public iShaderWrapper
+{
+  csRef<iShader> shader;
+  csSymbolTable symtab;
+public:
+  SCF_DECLARE_IBASE;
+
+  csShaderWrapper (iShader* shader);
+  virtual ~csShaderWrapper ();
+
+  virtual iShader* GetShader();
+  virtual void SelectMaterial(iMaterial* mat);
+  virtual csSymbolTable* GetSymbolTable();
+};
 
 class csShaderManager : public iShaderManager
 {
@@ -71,10 +87,10 @@ public:
   /// Returns all shaders that have been created
   virtual const csRefArray<iShaderWrapper> &GetShaders () { return shaders; }
   /// Create a wrapper for a shader
-  virtual csPtr<iShaderWrapper> CreateWrapper(iShader *);
+  virtual csPtr<iShaderWrapper> CreateWrapper(iShader* shader);
 
   /// Create variable
-  virtual csPtr<iShaderVariable> const CreateVariable(const char* name) ;
+  virtual csPtr<iShaderVariable> CreateVariable(const char* name) const;
   /// Add a variable to this context
   virtual bool AddVariable(iShaderVariable* variable) ;
   /// Get variable

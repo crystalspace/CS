@@ -44,7 +44,7 @@ struct iShaderPass;
 struct iShaderProgram;
 struct iShaderProgramPlugin;
 
-SCF_VERSION (iShaderManager, 0,0,1);
+SCF_VERSION (iShaderManager, 0, 1, 0);
 /**
  * A manager for all shaders. Will only be one at a given time
  */
@@ -55,7 +55,7 @@ struct iShaderManager : iBase
   /// Get a shader by name
   virtual iShader* GetShader(const char* name) = 0;
   /// Create a wrapper for a new shader
-  virtual csPtr<iShaderWrapper> CreateWrapper() = 0;
+  virtual csPtr<iShaderWrapper> CreateWrapper(iShader* shader) = 0;
   /// Returns all shaders that have been created
   virtual const csRefArray<iShaderWrapper> &GetShaders () = 0;
 
@@ -123,18 +123,18 @@ struct iShader : iBase
   virtual bool Prepare() = 0;
 };
 
-SCF_VERSION(iShaderWrapper, 0,0,1);
+SCF_VERSION(iShaderWrapper, 0, 0, 1);
 /**
  * A thin wrapper over iShader to do dynamic selection of which iMaterial
  * the shader is acting on.
  */
 struct iShaderWrapper : iBase
 {
-  /// Get the wrapper shader.
+  /// Get the wrapped shader.
   virtual iShader* GetShader() = 0;
 
   /// Select the material we are about to act on.
-  virtual void SelectMaterial(iMaterial *) = 0;
+  virtual void SelectMaterial(iMaterial* mat) = 0;
 
   /// Get the symbol table (used by the implementation to store the variables)
   virtual csSymbolTable* GetSymbolTable() = 0;

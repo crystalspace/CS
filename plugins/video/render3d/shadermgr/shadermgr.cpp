@@ -66,7 +66,7 @@ SCF_IMPLEMENT_IBASE (csShaderManager::EventHandler)
 SCF_IMPLEMENTS_INTERFACE (iEventHandler)
 SCF_IMPLEMENT_IBASE_END
 
-SCF_IMPLEMENT_FACTORY( csShaderManager )
+SCF_IMPLEMENT_FACTORY (csShaderManager)
 
 SCF_IMPLEMENT_IBASE( csShader )
   SCF_IMPLEMENTS_INTERFACE( iShader )
@@ -84,6 +84,33 @@ SCF_IMPLEMENT_IBASE_END
 SCF_IMPLEMENT_IBASE( csShaderVariable )
   SCF_IMPLEMENTS_INTERFACE( iShaderVariable )
 SCF_IMPLEMENT_IBASE_END
+
+//=================== csShaderWrapper ================//
+
+csShaderWrapper::csShaderWrapper (iShader* shader)
+{
+  SCF_CONSTRUCT_IBASE (0);
+  
+  csShaderWrapper::shader = shader;
+}
+
+csShaderWrapper::~csShaderWrapper ()
+{
+}
+
+iShader* csShaderWrapper::GetShader()
+{
+  return shader;
+}
+
+void csShaderWrapper::SelectMaterial(iMaterial* mat)
+{
+}
+
+csSymbolTable* csShaderWrapper::GetSymbolTable()
+{
+  return &symtab;
+}
 
 //=================== csShaderManager ================//
 
@@ -107,7 +134,7 @@ csShaderManager::~csShaderManager()
 
   while(cIter.HasNext() )
   {
-    iShaderVariable* i = (csShaderVariable*)cIter.Next();
+    iShaderVariable* i = (iShaderVariable*)cIter.Next();
     i->DecRef();
   }
 
@@ -173,7 +200,7 @@ bool csShaderManager::AddVariable(iShaderVariable* variable)
   return true;
 }
 
-csPtr<iShaderVariable> csShaderManager::CreateVariable(const char* name)
+csPtr<iShaderVariable> csShaderManager::CreateVariable(const char* name) const 
 {
   csShaderVariable* myVar = new csShaderVariable();
   myVar->SetName(name);
@@ -254,6 +281,11 @@ iShader* csShaderManager::GetShader(const char* name)
       return shaders.Get(i);
   }
   return 0;
+}
+
+csPtr<iShaderWrapper> csShaderManager::CreateWrapper(iShader* shader)
+{
+  return csPtr<iShaderWrapper> (new csShaderWrapper (shader));
 }
 
 csPtr<iShaderProgram> csShaderManager::CreateShaderProgram(const char* type)
