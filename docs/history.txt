@@ -21,6 +21,9 @@ The history order has been reversed so that new features are at the top.
 	  in a debugger. Just go to the end of WalkTest and change #if 1
 	  to #if 0. It catches memory overwrites, double deletes, and
 	  allocs with 0 bytes.
+	  It will also catch mismatches in new[]/delete[] and new/delete.
+	- Fixed a bug in radiosity. It was calling 'delete' on an array
+	  allocated with 'new[]'.
 10-May-2000
 	- Michael Dale Long did a major update for CrystalClear.  A lot of
 	  work has been done on iActor.  The main thing was adding multiple
