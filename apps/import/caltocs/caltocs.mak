@@ -1,4 +1,4 @@
-ifeq ($(HAS_CAL3D),yes)
+#ifeq ($(HAS_CAL3D),yes)
 # Application description
 DESCRIPTION.cal3dtocs = Cal3D to Sprite3D converter
 
@@ -66,4 +66,4 @@ else
 endif
 
 endif # ifeq ($(MAKESECTION),targets)
-endif # ifeq ($(HAS_CAL3D),yes)
+#endif # ifeq ($(HAS_CAL3D),yes)

@@ -24,7 +24,7 @@ endif # ifeq ($(MAKESECTION),roottargets)
 #------------------------------------------------------------- postdefines ---#
 ifeq ($(MAKESECTION),postdefines)
 
-vpath %.cpp plugins/engine/iso
+vpath %.cpp plugins/isoldr
 
 ifeq ($(USE_PLUGINS),yes)
   ISOLOAD = $(OUTDLL)isoload$(DLL)
@@ -37,9 +37,8 @@ else
   TO_INSTALL.STATIC_LIBS += $(ISOLOAD)
 endif
 
-INC.ISOLOAD = plugins/engine/iso/isoload.h
-SRC.ISOLOAD = plugins/engine/iso/isoload.cpp \
-	plugins/engine/iso/plgldr.cpp
+INC.ISOLOAD = $(wildcard plugins/isoldr/*.h)
+SRC.ISOLOAD = $(wildcard plugins/isoldr/*.cpp)
 OBJ.ISOLOAD = $(addprefix $(OUT),$(notdir $(SRC.ISOLOAD:.cpp=$O)))
 DEP.ISOLOAD = CSUTIL CSSYS CSGEOM CSGFX CSUTIL CSSYS
 

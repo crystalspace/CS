@@ -65,6 +65,7 @@ PLUGINS += csparser
 PLUGINS += csparser/services
 
 PLUGINS.DYNAMIC += engine/iso
+PLUGINS.DYNAMIC += isoldr
 PLUGINS.DYNAMIC += cslexan
 PLUGINS.DYNAMIC += sequence
 PLUGINS.DYNAMIC += video/renderer/line

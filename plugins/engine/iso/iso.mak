@@ -37,17 +37,8 @@ else
   TO_INSTALL.STATIC_LIBS += $(ISO)
 endif
 
-INC.ISO = plugins/engine/iso/isocell.h plugins/engine/iso/isoengin.h \
-	plugins/engine/iso/isogrid.h plugins/engine/iso/isoldr.h.h \
-	plugins/engine/iso/isomater.h plugins/engine/iso/isomesh.h \
-	plugins/engine/iso/isorview.h plugins/engine/iso/isospr.h \
-	plugins/engine/iso/isoview.h plugins/engine/iso/isoworld.h \
-	plugins/engine/iso/isolight.h
-SRC.ISO = plugins/engine/iso/isocell.cpp plugins/engine/iso/isoengin.cpp \
-	plugins/engine/iso/isogrid.cpp plugins/engine/iso/isolight.cpp \
-	plugins/engine/iso/isomater.cpp plugins/engine/iso/isomesh.cpp \
-	plugins/engine/iso/isorview.cpp plugins/engine/iso/isospr.cpp \
-	plugins/engine/iso/isoview.cpp plugins/engine/iso/isoworld.cpp
+INC.ISO = $(wildcard plugins/engine/iso/*.h)
+SRC.ISO = $(wildcard plugins/engine/iso/*.cpp)
 OBJ.ISO = $(addprefix $(OUT),$(notdir $(SRC.ISO:.cpp=$O)))
 DEP.ISO = CSUTIL CSSYS CSGEOM CSGFX CSUTIL CSSYS
 
