@@ -138,31 +138,29 @@ IMPLEMENT_OBJECT_INTERFACE (csMaterialWrapper)
   IMPLEMENTS_EMBEDDED_OBJECT_TYPE (iMaterialWrapper)
 IMPLEMENT_OBJECT_INTERFACE_END
 
-csMaterialWrapper::csMaterialWrapper (iMaterial* material) :
+csMaterialWrapper::csMaterialWrapper (iMaterial* m) :
   csPObject (), handle (NULL)
 {
+  CONSTRUCT_IBASE (NULL);
   CONSTRUCT_EMBEDDED_IBASE (scfiMaterialWrapper);
-  csMaterialWrapper::material = material;
-  material->IncRef ();
-  csEngine::current_engine->AddToCurrentRegion (this);
-}
 
-csMaterialWrapper::csMaterialWrapper (csMaterialWrapper &th) :
-  csPObject (), handle (NULL)
-{
-  CONSTRUCT_EMBEDDED_IBASE (scfiMaterialWrapper);
-  (material = th.material)->IncRef ();
-  handle = th.GetMaterialHandle ();
-  SetName (th.GetName ());
+  material = m;
+  material->IncRef ();
+
+  // @@@ ??????
   csEngine::current_engine->AddToCurrentRegion (this);
 }
 
 csMaterialWrapper::csMaterialWrapper (iMaterialHandle *ith) :
   csPObject (), material (NULL)
 {
+  CONSTRUCT_IBASE (NULL);
   CONSTRUCT_EMBEDDED_IBASE (scfiMaterialWrapper);
-  ith->IncRef ();
+
   handle = ith;
+  handle->IncRef ();
+
+  // @@@ ??????
   csEngine::current_engine->AddToCurrentRegion (this);
 }
 
@@ -174,22 +172,37 @@ csMaterialWrapper::~csMaterialWrapper ()
     material->DecRef ();
 }
 
-void csMaterialWrapper::SetMaterial (iMaterial *material)
+void csMaterialWrapper::SetMaterial (iMaterial *m)
 {
-  if (csMaterialWrapper::material)
-    csMaterialWrapper::material->DecRef ();
-  csMaterialWrapper::material = material;
+  if (material)
+    material->DecRef ();
+  material = m;
   material->IncRef ();
+}
+
+void csMaterialWrapper::SetMaterialHandle (iMaterialHandle *m)
+{
+  if (material)
+    material->DecRef ();
+  if (handle)
+    handle->DecRef ();
+
+  material = NULL;
+  handle = m;
+  handle->IncRef ();
 }
 
 void csMaterialWrapper::Register (iTextureManager *txtmgr)
 {
+  if (handle)
+    handle->DecRef ();
   handle = txtmgr->RegisterMaterial (material);
 }
 
 void csMaterialWrapper::Visit ()
 {
   // @@@ This is not very clean! We shouldn't cast from iMaterial to csMaterial.
+  // @@@ This is also not up-to-date because it doesn't deal with layers
   csMaterial* mat = (csMaterial*)material;
   if (mat && mat->GetTextureWrapper ())
     mat->GetTextureWrapper ()->Visit ();

@@ -78,8 +78,8 @@ public:
 
   /**
    * Change the texture handle. The changes will immediatly be visible. This
-   * will also change the iImage, key color and registration flags to those of
-   * the new texture.
+   * will also change the key color and registration flags to those of
+   * the new texture and the iImage to NULL.
    */
   void SetTextureHandle (iTextureHandle *tex);
   /// Get the texture handle.

@@ -133,6 +133,18 @@ csIsoMaterialWrapper::~csIsoMaterialWrapper ()
     material->DecRef ();
 }
 
+void csIsoMaterialWrapper::SetMaterialHandle (iMaterialHandle *m)
+{
+  if (handle)
+    handle->DecRef ();
+  if (material)
+    material->DecRef ();
+
+  material = NULL;
+  handle = m;
+  handle->IncRef ();  
+}
+
 void csIsoMaterialWrapper::SetMaterial (iMaterial *material)
 {
   if (csIsoMaterialWrapper::material)

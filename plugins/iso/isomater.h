@@ -138,6 +138,8 @@ public:
 
   /// Get the material handle.
   iMaterialHandle* GetMaterialHandle () { return handle; }
+  /// Set the material handle.
+  void SetMaterialHandle (iMaterialHandle *hdl);
 
   /// Change the base material - you must also change the index.
   void SetMaterial (iMaterial* material);
@@ -171,6 +173,10 @@ public:
     {
       return (csMaterialWrapper*)scfParent;
     }
+    virtual void SetMaterialHandle (iMaterialHandle* m)
+    {
+      scfParent->SetMaterialHandle (m);
+    }
     virtual iMaterialHandle* GetMaterialHandle ()
     {
       return scfParent->GetMaterialHandle ();
@@ -180,6 +186,11 @@ public:
       return scfParent;
     }
     virtual void Visit () { scfParent->Visit (); }
+    virtual void Register (iTextureManager *mng) { scfParent->Register (mng); }
+    virtual void SetMaterial (iMaterial* m)
+    {
+      scfParent->SetMaterial (m);
+    }
     virtual iMaterial* GetMaterial ()
     {
       return scfParent->GetMaterial ();

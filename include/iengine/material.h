@@ -24,6 +24,7 @@
 class csMaterialWrapper;
 struct iMaterial;
 struct iMaterialHandle;
+struct iTextureManager;
 struct iObject;
 
 SCF_VERSION (iMaterialWrapper, 0, 0, 4);
@@ -39,12 +40,32 @@ struct iMaterialWrapper : public iBase
   virtual csMaterialWrapper* GetPrivateObject () = 0;
   /// Get the iObject for this material.
   virtual iObject *QueryObject() = 0;
+
+  /**
+   * Change the material handle. Note: This will also change the base
+   * material to NULL.
+   */
+  virtual void SetMaterialHandle (iMaterialHandle *mat) = 0;
   /// Get the material handle.
   virtual iMaterialHandle* GetMaterialHandle () = 0;
-  /// Visit this material.
-  virtual void Visit () = 0;
+
+  /**
+   * Change the base material. Note: The changes will not be visible until
+   * you re-register the material.
+   */
+  virtual void SetMaterial (iMaterial* material) = 0;
   /// Get the original material.
   virtual iMaterial* GetMaterial () = 0;
+
+  /// Register the material with the texture manager
+  virtual void Register (iTextureManager *txtmng) = 0;
+
+  /**
+   * Visit this material. This should be called by the engine right
+   * before using the material. It will call Visit() on all textures
+   * that are used.
+   */
+  virtual void Visit () = 0;
 };
 
 SCF_VERSION (iMaterialList, 0, 0, 1);

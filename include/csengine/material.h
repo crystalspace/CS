@@ -130,26 +130,26 @@ private:
 public:
   /// Construct a material handle given a material.
   csMaterialWrapper (iMaterial* Image);
-
-  /**
-   * Construct a csMaterialWrapper from a pre-registered AND prepared material
-   * handle. The engine takes over responsibility for destroying the material
-   * handle. To prevent this IncRef () the material handle.
-   */
+  /// Construct a csMaterialWrapper from a pre-registered material handle.
   csMaterialWrapper (iMaterialHandle *ith);
-
-  /// Copy constructor
-  csMaterialWrapper (csMaterialWrapper &th);
   /// Release material handle
   virtual ~csMaterialWrapper ();
 
+  /**
+   * Change the material handle. Note: This will also change the base
+   * material to NULL.
+   */
+  void SetMaterialHandle (iMaterialHandle *mat);
   /// Get the material handle.
-  iMaterialHandle* GetMaterialHandle () { return handle; }
+  inline iMaterialHandle* GetMaterialHandle ();
 
-  /// Change the base material
+  /**
+   * Change the base material. Note: The changes will not be visible until
+   * you re-register the material.
+   */
   void SetMaterial (iMaterial* material);
-  /// Get the material.
-  iMaterial* GetMaterial () { return material; }
+  /// Get the original material.
+  inline iMaterial* GetMaterial ();
 
   /// Register the material with the texture manager
   void Register (iTextureManager *txtmng);
@@ -170,22 +170,21 @@ public:
   {
     DECLARE_EMBEDDED_IBASE (csMaterialWrapper);
     virtual csMaterialWrapper* GetPrivateObject ()
-    {
-      return (csMaterialWrapper*)scfParent;
-    }
+    { return (csMaterialWrapper*)scfParent; }
     virtual iObject *QueryObject()
-    {
-      return scfParent;
-    }
+    { return scfParent; }
+    virtual void SetMaterialHandle (iMaterialHandle *mat)
+    { scfParent->SetMaterialHandle (mat); }
     virtual iMaterialHandle* GetMaterialHandle ()
-    {
-      return scfParent->GetMaterialHandle ();
-    }
-    virtual void Visit () { scfParent->Visit (); }
+    { return scfParent->GetMaterialHandle (); }
+    virtual void SetMaterial (iMaterial* material)
+    { scfParent->SetMaterial (material); }
     virtual iMaterial* GetMaterial ()
-    {
-      return scfParent->GetMaterial ();
-    }
+    { return scfParent->GetMaterial (); }
+    virtual void Register (iTextureManager *txtmng)
+    { scfParent->Register (txtmng); }
+    virtual void Visit ()
+    { scfParent->Visit (); }
   } scfiMaterialWrapper;
 };
 
@@ -272,5 +271,10 @@ inline float csMaterial::GetReflection () const
 { return reflection; }
 inline void csMaterial::SetReflection (float val)
 { reflection = val; }
+
+inline iMaterialHandle* csMaterialWrapper::GetMaterialHandle ()
+{ return handle; }
+inline iMaterial* csMaterialWrapper::GetMaterial ()
+{ return material; }
 
 #endif // __CS_MATERIAL_H__
