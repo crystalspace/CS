@@ -25,6 +25,7 @@
 /**
  * \addtogroup aws_comp_flags
  * @{ */
+
 /// set if this component is focused
 const unsigned int AWSF_CMP_FOCUSED     = 512; 
 /// set if this component should not be clipped to client area
