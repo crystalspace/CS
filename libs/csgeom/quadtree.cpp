@@ -230,7 +230,19 @@ bool csQuadtree::TestPolygon (csQuadtreeNode* node,
   {
     // None of the vertices of the node are in the polygon.
     // In this case we must perform a more heavy test.
-    vis = csFrustrum::IsVisible (node->corners, 4, verts, num_verts);
+
+    // If any of the polygon vertices is in the node then
+    // the polygon is visible.
+    int i;
+    for (i = 0 ; i < num_verts ; i++)
+      if (csFrustrum::Contains (node->corners, 4, plane_normal, verts[i]))
+      {
+        vis = true;
+	break;
+      }
+
+    if (!vis)
+      vis = csFrustrum::IsVisibleFull (node->corners, 4, verts, num_verts);
   }
 
   // If polygon is not visible in node then nothing happens
@@ -238,8 +250,11 @@ bool csQuadtree::TestPolygon (csQuadtreeNode* node,
   if (!vis) return false;
 
   // The polygon partially overlaps with the node.
-  // In this case we check the state in the children (if any).
 
+  // If this node is empty then polygon is visible.
+  if (node->GetState () == CS_QUAD_EMPTY) return true;
+
+  // Otherwise we have to check the state in the children (if any).
   csQuadtreeNode** children = node->children;
   if (!children[0])
   {
@@ -270,8 +285,8 @@ bool csQuadtree::TestPolygon (csVector3* verts, int num_verts)
 {
   bool i00 = csFrustrum::Contains (verts, num_verts, plane_normal, root->GetCorner (0));
   bool i01 = csFrustrum::Contains (verts, num_verts, plane_normal, root->GetCorner (1));
-  bool i10 = csFrustrum::Contains (verts, num_verts, plane_normal, root->GetCorner (2));
-  bool i11 = csFrustrum::Contains (verts, num_verts, plane_normal, root->GetCorner (3));
+  bool i11 = csFrustrum::Contains (verts, num_verts, plane_normal, root->GetCorner (2));
+  bool i10 = csFrustrum::Contains (verts, num_verts, plane_normal, root->GetCorner (3));
   return TestPolygon (root, verts, num_verts, i00, i01, i11, i10);
 }
 

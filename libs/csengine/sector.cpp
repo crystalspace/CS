@@ -986,7 +986,7 @@ bool CullOctreeNodeLighting (csPolygonTree* tree, csPolygonTreeNode* node,
   csVector3 outline[6];
   int num_outline;
   otree->GetConvexOutline (onode, center, outline, num_outline);
-  if (num_outline)
+  if (num_outline > 0)
   {
     int i;
     for (i = 0 ; i < num_outline ; i++)

@@ -387,27 +387,25 @@ bool csFrustrum::IsVisibleFull (csVector3* frustrum, int num_frust,
   // Here is the difficult case. We need to see if there is an
   // edge from the polygon which intersects a frustrum plane.
   // If so then polygon is visible. Otherwise not.
-  //@@@ opt by reversing loops!!
-  i1 = num_poly-1;
-  for (i = 0 ; i < num_poly ; i++)
+  csVector3 normal;
+  csVector3 isect;
+  float dist;
+  j1 = num_frust-1;
+  for (j = 0 ; j < num_frust ; j++)
   {
-    j1 = num_frust-1;
-    for (j = 0 ; j < num_frust ; j++)
+    normal = frustrum[j] % frustrum[j1];
+    i1 = num_poly-1;
+    for (i = 0 ; i < num_poly ; i++)
     {
-      int s1 = csMath3::WhichSide3D (poly[i], frustrum[j], frustrum[j1]);
-      int s2 = csMath3::WhichSide3D (poly[i1], frustrum[j], frustrum[j1]);
-      if ((s1 < 0 && s2 > 0) || (s1 > 0 && s2 < 0))
+      if (csIntersect3::Plane (poly[i], poly[i1],
+      	normal.x, normal.y, normal.z, 0, isect, dist))
       {
-        s1 = csMath3::WhichSide3D (frustrum[j], poly[i], poly[i1]);
-        s2 = csMath3::WhichSide3D (frustrum[j1], poly[i], poly[i1]);
-        if ((s1 < 0 && s2 > 0) || (s1 > 0 && s2 < 0))
-          return true;
+        if (Contains (frustrum, num_frust, isect)) return true;
       }
-      j1 = j;
+      i1 = i;
     }
-    i1 = i;
+    j1 = j;
   }
-
   return false;
 }
 

@@ -344,11 +344,6 @@ bool csWorld::Initialize (ISystem* sys, IGraphics3D* g3d, csIniFile* config, csV
 //poly[1] = csVector3 (50, 50, 10);
 //poly[2] = csVector3 (50, -50, 10);
 //poly[3] = csVector3 (-50, -50, 10);
-
-//poly[0] = csVector3 (-5, -5, -10);
-//poly[1] = csVector3 (5, -5, -10);
-//poly[2] = csVector3 (5, 5, -10);
-//poly[3] = csVector3 (-5, 5, -10);
 //quadcube->InsertPolygon (poly, 4);
 //Dumper::dump (quadcube);
 
