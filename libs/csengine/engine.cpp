@@ -782,11 +782,7 @@ bool csEngine::Initialize (iObjectRegistry *object_reg)
   virtual_clock = CS_QUERY_REGISTRY (object_reg, iVirtualClock);
   if (!virtual_clock) return false;
 
-#ifndef CS_USE_NEW_RENDERER
   G3D = CS_QUERY_REGISTRY (object_reg, iGraphics3D);
-#else
-  G3D = CS_QUERY_REGISTRY (object_reg, iGraphics3D);
-#endif // CS_USE_NEW_RENDERER
   if (!G3D)
   {
     // If there is no G3D then we still allow initialization of the
@@ -858,7 +854,7 @@ bool csEngine::HandleEvent (iEvent &Event)
 	      csRef<iPluginManager> plugin_mgr (
 		CS_QUERY_REGISTRY (object_reg, iPluginManager));
 	      ShaderManager = csPtr<iShaderManager>
-		(CS_LOAD_PLUGIN(plugin_mgr, "crystalspace.render3d.shadermanager", iShaderManager));
+		(CS_LOAD_PLUGIN(plugin_mgr, "crystalspace.graphics3d.shadermanager", iShaderManager));
 	      object_reg->Register (ShaderManager, "iShaderManager");
 	    }
 #endif // CS_USE_NEW_RENDERER

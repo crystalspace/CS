@@ -14,6 +14,7 @@ chronological order.
 	  written in Java extending the CS iEventHandler.
 	- renej updated python scripting: initial support for easy extending
 	  VARG functions by means of include/ivaria/pythvarg.i
+	- Anders Stenberg changed 2 occurances of "render3d" to "graphics3d"
 28-Aug-2003
 	- Jorrit fixed the x2d plugin so it actually reports an error if the
 	  'xwin' plugin cannot be found.
