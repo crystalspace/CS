@@ -1044,7 +1044,7 @@ csRenderMesh** csGenmeshMeshObject::GetRenderMeshes (
     	logparent, -1, false);
   }
 
-  const csReversibleTransform& o2wt = movable->GetFullTransform ();
+  const csReversibleTransform o2wt = movable->GetFullTransform ();
   const csVector3& wo = o2wt.GetOrigin ();
 
   if (subMeshes.Length () == 0)
