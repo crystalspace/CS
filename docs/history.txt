@@ -58,6 +58,8 @@ chronological order.
 	- res added a method to iTextureLoaderContext to retrieve the name of
 	  the texture to be loaded.
 	- res un-inverted the <mipmap> texture flag parse logic.
+	- res added a texture loader to generate a (static) texture from a 
+	  shader expression.
 27-Mar-2004
 	- Anders Stenberg did the following NR changes:
 	    - Added the possibility to route Cg programs through

@@ -108,6 +108,7 @@ PLUGINS += culling/frustvis
 PLUGINS += csparser
 PLUGINS += csparser/services
 PLUGINS += proctex/standard
+PLUGINS += proctex/tlfunc
 PLUGINS += cssaver
 PLUGINS += sequence
 PLUGINS += engseq
