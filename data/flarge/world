@@ -340,6 +340,7 @@ WORLD (
       TRIANGLE (4,6,2) TRIANGLE (4,2,0)
       TRIANGLE (5,4,0) TRIANGLE (5,0,1)
       TRIANGLE (4,5,7) TRIANGLE (4,7,6)
+      SMOOTH ()
     )
   )
   MESHFACT 'fountainFactory' (
