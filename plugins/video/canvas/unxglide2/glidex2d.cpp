@@ -79,6 +79,11 @@ void csGraphics2DGlideX::Initialize()
   UnixSystem->GetSettings (sim_depth, do_shm, do_hwmouse);
 
   dpy = XOpenDisplay (NULL);
+  if (!dpy)
+  {
+    CsPrintf (MSG_FATAL_ERROR, "FATAL: Cannot open X display\n");
+    exit (-1);
+  }
 
   screen_num = DefaultScreen (dpy);
   screen_ptr = DefaultScreenOfDisplay (dpy);
