@@ -85,7 +85,7 @@ rm -f conftest.cpp conftest.o
 echo "%xdefine TEST" >conftest.asm
 
 # Check if NASM is installed and if it has the right version
-[ -z "${NASM}" ] && NASM=`which nasm 2>&1 | grep -v "no nasm"`
+[ -z "${NASM}" ] && NASM=`which nasm 2>&1 | grep -v "[Nn]o"`
 
 if [ -n "${NASM}" ]; then
   echo "NASM = "`basename ${NASM}`
@@ -98,7 +98,7 @@ fi
 rm -f conftest.asm conftest.o
 
 # Check if makedep is installed and is the right version
-[ -z "${MAKEDEP}" ] && MAKEDEP=`which makedep 2>&1 | grep -v "no makedep"`
+[ -z "${MAKEDEP}" ] && MAKEDEP=`which makedep 2>&1 | grep -v "[Nn]o"`
 if [ -n "${MAKEDEP}" ]; then
   echo "DEPEND_TOOL = mkdep"
   MAKEDEP_VERSION=`makedep -V | sed -e "s/.*Version *//"`
