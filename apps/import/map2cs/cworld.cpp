@@ -356,6 +356,7 @@ void CCSWorld::WriteSkybox()
   //This is because CS has some precision problems on the sides, and so
   //we will end up with lots of cracks between the boxes sides, which just
   //looks ugly. So for now we accept significant overdraw, to avoid cracks.
+#if 0
   static const struct {int x; int y; int z;} Vertices [] =
   {{-1,-1,-1},
    {-1,-1, 1},
@@ -372,6 +373,7 @@ void CCSWorld::WriteSkybox()
     const char*   vertices;
     CTextureFile* pTex;
   }
+
   ThingSides[] =
   {
     {"f", " 3, 7, 5, 1", NULL},
@@ -429,6 +431,61 @@ void CCSWorld::WriteSkybox()
                   ThingSides[s].vertices,
                   ThingSides[s].pTex->GetTexturename(),
                   BoxSize * 2 * TweakFactor);
+  }
+#endif
+
+  //Matze: This is my own version, I can't realize crackles so I'm using the
+  // simple version here... If it's ok in all cases you can remove the above
+  static const struct {int x; int y; int z;} Vertices [] =
+  {{-1,-1, 1}, { 1,-1, 1},
+   {-1,-1,-1}, { 1,-1,-1},
+   {-1, 1, 1}, { 1, 1, 1},
+   {-1, 1,-1}, { 1, 1,-1}};
+
+  static struct
+  {
+    const char*   ext;
+    const char*   vertices;
+    CTextureFile* pTex;
+  }
+
+  ThingSides[] =
+  {
+    {"f", " 4, 5, 1, 0", NULL},
+    {"r", " 5, 7, 3, 1", NULL},
+    {"b", " 7, 6, 2, 3", NULL},
+    {"l", " 6, 4, 0, 2", NULL},
+    {"u", " 6, 7, 5, 4", NULL},
+    {"d", " 3, 2, 0, 1", NULL},
+  };
+
+  //assign texture pointers to the sides of the skybox
+  int s,v;
+  for (s=0; s<int(sizeof(ThingSides)/sizeof(ThingSides[0])); s++)
+  {
+    char name[255];
+    sprintf(name, "%s_%s", BoxName, ThingSides[s].ext);
+    ThingSides[s].pTex = pTexMan->GetTexture(name);
+  }
+ 
+  for (v = 0; v<int(sizeof(Vertices)/sizeof(Vertices[0])); v++)
+  {
+    WriteIndent();
+    fprintf(m_fd, "VERTEX (%g,%g,%g)\n",  
+                  BoxSize*Vertices[v].x,
+                  BoxSize*Vertices[v].y,
+                  BoxSize*Vertices[v].z);
+  }
+
+  //write the skyboxes polygons
+  for (s=0; s<int(sizeof(ThingSides)/sizeof(ThingSides[0])); s++)
+  {
+    WriteIndent();
+    fprintf(m_fd, "POLYGON '' (VERTICES (%s)" 
+	    " TEXTURE (UV (0,0.005,0.005,1,.995,0.005,2,0.995,0.955))"
+	    " MATERIAL('%s') LIGHTING (NO))\n",
+                  ThingSides[s].vertices,
+                  ThingSides[s].pTex->GetTexturename());
   }
 }
 

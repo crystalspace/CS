@@ -1,6 +1,7 @@
 The history order is reversed so that new features are at the top.
 
 26-Jan-2002
+	- Matze fixed skybox generation in map2cs
 	- Added missing initialization of do_manual_colors to genmesh
 	  object. This could cause wrong colors in some cases.
 25-Jan-2002
