@@ -78,6 +78,7 @@ csLightMap::csLightMap ()
   first_smap = NULL;
   cachedata = NULL;
   delayed_light_info = NULL;
+  dyn_dirty = true;
 }
 
 csLightMap::~csLightMap ()
@@ -311,7 +312,9 @@ bool csLightMap::ReadFromCache (int w, int h, csPolygonSet* owner,
       if (light->GetType () == csStatLight::Type && poly)
       {
         csStatLight* slight = (csStatLight*)light;
-        slight->RegisterPolygon (poly);
+        //@@@: is this cast neccessary or should I
+        //     put MakeDynamicDirty() in iLightMap
+        slight->RegisterLightMap ( (csLightMap *)( poly->GetLightMapInfo()->GetLightMap() ) ); 
       }
       csShadowMap* smap = NewShadowMap (light, w, h);
       memcpy (smap->map, d, lm_size);

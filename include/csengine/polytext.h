@@ -90,9 +90,6 @@ private:
   /// LightMap.
   csLightMap* lm;
 
-  /// If true, dynamic lighting needs to be recalculated.
-  UByte dyn_dirty;
-
   /// Internally used by (software) texture cache
   void *cache_data [4];
 
@@ -160,14 +157,14 @@ public:
    */
   void FillLightMap (csFrustumView& lview);
 
+  /// set the dirty flag for our lightmap
+  void MakeDirtyDynamicLights ();
+
   /**
    * Update the real lightmap for a given csLightPatch
    * (used for a dynamic light).
    */
   void ShineDynLightMap (csLightPatch* lp);
-
-  ///
-  void MakeDirtyDynamicLights ();
 
   /// Get the bounding rectangle of the whole lightmap in world space
   bool GetLightmapBounds (csFrustumView *lview, csVector3 *bounds);

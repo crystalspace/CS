@@ -28,7 +28,8 @@
 
 class csSector;
 class csSprite;
-class csPolygon3D;
+//class csPolygon3D;
+class csLightMap;
 class csDynLight;
 class Dumper;
 class csThing;
@@ -280,11 +281,11 @@ private:
    */
   bool dynamic;
 
-  /// Number of polygons affected by this dynamic light.
-  int num_polygon;
+  /// Number of lightmaps affected by this dynamic light.
+  int num_lightmap;
 
-  /// List of polygons that are affected by this dynamic light.
-  csPolygon3D** polygons;
+  /// List of lightmaps that are affected by this dynamic light.
+  csLightMap** lightmaps;
 
 public:
   /**
@@ -323,12 +324,11 @@ public:
   virtual void SetColor (const csColor& col);
 
   /**
-   * Register a polygon for a pseudo-dynamic light.
-   * Every polygon which is interested in updating its
-   * lightmaps as this light changes should register itself
-   * to the light.
+   * Register a lightmap for a pseudo-dynamic light.
+   * Every lightmap which is interested in updating itself
+   * as this light changes should register itself to the light.
    */
-  void RegisterPolygon (csPolygon3D* poly);
+  void RegisterLightMap (csLightMap* lmap);
 
   /**
    * Shine this light on all polygons visible from the light.

@@ -23,7 +23,8 @@
 #include "csengine/light.h"
 #include "csengine/sector.h"
 #include "csengine/thing.h"
-#include "csengine/polygon.h"
+//#include "csengine/polygon.h"
+#include "csengine/lghtmap.h"
 #include "csengine/cssprite.h"
 #include "csengine/world.h"
 #include "csengine/lppool.h"
@@ -164,13 +165,13 @@ csStatLight::csStatLight (float x, float y, float z, float dist,
   : csLight (x, y, z, dist, red, green, blue)
 {
   csStatLight::dynamic = dynamic;
-  polygons = NULL;
+  lightmaps = NULL;
   flags.SetAll (CS_LIGHT_THINGSHADOWS);
 }
 
 csStatLight::~csStatLight ()
 {
-  delete [] polygons;
+  delete [] lightmaps;
 }
 
 void poly_light_func (csObject* obj, csFrustumView* lview)
@@ -256,22 +257,22 @@ void csStatLight::LightingFunc (csLightingFunc* callback, void* callback_data)
 }
 
 
-void csStatLight::RegisterPolygon (csPolygon3D* poly)
+void csStatLight::RegisterLightMap (csLightMap* lmap)
 {
-  if (dynamic && !polygons)
+  if (dynamic && !lightmaps)
   {
-    num_polygon = 0;
-    polygons = new csPolygon3D* [MAX_NUM_POLYGON];
+    num_lightmap = 0;
+    lightmaps = new csLightMap* [MAX_NUM_LIGHTMAP];
   }
 
   int i;
-  for (i = 0 ; i < num_polygon ; i++)
-    if (polygons[i] == poly)
+  for (i = 0 ; i < num_lightmap ; i++)
+    if (lightmaps[i] == lmap)
       return;
-  polygons[num_polygon++] = poly;
-  if (num_polygon >= MAX_NUM_POLYGON)
+  lightmaps[num_lightmap++] = lmap;
+  if (num_lightmap >= MAX_NUM_LIGHTMAP)
   {
-    CsPrintf (MSG_WARNING, "Overflow number of polygons for dynamic light!\n");
+    CsPrintf (MSG_WARNING, "Overflow number of lightmaps for dynamic light!\n");
   }
 }
 
@@ -279,8 +280,8 @@ void csStatLight::SetColor (const csColor& col)
 {
   csLight::SetColor (col);
   int i;
-  for (i = 0 ; i < num_polygon ; i++)
-    polygons[i]->MakeDirtyDynamicLights ();
+  for (i = 0 ; i < num_lightmap ; i++)
+    lightmaps[i]->MakeDirtyDynamicLights ();
 }
 
 //---------------------------------------------------------------------------

@@ -266,7 +266,6 @@ IMPLEMENT_IBASE_END
 csPolyTexture::csPolyTexture ()
 {
   CONSTRUCT_IBASE (NULL);
-  dyn_dirty = true;
   lm = NULL;
   cache_data [0] = cache_data [1] = cache_data [2] = cache_data [3] = NULL;
 }
@@ -337,17 +336,11 @@ void csPolyTexture::CreateBoundingTextureBox ()
   fdv = min_v * hh;
 }
 
-void csPolyTexture::MakeDirtyDynamicLights ()
-{
-  dyn_dirty = true;
-}
-
 bool csPolyTexture::RecalculateDynamicLights ()
 {
-  if (!dyn_dirty) return false;
-  if (!lm) return false;
+  if (!lm || !lm->dyn_dirty ) return false;
 
-  dyn_dirty = false;
+  lm->dyn_dirty = false;
 
   //---
   // First copy the static lightmap to the real lightmap.
@@ -1150,6 +1143,17 @@ iPolygon3D *csPolyTexture::GetPolygon ()
   return QUERY_INTERFACE(polygon, iPolygon3D);
 }
 
+bool csPolyTexture::DynamicLightsDirty () 
+{ 
+  return (lm && lm->dyn_dirty); 
+}
+
+void csPolyTexture::MakeDirtyDynamicLights () 
+{ 
+  if (lm) 
+    lm->dyn_dirty = true; 
+}
+
 iLightMap *csPolyTexture::GetLightMap () { return lm; }
 iTextureHandle *csPolyTexture::GetTextureHandle () { return txt_handle; }
 int csPolyTexture::GetWidth () { return w; }
@@ -1162,6 +1166,5 @@ int csPolyTexture::GetIMinU () { return Imin_u; }
 int csPolyTexture::GetIMinV () { return Imin_v; }
 void *csPolyTexture::GetCacheData (int idx) { return cache_data [idx]; }
 void csPolyTexture::SetCacheData (int idx, void *d) { cache_data [idx] = d; }
-bool csPolyTexture::DynamicLightsDirty () { return dyn_dirty && lm; }
 int csPolyTexture::GetLightCellSize () { return lightcell_size; }
 int csPolyTexture::GetLightCellShift () { return lightcell_shift; }

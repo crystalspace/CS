@@ -144,6 +144,12 @@ private:
    */
   csRGBLightMap real_lm;
 
+  /** 
+   * A flag indicating whether the lightmaps needs recalculating
+   * for dynamic lights
+   */
+  bool dyn_dirty;
+
   /**
    * Linked list of shadow-maps (for the pseudo-dynamic lights).
    * These shadowmaps are applied to static_lm to get real_lm.
@@ -197,6 +203,9 @@ public:
   csLightMap ();
   ///
   virtual ~csLightMap ();
+
+  /// set the dirty flag for this lightmap
+  void MakeDirtyDynamicLights () { dyn_dirty = true; }
 
   ///
   csRGBLightMap& GetStaticMap () { return static_lm; }
