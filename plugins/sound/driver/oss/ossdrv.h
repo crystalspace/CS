@@ -23,6 +23,7 @@
 #define __CS_OSSDRV_H__
 
 #include "csutil/scf.h"
+#include "cssys/thread.h"
 #include "isound/driver.h"
 #include "iutil/eventh.h"
 #include "iutil/comp.h"
@@ -62,6 +63,7 @@ private:
 
 class csSoundDriverOSS : public iSoundDriver
 {
+
 protected:
   iObjectRegistry* object_reg;
   void * memory;
@@ -71,7 +73,7 @@ protected:
   bool m_bStereo;
   int fragments;
   int block_size;
-  int block;
+  int writeblock;
   int lasterr;
   unsigned char *soundbuffer;
 
@@ -92,6 +94,7 @@ public:
   bool IsStereo();
   int GetFrequency();
   bool IsHandleVoidSound();
+  bool ThreadAware (){ return true; }
 
   struct eiComponent : public iComponent
   {
@@ -101,16 +104,7 @@ public:
   } scfiComponent;
   friend struct eiComponent;
 
-private:
-  // used to setup timer when background=true (not currently used)
-  bool SetupTimer( int nTimesPerSecond );
-
-  struct sigaction oldact;
-  struct itimerval otime;
-  bool bTimerInstalled, bSignalInstalled;
-  
 public:
-  iSoundRender *m_piSoundRender;
   AudioDevice device;
 };
 

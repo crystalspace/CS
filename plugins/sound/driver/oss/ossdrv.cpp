@@ -211,79 +211,31 @@ void AudioDevice::Play(unsigned char *snddata, int len)
   write(audio, snddata, len);
 }
 
-static void* soundptr;
-
-void isTime(int)
-{
-  csSoundDriverOSS *mysound = (csSoundDriverOSS*) soundptr;
-  if (!mysound->device.Blocked() && mysound->m_piSoundRender)
-    mysound->m_piSoundRender->MixingFunction();
-}
-
-bool csSoundDriverOSS::SetupTimer(int nTimesPerSecond)
-{
-  struct itimerval itime;
-  struct timeval val;
-  struct sigaction act;
-
-  val.tv_usec= 1000 / nTimesPerSecond;
-  val.tv_sec=0;
-
-  itime.it_value=val;
-  itime.it_interval=val;
-
-  act.sa_handler = isTime;
-  sigemptyset(&act.sa_mask);
-  sigaddset(&act.sa_mask, SIGVTALRM);
-  act.sa_flags = SA_NOCLDSTOP | SA_RESTART;
-
-  // set static ptr because the timer handler needs it...
-  soundptr=(void*) this;
-
-  /*
-   * Set signal handling function.
-   * LINUX-behavior: Dont use signal coz it resets after execution of
-   * handlerfunction.  sigaction is a way to make it BSD-like.  NOTE: its not
-   * POSIX setting sa_flags to SA_RESTART (from the man page)
-   */
-  lasterr=err_set_handler;
-  bSignalInstalled = (sigaction (SIGVTALRM, &act, &oldact) == 0);
-
-  if (bSignalInstalled) lasterr=err_set_timer;
-  // set timer
-  bTimerInstalled =
-    bSignalInstalled && setitimer (ITIMER_VIRTUAL,&itime,&otime) != -1;
-  return bTimerInstalled;
-}
-
 csSoundDriverOSS::csSoundDriverOSS(iBase *piBase)
 {
   SCF_CONSTRUCT_IBASE(piBase);
   SCF_CONSTRUCT_EMBEDDED_IBASE(scfiComponent);
   object_reg = NULL;
-  m_piSoundRender = NULL;
   memorysize = 0;
   memory = NULL;
   block_size=0;
-  block = 0;
+  writeblock = 0;
   fragments = 0;
   soundbuffer = NULL;
-  bSignalInstalled = false;
-  bTimerInstalled = false;
 }
 
 csSoundDriverOSS::~csSoundDriverOSS()
 {
   // if (memory) delete [] memory;
+  Close ();
 }
 
-bool csSoundDriverOSS::Open(iSoundRender *render, int frequency, bool bit16,
+bool csSoundDriverOSS::Open(iSoundRender *, int frequency, bool bit16,
   bool stereo)
 {
   csReport (object_reg, CS_REPORTER_SEVERITY_NOTIFY,
   	"crystalspace.sound.oss",
     	"SoundDriver OSS selected");
-  m_piSoundRender = render;
   m_bStereo = stereo;
   m_b16Bits = bit16;
   m_nFrequency = frequency;
@@ -293,7 +245,7 @@ bool csSoundDriverOSS::Open(iSoundRender *render, int frequency, bool bit16,
   {
     lasterr = err_alloc_soundbuffer;
     soundbuffer = new unsigned char[fragments * block_size];
-    Active = (soundbuffer != NULL) && SetupTimer(fragments);
+    Active = soundbuffer != NULL;
   }
 
   if (!Active)
@@ -307,8 +259,6 @@ bool csSoundDriverOSS::Open(iSoundRender *render, int frequency, bool bit16,
 
 void csSoundDriverOSS::Close()
 {
-  if (bTimerInstalled) setitimer (ITIMER_VIRTUAL, &otime, NULL);
-  if (bSignalInstalled) sigaction (SIGVTALRM, &oldact, NULL);
   if (soundbuffer) { delete[] soundbuffer; soundbuffer=NULL; }
   device.Close();
   memory=NULL;
@@ -317,15 +267,15 @@ void csSoundDriverOSS::Close()
 
 void csSoundDriverOSS::LockMemory(void **mem, int *memsize)
 {
-  *mem = &soundbuffer[block * block_size];
+  //  while (readblock == writeblock);
+  *mem = &soundbuffer[writeblock * block_size];
   *memsize = block_size;
 }
 
 void csSoundDriverOSS::UnlockMemory()
 {
-  // tell device to play this soundblock
-  device.Play(&soundbuffer[block * block_size], block_size);
-  block = (block+1) % fragments;
+  device.Play(&soundbuffer[writeblock * block_size], block_size);
+  writeblock = (writeblock+1) % fragments;
 }
 
 bool csSoundDriverOSS::IsHandleVoidSound() { return true; }
