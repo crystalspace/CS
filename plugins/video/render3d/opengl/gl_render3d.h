@@ -429,6 +429,9 @@ public:
   csStringSet *GetStringContainer () 
     { return strings; }
 
+  virtual bool SetRenderState (R3D_RENDERSTATEOPTION op, long val);
+  virtual long GetRenderState (R3D_RENDERSTATEOPTION op);
+
   ////////////////////////////////////////////////////////////////////
   //                         iShaderRenderInterface
   ////////////////////////////////////////////////////////////////////

@@ -14,11 +14,15 @@ PARAM p[4]      = { state.matrix.projection };
 #PARAM lightPos  = state.light[0].position;
 PARAM lightPos  = program.local[0];
 PARAM testDir   = { 0, 0, 0, 1 };
+# colors for visible shadow volume
+PARAM frontColor = { 0.5, 0.3, 0.1, 0.3};
+PARAM backColorDiff = { -0.3, 0.2, 0.0, 0.0};
 # Per vertex inputs
 ATTRIB iPos     = vertex.attrib[0];
 ATTRIB iNorm    = vertex.attrib[1];
 # Per vertex outputs
 OUTPUT oPos     = result.position;
+OUTPUT oCol0	= result.color;
 # Temporaries
 TEMP tempPos;
 TEMP tempNorm;
@@ -59,6 +63,8 @@ DP4 nonextrudedPos.w, mvp[3], iPos;
 SUB faceTest.z, testDir.w, faceTest.y;
 MUL extrudedPos, extrudedPos, faceTest.y;
 MAD oPos, nonextrudedPos, faceTest.z, extrudedPos;
+
+MAD oCol0, backColorDiff, faceTest.z, frontColor;
 
 END]]>
 </program>

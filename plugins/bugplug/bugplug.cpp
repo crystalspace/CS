@@ -153,6 +153,8 @@ csBugPlug::csBugPlug (iBase *iParent)
   debug_view.drag_point = -1;
 
   captureFormat = NULL;
+
+  do_shadow_debug = false;
 }
 
 csBugPlug::~csBugPlug ()
@@ -456,6 +458,24 @@ void csBugPlug::HideSpider (iCamera* camera)
 
 #ifndef CS_USE_NEW_RENDERER
 void csBugPlug::ToggleG3DState (G3D_RENDERSTATEOPTION op, const char* name)
+{
+  if (!G3D) return;
+  bool v;
+  v = G3D->GetRenderState (op);
+  v = !v;
+  if (G3D->SetRenderState (op, v))
+  {
+    Report (CS_REPORTER_SEVERITY_NOTIFY, "BugPlug %s %s.",
+	v ? "enabled" : "disabled", name);
+  }
+  else
+  {
+    Report (CS_REPORTER_SEVERITY_NOTIFY, "%s not supported for this renderer!",
+    	name);
+  }
+}
+#else
+void csBugPlug::ToggleR3DState (R3D_RENDERSTATEOPTION op, const char* name)
 {
   if (!G3D) return;
   bool v;
@@ -1159,6 +1179,50 @@ bool csBugPlug::EatKey (iEvent& event)
 	    	"BugPlug %s counting.",
 		counter_freeze ? "disabled" : "enabled");
 	break;
+#ifdef CS_USE_NEW_RENDERER
+      case DEBUGCMD_SHADOWDEBUG:
+	// swap the default shadow volume material shader to/from a version
+	// better visualizing the volume.
+	csRef<iMaterialWrapper> shadowmat = 
+	  Engine->FindMaterial ("shadow extruder");
+	if (!standardShadowShader)
+	  standardShadowShader = shadowmat->GetMaterial()->GetShader();
+	if (!debugShadowShader)
+	{
+	  csRef<iShaderManager> shmgr ( CS_QUERY_REGISTRY(object_reg, iShaderManager));
+	  if(shmgr)
+	  {
+	    debugShadowShader = shmgr->CreateShader();
+	    if(debugShadowShader)
+	    {
+	      debugShadowShader->Load (csRef<iDataBuffer> 
+		(VFS->ReadFile("/shader/shadowdebug.xml")));
+	      if(!debugShadowShader->Prepare())
+	      {
+		debugShadowShader = NULL;
+  		return true;
+	      }
+	    }
+	    else
+	      return true;
+	  }
+	  else
+	    return true;
+	}
+	do_shadow_debug = !do_shadow_debug;
+	if (do_shadow_debug)
+	{
+	  shadowmat->GetMaterial ()->SetShader(debugShadowShader);
+	}
+	else
+	{
+	  shadowmat->GetMaterial ()->SetShader(standardShadowShader);
+	}
+	Report (CS_REPORTER_SEVERITY_NOTIFY,
+	    "BugPlug %s shadow debugging.",
+	    do_shadow_debug ? "disabled" : "enabled");
+        break;
+#endif
     }
     process_next_key = false;
   }
@@ -1552,6 +1616,7 @@ int csBugPlug::GetCommandCode (const char* cmd, char* args)
   if (!strcmp (cmd, "counterreset"))	return DEBUGCMD_COUNTERRESET;
   if (!strcmp (cmd, "counterfreeze"))	return DEBUGCMD_COUNTERFREEZE;
   if (!strcmp (cmd, "counterremove"))	return DEBUGCMD_COUNTERREMOVE;
+  if (!strcmp (cmd, "shadowdebug"))	return DEBUGCMD_SHADOWDEBUG;
 
   return DEBUGCMD_UNKNOWN;
 }

@@ -1651,8 +1651,17 @@ void csGLRender3D::SetLightParameter (int i, int param, csVector3 value)
   }
 }
 
+// @@@ doesn't serve any purpose for now, but might in the future.
+// left in for now.
+bool csGLRender3D::SetRenderState (R3D_RENDERSTATEOPTION op, long val)
+{
+  return false;
+}
 
-
+long csGLRender3D::GetRenderState (R3D_RENDERSTATEOPTION op)
+{
+  return 0;
+}
 
 ////////////////////////////////////////////////////////////////////
 // iComponent

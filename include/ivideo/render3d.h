@@ -258,6 +258,11 @@ enum csVertexAttrib
 
 
 
+/// Graphics3D render state options
+enum R3D_RENDERSTATEOPTION
+{
+};
+
 /**
  * A triangle. Note that this structure is only valid if used
  * in combination with a vertex or edge table. 'a', 'b', and 'c' are then
@@ -452,6 +457,12 @@ struct iRender3D : public iBase
 
   /// Get a stringhash to be used by our streamsources etc.
   virtual csStringSet* GetStringContainer () = 0;
+
+  /// Set a renderstate value.
+  virtual bool SetRenderState (R3D_RENDERSTATEOPTION op, long val) = 0;
+
+  /// Get a renderstate value.
+  virtual long GetRenderState (R3D_RENDERSTATEOPTION op) = 0;
 };
 
 /** @} */

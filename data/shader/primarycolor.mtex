@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8" ?> 
+<mtex>
+	<layer>
+		<texturesource number="0"/>
+		<environment>
+			<colorsource num="0" source="primary color" modifier="color" />
+			<coloroperation operation="replace" />
+		</environment>
+	</layer>
+</mtex>

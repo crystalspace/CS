@@ -1,12 +1,13 @@
 
-<shader name="shadowextrude">
+<shader name="shadowextrude_debug">
 	<technique priority="100">
 		<pass>
 			<mixmode><add /></mixmode>
 			<streammapping stream="shadow vertices" destination="attribute 0" />
 			<streammapping stream="shadow normals" destination="attribute 1" />
-			<writemask r="false" g="false" b="false" a="false"/>
 			<vp type="gl_arb_vp" file="/shader/shadowextrude.avp"/>
+      			<texturemapping unit="0" layer="0" />
+			<fp type="gl_mtex_fp" file="/shader/primarycolor.mtex"/>
 		</pass>
 	</technique>
 </shader>

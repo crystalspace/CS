@@ -28,6 +28,9 @@
 #include "csutil/cfgacc.h"
 #include "iutil/plugin.h"
 #include "ivideo/graph3d.h"
+#ifdef CS_USE_NEW_RENDERER
+#include "ivideo/shader/shader.h"
+#endif
 #include "ivaria/bugplug.h"
 
 struct iObjectRegistry;
@@ -123,7 +126,7 @@ class csShadow;
 #define DEBUGCMD_COUNTERRESET	1043	// Reset all counters.
 #define DEBUGCMD_COUNTERREMOVE	1044	// Remove all counters.
 #define DEBUGCMD_COUNTERFREEZE	1045	// Freeze all counters.
-
+#define DEBUGCMD_SHADOWDEBUG	1046	// Toggle shadow debugging
 /**
  * For key mappings.
  */
@@ -216,6 +219,12 @@ private:
   // Toggle a G3D boolean option.
 #ifndef CS_USE_NEW_RENDERER
   void ToggleG3DState (G3D_RENDERSTATEOPTION op, const char* name);
+#else
+  bool do_shadow_debug;
+  csRef<iShader> standardShadowShader;
+  csRef<iShader> debugShadowShader;
+
+  void ToggleR3DState (R3D_RENDERSTATEOPTION op, const char* name);
 #endif
 
   // The selected mesh.

@@ -37,6 +37,9 @@ The history order is reversed so that new features are at the top.
 	  If not, 'crystalspace.utilities.' is added to the beginning of 
 	  plugin name. This makes it possible for lazy people to just 
 	  specify e.g. '-plugin=bugplug'.
+	- res added a shadow debugging aid for the new renderer to bugplug;
+	  the shadow extruder shader is swapped at runtime with a version 
+	  where the volume more visible.
 7-Apr-2003
         - Rhad changed MSVC specific CopyMemory to memcpy() in OpenAL
           sound renderer.  Increased default sound buffer to 1.0 seconds
