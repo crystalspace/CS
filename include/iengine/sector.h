@@ -30,6 +30,7 @@ struct iThing;
 struct iStatLight;
 struct iVisibilityCuller;
 struct iObject;
+struct csFog;
 
 SCF_VERSION (iSector, 0, 1, 9);
 
@@ -52,6 +53,8 @@ struct iSector : public iBase
   virtual CS_ID GetID () = 0;
   /// Has this sector fog?
   virtual bool HasFog () = 0;
+  /// Return the fog structure (even if fog is disabled)
+  virtual csFog *GetFog () = 0;
 
   /// Return the number of mesh objects in this sector
   virtual int GetMeshCount () = 0;
@@ -79,6 +82,11 @@ struct iSector : public iBase
   virtual void CalculateSectorBBox (csBox3& bbox,
   	bool do_meshes, bool do_terrain) = 0;
 
+  /**
+   * Use the specified mesh object as the visibility culler for
+   * this sector.
+   */
+  virtual void SetVisibilityCuller (const char *Name) = 0;
   /**
    * Get the visibility culler that is used for this sector.
    * NULL if none.

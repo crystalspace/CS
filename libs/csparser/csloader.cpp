@@ -417,7 +417,7 @@ iCollection* csLoader::load_collection (char* name, char* buf)
 
 //---------------------------------------------------------------------------
 
-csStatLight* csLoader::load_statlight (char* name, char* buf)
+iStatLight* csLoader::load_statlight (char* name, char* buf)
 {
   CS_TOKEN_TABLE_START(commands)
     CS_TOKEN_TABLE (ATTENUATION)
@@ -541,18 +541,18 @@ defaulthalo:
     }
   }
 
-  csStatLight* l = new csStatLight (x, y, z, dist, r, g, b, dyn);
-  l->SetName (name);
+  iStatLight* l = &(new csStatLight (x, y, z, dist, r, g, b, dyn))->scfiStatLight;
+  l->GetPrivateObject ()->SetName (name);
   switch (halo.type)
   {
     case 1:
-      l->SetHalo (new csCrossHalo (halo.cross.Intensity, halo.cross.Cross));
+      l->GetPrivateObject ()->SetHalo (new csCrossHalo (halo.cross.Intensity, halo.cross.Cross));
       break;
     case 2:
-      l->SetHalo (new csNovaHalo (halo.nova.Seed, halo.nova.NumSpokes, halo.nova.Roundness));
+      l->GetPrivateObject ()->SetHalo (new csNovaHalo (halo.nova.Seed, halo.nova.NumSpokes, halo.nova.Roundness));
       break;
   }
-  l -> SetAttenuation (attenuation);
+  l->GetPrivateObject ()->SetAttenuation (attenuation);
   return l;
 }
 
@@ -576,7 +576,7 @@ csKeyValuePair* csLoader::load_key (char* buf, iObject* pParent)
   }
 }
 
-csMapNode* csLoader::load_node (char* name, char* buf, csSector* sec)
+csMapNode* csLoader::load_node (char* name, char* buf, iSector* sec)
 {
   CS_TOKEN_TABLE_START (commands)
     CS_TOKEN_TABLE (ADDON)
@@ -585,7 +585,7 @@ csMapNode* csLoader::load_node (char* name, char* buf, csSector* sec)
   CS_TOKEN_TABLE_END
 
   csMapNode* pNode = new csMapNode (name);
-  pNode->SetSector (sec);
+  pNode->SetSector (sec->GetPrivateObject());
 
   long  cmd;
   char* xname;
@@ -800,7 +800,7 @@ void csLoader::mat_process (char *name, char* buf, const char *prefix)
 
 //---------------------------------------------------------------------------
 
-csSector* csLoader::load_sector (char* secname, char* buf)
+iSector* csLoader::load_sector (char* secname, char* buf)
 {
   CS_TOKEN_TABLE_START (commands)
     CS_TOKEN_TABLE (ADDON)
@@ -820,9 +820,7 @@ csSector* csLoader::load_sector (char* secname, char* buf)
   bool do_culler = false;
   char bspname[100];
 
-  csSector* sector = new csSector (Engine->GetCsEngine()) ;
-  sector->SetName (secname);
-
+  iSector *sector = Engine->CreateSector (secname);
   Stats->sectors_loaded++;
 
   while ((cmd = csGetObject (&buf, commands, &name, &params)) > 0)
@@ -835,7 +833,7 @@ csSector* csLoader::load_sector (char* secname, char* buf)
     switch (cmd)
     {
       case CS_TOKEN_ADDON:
-	LoadAddOn (params, &(sector->scfiSector));
+	LoadAddOn (params, sector);
       	break;
       case CS_TOKEN_CULLER:
         do_culler = true;
@@ -850,7 +848,7 @@ csSector* csLoader::load_sector (char* secname, char* buf)
         {
 	  iMeshWrapper* mesh = Engine->CreateMeshObject(name);
           LoadMeshObject (mesh, params);
-          mesh->GetMovable ()->SetSector (&sector->scfiSector);
+          mesh->GetMovable ()->SetSector (sector);
 	  mesh->GetMovable ()->UpdateMove ();
         }
         break;
@@ -864,18 +862,18 @@ csSector* csLoader::load_sector (char* secname, char* buf)
         sector->AddLight ( load_statlight(name, params) );
         break;
       case CS_TOKEN_NODE:
-        sector->ObjAdd ( load_node(name, params, sector) );
+        sector->QueryObject ()->ObjAdd (load_node(name, params, sector));
         break;
       case CS_TOKEN_FOG:
         {
-          csFog& f = sector->GetFog ();
-          f.enabled = true;
-          ScanStr (params, "%f,%f,%f,%f", &f.red, &f.green, &f.blue, &f.density);
+          csFog *f = sector->GetFog ();
+          f->enabled = true;
+          ScanStr (params, "%f,%f,%f,%f", &f->red, &f->green, &f->blue, &f->density);
         }
         break;
       case CS_TOKEN_KEY:
       {
-        load_key(params, sector);
+        load_key(params, sector->QueryObject());
         break;
       }
     }
@@ -888,7 +886,7 @@ csSector* csLoader::load_sector (char* secname, char* buf)
   }
 
   if (!(flags & CS_LOADER_NOBSP))
-    if (do_culler) sector->UseCuller (bspname);
+    if (do_culler) sector->SetVisibilityCuller (bspname);
   return sector;
 }
 
@@ -1024,7 +1022,7 @@ bool csLoader::LoadMap (char* buf)
 	  break;
         case CS_TOKEN_SECTOR:
           if (!Engine->FindSector (name, ResolveOnlyRegion))
-            Engine->GetCsEngine()->sectors.Push (load_sector (name, params));
+            load_sector (name, params);
           break;
         case CS_TOKEN_COLLECTION:
           load_collection (name, params);
@@ -1931,7 +1929,7 @@ bool csLoader::LoadTerrainObjectFactory (iTerrainFactoryWrapper* pWrapper,
 }
 
 bool csLoader::LoadTerrainObject (iTerrainWrapper *pWrapper,
-	char *pBuf, csSector* sector)
+	char *pBuf, iSector* sector)
 {
   CS_TOKEN_TABLE_START (commands)
     CS_TOKEN_TABLE (ADDON)
@@ -2013,7 +2011,7 @@ bool csLoader::LoadTerrainObject (iTerrainWrapper *pWrapper,
   }
 
   // add new terrain to sector
-  sector->AddTerrain (pWrapper->GetPrivateObject());
+  sector->AddTerrain (pWrapper);
 
   return true;
 }

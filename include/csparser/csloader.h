@@ -48,11 +48,11 @@ struct iMeshFactoryWrapper;
 struct iMeshWrapper;
 struct iTerrainFactoryWrapper;
 struct iTerrainWrapper;
+struct iSector;
+struct iStatLight;
 
-class csStatLight;
 class csKeyValuePair;
 class csMapNode;
-class csSector;
 
 /**
  * The loader for Crystal Space maps.
@@ -103,11 +103,11 @@ class csLoader : public iLoader
   /// Parse a collection definition and add it to the engine
   iCollection* load_collection (char* name, char* buf);
   /// Parse a static light definition and return a new object
-  csStatLight* load_statlight (char* name, char* buf);
+  iStatLight* load_statlight (char* name, char* buf);
   /// Parse a key definition and return a new object
   csKeyValuePair* load_key (char* buf, iObject* pParent);
   /// Parse a map node definition and return a new object
-  csMapNode* load_node (char* name, char* buf, csSector* sec);
+  csMapNode* load_node (char* name, char* buf, iSector* sec);
 
   /// Parse and load a single texture
   void txt_process (char *name, char* buf);
@@ -115,7 +115,7 @@ class csLoader : public iLoader
   void mat_process (char *name, char* buf, const char* prefix = NULL);
 
   /// Parse a sector definition and return a new object
-  csSector* load_sector (char* secname, char* buf);
+  iSector* load_sector (char* secname, char* buf);
 
   /// Resolve the portals of a thing
   void ResolvePortalSectors (iThing *Mesh);
@@ -135,7 +135,7 @@ class csLoader : public iLoader
    * Load the terrain object from the map file.
    */
   bool LoadTerrainObject( iTerrainWrapper *pTerrain, char* buf,
-  	csSector* pSector );
+  	iSector* pSector );
 
   /**
    * Load a plugin in general.

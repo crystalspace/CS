@@ -513,6 +513,10 @@ public:
     { return (csSector*)scfParent; }
     virtual iObject *QueryObject()
     { return scfParent; }
+    virtual void SetVisibilityCuller (const char *Name)
+    {
+      scfParent->UseCuller (Name);
+    }
     virtual iVisibilityCuller* GetVisibilityCuller ()
     {
       return scfParent->GetVisibilityCuller ();
@@ -532,6 +536,7 @@ public:
     }
     virtual CS_ID GetID () { return scfParent->GetID (); }
     virtual bool HasFog () { return scfParent->HasFog (); }
+    virtual csFog *GetFog () { return &scfParent->fog; }
     virtual int GetRecLevel () { return scfParent->draw_busy; }
   } scfiSector;
   friend struct eiSector;
