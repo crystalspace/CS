@@ -11,6 +11,12 @@ chronological order.
 	- Eric Sunshine fixed bug in Jam build system where msvcgen target
 	  would insert AWS's Bison and Flex input files into AWS project file
 	  rather than the related .cpp and .h files.
+	- Eric Sunshine worked around problem where msvcgen.jam reported that
+	  it did not know how to locate or create <grist>csperlxs.c when
+	  PERL5.AVAILABLE was "yes".  (A more correct fix will involve a
+	  paradigm shift in the way this glue file is handled.  The present
+	  scheme is completely incompatible with the notion of project files.
+	  Details of the problem are avalable in cscript/csperl5/Jamfile.)
 15-Apr-2004
 	- Eric Sunshine added a blurb to the Unix and MacOS/X build
 	  instructions cautioning about potential problems caused by

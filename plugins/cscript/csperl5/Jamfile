@@ -1,6 +1,6 @@
 SubDir TOP plugins cscript csperl5 ;
 
-if $(PERL5.AVAILABLE) = "yes"
+if $(PERL5.AVAILABLE) = "yes" && ! $(MSVCGEN_CONFIG) # Ugly!
 {
   # @@@ FIXME: This scheme of creating a file which includes
   # csperlxs_fallback.inc fails when it comes to project file creation, since

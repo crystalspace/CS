@@ -24,8 +24,6 @@ W - Wishlist (the build also works without this feature)
     wsock32.lib, for instance.  There are a number of other such modules.  The
     current monlithic solution of placing this information in
     CS/mk/msvcgen/Jamconfig is ugly, error-prone, and a maintenance headache.
-[H] msvcgen.jam: When PERL5.SDK.AVAILABLE is "yes", Jam reports that it doesn't
-    know how to locate or create <grist>csperlxs.c.
 [H] msvcgen.jam: Eliminate the ugly and monolithic mk/msvcgen/msvcgen.sh and
     mk/msvcgen/Jamconfig.  Instead, it should be possible to run the entire
     process using the normal Jamconfig created by the configuration process.
@@ -33,6 +31,10 @@ W - Wishlist (the build also works without this feature)
     a target, rather than relying upon the ugly, out-of-place "$(<)_help =
     $(>)" hack which was added to help.jam, to allow msvcgen.jam to access the
     help string.  msvcgen.jam should be responsible for its own requirements.
+[H] msvcgen.jam: There should be some way to indicate that project files should
+    not be generated for certain applications, plugins, and libraries.  This
+    could be done either via a monolithic list or on a module-by-module basis
+    in each module's Jamfile.  (What are the relative merits of each approach?)
 [H] There are no rules for building the pure Python module yet (only the Python
     plugin works).
 [H] There are no rules for building the pure Perl5 module yet (only the Perl5
@@ -81,6 +83,8 @@ W - Wishlist (the build also works without this feature)
     Jam with a message telling that you should rerun configure, or at least
     emit a big warning?
 
+[*] msvcgen.jam: When PERL5.AVAILABLE is "yes", Jam reports that it doesn't
+    know how to locate or create <grist>csperlxs.c.
 [*] When Bison and Flex are installed, the generated MSVC project file for AWS
     incorrectly mentions skinlex.ll and skinpars.yy, rather than skinlex.cpp
     and skinpars.cpp from the source directory.
