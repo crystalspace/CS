@@ -102,6 +102,23 @@ void csMotionTemplate::SetLoopFlip (bool enable) {
   loopflip=enable;
 }
 
+static int compare_bones (void* item1, void* item2)
+{
+  csMotionBone* mb1 = (csMotionBone*)item1;
+  csMotionBone* mb2 = (csMotionBone*)item2;
+  unsigned int id1 = mb1->GetHash ();
+  unsigned int id2 = mb2->GetHash ();
+  return id1-id2;
+}
+
+static int comparekey_bones (void* item, void* key)
+{
+  csMotionBone* mb = (csMotionBone*)item;
+  unsigned int id1 = mb->GetHash ();
+  unsigned int id2 = (unsigned int)key;
+  return id1-id2;
+}
+
 int csMotionTemplate::AddBone (const char* name)
 {
   MOT_DPRINTF(("AddBone '%s'\n", name));
@@ -109,11 +126,12 @@ int csMotionTemplate::AddBone (const char* name)
   csMotionBone *bone=new csMotionBone;
   bone->name = strdup (name);
   bone->hash = csHashCompute (name);
-  return bones.InsertSorted(bone);
+  return bones.InsertSorted (bone, compare_bones);
 }
 
-int csMotionTemplate::FindBoneByName (const char* name) {
-  return bones.FindSortedKey((void*)csHashCompute(name));
+int csMotionTemplate::FindBoneByName (const char* name)
+{
+  return bones.FindSortedKey ((void*)csHashCompute(name), comparekey_bones);
 }
 
 //TODO Make sure bones are sorted by time
@@ -435,9 +453,27 @@ bool csMotionManager::Initialize (iObjectRegistry* object_reg)
   return true;
 }
 
+static int compare_motions (void* item1, void* item2)
+{
+  csMotionTemplate* mb1 = (csMotionTemplate*)item1;
+  csMotionTemplate* mb2 = (csMotionTemplate*)item2;
+  unsigned int id1 = mb1->GetHash ();
+  unsigned int id2 = mb2->GetHash ();
+  return id1-id2;
+}
+
+static int comparekey_motions (void* item, void* key)
+{
+  csMotionTemplate* mb = (csMotionTemplate*)item;
+  unsigned int id1 = mb->GetHash ();
+  unsigned int id2 = (unsigned int)key;
+  return id1-id2;
+}
+
 csMotionTemplate* csMotionManager::FindMotionTemplateByName (const char* name)
 {
-  int index = motions.FindSortedKey((void*)csHashCompute(name));
+  int index = motions.FindSortedKey ((void*)csHashCompute(name),
+  	comparekey_motions);
   if (index == -1)
     return NULL;
   return motions.Get(index);
@@ -449,7 +485,7 @@ csMotionTemplate* csMotionManager::AddMotionTemplate (const char* name)
 
   csMotionTemplate* mot = new csMotionTemplate();
   mot->SetName(name);
-  motions.InsertSorted(mot);
+  motions.InsertSorted (mot, compare_motions);
   return mot;
 }
 
@@ -464,9 +500,27 @@ void csMotionManager::DeleteMotion( iMotionTemplate* motiontemp )
   motions.Delete((csMotionTemplate*)motiontemp);
 }
 
-csMotionController* csMotionManager::FindMotionControllerBySkeleton (iSkeletonBone *skel)
+static int compare_skeleton (void* item1, void* item2)
 {
-  int index = controllers.FindSortedKey(skel);
+  csMotionController* mb1 = (csMotionController*)item1;
+  csMotionController* mb2 = (csMotionController*)item2;
+  unsigned int id1 = (unsigned int)mb1->GetSkeleton ();
+  unsigned int id2 = (unsigned int)mb2->GetSkeleton ();
+  return id1-id2;
+}
+
+static int comparekey_skeleton (void* item, void* key)
+{
+  csMotionController* mb = (csMotionController*)item;
+  unsigned int id1 = (unsigned int)mb->GetSkeleton ();
+  unsigned int id2 = (unsigned int)key;
+  return id1-id2;
+}
+
+csMotionController* csMotionManager::FindMotionControllerBySkeleton (
+	iSkeletonBone *skel)
+{
+  int index = controllers.FindSortedKey (skel, comparekey_skeleton);
   if (index == -1)
     return NULL;
   return controllers.Get(index);
@@ -476,10 +530,10 @@ csMotionController* csMotionManager::AddMotionController (iSkeletonBone *skel)
 {
   MOT_DPRINTF(("AddController(%p)\n", skel));
 
-  assert(controllers.FindSortedKey(skel)==-1);
+  assert(controllers.FindSortedKey(skel, comparekey_skeleton)==-1);
 
   csMotionController *mc=new csMotionController(skel);
-  controllers.InsertSorted(mc);
+  controllers.InsertSorted (mc, compare_skeleton);
   return mc;
 }
 

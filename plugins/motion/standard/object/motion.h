@@ -51,22 +51,17 @@ public:
   void Animate(float time,float duration, csVector3 &v, csQuaternion &q, bool interpolate);
 };
 
-typedef csPDelArray<csMotionBone> csMotionBoneVectorBase;
-class csMotionBoneVector : public csMotionBoneVectorBase
+class csMotionBoneVector : public csPDelArray<csMotionBone>
 {
 public:
-  csMotionBoneVector (int ilimit = 0, int ithreshold = 0)
-    : csMotionBoneVectorBase(ilimit, ithreshold) {}
-  virtual int Compare (csSome Item1, csSome Item2, int /*Mode*/) const
-    { unsigned int id1 = ((csMotionBone*)Item1)->GetHash(), id2 = ((csMotionBone*)Item2)->GetHash();
-      return id1 - id2; }
-
-  virtual int CompareKey (csSome Item1, csConstSome Key, int /*Mode*/) const
-    { unsigned int id1 = ((csMotionBone*)Item1)->GetHash(), id2 = (unsigned int)Key; return id1 - id2; }
-
-  virtual bool FreeItem (csSome Item) {
-    delete (csMotionBone*)Item; return true;
-  }
+  //csMotionBoneVector (int ilimit = 0, int ithreshold = 0)
+    //: csMotionBoneVectorBase(ilimit, ithreshold) {}
+  //virtual int Compare (csSome Item1, csSome Item2, int /*Mode*/) const
+    //{ unsigned int id1 = ((csMotionBone*)Item1)->GetHash(), id2 = ((csMotionBone*)Item2)->GetHash();
+      //return id1 - id2; }
+//
+  //virtual int CompareKey (csSome Item1, csConstSome Key, int /*Mode*/) const
+    //{ unsigned int id1 = ((csMotionBone*)Item1)->GetHash(), id2 = (unsigned int)Key; return id1 - id2; }
 };
 
 class csMotionTemplate : public iMotionTemplate
@@ -103,22 +98,17 @@ public:
   virtual void AddFrameBone (int boneid, float frametime, const csVector3 &v, const csQuaternion &q);
 };
 
-typedef csPDelArray<csMotionTemplate> csMotionTemplateVectorBase;
-class csMotionTemplateVector : public csMotionTemplateVectorBase
+class csMotionTemplateVector : public csPDelArray<csMotionTemplate>
 {
 public:
-  csMotionTemplateVector (int ilimit = 8, int ithreshold = 16)
-    : csMotionTemplateVectorBase(ilimit, ithreshold) {}
-  virtual int Compare (csSome Item1, csSome Item2, int /*Mode*/) const
-    { unsigned int id1 = ((csMotionTemplate*)Item1)->GetHash(), id2 = ((csMotionTemplate*)Item2)->GetHash();
-      return id1 - id2; }
+  //csMotionTemplateVector (int ilimit = 8, int ithreshold = 16)
+    //: csMotionTemplateVectorBase(ilimit, ithreshold) {}
+  //virtual int Compare (csSome Item1, csSome Item2, int /*Mode*/) const
+    //{ unsigned int id1 = ((csMotionTemplate*)Item1)->GetHash(), id2 = ((csMotionTemplate*)Item2)->GetHash();
+      //return id1 - id2; }
 
-  virtual int CompareKey (csSome Item1, csConstSome Key, int /*Mode*/) const
-    { unsigned int id1 = ((csMotionTemplate*)Item1)->GetHash(), id2 = (unsigned int)Key; return id1 - id2; }
-
-  virtual bool FreeItem (csSome Item) {
-    ((csMotionTemplate*)Item)->DecRef(); return true;
-  }
+  //virtual int CompareKey (csSome Item1, csConstSome Key, int /*Mode*/) const
+    //{ unsigned int id1 = ((csMotionTemplate*)Item1)->GetHash(), id2 = (unsigned int)Key; return id1 - id2; }
 };
 
 class csMotionStackItem {
@@ -138,15 +128,11 @@ public:
   bool Update(float timedelta);
 };
 
-typedef csPDelArray<csMotionStackItem> csMotionStackVectorBase;
-class csMotionStackVector : public csMotionStackVectorBase
+class csMotionStackVector : public csPDelArray<csMotionStackItem>
 {
 public:
-  csMotionStackVector (int ilimit = 0, int ithreshold = 0)
-    : csMotionStackVectorBase(ilimit, ithreshold) {}
-  virtual bool FreeItem (csSome Item) {
-    delete (csMotionStackItem*)Item; return true;
-  }
+  //csMotionStackVector (int ilimit = 0, int ithreshold = 0)
+    //: csMotionStackVectorBase(ilimit, ithreshold) {}
 };
 
 #define MAX_MOTION_PER_BONE 12
@@ -186,22 +172,17 @@ public:
   virtual void Pause(bool enable);
 };
 
-typedef csPDelArray<csMotionController> csMotionControllerVectorBase;
-class csMotionControllerVector : public csMotionControllerVectorBase
+class csMotionControllerVector : public csPDelArray<csMotionController>
 {
 public:
-  csMotionControllerVector (int ilimit = 8, int ithreshold = 16)
-    : csMotionControllerVectorBase(ilimit, ithreshold) {}
-  virtual int Compare (csSome Item1, csSome Item2, int /*Mode*/) const
-    { unsigned int id1 = (int)((csMotionController*)Item1)->GetSkeleton(), id2 = (unsigned int)((csMotionController*)Item2)->GetSkeleton();
-      return id1 - id2; }
+  //csMotionControllerVector (int ilimit = 8, int ithreshold = 16)
+    //: csMotionControllerVectorBase(ilimit, ithreshold) {}
+  //virtual int Compare (csSome Item1, csSome Item2, int /*Mode*/) const
+    //{ unsigned int id1 = (int)((csMotionController*)Item1)->GetSkeleton(), id2 = (unsigned int)((csMotionController*)Item2)->GetSkeleton();
+      //return id1 - id2; }
 
-  virtual int CompareKey (csSome Item1, csConstSome Key, int /*Mode*/) const
-    { unsigned int id1 = (int)((csMotionController*)Item1)->GetSkeleton(), id2 = (unsigned int)Key; return id1 - id2; }
-
-  virtual bool FreeItem (csSome Item) {
-    ((csMotionController*)Item)->DecRef(); return true;
-  }
+  //virtual int CompareKey (csSome Item1, csConstSome Key, int /*Mode*/) const
+    //{ unsigned int id1 = (int)((csMotionController*)Item1)->GetSkeleton(), id2 = (unsigned int)Key; return id1 - id2; }
 };
 
 class csMotionManager : public iMotionManager

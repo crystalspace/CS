@@ -33,6 +33,8 @@ The history order is reversed so that new features are at the top.
 	  large triangle meshes.
 	- Andreas Busch modified the documentation for map2cs and texmap
 	  from old syntax to XML.
+	- Added InsertSorted() and FindSortedKey() to csPArray and
+	  csPDelArray. Fixed motion plugin with that.
 13-Jan-2002
 	- Further work on XML doc.
 	- Added support for <key> in mesh factories and collections.
