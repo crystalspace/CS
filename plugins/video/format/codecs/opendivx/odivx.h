@@ -44,4 +44,5 @@ class csOpenDivX : public iAVICodec
   virtual bool Decode (char *indata, uint32 inlength, void *&outdata);
   virtual bool Encode (void *indata, char *outdata, uint32 &outlength);
 };
+
 #endif
