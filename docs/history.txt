@@ -12,6 +12,7 @@ chronological order.
 	- Jorrit added a new test to csbench to do multiple objects in one
 	  sector. Unfortunatelly this breaks bumpmapping for some reason.
 	  To be investigated.
+	- Jorrit fixed a z-fighting issue in the multi-object room.
 22-Jul-2004
 	- Jorrit started work on adding a new test to csbench to test lots
 	  of smaller objects.
