@@ -1,13 +1,19 @@
 #!/usr/bin/env python
 
-import types, cPickle
+import types
 from string import *;
 
 try:
-	import cspacec;
-	from cspace import *;
+	import cPickle
 except:
-    	print "Failed to import cspace, can only pickle the map"
+	print "WARNING: Failed to import module cPickle, using slower pickle library"
+	import pickle
+
+try:
+	import cspacec
+	from cspace import *
+except:
+    	print "WARNING: Failed to import module cspace, can only pickle the map"
 	class Vector3:
 		def __init__(self, x, y, z):
 			print x, y, z
