@@ -7,6 +7,13 @@ individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
 17-Sep-2003
+	- Jorrit used valgrind in combination with the new renderer and
+	  discovered that the csGLExtensionManager didn't initialize the
+	  function pointers if some extension is not available. Since
+	  glrender3d (and other modules) sometimes test on the value of
+	  such a function pointer this could obviously give very bad
+	  results. Now csGLExtensionManager will initialize everything
+	  even if the extension is not present.
 	- Eric Sunshine documented cssys+csutil merge in apimod98.txi.
 	- Eric Sunshine documented csHash<> and csSet<> in apimod98.txi.
 	- Eric Sunshine repaired a lot of Texinfo mark-up errors in
