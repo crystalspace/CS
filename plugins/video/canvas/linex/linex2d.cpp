@@ -76,7 +76,7 @@ bool csGraphics2DLineXLib::Initialize (iSystem *pSystem)
   if (XSupportsLocale ())
     XSetLocaleModifiers ("");
 
-  csConfigAccess Config(iSys, "/config/video.cfg");
+  csConfigAccess Config(pSystem, "/config/video.cfg");
   do_hwmouse = Config->GetBool ("Video.SystemMouseCursor", true);
   if (System->GetOptionCL ("sysmouse"))
     do_hwmouse = true;
