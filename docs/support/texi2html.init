@@ -13,9 +13,8 @@ $T2H_NUMBER_SECTIONS = 1;
 $T2H_SPLIT = 'section';
 $T2H_SECTION_NAVIGATION = 1;
 $T2H_SUBDIR = undef;
-$T2H_SHORTEXTN = 1;
 $T2H_PREFIX = '';
-$T2H_VERBOSE = 1;
+$T2H_VERBOSE = 0;
 
 ######################################################################
 # The following settings are all geared toward preventing the user's

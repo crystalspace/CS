@@ -114,8 +114,8 @@ version @value{VERSION}, last updated @value{UPDATED}.
 
 @html
 For a list of available topics, see the
-<a href="cs_ovr.htm">quick overview</a>, or the full
-<a href="cs_toc.htm">table of contents</a>.
+<a href="cs_ovr.html">quick overview</a>, or the full
+<a href="cs_toc.html">table of contents</a>.
 <p><hr size=1>
 @end html
 

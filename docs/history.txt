@@ -3,6 +3,11 @@ The history order has been reversed so that new features are at the top.
 10-Jan-2001
 	- Eric Sunshine fixed a typo in win32.txi and made several other minor
 	  changes.
+	- Eric Sunshine changed the file extension on the HTML files in the
+	  docs/html and docs/pubapi directories from .htm to .html at Andrew's
+	  insistence.  :-)
+	- Eric Sunshine lowered the verbosity level of the build process for
+	  the HTML version of the User's Manual (make htmldoc).
 9-Jan-2001
 	- Eric Sunshine fixed a problem in bmpimage.cpp which caused loading
 	  of BMP files on big-endian Solaris to fail.

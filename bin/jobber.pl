@@ -546,10 +546,7 @@ sub apply_diffs {
 }
 
 #------------------------------------------------------------------------------
-# Publish a browseable copy of the generated files.  Also, copy index.htm to
-# index.html (if present) since most web servers will peform special handling
-# of index.html.  (Servers may also recognize index.htm, but in most cases,
-# they need to be specially configured to do so.)
+# Publish a browseable copy of the generated files.
 #------------------------------------------------------------------------------
 sub publish_browseable {
     create_directory_deep($BROWSEABLE_DIR, $OWNER_GROUP);
@@ -565,8 +562,6 @@ sub publish_browseable {
 
 	print "Preparing.\n";
 	run_command("cp -r \"$src\" \"$new_dir\"");
-	copy_file("$new_dir/index.htm", "$new_dir/index.html")
-	    if -e "$new_dir/index.htm";
 	change_group_deep($OWNER_GROUP, "$new_dir");
     
 	print "Installing.\n";
