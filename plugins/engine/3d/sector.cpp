@@ -111,13 +111,8 @@ void csSectorMeshList::FreeMesh (iMeshWrapper* item)
 //---------------------------------------------------------------------------
 SCF_IMPLEMENT_IBASE_EXT(csSector)
   SCF_IMPLEMENTS_EMBEDDED_INTERFACE(iSector)
-  SCF_IMPLEMENTS_EMBEDDED_INTERFACE(iVisibilityCullerListener)
   SCF_IMPLEMENTS_INTERFACE (csSector);
 SCF_IMPLEMENT_IBASE_EXT_END
-
-SCF_IMPLEMENT_EMBEDDED_IBASE (csSector::eiVisibilityCullerListener)
-  SCF_IMPLEMENTS_INTERFACE(iVisibilityCullerListener)
-SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 SCF_IMPLEMENT_EMBEDDED_IBASE (csSector::eiSector)
   SCF_IMPLEMENTS_INTERFACE(iSector)
@@ -126,7 +121,6 @@ SCF_IMPLEMENT_EMBEDDED_IBASE_END
 csSector::csSector (csEngine *engine) : csObject()
 {
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiSector);
-  SCF_CONSTRUCT_EMBEDDED_IBASE (scfiVisibilityCullerListener);
   DG_TYPE (this, "csSector");
   csSector::engine = engine;
   fog.enabled = false;
@@ -141,7 +135,6 @@ csSector::csSector (csEngine *engine) : csObject()
 csSector::~csSector ()
 {
   lights.RemoveAll ();
-  SCF_DESTRUCT_EMBEDDED_IBASE (scfiVisibilityCullerListener);
   SCF_DESTRUCT_EMBEDDED_IBASE (scfiSector);
 }
 
@@ -265,41 +258,6 @@ iVisibilityCuller* csSector::GetVisibilityCuller ()
   return culler;
 }
 
-// OR only!
-void csSector::MarkMeshAndChildrenVisible (iMeshWrapper* mesh,
-	uint32 frustum_mask)
-{
-  csMeshWrapper* cmesh = ((csMeshWrapper::MeshWrapper*)mesh)
-    	->GetCsMeshWrapper ();
-  cmesh->SetVisibilityNumber (current_visnr);
-  int i;
-  const csMeshMeshList& children = cmesh->GetChildren ();
-  for (i = 0 ; i < children.GetCount () ; i++)
-  {
-    iMeshWrapper* child = children.Get (i);
-    MarkMeshAndChildrenVisible (child, frustum_mask);
-  }
-}
-
-// OR only!
-void csSector::ObjectVisible (iRenderView* rview,
-	iVisibilityObject *visobj, iMeshWrapper *mesh, uint32 frustum_mask)
-{
-  visobj->SetVisibilityNumber (current_visnr);
-  csMeshWrapper* cmesh = ((csMeshWrapper::MeshWrapper*)mesh)
-    	->GetCsMeshWrapper ();
-  csStaticLODMesh* static_lod = cmesh->GetStaticLODMesh ();
-  if (static_lod)
-  {
-    float distance = qsqrt (cmesh->GetSquaredDistance (rview));
-    float lod = static_lod->GetLODValue (distance);
-    csArray<iMeshWrapper*>& meshes = static_lod->GetMeshesForLOD (lod);
-    int i;
-    for (i = 0 ; i < meshes.Length () ; i++)
-      MarkMeshAndChildrenVisible (meshes[i], frustum_mask);
-  }
-}
-
 class csSectorVisibleMeshCallback : public iVisibilityCullerListener
 {
 public:
@@ -309,6 +267,7 @@ public:
   {
     SCF_CONSTRUCT_IBASE(0);
     privMeshlist = 0;
+    sector = 0;
   }
 
   virtual ~csSectorVisibleMeshCallback()
@@ -316,10 +275,17 @@ public:
     SCF_DESTRUCT_IBASE();
   }
 
+  // NR version
   void Setup (csRenderMeshList *meshlist, iRenderView *rview)
   {
     privMeshlist = meshlist;
-    this->rview = rview;
+    csSectorVisibleMeshCallback::rview = rview;
+  }
+  // OR version
+  void Setup (csSector* sector, iRenderView *rview)
+  {
+    csSectorVisibleMeshCallback::sector = sector;
+    csSectorVisibleMeshCallback::rview = rview;
   }
 
   void MarkMeshAndChildrenVisible (iMeshWrapper* mesh, uint32 frustum_mask)
@@ -349,6 +315,7 @@ public:
         MarkMeshAndChildrenVisible (meshes[i], frustum_mask);
     }
 
+#ifdef CS_USE_NEW_RENDERER
     int num;
     csRenderMesh** meshes = cmesh->GetRenderMeshes (num, rview, 
       &(cmesh->GetCsMovable ()).scfiMovable, frustum_mask);
@@ -364,13 +331,18 @@ public:
       privMeshlist->AddRenderMeshes (meshes, num, cmesh->GetRenderPriority (),
 	  cmesh->GetZBufMode (), box);
     }
+#else
+    cmesh->SetVisibilityNumber (sector->current_visnr);
+#endif
   }
 
-  virtual void ObjectVisible (iVisibilityObject*, iMeshWrapper *mesh,
+  virtual void ObjectVisible (iVisibilityObject* visobj, iMeshWrapper *mesh,
   	uint32 frustum_mask)
   {
+#ifdef CS_USE_NEW_RENDERER
     if (privMeshlist == 0)
       return;
+#endif
 
     csMeshWrapper* cmesh = ((csMeshWrapper::MeshWrapper*)mesh)
     	->GetCsMeshWrapper ();
@@ -378,7 +350,8 @@ public:
   }
 
 private:
-  csRenderMeshList *privMeshlist;
+  csSector* sector;	// OR only
+  csRenderMeshList *privMeshlist;	// NR only
   iRenderView *rview;
 };
 
@@ -880,8 +853,8 @@ void csSector::Draw (iRenderView *rview)
   {
     // Mark visible objects.
     current_visnr++;
-    scfiVisibilityCullerListener.rview = rview;
-    culler->VisTest (rview, &scfiVisibilityCullerListener);
+    GetVisMeshCb ()->Setup (this, rview);
+    culler->VisTest (rview, GetVisMeshCb ());
     //uint32 current_visnr = culler->GetCurrentVisibilityNumber ();
 
     // get a pointer to the previous sector

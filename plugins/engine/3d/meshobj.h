@@ -361,11 +361,11 @@ public:
   virtual void SetVisibilityNumber (uint32 vis)
   {
     visnr = vis;
-    if (Parent)
-    {
-      ((csMeshWrapper::MeshWrapper*)Parent)->scfParent
-      	->SetVisibilityNumber (vis);
-    }
+    //if (Parent)
+    //{
+      //((csMeshWrapper::MeshWrapper*)Parent)->scfParent
+      	//->SetVisibilityNumber (vis);
+    //}
   }
 
   /// Return if this object is visible (for iVisibilityObject). 
