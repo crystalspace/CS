@@ -190,7 +190,8 @@ bool CCSSector::Write(csRef<iDocumentNode> node, CIWorld* pIWorld)
         for (j=0; j<pPortal->GetPolygonCount(); j++)
         {
 	  csString portalName;
-	  portalName.Format ("%s_%d_%d", meshname.GetData(), i, j);
+	  portalName.Format ("%s_%lu_%d", meshname.GetData(),
+			     (unsigned long)i, j);
 
 	  DocNode        portal = CreateNode(meshobj, "portal");
 	  portal->SetAttribute ("name", portalName);
