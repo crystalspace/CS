@@ -56,7 +56,7 @@ void csCubicSpline::SetDimensionValues (int dim, float* d)
     temp -=
       deriv_vals[i-1] * (time_points[i]-time_points[i-1])/6.;
     temp -=
-      deriv_vals[i] * (time_points[i+1]-time_points[-1])/3.;
+      deriv_vals[i] * (time_points[i+1]-time_points[i-1])/3.;
     temp /=
       (time_points[i+1]-time_points[i]) / 6.;
     deriv_vals[i+1] = temp;
