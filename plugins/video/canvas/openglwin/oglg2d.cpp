@@ -485,7 +485,7 @@ bool csGraphics2DOpenGL::SetMouseCursor (csMouseCursorID iShape)
 {
   HCURSOR hCursor;
 
-  if (!HardwareCursor) {
+  if (!m_bHardwareCursor) {
     SetCursor(NULL);
     return false;
   }

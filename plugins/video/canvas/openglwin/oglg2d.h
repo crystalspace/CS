@@ -86,6 +86,8 @@ protected:
 
   bool m_bPalettized;
   bool m_bPaletteChanged;
+
+  bool m_bHardwareCursor;
   
   HRESULT RestoreAll();
   unsigned char *LockBackBuf();
