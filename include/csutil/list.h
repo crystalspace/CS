@@ -146,13 +146,7 @@ public:
       return *this;
     }
   protected:
-//@@@ I added a special compilation fix for the VC6 compiler. Luca
-#if defined (COMP_VC) && (_MSC_VER < 1300)
     friend class csList<T>;
-#else
-    friend class csList;
-#endif
-
     Iterator (csListElement* element) : ptr(element)
     {}
 
