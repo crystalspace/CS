@@ -22,14 +22,43 @@
 
 #include "csutil/scf.h"
 #include "cstypes.h"
+#include "csutil/strset.h"
+#include "csutil/ref.h"
+#include "csutil/csvector.h"
+#include "ivideo/effects/efvector4.h"
 
 struct iEffectTechnique;
+
+#define CS_EFVARIABLETYPE_UNDEFINED 0
+#define CS_EFVARIABLETYPE_FLOAT 1
+#define CS_EFVARIABLETYPE_VECTOR4 2
+
+struct efvariable
+{
+public:
+  csStringID id;
+  char type;
+  float float_value;
+  csEffectVector4 vector_value;
+  int point_to;
+
+  efvariable( csStringID argid )
+    { type = CS_EFVARIABLETYPE_UNDEFINED; id = argid; }
+  efvariable( csStringID argid, float value)
+    { type = CS_EFVARIABLETYPE_FLOAT; id = argid; float_value = value; }
+  efvariable( csStringID argid, csEffectVector4 value)
+    { type = CS_EFVARIABLETYPE_VECTOR4; id = argid; vector_value = value;  }
+};
 
 class csEffectDefinition : public iEffectDefinition
 {
 private:
   csBasicVector techniques;
   char* techniquename;
+  csBasicVector variables;
+
+  int GetTopmostVariableID(int id);
+
 public:
 
   SCF_DECLARE_IBASE;
@@ -39,7 +68,7 @@ public:
     SCF_CONSTRUCT_IBASE( NULL );
   }
   virtual ~csEffectDefinition ()
-  {
+  { 
   }
 
   iEffectTechnique* CreateTechnique();
@@ -48,6 +77,16 @@ public:
 
   void SetName( const char* name );
   const char* GetName();
+
+  float GetVariableFloat( int variableID );
+  csEffectVector4 GetVariableVector4( int variableID );
+  char GetVariableType( int variableID );
+
+  void SetVariableFloat( int variableID, float value );
+  void SetVariableVector4( int variableID, csEffectVector4 value );
+
+  int GetVariableID(csStringID string, bool create = true);
+  csBasicVector GetAllVariableNames();
 };
 
 #endif // __EFFECTDEFINITION_H__

@@ -23,6 +23,7 @@
 #include "csutil/scf.h"
 
 struct iEffectTechnique;
+struct iEffectDefinition;
 
 SCF_VERSION (iEffectClient, 0, 0, 1);
 
@@ -34,7 +35,7 @@ struct iEffectClient : public iBase
 public:
 
   /// Validate a technique
-  virtual bool Validate( iEffectTechnique* technique ) = 0;
+  virtual bool Validate( iEffectDefinition* effect, iEffectTechnique* technique ) = 0;
 };
 
 #endif // __IEFFECTCLIENT_H__

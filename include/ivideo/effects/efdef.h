@@ -24,7 +24,8 @@
  */
 #include "csutil/scf.h"
 #include "cstypes.h"
-
+#include "efvector4.h"
+#include "csutil/csvector.h"
 
 struct iEffectTechnique;
 
@@ -46,8 +47,23 @@ struct iEffectDefinition : public iBase
   virtual void SetName( const char* name ) = 0;
   /// Retrieve name of effect
   virtual const char* GetName() = 0;
+  
+  /// Get variable value as float
+  virtual float GetVariableFloat( int variableID ) = 0;
+  /// Get variable value as csEffectVector4
+  virtual csEffectVector4 GetVariableVector4( int variableID ) = 0;
+  /// Get varaibletype
+  virtual char GetVariableType( int variableID ) = 0;
 
-	/// Set a 
+  /// Set variable value as float
+  virtual void SetVariableFloat( int variableID, float value ) = 0;
+  /// Set variable value as vector4
+  virtual void SetVariableVector4( int variableID, csEffectVector4 value ) = 0; 
+
+  /// Get/create variable
+  virtual int GetVariableID(uint32 string, bool create = true) = 0;
+  /// Get all variable stringnames (used when creatingthem)
+  virtual csBasicVector GetAllVariableNames() = 0; 
 };
 
 #endif // __IEFFECTDEFINITION_H__

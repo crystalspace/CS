@@ -58,7 +58,7 @@ bool csEffectServer::Validate( iEffectDefinition* effect )
     {
       bool valideffect = false;
       for( int i=0; i<effect->GetTechniqueCount(); i++ )
-        if( client->Validate( effect->GetTechnique(i) ) )
+        if( client->Validate( effect, effect->GetTechnique(i) ) )
         {
           effect->GetTechnique(i)->SetValidation( CS_TECHNIQUE_PASSED );
           valideffect = true;

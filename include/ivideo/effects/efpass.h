@@ -43,7 +43,7 @@ struct iEffectPass : public iBase
   /// Set a state opaque data.
   virtual void SetStateOpaque( csStringID state, void *value ) = 0;
 		/// Set a state vector4.
-	virtual void SetStateVector4( csStringID state, csEffectVector4 value) = 0;
+  virtual void SetStateVector4( csStringID state, csEffectVector4 value) = 0;
 
   
   /// Get a state float.
@@ -53,7 +53,7 @@ struct iEffectPass : public iBase
   /// Get a state opaque data.
   virtual void *GetStateOpaque( csStringID state ) = 0;
 	/// Get a state vector4.
-	virtual csEffectVector4 GetStateVector4( csStringID state) = 0;
+  virtual csEffectVector4 GetStateVector4( csStringID state) = 0;
 
 
 
@@ -69,10 +69,10 @@ struct iEffectPass : public iBase
   /// Get the id of the next state.
   virtual csStringID GetNextState() = 0;
 
-	/// Get renderer specific data
-	virtual csRef<iBase> GetRendererData() = 0;
-	/// Set renderer specific data
-	virtual void SetRendererData(csRef<iBase> data) = 0;
+  /// Get renderer specific data
+  virtual csRef<iBase> GetRendererData() = 0;
+  /// Set renderer specific data
+  virtual void SetRendererData(csRef<iBase> data) = 0;
 
 };
 
