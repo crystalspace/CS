@@ -37,11 +37,36 @@ struct swap_4
   unsigned char b1, b2, b3, b4;
 };
 
+struct swap_8
+{
+  unsigned char b1, b2, b3, b4,
+                b5, b6, b7, b8;
+};
+
 #ifdef CS_BIG_ENDIAN
+#  define big_endian_longlong(x) x
 #  define big_endian_long(x)  x
 #  define big_endian_short(x) x
 #  define big_endian_float(x) x
 #else
+
+/// Convert a longlong from big-endian to machine format
+static inline uint64 big_endian_longlong (uint64 l)
+{
+  uint64 r;
+  swap_8 *p1 = (swap_8 *)&l;
+  swap_8 *p2 = (swap_8 *)&r;
+  p2->b1 = p1->b8;
+  p2->b2 = p1->b7;
+  p2->b3 = p1->b6;
+  p2->b4 = p1->b5;
+  p2->b5 = p1->b4;
+  p2->b6 = p1->b3;
+  p2->b7 = p1->b2;
+  p2->b8 = p1->b1;
+  return r;
+}
+
 
 /// Convert a long from big-endian to machine format
 static inline uint32 big_endian_long (uint32 l)
@@ -65,10 +90,28 @@ static inline float big_endian_float (float f)
 #endif // CS_BIG_ENDIAN
 
 #ifdef CS_LITTLE_ENDIAN
+#  define little_endian_longlong(x) x
 #  define little_endian_long(x)  x
 #  define little_endian_short(x) x
 #  define little_endian_float(x) x
 #else
+
+/// Convert a longlong from little-endian to machine format
+static inline uint64 little_endian_longlong (uint64 l)
+{
+  uint64 r;
+  swap_8 *p1 = (swap_8 *)&l;
+  swap_8 *p2 = (swap_8 *)&r;
+  p2->b1 = p1->b8;
+  p2->b2 = p1->b7;
+  p2->b3 = p1->b6;
+  p2->b4 = p1->b5;
+  p2->b5 = p1->b4;
+  p2->b6 = p1->b3;
+  p2->b7 = p1->b2;
+  p2->b8 = p1->b1;
+  return r;
+}
 
 /// Convert a long from little-endian to machine format
 static inline uint32 little_endian_long (uint32 l)
@@ -127,7 +170,7 @@ static inline float long2float (int32 l)
   return (float) ldexp (mant, exp);
 }
 
-#if 0 // comment out this because it doesn't work on all compilers
+#ifdef COMP_GCC // GCC likes LL for 64bit values
 /// Convert a double to a cross-platform 64-bit format (no endianess adjustments!)
 static inline int64 double2longlong (double d)
 {
@@ -148,7 +191,33 @@ static inline double longlong2double (int64 i)
   if (i & 0x8000000000000000LL) mant = -mant;
   return ldexp (mant, exp);
 }
-#endif // 0
+#else
+# ifdef COMP_VC
+/// Convert a double to a cross-platform 64-bit format (no endianess adjustments!)
+static inline int64 double2longlong (double d)
+{
+  int exp;
+  int64 mant = (int64) (frexp (d, &exp) * 0x1000000000000L);
+  int64 sign = mant & 0x800000000000000L;
+  if (mant < 0) mant = -mant;
+  if (exp > 32767) exp = 32767; else if (exp < -32768) exp = -32768;
+  return sign | ((int64 (exp) & 0x7fff) << 48) | (mant & 0xffffffffffffL);
+}
+
+/// Convert a 64-bit cross-platform double to native format (no endianess adjustments!)
+static inline double longlong2double (int64 i)
+{
+  int64 exp = (i >> 48) & 0x7fff;
+  if (exp & 0x4000) exp = exp | ~0x7fff;
+  double mant = double (i & 0xffffffffffffL) / 0x1000000000000L;
+  if (i & 0x8000000000000000L) mant = -mant;
+  return ldexp (mant, exp);
+}
+# else
+#  warning CS cannot determine how to handle 64bit values in code, please report this.
+# endif
+#endif // COMP_GCC
+
 
 /**
  * The following routines are used for converting floating-point numbers
@@ -178,6 +247,14 @@ static inline float short2float (short s)
   if (s & 0x8000) mant = -mant;
   return (float) ldexp (mant, exp);
 }
+
+/// Swap the bytes in a uint64 value.
+static inline uint64 convert_endian (uint64 l)
+{ return little_endian_long (l); }
+
+/// Swap the bytes in a int64 value.
+static inline int64 convert_endian (int64 l)
+{ return little_endian_long (l); }
 
 /// Swap the bytes in a uint32 value.
 static inline uint32 convert_endian (uint32 l)
