@@ -919,47 +919,10 @@ STDMETHODIMP csGraphics3DDirect3DDx5::DrawPolygon (G3DPolygonDP& poly)
   poly_alpha = poly.alpha;
   bTransparent = poly_alpha>0 ? true : false;
 
-  // retrieve the texture.
+  //Mipmapping is done for us by DirectX, so we will always select the texture with
+  //the highest resolution.
+  IPolygonTexture *pTex = poly.poly_texture[0];
 
-  // Mipmapping.
-  int mipmap;
-  if (poly.uses_mipmaps == false ||  rstate_mipmap == false)
-  {
-    mipmap = 0;
-  }
-  else 
-  {
-    //*************************************************************************
-    // Do some mipmapping
-    //*************************************************************************
-
-    float min_z = M * (poly.vertices[0].sx - m_nHalfWidth)
-		+ N * (poly.vertices[0].sy - m_nHalfHeight) + O;
-
-    // count 'real' number of vertices
-    int num_vertices = 1;
-    for (i = 1 ; i < poly.num ; i++)
-    {
-      float inv_z = M * (poly.vertices[i].sx - m_nHalfWidth)
-		  + N * (poly.vertices[i].sy - m_nHalfHeight) + O;
-
-      if (inv_z > min_z) min_z = inv_z;
-    }
-
-    // Correct 1/z -> z.
-    min_z = 1/min_z;
-
-    if      (min_z < zdist_mipmap1) mipmap = 0;
-    else if (min_z < zdist_mipmap2) mipmap = 1;
-    else if (min_z < zdist_mipmap3) mipmap = 2;
-    else mipmap = 3;
-  }
-
-  mipmap = 0;
-  IPolygonTexture *pTex = poly.poly_texture[mipmap];
-
-  //pTex = poly.poly_texture[0];
-  
   if (!pTex)
     return E_INVALIDARG;
 
