@@ -92,14 +92,14 @@ public:
    */
   void SetAt (size_t n, const char c)
   {
-    CS_ASSERT (n < Size)
+    CS_ASSERT (n < Size);
     Data [n] = c;
   }
 
   /// Get character at n'th position.
   char GetAt (size_t n) const
   {
-    CS_ASSERT (n < Size)
+    CS_ASSERT (n < Size);
     return Data [n];
   }
 
