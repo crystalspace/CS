@@ -143,6 +143,7 @@ void csGraphics2DCaca::Close ()
   }
   if(Memory) delete[] Memory;
   Memory = 0;
+  csGraphics2D::Close ();
 }
 
 int csGraphics2DCaca::MapKey(int raw)
