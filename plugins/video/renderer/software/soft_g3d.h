@@ -386,7 +386,8 @@ public:
 
   /// Create a halo of the specified color and return a handle.
   virtual iHalo *CreateHalo (float iR, float iG, float iB,
-    unsigned char *iAlpha, int iWidth, int iHeight);
+    unsigned char *iAlpha, int iWidth, int iHeight)
+    { return NULL; }
 
   ///------------------- iConfig interface implementation -------------------
   struct csSoftConfig : public iConfig
