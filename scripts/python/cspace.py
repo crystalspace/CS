@@ -5070,6 +5070,8 @@ class iGeneralFactoryState(iGeneralMeshState):
     def GenerateBox(*args): return _cspace.iGeneralFactoryState_GenerateBox(*args)
     def SetBack2Front(*args): return _cspace.iGeneralFactoryState_SetBack2Front(*args)
     def IsBack2Front(*args): return _cspace.iGeneralFactoryState_IsBack2Front(*args)
+    def SetAnimationControl(*args): return _cspace.iGeneralFactoryState_SetAnimationControl(*args)
+    def GetAnimationControl(*args): return _cspace.iGeneralFactoryState_GetAnimationControl(*args)
     def AddRenderBuffer(*args): return _cspace.iGeneralFactoryState_AddRenderBuffer(*args)
     def SetRenderBufferComponent(*args): return _cspace.iGeneralFactoryState_SetRenderBufferComponent(*args)
     def SetRenderBuffer(*args): return _cspace.iGeneralFactoryState_SetRenderBuffer(*args)
@@ -5093,6 +5095,57 @@ class iGeneralFactoryStatePtr(iGeneralFactoryState):
 _cspace.iGeneralFactoryState_swigregister(iGeneralFactoryStatePtr)
 
 iGeneralFactoryState_scfGetVersion = _cspace.iGeneralFactoryState_scfGetVersion
+
+class iGenMeshAnimationControl(iBase):
+    __swig_setmethods__ = {}
+    for _s in [iBase]: __swig_setmethods__.update(_s.__swig_setmethods__)
+    __setattr__ = lambda self, name, value: _swig_setattr(self, iGenMeshAnimationControl, name, value)
+    __swig_getmethods__ = {}
+    for _s in [iBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
+    __getattr__ = lambda self, name: _swig_getattr(self, iGenMeshAnimationControl, name)
+    def __init__(self): raise RuntimeError, "No constructor defined"
+    def __repr__(self):
+        return "<C iGenMeshAnimationControl instance at %s>" % (self.this,)
+    def UpdateVertices(*args): return _cspace.iGenMeshAnimationControl_UpdateVertices(*args)
+    def UpdateTexels(*args): return _cspace.iGenMeshAnimationControl_UpdateTexels(*args)
+    def UpdateNormals(*args): return _cspace.iGenMeshAnimationControl_UpdateNormals(*args)
+    def UpdateColors(*args): return _cspace.iGenMeshAnimationControl_UpdateColors(*args)
+    def Load(*args): return _cspace.iGenMeshAnimationControl_Load(*args)
+    def Save(*args): return _cspace.iGenMeshAnimationControl_Save(*args)
+    def __del__(self, destroy=_cspace.delete_iGenMeshAnimationControl):
+        try:
+            if self.thisown: destroy(self)
+        except: pass
+
+class iGenMeshAnimationControlPtr(iGenMeshAnimationControl):
+    def __init__(self, this):
+        _swig_setattr(self, iGenMeshAnimationControl, 'this', this)
+        if not hasattr(self,"thisown"): _swig_setattr(self, iGenMeshAnimationControl, 'thisown', 0)
+        _swig_setattr(self, iGenMeshAnimationControl,self.__class__,iGenMeshAnimationControl)
+_cspace.iGenMeshAnimationControl_swigregister(iGenMeshAnimationControlPtr)
+
+class iGenMeshAnimationControlFactory(iBase):
+    __swig_setmethods__ = {}
+    for _s in [iBase]: __swig_setmethods__.update(_s.__swig_setmethods__)
+    __setattr__ = lambda self, name, value: _swig_setattr(self, iGenMeshAnimationControlFactory, name, value)
+    __swig_getmethods__ = {}
+    for _s in [iBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
+    __getattr__ = lambda self, name: _swig_getattr(self, iGenMeshAnimationControlFactory, name)
+    def __init__(self): raise RuntimeError, "No constructor defined"
+    def __repr__(self):
+        return "<C iGenMeshAnimationControlFactory instance at %s>" % (self.this,)
+    def CreateAnimationControl(*args): return _cspace.iGenMeshAnimationControlFactory_CreateAnimationControl(*args)
+    def __del__(self, destroy=_cspace.delete_iGenMeshAnimationControlFactory):
+        try:
+            if self.thisown: destroy(self)
+        except: pass
+
+class iGenMeshAnimationControlFactoryPtr(iGenMeshAnimationControlFactory):
+    def __init__(self, this):
+        _swig_setattr(self, iGenMeshAnimationControlFactory, 'this', this)
+        if not hasattr(self,"thisown"): _swig_setattr(self, iGenMeshAnimationControlFactory, 'thisown', 0)
+        _swig_setattr(self, iGenMeshAnimationControlFactory,self.__class__,iGenMeshAnimationControlFactory)
+_cspace.iGenMeshAnimationControlFactory_swigregister(iGenMeshAnimationControlFactoryPtr)
 
 class csSprite2DVertex(_object):
     __swig_setmethods__ = {}
@@ -6096,6 +6149,7 @@ class iLoader(iBase):
     def LoadLibraryFile(*args): return _cspace.iLoader_LoadLibraryFile(*args)
     def LoadMeshObjectFactory(*args): return _cspace.iLoader_LoadMeshObjectFactory(*args)
     def LoadMeshObject(*args): return _cspace.iLoader_LoadMeshObject(*args)
+    def Load(*args): return _cspace.iLoader_Load(*args)
     def __del__(self, destroy=_cspace.delete_iLoader):
         try:
             if self.thisown: destroy(self)
@@ -10535,6 +10589,9 @@ class iDynamicSystem(iBase):
     def GetLinearDampener(*args): return _cspace.iDynamicSystem_GetLinearDampener(*args)
     def SetRollingDampener(*args): return _cspace.iDynamicSystem_SetRollingDampener(*args)
     def GetRollingDampener(*args): return _cspace.iDynamicSystem_GetRollingDampener(*args)
+    def EnableAutoDisable(*args): return _cspace.iDynamicSystem_EnableAutoDisable(*args)
+    def AutoDisableEnabled(*args): return _cspace.iDynamicSystem_AutoDisableEnabled(*args)
+    def SetAutoDisableParams(*args): return _cspace.iDynamicSystem_SetAutoDisableParams(*args)
     def Step(*args): return _cspace.iDynamicSystem_Step(*args)
     def CreateBody(*args): return _cspace.iDynamicSystem_CreateBody(*args)
     def RemoveBody(*args): return _cspace.iDynamicSystem_RemoveBody(*args)
