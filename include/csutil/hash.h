@@ -291,12 +291,24 @@ public:
 
     friend class csHash<T, K, KeyHandler>;
   public:
+    /// Copy constructor.
     Iterator (const Iterator &o) :
       hash (o.hash),
       key(o.key),
       bucket(o.bucket),
       size(o.size),
       element(o.element) {}
+
+    /// Assignment operator.
+    Iterator& operator=(const Iterator& o)
+    {
+      hash = o.hash;
+      key = o.key;
+      bucket = o.bucket;
+      size = o.size;
+      element = o.element;
+      return *this;
+    }
 
     /// Returns a boolean indicating whether or not the hash has more elements.
     bool HasNext () const
@@ -360,8 +372,22 @@ public:
 
     friend class csHash<T, K, KeyHandler>;
   public:
-    GlobalIterator (const Iterator &o) : hash (o.hash), bucket (o.bucket),
-      size (o.size), element (o.element) {}
+    /// Copy constructor.
+    GlobalIterator (const Iterator &o) :
+      hash (o.hash),
+      bucket (o.bucket),
+      size (o.size),
+      element (o.element) {}
+
+    /// Assignment operator.
+    GlobalIterator& operator=(const GlobalIterator& o)
+    {
+      hash = o.hash;
+      bucket = o.bucket;
+      size = o.size;
+      element = o.element;
+      return *this;
+    }
 
     /// Returns a boolean indicating whether or not the hash has more elements.
     bool HasNext () const
