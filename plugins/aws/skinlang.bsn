@@ -9,7 +9,6 @@
 #include "csutil/scfstr.h"
 #include "csutil/csdllist.h"
 #include "awsprefs.h"
-
 #include <stdio.h>
 
 %}

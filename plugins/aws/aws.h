@@ -17,7 +17,8 @@
     License along with this library; if not, write to the Free
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 *****************************************************************************/
-
+#include "ivaria/aws.h"
+#include "isys/plugin.h"
 
 /****
   
@@ -25,21 +26,14 @@
 windowing system.  It supports simple skinning via the .skn defintions, and creation of windows from .win definitions.
 
  ****/
- 
 
 class awsComponent
 {
-   
-
 public:
-
-
-
 };
 
 class awsManager : public iAws
 {
-
 public:
     DECLARE_IBASE;
 
@@ -48,7 +42,7 @@ public:
     
     bool Initialize(iSystem *sys);
 
-    virtual void Load(char *defs_file);
+    virtual void Load(const char *defs_file);
 
   // Implement iPlugIn interface.
   struct eiPlugIn : public iPlugIn
@@ -57,7 +51,6 @@ public:
     virtual bool Initialize(iSystem* p) { return scfParent->Initialize(p); }
     virtual bool HandleEvent(iEvent&) { return false; }
   } scfiPlugIn;
-
 };
  
 #endif

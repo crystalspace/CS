@@ -2,7 +2,7 @@
 #include "iutil/string.h"
 #include "csgeom/csrect.h"
 #include "csutil/csdllist.h"
-#include "ivaria/iawsprefs.h"
+#include "ivaria/aws.h"
 #include "awsprefs.h"
 
 awsKey *
@@ -12,7 +12,7 @@ awsKeyContainer::Find(iString *name)
 
    while(p) 
    {
-     awsKey *key = static_cast<awsKey *>(p);
+     awsKey *key = STATIC_CAST(awsKey*,p);
 
      if (key) 
      {
@@ -28,4 +28,3 @@ awsKeyContainer::Find(iString *name)
 
   return NULL;
 }
-

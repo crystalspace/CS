@@ -1,13 +1,13 @@
 #------------------------------------------------------------------------------
 # Alternate Window Manager plugin submakefile
 #------------------------------------------------------------------------------
-DESCRIPTION.aws = Crystal Space alternate windowing system plug-in
+DESCRIPTION.aws = Alternate Windowing System plug-in
 
 #------------------------------------------------------------- rootdefines ---#
 ifeq ($(MAKESECTION),rootdefines)
 
 PLUGINHELP += \
-  $(NEWLINE)echo $"  make aws        Make the $(DESCRIPTION.aws)$"
+  $(NEWLINE)echo $"  make aws          Make the $(DESCRIPTION.aws)$"
 
 endif # ifeq ($(MAKESECTION),rootdefines)
 #------------------------------------------------------------- roottargets ---#
@@ -41,7 +41,7 @@ endif
 INC.AWS = $(wildcard plugins/aws/*.h)
 SRC.AWS = $(wildcard plugins/aws/*.cpp)
 OBJ.AWS = $(addprefix $(OUT),$(notdir $(SRC.AWS:.cpp=$O)))
-DEP.AWS = CSUTIL CSSYS CSUTIL
+DEP.AWS = CSUTIL CSSYS CSUTIL CSGEOM
 
 MSVC.DSP += AWS
 DSP.AWS.NAME = aws

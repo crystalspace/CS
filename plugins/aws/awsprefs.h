@@ -17,7 +17,10 @@
     License along with this library; if not, write to the Free
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 *****************************************************************************/
-
+#include "ivaria/aws.h"
+#include "csgeom/csrect.h"
+#include "csutil/csdllist.h"
+struct iString;
 
 /****
  This is the pseudo-symbol table for the definitions keeper.  Windows and their sub-keys can be looked up from here.
@@ -154,7 +157,6 @@ public:
     awsSkinNode(iString *name):awsKey(name) {};
     virtual ~awsSkinNode() {};
     
-
     /// So that we know this is a skin node
     virtual unsigned char Type() 
     { return KEY_SKIN; }
@@ -164,16 +166,13 @@ public:
 
 class awsPrefManager : public iAwsPrefs
 {
-   
-
 public:
     DECLARE_IBASE;
 
     awsPrefManager(iBase *iParent);
     virtual ~awsPrefManager();
 
-    virtual void Load(char *def_file);
-
+    virtual void Load(const char *def_file);
 };
  
 #endif

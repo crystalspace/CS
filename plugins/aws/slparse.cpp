@@ -27,9 +27,7 @@
 #include "csgeom/csrect.h"
 #include "csutil/scfstr.h"
 #include "csutil/csdllist.h"
-#include "ivaria/iawsprefs.h"
 #include "awsprefs.h"
-
 #include <stdio.h>
 
 

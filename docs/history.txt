@@ -96,6 +96,16 @@ The history order is reversed so that new features are at the top.
 	  csFindLoadLibrary in NeXTDynamicLibrary.cpp so that scfreg can once
 	  again find plugin modules which are stored in the "components"
 	  subdirectory of the current directory.
+	- Eric Sunshine made the following changes to AWS:
+	    - Fixed up the SCF goop so that the plugin loads properly and
+	      registers all of its plublic classes.  In particular, added
+	      registration for the awsPrefManager class.  Also added a missing
+	      IMPLEMENT_FACTORY() for this class.
+	    - Replaced use of static_cast<> with STATIC_CAST() for better
+	      portability.
+	    - Removed the `i' prefix from the names of the AWS files in
+	      CS/include/ivaria and merged them into aws.h.
+	    - Repaired a couple minor makefile defects.
 10-Jun-2001
 	- Norman Kramer did the following:
 	    - Blocks now decrefs its queried soundwrapper, releases/stops the
