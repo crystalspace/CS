@@ -586,7 +586,7 @@ void D3DLightMapCache::Load(csHighColorCacheData *d)
     LoadIntoVRAM(cached_texture);
   }
   
-  piLM->DecRef ();
+  // piLM->DecRef ();
 }       
 
 void D3DLightMapCache::LoadIntoVRAM(D3DLightCache_Data *tex)
