@@ -321,16 +321,18 @@ bool csIsoGroundMap::HitBeam(const csVector3& gsrc, const csVector3& gdest)
   grid->GetGridOffset(mingridx, mingridy);
 
   /// shift src/dest so that they both fall in the grid
+  csBox3 box = grid->GetBox();
+  box.Set(box.Min().x, -99999, box.Min().z, box.Max().x, +99999, box.Max().z);
   csVector3 isect;
   csSegment3 seg(src, dest);
-  if(!grid->Contains(src))
-    if(csIntersect3::BoxSegment(grid->GetBox(), seg, isect))
+  if(!box.In(src))
+    if(csIntersect3::BoxSegment(box, seg, isect))
     {
       src = isect;
       seg.SetStart(isect + 0.001*(dest-src)); // avoid 2nd hit on src
     }
-  if(!grid->Contains(dest))
-    if(csIntersect3::BoxSegment(grid->GetBox(), seg, isect))
+  if(!box.In(dest))
+    if(csIntersect3::BoxSegment(box, seg, isect))
     {
       dest = isect;
       //seg.SetEnd(isect);
@@ -340,7 +342,7 @@ bool csIsoGroundMap::HitBeam(const csVector3& gsrc, const csVector3& gdest)
 
   /// check each square along groundsquare size steps...
   if(delta.IsZero()) return true;
-  float len = 4.0*qsqrt(delta.z*delta.z*float(multx*multx) + 
+  float len = 2.0*qsqrt(delta.z*delta.z*float(multx*multx) + 
     delta.x*delta.x*float(multy*multy));
   csVector3 m = delta/len;
   m.z *= float(multx);
@@ -349,16 +351,17 @@ bool csIsoGroundMap::HitBeam(const csVector3& gsrc, const csVector3& gdest)
   csVector3 pos = src;
   pos.z *= float(multx);
   pos.x *= float(multy);
-  int multminx = mingridx*multx;
-  int multminy = mingridy*multy;
-  int x,y;
-  for(int i=0; i<steps; pos+=m, i++)
+  pos.z -= mingridx*multx;
+  pos.x -= mingridy*multy;
+  while(steps--)
   {
-    x = QInt(pos.z) - multminx;
-    y = QInt(pos.x) - multminy;
+    //x = QInt(pos.z) - multminx;
+    //y = QInt(pos.x) - multminy;
     //printf("Checking %d,%d (%g,%g,%g) %g\n", x,y, pos.x, pos.y, pos.z,
       //GetGround(x,y));
-    if(pos.y <= GetGround(x,y)) return false;
+    if(pos.y <= GetGround(QInt(pos.z), QInt(pos.x))) 
+      return false;
+    pos += m;
   }
   return true;
 }
