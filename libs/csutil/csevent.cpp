@@ -452,14 +452,14 @@ bool csEvent::Print (int level)
     {
 
       IndentLevel(level);
-      char const* fmt = " Value: %lld\n"; // Avoid Mingw/gcc borked PRId64.
-      csPrintf (fmt, object->intVal);
+      csPrintf (" Value: %lld\n", // Avoid Mingw/gcc borked PRId64.
+	object->intVal);
     }
     else if (object->type == csEventAttrUInt)
     {
       IndentLevel(level);
-      char const* fmt = " Value: %llu\n"; // Avoid Mingw/gcc borked PRIu64.
-      csPrintf (fmt, (ulonglong) object->intVal);
+      csPrintf (" Value: %llu\n", // Avoid Mingw/gcc borked PRIu64.
+	(ulonglong) object->intVal);
     }
     else if (object->type == csEventAttrFloat)
     {
