@@ -52,14 +52,35 @@ struct iLoaderContext : public iBase
 {
   /// Find a sector.
   virtual iSector* FindSector (const char* name) = 0;
-  /// Find a material. 
-  virtual iMaterialWrapper* FindMaterial (const char* name) = 0;
+  
+  /** Find a material.  If not found, try to use the filename supplied
+   *  to find a matching texture.  If that isn't found, try to load
+   *  the texture using the filename.  If loaded then it is also
+   *  Prepared.
+   */
+  virtual iMaterialWrapper* FindMaterial (const char* filename) = 0;
+
+  /** Same as FindMaterial but there is no assumption that the name
+   *  and the filename are the same.  This is useful if the filename
+   *  has /'s in it (a pathname), since region searching will mean that
+   *  names with /'s will never be found correctly.
+   */
+  virtual iMaterialWrapper* FindNamedMaterial (const char* name, const char *filename) = 0;
   /// Find a mesh factory.
   virtual iMeshFactoryWrapper* FindMeshFactory (const char* name) = 0;
   /// Find a mesh object.
   virtual iMeshWrapper* FindMeshObject (const char* name) = 0;
-  /// Find a texture. 
-  virtual iTextureWrapper* FindTexture (const char* name) = 0;
+  
+  /** Find a texture.  If not found, attempt to load and prepare the
+   *  texture using the supplied filename as the name.
+   */
+  virtual iTextureWrapper* FindTexture (const char* filename) = 0;
+
+  /** Find a texture with the given name.  If not found, attempt to load
+   *  the supplied filename and prepare the texture using the supplied name.
+   */
+  virtual iTextureWrapper* FindNamedTexture (const char* name, const char *filename) = 0;
+
   /// Find a light
   virtual iLight* FindLight (const char* name) = 0;
 
