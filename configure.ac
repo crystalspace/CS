@@ -1317,6 +1317,7 @@ CS_MAKEFILE_PROPERTY([TARGET], [$cs_host_target])
 CS_MAKEFILE_PROPERTY([TARGET_MAKEFILE], [$cs_host_makefile])
 CS_MAKEFILE_PROPERTY([OS], [$cs_host_os_normalized_uc])
 CS_JAMCONFIG_PROPERTY([TARGET.OS], [$cs_host_os_normalized_uc])
+CS_JAMCONFIG_PROPERTY([TARGET.OS.NORMALIZED], [$cs_host_os_normalized])
 CS_HEADER_PROPERTY([CS_PLATFORM_NAME],
     [AS_ESCAPE(["])$cs_host_os_normalized[]AS_ESCAPE(["])])
 
@@ -1679,50 +1680,7 @@ CS_MAKEFILE_PROPERTY([INSTALL_DIR], [$cs_install_dir])
 #------------------------------------------------------------------------------
 # Determine installation directories for Jam build system.
 #------------------------------------------------------------------------------
-# Handle the case when no prefix is given. And the special case when a path
-# contains more than 2 slashes, these paths seem to be correct but jam fails
-# on them.
-AS_IF([test $prefix = NONE], [prefix="$ac_default_prefix"],
-    [prefix=`echo "$prefix" | sed -e 's:///*:/:g'`])
-AS_IF([test $exec_prefix = NONE],
-    [exec_prefix="AS_ESCAPE([$(INSTALLDIR.PREFIX)])"],
-    [exec_prefix=`echo "$exec_prefix" | sed -e 's:///*:/:g'`])
-	
-CS_JAMCONFIG_PROPERTY([INSTALLDIR.PREFIX], [$prefix])
-CS_JAMCONFIG_PROPERTY([INSTALLDIR.EXEC_PREFIX], [$exec_prefix])
-
-# Hack: Unfortunately, values of the other directories often contain references
-# to prefix and exec_prefix in lowercase, thus we duplicate the above values.
-CS_JAMCONFIG_PROPERTY([prefix], [AS_ESCAPE([$(INSTALLDIR.PREFIX)])])
-CS_JAMCONFIG_PROPERTY([exec_prefix], [AS_ESCAPE([$(INSTALLDIR.EXEC_PREFIX)])])
-
-# Hack: Mutilate Autoconf's default paths.
-docdir="$datadir/doc/$PACKAGE_NAME";
-AS_IF([test "$includedir" = '${prefix}/include'],
-      [includedir="AS_ESCAPE([$(prefix)])/include/$PACKAGE_NAME"])
-AS_IF([test "$datadir" = '${prefix}/share'],
-      [datadir="AS_ESCAPE([$(prefix)])/share/$PACKAGE_NAME"])
-AS_IF([test "$sysconfdir" = '${prefix}/etc'],
-      [sysconfdir="AS_ESCAPE([$(prefix)])/etc/$PACKAGE_NAME"])
-
-mapdir="$datadir/maps" ;
-plugindir="$libdir/$PACKAGE_NAME" ;
-	  
-CS_JAMCONFIG_PROPERTY([INSTALLDIR.APPLICATION], [$bindir])
-CS_JAMCONFIG_PROPERTY([INSTALLDIR.SBIN], [$sbindir])
-CS_JAMCONFIG_PROPERTY([INSTALLDIR.LIBEXEC], [$libexecdir])
-CS_JAMCONFIG_PROPERTY([INSTALLDIR.DATA], [$datadir])
-CS_JAMCONFIG_PROPERTY([INSTALLDIR.MAP], [$mapdir])
-CS_JAMCONFIG_PROPERTY([INSTALLDIR.CONFIG], [$sysconfdir])
-CS_JAMCONFIG_PROPERTY([INSTALLDIR.SHAREDSTATE], [$sharedstatedir])
-CS_JAMCONFIG_PROPERTY([INSTALLDIR.LOCALSTATE], [$localstatedir])
-CS_JAMCONFIG_PROPERTY([INSTALLDIR.PLUGIN], [$plugindir])
-CS_JAMCONFIG_PROPERTY([INSTALLDIR.DOC], [$docdir])
-CS_JAMCONFIG_PROPERTY([INSTALLDIR.LIBRARY], [$libdir])
-CS_JAMCONFIG_PROPERTY([INSTALLDIR.INCLUDE], [$includedir])
-CS_JAMCONFIG_PROPERTY([INSTALLDIR.OLDINCLUDE], [$oldincludedir])
-CS_JAMCONFIG_PROPERTY([INSTALLDIR.INFO], [$infodir])
-CS_JAMCONFIG_PROPERTY([INSTALLDIR.MAN], [$mandir])
+CS_OUTPUT_INSTALLDIRS
 
 
 

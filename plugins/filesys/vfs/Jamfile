@@ -15,23 +15,22 @@ rule VfsCfgGen
 {
   Depends $(<) : $(>) ;
   Always $(<) ;
-  NotFile $(<) ;
 }
 
 actions VfsCfgGen
 {
   cat $(>) > $(<)
-  echo "VFS.Unix.CS_DATADIR = $(DATADIR) " >> $(<)
-  echo "VFS.Unix.CS_CONFIGDIR = $(SYSCONFDIR) " >> $(<)
-  echo "VFS.Unix.CS_MAPDIR = $(MAPDIR) " >> $(<)
+  echo "VFS.$(TARGET.OS.NORMALIZED).CS_DATADIR = $(INSTALLDIR.DATA) " >> $(<)
+  echo "VFS.$(TARGET.OS.NORMALIZED).CS_CONFIGDIR = $(INSTALLDIR.CONFIG) " >> $(<)
+  echo "VFS.$(TARGET.OS.NORMALIZED).CS_MAPDIR = $(INSTALLDIR.MAP) " >> $(<)
 }
 
 # Build our own vfs.cfg
 VFS_CONFIGFILE = vfs.cfg ;
-LOCATE on vfs.cfg = $(LOCATE_TARGET) ;
-SEARCH on vfs.cfg = $(LOCATE_TARGET) ;
-VfsCfgGen vfs.cfg : $(SUBDIR)/vfs.cfg.template ;
-InstallConfig vfs.cfg ;
+LOCATE on $(VFS_CONFIGFILE:G=config) = $(LOCATE_TARGET) ;
+SEARCH on $(VFS_CONFIGFILE:G=config) = $(LOCATE_TARGET) ;
+VfsCfgGen $(VFS_CONFIGFILE:G=config) : $(SUBDIR)/vfs.cfg.template ;
+InstallConfig $(VFS_CONFIGFILE:G=config) ;
 
 }
 
