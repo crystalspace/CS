@@ -179,7 +179,7 @@ void csTrianglesPerMaterial::CopyInfoPolygons()
 void csTriangleArrayPolygonBuffer::AddTriangles(csTrianglesPerMaterial* pol,
     int* verts, int num_vertices, const csMatrix3& m_obj2tex, 
     const csVector3& v_obj2tex, iPolygonTexture* poly_texture, int mat_index,
-    const csPlane3& poly_normal)
+    const csPlane3& )
 {
 
   csVector3 aux;
@@ -446,17 +446,13 @@ void csTriangleArrayPolygonBuffer::AddPolygon (int* verts, int num_verts,
    * the face normal, just add it to the vertex normal and normalize 
    */
   
-  
+  /*  
   csTriangle triangle;
   csVector2 uv[3];
   csColor col;
   unsigned char r,g,b;
   first_time_rendering = true;
-
-
-  
-
-
+  */
   if (polygons.GetLastMaterial() < 0)
   {
   
@@ -517,7 +513,6 @@ void csTriangleArrayPolygonBuffer::Clear ()
 {
   
 // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!Falta el Clear
-  int i;
 
   materials.SetLength (0);
   delete[] vertices; vertices = NULL;  

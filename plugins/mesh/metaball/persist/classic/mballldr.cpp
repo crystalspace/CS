@@ -138,7 +138,7 @@ bool csMetaBallFactoryLoader::Initialize (iObjectRegistry* object_reg)
 }
 
 iBase* csMetaBallFactoryLoader::Parse (const char* /*string*/,
-	iLoaderContext* ldr_context, iBase* /* context */)
+	iLoaderContext* , iBase* /* context */)
 {
   iMeshObjectType* type = CS_QUERY_PLUGIN_CLASS (plugin_mgr,
   	"crystalspace.mesh.object.metaball", iMeshObjectType);

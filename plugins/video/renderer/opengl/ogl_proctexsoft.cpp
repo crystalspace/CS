@@ -175,7 +175,7 @@ bool csOpenGLProcSoftware::Prepare(
   csGraphics3DOGLCommon *parent_g3d,
   csOpenGLProcSoftware *head_soft_tex,
   csTextureHandleOpenGL *tex,
-  csPixelFormat *ipfmt,
+  csPixelFormat *,
   void *buffer,bool alone_hint)
 { 
   // We generate a 32 bit pfmt based on whether the platform uses

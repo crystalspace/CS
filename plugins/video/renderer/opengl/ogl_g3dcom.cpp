@@ -3471,9 +3471,7 @@ void csGraphics3DOGLCommon::DrawPolygonMesh (G3DPolygonMesh& mesh)
     csTriangle *triangles = polbuf->GetTriangles (t);
     int num_triangles = polbuf->GetTriangleCount (t);
     int num_vertices = polbuf->GetVertexCount (t);
-    int mat_index = polbuf->GetMatIndex (t);
     work_uv_verts = polbuf->GetUV (t);
-    int uvCount = polbuf->GetUVCount (t);
     iMaterialHandle* mat_handle = polbuf->GetMaterialPolygon (t);
     G3DFogInfo* work_fog = mesh.vertex_fog;
     work_colors = polbuf->GetColors (t);

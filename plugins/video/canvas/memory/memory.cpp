@@ -138,7 +138,7 @@ bool csGraphicsMemory::Initialize(iObjectRegistry* obj_reg)
   return ok;
 }
 
-void csGraphicsMemory::Print (csRect *area = NULL)
+void csGraphicsMemory::Print (csRect *)
 {
 }
 
