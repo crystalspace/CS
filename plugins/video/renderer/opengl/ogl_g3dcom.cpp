@@ -1112,7 +1112,7 @@ void csGraphics3DOGLCommon::SetupClipPlanes (bool add_near_clip,
     CalculateFrustum ();
     csPlane3 pl;
     GLdouble plane_eq[4];
-    int i, i1;
+    size_t i, i1;
     i1 = frustum.GetVertexCount ()-1;
     for (i = 0 ; i < frustum.GetVertexCount () ; i++)
     {
@@ -4261,7 +4261,7 @@ void csGraphics3DOGLCommon::RestoreDTMTransforms ()
 
 void csGraphics3DOGLCommon::SetupDTMClipping (G3DTriangleMesh& mesh)
 {
-  int i;
+  size_t i;
   bool use_clip_portals = clipportal_floating;
 
   //===========
@@ -4422,7 +4422,7 @@ void csGraphics3DOGLCommon::SetupDTMClipping (G3DTriangleMesh& mesh)
 
 void csGraphics3DOGLCommon::RestoreDTMClipping ()
 {
-  int i;
+  size_t i;
   if (ci.stencil_enabled)
   {
     statecache->Disable_GL_STENCIL_TEST ();
