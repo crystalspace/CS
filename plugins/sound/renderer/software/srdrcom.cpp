@@ -96,9 +96,9 @@ bool csSoundRenderSoftware::Open()
     Config->GetYesNo("Sound.Software", "16Bits", true),
     Config->GetYesNo("Sound.Software", "Stereo", true));
 
-  float v=Config->GetFloat("Sound","Volume",-1);
-  if (v>1) v=1;
-  if (v>=0) SetVolume(v);
+  Volume = Config->GetFloat("Sound", "Volume", 1.0);
+  if (Volume>1) Volume = 1;
+  if (Volume<0) Volume = 0;
 
   Listener = new csSoundListenerSoftware (NULL);
   ActivateMixing = true;
@@ -106,7 +106,9 @@ bool csSoundRenderSoftware::Open()
   LoadFormat.Bits = is16Bits() ? 16 : 8;
   LoadFormat.Channels = -1;
 
-  System->Printf (MSG_INITIALIZATION, "  Volume: %g\n", GetVolume());
+  System->Printf (MSG_INITIALIZATION, "  Playing %d Hz, %d bits, %s\n",
+    getFrequency(), (is16Bits())?16:8, (isStereo())?"Stereo":"Mono");
+  System->Printf (MSG_INITIALIZATION, "  Volume: %g\n", Volume);
   return true;
 }
 
@@ -172,12 +174,12 @@ int csSoundRenderSoftware::getFrequency()
 
 void csSoundRenderSoftware::SetVolume(float vol)
 {
-  SoundDriver->SetVolume(vol);
+  Volume = vol;
 }
 
 float csSoundRenderSoftware::GetVolume()
 {
-  return SoundDriver->GetVolume();
+  return Volume;
 }
 
 void csSoundRenderSoftware::AddSource(csSoundSourceSoftware *src) {
@@ -223,7 +225,7 @@ void csSoundRenderSoftware::MixingFunction()
     // @@@ this divides volume by number of sources. If we don't do this,
     // sound can be distorted because of too high volume. Is there a better
     // solution?
-    src->Prepare(Sources.Length());
+    src->Prepare(Volume / Sources.Length());
     src->AddToBuffer(memory, memorysize);
     if (!src->IsActive()) {
       RemoveSource(src);

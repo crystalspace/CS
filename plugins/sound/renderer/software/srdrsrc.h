@@ -53,7 +53,7 @@ public:
   bool IsActive();
 
   // calculate internal values
-  void Prepare(unsigned long VolDiv);
+  void Prepare(float BaseVolume);
 
   // add the data from this source to the global buffer
   void AddToBuffer(void *mem, long size);

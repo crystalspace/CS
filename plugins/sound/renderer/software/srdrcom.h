@@ -95,6 +95,9 @@ private:
 
   // the format used to load sounds
   csSoundFormat LoadFormat;
+
+  // global volume setting
+  float Volume;
 };
 
 #endif

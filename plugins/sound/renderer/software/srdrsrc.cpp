@@ -109,12 +109,12 @@ csVector3 csSoundSourceSoftware::GetVelocity() {
   return Velocity;
 }
 
-void csSoundSourceSoftware::Prepare(unsigned long VolDiv) {
+void csSoundSourceSoftware::Prepare(float BaseVolume) {
   // frequency
   CalcFreqFactor=FrequencyFactor;
 
   // volume
-  CalcVolL=CalcVolR=Volume/VolDiv;
+  CalcVolL = CalcVolR = Volume*BaseVolume;
 
   // for non-3d sources we don't calculate anything else
   if (Mode3d == SOUND3D_DISABLE) return;

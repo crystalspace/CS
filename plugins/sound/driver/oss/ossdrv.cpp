@@ -292,8 +292,6 @@ bool csSoundDriverOSS::Open(iSoundRender *render, int frequency, bool bit16, boo
 	return false;
   }
 
-  m_piSystem->Printf (MSG_INITIALIZATION, "Sound initialized to %d Hz %d bits %s\n", m_nFrequency, (m_b16Bits)?16:8, (m_bStereo)?"Stereo":"Mono");
-    
   return true;
 }
 
