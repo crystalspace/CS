@@ -47,8 +47,14 @@ extern "C"
 #endif
 }
 
+#define MNG_DLL
 #define MNG_NO_CMS
-#define MNG_USE_DLL
+#define MNG_SUPPORT_FULL
+#define MNG_ACCESS_CHUNKS
+#define MNG_WRITE_CHUNKS
+#define MNG_SUPPORT_READ
+#define MNG_SUPPORT_WRITE
+#define MNG_SUPPORT_DISPLAY
 #include <libmng.h>
 
 #include "jng.h"
@@ -795,7 +801,20 @@ bool ImageJngFile::Load (uint8 *iBuffer, uint32 iSize)
   NewImage = NULL;
   mng_retcode retcode;
 
-  mng_handle handle = mng_initialize ( mng_ptr(this), cb_alloc, 
+  const int magicSize = 8;
+  const char magicMNG[] = "\x8aJNG\x0d\x0a\x1a\x0a";
+  const char magicJNG[] = "\x8bJNG\x0d\x0a\x1a\x0a";
+
+  // check for magic JNG/MNG bytes. If not correct, we can skip
+  // messing around w/ libmng entirely.
+  if ((iSize < 8) || 
+    ((memcmp ((void*)iBuffer, (void*)&magicMNG, magicSize)) &&
+     (memcmp ((void*)iBuffer, (void*)&magicJNG, magicSize))))
+  {
+    return false;
+  }
+
+  mng_handle handle = mng_initialize (mng_ptr(this), cb_alloc, 
                                       cb_free, MNG_NULL);
   if (!handle)
   {

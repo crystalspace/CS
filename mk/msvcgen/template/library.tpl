@@ -19,6 +19,7 @@ CFG=%project% - Win32 Debug
 !MESSAGE 
 !MESSAGE "%project% - Win32 Release" (based on "Win32 (x86) Static Library")
 !MESSAGE "%project% - Win32 Debug" (based on "Win32 (x86) Static Library")
+!MESSAGE "%project% - Win32 ExtensiveMemDebug" (based on "Win32 (x86) Console Application")
 !MESSAGE 
 
 # Begin Project
@@ -82,12 +83,40 @@ SOURCE="$(InputPath)"
 PostBuild_Cmds=echo File is a lib, Copy skipped.
 # End Special Build Tool
 
+!ELSEIF  "$(CFG)" == "%project% - Win32 ExtensiveMemDebug"
+
+# PROP BASE Use_MFC 0
+# PROP BASE Use_Debug_Libraries 1
+# PROP BASE Output_Dir "csmemdbg"
+# PROP BASE Intermediate_Dir "csmemdbg"
+# PROP BASE Target_Dir ""
+# PROP Use_MFC 0
+# PROP Use_Debug_Libraries 1
+# PROP Output_Dir "csmemdbg\bin\libs"
+# PROP Intermediate_Dir "csmemdbg\temp\%project%"
+# PROP Target_Dir ""
+# ADD BASE CPP /nologo /vmb /vms /W4 /Gm /G5 /ZI /Od /D "WIN32" /D "_DEBUG" /D "_LIB" /FD /c
+# ADD CPP /nologo /vmb /vms /MDd /W4 /Gm /G5 /ZI /Od /I "..\.." /I "..\..\include\cssys\win32" /I "..\..\include" /I "..\..\libs" /I "..\..\support" /I "..\..\apps" /I "..\..\plugins" /D "_DEBUG" /D "_MT" /D "_LIB" /D "WIN32" /D "_WINDOWS" /D "WIN32_VOLATILE" /D "__CRYSTAL_SPACE__" /D "CS_DEBUG" /D "CS_STRICT_SMART_POINTERS" /D "CS_EXTENSIVE_MEMDEBUG" /FD %cflags% /c
+# ADD BASE RSC /l 0x409 /d "_DEBUG" 
+# ADD RSC /l 0x409 /d "_DEBUG" /d "CS_DEBUG" /i "..\..\include\cssys\win32" /i "..\..\include"
+BSC32=bscmake.exe
+# ADD BASE BSC32 /nologo
+# ADD BSC32 /nologo
+LIB32=link.exe -lib
+# ADD BASE LIB32 /nologo
+# ADD LIB32 /nologo /out:"csmemdbg\bin\libs\%project%_d.lib"
+# Begin Special Build Tool
+SOURCE="$(InputPath)"
+PostBuild_Cmds=echo File is a lib, Copy skipped.
+# End Special Build Tool
+
 !ENDIF 
 
 # Begin Target
 
 # Name "%project% - Win32 Release"
 # Name "%project% - Win32 Debug"
+# Name "%project% - Win32 ExtensiveMemDebug"
 %groups%
 # End Target
 # End Project

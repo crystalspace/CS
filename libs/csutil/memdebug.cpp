@@ -17,13 +17,16 @@
 */
 
 #include <stdarg.h>
-#include "cssysdef.h"
+
 #ifdef CS_EXTENSIVE_MEMDEBUG
   // in cssysdef.h is a "#define new" which affects the operator
   // implementations as well
 #  define CS_EXTENSIVE_MEMDEBUG_IMPLEMENT
 #  undef CS_EXTENSIVE_MEMDEBUG
 #endif
+
+// it's important that cssysdef.h is included AFTER the above #ifdef
+#include "cssysdef.h"
 
 #if defined(COMP_VC)
 

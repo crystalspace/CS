@@ -19,6 +19,7 @@ CFG=%project% - Win32 Debug
 !MESSAGE 
 !MESSAGE "%project% - Win32 Release" (based on "Win32 (x86) Static Library")
 !MESSAGE "%project% - Win32 Debug" (based on "Win32 (x86) Static Library")
+!MESSAGE "%project% - Win32 ExtensiveMemDebug" (based on "Win32 (x86) Console Application")
 !MESSAGE 
 
 # Begin Project
@@ -74,11 +75,35 @@ LIB32=link.exe -lib
 # ADD BASE LIB32 /nologo
 # ADD LIB32 /nologo
 
+!ELSEIF  "$(CFG)" == "%project% - Win32 ExtensiveMemDebug"
+
+# PROP BASE Use_MFC 0
+# PROP BASE Use_Debug_Libraries 1
+# PROP BASE Output_Dir "csmemdbg"
+# PROP BASE Intermediate_Dir "csmemdbg"
+# PROP BASE Target_Dir ""
+# PROP Use_MFC 0
+# PROP Use_Debug_Libraries 1
+# PROP Output_Dir "csmemdbg\temp\%project%"
+# PROP Intermediate_Dir "csmemdbg\temp\%project%"
+# PROP Target_Dir ""
+# ADD BASE CPP /nologo /W4 /Gm /GX /Zi /Od /D "WIN32" /D "_DEBUG" /D "_MBCS" /D "_LIB" /YX /FD /c
+# ADD CPP /nologo /W4 /Gm /GX /Zi /Od /FR /YX /FD %cflags% /c
+# ADD BASE RSC /l 0x407 /d "_DEBUG"
+# ADD RSC /l 0x407 /d "_DEBUG"
+BSC32=bscmake.exe
+# ADD BASE BSC32 /nologo
+# ADD BSC32 /nologo
+LIB32=link.exe -lib
+# ADD BASE LIB32 /nologo
+# ADD LIB32 /nologo
+
 !ENDIF 
 
 # Begin Target
 
 # Name "%project% - Win32 Release"
 # Name "%project% - Win32 Debug"
+# Name "%project% - Win32 ExtensiveMemDebug"
 # End Target
 # End Project

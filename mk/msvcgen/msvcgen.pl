@@ -58,6 +58,8 @@ $main::opt_target = '';
 $main::opt_g = '';	# Alias for 'target'.
 @main::opt_library = ();
 @main::opt_L = ();	# Alias for 'library'.
+@main::opt_delaylib = ();
+@main::opt_Y = ();	# Alias for 'delaylib'.
 @main::opt_lflags = ();
 @main::opt_l = ();	# Alias for 'lflags'.
 @main::opt_cflags = ();
@@ -94,6 +96,8 @@ my @script_options = (
     'g=s',		# Alias for 'target'.
     'library=s@',
     'L=s@',		# Alias for 'library'.
+    'delaylib=s@',
+    'Y=s@',		# Alias for 'delaylib'.
     'lflags=s@',
     'l=s@',		# Alias for 'lflags'.
     'cflags=s@',
@@ -122,6 +126,7 @@ $main::groups = {};
 $main::project_template = '';
 $main::project_group_template = '';
 $main::project_file_template = '';
+$main::project_delaylib_template = '';
 
 $main::workspace_template = '';
 $main::workspace_project_template = '';
@@ -305,6 +310,7 @@ sub load_templates {
 	$main::project_template = load_template("$main::opt_template", 'tpl');
 	$main::project_group_template  = load_template('prjgroup', 'tpi');
 	$main::project_file_template   = load_template('prjfile', 'tpi');
+	$main::project_delaylib_template   = load_template('prjdelay', 'tpi');
 	$main::workspace_project_template  = load_template('wsgroup', 'tpi');
 	$main::workspace_depend_template = load_template('wsdep', 'tpi');
 	$main::workspace_config_template = load_template('wscfg', 'tpi');
@@ -370,13 +376,19 @@ sub interpolate_project_groups {
 #------------------------------------------------------------------------------
 sub interpolate_project {
     my $result = $main::project_template;
-    interpolate('%project%',  wellformed_string($main::opt_projname), \$result);
-    interpolate('%makefile%', wellformed_string($main::makefile),     \$result);
-    interpolate('%target%',   wellformed_string($main::opt_target),   \$result);
-    interpolate('%libs%',     wellformed_string(\@main::opt_library), \$result);
-    interpolate('%lflags%',   wellformed_string(\@main::opt_lflags),  \$result);
-    interpolate('%cflags%',   wellformed_string(\@main::opt_cflags),  \$result);
-    interpolate('%groups%',   interpolate_project_groups(),           \$result);
+    my $delaylibs = "";
+    foreach my $delaylib (@main::opt_delaylib) {
+    	$delaylibs .= $main::project_delaylib_template;
+    	interpolate('%delaylib%', $delaylib, \$delaylibs);
+    }
+    interpolate('%project%',   wellformed_string($main::opt_projname), \$result);
+    interpolate('%makefile%',  wellformed_string($main::makefile),     \$result);
+    interpolate('%target%',    wellformed_string($main::opt_target),   \$result);
+    interpolate('%libs%',      wellformed_string(\@main::opt_library), \$result);
+    interpolate('%delaylibs%', wellformed_string($delaylibs), 	       \$result);
+    interpolate('%lflags%',    wellformed_string(\@main::opt_lflags),  \$result);
+    interpolate('%cflags%',    wellformed_string(\@main::opt_cflags),  \$result);
+    interpolate('%groups%',    interpolate_project_groups(),           \$result);
     return $result;
 }
 
@@ -618,6 +630,7 @@ sub process_option_aliases {
     $main::opt_template = $main::opt_t unless $main::opt_template;
     $main::opt_template_dir = $main::opt_T unless $main::opt_template_dir;
     push(@main::opt_library, @main::opt_L);
+    push(@main::opt_delaylib, @main::opt_Y);
     push(@main::opt_lflags,  @main::opt_l);
     push(@main::opt_depend,  @main::opt_D);
     $main::opt_htmlents = 1 if $main::opt_H;

@@ -380,7 +380,7 @@ MSVC.DEPEND.LIST = $(foreach d,$(sort $(subst CSSYS,WIN32SYS,\
 MSVC.DEPEND.DIRECTIVES = $(foreach d,$(MSVC.DEPEND.LIST),--depend=$d)
 
 # Macro to compose list of --library directives from DSP.PROJECT.LIBS.
-MSVC.LIBRARY.DIRECTIVES = $(foreach l,$(DSP.$*.LIBS),--library=$l)
+MSVC.LIBRARY.DIRECTIVES = $(foreach l,$(DSP.$*.LIBS),--library=$l) $(foreach l,$(DSP.$*.DELAYLIBS),--delaylib=$l)
 
 # Macros to compose --lflags and --cflags directives from DSP.PROJECT.LFLAGS
 # and DSP.PROJECT.CFLAGS.  These are slightly complicated because it is valid
