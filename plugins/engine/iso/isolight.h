@@ -90,6 +90,7 @@ public:
 /// class to fake a iLight interface
 class csIsoFakeLight : public iLight {
   csIsoLight *isolight;
+  csFlags flags;
 
 public:
   SCF_DECLARE_IBASE;
@@ -121,6 +122,7 @@ public:
   virtual iFlareHalo* CreateFlareHalo () {return 0;}
   virtual float GetBrightnessAtDistance (float d)
   { return isolight->GetAttenuation(d); }
+  virtual csFlags& GetFlags () { return flags; }
 };
 
 #endif
