@@ -65,7 +65,7 @@ else
   TO_INSTALL.STATIC_LIBS += $(GL3D_EXT)
 endif
 
-INC.GL3D_EXT = $(wildcard plugins/video/renderer/opengl-ext/*.hpp) \
+INC.GL3D_EXT = $(wildcard plugins/video/renderer/opengl-ext/*.h) \
   plugins/video/renderer/common/txtmgr.h \
   plugins/video/renderer/common/dtmesh.h \
   plugins/video/renderer/common/dpmesh.h \
