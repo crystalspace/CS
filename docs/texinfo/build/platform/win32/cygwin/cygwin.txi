@@ -2,6 +2,14 @@
 @node Cygwin, NeXT, MinGW, Platform Instructions
 @subsection Windows using Cygwin
 
+@noindent
+@emph{Philip Wyett @email{philipwyett@@dsl.pipex.com}.}
+@noindent
+@emph{Last updated May 30, 2002}
+
+These instructions are for building Crystal Space with Cygwin a @sc{gnu}
+compiler for Windows created by Red Hat Inc. and other third party contributors.
+
 @uref{http://sources.redhat.com/cygwin/}
 
 @uref{http://sources.redhat.com/cygwin/setup.exe}
