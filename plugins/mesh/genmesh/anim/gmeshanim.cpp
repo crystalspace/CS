@@ -88,6 +88,8 @@ csAnimControlRunnable::csAnimControlRunnable (csAnimControlScript* script)
 {
   csAnimControlRunnable::script = script;
   current_instruction = 0;
+  movement.final = 0;
+  delay.final = 0;
 }
 
 csAnimControlRunnable::~csAnimControlRunnable ()
