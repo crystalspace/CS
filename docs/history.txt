@@ -3,6 +3,9 @@ The history order is reversed so that new features are at the top.
 27-Oct-2001
 	- Markus Korth <mkorth@military.de> fixed a bug with
 	  unixconf.sh which would use -mcpu=486 instead of -mcpu=i486.
+	- Fixed the link to cstex_1.zip in documentatoin to point to the
+	  new location at:
+	    sunsite.dk/projects/crystal/support/map2cs/cstex_1.zip.
 26-Oct-2001
 	- Jorge Acereda fixed warning introduced in his latest fix.
 25-Oct-2001
