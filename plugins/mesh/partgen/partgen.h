@@ -29,8 +29,6 @@
 #include "imesh/partsys.h"
 #include "imesh/particle.h"
 
-#define ALL_FEATURES (CS_OBJECT_FEATURE_LIGHTING|CS_OBJECT_FEATURE_ANIMATION)
-
 struct iMeshObjectFactory;
 struct iMaterialWrapper;
 struct iMovable;
@@ -259,18 +257,6 @@ public:
   virtual bool HitBeamObject (const csVector3&, const csVector3&,
   	csVector3&, float*) { return false; }
   virtual long GetShapeNumber () const { return shapenr; }
-  virtual uint32 GetLODFeatures () const { return current_features; }
-  virtual void SetLODFeatures (uint32 mask, uint32 value)
-  {
-    mask &= ALL_FEATURES;
-    current_features = (current_features & ~mask) | (value & mask);
-  }
-  virtual void SetLOD (float lod) { current_lod = lod; }
-  virtual float GetLOD () const { return current_lod; }
-  virtual int GetLODPolygonCount (float /*lod*/) const
-  {
-    return particles.Length ();
-  }
 
   //------------------------- iParticleState implementation ----------------
   class ParticleState : public iParticleState

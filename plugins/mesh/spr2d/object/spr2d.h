@@ -32,8 +32,6 @@
 #include "iutil/comp.h"
 #include "spr2duv.h"
 
-#define ALL_FEATURES (CS_OBJECT_FEATURE_LIGHTING|CS_OBJECT_FEATURE_ANIMATION)
-
 struct iMaterialWrapper;
 struct iSprite2DUVAnimation;
 class csSprite2DMeshObjectFactory;
@@ -151,18 +149,6 @@ public:
   	csVector3& isect, float* pr) 
   { return HitBeamOutline(start, end, isect, pr); }
   virtual long GetShapeNumber () const { return shapenr; }
-  virtual uint32 GetLODFeatures () const { return current_features; }
-  virtual void SetLODFeatures (uint32 mask, uint32 value)
-  {
-    mask &= ALL_FEATURES;
-    current_features = (current_features & ~mask) | (value & mask);
-  }
-  virtual void SetLOD (float lod) { current_lod = lod; }
-  virtual float GetLOD () const { return current_lod; }
-  virtual int GetLODPolygonCount (float /*lod*/) const
-  {
-    return 1;
-  }
 
   //------------------------- iSprite2DState implementation ----------------
   class Sprite2DState : public iSprite2DState
@@ -346,11 +332,6 @@ public:
   virtual ~csSprite2DMeshObjectType ();
   /// New Factory.
   virtual iMeshObjectFactory* NewFactory ();
-  /// Get features.
-  virtual uint32 GetFeatures () const
-  {
-    return ALL_FEATURES;
-  }
 
   struct eiComponent : public iComponent
   {

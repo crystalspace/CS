@@ -77,7 +77,7 @@ csParticleSystem::csParticleSystem (iObjectRegistry* object_reg,
   type->DecRef ();
   shapenr = 0;
   current_lod = 1;
-  current_features = ALL_FEATURES;
+  current_features = 0;
 }
 
 csParticleSystem::~csParticleSystem()

@@ -57,6 +57,7 @@ struct iStatLight;
 struct iKeyValuePair;
 struct iMapNode;
 struct iReporter;
+struct iLODControl;
 
 /**
  * The loader for Crystal Space maps.
@@ -167,6 +168,11 @@ private:
 
   /// Resolve the portals of a thing
   bool ResolvePortalSectors (iThingState *Mesh);
+
+  /**
+   * Load a LOD control object.
+   */
+  bool LoadLodControl (iLODControl* lodctrl, char* buf);
 
   /**
    * Load a Mesh Object Factory from the map file.

@@ -50,6 +50,7 @@
 #include "iengine/light.h"
 #include "iengine/statlght.h"
 #include "iengine/mesh.h"
+#include "iengine/lod.h"
 #include "ivideo/material.h"
 #include "igraphic/imageio.h"
 #include "isound/loader.h"
@@ -106,8 +107,10 @@ CS_TOKEN_DEF_START
   CS_TOKEN_DEF (HARDMOVE)
   CS_TOKEN_DEF (INVISIBLE)
   CS_TOKEN_DEF (KEY)
+  CS_TOKEN_DEF (LEVEL)
   CS_TOKEN_DEF (LIBRARY)
   CS_TOKEN_DEF (LIGHT)
+  CS_TOKEN_DEF (LOD)
   CS_TOKEN_DEF (MATERIAL)
   CS_TOKEN_DEF (MATERIALS)
   CS_TOKEN_DEF (MATRIX)
@@ -690,6 +693,48 @@ bool csLoader::LoadSounds (char* buf)
 
 //---------------------------------------------------------------------------
 
+bool csLoader::LoadLodControl (iLODControl* lodctrl, char* buf)
+{
+  CS_TOKEN_TABLE_START (commands)
+    CS_TOKEN_TABLE (LEVEL)
+  CS_TOKEN_TABLE_END
+
+  char* name;
+  long cmd;
+  char* params;
+
+  float level = 1;
+
+  while ((cmd = csGetObject (&buf, commands, &name, &params)) > 0)
+  {
+    if (!params)
+    {
+      ReportError (
+	  "crystalspace.maploader.parse.badformat",
+	  "Expected parameters instead of '%s' while parsing a LOD control!",
+	  buf);
+      return false;
+    }
+    switch (cmd)
+    {
+      case CS_TOKEN_LEVEL:
+        csScanStr (params, "%f", &level);
+        break;
+    }
+  }
+  if (cmd == CS_PARSERR_TOKENNOTFOUND)
+  {
+    TokenError ("a LOD control");
+    return false;
+  }
+
+  lodctrl->SetLOD (level);
+
+  return true;
+}
+
+//---------------------------------------------------------------------------
+
 iMeshFactoryWrapper* csLoader::LoadMeshObjectFactory (const char* fname)
 {
   if (!Engine) return NULL;
@@ -758,6 +803,7 @@ bool csLoader::LoadMeshObjectFactory (iMeshFactoryWrapper* stemp, char* buf,
     CS_TOKEN_TABLE (PLUGIN)
     CS_TOKEN_TABLE (MESHFACT)
     CS_TOKEN_TABLE (MOVE)
+    CS_TOKEN_TABLE (LOD)
   CS_TOKEN_TABLE_END
 
   CS_TOKEN_TABLE_START (tok_matvec)
@@ -785,6 +831,33 @@ bool csLoader::LoadMeshObjectFactory (iMeshFactoryWrapper* stemp, char* buf,
     }
     switch (cmd)
     {
+      case CS_TOKEN_LOD:
+        {
+	  if (!stemp->GetMeshObjectFactory ())
+	  {
+            ReportError (
+	      "crystalspace.maploader.parse.meshfactory",
+              "Please use PARAMS before specifying LOD!");
+	    return false;
+	  }
+	  iLODControl* lodctrl = SCF_QUERY_INTERFACE (
+	    	stemp->GetMeshObjectFactory (),
+		iLODControl);
+	  if (!lodctrl)
+	  {
+            ReportError (
+	      "crystalspace.maploader.parse.meshfactory",
+              "This mesh factory doesn't implement LOD control!");
+	    return false;
+	  }
+	  if (!LoadLodControl (lodctrl, params))
+	  {
+	    lodctrl->DecRef ();
+	    return false;
+	  }
+	  lodctrl->DecRef ();
+	}
+        break;
       case CS_TOKEN_ADDON:
 	if (!LoadAddOn (params, stemp))
 	  return false;
@@ -817,6 +890,13 @@ bool csLoader::LoadMeshObjectFactory (iMeshFactoryWrapper* stemp, char* buf,
 
       case CS_TOKEN_MATERIAL:
         {
+	  if (!stemp->GetMeshObjectFactory ())
+	  {
+            ReportError (
+	      "crystalspace.maploader.parse.meshfactory",
+              "Please use PARAMS before specifying MATERIAL!");
+	    return false;
+	  }
           csScanStr (params, "%s", str);
           mat = FindMaterial (str);
           if (mat)
@@ -824,6 +904,13 @@ bool csLoader::LoadMeshObjectFactory (iMeshFactoryWrapper* stemp, char* buf,
 	    iSprite3DFactoryState* state = SCF_QUERY_INTERFACE (
 	    	stemp->GetMeshObjectFactory (),
 		iSprite3DFactoryState);
+	    if (!state)
+	    {
+              ReportError (
+	        "crystalspace.maploader.parse.meshfactory",
+                "Only use MATERIAL keyword with 3D sprite factories!");
+	      return false;
+	    }
             state->SetMaterialWrapper (mat);
 	    state->DecRef ();
 	  }
@@ -975,6 +1062,7 @@ iMeshWrapper* csLoader::LoadMeshObjectFromFactory (char* buf)
     CS_TOKEN_TABLE (CAMERA)
     CS_TOKEN_TABLE (CONVEX)
     CS_TOKEN_TABLE (PRIORITY)
+    CS_TOKEN_TABLE (LOD)
   CS_TOKEN_TABLE_END
 
   CS_TOKEN_TABLE_START (tok_matvec)
@@ -1004,6 +1092,40 @@ iMeshWrapper* csLoader::LoadMeshObjectFromFactory (char* buf)
     }
     switch (cmd)
     {
+      case CS_TOKEN_LOD:
+        {
+          if (!mesh)
+	  {
+	    ReportError (
+	  	  "crystalspace.maploader.load.meshobject",
+	  	  "First specify the parent factory with FACTORY!");
+	    return NULL;
+	  }
+	  if (!mesh->GetMeshObject ())
+	  {
+            ReportError (
+	      "crystalspace.maploader.parse.meshobject",
+              "Mesh object is missing!");
+	    return false;
+	  }
+	  iLODControl* lodctrl = SCF_QUERY_INTERFACE (
+	    	mesh->GetMeshObject (),
+		iLODControl);
+	  if (!lodctrl)
+	  {
+            ReportError (
+	      "crystalspace.maploader.parse.meshobject",
+              "This mesh doesn't implement LOD control!");
+	    return false;
+	  }
+	  if (!LoadLodControl (lodctrl, params))
+	  {
+	    lodctrl->DecRef ();
+	    return false;
+	  }
+	  lodctrl->DecRef ();
+	}
+        break;
       case CS_TOKEN_PRIORITY:
 	csScanStr (params, "%s", priority);
 	break;
@@ -1303,6 +1425,7 @@ bool csLoader::LoadMeshObject (iMeshWrapper* mesh, char* buf)
     CS_TOKEN_TABLE (CAMERA)
     CS_TOKEN_TABLE (CONVEX)
     CS_TOKEN_TABLE (PRIORITY)
+    CS_TOKEN_TABLE (LOD)
   CS_TOKEN_TABLE_END
 
   CS_TOKEN_TABLE_START (tok_matvec)
@@ -1332,6 +1455,33 @@ bool csLoader::LoadMeshObject (iMeshWrapper* mesh, char* buf)
     }
     switch (cmd)
     {
+      case CS_TOKEN_LOD:
+        {
+	  if (!mesh->GetMeshObject ())
+	  {
+            ReportError (
+	      "crystalspace.maploader.parse.meshobject",
+	      "First use LOD after PARAMS!");
+	    return false;
+	  }
+	  iLODControl* lodctrl = SCF_QUERY_INTERFACE (
+	    	mesh->GetMeshObject (),
+		iLODControl);
+	  if (!lodctrl)
+	  {
+            ReportError (
+	      "crystalspace.maploader.parse.meshobject",
+              "This mesh doesn't implement LOD control!");
+	    return false;
+	  }
+	  if (!LoadLodControl (lodctrl, params))
+	  {
+	    lodctrl->DecRef ();
+	    return false;
+	  }
+	  lodctrl->DecRef ();
+	}
+        break;
       case CS_TOKEN_PRIORITY:
 	csScanStr (params, "%s", priority);
 	break;

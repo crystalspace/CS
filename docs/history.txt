@@ -23,6 +23,27 @@ The history order is reversed so that new features are at the top.
 	  anymore.
 	- Michael Voase did the following:
 	  - Update bin/unixconf.sh to seperate gcc from g++
+	- Added iLODControl interface file which will be used in the future
+	  for the LOD manager.
+	- Removed all LOD related functions from iMeshObject. Instead this
+	  will go to iLODControl.
+	- Removed the LOD setter/getters for iSprite3DState and
+	  Sprite3DFactoryState. The LodConfig setters/getters are still there
+	  because they are not in the iLODControl interface.
+	- The sprite3d mesh object, mesh factory, and mesh type all implement
+	  iLODControl now. Currently this can be used to set/get the LOD
+	  level for that object. The iLODControl at the mesh type level
+	  controls access to the global LOD setting for all 3D sprites.
+	  iLODControl at a factory level controls access to the LOD settings
+	  for all 3D sprites made from that factory. And the iLODControl for
+	  the mesh object controls LOD settings for an individual 3D
+	  sprite. On a sprite level you can choose which level to use by
+	  setting the LodConfig value.
+	- Fixed all other mesh objects for the changes above.
+	- csparser plugin can now also load LOD control objects. You can
+	  now use the LOD keyword with mesh factories or mesh objects.
+	  Currently you can only use one keyword in LOD and that is LEVEL
+	  which is used to set the LOD level. In future more will be possible.
 15-Oct-2001
 	- All func-id's are now changed so that they are equal to their
 	  interface name. Basically this means:

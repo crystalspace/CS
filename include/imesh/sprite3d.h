@@ -118,7 +118,7 @@ struct iSpriteAction : public iBase
   virtual void AddFrame (iSpriteFrame* frame, int delay) = 0;
 };
 
-SCF_VERSION (iSprite3DFactoryState, 0, 0, 2);
+SCF_VERSION (iSprite3DFactoryState, 0, 0, 3);
 
 /**
  * This interface describes the API for the 3D sprite factory mesh object.
@@ -245,12 +245,6 @@ struct iSprite3DFactoryState : public iBase
   /// Get the lighting quality config.
   virtual int GetLightingQualityConfig () const = 0;
 
-  /// Returns the lod_level for this template.
-  virtual float GetLodLevel () const = 0;
-
-  /// Sets the lod level for this template.  See CS_SPR_LOD_* defs.
-  virtual void SetLodLevel (float level) = 0;
-
   /**
    * Sets which lod config variable that all new sprites created 
    * from this template will use.
@@ -293,7 +287,7 @@ struct iSprite3DFactoryState : public iBase
   virtual UInt GetMixMode () const = 0;
 };
 
-SCF_VERSION (iSprite3DState, 0, 0, 4);
+SCF_VERSION (iSprite3DState, 0, 0, 5);
 
 /**
  * This interface describes the API for the 2D sprite mesh object.
@@ -373,17 +367,6 @@ struct iSprite3DState : public iBase
    * Returns what this sprite is using for determining the lighting quality.
    */
   virtual int GetLightingQualityConfig () const = 0;
-
-  /**
-   * Returns the lod level used by this sprite.
-   */ 
-  virtual float GetLodLevel () = 0;
-
-  /**
-   * Sets the local lod level for this sprite.  NOTE: you must use
-   * SetLodLevelConfig (CS_SPR_LOD_LOCAL) for the sprite to use this.
-   */
-  virtual void SetLocalLodLevel (float lod_level) = 0;
 
   /**
    * Sets which lighting config variable this sprite will use.

@@ -37,8 +37,6 @@ class csTerrainQuad;
 #define LOD_LEVELS 4
 #define CS_HORIZON_SIZE 100
 
-#define ALL_FEATURES (CS_OBJECT_FEATURE_LIGHTING)
-
 /**
  * This is one block in the terrain.
  */
@@ -479,20 +477,6 @@ public:
 
   virtual long GetShapeNumber () const { return 1; }
 
-  virtual uint32 GetLODFeatures () const { return current_features; }
-  virtual void SetLODFeatures (uint32 mask, uint32 value)
-  {
-    mask &= ALL_FEATURES;
-    current_features = (current_features & ~mask) | (value & mask);
-  }
-  virtual void SetLOD (float lod) { current_lod = lod; }
-  virtual float GetLOD () const { return current_lod; }
-  virtual int GetLODPolygonCount (float /*lod*/) const
-  {
-    // @@@ IMPLEMENT ME!
-    return 1;
-  }
-
   /**  RDS NOTE: this is from iTerrainObject, what matches???  **/
   //------------------------- iTerrFuncState implementation ----------------
   class TerrFuncState : public iTerrFuncState
@@ -682,9 +666,6 @@ public:
 
   /// Draw.
   virtual iMeshObjectFactory* NewFactory ();
-
-  /// get supported object features
-  virtual uint32 GetFeatures () const;
 
   struct eiComponent : public iComponent
   {

@@ -35,8 +35,6 @@ class csBallMeshObjectFactory;
 class csColor;
 class G3DFogInfo;
 
-#define ALL_FEATURES (CS_OBJECT_FEATURE_LIGHTING)
-
 /**
  * Ball version of mesh object.
  */
@@ -232,18 +230,6 @@ public:
   virtual bool HitBeamObject (const csVector3& start, const csVector3& end,
   	csVector3& isect, float* pr);
   virtual long GetShapeNumber () const { return shapenr; }
-  virtual uint32 GetLODFeatures () const { return current_features; }
-  virtual void SetLODFeatures (uint32 mask, uint32 value)
-  {
-    mask &= ALL_FEATURES;
-    current_features = (current_features & ~mask) | (value & mask);
-  }
-  virtual void SetLOD (float lod) { current_lod = lod; }
-  virtual float GetLOD () const { return current_lod; }
-  virtual int GetLODPolygonCount (float /*lod*/) const
-  {
-    return 0;	// @@@ Implement me please!
-  }
 
   //------------------------- iBallState implementation ----------------
   class BallState : public iBallState
@@ -355,11 +341,6 @@ public:
   virtual ~csBallMeshObjectType ();
   /// Draw.
   virtual iMeshObjectFactory* NewFactory ();
-  /// Get features.
-  virtual uint32 GetFeatures () const
-  {
-    return ALL_FEATURES;
-  }
   /// Initialize.
   bool Initialize (iObjectRegistry* object_reg)
   {

@@ -330,18 +330,6 @@ public:
   virtual bool HitBeamObject (const csVector3&, const csVector3&,
   	csVector3&, float*) { return false; }
   virtual long GetShapeNumber () const { return shapenr; }
-  virtual uint32 GetLODFeatures () const { return current_features; }
-  virtual void SetLODFeatures (uint32 mask, uint32 value)
-  {
-    mask &= 0;
-    current_features = (current_features & ~mask) | (value & mask);
-  }
-  virtual void SetLOD (float lod) { current_lod = lod; }
-  virtual float GetLOD () const { return current_lod; }
-  virtual int GetLODPolygonCount (float /*lod*/) const
-  {
-    return 1;
-  }
 
   //------------------------- iHazeState implementation ----------------
   class HazeState : public iHazeState
@@ -484,11 +472,6 @@ public:
   virtual ~csHazeMeshObjectType ();
   /// New Factory.
   virtual iMeshObjectFactory* NewFactory ();
-  /// Get features.
-  virtual uint32 GetFeatures () const
-  {
-    return 0;
-  }
 
   struct eiComponent : public iComponent
   {

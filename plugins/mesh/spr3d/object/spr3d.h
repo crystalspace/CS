@@ -34,13 +34,15 @@
 #include "imesh/sprite3d.h"
 #include "ivideo/material.h"
 #include "iengine/material.h"
+#include "iengine/lod.h"
 #include "imesh/object.h"
 #include "iutil/config.h"
 #include "iutil/eventh.h"
 #include "iutil/comp.h"
 #include "ivideo/vbufmgr.h"
+#include "qint.h"
 
-#define ALL_FEATURES (CS_OBJECT_FEATURE_LIGHTING|CS_OBJECT_FEATURE_ANIMATION)
+#define ALL_LOD_FEATURES (CS_LOD_TRIANGLE_REDUCTION|CS_LOD_DISTANCE_REDUCTION)
 
 struct iObjectRegistry;
 
@@ -121,7 +123,7 @@ public:
   /// Destroy this action object
   virtual ~csSpriteAction2 ();
 
-  /// Add a frame to this action @@@ OBSOLETE WHEN MOVED TO MESH SYSTEM
+  /// Add a frame to this action.
   void AddCsFrame (csSpriteFrame* frame, int delay);
   /// Add a frame to this action
   virtual void AddFrame (iSpriteFrame* frame, int delay);
@@ -132,10 +134,10 @@ public:
   { return name; }
   /// Get total number of frames in this action
   virtual int GetFrameCount () { return frames.Length (); }
-  /// Query the frame number f. @@@ OBSOLETE WHEN MOVED TO MESH SYSTEM
+  /// Query the frame number f.
   csSpriteFrame* GetCsFrame (int f)
   { return (f < frames.Length ()) ? (csSpriteFrame *)frames [f] : (csSpriteFrame*)NULL; }
-  /// Returns the looping frame after frame number f. @@@ OBSOLETE WHEN MOVED TO MESH SYSTEM
+  /// Returns the looping frame after frame number f.
   csSpriteFrame* GetCsNextFrame (int f)
   { f++; return f<frames.Length() ? (csSpriteFrame*)frames[f]:(csSpriteFrame*)frames[0]; }
   /// Query the frame number f.
@@ -230,10 +232,15 @@ private:
 
   /*
    * Configuration value for template LOD. 0 is lowest detail, 1 is maximum.
-   * If negative then the base mesh is used and no LOD reduction/computation
+   * If 1 then the base mesh is used and no LOD reduction/computation
    * is done.
    */
   float lod_level;
+
+  /*
+   * Current LOD features.
+   */
+  uint32 current_features;
 
   /**
    * The lod_level_config for this template.
@@ -315,12 +322,6 @@ public:
   int GetLightingQualityConfig () const
   { return lighting_quality_config; };
 
-  /// Returns the lod_level for this template.
-  float GetLodLevel() const { return lod_level; }
-
-  /// Sets the lod level for this template.  See CS_SPR_LOD_* defs.
-  void SetLodLevel(float level) {lod_level = level; }
-
   /**
    * Sets which lod config variable that all new sprites created
    * from this template will use.
@@ -400,15 +401,16 @@ public:
    */
   void AddTriangle (int a, int b, int c);
   /// returns the texel indices for triangle 'x'
-  csTriangle GetTriangle (int x) const { return texel_mesh->GetTriangle(x); }
+  csTriangle GetTriangle (int x) const { return texel_mesh->GetTriangle (x); }
   /// returns the triangles of the texel_mesh
-  csTriangle* GetTriangles () const { return texel_mesh->GetTriangles(); }
+  csTriangle* GetTriangles () const { return texel_mesh->GetTriangles (); }
   /// returns the number of triangles in the sprite
-  int GetTriangleCount () const { return texel_mesh->GetTriangleCount(); }
+  int GetTriangleCount () const { return texel_mesh->GetTriangleCount (); }
   /// Size triangle buffer size
-  void SetTriangleCount( int count ) { texel_mesh->SetSize(count); }
+  void SetTriangleCount (int count) { texel_mesh->SetSize (count); }
   /// Set a bank of triangles.  The bank is copied.
-  void SetTriangles( csTriangle const* trig, int count ) { texel_mesh->SetTriangles(trig, count); }
+  void SetTriangles (csTriangle const* trig, int count)
+  { texel_mesh->SetTriangles(trig, count); }
 
   /// Create and add a new frame to the sprite.
   csSpriteFrame* AddFrame ();
@@ -418,7 +420,11 @@ public:
   int GetFrameCount () const { return frames.Length (); }
   /// Query the frame number f
   csSpriteFrame* GetFrame (int f) const
-  { return (f < frames.Length ()) ? (csSpriteFrame *)frames [f] : (csSpriteFrame*)NULL; }
+  {
+    return (f < frames.Length ())
+  	? (csSpriteFrame *)frames [f]
+	: (csSpriteFrame*)NULL;
+  }
 
   /// Create and add a new action frameset to the sprite.
   csSpriteAction2* AddAction ();
@@ -473,6 +479,11 @@ public:
   { MixMode = mode; }
   UInt GetMixMode () const
   { return MixMode; }
+
+  /// For LOD.
+  int GetLODPolygonCount (float lod) const;
+  /// Default LOD level for this factory.
+  float GetLodLevel () const { return lod_level; }
 
   //------------------------ iMeshObjectFactory implementation --------------
   SCF_DECLARE_IBASE;
@@ -575,13 +586,15 @@ public:
     }
     virtual iSpriteFrame* AddFrame ()
     {
-      iSpriteFrame* ifr = SCF_QUERY_INTERFACE_SAFE (scfParent->AddFrame (), iSpriteFrame);
+      iSpriteFrame* ifr = SCF_QUERY_INTERFACE_SAFE (scfParent->AddFrame (),
+      	iSpriteFrame);
       if (ifr) ifr->DecRef ();
       return ifr;
     }
     virtual iSpriteFrame* FindFrame (const char* name) const
     {
-      iSpriteFrame* ifr = SCF_QUERY_INTERFACE_SAFE (scfParent->FindFrame (name), iSpriteFrame);
+      iSpriteFrame* ifr = SCF_QUERY_INTERFACE_SAFE (
+      	scfParent->FindFrame (name), iSpriteFrame);
       if (ifr) ifr->DecRef ();
       return ifr;
     }
@@ -591,25 +604,29 @@ public:
     }
     virtual iSpriteFrame* GetFrame (int f) const
     {
-      iSpriteFrame* ifr = SCF_QUERY_INTERFACE_SAFE (scfParent->GetFrame (f), iSpriteFrame);
+      iSpriteFrame* ifr = SCF_QUERY_INTERFACE_SAFE (scfParent->GetFrame (f),
+      	iSpriteFrame);
       if (ifr) ifr->DecRef ();
       return ifr;
     }
     virtual iSpriteAction* AddAction ()
     {
-      iSpriteAction* ia = SCF_QUERY_INTERFACE_SAFE (scfParent->AddAction (), iSpriteAction);
+      iSpriteAction* ia = SCF_QUERY_INTERFACE_SAFE (scfParent->AddAction (),
+      	iSpriteAction);
       if (ia) ia->DecRef ();
       return ia;
     }
     virtual iSpriteAction* FindAction (const char* name) const
     {
-      iSpriteAction* ia = SCF_QUERY_INTERFACE_SAFE (scfParent->FindAction (name), iSpriteAction);
+      iSpriteAction* ia = SCF_QUERY_INTERFACE_SAFE (
+      	scfParent->FindAction (name), iSpriteAction);
       if (ia) ia->DecRef ();
       return ia;
     }
     virtual iSpriteAction* GetFirstAction () const
     {
-      iSpriteAction* ia = SCF_QUERY_INTERFACE_SAFE (scfParent->GetFirstAction (), iSpriteAction);
+      iSpriteAction* ia = SCF_QUERY_INTERFACE_SAFE (
+      	scfParent->GetFirstAction (), iSpriteAction);
       if (ia) ia->DecRef ();
       return ia;
     }
@@ -619,7 +636,8 @@ public:
     }
     virtual iSpriteAction* GetAction (int No) const
     {
-      iSpriteAction* ia = SCF_QUERY_INTERFACE_SAFE (scfParent->GetAction (No), iSpriteAction);
+      iSpriteAction* ia = SCF_QUERY_INTERFACE_SAFE (scfParent->GetAction (No),
+      	iSpriteAction);
       if (ia) ia->DecRef ();
       return ia;
     }
@@ -649,14 +667,6 @@ public:
     {
       return scfParent->GetLightingQualityConfig ();
     }
-    virtual float GetLodLevel () const
-    {
-      return scfParent->GetLodLevel ();
-    }
-    virtual void SetLodLevel (float level)
-    {
-      scfParent->SetLodLevel (level);
-    }
     virtual void SetLodLevelConfig (int config_flag)
     {
       scfParent->SetLodLevelConfig (config_flag);
@@ -682,6 +692,60 @@ public:
     virtual UInt GetMixMode () const
     { return scfParent->GetMixMode (); }
   } scfiSprite3DFactoryState;
+
+  //--------------------- iLODControl implementation -------------//
+  struct LODControl : public iLODControl
+  {
+    SCF_DECLARE_EMBEDDED_IBASE (csSprite3DMeshObjectFactory);
+    virtual uint32 GetLODFeatures () const
+    {
+      return scfParent->current_features;
+    }
+    virtual void SetLODFeatures (uint32 mask, uint32 value)
+    {
+      mask &= ALL_LOD_FEATURES;
+      scfParent->current_features = (scfParent->current_features & ~mask)
+      	| (value & mask);
+    }
+    virtual void SetLOD (float lod) { scfParent->lod_level = lod; }
+    virtual float GetLOD () const { return scfParent->lod_level; }
+    virtual int GetLODPolygonCount (float lod) const
+    {
+      return scfParent->GetLODPolygonCount (lod);
+    }
+    virtual uint32 GetAvailableLODFeatures () const
+    {
+      return ALL_LOD_FEATURES;
+    }
+    virtual uint32 GetAvailableDistanceFeatures () const
+    {
+      return CS_LOD_TRIANGLE_REDUCTION;
+    }
+    virtual uint32 GetDistanceReduction () const
+    {
+      return CS_LOD_TRIANGLE_REDUCTION;
+    }
+    virtual void SetDistanceReduction (uint32 mask, uint32 value)
+    {
+      (void)mask; (void)value;
+      // @@@ TODO
+    }
+    virtual void SetLODPriority (uint16 group)
+    {
+      (void)group;
+      // @@@ TODO
+    }
+    virtual uint16 GetLODPriority () const
+    {
+      return 0;
+    }
+    virtual void SetMinLODThreshold (float level, bool turnOff)
+    {
+      (void)level; (void)turnOff;
+      // @@@ TODO
+    }
+  } scfiLODControl;
+  friend struct LODControl;
 };
 
 /**
@@ -698,7 +762,7 @@ private:
 public:
   /**
    * Configuration value for global LOD. 0 is lowest detail, 1 is maximum.
-   * If negative then the base mesh is used and no LOD reduction/computation
+   * If 1 then the base mesh is used and no LOD reduction/computation
    * is done.
    */
   static float global_lod_level;
@@ -717,7 +781,7 @@ private:
  
   /**
    * Configuration value for an individuals LOD. 0 is lowest detail,
-   * 1 is maximum.  If negative then the base mesh is used and no LOD
+   * 1 is maximum.  If 1 then the base mesh is used and no LOD
    * reduction/computation is done.
    */
   float local_lod_level;
@@ -741,7 +805,6 @@ private:
    */
   int lighting_quality_config;
 
-  float current_lod;
   uint32 current_features;
 
 public:
@@ -811,7 +874,7 @@ public:
   /**
    * Returns the lod level used by this sprite.
    */
-  float GetLodLevel ()
+  float GetLodLevel () const
   {
     switch (lod_level_config)
     {
@@ -819,10 +882,7 @@ public:
       case CS_SPR_LOD_TEMPLATE:    return factory->GetLodLevel(); break;
       case CS_SPR_LOD_LOCAL:       return local_lod_level; break;
       default:
-      {
-	lod_level_config = factory->GetLodLevelConfig();
 	return factory->GetLodLevel();
-      }
     }
   }
  
@@ -1171,12 +1231,16 @@ public:
   	float fov, float sx, float sy,
 	const csReversibleTransform& trans, csBox2& sbox, csBox3& cbox);
 
+  /// For LOD.
+  int GetLODPolygonCount (float lod) const;
+
   ///------------------------ iMeshObject implementation ----------------------
   SCF_DECLARE_IBASE;
 
   virtual iMeshObjectFactory* GetFactory () const
   {
-    iMeshObjectFactory* ifact = SCF_QUERY_INTERFACE (factory, iMeshObjectFactory);
+    iMeshObjectFactory* ifact = SCF_QUERY_INTERFACE (factory,
+    	iMeshObjectFactory);
     ifact->DecRef ();
     return ifact;
   }
@@ -1208,18 +1272,6 @@ public:
   virtual bool HitBeamObject (const csVector3& start, const csVector3& end,
     csVector3& intersect, float* pr);
   virtual long GetShapeNumber () const { return shapenr; }
-  virtual uint32 GetLODFeatures () const { return current_features; }
-  virtual void SetLODFeatures (uint32 mask, uint32 value)
-  {
-    mask &= ALL_FEATURES;
-    current_features = (current_features & ~mask) | (value & mask);
-  }
-  virtual void SetLOD (float lod) { current_lod = lod; }
-  virtual float GetLOD () const { return current_lod; }
-  virtual int GetLODPolygonCount (float /*lod*/) const
-  {
-    return 0;	// @@@ Implement me please!
-  }
 
   //------------------ iPolygonMesh interface implementation ----------------//
   struct PolyMesh : public iPolygonMesh
@@ -1305,7 +1357,8 @@ public:
     }
     virtual iSpriteAction* GetCurAction () const
     {
-      iSpriteAction* ia = SCF_QUERY_INTERFACE_SAFE (scfParent->GetCurAction (), iSpriteAction);
+      iSpriteAction* ia = SCF_QUERY_INTERFACE_SAFE (scfParent->GetCurAction (),
+      	iSpriteAction);
       if (ia) ia->DecRef ();
       return ia;
     }
@@ -1337,14 +1390,6 @@ public:
     {
       return scfParent->GetLightingQualityConfig ();
     }
-    virtual float GetLodLevel ()
-    {
-      return scfParent->GetLodLevel ();
-    }
-    virtual void SetLocalLodLevel (float lod_level)
-    {
-      scfParent->SetLocalLodLevel (lod_level);
-    }
     virtual void SetLodLevelConfig (int config_flag)
     {
       scfParent->SetLodLevelConfig (config_flag);
@@ -1355,7 +1400,7 @@ public:
     }
     virtual bool IsLodEnabled () const
     {
-      return scfParent->GetLodLevel () >= 0;
+      return scfParent->GetLodLevel () < .99;
     }
     virtual void SetBaseColor (const csColor& col)
     {
@@ -1366,6 +1411,60 @@ public:
       scfParent->GetBaseColor (col);
     }
   } scfiSprite3DState;
+
+  //--------------------- iLODControl implementation -------------//
+  struct LODControl : public iLODControl
+  {
+    SCF_DECLARE_EMBEDDED_IBASE (csSprite3DMeshObject);
+    virtual uint32 GetLODFeatures () const
+    {
+      return scfParent->current_features;
+    }
+    virtual void SetLODFeatures (uint32 mask, uint32 value)
+    {
+      mask &= ALL_LOD_FEATURES;
+      scfParent->current_features = (scfParent->current_features & ~mask)
+      	| (value & mask);
+    }
+    virtual void SetLOD (float lod) { scfParent->local_lod_level = lod; }
+    virtual float GetLOD () const { return scfParent->local_lod_level; }
+    virtual int GetLODPolygonCount (float lod) const
+    {
+      return scfParent->GetLODPolygonCount (lod);
+    }
+    virtual uint32 GetAvailableLODFeatures () const
+    {
+      return ALL_LOD_FEATURES;
+    }
+    virtual uint32 GetAvailableDistanceFeatures () const
+    {
+      return CS_LOD_TRIANGLE_REDUCTION;
+    }
+    virtual uint32 GetDistanceReduction () const
+    {
+      return CS_LOD_TRIANGLE_REDUCTION;
+    }
+    virtual void SetDistanceReduction (uint32 mask, uint32 value)
+    {
+      (void)mask; (void)value;
+      // @@@ TODO
+    }
+    virtual void SetLODPriority (uint16 group)
+    {
+      (void)group;
+      // @@@ TODO
+    }
+    virtual uint16 GetLODPriority () const
+    {
+      return 0;
+    }
+    virtual void SetMinLODThreshold (float level, bool turnOff)
+    {
+      (void)level; (void)turnOff;
+      // @@@ TODO
+    }
+  } scfiLODControl;
+  friend struct LODControl;
 };
 
 /**
@@ -1389,10 +1488,6 @@ public:
 
   /// New Factory.
   virtual iMeshObjectFactory* NewFactory ();
-  virtual uint32 GetFeatures () const
-  {
-    return ALL_FEATURES;
-  }
 
   //------------------- iConfig interface implementation -------------------
   struct csSprite3DConfig : public iConfig
@@ -1412,6 +1507,66 @@ public:
     { scfParent->object_reg = p; return true; }
   } scfiComponent;
   friend struct eiComponent;
+
+  //--------------------- iLODControl implementation -------------//
+  struct LODControl : public iLODControl
+  {
+    SCF_DECLARE_EMBEDDED_IBASE (csSprite3DMeshObjectType);
+    virtual uint32 GetLODFeatures () const
+    {
+      return ALL_LOD_FEATURES;
+    }
+    virtual void SetLODFeatures (uint32 mask, uint32 value)
+    {
+      (void)mask; (void)value;
+      // @@@ TODO
+    }
+    virtual void SetLOD (float lod)
+    {
+      csSprite3DMeshObject::global_lod_level = lod;
+    }
+    virtual float GetLOD () const
+    {
+      return csSprite3DMeshObject::global_lod_level;
+    }
+    virtual int GetLODPolygonCount (float lod) const
+    {
+      return 0;
+    }
+    virtual uint32 GetAvailableLODFeatures () const
+    {
+      return ALL_LOD_FEATURES;
+    }
+    virtual uint32 GetAvailableDistanceFeatures () const
+    {
+      return CS_LOD_TRIANGLE_REDUCTION;
+    }
+    virtual uint32 GetDistanceReduction () const
+    {
+      return CS_LOD_TRIANGLE_REDUCTION;
+    }
+    virtual void SetDistanceReduction (uint32 mask, uint32 value)
+    {
+      (void)mask; (void)value;
+      // @@@ TODO
+    }
+    virtual void SetLODPriority (uint16 group)
+    {
+      (void)group;
+      // @@@ TODO
+    }
+    virtual uint16 GetLODPriority () const
+    {
+      return 0;
+    }
+    virtual void SetMinLODThreshold (float level, bool turnOff)
+    {
+      (void)level; (void)turnOff;
+      // @@@ TODO
+    }
+  } scfiLODControl;
+  friend struct LODControl;
 };
 
 #endif // __CS_SPR3D_H__
+

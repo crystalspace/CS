@@ -50,26 +50,6 @@ class csReversibleTransform;
  */
 #define CS_BBOX_MAX 2
 
-
-
-/**
- * For iMeshObjectType::GetFeatures(). This feature is enabled if the mesh
- * object supports lighting.
- */
-#define CS_OBJECT_FEATURE_LIGHTING 1
-
-/**
- * For iMeshObjectType::GetFeatures(). This feature is enabled if the mesh
- * object supports animation.
- */
-#define CS_OBJECT_FEATURE_ANIMATION 2
-
-/**
- * For iMeshObject::SetLODFeatures(). Enable all features at once.
- */
-#define CS_OBJECT_FEATURE_ALL (~0)
-
-
 SCF_VERSION (iMeshObjectDrawCallback, 0, 0, 1);
 
 /**
@@ -82,7 +62,7 @@ struct iMeshObjectDrawCallback : public iBase
 };
 
 
-SCF_VERSION (iMeshObject, 0, 0, 19);
+SCF_VERSION (iMeshObject, 0, 0, 20);
 
 /**
  * This is a general mesh object that the engine can interact with. The mesh
@@ -216,43 +196,6 @@ struct iMeshObject : public iBase
    * and perform calculations on that.
    */
   virtual long GetShapeNumber () const = 0;
-
-  /**
-   * Get a mask with the currently enabled features for this mesh
-   * object. This will at most be equal to iMeshObjectType::GetFeatures().
-   * For LOD purposes some features may be disabled by the engine.
-   * The values in this mask are combinations of the CS_OBJECT_FEATURE_* flags.
-   */
-  virtual uint32 GetLODFeatures () const = 0;
-
-  /**
-   * Set the features you want this mesh object to support. Features can
-   * be disabled by the engine for LOD purposes.
-   * The values in this mask are combinations of the CS_OBJECT_FEATURE_* flags.
-   */
-  virtual void SetLODFeatures (uint32 mask, uint32 value) = 0;
-
-  /**
-   * Set the LOD level of this mesh object (for polygon count). A value
-   * of 1 (default) means that the mesh object will use full detail.
-   * A value of 0 means that the mesh object will use lowest possible detail
-   * while still being useful (i.e. a value of 0 should not result in no
-   * triangles to render).
-   */
-  virtual void SetLOD (float lod) = 0;
-
-  /**
-   * Get the current LOD setting for this mesh object (between 0 and 1).
-   */
-  virtual float GetLOD () const = 0;
-
-  /**
-   * Get a rough estimate of the number of polygons for a given LOD value
-   * (between 0 and 1, similar to the value used by SetLOD()).
-   * Note that a mesh object that doesn't support LOD should always return
-   * the same number of polygons.
-   */
-  virtual int GetLODPolygonCount (float lod) const = 0;
 };
 
 SCF_VERSION (iMeshObjectFactory, 0, 0, 4);
@@ -300,13 +243,6 @@ struct iMeshObjectType : public iBase
 {
   /// Create an instance of iMeshObjectFactory.
   virtual iMeshObjectFactory* NewFactory () = 0;
-
-  /**
-   * Return a mask with all features supported by objects of this
-   * mesh object type.
-   * The values in this mask are combinations of the CS_OBJECT_FEATURE_* flags.
-   */
-  virtual uint32 GetFeatures () const = 0;
 };
 
 #endif // __IMESH_OBJECT_H__

@@ -126,11 +126,6 @@ public:
   virtual bool HitBeamObject (const csVector3&, const csVector3&,
   	csVector3&, float*) { return false; }
   virtual long GetShapeNumber () const { return 1; }
-  virtual uint32 GetLODFeatures () const { return 0; }
-  virtual void SetLODFeatures (uint32, uint32) { return; }
-  virtual void SetLOD (float) { }
-  virtual float GetLOD () const { return 1.0; }
-  virtual int GetLODPolygonCount (float) const { return 1; }
 };
 
 #endif // __CS_SHADOW_H__

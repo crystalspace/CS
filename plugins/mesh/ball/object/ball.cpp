@@ -83,7 +83,7 @@ csBallMeshObject::csBallMeshObject (iMeshObjectFactory* factory)
   color.green = 0;
   color.blue = 0;
   current_lod = 1;
-  current_features = ALL_FEATURES;
+  current_features = 0;
   vbuf = NULL;
   vbufmgr = NULL;
 }

@@ -29,8 +29,6 @@
 #include "iutil/comp.h"
 #include "ivideo/vbufmgr.h"
 
-#define ALL_FEATURES (CS_OBJECT_FEATURE_LIGHTING)
-
 struct iMaterialWrapper;
 struct iObjectRegistry;
 class csSurfMeshObjectFactory;
@@ -193,18 +191,6 @@ public:
   virtual bool HitBeamObject (const csVector3&, const csVector3&,
   	csVector3&, float* pr);
   virtual long GetShapeNumber () const { return shapenr; }
-  virtual uint32 GetLODFeatures () const { return current_features; }
-  virtual void SetLODFeatures (uint32 mask, uint32 value)
-  {
-    mask &= ALL_FEATURES;
-    current_features = (current_features & ~mask) | (value & mask);
-  }
-  virtual void SetLOD (float lod) { current_lod = lod; }
-  virtual float GetLOD () const { return current_lod; }
-  virtual int GetLODPolygonCount (float /*lod*/) const
-  {
-    return 0;	// @@@ Implement me please!
-  }
 
   //------------------------- iSurfaceState implementation ----------------
   class SurfaceState : public iSurfaceState
@@ -318,11 +304,6 @@ public:
 
   /// New factory.
   virtual iMeshObjectFactory* NewFactory ();
-  // Get features.
-  virtual uint32 GetFeatures () const
-  {
-    return ALL_FEATURES;
-  }
   /// Initialize.
   bool Initialize (iObjectRegistry* object_reg)
   {

@@ -85,7 +85,7 @@ csMetaBall::csMetaBall (iMeshObjectFactory *fact)
   mp.charge = 3.5;
   mp.rate = 0.03;
   current_lod = 1;
-  current_features = ALL_FEATURES;
+  current_features = 0;
   vbuf = NULL;
   vbufmgr = NULL;
 }

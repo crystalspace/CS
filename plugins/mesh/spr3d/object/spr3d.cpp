@@ -42,7 +42,7 @@ CS_IMPLEMENT_PLUGIN
 //#define DEFAULT_LIGHTING CS_SPR_LIGHTING_FAST
 
 // Set the default lod used.
-#define DEFAULT_LOD -1
+#define DEFAULT_LOD 1
 
 //--------------------------------------------------------------------------
 
@@ -146,10 +146,15 @@ csSpriteActionVector::~csSpriteActionVector ()
 SCF_IMPLEMENT_IBASE (csSprite3DMeshObjectFactory)
   SCF_IMPLEMENTS_INTERFACE (iMeshObjectFactory)
   SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iSprite3DFactoryState)
+  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iLODControl)
 SCF_IMPLEMENT_IBASE_END
 
 SCF_IMPLEMENT_EMBEDDED_IBASE (csSprite3DMeshObjectFactory::Sprite3DFactoryState)
   SCF_IMPLEMENTS_INTERFACE (iSprite3DFactoryState)
+SCF_IMPLEMENT_EMBEDDED_IBASE_END
+
+SCF_IMPLEMENT_EMBEDDED_IBASE (csSprite3DMeshObjectFactory::LODControl)
+  SCF_IMPLEMENTS_INTERFACE (iLODControl)
 SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 void csSprite3DMeshObjectFactory::Report (int severity, const char* msg, ...)
@@ -172,6 +177,7 @@ csSprite3DMeshObjectFactory::csSprite3DMeshObjectFactory (iBase *pParent) :
 {
   SCF_CONSTRUCT_IBASE (pParent);
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiSprite3DFactoryState);
+  SCF_CONSTRUCT_EMBEDDED_IBASE (scfiLODControl);
   cstxt = NULL;
   emerge_from = NULL;
   skeleton = NULL;
@@ -186,6 +192,7 @@ csSprite3DMeshObjectFactory::csSprite3DMeshObjectFactory (iBase *pParent) :
   lod_level = DEFAULT_LOD;
   lod_level_config = CS_SPR_LOD_GLOBAL;
   MixMode = CS_FX_COPY;
+  current_features = ALL_LOD_FEATURES;
 
   initialized = false;
 }
@@ -256,7 +263,8 @@ void csSprite3DMeshObjectFactory::GenerateLOD ()
   for (i = 0; i < GetVertexCount(); i++)
     v[i] = GetVertex (lod_base_frame, i);
 
-  csTriangleVertices2* verts = new csTriangleVertices2 (texel_mesh, v, GetVertexCount());
+  csTriangleVertices2* verts = new csTriangleVertices2 (texel_mesh, v,
+  	GetVertexCount());
   delete [] v;
 
   delete [] emerge_from;
@@ -470,8 +478,10 @@ void csSprite3DMeshObjectFactory::MergeNormals (int base, int frame)
   int i, j;
 
   int num_frames = GetFrameCount();
-  if (base  > num_frames) Report (CS_REPORTER_SEVERITY_WARNING, "No frame number: %d", base);
-  if (frame > num_frames) Report (CS_REPORTER_SEVERITY_WARNING, "No frame number: %d", frame);
+  if (base  > num_frames)
+    Report (CS_REPORTER_SEVERITY_WARNING, "No frame number: %d", base);
+  if (frame > num_frames)
+    Report (CS_REPORTER_SEVERITY_WARNING, "No frame number: %d", frame);
   if (frame > num_frames || base > num_frames)
   {
     Report (CS_REPORTER_SEVERITY_WARNING, "no smoothing performed");
@@ -485,7 +495,8 @@ void csSprite3DMeshObjectFactory::MergeNormals (int base, int frame)
 
   if (!tri_verts)
   {
-    tri_verts = new csTriangleVertices2 (texel_mesh, obj_verts, GetVertexCount());
+    tri_verts = new csTriangleVertices2 (texel_mesh, obj_verts,
+    	GetVertexCount());
   }
 
   csTriangle * tris = texel_mesh->GetTriangles();
@@ -525,8 +536,10 @@ void csSprite3DMeshObjectFactory::MergeNormals (int base, int frame)
   // create a mesh which only uses the vertex indices in the table
   csTriangleMesh2 merge_mesh;
   for (i = 0; i < num_triangles; i++)
-    merge_mesh.AddTriangle (merge[tris[i].a], merge[tris[i].b], merge[tris[i].c]);
-  csTriangleVertices2 * tv = new csTriangleVertices2 (&merge_mesh, obj_verts, GetVertexCount());
+    merge_mesh.AddTriangle (merge[tris[i].a], merge[tris[i].b],
+    	merge[tris[i].c]);
+  csTriangleVertices2 * tv = new csTriangleVertices2 (&merge_mesh,
+  	obj_verts, GetVertexCount());
 
   // calculate vertex normals, by averaging connected triangle normals
   for (i = 0; i < GetVertexCount(); i++)
@@ -556,6 +569,10 @@ void csSprite3DMeshObjectFactory::MergeNormals (int base, int frame)
   delete tv;
 }
 
+int csSprite3DMeshObjectFactory::GetLODPolygonCount (float lod) const
+{
+  return QInt (GetTriangleCount ()*lod);
+}
 
 csSpriteAction2* csSprite3DMeshObjectFactory::FindAction (const char *n) const
 {
@@ -580,7 +597,8 @@ void csSprite3DMeshObjectFactory::HardTransform (const csReversibleTransform& t)
   }
 }
 
-void csSprite3DMeshObjectFactory::Sprite3DFactoryState::EnableSkeletalAnimation ()
+void csSprite3DMeshObjectFactory::Sprite3DFactoryState::
+	EnableSkeletalAnimation ()
 {
   csSkel* skel = new csSkel ();
   scfParent->SetSkeleton (skel);
@@ -601,6 +619,7 @@ SCF_IMPLEMENT_IBASE (csSprite3DMeshObject)
   SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iSprite3DState)
   SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iPolygonMesh)
   SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iVertexBufferManagerClient)
+  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iLODControl)
 SCF_IMPLEMENT_IBASE_END
 
 SCF_IMPLEMENT_EMBEDDED_IBASE (csSprite3DMeshObject::Sprite3DState)
@@ -613,6 +632,10 @@ SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 SCF_IMPLEMENT_EMBEDDED_IBASE (csSprite3DMeshObject::eiVertexBufferManagerClient)
   SCF_IMPLEMENTS_INTERFACE (iVertexBufferManagerClient)
+SCF_IMPLEMENT_EMBEDDED_IBASE_END
+
+SCF_IMPLEMENT_EMBEDDED_IBASE (csSprite3DMeshObject::LODControl)
+  SCF_IMPLEMENTS_INTERFACE (iLODControl)
 SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 /// Static vertex array.
@@ -632,6 +655,7 @@ csSprite3DMeshObject::csSprite3DMeshObject ()
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiPolygonMesh);
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiSprite3DState);
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiVertexBufferManagerClient);
+  SCF_CONSTRUCT_EMBEDDED_IBASE (scfiLODControl);
   cur_frame = 0;
   factory = NULL;
   force_otherskin = false;
@@ -659,8 +683,8 @@ csSprite3DMeshObject::csSprite3DMeshObject ()
   base_color.Set (0, 0, 0);
   initialized = false;
   shapenr = 0;
-  current_lod = 1;
-  current_features = ALL_FEATURES;
+  local_lod_level = 1;
+  current_features = ALL_LOD_FEATURES;
 
   vbuf = NULL;
   vbuf_tween = NULL;
@@ -682,6 +706,11 @@ csSprite3DMeshObject::~csSprite3DMeshObject ()
   delete [] vertex_colors;
   delete skeleton_state;
   delete rand_num;
+}
+
+int csSprite3DMeshObject::GetLODPolygonCount (float lod) const
+{
+  return QInt (factory->GetTriangleCount () * GetLodLevel ());
 }
 
 void csSprite3DMeshObject::SetFactory (csSprite3DMeshObjectFactory* tmpl)
@@ -756,7 +785,7 @@ static int map (int* emerge_from, int idx, int num_verts)
 
 int csSprite3DMeshObject::GetVertexToLightCount ()
 {
-  if (GetLodLevel () >= 0)
+  if (GetLodLevel () < .99)
   {
     if (num_verts_for_lod == -1)
       return factory->GetVertexCount ();
@@ -1040,7 +1069,7 @@ bool csSprite3DMeshObject::DrawTest (iRenderView* rview, iMovable* movable)
   // GetLodLevel() is the distance at which you will see full detail
   float level_of_detail = GetLodLevel() * GetLodLevel();
 
-  if (GetLodLevel () >= 0)
+  if (GetLodLevel () < .99)
   {
     // reduce LOD based on distance from camera to center of sprite
     csBox3 obox;
@@ -1056,7 +1085,7 @@ bool csSprite3DMeshObject::DrawTest (iRenderView* rview, iMovable* movable)
     level_of_detail *= aspect;
   }
 
-  if (GetLodLevel () >= 0 && level_of_detail < 1)
+  if (GetLodLevel () < .99 && level_of_detail < 1)
   {
     // We calculate the number of vertices to use for this LOD
     // level. The integer part will be the number of vertices.
@@ -1724,6 +1753,7 @@ SCF_IMPLEMENT_IBASE (csSprite3DMeshObjectType)
   SCF_IMPLEMENTS_INTERFACE (iMeshObjectType)
   SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iComponent)
   SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iConfig)
+  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iLODControl)
 SCF_IMPLEMENT_IBASE_END
 
 SCF_IMPLEMENT_EMBEDDED_IBASE (csSprite3DMeshObjectType::eiComponent)
@@ -1734,11 +1764,16 @@ SCF_IMPLEMENT_EMBEDDED_IBASE (csSprite3DMeshObjectType::csSprite3DConfig)
   SCF_IMPLEMENTS_INTERFACE (iConfig)
 SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
+SCF_IMPLEMENT_EMBEDDED_IBASE (csSprite3DMeshObjectType::LODControl)
+  SCF_IMPLEMENTS_INTERFACE (iLODControl)
+SCF_IMPLEMENT_EMBEDDED_IBASE_END
+
 SCF_IMPLEMENT_FACTORY (csSprite3DMeshObjectType)
 
 SCF_EXPORT_CLASS_TABLE (spr3d)
-  SCF_EXPORT_CLASS (csSprite3DMeshObjectType, "crystalspace.mesh.object.sprite.3d",
-    "Crystal Space Sprite3D Mesh Type")
+  SCF_EXPORT_CLASS (csSprite3DMeshObjectType,
+  	"crystalspace.mesh.object.sprite.3d",
+	"Crystal Space Sprite3D Mesh Type")
 SCF_EXPORT_CLASS_TABLE_END
 
 csSprite3DMeshObjectType::csSprite3DMeshObjectType (iBase* pParent)
@@ -1746,6 +1781,7 @@ csSprite3DMeshObjectType::csSprite3DMeshObjectType (iBase* pParent)
   SCF_CONSTRUCT_IBASE (pParent);
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiComponent);
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiConfig);
+  SCF_CONSTRUCT_EMBEDDED_IBASE (scfiLODControl);
 }
 
 csSprite3DMeshObjectType::~csSprite3DMeshObjectType ()

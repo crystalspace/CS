@@ -59,7 +59,7 @@ csStarsMeshObject::csStarsMeshObject (iMeshObjectFactory* factory)
   density = .1;
   seed = 3939394;
   current_lod = 1;
-  current_features = ALL_FEATURES;
+  current_features = 0;
 }
 
 csStarsMeshObject::~csStarsMeshObject ()

@@ -74,7 +74,7 @@ csMetaGen::csMetaGen (iBase* parent)
   env_map_mult = 1.0;
   frame = 0;
   current_lod = 1;
-  current_features = ALL_FEATURES;
+  current_features = 0;
 }
 
 csMetaGen::~csMetaGen ()

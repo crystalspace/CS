@@ -34,9 +34,7 @@
 #include "csutil/typedvec.h"
 #include "csutil/cscolor.h"
 
-#define ALL_FEATURES (CS_OBJECT_FEATURE_LIGHTING|CS_OBJECT_FEATURE_ANIMATION)
-
-#define I_PI_4 1 / (M_PI * 4.0)
+#define I_PI_4 (1 / (M_PI * 4.0))
 
 struct iObjectRegistry;
 struct iGraphics3D;
@@ -250,18 +248,6 @@ public:
   virtual bool SupportsHardTransform() const { return true; }
   virtual bool IsLighting() { return do_lighting; }
   virtual void SetLighting( bool set ) { do_lighting = set; }
-  virtual uint32 GetLODFeatures () const { return current_features; }
-  virtual void SetLODFeatures (uint32 mask, uint32 value)
-  {
-    mask &= ALL_FEATURES;
-    current_features = (current_features & ~mask) | (value & mask);
-  }
-  virtual void SetLOD (float lod) { current_lod = lod; }
-  virtual float GetLOD () const { return current_lod; }
-  virtual int GetLODPolygonCount (float /*lod*/) const
-  {
-    return 0;	// @@@ Implement me please!
-  }
 
 ///-------------------- Meta Ball state implementation
   class MetaGen : public iMetaGen
@@ -345,10 +331,6 @@ public:
   csMetaGenType ( iBase * );
   virtual ~csMetaGenType();
   virtual iMeshObjectFactory* NewFactory();
-  virtual uint32 GetFeatures () const
-  {
-    return ALL_FEATURES;
-  }
 
   struct eiComponent : public iComponent
   {

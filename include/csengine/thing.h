@@ -58,8 +58,6 @@ struct iFrustumView;
 struct iMaterialWrapper;
 struct iPolygonBuffer;
 
-#define ALL_FEATURES (CS_OBJECT_FEATURE_LIGHTING)
-
 /**
  * This structure keeps the indices of the vertices which
  * define the bounding box of a csThing. It is calculated
@@ -1115,22 +1113,6 @@ public:
     	const csVector3& /*end*/,
   	csVector3& /*isect*/, float* /*pr*/) { return false; }
     virtual long GetShapeNumber () const { return 0; /*@@@*/ }
-    virtual uint32 GetLODFeatures () const
-    {
-      return scfParent->current_features;
-    }
-    virtual void SetLODFeatures (uint32 mask, uint32 value)
-    {
-      mask &= ALL_FEATURES;
-      scfParent->current_features = (scfParent->current_features & ~mask)
-      	| (value & mask);
-    }
-    virtual void SetLOD (float lod) { scfParent->current_lod = lod; }
-    virtual float GetLOD () const { return scfParent->current_lod; }
-    virtual int GetLODPolygonCount (float /*lod*/) const
-    {
-      return 1;
-    }
   } scfiMeshObject;
   friend struct MeshObject;
 
@@ -1185,12 +1167,6 @@ public:
 
   /// New Factory.
   virtual iMeshObjectFactory* NewFactory ();
-
-  /// Get features.
-  virtual uint32 GetFeatures () const
-  {
-    return ALL_FEATURES;
-  }
 
   iPolyTxtPlane* CreatePolyTxtPlane (const char* name = NULL);
   iPolyTxtPlane* FindPolyTxtPlane (const char* name);

@@ -195,11 +195,6 @@ public:
 
   /// Draw.
   virtual iMeshObjectFactory* NewFactory ();
-  /// Get features.
-  virtual uint32 GetFeatures () const
-  {
-    return ALL_FEATURES;
-  }
 
   struct eiComponent : public iComponent
   {

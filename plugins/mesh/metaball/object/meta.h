@@ -31,8 +31,6 @@
 #include "iutil/comp.h"
 #include "ivideo/vbufmgr.h"
 
-#define ALL_FEATURES (CS_OBJECT_FEATURE_LIGHTING|CS_OBJECT_FEATURE_ANIMATION)
-
 class csMaterialHandle;
 struct G3DTriangleMesh;
 struct iObjectRegistry;
@@ -171,18 +169,6 @@ public:
   virtual bool IsLighting() { return do_lighting; }
   virtual void SetLighting( bool set ) { do_lighting = set; }
   virtual iMaterialWrapper *GetMaterial() { return th; }
-  virtual uint32 GetLODFeatures () const { return current_features; }
-  virtual void SetLODFeatures (uint32 mask, uint32 value)
-  {
-    mask &= ALL_FEATURES;
-    current_features = (current_features & ~mask) | (value & mask);
-  }
-  virtual void SetLOD (float lod) { current_lod = lod; }
-  virtual float GetLOD () const { return current_lod; }
-  virtual int GetLODPolygonCount (float /*lod*/) const
-  {
-    return 0;	// @@@ Implement me please!
-  }
 
 ///-------------------- Meta Ball state implementation
   class MetaBallState : public iMetaBallState
@@ -250,10 +236,6 @@ public:
   csMetaBallType ( iBase * );
   virtual ~csMetaBallType();
   virtual iMeshObjectFactory* NewFactory();
-  virtual uint32 GetFeatures () const
-  {
-    return ALL_FEATURES;
-  }
   bool Initialize (iObjectRegistry* object_reg)
   {
     csMetaBallType::object_reg = object_reg;

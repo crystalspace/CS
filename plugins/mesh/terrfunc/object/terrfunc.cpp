@@ -209,7 +209,7 @@ csTerrFuncObject::csTerrFuncObject (iObjectRegistry* object_reg,
   quadtree = NULL;
   vis_cb = NULL;
   current_lod = 1;
-  current_features = ALL_FEATURES;
+  current_features = 0;
   vbufmgr = NULL;
 }
 
@@ -1674,7 +1674,3 @@ iMeshObjectFactory* csTerrFuncObjectType::NewFactory()
   return (iMeshObjectFactory*)pFactory;
 }
 
-uint32 csTerrFuncObjectType::GetFeatures () const
-{
-  return 0;
-}

@@ -134,7 +134,7 @@ csThing::csThing (iBase* parent) : csObject (parent),
   prepared = false;
 
   current_lod = 1;
-  current_features = ALL_FEATURES;
+  current_features = 0;
   thing_edges_valid = false;
   
   curves_transf_ok = false;

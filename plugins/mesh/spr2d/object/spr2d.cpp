@@ -64,7 +64,7 @@ csSprite2DMeshObject::csSprite2DMeshObject (csSprite2DMeshObjectFactory* factory
   vis_cb = NULL;
   shapenr = 0;
   current_lod = 1;
-  current_features = ALL_FEATURES;
+  current_features = 0;
   o2t.Identity();
 }
 
