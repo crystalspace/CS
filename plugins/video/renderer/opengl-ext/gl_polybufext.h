@@ -40,21 +40,33 @@
 #include "csutil/typedvec.h"
 
 
-
+/** 
+* the EXT implementation splits up the Polygon into traingles
+* for faster rendering. (one batch per lightmap per material
+* this will raise the amount of memory that will have to be
+* pushed (or pulled if VAR) across the AGP, but reduces primitive
+* restarts
+*/
 class csPolygonBufferEXT : public iPolygonBuffer
 {
 public:
   csPolygonBufferEXT(iGraphics3D *g3d);
   virtual ~csPolygonBufferEXT();
 
-  struct csPolygonBufferPolyEXT
+  struct csPolygonBufferEXTLightmap
   {
-    int *       m_vertices;
-    int         m_num_verts;
-    csPlane3    m_normal;
-    int         m_materialindex;
-    csMatrix3   m_mobj2tex;
-    csVector3   m_vobj2tex;
+    CS_DECLARE_GROWING_ARRAY(m_indices, int);
+    unsigned int m_texturehandle;
+  };
+
+  struct csPolygonBufferEXTMaterial
+  {
+    /// it's better to have smaller vertex buffers
+    /// otherwise we'd copy all the vertices to AGP memory every frame
+    iVertexBuffer *m_vbuf;
+
+    iMaterialHandle *m_mat_handle;
+    CS_DECLARE_GROWING_ARRAY (m_lightmaps, csPolygonBufferEXTLightmap);
   };
 
   /**
@@ -81,10 +93,12 @@ public:
    * Add a material.
    */
   virtual void AddMaterial (iMaterialHandle* mat_handle);
+
   /**
    * Get the number of materials.
    */
   virtual int GetMaterialCount () const;
+
   /**
    * Get a material.
    */
@@ -94,7 +108,6 @@ public:
   virtual int GetVertexCount() const;
 
   ///Gets the array of vertices
-
   virtual csVector3* GetVertices() const;
 
   /**
@@ -106,7 +119,7 @@ public:
   /// Clear all polygons, materials, and vertex array.
   virtual void Clear ();
 
-   /** Sets the polygon buffer as dirty
+  /** Sets the polygon buffer as dirty
   * This means that the mesh is affected by some light 
   */
   virtual void MarkLightmapsDirty();
@@ -114,12 +127,9 @@ public:
   SCF_DECLARE_IBASE;
 
 private:
-
-  CS_DECLARE_GROWING_ARRAY (m_polygons, csPolygonBufferPolyEXT);
-  csVector  m_mathandles;
-  
+  CS_DECLARE_GROWING_ARRAY(m_materials, csPolygonBufferEXTMaterial);
   iGraphics3D *m_g3d;
-  iVertexBuffer *m_vbuf;
+  
 
 };
 

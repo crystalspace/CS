@@ -68,20 +68,25 @@ void csPolygonBufferEXT::AddPolygon (int* verts, int num_verts,
 
 void csPolygonBufferEXT::SetVertexArray (csVector3* verts, int num_verts)
 {
+  
 }
 
 void csPolygonBufferEXT::AddMaterial (iMaterialHandle* mat_handle)
 {
+  csPolygonBufferEXTMaterial newmat;
+  newmat.m_mat_handle = mat_handle;
+  newmat.m_vbuf = m_g3d->GetVertexBufferManager()->CreateBuffer(0);
+  m_materials.Push(newmat);
 }
 
 int csPolygonBufferEXT::GetMaterialCount () const
 {
-  return 0;
+  return m_materials.Length();
 }
 
 iMaterialHandle* csPolygonBufferEXT::GetMaterial (int idx) const
 {
-  return NULL; // Done only to fix compile errors. Change when necesary.
+  return m_materials[idx].m_mat_handle;
 }
 
 int csPolygonBufferEXT::GetVertexCount() const
@@ -96,6 +101,7 @@ csVector3* csPolygonBufferEXT::GetVertices() const
 
 void csPolygonBufferEXT::SetMaterial (int idx, iMaterialHandle* mat_handle)
 {
+  m_materials[idx].m_mat_handle = mat_handle;
 }
 
 void csPolygonBufferEXT::Clear ()
