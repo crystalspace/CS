@@ -59,8 +59,6 @@ public:
   ~Simple ();
 
   bool Initialize ();
-  void Start ();
-
   void PushFrame ();
   void OnIconize(wxIconizeEvent& event);
   void OnShow(wxShowEvent& event);
@@ -69,4 +67,3 @@ public:
 };
 
 #endif // __SIMPLE1_H__
-

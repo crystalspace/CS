@@ -369,11 +369,6 @@ bool Simple::Initialize ()
   return true;
 }
 
-void Simple::Start ()
-{
-  csDefaultRunLoop (object_reg);
-}
-
 void Simple::PushFrame ()
 {
   csRef<iEventQueue> q (CS_QUERY_REGISTRY(object_reg, iEventQueue));
@@ -491,8 +486,6 @@ void MyApp::OnIdle() {
 int MyApp::OnExit()
 {
   simple = 0;
-
   csInitializer::DestroyApplication (object_reg);
-
   return 0;
 }
