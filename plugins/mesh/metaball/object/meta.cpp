@@ -336,13 +336,6 @@ void csMetaBall::GetTransformedBoundingBox( long cam_num, long move_num,
   cbox = camera_bbox;
 }
 
-int csMetaBall::HitBeamBBox (const csVector3& start, const csVector3& end,
-  csVector3& isect, float* pr)
-{
-  csSegment3 seg (start, end);
-  return csIntersect3::BoxSegment (object_bbox, seg, isect, pr);
-}
-
 bool csMetaBall::HitBeamOutline (const csVector3& start, const csVector3& end,
   csVector3& isect, float* pr)
 {

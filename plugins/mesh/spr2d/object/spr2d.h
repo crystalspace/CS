@@ -144,8 +144,6 @@ public:
   virtual bool WantToDie () const { return false; }
   virtual void HardTransform (const csReversibleTransform& t);
   virtual bool SupportsHardTransform () const { return false; }
-  virtual int HitBeamBBox (const csVector3&, const csVector3&,
-        csVector3&, float*);
   virtual bool HitBeamOutline (const csVector3&, const csVector3&,
         csVector3&, float*);
   /// 2D sprites have no depth, so this is equivalent to HitBeamOutline.

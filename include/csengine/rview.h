@@ -76,6 +76,8 @@ private:
 
   /// The view frustum as defined at z=1.
   float leftx, rightx, topy, boty;
+  /// The frustum corresponding with this.
+  csRenderContextFrustum* top_frustum;
 
   /**
    * A callback function. If this is set then no drawing is done.
@@ -87,6 +89,19 @@ private:
    * Delete all data on the given render context.
    */
   void DeleteRenderContextData (csRenderContext* rc);
+
+  /**
+   * Update the csRenderContextFrustum to the given clipper.
+   */
+  void UpdateFrustum (iClipper2D* clip, csRenderContextFrustum*
+  	frust);
+
+  /**
+   * Given a csRenderContextFrustum and a bounding sphere calculate if
+   * the sphere is fully inside and fully outside that frustum.
+   */
+  static void TestSphereFrustum (csRenderContextFrustum* frust,
+  	const csVector3& center, float radius, bool& inside, bool& outside);
 
 public:
   ///
@@ -103,7 +118,6 @@ public:
   void SetEngine (iEngine* engine);
   /// Set the camera.
   void SetCamera (iCamera* camera);
-
 
   ///
   virtual void SetCallback (iDrawFuncCallback* cb)
@@ -159,13 +173,7 @@ public:
   /// Get the 3D graphics subsystem.
   virtual iGraphics3D* GetGraphics3D () { return g3d; }
   /// Set the view frustum at z=1.
-  virtual void SetFrustum (float lx, float rx, float ty, float by)
-  {
-    leftx = lx;
-    rightx = rx;
-    topy = ty;
-    boty = by;
-  }
+  virtual void SetFrustum (float lx, float rx, float ty, float by);
   /// Get the frustum.
   virtual void GetFrustum (float& lx, float& rx, float& ty, float& by)
   {
@@ -173,6 +181,11 @@ public:
     rx = rightx;
     ty = topy;
     by = boty;
+  }
+  /// Get the top level frustum (corresponding with SetFrustum()).
+  virtual csRenderContextFrustum* GetTopFrustum ()
+  {
+    return top_frustum;
   }
 
   //-----------------------------------------------------------------
@@ -258,6 +271,17 @@ public:
    */
   virtual void CalculateFogMesh (const csTransform& tr_o2c,
   	G3DTriangleMesh& mesh);
+  /**
+   * Check if the given bounding sphere (in object space coordinates)
+   * is visibile in this render view. The given transformation should
+   * transform object to camera space. If the sphere is visible this
+   * function will also initialize the clip_plane, clip_z_plane, and
+   * clip_portal fields which can be used for DrawTriangleMesh or
+   * DrawPolygonMesh.
+   */
+  virtual bool ClipBSphere (const csReversibleTransform& o2c,
+	const csVector3& center, float radius,
+	int& clip_portal, int& clip_plane, int& clip_z_plane);
   /**
    * Check if the screen bounding box of an object is visible in
    * this render view. If true is returned (visible) then clip_plane,

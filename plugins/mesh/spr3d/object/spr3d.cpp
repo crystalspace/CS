@@ -936,6 +936,18 @@ bool csSprite3DMeshObject::DrawTest (iRenderView* rview, iMovable* movable)
   //   C = Mwc * Mow * O - Mwc * (Vow + Vwc)
   csReversibleTransform tr_o2c = camera->GetTransform ()
     	* movable->GetFullTransform ().GetInverse ();
+
+#if 1
+  csVector3 center, radius;
+  GetRadius (radius, center);
+  float max_radius = radius.x;
+  if (max_radius < radius.y) max_radius = radius.y;
+  if (max_radius < radius.z) max_radius = radius.z;
+  int clip_portal, clip_plane, clip_z_plane;
+  if (rview->ClipBSphere (tr_o2c, center, max_radius, clip_portal, clip_plane,
+  	clip_z_plane) == false)
+    return false;
+#else
   float fov = camera->GetFOV ();
   float shiftx = camera->GetShiftX ();
   float shifty = camera->GetShiftY ();
@@ -955,6 +967,7 @@ bool csSprite3DMeshObject::DrawTest (iRenderView* rview, iMovable* movable)
   if (rview->ClipBBox (bbox, bbox3, clip_portal, clip_plane,
   	clip_z_plane) == false)
     return false;
+#endif
  
   UpdateWorkTables (factory->GetVertexCount());
   
@@ -1593,15 +1606,6 @@ void csSprite3DMeshObject::UpdateLightingHQ (iLight** lights, int num_lights,
       }
     }
   }
-}
-
-int csSprite3DMeshObject::HitBeamBBox (const csVector3& start,
-	const csVector3& end, csVector3& isect, float* pr)
-{
-  csBox3 b;
-  GetObjectBoundingBox (b);
-  csSegment3 seg (start, end);
-  return csIntersect3::BoxSegment (b, seg, isect, pr);
 }
 
 bool csSprite3DMeshObject::HitBeamOutline (const csVector3& start,

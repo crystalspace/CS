@@ -52,7 +52,7 @@ public:
   virtual iModelData *Load( UByte* Buffer, ULong size );
   virtual iDataBuffer *Save( iModelData*, const char *format );
 
-  struct Component : public iComponent
+  struct eiComponent : public iComponent
   {
     SCF_DECLARE_EMBEDDED_IBASE( csModelConverter3ds );
     virtual bool Initialize (iObjectRegistry *object_reg)

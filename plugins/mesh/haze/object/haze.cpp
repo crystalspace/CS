@@ -1055,13 +1055,6 @@ void csHazeMeshObject::NextFrame (csTicks /*current_time*/)
   // nothing
 }
 
-int csHazeMeshObject::HitBeamBBox(const csVector3& start, const csVector3& end,
-      csVector3& isect, float* pr)
-{
-  csSegment3 seg (start, end);
-  return csIntersect3::BoxSegment(bbox, seg, isect, pr);      
-}
-
 //----------------------------------------------------------------------
 
 SCF_IMPLEMENT_IBASE (csHazeMeshObjectFactory)

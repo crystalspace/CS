@@ -39,6 +39,7 @@ csRenderView::csRenderView () :
   SCF_CONSTRUCT_IBASE (NULL);
   ctxt = new csRenderContext ();
   memset (ctxt, 0, sizeof (csRenderContext));
+  top_frustum = NULL;
 }
 
 csRenderView::csRenderView (iCamera* c) :
@@ -50,6 +51,7 @@ csRenderView::csRenderView (iCamera* c) :
   memset (ctxt, 0, sizeof (csRenderContext));
   c->IncRef ();
   ctxt->icamera = c;
+  top_frustum = NULL;
 }
 
 csRenderView::csRenderView (iCamera* c, iClipper2D* v, iGraphics3D* ig3d,
@@ -63,14 +65,24 @@ csRenderView::csRenderView (iCamera* c, iClipper2D* v, iGraphics3D* ig3d,
   c->IncRef ();
   ctxt->icamera = c;
   ctxt->iview = v;
+  if (v)
+  {
+    v->IncRef ();
+    ctxt->iview_frustum = new csRenderContextFrustum ();
+    UpdateFrustum (ctxt->iview, ctxt->iview_frustum);
+  }
+  top_frustum = NULL;
 }
 
 csRenderView::~csRenderView ()
 {
   if (callback) callback->DecRef ();
+  if (top_frustum) top_frustum->DecRef ();
   if (ctxt)
   {
     if (ctxt->icamera) ctxt->icamera->DecRef ();
+    if (ctxt->iview) ctxt->iview->DecRef ();
+    if (ctxt->iview_frustum) ctxt->iview_frustum->DecRef ();
     DeleteRenderContextData (ctxt);
     delete ctxt;
   }
@@ -89,6 +101,9 @@ void csRenderView::SetClipper (iClipper2D* view)
   view->IncRef ();
   if (ctxt->iview) ctxt->iview->DecRef ();
   ctxt->iview = view;
+  if (ctxt->iview_frustum) ctxt->iview_frustum->DecRef ();
+  ctxt->iview_frustum = new csRenderContextFrustum ();
+  UpdateFrustum (ctxt->iview, ctxt->iview_frustum);
 }
 
 void csRenderView::SetEngine (iEngine* engine)
@@ -475,6 +490,189 @@ void csRenderView::CalculateFogMesh (const csTransform& tr_o2c,
   }
 }
 
+void csRenderView::UpdateFrustum (iClipper2D* clip, csRenderContextFrustum*
+  	frust)
+{
+  int i;
+  csBox2 bbox;
+  csVector2 shift (ctxt->icamera->GetShiftX (), ctxt->icamera->GetShiftY ());
+  float inv_fov = ctxt->icamera->GetInvFOV ();
+  csVector2* poly = clip->GetClipPoly ();
+  bbox.StartBoundingBox ((poly[0]-shift) * inv_fov);
+  for (i = 1 ; i < clip->GetVertexCount () ; i++)
+    bbox.AddBoundingVertexSmart ((poly[i]-shift) * inv_fov);
+
+  csVector3* frustum = frust->frustum;
+  csVector3 v1 (bbox.MinX (), bbox.MinY (), 1);
+  csVector3 v2 (bbox.MaxX (), bbox.MinY (), 1);
+  frustum[0] = v1 % v2; frustum[0].Normalize ();
+  csVector3 v3 (bbox.MaxX (), bbox.MaxY (), 1);
+  frustum[1] = v2 % v3; frustum[1].Normalize ();
+  v2.Set (bbox.MinX (), bbox.MaxY (), 1);
+  frustum[2] = v3 % v2; frustum[2].Normalize ();
+  frustum[3] = v2 % v1; frustum[3].Normalize ();
+}
+
+void csRenderView::SetFrustum (float lx, float rx, float ty, float by)
+{
+  leftx = lx;
+  rightx = rx;
+  topy = ty;
+  boty = by;
+  if (top_frustum) top_frustum->DecRef ();
+  top_frustum = new csRenderContextFrustum ();
+  csVector3* frustum = top_frustum->frustum;
+  csVector3 v1 (leftx, topy, 1);
+  csVector3 v2 (rightx, topy, 1);
+  frustum[0] = v1 % v2; frustum[0].Normalize ();
+  csVector3 v3 (rightx, boty, 1);
+  frustum[1] = v2 % v3; frustum[1].Normalize ();
+  v2.Set (leftx, boty, 1);
+  frustum[2] = v3 % v2; frustum[2].Normalize ();
+  frustum[3] = v2 % v1; frustum[3].Normalize ();
+}
+
+void csRenderView::TestSphereFrustum (csRenderContextFrustum* frustum,
+  	const csVector3& center, float radius, bool& inside, bool& outside)
+{
+  float dist;
+  csVector3* frust = frustum->frustum;
+  outside = true;
+  inside = true;
+
+  dist = frust[0] * center;
+  if (dist < radius) inside = false;
+  if ((-dist) <= radius)
+  {
+    dist = frust[1] * center;
+    if (dist < radius) inside = false;
+    if ((-dist) <= radius)
+    {
+      dist = frust[2] * center;
+      if (dist < radius) inside = false;
+      if ((-dist) <= radius)
+      {
+        dist = frust[3] * center;
+        if (dist < radius) inside = false;
+        if ((-dist) <= radius)
+	  outside = false;
+      }
+    }
+  }
+}
+
+bool csRenderView::ClipBSphere (const csReversibleTransform& o2c,
+	const csVector3& center, float radius,
+	int& clip_portal, int& clip_plane, int& clip_z_plane)
+{
+  //------
+  // First transform bounding sphere from object space to camera space
+  // by using the given transform.
+  //------
+  csVector3 tr_center = o2c.Other2This (center);
+  // @@@ It would be nice if we could quickly detect if a given
+  // transformation is orthonormal. In that case we don't need to transform
+  // the radius.
+  // To transform the radius we transform a vector with the radius
+  // relative to the transform.
+  csVector3 v_radius (radius);
+  v_radius = o2c.Other2ThisRelative (v_radius);
+  radius = v_radius.x;
+  if (radius < v_radius.y) radius = v_radius.y;
+  if (radius < v_radius.z) radius = v_radius.z;
+
+  //------
+  // Test if object is behind the camera plane.
+  //------
+  if (tr_center.z+radius <= 0)
+    return false;
+  
+  //------
+  // Test against far plane if needed.
+  //------
+  csPlane3 far_plane;
+  if (ctxt->icamera->GetFarPlane (far_plane))
+  {
+    // Ok, so this is not really far plane clipping - we just dont draw this
+    // object if the bounding sphere is further away than the D
+    // part of the farplane.
+    if (tr_center.z-radius > far_plane.D ())
+      return false;	
+  }
+
+  //------
+  // Check if we're fully inside the bounding sphere.
+  //------
+  bool fully_inside = csSquaredDist::PointPoint (csVector3 (0),
+  	tr_center) <= radius * radius;
+
+  //------
+  // Test if there is a chance we must clip to current portal.
+  //------
+  bool outside, inside;
+  CS_ASSERT (ctxt->iview_frustum != NULL);
+  if (fully_inside)
+  {
+    clip_portal = CS_CLIP_NEEDED;
+  }
+  else
+  {
+    TestSphereFrustum (ctxt->iview_frustum, tr_center, radius, inside, outside);
+    if (outside) return false;
+    if (!inside) clip_portal = CS_CLIP_NEEDED;
+    else clip_portal = CS_CLIP_NOT;
+  }
+
+  //------
+  // Test if there is a chance we must clip to the z-plane.
+  //------
+  if (tr_center.z-radius > 0)
+    clip_z_plane = CS_CLIP_NOT;
+  else
+    clip_z_plane = CS_CLIP_NEEDED;
+
+  //------
+  // Test if there is a chance we must clip to current plane.
+  //------
+  clip_plane = CS_CLIP_NOT;
+  if (ctxt->do_clip_plane)
+  {
+    bool mirror = GetCamera ()->IsMirrored ();
+    float dist = ctxt->clip_plane.Classify (tr_center);
+    if (mirror) dist = -dist;
+    if ((-dist) > radius) return false;
+    else if (dist <= radius) clip_plane = CS_CLIP_NEEDED;
+  }
+ 
+  //------
+  // If we don't need to clip to the current portal then we
+  // test if we need to clip to the top-level portal.
+  // Top-level clipping is always required unless we are totally
+  // within the top-level frustum.
+  // IF it is decided that we need to clip here then we still
+  // clip to the inner portal. We have to do clipping anyway so
+  // why not do it to the smallest possible clip area.
+  //------
+  if ((!ctxt->do_clip_frustum) || clip_portal != CS_CLIP_NEEDED)
+  {
+    if (fully_inside)
+    {
+      clip_portal = CS_CLIP_TOPLEVEL;
+    }
+    else
+    {
+      CS_ASSERT (GetTopFrustum () != NULL);
+      TestSphereFrustum (GetTopFrustum (), tr_center, radius, inside, outside);
+      // It is not possible that the sphere is fully outside the
+      // top-level frustum.
+      CS_ASSERT (!outside);
+      if (!inside) clip_portal = CS_CLIP_TOPLEVEL;
+    }
+  }
+
+  return true;
+}
+
 bool csRenderView::ClipBBox (const csBox2& sbox, const csBox3& cbox,
     int& clip_portal, int& clip_plane, int& clip_z_plane)
 {
@@ -484,8 +682,8 @@ bool csRenderView::ClipBBox (const csBox2& sbox, const csBox3& cbox,
   csPlane3 far_plane;
   if (ctxt->icamera->GetFarPlane (far_plane))
   {
-    // Ok, so this is not really a far plane clipping - we just dont draw this
-    // object if no point of the camera_bounding box is closer than the D
+    // Ok, so this is not really far plane clipping - we just dont draw this
+    // object if no point of the camera_bounding box is further than the D
     // part of the farplane.
     if (cbox.SquaredOriginDist () > far_plane.D ()*far_plane.D ())
       return false;	
@@ -569,6 +767,7 @@ void csRenderView::CreateRenderContext ()
   *ctxt = *old_ctxt;
   if (ctxt->icamera) ctxt->icamera->IncRef ();
   if (ctxt->iview) ctxt->iview->IncRef ();
+  if (ctxt->iview_frustum) ctxt->iview_frustum->IncRef ();
   ctxt->rcdata = NULL;
 }
 
@@ -579,6 +778,7 @@ void csRenderView::RestoreRenderContext (csRenderContext* original)
 
   if (old_ctxt->icamera) old_ctxt->icamera->DecRef ();
   if (old_ctxt->iview) old_ctxt->iview->DecRef ();
+  if (old_ctxt->iview_frustum) old_ctxt->iview_frustum->DecRef ();
   DeleteRenderContextData (old_ctxt);
   delete old_ctxt;
 }

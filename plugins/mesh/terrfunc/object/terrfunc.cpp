@@ -1445,13 +1445,6 @@ int csTerrFuncObject::CollisionDetect (csTransform* transform)
 // are encompassed by an overall bounding box. Each block is then comprised
 // of a number smaller blocks, which each contain two triangles.
 
-int csTerrFuncObject::HitBeamBBox (const csVector3& start,
-  const csVector3& end, csVector3& isect, float* pr)
-{
-  csSegment3 seg (start, end);
-  return csIntersect3::BoxSegment (global_bbox, seg, isect, pr);
-}
-
 bool csTerrFuncObject::HitBeamOutline (const csVector3& start,
 	const csVector3& end, csVector3& isect, float* pr)
 {
@@ -1461,8 +1454,8 @@ bool csTerrFuncObject::HitBeamOutline (const csVector3& start,
 // This variant will return on the first hit, making it a bit faster than
 // the other variant.
 
-  HitBeamBBox (start, end, isect, NULL);
   csSegment3 seg (start, end);
+  csIntersect3::BoxSegment (global_bbox, seg, isect, NULL);
   csVector3 v, *vrt;
   csTriangle *tr;
   csBox3 tbox;

@@ -227,6 +227,18 @@ bool csCubeMeshObject::DrawTest (iRenderView* rview, iMovable* movable)
   //   C = Mwc * Mow * O - Mwc * (Vow + Vwc)
   csReversibleTransform tr_o2c = camera->GetTransform ()
     	* movable->GetFullTransform ().GetInverse ();
+
+#if 1
+  csVector3 center, radius;
+  GetRadius (radius, center);
+  float max_radius = radius.x;
+  if (max_radius < radius.y) max_radius = radius.y;
+  if (max_radius < radius.z) max_radius = radius.z;
+  int clip_portal, clip_plane, clip_z_plane;
+  if (rview->ClipBSphere (tr_o2c, center, max_radius, clip_portal, clip_plane,
+  	clip_z_plane) == false)
+    return false;
+#else
   float fov = camera->GetFOV ();
   float shiftx = camera->GetShiftX ();
   float shifty = camera->GetShiftY ();
@@ -247,6 +259,7 @@ bool csCubeMeshObject::DrawTest (iRenderView* rview, iMovable* movable)
   if (rview->ClipBBox (sbox, cbox, clip_portal, clip_plane,
   	clip_z_plane) == false)
     return false;
+#endif
 
   iClipper2D* clipper; clipper = rview->GetClipper ();
   g3d->SetObjectToCamera (&tr_o2c);
@@ -364,23 +377,20 @@ void csCubeMeshObject::HardTransform (const csReversibleTransform& t)
   shapenr++;
 }
 
-int csCubeMeshObject::HitBeamBBox (const csVector3& start,
-  const csVector3& end, csVector3& isect, float* pr)
-{
-  csSegment3 seg (start, end);
-  return csIntersect3::BoxSegment (object_bbox, seg, isect, pr);
-}
-
 bool csCubeMeshObject::HitBeamOutline (const csVector3& start,
   const csVector3& end, csVector3& isect, float* pr)
 {
-  return (HitBeamBBox (start, end, isect, pr) < 0) ? false : true;
+  csSegment3 seg (start, end);
+  return (csIntersect3::BoxSegment (object_bbox, seg, isect, pr) < 0) ?
+  	false : true;
 }
 
 bool csCubeMeshObject::HitBeamObject(const csVector3& start,
   const csVector3& end, csVector3& isect, float *pr)
 {
-  return (HitBeamBBox (start, end, isect, pr) < 0) ? false : true;
+  csSegment3 seg (start, end);
+  return (csIntersect3::BoxSegment (object_bbox, seg, isect, pr) < 0) ?
+  	false : true;
 }
 
 

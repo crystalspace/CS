@@ -632,25 +632,6 @@ void csSprite2DMeshObject::CheckBeam (const csVector3& start,
 }
 
 
-int csSprite2DMeshObject::HitBeamBBox (const csVector3& start,
-      const csVector3& end, csVector3& isect, float* pr)
-{
-  
-  csVector2 cen = bbox_2d.GetCenter ();
-  csVector3 pl = start - csVector3 (cen.x, cen.y, 0);
-  float sqr = pl * pl;
-  if (sqr < SMALL_EPSILON) return -1; // Too close. Cannot intersect
-  float dist;
-  csIntersect3::Plane(start, end, pl, 0, isect, dist);
-  if (pr) *pr = dist;
-  CheckBeam (start, pl, sqr);
-  csVector3 r = o2t * isect;
-  csVector2 min = bbox_2d.Min(), max = bbox_2d.Max();
-  if (r.x < min.x || r.x > max.x) return -1;
-  if (r.y < min.y || r.y > max.y) return -1;
-  return BOX_SIDE_Z;
-}
-
 bool csSprite2DMeshObject::HitBeamOutline(const csVector3& start,
       const csVector3& end, csVector3& isect, float* pr)
 {

@@ -378,7 +378,7 @@ struct CompressVertex
   int new_idx;
 };
 
-int compare_vt (const void* p1, const void* p2)
+static int compare_vt (const void* p1, const void* p2)
 {
   CompressVertex* sp1 = (CompressVertex*)p1;
   CompressVertex* sp2 = (CompressVertex*)p2;
@@ -391,7 +391,7 @@ int compare_vt (const void* p1, const void* p2)
   return 0;
 }
 
-int compare_vt_orig (const void* p1, const void* p2)
+static int compare_vt_orig (const void* p1, const void* p2)
 {
   CompressVertex* sp1 = (CompressVertex*)p1;
   CompressVertex* sp2 = (CompressVertex*)p2;

@@ -35,6 +35,8 @@ struct iSector;
 struct iPolygon3D;
 struct csFog;
 class csRenderView;
+class csReversibleTransform;
+class csVector3;
 
 /**
  * Information for vertex based fog. There is an instance of this
@@ -71,6 +73,32 @@ public:
 };
 
 /**
+ * This structure holds the current render context frustum.
+ * It is basically a bounding frustum for the current clipper.
+ */
+class csRenderContextFrustum
+{
+  class csRenderContext;
+  friend class csRenderContext;	// To avoid gcc warning!
+
+private:
+  int ref_count;
+
+  ~csRenderContextFrustum () { }
+
+public:
+  /**
+   * The frustum is given as csVector3 and not with csPlane3 because
+   * the planes go through the origin so the D component is zero.
+   */
+  csVector3 frustum[4];
+
+  csRenderContextFrustum () : ref_count (1) { }
+  void IncRef () { ref_count++; }
+  void DecRef () { --ref_count; if (ref_count <= 0) delete this; }
+};
+
+/**
  * This structure keeps track of the current render context.
  * It is used by iRenderView. When recursing through a portal
  * a new render context will be created and set in place of the
@@ -91,6 +119,8 @@ public:
   iCamera* icamera;
   /// The 2D polygon describing how everything drawn inside should be clipped.
   iClipper2D* iview;
+  /// The frustum corresponding with iview.
+  csRenderContextFrustum* iview_frustum;
 
   /// The portal polygon (or NULL if the first sector).
   iPolygon3D* portal_polygon;
@@ -147,7 +177,7 @@ public:
   int draw_rec_level;
 };
 
-SCF_VERSION (iRenderView, 0, 1, 5);
+SCF_VERSION (iRenderView, 0, 2, 0);
 
 /**
  * This interface represents all information needed to render
@@ -188,6 +218,8 @@ struct iRenderView : public iBase
   virtual void SetFrustum (float lx, float rx, float ty, float by) = 0;
   /// Get the frustum.
   virtual void GetFrustum (float& lx, float& rx, float& ty, float& by) = 0;
+  /// Get the top level frustum (corresponding with SetFrustum()).
+  virtual csRenderContextFrustum* GetTopFrustum () = 0;
 
   //-----------------------------------------------------------------
   // The following functions operate on the current render context.
@@ -260,6 +292,19 @@ struct iRenderView : public iBase
    */
   virtual void CalculateFogMesh (const csTransform& tr_o2c,
   	G3DTriangleMesh& mesh) = 0;
+
+  /**
+   * Check if the given bounding sphere (in object space coordinates)
+   * is visibile in this render view. The given transformation should
+   * transform object to camera space. If the sphere is visible this
+   * function will also initialize the clip_plane, clip_z_plane, and
+   * clip_portal fields which can be used for DrawTriangleMesh or
+   * DrawPolygonMesh.
+   */
+  virtual bool ClipBSphere (const csReversibleTransform& o2c,
+	const csVector3& center, float radius,
+	int& clip_portal, int& clip_plane, int& clip_z_plane) = 0;
+
   /**
    * Check if the screen bounding box of an object is visible in
    * this render view. If true is returned (visible) then clip_plane,

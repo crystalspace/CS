@@ -368,7 +368,10 @@ void csMeshWrapper::PlaceMesh ()
 int csMeshWrapper::HitBeamBBox (const csVector3& start,
   const csVector3& end, csVector3& isect, float* pr)
 {
-  return mesh->HitBeamBBox (start, end, isect, pr);
+  csBox3 b;
+  mesh->GetObjectBoundingBox (b, CS_BBOX_MAX);
+  csSegment3 seg (start, end);
+  return csIntersect3::BoxSegment (b, seg, isect, pr);
 }
 
 bool csMeshWrapper::HitBeamOutline (const csVector3& start,

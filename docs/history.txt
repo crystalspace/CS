@@ -1,6 +1,43 @@
 The history order is reversed so that new features are at the top.
 
 29-Aug-2001
+	- Andrew Zabolotny reports:
+	  OS/2 port strikes back :-)
+	    - Fixed csdive plugin.
+	    - Renamed xextf86vm plugin to xext86vm because OS/2 doesn't
+	      allow shared libraries with basename length >8 :-(
+	- Andrew Zabolotny also fixed csConfigAccess so that it won't crash
+	  when object_reg is NULL in destructor (this can happen for example
+	  if you compiled imgplex but didn't compile the individual GIF, BMP
+	  etc... loaders).
+	- Corrected the ^M chars in csstring.cpp. These prevented proper
+	  compilation.
+	- Added patch to fix ie3ds loader from Norman Kramer.
+	- Fixed md2ie for the latest csString changes.
+	- Added a new constructor for csPlane3 which accepts two vectors.
+	  This will calculate the plane through the origin and the two
+	  given points. Also added an equivalent Set() function.
+	- Fixed reference counting in csRenderView with regards to iview
+	  (clipper).
+	- Added csRenderContextFrustum which holds the bounding frustum for
+	  the current clipper (for csRenderView).
+	- Added iRenderView::ClipBSphere() which is equivalent to
+	  iRenderView::ClipBBox() except that it clips the bounding sphere
+	  to the current render view. It is considerably faster but slightly
+	  less accurate since a bounding sphere is in many cases larger than
+	  a bounding box (not in all cases though).
+	- Added iRenderView::GetTopFrustum() which returns a
+	  csRenderContextFrustum for the top-level portal.
+	- Fixed the fake iRenderView implementation in the isometric engine
+	  to also implement the new functions.
+	- 3D sprites and cube mesh plugin now use the new ClipBSphere()
+	  as opposed to ClipBBox(). I didn't convert the other mesh objects
+	  yet as I first want be sure that everything is ok. ClipBSphere()
+	  hasn't been tested a lot yet.
+	- Removed iMeshObject::HitBeamBBox(). The implementation of this
+	  is (nearly) always the same (except for spr2d but that's not very
+	  important) so the implementation is now put in
+	  csMeshWrapper::HitBeamBBox() instead.
 	- Eric Sunshine reverted his changes to next2d.mak since they caused
 	  the build process to attempt to compile files from the NextStep port
 	  on MacOS/X, MacOS/X Server 1.0, and OpenStep.  At any rate, the
@@ -84,6 +121,25 @@ The history order is reversed so that new features are at the top.
 	- Eric Sunshine fixed the awstest.mak makefile so that it only adds the
 	  `awstst' target to the "help" list if the AWS plugin is present in
 	  the PLUGINS list.
+	- Philip Wyett fixed video app to Jorrit's changes.
+	- Philip added missing #include "iengine/material.h" in terrfldr.cpp.
+	- Philip updated Python plugin to the removal of
+	  iEngine::CreatePlane().
+	- Christopher Nelson did a commit of awstest.cfg.
+	- Justin Miller reports:
+	  Added csString methods PadLeft(), PadRight(), PadCenter(). These
+	  pad the object to a specified length with a specified [or default
+	  space] char.
+	  Added csString methods AsPadLeft(), AsPadRight(), AsPadCenter().
+	  These return new strings formatted respectively with the
+	  aforementioned methods.
+	  Added static cover methods PadLeft(), PadRight(), PadCenter() for
+	  all the common variants.
+	  Intend to similarly implement Format().
+	  Changed scfString and csString to take size_t instead of int for the
+	  reserved-length constructor.
+	  Tested (though not yet exhaustively) on gnu/linux (gcc) and
+	  win32 (msvc). Thanks to those who offered suggestions and feedback.
 27-Aug-2001
 	- Fixed a linking error in povie.mak.
 	- Did a new change to iPolygonBuffer.  Materials for polygons are now

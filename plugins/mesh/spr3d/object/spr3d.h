@@ -1194,8 +1194,6 @@ public:
   virtual bool WantToDie () const { return false; }
   virtual void HardTransform (const csReversibleTransform&) { }
   virtual bool SupportsHardTransform () const { return false; }
-  virtual int HitBeamBBox (const csVector3& start, const csVector3& end,
-    csVector3& intersect, float* pr);
   virtual bool HitBeamOutline (const csVector3& start, const csVector3& end,
     csVector3& intersect, float* pr);
   virtual bool HitBeamObject (const csVector3& start, const csVector3& end,

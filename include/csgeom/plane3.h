@@ -51,6 +51,11 @@ public:
 
   /// Initialize the plane through the three given points.
   csPlane3 (const csVector3& v1, const csVector3& v2, const csVector3& v3);
+  /// Initialize the plane through 0 and the two given points.
+  csPlane3 (const csVector3& v2, const csVector3& v3)
+  {
+    norm = v2 % v3; DD = 0;
+  }
 
   /// Return the normal vector of this plane.
   inline csVector3& Normal () { return norm; }
@@ -85,6 +90,11 @@ public:
 
   /// Initialize the plane through the three given points.
   void Set (const csVector3& v1, const csVector3& v2, const csVector3& v3);
+  /// Initialize the plane through the origin and the two given points.
+  void Set (const csVector3& v2, const csVector3& v3)
+  {
+    norm = v2 % v3; DD = 0;
+  }
 
   /// Classify the given vector with regards to this plane.
   inline float Classify (const csVector3& pt) const { return norm*pt+DD; }

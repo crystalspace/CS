@@ -602,13 +602,6 @@ void csBallMeshObject::HardTransform (const csReversibleTransform& t)
   shapenr++;
 }
 
-int csBallMeshObject::HitBeamBBox (const csVector3& start,
-  const csVector3& end, csVector3& isect, float* pr)
-{
-  csSegment3 seg (start, end);
-  return csIntersect3::BoxSegment (object_bbox, seg, isect, pr);
-}
-
 bool csBallMeshObject::HitBeamOutline (const csVector3& start,
   const csVector3& end, csVector3& isect, float* pr)
 {

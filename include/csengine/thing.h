@@ -1067,9 +1067,6 @@ public:
       scfParent->HardTransform (t);
     }
     virtual bool SupportsHardTransform () const { return true; }
-    virtual int HitBeamBBox (const csVector3&, const csVector3&,
-      csVector3&, float*)
-    { return -1; } //@@@ For missed box altogether... Not good.
     virtual bool HitBeamOutline (const csVector3&, const csVector3&,
       csVector3&, float*)
     { return false; }

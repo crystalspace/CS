@@ -23,13 +23,15 @@
 
 //---------------------------------------------------------------------------
 
-csPlane3::csPlane3 (const csVector3& v1, const csVector3& v2, const csVector3& v3)
+csPlane3::csPlane3 (const csVector3& v1, const csVector3& v2,
+	const csVector3& v3)
 {
   csMath3::CalcNormal (norm, v1, v2, v3);
   DD = - norm * v1;
 }
 
-void csPlane3::Set (const csVector3& v1, const csVector3& v2, const csVector3& v3)
+void csPlane3::Set (const csVector3& v1, const csVector3& v2,
+	const csVector3& v3)
 {
   csMath3::CalcNormal (norm, v1, v2, v3);
   DD = - norm * v1;
