@@ -6,6 +6,11 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+23-Sep-2003
+	- Jorrit changed the default display depth in video.cfg from 16
+	  to 32. On 3D cards, CS performs awfully bad with 16-bit displays
+	  because stencils are not hardware accelerated. So 32-bit is a better
+	  default.
 22-Sep-2003
 	- Eric Sunshine converted csengine.mak and thingmsh.mak over to the new
 	  style where built objects and resources are placed in their own
