@@ -31,6 +31,13 @@ The history order is reversed so that new features are at the top.
 	  call HitBeamObject() for HitBeamBBox() and HitBeamOutline().
 	  More optimal versions will be made later.
 	- Also added these functions to iMeshWrapper.
+	- Eric Sunshine modified static.mak so that it no longer overflows the
+	  short DOS command-line input buffer when synthesizing cslibref.cpp.
+	  This change should allow the DJGPP port to correctly generate
+	  cslibref.cpp when USE_PLUGINS=no.
+	- Eric Sunshine renamed csColorMapLine to csColorMapNull in the `null'
+	  renderer in order to avoid symbolic naming conflicts with the `line'
+	  renderer when USE_PLUGINS=no.
 17-Jul-2001
 	- Worked around an internal compiler error (for MingW compiler) in
 	  recent changes to crossbld.cpp by completely rearranging the

@@ -41,7 +41,7 @@ class csTextureManagerNull;
  * A class containing a colormap. A object of this class is used
  * for the global colormap in 8-bit modes.
  */
-class csColorMapLine
+class csColorMapNull
 {
 public:
   /**
@@ -55,7 +55,7 @@ public:
   bool alloc [256];
 
   /// Constructor
-  csColorMapLine ()
+  csColorMapNull ()
   { memset (alloc, sizeof (alloc), 0); }
 
   /// Find a value in the colormap and return the color index.
@@ -209,7 +209,7 @@ private:
 
 public:
   /// The global colormap (used in 256-color modes)
-  csColorMapLine cmap;
+  csColorMapNull cmap;
 
   /// The inverse colormap (for 8-bit modes)
   uint8 *inv_cmap;

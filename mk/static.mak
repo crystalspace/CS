@@ -104,9 +104,20 @@ define LIBREF.CONTENT
   echo $"#include "cssysdef.h"$">>$(SRC.LIBREF)
   echo $"#if defined(CS_STATIC_LINKED)$">>$(SRC.LIBREF)
   echo $"#include "csutil/scf.h"$">>$(SRC.LIBREF)
-  echo $"$(foreach r,$(SCF.STATIC),SCF_REGISTER_STATIC_LIBRARY($r);)$"\
-    >>$(SRC.LIBREF)
+  $(foreach r,$(SCF.STATIC),$(LIBREF.BODY))
   echo $"#endif // CS_STATIC_LINKED$">>$(SRC.LIBREF)
+endef
+
+# Emit the actual SCF_REGISTER_STATIC_LIBRARY() call on behalf of
+# LIBREF.CONTENT.  This macro is invoked by LIBREF.CONTENT once for each item
+# listed in the SCF.STATIC variable.  DO _NOT_ remove the blank line from this
+# macro definition.  Its presence forces a newline in the output in order to
+# ensure that each `echo' command appears on its own line.  This is required on
+# some platforms (such as DOS) which impose a maximum limit on the length of an
+# invoked command.
+define LIBREF.BODY
+  echo $"SCF_REGISTER_STATIC_LIBRARY($r);$">>$(SRC.LIBREF)
+
 endef
 
 endif # ifeq ($(MAKESECTION),postdefines)
