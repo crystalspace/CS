@@ -18,7 +18,7 @@ if ($action=="") {
     printEntries();
     print "<a href=\"$self?action=showadd#comments\">Add a comment</a><br>\n";
 } elseif ($action == "showadd") {
-    print "Note: this is <i>not</i> a support forum, please use this "
+    print "Note: this is <i>not</i> a support forum, please use this ";
     print "commenting facility only to add suggestions/notes regarding the ";
     print "documentation.<br>\n";
     print "For questions on the usage of CrystalSpace please see the ";
