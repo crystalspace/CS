@@ -45,8 +45,6 @@ CS_IMPLEMENT_APPLICATION
 
 //-----------------------------------------------------------------------------
 
-const bool DoSprite = false;
-
 void Cleanup ();
 
 iModelDataVertices *Simple::CreateDefaultModelVertexFrame ()
@@ -85,7 +83,7 @@ iModelData *Simple::CreateDefaultModel (iMaterialWrapper *OtherMaterial)
   Action->QueryObject ()->SetName ("action");
   Object->QueryObject ()->ObjAdd (Action->QueryObject ());
 
-  Action->AddFrame (0.3, Vertices->QueryObject ());
+  Action->AddFrame (1, Vertices->QueryObject ());
   Vertices->AddVertex (csVector3 (-3, -3, -3));
   Vertices->AddVertex (csVector3 (-3, -3, +3));
   Vertices->AddVertex (csVector3 (+3, -3, +3));
@@ -96,7 +94,7 @@ iModelData *Simple::CreateDefaultModel (iMaterialWrapper *OtherMaterial)
   Vertices->AddVertex (csVector3 (+3, +3, -3));
 
   Vertices = CreateDefaultModelVertexFrame ();
-  Action->AddFrame (0.6, Vertices->QueryObject ());
+  Action->AddFrame (2, Vertices->QueryObject ());
   Vertices->AddVertex (csVector3 (-3, -7, -3));
   Vertices->AddVertex (csVector3 (-3, -7, +3));
   Vertices->AddVertex (csVector3 (+3, -7, +3));
@@ -107,7 +105,7 @@ iModelData *Simple::CreateDefaultModel (iMaterialWrapper *OtherMaterial)
   Vertices->AddVertex (csVector3 (+3, +7, -3));
 
   Vertices = CreateDefaultModelVertexFrame ();
-  Action->AddFrame (0.9, Vertices->QueryObject ());
+  Action->AddFrame (3, Vertices->QueryObject ());
   Vertices->AddVertex (csVector3 (-7, -3, -3));
   Vertices->AddVertex (csVector3 (-7, -3, +3));
   Vertices->AddVertex (csVector3 (+7, -3, +3));
@@ -288,27 +286,31 @@ bool Simple::Initialize (int argc, const char* const argv[],
   iMeshWrapper *ThingWrapper = engine->CreateMeshWrapper (ThingObject, "thing");
   iMeshWrapper *SpriteWrapper = engine->CreateMeshWrapper (SpriteFactory, "sprite");
 
-  if (!DoSprite)
-  {
-    ThingWrapper->GetMovable ()->SetSector (room);
-    ThingWrapper->GetMovable ()->UpdateMove ();
-    ThingWrapper->GetFlags().Set (CS_ENTITY_CONVEX);
-    ThingWrapper->SetZBufMode (CS_ZBUF_USE);
-    ThingWrapper->SetRenderPriority (engine->GetWallRenderPriority ());
-  } else {
-    SpriteWrapper->GetMovable ()->SetSector (room);
-    SpriteWrapper->GetMovable ()->UpdateMove ();
-    SpriteWrapper->GetFlags().Set (CS_ENTITY_CONVEX);
-    SpriteWrapper->SetZBufMode (CS_ZBUF_USE);
-    SpriteWrapper->SetRenderPriority (engine->GetWallRenderPriority ());
+  // @@@ hardcoded == BAD!
+  float rad = 6;
 
-    iSprite3DState *sprState = SCF_QUERY_INTERFACE (SpriteWrapper->GetMeshObject (),
-      iSprite3DState);
-    sprState->SetBaseColor (csColor (1, 1, 1));
-    sprState->SetLighting (false);
-    sprState->DecRef ();
-    sprState->SetAction ("action");
-  }
+  csTransform tr;
+  tr.SetOrigin (csVector3 (-rad, 0, 0));
+  ThingWrapper->HardTransform (tr);
+  ThingWrapper->GetMovable ()->SetSector (room);
+  ThingWrapper->GetMovable ()->UpdateMove ();
+  ThingWrapper->GetFlags().Set (CS_ENTITY_CONVEX);
+  ThingWrapper->SetZBufMode (CS_ZBUF_USE);
+  ThingWrapper->SetRenderPriority (engine->GetWallRenderPriority ());
+
+  SpriteWrapper->GetMovable ()->SetPosition (csVector3 (rad, 0, 0));
+  SpriteWrapper->GetMovable ()->SetSector (room);
+  SpriteWrapper->GetMovable ()->UpdateMove ();
+  SpriteWrapper->GetFlags().Set (CS_ENTITY_CONVEX);
+  SpriteWrapper->SetZBufMode (CS_ZBUF_USE);
+  SpriteWrapper->SetRenderPriority (engine->GetWallRenderPriority ());
+
+  iSprite3DState *sprState = SCF_QUERY_INTERFACE (SpriteWrapper->GetMeshObject (),
+    iSprite3DState);
+  sprState->SetBaseColor (csColor (1, 1, 1));
+  sprState->SetLighting (false);
+  sprState->DecRef ();
+  sprState->SetAction ("action");
 
   engine->SetAmbientLight (csColor (0.5, 0.5, 0.5));
 
@@ -317,7 +319,7 @@ bool Simple::Initialize (int argc, const char* const argv[],
 
   view = new csView (engine, g3d);
   view->GetCamera ()->SetSector (room);
-  view->GetCamera ()->GetTransform ().SetOrigin (csVector3 (0, 0, -3));
+  view->GetCamera ()->GetTransform ().SetOrigin (csVector3 (0, 0, -3*rad));
   view->SetRectangle (0, 0, FrameWidth, FrameHeight);
 
   txtmgr->SetPalette ();
