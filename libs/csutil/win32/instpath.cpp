@@ -113,7 +113,7 @@ static inline char* FindConfigPath ()
     size_t colon = crystalPath.FindFirst (';'); 
       // MSYS converts :-separated paths to ;-separation in Win32 style.
     size_t subStrLen;
-    if (colon == 0)
+    if (colon == (size_t)-1)
       subStrLen = crystalPath.Length();
     else
       subStrLen = colon;

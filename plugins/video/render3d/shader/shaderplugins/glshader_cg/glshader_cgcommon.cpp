@@ -53,7 +53,7 @@ csShaderGLCGCommon::csShaderGLCGCommon (csGLShader_CG* shaderPlug,
   entrypoint = 0;
   debugFN = 0;
 
-  init_token_table (xmltokens);
+  InitTokenTable (xmltokens);
 }
 
 csShaderGLCGCommon::~csShaderGLCGCommon ()

@@ -42,11 +42,6 @@ csStringID csMaterial::nameReflectParam;
 csStringID csMaterial::nameFlatColorParam;
 csStringID csMaterial::nameDiffuseTexture;
 
-csStringID csMaterial::nameTextureLayer1;
-csStringID csMaterial::nameTextureLayer2;
-csStringID csMaterial::nameTextureLayer3;
-csStringID csMaterial::nameTextureLayer4;
-
 csMaterial::csMaterial (csEngine* engine)
 {
   SCF_CONSTRUCT_IBASE (0);
@@ -60,11 +55,6 @@ csMaterial::csMaterial (csEngine* engine)
   nameReflectParam = engine->Strings->Request (CS_MATERIAL_VARNAME_REFLECTION);
   nameFlatColorParam = engine->Strings->Request (CS_MATERIAL_VARNAME_FLATCOLOR);
   nameDiffuseTexture = engine->Strings->Request (CS_MATERIAL_TEXTURE_DIFFUSE);
-
-  nameTextureLayer1 = engine->Strings->Request (CS_MATERIAL_TEXTURE_LAYER1);
-  nameTextureLayer2 = engine->Strings->Request (CS_MATERIAL_TEXTURE_LAYER2);
-  nameTextureLayer3 = engine->Strings->Request (CS_MATERIAL_TEXTURE_LAYER3);
-  nameTextureLayer4 = engine->Strings->Request (CS_MATERIAL_TEXTURE_LAYER4);
 
   SetTextureWrapper (0);
   // @@@ This will force the shader vars to be created...

@@ -58,7 +58,7 @@ csPtr<iRenderStepFactory> csGenericRSType::NewFactory()
 
 csGenericRSLoader::csGenericRSLoader (iBase* p) : csBaseRenderStepLoader (p)
 {
-  init_token_table (tokens);
+  InitTokenTable (tokens);
 }
 
 csPtr<iBase> csGenericRSLoader::Parse (iDocumentNode* node, 
@@ -182,6 +182,7 @@ csGenericRenderStep::~csGenericRenderStep ()
 
 void csGenericRenderStep::RenderMeshes (iGraphics3D* g3d,
                                         iShader* shader, size_t ticket,
+					iShaderVariableContext** meshContexts,
                                         csRenderMesh** meshes, 
                                         int num,
                                         csShaderVarStack& stacks)
@@ -194,6 +195,7 @@ void csGenericRenderStep::RenderMeshes (iGraphics3D* g3d,
   }
 
   iMaterial *material = 0;
+  iShaderVariableContext* lastMeshContext = 0;
   
   size_t numPasses = shader->GetNumberOfPasses (ticket);
   for (size_t p = 0; p < numPasses; p++)
@@ -204,6 +206,9 @@ void csGenericRenderStep::RenderMeshes (iGraphics3D* g3d,
     for (j = 0; j < num; j++)
     {
       csRenderMesh* mesh = meshes[j];
+      iShaderVariableContext* meshContext = meshContexts[j];
+      if (meshContext->GetShaderVariables().Length() == 0)
+	meshContext = 0;
       if ((!portalTraversal) && mesh->portal != 0) continue;
       csShaderVariable *sv;
       
@@ -212,16 +217,20 @@ void csGenericRenderStep::RenderMeshes (iGraphics3D* g3d,
       sv = shadervars.Top ().GetVariable (o2c_vector_name);
       sv->SetValue (mesh->object2camera.GetO2TTranslation ());
 
-      if (mesh->material->GetMaterial () != material)
+      if ((mesh->material->GetMaterial () != material)
+	|| (meshContext != lastMeshContext))
       {
+	if (lastMeshContext) meshContext->PopVariables (stacks);
         if (material != 0)
         {
           material->PopVariables (stacks);
           shader->PopVariables (stacks);
         }
         material = mesh->material->GetMaterial ();
+	lastMeshContext = meshContext;
         shader->PushVariables (stacks);
         material->PushVariables (stacks);
+	if (meshContext) meshContext->PushVariables (stacks);
       }
       shadervars.Top ().PushVariables (stacks);
       if (mesh->variablecontext)
@@ -231,6 +240,7 @@ void csGenericRenderStep::RenderMeshes (iGraphics3D* g3d,
       shader->SetupPass (ticket, mesh, modes, stacks);
       g3d->DrawMesh (mesh, modes, stacks);
       shader->TeardownPass (ticket);
+
       if (mesh->variablecontext)
         mesh->variablecontext->PopVariables (stacks);
       shadervars.Top ().PopVariables (stacks);
@@ -238,6 +248,7 @@ void csGenericRenderStep::RenderMeshes (iGraphics3D* g3d,
     shader->DeactivatePass (ticket);
   }
 
+  if (lastMeshContext) lastMeshContext->PopVariables (stacks);
   if (material != 0)
   {
     material->PopVariables (stacks);
@@ -281,11 +292,12 @@ private:
 
   iMaterial* lastMat;
   iShader* lastShader;
-  size_t matShadTicket;
+  iShaderVariableContext* lastMeshContext;
+  size_t matShadMeshTicket;
 
   void Reset ()
   {
-    matShadTicket = (size_t)~0;
+    matShadMeshTicket = (size_t)~0;
   }
 
 public:
@@ -298,46 +310,57 @@ public:
   {
     lastMat = 0;
     lastShader = 0;
+    lastMeshContext = 0;
     Reset ();
   }
 
   size_t GetTicket (iMaterial* material, iShader* shader, 
-    csRenderMesh* mesh)
+    iShaderVariableContext* meshContext, csRenderMesh* mesh)
   {
-    if ((material != lastMat) || (shader != lastShader))
+    if ((material != lastMat) || (shader != lastShader)
+      || (meshContext != lastMeshContext))
     {
       Reset ();
       lastMat = material;
       lastShader = shader;
+      lastMeshContext = meshContext;
     }
     if (mesh->variablecontext.IsValid ())
     {
       shader->PushVariables (stacks);
       material->PushVariables (stacks);
+      if (meshContext) meshContext->PushVariables (stacks);
       mesh->variablecontext->PushVariables (stacks);
       shadervars[shadervars_idx].PushVariables (stacks);
+
       csRenderMeshModes modes (*mesh);
       size_t retTicket = shader->GetTicket (modes, stacks);
+
       shadervars[shadervars_idx].PopVariables (stacks);
       mesh->variablecontext->PopVariables (stacks);
+      if (meshContext) meshContext->PopVariables (stacks);
       material->PopVariables (stacks);
       shader->PopVariables (stacks);
       return retTicket;
     }
     else
     {
-      if (matShadTicket == (size_t)~0)
+      if (matShadMeshTicket == (size_t)~0)
       {
-        shader->PushVariables (stacks);
-        material->PushVariables (stacks);
+	shader->PushVariables (stacks);
+	material->PushVariables (stacks);
+	if (meshContext) meshContext->PushVariables (stacks);
 	shadervars[shadervars_idx].PushVariables (stacks);
+
 	csRenderMeshModes modes (*mesh);
-	matShadTicket = shader->GetTicket (modes, stacks);
+	matShadMeshTicket = shader->GetTicket (modes, stacks);
+
 	shadervars[shadervars_idx].PopVariables (stacks);
+	if (meshContext) meshContext->PopVariables (stacks);
 	material->PopVariables (stacks);
 	shader->PopVariables (stacks);
       }
-      return matShadTicket;
+      return matShadMeshTicket;
     }
   }
 };
@@ -349,22 +372,19 @@ void csGenericRenderStep::Perform (iRenderView* rview, iSector* sector,
   iGraphics3D* g3d = rview->GetGraphics3D();
 
   csRenderMeshList* meshlist = sector->GetVisibleMeshes (rview);
-#if 0
-  if (light != 0)
-  {
-    csSphere sphere;
-    sphere.SetCenter (light->GetCenter ());
-    sphere.SetRadius (light->GetInfluenceRadiusSq ());
-    meshlist->CullToSphere (sphere);
-  }
-#endif
   size_t num = meshlist->SortMeshLists ();
   visible_meshes.SetLength (visible_meshes_index+num);
+  imeshes_scratch.SetLength (num);
+  mesh_svc.SetLength (visible_meshes_index+num);
   csRenderMesh** sameShaderMeshes = visible_meshes.GetArray ()
+  	+ visible_meshes_index;
+  iShaderVariableContext** sameShaderMeshSvcs = mesh_svc.GetArray ()
   	+ visible_meshes_index;
   int prev_visible_meshes_index = visible_meshes_index;
   visible_meshes_index += num;
-  meshlist->GetSortedMeshes (sameShaderMeshes);
+  meshlist->GetSortedMeshes (sameShaderMeshes, imeshes_scratch.GetArray());
+  for (size_t i = 0; i < num; i++)
+    sameShaderMeshSvcs[i] = imeshes_scratch[i]->GetSVContext();
  
   size_t lastidx = 0;
   size_t numSSM = 0;
@@ -420,7 +440,7 @@ void csGenericRenderStep::Perform (iRenderView* rview, iSector* sector,
       {
         if (shader != 0)
 	{
-          RenderMeshes (g3d, shader, currentTicket, 
+	  RenderMeshes (g3d, shader, currentTicket, sameShaderMeshSvcs + lastidx,
 	    sameShaderMeshes+lastidx, numSSM, stacks);
           shader = 0;
 	}
@@ -439,8 +459,8 @@ void csGenericRenderStep::Perform (iRenderView* rview, iSector* sector,
       // growing array. So after portal traversal we have to fix
       // the sameShaderMeshes pointer because it may now point
       // to an invalid area.
-      sameShaderMeshes = visible_meshes.GetArray ()
-	  	+ prev_visible_meshes_index;
+      sameShaderMeshes = visible_meshes.GetArray () + prev_visible_meshes_index;
+      sameShaderMeshSvcs = mesh_svc.GetArray () + prev_visible_meshes_index;
     }
     else 
     {
@@ -463,13 +483,14 @@ void csGenericRenderStep::Perform (iRenderView* rview, iSector* sector,
 #endif
       iShader* meshShader = hdl->GetShader (shadertype);
       size_t newTicket = meshShader ? ticketHelper.GetTicket (
-	mesh->material->GetMaterial (), meshShader, mesh) : ~0;
+	mesh->material->GetMaterial (), meshShader, 
+	sameShaderMeshSvcs[n], mesh) : ~0;
       if ((meshShader != shader) || (newTicket != currentTicket))
       {
         // @@@ Need error reporter
         if (shader != 0)
 	{
-          RenderMeshes (g3d, shader, currentTicket, 
+          RenderMeshes (g3d, shader, currentTicket, sameShaderMeshSvcs + lastidx, 
 	    sameShaderMeshes + lastidx, numSSM, stacks);
 	}
 	lastidx = n;
@@ -485,7 +506,7 @@ void csGenericRenderStep::Perform (iRenderView* rview, iSector* sector,
   {
     // @@@ Need error reporter
     if (shader != 0)
-      RenderMeshes (g3d, shader, currentTicket, 
+      RenderMeshes (g3d, shader, currentTicket, sameShaderMeshSvcs + lastidx,
         sameShaderMeshes + lastidx, numSSM, stacks);
   }
 

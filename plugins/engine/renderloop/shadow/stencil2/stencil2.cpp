@@ -916,7 +916,7 @@ SCF_IMPLEMENT_FACTORY(csStencil2ShadowLoader);
 csStencil2ShadowLoader::csStencil2ShadowLoader (iBase *p) 
 : csBaseRenderStepLoader (p)
 {
-  init_token_table (tokens);
+  InitTokenTable (tokens);
 }
 
 csStencil2ShadowLoader::~csStencil2ShadowLoader ()

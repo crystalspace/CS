@@ -234,7 +234,7 @@ bool csSaver::SaveTextures(iDocumentNode *parent)
 	  {
 	    size_t colon = imgName.FindFirst (':', pos);
 	    size_t subStrLen;
-	    if (colon == 0)
+	    if (colon == (size_t)-1)
 	      subStrLen = imgName.Length() - pos;
 	    else
 	      subStrLen = colon - pos;
@@ -268,7 +268,7 @@ bool csSaver::SaveTextures(iDocumentNode *parent)
 	  {
 	    size_t colon = imgName.FindFirst (':', pos);
 	    size_t subStrLen;
-	    if (colon == 0)
+	    if (colon == (size_t)-1)
 	      subStrLen = imgName.Length() - pos;
 	    else
 	      subStrLen = colon - pos;

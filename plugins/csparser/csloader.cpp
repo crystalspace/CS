@@ -1021,188 +1021,10 @@ bool csLoader::Initialize (iObjectRegistry *object_Reg)
   GET_PLUGIN (ModelConverter, iModelConverter, "model converter");
   GET_PLUGIN (CrossBuilder, iCrossBuilder, "model crossbuilder");
 
-  xmltokens.Register ("ambient", XMLTOKEN_AMBIENT);
-  xmltokens.Register ("addon", XMLTOKEN_ADDON);
-  xmltokens.Register ("alwaysanimate", XMLTOKEN_ALWAYSANIMATE);
-  xmltokens.Register ("attenuation", XMLTOKEN_ATTENUATION);
-  xmltokens.Register ("attenuationvec", XMLTOKEN_ATTENUATIONVECTOR);
-  xmltokens.Register ("badoccluder", XMLTOKEN_BADOCCLUDER);
-  xmltokens.Register ("box", XMLTOKEN_BOX);
-  xmltokens.Register ("camera", XMLTOKEN_CAMERA);
-  xmltokens.Register ("center", XMLTOKEN_CENTER);
-  xmltokens.Register ("clamp", XMLTOKEN_CLAMP);
-  xmltokens.Register ("clearzbuf", XMLTOKEN_CLEARZBUF);
-  xmltokens.Register ("clearscreen", XMLTOKEN_CLEARSCREEN);
-  xmltokens.Register ("closed", XMLTOKEN_CLOSED);
-  xmltokens.Register ("colldet", XMLTOKEN_COLLDET);
-  xmltokens.Register ("collection", XMLTOKEN_COLLECTION);
-  xmltokens.Register ("color", XMLTOKEN_COLOR);
-  xmltokens.Register ("convex", XMLTOKEN_CONVEX);
-  xmltokens.Register ("culler", XMLTOKEN_CULLER);
-  xmltokens.Register ("cullerp", XMLTOKEN_CULLERP);
-  xmltokens.Register ("default", XMLTOKEN_DEFAULT);
-  xmltokens.Register ("detail", XMLTOKEN_DETAIL);
-  xmltokens.Register ("direction", XMLTOKEN_DIRECTION);
-  xmltokens.Register ("directional", XMLTOKEN_DIRECTIONAL);
-  xmltokens.Register ("distance", XMLTOKEN_DISTANCE);
-  xmltokens.Register ("dynamic", XMLTOKEN_DYNAMIC);
-  xmltokens.Register ("dither", XMLTOKEN_DITHER);
-  xmltokens.Register ("diffuse", XMLTOKEN_DIFFUSE);
-  xmltokens.Register ("factory", XMLTOKEN_FACTORY);
-  xmltokens.Register ("farplane", XMLTOKEN_FARPLANE);
-  xmltokens.Register ("fastmesh", XMLTOKEN_FASTMESH);
-  xmltokens.Register ("file", XMLTOKEN_FILE);
-  xmltokens.Register ("class", XMLTOKEN_CLASS);
-  xmltokens.Register ("alpha", XMLTOKEN_ALPHA);
-  // 3d Texture
-  xmltokens.Register ("texture3d", XMLTOKEN_TEXTURE3D);
-  // Cubemaps
-  xmltokens.Register ("cubemap", XMLTOKEN_CUBEMAP);
-  xmltokens.Register ("north", XMLTOKEN_NORTH);
-  xmltokens.Register ("south", XMLTOKEN_SOUTH);
-  xmltokens.Register ("east", XMLTOKEN_EAST);
-  xmltokens.Register ("west", XMLTOKEN_WEST);
-  xmltokens.Register ("top", XMLTOKEN_TOP);
-  xmltokens.Register ("bottom", XMLTOKEN_BOTTOM);
+  InitTokenTable (xmltokens);
 
-  xmltokens.Register ("filter", XMLTOKEN_FILTER);
-  xmltokens.Register ("fog", XMLTOKEN_FOG);
-  xmltokens.Register ("forward", XMLTOKEN_FORWARD);
-  xmltokens.Register ("for2d", XMLTOKEN_FOR2D);
-  xmltokens.Register ("for3d", XMLTOKEN_FOR3D);
-  xmltokens.Register ("goodoccluder", XMLTOKEN_GOODOCCLUDER);
-  xmltokens.Register ("halo", XMLTOKEN_HALO);
-  xmltokens.Register ("hardmove", XMLTOKEN_HARDMOVE);
-  xmltokens.Register ("heightgen", XMLTOKEN_HEIGHTGEN);
-  xmltokens.Register ("influenceradius", XMLTOKEN_INFLUENCERADIUS);
-  xmltokens.Register ("invisiblemesh", XMLTOKEN_INVISIBLEMESH);
-  xmltokens.Register ("invisible", XMLTOKEN_INVISIBLE);
-  xmltokens.Register ("keepimage", XMLTOKEN_KEEPIMAGE);
-  xmltokens.Register ("key", XMLTOKEN_KEY);
-  xmltokens.Register ("layer", XMLTOKEN_LAYER);
-  xmltokens.Register ("library", XMLTOKEN_LIBRARY);
-  xmltokens.Register ("light", XMLTOKEN_LIGHT);
-  xmltokens.Register ("lightmapcellsize", XMLTOKEN_LIGHTMAPCELLSIZE);
-  xmltokens.Register ("lod", XMLTOKEN_LOD);
-  xmltokens.Register ("lodlevel", XMLTOKEN_LODLEVEL);
-  xmltokens.Register ("material", XMLTOKEN_MATERIAL);
-  xmltokens.Register ("materials", XMLTOKEN_MATERIALS);
-  xmltokens.Register ("matrix", XMLTOKEN_MATRIX);
-  xmltokens.Register ("maxlightmapsize", XMLTOKEN_MAXLIGHTMAPSIZE);
-  xmltokens.Register ("mesh", XMLTOKEN_MESH);
-  xmltokens.Register ("meshfact", XMLTOKEN_MESHFACT);
-  xmltokens.Register ("meshlib", XMLTOKEN_MESHLIB);
-  xmltokens.Register ("meshobj", XMLTOKEN_MESHOBJ);
-  xmltokens.Register ("meshref", XMLTOKEN_MESHREF);
-  xmltokens.Register ("meta", XMLTOKEN_META);
-  xmltokens.Register ("move", XMLTOKEN_MOVE);
-  xmltokens.Register ("movelight", XMLTOKEN_MOVELIGHT);
-  xmltokens.Register ("mipmap", XMLTOKEN_MIPMAP);
-  xmltokens.Register ("mixmode", XMLTOKEN_MIXMODE);
-  xmltokens.Register ("node", XMLTOKEN_NODE);
-  xmltokens.Register ("nolighting", XMLTOKEN_NOLIGHTING);
-  xmltokens.Register ("noshadows", XMLTOKEN_NOSHADOWS);
-  xmltokens.Register ("notclosed", XMLTOKEN_NOTCLOSED);
-  xmltokens.Register ("notconvex", XMLTOKEN_NOTCONVEX);
-  xmltokens.Register ("nohitbeam", XMLTOKEN_NOHITBEAM);
-  xmltokens.Register ("nullmesh", XMLTOKEN_NULLMESH);
-  xmltokens.Register ("params", XMLTOKEN_PARAMS);
-  xmltokens.Register ("paramsfile", XMLTOKEN_PARAMSFILE);
-  xmltokens.Register ("plugin", XMLTOKEN_PLUGIN);
-  xmltokens.Register ("plugins", XMLTOKEN_PLUGINS);
-  xmltokens.Register ("pointlight", XMLTOKEN_POINTLIGHT);
-  xmltokens.Register ("position", XMLTOKEN_POSITION);
-  xmltokens.Register ("polymesh", XMLTOKEN_POLYMESH);
-  xmltokens.Register ("portal", XMLTOKEN_PORTAL);
-  xmltokens.Register ("portals", XMLTOKEN_PORTALS);
-  xmltokens.Register ("priority", XMLTOKEN_PRIORITY);
-  xmltokens.Register ("proctex", XMLTOKEN_PROCTEX);
-  xmltokens.Register ("radius", XMLTOKEN_RADIUS);
-  xmltokens.Register ("region", XMLTOKEN_REGION);
-  xmltokens.Register ("renderpriorities", XMLTOKEN_RENDERPRIORITIES);
-  xmltokens.Register ("reflection", XMLTOKEN_REFLECTION);
-  xmltokens.Register ("scale", XMLTOKEN_SCALE);
-  xmltokens.Register ("sector", XMLTOKEN_SECTOR);
-  xmltokens.Register ("settings", XMLTOKEN_SETTINGS);
-  xmltokens.Register ("shift", XMLTOKEN_SHIFT);
-  xmltokens.Register ("sound", XMLTOKEN_SOUND);
-  xmltokens.Register ("sounds", XMLTOKEN_SOUNDS);
-  xmltokens.Register ("spotlight", XMLTOKEN_SPOTLIGHT);
-  xmltokens.Register ("spotlightfalloff", XMLTOKEN_SPOTLIGHTFALLOFF);
-  xmltokens.Register ("start", XMLTOKEN_START);
-  xmltokens.Register ("t", XMLTOKEN_T);
-  xmltokens.Register ("texture", XMLTOKEN_TEXTURE);
-  xmltokens.Register ("textures", XMLTOKEN_TEXTURES);
-  xmltokens.Register ("transparent", XMLTOKEN_TRANSPARENT);
-  xmltokens.Register ("type", XMLTOKEN_TYPE);
-  xmltokens.Register ("up", XMLTOKEN_UP);
-  xmltokens.Register ("v", XMLTOKEN_V);
-  xmltokens.Register ("viscull", XMLTOKEN_VISCULL);
-  xmltokens.Register ("world", XMLTOKEN_WORLD);
-  xmltokens.Register ("imposter", XMLTOKEN_IMPOSTER);
-  xmltokens.Register ("zfill", XMLTOKEN_ZFILL);
-  xmltokens.Register ("znone", XMLTOKEN_ZNONE);
-  xmltokens.Register ("zuse", XMLTOKEN_ZUSE);
-  xmltokens.Register ("ztest", XMLTOKEN_ZTEST);
-  xmltokens.Register ("blend", XMLTOKEN_BLEND);
-  xmltokens.Register ("constant", XMLTOKEN_CONSTANT);
-  xmltokens.Register ("generate", XMLTOKEN_GENERATE);
-  xmltokens.Register ("height", XMLTOKEN_HEIGHT);
-  xmltokens.Register ("heightmap", XMLTOKEN_HEIGHTMAP);
-  xmltokens.Register ("multiply", XMLTOKEN_MULTIPLY);
-  xmltokens.Register ("partsize", XMLTOKEN_PARTSIZE);
-  xmltokens.Register ("shadows", XMLTOKEN_SHADOWS);
-  xmltokens.Register ("single", XMLTOKEN_SINGLE);
-  xmltokens.Register ("size", XMLTOKEN_SIZE);
-  xmltokens.Register ("slope", XMLTOKEN_SLOPE);
-  xmltokens.Register ("solid", XMLTOKEN_SOLID);
-  xmltokens.Register ("staticlod", XMLTOKEN_STATICLOD);
-  xmltokens.Register ("staticpos", XMLTOKEN_STATICPOS);
-  xmltokens.Register ("staticshape", XMLTOKEN_STATICSHAPE);
-  xmltokens.Register ("value", XMLTOKEN_VALUE);
-
-  xmltokens.Register ("variable", XMLTOKEN_VARIABLE);
-  xmltokens.Register ("variables", XMLTOKEN_VARIABLELIST);
-
-  xmltokens.Register ("run", XMLTOKEN_RUN);
-  xmltokens.Register ("sequence", XMLTOKEN_SEQUENCE);
-  xmltokens.Register ("sequences", XMLTOKEN_SEQUENCES);
-  xmltokens.Register ("trigger", XMLTOKEN_TRIGGER);
-  xmltokens.Register ("triggers", XMLTOKEN_TRIGGERS);
-  xmltokens.Register ("test", XMLTOKEN_TEST);
-  xmltokens.Register ("check", XMLTOKEN_CHECK);
-  xmltokens.Register ("setfog", XMLTOKEN_SETFOG);
-  xmltokens.Register ("fadefog", XMLTOKEN_FADEFOG);
-  xmltokens.Register ("setvar", XMLTOKEN_SETVAR);
-  xmltokens.Register ("setlight", XMLTOKEN_SETLIGHT);
-  xmltokens.Register ("fadelight", XMLTOKEN_FADELIGHT);
-  xmltokens.Register ("setambient", XMLTOKEN_SETAMBIENT);
-  xmltokens.Register ("fadeambient", XMLTOKEN_FADEAMBIENT);
-  xmltokens.Register ("setcolor", XMLTOKEN_SETCOLOR);
-  xmltokens.Register ("fadecolor", XMLTOKEN_FADECOLOR);
-  xmltokens.Register ("rotate", XMLTOKEN_ROTATE);
-  xmltokens.Register ("rotx", XMLTOKEN_ROTX);
-  xmltokens.Register ("roty", XMLTOKEN_ROTY);
-  xmltokens.Register ("rotz", XMLTOKEN_ROTZ);
-  xmltokens.Register ("enable", XMLTOKEN_ENABLE);
-  xmltokens.Register ("disable", XMLTOKEN_DISABLE);
-  xmltokens.Register ("delay", XMLTOKEN_DELAY);
-  xmltokens.Register ("fire", XMLTOKEN_FIRE);
-  xmltokens.Register ("sectorvis", XMLTOKEN_SECTORVIS);
-  xmltokens.Register ("manual", XMLTOKEN_MANUAL);
-  xmltokens.Register ("lightvalue",XMLTOKEN_LIGHTVALUE);
-  xmltokens.Register ("onclick", XMLTOKEN_ONCLICK);
-  xmltokens.Register ("polygon", XMLTOKEN_POLYGON);
-  xmltokens.Register ("arg", XMLTOKEN_ARG);
-  xmltokens.Register ("args", XMLTOKEN_ARGS);
-
-  xmltokens.Register ("casthwshadow", XMLTOKEN_CAST_HW_SHADOW);
-  xmltokens.Register ("shaders", XMLTOKEN_SHADERS);
-  xmltokens.Register ("shader", XMLTOKEN_SHADER);
-  xmltokens.Register ("shadervar", XMLTOKEN_SHADERVAR);
-  xmltokens.Register ("renderloop", XMLTOKEN_RENDERLOOP);
-  
-  xmltokens.Register ("autooffset", XMLTOKEN_AUTOOFFSET);
+  stringSet = CS_QUERY_REGISTRY_TAG_INTERFACE (
+    object_reg, "crystalspace.shared.stringset", iStringSet);
 
   return true;
 }
@@ -1307,7 +1129,7 @@ bool csLoader::LoadMap (iLoaderContext* ldr_context, iDocumentNode* node)
           if (!ParseMaterialList (ldr_context, child))
             return false;
           break;
-	case  XMLTOKEN_VARIABLELIST:
+	case  XMLTOKEN_VARIABLES:
 	  if (!ParseVariableList (ldr_context, child))
 	    return false;
 	  break;
@@ -1457,7 +1279,7 @@ bool csLoader::LoadLibrary (iLoaderContext* ldr_context, iDocumentNode* node)
           if (!ParseShaderList (ldr_context, child))
 	    return false;
           break;
-	case  XMLTOKEN_VARIABLELIST:
+	case  XMLTOKEN_VARIABLES:
 	  if (!ParseVariableList (ldr_context, child))
 	    return false;
 	  break;
@@ -2790,7 +2612,7 @@ bool csLoader::HandleMeshParameter (iLoaderContext* ldr_context,
       {
 	SyntaxService->ReportError (
 		"crystalspace.maploader.load.meshobject",
-		child, "Please specify the params of the meshobject fist!");
+		child, "Please specify the params of the meshobject first!");
 	return false;
       }
       else if (!mesh->GetMeshObject ()->SupportsHardTransform ())
@@ -2853,7 +2675,7 @@ bool csLoader::HandleMeshParameter (iLoaderContext* ldr_context,
 	mesh->GetMovable ()->UpdateMove ();
       }
       break;
-    case XMLTOKEN_CAST_HW_SHADOW:
+    case XMLTOKEN_CASTHWSHADOW:
       TEST_MISSING_MESH 
       else
       {
@@ -2871,6 +2693,27 @@ bool csLoader::HandleMeshParameter (iLoaderContext* ldr_context,
 	if (!SyntaxService->ParseBox (child, b))
 	  return false;
         mesh->GetMeshObject ()->GetObjectModel ()->SetObjectBoundingBox (b);
+      }
+      break;
+    case XMLTOKEN_SHADERVAR:
+      TEST_MISSING_MESH
+      else
+      {
+	csRef<iShaderVariableContext> svc = SCF_QUERY_INTERFACE (mesh, iShaderVariableContext);
+	CS_ASSERT (svc.IsValid());
+        //create a new variable
+        const char* varname = child->GetAttributeValue ("name");
+	csRef<csShaderVariable> var;
+	var.AttachNew (new csShaderVariable (stringSet->Request (varname)));
+	if (!SyntaxService->ParseShaderVar (child, *var))
+        {
+	  SyntaxService->ReportError (
+	    "crystalspace.maploader.load.meshobject", child,
+	    "Error loading shader variable '%s' in mesh '%s'.", 
+	    varname, mesh->QueryObject()->GetName());
+          break;
+        }
+	svc->AddVariable (var);
       }
       break;
     default:

@@ -75,7 +75,7 @@ void csGLShaderFFP::Report (int severity, const char* msg, ...)
 
 void csGLShaderFFP::BuildTokenHash()
 {
-  init_token_table (tokens);
+  InitTokenTable (tokens);
 
   tokens.Register("primary color", GL_PRIMARY_COLOR);
   tokens.Register("texture", GL_TEXTURE);

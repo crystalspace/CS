@@ -32,7 +32,7 @@
  * external file, surrounded by '#CS_TOKEN_LIST_TOKEN()'. The name of the
  * file (full path!) has to be put in a macro named CS_TOKEN_ITEM_FILE.
  * Optionally, the name of the function to init the token table can be set via
- * CS_INIT_TOKEN_TABLE_NAME, default is 'init_token_table'. Note that the 
+ * CS_INIT_TOKEN_TABLE_NAME, default is 'InitTokenTable'. Note that the 
  * user defines CS_TOKEN_ITEM_FILE and CS_INIT_TOKEN_TABLE_NAME won't be
  * undefined by this file; hence, if you want to build multiple token lists,
  * you have to redefine those macros and include tokenlist.h again.
@@ -59,7 +59,7 @@
  * \code
  * csFireLoader::csFireLoader(iBase *p)
  * {
- *   init_token_table (tokens);
+ *   InitTokenTable (tokens);
  * // ...
  * }
  *
@@ -97,7 +97,7 @@ enum {
 
 #ifndef CS_INIT_TOKEN_TABLE_NAME
 #define CS_INIT_TOKEN_TABLE_NAME_DEFAULT
-#define CS_INIT_TOKEN_TABLE_NAME	init_token_table
+#define CS_INIT_TOKEN_TABLE_NAME	InitTokenTable
 #endif
   
 static void CS_INIT_TOKEN_TABLE_NAME(csStringHash& t)

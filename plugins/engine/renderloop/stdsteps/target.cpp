@@ -54,7 +54,7 @@ csPtr<iRenderStepFactory> csTargetRSType::NewFactory()
 
 csTargetRSLoader::csTargetRSLoader (iBase* p) : csBaseRenderStepLoader (p)
 {
-  init_token_table (tokens);
+  InitTokenTable (tokens);
 }
 
 bool csTargetRSLoader::Initialize (iObjectRegistry* object_reg)

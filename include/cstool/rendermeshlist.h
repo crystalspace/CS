@@ -56,14 +56,7 @@ public:
    * Add a new set of rendermeshes to the lists
    */
   void AddRenderMeshes (csRenderMesh** meshes, int num, long renderPriority,
-	csZBufMode z_buf_mode, const csBox3& bbox);
-
-  /**
-   * Remove all rendermeshes that are outside the specified sphere.
-   * Note: the sphere's radius has to be the square of it's actual value.
-   * (For optimization purposes.)
-   */
-  void CullToSphere (const csSphere& sphere);
+	csZBufMode z_buf_mode, iMeshWrapper* mesh);
 
   /**
    * Sort the list of meshes by render priority and within every render
@@ -74,7 +67,7 @@ public:
   /**
    * After sorting the meshes fetch them with this function.
    */
-  void GetSortedMeshes (csRenderMesh** meshes);
+  void GetSortedMeshes (csRenderMesh** meshes, iMeshWrapper** imeshes);
 
   /**
    * Empty the meshlist. It will still hold the list of renderpriorities.
@@ -85,10 +78,10 @@ private:
   struct meshListEntry
   {
     csRenderMesh* rm;
-    csBox3 bbox;
+    iMeshWrapper* mesh;
 
-    meshListEntry (csRenderMesh* mesh, const csBox3& bb) : 
-      rm(mesh), bbox(bb) {}
+    meshListEntry (csRenderMesh* mesh, iMeshWrapper* imesh) 
+      : rm(mesh), mesh(imesh) {}
   };
 
   /// This struct contains one entry in the RP infoqueue

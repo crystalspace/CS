@@ -506,9 +506,6 @@ iMaterialWrapper* csLoader::ParseMaterial (iLoaderContext* ldr_context,
   csArray<iShader*> shaders;
   csRefArray<csShaderVariable> shadervars;
 
-  csRef<iStringSet> strings = CS_QUERY_REGISTRY_TAG_INTERFACE (
-    object_reg, "crystalspace.shared.stringset", iStringSet);
-
   csRefArray<iDocumentNode> key_nodes;
 
   csRef<iDocumentNodeIterator> it = node->GetNodes ();
@@ -583,7 +580,7 @@ iMaterialWrapper* csLoader::ParseMaterial (iLoaderContext* ldr_context,
 		shadername, matname);
             break;
           }
-          shadertypes.Push (strings->Request(shadertype));
+          shadertypes.Push (stringSet->Request(shadertype));
           //shaders.Push (shader);
 	  //csRef<iShaderWrapper> wrapper = shaderMgr->CreateWrapper (shader);
 	  shaders.Push (shader);
@@ -603,7 +600,7 @@ iMaterialWrapper* csLoader::ParseMaterial (iLoaderContext* ldr_context,
           /*csRef<csShaderVariable> var = 
             shaderMgr->CreateVariable (strings->Request (varname));*/
 	  csRef<csShaderVariable> var;
-	  var.AttachNew (new csShaderVariable (strings->Request (varname)));
+	  var.AttachNew (new csShaderVariable (stringSet->Request (varname)));
 
           if (!SyntaxService->ParseShaderVar (child, *var))
           {

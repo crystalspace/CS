@@ -60,7 +60,7 @@ csPtr<iRenderStepFactory> csLightIterRSType::NewFactory()
 
 csLightIterRSLoader::csLightIterRSLoader (iBase* p) : csBaseRenderStepLoader (p)
 {
-  init_token_table (tokens);
+  InitTokenTable (tokens);
 }
 
 bool csLightIterRSLoader::Initialize (iObjectRegistry* object_reg)

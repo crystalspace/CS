@@ -60,7 +60,7 @@ csPtr<iRenderStepFactory> csFullScreenQuadRSType::NewFactory()
 csFullScreenQuadRSLoader::csFullScreenQuadRSLoader (iBase* p)
 	: csBaseRenderStepLoader (p)
 {
-  init_token_table (tokens);
+  InitTokenTable (tokens);
 }
 
 csPtr<iBase> csFullScreenQuadRSLoader::Parse (iDocumentNode* node, 

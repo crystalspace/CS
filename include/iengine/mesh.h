@@ -536,6 +536,11 @@ struct iMeshWrapper : public iBase
    * Get if the meshobject is rendered after all fancy HW-shadow-stuff
    */
   virtual bool GetDrawAfterShadow () = 0;
+  
+  /**
+   * Get shader variable context of mesh object.
+   */
+  virtual iShaderVariableContext* GetSVContext() = 0;
 };
 
 SCF_VERSION (iMeshFactoryWrapper, 0, 1, 7);

@@ -82,7 +82,7 @@ csString csGetConfigPath()
     {
       size_t colon = crystalPath.FindFirst (':', pos);
       size_t subStrLen;
-      if (colon == 0)
+      if (colon == (size_t)-1)
 	subStrLen = crystalPath.Length() - pos;
       else
 	subStrLen = colon - pos;

@@ -6,6 +6,12 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+19-Feb-2005
+	- res changed the token table init function name from init_token_table
+	  to InitTokenTable.
+	- res changed csparser to use the token table mechanism.
+	- res added the ability to attach shader vars to mesh objects.
+	- res unbotched some string splitting code.
 18-Feb-2005
 	- Jorrit worked further on PVSCalc:
 	    - Some small fixes on kdtree building.

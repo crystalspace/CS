@@ -63,7 +63,7 @@ csFuncTexLoader::csFuncTexLoader (iBase *p)
   SCF_CONSTRUCT_IBASE (p);
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiComponent);
 
-  init_token_table (tokens);
+  InitTokenTable (tokens);
 }
 
 csFuncTexLoader::~csFuncTexLoader()

@@ -59,11 +59,6 @@ private:
   static csStringID nameFlatColorParam;
   static csStringID nameDiffuseTexture;
 
-  static csStringID nameTextureLayer1;
-  static csStringID nameTextureLayer2;
-  static csStringID nameTextureLayer3;
-  static csStringID nameTextureLayer4;
-
   csShaderVariableContext svcontext;
 
 public:

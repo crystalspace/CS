@@ -29,6 +29,7 @@
 #include "csutil/leakguard.h"
 #include "csutil/hash.h"
 #include "csutil/hashhandlers.h"
+#include "csgfx/shadervarcontext.h"
 #include "plugins/engine/3d/movable.h"
 #include "plugins/engine/3d/impmesh.h"
 #include "plugins/engine/3d/meshlod.h"
@@ -39,6 +40,7 @@
 #include "iengine/viscull.h"
 #include "iengine/shadcast.h"
 #include "ivideo/graph3d.h"
+#include "ivideo/shader/shader.h"
 
 struct iMeshWrapper;
 struct iRenderView;
@@ -148,7 +150,8 @@ SCF_VERSION (csMeshWrapper, 0, 0, 1);
 /**
  * The holder class for all implementations of iMeshObject.
  */
-class csMeshWrapper : public csObject, public iVisibilityObject
+class csMeshWrapper : public csObject, public iVisibilityObject, 
+		      public iShaderVariableContext
 {
   friend class csMovable;
   friend class csMovableSectorList;
@@ -208,6 +211,7 @@ protected:
    */
   csRef<csStaticLODMesh> static_lod;
 
+  csShaderVariableContext svcontext;
 private:
   /// Mesh object corresponding with this csMeshWrapper.
   csRef<iMeshObject> meshobj;
@@ -642,6 +646,34 @@ public:
   //--------------------- SCF stuff follows ------------------------------//
   SCF_DECLARE_IBASE_EXT (csObject);
 
+  //=================== iShaderVariableContext ================//
+
+  /// Add a variable to this context
+  void AddVariable (csShaderVariable *variable)
+  { svcontext.AddVariable (variable); }
+
+  /// Get a named variable from this context
+  csShaderVariable* GetVariable (csStringID name) const
+  { return svcontext.GetVariable (name); }
+
+  /// Get Array of all ShaderVariables
+  const csRefArray<csShaderVariable>& GetShaderVariables () const
+  { return svcontext.GetShaderVariables (); }
+
+  /**
+   * Push the variables of this context onto the variable stacks
+   * supplied in the "stacks" argument
+   */
+  void PushVariables (csShaderVarStack &stacks) const
+  { svcontext.PushVariables (stacks); }
+
+  /**
+   * Pop the variables of this context off the variable stacks
+   * supplied in the "stacks" argument
+   */
+  void PopVariables (csShaderVarStack &stacks) const
+  { svcontext.PopVariables (stacks); }
+
   //--------------------- iMeshWrapper implementation --------------------//
   struct MeshWrapper : public iMeshWrapper
   {
@@ -841,6 +873,8 @@ public:
     { 
       return (csMeshWrapper*)scfParent;
     }
+    virtual iShaderVariableContext* GetSVContext()
+    { return CS_STATIC_CAST(iShaderVariableContext*, scfParent); }
   } scfiMeshWrapper;
   friend struct MeshWrapper;
 
@@ -893,7 +927,6 @@ private:
   long render_priority;
   /// Suggestion for new children created from factory.
   csZBufMode zbufMode;
-
 private:
   /// Destructor.
   virtual ~csMeshFactoryWrapper ();

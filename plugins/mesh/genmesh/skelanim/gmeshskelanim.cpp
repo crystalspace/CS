@@ -901,7 +901,7 @@ csGenmeshSkelAnimationControlFactory::csGenmeshSkelAnimationControlFactory (
 	SCF_CONSTRUCT_IBASE (0);
 	csGenmeshSkelAnimationControlFactory::type = type;
 	csGenmeshSkelAnimationControlFactory::object_reg = object_reg;
-	init_token_table (xmltokens);
+	InitTokenTable (xmltokens);
 
 	animates_vertices = false;
 	animates_texels = false;

@@ -50,7 +50,7 @@ SCF_IMPLEMENT_FACTORY(csRenderLoopLoader);
 csRenderLoopLoader::csRenderLoopLoader (iBase *p)
 {
   SCF_CONSTRUCT_IBASE (p);
-  init_token_table (tokens);
+  InitTokenTable (tokens);
 }
 
 csRenderLoopLoader::~csRenderLoopLoader ()

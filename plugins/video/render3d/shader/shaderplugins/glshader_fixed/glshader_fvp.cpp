@@ -52,7 +52,7 @@ csGLShaderFVP::csGLShaderFVP (csGLShader_FIXED* shaderPlug) :
   validProgram = true;
   csGLShaderFVP::shaderPlug = shaderPlug;
 
-  init_token_table (tokens);
+  InitTokenTable (tokens);
 }
 
 csGLShaderFVP::~csGLShaderFVP ()

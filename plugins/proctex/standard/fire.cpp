@@ -75,7 +75,7 @@ csPtr<iTextureWrapper> csPtFireFactory::Generate ()
 
 csPtFireLoader::csPtFireLoader(iBase *p) : csBaseProctexLoader(p)
 {
-  init_token_table (tokens);
+  InitTokenTable (tokens);
 }
 
 csPtr<iBase> csPtFireLoader::Parse (iDocumentNode* node, 

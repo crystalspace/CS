@@ -473,7 +473,7 @@ void csGLDriverDatabase::Report (int severity, const char* msg, ...)
 
 csGLDriverDatabase::csGLDriverDatabase ()
 {
-  init_token_table (tokens);
+  InitTokenTable (tokens);
 }
 
 csGLDriverDatabase::~csGLDriverDatabase ()

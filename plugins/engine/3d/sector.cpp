@@ -352,10 +352,8 @@ public:
 #endif
     if (num > 0)
     {
-      csBox3 box;
-      //@@@ Don't call this here! cmesh->GetWorldBoundingBox (box);
       privMeshlist->AddRenderMeshes (meshes, num, cmesh->GetRenderPriority (),
-	  cmesh->GetZBufMode (), box);
+	cmesh->GetZBufMode (), &cmesh->scfiMeshWrapper);
     }
   }
 

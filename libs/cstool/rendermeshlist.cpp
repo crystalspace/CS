@@ -40,9 +40,9 @@ csRenderMeshList::~csRenderMeshList ()
 }
 
 void csRenderMeshList::AddRenderMeshes (csRenderMesh** meshes, int num,
-                                   long renderPriority,
-				   csZBufMode z_buf_mode, 
-				   const csBox3& bbox)
+					long renderPriority, 
+					csZBufMode z_buf_mode, 
+					iMeshWrapper* mesh)
 {
   renderMeshListInfo* entry;
 
@@ -71,27 +71,7 @@ void csRenderMeshList::AddRenderMeshes (csRenderMesh** meshes, int num,
   for (int i = 0; i < num; ++i)
   {
     meshes[i]->z_buf_mode = z_buf_mode;
-    entry->meshList.Push (meshListEntry (meshes[i], bbox));
-  }
-}
-
-void csRenderMeshList::CullToSphere (const csSphere& sphere)
-{
-  csVector3 sphCenter (sphere.GetCenter ());
-  float sphSqRadius = sphere.GetRadius ();
-
-  for (size_t i = 0; i < renderList.Length(); i++)
-  {
-    renderMeshListInfo*& mli = renderList[i];
-    if (!mli) continue;
-
-    for (size_t j = mli->meshList.Length(); j-- > 0;)
-    {
-      const meshListEntry& entry = mli->meshList[j];
-      if (!csIntersect3::BoxSphere (entry.bbox, sphCenter,
-	sphSqRadius))
-	mli->meshList.DeleteIndex (j);
-    }
+    entry->meshList.Push (meshListEntry (meshes[i], mesh));
   }
 }
 
@@ -197,7 +177,8 @@ size_t csRenderMeshList::SortMeshLists ()
   return numObjects;
 }
 
-void csRenderMeshList::GetSortedMeshes (csRenderMesh** meshes)
+void csRenderMeshList::GetSortedMeshes (csRenderMesh** meshes, 
+					iMeshWrapper** imeshes)
 {
   csPDelArray < renderMeshListInfo >::Iterator it = renderList.GetIterator ();
   while (it.HasNext ())
@@ -207,7 +188,10 @@ void csRenderMeshList::GetSortedMeshes (csRenderMesh** meshes)
     {
       size_t numObjects = listEnt->meshList.Length ();
       for (size_t j = 0 ; j < numObjects ; j++)
+      {
 	*meshes++ = listEnt->meshList[j].rm;
+	*imeshes++ = listEnt->meshList[j].mesh;
+      }
     }
   }
 }

@@ -1082,7 +1082,7 @@ csXMLShaderCompiler::csXMLShaderCompiler(iBase* parent)
 {
   SCF_CONSTRUCT_IBASE(parent);
   wrapperFact = 0;
-  init_token_table (xmltokens);
+  InitTokenTable (xmltokens);
 }
 
 csXMLShaderCompiler::~csXMLShaderCompiler()
@@ -1279,7 +1279,7 @@ csXMLShader::csXMLShader (csXMLShaderCompiler* compiler,
 			  iDocumentNode* source,
 			  int forcepriority)
 {
-  init_token_table (xmltokens);
+  InitTokenTable (xmltokens);
 
   activeTech = 0;
   filename = 0;

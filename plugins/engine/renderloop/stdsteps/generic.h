@@ -97,6 +97,8 @@ private:
   // exit of this step the visible meshes from the current recursion
   // level are removed again.
   csDirtyAccessArray<csRenderMesh*> visible_meshes;
+  csDirtyAccessArray<iMeshWrapper*> imeshes_scratch;
+  csDirtyAccessArray<iShaderVariableContext*> mesh_svc;
   int visible_meshes_index;	// First free index in the visible meshes.
 
   static csStringID o2c_matrix_name;
@@ -126,7 +128,8 @@ public:
   virtual void SetZBufMode (csZBufMode zmode);
   virtual csZBufMode GetZBufMode () const;
 
-  inline void RenderMeshes (iGraphics3D* g3d, iShader* shader, size_t ticket,
+  inline void RenderMeshes (iGraphics3D* g3d, iShader* shader, 					
+    size_t ticket, iShaderVariableContext** meshContext, 
     csRenderMesh** meshes, int num, csShaderVarStack &stacks);
 
   /// Enables/disables z offset and z mode as needed

@@ -397,7 +397,7 @@ SCF_IMPLEMENT_FACTORY(csCubemapTextureLoader);
 csCubemapTextureLoader::csCubemapTextureLoader (iBase *p) : 
   csBaseTextureLoader(p)
 {
-  init_token_table (xmltokens);
+  InitTokenTable (xmltokens);
 }
 
 csPtr<iBase> csCubemapTextureLoader::Parse (iDocumentNode* node, 
@@ -530,7 +530,7 @@ SCF_IMPLEMENT_FACTORY(csTexture3DLoader);
 
 csTexture3DLoader::csTexture3DLoader (iBase *p) : csBaseTextureLoader(p)
 {
-  init_token_table (xmltokens);
+  InitTokenTable (xmltokens);
 }
 
 csPtr<iBase> csTexture3DLoader::Parse (iDocumentNode* node, 
