@@ -67,11 +67,26 @@ public:
 
   /// Read a single character. Returns EOF if the stream has finished.
   int GetChar ();
+  /// Return the next character (or EOF), but don't move forward
+  int LookChar ();
+
   /**
    * Read a line of text. Returns false if the stream has finished. If
    * 'OmitNewline' is true then the newline character will be thrown away.
    */
   bool GetString (char* buf, int len, bool OmitNewline = true);
+  /**
+   * Read an integer value from the stream that is stored as ASCII.
+   */
+  int ReadTextInt ();
+  /**
+   * Read a floating-point value from the stream that is stored as ASCII.
+   */
+  float ReadTextFloat ();
+  /**
+   * Skip any whitespace characters.
+   */
+  void SkipWhitespace ();
 };
 
 #endif // __DATASTRM_H__

@@ -234,7 +234,6 @@ int                ivec_max ( int n, int *a );
 int                leqi ( char* string1, char* string2 );
 void               minmax ( void );
 void               news ( void );
-int                obj_read ( FILE *filein );
 int                obj_write ( FILE *fileout );
 void               print_sizes ( );
 int                rcol_find ( float a[][MAX_COR3], int m, int n, float r[] );

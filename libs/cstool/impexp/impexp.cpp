@@ -791,9 +791,6 @@ int converter::data_read ( void ) {
   else if ( leqi ( filein_type, "IV" ) == TRUE ) {
     ierror = iv_read ( filein );
   }
-  else if ( leqi ( filein_type, "OBJ" ) == TRUE ) {
-    ierror = obj_read ( filein );
-  }
   else if ( leqi ( filein_type, "SMF" ) == TRUE ) {
     ierror = smf_read ( filein );
   }

@@ -85,13 +85,20 @@ int csDataStream::GetChar () {
   return val;
 }
 
+int csDataStream::LookChar () {
+  int OldPosition = Position;
+  int Result = GetChar ();
+  Position = OldPosition;
+  return Result;
+}
+
 bool csDataStream::GetString (char* buf, int len, bool OmitNewline)
 {
   // test for EOF
   if (Position == Size) return false;
 
   // find the end of the current line
-  char *String = (char*)Data;
+  char *String = (char*)(Data+Position);
   char *FirstNewline = strchr (String, '\n');
 
   // look if there are now more lines
@@ -118,3 +125,28 @@ bool csDataStream::GetString (char* buf, int len, bool OmitNewline)
 
   return true;
 }
+
+int csDataStream::ReadTextInt ()
+{
+  int Value, Length;
+  sscanf ((char*)(Data+Position), "%d%n", &Value, &Length);
+  Position += Length;
+  return Value;
+}
+
+float csDataStream::ReadTextFloat ()
+{
+  float Value;
+  int Length;
+  sscanf ((char*)(Data+Position), "%f%n", &Value, &Length);
+  Position += Length;
+  return Value;
+}
+
+void csDataStream::SkipWhitespace ()
+{
+  while (Position < Size && isspace (Data[Position]))
+    Position++;
+}
+
+

@@ -218,8 +218,6 @@ static void ReadMDLHeader (csMDLHeader *hdr, csDataStream *in)
 
 iModelData *csModelConverterMDL::Load (UByte *Buffer, ULong Size)
 {
-  return NULL;
-
   // prepare input buffer
   csDataStream in (Buffer, Size, false);
   unsigned char Readbuffer[MAX_DATAELEMENT_SIZE];
