@@ -1,5 +1,12 @@
 The history order has been reversed so that new features are at the top.
 
+27-Jul-2000
+	- Martin Geisse converted some more docs to texinfo format
+	  (including the much asked for worldfmt.tex file).
+	- Added TEX2D keyword to parsing of textures in world file.
+	  So you can mark textures as being 2D only.
+	- Added a missing menu to the world format texinfo documentation
+	  file.
 26-Jul-2000
 	- Started completing support for the rapid collision detection
 	  plugin and also completing support for the interfaces needed
@@ -10,6 +17,15 @@ The history order has been reversed so that new features are at the top.
 	- Norman Kramer fixed Yet Another csFrustum::Classify(). This
 	  function must hold the record for one of the most difficult
 	  ones to get right :-)
+	- Norman Kramer updated the name of the glide 3d target drivers.
+	- Thomas Hieber did another update to map2cs:
+	    - Now it will properly detect wrong plane definitions in
+	      the map file and eliminate these. (Workaround for problems
+	      in the editor!)
+	    - Significant speedup when removal of hidden surfaces
+	      is wanted. (using bounding boxes for brushes and polygons)
+	    - Skyboxes are now being written using the CAMERA() modifier,
+	      so they don't move any more, while walking.
 25-Jul-2000
 	- Thomas Hieber did a small maintainance release to Map2CS
 	  (labeled 0.82):

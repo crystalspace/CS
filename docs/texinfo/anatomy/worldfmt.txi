@@ -6,6 +6,11 @@ The first section of this document is a syntax description of the
 Crystal Space world file format. The second section gives a few hints
 about what everything means.
 
+@menu
+* WorldFmt Syntax:: World Format Syntax
+* WorldFmt Hints:: Some Hints
+@end menu
+
 @node WorldFmt Syntax, WorldFmt Hints, World File Format, World File Format
 @subsection Syntax
 
@@ -336,6 +341,7 @@ A texture description:
 @example
 <transparent> ::= 'TRANSPARENT' '(' <color> ')'
 <procedural> ::= 'PROCEDURAL' '(' ')'
+<tex2d> ::= 'TEX2D' '(' ')'
 <persistent> ::= 'PERSISTENT' '(' ')'
 <filter> ::= 'FILTER' '(' ... ')'
 <mipmap> ::= 'MIPMAP' '(' <yes-no> ')'
@@ -343,7 +349,7 @@ A texture description:
 <texture-file> ::= 'FILE' '(' <file-name> ')'
 
 <texture-desc-comp> ::= <transparent> | <filter> | <mipmap> | <dither> |
-  <file> | <procedural> | <persistent>
+  <file> | <procedural> | <tex2d> | <persistent>
 <texture-desc> ::= 'TEXTURE' <texture-name> '(' [ <texture-desc-comp> ] ')'
 @end example
 
