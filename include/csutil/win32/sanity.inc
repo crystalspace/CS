@@ -28,5 +28,6 @@
 #undef max
 #undef min
 #undef RegisterClass
+#undef SendMessage
 #undef UnregisterClass
 #undef Yield

@@ -9,6 +9,9 @@ chronological order.
 14-Nov-2004
 	- Eric Sunshine updated cspace.i to take csPoly2D decomposition into
 	  account.
+	- Eric Sunshine added SendMessage() to the list of names sanitized by
+	  CS/include/csutil/win32/sanity.inc since CEL uses this identifier for
+	  its own purposes.
 13-Nov-2004
 	- res made the memtracker also work in optimize builds.
 	- res fixed memtracker compilation with MSVC.
