@@ -19,6 +19,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <unistd.h>
+#define CS_SYSDEF_PROVIDE_PATH
 #include "cssysdef.h"
 #include "cssys/sysfunc.h"
 
