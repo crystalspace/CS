@@ -411,8 +411,6 @@ void csDDGTerrainObject::Draw (iRenderView* rview, bool use_z_buf)
 
   } // end modified.
 
-
-  iClipper2D* pClipper = rview->GetClipper ();
   // RDS NOTE: check in cube, it's done a little different
   pG3D->SetObjectToCamera( &RevTrans );
   pG3D->SetRenderState (G3DRENDERSTATE_ZBUFFERMODE,

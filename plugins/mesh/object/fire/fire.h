@@ -37,12 +37,23 @@ struct iSector;
 class csFireMeshObject : public csParticleSystem
 {
 protected:
-  static const csColor cols[5];
-  static const float col_age[5];
-  static const float col_dage[5];
-  // The following two colors are precalculated from
-  // cols above, the COL_AGE and COL_DAGE macros and color_scale.
-  // If precalc_valid == false this table has to be recalculated.
+  enum { MAX_COLORS = 5 };
+  struct ColorInfo { csColor c; float age; float dage; };
+  static ColorInfo* Colors;
+  static void SetupColors();
+  static ColorInfo const* GetColorInfo(int n)
+  {
+    CS_ASSERT(n < MAX_COLORS);
+    if (Colors == 0) SetupColors();
+    return Colors + n;
+  }
+  static csColor const GetColor(int n) { return GetColorInfo(n)->c;    }
+  static float GetColorAge(int n)      { return GetColorInfo(n)->age;  }
+  static float GetColorDAge(int n)     { return GetColorInfo(n)->dage; }
+
+  // The following two colors are precalculated from the base colors, ages,
+  // and dages (see above).  If precalc_valid == false this table has to be
+  // recalculated.
   csColor precalc_add[5], precalc_mul[5];
   bool precalc_valid;
 
@@ -300,6 +311,4 @@ public:
   virtual iMeshObjectFactory* NewFactory ();
 };
 
-
 #endif // __CS_FIRE_H__
-

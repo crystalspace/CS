@@ -40,30 +40,33 @@ IMPLEMENT_EMBEDDED_IBASE (csFireMeshObject::FireState)
 IMPLEMENT_EMBEDDED_IBASE_END
 
 // Aging ratios
-#define COL_AGE0	0.
+#define COL_AGE0	0.0
 #define COL_AGE1	0.05
 #define COL_AGE2	0.2
 #define COL_AGE3	0.5
 #define COL_AGE4	1.0
-// COL_DAGE(x) = 1. / (COL_AGE(x) - COL_AGE(x-1))
-#define COL_DAGE1	(1. / (COL_AGE1-COL_AGE0))
-#define COL_DAGE2	(1. / (COL_AGE2-COL_AGE1))
-#define COL_DAGE3	(1. / (COL_AGE3-COL_AGE2))
-#define COL_DAGE4	(1. / (COL_AGE4-COL_AGE3))
+// COL_DAGE(x) = 1.0 / (COL_AGE(x) - COL_AGE(x-1))
+#define COL_DAGE0	0.0
+#define COL_DAGE1	(1.0 / (COL_AGE1-COL_AGE0))
+#define COL_DAGE2	(1.0 / (COL_AGE2-COL_AGE1))
+#define COL_DAGE3	(1.0 / (COL_AGE3-COL_AGE2))
+#define COL_DAGE4	(1.0 / (COL_AGE4-COL_AGE3))
 
-const float csFireMeshObject::col_age[5] =
-{ COL_AGE0, COL_AGE1, COL_AGE2, COL_AGE3, COL_AGE4 };
-const float csFireMeshObject::col_dage[5] =
-{ 0, COL_DAGE1, COL_DAGE2, COL_DAGE3, COL_DAGE4 };
+csFireMeshObject::ColorInfo* csFireMeshObject::Colors = 0;
 
-const csColor csFireMeshObject::cols[5] =
+void csFireMeshObject::SetupColors()
 {
-  csColor(1.,1.,1.),
-  csColor(1.,1.,0.),
-  csColor(1.,0.,0.),
-  csColor(0.6,0.6,0.6),
-  csColor(0.1,0.1,0.1)
-};
+  if (Colors == 0)
+  {
+    static ColorInfo c[MAX_COLORS];
+    c[0].c.Set(1.0,1.0,1.0); c[0].age = COL_AGE0; c[0].dage = COL_DAGE0;
+    c[0].c.Set(1.0,1.0,0.0); c[0].age = COL_AGE1; c[0].dage = COL_DAGE1;
+    c[0].c.Set(1.0,0.0,0.0); c[0].age = COL_AGE2; c[0].dage = COL_DAGE2;
+    c[0].c.Set(0.6,0.6,0.6); c[0].age = COL_AGE3; c[0].dage = COL_DAGE3;
+    c[0].c.Set(0.1,0.1,0.1); c[0].age = COL_AGE4; c[0].dage = COL_DAGE4;
+    Colors = c;
+  }
+}
 
 void csFireMeshObject::SetupObject ()
 {
@@ -109,8 +112,8 @@ void csFireMeshObject::SetupObject ()
   }
 }
 
-csFireMeshObject::csFireMeshObject (iSystem* system, iMeshObjectFactory* factory)
-	: csParticleSystem (system, factory)
+csFireMeshObject::csFireMeshObject (iSystem* system,
+  iMeshObjectFactory* factory) : csParticleSystem (system, factory)
 {
   CONSTRUCT_EMBEDDED_IBASE (scfiFireState);
   part_pos = NULL;
@@ -171,13 +174,15 @@ void csFireMeshObject::MoveAndAge (int i, float delta_t)
   if (!precalc_valid)
   {
     precalc_valid = true;
-    int k;
-    for (k = 1 ; k < 5 ; k++)
+    ColorInfo const* prev_info = GetColorInfo(0);
+    for (int k = 1 ; k < MAX_COLORS ; k++)
     {
-      precalc_add[k] = color_scale * (cols[k-1]
-      	+ cols[k-1] * col_age[k-1] * col_dage[k]
-    	- cols[k] * col_age[k-1] * col_dage[k]);
-      precalc_mul[k] = color_scale * col_dage[k] * (cols[k] - cols[k-1]);
+      ColorInfo const* info = GetColorInfo(k);
+      precalc_add[k] = color_scale * (prev_info->c
+      	+ prev_info->c * prev_info->age * info->dage
+    	- info->c * prev_info->age * info->dage);
+      precalc_mul[k] = color_scale * info->dage * (info->c - prev_info->c);
+      prev_info = info;
     }
   }
 
@@ -259,10 +264,10 @@ IMPLEMENT_IBASE (csFireMeshObjectFactory)
   IMPLEMENTS_INTERFACE (iMeshObjectFactory)
 IMPLEMENT_IBASE_END
 
-csFireMeshObjectFactory::csFireMeshObjectFactory (iBase *pParent, iSystem* system)
+csFireMeshObjectFactory::csFireMeshObjectFactory(iBase* b, iSystem* s)
 {
-  CONSTRUCT_IBASE (pParent);
-  csFireMeshObjectFactory::system = system;
+  CONSTRUCT_IBASE (b);
+  system = s;
 }
 
 csFireMeshObjectFactory::~csFireMeshObjectFactory ()
@@ -271,7 +276,8 @@ csFireMeshObjectFactory::~csFireMeshObjectFactory ()
 
 iMeshObject* csFireMeshObjectFactory::NewInstance ()
 {
-  csFireMeshObject* cm = new csFireMeshObject (system, (iMeshObjectFactory*)this);
+  csFireMeshObject* cm =
+    new csFireMeshObject (system, (iMeshObjectFactory*)this );
   iMeshObject* im = QUERY_INTERFACE (cm, iMeshObject);
   im->DecRef ();
   return im;
@@ -313,4 +319,3 @@ iMeshObjectFactory* csFireMeshObjectType::NewFactory ()
   ifact->DecRef ();
   return ifact;
 }
-

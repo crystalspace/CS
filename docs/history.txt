@@ -13,6 +13,13 @@ The history order is reversed so that new features are at the top.
 	  clobbered by longjmp() in jpgimage.cpp.
 	- Eric Sunshine fixed several problems which were recently introduced
 	  into various makefiles.
+	- Eric Sunshine fixed a portability problem in the Fire plugin where it
+	  was relying on implicit initialization of several static global
+	  tables.  Unfortunately, not all platforms correctly initialize such
+	  data structures at plugin load time, so these tables must be
+	  explicity initialized by the plugin itself.
+	- Eric Sunshine eliminated compilation warnings from stars.cpp and
+	  ddgterr.cpp.
 5-May-2001
 	- Added HardTransform() to iMeshFactoryWrapper and
 	  csMeshFactoryWrapper.
