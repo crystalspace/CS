@@ -89,6 +89,8 @@ chronological order.
 	  simplicity, they #include only <crystalspace.h>, rather than the bevy
 	  of individual header files which they used to #include, and which
 	  served only to confuse new users.
+	- Eric Sunshine fixed Texinfo formatting and mark-up problems in the
+	  tutorials and HOWTO's.
 13-Sep-2004
 	- Eric Sunshine renamed the following symbols in order to avoid
 	  global namespace pollution:
