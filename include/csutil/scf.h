@@ -443,7 +443,7 @@ void *Class::QueryInterface (scfInterfaceID iInterfaceID, int iVersion)	\
  * arguments (that is, more than one iBase* argument).
  */
 #define SCF_IMPLEMENT_FACTORY(Class)					\
-void *Create_##Class (iBase *iParent)					\
+void *Class##_Create (iBase *iParent)					\
 {									\
   void *ret = new Class (iParent);					\
   SCF_TRACE (("  %p = new %s ()\n", ret, #Class));			\
@@ -454,7 +454,7 @@ void *Create_##Class (iBase *iParent)					\
  * The SCF_DECLARE_FACTORY macro is used to provide a forward definition
  * if SCF_IMPLEMENT_FACTORY is declared in another file.
  */
-#define SCF_DECLARE_FACTORY(Class)  void *Create_##Class (iBase *iParent);
+#define SCF_DECLARE_FACTORY(Class)  void* Class##_Create (iBase *iParent);
 
 /**
  * The shared library loader expects an array of such structures
@@ -516,11 +516,11 @@ CS_EXPORTED_NAME(LibraryName,_scfInitialize)(iSCF *SCF)		        \
 
 /** Add information about a exported class into the table. */
 #define SCF_EXPORT_CLASS(Class, ClassID, Description)			\
-    { ClassID, Description, NULL, Create_##Class },
+    { ClassID, Description, NULL, Class##_Create },
 
 /** Add information about an exported class and dependency info into table. */
 #define SCF_EXPORT_CLASS_DEP(Class, ClassID, Description, Dependencies)	\
-    { ClassID, Description, Dependencies, Create_##Class },
+    { ClassID, Description, Dependencies, Class##_Create },
 
 /** Finish the definition of exported class table. */
 #define SCF_EXPORT_CLASS_TABLE_END					\
@@ -559,16 +559,16 @@ CS_EXPORTED_NAME(LibraryName,_scfInitialize)(iSCF *SCF)		        \
  * an additional argument specifying the class dependencies.
  */
 #define SCF_REGISTER_STATIC_CLASS_DEP(Class,ClassID,Description,Dependency)\
-  extern void *Create_##Class (iBase *);				\
+  extern void *Class##_Create (iBase *);				\
   static scfClassInfo Class##_ClassInfo =				\
-  { ClassID, Description, Dependency, Create_##Class };			\
-  class __##Class##_Init						\
+  { ClassID, Description, Dependency, Class##_Create };			\
+  class Class##_Init__						\
   {									\
   public:								\
-    __##Class##_Init ()							\
+    Class##_Init__ ()							\
     { if (!iSCF::SCF) scfInitialize ();					\
       iSCF::SCF->RegisterStaticClass (&Class##_ClassInfo); }		\
-  } __##Class##_dummy;
+  } Class##_dummy__;
 
 //--------------------------------------------- Class factory interface -----//
 
