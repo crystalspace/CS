@@ -3153,6 +3153,9 @@ class iClipper2D(iBase):
     def IsInside(*args): return _cspace.iClipper2D_IsInside(*args)
     def GetVertexCount(*args): return _cspace.iClipper2D_GetVertexCount(*args)
     def GetClipPoly(*args): return _cspace.iClipper2D_GetClipPoly(*args)
+    clipperPoly = _cspace.iClipper2D_clipperPoly
+    clipperBox = _cspace.iClipper2D_clipperBox
+    def GetClipperType(*args): return _cspace.iClipper2D_GetClipperType(*args)
     def __del__(self, destroy=_cspace.delete_iClipper2D):
         try:
             if self.thisown: destroy(self)
@@ -5634,6 +5637,7 @@ class iMeshObject(iBase):
         return "<C iMeshObject instance at %s>" % (self.this,)
     def GetFactory(*args): return _cspace.iMeshObject_GetFactory(*args)
     def GetFlags(*args): return _cspace.iMeshObject_GetFlags(*args)
+    def Clone(*args): return _cspace.iMeshObject_Clone(*args)
     def DrawTest(*args): return _cspace.iMeshObject_DrawTest(*args)
     def Draw(*args): return _cspace.iMeshObject_Draw(*args)
     def GetRenderMeshes(*args): return _cspace.iMeshObject_GetRenderMeshes(*args)
@@ -5681,6 +5685,7 @@ class iMeshObjectFactory(iBase):
         return "<C iMeshObjectFactory instance at %s>" % (self.this,)
     def GetFlags(*args): return _cspace.iMeshObjectFactory_GetFlags(*args)
     def NewInstance(*args): return _cspace.iMeshObjectFactory_NewInstance(*args)
+    def Clone(*args): return _cspace.iMeshObjectFactory_Clone(*args)
     def HardTransform(*args): return _cspace.iMeshObjectFactory_HardTransform(*args)
     def SupportsHardTransform(*args): return _cspace.iMeshObjectFactory_SupportsHardTransform(*args)
     def SetLogicalParent(*args): return _cspace.iMeshObjectFactory_SetLogicalParent(*args)
@@ -10197,7 +10202,6 @@ class iCollideSystem(iBase):
     def ResetCollisionPairs(*args): return _cspace.iCollideSystem_ResetCollisionPairs(*args)
     def SetOneHitOnly(*args): return _cspace.iCollideSystem_SetOneHitOnly(*args)
     def GetOneHitOnly(*args): return _cspace.iCollideSystem_GetOneHitOnly(*args)
-    def CollidePath(*args): return _cspace.iCollideSystem_CollidePath(*args)
     def __del__(self, destroy=_cspace.delete_iCollideSystem):
         try:
             if self.thisown: destroy(self)
@@ -11009,6 +11013,10 @@ class csColliderHelper(_object):
     if _newclass:InitializeCollisionWrapper = staticmethod(_cspace.csColliderHelper_InitializeCollisionWrapper)
     __swig_getmethods__["InitializeCollisionWrappers"] = lambda x: _cspace.csColliderHelper_InitializeCollisionWrappers
     if _newclass:InitializeCollisionWrappers = staticmethod(_cspace.csColliderHelper_InitializeCollisionWrappers)
+    __swig_getmethods__["CollideArray"] = lambda x: _cspace.csColliderHelper_CollideArray
+    if _newclass:CollideArray = staticmethod(_cspace.csColliderHelper_CollideArray)
+    __swig_getmethods__["CollidePath"] = lambda x: _cspace.csColliderHelper_CollidePath
+    if _newclass:CollidePath = staticmethod(_cspace.csColliderHelper_CollidePath)
     def __init__(self, *args):
         _swig_setattr(self, csColliderHelper, 'this', _cspace.new_csColliderHelper(*args))
         _swig_setattr(self, csColliderHelper, 'thisown', 1)
@@ -11027,6 +11035,10 @@ _cspace.csColliderHelper_swigregister(csColliderHelperPtr)
 csColliderHelper_InitializeCollisionWrapper = _cspace.csColliderHelper_InitializeCollisionWrapper
 
 csColliderHelper_InitializeCollisionWrappers = _cspace.csColliderHelper_InitializeCollisionWrappers
+
+csColliderHelper_CollideArray = _cspace.csColliderHelper_CollideArray
+
+csColliderHelper_CollidePath = _cspace.csColliderHelper_CollidePath
 
 
 csfxInterference = _cspace.csfxInterference
