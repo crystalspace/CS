@@ -86,6 +86,10 @@ public:
 
   virtual void AllowResize (bool iAllow);
 
+  virtual bool Resize (int width, int height);
+
+  virtual void SetFullScreen (bool b);
+
   int m_nGraphicsReady;
 
   /**

@@ -639,6 +639,9 @@ bool csGraphics2DOpenGL::Open ()
   pfmt.BlueBits = pfd.cBlueBits;
   pfmt.BlueShift = pfd.cBlueShift;
   pfmt.BlueMask = ((1 << pfd.cBlueBits) - 1) << pfd.cBlueShift;
+  pfmt.AlphaBits = pfd.cAlphaBits;
+  pfmt.AlphaShift = pfd.cAlphaShift;
+  pfmt.AlphaMask = ((1 << pfd.cAlphaBits) - 1) << pfd.cAlphaShift;
   pfmt.PalEntries = 0;
 
   hGLRC = wglCreateContext (hDC);
@@ -954,6 +957,79 @@ void csGraphics2DOpenGL::AllowResize (bool iAllow)
   }
 }
 
+bool csGraphics2DOpenGL::Resize (int width, int height)
+{
+  if (!csGraphics2DGLCommon::Resize (width, height)) return false;
+
+  if (is_open && !FullScreen)
+  {
+    RECT R;
+    GetClientRect (m_hWnd, &R);
+    if (R.right - R.left != Width || R.bottom - R.top != Height)
+    {
+      // We only resize the window when the canvas is different. This only
+      // happens on a manual Resize() from the app, as this is called after
+      // the window resizing is finished     
+      int wwidth = Width + 2 * GetSystemMetrics (SM_CXSIZEFRAME);
+      int wheight = Height + 2 * GetSystemMetrics (SM_CYSIZEFRAME)
+        + GetSystemMetrics (SM_CYCAPTION);
+
+      // To prevent a second resize of the canvas, we temporarily disable resizing
+      AllowResizing = false;
+
+      SetWindowPos (m_hWnd, 0, (GetSystemMetrics (SM_CXSCREEN) - wwidth) / 2,
+        (GetSystemMetrics (SM_CYSCREEN) - wheight) / 2, wwidth, wheight, SWP_NOZORDER);
+      
+      // Reset. AllowResizing must be true in order to reach this point anyway
+      AllowResizing = true;
+    }
+  }
+  return true;
+}
+
+void csGraphics2DOpenGL::SetFullScreen (bool b)
+{
+  if (FullScreen == b) return;
+  FullScreen = b;
+
+  if (is_open)
+  {
+    // Now actually change the window/display settings
+    DWORD style;
+    if (FullScreen)
+    {
+      SwitchDisplayMode (false);
+      style = WS_POPUP | WS_VISIBLE | WS_SYSMENU;
+      SetWindowLong (m_hWnd, GWL_STYLE, style);
+      SetWindowPos (m_hWnd, CS_WINDOW_Z_ORDER, 0, 0, Width, Height, SWP_FRAMECHANGED);
+      ShowWindow (m_hWnd, SW_SHOW);
+    }
+    else
+    {
+      SwitchDisplayMode (true);
+      style = WS_CAPTION | WS_MINIMIZEBOX | WS_POPUP | WS_SYSMENU;
+      int wwidth, wheight;
+      if (AllowResizing)
+      {
+        style |= WS_THICKFRAME | WS_MAXIMIZEBOX;
+        wwidth = Width + 2 * GetSystemMetrics (SM_CXSIZEFRAME);
+        wheight = Height + 2 * GetSystemMetrics (SM_CYSIZEFRAME)
+          + GetSystemMetrics (SM_CYCAPTION);
+      }
+      else
+      {
+        wwidth = Width + 2 * GetSystemMetrics (SM_CXFIXEDFRAME);
+        wheight = Height + 2 * GetSystemMetrics (SM_CYFIXEDFRAME)
+          + GetSystemMetrics (SM_CYCAPTION);
+      }
+      SetWindowLong (m_hWnd, GWL_STYLE, style);
+      SetWindowPos (m_hWnd, HWND_NOTOPMOST, (GetSystemMetrics (SM_CXSCREEN) - wwidth) / 2,
+        (GetSystemMetrics (SM_CYSCREEN) - wheight) / 2, wwidth, wheight, SWP_FRAMECHANGED);
+      ShowWindow (m_hWnd, SW_SHOW);
+    }
+  }
+}
+
 LRESULT CALLBACK csGraphics2DOpenGL::WindowProc (HWND hWnd, UINT message,
   WPARAM wParam, LPARAM lParam)
 {
@@ -979,7 +1055,7 @@ LRESULT CALLBACK csGraphics2DOpenGL::WindowProc (HWND hWnd, UINT message,
         {
 	  RECT R;
 	  GetClientRect (hWnd, &R);
-	  This->Resize (R.right - R.left + 1, R.bottom - R.top + 1);
+	  This->Resize (R.right - R.left, R.bottom - R.top);
         }
       }
       break;
