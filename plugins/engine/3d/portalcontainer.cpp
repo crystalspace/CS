@@ -839,12 +839,13 @@ void csPortalContainer::DrawOnePortal (
 {
   iGraphics3D* g3d = rview->GetGraphics3D ();
 #ifndef CS_USE_NEW_RENDERER
-  if (rview->AddedFogInfo ())
+  csRenderView* csrview = (csRenderView*)rview;
+  if (csrview->AddedFogInfo ())
   {
     // If fog info was added then we are dealing with vertex fog and
     // the current sector has fog. This means we have to complete the
     // fog_info structure with the plane of the current polygon.
-    rview->GetFirstFogInfo ()->outgoing_plane = camera_plane;
+    csrview->GetFirstFogInfo ()->outgoing_plane = camera_plane;
   }
 #endif
   // is_this_fog is true if this sector is fogged.

@@ -9,6 +9,7 @@ chronological order.
 22-Apr-2004
 	- Jorrit removed motion and motldr from Jamrules for static
 	  compilation.
+	- Jorrit fixed a compilation error of the engine with OR.
 21-Apr-2004
 	- Jorrit fixed compilation of the engine plugin with OR after
 	  breaking it yesterday.
