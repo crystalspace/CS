@@ -73,7 +73,8 @@ static iSequenceTrigger* FindCreateTrigger (iEngineSequenceManager* eseqmgr,
 #define PARTYPE_SEQUENCE 5
 #define PARTYPE_POLYGON 6
 
-csPtr<iParameterESM> csLoader::ResolveOperationParameter (iDocumentNode* opnode,
+csPtr<iParameterESM> csLoader::ResolveOperationParameter (
+	iDocumentNode* opnode,
 	int partypeidx, const char* partype, const char* seqname,
 	iEngineSequenceParameters* base_params)
 {
@@ -753,9 +754,9 @@ iSequenceWrapper* csLoader::LoadSequence (iDocumentNode* node)
 	  if (!time && !(min || max))
 	  {
 	    SyntaxService->ReportError (
-		"crystalspace.maploader.parse.sequence",
-		child, "Delay tag in sequence '%s' must specify time, or min and max!",
-		seqname);
+	      "crystalspace.maploader.parse.sequence", child,
+	      "Delay tag in sequence '%s' must specify time, or min and max!",
+	      seqname);
 	    return NULL;
 	  }
 	  if (!time)
@@ -946,15 +947,14 @@ iSequenceWrapper* csLoader::LoadSequence (iDocumentNode* node)
 	  iSharedVariable *var=NULL;
 	  csColor col;
 	  const char *colvar;
-	  if (colvar = child->GetAttributeValue ("color_var")) // variable set at run time
-	  {
-	    var = FindSharedVariable(colvar,
-				     iSharedVariable::SV_COLOR );
+	  if ((colvar = child->GetAttributeValue ("color_var")) != 0)
+	  { // variable set at run time
+	    var = FindSharedVariable(colvar, iSharedVariable::SV_COLOR );
 	    if (!var)
 	    {
 	      SyntaxService->ReportError (
-			"crystalspace.maploader.parse.sequence",
-			child, "Shared variable '%s' not found or not a color!",
+			"crystalspace.maploader.parse.sequence", child,
+			"Shared variable '%s' not found or not a color!",
 			colvar);
 	      return NULL;
 	    }
@@ -1054,7 +1054,7 @@ iSequenceWrapper* csLoader::LoadSequence (iDocumentNode* node)
 	    trueseq = trueseqwrap->GetSequence ();
 	  }
 	  iSequence* falseseq = NULL;
-	  const char* falseseqname = child->GetAttributeValue ("falsesequence");
+	  const char* falseseqname = child->GetAttributeValue("falsesequence");
 	  if (falseseqname)
 	  {
 	    iSequenceWrapper* falseseqwrap = FindSequence (

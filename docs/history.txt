@@ -36,6 +36,7 @@ The history order is reversed so that new features are at the top.
 	  opendir(), readdir(), closedir().
 	- Eric Sunshine applied patch from John Harger <john_h@selectpath.com>
 	  to mdltool.cpp to work around MSVC6 internal compiler error.
+	- Eric Sunshine eliminated some compilation warnings.
 15-Jan-2003
 	- Started removing a few csVector usages and replacing them
 	  with typed versions. In particular changed:
