@@ -135,6 +135,9 @@ void csSector::AddLight (csStatLight* light)
 
 void csSector::UseStaticTree (int mode, bool octree)
 {
+  // @@@ Always use octrees now.
+  octree = true;
+
   CHK (delete bsp); bsp = NULL;
   CHK (delete static_tree); static_tree = NULL;
 

@@ -45,6 +45,58 @@ int csBspPolygon::Classify (const csPlane& pl)
   return POL_SPLIT_NEEDED;
 }
 
+int csBspPolygon::ClassifyX (float x)
+{
+  int i;
+  int front = 0, back = 0;
+  csVector3* verts = parent->GetVertices ().GetVertices ();
+
+  for (i = 0 ; i < polygon.GetNumVertices () ; i++)
+  {
+    float xx = verts[polygon[i]].x-x;
+    if (xx < -SMALL_EPSILON) front++;
+    else if (xx > SMALL_EPSILON) back++;
+  }
+  if (back == 0) return POL_FRONT;
+  if (front == 0) return POL_BACK;
+  return POL_SPLIT_NEEDED;
+}
+
+int csBspPolygon::ClassifyY (float y)
+{
+  int i;
+  int front = 0, back = 0;
+  csVector3* verts = parent->GetVertices ().GetVertices ();
+
+  for (i = 0 ; i < polygon.GetNumVertices () ; i++)
+  {
+    float yy = verts[polygon[i]].y-y;
+    if (yy < -SMALL_EPSILON) front++;
+    else if (yy > SMALL_EPSILON) back++;
+  }
+  if (back == 0) return POL_FRONT;
+  if (front == 0) return POL_BACK;
+  return POL_SPLIT_NEEDED;
+}
+
+int csBspPolygon::ClassifyZ (float z)
+{
+  int i;
+  int front = 0, back = 0;
+  csVector3* verts = parent->GetVertices ().GetVertices ();
+
+  for (i = 0 ; i < polygon.GetNumVertices () ; i++)
+  {
+    float zz = verts[polygon[i]].z-z;
+    if (zz < -SMALL_EPSILON) front++;
+    else if (zz > SMALL_EPSILON) back++;
+  }
+  if (back == 0) return POL_FRONT;
+  if (front == 0) return POL_BACK;
+  return POL_SPLIT_NEEDED;
+}
+
+
 void csBspPolygon::SplitWithPlane (csPolygonInt** poly1, csPolygonInt** poly2,
 				  const csPlane& split_plane)
 {

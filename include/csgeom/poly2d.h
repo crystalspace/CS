@@ -106,13 +106,15 @@ public:
 
   /**
    * Add a vertex (2D) to the polygon.
+   * Return index of added vertex.
    */
-  void AddVertex (const csVector2& v) { AddVertex (v.x, v.y); }
+  int AddVertex (const csVector2& v) { return AddVertex (v.x, v.y); }
 
   /**
    * Add a vertex (2D) to the polygon.
+   * Return index of added vertex.
    */
-  void AddVertex (float x, float y);
+  int AddVertex (float x, float y);
 
   /**
    * Set all polygon vertices at once.

@@ -54,12 +54,13 @@ void csPolyIndexed::MakeRoom (int new_max)
   max_vertices = new_max;
 }
 
-void csPolyIndexed::AddVertex (int i)
+int csPolyIndexed::AddVertex (int i)
 {
   if (num_vertices >= max_vertices)
     MakeRoom (max_vertices+5);
   vertices_idx[num_vertices] = i;
   num_vertices++;
+  return num_vertices-1;
 }
 
 //---------------------------------------------------------------------------

@@ -560,6 +560,7 @@ void* csPolygonSet::TestQueuePolygonArray (csPolygonInt** polygon, int num,
       // We're dealing with a csBspPolygon.
       csBspPolygon* bsppol = (csBspPolygon*)polygon[i];
       csSprite3D* sp3d = (csSprite3D*)(bsppol->GetOriginator ());
+
       // If the sprite is already marked visible then we don't have
       // to do any of the other processing for this polygon.
       if (!sp3d->IsVisible ())
@@ -570,11 +571,14 @@ void* csPolygonSet::TestQueuePolygonArray (csPolygonInt** polygon, int num,
         if ( bsppol->ClipToPlane (d->do_clip_plane ? &d->clip_plane :
 		(csPlane*)NULL, d->GetOrigin (), verts, num_verts) &&
              bsppol->DoPerspective (*d, verts, num_verts, clip,
-	 	d->IsMirrored ()))
+	 	d->IsMirrored ()) &&
+             clip->ClipAgainst (d->view) )
         {
           if (c_buffer->TestPolygon (clip->GetVertices (),
 	  	clip->GetNumVertices ()))
+	  {
             sp3d->MarkVisible ();
+	  }
         }
         render_pool->Free (clip);
       }

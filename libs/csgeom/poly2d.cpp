@@ -65,7 +65,7 @@ void csPoly2D::MakeRoom (int new_max)
   max_vertices = new_max;
 }
 
-void csPoly2D::AddVertex (float x, float y)
+int csPoly2D::AddVertex (float x, float y)
 {
   if (num_vertices >= max_vertices)
     MakeRoom (max_vertices+5);
@@ -73,6 +73,7 @@ void csPoly2D::AddVertex (float x, float y)
   vertices[num_vertices].y = y;
   num_vertices++;
   bbox.AddBoundingVertex (x, y);
+  return num_vertices-1;
 }
 
 bool csPoly2D::ClipAgainst (csClipper* view)

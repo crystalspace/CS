@@ -550,14 +550,14 @@ void csSprite3D::AddBoundingBox (csBspContainer* container)
   // Add the eight corner points of the bounding box to the container.
   // Transform from object to world space here.
   csVector3Array& va = container->GetVertices ();
-  int pt_xyz = va.AddVertexSmart (trans.Other2This (csVector3 (b_min.x, b_min.y, b_min.z)));
-  int pt_Xyz = va.AddVertexSmart (trans.Other2This (csVector3 (b_max.x, b_min.y, b_min.z)));
-  int pt_xYz = va.AddVertexSmart (trans.Other2This (csVector3 (b_min.x, b_max.y, b_min.z)));
-  int pt_XYz = va.AddVertexSmart (trans.Other2This (csVector3 (b_max.x, b_max.y, b_min.z)));
-  int pt_xyZ = va.AddVertexSmart (trans.Other2This (csVector3 (b_min.x, b_min.y, b_max.z)));
-  int pt_XyZ = va.AddVertexSmart (trans.Other2This (csVector3 (b_max.x, b_min.y, b_max.z)));
-  int pt_xYZ = va.AddVertexSmart (trans.Other2This (csVector3 (b_min.x, b_max.y, b_max.z)));
-  int pt_XYZ = va.AddVertexSmart (trans.Other2This (csVector3 (b_max.x, b_max.y, b_max.z)));
+  int pt_xyz = va.AddVertex (trans.Other2This (csVector3 (b_min.x, b_min.y, b_min.z)));
+  int pt_Xyz = va.AddVertex (trans.Other2This (csVector3 (b_max.x, b_min.y, b_min.z)));
+  int pt_xYz = va.AddVertex (trans.Other2This (csVector3 (b_min.x, b_max.y, b_min.z)));
+  int pt_XYz = va.AddVertex (trans.Other2This (csVector3 (b_max.x, b_max.y, b_min.z)));
+  int pt_xyZ = va.AddVertex (trans.Other2This (csVector3 (b_min.x, b_min.y, b_max.z)));
+  int pt_XyZ = va.AddVertex (trans.Other2This (csVector3 (b_max.x, b_min.y, b_max.z)));
+  int pt_xYZ = va.AddVertex (trans.Other2This (csVector3 (b_min.x, b_max.y, b_max.z)));
+  int pt_XYZ = va.AddVertex (trans.Other2This (csVector3 (b_max.x, b_max.y, b_max.z)));
 
   CHK (poly = new csBspPolygon ());
   container->AddPolygon (poly);
@@ -576,7 +576,7 @@ void csSprite3D::AddBoundingBox (csBspContainer* container)
   poly->GetPolygon ().AddVertex (pt_XYZ);
   poly->GetPolygon ().AddVertex (pt_XyZ);
   poly->GetPolygon ().AddVertex (pt_Xyz);
-  poly->SetPolyPlane (csPlane (1, 0, 0, -b_max.x));
+  poly->SetPolyPlane (csPlane (-1, 0, 0, b_max.x));
   poly->Transform (trans);
 
   CHK (poly = new csBspPolygon ());
@@ -586,7 +586,7 @@ void csSprite3D::AddBoundingBox (csBspContainer* container)
   poly->GetPolygon ().AddVertex (pt_xYZ);
   poly->GetPolygon ().AddVertex (pt_xyZ);
   poly->GetPolygon ().AddVertex (pt_XyZ);
-  poly->SetPolyPlane (csPlane (0, 0, 1, -b_max.z));
+  poly->SetPolyPlane (csPlane (0, 0, -1, b_max.z));
   poly->Transform (trans);
 
   CHK (poly = new csBspPolygon ());
@@ -606,7 +606,7 @@ void csSprite3D::AddBoundingBox (csBspContainer* container)
   poly->GetPolygon ().AddVertex (pt_XYZ);
   poly->GetPolygon ().AddVertex (pt_XYz);
   poly->GetPolygon ().AddVertex (pt_xYz);
-  poly->SetPolyPlane (csPlane (0, 1, 0, -b_max.y));
+  poly->SetPolyPlane (csPlane (0, -1, 0, b_max.y));
   poly->Transform (trans);
 
   CHK (poly = new csBspPolygon ());
@@ -618,6 +618,38 @@ void csSprite3D::AddBoundingBox (csBspContainer* container)
   poly->GetPolygon ().AddVertex (pt_xyZ);
   poly->SetPolyPlane (csPlane (0, 1, 0, -b_min.y));
   poly->Transform (trans);
+}
+
+float csSprite3D::GetScreenBoundingBox (csCamera *camera, csBox &boundingBox)
+{
+  csFrame *   theFrame;
+  csVector2   oneCorner;
+  csVector3   bbox_min;
+  csVector3   bbox_max;
+  csVector3   cameraPointMin;
+  csVector3   cameraPointMax;
+  csTransform trans;
+
+  theFrame = cur_action->GetFrame(cur_frame);
+  theFrame->GetBoundingBox(bbox_min, bbox_max);
+
+  trans = *camera * csTransform(m_obj2world, m_world2obj * v_obj2world);
+  cameraPointMin = trans * bbox_min;
+  cameraPointMax = trans * bbox_max;
+
+  // if the entire bounding box is behind the camera, we're done
+  if ((cameraPointMin.z < 0) && (cameraPointMax.z < 0))
+    return -1;
+
+  // Transform from camera to screen space.
+  oneCorner.x = cameraPointMin.x / cameraPointMin.z * csCamera::aspect + csWorld::shift_x;
+  oneCorner.y = cameraPointMin.y / cameraPointMin.z * csCamera::aspect + csWorld::shift_y;
+  boundingBox.StartBoundingBox(oneCorner);
+  oneCorner.x = cameraPointMax.x / cameraPointMax.z * csCamera::aspect + csWorld::shift_x;
+  oneCorner.y = cameraPointMax.y / cameraPointMax.z * csCamera::aspect + csWorld::shift_y;
+  boundingBox.AddBoundingVertexSmart(oneCorner);
+
+  return cameraPointMin.z;
 }
 
 void csSprite3D::Draw (csRenderView& rview)

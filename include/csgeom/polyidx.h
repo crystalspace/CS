@@ -91,8 +91,9 @@ public:
 
   /**
    * Add a vertex index to the polygon.
+   * Return index of added index.
    */
-  void AddVertex (int i);
+  int AddVertex (int i);
 };
 
 #endif /*POLYIDX_H*/

@@ -69,7 +69,7 @@ void csBspNode::RemoveDynamicPolygons ()
   if (front)
   {
     front->RemoveDynamicPolygons ();
-    if (front->IsEmpty () == 0)
+    if (front->IsEmpty ())
     {
       CHK (delete front);
       front = NULL;
@@ -78,7 +78,7 @@ void csBspNode::RemoveDynamicPolygons ()
   if (back)
   {
     back->RemoveDynamicPolygons ();
-    if (back->IsEmpty () == 0)
+    if (back->IsEmpty ())
     {
       CHK (delete back);
       back = NULL;
@@ -163,6 +163,7 @@ void csBspTree::AddDynamicPolygons (csPolygonInt** polygons, int num)
 {
   // @@@ We should only do this copy if there is a split in the first level.
   // Now it is just overhead.
+  if (!root) { CHK (root = new csBspNode); }
   CHK (csPolygonInt** new_polygons = new csPolygonInt* [num]);
   int i;
   for (i = 0 ; i < num ; i++) new_polygons[i] = polygons[i];
@@ -172,7 +173,15 @@ void csBspTree::AddDynamicPolygons (csPolygonInt** polygons, int num)
 
 void csBspTree::RemoveDynamicPolygons ()
 {
-  if (root) root->RemoveDynamicPolygons ();
+  if (root)
+  {
+    root->RemoveDynamicPolygons ();
+    if (root->IsEmpty ())
+    {
+      CHK (delete root);
+      root = NULL;
+    }
+  }
 }
 
 int csBspTree::SelectSplitter (csPolygonInt** polygons, int num)
@@ -364,10 +373,13 @@ void csBspTree::BuildDynamic (csBspNode* node, csPolygonInt** polygons, int num)
       case POL_BACK: back_poly[back_idx++] = polygons[i]; break;
       case POL_SPLIT_NEEDED:
 	{
-	  csPolygonInt* np1, * np2;
-	  polygons[i]->SplitWithPlane (&np1, &np2, *split_plane);
-	  front_poly[front_idx++] = np1;
-	  back_poly[back_idx++] = np2;
+    	  // In case of dynamic polygon adding we don't split the polygon.
+	  //csPolygonInt* np1, * np2;
+	  //polygons[i]->SplitWithPlane (&np1, &np2, *split_plane);
+	  //front_poly[front_idx++] = np1;
+	  //back_poly[back_idx++] = np2;
+	  front_poly[front_idx++] = polygons[i];
+	  back_poly[back_idx++] = polygons[i];
 	}
 	break;
 

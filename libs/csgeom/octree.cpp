@@ -110,7 +110,15 @@ void csOctreeNode::RemoveDynamicPolygons ()
         children[i] = NULL;
       }
     }
-  if (minibsp) minibsp->RemoveDynamicPolygons ();
+  if (minibsp)
+  {
+    minibsp->RemoveDynamicPolygons ();
+    if (minibsp->IsEmpty ())
+    {
+      CHK (delete minibsp);
+      minibsp = NULL;
+    }
+  }
 }
 
 bool csOctreeNode::IsEmpty ()
@@ -186,7 +194,7 @@ void csOctree::AddDynamicPolygons (csPolygonInt** polygons, int num)
   CHK (csPolygonInt** new_polygons = new csPolygonInt* [num]);
   int i;
   for (i = 0 ; i < num ; i++) new_polygons[i] = polygons[i];
-  BuildDynamic ((csOctreeNode*)root, min_bbox, max_bbox, new_polygons, num);
+  BuildDynamic ((csOctreeNode*)root, new_polygons, num);
   CHK (delete [] new_polygons);
 }
 
@@ -218,6 +226,40 @@ void SplitOptPlane (csPolygonInt* np, csPolygonInt** npF, csPolygonInt** npB,
       case 1: np->SplitWithPlaneY (npF, npB, xyz_val); break;
       case 2: np->SplitWithPlaneZ (npF, npB, xyz_val); break;
     }
+  else if (rc == POL_BACK)
+  {
+    *npF = NULL;
+    *npB = np;
+  }
+  else
+  {
+    *npF = np;
+    *npB = NULL;
+  }
+}
+
+void SplitOptPlaneDyn (csPolygonInt* np, csPolygonInt** npF, csPolygonInt** npB,
+	int xyz, float xyz_val)
+{
+  if (!np)
+  {
+    *npF = NULL;
+    *npB = NULL;
+    return;
+  }
+  int rc = 0;
+  switch (xyz)
+  {
+    case 0: rc = np->ClassifyX (xyz_val); break;
+    case 1: rc = np->ClassifyY (xyz_val); break;
+    case 2: rc = np->ClassifyZ (xyz_val); break;
+  }
+  if (rc == POL_SPLIT_NEEDED)
+  {
+    // In case of dynamic polygon adding we don't split the polygon.
+    *npF = np;
+    *npB = np;
+  }
   else if (rc == POL_BACK)
   {
     *npF = NULL;
@@ -298,55 +340,75 @@ void csOctree::Build (csOctreeNode* node, const csVector3& bmin,
   }
 }
 
-void csOctree::BuildDynamic (csOctreeNode* node, const csVector3& bmin,
-	const csVector3& bmax, csPolygonInt** polygons, int num)
+void csOctree::BuildDynamic (csOctreeNode* node, csPolygonInt** polygons, int num)
 {
-#if 0
-  int i;
-  csPolygonInt* split_poly;
-  if (node->num) split_poly = node->polygons[0];
-  else split_poly = polygons[SelectSplitter (polygons, num)];
-  csPlane* split_plane = split_poly->GetPolyPlane ();
-
-  // Now we split the list of polygons according to the plane of that polygon.
-  CHK (csPolygonInt** front_poly = new csPolygonInt* [num]);
-  CHK (csPolygonInt** back_poly = new csPolygonInt* [num]);
-  int front_idx = 0, back_idx = 0;
-
-  for (i = 0 ; i < num ; i++)
+  if (node->minibsp)
   {
-    int c = polygons[i]->Classify (split_poly);
-    switch (c)
+    node->minibsp->AddDynamicPolygons (polygons, num);
+    return;
+  }
+
+  const csVector3& center = node->GetCenter ();
+  const csVector3& bmin = node->min_corner;
+  const csVector3& bmax = node->max_corner;
+
+  int i, k;
+
+  // Now we split the node according to the planes.
+  //@@@ Avoid the following allocation some way.
+  csPolygonInt** polys[8];
+  int idx[8];
+  for (i = 0 ; i < 8 ; i++)
+  {
+    CHK (polys[i] = new csPolygonInt* [num]);
+    idx[i] = 0;
+  }
+
+  for (k = 0 ; k < num ; k++)
+  {
+    // The following is approach is most likely not the best way
+    // to do it. We should have a routine which can split a polygon
+    // immediatelly to the eight octree nodes.
+    // But since polygons will not often be split that heavily
+    // it probably doesn't really matter much.
+    csPolygonInt* npF, * npB, * npFF, * npFB, * npBF, * npBB;
+    csPolygonInt* nps[8];
+    SplitOptPlaneDyn (polygons[k], &npF, &npB, 0, center.x);
+    SplitOptPlaneDyn (npF, &npFF, &npFB, 1, center.y);
+    SplitOptPlaneDyn (npB, &npBF, &npBB, 1, center.y);
+    SplitOptPlaneDyn (npFF, &nps[OCTREE_FFF], &nps[OCTREE_FFB], 2, center.z);
+    SplitOptPlaneDyn (npFB, &nps[OCTREE_FBF], &nps[OCTREE_FBB], 2, center.z);
+    SplitOptPlaneDyn (npBF, &nps[OCTREE_BFF], &nps[OCTREE_BFB], 2, center.z);
+    SplitOptPlaneDyn (npBB, &nps[OCTREE_BBF], &nps[OCTREE_BBB], 2, center.z);
+    for (i = 0 ; i < 8 ; i++)
+      if (nps[i])
+        polys[i][idx[i]++] = nps[i];
+  }
+
+  for (i = 0 ; i < 8 ; i++)
+  {
+    if (idx[i])
     {
-      case POL_SAME_PLANE: node->AddPolygon (polygons[i], true); break;
-      case POL_FRONT: front_poly[front_idx++] = polygons[i]; break;
-      case POL_BACK: back_poly[back_idx++] = polygons[i]; break;
-      case POL_SPLIT_NEEDED:
-	{
-	  csPolygonInt* np1, * np2;
-	  polygons[i]->SplitWithPlane (&np1, &np2, *split_plane);
-	  front_poly[front_idx++] = np1;
-	  back_poly[back_idx++] = np2;
-	}
-	break;
-
+      if (!node->children[i])
+      {
+        csVector3 new_bmin;
+        csVector3 new_bmax;
+        CHK (node->children[i] = new csOctreeNode);
+        if (i & 4) { new_bmin.x = center.x; new_bmax.x = bmax.x; }
+        else { new_bmin.x = bmin.x; new_bmax.x = center.x; }
+        if (i & 2) { new_bmin.y = center.y; new_bmax.y = bmax.y; }
+        else { new_bmin.y = bmin.y; new_bmax.y = center.y; }
+        if (i & 1) { new_bmin.z = center.z; new_bmax.z = bmax.z; }
+        else { new_bmin.z = bmin.z; new_bmax.z = center.z; }
+        ((csOctreeNode*)(node->children[i]))->SetBox (bmin, bmax);
+        csBspTree* bsp;
+        CHK (bsp = new csBspTree (pset, mode));
+        ((csOctreeNode*)(node->children[i]))->SetMiniBsp (bsp);
+      }
+      BuildDynamic ((csOctreeNode*)node->children[i], polys[i], idx[i]);
     }
+    CHK (delete [] polys[i]);
   }
-
-  if (front_idx)
-  {
-    if (!node->front) CHKB (node->front = new csBspNode);
-    BuildDynamic (node->front, front_poly, front_idx);
-  }
-  if (back_idx)
-  {
-    if (!node->back) CHKB (node->back = new csBspNode);
-    BuildDynamic (node->back, back_poly, back_idx);
-  }
-
-  CHK (delete [] front_poly);
-  CHK (delete [] back_poly);
-#endif
 }
 
 void* csOctree::Back2Front (const csVector3& pos,

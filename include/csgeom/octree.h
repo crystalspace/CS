@@ -147,13 +147,7 @@ private:
    * This is a dynamic version. It will add the polygons to an already built
    * octree and add the polygons so that they can easily be removed later.
    */
-  void BuildDynamic (csOctreeNode* node, const csVector3& bmin, const csVector3& bmax,
-  	csPolygonInt** polygons, int num);
-
-  /**
-   * Remove all dynamically added polygons from the node.
-   */
-  void RemoveDynamicPolygons (csOctreeNode* node);
+  void BuildDynamic (csOctreeNode* node, csPolygonInt** polygons, int num);
 
   /// Traverse the tree from back to front starting at 'node' and 'pos'.
   void* Back2Front (csOctreeNode* node, const csVector3& pos,

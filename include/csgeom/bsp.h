@@ -107,7 +107,8 @@ public:
   {
     return num == 0 &&
     	(!front || front->IsEmpty ()) &&
-	(!back || back->IsEmpty ()); }
+	(!back || back->IsEmpty ());
+  }
 
   /// Return type (NODE_???).
   int Type () { return NODE_BSPTREE; }
@@ -209,6 +210,11 @@ public:
    * The vertices are returned as indices into the parent object (pset).
    */
   int* GetVertices (int& count);
+
+  /**
+   * Return true if bsp tree is empty.
+   */
+  bool IsEmpty () { return root ? root->IsEmpty () : false; }
 };
 
 #endif /*BSP_H*/
