@@ -43,43 +43,12 @@ csGLFontCache::csGLFontCache (csGraphics2DGLCommon* G2D) :
   csGLFontCache::G2D = G2D;
   statecache = G2D->statecache;
 
-  GLint maxtex = 256;
-  glGetIntegerv (GL_MAX_TEXTURE_SIZE, &maxtex);
-
-  multiTexText = G2D->config->GetBool (
-    "Video.OpenGL.FontCache.UseMultiTexturing", true) && G2D->useCombineTE;
-  intensityBlendText = G2D->config->GetBool (
-    "Video.OpenGL.FontCache.UseIntensityBlend", true);
-  
-  texSize = G2D->config->GetInt ("Video.OpenGL.FontCache.TextureSize", 256);
-  texSize = MAX (texSize, 64);
-  texSize = MIN (texSize, maxtex);
-  maxTxts = G2D->config->GetInt ("Video.OpenGL.FontCache.MaxTextureNum", 16);
-  maxTxts = MAX (maxTxts, 1);
-  maxTxts = MIN (maxTxts, 32);
-  maxFloats = G2D->config->GetInt ("Video.OpenGL.FontCache.VertexCache", 128);
-  maxFloats = ((maxFloats + 3) / 4) * 4;
-  maxFloats = MAX (maxFloats, 4);
   usedTexs = 0;
 
   glyphAlign = 1;
-
-  glGenTextures (1, &texWhite);
-  statecache->SetTexture (GL_TEXTURE_2D, texWhite);
-  glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-  glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-  glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP);
-  glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP);
-
-  csRGBpixel texPix (255, 255, 255, 0);
-
-  glTexImage2D (GL_TEXTURE_2D, 0, GL_RGBA8, 1, 1, 0, 
-    GL_RGBA, GL_UNSIGNED_BYTE, &texPix);
-
   numFloats = 0;
   jobCount = 0;
 
-  textWriting = false;
   textWriting = false;
 }
 
@@ -97,6 +66,62 @@ csGLFontCache::~csGLFontCache ()
   }
   glDeleteTextures (1, &texWhite);
   textures.DeleteAll ();
+}
+
+void csGLFontCache::Setup()
+{
+  GLint maxtex = 256;
+  glGetIntegerv (GL_MAX_TEXTURE_SIZE, &maxtex);
+
+  multiTexText = G2D->config->GetBool (
+    "Video.OpenGL.FontCache.UseMultiTexturing", true) && G2D->useCombineTE;
+  intensityBlendText = G2D->config->GetBool (
+    "Video.OpenGL.FontCache.UseIntensityBlend", true);
+
+  csRef<iVerbosityManager> verbosemgr (
+    CS_QUERY_REGISTRY (G2D->object_reg, iVerbosityManager));
+  bool do_verbose = false;
+  if (verbosemgr) 
+    do_verbose = verbosemgr->CheckFlag ("renderer", "fontcache");
+  if (do_verbose)
+  {
+    int textMethod;
+    if (multiTexText)
+      textMethod = 0;
+    else if (intensityBlendText)
+      textMethod = 1;
+    else
+      textMethod = 2;
+    static const char* textMethodStr[3] =
+      {"Multitexturing",
+       "GL_BLEND texenv with GL_INTENSITY texture",
+       "GL_MODULATE, two-pass"};
+    csReport (G2D->object_reg, CS_REPORTER_SEVERITY_NOTIFY,
+      "crystalspace.canvas.openglcommon.fontcache",
+      "Text drawing method: %s", textMethodStr[textMethod]);
+  }
+  
+  texSize = G2D->config->GetInt ("Video.OpenGL.FontCache.TextureSize", 256);
+  texSize = MAX (texSize, 64);
+  texSize = MIN (texSize, maxtex);
+  maxTxts = G2D->config->GetInt ("Video.OpenGL.FontCache.MaxTextureNum", 16);
+  maxTxts = MAX (maxTxts, 1);
+  maxTxts = MIN (maxTxts, 32);
+  maxFloats = G2D->config->GetInt ("Video.OpenGL.FontCache.VertexCache", 128);
+  maxFloats = ((maxFloats + 3) / 4) * 4;
+  maxFloats = MAX (maxFloats, 4);
+
+  glGenTextures (1, &texWhite);
+  statecache->SetTexture (GL_TEXTURE_2D, texWhite);
+  glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+  glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+  glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP);
+  glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP);
+
+  csRGBpixel texPix (255, 255, 255, 0);
+
+  glTexImage2D (GL_TEXTURE_2D, 0, GL_RGBA8, 1, 1, 0, 
+    GL_RGBA, GL_UNSIGNED_BYTE, &texPix);
 }
 
 csGLFontCache::GlyphCacheData* csGLFontCache::InternalCacheGlyph (
@@ -167,7 +192,7 @@ csGLFontCache::GlyphCacheData* csGLFontCache::InternalCacheGlyph (
     }
 #endif
     // Alloc a pixel on that texture for background drawing.
-    *texImage = 255;
+    *texImage = multiTexText ? 0 : 255;
     textures[tex].glyphRects->Alloc (1, 1, texRect);
 
     glTexImage2D (GL_TEXTURE_2D, 0, 
@@ -714,8 +739,10 @@ void csGLFontCache::FlushText ()
   if (!tcaEnabled) statecache->Disable_GL_TEXTURE_COORD_ARRAY();
   if (caEnabled) statecache->Enable_GL_COLOR_ARRAY();
 
-  if (multiTexText)
+  if (G2D->useCombineTE)
   {
+    if (!multiTexText)
+      glTexEnvi (GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_COMBINE_ARB);
     glTexEnvi (GL_TEXTURE_ENV, GL_SOURCE0_RGB_ARB, GL_TEXTURE);
     glTexEnvi (GL_TEXTURE_ENV, GL_OPERAND0_RGB_ARB, GL_SRC_COLOR);
     glTexEnvi (GL_TEXTURE_ENV, GL_SOURCE1_RGB_ARB, GL_PRIMARY_COLOR);
@@ -730,8 +757,6 @@ void csGLFontCache::FlushText ()
     glTexEnvi (GL_TEXTURE_ENV, GL_COMBINE_ALPHA_ARB, GL_MODULATE);
     glTexEnvf (GL_TEXTURE_ENV, GL_ALPHA_SCALE, 1.0f);
   }
-  else if (G2D->useCombineTE)
-    glTexEnvi (GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_COMBINE_ARB);
   else
     glTexEnvi (GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
 

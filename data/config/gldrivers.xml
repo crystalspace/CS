@@ -148,6 +148,15 @@
 	</OpenGL>
       </Video>
     </config>
+    <config name="disableIntensityBlendText">
+      <Video>
+	<OpenGL>
+	  <FontCache>
+	    <UseIntensityBlend>no</UseIntensityBlend>
+	  </FontCache>
+	</OpenGL>
+      </Video>
+    </config>
     <config name="enableIntensityBlendText">
       <Video>
 	<OpenGL>
@@ -283,6 +292,17 @@
       <applicable>
 	<usecfg>nolinearfog</usecfg>
 	<usecfg>enableintensityblend</usecfg>
+      </applicable>
+    </rule>
+    <rule description="ATI: Can't handle GL_BLEND texenv for GL_INTENSITY textures">
+      <conditions>
+	<regexp string="vendor" pattern="^ATI" />
+	<regexp string="platform" pattern="Win32" />
+      </conditions>
+      <applicable>
+	<usecfg>disableintensityblend</usecfg>
+	<!-- NB: this is the default in video.cfg actually. But to ensure the
+	     setting it's made here, too -->
       </applicable>
     </rule>
     <!--

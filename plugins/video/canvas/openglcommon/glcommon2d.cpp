@@ -107,7 +107,8 @@ bool csGraphics2DGLCommon::Open ()
   driverdb.Open (this);
 
   // initialize font cache object
-  fontCache = new csGLFontCache (this);
+  csGLFontCache* GLFontCache = new csGLFontCache (this);
+  fontCache = GLFontCache;
 
   statecache->Enable_GL_SCISSOR_TEST ();
 
@@ -227,6 +228,8 @@ bool csGraphics2DGLCommon::Open ()
 	  "Multisample: disabled");
     }
   }
+
+  GLFontCache->Setup();
 
   glClearColor (0., 0., 0., 0.);
   glClearDepth (-1.0);

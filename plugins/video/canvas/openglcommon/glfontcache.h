@@ -125,6 +125,9 @@ public:
   csGLFontCache (csGraphics2DGLCommon* G2D);
   virtual ~csGLFontCache ();
 
+  /// Read configuration etc.
+  void Setup();
+
   /**
    * Draw a string using OpenGL, where the baseline starts at x,y. 
    */
