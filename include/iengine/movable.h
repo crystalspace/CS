@@ -119,12 +119,18 @@ struct iMovable : public iBase
   virtual void SetTransform (const csMatrix3& matrix) = 0;
 
   /**
-   * Set the world to object tranformation.
+   * Set the world to object tranformation. Note that it is
+   * recommended not to scale objects using SetTransform()
+   * as some parts of CS don't work properly in that case.
+   * It is better to scale your object using
+   * iMeshWrapper or iMeshFactoryWrapper->HardTransform().
    */
   virtual void SetTransform (const csReversibleTransform& t) = 0;
 
   /**
-   * Get the world to object tranformation.
+   * Get the world to object tranformation. This==object
+   * and Other==world so This2Other()
+   * transforms from object to world space.
    */
   virtual csReversibleTransform& GetTransform () = 0;
 
