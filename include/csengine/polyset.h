@@ -16,8 +16,8 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef POLYSET_H
-#define POLYSET_H
+#ifndef __CS_POLYSET_H__
+#define __CS_POLYSET_H__
 
 #include "csutil/scf.h"
 #include "csutil/csvector.h"
@@ -95,7 +95,7 @@ struct csPolygonSetBBox
  * <li> Things do not require portals but can use them. 
  * </ul>
  */
-class csPolygonSet : public csObject, public iPolygonSet
+class csPolygonSet : public csObject, public iBase
 {
   friend class Dumper;
 
@@ -463,18 +463,6 @@ public:
    */
   csVector2* IntersectCameraZPlane (float z, csVector2* clipper, int num_clip, int& num_pts);
 
-  CSOBJTYPE;
-
-  //-------------------- iPolygonSet interface implementation ------------------
-  DECLARE_IBASE;
-
-  /// Same as GetName()
-  virtual const char *GetName ()
-  { return csObject::GetName (); }
-  /// Set polygon set name
-  virtual void SetName (const char *iName)
-  { csObject::SetName (iName); }
-
   /**
    * Compress the vertex table so that all nearly identical vertices
    * are compressed. The polygons in the set are automatically adapted.
@@ -487,32 +475,53 @@ public:
    */
   virtual void CompressVertices ();
 
-  /// Query number of polygons in set
-  virtual int GetPolygonCount ()
-  { return polygons.Length (); }
-  /// Get a polygon from set by his index
-  virtual iPolygon3D *GetPolygon (int idx);
-  /// Create a new polygon and return a pointer to it
-  virtual iPolygon3D *CreatePolygon (const char *iName);
+  CSOBJTYPE;
+  DECLARE_IBASE;
 
-  /// Query number of vertices in set
-  virtual int GetVertexCount ()
-  { return num_vertices; }
-  /// Get the given vertex coordinates in object space
-  virtual csVector3 &GetVertex (int idx)
-  { return obj_verts [idx]; }
-  /// Get the given vertex coordinates in world space
-  virtual csVector3 &GetVertexW (int idx)
-  { return wor_verts [idx]; }
-  /// Get the given vertex coordinates in camera space
-  virtual csVector3 &GetVertexC (int idx)
-  { return cam_verts [idx]; }
-  /// Create a vertex given his object-space coords and return his index
-  virtual int CreateVertex (csVector3 &iVertex)
-  { return AddVertex (iVertex.x, iVertex.y, iVertex.z); }
+  //-------------------- iPolygonSet interface implementation ------------------
+  struct PolySet : public iPolygonSet
+  {
+    DECLARE_EMBEDDED_IBASE (csPolygonSet);
 
-  /// Create a key/value pair object
-  virtual bool CreateKey (const char *iName, const char *iValue);
+    /// Same as GetName()
+    virtual const char *GetName () const
+    { return scfParent->GetName (); }
+    /// Set polygon set name
+    virtual void SetName (const char *iName)
+    { scfParent->SetName (iName); }
+
+    /// Compress the vertex table.
+    virtual void CompressVertices ()
+    { scfParent->CompressVertices(); }
+
+    /// Query number of polygons in set
+    virtual int GetPolygonCount ()
+    { return scfParent->polygons.Length (); }
+    /// Get a polygon from set by his index
+    virtual iPolygon3D *GetPolygon (int idx);
+    /// Create a new polygon and return a pointer to it
+    virtual iPolygon3D *CreatePolygon (const char *iName);
+
+    /// Query number of vertices in set
+    virtual int GetVertexCount ()
+    { return scfParent->num_vertices; }
+    /// Get the given vertex coordinates in object space
+    virtual csVector3 &GetVertex (int idx)
+    { return scfParent->obj_verts [idx]; }
+    /// Get the given vertex coordinates in world space
+    virtual csVector3 &GetVertexW (int idx)
+    { return scfParent->wor_verts [idx]; }
+    /// Get the given vertex coordinates in camera space
+    virtual csVector3 &GetVertexC (int idx)
+    { return scfParent->cam_verts [idx]; }
+    /// Create a vertex given his object-space coords and return his index
+    virtual int CreateVertex (csVector3 &iVertex)
+    { return scfParent->AddVertex (iVertex.x, iVertex.y, iVertex.z); }
+
+    /// Create a key/value pair object
+    virtual bool CreateKey (const char *iName, const char *iValue);
+  } scfiPolygonSet;
+  friend class PolySet;
 };
 
-#endif /*POLYSET_H*/
+#endif // __CS_POLYSET_H__

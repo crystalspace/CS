@@ -16,8 +16,8 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef POLYGON_H
-#define POLYGON_H
+#ifndef __CS_POLYGON_H__
+#define __CS_POLYGON_H__
 
 #include "csutil/scf.h"
 #include "csutil/cscolor.h"
@@ -340,7 +340,7 @@ public:
  * the texture is filtered in which case it is drawn on top of the other
  * sector.
  */
-class csPolygon3D : public iPolygon3D, public csObject, public csPolygonInt
+class csPolygon3D : public iBase, public csObject, public csPolygonInt
 {
   friend class Dumper;
 
@@ -1058,55 +1058,6 @@ public:
    */
   bool IntersectRay (const csVector3& start, const csVector3& end);
 
-  CSOBJTYPE;
-
-  //-------------------- iPolygon3D interface implementation -------------------
-  DECLARE_IBASE;
-
-  /// Get polygon name
-  virtual const char *GetName ()
-  { return csObject::GetName (); }
-  /// Set polygon name
-  virtual void SetName (const char *iName)
-  { csObject::SetName (iName); }
-
-  /// Get the polygonset (container) that this polygons belongs to.
-  virtual iPolygonSet *GetContainer ()
-  { return GetParent (); }
-  /// Get the lightmap associated with this polygon
-  virtual iLightMap *GetLightMap ()
-  {
-    csLightMapped *lm = GetLightMapInfo ();
-    return lm ? lm->GetLightMap () : NULL;
-  }
-  /// Get the handle to the polygon texture object
-  virtual iPolygonTexture *GetTexture ()
-  {
-    csLightMapped *lm = GetLightMapInfo ();
-    return lm ? lm->GetPolyTex () : NULL;
-  }
-  /// Get the texture handle for the texture manager.
-  virtual iTextureHandle *GetTextureHandle ();
-
-  /// Query number of vertices in this polygon
-  virtual int GetVertexCount ()
-  { return vertices.GetNumVertices (); }
-  /// Get the given polygon vertex coordinates in object space
-  virtual csVector3 &GetVertex (int idx)
-  { return GetParent ()->GetVertex (vertices.GetVertex (idx)); }
-  /// Get the given polygon vertex coordinates in world space
-  virtual csVector3 &GetVertexW (int idx)
-  { return GetParent ()->GetVertexW (vertices.GetVertex (idx)); }
-  /// Get the given polygon vertex coordinates in camera space
-  virtual csVector3 &GetVertexC (int idx)
-  { return GetParent ()->GetVertexC (vertices.GetVertex (idx)); }
-  /// Create a polygon vertex given his index in parent polygon set
-  virtual int CreateVertex (int idx)
-  { return AddVertex (idx); }
-  /// Create a polygon vertex and add it to parent object
-  virtual int CreateVertex (const csVector3 &iVertex)
-  { return AddVertex (iVertex); }
-
   /// Get the alpha transparency value for this polygon.
   virtual int GetAlpha ()
   { return portal ? portal->GetAlpha () : 0; }
@@ -1117,13 +1068,82 @@ public:
    * 75, and 100 will always work but other values may give
    * only the closest possible to one of the above.
    */
-  void SetAlpha (int iAlpha)
+  virtual void SetAlpha (int iAlpha)
   { if (portal) portal->SetAlpha (iAlpha); }
 
-  /// Create a private polygon texture mapping plane
-  virtual void CreatePlane (const csVector3 &iOrigin, const csMatrix3 &iMatrix);
-  /// Set polygon texture mapping plane
-  virtual bool SetPlane (const char *iName);
+  /// Get the texture handle for the texture manager.
+  virtual iTextureHandle *GetTextureHandle ();
+  /// Get the handle to the polygon texture object
+  virtual iPolygonTexture *GetTexture ()
+  {
+    csLightMapped *lm = GetLightMapInfo ();
+    return lm ? lm->GetPolyTex () : NULL;
+  }
+
+  CSOBJTYPE;
+  DECLARE_IBASE;
+
+  //-------------------- iPolygon3D interface implementation -------------------
+
+  struct Poly3D : public iPolygon3D
+  {
+    DECLARE_EMBEDDED_IBASE (csPolygon3D);
+
+    /// Get polygon name
+    virtual const char *GetName () const
+    { return scfParent->GetName (); }
+    /// Set polygon name
+    virtual void SetName (const char *iName)
+    { scfParent->SetName (iName); }
+
+    /// Get the polygonset (container) that this polygons belongs to.
+    virtual iPolygonSet *GetContainer ()
+    { return QUERY_INTERFACE(scfParent->GetParent(), iPolygonSet); }
+    /// Get the lightmap associated with this polygon
+    virtual iLightMap *GetLightMap ()
+    {
+      csLightMapped *lm = scfParent->GetLightMapInfo ();
+      return lm ? lm->GetLightMap () : NULL;
+    }
+    /// Get the handle to the polygon texture object
+    virtual iPolygonTexture *GetTexture ()
+    { return scfParent->GetTexture(); }
+    /// Get the texture handle for the texture manager.
+    virtual iTextureHandle *GetTextureHandle ()
+    { return scfParent->GetTextureHandle (); }
+
+    /// Query number of vertices in this polygon
+    virtual int GetVertexCount ()
+    { return scfParent->vertices.GetNumVertices (); }
+    /// Get the given polygon vertex coordinates in object space
+    virtual csVector3 &GetVertex (int idx)
+    { return GetContainer ()->GetVertex (scfParent->vertices.GetVertex (idx)); }
+    /// Get the given polygon vertex coordinates in world space
+    virtual csVector3 &GetVertexW (int idx)
+    { return GetContainer ()->GetVertexW (scfParent->vertices.GetVertex (idx)); }
+    /// Get the given polygon vertex coordinates in camera space
+    virtual csVector3 &GetVertexC (int idx)
+    { return GetContainer ()->GetVertexC (scfParent->vertices.GetVertex (idx)); }
+    /// Create a polygon vertex given his index in parent polygon set
+    virtual int CreateVertex (int idx)
+    { return scfParent->AddVertex (idx); }
+    /// Create a polygon vertex and add it to parent object
+    virtual int CreateVertex (const csVector3 &iVertex)
+    { return scfParent->AddVertex (iVertex); }
+
+    /// Get the alpha transparency value for this polygon.
+    virtual int GetAlpha ()
+    { return scfParent->GetAlpha (); }
+    /// Set the alpha transparency value for this polygon.
+    virtual void SetAlpha (int iAlpha)
+    { scfParent->SetAlpha (iAlpha); }
+
+    /// Create a private polygon texture mapping plane
+    virtual void CreatePlane (const csVector3 &iOrigin, const csMatrix3 &iMatrix);
+    /// Set polygon texture mapping plane
+    virtual bool SetPlane (const char *iName);
+  } scfiPolygon3D;
+  friend class Poly3D;
 };
 
-#endif /*POLYGON_H*/
+#endif // __CS_POLYGON_H__

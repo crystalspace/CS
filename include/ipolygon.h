@@ -30,17 +30,15 @@ struct iLightMap;
 class csVector3;
 class csMatrix3;
 
-SCF_VERSION (iPolygon3D, 0, 1, 0);
+SCF_VERSION (iPolygon3D, 0, 1, 1);
 
 /**
  * This is the interface to 3D polygons.
- * The iPolygonSet interface defines the interface for
- * the containers of iPolygon3D objects.
  */
 struct iPolygon3D : public iBase
 {
   /// Get polygon name
-  virtual const char *GetName () = 0;
+  virtual const char *GetName () const = 0;
   /// Set polygon name
   virtual void SetName (const char *iName) = 0;
 
@@ -78,7 +76,8 @@ struct iPolygon3D : public iBase
   virtual void SetAlpha (int iAlpha) = 0;
 
   /// Create a private polygon texture mapping plane
-  virtual void CreatePlane (const csVector3 &iOrigin, const csMatrix3 &iMatrix) = 0;
+  virtual void CreatePlane (const csVector3 &iOrigin,
+    const csMatrix3 &iMatrix) = 0;
   /// Set polygon texture mapping plane
   virtual bool SetPlane (const char *iName) = 0;
 };
@@ -90,27 +89,28 @@ struct iPolygonTexture : public iBase
 {
   /// Get the texture handle associated with this polygon
   virtual iTextureHandle *GetTextureHandle () = 0;
-  ///
+  /// Get FDU :-)
   virtual float GetFDU () = 0;
-  ///
+  /// Get FDV :-)
   virtual float GetFDV () = 0;
   /// Get width of lighted texture (power of 2)
   virtual int GetWidth () = 0;
   /// Get height of lighted texture.
   virtual int GetHeight () = 0;
-  ///
+  ///Get ShiftU :-)
   virtual int GetShiftU () = 0;
 
-  ///
+  /// Get IMinU :-)
   virtual int GetIMinU () = 0;
-  ///
+  /// Get IMinV :-)
   virtual int GetIMinV () = 0;
-  ///
-  virtual void GetTextureBox (float& fMinU, float& fMinV, float& fMaxU, float& fMaxV) = 0;
-  ///
+  /// Get texture box.
+  virtual void GetTextureBox (float& fMinU, float& fMinV,
+    float& fMaxU, float& fMaxV) = 0;
+  /// Get original width.
   virtual int GetOriginalWidth () = 0;
 
-  ///
+  /// Get polygon.
   virtual iPolygon3D *GetPolygon () = 0;
   /// Check if dynamic lighting information should be recalculated
   virtual bool DynamicLightsDirty () = 0;
@@ -122,7 +122,7 @@ struct iPolygonTexture : public iBase
    */
   virtual bool RecalculateDynamicLights () = 0;
 
-  /// 
+  /// Get light map.
   virtual iLightMap *GetLightMap () = 0;
   /// Query the size of one light cell (always a power of two)
   virtual int GetLightCellSize () = 0;

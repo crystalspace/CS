@@ -384,7 +384,7 @@ void reset_vertex_colors (csThing* th)
   int i;
   for (i = 0 ; i < th->GetNumPolygons () ; i++)
   {
-    csPolygon3D* p = (csPolygon3D*)(th->GetPolygon (i));
+    csPolygon3D* p = th->GetPolygon3D (i);
     p->UpdateVertexLighting (NULL, csColor (0, 0, 0), true, true);
     p->UpdateVertexLighting (NULL, csColor (0, 0, 0), false, true);
   }

@@ -1038,8 +1038,7 @@ void csPolyTexture::GetTextureBox (float& fMinU, float& fMinV, float& fMaxU, flo
 
 iPolygon3D *csPolyTexture::GetPolygon ()
 {
-  polygon->IncRef ();
-  return polygon;
+  return QUERY_INTERFACE(polygon, iPolygon3D);
 }
 
 iLightMap *csPolyTexture::GetLightMap () { return lm; }

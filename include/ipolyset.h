@@ -24,7 +24,7 @@
 class csVector3;
 struct iPolygon3D;
 
-SCF_VERSION (iPolygonSet, 0, 1, 0);
+SCF_VERSION (iPolygonSet, 0, 1, 1);
 
 /**
  * The iPolygonSet interface is meant to be the common nominator for
@@ -34,7 +34,7 @@ SCF_VERSION (iPolygonSet, 0, 1, 0);
 struct iPolygonSet : public iBase
 {
   /// Get polygon set name
-  virtual const char *GetName () = 0;
+  virtual const char *GetName () const = 0;
   /// Set polygon set name
   virtual void SetName (const char *iName) = 0;
 

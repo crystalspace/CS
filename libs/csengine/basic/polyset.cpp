@@ -46,8 +46,13 @@
 IMPLEMENT_CSOBJTYPE (csPolygonSet,csObject);
 
 IMPLEMENT_IBASE (csPolygonSet)
-  IMPLEMENTS_INTERFACE (iPolygonSet)
+  IMPLEMENTS_INTERFACE (iBase)
+  IMPLEMENTS_EMBEDDED_INTERFACE (iPolygonSet)
 IMPLEMENT_IBASE_END
+
+IMPLEMENT_EMBEDDED_IBASE(csPolygonSet::PolySet)
+  IMPLEMENTS_INTERFACE(iPolygonSet)
+IMPLEMENT_EMBEDDED_IBASE_END
 
 long csPolygonSet::current_light_frame_number = 0;
 
@@ -55,6 +60,7 @@ csPolygonSet::csPolygonSet () : csObject(),
   polygons (64, 64), curves (16, 16)
 {
   CONSTRUCT_IBASE (NULL);
+  CONSTRUCT_EMBEDDED_IBASE (scfiPolygonSet);
   max_vertices = num_vertices = 0;
 
   curves_center.x = curves_center.y = curves_center.z = 0;
@@ -296,9 +302,9 @@ csPolygon3D* csPolygonSet::GetPolygon3D (char* name)
   return idx >= 0 ? polygons.Get (idx) : NULL;
 }
 
-iPolygon3D *csPolygonSet::GetPolygon (int idx)
+iPolygon3D *csPolygonSet::PolySet::GetPolygon (int idx)
 {
-  return GetPolygon3D (idx);
+  return QUERY_INTERFACE(scfParent->GetPolygon3D (idx), iPolygon3D);
 }
 
 csPolygon3D* csPolygonSet::NewPolygon (csTextureHandle* texture)
@@ -309,14 +315,15 @@ csPolygon3D* csPolygonSet::NewPolygon (csTextureHandle* texture)
   return p;
 }
 
-iPolygon3D *csPolygonSet::CreatePolygon (const char *iName)
+iPolygon3D *csPolygonSet::PolySet::CreatePolygon (const char *iName)
 {
   csPolygon3D *p = new csPolygon3D (NULL);
   p->SetName (iName);
-  p->SetSector (sector);
-  AddPolygon (p);
-  p->IncRef ();
-  return p;
+  p->SetSector (scfParent->sector);
+  scfParent->AddPolygon (p);
+  iPolygon3D* ip = QUERY_INTERFACE(p, iPolygon3D);
+  p->DecRef();
+  return ip;
 }
 
 void csPolygonSet::AddPolygon (csPolygonInt* poly)
@@ -999,8 +1006,8 @@ csVector2* csPolygonSet::IntersectCameraZPlane (float z,csVector2* /*clipper*/,
 
 //---------------------------------------------------------------------------------------------------------
 
-bool csPolygonSet::CreateKey (const char *iName, const char *iValue)
+bool csPolygonSet::PolySet::CreateKey (const char *iName, const char *iValue)
 {
-  ObjAdd (new csKeyValuePair (iName, iValue));
+  scfParent->ObjAdd (new csKeyValuePair (iName, iValue));
   return true;
 }

@@ -208,13 +208,19 @@ void csGouraudShaded::SetDynamicColor (int i, float r, float g, float b)
 IMPLEMENT_CSOBJTYPE (csPolygon3D,csObject);
 
 IMPLEMENT_IBASE (csPolygon3D)
-  IMPLEMENTS_INTERFACE (iPolygon3D)
+  IMPLEMENTS_INTERFACE (iBase)
+  IMPLEMENTS_EMBEDDED_INTERFACE (iPolygon3D)
 IMPLEMENT_IBASE_END
+
+IMPLEMENT_EMBEDDED_IBASE(csPolygon3D::Poly3D)
+  IMPLEMENTS_INTERFACE(iPolygon3D)
+IMPLEMENT_EMBEDDED_IBASE_END
 
 csPolygon3D::csPolygon3D (csTextureHandle* texture) : csObject (),
   csPolygonInt (), vertices (4)
 {
   CONSTRUCT_IBASE (NULL);
+  CONSTRUCT_EMBEDDED_IBASE (scfiPolygon3D);
   txtMM = texture;
   if (texture) SetTexture (texture);
 
@@ -458,17 +464,17 @@ iTextureHandle* csPolygon3D::GetTextureHandle ()
   return txtMM ? txtMM->GetTextureHandle () : (iTextureHandle*)NULL;
 }
 
-void csPolygon3D::CreatePlane (const csVector3 &iOrigin, const csMatrix3 &iMatrix)
+void csPolygon3D::Poly3D::CreatePlane (const csVector3 &iOrigin, const csMatrix3 &iMatrix)
 {
-  SetTextureSpace (iMatrix, iOrigin);
+  scfParent->SetTextureSpace (iMatrix, iOrigin);
 }
 
-bool csPolygon3D::SetPlane (const char *iName)
+bool csPolygon3D::Poly3D::SetPlane (const char *iName)
 {
   csPolyTxtPlane *ppl =
     (csPolyTxtPlane *)csWorld::current_world->planes.FindByName (iName);
   if (!ppl) return false;
-  SetTextureSpace (ppl);
+  scfParent->SetTextureSpace (ppl);
   return true;
 }
 
