@@ -36,7 +36,7 @@ typedef float (csTerrainHeightFunction)(void* data, float dx, float dy);
  */
 typedef csVector3 (csTerrainNormalFunction)(void* data, float dx, float dy);
 
-SCF_VERSION (iTerrFuncState, 0, 0, 2);
+SCF_VERSION (iTerrFuncState, 0, 0, 3);
 
 /**
  * This interface describes the API for the terrain object.
@@ -61,14 +61,13 @@ struct iTerrFuncState : public iBase
   /// Get the y resolution.
   virtual int GetYResolution () = 0;
   /**
-   * Setup the number of grid points in every block for a given
-   * LOD level. There are four LOD levels (0..3).
+   * Setup the number of grid points in every block for the base mesh.
    */
-  virtual void SetGridResolution (int lod, int x, int y) = 0;
-  /// Get the x resolution for a block given some LOD (0..3).
-  virtual int GetXGridResolution (int lod) = 0;
-  /// Get the y resolution for a block given some LOD (0..3).
-  virtual int GetYGridResolution (int lod) = 0;
+  virtual void SetGridResolution (int x, int y) = 0;
+  /// Get the x resolution for a block.
+  virtual int GetXGridResolution () = 0;
+  /// Get the y resolution for a block.
+  virtual int GetYGridResolution () = 0;
   /// Set the base color.
   virtual void SetColor (const csColor& col) = 0;
   /// Get the base color.
@@ -79,6 +78,24 @@ struct iTerrFuncState : public iBase
   /// Set the normal function to use for the terrain.
   virtual void SetNormalFunction (csTerrainNormalFunction* func,
   	void* data) = 0;
+
+  /**
+   * Set the distance at which to switch to the given lod level
+   * (lod from 1 to 3).
+   */
+  virtual void SetLODDistance (int lod, float dist) = 0;
+  /**
+   * Get the distance at which lod will switch to that level.
+   */
+  virtual float GetLODDistance (int lod) = 0;
+  /**
+   * Set the maximum cost for LOD level (1..3).
+   */
+  virtual void SetMaximumLODCost (int lod, float maxcost) = 0;
+  /**
+   * Get the maximum cost for LOD level (1..3).
+   */
+  virtual float GetMaximumLODCost (int lod) = 0;
 };
 
 #endif // __ITERRAIN_TERRFUNC_H_

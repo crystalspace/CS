@@ -38,6 +38,8 @@ CS_TOKEN_DEF_START
   CS_TOKEN_DEF (TOPLEFT)
   CS_TOKEN_DEF (SCALE)
   CS_TOKEN_DEF (DIRLIGHT)
+  CS_TOKEN_DEF (LODDIST)
+  CS_TOKEN_DEF (LODCOST)
 CS_TOKEN_DEF_END
 
 IMPLEMENT_IBASE (csTerrFuncFactoryLoader)
@@ -122,6 +124,8 @@ iBase* csTerrFuncLoader::Parse (const char* pString, iEngine *iEngine,
     CS_TOKEN_TABLE (SCALE)
     CS_TOKEN_TABLE (DIRLIGHT)
     CS_TOKEN_TABLE (COLOR)
+    CS_TOKEN_TABLE (LODDIST)
+    CS_TOKEN_TABLE (LODCOST)
   CS_TOKEN_TABLE_END
 
   char *pName;
@@ -186,8 +190,8 @@ iBase* csTerrFuncLoader::Parse (const char* pString, iEngine *iEngine,
       case CS_TOKEN_GRID:
 	{
 	  int lod, bx, by;
-	  ScanStr (pParams, "%d,%d,%d", &lod, &bx, &by);
-          iTerrainState->SetGridResolution (lod, bx, by);
+	  ScanStr (pParams, "%d,%d", &bx, &by);
+          iTerrainState->SetGridResolution (bx, by);
         }
         break;
       case CS_TOKEN_TOPLEFT:
@@ -218,6 +222,22 @@ iBase* csTerrFuncLoader::Parse (const char* pString, iEngine *iEngine,
 	  ScanStr (pParams, "%f,%f,%f:%f,%f,%f", &pos.x, &pos.y, &pos.z,
 	  	&col.red, &col.green, &col.blue);
 	  iTerrObj->SetDirLight (pos, col);
+	}
+	break;
+      case CS_TOKEN_LODDIST:
+        {
+	  int lod;
+	  float dist;
+	  ScanStr (pParams, "%d,%f", &lod, &dist);
+	  iTerrainState->SetLODDistance (lod, dist);
+	}
+	break;
+      case CS_TOKEN_LODCOST:
+        {
+	  int lod;
+	  float cost;
+	  ScanStr (pParams, "%d,%f", &lod, &cost);
+	  iTerrainState->SetMaximumLODCost (lod, cost);
 	}
 	break;
     }

@@ -31,6 +31,28 @@ struct iEngine;
 struct iMaterialWrapper;
 struct iSystem;
 
+#define LOD_LEVELS 4
+
+/**
+ * This is one block in the terrain.
+ */
+class csTerrBlock
+{
+public:
+  G3DTriangleMesh mesh[LOD_LEVELS];	// Mesh with four LOD levels.
+  csVector3* normals[LOD_LEVELS];	// Array of normals for the LOD levels.
+  iMaterialWrapper* material;		// Material for this block.
+  csVector3 center;			// Center for LOD.
+  // Numbers of all meshes. Here we can see if we need to update the lighting
+  // for a mesh and LOD.
+  int dirlight_numbers[LOD_LEVELS];
+  csBox3 bbox;				// Bounding box in 3D of this block.
+
+public:
+  csTerrBlock ();
+  ~csTerrBlock ();
+};
+
 class csTerrFuncObject : public iTerrainObject
 {
 public:
@@ -39,22 +61,20 @@ public:
   void* height_func_data;
   void* normal_func_data;
   int blockx, blocky;
-  int gridx[4], gridy[4];
+  int gridx, gridy;
   csVector3 topleft;
   csVector3 scale;
+  csTerrBlock* blocks;
+  bool block_dim_invalid;
 
 private:
   iSystem* pSystem;
   iTerrainObjectFactory* pFactory;
-  iMaterialWrapper** materials;
-  G3DTriangleMesh* trimesh[4];
-  csVector3* normals[4];
   csColor base_color;
-  // Precomputed centers of blocks for LOD.
-  csVector3* block_centers;
-  float lod_sqdist1;
-  float lod_sqdist2;
-  float lod_sqdist3;
+  // Squared distances at which to change LOD (0..2).
+  float lod_sqdist[LOD_LEVELS-1];
+  // Maximum cost for every lod transition.
+  float max_cost[LOD_LEVELS-1];
 
   // For directional lighting.
   bool do_dirlight;
@@ -62,17 +82,68 @@ private:
   csColor dirlight_color;
   // This number is increased whenever there is a lighting change
   long dirlight_number;
-  // Numbers of all meshes. Here we can see if we need to update the lighting
-  // for a mesh.
-  long* dirlight_numbers[4];
 
   bool initialized;
-  void SetupObject ();
-  void ComputeNormals ();
-  void RecomputeLighting (int lod, int bx, int by);
+
+  /**
+   * Clear a mesh and initialize it for new usage (call before
+   * SetupBaseMesh() or ComputeLODLevel() (as dest)).
+   */
+  void InitMesh (G3DTriangleMesh& mesh);
+
+  /**
+   * Setup the base mesh (lod level 0). This will basically
+   * initialize the mesh by sampling the height function at regular
+   * intervals (gridx/gridy resolution).
+   */
+  void SetupBaseMesh (G3DTriangleMesh& mesh, int bx, int by);
+
+  /**
+   * Compute a destination mesh from a given source mesh
+   * by reducing triangles.
+   */
   void ComputeLODLevel (
 	const G3DTriangleMesh& source, G3DTriangleMesh& dest,
-	float maxcost);
+	float maxcost, int& del_tri, int& tot_tri);
+
+  /**
+   * Compute the bounding box of a triangle mesh.
+   */
+  void ComputeBBox (const G3DTriangleMesh& mesh, csBox3& bbox);
+
+  /**
+   * Compute all bounding boxes.
+   */
+  void ComputeBBoxes ();
+  
+  /**
+   * Allocate normal array and compute normals for one mesh and put
+   * result in pNormals.
+   */
+  void ComputeNormals (const G3DTriangleMesh& mesh, csVector3** pNormals);
+
+  /**
+   * Compute all normal arrays (all lod levels and all blocks).
+   */
+  void ComputeNormals ();
+
+  /**
+   * Do the setup of the entire terrain. This will compute the base
+   * mesh, the LOD meshes, normals, ...
+   */
+  void SetupObject ();
+
+  /**
+   * Recompute lighting for one block.
+   */
+  void RecomputeLighting (int lod, int bx, int by);
+
+  /**
+   * Test if this bounding box is visible in the given clipper.
+   * If visible 'do_clip' will be set to true if clipping is needed.
+   */
+  bool BBoxVisible (const csBox3& bbox, iCamera* camera,
+	iClipper2D* clipper, bool& do_clip);
 
 public:
   /// Constructor.
@@ -119,17 +190,22 @@ public:
   virtual void Draw (iRenderView *rview, bool use_z_buf = true);
   virtual void SetMaterial (int i, iMaterialWrapper* mat)
   {
-    if (!materials) materials = new iMaterialWrapper* [blockx * blocky];
-    materials[i] = mat;
+    if (!blocks || block_dim_invalid)
+    {
+      blocks = new csTerrBlock [blockx*blocky];
+      block_dim_invalid = false;
+    }
+    blocks[i].material = mat;
   }
   virtual int GetNumMaterials () { return blockx*blocky; }
-  virtual void SetLOD (unsigned int detail) { }
+  virtual void SetLOD (unsigned int) { }
 
   virtual int CollisionDetect (csTransform *p);
 
   /// Setup the number of blocks in the terrain.
   void SetResolution (int x, int y)
   {
+    block_dim_invalid = blockx != x || blocky != y;
     blockx = x;
     blocky = y;
     initialized = false;
@@ -140,19 +216,18 @@ public:
   /// Get the y resolution.
   int GetYResolution () { return blocky; }
   /**
-   * Setup the number of grid points in every block for a given
-   * LOD level. There are four LOD levels (0..3).
+   * Setup the number of grid points in every block for the base mesh.
    */
-  void SetGridResolution (int lod, int x, int y)
+  void SetGridResolution (int x, int y)
   {
-    gridx[lod] = x;
-    gridy[lod] = y;
+    gridx = x;
+    gridy = y;
     initialized = false;
   }
-  /// Get the x resolution for a block given some LOD (0..3).
-  int GetXGridResolution (int lod) { return gridx[lod]; }
-  /// Get the y resolution for a block given some LOD (0..3).
-  int GetYGridResolution (int lod) { return gridy[lod]; }
+  /// Get the x resolution for a block.
+  int GetXGridResolution () { return gridx; }
+  /// Get the y resolution for a block.
+  int GetYGridResolution () { return gridy; }
 
   /// Set the top-left corner of the terrain.
   virtual void SetTopLeftCorner (const csVector3& topleft)
@@ -175,6 +250,36 @@ public:
   virtual csVector3 GetScale ()
   {
     return scale;
+  }
+  /**
+   * Set the distance at which to switch to the given lod level
+   * (lod from 1 to 3).
+   */
+  void SetLODDistance (int lod, float dist)
+  {
+    lod_sqdist[lod-1] = dist*dist;
+  }
+  /**
+   * Get the distance at which lod will switch to that level.
+   */
+  float GetLODDistance (int lod)
+  {
+    return sqrt (lod_sqdist[lod-1]);
+  }
+  /**
+   * Set the maximum cost for LOD level (1..3).
+   */
+  void SetMaximumLODCost (int lod, float maxcost)
+  {
+    max_cost[lod-1] = maxcost;
+    initialized = false;
+  }
+  /**
+   * Get the maximum cost for LOD level (1..3).
+   */
+  float GetMaximumLODCost (int lod)
+  {
+    return max_cost[lod-1];
   }
 
   //------------------------- iTerrFuncState implementation ----------------
@@ -214,17 +319,17 @@ public:
     {
       return scfParent->GetYResolution ();
     }
-    virtual void SetGridResolution (int lod, int x, int y)
+    virtual void SetGridResolution (int x, int y)
     {
-      scfParent->SetGridResolution (lod, x, y);
+      scfParent->SetGridResolution (x, y);
     }
-    virtual int GetXGridResolution (int lod)
+    virtual int GetXGridResolution ()
     {
-      return scfParent->GetXGridResolution (lod);
+      return scfParent->GetXGridResolution ();
     }
-    virtual int GetYGridResolution (int lod)
+    virtual int GetYGridResolution ()
     {
-      return scfParent->GetYGridResolution (lod);
+      return scfParent->GetYGridResolution ();
     }
     virtual void SetColor (const csColor& col)
     {
@@ -243,6 +348,22 @@ public:
     	void* d)
     {
       scfParent->SetNormalFunction (func, d);
+    }
+    virtual void SetLODDistance (int lod, float dist)
+    {
+      scfParent->SetLODDistance (lod, dist);
+    }
+    virtual float GetLODDistance (int lod)
+    {
+      return scfParent->GetLODDistance (lod);
+    }
+    virtual void SetMaximumLODCost (int lod, float maxcost)
+    {
+      scfParent->SetMaximumLODCost (lod, maxcost);
+    }
+    virtual float GetMaximumLODCost (int lod)
+    {
+      return scfParent->GetMaximumLODCost (lod);
     }
   } scfiTerrFuncState;
   friend class TerrFuncState;

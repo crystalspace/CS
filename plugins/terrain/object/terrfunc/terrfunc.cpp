@@ -44,6 +44,36 @@ IMPLEMENT_EMBEDDED_IBASE (csTerrFuncObject::TerrFuncState)
   IMPLEMENTS_INTERFACE (iTerrFuncState)
 IMPLEMENT_EMBEDDED_IBASE_END
 
+//------------------------------------------------------------------------
+
+csTerrBlock::csTerrBlock ()
+{
+  int i;
+  for (i = 0 ; i < LOD_LEVELS ; i++)
+  {
+    memset (&mesh[i], 0, sizeof (G3DTriangleMesh));
+    normals[i] = NULL;
+    dirlight_numbers[i] = -1;
+  }
+  material = NULL;
+}
+
+csTerrBlock::~csTerrBlock ()
+{
+  int i;
+  for (i = 0 ; i < LOD_LEVELS ; i++)
+  {
+    delete[] mesh[i].vertices[0];
+    delete[] mesh[i].vertex_colors[0];
+    delete[] mesh[i].texels[0][0];
+    delete[] mesh[i].vertex_fog;
+    delete[] mesh[i].triangles;
+    delete[] normals[i];
+  }
+}
+
+//------------------------------------------------------------------------
+
 static float TerrFunc (void*, float x, float y)
 {
   return 8. * (sin (x*40.)+cos (y*40.));
@@ -59,61 +89,38 @@ csTerrFuncObject::csTerrFuncObject (iSystem* pSys,
   initialized = false;
   blockx = 4;
   blocky = 4;
-  gridx[0] = 8; gridy[0] = 8;
-  gridx[1] = 6; gridy[1] = 6;
-  gridx[2] = 4; gridy[2] = 4;
-  gridx[3] = 3; gridy[3] = 3;
+  gridx = 8; gridy = 8;
   topleft.Set (0, 0, 0);
   scale.Set (1, 1, 1);
-  normals[0] = NULL;
-  normals[1] = NULL;
-  normals[2] = NULL;
-  normals[3] = NULL;
-  trimesh[0] = NULL;
-  trimesh[1] = NULL;
-  trimesh[2] = NULL;
-  trimesh[3] = NULL;
-  dirlight_numbers[0] = NULL;
-  dirlight_numbers[1] = NULL;
-  dirlight_numbers[2] = NULL;
-  dirlight_numbers[3] = NULL;
+  blocks = NULL;
   do_dirlight = false;
   dirlight_number = 0;
-  materials = NULL;
   base_color.red = 0;
   base_color.green = 0;
   base_color.blue = 0;
   height_func = TerrFunc;
   normal_func = NULL;
-  block_centers = NULL;
-  lod_sqdist1 = 200*200;
-  lod_sqdist2 = 400*400;
-  lod_sqdist3 = 600*600;
+  lod_sqdist[0] = 100*100;
+  lod_sqdist[1] = 400*400;
+  lod_sqdist[2] = 800*800;
+  max_cost[0] = .03;
+  max_cost[1] = .08;
+  max_cost[2] = .2;
 }
 
 csTerrFuncObject::~csTerrFuncObject ()
 {
-  int i;
-  for (i = 0 ; i < 4 ; i++)
-    delete[] trimesh[i]; // @@@ Memory leak: Cleanup vertex arrays too!
-  delete[] normals[0];
-  delete[] normals[1];
-  delete[] normals[2];
-  delete[] normals[3];
-  delete[] dirlight_numbers[0];
-  delete[] dirlight_numbers[1];
-  delete[] dirlight_numbers[2];
-  delete[] dirlight_numbers[3];
-  delete[] materials;
-  delete[] block_centers;
+  delete[] blocks;
 }
 
 void csTerrFuncObject::LoadMaterialGroup (iEngine* engine, const char *pName,
 	int iStart, int iEnd)
 {
-  if (!materials)
-    materials = new iMaterialWrapper* [blockx * blocky];
-
+  if (!blocks || block_dim_invalid)
+  {
+    blocks = new csTerrBlock [blockx*blocky];
+    block_dim_invalid = false;
+  }
   int i;
   char pMatName[256];
 
@@ -124,7 +131,7 @@ void csTerrFuncObject::LoadMaterialGroup (iEngine* engine, const char *pName,
     int bx = i % blockx;
     int by = i / blockx;
     int newi = bx*blockx + by;
-    materials[newi] = mat;
+    blocks[newi].material = mat;
   }
 }
 
@@ -142,8 +149,14 @@ class csTriangleVertex
 public:
   // Position of this vertex in 3D space.
   csVector3 pos;
-  // Function coordinates for this vertex.
+  // Terrain function coordinates for this vertex.
   float dx, dy;
+  // True if a corner point.
+  bool at_corner;
+  // True if a horizontal edge point.
+  bool at_hor_edge;
+  // True if a vertical edge point.
+  bool at_ver_edge;
   // Index of this vertex.
   int idx;
   // True if already deleted.
@@ -288,7 +301,7 @@ void csTriangleVertex::CalculateCost (csTriangleVertices* vertices,
     cost = min_dheight+1;
     return;
   }
-  if (false)//@@@ TEST FOR CORNER VERTEX)
+  if (at_corner)
   {
     // If the vertex is on the corner of this mesh block then
     // we give it a very high cost as well. We cannot allow deletion
@@ -300,12 +313,28 @@ void csTriangleVertex::CalculateCost (csTriangleVertices* vertices,
   csVector3 vv = vertices->GetVertex (idx).pos;
   csVector2 this_pos (vv.x, vv.z);
   float this_height = vv.y;
-  if (true)//@@@ Vertex not on edge)
+  if (!at_hor_edge && !at_ver_edge)
     this_height = terrfunc->height_func (terrfunc->height_func_data,
   	vertices->GetVertex (idx).dx,
-  	vertices->GetVertex (idx).dy);
+  	vertices->GetVertex (idx).dy) * terrfunc->scale.y + terrfunc->topleft.y;
   for (i = 0 ; i < num_con_vertices ; i++)
   {
+    // Consider collapsing to vertex i.
+    csTriangleVertex& vt_to = vertices->GetVertex (con_vertices[i]);
+
+    if (at_hor_edge && !vt_to.at_hor_edge)
+    {
+      // This point is at horizontal edge, so we only allow edge collapse
+      // to another point at the horizontal edge.
+      continue;
+    }
+    if (at_ver_edge && !vt_to.at_ver_edge)
+    {
+      // This point is at vertical edge, so we only allow edge collapse
+      // to another point at the vertical edge.
+      continue;
+    }
+
     // Here we calculate what will happen to the height at position
     // of this vertex to see how high the cost is. Ideally we should
     // also look at normals here (@@@) but we only consider height for now.
@@ -317,29 +346,39 @@ void csTriangleVertex::CalculateCost (csTriangleVertices* vertices,
     // to the previous location instead of the value of the function (so that
     // we fit better to adjacent meshes with lower LOD).
 
+    // Also note that for vertices at the edge we only allow edge
+    // collapsing to vertices at the same edge.
+
     // First we need to find out in which triangle we are after the
     // collapse.
-    int j0, j1, j2;
+    int j0, j1;
     csVector2 v[3];
     float height[3];
-    j1 = num_con_vertices-2; vv = vertices->GetVertex (con_vertices[j1]).pos;
-    v[1].Set (vv.x, vv.z); height[1] = vv.y;
-    j2 = num_con_vertices-1; vv = vertices->GetVertex (con_vertices[j2]).pos;
-    v[2].Set (vv.x, vv.z); height[2] = vv.y;
-    for (j0 = 0 ; j0 < num_con_vertices ; j0++)
+    v[2].Set (vt_to.pos.x, vt_to.pos.z);
+    height[2] = vt_to.pos.y;
+    j0 = num_con_vertices-1; vv = vertices->GetVertex (con_vertices[j0]).pos;
+    v[0].Set (vv.x, vv.z); height[0] = vv.y;
+    for (j1 = 0 ; j1 < num_con_vertices ; j1++)
     {
-      vv = vertices->GetVertex (con_vertices[j0]).pos;
-      v[0].Set (vv.x, vv.z); height[0] = vv.y;
-      // v[0..2] is a triangle. Check if our point is in it (only consider
-      // x and z).
-      if (csPoly2D::In (v, 3, this_pos))
+      vv = vertices->GetVertex (con_vertices[j1]).pos;
+      v[1].Set (vv.x, vv.z); height[1] = vv.y;
+      if (j1 != i && j0 != i)
       {
-	// Found the triangle!
-        break;
+        // v[0..2] is a triangle. Check if our point is in it (only consider
+        // x and z).
+        int rc1 = csMath2::WhichSide2D (this_pos, v[0], v[1]);
+        int rc2 = csMath2::WhichSide2D (this_pos, v[1], v[2]);
+        int rc3 = csMath2::WhichSide2D (this_pos, v[2], v[0]);
+        int rc = rc1+rc2+rc3;
+        if (rc == 3 || rc == 2 || rc == 0 || rc == -2 || rc == -3 ||
+	    (rc1*rc2*rc3 == 0))
+        {
+	  // Found the triangle!
+          break;
+        }
       }
 
-      j2 = j1; v[2] = v[1]; height[2] = height[1];
-      j1 = j0; v[1] = v[0]; height[1] = height[0];
+      j0 = j1; v[0] = v[1]; height[0] = height[1];
     }
 
     // Now we find out what height our original point will have when
@@ -365,6 +404,7 @@ void csTriangleVertex::CalculateCost (csTriangleVertices* vertices,
     //  y     fig. 2     is fairly arbitrary, this probably needs to be refined.
     if (v[top] == v[_vbl]) v[_vbl].x -= EPSILON;
     if (v[top] == v[_vbr]) v[_vbr].x -= EPSILON;
+    if (v[_vbr] == v[_vbl]) v[_vbl].x -= EPSILON;//@@@
 
     // Find the original triangle top/left/bottom/right vertices
     // between which the desired point is located.
@@ -382,12 +422,15 @@ void csTriangleVertex::CalculateCost (csTriangleVertices* vertices,
       vtr = vbr;
       if (++vbr > 2) vbr = 0;
     }
+//printf ("a: vbl=%d v[vbl].y=%g vtl=%d v[vtl].y=%g y=%g\n", vbl, v[vbl].y, vtl, v[vtl].y, y);
+//printf ("a: v[vbl].x=%g v[vtl].x=%g x=%g\n", v[vbl].x, v[vtl].x, x);
     // Now interpolate the height.
     float tL, tR, xL, xR, tX;
     if (QRound (v[vbl].y) != QRound (v[vtl].y))
       tL = (y - v[vtl].y) / (v[vbl].y - v[vtl].y);
     else
       tL = (x - v[vtl].x) / (v[vbl].x - v[vtl].x);
+//printf ("b\n");
     if (QRound (v[vbr].y) != QRound (v[vtr].y))
       tR = (y - v[vtr].y) / (v[vbr].y - v[vtr].y);
     else
@@ -417,6 +460,9 @@ void csTriangleVertex::CalculateCost (csTriangleVertices* vertices,
     INTERPOLATE(new_height, height[vtl], height[vbl], height[vtr], height[vbr]);
 
     float dheight = ABS (new_height - this_height);
+    // Increase the cost of collapsing an edge vertex.
+    if (at_hor_edge || at_ver_edge) dheight *= 2.;
+
     if (dheight < min_dheight)
     {
       min_dheight = dheight;
@@ -429,20 +475,39 @@ void csTriangleVertex::CalculateCost (csTriangleVertices* vertices,
 csTriangleVertices::csTriangleVertices (const G3DTriangleMesh& mesh,
 	csTerrFuncObject* terrfunc)
 {
+  int i, j;
+
   vertices = new csTriangleVertex [mesh.num_vertices];
   num_vertices = mesh.num_vertices;
 
+  // First build a bounding box in 2D for all vertices of this mesh.
+  // This bounding box will be used to detect if a vertex is on the
+  // corner of edge of the mesh.
+  csBox2 box;
+  box.StartBoundingBox ();
+  for (i = 0 ; i < num_vertices ; i++)
+  {
+    csVector3 v = mesh.vertices[0][i] - terrfunc->topleft;
+    box.AddBoundingVertex (csVector2 (v.x, v.z));
+  }
+  
   // Build connectivity information for all vertices in this mesh.
   csTriangle* triangles = mesh.triangles;
-  int i, j;
   for (i = 0 ; i < num_vertices ; i++)
   {
     vertices[i].pos = mesh.vertices[0][i];
     csVector3 v = vertices[i].pos - terrfunc->topleft;
-    v.x /= terrfunc->scale.x;
-    v.z /= terrfunc->scale.z;
+    bool at_hor_edge = ABS (v.z-box.MinY ()) < .001 ||
+      		       ABS (v.z-box.MaxY ()) < .001;
+    bool at_ver_edge = ABS (v.x-box.MinX ()) < .001 ||
+      		       ABS (v.x-box.MaxX ()) < .001;
+    v.x /= terrfunc->scale.x * float (terrfunc->blockx);
+    v.z /= terrfunc->scale.z * float (terrfunc->blocky);
     vertices[i].dx = v.x;
     vertices[i].dy = v.z;
+    vertices[i].at_hor_edge = at_hor_edge;
+    vertices[i].at_ver_edge = at_ver_edge;
+    vertices[i].at_corner = at_hor_edge && at_ver_edge;
     vertices[i].idx = i;
     for (j = 0 ; j < mesh.num_triangles ; j++)
       if (triangles[j].a == i || triangles[j].b == i || triangles[j].c == i)
@@ -493,7 +558,7 @@ void csTriangleVertices::CalculateCost (csTerrFuncObject* terrfunc)
 
 void csTerrFuncObject::ComputeLODLevel (
 	const G3DTriangleMesh& source, G3DTriangleMesh& dest,
-	float maxcost)
+	float maxcost, int& del_tri, int& tot_tri)
 {
   // Here is a short explanation on the algorithm we are using.
   // Basically we work with edge collapsing. An edge collapse means that
@@ -526,7 +591,6 @@ void csTerrFuncObject::ComputeLODLevel (
   // with the minimal cost exceeds maxcost.
 
   int i;
-
   // Calculate connectivity information.
   csTriangleVertices* verts = new csTriangleVertices (source, this);
 
@@ -582,55 +646,232 @@ void csTerrFuncObject::ComputeLODLevel (
     }
   }
 
+  // Now we are going to fill the destination with the vertices
+  // and triangles. First we count how many vertices and triangles
+  // are really left.
+  dest.num_vertices = 0;
+  int* translate = new int[source.num_vertices];
+  for (i = 0 ; i < source.num_vertices ; i++)
+  {
+    if (!verts->GetVertex (i).deleted)
+    {
+      translate[i] = dest.num_vertices;
+      dest.num_vertices++;
+    }
+    else
+      translate[i] = -1;
+  }
+  dest.vertices[0] = new csVector3[dest.num_vertices];
+  dest.vertex_fog = new G3DFogInfo[dest.num_vertices];
+  dest.vertex_colors[0] = new csColor[dest.num_vertices];
+  dest.texels[0][0] = new csVector2[dest.num_vertices];
+  dest.num_vertices = 0;
+  for (i = 0 ; i < source.num_vertices ; i++)
+  {
+    if (translate[i] != -1)
+    {
+      dest.texels[0][0][dest.num_vertices] = source.texels[0][0][i];
+      dest.vertex_fog[dest.num_vertices] = source.vertex_fog[i];
+      dest.vertex_colors[0][dest.num_vertices] = source.vertex_colors[0][i];
+      dest.vertices[0][dest.num_vertices++] = source.vertices[0][i];
+    }
+  }
+  dest.num_triangles = 0;
+  for (i = 0 ; i < source.num_triangles ; i++)
+  {
+    if (new_triangles[i].a != new_triangles[i].b &&
+	new_triangles[i].a != new_triangles[i].c &&
+	new_triangles[i].b != new_triangles[i].c)
+    {
+      // Triangle is not collapsed.
+      dest.num_triangles++;
+    }
+  }
+  del_tri = source.num_triangles - dest.num_triangles;
+  tot_tri = source.num_triangles;
+  dest.triangles = new csTriangle[dest.num_triangles];
+  dest.num_triangles = 0;
+  for (i = 0 ; i < source.num_triangles ; i++)
+  {
+    if (new_triangles[i].a != new_triangles[i].b &&
+	new_triangles[i].a != new_triangles[i].c &&
+	new_triangles[i].b != new_triangles[i].c)
+    {
+      // Triangle is not collapsed.
+      dest.triangles[dest.num_triangles] = new_triangles[i];
+      csTriangle& tr = dest.triangles[dest.num_triangles];
+      tr.a = translate[tr.a];
+      tr.b = translate[tr.b];
+      tr.c = translate[tr.c];
+      dest.num_triangles++;
+    }
+  }
+
+  delete[] translate;
   delete[] new_triangles;
   delete verts;
+}
+
+void csTerrFuncObject::ComputeNormals (const G3DTriangleMesh& mesh,
+    	csVector3** pNormals)
+{
+  csVector3* normals = new csVector3 [mesh.num_vertices];
+  *pNormals = normals;
+  float inv_totx = .5 / float (1+blockx*gridx);
+  float inv_toty = .5 / float (1+blocky*gridy);
+  csVector3 v[8];
+  int i;
+  for (i = 0 ; i < mesh.num_vertices ; i++)
+  {
+    csVector3 vv = mesh.vertices[0][i] - topleft;
+    vv.x /= scale.x * float (blockx);
+    vv.z /= scale.z * float (blocky);
+    float dx = vv.x, dy = vv.z;
+    csVector3 n;
+    if (normal_func)
+      n = normal_func (normal_func_data, dx, dy);
+    else
+    {
+      v[0].Set (-.1, height_func (height_func_data, dx-inv_totx, dy-inv_toty), -.1);
+      v[1].Set (  0, height_func (height_func_data, dx, dy-inv_toty), -.1);
+      v[2].Set ( .1, height_func (height_func_data, dx+inv_totx, dy-inv_toty), -.1);
+      v[3].Set ( .1, height_func (height_func_data, dx+inv_totx, dy), 0);
+      v[4].Set ( .1, height_func (height_func_data, dx+inv_totx, dy+inv_toty),  .1);
+      v[5].Set (  0, height_func (height_func_data, dx, dy+inv_toty),  .1);
+      v[6].Set (-.1, height_func (height_func_data, dx-inv_totx, dy+inv_toty),  .1);
+      v[7].Set (-.1, height_func (height_func_data, dx-inv_totx, dy), 0);
+      n.Set (0, 0, 0);
+      int j1, j;
+      j1 = 7;
+      for (j = 0 ; j < 8 ; j++)
+      {
+	n += (v[j1] % v[j]).Unit ();
+	j1 = j;
+      }
+      n.Normalize ();
+    }
+    *normals++ = n;
+  }
 }
 
 void csTerrFuncObject::ComputeNormals ()
 {
   int lod;
-  int i1, i, x, y;
-  float dx, dy;
-  float inv_totx = 1. / float (1+blockx*gridx[0]);
-  float inv_toty = 1. / float (1+blocky*gridy[0]);
-  csVector3 n, v[8];
-  for (lod = 0 ; lod < 4 ; lod++)
-  {
-    int totx = 1+blockx*gridx[lod];
-    int toty = 1+blocky*gridy[lod];
-    float ftotx = float (totx);
-    float ftoty = float (toty);
-    for (y = 0 ; y < toty ; y++)
-    {
-      dy = float (y) / ftoty;
-      for (x = 0 ; x < totx ; x++)
+  int bx, by;
+  for (lod = 0 ; lod < LOD_LEVELS ; lod++)
+    for (by = 0 ; by < blocky ; by++)
+      for (bx = 0 ; bx < blockx ; bx++)
       {
-	dx = float (x) / ftotx;
-	if (normal_func)
-	  n = normal_func (normal_func_data, dx, dy);
-	else
-	{
-	  v[0].Set (-.1, height_func (height_func_data, dx-inv_totx, dy-inv_toty), -.1);
-	  v[1].Set (  0, height_func (height_func_data, dx, dy-inv_toty), -.1);
-	  v[2].Set ( .1, height_func (height_func_data, dx+inv_totx, dy-inv_toty), -.1);
-	  v[3].Set ( .1, height_func (height_func_data, dx+inv_totx, dy), 0);
-	  v[4].Set ( .1, height_func (height_func_data, dx+inv_totx, dy+inv_toty),  .1);
-	  v[5].Set (  0, height_func (height_func_data, dx, dy+inv_toty),  .1);
-	  v[6].Set (-.1, height_func (height_func_data, dx-inv_totx, dy+inv_toty),  .1);
-	  v[7].Set (-.1, height_func (height_func_data, dx-inv_totx, dy), 0);
-	  n.Set (0, 0, 0);
-	  i1 = 7;
-	  for (i = 0 ; i < 8 ; i++)
-	  {
-	    n += (v[i1] % v[i]).Unit ();
-	    i1 = i;
-	  }
-	  n.Normalize ();
-	}
-	normals[lod][y*totx+x] = n;
+	int blidx = by*blockx + bx;
+	ComputeNormals (blocks[blidx].mesh[lod], &blocks[blidx].normals[lod]);
+      }
+}
+
+void csTerrFuncObject::ComputeBBox (const G3DTriangleMesh& mesh, csBox3& bbox)
+{
+  int i;
+  bbox.StartBoundingBox ();
+  for (i = 0 ; i < mesh.num_vertices ; i++)
+    bbox.AddBoundingVertex (mesh.vertices[0][i]);
+}
+
+void csTerrFuncObject::ComputeBBoxes ()
+{
+  int lod;
+  int bx, by;
+  for (by = 0 ; by < blocky ; by++)
+    for (bx = 0 ; bx < blockx ; bx++)
+    {
+      int blidx = by*blockx + bx;
+      blocks[blidx].bbox.StartBoundingBox ();
+      for (lod = 0 ; lod < LOD_LEVELS ; lod++)
+      {
+	csBox3 bb;
+	ComputeBBox (blocks[blidx].mesh[lod], bb);
+	blocks[blidx].bbox += bb;
       }
     }
+}
+
+void csTerrFuncObject::InitMesh (G3DTriangleMesh& mesh)
+{
+  delete[] mesh.vertex_colors[0];
+  mesh.vertex_colors[0] = NULL;
+  delete[] mesh.vertices[0];
+  mesh.vertices[0] = NULL;
+  delete[] mesh.texels[0][0];
+  mesh.texels[0][0] = NULL;
+  delete[] mesh.vertex_fog;
+  mesh.vertex_fog = NULL;
+  mesh.morph_factor = 0;
+  mesh.num_vertices_pool = 1;
+  mesh.num_materials = 1;
+  mesh.use_vertex_color = true;
+  mesh.do_morph_texels = false;
+  mesh.do_morph_colors = false;
+  mesh.do_fog = false;
+  mesh.vertex_mode = G3DTriangleMesh::VM_WORLDSPACE;
+  mesh.fxmode = CS_FX_GOURAUD;
+}
+
+void csTerrFuncObject::SetupBaseMesh (G3DTriangleMesh& mesh, int bx, int by)
+{
+  mesh.num_vertices = (gridx+1) * (gridy+1);
+  mesh.vertices[0] = new csVector3[mesh.num_vertices];
+  mesh.texels[0][0] = new csVector2[mesh.num_vertices];
+  mesh.vertex_fog = new G3DFogInfo [mesh.num_vertices];
+  mesh.vertex_colors[0] = new csColor[mesh.num_vertices];
+  csVector3 tl = topleft;
+  tl.x += bx*scale.x;
+  tl.y += 0;
+  tl.z += by*scale.z;
+  csVector2 tluv (0, 0);
+#if 0
+  tluv.x += float (bx) / float (blockx);
+  tluv.y += float (by) / float (blocky);
+#endif
+  int gx, gy;
+  float dx, dy;
+  for (gy = 0 ; gy <= gridy ; gy++)
+  {
+    dy = float (by*gridy+gy) / float (blocky * gridy);
+    for (gx = 0 ; gx <= gridx ; gx++)
+    {
+      dx = float (bx*gridx+gx) / float (blockx * gridx);
+      int vtidx = gy*(gridx+1)+gx;
+      csVector3 v = tl;
+      v.x += gx*scale.x / float (gridx);
+      v.y += height_func (height_func_data, dx, dy) * scale.y;
+      v.z += gy*scale.z / float (gridy);
+      mesh.vertices[0][vtidx] = v;
+      csVector2 uv = tluv;
+#if 0
+      uv.x += float (gx) / float (blockx*gridx);
+      uv.y += float (gy) / float (blocky*gridy);
+#else
+      uv.x += float (gx) / float (gridx);
+      uv.y += float (gy) / float (gridy);
+      //uv.x = uv.x * .999;// + .0005;
+      //uv.y = uv.y * .999;// + .0005;
+#endif
+      mesh.texels[0][0][vtidx] = uv;
+      mesh.vertex_colors[0][vtidx].Set (1, 1, 1);
+    }
   }
+  mesh.num_triangles = 2*gridx*gridy;
+  mesh.triangles = new csTriangle [mesh.num_triangles];
+  for (gy = 0 ; gy < gridy ; gy++)
+    for (gx = 0 ; gx < gridx ; gx++)
+    {
+      int tridx = (gy*gridx+gx) * 2;
+      int vtidx = gy*(gridx+1)+gx;	// Top left vertex of triangles
+      mesh.triangles[tridx].c = vtidx;
+      mesh.triangles[tridx].b = vtidx+1;
+      mesh.triangles[tridx].a = vtidx+gridx+1;
+      mesh.triangles[tridx+1].c = vtidx+1;
+      mesh.triangles[tridx+1].b = vtidx+gridx+1+1;
+      mesh.triangles[tridx+1].a = vtidx+gridx+1;
+    }
 }
 
 void csTerrFuncObject::SetupObject ()
@@ -638,10 +879,12 @@ void csTerrFuncObject::SetupObject ()
   if (!initialized)
   {
     initialized = true;
-    if (!materials) materials = new iMaterialWrapper* [blockx * blocky];
+    if (!blocks || block_dim_invalid)
+    {
+      delete[] blocks;
+      blocks = new csTerrBlock [blockx*blocky];
+    }
 
-    delete[] block_centers;
-    block_centers = new csVector3 [blockx * blocky];
     int bx, by;
     int blidx = 0;
     for (by = 0 ; by < blocky ; by++)
@@ -654,101 +897,38 @@ void csTerrFuncObject::SetupObject ()
 	tl.x += (float (bx) + .5)*scale.x;
 	tl.y += height_func (height_func_data, dx, dy)*scale.y;
 	tl.z += (float (by) + .5)*scale.z;
-	block_centers[blidx] = tl;
+	blocks[blidx].center = tl;
       }
     }
     
     int lod;
     for (lod = 0 ; lod < 4 ; lod++)
     {
-      delete[] trimesh[lod];
-      delete[] normals[lod];
-      delete[] dirlight_numbers[lod];
-      G3DTriangleMesh* meshes = new G3DTriangleMesh [blockx * blocky];
-      trimesh[lod] = meshes;
-      normals[lod] = new csVector3 [(1+blockx*gridx[lod])
-      	* (1+blocky*gridy[lod])];
-      dirlight_numbers[lod] = new long [blockx * blocky];
-    }
-
-    ComputeNormals ();
-
-    for (lod = 0 ; lod < 4 ; lod++)
-    {
-      G3DTriangleMesh* meshes = trimesh[lod];
-      int gx, gy;
+      printf ("Setting up LOD level %d\n", lod);
+      int del_tri = 0;
+      int tot_tri = 0;
       for (by = 0 ; by < blocky ; by++)
         for (bx = 0 ; bx < blockx ; bx++)
 	{
-	  dirlight_numbers[lod][by*blockx+bx] = -1;
-	  G3DTriangleMesh* m = &meshes[by*blockx + bx];
-	  m->vertex_colors[0] = NULL;
-    	  m->morph_factor = 0;
-    	  m->num_vertices_pool = 1;
-    	  m->num_materials = 1;
-    	  m->use_vertex_color = true;
-    	  m->do_morph_texels = false;
-    	  m->do_morph_colors = false;
-    	  m->do_fog = false;
-    	  m->vertex_mode = G3DTriangleMesh::VM_WORLDSPACE;
-    	  m->fxmode = CS_FX_GOURAUD;
-	  m->num_vertices = (gridx[lod]+1) * (gridy[lod]+1);
-	  m->vertices[0] = new csVector3[m->num_vertices];
-	  m->texels[0][0] = new csVector2[m->num_vertices];
-	  m->vertex_fog = new G3DFogInfo [m->num_vertices];
-	  m->vertex_colors[0] = new csColor[m->num_vertices];
-	  csVector3 tl = topleft;
-	  tl.x += bx*scale.x;
-	  tl.y += 0;
-	  tl.z += by*scale.z;
-	  csVector2 tluv (0, 0);
-#if 0
-	  tluv.x += float (bx) / float (blockx);
-	  tluv.y += float (by) / float (blocky);
-#endif
-	  float dx, dy;
-	  for (gy = 0 ; gy <= gridy[lod] ; gy++)
+	  int blidx = by*blockx+bx;
+	  csTerrBlock& block = blocks[blidx];
+	  block.dirlight_numbers[lod] = -1;
+	  InitMesh (block.mesh[lod]);
+	  if (lod == 0)
+	    SetupBaseMesh (block.mesh[lod], bx, by);
+	  else
 	  {
-	    dy = float (by*gridy[lod]+gy) / float (1. + blocky * gridy[lod]);
-	    for (gx = 0 ; gx <= gridx[lod] ; gx++)
-	    {
-	      dx = float (bx*gridx[lod]+gx) / float (1. + blockx * gridx[lod]);
-	      int vtidx = gy*(gridx[lod]+1)+gx;
-	      csVector3 v = tl;
-	      v.x += gx*scale.x / float (gridx[lod]);
-	      v.y += height_func (height_func_data, dx, dy) * scale.y;
-	      v.z += gy*scale.z / float (gridy[lod]);
-	      m->vertices[0][vtidx] = v;
-	      csVector2 uv = tluv;
-#if 0
-	      uv.x += float (gx) / float (blockx*gridx[lod]);
-	      uv.y += float (gy) / float (blocky*gridy[lod]);
-#else
-	      uv.x += float (gx) / float (gridx[lod]);
-	      uv.y += float (gy) / float (gridy[lod]);
-	      //uv.x = uv.x * .999;// + .0005;
-	      //uv.y = uv.y * .999;// + .0005;
-#endif
-	      m->texels[0][0][vtidx] = uv;
-	      m->vertex_colors[0][vtidx].Set (1, 1, 1);
-	    }
+	    G3DTriangleMesh& mprev = block.mesh[lod-1];
+	    int dt, tt;
+	    ComputeLODLevel (mprev, block.mesh[lod], max_cost[lod-1], dt, tt);
+	    del_tri += dt;
+	    tot_tri += tt;
 	  }
-	  m->num_triangles = 2*gridx[lod]*gridy[lod];
-	  m->triangles = new csTriangle [m->num_triangles];
-	  for (gy = 0 ; gy < gridy[lod] ; gy++)
-	    for (gx = 0 ; gx < gridx[lod] ; gx++)
-	    {
-	      int tridx = (gy*gridx[lod]+gx) * 2;
-	      int vtidx = gy*(gridx[lod]+1)+gx;	// Top left vertex of triangles
-	      m->triangles[tridx].c = vtidx;
-	      m->triangles[tridx].b = vtidx+1;
-	      m->triangles[tridx].a = vtidx+gridx[lod]+1;
-	      m->triangles[tridx+1].c = vtidx+1;
-	      m->triangles[tridx+1].b = vtidx+gridx[lod]+1+1;
-	      m->triangles[tridx+1].a = vtidx+gridx[lod]+1;
-	    }
         }
+      printf ("Deleted %d triangles from %d.\n", del_tri, tot_tri);
     }
+    ComputeNormals ();
+    ComputeBBoxes ();
   }
 }
 
@@ -756,29 +936,57 @@ void csTerrFuncObject::RecomputeLighting (int lod, int bx, int by)
 {
   if (!do_dirlight) return;
   int blidx = by*blockx + bx;
-  if (dirlight_number != dirlight_numbers[lod][blidx])
+  csTerrBlock& block = blocks[blidx];
+  if (dirlight_number != block.dirlight_numbers[lod])
   {
-    dirlight_numbers[lod][blidx] = dirlight_number;
-    G3DTriangleMesh* meshes = trimesh[lod];
-    G3DTriangleMesh* m = &meshes[blidx];
-    int gx, gy;
+    block.dirlight_numbers[lod] = dirlight_number;
+    G3DTriangleMesh* m = &block.mesh[lod];
     csColor* vtcols = m->vertex_colors[0];
-    int normidx_dim = 1+blockx*gridx[lod];
-    int normidx = by*gridy[lod]*normidx_dim + bx*gridx[lod];
-    csVector3* norms_y = &normals[lod][normidx];
-    for (gy = 0 ; gy <= gridy[lod] ; gy++, norms_y += normidx_dim)
+    csVector3* norms = block.normals[lod];
+    int i;
+    for (i = 0 ; i < m->num_vertices ; i++)
     {
-      csVector3* norms = norms_y;
-      for (gx = 0 ; gx <= gridx[lod] ; gx++)
-      {
-	float l = dirlight * *(norms++);
-	(*(vtcols++)).Set (
+      float l = dirlight * *(norms++);
+      (*(vtcols++)).Set (
 		base_color.red+dirlight_color.red * l,
 		base_color.green+dirlight_color.green * l,
 		base_color.blue+dirlight_color.blue * l);
-      }
     }
   }
+}
+
+static void Perspective (const csVector3& v, csVector2& p, float fov,
+    	float sx, float sy)
+{
+  float iz = fov / v.z;
+  p.x = v.x * iz + sx;
+  p.y = v.y * iz + sy;
+}
+
+bool csTerrFuncObject::BBoxVisible (const csBox3& bbox,
+    	iCamera* camera, iClipper2D* clipper, bool& do_clip)
+{
+  int i;
+  csReversibleTransform& camtrans = camera->GetTransform ();
+  float fov = camera->GetFOV ();
+  float shiftx = camera->GetShiftX ();
+  float shifty = camera->GetShiftY ();
+  int in = 0;
+  csVector2 p;
+  for (i = 0 ; i < 8 ; i++)
+  {
+    csVector3 v = bbox.GetCorner (i);
+    v = camtrans * v;
+    if (v.z >= .001)
+    {
+      Perspective (v, p, fov, shiftx, shifty);
+      in += int (clipper->IsInside (p));
+    }
+  }
+  if (in == 0) return false;
+  if (in == 8) { do_clip = false; return true; }
+  do_clip = true;
+  return true;
 }
 
 void csTerrFuncObject::Draw (iRenderView* rview, bool use_z_buf)
@@ -802,21 +1010,27 @@ void csTerrFuncObject::Draw (iRenderView* rview, bool use_z_buf)
   {
     for (bx = 0 ; bx < blockx ; bx++, blidx++)
     {
-      csVector3& bc = block_centers[blidx];
-      int lod = 0;
-      //float sqdist = csSquaredDist::PointPoint (bc, origin);
-      //if (sqdist > lod_sqdist1) lod++;
-      //if (sqdist > lod_sqdist2) lod++;
-      //if (sqdist > lod_sqdist3) lod++;
-      RecomputeLighting (lod, bx, by);
-      G3DTriangleMesh* meshes = trimesh[lod];
-      G3DTriangleMesh* m = &meshes[blidx];
-      m->mat_handle[0] = materials[blidx]->GetMaterialHandle ();
-      if (!m->mat_handle[0])
-        m->mat_handle[0] = materials[0]->GetMaterialHandle ();
-      m->do_mirror = pCamera->IsMirrored ();
-      m->do_clip = true;
-      pG3D->DrawTriangleMesh (*m);
+      csTerrBlock& block = blocks[blidx];
+      bool do_clip;
+      if (BBoxVisible (block.bbox, pCamera, pClipper, do_clip))
+      {
+        csVector3& bc = block.center;
+        int lod = 0;
+        float sqdist = csSquaredDist::PointPoint (bc, origin);
+        if (sqdist > lod_sqdist[0]) lod++;
+        if (sqdist > lod_sqdist[1]) lod++;
+        if (sqdist > lod_sqdist[2]) lod++;
+        RecomputeLighting (lod, bx, by);
+        G3DTriangleMesh* m = &block.mesh[lod];
+        m->mat_handle[0] = block.material->GetMaterialHandle ();
+        if (!m->mat_handle[0])
+          m->mat_handle[0] = block.material->GetMaterialHandle ();
+        m->do_mirror = pCamera->IsMirrored ();
+        //@@@ It would be good to do proper handling of this
+	//flag in the 3D renderer.
+        m->do_clip = do_clip;
+        pG3D->DrawTriangleMesh (*m);
+      }
     }
   }
 }
