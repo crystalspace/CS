@@ -435,7 +435,7 @@ private:
   nTerrainInfo *info;
 
   /// List of materials that we use for this terrain
-  iMaterialHandle *materials;
+  iMaterialHandle **materials;
 
   /// Number of textures
   unsigned short nTextures;
