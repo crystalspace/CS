@@ -30,6 +30,7 @@
 #define CS_SYSDEF_PROVIDE_HARDWARE_MMIO 1
 #include "cssysdef.h"
 #include "cssys/sysfunc.h"
+#include "cssys/syspath.h"
 #include "vfs.h"
 #include "csutil/archive.h"
 #include "csutil/util.h"
