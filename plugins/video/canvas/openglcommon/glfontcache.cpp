@@ -502,7 +502,7 @@ void csGLFontCache::FlushArrays ()
   numFloats = 0;
 
   if (!texEnabled)
-    statecache->Disable_GL_TEXTURE_2D;
+    statecache->Disable_GL_TEXTURE_2D ();
 }
 
 csGLFontCache::TextJob& csGLFontCache::GetJob (int fg, int bg, 
