@@ -13,6 +13,19 @@ Short-term cleanups that need to be done:
 	- Check the dependencies of libraries/COM objects and try to find
 	  includes that don't belong there (like from csengine).
 
+23-Nov-1999
+	- Robert Bate cleaned up the Macintosh port with relation to the
+	  old COM and new SCF.
+	- A little more work on the coverage mask tree. I added stubs for
+	  the coverage mask tree using templates! That's right! Templates :-)
+	  The key to making them work in an system independent way is to
+	  only allow the template usage in one source file. The templates
+	  are private and there will be wrapper classes to expose functionality
+	  to the outer world.
+	- Added a phyziks :-) library to Crystal Space. This library was
+	  contributed by Michael Ewert <mewert99@yahoo.com>. Have a look
+	  in include/csphyzik and also try out the test application which
+	  is included. Press the del and tab key to see two examples.
 22-Nov-1999
 	- Alex Pfaffe added support for Z sorted triangles to terrain
 	  engine.
@@ -36,6 +49,8 @@ Short-term cleanups that need to be done:
 	  circumstances.  The actual problem is that the compiler does not
 	  deal gracefully with multiple inheritance when a common base class
 	  is involved.
+	- Brandon Ehle make an Unreal -> CS map convertor using python.
+	  It almost works but geometry is still messed up.
 21-Nov-1999
 	- Michael Dale Long added some changes to CrystalClear:
 	    - Fixed rotation skew in cctest.
