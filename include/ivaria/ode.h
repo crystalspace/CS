@@ -19,6 +19,19 @@
 #ifndef __CS_IVARIA_ODE_H__
 #define __CS_IVARIA_ODE_H__
 
+SCF_VERSION (iODEFrameUpdateCallback, 0, 0, 1);
+
+/**
+ * This class can be passed in as a callback during the physics update
+ * it is only called if FrameRate is enabled.
+ */
+
+struct iODEFrameUpdateCallback : public iBase
+{
+  /// Executes the per update callback
+  virtual void Execute (float stepsize) = 0;
+};
+
 SCF_VERSION (iODEDynamicState, 0, 0, 1);
 
 /**
@@ -66,6 +79,9 @@ struct iODEDynamicState : public iBase
 
   virtual void SetFrameLimit (float hz) = 0;
   virtual float FrameLimit () = 0;
+
+  virtual void AddFrameUpdateCallback (iODEFrameUpdateCallback *cb) = 0;
+  virtual void RemoveFrameUpdateCallback (iODEFrameUpdateCallback *cb) = 0;
 
   /** 
    * The following enables special robustness checks for fast
@@ -143,6 +159,9 @@ struct iODEDynamicSystemState : public iBase
 
   virtual void SetFrameLimit (float hz) = 0;
   virtual float FrameLimit () = 0;
+
+  virtual void AddFrameUpdateCallback (iODEFrameUpdateCallback *cb) = 0;
+  virtual void RemoveFrameUpdateCallback (iODEFrameUpdateCallback *cb) = 0;
 
   /** 
    * The following enables special robustness checks for fast
