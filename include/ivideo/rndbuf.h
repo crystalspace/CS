@@ -32,15 +32,19 @@ struct iLightingInfo;
 struct iTextureHandle;
 
 
-/// Where the buffer is placed
+/**
+ * Where the buffer is placed
+ * CS_BUF_INDEX is special and only to be used by indexbuffers
+ */
 typedef enum _CS_RENDERBUFFER_TYPE
 {
   CS_BUF_DYNAMIC,
-  CS_BUF_STATIC
+  CS_BUF_STATIC,
+  CS_BUF_INDEX
 } CS_RENDERBUFFER_TYPE;
 
 
-SCF_VERSION (iRenderBuffer, 0, 0, 1);
+SCF_VERSION (iRenderBuffer, 0, 0, 2);
 
 /**
  * This is a general buffer to be used by the renderer. It can ONLY be
@@ -48,40 +52,48 @@ SCF_VERSION (iRenderBuffer, 0, 0, 1);
  */
 struct iRenderBuffer : public iBase
 {
-  
-  /// Get a raw pointer to the bufferdata as different datatypes
-  virtual float* GetFloatBuffer () = 0;
-  virtual unsigned char* GetUCharBuffer () = 0;
-  virtual unsigned int* GetUIntBuffer () = 0;
-  virtual csVector3* GetVector3Buffer () = 0;
-  virtual csVector2* GetVector2Buffer () = 0;
-  virtual csColor* GetColorBuffer () = 0;
+  /**
+   * Type of lock
+   * CS_BUF_LOCK_NORMAL: Just get a point to the buffer, nothing special
+   * CS_BUF_LOCK_DISCARD: Get a buffer to use just this frame/rendering
+   * CS_BUF_LOCK_RENDER: Special lock only to be used by renderer
+   */
+  typedef enum _CS_BUFFER_LOCK_TYPE
+  {
+    CS_BUF_LOCK_NOLOCK,
+    CS_BUF_LOCK_NORMAL,
+    CS_BUF_LOCK_DISCARD,
+    CS_BUF_LOCK_RENDER
+  } CS_BUFFER_LOCK_TYPE;
+
+  /**
+   * Lock the buffer to allow writing and give us a pointer to the data
+   * The pointer will be NULL if there was some error
+   */
+  virtual void* Lock(CS_BUFFER_LOCK_TYPE lockType) = 0;
+
+  /// Releases the buffer. After this all writing to the buffer is illegal
+  virtual void Release() = 0;
+
 
   /// Get type of buffer (where it's located)
   virtual CS_RENDERBUFFER_TYPE GetBufferType() = 0;
 
-  /// Get number of indices in the data (as different datatypes)
-  virtual int GetFloatLength () = 0;
-  virtual int GetUCharLength() = 0;
-  virtual int GetUIntLength () = 0;
-  virtual int GetVec3Length () = 0;
-  virtual int GetVec2Length () = 0;
-  virtual int GetColorLength () = 0;
+  /// Get the size of the buffer (in bytes)
+  virtual int GetSize() = 0;
+
 };
 
-SCF_VERSION (iRenderBufferManager, 0, 0, 1);
+SCF_VERSION (iRenderBufferManager, 0, 0, 2);
 
 struct iRenderBufferManager : public iBase
 {
   /// Allocate a buffer of the specified type and return it
-  virtual csPtr<iRenderBuffer> GetBuffer (int buffersize, CS_RENDERBUFFER_TYPE location) = 0;
-  
-  /// Lock a specified buffer. Return true if successful
-  virtual bool LockBuffer (iRenderBuffer* buffer) = 0;
 
-  /// Unlock buffer
-  virtual void UnlockBuffer (iRenderBuffer* buffer) = 0;
+  virtual csPtr<iRenderBuffer> GetBuffer(int buffersize, CS_RENDERBUFFER_TYPE type) = 0;
+
 };
+
 
 SCF_VERSION (iStreamSource, 0, 0, 1);
 
