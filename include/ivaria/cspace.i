@@ -82,6 +82,22 @@
 
 %module cspace
 
+// Ignored macro's.
+#define CS_STRUCT_ALIGN_4BYTE_BEGIN
+#define CS_STRUCT_ALIGN_4BYTE_END
+#define CS_GNUC_PRINTF(format_idx, arg_idx)
+#define CS_GNUC_SCANF(format_idx, arg_idx)
+#define CS_DECLARE_STATIC_CLASSVAR(a, b, c)
+#define CS_SPECIALIZE_TEMPLATE template<>
+#define CS_EXPORT_SYM
+#define CS_IMPORT_SYM
+#define CS_CSAPPFRAME_EXPORT
+#define CS_CSGEOM_EXPORT
+#define CS_CSGFX_EXPORT
+#define CS_CSTOOL_EXPORT
+#define CS_CSUTIL_EXPORT
+#define CS_CSWS_EXPORT
+
 /* For debugging: If you need to debug the build commands for the scripting
  * modules, or if you need to debug or test certain small portions of the
  * entire scripting support but despair of having to wait for the lengthy
@@ -471,14 +487,6 @@ TYPEMAP_OUTARG_ARRAY_PTR_CNT(
 APPLY_FOR_EACH_INTERFACE
 
 TYPEMAP_OUT_csWrapPtr
-
-// Ignored macro's.
-#define CS_STRUCT_ALIGN_4BYTE_BEGIN
-#define CS_STRUCT_ALIGN_4BYTE_END
-#define CS_GNUC_PRINTF(format_idx, arg_idx)
-#define CS_GNUC_SCANF(format_idx, arg_idx)
-#define CS_DECLARE_STATIC_CLASSVAR(a, b, c)
-#define CS_SPECIALIZE_TEMPLATE template<>
 
 // Inclusion of CS headers.
 // The sequence of %include-ing the CS headers can be crucial!

@@ -70,6 +70,9 @@ chronological order.
 	  to be created.
 	- res changed the imgplex plugin to set the dither flag on all image
 	  loaders.
+	- Eric Sunshine augmented cspace.i to take into account the new
+	  CS_CSUTIL_EXPORT, CS_CSTOOL_EXPORT, etc. export macros in order to
+	  keep Swig from barfing on them.
 17-Mar-2004
 	- Duhprey added a simple terraformer loader plugin
 	- Eric Sunshine fixed copy/paste error in terraformer loader makefile
