@@ -70,12 +70,15 @@ csGraphics3DSoftware::~csGraphics3DSoftware ()
 bool csGraphics3DSoftware::Initialize (iSystem *iSys)
 {
   csGraphics3DSoftwareCommon::Initialize(iSys);
-  NewInitialize ();
-  const char *driver = iSys->GetCommandLine ()->GetOption ("canvas");
-  if (!driver)
-    driver = config->GetStr ("Video.Software.Canvas", CS_SOFTWARE_2D_DRIVER);
   iObjectRegistry* object_reg = iSys->GetObjectRegistry ();
   iPluginManager* plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
+  iCommandLineParser* cmdline = CS_QUERY_REGISTRY (object_reg,
+  	iCommandLineParser);
+  
+  NewInitialize ();
+  const char *driver = cmdline->GetOption ("canvas");
+  if (!driver)
+    driver = config->GetStr ("Video.Software.Canvas", CS_SOFTWARE_2D_DRIVER);
   G2D = CS_LOAD_PLUGIN (plugin_mgr, driver, NULL, iGraphics2D);
   return G2D ? true : false;
 }

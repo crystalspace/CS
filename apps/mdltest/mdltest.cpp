@@ -237,6 +237,8 @@ bool Simple::Initialize (int argc, const char* const argv[],
 
   iObjectRegistry* object_reg = GetObjectRegistry ();
   iPluginManager* plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
+  iCommandLineParser* cmdline = CS_QUERY_REGISTRY (object_reg,
+  	iCommandLineParser);
 
   // Find the pointer to engine plugin
   engine = CS_QUERY_PLUGIN (plugin_mgr, iEngine);
@@ -313,7 +315,7 @@ bool Simple::Initialize (int argc, const char* const argv[],
 
   // -------------------------------------------------------------------------
 
-  const char *Filename = GetCommandLine ()->GetName (0);
+  const char *Filename = cmdline->GetName (0);
   iModelData *Model = Filename ? ImportModel (Filename) : CreateDefaultModel (tm2);
 
   iMeshObjectType *ThingType = engine->GetThingType ();

@@ -275,8 +275,11 @@ void WalkTest::SetSystemDefaults (iConfigManager *Config)
   do_stats = Config->GetBool ("Walktest.Settings.Stats", false);
   do_cd = Config->GetBool ("Walktest.Settings.Colldet", true);
 
+  iCommandLineParser* cmdline = CS_QUERY_REGISTRY (object_reg,
+  	iCommandLineParser);
+
   const char *val;
-  if (!(val = GetCommandLine ()->GetName ()))
+  if (!(val = cmdline->GetName ()))
     val = Config->GetStr ("Walktest.Settings.WorldFile");
 
   // if an absolute path is given, copy it. Otherwise prepend "/lev/".
@@ -285,50 +288,50 @@ void WalkTest::SetSystemDefaults (iConfigManager *Config)
   else
     sprintf (map_dir, "/lev/%s", val);
   
-  if (GetCommandLine ()->GetOption ("stats"))
+  if (cmdline->GetOption ("stats"))
   {
     do_stats = true;
     Sys->Printf (CS_MSG_INITIALIZATION, "Statistics enabled.\n");
   }
-  else if (GetCommandLine ()->GetOption ("nostats"))
+  else if (cmdline->GetOption ("nostats"))
   {
     do_stats = false;
     Sys->Printf (CS_MSG_INITIALIZATION, "Statistics disabled.\n");
   }
 
-  if (GetCommandLine ()->GetOption ("fps"))
+  if (cmdline->GetOption ("fps"))
   {
     do_fps = true;
     Sys->Printf (CS_MSG_INITIALIZATION, "Frame Per Second enabled.\n");
   }
-  else if (GetCommandLine ()->GetOption ("nofps"))
+  else if (cmdline->GetOption ("nofps"))
   {
     do_fps = false;
     Sys->Printf (CS_MSG_INITIALIZATION, "Frame Per Second disabled.\n");
   }
 
-  if (GetCommandLine ()->GetOption ("infinite"))
+  if (cmdline->GetOption ("infinite"))
     do_infinite = true;
 
-  if (GetCommandLine ()->GetOption ("huge"))
+  if (cmdline->GetOption ("huge"))
     do_huge = true;
 
   extern bool do_bots;
-  if (GetCommandLine ()->GetOption ("bots"))
+  if (cmdline->GetOption ("bots"))
     do_bots = true;
 
-  if (GetCommandLine ()->GetOption ("colldet"))
+  if (cmdline->GetOption ("colldet"))
   {
     do_cd = true;
     Sys->Printf (CS_MSG_INITIALIZATION, "Enabled collision detection system.\n");
   }
-  else if (GetCommandLine ()->GetOption ("nocolldet"))
+  else if (cmdline->GetOption ("nocolldet"))
   {
     do_cd = false;
     Sys->Printf (CS_MSG_INITIALIZATION, "Disabled collision detection system.\n");
   }
 
-  if ((val = GetCommandLine ()->GetOption ("exec")))
+  if ((val = cmdline->GetOption ("exec")))
   {
     delete [] auto_script;
     auto_script = csStrNew (val);
@@ -337,6 +340,7 @@ void WalkTest::SetSystemDefaults (iConfigManager *Config)
 
 void WalkTest::Help ()
 {
+  iConfigManager* cfg = CS_QUERY_REGISTRY (object_reg, iConfigManager);
   SysSystemDriver::Help ();
   Sys->Printf (CS_MSG_STDOUT, "  -exec=<script>     execute given script at startup\n");
   Sys->Printf (CS_MSG_STDOUT, "  -[no]stats         statistics (default '%sstats')\n", do_stats ? "" : "no");
@@ -346,7 +350,7 @@ void WalkTest::Help ()
   Sys->Printf (CS_MSG_STDOUT, "  -huge              special huge level generation (ignores map file!)\n");
   Sys->Printf (CS_MSG_STDOUT, "  -bots              allow random generation of bots\n");
   Sys->Printf (CS_MSG_STDOUT, "  <path>             load map from VFS <path> (default '%s')\n",
-        GetConfig()->GetStr ("Walktest.Settings.WorldFile", "world"));
+        cfg->GetStr ("Walktest.Settings.WorldFile", "world"));
 }
 
 //-----------------------------------------------------------------------------
@@ -1247,16 +1251,17 @@ void WalkTest::Create2DSprites(void)
 bool WalkTest::Initialize (int argc, const char* const argv[],
 	const char *iConfigName)
 {
-  object_reg = Sys->GetObjectRegistry ();
-  plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
-
   Sys->RequestPlugin ("crystalspace.utilities.reporter:Reporter");
 
+  object_reg = Sys->GetObjectRegistry ();
   if (!SysSystemDriver::Initialize (argc, argv, iConfigName))
   {
     Printf (CS_MSG_FATAL_ERROR, "Failed to initialize SysSystemDriver!\n");
     return false;
   }
+
+  plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
+  iConfigManager* cfg = CS_QUERY_REGISTRY (object_reg, iConfigManager);
 
   myG3D = CS_QUERY_PLUGIN_ID (plugin_mgr, CS_FUNCID_VIDEO, iGraphics3D);
   if (!myG3D)
@@ -1298,26 +1303,26 @@ bool WalkTest::Initialize (int argc, const char* const argv[],
   Printf (CS_MSG_INITIALIZATION, "Created by Jorrit Tyberghein and others...\n\n");
 
   // Get all collision detection and movement config file parameters.
-  cfg_jumpspeed = GetConfig()->GetFloat ("Walktest.CollDet.JumpSpeed", 0.08);
-  cfg_walk_accelerate = GetConfig()->GetFloat ("Walktest.CollDet.WalkAccelerate", 0.007);
-  cfg_walk_maxspeed = GetConfig()->GetFloat ("Walktest.CollDet.WalkMaxSpeed", 0.1);
-  cfg_walk_brake = GetConfig()->GetFloat ("Walktest.CollDet.WalkBrake", 0.014);
-  cfg_rotate_accelerate = GetConfig()->GetFloat ("Walktest.CollDet.RotateAccelerate", 0.005);
-  cfg_rotate_maxspeed = GetConfig()->GetFloat ("Walktest.CollDet.RotateMaxSpeed", 0.03);
-  cfg_rotate_brake = GetConfig()->GetFloat ("Walktest.CollDet.RotateBrake", 0.015);
-  cfg_look_accelerate = GetConfig()->GetFloat ("Walktest.CollDet.LookAccelerate", 0.028);
-  cfg_body_height = GetConfig()->GetFloat ("Walktest.CollDet.BodyHeight", 1.4);
-  cfg_body_width = GetConfig()->GetFloat ("Walktest.CollDet.BodyWidth", 0.5);
-  cfg_body_depth = GetConfig()->GetFloat ("Walktest.CollDet.BodyDepth", 0.5);
-  cfg_eye_offset = GetConfig()->GetFloat ("Walktest.CollDet.EyeOffset", -0.7);
-  cfg_legs_width = GetConfig()->GetFloat ("Walktest.CollDet.LegsWidth", 0.4);
-  cfg_legs_depth = GetConfig()->GetFloat ("Walktest.CollDet.LegsDepth", 0.4);
-  cfg_legs_offset = GetConfig()->GetFloat ("Walktest.CollDet.LegsOffset", -1.1);
+  cfg_jumpspeed = cfg->GetFloat ("Walktest.CollDet.JumpSpeed", 0.08);
+  cfg_walk_accelerate = cfg->GetFloat ("Walktest.CollDet.WalkAccelerate", 0.007);
+  cfg_walk_maxspeed = cfg->GetFloat ("Walktest.CollDet.WalkMaxSpeed", 0.1);
+  cfg_walk_brake = cfg->GetFloat ("Walktest.CollDet.WalkBrake", 0.014);
+  cfg_rotate_accelerate = cfg->GetFloat ("Walktest.CollDet.RotateAccelerate", 0.005);
+  cfg_rotate_maxspeed = cfg->GetFloat ("Walktest.CollDet.RotateMaxSpeed", 0.03);
+  cfg_rotate_brake = cfg->GetFloat ("Walktest.CollDet.RotateBrake", 0.015);
+  cfg_look_accelerate = cfg->GetFloat ("Walktest.CollDet.LookAccelerate", 0.028);
+  cfg_body_height = cfg->GetFloat ("Walktest.CollDet.BodyHeight", 1.4);
+  cfg_body_width = cfg->GetFloat ("Walktest.CollDet.BodyWidth", 0.5);
+  cfg_body_depth = cfg->GetFloat ("Walktest.CollDet.BodyDepth", 0.5);
+  cfg_eye_offset = cfg->GetFloat ("Walktest.CollDet.EyeOffset", -0.7);
+  cfg_legs_width = cfg->GetFloat ("Walktest.CollDet.LegsWidth", 0.4);
+  cfg_legs_depth = cfg->GetFloat ("Walktest.CollDet.LegsDepth", 0.4);
+  cfg_legs_offset = cfg->GetFloat ("Walktest.CollDet.LegsOffset", -1.1);
 
   //--- create the converter class for testing
   ImportExport = new converter();
   // process import/export files from config and print log for testing
-  ImportExport->ProcessConfig (GetConfig());
+  ImportExport->ProcessConfig (cfg);
   // free memory - delete this if you want to use the data in the buffer
   delete ImportExport;
   //--- end converter test
@@ -1382,7 +1387,7 @@ bool WalkTest::Initialize (int argc, const char* const argv[],
   view = new csView (Engine, Gfx3D);
 
   // Get the collide system plugin.
-  const char* p = GetConfig()->GetStr ("Walktest.Settings.CollDetPlugin",
+  const char* p = cfg->GetStr ("Walktest.Settings.CollDetPlugin",
   	"crystalspace.collisiondetection.rapid");
   collide_system = CS_LOAD_PLUGIN (plugin_mgr, p, "CollDet", iCollideSystem);
   if (!collide_system)
@@ -1491,7 +1496,7 @@ bool WalkTest::Initialize (int argc, const char* const argv[],
         //sprintf (tmp, "$.$/data$/%s.zip, $.$/%s.zip, $(..)$/data$/%s.zip",
         //  name, name, name);
 	const char *valfiletype = "";
-	valfiletype = GetConfig()->GetStr ("Walktest.Settings.WorldZipType", "");
+	valfiletype = cfg->GetStr ("Walktest.Settings.WorldZipType", "");
 	if (strcmp (valfiletype, "") ==0)
 	{
 	  valfiletype = "zip";

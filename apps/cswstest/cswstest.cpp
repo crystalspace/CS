@@ -1,4 +1,5 @@
 /*
+    Copyright (C) 2001 by Jorrit Tyberghein
     Copyright (C) 1999 by Andrew Zabolotny <bit@eltech.ru>
 
     This library is free software; you can redistribute it and/or
@@ -24,6 +25,7 @@
 #include "ivideo/fontserv.h"
 #include "iutil/cfgmgr.h"
 #include "iutil/cmdline.h"
+#include "iutil/objreg.h"
 
 CS_IMPLEMENT_APPLICATION
 
@@ -1007,10 +1009,15 @@ int main (int argc, char* argv[])
   if (!System.Open ("Crystal Space Windowing System testbed"))
     return -1;
 
+  iObjectRegistry* object_reg = System.GetObjectRegistry ();
+  iCommandLineParser* cmdline = CS_QUERY_REGISTRY (object_reg,
+  	iCommandLineParser);
+  iConfigManager* config = CS_QUERY_REGISTRY (object_reg, iConfigManager);
+
   // Look for skin variant from config file
-  DefaultSkin.Prefix = System.GetCommandLine ()->GetOption ("skin");
+  DefaultSkin.Prefix = cmdline->GetOption ("skin");
   if (!DefaultSkin.Prefix)
-    DefaultSkin.Prefix = System.GetConfig ()->GetStr ("CSWS.Skin.Variant", NULL);
+    DefaultSkin.Prefix = config->GetStr ("CSWS.Skin.Variant", NULL);
 
   // Create our application object
   csWsTest app (&System, DefaultSkin);

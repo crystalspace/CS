@@ -1,5 +1,20 @@
 The history order is reversed so that new features are at the top.
 
+24-Jul-2001
+	- Further work on the decomposition of the system driver.
+	    - The iObjectRegistry in the system driver is now more complete.
+	      You can now register and unregister objects to it.
+	    - The system driver will now register the
+	      plugin manager (iPluginManager), the commandline parser
+	      (iCommandLineParser), and the config manager (iConfigManager).
+	      In the future this registration will have to be done by another
+	      entity.
+	    - Removed iSystem::GetCommandLine(). Use the object registry
+	      instead to get the commandline like this:
+	          iCommandLineParser* cmdline = CS_QUERY_REGISTRY (object_reg,
+		  	iCommandLineParser);
+	    - Removed iSystem::GetConfig(). Use the object registry instead
+	      to get to the config manager (iConfigManager).
 23-Jul-2001
 	- Continued work on the decomposition of the system driver. The
 	  following items were performed:

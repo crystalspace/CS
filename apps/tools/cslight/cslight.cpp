@@ -141,6 +141,8 @@ bool Lighter::Initialize (int argc, const char* const argv[],
 
   iObjectRegistry* object_reg = GetObjectRegistry ();
   iPluginManager* plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
+  iCommandLineParser* cmdline = CS_QUERY_REGISTRY (object_reg,
+  	iCommandLineParser);
 
   // Find the pointer to engine plugin
   engine = CS_QUERY_PLUGIN (plugin_mgr, iEngine);
@@ -201,7 +203,7 @@ bool Lighter::Initialize (int argc, const char* const argv[],
   engine->SetLightingCacheMode (CS_ENGINE_CACHE_WRITE);
 
   char map_dir[255];
-  const char* val = GetCommandLine ()->GetName ();
+  const char* val = cmdline->GetName ();
   if (!val)
   {
     Printf (CS_MSG_FATAL_ERROR,

@@ -80,17 +80,19 @@ csGraphics3DNull::~csGraphics3DNull ()
 bool csGraphics3DNull::Initialize (iSystem *iSys)
 {
   System = iSys;
+  iObjectRegistry* object_reg = System->GetObjectRegistry ();
+  iPluginManager* plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
+  iCommandLineParser* cmdline = CS_QUERY_REGISTRY (object_reg,
+  	iCommandLineParser);
 
   config.AddConfig(System, "/config/null3d.cfg");
 
   width = height = -1;
 
-  const char *driver = iSys->GetCommandLine ()->GetOption ("canvas");
+  const char *driver = cmdline->GetOption ("canvas");
   if (!driver)
     driver = config->GetStr ("Video.Null.Canvas", CS_SOFTWARE_2D_DRIVER);
 
-  iObjectRegistry* object_reg = System->GetObjectRegistry ();
-  iPluginManager* plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
   G2D = CS_LOAD_PLUGIN (plugin_mgr, driver, NULL, iGraphics2D);
   if (!G2D)
     return false;

@@ -784,12 +784,14 @@ int main (int argc, char *argv[])
 
   iObjectRegistry* object_reg = System.GetObjectRegistry ();
   iPluginManager* plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
+  iCommandLineParser* cmdline = CS_QUERY_REGISTRY (object_reg,
+  	iCommandLineParser);
 
   System.myG2D = CS_QUERY_PLUGIN (plugin_mgr, iGraphics2D);
   // Now load the canvas plugin
   if (!System.myG2D)
   {
-    const char *canvas = System.GetCommandLine ()->GetOption ("canvas");
+    const char *canvas = cmdline->GetOption ("canvas");
     if (!canvas || !*canvas)
       canvas = CS_SOFTWARE_2D_DRIVER;
     else if (strncmp ("crystalspace.", canvas, 13))

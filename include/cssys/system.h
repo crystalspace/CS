@@ -207,10 +207,6 @@ class csSystemDriver : public iSystem
   csTime ElapsedTime, CurrentTime;
   
 protected:
-  /// The command line parser
-  iCommandLineParser *CommandLine;
-  /// The configuration manager
-  iConfigManager *Config;
   /// The Virtual File System object
   iVFS *VFS;
   /// 3D Graphics context
@@ -337,13 +333,6 @@ private:
   /// Get the specified plugin from the plugin manager.
   iBase* GetPlugin (int idx);
 
-  // @@@ The following should all move to the
-  // specific implementation of the object registry when we have that.
-  bool Register (iBase*, char const* tag = NULL);
-  void Unregister (iBase*, char const* tag = NULL);
-  iBase* Get (char const* tag);
-  iBase* Get (scfInterfaceID, int version);
-
 protected:
   /**
    * Print help for an iConfig interface.
@@ -423,8 +412,6 @@ public:
   /// Get the installation path.
   virtual bool GetInstallPath (char *oInstallPath, size_t iBufferSize);
 
-  /// Get the system configuration file: this does NOT IncRef the object
-  virtual iConfigManager *GetConfig ();
   /**
    * Add a config file to the global config manager (convenience method).
    * The returned config file is the newly loaded file. You must keep the
@@ -461,30 +448,22 @@ public:
   /// Get a public event outlet for posting just a single event and such.
   virtual iEventOutlet *GetSystemEventOutlet ();
 
-  /// Return the command line parser
-  virtual iCommandLineParser *GetCommandLine ();
-
   //------------------------------------------------------------------
 
   class ObjectRegistry : public iObjectRegistry
   {
+  private:
+    csVector registry;
+    csVector tags;
+
+  public:
+    virtual ~ObjectRegistry ();
+
     SCF_DECLARE_EMBEDDED_IBASE (csSystemDriver);
-    virtual bool Register (iBase* obj, char const* tag = NULL)
-    {
-      return scfParent->Register (obj, tag);
-    }
-    virtual void Unregister (iBase* obj, char const* tag = NULL)
-    {
-      scfParent->Unregister (obj, tag);
-    }
-    virtual iBase* Get (char const* tag)
-    {
-      return scfParent->Get (tag);
-    }
-    virtual iBase* Get (scfInterfaceID id, int version)
-    {
-      return scfParent->Get (id, version);
-    }
+    virtual bool Register (iBase* obj, char const* tag = NULL);
+    virtual void Unregister (iBase* obj, char const* tag = NULL);
+    virtual iBase* Get (char const* tag);
+    virtual iBase* Get (scfInterfaceID id, int version);
   } scfiObjectRegistry;
   friend class ObjectRegistry;
 

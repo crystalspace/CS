@@ -28,6 +28,7 @@
 #include "isys/system.h"
 #include "iutil/cfgfile.h"
 #include "iutil/cmdline.h"
+#include "iutil/objreg.h"
 #include "csdive.h"
 #include "libDIVE.h"
 #include "libDIVEprv.h"
@@ -123,9 +124,12 @@ bool csGraphics2DOS2DIVE::Initialize (iSystem* pSystem)
   WindowWidth = Config->GetInt ("Video.WindowWidth", -1);
   WindowHeight = Config->GetInt ("Video.WindowHeight", -1);
   HardwareCursor = Config->GetBool ("Video.SystemMouseCursor", true);
+  iObjectRegistry* object_reg = System->GetObjectRegistry ();
+  iCommandLineParser* cmdline = CS_QUERY_REGISTRY (object_reg,
+  	iCommandLineParser);
 
   const char *val;
-  if ((val = System->GetCommandLine ()->GetOption ("winsize")))
+  if ((val = cmdline->GetOption ("winsize")))
   {
     int wres, hres;
     if (sscanf (val, "%d,%d", &wres, &hres) == 2)
@@ -137,7 +141,7 @@ bool csGraphics2DOS2DIVE::Initialize (iSystem* pSystem)
       System->Printf (CS_MSG_WARNING, "Bad value `%s' for -winsize command-line parameter (W,H expected)\n", val);
   }
 
-  if ((val = System->GetCommandLine ()->GetOption ("winpos")))
+  if ((val = cmdline->GetOption ("winpos")))
   {
     int xpos, ypos;
     if (sscanf (val, "%d,%d", &xpos, &ypos) == 2)
@@ -149,10 +153,8 @@ bool csGraphics2DOS2DIVE::Initialize (iSystem* pSystem)
       System->Printf (CS_MSG_WARNING, "Bad value `%s' for -winpos command-line parameter (X,Y expected)\n", val);
   }
 
-  if (System->GetCommandLine ()->GetOption ("sysmouse"))
-    HardwareCursor = true;
-  if (System->GetCommandLine ()->GetOption ("nosysmouse"))
-    HardwareCursor = false;
+  if (cmdline->GetOption ("sysmouse")) HardwareCursor = true;
+  if (cmdline->GetOption ("nosysmouse")) HardwareCursor = false;
 
   EventOutlet = System->CreateEventOutlet (this);
 

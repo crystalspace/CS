@@ -21,6 +21,7 @@
 #include "x11comm.h"
 #include "csutil/cfgacc.h"
 #include "iutil/cmdline.h"
+#include "iutil/objreg.h"
 
 void GetX11Settings (iSystem *iSys, int &oSimDepth, bool &oUseSHM,
   bool &oHardwareCursor)
@@ -30,25 +31,24 @@ void GetX11Settings (iSystem *iSys, int &oSimDepth, bool &oUseSHM,
   oUseSHM = Config->GetBool ("Video.XSHM", true);
   oHardwareCursor = Config->GetBool ("Video.SystemMouseCursor", true);
 
+  iObjectRegistry* object_reg = iSys->GetObjectRegistry ();
+  iCommandLineParser* cmdline = CS_QUERY_REGISTRY (object_reg,
+  	iCommandLineParser);
+
   const char *val;
-  if ((val = iSys->GetCommandLine ()->GetOption ("shm")))
-    oUseSHM = true;
-
-  if ((val = iSys->GetCommandLine ()->GetOption ("noshm")))
-    oUseSHM = false;
-
-  if ((val = iSys->GetCommandLine ()->GetOption ("sdepth")))
+  if ((val = cmdline->GetOption ("shm"))) oUseSHM = true;
+  if ((val = cmdline->GetOption ("noshm"))) oUseSHM = false;
+  if ((val = cmdline->GetOption ("sdepth")))
   {
     oSimDepth = atol (val);
     if (oSimDepth != 8 && oSimDepth != 15 && oSimDepth != 16 && oSimDepth != 32)
     {
-      iSys->Printf (CS_MSG_WARNING, "Crystal Space can't run in this simulated depth! (use 8, 15, 16, or 32)!\n");
+      iSys->Printf (CS_MSG_WARNING,
+      	"Crystal Space can't run in this simulated depth! (use 8, 15, 16, or 32)!\n");
       oSimDepth = 0;
     }
   }
 
-  if (iSys->GetCommandLine ()->GetOption ("sysmouse"))
-    oHardwareCursor = true;
-  if (iSys->GetCommandLine ()->GetOption ("nosysmouse"))
-    oHardwareCursor = false;
+  if (cmdline->GetOption ("sysmouse")) oHardwareCursor = true;
+  if (cmdline->GetOption ("nosysmouse")) oHardwareCursor = false;
 }

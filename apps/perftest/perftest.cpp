@@ -98,6 +98,8 @@ bool PerfTest::Initialize (int argc, const char* const argv[],
 
   iObjectRegistry* object_reg = GetObjectRegistry ();
   iPluginManager* plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
+  iCommandLineParser* cmdline = CS_QUERY_REGISTRY (object_reg,
+  	iCommandLineParser);
 
   ImageLoader = CS_QUERY_PLUGIN_ID(plugin_mgr, CS_FUNCID_IMGLOADER, iImageIO);
   if (!ImageLoader) {
@@ -147,7 +149,7 @@ bool PerfTest::Initialize (int argc, const char* const argv[],
   txtmgr->SetPalette ();
 
   const char *val;
-  if ((val = GetCommandLine ()->GetOption ("2d")))
+  if ((val = cmdline->GetOption ("2d")))
   {
     current_tester = new StringTester ();
     draw_3d = false;
@@ -155,7 +157,7 @@ bool PerfTest::Initialize (int argc, const char* const argv[],
   else
     current_tester = new SinglePolygonTester ();
 
-  if ((val = GetCommandLine ()->GetOption ("3d")))
+  if ((val = cmdline->GetOption ("3d")))
     draw_2d = false;
 
   needs_setup = true;

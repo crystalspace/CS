@@ -26,6 +26,7 @@
 #include "csutil/cfgacc.h"
 #include "iutil/cfgfile.h"
 #include "iutil/cmdline.h"
+#include "iutil/objreg.h"
 #include "isys/event.h"
 #include "isys/system.h"
 #include "csver.h"
@@ -120,7 +121,10 @@ bool NeXTDriver2D::init_driver(int desired_depth)
 int NeXTDriver2D::get_desired_depth() const
 {
   int depth = 0;
-  char const* s = System->GetCommandLine ()->GetOption("simdepth");
+  iObjectRegistry* object_reg = System->GetObjectRegistry ();
+  iCommandLineParser* cmdline = CS_QUERY_REGISTRY (object_reg,
+  	iCommandLineParser);
+  char const* s = cmdline->GetOption("simdepth");
   if (s != 0)
     depth = atoi(s);
   else

@@ -2807,7 +2807,8 @@ const char* Blocks::KeyName (const KeyMapping& map)
 
 void Blocks::ReadConfig ()
 {
-  iConfigFile *keys = GetConfig();
+  iObjectRegistry* object_reg = Sys->GetObjectRegistry ();
+  iConfigFile* keys = CS_QUERY_REGISTRY (object_reg, iConfigManager);
   NamedKey (keys->GetStr ("Blocks.Keys.Up", "up"), key_up);
   NamedKey (keys->GetStr ("Blocks.Keys.Down", "down"), key_down);
   NamedKey (keys->GetStr ("Blocks.Keys.Left", "left"), key_left);
@@ -2852,7 +2853,8 @@ void Blocks::ReadConfig ()
 
 void Blocks::WriteConfig ()
 {
-  iConfigFile *keys = GetConfig();
+  iObjectRegistry* object_reg = Sys->GetObjectRegistry ();
+  iConfigFile* keys = CS_QUERY_REGISTRY (object_reg, iConfigManager);
   keys->SetStr ("Blocks.Keys.Up", KeyName (key_up));
   keys->SetStr ("Blocks.Keys.Down", KeyName (key_down));
   keys->SetStr ("Blocks.Keys.Left", KeyName (key_left));
@@ -3088,6 +3090,7 @@ int main (int argc, char* argv[])
 
   iObjectRegistry* object_reg = Sys->GetObjectRegistry ();
   plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
+  iConfigManager* config = CS_QUERY_REGISTRY (object_reg, iConfigManager);
 
   // Open the main system. This will open all the previously loaded plug-ins.
   if (!Sys->Open ("3D Blocks"))
@@ -3146,7 +3149,7 @@ int main (int argc, char* argv[])
   // Change to virtual directory where Blocks data is stored
   //if (!)
 
-  csString world_file(Sys->GetConfig ()->GetStr ("Blocks.Data", "/data/blocks"));
+  csString world_file(config->GetStr ("Blocks.Data", "/data/blocks"));
   world_file.Append("/");
   if (!Sys->myVFS->Exists (world_file.GetData()))
   {

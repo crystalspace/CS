@@ -29,6 +29,7 @@
 #include "isys/system.h"
 #include "iutil/cfgfile.h"
 #include "iutil/cmdline.h"
+#include "iutil/objreg.h"
 
 // shit ...
 #undef SEVERITY_ERROR
@@ -111,9 +112,12 @@ bool csGraphics2DOS2GL::Initialize (iSystem *pSystem)
   WindowX = Config->GetInt ("Video.WindowX", INT_MIN);
   WindowY = Config->GetInt ("Video.WindowY", INT_MIN);
   HardwareCursor = Config->GetBool ("Video.SystemMouseCursor", true);
+  iObjectRegistry* object_reg = System->GetObjectRegistry ();
+  iCommandLineParser* cmdline = CS_QUERY_REGISTRY (object_reg,
+  	iCommandLineParser);
 
   const char *val;
-  if ((val = System->GetCommandLine ()->GetOption ("winpos")))
+  if ((val = cmdline->GetOption ("winpos")))
   {
     int xpos, ypos;
     if (sscanf (val, "%d,%d", &xpos, &ypos) == 2)
@@ -125,9 +129,9 @@ bool csGraphics2DOS2GL::Initialize (iSystem *pSystem)
       System->Printf (CS_MSG_WARNING, "Bad value `%s' for -winpos command-line parameter (X,Y expected)\n", val);
   }
 
-  if (System->GetCommandLine ()->GetOption ("sysmouse"))
+  if (cmdline->GetOption ("sysmouse"))
     HardwareCursor = true;
-  if (System->GetCommandLine ()->GetOption ("nosysmouse"))
+  if (cmdline->GetOption ("nosysmouse"))
     HardwareCursor = false;
 
   EventOutlet = System->CreateEventOutlet (this);

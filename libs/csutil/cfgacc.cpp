@@ -19,6 +19,7 @@
 #include "cssysdef.h"
 #include "csutil/cfgacc.h"
 #include "iutil/cfgmgr.h"
+#include "iutil/objreg.h"
 
 csConfigAccess::csConfigAccess()
 {
@@ -46,10 +47,14 @@ void csConfigAccess::AddConfig(iSystem *sys, const char *fname,
 
 iConfigFile *csConfigAccess::operator->()
 {
-  return System->GetConfig();
+  iObjectRegistry* object_reg = System->GetObjectRegistry ();
+  iConfigFile* cfg = CS_QUERY_REGISTRY (object_reg, iConfigManager);
+  return cfg;
 }
 
 csConfigAccess::operator iConfigFile* ()
 {
-  return System->GetConfig();
+  iObjectRegistry* object_reg = System->GetObjectRegistry ();
+  iConfigFile* cfg = CS_QUERY_REGISTRY (object_reg, iConfigManager);
+  return cfg;
 }

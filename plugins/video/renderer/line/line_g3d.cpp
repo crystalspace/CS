@@ -107,17 +107,19 @@ csGraphics3DLine::~csGraphics3DLine ()
 bool csGraphics3DLine::Initialize (iSystem *iSys)
 {
   System = iSys;
+  iObjectRegistry* object_reg = System->GetObjectRegistry ();
+  iPluginManager* plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
+  iCommandLineParser* cmdline = CS_QUERY_REGISTRY (object_reg,
+  	iCommandLineParser);
 
   config.AddConfig(System, "/config/line3d.cfg");
 
   width = height = -1;
 
-  const char *driver = iSys->GetCommandLine ()->GetOption ("canvas");
+  const char *driver = cmdline->GetOption ("canvas");
   if (!driver)
     driver = config->GetStr ("Video.Line.Canvas", LINE_CS_SOFTWARE_2D_DRIVER);
 
-  iObjectRegistry* object_reg = System->GetObjectRegistry ();
-  iPluginManager* plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
   G2D = CS_LOAD_PLUGIN (plugin_mgr, driver, NULL, iGraphics2D);
   if (!G2D)
     return false;

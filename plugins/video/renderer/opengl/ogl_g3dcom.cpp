@@ -211,8 +211,10 @@ bool csGraphics3DOGLCommon::Initialize (iSystem* p)
 bool csGraphics3DOGLCommon::NewInitialize ()
 {
   config.AddConfig(System, "/config/opengl.cfg");
+  iCommandLineParser* cmdline = CS_QUERY_REGISTRY (object_reg,
+  	iCommandLineParser);
 
-  const char *driver = System->GetCommandLine ()->GetOption ("canvas");
+  const char *driver = cmdline->GetOption ("canvas");
   if (!driver)
     driver = config->GetStr ("Video.OpenGL.Canvas", CS_OPENGL_2D_DRIVER);
 

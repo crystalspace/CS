@@ -540,7 +540,10 @@ int main (int argc, char* argv[])
   srand (time (NULL));
   System = &Sys;
 
-  Sys.GetCommandLine ()->AddOption ("mode", "800x600");
+  iObjectRegistry* object_reg = System->GetObjectRegistry ();
+  iCommandLineParser* cmdline = CS_QUERY_REGISTRY (object_reg,
+  	iCommandLineParser);
+  cmdline->AddOption ("mode", "800x600");
   System->RequestPlugin ("crystalspace.kernel.vfs:VFS");
   System->RequestPlugin ("crystalspace.font.server.default:FontServer");
   System->RequestPlugin ("crystalspace.graphic.image.io.multiplex:ImageLoader");

@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 1998,1999,2000 by Jorrit Tyberghein
+    Copyright (C) 1998-2001 by Jorrit Tyberghein
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -63,10 +63,9 @@ struct iEventCord;
 struct iStrVector;
 struct iConfigFile;
 struct iConfigManager;
-struct iCommandLineParser;
 
 
-SCF_VERSION (iSystem, 5, 0, 0);
+SCF_VERSION (iSystem, 6, 0, 0);
 
 /**
  * This interface serves as a way for plug-ins to query Crystal Space about
@@ -208,8 +207,6 @@ struct iSystem : public iBase
     // command-line priority
     ConfigPriorityCmdLine       = iConfigManager::PriorityVeryHigh
   };
-  /// Get the system configuration file: this does NOT IncRef the object
-  virtual iConfigManager *GetConfig () = 0;
   /**
    * Add a config file to the global config manager (convenience method).
    * The returned config file is the newly loaded file. You must keep the
@@ -274,11 +271,6 @@ struct iSystem : public iBase
    * DecRef it after usage.
    */
   virtual iEventOutlet *GetSystemEventOutlet () = 0;
-
-  //--------------------------- Command-line access --------------------------//
-
-  /// Return the command line parser
-  virtual iCommandLineParser *GetCommandLine () = 0;
 };
 
 #endif // __ISYS_SYSTEM_H__

@@ -28,6 +28,7 @@
 #include "isys/system.h"
 #include "iutil/cfgmgr.h"
 #include "iutil/cmdline.h"
+#include "iutil/objreg.h"
 #include "isys/plugin.h"
 
 CS_IMPLEMENT_PLUGIN
@@ -85,11 +86,12 @@ bool csGraphics2DLineXLib::Initialize (iSystem *pSystem)
     XSetLocaleModifiers ("");
 
   csConfigAccess Config(pSystem, "/config/video.cfg");
+  iObjectRegistry* object_reg = pSystem->GetObjectRegistry ();
+  iCommandLineParser* cmdline = CS_QUERY_REGISTRY (object_reg,
+  	iCommandLineParser);
   do_hwmouse = Config->GetBool ("Video.SystemMouseCursor", true);
-  if (System->GetCommandLine ()->GetOption ("sysmouse"))
-    do_hwmouse = true;
-  if (System->GetCommandLine ()->GetOption ("nosysmouse"))
-    do_hwmouse = false;
+  if (cmdline->GetOption ("sysmouse")) do_hwmouse = true;
+  if (cmdline->GetOption ("nosysmouse")) do_hwmouse = false;
 
   screen_num = DefaultScreen (dpy);
   root_window = RootWindow (dpy, screen_num);

@@ -27,6 +27,7 @@
 #include "isys/system.h"
 #include "isys/event.h"
 #include "iutil/cfgfile.h"
+#include "iutil/objreg.h"
 #include "qint.h"
 
 #include "csaa.h"
@@ -71,8 +72,9 @@ bool csGraphics2DAA::Initialize (iSystem *pSystem)
   config.AddConfig(pSystem, "/config/video.cfg");
 
   // Load settings from config file and setup the aa_defparams structure
-  HardwareCursor = System->GetConfig ()->GetBool
-        ("Video.SystemMouseCursor", true);
+  iObjectRegistry* object_reg = System->GetObjectRegistry ();
+  iConfigManager* cfg = CS_QUERY_REGISTRY (object_reg, iConfigManager);
+  HardwareCursor = config->GetBool ("Video.SystemMouseCursor", true);
 
   aa_defparams.width =
   aa_defparams.recwidth = config->GetInt ("Video.ASCII.Console.Width", 80);

@@ -307,13 +307,16 @@ csSystemDriver::csSystemDriver () : Plugins (8, 8), EventQueue (),
   G2D = NULL;
 
   Console = NULL;
-  Config = NULL;
 
   debug_level = 0;
   Shutdown = false;
   CurrentTime = csTime (-1);
 
-  CommandLine = new csCommandLineParser ();
+  scfiObjectRegistry.Register (&scfiPluginManager, "PluginManager");
+  iCommandLineParser* cmdline = new csCommandLineParser ();
+  scfiObjectRegistry.Register (cmdline, "CommandLine");
+  //@@@ cmdline->DecRef (); Uncomment when object registry moves out
+  // of system driver.
 }
 
 csSystemDriver::~csSystemDriver ()
@@ -335,13 +338,6 @@ csSystemDriver::~csSystemDriver ()
   Plugins.DeleteAll ();
   // Free the system event outlet
   EventOutlets.DeleteAll ();
-
-  // this must happen *after* the plug-ins are deleted, because most plug-ins
-  // de-register their config file at destruction time
-  if (Config) Config->DecRef ();
-
-  // release the command line parser
-  CommandLine->DecRef ();
 
   iSCF::SCF->Finish ();
 }
@@ -385,7 +381,9 @@ bool csSystemDriver::Initialize (int argc, const char* const argv[],
   // config file the dynamic one.
 
   iConfigFile *cfg = new csConfigFile();
-  Config = new csConfigManager(cfg, true);
+  iConfigManager* Config = new csConfigManager(cfg, true);
+  scfiObjectRegistry.Register (Config, "ConfigManager");
+  // @@@ Config->DecRef (); uncomment when object reg outside system driver
   cfg->DecRef ();
   Config->SetDomainPriority(cfg, ConfigPriorityApplication);
   VFS = CS_LOAD_PLUGIN (this, "crystalspace.kernel.vfs", CS_FUNCID_VFS, iVFS);
@@ -416,6 +414,8 @@ bool csSystemDriver::Initialize (int argc, const char* const argv[],
   }
   
   // Collect all options from command line
+  iCommandLineParser* CommandLine = CS_QUERY_REGISTRY ((&scfiObjectRegistry),
+  	iCommandLineParser);
   CommandLine->Initialize (argc, argv);
 
   // Analyse config and command line
@@ -627,6 +627,9 @@ void csSystemDriver::SetSystemDefaults (iConfigManager *Config)
   // Now analyze command line
   const char *val;
 
+  iCommandLineParser* CommandLine = CS_QUERY_REGISTRY ((&scfiObjectRegistry),
+  	iCommandLineParser);
+
   if ((val = CommandLine->GetOption ("debug")))
     debug_level = atoi(val);
 
@@ -735,6 +738,9 @@ void csSystemDriver::DebugTextOut (bool flush, const char *str)
 
 void csSystemDriver::QueryOptions (iPlugin *iObject)
 {
+  iCommandLineParser* CommandLine = CS_QUERY_REGISTRY ((&scfiObjectRegistry),
+  	iCommandLineParser);
+
   iConfig *Config = SCF_QUERY_INTERFACE (iObject, iConfig);
   if (Config)
   {
@@ -794,6 +800,10 @@ void csSystemDriver::QueryOptions (iPlugin *iObject)
 
 void csSystemDriver::RequestPlugin (const char *iPluginName)
 {
+  // @@@ WARNING we have to query for the commandline by tag name
+  // because SCF is not yet initialized at the point we come here.
+  iCommandLineParser* CommandLine = (iCommandLineParser*)(
+  	CS_QUERY_REGISTRY_TAG ((&scfiObjectRegistry), "CommandLine"));
   CommandLine->AddOption ("plugin", iPluginName);
 }
 
@@ -1030,18 +1040,19 @@ bool csSystemDriver::UnloadPlugin (iPlugin *iObject)
   return Plugins.Delete (idx);
 }
 
-iConfigManager *csSystemDriver::GetConfig ()
-{
-  return Config;
-}
-
 iConfigFile *csSystemDriver::AddConfig(const char *iFileName, bool iVFS, int Priority)
 {
+  iConfigManager* Config = CS_QUERY_REGISTRY ((&scfiObjectRegistry),
+  	iConfigManager);
+  if (!Config) return NULL;
   return Config->AddDomain(iFileName, iVFS ? VFS : NULL, Priority);
 }
 
 void csSystemDriver::RemoveConfig(iConfigFile *cfg)
 {
+  iConfigManager* Config = CS_QUERY_REGISTRY ((&scfiObjectRegistry),
+  	iConfigManager);
+  if (!Config) return;
   Config->RemoveDomain(cfg);
 }
 
@@ -1052,6 +1063,9 @@ iConfigFile *csSystemDriver::CreateSeparateConfig (const char *iFileName, bool i
 
 bool csSystemDriver::SaveConfig ()
 {
+  iConfigManager* Config = CS_QUERY_REGISTRY ((&scfiObjectRegistry),
+  	iConfigManager);
+  if (!Config) return false;
   return Config->Save ();
 }
 
@@ -1121,34 +1135,73 @@ iEventOutlet *csSystemDriver::GetSystemEventOutlet ()
   return EventOutlets.Get (0);
 }
 
-iCommandLineParser *csSystemDriver::GetCommandLine ()
+//---------------------------------------------------------------------------
+
+csSystemDriver::ObjectRegistry::~ObjectRegistry ()
 {
-  return CommandLine;
+  int i;
+  for (i = 0 ; i < registry.Length () ; i++)
+  {
+    //iBase* b = (iBase*)registry[i];
+    //b->DecRef ();	// @@@ Enable as soon as object reg moves out system
+    char* t = (char*)tags[i];
+    delete[] t;
+  }
 }
 
-bool csSystemDriver::Register (iBase*, char const* tag)
+bool csSystemDriver::ObjectRegistry::Register (iBase* obj, char const* tag)
 {
-  // @@@ TODO
+  registry.Push (obj);
+  tags.Push ((void*)(tag ? csStrNew (tag) : NULL));
   return false;
 }
 
-void csSystemDriver::Unregister (iBase*, char const* tag)
+void csSystemDriver::ObjectRegistry::Unregister (iBase* obj, char const* tag)
 {
-  // @@@ TODO
+  int i;
+  for (i = 0 ; i < registry.Length () ; i++)
+  {
+    iBase* b = (iBase*)registry[i];
+    if (b == obj)
+    {
+      char* t = (char*)tags[i];
+      if ((t == NULL && tag == NULL) ||
+          (t != NULL && tag != NULL && !strcmp (tag, t)))
+      {
+        delete[] t;
+        //b->DecRef ();	// @@@ Enable as soon as object reg moves out system
+	if (tag != NULL) return;	// Continue if tag == NULL
+      }
+    }
+  }
 }
 
-iBase* csSystemDriver::Get (char const* tag)
+iBase* csSystemDriver::ObjectRegistry::Get (char const* tag)
 {
-  if (!strcmp (tag, "PluginManager"))
+  int i;
+  for (i = 0 ; i < registry.Length () ; i++)
   {
-    return &scfiPluginManager;
+    char* t = (char*)tags[i];
+    if (t && !strcmp (tag, t))
+    {
+      iBase* b = (iBase*)registry[i];
+      return b;
+    }
   }
   return NULL;
 }
 
-iBase* csSystemDriver::Get (scfInterfaceID, int version)
+iBase* csSystemDriver::ObjectRegistry::Get (scfInterfaceID id, int version)
 {
-  // @@@
-  return &scfiPluginManager;
+  int i;
+  for (i = 0 ; i < registry.Length () ; i++)
+  {
+    iBase* b = (iBase*)registry[i];
+    iBase* interf = (iBase*)(b->QueryInterface (id, version));
+    if (interf) { interf->DecRef (); return interf; }
+  }
+  return NULL;
 }
+
+//---------------------------------------------------------------------------
 

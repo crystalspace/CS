@@ -26,6 +26,7 @@
 #include "ivideo/fontserv.h"
 #include "iutil/cfgmgr.h"
 #include "iutil/cmdline.h"
+#include "iutil/objreg.h"
 #include <sys/stat.h>
 #include "csgeom/csrect.h"
 
@@ -1537,9 +1538,13 @@ int main (int argc, char* argv[])
     return -1;
 
   // Look for skin variant from config file
-  DefaultSkin.Prefix = System.GetCommandLine ()->GetOption ("skin");
+  iObjectRegistry* object_reg = System.GetObjectRegistry ();
+  iCommandLineParser* cmdline = CS_QUERY_REGISTRY (object_reg,
+  	iCommandLineParser);
+  iConfigManager* cfg = CS_QUERY_REGISTRY (object_reg, iConfigManager);
+  DefaultSkin.Prefix = cmdline->GetOption ("skin");
   if (!DefaultSkin.Prefix)
-    DefaultSkin.Prefix = System.GetConfig ()->GetStr ("CSWS.Skin.Variant", NULL);
+    DefaultSkin.Prefix = cfg->GetStr ("CSWS.Skin.Variant", NULL);
 
   // Create our application object
   CsfEdit app (&System, DefaultSkin);

@@ -35,6 +35,7 @@
 #include "sft3dcom.h"
 #include "iutil/cfgfile.h"
 #include "iutil/cmdline.h"
+#include "iutil/objreg.h"
 
 #if defined (DO_MMX)
 #  include "video/renderer/software/i386/cpuid.h"
@@ -295,11 +296,14 @@ bool csGraphics3DSoftwareCommon::Initialize (iSystem* p)
 void csGraphics3DSoftwareCommon::NewInitialize ()
 {
   config.AddConfig(System, "/config/soft3d.cfg");
+  iObjectRegistry* object_reg = System->GetObjectRegistry ();
+  iCommandLineParser* cmdline = CS_QUERY_REGISTRY (object_reg,
+  	iCommandLineParser);
   do_smaller_rendering = config->GetBool ("Video.Software.Smaller", false);
   mipmap_coef = config->GetFloat ("Video.Software.TextureManager.MipmapCoef", 1.3);
   do_interlaced = config->GetBool ("Video.Software.Interlacing", false) ? 0 : -1;
 
-  const char *gamma = System->GetCommandLine ()->GetOption ("gamma");
+  const char *gamma = cmdline->GetOption ("gamma");
   if (!gamma) gamma = config->GetStr ("Video.Software.Gamma", "1");
   float fGamma;
   sscanf (gamma, "%f", &fGamma);
