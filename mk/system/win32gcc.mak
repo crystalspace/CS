@@ -178,10 +178,3 @@ ifeq ($(ROOTCONFIG),config)
 SYSCONFIG=bin/win32conf.bat
 
 endif # ifeq ($(ROOTCONFIG),config)
-
-ifeq ($(ROOTCONFIG),volatile)
-
-# Does this OS have native COM support?
-NATIVE_COM=yes
-
-endif # ifeq ($(ROOTCONFIG),volatile)

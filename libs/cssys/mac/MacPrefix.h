@@ -2,8 +2,6 @@
 
 // some mac specific defines
 
-#define NO_COM_SUPPORT	1
-
 #define __NEED_OPENDIR_PROTOTYPE	1
 
 #define SCAN_KEYBOARD		1

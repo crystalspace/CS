@@ -8,9 +8,6 @@ endif
 ifeq ($(MODE),debug)
   MAKE_VOLATILE_H+=$(NEWLINE)echo $"\#define DEBUG$">>volatile.tmp
 endif
-ifneq ($(NATIVE_COM),yes)
-  MAKE_VOLATILE_H+=$(NEWLINE)echo $"\#define NO_COM_SUPPORT$">>volatile.tmp
-endif
 ifeq ($(DO_SOUND),yes)
   MAKE_VOLATILE_H+=$(NEWLINE)echo $"\#define DO_SOUND$">>volatile.tmp
 endif

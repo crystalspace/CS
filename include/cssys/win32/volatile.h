@@ -24,7 +24,6 @@
   #define DO_AU
   #define DO_MMX
   #define ZLIB_DLL
-  #define NO_COM_SUPPORT    // undefine this, if you want native COM on Windows.
   #undef DO_DINPUT_KEYBOARD // undefine this if you have problems with keyboard handling
 
   //#ifdef _DEBUG
