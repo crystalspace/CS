@@ -20,6 +20,7 @@ Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "cssysdef.h"
 
 #include "csutil/csvector.h"
+#include "csutil/hashmap.h"
 #include "csutil/objreg.h"
 #include "csutil/ref.h"
 #include "csutil/scf.h"

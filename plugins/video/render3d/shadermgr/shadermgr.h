@@ -25,6 +25,9 @@
 #include "csutil/objreg.h"
 #include "csutil/csstring.h"
 
+#include "iutil/event.h"
+#include "iutil/eventh.h"
+
 #include "iutil/string.h"
 #include "iutil/comp.h"
 
@@ -34,11 +37,17 @@ class csShaderManager : public iShaderManager
 {
 private:
   csRef<iObjectRegistry> objectreg;
+  csRef<iVirtualClock> vc;
 
   csHashMap* variables;
   csBasicVector* shaders;
 
   int seqnumber;
+
+  // standard variables
+  // these are inited and updated by the shadermanager itself
+  csRef<iShaderVariable> sv_time;
+  void UpdateStandardVariables();
 public:
   SCF_DECLARE_IBASE;
 
@@ -59,7 +68,7 @@ public:
   /// Add a variable to this context
   virtual bool AddVariable(iShaderVariable* variable) ;
   /// Get variable
-  virtual iShaderVariable* GetVariable(const char* string) ;
+  virtual iShaderVariable* GetVariable(const char* string);
   /// Get all variable stringnames added to this context (used when creatingthem)
   virtual csBasicVector GetAllVariableNames() ; 
 
@@ -67,6 +76,7 @@ public:
   virtual csPtr<iShaderProgram> CreateShaderProgramFromFile(const char* programfile, const char* type);
   /// Create a shaderprogram from a string describing it
   virtual csPtr<iShaderProgram> CreateShaderProgramFromString(const char* programstring, const char* type);
+
   //==================== iComponent ====================//
   bool Initialize(iObjectRegistry* objreg);
 
@@ -78,9 +88,31 @@ public:
       return scfParent->Initialize( objectreg );
     }
   } scfiComponent;
+
+  ////////////////////////////////////////////////////////////////////
+  //                         iEventHandler
+  ////////////////////////////////////////////////////////////////////
+  
+  bool HandleEvent (iEvent& Event);
+
+  struct EventHandler : public iEventHandler
+  {
+  private:
+    csShaderManager* parent;
+  public:
+    EventHandler (csShaderManager* parent)
+    {
+      SCF_CONSTRUCT_IBASE (NULL);
+      EventHandler::parent = parent;
+    }
+    
+    SCF_DECLARE_IBASE;
+    virtual bool HandleEvent (iEvent& ev) 
+      { return parent->HandleEvent (ev); }
+  } * scfiEventHandler;
 };
 
-class csShaderVariable : public iShaderVariable
+/*class csShaderVariable : public iShaderVariable
 {
 private:
   csString name;
@@ -109,19 +141,21 @@ public:
   virtual bool SetValue(csVector3 value) { type=2; v3 = value; return true; }
 //  virtual bool SetValue(csVector4* value);
 };
-
+*/
 class csShader : public iShader
 {
 private:
   csHashMap* variables;
   csBasicVector* techniques;
-
+  csShaderManager* parent;
   char* name;
 public:
   SCF_DECLARE_IBASE;
 
-  csShader();
-  csShader(const char* name);
+  csShaderManager* GetParent() {return parent;}
+
+  csShader(csShaderManager* owner);
+  csShader(const char* name, csShaderManager* owner);
   virtual ~csShader();
 
   //====================== iShader =====================//
@@ -164,11 +198,13 @@ class csShaderTechnique : public iShaderTechnique
 private:
   int priority;
   csBasicVector* passes;
-
+  csShader* parent;
 public:
   SCF_DECLARE_IBASE;
+
+  csShader* GetParent() {return parent;}
   
-  csShaderTechnique();
+  csShaderTechnique(csShader* owner);
   virtual ~csShaderTechnique();
   
 
@@ -200,13 +236,19 @@ class csShaderPass : public iShaderPass
 private:
   csRef<iShaderProgram> vp;
   csRef<iShaderProgram> fp;
+
+  csShaderTechnique* parent;
+  csHashMap variables;
 public:
   SCF_DECLARE_IBASE;
 
-  csShaderPass()
+  iShaderTechnique* GetParent() {return parent;}
+
+  csShaderPass(csShaderTechnique* owner)
   {
     SCF_CONSTRUCT_IBASE( NULL );
     vp = 0; fp = 0;
+    parent = owner;
   }
 
   /// Get vertex-program
@@ -232,16 +274,23 @@ public:
   /// Activate
   virtual void Activate()
   {
-    if(vp) vp->Activate();
-    if(fp) fp->Activate();
+    if(vp) vp->Activate(this);
+    if(fp) fp->Activate(this);
   }
 
   /// Deactivate
   virtual void Deactivate()
   {
-    if(vp) vp->Deactivate();
-    if(fp) fp->Deactivate();
+    if(vp) vp->Deactivate(this);
+    if(fp) fp->Deactivate(this);
   }
+
+  /// Add a variable to this context
+  virtual bool AddVariable(iShaderVariable* variable){return false;}
+  /// Get variable
+  virtual iShaderVariable* GetVariable(const char* string);
+  /// Get all variable stringnames in this context (used when creatingthem)
+  virtual csBasicVector GetAllVariableNames() {return csBasicVector();}
 };
 
 #endif //__SHADERMGR_H__

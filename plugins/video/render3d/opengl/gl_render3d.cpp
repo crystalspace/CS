@@ -778,7 +778,7 @@ bool csGLRender3D::BeginDraw (int drawflags)
 
 void csGLRender3D::FinishDraw ()
 {
-  printf ("Number of tris: %i\n", tricnt);
+  //printf ("Number of tris: %i\n", tricnt);
   tricnt = 0;
   SetMirrorMode (false);
 
@@ -973,6 +973,7 @@ void csGLRender3D::DrawMesh(csRenderMesh* mymesh)
     alpha = 1.0f - BYTE_TO_FLOAT (mymesh->mixmode & CS_FX_MASK_ALPHA);
     alpha = SetMixMode (mymesh->mixmode, alpha, 
       txthandle->GetKeyColor () || txthandle->GetAlphaMap ());
+
   } else {
     statecache->DisableState (GL_TEXTURE_2D);
 
@@ -988,18 +989,37 @@ void csGLRender3D::DrawMesh(csRenderMesh* mymesh)
 
   glColor4f (red, green, blue, alpha);
 
-  glDrawElements (
-    GL_TRIANGLES,
-    mymesh->GetIndexEnd ()-mymesh->GetIndexStart (),
-    GL_UNSIGNED_INT,
-    ((unsigned int*)indexbuf->Lock(iRenderBuffer::CS_BUF_LOCK_RENDER))
-    +mymesh->GetIndexStart ());
-
-  if (mathandle)
+  csRef<iShader> shader = mymesh->GetMaterialWrapper()->GetMaterial()->GetShader();
+  bool useshader = false;
+  if(shader)
   {
-    for (int l=0; l<mathandle->GetTextureLayerCount (); l++)
+    useshader = true;
+    csRef<iShaderTechnique> tech = shader->GetBestTechnique();
+    
+    int currp;
+    for(currp = 0; currp< tech->GetPassCount(); ++currp)
     {
-      csTextureLayer* layer = mathandle->GetTextureLayer (l);
+      tech->GetPass(currp)->Activate();
+      glDrawElements (
+      GL_TRIANGLES,
+      mymesh->GetIndexEnd ()-mymesh->GetIndexStart (),
+      GL_UNSIGNED_INT,
+      ((unsigned int*)indexbuf->Lock(iRenderBuffer::CS_BUF_LOCK_RENDER))
+      +mymesh->GetIndexStart ());
+      tech->GetPass(currp)->Deactivate();
+    }
+  }else{
+    glDrawElements (
+      GL_TRIANGLES,
+      mymesh->GetIndexEnd ()-mymesh->GetIndexStart (),
+      GL_UNSIGNED_INT,
+      ((unsigned int*)indexbuf->Lock(iRenderBuffer::CS_BUF_LOCK_RENDER))
+      +mymesh->GetIndexStart ());
+
+    csMaterialHandle* handle = (csMaterialHandle*)mymesh->GetMaterialWrapper ()->GetMaterialHandle ();
+    for (int l=0; l<handle->GetTextureLayerCount (); l++)
+    {
+      csTextureLayer* layer = handle->GetTextureLayer (l);
       txthandle = layer->txt_handle;
       if (txthandle)
       {
@@ -1042,6 +1062,7 @@ void csGLRender3D::DrawMesh(csRenderMesh* mymesh)
       glPopMatrix ();
     }
   }
+
 
   vertexbuf->Release();
   glDisableClientState (GL_VERTEX_ARRAY);

@@ -27,8 +27,11 @@
 
 #include "igeom/clip2d.h"
 #include "iutil/vfs.h"
+#include "iutil/eventq.h"
+#include "iutil/virtclk.h"
 
 #include "ivideo/shader/shader.h"
+#include "ivideo/shader/shadervar.h"
 #include "ivideo/render3d.h"
 #include "shadermgr.h"
 
@@ -45,14 +48,14 @@ SCF_IMPLEMENT_EMBEDDED_IBASE( csShaderManager::Component )
   SCF_IMPLEMENTS_INTERFACE( iComponent )
 SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
+SCF_IMPLEMENT_IBASE (csShaderManager::EventHandler)
+SCF_IMPLEMENTS_INTERFACE (iEventHandler)
+SCF_IMPLEMENT_IBASE_END
+
 SCF_IMPLEMENT_FACTORY( csShaderManager )
 
 SCF_IMPLEMENT_IBASE( csShader )
   SCF_IMPLEMENTS_INTERFACE( iShader )
-SCF_IMPLEMENT_IBASE_END
-
-SCF_IMPLEMENT_IBASE( csShaderVariable )
-  SCF_IMPLEMENTS_INTERFACE( iShaderVariable )
 SCF_IMPLEMENT_IBASE_END
 
 SCF_IMPLEMENT_IBASE( csShaderTechnique )
@@ -74,6 +77,7 @@ csShaderManager::csShaderManager(iBase* parent)
 {
   SCF_CONSTRUCT_IBASE( parent );
   SCF_CONSTRUCT_EMBEDDED_IBASE( scfiComponent );
+  scfiEventHandler = NULL;
 
   // alloc variables-hash
   variables = new csHashMap();
@@ -108,6 +112,19 @@ csShaderManager::~csShaderManager()
 bool csShaderManager::Initialize(iObjectRegistry *objreg)
 {
   objectreg = objreg;
+  vc = CS_QUERY_REGISTRY(objectreg, iVirtualClock);
+
+  if (!scfiEventHandler)
+    scfiEventHandler = new EventHandler (this);
+
+  csRef<iEventQueue> q (CS_QUERY_REGISTRY(objectreg, iEventQueue));
+  if (q)
+    q->RegisterListener (scfiEventHandler, CSMASK_Broadcast || CSMASK_FrameProcess  );
+
+
+  //create standard-variables
+  sv_time = CreateVariable("STANDARD_TIME");
+  AddVariable(sv_time);
   return true;
 }
 
@@ -151,6 +168,30 @@ csBasicVector csShaderManager::GetAllVariableNames()
   return vReturnValue;
 }
 
+bool csShaderManager::HandleEvent(iEvent& event)
+{
+  if (event.Type = csevBroadcast)
+  {
+    switch(event.Command.Code)
+    {
+    case cscmdPreProcess:
+      UpdateStandardVariables();
+      return false;
+    }
+  }
+  return false;
+}
+
+void csShaderManager::UpdateStandardVariables()
+{
+  //time
+  if(sv_time && vc)
+  {
+    float sec = vc->GetCurrentTicks()/1000.0f;
+    sv_time->SetValue(sec);
+  }
+}
+
 // Shader handling
 csPtr<iShader> csShaderManager::CreateShader()
 {
@@ -158,7 +199,7 @@ csPtr<iShader> csShaderManager::CreateShader()
   sprintf(name, "effect%2d", seqnumber);
   seqnumber++;
 
-  csShader* cshader = new csShader(name);
+  csShader* cshader = new csShader(name, this);
   cshader->IncRef();
 
   shaders->Push(cshader);
@@ -214,21 +255,22 @@ csPtr<iShaderProgram> csShaderManager::CreateShaderProgramFromString(const char*
 }
 
 //===================== csShader ====================//
-csShader::csShader()
+csShader::csShader(csShaderManager* owner)
 {
   SCF_CONSTRUCT_IBASE( NULL );
   this->name = 0;
   variables = new csHashMap();
   techniques = new csBasicVector();
+  parent = owner;
 }
 
-csShader::csShader(const char* name)
+csShader::csShader(const char* name, csShaderManager* owner)
 {
   SCF_CONSTRUCT_IBASE( NULL );
   this->name = 0;
   variables = new csHashMap();
   techniques = new csBasicVector();
-  
+  parent = owner;
   SetName(name);
 }
 
@@ -272,11 +314,19 @@ bool csShader::AddVariable(iShaderVariable* variable)
 
 iShaderVariable* csShader::GetVariable(const char* name)
 {
+  iShaderVariable* var;
   csHashIterator cIter(variables, csHashCompute(name));
 
   if( cIter.HasNext() )
   {
-    return (iShaderVariable*)cIter.Next();
+    var = (iShaderVariable*)cIter.Next();
+
+    return var;
+  }
+
+  if(parent)
+  {
+    return parent->GetVariable(name);
   }
 
   return NULL;
@@ -298,7 +348,7 @@ csBasicVector csShader::GetAllVariableNames()
 //technique-related
 csPtr<iShaderTechnique> csShader::CreateTechnique()
 {
-  iShaderTechnique* mytech = new csShaderTechnique();
+  iShaderTechnique* mytech = new csShaderTechnique(this);
   mytech->IncRef();
 
   techniques->Push(mytech);
@@ -334,12 +384,33 @@ void csShader::MapStream(int mapid, const char* streamname)
 {
 }
 
+//==================== csShaderPass ==============//
+iShaderVariable* csShaderPass::GetVariable(const char* string)
+{
+  iShaderVariable* var;
+  csHashIterator c(&variables, csHashCompute(string));
+
+  if(c.HasNext())
+  {
+    var = (iShaderVariable*)c.Next();
+    
+    return var;
+  }
+
+  if (parent && parent->GetParent())
+  {
+    return parent->GetParent()->GetVariable(string);
+  }
+
+  return NULL;
+}
 
 //================= csShaderTechnique ============//
-csShaderTechnique::csShaderTechnique()
+csShaderTechnique::csShaderTechnique(csShader* owner)
 {
   SCF_CONSTRUCT_IBASE( NULL );
   passes = new csBasicVector();
+  parent = owner;
 }
 
 csShaderTechnique::~csShaderTechnique()
@@ -354,7 +425,7 @@ csShaderTechnique::~csShaderTechnique()
 
 csPtr<iShaderPass> csShaderTechnique::CreatePass()
 {
-  iShaderPass* mpass = new csShaderPass();
+  iShaderPass* mpass = new csShaderPass(this);
   mpass->IncRef();
 
   passes->Push(mpass);
