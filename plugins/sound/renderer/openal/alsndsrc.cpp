@@ -95,55 +95,71 @@ csSoundSourceOpenAL::~csSoundSourceOpenAL()
   // Stop the source if it's playing
   Stop();
 
-  SoundRender->mutex_OpenAL->LockWait();
-
-  // Unqueue any queued buffers
-  ALuint last_buffer,buffer;
-  ALint LastError=AL_NO_ERROR;
-  // Clear the last error value - I don't know if this is necessary, the OpenAL spec isn't clear
-  alGetError ();
-
-  /*  Under windows at least, the OpenAL driver appears to be able to get stuck in a loop here.
-  *    It unqueues the same buffer infinite times.  To protect against this, if the buffer unqueued is
-  *    the same on two successive calls, we're done.
-  */
-  last_buffer=1;
-  buffer=0;
-
-  while (LastError==AL_NO_ERROR && buffer!=last_buffer)
+  if (SoundRender->al_open)
   {
-    last_buffer=buffer;
-    alSourceUnqueueBuffers(source,1,&buffer);
-    LastError=alGetError ();
-    if (LastError==AL_NO_ERROR && buffer!=last_buffer)
+    SoundRender->mutex_OpenAL->LockWait();
+    ALint queued,processed,release_count;
+
+    // Unqueue any queued buffers
+    ALuint use_buffer,last_buffer;
+    ALint lasterror=AL_NO_ERROR;
+    /* Clear the last error value. This is required per 
+    * ftp://opensource.creative.com/pub/sdk/OpenAL_PGuide.pdf
+    */  
+    alGetError ();
+
+    /* At least some Windows implementations of OpenAL32.dll 
+    *  require AL_BUFFERS_PROCESSED to be queried prior to
+    *  calling alSourceUnqueueBuffers(), or else no buffers
+    *  will be unqueued and AL_INVALID_OPERATION will always
+    *  be returned.
+    */
+    alGetSourcei (source, AL_BUFFERS_QUEUED, &queued);
+    alGetSourcei (source, AL_BUFFERS_PROCESSED, &processed);
+
+    /*  Under windows at least, the OpenAL library appears to be able to get stuck in a loop here.
+    *   It unqueues the same buffer infinite times.  To protect against this, if the buffer unqueued is
+    *   the same on two successive calls, we're done.
+    */
+    last_buffer=1;
+    use_buffer=0;
+    release_count=0;
+
+    while (lasterror==AL_NO_ERROR && use_buffer!=last_buffer && release_count<processed)
     {
-      // Delete buffer
-      alDeleteBuffers(1,&buffer);
+      last_buffer=use_buffer;
+      alSourceUnqueueBuffers(source,1,&use_buffer);
+      lasterror=alGetError ();
+      if (lasterror==AL_NO_ERROR && use_buffer!=last_buffer)
+      {
+        // Delete buffer
+        alDeleteBuffers(1,&use_buffer);
 #ifdef OPENAL_DEBUG_BUFFERS
-      Report (CS_REPORTER_SEVERITY_WARNING,
-        "Source destructing. Deleted buffer %d!",buffer);
+        Report (CS_REPORTER_SEVERITY_WARNING,
+          "Source destructing. Deleted buffer %d!",use_buffer);
 #endif
+      }
+      release_count++;
     }
-  }
 
 #ifdef OPENAL_DEBUG_BUFFERS
-  ALint queued,processed;
-  alGetSourcei (source, AL_BUFFERS_QUEUED, &queued);
-  alGetSourcei (source, AL_BUFFERS_PROCESSED, &processed);
-  if (queued)
-  {
-    Report (CS_REPORTER_SEVERITY_WARNING,
-      "Source destructing. There are still %d buffers queued!",queued,processed);
-  }
+    alGetSourcei (source, AL_BUFFERS_QUEUED, &queued);
+    if (queued)
+    {
+      Report (CS_REPORTER_SEVERITY_WARNING,
+        "Source destructing. There are still %d buffers queued!",queued);
+    }
 #endif
 
-  SoundRender->mutex_OpenAL->Release();
-
+    SoundRender->mutex_OpenAL->Release();
+  }
 }
 
 
 void csSoundSourceOpenAL::SetPosition(csVector3 v)
 {
+  if (!SoundRender->al_open)
+    return;
   position[0] = v.x; position[1] = v.y; position[2] = v.z;
   SoundRender->mutex_OpenAL->LockWait();
   alSourcefv (source, AL_POSITION, position);
@@ -152,6 +168,8 @@ void csSoundSourceOpenAL::SetPosition(csVector3 v)
 
 void csSoundSourceOpenAL::SetVelocity(csVector3 v)
 {
+  if (!SoundRender->al_open)
+    return;
   velocity[0] = v.x; velocity[1] = v.y; velocity[2] = v.z;
   SoundRender->mutex_OpenAL->LockWait();
   alSourcefv (source, AL_VELOCITY, velocity);
@@ -160,6 +178,8 @@ void csSoundSourceOpenAL::SetVelocity(csVector3 v)
 
 void csSoundSourceOpenAL::SetVolume(float vol)
 {
+  if (!SoundRender->al_open)
+    return;
   SoundRender->mutex_OpenAL->LockWait();
   alSourcef (source, AL_GAIN, vol); 
   SoundRender->mutex_OpenAL->Release();
@@ -167,6 +187,8 @@ void csSoundSourceOpenAL::SetVolume(float vol)
 
 float csSoundSourceOpenAL::GetVolume()
 {
+  if (!SoundRender->al_open)
+    return 0.0f;
   float vol;
   SoundRender->mutex_OpenAL->LockWait();
   alGetSourcef (source, AL_GAIN, &vol);
@@ -176,6 +198,8 @@ float csSoundSourceOpenAL::GetVolume()
 
 void csSoundSourceOpenAL::SetFrequencyFactor (float factor)
 {
+  if (!SoundRender->al_open)
+    return;
   SoundRender->mutex_OpenAL->LockWait();
   alSourcef (source, AL_PITCH, factor);
   SoundRender->mutex_OpenAL->Release();
@@ -183,6 +207,8 @@ void csSoundSourceOpenAL::SetFrequencyFactor (float factor)
 
 float csSoundSourceOpenAL::GetFrequencyFactor ()
 {
+  if (!SoundRender->al_open)
+    return 1.0f;
   float factor;
   SoundRender->mutex_OpenAL->LockWait();
   alGetSourcef (source, AL_PITCH, &factor);
@@ -190,7 +216,10 @@ float csSoundSourceOpenAL::GetFrequencyFactor ()
   return factor;
 }
 
-void csSoundSourceOpenAL::SetMode3D(int m) {
+void csSoundSourceOpenAL::SetMode3D(int m) 
+{
+  if (!SoundRender->al_open)
+    return;
   mode = m;
   SoundRender->mutex_OpenAL->LockWait();
   switch (mode) {
@@ -204,7 +233,11 @@ void csSoundSourceOpenAL::SetMode3D(int m) {
   SoundRender->mutex_OpenAL->Release();
 }
 
-bool csSoundSourceOpenAL::IsPlaying() {
+bool csSoundSourceOpenAL::IsPlaying() 
+{
+  if (!SoundRender->al_open)
+    return false;
+
   // For static buffers we can go straight to the OpenAL layer.
   if (Static)
   {
@@ -224,6 +257,8 @@ bool csSoundSourceOpenAL::IsPlaying() {
 
 void csSoundSourceOpenAL::Play(unsigned long PlayMethod)
 {
+  if (!SoundRender->al_open)
+    return;
 #ifdef OPENAL_DEBUG_CALLS
   Report (CS_REPORTER_SEVERITY_NOTIFY,  	
     "csSoundSourceOpenAL::Play(%slooping)",(PlayMethod & SOUND_LOOP)? "": "not ");
@@ -313,6 +348,8 @@ void csSoundSourceOpenAL::Play(unsigned long PlayMethod)
 
 void csSoundSourceOpenAL::Stop()
 {
+  if (!SoundRender->al_open)
+    return;
 #ifdef OPENAL_DEBUG_CALLS
   Report (CS_REPORTER_SEVERITY_NOTIFY,  	
     "csSoundSourceOpenAL::Stop()");
@@ -340,8 +377,12 @@ void csSoundSourceOpenAL::NotifyStreamEnd()
 //  Here we check for the last of the buffers to finish emptying.
 void csSoundSourceOpenAL::WatchBufferEnd()
 {
-  ALuint use_buffer;
+  ALuint use_buffer,last_buffer;
   ALint lasterror;
+  ALint queued,processed,release_count;
+
+  if (!SoundRender->al_open)
+    return;
 
 #ifdef OPENAL_DEBUG_CALLS
   Report (CS_REPORTER_SEVERITY_NOTIFY,  	
@@ -360,15 +401,39 @@ void csSoundSourceOpenAL::WatchBufferEnd()
   if (sourcestate!=AL_PLAYING && sourcestate!=AL_PAUSED)
     SourcePlaying=false;
 
+
+  /* At least some Windows implementations of OpenAL32.dll 
+  *  require AL_BUFFERS_PROCESSED to be queried prior to
+  *  calling alSourceUnqueueBuffers(), or else no buffers
+  *  will be unqueued and AL_INVALID_OPERATION will always
+  *  be returned.
+  */
+  alGetSourcei (source, AL_BUFFERS_QUEUED, &queued);
+  alGetSourcei (source, AL_BUFFERS_PROCESSED, &processed);
+
+
+#ifdef OPENAL_DEBUG_BUFFERS
+  Report (CS_REPORTER_SEVERITY_WARNING,
+    "There are %d buffers queued and %d buffers processed.",queued,processed);
+#endif
+
+
   /* Clear the last error value. This is required per 
-   * ftp://opensource.creative.com/pub/sdk/OpenAL_PGuide.pdf
-   */  
+  * ftp://opensource.creative.com/pub/sdk/OpenAL_PGuide.pdf
+  */  
   lasterror=alGetError ();
   lasterror=AL_NO_ERROR;
 
+  /*  Under windows at least, the OpenAL library appears to be able to get stuck in a loop here.
+  *    It unqueues the same buffer infinite times.  To protect against this, if the buffer unqueued is
+  *    the same on two successive calls, we're done.
+  */
+  last_buffer=1;
+  use_buffer=0;
+  release_count=0;
 
   //  Release any buffers waiting to be unqueued and delete them.
-  while (lasterror==AL_NO_ERROR)
+  while (lasterror==AL_NO_ERROR && use_buffer!=last_buffer && release_count<processed)
   {
     // dequeue the next buffer
     alSourceUnqueueBuffers(source,1,&use_buffer);
@@ -381,9 +446,19 @@ void csSoundSourceOpenAL::WatchBufferEnd()
       * Still, the OpenAL API is rather vague, and we don't really care if there's an error here anyway.
       */
       alDeleteBuffers(1,&use_buffer);
+#ifdef OPENAL_DEBUG_BUFFERS
+      alGetSourcei (source, AL_BUFFERS_QUEUED, &queued);
+      Report (CS_REPORTER_SEVERITY_WARNING,
+        "WatchBufferEnd() Deleted buffer %d.  %d buffers remain queued.",use_buffer,queued);
+#endif
     }
+    release_count++;
   }
-
+#ifdef OPENAL_DEBUG_BUFFERS
+  if (lasterror==AL_NO_ERROR && use_buffer==last_buffer)
+    Report (CS_REPORTER_SEVERITY_WARNING,
+    "Aborted on double-unqueued buffer %d! Check www.openal.org for a new OpenAL version!",use_buffer);
+#endif
   SoundRender->mutex_OpenAL->Release();
 
 
@@ -393,32 +468,43 @@ void csSoundSourceOpenAL::Write(void *Data, unsigned long NumBytes)
 {
   int lasterror;
   ALuint use_buffer,last_buffer;
+  ALint queued,processed,release_count;
+
+  if (!SoundRender->al_open)
+    return;
 
   SoundRender->mutex_OpenAL->LockWait();
 
-
-#ifdef OPENAL_DEBUG_BUFFERS
-  ALint queued,processed;
+  /* At least some Windows implementations of OpenAL32.dll 
+  *  require AL_BUFFERS_PROCESSED to be queried prior to
+  *  calling alSourceUnqueueBuffers(), or else no buffers
+  *  will be unqueued and AL_INVALID_OPERATION will always
+  *  be returned.
+  */
   alGetSourcei (source, AL_BUFFERS_QUEUED, &queued);
   alGetSourcei (source, AL_BUFFERS_PROCESSED, &processed);
+
+
+#ifdef OPENAL_DEBUG_BUFFERS
   Report (CS_REPORTER_SEVERITY_WARNING,
     "There are %d buffers queued and %d buffers processed.",queued,processed);
 #endif
 
   /* Clear the last error value. This is required per 
-   * ftp://opensource.creative.com/pub/sdk/OpenAL_PGuide.pdf
-   */  
+  * ftp://opensource.creative.com/pub/sdk/OpenAL_PGuide.pdf
+  */  
   lasterror=alGetError ();
   lasterror=AL_NO_ERROR;
 
-  /*  Under windows at least, the OpenAL driver appears to be able to get stuck in a loop here.
+  /*  Under windows at least, the OpenAL library appears to be able to get stuck in a loop here.
   *    It unqueues the same buffer infinite times.  To protect against this, if the buffer unqueued is
   *    the same on two successive calls, we're done.
   */
   last_buffer=1;
   use_buffer=0;
+  release_count=0;
 
-  while (lasterror==AL_NO_ERROR && use_buffer!=last_buffer)
+  while (lasterror==AL_NO_ERROR && use_buffer!=last_buffer && release_count<processed )
   {
     last_buffer=use_buffer;
     // dequeue the next buffer
@@ -436,7 +522,13 @@ void csSoundSourceOpenAL::Write(void *Data, unsigned long NumBytes)
         "Deleted buffer %d!",use_buffer);
 #endif
     }
+    release_count++;
   }
+#ifdef OPENAL_DEBUG_BUFFERS
+  if (lasterror==AL_NO_ERROR && use_buffer==last_buffer)
+    Report (CS_REPORTER_SEVERITY_WARNING,
+    "Aborted on double-unqueued buffer %d! Check www.openal.org for a new OpenAL version!",use_buffer);
+#endif
 
 
 
@@ -454,6 +546,7 @@ void csSoundSourceOpenAL::Write(void *Data, unsigned long NumBytes)
     SoundRender->mutex_OpenAL->Release();
     return;
   }
+
 
 
   // Fill the next free buffer

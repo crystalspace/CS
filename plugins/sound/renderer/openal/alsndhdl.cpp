@@ -56,13 +56,14 @@ void csSoundHandleOpenAL::StartStream(bool Loop)
 {
   if (!Data->IsStatic() && !ActiveStream)
   {
+    SoundRender->mutex_ActiveSources->LockWait();
     mutex_WriteCursor->LockWait();
-    buffer_writecursor=0;
     LoopStream = Loop;
     ActiveStream = true;
     // Fill our local buffer if we have one
     UpdateCount(NumSamples);
     mutex_WriteCursor->Release();
+    SoundRender->mutex_ActiveSources->Release();
   }
 }
 
@@ -86,6 +87,8 @@ void csSoundHandleOpenAL::UpdateCount(long NumSamples)
   long Num;
   long bytespersample;
 
+  if (NumSamples<=0)
+    return;
 
   // If the stream is not active, allow the source to check for buffer end
   if (!ActiveStream)
@@ -119,7 +122,7 @@ void csSoundHandleOpenAL::UpdateCount(long NumSamples)
   // Read data until the end of the stream, or the buffer is full
 
   void *buf = Data->ReadStreamed(Num);
-  if (Num)
+  if (Num && buf)
   {
 
     // Add the data that we did get to the buffer

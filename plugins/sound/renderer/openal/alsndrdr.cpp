@@ -75,9 +75,9 @@ csSoundRenderOpenAL::csSoundRenderOpenAL(iBase *parent)
   roll = 1.0;
   dist = 1.0;
 
-  mutex_Listener = csMutex::Create ();
-  mutex_ActiveSources = csMutex::Create ();
-  mutex_SoundHandles = csMutex::Create ();
+  mutex_Listener = csMutex::Create (true);
+  mutex_ActiveSources = csMutex::Create (true);
+  mutex_SoundHandles = csMutex::Create (true);
   mutex_OpenAL = csMutex::Create ();
 
   bRunning=false;
