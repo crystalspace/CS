@@ -26,6 +26,9 @@ Some interesting options to play with are:
 @item -mode=640x480
 Use this option to set the size of the display.
 
+@item -canvas=sdl2d
+Use this option to select the type of 2D canvas to use.
+
 @item -video=opengl
 (or direct3d, glide, software, ...).
 Use this option to select type of display driver to use.  Other options
