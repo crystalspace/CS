@@ -21,6 +21,7 @@ chronological order.
 	  declaration of the csPrintfFormatter::mantissa member broke gcc
 	  3.4.x, which complains (possibly incorrectly?) that IEEEFloatMantissa
 	  is not a templated type.
+	- Jorrit improved the PVS debugging stuff a bit.
 21-Mar-2005
 	- Eric Sunshine re-wrote crystal.m4 essentially from scratch since it
 	  was fragile, obfuscated, and unnecessarily complex.

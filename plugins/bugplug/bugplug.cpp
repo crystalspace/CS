@@ -2621,13 +2621,29 @@ void csBugPlug::DebugSectorBox (const csBox3& box, float r, float g, float b,
   gfs->GenerateBox (tbox);
   gfs->CalculateNormals ();
   gfs->GetColors ()[0].Set (1, 1, 1);
-  gfs->GetColors ()[1].Set (0.5f, 0.5f, 0.5f);
-  gfs->GetColors ()[2].Set (0.3f, 0.3f, 0.3f);
+  gfs->GetColors ()[1].Set (0.5f, 0.8f, 0.5f);
+  gfs->GetColors ()[2].Set (0.5f, 0.3f, 0.8f);
   gfs->GetColors ()[3].Set (0.8f, 0.8f, 0.8f);
-  gfs->GetColors ()[4].Set (0.4f, 0.4f, 0.4f);
-  gfs->GetColors ()[5].Set (0.2f, 0.2f, 0.2f);
+  gfs->GetColors ()[4].Set (0.9f, 0.4f, 0.4f);
+  gfs->GetColors ()[5].Set (0.2f, 0.8f, 0.7f);
   gfs->GetColors ()[6].Set (0.9f, 0.9f, 0.9f);
   gfs->GetColors ()[7].Set (0.6f, 0.6f, 0.6f);
+  gfs->GetColors ()[8].Set (1, 1, 1);
+  gfs->GetColors ()[9].Set (0.5f, 0.8f, 0.5f);
+  gfs->GetColors ()[10].Set (0.5f, 0.3f, 0.8f);
+  gfs->GetColors ()[11].Set (0.8f, 0.8f, 0.8f);
+  gfs->GetColors ()[12].Set (0.9f, 0.4f, 0.4f);
+  gfs->GetColors ()[13].Set (0.2f, 0.8f, 0.7f);
+  gfs->GetColors ()[14].Set (0.9f, 0.9f, 0.9f);
+  gfs->GetColors ()[15].Set (0.6f, 0.6f, 0.6f);
+  gfs->GetColors ()[16].Set (1, 1, 1);
+  gfs->GetColors ()[17].Set (0.5f, 0.8f, 0.5f);
+  gfs->GetColors ()[18].Set (0.5f, 0.3f, 0.8f);
+  gfs->GetColors ()[19].Set (0.8f, 0.8f, 0.8f);
+  gfs->GetColors ()[20].Set (0.9f, 0.4f, 0.4f);
+  gfs->GetColors ()[21].Set (0.2f, 0.8f, 0.7f);
+  gfs->GetColors ()[22].Set (0.9f, 0.9f, 0.9f);
+  gfs->GetColors ()[23].Set (0.6f, 0.6f, 0.6f);
 
   csRef<iMeshWrapper> mw (Engine->CreateMeshWrapper (
   	mf, name ? name : "__BugPlug_mesh__", debug_sector.sector, pos));
@@ -2639,11 +2655,16 @@ void csBugPlug::DebugSectorBox (const csBox3& box, float r, float g, float b,
   gms->SetManualColors (true);
   gms->SetMixMode (mixmode);
 
-  // The following two calls are not needed since CS_ZBUF_USE and
-  // Object render priority are the default but they show how you
-  // can do this.
-  mw->SetZBufMode (CS_ZBUF_USE);
-  mw->SetRenderPriority (Engine->GetObjectRenderPriority ());
+  if (mixmode == CS_FX_COPY)
+  {
+    mw->SetZBufMode (CS_ZBUF_USE);
+    mw->SetRenderPriority (Engine->GetObjectRenderPriority ());
+  }
+  else
+  {
+    mw->SetZBufMode (CS_ZBUF_TEST);
+    mw->SetRenderPriority (Engine->GetAlphaRenderPriority ());
+  }
 }
 
 void csBugPlug::DebugSectorTriangle (const csVector3& s1, const csVector3& s2,
@@ -2696,8 +2717,16 @@ void csBugPlug::DebugSectorTriangle (const csVector3& s1, const csVector3& s2,
   gms->SetManualColors (true);
   gms->SetMixMode (mixmode);
 
-  mw->SetZBufMode (CS_ZBUF_TEST);
-  mw->SetRenderPriority (Engine->GetAlphaRenderPriority ());
+  if (mixmode == CS_FX_COPY)
+  {
+    mw->SetZBufMode (CS_ZBUF_USE);
+    mw->SetRenderPriority (Engine->GetObjectRenderPriority ());
+  }
+  else
+  {
+    mw->SetZBufMode (CS_ZBUF_TEST);
+    mw->SetRenderPriority (Engine->GetAlphaRenderPriority ());
+  }
 }
 
 void csBugPlug::SwitchDebugSector (const csReversibleTransform& trans,

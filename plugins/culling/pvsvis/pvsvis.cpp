@@ -1253,12 +1253,6 @@ bool csPVSVis::Debug_DebugCommand (const char* cmd)
 
   if (!strcmp (cmd, "setup_debugsector"))
   {
-    bugplug->SetupDebugSector ();
-    bugplug->DebugSectorBox (debug_node->GetNodeBBox (),
-      	1.0, 1.0, 1.0, 0, 0, CS_FX_ADD);
-    csReversibleTransform trans;
-    bugplug->SwitchDebugSector (trans, false);
-    return true;
   }
   else if (!strcmp (cmd, "navigate_child1"))
   {
@@ -1266,14 +1260,6 @@ bool csPVSVis::Debug_DebugCommand (const char* cmd)
     {
       debug_node = debug_node->child1;
       debug_nodepath.Push (1);
-      printf ("Going to child1 %p at (%g,%g,%g)-(%g,%g,%g)\n",
-      	debug_node,
-	debug_node->GetNodeBBox ().MinX (),
-	debug_node->GetNodeBBox ().MinY (),
-	debug_node->GetNodeBBox ().MinZ (),
-	debug_node->GetNodeBBox ().MaxX (),
-	debug_node->GetNodeBBox ().MaxY (),
-	debug_node->GetNodeBBox ().MaxZ ());
     }
   }
   else if (!strcmp (cmd, "navigate_child2"))
@@ -1282,44 +1268,33 @@ bool csPVSVis::Debug_DebugCommand (const char* cmd)
     {
       debug_node = debug_node->child2;
       debug_nodepath.Push (2);
-      printf ("Going to child2 %p at (%g,%g,%g)-(%g,%g,%g)\n",
-      	debug_node,
-	debug_node->GetNodeBBox ().MinX (),
-	debug_node->GetNodeBBox ().MinY (),
-	debug_node->GetNodeBBox ().MinZ (),
-	debug_node->GetNodeBBox ().MaxX (),
-	debug_node->GetNodeBBox ().MaxY (),
-	debug_node->GetNodeBBox ().MaxZ ());
     }
   }
   else if (!strcmp (cmd, "navigate_parent"))
   {
     debug_node = pvstree.GetRealRootNode ();
-    debug_nodepath.SetLength (debug_nodepath.Length ()-1);
-    size_t i;
-    for (i = 0 ; i < debug_nodepath.Length () ; i++)
-      if (debug_nodepath[i] == 1)
-        debug_node = debug_node->child1;
-      else
-        debug_node = debug_node->child2;
-      printf ("Going to parent %p at (%g,%g,%g)-(%g,%g,%g)\n",
-      	debug_node,
-	debug_node->GetNodeBBox ().MinX (),
-	debug_node->GetNodeBBox ().MinY (),
-	debug_node->GetNodeBBox ().MinZ (),
-	debug_node->GetNodeBBox ().MaxX (),
-	debug_node->GetNodeBBox ().MaxY (),
-	debug_node->GetNodeBBox ().MaxZ ());
+    if (debug_nodepath.Length () > 0)
+    {
+      debug_nodepath.SetLength (debug_nodepath.Length ()-1);
+      size_t i;
+      for (i = 0 ; i < debug_nodepath.Length () ; i++)
+        if (debug_nodepath[i] == 1)
+          debug_node = debug_node->child1;
+        else
+          debug_node = debug_node->child2;
+    }
   }
   else
     return false;
 
   bugplug->SetupDebugSector ();
-  bugplug->DebugSectorBox (debug_node->GetNodeBBox (),
-      	1.0, 1.0, 1.0, 0, 0, CS_FX_ADD);
-  csReversibleTransform trans;
+  const csBox3& nb = debug_node->GetNodeBBox ();
+  bugplug->DebugSectorBox (nb, .5, .5, .5, 0, 0, CS_FX_ADD);
   if (!bugplug->CheckDebugSector ())
+  {
+    csReversibleTransform trans;
     bugplug->SwitchDebugSector (trans, false);
+  }
 
   return true;
 }
