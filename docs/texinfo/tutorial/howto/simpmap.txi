@@ -101,7 +101,7 @@ to explain. Basically if we had a polygon that was 4x4 units big, then
 a texture using @samp{TEXLEN(4)} would be tiled exactly one time on that
 polygon. So the @samp{TEXLEN} command directly specifies the texture density
 or the amount of times a texture is tiled. For more information about this
-see @xpref{Texture Mapping}.
+see @pxref{Texture Mapping}.
 
 Finally we define the six polygons that form the walls of our room.
 Polygons don't have to have names but in this case we use names to make
