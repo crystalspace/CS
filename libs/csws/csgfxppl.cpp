@@ -216,7 +216,7 @@ void csGraphicsPipeline::Polygon3D (G3DPolygonDPFX &poly, UInt mode)
   for (int i = 0; i < poly.num; i++)
     INCLUDE_POINT (QRound (poly.vertices [i].sx), QRound (poly.vertices [i].sy));
 
-  G3D->StartPolygonFX (poly.txt_handle, mode);
+  G3D->StartPolygonFX (poly.mat_handle, mode);
   G3D->DrawPolygonFX (poly);
   G3D->FinishPolygonFX ();
 }

@@ -4837,7 +4837,8 @@ csTextureHandle* csLoader::LoadTexture (csWorld* world, const char* name, const 
   image->DecRef ();
 
   csMaterial* material = new csMaterial ();
-  World->GetMaterials ()->NewMaterial (material);
+  csMaterialHandle* mat = World->GetMaterials ()->NewMaterial (material);
+  mat->SetName (name);
   material->SetTextureHandle (th);
   material->DecRef ();
 
@@ -5076,7 +5077,7 @@ bool csLoader::LoadSpriteTemplate (csSpriteTemplate* stemp, char* buf)
     }
     switch (cmd)
     {
-      case TOKEN_TEXNR:
+      case TOKEN_TEXNR://@@@MAT
         {
           ScanStr (params, "%s", str);
           stemp->SetMaterial (World->GetMaterials (), str);

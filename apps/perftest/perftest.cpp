@@ -50,7 +50,7 @@ void cleanup ()
   delete System;
 }
 
-iTextureHandle* PerfTest::LoadTexture (char* file)
+iMaterialHandle* PerfTest::LoadMaterial (char* file)
 {
   iTextureManager* txtmgr = G3D->GetTextureManager ();
   size_t size;
@@ -69,6 +69,8 @@ iTextureHandle* PerfTest::LoadTexture (char* file)
   iTextureHandle* texture = txtmgr->RegisterTexture (image, CS_TEXTURE_3D);
   if (!texture) exit (-1);
   image->DecRef ();
+  csMaterial* mat = new csMaterial ();
+  mat->SetTextureHandle (@@@
   return texture;
 }
 

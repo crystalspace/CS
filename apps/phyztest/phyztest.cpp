@@ -178,7 +178,8 @@ bool Phyztest::Initialize (int argc, const char* const argv[], const char *iConf
     StartShutdown ();
     return false;
   }
-  csTextureHandle* tm = csLoader::LoadTexture (world, "stone", "/lib/std/stone4.gif");
+  csLoader::LoadTexture (world, "stone", "/lib/std/stone4.gif");
+  csMaterialHandle* tm = world->GetMaterials ()->FindByName ("stone");
 
   room = world->NewSector ();
   room->SetName ("room"); 

@@ -19,6 +19,13 @@ The history order has been reversed so that new features are at the top.
 	  software mode. Will fix this later).
 	- Fixed WalkTest to work with new materials.
 	- Fixed Blocks to work with new materials.
+	- Tried to fix funcon console but failed for now. Will look at
+	  this later.
+	- Fixed DrawPolygonMesh for procedural textures (OpenGL).
+	- Fixed Squawk so that it compiles and runs.
+	- Fixed wscs3d so that it compiles and runs.
+	- Fixed simple so that it compiles and runs.
+	- Fixed phyztest so that it compiles and runs.
 3-Aug-2000
 	- Norman Kramer added clipping code to openglcommon canvas code,
 	  especially to font drawing.

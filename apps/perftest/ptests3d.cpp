@@ -62,7 +62,7 @@ void SetupPolygonDPFX (iGraphics3D* /*g3d*/, G3DPolygonDPFX& poly,
   poly.vertices[3].b = 0;
   poly.use_fog = false;
   poly.inv_aspect = 1./400.;
-  poly.txt_handle = NULL;
+  poly.mat_handle = NULL;
   poly.flat_color_r = 255;
   poly.flat_color_g = 255;
   poly.flat_color_b = 255;
@@ -74,14 +74,14 @@ void SinglePolygonTester::Setup (iGraphics3D* g3d, PerfTest* perftest)
 {
   draw = 0;
   SetupPolygonDPFX (g3d, poly, 10, 10, g3d->GetWidth ()-10, g3d->GetHeight ()-10);
-  poly.txt_handle = perftest->GetTexture (0);
+  poly.mat_handle = perftest->GetMaterial (0);
 }
 
 void SinglePolygonTester::Draw (iGraphics3D* g3d)
 {
   draw++;
   g3d->SetRenderState (G3DRENDERSTATE_ZBUFFERMODE, CS_ZBUF_FILL);
-  g3d->StartPolygonFX (poly.txt_handle, CS_FX_COPY|CS_FX_GOURAUD);
+  g3d->StartPolygonFX (poly.mat_handle, CS_FX_COPY|CS_FX_GOURAUD);
   g3d->DrawPolygonFX (poly);
   g3d->FinishPolygonFX ();
 }
@@ -119,14 +119,14 @@ void SinglePolygonTesterAlpha::Setup (iGraphics3D* g3d, PerfTest* perftest)
 {
   draw = 0;
   SetupPolygonDPFX (g3d, poly, 10, 10, g3d->GetWidth ()-10, g3d->GetHeight ()-10);
-  poly.txt_handle = perftest->GetTexture (0);
+  poly.mat_handle = perftest->GetMaterial (0);
 }
 
 void SinglePolygonTesterAlpha::Draw (iGraphics3D* g3d)
 {
   draw++;
   g3d->SetRenderState (G3DRENDERSTATE_ZBUFFERMODE, CS_ZBUF_FILL);
-  g3d->StartPolygonFX (poly.txt_handle, CS_FX_SETALPHA(.5) | CS_FX_GOURAUD);
+  g3d->StartPolygonFX (poly.mat_handle, CS_FX_SETALPHA(.5) | CS_FX_GOURAUD);
   g3d->DrawPolygonFX (poly);
   g3d->FinishPolygonFX ();
 }
@@ -150,7 +150,7 @@ void MultiPolygonTester::Setup (iGraphics3D* g3d, PerfTest* perftest)
       SetupPolygonDPFX (g3d, poly[x][y], 10+x*w/NUM_MULTIPOLTEST,
       	10+y*h/NUM_MULTIPOLTEST,
       	10+(x+1)*w/NUM_MULTIPOLTEST, 10+(y+1)*h/NUM_MULTIPOLTEST);
-      poly[x][y].txt_handle = perftest->GetTexture (0);
+      poly[x][y].mat_handle = perftest->GetMaterial (0);
     }
 }
 
@@ -158,7 +158,7 @@ void MultiPolygonTester::Draw (iGraphics3D* g3d)
 {
   draw++;
   g3d->SetRenderState (G3DRENDERSTATE_ZBUFFERMODE, CS_ZBUF_FILL);
-  g3d->StartPolygonFX (poly[0][0].txt_handle, CS_FX_COPY | CS_FX_GOURAUD);
+  g3d->StartPolygonFX (poly[0][0].mat_handle, CS_FX_COPY | CS_FX_GOURAUD);
   int x, y;
   for (y = 0 ; y < NUM_MULTIPOLTEST ; y++)
     for (x = 0 ; x < NUM_MULTIPOLTEST ; x++)
@@ -187,7 +187,7 @@ void MultiPolygon2Tester::Setup (iGraphics3D* g3d, PerfTest* perftest)
       SetupPolygonDPFX (g3d, poly[x][y], 10+x*w/NUM_MULTIPOLTEST,
       	10+y*h/NUM_MULTIPOLTEST,
       	10+(x+1)*w/NUM_MULTIPOLTEST, 10+(y+1)*h/NUM_MULTIPOLTEST);
-      poly[x][y].txt_handle = perftest->GetTexture (0);
+      poly[x][y].mat_handle = perftest->GetMaterial (0);
     }
 }
 
@@ -199,7 +199,7 @@ void MultiPolygon2Tester::Draw (iGraphics3D* g3d)
   for (y = 0 ; y < NUM_MULTIPOLTEST ; y++)
     for (x = 0 ; x < NUM_MULTIPOLTEST ; x++)
     {
-      g3d->StartPolygonFX (poly[x][y].txt_handle, CS_FX_COPY | CS_FX_GOURAUD);
+      g3d->StartPolygonFX (poly[x][y].mat_handle, CS_FX_COPY | CS_FX_GOURAUD);
       g3d->DrawPolygonFX (poly[x][y]);
       g3d->FinishPolygonFX ();
     }
@@ -225,7 +225,7 @@ void MultiTexture1Tester::Setup (iGraphics3D* g3d, PerfTest* perftest)
       SetupPolygonDPFX (g3d, poly[x][y], 10+x*w/NUM_MULTIPOLTEST,
       	10+y*h/NUM_MULTIPOLTEST,
       	10+(x+1)*w/NUM_MULTIPOLTEST, 10+(y+1)*h/NUM_MULTIPOLTEST);
-      poly[x][y].txt_handle = perftest->GetTexture (i%4);
+      poly[x][y].mat_handle = perftest->GetMaterial (i%4);
       i++;
     }
 }
@@ -238,7 +238,7 @@ void MultiTexture1Tester::Draw (iGraphics3D* g3d)
   for (y = 0 ; y < NUM_MULTIPOLTEST ; y++)
     for (x = 0 ; x < NUM_MULTIPOLTEST ; x++)
     {
-      g3d->StartPolygonFX (poly[x][y].txt_handle, CS_FX_COPY);
+      g3d->StartPolygonFX (poly[x][y].mat_handle, CS_FX_COPY);
       g3d->DrawPolygonFX (poly[x][y]);
       g3d->FinishPolygonFX ();
     }
@@ -265,7 +265,7 @@ void MultiTexture2Tester::Setup (iGraphics3D* g3d, PerfTest* perftest)
       SetupPolygonDPFX (g3d, poly[x][y], 10+x*w/NUM_MULTIPOLTEST,
         10+y*h/NUM_MULTIPOLTEST,
       	10+(x+1)*w/NUM_MULTIPOLTEST, 10+(y+1)*h/NUM_MULTIPOLTEST);
-      poly[x][y].txt_handle = perftest->GetTexture (i/div);
+      poly[x][y].mat_handle = perftest->GetMaterial (i/div);
       i++;
     }
 }
@@ -274,16 +274,16 @@ void MultiTexture2Tester::Draw (iGraphics3D* g3d)
 {
   draw++;
   g3d->SetRenderState (G3DRENDERSTATE_ZBUFFERMODE, CS_ZBUF_FILL);
-  iTextureHandle* prev = NULL;
+  iMaterialHandle* prev = NULL;
   int x, y;
   for (y = 0 ; y < NUM_MULTIPOLTEST ; y++)
     for (x = 0 ; x < NUM_MULTIPOLTEST ; x++)
     {
-      if (poly[x][y].txt_handle != prev)
+      if (poly[x][y].mat_handle != prev)
       {
         if (prev != NULL) g3d->FinishPolygonFX ();
-        g3d->StartPolygonFX (poly[x][y].txt_handle, CS_FX_COPY);
-	prev = poly[x][y].txt_handle;
+        g3d->StartPolygonFX (poly[x][y].mat_handle, CS_FX_COPY);
+	prev = poly[x][y].mat_handle;
       }
       g3d->DrawPolygonFX (poly[x][y]);
     }
@@ -316,7 +316,7 @@ void MeshTester::Setup (iGraphics3D* g3d, PerfTest* perftest)
   mesh.morph_factor = 0;
   mesh.vertices[0] = new csVector3 [mesh.num_vertices];
   mesh.texels[0][0] = new csVector2 [mesh.num_vertices];
-  mesh.txt_handle[0] = perftest->GetTexture (0);
+  mesh.mat_handle[0] = perftest->GetMaterial (0);
   int i;
   int x, y;
   float w = (g3d->GetWidth ()-20)/2;
@@ -374,7 +374,7 @@ void PixmapTester::Setup (iGraphics3D* g3d, PerfTest* perftest)
   draw = 0;
   inc_w = g3d->GetWidth ()/10;
   inc_h = g3d->GetHeight ()/10;
-  texture = perftest->GetTexture (0);
+  texture = perftest->GetMaterial (0);
   texture->GetMipMapDimensions (0, tex_w, tex_h);
 }
 
@@ -403,7 +403,7 @@ void MultiTexturePixmapTester::Setup (iGraphics3D* g3d, PerfTest* perftest)
   inc_h = g3d->GetHeight ()/10;
   for (int i = 0; i < 4; i++)
   {
-    tex[i].texture = perftest->GetTexture (i);
+    tex[i].texture = perftest->GetMaterial (i);
     tex[i].texture->GetMipMapDimensions (0, tex[i].tex_w, tex[i].tex_h);
   }
 }

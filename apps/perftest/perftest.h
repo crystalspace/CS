@@ -22,7 +22,7 @@
 #include "cssys/sysdriv.h"
 
 class PerfTest;
-struct iTextureHandle;
+struct iMaterialHandle;
 
 class Tester
 {
@@ -47,9 +47,9 @@ private:
   bool draw_2d;
   bool needs_setup;
   Tester* current_tester;
-  iTextureHandle* texture[4];
-  // Load a texture.
-  iTextureHandle* LoadTexture (char* file);
+  iMaterialHandle* materials[4];
+  // Load a material.
+  iMaterialHandle* LoadMaterial (char* file);
 
 public:
   PerfTest ();
@@ -60,9 +60,9 @@ public:
   virtual void NextFrame (time_t elapsed_time, time_t current_time);
   virtual bool HandleEvent (csEvent &Event);
   
-  iTextureHandle* GetTexture (int idx)
+  iMaterialHandle* GetMaterial (int idx)
   {
-    return texture[idx];
+    return material[idx];
   }
 };
 

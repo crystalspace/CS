@@ -902,7 +902,7 @@ void csSprite3D::Draw (csRenderView& rview)
 
   if (!tpl->cstxt)
   {
-    CsPrintf (MSG_FATAL_ERROR, "Error! Trying to draw a sprite with no texture!\n");
+    CsPrintf (MSG_FATAL_ERROR, "Error! Trying to draw a sprite with no material!\n");
     fatal_exit (0, false);
   }
 

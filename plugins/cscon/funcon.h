@@ -24,7 +24,7 @@
 #include "ivfs.h"
 
 typedef struct{
-  iTextureHandle *txt;
+  iMaterialHandle *mat;
   bool do_keycolor;
   UByte kr, kg, kb;
   bool do_stretch;

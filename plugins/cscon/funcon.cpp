@@ -93,10 +93,10 @@ void funConsole::Draw3D (csRect *)
   {
     // determine what space left to draw the actual console
     memset( &bordersize, 0, sizeof(bordersize) );
-    if ( deco.border[0].txt )
-      deco.border[0].txt->GetMipMapDimensions( 0, bordersize.xmin, bordersize.ymin );
-    if ( deco.border[2].txt )
-      deco.border[2].txt->GetMipMapDimensions( 0, bordersize.xmax, bordersize.ymax );
+    if ( deco.border[0].mat )
+      deco.border[0].mat->GetTexture ()->GetMipMapDimensions( 0, bordersize.xmin, bordersize.ymin );
+    if ( deco.border[2].mat )
+      deco.border[2].mat->GetTexture ()->GetMipMapDimensions( 0, bordersize.xmax, bordersize.ymax );
 
     SetTransparency( true ); // other wise 2D-part will overdraw all we paint here
     border_computed = true;
@@ -114,7 +114,7 @@ void funConsole::Draw3D (csRect *)
   // first draw the background
   // do we draw gouraud/flat or with texture ?
  
-  bool with_color = deco.bgnd.txt == NULL;
+  bool with_color = deco.bgnd.mat == NULL;
 
   poly.num = 4;
   poly.vertices[0].sx = size.xmin;
@@ -132,7 +132,7 @@ void funConsole::Draw3D (csRect *)
   if ( !with_color && !deco.bgnd.do_stretch )
   {
     int w, h;
-    deco.bgnd.txt->GetMipMapDimensions( 0, w, h );
+    deco.bgnd.mat->GetTexture ()->GetMipMapDimensions( 0, w, h );
     u_stretch = ((float)(size.xmax - size.xmin)) / ((float)w);
     v_stretch = ((float)(size.ymax - size.ymin)) / ((float)h);
   }
@@ -155,13 +155,13 @@ void funConsole::Draw3D (csRect *)
     poly.vertices[i].z=1;
   }
 
-  poly.txt_handle = deco.bgnd.txt;
+  poly.mat_handle = deco.bgnd.mat;
   if (with_color)
     G3D->SetRenderState (G3DRENDERSTATE_TEXTUREMAPPINGENABLE, false);
   
   float alpha = deco.bgnd.do_alpha ? deco.bgnd.alpha : 0.0;
 
-  G3D->StartPolygonFX (poly.txt_handle, CS_FX_SETALPHA (alpha) |
+  G3D->StartPolygonFX (poly.mat_handle, CS_FX_SETALPHA (alpha) |
     CS_FX_COPY | (with_color && deco.bgnd.do_keycolor ? CS_FX_GOURAUD : 0));
 
   G3D->DrawPolygonFX (poly);
@@ -195,7 +195,7 @@ void funConsole::Draw3D (csRect *)
 
 void funConsole::DrawBorder ( int x, int y, int width, int height, ConDecoBorder &border, int align )
 {
-  if ( border.txt )
+  if ( border.mat )
   {
     G3DPolygonDPFX poly;
     int i;
@@ -203,7 +203,7 @@ void funConsole::DrawBorder ( int x, int y, int width, int height, ConDecoBorder
     float u_stretch=1.0, v_stretch=1.0;
     int w, h;
     
-    border.txt->GetMipMapDimensions( 0, w, h );
+    border.mat->GetTexture ()->GetMipMapDimensions( 0, w, h );
     switch ( align ){
     case 1:
       height = MIN( height, h );
@@ -260,10 +260,10 @@ void funConsole::DrawBorder ( int x, int y, int width, int height, ConDecoBorder
       poly.vertices[i].b=1;
     }
 
-    poly.txt_handle = border.txt;
+    poly.mat_handle = border.mat;
 
     float alpha = border.do_alpha ? border.alpha : 0.0;
-    G3D->StartPolygonFX ( poly.txt_handle, CS_FX_SETALPHA( alpha ) |  (border.do_keycolor ? CS_FX_KEYCOLOR : 0 ) );
+    G3D->StartPolygonFX ( poly.mat_handle, CS_FX_SETALPHA( alpha ) |  (border.do_keycolor ? CS_FX_KEYCOLOR : 0 ) );
     G3D->DrawPolygonFX (poly);
     G3D->FinishPolygonFX ();
   }
@@ -345,7 +345,7 @@ void funConsole::PrepPix( csIniFile *ini, const char *sect, ConDecoBorder &borde
 {
   const char* pix = ini->GetStr( sect, "pic", "" );
 
-  border.txt = NULL;
+  border.mat = NULL;
   border.do_keycolor = false;
   border.do_alpha = false;
   border.do_stretch = false;
@@ -364,7 +364,9 @@ void funConsole::PrepPix( csIniFile *ini, const char *sect, ConDecoBorder &borde
       iTextureManager *tm = piG3D->GetTextureManager();
       iImage *image = csImageLoader::Load( (UByte*)data, len, tm->GetTextureFormat() );
       if ( image ){
-	border.txt = tm->RegisterTexture ( image, CS_TEXTURE_3D | CS_TEXTURE_NOMIPMAPS );
+	iTextureHandle* txt = tm->RegisterTexture ( image, CS_TEXTURE_3D | CS_TEXTURE_NOMIPMAPS );
+	@@@@@@@@@@@@ NEED A MATERIAL HERE!!??
+	border.mat = 
 	image->DecRef();
 
 	border.offx=ini->GetInt( sect, "x", 0 );
