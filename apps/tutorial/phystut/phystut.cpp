@@ -96,6 +96,7 @@ void Simple::SetupFrame ()
       avatarbody->SetLinearVelocity (view->GetCamera()->GetTransform().GetT2O () * csVector3 (0, 0, -5));
   }
 
+
   // Take small steps.
   const float maxStep = .01;
   float ta = 0;
@@ -108,10 +109,13 @@ void Simple::SetupFrame ()
     dyn->Step (tb - ta);
     ta = tb;
     tb = speed;
+
+    view->GetCamera()->GetTransform().SetOrigin(avatar->GetMovable()->GetTransform().GetOrigin());
+    avatarbody->SetTransform(view->GetCamera()->GetTransform());
   }
 
   view->GetCamera()->GetTransform().SetOrigin(avatar->GetMovable()->GetTransform().GetOrigin());
-  //avatar->GetMovable()->SetTransform(view->GetCamera()->GetTransform());
+  avatar->GetMovable()->SetTransform(view->GetCamera()->GetTransform());
 
   // Tell 3D driver we're going to display 3D things.
   if (!g3d->BeginDraw (engine->GetBeginDrawFlags () | CSDRAW_3DGRAPHICS))
@@ -171,6 +175,9 @@ bool Simple::HandleEvent (iEvent& ev)
     csRef<iEventQueue> q (CS_QUERY_REGISTRY (object_reg, iEventQueue));
     if (q) q->GetEventOutlet()->Broadcast (cscmdQuit);
     return true;
+  } else if(ev.Type == csevKeyUp && (ev.Key.Code == CSKEY_DOWN || ev.Key.Code == CSKEY_UP)) {
+      avatarbody->SetLinearVelocity(csVector3 (0, 0, 0));
+      avatarbody->SetAngularVelocity (csVector3 (0, 0, 0));
   }
 
   return false;
