@@ -38,6 +38,7 @@
 
 CS_LEAKGUARD_IMPLEMENT (csSprite2DMeshObject)
 CS_LEAKGUARD_IMPLEMENT (csSprite2DMeshObjectFactory)
+CS_LEAKGUARD_IMPLEMENT (csSprite2DMeshObject::eiShaderVariableAccessor)
 
 CS_IMPLEMENT_PLUGIN
 

@@ -24,6 +24,7 @@
 #include "csutil/garray.h"
 #include "csutil/ref.h"
 #include "csutil/weakref.h"
+#include "csutil/leakguard.h"
 
 #include "csgeom/objmodel.h"
 #include "csgeom/transfrm.h"
@@ -130,6 +131,8 @@ private:
   csFlags flags;
 
 public:
+  CS_LEAKGUARD_DECLARE (csParticlesFactory);
+
   SCF_DECLARE_IBASE;
 
   csParticlesFactory (csParticlesType* p, iObjectRegistry* objreg);
@@ -564,6 +567,8 @@ private:
   csFlags flags;
 
 public:
+  CS_LEAKGUARD_DECLARE (csParticlesObject);
+
   SCF_DECLARE_IBASE;
 
   csParticlesObject (csParticlesFactory* f);
@@ -984,6 +989,7 @@ public:
   private:
     csParticlesObject* parent;
   public:
+    CS_LEAKGUARD_DECLARE (eiShaderVariableAccessor);
     SCF_DECLARE_IBASE;
     eiShaderVariableAccessor (csParticlesObject* parent)
     {

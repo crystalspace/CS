@@ -36,8 +36,13 @@
 
 #include "lightiter.h"
 
-SCF_IMPLEMENT_FACTORY(csLightIterRSType);
-SCF_IMPLEMENT_FACTORY(csLightIterRSLoader);
+CS_LEAKGUARD_IMPLEMENT (csLightIterRSType)
+CS_LEAKGUARD_IMPLEMENT (csLightIterRSLoader)
+CS_LEAKGUARD_IMPLEMENT (csLightIterRenderStepFactory)
+CS_LEAKGUARD_IMPLEMENT (csLightIterRenderStep::LightSVAccessor)
+
+SCF_IMPLEMENT_FACTORY(csLightIterRSType)
+SCF_IMPLEMENT_FACTORY(csLightIterRSLoader)
 
 //---------------------------------------------------------------------------
 
@@ -347,9 +352,9 @@ csPtr<iTextureHandle> csLightIterRenderStep::GetAttenuationTexture (
 
 //---------------------------------------------------------------------------
 
-SCF_IMPLEMENT_IBASE(csLightIterRenderStep::LightSVAccessor)					
-  SCF_IMPLEMENTS_INTERFACE(iLightCallback);
-  SCF_IMPLEMENTS_INTERFACE(iShaderVariableAccessor);
+SCF_IMPLEMENT_IBASE(csLightIterRenderStep::LightSVAccessor)
+  SCF_IMPLEMENTS_INTERFACE(iLightCallback)
+  SCF_IMPLEMENTS_INTERFACE(iShaderVariableAccessor)
 SCF_IMPLEMENT_EMBEDDED_IBASE_END;
 
 csLightIterRenderStep::LightSVAccessor::LightSVAccessor (iLight* light,

@@ -22,8 +22,9 @@
 #include "csextern.h"
 
 #include "csutil/strhash.h"
-#include "csgeom/vector4.h"
 #include "csutil/array.h"
+#include "csutil/leakguard.h"
+#include "csgeom/vector4.h"
 
 struct iObjectRegistry;
 class csShaderVariable;
@@ -38,6 +39,8 @@ struct cons;
 class CS_CSGFX_EXPORT csShaderExpression 
 {
 public:
+  CS_LEAKGUARD_DECLARE (csShaderExpression);
+
   struct oper_arg 
   { 
     uint8 type;
@@ -82,13 +85,16 @@ private:
   csRef<iStringSet> strset;
   /// Compiled array of opcodes for evaluation
   oper_array opcodes;
-  /// Used during compilation, set to the maximum allocated dimensions of the accstack.
-  int accstack_max;
-  /// The accumulator stack.
   /**
-     Set to a static size after compilation, to save on allocation costs, according
-     to accstack_max.
-  */
+   * Used during compilation, set to the maximum allocated dimensions of
+   * the accstack.
+   */
+  int accstack_max;
+  /**
+   * The accumulator stack.
+   * Set to a static size after compilation, to save on allocation costs,
+   * according to accstack_max.
+   */
   arg_array accstack;
 
   /// Parse an XML X-expression
@@ -119,13 +125,17 @@ private:
   bool eval_oper(int oper, oper_arg & output);
 
   /// Add operator
-  bool eval_add(const oper_arg & arg1, const oper_arg & arg2, oper_arg & output) const;
+  bool eval_add(const oper_arg & arg1, const oper_arg & arg2,
+  	oper_arg & output) const;
   /// Subtraction operator
-  bool eval_sub(const oper_arg & arg1, const oper_arg & arg2, oper_arg & output) const;
+  bool eval_sub(const oper_arg & arg1, const oper_arg & arg2,
+  	oper_arg & output) const;
   /// Multiplication operator
-  bool eval_mul(const oper_arg & arg1, const oper_arg & arg2, oper_arg & output) const;
+  bool eval_mul(const oper_arg & arg1, const oper_arg & arg2,
+  	oper_arg & output) const;
   /// Division operator
-  bool eval_div(const oper_arg & arg1, const oper_arg & arg2, oper_arg & output) const;
+  bool eval_div(const oper_arg & arg1, const oper_arg & arg2,
+  	oper_arg & output) const;
   
   /// Element1 operator
   bool eval_elt1(const oper_arg & arg1, oper_arg & output) const;
@@ -142,14 +152,19 @@ private:
   bool eval_cos(const oper_arg & arg1, oper_arg & output) const;
   /// Tangent operator
   bool eval_tan(const oper_arg & arg1, oper_arg & output) const;
-  bool eval_dot(const oper_arg & arg1, const oper_arg & arg2, oper_arg & output) const;
-  bool eval_cross(const oper_arg & arg1, const oper_arg & arg2, oper_arg & output) const;
+  bool eval_dot(const oper_arg & arg1, const oper_arg & arg2,
+  	oper_arg & output) const;
+  bool eval_cross(const oper_arg & arg1, const oper_arg & arg2,
+  	oper_arg & output) const;
   bool eval_vec_len(const oper_arg & arg1, oper_arg & output) const;
   bool eval_normal(const oper_arg & arg1, oper_arg & output) const;
 
-  bool eval_pow(const oper_arg & arg1, const oper_arg & arg2, oper_arg & output) const;
-  bool eval_min(const oper_arg & arg1, const oper_arg & arg2, oper_arg & output) const;
-  bool eval_max(const oper_arg & arg1, const oper_arg & arg2, oper_arg & output) const;
+  bool eval_pow(const oper_arg & arg1, const oper_arg & arg2,
+  	oper_arg & output) const;
+  bool eval_min(const oper_arg & arg1, const oper_arg & arg2,
+  	oper_arg & output) const;
+  bool eval_max(const oper_arg & arg1, const oper_arg & arg2,
+  	oper_arg & output) const;
 
   /// Time function
   bool eval_time(oper_arg & output) const;

@@ -415,7 +415,7 @@ public:
   class eiShaderVariableAccessor : public iShaderVariableAccessor
   {
   public:
-    //SCF_DECLARE_EMBEDDED_IBASE (csGenmeshMeshObject);
+    CS_LEAKGUARD_DECLARE (eiShaderVariableAccessor);
     SCF_DECLARE_IBASE;
     csGenmeshMeshObject* parent;
     virtual ~eiShaderVariableAccessor ()

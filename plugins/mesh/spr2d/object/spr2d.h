@@ -68,8 +68,10 @@ protected:
 #ifdef CS_USE_NEW_RENDERER
   class eiShaderVariableAccessor : public iShaderVariableAccessor
   {
+  private:
     csWeakRef<csSprite2DMeshObject> parent;
   public:
+    CS_LEAKGUARD_DECLARE (eiShaderVariableAccessor);
     SCF_DECLARE_IBASE;
 
     eiShaderVariableAccessor (csSprite2DMeshObject* parent)

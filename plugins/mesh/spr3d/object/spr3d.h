@@ -376,6 +376,8 @@ private:
   const char* GetCacheName ();
 
 public:
+  CS_LEAKGUARD_DECLARE(csSprite3DMeshObjectFactory);
+
   iObjectRegistry* object_reg;
   iVirtualClock* vc;
 
@@ -1088,9 +1090,9 @@ public:
   {
     switch (lighting_quality_config)
     {
-      case CS_SPR_LIGHT_GLOBAL:      return global_lighting_quality; break;
-      case CS_SPR_LIGHT_TEMPLATE:    return factory->GetLightingQuality(); break;
-      case CS_SPR_LIGHT_LOCAL:       return local_lighting_quality; break;
+      case CS_SPR_LIGHT_GLOBAL:      return global_lighting_quality;
+      case CS_SPR_LIGHT_TEMPLATE:    return factory->GetLightingQuality();
+      case CS_SPR_LIGHT_LOCAL:       return local_lighting_quality;
       default:
       {
 	lighting_quality_config = factory->GetLightingQualityConfig();
@@ -1994,6 +1996,7 @@ public:
     csSprite3DMeshObject* parent;
 
   public:
+    CS_LEAKGUARD_DECLARE (eiShaderVariableAccessor);
     eiShaderVariableAccessor (csSprite3DMeshObject* p)
     {
       SCF_CONSTRUCT_IBASE (0);

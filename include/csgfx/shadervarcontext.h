@@ -31,7 +31,9 @@
 
 class CS_CSGFX_EXPORT csShaderVariableContext : public iShaderVariableContext
 {
+private:
   csRefArray<csShaderVariable> variables;
+
 public:
   CS_LEAKGUARD_DECLARE (csShaderVariableContext);
   

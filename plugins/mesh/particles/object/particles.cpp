@@ -43,6 +43,10 @@
 #include "particles.h"
 #include <limits.h>
 
+CS_LEAKGUARD_IMPLEMENT (csParticlesFactory)
+CS_LEAKGUARD_IMPLEMENT (csParticlesObject)
+CS_LEAKGUARD_IMPLEMENT (csParticlesObject::eiShaderVariableAccessor)
+
 CS_IMPLEMENT_PLUGIN
 
 SCF_IMPLEMENT_IBASE (csParticlesType)

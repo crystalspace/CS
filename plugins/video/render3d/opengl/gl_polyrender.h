@@ -18,12 +18,14 @@
 */
 
 #include "csutil/array.h"
+#include "csutil/leakguard.h"
 #include "ivideo/polyrender.h"
 
 class csGLGraphics3D;
 
 class csGLPolygonRenderer : public iPolygonRenderer
 {
+private:
   csGLGraphics3D* parent;
   uint renderBufferNum;
   uint polysNum;
@@ -67,6 +69,7 @@ class csGLPolygonRenderer : public iPolygonRenderer
     
     uint fogVerticesNum;
   public:
+    CS_LEAKGUARD_DECLARE (FogAccesor);
     SCF_DECLARE_IBASE;
 
     FogAccesor (csGLPolygonRenderer *renderer)
@@ -87,6 +90,8 @@ class csGLPolygonRenderer : public iPolygonRenderer
 
   csRef<FogAccesor> fog_accessor;
 public:
+  CS_LEAKGUARD_DECLARE (csGLPolygonRenderer);
+
   SCF_DECLARE_IBASE;
 
   csGLPolygonRenderer (csGLGraphics3D* parent);

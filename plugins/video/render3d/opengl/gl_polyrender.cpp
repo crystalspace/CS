@@ -26,6 +26,9 @@
 #include "gl_polyrender.h"
 #include "gl_render3d.h"
 
+CS_LEAKGUARD_IMPLEMENT (csGLPolygonRenderer)
+CS_LEAKGUARD_IMPLEMENT (csGLPolygonRenderer::FogAccesor)
+
 SCF_IMPLEMENT_IBASE(csGLPolygonRenderer)
   SCF_IMPLEMENTS_INTERFACE(iPolygonRenderer)
 SCF_IMPLEMENT_IBASE_END

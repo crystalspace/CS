@@ -44,9 +44,9 @@ enum
   OP_INVALID = 0,
     
   // Arith operations
-  /* @@@ These may be supplemented with type-specific ops for better optimizations, 
-     if types of variables can be guaranteed somehow. Types of constant expressions 
-     are not an issue, as they are evaluated once. */     
+  /* @@@ These may be supplemented with type-specific ops for better
+     optimizations, if types of variables can be guaranteed somehow. Types
+     of constant expressions are not an issue, as they are evaluated once. */     
   OP_ADD,
   OP_SUB,
   OP_MUL,
@@ -166,7 +166,8 @@ static op_args_info optimize_arg_table[] =
 
   { 0, 0, false }, //  OP_LIMIT
 };
-  
+
+CS_LEAKGUARD_IMPLEMENT (csShaderExpression)
 
 bool csShaderExpression::loaded = false;
 csStringHash csShaderExpression::xmltokens;

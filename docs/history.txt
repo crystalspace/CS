@@ -11,6 +11,7 @@ chronological order.
 	  (cached) if -recalc cmdline option is given.
 	- Jorrit additionally implemented caching for the LOD tables.
 	  Also recalculated if -recalc is given.
+	- Jorrit added lots of leak guards again.
 24-Aug-2004
 	- Jorrit fixed a bug in Dynavis where it would try to use the
 	  hint_goodoccluder flag before setting the value of that.

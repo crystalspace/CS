@@ -23,6 +23,7 @@
 #include "cstool/basetexfact.h"
 #include "csutil/strhash.h"
 #include "csutil/csstring.h"
+#include "csutil/leakguard.h"
 
 #include "iutil/comp.h"
 
@@ -35,6 +36,8 @@ protected:
 #include "cstool/tokenlist.h"
 
 public:
+  CS_LEAKGUARD_DECLARE (csFuncTexLoader);
+
   SCF_DECLARE_IBASE;
 
   csFuncTexLoader (iBase *p);
