@@ -21,6 +21,10 @@ The history order is reversed so that new features are at the top.
 	  binary compatible.
 	- Fixed handling of dynamic lights (CreateDynLight()) in the engine.
 	  The engine now also keeps a reference as it should.
+	- Eric Sunshine added cfg2xml.pl to the project.  This is a script
+	  which automates the task of converting flat configuration file
+	  property lists (*.cfg) of the form "key.subkey.subsubkey = value"
+	  into XML documents.
 10-Sep-2002
 	- iLoaderPlugin and iBinaryLoaderPlugin->Parse() now return a
 	  csPtr.
