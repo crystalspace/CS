@@ -446,7 +446,7 @@ void csSector::Draw (csRenderView& rview)
 
   if (HasFog ())
   {
-    G3DPolygon g3dpoly;
+    G3DPolygonAFP g3dpoly;
     int i;
     if (fogmethod == G3DFOGMETHOD_ZBUFFER)
     {

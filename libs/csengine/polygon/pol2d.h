@@ -189,12 +189,12 @@ public:
   void AddFogPolygon (IGraphics3D* g3d, csPolygon3D* poly, csPolyPlane* plane, bool mirror, CS_ID id, int fog_type);
 };
 
-struct G3DPolygon;
+struct G3DPolygonDPQ;
 
 /**
- * Prepare a filled in G3DPolygon structure for drawing via
+ * Prepare a filled in G3DPolygonDPQ structure for drawing via
  * g3d->DrawPolygonQuick.
  */
-extern void PreparePolygonQuick (G3DPolygon* g3dpoly, bool gouraud);
+extern void PreparePolygonQuick (G3DPolygonDPQ* g3dpoly, csVector2 *orig_triangle, bool gouraud);
 
 #endif /*POL2D_H*/

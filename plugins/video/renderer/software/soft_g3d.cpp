@@ -32,7 +32,7 @@
 #include "cs3d/software/tcache32.h"
 #include "cs3d/software/soft_txt.h"
 #include "cs3d/software/tables.h"
-#include "csengine/basic/fog.h"	//@@@???
+#include "csengine/basic/fog.h" //@@@???
 #include "ipolygon.h"
 #include "isystem.h"
 #include "igraph2d.h"
@@ -106,7 +106,7 @@ csGraphics3DSoftware::csGraphics3DSoftware (ISystem* piSystem) : m_piG2D(NULL)
 {
   HRESULT hRes;
   CLSID clsid2dDriver;
-  char *sz2DDriver = SOFTWARE_2D_DRIVER;	// "crystalspace.graphics2d.xxx"
+  char *sz2DDriver = SOFTWARE_2D_DRIVER;        // "crystalspace.graphics2d.xxx"
   IGraphics2DFactory* piFactory = NULL;
   tcache = NULL;
   txtmgr = NULL;
@@ -116,7 +116,7 @@ csGraphics3DSoftware::csGraphics3DSoftware (ISystem* piSystem) : m_piG2D(NULL)
   hRes = csCLSIDFromProgID( &sz2DDriver, &clsid2dDriver );
 
   if (FAILED(hRes))
-  {	  
+  {       
     SysPrintf(MSG_FATAL_ERROR, "FATAL: Cannot open \"%s\" 2D Graphics driver", sz2DDriver);
     exit(0);
   }
@@ -153,7 +153,7 @@ csGraphics3DSoftware::csGraphics3DSoftware (ISystem* piSystem) : m_piG2D(NULL)
   ilace_fastmove = false;
   do_texel_filt = false;
   do_bilin_filt = false;
-  dbg_max_polygons_to_draw = 2000000000;	// After 2 billion polygons we give up :-)
+  dbg_max_polygons_to_draw = 2000000000;        // After 2 billion polygons we give up :-)
 
   fogMode = G3DFOGMETHOD_ZBUFFER;
   //fogMode = G3DFOGMETHOD_PLANES;
@@ -386,10 +386,10 @@ struct
   { 128, 7, 64, 6, 32, 5, 16, 4 },      // Selective
   { 32, 5, 32, 5, 32, 5, 32, 5 },       // 32-steps
   { 16, 4, 16, 4, 16, 4, 16, 4 },       // 16-steps
-  { 8, 3, 8, 3, 8, 3, 8, 3 }       	// 8-steps
+  { 8, 3, 8, 3, 8, 3, 8, 3 }            // 8-steps
 };
 
-HRESULT csGraphics3DSoftware::DrawPolygonFlat (G3DPolygon& poly)
+HRESULT csGraphics3DSoftware::DrawPolygonFlat (G3DPolygonDPF& poly)
 {
   int i;
   int max_i, min_i;
@@ -425,10 +425,6 @@ HRESULT csGraphics3DSoftware::DrawPolygonFlat (G3DPolygon& poly)
   if (ABS (Dc) < SMALL_D) Dc = -SMALL_D;
   if (ABS (Dc) < SMALL_D)
   {
-
-    ComcsVector3 vcam_0;
-    poly.polygon->GetCameraVector (0, &vcam_0);
-
     // The Dc component of the plane normal is too small. This means that
     // the plane of the polygon is almost perpendicular to the eye of the
     // viewer. In this case, nothing much can be seen of the plane anyway
@@ -437,7 +433,7 @@ HRESULT csGraphics3DSoftware::DrawPolygonFlat (G3DPolygon& poly)
     N = 0;
     // For O choose the transformed z value of one vertex.
     // That way Z buffering should at least work.
-    O = 1/vcam_0.z;
+    O = 1/poly.z_value;
   }
   else
   {
@@ -484,7 +480,7 @@ HRESULT csGraphics3DSoftware::DrawPolygonFlat (G3DPolygon& poly)
   ILightMap* lm = NULL;
   if (do_lighting)
   {
-    poly.polygon->GetTexture (0, &tex);
+    tex = poly.poly_texture[0];
     tex->GetLightMap (&lm);
   }
   csTextureMMSoftware* txt_mm = (csTextureMMSoftware*)GetcsTextureMMFromITextureHandle (poly.txt_handle);
@@ -535,8 +531,8 @@ HRESULT csGraphics3DSoftware::DrawPolygonFlat (G3DPolygon& poly)
         unsigned char * rgb, * rgb_values = txt_mm->get_colormap_private ();
         rgb = rgb_values + (mean_color_idx << 2);
         mean_color_idx = true_to_pal[lt_light[*rgb].red[lr] |
-		   lt_light[*(rgb+1)].green[lg] |
-		   lt_light[*(rgb+2)].blue[lb]];
+                   lt_light[*(rgb+1)].green[lg] |
+                   lt_light[*(rgb+2)].blue[lb]];
       }
     }
   }
@@ -548,8 +544,7 @@ HRESULT csGraphics3DSoftware::DrawPolygonFlat (G3DPolygon& poly)
   dscan = NULL;
 
   bool tex_transp = Scan::texture->get_transparent ();
-  int poly_alpha;
-  poly.polygon->GetAlpha (poly_alpha);
+  int  poly_alpha = poly.alpha;
 
   // No texture mapping.
   if (do_transp && (tex_transp) || poly_alpha)
@@ -675,7 +670,7 @@ HRESULT csGraphics3DSoftware::DrawPolygonFlat (G3DPolygon& poly)
         xR = QRound (sxR);
 
         //m_piG2D->GetPixelAt(xL, screenY, &d);
-	d = line_table[screenY] + (xL << pixel_shift);
+        d = line_table[screenY] + (xL << pixel_shift);
         z_buf = z_buffer + width * screenY + xL;
 
         // do not draw the rightmost pixel - it will be covered
@@ -695,7 +690,7 @@ finish:
   return S_OK;
 }
 
-STDMETHODIMP csGraphics3DSoftware::DrawPolygon (G3DPolygon& poly)
+STDMETHODIMP csGraphics3DSoftware::DrawPolygon (G3DPolygonDP& poly)
 {
   if (!do_textured)
   {
@@ -739,10 +734,6 @@ STDMETHODIMP csGraphics3DSoftware::DrawPolygon (G3DPolygon& poly)
   if (ABS (Dc) < SMALL_D) Dc = -SMALL_D;
   if (ABS (Dc) < SMALL_D)
   {
-
-    ComcsVector3 vcam_0;
-    poly.polygon->GetCameraVector (0, &vcam_0);
-
     // The Dc component of the plane normal is too small. This means that
     // the plane of the polygon is almost perpendicular to the eye of the
     // viewer. In this case, nothing much can be seen of the plane anyway
@@ -751,7 +742,7 @@ STDMETHODIMP csGraphics3DSoftware::DrawPolygon (G3DPolygon& poly)
     N = 0;
     // For O choose the transformed z value of one vertex.
     // That way Z buffering should at least work.
-    O = 1/vcam_0.z;
+    O = 1/poly.z_value;
   }
   else
   {
@@ -806,7 +797,7 @@ STDMETHODIMP csGraphics3DSoftware::DrawPolygon (G3DPolygon& poly)
 
   // Mipmapping.
   int mipmap;
-  if (poly.polygon->UsesMipMaps () == S_FALSE  ||  rstate_mipmap == 1)
+  if (poly.uses_mipmaps == false ||  rstate_mipmap == 1)
     mipmap = 0;
   else if (rstate_mipmap == 0)
   {
@@ -817,10 +808,9 @@ STDMETHODIMP csGraphics3DSoftware::DrawPolygon (G3DPolygon& poly)
   }
   else
     mipmap = rstate_mipmap - 1;
-  IPolygonTexture* tex;
-  poly.polygon->GetTexture (mipmap, &tex);
-  csTextureMMSoftware* txt_mm = (csTextureMMSoftware*)GetcsTextureMMFromITextureHandle (poly.txt_handle);
-  csTexture* txt_unl = txt_mm->get_texture (mipmap);
+  IPolygonTexture* tex         = poly.poly_texture[mipmap];
+  csTextureMMSoftware* txt_mm  = (csTextureMMSoftware*)GetcsTextureMMFromITextureHandle (poly.txt_handle);
+  csTexture*           txt_unl = txt_mm->get_texture (mipmap);
 
   // Initialize our static drawing information and cache
   // the texture in the texture cache (if this is not already the case).
@@ -834,7 +824,7 @@ STDMETHODIMP csGraphics3DSoftware::DrawPolygon (G3DPolygon& poly)
     else CacheTexture (tex);
   }
 
-  Scan::init_draw (this, poly.polygon, tex, txt_mm, txt_unl);
+  Scan::init_draw (this, tex, txt_mm, txt_unl);
 
   // @@@ The texture transform matrix is currently written as T = M*(C-V)
   // (with V being the transform vector, M the transform matrix, and C
@@ -914,8 +904,7 @@ STDMETHODIMP csGraphics3DSoftware::DrawPolygon (G3DPolygon& poly)
   dscan = NULL;
 
   bool tex_transp = Scan::texture->get_transparent ();
-  int poly_alpha;
-  poly.polygon->GetAlpha (poly_alpha);
+  int  poly_alpha = poly.alpha;
 
   if (gi_pixelbytes == 2)
   {
@@ -928,17 +917,17 @@ STDMETHODIMP csGraphics3DSoftware::DrawPolygon (G3DPolygon& poly)
         dscan = Scan16::draw_scanline_transp_map;
       else if (do_transp && poly_alpha)
       {
-	Scan::alpha_mask = txtmgr->alpha_mask;
+        Scan::alpha_mask = txtmgr->alpha_mask;
         if (poly_alpha == 50)
           dscan = Scan16::draw_scanline_map_alpha50;
-	else
-	{
-	  Scan::alpha_fact = poly_alpha*256/100;
-	  if (pfmt.GreenBits == 5)
-	    dscan = Scan16::draw_scanline_map_alpha_555;
-	  else
-	    dscan = Scan16::draw_scanline_map_alpha_565;
-	}
+        else
+        {
+          Scan::alpha_fact = poly_alpha*256/100;
+          if (pfmt.GreenBits == 5)
+            dscan = Scan16::draw_scanline_map_alpha_555;
+          else
+            dscan = Scan16::draw_scanline_map_alpha_565;
+        }
       }
       else
         if (do_texel_filt && mipmap == 0)
@@ -961,7 +950,7 @@ STDMETHODIMP csGraphics3DSoftware::DrawPolygon (G3DPolygon& poly)
       if (txtMode == TXT_PRIVATE)
       {
         unsigned char* priv_to_global;
-	priv_to_global = Scan::texture->get_private_to_global ();
+        priv_to_global = Scan::texture->get_private_to_global ();
 
         if (z_buf_mode == ZBuf_Use)
           dscan = Scan16::draw_scanline_z_buf_private;
@@ -992,11 +981,11 @@ STDMETHODIMP csGraphics3DSoftware::DrawPolygon (G3DPolygon& poly)
       {
         if (poly_alpha == 50)
           dscan = Scan32::draw_scanline_map_alpha50;
-	else
-	{
-	  Scan::alpha_fact = poly_alpha*256/100;
-	  dscan = Scan32::draw_scanline_map_alpha;
-	}
+        else
+        {
+          Scan::alpha_fact = poly_alpha*256/100;
+          dscan = Scan32::draw_scanline_map_alpha;
+        }
       }
       else
         dscan = Scan32::draw_scanline_map;
@@ -1033,7 +1022,7 @@ STDMETHODIMP csGraphics3DSoftware::DrawPolygon (G3DPolygon& poly)
         if (txtMode == TXT_PRIVATE)
         {
           unsigned char* priv_to_global;
-	  priv_to_global = Scan::texture->get_private_to_global ();
+          priv_to_global = Scan::texture->get_private_to_global ();
           
           dscan = Scan::draw_scanline_z_buf_private;
         } 
@@ -1054,7 +1043,7 @@ STDMETHODIMP csGraphics3DSoftware::DrawPolygon (G3DPolygon& poly)
         if (txtMode == TXT_PRIVATE)
         {
           unsigned char* priv_to_global;
-	  priv_to_global = Scan::texture->get_private_to_global ();
+          priv_to_global = Scan::texture->get_private_to_global ();
           dscan = Scan::draw_scanline_transp_private;
         } 
         else
@@ -1083,12 +1072,12 @@ STDMETHODIMP csGraphics3DSoftware::DrawPolygon (G3DPolygon& poly)
           alpha_map = lt_alpha->alpha_map25;
           dscan = Scan::draw_scanline_map_alpha1;
         }
-	else if (poly_alpha >= 37 && poly_alpha < 63)
+        else if (poly_alpha >= 37 && poly_alpha < 63)
         {
           alpha_map = lt_alpha->alpha_map50;
           dscan = Scan::draw_scanline_map_alpha1;
         }
-	else
+        else
         {
           alpha_map = lt_alpha->alpha_map25;
           dscan = Scan::draw_scanline_map_alpha2;
@@ -1113,7 +1102,7 @@ STDMETHODIMP csGraphics3DSoftware::DrawPolygon (G3DPolygon& poly)
       if (txtMode == TXT_PRIVATE)
       {
         unsigned char* priv_to_global;
-	priv_to_global = Scan::texture->get_private_to_global ();
+        priv_to_global = Scan::texture->get_private_to_global ();
         dscan = Scan::draw_scanline_private;
       }
       else
@@ -1284,7 +1273,7 @@ STDMETHODIMP csGraphics3DSoftware::DrawPolygon (G3DPolygon& poly)
         float deltaX = (float)xL - sxL;
 
         //m_piG2D->GetPixelAt(xL, screenY, &d);
-	d = line_table[screenY] + (xL << pixel_shift);
+        d = line_table[screenY] + (xL << pixel_shift);
         z_buf = z_buffer + width * screenY + xL;
 
         // Select the right filter depending if we are drawing an odd or even line.
@@ -1344,7 +1333,7 @@ finish:
 #endif // ---------------------------------------------------------------------
 
 
-STDMETHODIMP csGraphics3DSoftware::DrawPolygonDebug (G3DPolygon& poly)
+STDMETHODIMP csGraphics3DSoftware::DrawPolygonDebug (G3DPolygonDP& poly)
 {
   (void)poly;
   return S_OK;
@@ -1391,7 +1380,7 @@ STDMETHODIMP csGraphics3DSoftware::CloseFogObject (CS_ID id)
   return S_OK;
 }
 
-STDMETHODIMP csGraphics3DSoftware::AddFogPolygon (CS_ID id, G3DPolygon& poly, int fog_type)
+STDMETHODIMP csGraphics3DSoftware::AddFogPolygon (CS_ID id, G3DPolygonAFP& poly, int fog_type)
 {
   int i;
   int max_i, min_i;
@@ -1430,9 +1419,6 @@ STDMETHODIMP csGraphics3DSoftware::AddFogPolygon (CS_ID id, G3DPolygon& poly, in
 
     if (ABS (Dc) < SMALL_D)
     {
-      //ComcsVector3 vcam_0;
-      //poly.polygon->GetCameraVector(0, &vcam_0);
-
       // The Dc component of the plane normal is too small. This means that
       // the plane of the polygon is almost perpendicular to the eye of the
       // viewer. In this case, nothing much can be seen of the plane anyway
@@ -1441,7 +1427,6 @@ STDMETHODIMP csGraphics3DSoftware::AddFogPolygon (CS_ID id, G3DPolygon& poly, in
       N = 0;
       // For O choose the transformed z value of one vertex.
       // That way Z buffering should at least work.
-      //O = 1/vcam_0.z;
       O = 1;
     }
     else
@@ -1525,19 +1510,19 @@ STDMETHODIMP csGraphics3DSoftware::AddFogPolygon (CS_ID id, G3DPolygon& poly, in
     {
       case CS_FOG_FRONT:
         if (pfmt.GreenBits == 5) dscan = Scan16::draw_scanline_fog_555;
-	else dscan = Scan16::draw_scanline_fog_565;
-	break;
+        else dscan = Scan16::draw_scanline_fog_565;
+        break;
       case CS_FOG_BACK:
         dscan = Scan16::draw_scanline_zfill_only;
-	break;
+        break;
       case CS_FOG_VIEW:
         if (pfmt.GreenBits == 5) dscan = Scan16::draw_scanline_fog_view_555;
         else dscan = Scan16::draw_scanline_fog_view_565;
-	break;
+        break;
       case CS_FOG_PLANE:
         if (pfmt.GreenBits == 5) dscan = Scan16::draw_scanline_fog_plane_555;
         else dscan = Scan16::draw_scanline_fog_plane_565;
-	break;
+        break;
     }
   }
   else if (gi_pixelbytes == 4)
@@ -1664,7 +1649,7 @@ STDMETHODIMP csGraphics3DSoftware::AddFogPolygon (CS_ID id, G3DPolygon& poly, in
         float deltaX = (float)xL - sxL;
 
         //m_piG2D->GetPixelAt(xL, screenY, &d);
-	d = line_table[screenY] + (xL << pixel_shift);
+        d = line_table[screenY] + (xL << pixel_shift);
         z_buf = z_buffer + width * screenY + xL;
 
         // do not draw the rightmost pixel - it will be covered
@@ -1754,7 +1739,7 @@ STDMETHODIMP csGraphics3DSoftware::StartPolygonQuick (ITextureHandle* handle, bo
 
   Scan::alpha_mask = txtmgr->alpha_mask;
 
-  pqinfo.redFact = (1<<pfmt.RedBits)-1;	// 32 for 555, 64 for 565, and 256 for 888 mode.
+  pqinfo.redFact = (1<<pfmt.RedBits)-1; // 32 for 555, 64 for 565, and 256 for 888 mode.
   pqinfo.greenFact = (1<<pfmt.GreenBits)-1;
   pqinfo.blueFact = (1<<pfmt.BlueBits)-1;
   pqinfo.greenBits = pfmt.GreenBits;
@@ -1773,14 +1758,14 @@ STDMETHODIMP csGraphics3DSoftware::StartPolygonQuick (ITextureHandle* handle, bo
       if (pqinfo.do_gouraud)
       {
         if (z_buf_mode == ZBuf_Use)
-	  if (pqinfo.greenBits == 5)
+          if (pqinfo.greenBits == 5)
             pqinfo.drawline_gouraud = Scan16::draw_pi_scanline_flat_gouraud_555;
-	  else
+          else
             pqinfo.drawline_gouraud = Scan16::draw_pi_scanline_flat_gouraud_565;
         else
-	  if (pqinfo.greenBits == 5)
+          if (pqinfo.greenBits == 5)
             pqinfo.drawline_gouraud = Scan16::draw_pi_scanline_flat_gouraud_zfill_555;
-	  else
+          else
             pqinfo.drawline_gouraud = Scan16::draw_pi_scanline_flat_gouraud_zfill_565;
       }
       else
@@ -1796,14 +1781,14 @@ STDMETHODIMP csGraphics3DSoftware::StartPolygonQuick (ITextureHandle* handle, bo
       if (gouraud)
       {
         if (z_buf_mode == ZBuf_Use)
-	  if (pqinfo.greenBits == 5)
+          if (pqinfo.greenBits == 5)
             pqinfo.drawline_gouraud = Scan16::draw_pi_scanline_gouraud_555;
-	  else
+          else
             pqinfo.drawline_gouraud = Scan16::draw_pi_scanline_gouraud_565;
         else
-	  if (pqinfo.greenBits == 5)
+          if (pqinfo.greenBits == 5)
             pqinfo.drawline_gouraud = Scan16::draw_pi_scanline_gouraud_zfill_555;
-	  else
+          else
             pqinfo.drawline_gouraud = Scan16::draw_pi_scanline_gouraud_zfill_565;
       }
       else
@@ -1811,9 +1796,9 @@ STDMETHODIMP csGraphics3DSoftware::StartPolygonQuick (ITextureHandle* handle, bo
         if (z_buf_mode == ZBuf_Use)
         {
 #         if defined(DO_MMX) && !defined(NO_ASSEMBLER)
-	    // if (cpu_mmx && do_mmx)
-	    // drawline = Scan16::mmx_draw_pi_scanline;
-	    // else
+            // if (cpu_mmx && do_mmx)
+            // drawline = Scan16::mmx_draw_pi_scanline;
+            // else
 #         endif
           pqinfo.drawline = Scan16::draw_pi_scanline;
         }
@@ -1861,7 +1846,7 @@ STDMETHODIMP csGraphics3DSoftware::StartPolygonQuick (ITextureHandle* handle, bo
   }
   else
   {
-    if (!handle) return S_OK;	// Not implemented yet@@@
+    if (!handle) return S_OK;   // Not implemented yet@@@
     if (z_buf_mode == ZBuf_Use)
     {
 #     if defined(DO_MMX) && !defined(NO_ASSEMBLER)
@@ -1884,10 +1869,10 @@ STDMETHODIMP csGraphics3DSoftware::FinishPolygonQuick ()
 
 #define EPS   0.0001
 
-STDMETHODIMP csGraphics3DSoftware::DrawPolygonQuick (G3DPolygon& poly, bool gouraud)
+STDMETHODIMP csGraphics3DSoftware::DrawPolygonQuick (G3DPolygonDPQ& poly, bool gouraud)
 {
   int i;
-  if (pqinfo.pixelbytes <= 1) gouraud = false;	// Currently no gouraud shading in 8-bit mode.
+  if (pqinfo.pixelbytes <= 1) gouraud = false;  // Currently no gouraud shading in 8-bit mode.
   gouraud = pqinfo.do_gouraud;
 
   float flat_r, flat_g, flat_b;
@@ -1906,12 +1891,12 @@ STDMETHODIMP csGraphics3DSoftware::DrawPolygonQuick (G3DPolygon& poly, bool gour
   top = bot = 0;                        // avoid GCC complains
   for (i = 0 ; i < poly.num ; i++)
   {
-    uu[i] = pqinfo.tw * poly.pi_texcoords [i].u;
-    vv[i] = pqinfo.th * poly.pi_texcoords [i].v;
-    iz[i] = poly.pi_texcoords [i].z;
-    rr[i] = pqinfo.redFact*(flat_r*poly.pi_texcoords[i].r);
-    gg[i] = pqinfo.greenFact*(flat_g*poly.pi_texcoords[i].g);
-    bb[i] = pqinfo.blueFact*(flat_b*poly.pi_texcoords[i].b);
+    uu[i] = pqinfo.tw * poly.vertices [i].u;
+    vv[i] = pqinfo.th * poly.vertices [i].v;
+    iz[i] = poly.vertices [i].z;
+    rr[i] = pqinfo.redFact*(flat_r*poly.vertices[i].r);
+    gg[i] = pqinfo.greenFact*(flat_g*poly.vertices[i].g);
+    bb[i] = pqinfo.blueFact*(flat_b*poly.vertices[i].b);
     if (poly.vertices [i].sy > top_y)
     {
       top_y = poly.vertices [i].sy;
@@ -1954,38 +1939,38 @@ STDMETHODIMP csGraphics3DSoftware::DrawPolygonQuick (G3DPolygon& poly, bool gour
   int du = 0, dv = 0;
   if (pqinfo.textured)
   {
-    float uu0 = pqinfo.tw * poly.pi_texcoords [0].u;
-    float uu1 = pqinfo.tw * poly.pi_texcoords [1].u;
-    float uu2 = pqinfo.tw * poly.pi_texcoords [last].u;
+    float uu0 = pqinfo.tw * poly.vertices [0].u;
+    float uu1 = pqinfo.tw * poly.vertices [1].u;
+    float uu2 = pqinfo.tw * poly.vertices [last].u;
     du = QInt16 (((uu0 - uu2) * (poly.vertices [1].sy - poly.vertices [last].sy)
                 - (uu1 - uu2) * (poly.vertices [0].sy - poly.vertices [last].sy)) * inv_dd);
-    float vv0 = pqinfo.th * poly.pi_texcoords [0].v;
-    float vv1 = pqinfo.th * poly.pi_texcoords [1].v;
-    float vv2 = pqinfo.th * poly.pi_texcoords [last].v;
+    float vv0 = pqinfo.th * poly.vertices [0].v;
+    float vv1 = pqinfo.th * poly.vertices [1].v;
+    float vv2 = pqinfo.th * poly.vertices [last].v;
     dv = QInt16 (((vv0 - vv2) * (poly.vertices [1].sy - poly.vertices [last].sy)
                 - (vv1 - vv2) * (poly.vertices [0].sy - poly.vertices [last].sy)) * inv_dd);
   }
-  float iz0 = poly.pi_texcoords [0].z;
-  float iz1 = poly.pi_texcoords [1].z;
-  float iz2 = poly.pi_texcoords [last].z;
+  float iz0 = poly.vertices [0].z;
+  float iz1 = poly.vertices [1].z;
+  float iz2 = poly.vertices [last].z;
   int dz = QInt24 (((iz0 - iz2) * (poly.vertices [1].sy - poly.vertices [last].sy)
                   - (iz1 - iz2) * (poly.vertices [0].sy - poly.vertices [last].sy)) * inv_dd);
   long dr = 0, dg = 0, db = 0;
   if (gouraud)
   {
-    float rr0 = pqinfo.redFact*(flat_r*poly.pi_texcoords [0].r);
-    float rr1 = pqinfo.redFact*(flat_r*poly.pi_texcoords [1].r);
-    float rr2 = pqinfo.redFact*(flat_r*poly.pi_texcoords [last].r);
+    float rr0 = pqinfo.redFact*(flat_r*poly.vertices [0].r);
+    float rr1 = pqinfo.redFact*(flat_r*poly.vertices [1].r);
+    float rr2 = pqinfo.redFact*(flat_r*poly.vertices [last].r);
     dr = QInt16 (((rr0 - rr2) * (poly.vertices [1].sy - poly.vertices [last].sy)
                 - (rr1 - rr2) * (poly.vertices [0].sy - poly.vertices [last].sy)) * inv_dd);
-    float gg0 = pqinfo.greenFact*(flat_g*poly.pi_texcoords [0].g);
-    float gg1 = pqinfo.greenFact*(flat_g*poly.pi_texcoords [1].g);
-    float gg2 = pqinfo.greenFact*(flat_g*poly.pi_texcoords [last].g);
+    float gg0 = pqinfo.greenFact*(flat_g*poly.vertices [0].g);
+    float gg1 = pqinfo.greenFact*(flat_g*poly.vertices [1].g);
+    float gg2 = pqinfo.greenFact*(flat_g*poly.vertices [last].g);
     dg = QInt16 (((gg0 - gg2) * (poly.vertices [1].sy - poly.vertices [last].sy)
                 - (gg1 - gg2) * (poly.vertices [0].sy - poly.vertices [last].sy)) * inv_dd);
-    float bb0 = pqinfo.blueFact*(flat_b*poly.pi_texcoords [0].b);
-    float bb1 = pqinfo.blueFact*(flat_b*poly.pi_texcoords [1].b);
-    float bb2 = pqinfo.blueFact*(flat_b*poly.pi_texcoords [last].b);
+    float bb0 = pqinfo.blueFact*(flat_b*poly.vertices [0].b);
+    float bb1 = pqinfo.blueFact*(flat_b*poly.vertices [1].b);
+    float bb2 = pqinfo.blueFact*(flat_b*poly.vertices [last].b);
     db = QInt16 (((bb0 - bb2) * (poly.vertices [1].sy - poly.vertices [last].sy)
                 - (bb1 - bb2) * (poly.vertices [0].sy - poly.vertices [last].sy)) * inv_dd);
   }
@@ -2067,20 +2052,20 @@ b:      if (scanL2==bot)
         float dyL = poly.vertices [scanL1].sy - poly.vertices [scanL2].sy;
         if (dyL > 0)
         {
-	  float inv_dyL = 1/dyL;
+          float inv_dyL = 1/dyL;
           dxdyL = QInt16 ((poly.vertices [scanL2].sx - poly.vertices [scanL1].sx) * inv_dyL);
-	  if (pqinfo.textured)
-	  {
+          if (pqinfo.textured)
+          {
             dudyL = QInt16 ((uu[scanL2] - uu[scanL1]) * inv_dyL);
             dvdyL = QInt16 ((vv[scanL2] - vv[scanL1]) * inv_dyL);
-	  }
+          }
           dzdyL = QInt24 ((iz[scanL2] - iz[scanL1]) * inv_dyL);
-	  if (gouraud)
-	  {
+          if (gouraud)
+          {
             drdyL = QInt16 ((rr[scanL2] - rr[scanL1]) * inv_dyL);
             dgdyL = QInt16 ((gg[scanL2] - gg[scanL1]) * inv_dyL);
             dbdyL = QInt16 ((bb[scanL2] - bb[scanL1]) * inv_dyL);
-	  }
+          }
           xL = QInt16 (poly.vertices [scanL1].sx);
 
           // horizontal pixel correction
@@ -2094,19 +2079,19 @@ b:      if (scanL2==bot)
             Factor = deltaX / (poly.vertices [scanL2].sx - poly.vertices [scanL1].sx);
           else
             Factor = 0;
-	        
+                
           if (pqinfo.textured)
-	  {
+          {
             uL = QInt16 (uu [scanL1] + (uu [scanL2] - uu [scanL1]) * Factor);
             vL = QInt16 (vv [scanL1] + (vv [scanL2] - vv [scanL1]) * Factor);
-	  }
+          }
           zL = QInt24 (iz [scanL1] + (iz [scanL2] - iz [scanL1]) * Factor);
           if (gouraud)
-	  {
-	    rL = QInt16 (rr [scanL1] + (rr [scanL2] - rr [scanL1]) * Factor);
-	    gL = QInt16 (gg [scanL1] + (gg [scanL2] - gg [scanL1]) * Factor);
-	    bL = QInt16 (bb [scanL1] + (bb [scanL2] - bb [scanL1]) * Factor);
-	  }
+          {
+            rL = QInt16 (rr [scanL1] + (rr [scanL2] - rr [scanL1]) * Factor);
+            gL = QInt16 (gg [scanL1] + (gg [scanL2] - gg [scanL1]) * Factor);
+            bL = QInt16 (bb [scanL1] + (bb [scanL2] - bb [scanL1]) * Factor);
+          }
         } /* endif */
         leave = false;
       } /* endif */
@@ -2259,7 +2244,7 @@ void csGraphics3DSoftware::CacheSubTexture (IPolygonTexture* texture, int u, int
 }
 
 void csGraphics3DSoftware::CacheRectTexture (IPolygonTexture* tex,
-	int minu, int minv, int maxu, int maxv)
+        int minu, int minv, int maxu, int maxv)
 {
   int subtex_size;
   tex->GetSubtexSize (subtex_size);
@@ -2615,7 +2600,7 @@ STDMETHODIMP csGraphics3DSoftware::DrawHalo(csVector3* pCenter, float fIntensity
   if (nx < 0)
   {
     hw += nx;    // decrease the width
-    nx = 0;	    // clip to screen boundaries
+    nx = 0;         // clip to screen boundaries
   }
     
   if (ny < 0)
@@ -2839,7 +2824,7 @@ csGraphics3DSoftware::csHaloDrawer::csHaloDrawer(IGraphics2D* piG2D, float r, fl
       d += 2 * (x - y) + 5;
       y--;
       if (y <= x)
-	break;
+        break;
 
       drawline_outerrim(-x, x, y);
       drawline_outerrim(-x, x, -y);
@@ -2873,7 +2858,7 @@ csGraphics3DSoftware::csHaloDrawer::csHaloDrawer(IGraphics2D* piG2D, float r, fl
       d += 2 * (x - y) + 5;
       y--;
       if (y <= x)
-	break;
+        break;
 
       drawline_innerrim(-x, x, y);
       drawline_innerrim(-x, x, -y);
@@ -2936,7 +2921,7 @@ void csGraphics3DSoftware::csHaloDrawer::drawline_vertical(int /*x*/, int y1, in
     for(i=0; i<3; i++)
     {
         buf[i] = c;    
-	abuf[i] = 0;
+        abuf[i] = 0;
     }
   }
 

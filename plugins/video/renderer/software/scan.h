@@ -151,68 +151,68 @@ public:
 
   /// Draw one horizontal scanline with no texture mapping.
   static void draw_scanline_flat (int xx, unsigned char* d, unsigned long* z_buf,
-  			  float inv_z, float u_div_z, float v_div_z);
+                          float inv_z, float u_div_z, float v_div_z);
   /// Draw one horizontal scanline with no texture mapping (but use Z buffer).
   static void draw_scanline_z_buf_flat (int xx, unsigned char* d, unsigned long* z_buf,
-  			  float inv_z, float u_div_z, float v_div_z);
+                          float inv_z, float u_div_z, float v_div_z);
   /// Draw one horizontal scanline (no lighting).
   static void draw_scanline (int xx, unsigned char* d, unsigned long* z_buf,
-  			  float inv_z, float u_div_z, float v_div_z);
+                          float inv_z, float u_div_z, float v_div_z);
   /// Draw one horizontal scanline (no lighting, private mode).
   static void draw_scanline_private (int xx, unsigned char* d, unsigned long* z_buf,
-  			  float inv_z, float u_div_z, float v_div_z);
+                          float inv_z, float u_div_z, float v_div_z);
   /// Draw one horizontal scanline for fog.
   static void draw_scanline_fog (int xx, unsigned char* d, unsigned long* z_buf,
-  			  float inv_z, float u_div_z, float v_div_z);
+                          float inv_z, float u_div_z, float v_div_z);
   /// Draw one horizontal scanline (lighting and alpha transparency).
   static void draw_scanline_map_alpha1 (int xx, unsigned char* d, unsigned long* z_buf,
-			  float inv_z, float u_div_z, float v_div_z);
+                          float inv_z, float u_div_z, float v_div_z);
   /// Draw one horizontal scanline (lighting and alpha transparency).
   static void draw_scanline_map_alpha2 (int xx, unsigned char* d, unsigned long* z_buf,
-			  float inv_z, float u_div_z, float v_div_z);
+                          float inv_z, float u_div_z, float v_div_z);
   /// Draw one horizontal scanline (lighting).
   static void draw_scanline_map (int xx, unsigned char* d, unsigned long* z_buf,
-			  float inv_z, float u_div_z, float v_div_z);
+                          float inv_z, float u_div_z, float v_div_z);
   /// Draw one horizontal scanline (lighting and filtering).
   static void draw_scanline_map_filter (int xx, unsigned char* d, unsigned long* z_buf,
-			  float inv_z, float u_div_z, float v_div_z);
+                          float inv_z, float u_div_z, float v_div_z);
   /// Draw one horizontal scanline (transparent and no lighting).
   static void draw_scanline_transp (int xx, unsigned char* d, unsigned long* z_buf,
-			  float inv_z, float u_div_z, float v_div_z);
+                          float inv_z, float u_div_z, float v_div_z);
   /// Draw one horizontal scanline (transparent and no lighting, private mode).
   static void draw_scanline_transp_private (int xx, unsigned char* d, unsigned long* z_buf,
-			  float inv_z, float u_div_z, float v_div_z);
+                          float inv_z, float u_div_z, float v_div_z);
   /// Draw one horizontal scanline (transparent with lighting).
   static void draw_scanline_transp_map (int xx, unsigned char* d, unsigned long* z_buf,
-			  float inv_z, float u_div_z, float v_div_z);
+                          float inv_z, float u_div_z, float v_div_z);
   /// Draw one horizontal scanline (Z buffer and no lighting).
   static void draw_scanline_z_buf (int xx, unsigned char* d, unsigned long* z_buf,
-			  float inv_z, float u_div_z, float v_div_z);
+                          float inv_z, float u_div_z, float v_div_z);
   /// Draw one horizontal scanline (Z buffer and no lighting, private mode).
   static void draw_scanline_z_buf_private (int xx, unsigned char* d, unsigned long* z_buf,
-			  float inv_z, float u_div_z, float v_div_z);
+                          float inv_z, float u_div_z, float v_div_z);
   /// Draw one horizontal scanline (Z buffer and lighting).
   static void draw_scanline_z_buf_map (int xx, unsigned char* d, unsigned long* z_buf,
-			  float inv_z, float u_div_z, float v_div_z);
+                          float inv_z, float u_div_z, float v_div_z);
   /// Draw one horizontal scanline (lighting and uniform lighting).
   static void draw_scanline_map_light (int xx, unsigned char* d, unsigned long* z_buf,
-			  float inv_z, float u_div_z, float v_div_z);
+                          float inv_z, float u_div_z, float v_div_z);
   /// Draw one horizontal scanline (Z buffer, lighting and uniform lighting).
   static void draw_scanline_z_buf_map_light (int xx, unsigned char* d, unsigned long* z_buf,
-			  float inv_z, float u_div_z, float v_div_z);
+                          float inv_z, float u_div_z, float v_div_z);
 
 #ifdef DO_MMX
   /// Draw one horizontal scanline (lighting) using MMX
   static void mmx_draw_scanline_map (int xx, unsigned char* d, unsigned long* z_buf,
-			  float inv_z, float u_div_z, float v_div_z);
+                          float inv_z, float u_div_z, float v_div_z);
   /// Draw one horizontal scanline (no lighting) using MMX
   static void mmx_draw_scanline (int xx, unsigned char* d, unsigned long* z_buf,
-  			  float inv_z, float u_div_z, float v_div_z);
+                          float inv_z, float u_div_z, float v_div_z);
 #endif
 
   ///
-  static void init_draw (csGraphics3DSoftware* g3d, IPolygon3D* p, IPolygonTexture* tex,
-  	csTextureMMSoftware* texture, csTexture* untxt);
+  static void init_draw (csGraphics3DSoftware* g3d, IPolygonTexture* tex,
+        csTextureMMSoftware* texture, csTexture* untxt);
   /// Do a debugging dump.
   static void dump (csGraphics3DSoftware* pG3D);
 

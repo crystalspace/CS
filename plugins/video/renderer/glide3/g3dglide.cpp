@@ -10,7 +10,7 @@
     but WITHOUT ANY WARRANTY; without even the implied warranty of
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
     Library General Public License for more details.
-	
+  
     You should have received a copy of the GNU Library General Public
     License along with this library; if not, write to the Free
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
@@ -37,7 +37,7 @@
 #include "IGraph3d.h"
 #include "csutil/inifile.h"
 
-//#include "render/glide3/driver2d/g2d.h"	@@@
+//#include "render/glide3/driver2d/g2d.h" @@@
 #include "cs3d/glide3/g3dglide.h"
 
 csIniFile *configglide3;
@@ -45,34 +45,34 @@ csIniFile *configglide3;
 void sys_fatalerror(char *str, HRESULT hRes = S_OK)
 {
 #if defined(OS_WIN32)
-	if (hRes!=S_OK)
-	{
+  if (hRes!=S_OK)
+  {
     LPVOID lpMsgBuf;
     char* szMsg;
     char szStdMessage[] = "\nLast Error: ";
 
     DWORD dwResult;
-		dwResult = FormatMessage(FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM, NULL,
-								 hRes,  MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), 
-							     (LPTSTR) &lpMsgBuf, 0, NULL );
-	
-		if (dwResult != 0)
-		{
-			szMsg = new char[strlen((const char*)lpMsgBuf) + strlen(str) + strlen(szStdMessage) + 1];
-			strcpy( szMsg, str );
-			strcat( szMsg, szStdMessage );
-			strcat( szMsg, (const char*)lpMsgBuf );
-			
-			LocalFree( lpMsgBuf );
-			
-			MessageBox (NULL, szMsg, "Fatal Error in Glide3xRender.dll", MB_OK);
-			delete szMsg;
+    dwResult = FormatMessage(FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM, NULL,
+                 hRes,  MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), 
+                   (LPTSTR) &lpMsgBuf, 0, NULL );
+  
+    if (dwResult != 0)
+    {
+      szMsg = new char[strlen((const char*)lpMsgBuf) + strlen(str) + strlen(szStdMessage) + 1];
+      strcpy( szMsg, str );
+      strcat( szMsg, szStdMessage );
+      strcat( szMsg, (const char*)lpMsgBuf );
+      
+      LocalFree( lpMsgBuf );
+      
+      MessageBox (NULL, szMsg, "Fatal Error in Glide3xRender.dll", MB_OK);
+      delete szMsg;
 
-			exit(1);
-		}
-	}
+      exit(1);
+    }
+  }
 
-	MessageBox(NULL, str, "Fatal Error in Glide3xRender.dll", MB_OK);
+  MessageBox(NULL, str, "Fatal Error in Glide3xRender.dll", MB_OK);
 #else
   fprintf(stderr, "FATAL ERROR: %s", str);
 #endif
@@ -103,12 +103,12 @@ void csGraphics3DGlide3x::InitializeBoard()
   FxI32 nTmu, nFb, nRevTmu, nRevFb, nMemTmu, nMemFb;
   const char *szHardware;
 
-	grGet(GR_NUM_TMU, sizeof(FxI32), &nTmu);
-	grGet(GR_NUM_FB, sizeof(FxI32), &nFb);
-	grGet(GR_MEMORY_TMU, sizeof(FxI32), &nMemTmu);
-	grGet(GR_MEMORY_FB, sizeof(FxI32), &nMemFb);
-	grGet(GR_REVISION_TMU, sizeof(FxI32), &nRevTmu);
-	grGet(GR_REVISION_FB, sizeof(FxI32), &nRevFb);
+  grGet(GR_NUM_TMU, sizeof(FxI32), &nTmu);
+  grGet(GR_NUM_FB, sizeof(FxI32), &nFb);
+  grGet(GR_MEMORY_TMU, sizeof(FxI32), &nMemTmu);
+  grGet(GR_MEMORY_FB, sizeof(FxI32), &nMemFb);
+  grGet(GR_REVISION_TMU, sizeof(FxI32), &nRevTmu);
+  grGet(GR_REVISION_FB, sizeof(FxI32), &nRevFb);
   szHardware = grGetString(GR_HARDWARE);
   
   SysPrintf (MSG_INITIALIZATION, "Board is a %s.\n", szHardware);
@@ -119,49 +119,49 @@ void csGraphics3DGlide3x::InitializeBoard()
   SysPrintf (MSG_INITIALIZATION, "  Texelfx has revision %d and %d Mo of RAM.\n", nRevTmu, nMemTmu);
   if(nTmu==1)
   {
-		m_iMultiPass=true;
+    m_iMultiPass=true;
     iTMUTexture=1;
     iTMULightMap=0;
   }
   else
   {
-		m_iMultiPass=false;
+    m_iMultiPass=false;
     iTMULightMap=1;
     iTMUTexture=1;
   }
 
-	if(configglide3->GetYesNo("Glide3x","FORCEMULTIPASS",FALSE)&&(m_iMultiPass==false))
-	{
-		SysPrintf (MSG_INITIALIZATION, "Forced MultiPass Rendering.\n");
-		m_iMultiPass=true;
-	}
-	if(m_iMultiPass)
-	{
-		SysPrintf (MSG_INITIALIZATION, "Will use MultiPass Rendering.\n");
-	}
+  if(configglide3->GetYesNo("Glide3x","FORCEMULTIPASS",FALSE)&&(m_iMultiPass==false))
+  {
+    SysPrintf (MSG_INITIALIZATION, "Forced MultiPass Rendering.\n");
+    m_iMultiPass=true;
+  }
+  if(m_iMultiPass)
+  {
+    SysPrintf (MSG_INITIALIZATION, "Will use MultiPass Rendering.\n");
+  }
   else
-	{
-		SysPrintf (MSG_INITIALIZATION, "Will use SinglePass Rendering.\n");
-		SysPrintf (MSG_INITIALIZATION, "Affected %d TMU for Texture and %d for LightMap.\n",iTMUTexture,iTMULightMap);
-	}
-	m_TMUs = new TMUInfo[2];
-	if(m_iMultiPass)
-	{
-		m_TMUs[0].tmu_id=m_TMUs[1].tmu_id=0;
-		m_TMUs[0].minAddress = grTexMinAddress(0);
-		m_TMUs[1].maxAddress = grTexMaxAddress(0);
-		m_TMUs[1].minAddress = m_TMUs[0].maxAddress = (m_TMUs[1].maxAddress -  m_TMUs[0].minAddress)/2;
-		m_TMUs[1].minAddress = (m_TMUs[1].minAddress+7)&(~7);
-	} else {
-		m_TMUs[0].tmu_id=0;
-		m_TMUs[0].minAddress = grTexMinAddress(0);
-		m_TMUs[0].maxAddress = grTexMaxAddress(0);
-		m_TMUs[1].tmu_id=1;
-		m_TMUs[1].minAddress = grTexMinAddress(1);
-		m_TMUs[1].maxAddress = grTexMaxAddress(1);
-	}
-	m_TMUs[0].memory_size = (m_TMUs[0].maxAddress -  m_TMUs[0].minAddress);
-	m_TMUs[1].memory_size = (m_TMUs[1].maxAddress -  m_TMUs[1].minAddress);
+  {
+    SysPrintf (MSG_INITIALIZATION, "Will use SinglePass Rendering.\n");
+    SysPrintf (MSG_INITIALIZATION, "Affected %d TMU for Texture and %d for LightMap.\n",iTMUTexture,iTMULightMap);
+  }
+  m_TMUs = new TMUInfo[2];
+  if(m_iMultiPass)
+  {
+    m_TMUs[0].tmu_id=m_TMUs[1].tmu_id=0;
+    m_TMUs[0].minAddress = grTexMinAddress(0);
+    m_TMUs[1].maxAddress = grTexMaxAddress(0);
+    m_TMUs[1].minAddress = m_TMUs[0].maxAddress = (m_TMUs[1].maxAddress -  m_TMUs[0].minAddress)/2;
+    m_TMUs[1].minAddress = (m_TMUs[1].minAddress+7)&(~7);
+  } else {
+    m_TMUs[0].tmu_id=0;
+    m_TMUs[0].minAddress = grTexMinAddress(0);
+    m_TMUs[0].maxAddress = grTexMaxAddress(0);
+    m_TMUs[1].tmu_id=1;
+    m_TMUs[1].minAddress = grTexMinAddress(1);
+    m_TMUs[1].maxAddress = grTexMaxAddress(1);
+  }
+  m_TMUs[0].memory_size = (m_TMUs[0].maxAddress -  m_TMUs[0].minAddress);
+  m_TMUs[1].memory_size = (m_TMUs[1].maxAddress -  m_TMUs[1].minAddress);
 }
 
 
@@ -177,93 +177,93 @@ void csGraphics3DGlide3x::InitializeBoard()
 **/
 int csGraphics3DGlide3x::SelectBoard()
 {
-	int i;
-	board=0;
+  int i;
+  board=0;
 /*
   for(i=0; i<hwconfig.num_sst; i++)
-	{
-		switch(hwconfig.SSTs[i].type)
-		{
+  {
+    switch(hwconfig.SSTs[i].type)
+    {
 #ifndef GLIDE24_ONLY
     case GR_SSTTYPE_Voodoo2:
-			if(hwconfig.SSTs[board].type!=GR_SSTTYPE_Voodoo2)
-			{
-				board=i;
-			}
-			else
-			{
-				if(hwconfig.SSTs[board].sstBoard.Voodoo2Config.sliDetect==FXTRUE)
-				{
-					if(hwconfig.SSTs[i].sstBoard.Voodoo2Config.sliDetect==FXTRUE)
-					{	// Equivalent => Most RAM
-						if(hwconfig.SSTs[i].sstBoard.Voodoo2Config.fbRam>hwconfig.SSTs[board].sstBoard.Voodoo2Config.fbRam)
-						{
-							board=i;
-						}
-					}
-				}
-				else
-				{
-					if(hwconfig.SSTs[i].sstBoard.Voodoo2Config.sliDetect==FXTRUE)
-					{	
-						board=i;
-					}
-					else
-					{	// Equivalent => Most RAM
-						if(hwconfig.SSTs[i].sstBoard.Voodoo2Config.fbRam>hwconfig.SSTs[board].sstBoard.Voodoo2Config.fbRam)
-						{
-							board=i;
-						}
-					}
-				}
-			}
-			break;
+      if(hwconfig.SSTs[board].type!=GR_SSTTYPE_Voodoo2)
+      {
+        board=i;
+      }
+      else
+      {
+        if(hwconfig.SSTs[board].sstBoard.Voodoo2Config.sliDetect==FXTRUE)
+        {
+          if(hwconfig.SSTs[i].sstBoard.Voodoo2Config.sliDetect==FXTRUE)
+          { // Equivalent => Most RAM
+            if(hwconfig.SSTs[i].sstBoard.Voodoo2Config.fbRam>hwconfig.SSTs[board].sstBoard.Voodoo2Config.fbRam)
+            {
+              board=i;
+            }
+          }
+        }
+        else
+        {
+          if(hwconfig.SSTs[i].sstBoard.Voodoo2Config.sliDetect==FXTRUE)
+          { 
+            board=i;
+          }
+          else
+          { // Equivalent => Most RAM
+            if(hwconfig.SSTs[i].sstBoard.Voodoo2Config.fbRam>hwconfig.SSTs[board].sstBoard.Voodoo2Config.fbRam)
+            {
+              board=i;
+            }
+          }
+        }
+      }
+      break;
 #endif
 
-		case GR_SSTTYPE_VOODOO:
+    case GR_SSTTYPE_VOODOO:
 #ifndef GLIDE24_ONLY
       if(hwconfig.SSTs[board].type==GR_SSTTYPE_Voodoo2)
-				break;
+        break;
 #endif
 
       if(hwconfig.SSTs[board].type!=GR_SSTTYPE_VOODOO)
-			{
-				board=i;
-			}
-			else
-			{
-				if(hwconfig.SSTs[board].sstBoard.VoodooConfig.sliDetect==FXTRUE)
-				{
-					if(hwconfig.SSTs[i].sstBoard.VoodooConfig.sliDetect==FXTRUE)
-					{	// Equivalent => Most RAM
-						if(hwconfig.SSTs[i].sstBoard.VoodooConfig.fbRam>hwconfig.SSTs[board].sstBoard.VoodooConfig.fbRam)
-						{
-							board=i;
-						}
-					}
-				}
-				else
-				{
-					if(hwconfig.SSTs[i].sstBoard.VoodooConfig.sliDetect==FXTRUE)
-					{	
-						board=i;
-					}
-					else
-					{	// Equivalent => Most RAM
-						if(hwconfig.SSTs[i].sstBoard.VoodooConfig.fbRam>hwconfig.SSTs[board].sstBoard.VoodooConfig.fbRam)
-						{
-							board=i;
-						}
-					}
-				}
-			}
-			break;
-		default:
-			break;
-		}
-	}
+      {
+        board=i;
+      }
+      else
+      {
+        if(hwconfig.SSTs[board].sstBoard.VoodooConfig.sliDetect==FXTRUE)
+        {
+          if(hwconfig.SSTs[i].sstBoard.VoodooConfig.sliDetect==FXTRUE)
+          { // Equivalent => Most RAM
+            if(hwconfig.SSTs[i].sstBoard.VoodooConfig.fbRam>hwconfig.SSTs[board].sstBoard.VoodooConfig.fbRam)
+            {
+              board=i;
+            }
+          }
+        }
+        else
+        {
+          if(hwconfig.SSTs[i].sstBoard.VoodooConfig.sliDetect==FXTRUE)
+          { 
+            board=i;
+          }
+          else
+          { // Equivalent => Most RAM
+            if(hwconfig.SSTs[i].sstBoard.VoodooConfig.fbRam>hwconfig.SSTs[board].sstBoard.VoodooConfig.fbRam)
+            {
+              board=i;
+            }
+          }
+        }
+      }
+      break;
+    default:
+      break;
+    }
+  }
 */
-	return board;
+  return board;
 }
 
 csGraphics3DGlide3x::csGraphics3DGlide3x(ISystem* piSystem) :
@@ -296,19 +296,19 @@ csGraphics3DGlide3x::csGraphics3DGlide3x(ISystem* piSystem) :
   FxI32 grncard=0;
 
   grGet(GR_NUM_BOARDS, sizeof(FxI32), &grncard);
-	if(grncard==0) 
-		sys_fatalerror("csGraphics3DGlide3x::Open : No 3dfx chip found");
+  if(grncard==0) 
+    sys_fatalerror("csGraphics3DGlide3x::Open : No 3dfx chip found");
 
   grGlideInit();
 
   SelectBoard();
 
   const char *szString;
-	szString = grGetString(GR_VERSION);
-	SysPrintf (MSG_INITIALIZATION, "Glide %s detected.\n",szString);
+  szString = grGetString(GR_VERSION);
+  SysPrintf (MSG_INITIALIZATION, "Glide %s detected.\n",szString);
   SysPrintf (MSG_INITIALIZATION, "Board %d selected.\n",board);
-	
-	grSstSelect(board);
+  
+  grSstSelect(board);
 
   InitializeBoard();
 
@@ -348,46 +348,46 @@ csGraphics3DGlide3x::csGraphics3DGlide3x(ISystem* piSystem) :
 
 static struct
 {
-	int width,height;
-	GrScreenResolution_t res;
+  int width,height;
+  GrScreenResolution_t res;
 } StatGlideRes[]=
 {
-	{0,0,GR_RESOLUTION_NONE},
-	{320,200,GR_RESOLUTION_320x200},
-	{320,240,GR_RESOLUTION_320x240},
-	{400,256,GR_RESOLUTION_400x256},
-	{512,384,GR_RESOLUTION_512x384},
-	{640,200,GR_RESOLUTION_640x200},
-	{640,350,GR_RESOLUTION_640x350},
-	{640,400,GR_RESOLUTION_640x400},
-	{640,480,GR_RESOLUTION_640x480},
-	{800,600,GR_RESOLUTION_800x600},
-	{960,720,GR_RESOLUTION_960x720},
-	{856,480,GR_RESOLUTION_856x480},
-	{512,256,GR_RESOLUTION_512x256},
+  {0,0,GR_RESOLUTION_NONE},
+  {320,200,GR_RESOLUTION_320x200},
+  {320,240,GR_RESOLUTION_320x240},
+  {400,256,GR_RESOLUTION_400x256},
+  {512,384,GR_RESOLUTION_512x384},
+  {640,200,GR_RESOLUTION_640x200},
+  {640,350,GR_RESOLUTION_640x350},
+  {640,400,GR_RESOLUTION_640x400},
+  {640,480,GR_RESOLUTION_640x480},
+  {800,600,GR_RESOLUTION_800x600},
+  {960,720,GR_RESOLUTION_960x720},
+  {856,480,GR_RESOLUTION_856x480},
+  {512,256,GR_RESOLUTION_512x256},
   {1024,768,GR_RESOLUTION_1024x768},
-	{1280,1024,GR_RESOLUTION_1280x1024},
-	{1600,1200,GR_RESOLUTION_1600x1200},
-	{400,300,GR_RESOLUTION_400x300},
+  {1280,1024,GR_RESOLUTION_1280x1024},
+  {1600,1200,GR_RESOLUTION_1600x1200},
+  {400,300,GR_RESOLUTION_400x300},
 };
 
 #define SIZEOFRESSTRUCT (sizeof(StatGlideRes)/sizeof(StatGlideRes[0]))
 
 static int getResolutionIndex(int width, int height)
 {
-	int i;
-	for(i=1;i<SIZEOFRESSTRUCT;i++)
-	{
-		if((width==StatGlideRes[i].width)&&(height==StatGlideRes[i].height))
-			return i;
-	}
-	return -1;
+  int i;
+  for(i=1;i<SIZEOFRESSTRUCT;i++)
+  {
+    if((width==StatGlideRes[i].width)&&(height==StatGlideRes[i].height))
+      return i;
+  }
+  return -1;
 }
 
 STDMETHODIMP csGraphics3DGlide3x::Open(char* Title)
 {
-	FxU32 hwnd=NULL;
-	GrScreenResolution_t iRes;
+  FxU32 hwnd=NULL;
+  GrScreenResolution_t iRes;
 
   IGlide3xGraphicsInfo* pSysGInfo = NULL;
   IGraphicsInfo*      pGraphicsInfo = NULL;
@@ -404,9 +404,9 @@ STDMETHODIMP csGraphics3DGlide3x::Open(char* Title)
   hRes = m_piG2D->Open(Title);
   if ( FAILED(hRes) )
     goto OnError;
-	
+  
 #if defined(OS_WIN32)
-	//pSysGInfo->GethWnd((void**)hwnd);
+  //pSysGInfo->GethWnd((void**)hwnd);
 #endif
 
   pGraphicsInfo->GetWidth(m_nWidth);
@@ -416,80 +416,80 @@ STDMETHODIMP csGraphics3DGlide3x::Open(char* Title)
   m_nHalfHeight = m_nHeight/2;
   
   if(/*configglide3->GetYesNo("VideoDriver","FULL_SCREEN",TRUE)*/true)
-	{
-		iRes=::getResolutionIndex(m_nWidth, m_nHeight);
-		if(iRes==-1)
-			sys_fatalerror("csGraphics3DGlide3x::Open() Invalid Resolution !");
-	}
+  {
+    iRes=::getResolutionIndex(m_nWidth, m_nHeight);
+    if(iRes==-1)
+      sys_fatalerror("csGraphics3DGlide3x::Open() Invalid Resolution !");
+  }
   else
   {
-		iRes=0;
-	}
-	if(!(grcontext=grSstWinOpen(hwnd,
-		StatGlideRes[iRes].res,GR_REFRESH_60Hz, // We should find a way to allow to change the refresh rate
-		GR_COLORFORMAT_ARGB,GR_ORIGIN_LOWER_LEFT,2,1)))
+    iRes=0;
+  }
+  if(!(grcontext=grSstWinOpen(hwnd,
+    StatGlideRes[iRes].res,GR_REFRESH_60Hz, // We should find a way to allow to change the refresh rate
+    GR_COLORFORMAT_ARGB,GR_ORIGIN_LOWER_LEFT,2,1)))
     {
-   		sys_fatalerror("csGraphics3DGlide3x::Open() : Could not open Window !");
+      sys_fatalerror("csGraphics3DGlide3x::Open() : Could not open Window !");
     }
   
   grGet(GR_WDEPTH_MIN_MAX,2,(FxI32*)&wLimits[0]); // Get w-buffer limits
-	grRenderBuffer(GR_BUFFER_BACKBUFFER);	// RENDER IN BACKBUFFER
-	grColorMask(FXTRUE,FXFALSE);			// DISABLE ALPHA BUFFER
-	grDepthMask(FXTRUE);					// ENABLE ZBUFFER
-	grDepthBufferMode(GR_DEPTHBUFFER_WBUFFER); // ENABLE WBUFFER
-	grDepthBufferFunction(GR_CMP_LEQUAL);		// WBUFFER FUNCTION
-	
-	grBufferClear(0,0,wLimits[1]); // CLEAR BACKBUFFER
-	grBufferSwap(0);							// PUT BACKBUFFER TO FRONT
-	grCullMode(GR_CULL_DISABLE);				// CULL POSITIVE 
-	grChromakeyValue(0x0000);
-	
-	if(m_iMultiPass)
-	{ // This card has only one TMU, enable Multipass rendering	  
-	  grTexCombine(m_TMUs[0].tmu_id, GR_COMBINE_FUNCTION_LOCAL,
-	  GR_COMBINE_FACTOR_NONE,GR_COMBINE_FUNCTION_ZERO,
-	  GR_COMBINE_FACTOR_NONE,FXFALSE,FXFALSE);	// TMU INIT
-		grTexClampMode(m_TMUs[0].tmu_id,
-			GR_TEXTURECLAMP_WRAP,GR_TEXTURECLAMP_WRAP);	 // TEXTURE WRAP
-		grTexFilterMode(m_TMUs[0].tmu_id,
-			GR_TEXTUREFILTER_BILINEAR,GR_TEXTUREFILTER_BILINEAR);	 // TEXTURE WRAP
-		//	GlideLib_grTexLodBiasValue(m_TMUs[0].tmu_id,7.75);		// LOD BIAS
-		grTexMipMapMode(m_TMUs[0].tmu_id,GR_MIPMAP_NEAREST,FXFALSE);	// MIPMAP Mode
-		//GlideLib_grTexMipMapMode(m_TMUs[0].tmu_id,GR_MIPMAP_DISABLE,FXFALSE);
-		RenderPolygon=RenderPolygonMultiPass;
-	}
-	else
-	{ // This card has several TMUs, enable Singlepass rendering
-		grTexCombine(m_TMUs[0].tmu_id, GR_COMBINE_FUNCTION_SCALE_OTHER,
-			GR_COMBINE_FACTOR_LOCAL,GR_COMBINE_FUNCTION_ZERO,
-			GR_COMBINE_FACTOR_NONE,FXFALSE,FXFALSE);	// TMU INIT (SCALED BY TMU1)
-		grTexClampMode(m_TMUs[0].tmu_id,
-			GR_TEXTURECLAMP_WRAP,GR_TEXTURECLAMP_WRAP);	 // TEXTURE WRAP
-		grTexFilterMode(m_TMUs[0].tmu_id,
-			GR_TEXTUREFILTER_BILINEAR,GR_TEXTUREFILTER_BILINEAR);	 // TEXTURE WRAP
-		//		GlideLib_grTexLodBiasValue(m_TMUs[0].tmu_id,7.75);		// LOD BIAS		
-		grTexMipMapMode(m_TMUs[0].tmu_id,GR_MIPMAP_NEAREST,FXFALSE); // MIPMAP Mode
-		
-		grTexCombine(m_TMUs[1].tmu_id, GR_COMBINE_FUNCTION_LOCAL,
-			GR_COMBINE_FACTOR_NONE,GR_COMBINE_FUNCTION_ZERO,
-			GR_COMBINE_FACTOR_NONE,FXFALSE,FXFALSE);	// TMU INIT
-		grTexClampMode(m_TMUs[1].tmu_id,
-			GR_TEXTURECLAMP_CLAMP,GR_TEXTURECLAMP_CLAMP);	 // TEXTURE WRAP
-		grTexFilterMode(m_TMUs[1].tmu_id,
-			GR_TEXTUREFILTER_BILINEAR,GR_TEXTUREFILTER_BILINEAR);	 // TEXTURE WRAP
-		grTexMipMapMode(m_TMUs[1].tmu_id,GR_MIPMAP_NEAREST,FXFALSE); // MIPMAP Mode
-//		grHints(0,GR_STWHINT_ST_DIFF_TMU1);
-		RenderPolygon=RenderPolygonSinglePass;
-	}
-	grAlphaCombine(GR_COMBINE_FUNCTION_LOCAL,
-		GR_COMBINE_FACTOR_NONE,
-		GR_COMBINE_LOCAL_CONSTANT, 
-		GR_COMBINE_OTHER_NONE,FXFALSE);
-	grAlphaBlendFunction(GR_BLEND_SRC_ALPHA,
-		GR_BLEND_ONE_MINUS_SRC_ALPHA,GR_BLEND_ONE,GR_BLEND_ZERO);
-	grColorCombine(GR_COMBINE_FUNCTION_BLEND,			// COLOR COMBINE
-		GR_COMBINE_FACTOR_LOCAL,GR_COMBINE_LOCAL_ITERATED,
-		GR_COMBINE_OTHER_TEXTURE,FXFALSE);
+  grRenderBuffer(GR_BUFFER_BACKBUFFER); // RENDER IN BACKBUFFER
+  grColorMask(FXTRUE,FXFALSE);      // DISABLE ALPHA BUFFER
+  grDepthMask(FXTRUE);          // ENABLE ZBUFFER
+  grDepthBufferMode(GR_DEPTHBUFFER_WBUFFER); // ENABLE WBUFFER
+  grDepthBufferFunction(GR_CMP_LEQUAL);   // WBUFFER FUNCTION
+  
+  grBufferClear(0,0,wLimits[1]); // CLEAR BACKBUFFER
+  grBufferSwap(0);              // PUT BACKBUFFER TO FRONT
+  grCullMode(GR_CULL_DISABLE);        // CULL POSITIVE 
+  grChromakeyValue(0x0000);
+  
+  if(m_iMultiPass)
+  { // This card has only one TMU, enable Multipass rendering   
+    grTexCombine(m_TMUs[0].tmu_id, GR_COMBINE_FUNCTION_LOCAL,
+    GR_COMBINE_FACTOR_NONE,GR_COMBINE_FUNCTION_ZERO,
+    GR_COMBINE_FACTOR_NONE,FXFALSE,FXFALSE);  // TMU INIT
+    grTexClampMode(m_TMUs[0].tmu_id,
+      GR_TEXTURECLAMP_WRAP,GR_TEXTURECLAMP_WRAP);  // TEXTURE WRAP
+    grTexFilterMode(m_TMUs[0].tmu_id,
+      GR_TEXTUREFILTER_BILINEAR,GR_TEXTUREFILTER_BILINEAR);  // TEXTURE WRAP
+    //  GlideLib_grTexLodBiasValue(m_TMUs[0].tmu_id,7.75);    // LOD BIAS
+    grTexMipMapMode(m_TMUs[0].tmu_id,GR_MIPMAP_NEAREST,FXFALSE);  // MIPMAP Mode
+    //GlideLib_grTexMipMapMode(m_TMUs[0].tmu_id,GR_MIPMAP_DISABLE,FXFALSE);
+    RenderPolygon=RenderPolygonMultiPass;
+  }
+  else
+  { // This card has several TMUs, enable Singlepass rendering
+    grTexCombine(m_TMUs[0].tmu_id, GR_COMBINE_FUNCTION_SCALE_OTHER,
+      GR_COMBINE_FACTOR_LOCAL,GR_COMBINE_FUNCTION_ZERO,
+      GR_COMBINE_FACTOR_NONE,FXFALSE,FXFALSE);  // TMU INIT (SCALED BY TMU1)
+    grTexClampMode(m_TMUs[0].tmu_id,
+      GR_TEXTURECLAMP_WRAP,GR_TEXTURECLAMP_WRAP);  // TEXTURE WRAP
+    grTexFilterMode(m_TMUs[0].tmu_id,
+      GR_TEXTUREFILTER_BILINEAR,GR_TEXTUREFILTER_BILINEAR);  // TEXTURE WRAP
+    //    GlideLib_grTexLodBiasValue(m_TMUs[0].tmu_id,7.75);    // LOD BIAS   
+    grTexMipMapMode(m_TMUs[0].tmu_id,GR_MIPMAP_NEAREST,FXFALSE); // MIPMAP Mode
+    
+    grTexCombine(m_TMUs[1].tmu_id, GR_COMBINE_FUNCTION_LOCAL,
+      GR_COMBINE_FACTOR_NONE,GR_COMBINE_FUNCTION_ZERO,
+      GR_COMBINE_FACTOR_NONE,FXFALSE,FXFALSE);  // TMU INIT
+    grTexClampMode(m_TMUs[1].tmu_id,
+      GR_TEXTURECLAMP_CLAMP,GR_TEXTURECLAMP_CLAMP);  // TEXTURE WRAP
+    grTexFilterMode(m_TMUs[1].tmu_id,
+      GR_TEXTUREFILTER_BILINEAR,GR_TEXTUREFILTER_BILINEAR);  // TEXTURE WRAP
+    grTexMipMapMode(m_TMUs[1].tmu_id,GR_MIPMAP_NEAREST,FXFALSE); // MIPMAP Mode
+//    grHints(0,GR_STWHINT_ST_DIFF_TMU1);
+    RenderPolygon=RenderPolygonSinglePass;
+  }
+  grAlphaCombine(GR_COMBINE_FUNCTION_LOCAL,
+    GR_COMBINE_FACTOR_NONE,
+    GR_COMBINE_LOCAL_CONSTANT, 
+    GR_COMBINE_OTHER_NONE,FXFALSE);
+  grAlphaBlendFunction(GR_BLEND_SRC_ALPHA,
+    GR_BLEND_ONE_MINUS_SRC_ALPHA,GR_BLEND_ONE,GR_BLEND_ZERO);
+  grColorCombine(GR_COMBINE_FUNCTION_BLEND,     // COLOR COMBINE
+    GR_COMBINE_FACTOR_LOCAL,GR_COMBINE_LOCAL_ITERATED,
+    GR_COMBINE_OTHER_TEXTURE,FXFALSE);
 
   m_nDrawMode = 0;
 
@@ -556,67 +556,67 @@ csGraphics3DGlide3x::~csGraphics3DGlide3x()
 STDMETHODIMP csGraphics3DGlide3x::BeginDraw (int DrawFlags)
 {
   if (DrawFlags & CSDRAW_2DGRAPHICS)
-	{
+  {
     // if graphics is in 3D mode, turn it off
-		if (m_nDrawMode & CSDRAW_3DGRAPHICS)
-			FinishDraw ();
-		// if 2D mode is not enabled, turn it on
-		if (!(m_nDrawMode & CSDRAW_2DGRAPHICS))
-			m_piG2D->BeginDraw ();
+    if (m_nDrawMode & CSDRAW_3DGRAPHICS)
+      FinishDraw ();
+    // if 2D mode is not enabled, turn it on
+    if (!(m_nDrawMode & CSDRAW_2DGRAPHICS))
+      m_piG2D->BeginDraw ();
   }
-	else if (DrawFlags & CSDRAW_3DGRAPHICS)
-	{
+  else if (DrawFlags & CSDRAW_3DGRAPHICS)
+  {
     // if graphics is in 2D mode, turn it off
-		if (m_nDrawMode & CSDRAW_2DGRAPHICS)
-			FinishDraw ();
-		
-		// if 3D mode is not enabled, turn it on
-		if (!(m_nDrawMode & CSDRAW_3DGRAPHICS))
-		{
+    if (m_nDrawMode & CSDRAW_2DGRAPHICS)
+      FinishDraw ();
+    
+    // if 3D mode is not enabled, turn it on
+    if (!(m_nDrawMode & CSDRAW_3DGRAPHICS))
+    {
       grBufferClear(0,0,wLimits[1]);
 
-			/*DWORD clear_flag = 0;
-						      
-			if (DrawFlags & CSDRAW_CLEARZBUFFER)
-			clear_flag |= D3DCLEAR_ZBUFFER;
-			
-			  if (DrawFlags & CSDRAW_CLEARSCREEN)
-			  clear_flag |= D3DCLEAR_TARGET;
-			  
-				if (clear_flag)
-					// To be optimized by drawing 2 triangles!	
-      		{
-			static	GrVertex * verts = NULL;
-			if(verts==NULL)
-			{
-			verts=new GrVertex[4];
-			verts[0].x=verts[1].x=0;
-			verts[0].y=verts[2].y=0;
-			verts[1].y=verts[3].y=FRAME_HEIGHT-1;
-			verts[2].x=verts[3].x=FRAME_WIDTH-1;
-			verts[0].oow=verts[1].oow=verts[2].oow=1.0;
-			verts[0].r=verts[0].g=verts[0].b=
-			verts[1].r=verts[1].g=verts[1].b=
-			verts[2].r=verts[2].g=verts[2].b=
-			verts[3].r=verts[3].g=verts[3].b=0;
-			}
-			GlideLib_grDepthBufferFunction(GR_CMP_ALWAYS);		// WBUFFER FUNCTION
-			GlideLib_grDrawTriangle(&verts[0],&verts[1],&verts[2]);
-			GlideLib_grDrawTriangle(&verts[3],&verts[1],&verts[2]);
-			GlideLib_grDepthBufferFunction(GR_CMP_LESS);		// WBUFFER FUNCTION
-			
-		} */
-		} /* endif */
-	} /* endif */
-	m_nDrawMode = DrawFlags;
-	return S_OK;
+      /*DWORD clear_flag = 0;
+                  
+      if (DrawFlags & CSDRAW_CLEARZBUFFER)
+      clear_flag |= D3DCLEAR_ZBUFFER;
+      
+        if (DrawFlags & CSDRAW_CLEARSCREEN)
+        clear_flag |= D3DCLEAR_TARGET;
+        
+        if (clear_flag)
+          // To be optimized by drawing 2 triangles!  
+          {
+      static  GrVertex * verts = NULL;
+      if(verts==NULL)
+      {
+      verts=new GrVertex[4];
+      verts[0].x=verts[1].x=0;
+      verts[0].y=verts[2].y=0;
+      verts[1].y=verts[3].y=FRAME_HEIGHT-1;
+      verts[2].x=verts[3].x=FRAME_WIDTH-1;
+      verts[0].oow=verts[1].oow=verts[2].oow=1.0;
+      verts[0].r=verts[0].g=verts[0].b=
+      verts[1].r=verts[1].g=verts[1].b=
+      verts[2].r=verts[2].g=verts[2].b=
+      verts[3].r=verts[3].g=verts[3].b=0;
+      }
+      GlideLib_grDepthBufferFunction(GR_CMP_ALWAYS);    // WBUFFER FUNCTION
+      GlideLib_grDrawTriangle(&verts[0],&verts[1],&verts[2]);
+      GlideLib_grDrawTriangle(&verts[3],&verts[1],&verts[2]);
+      GlideLib_grDepthBufferFunction(GR_CMP_LESS);    // WBUFFER FUNCTION
+      
+    } */
+    } /* endif */
+  } /* endif */
+  m_nDrawMode = DrawFlags;
+  return S_OK;
 }
 
 /// End the frame
 STDMETHODIMP csGraphics3DGlide3x::FinishDraw ()
 {
   if (m_nDrawMode & CSDRAW_2DGRAPHICS)
-		m_piG2D->FinishDraw ();
+    m_piG2D->FinishDraw ();
 
   m_nDrawMode = 0;
   return S_OK;
@@ -635,69 +635,69 @@ STDMETHODIMP csGraphics3DGlide3x::Print(csRect* rect)
 /// Set the mode for the Z buffer (functionality also exists in SetRenderState).
 STDMETHODIMP csGraphics3DGlide3x::SetZBufMode (ZBufMode mode)
 {
-  return E_NOTIMPL;  	
+  return E_NOTIMPL;   
 }
 
 #define SNAP (( float ) ( 3L << 18 ))
 
 void csGraphics3DGlide3x::RenderPolygonSinglePass (MyGrVertex * verts, int num, bool haslight,TextureHandler*text,TextureHandler*light)
 {
-	int i;
-	for(i=0;i<num;i++) 
-	{
-		verts[i].tmuvtx[0].sow *= text->width*verts[i].oow;
-		verts[i].tmuvtx[0].tow *= text->height*verts[i].oow;
-	}
-	grTexSource(text->tmu->tmu_id, text->loadAddress,
-		GR_MIPMAPLEVELMASK_BOTH, &text->info);
-	if(haslight)
-	{
-		for(i=0;i<num;i++)
-		{
-			verts[i].tmuvtx[1].sow *= light->width*verts[i].oow; 
-			verts[i].tmuvtx[1].tow *= light->height*verts[i].oow; 
-		}
-		grTexSource(light->tmu->tmu_id, light->loadAddress,
-			GR_MIPMAPLEVELMASK_BOTH, &light->info);
-		// Perhaps we have to modify the TexCombine for TMU 0 if no lightmap ???
-	}	
-	else
-	{
-		// Perhaps we have to modify the TexCombine for TMU 0 if no lightmap ???
-	}
-	grDrawVertexArrayContiguous(GR_POLYGON, num, verts, sizeof(MyGrVertex));
+  int i;
+  for(i=0;i<num;i++) 
+  {
+    verts[i].tmuvtx[0].sow *= text->width*verts[i].oow;
+    verts[i].tmuvtx[0].tow *= text->height*verts[i].oow;
+  }
+  grTexSource(text->tmu->tmu_id, text->loadAddress,
+    GR_MIPMAPLEVELMASK_BOTH, &text->info);
+  if(haslight)
+  {
+    for(i=0;i<num;i++)
+    {
+      verts[i].tmuvtx[1].sow *= light->width*verts[i].oow; 
+      verts[i].tmuvtx[1].tow *= light->height*verts[i].oow; 
+    }
+    grTexSource(light->tmu->tmu_id, light->loadAddress,
+      GR_MIPMAPLEVELMASK_BOTH, &light->info);
+    // Perhaps we have to modify the TexCombine for TMU 0 if no lightmap ???
+  } 
+  else
+  {
+    // Perhaps we have to modify the TexCombine for TMU 0 if no lightmap ???
+  }
+  grDrawVertexArrayContiguous(GR_POLYGON, num, verts, sizeof(MyGrVertex));
 }
 
 void csGraphics3DGlide3x::RenderPolygonMultiPass (MyGrVertex * verts, int num, bool haslight,TextureHandler*text,TextureHandler*light)
 {
-	int i;
-	for(i=0;i<num;i++)
-	{
-		verts[i].tmuvtx[0].sow *= text->width*verts[i].oow;
-		verts[i].tmuvtx[0].tow *= text->height*verts[i].oow;
-	}
-	grTexSource(text->tmu->tmu_id, text->loadAddress,
-		GR_MIPMAPLEVELMASK_BOTH, &text->info);
+  int i;
+  for(i=0;i<num;i++)
+  {
+    verts[i].tmuvtx[0].sow *= text->width*verts[i].oow;
+    verts[i].tmuvtx[0].tow *= text->height*verts[i].oow;
+  }
+  grTexSource(text->tmu->tmu_id, text->loadAddress,
+    GR_MIPMAPLEVELMASK_BOTH, &text->info);
   grDrawVertexArrayContiguous(GR_POLYGON, num, verts, sizeof(MyGrVertex));
-	if(haslight)
-	{
-		for(i=0;i<num;i++)
-		{
-			verts[i].tmuvtx[0].sow= verts[i].tmuvtx[1].sow * light->width*verts[i].oow; 
-			verts[i].tmuvtx[0].tow= verts[i].tmuvtx[1].tow * light->height*verts[i].oow; 
-		}
-		grTexSource(light->tmu->tmu_id, light->loadAddress,
-			GR_MIPMAPLEVELMASK_BOTH, &light->info);
+  if(haslight)
+  {
+    for(i=0;i<num;i++)
+    {
+      verts[i].tmuvtx[0].sow= verts[i].tmuvtx[1].sow * light->width*verts[i].oow; 
+      verts[i].tmuvtx[0].tow= verts[i].tmuvtx[1].tow * light->height*verts[i].oow; 
+    }
+    grTexSource(light->tmu->tmu_id, light->loadAddress,
+      GR_MIPMAPLEVELMASK_BOTH, &light->info);
 
-		grConstantColorValue(0X80FFFFFF);
+    grConstantColorValue(0X80FFFFFF);
     grDrawVertexArrayContiguous(GR_POLYGON, num, verts, sizeof(MyGrVertex));
-		grConstantColorValue(0XFFFFFFFF);
-	}
+    grConstantColorValue(0XFFFFFFFF);
+  }
 }
 
-void csGraphics3DGlide3x::SetupPolygon( G3DPolygon& poly, float& J1, float& J2, float& J3, 
-                                                           float& K1, float& K2, float& K3,
-                                                           float& M,  float& N,  float& O  )
+void csGraphics3DGlide3x::SetupPolygon( G3DPolygonDP& poly, float& J1, float& J2, float& J3, 
+                                                            float& K1, float& K2, float& K3,
+                                                            float& M,  float& N,  float& O  )
 {
     float P1, P2, P3, P4, Q1, Q2, Q3, Q4;
     
@@ -716,13 +716,9 @@ void csGraphics3DGlide3x::SetupPolygon( G3DPolygon& poly, float& J1, float& J2, 
    
     if (ABS (Dc) < 0.06)
     {
-        ComcsVector3 vcam_0;
-
-        poly.polygon->GetCameraVector(0, &vcam_0);
-
         M = 0;
         N = 0;
-        O = 1/vcam_0.z;
+        O = 1/poly.z_value;
     }
     else
     {
@@ -764,38 +760,35 @@ void csGraphics3DGlide3x::SetupPolygon( G3DPolygon& poly, float& J1, float& J2, 
     }
 }
 
-STDMETHODIMP csGraphics3DGlide3x::DrawPolygon(G3DPolygon& poly)
+STDMETHODIMP csGraphics3DGlide3x::DrawPolygon(G3DPolygonDP& poly)
 {
-	MyGrVertex * verts;
-
-  if(!poly.polygon)
-            return E_INVALIDARG;
+  MyGrVertex * verts;
 
     if (poly.num < 3) 
     {
         return E_INVALIDARG;
     }
 
-	bool lm_exists=true;
-	bool is_transparent = false;
-	bool is_colorkeyed = false;
+  bool lm_exists=true;
+  bool is_transparent = false;
+  bool is_colorkeyed = false;
   int  poly_alpha;
   IPolygonTexture* pTex;
-	float J1, J2, J3, K1, K2, K3;
-	float M, N, O;
+  float J1, J2, J3, K1, K2, K3;
+  float M, N, O;
   
   // set up the geometry.
   SetupPolygon( poly, J1, J2, J3, K1, K2, K3, M, N, O );
 
   // retrieve the texture.
-  poly.polygon->GetTexture(0, &pTex);
+  pTex = poly.poly_texture[0];
 
   if (!pTex)
      return E_INVALIDARG;
 
-	CacheTexture (pTex);
+  CacheTexture (pTex);
   
-  poly.polygon->GetAlpha( poly_alpha );
+  poly_alpha = poly.alpha;
   is_transparent = poly_alpha ? true : false;
 
   ITextureMap* piTM;
@@ -810,12 +803,12 @@ STDMETHODIMP csGraphics3DGlide3x::DrawPolygon(G3DPolygon& poly)
   piMMC->GetTransparent (is_colorkeyed);
   
   HighColorCacheAndManage_Data* tcache;
-	HighColorCacheAndManage_Data* lcache;
+  HighColorCacheAndManage_Data* lcache;
   
   // retrieve the cached texture handle.
   piMMC->GetHighColorCache((HighColorCache_Data **)&tcache ); 
   ASSERT( tcache );
-	
+  
   FINAL_RELEASE( piTM );
   FINAL_RELEASE( piMMC );
   
@@ -840,117 +833,117 @@ STDMETHODIMP csGraphics3DGlide3x::DrawPolygon(G3DPolygon& poly)
   }
 
   if(is_transparent)
-	{
-		GrColor_t c = 0x00FFFFFF;
-		c |= ((int)((float)(poly_alpha)/100.0f*255.0f) << 24);
-		grConstantColorValue(c);
-	}
-	else
-	{
-		grConstantColorValue(0XFFFFFFFF);
-	}
-	
-	verts=new MyGrVertex[poly.num];
-	float q,x,y,ooz,z,u,v,lu,lv;
-	TextureHandler *thLm=NULL,*thTex = (TextureHandler *)tcache->pData;
-/*	if (poly.polygon->theDynLight) // Use a dynamic light if it exists
-		q = (float)((poly.polygon->theDynLight->RawIntensity() * 256) >> 16);
-	else*/
-		q = 255;
-	for(int i=0;i<poly.num;i++)
-	{
-		x = poly.vertices[i].sx;
-		y = poly.vertices[i].sy;
-		verts[i].x = x + SNAP;
-		verts[i].y =/* FRAME_HEIGHT -1 - */y + SNAP; 
-		x-=m_nHalfWidth;
-		y-=m_nHalfHeight;
-		ooz = (M*(x) + N*(y) + O);
-		/*verts[i].z =*/ z = 1/ooz;
-		u = (J1 * (x) + J2 * (y) + J3)*z;
-		v = (K1 * (x) + K2 * (y) + K3)*z;
-		verts[i].tmuvtx[0].sow= u; 
-		verts[i].tmuvtx[0].tow= v; 
-		verts[i].oow /*= verts[i].tmuvtx[0].oow = verts[i].tmuvtx[1].oow */= ooz;
-		verts[i].r = q;
-		verts[i].g = q;
-		verts[i].b = q;
-//		verts[i].a = poly.polygon->get_alpha(); // Not used
-//		verts[i].x -= SNAP;  // You can forget it
-//		verts[i].y -= SNAP;  // This one also
-	}
-	if(lm_exists)
-	{
+  {
+    GrColor_t c = 0x00FFFFFF;
+    c |= ((int)((float)(poly_alpha)/100.0f*255.0f) << 24);
+    grConstantColorValue(c);
+  }
+  else
+  {
+    grConstantColorValue(0XFFFFFFFF);
+  }
+  
+  verts=new MyGrVertex[poly.num];
+  float q,x,y,ooz,z,u,v,lu,lv;
+  TextureHandler *thLm=NULL,*thTex = (TextureHandler *)tcache->pData;
+/*  if (poly.polygon->theDynLight) // Use a dynamic light if it exists
+    q = (float)((poly.polygon->theDynLight->RawIntensity() * 256) >> 16);
+  else*/
+    q = 255;
+  for(int i=0;i<poly.num;i++)
+  {
+    x = poly.vertices[i].sx;
+    y = poly.vertices[i].sy;
+    verts[i].x = x + SNAP;
+    verts[i].y =/* FRAME_HEIGHT -1 - */y + SNAP; 
+    x-=m_nHalfWidth;
+    y-=m_nHalfHeight;
+    ooz = (M*(x) + N*(y) + O);
+    /*verts[i].z =*/ z = 1/ooz;
+    u = (J1 * (x) + J2 * (y) + J3)*z;
+    v = (K1 * (x) + K2 * (y) + K3)*z;
+    verts[i].tmuvtx[0].sow= u; 
+    verts[i].tmuvtx[0].tow= v; 
+    verts[i].oow /*= verts[i].tmuvtx[0].oow = verts[i].tmuvtx[1].oow */= ooz;
+    verts[i].r = q;
+    verts[i].g = q;
+    verts[i].b = q;
+//    verts[i].a = poly.polygon->get_alpha(); // Not used
+//    verts[i].x -= SNAP;  // You can forget it
+//    verts[i].y -= SNAP;  // This one also
+  }
+  if(lm_exists)
+  {
     float fMinU, fMinV, fMaxU, fMaxV;
 
     pTex->GetTextureBox( fMinU, fMinV, fMaxU, fMaxV );
 
     thLm = (TextureHandler *)lcache->pData;
-		float lu_dif, lv_dif,lu_scale, lv_scale;
-		lu_dif = fMinU;
-		lv_dif = fMinV;
-		lu_scale = 1.0f/(fMaxU - fMinU);
-		lv_scale = 1.0f/(fMaxV - fMinV);
-		for(i=0;i<poly.num;i++)
-		{
-			lu = (verts[i].tmuvtx[0].sow- lu_dif) * lu_scale;
-			lv = (verts[i].tmuvtx[0].tow- lv_dif) * lv_scale;
-			verts[i].tmuvtx[1].sow= lu; 
-			verts[i].tmuvtx[1].tow= lv; 
-		}
-	}
-	
-	if(is_colorkeyed)
-		grChromakeyMode(GR_CHROMAKEY_ENABLE);
+    float lu_dif, lv_dif,lu_scale, lv_scale;
+    lu_dif = fMinU;
+    lv_dif = fMinV;
+    lu_scale = 1.0f/(fMaxU - fMinU);
+    lv_scale = 1.0f/(fMaxV - fMinV);
+    for(i=0;i<poly.num;i++)
+    {
+      lu = (verts[i].tmuvtx[0].sow- lu_dif) * lu_scale;
+      lv = (verts[i].tmuvtx[0].tow- lv_dif) * lv_scale;
+      verts[i].tmuvtx[1].sow= lu; 
+      verts[i].tmuvtx[1].tow= lv; 
+    }
+  }
+  
+  if(is_colorkeyed)
+    grChromakeyMode(GR_CHROMAKEY_ENABLE);
 
   RenderPolygon(verts,poly.num,lm_exists,thTex,thLm);
 
   if(is_colorkeyed)
-		grChromakeyMode(GR_CHROMAKEY_DISABLE);
-	
-	delete[] verts;
+    grChromakeyMode(GR_CHROMAKEY_DISABLE);
+  
+  delete[] verts;
 
   return S_OK;
 }
 
 /// Draw a projected (non-perspective correct) polygon.
-STDMETHODIMP csGraphics3DGlide3x::DrawPolygonQuick (G3DPolygon& poly, bool gouroud)
+STDMETHODIMP csGraphics3DGlide3x::DrawPolygonQuick (G3DPolygonDPQ& poly, bool gouroud)
 {
   HighColorCacheAndManage_Data* tcache=NULL;
 
   if (poly.num < 3) 
-		return S_OK;
-	
-	CHK(MyGrVertex *verts = new MyGrVertex[poly.num]);
-	
-	float x, y;
-	for(int i=0; i<poly.num; i++)
-	{
-		x = poly.vertices[i].sx;
-		y = poly.vertices[i].sy;
-		verts[i].x = x + SNAP;
-		verts[i].y = m_nHeight -1 - y + SNAP;
-		x-=m_nHalfWidth;
-		y-=m_nHalfHeight;
-		verts[i].r = 255;
-		verts[i].g = 255;
-		verts[i].b = 255;
-		verts[i].oow = poly.pi_texcoords[i].z;
-		verts[i].x -= SNAP;
-		verts[i].y -= SNAP;
-	}
-	
-	m_pTextureCache->Add(poly.pi_texture);
+    return S_OK;
+  
+  CHK(MyGrVertex *verts = new MyGrVertex[poly.num]);
+  
+  float x, y;
+  for(int i=0; i<poly.num; i++)
+  {
+    x = poly.vertices[i].sx;
+    y = poly.vertices[i].sy;
+    verts[i].x = x + SNAP;
+    verts[i].y = m_nHeight -1 - y + SNAP;
+    x-=m_nHalfWidth;
+    y-=m_nHalfHeight;
+    verts[i].r = 255;
+    verts[i].g = 255;
+    verts[i].b = 255;
+    verts[i].oow = poly.vertices[i].z;
+    verts[i].x -= SNAP;
+    verts[i].y -= SNAP;
+  }
+  
+  m_pTextureCache->Add(poly.pi_texture);
   poly.pi_texture->GetHighColorCache((HighColorCache_Data **)&tcache ); 
   ASSERT( tcache );
-	
+  
   TextureHandler *thTex = (TextureHandler *)tcache->pData;
-	grTexSource(thTex->tmu->tmu_id, thTex->loadAddress,
-		GR_MIPMAPLEVELMASK_BOTH, &thTex->info);
-	
+  grTexSource(thTex->tmu->tmu_id, thTex->loadAddress,
+    GR_MIPMAPLEVELMASK_BOTH, &thTex->info);
+  
   grDrawVertexArrayContiguous(GR_POLYGON, poly.num, verts, sizeof(MyGrVertex));
-	
-	delete[] verts;
+  
+  delete[] verts;
 
   return S_OK;
 }
@@ -985,23 +978,23 @@ STDMETHODIMP csGraphics3DGlide3x::CacheTexture (IPolygonTexture *piPT)
 /// Release a texture from the cache.
 STDMETHODIMP csGraphics3DGlide3x::UncacheTexture (IPolygonTexture *piPT)
 {
-	(void)piPT;
+  (void)piPT;
   return E_NOTIMPL;
 }
 
 /// Dump the texture cache.
 STDMETHODIMP csGraphics3DGlide3x::DumpCache(void)
 {
-	m_pTextureCache->Dump();
-	m_pLightmapCache->Dump();
+  m_pTextureCache->Dump();
+  m_pLightmapCache->Dump();
   return S_OK;
 }
 
 /// Clear the texture cache.
 STDMETHODIMP csGraphics3DGlide3x::ClearCache(void)
 {
-	if(m_pTextureCache) m_pTextureCache->Clear();
-	if(m_pLightmapCache) m_pLightmapCache->Clear();
+  if(m_pTextureCache) m_pTextureCache->Clear();
+  if(m_pLightmapCache) m_pLightmapCache->Clear();
   return S_OK;
 }
 
@@ -1067,27 +1060,27 @@ STDMETHODIMP csGraphics3DGlide3x::DrawLine (csVector3& v1, csVector3& v2, int co
 STDMETHODIMP csGraphics3DGlide3x::SetRenderState (G3D_RENDERSTATEOPTION op, long val)
 {
   switch (op)
-	{
+  {
 /*
   case G3DRENDERSTATE_ZBUFFERTESTENABLE:
-		if (val)
-			m_lpd3dDevice->SetRenderState(D3DRENDERSTATE_ZFUNC, D3DCMP_LESSEQUAL);
-		else
-			m_lpd3dDevice->SetRenderState(D3DRENDERSTATE_ZFUNC, D3DCMP_ALWAYS);
-	break;
+    if (val)
+      m_lpd3dDevice->SetRenderState(D3DRENDERSTATE_ZFUNC, D3DCMP_LESSEQUAL);
+    else
+      m_lpd3dDevice->SetRenderState(D3DRENDERSTATE_ZFUNC, D3DCMP_ALWAYS);
+  break;
 
-	case G3DRENDERSTATE_ZBUFFERFILLENABLE:
-		if (val)
-			m_lpd3dDevice->SetRenderState(D3DRENDERSTATE_ZWRITEENABLE, TRUE);
-		else
-			m_lpd3dDevice->SetRenderState(D3DRENDERSTATE_ZWRITEENABLE, FALSE);
-	break;
+  case G3DRENDERSTATE_ZBUFFERFILLENABLE:
+    if (val)
+      m_lpd3dDevice->SetRenderState(D3DRENDERSTATE_ZWRITEENABLE, TRUE);
+    else
+      m_lpd3dDevice->SetRenderState(D3DRENDERSTATE_ZWRITEENABLE, FALSE);
+  break;
 */
-	default:
-		return E_NOTIMPL;
-	}
+  default:
+    return E_NOTIMPL;
+  }
 
-	return S_OK;
+  return S_OK;
 }
 
 void csGraphics3DGlide3x::SysPrintf(int mode, char* szMsg, ...)

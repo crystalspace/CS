@@ -1478,10 +1478,8 @@ void csPolygon2D::Draw (IGraphics2D* g2d, int col)
 
 //---------------------------------------------------------------------------
 
-void PreparePolygonQuick (G3DPolygon* g3dpoly, bool gouraud)
+void PreparePolygonQuick (G3DPolygonDPQ* g3dpoly, csVector2* orig_triangle, bool gouraud)
 {
-  csVector2* orig_triangle = g3dpoly->pi_triangle;
-
   // First we have to find the u,v coordinates for every
   // point in the clipped polygon. We know we started
   // from orig_triangle and that texture mapping is not perspective correct.
@@ -1552,47 +1550,45 @@ void PreparePolygonQuick (G3DPolygon* g3dpoly, bool gouraud)
         }
 
     // Calculate Z
-    INTERPOLATE (g3dpoly->pi_texcoords [j].z,
-          g3dpoly->pi_tritexcoords [vtl].z, g3dpoly->pi_tritexcoords [vbl].z,
-          g3dpoly->pi_tritexcoords [vtr].z, g3dpoly->pi_tritexcoords [vbr].z);
+    INTERPOLATE (g3dpoly->vertices [j].z,
+          g3dpoly->vertices [vtl].z, g3dpoly->vertices [vbl].z,
+          g3dpoly->vertices [vtr].z, g3dpoly->vertices [vbr].z);
     if (g3dpoly->txt_handle)
     {
       // Calculate U
-      INTERPOLATE (g3dpoly->pi_texcoords [j].u,
-            g3dpoly->pi_tritexcoords [vtl].u, g3dpoly->pi_tritexcoords [vbl].u,
-            g3dpoly->pi_tritexcoords [vtr].u, g3dpoly->pi_tritexcoords [vbr].u);
+      INTERPOLATE (g3dpoly->vertices [j].u,
+            g3dpoly->vertices [vtl].u, g3dpoly->vertices [vbl].u,
+            g3dpoly->vertices [vtr].u, g3dpoly->vertices [vbr].u);
       // Calculate V
-      INTERPOLATE (g3dpoly->pi_texcoords [j].v,
-            g3dpoly->pi_tritexcoords [vtl].v, g3dpoly->pi_tritexcoords [vbl].v,
-            g3dpoly->pi_tritexcoords [vtr].v, g3dpoly->pi_tritexcoords [vbr].v);
+      INTERPOLATE (g3dpoly->vertices [j].v,
+            g3dpoly->vertices [vtl].v, g3dpoly->vertices [vbl].v,
+            g3dpoly->vertices [vtr].v, g3dpoly->vertices [vbr].v);
     }
     if (gouraud)
     {
       // Calculate R
-      INTERPOLATE (g3dpoly->pi_texcoords [j].r,
-            g3dpoly->pi_tritexcoords [vtl].r, g3dpoly->pi_tritexcoords [vbl].r,
-            g3dpoly->pi_tritexcoords [vtr].r, g3dpoly->pi_tritexcoords [vbr].r);
+      INTERPOLATE (g3dpoly->vertices [j].r,
+            g3dpoly->vertices [vtl].r, g3dpoly->vertices [vbl].r,
+            g3dpoly->vertices [vtr].r, g3dpoly->vertices [vbr].r);
       // Calculate G
-      INTERPOLATE (g3dpoly->pi_texcoords [j].g,
-            g3dpoly->pi_tritexcoords [vtl].g, g3dpoly->pi_tritexcoords [vbl].g,
-            g3dpoly->pi_tritexcoords [vtr].g, g3dpoly->pi_tritexcoords [vbr].g);
+      INTERPOLATE (g3dpoly->vertices [j].g,
+            g3dpoly->vertices [vtl].g, g3dpoly->vertices [vbl].g,
+            g3dpoly->vertices [vtr].g, g3dpoly->vertices [vbr].g);
       // Calculate B
-      INTERPOLATE (g3dpoly->pi_texcoords [j].b,
-            g3dpoly->pi_tritexcoords [vtl].b, g3dpoly->pi_tritexcoords [vbl].b,
-            g3dpoly->pi_tritexcoords [vtr].b, g3dpoly->pi_tritexcoords [vbr].b);
+      INTERPOLATE (g3dpoly->vertices [j].b,
+            g3dpoly->vertices [vtl].b, g3dpoly->vertices [vbl].b,
+            g3dpoly->vertices [vtr].b, g3dpoly->vertices [vbr].b);
     }
     else
     {
-      g3dpoly->pi_texcoords[j].r = 0;
-      g3dpoly->pi_texcoords[j].g = 0;
-      g3dpoly->pi_texcoords[j].b = 0;
+      g3dpoly->vertices[j].r = 0;
+      g3dpoly->vertices[j].g = 0;
+      g3dpoly->vertices[j].b = 0;
     }
   }
 }
 
 //---------------------------------------------------------------------------
-
-G3DPolygon g3dpoly;
 
 // For debugging
 csPolygon3D* csPolygon3D::hilight = NULL;
@@ -1646,13 +1642,15 @@ void csPolygon2D::DrawFilled (IGraphics3D* g3d, csPolygon3D* poly, csPolyPlane* 
     g3d->SetRenderState (G3DRENDERSTATE_ZBUFFERFILLENABLE, true);
   }
 
-  memset (&g3dpoly, 0, sizeof (G3DPolygon));
-  g3dpoly.num = num_vertices;
-  g3dpoly.txt_handle = poly->GetTextureHandle ();
-  g3dpoly.inv_aspect = csCamera::inv_aspect;
-
   if (poly->GetUVCoords () || poly->UseFlatColor ())
   {
+    G3DPolygonDPQ g3dpoly;
+
+    memset (&g3dpoly, 0, sizeof (g3dpoly));
+    g3dpoly.num = num_vertices;
+    g3dpoly.txt_handle = poly->GetTextureHandle ();
+    g3dpoly.inv_aspect = csCamera::inv_aspect;
+
     csColor* po_colors = poly->GetColors ();
     g3dpoly.flat_color_r = poly->GetFlatColor ().red;
     g3dpoly.flat_color_g = poly->GetFlatColor ().green;
@@ -1660,45 +1658,49 @@ void csPolygon2D::DrawFilled (IGraphics3D* g3d, csPolygon3D* poly, csPolyPlane* 
     if (poly->UseFlatColor ()) g3dpoly.txt_handle = NULL;
 
     // We are going to use DrawPolygonQuick.
-    g3dpoly.pi_triangle = orig_triangle;
-    g3dpoly.pi_tritexcoords[0].z = 1. / poly->Vcam (0).z;
-    g3dpoly.pi_tritexcoords[1].z = 1. / poly->Vcam (1).z;
-    g3dpoly.pi_tritexcoords[2].z = 1. / poly->Vcam (2).z;
+    g3dpoly.vertices[0].z = 1. / poly->Vcam (0).z;
+    g3dpoly.vertices[1].z = 1. / poly->Vcam (1).z;
+    g3dpoly.vertices[2].z = 1. / poly->Vcam (2).z;
     if (g3dpoly.txt_handle)
     {
-      g3dpoly.pi_tritexcoords[0].u = poly->GetUVCoords ()[0].x;
-      g3dpoly.pi_tritexcoords[0].v = poly->GetUVCoords ()[0].y;
-      g3dpoly.pi_tritexcoords[1].u = poly->GetUVCoords ()[1].x;
-      g3dpoly.pi_tritexcoords[1].v = poly->GetUVCoords ()[1].y;
-      g3dpoly.pi_tritexcoords[2].u = poly->GetUVCoords ()[2].x;
-      g3dpoly.pi_tritexcoords[2].v = poly->GetUVCoords ()[2].y;
+      g3dpoly.vertices[0].u = poly->GetUVCoords ()[0].x;
+      g3dpoly.vertices[0].v = poly->GetUVCoords ()[0].y;
+      g3dpoly.vertices[1].u = poly->GetUVCoords ()[1].x;
+      g3dpoly.vertices[1].v = poly->GetUVCoords ()[1].y;
+      g3dpoly.vertices[2].u = poly->GetUVCoords ()[2].x;
+      g3dpoly.vertices[2].v = poly->GetUVCoords ()[2].y;
     }
     if (po_colors)
     {
-      g3dpoly.pi_tritexcoords[0].r = po_colors[0].red;
-      g3dpoly.pi_tritexcoords[0].g = po_colors[0].green;
-      g3dpoly.pi_tritexcoords[0].b = po_colors[0].blue;
-      g3dpoly.pi_tritexcoords[1].r = po_colors[1].red;
-      g3dpoly.pi_tritexcoords[1].g = po_colors[1].green;
-      g3dpoly.pi_tritexcoords[1].b = po_colors[1].blue;
-      g3dpoly.pi_tritexcoords[2].r = po_colors[2].red;
-      g3dpoly.pi_tritexcoords[2].g = po_colors[2].green;
-      g3dpoly.pi_tritexcoords[2].b = po_colors[2].blue;
+      g3dpoly.vertices[0].r = po_colors[0].red;
+      g3dpoly.vertices[0].g = po_colors[0].green;
+      g3dpoly.vertices[0].b = po_colors[0].blue;
+      g3dpoly.vertices[1].r = po_colors[1].red;
+      g3dpoly.vertices[1].g = po_colors[1].green;
+      g3dpoly.vertices[1].b = po_colors[1].blue;
+      g3dpoly.vertices[2].r = po_colors[2].red;
+      g3dpoly.vertices[2].g = po_colors[2].green;
+      g3dpoly.vertices[2].b = po_colors[2].blue;
     }
     for (i = 0 ; i < num_vertices ; i++)
     {
       g3dpoly.vertices[i].sx = vertices[i].x;
       g3dpoly.vertices[i].sy = vertices[i].y;
     }
-    CHK (g3dpoly.pi_texcoords = new G3DPolygon::poly_texture_def [64]);
-    PreparePolygonQuick (&g3dpoly, po_colors != NULL);
+    PreparePolygonQuick (&g3dpoly, orig_triangle, po_colors != NULL);
     g3d->StartPolygonQuick (g3dpoly.txt_handle, po_colors != NULL);
     g3d->DrawPolygonQuick (g3dpoly, po_colors != NULL);
     g3d->FinishPolygonQuick ();
-    CHK (delete [] g3dpoly.pi_texcoords);
   }
   else
   {
+    G3DPolygonDP g3dpoly;
+
+    memset (&g3dpoly, 0, sizeof (g3dpoly));
+    g3dpoly.num = num_vertices;
+    g3dpoly.txt_handle = poly->GetTextureHandle ();
+    g3dpoly.inv_aspect = csCamera::inv_aspect;
+
     // We are going to use DrawPolygon.
     if (mirror)
       for (i = 0 ; i < num_vertices ; i++)
@@ -1712,8 +1714,16 @@ void csPolygon2D::DrawFilled (IGraphics3D* g3d, csPolygon3D* poly, csPolyPlane* 
         g3dpoly.vertices[i].sx = vertices[i].x;
         g3dpoly.vertices[i].sy = vertices[i].y;
       }
-    g3dpoly.polygon = GetIPolygon3DFromcsPolygon3D(poly);
-    g3dpoly.id = poly->GetID ();
+
+    g3dpoly.alpha           = poly->GetAlpha();
+    g3dpoly.uses_mipmaps    = poly->IsMipmapped();
+    g3dpoly.z_value         = poly->Vcam(0).z;
+
+    for (int mipmaplevel = 0; mipmaplevel<4; mipmaplevel++)
+    {
+      g3dpoly.poly_texture[mipmaplevel] = 
+        GetIPolygonTextureFromcsPolyTexture(poly->GetPolyTex(mipmaplevel));
+    }
 
     g3dpoly.plane.m_cam2tex = &plane->m_cam2tex;
     g3dpoly.plane.v_cam2tex = &plane->v_cam2tex;
@@ -1752,7 +1762,8 @@ void csPolygon2D::AddFogPolygon (IGraphics3D* g3d, csPolygon3D* poly, csPolyPlan
 {
   int i;
 
-  memset(&g3dpoly, 0, sizeof(G3DPolygon));
+  G3DPolygonAFP g3dpoly;
+  memset(&g3dpoly, 0, sizeof(g3dpoly));
   g3dpoly.num = num_vertices;
   g3dpoly.inv_aspect = csCamera::inv_aspect;
   if (mirror)
@@ -1767,8 +1778,7 @@ void csPolygon2D::AddFogPolygon (IGraphics3D* g3d, csPolygon3D* poly, csPolyPlan
       g3dpoly.vertices[i].sx = vertices[i].x;
       g3dpoly.vertices[i].sy = vertices[i].y;
     }
-  g3dpoly.polygon = GetIPolygon3DFromcsPolygon3D(poly);
-  g3dpoly.id = poly->GetID ();
+  //g3dpoly.polygon = GetIPolygon3DFromcsPolygon3D(poly); //DPQFIX
 
   float Ac, Bc, Cc, Dc;
   plane->GetCameraNormal (&Ac, &Bc, &Cc, &Dc);

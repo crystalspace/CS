@@ -123,19 +123,19 @@ unsigned char *Scan::curLightTable; // SJI dynamic light
 #define SCANFUNC draw_scanline_map
 #define SCANMAP 1
 #define SCANLOOP \
-    do									\
-    {									\
-      *_dest++ = srcTex[((vv>>16)<<shifter) + (uu>>16)];		\
-      uu += duu;							\
-      vv += dvv;							\
-    }									\
+    do                                                                  \
+    {                                                                   \
+      *_dest++ = srcTex[((vv>>16)<<shifter) + (uu>>16)];                \
+      uu += duu;                                                        \
+      vv += dvv;                                                        \
+    }                                                                   \
     while (_dest <= _destend)
 #define SCANEND \
-    do									\
-    {									\
-      *z_buffer++ = izz;						\
-      izz += dzz;							\
-    }									\
+    do                                                                  \
+    {                                                                   \
+      *z_buffer++ = izz;                                                \
+      izz += dzz;                                                       \
+    }                                                                   \
     while (z_buffer <= lastZbuf)
 #include "scanline.inc"
 
@@ -159,38 +159,38 @@ int filter_bf;
     while(_dest<=_destend&&((vv<BAILOUT_CONSTANT||uu<BAILOUT_CONSTANT)||(vv>=Scan::th2fp-BAILOUT_CONSTANT||uu>=Scan::tw2fp-BAILOUT_CONSTANT)))\
     {                                                                   \
       *_dest++ = srcTex[((vv>>16)<<shifter) + (uu>>16)];                \
-      uu += duu;							\
-      vv += dvv;							\
+      uu += duu;                                                        \
+      vv += dvv;                                                        \
     }                                                                   \
     while ((_dest <= _destend)&&!((vv<BAILOUT_CONSTANT||uu<BAILOUT_CONSTANT)||(vv>=Scan::th2fp-BAILOUT_CONSTANT||uu>=Scan::tw2fp-BAILOUT_CONSTANT)))\
-    {									\
-      if (((((long)_dest)) & filter_bf_shifted) != 0)			\
-      {									\
-        if ((uu&0xffff) < 64*256) filter_du = -1;			\
-	else if ((uu&0xffff) > 192*256) filter_du = 1;			\
-	else filter_du = 0;						\
-        if ((vv&0xffff) < 64*256) filter_dv = -1;			\
-	else if ((vv&0xffff) > 192*256) filter_dv = 1;			\
-	else filter_dv = 0;						\
-      }									\
-      else filter_du = filter_dv = 0;					\
+    {                                                                   \
+      if (((((long)_dest)) & filter_bf_shifted) != 0)                   \
+      {                                                                 \
+        if ((uu&0xffff) < 64*256) filter_du = -1;                       \
+        else if ((uu&0xffff) > 192*256) filter_du = 1;                  \
+        else filter_du = 0;                                             \
+        if ((vv&0xffff) < 64*256) filter_dv = -1;                       \
+        else if ((vv&0xffff) > 192*256) filter_dv = 1;                  \
+        else filter_dv = 0;                                             \
+      }                                                                 \
+      else filter_du = filter_dv = 0;                                   \
       *_dest++ = srcTex[(((vv>>16)+filter_dv)<<shifter) + ((uu>>16)+filter_du)];\
-      uu += duu;							\
-      vv += dvv;							\
-    }									\
+      uu += duu;                                                        \
+      vv += dvv;                                                        \
+    }                                                                   \
     while(_dest<=_destend)                                              \
     {                                                                   \
       *_dest++ = srcTex[((vv>>16)<<shifter) + (uu>>16)];                \
-      uu += duu;							\
-      vv += dvv;							\
+      uu += duu;                                                        \
+      vv += dvv;                                                        \
     }
 
 #define SCANEND \
-    do									\
-    {									\
-      *z_buffer++ = izz;						\
-      izz += dzz;							\
-    }									\
+    do                                                                  \
+    {                                                                   \
+      *z_buffer++ = izz;                                                \
+      izz += dzz;                                                       \
+    }                                                                   \
     while (z_buffer <= lastZbuf)
 #include "scanline.inc"
 
@@ -206,19 +206,19 @@ int filter_bf;
 #undef SCANMAP
 #define SCANFUNC draw_scanline
 #define SCANLOOP \
-    do									\
-    {									\
+    do                                                                  \
+    {                                                                   \
       *_dest++ = srcTex[((uu>>16)&ander_w) + ((vv>>shifter_h)&ander_h)];\
-      uu += duu;							\
-      vv += dvv;							\
-    }									\
+      uu += duu;                                                        \
+      vv += dvv;                                                        \
+    }                                                                   \
     while (_dest <= _destend)
 #define SCANEND \
-    do									\
-    {									\
-      *z_buffer++ = izz;						\
-      izz += dzz;							\
-    }									\
+    do                                                                  \
+    {                                                                   \
+      *z_buffer++ = izz;                                                \
+      izz += dzz;                                                       \
+    }                                                                   \
     while (z_buffer <= lastZbuf)
 #include "scanline.inc"
 
@@ -234,19 +234,19 @@ int filter_bf;
 #undef SCANMAP
 #define SCANFUNC draw_scanline_private
 #define SCANLOOP \
-    do									\
-    {									\
-      *_dest++ = priv_to_global[srcTex[((uu>>16)&ander_w) + ((vv>>shifter_h)&ander_h)]];	\
-      uu += duu;							\
-      vv += dvv;							\
-    }									\
+    do                                                                  \
+    {                                                                   \
+      *_dest++ = priv_to_global[srcTex[((uu>>16)&ander_w) + ((vv>>shifter_h)&ander_h)]];        \
+      uu += duu;                                                        \
+      vv += dvv;                                                        \
+    }                                                                   \
     while (_dest <= _destend)
 #define SCANEND \
-    do									\
-    {									\
-      *z_buffer++ = izz;						\
-      izz += dzz;							\
-    }									\
+    do                                                                  \
+    {                                                                   \
+      *z_buffer++ = izz;                                                \
+      izz += dzz;                                                       \
+    }                                                                   \
     while (z_buffer <= lastZbuf)
 #include "scanline.inc"
 
@@ -263,13 +263,13 @@ int filter_bf;
 #define SCANFUNC draw_scanline_map_alpha1
 #define SCANMAP 1
 #define SCANLOOP \
-    do									\
-    {									\
+    do                                                                  \
+    {                                                                   \
       *_dest = alpha_map[*_dest][srcTex[((vv>>16)<<shifter) + (uu>>16)]];\
-      _dest++;								\
-      uu += duu;							\
-      vv += dvv;							\
-    }									\
+      _dest++;                                                          \
+      uu += duu;                                                        \
+      vv += dvv;                                                        \
+    }                                                                   \
     while (_dest <= _destend)
 #include "scanline.inc"
 
@@ -286,13 +286,13 @@ int filter_bf;
 #define SCANFUNC draw_scanline_map_alpha2
 #define SCANMAP 1
 #define SCANLOOP \
-    do									\
-    {									\
+    do                                                                  \
+    {                                                                   \
       *_dest = alpha_map[srcTex[((vv>>16)<<shifter) + (uu>>16)]][*_dest];\
-      _dest++;								\
-      uu += duu;							\
-      vv += dvv;							\
-    }									\
+      _dest++;                                                          \
+      uu += duu;                                                        \
+      vv += dvv;                                                        \
+    }                                                                   \
     while (_dest <= _destend)
 #include "scanline.inc"
 
@@ -308,24 +308,24 @@ int filter_bf;
 #undef SCANMAP
 #define SCANFUNC draw_scanline_transp
 #define SCANLOOP \
-    unsigned char c;							\
-    do									\
-    {									\
+    unsigned char c;                                                    \
+    do                                                                  \
+    {                                                                   \
       c = srcTex[((uu>>16)&ander_w) + ((vv>>shifter_h)&ander_h)];\
-      if (c)								\
-      {									\
-        *_dest++ = c;							\
-	*z_buffer++ = izz;						\
-      }									\
-      else								\
-      {									\
-        _dest++;							\
-	z_buffer++;							\
-      }									\
-      uu += duu;							\
-      vv += dvv;							\
-      izz += dzz;							\
-    }									\
+      if (c)                                                            \
+      {                                                                 \
+        *_dest++ = c;                                                   \
+        *z_buffer++ = izz;                                              \
+      }                                                                 \
+      else                                                              \
+      {                                                                 \
+        _dest++;                                                        \
+        z_buffer++;                                                     \
+      }                                                                 \
+      uu += duu;                                                        \
+      vv += dvv;                                                        \
+      izz += dzz;                                                       \
+    }                                                                   \
     while (_dest <= _destend)
 #include "scanline.inc"
 
@@ -341,24 +341,24 @@ int filter_bf;
 #undef SCANMAP
 #define SCANFUNC draw_scanline_transp_private
 #define SCANLOOP \
-    do									\
-    {									\
-      unsigned char c = srcTex[((uu>>16)&ander_w) +			\
-        ((vv>>shifter_h)&ander_h)];					\
-      if (c)								\
-      {									\
-        *_dest++ = priv_to_global[c];					\
-	*z_buffer++ = izz;						\
-      }									\
-      else								\
-      {									\
-        _dest++;							\
-	z_buffer++;							\
-      }									\
-      uu += duu;							\
-      vv += dvv;							\
-      izz += dzz;							\
-    }									\
+    do                                                                  \
+    {                                                                   \
+      unsigned char c = srcTex[((uu>>16)&ander_w) +                     \
+        ((vv>>shifter_h)&ander_h)];                                     \
+      if (c)                                                            \
+      {                                                                 \
+        *_dest++ = priv_to_global[c];                                   \
+        *z_buffer++ = izz;                                              \
+      }                                                                 \
+      else                                                              \
+      {                                                                 \
+        _dest++;                                                        \
+        z_buffer++;                                                     \
+      }                                                                 \
+      uu += duu;                                                        \
+      vv += dvv;                                                        \
+      izz += dzz;                                                       \
+    }                                                                   \
     while (_dest <= _destend)
 #include "scanline.inc"
 
@@ -375,23 +375,23 @@ int filter_bf;
 #define SCANFUNC draw_scanline_transp_map
 #define SCANMAP 1
 #define SCANLOOP \
-    do									\
-    {									\
-      unsigned char c = srcTex[((vv>>16)<<shifter) + (uu>>16)];		\
-      if (c)								\
-      {									\
-        *_dest++ = c;							\
-	*z_buffer++ = izz;						\
-      }									\
-      else								\
-      {									\
-        _dest++;							\
-	z_buffer++;							\
-      }									\
-      uu += duu;							\
-      vv += dvv;							\
-      izz += dzz;							\
-    }									\
+    do                                                                  \
+    {                                                                   \
+      unsigned char c = srcTex[((vv>>16)<<shifter) + (uu>>16)];         \
+      if (c)                                                            \
+      {                                                                 \
+        *_dest++ = c;                                                   \
+        *z_buffer++ = izz;                                              \
+      }                                                                 \
+      else                                                              \
+      {                                                                 \
+        _dest++;                                                        \
+        z_buffer++;                                                     \
+      }                                                                 \
+      uu += duu;                                                        \
+      vv += dvv;                                                        \
+      izz += dzz;                                                       \
+    }                                                                   \
     while (_dest <= _destend)
 #include "scanline.inc"
 
@@ -407,22 +407,22 @@ int filter_bf;
 #undef SCANMAP
 #define SCANFUNC draw_scanline_z_buf
 #define SCANLOOP \
-    do									\
-    {									\
-      if (izz >= (int)(*z_buffer))					\
-      {									\
-	*_dest++ = srcTex[((uu>>16)&ander_w) + ((vv>>shifter_h)&ander_h)];\
-	*z_buffer++ = izz;						\
-      }									\
-      else								\
-      {									\
-        _dest++;							\
-        z_buffer++;							\
-      }									\
-      uu += duu;							\
-      vv += dvv;							\
-      izz += dzz;							\
-    }									\
+    do                                                                  \
+    {                                                                   \
+      if (izz >= (int)(*z_buffer))                                      \
+      {                                                                 \
+        *_dest++ = srcTex[((uu>>16)&ander_w) + ((vv>>shifter_h)&ander_h)];\
+        *z_buffer++ = izz;                                              \
+      }                                                                 \
+      else                                                              \
+      {                                                                 \
+        _dest++;                                                        \
+        z_buffer++;                                                     \
+      }                                                                 \
+      uu += duu;                                                        \
+      vv += dvv;                                                        \
+      izz += dzz;                                                       \
+    }                                                                   \
     while (_dest <= _destend)
 #include "scanline.inc"
 
@@ -438,22 +438,22 @@ int filter_bf;
 #undef SCANMAP
 #define SCANFUNC draw_scanline_z_buf_private
 #define SCANLOOP \
-    do									\
-    {									\
-      if (izz >= (int)(*z_buffer))					\
-      {									\
-	*_dest++ = priv_to_global[srcTex[((uu>>16)&ander_w) + ((vv>>shifter_h)&ander_h)]];	\
-	*z_buffer++ = izz;						\
-      }									\
-      else								\
-      {									\
-        _dest++;							\
-        z_buffer++;							\
-      }									\
-      uu += duu;							\
-      vv += dvv;							\
-      izz += dzz;							\
-    }									\
+    do                                                                  \
+    {                                                                   \
+      if (izz >= (int)(*z_buffer))                                      \
+      {                                                                 \
+        *_dest++ = priv_to_global[srcTex[((uu>>16)&ander_w) + ((vv>>shifter_h)&ander_h)]];      \
+        *z_buffer++ = izz;                                              \
+      }                                                                 \
+      else                                                              \
+      {                                                                 \
+        _dest++;                                                        \
+        z_buffer++;                                                     \
+      }                                                                 \
+      uu += duu;                                                        \
+      vv += dvv;                                                        \
+      izz += dzz;                                                       \
+    }                                                                   \
     while (_dest <= _destend)
 #include "scanline.inc"
 
@@ -470,22 +470,22 @@ int filter_bf;
 #define SCANFUNC draw_scanline_z_buf_map
 #define SCANMAP 1
 #define SCANLOOP \
-    do									\
-    {									\
-      if (izz >= (int)(*z_buffer))					\
-      {									\
-	*_dest++ = srcTex[((vv>>16)<<shifter) + (uu>>16)];		\
-	*z_buffer++ = izz;						\
-      }									\
-      else								\
-      {									\
-        _dest++;							\
-        z_buffer++;							\
-      }									\
-      uu += duu;							\
-      vv += dvv;							\
-      izz += dzz;							\
-    }									\
+    do                                                                  \
+    {                                                                   \
+      if (izz >= (int)(*z_buffer))                                      \
+      {                                                                 \
+        *_dest++ = srcTex[((vv>>16)<<shifter) + (uu>>16)];              \
+        *z_buffer++ = izz;                                              \
+      }                                                                 \
+      else                                                              \
+      {                                                                 \
+        _dest++;                                                        \
+        z_buffer++;                                                     \
+      }                                                                 \
+      uu += duu;                                                        \
+      vv += dvv;                                                        \
+      izz += dzz;                                                       \
+    }                                                                   \
     while (_dest <= _destend)
 #include "scanline.inc"
 
@@ -502,19 +502,19 @@ int filter_bf;
 #define SCANFUNC draw_scanline_map_light
 #define SCANMAP 1
 #define SCANLOOP \
-    do									\
-    {									\
-      *_dest++ = curLightTable[srcTex[((vv>>16)<<shifter) + (uu>>16)]];	\
-      uu += duu;							\
-      vv += dvv;							\
-    }									\
+    do                                                                  \
+    {                                                                   \
+      *_dest++ = curLightTable[srcTex[((vv>>16)<<shifter) + (uu>>16)]]; \
+      uu += duu;                                                        \
+      vv += dvv;                                                        \
+    }                                                                   \
     while (_dest <= _destend)
 #define SCANEND \
-    do									\
-    {									\
-      *z_buffer++ = izz;						\
-      izz += dzz;							\
-    }									\
+    do                                                                  \
+    {                                                                   \
+      *z_buffer++ = izz;                                                \
+      izz += dzz;                                                       \
+    }                                                                   \
     while (z_buffer <= lastZbuf)
 #include "scanline.inc"
 
@@ -531,22 +531,22 @@ int filter_bf;
 #define SCANFUNC draw_scanline_z_buf_map_light
 #define SCANMAP 1
 #define SCANLOOP \
-    do									\
-    {									\
-      if (izz >= (int)(*z_buffer))					\
-      {									\
-	*_dest++ = curLightTable[srcTex[((vv>>16)<<shifter) + (uu>>16)]];\
-	*z_buffer++ = izz;						\
-      }									\
-      else								\
-      {									\
-        _dest++;							\
-        z_buffer++;							\
-      }									\
-      uu += duu;							\
-      vv += dvv;							\
-      izz += dzz;							\
-    }									\
+    do                                                                  \
+    {                                                                   \
+      if (izz >= (int)(*z_buffer))                                      \
+      {                                                                 \
+        *_dest++ = curLightTable[srcTex[((vv>>16)<<shifter) + (uu>>16)]];\
+        *z_buffer++ = izz;                                              \
+      }                                                                 \
+      else                                                              \
+      {                                                                 \
+        _dest++;                                                        \
+        z_buffer++;                                                     \
+      }                                                                 \
+      uu += duu;                                                        \
+      vv += dvv;                                                        \
+      izz += dzz;                                                       \
+    }                                                                   \
     while (_dest <= _destend)
 #include "scanline.inc"
 
@@ -557,8 +557,8 @@ int filter_bf;
 #ifndef NO_draw_scanline_flat
 
 void Scan::draw_scanline_flat (int xx, unsigned char* d,
-			       unsigned long* z_buf,
-			       float inv_z, float u_div_z, float v_div_z)
+                               unsigned long* z_buf,
+                               float inv_z, float u_div_z, float v_div_z)
 {
   (void)u_div_z; (void)v_div_z;
   int color = flat_color;
@@ -582,8 +582,8 @@ void Scan::draw_scanline_flat (int xx, unsigned char* d,
 #ifndef NO_draw_scanline_z_buf_flat
 
 void Scan::draw_scanline_z_buf_flat (int xx, unsigned char* d,
-			       unsigned long* z_buf,
-			       float inv_z, float u_div_z, float v_div_z)
+                               unsigned long* z_buf,
+                               float inv_z, float u_div_z, float v_div_z)
 {
   (void)u_div_z; (void)v_div_z;
   int color = Scan::flat_color;
@@ -628,11 +628,11 @@ void Scan::draw_scanline_fog (int xx, unsigned char* d,
 
 #if 0
 void Scan::light_scanline (int xx,
-			   int uu, int vv,
-			   unsigned char* d,
-			   float d1, float d2, float dd1, float dd2,
-			   float dd_u, float da_u, float dd_v, float da_v,
-			   int lu, int lv, int sq_rad)
+                           int uu, int vv,
+                           unsigned char* d,
+                           float d1, float d2, float dd1, float dd2,
+                           float dd_u, float da_u, float dd_v, float da_v,
+                           int lu, int lv, int sq_rad)
 {
   int i;
   float r, u1, v1;
@@ -665,9 +665,9 @@ void Scan::light_scanline (int xx,
       sqd = sq_rad-sqd;
       if (sqd > 0)
       {
-	if (sqd > (255-NORMAL_LIGHT_LEVEL)) sqd = 255-NORMAL_LIGHT_LEVEL;
-	lt = textures->get_light_table (NORMAL_LIGHT_LEVEL+sqd);
-	*d++ = lt[*d];
+        if (sqd > (255-NORMAL_LIGHT_LEVEL)) sqd = 255-NORMAL_LIGHT_LEVEL;
+        lt = textures->get_light_table (NORMAL_LIGHT_LEVEL+sqd);
+        *d++ = lt[*d];
       }
       uu += duu;
       vv += dvv;
@@ -775,10 +775,9 @@ void Scan::mmx_draw_pi_scanline (void *dest, int len, long *zbuff, long u, long 
 
 //------------------------------------------------------------------
 
-void Scan::init_draw (csGraphics3DSoftware* g3d, IPolygon3D* p, IPolygonTexture* tex,
-	csTextureMMSoftware* texture, csTexture* untxt)
+void Scan::init_draw (csGraphics3DSoftware* g3d, IPolygonTexture* tex,
+        csTextureMMSoftware* texture, csTexture* untxt)
 {
-  poly = p;
 
   Scan::texture = texture;
   tw = untxt->get_width ();
@@ -800,7 +799,7 @@ void Scan::init_draw (csGraphics3DSoftware* g3d, IPolygon3D* p, IPolygonTexture*
       TCacheLightedTexture* tclt = (TCacheLightedTexture*)td;
       tmap2 = tclt->get_tmap8 ();
     }
-    else tmap2 = NULL;	// Not a lighted texture.
+    else tmap2 = NULL;  // Not a lighted texture.
 
     tex->GetFDU (fdu);
     tex->GetFDV (fdv);
@@ -858,7 +857,7 @@ void Scan::dump (csGraphics3DSoftware* pG3D)
     pG3D->SysPrintf (MSG_DEBUG_0, "      (%f,%f) - (%f,%f)\n", debug_sx2L, debug_sy2, debug_sx2R, debug_sy2);
     pG3D->SysPrintf (MSG_DEBUG_0, "  sy=%f, sxL=%f, sxR=%f\n", debug_sy, debug_sxL, debug_sxR);
     pG3D->SysPrintf (MSG_DEBUG_0, "  inv_z=%f, u_div_z=%f, v_div_z=%f\n",
-    	debug_inv_z, debug_u_div_z, debug_v_div_z);
+        debug_inv_z, debug_u_div_z, debug_v_div_z);
     pG3D->SysPrintf (MSG_DEBUG_0, "  1/z = (%f * sx) + (%f * sy) + %f\n", M, debug_N, debug_O);
     pG3D->SysPrintf (MSG_DEBUG_0, "  u/z = (%f * sx) + (%f * sy) + %f\n", J1, debug_J2, debug_J3);
     pG3D->SysPrintf (MSG_DEBUG_0, "  v/z = (%f * sx) + (%f * sy) + %f\n", K1, debug_K2, debug_K3);

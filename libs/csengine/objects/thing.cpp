@@ -203,8 +203,8 @@ void csThing::DrawCurves (csRenderView& rview, bool use_z_buf)
     // Clipped polygon (assume it cannot have more than 64 vertices)
 
     // Draw all the triangles within this curve
-    G3DPolygon poly;
-    memset (&poly, 0, sizeof(G3DPolygon));
+    G3DPolygonDPQ poly;
+    memset (&poly, 0, sizeof(poly));
     poly.txt_handle = c->GetTextureHandle ();
     if (poly.txt_handle == NULL)
     {
@@ -222,7 +222,6 @@ void csThing::DrawCurves (csRenderView& rview, bool use_z_buf)
       lm_width = c->lightmap->GetWidth ()-2;
       lm_height = c->lightmap->GetWidth ()-2;
     }
-    CHK (poly.pi_texcoords = new G3DPolygon::poly_texture_def [64]);
     rview.g3d->SetRenderState (G3DRENDERSTATE_ZBUFFERTESTENABLE, use_z_buf);
     rview.g3d->SetRenderState (G3DRENDERSTATE_ZBUFFERFILLENABLE, true);
     rview.g3d->StartPolygonQuick (poly.txt_handle, gouraud);
@@ -283,21 +282,20 @@ void csThing::DrawCurves (csRenderView& rview, bool use_z_buf)
 	if (!cpoly) continue;
 
 	poly.num = rescount;
-	poly.pi_triangle = (csVector2 *)persp;
 	int j;
 	for (j = 0; j < 3; j++)
 	{
 	  if (varr[j]->z > 0.0001)
-	    poly.pi_tritexcoords [j].z = 1 / varr[j]->z;
-	  poly.pi_tritexcoords [j].u = texes[j]->x;
-	  poly.pi_tritexcoords [j].v = texes[j]->y;
+	    poly.vertices [j].z = 1 / varr[j]->z;
+	  poly.vertices [j].u = texes[j]->x;
+	  poly.vertices [j].v = texes[j]->y;
 	  if (gouraud)
 	  {
 	    int lm_idx = control_y[j]*(lm_width+2) + control_x[j];
 	    //@@@ NOT EFFICIENT!
-	    poly.pi_tritexcoords[j].r = ((float)mapR[lm_idx])/256.;
-	    poly.pi_tritexcoords[j].g = ((float)mapG[lm_idx])/256.;
-	    poly.pi_tritexcoords[j].b = ((float)mapB[lm_idx])/256.;
+	    poly.vertices[j].r = ((float)mapR[lm_idx])/256.;
+	    poly.vertices[j].g = ((float)mapG[lm_idx])/256.;
+	    poly.vertices[j].b = ((float)mapB[lm_idx])/256.;
 	  }
 	}
 
@@ -308,14 +306,14 @@ void csThing::DrawCurves (csRenderView& rview, bool use_z_buf)
 	}
 	CHK (delete[] cpoly);
 
-        PreparePolygonQuick (&poly, gouraud);
+	//poly.pi_triangle = ; //DPQFIX
+        PreparePolygonQuick (&poly, (csVector2 *)persp, gouraud);
 	// Draw resulting polygon
 	rview.g3d->DrawPolygonQuick (poly, gouraud);
       }
     }
     rview.g3d->FinishPolygonQuick ();
 
-    CHK (delete [] poly.pi_texcoords);
   }
 }
 
@@ -469,7 +467,7 @@ void csThing::DrawFoggy (csRenderView& d)
 void csThing::CalculateLighting (csLightView& lview)
 {
   csPolygon3D* p;
-  int i, j;
+  int i;
 
   draw_busy++;
   csVector3* old;
@@ -484,7 +482,6 @@ void csThing::CalculateLighting (csLightView& lview)
   }
   else lview.gouroud_color_reset = false;
 
-  csVector3* poly;
   for (i = 0 ; i < num_polygon ; i++)
   {
     p = (csPolygon3D*)polygons[i];

@@ -42,7 +42,7 @@ interface ITextureHandle;
 #define CS_FOG_VIEW 2
 #define CS_FOG_PLANE 3
 
-///
+///Vertex Structure for use with G3DPolygonDP and G3DPolygonAFP
 class G3DVertex
 {
 public:
@@ -50,6 +50,20 @@ public:
   float sx;
   /// Screen y space.
   float sy;
+};
+
+///Vertex Structure for use with G3DPolygonDPQ
+class G3DTexturedVertex : public G3DVertex
+{
+public:
+  /// z value
+  float z;
+  
+  //Texture coordinates
+  float u, v; 
+
+  //Lighting info (Used only with Gouroud shading (between 0 and 1))
+  float r, g, b;
 };
 
 ///
@@ -77,52 +91,89 @@ public:
 };
 
 
-///
-struct G3DPolygon
+///Structure containing all info needed by DrawPolygonQuick (DPQ)
+struct G3DPolygonDPQ
 {
-  /// Vertices that form the polygon.
-  G3DVertex vertices[200];
-  /// Invert aspect ratio that was used to perspective project the vertices (1/fov)
-  float inv_aspect;
-  /// Maximum number of vertices.
-  int max;
   /// Current number of vertices.
   int num;
-  /// The original polygon.
-  IPolygon3D* polygon;
+  /// Vertices that form the polygon.
+  G3DTexturedVertex vertices[200];
+
+  /// Invert aspect ratio that was used to perspective project the vertices (1/fov)
+  float inv_aspect;
+
+  /// The texture handle as returned by ITextureManager.
+  ITextureHandle* txt_handle;
+
+  /// Use this color for drawing (if txt_handle == NULL) instead of a texture.
+  float flat_color_r;
+  float flat_color_g;
+  float flat_color_b;
+};
+
+///Structure containing all info needed by DrawPolygon (DP)
+struct G3DPolygonDP
+{
+  /// Current number of vertices.
+  int num;
+  /// Vertices that form the polygon.
+  G3DVertex vertices[200];
+
+  /// Invert aspect ratio that was used to perspective project the vertices (1/fov)
+  float inv_aspect;
+
+  /// The texture handle as returned by ITextureManager.
+  ITextureHandle* txt_handle;
+
   /// Transformation matrices for the texture. @@@ BAD NAME
   G3DTexturePlane plane;
   /// The plane equation in camera space of this polygon. @@@ BAD NAME
   G3DPolyNormal normal;
+
+  /// Use this color for drawing (if txt_handle == NULL) instead of a texture.
+  float flat_color_r;
+  float flat_color_g;
+  float flat_color_b;
+
+  ///Handle to lighted textures (texture+lightmap) (for all mipmap levels)
+  IPolygonTexture* poly_texture[4];
+
+  /** 
+    * AlphaValue of the polygon. Ranges from 0 to 100. 0 means opaque, 100 is 
+    * comletely transparent.
+    */
+  int alpha;
+
+  ///true, if it is ok, to use mipmaps
+  bool uses_mipmaps;
+
+  ///z value (in camera space) of vertex[0]
+  float z_value;
+};
+
+///Structure containing all info needed by DrawPolygonFlat (DPF)
+typedef G3DPolygonDP G3DPolygonDPF;
+
+///Structure containing all info needed by AddFogPolygon (AFP)
+struct G3DPolygonAFP
+{
+  /// Current number of vertices.
+  int num;
+  /// Vertices that form the polygon.
+  G3DVertex vertices[200];
+
+  /// Invert aspect ratio that was used to perspective project the vertices (1/fov)
+  float inv_aspect;
+
   /**
    * In case we are dealing with planed fog this value contains
    * the Z distance in camera space of the plane. Otherwise this
    * value is not defined.
    */
   float fog_plane_z;
-  /// Unique ID number of the polygon.
-  CS_ID id;
 
-  /// The texture handle as returned by ITextureManager.
-  ITextureHandle* txt_handle;
-  
-  ///
-  struct poly_texture_def 
-  { 
-    float u, v, z; 
-    float r, g, b;	// Used only with Gouroud shading (between 0 and 1).
-  };
-
-  /// Perspective-incorrect U & V for vertices; also z values
-  poly_texture_def *pi_texcoords;
-  /// The original triangle (that resulted in this polygon after clipping)
-  csVector2 *pi_triangle;
-  /// The original u,v,z
-  poly_texture_def pi_tritexcoords [3];
-  /// Use this color for drawing (if txt_handle == NULL) instead of a texture.
-  float flat_color_r;
-  float flat_color_g;
-  float flat_color_b;
+  /// The plane equation in camera space of this polygon. @@@ BAD NAME
+  G3DPolyNormal normal;
 };
 
 ///
@@ -294,7 +345,7 @@ public:
   STDMETHOD (SetZBufMode) (ZBufMode mode) PURE;
 
   /// Draw the projected polygon with light and texture.
-  STDMETHOD (DrawPolygon) (G3DPolygon& poly) PURE;
+  STDMETHOD (DrawPolygon) (G3DPolygonDP& poly) PURE;
 
   /**
    * Draw the projected polygon with light and texture.
@@ -302,7 +353,7 @@ public:
    * but it just prints debug information about what it would have
    * done.
    */
-  STDMETHOD (DrawPolygonDebug) ( G3DPolygon& poly) PURE;
+  STDMETHOD (DrawPolygonDebug) ( G3DPolygonDP& poly) PURE;
 
   /// Draw a line in camera space.
   STDMETHOD (DrawLine) (csVector3& v1, csVector3& v2, float fov, int color) PURE;
@@ -331,7 +382,7 @@ public:
    * be perspective correct since this function is generally going
    * to be used for 3D sprites which are made up of small triangles.
    */
-  STDMETHOD (DrawPolygonQuick) (G3DPolygon& poly, bool gouroud) PURE;
+  STDMETHOD (DrawPolygonQuick) (G3DPolygonDPQ& poly, bool gouroud) PURE;
 
   /// Get the current fog mode (G3D_FOGMETHOD).
   COM_METHOD_DECL GetFogMode (G3D_FOGMETHOD& fogMethod) = 0;
@@ -360,7 +411,7 @@ public:
    *	<li>CS_FOG_PLANE:	used in planed fog mode
    * </ul>
    */
-  STDMETHOD (AddFogPolygon) (CS_ID id, G3DPolygon& poly, int fogtype) PURE;
+  STDMETHOD (AddFogPolygon) (CS_ID id, G3DPolygonAFP& poly, int fogtype) PURE;
 
   /**
    * Close a volumetric fog object. After the volumetric object is

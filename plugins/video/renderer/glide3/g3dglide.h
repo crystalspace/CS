@@ -127,15 +127,15 @@ public:
   STDMETHODIMP SetZBufMode (ZBufMode mode);
  
   /// Draw the projected polygon with light and texture.
-  STDMETHODIMP DrawPolygon (G3DPolygon& poly);
+  STDMETHODIMP DrawPolygon (G3DPolygonDP& poly);
   /// Draw debug poly
-  STDMETHODIMP DrawPolygonDebug(G3DPolygon& poly)   { return E_NOTIMPL; }
+  STDMETHODIMP DrawPolygonDebug(G3DPolygonDP& poly)   { return E_NOTIMPL; }
 
   /// Draw a Line.
   STDMETHODIMP DrawLine (csVector3& v1, csVector3& v2, int color);
  
   /// Draw a projected (non-perspective correct) polygon.
-  STDMETHODIMP DrawPolygonQuick (G3DPolygon& poly, bool gouroud);
+  STDMETHODIMP DrawPolygonQuick (G3DPolygonDPQ& poly, bool gouroud);
 
   /// Draw a projected floating light on the screen.
   STDMETHODIMP DrawFltLight(G3DFltLight& light);
@@ -201,7 +201,7 @@ public:
   }
 
   STDMETHODIMP OpenFogObject (CS_ID id, csFog* fog) { return E_NOTIMPL; }
-  STDMETHODIMP AddFogPolygon (CS_ID id, G3DPolygon& poly, int fogtype) { return E_NOTIMPL; }
+  STDMETHODIMP AddFogPolygon (CS_ID id, G3DPolygonAFP& poly, int fogtype) { return E_NOTIMPL; }
   STDMETHODIMP CloseFogObject (CS_ID id) { return E_NOTIMPL; }
 
   STDMETHODIMP CreateHalo(float r, float g, float b, HALOINFO* pRetVal) { return E_NOTIMPL;};  
@@ -237,9 +237,9 @@ private:
 	static void RenderPolygonSinglePass(MyGrVertex*, int, bool,TextureHandler*,TextureHandler*);
 
   /// used to set up polygon geometry before rasterization.
-  inline void SetupPolygon( G3DPolygon& poly, float& J1, float& J2, float& J3, 
-                                              float& K1, float& K2, float& K3,
-                                              float& M,  float& N,  float& O  );
+  inline void SetupPolygon( G3DPolygonDP& poly, float& J1, float& J2, float& J3, 
+                                                float& K1, float& K2, float& K3,
+                                                float& M,  float& N,  float& O  );
 
   DECLARE_INTERFACE_TABLE(csGraphics3DGlide3x)
   DECLARE_IUNKNOWN()

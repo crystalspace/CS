@@ -721,7 +721,7 @@ STDMETHODIMP csGraphics3DDirect3DDx6::UncacheTexture(IPolygonTexture *texture)
   return E_NOTIMPL;
 }
 
-void csGraphics3DDirect3DDx6::SetupPolygon( G3DPolygon& poly, float& J1, float& J2, float& J3, 
+void csGraphics3DDirect3DDx6::SetupPolygon( G3DPolygonDP& poly, float& J1, float& J2, float& J3, 
                                         float& K1, float& K2, float& K3,
                                         float& M,  float& N,  float& O  )
 {
@@ -742,13 +742,9 @@ void csGraphics3DDirect3DDx6::SetupPolygon( G3DPolygon& poly, float& J1, float& 
   
   if (ABS (Dc) < 0.06)
   {
-    ComcsVector3 vcam_0;
-    
-    poly.polygon->GetCameraVector(0, &vcam_0);
-    
     M = 0;
     N = 0;
-    O = 1/vcam_0.z;
+    O = 1/poly.z_value;
   }
   else
   {
@@ -791,7 +787,7 @@ void csGraphics3DDirect3DDx6::SetupPolygon( G3DPolygon& poly, float& J1, float& 
 }
 
 
-STDMETHODIMP csGraphics3DDirect3DDx6::DrawPolygon (G3DPolygon& poly)
+STDMETHODIMP csGraphics3DDirect3DDx6::DrawPolygon (G3DPolygonDP& poly)
 {
   ASSERT( m_lpd3dDevice );
   
@@ -813,16 +809,13 @@ STDMETHODIMP csGraphics3DDirect3DDx6::DrawPolygon (G3DPolygon& poly)
   
   float z;
   
-  if(!poly.polygon)
-    return E_INVALIDARG;
-  
   if (poly.num < 3) 
   {
     return E_INVALIDARG;
   }
   
   // retrieve the texture.
-  poly.polygon->GetTexture(0, &pTex);
+  pTex = poly.poly_texture[0];
   
   if (!pTex)
     return E_INVALIDARG;
@@ -836,7 +829,7 @@ STDMETHODIMP csGraphics3DDirect3DDx6::DrawPolygon (G3DPolygon& poly)
   ITextureMap* piTM;
   IMipMapContainer* piMMC;
   
-  poly.polygon->GetAlpha( poly_alpha );
+  poly_alpha = poly.alpha;
   bTransparent = poly_alpha>0 ? true : false;
 
   pTex->GetTexture( &piTM );
@@ -1018,7 +1011,7 @@ lpD3DDev->SetTextureStageState(1, D3DTSS_COLORARG2, D3DTA_CURRENT );
   return S_OK;
 }
 
-STDMETHODIMP csGraphics3DDirect3DDx6::DrawPolygonQuick (G3DPolygon& poly, bool gouroud)
+STDMETHODIMP csGraphics3DDirect3DDx6::DrawPolygonQuick (G3DPolygonDPQ& poly, bool gouroud)
 {    
   int i;
   HighColorCache_Data *pTexData;
@@ -1036,12 +1029,12 @@ STDMETHODIMP csGraphics3DDirect3DDx6::DrawPolygonQuick (G3DPolygon& poly, bool g
   {
     vx.sx = poly.vertices[i].sx;
     vx.sy = m_nHeight-poly.vertices[i].sy;
-    vx.sz = SCALE_FACTOR / poly.pi_texcoords[i].z;
-    vx.rhw = poly.pi_texcoords[i].z;
+    vx.sz = SCALE_FACTOR / poly.vertices[i].z;
+    vx.rhw = poly.vertices[i].z;
     vx.color = D3DRGB(0.8, 0.8, 0.8);
     vx.specular = D3DRGB(0.0, 0.0, 0.0);
-    vx.tu = poly.pi_texcoords[i].u;
-    vx.tv = poly.pi_texcoords[i].v;
+    vx.tu = poly.vertices[i].u;
+    vx.tv = poly.vertices[i].v;
     
     m_lpd3dDevice->Vertex( &vx );
   }
@@ -1228,7 +1221,7 @@ STDMETHODIMP csGraphics3DDirect3DDx6::OpenFogObject (CS_ID id, csFog* fog)
   return E_NOTIMPL;
 }
 
-STDMETHODIMP csGraphics3DDirect3DDx6::AddFogPolygon (CS_ID id, G3DPolygon& poly, int fogtype)
+STDMETHODIMP csGraphics3DDirect3DDx6::AddFogPolygon (CS_ID id, G3DPolygonAFP& poly, int fogtype)
 {
   return E_NOTIMPL;
 }

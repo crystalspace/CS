@@ -379,7 +379,7 @@ void csSprite3D::Draw (csRenderView& rview)
     // between the new vertex and the previous last vertex.
     fnum = cfg_lod_detail*(float)(tpl->num_vertices+1);
     num_verts = (int)fnum;
-    fnum -= num_verts;	// fnum is now the fractional part.
+    fnum -= num_verts;  // fnum is now the fractional part.
     GenerateSpriteLOD (num_verts);
     emerge_from = tpl->GetEmergeFrom ();
   }
@@ -417,10 +417,9 @@ void csSprite3D::Draw (csRenderView& rview)
   }
 
   // Clipped polygon (assume it cannot have more than 64 vertices)
-  G3DPolygon poly;
-  memset (&poly, 0, sizeof(G3DPolygon));
+  G3DPolygonDPQ poly;
+  memset (&poly, 0, sizeof(poly));
 
-  CHK (poly.pi_texcoords = new G3DPolygon::poly_texture_def [64]);
   // The triangle in question
   csVector2 triangle [3];
   rview.g3d->SetRenderState (G3DRENDERSTATE_ZBUFFERTESTENABLE, true);
@@ -458,20 +457,19 @@ void csSprite3D::Draw (csRenderView& rview)
       if (!cpoly) continue;
 
       poly.num = rescount;
-      poly.pi_triangle = (csVector2 *)triangle;
       int trivert [3] = { a, b, c };
       int j;
       for (j = 0; j < 3; j++)
       {
-        poly.pi_tritexcoords [j].z = 1 / tr_frame->GetVertex (trivert [j]).z;
-        poly.pi_tritexcoords [j].u = tr_frame->GetTexel (trivert [j]).x;
-        poly.pi_tritexcoords [j].v = tr_frame->GetTexel (trivert [j]).y;
-	if (vertex_colors)
-	{
-	  poly.pi_tritexcoords[j].r = vertex_colors[trivert[j]].red;
-	  poly.pi_tritexcoords[j].g = vertex_colors[trivert[j]].green;
-	  poly.pi_tritexcoords[j].b = vertex_colors[trivert[j]].blue;
-	}
+        poly.vertices [j].z = 1 / tr_frame->GetVertex (trivert [j]).z;
+        poly.vertices [j].u = tr_frame->GetTexel (trivert [j]).x;
+        poly.vertices [j].v = tr_frame->GetTexel (trivert [j]).y;
+        if (vertex_colors)
+        {
+          poly.vertices [j].r = vertex_colors[trivert[j]].red;
+          poly.vertices [j].g = vertex_colors[trivert[j]].green;
+          poly.vertices [j].b = vertex_colors[trivert[j]].blue;
+        }
       }
       for (j = 0; j < rescount; j++)
       {
@@ -480,15 +478,13 @@ void csSprite3D::Draw (csRenderView& rview)
       }
       CHK (delete[] cpoly);
 
-      PreparePolygonQuick (&poly, vertex_colors != NULL);
+      PreparePolygonQuick (&poly, (csVector2 *)triangle, vertex_colors != NULL);
       // Draw resulting polygon
       rview.g3d->DrawPolygonQuick (poly, vertex_colors != NULL);
     }
   }
 
   rview.g3d->FinishPolygonQuick ();
-
-  CHK (delete [] poly.pi_texcoords);
 }
 
 void csSprite3D::InitSprite ()

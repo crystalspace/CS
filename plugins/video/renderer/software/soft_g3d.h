@@ -135,7 +135,7 @@ private:
    * Same as DrawPolygon but no texture mapping.
    * (Flat drawing).
    */
-  HRESULT DrawPolygonFlat (G3DPolygon& poly);
+  HRESULT DrawPolygonFlat (G3DPolygonDPF& poly);
 
 public:
 #if defined (DO_MMX)
@@ -219,7 +219,7 @@ public:
   STDMETHODIMP SetZBufMode (ZBufMode mode);
 
   /// Draw the projected polygon with light and texture.
-  STDMETHODIMP DrawPolygon (G3DPolygon& poly);
+  STDMETHODIMP DrawPolygon (G3DPolygonDP& poly);
 
   /**
    * Draw the projected polygon with light and texture.
@@ -227,7 +227,7 @@ public:
    * but it just prints debug information about what it would have
    * done.
    */
-  STDMETHODIMP DrawPolygonDebug (G3DPolygon& poly);
+  STDMETHODIMP DrawPolygonDebug (G3DPolygonDP& poly);
 
   /// Get the fog mode.
   STDMETHODIMP GetFogMode (G3D_FOGMETHOD& retval) { retval = fogMode; return S_OK; }
@@ -256,7 +256,7 @@ public:
    *	<li>CS_FOG_PLANE:	used in planed fog mode
    * </ul>
    */
-  STDMETHODIMP AddFogPolygon (CS_ID id, G3DPolygon& poly, int fogtype);
+  STDMETHODIMP AddFogPolygon (CS_ID id, G3DPolygonAFP& poly, int fogtype);
 
   /**
    * Close a volumetric fog object. After the volumetric object is
@@ -275,7 +275,7 @@ public:
   STDMETHODIMP FinishPolygonQuick ();
 
   /// Draw a projected polygon.
-  STDMETHODIMP DrawPolygonQuick (G3DPolygon& poly, bool gouroud);
+  STDMETHODIMP DrawPolygonQuick (G3DPolygonDPQ& poly, bool gouroud);
 
   /// Give a texture to csGraphics3DSoftware to cache it.
   STDMETHODIMP CacheTexture (IPolygonTexture* texture);

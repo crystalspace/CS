@@ -896,9 +896,9 @@ void csGraphics3DGlide2x::RenderPolygonMultiPass (GrVertex * verts, int num, boo
   
 }
 
-void csGraphics3DGlide2x::SetupPolygon( G3DPolygon& poly, float& J1, float& J2, float& J3, 
-                                                           float& K1, float& K2, float& K3,
-                                                           float& M,  float& N,  float& O  )
+void csGraphics3DGlide2x::SetupPolygon( G3DPolygonDP& poly, float& J1, float& J2, float& J3, 
+                                                            float& K1, float& K2, float& K3,
+                                                            float& M,  float& N,  float& O  )
 {
   float P1, P2, P3, P4, Q1, Q2, Q3, Q4;
   
@@ -914,13 +914,9 @@ void csGraphics3DGlide2x::SetupPolygon( G3DPolygon& poly, float& J1, float& J2, 
   
   if (ABS (Dc) < 0.06)
   {
-    ComcsVector3 vcam_0;
-    
-    poly.polygon->GetCameraVector(0, &vcam_0);
-    
     M = 0;
     N = 0;
-    O = 1/vcam_0.z;
+    O = 1/poly.z_value;
   }
   else
   {
@@ -962,31 +958,28 @@ void csGraphics3DGlide2x::SetupPolygon( G3DPolygon& poly, float& J1, float& J2, 
   }
 }
 
-STDMETHODIMP csGraphics3DGlide2x::DrawPolygon(G3DPolygon& poly)
+STDMETHODIMP csGraphics3DGlide2x::DrawPolygon(G3DPolygonDP& poly)
 {
-        GrVertex * verts;
-
-  if(!poly.polygon)
-    return E_INVALIDARG;
+  GrVertex * verts;
 
   if (poly.num < 3) 
   {
     return E_INVALIDARG;
   }
 
-        bool lm_exists=true;
-        bool is_transparent = false;
-        bool is_colorkeyed = false;
+  bool lm_exists=true;
+  bool is_transparent = false;
+  bool is_colorkeyed = false;
   int  poly_alpha;
   IPolygonTexture* pTex;
-        float J1, J2, J3, K1, K2, K3;
-        float M, N, O;
+  float J1, J2, J3, K1, K2, K3;
+  float M, N, O;
   
   // set up the geometry.
   SetupPolygon( poly, J1, J2, J3, K1, K2, K3, M, N, O );
 
   // retrieve the texture.
-  poly.polygon->GetTexture(0, &pTex);
+  pTex = poly.poly_texture[0];
 
   
   csTextureMMGlide* txt_mm = (csTextureMMGlide*)GetcsTextureMMFromITextureHandle (poly.txt_handle);
@@ -998,7 +991,7 @@ STDMETHODIMP csGraphics3DGlide2x::DrawPolygon(G3DPolygon& poly)
 
   CacheTexture (pTex);
 
-  poly.polygon->GetAlpha( poly_alpha );
+  poly_alpha     = poly.alpha;
   is_transparent = poly_alpha ? true : false;
 
   //HighColorCacheAndManage_Data* tcache;
@@ -1048,9 +1041,6 @@ STDMETHODIMP csGraphics3DGlide2x::DrawPolygon(G3DPolygon& poly)
   TextureHandler *thLm =NULL, 
                  *thTex = (TextureHandler *)tcache->pData;
                        
-/*      if (poly.polygon->theDynLight) // Use a dynamic light if it exists
-                q = (float)((poly.polygon->theDynLight->RawIntensity() * 256) >> 16);
-        else*/
   q = 255;
   for(i=0;i<poly.num;i++)
     {
@@ -1070,7 +1060,7 @@ STDMETHODIMP csGraphics3DGlide2x::DrawPolygon(G3DPolygon& poly)
       verts[i].r = q;
       verts[i].g = q;
       verts[i].b = q;
-      //verts[i].a = poly.polygon->get_alpha(); // Not used
+      //verts[i].a = poly_alpha; // Not used
       //verts[i].x -= SNAP;  // You can forget it
       //verts[i].y -= SNAP;  // This one also
     }
@@ -1134,7 +1124,7 @@ STDMETHODIMP csGraphics3DGlide2x::DrawPolygon(G3DPolygon& poly)
 }
 
 /// Draw a projected (non-perspective correct) polygon.
-STDMETHODIMP csGraphics3DGlide2x::DrawPolygonQuick (G3DPolygon& poly, bool gouroud)
+STDMETHODIMP csGraphics3DGlide2x::DrawPolygonQuick (G3DPolygonDPQ& poly, bool gouroud)
 {
   //  HighColorCacheAndManage_Data* tcache=NULL;
   HighColorCache_Data* tcache=NULL;
@@ -1165,9 +1155,9 @@ STDMETHODIMP csGraphics3DGlide2x::DrawPolygonQuick (G3DPolygon& poly, bool gouro
       y-=m_nHalfHeight;
       if(gouroud)
       {
-        verts[i].r = poly.pi_texcoords[i].r*255;
-        verts[i].g = poly.pi_texcoords[i].g*255;
-        verts[i].b = poly.pi_texcoords[i].b*255;
+        verts[i].r = poly.vertices[i].r*255;
+        verts[i].g = poly.vertices[i].g*255;
+        verts[i].b = poly.vertices[i].b*255;
       }
       else
       {
@@ -1175,11 +1165,11 @@ STDMETHODIMP csGraphics3DGlide2x::DrawPolygonQuick (G3DPolygon& poly, bool gouro
         verts[i].g = 255;
         verts[i].b = 255;
       }
-      verts[i].oow = poly.pi_texcoords[i].z;
+      verts[i].oow = poly.vertices[i].z;
       verts[i].x -= SNAP;
       verts[i].y -= SNAP;
-      verts[i].tmuvtx[1].sow = verts[i].tmuvtx[0].sow = poly.pi_texcoords[i].u*thTex->width*verts[i].oow;
-      verts[i].tmuvtx[1].tow = verts[i].tmuvtx[0].tow = poly.pi_texcoords[i].v*thTex->height*verts[i].oow;
+      verts[i].tmuvtx[1].sow = verts[i].tmuvtx[0].sow = poly.vertices[i].u*thTex->width*verts[i].oow;
+      verts[i].tmuvtx[1].tow = verts[i].tmuvtx[0].tow = poly.vertices[i].v*thTex->height*verts[i].oow;
     }
     
     GlideLib_grTexSource(thTex->tmu->tmu_id, thTex->loadAddress,
@@ -1419,7 +1409,7 @@ STDMETHODIMP csGraphics3DGlide2x::OpenFogObject (CS_ID id, csFog* fog)
   return E_NOTIMPL;
 }
 
-STDMETHODIMP csGraphics3DGlide2x::AddFogPolygon (CS_ID id, G3DPolygon& poly, int fogtype)
+STDMETHODIMP csGraphics3DGlide2x::AddFogPolygon (CS_ID id, G3DPolygonAFP& poly, int fogtype)
 {
   return E_NOTIMPL;
 }
