@@ -78,6 +78,7 @@ struct csParticlesData
   csVector3 velocity;
   float mass;
   float time_to_live;
+  float sort;
 };
 
 SCF_VERSION (iParticlesObjectState, 0, 0, 1);
@@ -214,6 +215,12 @@ struct iParticlesObjectState : public iBase
   virtual void SetAutoStart (bool autostart) = 0;
 
   /**
+   * Change the particle physics plugin
+   * (Defaults to loading 'crystalspace.particles.physics.simple')
+   */
+  virtual void ChangePhysicsPlugin (const char *plugin) = 0;
+
+  /**
    * (Re)Start the particle emitter. This is automatically called when
    * the particle mesh object is created
    */
@@ -317,6 +324,12 @@ struct iParticlesFactoryState : public iBase
 
   /// Set whether the emitter automatically starts (default: true)
   virtual void SetAutoStart (bool autostart) = 0;
+
+  /**
+   * Set the particle physics plugin
+   * (Defaults to 'crystalspace.particles.physics.simple')
+   */
+  virtual void SetPhysicsPlugin (const char *plugin) = 0;
 };
 
 

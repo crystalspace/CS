@@ -67,7 +67,8 @@ enum
   XMLTOKEN_DAMPENER,
   XMLTOKEN_MASS,
   XMLTOKEN_MASSVARIATION,
-  XMLTOKEN_AUTOSTART
+  XMLTOKEN_AUTOSTART,
+  XMLTOKEN_PHYSICS_PLUGIN
 };
 
 SCF_IMPLEMENT_IBASE (csParticlesFactoryLoader)
@@ -125,6 +126,7 @@ bool csParticlesFactoryLoader::Initialize (iObjectRegistry* objreg)
   xmltokens.Register ("mass", XMLTOKEN_MASS);
   xmltokens.Register ("massvariation", XMLTOKEN_MASSVARIATION);
   xmltokens.Register ("autostart", XMLTOKEN_AUTOSTART);
+  xmltokens.Register ("physicsplugin", XMLTOKEN_PHYSICS_PLUGIN);
   return true;
 }
 
@@ -236,6 +238,9 @@ csPtr<iBase> csParticlesFactoryLoader::Parse (iDocumentNode* node,
         else state->SetAutoStart (true);
         break;
       }
+      case XMLTOKEN_PHYSICS_PLUGIN:
+        state->SetPhysicsPlugin (child->GetContentsValue ());
+        break;
       case XMLTOKEN_DAMPENER:
         state->SetDampener (child->GetContentsValueAsFloat ());
         break;
@@ -250,11 +255,11 @@ csPtr<iBase> csParticlesFactoryLoader::Parse (iDocumentNode* node,
           return false;
         }
         if (!strcmp (str, "constant"))
-	  heat = CS_PART_HEAT_CONSTANT;
+	        heat = CS_PART_HEAT_CONSTANT;
         else if (!strcmp (str, "time_linear"))
-	  heat = CS_PART_HEAT_TIME_LINEAR;
+	        heat = CS_PART_HEAT_TIME_LINEAR;
         else if (!strcmp (str, "speed"))
-	  heat = CS_PART_HEAT_SPEED;
+	        heat = CS_PART_HEAT_SPEED;
         else
         {
           synldr->ReportError ("crystalspace.particles.factory.loader",
@@ -560,6 +565,7 @@ bool csParticlesObjectLoader::Initialize (iObjectRegistry* objreg)
   xmltokens.Register ("mass", XMLTOKEN_MASS);
   xmltokens.Register ("massvariation", XMLTOKEN_MASSVARIATION);
   xmltokens.Register ("autostart", XMLTOKEN_AUTOSTART);
+  xmltokens.Register ("physicsplugin", XMLTOKEN_PHYSICS_PLUGIN);
   return true;
 }
 
@@ -664,6 +670,9 @@ csPtr<iBase> csParticlesObjectLoader::Parse (iDocumentNode* node,
         }
         break;
       }
+      case XMLTOKEN_PHYSICS_PLUGIN:
+        state->ChangePhysicsPlugin (child->GetContentsValue ());
+        break;
       case XMLTOKEN_DAMPENER:
         state->SetDampener (child->GetContentsValueAsFloat ());
         break;

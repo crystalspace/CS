@@ -114,6 +114,8 @@ private:
 
   float particle_radius;
 
+  csString physics_plugin;
+
   csArray<csColor> gradient_colors;
 
   csParticleHeatFunction heat_function;
@@ -225,6 +227,8 @@ public:
   { return mass_variation; }
   void SetAutoStart (bool a)
   { autostart = a; }
+  void SetPhysicsPlugin (const char *plugin)
+  { physics_plugin = plugin; }
 
   struct eiParticlesFactoryState : public iParticlesFactoryState
   {
@@ -290,6 +294,8 @@ public:
     { scfParent->SetAutoStart (autostart); }
     virtual float GetMassVariation ()
     { return scfParent->GetMassVariation (); }
+    virtual void SetPhysicsPlugin (const char *plugin)
+    { scfParent->SetPhysicsPlugin (plugin); }
   } scfiParticlesFactoryState;
   friend struct eiParticlesFactoryState;
 };
@@ -393,7 +399,6 @@ private:
   csRandomGen rng;
   csVector3 emitter;
   float radius;
-  static int ZSort(csParticlesData const &item1, csParticlesData const &item2);
   static int ZSort(void const *item1, void const *item2);
 
 public:
@@ -692,6 +697,8 @@ public:
     { return scfParent->GetMassVariation (); }
     virtual void SetAutoStart (bool autostart)
     { scfParent->SetAutoStart (autostart); }
+    virtual void ChangePhysicsPlugin (const char *plugin)
+    { scfParent->LoadPhysicsPlugin (plugin); }
     virtual void Start ()
     { scfParent->Start (); }
     virtual void Stop ()

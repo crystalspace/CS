@@ -125,6 +125,8 @@ csParticlesFactory::csParticlesFactory (csParticlesType* p,
 
   autostart = true;
 
+  physics_plugin = "crystalspace.particles.physics.simple";
+
   heat_function = CS_PART_HEAT_SPEED;
 
   heat_callback = NULL;
@@ -245,7 +247,7 @@ csParticlesObject::csParticlesObject (csParticlesFactory* p)
   sv = dynDomain->GetVariableAdd (scale_name);
   sv->SetValue (1.0f);
 
-  LoadPhysicsPlugin ("crystalspace.particles.physics.simple");
+  LoadPhysicsPlugin (p->physics_plugin);
 
   if(autostart) Start();
 }
@@ -262,6 +264,11 @@ bool csParticlesObject::LoadPhysicsPlugin (const char *plugin_id)
 {
   csRef<iPluginManager> plugin_mgr = CS_QUERY_REGISTRY (
     pFactory->object_reg, iPluginManager);
+
+  if(physics)
+  {
+    physics->RemoveParticles (&scfiParticlesObjectState);
+  }
 
   physics = CS_QUERY_PLUGIN_CLASS (plugin_mgr, plugin_id, iParticlesPhysics);
   if (!physics)
@@ -295,6 +302,10 @@ bool csParticlesObject::DrawTest (iRenderView* rview, iMovable* movable)
 
   tr_o2c = cam->GetTransform ();
   emitter = movable->GetFullPosition();
+  csReversibleTransform test;
+  test.Identity();
+  test.SetOrigin (emitter);
+  tr_o2c /= test;
 
   int vertnum = 0;
   if ((vertnum = point_data.Length () - dead_particles) < 1) return false;
@@ -323,7 +334,7 @@ bool csParticlesObject::DrawTest (iRenderView* rview, iMovable* movable)
   }
 
   int clip_portal, clip_plane, clip_z_plane;
-  csSphere s(emitter, radius);
+  csSphere s(csVector3(0,0,0), radius);
   if (!rview->ClipBSphere (tr_o2c, s, clip_portal, clip_plane, clip_z_plane))
     return false;
 
@@ -350,18 +361,11 @@ bool csParticlesObject::DrawTest (iRenderView* rview, iMovable* movable)
   return true;
 }
 
-int csParticlesObject::ZSort (csParticlesData const &item1,
-  csParticlesData const &item2)
-{
-  if (item1.position.z > item2.position.z) return 1;
-  return -1;
-}
-
 int csParticlesObject::ZSort (void const *item1, void const *item2)
 {
   csParticlesData* i1 = (csParticlesData*)item1;
   csParticlesData* i2 = (csParticlesData*)item2;
-  if (i1->position.z > i2->position.z) return 1;
+  if (i1->sort < i2->sort) return 1;
   return -1;
 }
 
@@ -391,15 +395,14 @@ iRenderBuffer *csParticlesObject::GetRenderBuffer (csStringID name)
     color_buffer->SetOffset (sizeof(csVector3));
     color_buffer->SetComponentType (CS_BUFCOMP_FLOAT);
     color_buffer->SetComponentCount (4);
-    color_buffer->SetStride (sizeof(csParticlesData));
     texcoord_buffer = pFactory->g3d->CreateRenderBuffer (
       sizeof (csVector2) * bufsize, CS_BUF_DYNAMIC,
       CS_BUFCOMP_FLOAT, 2, false);
     csVector2 *texcoords = new csVector2 [bufsize];
     if (point_sprites)
     {
-      vertex_buffer->SetStride (sizeof(csParticlesData));
-      color_buffer->SetStride (sizeof(csParticlesData));
+      vertex_buffer->SetStride (sizeof(i_vertex));
+      color_buffer->SetStride (sizeof(i_vertex));
 
       unsigned int *indices = new unsigned int[buffer_length];
       for (int i = 0; i < buffer_length; i++)
@@ -457,8 +460,19 @@ iRenderBuffer *csParticlesObject::GetRenderBuffer (csStringID name)
     int size;
     if (point_sprites)
     {
-      data = point_data.GetArray ();
-      size = point_data.Length () * (sizeof(csParticlesData));
+      int len = point_data.Length ();
+      vertex_data.SetLength (len);
+      for (int i = 0; i < len - 1; i++)
+      {
+        csParticlesData &point = point_data[i];
+        i_vertex vertex;
+        vertex.position = point.position - emitter;
+        vertex.color = point.color;
+        vertex_data.Put (i, vertex);
+      }
+
+      data = vertex_data.GetArray ();
+      size = vertex_data.Length () * sizeof(i_vertex);
     }
     else
     {
@@ -469,16 +483,16 @@ iRenderBuffer *csParticlesObject::GetRenderBuffer (csStringID name)
       {
         csParticlesData &point = point_data[i];
         i_vertex vertex;
-        vertex.position = point.position + corners[0];
+        vertex.position = (point.position - emitter) + corners[0];
         vertex.color = point.color;
         vertex_data.Put (j, vertex);
-        vertex.position = point.position + corners[1];
+        vertex.position = (point.position - emitter) + corners[1];
         vertex.color = point.color;
         vertex_data.Put (j+1, vertex);
-        vertex.position = point.position + corners[2];
+        vertex.position = (point.position - emitter) + corners[2];
         vertex.color = point.color;
         vertex_data.Put (j+2, vertex);
-        vertex.position = point.position + corners[3];
+        vertex.position = (point.position - emitter) + corners[3];
         vertex.color = point.color;
         vertex_data.Put (j+3, vertex);
       }
@@ -576,7 +590,7 @@ void csParticlesObject::Start ()
     for (int i = 0; i < start_size; i++)
     {
       csParticlesData &p = point_data.Get (i);
-      p.position.z = FLT_MAX;
+      p.sort = -FLT_MAX;
       p.color.w = 0.0f;
       p.time_to_live = -1.0f;
     }
@@ -617,7 +631,7 @@ bool csParticlesObject::Update (float elapsed_time)
     dead_particles += point_data.Length() - oldlen;
     for(int i=oldlen;i<point_data.Length ();i++) {
       csParticlesData &p = point_data.Get (i);
-      p.position.z = FLT_MAX;
+      p.sort = -FLT_MAX;
       p.color.w = 0.0f;
       p.time_to_live = -1.0f;
     }
@@ -670,7 +684,7 @@ bool csParticlesObject::Update (float elapsed_time)
     {
       // Deletion :(
       point.color.w = 0.0f;
-      point.position.z = FLT_MAX;
+      point.sort = -FLT_MAX;
       dead_particles ++;
       continue;
     }
@@ -724,6 +738,9 @@ bool csParticlesObject::Update (float elapsed_time)
       point.color.z = basecolor.blue * heat;
     }
     point.color.w = point.time_to_live / (time_to_live + time_variation);
+
+    csVector3 transformed = tr_o2c.Other2This(point.position);
+    point.sort = transformed.z;
 
     // For calculating radius
     csVector3 dist_vect = point.position - emitter;
