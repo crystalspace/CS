@@ -1,6 +1,6 @@
 /*
     Crystal Space Windowing System : grid class
-    Copyright (C) 2000 by Norman Krämer <normank@lycosmail.com>
+    Copyright (C) 2000 by Norman Kramer <normank@lycosmail.com>
   
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -157,11 +157,12 @@ void csGridCell::DrawLine (int x1, int y1, int x2, int y2, csCellBorder& border)
   if (border.style == GCBS_LINE)
     Box ( MIN(x1,x2), y1, MAX(x1,x2), y2, CSPAL_GRIDCELL_BORDER_FG);
   else if (border.style != GCBS_NONE){
-    int maxX, maxY, i, nSegs, xcompo, ycompo;
-    static int linepattern[][13]= { { 2, 4, 0, 2, 0 }, /* DASH */
-				  { 4, 4, 0, 2, 0, 2, 0, 2, 0 }, /* DASHPOINT */
-				  { 6, 4, 0, 2, 0, 2, 0, 2, 0, 2, 0, 2, 0 }, /* DASHPOINTPOINT */
-				  { 6, 4, 0, 2, 0, 4, 0, 2, 0, 2, 0, 2, 0 } /* DASHDASHPOINT */
+    int maxX, maxY, i = 0, nSegs, xcompo, ycompo;
+    static const int linepattern[][13] = {
+      { 2, 4, 0, 2, 0 }, // DASH
+      { 4, 4, 0, 2, 0, 2, 0, 2, 0 }, // DASHPOINT
+      { 6, 4, 0, 2, 0, 2, 0, 2, 0, 2, 0, 2, 0 }, // DASHPOINTPOINT
+      { 6, 4, 0, 2, 0, 4, 0, 2, 0, 2, 0, 2, 0 }  // DASHDASHPOINT
     };
     if (x1<=x2) {xcompo=0; ycompo=1;}
     else {xcompo=1; ycompo=0;}
@@ -365,7 +366,7 @@ void csGridView::Draw()
   csRect rc;
   csRegionTree2D *r;
   csVector vRegions;
-  csGridCell *cell;
+  csGridCell *cell = NULL;
 
   while (y < bound.Height ()){
     rc.Set (col, actRow, area.xmax, actRow+1);
@@ -378,7 +379,10 @@ void csGridView::Draw()
       cell = (csGridCell*)r->data;
       Insert (cell); cell->Show (false); // show but don't focus
       for (; c < r->region.xmax && x < bound.Width (); c++){
-	cell->SetPos (x, y); cell->row = actRow; cell->col = c; cell->data = pGrid->grid->GetAt (actRow, c);
+	cell->SetPos (x, y);
+	cell->row = actRow;
+	cell->col = c;
+	cell->data = pGrid->grid->GetAt (actRow, c);
 	cell->Draw ();
 	cell->ForEach (DrawCellComponents, NULL, true);
 	x += cell->bound.Width ();
