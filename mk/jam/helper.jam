@@ -396,7 +396,7 @@ if $(JAMVERSION) >= 2.5
 {
 
 ##  IsElem element : list
-##    Returns "true" if the elemnt is in the list. Otherwise nothing is
+##    Returns "true" if the element is in the list. Otherwise nothing is
 ##    returned.
 rule IsElem
 {
