@@ -1,36 +1,36 @@
 The history order has been reversed so that new features are at the top.
 
 14-Feb-2001
-	- Continued making use of QUERY_INTERFACE in the engine more
-	  sensible. This involves:
-	  	- csMovable::SetParent()
-		- csMeshWrapper::Draw()
-		- csMeshWrapper::GetMovable()
-		- csPolyTexture::GetPolygon()
-		- csOctree::Cache()
-	- Also did the same for all mesh object plugins and loaders,
-	  csparser library, and csclear library.
-	- Added csEngine::current_iengine which is a reference to the
-	  main iEngine.
-	- Fixed a bug in csMeshFactoryWrapper::SetMeshObjectFactory().
-	  This function would not correctly call DecRef() on the old
-	  factory and IncRef() on the new one.
+	- Continued making use of QUERY_INTERFACE in the engine more sensible.
+	  This involves:
+	    - csMovable::SetParent()
+	    - csMeshWrapper::Draw()
+	    - csMeshWrapper::GetMovable()
+	    - csPolyTexture::GetPolygon()
+	    - csOctree::Cache()
+	- Also did the same for all mesh object plugins and loaders, csparser
+	  library, and csclear library.
+	- Added csEngine::current_iengine which is a reference to the main
+	  iEngine.
+	- Fixed a bug in csMeshFactoryWrapper::SetMeshObjectFactory().  This
+	  function would not correctly call DecRef() on the old factory and
+	  IncRef() on the new one.
 	- Renamed csEngine::meshobj_factories to csEngine::mesh_factories.
-	- Changed all UpdateLighting routines everywhere to work directly
-	  with iLight instead of csLight pointers. That is easier and also
-	  avoids some problems with the need to conver them. This also
-	  fixes iMeshWrapper::UpdateLighting().
-	- csEngine::GetNearbyLights() now returns references to iLight
-	  instead of csLight.
-	- Fixed a few bugs in the explosion loader which prevented that
-	  loader from working correctly.
+	- Changed all UpdateLighting routines everywhere to work directly with
+	  iLight instead of csLight pointers.  That is easier and also avoids
+	  some problems with the need to conver them.  This also fixes
+	  iMeshWrapper::UpdateLighting().
+	- csEngine::GetNearbyLights() now returns references to iLight instead
+	  of csLight.
+	- Fixed a few bugs in the explosion loader which prevented that loader
+	  from working correctly.
 	- Fixed a reference to zlib-win32-bin in the documentation.
-	- Added full documentation for all the existing mesh object plugins
-	  in CS.
-	- Cleaned up mapfmt.txi documentation. i.e. removed all the
-	  documentation related to sprite and particle systems. This
-	  is now documented with the mesh object plugin documentation.
-	  Also added documentation about MESHOBJ keyword.
+	- Added full documentation for all the existing mesh object plugins in
+	  CS.
+	- Cleaned up mapfmt.txi documentation.  i.e.  removed all the
+	  documentation related to sprite and particle systems.  This is now
+	  documented with the mesh object plugin documentation.  Also added
+	  documentation about MESHOBJ keyword.
 	- Eric Sunshine made the following changes:
 	    - Modified static.mak so that cslibref.cpp now depends upon the
 	      system makefile (such as linux.mak) in addition to user.mak and
@@ -39,6 +39,12 @@ The history order has been reversed so that new features are at the top.
 	      variable in the system makefile.
 	    - Fixed a couple minor problems with ddraw.mak and fountain.mak so
 	      that they work correctly with static linking.
+	- Eric Sunshine made the following changes to snapshot.py, the CVS
+	  snapshot generation script.
+	    - Improved error reporting when external (shell invoked) commands
+	      fail.  The actual command is now reported (in addition to the
+	      error message which has always been reported).
+	    - Added the missing `-P' flag to the `cvs checkout' command.
 13-Feb-2001
 	- Philip Wyett did some proof reading of the docs:
 	    - Added two missing web links for required mingw

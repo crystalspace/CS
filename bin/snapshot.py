@@ -59,7 +59,7 @@
 import commands, glob, grp, os, re, string, sys, tempfile, time
 
 prog_name = "snapshot.py"
-prog_version = "1.8"
+prog_version = "10"
 author_name = "Eric Sunshine"
 author_email = "sunshine@sunshineco.com"
 copyright = "Copyright (C) 2000 by " + author_name + " <" + author_email + ">"
@@ -112,8 +112,8 @@ ownergroup = "crystal"
 packprefix = "cs-"
 snapdir = "/home/groups/ftp/pub/crystal/cvs-snapshots"
 keepsnapshots = 2
-keepdiffs = 7
-keeplogs = 7
+keepdiffs = 14
+keeplogs = 14
 workdir = "/tmp"
 warnlevel = 0
 
@@ -175,6 +175,7 @@ class Snapshot:
     def run(self, cmd):
         rc = commands.getstatusoutput(cmd)
         if len(rc[1]) > 0:
+            self.log("Command failed: " + cmd)
             self.log(rc[1])
         return (rc[0] == 0)
 
@@ -263,6 +264,7 @@ class Snapshot:
             dirs = string.split(rc[1])
         else: # 'find' command returned error.
             if len(rc[1]) > 0:
+                self.log("Error searching for CVS directories")
                 self.log(rc[1])
         return dirs
 
@@ -300,7 +302,7 @@ class Snapshot:
         self.makedirectory(outdir)
         self.dirstack.pushdir(outdir)
         rc = self.run("cvs -Q -d " + cvsroot + " checkout -D '" + datewanted +
-                      "' " + cvsmodule)
+                      "' -P " + cvsmodule)
         self.dirstack.popdir()
         if rc:
             dirs = self.findcvsdirs(os.path.join(outdir, moduledir))
