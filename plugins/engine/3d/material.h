@@ -166,6 +166,11 @@ public:
   virtual int GetTextureLayerCount ();
   /// Get a texture layer.
   virtual csTextureLayer* GetTextureLayer (int idx);
+#else
+  /// Get num texture layers. OR only.
+  virtual int GetTextureLayerCount () { return 0; }
+  /// Get a texture layer. OR only.
+  virtual csTextureLayer* GetTextureLayer (int) { return 0; }
 #endif
   /// Get flat color.
   virtual void GetFlatColor (csRGBpixel &oColor, bool useTextureMean = true);

@@ -125,18 +125,18 @@ struct iMaterial : public iShaderVariableContext
    */
   virtual iTextureHandle* GetTexture (csStringID name) = 0;
 
-#ifndef CS_USE_NEW_RENDERER
   /**
    * Get the number of texture layers. The base
    * texture is not counted in this.
+   * OR only!
    */
   virtual int GetTextureLayerCount () = 0;
 
   /**
    * Get a texture layer.
+   * OR only!
    */
   virtual csTextureLayer* GetTextureLayer (int idx) = 0;
-#endif
 
   /**
    * Get the flat color. If the material has a texture assigned, this

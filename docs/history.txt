@@ -6,6 +6,12 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+12-May-2004
+	- Jorrit added iMaterial->GetTextureLayerCount() and GetTextureLayer()
+	  to NR too (but with an empty implementation) so that we can get
+	  the swig stuff to work compatible between NR and OR.
+	- Jorrit removed 'waterdemo' from walkall target.
+	- Jorrit removed the gtreeldr plugin. It is pretty useless.
 11-May-2004
 	- Eric Sunshine made some clarifications and corrections to the
 	  'simple' tutorial, AWS "getting started", and iGraphics3D Doxygen
@@ -38,7 +44,6 @@ chronological order.
 	    - Building is done by the make emulation layer, which will
 	      automatically call system installed jam if present, else use CS
 	      provided jam.
-
 10-May-2004
 	- Jorrit added a missing file in the new 3dsmax exporter from Luca
 	  Pancallo. Now it should work.

@@ -5,5 +5,4 @@ if [ Property build : newrenderer ] || [ Property build : projgen ]
 Description waterdemo : "Displaying rendering of a watersurface in new renderer" ;
 Application waterdemo : [ Wildcard *.cpp *.h ] : noinstall ;
 LinkWith waterdemo : csgeom csgfx cstool csutil ;
-CompileGroups waterdemo : nrall ;
 }

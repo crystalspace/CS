@@ -1,8 +1,0 @@
-SubDir TOP plugins mesh genmesh persist tree ;
-
-Description gtreeldr : "General/Tree mesh object loader" ;
-
-Plugin gtreeldr
-	: [ Wildcard *.cpp *.h ]
-;
-LinkWith gtreeldr : csgeom csutil ;

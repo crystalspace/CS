@@ -13,7 +13,6 @@
         <plugin name="spr3d">crystalspace.mesh.loader.sprite.3d</plugin>
         <plugin name="spr2dFact">crystalspace.mesh.loader.factory.sprite.2d</plugin>
         <plugin name="spr2d">crystalspace.mesh.loader.sprite.2d</plugin>
-        <plugin name="treeFact">crystalspace.mesh.loader.factory.genmesh.tree</plugin>
         <plugin name="meshFact">crystalspace.mesh.loader.factory.genmesh</plugin>
         <plugin name="mesh">crystalspace.mesh.loader.genmesh</plugin>
         <plugin name="emitFact">crystalspace.mesh.loader.factory.emit</plugin>
@@ -437,10 +436,6 @@
     <meshfact name="paramsFileTest">
         <plugin>spr3dFact</plugin>
         <paramsfile>/lib/std/sprite3</paramsfile>
-    </meshfact>
-    <meshfact name="treeFact">
-        <plugin>treeFact</plugin>
-        <params />
     </meshfact>
     <meshfact name="sprFrameFact">
         <plugin>spr3dFact</plugin>
@@ -5693,19 +5688,6 @@
             <radius>5</radius>
             <color red="0.7" green="0.7" blue="0.8" />
         </light>
-        <meshobj name="treeMesh">
-            <plugin>mesh</plugin>
-            <params>
-                <factory>treeFact</factory>
-                <material>tree</material>
-                <mixmode>
-                    <tiling />
-                </mixmode>
-            </params>
-            <move>
-                <v x="-2.5" y="0.3" z="14" />
-            </move>
-        </meshobj>
         <meshobj name="genMesh">
             <plugin>mesh</plugin>
             <params>
