@@ -403,12 +403,19 @@ public:
   class eiShaderVariableAccessor : public iShaderVariableAccessor
   {
   public:
-    SCF_DECLARE_EMBEDDED_IBASE (csGenmeshMeshObject);
+    //SCF_DECLARE_EMBEDDED_IBASE (csGenmeshMeshObject);
+    SCF_DECLARE_IBASE;
+    csGenmeshMeshObject* parent;
+    eiShaderVariableAccessor (csGenmeshMeshObject* parent)
+    {
+      eiShaderVariableAccessor::parent = parent;
+    }
     virtual void PreGetValue (csShaderVariable* variable)
     {
-      scfParent->PreGetShaderVariableValue (variable);
+      //scfParent->PreGetShaderVariableValue (variable);
+      parent->PreGetShaderVariableValue (variable);
     }
-  } scfiShaderVariableAccessor;
+  } *scfiShaderVariableAccessor;
   friend class eiShaderVariableAccessor;
 
   void PreGetShaderVariableValue (csShaderVariable* variable);
@@ -858,12 +865,19 @@ public:
   class eiShaderVariableAccessor : public iShaderVariableAccessor
   {
   public:
-    SCF_DECLARE_EMBEDDED_IBASE (csGenmeshMeshObjectFactory);
+    //SCF_DECLARE_EMBEDDED_IBASE (csGenmeshMeshObjectFactory);
+    SCF_DECLARE_IBASE;
+    csGenmeshMeshObjectFactory* parent;
+    eiShaderVariableAccessor (csGenmeshMeshObjectFactory* parent)
+    {
+      eiShaderVariableAccessor::parent = parent;
+    }
     virtual void PreGetValue (csShaderVariable* variable)
     {
-      scfParent->PreGetShaderVariableValue (variable);
+      //scfParent->PreGetShaderVariableValue (variable);
+      parent->PreGetShaderVariableValue (variable);
     }
-  } scfiShaderVariableAccessor;
+  } *scfiShaderVariableAccessor;
   friend class eiShaderVariableAccessor;
 
   void PreGetShaderVariableValue (csShaderVariable* variable);

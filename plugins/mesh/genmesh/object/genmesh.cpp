@@ -74,9 +74,6 @@ SCF_IMPLEMENT_IBASE (csGenmeshMeshObject)
       return CS_STATIC_CAST(iPolygonMesh*, &scfiPolygonMesh);
     }
   }
-#ifdef CS_USE_NEW_RENDERER
-  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iShaderVariableAccessor)
-#endif
 SCF_IMPLEMENT_IBASE_END
 
 SCF_IMPLEMENT_EMBEDDED_IBASE (csGenmeshMeshObject::ShadowCaster)
@@ -100,9 +97,9 @@ SCF_IMPLEMENT_EMBEDDED_IBASE (csGenmeshMeshObject::LightingInfo)
 SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 #ifdef CS_USE_NEW_RENDERER
-SCF_IMPLEMENT_EMBEDDED_IBASE (csGenmeshMeshObject::eiShaderVariableAccessor)
+SCF_IMPLEMENT_IBASE (csGenmeshMeshObject::eiShaderVariableAccessor)
   SCF_IMPLEMENTS_INTERFACE (iShaderVariableAccessor)
-SCF_IMPLEMENT_EMBEDDED_IBASE_END
+SCF_IMPLEMENT_IBASE_END
 #endif
 
 csGenmeshMeshObject::csGenmeshMeshObject (csGenmeshMeshObjectFactory* factory) :
@@ -117,7 +114,7 @@ csGenmeshMeshObject::csGenmeshMeshObject (csGenmeshMeshObjectFactory* factory) :
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiShadowReceiver);
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiLightingInfo);
 #ifdef CS_USE_NEW_RENDERER
-  SCF_CONSTRUCT_EMBEDDED_IBASE (scfiShaderVariableAccessor);
+  scfiShaderVariableAccessor = new eiShaderVariableAccessor (this);
 #endif
   csGenmeshMeshObject::factory = factory;
   logparent = 0;
@@ -180,15 +177,15 @@ csGenmeshMeshObject::~csGenmeshMeshObject ()
   }
 #endif
 
+#ifdef CS_USE_NEW_RENDERER
+  scfiShaderVariableAccessor->DecRef ();
+#endif
   //SCF_DESTRUCT_EMBEDDED_IBASE (scfiObjectModel);
   SCF_DESTRUCT_EMBEDDED_IBASE (scfiPolygonMesh);
   SCF_DESTRUCT_EMBEDDED_IBASE (scfiGeneralMeshState);
   SCF_DESTRUCT_EMBEDDED_IBASE (scfiShadowCaster);
   SCF_DESTRUCT_EMBEDDED_IBASE (scfiShadowReceiver);
   SCF_DESTRUCT_EMBEDDED_IBASE (scfiLightingInfo);
-#ifdef CS_USE_NEW_RENDERER
-  SCF_DESTRUCT_EMBEDDED_IBASE (scfiShaderVariableAccessor);
-#endif
   SCF_DESTRUCT_IBASE ();
 }
 
@@ -544,24 +541,24 @@ void csGenmeshMeshObject::SetupObject ()
     if (!factory->back2front)
     {
       sv = svcontext->GetVariableAdd (csGenmeshMeshObjectFactory::index_name);
-      sv->SetAccessor (&factory->scfiShaderVariableAccessor);
+      sv->SetAccessor (factory->scfiShaderVariableAccessor);
     }
     sv = svcontext->GetVariableAdd (csGenmeshMeshObjectFactory::vertex_name);
-    sv->SetAccessor (&factory->scfiShaderVariableAccessor);
+    sv->SetAccessor (factory->scfiShaderVariableAccessor);
     sv = svcontext->GetVariableAdd (csGenmeshMeshObjectFactory::texel_name);
-    sv->SetAccessor (&factory->scfiShaderVariableAccessor);
+    sv->SetAccessor (factory->scfiShaderVariableAccessor);
     sv = svcontext->GetVariableAdd (csGenmeshMeshObjectFactory::normal_name);
-    sv->SetAccessor (&factory->scfiShaderVariableAccessor);
+    sv->SetAccessor (factory->scfiShaderVariableAccessor);
 
     /*sv = dynDomain->GetVariableAdd (csGenmeshMeshObjectFactory::color_name);
     sv->SetAccessor (&factory->shaderVarAccessor);*/
     sv = svcontext->GetVariableAdd (csGenmeshMeshObjectFactory::color_name);
-    sv->SetAccessor (&scfiShaderVariableAccessor);
+    sv->SetAccessor (scfiShaderVariableAccessor);
 
     for(int i=0;i<factory->GetAnonymousNames().Length();i++)
     {
       sv = svcontext->GetVariableAdd (factory->GetAnonymousNames().Get(i));
-      sv->SetAccessor (&factory->scfiShaderVariableAccessor);
+      sv->SetAccessor (factory->scfiShaderVariableAccessor);
     }
 #endif // CS_USE_NEW_RENDERER
   }
@@ -1273,9 +1270,6 @@ SCF_IMPLEMENT_IBASE (csGenmeshMeshObjectFactory)
 #ifndef CS_USE_NEW_RENDERER
   SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iVertexBufferManagerClient)
 #endif
-#ifdef CS_USE_NEW_RENDERER
-  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iShaderVariableAccessor)
-#endif
 SCF_IMPLEMENT_IBASE_END
 
 SCF_IMPLEMENT_EMBEDDED_IBASE (csGenmeshMeshObjectFactory::GeneralFactoryState)
@@ -1294,9 +1288,9 @@ SCF_IMPLEMENT_EMBEDDED_IBASE_END
 #endif
 
 #ifdef CS_USE_NEW_RENDERER
-SCF_IMPLEMENT_EMBEDDED_IBASE (csGenmeshMeshObjectFactory::eiShaderVariableAccessor)
+SCF_IMPLEMENT_IBASE (csGenmeshMeshObjectFactory::eiShaderVariableAccessor)
   SCF_IMPLEMENTS_INTERFACE (iShaderVariableAccessor)
-SCF_IMPLEMENT_EMBEDDED_IBASE_END
+SCF_IMPLEMENT_IBASE_END
 #endif
 
 csStringID csGenmeshMeshObjectFactory::vertex_name = csInvalidStringID;
@@ -1318,7 +1312,7 @@ csGenmeshMeshObjectFactory::csGenmeshMeshObjectFactory (iBase *pParent,
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiVertexBufferManagerClient);
 #endif
 #ifdef CS_USE_NEW_RENDERER
-  SCF_CONSTRUCT_EMBEDDED_IBASE (scfiShaderVariableAccessor);
+  scfiShaderVariableAccessor = new eiShaderVariableAccessor (this);
 #endif
   csGenmeshMeshObjectFactory::object_reg = object_reg;
 
@@ -1415,13 +1409,13 @@ csGenmeshMeshObjectFactory::~csGenmeshMeshObjectFactory ()
 
   delete back2front_tree;
 
+#ifdef CS_USE_NEW_RENDERER
+  scfiShaderVariableAccessor->DecRef ();
+#endif
   SCF_DESTRUCT_EMBEDDED_IBASE (scfiGeneralFactoryState);
   SCF_DESTRUCT_EMBEDDED_IBASE (scfiObjectModel);
 #ifndef CS_USE_NEW_RENDERER
   SCF_DESTRUCT_EMBEDDED_IBASE (scfiVertexBufferManagerClient);
-#endif
-#ifdef CS_USE_NEW_RENDERER
-  SCF_DESTRUCT_EMBEDDED_IBASE (scfiShaderVariableAccessor);
 #endif
   SCF_DESTRUCT_IBASE ();
 }

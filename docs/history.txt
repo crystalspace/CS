@@ -10,6 +10,9 @@ chronological order.
 	- Jorrit fixed a bug in spr3d with new renderer. It would try to
 	  tween vertices also for skeletal animation. That would cause
 	  crashes for skeletal sprites.
+	- Jorrit fixed a memory leak in genmesh with new renderer. Please
+	  don't use embedded interfaces for SharedVariableAccessor since that
+	  will cause a circular reference.
 9-Apr-2004
 	- Jorrit added iMeshWrapper->SetZBufModeRecursive(),
 	  SetFlagsRecursive(), and SetRenderPriorityRecursive(). These
