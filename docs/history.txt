@@ -9,6 +9,7 @@ The history order has been reversed so that new features are at the top.
 	  fix is not very satisfactory because I simply worked around the
 	  bug. When I have a little more time this needs to be investigated
 	  better.
+	- Eric Sunshine removed obsolete reference to CS/newdocs from subs.mak.
 27-Jun-2000
 	- Samuel Humphreys fixed dtsimple:
 	    - Fixed the portal...it was the gouraud shading which broke it,

@@ -34,7 +34,7 @@ ifneq ($(TESTS_SUBMAKEFILES),)
 endif
 
 ifeq ($(COMPOSITE_SUBMAKEFILES),)
-  COMPOSITE_SUBMAKEFILES=$(wildcard docs/*.mak newdocs/*.mak)
+  COMPOSITE_SUBMAKEFILES=$(wildcard docs/*.mak)
 endif
 ifneq ($(COMPOSITE_SUBMAKEFILES),)
   include $(COMPOSITE_SUBMAKEFILES)
