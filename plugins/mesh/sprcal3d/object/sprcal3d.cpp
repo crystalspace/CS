@@ -339,7 +339,7 @@ int csSpriteCal3DMeshObjectFactory::LoadCoreAnimation (
         an->idle_pct      = idle_pct;
         an->lock          = lock;
 
-        an->index = anims.Push(an);
+        an->index = (int)anims.Push(an);
 
         std::string str(name);
         calCoreModel.addAnimationName (str,id);
@@ -454,7 +454,7 @@ bool csSpriteCal3DMeshObjectFactory::AddMorphTarget(
   }
   CalCoreMorphAnimation* morph_animation = calCoreModel.getCoreMorphAnimation (
   	morphanimation_index);
-  return morph_animation->addMorphTarget(mesh_index,i);
+  return morph_animation->addMorphTarget (mesh_index, (int)i);
 }
 
 int csSpriteCal3DMeshObjectFactory::GetMorphTargetCount(int mesh_id)
@@ -463,7 +463,7 @@ int csSpriteCal3DMeshObjectFactory::GetMorphTargetCount(int mesh_id)
   {
     return -1;
   }
-  return submeshes[mesh_id]->morph_target_name.Length();
+  return (int)submeshes[mesh_id]->morph_target_name.Length();
 }
 
 const char *csSpriteCal3DMeshObjectFactory::GetMeshName(int idx)
@@ -844,10 +844,9 @@ void csSpriteCal3DMeshObject::SetFactory (csSpriteCal3DMeshObjectFactory* tmpl)
   {
     if (factory->submeshes[meshId]->attach_by_default)
     {
-      // @@@ FIXME: The pointer to int cast is potentially bogus on 64-bit
-      // platforms.
-      AttachCoreMesh(factory->submeshes[meshId]->index,(int)(iMaterialWrapper*)
-		      factory->submeshes[meshId]->default_material);
+      AttachCoreMesh (factory->submeshes[meshId]->index,
+	materialMapper.GetIdForMaterial (
+	factory->submeshes[meshId]->default_material));
     }
   }
   // To get an accurate bbox below, you must have the model standing in
@@ -1045,14 +1044,14 @@ void csSpriteCal3DMeshObject::UpdateLightingSubmesh (
   // center in object space is obviously at (0,0,0).
   csColor color;
 
-  int num_lights = lights.Length ();
+  size_t num_lights = lights.Length ();
 
   // Make sure colors array exists and set all to ambient
   InitSubmeshLighting (mesh, submesh, pCalRenderer, movable);
   csColor* colors = meshes_colors[mesh][submesh];
 
   // Update Lighting for all relevant lights
-  for (int l = 0; l < num_lights; l++)
+  for (size_t l = 0; l < num_lights; l++)
   {
     iLight* li = lights[l];
     // Compute light position in object coordinates
@@ -1229,23 +1228,23 @@ void csSpriteCal3DMeshObject::SetupVertices()
 {
   if(!vertices_allocated)
   {
-    vertices.SetLength( attached_ids.Length() );
+    vertices.SetLength (attached_ids.Length());
     size_t m;
     for (m = 0; m < vertices.Length(); m++)
     {
-      vertices[m].SetLength(calModel.getMesh(m)->getSubmeshCount());
+      CalMesh* mesh = calModel.getMesh ((int)m);
+      csArray<csVector3*>& vM = vertices[m];
+      vM.SetLength (mesh->getSubmeshCount());
       size_t s;
       for (s = 0; s < vertices[m].Length(); s++)
       {
-	vertices[m][s] = 
-	  new csVector3[calModel.getMesh(m)->getSubmesh(s)->getVertexCount ()];
+	CalSubmesh* submesh = mesh->getSubmesh ((int)s);
+	csVector3*& vSM = vertices[m][s];
+	vSM = new csVector3[submesh->getVertexCount ()];
 	int v;
-	for(v = 0; v < calModel.getMesh(m)->getSubmesh(s)->getVertexCount ();
-		v++)
+	for(v = 0; v < submesh->getVertexCount (); v++)
 	{
-	  vertices[m][s][v].x = 0;
-	  vertices[m][s][v].y = 0;
-	  vertices[m][s][v].z = 0;
+	  vSM[v].Set (0, 0, 0);
 	}
       }
     }
@@ -1257,16 +1256,17 @@ void csSpriteCal3DMeshObject::SetupVertices()
     size_t m;
     for (m = 0; m < vertices.Length(); m++)
     {
+      csArray<csVector3*>& vM = vertices[m];
       size_t s;
       for (s = 0; s < vertices[m].Length(); s++)
       {
+	csVector3*& vSM = vM[s];
 	int v;
-	for(v = 0; v < calModel.getMesh(m)->getSubmesh(s)->getVertexCount ();
+	for(v = 0; 
+	  v < calModel.getMesh((int)m)->getSubmesh((int)s)->getVertexCount ();
 	  v++)
 	{
-	  vertices[m][s][v].x = 0;
-	  vertices[m][s][v].y = 0;
-	  vertices[m][s][v].z = 0;
+	  vSM[v].Set (0, 0, 0);
 	}
       }
     }
@@ -1329,7 +1329,7 @@ bool csSpriteCal3DMeshObject::HitBeamOutline (const csVector3& start,
       for (s = 0; s < vertices[m].Length(); s++)
       {
 	std::vector<CalCoreSubmesh::Face>& vectorFace
-		= calModel.getMesh(m)->getSubmesh(s)
+		= calModel.getMesh((int)m)->getSubmesh((int)s)
 		->getCoreSubmesh()->getVectorFace();
 	std::vector<CalCoreSubmesh::Face>::iterator iteratorFace
 	  = vectorFace.begin();
@@ -1340,7 +1340,7 @@ bool csSpriteCal3DMeshObject::HitBeamOutline (const csVector3& start,
 	  for(f=0;!bboxhit&&f<3;f++)
 	  {
 	    std::vector<CalCoreSubmesh::Influence> influ
-	    	= calModel.getMesh(m)->getSubmesh(s)
+	    	= calModel.getMesh((int)m)->getSubmesh((int)s)
 		->getCoreSubmesh()->getVectorVertex ()
 	      [(*iteratorFace).vertexId[f]].vectorInfluence;
 	    std::vector<CalCoreSubmesh::Influence>::iterator iteratorInflu =
@@ -1365,7 +1365,7 @@ bool csSpriteCal3DMeshObject::HitBeamOutline (const csVector3& start,
 		 vertices[m][s][(*iteratorFace).vertexId[f]].z == 0)
 	      {
 		CalVector calVector = calModel.getPhysique()->calculateVertex(
-		    calModel.getMesh(m)->getSubmesh(s),
+		    calModel.getMesh((int)m)->getSubmesh((int)s),
 		    (*iteratorFace).vertexId[f]);
 		vertices[m][s][(*iteratorFace).vertexId[f]].x = calVector.x;
 		vertices[m][s][(*iteratorFace).vertexId[f]].y = calVector.y;
@@ -1451,7 +1451,7 @@ bool csSpriteCal3DMeshObject::HitBeamObject (const csVector3& start,
       for (s = 0; s < vertices[m].Length(); s++)
       {
 	std::vector<CalCoreSubmesh::Face>& vectorFace
-		= calModel.getMesh(m)->getSubmesh(s)
+		= calModel.getMesh((int)m)->getSubmesh((int)s)
 		->getCoreSubmesh()->getVectorFace();
 	std::vector<CalCoreSubmesh::Face>::iterator iteratorFace
 	  = vectorFace.begin();
@@ -1462,7 +1462,7 @@ bool csSpriteCal3DMeshObject::HitBeamObject (const csVector3& start,
 	  for(f=0;!bboxhit&&f<3;f++)
 	  {
 	    std::vector<CalCoreSubmesh::Influence> influ
-	    	= calModel.getMesh(m)->getSubmesh(s)
+	    	= calModel.getMesh((int)m)->getSubmesh((int)s)
 		->getCoreSubmesh()->getVectorVertex ()
 	      [(*iteratorFace).vertexId[f]].vectorInfluence;
 	    std::vector<CalCoreSubmesh::Influence>::iterator iteratorInflu =
@@ -1487,7 +1487,7 @@ bool csSpriteCal3DMeshObject::HitBeamObject (const csVector3& start,
 		  vertices[m][s][(*iteratorFace).vertexId[f]].z == 0)
 	      {
 		CalVector calVector = calModel.getPhysique()->calculateVertex(
-		    calModel.getMesh(m)->getSubmesh(s),
+		    calModel.getMesh((int)m)->getSubmesh((int)s),
 		    (*iteratorFace).vertexId[f]);
 		vertices[m][s][(*iteratorFace).vertexId[f]].x = calVector.x;
 		vertices[m][s][(*iteratorFace).vertexId[f]].y = calVector.y;
@@ -1696,7 +1696,7 @@ csRenderMesh** csSpriteCal3DMeshObject::GetRenderMeshes (int &n,
   currentMovable = movable;
   // @@@ One movable for all meshes... not good.
 
-  n = meshes.Length();
+  n = (int)meshes.Length();
   return meshes.GetArray();
 
   /*n = allRenderMeshes.Length();
@@ -1712,16 +1712,16 @@ void csSpriteCal3DMeshObject::SetupRenderMeshes ()
   {
     for (size_t s = 0; s < renderMeshes[m].Length(); s++)
     {
-      CalSubmesh* submesh = calModel.getMesh (m)->getSubmesh (s);
+      CalSubmesh* submesh = calModel.getMesh ((int)m)->getSubmesh ((int)s);
       csRenderMesh& rm = renderMeshes[m][s];
       rm.indexstart = 0;
       rm.indexend = submesh->getFaceCount () * 3;
       rm.meshtype = CS_MESHTYPE_TRIANGLES;
-      rm.material = (iMaterialWrapper *)submesh->getCoreMaterialId ();
+      rm.material = materialMapper.GetMaterialForId (submesh->getCoreMaterialId ());
       rm.buffers.AttachNew (new csRenderBufferHolder );
 
       csRef<iRenderBufferAccessor> accessor (
-	csPtr<iRenderBufferAccessor> (new BaseAccessor (this, m, s)));
+	csPtr<iRenderBufferAccessor> (new BaseAccessor (this, (int)m, (int)s)));
       rm.buffers->SetAccessor (accessor, CS_BUFFER_ALL_MASK);
 
       allRenderMeshes.Push (&rm);
@@ -1807,7 +1807,7 @@ int csSpriteCal3DMeshObject::FindAnim(const char *name)
 void csSpriteCal3DMeshObject::ClearAllAnims()
 {
   while (active_anims.Length())
-    ClearAnimCyclePos(active_anims.Length() - 1, 0);
+    ClearAnimCyclePos ((int)(active_anims.Length() - 1), 0);
 
   if (last_locked_anim != -1)
   {
@@ -1894,7 +1894,7 @@ bool csSpriteCal3DMeshObject::ClearAnimCycle (const char *name, float delay)
 
 int csSpriteCal3DMeshObject::GetActiveAnimCount()
 {
-  return active_anims.Length();
+  return (int)active_anims.Length();
 }
 
 int csSpriteCal3DMeshObject::GetActiveAnims(char *buffer,int max_length)
@@ -2081,10 +2081,9 @@ bool csSpriteCal3DMeshObject::AttachCoreMesh(const char *meshname)
   if (idx == -1)
     return false;
 
-  // @@@ FIXME: The pointer to int cast is potentially bogus on 64-bit
-  // platforms.
-  return AttachCoreMesh(factory->submeshes[idx]->index,
-  	(int)(iMaterialWrapper*)factory->submeshes[idx]->default_material);
+  return AttachCoreMesh (factory->submeshes[idx]->index,
+    materialMapper.GetIdForMaterial (
+    factory->submeshes[idx]->default_material));
 }
 
 bool csSpriteCal3DMeshObject::AttachCoreMesh(int mesh_id,int iMatWrapID)
@@ -2102,7 +2101,7 @@ bool csSpriteCal3DMeshObject::AttachCoreMesh(int mesh_id,int iMatWrapID)
   // removed.
 
   attached_ids.Push(mesh_id);
-  SetupObjectSubmesh(attached_ids.Length()-1);
+  SetupObjectSubmesh ((int)(attached_ids.Length()-1));
   CalMesh *mesh = calModel.getMesh(mesh_id);
   for (int i=0; i<mesh->getSubmeshCount(); i++)
   {
@@ -2203,7 +2202,8 @@ bool csSpriteCal3DMeshObject::SetMaterial(const char *mesh_name,
       CalMesh *mesh = calModel.getMesh(attached_ids[i]);
       for (j=0; j<mesh->getSubmeshCount(); j++)
       {
-        mesh->getSubmesh(j)->setCoreMaterialId((int)mat);
+	mesh->getSubmesh(j)->setCoreMaterialId (
+	  materialMapper.GetIdForMaterial (mat));
         if (arrays_initialized)
         {
           csRenderMesh *rm = &renderMeshes[attached_ids[i]][j];

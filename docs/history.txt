@@ -47,6 +47,8 @@ chronological order.
 	- res fixed compiling of Opcode under Cygwin (and probably other 
 	  platforms where uintptr_t isn't basically the same as Opcode's 
 	  udword).
+	- res fixed the use of int<->iMaterialWrapper* casts in sprcal3d.
+	- res fixed a wrong #include in the asciiart canvas.
 23-Feb-2005
 	- res moved the code from the various "common" libraries into a
 	  library "csplugincommon" (and libraries with Win32, OpenGL and

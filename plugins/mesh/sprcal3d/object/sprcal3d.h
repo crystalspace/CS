@@ -31,6 +31,7 @@
 #include "csutil/cscolor.h"
 #include "csutil/dirtyaccessarray.h"
 #include "csutil/hash.h"
+#include "csutil/hashr.h"
 #include "csutil/leakguard.h"
 #include "csutil/parray.h"
 #include "csutil/refarr.h"
@@ -263,8 +264,8 @@ public:
   bool RegisterAnimCallback(const char *anim, CalAnimationCallback *callback,float min_interval);
   bool RemoveAnimCallback(const char *anim, CalAnimationCallback *callback);
 
-  int  GetMeshCount() { return submeshes.Length(); }
-  int GetMorphAnimationCount() { return morph_animation_names.Length(); }
+  int  GetMeshCount() { return (int)submeshes.Length(); }
+  int GetMorphAnimationCount() { return (int)morph_animation_names.Length(); }
   int GetMorphTargetCount(int mesh_id);
   const char *GetMeshName(int idx);
   int  FindMeshName(const char *meshName);  
@@ -280,7 +281,7 @@ public:
   /// find a socked based on the sprite attached to it
   csSpriteCal3DSocket* FindSocket (iMeshWrapper *mesh) const;
   /// Query the number of sockets
-  int GetSocketCount () const { return sockets.Length (); }
+  int GetSocketCount () const { return (int)sockets.Length (); }
   /// Query the socket number f
   csSpriteCal3DSocket* GetSocket (int f) const
   {
@@ -591,7 +592,40 @@ private:
    */
   csPDelArray<csSpriteCal3DSocket> sockets;
 
+  struct MaterialToIdMapper
+  {
+#if (CS_PROCESSOR_SIZE == 32)
+#if (_MSC_VER >= 1300)
+    int GetIdForMaterial (iMaterialWrapper* mat)
+    { return (int __w64)mat; }
+#else
+    int GetIdForMaterial (iMaterialWrapper* mat)
+    { return (int)mat; }
+#endif
+    iMaterialWrapper* GetMaterialForId (int id)
+    { return (iMaterialWrapper*)id; }
+#else
+    int nextId;
+    csHashReversible<int, iMaterialWrapper*> matHash;
+    MaterialToIdMapper() : nextId(0), matHash (7, 3) {}
 
+    int GetIdForMaterial (iMaterialWrapper* mat)
+    {
+      int id = matHash.Get (mat, -1);
+      if (id == -1) 
+      {
+	id = nextId++;
+	matHash.Put (mat, id);
+      }
+      return id;
+    }
+    iMaterialWrapper* GetMaterialForId (int id)
+    {
+      return matHash.GetKey (id, 0);
+    }
+#endif
+  };
+  MaterialToIdMapper materialMapper;
 
   class BaseAccessor : public iRenderBufferAccessor
   {
@@ -903,7 +937,7 @@ public:
   /// find a socked based on the sprite attached to it
   csSpriteCal3DSocket* FindSocket (iMeshWrapper *mesh) const;
   /// Query the number of sockets
-  int GetSocketCount () const { return sockets.Length (); }
+  int GetSocketCount () const { return (int)sockets.Length (); }
   /// Query the socket number f
   csSpriteCal3DSocket* GetSocket (int f) const
   {
