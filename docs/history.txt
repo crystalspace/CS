@@ -51,6 +51,9 @@ The history order has been reversed so that new features are at the top.
 	  inconsistent use of 'inline' in csterrain library.
 	- Eric Sunshine fixed software renderer halos (again) for big-endian
 	  32-bit NeXT machines following Andrew's change which broke them.
+	- Eric Sunshine fixed out-of-date key names in several configuration
+	  files (in data/config) following renaming which Andrew performed in
+	  the source code.
 30-May-2000
 	- Alex Pfaffe did some minor fixes and cleanup in the terrain
 	  engine. Alex also fixed a bug w.r.t. vertex reuse in buffers.
