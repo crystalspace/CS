@@ -1,5 +1,19 @@
 The history order has been reversed so that new features are at the top.
 
+8-Apr-2001
+	- Martin Geisse updated the sound system documentation.
+	- Martin fixed the garbled output from streamed sound in ds3d.
+	- Norman Kramer added interfaces iSprite2DUVAnimation and
+	  iSprite2DUVAnimationFrame. Also extended iSprite2DState
+	  and iSprite2DFactoryState accordingly. With those new interfaces
+	  it is now possible to do UV animation (texture coordinate
+	  animation) for 2D sprites.
+	- Norman added ANIMATE keyword to the spr2d object to select
+	  an uv animation.
+	- Norman also documented UV animation for 2D sprites and added
+	  an example.
+7-Apr-2001
+	- Martin Geisse did some clean-up work in the image loader.
 6-Apr-2001
 	- Martin Geisse did the first changes towards moving csparser to
 	  a plugin:
@@ -20,6 +34,9 @@ The history order has been reversed so that new features are at the top.
 	    - Changed the applications to match the above rules.
 	- Martin Geisse fixed a bug in cctest.
 	- Martin fixed a bug in csstring.
+	- Martin fixed a bug with the ball mesh plugin. He added the missing
+	  do_clip parameter in csBallMeshObject::Draw().
+	- Martin removed some unneeded dependencies on csgfx.
 	- Philip Wyett fixed a bug in simple.
 	- Philip updated MingW package version number to 0.20.
 	- Wouter Wijngaards added /usr/lib/crystalspace to the installation
