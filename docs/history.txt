@@ -20,6 +20,19 @@ The history order has been reversed so that new features are at the top.
 	- Eric Sunshine and Jorrit performed repair work on the new terrain
 	  library merge, bringing the makefile and source code into shape.
 	  Eliminated compilation warnings and errors.
+	- Eric Sunshine eliminated all the remaining build-time problems
+	  with the new terrain library.
+	    - Eliminated all the remaining compilation errors and warnings in
+	      the new terrain library.  This mostly involved missing I/O
+	      streams, lack of bool type (on some platforms), implicit
+	      conversion from float to integer, etc.
+	    - The terrain makefile now defines __CRYSTAL_SPACE__ when building
+	      for Crystal Space.  Currently this define is used to control
+	      whether or not cssysdef.h and cstypes.h are included.
+	    - Enabled all the code in csengine/terrain.cpp which was protected
+	      within DDG_FIXME blocks.
+	    - Updated makefile so that Crystal Space applications once again
+	      link against the terrain library.
 15-May-2000
 	- Added const version of csPoly3D::operator[].
 	- Added csPoly3D::SplitWithPlaneXYZ().
