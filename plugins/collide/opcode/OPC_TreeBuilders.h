@@ -81,7 +81,7 @@
 		 *	\return		splitting value
 		 */
 		///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-		virtual						float		GetSplittingValue(const udword* primitives, udword nb_prims, const AABB& global_box, udword axis)	const
+		virtual						float		GetSplittingValue(const udword* /*primitives*/, udword /*nb_prims*/, const AABB& global_box, udword axis)	const
 									{
 										// Default split value = middle of the axis (using only the box)
 										return global_box.GetCenter(axis);

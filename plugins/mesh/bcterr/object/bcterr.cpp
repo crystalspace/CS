@@ -1620,13 +1620,13 @@ void csBCTerrObject::SetControlPointHeight (const float height,
 }
 
 
-bool csBCTerrObject::DrawTest (iRenderView* rview, iMovable* movable)
+bool csBCTerrObject::DrawTest (iRenderView*, iMovable*)
 {
   return true;
 }
 
-void csBCTerrObject::UpdateLighting (iLight** lights, int num_lights,
-               iMovable* movable)
+void csBCTerrObject::UpdateLighting (iLight** /*lights*/, int /*num_lights*/,
+               iMovable*)
 {
 }
 
@@ -1639,8 +1639,7 @@ void csBCTerrObject::UpdateLighting (iLight** lights, int num_lights,
  * add list of checking objects to factory
 */
 
-bool csBCTerrObject::Draw (iRenderView* rview, iMovable* movable,
-    csZBufMode zbufMode)
+bool csBCTerrObject::Draw (iRenderView* rview, iMovable*, csZBufMode zbufMode)
 {
   if ( !initialized) return true;
   int i, n, j, lod_levels, level;

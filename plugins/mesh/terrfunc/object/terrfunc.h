@@ -299,6 +299,7 @@ public:
   /// Setup the number of blocks in the terrain.
   void SetResolution (int x, int y)
   {
+    (void)y;
     // @@@: x and y should be equal!!!
     CS_ASSERT (x == y);
     block_dim_invalid = blockxy != x;

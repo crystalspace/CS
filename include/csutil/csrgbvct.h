@@ -32,7 +32,7 @@ class csRGBVector : public csVector
 
 public:
   /// Compare two csRGBcolor structs.
-  virtual int Compare(csSome item1, csSome item2, int Mode)
+  virtual int Compare(csSome item1, csSome item2, int /*Mode*/)
   {
     csRGBcolor *i1 = STATIC_CAST(csRGBcolor *, item1);
     csRGBcolor *i2 = STATIC_CAST(csRGBcolor *, item2);
@@ -50,7 +50,7 @@ public:
   }
 
   /// Compare a key (csRGBcolor struct) with a csRGBcolor struct
-  virtual int CompareKey(csSome item, csConstSome key, int Mode)
+  virtual int CompareKey(csSome item, csConstSome key, int /*Mode*/)
   {
     csRGBcolor *i1 = STATIC_CAST(csRGBcolor *, item);
     const csRGBcolor *i2 = STATIC_CAST(const csRGBcolor *, key);

@@ -295,7 +295,7 @@ bool csMotionLoader::LoadMotion (iDocumentNode* node, iMotionTemplate* mot)
 
 
 csPtr<iBase> csMotionLoader::Parse (iDocumentNode* node,
-	iLoaderContext* ldr_context, iBase* /* context */ )
+	    iLoaderContext* /*ldr_context*/, iBase* /* context */ )
 {
   csRef<iDocumentNodeIterator> it = node->GetNodes ();
   while (it->HasNext ())

@@ -85,6 +85,9 @@ Point& Point::ProjectToPlane(const Plane& p)
 //### could be optimized
 Point& Point::Unfold(Plane& p, Point& a, Point& b)
 {
+  (void)a;
+  (void)p;
+  (void)b;
 	ASSERT(!"Obsolete code");
 /*	Point v = *this;
 

@@ -98,10 +98,10 @@ csPtr<iCollider> csOPCODECollideSystem::CreateCollider (iPolygonMesh* mesh)
   return csPtr<iCollider> (col);
 }
 
-csPtr<iCollider> csOPCODECollideSystem::CreateSphereCollider (iMeshObject* mesh) 
+csPtr<iCollider> csOPCODECollideSystem::CreateSphereCollider (iMeshObject*) 
 { return NULL; };  //unimplemented yet
 
-csPtr<iCollider> csOPCODECollideSystem::CreateBoxCollider (iMeshObject* mesh) 
+csPtr<iCollider> csOPCODECollideSystem::CreateBoxCollider (iMeshObject*) 
 { return NULL; };  //unimplemented yet
 
 bool csOPCODECollideSystem::Collide (
@@ -192,6 +192,12 @@ int csOPCODECollideSystem::CollidePath (
 	iCollider** colliders,
 	csReversibleTransform** transforms)
 {
+  (void)collider;
+  (void)trans;
+  (void)newpos;
+  (void)num_colliders;
+  (void)colliders;
+  (void)transforms;
 	return 0;
   // csOPCODECollider* thiscol = (csOPCODECollider*) collider;
   // return thiscol->CollidePath (trans, newpos,	num_colliders, colliders, transforms);
@@ -271,7 +277,7 @@ void csOPCODECollideSystem::ResetCollisionPairs ()
   }
 }
 
-void csOPCODECollideSystem::SetOneHitOnly (bool o) 
+void csOPCODECollideSystem::SetOneHitOnly (bool) 
 {
 }
 

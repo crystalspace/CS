@@ -353,7 +353,7 @@ void nTerrain::SetMaterialsList(iMaterialWrapper **matlist, unsigned int nMateri
   // @@@ Should I incref each material?  Then decref on closing?
 }
 
-void nTerrain::CreateMaterialMap(iFile *matmap, iImage *terrtex)
+void nTerrain::CreateMaterialMap(iFile *matmap, iImage* /*terrtex*/)
 {
   char mode[128];
   char matname[512];
@@ -644,7 +644,7 @@ csBigTerrainObject::DrawTest (iRenderView* rview, iMovable* movable)
 }
 
 void 
-csBigTerrainObject::UpdateLighting (iLight** lis, int num_lights, iMovable* movable)
+csBigTerrainObject::UpdateLighting (iLight** lis, int num_lights, iMovable*)
 {
   if (info->light_list) {
     delete [] info->light_list;
@@ -656,7 +656,7 @@ csBigTerrainObject::UpdateLighting (iLight** lis, int num_lights, iMovable* mova
 }
 
 bool 
-csBigTerrainObject::Draw (iRenderView* rview, iMovable* movable, csZBufMode zbufMode)
+csBigTerrainObject::Draw (iRenderView* rview, iMovable*, csZBufMode zbufMode)
 {
   int i;
   static int bufcount=0;
@@ -700,7 +700,7 @@ csBigTerrainObject::Draw (iRenderView* rview, iMovable* movable, csZBufMode zbuf
 }
 
 void 
-csBigTerrainObject::GetObjectBoundingBox (csBox3& bbox, int type)
+csBigTerrainObject::GetObjectBoundingBox (csBox3& bbox, int /*type*/)
 {
 		bbox.StartBoundingBox( csVector3( -1000, -1000, -1000 ) );
 		bbox.AddBoundingVertexSmart( csVector3( 1000,  1000,  1000 ) );

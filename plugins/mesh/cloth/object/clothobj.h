@@ -189,7 +189,7 @@ SCF_DECLARE_IBASE;
   /// Is lighting enabled.
   virtual bool IsLighting () const { return scfParent->LightsEnabled; };
   /// Set the color to use. Will be added to the lighting values.
-  virtual void SetColor (const csColor& col) {};
+  virtual void SetColor (const csColor&) {};
   /// Get the color.
   virtual csColor GetColor () const { return csColor(0,0,0); };
   /**
@@ -197,7 +197,7 @@ SCF_DECLARE_IBASE;
    * and so will the color set with SetColor(). In this case you can
    * manipulate the color array manually by calling GetColors().
    */
-  virtual void SetManualColors (bool m) {};
+  virtual void SetManualColors (bool) {};
   /// Are manual colors enabled?
   virtual bool IsManualColors () const { return false; };
 } scfiClothMeshState;

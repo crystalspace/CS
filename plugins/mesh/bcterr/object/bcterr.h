@@ -327,7 +327,7 @@ public:
       if (!scfParent->initialized) return 0;
       return scfParent->HeightTest (point);
     }
-    virtual int CameraHeightTest (csVector3 *point)
+    virtual int CameraHeightTest (csVector3* /*point*/)
     {
       return 0;
     }
@@ -413,10 +413,10 @@ public:
     {
       return (iPolygonMesh*)&scfParent->culling_mesh;
     }
-    virtual csPtr<iPolygonMesh> CreateLowerDetailPolygonMesh (float detail)
+    virtual csPtr<iPolygonMesh> CreateLowerDetailPolygonMesh (float /*detail*/)
     { return NULL; }
     virtual void GetObjectBoundingBox (csBox3& bbox,
-        int type = CS_BBOX_NORMAL)
+				       int /*type*/ = CS_BBOX_NORMAL)
     {
       bbox = scfParent->bbox;
     }
@@ -434,12 +434,12 @@ public:
   class TerrFuncState : public iTerrFuncState
   {
     SCF_DECLARE_EMBEDDED_IBASE (csBCTerrObject);
-    virtual void LoadMaterialGroup (iLoaderContext* ldr_context,
-    	const char *pName, int iStart, int iEnd)
+    virtual void LoadMaterialGroup (iLoaderContext*,
+		    const char* /*pName*/, int /*iStart*/, int /*iEnd*/)
     {
       return;
     }
-    virtual void SetTopLeftCorner (const csVector3& topleft)
+    virtual void SetTopLeftCorner (const csVector3& /*topleft*/)
     {
       return;
     }
@@ -447,7 +447,7 @@ public:
     {
       return scfParent->topleft;
     }
-    virtual void SetScale (const csVector3& scale)
+    virtual void SetScale (const csVector3& /*scale*/)
     {
       return;
     }
@@ -456,7 +456,7 @@ public:
       csVector3 nreturn;
       return nreturn;
     }
-    virtual void SetResolution (int x, int y)
+    virtual void SetResolution (int /*x*/, int /*y*/)
     {
       return;
     }
@@ -468,7 +468,7 @@ public:
     {
       return 0;
     }
-    virtual void SetGridResolution (int x, int y)
+    virtual void SetGridResolution (int /*x*/, int /*y*/)
     {
       return;
     }
@@ -480,7 +480,7 @@ public:
     {
       return 0;
     }
-    virtual void SetColor (const csColor& col)
+    virtual void SetColor (const csColor&)
     {
       return;
     }
@@ -489,15 +489,15 @@ public:
       csColor ncolor;
       return ncolor;
     }
-    virtual void SetHeightFunction (iTerrainHeightFunction* func)
+    virtual void SetHeightFunction (iTerrainHeightFunction*)
     {
       return;;
     }
-    virtual void SetNormalFunction (iTerrainNormalFunction* func)
+    virtual void SetNormalFunction (iTerrainNormalFunction*)
     {
       return;;
     }
-    virtual void SetHeightMap (iImage* im, float hscale, float hshift)
+    virtual void SetHeightMap (iImage*, float /*hscale*/, float /*hshift*/)
     {
       return;
     }
@@ -509,19 +509,19 @@ public:
     {
       return NULL;
     }
-    virtual void SetLODDistance (int lod, float dist)
+    virtual void SetLODDistance (int /*lod*/, float /*dist*/)
     {
       return;
     }
-    virtual float GetLODDistance (int lod)
+    virtual float GetLODDistance (int /*lod*/)
     {
       return 0;
     }
-    virtual void SetMaximumLODCost (int lod, float maxcost)
+    virtual void SetMaximumLODCost (int /*lod*/, float /*maxcost*/)
     {
       return;
     }
-    virtual float GetMaximumLODCost (int lod)
+    virtual float GetMaximumLODCost (int /*lod*/)
     {
       return 0;
     }
@@ -530,11 +530,11 @@ public:
       scfParent->CorrectSeams (tw, th);
       return;
     }
-    virtual void GetCorrectSeams (int& tw, int& th) const
+    virtual void GetCorrectSeams (int& /*tw*/, int& /*th*/) const
     {
       return;
     }
-    virtual void SetQuadDepth (int qd)
+    virtual void SetQuadDepth (int /*qd*/)
     {
       return;
     }
@@ -542,7 +542,7 @@ public:
     {
       return 0;
     }
-    virtual void SetVisTesting (bool en)
+    virtual void SetVisTesting (bool)
     {
       return;
     }
@@ -550,7 +550,7 @@ public:
     {
       return false;
     }
-    virtual void SetDirLight (const csVector3& pos, const csColor& col)
+    virtual void SetDirLight (const csVector3& /*pos*/, const csColor& /*col*/)
     {
       return;
     }
@@ -572,7 +572,7 @@ public:
     {
       return false;
     }
-    virtual void SetMaterial (int i, iMaterialWrapper* mat)
+    virtual void SetMaterial (int, iMaterialWrapper*)
     {
       return;
     }
@@ -745,7 +745,7 @@ public:
     {
       return &scfParent->blocksize;
     }
-    virtual csSharedLODMesh* CreateFreeMesh (bool wavy)
+    virtual csSharedLODMesh* CreateFreeMesh (bool /*wavy*/)
     {
       return scfParent->CreateFreeMesh ();
     }

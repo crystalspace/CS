@@ -1606,10 +1606,12 @@ void csTiledCoverageBuffer::Debug_Dump (iGraphics3D* g3d, int /*zoom*/)
   }
 }
 
+#if 0
 static float rnd (int totrange, int leftpad, int rightpad)
 {
   return float (((rand () >> 4) % (totrange-leftpad-rightpad)) + leftpad);
 }
+#endif
 
 #define COV_ASSERT(test,msg) \
   if (!(test)) \
@@ -1648,7 +1650,7 @@ csPtr<iString> csTiledCoverageBuffer::Debug_UnitTest ()
   return NULL;
 }
 
-csTicks csTiledCoverageBuffer::Debug_Benchmark (int num_iterations)
+csTicks csTiledCoverageBuffer::Debug_Benchmark (int /*num_iterations*/)
 {
   Setup (640, 480);
 

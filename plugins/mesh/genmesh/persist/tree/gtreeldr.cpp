@@ -648,7 +648,7 @@ bool csGeneralTreeFactoryLoader::Initialize (iObjectRegistry* object_reg)
 
 csPtr<iBase> csGeneralTreeFactoryLoader::Parse (
 	iDocumentNode* node,
-	iLoaderContext* ldr_context, iBase* /* context */)
+	iLoaderContext* /*ldr_context*/, iBase* /* context */)
 {
   csRef<iPluginManager> plugin_mgr (CS_QUERY_REGISTRY (object_reg,
   	iPluginManager));

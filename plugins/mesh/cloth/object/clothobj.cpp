@@ -207,7 +207,7 @@ void csStuffObject::GetRadius (csVector3& rad, csVector3& cent)
 }
 
 
-bool csStuffObject::Draw(iRenderView *rview, iMovable *movable, csZBufMode zbufmode){
+bool csStuffObject::Draw(iRenderView *rview, iMovable*, csZBufMode zbufmode){
  //printf("       DRAW\n");
 	iGraphics3D* g3d = rview->GetGraphics3D ();
  if (!material)

@@ -38,9 +38,9 @@ public:
   virtual ~csRapidCollideSystem ();
 
   /// Create an iCollider for the given geometry.
-       virtual csPtr<iCollider> CreateCollider (iPolygonMesh* mesh);
- virtual csPtr<iCollider> CreateSphereCollider (iMeshObject* mesh) { return NULL; }; //to be implemented
-       virtual csPtr<iCollider> CreateBoxCollider (iMeshObject* mesh) { return NULL; };
+       virtual csPtr<iCollider> CreateCollider (iPolygonMesh*);
+ virtual csPtr<iCollider> CreateSphereCollider (iMeshObject*) { return NULL; }; //to be implemented
+       virtual csPtr<iCollider> CreateBoxCollider (iMeshObject*) { return NULL; };
 
 
   virtual bool Collide (

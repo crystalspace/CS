@@ -140,7 +140,7 @@ bool csSprite2DFactoryLoader::Initialize (iObjectRegistry* object_reg)
 }
 
 bool csSprite2DFactoryLoader::ParseAnim (iDocumentNode* node,
-	iReporter* reporter, 
+	iReporter*, 
 	iSprite2DFactoryState* spr2dLook, 
 	const char *animname)
 {

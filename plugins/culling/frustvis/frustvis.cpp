@@ -201,6 +201,7 @@ void csFrustumVis::UpdateObjects ()
   }
 }
 
+#if 0
 static void Perspective (const csVector3& v, csVector2& p, float fov,
     	float sx, float sy)
 {
@@ -208,6 +209,7 @@ static void Perspective (const csVector3& v, csVector2& p, float fov,
   p.x = v.x * iz + sx;
   p.y = v.y * iz + sy;
 }
+#endif
 
 struct FrustTest_Front2BackData
 {

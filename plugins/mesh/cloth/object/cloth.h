@@ -508,7 +508,7 @@ for (i=0;i<nverts;i++)
 #endif 			
 	};
 	
-	inline void Update(uint msec)
+	inline void Update(uint /*msec*/)
 	{
 		//do
 			//{

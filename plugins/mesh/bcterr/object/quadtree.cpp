@@ -61,12 +61,18 @@ static bool InsideExt (csBox3 bbox, csVector3 *point)
     return false;
 }
 
+#if 0
 static bool BBoxLineIntersect (csBox3 bbox,
         csSegment3 seg, csVector3 &isect,
         float *pr)
 {
+  (void)bbox;
+  (void)seg;
+  (void)isect;
+  (void)pr;
   return false;
 }
+#endif
        
 
 bool csColQuad::HitBeamOutline (csSegment3 seg,

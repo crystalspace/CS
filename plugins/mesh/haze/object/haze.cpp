@@ -942,7 +942,7 @@ bool csHazeMeshObject::Draw (iRenderView* rview, iMovable* movable,
 
 
 void csHazeMeshObject::DrawPolyAdapt(iRenderView *rview, iGraphics3D *g3d,
-  iMaterialHandle *mat, int num_sides, csVector3* pts, csVector2* uvs,
+				     iMaterialHandle *mat, int /*num_sides*/, csVector3* pts, csVector2* uvs,
         float layer_scale, float quality)
 {
   /// only triangles

@@ -187,7 +187,7 @@ iMeshWrapper* StdIsoLoaderContext::FindMeshObject (const char* /*name*/)
   return NULL;
 }
 
-iTextureWrapper* StdIsoLoaderContext::FindTexture (const char* name)
+iTextureWrapper* StdIsoLoaderContext::FindTexture (const char* /*name*/)
 {
   return NULL;
 }

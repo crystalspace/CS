@@ -1801,7 +1801,7 @@ iMaterialWrapper* csBugPlug::FindColor (float r, float g, float b)
 }
 
 void csBugPlug::DebugSectorBox (const csBox3& box, float r, float g, float b,
-  	const char* name, iMeshObject* mesh)
+  	const char* name, iMeshObject*)
 {
   if (!debug_sector.sector) return;
 

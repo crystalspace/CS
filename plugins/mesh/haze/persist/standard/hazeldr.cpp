@@ -138,7 +138,7 @@ bool csHazeFactoryLoader::Initialize (iObjectRegistry* object_reg)
   return true;
 }
 
-static iHazeHull* ParseHull (csStringHash& xmltokens, iReporter* reporter,
+static iHazeHull* ParseHull (csStringHash& xmltokens, iReporter*,
 			     iSyntaxService* synldr,
 			     iDocumentNode* node,
 			     iHazeFactoryState *fstate, float &s)
