@@ -1,8 +1,0 @@
-LIBRARY NetDrvN INITINSTANCE TERMINSTANCE
-DESCRIPTION "Crystal Space NULL network driver"
-EXPORTS
-	DllInitialize
-	DllCanUnloadNow
-	DllGetClassObject
-	DllRegisterServer
-	DllUnregisterServer

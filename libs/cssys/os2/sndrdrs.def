@@ -1,8 +1,0 @@
-LIBRARY SndRdrS INITINSTANCE TERMINSTANCE
-DESCRIPTION "Crystal Space Surround sound renderer"
-EXPORTS
-	DllInitialize
-	DllCanUnloadNow
-	DllGetClassObject
-	DllRegisterServer
-	DllUnregisterServer

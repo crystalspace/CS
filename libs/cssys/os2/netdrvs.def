@@ -1,8 +1,0 @@
-LIBRARY NetDrvS INITINSTANCE TERMINSTANCE
-DESCRIPTION "Crystal Space BSD sockets TCP/IP network driver"
-EXPORTS
-	DllInitialize
-	DllCanUnloadNow
-	DllGetClassObject
-	DllRegisterServer
-	DllUnregisterServer

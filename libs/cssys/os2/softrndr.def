@@ -1,8 +1,0 @@
-LIBRARY SoftRndr INITINSTANCE TERMINSTANCE
-DESCRIPTION "Crystal Space 3D Software Renderer"
-EXPORTS
-	DllInitialize
-	DllCanUnloadNow
-	DllGetClassObject
-	DllRegisterServer
-	DllUnregisterServer

@@ -1,8 +1,0 @@
-LIBRARY NetManS INITINSTANCE TERMINSTANCE
-DESCRIPTION "Crystal Space Simple network manager"
-EXPORTS
-	DllInitialize
-	DllCanUnloadNow
-	DllGetClassObject
-	DllRegisterServer
-	DllUnregisterServer
