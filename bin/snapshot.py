@@ -76,7 +76,9 @@ import commands, glob, grp, os, re, string, sys, tempfile, time
 #    packprefix - Prefix used to compose the final package name of the form
 #        prefix-YYYY-MM-DD-HHMMSS.ext".
 #    snapdir - Directory where snapshot packages will be placed.
-#    keepsnaps - Number of recent packages to retain.
+#    keepsnaphots - Number of historical snapshots to retain.
+#    keepdiffs - Number of historical 'diffs' to retain.
+#    keeplogs - Number of historical log files to retain.
 #    archivers - A tuple of archivers used to generate the project packages.
 #        Each tuple element is a dictionary with the following keys.  The key
 #        "name" specifies the name of the directory under 'snapdir' into which
@@ -99,7 +101,9 @@ moduledir = "CS"
 ownergroup = "crystal"
 packprefix = "cs-"
 snapdir = "/home/groups/ftp/pub/crystal/cvs-snapshots"
-keepsnaps = 3
+keepsnapshots = 2
+keepdiffs = 7
+keeplogs = 7
 
 archivers = (
     {"name": "gzip",
@@ -208,9 +212,9 @@ class Snapshot:
             file.close()
         return stamp
 
-    def purge(self, pattern):
+    def purge(self, pattern, keep):
         files = glob.glob(pattern)
-        blast = len(files) - keepsnaps
+        blast = len(files) - keep
         if blast > 0:
             files.sort()
             for i in range(0, blast):
@@ -218,12 +222,15 @@ class Snapshot:
                 os.remove(files[i])
 
     def purgeold(self):
-        self.purge(os.path.join(self.logdir, self.packtemplate + self.logext))
+        self.purge(os.path.join(
+            self.logdir, self.packtemplate + self.logext), keeplogs)
         for dict in archivers:
-            self.purge(os.path.join(snapdir, dict["name"], self.packtemplate +
-                                    "." + dict["dir"]["ext"]))
-            self.purge(os.path.join(snapdir, dict["name"], self.packtemplate +
-                                    self.diffext + "." + dict["file"]["ext"]))
+            self.purge(os.path.join(
+                snapdir, dict["name"], self.packtemplate +
+                "." + dict["dir"]["ext"]), keepsnapshots)
+            self.purge(os.path.join(
+                snapdir, dict["name"], self.packtemplate + self.diffext +
+                "." + dict["file"]["ext"]), keepdiffs)
 
     def purgetransient(self):
         self.dirstack.pushdir(snapdir)
