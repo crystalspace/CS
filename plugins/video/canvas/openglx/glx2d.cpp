@@ -342,13 +342,16 @@ bool csGraphics2DGLX::CreateVisuals ()
       
     int bit;
     // Fun hack, xvis doesn't provide alpha mask
-    bit=0; while (bit < alpha_bits) pfmt.AlphaMask |= (1<<++bit);
+    bit=0; while (bit < alpha_bits) pfmt.AlphaMask |= (1<<(bit++));
     pfmt.AlphaMask = pfmt.AlphaMask << color_bits;
 
     bit=0; while (!(pfmt.RedMask & (1<<bit))) bit++; pfmt.RedShift = bit;
     bit=0; while (!(pfmt.GreenMask & (1<<bit))) bit++; pfmt.GreenShift = bit;
     bit=0; while (!(pfmt.BlueMask & (1<<bit))) bit++; pfmt.BlueShift = bit;
-    bit=0; while (!(pfmt.AlphaMask & (1<<bit))) bit++; pfmt.AlphaShift = bit;
+    if (pfmt.AlphaMask)
+    {
+      bit=0; while (!(pfmt.AlphaMask & (1<<bit))) bit++; pfmt.AlphaShift = bit;
+    }
   }
 
   // Report Info

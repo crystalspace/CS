@@ -41,6 +41,7 @@ chronological order.
 	  reduction.
 	- Jorrit fixed genmesh so that it honors the SetColor() call
 	  again.
+	- Squee fixed the glx canvas locking up under certain alpha conditions.
 13-Oct-2004
 	- Jorrit removed the triangle connectivity information in
 	  the csTriangleVerticesCost class since they were not used there.
