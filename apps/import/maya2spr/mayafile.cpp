@@ -182,7 +182,7 @@ bool MayaInputFile::GetToken(csString& tok)
     tok = "";
     while (!stop)
     {
-        word = ReadWord("_-./\"",FALSE);    // . and " are allowed within the word
+        word = ReadWord("_-./\"", false);    // . and " are allowed within the word
         if (!word.Length())
             break;
 
