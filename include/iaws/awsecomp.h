@@ -432,13 +432,11 @@ class awsEmbeddedComponentFactory : public iAwsComponentFactory
     awsEmbeddedComponentFactory(iAws *_wmgr)
     {
       wmgr=_wmgr;
-      if (wmgr) wmgr->IncRef();
     }
 
     /// Does nothing
     virtual ~awsEmbeddedComponentFactory()
     {
-      if (wmgr) wmgr->DecRef();
     }
 
     /// Returns the current window manager
