@@ -875,7 +875,6 @@ static iBase* load_thing_part (ThingLoadInfo& info, iMeshWrapper* imeshwrap,
     CS_TOKEN_TABLE (FACTORY)
   CS_TOKEN_TABLE_END
 
-  char* name;
   char* xname;
   long cmd;
   char* params;
@@ -1004,7 +1003,7 @@ static iBase* load_thing_part (ThingLoadInfo& info, iMeshWrapper* imeshwrap,
         break;
       case CS_TOKEN_SKYDOME:
       //@@@
-        //skydome_process (*thing, name, params, info.default_material,
+        //skydome_process (*thing, xname, params, info.default_material,
 	    //vt_offset);
         break;
       case CS_TOKEN_VERTEX:
@@ -1060,7 +1059,7 @@ static iBase* load_thing_part (ThingLoadInfo& info, iMeshWrapper* imeshwrap,
         break;
       case CS_TOKEN_POLYGON:
         {
-	  iPolygon3D* poly3d = load_poly3d (engine, name, params,
+	  iPolygon3D* poly3d = load_poly3d (engine, xname, params,
             info.default_material, info.default_texlen,
 	    thing_state, vt_offset);
 	  if (!poly3d) return NULL;
@@ -1071,7 +1070,7 @@ static iBase* load_thing_part (ThingLoadInfo& info, iMeshWrapper* imeshwrap,
         {
 #if 0
 //@@@
-          csCurveTemplate* ct = load_beziertemplate (name, params,
+          csCurveTemplate* ct = load_beziertemplate (xname, params,
 	      info.default_material, info.default_texlen,
 	      thing->GetCurveVertices ());
 	  Engine->curve_templates.Push (ct);
