@@ -44,6 +44,9 @@ chronological order.
 	- Eric Sunshine fixed javapre.i and javapost.i so that they work
 	  correctly in the presence of the CS_MICRO_SWIG and CS_MINI_SWIG
 	  macros.
+	- Vincent Knecht changed %doc to %docdir in cs.spec so documentation is
+	  installed only once by rpm file. Also changed %prefix to /usr instead
+	  of /usr/local/crystal.
 8-Feb-2004
 	- Eric Sunshine corrected Reed Hedges' changes to evdefs.h so that they
 	  are correct for plain-C compilers.  This file is processed by non-C++

@@ -1,8 +1,7 @@
 %define name    crystalspace
-%define version 20040208
-%define release 1
-%define prefix	/usr/local/crystal
-
+%define version 20040209
+%define release 3
+%define prefix	/usr
 Group: Applications/Development
 Source: cs-current-snapshot.tar.bz2
 BuildRoot: %{_tmppath}/%{name}-%{version}-root
@@ -60,7 +59,7 @@ rm -rf "$RPM_BUILD_ROOT"
 #---------------------DOC-------------------------
 %files -n %{name}-doc
 %defattr(-,root,root)
-%doc docs
+%docdir docs
 %{prefix}/share/doc/crystal/README.html
 %{prefix}/share/doc/crystal/html/manual/*.html
 %{prefix}/share/doc/crystal/html/manual/build/platform/win32/cygwin/*.jpg
@@ -110,6 +109,10 @@ rm -rf "$RPM_BUILD_ROOT"
 %{prefix}/include/igraphic/*.h
 
 %changelog
+* Mon Feb 9 2004 Vincent Knecht <vknecht@users.sourceforge.net> 20040209-3
+- Using /usr for %{prefix}
+- Fixed bogus doc package by using %docdir instead of %doc
+
 * Fri Feb 7 2004 Vincent Knecht <vknecht@users.sourceforge.net> 20040207-1
 - using jam to build and install
 - Update %files section according to latest cvs snapshot
