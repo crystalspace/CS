@@ -403,6 +403,10 @@ const char* TiXmlElement::Parse( TiDocument* document, const char* p )
 
 const char* TiXmlElement::ReadValue( TiDocument* document, const char* p )
 {
+  // Remember original location in stream because text and CDATA nodes decide
+  // themselves if leading whitespace should be stripped.
+  char const* orig_p = p;
+
   // Read in text and elements in any order.
   p = SkipWhiteSpace( p );
   while ( p && *p )
@@ -418,7 +422,7 @@ const char* TiXmlElement::ReadValue( TiDocument* document, const char* p )
             return 0;
       }
 
-      p = textNode->Parse( document, p );
+      p = textNode->Parse( document, orig_p );
 
       if ( !textNode->Blank() )
         LinkEndChild( textNode );
@@ -435,7 +439,7 @@ const char* TiXmlElement::ReadValue( TiDocument* document, const char* p )
             return 0;
       }
 
-      p = cdataNode->Parse( document, p );
+      p = cdataNode->Parse( document, orig_p );
 
       if ( !cdataNode->Blank() )
         LinkEndChild( cdataNode );

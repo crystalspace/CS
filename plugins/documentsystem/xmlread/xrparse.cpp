@@ -387,6 +387,10 @@ char* TrXmlElement::Parse( TrDocument* document, char* p )
 
 char* TrXmlElement::ReadValue( TrDocument* document, char* p )
 {
+  // Remember original location in stream because text and CDATA nodes decide
+  // themselves if leading whitespace should be stripped.
+  char* orig_p = p;
+
   // Read in text and elements in any order.
   p = SkipWhiteSpace( p );
   bool first_text = false;
@@ -395,36 +399,26 @@ char* TrXmlElement::ReadValue( TrDocument* document, char* p )
   {
     if ( *p != '<' )
     {
-      // First skip some spaces to see if this can really be
-      // a text element.
-      char* ps = SkipWhiteSpace (p);
-      if (*ps != '<')
+      // If we are parsing the first child we use an optimization
+      // to store the text in this node instead of a child.
+      if (lastChild == 0 && !first_text)
       {
-        // If we are parsing the first child we use an optimization
-	// to store the text in this node instead of a child.
-	if (lastChild == 0 && !first_text)
+	first_text = true;
+	const char* end = "<";
+	p = ReadText( orig_p, contentsvalue, contentsvalue_len, true, end);
+	if ( p ) p--;
+      }
+      else
+      {
+	// Take what we have, make a text element.
+	TrXmlText* textNode = document->blk_text.Alloc ();
+	if ( !textNode )
 	{
-	  first_text = true;
-	  const char* end = "<";
-	  p = ps;
-	  p = ReadText( p, contentsvalue, contentsvalue_len, true, end);
-	  if ( p ) p--;
+	  document->SetError( TIXML_ERROR_OUT_OF_MEMORY );
+	  return 0;
 	}
-	else
-	{
-          // Take what we have, make a text element.
-          TrXmlText* textNode = document->blk_text.Alloc ();
-          if ( !textNode )
-          {
-            document->SetError( TIXML_ERROR_OUT_OF_MEMORY );
-            return 0;
-          }
-
-	  p = ps;
-          p = textNode->Parse( document, p );
-
-          lastChild = LinkEndChild( lastChild, textNode );
-        }
+	p = textNode->Parse( document, orig_p );
+	lastChild = LinkEndChild( lastChild, textNode );
       }
     } 
     else if ( StringEqual(p, "<![CDATA[") )
@@ -437,7 +431,7 @@ char* TrXmlElement::ReadValue( TrDocument* document, char* p )
         return 0;
       }
 
-      p = cdataNode->Parse( document, p );
+      p = cdataNode->Parse( document, orig_p );
 
       if ( !cdataNode->Blank() )
         lastChild = LinkEndChild( lastChild, cdataNode );

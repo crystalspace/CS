@@ -7,17 +7,21 @@ individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
 29-Mar-2005
-	- Jorrit disabled the new clearWithBox rule in gldrivers.xml
+	- Jorrit disabled the new `clearWithBox' rule in gldrivers.xml
 	  because it breaks screen clearing on his nVidia card. If this is
 	  to be enabled again then I propose it is enabled ONLY on cards
 	  that are known to give this problem. Not on all nVidia cards.
-	- res fixed an uninit member in csSimpleRenderMesh.
+	- res fixed an uninitialized member in csSimpleRenderMesh.
 	- res fixed a stupid condition reversion in cssynldr.
 	- res fixed a 0 string passed to iFont->GetDimensions() by bugplug.
 	- res fixed a syntax error in reflect.xml.
 	- Marten made some general cleanup.
-	- Marten fixed DrawSimpleMesh after yesterdays changes.
+	- Marten fixed DrawSimpleMesh() after yesterday's changes.
 	- Marten fixed the approximate mesh z-sorting.
+	- Eric Sunshine fixed bugs in TiXmlElement::ReavValue() and
+	  TrXmlElement::ReadValue() where they unconditionally stripped leading
+	  whitepsace from text and cdata nodes even if the client asked for
+	  whitespace to be preserved.
 28-Mar-2005
 	- Marten changed how transforms are sent from meshobjects to the
 	  renderer.
