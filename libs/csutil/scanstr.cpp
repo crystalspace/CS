@@ -22,7 +22,7 @@
 #include "sysdef.h"
 #include "csutil/scanstr.h"
 
-int ScanStr (const char* in, char* format, ...)
+int ScanStr (const char* in, const char* format, ...)
 {
   va_list arg;
   va_start (arg, format);
