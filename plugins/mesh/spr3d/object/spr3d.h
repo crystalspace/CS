@@ -378,6 +378,8 @@ private:
 
   /// If true then this factory has been initialized.
   bool initialized;
+  long shapenr;
+  csRefArray<iObjectModelListener> listeners;
 
   void GenerateCacheName ();
   const char* GetCacheName ();
@@ -620,6 +622,12 @@ public:
   /// Default LOD level for this factory.
   float GetLodLevel () const { return lod_level; }
 
+  void GetObjectBoundingBox (csBox3& bbox, int type = CS_BBOX_NORMAL);
+  void GetRadius (csVector3& rad, csVector3 &cent);
+  void FireListeners ();
+  void AddListener (iObjectModelListener* listener);
+  void RemoveListener (iObjectModelListener* listener);
+
   //------------------------ iMeshObjectFactory implementation --------------
   SCF_DECLARE_IBASE;
 
@@ -628,6 +636,76 @@ public:
   virtual bool SupportsHardTransform () const { return true; }
   virtual void SetLogicalParent (iBase* lp) { logparent = lp; }
   virtual iBase* GetLogicalParent () const { return logparent; }
+
+  //------------------ iPolygonMesh interface implementation ----------------//
+  struct PolyMesh : public iPolygonMesh
+  {
+    SCF_DECLARE_EMBEDDED_IBASE (csSprite3DMeshObjectFactory);
+
+    /// Get the number of vertices for this mesh.
+    virtual int GetVertexCount ()
+    {
+      return scfParent->GetVertexCount ();
+    }
+    /// Get the pointer to the array of vertices.
+    virtual csVector3* GetVertices ()
+    {
+      return scfParent->GetVertices (0);
+    }
+    /// Get the number of polygons for this mesh.
+    virtual int GetPolygonCount ()
+    {
+      return scfParent->GetTriangleCount ();
+    }
+
+    /// Get the pointer to the array of polygons.
+    virtual csMeshedPolygon* GetPolygons ();
+
+    /// Cleanup.
+    virtual void Cleanup () { delete[] polygons; polygons = NULL; }
+    
+    virtual bool IsDeformable () const { return false;  }
+    virtual uint32 GetChangeNumber() const { return 0; }
+
+    PolyMesh () : polygons (NULL) { }
+    virtual ~PolyMesh () { Cleanup (); }
+
+    csMeshedPolygon* polygons;
+  } scfiPolygonMesh;
+  friend struct PolyMesh;
+
+  //------------------------- iObjectModel implementation ----------------
+  class ObjectModel : public iObjectModel
+  {
+    SCF_DECLARE_EMBEDDED_IBASE (csSprite3DMeshObjectFactory);
+    virtual long GetShapeNumber () const { return scfParent->shapenr; }
+    virtual iPolygonMesh* GetPolygonMeshColldet ()
+    {
+      return &(scfParent->scfiPolygonMesh);
+    }
+    virtual iPolygonMesh* GetPolygonMeshViscull () { return NULL; }
+    virtual csPtr<iPolygonMesh> CreateLowerDetailPolygonMesh (float)
+    { return NULL; }
+    virtual void GetObjectBoundingBox (csBox3& bbox, int type = CS_BBOX_NORMAL)
+    {
+      scfParent->GetObjectBoundingBox (bbox, type);
+    }
+    virtual void GetRadius (csVector3& rad, csVector3& cent)
+    {
+      scfParent->GetRadius (rad, cent);
+    }
+    virtual void AddListener (iObjectModelListener* listener)
+    {
+      scfParent->AddListener (listener);
+    }
+    virtual void RemoveListener (iObjectModelListener* listener)
+    {
+      scfParent->RemoveListener (listener);
+    }
+  } scfiObjectModel;
+  friend class ObjectModel;
+
+  virtual iObjectModel* GetObjectModel () { return &scfiObjectModel; }
 
   //--------------------- iSprite3DFactoryState implementation -------------//
   struct Sprite3DFactoryState : public iSprite3DFactoryState
@@ -1190,7 +1268,6 @@ private:
 
   iMeshObjectDrawCallback* vis_cb;
   long shapenr;
-  csRefArray<iObjectModelListener> listeners;
 
   /**
    * Camera space bounding box is cached here.
@@ -1491,9 +1568,6 @@ public:
 
   void GetObjectBoundingBox (csBox3& bbox, int type = CS_BBOX_NORMAL);
   void GetRadius (csVector3& rad, csVector3 &cent);
-  void FireListeners ();
-  void AddListener (iObjectModelListener* listener);
-  void RemoveListener (iObjectModelListener* listener);
 
   /// Create and add a new socket to the sprite.
   csSpriteSocket* AddSocket ();
@@ -1587,38 +1661,8 @@ public:
   } scfiPolygonMesh;
   friend struct PolyMesh;
 
-  //------------------------- iObjectModel implementation ----------------
-  class ObjectModel : public iObjectModel
-  {
-    SCF_DECLARE_EMBEDDED_IBASE (csSprite3DMeshObject);
-    virtual long GetShapeNumber () const { return scfParent->shapenr; }
-    virtual iPolygonMesh* GetPolygonMeshColldet ()
-    {
-      return &(scfParent->scfiPolygonMesh);
-    }
-    virtual iPolygonMesh* GetPolygonMeshViscull () { return NULL; }
-    virtual csPtr<iPolygonMesh> CreateLowerDetailPolygonMesh (float)
-    { return NULL; }
-    virtual void GetObjectBoundingBox (csBox3& bbox, int type = CS_BBOX_NORMAL)
-    {
-      scfParent->GetObjectBoundingBox (bbox, type);
-    }
-    virtual void GetRadius (csVector3& rad, csVector3& cent)
-    {
-      scfParent->GetRadius (rad, cent);
-    }
-    virtual void AddListener (iObjectModelListener* listener)
-    {
-      scfParent->AddListener (listener);
-    }
-    virtual void RemoveListener (iObjectModelListener* listener)
-    {
-      scfParent->RemoveListener (listener);
-    }
-  } scfiObjectModel;
-  friend class ObjectModel;
+  virtual iObjectModel* GetObjectModel () { return factory->GetObjectModel (); }
 
-  virtual iObjectModel* GetObjectModel () { return &scfiObjectModel; }
   virtual bool SetColor (const csColor& col)
   {
     SetBaseColor (col);

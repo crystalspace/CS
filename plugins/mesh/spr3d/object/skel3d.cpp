@@ -133,6 +133,53 @@ void csSkelLimb::ComputeBoundingBox (csPoly3D* source)
   }
 }
 
+void csSkelLimb::ComputeBoundingBox (const csTransform& tr,
+	csBox3& box, csPoly3D* source)
+{
+  if (num_vertices)
+  {
+    if (num_vertices < 10)
+    {
+      // This is an optimization. If a limb has less than 8 vertices
+      // then it is more optimal to compute the transformed bounding
+      // box based on vertices than on the precalculated limb bounding
+      // box. Not even is it more efficient, it is also more accurate
+      // (i.e. bounding box will be closer to reality). For this gain
+      // of accuracy we will also use this technique if a limb
+      // has slightly more than 8 vertices.
+      int i;
+      for (i = 0 ; i < num_vertices ; i++)
+      {
+        const csVector3& v = (*source)[vertices[i]];
+        box.AddBoundingVertex (tr * v);
+      }
+    }
+    else
+    {
+      // The number of vertices in this limb is big enough so that
+      // it is better (though less accurate) to just use the bounding
+      // box.
+      csBox3 b;
+      GetBoundingBox (b);
+      box.AddBoundingVertex (tr * b.GetCorner (0));
+      box.AddBoundingVertexSmart (tr * b.GetCorner (1));
+      box.AddBoundingVertexSmart (tr * b.GetCorner (2));
+      box.AddBoundingVertexSmart (tr * b.GetCorner (3));
+      box.AddBoundingVertexSmart (tr * b.GetCorner (4));
+      box.AddBoundingVertexSmart (tr * b.GetCorner (5));
+      box.AddBoundingVertexSmart (tr * b.GetCorner (6));
+      box.AddBoundingVertexSmart (tr * b.GetCorner (7));
+    }
+  }
+
+  csSkelLimb* c = children;
+  while (c)
+  {
+    c->ComputeBoundingBox (tr, box, source);
+    c = c->GetNext ();
+  }
+}
+
 void csSkelLimb::SetName (const char *newname)
 {
   delete[] name;

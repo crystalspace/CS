@@ -339,6 +339,7 @@ public:
   virtual bool SupportsHardTransform () const { return false; }
   virtual void SetLogicalParent (iBase* lp) { logparent = lp; }
   virtual iBase* GetLogicalParent () const { return logparent; }
+  virtual iObjectModel* GetObjectModel () { return NULL; }
 
   //---------------------- iSprite2DFactoryState implementation ----------------
   class Sprite2DFactoryState : public iSprite2DFactoryState

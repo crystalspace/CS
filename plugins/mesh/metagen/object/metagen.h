@@ -252,6 +252,7 @@ public:
   virtual bool SupportsHardTransform() const { return true; }
   virtual void SetLogicalParent (iBase* lp) { logparent = lp; }
   virtual iBase* GetLogicalParent () const { return logparent; }
+  virtual iObjectModel* GetObjectModel () { return NULL; }
   virtual bool IsLighting() { return do_lighting; }
   virtual void SetLighting( bool set ) { do_lighting = set; }
 

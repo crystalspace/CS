@@ -31,6 +31,7 @@ struct iCollider;
 struct iObject;
 struct iEngine;
 struct iRegion;
+struct iMeshWrapper;
 
 SCF_VERSION (csColliderWrapper, 0, 0, 3);
 
@@ -56,6 +57,10 @@ public:
   /// Create a collider based on a mesh.
   csColliderWrapper (iObject* parent, iCollideSystem* collide_system,
   	iPolygonMesh* mesh);
+
+  /// Create a collider based on a collider.
+  csColliderWrapper (iObject* parent, iCollideSystem* collide_system,
+  	iCollider* collider);
 
   /// Destroy the plugin collider object
   virtual ~csColliderWrapper ();
@@ -114,12 +119,22 @@ class csColliderHelper
 {
 public:
   /**
+   * Initialize collision detection for a single object. This function will
+   * first check if the parent factory has a collider. If so it will use
+   * that for the object too. Otherwise it will create a new collider
+   * and attaches it to the object. The new collider will also be attached
+   * to the parent factory if it supports iObjectModel.
+   * <p>
+   * This function will also initialize colliders for the children of the
+   * mesh.
+   */
+  static void InitializeCollisionWrapper (iCollideSystem* colsys,
+  	iMeshWrapper* mesh);
+
+  /**
    * Initialize collision detection (i.e. create csColliderWrapper) for
    * all objects in the engine. If the optional region is given only
-   * the objects from that region will be initialized. This function will
-   * create csColliderWrapper objects for all mesh objects that don't
-   * already have one. It will check both the factory and mesh object
-   * for an iPolygonMesh that it can use.
+   * the objects from that region will be initialized.
    */
   static void InitializeCollisionWrappers (iCollideSystem* colsys,
   	iEngine* engine, iRegion* region = NULL);

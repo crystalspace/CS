@@ -201,6 +201,8 @@ SCF_IMPLEMENT_IBASE (csSprite3DMeshObjectFactory)
   SCF_IMPLEMENTS_INTERFACE (iMeshObjectFactory)
   SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iSprite3DFactoryState)
   SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iLODControl)
+  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iObjectModel)
+  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iPolygonMesh)
 SCF_IMPLEMENT_IBASE_END
 
 SCF_IMPLEMENT_EMBEDDED_IBASE (csSprite3DMeshObjectFactory::Sprite3DFactoryState)
@@ -209,6 +211,14 @@ SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 SCF_IMPLEMENT_EMBEDDED_IBASE (csSprite3DMeshObjectFactory::LODControl)
   SCF_IMPLEMENTS_INTERFACE (iLODControl)
+SCF_IMPLEMENT_EMBEDDED_IBASE_END
+
+SCF_IMPLEMENT_EMBEDDED_IBASE (csSprite3DMeshObjectFactory::ObjectModel)
+  SCF_IMPLEMENTS_INTERFACE (iObjectModel)
+SCF_IMPLEMENT_EMBEDDED_IBASE_END
+
+SCF_IMPLEMENT_EMBEDDED_IBASE (csSprite3DMeshObjectFactory::PolyMesh)
+  SCF_IMPLEMENTS_INTERFACE (iPolygonMesh)
 SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 void csSprite3DMeshObjectFactory::Report (int severity, const char* msg, ...)
@@ -232,6 +242,8 @@ csSprite3DMeshObjectFactory::csSprite3DMeshObjectFactory (iBase *pParent) :
   SCF_CONSTRUCT_IBASE (pParent);
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiSprite3DFactoryState);
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiLODControl);
+  SCF_CONSTRUCT_EMBEDDED_IBASE (scfiObjectModel);
+  SCF_CONSTRUCT_EMBEDDED_IBASE (scfiPolygonMesh);
   logparent = NULL;
   cstxt = NULL;
   emerge_from = NULL;
@@ -251,6 +263,7 @@ csSprite3DMeshObjectFactory::csSprite3DMeshObjectFactory (iBase *pParent) :
   current_features = ALL_LOD_FEATURES;
 
   initialized = false;
+  shapenr = 0;
 }
 
 csSprite3DMeshObjectFactory::~csSprite3DMeshObjectFactory ()
@@ -848,12 +861,72 @@ iSkeleton* csSprite3DMeshObjectFactory::Sprite3DFactoryState::GetSkeleton ()
   return iskel;	// DecRef is ok here.
 }
 
+void csSprite3DMeshObjectFactory::FireListeners ()
+{
+  int i;
+  for (i = 0 ; i < listeners.Length () ; i++)
+    listeners[i]->ObjectModelChanged (&scfiObjectModel);
+}
+
+void csSprite3DMeshObjectFactory::AddListener (iObjectModelListener *listener)
+{
+  RemoveListener (listener);
+  listeners.Push (listener);
+}
+
+void csSprite3DMeshObjectFactory::RemoveListener (
+	iObjectModelListener *listener)
+{
+  int idx = listeners.Find (listener);
+  if (idx == -1) return ;
+  listeners.Delete (idx);
+}
+
+void csSprite3DMeshObjectFactory::GetObjectBoundingBox (csBox3& b, int /*type*/)
+{
+  if (skeleton)
+  {
+    skeleton->ComputeBoundingBox (csTransform (), b, vertices.Get (0));
+  }
+  else
+  {
+    csSpriteFrame* cframe = GetAction (0)->GetCsFrame (0);
+    cframe->GetBoundingBox (b);
+  }
+}
+
+void csSprite3DMeshObjectFactory::GetRadius (csVector3& rad, csVector3& cent)
+{
+  csVector3 r; csBox3 bbox;
+  GetObjectBoundingBox (bbox);
+  cent = bbox.GetCenter();
+
+  csSpriteFrame* cframe = GetAction (0)->GetCsFrame (0);
+  cframe->GetRadius (r);
+  rad =  r;
+}
+
+csMeshedPolygon* csSprite3DMeshObjectFactory::PolyMesh::GetPolygons ()
+{
+  if (!polygons)
+  {
+    csTriangle* triangles = scfParent->GetTriangles ();
+    polygons = new csMeshedPolygon [GetPolygonCount ()];
+    int i;
+    for (i = 0 ; i < GetPolygonCount () ; i++)
+    {
+      polygons[i].num_vertices = 3;
+      polygons[i].vertices = &triangles[i].a;
+    }
+  }
+  return polygons;
+}
+
 //=============================================================================
 
 SCF_IMPLEMENT_IBASE (csSprite3DMeshObject)
   SCF_IMPLEMENTS_INTERFACE (iMeshObject)
   SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iSprite3DState)
-  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iObjectModel)
   SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iPolygonMesh)
   SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iVertexBufferManagerClient)
   SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iLODControl)
@@ -861,10 +934,6 @@ SCF_IMPLEMENT_IBASE_END
 
 SCF_IMPLEMENT_EMBEDDED_IBASE (csSprite3DMeshObject::Sprite3DState)
   SCF_IMPLEMENTS_INTERFACE (iSprite3DState)
-SCF_IMPLEMENT_EMBEDDED_IBASE_END
-
-SCF_IMPLEMENT_EMBEDDED_IBASE (csSprite3DMeshObject::ObjectModel)
-  SCF_IMPLEMENTS_INTERFACE (iObjectModel)
 SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 SCF_IMPLEMENT_EMBEDDED_IBASE (csSprite3DMeshObject::PolyMesh)
@@ -904,7 +973,6 @@ spr3d_tween_verts *tween_verts = NULL;
 csSprite3DMeshObject::csSprite3DMeshObject ()
 {
   SCF_CONSTRUCT_IBASE (NULL);
-  SCF_CONSTRUCT_EMBEDDED_IBASE (scfiObjectModel);
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiPolygonMesh);
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiSprite3DState);
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiVertexBufferManagerClient);
@@ -1226,26 +1294,6 @@ void csSprite3DMeshObject::SetupObject ()
     initialized = true;
     InitSprite ();
   }
-}
-
-void csSprite3DMeshObject::FireListeners ()
-{
-  int i;
-  for (i = 0 ; i < listeners.Length () ; i++)
-    listeners[i]->ObjectModelChanged (&scfiObjectModel);
-}
-
-void csSprite3DMeshObject::AddListener (iObjectModelListener *listener)
-{
-  RemoveListener (listener);
-  listeners.Push (listener);
-}
-
-void csSprite3DMeshObject::RemoveListener (iObjectModelListener *listener)
-{
-  int idx = listeners.Find (listener);
-  if (idx == -1) return ;
-  listeners.Delete (idx);
 }
 
 csSpriteSocket* csSprite3DMeshObject::AddSocket ()

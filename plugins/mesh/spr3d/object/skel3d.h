@@ -108,6 +108,12 @@ public:
    */
   void ComputeBoundingBox (csPoly3D* source);
 
+  /**
+   * Calculate the real combined bounding box for the given state.
+   */
+  virtual void ComputeBoundingBox (const csTransform& tr, csBox3& box,
+  	csPoly3D* source);
+
   /// Set the name for this limb.
   virtual void SetName (const char* name);
   /// Get the name for this limb.

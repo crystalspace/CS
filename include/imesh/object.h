@@ -178,6 +178,8 @@ struct iMeshObject : public iBase
 
   /**
    * Get the generic interface describing the geometry of this mesh.
+   * If the factory supports this you should preferably use the object
+   * model from the factory instead.
    */
   virtual iObjectModel* GetObjectModel () = 0;
 
@@ -206,7 +208,7 @@ struct iMeshObject : public iBase
   virtual iMaterialWrapper* GetMaterialWrapper () const = 0;
 };
 
-SCF_VERSION (iMeshObjectFactory, 0, 0, 5);
+SCF_VERSION (iMeshObjectFactory, 0, 0, 6);
 
 /**
  * This object is a factory which can generate
@@ -255,6 +257,16 @@ struct iMeshObjectFactory : public iBase
    * for more information.
    */
   virtual iBase* GetLogicalParent () const = 0;
+
+  /**
+   * Get the generic interface describing the geometry of this mesh factory.
+   * It is possible that this will return NULL if the factory itself doesn't
+   * support the geometry. In that case you need to get the object model
+   * from the individual instance instead. Note that for collision detection
+   * and other parts of CS it is prefered to use the factory object model
+   * when available as that reduces the amount of redundant memory usage.
+   */
+  virtual iObjectModel* GetObjectModel () = 0;
 };
 
 SCF_VERSION (iMeshObjectType, 0, 0, 2);

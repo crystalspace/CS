@@ -248,6 +248,7 @@ class           StuffFactory:public iMeshObjectFactory
     virtual ~ StuffFactory();
     virtual bool    Initialize(iObjectRegistry * iO_R);
     virtual         csPtr < iMeshObject > NewInstance();
+    virtual iObjectModel* GetObjectModel () { return NULL; }
 
     virtual void    HardTransform(const csReversibleTransform &);
     virtual bool    SupportsHardTransform() const;

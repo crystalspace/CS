@@ -36,6 +36,19 @@ The history order is reversed so that new features are at the top.
 	  rather than a single file.  We can remove this hack once
 	  LinkApplication for MacOS/X is updated so that Jam has full knowledge
 	  of the generated .app wrapper.
+	- Added csColliderHelper::InitializeCollisionWrapper() which initializes
+	  collision detection for a mesh and all children.
+	- Added iMeshObjectFactory->GetObjectModel(). This is an optional
+	  method which factories can implement similar to the GetObjectModel()
+	  in iMeshObject. If the factory contains the geometry for a model
+	  then it is prefered that the factory has the object model. This
+	  allows for better sharing of similar data between instances using
+	  the same factory.
+	- Genmesh now implements GetObjectModel() in the factory.
+	- Spr3d now implements GetObjectModel() in the factory.
+	- InitializeCollisionWrapper() will now actually check if the parent
+	  factory supports GetObjectModel() and if so it will share the
+	  collider.
 13-Apr-2003
 	- Wouter fixed mikmod sound loader, delete[]/realloc mismatch.
 	- Matze cleaned some jamrules.

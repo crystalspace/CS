@@ -61,7 +61,6 @@ SCF_IMPLEMENT_IBASE (csGenmeshMeshObject)
 #ifdef CS_USE_NEW_RENDERER
   SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iStreamSource)
 #endif
-  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iObjectModel)
   SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iShadowCaster)
   SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iShadowReceiver)
   SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iPolygonMesh)
@@ -74,10 +73,6 @@ SCF_IMPLEMENT_EMBEDDED_IBASE (csGenmeshMeshObject::StreamSource)
   SCF_IMPLEMENTS_INTERFACE (iStreamSource) 
 SCF_IMPLEMENT_EMBEDDED_IBASE_END
 #endif
-
-SCF_IMPLEMENT_EMBEDDED_IBASE (csGenmeshMeshObject::ObjectModel)
-  SCF_IMPLEMENTS_INTERFACE (iObjectModel)
-SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 SCF_IMPLEMENT_EMBEDDED_IBASE (csGenmeshMeshObject::ShadowCaster)
   SCF_IMPLEMENTS_INTERFACE (iShadowCaster)
@@ -107,7 +102,7 @@ csGenmeshMeshObject::csGenmeshMeshObject (csGenmeshMeshObjectFactory* factory)
 #ifdef CS_USE_NEW_RENDERER
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiStreamSource);
 #endif
-  SCF_CONSTRUCT_EMBEDDED_IBASE (scfiObjectModel);
+  //SCF_CONSTRUCT_EMBEDDED_IBASE (scfiObjectModel);
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiPolygonMesh);
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiGeneralMeshState);
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiShadowCaster);
@@ -428,26 +423,6 @@ void csGenmeshMeshObject::SetupObject ()
       lit_mesh_colors = new csColor [num_lit_mesh_colors];
     }
   }
-}
-
-void csGenmeshMeshObject::FireListeners ()
-{
-  int i;
-  for (i = 0 ; i < listeners.Length () ; i++)
-    listeners[i]->ObjectModelChanged (&scfiObjectModel);
-}
-
-void csGenmeshMeshObject::AddListener (iObjectModelListener *listener)
-{
-  RemoveListener (listener);
-  listeners.Push (listener);
-}
-
-void csGenmeshMeshObject::RemoveListener (iObjectModelListener *listener)
-{
-  int idx = listeners.Find (listener);
-  if (idx == -1) return ;
-  listeners.Delete (idx);
 }
 
 bool csGenmeshMeshObject::DrawTest (iRenderView* rview, iMovable* movable)
@@ -1193,13 +1168,19 @@ void csGenmeshMeshObject::HardTransform (const csReversibleTransform& t)
   delete hard_bbox;
   hard_bbox = NULL;
   shapenr++;
-  FireListeners ();
+}
+
+iObjectModel* csGenmeshMeshObject::GetObjectModel ()
+{
+  return factory->GetObjectModel ();
 }
 
 //----------------------------------------------------------------------
 
 SCF_IMPLEMENT_IBASE (csGenmeshMeshObjectFactory)
   SCF_IMPLEMENTS_INTERFACE (iMeshObjectFactory)
+  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iObjectModel)
+  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iPolygonMesh)
 #ifdef CS_USE_NEW_RENDERER
   SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iStreamSource)
 #endif
@@ -1219,6 +1200,14 @@ SCF_IMPLEMENT_EMBEDDED_IBASE (csGenmeshMeshObjectFactory::GeneralFactoryState)
   SCF_IMPLEMENTS_INTERFACE (iGeneralFactoryState)
 SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
+SCF_IMPLEMENT_EMBEDDED_IBASE (csGenmeshMeshObjectFactory::ObjectModel)
+  SCF_IMPLEMENTS_INTERFACE (iObjectModel)
+SCF_IMPLEMENT_EMBEDDED_IBASE_END
+
+SCF_IMPLEMENT_EMBEDDED_IBASE (csGenmeshMeshObjectFactory::PolyMesh)
+  SCF_IMPLEMENTS_INTERFACE (iPolygonMesh)
+SCF_IMPLEMENT_EMBEDDED_IBASE_END
+
 #ifndef CS_USE_NEW_RENDERER
 SCF_IMPLEMENT_EMBEDDED_IBASE (csGenmeshMeshObjectFactory::
 	eiVertexBufferManagerClient)
@@ -1234,12 +1223,15 @@ csGenmeshMeshObjectFactory::csGenmeshMeshObjectFactory (iBase *pParent,
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiStreamSource);
 #endif
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiGeneralFactoryState);
+  SCF_CONSTRUCT_EMBEDDED_IBASE (scfiObjectModel);
+  SCF_CONSTRUCT_EMBEDDED_IBASE (scfiPolygonMesh);
 #ifndef CS_USE_NEW_RENDERER 
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiVertexBufferManagerClient);
 #endif
   csGenmeshMeshObjectFactory::object_reg = object_reg;
   logparent = NULL;
   initialized = false;
+  shapenr = 0;
   object_bbox_valid = false;
   mesh_tri_normals = NULL;
 #ifndef CS_USE_NEW_RENDERER
@@ -1841,13 +1833,15 @@ void csGenmeshMeshObjectFactory::SetVertexCount (int n)
 #ifndef CS_USE_NEW_RENDERER
   top_mesh.vertex_fog = new G3DFogInfo [num_mesh_vertices];
 #endif
+
+  shapenr++;
+  FireListeners ();
 }
 
 void csGenmeshMeshObjectFactory::SetTriangleCount (int n)
 {
 #ifndef CS_USE_NEW_RENDERER
   top_mesh.num_triangles = n;
-  initialized = false;
   delete[] top_mesh.triangles;
   top_mesh.triangles = new csTriangle [top_mesh.num_triangles];
 #else
@@ -1855,6 +1849,10 @@ void csGenmeshMeshObjectFactory::SetTriangleCount (int n)
   if (mesh_triangles) delete [] mesh_triangles;
   mesh_triangles = new csTriangle [num_mesh_triangles];
 #endif
+
+  initialized = false;
+  shapenr++;
+  FireListeners ();
 }
 
 struct CompressVertex
@@ -2240,16 +2238,38 @@ void csGenmeshMeshObjectFactory::Invalidate ()
 #endif
 }
 
+int csGenmeshMeshObjectFactory::PolyMesh::GetVertexCount ()
+{
+  return scfParent->GetVertexCount ();
+}
+
+csVector3* csGenmeshMeshObjectFactory::PolyMesh::GetVertices ()
+{
+  return scfParent->GetVertices ();
+}
+
+int csGenmeshMeshObjectFactory::PolyMesh::GetPolygonCount ()
+{
+  return scfParent->GetTriangleCount ();
+}
+
+csMeshedPolygon* csGenmeshMeshObjectFactory::PolyMesh::GetPolygons ()
+{
+  return scfParent->GetPolygons ();
+}
+
 void csGenmeshMeshObjectFactory::HardTransform (
     const csReversibleTransform& t)
 {
   int i;
   for (i = 0 ; i < num_mesh_vertices ; i++)
     mesh_vertices[i] = t.This2Other (mesh_vertices[i]);
-  initialized = false;
 #ifdef CS_USE_NEW_RENDERER
   mesh_vertices_dirty_flag = true;
 #endif  
+  initialized = false;
+  shapenr++;
+  FireListeners ();
 }
 
 csPtr<iMeshObject> csGenmeshMeshObjectFactory::NewInstance ()
@@ -2294,6 +2314,26 @@ csMeshedPolygon* csGenmeshMeshObjectFactory::GetPolygons ()
     }
   }
   return polygons;
+}
+
+void csGenmeshMeshObjectFactory::FireListeners ()
+{
+  int i;
+  for (i = 0 ; i < listeners.Length () ; i++)
+    listeners[i]->ObjectModelChanged (&scfiObjectModel);
+}
+
+void csGenmeshMeshObjectFactory::AddListener (iObjectModelListener *listener)
+{
+  RemoveListener (listener);
+  listeners.Push (listener);
+}
+
+void csGenmeshMeshObjectFactory::RemoveListener (iObjectModelListener *listener)
+{
+  int idx = listeners.Find (listener);
+  if (idx == -1) return ;
+  listeners.Delete (idx);
 }
 
 //----------------------------------------------------------------------

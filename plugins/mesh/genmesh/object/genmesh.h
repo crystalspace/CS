@@ -139,7 +139,6 @@ private:
 
   bool initialized;
   long shapenr;
-  csRefArray<iObjectModelListener> listeners;
 
   /**
    * Camera space bounding box is cached here.
@@ -193,9 +192,6 @@ public:
   bool IsManualColors () const { return do_manual_colors; }
   void GetObjectBoundingBox (csBox3& bbox, int type = CS_BBOX_NORMAL);
   void GetRadius (csVector3& rad, csVector3& cent);
-  void FireListeners ();
-  void AddListener (iObjectModelListener* listener);
-  void RemoveListener (iObjectModelListener* listener);
 
   //----------------------- Shadow and lighting system ----------------------
   char* GenerateCacheName ();
@@ -270,38 +266,8 @@ public:
   } scfiStreamSource;
   friend class StreamSource;
 #endif
-  //------------------------- iObjectModel implementation ----------------
-  class ObjectModel : public iObjectModel
-  {
-    SCF_DECLARE_EMBEDDED_IBASE (csGenmeshMeshObject);
-    virtual long GetShapeNumber () const { return scfParent->shapenr; }
-    virtual iPolygonMesh* GetPolygonMeshColldet ()
-    {
-      return &(scfParent->scfiPolygonMesh);
-    }
-    virtual iPolygonMesh* GetPolygonMeshViscull () { return NULL; }
-    virtual csPtr<iPolygonMesh> CreateLowerDetailPolygonMesh (float)
-    { return NULL; }
-    virtual void GetObjectBoundingBox (csBox3& bbox, int type = CS_BBOX_NORMAL)
-    {
-      scfParent->GetObjectBoundingBox (bbox, type);
-    }
-    virtual void GetRadius (csVector3& rad, csVector3& cent)
-    {
-      scfParent->GetRadius (rad, cent);
-    }
-    virtual void AddListener (iObjectModelListener* listener)
-    {
-      scfParent->AddListener (listener);
-    }
-    virtual void RemoveListener (iObjectModelListener* listener)
-    {
-      scfParent->RemoveListener (listener);
-    }
-  } scfiObjectModel;
-  friend class ObjectModel;
 
-  virtual iObjectModel* GetObjectModel () { return &scfiObjectModel; }
+  virtual iObjectModel* GetObjectModel ();
   virtual bool SetColor (const csColor& col) { color = col; return true; }
   virtual bool GetColor (csColor& col) const { col = color; return true; }
   virtual bool SetMaterialWrapper (iMaterialWrapper* mat)
@@ -498,6 +464,8 @@ private:
   csBox3 object_bbox;
   bool object_bbox_valid;
   bool initialized;
+  long shapenr;
+  csRefArray<iObjectModelListener> listeners;
 
   csMeshedPolygon* polygons;
 
@@ -595,6 +563,10 @@ public:
 #endif
   const csBox3& GetObjectBoundingBox ();
   const csVector3& GetRadius ();
+
+  void FireListeners ();
+  void AddListener (iObjectModelListener* listener);
+  void RemoveListener (iObjectModelListener* listener);
 
   /**
    * Calculate polygons for iPolygonMesh.
@@ -722,6 +694,59 @@ public:
 #endif
   } scfiGeneralFactoryState;
   friend class GeneralFactoryState;
+
+  //------------------ iPolygonMesh interface implementation ----------------//
+  struct PolyMesh : public iPolygonMesh
+  {
+    SCF_DECLARE_EMBEDDED_IBASE (csGenmeshMeshObjectFactory);
+
+    virtual int GetVertexCount ();
+    virtual csVector3* GetVertices ();
+    virtual int GetPolygonCount ();
+    virtual csMeshedPolygon* GetPolygons ();
+    virtual void Cleanup () { }
+    
+    virtual bool IsDeformable () const { return false;  }
+    virtual uint32 GetChangeNumber() const { return 0; }
+
+    PolyMesh () { }
+    virtual ~PolyMesh () { }
+  } scfiPolygonMesh;
+  friend struct PolyMesh;
+
+  //------------------------- iObjectModel implementation ----------------
+  class ObjectModel : public iObjectModel
+  {
+    SCF_DECLARE_EMBEDDED_IBASE (csGenmeshMeshObjectFactory);
+    virtual long GetShapeNumber () const { return scfParent->shapenr; }
+    virtual iPolygonMesh* GetPolygonMeshColldet ()
+    {
+      return &(scfParent->scfiPolygonMesh);
+    }
+    virtual iPolygonMesh* GetPolygonMeshViscull () { return NULL; }
+    virtual csPtr<iPolygonMesh> CreateLowerDetailPolygonMesh (float)
+    { return NULL; }
+    virtual void GetObjectBoundingBox (csBox3& bbox, int type = CS_BBOX_NORMAL)
+    {
+      bbox = scfParent->GetObjectBoundingBox ();
+    }
+    virtual void GetRadius (csVector3& rad, csVector3& cent)
+    {
+      rad = scfParent->GetRadius ();
+      cent.Set (0);
+    }
+    virtual void AddListener (iObjectModelListener* listener)
+    {
+      scfParent->AddListener (listener);
+    }
+    virtual void RemoveListener (iObjectModelListener* listener)
+    {
+      scfParent->RemoveListener (listener);
+    }
+  } scfiObjectModel;
+  friend class ObjectModel;
+
+  virtual iObjectModel* GetObjectModel () { return &scfiObjectModel; }
 };
 
 /**

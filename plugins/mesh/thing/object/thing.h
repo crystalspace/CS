@@ -344,16 +344,11 @@ public:
   //-------------------- iMeshObjectFactory interface implementation ---------
 
   virtual csPtr<iMeshObject> NewInstance ();
-  /**
-   * Do a hard transform of the object vertices.
-   * This transformation and the original coordinates are not
-   * remembered but the object space coordinates are directly
-   * computed.
-   */
   virtual void HardTransform (const csReversibleTransform& t);
   virtual bool SupportsHardTransform () const { return true; }
   virtual void SetLogicalParent (iBase* lp) { logparent = lp; }
   virtual iBase* GetLogicalParent () const { return logparent; }
+  virtual iObjectModel* GetObjectModel () { return NULL; }
 };
 
 

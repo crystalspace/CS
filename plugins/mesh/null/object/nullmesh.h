@@ -159,6 +159,7 @@ public:
     virtual bool SupportsHardTransform () const { return false; }
     virtual void SetLogicalParent (iBase* lp) { scfParent->logparent = lp; }
     virtual iBase* GetLogicalParent () const { return scfParent->logparent; }
+    virtual iObjectModel* GetObjectModel () { return NULL; }
   } scfiMeshObjectFactory;
   friend struct MeshObjectFactory;
 };

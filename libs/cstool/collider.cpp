@@ -25,6 +25,7 @@
 #include "iengine/mesh.h"
 #include "imesh/object.h"
 #include "igeom/polymesh.h"
+#include "igeom/objmodel.h"
 
 //----------------------------------------------------------------------
 
@@ -48,6 +49,15 @@ csColliderWrapper::csColliderWrapper (iObject* parent,
   parent->ObjAdd (this);
   csColliderWrapper::collide_system = collide_system;
   collider = collide_system->CreateCollider (mesh);
+}
+
+csColliderWrapper::csColliderWrapper (iObject* parent,
+	iCollideSystem* collide_system,
+	iCollider* collider)
+{
+  parent->ObjAdd (this);
+  csColliderWrapper::collide_system = collide_system;
+  csColliderWrapper::collider = collider;
 }
 
 csColliderWrapper::~csColliderWrapper ()
@@ -102,10 +112,71 @@ csColliderWrapper* csColliderWrapper::GetColliderWrapper (iObject* object)
 //----------------------------------------------------------------------
 
 
+void csColliderHelper::InitializeCollisionWrapper (iCollideSystem* colsys,
+	iMeshWrapper* mesh)
+{
+  iMeshFactoryWrapper* factory = mesh->GetFactory ();
+  if (factory)
+  {
+    iObjectModel* objmodel = factory->GetMeshObjectFactory ()
+    	->GetObjectModel ();
+    if (objmodel)
+    {
+      iPolygonMesh* polymesh = objmodel->GetPolygonMeshColldet ();
+      if (polymesh)
+      {
+        // First check if the parent factory has a collider wrapper.
+	iCollider* collider;
+        csColliderWrapper* cw_fact = csColliderWrapper::GetColliderWrapper (
+		factory->QueryObject ());
+        if (cw_fact)
+	{
+	  collider = cw_fact->GetCollider ();
+	}
+	else
+	{
+	  csColliderWrapper *cw_fact = new csColliderWrapper (
+	  	factory->QueryObject (), colsys, polymesh);
+	  cw_fact->SetName (factory->QueryObject ()->GetName());
+	  collider = cw_fact->GetCollider ();
+	  cw_fact->DecRef ();
+	}
+
+	// Now add the collider wrapper to the mesh. We need a new
+	// csColliderWrapper because the csObject system is strictly
+	// a tree and one csColliderWrapper cannot have multiple parents.
+	csColliderWrapper *cw = new csColliderWrapper (mesh->QueryObject (),
+	  colsys, collider);
+	cw->SetName (mesh->QueryObject ()->GetName());
+	cw->DecRef ();
+        return;
+      }
+    }
+  }
+
+
+  iObjectModel* objmodel = mesh->GetMeshObject ()->GetObjectModel ();
+  iPolygonMesh* polymesh = objmodel->GetPolygonMeshColldet ();
+  if (polymesh)
+  {
+    csColliderWrapper *cw = new csColliderWrapper (mesh->QueryObject (),
+	colsys, polymesh);
+    cw->SetName (mesh->QueryObject ()->GetName());
+    cw->DecRef ();
+  }
+
+  iMeshList* ml = mesh->GetChildren ();
+  int i;
+  for (i = 0 ; i < ml->GetCount () ; i++)
+  {
+    iMeshWrapper* child = ml->Get (i);
+    InitializeCollisionWrapper (colsys, child);
+  }
+}
+
 void csColliderHelper::InitializeCollisionWrappers (iCollideSystem* colsys,
   	iEngine* engine, iRegion* region)
 {
-  csRef<iPolygonMesh> mesh;
   // Initialize all mesh objects for collision detection.
   int i;
   iMeshList* meshes = engine->GetMeshes ();
@@ -113,14 +184,7 @@ void csColliderHelper::InitializeCollisionWrappers (iCollideSystem* colsys,
   {
     iMeshWrapper* sp = meshes->Get (i);
     if (region && !region->IsInRegion (sp->QueryObject ())) continue;
-    mesh = SCF_QUERY_INTERFACE (sp->GetMeshObject (), iPolygonMesh);
-    if (mesh)
-    {
-      csColliderWrapper *cw = new csColliderWrapper (sp->QueryObject (),
-	colsys, mesh);
-      cw->SetName (sp->QueryObject ()->GetName());
-      cw->DecRef ();
-    }
+    InitializeCollisionWrapper (colsys, sp);
   }
 }
 

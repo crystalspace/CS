@@ -462,6 +462,7 @@ public:
   virtual bool SupportsHardTransform () const { return false; }
   virtual void SetLogicalParent (iBase* lp) { logparent = lp; }
   virtual iBase* GetLogicalParent () const { return logparent; }
+  virtual iObjectModel* GetObjectModel () { return NULL; }
 
   //------------------------- iEmitFactoryState implementation ----------------
   class EmitFactoryState : public iEmitFactoryState

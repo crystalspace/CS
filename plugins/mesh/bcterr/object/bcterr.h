@@ -694,6 +694,7 @@ public:
   SCF_DECLARE_IBASE;
 
   virtual csPtr<iMeshObject> NewInstance ();
+  virtual iObjectModel* GetObjectModel () { return NULL; }
 
   virtual void HardTransform (const csReversibleTransform&) { }
   virtual bool SupportsHardTransform () const { return false; }
