@@ -9,7 +9,7 @@ PLUGINS+= cscript/cspython
 PLUGINS+= sound/renderer/software
 PLUGINS+= video/canvas/ddraw
 PLUGINS+= video/canvas/ddraw8
-#video/renderer/direct3d8
+#PLUGINS+= cscript/cslua
 
 # if u have the following line uncommented make sure one  
 # LIBS.OPENGL.SYSTEM is set below or you have a custom 
@@ -67,6 +67,9 @@ LIBS.SOUND.SYSTEM=$(LFLAGS.l)dsound $(LFLAGS.l)winmm
 
 # Python library
 LIBS.CSPYTHON.SYSTEM=$(LFLAGS.l)python15
+
+# Lua library
+LIBS.CSLUA.SYSTEM=$(LFLAGS.l)lua $(LFLAGS.l)lualib
 
 # Freetype library
 LIBS.FREETYPE.SYSTEM=$(LFLAGS.l)ttf
