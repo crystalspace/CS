@@ -28,6 +28,7 @@
 #include "iengine/mesh.h"
 #include "iengine/engine.h"
 #include "iutil/plugin.h"
+#include "iutil/document.h"
 #include "imesh/ball.h"
 #include "ivideo/graph3d.h"
 #include "qint.h"
@@ -57,6 +58,21 @@ CS_TOKEN_DEF_START
   CS_TOKEN_DEF (TOPONLY)
   CS_TOKEN_DEF (CYLINDRICAL)
 CS_TOKEN_DEF_END
+
+enum
+{
+  XMLTOKEN_LIGHTING,
+  XMLTOKEN_COLOR,
+  XMLTOKEN_NUMRIM,
+  XMLTOKEN_MATERIAL,
+  XMLTOKEN_FACTORY,
+  XMLTOKEN_MIXMODE,
+  XMLTOKEN_RADIUS,
+  XMLTOKEN_SHIFT,
+  XMLTOKEN_REVERSED,
+  XMLTOKEN_TOPONLY,
+  XMLTOKEN_CYLINDRICAL
+};
 
 SCF_IMPLEMENT_IBASE (csBallFactoryLoader)
   SCF_IMPLEMENTS_INTERFACE (iLoaderPlugin)
@@ -175,6 +191,28 @@ iBase* csBallFactoryLoader::Parse (const char* /*string*/,
   return fact;
 }
 
+iBase* csBallFactoryLoader::Parse (iDocumentNode*,
+			     iLoaderContext*, iBase*)
+{
+  iMeshObjectType* type = CS_QUERY_PLUGIN_CLASS (plugin_mgr,
+  	"crystalspace.mesh.object.ball", iMeshObjectType);
+  if (!type)
+  {
+    type = CS_LOAD_PLUGIN (plugin_mgr, "crystalspace.mesh.object.ball",
+    	iMeshObjectType);
+  }
+  if (!type)
+  {
+    ReportError (reporter,
+		"crystalspace.ballfactoryloader.setup.objecttype",
+		"Could not load the ball mesh object plugin!");
+    return NULL;
+  }
+  iMeshObjectFactory* fact = type->NewFactory ();
+  type->DecRef ();
+  return fact;
+}
+
 //---------------------------------------------------------------------------
 
 csBallFactorySaver::csBallFactorySaver (iBase* pParent)
@@ -249,6 +287,18 @@ bool csBallLoader::Initialize (iObjectRegistry* object_reg)
       return false;
     }
   }
+
+  xmltokens.Register ("lighting", XMLTOKEN_LIGHTING);
+  xmltokens.Register ("color", XMLTOKEN_COLOR);
+  xmltokens.Register ("numrim", XMLTOKEN_NUMRIM);
+  xmltokens.Register ("material", XMLTOKEN_MATERIAL);
+  xmltokens.Register ("factory", XMLTOKEN_FACTORY);
+  xmltokens.Register ("mixmode", XMLTOKEN_MIXMODE);
+  xmltokens.Register ("radius", XMLTOKEN_RADIUS);
+  xmltokens.Register ("shift", XMLTOKEN_SHIFT);
+  xmltokens.Register ("reversed", XMLTOKEN_REVERSED);
+  xmltokens.Register ("toponly", XMLTOKEN_TOPONLY);
+  xmltokens.Register ("cylindrical", XMLTOKEN_CYLINDRICAL);
   return true;
 }
 
@@ -397,6 +447,137 @@ iBase* csBallLoader::Parse (const char* string,
   if (ballstate) ballstate->DecRef ();
   return mesh;
 }
+
+iBase* csBallLoader::Parse (iDocumentNode* node,
+			     iLoaderContext* ldr_context, iBase*)
+{
+  csRef<iMeshObject> mesh;
+  csRef<iBallState> ballstate;
+
+  csRef<iDocumentNodeIterator> it = node->GetNodes ();
+  while (it->HasNext ())
+  {
+    csRef<iDocumentNode> child = it->Next ();
+    if (child->GetType () != CS_NODE_ELEMENT) continue;
+    const char* value = child->GetValue ();
+    csStringID id = xmltokens.Request (value);
+    switch (id)
+    {
+      case XMLTOKEN_REVERSED:
+	{
+	  bool r;
+	  if (!synldr->ParseBool (child, r, true))
+	    return false;
+	  ballstate->SetReversed (r);
+	}
+	break;
+      case XMLTOKEN_TOPONLY:
+	{
+	  bool r;
+	  if (!synldr->ParseBool (child, r, true))
+	    return false;
+	  ballstate->SetTopOnly (r);
+	}
+	break;
+      case XMLTOKEN_CYLINDRICAL:
+	{
+	  bool r;
+	  if (!synldr->ParseBool (child, r, true))
+	    return false;
+	  ballstate->SetCylindricalMapping (r);
+	}
+	break;
+      case XMLTOKEN_LIGHTING:
+	{
+	  bool r;
+	  if (!synldr->ParseBool (child, r, true))
+	    return false;
+	  ballstate->SetLighting (r);
+	}
+	break;
+      case XMLTOKEN_COLOR:
+	{
+	  csColor col;
+	  if (!synldr->ParseColor (child, col))
+	    return false;
+	  ballstate->SetColor (col);
+	}
+	break;
+      case XMLTOKEN_RADIUS:
+	{
+	  csVector3 rad;
+	  if (!synldr->ParseVector (child, rad))
+	    return false;
+	  ballstate->SetRadius (rad.x, rad.y, rad.z);
+	}
+	break;
+      case XMLTOKEN_SHIFT:
+	{
+	  csVector3 rad;
+	  if (!synldr->ParseVector (child, rad))
+	    return false;
+	  ballstate->SetShift (rad.x, rad.y, rad.z);
+	}
+	break;
+      case XMLTOKEN_NUMRIM:
+	{
+	  int f = child->GetContentsValueAsInt ();
+	  ballstate->SetRimVertices (f);
+	}
+	break;
+      case XMLTOKEN_FACTORY:
+	{
+	  const char* factname = child->GetContentsValue ();
+	  iMeshFactoryWrapper* fact = ldr_context->FindMeshFactory (factname);
+	  if (!fact)
+	  {
+      	    ReportError (reporter,
+		"crystalspace.ballloader.parse.unknownfactory",
+		"Couldn't find factory '%s'!", factname);
+	    return NULL;
+	  }
+	  mesh.Take (fact->GetMeshObjectFactory ()->NewInstance ());
+          ballstate.Take (SCF_QUERY_INTERFACE (mesh, iBallState));
+	}
+	break;
+      case XMLTOKEN_MATERIAL:
+	{
+	  const char* matname = child->GetContentsValue ();
+          iMaterialWrapper* mat = ldr_context->FindMaterial (matname);
+	  if (!mat)
+	  {
+      	    ReportError (reporter,
+		"crystalspace.ballloader.parse.unknownmaterial",
+		"Couldn't find material '%s'!", matname);
+            return NULL;
+	  }
+	  ballstate->SetMaterialWrapper (mat);
+	}
+	break;
+      case XMLTOKEN_MIXMODE:
+	{
+	  uint mm;
+	  if (!synldr->ParseMixmode (child, mm))
+	  {
+	    ReportError (reporter, "crystalspace.ballloader.parse.mixmode",
+	  	  "Error parsing mixmode!");
+	    return NULL;
+	  }
+          ballstate->SetMixMode (mm);
+	}
+	break;
+      default:
+	ReportError (reporter, "crystalspace.ballloader.parse",
+	  	  "Unknown token '%s' in ball loader!", value);
+	return NULL;
+    }
+  }
+
+  // IncRef() because otherwise our smart pointer will clean things up.
+  mesh->IncRef ();
+  return mesh;
+}
+
 
 //---------------------------------------------------------------------------
 
