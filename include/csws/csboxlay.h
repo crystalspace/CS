@@ -1,6 +1,6 @@
 /*
     Copyright (C) Aleksandras Gluchovas
-    CS port by Norman Krämer <norman@users.sourceforge.net>
+    CS port by Norman Kraemer <norman@users.sourceforge.net>
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public

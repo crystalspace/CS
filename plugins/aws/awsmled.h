@@ -1,7 +1,7 @@
 #ifndef __CS_AWS_MULTILINE_EDIT_H__
 #define __CS_AWS_MULTILINE_EDIT_H__
 /*
-    Copyright (C) 2002 by Norman Krämer
+    Copyright (C) 2002 by Norman Kraemer
   
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public

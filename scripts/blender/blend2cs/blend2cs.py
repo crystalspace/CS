@@ -19,7 +19,7 @@
 # export script blender -> crystal space
 
 # this script is based on the csexp212.py
-# which is (c) Norman Krämer 2001
+# which is (c) Norman Kraemer 2001
 
 # The import Blender210 is used to make the script work with Blender 2.14
 # If you want the script to work with Blender 2.12, 2.10, other versions. Then replace all the Blender210 with Blender

@@ -1,5 +1,5 @@
 Export script from Blender to Crystal Space
- -> written by Norman Krämer
+ -> written by Norman Kraemer
  -> modify for the new Blender API by Yvon TANGUY (yvontang@caramail.com)
  -> work on Blender 2.23.
 

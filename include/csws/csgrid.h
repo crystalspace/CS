@@ -1,6 +1,6 @@
 /*
     Crystal Space Windowing System : grid class
-    Copyright (C) 2000 by Norman Krämer <normank@lycosmail.com>
+    Copyright (C) 2000 by Norman Kraemer <normank@lycosmail.com>
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public

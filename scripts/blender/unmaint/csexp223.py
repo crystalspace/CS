@@ -1,5 +1,5 @@
 #######################################################################
-#    Copyright (C) 2001 by Norman Krämer
+#    Copyright (C) 2001 by Norman Kraemer
 #    Copyright (C) 2002 by Yvon Tanguy
 #
 #    This library is free software; you can redistribute it and/or

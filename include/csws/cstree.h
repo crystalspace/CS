@@ -1,6 +1,6 @@
 /*
     Crystal Space Windowing System: tree box class
-    Copyright (C) 2000 by Norman Krämer, based on the listbox code:
+    Copyright (C) 2000 by Norman Kraemer, based on the listbox code:
     Copyright (C) 1998,1999 by Andrew Zabolotny <bit@eltech.ru>
 
     This library is free software; you can redistribute it and/or

@@ -2,7 +2,7 @@
 // Copyright:   (c) Aleksandras Gluchovas
 // Licence:     wxWindows license
 //
-// Ported to Crystal Space by Norman Krämer <norman@users.sourceforge.net>
+// Ported to Crystal Space by Norman Kraemer <norman@users.sourceforge.net>
 /////////////////////////////////////////////////////////////////////////////
 
 #include "cssysdef.h"
