@@ -8,8 +8,8 @@
             <buffer name="tangents" destination="attribute 4" />
             <buffer name="binormals" destination="attribute 5" />
             <vp plugin="glarb" file="/shader/bump_ppl_diffuse_attn.avp"/>
-            <texture destination="unit 0" name="standardtex attenuation" />
-            <texture destination="unit 1" name="standardtex attenuation" />
+            <texture destination="unit 0" name="STANDARD_LIGHT_0_ATTENUATIONTEX" />
+            <texture destination="unit 1" name="STANDARD_LIGHT_0_ATTENUATIONTEX" />
             <texture destination="unit 2" name="standardtex normalization map" />
             <texture destination="unit 3" name="tex normal" />
             <texture destination="unit 4" name="tex diffuse" />
@@ -65,8 +65,8 @@
             <mixmode><copy/></mixmode>
             <buffer name="vertices" destination="attribute 0" />
             <vp plugin="glarb" file="/shader/flat_ppl_attenuation.avp"/>
-            <texture destination="unit 0" name="standardtex attenuation" />
-            <texture destination="unit 1" name="standardtex attenuation" />
+            <texture destination="unit 0" name="STANDARD_LIGHT_0_ATTENUATIONTEX" />
+            <texture destination="unit 1" name="STANDARD_LIGHT_0_ATTENUATIONTEX" />
             <fp plugin="glfixed">
                 <fixedfp>
                     <layer>
@@ -127,8 +127,8 @@
             <mixmode><copy/></mixmode>
             <buffer name="vertices" destination="attribute 0" />
             <vp plugin="glarb" file="/shader/flat_ppl_attenuation.avp"/>
-            <texture destination="unit 0" name="standardtex attenuation" />
-            <texture destination="unit 1" name="standardtex attenuation" />
+            <texture destination="unit 0" name="STANDARD_LIGHT_0_ATTENUATIONTEX" />
+            <texture destination="unit 1" name="STANDARD_LIGHT_0_ATTENUATIONTEX" />
             <fp plugin="glfixed">
                 <fixedfp>
                     <layer>
@@ -194,8 +194,8 @@
             <mixmode><copy/></mixmode>
             <buffer name="vertices" destination="attribute 0" />
             <vp plugin="glarb" file="/shader/flat_ppl_attenuation.avp"/>
-            <texture destination="unit 0" name="standardtex attenuation" />
-            <texture destination="unit 1" name="standardtex attenuation" />
+            <texture destination="unit 0" name="STANDARD_LIGHT_0_ATTENUATIONTEX" />
+            <texture destination="unit 1" name="STANDARD_LIGHT_0_ATTENUATIONTEX" />
             <fp plugin="glfixed">
                 <fixedfp>
                     <layer>
@@ -254,8 +254,8 @@
             <mixmode><copy/></mixmode>
             <buffer name="vertices" destination="attribute 0" />
             <vp plugin="glarb" file="/shader/flat_ppl_attenuation.avp"/>
-            <texture destination="unit 0" name="standardtex attenuation" />
-            <texture destination="unit 1" name="standardtex attenuation" />
+            <texture destination="unit 0" name="STANDARD_LIGHT_0_ATTENUATIONTEX" />
+            <texture destination="unit 1" name="STANDARD_LIGHT_0_ATTENUATIONTEX" />
             <fp plugin="glfixed">
                 <fixedfp>
                     <layer>

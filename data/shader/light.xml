@@ -5,8 +5,8 @@
       <mixmode><copy /></mixmode>
       <buffer name="vertices" destination="attribute 0" />
       <vp plugin="glarb" file="/shader/flat_ppl_attenuation.avp" />
-      <texture destination="unit 0" name="standardtex attenuation" />
-      <texture destination="unit 1" name="standardtex attenuation" />
+      <texture destination="unit 0" name="STANDARD_LIGHT_0_ATTENUATIONTEX" />
+      <texture destination="unit 1" name="STANDARD_LIGHT_0_ATTENUATIONTEX" />
       <fp plugin="glfixed">
         <fixedfp>
           <layer>
@@ -66,8 +66,8 @@
       </mixmode>
       <buffer name="vertices" destination="attribute 0" />
       <vp plugin="glarb" file="/shader/flat_ppl_attenuation.avp" />
-      <texture destination="unit 0" name="standardtex attenuation" />
-      <texture destination="unit 1" name="standardtex attenuation" />
+      <texture destination="unit 0" name="STANDARD_LIGHT_0_ATTENUATIONTEX" />
+      <texture destination="unit 1" name="STANDARD_LIGHT_0_ATTENUATIONTEX" />
       <fp plugin="glfixed">
         <fixedfp>
           <layer>

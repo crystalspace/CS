@@ -229,6 +229,25 @@ public:
   }
 
   /**
+   * Get a pointer to the first element matching the given key, 
+   * or 0 if there is none.
+   */
+  T* GetElementPointer (const K& key)
+  {
+    csArray<Element> &values = 
+      Elements[KeyHandler::ComputeHash (key) % Modulo];
+    const int len = values.Length ();
+    for (int i = 0; i < len; ++i)
+    {
+      Element& v = values[i];
+      if (KeyHandler::CompareKeys (v.key, key))
+	return &v.value;
+    }
+
+    return 0;
+  }
+
+  /**
    * Get the first element matching the given key, or \p fallback if there is 
    * none.
    */
@@ -240,6 +259,25 @@ public:
     for (int i = 0; i < len; ++i)
     {
       const Element& v = values[i];
+      if (KeyHandler::CompareKeys (v.key, key))
+	return v.value;
+    }
+
+    return fallback;
+  }
+
+  /**
+   * Get the first element matching the given key, or \p fallback if there is 
+   * none.
+   */
+  T& Get (const K& key, T& fallback)
+  {
+    csArray<Element> &values = 
+      Elements[KeyHandler::ComputeHash (key) % Modulo];
+    const int len = values.Length ();
+    for (int i = 0; i < len; ++i)
+    {
+      Element& v = values[i];
       if (KeyHandler::CompareKeys (v.key, key))
 	return v.value;
     }

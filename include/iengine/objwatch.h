@@ -50,6 +50,8 @@ struct iLight;
 #define CS_WATCH_MOVABLE_DESTROY 6
 /// Movable has changed otherwise.
 #define CS_WATCH_MOVABLE_CHANGED 7
+/// Light has changed attenuation.
+#define CS_WATCH_LIGHT_ATTENUATION 8
 /** @} */
 
 

@@ -1660,7 +1660,7 @@ bool csDynaVis::VisTest (iRenderView* rview,
     {
       iClipper2D* clipper = rview->GetClipper ();
       tcovbuf->InsertPolygonInverted (clipper->GetClipPoly (),
-    	  clipper->GetVertexCount (), .01);
+    	  clipper->GetVertexCount (), .01f);
     }
   }
 

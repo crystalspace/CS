@@ -1565,6 +1565,7 @@ public:
   virtual void OnSectorChange (iLight*, iSector*) { }
   virtual void OnRadiusChange (iLight*, float) { }
   virtual void OnDestroy (iLight*) { }
+  virtual void OnAttenuationChange (iLight* light, int newatt) { }
 };
 
 SCF_IMPLEMENT_IBASE (csTriggerLightCallback)

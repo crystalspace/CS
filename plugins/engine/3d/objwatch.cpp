@@ -98,6 +98,11 @@ public:
     watcher->ReportOperation (CS_WATCH_LIGHT_DESTROY, 0, light);
     watcher->RemoveLight (light);
   }
+
+  virtual void OnAttenuationChange (iLight* light, int newatt)
+  {
+    watcher->ReportOperation (CS_WATCH_LIGHT_ATTENUATION, 0, light);
+  }
 };
 
 SCF_IMPLEMENT_IBASE(csLightCallback)

@@ -81,15 +81,48 @@ private:
   csRef<csShaderVariable> shvar_light_0_diffuse;
   csRef<csShaderVariable> shvar_light_0_specular;
   csRef<csShaderVariable> shvar_light_0_attenuation;
+  csRef<csShaderVariable> shvar_light_0_attenuationtex;
   bool initialized;
 
+  class LightSVAccessor : public iLightCallback,
+			  public iShaderVariableAccessor
+  {
+    iLight* light;
+    csLightIterRenderStep* parent;
+
+    csRef<iTextureHandle> attTex;
+
+    bool needUpdate;
+
+    void CreateTexture ();
+  public:
+    SCF_DECLARE_IBASE;
+
+    LightSVAccessor (iLight* light, csLightIterRenderStep* parent);
+    virtual ~LightSVAccessor ();
+
+    virtual void OnColorChange (iLight* light, const csColor& newcolor);
+    virtual void OnPositionChange (iLight* light, const csVector3& newpos);
+    virtual void OnSectorChange (iLight* light, iSector* newsector);
+    virtual void OnRadiusChange (iLight* light, float newradius);
+    virtual void OnDestroy (iLight* light);
+    virtual void OnAttenuationChange (iLight* light, int newatt);
+
+    virtual void PreGetValue (csShaderVariable *variable);
+  };
+
+  csHash<LightSVAccessor*, iLight*> knownLights;
+
+  LightSVAccessor* GetLightAccessor (iLight* light);
 public:
+  csRef<iGraphics3D> g3d;
+
   SCF_DECLARE_IBASE;
 
   csLightIterRenderStep (iObjectRegistry* object_reg);
   virtual ~csLightIterRenderStep ();
 
-  void InitVariables ();
+  void Init ();
   virtual void Perform (iRenderView* rview, iSector* sector,
     csShaderVarStack &stacks);
 

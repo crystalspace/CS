@@ -989,39 +989,6 @@ bool csGLGraphics3D::Open ()
   normvar->SetValue (normtex);
   shadermgr->AddVariable(normvar);
 
-  #define CS_ATTTABLE_SIZE	  128
-  #define CS_HALF_ATTTABLE_SIZE	  ((float)CS_ATTTABLE_SIZE/2.0f)
-
-  csRGBpixel *attenuationdata = 
-    new csRGBpixel[CS_ATTTABLE_SIZE * CS_ATTTABLE_SIZE * 4];
-  csRGBpixel* data = attenuationdata;
-  for (int y=0; y < CS_ATTTABLE_SIZE; y++)
-  {
-    for (int x=0; x < CS_ATTTABLE_SIZE; x++)
-    {
-      float yv = 3.0f * ((y + 0.5f)/CS_HALF_ATTTABLE_SIZE - 1.0f);
-      float xv = 3.0f * ((x + 0.5f)/CS_HALF_ATTTABLE_SIZE - 1.0f);
-      float i = exp (-0.7 * (xv*xv + yv*yv));
-      unsigned char v = i>1.0f ? 255 : QInt (i*255.99f);
-      (data++)->Set (v, v, v, v);
-    }
-  }
-
-  img  = csPtr<iImage> (new csImageMemory (
-    CS_ATTTABLE_SIZE, CS_ATTTABLE_SIZE, attenuationdata, true, 
-    CS_IMGFMT_TRUECOLOR | CS_IMGFMT_ALPHA));
-  imgvec = csPtr<iImageVector> (new csImageVector ());
-  imgvec->AddImage (img);
-  csRef<iTextureHandle> atttex = txtmgr->RegisterTexture (
-    imgvec, CS_TEXTURE_3D | CS_TEXTURE_CLAMP | CS_TEXTURE_NOMIPMAPS, 
-    iTextureHandle::CS_TEX_IMG_2D);
-
-  csRef<csShaderVariable> attvar = csPtr<csShaderVariable> (
-  	new csShaderVariable (
-		strings->Request ("standardtex attenuation")));
-  attvar->SetValue (atttex);
-  shadermgr->AddVariable(attvar);
-
   cache_clip_portal = -1;
   cache_clip_plane = -1;
   cache_clip_z_plane = -1;

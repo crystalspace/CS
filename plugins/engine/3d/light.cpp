@@ -74,6 +74,7 @@ csLight::csLight (
   attenuation = CS_ATTN_LINEAR;
   influenceRadius = d;
   influenceRadiusSq = d * d;
+  influenceValid = true;
   inv_dist = 1 / d;
   //CalculateAttenuationVector (attenuation, d, 
   //  (attenuation == CS_ATTN_LINEAR) ? 1.0f / influenceIntensityFraction : 1.0f);
@@ -250,6 +251,14 @@ void csLight::SetAttenuation (int a)
     CalculateAttenuationVector (a, dist, 1.0f);
   }
   attenuation = a;
+
+  int i = light_cb_vector.Length ()-1;
+  while (i >= 0)
+  {
+    iLightCallback* cb = light_cb_vector[i];
+    cb->OnAttenuationChange (&scfiLight, a);
+    i--;
+  }
 }
 
 void csLight::SetAttenuationVector (const csVector3& attenv)
@@ -257,6 +266,14 @@ void csLight::SetAttenuationVector (const csVector3& attenv)
   attenuation = CS_ATTN_CLQ;
   attenuationvec.Set (attenv);
   influenceValid = false;
+
+  int i = light_cb_vector.Length ()-1;
+  while (i >= 0)
+  {
+    iLightCallback* cb = light_cb_vector[i];
+    cb->OnAttenuationChange (&scfiLight, attenuation);
+    i--;
+  }
 }
 
 const csVector3 &csLight::GetAttenuationVector()

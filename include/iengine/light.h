@@ -109,7 +109,7 @@ struct iLightingInfo;
 #define CS_ATTN_CLQ 4
 /** @} */
 
-SCF_VERSION (iLightCallback, 0, 2, 0);
+SCF_VERSION (iLightCallback, 0, 2, 1);
 
 /**
  * Set a callback which is called when this light color is changed.
@@ -147,6 +147,12 @@ struct iLightCallback : public iBase
    * It is safe to delete this callback in this function.
    */
   virtual void OnDestroy (iLight* light) = 0;
+
+  /**
+   * Attenuation will be changed.
+   * It is safe to delete this callback in this function.
+   */
+  virtual void OnAttenuationChange (iLight* light, int newatt) = 0;
 };
 
 

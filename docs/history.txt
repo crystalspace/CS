@@ -6,6 +6,13 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+4-Apr-2004
+	- res moved the attenuation texture generation to the light iter 
+	  plugin. Still the same texture for all lights, though. Plan is to
+	  have individual attenuation textures, reflecting the light's
+	  actual attenuation settings.
+	- res added non-const versions for csHash<>::Get() and 
+	  GetElementPointer().
 3-Apr-2004
 	- Jorrit fixed a new compile error in the simple console plugin.
 	- Jorrit added a new 'back2front' keyword for the genmesh factory
