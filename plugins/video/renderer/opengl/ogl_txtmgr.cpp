@@ -417,8 +417,6 @@ void csTextureHandleOpenGL::InitTexture (csTextureManagerOpenGL *texman,
 
   if ((nwidth != image->GetWidth() ) || (nheight != image->GetHeight() ))
   {
-    printf ("Rescale: %d %d -> %d %d\n", image->GetWidth(), image->GetHeight(),
-	    nwidth, nheight);
     image->Rescale (nwidth, nheight);
   }
 
