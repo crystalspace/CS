@@ -20,6 +20,7 @@
 #include "cssysdef.h"
 #include "csengine/sector.h"
 #include "csengine/terrobj.h"
+#include "csengine/engine.h"
 #include "csengine/light.h"
 #include "igraph3d.h"  // RDS NOTE: will this be needed???
 
@@ -42,6 +43,7 @@ csTerrainWrapper::csTerrainWrapper( iEngine *pEng, iTerrainObject *pTerr )
   csTerrainWrapper::pTerrObj = pTerr;
   pTerr->IncRef ();
   pFactory = NULL;
+  csEngine::current_engine->AddToCurrentRegion (this);
 }
 
 csTerrainWrapper::csTerrainWrapper( iEngine *pEng )
@@ -51,6 +53,7 @@ csTerrainWrapper::csTerrainWrapper( iEngine *pEng )
   csTerrainWrapper::pEngine = pEng;
   csTerrainWrapper::pTerrObj = NULL;
   pFactory = NULL;
+  csEngine::current_engine->AddToCurrentRegion (this);
 }
 
 void csTerrainWrapper::SetTerrainObject( iTerrainObject *pObj )
@@ -58,7 +61,7 @@ void csTerrainWrapper::SetTerrainObject( iTerrainObject *pObj )
   if (pObj)
     pObj->IncRef ();
   if (csTerrainWrapper::pTerrObj)
-    pObj->DecRef ();
+    csTerrainWrapper::pTerrObj->DecRef ();
   csTerrainWrapper::pTerrObj = pObj;
 }
 
@@ -66,6 +69,7 @@ csTerrainWrapper::~csTerrainWrapper ()
 {
   if( pTerrObj )
     pTerrObj->DecRef();
+  csEngine::current_engine->UnlinkTerrain (this);
 }
 
 void csTerrainWrapper::AddSector( csSector *pSector )

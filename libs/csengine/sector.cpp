@@ -315,6 +315,18 @@ void csSector::UnlinkTerrain (csTerrainWrapper *pTerrain)
   }
 }
 
+csTerrainWrapper* csSector::GetTerrain (const char* name)
+{
+  int i;
+  for (i = 0 ; i < terrains.Length () ; i++)
+  {
+    csTerrainWrapper* s = (csTerrainWrapper*)terrains[i];
+    if (!strcmp (name, s->GetName ()))
+      return s;
+  }
+  return NULL;
+}
+
 //----------------------------------------------------------------------
 
 void csSector::UseStaticTree (int mode, bool octree)

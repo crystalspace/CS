@@ -87,7 +87,7 @@ private:
    * List of terrain objects in this sector. This vector
    * contains objects of type csTerrainWrapper*.
    */
-  csNamedObjVector terrains;
+  csVector terrains;
 
   /// Engine handle.
   csEngine* engine;
@@ -406,10 +406,7 @@ public:
   /**
    * Find a terrain with the given name.
    */
-  csTerrainWrapper* GetTerrains (const char* name)
-  {
-    return (csTerrainWrapper*)terrains.FindByName (name);
-  }
+  csTerrainWrapper* GetTerrain (const char* name);
 
   //----------------------------------------------------------------------
   // Visibility Stuff

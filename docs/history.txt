@@ -12,6 +12,7 @@ The history order has been reversed so that new features are at the top.
 	  time it is implemented as a plugin. Great work Richard!
 	  Note that the old terrlod is currently no longer supported.
 	  Richard will do that one soon.
+	- Fixed several bugs in the new terrain plugin.
 	- 'make walkall' will now also compile the standard canvas that
 	  belongs with the software renderer and the OS. The way this works
 	  is that every such canvas which is for the software renderer

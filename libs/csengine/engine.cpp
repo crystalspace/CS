@@ -1550,6 +1550,25 @@ void csEngine::RemoveMesh (csMeshWrapper* mesh)
   delete mesh;
 }
 
+void csEngine::UnlinkTerrain (csTerrainWrapper* terr)
+{
+  terr->ClearSectors ();
+  int idx = terrains.Find (terr);
+  if (idx == -1) return;
+  terrains[idx] = NULL;
+  terrains.Delete (idx);
+}
+
+void csEngine::RemoveTerrain (csTerrainWrapper* terr)
+{
+  terr->ClearSectors ();
+  int idx = terrains.Find (terr);
+  if (idx == -1) return;
+  terrains[idx] = NULL;
+  terrains.Delete (idx);
+  delete terr;
+}
+
 void csEngine::UnlinkThing (csThing* thing)
 {
   thing->GetMovable ().ClearSectors ();
