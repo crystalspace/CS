@@ -34,7 +34,7 @@ class csCamera;
 class csDynLight;
 class csSprite3D;
 class Dumper;
-class csBspTree;
+class csPolygonTree;
 class csPolygon2DQueue;
 class csProgressPulse;
 interface IGraphics3D;
@@ -76,13 +76,13 @@ private:
   int visited;
 
   /**
-   * If this variable is not NULL then it is a BSP tree in this
+   * If this variable is not NULL then it is a BSP or octree in this
    * sector which includes all static (non-moving) csThings.
    */
-  csBspTree* static_bsp;
+  csPolygonTree* static_tree;
 
   /**
-   * If static_bsp is not NULL then this is a pointer to the csThing
+   * If static_tree is not NULL then this is a pointer to the csThing
    * which holds all polygons of the non-moving csThings.
    */
   csThing* static_thing;
@@ -198,16 +198,19 @@ public:
   csThing* GetStaticThing () { return static_thing; }
 
   /**
-   * Call this function to generate a BSP tree for all csThings
+   * Call this function to generate a polygon tree tree for all csThings
    * in this sector. This might make drawing more efficient because
    * those things can then be drawn using Z-fill instead of Z-buffer.
-   * This function will only generate BSP trees for the csThings
+   * Also the c-buffer requires a tree of this kind.
+   * This function will only generate a tree for the csThings
    * which cannot move. Note that you can no longer remove a csThing
-   * from the sector if it has been added to the static BSP tree.
+   * from the sector if it has been added to the static tree.
    * The mode is given to the BSP building routines and can be one of the
-   * BSP_... flags.
+   * BSP_... flags.<p>
+   * If 'octree' is true this function will create an octree with mini-bsp
+   * trees instead of a BSP tree alone.
    */
-  void UseStaticBSP (int mode = BSP_MINIMIZE_SPLITS);
+  void UseStaticTree (int mode = BSP_MINIMIZE_SPLITS, bool octree = false);
 
   /**
    * Get ambient color valid in this sector.

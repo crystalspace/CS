@@ -3108,7 +3108,7 @@ csSector* CSLoader::load_room (char* secname, csWorld* w, char* buf,
   }
 
   if (do_bsp) sector->UseBSP ();
-  if (do_stat_bsp) sector->UseStaticBSP ();
+  if (do_stat_bsp) sector->UseStaticTree ();
 
   return sector;
 }
@@ -3197,7 +3197,7 @@ csSector* CSLoader::load_sector (char* secname, csWorld* w, char* buf,
   }
 
   if (info.use_bsp) sector->UseBSP ();
-  if (do_stat_bsp) sector->UseStaticBSP ();
+  if (do_stat_bsp) sector->UseStaticTree ();
   return sector;
 }
 

@@ -33,6 +33,8 @@ csBspNode::csBspNode ()
 csBspNode::~csBspNode ()
 {
   CHK (delete [] polygons);
+  CHK (delete front);
+  CHK (delete back);
 }
 
 void csBspNode::AddPolygon (csPolygonInt* poly, bool dynamic)
@@ -64,14 +66,41 @@ void csBspNode::RemoveDynamicPolygons ()
     num = dynamic_idx;
     dynamic_idx = -1;
   }
+  if (front)
+  {
+    front->RemoveDynamicPolygons ();
+    if (front->IsEmpty () == 0)
+    {
+      CHK (delete front);
+      front = NULL;
+    }
+  }
+  if (back)
+  {
+    back->RemoveDynamicPolygons ();
+    if (back->IsEmpty () == 0)
+    {
+      CHK (delete back);
+      back = NULL;
+    }
+  }
 }
+
 
 //---------------------------------------------------------------------------
 
-csBspTree::csBspTree (csPolygonParentInt* pset, int mode)
+csBspTree::csBspTree (csPolygonParentInt* pset, int mode) : csPolygonTree (pset)
 {
-  csBspTree::pset = pset;
+  csBspTree::mode = mode;
+}
 
+csBspTree::~csBspTree ()
+{
+  Clear ();
+}
+
+void csBspTree::Build ()
+{
   int i;
   int num = pset->GetNumPolygons ();
   CHK (csPolygonInt** polygons = new csPolygonInt* [num]);
@@ -79,53 +108,39 @@ csBspTree::csBspTree (csPolygonParentInt* pset, int mode)
 
   CHK (root = new csBspNode);
 
-  Build (root, polygons, num, mode);
+  Build ((csBspNode*)root, polygons, num);
 
   CHK (delete [] polygons);
 }
 
-csBspTree::csBspTree (csPolygonParentInt* pset, csPolygonInt** polygons, int num, int mode)
+void csBspTree::Build (csPolygonInt** polygons, int num)
 {
-  csBspTree::pset = pset;
   CHK (root = new csBspNode);
 
   CHK (csPolygonInt** new_polygons = new csPolygonInt* [num]);
   int i;
   for (i = 0 ; i < num ; i++) new_polygons[i] = polygons[i];
-  Build (root, new_polygons, num, mode);
+  Build ((csBspNode*)root, new_polygons, num);
   CHK (delete [] new_polygons);
 }
 
-csBspTree::~csBspTree ()
-{
-  Clear (root);
-}
-
-void csBspTree::AddDynamicPolygons (csPolygonInt** polygons, int num, int mode)
+void csBspTree::AddDynamicPolygons (csPolygonInt** polygons, int num)
 {
   // @@@ We should only do this copy if there is a split in the first level.
   // Now it is just overhead.
   CHK (csPolygonInt** new_polygons = new csPolygonInt* [num]);
   int i;
   for (i = 0 ; i < num ; i++) new_polygons[i] = polygons[i];
-  BuildDynamic (root, new_polygons, num, mode);
+  BuildDynamic ((csBspNode*)root, new_polygons, num);
   CHK (delete [] new_polygons);
 }
 
 void csBspTree::RemoveDynamicPolygons ()
 {
-  if (root) RemoveDynamicPolygons (root);
+  if (root) root->RemoveDynamicPolygons ();
 }
 
-void csBspTree::Clear (csBspNode* node)
-{
-  if (!node) return;
-  Clear (node->front);
-  Clear (node->back);
-  CHK (delete node);
-}
-
-int csBspTree::SelectSplitter (csPolygonInt** polygons, int num, int mode)
+int csBspTree::SelectSplitter (csPolygonInt** polygons, int num)
 {
   int i, j, poly_idx;
 
@@ -142,7 +157,7 @@ int csBspTree::SelectSplitter (csPolygonInt** polygons, int num, int mode)
     {
       int cnt = 0;
       for (j = 0 ; j < num ; j++)
-        if (polygons[j]->Classify (polygons[i]) == POL_SPLIT_NEEDED) cnt++;
+        if (polygons[j]->Classify (*polygons[i]->GetPolyPlane ()) == POL_SPLIT_NEEDED) cnt++;
       if (cnt < min_splits) { min_splits = cnt; poly_idx = i; }
     }
   }
@@ -159,7 +174,7 @@ int csBspTree::SelectSplitter (csPolygonInt** polygons, int num, int mode)
       for (j = 0 ; j < n ; j++)
       {
         int jj = rand () % num;
-        if (polygons[jj]->Classify (polygons[ii]) == POL_SPLIT_NEEDED) cnt++;
+        if (polygons[jj]->Classify (*polygons[ii]->GetPolyPlane ()) == POL_SPLIT_NEEDED) cnt++;
       }
       if (cnt < min_splits) { min_splits = cnt; poly_idx = ii; }
     }
@@ -175,7 +190,7 @@ int csBspTree::SelectSplitter (csPolygonInt** polygons, int num, int mode)
       int splits = 0;
       for (j = 0 ; j < num ; j++)
       {
-        int c = polygons[j]->Classify (polygons [i]);
+        int c = polygons[j]->Classify (*polygons [i]->GetPolyPlane ());
 	if (c == POL_FRONT) front++;
 	else if (c == POL_BACK) back++;
 	else if (c == POL_SPLIT_NEEDED) splits++;
@@ -207,7 +222,7 @@ int csBspTree::SelectSplitter (csPolygonInt** polygons, int num, int mode)
       for (j = 0 ; j < n ; j++)
       {
         int jj = rand () % num;
-        int c = polygons[jj]->Classify (polygons [ii]);
+        int c = polygons[jj]->Classify (*polygons [ii]->GetPolyPlane ());
 	if (c == POL_FRONT) front++;
 	else if (c == POL_BACK) back++;
 	else if (c == POL_SPLIT_NEEDED) splits++;
@@ -231,19 +246,24 @@ int csBspTree::SelectSplitter (csPolygonInt** polygons, int num, int mode)
     int same_poly = 0;
     for (i = 0 ; i < num ; i++)
     {
+      csPlane* plane_i = polygons[i]->GetPolyPlane ();
       int cnt = 1;
       for (j = i+1 ; j < num ; j++)
-        if (polygons[i]->SamePlane (polygons[j])) cnt++;
+      {
+        if (plane_i == polygons[j]->GetPolyPlane () ||
+		csMath3::PlanesEqual (*plane_i, *polygons[j]->GetPolyPlane ()))
+	  cnt++;
+      }
       if (cnt > same_poly) { same_poly = cnt; poly_idx = i; }
     }
   }
   return poly_idx;
 }
 
-void csBspTree::Build (csBspNode* node, csPolygonInt** polygons, int num, int mode)
+void csBspTree::Build (csBspNode* node, csPolygonInt** polygons, int num)
 {
   int i;
-  csPolygonInt* split_poly = polygons[SelectSplitter (polygons, num, mode)];
+  csPolygonInt* split_poly = polygons[SelectSplitter (polygons, num)];
   csPlane* split_plane = split_poly->GetPolyPlane ();
 
   // Now we split the node according to the plane of that polygon.
@@ -253,7 +273,7 @@ void csBspTree::Build (csBspNode* node, csPolygonInt** polygons, int num, int mo
 
   for (i = 0 ; i < num ; i++)
   {
-    int c = polygons[i]->Classify (split_poly);
+    int c = polygons[i]->Classify (*split_plane);
     switch (c)
     {
       case POL_SAME_PLANE: node->AddPolygon (polygons[i]); break;
@@ -274,24 +294,24 @@ void csBspTree::Build (csBspNode* node, csPolygonInt** polygons, int num, int mo
   if (front_idx)
   {
     CHK (node->front = new csBspNode);
-    Build (node->front, front_poly, front_idx, mode);
+    Build (node->front, front_poly, front_idx);
   }
   if (back_idx)
   {
     CHK (node->back = new csBspNode);
-    Build (node->back, back_poly, back_idx, mode);
+    Build (node->back, back_poly, back_idx);
   }
 
   CHK (delete [] front_poly);
   CHK (delete [] back_poly);
 }
 
-void csBspTree::BuildDynamic (csBspNode* node, csPolygonInt** polygons, int num, int mode)
+void csBspTree::BuildDynamic (csBspNode* node, csPolygonInt** polygons, int num)
 {
   int i;
   csPolygonInt* split_poly;
   if (node->num) split_poly = node->polygons[0];
-  else split_poly = polygons[SelectSplitter (polygons, num, mode)];
+  else split_poly = polygons[SelectSplitter (polygons, num)];
   csPlane* split_plane = split_poly->GetPolyPlane ();
 
   // Now we split the list of polygons according to the plane of that polygon.
@@ -301,7 +321,7 @@ void csBspTree::BuildDynamic (csBspNode* node, csPolygonInt** polygons, int num,
 
   for (i = 0 ; i < num ; i++)
   {
-    int c = polygons[i]->Classify (split_poly);
+    int c = polygons[i]->Classify (*split_plane);
     switch (c)
     {
       case POL_SAME_PLANE: node->AddPolygon (polygons[i], true); break;
@@ -322,55 +342,32 @@ void csBspTree::BuildDynamic (csBspNode* node, csPolygonInt** polygons, int num,
   if (front_idx)
   {
     if (!node->front) CHKB (node->front = new csBspNode);
-    BuildDynamic (node->front, front_poly, front_idx, mode);
+    BuildDynamic (node->front, front_poly, front_idx);
   }
   if (back_idx)
   {
     if (!node->back) CHKB (node->back = new csBspNode);
-    BuildDynamic (node->back, back_poly, back_idx, mode);
+    BuildDynamic (node->back, back_poly, back_idx);
   }
 
   CHK (delete [] front_poly);
   CHK (delete [] back_poly);
 }
 
-//@@@ Can this be done more efficiently? Maybe remembering all nodes
-// where we added dynamic polygons in a seperate list.
-void csBspTree::RemoveDynamicPolygons (csBspNode* node)
+void* csBspTree::Back2Front (const csVector3& pos, csTreeVisitFunc* func,
+	void* data)
 {
-  node->RemoveDynamicPolygons ();
-  if (node->front)
-  {
-    RemoveDynamicPolygons (node->front);
-    if (node->front->num == 0)
-    {
-      CHK (delete node->front);
-      node->front = NULL;
-    }
-  }
-  if (node->back)
-  {
-    RemoveDynamicPolygons (node->back);
-    if (node->back->num == 0)
-    {
-      CHK (delete node->back);
-      node->back = NULL;
-    }
-  }
+  return Back2Front ((csBspNode*)root, pos, func, data);
 }
 
-void* csBspTree::Back2Front (const csVector3& pos, csBspVisitFunc* func, void* data)
+void* csBspTree::Front2Back (const csVector3& pos, csTreeVisitFunc* func,
+	void* data)
 {
-  return Back2Front (root, pos, func, data);
-}
-
-void* csBspTree::Front2Back (const csVector3& pos, csBspVisitFunc* func, void* data)
-{
-  return Front2Back (root, pos, func, data);
+  return Front2Back ((csBspNode*)root, pos, func, data);
 }
 
 void* csBspTree::Back2Front (csBspNode* node, const csVector3& pos,
-	csBspVisitFunc* func, void* data)
+	csTreeVisitFunc* func, void* data)
 {
   if (!node) return NULL;
   void* rc;
@@ -401,7 +398,7 @@ void* csBspTree::Back2Front (csBspNode* node, const csVector3& pos,
 }
 
 void* csBspTree::Front2Back (csBspNode* node, const csVector3& pos,
-	csBspVisitFunc* func, void* data)
+	csTreeVisitFunc* func, void* data)
 {
   if (!node) return NULL;
   void* rc;

@@ -36,6 +36,7 @@
 #include "csengine/cbuffer.h"
 #include "csengine/bspbbox.h"
 #include "csgeom/bsp.h"
+#include "csgeom/octree.h"
 #include "csobject/nameobj.h"
 #include "ihalo.h"
 #include "igraph3d.h"
@@ -62,7 +63,7 @@ csSector::csSector () : csPolygonSet ()
   sector = this;
   beam_busy = 0;
   level_r = level_g = level_b = 0;
-  static_bsp = NULL;
+  static_tree = NULL;
   static_thing = NULL;
 }
 
@@ -74,7 +75,7 @@ csSector::~csSector ()
     CHK (delete first_thing);
     first_thing = n;
   }
-  CHK (delete static_bsp);
+  CHK (delete static_tree);
 
   // The sprites are not deleted here because they can occur in more
   // than one sector at the same time. Therefor we first clear the list.
@@ -108,10 +109,10 @@ void csSector::AddLight (csStatLight* light)
   light->SetSector (this);
 }
 
-void csSector::UseStaticBSP (int mode)
+void csSector::UseStaticTree (int mode, bool octree)
 {
   CHK (delete bsp); bsp = NULL;
-  CHK (delete static_bsp); static_bsp = NULL;
+  CHK (delete static_tree); static_tree = NULL;
 
   if (static_thing) return;
   CHK (static_thing = new csThing ());
@@ -137,7 +138,17 @@ void csSector::UseStaticBSP (int mode)
   first_thing = static_thing;
   static_thing->CreateBoundingBox ();
 
-  CHK (static_bsp = new csBspTree (static_thing, mode));
+  if (octree)
+  {
+    csVector3 min_bbox, max_bbox;
+    static_thing->GetBoundingBox (min_bbox, max_bbox);
+    CHK (static_tree = new csOctree (static_thing, min_bbox, max_bbox, 40, mode));
+  }
+  else
+  {
+    CHK (static_tree = new csBspTree (static_thing, mode));
+  }
+  static_tree->Build ();
 }
 
 csPolygon3D* csSector::HitBeam (csVector3& start, csVector3& end)
@@ -391,7 +402,7 @@ void csSector::Draw (csRenderView& rview)
 	  sp3d->MarkInvisible ();
 	  sp3d->AddBoundingBox (spr_container);
         }
-	static_bsp->AddDynamicPolygons (spr_container->GetPolygons (),
+	static_tree->AddDynamicPolygons (spr_container->GetPolygons (),
 		spr_container->GetNumPolygons ());
 	spr_container->World2Camera (rview);
       }
@@ -399,13 +410,13 @@ void csSector::Draw (csRenderView& rview)
       CHK (poly_queue = new csPolygon2DQueue (GetNumPolygons ()+
       	static_thing->GetNumPolygons ()));
       static_thing->UpdateTransformation (rview);
-      static_bsp->Front2Back (rview.GetOrigin (), &TestQueuePolygons,
+      static_tree->Front2Back (rview.GetOrigin (), &TestQueuePolygons,
       	(void*)&rview);
 
       if (sprites.Length () > 0)
       {
         // Clean up the dynamically added BSP polygons.
-	static_bsp->RemoveDynamicPolygons ();
+	static_tree->RemoveDynamicPolygons ();
         CHK (delete spr_container);
 
 	// Push all visible sprites in a queue.
@@ -438,7 +449,7 @@ void csSector::Draw (csRenderView& rview)
     if (static_thing && do_things)
     {
       static_thing->UpdateTransformation (rview);
-      static_bsp->Back2Front (rview.GetOrigin (), &DrawPolygons, (void*)&rview);
+      static_tree->Back2Front (rview.GetOrigin (), &DrawPolygons, (void*)&rview);
     }
   }
 

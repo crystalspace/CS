@@ -56,14 +56,7 @@ public:
  * The BSP tree implementation is an example of a class that
  * uses this csPolygonInt interface. The consequence of this is that
  * the BSP tree can be used for several sorts of polygons (even
- * 3D or 2D ones).<p>
- *
- * This class exports methods in three categories:
- * <ul>
- * <li>Polygon manipulation (clone, set_parent, get_parent)
- * <li>Vertex manipulation (reset, add_vertex, finish, get_num_vertices)
- * <li>Plane functions (classify, same_plane, get_poly_plane, split_with_plane)
- * </ul>
+ * 3D or 2D ones). The csOctree class also uses csPolygonInt.
  */
 class csPolygonInt
 {
@@ -74,30 +67,77 @@ public:
   virtual csPlane* GetPolyPlane () = 0;
 
   /**
-   * Classify a polygon with regards to this one. If the poly is on same
-   * plane as this one it returns POL_SAME_PLANE. If this poly is
-   * completely in front of the given poly it returnes POL_FRONT. If this poly
-   * is completely back of the given poly it returnes POL_BACK. Otherwise it
+   * Classify this polygon with regards to a plane (in world space). If this poly
+   * is on same plane it returns POL_SAME_PLANE. If this poly is
+   * completely in front of the given plane it returnes POL_FRONT. If this poly
+   * is completely back of the given plane it returnes POL_BACK. Otherwise it
    * returns POL_SPLIT_NEEDED.
    */
-  virtual int Classify (csPolygonInt* poly) = 0;
+  virtual int Classify (const csPlane& pl) = 0;
+
+  /**
+   * Classify to X plane. The default implementation just calls Classify()
+   * above with a constructed plane but this function can be overridden
+   * for more efficiency.
+   */
+  virtual int ClassifyX (float x) { return Classify (csPlane (1, 0, 0, -x)); }
+
+  /**
+   * Classify to Y plane. The default implementation just calls Classify()
+   * above with a constructed plane but this function can be overridden
+   * for more efficiency.
+   */
+  virtual int ClassifyY (float y) { return Classify (csPlane (0, 1, 0, -y)); }
+
+  /**
+   * Classify to Z plane. The default implementation just calls Classify()
+   * above with a constructed plane but this function can be overridden
+   * for more efficiency.
+   */
+  virtual int ClassifyZ (float z) { return Classify (csPlane (0, 0, 1, -z)); }
 
   /**
    * Split this polygon with the given plane (A,B,C,D) and return the
    * two resulting new polygons in 'front' and 'back'. The new polygons will
    * mimic the behaviour of the parent polygon as good as possible.
-   * This function is mainly used by the BSP splitter.
+   * Note that the 'front' should be the negative side of the plane
+   * and 'back' the positive side.
    */
   virtual void SplitWithPlane (csPolygonInt** front, csPolygonInt** back,
-  	csPlane& plane) = 0;
+  	const csPlane& plane) = 0;
 
   /**
-   * Return true if this polygon and the given polygon are on the same
-   * plane. If their planes are shared this is automatically the case.
-   * Otherwise this function will check their respective plane equations
-   * to test for equality.
+   * Split this polygon with the X plane. Default implementation just
+   * calls SplitWithPlane() with a constructed plane but this function
+   * can be overridden for more efficiency.
    */
-  virtual bool SamePlane (csPolygonInt* p) = 0;
+  virtual void SplitWithPlaneX (csPolygonInt** front, csPolygonInt** back,
+  	float x)
+  {
+    SplitWithPlane (front, back, csPlane (1, 0, 0, -x));
+  }
+
+  /**
+   * Split this polygon with the Y plane. Default implementation just
+   * calls SplitWithPlane() with a constructed plane but this function
+   * can be overridden for more efficiency.
+   */
+  virtual void SplitWithPlaneY (csPolygonInt** front, csPolygonInt** back,
+  	float y)
+  {
+    SplitWithPlane (front, back, csPlane (0, 1, 0, -y));
+  }
+
+  /**
+   * Split this polygon with the Z plane. Default implementation just
+   * calls SplitWithPlane() with a constructed plane but this function
+   * can be overridden for more efficiency.
+   */
+  virtual void SplitWithPlaneZ (csPolygonInt** front, csPolygonInt** back,
+  	float z)
+  {
+    SplitWithPlane (front, back, csPlane (0, 0, 1, -z));
+  }
 
   /**
    * Return some type-id which BSP visitors can use for their

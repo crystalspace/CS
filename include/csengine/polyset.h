@@ -452,6 +452,12 @@ public:
   csPolygonSetBBox* GetBoundingBox () { return bbox; }
 
   /**
+   * Get the bounding box in object space for this polygon set.
+   * This is calculated based on the oriented bounding box.
+   */
+  void GetBoundingBox (csVector3& min_bbox, csVector3& max_bbox);
+
+  /**
    * Return true if this has fog.
    */
   bool HasFog () { return fog.enabled; }

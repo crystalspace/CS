@@ -277,7 +277,7 @@ void Dumper::dump (csBspTree* tree, csBspNode* node, int indent)
 
 void Dumper::dump (csBspTree* tree)
 {
-  dump (tree, tree->root, 0);
+  dump (tree, (csBspNode*)(tree->root), 0);
 }
 
 void Dumper::dump (csPolygonClipper* clipper, char* name)

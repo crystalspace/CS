@@ -125,6 +125,11 @@ public:
   void SetWarp (const csMatrix3& m_w, const csVector3& v_w_before, const csVector3& v_w_after);
 
   /**
+   * Get the warping transformation in object space.
+   */
+  const csReversibleTransform& GetWarp () { return warp_obj; }
+
+  /**
    * Check if space is warped by this portal.
    */
   bool IsSpaceWarped () { return do_warp_space; }

@@ -24,18 +24,18 @@
 
 //---------------------------------------------------------------------------
 
-int csBspPolygon::Classify (csPolygonInt* spoly)
+int csBspPolygon::Classify (const csPlane& pl)
 {
-  if (SamePlane (spoly)) return POL_SAME_PLANE;
+  if (GetPolyPlane () == &pl) return POL_SAME_PLANE;
+  if (csMath3::PlanesEqual (pl, *GetPolyPlane ())) return POL_SAME_PLANE;
 
   int i;
   int front = 0, back = 0;
-  csPlane* pl = spoly->GetPolyPlane ();
   csVector3* verts = parent->GetVertices ().GetVertices ();
 
   for (i = 0 ; i < polygon.GetNumVertices () ; i++)
   {
-    float dot = pl->Classify (verts[polygon[i]]);
+    float dot = pl.Classify (verts[polygon[i]]);
     if (ABS (dot) < SMALL_EPSILON) dot = 0;
     if (dot > 0) back++;
     else if (dot < 0) front++;
@@ -46,7 +46,7 @@ int csBspPolygon::Classify (csPolygonInt* spoly)
 }
 
 void csBspPolygon::SplitWithPlane (csPolygonInt** poly1, csPolygonInt** poly2,
-				  csPlane& split_plane)
+				  const csPlane& split_plane)
 {
   CHK (csBspPolygon* np1 = new csBspPolygon ());
   CHK (csBspPolygon* np2 = new csBspPolygon ());
@@ -84,7 +84,7 @@ void csBspPolygon::SplitWithPlane (csPolygonInt** poly1, csPolygonInt** poly2,
 	// from point A to point B with the partition
 	// plane. This is a simple ray-plane intersection.
 	csVector3 v = ptB; v -= ptA;
-	float sect = - split_plane.Classify (ptA) / ( split_plane.Normal () * v ) ;
+	float sect = - split_plane.Classify (ptA) / ( split_plane.GetNormal () * v ) ;
 	v *= sect; v += ptA;
 	idx = GetParent ()->GetVertices ().AddVertexSmart (v);
 	polygon1.AddVertex (idx);
@@ -100,7 +100,7 @@ void csBspPolygon::SplitWithPlane (csPolygonInt** poly1, csPolygonInt** poly2,
 	// from point A to point B with the partition
 	// plane. This is a simple ray-plane intersection.
 	csVector3 v = ptB; v -= ptA;
-	float sect = - split_plane.Classify (ptA) / ( split_plane.Normal () * v );
+	float sect = - split_plane.Classify (ptA) / ( split_plane.GetNormal () * v );
 	v *= sect; v += ptA;
 	idx = GetParent ()->GetVertices ().AddVertexSmart (v);
 	polygon1.AddVertex (idx);
@@ -116,12 +116,6 @@ void csBspPolygon::SplitWithPlane (csPolygonInt** poly1, csPolygonInt** poly2,
     ptA = ptB;
     sideA = sideB;
   }
-}
-
-bool csBspPolygon::SamePlane (csPolygonInt* p)
-{
-  if (GetPolyPlane () == p->GetPolyPlane ()) return true;
-  return csMath3::PlanesEqual (*p->GetPolyPlane (), *GetPolyPlane ());
 }
 
 void csBspPolygon::Transform (const csTransform& trans)

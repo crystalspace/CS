@@ -224,8 +224,10 @@ csSector* HugeRoom::create_huge_world (csWorld* world)
 #ifdef ROOM_CITYBLOCKS
   float x, y;
   float cnt = wall_dim/thing_cityblock_dim;
-  for (x = -cnt/2 ; x < cnt/2 ; x++)
-    for (y = -cnt/2 ; y < cnt/2 ; y++)
+  //for (x = -cnt/2 ; x < cnt/2 ; x++)
+    //for (y = -cnt/2 ; y < cnt/2 ; y++)
+  for (x = -3 ; x < 3 ; x++)
+    for (y = -3 ; y < 3 ; y++)
     {
       if ((rand () & 0xc) == 0)
         create_thing (room, csVector3 (x*thing_cityblock_dim, 0, y*thing_cityblock_dim));
@@ -292,7 +294,7 @@ csSector* HugeRoom::create_huge_world (csWorld* world)
 	wall_num_tris, wall_num_tris, 0);
 
   Sys->Printf (MSG_INITIALIZATION, "Number of polygons: %d\n", pol_nr);
-  room->UseStaticBSP (BSP_ALMOST_MINIMIZE_SPLITS);
+  room->UseStaticTree (BSP_ALMOST_MINIMIZE_SPLITS, true);
   Sys->Printf (MSG_INITIALIZATION, "Number of polygons (after BSP): %d+%d=%d\n",
   	room->GetStaticThing ()->GetNumPolygons (), room->GetNumPolygons (),
 	room->GetStaticThing ()->GetNumPolygons ()+room->GetNumPolygons ());

@@ -447,7 +447,7 @@ void csPolygon3D::SetPortal (csPortal* prt)
 }
 
 void csPolygon3D::SplitWithPlane (csPolygonInt** poly1, csPolygonInt** poly2,
-				  csPlane& plane)
+				  const csPlane& plane)
 {
   CHK (csPolygon3D* np1 = new csPolygon3D (*this));
   CHK (csPolygon3D* np2 = new csPolygon3D (*this));
@@ -457,17 +457,6 @@ void csPolygon3D::SplitWithPlane (csPolygonInt** poly1, csPolygonInt** poly2,
   np2->Reset ();
   GetParent ()->AddPolygon (np1);
   GetParent ()->AddPolygon (np2);
-
-//bool verbose = strcmp (csNameObject::GetName (*this), "p19") == 0;
-//if (verbose)
-//{
-//printf ("------------\nSplitting p19:%08lx (orig=%08lx)\n", (long)this, (long)orig_poly);
-//printf ("    num_vertices=%d\n", GetVertices ().GetNumVertices ());
-//int j;
-//for (j = 0 ; j < GetVertices ().GetNumVertices () ; j++)
-//printf ("       %d: %f,%f,%f\n", j, Vwor (j).x, Vwor (j).y, Vwor (j).z);
-//printf ("    split_plane=(%f,%f,%f,%f)\n", plane.A (), plane.B (), plane.C (), plane.D ());
-//}
 
   csVector3 ptB;
   float sideA, sideB;
@@ -480,10 +469,6 @@ void csPolygon3D::SplitWithPlane (csPolygonInt** poly1, csPolygonInt** poly2,
     ptB = Vwor (i);
     sideB = plane.Classify (ptB);
     if (ABS (sideB) < EPSILON) sideB = 0;
-//if (verbose)
-//{
-//printf ("    looking at vertex A=%f,%f,%f (%f) and B=%f,%f,%f (%f)\n", ptA.x, ptA.y, ptA.z, sideA, ptB.x, ptB.y, ptB.z, sideB);
-//}
     if (sideB > 0)
     {
       if (sideA < 0)
@@ -492,20 +477,11 @@ void csPolygon3D::SplitWithPlane (csPolygonInt** poly1, csPolygonInt** poly2,
 	// from point A to point B with the partition
 	// plane. This is a simple ray-plane intersection.
 	csVector3 v = ptB; v -= ptA;
-	float sect = - plane.Classify (ptA) / ( plane.Normal () * v ) ;
+	float sect = - plane.Classify (ptA) / ( plane.GetNormal () * v ) ;
 	v *= sect; v += ptA;
-//if (verbose)
-//{
-//printf ("        (1) pol1: adding vertex v=%f,%f,%f\n", v.x, v.y, v.z);
-//printf ("        (2) pol2: adding vertex v=%f,%f,%f\n", v.x, v.y, v.z);
-//}
 	np1->AddVertex (v);
 	np2->AddVertex (v);
       }
-//if (verbose)
-//{
-//printf ("        (3) pol2: adding vertex B=%f,%f,%f\n", ptB.x, ptB.y, ptB.z);
-//}
       np2->AddVertex (ptB);
     }
     else if (sideB < 0)
@@ -516,29 +492,15 @@ void csPolygon3D::SplitWithPlane (csPolygonInt** poly1, csPolygonInt** poly2,
 	// from point A to point B with the partition
 	// plane. This is a simple ray-plane intersection.
 	csVector3 v = ptB; v -= ptA;
-	float sect = - plane.Classify (ptA) / ( plane.Normal () * v );
+	float sect = - plane.Classify (ptA) / ( plane.GetNormal () * v );
 	v *= sect; v += ptA;
-//if (verbose)
-//{
-//printf ("        (4) pol1: adding vertex v=%f,%f,%f\n", v.x, v.y, v.z);
-//printf ("        (5) pol2: adding vertex v=%f,%f,%f\n", v.x, v.y, v.z);
-//}
 	np1->AddVertex (v);
 	np2->AddVertex (v);
       }
-//if (verbose)
-//{
-//printf ("        (6) pol1: adding vertex B=%f,%f,%f\n", ptB.x, ptB.y, ptB.z);
-//}
       np1->AddVertex (ptB);
     }
     else
     {
-//if (verbose)
-//{
-//printf ("        (7) pol1: adding vertex B=%f,%f,%f\n", ptB.x, ptB.y, ptB.z);
-//printf ("        (8) pol2: adding vertex B=%f,%f,%f\n", ptB.x, ptB.y, ptB.z);
-//}
       np1->AddVertex (ptB);
       np2->AddVertex (ptB);
     }
@@ -548,16 +510,6 @@ void csPolygon3D::SplitWithPlane (csPolygonInt** poly1, csPolygonInt** poly2,
 
   np1->Finish ();
   np2->Finish ();
-//if (verbose)
-//{
-//int j;
-//printf ("    split to %08lx (num_vertices=%d)\n", (long)np1, np1->GetVertices ().GetNumVertices ());
-//for (j = 0 ; j < np1->GetVertices ().GetNumVertices () ; j++)
-//printf ("       %d: %f,%f,%f\n", j, np1->Vwor (j).x, np1->Vwor (j).y, np1->Vwor (j).z);
-//printf ("    split to %08lx (num_vertices=%d)\n", (long)np2, np2->GetVertices ().GetNumVertices ());
-//for (j = 0 ; j < np2->GetVertices ().GetNumVertices () ; j++)
-//printf ("       %d: %f,%f,%f\n", j, np2->Vwor (j).x, np2->Vwor (j).y, np2->Vwor (j).z);
-//}
 }
 
 
@@ -581,23 +533,17 @@ bool csPolygon3D::IsTransparent ()
   return transp;
 }
 
-bool csPolygon3D::SamePlane (csPolygonInt* p)
+int csPolygon3D::Classify (const csPlane& pl)
 {
-  if (GetPolyPlane () == p->GetPolyPlane ()) return true;
-  return csMath3::PlanesEqual (*p->GetPolyPlane (), *GetPolyPlane ());
-}
-
-int csPolygon3D::Classify (csPolygonInt* spoly)
-{
-  if (SamePlane (spoly)) return POL_SAME_PLANE;
+  if (GetPolyPlane () == &pl) return POL_SAME_PLANE;
+  if (csMath3::PlanesEqual (pl, *GetPolyPlane ())) return POL_SAME_PLANE;
 
   int i;
   int front = 0, back = 0;
-  csPlane* pl = spoly->GetPolyPlane ();
 
   for (i = 0 ; i < GetVertices ().GetNumVertices () ; i++)
   {
-    float dot = pl->Classify (Vwor (i));
+    float dot = pl.Classify (Vwor (i));
     if (ABS (dot) < SMALL_EPSILON) dot = 0;
     if (dot > 0) back++;
     else if (dot < 0) front++;

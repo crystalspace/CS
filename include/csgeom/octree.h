@@ -16,129 +16,128 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef BSP_H
-#define BSP_H
+#ifndef OCTREE_H
+#define OCTREE_H
 
 #include "csgeom/math3d.h"
 #include "csgeom/polytree.h"
+#include "csgeom/bsp.h"
 
+class csPolygonInt;
+class csPolygonParentInt;
+class csOctree;
 class csBspTree;
 class Dumper;
 
-// The BSP tree can be build using the following criteria:
-#define BSP_MINIMIZE_SPLITS 1		// Minimize the number of polygon splits
-#define BSP_MOST_ON_SPLITTER 2		// Splitter with most coplanar polygons
-#define BSP_RANDOM 3			// Choose a random splitter
-#define BSP_ALMOST_MINIMIZE_SPLITS 4	// Select a number of polygons and choose minimal split
-#define BSP_BALANCED 5			// Try to create a balanced tree
-#define BSP_ALMOST_BALANCED 6		// Try to create an approximation of a balanced tree
+#define OCTREE_FFF 0
+#define OCTREE_FFB 1
+#define OCTREE_FBF 2
+#define OCTREE_FBB 3
+#define OCTREE_BFF 4
+#define OCTREE_BFB 5
+#define OCTREE_BBF 6
+#define OCTREE_BBB 7
 
 /**
- * A BSP node.
+ * An octree node.
  */
-class csBspNode : public csPolygonTreeNode
+class csOctreeNode : public csPolygonTreeNode
 {
-  friend class csBspTree;
+  friend class csOctree;
   friend class Dumper;
 
 private:
-  /**
-   * All the polygons in this node.
-   * These polygons are all on the same plane.
-   * The 'front' and 'back' children in this node are seperated
-   * by that plane.
-   */
-  csPolygonInt** polygons;
-  ///
-  int num;
-  ///
-  int max;
-  /**
-   * If not -1 then this is the index of the first dynamic
-   * polygon in the list of polygons.
-   */
-  int dynamic_idx;
-
-  /// The front node.
-  csBspNode* front;
-  /// The back node.
-  csBspNode* back;
+  /// Children.
+  csPolygonTreeNode* children[8];
+  /// Center point for this node.
+  csVector3 center;
+  /// Mini-bsp tree (in this case there are no children).
+  csBspTree* minibsp;
 
 private:
-  /// Make an empty BSP node.
-  csBspNode ();
+  /// Make an empty octree node.
+  csOctreeNode ();
 
   /**
-   * Destroy this BSP node. The list of polygons
-   * will be deleted but not the polygons themselves.
+   * Destroy this octree node.
    */
-  virtual ~csBspNode ();
+  virtual ~csOctreeNode ();
 
-  /**
-   * Add a polygon to this BSP node.
-   * If 'dynamic' is true it will be a dynamic polygon.
-   * Dynamic polygons can be removed all at once with RemoveDynamicPolygons().
-   */
-  void AddPolygon (csPolygonInt* poly, bool dynamic = false);
-
-  /**
-   * Remove all dynamic polygons.
-   */
+  /// Remove all dynamically added polygons from the node.
   void RemoveDynamicPolygons ();
 
   /// Return true if node is empty.
-  bool IsEmpty ()
-  {
-    return num == 0 &&
-    	(!front || front->IsEmpty ()) &&
-	(!back || back->IsEmpty ()); }
+  bool IsEmpty ();
+
+  /// Set center.
+  void SetCenter (const csVector3& c) { center = c; }
+
+  /// Get center.
+  const csVector3& GetCenter () { return center; }
+
+  /// Set mini-bsp tree.
+  void SetMiniBsp (csBspTree* mbsp) { minibsp = mbsp; }
+
+  /// Get mini-bsp tree.
+  csBspTree* GetMiniBsp () { return minibsp; }
 };
 
 /**
- * The BSP tree.
+ * The octree.
  */
-class csBspTree : public csPolygonTree
+class csOctree : public csPolygonTree
 {
   friend class Dumper;
 
 private:
-  /// The mode.
+  /// The main bounding box for the octree (min).
+  csVector3 min_bbox;
+  /// The main bounding box for the octree (max).
+  csVector3 max_bbox;
+  /// The number of polygons at which we revert to a bsp tree.
+  int bsp_num;
+  /// The mode for the mini-bsp trees.
   int mode;
 
 private:
   /// Build the tree from the given node and number of polygons.
-  void Build (csBspNode* node, csPolygonInt** polygons, int num);
+  void Build (csOctreeNode* node, const csVector3& bmin, const csVector3& bmax,
+  	csPolygonInt** polygons, int num);
 
   /**
    * Build the tree from the given node and number of polygons.
    * This is a dynamic version. It will add the polygons to an already built
-   * BSP tree and add the polygons so that they can easily be removed later.
+   * octree and add the polygons so that they can easily be removed later.
    */
-  void BuildDynamic (csBspNode* node, csPolygonInt** polygons, int num);
+  void BuildDynamic (csOctreeNode* node, const csVector3& bmin, const csVector3& bmax,
+  	csPolygonInt** polygons, int num);
 
   /**
-   * Select a splitter from a list of polygons and return the index.
+   * Remove all dynamically added polygons from the node.
    */
-  int SelectSplitter (csPolygonInt** polygons, int num);
+  void RemoveDynamicPolygons (csOctreeNode* node);
 
   /// Traverse the tree from back to front starting at 'node' and 'pos'.
-  void* Back2Front (csBspNode* node, const csVector3& pos,
+  void* Back2Front (csOctreeNode* node, const csVector3& pos,
   	csTreeVisitFunc* func, void* data);
   /// Traverse the tree from front to back starting at 'node' and 'pos'.
-  void* Front2Back (csBspNode* node, const csVector3& pos,
+  void* Front2Back (csOctreeNode* node, const csVector3& pos,
   	csTreeVisitFunc* func, void* data);
 
 public:
   /**
-   * Create an empty tree for a parent container.
+   * Create an empty tree for the given parent, a bounding box defining the
+   * outer limits of the octree, and the number of polygons at which we revert to
+   * a BSP tree.
    */
-  csBspTree (csPolygonParentInt* pset, int mode = BSP_MINIMIZE_SPLITS);
+  csOctree (csPolygonParentInt* pset, const csVector3& min_bbox,
+  	const csVector3& max_bbox, int bsp_num, int mode = BSP_MINIMIZE_SPLITS);
 
   /**
-   * Destroy the whole BSP tree (but not the actual polygons and parent
+   * Destroy the whole octree (but not the actual polygons and parent
    * objects).
    */
-  virtual ~csBspTree ();
+  virtual ~csOctree ();
 
   /**
    * Create the tree for the default parent set.
@@ -151,7 +150,7 @@ public:
   void Build (csPolygonInt** polygons, int num);
 
   /**
-   * Add a bunch of polygons to the BSP tree. They will be marked
+   * Add a bunch of polygons to the octree. They will be marked
    * as dynamic polygons so that you can remove them from the tree again
    * with RemoveDynamicPolygons(). Note that adding polygons dynamically
    * will not modify the existing tree and splits but instead continue
@@ -161,7 +160,7 @@ public:
 
   /**
    * Remove all dynamically added polygons from the node. Note that
-   * the polygons are not really destroyed. Only unlinked from the BSP
+   * the polygons are not really destroyed. Only unlinked from the
    * tree.
    */
   void RemoveDynamicPolygons ();
@@ -172,5 +171,5 @@ public:
   void* Front2Back (const csVector3& pos, csTreeVisitFunc* func, void* data);
 };
 
-#endif /*BSP_H*/
+#endif /*OCTREE_H*/
 

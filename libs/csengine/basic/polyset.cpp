@@ -598,6 +598,53 @@ void csPolygonSet::CreateBoundingBox ()
   bbox->i2 = AddVertexSmart (maxx, maxy, maxz);
 }
 
+void csPolygonSet::GetBoundingBox (csVector3& min_bbox, csVector3& max_bbox)
+{
+  min_bbox = max_bbox = Vobj (bbox->i1);
+  if (Vobj (bbox->i2).x < min_bbox.x) min_bbox.x = Vobj (bbox->i2).x;
+  else if (Vobj (bbox->i2).x > max_bbox.x) max_bbox.x = Vobj (bbox->i2).x;
+  if (Vobj (bbox->i2).y < min_bbox.y) min_bbox.y = Vobj (bbox->i2).y;
+  else if (Vobj (bbox->i2).y > max_bbox.y) max_bbox.y = Vobj (bbox->i2).y;
+  if (Vobj (bbox->i2).z < min_bbox.z) min_bbox.z = Vobj (bbox->i2).z;
+  else if (Vobj (bbox->i2).z > max_bbox.z) max_bbox.z = Vobj (bbox->i2).z;
+  if (Vobj (bbox->i3).x < min_bbox.x) min_bbox.x = Vobj (bbox->i3).x;
+  else if (Vobj (bbox->i3).x > max_bbox.x) max_bbox.x = Vobj (bbox->i3).x;
+  if (Vobj (bbox->i3).y < min_bbox.y) min_bbox.y = Vobj (bbox->i3).y;
+  else if (Vobj (bbox->i3).y > max_bbox.y) max_bbox.y = Vobj (bbox->i3).y;
+  if (Vobj (bbox->i3).z < min_bbox.z) min_bbox.z = Vobj (bbox->i3).z;
+  else if (Vobj (bbox->i3).z > max_bbox.z) max_bbox.z = Vobj (bbox->i3).z;
+  if (Vobj (bbox->i4).x < min_bbox.x) min_bbox.x = Vobj (bbox->i4).x;
+  else if (Vobj (bbox->i4).x > max_bbox.x) max_bbox.x = Vobj (bbox->i4).x;
+  if (Vobj (bbox->i4).y < min_bbox.y) min_bbox.y = Vobj (bbox->i4).y;
+  else if (Vobj (bbox->i4).y > max_bbox.y) max_bbox.y = Vobj (bbox->i4).y;
+  if (Vobj (bbox->i4).z < min_bbox.z) min_bbox.z = Vobj (bbox->i4).z;
+  else if (Vobj (bbox->i4).z > max_bbox.z) max_bbox.z = Vobj (bbox->i4).z;
+  if (Vobj (bbox->i5).x < min_bbox.x) min_bbox.x = Vobj (bbox->i5).x;
+  else if (Vobj (bbox->i5).x > max_bbox.x) max_bbox.x = Vobj (bbox->i5).x;
+  if (Vobj (bbox->i5).y < min_bbox.y) min_bbox.y = Vobj (bbox->i5).y;
+  else if (Vobj (bbox->i5).y > max_bbox.y) max_bbox.y = Vobj (bbox->i5).y;
+  if (Vobj (bbox->i5).z < min_bbox.z) min_bbox.z = Vobj (bbox->i5).z;
+  else if (Vobj (bbox->i5).z > max_bbox.z) max_bbox.z = Vobj (bbox->i5).z;
+  if (Vobj (bbox->i6).x < min_bbox.x) min_bbox.x = Vobj (bbox->i6).x;
+  else if (Vobj (bbox->i6).x > max_bbox.x) max_bbox.x = Vobj (bbox->i6).x;
+  if (Vobj (bbox->i6).y < min_bbox.y) min_bbox.y = Vobj (bbox->i6).y;
+  else if (Vobj (bbox->i6).y > max_bbox.y) max_bbox.y = Vobj (bbox->i6).y;
+  if (Vobj (bbox->i6).z < min_bbox.z) min_bbox.z = Vobj (bbox->i6).z;
+  else if (Vobj (bbox->i6).z > max_bbox.z) max_bbox.z = Vobj (bbox->i6).z;
+  if (Vobj (bbox->i7).x < min_bbox.x) min_bbox.x = Vobj (bbox->i7).x;
+  else if (Vobj (bbox->i7).x > max_bbox.x) max_bbox.x = Vobj (bbox->i7).x;
+  if (Vobj (bbox->i7).y < min_bbox.y) min_bbox.y = Vobj (bbox->i7).y;
+  else if (Vobj (bbox->i7).y > max_bbox.y) max_bbox.y = Vobj (bbox->i7).y;
+  if (Vobj (bbox->i7).z < min_bbox.z) min_bbox.z = Vobj (bbox->i7).z;
+  else if (Vobj (bbox->i7).z > max_bbox.z) max_bbox.z = Vobj (bbox->i7).z;
+  if (Vobj (bbox->i8).x < min_bbox.x) min_bbox.x = Vobj (bbox->i8).x;
+  else if (Vobj (bbox->i8).x > max_bbox.x) max_bbox.x = Vobj (bbox->i8).x;
+  if (Vobj (bbox->i8).y < min_bbox.y) min_bbox.y = Vobj (bbox->i8).y;
+  else if (Vobj (bbox->i8).y > max_bbox.y) max_bbox.y = Vobj (bbox->i8).y;
+  if (Vobj (bbox->i8).z < min_bbox.z) min_bbox.z = Vobj (bbox->i8).z;
+  else if (Vobj (bbox->i8).z > max_bbox.z) max_bbox.z = Vobj (bbox->i8).z;
+}
+
 //---------------------------------------------------------------------------------------------------------
 /*
  * Ken Clarkson wrote this.  Copyright (c) 1996 by AT&T..

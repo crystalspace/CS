@@ -1006,13 +1006,13 @@ public:
 	bool mirror);
 
   /**
-   * Classify a polygon with regards to this one (in world space). If this poly
-   * is on same plane as this one it returns POL_SAME_PLANE. If this poly is
-   * completely in front of the given poly it returnes POL_FRONT. If this poly
-   * is completely back of the given poly it returnes POL_BACK. Otherwise it
+   * Classify this polygon with regards to a plane (in world space). If this poly
+   * is on same plane it returns POL_SAME_PLANE. If this poly is
+   * completely in front of the given plane it returnes POL_FRONT. If this poly
+   * is completely back of the given plane it returnes POL_BACK. Otherwise it
    * returns POL_SPLIT_NEEDED.
    */
-  int Classify (csPolygonInt* spoly);
+  int Classify (const csPlane& pl);
 
   /**
    * Split this polygon with the given plane (A,B,C,D) and return the
@@ -1021,15 +1021,7 @@ public:
    * This function is mainly used by the BSP splitter.
    */
   void SplitWithPlane (csPolygonInt** front, csPolygonInt** back,
-  	csPlane& plane);
-
-  /**
-   * Return true if this polygon and the given polygon are on the same
-   * plane. If their planes are shared this is automatically the case.
-   * Otherwise this function will check their respective plane equations
-   * to test for equality.
-   */
-  bool SamePlane (csPolygonInt* p);
+  	const csPlane& plane);
 
   /**
    * Return 1 to indicate to the BSP tree routines that
