@@ -2604,6 +2604,8 @@ void csSprite3DMeshObject::PositionChild (iMeshObject* child,csTicks current_tim
   }
   if(socket)
   {
+    csVector3 new_pos = last_pos;
+    OldNextFrame (current_time, new_pos, single_step, !loopaction);
     iMovable* movable = socket->GetMeshWrapper()->GetMovable();
     
     csSprite3DMeshObjectFactory* sof= factory;

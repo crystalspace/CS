@@ -18,6 +18,8 @@ chronological order.
 	  that doesn't compile) so a real fix is needed.
 	- Eric Sunshine applied a fix to csParseMouseDef() instead of merely
 	  commenting out the code.
+	- Steven Geens probably fixed an out-of-sync hierarchical meshing
+	  problem in spr3d.
 29-Dec-2003
 	- Eric Sunshine changed user.mak so the old OpenGL renderer is not
 	  built when USE_NEW_RENDERER is 'yes'.
