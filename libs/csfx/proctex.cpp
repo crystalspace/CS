@@ -71,6 +71,7 @@ bool csProcTexture::Initialize (iSystem* system)
   iEngine* engine = QUERY_PLUGIN (system, iEngine);
   tex = engine->GetTextureList ()->NewTexture (proc_image);
   engine->DecRef ();
+  proc_image->DecRef ();
   if (!tex) 
     return false;
 
