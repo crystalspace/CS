@@ -128,19 +128,16 @@ void csTextureHandle::CreateMipmaps ()
   if ((flags & (CS_TEXTURE_3D | CS_TEXTURE_NOMIPMAPS)) == CS_TEXTURE_3D)
   {
     // Create each new level by creating a level 2 mipmap from previous level
-    iImage *i1 = image->MipMap (1, tc);
-    iImage *i2 = i1->MipMap (1, tc);
-    iImage *i3 = i2->MipMap (1, tc);
+    csRef<iImage> i1 = image->MipMap (1, tc);
+    csRef<iImage> i2 = i1->MipMap (1, tc);
+    csRef<iImage> i3 = i2->MipMap (1, tc);
 
     tex[1] = NewTexture (i1);
     DG_LINK (this, tex[1]);
-    i1->DecRef ();
     tex[2] = NewTexture (i2);
     DG_LINK (this, tex[2]);
-    i2->DecRef ();
     tex[3] = NewTexture (i3);
     DG_LINK (this, tex[3]);
-    i3->DecRef ();
   }
 
   ComputeMeanColor ();

@@ -156,7 +156,7 @@ public:
       (void)command;
       return false;
     };
-    virtual iImage *ScreenShot () { return NULL; };
+    virtual csPtr<iImage> ScreenShot () { return NULL; };
     virtual iGraphics2D *CreateOffScreenCanvas (
       int width,
       int height,

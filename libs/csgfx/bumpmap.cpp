@@ -57,25 +57,25 @@ csBumpMap::csBumpMap (iImage* src, int fmt)
     bumpmap = new uint8 [width * height];
     uint8 *map = (uint8 *)bumpmap;
 
-	int y;
+    int y;
     for (y = 0; y < height; y++)
-	{
-	  int x;
+    {
+      int x;
       for (x = 0; x < width; x++)
       {
-        int dx = heightdata [y * width + (x + 1) % width] -
-		  heightdata [y * width + (x - 1) % width];
-        int dy = heightdata [((y + 1) % height) * width + x] -
-		  heightdata [((y - 1) % height) * width + x];
+	int dx = heightdata [y * width + (x + 1) % width] -
+	  heightdata [y * width + (x - 1) % width];
+	int dy = heightdata [((y + 1) % height) * width + x] -
+	  heightdata [((y - 1) % height) * width + x];
 
-		/// now dx,dy are -255 ... 255, but must fit in -8..+7
-		dx >>= 5;
-		dy >>= 5;
-		map [y * width + x] = ((dx << 4) & 0xF0) | (dy & 0xF);
+	/// now dx,dy are -255 ... 255, but must fit in -8..+7
+	dx >>= 5;
+	dy >>= 5;
+	map [y * width + x] = ((dx << 4) & 0xF0) | (dy & 0xF);
       }
-	}
+    }
   }
-
+  
   delete [] heightdata;
 }
 
@@ -83,3 +83,4 @@ csBumpMap::~csBumpMap ()
 {
   delete [] bumpmap;
 }
+
