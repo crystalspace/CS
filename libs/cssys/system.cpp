@@ -566,13 +566,15 @@ bool csSystemDriver::CheckDrivers ()
 
 void csSystemDriver::NextFrame ()
 {
+  int i;
+
   // Update elapsed time first
   cs_time cur_time = Time ();
   ElapsedTime = (CurrentTime == cs_time (-1)) ? 0 : cur_time - CurrentTime;
   CurrentTime = cur_time;
 
   // See if any plugin wants to be called every frame
-  for (int i = 0; i < PlugIns.Length (); i++)
+  for (i = 0; i < PlugIns.Length (); i++)
   {
     csPlugIn *plugin = PlugIns.Get (i);
     if (plugin->EventMask & CSMASK_Nothing)
@@ -601,7 +603,7 @@ void csSystemDriver::NextFrame ()
 //@@@@@@@@@@@@@@ END @@@@@@@@@@@@@@@@
 
   // If a plugin has set CSMASK_Nothing, it receives cscmdPostProcess events too
-  for (int i = 0; i < PlugIns.Length (); i++)
+  for (i = 0; i < PlugIns.Length (); i++)
   {
     csPlugIn *plugin = PlugIns.Get (i);
     if (plugin->EventMask & CSMASK_Nothing)

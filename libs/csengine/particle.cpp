@@ -348,7 +348,7 @@ void csSpiralParticleSystem::Update (cs_time elapsed_time)
 
     SetSpeed (part_idx, dir);
     SetAccel (part_idx, csVector3 (0));
-    part->MovePosition( -time_before_new_particle / 1000.0 * dir);
+    part->MovePosition( -(float)time_before_new_particle / 1000.0 * dir);
   }
   csNewtonianParticleSystem::Update (elapsed_time);
 }
