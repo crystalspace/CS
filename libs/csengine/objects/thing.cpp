@@ -296,6 +296,36 @@ void csThing::MarkLightmapsDirty ()
 #endif // CS_USE_NEW_RENDERER
 }
 
+void csThing::DynamicLightChanged (iDynLight* dynlight)
+{
+  int i;
+  for (i = 0 ; i < polygons.Length () ; i++)
+  {
+    csPolygon3D *p = GetPolygon3D (i);
+    p->MakeDirtyDynamicLights ();
+  }
+  for (i = 0; i < curves.Length (); i++)
+  {
+    csCurve *c = GetCurve (i);
+    c->MakeDirtyDynamicLights ();
+  }
+}
+
+void csThing::DynamicLightDisconnect (iDynLight* dynlight)
+{
+  int i;
+  for (i = 0 ; i < polygons.Length () ; i++)
+  {
+    csPolygon3D *p = GetPolygon3D (i);
+    p->DynamicLightDisconnect (dynlight);
+  }
+  for (i = 0; i < curves.Length (); i++)
+  {
+    csCurve *c = GetCurve (i);
+    c->DynamicLightDisconnect (dynlight);
+  }
+}
+
 void csThing::CleanupThingEdgeTable ()
 {
   int i;
@@ -2670,12 +2700,20 @@ void csThing::CastShadows (iFrustumView *lview, iMovable *movable)
 
   draw_busy++;
 
+  csLightingPolyTexQueue *lptq = (csLightingPolyTexQueue *)
+    (lview->GetUserdata ());
+  bool dyn = lptq->IsDynamic ();
+  if (dyn)
+  {
+    // @@@ Needs to be iDynLight!!!
+    csDynLight *dl = (csDynLight *) (lptq->GetCsLight ());
+    dl->AddAffectedLightingInfo (&scfiLightingInfo);
+  }
+
   for (i = 0; i < polygons.Length (); i++)
   {
     csPolygon3D* poly = GetPolygon3D (i);
-    csLightingPolyTexQueue *lptq = (csLightingPolyTexQueue *)
-      (lview->GetUserdata ());
-    if (lptq->IsDynamic ())
+    if (dyn)
       poly->CalculateLightingDynamic ((csFrustumView*)lview);
     else
       poly->CalculateLightingStatic ((csFrustumView*)lview, true);
@@ -2684,9 +2722,7 @@ void csThing::CastShadows (iFrustumView *lview, iMovable *movable)
   for (i = 0; i < GetCurveCount (); i++)
   {
     csCurve* curve = curves.Get (i);
-    csLightingPolyTexQueue *lptq = (csLightingPolyTexQueue *)
-      (lview->GetUserdata ());
-    if (lptq->IsDynamic ())
+    if (dyn)
       curve->CalculateLightingDynamic ((csFrustumView*)lview);
     else
       curve->CalculateLightingStatic ((csFrustumView*)lview, true);

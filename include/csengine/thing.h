@@ -954,6 +954,8 @@ public:
   uint32 GetDynamicAmbientVersion()
   {   return ambient_version; }
 
+  void DynamicLightChanged (iDynLight* dynlight);
+  void DynamicLightDisconnect (iDynLight* dynlight);
 
   SCF_DECLARE_IBASE_EXT (csObject);
 
@@ -1117,6 +1119,10 @@ public:
     { return scfParent->GetDynamicAmbientLight (); }
     virtual uint32 GetDynamicAmbientVersion () const
     { return scfParent->GetDynamicAmbientVersion (); }
+    virtual void DynamicLightChanged (iDynLight* dynlight)
+    { scfParent->DynamicLightChanged (dynlight); }
+    virtual void DynamicLightDisconnect (iDynLight* dynlight)
+    { scfParent->DynamicLightDisconnect (dynlight); }
   } scfiLightingInfo;
   friend struct LightingInfo;
 

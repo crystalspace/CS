@@ -340,8 +340,7 @@ void csStatLight::SetColor (const csColor &col)
 
 csLightPatch::csLightPatch ()
 {
-  next_poly = prev_poly = NULL;
-  next_light = prev_light = NULL;
+  next = prev = NULL;
   num_vertices = 0;
   max_vertices = 0;
   vertices = NULL;
@@ -361,7 +360,6 @@ void csLightPatch::RemovePatch ()
 {
   if (polygon) polygon->UnlinkLightpatch (this);
   if (curve) curve->UnlinkLightPatch (this);
-  if (light) light->UnlinkLightpatch (this);
   shadows.DeleteShadows ();
   if (light_frustum)
   {
@@ -403,24 +401,30 @@ csDynLight::csDynLight (
 {
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiDynLight);
   DG_TYPE (this, "csDynLight");
-  lightpatches = NULL;
 }
 
 csDynLight::~csDynLight ()
 {
-  // @@@ VERY DIRTY!
-  csThingObjectType* t = (csThingObjectType*)csEngine::current_engine->GetThingType ();
-  while (lightpatches)
-    t->lightpatch_pool->Free (lightpatches);
   //csEngine::current_engine->RemoveDynLight (this);
+
+  csHashIterator it (lightinginfos.GetHashMap ());
+  while (it.HasNext ())
+  {
+    iLightingInfo* linfo = (iLightingInfo*)it.Next ();
+    linfo->DynamicLightDisconnect (&scfiDynLight);
+  }
+  lightinginfos.DeleteAll ();
 }
 
 void csDynLight::Setup ()
 {
-  // @@@ VERY DIRTY!
-  csThingObjectType* t = (csThingObjectType*)csEngine::current_engine->GetThingType ();
-  while (lightpatches)
-    t->lightpatch_pool->Free (lightpatches);
+  csHashIterator it (lightinginfos.GetHashMap ());
+  while (it.HasNext ())
+  {
+    iLightingInfo* linfo = (iLightingInfo*)it.Next ();
+    linfo->DynamicLightDisconnect (&scfiDynLight);
+  }
+  lightinginfos.DeleteAll ();
 
   csFrustumView lview;
   csFrustumContext *ctxt = lview.GetFrustumContext ();
@@ -444,31 +448,26 @@ void csDynLight::Setup ()
   lptq->DecRef ();
 }
 
+void csDynLight::AddAffectedLightingInfo (iLightingInfo* li)
+{
+  lightinginfos.Add (li);
+}
+
+void csDynLight::RemoveAffectedLightingInfo (iLightingInfo* li)
+{
+  lightinginfos.Delete (li);
+}
+
 void csDynLight::SetColor (const csColor &col)
 {
   csLight::SetColor (col);
 
-  csLightPatch *lp = lightpatches;
-  while (lp)
+  csHashIterator it (lightinginfos.GetHashMap ());
+  while (it.HasNext ())
   {
-    if (lp->GetPolygon ())
-      lp->GetPolygon ()->MakeDirtyDynamicLights ();
-    else
-      lp->GetCurve ()->MakeDirtyDynamicLights ();
-
-    lp = lp->GetNextLight ();
+    iLightingInfo* linfo = (iLightingInfo*)it.Next ();
+    linfo->DynamicLightChanged (&scfiDynLight);
   }
-}
-
-void csDynLight::UnlinkLightpatch (csLightPatch *lp)
-{
-  lp->RemoveLightList (lightpatches);
-}
-
-void csDynLight::AddLightpatch (csLightPatch *lp)
-{
-  lp->AddLightList (lightpatches);
-  lp->SetLight (this);
 }
 
 // --- csLightList -----------------------------------------------------------

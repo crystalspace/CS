@@ -226,9 +226,21 @@ void csCurve::MakeDirtyDynamicLights ()
   LightMap->MakeDirtyDynamicLights ();
 };
 
+void csCurve::DynamicLightDisconnect (iDynLight* dynlight)
+{
+  csLightPatch* lp = LightPatches;
+  while (lp)
+  {
+    csLightPatch* lpnext = lp->GetNext ();
+    if (&(lp->GetLight ()->scfiDynLight) == dynlight)
+      thing_type->lightpatch_pool->Free (lp);
+    lp = lpnext;
+  }
+}
+
 void csCurve::AddLightPatch (csLightPatch *lp)
 {
-  lp->AddPolyList (LightPatches);
+  lp->AddList (LightPatches);
   lp->SetPolyCurve (this);
 
   /// set the dynamic lights to dirty
@@ -237,7 +249,7 @@ void csCurve::AddLightPatch (csLightPatch *lp)
 
 void csCurve::UnlinkLightPatch (csLightPatch *lp)
 {
-  lp->RemovePolyList (LightPatches);
+  lp->RemoveList (LightPatches);
   LightMap->MakeDirtyDynamicLights ();
 }
 
@@ -253,7 +265,7 @@ bool csCurve::RecalculateDynamicLights ()
   while (lp)
   {
     ShineDynLight (lp);
-    lp = lp->GetNextPoly ();
+    lp = lp->GetNext ();
   }
 
   return true;
@@ -547,7 +559,8 @@ void csCurve::CalculateLightingDynamic (csFrustumView *lview)
   AddLightPatch (lp);
 
   csDynLight *dl = (csDynLight *) (lptq->GetCsLight ());
-  dl->AddLightpatch (lp);
+  //dl->AddLightpatch (lp);
+  lp->SetLight (dl);
 
   // This light patch has exactly 4 vertices because it fits around our
   // LightMap

@@ -947,6 +947,11 @@ public:
    */
   void MakeDirtyDynamicLights ();
 
+  /**
+   * Disconnect a dynamic light from this polygon.
+   */
+  void DynamicLightDisconnect (iDynLight* dynlight);
+
   /// Return true if polygon is dirty for dynamic lights.
   bool IsDirty () { return light_info.dyn_dirty; }
 

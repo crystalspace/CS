@@ -1,5 +1,18 @@
 The history order is reversed so that new features are at the top.
 
+19-Dec-2002
+	- Added iDynLight->AddAffectedLightingInfo(). The plan is to make
+	  dynamic lights work on a base of meshes instead of curves and
+	  polygons directly.
+	- Added iDynLight->RemoveAffectedLightingInfo().
+	- Added iLightingInfo->DynamicLightChanged() function. With this
+	  function dynamic lights will notify mesh objects that a dynamic
+	  light has changed. The dynamic light will only notify meshes
+	  that were added using AddAffectedLightingInfo().
+	- Added iLightingInfo->DynamicLightDisconnect() function.
+	- The changes above disconnect the knowledge of individual
+	  polygons and curves from the dynamic lighting system. Another
+	  step closer towards csThing/csEngine seperation.
 18-Dec-2002
 	- Fixed the sprite socket vector. FreeItem() casted the item
 	  to delete to the wrong type (csSpriteSocketVector instead

@@ -456,7 +456,7 @@ void csPolygon2D::DrawFilled (
                 true,
                 reset);
             reset = false;
-            lp = lp->GetNextPoly ();
+            lp = lp->GetNext ();
           }
         }
         else

@@ -163,6 +163,8 @@ public:
   void AppendShadows (iMovable* movable, iShadowBlockList* shadows,
     	const csVector3& origin);
   void CastShadows (iMovable* movable, iFrustumView* fview);
+  void DynamicLightChanged (iDynLight* dynlight);
+  void DynamicLightDisconnect (iDynLight* dynlight);
 
   //----------------------- iMeshObject implementation ----------------------
   SCF_DECLARE_IBASE;
@@ -264,6 +266,14 @@ public:
     virtual uint32 GetDynamicAmbientVersion () const
     {
       return scfParent->ambient_version;
+    }
+    virtual void DynamicLightChanged (iDynLight* dynlight)
+    {
+      scfParent->DynamicLightChanged (dynlight);
+    }
+    virtual void DynamicLightDisconnect (iDynLight* dynlight)
+    {
+      scfParent->DynamicLightDisconnect (dynlight);
     }
   } scfiLightingInfo;
   friend struct LightingInfo;

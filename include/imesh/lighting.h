@@ -22,8 +22,9 @@
 #include "csutil/scf.h"
 
 struct iCacheManager;
+struct iDynLight;
 
-SCF_VERSION (iLightingInfo, 0, 1, 1);
+SCF_VERSION (iLightingInfo, 0, 1, 2);
 
 /**
  * This interface is implemented by mesh objects that have some kind
@@ -71,6 +72,18 @@ struct iLightingInfo : public iBase
    * Get dynamic ambient light version to test if needs to be recalculated.
    */
   virtual uint32 GetDynamicAmbientVersion () const = 0;
+
+  /**
+   * Indicate that some dynamic light has changed. This function will
+   * be called by the lighting system whenever a dynamic light that
+   * affects this mesh is changed in some way.
+   */
+  virtual void DynamicLightChanged (iDynLight* dynlight) = 0;
+
+  /**
+   * Indicate that some dynamic no longer affects this mesh.
+   */
+  virtual void DynamicLightDisconnect (iDynLight* dynlight) = 0;
 };
 
 #endif // __IMESH_LIGHTING_H__

@@ -226,6 +226,16 @@ void csGenmeshMeshObject::PrepareLighting ()
 {
 }
 
+void csGenmeshMeshObject::DynamicLightChanged (iDynLight* dynlight)
+{
+  (void)dynlight;
+}
+
+void csGenmeshMeshObject::DynamicLightDisconnect (iDynLight* dynlight)
+{
+  (void)dynlight;
+}
+
 void csGenmeshMeshObject::AppendShadows (iMovable* movable,
 	iShadowBlockList* shadows, const csVector3& origin)
 {

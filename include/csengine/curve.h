@@ -214,6 +214,8 @@ public:
 
   /// @@@
   void MakeDirtyDynamicLights ();
+  /// @@@
+  void DynamicLightDisconnect (iDynLight* dynlight);
   /// Add a lightpatch to this curves list of light patches
   void AddLightPatch (csLightPatch* lp);
   /// Remove a lightpatch from this curves list

@@ -400,7 +400,12 @@ csPolygon3D::~csPolygon3D ()
   if (thing)
   {
     while (light_info.lightpatches)
+    {
+      csDynLight* dl = light_info.lightpatches->GetLight ();
+      if (dl)
+        dl->RemoveAffectedLightingInfo (&(thing->scfiLightingInfo));
       thing->thing_type->lightpatch_pool->Free (light_info.lightpatches);
+    }
   }
   VectorArray->DecRef ();
 #ifdef DO_HW_UVZ
@@ -1131,15 +1136,27 @@ void csPolygon3D::MakeDirtyDynamicLights ()
   if (lmi && lmi->tex) lmi->tex->MakeDirtyDynamicLights ();
 }
 
+void csPolygon3D::DynamicLightDisconnect (iDynLight* dynlight)
+{
+  csLightPatch* lp = light_info.lightpatches;
+  while (lp)
+  {
+    csLightPatch* lpnext = lp->GetNext ();
+    if (&(lp->GetLight ()->scfiDynLight) == dynlight)
+      thing->thing_type->lightpatch_pool->Free (lp);
+    lp = lpnext;
+  }
+}
+
 void csPolygon3D::UnlinkLightpatch (csLightPatch *lp)
 {
-  lp->RemovePolyList (light_info.lightpatches);
+  lp->RemoveList (light_info.lightpatches);
   MakeDirtyDynamicLights ();
 }
 
 void csPolygon3D::AddLightpatch (csLightPatch *lp)
 {
-  lp->AddPolyList (light_info.lightpatches);
+  lp->AddList (light_info.lightpatches);
   lp->SetPolyCurve (this);
   MakeDirtyDynamicLights ();
 }
@@ -2086,7 +2103,8 @@ void csPolygon3D::FillLightMapDynamic (csFrustumView &lview)
   csLightingPolyTexQueue *lptq = (csLightingPolyTexQueue *)
     (lview.GetUserdata ());
   csDynLight *dl = (csDynLight *) (lptq->GetCsLight ());
-  dl->AddLightpatch (lp);
+  //dl->AddLightpatch (lp);
+  lp->SetLight (dl);
 
   csFrustum *light_frustum = ctxt->GetLightFrustum ();
   lp->Initialize (light_frustum->GetVertexCount ());

@@ -31,8 +31,9 @@
 class csDynLight;
 struct iObject;
 struct iLight;
+struct iLightingInfo;
 
-SCF_VERSION (iDynLight, 0, 0, 1);
+SCF_VERSION (iDynLight, 0, 1, 0);
 
 /**
  * The iDynLight interface represents a dynamic light.
@@ -46,6 +47,13 @@ struct iDynLight : public iBase
   virtual iObject *QueryObject () = 0;
   /// Get the iLight for this light.
   virtual iLight *QueryLight () = 0;
+
+  /**
+   * Add a mesh to this dynamic light. This is usually
+   * called during Setup() by meshes that are hit by the
+   * dynamic light.
+   */
+  virtual void AddAffectedLightingInfo (iLightingInfo* li) = 0; 
 
   /// Setup the light (i.e. do the lighting calculations).
   virtual void Setup () = 0;

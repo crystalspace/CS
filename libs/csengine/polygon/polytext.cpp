@@ -174,7 +174,7 @@ bool csPolyTexture::RecalculateDynamicLights ()
   while (lp)
   {
     ShineDynLightMap (lp);
-    lp = lp->GetNextPoly ();
+    lp = lp->GetNext ();
   }
 
   return true;

@@ -25,6 +25,7 @@
 #include "csutil/flags.h"
 #include "csutil/csvector.h"
 #include "csutil/nobjvec.h"
+#include "csutil/hashmap.h"
 #include "csengine/lview.h"
 #include "iengine/light.h"
 #include "iengine/statlght.h"
@@ -38,6 +39,7 @@ class csPolygon3D;
 class csCurve;
 class csSector;
 struct iMeshWrapper;
+struct iLightingInfo;
 
 /**
  * Superclass of all positional lights.
@@ -386,10 +388,8 @@ class csLightPatch
   friend class csLightPatchPool;
 
 private:
-  csLightPatch* next_poly;
-  csLightPatch* prev_poly;
-  csLightPatch* next_light;
-  csLightPatch* prev_light;
+  csLightPatch* next;
+  csLightPatch* prev;
 
   /// Vertices.
   csVector3* vertices;
@@ -467,16 +467,9 @@ public:
   }
 
   /**
-   * Get next light patch as seen from the standpoint
-   * of the polygon.
+   * Get next light patch.
    */
-  csLightPatch* GetNextPoly () { return next_poly; }
-
-  /**
-   * Get the next light patch as seen from the standpoint
-   * of the light.
-   */
-  csLightPatch* GetNextLight () { return next_light; }
+  csLightPatch* GetNext () { return next; }
 
   /// Set polygon.
   void SetPolyCurve (csPolygon3D* pol) { polygon = pol; curve = NULL; }
@@ -484,42 +477,24 @@ public:
   void SetPolyCurve (csCurve* c) { curve = c; polygon = NULL; }
   /// Set light.
   void SetLight (csDynLight* l) { light = l; }
-  /// Add to poly list.
-  void AddPolyList (csLightPatch*& first)
+  /// Add to list.
+  void AddList (csLightPatch*& first)
   {
-    next_poly = first;
-    prev_poly = NULL;
+    next = first;
+    prev = NULL;
     if (first)
-      first->prev_poly = this;
+      first->prev = this;
     first = this;
   }
-  /// Remove from poly list.
-  void RemovePolyList (csLightPatch*& first)
+  /// Remove from list.
+  void RemoveList (csLightPatch*& first)
   {
-    if (next_poly) next_poly->prev_poly = prev_poly;
-    if (prev_poly) prev_poly->next_poly = next_poly;
-    else first = next_poly;
-    prev_poly = next_poly = NULL;
+    if (next) next->prev= prev;
+    if (prev) prev->next= next;
+    else first = next;
+    prev= next= NULL;
     polygon = NULL;
     curve = NULL;
-  }
-  /// Add to light list.
-  void AddLightList (csLightPatch*& first)
-  {
-    next_light = first;
-    prev_light = NULL;
-    if (first)
-      first->prev_light = this;
-    first = this;
-  }
-  /// Remove from light list.
-  void RemoveLightList (csLightPatch*& first)
-  {
-    if (next_light) next_light->prev_light = prev_light;
-    if (prev_light) prev_light->next_light = next_light;
-    else first = next_light;
-    prev_light = next_light = NULL;
-    light = NULL;
   }
 
   /// Set the light frustum.
@@ -539,8 +514,8 @@ private:
   csDynLight* next;
   csDynLight* prev;
 
-  /// List of light patches for this dynamic light.
-  csLightPatch* lightpatches;
+  /// Set of meshes that we are currently affecting.
+  csHashSet lightinginfos;
 
 public:
   /**
@@ -574,16 +549,16 @@ public:
   virtual void SetColor (const csColor& col);
 
   /**
-   * Unlink a light patch from the light patch list.
-   * Warning! This function does not test if the light patch
-   * is really on the list!
+   * Add a lighting info to this dynamic light. This is usually
+   * called during Setup() by meshes that are hit by the
+   * dynamic light.
    */
-  void UnlinkLightpatch (csLightPatch* lp);
+  void AddAffectedLightingInfo (iLightingInfo* li);
 
   /**
-   * Add a light patch to the light patch list.
+   * Remove a lighting info from this dynamic light.
    */
-  void AddLightpatch (csLightPatch* lp);
+  void RemoveAffectedLightingInfo (iLightingInfo* li);
 
   ///
   void SetNext (csDynLight* n) { next = n; }
@@ -605,6 +580,10 @@ public:
     /// Used by the engine to retrieve internal dyn light object (ugly)
     virtual csDynLight* GetPrivateObject ()
     { return scfParent; }
+    virtual void AddAffectedLightingInfo (iLightingInfo* li)
+    { scfParent->AddAffectedLightingInfo (li); }
+    virtual void RemoveAffectedLightingInfo (iLightingInfo* li)
+    { scfParent->RemoveAffectedLightingInfo (li); }
     virtual void Setup ()
     { scfParent->Setup (); }
     virtual iObject *QueryObject ()
