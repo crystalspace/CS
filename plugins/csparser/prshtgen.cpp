@@ -395,12 +395,6 @@ bool csLoader::ParseHeightgen (char* buf)
   }
 
   delete gen;
-  //@@@ Memory leak!
-  //if (data)
-  //{
-    //data->im->DecRef ();
-    //delete data;
-  //}
 
   if (cmd == CS_PARSERR_TOKENNOTFOUND)
   {
@@ -412,8 +406,306 @@ bool csLoader::ParseHeightgen (char* buf)
 
 // XML versions -------------------------------------------------------------------
 
+csGenerateImageValue* csLoader::ParseHeightgenValue (iDocumentNode* node)
+{
+  csGenerateImageValue* v = NULL;
+
+  csRef<iDocumentNodeIterator> it = node->GetNodes ();
+  while (it->HasNext ())
+  {
+    csRef<iDocumentNode> child = it->Next ();
+    if (child->GetType () != CS_NODE_ELEMENT) continue;
+    const char* value = child->GetValue ();
+    csStringID id = xmltokens.Request (value);
+    switch (id)
+    {
+      case XMLTOKEN_CONSTANT:
+        {
+	  csGenerateImageValueFuncConst* vt =
+	  	new csGenerateImageValueFuncConst ();
+	  vt->constant = child->GetContentsValueAsFloat ();
+	  v = vt;
+	}
+	break;
+      case XMLTOKEN_HEIGHTMAP:
+        {
+	  csGenerateImageValueFunc* vf = new csGenerateImageValueFunc ();
+	  float hscale = 1, hshift = 0;
+	  csRef<iDocumentNode> imagenode = child->GetNode ("image");
+	  if (!imagenode)
+	  {
+	    ReportError (
+	      "crystalspace.maploader.parse.heightgen",
+              "Expected 'image' token in 'heightmap'!");
+	  }
+	  const char* heightmap = imagenode->GetContentsValue ();;
+	  csRef<iDocumentNode> scalenode = child->GetNode ("scale");
+	  if (scalenode)
+	    hscale = scalenode->GetContentsValueAsFloat ();
+	  csRef<iDocumentNode> shiftnode = child->GetNode ("shift");
+	  if (shiftnode)
+	    hshift = shiftnode->GetContentsValueAsFloat ();
+
+	  iImage* img = LoadImage (heightmap, CS_IMGFMT_TRUECOLOR);
+	  if (!img) return NULL;
+	  PrsHeightMapData* data = new PrsHeightMapData (false);
+  	  data->im = img;
+  	  data->iw = img->GetWidth ();
+  	  data->ih = img->GetHeight ();
+  	  data->w = float (data->iw);
+  	  data->h = float (data->ih);
+  	  data->p = (csRGBpixel*)(img->GetImageData ());
+  	  data->hscale = hscale;
+  	  data->hshift = hshift;
+	  vf->SetFunction (data);
+	  data->DecRef ();
+	  v = vf;
+	}
+	break;
+      case XMLTOKEN_SLOPE:
+        {
+	  csGenerateImageValueFunc* vf = new csGenerateImageValueFunc ();
+	  float hscale = 1, hshift = 0;
+	  csRef<iDocumentNode> imagenode = child->GetNode ("image");
+	  if (!imagenode)
+	  {
+	    ReportError (
+	      "crystalspace.maploader.parse.heightgen",
+              "Expected 'image' token in 'slope'!");
+	  }
+	  const char* heightmap = imagenode->GetContentsValue ();;
+	  csRef<iDocumentNode> scalenode = child->GetNode ("scale");
+	  if (scalenode)
+	    hscale = scalenode->GetContentsValueAsFloat ();
+	  csRef<iDocumentNode> shiftnode = child->GetNode ("shift");
+	  if (shiftnode)
+	    hshift = shiftnode->GetContentsValueAsFloat ();
+	  iImage* img = LoadImage (heightmap, CS_IMGFMT_TRUECOLOR);
+	  if (!img) return NULL;
+	  PrsHeightMapData* data = new PrsHeightMapData (true);
+  	  data->im = img;
+  	  data->iw = img->GetWidth ();
+  	  data->ih = img->GetHeight ();
+  	  data->w = float (data->iw);
+  	  data->h = float (data->ih);
+  	  data->p = (csRGBpixel*)(img->GetImageData ());
+  	  data->hscale = hscale;
+  	  data->hshift = hshift;
+	  vf->SetFunction (data);
+	  data->DecRef ();
+	  v = vf;
+	}
+	break;
+      case XMLTOKEN_TEXTURE:
+	{
+	  csGenerateImageValueFuncTex* vf = new csGenerateImageValueFuncTex ();
+	  vf->tex = ParseHeightgenTexture (child);
+	  v = vf;
+	}
+	break;
+      default:
+	TokenError ("a texture specification", value);
+	return NULL;
+    }
+  }
+  return v;
+}
+
+csGenerateImageTexture* csLoader::ParseHeightgenTexture (iDocumentNode* node)
+{
+  csGenerateImageTexture* t = NULL;
+
+  csRef<iDocumentNodeIterator> it = node->GetNodes ();
+  while (it->HasNext ())
+  {
+    csRef<iDocumentNode> child = it->Next ();
+    if (child->GetType () != CS_NODE_ELEMENT) continue;
+    const char* value = child->GetValue ();
+    csStringID id = xmltokens.Request (value);
+    switch (id)
+    {
+      case XMLTOKEN_SOLID:
+        {
+	  csColor col;
+          if (!SyntaxService->ParseColor (child, col))
+	    return NULL;
+	  csGenerateImageTextureSolid* ts = new csGenerateImageTextureSolid ();
+	  ts->color = col;
+	  t = ts;
+	}
+	break;
+      case XMLTOKEN_SINGLE:
+        {
+	  csRef<iDocumentNode> imagenode = child->GetNode ("image");
+	  if (!imagenode)
+	  {
+	    ReportError (
+		    "crystalspace.maploader.parse.heightgen",
+		    "No 'image' child specified for 'single'!");
+	    return NULL;
+	  }
+	  const char* imagename = imagenode->GetContentsValue ();
+	  csVector2 scale (1, 1), offset (0, 0);
+	  csRef<iDocumentNode> scalenode = child->GetNode ("scale");
+	  if (scalenode)
+	  {
+	    scale.x = scalenode->GetAttributeValueAsFloat ("x");
+	    scale.y = scalenode->GetAttributeValueAsFloat ("y");
+	  }
+	  csRef<iDocumentNode> offsetnode = child->GetNode ("offset");
+	  if (offsetnode)
+	  {
+	    offset.x = offsetnode->GetAttributeValueAsFloat ("x");
+	    offset.y = offsetnode->GetAttributeValueAsFloat ("y");
+	  }
+
+	  iImage* img = LoadImage (imagename, CS_IMGFMT_TRUECOLOR);
+	  if (!img) return NULL;
+	  csGenerateImageTextureSingle* ts =
+	  	new csGenerateImageTextureSingle ();
+	  ts->SetImage (img);
+	  ts->scale = scale;
+	  ts->offset = offset;
+	  t = ts;
+	}
+	break;
+      case XMLTOKEN_BLEND:
+        {
+	  csGenerateImageTextureBlend* tb = new csGenerateImageTextureBlend ();
+	  csRef<iDocumentNodeIterator> blend_it = child->GetNodes ();
+	  while (blend_it->HasNext ())
+	  {
+	    csRef<iDocumentNode> blend_child = blend_it->Next ();
+	    if (blend_child->GetType () != CS_NODE_ELEMENT) continue;
+	    const char* blend_value = blend_child->GetValue ();
+	    csStringID id = xmltokens.Request (blend_value);
+	    switch (id)
+	    {
+	      case XMLTOKEN_VALUE:
+	        tb->valuefunc = ParseHeightgenValue (blend_child);
+		if (!tb->valuefunc)
+		{
+		  ReportError (
+		    "crystalspace.maploader.parse.heightgen",
+		    "Problem with returned value!");
+		  return NULL;
+		}
+	        break;
+	      case XMLTOKEN_LAYER:
+	        {
+		  float height = 0;
+		  csGenerateImageTexture* txt = NULL;
+		  csRef<iDocumentNode> texturenode = blend_child->GetNode ("texture");
+		  if (!texturenode)
+		  {
+		    ReportError (
+		      "crystalspace.maploader.parse.heightgen",
+		      "No 'texture' specified inside 'layer'!");
+		    return NULL;
+		  }
+	          txt = ParseHeightgenTexture (texturenode);
+		  if (!txt)
+		  {
+		    ReportError (
+			    "crystalspace.maploader.parse.heightgen",
+			    "Problem with returned texture!");
+		    return NULL;
+		  }
+		  csRef<iDocumentNode> heightnode = blend_child->GetNode ("height");
+		  if (heightnode)
+		  {
+		    height = heightnode->GetContentsValueAsFloat ();
+		  }
+		  tb->AddLayer (height, txt);
+	  	}
+	        break;
+	      default:
+		TokenError ("a blend specification", blend_value);
+		return NULL;
+	    }
+	  }
+	  t = tb;
+	}
+	break;
+      default:
+	TokenError ("a texture specification", value);
+	return NULL;
+    }
+  }
+  if (!t)
+  {
+    ReportError (
+	    "crystalspace.maploader.parse.heightgen",
+	    "Problem with texture specification!");
+  }
+  return t;
+}
+
 bool csLoader::ParseHeightgen (iDocumentNode* node)
 {
+  int totalw = 256, totalh = 256;
+  int partw = 64, parth = 64;
+  int mw = 1, mh = 1;
+  csGenerateImage* gen = new csGenerateImage ();
+
+  csRef<iDocumentNodeIterator> it = node->GetNodes ();
+  while (it->HasNext ())
+  {
+    csRef<iDocumentNode> child = it->Next ();
+    if (child->GetType () != CS_NODE_ELEMENT) continue;
+    const char* value = child->GetValue ();
+    csStringID id = xmltokens.Request (value);
+    switch (id)
+    {
+      case XMLTOKEN_SIZE:
+	totalw = child->GetAttributeValueAsInt ("width");
+	totalh = child->GetAttributeValueAsInt ("height");
+	break;
+      case XMLTOKEN_MULTIPLY:
+	mw = child->GetAttributeValueAsInt ("width");
+	mh = child->GetAttributeValueAsInt ("height");
+	break;
+      case XMLTOKEN_PARTSIZE:
+	partw = child->GetAttributeValueAsInt ("width");
+	parth = child->GetAttributeValueAsInt ("height");
+	break;
+      case XMLTOKEN_TEXTURE:
+        {
+          csGenerateImageTexture* txt = ParseHeightgenTexture (child);
+          gen->SetTexture (txt);
+	}
+	break;
+      case XMLTOKEN_GENERATE:
+        {
+          if (!Engine || !G3D)
+	    break;
+
+	  int startx = child->GetAttributeValueAsInt ("x");
+	  int starty = child->GetAttributeValueAsInt ("y");
+	  iImage* img = gen->Generate (totalw, totalh, startx*mw, starty*mh,
+	  	partw, parth);
+	  iTextureHandle *TexHandle = G3D->GetTextureManager ()
+	  	->RegisterTexture (img, CS_TEXTURE_3D);
+	  if (!TexHandle)
+	  {
+	    ReportError (
+	      "crystalspace.maploader.parse.heightgen",
+	      "Cannot create texture!");
+	    return false;
+	  }
+	  iTextureWrapper *TexWrapper = Engine->GetTextureList ()
+	  	->NewTexture (TexHandle);
+	  TexWrapper->QueryObject ()->SetName (child->GetAttributeValue ("name"));
+	}
+	break;
+      default:
+	TokenError ("a heightgen specification", value);
+	delete gen;
+	return false;
+    }
+  }
+
+  delete gen;
   return true;
 }
 

@@ -2476,6 +2476,18 @@ bool csLoader::Initialize (iObjectRegistry *object_Reg)
   xmltokens.Register ("znone", XMLTOKEN_ZNONE);
   xmltokens.Register ("zuse", XMLTOKEN_ZUSE);
   xmltokens.Register ("ztest", XMLTOKEN_ZTEST);
+  xmltokens.Register ("blend", XMLTOKEN_BLEND);
+  xmltokens.Register ("constant", XMLTOKEN_CONSTANT);
+  xmltokens.Register ("generate", XMLTOKEN_GENERATE);
+  xmltokens.Register ("height", XMLTOKEN_HEIGHT);
+  xmltokens.Register ("heightmap", XMLTOKEN_HEIGHTMAP);
+  xmltokens.Register ("multiply", XMLTOKEN_MULTIPLY);
+  xmltokens.Register ("partsize", XMLTOKEN_PARTSIZE);
+  xmltokens.Register ("single", XMLTOKEN_SINGLE);
+  xmltokens.Register ("size", XMLTOKEN_SIZE);
+  xmltokens.Register ("slope", XMLTOKEN_SLOPE);
+  xmltokens.Register ("solid", XMLTOKEN_SOLID);
+  xmltokens.Register ("value", XMLTOKEN_VALUE);
 
   return true;
 }
@@ -4609,6 +4621,7 @@ bool csLoader::LoadSettings (iDocumentNode* node)
 	  else
 	  {
 	    ReportNotify ("bogus maximum lightmap size %dx%d", max[0], max[1]);
+	    return false;
 	  }
         }
 	break;
@@ -4616,7 +4629,7 @@ bool csLoader::LoadSettings (iDocumentNode* node)
         {
 	  csColor c;
 	  if (!SyntaxService->ParseColor (child, c))
-	    return NULL;
+	    return false;
 	  Engine->SetAmbientLight (c);
         }
 	break;

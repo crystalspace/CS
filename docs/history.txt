@@ -14,6 +14,8 @@ The history order is reversed so that new features are at the top.
 	    - Start (START)
 	    - Keys (KEY)
 	    - Nodes (NODE)
+	- Additionally implemented:
+	    - Texture generation (HEIGHTGEN)
 15-Aug-2002
 	- Eric Sunshine changed next.mak so that it only uses the CFLAGS
 	  -Ilibs/zlib, -Ilibs/libpng, -Ilibs/libjpeg and the LFLAGS
