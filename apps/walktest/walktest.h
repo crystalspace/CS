@@ -31,7 +31,7 @@ class Polygon3D;
 class WalkTest;
 class LanguageLayer;
 class csView;
-class csSoundBuffer;
+class csSoundData;
 class csWorld;
 class csSprite2D;
 class csWireFrameCam;
@@ -142,8 +142,8 @@ public:
   HugeRoom* huge_room;
 
   /// Some sounds.
-  csSoundBuffer* wMissile_boom;
-  csSoundBuffer* wMissile_whoosh;
+  csSoundData* wMissile_boom;
+  csSoundData* wMissile_whoosh;
 
   PhysicsLibrary *pl;
 

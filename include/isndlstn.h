@@ -22,7 +22,6 @@
 #define __ISOUNDLISTENER_H__
 
 #include "isndrdr.h"
-#include "cssndldr/common/sndbuf.h"	//@@@BAD
 
 /// taken from eax preset environment
 enum SoundEnvironment
@@ -56,28 +55,6 @@ enum SoundEnvironment
 
 extern const GUID IID_ISoundListener;
 
-typedef struct
-{
-  /// Position of listener object
-  float fPosX, fPosY, fPosZ;
-  /// Front Direction of listener object
-  float fDirFrontX, fDirFrontY, fDirFrontZ;
-  /// Top Direction of listener object
-  float fDirTopX, fDirTopY, fDirTopZ;
-  /// Velocity of listener object
-  float fVelX, fVelY, fVelZ;
-  /// Doppler factor
-  float fDoppler;
-  /// Distance factor
-  float fDistance;
-  /// RollOff factor
-  float fRollOff;
-  /// Hear size (ears distance)
-  float fHeadSize;
-  /// Type of environment where is listener
-  SoundEnvironment Environment;
-} csSoundListenerInfo;
-
 interface ISoundListener : public IUnknown
 {
 public:
@@ -98,7 +75,22 @@ public:
   /// set type of environment where 'live' listener
   STDMETHOD (SetEnvironment) (SoundEnvironment env) PURE;
 
-  STDMETHOD (GetInfoListener) (csSoundListenerInfo *info) PURE;
+  /// Get direction of listener (front and top 3d vectors)
+  STDMETHOD (GetDirection) (float &fx, float &fy, float &fz, float &tx, float &ty, float &tz) PURE;
+  /// Get position of listener
+  STDMETHOD (GetPosition) (float &x, float &y, float &z) PURE;
+  /// Get velocity of listener
+  STDMETHOD (GetVelocity) (float &x, float &y, float &z) PURE;
+  /// Get a distance attenuator
+  STDMETHOD (GetDistanceFactor) (float &factor) PURE;
+  /// Get a RollOff factor
+  STDMETHOD (GetRollOffFactor) (float &factor) PURE;
+  /// Get the Doppler attenuator
+  STDMETHOD (GetDopplerFactor) (float &factor) PURE;
+  /// Get distance between the 2 'ears' of listener
+  STDMETHOD (GetHeadSize) (float &size) PURE;
+  /// Get type of environment where 'live' listener
+  STDMETHOD (GetEnvironment) (SoundEnvironment &env) PURE;
 };
 
 #endif // __ISOUNDLISTENER_H__

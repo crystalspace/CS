@@ -23,7 +23,9 @@
 
 #include "isndrdr.h"
 #include "isndsrc.h"
-#include "cssndldr/common/sndbuf.h"
+#include "cssfxldr/common/snddata.h"
+
+class csSoundBufferA3D;
 
 class csSoundSourceA3D : public ISoundSource
 {
@@ -31,22 +33,28 @@ public:
 	csSoundSourceA3D();
 	virtual ~csSoundSourceA3D();
 
-	STDMETHODIMP StopSource();
-	STDMETHODIMP PlaySource(bool inLoop);
-
 	STDMETHODIMP SetPosition(float x, float y, float z);
-  STDMETHODIMP SetVelocity(float x, float y, float z);
+	STDMETHODIMP SetVelocity(float x, float y, float z);
 
-  STDMETHODIMP GetInfoSource(csSoundSourceInfo *info);
+  STDMETHODIMP GetPosition(float &x, float &y, float &z);
+	STDMETHODIMP GetVelocity(float &x, float &y, float &z);
+
+  STDMETHODIMP GetSoundBuffer(ISoundBuffer **sound_buffer);
 
  	DECLARE_IUNKNOWN()
 	DECLARE_INTERFACE_TABLE(csSoundSourceA3D)
 
 public:
-  csSoundSourceInfo info;
+  /// Position of sound object
+  float fPosX, fPosY, fPosZ;
+  /// Velocity of sound object
+  float fVelX, fVelY, fVelZ;
 
 	int DestroySource();
-	int CreateSource(ISoundRender *render, csSoundBuffer * sound);
+	int CreateSource(ISoundRender *render, csSoundData * sound);
+
+  // SoundBuffer
+  csSoundBufferA3D *pSoundBuffer;
 
   IA3dSource *m_p3DSource;
   IA3d4 *m_p3DAudioRenderer;

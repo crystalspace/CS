@@ -36,13 +36,13 @@ END_INTERFACE_TABLE()
 
 csSoundListenerDS3D::csSoundListenerDS3D()
 {
-  info.fPosX = info.fPosY = info.fPosZ = 0.0;
-  info.fDirTopX = info.fDirTopY = info.fDirTopZ = 0.0;
-  info.fDirFrontX = info.fDirFrontY = info.fDirFrontZ = 0.0;
-  info.fVelX = info.fVelY = info.fVelZ = 0.0;
-  info.fDoppler = 1.0;
-  info.fDistance = 1.0;
-  info.fRollOff = 1.0;
+  fPosX = fPosY = fPosZ = 0.0;
+  fDirTopX = fDirTopY = fDirTopZ = 0.0;
+  fDirFrontX = fDirFrontY = fDirFrontZ = 0.0;
+  fVelX = fVelY = fVelZ = 0.0;
+  fDoppler = 1.0;
+  fDistance = 1.0;
+  fRollOff = 1.0;
 
   m_p3DAudioRenderer = NULL;
   m_pDS3DPrimaryBuffer = NULL;
@@ -83,17 +83,17 @@ int csSoundListenerDS3D::CreateListener(ISoundRender * render)
     return E_FAIL;
   }
   
-  if ((hr = m_pDS3DListener->SetDopplerFactor(info.fDoppler, DS3D_IMMEDIATE)) != DS_OK)
+  if ((hr = m_pDS3DListener->SetDopplerFactor(fDoppler, DS3D_IMMEDIATE)) != DS_OK)
   {
     return E_FAIL;
   }
   
-  if ((hr = m_pDS3DListener->SetDistanceFactor(info.fDistance, DS3D_IMMEDIATE)) != DS_OK)
+  if ((hr = m_pDS3DListener->SetDistanceFactor(fDistance, DS3D_IMMEDIATE)) != DS_OK)
   {
     return E_FAIL;
   }
   
-  if ((hr = m_pDS3DListener->SetRolloffFactor(info.fRollOff, DS3D_IMMEDIATE)) != DS_OK)
+  if ((hr = m_pDS3DListener->SetRolloffFactor(fRollOff, DS3D_IMMEDIATE)) != DS_OK)
   {
     return E_FAIL;
   }
@@ -124,9 +124,9 @@ int csSoundListenerDS3D::DestroyListener()
     m_pDS3DPrimaryBuffer = NULL;
   }
   
-  info.fDoppler = 1.0f;
-  info.fDistance = 1.0f;
-  info.fRollOff = 1.0f;
+  fDoppler = 1.0f;
+  fDistance = 1.0f;
+  fRollOff = 1.0f;
 
   return S_OK;
 }
@@ -135,10 +135,10 @@ STDMETHODIMP csSoundListenerDS3D::SetPosition(float x, float y, float z)
 {
   HRESULT hr;
 
-  info.fPosX = x; info.fPosY = y; info.fPosZ = z;
+  fPosX = x; fPosY = y; fPosZ = z;
 
   if ((hr = m_pDS3DListener->SetPosition(
-    info.fPosX, info.fPosY, info.fPosZ,
+    fPosX, fPosY, fPosZ,
     DS3D_IMMEDIATE)) != DS_OK)
   {
     return E_FAIL;
@@ -151,12 +151,12 @@ STDMETHODIMP csSoundListenerDS3D::SetDirection(float fx, float fy, float fz, flo
 {
   HRESULT hr;
 
-  info.fDirFrontX = fx; info.fDirFrontY = fy; info.fDirFrontZ = fz;
-  info.fDirTopX = tx; info.fDirTopY = ty; info.fDirTopZ = tz;
+  fDirFrontX = fx; fDirFrontY = fy; fDirFrontZ = fz;
+  fDirTopX = tx; fDirTopY = ty; fDirTopZ = tz;
 
   if ((hr = m_pDS3DListener->SetOrientation(
-    info.fDirFrontX, info.fDirFrontY, info.fDirFrontZ,
-    info.fDirTopX, info.fDirTopY, info.fDirTopZ,
+    fDirFrontX, fDirFrontY, fDirFrontZ,
+    fDirTopX, fDirTopY, fDirTopZ,
     DS3D_IMMEDIATE)) != DS_OK)
   {
     return E_FAIL;
@@ -167,7 +167,7 @@ STDMETHODIMP csSoundListenerDS3D::SetDirection(float fx, float fy, float fz, flo
 
 STDMETHODIMP csSoundListenerDS3D::SetHeadSize(float size)
 {
-  info.fHeadSize = size;
+  fHeadSize = size;
 
   return S_OK;
 }
@@ -176,12 +176,12 @@ STDMETHODIMP csSoundListenerDS3D::SetVelocity(float x, float y, float z)
 {
   HRESULT hr;
   
-  info.fVelX = x; info.fVelY = y; info.fVelZ = z;
+  fVelX = x; fVelY = y; fVelZ = z;
 
   if(!m_pDS3DListener) return E_FAIL;
 
   if ((hr = m_pDS3DListener->SetVelocity(
-    info.fVelX, info.fVelY, info.fVelZ,
+    fVelX, fVelY, fVelZ,
     DS3D_IMMEDIATE)) != DS_OK)
   {
     return E_FAIL;
@@ -194,11 +194,11 @@ STDMETHODIMP csSoundListenerDS3D::SetDopplerFactor(float factor)
 {
   HRESULT hr;
 
-  info.fDoppler = factor;
+  fDoppler = factor;
 
   if(!m_pDS3DListener) return E_FAIL;
 
-  if ((hr = m_pDS3DListener->SetDopplerFactor(info.fDoppler, DS3D_IMMEDIATE)) != DS_OK)
+  if ((hr = m_pDS3DListener->SetDopplerFactor(fDoppler, DS3D_IMMEDIATE)) != DS_OK)
   {
     return E_FAIL;
   }
@@ -210,11 +210,11 @@ STDMETHODIMP csSoundListenerDS3D::SetDistanceFactor(float factor)
 {
   HRESULT hr;
 
-  info.fDistance = factor;
+  fDistance = factor;
 
   if(!m_pDS3DListener) return E_FAIL;
 
-  if ((hr = m_pDS3DListener->SetDistanceFactor(info.fDistance, DS3D_IMMEDIATE)) != DS_OK)
+  if ((hr = m_pDS3DListener->SetDistanceFactor(fDistance, DS3D_IMMEDIATE)) != DS_OK)
   {
     return E_FAIL;
   }
@@ -226,11 +226,11 @@ STDMETHODIMP csSoundListenerDS3D::SetRollOffFactor(float factor)
 {
   HRESULT hr;
 
-  info.fRollOff = factor;
+  fRollOff = factor;
 
   if(!m_pDS3DListener) return E_FAIL;
 
-  if ((hr = m_pDS3DListener->SetRolloffFactor(info.fRollOff, DS3D_IMMEDIATE)) != DS_OK)
+  if ((hr = m_pDS3DListener->SetRolloffFactor(fRollOff, DS3D_IMMEDIATE)) != DS_OK)
   {
     return E_FAIL;
   }
@@ -240,14 +240,64 @@ STDMETHODIMP csSoundListenerDS3D::SetRollOffFactor(float factor)
 
 STDMETHODIMP csSoundListenerDS3D::SetEnvironment(SoundEnvironment env)
 {
-  info.Environment = env;
+  Environment = env;
 
   return S_OK;
 }
 
-STDMETHODIMP csSoundListenerDS3D::GetInfoListener(csSoundListenerInfo *i)
+STDMETHODIMP csSoundListenerDS3D::GetPosition(float &x, float &y, float &z)
 {
-  *i = info;
+  x = fPosX; y = fPosY; z = fPosZ;
+
+  return S_OK;
+}
+
+STDMETHODIMP csSoundListenerDS3D::GetDirection(float &fx, float &fy, float &fz, float &tx, float &ty, float &tz)
+{
+  fx = fDirFrontX; fy = fDirFrontY; fz = fDirFrontZ;
+  tx = fDirTopX; ty = fDirTopY; tz = fDirTopZ;
+
+  return S_OK;
+}
+
+STDMETHODIMP csSoundListenerDS3D::GetHeadSize(float &size)
+{
+  size = fHeadSize;
+
+  return S_OK;
+}
+
+STDMETHODIMP csSoundListenerDS3D::GetVelocity(float &x, float &y, float &z)
+{
+  x = fVelX; y = fVelY; z = fVelZ;
+
+  return S_OK;
+}
+
+STDMETHODIMP csSoundListenerDS3D::GetDopplerFactor(float &factor)
+{
+  factor = fDoppler;
+
+  return S_OK;
+}
+
+STDMETHODIMP csSoundListenerDS3D::GetDistanceFactor(float &factor)
+{
+  factor = fDistance;
+
+  return S_OK;
+}
+
+STDMETHODIMP csSoundListenerDS3D::GetRollOffFactor(float &factor)
+{
+  factor = fRollOff;
+
+  return S_OK;
+}
+
+STDMETHODIMP csSoundListenerDS3D::GetEnvironment(SoundEnvironment &env)
+{
+  env = Environment;
 
   return S_OK;
 }

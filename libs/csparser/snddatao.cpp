@@ -1,5 +1,7 @@
 /*
-    Copyright (C) 1998 by Jorrit Tyberghein    
+    Copyright (C) 1998, 1999 by Nathaniel 'NooTe' Saint Martin
+    Copyright (C) 1998, 1999 by Jorrit Tyberghein
+    Written by Nathaniel 'NooTe' Saint Martin
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -16,25 +18,25 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __AIFFFILE_H
-#define __AIFFFILE_H
+#include <string.h>
+#include "sysdef.h"
+#include "cssfxldr/common/snddata.h"
+#include "csparser/snddatao.h"
+#include "csobject/nameobj.h"
 
-#include "cssndldr/sndload.h"
+CSOBJTYPE_IMPL(csSoundDataObject,csObject);
 
-///
-class AIFFLoader : public csSoundBufferLoader  
+csSoundDataObject::~csSoundDataObject()
+{ if (sndbuf) CHKB(delete sndbuf); }
+
+csSoundData* csSoundDataObject::GetSound(csObject& csobj, const char* name)
 {
-protected:
-  ///
-  virtual csSoundBuffer* loadsound(UByte* buf, ULong size); 
-
-public:
-  ///
-  virtual const char* get_name() const
-  { return "AIFF"; }
-  ///
-  virtual const char* get_desc() const 
-  { return "MacIntosh AIFF sound format"; }
-};
-
-#endif // __AIFFFILE_H
+  csObjIterator i = csobj.ObjGet(csSoundDataObject::Type());
+  while (!i.IsNull())
+  {
+    if (strcmp(name, csNameObject::GetName(*i)) == 0)
+      return ((csSoundDataObject&)(*i)).GetSound();
+    ++i;
+  }
+  return NULL;
+}

@@ -21,9 +21,11 @@
 #if !defined(__CSSOUNDSOURCEEAX_H__)
 #define __CSSOUNDSOURCEEAX_H__
 
-#include "cssndldr/common/sndbuf.h"
+#include "cssfxldr/common/snddata.h"
 #include "isndrdr.h"
 #include "isndsrc.h"
+
+class csSoundBufferEAX;
 
 class csSoundSourceEAX : public ISoundSource
 {
@@ -31,22 +33,28 @@ public:
 	csSoundSourceEAX();
 	virtual ~csSoundSourceEAX();
 
-	STDMETHODIMP StopSource();
-	STDMETHODIMP PlaySource(bool inLoop);
-
 	STDMETHODIMP SetPosition(float x, float y, float z);
   STDMETHODIMP SetVelocity(float x, float y, float z);
 
-  STDMETHODIMP GetInfoSource(csSoundSourceInfo *info);
+	STDMETHODIMP GetPosition(float &x, float &y, float &z);
+	STDMETHODIMP GetVelocity(float &x, float &y, float &z);
+
+  STDMETHODIMP GetSoundBuffer(ISoundBuffer **sound_buffer);
 
  	DECLARE_IUNKNOWN()
 	DECLARE_INTERFACE_TABLE(csSoundSourceEAX)
 
 public:
-  csSoundSourceInfo info;
+  /// Position of sound object
+  float fPosX, fPosY, fPosZ;
+  /// Velocity of sound object
+  float fVelX, fVelY, fVelZ;
 
 	int DestroySource();
-	int CreateSource(ISoundRender *render, csSoundBuffer * sound);
+	int CreateSource();
+
+  // SoundBuffer
+  csSoundBufferEAX *pSoundBuffer;
 
   LPDIRECTSOUNDBUFFER		m_pDS3DBuffer2D;
   LPDIRECTSOUND3DBUFFER	m_pDS3DBuffer3D;

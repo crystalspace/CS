@@ -35,7 +35,7 @@ class ImageFile;
 class csWorld;
 class LanguageLayer;
 class csCurveTemplate;
-class csSoundBufferObject;
+class csSoundDataObject;
 class csSpriteTemplate;
 class csSprite3D;
 
@@ -139,7 +139,7 @@ public:
   static void load_light (char* name, char* buf);
 
   ///
-  static csSoundBufferObject* load_sound (char* name, char* filename, csWorld* w);
+  static csSoundDataObject* load_sound (char* name, char* filename, csWorld* w);
 
   /// Load data into a world.
   static bool LoadWorld (csWorld* world, LanguageLayer* layer, char* buf);

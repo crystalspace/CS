@@ -18,26 +18,30 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#if !defined(__ISOUNDSOURCE_H__)
-#define __ISOUNDSOURCE_H__
+#if !defined(__CSSOUNDDATAOBJECT_H__)
+#define __CSSOUNDDATAOBJECT_H__
 
-extern const GUID IID_ISoundSource;
-interface ISoundBuffer;
+#include "csobject/csobj.h"
 
-interface ISoundSource : public IUnknown
+class csSoundData;
+
+class csSoundDataObject : public csObject
 {
-public:
-  /// Set position of sound object
-  STDMETHOD (SetPosition) (float x, float y, float z) PURE;
-  /// Set velocity of sound object
-  STDMETHOD (SetVelocity) (float x, float y, float z) PURE;
-  /// Get position of sound object
-  STDMETHOD (GetPosition) (float &x, float &y, float &z) PURE;
-  /// Get velocity of sound object
-  STDMETHOD (GetVelocity) (float &x, float &y, float &z) PURE;
+protected:
+  ///
+  csSoundData* sndbuf;
 
-  /// Get sound buffer
-  STDMETHOD (GetSoundBuffer) (ISoundBuffer **sound) PURE;
+public:
+  ///
+  csSoundDataObject(csSoundData* buf) : csObject(), sndbuf(buf) {}
+  ///
+  ~csSoundDataObject();
+  ///
+  csSoundData* GetSound() const { return sndbuf; }
+  ///
+  static csSoundData* GetSound(csObject& csobj, const char* name);
+
+  CSOBJTYPE;
 };
 
-#endif // __ISOUNDSOURCE_H__
+#endif // __CSSOUNDDATAOBJECT_H__

@@ -28,7 +28,7 @@ Channel_ID Channel::lastID=1;
 Channel::Channel()
 {
   Active = false;
-  pSoundBuffer = NULL;
+  pSoundData = NULL;
   Step = 0;
   Loop = false;
   Used = false;
@@ -53,7 +53,7 @@ Channel_ID Channel::getID()
   return ID;
 }
 
-bool Channel::setSoundBuffer(csSoundBuffer *snd, bool toLoop)
+bool Channel::setSoundData(csSoundData *snd, bool toLoop)
 {
   if(snd == NULL) return false;
 
@@ -61,7 +61,7 @@ bool Channel::setSoundBuffer(csSoundBuffer *snd, bool toLoop)
   Loop = 0;
   Volume = 1.0;
   Pan = 0.0;
-  pSoundBuffer = snd;
+  pSoundData = snd;
   Loop = toLoop;
   computeVolume(Volume, Pan);
 
@@ -74,12 +74,12 @@ void Channel::toStep(unsigned long s)
 {
   if(isActive())
   {
-    if(s>=(unsigned long)pSoundBuffer->getSize())
+    if(s>=(unsigned long)pSoundData->getSize())
     {
       if(Loop)
       {
-        while(s>=(unsigned long)pSoundBuffer->getSize())
-          s-=pSoundBuffer->getSize();
+        while(s>=(unsigned long)pSoundData->getSize())
+          s-=pSoundData->getSize();
         Step=s;
       }
       else
@@ -87,7 +87,7 @@ void Channel::toStep(unsigned long s)
         if(Ephemeral)
         {
           Active=false;
-          pSoundBuffer = NULL;
+          pSoundData = NULL;
         }
         started = false;
         Step=0;
@@ -126,28 +126,28 @@ int Channel::getSample()
 {
   int ret = 64;
 
-  if(pSoundBuffer)
+  if(pSoundData)
   {
     if(isActive() && isStarted())
     {
-      if(pSoundBuffer->is16Bits())
+      if(pSoundData->is16Bits())
       {
-        short *ptr = (short *) pSoundBuffer->getData();
+        short *ptr = (short *) pSoundData->getData();
         ret = ptr[Step];
         addStep(1);
       }
-      else //if(!pSoundBuffer->is16Bits())
+      else //if(!pSoundData->is16Bits())
       {
-        unsigned char *ptr = (unsigned char *) pSoundBuffer->getData();
+        unsigned char *ptr = (unsigned char *) pSoundData->getData();
         ret = ptr[Step];
         addStep(1);
       }
     }
     else
     {
-      if(pSoundBuffer->is16Bits())
+      if(pSoundData->is16Bits())
         ret = 0;
-      else //if(!pSoundBuffer->is16bits)
+      else //if(!pSoundData->is16bits)
         ret = 128;
     }
   }
@@ -157,7 +157,7 @@ int Channel::getSample()
 
 bool Channel::isStereo()
 {
-  if(pSoundBuffer) return pSoundBuffer->isStereo();
+  if(pSoundData) return pSoundData->isStereo();
   return false;
 }
 

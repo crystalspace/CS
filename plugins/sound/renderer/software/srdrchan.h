@@ -20,7 +20,7 @@
 #ifndef __CHANNEL_H
 #define __CHANNEL_H
 
-#include "cssndldr/common/sndbuf.h"
+#include "cssfxldr/common/snddata.h"
 
 typedef unsigned long Channel_ID;
 
@@ -81,8 +81,8 @@ public:
   bool isStereo();
 
   ///
-  bool setSoundBuffer(csSoundBuffer *snd, bool toLoop = false);
-  csSoundBuffer *pSoundBuffer;
+  bool setSoundData(csSoundData *snd, bool toLoop = false);
+  csSoundData *pSoundData;
 
   float Volume;
   float Pan;

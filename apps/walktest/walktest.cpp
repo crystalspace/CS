@@ -52,8 +52,8 @@
 #include "csobject/nameobj.h"
 #include "csobject/dataobj.h"
 #include "csgfxldr/csimage.h"
-#include "cssndldr/common/sndbuf.h"
-#include "csparser/sndbufo.h"
+#include "cssfxldr/common/snddata.h"
+#include "csparser/snddatao.h"
 #include "igraph3d.h"
 #include "itxtmgr.h"
 #include "isndrdr.h"
@@ -1507,11 +1507,11 @@ int main (int argc, char* argv[])
 
   // Load a few sounds.
 #ifdef DO_SOUND
-  csSoundBuffer* w = csSoundBufferObject::GetSound(*world, "tada.wav");
+  csSoundData* w = csSoundDataObject::GetSound(*world, "tada.wav");
   if (w) Sys->piSound->PlayEphemeral (w);
 
-  Sys->wMissile_boom = csSoundBufferObject::GetSound(*world, "boom.wav");
-  Sys->wMissile_whoosh = csSoundBufferObject::GetSound(*world, "whoosh.wav");
+  Sys->wMissile_boom = csSoundDataObject::GetSound(*world, "boom.wav");
+  Sys->wMissile_whoosh = csSoundDataObject::GetSound(*world, "whoosh.wav");
 #endif
 
   // Start the 'autoexec.cfg' script and fully execute it.

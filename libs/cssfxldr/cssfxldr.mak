@@ -1,21 +1,21 @@
 # Library description
-DESCRIPTION.cssndldr = Crystal Space sound loader library
+DESCRIPTION.cssfxldr = Crystal Space sound loader library
 
 #-------------------------------------------------------------- rootdefines ---#
 ifeq ($(MAKESECTION),rootdefines)
 
 # Library-specific help commands
-LIBHELP += $(NEWLINE)echo $"  make cssndldr     Make the $(DESCRIPTION.cssndldr)$"
+LIBHELP += $(NEWLINE)echo $"  make cssfxldr     Make the $(DESCRIPTION.cssfxldr)$"
 
 endif # ifeq ($(MAKESECTION),rootdefines)
 
 #-------------------------------------------------------------- roottargets ---#
 ifeq ($(MAKESECTION),roottargets)
 
-.PHONY: cssndldr
+.PHONY: cssfxldr
 
-all libs: cssndldr
-cssndldr:
+all libs: cssfxldr
+cssfxldr:
 	$(MAKE_TARGET)
 
 endif # ifeq ($(MAKESECTION),roottargets)
@@ -23,50 +23,50 @@ endif # ifeq ($(MAKESECTION),roottargets)
 #-------------------------------------------------------------- postdefines ---#
 ifeq ($(MAKESECTION),postdefines)
 
-vpath %.cpp libs/cssndldr libs/cssndldr/common
+vpath %.cpp libs/cssfxldr libs/cssfxldr/common
 
-SRC.CSSNDLDR = $(wildcard libs/cssndldr/common/*.cpp) \
-  libs/cssndldr/sndload.cpp libs/cssndldr/funcs.cpp
+SRC.CSSFXLDR = $(wildcard libs/cssfxldr/common/*.cpp) \
+  libs/cssfxldr/sndload.cpp libs/cssfxldr/funcs.cpp
 
 ifeq ($(DO_AIFF),yes)
-  SRC.CSSNDLDR+=libs/cssndldr/aifffile.cpp
+  SRC.CSSFXLDR+=libs/cssfxldr/aifffile.cpp
 endif
 ifeq ($(DO_IFF),yes)
-  SRC.CSSNDLDR+=libs/cssndldr/ifffile.cpp
+  SRC.CSSFXLDR+=libs/cssfxldr/ifffile.cpp
 endif
 ifeq ($(DO_WAV),yes)
-  SRC.CSSNDLDR+=libs/cssndldr/wavfile.cpp
+  SRC.CSSFXLDR+=libs/cssfxldr/wavfile.cpp
 endif
 ifeq ($(DO_AU),yes)
-  SRC.CSSNDLDR+=libs/cssndldr/aufile.cpp
+  SRC.CSSFXLDR+=libs/cssfxldr/aufile.cpp
 endif
 
-CSSNDLDR.LIB = $(OUT)$(LIB_PREFIX)cssndldr$(LIB)
-OBJ.CSSNDLDR = $(addprefix $(OUT),$(notdir $(SRC.CSSNDLDR:.cpp=$O)))
+CSSFXLDR.LIB = $(OUT)$(LIB_PREFIX)cssfxldr$(LIB)
+OBJ.CSSFXLDR = $(addprefix $(OUT),$(notdir $(SRC.CSSFXLDR:.cpp=$O)))
 
 endif # ifeq ($(MAKESECTION),postdefines)
 
 #------------------------------------------------------------------ targets ---#
 ifeq ($(MAKESECTION),targets)
 
-.PHONY: cssndldr cssndldrclean
+.PHONY: cssfxldr cssfxldrclean
 
-all: $(CSSNDLDR.LIB)
-cssndldr: $(OUTDIRS) $(CSSNDLDR.LIB)
-clean: cssndldrclean
+all: $(CSSFXLDR.LIB)
+cssfxldr: $(OUTDIRS) $(CSSFXLDR.LIB)
+clean: cssfxldrclean
 
-$(CSSNDLDR.LIB): $(OBJ.CSSNDLDR)
+$(CSSFXLDR.LIB): $(OBJ.CSSFXLDR)
 	$(DO.STATIC.LIBRARY)
 
-cssndldrclean:
-	-$(RM) $(CSSNDLDR.LIB)
+cssfxldrclean:
+	-$(RM) $(CSSFXLDR.LIB)
 
 ifdef DO_DEPEND
-depend: $(OUTOS)cssndldr.dep
-$(OUTOS)cssndldr.dep: $(SRC.CSSNDLDR)
+depend: $(OUTOS)cssfxldr.dep
+$(OUTOS)cssfxldr.dep: $(SRC.CSSFXLDR)
 	$(DO.DEP)
 else
--include $(OUTOS)cssndldr.dep
+-include $(OUTOS)cssfxldr.dep
 endif
 
 endif # ifeq ($(MAKESECTION),targets)

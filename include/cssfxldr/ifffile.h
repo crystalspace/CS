@@ -16,25 +16,25 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __AUFILE_H
-#define __AUFILE_H
+#ifndef __IFFFILE_H
+#define __IFFFILE_H
 
-#include "cssndldr/sndload.h"
+#include "cssfxldr/sndload.h"
 
 ///
-class AULoader : public csSoundBufferLoader  
+class IFFLoader : public csSoundLoader  
 {
 protected:
   ///
-  virtual csSoundBuffer* loadsound(UByte* buf, ULong size);
+  virtual csSoundData* loadsound(UByte* buf, ULong size);
 
 public:
   ///
   virtual const char* get_name() const
-  { return "AU"; }
+  { return "IFF"; }
   ///
   virtual const char* get_desc() const 
-  { return "Sun sound format"; }
+  { return "Amiga svx/iff sound format"; }
 };
 
-#endif // __AUFILE_H
+#endif // __IFFFILE_H

@@ -26,10 +26,12 @@
 #include "cscom/com.h"
 #include "cssndrdr/a3d/sndrdr.h"
 #include "cssndrdr/a3d/sndlstn.h"
+#include "cssndrdr/a3d/sndbuf.h"
 #include "cssndrdr/a3d/sndsrc.h"
 #include "isystem.h"
 #include "isndlstn.h"
 #include "isndsrc.h"
+#include "isndbuf.h"
 
 
 IMPLEMENT_UNKNOWN_NODELETE (csSoundRenderA3D)
@@ -63,18 +65,32 @@ STDMETHODIMP csSoundRenderA3D::GetListener(ISoundListener** ppv )
   return m_pListener->QueryInterface (IID_ISoundListener, (void**)ppv);
 }
 
-STDMETHODIMP csSoundRenderA3D::CreateSource(ISoundSource** ppv, csSoundBuffer *snd)
+STDMETHODIMP csSoundRenderA3D::CreateSource(ISoundSource** ppv, csSoundData *snd)
 {
-  csSoundSourceA3D* pNew = new csSoundSourceA3D ();
+  csSoundBufferA3D* pNew = new csSoundBufferA3D ();
   if (!pNew)
   {
     *ppv = 0;
     return E_OUTOFMEMORY;
   }
 
-  pNew->CreateSource(this, snd);
+  pNew->CreateSoundBuffer(this, snd);
+
+  return pNew->CreateSource(ppv);
+}
+
+STDMETHODIMP csSoundRenderA3D::CreateSoundBuffer(ISoundBuffer** ppv, csSoundData *snd)
+{
+  csSoundBufferA3D* pNew = new csSoundBufferA3D ();
+  if (!pNew)
+  {
+    *ppv = 0;
+    return E_OUTOFMEMORY;
+  }
+
+  pNew->CreateSoundBuffer(this, snd);
   
-  return pNew->QueryInterface (IID_ISoundSource, (void**)ppv);
+  return pNew->QueryInterface (IID_ISoundBuffer, (void**)ppv);
 }
 
 STDMETHODIMP csSoundRenderA3D::Open()
@@ -154,8 +170,13 @@ STDMETHODIMP csSoundRenderA3D::GetVolume(float *vol)
   return S_OK;
 }
 
-STDMETHODIMP csSoundRenderA3D::PlayEphemeral(csSoundBuffer *snd)
+STDMETHODIMP csSoundRenderA3D::PlayEphemeral(csSoundData *snd)
 {
+  ISoundBuffer *played;
+  if(CreateSoundBuffer(&played, snd) == S_OK)
+  {
+    played->Play(SoundBufferPlay_DestroyAtEnd);
+  }
   return S_OK;
 }
 

@@ -31,13 +31,13 @@ END_INTERFACE_TABLE()
 
 csSoundListenerNull::csSoundListenerNull()
 {
-  info.fPosX = info.fPosY = info.fPosZ = 0.0;
-  info.fDirTopX = info.fDirTopY = info.fDirTopZ = 0.0;
-  info.fDirFrontX = info.fDirFrontY = info.fDirFrontZ = 0.0;
-  info.fVelX = info.fVelY = info.fVelZ = 0.0;
-  info.fDoppler = 1.0;
-  info.fDistance = 1.0;
-  info.fRollOff = 1.0;
+  fPosX = fPosY = fPosZ = 0.0;
+  fDirTopX = fDirTopY = fDirTopZ = 0.0;
+  fDirFrontX = fDirFrontY = fDirFrontZ = 0.0;
+  fVelX = fVelY = fVelZ = 0.0;
+  fDoppler = 1.0;
+  fDistance = 1.0;
+  fRollOff = 1.0;
 }
 
 csSoundListenerNull::~csSoundListenerNull()
@@ -46,64 +46,114 @@ csSoundListenerNull::~csSoundListenerNull()
 
 STDMETHODIMP csSoundListenerNull::SetPosition(float x, float y, float z)
 {
-  info.fPosX = x; info.fPosY = y; info.fPosZ = z;
+  fPosX = x; fPosY = y; fPosZ = z;
 
   return S_OK;
 }
 
 STDMETHODIMP csSoundListenerNull::SetDirection(float fx, float fy, float fz, float tx, float ty, float tz)
 {
-  info.fDirFrontX = fx; info.fDirFrontY = fy; info.fDirFrontZ = fz;
-  info.fDirTopX = tx; info.fDirTopY = ty; info.fDirTopZ = tz;
+  fDirFrontX = fx; fDirFrontY = fy; fDirFrontZ = fz;
+  fDirTopX = tx; fDirTopY = ty; fDirTopZ = tz;
 
   return S_OK;
 }
 
 STDMETHODIMP csSoundListenerNull::SetVelocity(float x, float y, float z)
 {
-  info.fVelX = x; info.fVelY = y; info.fVelZ = z;
+  fVelX = x; fVelY = y; fVelZ = z;
 
   return S_OK;
 }
 
 STDMETHODIMP csSoundListenerNull::SetHeadSize(float size)
 {
-  info.fHeadSize = size;
+  fHeadSize = size;
 
   return S_OK;
 }
 
 STDMETHODIMP csSoundListenerNull::SetDopplerFactor(float factor)
 {
-  info.fDoppler = factor;
+  fDoppler = factor;
 
   return S_OK;
 }
 
 STDMETHODIMP csSoundListenerNull::SetDistanceFactor(float factor)
 {
-  info.fDistance = factor;
+  fDistance = factor;
 
   return S_OK;
 }
 
 STDMETHODIMP csSoundListenerNull::SetRollOffFactor(float factor)
 {
-  info.fRollOff = factor;
+  fRollOff = factor;
 
   return S_OK;
 }
 
 STDMETHODIMP csSoundListenerNull::SetEnvironment(SoundEnvironment env)
 {
-  info.Environment = env;
+  Environment = env;
 
   return S_OK;
 }
 
-STDMETHODIMP csSoundListenerNull::GetInfoListener(csSoundListenerInfo *i)
+STDMETHODIMP csSoundListenerNull::GetPosition(float &x, float &y, float &z)
 {
-  *i = info;
+  x = fPosX; y = fPosY; z = fPosZ;
+
+  return S_OK;
+}
+
+STDMETHODIMP csSoundListenerNull::GetDirection(float &fx, float &fy, float &fz, float &tx, float &ty, float &tz)
+{
+  fx = fDirFrontX; fy = fDirFrontY; fz = fDirFrontZ;
+  tx = fDirTopX; ty = fDirTopY; tz = fDirTopZ;
+
+  return S_OK;
+}
+
+STDMETHODIMP csSoundListenerNull::GetHeadSize(float &size)
+{
+  size = fHeadSize;
+
+  return S_OK;
+}
+
+STDMETHODIMP csSoundListenerNull::GetVelocity(float &x, float &y, float &z)
+{
+  x = fVelX; y = fVelY; z = fVelZ;
+
+  return S_OK;
+}
+
+STDMETHODIMP csSoundListenerNull::GetDopplerFactor(float &factor)
+{
+  factor = fDoppler;
+
+  return S_OK;
+}
+
+STDMETHODIMP csSoundListenerNull::GetDistanceFactor(float &factor)
+{
+  factor = fDistance;
+
+  return S_OK;
+}
+
+STDMETHODIMP csSoundListenerNull::GetRollOffFactor(float &factor)
+{
+  factor = fRollOff;
+
+  return S_OK;
+}
+
+STDMETHODIMP csSoundListenerNull::GetEnvironment(SoundEnvironment &env)
+{
+  env = Environment;
 
   return S_OK;
 }

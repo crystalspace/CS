@@ -20,6 +20,7 @@
 
 #include "sysdef.h"
 #include "cscom/com.h"
+#include "cssndrdr/software/srdrbuf.h"
 #include "cssndrdr/software/srdrsrc.h"
 #include "isystem.h"
 
@@ -31,8 +32,8 @@ END_INTERFACE_TABLE()
 
 csSoundSourceSoftware::csSoundSourceSoftware()
 {
-  info.fPosX = info.fPosY = info.fPosZ = 0.0;
-  info.fVelX = info.fVelY = info.fVelZ = 0.0;
+  fPosX = fPosY = fPosZ = 0.0;
+  fVelX = fVelY = fVelZ = 0.0;
 }
 
 csSoundSourceSoftware::~csSoundSourceSoftware()
@@ -40,38 +41,41 @@ csSoundSourceSoftware::~csSoundSourceSoftware()
 
 }
 
-STDMETHODIMP csSoundSourceSoftware::PlaySource(bool inloop)
+STDMETHODIMP csSoundSourceSoftware::GetSoundBuffer(ISoundBuffer **ppv)
 {
-  setStarted(true);
-  inLoop(inloop);
+  if(!pSoundBuffer)
+  {
+    return E_FAIL;
+  }
 
-  return S_OK;
-}
-
-STDMETHODIMP csSoundSourceSoftware::StopSource()
-{
-  setStarted(false);
-
-  return S_OK;
+  return pSoundBuffer->QueryInterface (IID_ISoundBuffer, (void**)ppv);
 }
 
 STDMETHODIMP csSoundSourceSoftware::SetPosition(float x, float y, float z)
 {
-  info.fPosX = x; info.fPosY = y; info.fPosZ = z;
+  fPosX = x; fPosY = y; fPosZ = z;
 
   return S_OK;
 }
 
 STDMETHODIMP csSoundSourceSoftware::SetVelocity(float x, float y, float z)
 {
-  info.fVelX = x; info.fVelY = y; info.fVelZ = z;
+  fVelX = x; fVelY = y; fVelZ = z;
 
   return S_OK;
 }
 
-STDMETHODIMP csSoundSourceSoftware::GetInfoSource(csSoundSourceInfo *i)
+STDMETHODIMP csSoundSourceSoftware::GetPosition(float &x, float &y, float &z)
 {
-  *i=info;
+  x = fPosX; y = fPosY; z = fPosZ;
 
   return S_OK;
 }
+
+STDMETHODIMP csSoundSourceSoftware::GetVelocity(float &x, float &y, float &z)
+{
+  x = fVelX; y = fVelY; z = fVelZ;
+
+  return S_OK;
+}
+

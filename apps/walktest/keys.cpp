@@ -42,14 +42,15 @@
 #include "csutil/impexp.h"
 #include "csobject/nameobj.h"
 #include "csobject/dataobj.h"
-#include "cssndldr/common/sndbuf.h"
-#include "csparser/sndbufo.h"
+#include "cssfxldr/common/snddata.h"
+#include "csparser/snddatao.h"
 #include "csparser/csloader.h"
 #include "csparser/crossbld.h"
 #include "csscript/csscript.h"
 #include "csgeom/math3d.h"
 #include "isndsrc.h"
 #include "isndlstn.h"
+#include "isndbuf.h"
 #include "isndrdr.h"
 #include "igraph3d.h"
 
@@ -691,7 +692,9 @@ void HandleDynLight (csDynLight* dyn)
 	if (es->snd)
 	{
 	  es->snd->SetPosition (v.x, v.y, v.z);
-	  es->snd->PlaySource ();
+	  ISoundBuffer *sb;
+    es->snd->GetSoundBuffer(&sb);
+    sb->Play ();
 	}
 	es->type = DYN_TYPE_EXPLOSION;
 	es->radius = 2;
@@ -721,7 +724,10 @@ void HandleDynLight (csDynLight* dyn)
 	{
           if (es->snd)
 	  {
-	    es->snd->StopSource ();
+	  ISoundBuffer *sb;
+    es->snd->GetSoundBuffer(&sb);
+    sb->Stop ();
+
             FINAL_RELEASE (es->snd);
 	  }
 	  CHK (delete es);
@@ -1274,7 +1280,9 @@ static bool CommandHandler (char *cmd, char *arg)
     if (ms->snd)
     {
       ms->snd->SetPosition (pos.x, pos.y, pos.z);
-      ms->snd->PlaySource ();
+      ISoundBuffer *sb = NULL;
+      ms->snd->GetSoundBuffer(&sb);
+      sb->Play ();
     }
     ms->type = DYN_TYPE_MISSILE;
     ms->dir = (csOrthoTransform)*(Sys->view->GetCamera ());
@@ -1428,8 +1436,8 @@ static bool CommandHandler (char *cmd, char *arg)
   }
   else if (!strcasecmp (cmd, "snd_play"))
   {
-    csSoundBuffer *sb =
-         csSoundBufferObject::GetSound(*(Sys->view->GetWorld()), arg);
+    csSoundData *sb =
+         csSoundDataObject::GetSound(*(Sys->view->GetWorld()), arg);
     if (sb)
       Sys->piSound->PlayEphemeral(sb);
     else Sys->Printf (MSG_CONSOLE, "Sound '%s' not found!\n", arg);

@@ -34,7 +34,8 @@ extern const GUID IID_ISoundRender;
 
 interface ISoundListener;
 interface ISoundSource;
-class csSoundBuffer;
+interface ISoundBuffer;
+class csSoundData;
 
 interface ISoundRender : public IUnknown
 {
@@ -50,11 +51,13 @@ public:
   /// Get Volume [0, 1]
   STDMETHOD (GetVolume) (float *vol) PURE;
   /// Play a sound buffer without control (it's play until his end)
-  STDMETHOD (PlayEphemeral) (csSoundBuffer *snd) PURE;
+  STDMETHOD (PlayEphemeral) (csSoundData *snd) PURE;
   /// Create a Listener object
   STDMETHOD (GetListener) (ISoundListener ** ppv ) PURE;
   /// Create a Source object
-  STDMETHOD (CreateSource) (ISoundSource ** ppv, csSoundBuffer *snd) PURE;
+  STDMETHOD (CreateSource) (ISoundSource ** ppv, csSoundData *snd) PURE;
+  /// Create a controled SoundBuffer object
+  STDMETHOD (CreateSoundBuffer) (ISoundBuffer ** ppv, csSoundData *snd) PURE;
   /// Internal use : mixing function (need if your render use a driver)
   STDMETHOD (MixingFunction) () PURE;
 };

@@ -37,17 +37,19 @@ END_INTERFACE_TABLE()
 
 csSoundListenerEAX::csSoundListenerEAX()
 {
-  info.fPosX = info.fPosY = info.fPosZ = 0.0;
-  info.fDirTopX = info.fDirTopY = info.fDirTopZ = 0.0;
-  info.fDirFrontX = info.fDirFrontY = info.fDirFrontZ = 0.0;
-  info.fVelX = info.fVelY = info.fVelZ = 0.0;
-  info.fDoppler = 1.0;
-  info.fDistance = 1.0;
-  info.fRollOff = 1.0;
+  fPosX = fPosY = fPosZ = 0.0;
+  fDirTopX = fDirTopY = fDirTopZ = 0.0;
+  fDirFrontX = fDirFrontY = fDirFrontZ = 0.0;
+  fVelX = fVelY = fVelZ = 0.0;
+  fDoppler = 1.0;
+  fDistance = 1.0;
+  fRollOff = 1.0;
 
+  m_bEaxSupported = false;
   m_p3DAudioRenderer = NULL;
   m_pDS3DPrimaryBuffer = NULL;
 	m_pDS3DListener = NULL;
+  m_pKsPropertiesSet = NULL;
 }
 
 csSoundListenerEAX::~csSoundListenerEAX()
@@ -84,20 +86,41 @@ int csSoundListenerEAX::CreateListener(ISoundRender * render)
     return E_FAIL;
   }
   
-  if ((hr = m_pDS3DListener->SetDopplerFactor(info.fDoppler, DS3D_IMMEDIATE)) != DS_OK)
+  if ((hr = m_pDS3DListener->SetDopplerFactor(fDoppler, DS3D_IMMEDIATE)) != DS_OK)
   {
     return E_FAIL;
   }
   
-  if ((hr = m_pDS3DListener->SetDistanceFactor(info.fDistance, DS3D_IMMEDIATE)) != DS_OK)
+  if ((hr = m_pDS3DListener->SetDistanceFactor(fDistance, DS3D_IMMEDIATE)) != DS_OK)
   {
     return E_FAIL;
   }
   
-  if ((hr = m_pDS3DListener->SetRolloffFactor(info.fRollOff, DS3D_IMMEDIATE)) != DS_OK)
+  if ((hr = m_pDS3DListener->SetRolloffFactor(fRollOff, DS3D_IMMEDIATE)) != DS_OK)
   {
     return E_FAIL;
   }
+  
+  hr = m_pDS3DPrimaryBuffer->QueryInterface(IID_IKsPropertySet, (void**) &m_pKsPropertiesSet);
+  ULONG support = 0;
+  if(SUCCEEDED(hr) && m_pKsPropertiesSet)
+  {    
+    hr = m_pKsPropertiesSet->QuerySupport(DSPROPSETID_EAX_ListenerProperties, DSPROPERTY_EAXLISTENER_ALLPARAMETERS, &support);
+    if(SUCCEEDED(hr))
+    {
+      if( (support&(KSPROPERTY_SUPPORT_GET|KSPROPERTY_SUPPORT_SET))
+        == (KSPROPERTY_SUPPORT_GET|KSPROPERTY_SUPPORT_SET))
+      {
+        m_bEaxSupported = true;
+      }
+    }
+    if(!m_bEaxSupported)
+    {
+      renderEAX->SysPrintf (MSG_INITIALIZATION, "WARNING : this device don't support EAX 2.0\n");
+    }
+  }
+  else
+    renderEAX->SysPrintf (MSG_INITIALIZATION, "WARNING : cannot get properties, this device may not support EAX\n");
 
   return S_OK;
 }
@@ -106,6 +129,14 @@ int csSoundListenerEAX::DestroyListener()
 {
   HRESULT hr;
   
+  if(m_pKsPropertiesSet)
+  {
+    if ((hr = m_pKsPropertiesSet->Release()) < DS_OK)
+      return(hr);
+
+    m_pKsPropertiesSet = NULL;
+  }
+
   if (m_pDS3DListener)
   {
     if ((hr = m_pDS3DListener->Release()) < DS_OK)
@@ -125,9 +156,9 @@ int csSoundListenerEAX::DestroyListener()
     m_pDS3DPrimaryBuffer = NULL;
   }
   
-  info.fDoppler = 1.0f;
-  info.fDistance = 1.0f;
-  info.fRollOff = 1.0f;
+  fDoppler = 1.0f;
+  fDistance = 1.0f;
+  fRollOff = 1.0f;
 
   return S_OK;
 }
@@ -136,10 +167,10 @@ STDMETHODIMP csSoundListenerEAX::SetPosition(float x, float y, float z)
 {
   HRESULT hr;
 
-  info.fPosX = x; info.fPosY = y; info.fPosZ = z;
+  fPosX = x; fPosY = y; fPosZ = z;
 
   if ((hr = m_pDS3DListener->SetPosition(
-    info.fPosX, info.fPosY, info.fPosZ,
+    fPosX, fPosY, fPosZ,
     DS3D_IMMEDIATE)) != DS_OK)
   {
     return E_FAIL;
@@ -152,12 +183,12 @@ STDMETHODIMP csSoundListenerEAX::SetDirection(float fx, float fy, float fz, floa
 {
   HRESULT hr;
 
-  info.fDirFrontX = fx; info.fDirFrontY = fy; info.fDirFrontZ = fz;
-  info.fDirTopX = tx; info.fDirTopY = ty; info.fDirTopZ = tz;
+  fDirFrontX = fx; fDirFrontY = fy; fDirFrontZ = fz;
+  fDirTopX = tx; fDirTopY = ty; fDirTopZ = tz;
 
   if ((hr = m_pDS3DListener->SetOrientation(
-    info.fDirFrontX, info.fDirFrontY, info.fDirFrontZ,
-    info.fDirTopX, info.fDirTopY, info.fDirTopZ,
+    fDirFrontX, fDirFrontY, fDirFrontZ,
+    fDirTopX, fDirTopY, fDirTopZ,
     DS3D_IMMEDIATE)) != DS_OK)
   {
     return E_FAIL;
@@ -168,7 +199,7 @@ STDMETHODIMP csSoundListenerEAX::SetDirection(float fx, float fy, float fz, floa
 
 STDMETHODIMP csSoundListenerEAX::SetHeadSize(float size)
 {
-  info.fHeadSize = size;
+  fHeadSize = size;
 
   return S_OK;
 }
@@ -177,12 +208,12 @@ STDMETHODIMP csSoundListenerEAX::SetVelocity(float x, float y, float z)
 {
   HRESULT hr;
   
-  info.fVelX = x; info.fVelY = y; info.fVelZ = z;
+  fVelX = x; fVelY = y; fVelZ = z;
 
   if(!m_pDS3DListener) return E_FAIL;
 
   if ((hr = m_pDS3DListener->SetVelocity(
-    info.fVelX, info.fVelY, info.fVelZ,
+    fVelX, fVelY, fVelZ,
     DS3D_IMMEDIATE)) != DS_OK)
   {
     return E_FAIL;
@@ -195,11 +226,11 @@ STDMETHODIMP csSoundListenerEAX::SetDopplerFactor(float factor)
 {
   HRESULT hr;
 
-  info.fDoppler = factor;
+  fDoppler = factor;
 
   if(!m_pDS3DListener) return E_FAIL;
 
-  if ((hr = m_pDS3DListener->SetDopplerFactor(info.fDoppler, DS3D_IMMEDIATE)) != DS_OK)
+  if ((hr = m_pDS3DListener->SetDopplerFactor(fDoppler, DS3D_IMMEDIATE)) != DS_OK)
   {
     return E_FAIL;
   }
@@ -211,11 +242,11 @@ STDMETHODIMP csSoundListenerEAX::SetDistanceFactor(float factor)
 {
   HRESULT hr;
 
-  info.fDistance = factor;
+  fDistance = factor;
 
   if(!m_pDS3DListener) return E_FAIL;
 
-  if ((hr = m_pDS3DListener->SetDistanceFactor(info.fDistance, DS3D_IMMEDIATE)) != DS_OK)
+  if ((hr = m_pDS3DListener->SetDistanceFactor(fDistance, DS3D_IMMEDIATE)) != DS_OK)
   {
     return E_FAIL;
   }
@@ -227,11 +258,11 @@ STDMETHODIMP csSoundListenerEAX::SetRollOffFactor(float factor)
 {
   HRESULT hr;
 
-  info.fRollOff = factor;
+  fRollOff = factor;
 
   if(!m_pDS3DListener) return E_FAIL;
 
-  if ((hr = m_pDS3DListener->SetRolloffFactor(info.fRollOff, DS3D_IMMEDIATE)) != DS_OK)
+  if ((hr = m_pDS3DListener->SetRolloffFactor(fRollOff, DS3D_IMMEDIATE)) != DS_OK)
   {
     return E_FAIL;
   }
@@ -243,81 +274,123 @@ STDMETHODIMP csSoundListenerEAX::SetRollOffFactor(float factor)
 struct s2eaxEnv_type
 {
   SoundEnvironment senv;
-  EAX_REVERBPROPERTIES eaxenv;
+  DWORD eaxenv;
 } s2eaxEnv[MAX_s2eaxEnv]=
 {
-  {ENVIRONMENT_GENERIC,{EAX_PRESET_GENERIC}},
-  {ENVIRONMENT_PADDEDCELL,{EAX_PRESET_PADDEDCELL}},
-  {ENVIRONMENT_ROOM,{EAX_PRESET_ROOM}},
-  {ENVIRONMENT_BATHROOM,{EAX_PRESET_BATHROOM}},
-  {ENVIRONMENT_LIVINGROOM,{EAX_PRESET_LIVINGROOM}},
-  {ENVIRONMENT_STONEROOM,{EAX_PRESET_STONEROOM}},
-  {ENVIRONMENT_AUDITORIUM,{EAX_PRESET_AUDITORIUM}},
-  {ENVIRONMENT_CONCERTHALL,{EAX_PRESET_CONCERTHALL}},
-  {ENVIRONMENT_CAVE,{EAX_PRESET_CAVE}},
-  {ENVIRONMENT_ARENA,{EAX_PRESET_ARENA}},
-  {ENVIRONMENT_CARPETEDHALLWAY,{EAX_PRESET_CARPETEDHALLWAY}},
-  {ENVIRONMENT_HALLWAY,{EAX_PRESET_HALLWAY}},
-  {ENVIRONMENT_STONECORRIDOR,{EAX_PRESET_STONECORRIDOR}},
-  {ENVIRONMENT_ALLEY,{EAX_PRESET_ALLEY}},
-  {ENVIRONMENT_FOREST,{EAX_PRESET_FOREST}},
-  {ENVIRONMENT_CITY,{EAX_PRESET_CITY}},
-  {ENVIRONMENT_MOUNTAINS,{EAX_PRESET_MOUNTAINS}},
-  {ENVIRONMENT_QUARRY,{EAX_PRESET_QUARRY}},
-  {ENVIRONMENT_PLAIN,{EAX_PRESET_PLAIN}},
-  {ENVIRONMENT_PARKINGLOT,{EAX_PRESET_PARKINGLOT}},
-  {ENVIRONMENT_SEWERPIPE,{EAX_PRESET_SEWERPIPE}},
-  {ENVIRONMENT_UNDERWATER,{EAX_PRESET_UNDERWATER}},
-  {ENVIRONMENT_DRUGGED,{EAX_PRESET_DRUGGED}},
-  {ENVIRONMENT_DIZZY,{EAX_PRESET_DIZZY}},
-  {ENVIRONMENT_PSYCHOTIC,{EAX_PRESET_PSYCHOTIC}}
+  {ENVIRONMENT_GENERIC,         {EAX_ENVIRONMENT_GENERIC}},
+  {ENVIRONMENT_PADDEDCELL,      {EAX_ENVIRONMENT_PADDEDCELL}},
+  {ENVIRONMENT_ROOM,            {EAX_ENVIRONMENT_ROOM}},
+  {ENVIRONMENT_BATHROOM,        {EAX_ENVIRONMENT_BATHROOM}},
+  {ENVIRONMENT_LIVINGROOM,      {EAX_ENVIRONMENT_LIVINGROOM}},
+  {ENVIRONMENT_STONEROOM,       {EAX_ENVIRONMENT_STONEROOM}},
+  {ENVIRONMENT_AUDITORIUM,      {EAX_ENVIRONMENT_AUDITORIUM}},
+  {ENVIRONMENT_CONCERTHALL,     {EAX_ENVIRONMENT_CONCERTHALL}},
+  {ENVIRONMENT_CAVE,            {EAX_ENVIRONMENT_CAVE}},
+  {ENVIRONMENT_ARENA,           {EAX_ENVIRONMENT_ARENA}},
+  {ENVIRONMENT_CARPETEDHALLWAY, {EAX_ENVIRONMENT_CARPETEDHALLWAY}},
+  {ENVIRONMENT_HALLWAY,         {EAX_ENVIRONMENT_HALLWAY}},
+  {ENVIRONMENT_STONECORRIDOR,   {EAX_ENVIRONMENT_STONECORRIDOR}},
+  {ENVIRONMENT_ALLEY,           {EAX_ENVIRONMENT_ALLEY}},
+  {ENVIRONMENT_FOREST,          {EAX_ENVIRONMENT_FOREST}},
+  {ENVIRONMENT_CITY,            {EAX_ENVIRONMENT_CITY}},
+  {ENVIRONMENT_MOUNTAINS,       {EAX_ENVIRONMENT_MOUNTAINS}},
+  {ENVIRONMENT_QUARRY,          {EAX_ENVIRONMENT_QUARRY}},
+  {ENVIRONMENT_PLAIN,           {EAX_ENVIRONMENT_PLAIN}},
+  {ENVIRONMENT_PARKINGLOT,      {EAX_ENVIRONMENT_PARKINGLOT}},
+  {ENVIRONMENT_SEWERPIPE,       {EAX_ENVIRONMENT_SEWERPIPE}},
+  {ENVIRONMENT_UNDERWATER,      {EAX_ENVIRONMENT_UNDERWATER}},
+  {ENVIRONMENT_DRUGGED,         {EAX_ENVIRONMENT_DRUGGED}},
+  {ENVIRONMENT_DIZZY,           {EAX_ENVIRONMENT_DIZZY}},
+  {ENVIRONMENT_PSYCHOTIC,       {EAX_ENVIRONMENT_PSYCHOTIC}}
 };
 
 STDMETHODIMP csSoundListenerEAX::SetEnvironment(SoundEnvironment env)
 {
   UINT ret = S_FALSE;
-  info.Environment = env;
+  Environment = env;
 
-  LPKSPROPERTYSET pProperties;
-  HRESULT hr = m_pDS3DPrimaryBuffer->QueryInterface(IID_IKsPropertySet, (void**) &pProperties);
-  if(SUCCEEDED(hr) && pProperties)
+  if(m_bEaxSupported)
   {
-    ULONG support = 0;
-    hr = pProperties->QuerySupport(DSPROPSETID_EAX_ReverbProperties, DSPROPERTY_EAX_ALL, &support);
-    if(SUCCEEDED(hr))
+    if(m_pKsPropertiesSet)
     {
-      if( (support&(KSPROPERTY_SUPPORT_GET|KSPROPERTY_SUPPORT_SET))
-        == (KSPROPERTY_SUPPORT_GET|KSPROPERTY_SUPPORT_SET))
+      DWORD preset={EAX_ENVIRONMENT_GENERIC};
+      
+      for(int i=0; i<MAX_s2eaxEnv; i++)
       {
-        EAX_REVERBPROPERTIES preset={EAX_PRESET_GENERIC};
-        
-        for(int i=0; i<MAX_s2eaxEnv; i++)
-          if(s2eaxEnv[i].senv==env)
-          {
-            preset = s2eaxEnv[i].eaxenv;
-            break;
-          }
-
-        pProperties->Set(DSPROPSETID_EAX_ReverbProperties,
-          DSPROPERTY_EAX_ALL,
-          NULL,
-          0,
-          &preset,
-          sizeof(EAX_REVERBPROPERTIES));
-        ret = S_OK;
+        if(s2eaxEnv[i].senv==env)
+        {
+          preset = s2eaxEnv[i].eaxenv;
+          break;
+        }
       }
       
-      pProperties->Release();
-      pProperties = NULL;
+      m_pKsPropertiesSet->Set(DSPROPSETID_EAX_ListenerProperties,
+        DSPROPERTY_EAXLISTENER_ENVIRONMENT,
+        NULL,
+        0,
+        &preset,
+        sizeof(DWORD));
+      ret = S_OK;
     }
   }
+
 
   return ret;
 }
 
-STDMETHODIMP csSoundListenerEAX::GetInfoListener(csSoundListenerInfo *i)
+STDMETHODIMP csSoundListenerEAX::GetPosition(float &x, float &y, float &z)
 {
-  *i = info;
+  x = fPosX; y = fPosY; z = fPosZ;
+
+  return S_OK;
+}
+
+STDMETHODIMP csSoundListenerEAX::GetDirection(float &fx, float &fy, float &fz, float &tx, float &ty, float &tz)
+{
+  fx = fDirFrontX; fy = fDirFrontY; fz = fDirFrontZ;
+  tx = fDirTopX; ty = fDirTopY; tz = fDirTopZ;
+
+  return S_OK;
+}
+
+STDMETHODIMP csSoundListenerEAX::GetHeadSize(float &size)
+{
+  size = fHeadSize;
+
+  return S_OK;
+}
+
+STDMETHODIMP csSoundListenerEAX::GetVelocity(float &x, float &y, float &z)
+{
+  x = fVelX; y = fVelY; z = fVelZ;
+
+  return S_OK;
+}
+
+STDMETHODIMP csSoundListenerEAX::GetDopplerFactor(float &factor)
+{
+  factor = fDoppler;
+
+  return S_OK;
+}
+
+STDMETHODIMP csSoundListenerEAX::GetDistanceFactor(float &factor)
+{
+  factor = fDistance;
+
+  return S_OK;
+}
+
+STDMETHODIMP csSoundListenerEAX::GetRollOffFactor(float &factor)
+{
+  factor = fRollOff;
+
+  return S_OK;
+}
+
+STDMETHODIMP csSoundListenerEAX::GetEnvironment(SoundEnvironment &env)
+{
+  env = Environment;
 
   return S_OK;
 }

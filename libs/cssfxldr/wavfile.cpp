@@ -24,8 +24,8 @@
 #include "sysdef.h"
 #include "csutil/csvector.h"
 #include "csutil/util.h"
-#include "cssndldr/common/sndbuf.h"
-#include "cssndldr/wavfile.h"
+#include "cssfxldr/common/snddata.h"
+#include "cssfxldr/wavfile.h"
 
 // Microsoft Wav file loader
 //  support 8 and 16 bits PCM (RIFF)
@@ -58,14 +58,14 @@ struct _WAVhdr
 bool RegisterWAV ()
 {
   static WAVLoader loader;
-  return csSoundBufferLoader::Register (&loader);
+  return csSoundLoader::Register (&loader);
 }
 
-csSoundBuffer* WAVLoader::loadsound(UByte* buf, ULong size)
+csSoundData* WAVLoader::loadsound(UByte* buf, ULong size)
 {
   int index=0;
 
-  csSoundBuffer *sb= NULL;
+  csSoundData *sb= NULL;
   void *data=NULL;
   UByte *ptr;
   UByte *ptr_end;
@@ -127,7 +127,7 @@ csSoundBuffer* WAVLoader::loadsound(UByte* buf, ULong size)
   }
 #endif // PORT_BYTESEX_BIG_ENDIAN
 
-  CHK (sb = new csSoundBuffer(wavhdr.samples_per_sec,
+  CHK (sb = new csSoundData(wavhdr.samples_per_sec,
     (wavhdr.bits_per_sample==16)?true:false,
     (wavhdr.channel==2)?true:false,
     (wavhdr.bits_per_sample==16)?true:false,

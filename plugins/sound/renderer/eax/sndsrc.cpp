@@ -27,6 +27,7 @@
 
 #include "cssndrdr/eax/sndrdr.h"
 #include "cssndrdr/eax/sndsrc.h"
+#include "cssndrdr/eax/sndbuf.h"
 
 IMPLEMENT_UNKNOWN_NODELETE (csSoundSourceEAX)
 
@@ -36,8 +37,8 @@ END_INTERFACE_TABLE()
 
 csSoundSourceEAX::csSoundSourceEAX()
 {
-  info.fPosX = info.fPosY = info.fPosZ = 0.0;
-  info.fVelX = info.fVelY = info.fVelZ = 0.0;
+  fPosX = fPosY = fPosZ = 0.0;
+  fVelX = fVelY = fVelZ = 0.0;
 
   m_pDS3DBuffer2D = NULL;
   m_pDS3DBuffer3D = NULL;
@@ -48,90 +49,10 @@ csSoundSourceEAX::~csSoundSourceEAX()
 
 }
 
-int csSoundSourceEAX::CreateSource(ISoundRender * render, csSoundBuffer * sound)
+int csSoundSourceEAX::CreateSource()
 {
   HRESULT                 hr;
-  csSoundRenderEAX *renderEAX;
-  DSBUFFERDESC    dsbd;
-  VOID                            *pbWrite1 = NULL, *pbWrite2 = NULL;
-  DWORD                           cbLen1, cbLen2;
   DWORD           dwMode;
-
-  if (!render) return E_FAIL;
-  if (!sound) return E_FAIL;
-
-  renderEAX = (csSoundRenderEAX *)render;
-
-  m_p3DAudioRenderer = renderEAX->m_p3DAudioRenderer;
-  
-  if (!m_p3DAudioRenderer)
-    return(E_FAIL);
-  
-  ZeroMemory(&dsbd, sizeof(DSBUFFERDESC));
-  dsbd.dwSize = sizeof(DSBUFFERDESC);
-  
-  dsbd.dwFlags = DSBCAPS_STATIC | DSBCAPS_CTRLDEFAULT | DSBCAPS_CTRL3D;
-  
-  WAVEFORMATEX    wfxFormat;
-  wfxFormat.wFormatTag                    = WAVE_FORMAT_PCM;
-  wfxFormat.nChannels                     = (sound->isStereo())?2:1;
-  wfxFormat.nSamplesPerSec        = sound->getFrequency();
-  wfxFormat.wBitsPerSample        = (sound->is16Bits())?16:8;
-  wfxFormat.nBlockAlign           = (wfxFormat.wBitsPerSample*wfxFormat.nChannels)/8;
-  wfxFormat.nAvgBytesPerSec       = wfxFormat.nBlockAlign*wfxFormat.nSamplesPerSec;
-  wfxFormat.cbSize                                = 0;
-  dsbd.lpwfxFormat = &wfxFormat;
-  dsbd.dwBufferBytes = sound->getSize();
-  
-  m_pDS3DBuffer2D = NULL;
-  m_pDS3DBuffer3D = NULL;
-  
-  if ((hr = m_p3DAudioRenderer->CreateSoundBuffer(&dsbd, &m_pDS3DBuffer2D, NULL)) != DS_OK)
-  {
-    if (m_pDS3DBuffer2D)
-      m_pDS3DBuffer2D = NULL;
-    return(hr);
-  }
-  
-  if ((hr = m_pDS3DBuffer2D->Lock(0, sound->getSize(), &pbWrite1, &cbLen1, &pbWrite2, &cbLen2, 0L)) != DS_OK)
-  {
-    if (pbWrite1 != NULL)
-    {
-      m_pDS3DBuffer2D->Unlock(pbWrite1, sound->getSize(), pbWrite2, 0);
-      pbWrite1 = NULL;
-    }
-    
-    if (m_pDS3DBuffer2D != NULL)
-    {
-      m_pDS3DBuffer2D->Release();
-      m_pDS3DBuffer2D = NULL;
-    }
-    
-    return(hr);
-  }
-  
-  CopyMemory(pbWrite1, sound->getData(), sound->getSize());
-    
-  if ((hr = m_pDS3DBuffer2D->Unlock(pbWrite1, sound->getSize(), pbWrite2, 0)) != DS_OK)
-  {
-    if (pbWrite1 != NULL)
-    {
-      m_pDS3DBuffer2D->Unlock(pbWrite1, sound->getSize(), pbWrite2, 0);
-      pbWrite1 = NULL;
-    }
-    
-    if (m_pDS3DBuffer2D != NULL)
-    {
-      m_pDS3DBuffer2D->Release();
-      m_pDS3DBuffer2D = NULL;
-    }
-    
-    return(hr);
-  }
-  
-
-  pbWrite1 = NULL;
-  pbWrite2 = NULL;
 
   if((hr = m_pDS3DBuffer2D->QueryInterface(IID_IDirectSound3DBuffer, (void **) &m_pDS3DBuffer3D)) < DS_OK)
   {
@@ -158,45 +79,23 @@ int csSoundSourceEAX::DestroySource()
     
     m_pDS3DBuffer3D = NULL;
   }
-  
-  if (m_pDS3DBuffer2D)
-  {
-    if ((hr = m_pDS3DBuffer2D->Stop()) < DS_OK)
-      return(hr);
-    
-    if ((hr = m_pDS3DBuffer2D->Release()) < DS_OK)
-      return(hr);
-    
-    m_pDS3DBuffer2D = NULL;
-  }
 
   return S_OK;
 }
 
-STDMETHODIMP csSoundSourceEAX::PlaySource(bool inLoop)
+STDMETHODIMP csSoundSourceEAX::GetSoundBuffer(ISoundBuffer **ppv)
 {
-  if (m_pDS3DBuffer2D)
+  if(!pSoundBuffer)
   {
-    if (inLoop)
-      m_pDS3DBuffer2D->Play(0, 0, DSBPLAY_LOOPING);
-    else
-      m_pDS3DBuffer2D->Play(0, 0, 0);
+    return E_FAIL;
   }
 
-  return S_OK;
-}
-
-STDMETHODIMP csSoundSourceEAX::StopSource()
-{
-  if (m_pDS3DBuffer2D)
-    m_pDS3DBuffer2D->Stop();
-
-  return S_OK;
+  return pSoundBuffer->QueryInterface (IID_ISoundBuffer, (void**)ppv);
 }
 
 STDMETHODIMP csSoundSourceEAX::SetPosition(float x, float y, float z)
 {
-  info.fPosX = x; info.fPosY = y; info.fPosZ = z;
+  fPosX = x; fPosY = y; fPosZ = z;
 
   if (m_pDS3DBuffer3D)
     m_pDS3DBuffer3D->SetPosition(x, y ,z, DS3D_IMMEDIATE);
@@ -206,7 +105,7 @@ STDMETHODIMP csSoundSourceEAX::SetPosition(float x, float y, float z)
 
 STDMETHODIMP csSoundSourceEAX::SetVelocity(float x, float y, float z)
 {
-  info.fVelX = x; info.fVelY = y; info.fVelZ = z;
+  fVelX = x; fVelY = y; fVelZ = z;
 
   if (m_pDS3DBuffer3D)
     m_pDS3DBuffer3D->SetVelocity(x, y ,z, DS3D_IMMEDIATE);
@@ -214,9 +113,30 @@ STDMETHODIMP csSoundSourceEAX::SetVelocity(float x, float y, float z)
   return S_OK;
 }
 
-STDMETHODIMP csSoundSourceEAX::GetInfoSource(csSoundSourceInfo *i)
+STDMETHODIMP csSoundSourceEAX::GetPosition(float &x, float &y, float &z)
 {
-  *i=info;
+  x = fPosX; y = fPosY; z = fPosZ;
+
+  if (m_pDS3DBuffer3D)
+  {
+    D3DVECTOR v;
+    m_pDS3DBuffer3D->GetPosition(&v);
+    x = v.x; y = v.y; z = v.z;
+  }
+
+  return S_OK;
+}
+
+STDMETHODIMP csSoundSourceEAX::GetVelocity(float &x, float &y, float &z)
+{
+  x = fVelX; y = fVelY; z = fVelZ;
+
+  if (m_pDS3DBuffer3D)
+  {
+    D3DVECTOR v;
+    m_pDS3DBuffer3D->GetVelocity(&v);
+    x = v.x; y = v.y; z = v.z;
+  }
 
   return S_OK;
 }

@@ -25,7 +25,7 @@
 // csSoundRenderSoftware class.
 
 #include "cscom/com.h"
-#include "cssndldr/common/sndbuf.h"
+#include "cssfxldr/common/snddata.h"
 #include "cssndrdr/software/srdrchan.h"
 #include "isndrdr.h"
 #include "isnddrv.h"
@@ -49,10 +49,11 @@ public:
   STDMETHODIMP SetVolume(float vol);
   STDMETHODIMP GetVolume(float *vol);
 
-  STDMETHODIMP PlayEphemeral(csSoundBuffer *snd);
+  STDMETHODIMP PlayEphemeral(csSoundData *snd);
 
   STDMETHODIMP GetListener(ISoundListener ** ppv );
-  STDMETHODIMP CreateSource(ISoundSource ** ppv, csSoundBuffer *snd);
+  STDMETHODIMP CreateSource(ISoundSource ** ppv, csSoundData *snd);
+  STDMETHODIMP CreateSoundBuffer(ISoundBuffer ** ppv, csSoundData *snd);
 	
   STDMETHODIMP MixingFunction();
 

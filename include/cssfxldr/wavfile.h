@@ -1,7 +1,5 @@
 /*
-    Copyright (C) 1998, 1999 by Nathaniel 'NooTe' Saint Martin
-    Copyright (C) 1998, 1999 by Jorrit Tyberghein
-    Written by Nathaniel 'NooTe' Saint Martin
+    Copyright (C) 1998 by Jorrit Tyberghein    
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -18,25 +16,25 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#include <string.h>
-#include "sysdef.h"
-#include "cssndldr/common/sndbuf.h"
-#include "csparser/sndbufo.h"
-#include "csobject/nameobj.h"
+#ifndef __WAVFILE_H
+#define __WAVFILE_H
 
-CSOBJTYPE_IMPL(csSoundBufferObject,csObject);
+#include "cssfxldr/sndload.h"
 
-csSoundBufferObject::~csSoundBufferObject()
-{ if (sndbuf) CHKB(delete sndbuf); }
-
-csSoundBuffer* csSoundBufferObject::GetSound(csObject& csobj, const char* name)
+///
+class WAVLoader : public csSoundLoader
 {
-  csObjIterator i = csobj.ObjGet(csSoundBufferObject::Type());
-  while (!i.IsNull())
-  {
-    if (strcmp(name, csNameObject::GetName(*i)) == 0)
-      return ((csSoundBufferObject&)(*i)).GetSound();
-    ++i;
-  }
-  return NULL;
-}
+protected:
+  ///
+  virtual csSoundData* loadsound(UByte* buf, ULong size);
+
+public:
+  ///
+  virtual const char* get_name() const
+  { return "WAV"; }
+  ///
+  virtual const char* get_desc() const 
+  { return "Microsoft WAV sound format"; }
+};
+
+#endif // __WAVFILE_H

@@ -21,7 +21,7 @@
 #if !defined(__CSSOUNDLISTENERDS3D_H__)
 #define __CSSOUNDLISTENERDS3D_H__
 
-#include "cssndldr/common/sndbuf.h"
+#include "cssfxldr/common/snddata.h"
 #include "isndrdr.h"
 #include "isndlstn.h"
 
@@ -40,13 +40,35 @@ public:
   STDMETHODIMP SetHeadSize(float size);
   STDMETHODIMP SetEnvironment(SoundEnvironment env);
 
-  STDMETHODIMP GetInfoListener(csSoundListenerInfo *info);
+	STDMETHODIMP GetDirection(float &fx, float &fy, float &fz, float &tx, float &ty, float &tz);
+	STDMETHODIMP GetPosition(float &x, float &y, float &z);
+  STDMETHODIMP GetVelocity(float &x, float &y, float &z);
+	STDMETHODIMP GetDistanceFactor(float &factor);
+  STDMETHODIMP GetRollOffFactor(float &factor);
+  STDMETHODIMP GetDopplerFactor(float &factor);
+  STDMETHODIMP GetHeadSize(float &size);
+  STDMETHODIMP GetEnvironment(SoundEnvironment &env);
 
 	DECLARE_IUNKNOWN()
 	DECLARE_INTERFACE_TABLE(csSoundListenerDS3D)
 
 public:
-  csSoundListenerInfo info;
+  // Position
+	float fPosX, fPosY, fPosZ;
+  // Velocity
+  float fVelX, fVelY, fVelZ;
+  // Direction
+  float fDirTopX, fDirTopY, fDirTopZ, fDirFrontX, fDirFrontY, fDirFrontZ;
+  // Doppler
+  float fDoppler;
+  // Distance
+  float fDistance;
+  // RollOff
+  float fRollOff;
+  // HeadSize
+  float fHeadSize;
+  // Environment
+  SoundEnvironment Environment;
 
   int CreateListener(ISoundRender *render);
 	int DestroyListener();

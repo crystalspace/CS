@@ -1,151 +1,141 @@
 /*
-    Sound Render interface DLL
+	Copyright (C) 1998, 1999 by Nathaniel 'NooTe' Saint Martin
+	Copyright (C) 1998, 1999 by Jorrit Tyberghein
+	Written by Nathaniel 'NooTe' Saint Martin
 
-    Copyright (C) 1998, 1999 by Nathaniel 'NooTe' Saint Martin
-    Copyright (C) 1998, 1999 by Jorrit Tyberghein
-    Written by Nathaniel 'NooTe' Saint Martin
+	This library is free software; you can redistribute it and/or
+	modify it under the terms of the GNU Library General Public
+	License as published by the Free Software Foundation; either
+	version 2 of the License, or (at your option) any later version.
 
-    This library is free software; you can redistribute it and/or
-    modify it under the terms of the GNU Library General Public
-    License as published by the Free Software Foundation; either
-    version 2 of the License, or (at your option) any later version.
+	This library is distributed in the hope that it will be useful,
+	but WITHOUT ANY WARRANTY; without even the implied warranty of
+	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+	Library General Public License for more details.
 
-    This library is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-    Library General Public License for more details.
-
-    You should have received a copy of the GNU Library General Public
-    License along with this library; if not, write to the Free
-    Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+	You should have received a copy of the GNU Library General Public
+	License along with this library; if not, write to the Free
+	Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#include <stdlib.h>
+#include <stdarg.h>
+#include <stdio.h>
+
 #include "sysdef.h"
 #include "cscom/com.h"
 #include "cssndrdr/null/nrdrcom.h"
-#include "isndrdr.h"
+#include "cssndrdr/null/nrdrlst.h"
+#include "cssndrdr/null/nrdrsrc.h"
+#include "cssndrdr/null/nrdrbuf.h"
+#include "isystem.h"
+#include "isndlstn.h"
+#include "isndsrc.h"
+#include "isndbuf.h"
 
-static unsigned int gRefCount = 0;
-static DllRegisterData gRegData =
+IMPLEMENT_UNKNOWN_NODELETE (csSoundRenderNull)
+
+BEGIN_INTERFACE_TABLE(csSoundRenderNull)
+  IMPLEMENTS_INTERFACE(ISoundRender)
+END_INTERFACE_TABLE()
+
+csSoundRenderNull::csSoundRenderNull(ISystem* piSystem) : m_pListener(NULL)
 {
-  &CLSID_NullSoundRender,
-  "crystalspace.sound.render.null",
-  "Crystal Space Null Sound Render"
-};
+  m_piSystem = piSystem;
 
-#ifdef CS_STATIC_LINKED
-
-void SoundRenderNullRegister ()
-{
-  static csSoundRenderNullFactory gNullFactory;
-  gRegData.pClass = &gNullFactory;
-  csRegisterServer (&gRegData);
+  CHK (m_pListener = new csSoundListenerNull ());
 }
 
-void SoundRenderNullUnregister ()
+csSoundRenderNull::~csSoundRenderNull()
 {
-  csUnregisterServer (&gRegData);
+  CHK (delete m_pListener);
 }
 
-#else
-
-// This is the name of the DLL. Make sure to change this if you change the DLL name!
-// DAN: this might have to be changed for each OS, cuz each OS has a different extension for DLLs.
-#if defined (OS_WIN32)
-#define DLL_NAME "SoundRenderNull.dll"
-#elif defined (OS_OS2)
-#define DLL_NAME "sndrdrn.dll"
-#elif defined (OS_MACOS)
-#define DLL_NAME "sndrdrn.shlb"
-#elif defined (OS_NEXT)
-#define DLL_NAME "sndrdrn.dylib"
-#else
-#define DLL_NAME "sndrdrn.so"
-#endif
-
-// our main entry point...should be called when we're loaded.
-STDAPI DllInitialize ()
+STDMETHODIMP csSoundRenderNull::GetListener(ISoundListener ** ppv )
 {
-  csCoInitialize (0);
-  gRegData.szInProcServer = DLL_NAME;
-  return TRUE;
+  if (!m_pListener)
+  {
+    *ppv = NULL;
+    return E_OUTOFMEMORY;
+  }
+  
+  return m_pListener->QueryInterface (IID_ISoundListener, (void**)ppv);
 }
 
-void STDAPICALLTYPE ModuleRelease ()
+STDMETHODIMP csSoundRenderNull::CreateSource(ISoundSource ** ppv, csSoundData* snd)
 {
-  gRefCount--;
-}
+  ISoundBuffer* pNewBuffer=NULL;
 
-void STDAPICALLTYPE ModuleAddRef ()
-{
-  gRefCount++;
-}
+  CreateSoundBuffer(&pNewBuffer, snd);
 
-// return S_OK if it's ok to unload us now.
-STDAPI DllCanUnloadNow ()
-{
-  return gRefCount ? S_FALSE : S_OK;
-}
-
-// used to get a COM class object from us.
-STDAPI DllGetClassObject (REFCLSID rclsid, REFIID riid, void** ppv)
-{
-  static csSoundRenderNullFactory gNullFactory;
-  if (rclsid == CLSID_NullSoundRender)
-    return gNullFactory.QueryInterface(riid, ppv);
-
-  //  if we get here, rclsid is a class we don't implement
-  *ppv = NULL;
-  return CLASS_E_CLASSNOTAVAILABLE;
-}
-
-// Called by RegSvr32.exe
-STDAPI DllRegisterServer ()
-{
-  return csRegisterServer (&gRegData);
-}
-
-// Called by RegSvr32.exe
-STDAPI DllUnregisterServer ()
-{
-  return csUnregisterServer(&gRegData);
-}
-
-#endif
-
-// Implementation of csSoundRenderNullFactory
-
-IMPLEMENT_UNKNOWN_NODELETE (csSoundRenderNullFactory)
-
-BEGIN_INTERFACE_TABLE (csSoundRenderNullFactory)
-  IMPLEMENTS_INTERFACE (ISoundRenderFactory)
-END_INTERFACE_TABLE ()
-
-STDMETHODIMP csSoundRenderNullFactory::CreateInstance (REFIID riid, ISystem* piSystem, void** ppv)
-{
-  if (!piSystem)
+  if(!pNewBuffer)
   {
     *ppv = 0;
-    return E_UNEXPECTED;
+    return E_OUTOFMEMORY;
   }
 
-  csSoundRenderNull* pNew = new csSoundRenderNull (piSystem);
+  csSoundBufferNull *pNew = (csSoundBufferNull*)pNewBuffer;
+
   if (!pNew)
   {
     *ppv = 0;
     return E_OUTOFMEMORY;
   }
 
-  return pNew->QueryInterface (riid, ppv);
+  return pNew->CreateSource(ppv);
 }
 
-STDMETHODIMP csSoundRenderNullFactory::LockServer (COMBOOL bLock)
+STDMETHODIMP csSoundRenderNull::CreateSoundBuffer(ISoundBuffer** ppv, csSoundData * /*snd*/)
 {
-  if (bLock)
-    gRefCount++;
-  else
-    gRefCount--;
+  CHK (csSoundBufferNull* pNew = new csSoundBufferNull ());
+  if (!pNew)
+  {
+    *ppv = 0;
+    return E_OUTOFMEMORY;
+  }
+  
+  return pNew->QueryInterface (IID_ISoundBuffer, (void**)ppv);
+}
+
+STDMETHODIMP csSoundRenderNull::Open()
+{
+  SysPrintf (MSG_INITIALIZATION, "\nSoundRender Null selected\n");
 
   return S_OK;
+}
+
+STDMETHODIMP csSoundRenderNull::Close()
+{
+  return S_OK;
+}
+
+STDMETHODIMP csSoundRenderNull::Update()
+{
+  return S_OK;
+}
+
+STDMETHODIMP csSoundRenderNull::SetVolume(float /*vol*/)
+{
+  return S_OK;
+}
+
+STDMETHODIMP csSoundRenderNull::GetVolume(float* /*vol*/)
+{
+  return S_OK;
+}
+
+STDMETHODIMP csSoundRenderNull::PlayEphemeral(csSoundData* /*snd*/)
+{
+  return S_OK;
+}
+
+void csSoundRenderNull::SysPrintf(int mode, char* szMsg, ...)
+{
+  char buf[1024];
+  va_list arg;
+  
+  va_start (arg, szMsg);
+  vsprintf (buf, szMsg, arg);
+  va_end (arg);
+  
+  m_piSystem->Print(mode, buf);
 }

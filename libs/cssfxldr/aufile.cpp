@@ -23,9 +23,9 @@
 
 #include "sysdef.h"
 #include "csutil/csvector.h"
-#include "cssndldr/common/sndbuf.h"
-#include "cssndldr/funcs.h"
-#include "cssndldr/aufile.h"
+#include "cssfxldr/common/snddata.h"
+#include "cssfxldr/funcs.h"
+#include "cssfxldr/aufile.h"
 
 // Sun AU file loader
 //  support 8 and 16 bits PCM
@@ -43,13 +43,13 @@
 bool RegisterAU ()
 {
   static AULoader loader;
-  return csSoundBufferLoader::Register (&loader);
+  return csSoundLoader::Register (&loader);
 }
 
-csSoundBuffer* AULoader::loadsound(UByte* buf, ULong size)
+csSoundData* AULoader::loadsound(UByte* buf, ULong size)
 {
   unsigned long index=0;
-  csSoundBuffer *sb= NULL;
+  csSoundData *sb= NULL;
   void *data=NULL;
   unsigned char dummy0, dummy1, dummy2, dummy3;
 
@@ -144,7 +144,7 @@ csSoundBuffer* AULoader::loadsound(UByte* buf, ULong size)
     }
   }
 
-  CHK (sb = new csSoundBuffer(freq,
+  CHK (sb = new csSoundData(freq,
     (flag==BIT16 || flag==BIT8ULAW)?true:false,
     (nchannels==2)?true:false,
     (flag==BIT16)?true:false,

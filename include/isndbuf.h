@@ -18,30 +18,31 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#if !defined(__CSSOUNDBUFFEROBJECT_H__)
-#define __CSSOUNDBUFFEROBJECT_H__
+#if !defined(__ISOUNDBUFFER_H__)
+#define __ISOUNDBUFFER_H__
 
-#include "csobject/csobj.h"
+extern const GUID IID_ISoundBuffer;
 
-class csSoundBuffer;
-
-class csSoundBufferObject : public csObject
+enum SoundBufferPlayMethod
 {
-protected:
-  ///
-  csSoundBuffer* sndbuf;
-
-public:
-  ///
-  csSoundBufferObject(csSoundBuffer* buf) : csObject(), sndbuf(buf) {}
-  ///
-  ~csSoundBufferObject();
-  ///
-  csSoundBuffer* GetSound() const { return sndbuf; }
-  ///
-  static csSoundBuffer* GetSound(csObject& csobj, const char* name);
-
-  CSOBJTYPE;
+  SoundBufferPlay_Normal = 0,
+  SoundBufferPlay_Restart,
+  SoundBufferPlay_InLoop,
+  SoundBufferPlay_RestartInLoop,
+  SoundBufferPlay_DestroyAtEnd,
 };
 
-#endif // __CSSOUNDBUFFEROBJECT_H__
+interface ISoundSource;
+
+interface ISoundBuffer : public IUnknown
+{
+public:
+  /// Play the sound
+  STDMETHOD (Play) (SoundBufferPlayMethod playMethod = SoundBufferPlay_Normal) PURE;
+  /// Stop the sound
+  STDMETHOD (Stop) () PURE;
+  // Create a 3d 
+  STDMETHOD (CreateSource) (ISoundSource **source) PURE;
+};
+
+#endif // __ISOUNDBUFFER_H__

@@ -20,9 +20,9 @@
 
 #include "sysdef.h"
 #include "qint.h"
-#include "cssndldr/common/sndbuf.h"
+#include "cssfxldr/common/snddata.h"
 
-csSoundBuffer::csSoundBuffer(int frequency, bool bit16, bool stereo, bool sign, long size, void *data)
+csSoundData::csSoundData(int frequency, bool bit16, bool stereo, bool sign, long size, void *data)
 {
   Data = data;
   Size = size;
@@ -33,12 +33,12 @@ csSoundBuffer::csSoundBuffer(int frequency, bool bit16, bool stereo, bool sign, 
 }
 
 
-csSoundBuffer::~csSoundBuffer()
+csSoundData::~csSoundData()
 {
   Clean();
 }
 
-void csSoundBuffer::Clean()
+void csSoundData::Clean()
 {
   if(Data) CHKB (delete Data);
   Size = 0;
@@ -48,32 +48,32 @@ void csSoundBuffer::Clean()
   Sign = false;
 }
 
-int csSoundBuffer::getFrequency()
+int csSoundData::getFrequency()
 {
   return Frequency;
 }
 
-bool csSoundBuffer::is16Bits()
+bool csSoundData::is16Bits()
 {
   return Bit16;
 }
 
-bool csSoundBuffer::isStereo()
+bool csSoundData::isStereo()
 {
   return Stereo;
 }
 
-void * csSoundBuffer::getData()
+void * csSoundData::getData()
 {
   return Data;
 }
 
-long csSoundBuffer::getSize()
+long csSoundData::getSize()
 {
   return Size;
 }
 
-bool csSoundBuffer::convertTo(int toFrequency, bool toBit16, bool toStereo)
+bool csSoundData::convertTo(int toFrequency, bool toBit16, bool toStereo)
 {
   convertStereoTo(toStereo);
   convert16bitTo(toBit16);
@@ -82,7 +82,7 @@ bool csSoundBuffer::convertTo(int toFrequency, bool toBit16, bool toStereo)
   return true;
 }
 
-bool csSoundBuffer::convertFrequencyTo (int toFrequency)
+bool csSoundData::convertFrequencyTo (int toFrequency)
 {
   int i;
 
@@ -146,7 +146,7 @@ bool csSoundBuffer::convertFrequencyTo (int toFrequency)
   return true;
 }
 
-bool csSoundBuffer::convert16bitTo(bool toBit16)
+bool csSoundData::convert16bitTo(bool toBit16)
 {
   int i;
 
@@ -187,7 +187,7 @@ bool csSoundBuffer::convert16bitTo(bool toBit16)
   return true;
 }
 
-bool csSoundBuffer::convertStereoTo(bool toStereo)
+bool csSoundData::convertStereoTo(bool toStereo)
 {
   int i;
 
@@ -272,7 +272,7 @@ bool csSoundBuffer::convertStereoTo(bool toStereo)
   return true;
 }
 
-void csSoundBuffer::forceMute()
+void csSoundData::forceMute()
 {
   if(Bit16)
   {

@@ -22,8 +22,8 @@
 
 #include "sysdef.h"
 #include "csutil/csvector.h"
-#include "cssndldr/common/sndbuf.h"
-#include "cssndldr/sndload.h"
+#include "cssfxldr/common/snddata.h"
+#include "cssfxldr/sndload.h"
 #include "isystem.h"
 
 // Register all file formats we want
@@ -48,9 +48,9 @@
 // Construction/Destruction
 //////////////////////////////////////////////////////////////////////
 
-csVector *csSoundBufferLoader::loaderlist = NULL;
+csVector *csSoundLoader::loaderlist = NULL;
 
-bool csSoundBufferLoader::Register (csSoundBufferLoader* loader)
+bool csSoundLoader::Register (csSoundLoader* loader)
 {
   if (!loaderlist)
     { CHK (loaderlist = new csVector (8, 8)); }
@@ -58,35 +58,35 @@ bool csSoundBufferLoader::Register (csSoundBufferLoader* loader)
   return true;
 }
 
-csSoundBuffer* csSoundBufferLoader::load (ISystem* system, const char* filename)
+csSoundData* csSoundLoader::load (ISystem* system, const char* filename)
 {
   FILE* fp;
   system->FOpen (filename, "rb", &fp);
   if (!fp) return NULL;
-  csSoundBuffer* i = load(fp);
+  csSoundData* i = load(fp);
   system->FClose (fp);
   return i;
 }
 
-csSoundBuffer* csSoundBufferLoader::load (FILE* fp)
+csSoundData* csSoundLoader::load (FILE* fp)
 {
   fseek(fp, 0, SEEK_END);
   ULong size = ftell(fp);
   fseek(fp, 0, SEEK_SET);
   CHK (UByte* buf = new UByte [size+1] );
   fread(buf, 1, size+1, fp);
-  csSoundBuffer* i = load(buf,size);
+  csSoundData* i = load(buf,size);
   CHK (delete [] buf);
   return i;
 }
 
-csSoundBuffer* csSoundBufferLoader::load (UByte* buf, ULong size)
+csSoundData* csSoundLoader::load (UByte* buf, ULong size)
 {
   int i=0;
   while (i < loaderlist->Length() )
   {
-    csSoundBufferLoader* l = (csSoundBufferLoader*) (loaderlist->Get (i));
-    csSoundBuffer* w = l->loadsound (buf,size);
+    csSoundLoader* l = (csSoundLoader*) (loaderlist->Get (i));
+    csSoundData* w = l->loadsound (buf,size);
     if (w) return w;
     i++; 
   }

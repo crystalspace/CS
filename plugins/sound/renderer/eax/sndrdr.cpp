@@ -29,6 +29,7 @@
 #include "cssndrdr/eax/sndrdr.h"
 #include "cssndrdr/eax/sndlstn.h"
 #include "cssndrdr/eax/sndsrc.h"
+#include "cssndrdr/eax/sndbuf.h"
 #include "isystem.h"
 #include "isndlstn.h"
 #include "isndsrc.h"
@@ -65,18 +66,42 @@ STDMETHODIMP csSoundRenderEAX::GetListener(ISoundListener** ppv )
   return m_pListener->QueryInterface (IID_ISoundListener, (void**)ppv);
 }
 
-STDMETHODIMP csSoundRenderEAX::CreateSource(ISoundSource** ppv, csSoundBuffer *snd)
+STDMETHODIMP csSoundRenderEAX::CreateSource(ISoundSource** ppv, csSoundData *snd)
 {
-  csSoundSourceEAX* pNew = new csSoundSourceEAX ();
+  csSoundBufferEAX* pNew = new csSoundBufferEAX();
+  if (!pNew)
+  {
+    *ppv = 0;
+    return E_OUTOFMEMORY;
+  }
+  
+  pNew->CreateSoundBuffer(this, snd);
+  
+  return pNew->CreateSource(ppv);
+}
+
+STDMETHODIMP csSoundRenderEAX::CreateSoundBuffer(ISoundBuffer** ppv, csSoundData *snd)
+{
+  csSoundBufferEAX* pNew = new csSoundBufferEAX ();
   if (!pNew)
   {
     *ppv = 0;
     return E_OUTOFMEMORY;
   }
 
-  pNew->CreateSource(this, snd);
+  pNew->CreateSoundBuffer(this, snd);
   
-  return pNew->QueryInterface (IID_ISoundSource, (void**)ppv);
+  return pNew->QueryInterface (IID_ISoundBuffer, (void**)ppv);
+}
+
+STDMETHODIMP csSoundRenderEAX::PlayEphemeral(csSoundData *snd)
+{
+  ISoundBuffer *played;
+  if(CreateSoundBuffer(&played, snd) == S_OK)
+  {
+    played->Play(SoundBufferPlay_DestroyAtEnd);
+  }
+  return S_OK;
 }
 
 STDMETHODIMP csSoundRenderEAX::Open()
@@ -85,7 +110,7 @@ STDMETHODIMP csSoundRenderEAX::Open()
   
   SysPrintf (MSG_INITIALIZATION, "\nSoundRender DirectSound3D with EAX selected\n");
 
-  if (FAILED(hr = DirectSoundCreate(NULL, &m_p3DAudioRenderer, NULL)))
+  if (FAILED(hr = EAXDirectSoundCreate(NULL, &m_p3DAudioRenderer, NULL)))
   {
     SysPrintf(MSG_FATAL_ERROR, "Error : Cannot Initialize DirectSound3D !");
     Close();
@@ -103,30 +128,7 @@ STDMETHODIMP csSoundRenderEAX::Open()
 
   m_pListener->CreateListener(this);
 
-  if(m_pListener->m_pDS3DPrimaryBuffer)
-  {
-    LPKSPROPERTYSET pProperties = NULL;
-    hr = m_pListener->m_pDS3DPrimaryBuffer->QueryInterface(IID_IKsPropertySet, (void**) &pProperties);
-    ULONG support = 0;
-    if(SUCCEEDED(hr) && pProperties)
-    {
-      hr = pProperties->QuerySupport(DSPROPSETID_EAX_ReverbProperties, DSPROPERTY_EAX_ALL, &support);
-      if(SUCCEEDED(hr))
-      {
-        if( (support&(KSPROPERTY_SUPPORT_GET|KSPROPERTY_SUPPORT_SET))
-          != (KSPROPERTY_SUPPORT_GET|KSPROPERTY_SUPPORT_SET))
-        {
-          SysPrintf (MSG_INITIALIZATION, "WARNING : this device don't support EAX\n");
-        }
-        
-        pProperties->Release();
-        pProperties = NULL;
-      }
-    }
-    else
-      SysPrintf (MSG_INITIALIZATION, "WARNING : cannot get properties, this device don't support EAX\n");
-  }
-  else
+  if(!m_pListener->m_pDS3DPrimaryBuffer)
   {
     SysPrintf(MSG_FATAL_ERROR, "Error : Listener isn't initialized !");
     Close();
@@ -146,7 +148,6 @@ STDMETHODIMP csSoundRenderEAX::Close()
     m_pListener->Release();
   }
 
-
   if (m_p3DAudioRenderer)
   {
     if ((hr = m_p3DAudioRenderer->Release()) < DS_OK)
@@ -165,16 +166,23 @@ STDMETHODIMP csSoundRenderEAX::Update()
 
 STDMETHODIMP csSoundRenderEAX::SetVolume(float vol)
 {
+  long dsvol = DSBVOLUME_MIN + (DSBVOLUME_MAX-DSBVOLUME_MIN)*vol;
+  if (m_pListener)
+  {
+    m_pListener->m_pDS3DPrimaryBuffer->SetVolume(dsvol);
+  }
   return S_OK;
 }
 
 STDMETHODIMP csSoundRenderEAX::GetVolume(float *vol)
 {
-  return S_OK;
-}
+  long dsvol=DSBVOLUME_MIN;
+  if (m_pListener)
+  {
+    m_pListener->m_pDS3DPrimaryBuffer->GetVolume(&dsvol);
+  }
+  *vol = (float)(dsvol-DSBVOLUME_MIN)/(float)(DSBVOLUME_MAX-DSBVOLUME_MIN);
 
-STDMETHODIMP csSoundRenderEAX::PlayEphemeral(csSoundBuffer *snd)
-{
   return S_OK;
 }
 

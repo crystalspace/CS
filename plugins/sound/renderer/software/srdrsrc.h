@@ -21,30 +21,36 @@
 #if !defined(__CSSOUNDSOURCESOFTWARE_H__)
 #define __CSSOUNDSOURCESOFTWARE_H__
 
-#include "cssndldr/common/sndbuf.h"
-#include "cssndrdr/software/srdrchan.h"
-#include "isndrdr.h"
+#include "isndbuf.h"
 #include "isndsrc.h"
 
-class csSoundSourceSoftware : public Channel, ISoundSource
+class csSoundBufferSoftware;
+
+class csSoundSourceSoftware : public ISoundSource
 {
 public:
 	csSoundSourceSoftware();
 	virtual ~csSoundSourceSoftware();
 
-	STDMETHODIMP StopSource();
-	STDMETHODIMP PlaySource(bool inLoop);
-
 	STDMETHODIMP SetPosition(float x, float y, float z);
 	STDMETHODIMP SetVelocity(float x, float y, float z);
 
-  STDMETHODIMP GetInfoSource(csSoundSourceInfo *info);
+	STDMETHODIMP GetPosition(float &x, float &y, float &z);
+	STDMETHODIMP GetVelocity(float &x, float &y, float &z);
+
+  STDMETHODIMP GetSoundBuffer(ISoundBuffer **sound_buffer);
 
 	DECLARE_IUNKNOWN()
 	DECLARE_INTERFACE_TABLE(csSoundSourceSoftware)
 
-private:
-  csSoundSourceInfo info;
+public:
+  /// Position of sound object
+  float fPosX, fPosY, fPosZ;
+  /// Velocity of sound object
+  float fVelX, fVelY, fVelZ;
+
+  // SoundBuffer
+  csSoundBufferSoftware *pSoundBuffer;
 };
 
 #endif // __CSSOUNDSOURCE_H__

@@ -43,8 +43,8 @@
 #include "csutil/vfs.h"
 #include "csutil/inifile.h"
 #include "csutil/util.h"
-#include "cssndldr/sndload.h"
-#include "csparser/sndbufo.h"
+#include "cssfxldr/sndload.h"
+#include "csparser/snddatao.h"
 #include "csgfxldr/csimage.h"
 #include "csobject/nameobj.h"
 #include "csscript/objtrig.h"
@@ -1441,8 +1441,8 @@ csPolygon3D* csLoader::load_poly3d (char* polyname, csWorld* w, char* buf,
   if (tx1_given)
     if (tx2_given)
          poly3d->SetTextureSpace (tx1_orig.x, tx1_orig.y, tx1_orig.z,
-                                      tx1.x, tx1.y, tx1.z, tx1_len,
-                                      tx2.x, tx2.y, tx2.z, tx2_len);
+	 			tx1.x, tx1.y, tx1.z, tx1_len,
+				tx2.x, tx2.y, tx2.z, tx2_len);
     else poly3d->SetTextureSpace (tx1_orig.x, tx1_orig.y, tx1_orig.z,
                             tx1.x, tx1.y, tx1.z, tx1_len);
   else if (plane_name[0])
@@ -1883,8 +1883,7 @@ csPolygonTemplate* csLoader::load_ptemplate (char* ptname, char* buf,
       float A, B, C;
       ptemplate->PlaneNormal (&A, &B, &C);
       TextureTrans::compute_texture_space (tx_matrix, tx_vector,
-        tx1_orig, tx1, tx1_len,
-        A, B, C);
+        tx1_orig, tx1, tx1_len, A, B, C);
     }
   else if (tx_len)
   {
@@ -3465,12 +3464,12 @@ void csLoader::skydome_process (csSector& sector, char* name, char* buf,
 
 //---------------------------------------------------------------------------
 
-csSoundBufferObject* csLoader::load_sound(char* name, char* filename, csWorld* w)
+csSoundDataObject* csLoader::load_sound(char* name, char* filename, csWorld* w)
 {
   (void) w;
 
-  csSoundBufferObject* sndobj = NULL;
-  csSoundBuffer* snd = NULL;
+  csSoundDataObject* sndobj = NULL;
+  csSoundData* snd = NULL;
 
   size_t size;
   char* buf = VFS->ReadFile (filename, size);
@@ -3482,7 +3481,7 @@ csSoundBufferObject* csLoader::load_sound(char* name, char* filename, csWorld* w
     return NULL;
   }
 
-  snd = csSoundBufferLoader::load ((UByte*)buf, size);
+  snd = csSoundLoader::load ((UByte*)buf, size);
   CHK (delete [] buf);
   if (!snd)
   {
@@ -3490,7 +3489,7 @@ csSoundBufferObject* csLoader::load_sound(char* name, char* filename, csWorld* w
     return NULL;
   }
 
-  CHK (sndobj = new csSoundBufferObject (snd));
+  CHK (sndobj = new csSoundDataObject (snd));
   csNameObject::AddName (*sndobj, name);
   return sndobj;
 }
@@ -3861,10 +3860,10 @@ bool csLoader::LoadSounds (csWorld* world, char* buf)
             CsPrintf (MSG_FATAL_ERROR, "Unknown token '%s' found while parsing SOUND directive.\n", csGetLastOffender());
             fatal_exit (0, false);
 	  }
-          csSoundBuffer *snd = csSoundBufferObject::GetSound(*world,name);
+          csSoundData *snd = csSoundDataObject::GetSound(*world,name);
           if (!snd)
           {
-            csSoundBufferObject *s = load_sound (name, filename, world);
+            csSoundDataObject *s = load_sound (name, filename, world);
             if (s) world->ObjAdd(s);
           }
         }

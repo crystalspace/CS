@@ -20,6 +20,7 @@
 
 #include "sysdef.h"
 #include "cscom/com.h"
+#include "cssndrdr/null/nrdrbuf.h"
 #include "cssndrdr/null/nrdrsrc.h"
 #include "isystem.h"
 
@@ -31,8 +32,9 @@ END_INTERFACE_TABLE()
 
 csSoundSourceNull::csSoundSourceNull()
 {
-  info.fPosX = info.fPosY = info.fPosZ = 0.0;
-  info.fVelX = info.fVelY = info.fVelZ = 0.0;
+  fPosX = fPosY = fPosZ = 0.0;
+  fVelX = fVelY = fVelZ = 0.0;
+  pSoundBuffer = NULL;
 }
 
 csSoundSourceNull::~csSoundSourceNull()
@@ -40,33 +42,40 @@ csSoundSourceNull::~csSoundSourceNull()
 
 }
 
-STDMETHODIMP csSoundSourceNull::PlaySource(bool /*inLoop*/)
+STDMETHODIMP csSoundSourceNull::GetSoundBuffer(ISoundBuffer **ppv)
 {
-  return S_OK;
-}
+  if(!pSoundBuffer)
+  {
+    return E_FAIL;
+  }
 
-STDMETHODIMP csSoundSourceNull::StopSource()
-{
-  return S_OK;
+  return pSoundBuffer->QueryInterface (IID_ISoundBuffer, (void**)ppv);
 }
 
 STDMETHODIMP csSoundSourceNull::SetPosition(float x, float y, float z)
 {
-  info.fPosX = x; info.fPosY = y; info.fPosZ = z;
+  fPosX = x; fPosY = y; fPosZ = z;
 
   return S_OK;
 }
 
 STDMETHODIMP csSoundSourceNull::SetVelocity(float x, float y, float z)
 {
-  info.fVelX = x; info.fVelY = y; info.fVelZ = z;
+  fVelX = x; fVelY = y; fVelZ = z;
 
   return S_OK;
 }
 
-STDMETHODIMP csSoundSourceNull::GetInfoSource(csSoundSourceInfo *i)
+STDMETHODIMP csSoundSourceNull::GetPosition(float &x, float &y, float &z)
 {
-  *i=info;
+  x = fPosX; y = fPosY; z = fPosZ;
+
+  return S_OK;
+}
+
+STDMETHODIMP csSoundSourceNull::GetVelocity(float &x, float &y, float &z)
+{
+  x = fVelX; y = fVelY; z = fVelZ;
 
   return S_OK;
 }

@@ -21,9 +21,10 @@
 #if !defined(__CSSOUNDSOURCENULL_H__)
 #define __CSSOUNDSOURCENULL_H__
 
-#include "cssndldr/common/sndbuf.h"
-#include "isndrdr.h"
+#include "isndbuf.h"
 #include "isndsrc.h"
+
+class csSoundBufferNull;
 
 class csSoundSourceNull : public ISoundSource
 {
@@ -31,19 +32,24 @@ public:
 	csSoundSourceNull();
 	virtual ~csSoundSourceNull();
 
-	STDMETHODIMP StopSource();
-	STDMETHODIMP PlaySource(bool inLoop);
-
 	STDMETHODIMP SetPosition(float x, float y, float z);
 	STDMETHODIMP SetVelocity(float x, float y, float z);
 
-  STDMETHODIMP GetInfoSource(csSoundSourceInfo *info);
+	STDMETHODIMP GetPosition(float &x, float &y, float &z);
+	STDMETHODIMP GetVelocity(float &x, float &y, float &z);
+
+  STDMETHODIMP GetSoundBuffer(ISoundBuffer **sound);
 
  	DECLARE_IUNKNOWN()
 	DECLARE_INTERFACE_TABLE(csSoundSourceNull)
 
-private:
-  csSoundSourceInfo info;
+public:
+  /// Position of sound object
+  float fPosX, fPosY, fPosZ;
+  /// Velocity of sound object
+  float fVelX, fVelY, fVelZ;
+
+  csSoundBufferNull* pSoundBuffer;
 };
 
 #endif // __CSSOUNDSOURCENULL_H__

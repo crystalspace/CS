@@ -7,31 +7,24 @@
 
 <body bgcolor="#FFFFFF">
 
-<p align="right">Version 0.021 (12 dec 1998)</p>
+<p align="right">Version 0.03 (22 sept 1999)<br>
+By <strong>NooTe</strong> (aka <strong>Nathaniel Saint Martin</strong>)</p>
 
-<p align="right">By <strong>NooTe</strong> (aka <strong>Nathaniel Saint Martin</strong>)</p>
-
-<p align="right"><a href="mailto:noote@bigfoot.com">noote@bigfoot.com</a></p>
-
-<p align="right"><a href="http://www.bigfoot.com/~noote/">http://www.bigfoot.com/~noote/</a></p>
+<p align="right"><a href="mailto:noote@bigfoot.com">noote@bigfoot.com</a><br>
+<a href="http://www.bigfoot.com/~noote/">http://www.bigfoot.com/~noote/</a></p>
 
 <hr>
 
 <h1 align="center">Sound System for CrystalSpace.</h1>
 
-<p align="center"><strong><font color="#FF0000" size="3">A big WWAARRNNIINNGG... Module
-player is bugged a lot. Also, don't try to play mod !</font></strong></p>
-
 <h3>OS supported :</h3>
 
 <blockquote>
-  <p>I have made a win32 driver using waveOut functions (standard win32 api).</p>
+  <p>I have made a win32 driver using waveOut functions (standard win32 api).<br>
+  I have done Aureal3D 2.0, DirectSound3D (DX5), EAX 2.0 and Software renderer too !</p>
   <p>Gert Steenssens <a href="mailto:gsteenss@eps.agfa.be">gsteenss@eps.agfa.be</a> have
-  made a (experimental) linux driver.</p>
-  <p>(I cannot do a linux/solaris driver because my pnp awe64 isn't recognize yet, if you
-  have info/solution about this problem, well : email me :-)).</p>
-  <p>I planed to add DirectSound with hardware mixing when this sound system will be
-  stabilized.</p>
+  made linux driver (OSS).</p>
+  <p>Someone (sorry I don't known, please give me your name) have done the MacIntosh driver</p>
 </blockquote>
 
 <h3>File format supported :</h3>
@@ -40,32 +33,15 @@ player is bugged a lot. Also, don't try to play mod !</font></strong></p>
   <p>it can read :</p>
   <blockquote>
     <p>sun standard <strong>.au</strong> (or <strong>.snd</strong>), 8 and 16 bit PCM, 8 bit
-    G.711 u-Law (no-compressed) ;</p>
-    <p>microsoft <strong>.wav</strong>, 8 and 16 bit PCM ;</p>
-    <p>amiga <strong>.8svx</strong>/<strong>.iff</strong>, 8 bit PCM ;</p>
-    <p>mac <strong>.aiff</strong>, 8 and 16 bit PCM.</p>
+    G.711 u-Law (no-compressed) ;<br>
+    microsoft <strong>.wav</strong>, 8 and 16 bit PCM ;<br>
+    amiga <strong>.8svx</strong>/<strong>.iff</strong>, 8 bit PCM ;<br>
+    mac <strong>.aiff</strong>, 8 and 16 bit PCM.</p>
   </blockquote>
   <p>I'm searching about other usual file format (<a href="http://www.wotsit.org">http://www.wotsit.org</a>
   don't handle or give (good) information about mac .aiff format).</p>
-  <p>Does some one know about 'Fibonacci-Delta encoding' compression in .8svx/.iff format ?</p>
-</blockquote>
-
-<blockquote>
-  <p>Or about G.721 a-Law ADPCM compression ?</p>
-</blockquote>
-
-<h3>Module file supported :</h3>
-
-<blockquote>
-  <p>currently, my module player don't work correctly but I can read .mod file and play
-  (more or less) it :</p>
-  <blockquote>
-    <p><strong>.mod</strong>, old 4 channel mod format, protracker, fastracker, oktalizer,
-    taketracker and startracker : 2, 4, 6, 8, 10, 12, 14, 16, 18, 20, 22, 24, 26, 28 and 32
-    channels and 31/15 instruments.</p>
-  </blockquote>
-  <p>I try to made all specific effects in some general effects for all (and future)
-  supported module format (it, s3m...).</p>
+  <p>Does some one know about 'Fibonacci-Delta encoding' compression in .8svx/.iff format ?<br>
+  Or about G.721 a-Law ADPCM compression ?</p>
 </blockquote>
 
 <h3>Where can get it ?</h3>
@@ -73,40 +49,49 @@ player is bugged a lot. Also, don't try to play mod !</font></strong></p>
 <blockquote>
   <p>In CrystalSpace. distribution at <a href="http://crystal.linuxgames.com">http://crystal.linuxgames.com</a>
   !</p>
-  <p>or on <a href="http://www.bigfoot.com/~noote/CrystalSpace/Sound">http://www.bigfoot.com/~noote/CrystalSpace/Sound</a>
-  for latest development, fix and others things...</p>
 </blockquote>
 
 <h3>How it work ?</h3>
 
 <blockquote>
-  <p>csSoundDriver class is the interface driver, you might use this for handle you sound
-  driver.</p>
-  <p>This class mix sound in a alone output.</p>
-  <p>I call 'Wave' : the sound get from sound file (not module), 'Module' is... yes, a
-  module get from module file :-). A 'Channel' contient a Wave or a Module output,
-  csSoundDriver mix several Channel (you can define number of channel in properties, see '<a
-  href="#config">How configure sound system ?</a>').</p>
-  <p>csSoundDriver handle a list of Channel, it choice the 'MAX_CHANNELS' channels to mix.
-  The selection of happy channels can be done with a priority function : then you add a
-  Channel in the list, you can set a priority on it.</p>
-  <p>Each module is a channel, so you can add several module in channel list and play it
-  simultaneous, but you cpu free time can decrease a lot !</p>
-  <p>Currently, you can play simultaneous several time one Wave : csSoundDriver handle each
-  with a different... handle. For Modules, its a bit different, you can play only once a
-  Module, you cannot play two time the same Module simultaneous.</p>
-  <p>Well, there are to type of wave control, one is ephemeral : you put a wave in the list
-  of channel, mixing play until the end and kill him (delete), second is a Channel control,
-  you can stop, resume, kill, mute, loop... if you arrive to the end you need to kill him
-  because it wait in the list (but he's desactived).<br>
-  You can control the volume/3d position of the two waves categories (and maybe later
-  effects like reverb, echo...).<br>
-  <br>
-  The first category is best for random sound like ambiance (in a sector or the world) or
-  for other stuff with gui, menu...<br>
-  The second is for entities sounds (sprites, moving things...).<br>
-  An example : for missile, the 'whoosh' must be a second category but the 'boom' can be
-  first category (we don't need to control him).</p>
+  <p>Sound System architecture is a bit like Graphics System... there're a renderer (and
+  'low' driver access for software renderer). sound renderer enable 2d buffer (<strong><em>ISoundBuffer</em></strong>)
+  and 3d buffer (<strong><em>ISoundSource</em></strong>)... attached with renderer (<strong><em>ISoundRender</em></strong>)
+  there're the listener (basicly the ears of the view/player) (<strong><em>ISoundListener</em></strong>)
+  for the 3d mode... ok you haven't understand this... i resume :</p>
+  <p>Here the COM architecture :</p>
+  <blockquote>
+    <p>ISoundRender (this mix, calculate... all ISoundBuffer)<br>
+    |---&gt; ISoundDriver (only used by software renderer, this is the 'low' access to sound
+    OS)<br>
+    |---&gt; ISoundBuffer (this is theplayed sound, we can create this with a <strong><em>csSoundData</em></strong>)<br>
+    |&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; |---&gt; ISoundSource (the 3d sound emmitter
+    control)<br>
+    |---&gt;ISoundListener (the 3d listener)</p>
+  </blockquote>
+  <p>somes samples better than words (hum, I hope ;)) :</p>
+  <blockquote>
+    <p><em>csSoundData *sounddata;</em><strong><br>
+    </strong>The sound data object.</p>
+    <p><em>sounddata = csSoundDataObject::GetSound(pWorld, &quot;beep.wav&quot;);<br>
+    </em>I load a sound file.</p>
+    <p><em>ISoundBuffer *soundbuffer;<br>
+    piSystem-&gt;piSoundRender-&gt;CreateSoundBuffer(&amp;soundbuffer, sounddata);</em><br>
+    I create a 2d sound buffer;</p>
+    <p><em>soundbuffer-&gt;Play();<br>
+    </em>I play the sound... not really complicate ?</p>
+    <p><em>soundbuffer-&gt;Stop();<br>
+    </em>I stop this sound... hum, simple...</p>
+    <p>And now, playing with 3d ! (a bit more complicate) :</p>
+    <p><em>ISoundSource *source;<br>
+    </em>The 3d source object<br>
+    <br>
+    There are two methodes for create a 3d source : directly from<em><strong> ISoundRender</strong></em>
+    or from a <em><strong>ISoundBuffer<br>
+    </strong>piSystem-&gt;piSoundRender-&gt;CreateSource(&amp;source, sounddata);<br>
+    </em>... or...<br>
+    <em>soundbuffer-&gt;CreateSource-&gt;(&amp;source);</em></p>
+  </blockquote>
 </blockquote>
 
 <h3><a name="config">How configure sound system ?</a></h3>
@@ -163,7 +148,7 @@ VOLUME=-1
 CALLBACK=thread
 ; THREAD_PRIORITY can be 'lowest', 'normal' or 'highest'
 THREAD_PRIORITY=highest
-; 16BITS set if sound device may use 16 bits (if it supported)
+; number of refresh in a second
 REFRESH=10
 </pre>
 
@@ -185,58 +170,17 @@ REFRESH=10
   crash for function callback or cut sound for thread method !</p>
 </blockquote>
 
-<h3>How make a specific driver ?</h3>
-
-<blockquote>
-  <p>the csSoundDriver class is made for a sound card which have only one digital output
-  (like a sb16), if you want add support for multi digital outputs (like a sbawe or a gus),
-  you need to overload csSoundDriver::functionMixing() but it an other thing...</p>
-  <p>For made you own sound driver for CrystalSpace (assume it have one ouput) :</p>
-  <blockquote>
-    <p>- you must do a class whose inherit of csSoundDriver class, some thing like : 'class
-    MyOSSoundDriver : private csSoundDriver' ;</p>
-    <p>- you need to overload csSoundDriver::Open(int Frequency, bool 16bit, bool stereo), for
-    open your OS sound driver&nbsp; ;</p>
-    <p>- you need to overload csSoundDriver::Close(), for close you OS sound driver ;</p>
-    <p>- you need to overload csSoundDriver::setVolume(float volume), for setting volume in
-    you hardware (value is [0...1], so you certainly need to convert it) ;</p>
-    <p>- you need to overload csSoundDriver::nextMemory(), for preparing your next buffer
-    sound system ;</p>
-    <p>- you need to set correctly csSoundDriver::Background value : true if you have you own
-    handler for putting output data, false if you wait a CrystalSpace event
-    (csSystem::NextFrame()) for fill sound memory ;</p>
-    <p>- if you have you own callback function (timer, callback...), you to do fill in this
-    order :</p>
-    <blockquote>
-      <p>1° set size in csSoundDriver::MemorySize (remember this size correspond to number of
-      bytes not to number of samples and set pointer for csSoundDriver::Memory ;</p>
-      <p>2° call csSoundDriver::functionMixing() ;</p>
-      <p>3° (depending of your OS sound driver), write csSoundDriver::Memory in your OS sound
-      driver (like OSS)</p>
-    </blockquote>
-    <p>- if you're waiting for CrystalSpace event (csSystem::NextFrame()), you need to
-    overload csSoundDriver::update() and do :</p>
-    <blockquote>
-      <p>1° verify if you have finish to play current buffer sound memory ;</p>
-      <p>2° prepare next buffer</p>
-      <p>3° call csSoundDriver::functionMixing() ;</p>
-      <p>4° put new data in you OS sound driver</p>
-    </blockquote>
-    <p>-(...)</p>
-  </blockquote>
-</blockquote>
-
 <h3>Why it don't work ?</h3>
 
 <blockquote>
-  <p>hum... :</p>
-  <p>first, are you sure to have a sound card ? :-)</p>
-  <p>second, are you sure that sound card is supported by your OS ?</p>
-  <p>three, are you sure CrystalSpace have a sound driver for your OS ?</p>
-  <p>fourth, are you sure ? see debug.txt, if return a error from sound driver, try an other
+  <p>hum... :<br>
+  first, are you sure to have a sound card ? :-)<br>
+  second, are you sure that sound card is supported by your OS ?<br>
+  three, are you sure CrystalSpace have a sound driver for your OS ?<br>
+  fourth, are you sure ? see debug.txt, if return a error from sound driver, try an other
   configuration by changing FREQUENCY, STEREO, 16 BITS, VOLUME and check if ACTIVE is
-  'on/true/1'</p>
-  <p>fifth... bin, p'têt' qu'c'est un bogue ? (well, maybe it's a bug ?)</p>
+  'on/true/1'<br>
+  fifth... bin, p'têt' qu'c'est un bogue ? (well, maybe it's a bug ?)</p>
 </blockquote>
 </body>
 </html>

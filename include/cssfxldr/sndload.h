@@ -16,19 +16,19 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __SOUNDBUFFERLOADER_H
-#define __SOUNDBUFFERLOADER_H
+#ifndef __SOUNDLOADER_H
+#define __SOUNDLOADER_H
 
 #include <stdio.h>
 #include "cscom/com.h"
 #include "types.h"
 
-class csSoundBuffer;
+class csSoundData;
 
 interface ISystem;
 
 ///
-class csSoundBufferLoader  
+class csSoundLoader  
 {
 public:
   /// Return the name of the wave type supported by this loader.
@@ -43,7 +43,7 @@ public:
    * type, and return an Wave of the appropriate type.  Returns a
    * pointer to the Wave on success, or NULL on failure.
    */
-  static csSoundBuffer* load (ISystem* system, const char* filename);
+  static csSoundData* load (ISystem* system, const char* filename);
 
   /**
    * Load an wave given a file pointer.
@@ -51,7 +51,7 @@ public:
    * type, and return an Wave of the appropriate type.  Returns a
    * pointer to the Wave on success, or NULL on failure.
    */
-  static csSoundBuffer* load (FILE* fp);
+  static csSoundData* load (FILE* fp);
 
   /**
    * Load an wave from a buffer.
@@ -60,18 +60,18 @@ public:
    * of the appropriate type.  Returns a pointer to the Wave on 
    * success, or NULL on failure.
    */
-  static csSoundBuffer* load (UByte* buf, ULong size);
+  static csSoundData* load (UByte* buf, ULong size);
 
   /**
    * Register a loader for a given type of sound files.
    * Adds 'loader' to the list of image formats to be checked during an
    * ImageLoader::load(...) call.
    */
-  static bool Register (csSoundBufferLoader* loader);
+  static bool Register (csSoundLoader* loader);
 
 protected:
   ///
-  virtual ~csSoundBufferLoader() {}
+  virtual ~csSoundLoader() {}
 
   /**
    * Load an image from the given buffer.
@@ -79,10 +79,10 @@ protected:
    * If successful, returns a pointer to the resulting ImageFile.  Otherwise
    * returns NULL.
    */
-  virtual csSoundBuffer* loadsound(UByte* buf, ULong size) = 0;
+  virtual csSoundData* loadsound(UByte* buf, ULong size) = 0;
 
 private:
   static csVector *loaderlist;
 };
 
-#endif // __SOUNDBUFFERLOADER_H
+#endif // __SOUNDLOADER_H

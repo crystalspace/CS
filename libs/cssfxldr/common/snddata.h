@@ -18,8 +18,8 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#if !defined(__CSSOUNDBUFFER_H__)
-#define __CSSOUNDBUFFER_H__
+#if !defined(__CSSOUNDDATA_H__)
+#define __CSSOUNDDATA_H__
 
 #include <types.h>	// For bool.
 
@@ -34,13 +34,13 @@
  *       if it's stereo 16 bit and size = 800, data size is 800*2*2 (two channels and 16 bits)
  */
 
-class csSoundBuffer
+class csSoundData
 {
 public:
   ///
-  csSoundBuffer(int frequency, bool bit16, bool stereo, bool sign, long size, void *data);
+  csSoundData(int frequency, bool bit16, bool stereo, bool sign, long size, void *data);
   ///
-  ~csSoundBuffer();
+  ~csSoundData();
 
   /// delete data
   void Clean();
@@ -77,4 +77,4 @@ private:
   bool Sign;
 };
 
-#endif // __CSSOUNDBUFFER_H__
+#endif // __CSSOUNDDATA_H__
