@@ -217,7 +217,7 @@ struct iSequenceManager : public iBase
    * sequence manager in any way. After calling NewSequence() you can
    * add operations to it and then use RunSequence() to run it.
    */
-  virtual iSequence* NewSequence () = 0;
+  virtual csPtr<iSequence> NewSequence () = 0;
 
   /**
    * Execute a sequence at the given time. This will effectively put the

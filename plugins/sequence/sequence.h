@@ -190,7 +190,7 @@ public:
   virtual void TimeWarp (csTicks time, bool skip);
   virtual csTicks GetMainTime () const { return main_time; }
   virtual csTicks GetDeltaTime () const;
-  virtual iSequence* NewSequence ();
+  virtual csPtr<iSequence> NewSequence ();
   virtual void RunSequence (csTicks time, iSequence* sequence,
   	iBase* params = 0);
 

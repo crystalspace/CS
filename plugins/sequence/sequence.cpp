@@ -322,7 +322,7 @@ void csSequenceManager::TimeWarp (csTicks time, bool skip)
   }
 }
 
-iSequence* csSequenceManager::NewSequence ()
+csPtr<iSequence> csSequenceManager::NewSequence ()
 {
   static int cnt = 0;
   csSequence* n = new csSequence (this);
@@ -346,7 +346,7 @@ iSequence* csSequenceManager::NewSequence ()
       sequences = copy;
     }
   }
-  return n;
+  return csPtr<iSequence> (n);
 }
 
 void csSequenceManager::RunSequence (csTicks time, iSequence* sequence,

@@ -1836,8 +1836,7 @@ void csSequenceTrigger::TestConditions (csTicks delay)
   if (delay > 0)
   {
     // Here we already start a new sequence with the new delay.
-    interval_seq = csPtr<iSequence> (
-	eseqmgr->GetSequenceManager ()->NewSequence ());
+    interval_seq = eseqmgr->GetSequenceManager ()->NewSequence ();
     CondTestConditions* cond = new CondTestConditions (this, delay);
     interval_seq->AddCondition (delay, cond, interval_seq, 0);
     cond->DecRef ();
@@ -2051,7 +2050,7 @@ bool csEngineSequenceManager::FireTriggerByName (const char *name,
 csPtr<iSequenceWrapper> csEngineSequenceManager::CreateSequence (
 	const char* name)
 {
-  csRef<iSequence> seq (csPtr<iSequence> (seqmgr->NewSequence ()));
+  csRef<iSequence> seq = seqmgr->NewSequence ();
   csSequenceWrapper* seqwrap = new csSequenceWrapper (this, seq);
   seqwrap->SetName (name);
   sequences.Push (&(seqwrap->scfiSequenceWrapper));

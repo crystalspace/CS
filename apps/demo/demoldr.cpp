@@ -369,10 +369,9 @@ void DemoSequenceLoader::LoadSequence (iDocumentNode* node, iSequence* seq)
       }
       case XMLTOKEN_SEQUENCE:
       {
-        iSequence* newseq = seqmgr->NewSequence ();
+        csRef<iSequence> newseq = seqmgr->NewSequence ();
 	LoadSequence (child, newseq);
 	seq->AddRunSequence (cur_time, newseq);
-	newseq->DecRef ();
 	break;
       }
       default:
@@ -402,26 +401,28 @@ void DemoSequenceLoader::LoadSequences (iDocumentNode* node)
       }
       case XMLTOKEN_DECLARESEQUENCE:
       {
-        iSequence* newseq = GetSequence (child->GetAttributeValue ("name"));
+        csRef<iSequence> newseq =
+		GetSequence (child->GetAttributeValue ("name"));
 	if (!newseq)
 	{
 	  newseq = seqmgr->NewSequence ();
 	  NamedSequence* ns = new NamedSequence ();
 	  ns->name = csStrNew (child->GetAttributeValue ("name"));
-	  ns->sequence = csPtr<iSequence> (newseq);
+	  ns->sequence = newseq;
 	  sequences.Push (ns);
 	}
         break;
       }
       case XMLTOKEN_SEQUENCE:
       {
-        iSequence* newseq = GetSequence (child->GetAttributeValue ("name"));
+        csRef<iSequence> newseq =
+		GetSequence (child->GetAttributeValue ("name"));
 	if (!newseq)
 	{
           newseq = seqmgr->NewSequence ();
 	  NamedSequence* ns = new NamedSequence ();
 	  ns->name = csStrNew (child->GetAttributeValue ("name"));
-	  ns->sequence = csPtr<iSequence> (newseq);
+	  ns->sequence = newseq;
 	  sequences.Push (ns);
 	}
 	else if (!newseq->IsEmpty ())
