@@ -19,6 +19,8 @@ The history order has been reversed so that new features are at the top.
 	- Wouter Wijngaards fixed the depend target of the terrain engine.
 	- Eric Sunshine reverted more problematic changes and fixed errors or 
 	  potential problems which Paul Garceau introduced.  
+	- Changed a fix from Eric to octree.cpp to make it a bit more
+	  readable.
 16-May-2000
 	- Alex Pfaffe did some minor changes/cleanup to the terrain engine.
 	- Removed a few warnings in terrain.cpp.
