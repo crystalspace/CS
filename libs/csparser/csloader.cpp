@@ -162,7 +162,6 @@ CS_TOKEN_DEF_START
   CS_TOKEN_DEF (HEIGHT)
   CS_TOKEN_DEF (HEIGHTMAP)
   CS_TOKEN_DEF (IDENTITY)
-  CS_TOKEN_DEF (INCLUDESPRITE)
   CS_TOKEN_DEF (KEY)
   CS_TOKEN_DEF (KEYCOLOR)
   CS_TOKEN_DEF (LEN)
@@ -226,7 +225,6 @@ CS_TOKEN_DEF_START
   CS_TOKEN_DEF (SOUND)
   CS_TOKEN_DEF (SOUNDS)
   CS_TOKEN_DEF (SPLIT)
-  CS_TOKEN_DEF (SPRITE)
   CS_TOKEN_DEF (START)
   CS_TOKEN_DEF (STATBSP)
   CS_TOKEN_DEF (STATELESS)
@@ -547,7 +545,7 @@ csCollection* csLoader::load_collection (char* name, char* buf)
 {
   CS_TOKEN_TABLE_START(commands)
     CS_TOKEN_TABLE (THING)
-    CS_TOKEN_TABLE (SPRITE)
+    CS_TOKEN_TABLE (MESHOBJ)
     CS_TOKEN_TABLE (COLLECTION)
     CS_TOKEN_TABLE (LIGHT)
     CS_TOKEN_TABLE (TRIGGER)
@@ -584,16 +582,19 @@ csCollection* csLoader::load_collection (char* name, char* buf)
           collection->AddObject ((csObject*)(th->GetPrivateObject ()));
         }
         break;
-      case CS_TOKEN_SPRITE:
+      case CS_TOKEN_MESHOBJ:
         {
+# if 0
+//@@@@@@
           ScanStr (params, "%s", str);
-	  iSprite* spr = Engine->FindSprite (str, onlyRegion);
+	  iMeshWrapper* spr = Engine->FindMeshObject (str, onlyRegion);
           if (!spr)
           {
-            CsPrintf (MSG_FATAL_ERROR, "Sprite '%s' not found!\n", str);
+            CsPrintf (MSG_FATAL_ERROR, "Mesh object '%s' not found!\n", str);
             fatal_exit (0, false);
           }
           collection->AddObject ((csObject*)(spr->GetPrivateObject ()));
+# endif
         }
         break;
       case CS_TOKEN_LIGHT:
@@ -2551,7 +2552,6 @@ csSector* csLoader::load_room (char* secname, char* buf)
     CS_TOKEN_TABLE (ACTIVATE)
     CS_TOKEN_TABLE (BSP)
     CS_TOKEN_TABLE (STATBSP)
-    CS_TOKEN_TABLE (SPRITE)
     CS_TOKEN_TABLE (MESHOBJ)
     CS_TOKEN_TABLE (FOG)
     CS_TOKEN_TABLE (KEY)
@@ -2761,16 +2761,6 @@ csSector* csLoader::load_room (char* secname, char* buf)
           csMeshWrapper* sp = new csMeshWrapper (Engine);
           sp->SetName (name);
           LoadMeshObject (sp, params, sector);
-          Engine->sprites.Push (sp);
-          sp->GetMovable ().SetSector (sector);
-	  sp->GetMovable ().UpdateMove ();
-        }
-        break;
-      case CS_TOKEN_SPRITE:
-        {
-          csSprite3D* sp = new csSprite3D (Engine);
-          sp->SetName (name);
-          LoadSprite (sp, params);
           Engine->sprites.Push (sp);
           sp->GetMovable ().SetSector (sector);
 	  sp->GetMovable ().UpdateMove ();
@@ -3089,7 +3079,6 @@ csSector* csLoader::load_sector (char* secname, char* buf)
     CS_TOKEN_TABLE (THING)
     CS_TOKEN_TABLE (SIXFACE)
     CS_TOKEN_TABLE (LIGHT)
-    CS_TOKEN_TABLE (SPRITE)
     CS_TOKEN_TABLE (MESHOBJ)
     CS_TOKEN_TABLE (SKYDOME)
     CS_TOKEN_TABLE (SKY)
@@ -3148,16 +3137,6 @@ csSector* csLoader::load_sector (char* secname, char* buf)
           csMeshWrapper* sp = new csMeshWrapper (Engine);
           sp->SetName (name);
           LoadMeshObject (sp, params, sector);
-          Engine->sprites.Push (sp);
-          sp->GetMovable ().SetSector (sector);
-	  sp->GetMovable ().UpdateMove ();
-        }
-        break;
-      case CS_TOKEN_SPRITE:
-        {
-          csSprite3D* sp = new csSprite3D (Engine);
-          sp->SetName (name);
-          LoadSprite (sp, params);
           Engine->sprites.Push (sp);
           sp->GetMovable ().SetSector (sector);
 	  sp->GetMovable ().UpdateMove ();
@@ -3570,13 +3549,11 @@ bool csLoader::LoadMap (char* buf, bool onlyRegion)
     CS_TOKEN_TABLE (LIGHTX)
     CS_TOKEN_TABLE (THING)
     CS_TOKEN_TABLE (SIXFACE)
-    CS_TOKEN_TABLE (SPRITE)
     CS_TOKEN_TABLE (LIBRARY)
     CS_TOKEN_TABLE (START)
     CS_TOKEN_TABLE (SOUNDS)
     CS_TOKEN_TABLE (KEY)
     CS_TOKEN_TABLE (MOTION)
-    CS_TOKEN_TABLE (INCLUDESPRITE)
     CS_TOKEN_TABLE (REGION)
   CS_TOKEN_TABLE_END
 
@@ -3645,26 +3622,6 @@ bool csLoader::LoadMap (char* buf, bool onlyRegion)
 	      Engine->SelectRegion (NULL);
 	  }
 	  break;
-        case CS_TOKEN_INCLUDESPRITE:
-	  {
-	    char str[255];
-	    ScanStr (params, "%s", str);
-	    CsPrintf (MSG_WARNING, "Loading sprite '%s'\n", str);
-	    LoadSpriteTemplate(Engine, str);
-	  }
-	  break;
-        case CS_TOKEN_SPRITE:
-          {
-            csSpriteTemplate* t = (csSpriteTemplate*)Engine->sprite_templates.FindByName (name);
-            if (!t)
-            {
-              t = new csSpriteTemplate ();
-              t->SetName (name);
-              Engine->sprite_templates.Push (t);
-            }
-            LoadSpriteTemplate (t, params);
-          }
-          break;
         case CS_TOKEN_THING:
           if (!Engine->thing_templates.FindByName (name))
             Engine->thing_templates.Push (load_thing (name, params, NULL, false, true));
@@ -3921,7 +3878,6 @@ bool csLoader::LoadLibrary (char* buf)
     CS_TOKEN_TABLE (MATERIALS)
     CS_TOKEN_TABLE (MESHOBJ)
     CS_TOKEN_TABLE (THING)
-    CS_TOKEN_TABLE (SPRITE)
     CS_TOKEN_TABLE (SOUNDS)
     CS_TOKEN_TABLE (PLANE)
   CS_TOKEN_TABLE_END
@@ -3974,18 +3930,6 @@ bool csLoader::LoadLibrary (char* buf)
               Engine->meshobj_factories.Push (t);
             }
             LoadMeshObjectFactory (t, params);
-          }
-          break;
-        case CS_TOKEN_SPRITE:
-          {
-            csSpriteTemplate* t = (csSpriteTemplate*)Engine->sprite_templates.FindByName (name);
-            if (!t)
-            {
-              t = new csSpriteTemplate ();
-              t->SetName (name);
-              Engine->sprite_templates.Push (t);
-            }
-            LoadSpriteTemplate (t, params);
           }
           break;
         case CS_TOKEN_THING:
@@ -4522,265 +4466,6 @@ bool csLoader::LoadMeshObject (csMeshWrapper* mesh, char* buf, csSector* sector)
 
 //---------------------------------------------------------------------------
 
-csSpriteTemplate* csLoader::LoadSpriteTemplate (csEngine* engine,
-	const char* fname)
-{
-  Engine = engine;
-
-  iDataBuffer *databuff = System->VFS->ReadFile (fname);
-
-  if (!databuff || !databuff->GetSize ())
-  {
-    if (databuff) databuff->DecRef ();
-    CsPrintf (MSG_FATAL_ERROR, "Could not open sprite template file \"%s\" on VFS!\n", fname);
-    return NULL;
-  }
-
-  CS_TOKEN_TABLE_START (tokens)
-    CS_TOKEN_TABLE (SPRITE)
-  CS_TOKEN_TABLE_END
-
-  char *name, *data;
-  char *buf = **databuff;
-
-  if (csGetObject (&buf, tokens, &name, &data))
-  {
-    if (!data)
-    {
-      CsPrintf (MSG_FATAL_ERROR, "Expected parameters instead of '%s'!\n", buf);
-      fatal_exit (0, false);
-    }
-
-    csSpriteTemplate* tmpl = new csSpriteTemplate ();
-    tmpl->SetName (name);
-    if (LoadSpriteTemplate (tmpl, data))
-    {
-      Engine->sprite_templates.Push (tmpl);
-      databuff->DecRef ();
-      return tmpl;
-    }
-    else
-    {
-      delete tmpl;
-      databuff->DecRef ();
-      return NULL;
-    }
-  }
-  databuff->DecRef ();
-  return NULL;
-}
-
-bool csLoader::LoadSpriteTemplate (csSpriteTemplate* stemp, char* buf)
-{
-  CS_TOKEN_TABLE_START (commands)
-    CS_TOKEN_TABLE (TEXNR)
-    CS_TOKEN_TABLE (MATERIAL)
-    CS_TOKEN_TABLE (FRAME)
-    CS_TOKEN_TABLE (ACTION)
-    CS_TOKEN_TABLE (SMOOTH)
-    CS_TOKEN_TABLE (TRIANGLE)
-    CS_TOKEN_TABLE (SKELETON)
-    CS_TOKEN_TABLE (FILE)
-    CS_TOKEN_TABLE (TWEEN)
-  CS_TOKEN_TABLE_END
-
-  CS_TOKEN_TABLE_START (tok_frame)
-    CS_TOKEN_TABLE (V)
-  CS_TOKEN_TABLE_END
-
-  CS_TOKEN_TABLE_START (tok_frameset)
-    CS_TOKEN_TABLE (F)
-  CS_TOKEN_TABLE_END
-
-  char* name;
-  long cmd;
-  char* params;
-  char* params2;
-  char str[255];
-
-  iSprite3DFactoryState* state = QUERY_INTERFACE (stemp, iSprite3DFactoryState);
-
-  while ((cmd = csGetObject (&buf, commands, &name, &params)) > 0)
-  {
-    if (!params)
-    {
-      CsPrintf (MSG_FATAL_ERROR, "Expected parameters instead of '%s'!\n", buf);
-      fatal_exit (0, false);
-    }
-    switch (cmd)
-    {
-      case CS_TOKEN_TEXNR:
-        //@@OBSOLETE, retained for backward compatibility
-      case CS_TOKEN_MATERIAL:
-        {
-          ScanStr (params, "%s", str);
-          csMaterialWrapper *mat = FindMaterial (str, onlyRegion);
-          if (mat)
-            state->SetMaterialWrapper (QUERY_INTERFACE (mat, iMaterialWrapper));
-          else
-          {
-            CsPrintf (MSG_FATAL_ERROR, "Material `%s' not found!\n", str);
-            fatal_exit (0, true);
-          }
-        }
-        break;
-
-      case CS_TOKEN_SKELETON:
-	{
-	  state->EnableSkeletalAnimation ();
-	  iSkeleton* skeleton = state->GetSkeleton ();
-	  iSkeletonLimb* skellimb = QUERY_INTERFACE (skeleton, iSkeletonLimb);
-	  if (name) skellimb->SetName (name);
-	  if (!LoadSkeleton (skellimb, params)) return false;
-	}
-        break;
-
-      case CS_TOKEN_ACTION:
-        {
-          iSpriteAction* act = state->AddAction ();
-          act->SetName (name);
-          int d;
-          char fn[64];
-          while ((cmd = csGetObject (&params, tok_frameset, &name, &params2)) > 0)
-          {
-            if (!params2)
-            {
-              CsPrintf (MSG_FATAL_ERROR, "Expected parameters instead of '%s'!\n", params);
-              fatal_exit (0, false);
-            }
-            switch (cmd)
-            {
-              case CS_TOKEN_F:
-                ScanStr (params2, "%s,%d", fn, &d);
-                iSpriteFrame* ff = state->FindFrame (fn);
-                if (!ff)
-                {
-                  CsPrintf (MSG_FATAL_ERROR, "Error! Trying to add a unknown frame '%s' in %s action !\n",
-                        fn, act->GetName ());
-                  fatal_exit (0, false);
-                }
-                act->AddFrame (ff, d);
-                break;
-            }
-          }
-        }
-        break;
-
-      case CS_TOKEN_FRAME:
-        {
-          iSpriteFrame* fr = state->AddFrame ();
-          fr->SetName (name);
-          int anm_idx = fr->GetAnmIndex ();
-          int tex_idx = fr->GetTexIndex ();
-          int i = 0;
-          float x, y, z, u, v;
-          while ((cmd = csGetObject (&params, tok_frame, &name, &params2)) > 0)
-          {
-            if (!params2)
-            {
-              CsPrintf (MSG_FATAL_ERROR, "Expected parameters instead of '%s'!\n", params);
-              fatal_exit (0, false);
-            }
-            switch (cmd)
-            {
-              case CS_TOKEN_V:
-                ScanStr (params2, "%f,%f,%f:%f,%f", &x, &y, &z, &u, &v);
-                // check if it's the first frame
-                if (state->GetNumFrames () == 1)
-                {
-                  state->AddVertices (1);
-                }
-                else if (i >= state->GetNumTexels ())
-                {
-                  CsPrintf (MSG_FATAL_ERROR, "Error! Trying to add too many vertices in frame '%s'!\n",
-                    fr->GetName ());
-                  fatal_exit (0, false);
-                }
-                state->GetVertex (anm_idx, i) = csVector3 (x, y, z);
-                state->GetTexel  (tex_idx, i) = csVector2 (u, v);
-                i++;
-                break;
-            }
-          }
-          if (cmd == CS_PARSERR_TOKENNOTFOUND)
-          {
-            CsPrintf (MSG_FATAL_ERROR, "Token '%s' not found while parsing frame '%s'!\n",
-                fr->GetName (), csGetLastOffender ());
-            fatal_exit (0, false);
-          }
-          if (i < state->GetNumTexels ())
-          {
-            CsPrintf (MSG_FATAL_ERROR, "Error! Too few vertices in frame '%s'! (%d %d)\n",
-                fr->GetName (), i, state->GetNumTexels ());
-            fatal_exit (0, false);
-          }
-        }
-        break;
-
-      case CS_TOKEN_TRIANGLE:
-        {
-          int a, b, c;
-          ScanStr (params, "%d,%d,%d", &a, &b, &c);
-          state->AddTriangle (a, b, c);
-        }
-        break;
-
-      case CS_TOKEN_FILE:
-        {
-          ScanStr (params, "%s", str);
-	  converter* filedata = new converter;
-	  if (filedata->ivcon (str, true, false, NULL, System->VFS) == ERROR)
-	  {
-	    CsPrintf (MSG_FATAL_ERROR, "Error loading file model '%s'!\n", str);
-	    delete filedata;
-	    fatal_exit (0, false);
-	  }
-	  csCrossBuild_SpriteTemplateFactory builder;
-	  builder.CrossBuild (state, *filedata);
-	  delete filedata;
-        }
-        break;
-
-      case CS_TOKEN_SMOOTH:
-        {
-          int num, list[30];
-          ScanStr (params, "%D", list, &num);
-          switch (num)
-          {
-            case 0  :  state->MergeNormals ();                  break;
-            case 1  :  state->MergeNormals (list[0]);           break;
-            case 2  :  state->MergeNormals (list[0], list[1]);  break;
-            default :  CsPrintf (MSG_WARNING, "Confused by SMOOTH options: '%s'\n", params);
-                       CsPrintf (MSG_WARNING, "no smoothing performed\n");
-          }
-        }
-        break;
-
-      case CS_TOKEN_TWEEN:
-	{
-	  bool do_tween;
-          ScanStr (params, "%b", &do_tween);
-          state->EnableTweening (do_tween);
-	}
-	break;
-    }
-  }
-  if (cmd == CS_PARSERR_TOKENNOTFOUND)
-  {
-    CsPrintf (MSG_FATAL_ERROR, "Token '%s' not found while parsing the a sprite template!\n",
-        csGetLastOffender ());
-    fatal_exit (0, false);
-  }
-
-  // @@@ In the future this should be done automatically as soon
-  // as the sprite template thinks it is needed.
-  stemp->GenerateLOD ();
-  stemp->ComputeBoundingBox ();
-
-  return true;
-}
-
-//---------------------------------------------------------------------------
 csThing * csLoader::LoadThing (csEngine* engine, const char* fname)
 {
   Engine = engine;
@@ -4853,169 +4538,6 @@ csThing * csLoader::LoadThingTemplate (csEngine* engine, const char* fname)
 }
 
 //---------------------------------------------------------------------------
-bool csLoader::LoadSprite (csSprite3D* spr, char* buf)
-{
-  CS_TOKEN_TABLE_START (commands)
-    CS_TOKEN_TABLE (MIXMODE)
-    CS_TOKEN_TABLE (TEMPLATE)
-    CS_TOKEN_TABLE (TEXNR)
-    CS_TOKEN_TABLE (MATERIAL)
-    CS_TOKEN_TABLE (MOVE)
-    CS_TOKEN_TABLE (TWEEN)
-  CS_TOKEN_TABLE_END
-
-  CS_TOKEN_TABLE_START (tok_matvec)
-    CS_TOKEN_TABLE (MATRIX)
-    CS_TOKEN_TABLE (V)
-  CS_TOKEN_TABLE_END
-
-  char* name;
-  long cmd;
-  char* params;
-  char str[255], str2[255];
-  csSpriteTemplate* tpl;
-
-  csLoaderStat::sprites_loaded++;
-
-  while ((cmd = csGetObject (&buf, commands, &name, &params)) > 0)
-  {
-    if (!params)
-    {
-      CsPrintf (MSG_FATAL_ERROR, "Expected parameters instead of '%s'!\n", buf);
-      fatal_exit (0, false);
-    }
-    switch (cmd)
-    {
-      case CS_TOKEN_MIXMODE:
-        spr->SetMixmode (ParseMixmode (params));
-        break;
-      case CS_TOKEN_MOVE:
-        {
-          char* params2;
-          spr->GetMovable ().SetTransform (csMatrix3 ());     // Identity matrix.
-          spr->GetMovable ().SetPosition (csVector3 (0, 0, 0));
-          while ((cmd = csGetObject (&params, tok_matvec, &name, &params2)) > 0)
-          {
-            if (!params2)
-            {
-              CsPrintf (MSG_FATAL_ERROR, "Expected parameters instead of '%s'!\n", params);
-              fatal_exit (0, false);
-            }
-            switch (cmd)
-            {
-              case CS_TOKEN_MATRIX:
-              {
-                csMatrix3 m;
-                load_matrix (params2, m);
-                spr->GetMovable ().SetTransform (m);
-                break;
-              }
-              case CS_TOKEN_V:
-              {
-                csVector3 v;
-                load_vector (params2, v);
-                spr->GetMovable ().SetPosition (v);
-                break;
-              }
-            }
-          }
-	  spr->GetMovable ().UpdateMove ();
-        }
-        break;
-
-      case CS_TOKEN_TEMPLATE:
-        memset (str, 0, 255);
-        memset (str2, 0, 255);
-        ScanStr (params, "%s,%s", str, str2);
-        tpl = (csSpriteTemplate*)Engine->sprite_templates.FindByName (str);
-        if (tpl == NULL)
-        {
-          CsPrintf (MSG_WARNING, "Couldn't find sprite template '%s'!\n", str);
-          fatal_exit (0, true);
-        }
-        spr->SetTemplate (tpl);
-        if (tpl->FindAction (str2) != NULL)
-          spr->SetAction (str2);
-        break;
-
-      case CS_TOKEN_TWEEN:
-	{
-	  bool do_tween;
-          ScanStr (params, "%b", &do_tween);
-          spr->EnableTweening (do_tween);
-	}
-	break;
-
-      case CS_TOKEN_TEXNR:
-        //@@OBSOLETE, retained for backward compatibility
-      case CS_TOKEN_MATERIAL:
-        ScanStr (params, "%s", str);
-        csMaterialWrapper *mat = FindMaterial (str, onlyRegion);
-        if (!mat)
-        {
-          CsPrintf (MSG_FATAL_ERROR, "No material named `%s' found!\n", str);
-          fatal_exit (0, true);
-        }
-        else
-          spr->SetMaterial (mat);
-        // unset_texture ();
-        break;
-    }
-  }
-  if (cmd == CS_PARSERR_TOKENNOTFOUND)
-  {
-    CsPrintf (MSG_FATAL_ERROR, "Token '%s' not found while parsing the sprite!\n", csGetLastOffender ());
-    fatal_exit (0, false);
-  }
-
-  spr->InitSprite ();
-  return true;
-}
-
-csFrame* csLoader::LoadFrame (csSpriteTemplate* stemp, char* buf)
-{
-  CS_TOKEN_TABLE_START (commands)
-    CS_TOKEN_TABLE (ACTION)
-    CS_TOKEN_TABLE (FRAME)
-  CS_TOKEN_TABLE_END
-
-  long cmd;
-  char* name;
-  char* params;
-  char action[255];
-  bool action_specified = false;
-  int frame = 0;
-
-  while ((cmd = csGetObject (&buf, commands, &name, &params)) > 0)
-  {
-    if (!params)
-    {
-      CsPrintf (MSG_FATAL_ERROR, "Expected parameters instead of '%s'!\n", buf);
-      fatal_exit (0, false);
-    }
-    switch (cmd)
-    {
-      case CS_TOKEN_ACTION:
-        ScanStr (params, "%s", action);
-        action_specified = true;
-        break;
-      case CS_TOKEN_FRAME:
-        ScanStr (params, "%d", &frame);
-        break;
-    }
-  }
-  if (cmd == CS_PARSERR_TOKENNOTFOUND)
-  {
-    CsPrintf (MSG_FATAL_ERROR, "Token '%s' not found while getting a frame!\n",
-      csGetLastOffender ());
-    fatal_exit (0, false);
-  }
-
-  if (action_specified)
-    return (stemp->FindAction(action))->GetCsFrame(frame);
-  else
-    return stemp->GetFrame(frame);
-}
 
 iMotion* csLoader::LoadMotion (csEngine* engine, const char* fname)
 {

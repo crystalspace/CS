@@ -123,9 +123,7 @@ public:
     /// Find a thing template in this region by name
     virtual iThing *FindThingTemplate (const char *iName);
     /// Find a sprite in this region by name
-    virtual iSprite *FindSprite (const char *iName);
-    /// Find a sprite template in this region by name
-    virtual iSpriteTemplate *FindSpriteTemplate (const char *iName);
+    virtual iMeshWrapper *FindMeshObject (const char *iName);
     /// Find a mesh factory in this region by name
     virtual iMeshFactoryWrapper *FindMeshFactory (const char *iName);
     /// Find a texture in this region by name

@@ -45,7 +45,6 @@ class csThing;
 class csCollection;
 class csStatLight;
 class csDynLight;
-class csSpriteTemplate;
 class csClipper;
 class csCovcube;
 class csCBufferCube;
@@ -65,7 +64,6 @@ struct iVFS;
 struct iMaterialWrapper;
 struct iRegion;
 struct iSprite;
-struct iSpriteTemplate;
 
 
 /**
@@ -428,12 +426,6 @@ public:
    * need to add it to all sectors that you want it to be visible in.
    */
   csNamedObjVector collections;
-
-  /**
-   * List of sprite templates. This vector contains objects of
-   * type csSpriteTemplate*.
-   */
-  csNamedObjVector sprite_templates;
 
   /**
    * List of mesh object factories. This vector contains objects of
@@ -1184,9 +1176,7 @@ public:
   /// Find a thing template by name
   virtual iThing *FindThingTemplate (const char *iName, bool regionOnly = false);
   /// Find a sprite by name
-  virtual iSprite *FindSprite (const char *iName, bool regionOnly = false);
-  /// Find a sprite template by name
-  virtual iSpriteTemplate *FindSpriteTemplate (const char *iName, bool regionOnly = false);
+  virtual iMeshWrapper *FindMeshObject (const char *iName, bool regionOnly = false);
   /// Find a mesh factory by name
   virtual iMeshFactoryWrapper *FindMeshFactory (const char *iName, bool regionOnly = false);
 

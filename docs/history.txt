@@ -28,6 +28,13 @@ The history order has been reversed so that new features are at the top.
 	- Fixed levtool app to use the new spr3d plugin.
 	- Changed GetRadius() in iMeshObject to return a csVector instead
 	  of a float.
+	- Completely removed csSprite3D and csSpriteTemplate from the engine.
+	  This means that csFrame, csSpriteAction, csSkeleton... are all
+	  gone now. Also removed csLoader::LoadSpriteTemplate and LoadSprite.
+	  The 'SPRITE' keyword is no longer recognized.
+	- Removed FindSprite() in iEngine, csEngine, iRegion, and csRegion and
+	  added FindMeshObject() instead.
+	- Removed iSprite and iSpriteTemplate interfaces.
 	- Eric Sunshine made the following changes to the API transition
 	  documentation:
 	    - Re-organized so that there is a single appendix for API

@@ -43,10 +43,8 @@ class csThing;
 class csEngine;
 class csCurveTemplate;
 class csSoundDataObject;
-class csSpriteTemplate;
 class csMeshFactoryWrapper;
 class csMeshWrapper;
-class csSprite3D;
 class csParticleSystem;
 class csKeyValuePair;
 class csMapNode;
@@ -132,16 +130,8 @@ class csLoader
   /// Load a skeleton part.
   static bool LoadSkeleton (iSkeletonLimb*, char* buf);
 
-  /// Load the sprite template from the map file.
-  static bool LoadSpriteTemplate (csSpriteTemplate* stemp, char* buf);
-
   /// Load a Mesh Object Factory from the map file.
   static bool LoadMeshObjectFactory (csMeshFactoryWrapper* meshFact, char* buf);
-
-  /**
-   * Load the sprite from the map file.
-   */
-  static bool LoadSprite (csSprite3D* spr, char* buf);
 
   /**
    * Load the mesh object from the map file.
@@ -187,12 +177,6 @@ class csLoader
   /// Load map from a memory buffer
   static bool LoadMap (char* buf, bool onlyRegion);
 
-  /**
-   * Get a sprite template frame from a frame number
-   * or an action name and a frame number
-   */
-  static csFrame* LoadFrame (csSpriteTemplate* stemp, char* buf);
-
   /// Find a material (and create one from texture if possible)
   static csMaterialWrapper* FindMaterial (const char *iName, bool onlyRegion = false);
 
@@ -229,11 +213,6 @@ public:
    */
   static csTextureWrapper* LoadTexture (csEngine*, const char* name,
     const char* fname);
-
-  /**
-   * Load a sprite template from a file.
-   */
-  static csSpriteTemplate* LoadSpriteTemplate (csEngine*, const char* fname);
 
   /// Load a Mesh Object Factory from the map file.
   static csMeshFactoryWrapper* LoadMeshObjectFactory (csEngine*, const char* fname);

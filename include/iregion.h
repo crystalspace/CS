@@ -26,13 +26,14 @@ struct iSector;
 struct iThing;
 struct iSprite;
 struct iSpriteTemplate;
+struct iMeshWrapper;
 struct iMeshFactoryWrapper;
 struct iTextureWrapper;
 struct iMaterialWrapper;
 struct iCameraPosition;
 struct iObject;
 
-SCF_VERSION (iRegion, 0, 1, 4);
+SCF_VERSION (iRegion, 0, 1, 5);
 
 /**
  * A region. A region is basically a collection of objects in the
@@ -83,9 +84,7 @@ struct iRegion : public iBase
   /// Find a thing template in this region by name
   virtual iThing *FindThingTemplate (const char *iName) = 0;
   /// Find a sprite in this region by name
-  virtual iSprite *FindSprite (const char *iName) = 0;
-  /// Find a sprite template in this region by name
-  virtual iSpriteTemplate *FindSpriteTemplate (const char *iName) = 0;
+  virtual iMeshWrapper *FindMeshObject (const char *iName) = 0;
   /// Find a mesh factory in this region by name
   virtual iMeshFactoryWrapper *FindMeshFactory (const char *iName) = 0;
   /// Find a texture in this region by name

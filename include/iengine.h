@@ -33,7 +33,6 @@ struct iStatLight;
 struct iDynLight;
 struct iThing;
 struct iSprite;
-struct iSpriteTemplate;
 struct iMeshWrapper;
 struct iMeshFactoryWrapper;
 struct iMaterialWrapper;
@@ -44,7 +43,7 @@ struct iView;
 struct iGraphics3D;
 struct iTransformationManager;
 
-SCF_VERSION (iEngine, 0, 1, 10);
+SCF_VERSION (iEngine, 0, 1, 11);
 
 /**
  * This interface is the main interface to the 3D engine.
@@ -154,13 +153,13 @@ struct iEngine : public iPlugIn
    */
   virtual iThing *FindThingTemplate (const char *iName, bool regionOnly = false) = 0;
   /**
-   * Find a sprite by name. If regionOnly is true then the returned
-   * sprite will belong to the current region. Note that this is different
-   * from calling iRegion::FindSprite() because the latter will also
-   * return sprites that belong in a region but are not connected to the
+   * Find a mesh object by name. If regionOnly is true then the returned
+   * mesh object will belong to the current region. Note that this is different
+   * from calling iRegion::FindMeshObject() because the latter will also
+   * return mesh objects that belong in a region but are not connected to the
    * engine.
    */
-  virtual iSprite *FindSprite (const char *iName, bool regionOnly = false) = 0;
+  virtual iMeshWrapper *FindMeshObject (const char *iName, bool regionOnly = false) = 0;
   /**
    * Find a mesh factory by name. If regionOnly is true then the returned
    * factory will belong to the current region. Note that this is different
@@ -169,14 +168,6 @@ struct iEngine : public iPlugIn
    * engine.
    */
   virtual iMeshFactoryWrapper *FindMeshFactory (const char *iName, bool regionOnly = false) = 0;
-  /**
-   * Find a sprite template by name. If regionOnly is true then the returned
-   * sprite will belong to the current region. Note that this is different
-   * from calling iRegion::FindSprite() because the latter will also
-   * return sprites that belong in a region but are not connected to the
-   * engine.
-   */
-  virtual iSpriteTemplate *FindSpriteTemplate (const char *iName, bool regionOnly = false) = 0;
   /**
    * Find a texture by name. If regionOnly is true then the returned
    * texture will belong to the current region. Note that this is different

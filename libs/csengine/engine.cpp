@@ -773,7 +773,6 @@ void csEngine::Clear ()
   sprites.DeleteAll ();
   things.DeleteAll ();
   skies.DeleteAll ();
-  sprite_templates.DeleteAll ();
   meshobj_factories.DeleteAll ();
   curve_templates.DeleteAll ();
   thing_templates.DeleteAll ();
@@ -1523,7 +1522,7 @@ void csEngine::ReadConfig ()
 
   csSector::cfg_reflections = Config->GetInt ("Engine.Lighting.Reflections", csSector::cfg_reflections);
   csPolyTexture::cfg_cosinus_factor = Config->GetFloat ("Engine.Lighting.CosinusFactor", csPolyTexture::cfg_cosinus_factor);
-  csSprite3D::global_lighting_quality = Config->GetInt ("Engine.Lighting.SpriteQuality", csSprite3D::global_lighting_quality);
+  //@@@ NOT THE RIGHT PLACE! csSprite3D::global_lighting_quality = Config->GetInt ("Engine.Lighting.SpriteQuality", csSprite3D::global_lighting_quality);
   csSector::do_radiosity = Config->GetBool ("Engine.Lighting.Radiosity", csSector::do_radiosity);
 
   // radiosity options
@@ -1818,7 +1817,6 @@ bool csEngine::DeleteLibrary (const char *iName)
 
   DELETE_ALL_OBJECTS (collections, csCollection)
   DELETE_ALL_OBJECTS (sprites, csSprite)
-  DELETE_ALL_OBJECTS (sprite_templates, csSpriteTemplate)
   DELETE_ALL_OBJECTS (meshobj_factories, csMeshFactoryWrapper)
   DELETE_ALL_OBJECTS (curve_templates, csCurveTemplate)
   DELETE_ALL_OBJECTS (thing_templates, csThing)
@@ -2029,14 +2027,14 @@ iThing *csEngine::FindThingTemplate (const char *iName, bool regionOnly)
   return thing ? &thing->scfiThing : NULL;
 }
 
-iSprite *csEngine::FindSprite (const char *iName, bool regionOnly)
+iMeshWrapper *csEngine::FindMeshObject (const char *iName, bool regionOnly)
 {
-  csSprite* sprite;
+  csMeshWrapper* sprite;
   if (regionOnly && region)
-    sprite = (csSprite*)FindObjectInRegion (region, sprites, iName);
+    sprite = (csMeshWrapper*)FindObjectInRegion (region, sprites, iName);
   else
-    sprite = (csSprite*)sprites.FindByName (iName);
-  return sprite ? &sprite->scfiSprite : NULL;
+    sprite = (csMeshWrapper*)sprites.FindByName (iName);
+  return QUERY_INTERFACE (sprite, iMeshWrapper);
 }
 
 iMeshFactoryWrapper *csEngine::FindMeshFactory (const char *iName, bool regionOnly)
@@ -2047,16 +2045,6 @@ iMeshFactoryWrapper *csEngine::FindMeshFactory (const char *iName, bool regionOn
   else
     fact = (csMeshFactoryWrapper*)meshobj_factories.FindByName (iName);
   return fact ? &fact->scfiMeshFactoryWrapper : NULL;
-}
-
-iSpriteTemplate *csEngine::FindSpriteTemplate (const char *iName, bool regionOnly)
-{
-  csSpriteTemplate* sprite;
-  if (regionOnly && region)
-    sprite = (csSpriteTemplate*)FindObjectInRegion (region, sprite_templates, iName);
-  else
-    sprite = (csSpriteTemplate*)sprite_templates.FindByName (iName);
-  return sprite ? &sprite->scfiSpriteTemplate : NULL;
 }
 
 iMaterialWrapper* csEngine::FindMaterial (const char* iName, bool regionOnly)

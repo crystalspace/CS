@@ -182,15 +182,10 @@ void Dumper::dump (csSector* s)
 {
   dump ((csPolygonSet*)s);
   int i;
-  for (i = 0 ; i < s->sprites.Length () ; i++)
-  {
-    csSprite* sp = (csSprite*)s->sprites[i];
-    if (sp->GetType () == csSprite3D::Type)
-    {
-      csSprite3D* sp3d = (csSprite3D*)sp;
-      dump (sp3d);
-    }
-  }
+  //for (i = 0 ; i < s->sprites.Length () ; i++)
+  //{
+    //csSprite* sp = (csSprite*)s->sprites[i];
+  //}
   for (i = 0 ; i < s->things.Length () ; i++)
   {
     csThing* th = (csThing*)s->things[i];
@@ -212,34 +207,6 @@ void Dumper::dump (csEngine* e)
     csSector* s = (csSector*)e->sectors[sn];
     dump (s);
   }
-}
-
-void Dumper::dump (csSpriteTemplate* s)
-{
-  CsPrintf (MSG_DEBUG_0, "Dump sprite template '%s' id=%ld:\n", 
-    s->GetName (), s->GetID ());
-  CsPrintf (MSG_DEBUG_0, "%d vertices.\n", s->GetNumTexels());
-  CsPrintf (MSG_DEBUG_0, "%d triangles.\n", s->GetTexelMesh ()->GetNumTriangles ());
-  CsPrintf (MSG_DEBUG_0, "%d frames.\n", s->GetNumFrames ());
-  CsPrintf (MSG_DEBUG_0, "%d actions.\n", s->GetNumActions ());
-}
- 
-void Dumper::dump (csSprite3D* s)
-{
-  CsPrintf (MSG_DEBUG_0, "Dump sprite '%s' id=%ld:\n", 
-    s->GetName (), s->GetID ());
-  dump (s->tpl);
-  //dump (&s->m_obj2world, "Object->world");
-  //dump (&s->v_obj2world, "Object->world");
-#if 0
-  int i;
-  CsPrintf (MSG_DEBUG_0, "Last transformed frame:\n");
-  for (i = 0 ; i < s->tpl->num_vertices ; i++)
-    CsPrintf (MSG_DEBUG_0, "  V%d: tex:(%f,%f) cam:(%f,%f,%f) scr:(%f,%f) vis:%d\n",
-    	i, s->tr_frame->GetTexel (i).x, s->tr_frame->GetTexel (i).y,
-    	s->tr_frame->GetVertex (i).x, s->tr_frame->GetVertex (i).y, s->tr_frame->GetVertex (i).z,
-	s->persp[i].x, s->persp[i].y, s->visible[i]);
-#endif
 }
 
 void Dumper::dump (csPolyTexture* p, char const* name)

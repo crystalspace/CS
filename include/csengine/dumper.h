@@ -37,8 +37,6 @@ class csPolygonSet;
 class csPolyTexture;
 class csSector;
 class csEngine;
-class csSpriteTemplate;
-class csSprite3D;
 class csOctree;
 class csOctreeNode;
 class csBspTree;
@@ -91,8 +89,6 @@ public:
   static void dump (csPolyTexture*, char const* name);
   static void dump (csSector*);
   static void dump (csEngine*);
-  static void dump (csSpriteTemplate*);
-  static void dump (csSprite3D*);
   static void dump (csBspTree*);
   static void dump (csBspTree2D*);
   static void dump (csOctree*);

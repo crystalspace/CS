@@ -104,17 +104,6 @@ void csRegion::Region::DeleteAll ()
       copy[i] = NULL;
     }
 
-  // @@@ Should sprite templates be deleted if there are still sprites
-  // (in other regions) using them? Maybe a ref counter. Also make
-  // sure to ObjRelease when you don't delete a sprite template.
-  for (i = 0 ; i < copy.Length () ; i++)
-    if (copy[i] && ((csObject*)copy[i])->GetType () == csSpriteTemplate::Type)
-    {
-      csSpriteTemplate* o = (csSpriteTemplate*)copy[i];
-      scfParent->engine->sprite_templates.Delete (
-        scfParent->engine->sprite_templates.Find (o));
-      copy[i] = NULL;
-    }
   // @@@ Should mesh factories be deleted if there are still mesh objects
   // (in other regions) using them? Maybe a ref counter. Also make
   // sure to ObjRelease when you don't delete a mesh factory.
@@ -402,19 +391,11 @@ iThing* csRegion::Region::FindThingTemplate (const char *iName)
   return NULL;
 }
 
-iSprite* csRegion::Region::FindSprite (const char *iName)
+iMeshWrapper* csRegion::Region::FindMeshObject (const char *iName)
 {
-  csSprite* obj = (csSprite*)scfParent->FindObject(iName,csSprite::Type,true);
+  csMeshWrapper* obj = (csMeshWrapper*)scfParent->FindObject(iName,csMeshWrapper::Type,true);
   if (!obj) return NULL;
-  return &obj->scfiSprite;
-}
-
-iSpriteTemplate* csRegion::Region::FindSpriteTemplate (const char *iName)
-{
-  csSpriteTemplate* obj = (csSpriteTemplate*)
-    scfParent->FindObject (iName, csSpriteTemplate::Type, false);
-  if (!obj) return NULL;
-  return &obj->scfiSpriteTemplate;
+  return QUERY_INTERFACE (obj, iMeshWrapper);
 }
 
 iMeshFactoryWrapper* csRegion::Region::FindMeshFactory (const char *iName)
