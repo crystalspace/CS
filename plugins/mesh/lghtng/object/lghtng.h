@@ -24,7 +24,7 @@
 #include "csutil/cscolor.h"
 #include "csutil/csvector.h"
 #include "csutil/refarr.h"
-#include <csutil/randomgen.h>
+#include "csutil/randomgen.h"
 #include "imesh/object.h"
 #include "imesh/lghtng.h"
 #include "imesh/particle.h"

@@ -17,22 +17,22 @@
 */
 
 
-#include <cssysdef.h>
-#include <csgeom/math3d.h>
-#include <csgeom/poly2d.h>
-#include <iengine/movable.h>
-#include <iengine/rview.h>
-#include <ivideo/graph3d.h>
-#include <ivideo/graph2d.h>
-#include <ivideo/material.h>
-#include <iengine/material.h>
-#include <iengine/camera.h>
-#include <igeom/clip2d.h>
-#include <iengine/engine.h>
-#include <iengine/light.h>
-#include <iutil/objreg.h>
-#include <iutil/plugin.h>
-#include <qsqrt.h>
+#include "cssysdef.h"
+#include "csgeom/math3d.h"
+#include "csgeom/poly2d.h"
+#include "iengine/movable.h"
+#include "iengine/rview.h"
+#include "ivideo/graph3d.h"
+#include "ivideo/graph2d.h"
+#include "ivideo/material.h"
+#include "iengine/material.h"
+#include "iengine/camera.h"
+#include "igeom/clip2d.h"
+#include "iengine/engine.h"
+#include "iengine/light.h"
+#include "iutil/objreg.h"
+#include "iutil/plugin.h"
+#include "qsqrt.h"
 
 #include "lghtng.h"
 
