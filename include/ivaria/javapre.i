@@ -33,48 +33,48 @@
 
 %typemap(javabase) iBase "cspace";
 
-%ignore *::operator[];
-%rename(get) *::operator[] const;
-%ignore *::operator();
-%rename(add) *::operator+;
-%rename(subtract) *::operator-;
-%rename(multiply) *::operator*;
-%rename(divide) *::operator/;
-%rename(modulo) *::operator%;
-%rename(leftShift) *::operator<<;
-%rename(rightShift) *::operator>>;
-%rename(bitAnd) *::operator&;
-%rename(bitOr) *::operator|;
-%rename(bitXor) *::operator^;
-%rename(and) *::operator&&;
-%rename(or) *::operator||;
-%rename(isLessThan) *::operator<;
-%rename(equalsOrLess) *::operator<=;
-%rename(isGreaterThen) *::operator>;
-%rename(equalsOrGreater) *::operator>=;
-%rename(equals) *::operator==;
-%rename(equalsNot) *::operator!=;
+%ignore operator[];
+%rename(get) operator[] const;
+%ignore operator();
+%rename(add) operator+;
+%rename(subtract) operator-;
+%rename(multiply) operator*;
+%rename(divide) operator/;
+%rename(modulo) operator%;
+%rename(leftShift) operator<<;
+%rename(rightShift) operator>>;
+%rename(bitAnd) operator&;
+%rename(bitOr) operator|;
+%rename(bitXor) operator^;
+%rename(and) operator&&;
+%rename(or) operator||;
+%rename(isLessThan) operator<;
+%rename(equalsOrLess) operator<=;
+%rename(isGreaterThen) operator>;
+%rename(equalsOrGreater) operator>=;
+%rename(equals) operator==;
+%rename(equalsNot) operator!=;
 
-%ignore *::operator+();
-%rename(negate) *::operator-();
-%rename(not) *::operator!;
-%rename(bitComplement) *::operator~;
-%rename(increment) *::operator++();
-%rename(getAndIncrement) *::operator++(int);
-%rename(decrement) *::operator--();
-%rename(getAndDecrement) *::operator--(int);
+%ignore operator+();
+%rename(negate) operator-();
+%rename(not) operator!;
+%rename(bitComplement) operator~;
+%rename(increment) operator++();
+%rename(getAndIncrement) operator++(int);
+%rename(decrement) operator--();
+%rename(getAndDecrement) operator--(int);
 
-%rename(assign) *::operator=;
-%rename(addAssign) *::operator+=;
-%rename(subtractAssign) *::operator-=;
-%rename(multiplyAssign) *::operator*=;
-%rename(divideAssign) *::operator/=;
-%rename(moduloAssign) *::operator%=;
-%rename(leftShiftAssign) *::operator<<=;
-%rename(rightShiftAssign) *::operator>>=;
-%rename(bitAssign) *::operator&=;
-%rename(bitOrAssign) *::operator|=;
-%rename(bitXorAssign) *::operator^=;
+%rename(assign) operator=;
+%rename(addAssign) operator+=;
+%rename(subtractAssign) operator-=;
+%rename(multiplyAssign) operator*=;
+%rename(divideAssign) operator/=;
+%rename(moduloAssign) operator%=;
+%rename(leftShiftAssign) operator<<=;
+%rename(rightShiftAssign) operator>>=;
+%rename(bitAssign) operator&=;
+%rename(bitOrAssign) operator|=;
+%rename(bitXorAssign) operator^=;
 
 // cstool/initapp.h
 %extend csPluginRequest
@@ -86,12 +86,29 @@
 }
 
 // csgeom/transfrm.h
-%rename(mul2) csTransform::operator * (const csReversibleTransform &);
+%ignore operator* (const csVector3&, const csTransform&);
+%ignore operator* (const csTransform&, const csVector3&);
+%ignore operator*=(csVector3&, const csTransform&);
+%ignore operator* (const csPlane3&, const csTransform&);
+%ignore operator* (const csTransform&, const csPlane3&);
+%ignore operator*=(csPlane3&, const csTransform&);
+%ignore operator* (const csSphere&, const csTransform&);
+%ignore operator* (const csTransform&, const csSphere&);
+%ignore operator*=(csSphere&, const csTransform&);
+%ignore operator* (const csMatrix3&, const csTransform&);
+%ignore operator* (const csTransform&, const csMatrix3&);
+%ignore operator*= (csMatrix3&, const csTransform&);
+%ignore operator* (const csTransform&, const csReversibleTransform&);
+
 #ifndef CS_MINI_SWIG
 %extend csReversibleTransform
 {
-	csTransform operator * (const csReversibleTransform & t) const
-		{ return *self * t; } 
+  csMatrix3 mulmat1 (const csMatrix3& m, const csTransform& t)
+  { return m * t; }
+  csMatrix3 mulmat2 (const csTransform& t, const csMatrix3& m)
+  { return t * m; }
+  csTransform mulrev (const csTransform& t1, const csReversibleTransform& t2)
+  { return t1 * t2; } 
 }
 #endif // CS_MINI_SWIG
 

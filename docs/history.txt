@@ -17,6 +17,9 @@ chronological order.
 	    - Fixed `delete' vs. `delete[]' mixup in dds::Loader::ReadHeader().
 	    - Fixed bug in csDDSImageFile::Load() where it was leaking a
 	      csDDSImageFile for each mipmap.
+	- Eric Sunshine upgraded ivaria/javapre.i to be compatible with Swig
+	  1.3.22 which complained (correctly) about unamed operator overloads
+	  in several exported classes.
 20-Oct-2004
 	- Jorrit fixed a critical bug in VFS. In case you tried to
 	  call VFS->Sync() while there were still references to open files
