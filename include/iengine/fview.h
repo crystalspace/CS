@@ -86,6 +86,7 @@ public:
     color = i.color;
     gouraud_only = i.gouraud_only;
     gouraud_color_reset = i.gouraud_color_reset;
+    return *this;
   }
   /// Set gouraud only.
   void SetGouraudOnly (bool go) { gouraud_only = go; }
@@ -157,6 +158,7 @@ public:
     mirror = c.mirror;
     light_frustum = c.light_frustum;
     lighting_info = c.lighting_info;
+    return *this;
   }
 
   /// Get the list of shadows.
