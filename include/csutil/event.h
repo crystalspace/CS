@@ -39,22 +39,22 @@ class csKeyEventHelper
 {
 public:
   /// Retrieve the key's raw code.
-  static utf32_char GetRawCode (iEvent* event);
+  static utf32_char GetRawCode (const iEvent* event);
   /// Retrieve the key's cooked code.
-  static utf32_char GetCookedCode (iEvent* event);
+  static utf32_char GetCookedCode (const iEvent* event);
   /// Retrieve the key's raw code.
-  static void GetModifiers (iEvent* event, csKeyModifiers& modifiers);
+  static void GetModifiers (const iEvent* event, csKeyModifiers& modifiers);
   /// Retrieve the event type (key up or down.)
-  static csKeyEventType GetEventType (iEvent* event);
+  static csKeyEventType GetEventType (const iEvent* event);
   /**
    * Retrieve whether a keyboard down event was caused by the initial press
    * (not auto-repeat) or by having it held for a period of time (auto-repeat.)
    */
-  static bool GetAutoRepeat (iEvent* event);
+  static bool GetAutoRepeat (const iEvent* event);
   /// Retrieve the character type (dead or normal.)
-  static csKeyCharType GetCharacterType (iEvent* event);
+  static csKeyCharType GetCharacterType (const iEvent* event);
   /// Get all the information in one compact struct.
-  static bool GetEventData (iEvent* event, csKeyEventData& data);
+  static bool GetEventData (const iEvent* event, csKeyEventData& data);
   /**
    * Get a bitmask corresponding to the pressed modifier keys from the
    * keyboard modifiers struct.
@@ -65,7 +65,7 @@ public:
    * Get a bitmask corresponding to the pressed modifier keys from the event.
    * \sa CSMASK_ALT etc.
    */
-  static uint32 GetModifiersBits (iEvent* event);
+  static uint32 GetModifiersBits (const iEvent* event);
 };
 /** @} */
  

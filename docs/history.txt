@@ -6,6 +6,9 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+3-Dec-2003
+	- res changed the csKeyEventHelper to accept 'const iEvent*' arguments.
+	  Also changed the iEvent->Find() methods to be 'const'.
 2-Dec-2003
 	- res enabled VC the warning "class has virtual functions, but
 	  destructor is not virtual". It was enabled in the past, but somehow
