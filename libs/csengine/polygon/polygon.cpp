@@ -1746,8 +1746,7 @@ void CalculateFogPolygon (csRenderView* rview, G3DPolygonDP& poly)
     poly.fog_info[i].r = 0;
     poly.fog_info[i].g = 0;
     poly.fog_info[i].b = 0;
-    poly.fog_info[i].density = 0;
-    poly.fog_info[i].thickness = 0;
+    poly.fog_info[i].intensity = 0;
 
     // Consider a ray between (0,0,0) and v and calculate the thickness of every
     // fogged sector in between.
@@ -1768,17 +1767,111 @@ void CalculateFogPolygon (csRenderView* rview, G3DPolygonDP& poly)
       float denom = pl.norm.x*v.x + pl.norm.y*v.y + pl.norm.z*v.z;
       dist2 = v.Norm () * (-pl.DD / denom);
 
-      // @@@ The following updates are not correct. We should use better formulas
-      // to combine several differently colored layers of fog (and different densities).
-      poly.fog_info[i].thickness += ABS (dist2-dist1);
-      poly.fog_info[i].r = fog_info->fog->red;
-      poly.fog_info[i].g = fog_info->fog->green;
-      poly.fog_info[i].b = fog_info->fog->blue;
-      poly.fog_info[i].density = fog_info->fog->density;
+      float I2 = ABS (dist2-dist1) * fog_info->fog->density;
+      if (poly.fog_info[i].intensity)
+      {
+        // We already have a previous fog level. In this case we do some
+	// mathematical tricks to combine both fog levels. Substitute one
+	// fog expresion in the other. The basic fog expression is:
+	//	C = I*F + (1-I)*P
+	//	with I = intensity
+	//	     F = fog color
+	//	     P = polygon color
+	//	     C = result
+	float I1 = poly.fog_info[i].intensity;
+	poly.fog_info[i].intensity = I1 + I2 - I1*I2;
+	float fact = 1. / (I1 + I2 - I1*I2);
+	poly.fog_info[i].r = (I2*fog_info->fog->red + I1*poly.fog_info[i].r + I1*I2*poly.fog_info[i].r) * fact;
+	poly.fog_info[i].g = (I2*fog_info->fog->green + I1*poly.fog_info[i].g + I1*I2*poly.fog_info[i].g) * fact;
+	poly.fog_info[i].b = (I2*fog_info->fog->blue + I1*poly.fog_info[i].b + I1*I2*poly.fog_info[i].b) * fact;
+      }
+      else
+      {
+        // The first fog level.
+        poly.fog_info[i].intensity = I2;
+        poly.fog_info[i].r = fog_info->fog->red;
+        poly.fog_info[i].g = fog_info->fog->green;
+        poly.fog_info[i].b = fog_info->fog->blue;
+      }
       fog_info = fog_info->next;
     }
   }
 }
+
+// @@@ We should be able to avoid having the need for two functions
+// which are almost exactly the same.
+void CalculateFogPolygon (csRenderView* rview, G3DPolygonDPFX& poly)
+{
+  if (!rview->fog_info || poly.num < 3) { poly.use_fog = false; return; }
+  poly.use_fog = true;
+
+  float inv_aspect = poly.inv_aspect;
+
+  int i;
+  for (i = 0 ; i < poly.num ; i++)
+  {
+    // Calculate the original 3D coordinate again (camera space).
+    csVector3 v;
+    v.z = 1. / poly.vertices[i].z;
+    v.x = (poly.vertices[i].sx - csWorld::shift_x) * v.z * inv_aspect;
+    v.y = (poly.vertices[i].sy - csWorld::shift_y) * v.z * inv_aspect;
+
+    // Initialize fog vertex.
+    poly.fog_info[i].r = 0;
+    poly.fog_info[i].g = 0;
+    poly.fog_info[i].b = 0;
+    poly.fog_info[i].intensity = 0;
+
+    // Consider a ray between (0,0,0) and v and calculate the thickness of every
+    // fogged sector in between.
+    csFogInfo* fog_info = rview->fog_info;
+    while (fog_info)
+    {
+      csVector3 isect;
+      float dist1, dist2;
+      if (fog_info->has_incoming_plane)
+      {
+	const csPlane& pl = fog_info->incoming_plane;
+	float denom = pl.norm.x*v.x + pl.norm.y*v.y + pl.norm.z*v.z;
+	dist1 = v.Norm () * (-pl.DD / denom);
+      }
+      else
+        dist1 = 0;
+      const csPlane& pl = fog_info->outgoing_plane;
+      float denom = pl.norm.x*v.x + pl.norm.y*v.y + pl.norm.z*v.z;
+      dist2 = v.Norm () * (-pl.DD / denom);
+
+      float I2 = ABS (dist2-dist1) * fog_info->fog->density;
+      if (poly.fog_info[i].intensity)
+      {
+        // We already have a previous fog level. In this case we do some
+	// mathematical tricks to combine both fog levels. Substitute one
+	// fog expresion in the other. The basic fog expression is:
+	//	C = I*F + (1-I)*P
+	//	with I = intensity
+	//	     F = fog color
+	//	     P = polygon color
+	//	     C = result
+	float I1 = poly.fog_info[i].intensity;
+	poly.fog_info[i].intensity = I1 + I2 - I1*I2;
+	float fact = 1. / (I1 + I2 - I1*I2);
+	poly.fog_info[i].r = (I2*fog_info->fog->red + I1*poly.fog_info[i].r + I1*I2*poly.fog_info[i].r) * fact;
+	poly.fog_info[i].g = (I2*fog_info->fog->green + I1*poly.fog_info[i].g + I1*I2*poly.fog_info[i].g) * fact;
+	poly.fog_info[i].b = (I2*fog_info->fog->blue + I1*poly.fog_info[i].b + I1*I2*poly.fog_info[i].b) * fact;
+      }
+      else
+      {
+        // The first fog level.
+        poly.fog_info[i].intensity = I2;
+        poly.fog_info[i].r = fog_info->fog->red;
+        poly.fog_info[i].g = fog_info->fog->green;
+        poly.fog_info[i].b = fog_info->fog->blue;
+      }
+      fog_info = fog_info->next;
+    }
+  }
+}
+
 
 //---------------------------------------------------------------------------
 
@@ -1861,6 +1954,7 @@ void csPolygon2D::DrawFilled (csRenderView* rview, csPolygon3D* poly, csPolyPlan
     }
     PreparePolygonFX (&g3dpoly, vertices, num_vertices, orig_triangle, po_colors != NULL);
     rview->g3d->StartPolygonFX (g3dpoly.txt_handle, CS_FX_COPY | (po_colors ? CS_FX_GOURAUD : 0));
+    CalculateFogPolygon (rview, g3dpoly);
     rview->g3d->DrawPolygonFX (g3dpoly);
     rview->g3d->FinishPolygonFX ();
   }
