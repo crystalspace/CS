@@ -51,7 +51,9 @@ ifeq ($(MAKESECTION),targets)
 ie3ds: $(OUTDIRS) $(IE3DS)
 
 $(IE3DS): $(OBJ.IE3DS) $(LIB.IE3DS)
-	$(DO.PLUGIN) $(3DS.LFLAGS)
+	$(DO.PLUGIN.PREAMBLE) \
+	$(DO.PLUGIN.CORE) $(3DS.LFLAGS) \
+	$(DO.PLUGIN.POSTAMBLE)
 
 $(OUT)/%$O: plugins/mesh/impexp/3ds/%.cpp
 	$(DO.COMPILE.CPP) $(3DS.CFLAGS)
@@ -63,7 +65,9 @@ ie3dsclean:
 ifdef DO_DEPEND
 dep: $(OUTOS)/ie3ds.dep
 $(OUTOS)/ie3ds.dep: $(SRC.IE3DS)
-	$(DO.DEP)
+	$(DO.DEP1) \
+	$(3DS.CFLAGS) \
+	$(DO.DEP2)
 else
 -include $(OUTOS)/ie3ds.dep
 endif
