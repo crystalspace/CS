@@ -33,6 +33,22 @@ Short-term cleanups that need to be done:
 	  (note from Jorrit: as a result of these makefile changes the
 	  Linux port will now run about 25-50% faster compared to the
 	  previous CVS update. This is no joke! :-)
+	- Eric Sunshine updated the MacOS/X Server, OpenStep, and NextStep
+	  makefiles to work properly with Andrew's recent makefile system
+	  changes.  There were a few errors, including a couple crashers,
+	  as well as a few aesthetic problems.  Most of the errors stemmed
+	  from the fact that the common next.mak makefile now gets included
+	  multiple times, whereas previously it was only ever included once.
+	  Also made a few simplifications.
+	- Eric Sunshine added a "platforms" target to the makefile.  This
+	  allows the user to see the list of platforms for which Crystal Space
+	  can be configured.  This list used to be available via "make help"
+	  at all times, but Andrew's recent modifications changed the behavior
+	  in such a way that it was no longer feasible to display the list of
+	  platforms once the makefiles were already configured.  The new
+	  "platforms" target gets around this limitation by only performing
+	  the extra work needed to generate the platform list if the user
+	  explicitly requests it.
 21-Jul-1999
 	- Eric Sunshine uploaded new archives of zlib, libpng, and libjpeg
 	  to the Crystal Space ftp site which conform to the new beta 13
@@ -57,7 +73,6 @@ Short-term cleanups that need to be done:
 	- Jorrit fixed a compilation problem in Eric Sunshine's changes from
 	  yesterday, which the NextStep compiler did not catch.  He also fixed
 	  the ndrvdem makefile which failed to mention csapputil.
-	- Did some minor fixes on the changes from Eric Sunshine.
 	- For more fun, Jorrit extended the 'addskel' command so that you
 	  can now give a negative width. In that case the real width at every
 	  node will be random between 1 and -width.
@@ -66,7 +81,7 @@ Short-term cleanups that need to be done:
 	- Renamed BOOL to COMBOOL for compatiblity problems with BOOL on
 	  some systems (like IRIX, MacOS/X Server, OpenStep, and NextStep).
 	- Eric Sunshine made these changes:
-	    - Eric Sunshine made drawing optimizations to csProgressMeter and
+	    - Made drawing optimizations in csProgressMeter and
 	      csProgressPulse.  In many cases the impact of these
 	      optimizations on drawing performance is quite dramatic.
 	    - Fixed a new compilation warning in cssprite.cpp.
