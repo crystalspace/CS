@@ -111,26 +111,16 @@ public:
   }
 
   /// Add a new vertex and recalculate the bounding box.
-  void AddBoundingVertex (const csVector2& v)
-  {
-    AddBoundingVertex (v.x, v.y);
-  }
-
-  /// Add a new vertex and recalculate the bounding box.
   void AddBoundingVertex (float x, float y)
   {
     if (x < minbox.x) minbox.x = x;  if (x > maxbox.x) maxbox.x = x;
     if (y < minbox.y) minbox.y = y;  if (y > maxbox.y) maxbox.y = y;
   }
 
-  /**
-   * Add a new vertex and recalculate the bounding box.
-   * This version is a little more optimal. It assumes however
-   * that at least one point has been added to the bounding box.
-   */
-  void AddBoundingVertexSmart (const csVector2& v)
+  /// Add a new vertex and recalculate the bounding box.
+  void AddBoundingVertex (const csVector2& v)
   {
-    AddBoundingVertexSmart (v.x, v.y);
+    AddBoundingVertex (v.x, v.y);
   }
 
   /**
@@ -144,6 +134,16 @@ public:
     if (y < minbox.y) minbox.y = y; else if (y > maxbox.y) maxbox.y = y;
   }
 
+  /**
+   * Add a new vertex and recalculate the bounding box.
+   * This version is a little more optimal. It assumes however
+   * that at least one point has been added to the bounding box.
+   */
+  void AddBoundingVertexSmart (const csVector2& v)
+  {
+    AddBoundingVertexSmart (v.x, v.y);
+  }
+
   //-----
   // Maintenance Note: The csBox constructors and Set() appear at this point
   // in the file, rather than earlier, in order to appease the OpenStep 4.2
@@ -153,7 +153,7 @@ public:
   // constructors were listed at the top of the file, rather than here, the
   // compiler would see calls to Empty() and StartBoundingBox() before seeing
   // declarations for them.  In such a situation, the buggy compiler
-  // generated a broken object file.  The simple work-around of textually
+  // generates a broken object file.  The simple work-around of textually
   // reorganizing the file ensures that the declarations for Empty() and
   // StartBoundingBox() are seen before they are called.
   //-----
@@ -301,12 +301,6 @@ public:
   }
 
   /// Add a new vertex and recalculate the bounding box.
-  void AddBoundingVertex (const csVector3& v)
-  {
-    AddBoundingVertex (v.x, v.y, v.z);
-  }
-
-  /// Add a new vertex and recalculate the bounding box.
   void AddBoundingVertex (float x, float y, float z)
   {
     if (x < minbox.x) minbox.x = x; if (x > maxbox.x) maxbox.x = x;
@@ -314,14 +308,10 @@ public:
     if (z < minbox.z) minbox.z = z; if (z > maxbox.z) maxbox.z = z;
   }
 
-  /**
-   * Add a new vertex and recalculate the bounding box.
-   * This version is a little more optimal. It assumes however
-   * that at least one point has been added to the bounding box.
-   */
-  void AddBoundingVertexSmart (const csVector3& v)
+  /// Add a new vertex and recalculate the bounding box.
+  void AddBoundingVertex (const csVector3& v)
   {
-    AddBoundingVertexSmart (v.x, v.y, v.z);
+    AddBoundingVertex (v.x, v.y, v.z);
   }
 
   /**
@@ -334,6 +324,16 @@ public:
     if (x < minbox.x) minbox.x = x; else if (x > maxbox.x) maxbox.x = x;
     if (y < minbox.y) minbox.y = y; else if (y > maxbox.y) maxbox.y = y;
     if (z < minbox.z) minbox.z = z; else if (z > maxbox.z) maxbox.z = z;
+  }
+
+  /**
+   * Add a new vertex and recalculate the bounding box.
+   * This version is a little more optimal. It assumes however
+   * that at least one point has been added to the bounding box.
+   */
+  void AddBoundingVertexSmart (const csVector3& v)
+  {
+    AddBoundingVertexSmart (v.x, v.y, v.z);
   }
 
   //-----

@@ -203,6 +203,25 @@ public:
 	/// Returns true if this is a mirrored mesh.
 	bool mirror(void) { return _mirror; }
 
+	/// Initialize the bin tree.
+	bool init(void);
+	/// Get maxLevel.
+	unsigned int maxLevel(void) { return _mesh->maxLevel(); }
+	/// Get number of triangles in a single BinTree.
+	unsigned int triNo(void) { return _mesh->triNo(); }
+	/// Get triangle row.
+	unsigned int row(unsigned int i)
+	{ return _mesh->stri[i].row; }
+	/// Get triangle col.
+	unsigned int col(unsigned int i)
+	{ return _mesh->stri[i].col; }
+	/// Get triangle vertex 0.
+	ddgTriIndex v0(ddgTriIndex i)
+	{ return _mesh->stri[i].v0; }
+	/// Get triangle vertex 1.
+	ddgTriIndex v1(ddgTriIndex i)
+	{ return _mesh->stri[i].v1; }
+
 	/// Return the height of a location on the mesh.
     float height(ddgTriIndex tindex)
     {
@@ -250,24 +269,6 @@ public:
         	vout->set(_dr+row(tindex),_dc+col(tindex));
     }
 
-	/// Initialize the bin tree.
-	bool init(void);
-	/// Get maxLevel.
-	unsigned int maxLevel(void) { return _mesh->maxLevel(); }
-	/// Get number of triangles in a single BinTree.
-	unsigned int triNo(void) { return _mesh->triNo(); }
-	/// Get triangle row.
-	unsigned int row(unsigned int i)
-	{ return _mesh->stri[i].row; }
-	/// Get triangle col.
-	unsigned int col(unsigned int i)
-	{ return _mesh->stri[i].col; }
-	/// Get triangle vertex 0.
-	ddgTriIndex v0(ddgTriIndex i)
-	{ return _mesh->stri[i].v0; }
-	/// Get triangle vertex 1.
-	ddgTriIndex v1(ddgTriIndex i)
-	{ return _mesh->stri[i].v1; }
 	/** Return the starting offset in the array where a
 	 * given level is stored.
 	 */
@@ -303,14 +304,14 @@ public:
 		return i>>1;
 	}
 	/// Return the index of the left child.
-	static ddgTriIndex left(ddgTriIndex i)
-	{
-		return right(i)+1;
-	}
-	/// Return the index of the left child.
 	static ddgTriIndex right(ddgTriIndex i)
 	{
 		return i*2;
+	}
+	/// Return the index of the left child.
+	static ddgTriIndex left(ddgTriIndex i)
+	{
+		return right(i)+1;
 	}
 	/// Return the quad brother. If 0 there is no brother.
 	ddgTriIndex brother( ddgTriIndex i)
