@@ -2001,7 +2001,7 @@ void csComponent::DrawUnderline (int iX, int iY, const char *iText, int iUnderli
   if ((iUnderlinePos >= 0) && (iUnderlinePos < (int)strlen (iText)))
   {
     size_t sl = strlen (iText) + 1;
-    ALLOC_STACK_ARRAY (tmp, char, sl);
+    CS_ALLOC_STACK_ARRAY (char, tmp, sl);
     memcpy (tmp, iText, sl);
     tmp [iUnderlinePos + 1] = 0;
     int fx = GetTextSize (tmp);

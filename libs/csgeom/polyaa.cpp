@@ -95,9 +95,9 @@ void __poly_fill (csVector2 *iverts, int ivertscount)
   int n2[2] = { 0, 0 };
   csVector2 *p2[2];
 
-  ALLOC_STACK_ARRAY (p2_0, csVector2, ivertscount  + 1);
+  CS_ALLOC_STACK_ARRAY (csVector2, p2_0, ivertscount  + 1);
   p2[0] = p2_0;
-  ALLOC_STACK_ARRAY (p2_1, csVector2, ivertscount  + 1);
+  CS_ALLOC_STACK_ARRAY (csVector2, p2_1, ivertscount  + 1);
   p2[1] = p2_1;
 
   if (width > height)

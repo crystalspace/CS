@@ -676,7 +676,7 @@ void csColorQuantizer::RemapDither (
   uint8 *dst = outimage;
   count = pixels;
 
-  ALLOC_STACK_ARRAY (fserr, int, (2 * 3 * (pixperline + 2)));
+  CS_ALLOC_STACK_ARRAY (int, fserr, (2 * 3 * (pixperline + 2)));
   memset (fserr, 0, 3 * (pixperline + 2) * sizeof (int));
   // odd/even row
   unsigned char odd = 0;

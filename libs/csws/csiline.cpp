@@ -334,7 +334,7 @@ do_key:   if ((((Event.Key.Modifiers & (CSMASK_CTRL | CSMASK_ALT))
           if ((Event.Key.Char > 255) || !IsValidChar (Event.Key.Char))
             return true;
           DeleteSelection ();
-          ALLOC_STACK_ARRAY (tmp, char, maxlen + 1);
+          CS_ALLOC_STACK_ARRAY (char, tmp, maxlen + 1);
           strcpy (tmp, text);
           int sl = strlen (tmp);
           if (app->InsertMode)
@@ -491,7 +491,7 @@ void csInputLine::DeleteSelection ()
     int ss = selstart, se = selend;
     if (ss > se)
     { ss = selend; se = selstart; }
-    ALLOC_STACK_ARRAY (tmp, char, maxlen + 1);
+    CS_ALLOC_STACK_ARRAY (char, tmp, maxlen + 1);
     strcpy (tmp, text);
     strcpy (&tmp [ss], &tmp [se]);
     if (IsValidString (tmp))

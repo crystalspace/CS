@@ -90,6 +90,11 @@ public:
     int iIndex = 0);
   /// Replace the Nth command-line name with a new value
   virtual bool ReplaceName (const char *iValue, int iIndex = 0);
+  /**
+   * Check for a -[no]option toggle. 
+   */
+  virtual bool GetBoolOption (const char *iName, 
+    bool defaultValue = false);
 };
 
 #endif // __CS_CMDLINE_H__

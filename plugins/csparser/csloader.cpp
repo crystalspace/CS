@@ -2226,7 +2226,7 @@ bool csLoader::LoadSettings (iDocumentNode* node)
       case XMLTOKEN_LIGHTMAPCELLSIZE:
         {
 	  int cellsize = child->GetContentsValueAsInt ();
-	  if (cellsize >= 0)
+	  if (cellsize > 0)
 	  {
 	    if (!csIsPowerOf2 (cellsize) )
 	    {

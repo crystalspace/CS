@@ -538,7 +538,9 @@ DllMain (HINSTANCE hinstDLL, DWORD fdwReason, LPVOID /*lpvReserved*/) \
   if (fdwReason == DLL_PROCESS_ATTACH) \
     ModuleHandle = hinstDLL; \
   return TRUE; \
-}
+} \
+extern "C" __declspec(dllexport) \
+const char* plugin_compiler() { return CS_COMPILER_NAME; }
 
 #endif // !CS_STATIC_LINKED
 #endif // __CS_CSOSDEFS_H__

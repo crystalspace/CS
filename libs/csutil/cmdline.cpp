@@ -142,4 +142,30 @@ void csCommandLineParser::AddName (const char *iName)
   Names.Push (csStrNew (iName));
 }
 
+bool csCommandLineParser::GetBoolOption(const char *iName, bool defaultValue)
+{
+  bool result = defaultValue;
+
+  CS_ALLOC_STACK_ARRAY (char, negName, strlen(iName)+3);
+  strcpy (negName, "no");
+  strcpy (negName+2, iName);
+  int idx;
+  for (idx = Options.Length ()-1; idx >= 0; idx--)
+  {
+    csCommandLineOption* cl = Options[idx];
+    if (!strcmp (cl->Name, iName))
+    {
+      result = true;
+      break;
+    }
+    if (!strcmp (cl->Name, negName))
+    {
+      result = false;
+      break;
+    }
+  }
+
+  return result;
+}
+
 

@@ -101,17 +101,11 @@ INC.SYS_CSSYS = $(wildcard libs/cssys/win32/*.h) $(CSTHREAD.INC)
 # Extra parameters for 'sed' which are used for doing 'make depend'.
 SYS_SED_DEPEND = -e "s/\.ob*j*\:/\$$O:/g"
 
-# Flags for linking a GUI and a console executable
-ifeq ($(MODE),debug)
-  LFLAGS.EXE = -mconsole
-else
-  LFLAGS.EXE = -mwindows
-endif
+LFLAGS.EXE = -mconsole
 # Commenting out the following line will make the -noconsole option work
 # but the only way to redirect output will be WITH -noconsole (wacky :-)
 # and the console will not start minimized if a shortcut says it should
 #LFLAGS.EXE += -mconsole
-LFLAGS.CONSOLE.EXE = -mconsole
 
 # Use makedep to build dependencies
 DEPEND_TOOL = mkdep
@@ -164,14 +158,6 @@ DO.LINK.EXE = \
   $(LINK) $(LFLAGS) $(LFLAGS.EXE) $(LFLAGS.@) $(^^) \
     $(OUT)/$(@:$(EXE)=-rsrc.o) $(L^) $(LIBS) $(LIBS.EXE.PLATFORM)
 
-DO.LINK.CONSOLE.EXE = \
-  $(MAKEVERSIONINFO) $(OUT)/$(@:$(EXE)=-version.rc) \
-    "$(DESCRIPTION.$*)" $(COMMAND_DELIM) \
-  $(MERGERES) $(OUT)/$(@:$(EXE)=-rsrc.rc) ./ \
-    $(OUT)/$(@:$(EXE)=-version.rc) $($@.WINRSRC) $(COMMAND_DELIM) \
-  $(COMPILE_RES) -i $(OUT)/$(@:$(EXE)=-rsrc.rc) \
-    -o $(OUT)/$(@:$(EXE)=-rsrc.o) $(COMMAND_DELIM) \
-  $(LINK) $(LFLAGS) $(LFLAGS.CONSOLE.EXE) $(LFLAGS.@) $(^^) \
-    $(OUT)/$(@:$(EXE)=-rsrc.o) $(L^) $(LIBS) $(LIBS.EXE.PLATFORM)
+DO.LINK.CONSOLE.EXE = $(DO.LINK.EXE)
 
 endif # ifeq ($(MAKESECTION),postdefines)

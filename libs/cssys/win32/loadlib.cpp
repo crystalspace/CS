@@ -60,11 +60,40 @@ csLibraryHandle csLoadLibrary (const char* iName)
         NULL, errorCode, MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
         (LPTSTR) &buf, 0, NULL);
     char *str = new char[strlen(buf) + strlen(iName) + 50];
-    sprintf(str, "LoadLibrary('%s') error %d: %s",
+    sprintf (str, "LoadLibrary('%s') error %d: %s",
 	iName, (int)errorCode, buf);
-    ErrorMessages.Push(str);
+    ErrorMessages.Push (csStrNew (str));
     LocalFree (buf);
+    return NULL;
   }
+
+  typedef const char* (*pfnGetPluginCompiler)();
+  pfnGetPluginCompiler get_plugin_compiler = 
+    (pfnGetPluginCompiler) GetProcAddress ((HMODULE)handle, "plugin_compiler");
+  if (!get_plugin_compiler)
+  {
+    const char *noPluginCompiler =
+      "%s: DLL doesn't export \"plugin_compiler\".\n";
+    CS_ALLOC_STACK_ARRAY (char, msg, 
+      strlen(noPluginCompiler) + strlen(iName));
+    sprintf (msg, noPluginCompiler, iName);
+    ErrorMessages.Push (csStrNew (msg));
+    FreeLibrary ((HMODULE)handle);
+    return NULL;
+  }
+  const char* plugin_compiler = get_plugin_compiler();
+  if (strcmp(plugin_compiler, CS_COMPILER_NAME))
+  {
+    const char *compilerMismatch =
+      "%s: plugin compiler mismatches app compiler: %s != " CS_COMPILER_NAME "\n";
+    CS_ALLOC_STACK_ARRAY (char, msg, 
+      strlen(compilerMismatch) + strlen(iName) + strlen(plugin_compiler));
+    sprintf (msg, compilerMismatch, iName, plugin_compiler);
+    ErrorMessages.Push (csStrNew (msg));
+    FreeLibrary ((HMODULE)handle);
+    return NULL;
+  }
+
   return handle;
 }
 
@@ -91,7 +120,6 @@ bool csUnloadLibrary (csLibraryHandle Handle)
 void csPrintLibraryError (const char *iModule)
 {
   char *str;
-  fprintf(stderr, "ERROR (%s):\n", iModule);
   while((str = (char*)ErrorMessages.Pop()) != NULL)
   {
     fprintf (stderr, "  %s", str);

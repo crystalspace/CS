@@ -414,9 +414,12 @@ class Win32Assistant :
 {
 private:
   iObjectRegistry* registry;
+  /// is a console window to be displayed?
   bool console_window;
-  bool cmdline_help_wanted;
+  /// is the binary linked as GUI or console app?
   bool is_console_app;
+  /// is command line help requested?
+  bool cmdline_help_wanted;
   HCURSOR m_hCursor;
   csRef<iEventOutlet> EventOutlet;
   void SetWinCursor (HCURSOR);
@@ -446,7 +449,6 @@ public:
 };
 
 static Win32Assistant* GLOBAL_ASSISTANT = 0;
-//static bool is_console_app = false;
 
 SCF_IMPLEMENT_IBASE (Win32Assistant)
   SCF_IMPLEMENTS_INTERFACE (iWin32Assistant)
@@ -549,8 +551,8 @@ bool csPlatformShutdown(iObjectRegistry* r)
 
 Win32Assistant::Win32Assistant (iObjectRegistry* r) :
   console_window (false),  
-  cmdline_help_wanted(false),
   is_console_app(false),
+  cmdline_help_wanted(false),
   EventOutlet (0)
 {
   SCF_CONSTRUCT_IBASE(0);
@@ -566,8 +568,9 @@ Win32Assistant::Win32Assistant (iObjectRegistry* r) :
 #endif
 
   csRef<iCommandLineParser> cmdline (CS_QUERY_REGISTRY (r, iCommandLineParser));
-  if (cmdline->GetOption ("console")) console_window = true;
-  if (cmdline->GetOption ("noconsole")) console_window = false;
+  console_window = cmdline->GetBoolOption ("console", console_window);
+
+  cmdline_help_wanted = cmdline->GetOption ("help");
 
   /*
      to determine if we are actually a console we app we look up
@@ -581,11 +584,8 @@ Win32Assistant::Win32Assistant (iObjectRegistry* r) :
       (NTheader->OptionalHeader.Subsystem == IMAGE_SUBSYSTEM_WINDOWS_CUI);
   }
 
-  cmdline_help_wanted = cmdline->GetOption ("help");
-
-  /*
-    - console apps won't do anything about it. 
-      (you can't hide the con either)
+/*
+    - console apps won't do anything about their console... yet. 
     - GUI apps will open a console window if desired.
    */
   if (!is_console_app)
@@ -596,10 +596,6 @@ Win32Assistant::Win32Assistant (iObjectRegistry* r) :
       freopen("CONOUT$", "a", stderr);
       freopen("CONOUT$", "a", stdout);
       freopen("CONIN$", "a", stdin);
-    }
-    else 
-    {
-      DisableConsole ();
     }
   }
 
@@ -661,9 +657,9 @@ void Win32Assistant::Shutdown()
   csRef<iEventQueue> q (CS_QUERY_REGISTRY (registry, iEventQueue));
   if (q != 0)
     q->RemoveListener(this);
-  if (cmdline_help_wanted && !is_console_app)
+  if (!is_console_app && (cmdline_help_wanted || console_window))
   {
-    printf ("\nPress a key to close this window...");
+    fprintf (stdout, "\nPress a key to close this window...");
     HANDLE hConsole = GetStdHandle (STD_INPUT_HANDLE);
     INPUT_RECORD ir;
     DWORD events_read;
@@ -871,6 +867,17 @@ LRESULT CALLBACK Win32Assistant::WindowProc (HWND hWnd, UINT message,
 	iEventOutlet* outlet = GLOBAL_ASSISTANT->GetEventOutlet();
         outlet->Broadcast (cscmdFocusChanged,
           (void *)(LOWORD (wParam) != WA_INACTIVE));
+      }
+      break;
+    case WM_CREATE:
+      if (GLOBAL_ASSISTANT != 0)
+      {
+	// a window is created. Hide the console window, if requested.
+	if (GLOBAL_ASSISTANT->is_console_app && 
+	  !GLOBAL_ASSISTANT->console_window)
+	{
+	  GLOBAL_ASSISTANT->DisableConsole ();
+	}
       }
       break;
     case WM_DESTROY:

@@ -96,7 +96,7 @@ static void PreparePolygonFX2 (G3DPolygonDPFX* g3dpoly,
 {
   // first we copy the first texture coordinates to a local buffer
   // to avoid that they are overwritten when interpolating.
-  ALLOC_STACK_ARRAY (inpoly, G3DTexturedVertex, orig_num_vertices);
+  CS_ALLOC_STACK_ARRAY (G3DTexturedVertex, inpoly, orig_num_vertices);
 
   int i;
   for (i = 0; i < orig_num_vertices; i++)
@@ -218,7 +218,7 @@ void csIsoSprite::Draw(iIsoRenderView *rview)
   g3dpolyfx.mat_handle->GetTexture ()->GetMeanColor (g3dpolyfx.flat_color_r,
     g3dpolyfx.flat_color_g, g3dpolyfx.flat_color_b);
 
-  ALLOC_STACK_ARRAY (poly2d, csVector2, g3dpolyfx.num);
+  CS_ALLOC_STACK_ARRAY (csVector2, poly2d, g3dpolyfx.num);
 
   csVector2 clipped_poly2d[MAX_OUTPUT_VERTICES];
   csVertexStatus clipped_vtstats[MAX_OUTPUT_VERTICES];

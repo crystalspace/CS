@@ -97,7 +97,7 @@ bool csPluginList::Sort (iObjectRegistry* object_reg)
   int row, col, len = Length ();
 
   // Build the dependency matrix
-  ALLOC_STACK_ARRAY (matrix, bool, len * len);
+  CS_ALLOC_STACK_ARRAY (bool, matrix, len * len);
   memset (matrix, 0, len * len * sizeof (bool));
   for (row = 0; row < len; row++)
   {
@@ -131,9 +131,9 @@ bool csPluginList::Sort (iObjectRegistry* object_reg)
 
   // Go through dependency matrix and put all plugins into an array
   bool error = false;
-  ALLOC_STACK_ARRAY (order, int, len + 1);
+  CS_ALLOC_STACK_ARRAY (int, order, len + 1);
   *order = 0;
-  ALLOC_STACK_ARRAY (loop, int, len + 1);
+  CS_ALLOC_STACK_ARRAY (int, loop, len + 1);
   *loop = 0;
 
   for (row = 0; row < len; row++)

@@ -178,11 +178,11 @@ csLibraryHandle csFindLoadLibrary (char const* iPrefix, char const* iName,
     if (!csGetLoadLibraryVerbose())
     {
       fprintf(stderr,
-        "Warning: Failed to load `%s'; use -verbose for details.\n", iName);
+        "Warning: Failed to load `%s'; use '-verbose' argument for details.\n", iName);
     }
     else
     {
-      fprintf(stderr, "Warning: Failed to load `%s'; reason:\n", iName);
+      fprintf(stderr, "Warning: Failed to load `%s'; reason(s):\n", iName);
       if (loader.file_found)
       {
         csPrintLibraryError (iName);

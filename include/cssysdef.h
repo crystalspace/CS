@@ -173,16 +173,19 @@
 #  endif
 #endif
 
-/**\def ALLOC_STACK_ARRAY(var,type,size)
- * Dynamic stack memory allocation
+/**\def CS_ALLOC_STACK_ARRAY(type, var, size)
+ * Dynamic stack memory allocation.
+ * \param type Type of the array elements.
+ * \param var Name of the array to be allocated.
+ * \param size Number of elements to be allocated.
  */
 #ifdef COMP_GCC
 // In GCC we are able to declare stack vars of dynamic size directly
-#  define ALLOC_STACK_ARRAY(var,type,size) \
+#  define CS_ALLOC_STACK_ARRAY(type, var, size) \
 	    type var [size]
 #else
 #  include <malloc.h>
-#  define ALLOC_STACK_ARRAY(var,type,size) \
+#  define CS_ALLOC_STACK_ARRAY(type, var, size) \
 	    type *var = (type *)alloca ((size) * sizeof (type))
 #endif
 

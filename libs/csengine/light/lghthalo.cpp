@@ -365,7 +365,7 @@ static void PreparePolygonFX2 (
   // first we copy the first texture coordinates to a local buffer
 
   // to avoid that they are overwritten when interpolating.
-  ALLOC_STACK_ARRAY (inpoly, G3DTexturedVertex, orig_num_vertices);
+  CS_ALLOC_STACK_ARRAY (G3DTexturedVertex, inpoly, orig_num_vertices);
 
   int i;
   for (i = 0; i < orig_num_vertices; i++) inpoly[i] = g3dpoly->vertices[i];

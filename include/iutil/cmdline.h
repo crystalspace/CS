@@ -25,7 +25,7 @@
  * @{ */
 #include "csutil/scf.h"
 
-SCF_VERSION (iCommandLineParser, 0, 0, 1);
+SCF_VERSION (iCommandLineParser, 0, 0, 2);
 
 /// A utility class that makes it easier to parse the command line.
 struct iCommandLineParser : public iBase
@@ -51,6 +51,21 @@ struct iCommandLineParser : public iBase
     int iIndex = 0) = 0;
   /// Replace the Nth command-line name with a new value
   virtual bool ReplaceName (const char *iValue, int iIndex = 0) = 0;
+  /**
+   * Check for a -[no]option toggle. The difference to using GetOption() to
+   * check for the two possibilities is that this function respects the
+   * argument order.<br> 
+   * Example: the result of evaluating the arguments 
+   * <tt>-option -nooption</tt> would depend on if you either check for
+   * "option" or "nooption" using GetOption(), while GetBoolOption() returns
+   * false because it looks for the <em>last</em> toggle argument.
+   * \param iName The name of the positive toggle argument. The negative argument is 
+   *		  created by inserting "no" in front of it.
+   * \param defaultValue The default value, if neither of the toggle arguments is
+   *			  found.
+   */
+  virtual bool GetBoolOption (const char *iName, 
+    bool defaultValue = false) = 0;
 };
 
 /** @} */

@@ -1309,6 +1309,12 @@ bool WalkTest::Initialize (int argc, const char* const argv[],
 
   // Find the font we'll use
   Font = Gfx2D->GetFontServer ()->LoadFont (cfg_font);
+  if (!Font)
+  {
+    Report (CS_REPORTER_SEVERITY_NOTIFY, "Couldn't load font '%s', using standard one",
+      cfg_font);
+    Font = Gfx2D->GetFontServer ()->LoadFont (CSFONT_COURIER);
+  }
 
   // Open the startup console
   start_console ();

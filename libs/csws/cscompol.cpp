@@ -70,8 +70,8 @@ void csComponent::Polygon3D (G3DPolygonDPFX &poly, uint mode)
 
   // Store the original polygon aside (for clipping)
   int orig_num_vert = poly.num;
-  ALLOC_STACK_ARRAY (orig_vert, csVector2, orig_num_vert);
-  ALLOC_STACK_ARRAY (orig_poly, G3DTexturedVertex, orig_num_vert);
+  CS_ALLOC_STACK_ARRAY (csVector2, orig_vert, orig_num_vert);
+  CS_ALLOC_STACK_ARRAY (G3DTexturedVertex, orig_poly, orig_num_vert);
   for (i = 0; i < orig_num_vert; i++)
   {
     orig_vert [i].x = dx + poly.vertices [i].x;
