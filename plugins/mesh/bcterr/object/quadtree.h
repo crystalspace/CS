@@ -52,7 +52,7 @@ public:
   bool HitBeamOutline (csSegment3 seg,
     csVector3& isect, float* pr);
   bool HitBeamObject (csSegment3 seg,
-    csVector3& isect, float* pr);
+    csVector3& isect, float* pr, float &distance);
 };
 
 class csBCCollisionQuad

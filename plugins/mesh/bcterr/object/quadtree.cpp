@@ -105,16 +105,19 @@ bool csColQuad::HitBeamOutline (csSegment3 seg,
 }
 
 bool csColQuad::HitBeamObject (csSegment3 seg,
-    csVector3& isect, float* pr)
+    csVector3& isect, float* pr, float &distance)
 {
   if (csIntersect3::BoxSegment (bbox, seg, isect, pr) )
   //if (BBoxLineIntersect (bbox, seg, isect, pr) )
   {
     int i, j, k, length;
-    bool hit;
+    float shortest;
+    csVector3 dist, ssect;
+    bool hit, hashit;
     csVector3 *work;
     i = 0;
     hit = false;
+    hashit = false;
     for (i = 0; i < num_blocks; i++)
     {
       length = blocks[i]->owner->hor_length;
@@ -127,13 +130,45 @@ bool csColQuad::HitBeamObject (csSegment3 seg,
             work[length], seg, isect);
           if (hit)
           {
-            return true;
+            dist = isect - seg.Start ();
+            distance = dist.x * dist.x + dist.y * dist.y +
+              dist.z * dist.z;
+            if (hashit)
+            {
+              if (distance < shortest)
+              {
+                shortest = distance;
+                ssect = isect;
+              }
+            }
+            else 
+            {
+              hashit = true;
+              ssect = isect;
+              shortest = distance;
+            }
           }
           hit = csIntersect3::IntersectTriangle (work[1], work[length],
             work[length + 1], seg, isect);
           if (hit)
           {
-            return true;
+            dist = isect - seg.Start ();
+            distance = dist.x * dist.x + dist.y * dist.y +
+              dist.z * dist.z;
+            if (hashit)
+            {
+              if (distance < shortest)
+              {
+                shortest = distance;
+                ssect = isect;
+              }
+            }
+            else 
+            {
+              hashit = true;
+              ssect = isect;
+              shortest = distance;
+            }
           }
           work += 1;
         }
@@ -144,12 +179,36 @@ bool csColQuad::HitBeamObject (csSegment3 seg,
     {
       for (i = 0; i < 4; i++)
       {
-        hit = children[i]->HitBeamObject (seg, isect, pr);
+        hit = children[i]->HitBeamObject (seg, isect, pr, distance);
         if (hit)
-          return true;
+        {
+          if (hashit)
+          {
+            if (distance < shortest)
+            {
+              shortest = distance;
+              ssect = isect;
+            }
+          }
+          else 
+          {
+            hashit = true;
+            ssect = isect;
+            shortest = distance;
+          }
+        }
       }
     }
-    return false;
+    if (hashit)
+    {
+      isect = ssect;  
+      if (shortest > 0)
+        distance = qsqrt (shortest);
+      else 
+        distance = 0; 
+      return true;
+    } else
+      return false;
   } else
   {
     return false;
@@ -600,5 +659,6 @@ bool csBCCollisionQuad::HitBeamObject (const csVector3& start, const csVector3& 
     csVector3& isect, float* pr)
 {
   csSegment3 seg (start, end);
-  return root_quad->HitBeamObject (seg, isect, pr);
+  float dist = 0;
+  return root_quad->HitBeamObject (seg, isect, pr, dist);
 }
