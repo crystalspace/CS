@@ -56,7 +56,7 @@
 
 // Whether or not we should try  and use OpenGL extensions. This should be 
 // removed eventually, when all platforms have been updated.
-#define USE_EXTENSIONS 1
+//#define USE_EXTENSIONS 1
 
 // ---------------------------------------------------------------------------
 
