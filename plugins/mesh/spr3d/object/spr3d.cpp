@@ -327,7 +327,7 @@ void csSprite3DMeshObjectFactory::SetSkeleton (csSkel* sk)
   skeleton = sk;
 }
 
-iMeshObject* csSprite3DMeshObjectFactory::NewInstance ()
+csPtr<iMeshObject> csSprite3DMeshObjectFactory::NewInstance ()
 {
   if (!initialized)
   {
@@ -347,7 +347,7 @@ iMeshObject* csSprite3DMeshObjectFactory::NewInstance ()
   spr->InitSprite ();
   iMeshObject* im = SCF_QUERY_INTERFACE (spr, iMeshObject);
   im->DecRef ();
-  return im;
+  return csPtr<iMeshObject> (im);
 }
 
 void csSprite3DMeshObjectFactory::GenerateLOD ()
@@ -2120,13 +2120,13 @@ csSprite3DMeshObjectType::~csSprite3DMeshObjectType ()
 {
 }
 
-iMeshObjectFactory* csSprite3DMeshObjectType::NewFactory ()
+csPtr<iMeshObjectFactory> csSprite3DMeshObjectType::NewFactory ()
 {
   csSprite3DMeshObjectFactory* cm = new csSprite3DMeshObjectFactory (this);
   cm->object_reg = object_reg;
   iMeshObjectFactory* ifact = SCF_QUERY_INTERFACE (cm, iMeshObjectFactory);
   ifact->DecRef ();
-  return ifact;
+  return csPtr<iMeshObjectFactory> (ifact);
 }
 
 #define NUM_OPTIONS 2

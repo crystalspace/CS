@@ -153,13 +153,13 @@ csRainMeshObjectFactory::~csRainMeshObjectFactory ()
 {
 }
 
-iMeshObject* csRainMeshObjectFactory::NewInstance ()
+csPtr<iMeshObject> csRainMeshObjectFactory::NewInstance ()
 {
   csRainMeshObject* cm =
     new csRainMeshObject (object_reg, (iMeshObjectFactory*)this);
   iMeshObject* im = SCF_QUERY_INTERFACE (cm, iMeshObject);
   im->DecRef ();
-  return im;
+  return csPtr<iMeshObject> (im);
 }
 
 //----------------------------------------------------------------------
@@ -190,10 +190,11 @@ csRainMeshObjectType::~csRainMeshObjectType ()
 {
 }
 
-iMeshObjectFactory* csRainMeshObjectType::NewFactory ()
+csPtr<iMeshObjectFactory> csRainMeshObjectType::NewFactory ()
 {
   csRainMeshObjectFactory* cm = new csRainMeshObjectFactory (this, object_reg);
   iMeshObjectFactory* ifact = SCF_QUERY_INTERFACE (cm, iMeshObjectFactory);
   ifact->DecRef ();
-  return ifact;
+  return csPtr<iMeshObjectFactory> (ifact);
 }
+

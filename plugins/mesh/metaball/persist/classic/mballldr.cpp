@@ -331,7 +331,7 @@ iBase* csMetaBallLoader::Parse (const char* string,
 	break;
       case CS_TOKEN_FACTORY:
 	{
-      csScanStr (params, "%s", str);
+	  csScanStr (params, "%s", str);
 	  iMeshFactoryWrapper* fact = ldr_context->FindMeshFactory (str);
 	  if (!fact)
 	  {
@@ -339,7 +339,7 @@ iBase* csMetaBallLoader::Parse (const char* string,
 	    return NULL;
 	  }
 	  mesh = fact->GetMeshObjectFactory ()->NewInstance ();
-      ballstate = SCF_QUERY_INTERFACE (mesh, iMetaBallState);
+	  ballstate = SCF_QUERY_INTERFACE (mesh, iMetaBallState);
 	  mp = ballstate->GetParameters();
 	}
 	break;
@@ -480,8 +480,7 @@ iBase* csMetaBallLoader::Parse (iDocumentNode* node,
 		child, "Can't find factory '%s'!", factname);
 	    return NULL;
 	  }
-	  mesh = csPtr<iMeshObject> (
-	  	fact->GetMeshObjectFactory ()->NewInstance ());
+	  mesh = fact->GetMeshObjectFactory ()->NewInstance ();
           ballstate = SCF_QUERY_INTERFACE (mesh, iMetaBallState);
 	  mp = ballstate->GetParameters();
 	}

@@ -516,8 +516,7 @@ iBase* csBallLoader::Parse (iDocumentNode* node,
 		child, "Couldn't find factory '%s'!", factname);
 	    return NULL;
 	  }
-	  mesh = csPtr<iMeshObject> (
-	  	fact->GetMeshObjectFactory ()->NewInstance ());
+	  mesh = fact->GetMeshObjectFactory ()->NewInstance ();
           ballstate = SCF_QUERY_INTERFACE (mesh, iBallState);
 	}
 	break;

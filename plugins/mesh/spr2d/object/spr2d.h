@@ -317,7 +317,7 @@ public:
   //------------------------ iMeshObjectFactory implementation --------------
   SCF_DECLARE_IBASE;
 
-  virtual iMeshObject* NewInstance ();
+  virtual csPtr<iMeshObject> NewInstance ();
   virtual void HardTransform (const csReversibleTransform&) { }
   virtual bool SupportsHardTransform () const { return false; }
   virtual void SetLogicalParent (iBase* lp) { logparent = lp; }
@@ -367,7 +367,7 @@ public:
   /// Destructor.
   virtual ~csSprite2DMeshObjectType ();
   /// New Factory.
-  virtual iMeshObjectFactory* NewFactory ();
+  virtual csPtr<iMeshObjectFactory> NewFactory ();
 
   struct eiComponent : public iComponent
   {

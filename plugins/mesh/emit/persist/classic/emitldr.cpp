@@ -780,8 +780,7 @@ iBase* csEmitLoader::Parse (iDocumentNode* node,
 		child, "Cannot find factory '%s' for emit!", factname);
 	    return NULL;
 	  }
-	  mesh = csPtr<iMeshObject> (
-	  	fact->GetMeshObjectFactory ()->NewInstance ());
+	  mesh = fact->GetMeshObjectFactory ()->NewInstance ();
           partstate = SCF_QUERY_INTERFACE (mesh, iParticleState);
           emitstate = SCF_QUERY_INTERFACE (mesh, iEmitState);
 	  emitfactorystate = SCF_QUERY_INTERFACE (

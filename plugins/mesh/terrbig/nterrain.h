@@ -492,7 +492,7 @@ public:
 
   SCF_DECLARE_IBASE;
 
-  virtual iMeshObject* NewInstance ();
+  virtual csPtr<iMeshObject> NewInstance ();
 
   virtual void HardTransform (const csReversibleTransform&) { }
   virtual bool SupportsHardTransform () const { return false; }
@@ -516,7 +516,7 @@ public:
   /// Destructor
   virtual ~csBigTerrainObjectType ();
   /// Create an instance of csBigTerrainObjectFactory
-  virtual iMeshObjectFactory* NewFactory ();
+  virtual csPtr<iMeshObjectFactory> NewFactory ();
   /// Initialize
   bool Initialize (iObjectRegistry* oreg)
   {

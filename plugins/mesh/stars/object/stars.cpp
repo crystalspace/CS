@@ -287,12 +287,12 @@ csStarsMeshObjectFactory::~csStarsMeshObjectFactory ()
 {
 }
 
-iMeshObject* csStarsMeshObjectFactory::NewInstance ()
+csPtr<iMeshObject> csStarsMeshObjectFactory::NewInstance ()
 {
   csStarsMeshObject* cm = new csStarsMeshObject ((iMeshObjectFactory*)this);
   iMeshObject* im = SCF_QUERY_INTERFACE (cm, iMeshObject);
   im->DecRef ();
-  return im;
+  return csPtr<iMeshObject> (im);
 }
 
 //----------------------------------------------------------------------
@@ -323,10 +323,11 @@ csStarsMeshObjectType::~csStarsMeshObjectType ()
 {
 }
 
-iMeshObjectFactory* csStarsMeshObjectType::NewFactory ()
+csPtr<iMeshObjectFactory> csStarsMeshObjectType::NewFactory ()
 {
   csStarsMeshObjectFactory* cm = new csStarsMeshObjectFactory (this);
   iMeshObjectFactory* ifact = SCF_QUERY_INTERFACE (cm, iMeshObjectFactory);
   ifact->DecRef ();
-  return ifact;
+  return csPtr<iMeshObjectFactory> (ifact);
 }
+

@@ -83,7 +83,7 @@ void BoundingBoxForView(iView *view, csBox2 *box)
 /// Save recording
 void SaveRecording (iVFS* vfs, const char* fName)
 {
-  iFile* cf;
+  csRef<iFile> cf;
   cf = vfs->Open (fName, VFS_FILE_WRITE);
   int32 l = Sys->recording.Length();
   l = convert_endian (l);
@@ -145,13 +145,12 @@ void SaveRecording (iVFS* vfs, const char* fName)
       cf->Write ((char*)&len, 1);
     }
   }
-  cf->DecRef ();
 }
 
 /// Load recording
 void LoadRecording (iVFS* vfs, const char* fName)
 {
-  iFile* cf;
+  csRef<iFile> cf;
   cf = vfs->Open (fName, VFS_FILE_READ);
   if (!cf) return;
   Sys->recording.DeleteAll ();
@@ -217,7 +216,6 @@ void LoadRecording (iVFS* vfs, const char* fName)
     }
     Sys->recording.Push ((void*)reccam);
   }
-  cf->DecRef ();
 }
 
 /// Save/load camera functions
@@ -312,7 +310,7 @@ void load_meshobj (char *filename, char *templatename, char* txtname)
   }
 
   // read in the model file
-  iDataBuffer *buf = Sys->myVFS->ReadFile (filename);
+  csRef<iDataBuffer> buf (Sys->myVFS->ReadFile (filename));
   if (!buf)
   {
     Sys->Report (CS_REPORTER_SEVERITY_NOTIFY,
@@ -322,7 +320,6 @@ void load_meshobj (char *filename, char *templatename, char* txtname)
 
   iModelData *Model = Sys->ModelConverter->Load (buf->GetUint8 (),
   	buf->GetSize ());
-  buf->DecRef ();
   if (!Model)
   {
     Sys->Report (CS_REPORTER_SEVERITY_NOTIFY,
@@ -346,50 +343,44 @@ void GenerateThing (iObjectIterator * it, iMaterialWrapper* mat,
   it->Reset();
   while(!it->IsFinished())
   {
-    iModelDataObject* mdo = SCF_QUERY_INTERFACE(it->GetObject(),
-		                    iModelDataObject);
+    csRef<iModelDataObject> mdo (SCF_QUERY_INTERFACE(it->GetObject(),
+		                    iModelDataObject));
     if(!mdo)
     {
       it->Next();
       continue;
     }
     iMeshObjectType* thingType = Sys->Engine->GetThingType();
-    iMeshObjectFactory* thingFactory = thingType->NewFactory();
-    iThingState* thingState = SCF_QUERY_INTERFACE(thingFactory, iThingState);
+    csRef<iMeshObjectFactory> thingFactory (thingType->NewFactory());
+    csRef<iThingState> thingState (
+    	SCF_QUERY_INTERFACE(thingFactory, iThingState));
     if(!thingState)
     {
       Sys->Report(CS_REPORTER_SEVERITY_NOTIFY,
 		  "Can't get iThingState Interface!");
-      thingFactory->DecRef();
       return;
     }
     if(!Sys->CrossBuilder->BuildThing(mdo,thingState,mat))
     {
       Sys->Report(CS_REPORTER_SEVERITY_NOTIFY,"Can't Build Thing!");
-      thingFactory->DecRef();
-      thingState->DecRef();
       return;
     }
-    mdo->DecRef();
     //Now we have loaded the thing, let's do the mesh
-    iMeshObject* thingObj = SCF_QUERY_INTERFACE(thingFactory,iMeshObject);
+    csRef<iMeshObject> thingObj (
+    	SCF_QUERY_INTERFACE(thingFactory,iMeshObject));
     if(!thingObj)
     {
       Sys->Report(CS_REPORTER_SEVERITY_NOTIFY,"Can't Get iMeshObj Interface!");
-      thingFactory->DecRef();
       return;
     }
-    thingFactory->DecRef();
-    iMeshWrapper* thingWrapper = Sys->Engine->CreateMeshWrapper(
-    	thingObj,spriteName);
+    csRef<iMeshWrapper> thingWrapper (Sys->Engine->CreateMeshWrapper(
+    	thingObj,spriteName));
 
     if(!thingWrapper)
     {
       Sys->Report(CS_REPORTER_SEVERITY_NOTIFY,"Can't Get iMeshObj Interface!");
-      thingObj->DecRef();
       return;
     }
-    thingObj->DecRef();
     csMatrix3 m; m.Identity(); m = m*(1./size);
     csReversibleTransform t = csReversibleTransform(m,csVector3(0,0,0));
     csReversibleTransform t2;
@@ -399,8 +390,6 @@ void GenerateThing (iObjectIterator * it, iMaterialWrapper* mat,
     thingWrapper->GetMovable()->SetSector(sector);
     thingWrapper->GetMovable()->UpdateMove();
     thingWrapper->DeferUpdateLighting (CS_NLIGHT_STATIC|CS_NLIGHT_DYNAMIC, 10);
-    thingWrapper->DecRef();
-    thingState->DecRef();
 
     it->Next();
   }
@@ -428,7 +417,7 @@ void load_thing (iSector* sector, csVector3 position,
 	            for thing creation in memory!!",defaultMat);
     return;
   }
-  iDataBuffer *buffer = Sys->myVFS->ReadFile(fileName);
+  csRef<iDataBuffer> buffer (Sys->myVFS->ReadFile(fileName));
   if(!buffer)
   {
     Sys->Report(CS_REPORTER_SEVERITY_NOTIFY,"There was an error loading \
@@ -438,7 +427,6 @@ void load_thing (iSector* sector, csVector3 position,
 
   iModelData *Model = Sys->ModelConverter->Load (buffer->GetUint8(),
   	buffer->GetSize());
-  buffer->DecRef();
   if(!Model)
   {
     Sys->Report(CS_REPORTER_SEVERITY_NOTIFY,
@@ -464,11 +452,10 @@ iMeshWrapper* GenerateSprite(const char* tname, char* sname, iSector* where,
     	"Unknown mesh factory '%s'!", tname);
     return NULL;
   }
-  iMeshWrapper* spr = Sys->Engine->CreateMeshWrapper (tmpl, sname);
+  csRef<iMeshWrapper> spr (Sys->Engine->CreateMeshWrapper (tmpl, sname));
   spr->GetMovable()->SetPosition(where, pos);
   spr->GetMovable ()->UpdateMove ();
   spr->DeferUpdateLighting (CS_NLIGHT_STATIC|CS_NLIGHT_DYNAMIC, 10);
-  spr->DecRef (); // its now held by a ref inside the engine
   return spr;
 }
 
@@ -484,13 +471,13 @@ iMeshWrapper* add_meshobj (const char* tname, char* sname, iSector* where,
     	"Unknown mesh factory '%s'!", tname);
     return NULL;
   }
-  iMeshWrapper* spr = Sys->Engine->CreateMeshWrapper (tmpl, sname, where, pos);
+  csRef<iMeshWrapper> spr (
+  	Sys->Engine->CreateMeshWrapper (tmpl, sname, where, pos));
   csMatrix3 m; m.Identity (); m = m * size;
   spr->GetMovable ()->SetTransform (m);
   spr->GetMovable ()->UpdateMove ();
 
   spr->DeferUpdateLighting (CS_NLIGHT_STATIC|CS_NLIGHT_DYNAMIC, 10);
-  spr->DecRef (); // its now held by a ref inside the engine
   return spr;
 }
 
@@ -523,7 +510,7 @@ void list_meshes (void)
 
 void SetConfigOption (iBase* plugin, const char* optName, const char* optValue)
 {
-  iConfig* config = SCF_QUERY_INTERFACE (plugin, iConfig);
+  csRef<iConfig> config (SCF_QUERY_INTERFACE (plugin, iConfig));
   if (!config)
     Sys->Report (CS_REPORTER_SEVERITY_NOTIFY,
     	"No config interface for this plugin.");
@@ -569,15 +556,15 @@ void SetConfigOption (iBase* plugin, const char* optName, const char* optValue)
 	return;
       }
     }
-    config->DecRef ();
   }
 }
 
 void SetConfigOption (iBase* plugin, const char* optName, csVariant& optValue)
 {
-  iConfig* config = SCF_QUERY_INTERFACE (plugin, iConfig);
+  csRef<iConfig> config (SCF_QUERY_INTERFACE (plugin, iConfig));
   if (!config)
-    Sys->Report (CS_REPORTER_SEVERITY_NOTIFY, "No config interface for this plugin.");
+    Sys->Report (CS_REPORTER_SEVERITY_NOTIFY,
+    	"No config interface for this plugin.");
   else
   {
     int i;
@@ -586,19 +573,20 @@ void SetConfigOption (iBase* plugin, const char* optName, csVariant& optValue)
       csOptionDescription odesc;
       if (!config->GetOptionDescription (i, &odesc)) break;
       if (strcmp (odesc.name, optName) == 0)
+      {
 	config->SetOption (i, &optValue);
-	config->DecRef ();
 	return;
+      }
     }
-    config->DecRef ();
   }
 }
 
 bool GetConfigOption (iBase* plugin, const char* optName, csVariant& optValue)
 {
-  iConfig* config = SCF_QUERY_INTERFACE (plugin, iConfig);
+  csRef<iConfig> config (SCF_QUERY_INTERFACE (plugin, iConfig));
   if (!config)
-    Sys->Report (CS_REPORTER_SEVERITY_NOTIFY, "No config interface for this plugin.");
+    Sys->Report (CS_REPORTER_SEVERITY_NOTIFY,
+    	"No config interface for this plugin.");
   else
   {
     int i;
@@ -609,11 +597,9 @@ bool GetConfigOption (iBase* plugin, const char* optName, csVariant& optValue)
       if (strcmp (odesc.name, optName) == 0)
       {
 	config->GetOption (i, &optValue);
-	config->DecRef ();
 	return true;
       }
     }
-    config->DecRef ();
   }
   return false;
 }
@@ -628,7 +614,8 @@ char* LookForKeyValue (iObjectIterator* it,const char* key)
   it->Reset();
   while(!it->IsFinished())
   {
-    iKeyValuePair *kp = SCF_QUERY_INTERFACE(it->GetObject(),iKeyValuePair);
+    csRef<iKeyValuePair> kp (
+    	SCF_QUERY_INTERFACE(it->GetObject(),iKeyValuePair));
     if(!kp)
     {
       it->Next();
@@ -637,10 +624,8 @@ char* LookForKeyValue (iObjectIterator* it,const char* key)
     if(!strcmp(key,kp->GetKey()))
     {
       strcpy(value ,kp->GetValue());
-      kp->DecRef();
       return value;
     }
-    kp->DecRef();
     it->Next();
   }
   delete[] value;
@@ -735,7 +720,7 @@ void RegisterMaterials(iObjectIterator* it,iEngine* Engine,
   //used to check if a material is already registered
   char * matName;
   char * textFileName;
-  iKeyValuePair* kp;
+  csRef<iKeyValuePair> kp;
   it->Reset();
 
   while(!it->IsFinished())
@@ -749,7 +734,6 @@ void RegisterMaterials(iObjectIterator* it,iEngine* Engine,
     if(strcmp("defmaterial",kp->GetKey()))
     {
       it->Next();
-      kp->DecRef();
       continue;
     }
     matName = LookForMaterialName(kp->GetValue());
@@ -759,7 +743,6 @@ void RegisterMaterials(iObjectIterator* it,iEngine* Engine,
     {
       //Is registered, let's go to another material
       it->Next();
-      kp->DecRef();
       delete [] matName;
     }
     else
@@ -772,7 +755,6 @@ void RegisterMaterials(iObjectIterator* it,iEngine* Engine,
       }
       //Material registered, let's go to another one
       it->Next();
-      kp->DecRef();
       delete [] matName;
       delete [] textFileName;
     }
@@ -792,10 +774,10 @@ void BuildFactory(iObjectIterator* it, char* factoryName, iEngine* Engine)
 
   load_meshobj(modelFilename,factoryName,materialName);
 
-  iSprite3DFactoryState* state = SCF_QUERY_INTERFACE(
+  csRef<iSprite3DFactoryState> state (SCF_QUERY_INTERFACE(
 	  Engine->GetMeshFactories()->FindByName(factoryName)\
 	  ->GetMeshObjectFactory(),
-	  iSprite3DFactoryState);
+	  iSprite3DFactoryState));
 
   iMeshFactoryWrapper* factWrapper =
 	                   Engine->GetMeshFactories()->FindByName(factoryName);
@@ -803,7 +785,6 @@ void BuildFactory(iObjectIterator* it, char* factoryName, iEngine* Engine)
   csMatrix3 m; m.Identity(); m = m*(1.0/scaleFactor);
   csReversibleTransform t = csReversibleTransform(m,csVector3(0,0,0));
   factWrapper->HardTransform(t);
-  state->DecRef();
 }
 
 /**
@@ -821,10 +802,9 @@ void BuildSprite(iSector * sector, iObjectIterator* it, csVector3 position)
 
   iMeshWrapper* sprite = GenerateSprite(factName,sprName,sector,position);
 
-  iSprite3DState* state = SCF_QUERY_INTERFACE(sprite->GetMeshObject(),
-                          iSprite3DState);
+  csRef<iSprite3DState> state (SCF_QUERY_INTERFACE(sprite->GetMeshObject(),
+                          iSprite3DState));
   state->SetAction("default");
-  state->DecRef();
 };
 
 
@@ -864,35 +844,33 @@ void BuildObject(iSector * sector,
 
 void WalkTest::ParseKeyNodes(iObject* src)
 {
-  iObjectIterator *it = src->GetIterator();
-  iSector* sector = SCF_QUERY_INTERFACE(src,iSector);
+  csRef<iObjectIterator> it (csPtr<iObjectIterator> (src->GetIterator()));
+  csRef<iSector> sector (SCF_QUERY_INTERFACE(src,iSector));
 
   while(!it->IsFinished())
   {
-    iMapNode* node = SCF_QUERY_INTERFACE(it->GetObject(), iMapNode);
+    csRef<iMapNode> node (SCF_QUERY_INTERFACE(it->GetObject(), iMapNode));
     if(!node)
     {
       it->Next();
       continue;
     }
-    iObjectIterator *it2 = it->GetObject()->GetIterator();
+    csRef<iObjectIterator> it2 (csPtr<iObjectIterator> (
+    	it->GetObject()->GetIterator()));
 
     BuildObject(sector,it2, Engine, node->GetPosition(), myG3D,
 		LevelLoader, object_reg);
-    node->DecRef();
     it->Next();
-    it2->DecRef();
   }
-  it->DecRef ();
-  sector->DecRef ();
 }
 
 void WalkTest::ParseKeyCmds (iObject* src)
 {
-  iObjectIterator *it = src->GetIterator ();
+  csRef<iObjectIterator> it (csPtr<iObjectIterator> (src->GetIterator ()));
   while (!it->IsFinished ())
   {
-    iKeyValuePair* kp = SCF_QUERY_INTERFACE (it->GetObject (), iKeyValuePair);
+    csRef<iKeyValuePair> kp (
+    	SCF_QUERY_INTERFACE (it->GetObject (), iKeyValuePair));
     if (!kp)
     {
       it->Next ();
@@ -900,7 +878,7 @@ void WalkTest::ParseKeyCmds (iObject* src)
     }
     if (!strcmp (kp->GetKey (), "cmd_AnimateSky"))
     {
-      iSector *Sector = SCF_QUERY_INTERFACE (src, iSector);
+      csRef<iSector> Sector (SCF_QUERY_INTERFACE (src, iSector));
       if (Sector)
       {
         char name[100], rot[100];
@@ -909,30 +887,23 @@ void WalkTest::ParseKeyCmds (iObject* src)
         else if (rot[0] == 'y') anim_sky_rot = 1;
         else anim_sky_rot = 2;
         anim_sky = Sector->GetMeshes ()->FindByName (name);
-	Sector->DecRef ();
       }
     }
     else if (!strcmp (kp->GetKey (), "cmd_AnimateDirLight"))
     {
-      iMeshWrapper *wrap = SCF_QUERY_INTERFACE (src, iMeshWrapper);
+      csRef<iMeshWrapper> wrap (SCF_QUERY_INTERFACE (src, iMeshWrapper));
       if (wrap)
-      {
-        anim_dirlight = wrap;
-	wrap->DecRef ();
-      }
+        anim_dirlight = wrap;	// @@@ anim_dirlight should be csRef
     }
     else if (!strcmp (kp->GetKey (), "cmd_AnimateDynLight"))
     {
-      iLight* l = SCF_QUERY_INTERFACE (src, iLight);
+      csRef<iLight> l (SCF_QUERY_INTERFACE (src, iLight));
       if (l)
-      {
-        anim_dynlight = l;
-	l->DecRef ();
-      }
+        anim_dynlight = l;	// @@@ anim_dynlight should be csRef
     }
     else if (!strcmp (kp->GetKey (), "entity_Door"))
     {
-      iMeshWrapper *wrap = SCF_QUERY_INTERFACE (src, iMeshWrapper);
+      csRef<iMeshWrapper> wrap (SCF_QUERY_INTERFACE (src, iMeshWrapper));
       if (wrap)
       {
         csVector3 hinge;
@@ -941,7 +912,6 @@ void WalkTest::ParseKeyCmds (iObject* src)
 	door->SetHinge (hinge);
         src->ObjAdd (door);
 	door->DecRef ();
-	wrap->DecRef ();
       }
     }
     else if (!strcmp (kp->GetKey (), "entity_Rotate"))
@@ -960,11 +930,11 @@ void WalkTest::ParseKeyCmds (iObject* src)
     }
     else if (!strcmp (kp->GetKey (), "entity_WavePortal"))
     {
-      iMeshWrapper* wrap = SCF_QUERY_INTERFACE (src, iMeshWrapper);
+      csRef<iMeshWrapper> wrap (SCF_QUERY_INTERFACE (src, iMeshWrapper));
       if (wrap)
       {
-        iThingState* thing = SCF_QUERY_INTERFACE (
-		wrap->GetMeshObject (), iThingState);
+        csRef<iThingState> thing (SCF_QUERY_INTERFACE (
+		wrap->GetMeshObject (), iThingState));
 	if (thing)
 	{
 	  char polyname[255];
@@ -996,19 +966,17 @@ void WalkTest::ParseKeyCmds (iObject* src)
               anportal->DecRef ();
 	    }
 	  }
-	  thing->DecRef ();
 	}
 	else
 	{
 	  Sys->Report (CS_REPORTER_SEVERITY_WARNING,
 	  	"This mesh object is not a thing!");
 	}
-        wrap->DecRef ();
       }
     }
     else if (!strcmp (kp->GetKey (), "entity_Light"))
     {
-      iMeshWrapper *wrap = SCF_QUERY_INTERFACE (src, iMeshWrapper);
+      csRef<iMeshWrapper> wrap (SCF_QUERY_INTERFACE (src, iMeshWrapper));
       if (wrap)
       {
 	csColor start_col, end_col;
@@ -1044,19 +1012,16 @@ void WalkTest::ParseKeyCmds (iObject* src)
 	    lobj->DecRef ();
 	  }
 	}
-	wrap->DecRef ();
       }
     }
     else
     {
       // Unknown command. Ignore for the moment.
     }
-    kp->DecRef ();
     it->Next ();
   }
-  it->DecRef ();
 
-  iMeshWrapper *mesh = SCF_QUERY_INTERFACE (src, iMeshWrapper);
+  csRef<iMeshWrapper> mesh (SCF_QUERY_INTERFACE (src, iMeshWrapper));
   if (mesh)
   {
     int k;
@@ -1066,7 +1031,6 @@ void WalkTest::ParseKeyCmds (iObject* src)
       iMeshWrapper* spr = ml->Get (k);
       ParseKeyCmds (spr->QueryObject ());
     }
-    mesh->DecRef ();
   }
 
 }
@@ -1097,19 +1061,15 @@ void WalkTest::ParseKeyCmds ()
 
 void WalkTest::ActivateObject (iObject* src)
 {
-  iObjectIterator *it = src->GetIterator ();
+  csRef<iObjectIterator> it (csPtr<iObjectIterator> (src->GetIterator ()));
   while (!it->IsFinished ())
   {
-    csWalkEntity* wentity = SCF_QUERY_INTERFACE (it->GetObject (),
-    	csWalkEntity);
+    csRef<csWalkEntity> wentity (SCF_QUERY_INTERFACE (it->GetObject (),
+    	csWalkEntity));
     if (wentity)
-    {
       wentity->Activate ();
-      wentity->DecRef ();
-    }
     it->Next ();
   }
-  it->DecRef ();
 }
 
 //===========================================================================
@@ -1203,10 +1163,9 @@ bool CommandHandler (const char *cmd, const char *arg)
     for (i = 0 ; i < num ; i++)
     {
       iBase* plugin = Sys->plugin_mgr->GetPlugin (i);
-      iFactory* fact = SCF_QUERY_INTERFACE (plugin, iFactory);
+      csRef<iFactory> fact (SCF_QUERY_INTERFACE (plugin, iFactory));
       Sys->Report (CS_REPORTER_SEVERITY_NOTIFY,
       	"%d: %s", i, fact->QueryDescription ());
-      fact->DecRef ();
     }
   }
   else if (!strcasecmp (cmd, "conflist"))
@@ -1221,7 +1180,7 @@ bool CommandHandler (const char *cmd, const char *arg)
       else
       {
         iBase* plugin = Sys->plugin_mgr->GetPlugin (idx);
-        iConfig* config = SCF_QUERY_INTERFACE (plugin, iConfig);
+        csRef<iConfig> config (SCF_QUERY_INTERFACE (plugin, iConfig));
 	if (!config)
 	  Sys->Report (CS_REPORTER_SEVERITY_NOTIFY,
 	  	"No config interface for this plugin.");
@@ -1258,7 +1217,6 @@ bool CommandHandler (const char *cmd, const char *arg)
 		break;
 	    }
           }
-	  config->DecRef ();
 	}
       }
     }
@@ -2218,9 +2176,9 @@ bool CommandHandler (const char *cmd, const char *arg)
       iMeshWrapper *wrap = Sys->Engine->GetMeshes ()->FindByName (name);
       if (wrap)
       {
-	iSprite3DFactoryState* fstate = SCF_QUERY_INTERFACE (
+	csRef<iSprite3DFactoryState> fstate (SCF_QUERY_INTERFACE (
 		wrap->GetMeshObject ()->GetFactory (),
-		iSprite3DFactoryState);
+		iSprite3DFactoryState));
 	iSpriteAction* aspr_act;
 	int i;
 
@@ -2230,7 +2188,6 @@ bool CommandHandler (const char *cmd, const char *arg)
 	  Sys->Report (CS_REPORTER_SEVERITY_NOTIFY,
 	  	"%s", aspr_act->GetName ());
 	}
-	fstate->DecRef ();
       }
       else
       {
@@ -2262,8 +2219,9 @@ bool CommandHandler (const char *cmd, const char *arg)
         Sys->Report (CS_REPORTER_SEVERITY_NOTIFY, "No such mesh!");
       else
       {
-        iSprite3DState* state = SCF_QUERY_INTERFACE (wrap->GetMeshObject (),
-		iSprite3DState);
+        csRef<iSprite3DState> state (
+		SCF_QUERY_INTERFACE (wrap->GetMeshObject (),
+		iSprite3DState));
         if (state)
         {
           // Test to see if the action exists for that sprite.
@@ -2274,7 +2232,6 @@ bool CommandHandler (const char *cmd, const char *arg)
 	    Sys->Report (CS_REPORTER_SEVERITY_NOTIFY,
 		   "That mesh does not have that action.");
 	  }
-	  state->DecRef ();
         }
         else
           Sys->Report (CS_REPORTER_SEVERITY_NOTIFY, "Mesh is not a 3D sprite!");
@@ -2302,33 +2259,39 @@ bool CommandHandler (const char *cmd, const char *arg)
         Sys->Report (CS_REPORTER_SEVERITY_NOTIFY, "No such mesh!");
       else
       {
-	iSprite3DState* state = SCF_QUERY_INTERFACE (wrap->GetMeshObject (),
-		iSprite3DState);
+	csRef<iSprite3DState> state (
+		SCF_QUERY_INTERFACE (wrap->GetMeshObject (),
+		iSprite3DState));
         if (state)
         {
-	  iSkeletonBone *sb=SCF_QUERY_INTERFACE(state->GetSkeletonState(),
-	  	iSkeletonBone);
+	  csRef<iSkeletonBone> sb (
+	  	SCF_QUERY_INTERFACE(state->GetSkeletonState(), iSkeletonBone));
 	  if (sb)
 	  {
 	    if (Sys->myMotionMan)
 	    {
-              iMotionController* mc=Sys->myMotionMan->FindControllerBySkeleton(sb);
-              if(!mc) {
+              iMotionController* mc=Sys->myMotionMan->
+	      	FindControllerBySkeleton(sb);
+              if(!mc)
+	      {
                 mc=Sys->myMotionMan->AddController(sb);
               }
               iMotionTemplate* mt=Sys->myMotionMan->FindMotionByName(motion);
-	      if (mt) {
+	      if (mt)
+	      {
                 mc->SetMotion(mt);
-              } else
-	        Sys->Report (CS_REPORTER_SEVERITY_NOTIFY, "That motion does not exist!");
+              }
+	      else
+	        Sys->Report (CS_REPORTER_SEVERITY_NOTIFY,
+			"That motion does not exist!");
 	    }
 	    else
-	      Sys->Report (CS_REPORTER_SEVERITY_NOTIFY, "No motion manager exists to animate the skeleton!");
-	    sb->DecRef ();
+	      Sys->Report (CS_REPORTER_SEVERITY_NOTIFY,
+	      	"No motion manager exists to animate the skeleton!");
 	  }
 	  else
-	    Sys->Report (CS_REPORTER_SEVERITY_NOTIFY, "That sprite does not contain a skeleton!");
-	  state->DecRef ();
+	    Sys->Report (CS_REPORTER_SEVERITY_NOTIFY,
+	    	"That sprite does not contain a skeleton!");
         }
 	else
 	{
@@ -2467,13 +2430,11 @@ bool CommandHandler (const char *cmd, const char *arg)
   {
     if (Sys->mySound)
     {
-      iSoundWrapper *sb = CS_GET_NAMED_CHILD_OBJECT (Sys->view->GetEngine ()->
-        QueryObject (), iSoundWrapper, arg);
+      csRef<iSoundWrapper> sb (
+        CS_GET_NAMED_CHILD_OBJECT (Sys->view->GetEngine ()->
+        QueryObject (), iSoundWrapper, arg));
       if (sb)
-      {
         sb->GetSound ()->Play();
-	sb->DecRef ();
-      }
       else
         Sys->Report (CS_REPORTER_SEVERITY_NOTIFY,
 		"Sound '%s' not found!", arg);

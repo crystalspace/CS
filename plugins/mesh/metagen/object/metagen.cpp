@@ -741,10 +741,11 @@ csMetaGenType::~csMetaGenType()
 {
 }
 
-iMeshObjectFactory* csMetaGenType::NewFactory()
+csPtr<iMeshObjectFactory> csMetaGenType::NewFactory()
 {
   csMetaGen* cm = new csMetaGen(this);
   iMeshObjectFactory* ifact = SCF_QUERY_INTERFACE(cm, iMeshObjectFactory);
   ifact->DecRef();
-  return ifact;
+  return csPtr<iMeshObjectFactory> (ifact);
 }
+

@@ -185,13 +185,13 @@ csExploMeshObjectFactory::~csExploMeshObjectFactory ()
 {
 }
 
-iMeshObject* csExploMeshObjectFactory::NewInstance ()
+csPtr<iMeshObject> csExploMeshObjectFactory::NewInstance ()
 {
   csExploMeshObject* cm =
     new csExploMeshObject (object_reg, (iMeshObjectFactory*)this);
   iMeshObject* im = SCF_QUERY_INTERFACE (cm, iMeshObject);
   im->DecRef ();
-  return im;
+  return csPtr<iMeshObject> (im);
 }
 
 //----------------------------------------------------------------------
@@ -223,11 +223,12 @@ csExploMeshObjectType::~csExploMeshObjectType ()
 {
 }
 
-iMeshObjectFactory* csExploMeshObjectType::NewFactory ()
+csPtr<iMeshObjectFactory> csExploMeshObjectType::NewFactory ()
 {
   csExploMeshObjectFactory* cm = new csExploMeshObjectFactory (this,
   	object_reg);
   iMeshObjectFactory* ifact = SCF_QUERY_INTERFACE (cm, iMeshObjectFactory);
   ifact->DecRef ();
-  return ifact;
+  return csPtr<iMeshObjectFactory> (ifact);
 }
+

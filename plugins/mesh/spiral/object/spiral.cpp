@@ -152,13 +152,13 @@ csSpiralMeshObjectFactory::~csSpiralMeshObjectFactory ()
 {
 }
 
-iMeshObject* csSpiralMeshObjectFactory::NewInstance ()
+csPtr<iMeshObject> csSpiralMeshObjectFactory::NewInstance ()
 {
   csSpiralMeshObject* cm =
     new csSpiralMeshObject (object_reg, (iMeshObjectFactory*)this);
   iMeshObject* im = SCF_QUERY_INTERFACE (cm, iMeshObject);
   im->DecRef ();
-  return im;
+  return csPtr<iMeshObject> (im);
 }
 
 //----------------------------------------------------------------------
@@ -189,11 +189,12 @@ csSpiralMeshObjectType::~csSpiralMeshObjectType ()
 {
 }
 
-iMeshObjectFactory* csSpiralMeshObjectType::NewFactory ()
+csPtr<iMeshObjectFactory> csSpiralMeshObjectType::NewFactory ()
 {
   csSpiralMeshObjectFactory* cm = new csSpiralMeshObjectFactory (this,
   	object_reg);
   iMeshObjectFactory* ifact = SCF_QUERY_INTERFACE (cm, iMeshObjectFactory);
   ifact->DecRef ();
-  return ifact;
+  return csPtr<iMeshObjectFactory> (ifact);
 }
+

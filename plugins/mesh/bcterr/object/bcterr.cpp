@@ -2397,8 +2397,7 @@ void csBCTerrObjectFactory::AddLOD (float distance, int inc)
  * Creates a new Bezier Curve Terrain Object if: UV & Distances are defined;
  * Also is responsable for setting iniitialized & creating shared meshes
  */
-
-iMeshObject* csBCTerrObjectFactory::NewInstance ()
+csPtr<iMeshObject> csBCTerrObjectFactory::NewInstance ()
 {
   if ( (LOD_Levels > 0) && (LOD_Distance && LOD_UV) && (default_mat) )
   {
@@ -2409,7 +2408,7 @@ iMeshObject* csBCTerrObjectFactory::NewInstance ()
       float longest;
       int coverage;
       if (blocksize.x > blocksize.y) longest = blocksize.x; else longest = blocksize.y;
-      if (longest <= 0) return NULL;
+      if (longest <= 0) return csPtr<iMeshObject> (NULL);
       longest = longest * longest;
       Shared_Meshes = new csSharedLODMesh*[LOD_Levels];
       LOD_Mesh_Numbers = new int[LOD_Levels];
@@ -2445,10 +2444,11 @@ iMeshObject* csBCTerrObjectFactory::NewInstance ()
 
     csBCTerrObject* pTerrObj = new csBCTerrObject (object_reg, this);
     AddTerrObject (pTerrObj);
-    return (iMeshObject*)pTerrObj;
-  } else
+    return csPtr<iMeshObject> (pTerrObj);
+  }
+  else
   {
-    return NULL;
+    return csPtr<iMeshObject> (NULL);
   }
 }
 
@@ -2556,8 +2556,9 @@ csBCTerrObjectType::~csBCTerrObjectType ()
 {
 }
 
-iMeshObjectFactory* csBCTerrObjectType::NewFactory()
+csPtr<iMeshObjectFactory> csBCTerrObjectType::NewFactory()
 {
   csBCTerrObjectFactory *pFactory = new csBCTerrObjectFactory (object_reg);
-  return (iMeshObjectFactory*)pFactory;
+  return csPtr<iMeshObjectFactory> (pFactory);
 }
+

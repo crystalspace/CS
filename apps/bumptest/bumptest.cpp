@@ -153,13 +153,13 @@ bool BumpTest::InitProcDemo ()
     return false;
   }
 
-  iMeshObjectFactory* thing_fact = thing_type->NewFactory ();
+  csRef<iMeshObjectFactory> thing_fact (thing_type->NewFactory ());
   thing_type->DecRef ();
-  iMeshObject* thing_obj = SCF_QUERY_INTERFACE (thing_fact, iMeshObject);
-  thing_fact->DecRef ();
+  csRef<iMeshObject> thing_obj (SCF_QUERY_INTERFACE (thing_fact, iMeshObject));
 
-  iMaterialWrapper* imatBump = SCF_QUERY_INTERFACE (matBump, iMaterialWrapper);
-  iThingState* thing_state = SCF_QUERY_INTERFACE (thing_obj, iThingState);
+  csRef<iMaterialWrapper> imatBump (
+  	SCF_QUERY_INTERFACE (matBump, iMaterialWrapper));
+  csRef<iThingState> thing_state (SCF_QUERY_INTERFACE (thing_obj, iThingState));
   float dx = 1, dy = 1, dz = 1;
   iPolygon3D* p;
 
@@ -224,17 +224,13 @@ bool BumpTest::InitProcDemo ()
   thing_wrap->HardTransform (csTransform (csMatrix3 (), csVector3 (0, 5, 1)));
   thing_wrap->GetMovable ()->SetSector (room);
   thing_wrap->GetMovable ()->UpdateMove ();
-  thing_state->DecRef ();
 
   iLightingInfo* linfo = SCF_QUERY_INTERFACE (thing_obj, iLightingInfo);
   linfo->InitializeDefault ();
   room->ShineLights (thing_wrap);
   linfo->PrepareLighting ();
   linfo->DecRef ();
-  thing_obj->DecRef ();
   thing_wrap->DecRef ();
-
-  imatBump->DecRef ();
 
 
 #if 0

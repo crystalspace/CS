@@ -109,9 +109,9 @@ void csParticleSystem::RemoveParticles ()
 void csParticleSystem::AppendRectSprite (float width, float height,
   iMaterialWrapper *mat, bool lighted)
 {
-  iMeshObject* sprmesh = spr_factory->NewInstance ();
-  iParticle* part = SCF_QUERY_INTERFACE (sprmesh, iParticle);
-  iSprite2DState* state = SCF_QUERY_INTERFACE (sprmesh, iSprite2DState);
+  csRef<iMeshObject> sprmesh (spr_factory->NewInstance ());
+  csRef<iParticle> part (SCF_QUERY_INTERFACE (sprmesh, iParticle));
+  csRef<iSprite2DState> state (SCF_QUERY_INTERFACE (sprmesh, iSprite2DState));
   csColoredVertices& vs = state->GetVertices();
 
   vs.SetLimit (4);
@@ -128,9 +128,6 @@ void csParticleSystem::AppendRectSprite (float width, float height,
   part->SetColor (csColor (1.0, 1.0, 1.0));
   state->SetMaterialWrapper (mat);
   AppendParticle (part);
-  part->DecRef ();
-  state->DecRef ();
-  sprmesh->DecRef ();
   shapenr++;
 }
 
@@ -138,9 +135,9 @@ void csParticleSystem::AppendRectSprite (float width, float height,
 void csParticleSystem::AppendRegularSprite (int n, float radius,
   iMaterialWrapper* mat, bool lighted)
 {
-  iMeshObject* sprmesh = spr_factory->NewInstance ();
-  iParticle* part = SCF_QUERY_INTERFACE (sprmesh, iParticle);
-  iSprite2DState* state = SCF_QUERY_INTERFACE (sprmesh, iSprite2DState);
+  csRef<iMeshObject> sprmesh (spr_factory->NewInstance ());
+  csRef<iParticle> part (SCF_QUERY_INTERFACE (sprmesh, iParticle));
+  csRef<iSprite2DState> state (SCF_QUERY_INTERFACE (sprmesh, iSprite2DState));
   state->CreateRegularVertices (n, true);
   part->ScaleBy (radius);
   if (mat) state->SetMaterialWrapper (mat);
@@ -148,9 +145,6 @@ void csParticleSystem::AppendRegularSprite (int n, float radius,
   part->SetColor (csColor (1.0, 1.0, 1.0));
 
   AppendParticle (part);
-  part->DecRef ();
-  sprmesh->DecRef ();
-  state->DecRef ();
   shapenr++;
 }
 

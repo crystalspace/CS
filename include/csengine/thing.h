@@ -1286,7 +1286,7 @@ public:
   struct MeshObjectFactory : public iMeshObjectFactory
   {
     SCF_DECLARE_EMBEDDED_IBASE (csThing);
-    virtual iMeshObject* NewInstance ();
+    virtual csPtr<iMeshObject> NewInstance ();
     virtual void HardTransform (const csReversibleTransform& t)
     {
       scfParent->HardTransform (t);
@@ -1334,7 +1334,7 @@ public:
   virtual bool Initialize (iObjectRegistry *object_reg);
 
   /// New Factory.
-  virtual iMeshObjectFactory* NewFactory ();
+  virtual csPtr<iMeshObjectFactory> NewFactory ();
 
   iPolyTxtPlane* CreatePolyTxtPlane (const char* name = NULL);
   iPolyTxtPlane* FindPolyTxtPlane (const char* name);

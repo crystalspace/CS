@@ -554,13 +554,13 @@ csMetaBallFactory::~csMetaBallFactory()
 {
 }
 
-iMeshObject* csMetaBallFactory::NewInstance()
+csPtr<iMeshObject> csMetaBallFactory::NewInstance()
 {
   csMetaBall* cm = new csMetaBall((iMeshObjectFactory *) this);
   cm->Initialize(object_reg);
   iMeshObject* im = SCF_QUERY_INTERFACE( cm, iMeshObject );
   im->DecRef();
-  return im;
+  return csPtr<iMeshObject> (im);
 }
 
 SCF_IMPLEMENT_IBASE (csMetaBallType)
@@ -589,10 +589,11 @@ csMetaBallType::~csMetaBallType()
 {
 }
 
-iMeshObjectFactory* csMetaBallType::NewFactory()
+csPtr<iMeshObjectFactory> csMetaBallType::NewFactory()
 {
   csMetaBallFactory* cm = new csMetaBallFactory(this, object_reg);
   iMeshObjectFactory* ifact = SCF_QUERY_INTERFACE(cm, iMeshObjectFactory);
   ifact->DecRef();
-  return ifact;
+  return csPtr<iMeshObjectFactory> (ifact);
 }
+

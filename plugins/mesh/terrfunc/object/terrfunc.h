@@ -714,7 +714,7 @@ public:
 
   SCF_DECLARE_IBASE;
 
-  virtual iMeshObject* NewInstance ();
+  virtual csPtr<iMeshObject> NewInstance ();
 
   virtual void HardTransform (const csReversibleTransform&) { }
   virtual bool SupportsHardTransform () const { return false; }
@@ -740,7 +740,7 @@ public:
   virtual ~csTerrFuncObjectType ();
 
   /// create a new factory.
-  virtual iMeshObjectFactory* NewFactory ();
+  virtual csPtr<iMeshObjectFactory> NewFactory ();
 
   struct eiComponent : public iComponent
   {

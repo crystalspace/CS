@@ -948,12 +948,12 @@ csBallMeshObjectFactory::~csBallMeshObjectFactory ()
 {
 }
 
-iMeshObject* csBallMeshObjectFactory::NewInstance ()
+csPtr<iMeshObject> csBallMeshObjectFactory::NewInstance ()
 {
   csBallMeshObject* cm = new csBallMeshObject ((iMeshObjectFactory*)this);
   iMeshObject* im = SCF_QUERY_INTERFACE (cm, iMeshObject);
   im->DecRef ();
-  return im;
+  return csPtr<iMeshObject> (im);
 }
 
 //----------------------------------------------------------------------
@@ -984,11 +984,12 @@ csBallMeshObjectType::~csBallMeshObjectType ()
 {
 }
 
-iMeshObjectFactory* csBallMeshObjectType::NewFactory ()
+csPtr<iMeshObjectFactory> csBallMeshObjectType::NewFactory ()
 {
   csBallMeshObjectFactory* cm = new csBallMeshObjectFactory (this,
   	object_reg);
   iMeshObjectFactory* ifact = SCF_QUERY_INTERFACE (cm, iMeshObjectFactory);
   ifact->DecRef ();
-  return ifact;
+  return csPtr<iMeshObjectFactory> (ifact);
 }
+

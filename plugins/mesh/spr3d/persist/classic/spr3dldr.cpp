@@ -734,7 +734,7 @@ iBase* csSprite3DFactoryLoader::Parse (iDocumentNode* node,
   // DecRef of fact will be handled later.
   // If there was no factory we create a new one.
   if (!fact)
-    fact = csPtr<iMeshObjectFactory> (type->NewFactory ());
+    fact = type->NewFactory ();
 
   type->DecRef ();
   csRef<iSprite3DFactoryState> spr3dLook (
@@ -1317,8 +1317,7 @@ iBase* csSprite3DLoader::Parse (iDocumentNode* node,
 		child, "Couldn't find factory '%s'!", factname);
 	    return NULL;
 	  }
-	  mesh = csPtr<iMeshObject> (
-	  	fact->GetMeshObjectFactory ()->NewInstance ());
+	  mesh = fact->GetMeshObjectFactory ()->NewInstance ();
           spr3dLook = SCF_QUERY_INTERFACE (mesh, iSprite3DState);
 	}
 	break;

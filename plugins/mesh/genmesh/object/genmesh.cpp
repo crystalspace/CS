@@ -648,12 +648,12 @@ void csGenmeshMeshObjectFactory::Invalidate ()
   polygons = NULL;
 }
 
-iMeshObject* csGenmeshMeshObjectFactory::NewInstance ()
+csPtr<iMeshObject> csGenmeshMeshObjectFactory::NewInstance ()
 {
   csGenmeshMeshObject* cm = new csGenmeshMeshObject (this);
   iMeshObject* im = SCF_QUERY_INTERFACE (cm, iMeshObject);
   im->DecRef ();
-  return im;
+  return csPtr<iMeshObject> (im);
 }
 
 void csGenmeshMeshObjectFactory::eiVertexBufferManagerClient::ManagerClosing ()
@@ -710,12 +710,12 @@ csGenmeshMeshObjectType::~csGenmeshMeshObjectType ()
 {
 }
 
-iMeshObjectFactory* csGenmeshMeshObjectType::NewFactory ()
+csPtr<iMeshObjectFactory> csGenmeshMeshObjectType::NewFactory ()
 {
   csGenmeshMeshObjectFactory* cm = new csGenmeshMeshObjectFactory (this,
   	object_reg);
   iMeshObjectFactory* ifact = SCF_QUERY_INTERFACE (cm, iMeshObjectFactory);
   ifact->DecRef ();
-  return ifact;
+  return csPtr<iMeshObjectFactory> (ifact);
 }
 

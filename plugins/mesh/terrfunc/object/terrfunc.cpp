@@ -2120,10 +2120,10 @@ csTerrFuncObjectFactory::~csTerrFuncObjectFactory ()
 {
 }
 
-iMeshObject* csTerrFuncObjectFactory::NewInstance ()
+csPtr<iMeshObject> csTerrFuncObjectFactory::NewInstance ()
 {
   csTerrFuncObject* pTerrObj = new csTerrFuncObject (object_reg, this);
-  return (iMeshObject*)pTerrObj;
+  return csPtr<iMeshObject> (pTerrObj);
 }
 
 //----------------------------------------------------------------------
@@ -2154,9 +2154,9 @@ csTerrFuncObjectType::~csTerrFuncObjectType ()
 {
 }
 
-iMeshObjectFactory* csTerrFuncObjectType::NewFactory()
+csPtr<iMeshObjectFactory> csTerrFuncObjectType::NewFactory()
 {
   csTerrFuncObjectFactory *pFactory = new csTerrFuncObjectFactory (object_reg);
-  return (iMeshObjectFactory*)pFactory;
+  return csPtr<iMeshObjectFactory> (pFactory);
 }
 

@@ -686,12 +686,12 @@ csSprite2DMeshObjectFactory::~csSprite2DMeshObjectFactory ()
 {
 }
 
-iMeshObject* csSprite2DMeshObjectFactory::NewInstance ()
+csPtr<iMeshObject> csSprite2DMeshObjectFactory::NewInstance ()
 {
   csSprite2DMeshObject* cm = new csSprite2DMeshObject (this);
   iMeshObject* im = SCF_QUERY_INTERFACE (cm, iMeshObject);
   im->DecRef ();
-  return im;
+  return csPtr<iMeshObject> (im);
 }
 
 //----------------------------------------------------------------------
@@ -722,11 +722,11 @@ csSprite2DMeshObjectType::~csSprite2DMeshObjectType ()
 {
 }
 
-iMeshObjectFactory* csSprite2DMeshObjectType::NewFactory ()
+csPtr<iMeshObjectFactory> csSprite2DMeshObjectType::NewFactory ()
 {
   csSprite2DMeshObjectFactory* cm = new csSprite2DMeshObjectFactory (this);
   iMeshObjectFactory* ifact = SCF_QUERY_INTERFACE (cm, iMeshObjectFactory);
   ifact->DecRef ();
-  return ifact;
+  return csPtr<iMeshObjectFactory> (ifact);
 }
 

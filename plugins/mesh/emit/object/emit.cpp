@@ -931,13 +931,13 @@ csEmitMeshObjectFactory::~csEmitMeshObjectFactory ()
 {
 }
 
-iMeshObject* csEmitMeshObjectFactory::NewInstance ()
+csPtr<iMeshObject> csEmitMeshObjectFactory::NewInstance ()
 {
   csEmitMeshObject* cm =
     new csEmitMeshObject (object_reg, (iMeshObjectFactory*)this);
   iMeshObject* im = SCF_QUERY_INTERFACE (cm, iMeshObject);
   im->DecRef ();
-  return im;
+  return csPtr<iMeshObject> (im);
 }
 
 //----------------------------------------------------------------------
@@ -968,10 +968,11 @@ csEmitMeshObjectType::~csEmitMeshObjectType ()
 {
 }
 
-iMeshObjectFactory* csEmitMeshObjectType::NewFactory ()
+csPtr<iMeshObjectFactory> csEmitMeshObjectType::NewFactory ()
 {
   csEmitMeshObjectFactory* cm = new csEmitMeshObjectFactory (this, object_reg);
   iMeshObjectFactory* ifact = SCF_QUERY_INTERFACE (cm, iMeshObjectFactory);
   ifact->DecRef ();
-  return ifact;
+  return csPtr<iMeshObjectFactory> (ifact);
 }
+

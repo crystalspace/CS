@@ -103,13 +103,14 @@ bool TerrBigTool::Convert ()
     abort ();
   }
 
-  iMeshObjectFactory *terrfact = terrtype->NewFactory ();
-  iMeshObject *terrobj = terrfact->NewInstance ();
-  iTerrBigState *terrstate = SCF_QUERY_INTERFACE (terrobj, iTerrBigState);
+  csRef<iMeshObjectFactory> terrfact (terrtype->NewFactory ());
+  terrfact->IncRef ();	// @@@ MEMORY LEAK!!! Investigate.
+  csRef<iMeshObject> terrobj (terrfact->NewInstance ());
+  terrobj->IncRef ();	// @@@ MEMORY LEAK!!!
+  csRef<iTerrBigState> terrstate (SCF_QUERY_INTERFACE (terrobj, iTerrBigState));
 
   terrstate->ConvertImageToMapFile (input, imageio, cmdline->GetName(1));
 
-  terrstate->DecRef();
   terrtype->DecRef();
   plugin_mgr->DecRef();
 

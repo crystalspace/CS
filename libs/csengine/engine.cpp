@@ -2530,13 +2530,12 @@ csPtr<iMeshFactoryWrapper> csEngine::CreateMeshFactory (
   plugin_mgr->DecRef ();
   if (!type) return NULL;
 
-  iMeshObjectFactory *fact = type->NewFactory ();
+  csRef<iMeshObjectFactory> fact (type->NewFactory ());
   if (!fact) return NULL;
 
   // don't pass the name to avoid a second search
   iMeshFactoryWrapper *fwrap = CreateMeshFactory (fact, NULL);
   if (fwrap && name) fwrap->QueryObject ()->SetName (name);
-  fact->DecRef ();
   type->DecRef ();
   return csPtr<iMeshFactoryWrapper> (fwrap);
 }
@@ -2807,29 +2806,25 @@ csPtr<iMeshWrapper> csEngine::CreateMeshWrapper (
   plugin_mgr->DecRef ();
   if (!type) return csPtr<iMeshWrapper> (NULL);
 
-  iMeshObjectFactory *fact = type->NewFactory ();
+  csRef<iMeshObjectFactory> fact (type->NewFactory ());
   type->DecRef ();
   if (!fact) return csPtr<iMeshWrapper> (NULL);
 
-  iMeshObject* mo = SCF_QUERY_INTERFACE (fact, iMeshObject);
+  csRef<iMeshObject> mo (SCF_QUERY_INTERFACE (fact, iMeshObject));
   if (!mo)
   {
     // The factory is not itself a mesh object. Let's see if the
     // factory can return a working mesh object.
     mo = fact->NewInstance ();
-    fact->DecRef ();
     if (mo)
     {
       iMeshWrapper* mw = CreateMeshWrapper (mo, name, sector, pos);
-      mo->DecRef ();
       return csPtr<iMeshWrapper> (mw);
     }
     return csPtr<iMeshWrapper> (NULL);
   }
 
-  fact->DecRef ();
   iMeshWrapper* mw = CreateMeshWrapper (mo, name, sector, pos);
-  mo->DecRef ();
   return csPtr<iMeshWrapper> (mw);
 }
 

@@ -279,13 +279,13 @@ csFireMeshObjectFactory::~csFireMeshObjectFactory ()
 {
 }
 
-iMeshObject* csFireMeshObjectFactory::NewInstance ()
+csPtr<iMeshObject> csFireMeshObjectFactory::NewInstance ()
 {
   csFireMeshObject* cm =
     new csFireMeshObject (object_reg, (iMeshObjectFactory*)this );
   iMeshObject* im = SCF_QUERY_INTERFACE (cm, iMeshObject);
   im->DecRef ();
-  return im;
+  return csPtr<iMeshObject> (im);
 }
 
 //----------------------------------------------------------------------
@@ -316,10 +316,11 @@ csFireMeshObjectType::~csFireMeshObjectType ()
 {
 }
 
-iMeshObjectFactory* csFireMeshObjectType::NewFactory ()
+csPtr<iMeshObjectFactory> csFireMeshObjectType::NewFactory ()
 {
   csFireMeshObjectFactory* cm = new csFireMeshObjectFactory (this, object_reg);
   iMeshObjectFactory* ifact = SCF_QUERY_INTERFACE (cm, iMeshObjectFactory);
   ifact->DecRef ();
-  return ifact;
+  return csPtr<iMeshObjectFactory> (ifact);
 }
+

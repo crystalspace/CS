@@ -566,7 +566,7 @@ public:
   //------------------------ iMeshObjectFactory implementation --------------
   SCF_DECLARE_IBASE;
 
-  virtual iMeshObject* NewInstance ();
+  virtual csPtr<iMeshObject> NewInstance ();
   virtual void HardTransform (const csReversibleTransform& t);
   virtual bool SupportsHardTransform () const { return true; }
   virtual void SetLogicalParent (iBase* lp) { logparent = lp; }
@@ -1669,7 +1669,7 @@ public:
   SCF_DECLARE_IBASE;
 
   /// New Factory.
-  virtual iMeshObjectFactory* NewFactory ();
+  virtual csPtr<iMeshObjectFactory> NewFactory ();
 
   //------------------- iConfig interface implementation -------------------
   struct csSprite3DConfig : public iConfig

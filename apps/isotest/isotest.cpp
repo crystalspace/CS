@@ -439,18 +439,16 @@ bool IsoTest::Initialize (int argc, const char* const argv[],
   cubelook->CalculateNormals ();
   cubelook->DecRef();
 
-  iMeshObject *mesh_obj = mesh_fact->NewInstance();
-  iGeneralMeshState* cubestate =
-    SCF_QUERY_INTERFACE (mesh_obj, iGeneralMeshState);
+  csRef<iMeshObject> mesh_obj (mesh_fact->NewInstance());
+  csRef<iGeneralMeshState> cubestate (
+    SCF_QUERY_INTERFACE (mesh_obj, iGeneralMeshState));
   cubestate->SetMixMode (CS_FX_COPY);
-  cubestate->DecRef ();
 
   /// add a mesh object sprite
   iIsoMeshSprite *meshspr = engine->CreateMeshSprite();
   meshspr->SetMeshObject(mesh_obj);
   meshspr->SetPosition( csVector3(12 + 0.5, +0.5, 2+0.5) );
   world->AddSprite(meshspr);
-  mesh_obj->DecRef ();
   meshspr->DecRef ();
 
   const char* fo_classId = "crystalspace.mesh.object.fountain";
@@ -458,8 +456,8 @@ bool IsoTest::Initialize (int argc, const char* const argv[],
   mesh_fact = mesh_wrap->GetMeshObjectFactory ();
 
   mesh_obj = mesh_fact->NewInstance();
-  iParticleState *pastate = SCF_QUERY_INTERFACE(mesh_obj, iParticleState);
-  iFountainState *fostate = SCF_QUERY_INTERFACE(mesh_obj, iFountainState);
+  csRef<iParticleState> pastate (SCF_QUERY_INTERFACE(mesh_obj, iParticleState));
+  csRef<iFountainState> fostate (SCF_QUERY_INTERFACE(mesh_obj, iFountainState));
   pastate->SetMaterialWrapper(halo);
   pastate->SetMixMode(CS_FX_ADD);
   pastate->SetColor( csColor(0.125, 0.5, 1.0) );
@@ -473,15 +471,12 @@ bool IsoTest::Initialize (int argc, const char* const argv[],
   fostate->SetOpening(0.14);
   fostate->SetSpeed(1.0);
   fostate->SetFallTime(6.0);
-  pastate->DecRef();
-  fostate->DecRef();
 
   meshspr = engine->CreateMeshSprite();
   meshspr->SetMeshObject(mesh_obj);
   meshspr->SetZBufMode(CS_ZBUF_TEST);
   meshspr->SetPosition( csVector3(10, 0, 8) );
   world->AddSprite(meshspr);
-  mesh_obj->DecRef ();
   meshspr->DecRef ();
 
   // create second grid

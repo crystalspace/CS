@@ -199,13 +199,13 @@ csFountainMeshObjectFactory::~csFountainMeshObjectFactory ()
 {
 }
 
-iMeshObject* csFountainMeshObjectFactory::NewInstance ()
+csPtr<iMeshObject> csFountainMeshObjectFactory::NewInstance ()
 {
   csFountainMeshObject* cm =
     new csFountainMeshObject (object_reg, (iMeshObjectFactory*)this);
   iMeshObject* im = SCF_QUERY_INTERFACE (cm, iMeshObject);
   im->DecRef ();
-  return im;
+  return csPtr<iMeshObject> (im);
 }
 
 //----------------------------------------------------------------------
@@ -237,11 +237,12 @@ csFountainMeshObjectType::~csFountainMeshObjectType ()
 {
 }
 
-iMeshObjectFactory* csFountainMeshObjectType::NewFactory ()
+csPtr<iMeshObjectFactory> csFountainMeshObjectType::NewFactory ()
 {
   csFountainMeshObjectFactory* cm =
     new csFountainMeshObjectFactory (this, object_reg);
   iMeshObjectFactory* ifact = SCF_QUERY_INTERFACE (cm, iMeshObjectFactory);
   ifact->DecRef ();
-  return ifact;
+  return csPtr<iMeshObjectFactory> (ifact);
 }
+

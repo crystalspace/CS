@@ -242,7 +242,7 @@ public:
   csMetaBallFactory( iBase *parent, iObjectRegistry* object_reg);
   virtual ~csMetaBallFactory();
   SCF_DECLARE_IBASE;
-  virtual iMeshObject* NewInstance();
+  virtual csPtr<iMeshObject> NewInstance();
   virtual void HardTransform ( const csReversibleTransform & ) {};
   virtual bool SupportsHardTransform() const { return false; }
   virtual void SetLogicalParent (iBase* lp) { logparent = lp; }
@@ -264,7 +264,7 @@ public:
 
   csMetaBallType ( iBase * );
   virtual ~csMetaBallType();
-  virtual iMeshObjectFactory* NewFactory();
+  virtual csPtr<iMeshObjectFactory> NewFactory();
   bool Initialize (iObjectRegistry* object_reg)
   {
     csMetaBallType::object_reg = object_reg;

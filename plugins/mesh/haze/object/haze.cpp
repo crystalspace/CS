@@ -1092,12 +1092,12 @@ csHazeMeshObjectFactory::~csHazeMeshObjectFactory ()
 {
 }
 
-iMeshObject* csHazeMeshObjectFactory::NewInstance ()
+csPtr<iMeshObject> csHazeMeshObjectFactory::NewInstance ()
 {
   csHazeMeshObject* cm = new csHazeMeshObject (this);
   iMeshObject* im = SCF_QUERY_INTERFACE (cm, iMeshObject);
   im->DecRef ();
-  return im;
+  return csPtr<iMeshObject> (im);
 }
 
 //----------------------------------------------------------------------
@@ -1128,11 +1128,11 @@ csHazeMeshObjectType::~csHazeMeshObjectType ()
 {
 }
 
-iMeshObjectFactory* csHazeMeshObjectType::NewFactory ()
+csPtr<iMeshObjectFactory> csHazeMeshObjectType::NewFactory ()
 {
   csHazeMeshObjectFactory* cm = new csHazeMeshObjectFactory (this);
   iMeshObjectFactory* ifact = SCF_QUERY_INTERFACE (cm, iMeshObjectFactory);
   ifact->DecRef ();
-  return ifact;
+  return csPtr<iMeshObjectFactory> (ifact);
 }
 

@@ -7,6 +7,12 @@ The history order is reversed so that new features are at the top.
 	- Fixed cs2xml for UP, FORWARD, and FARPLANE inside START.
 	- Added notification warnings to csloader plugin whenever
 	  it detects that the old format is still used.
+	- Changed iMeshObjectFactory->NewInstance() to return a csPtr.
+	- Changed iMeshObjectType->NewFactory() to return a csPtr.
+	- Fixed a bug in walktest (SetConfigOption) with missing
+	  curly braces.
+	- Eliminated a lot of DecRef()'s in walktest by using
+	  csRef.
 5-Sep-2002
 	- Fixed a very subtle bug in the csRef assignement operators.
 	  It is very important FIRST to assign the new value to the

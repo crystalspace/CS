@@ -938,10 +938,9 @@ void add_bot (float size, iSector* where, csVector3 const& pos,
   }
   iMeshFactoryWrapper* tmpl = Sys->view->GetEngine ()->GetMeshFactories ()->FindByName ("bot");
   if (!tmpl) return;
-  iMeshObject* botmesh = tmpl->GetMeshObjectFactory ()->NewInstance ();
+  csRef<iMeshObject> botmesh (tmpl->GetMeshObjectFactory ()->NewInstance ());
   Bot* bot;
   bot = new Bot (Sys->view->GetEngine(), botmesh);
-  botmesh->DecRef ();
   bot->SetName ("bot");
   Sys->view->GetEngine ()->GetMeshes ()->Add (&(bot->scfiMeshWrapper));
   bot->GetMovable ().SetSector (where);
@@ -1235,13 +1234,11 @@ static iMeshWrapper* CreateMeshWrapper (const char* name)
     	"crystalspace.mesh.object.thing", iMeshObjectType);
   plugin_mgr->DecRef ();
 
-  iMeshObjectFactory* thing_fact = ThingType->NewFactory ();
+  csRef<iMeshObjectFactory> thing_fact (ThingType->NewFactory ());
   ThingType->DecRef ();
-  iMeshObject* mesh_obj = SCF_QUERY_INTERFACE (thing_fact, iMeshObject);
-  thing_fact->DecRef ();
+  csRef<iMeshObject> mesh_obj (SCF_QUERY_INTERFACE (thing_fact, iMeshObject));
 
   iMeshWrapper* mesh_wrap = Sys->Engine->CreateMeshWrapper (mesh_obj, name);
-  mesh_obj->DecRef ();
   return mesh_wrap;
 }
 

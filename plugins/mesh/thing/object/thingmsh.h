@@ -41,7 +41,7 @@ public:
   /// Destructor.
   virtual ~csThingMeshObjectType ();
   /// Draw.
-  virtual iMeshObjectFactory* NewFactory ();
+  virtual csPtr<iMeshObjectFactory> NewFactory ();
   /// Initialize.
   bool Initialize (iObjectRegistry* object_reg)
   {

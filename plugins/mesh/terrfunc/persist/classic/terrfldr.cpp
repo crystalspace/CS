@@ -481,8 +481,7 @@ iBase* csTerrFuncLoader::Parse (iDocumentNode* node,
 		child, "Couldn't find factory '%s'!", factname);
 	    return NULL;
 	  }
-	  mesh = csPtr<iMeshObject> (
-	  	iFactory->GetMeshObjectFactory()->NewInstance());
+	  mesh = iFactory->GetMeshObjectFactory()->NewInstance();
           terrstate = SCF_QUERY_INTERFACE (mesh, iTerrFuncState);
 	}
 	break;

@@ -797,7 +797,7 @@ iBase* csGeneralTreeFactoryLoader::Parse (
   csRef<iMeshObjectFactory> fact;
   csRef<iGeneralFactoryState> state;
 
-  fact = csPtr<iMeshObjectFactory> (type->NewFactory ());
+  fact = type->NewFactory ();
   state = SCF_QUERY_INTERFACE (fact, iGeneralFactoryState);
   type->DecRef ();
 

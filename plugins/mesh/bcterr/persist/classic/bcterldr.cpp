@@ -294,8 +294,7 @@ iBase* csBCTerrFactoryLoader::Parse (iDocumentNode* node,
     }
   }
 
-  csRef<iMeshObjectFactory> pFactory (csPtr<iMeshObjectFactory> (
-  	pType->NewFactory ()));
+  csRef<iMeshObjectFactory> pFactory (pType->NewFactory ());
   pType->DecRef ();
   csRef<iBCTerrFactoryState> iState;
   iState = SCF_QUERY_INTERFACE (pFactory, iBCTerrFactoryState);
@@ -700,8 +699,7 @@ iBase* csBCTerrLoader::Parse (iDocumentNode* node,
 		    child, "Couldn't find factory '%s'!", factname);
             return NULL;
           }
-          iTerrObj = csPtr<iMeshObject> (
-		  iFactory->GetMeshObjectFactory()->NewInstance());
+          iTerrObj = iFactory->GetMeshObjectFactory()->NewInstance();
           iState = SCF_QUERY_INTERFACE (iTerrObj, iBCTerrState);
           iTerrFunc = SCF_QUERY_INTERFACE (iTerrObj, iTerrFuncState);
         }

@@ -71,7 +71,7 @@ int FindIntersection(csCollisionPair& cd,csVector3 line[2])
 void WalkTest::CreateColliders ()
 {
   iPolygon3D *p;
-  iPolygonMesh* mesh;
+  csRef<iPolygonMesh> mesh;
   iPluginManager* plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
   iMeshObjectType* ThingType = CS_QUERY_PLUGIN_CLASS (plugin_mgr,
   	"crystalspace.mesh.object.thing", iMeshObjectType);
@@ -80,12 +80,10 @@ void WalkTest::CreateColliders ()
     	"crystalspace.mesh.object.thing", iMeshObjectType);
 
   plugin_mgr->DecRef ();
-  iMeshObjectFactory* thing_fact = ThingType->NewFactory ();
-  iMeshObject* mesh_obj = SCF_QUERY_INTERFACE (thing_fact, iMeshObject);
-  thing_fact->DecRef ();
+  csRef<iMeshObjectFactory> thing_fact (ThingType->NewFactory ());
+  csRef<iMeshObject> mesh_obj (SCF_QUERY_INTERFACE (thing_fact, iMeshObject));
   plbody = Engine->CreateMeshWrapper (mesh_obj, "Player's Body");
-  iThingState* thing_state = SCF_QUERY_INTERFACE (mesh_obj, iThingState);
-  mesh_obj->DecRef ();
+  csRef<iThingState> thing_state (SCF_QUERY_INTERFACE (mesh_obj, iThingState));
 
   thing_state->CreateVertex (csVector3 (-DX_2, OY,    -DZ_2));
   thing_state->CreateVertex (csVector3 (-DX_2, OY,    DZ_2));
@@ -130,16 +128,12 @@ void WalkTest::CreateColliders ()
   body = new csColliderWrapper (plbody->QueryObject (), collide_system, mesh);
   body->SetName ("player body");
   plbody->GetRadius (body_radius, body_center);
-  mesh->DecRef ();
-  thing_state->DecRef ();
 
-  thing_fact = ThingType-> NewFactory ();
+  thing_fact = ThingType->NewFactory ();
   ThingType->DecRef ();
   mesh_obj = SCF_QUERY_INTERFACE (thing_fact, iMeshObject);
-  thing_fact->DecRef ();
   pllegs = Engine->CreateMeshWrapper (mesh_obj, "Player's Legs");
   thing_state = SCF_QUERY_INTERFACE (mesh_obj, iThingState);
-  mesh_obj->DecRef ();
 
   thing_state->CreateVertex (csVector3 (-DX_2L, OYL,     -DZ_2L));
   thing_state->CreateVertex (csVector3 (-DX_2L, OYL,     DZ_2L));
@@ -184,8 +178,6 @@ void WalkTest::CreateColliders ()
   legs = new csColliderWrapper (pllegs->QueryObject (), collide_system, mesh);
   legs->SetName ("player legs");
   pllegs->GetRadius ( legs_radius, legs_center);
-  mesh->DecRef ();
-  thing_state->DecRef ();
 
   SCF_DEC_REF (pllegs);
   SCF_DEC_REF (plbody);

@@ -58,14 +58,13 @@ csThingMeshObjectType::~csThingMeshObjectType ()
   if (te) te->DecRef ();
 }
 
-iMeshObjectFactory* csThingMeshObjectType::NewFactory ()
+csPtr<iMeshObjectFactory> csThingMeshObjectType::NewFactory ()
 {
   if (!parent_type)
   {
-    iEngine* engine = CS_QUERY_REGISTRY (object_reg, iEngine);
+    csRef<iEngine> engine (CS_QUERY_REGISTRY (object_reg, iEngine));
     CS_ASSERT (engine != NULL);
     parent_type = engine->GetThingType ();
-    engine->DecRef ();
   }
   return parent_type->NewFactory ();
 }
@@ -75,10 +74,9 @@ iThingEnvironment* csThingMeshObjectType::TE ()
   if (te) return te;
   if (!parent_type)
   {
-    iEngine* engine = CS_QUERY_REGISTRY (object_reg, iEngine);
+    csRef<iEngine> engine (CS_QUERY_REGISTRY (object_reg, iEngine));
     CS_ASSERT (engine != NULL);
     parent_type = engine->GetThingType ();
-    engine->DecRef ();
   }
   te = SCF_QUERY_INTERFACE (parent_type, iThingEnvironment);
   return te;

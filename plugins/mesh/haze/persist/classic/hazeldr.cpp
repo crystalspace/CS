@@ -383,7 +383,7 @@ iBase* csHazeFactoryLoader::Parse (iDocumentNode* node,
     printf ("Load TYPE plugin crystalspace.mesh.object.haze\n");
   }
   csRef<iMeshObjectFactory> fact;
-  fact = csPtr<iMeshObjectFactory> (type->NewFactory ());
+  fact = type->NewFactory ();
   csRef<iHazeFactoryState> hazefactorystate (
   	SCF_QUERY_INTERFACE (fact, iHazeFactoryState));
   CS_ASSERT (hazefactorystate);
@@ -700,8 +700,7 @@ iBase* csHazeLoader::Parse (iDocumentNode* node,
 		child, "Could not find factory '%s'!", factname);
 	    return NULL;
 	  }
-	  mesh = csPtr<iMeshObject> (
-	  	fact->GetMeshObjectFactory ()->NewInstance ());
+	  mesh = fact->GetMeshObjectFactory ()->NewInstance ();
           hazestate = SCF_QUERY_INTERFACE (mesh, iHazeState);
 	  hazefactorystate = SCF_QUERY_INTERFACE (
 	  	fact->GetMeshObjectFactory(), iHazeFactoryState);

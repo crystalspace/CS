@@ -4142,11 +4142,11 @@ iPolygon3D *csThing::VisCull::IntersectSegment (
 }
 
 //---------------------------------------------------------------------------
-iMeshObject *csThing::MeshObjectFactory::NewInstance ()
+csPtr<iMeshObject> csThing::MeshObjectFactory::NewInstance ()
 {
   csThing *thing = new csThing (scfParent);
   thing->MergeTemplate (&(scfParent->scfiThingState), NULL);
-  return &thing->scfiMeshObject;
+  return csPtr<iMeshObject> (&thing->scfiMeshObject);
 }
 
 //---------------------------------------------------------------------------
@@ -4186,14 +4186,14 @@ bool csThingObjectType::Initialize (iObjectRegistry *object_reg)
   return true;
 }
 
-iMeshObjectFactory *csThingObjectType::NewFactory ()
+csPtr<iMeshObjectFactory> csThingObjectType::NewFactory ()
 {
   csThing *cm = new csThing (this);
   iMeshObjectFactory *ifact = SCF_QUERY_INTERFACE (
       cm,
       iMeshObjectFactory);
   ifact->DecRef ();
-  return ifact;
+  return csPtr<iMeshObjectFactory> (ifact);
 }
 
 iPolyTxtPlane *csThingObjectType::CreatePolyTxtPlane (const char *name)

@@ -186,7 +186,7 @@ SCF_VERSION (iMeshObjectFactory, 0, 0, 5);
 struct iMeshObjectFactory : public iBase
 {
   /// Create an instance of iMeshObject.
-  virtual iMeshObject* NewInstance () = 0;
+  virtual csPtr<iMeshObject> NewInstance () = 0;
 
   /**
    * Do a hard transform of this factory.
@@ -232,7 +232,8 @@ SCF_VERSION (iMeshObjectType, 0, 0, 2);
 struct iMeshObjectType : public iBase
 {
   /// Create an instance of iMeshObjectFactory.
-  virtual iMeshObjectFactory* NewFactory () = 0;
+  virtual csPtr<iMeshObjectFactory> NewFactory () = 0;
 };
 
 #endif // __IMESH_OBJECT_H__
+

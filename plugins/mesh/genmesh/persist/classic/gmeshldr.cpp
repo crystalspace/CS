@@ -514,7 +514,7 @@ iBase* csGeneralFactoryLoader::Parse (iDocumentNode* node,
   csRef<iMeshObjectFactory> fact;
   csRef<iGeneralFactoryState> state;
 
-  fact = csPtr<iMeshObjectFactory> (type->NewFactory ());
+  fact = type->NewFactory ();
   state = SCF_QUERY_INTERFACE (fact, iGeneralFactoryState);
 
   type->DecRef ();
@@ -876,8 +876,7 @@ iBase* csGeneralMeshLoader::Parse (iDocumentNode* node,
 		child, "Couldn't find factory '%s'!", factname);
 	    return NULL;
 	  }
-	  mesh = csPtr<iMeshObject> (
-	  	fact->GetMeshObjectFactory ()->NewInstance ());
+	  mesh = fact->GetMeshObjectFactory ()->NewInstance ();
           meshstate = SCF_QUERY_INTERFACE (mesh, iGeneralMeshState);
 	}
 	break;

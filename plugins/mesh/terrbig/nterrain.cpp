@@ -611,10 +611,10 @@ csBigTerrainObjectFactory::~csBigTerrainObjectFactory ()
 {
 }
 
-iMeshObject* csBigTerrainObjectFactory::NewInstance ()
+csPtr<iMeshObject> csBigTerrainObjectFactory::NewInstance ()
 {
   csBigTerrainObject* pTerrObj = new csBigTerrainObject (object_reg, this);
-  return (iMeshObject*)pTerrObj;
+  return csPtr<iMeshObject> (pTerrObj);
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////
@@ -644,11 +644,12 @@ csBigTerrainObjectType::~csBigTerrainObjectType ()
 {
 }
 
-iMeshObjectFactory* csBigTerrainObjectType::NewFactory ()
+csPtr<iMeshObjectFactory> csBigTerrainObjectType::NewFactory ()
 {
   csBigTerrainObjectFactory* btf = new csBigTerrainObjectFactory (this, 
   	object_reg);
   iMeshObjectFactory* ifact = SCF_QUERY_INTERFACE (btf, iMeshObjectFactory);
   ifact->DecRef ();
-  return ifact;
+  return csPtr<iMeshObjectFactory> (ifact);
 }
+

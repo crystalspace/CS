@@ -477,22 +477,22 @@ bool Simple::Initialize (int argc, const char* const argv[],
     exit (1);
   }
 
-  iMeshObjectFactory *ThingFactory = ThingType->NewFactory ();
+  csRef<iMeshObjectFactory> ThingFactory (ThingType->NewFactory ());
   ThingType->DecRef ();
 
-  iThingState *fState =
-	SCF_QUERY_INTERFACE (ThingFactory, iThingState);
-  iModelDataObject *mdo = CS_GET_CHILD_OBJECT (Model->QueryObject (), iModelDataObject);
+  csRef<iThingState> fState (
+	SCF_QUERY_INTERFACE (ThingFactory, iThingState));
+  csRef<iModelDataObject> mdo (
+  	CS_GET_CHILD_OBJECT (Model->QueryObject (), iModelDataObject));
   crossbuilder->BuildThing (mdo, fState, tm);
   csModelDataTools::SplitObjectsByMaterial (Model);
-  iMeshFactoryWrapper *sfWrapper = crossbuilder->BuildSpriteFactoryHierarchy (Model, engine, tm);
-  fState->DecRef ();
-  mdo->DecRef ();
+  iMeshFactoryWrapper *sfWrapper = crossbuilder->BuildSpriteFactoryHierarchy (
+  	Model, engine, tm);
   Model->DecRef ();
 
-  iMeshObject *ThingObject = ThingFactory->NewInstance ();
-  iMeshWrapper *ThingWrapper = engine->CreateMeshWrapper (ThingObject, "thing");
-  iMeshWrapper *SpriteWrapper = engine->CreateMeshWrapper (sfWrapper, "sprite");
+  csRef<iMeshObject> ThingObject (ThingFactory->NewInstance ());
+  csRef<iMeshWrapper> ThingWrapper (engine->CreateMeshWrapper (ThingObject, "thing"));
+  csRef<iMeshWrapper> SpriteWrapper (engine->CreateMeshWrapper (sfWrapper, "sprite"));
 
   // @@@ hardcoded == BAD!
   float rad = 6;

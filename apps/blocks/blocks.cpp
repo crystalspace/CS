@@ -551,34 +551,28 @@ iPolygon3D* add_polygon_template (iThingState* tmpl,
 static iMeshFactoryWrapper* CreateMeshFactoryWrapper (
 	const char* name)
 {
-  iMeshObjectFactory* thing_fact = Sys->thing_type->NewFactory ();
-
+  csRef<iMeshObjectFactory> thing_fact (Sys->thing_type->NewFactory ());
   iMeshFactoryWrapper *wrap = Sys->engine->CreateMeshFactory (name);
   wrap->SetMeshObjectFactory (thing_fact);
-  thing_fact->DecRef ();
   return wrap;
 }
 
 static iMeshWrapper* CreateMeshWrapper (const char* name)
 {
-  iMeshObjectFactory* thing_fact = Sys->thing_type->NewFactory ();
-  iMeshObject* mesh_obj = SCF_QUERY_INTERFACE (thing_fact, iMeshObject);
-  thing_fact->DecRef ();
+  csRef<iMeshObjectFactory> thing_fact (Sys->thing_type->NewFactory ());
+  csRef<iMeshObject> mesh_obj (SCF_QUERY_INTERFACE (thing_fact, iMeshObject));
 
   iMeshWrapper *wrap = Sys->engine->CreateMeshWrapper (name);
   wrap->SetMeshObject (mesh_obj);
-  mesh_obj->DecRef ();
   return wrap;
 }
 
 static iMeshWrapper* CreateMeshFromFactory (iMeshFactoryWrapper* fact,
 	const char* name)
 {
-  iMeshObject* mesh_obj = fact->GetMeshObjectFactory ()->NewInstance ();
-
+  csRef<iMeshObject> mesh_obj (fact->GetMeshObjectFactory ()->NewInstance ());
   iMeshWrapper *wrap = Sys->engine->CreateMeshWrapper (name);
   wrap->SetMeshObject (mesh_obj);
-  mesh_obj->DecRef ();
   return wrap;
 }
 
