@@ -3,7 +3,7 @@
 
     This document was written by Eric Sunshine <sunshine@sunshineco.com>
     Copyright (C)1999 by Eric Sunshine
-    1999/10/06
+    1999/10/08
 
     Also see INSTALL.NeXT for installation details.
 ===============================================================================
@@ -215,9 +215,9 @@ AppKit's Application class.  The files comprising this module are:
     NeXTMenu.cfg            An INI-style configuration file which defines a
                             menu layout appropriate to the platform.
 
-    NeXTprintf.cpp          Platform-specific implementations of
-    NeXTTime.cpp            csSystemDriver::printf, and csSystemDriver::Time
-                            which work on MacOS/X Server, OpenStep, & NextStep.
+    NeXTTime.cpp            Platform-specific implementation of
+                            csSystemDriver::Time which work on MacOS/X Server,
+                            OpenStep, and NextStep.
 
     malloc.h                A header which works around Crystal Space's misuse
                             of the deprecated <malloc.h> header.
@@ -556,7 +556,7 @@ This is a list of items which are planned for future releases of this project.
 -------
 This is a list of known problems with the current release of this project.
 
-    o Using the -nolight option causes WalkTest to crash very early in 
+    o Using the -nolight option causes WalkTest to crash very early in
       csScan_CalcBlendTables().
     o The NextStep compiler generates invalid code at locations which make COM
       queries for the IID_IHaloRasterizer module.  This is the only COM module
@@ -591,8 +591,8 @@ This is a list of known problems with the current release of this project.
 1999/10/06 (15r000+CVS)
     Implemented dynamic linking support.  The 2D driver, 3D renderer, and
         sound & network drivers are now linked into the application
-	dynamically at run-time.  The NextStep implementation relies on RLD,
-	whereas the OpenStep and MacOS/X Server implementations rely on DYLD.
+        dynamically at run-time.  The NextStep implementation relies on RLD,
+        whereas the OpenStep and MacOS/X Server implementations rely on DYLD.
 
 1999/09/13 (15r000+CVS)
     Now uses -[NSWindow center] to center window instead of doing so manually.
@@ -600,7 +600,7 @@ This is a list of known problems with the current release of this project.
 1999/08/06 (14r000+CVS)
     Added "simulated depth" support via the VideoDriver/SIMULATE_DEPTH
         configuration option and the -simdepth command line argument.  This
-	allows testing of 32-bit depth on 15-bit displays, and vice-versa.
+        allows testing of 32-bit depth on 15-bit displays, and vice-versa.
 
 1999/07/26 (13r012+CVS)
     Now supports 16-bit and 32-bit RGB instead of being limited to 8-bit, 256
