@@ -90,12 +90,12 @@ unwrapped adds two more vertices.
 @end ifnotinfo
 Now we have 98 vertices instead of 48.  This is a big hit, but it may be
 necessary to get the artwork done fast and well.  Fortunately, we still have
-only 98 vertices instead of 288, but can we do better than that? Do we have
+only 98 vertices instead of 288, but can we do better than that?  Do we have
 to duplicate the 3D coordinates just because we need more texture coordinates?
 
 We experimented with a system where the sprite had a different set of 3D
 coordinates (vertices), texture coordinates (texels) and vertex normals (for
-shading.)  For example: our cylinder could have each triangle connected to
+shading).  For example: our cylinder could have each triangle connected to
 any 3 of the 48 unique vertices and any 3 of the 98 texels, instead of the
 current system where the triangle has 3 indices used for both vertices and
 texels.  Unfortunately our approach proved ackward, slow and difficult to
@@ -121,7 +121,7 @@ With the ends seperated, that edge is now sharply defined.
 Unfortunately, we have also split one edge of the cylinder's sides, which
 creates a sharply defined edge where we don't want it.  We could reconnect
 the shared vertices along that edge, but then we would have to texture the
-sides differently - The sides would either curve ackwardly or overlap itself.
+sides differently---the sides would either curve ackwardly or overlap.
 
 We are stuck with an unwanted edge or a difficult texturing job until we
 can find a way to connect vertex normals without connecting skin vertices.
@@ -144,6 +144,6 @@ split for texturing would be blended for shading.
 The simplest way to apply the blending would be by averaging the vertex
 normals after vertex normal calculation. It would probably be more accurate
 to re-calculate the vertex normal by averaging the normals of all of the
-triangles connected to both vertices.  Vertex normals can be pre-calculated
-- especially if you are using pre-calculated vertex animation anyway.  So
+triangles connected to both vertices.  Vertex normals can be pre-calculated---
+especially if you are using pre-calculated vertex animation anyway.  So
 the blending effect might only have to be applied once.
