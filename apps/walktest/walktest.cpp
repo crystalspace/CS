@@ -1382,14 +1382,16 @@ bool WalkTest::Initialize (int argc, const char* const argv[],
   cfg_legs_offset = cfg->GetFloat ("Walktest.CollDet.LegsOffset", -1.1);
   cfg->DecRef ();
 
-#ifdef CS_DEBUG
-  // enable all kinds of useful FPU exceptions on a x86
-  // note that we can't do it above since at least on OS/2 each dynamic
-  // library on loading/initialization resets the control word to default
-  csControl87 (0x33, 0x3f);
-#else
-  // this will disable exceptions on DJGPP (for the non-debug version)
-  csControl87 (0x3f, 0x3f);
+#ifndef COMP_VC
+  #ifdef CS_DEBUG
+    // enable all kinds of useful FPU exceptions on a x86
+    // note that we can't do it above since at least on OS/2 each dynamic
+    // library on loading/initialization resets the control word to default
+    csControl87 (0x33, 0x3f);
+  #else
+    // this will disable exceptions on DJGPP (for the non-debug version)
+    csControl87 (0x3f, 0x3f);
+  #endif
 #endif
 
   // Start the engine
