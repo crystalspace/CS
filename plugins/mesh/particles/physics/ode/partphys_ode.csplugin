@@ -4,9 +4,9 @@
   <scf>
     <classes>
       <class>
-        <name>crystalspace.particles.physics.simple</name>
-		<implementation>csParticlesPhysicsSimple</implementation>
-        <description>Crystal Space Simple Particle Physics</description>
+        <name>crystalspace.particles.physics.ode</name>
+	<implementation>csODEParticlePhysics</implementation>
+        <description>Crystal Space ODE Particle Physics</description>
       </class>
     </classes>
   </scf>
