@@ -1,0 +1,144 @@
+@c -*-texinfo-*-
+@node En Socket, csEngine, Sound Drivers, Plug-In Drivers
+@subsection EN Socket
+
+The EN Network Driver consists of two components.
+
+@table @emph
+@item Network Driver
+System independent network driver.  This driver implements a tcp/ip networking
+interface.  The network driver and socket driver currently support BSD compliant
+calls.
+
+@emph{Note}: Some operating systems may not support all the functions of
+this plugin.
+
+@item Network Driver
+Network Driver.  This driver is used to create an implementation of the Socket
+Driver via the CreateSocket() call.  The Network Driverr calls appropriate socket
+startup/shutdown calls for the OS.
+
+@item Socket Driver
+This driver handles all the connection functions.  This driver is implemented by
+calling the CreateSocket() call located in the Network Driver.  The Socket Driver
+supports the following features (some might not work on all OSes):
+
+@itemize @bullet
+@item
+TCP/UDP connections over TCP/IP networks.
+@item
+Blocking/Non-blocking calls.
+@item
+Sending/Recving of data across the connection.
+@item
+Blocking/Non-blocking buffered read function.
+@end itemize
+@end table
+
+@subheading Network Driver
+
+The Network Driver is used to setup the socket sub-system.  The driver's
+purpose is to provide a method for creating a BSD sockets compliant socket
+of either UDP or TCP type.  Upon construction all appropriate socket 
+start-up calls are made, like wise with the distructor.
+
+@itemize @bullet
+@item CreateSocket
+Returns a socket that has been created with the type of TCP or UDP.
+@item LastError
+Returns the last error that was encountered.
+@end itemize
+
+@subheading Socket Driver
+
+The Socket Driver is used to supply a common interface to a low-level
+TCP/IP network connection.  It allows connecting/accepting TCP and UDP
+based socket connections.  It provides very basic BSD compliant functionality.
+
+@itemize @bullet
+@item LastError
+Returns the last error that was encountered.
+@item LastOSError
+Returns the last error that is returned by the OS.
+@item IsConnected
+Returns true or false depending upon the status of the connection.
+@item SetSocketBlock
+This function sets the blocking/non-blocking attribute of the socket.
+@item SetSocketReuse
+This function sets the 'reuse' attribute of a listening socket.
+@item Connect
+This function connects to a remote host and port.
+@item Send
+This function sends a number of bytes to the remote connection.
+@item Recv
+This function reads a number of bytes from the remote connection.
+@item Close
+This function closes the socket and it is no longer valid after this point.
+@item Disconnect
+This function closes the connection then closes the socket.
+@item WaitForConnection
+This function sets the socket up for incomming connections on a port.
+@item Accept
+This function returns a socket that is connected to a incomming connection 
+from a  remote system.
+@item set
+This function is for internal use and should not be called.
+@item ReadLine
+This function performs a buffered read in both tcp blocking/non-blocking modes.
+@item RemoteName
+This function returns the remote name/ip of the remote connection.
+@end itemize
+
+@subheading Example
+
+@example
+#include "inetwork/driver2.h"
+#include "inetwork/socket2.h"
+#include "inetwork/socketerr.h"
+
+iNetworkDriver2* netdriver = NULL;
+iSocketDriver2*  client = NULL;
+iSocketDriver2*  server = NULL;
+
+...
+
+netdriver = CS_QUERY_REGISTRY(object_reg, iNetworkDriver2);
+if (!netdriver) {
+  ...
+}
+
+server = netdriver->CreateSocket(CS_NET_SOCKET_TYPE_TCP);  // create tcp socket
+
+// last error is netdriver->LastError();
+if (server) {
+	server->SetSocketReuse(true);
+	if (server->LastError() != CS_NET_SOCKET_NOERROR) {
+		printf("Unable to set reuse option.\n");
+	}
+	server->SetSocketBlock(true);
+	if (server->LastError() != CS_NET_SOCKET_NOERROR) {
+		printf("Unable to set block option.\n");
+	}
+	server->WaitForConnection(0,9999,5); // wait on port 9999 que up to 5 connections
+	if (server->LastError() != CS_NET_SOCKET_NOERROR) {
+		printf("Unable to bind to port.\n");
+	}
+}
+
+...
+
+if (server) {
+	client = server->Accept();
+	if (client != NULL) {
+		// we have a connection
+		client->Send("hello\r\n",7);
+		client->Disconnect();
+	}
+	server->Close();
+	client->DecRef();
+	server->DecRef();
+}
+
+@end example
+
+
