@@ -1,0 +1,60 @@
+@c -*-texinfo-*-
+@node mdl2spr
+@section Quake MDL Converter (@code{mdl2spr})
+@cindex @file{mdl2spr}
+@cindex Applications, @file{mdl2spr}
+
+A quake model (MDL/MD2) convertor for Crystal Space.
+
+By Nathaniel Saint Martin (@email{noote@@bigfoot.com}). @*
+Project overhauled by Eric Sunshine (@email{sunshine@@sunshineco.com}). @*
+Back seam fix and skin resizing by Seth Galbraith
+(@email{sgalbrai@@linknet.kitsap.lib.wa.us}).
+
+@table @emph
+@item what it does
+
+Converts Quake1 MDL and Quake2 MD2 models to CrystalSpace sprite format. If
+the Quake1 MDL contains skins, they are extracted and saved in PNG format
+image files. If skin height or width is not a power of two, it will be
+resized.
+
+@item how it works
+
+Usage: @code{mdl2spr [options] <model-file> <output-sprite-name>}
+
+Options:
+@itemize @bullet
+@item
+-h : help (this page)
+
+@item
+-s <float> : global scale of model (default 0.025)
+
+@item
+-d <int> : frame delay for frame which don't have delay (default 100)
+
+@item
+-n : disable auto naming of action frameset (enabled by default)
+
+@item
+-x <float> : sprite moving on X axis (default 0)
+
+@item
+-y <float> : sprite moving on Y axis (default 0)
+
+@item
+-z <float> : sprite moving on Z axis (default 0)
+
+@item
+-r : disable automatic power-of-2 skin resizing (enabled by default).
+Only applies to MDL files (not MD2).
+@end itemize
+
+@item to do
+@itemize @bullet
+@item
+Add option to specify location of alternate palette.lmp file on command line.
+@end itemize
+@end table
+

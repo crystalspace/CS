@@ -40,8 +40,8 @@ lacking such a tool.
 @cindex Applications, @file{map2cs}
 @item map2cs
 A map convertors which converts between Quake style @file{.map} format to the
-native Crystal Space @samp{world} format.  It is known to work with WorldCraft
-2.1 Beta and QuArK (Quake Army Knife).
+native Crystal Space @samp{world} format. It is known to work with WorldCraft
+2.1 Beta and QuArK (Quake Army Knife). @xref{map2cs}.
 
 @cindex @file{MazeD}
 @cindex Applications, @file{MazeD}
@@ -53,7 +53,7 @@ progress.
 @cindex Applications, @file{mdl2spr}
 @item mdl2spr
 This application is a Quake @file{.mdl} and @file{.md2} model convertor.  It
-converts model files into native Crystal Space sprites.
+converts model files into native Crystal Space sprites. @xref{mdl2spr}.
 
 @cindex @file{metademo}
 @cindex Applications, @file{metademo}
@@ -93,7 +93,7 @@ An tutorial demonstrating the ins and outs of Crystal Space's @sc{scf} system.
 @cindex Applications, @file{simple}
 @item simple
 Developers should use this application as a guide when devloping their new
-programs.  Its code tends to be much cleaner than that of @file{walktest}, and
+programs. Its code tends to be much cleaner than that of @file{walktest}, and
 makes proper use of various modules in the engine.  The @file{simple}
 application is the subject of a Crystal Space programming tutorial,
 @ref{Tutorials}.
