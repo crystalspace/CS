@@ -20,7 +20,7 @@
 	  <fog>
 	    <mode>linear</mode>
 	    <start type="shadervar">texture lod distance</start>
-	    <end type="float">0</end>
+	    <end type="float">0.0001</end>
 	    <fogcolor type="vector4">0,0,0,0</fogcolor>	
 	  </fog>
 	  <layer>
