@@ -687,7 +687,7 @@ bool csGLRender3D::Open ()
   csRef<iOpenGLInterface> gl = SCF_QUERY_INTERFACE (G2D, iOpenGLInterface);
   ext.InitExtensions (gl);
 
-  if ( false && ext.CS_GL_NV_vertex_array_range && ext.CS_GL_NV_fence)
+  if ( /*false &&*/ ext.CS_GL_NV_vertex_array_range && ext.CS_GL_NV_fence)
   {
     csVARRenderBufferManager * bm = new csVARRenderBufferManager();
     bm->Initialize(this);
@@ -1086,6 +1086,9 @@ void csGLRender3D::DrawMesh(csRenderMesh* mymesh)
     {
       for (int l=0; l<mathandle->GetTextureLayerCount (); l++)
       {
+        if (indexbuf) // must make sure that the indexbuffer is aviable for locking
+          indexbuf->Release();
+
         csTextureLayer* layer = mathandle->GetTextureLayer (l);
         txthandle = layer->txt_handle;
         if (txthandle)
