@@ -23,6 +23,15 @@
 #include "types.h"
 #include "qint.h"
 
+/*
+ * This is a bit of overkill but if you're sure your CPU doesn't require
+ * strict alignment add your CPU to the !defined below to get slightly
+ * smaller and faster code in some cases.
+ */
+#if !defined (PROC_INTEL)
+#  define PROC_NEEDS_STRICT_ALIGNMENT
+#endif
+
 struct swap_4
 {
   unsigned char b1, b2, b3, b4;
@@ -167,7 +176,14 @@ inline short get_le_short (void *buff)
 
 /// Read a little-endian long from address
 inline long get_le_long (void *buff)
-{ return little_endian_long (*(long *)buff); }
+{
+#ifdef PROC_NEEDS_STRICT_ALIGNMENT
+  long l; memcpy (&l, buff, sizeof (l));
+  return little_endian_long (l);
+#else
+  return little_endian_long (*(long *)buff);
+#endif
+}
 
 /// Read a little-endian 32-bit float from address
 inline float get_le_float32 (void *buff)
@@ -183,7 +199,14 @@ inline void set_le_short (void *buff, short s)
 
 /// Set a little-endian long on a address
 inline void set_le_long (void *buff, long l)
-{ *((long *)buff) = little_endian_long (l); }
+{
+#ifdef PROC_NEEDS_STRICT_ALIGNMENT
+  long l = little_endian_long (l);
+  memcpy (buff, &l, sizeof (l));
+#else
+  *((long *)buff) = little_endian_long (l);
+#endif
+}
 
 /// Set a little-endian 32-bit float on a address
 inline void set_le_float32 (void *buff, float f)
