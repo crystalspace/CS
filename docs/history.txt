@@ -85,6 +85,10 @@ The history order has been reversed so that new features are at the top.
 	  and csutil.
 	- Eric Sunshine added missing CSGFX dependency to meta.mak.
 	- Eric Sunshine added missing CSGFX dependency to squawk.mak.
+	- Christopher Nelson added modified csdialog header for overlay
+	  support. Also support for skinned listbox headers.
+	- Christopher also did some further updates to cslistbox to make
+	  it work better as a skinned control.
 16-Apr-2001
 	- Added iEngine::CreateSectorWallsMesh().
 	- Fixed simplep (plugin version of simple) so that it works again.
