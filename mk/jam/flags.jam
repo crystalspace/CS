@@ -142,7 +142,7 @@ rule ExtraObjects
 ##    Given a list of libraries, augment the list by adding other libraries
 ##    upon which the given libraries depend.  Dependencies between libraries
 ##    are specified via LibDepends (or LinkWith when the target is a library).
-##    The returned list is ordered such that it issuitable for Unix linkers
+##    The returned list is ordered such that it is suitable for Unix linkers
 ##    which are sensitive to the order of libraries in the invocation
 ##    statement.
 rule ResolveLibs
