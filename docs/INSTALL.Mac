@@ -1,5 +1,5 @@
 Crystal Space Macintosh Development Readme
-This is up to date as of April 27rd, 1999
+This is up to date as of May 17th, 1999
 Written by K. Robert Bate
 If you have any questions or problems, contact me at rbate@ma.ultranet.com.
 
@@ -25,48 +25,44 @@ if they were not unpacked into this folder.
 unpack the includes, move the folder that is in "includes Folder" into "mac" then throw
 out "includes Folder".
 
-2. Unpack the compressed projects files in mk:mwcw:projects.sit.  If you used Stuffit Expander to
-unpack the project files, move the files that are in "projects Folder" into
-mwcw then throw out "projects Folder".  If you want to work with the glide renderer then unpack
-more_projects.sit.
-
 [3] WORKING WITH THE CRYSTAL SPACE PROJECTS
 
-There are 17 Crystal Space projects in the mwcw folder: 
+There are 19 Crystal Space projects in the mwcw folder: 
 
 2 projects that build static libraries:
-CrystLib.prj	- generates the static linked library, which includes the
+CSpace.mcp		- generates the static linked library, which includes the
 				  majority of the code for Crystal Space
-CSWSLib.prj		- generates the static linked library, which includes the
+CSWS.mcp		- generates the static linked library, which includes the
 				  code for the Crystal Space Windowing System
 
-8 projects that build shared libraries:
-Driver2D.prj			- generates the 2D Graphics shared library.
-NetworkDriverNull.prj	- generates the null network driver shared library.
-NetworkMgrNull.prj  	- generates the null network manager shared library.
-SftRndr.prj				- generates the SoftwareRender shared library, which includes the 3D graphics
+10 projects that build shared libraries:
+Driver2D.mcp			- generates the 2D Graphics shared library.
+NetworkDriverNull.mcp	- generates the null network driver shared library.
+NetworkMgrNull.mcp  	- generates the null network manager shared library.
+SftRndr.mcp				- generates the SoftwareRender shared library, which includes the 3D graphics
 						  driver for software rasterization.
-SoundDriver.prj 		- generates the mac sound driver shared library.
-SoundDriverNull.prj  	- generates the null sound driver shared library.
-SoundRender.prj			- generates the software sound render shared library.
-SoundRenderNull.prj		- generates the null sound render manager shared library.
-GlideRender.prj			- generates the Glide Render shared library.
+SoundDriver.mcp 		- generates the mac sound driver shared library.
+SoundDriverNull.mcp  	- generates the null sound driver shared library.
+SoundRender.mcp			- generates the software sound render shared library.
+SoundRenderNull.mcp		- generates the null sound render manager shared library.
+GlideRender.mcp			- generates the Glide Render shared library.
+OpenGLRndr.mcp			- generates the OpenGL Render shared library.
 
 6 projects that generate applications
-CSRegSvr.prj	- generates the application which registers the shared libraries.
-CSWSTest.prj	- generates the application which tests the Crystal Space Windowing System.
-MazeD.prj		- generates the Crystal Space Editor.
-Primedit.prj	- generates another Crystal Space Editor.
-Simple.prj  	- generates a Simple Crystal Space application.
-Walktest.prj	- generates another Simple Crystal Space application.
+CSRegSvr.mcp	- generates the application which registers the shared libraries.
+CSWSTest.mcp	- generates the application which tests the Crystal Space Windowing System.
+MazeD.mcp		- generates the Crystal Space Editor.
+Primedit.mcp	- generates another Crystal Space Editor.
+Simple.mcp  	- generates a Simple Crystal Space application.
+Walktest.mcp	- generates another Simple Crystal Space application.
 
 and 1 project that builds other projects
-MakeShared.prj	- Makes sure all of the shared libraries and CSRegSvr are up to date.
+MakeShared.mcp	- Makes sure all of the shared libraries and CSRegSvr are up to date.
 
 Generally you will just build an application and all of the other pieces will be built for you.
 All of the resulting libraries and applications will be placed in the src directory.
 
-1. Open MakeShared.prj in CodeWarrior and make it.
+1. Open MakeShared.mcp in CodeWarrior and make it.
 
 2. Switch back to the finder select all of the files that end in .shlb
 in the src folder and drop them on the csregsvr application.

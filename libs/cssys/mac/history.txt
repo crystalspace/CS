@@ -7,6 +7,10 @@ Add Network support.
 Optimize everything.
 
 History:
+18-May-99
+	- Changing all of the projects to end in .mcp instead of .prj so MacCVS Pro will know that
+	  they are MetroWerks CodeWarrior Projects.
+	- Renamed CrystLib.prj to CSpace.mcp and CSWSLib.prj to CSWS.mcp for consistancy.
 17-May-99
 	- Adding support for OpenGL.
 14-May-99
