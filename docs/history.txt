@@ -1,5 +1,72 @@
 The history order has been reversed so that new features are at the top.
 
+10-Oct-2000
+	- Andrew Zabolotny did the following changes:
+	    - Fixed makedep so that it will work unde Unix (well, at
+	      least under Linux :-) Added autodetection of system include
+	      directories to unixconf.sh.  You will have to re-configure
+	      in order "make depend" to work.  Added a new AWK script
+	      bin/includes.awk which parses the output of "gcc -H" and
+	      outputs a line like this:
+     		MAKEDEP.INCLUDES=-I/usr/include;/usr/local/include
+	      Maybe I'll enable later this script for mingw32 port as well,
+	      since mingw32 needs these includes too; currently you have to
+	      specify them as "C_INCLUDE_PATH" environment variable.
+	    - Changed Unix makefile so that makedep is used now on Unix
+	      for dependency generation. This is about five times faster
+	      (a random evaluation though :-)
+	    - Re-implemented former `themes' from scratch. It was a nice
+	      try, but did not fit well with CSWS concept; besides they
+	      involved too much overhead.
+	      They are called now "skins". A "skin" is a collection of
+	      "skin slices", every "slice" is responsible for a certain
+	      class of components, e.g.  buttons, titlebars and so on. When
+	      a component is created or when the skin is changed the
+	      component queries the skin for the slice it wants and
+	      remembers it; then it uses it for miscelaneous operations
+	      such as drawing and so on.
+	      There are three skinnable components right now: buttons,
+	      windows and dialogs. There is just one (default) scheme
+	      right now thus you won't notice any difference :-) The code
+	      for exterior look of these components is completely separated
+	      (and can be replaced by other code, e.g. Motif, Windoze,
+	      OS/2 look (um... the default look is quite close to OS/2
+	      already :-) etc).
+	    - Changed CSWS configuration file format. Now it use csIniFile.
+	      This is a preparation so that themes could be easier configured
+	      through config file in future.
+	    - Updated CSWS docs so that it can be used to gather basic
+	      information about CSWS. All beginner CSWS users are highly
+	      recommended that; I have tried to respond to the most
+	      frequently asked questions on the mailing list there.
+	    - Renamed csApp::InitialSetup() into csApp::Initialize(const
+	      char *iConfigName) for uniformity (all other classes uses
+	      Initialize()). I have fixed the applications in CVS, for
+	      applications outside CVS this have to be done yet. The
+	      iConfigName passed is the name of CSWS configuration file
+	      (usually "/csws/csws.cfg"). This allows to create CSWS
+	      applications without having a system configuration file
+	      (previously CSWS config name was read from the [CSWS] section
+	      of system config file).
+	    - Added the notion of "color schemes". There is a function
+	      called csSetColorScheme() which in fact applies a (tricky)
+	      function onto the entire application palette (in HLS space).
+	      There are just too many colors in all palettes to enumerate
+	      them separately; I would prefer some automatic way to
+	      process all colors in the palette; I'm not sure the method
+	      that is currently implemented is flexible enough (I'm going
+	      to finish the "Theme" window in cswstest in order to see
+	      schemes in action dynamically).
+	    - Fixed a small bug in CSWS that caused transparent windows
+	      to leave visible traces on neightbour's child components.
+	      The solution was simple and elegant - just a single line
+	      change! :-) Now you can even drag a window *below* the
+	      transparent window (e.g. try to drag the "CSS_TOPSELECT"
+	      window under the "Theme test" window in cswstest!). This
+	      looks cool, although it will look much better when I will
+	      implement support for alpha backgrounds! :-)
+	    - Removed the #ifdef MSC_VER from csapp.cpp. Grrrr.... such
+	      things make me angry.
 9-Oct-2000
 	- Brandon Ehle fixed some compile errors in imotion.h and
 	  also restructured the API a bit.
