@@ -19,7 +19,7 @@ chronological order.
 	- Jorrit reverted the crash fix in genmesh made by res2k earlier.
 	  Better to leave the crash there until the REAL bug is fixed.
 	- Jorrit fixed all mesh loaders to test if the factory is actually
-	  the same type as the mesh object. That's better then just crashing.
+	  the same type as the mesh object. That's better than just crashing.
 	- Jorrit fixed the engine so that objects created from a hierarchical
 	  mesh factory (<meshref> in loader) will also have SetLogicalParent()
 	  called.
@@ -28,7 +28,7 @@ chronological order.
 	  file. The problem is that it is impossible to detect at load time
 	  and we have no facility to report these kind of errors at
 	  render time yet... So a CS_ASSERT will have to do for now.
-	- Steven Geens fixed sockets in sprcal3d. The alignement of the
+	- Steven Geens fixed sockets in sprcal3d. The alignment of the
 	  object in the socket was incorrect.
 	- Jorrit added 'const' to several methods in iGenericRenderStep.
 	- Jorrit added methods iGenericRenderStep->SetPortalTraversal()
@@ -50,6 +50,23 @@ chronological order.
 	  Walktest.Win32.Minidumps config setting. Also, for non-VC compilers
 	  it's now disabled by default (not much useful there anyway).
 	- res fixed a crash in bindoc when 0 was set as a node value.
+	- Eric Sunshine made the following changes to the Jam build system:
+	    - Introduced a new rule named Description which can be used to
+	      both set and query a target's description.
+	    - Changed all invocations of the Help rule (except the ones using
+	      the "verbatim" option) to invocations of the Description rule
+	      throughout the project.
+	    - Removed the "verbatim" option from the Help rule and changed the
+	      Help rule _always_ treat its argument as verbatim.
+	    - Eliminated the anomaly where Help was hard-coded to prepend
+	      "Build the" to the incoming text.
+	    - Augmented the Application, Library, Plugin, and ShellScript rules
+	      to invoke Help automatically with the text "Build the
+	      $(description)".
+	    - Augmented msvcgen.jam and win32.jam to utilize the target's
+	      decription string (as collected by the Description rule) rather
+	      than the help string (which was not necessarily appropriate in
+	      the context of project files and .rc files).
 27-Apr-2004
 	- Jorrit removed ClipBSphere() from iRenderView.
 	- Jorrit added a private implementation of ClipBSphere() to
