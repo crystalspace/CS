@@ -31,7 +31,7 @@ elif [ -d /usr/lib/X11 ]; then
   X11_PATH="/usr/lib/X11"
 fi
 
-if [ -n "${X11_PATH}" ]; then
+if [ -n "$X11_PATH" ]; then
   echo "X11_PATH = ${X11_PATH}"
   msg_result "${X11_PATH}"
 else
@@ -43,7 +43,7 @@ fi
 
 if [ -n "${X11_PATH}" ]; then
   msg_checking "for XFree86"
-  if [ -f "${X11_PATH}/lib/libXxf86vm.so" ]; then
+  if [ -f "${X11_PATH}/lib/libXxf86vm.so" -o  -f "${X11_PATH}/lib/libXxf86vm.a" ]; then
     echo "USE_XFREE86VM = yes"
     msg_result "yes"
   else
