@@ -1,0 +1,14 @@
+@node Internals
+@chapter The Internal Structure of the Project
+@cindex Internal Structure
+
+This chapter describes how Crystal Space works internally. This information
+should not be nessecary to use CS in your project. It is intended for
+developers.
+
+@menu
+* Makefile How-To:: Makefile How-To
+@end menu
+
+@imports{internal,makefile.txi}
+

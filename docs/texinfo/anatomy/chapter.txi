@@ -21,7 +21,6 @@ Scripting
 * Library List:: Quick Overview of Modules and Libraries
 * Dependencies::
 * Directory Hierarchy::
-* Makefile How-To::
 * SCF:: Shared Class Facility (@sc{scf})
 * VFS:: Virtual File System (@sc{vfs})
 * World Components:: Components of a World
@@ -34,7 +33,6 @@ Scripting
 @imports{anatomy,liblist.txi}
 @imports{anatomy,depend.txi}
 @imports{anatomy,dirhier.txi}
-@imports{anatomy,makefile.txi}
 @imports{anatomy,scf.txi}
 @imports{anatomy,vfs.txi}
 @imports{anatomy,worldcmp.txi}

@@ -106,6 +106,7 @@ version @value{VERSION}, last updated @value{UPDATED}.
 * Anatomy:: Project Anatomy
 * Libraries::
 * Plug-In Drivers:: Plug-In Modules and Drivers
+* Internals:: The Internal Structure of the Project
 * Contributing:: Contributing to Crystal Space
 * FAQ:: Frequently Asked Questions (@sc{faq})
 * ApiMods17:: Significant @sc{api} Changes
@@ -132,6 +133,7 @@ For a list of available topics, see the
 @imports{anatomy,chapter.txi}
 @imports{libs,chapter.txi}
 @imports{plugins,chapter.txi}
+@imports{internal,chapter.txi}
 @imports{contrib,chapter.txi}
 @imports{appendix,appendix.txi}
 
