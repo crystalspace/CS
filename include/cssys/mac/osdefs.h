@@ -6,6 +6,10 @@
 #ifndef OSDEFS_H
 #define OSDEFS_H
 
+#ifdef __cplusplus
+	extern "C" {
+#endif
+
 int strcasecmp (const char *str1, const char *str2);
 int strncasecmp (char const *dst, char const *src, int maxLen);
 char *strdup (const char *str);
@@ -13,6 +17,10 @@ char *strdup (const char *str);
 
 #ifdef SYSDEF_ACCESS
 int access (const char *path, int mode);
+#endif
+
+#ifdef __cplusplus
+	}
 #endif
 
 // The 2D graphics driver used by software renderer on this platform

@@ -21,6 +21,7 @@
 // actions, sprite templates, and things. The resulting structures
 // can be used in a Crystal Space world.
 
+#include "sysdef.h"
 #include "csparser/crossbld.h"
 #include "csobject/nameobj.h"
 #include "csengine/world.h"

@@ -130,7 +130,7 @@
 // Path separator character
 #  ifndef PATH_SEPARATOR
 #    if defined(OS_MACOS)
-#      define PATH_SEPARATOR ':'
+#      define PATH_SEPARATOR '/'
 #    elif defined(OS_OS2) || defined(OS_DOS) || defined(OS_WIN32)
 #      define PATH_SEPARATOR '\\'
 #    else

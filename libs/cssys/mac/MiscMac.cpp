@@ -24,11 +24,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
-#include <stat.h>
-#include <FSp_fopen.h>
-#define SYSDEF_ACCESS
 #include "sysdef.h"
-#include "osdefs.h"
 
 /*------------------------------------------------------------------------------
 	Case insensitve strcmp
@@ -82,14 +78,3 @@ char *	strdup(const char *str)
 
 	return c;
 	}
-
-
-/*------------------------------------------------------------------------------
-	Get state information on a file
-------------------------------------------------------------------------------*/
-int access( const char *path, int /* mode */ )
-{
-	struct stat info;
-
-	return stat( path, &info );	
-}
