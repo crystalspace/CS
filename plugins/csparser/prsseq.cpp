@@ -468,6 +468,41 @@ iSequenceTrigger* csLoader::LoadTrigger (iDocumentNode* node)
 	  trigger->AddConditionMeshClick (mesh);
 	}
 	break;
+      case XMLTOKEN_LIGHTVALUE:
+	{
+	  const char *lightname = child->GetAttributeValue ("light");
+	  if (!lightname)
+	  {
+	    SyntaxService->ReportError (
+		"crystalspace.maploader.parse.trigger",
+		child, "Couldn't find 'light' attribute in trigger '%s'!",
+		trigname);
+	    return NULL;
+	  }
+	  iLight* light = ldr_context->FindLight (lightname);
+	  if (!light)
+	  {
+	    SyntaxService->ReportError (
+		"crystalspace.maploader.parse.trigger",
+		child, "Couldn't find light '%s' in trigger '%s'!", lightname,
+		trigname);
+	    return NULL;
+	  }
+	  int oper;
+	  float r,g,b;
+	  const char *operation = child->GetAttributeValue ("operator");
+	  if (!operation)
+	      oper = 0;
+	  else if (!strcmp (operation,"less"))
+	      oper = 1;
+	  else if (!strcmp (operation,"greater"))
+	      oper = 2;
+	  r = child->GetAttributeValueAsFloat ("red");
+	  g = child->GetAttributeValueAsFloat ("green");
+	  b = child->GetAttributeValueAsFloat ("blue");
+	  trigger->AddConditionLightChange (light, oper, csColor(r,g,b) );
+	}
+	break;
       case XMLTOKEN_MANUAL:
 	{
 	  trigger->AddConditionManual();

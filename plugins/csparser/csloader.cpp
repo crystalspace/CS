@@ -31,6 +31,7 @@
 #include "cstool/mdltool.h"
 #include "csgfx/csimage.h"
 #include "csloader.h"
+#include "csengine/light.h"
 
 #include "iutil/databuff.h"
 #include "iutil/document.h"
@@ -99,6 +100,7 @@ public:
   virtual iMeshFactoryWrapper* FindMeshFactory (const char* name);
   virtual iMeshWrapper* FindMeshObject (const char* name);
   virtual iTextureWrapper* FindTexture (const char* name);
+  virtual iLight* FindLight (const char *name);
 };
 
 SCF_IMPLEMENT_IBASE(StdLoaderContext);
@@ -173,6 +175,21 @@ iMeshFactoryWrapper* StdLoaderContext::FindMeshFactory (const char* name)
 iMeshWrapper* StdLoaderContext::FindMeshObject (const char* name)
 {
   return Engine->FindMeshObject (name, region);
+}
+
+iLight* StdLoaderContext::FindLight(const char *name)
+{
+  // This function is necessary because Engine::FindLight returns iStatLight
+  // and not iLight.
+  csRef<iLightIterator> li = Engine->GetLightIterator(region);
+  iLight *light;
+
+  while ((light = li->Fetch ()) != NULL)
+  {
+      if (!strcmp (light->GetPrivateObject ()->GetName (),name))
+	  return light;
+  }
+  return NULL;
 }
 
 iTextureWrapper* StdLoaderContext::FindTexture (const char* name)
@@ -803,6 +820,7 @@ bool csLoader::Initialize (iObjectRegistry *object_Reg)
   xmltokens.Register ("fire", XMLTOKEN_FIRE);
   xmltokens.Register ("sectorvis", XMLTOKEN_SECTORVIS);
   xmltokens.Register ("manual", XMLTOKEN_MANUAL);
+  xmltokens.Register ("lightvalue",XMLTOKEN_LIGHTVALUE);
   xmltokens.Register ("onclick", XMLTOKEN_ONCLICK);
   xmltokens.Register ("polygon", XMLTOKEN_POLYGON);
   xmltokens.Register ("arg", XMLTOKEN_ARG);

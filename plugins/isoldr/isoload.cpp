@@ -151,6 +151,7 @@ public:
   virtual iMeshFactoryWrapper* FindMeshFactory (const char* name);
   virtual iMeshWrapper* FindMeshObject (const char* name);
   virtual iTextureWrapper* FindTexture (const char* name);
+  virtual iLight *FindLight (const char* name);
 };
 
 SCF_IMPLEMENT_IBASE(StdIsoLoaderContext);
@@ -189,6 +190,12 @@ iMeshWrapper* StdIsoLoaderContext::FindMeshObject (const char* /*name*/)
 
 iTextureWrapper* StdIsoLoaderContext::FindTexture (const char* /*name*/)
 {
+  return NULL;
+}
+
+iLight* StdIsoLoaderContext::FindLight(const char *name)
+{
+  // TODO: Implement this.
   return NULL;
 }
 
