@@ -1215,6 +1215,7 @@ csPolygon3D *csThing::IntersectSegmentFull (
   float *pr,
   csMeshWrapper **p_mesh)
 {
+  if (p_mesh) *p_mesh = NULL;
   if (static_tree)
   {
     // Version with culler.
