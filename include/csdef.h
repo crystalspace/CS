@@ -41,10 +41,12 @@
   #define iGraphics3D iRender3D
 #endif*/
 
+// DEPRECATED use "true" instead
 #ifndef TRUE
   #define TRUE 1
 #endif
 
+// DEPRECATED use "false" instead
 #ifndef FALSE
   #define FALSE 0
 #endif
@@ -61,7 +63,7 @@
  #define ABS(x) ((x)<0?-(x):(x))
 #endif
 
-#if !defined(SIGN)
+#ifndef SIGN
   #define SIGN(x) ((x) < 0 ? -1 : ((x) > 0 ? 1 : 0))
 #endif
 
@@ -81,15 +83,6 @@
   #define SMALL_EPSILON 0.000001f		/* Very small value */
 #undef SMALL_EPSILON_D
   #define SMALL_EPSILON_D 0.000000000001f	/* Very, very small value */
-
-// A macro for defining a constant static table.  The default expansion is
-// merely `static const'.  Typical usage is `CS_STATIC_TABLE Foo[] = {...};',
-// which expands to `static const Foo[] = {...};'.  Some variants of GCC have
-// been known to throw an internal compiler error exception when confronted
-// with such an expression.  In this case, the platform-specific header file
-// may override the definition of CS_STATIC_TABLE with one which works around
-// the compiler bug.
-#define CS_STATIC_TABLE static const
 
 // Platforms with compilers which only understand old-style C++ casting syntax
 // should define CS_USE_OLD_STYLE_CASTS.
