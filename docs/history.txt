@@ -17,6 +17,13 @@ chronological order.
 	  csappframe as a standard library. But csappframe should not be
 	  standard because it adds things like CS_IMPLEMENT_APPLICATION
 	  which many applications already have on their own.
+	- John Harger added an experimental plugin to provide fragment program
+	  support for DX8 type video cards (GF3/4,R8500-9200) using the
+	  DX8 pixel shader language. Please read the readme.txt file before
+	  you try to use this. I would like anyone interested to test it out
+	  using PS 1.4 programs (for ATI) and PS 1.1 (for nVidia). Let me know
+	  of any problems or errors. PS 1.4 emulation will work on all Radeon
+	  8500 and up, while PS 1.1 will only work on nVidia GeForce 3 and up.
 1-Mar-2004
 	- res augmented the Win32 canvas to allow retrieval/setting of the
 	  window rectangle (via PerformExtension()).

@@ -753,7 +753,11 @@ bool csGLGraphics3D::Open ()
    */
   if (config->GetBool ("Video.OpenGL.UseNVidiaExt", true))
   {
-    //no special nvidia extensions atm
+    ext->InitGL_NV_register_combiners ();
+    ext->InitGL_NV_register_combiners2 ();
+    ext->InitGL_NV_texture_shader ();
+    ext->InitGL_NV_texture_shader2 ();
+    ext->InitGL_NV_texture_shader3 ();
   }
   /*
     Check whether to init ATI-only exts.
@@ -763,6 +767,7 @@ bool csGLGraphics3D::Open ()
   if (config->GetBool ("Video.OpenGL.UseATIExt", true))
   {
     ext->InitGL_ATI_separate_stencil ();
+    ext->InitGL_ATI_fragment_shader ();
   }
 
   rendercaps.SupportsPointSprites = ext->CS_GL_ARB_point_parameters &&
