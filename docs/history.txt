@@ -8,6 +8,7 @@ chronological order.
 
 8-Aug-2003
         - Philip Wyett changed instances of NULL for 0 in sprcal3d plugins.
+            - Added 3ds2lev to CS/ root .cvsignore.
 7-Aug-2003
 	- Jorrit did the following array related changes:
 	    - Added Put() to csArray.

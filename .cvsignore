@@ -11,6 +11,7 @@ config.mak*
 Jamconfig
 Jamfile
 Makefile
+3ds2lev
 awstest
 awstut
 blocks
