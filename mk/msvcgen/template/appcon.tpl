@@ -83,7 +83,7 @@ LINK32=link.exe
 # Begin Special Build Tool
 TargetPath=.\csdebug\temp\%project%\%target%
 SOURCE="$(InputPath)"
-PostBuild_Cmds=echo Moving output to CS root.	copy "$(TargetPath)"  ..\..	echo Moving output to MSVC Debug Bin.	copy "$(TargetPath)"  csdebug\bin
+PostBuild_Cmds=copy %0 post_build_debug.txt	echo Moving output to CS root.	copy "$(TargetPath)"  ..\..	echo Moving output to MSVC Debug Bin.	copy "$(TargetPath)"  csdebug\bin
 # End Special Build Tool
 
 !ENDIF 
