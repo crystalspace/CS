@@ -127,6 +127,31 @@ obtained from:
 
 @uref{http://www.python.org}
 
+Note: To correctly build the CS Python plugin with Python version later than
+1.5.2 in @emph{CS\plugins\cscript\cspythoncs_pyth.cpp'} Now find the code lines
+49 - 55 inclusive  i.e.
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+#include "Python.h"
+#ifdef __cplusplus
+}
+#endif
+
+The above 'extern "C"' will cause problems because MS put C++ 
+template code right in the middle of MSVC's math.h and for that blows 
+out some nice errors. To avoid this edit the above to match the 
+following.
+
+//#ifdef __cplusplus
+//extern "C" {
+//#endif
+#include "Python.h"
+//#ifdef __cplusplus
+//}
+//#endif
+
 @subsubheading BisonFlex
 
 To successfully build the Crystal Space Alternate Windowing System (AWS) plugin
