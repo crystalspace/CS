@@ -21,6 +21,7 @@
 #define __CS_SIMPCON_H__
 
 #include "ivaria/conout.h"
+#include "csutil/scopedmutexlock.h"
 #include "iutil/eventh.h"
 #include "iutil/comp.h"
 #include "ivideo/fontserv.h"
@@ -35,6 +36,8 @@ struct iGraphics2D;
 class csSimpleConsole : public iConsoleOutput
 {
 private:
+  csRef<csMutex> mutex;
+
   /// Two possible console modes
   enum
   {

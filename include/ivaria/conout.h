@@ -90,12 +90,16 @@ struct iConsoleOutput : public iBase
   /**
    * Display the console and return the dirty rectangle.
    * The graphics driver should be in 2D draw mode.
+   * Only call this function from the same thread that maintains
+   * the graphics subsystem!
    */
   virtual void Draw2D (csRect *oRect = NULL) = 0;
 
   /**
    * Update the 3D part of the console on the window.
    * The graphics driver should be in 3D draw mode.
+   * Only call this function from the same thread that maintains
+   * the graphics subsystem!
    */
   virtual void Draw3D (csRect *oRect = NULL) = 0;
 
@@ -148,6 +152,10 @@ struct iConsoleOutput : public iBase
    * calls BeginDraw/Console->Draw methods on every PutText call.
    * Otherwise it is your responsability to call Draw() at appropiate
    * times. Initially this mode is enabled.
+   * <p>
+   * Note that some implementations of the output consoles may be thread-safe.
+   * But in that case you MUST use AutoUpdate(false) because access to
+   * graphics is not thread-safe.
    */
   virtual void AutoUpdate (bool iAutoUpdate) = 0;
 

@@ -83,6 +83,7 @@ csSimpleConsole::csSimpleConsole (iBase *iParent)
   ConsoleMode = CONSOLE_MODE;
   CursorState = false;
   InvalidAll = true;
+  mutex = csMutex::Create (true);
 }
 
 csSimpleConsole::~csSimpleConsole ()
@@ -209,6 +210,8 @@ void csSimpleConsole::FreeBuffer ()
 
 void csSimpleConsole::SetBufferSize (int iCount)
 {
+  csScopedMutexLock lock (mutex);
+
   FreeBuffer ();
 
   LineMax = iCount;
@@ -251,7 +254,7 @@ void csSimpleConsole::PutMessage (bool advance, const char *iText)
 {
   if (LineMessageNumber >= LineMessageMax)
   {
-	int i;
+    int i;
     for (i = 1; i < LineMessageMax; i++)
     {
       strcpy (LineMessage [i - 1], LineMessage [i]);
@@ -270,6 +273,8 @@ void csSimpleConsole::PutMessage (bool advance, const char *iText)
 
 void csSimpleConsole::PutTextV (const char *iText2, va_list args)
 {
+  csScopedMutexLock lock (mutex);
+
   int len;
   char *dst;
   const char *src;
@@ -315,7 +320,7 @@ void csSimpleConsole::PutTextV (const char *iText2, va_list args)
       }
       else
       {
-		int i;
+	int i;
         for (i = 1; i < LineMax; i++)
           strcpy (Line[i - 1], Line[i]);
       }
@@ -352,6 +357,8 @@ void csSimpleConsole::SetCursorPos (int iCharNo)
 
 void csSimpleConsole::Clear (bool)
 {
+  csScopedMutexLock lock (mutex);
+
   LineMessageNumber = 0;
   LineNumber = 0;
   Line [LineNumber][0] = '\0';
@@ -367,6 +374,8 @@ void csSimpleConsole::Clear (bool)
 
 void csSimpleConsole::Draw2D (csRect* area)
 {
+  csScopedMutexLock lock (mutex);
+
   int i;
   csTicks CurrentTime = csGetTicks ();
 
@@ -500,6 +509,7 @@ void csSimpleConsole::SetVisible (bool iShow)
 
 const char *csSimpleConsole::GetLine (int iLine) const
 {
+  csScopedMutexLock lock (mutex);
   return Line [iLine < 0 ? LineNumber : iLine];
 }
 

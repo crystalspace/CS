@@ -11,6 +11,10 @@ threads in combination with Crystal Space you have to be careful. However,
 several parts of Crystal Space are thread-safe to some degree. This is
 documented in this section. However, by default you must assume that some
 Crystal Space plugin or module is not thread-safe unless it is mentioned here.
+One important module which is not at all thread-safe yet is @sc{vfs}. Since
+several other plugins depend on that this might be a problem.
+
+@subsubheading Threadsafe parts of CS
 
 @itemize @bullet
 @item
@@ -40,6 +44,11 @@ matrices, reporting errors, ...). For polygons and thing related objects
 this hasn't been checked yet.
 
 @item
+The @sc{simpcon} output console is thread-safe provided auto-updating
+is disabled (call @code{iConsoleOutput->AutoUpdate(false)}). Note that
+by default auto-updating is enabled!
+
+@item
 The reporter plugin is fully thread-safe.
 
 @item
@@ -48,9 +57,7 @@ but not for initialization. That should be done from the main thread.
 Also logging to file (@sc{vfs}) with @file{debug.txt} or otherwise
 is not thread-safe since @sc{vfs} itself is not thread-safe.
 Also note that thread-safety of the standard reporter listener depends
-on thread-safety of the output console that is being used. None of the
-output consoles have been tested yet so most likely it is actually not
-thread-safe.
+on thread-safety of the output console that is being used.
 
 @item
 The following mesh object and factory loaders are thread-safe provided
@@ -65,4 +72,24 @@ thread-safe.
 @end itemize
 
 @end itemize
+
+@subsubheading Threaded Loading
+
+One important threaded section of CS is the threaded loader. In order
+to ensure that the threaded loader works correctly you must make sure that
+you use thread-safe versions of the following modules in CS:
+
+@itemize
+@item
+@code{iReporter} (the standard reporter is ok).
+@item
+@code{iReporterListener} (the standard reporter listener is ok).
+@item
+@code{iConsoleOutput} (simpcon is ok).
+@item
+@code{iLoaderContext} (the threaded loader provides a thread-safe version
+of this one).
+@end itemize
+
+
 

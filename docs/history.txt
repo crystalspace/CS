@@ -35,6 +35,8 @@ The history order is reversed so that new features are at the top.
 	- Made the reporter and standard reporter listener thread-safe.
 	  However the standard-reporter listener will only become
 	  really thread-safe after the output consoles are thread-safe.
+	- The simpcon output console is now thread-safe provided
+	  auto-updating is disabled! Note that this is enabled by default.
 17-Apr-2003
 	- Fixed a bug in the common polygon buffer implementation where it
 	  was incrementing the ref count on poly_texture without testing if
