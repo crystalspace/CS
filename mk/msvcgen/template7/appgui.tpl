@@ -25,11 +25,10 @@
 				AdditionalIncludeDirectories="..\..\plugins,..\..,..\..\include\cssys\win32,..\..\include,..\..\libs,..\..\support,..\..\apps"
 				PreprocessorDefinitions="_DEBUG,WIN32,_WINDOWS,WIN32_VOLATILE,__CRYSTAL_SPACE__,CS_DEBUG"
 				RuntimeLibrary="1"
-				UsePrecompiledHeader="2"
 				PrecompiledHeaderFile=".\csdebug\temp\%project%/%project%.pch"
 				AssemblerListingLocation=".\csdebug\temp\%project%/"
 				ObjectFile=".\csdebug\temp\%project%/"
-				ProgramDataBaseFileName=".\csdebug\temp\%project%/"
+				ProgramDataBaseFileName=".\csdebug\temp\%project%/%project%.pdb"
 				WarningLevel="4"
 				SuppressStartupBanner="TRUE"
 				DebugInformationFormat="4"
@@ -39,7 +38,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalOptions="/MACHINE:I386 %lflags%"
-				AdditionalDependencies="ddraw.lib zlib.lib %libs%"
+				AdditionalDependencies="%libs%"
 				OutputFile="csdebug\temp\%project%\%target%"
 				LinkIncremental="2"
 				SuppressStartupBanner="TRUE"
@@ -47,7 +46,7 @@
 				IgnoreDefaultLibraryNames="LIBC"
 				GenerateDebugInformation="TRUE"
 				ProgramDatabaseFile=".\csdebug\temp\%project%/%project%.pdb"
-				SubSystem="2"/>
+				SubSystem="1"/>
 			<Tool
 				Name="VCMIDLTool"
 				PreprocessorDefinitions="_DEBUG"
@@ -97,11 +96,10 @@ copy $(TargetPath)  csdebug\bin
 				StringPooling="TRUE"
 				RuntimeLibrary="0"
 				EnableFunctionLevelLinking="TRUE"
-				UsePrecompiledHeader="2"
 				PrecompiledHeaderFile=".\csrelease\temp\%project%/%project%.pch"
 				AssemblerListingLocation=".\csrelease\temp\%project%/"
 				ObjectFile=".\csrelease\temp\%project%/"
-				ProgramDataBaseFileName=".\csrelease\temp\%project%/"
+				ProgramDataBaseFileName=".\csrelease\temp\%project%/%project%.pdb"
 				WarningLevel="4"
 				SuppressStartupBanner="TRUE"
 				CompileAs="0"/>
@@ -110,7 +108,7 @@ copy $(TargetPath)  csdebug\bin
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalOptions="/MACHINE:I386 %lflags%"
-				AdditionalDependencies="ddraw.lib zlib.lib %libs%"
+				AdditionalDependencies="%libs%"
 				OutputFile="csrelease\temp\%project%\%target%"
 				LinkIncremental="1"
 				SuppressStartupBanner="TRUE"
@@ -118,7 +116,8 @@ copy $(TargetPath)  csdebug\bin
 				IgnoreDefaultLibraryNames="LIBC"
 				GenerateDebugInformation="TRUE"
 				ProgramDatabaseFile=".\csrelease\temp\%project%/%project%.pdb"
-				SubSystem="2"/>
+				SubSystem="1"
+				OptimizeReferences="1"/>
 			<Tool
 				Name="VCMIDLTool"
 				PreprocessorDefinitions="NDEBUG"
@@ -148,7 +147,7 @@ copy $(TargetPath)  csrelease\bin
 		</Configuration>
 	</Configurations>
 	<Files>
-		%groups%
+%groups%
 	</Files>
 	<Globals>
 	</Globals>
