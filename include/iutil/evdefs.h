@@ -37,11 +37,14 @@
 
 /// System Events
 // take care not to define more than 32 event types
-enum
+enum csEventType
 {
   /// Nothing happened	
   csevNothing = 0,
-  /// A keyboard event (key down/up)			
+  /** A keyboard event (key down/up)  
+        @sa csKeyEventHelper
+        @sa csKeyEventType
+    */
   csevKeyboard,
   /// Mouse has been moved
   csevMouseMove,		
@@ -59,7 +62,7 @@ enum
   csevJoystickDown,		
   /// A joystick button has been released
   csevJoystickUp,		
-  /// Somebody(-thing) sent a command
+  /// Somebody(-thing) sent a command. @see csEventCommandData
   csevCommand,			
   /// Somebody(-thing) sent a broadcast command
   csevBroadcast,		
@@ -178,7 +181,7 @@ enum csKeyEventType
  * \sa \ref Keyboard, Modifier key masks
  * @{ */
 /// Modifier types
-enum
+enum csKeyModifierType
 {
   /// 'Shift' is held
   csKeyModifierTypeShift = 0,
@@ -198,7 +201,7 @@ enum
 };
 
 /// Modifier numbers
-enum
+enum csKeyModifierNumType
 {
   /// The default number for a 'left' version of a key.
   csKeyModifierNumLeft = 0,
@@ -518,7 +521,7 @@ enum csKeyCharType
  * }
  *</pre>
  */
-enum
+enum csCommandEventCode
 {
   /**
    * No command. Dunno really why it is needed but traditionally
@@ -544,7 +547,7 @@ enum
    * hide software mouse cursor and so on. iEnable = true in the event
    * application receives focus and false if it loses focus.
    * <pre>
-   * IN: false -> window lose focus, true -> window got focus
+   * Info: NULL -> window lose focus, non-NULL -> window got focus
    * </pre>
    */
   cscmdFocusChanged,
@@ -565,7 +568,7 @@ enum
    * This event is generated when user resizes the application window.
    * The argument points to the graphics context that has been resized.
    * <pre>
-   * IN: (iGraphics2D *) The context that has been resized
+   * Info: (iGraphics2D *) The context that has been resized
    * </pre>
    */
   cscmdContextResize,
@@ -576,7 +579,7 @@ enum
    * but there is one exception: when a dynamic texture is closed
    * (a dynamic texture is a graphics context as well).
    * <pre>
-   * IN: (iGraphics2D *) The context that has been closed
+   * Info: (iGraphics2D *) The context that has been closed
    * </pre>
    */
   cscmdContextClose,

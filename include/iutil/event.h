@@ -104,6 +104,7 @@ SCF_VERSION (iEvent, 0, 1, 1);
  * The event it self doesn't transfer it; it is merely ment to pass around 
  * keyboard event data in a compact without having to pass  around the event 
  * itself. 
+ * @sa csKeyEventHelper
  */
 struct csKeyEventData
 {
@@ -155,9 +156,9 @@ struct csEventJoystickData
 /// Command event data in iEvent.
 struct csEventCommandData
 {
-  /// Command code	
+  /** Command code. @see csCommandEventCode for common codes. */
   uint Code;
-  /// Command info
+  /** Command info. Meaning depends on the particular command. */
   void *Info;
 };
 
@@ -197,7 +198,7 @@ struct csEventNetworkData
  */
 struct iEvent : public iBase
 {
-  /// Event type (one of #csevKeyDown etc.)
+  /// Event type. @see csEventType
   uint8 Type;			
   /// Event category (unused by CSWS)
   uint8 Category;		

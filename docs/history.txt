@@ -11,6 +11,8 @@ chronological order.
 	- Jorrit corrected the howto on creating a thing. It was still
 	  mentioning that things support portals. But this is no longer true.
 	- Jorrit added a howto on creating genmesh objects.
+    - Reed made some changes to doxygen comments, and named some anonymous
+      enums, for event type codes.
 5-Feb-2004
 	- res added a small convenience wrapper arounf LoadLibrary() and 
 	  FreeLibrary() for Win32.
