@@ -20,374 +20,413 @@
 #include "cssys/thread.h"
 #include <sys/time.h>
 
-/**
- * A pthread implementation of the CS thread interface.
- */
+#ifdef CS_DEBUG
+#define CS_SHOW_ERROR if (lasterr) printf ("%s\n",lasterr)
+#else
+#define CS_SHOW_ERROR
+#endif
 
-uint32 csThreadInit (csThread *thread, csThreadFunc func, void* param, uint32 /*threadAttributes*/)
+csPosixMutex::csPosixMutex ()
 {
-   pthread_attr_t attr;
-   int rc;
-   uint32 ret;
+  lasterr = NULL;
 
-   /* 
-      Force thread to be joinable, in later pthread implementations this is default already
-      Thread cancellation state is _assumed_ to be PTHREAD_CANCEL_ENABLE and cancellation type is PTHREAD_CANCEL_DEFERRED
-   */
-   pthread_attr_init(&attr);
-   pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_JOINABLE);
-   rc = pthread_create((pthread_t*)thread, &attr, func, param); 
-
-   switch (rc)
-   {
-   case EAGAIN:
-     ret = CS_THREAD_OUT_OF_RESOURCES;
-     break;
-   case EINVAL:
-     ret = CS_THREAD_ERR_ATTRIBUTE;
-     break;
-   case EPERM:
-     ret = CS_THREAD_NO_PERMISSION;
-     break;
-   case 0:
-     ret = CS_THREAD_NO_ERROR;
-     pthread_attr_destroy(&attr);
-     break;
-   default:
-     ret = CS_THREAD_UNKNOWN_ERROR;
-     break;
-   }
-
-   return ret;
-}
-
-void csThreadExit (void* exitValue)
-{
-  pthread_exit (exitValue);
-}
-
-uint32 csThreadJoin (csThread *thread, void** retValue)
-{
-  int rc = pthread_join (*(pthread_t*)thread, retValue);
-  uint32 ret;
-
-  switch (rc)
-  {
-  case ESRCH:
-    ret = CS_THREAD_UNKNOWN_THREAD;
-    break;
-  case EDEADLK:
-    ret = CS_THREAD_DEADLOCK;
-    break;
-  case 0:
-    ret = CS_THREAD_NO_ERROR;
-    break;
-  default:
-    ret = CS_THREAD_UNKNOWN_ERROR;
-    break;
-  }
-
-  return ret;
-}
-
-uint32 csThreadKill (csThread *thread, csThreadSignal signal)
-{
-  uint32 ret = CS_THREAD_NO_ERROR;
-  int sig = 0;
-
-  if (signal == csThreadSignalTerminate)
-    sig = SIGTERM;
-  else if (signal == csThreadSignalKill)
-    sig = SIGKILL;
-  else
-    ret = CS_THREAD_SIGNAL_UNKNOWN;
-
-  if (ret == CS_THREAD_NO_ERROR)
-  {
-    int rc;
-    rc = pthread_kill (*(pthread_t*)thread, sig);
-    switch (rc)
-    {
-    case ESRCH:
-      ret = CS_THREAD_UNKNOWN_THREAD;
-      break;
-    case EINVAL:
-      ret = CS_THREAD_SIGNAL_UNKNOWN;
-      break;
-    case 0:
-      ret = CS_THREAD_NO_ERROR;
-      break;
-    default:
-      ret = CS_THREAD_UNKNOWN_ERROR;
-      break;
-    }
-  }
-  return ret;
-}
-
-uint32 csThreadCancel (csThread *thread)
-{
-  int rc = pthread_cancel (*(pthread_t*)thread);
-  uint32 ret;
-
-  switch (rc)
-  {
-  case ESRCH:
-    ret = CS_THREAD_UNKNOWN_THREAD;
-    break;
-  case 0:
-    ret = CS_THREAD_NO_ERROR;
-    break;
-  default:
-    ret = CS_THREAD_UNKNOWN_ERROR;
-    break;
-  }
-  return ret;
-}
-
-uint32 csMutexInit (csMutex* mutex)
-{
   /*
     Create an 'fast' mutex, that is a deadlock occurs if a thread 
     tries to LockWait a mutex it already owns.
   */
-
-  pthread_mutex_init ((pthread_mutex_t*)mutex, NULL);
-  return CS_THREAD_NO_ERROR;
+  pthread_mutex_init (&mutex, NULL);
 }
 
-uint32 csMutexLockWait (csMutex* mutex)
+csPosixMutex::~csPosixMutex ()
 {
-  uint32 ret;
-  int rc = pthread_mutex_lock ((pthread_mutex_t*)mutex);
+#ifdef CS_DEBUG
+  //  CS_ASSERT (Destroy ());
+  Destroy ();
+#else
+  Destroy ();
+#endif
+}
+
+bool csPosixMutex::Destroy ()
+{
+  int rc = pthread_mutex_destroy (&mutex);
+  switch (rc)
+  {
+  case EBUSY:
+    lasterr = "Mutex busy";
+    break;
+  case 0:
+    lasterr = NULL;
+    break;
+  default:
+    lasterr = "Unknown error while destroying mutex";
+    break;
+  }
+  CS_SHOW_ERROR;
+  return rc == 0;
+}
+
+bool csPosixMutex::LockWait()
+{
+  int rc = pthread_mutex_lock (&mutex);
   switch (rc)
   {
   case EINVAL:
-    ret = CS_THREAD_MUTEX_NOT_INITIALIZED;
+    lasterr = "Mutex not initialized";
     break;
   case EDEADLK:
-    ret = CS_THREAD_DEADLOCK;
+    lasterr = "Deadlock";
     break;
   case 0:
-    ret = CS_THREAD_NO_ERROR;
+    lasterr = NULL;
     break;
   default:
-    ret = CS_THREAD_UNKNOWN_ERROR;
+    lasterr = "Unknown error while locking mutex";
     break;
   }
-  return ret;
+  CS_SHOW_ERROR;
+  return rc == 0;
 }
 
-uint32 csMutexLockTry (csMutex* mutex)
+bool csPosixMutex::LockTry ()
 {
   uint32 ret;
-  int rc = pthread_mutex_trylock ((pthread_mutex_t*)mutex);
+  int rc = pthread_mutex_trylock (&mutex);
   switch (rc)
   {
   case EINVAL:
-    ret = CS_THREAD_MUTEX_NOT_INITIALIZED;
+    lasterr = "Mutex not initialized";
     break;
-  case EBUSY:
-    ret = CS_THREAD_MUTEX_BUSY;
+  case EDEADLK:
+    lasterr = "Deadlock";
     break;
   case 0:
-    ret = CS_THREAD_NO_ERROR;
+    lasterr = NULL;
     break;
   default:
-    ret = CS_THREAD_UNKNOWN_ERROR;
+    lasterr = "Unknown error while trying to lock mutex";
     break;
   }
+  CS_SHOW_ERROR;
   return ret;
 }
 
-uint32 csMutexRelease (csMutex* mutex)
+bool csPosixMutex::Release ()
 {
-  uint32 ret;
-  int rc = pthread_mutex_unlock ((pthread_mutex_t*)mutex);
+  int rc = pthread_mutex_unlock (&mutex);
   switch (rc)
   {
   case EINVAL:
-    ret = CS_THREAD_MUTEX_NOT_INITIALIZED;
+    lasterr = "Mutex not initialized";
     break;
   case EPERM:
-    ret = CS_THREAD_NO_PERMISSION;
+    lasterr = "No permission";
     break;
   case 0:
-    ret = CS_THREAD_NO_ERROR;
+    lasterr = NULL;
     break;
   default:
-    ret = CS_THREAD_UNKNOWN_ERROR;
+    lasterr = "Unknown error while releasing mutex";
     break;
   }
-  return ret;
+  CS_SHOW_ERROR;
+  return rc == 0;
 }
 
-uint32 csMutexDestroy (csMutex* mutex)
+void csPosixMutex::Cleanup (void *arg)
 {
-  uint32 ret;
-  int rc = pthread_mutex_destroy ((pthread_mutex_t*)mutex);
-  switch (rc)
-  {
-  case EBUSY:
-    ret = CS_THREAD_MUTEX_BUSY;
-    break;
-  case 0:
-    ret = CS_THREAD_NO_ERROR;
-    break;
-  default:
-    ret = CS_THREAD_UNKNOWN_ERROR;
-    break;
-  }
-  return ret;
+  ((csPosixMutex*)arg)->Release ();
 }
 
-uint32 csSemaphoreInit (csSemaphore* sem, uint32 value)
+const char* csPosixMutex::GetLastError ()
 {
-  int rc = sem_init ((sem_t*)sem, 0, (unsigned int)value);
-  uint32 ret = CS_THREAD_NO_ERROR;
+  return lasterr;
+}
+
+
+csPosixSemaphore::csPosixSemaphore (uint32 value)
+{
+  int rc = sem_init (&sem, 0, (unsigned int)value);
   if (rc)
-  {
-    if (errno == EINVAL)
-      ret = CS_THREAD_SEMA_VALUE_TOO_LARGE;
-  }
+    lasterr = sys_errlist[errno];
   else
-    ret = CS_THREAD_NO_ERROR;
-  return ret;
+    lasterr = NULL;
+  CS_SHOW_ERROR;
 }
 
-uint32 csSemaphoreLock (csSemaphore* sem)
+csPosixSemaphore::~csPosixSemaphore ()
 {
-  sem_wait ((sem_t*)sem);
-  return CS_THREAD_NO_ERROR;
+  Destroy ();
 }
 
-uint32 csSemaphoreLockTry (csSemaphore* sem)
+bool csPosixSemaphore::LockWait ()
 {
-  int rc = sem_trywait ((sem_t*)sem);
-  uint32 ret;
+  sem_wait (&sem);
+  return true;
+}
+
+bool csPosixSemaphore::LockTry ()
+{
+  int rc = sem_trywait (&sem);
   if (rc)
-    switch (errno)
-    {
-    case EAGAIN:
-      ret = CS_THREAD_SEMA_BUSY;
-      break;
-    default:
-      ret = CS_THREAD_UNKNOWN_ERROR;
-      break;
-    }
+    lasterr = sys_errlist[errno];
   else
-    ret = CS_THREAD_NO_ERROR;
-
-  return ret;
+    lasterr = NULL;
+  CS_SHOW_ERROR;
+  return rc == 0;
 }
 
-uint32 csSemaphoreRelease (csSemaphore* sem)
+bool csPosixSemaphore::Release ()
 {
-  int rc = sem_post ((sem_t*)sem);
-  uint32 ret;
+  int rc = sem_post (&sem);
   if (rc)
-    ret = CS_THREAD_UNKNOWN_ERROR;
+    lasterr = sys_errlist[errno];
   else
-    ret = CS_THREAD_NO_ERROR;
-  return ret;
+    lasterr = NULL;
+  CS_SHOW_ERROR;
+  return rc == 0;
 }
 
-uint32 csSemaphoreValue (csSemaphore* sem)
+uint32 csPosixSemaphore::Value ()
 {
   int val;
-  sem_getvalue ((sem_t*)sem, &val);
+  sem_getvalue (&sem, &val);
   return (uint32)val;
 }
 
-uint32 csSemaphoreDestroy (csSemaphore* sem)
+bool csPosixSemaphore::Destroy ()
 {
-  int rc = sem_destroy ((sem_t*)sem);
-  uint32 ret;
-
+  int rc = sem_destroy (&sem);
   if (rc)
-    switch (errno)
+    lasterr = sys_errlist[errno];
+  else
+    lasterr = NULL;
+  CS_SHOW_ERROR;
+  return rc == 0;
+}
+
+csPosixCondition::csPosixCondition (uint32 /*conditionAttributes*/)
+{
+  pthread_cond_init (&cond, NULL);
+  lasterr = NULL;
+}
+
+csPosixCondition::~csPosixCondition ()
+{
+  Destroy ();
+}
+
+void csPosixCondition::Signal (bool bAll)
+{
+  if (bAll)
+    pthread_cond_broadcast (&cond);
+  else
+    pthread_cond_signal (&cond);
+}
+
+bool csPosixCondition::Wait (csPosixMutex *mutex, csTicks timeout)
+{
+  int rc = 0;
+  if (timeout > 0)
+  {
+    struct timeval now;
+    struct timezone tz;
+    struct timespec to;
+    gettimeofday (&now, &tz);
+    to.tv_sec = now.tv_sec + (timeout / 1000);
+    to.tv_nsec = (now.tv_usec + (timeout % 1000)*1000)*1000;
+    rc = pthread_cond_timedwait (&cond, &mutex->mutex, &to);
+    switch (rc)
     {
-    case EBUSY:
-      ret = CS_THREAD_SEMA_BUSY;
+    case ETIMEDOUT:
+      lasterr = "Timeout";
+      break;
+    case EINTR:
+      lasterr = "Wait interrupted";
+      break;
+    case 0:
+      lasterr = NULL;
       break;
     default:
-      ret = CS_THREAD_UNKNOWN_ERROR;
+      lasterr = "Unknown error while timed waiting for condition";
       break;
     }
-  else
-    ret = CS_THREAD_NO_ERROR;
-
-  return ret;
-}
-
-uint32 csConditionInit (csCondition *cond, uint32 /*conditionAttributes*/)
-{
-  pthread_cond_init ((pthread_cond_t*)cond, NULL);
-  return CS_THREAD_NO_ERROR;
-}
-
-uint32 csConditionSignalOne (csCondition *cond)
-{
-  pthread_cond_signal ((pthread_cond_t*)cond);
-  return CS_THREAD_NO_ERROR;
-}
-
-uint32 csConditionSignalAll (csCondition *cond)
-{
-  pthread_cond_broadcast ((pthread_cond_t*)cond);
-  return CS_THREAD_NO_ERROR;
-}
-
-uint32 csConditionWait (csCondition *cond, csMutex *mutex)
-{
-  pthread_cond_wait ((pthread_cond_t*)cond, (pthread_mutex_t*)mutex);
-  return CS_THREAD_NO_ERROR;
-}
-
-uint32 csConditionWait (csCondition *cond, csMutex *mutex, csTicks timeout)
-{
-  uint32 ret;
-  struct timeval now;
-  struct timezone tz;
-  struct timespec to;
-  gettimeofday (&now, &tz);
-  to.tv_sec = now.tv_sec + (timeout / 1000);
-  to.tv_nsec = (now.tv_usec + (timeout % 1000)*1000)*1000;
-  int rc = pthread_cond_timedwait ((pthread_cond_t*)cond, (pthread_mutex_t*)mutex, &to);
-  switch (rc)
-  {
-  case ETIMEDOUT:
-    ret = CS_THREAD_CONDITION_TIMEOUT;
-    break;
-  case EINTR:
-    ret = CS_THREAD_CONDITION_WAIT_INTERRUPTED;
-    break;
-  case 0:
-    ret = CS_THREAD_NO_ERROR;
-    break;
-  default:
-    ret = CS_THREAD_UNKNOWN_ERROR;
-    break;
   }
-  return ret;
+  else
+    pthread_cond_wait (&cond, &mutex->mutex);
+  CS_SHOW_ERROR;
+  return rc == 0;
 }
 
-uint32 csConditionDestroy (csCondition *cond)
+bool csPosixCondition::Destroy ()
 {
-  int rc = pthread_cond_destroy ((pthread_cond_t*)cond);
-  uint32 ret;
+  int rc = pthread_cond_destroy (&cond);
   switch (rc)
   {
   case EBUSY:
-    ret = CS_THREAD_CONDITION_BUSY;
+    lasterr = "Condition busy";
     break;
   case 0:
-    ret = CS_THREAD_NO_ERROR;
+    lasterr = NULL;
     break;
   default:
-    ret = CS_THREAD_UNKNOWN_ERROR;
+    lasterr = "Unknown error while destroying mutex";
     break;
   }
-  return ret;
+  CS_SHOW_ERROR;
+  return rc == 0;
 }
+
+csPosixThread::csPosixThread (iRunnable *runnable, uint32 /*options*/)
+{
+  csPosixThread::runnable = runnable;
+  running = false;
+  created = false;
+  lasterr = NULL;
+}
+
+csPosixThread::~csPosixThread ()
+{
+  if (running)
+    Kill ();
+  //  if (created)
+    //    pthread_join (thread, NULL); // clean up resources
+}
+
+bool csPosixThread::Start ()
+{
+  if (!running && runnable)
+  {
+    if (created)
+    {
+      pthread_join (thread, NULL); // clean up resources
+      created = false;
+    }
+    pthread_attr_t attr;
+    int rc;
+
+    /* 
+       Force thread to be joinable, in later pthread implementations this is default already
+       Thread cancellation state is _assumed_ to be PTHREAD_CANCEL_ENABLE and cancellation type is PTHREAD_CANCEL_DEFERRED
+    */
+    pthread_attr_init(&attr);
+    pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_JOINABLE);
+    rc = pthread_create(&thread, &attr, ThreadRun, (void*)this); 
+
+    switch (rc)
+    {
+    case EAGAIN:
+      lasterr = "Out of system resources.";
+      break;
+    case EINVAL:
+      lasterr = "Tried to create thread with wrong attributes";
+      break;
+    case EPERM:
+      lasterr = "No permission to create thread";
+      break;
+    case 0:
+      lasterr = NULL;
+      running = true;
+      created = true;
+      break;
+    default:
+      lasterr = "Unknown error while creating thread";
+      break;
+    }
+    pthread_attr_destroy(&attr);
+  }
+  CS_SHOW_ERROR;
+  return running;
+}
+
+bool csPosixThread::Stop ()
+{
+  if (running)
+  {
+    int rc = pthread_cancel (thread);
+    switch (rc)
+    {
+    case ESRCH:
+      lasterr = "Trying to stop unknown thread";
+      break;
+    case 0:
+      lasterr = NULL;
+      running = false;
+      break;
+    default:
+      lasterr = "Unknown error while cancelling thread";
+      break;
+    }
+  }
+  CS_SHOW_ERROR;
+  return !running;
+}
+
+bool csPosixThread::Wait ()
+{
+  if (running)
+  {
+    int rc = pthread_join (thread,NULL);
+    switch (rc)
+    {
+    case ESRCH:
+      lasterr = "Trying to wait for unknown thread";
+      break;
+    case 0:
+      lasterr = NULL;
+      running = false;
+      created=false;
+      break;
+    default:
+      //      lasterr = "Unknown error while waiting for thread";
+      lasterr = sys_errlist[errno];
+      break;
+    }
+  }
+  CS_SHOW_ERROR;
+  return !running;
+}
+
+bool csPosixThread::Kill ()
+{
+  if (running)
+  {
+    int rc;
+    rc = pthread_kill (thread, SIGKILL);
+    switch (rc)
+    {
+    case ESRCH:
+      lasterr = "Thread does not exist";
+      created = false;
+      break;
+    case EINVAL:
+      lasterr = "Unknown signal sent to thread";
+      break;
+    case 0:
+      lasterr = NULL;
+      running = false;
+      break;
+    default:
+      lasterr = "Unknown error while killing thread";;
+      break;
+    }
+  }
+  CS_SHOW_ERROR;
+  return !running;
+}
+
+const char *csPosixThread::GetLastError ()
+{
+  return lasterr;
+}
+
+void* csPosixThread::ThreadRun (void *param)
+{
+  csPosixThread *thread = (csPosixThread *)param;
+  thread->runnable->Run ();
+  thread->running = false;
+  pthread_exit (NULL);
+}
+
+#undef CS_SHOW_ERROR
 
