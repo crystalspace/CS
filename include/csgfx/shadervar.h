@@ -288,8 +288,14 @@ public:
   bool SetValue (const csMatrix3 &value)
   {
     Type = MATRIX;
-    delete MatrixValuePtr;
-    MatrixValuePtr = new csMatrix3 (value);
+    if (MatrixValuePtr)
+    {
+      *MatrixValuePtr = value;
+    }
+    else
+    {
+      MatrixValuePtr = new csMatrix3 (value);
+    }
     return true;
   }
 };

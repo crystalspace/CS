@@ -23,6 +23,11 @@ chronological order.
 	  routine is only called if the shaders actually need color
 	  information. That speeds up levels that use stencil shadows or
 	  other shaders that don't require software vertex lighting.
+	- Jorrit did a significant optimization in
+	  csShaderVariable::SetValue() for matrices. The current
+	  implementation would do 'new/delete' all the time and this is
+	  VERY bad (especially with MSVC) for performance. Now it only
+	  does 'new' if needed.
 3-Jun-2004
 	- Eric Sunshine added MsvcGenVariable rule to msvcgen.jam, which allows
 	  clients to create msvcgen %foo%-style template variables on-the-fly.
