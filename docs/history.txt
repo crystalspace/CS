@@ -1,5 +1,8 @@
 The history order is reversed so that new features are at the top.
 
+18-Oct-2001
+	- M Voase did the following
+	  - Shifted water and fire proctex down to the basement.
 17-Oct-2001
 	- M Voase did the following
 	  - Small typo fix to data/walktest.cfg. This just fixes up
