@@ -570,8 +570,8 @@ idiom works in the obvious and expected inverse fashion.
 Finally, @code{csList<>::Iterator::Next()} and @code{Previous()} now return
 references to contained elements, rather than pointers.  This makes the
 interface of @code{csList<>::Iterator} internally consistent, as well as
-consistent with all other iterators throughout the toolkit, in which these
-methods return references.
+consistent with other iterators throughout the toolkit, in which these methods
+return references.
 
 @subheading @code{iDocument} Changes
 
