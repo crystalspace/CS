@@ -21,9 +21,14 @@
 
 #include "cssysdef.h"
 #include "csutil/csstring.h"
+#include "iutil/objreg.h"
+#include "ivaria/reporter.h"
 #include <stdlib.h>
 #include <windows.h>
 
+#if (DIRECTDRAW_VERSION < 0x0700) && !defined(SM_CMONITORS)
+#define SM_CMONITORS
+#endif
 #include <ddraw.h>
 
 #include <d3d.h>
@@ -39,11 +44,10 @@
 # define _strdup strdup
 #endif
 
-void SystemFatalError (char *str, HRESULT hRes)
+void DirectDetection::ReportResult (int severity, char *str, HRESULT hRes)
 {
   LPVOID lpMsgBuf;
-  char *szMsg;
-  char szStdMessage [] = "\nLast Error: ";
+  char *szMsg = NULL;
   if (FAILED (hRes))
   {
     DWORD dwResult;
@@ -52,20 +56,31 @@ void SystemFatalError (char *str, HRESULT hRes)
 
     if (dwResult != 0)
     {
-      szMsg = new char [strlen ((const char*)lpMsgBuf) + strlen (str) + strlen (szStdMessage) + 1];
-      strcpy (szMsg, str);
-      strcat (szMsg, szStdMessage);
-      strcat (szMsg, (const char*)lpMsgBuf);
+      const char* szStdMessage = "%s\nLast Error: %s [0x%.8x]";
+      szMsg = new char [strlen (szStdMessage) + strlen ((const char*)lpMsgBuf) - 2 + strlen (str) - 2 + 8 - 4 + 1];
+       // in the length formula above the format specifier lengths were subtracted.
+      sprintf (szMsg, szStdMessage, str, lpMsgBuf, hRes);
       LocalFree (lpMsgBuf);
-
-      MessageBox (NULL, szMsg, "Fatal Error", MB_OK | MB_TOPMOST);
-      delete szMsg;
-
-      exit (1);
     }
   }
 
-  MessageBox (NULL, str, "Fatal Error", MB_OK | MB_TOPMOST);
+  csRef<iReporter> rep = CS_QUERY_REGISTRY (object_reg, iReporter);
+  if (rep)
+    rep->Report (severity, "crystalspace.canvas.ddraw.directdetection", "%s", 
+      szMsg ? szMsg : str);
+  else
+  {
+    csPrintf ("%s", szMsg ? szMsg : str);
+    csPrintf ("\n");
+  }
+
+  delete szMsg;
+}
+
+void DirectDetection::SystemFatalError (char *str, HRESULT hRes)
+{
+  ReportResult (CS_REPORTER_SEVERITY_ERROR,
+    str, hRes);
   exit (1);
 }
 
@@ -76,6 +91,7 @@ void SystemFatalError (char *str, HRESULT hRes)
 DirectDetection::DirectDetection ()
 {
   Devices = NULL;
+  object_reg = NULL;
 }
 
 DirectDetection::~DirectDetection ()
@@ -288,7 +304,13 @@ static BOOL WINAPI DirectDetectionDDrawEnumCallback (GUID FAR * lpGUID,
   HRESULT hRes;
 
   if (FAILED (hRes = DirectDrawCreate (lpGUID, &pDD, NULL)))
-    SystemFatalError ("Can't create DirectDraw device", hRes);
+  {
+    ddetect->ReportResult (
+      CS_REPORTER_SEVERITY_WARNING, 
+      "Can't create DirectDraw device",
+      hRes);
+    return DDENUMRET_OK;
+  }
 
   ZeroMemory (&DriverCaps, sizeof (DDCAPS));
   DriverCaps.dwSize = sizeof (DDCAPS);
@@ -296,7 +318,13 @@ static BOOL WINAPI DirectDetectionDDrawEnumCallback (GUID FAR * lpGUID,
   HELCaps.dwSize = sizeof (DDCAPS);
 
   if (FAILED (hRes = pDD->GetCaps (&DriverCaps, &HELCaps)))
-    SystemFatalError ("Can't get device capabilities for DirectDraw device", hRes);
+  {
+    ddetect->ReportResult (
+      CS_REPORTER_SEVERITY_WARNING, 
+      "Can't get device capabilities for DirectDraw device",
+      hRes);
+    return DDENUMRET_OK;
+  }
 
   // some informations about device
   dd2d.DeviceName2D = _strdup (lpDriverName);
@@ -369,11 +397,23 @@ bool DirectDetection::checkDevices3D ()
 
         HRESULT hRes;
         if (FAILED (hRes = DirectDrawCreate (pGuid, &lpDD, NULL)))
-          SystemFatalError ("Can't create DirectDraw device", hRes);
+	{
+	  ReportResult (CS_REPORTER_SEVERITY_WARNING, 
+	    "Can't create DirectDraw device",
+	    hRes);
+	  cur = cur->next;
+	  continue;
+	}
 
         lpDD->QueryInterface (IID_IDirect3D, (LPVOID *)&lpD3D);
         if (FAILED (hRes = lpD3D->EnumDevices (DirectDetectionD3DEnumCallback, (LPVOID *)&toy)))
-          SystemFatalError ("Error when enumerating Direct3D devices.", hRes);
+	{
+	  ReportResult (CS_REPORTER_SEVERITY_WARNING, 
+	    "Error when enumerating Direct3D devices.",
+	    hRes);
+	  cur = cur->next;
+	  continue;
+	}
 
         lpD3D->Release ();
         lpDD->Release ();
@@ -415,7 +455,12 @@ bool DirectDetection::checkDevices2D ()
   {
     HRESULT hRes;
     if (FAILED (hRes = DirectDrawEnumerate (OldCallback, this)))
-      SystemFatalError ("Error when enumerating DirectDraw devices.", hRes);
+    {
+      //SystemFatalError ("Error when enumerating DirectDraw devices.", hRes);
+      ReportResult (CS_REPORTER_SEVERITY_WARNING, 
+	"Error when enumerating DirectDraw devices.",
+	hRes);
+    }
   } 
   else
   {
@@ -426,11 +471,28 @@ bool DirectDetection::checkDevices2D ()
       DDENUM_DETACHEDSECONDARYDEVICES | DDENUM_ATTACHEDSECONDARYDEVICES |
       DDENUM_NONDISPLAYDEVICES)))
     {
-      SystemFatalError ("Error when enumerating DirectDraw devices.", hRes);
+      ReportResult (CS_REPORTER_SEVERITY_WARNING, 
+	"Error when enumerating DirectDraw devices.",
+	hRes);
     }
   }
   //Free the library.
   FreeLibrary (libraryHandle);
+
+    ReportResult (CS_REPORTER_SEVERITY_WARNING, 
+      "test",
+      0x80000001);
+    ReportResult (CS_REPORTER_SEVERITY_ERROR, 
+      "test",
+      0x80000002);
+
+  if (Devices == NULL)
+  {
+    ReportResult (CS_REPORTER_SEVERITY_WARNING, 
+      "No 2D devices found.",
+      ERROR_SUCCESS);
+  }
+
   return true;
 }
 

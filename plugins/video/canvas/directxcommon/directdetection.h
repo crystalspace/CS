@@ -42,7 +42,9 @@ public:
     IsPrimary2D = true; DeviceName2D = NULL; DeviceDescription2D = NULL;
     ZeroMemory(&Guid2D, sizeof(GUID));
   }
-  virtual ~DirectDetection2D() {}
+  virtual ~DirectDetection2D() 
+  {
+  }
 
   bool Mipmap;                // Can enable ddraw surface as mipmap ?
   bool Texture;               // Can enable ddraw surface as texture ?
@@ -131,7 +133,11 @@ public:
   bool checkDevices2D();
   bool checkDevices3D();
 
+  void ReportResult (int severity, char *str, HRESULT hRes);
+  void SystemFatalError (char *str, HRESULT hRes);
+
   DirectDetectionDevice * Devices; // list of devices
+  iObjectRegistry* object_reg;
 };
 
 #endif // __CS_DIRECTDETECTION_H__

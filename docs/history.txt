@@ -107,6 +107,11 @@ The history order is reversed so that new features are at the top.
 		- Augment static linking to work with the new facility.
 		- Eliminate the hard-coded SCF registration information in each
 		  plugin's source code.
+	- res changed the ddraw code so errors in device enumeration aren't
+	  fatal any more, but just emit a warning instead. Also tried to 
+	  improve the compilation for people with older DirectX SDKs. Those
+	  changes are made somewhat blindly as everything worked and works 
+	  fine for me.
 25-May-2003
 	- Jorrit optimized ball->HitBeamObject() considerably by moving an
 	  expensive operation out the inner loop. Same optimization for

@@ -100,6 +100,9 @@ protected:
   HRESULT ChangeCoopLevel ();
   HRESULT InitFail (HRESULT hRet, LPCTSTR szError);
 
+  DirectDetection DDetection;
+  DirectDetectionDevice *DirectDevice;
+
   void ClearSystemPalette ();
   bool CreateIdentityPalette (csRGBpixel *p);
   // Check if palette has changed and if so, realize it

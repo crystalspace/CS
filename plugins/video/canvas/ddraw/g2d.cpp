@@ -27,10 +27,11 @@
 #include "ivaria/reporter.h"
 #include "cssys/win32/win32.h"
 #include "iutil/cmdline.h"
-#include "g2d.h"
 
 #define INITGUID
 #include "video/canvas/directxcommon/directdetection.h"
+
+#include "g2d.h"
 
 #ifndef DD_FALSE
   // This is normally being done in the ddraw.h file
@@ -39,9 +40,6 @@
 
 #define WINDOW_STYLE (WS_CAPTION | WS_MINIMIZEBOX | WS_POPUP | WS_SYSMENU)
 #define FULLSCREEN_STYLE (WS_POPUP | WS_SYSMENU)
-
-static DirectDetection DDetection;
-static DirectDetectionDevice *DirectDevice;
 
 //--//--//--//--//--//--//--//--//--//--//--//--//-- csGraphics2DDDraw3 --//--//
 
@@ -107,6 +105,8 @@ bool csGraphics2DDDraw3::Initialize (iObjectRegistry *object_reg)
       MB_OK | MB_ICONERROR);
     exit(1);
   }
+
+  DDetection.object_reg = object_reg;
 
   csRef<iCommandLineParser> cmdline = CS_QUERY_REGISTRY (object_reg,
 						   iCommandLineParser);
