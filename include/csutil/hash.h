@@ -158,7 +158,7 @@ public:
   }
 
   /// Get all the elements with the given key, or empty if there are none.
-  csArray<T> FetchAll (const K& key) const
+  csArray<T> GetAll (const K& key) const
   {
     const csArray<Element> &values = 
       Elements[KeyHandler::ComputeHash (key) % Modulo];
@@ -212,7 +212,7 @@ public:
    * Get a pointer to the first element matching the given key, 
    * or 0 if there is none.
    */
-  const T* Fetch (const K& key) const
+  const T* GetElementPointer (const K& key) const
   {
     const csArray<Element> &values = 
       Elements[KeyHandler::ComputeHash (key) % Modulo];
@@ -231,7 +231,7 @@ public:
    * Get the first element matching the given key, or \p fallback if there is 
    * none.
    */
-  const T& Fetch (const K& key, const T& fallback) const
+  const T& Get (const K& key, const T& fallback) const
   {
     const csArray<Element> &values = 
       Elements[KeyHandler::ComputeHash (key) % Modulo];

@@ -23,6 +23,10 @@ chronological order.
 	  operators for types T and T2.  It turns out that MSVC6 will accept
 	  these as long as the templated versions (T2) appear before the
 	  non-templated versions (T).
+	- res renamed T& csHash<>::Fetch(key, fallback) to Get() and 
+	  T* csHash<>::Fetch(key) to GetElementPointer(). This way, familiar
+	  name(s) are kept, but code utilizing the old-style Get() syntax will
+	  fail to compile, thus forcing examination of the code as well.
 15-Mar-2004
 	- Anders Stenberg added a first version of a TerraFormer plugin. It
 	  will be responsible for feeding data to other plugins like terrain

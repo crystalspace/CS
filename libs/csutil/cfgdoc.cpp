@@ -179,7 +179,7 @@ bool csConfigDocument::KeyExists (const char *Key) const
   csString dcKey (Key); dcKey.Downcase ();
   if (keys.In ((const char*)dcKey))
   {
-    const KeyInfo* info = keys.Fetch ((const char*)dcKey);
+    const KeyInfo* info = keys.GetElementPointer ((const char*)dcKey);
 
     return (info && (info->cachedStringValue != 0));
   }
@@ -195,7 +195,7 @@ bool csConfigDocument::SubsectionExists (const char *Subsection) const
 int csConfigDocument::GetInt (const char *Key, int Def) const
 {
   csString dcKey (Key); dcKey.Downcase ();
-  const KeyInfo* info = keys.Fetch ((const char*)dcKey);
+  const KeyInfo* info = keys.GetElementPointer ((const char*)dcKey);
   const char* val = info ? info->cachedStringValue : 0;
 
   if (!val) return Def;
@@ -208,7 +208,7 @@ int csConfigDocument::GetInt (const char *Key, int Def) const
 float csConfigDocument::GetFloat (const char *Key, float Def) const
 {
   csString dcKey (Key); dcKey.Downcase ();
-  const KeyInfo* info = keys.Fetch ((const char*)dcKey);
+  const KeyInfo* info = keys.GetElementPointer ((const char*)dcKey);
   const char* val = info ? info->cachedStringValue : 0;
 
   if (!val) return Def;
@@ -221,7 +221,7 @@ float csConfigDocument::GetFloat (const char *Key, float Def) const
 const char* csConfigDocument::GetStr (const char *Key, const char* Def) const
 {
   csString dcKey (Key); dcKey.Downcase ();
-  const KeyInfo* info = keys.Fetch ((const char*)dcKey);
+  const KeyInfo* info = keys.GetElementPointer ((const char*)dcKey);
   const char* val = info ? info->cachedStringValue : 0;
   if (!val) return Def;
   
@@ -231,7 +231,7 @@ const char* csConfigDocument::GetStr (const char *Key, const char* Def) const
 bool csConfigDocument::GetBool (const char *Key, bool Def) const
 {
   csString dcKey (Key); dcKey.Downcase ();
-  const KeyInfo* info = keys.Fetch ((const char*)dcKey);
+  const KeyInfo* info = keys.GetElementPointer ((const char*)dcKey);
   const char* val = info ? info->cachedStringValue : 0;
 
   if (!val) return Def;
@@ -246,7 +246,7 @@ bool csConfigDocument::GetBool (const char *Key, bool Def) const
 const char* csConfigDocument::GetComment (const char *Key) const
 {
   csString dcKey (Key); dcKey.Downcase ();
-  const KeyInfo* info = keys.Fetch ((const char*)dcKey);
+  const KeyInfo* info = keys.GetElementPointer ((const char*)dcKey);
   return info ? info->cachedComment : 0;
 }
 

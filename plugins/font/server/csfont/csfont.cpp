@@ -99,7 +99,7 @@ csPtr<iFont> csDefaultFontServer::LoadFont (const char *filename, int size)
   int i;
 
   // First of all, look for an already loaded font
-  csDefaultFont* font = fonts.Fetch (filename, 0);
+  csDefaultFont* font = fonts.Get (filename, 0);
   if (font != 0)
   {
     return csPtr<iFont> (csRef<iFont> ((iFont*)font));

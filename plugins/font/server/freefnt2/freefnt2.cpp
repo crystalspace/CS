@@ -208,14 +208,14 @@ csPtr<iFont> csFreeType2Server::LoadFont (const char *filename, int size)
   csString fontid;
   fontid.Format ("%d:%s", size, filename);
   // see if we already loaded that face/size pair
-  csRef<iFont> font = fonts.Fetch ((const char*)fontid, 0);
+  csRef<iFont> font = fonts.Get ((const char*)fontid, 0);
   if (font)
   {
     return csPtr<iFont> (font);
   }
 
   // see if we already loaded that face
-  csRef<csFt2FaceWrapper> face = ftfaces.Fetch (filename, 0);
+  csRef<csFt2FaceWrapper> face = ftfaces.Get (filename, 0);
   if (face == 0)
   {
     // not yet loaded, so do it now
@@ -362,7 +362,7 @@ void csFreeType2Font::GetMaxSize (int &oW, int &oH)
 bool csFreeType2Font::GetGlyphMetrics (utf32_char c, csGlyphMetrics& metrics)
 {
   const csGlyphMetrics* cachedMetrics;
-  if ((cachedMetrics = glyphMetrics.Fetch (c)) != 0)
+  if ((cachedMetrics = glyphMetrics.GetElementPointer (c)) != 0)
   {
     metrics = *cachedMetrics;
     return true;
@@ -508,7 +508,7 @@ void csFreeType2Font::GetDimensions (const char *text, int &oW, int &oH, int &de
     text += skip;
     textLen -= skip;
 
-    const csGlyphMetrics* metrics = glyphMetrics.Fetch (glyph);
+    const csGlyphMetrics* metrics = glyphMetrics.GetElementPointer (glyph);
     if (metrics != 0)
     {
       oW += metrics->advance;
@@ -567,7 +567,7 @@ int csFreeType2Font::GetLength (const char *text, int maxwidth)
     textLen -= skip;
 
     int glyphW = defW;
-    const csGlyphMetrics* metrics = glyphMetrics.Fetch (glyph);
+    const csGlyphMetrics* metrics = glyphMetrics.GetElementPointer (glyph);
     if (metrics != 0)
       glyphW = metrics->advance;
     else

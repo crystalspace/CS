@@ -456,7 +456,7 @@ bool csPolygonMeshTools::IsMeshClosed (iPolygonMesh* polyMesh)
       int v2 = poly.vertices[v];
 
       PolyEdge edge (v1, v2);
-      AdjacencyCounter counter (adjacency.Fetch (edge));
+      AdjacencyCounter counter (adjacency.GetElementPointer (edge));
 
       if (counter.adjFlipped != counter.adjNormal)
       {
