@@ -506,7 +506,7 @@ void csLightMap::Cache (
 
     // unsigned long == ls.light_id.
     uint32 size = lh.dyn_cnt * (sizeof (LightSave) + lm_size);
-    uint32 s = convert_endian (s);
+    uint32 s = convert_endian (size);
     file->Write ((char*)&s, sizeof (s));
 
     while (smap)
