@@ -1,6 +1,5 @@
-/* This header is used by COMP_BC, COMP_VC and COMP_GCC for all OS_WIN32 builds
-
 /*
+    This header is used by COMP_BC, COMP_VC and COMP_GCC for all OS_WIN32 builds
     You can change these macros to suit your own needs
     For a description of what each macro does, see mk/user.mak
 */
