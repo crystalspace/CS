@@ -134,8 +134,7 @@ bool csPython::Store(const char* name, void* data, void* tag)
 #if USE_NEW_CSPYTHON_PLUGIN
   swig_type_info * ti = SWIG_TypeQuery((char*)tag);
   PyObject * obj = SWIG_NewPointerObj(data, ti, 0);
-  char mod_name[strlen(name)];
-  strcpy(mod_name, name);
+  char *mod_name = csStrNew(name);
   char * var_name = strrchr(mod_name, '.');
   if(!var_name)
     return false;
@@ -143,6 +142,8 @@ bool csPython::Store(const char* name, void* data, void* tag)
   ++var_name;
   PyObject * module = PyImport_ImportModule(mod_name);
   PyModule_AddObject(module, (char*)var_name, obj);
+
+  delete[] mod_name;
 #else
   char command[256];
   char sysPtr[100];
