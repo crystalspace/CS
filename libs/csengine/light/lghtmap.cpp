@@ -25,6 +25,7 @@
 #include "csengine/light/light.h"
 #include "csengine/world.h"
 #include "csutil/archive.h"
+#include "csutil/util.h"
 #include "csobject/nameobj.h"
 
 //---------------------------------------------------------------------------
@@ -138,31 +139,6 @@ csShadowMap* csLightMap::FindShadowMap (csLight* light)
     smap = smap->next;
   }
   return NULL;
-}
-
-// finds nearest number that is a power of two
-int find_nearest_po2 (int n)
-{
-  int w=1;
-
-  while (n > w)  w <<= 1;
-
-  return w;
-}
-
-
-// returns true if n is a power of two
-bool is_po2 (int n)
-{
-  int i;
-  int po2 = 1;
-
-  if (!n) return false; 
-    
-  for (i=0; i<32; i++, po2<<=1)
-    if (n==po2) return true;
-
-  return false;
 }
 
 void csLightMap::SetSize (int w, int h, int lms)
@@ -563,10 +539,13 @@ void csLightMap::ConvertFor3dDriver (bool requirePO2, int maxAspect)
 {
   if (!requirePO2) return; // Nothing to do.
   int oldw = lwidth, oldh = lheight;
-  lwidth = find_nearest_po2 (lwidth);
-  lheight = find_nearest_po2 (lheight);
+
+  lwidth  = FindNearestPowerOf2 (lwidth);
+  lheight = FindNearestPowerOf2 (lheight);
+
   while (lwidth/lheight > maxAspect) lheight += lheight;
-  while (lheight/lwidth > maxAspect) lwidth += lwidth;
+  while (lheight/lwidth > maxAspect) lwidth  += lwidth;
+
   if (oldw == lwidth && oldh == lheight) return;	// Already ok, nothing to do.
 
   // Move the old data to o_stat and o_real.
