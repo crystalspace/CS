@@ -445,10 +445,12 @@ struct G3DPolygonDPFX
   /// Mixmode to use. If CS_FX_COPY then no mixmode is used.
   uint mixmode;
 
+  //@{
   /// Use this color for drawing (if txt_handle == 0) instead of a material.
   uint8 flat_color_r;
   uint8 flat_color_g;
   uint8 flat_color_b;
+  //@}
 
   // A dummy constructor to appease NextStep compiler which otherwise
   // complains that it is unable to create this object.  This happens when
