@@ -119,6 +119,7 @@ chronological order.
 	- Rhad fixed a bug in partedit that caused regular particles to be
 	  unavailsble after some changes last night, and another bug that 
 	  caused negative forces on attractors (repulsors) to fail to function.
+        - Philip Wyett fixed typo in aws makefile, fixing make depend.
 20-Oct-2003
         - Philip Wyett added 'joytest' to CS/ root .cvsignore file.
 	- Jorrit added thing.cfg.

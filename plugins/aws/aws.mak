@@ -119,7 +119,7 @@ awscleandep:
 	-$(RM) $(OUT.AWS)/aws.dep
 
 ifdef DO_DEPEND
-dep: $(OUT.AWS) $(OUTAWS)/aws.dep
+dep: $(OUT.AWS) $(OUT.AWS)/aws.dep
 $(OUT.AWS)/aws.dep: $(SRC.AWS)
 	$(DO.DEPEND)
 else
