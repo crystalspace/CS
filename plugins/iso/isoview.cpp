@@ -139,3 +139,15 @@ void csIsoView::PreCalc()
   //printf("scanw, scasnh %d %d\n", scanw, scanh);
   rview->SetPrecalcGrid(startx, starty, scanw, scanh);
 }
+
+void csIsoView::SetAxes(float xscale, float yscale, float zscale, float zskew, 
+  float xskew)
+{
+  x_axis.Set(1.0,-xskew);
+  y_axis.Set(0.0,1.0);
+  z_axis.Set(1.0,zskew);
+  x_axis *= xscale;
+  y_axis *= yscale;
+  z_axis *= zscale;
+  invx_axis_y = 1.0 / x_axis.y;
+}

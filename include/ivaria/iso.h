@@ -182,6 +182,16 @@ struct iIsoView : public iBase
   /// Get the rectangle on the screen to draw to
   virtual const csRect& GetRect() const = 0;
 
+  /** set the axis of the view on the world.
+   *  The scale is in pixels, and must be > 0. Default is g3d->height/16.
+   *  The skew values determine the angle of the z and x axis.
+   *  it is the amount of vertical change per horizontal change.
+   *  1.0 gives perfect isometrical view, 0.5 flattens the lines.
+   *  skew values must be > 0.
+   */
+  virtual void SetAxes(float xscale, float yscale, float zscale,
+    float zskew, float xskew) = 0;
+
   /// See the world position scrolled to (shown in center of view)
   virtual const csVector2& GetScroll() const = 0;
   /// Set the scroll position. Show world space pos as screen space coord.

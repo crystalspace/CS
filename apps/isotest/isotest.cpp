@@ -240,6 +240,27 @@ bool IsoTest::HandleEvent (iEvent &Event)
     Shutdown = true;
     return true;
   }
+  if ((Event.Type == csevKeyDown) && (Event.Key.Code == '\t'))
+  {
+    static float settings[][5] = {
+    // scale should be *displayheight.
+    //xscale, yscale, zscale, zskew, xskew
+    {1./16., 1./16., 1./16., 1.0, 1.0},
+    {1./16., 1./16., 1./16., 0.6, 0.6},
+    {1./16., 1./16., 1./16., 0.5, 0.5},
+    {1./40., 1./40., 1./40., 0.5, 0.5},
+    {1./4., 1./4., 1./4., 0.5, 0.5},
+    };
+    static int nrsettings = 5;
+    static int setting = 0;
+    setting = (setting+1)%nrsettings;
+    float h = engine->GetG3D()->GetHeight();
+    view->SetAxes( h*settings[setting][0], h*settings[setting][1], 
+      h*settings[setting][2], settings[setting][3], settings[setting][4]);
+    view->SetScroll(player->GetPosition(), 
+      csVector2(G3D->GetWidth()/2, G3D->GetHeight()/2));
+    return true;
+  }
 
   return false;
 }

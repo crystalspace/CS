@@ -75,6 +75,8 @@ public:
   virtual const csVector2& GetScroll() const {return scroll;}
   virtual void SetScroll(const csVector3& worldpos, const csVector2& coord);
   virtual void MoveScroll(const csVector3& delta);
+  virtual void SetAxes(float xscale, float yscale, float zscale,
+    float zskew, float xskew);
 };
 
 
