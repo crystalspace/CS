@@ -695,10 +695,11 @@ csPtr<iDataBuffer> csJNGImageIO::Save (iImage *Image, iImageIO::FileFormatDescri
 
   mng_cleanup (&handle);
 
-  iDataBuffer *db = outfile->GetAllData ();
+  csRef<iDataBuffer> db (outfile->GetAllData ());
 
   delete outfile;
 
+  db->IncRef ();	// Avoid smart pointer cleanup.
   return csPtr<iDataBuffer> (db);
 }
 

@@ -79,8 +79,6 @@ struct iCacheManager : public iBase
   /**
    * Retrieve some data from the cache. Returns NULL if the
    * data could not be found in the cache.
-   * The returned data buffer should be DecRef()'ed if you are
-   * ready with it.
    */
   virtual csPtr<iDataBuffer> ReadCache (
   	const char* type, const char* scope, uint32 id) = 0;

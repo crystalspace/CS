@@ -115,7 +115,7 @@ public:
   /// Query current file pointer
   virtual size_t GetPos ();
   /// Get all the data at once
-  virtual iDataBuffer *GetAllData ();
+  virtual csPtr<iDataBuffer> GetAllData ();
 };
 
 class VfsArchive : public csArchive
@@ -295,9 +295,9 @@ int csFile::GetStatus ()
   return rc;
 }
 
-iDataBuffer *csFile::GetAllData ()
+csPtr<iDataBuffer> csFile::GetAllData ()
 {
-  return NULL;
+  return csPtr<iDataBuffer> (NULL);
 }
 
 // ------------------------------------------------------------ DiskFile --- //
@@ -618,13 +618,13 @@ size_t ArchiveFile::GetPos ()
   return fpos;
 }
 
-iDataBuffer *ArchiveFile::GetAllData ()
+csPtr<iDataBuffer> ArchiveFile::GetAllData ()
 {
   iDataBuffer *db = new csDataBuffer (data, Size);
   data = NULL;
   fpos = 0;
   Size = 0;
-  return db;
+  return csPtr<iDataBuffer> (db);
 }
 
 // ------------------------------------------------------------- VfsNode --- //
@@ -1522,9 +1522,12 @@ csPtr<iDataBuffer> csVFS::ReadFile (const char *FileName)
     return csPtr<iDataBuffer> (NULL);
 
   size_t Size = F->GetSize ();
-  iDataBuffer *data = F->GetAllData ();
+  csRef<iDataBuffer> data (F->GetAllData ());
   if (data)
+  {
+    data->IncRef ();	// Avoid smart pointer cleanup.
     return csPtr<iDataBuffer> (data);
+  }
 
   char *buff = new char [Size + 1];
   if (!buff)

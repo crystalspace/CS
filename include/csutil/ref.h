@@ -28,7 +28,7 @@
  * to remember pointers to anything. Use csRef for that).
  * It only stores the pointer. Nothing else. When it is assigned to
  * a csRef, the csRef smart pointer will 'inherit' the reference
- * (so no IncRef()) happens.
+ * (so no IncRef() happens).
  */
 template <class T>
 class csPtr

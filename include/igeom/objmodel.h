@@ -95,13 +95,12 @@ struct iObjectModel : public iBase
   /**
    * Create a polygon mesh representing a lower detail version of the
    * object but without the restrictions of GetSmallerPolygonMesh().
-   * Delete this object after using with DecRef().
    * The floating point input number is 0 for minimum detail and
    * 1 for highest detail. This function may return the same polygon
    * mesh as GetPolygonMesh() (but with ref count incremented by one).
    * Can return NULL if this object model doesn't support that.
    */
-  virtual iPolygonMesh* CreateLowerDetailPolygonMesh (float detail) = 0;
+  virtual csPtr<iPolygonMesh> CreateLowerDetailPolygonMesh (float detail) = 0;
 
   /**
    * Get the bounding box in object space for this mesh object.

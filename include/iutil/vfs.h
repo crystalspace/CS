@@ -122,7 +122,7 @@ struct iFile : public iBase
    * This function is intended for VFS internal use only. It is not guaranteed
    * to work for all file types (currently it works only for archive files)
    */
-  virtual iDataBuffer *GetAllData () = 0;
+  virtual csPtr<iDataBuffer> GetAllData () = 0;
 };
 
 

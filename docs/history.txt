@@ -11,6 +11,9 @@ The history order is reversed so that new features are at the top.
 	- iSoundRender->RegisterSound() now returns a csPtr.
 	- iSoundHandle->CreateSource() now returns a csPtr.
 	- iSoundHandle->Play() now returns a csPtr.
+	- iObjectModel->CreateLowerDetailPolygonMesh() now returns a
+	  csPtr.
+	- iFile->GetAllData() now returns a csPtr.
 7-Sep-2002
 	- Changed all config related Enumerate() calls to return csPtr.
 	- Changed iImageIO->Load() to return csPtr.

@@ -71,7 +71,7 @@ public:
    * Get entire file data in one go.
    * When you're done call DecRef().
    */
-  virtual iDataBuffer* GetAllData();
+  virtual csPtr<iDataBuffer> GetAllData();
   /**
    * Returns a pointer to the memory buffer.  May return NULL if memory file
    * is empty.  Use GetSize() for size info.

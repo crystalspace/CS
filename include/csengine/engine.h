@@ -852,7 +852,6 @@ public:
   /**
    * This routine returns an iterator to iterate over
    * all nearby sectors.
-   * Delete the iterator with 'DecRef()' when ready.
    */
   virtual csPtr<iSectorIterator> GetNearbySectors (iSector* sector,
   	const csVector3& pos, float radius);

@@ -113,7 +113,7 @@ size_t csMemFile::Write(const char* Data, size_t DataSize)
   return written;
 }
 
-iDataBuffer *csMemFile::GetAllData()
+csPtr<iDataBuffer> csMemFile::GetAllData()
 {
   char *data = buffer;
   if (buffer && disposition == DISPOSITION_FREE)
@@ -131,5 +131,6 @@ iDataBuffer *csMemFile::GetAllData()
   capacity = 0;
   size = 0;
   cursor = 0;
-  return db;
+  return csPtr<iDataBuffer> (db);
 }
+

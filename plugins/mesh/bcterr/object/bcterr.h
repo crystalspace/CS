@@ -413,10 +413,8 @@ public:
     {
       return (iPolygonMesh*)&scfParent->culling_mesh;
     }
-    virtual iPolygonMesh* CreateLowerDetailPolygonMesh (float detail)
-    {
-      return (iPolygonMesh*)&scfParent->culling_mesh;
-    }
+    virtual csPtr<iPolygonMesh> CreateLowerDetailPolygonMesh (float detail)
+    { return csPtr<iPolygonMesh> (NULL); }
     virtual void GetObjectBoundingBox (csBox3& bbox,
         int type = CS_BBOX_NORMAL)
     {

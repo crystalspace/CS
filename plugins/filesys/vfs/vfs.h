@@ -67,7 +67,7 @@ public:
   /// Query current file pointer
   virtual size_t GetPos () = 0;
   /// Get entire file data at once, if possible, or NULL
-  virtual iDataBuffer *GetAllData ();
+  virtual csPtr<iDataBuffer> GetAllData ();
 
 protected:
   friend class csVFS;
