@@ -528,7 +528,6 @@ awsComponentFactory::awsComponentFactory (iAws *_wmgr)
   SCF_CONSTRUCT_IBASE (NULL);
   // This is where you call register, only you must do it in the derived factory.  Like this:
 
-  // Register(wmgr, "Radio Button");
   wmgr = _wmgr;
 }
 
@@ -539,7 +538,7 @@ awsComponentFactory::~awsComponentFactory ()
 
 iAwsComponent *awsComponentFactory::Create ()
 {
-  return NULL;
+  return new awsComponent;
 }
 
 void awsComponentFactory::Register (char *name)

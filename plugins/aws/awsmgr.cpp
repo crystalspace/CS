@@ -1178,6 +1178,8 @@ void awsManager::RegisterCommonComponents ()
   (void)new awsNotebookFactory (this);
   (void)new awsNotebookPageFactory (this);
   (void)new awsNotebookButtonFactory (this);
+  
+  RegisterComponentFactory (new awsComponentFactory (this), "awsComponent");
 
   // window constants
   (void)awsWindow::Register (this);

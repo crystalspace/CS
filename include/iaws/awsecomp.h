@@ -62,38 +62,7 @@ public:
 
     /// Event dispatcher, demultiplexes events and sends them off to the proper event handler
     virtual bool HandleEvent(iEvent& Event)
-    {
-      switch(Event.Type)
-      {
-        case csevMouseMove:
-        return OnMouseMove(Event.Mouse.Button, Event.Mouse.x, Event.Mouse.y);
-
-        case csevMouseUp:
-        return OnMouseUp(Event.Mouse.Button, Event.Mouse.x, Event.Mouse.y);
-
-        case csevMouseDown:
-        return OnMouseDown(Event.Mouse.Button, Event.Mouse.x, Event.Mouse.y);
-
-        case csevMouseClick:
-        return OnMouseClick(Event.Mouse.Button, Event.Mouse.x, Event.Mouse.y);
-
-        case csevMouseEnter:
-        return OnMouseEnter();
-
-        case csevMouseExit:
-        return OnMouseExit();
-
-        case csevKeyDown:
-        return OnKeypress(Event.Key.Char, Event.Key.Modifiers);
-
-        case csevGainFocus:
-        return OnGainFocus();
-
-        case csevLostFocus:
-        return OnLostFocus();
-      }
-      return false;
-    }
+    { return comp->HandleEvent (Event); }
 
     /// Gets the property specified, setting the parameter to a COPY of the property's value. Returns false if there's no such property.
     virtual bool GetProperty(char *name, void **parm)
