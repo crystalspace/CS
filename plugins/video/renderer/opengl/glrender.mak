@@ -29,8 +29,8 @@ endif # ifeq ($(MAKESECTION),roottargets)
 #------------------------------------------------------------- postdefines ---#
 ifeq ($(MAKESECTION),postdefines)
 
-ifneq (,$(strip $(LIB.GL3D.SYSTEM)))
-  LIB.GL3D.LOCAL += $(LIB.GL3D.SYSTEM)
+ifneq (,$(strip $(LIBS.OPENGL.SYSTEM)))
+  LIB.GL3D.LOCAL += $(LIBS.OPENGL.SYSTEM)
 else
   ifdef X11_PATH
     CFLAGS.GL3D += -I$(X11_PATH)/include

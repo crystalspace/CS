@@ -120,9 +120,8 @@ CXX=gcc -c
 LINK=gcc
 
 # Defines for OpenGL 3D driver
-OPENGL.LIBS.DEFINED=1
-CFLAGS.GL3D+=$(CFLAGS.I)/boot/develop/headers/be/opengl 
-LIBS.LOCAL.GL3D+=$(LFLAGS.l)GL
+CFLAGS.GL3D+=$(CFLAGS.I)/boot/develop/headers/be/opengl
+LIBS.OPENGL.SYSTEM+=$(LFLAGS.l)GL
 
 # Defines for Glide2 driver.
 ifneq ($(findstring 2,$(GLIDE_VERSIONS)),)

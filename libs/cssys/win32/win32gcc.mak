@@ -9,7 +9,7 @@ PLUGINS+= video/canvas/ddraw video/renderer/software
 PLUGINS+= video/canvas/ddraw61 video/renderer/direct3d61
 
 # if u have the following line uncommented make sure one  
-# OPENGL.LIBS.DEFINED is set below or you have a custom 
+# LIBS.OPENGL.SYSTEM is set below or you have a custom 
 # opengl dll installed as GL.dll (e.g. MESA)
 PLUGINS+= video/canvas/openglwin video/renderer/opengl
 
@@ -51,11 +51,10 @@ LIBS.EXE=
 
 # OpenGL settings for use with OpenGL Drivers...untested
 #SGI OPENGL SDK v1.1.1 for Win32
-#OPENGL.LIBS.DEFINED = -lopengl -lglut
+#LIBS.OPENGL.SYSTEM = -lopengl -lglut
 
 #MS OpenGL
-OPENGL.LIBS.DEFINED=-lopengl32 -lglut32
-LIBS.GL3D.SYSTEM=$(OPENGL.LIBS.DEFINED)
+LIBS.OPENGL.SYSTEM=-lopengl32 -lglut32
 
 # socket dll
 LIBS.SOCKET.SYSTEM=-lwsock32
