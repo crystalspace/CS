@@ -42,15 +42,6 @@
 #include <GL/gl.h>
 #endif
 
-// Crystal Space Headers that define interfaces for us
-#include "cssysdef.h"
-#include "csutil/scf.h"
-#include "csutil/cfgacc.h"
-#include "ivideo/graph2d.h"
-#include "ivideo/graph3d.h"
-#include "ivideo/vbufmgr.h"
-#include "iutil/plugin.h"
-
 /* -----------------------------------------------------------------
  * Preprocessor Defines and Enumeration Types
  * ----------------------------------------------------------------- */

@@ -32,8 +32,17 @@
 /* -----------------------------------------------------------------
  * Preprocessor Includes
  * ----------------------------------------------------------------- */
-#include "ogl_g3dext.h"
 
+// Crystal Space Headers that define interfaces for us
+#include "cssysdef.h"
+#include "csutil/scf.h"
+#include "csutil/cfgacc.h"
+#include "ivideo/graph2d.h"
+#include "ivideo/graph3d.h"
+#include "ivideo/vbufmgr.h"
+#include "iutil/plugin.h"
+
+#include "ogl_g3dext.h"
 
 /* -----------------------------------------------------------------
  * Preprocessor Defines
