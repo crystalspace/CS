@@ -1,5 +1,13 @@
 The history order is reversed so that new features are at the top.
 
+24-Jul-2002
+	- Eric Sunshine corrected the formatting of some makefile help
+	  messages.
+	- Eric Sunshine introduced the new variable RUN_SCRIPT into the
+	  makefile system.  This variable is used to run Bourne-style (Bash)
+	  scripts.  Typically, its value is the same as SHELL, but some
+	  platforms may need to change it.  For example, on Windows, if SHELL
+	  is COMMAND.COM or CMD.EXE, then RUN_SCRIPT may be set to "bash".
 23-Jul-2002
 	- Both walktest and cslight now support the 'cache:' keyword
 	  on the commandline. If this keyword is given then the lightmap
