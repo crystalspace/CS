@@ -47,6 +47,9 @@ chronological order.
 	  remains.
 	- Jorrit fixed a compile error in viewmesh with the array changes.
 	- Jorrit fixed a compile error in freefnt2 with the array changes.
+	- Fixed a bad bug in the copy constructor of csArray. It would not
+	  initialize capacity to 0 which could cause very bad results
+	  and crashes in CS.
 6-Aug-2003
 	- Jorrit fixed a compile error in freefnt2 font server related to the
 	  csRefArray->csArray change.

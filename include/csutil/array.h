@@ -142,6 +142,7 @@ public:
   csArray (const csArray& source)
   {
     root = 0;
+    capacity = 0;
     CopyFrom (source);
   }
   
