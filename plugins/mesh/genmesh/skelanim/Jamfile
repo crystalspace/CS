@@ -1,0 +1,10 @@
+SubDir TOP plugins mesh genmesh skelanim ;
+
+Description gmeshskelanim : "General mesh skeletal animation plugin" ;
+
+Plugin gmeshskelanim
+	: [ Wildcard *.cpp *.h ]
+;
+LinkWith gmeshskelanim : csgfx cstool csgeom csutil ;
+
+CompileGroups gmeshskelanim :  meshes ;
