@@ -38,11 +38,14 @@ AC_DEFUN([CS_CHECK_CPPUNIT],
 	[], [C++])
 	
     AS_IF([test $cs_cv_libcppunit = yes],
-	[CS_CHECK_BUILD([if cppunit is sufficiently recent], [cs_cv_libcppunit_recent],
-	    [AC_LANG_PROGRAM([[#include <cppunit/BriefTestProgressListener.h>]], 
-		[CppUnit::BriefTestProgressListener briefListener;])],
-	    [], [C++], [CS_EMIT_BUILD_RESULT([cs_cv_libcppunit], [CPPUNIT],
+	[CS_CHECK_BUILD([if cppunit is sufficiently recent],
+	    [cs_cv_libcppunit_recent],
+	    [AC_LANG_PROGRAM(
+		[[#include <cppunit/BriefTestProgressListener.h>]], 
+		[CppUnit::BriefTestProgressListener b; b.startTest(0);])],
+	    [], [C++],
+	    [CS_EMIT_BUILD_RESULT([cs_cv_libcppunit], [CPPUNIT],
 		CS_EMITTER_OPTIONAL([$1]))], [], [],
-	    [$cs_cv_libcppunit_cflags], [$cs_cv_libcppunit_lflags], [$cs_cv_libcppunit_libs],
-	    [yes]
-	    )])])
+	    [$cs_cv_libcppunit_cflags],
+	    [$cs_cv_libcppunit_lflags],
+	    [$cs_cv_libcppunit_libs])])])
