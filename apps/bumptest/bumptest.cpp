@@ -477,6 +477,7 @@ bool BumpTest::Initialize (int argc, const char* const argv[],
   p->SetTextureSpace (p->GetVertex (0), p->GetVertex (1), 3);
 
   walls_state->DecRef ();
+  walls->DecRef ();
 
 #if 0
   LevelLoader->LoadTexture ("flare_center", "/lib/std/snow.jpg");

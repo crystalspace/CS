@@ -249,6 +249,7 @@ bool Simple::Initialize (int argc, const char* const argv[],
   CreatePolygon (walls_state, 7, 6, 5, 4, tm);
 
   walls_state->DecRef ();
+  walls->DecRef ();
 
   iStatLight* light;
   light = engine->CreateLight (NULL, csVector3 (0, 0, 0), 20,

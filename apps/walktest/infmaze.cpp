@@ -343,3 +343,8 @@ void InfiniteMaze::random_loose_portals (int x1, int y1, int z1)
   }
 }
 
+InfRoomData::~InfRoomData ()
+{
+  walls_state->DecRef ();
+  walls->DecRef ();
+}

@@ -474,6 +474,7 @@ iSector* HugeRoom::create_huge_world (iEngine* engine)
 	csVector3 (wall_dim,wall_dim,wall_dim), csVector3 (-wall_dim,wall_dim,wall_dim),
 	wall_num_tris, wall_num_tris, 0);
   thing_state->DecRef ();
+  walls->DecRef ();
 
   Sys->Report (CS_REPORTER_SEVERITY_NOTIFY, "Number of polygons: %d", pol_nr);
   //room->UseCuller ("@@@ (NOT WORKING!!!)");

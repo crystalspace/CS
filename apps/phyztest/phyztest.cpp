@@ -275,8 +275,8 @@ bool Phyztest::Initialize (int argc, const char* const argv[], const char *iConf
   iMaterialWrapper* tm = engine->GetMaterialList ()->FindByName ("stone");
  
   room = engine->CreateSector ("room");
-  iThingState* walls = SCF_QUERY_INTERFACE (engine->CreateSectorWallsMesh (room,
-  	"walls")->GetMeshObject (), iThingState);
+  iMeshWrapper *wallmw = engine->CreateSectorWallsMesh (room,"walls");
+  iThingState* walls = SCF_QUERY_INTERFACE (wallmw->GetMeshObject (), iThingState);
   csVector3 
 	   f1 (-5,  5,  5),
 	   f2 ( 5,  5,  5), 
@@ -336,6 +336,7 @@ bool Phyztest::Initialize (int argc, const char* const argv[], const char *iConf
   p->SetTextureSpace (p->GetVertex (0), p->GetVertex (1), 3);
 
   walls->DecRef ();
+  wallmw->DecRef ();
 
   iStatLight* light;
   iLightList* ll = room->GetLights ();

@@ -320,6 +320,7 @@ bool DemoSky::Initialize (int argc, const char* const argv[],
   SetTexSpace (sky_b, p, 256, p->GetVertex  (0), p->GetVertex  (1), 2.*size, p->GetVertex (3), 2.*size);
   p->GetFlags ().Set(CS_POLY_LIGHTING, 0);
   walls_state->DecRef ();
+  walls->DecRef ();
 
   LevelLoader->LoadTexture ("seagull", "/lib/std/seagull.gif");
   iMaterialWrapper *sg = engine->GetMaterialList ()->FindByName("seagull");

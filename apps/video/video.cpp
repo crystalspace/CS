@@ -193,7 +193,9 @@ bool Video::Initialize (int argc, const char* const argv[],
   iMaterialWrapper *iMW = SCF_QUERY_INTERFACE (tm, iMaterialWrapper);
  
   room = engine->CreateSector ("room");
-  iThingState* walls = SCF_QUERY_INTERFACE (engine->CreateSectorWallsMesh (room, "walls")->GetMeshObject (), iThingState);
+iMeshWrapper *wallmesh = engine->CreateSectorWallsMesh (room, "walls");
+  iThingState* walls = SCF_QUERY_INTERFACE (wallmesh->GetMeshObject (), iThingState);
+
   csVector3 
 	   f1 (-5, 20, 5),
 	   f2 ( 5, 20, 5), 
@@ -254,6 +256,7 @@ bool Video::Initialize (int argc, const char* const argv[],
 
   iMW->DecRef ();
   walls->DecRef ();
+  wallmesh->DecRef ();
   
   iStatLight* light;
   iLightList* ll = room->GetLights ();

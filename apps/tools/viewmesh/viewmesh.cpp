@@ -237,6 +237,7 @@ bool ViewMesh::Initialize (int argc, const char* const argv[],
   p->SetTextureSpace (p->GetVertex (0), p->GetVertex (1), 3);
 
   walls_state->DecRef ();
+  walls->DecRef ();
 
   iStatLight* light;
   iLightList* ll = room->GetLights ();

@@ -2200,6 +2200,7 @@ void Blocks::InitGameRoom ()
   p->CreateVertex (csVector3 (5, 0, -5));
   p->SetTextureSpace (p->GetVertex (0), p->GetVertex (1), 3);
   walls_state->DecRef ();
+  walls->DecRef ();
 
   Sys->add_pillar_template ();
   Sys->add_cube_template ();
@@ -2265,6 +2266,7 @@ void Blocks::InitDemoRoom ()
   p->SetTextureSpace (p->GetVertex (0), p->GetVertex (1), 100);
 
   walls_state->DecRef ();
+  walls->DecRef ();
 
   iLight *light;
   demo_room->GetLights ()->AddLight (

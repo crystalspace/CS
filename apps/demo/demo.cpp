@@ -388,6 +388,7 @@ void Demo::SetupSector ()
   p->GetFlags ().Set (CS_POLY_LIGHTING, 0);
 
   walls_state->DecRef ();
+  walls->DecRef ();
 
   //====================================================================
   // Create the stars.
@@ -478,6 +479,7 @@ void Demo::SetupSector ()
   pt->SetMixMode (CS_FX_ADD);
 
   walls_state->DecRef ();
+  walls->DecRef ();
   //====================================================================
 
   iStatLight* light;

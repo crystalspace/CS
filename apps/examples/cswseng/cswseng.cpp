@@ -335,6 +335,7 @@ void ceCswsEngineApp::SetupDefaultWorld ()
   p->CreateVertex (csVector3 (5, -1, -5));
   p->SetTextureSpace (p->GetVertex (0), p->GetVertex (1), 3);
   walls_state->DecRef ();
+  walls->DecRef ();
 
   iLightList* ll = room->GetLights ();
   iStatLight* light;

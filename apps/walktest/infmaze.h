@@ -38,6 +38,7 @@ struct iFrustumView;
  */
 struct InfRoomData
 {
+  ~InfRoomData ();
   int x, y, z;
   iSector* sector;
   iMeshWrapper* walls;
