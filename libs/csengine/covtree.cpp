@@ -680,7 +680,7 @@ again:
     {
       for (c = 0 ; c < Child::GetPixelSize () ; c++)
         for (r = 0 ; r < Child::GetPixelSize () ; r++)
-      	  ig2d->DrawPixel (new_hor_offs+c, /*ig2d->GetHeight () -*/ (new_ver_offs+r), ~0);
+      	  ig2d->DrawPixel (new_hor_offs+c, ig2d->GetHeight ()-1024+ (new_ver_offs+r), ~0);
     }
     else if (OUTSIDE (msk_out))
     {
@@ -703,17 +703,17 @@ again:
       {
         for (c = 0 ; c < Child::GetPixelSize () ; c++)
           for (r = 0 ; r < Child::GetPixelSize () ; r++)
-      	    ig2d->DrawPixel (new_hor_offs+c, /*ig2d->GetHeight () -*/ (new_ver_offs+r), 0x5555);
+      	    ig2d->DrawPixel (new_hor_offs+c, ig2d->GetHeight ()-1024+ (new_ver_offs+r), 0x5555);
       }
     }
     if (level <= 1)
     {
       for (c = 0 ; c < Child::GetPixelSize () ; c++)
       	ig2d->DrawPixel (new_hor_offs+c,
-		/*ig2d->GetHeight () -*/ (new_ver_offs+Child::GetPixelSize ()-1), 0xaaaa);
+		ig2d->GetHeight ()-1024+ (new_ver_offs+Child::GetPixelSize ()-1), 0xaaaa);
       for (r = 0 ; r < Child::GetPixelSize () ; r++)
         ig2d->DrawPixel (new_hor_offs+Child::GetPixelSize ()-1,
-		/*ig2d->GetHeight () -*/ (new_ver_offs+r), 0xaaaa);
+		ig2d->GetHeight ()-1024+ (new_ver_offs+r), 0xaaaa);
     }
 
     // Go to next bit.
@@ -952,7 +952,7 @@ again:
     {
       col = idx & CS_CM_DIMMASK;
       row = idx >> CS_CM_DIMSHIFT;
-      ig2d->DrawPixel (hor_offs+col, /*ig2d->GetHeight () -*/ (ver_offs+row), ~0);
+      ig2d->DrawPixel (hor_offs+col, ig2d->GetHeight () - 1024+ (ver_offs+row), ~0);
     }
 
     // Go to next bit.
