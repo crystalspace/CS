@@ -10,6 +10,19 @@ The history order is reversed so that new features are at the top.
 	    - Was incorrectly using "==" rather than "=" in a `test'
 	      conditional.
 	    - Was passing incorrect flags to CS_CHECK_BUILD().
+	- Eric Sunshine made the following changes to configure's OpenGL tests:
+	    - Now checks for opengl32 and cousins before libGL and libMesaGL.
+	      Hopefully this will work around problems experienced by Cygwin
+	      users who have Mesa installed.  The problem is that Mesa seems to
+	      be compiled without __stdcall, yet the header found by CS
+	      contains __stdcall.  This mismatch leads to linkage errors.
+	      Also, Cygwin users report that using opengl32 works properly.
+	    - On Unix, now prefers the vendor's OpenGL over Mesa.  Hopefully
+	      this will work around some problems reported by users when Mesa
+	      was used rather than the vendor's implementation.
+	    - Now uses the pthread flags if present when attempting to resolve
+	      the OpenGL library since some users have reported that Mesa's
+	      OpenGL library references pthread functions.
 2-Feb-2003
 	- Eric Sunshine modified tutorial/intro.txi so that it gives the full
 	  name of SCF and features a hyperlink to the SCF section.

@@ -6911,6 +6911,614 @@ ac_compiler_gnu=$ac_cv_c_compiler_gnu
 
 
 #------------------------------------------------------------------------------
+# Check for pthread.  Also check if pthread implementation supports the
+# RECURSIVE_NP extension.
+#------------------------------------------------------------------------------
+
+
+
+
+if test "" != yes; then
+  echo "$as_me:$LINENO: checking for pthread" >&5
+echo $ECHO_N "checking for pthread... $ECHO_C" >&6
+if test "${cs_cv_sys_pthread+set}" = set; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+else
+  ac_ext=c
+ac_cpp='$CPP $CPPFLAGS'
+ac_compile='$CC -c $CFLAGS $CPPFLAGS conftest.$ac_ext >&5'
+ac_link='$CC -o conftest$ac_exeext $CFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
+ac_compiler_gnu=$ac_cv_c_compiler_gnu
+
+    cs_cflags_save="$CFLAGS"
+    cs_lflags_save="$LDFLAGS"
+    cs_libs_save="$LIBS"
+    cs_build_ok=no
+
+    for cs_build_item in `echo @@@ | sed 'y% %#%'` \
+    `echo @@@-lpthread | sed 'y% %#%'` \
+    `echo @-pthread@@ | sed 'y% %#%'` \
+    `echo @-pthread@@-lpthread | sed 'y% %#%'`
+    do
+
+    set filler `echo "$cs_build_item" | awk 'BEGIN { FS="@" }
+	{ for (i=1; i <= NF; ++i)
+	    { if ($i == "") print "filler"; else print $i } }'`
+    shift
+    if test $# -eq 0; then
+  cs_dummy=''
+else
+  if test "$1" = filler; then
+  cs_dummy=''
+else
+  cs_dummy=$1
+fi
+
+	shift
+fi
+if test $# -eq 0; then
+  cs_cflags_test=''
+else
+  if test "$1" = filler; then
+  cs_cflags_test=''
+else
+  cs_cflags_test=$1
+fi
+
+	shift
+fi
+if test $# -eq 0; then
+  cs_lflags_test=''
+else
+  if test "$1" = filler; then
+  cs_lflags_test=''
+else
+  cs_lflags_test=$1
+fi
+
+	shift
+fi
+if test $# -eq 0; then
+  cs_libs_test=''
+else
+  if test "$1" = filler; then
+  cs_libs_test=''
+else
+  cs_libs_test=$1
+fi
+
+	shift
+fi
+
+    cs_cflags_test=`echo $cs_cflags_test | sed 'y%#% %'`
+    cs_lflags_test=`echo $cs_lflags_test | sed 'y%#% %'`
+    cs_libs_test=`echo $cs_libs_test | sed 'y%#% %'`
+
+	CFLAGS="$cs_cflags_test  $cs_cflags_save"
+	LDFLAGS="$cs_lflags_test  $cs_lflags_save"
+	LIBS="$cs_libs_test  $cs_libs_save"
+	cat >conftest.$ac_ext <<_ACEOF
+#line $LINENO "configure"
+/* confdefs.h.  */
+_ACEOF
+cat confdefs.h >>conftest.$ac_ext
+cat >>conftest.$ac_ext <<_ACEOF
+/* end confdefs.h.  */
+#include <pthread.h>
+	    void* worker(void* p) { (void)p; return p; }
+int
+main ()
+{
+pthread_t tid; pthread_create(&tid, 0, worker, 0);
+  ;
+  return 0;
+}
+_ACEOF
+rm -f conftest.$ac_objext conftest$ac_exeext
+if { (eval echo "$as_me:$LINENO: \"$ac_link\"") >&5
+  (eval $ac_link) 2>&5
+  ac_status=$?
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); } &&
+         { ac_try='test -s conftest$ac_exeext'
+  { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
+  (eval $ac_try) 2>&5
+  ac_status=$?
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); }; }; then
+  cs_build_ok=yes break
+else
+  echo "$as_me: failed program was:" >&5
+sed 's/^/| /' conftest.$ac_ext >&5
+
+fi
+rm -f conftest.$ac_objext conftest$ac_exeext conftest.$ac_ext
+    done
+
+    CFLAGS=$cs_cflags_save
+    LDFLAGS=$cs_lflags_save
+    LIBS=$cs_libs_save
+    ac_ext=c
+ac_cpp='$CPP $CPPFLAGS'
+ac_compile='$CC -c $CFLAGS $CPPFLAGS conftest.$ac_ext >&5'
+ac_link='$CC -o conftest$ac_exeext $CFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
+ac_compiler_gnu=$ac_cv_c_compiler_gnu
+
+
+    if test $cs_build_ok = yes; then
+  cs_build_cflags=`echo x$cs_cflags_test  | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+	cs_build_lflags=`echo x$cs_lflags_test  | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+	cs_build_libs=`echo x$cs_libs_test  | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+	cs_cv_sys_pthread=yes
+		cs_cv_sys_pthread_cflags=$cs_build_cflags
+		cs_cv_sys_pthread_lflags=$cs_build_lflags
+		cs_cv_sys_pthread_libs=$cs_build_libs
+else
+  cs_cv_sys_pthread=no
+fi
+
+fi
+echo "$as_me:$LINENO: result: $cs_cv_sys_pthread" >&5
+echo "${ECHO_T}$cs_cv_sys_pthread" >&6
+else
+  echo "$as_me:$LINENO: checking for pthread" >&5
+echo $ECHO_N "checking for pthread... $ECHO_C" >&6
+	    ac_ext=c
+ac_cpp='$CPP $CPPFLAGS'
+ac_compile='$CC -c $CFLAGS $CPPFLAGS conftest.$ac_ext >&5'
+ac_link='$CC -o conftest$ac_exeext $CFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
+ac_compiler_gnu=$ac_cv_c_compiler_gnu
+
+    cs_cflags_save="$CFLAGS"
+    cs_lflags_save="$LDFLAGS"
+    cs_libs_save="$LIBS"
+    cs_build_ok=no
+
+    for cs_build_item in `echo @@@ | sed 'y% %#%'` \
+    `echo @@@-lpthread | sed 'y% %#%'` \
+    `echo @-pthread@@ | sed 'y% %#%'` \
+    `echo @-pthread@@-lpthread | sed 'y% %#%'`
+    do
+
+    set filler `echo "$cs_build_item" | awk 'BEGIN { FS="@" }
+	{ for (i=1; i <= NF; ++i)
+	    { if ($i == "") print "filler"; else print $i } }'`
+    shift
+    if test $# -eq 0; then
+  cs_dummy=''
+else
+  if test "$1" = filler; then
+  cs_dummy=''
+else
+  cs_dummy=$1
+fi
+
+	shift
+fi
+if test $# -eq 0; then
+  cs_cflags_test=''
+else
+  if test "$1" = filler; then
+  cs_cflags_test=''
+else
+  cs_cflags_test=$1
+fi
+
+	shift
+fi
+if test $# -eq 0; then
+  cs_lflags_test=''
+else
+  if test "$1" = filler; then
+  cs_lflags_test=''
+else
+  cs_lflags_test=$1
+fi
+
+	shift
+fi
+if test $# -eq 0; then
+  cs_libs_test=''
+else
+  if test "$1" = filler; then
+  cs_libs_test=''
+else
+  cs_libs_test=$1
+fi
+
+	shift
+fi
+
+    cs_cflags_test=`echo $cs_cflags_test | sed 'y%#% %'`
+    cs_lflags_test=`echo $cs_lflags_test | sed 'y%#% %'`
+    cs_libs_test=`echo $cs_libs_test | sed 'y%#% %'`
+
+	CFLAGS="$cs_cflags_test  $cs_cflags_save"
+	LDFLAGS="$cs_lflags_test  $cs_lflags_save"
+	LIBS="$cs_libs_test  $cs_libs_save"
+	cat >conftest.$ac_ext <<_ACEOF
+#line $LINENO "configure"
+/* confdefs.h.  */
+_ACEOF
+cat confdefs.h >>conftest.$ac_ext
+cat >>conftest.$ac_ext <<_ACEOF
+/* end confdefs.h.  */
+#include <pthread.h>
+	    void* worker(void* p) { (void)p; return p; }
+int
+main ()
+{
+pthread_t tid; pthread_create(&tid, 0, worker, 0);
+  ;
+  return 0;
+}
+_ACEOF
+rm -f conftest.$ac_objext conftest$ac_exeext
+if { (eval echo "$as_me:$LINENO: \"$ac_link\"") >&5
+  (eval $ac_link) 2>&5
+  ac_status=$?
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); } &&
+         { ac_try='test -s conftest$ac_exeext'
+  { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
+  (eval $ac_try) 2>&5
+  ac_status=$?
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); }; }; then
+  cs_build_ok=yes break
+else
+  echo "$as_me: failed program was:" >&5
+sed 's/^/| /' conftest.$ac_ext >&5
+
+fi
+rm -f conftest.$ac_objext conftest$ac_exeext conftest.$ac_ext
+    done
+
+    CFLAGS=$cs_cflags_save
+    LDFLAGS=$cs_lflags_save
+    LIBS=$cs_libs_save
+    ac_ext=c
+ac_cpp='$CPP $CPPFLAGS'
+ac_compile='$CC -c $CFLAGS $CPPFLAGS conftest.$ac_ext >&5'
+ac_link='$CC -o conftest$ac_exeext $CFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
+ac_compiler_gnu=$ac_cv_c_compiler_gnu
+
+
+    if test $cs_build_ok = yes; then
+  cs_build_cflags=`echo x$cs_cflags_test  | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+	cs_build_lflags=`echo x$cs_lflags_test  | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+	cs_build_libs=`echo x$cs_libs_test  | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+	cs_cv_sys_pthread=yes
+		cs_cv_sys_pthread_cflags=$cs_build_cflags
+		cs_cv_sys_pthread_lflags=$cs_build_lflags
+		cs_cv_sys_pthread_libs=$cs_build_libs
+else
+  cs_cv_sys_pthread=no
+fi
+
+	    echo "$as_me:$LINENO: result: $cs_cv_sys_pthread" >&5
+echo "${ECHO_T}$cs_cv_sys_pthread" >&6
+fi
+
+    if test $cs_cv_sys_pthread = yes; then
+  if test "$cs_cv_sys_pthread" = yes; then
+  cs_makefile_text="${cs_makefile_text}PTHREAD.AVAILABLE = yes
+"
+	cs_result_cflags=`echo x$cs_cv_sys_pthread_cflags | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+	cs_result_lflags=`echo x$cs_cv_sys_pthread_lflags $cs_cv_sys_pthread_libs | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+	if test -n "$cs_result_cflags"; then
+  cs_makefile_text="${cs_makefile_text}PTHREAD.CFLAGS = $cs_result_cflags
+"
+fi
+
+	if test -n "$cs_result_lflags"; then
+  cs_makefile_text="${cs_makefile_text}PTHREAD.LFLAGS = $cs_result_lflags
+"
+fi
+
+fi
+
+else
+  cs_cv_sys_pthread_cflags=''
+	cs_cv_sys_pthread_lflags=''
+	cs_cv_sys_pthread_libs=''
+	:
+fi
+
+
+if test $cs_cv_sys_pthread = yes; then
+  if test "" != yes; then
+  echo "$as_me:$LINENO: checking for pthread recursive mutexes" >&5
+echo $ECHO_N "checking for pthread recursive mutexes... $ECHO_C" >&6
+if test "${cs_cv_sys_pthread_mutex_recursive+set}" = set; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+else
+  ac_ext=c
+ac_cpp='$CPP $CPPFLAGS'
+ac_compile='$CC -c $CFLAGS $CPPFLAGS conftest.$ac_ext >&5'
+ac_link='$CC -o conftest$ac_exeext $CFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
+ac_compiler_gnu=$ac_cv_c_compiler_gnu
+
+    cs_cflags_save="$CFLAGS"
+    cs_lflags_save="$LDFLAGS"
+    cs_libs_save="$LIBS"
+    cs_build_ok=no
+
+    for cs_build_item in `echo @@@ | sed 'y% %#%'`
+    do
+
+    set filler `echo "$cs_build_item" | awk 'BEGIN { FS="@" }
+	{ for (i=1; i <= NF; ++i)
+	    { if ($i == "") print "filler"; else print $i } }'`
+    shift
+    if test $# -eq 0; then
+  cs_dummy=''
+else
+  if test "$1" = filler; then
+  cs_dummy=''
+else
+  cs_dummy=$1
+fi
+
+	shift
+fi
+if test $# -eq 0; then
+  cs_cflags_test=''
+else
+  if test "$1" = filler; then
+  cs_cflags_test=''
+else
+  cs_cflags_test=$1
+fi
+
+	shift
+fi
+if test $# -eq 0; then
+  cs_lflags_test=''
+else
+  if test "$1" = filler; then
+  cs_lflags_test=''
+else
+  cs_lflags_test=$1
+fi
+
+	shift
+fi
+if test $# -eq 0; then
+  cs_libs_test=''
+else
+  if test "$1" = filler; then
+  cs_libs_test=''
+else
+  cs_libs_test=$1
+fi
+
+	shift
+fi
+
+    cs_cflags_test=`echo $cs_cflags_test | sed 'y%#% %'`
+    cs_lflags_test=`echo $cs_lflags_test | sed 'y%#% %'`
+    cs_libs_test=`echo $cs_libs_test | sed 'y%#% %'`
+
+	CFLAGS="$cs_cflags_test $cs_cv_sys_pthread_cflags $cs_cflags_save"
+	LDFLAGS="$cs_lflags_test $cs_cv_sys_pthread_lflags $cs_lflags_save"
+	LIBS="$cs_libs_test $cs_cv_sys_pthread_libs $cs_libs_save"
+	cat >conftest.$ac_ext <<_ACEOF
+#line $LINENO "configure"
+/* confdefs.h.  */
+_ACEOF
+cat confdefs.h >>conftest.$ac_ext
+cat >>conftest.$ac_ext <<_ACEOF
+/* end confdefs.h.  */
+#include <pthread.h>
+int
+main ()
+{
+pthread_mutex_t mutex;
+	    pthread_mutex_init(&mutex, PTHREAD_MUTEX_RECURSIVE_NP);
+  ;
+  return 0;
+}
+_ACEOF
+rm -f conftest.$ac_objext conftest$ac_exeext
+if { (eval echo "$as_me:$LINENO: \"$ac_link\"") >&5
+  (eval $ac_link) 2>&5
+  ac_status=$?
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); } &&
+         { ac_try='test -s conftest$ac_exeext'
+  { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
+  (eval $ac_try) 2>&5
+  ac_status=$?
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); }; }; then
+  cs_build_ok=yes break
+else
+  echo "$as_me: failed program was:" >&5
+sed 's/^/| /' conftest.$ac_ext >&5
+
+fi
+rm -f conftest.$ac_objext conftest$ac_exeext conftest.$ac_ext
+    done
+
+    CFLAGS=$cs_cflags_save
+    LDFLAGS=$cs_lflags_save
+    LIBS=$cs_libs_save
+    ac_ext=c
+ac_cpp='$CPP $CPPFLAGS'
+ac_compile='$CC -c $CFLAGS $CPPFLAGS conftest.$ac_ext >&5'
+ac_link='$CC -o conftest$ac_exeext $CFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
+ac_compiler_gnu=$ac_cv_c_compiler_gnu
+
+
+    if test $cs_build_ok = yes; then
+  cs_build_cflags=`echo x$cs_cflags_test $cs_cv_sys_pthread_cflags | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+	cs_build_lflags=`echo x$cs_lflags_test $cs_cv_sys_pthread_lflags | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+	cs_build_libs=`echo x$cs_libs_test $cs_cv_sys_pthread_libs | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+	cs_cv_sys_pthread_mutex_recursive=yes
+		cs_cv_sys_pthread_mutex_recursive_cflags=$cs_build_cflags
+		cs_cv_sys_pthread_mutex_recursive_lflags=$cs_build_lflags
+		cs_cv_sys_pthread_mutex_recursive_libs=$cs_build_libs
+else
+  cs_cv_sys_pthread_mutex_recursive=no
+fi
+
+fi
+echo "$as_me:$LINENO: result: $cs_cv_sys_pthread_mutex_recursive" >&5
+echo "${ECHO_T}$cs_cv_sys_pthread_mutex_recursive" >&6
+else
+  echo "$as_me:$LINENO: checking for pthread recursive mutexes" >&5
+echo $ECHO_N "checking for pthread recursive mutexes... $ECHO_C" >&6
+	    ac_ext=c
+ac_cpp='$CPP $CPPFLAGS'
+ac_compile='$CC -c $CFLAGS $CPPFLAGS conftest.$ac_ext >&5'
+ac_link='$CC -o conftest$ac_exeext $CFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
+ac_compiler_gnu=$ac_cv_c_compiler_gnu
+
+    cs_cflags_save="$CFLAGS"
+    cs_lflags_save="$LDFLAGS"
+    cs_libs_save="$LIBS"
+    cs_build_ok=no
+
+    for cs_build_item in `echo @@@ | sed 'y% %#%'`
+    do
+
+    set filler `echo "$cs_build_item" | awk 'BEGIN { FS="@" }
+	{ for (i=1; i <= NF; ++i)
+	    { if ($i == "") print "filler"; else print $i } }'`
+    shift
+    if test $# -eq 0; then
+  cs_dummy=''
+else
+  if test "$1" = filler; then
+  cs_dummy=''
+else
+  cs_dummy=$1
+fi
+
+	shift
+fi
+if test $# -eq 0; then
+  cs_cflags_test=''
+else
+  if test "$1" = filler; then
+  cs_cflags_test=''
+else
+  cs_cflags_test=$1
+fi
+
+	shift
+fi
+if test $# -eq 0; then
+  cs_lflags_test=''
+else
+  if test "$1" = filler; then
+  cs_lflags_test=''
+else
+  cs_lflags_test=$1
+fi
+
+	shift
+fi
+if test $# -eq 0; then
+  cs_libs_test=''
+else
+  if test "$1" = filler; then
+  cs_libs_test=''
+else
+  cs_libs_test=$1
+fi
+
+	shift
+fi
+
+    cs_cflags_test=`echo $cs_cflags_test | sed 'y%#% %'`
+    cs_lflags_test=`echo $cs_lflags_test | sed 'y%#% %'`
+    cs_libs_test=`echo $cs_libs_test | sed 'y%#% %'`
+
+	CFLAGS="$cs_cflags_test $cs_cv_sys_pthread_cflags $cs_cflags_save"
+	LDFLAGS="$cs_lflags_test $cs_cv_sys_pthread_lflags $cs_lflags_save"
+	LIBS="$cs_libs_test $cs_cv_sys_pthread_libs $cs_libs_save"
+	cat >conftest.$ac_ext <<_ACEOF
+#line $LINENO "configure"
+/* confdefs.h.  */
+_ACEOF
+cat confdefs.h >>conftest.$ac_ext
+cat >>conftest.$ac_ext <<_ACEOF
+/* end confdefs.h.  */
+#include <pthread.h>
+int
+main ()
+{
+pthread_mutex_t mutex;
+	    pthread_mutex_init(&mutex, PTHREAD_MUTEX_RECURSIVE_NP);
+  ;
+  return 0;
+}
+_ACEOF
+rm -f conftest.$ac_objext conftest$ac_exeext
+if { (eval echo "$as_me:$LINENO: \"$ac_link\"") >&5
+  (eval $ac_link) 2>&5
+  ac_status=$?
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); } &&
+         { ac_try='test -s conftest$ac_exeext'
+  { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
+  (eval $ac_try) 2>&5
+  ac_status=$?
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); }; }; then
+  cs_build_ok=yes break
+else
+  echo "$as_me: failed program was:" >&5
+sed 's/^/| /' conftest.$ac_ext >&5
+
+fi
+rm -f conftest.$ac_objext conftest$ac_exeext conftest.$ac_ext
+    done
+
+    CFLAGS=$cs_cflags_save
+    LDFLAGS=$cs_lflags_save
+    LIBS=$cs_libs_save
+    ac_ext=c
+ac_cpp='$CPP $CPPFLAGS'
+ac_compile='$CC -c $CFLAGS $CPPFLAGS conftest.$ac_ext >&5'
+ac_link='$CC -o conftest$ac_exeext $CFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
+ac_compiler_gnu=$ac_cv_c_compiler_gnu
+
+
+    if test $cs_build_ok = yes; then
+  cs_build_cflags=`echo x$cs_cflags_test $cs_cv_sys_pthread_cflags | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+	cs_build_lflags=`echo x$cs_lflags_test $cs_cv_sys_pthread_lflags | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+	cs_build_libs=`echo x$cs_libs_test $cs_cv_sys_pthread_libs | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+	cs_cv_sys_pthread_mutex_recursive=yes
+		cs_cv_sys_pthread_mutex_recursive_cflags=$cs_build_cflags
+		cs_cv_sys_pthread_mutex_recursive_lflags=$cs_build_lflags
+		cs_cv_sys_pthread_mutex_recursive_libs=$cs_build_libs
+else
+  cs_cv_sys_pthread_mutex_recursive=no
+fi
+
+	    echo "$as_me:$LINENO: result: $cs_cv_sys_pthread_mutex_recursive" >&5
+echo "${ECHO_T}$cs_cv_sys_pthread_mutex_recursive" >&6
+fi
+
+    if test $cs_cv_sys_pthread_mutex_recursive = yes; then
+  cs_header_text="${cs_header_text}#define PTHREAD_MUTEX_HAS_RECURSIVE_NP
+"
+else
+  cs_cv_sys_pthread_mutex_recursive_cflags=''
+	cs_cv_sys_pthread_mutex_recursive_lflags=''
+	cs_cv_sys_pthread_mutex_recursive_libs=''
+	:
+fi
+
+fi
+
+
+
+
+#------------------------------------------------------------------------------
 # Check for X-Windows.  If the X-Windows implementation is XFree86, then also
 # enable the `VideoMode' extension.
 #------------------------------------------------------------------------------
@@ -8790,10 +9398,13 @@ fi
 
 
 #------------------------------------------------------------------------------
-# Check for OpenGL and companions.  Prefer Mesa over a vendor's OpenGL
-# implementation, unless expclitly disabled via --without-mesa.  Also check if
-# GLX extensions are supported and define the header property
-# CSGL_EXT_STATIC_ASSERTION if they are _not_ supported.
+# Check for OpenGL and companions.  Also check if GLX extensions are supported
+# and define the header property CSGL_EXT_STATIC_ASSERTION if they are _not_
+# supported.  Apparently, some Mesa installations require pthread, so pthread
+# flags are used if available.  We check for Windows opengl32 first because
+# Cygwin users often have Mesa installed, and Mesa's OpenGL library is compiled
+# without the __stdcall flags which results in link errors, whereas Microsoft's
+# native opengl32 works fine.
 #------------------------------------------------------------------------------
 
 
@@ -9042,6 +9653,7 @@ done
 
 
 
+
     echo "$as_me:$LINENO: checking for int32" >&5
 echo $ECHO_N "checking for int32... $ECHO_C" >&6
 if test "${ac_cv_type_int32+set}" = set; then
@@ -9156,6 +9768,12 @@ done
 cs_gl_plat_cflags=''
 cs_gl_plat_lflags=''
 cs_gl_plat_libs=''
+if test $cs_cv_sys_pthread = yes; then
+  cs_gl_plat_cflags="$cs_cv_sys_pthread_cflags $cs_gl_plat_cflags"
+    cs_gl_plat_lflags="$cs_cv_sys_pthread_lflags $cs_gl_plat_lflags"
+    cs_gl_plat_libs="$cs_cv_sys_pthread_libs $cs_gl_plat_libs"
+fi
+
 if test "$no_x" != yes; then
   cs_gl_plat_cflags="$X_CFLAGS $cs_gl_plat_cflags"
     cs_gl_plat_lflags="$cs_gl_plat_lflags"
@@ -9199,10 +9817,10 @@ ac_compiler_gnu=$ac_cv_c_compiler_gnu
     cs_libs_save="$LIBS"
     cs_build_ok=no
 
-    for cs_build_item in $cs_mesa_gl \
+    for cs_build_item in `echo @@@-lopengl32 | sed 'y% %#%'` \
     `echo @@@-lGL | sed 'y% %#%'` \
-    `echo @@@-lopengl32 | sed 'y% %#%'` \
-    `echo @-DCS_OPENGL_PATH=OpenGL@@-framework OpenGL | sed 'y% %#%'`
+    `echo @-DCS_OPENGL_PATH=OpenGL@@-framework OpenGL | sed 'y% %#%'` \
+    $cs_mesa_gl
     do
 
     set filler `echo "$cs_build_item" | awk 'BEGIN { FS="@" }
@@ -9352,10 +9970,10 @@ ac_compiler_gnu=$ac_cv_c_compiler_gnu
     cs_libs_save="$LIBS"
     cs_build_ok=no
 
-    for cs_build_item in $cs_mesa_gl \
+    for cs_build_item in `echo @@@-lopengl32 | sed 'y% %#%'` \
     `echo @@@-lGL | sed 'y% %#%'` \
-    `echo @@@-lopengl32 | sed 'y% %#%'` \
-    `echo @-DCS_OPENGL_PATH=OpenGL@@-framework OpenGL | sed 'y% %#%'`
+    `echo @-DCS_OPENGL_PATH=OpenGL@@-framework OpenGL | sed 'y% %#%'` \
+    $cs_mesa_gl
     do
 
     set filler `echo "$cs_build_item" | awk 'BEGIN { FS="@" }
@@ -9541,10 +10159,10 @@ ac_compiler_gnu=$ac_cv_c_compiler_gnu
     cs_libs_save="$LIBS"
     cs_build_ok=no
 
-    for cs_build_item in $cs_mesa_glu \
+    for cs_build_item in `echo @@@-lglu32 | sed 'y% %#%'` \
 	`echo @@@-lGLU | sed 'y% %#%'` \
-	`echo @@@-lglu32 | sed 'y% %#%'` \
-	`echo @-DCS_GL_PATH=OpenGL@@-framework OpenGL | sed 'y% %#%'`
+	`echo @-DCS_GL_PATH=OpenGL@@-framework OpenGL | sed 'y% %#%'` \
+	$cs_mesa_glu
     do
 
     set filler `echo "$cs_build_item" | awk 'BEGIN { FS="@" }
@@ -9694,10 +10312,10 @@ ac_compiler_gnu=$ac_cv_c_compiler_gnu
     cs_libs_save="$LIBS"
     cs_build_ok=no
 
-    for cs_build_item in $cs_mesa_glu \
+    for cs_build_item in `echo @@@-lglu32 | sed 'y% %#%'` \
 	`echo @@@-lGLU | sed 'y% %#%'` \
-	`echo @@@-lglu32 | sed 'y% %#%'` \
-	`echo @-DCS_GL_PATH=OpenGL@@-framework OpenGL | sed 'y% %#%'`
+	`echo @-DCS_GL_PATH=OpenGL@@-framework OpenGL | sed 'y% %#%'` \
+	$cs_mesa_glu
     do
 
     set filler `echo "$cs_build_item" | awk 'BEGIN { FS="@" }
@@ -9878,8 +10496,8 @@ ac_compiler_gnu=$ac_cv_c_compiler_gnu
     cs_libs_save="$LIBS"
     cs_build_ok=no
 
-    for cs_build_item in `echo @@@-lglut | sed 'y% %#%'` \
-	`echo @@@-lglut32 | sed 'y% %#%'` \
+    for cs_build_item in `echo @@@-lglut32 | sed 'y% %#%'` \
+	`echo @@@-lglut | sed 'y% %#%'` \
 	`echo @-DCS_GLUT_PATH=GLUT@@-framework GLUT | sed 'y% %#%'`
     do
 
@@ -10030,8 +10648,8 @@ ac_compiler_gnu=$ac_cv_c_compiler_gnu
     cs_libs_save="$LIBS"
     cs_build_ok=no
 
-    for cs_build_item in `echo @@@-lglut | sed 'y% %#%'` \
-	`echo @@@-lglut32 | sed 'y% %#%'` \
+    for cs_build_item in `echo @@@-lglut32 | sed 'y% %#%'` \
+	`echo @@@-lglut | sed 'y% %#%'` \
 	`echo @-DCS_GLUT_PATH=GLUT@@-framework GLUT | sed 'y% %#%'`
     do
 
@@ -10213,8 +10831,7 @@ ac_compiler_gnu=$ac_cv_c_compiler_gnu
     cs_libs_save="$LIBS"
     cs_build_ok=no
 
-    for cs_build_item in $cs_mesa_glx \
-	`echo @@@-lGLX | sed 'y% %#%'`
+    for cs_build_item in `echo @@@-lGLX | sed 'y% %#%'` $cs_mesa_glx
     do
 
     set filler `echo "$cs_build_item" | awk 'BEGIN { FS="@" }
@@ -10349,8 +10966,7 @@ ac_compiler_gnu=$ac_cv_c_compiler_gnu
     cs_libs_save="$LIBS"
     cs_build_ok=no
 
-    for cs_build_item in $cs_mesa_glx \
-	`echo @@@-lGLX | sed 'y% %#%'`
+    for cs_build_item in `echo @@@-lGLX | sed 'y% %#%'` $cs_mesa_glx
     do
 
     set filler `echo "$cs_build_item" | awk 'BEGIN { FS="@" }
@@ -16920,616 +17536,6 @@ fi
 "
 else
   :
-fi
-
-
-
-
-#------------------------------------------------------------------------------
-# Check for pthread.
-#------------------------------------------------------------------------------
-
-
-if test "" != yes; then
-  echo "$as_me:$LINENO: checking for pthread" >&5
-echo $ECHO_N "checking for pthread... $ECHO_C" >&6
-if test "${cs_cv_sys_pthread+set}" = set; then
-  echo $ECHO_N "(cached) $ECHO_C" >&6
-else
-  ac_ext=c
-ac_cpp='$CPP $CPPFLAGS'
-ac_compile='$CC -c $CFLAGS $CPPFLAGS conftest.$ac_ext >&5'
-ac_link='$CC -o conftest$ac_exeext $CFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
-ac_compiler_gnu=$ac_cv_c_compiler_gnu
-
-    cs_cflags_save="$CFLAGS"
-    cs_lflags_save="$LDFLAGS"
-    cs_libs_save="$LIBS"
-    cs_build_ok=no
-
-    for cs_build_item in `echo @@@ | sed 'y% %#%'` \
-    `echo @@@-lpthread | sed 'y% %#%'` \
-    `echo @-pthread@@ | sed 'y% %#%'` \
-    `echo @-pthread@@-lpthread | sed 'y% %#%'`
-    do
-
-    set filler `echo "$cs_build_item" | awk 'BEGIN { FS="@" }
-	{ for (i=1; i <= NF; ++i)
-	    { if ($i == "") print "filler"; else print $i } }'`
-    shift
-    if test $# -eq 0; then
-  cs_dummy=''
-else
-  if test "$1" = filler; then
-  cs_dummy=''
-else
-  cs_dummy=$1
-fi
-
-	shift
-fi
-if test $# -eq 0; then
-  cs_cflags_test=''
-else
-  if test "$1" = filler; then
-  cs_cflags_test=''
-else
-  cs_cflags_test=$1
-fi
-
-	shift
-fi
-if test $# -eq 0; then
-  cs_lflags_test=''
-else
-  if test "$1" = filler; then
-  cs_lflags_test=''
-else
-  cs_lflags_test=$1
-fi
-
-	shift
-fi
-if test $# -eq 0; then
-  cs_libs_test=''
-else
-  if test "$1" = filler; then
-  cs_libs_test=''
-else
-  cs_libs_test=$1
-fi
-
-	shift
-fi
-
-    cs_cflags_test=`echo $cs_cflags_test | sed 'y%#% %'`
-    cs_lflags_test=`echo $cs_lflags_test | sed 'y%#% %'`
-    cs_libs_test=`echo $cs_libs_test | sed 'y%#% %'`
-
-	CFLAGS="$cs_cflags_test  $cs_cflags_save"
-	LDFLAGS="$cs_lflags_test  $cs_lflags_save"
-	LIBS="$cs_libs_test  $cs_libs_save"
-	cat >conftest.$ac_ext <<_ACEOF
-#line $LINENO "configure"
-/* confdefs.h.  */
-_ACEOF
-cat confdefs.h >>conftest.$ac_ext
-cat >>conftest.$ac_ext <<_ACEOF
-/* end confdefs.h.  */
-#include <pthread.h>
-	void* worker(void* p) { (void)p; return p; }
-int
-main ()
-{
-pthread_t tid; pthread_create(&tid, 0, worker, 0);
-  ;
-  return 0;
-}
-_ACEOF
-rm -f conftest.$ac_objext conftest$ac_exeext
-if { (eval echo "$as_me:$LINENO: \"$ac_link\"") >&5
-  (eval $ac_link) 2>&5
-  ac_status=$?
-  echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); } &&
-         { ac_try='test -s conftest$ac_exeext'
-  { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
-  (eval $ac_try) 2>&5
-  ac_status=$?
-  echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); }; }; then
-  cs_build_ok=yes break
-else
-  echo "$as_me: failed program was:" >&5
-sed 's/^/| /' conftest.$ac_ext >&5
-
-fi
-rm -f conftest.$ac_objext conftest$ac_exeext conftest.$ac_ext
-    done
-
-    CFLAGS=$cs_cflags_save
-    LDFLAGS=$cs_lflags_save
-    LIBS=$cs_libs_save
-    ac_ext=c
-ac_cpp='$CPP $CPPFLAGS'
-ac_compile='$CC -c $CFLAGS $CPPFLAGS conftest.$ac_ext >&5'
-ac_link='$CC -o conftest$ac_exeext $CFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
-ac_compiler_gnu=$ac_cv_c_compiler_gnu
-
-
-    if test $cs_build_ok = yes; then
-  cs_build_cflags=`echo x$cs_cflags_test  | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-	cs_build_lflags=`echo x$cs_lflags_test  | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-	cs_build_libs=`echo x$cs_libs_test  | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-	cs_cv_sys_pthread=yes
-		cs_cv_sys_pthread_cflags=$cs_build_cflags
-		cs_cv_sys_pthread_lflags=$cs_build_lflags
-		cs_cv_sys_pthread_libs=$cs_build_libs
-else
-  cs_cv_sys_pthread=no
-fi
-
-fi
-echo "$as_me:$LINENO: result: $cs_cv_sys_pthread" >&5
-echo "${ECHO_T}$cs_cv_sys_pthread" >&6
-else
-  echo "$as_me:$LINENO: checking for pthread" >&5
-echo $ECHO_N "checking for pthread... $ECHO_C" >&6
-	    ac_ext=c
-ac_cpp='$CPP $CPPFLAGS'
-ac_compile='$CC -c $CFLAGS $CPPFLAGS conftest.$ac_ext >&5'
-ac_link='$CC -o conftest$ac_exeext $CFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
-ac_compiler_gnu=$ac_cv_c_compiler_gnu
-
-    cs_cflags_save="$CFLAGS"
-    cs_lflags_save="$LDFLAGS"
-    cs_libs_save="$LIBS"
-    cs_build_ok=no
-
-    for cs_build_item in `echo @@@ | sed 'y% %#%'` \
-    `echo @@@-lpthread | sed 'y% %#%'` \
-    `echo @-pthread@@ | sed 'y% %#%'` \
-    `echo @-pthread@@-lpthread | sed 'y% %#%'`
-    do
-
-    set filler `echo "$cs_build_item" | awk 'BEGIN { FS="@" }
-	{ for (i=1; i <= NF; ++i)
-	    { if ($i == "") print "filler"; else print $i } }'`
-    shift
-    if test $# -eq 0; then
-  cs_dummy=''
-else
-  if test "$1" = filler; then
-  cs_dummy=''
-else
-  cs_dummy=$1
-fi
-
-	shift
-fi
-if test $# -eq 0; then
-  cs_cflags_test=''
-else
-  if test "$1" = filler; then
-  cs_cflags_test=''
-else
-  cs_cflags_test=$1
-fi
-
-	shift
-fi
-if test $# -eq 0; then
-  cs_lflags_test=''
-else
-  if test "$1" = filler; then
-  cs_lflags_test=''
-else
-  cs_lflags_test=$1
-fi
-
-	shift
-fi
-if test $# -eq 0; then
-  cs_libs_test=''
-else
-  if test "$1" = filler; then
-  cs_libs_test=''
-else
-  cs_libs_test=$1
-fi
-
-	shift
-fi
-
-    cs_cflags_test=`echo $cs_cflags_test | sed 'y%#% %'`
-    cs_lflags_test=`echo $cs_lflags_test | sed 'y%#% %'`
-    cs_libs_test=`echo $cs_libs_test | sed 'y%#% %'`
-
-	CFLAGS="$cs_cflags_test  $cs_cflags_save"
-	LDFLAGS="$cs_lflags_test  $cs_lflags_save"
-	LIBS="$cs_libs_test  $cs_libs_save"
-	cat >conftest.$ac_ext <<_ACEOF
-#line $LINENO "configure"
-/* confdefs.h.  */
-_ACEOF
-cat confdefs.h >>conftest.$ac_ext
-cat >>conftest.$ac_ext <<_ACEOF
-/* end confdefs.h.  */
-#include <pthread.h>
-	void* worker(void* p) { (void)p; return p; }
-int
-main ()
-{
-pthread_t tid; pthread_create(&tid, 0, worker, 0);
-  ;
-  return 0;
-}
-_ACEOF
-rm -f conftest.$ac_objext conftest$ac_exeext
-if { (eval echo "$as_me:$LINENO: \"$ac_link\"") >&5
-  (eval $ac_link) 2>&5
-  ac_status=$?
-  echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); } &&
-         { ac_try='test -s conftest$ac_exeext'
-  { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
-  (eval $ac_try) 2>&5
-  ac_status=$?
-  echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); }; }; then
-  cs_build_ok=yes break
-else
-  echo "$as_me: failed program was:" >&5
-sed 's/^/| /' conftest.$ac_ext >&5
-
-fi
-rm -f conftest.$ac_objext conftest$ac_exeext conftest.$ac_ext
-    done
-
-    CFLAGS=$cs_cflags_save
-    LDFLAGS=$cs_lflags_save
-    LIBS=$cs_libs_save
-    ac_ext=c
-ac_cpp='$CPP $CPPFLAGS'
-ac_compile='$CC -c $CFLAGS $CPPFLAGS conftest.$ac_ext >&5'
-ac_link='$CC -o conftest$ac_exeext $CFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
-ac_compiler_gnu=$ac_cv_c_compiler_gnu
-
-
-    if test $cs_build_ok = yes; then
-  cs_build_cflags=`echo x$cs_cflags_test  | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-	cs_build_lflags=`echo x$cs_lflags_test  | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-	cs_build_libs=`echo x$cs_libs_test  | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-	cs_cv_sys_pthread=yes
-		cs_cv_sys_pthread_cflags=$cs_build_cflags
-		cs_cv_sys_pthread_lflags=$cs_build_lflags
-		cs_cv_sys_pthread_libs=$cs_build_libs
-else
-  cs_cv_sys_pthread=no
-fi
-
-	    echo "$as_me:$LINENO: result: $cs_cv_sys_pthread" >&5
-echo "${ECHO_T}$cs_cv_sys_pthread" >&6
-fi
-
-    if test $cs_cv_sys_pthread = yes; then
-  if test "$cs_cv_sys_pthread" = yes; then
-  cs_makefile_text="${cs_makefile_text}PTHREAD.AVAILABLE = yes
-"
-	cs_result_cflags=`echo x$cs_cv_sys_pthread_cflags | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-	cs_result_lflags=`echo x$cs_cv_sys_pthread_lflags $cs_cv_sys_pthread_libs | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-	if test -n "$cs_result_cflags"; then
-  cs_makefile_text="${cs_makefile_text}PTHREAD.CFLAGS = $cs_result_cflags
-"
-fi
-
-	if test -n "$cs_result_lflags"; then
-  cs_makefile_text="${cs_makefile_text}PTHREAD.LFLAGS = $cs_result_lflags
-"
-fi
-
-fi
-
-else
-  cs_cv_sys_pthread_cflags=''
-	cs_cv_sys_pthread_lflags=''
-	cs_cv_sys_pthread_libs=''
-	:
-fi
-
-
-
-
-#------------------------------------------------------------------------------
-# Check if pthread implementation supports the RECURSIVE_NP externsion.
-#------------------------------------------------------------------------------
-if test $cs_cv_sys_pthread = yes; then
-  if test "" != yes; then
-  echo "$as_me:$LINENO: checking for pthread recursive mutexes" >&5
-echo $ECHO_N "checking for pthread recursive mutexes... $ECHO_C" >&6
-if test "${cs_cv_sys_pthread_mutex_recursive+set}" = set; then
-  echo $ECHO_N "(cached) $ECHO_C" >&6
-else
-  ac_ext=c
-ac_cpp='$CPP $CPPFLAGS'
-ac_compile='$CC -c $CFLAGS $CPPFLAGS conftest.$ac_ext >&5'
-ac_link='$CC -o conftest$ac_exeext $CFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
-ac_compiler_gnu=$ac_cv_c_compiler_gnu
-
-    cs_cflags_save="$CFLAGS"
-    cs_lflags_save="$LDFLAGS"
-    cs_libs_save="$LIBS"
-    cs_build_ok=no
-
-    for cs_build_item in `echo @@@ | sed 'y% %#%'`
-    do
-
-    set filler `echo "$cs_build_item" | awk 'BEGIN { FS="@" }
-	{ for (i=1; i <= NF; ++i)
-	    { if ($i == "") print "filler"; else print $i } }'`
-    shift
-    if test $# -eq 0; then
-  cs_dummy=''
-else
-  if test "$1" = filler; then
-  cs_dummy=''
-else
-  cs_dummy=$1
-fi
-
-	shift
-fi
-if test $# -eq 0; then
-  cs_cflags_test=''
-else
-  if test "$1" = filler; then
-  cs_cflags_test=''
-else
-  cs_cflags_test=$1
-fi
-
-	shift
-fi
-if test $# -eq 0; then
-  cs_lflags_test=''
-else
-  if test "$1" = filler; then
-  cs_lflags_test=''
-else
-  cs_lflags_test=$1
-fi
-
-	shift
-fi
-if test $# -eq 0; then
-  cs_libs_test=''
-else
-  if test "$1" = filler; then
-  cs_libs_test=''
-else
-  cs_libs_test=$1
-fi
-
-	shift
-fi
-
-    cs_cflags_test=`echo $cs_cflags_test | sed 'y%#% %'`
-    cs_lflags_test=`echo $cs_lflags_test | sed 'y%#% %'`
-    cs_libs_test=`echo $cs_libs_test | sed 'y%#% %'`
-
-	CFLAGS="$cs_cflags_test $cs_cv_sys_pthread_cflags $cs_cflags_save"
-	LDFLAGS="$cs_lflags_test $cs_cv_sys_pthread_lflags $cs_lflags_save"
-	LIBS="$cs_libs_test $cs_cv_sys_pthread_libs $cs_libs_save"
-	cat >conftest.$ac_ext <<_ACEOF
-#line $LINENO "configure"
-/* confdefs.h.  */
-_ACEOF
-cat confdefs.h >>conftest.$ac_ext
-cat >>conftest.$ac_ext <<_ACEOF
-/* end confdefs.h.  */
-#include <pthread.h>
-int
-main ()
-{
-pthread_mutex_t mutex;
-	    pthread_mutex_init(&mutex, PTHREAD_MUTEX_RECURSIVE_NP);
-  ;
-  return 0;
-}
-_ACEOF
-rm -f conftest.$ac_objext conftest$ac_exeext
-if { (eval echo "$as_me:$LINENO: \"$ac_link\"") >&5
-  (eval $ac_link) 2>&5
-  ac_status=$?
-  echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); } &&
-         { ac_try='test -s conftest$ac_exeext'
-  { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
-  (eval $ac_try) 2>&5
-  ac_status=$?
-  echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); }; }; then
-  cs_build_ok=yes break
-else
-  echo "$as_me: failed program was:" >&5
-sed 's/^/| /' conftest.$ac_ext >&5
-
-fi
-rm -f conftest.$ac_objext conftest$ac_exeext conftest.$ac_ext
-    done
-
-    CFLAGS=$cs_cflags_save
-    LDFLAGS=$cs_lflags_save
-    LIBS=$cs_libs_save
-    ac_ext=c
-ac_cpp='$CPP $CPPFLAGS'
-ac_compile='$CC -c $CFLAGS $CPPFLAGS conftest.$ac_ext >&5'
-ac_link='$CC -o conftest$ac_exeext $CFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
-ac_compiler_gnu=$ac_cv_c_compiler_gnu
-
-
-    if test $cs_build_ok = yes; then
-  cs_build_cflags=`echo x$cs_cflags_test $cs_cv_sys_pthread_cflags | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-	cs_build_lflags=`echo x$cs_lflags_test $cs_cv_sys_pthread_lflags | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-	cs_build_libs=`echo x$cs_libs_test $cs_cv_sys_pthread_libs | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-	cs_cv_sys_pthread_mutex_recursive=yes
-		cs_cv_sys_pthread_mutex_recursive_cflags=$cs_build_cflags
-		cs_cv_sys_pthread_mutex_recursive_lflags=$cs_build_lflags
-		cs_cv_sys_pthread_mutex_recursive_libs=$cs_build_libs
-else
-  cs_cv_sys_pthread_mutex_recursive=no
-fi
-
-fi
-echo "$as_me:$LINENO: result: $cs_cv_sys_pthread_mutex_recursive" >&5
-echo "${ECHO_T}$cs_cv_sys_pthread_mutex_recursive" >&6
-else
-  echo "$as_me:$LINENO: checking for pthread recursive mutexes" >&5
-echo $ECHO_N "checking for pthread recursive mutexes... $ECHO_C" >&6
-	    ac_ext=c
-ac_cpp='$CPP $CPPFLAGS'
-ac_compile='$CC -c $CFLAGS $CPPFLAGS conftest.$ac_ext >&5'
-ac_link='$CC -o conftest$ac_exeext $CFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
-ac_compiler_gnu=$ac_cv_c_compiler_gnu
-
-    cs_cflags_save="$CFLAGS"
-    cs_lflags_save="$LDFLAGS"
-    cs_libs_save="$LIBS"
-    cs_build_ok=no
-
-    for cs_build_item in `echo @@@ | sed 'y% %#%'`
-    do
-
-    set filler `echo "$cs_build_item" | awk 'BEGIN { FS="@" }
-	{ for (i=1; i <= NF; ++i)
-	    { if ($i == "") print "filler"; else print $i } }'`
-    shift
-    if test $# -eq 0; then
-  cs_dummy=''
-else
-  if test "$1" = filler; then
-  cs_dummy=''
-else
-  cs_dummy=$1
-fi
-
-	shift
-fi
-if test $# -eq 0; then
-  cs_cflags_test=''
-else
-  if test "$1" = filler; then
-  cs_cflags_test=''
-else
-  cs_cflags_test=$1
-fi
-
-	shift
-fi
-if test $# -eq 0; then
-  cs_lflags_test=''
-else
-  if test "$1" = filler; then
-  cs_lflags_test=''
-else
-  cs_lflags_test=$1
-fi
-
-	shift
-fi
-if test $# -eq 0; then
-  cs_libs_test=''
-else
-  if test "$1" = filler; then
-  cs_libs_test=''
-else
-  cs_libs_test=$1
-fi
-
-	shift
-fi
-
-    cs_cflags_test=`echo $cs_cflags_test | sed 'y%#% %'`
-    cs_lflags_test=`echo $cs_lflags_test | sed 'y%#% %'`
-    cs_libs_test=`echo $cs_libs_test | sed 'y%#% %'`
-
-	CFLAGS="$cs_cflags_test $cs_cv_sys_pthread_cflags $cs_cflags_save"
-	LDFLAGS="$cs_lflags_test $cs_cv_sys_pthread_lflags $cs_lflags_save"
-	LIBS="$cs_libs_test $cs_cv_sys_pthread_libs $cs_libs_save"
-	cat >conftest.$ac_ext <<_ACEOF
-#line $LINENO "configure"
-/* confdefs.h.  */
-_ACEOF
-cat confdefs.h >>conftest.$ac_ext
-cat >>conftest.$ac_ext <<_ACEOF
-/* end confdefs.h.  */
-#include <pthread.h>
-int
-main ()
-{
-pthread_mutex_t mutex;
-	    pthread_mutex_init(&mutex, PTHREAD_MUTEX_RECURSIVE_NP);
-  ;
-  return 0;
-}
-_ACEOF
-rm -f conftest.$ac_objext conftest$ac_exeext
-if { (eval echo "$as_me:$LINENO: \"$ac_link\"") >&5
-  (eval $ac_link) 2>&5
-  ac_status=$?
-  echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); } &&
-         { ac_try='test -s conftest$ac_exeext'
-  { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
-  (eval $ac_try) 2>&5
-  ac_status=$?
-  echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); }; }; then
-  cs_build_ok=yes break
-else
-  echo "$as_me: failed program was:" >&5
-sed 's/^/| /' conftest.$ac_ext >&5
-
-fi
-rm -f conftest.$ac_objext conftest$ac_exeext conftest.$ac_ext
-    done
-
-    CFLAGS=$cs_cflags_save
-    LDFLAGS=$cs_lflags_save
-    LIBS=$cs_libs_save
-    ac_ext=c
-ac_cpp='$CPP $CPPFLAGS'
-ac_compile='$CC -c $CFLAGS $CPPFLAGS conftest.$ac_ext >&5'
-ac_link='$CC -o conftest$ac_exeext $CFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
-ac_compiler_gnu=$ac_cv_c_compiler_gnu
-
-
-    if test $cs_build_ok = yes; then
-  cs_build_cflags=`echo x$cs_cflags_test $cs_cv_sys_pthread_cflags | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-	cs_build_lflags=`echo x$cs_lflags_test $cs_cv_sys_pthread_lflags | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-	cs_build_libs=`echo x$cs_libs_test $cs_cv_sys_pthread_libs | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-	cs_cv_sys_pthread_mutex_recursive=yes
-		cs_cv_sys_pthread_mutex_recursive_cflags=$cs_build_cflags
-		cs_cv_sys_pthread_mutex_recursive_lflags=$cs_build_lflags
-		cs_cv_sys_pthread_mutex_recursive_libs=$cs_build_libs
-else
-  cs_cv_sys_pthread_mutex_recursive=no
-fi
-
-	    echo "$as_me:$LINENO: result: $cs_cv_sys_pthread_mutex_recursive" >&5
-echo "${ECHO_T}$cs_cv_sys_pthread_mutex_recursive" >&6
-fi
-
-    if test $cs_cv_sys_pthread_mutex_recursive = yes; then
-  cs_header_text="${cs_header_text}#define PTHREAD_MUTEX_HAS_RECURSIVE_NP
-"
-else
-  cs_cv_sys_pthread_mutex_recursive_cflags=''
-	cs_cv_sys_pthread_mutex_recursive_lflags=''
-	cs_cv_sys_pthread_mutex_recursive_libs=''
-	:
-fi
-
 fi
 
 

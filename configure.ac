@@ -1066,6 +1066,41 @@ CS_CHECK_COMMON_LIBS
 
 
 #------------------------------------------------------------------------------
+# Check for pthread.  Also check if pthread implementation supports the
+# RECURSIVE_NP extension.
+#------------------------------------------------------------------------------
+m4_define([cs_pthread_flags],
+    [CS_CREATE_TUPLE() \
+    CS_CREATE_TUPLE([], [], [-lpthread]) \
+    CS_CREATE_TUPLE([-pthread], [], []) \
+    CS_CREATE_TUPLE([-pthread], [], [-lpthread])])
+
+AC_DEFUN([CS_CHECK_PTHREAD],
+    [CS_CHECK_BUILD([for pthread], [cs_cv_sys_pthread],
+	[AC_LANG_PROGRAM(
+	    [#include <pthread.h>
+	    void* worker(void* p) { (void)p; return p; }],
+	    [pthread_t tid; pthread_create(&tid, 0, worker, 0);])],
+	[cs_pthread_flags], [],
+	[CS_MAKEFILE_BUILD_RESULT([cs_cv_sys_pthread], [PTHREAD])])])
+
+CS_CHECK_PTHREAD
+
+AS_IF([test $cs_cv_sys_pthread = yes],
+    [CS_CHECK_BUILD([for pthread recursive mutexes],
+	[cs_cv_sys_pthread_mutex_recursive],
+	[AC_LANG_PROGRAM(
+	    [#include <pthread.h>],
+	    [pthread_mutex_t mutex;
+	    pthread_mutex_init(&mutex, PTHREAD_MUTEX_RECURSIVE_NP);])],
+	[], [], [CS_HEADER_PROPERTY([PTHREAD_MUTEX_HAS_RECURSIVE_NP])], [], [],
+	[$cs_cv_sys_pthread_cflags],
+	[$cs_cv_sys_pthread_lflags],
+	[$cs_cv_sys_pthread_libs])])
+
+
+
+#------------------------------------------------------------------------------
 # Check for X-Windows.  If the X-Windows implementation is XFree86, then also
 # enable the `VideoMode' extension.
 #------------------------------------------------------------------------------
@@ -1093,10 +1128,13 @@ AS_IF([test "$no_x" != yes],
 
 
 #------------------------------------------------------------------------------
-# Check for OpenGL and companions.  Prefer Mesa over a vendor's OpenGL
-# implementation, unless expclitly disabled via --without-mesa.  Also check if
-# GLX extensions are supported and define the header property
-# CSGL_EXT_STATIC_ASSERTION if they are _not_ supported.
+# Check for OpenGL and companions.  Also check if GLX extensions are supported
+# and define the header property CSGL_EXT_STATIC_ASSERTION if they are _not_
+# supported.  Apparently, some Mesa installations require pthread, so pthread
+# flags are used if available.  We check for Windows opengl32 first because
+# Cygwin users often have Mesa installed, and Mesa's OpenGL library is compiled
+# without the __stdcall flags which results in link errors, whereas Microsoft's
+# native opengl32 works fine.
 #------------------------------------------------------------------------------
 m4_define([cs_define_int32],
     [@%:@if !HAVE_TYPE_INT32
@@ -1105,7 +1143,8 @@ m4_define([cs_define_int32],
     ])
 
 AC_DEFUN([CS_CHECK_GL_PREPARE],
-    [AC_REQUIRE([AC_PATH_X])
+    [AC_REQUIRE([CS_CHECK_PTHREAD])
+    AC_REQUIRE([AC_PATH_X])
     AC_REQUIRE([AC_PATH_XTRA])
     AC_CHECK_TYPE([int32], [AC_DEFINE([HAVE_TYPE_INT32])], [])
     AC_CHECK_HEADERS([windows.h], [], [], [cs_define_int32])])
@@ -1135,6 +1174,10 @@ CS_CHECK_GL_PREPARE
 cs_gl_plat_cflags=''
 cs_gl_plat_lflags=''
 cs_gl_plat_libs=''
+AS_IF([test $cs_cv_sys_pthread = yes],
+    [cs_gl_plat_cflags="$cs_cv_sys_pthread_cflags $cs_gl_plat_cflags"
+    cs_gl_plat_lflags="$cs_cv_sys_pthread_lflags $cs_gl_plat_lflags"
+    cs_gl_plat_libs="$cs_cv_sys_pthread_libs $cs_gl_plat_libs"])
 AS_IF([test "$no_x" != yes],
     [cs_gl_plat_cflags="$X_CFLAGS $cs_gl_plat_cflags"
     cs_gl_plat_lflags="$cs_gl_plat_lflags"
@@ -1154,10 +1197,10 @@ AS_IF([test $with_mesa != no],
 # Check for OpenGL.
 CS_CHECK_BUILD([for OpenGL], [cs_cv_libgl],
     [AC_LANG_PROGRAM([CS_GL_INCLUDE([CS_OPENGL_PATH],[GL],[gl.h])],[glEnd()])],
-    [$cs_mesa_gl \
+    [CS_CREATE_TUPLE([],[],[-lopengl32]) \
     CS_CREATE_TUPLE([],[],[-lGL]) \
-    CS_CREATE_TUPLE([],[],[-lopengl32]) \
-    CS_CREATE_TUPLE([-DCS_OPENGL_PATH=OpenGL],[],[-framework OpenGL])], [],
+    CS_CREATE_TUPLE([-DCS_OPENGL_PATH=OpenGL],[],[-framework OpenGL]) \
+    $cs_mesa_gl], [],
     [CS_MAKEFILE_BUILD_RESULT([cs_cv_libgl], [GL])], [], [],
     [$cs_gl_plat_cflags], [$cs_gl_plat_lflags], [$cs_gl_plat_libs])
 
@@ -1170,10 +1213,10 @@ AS_IF([test $cs_cv_libgl = yes],
     CS_CHECK_BUILD([for GLU], [cs_cv_libglu],
 	[AC_LANG_PROGRAM(
 	    [CS_GL_INCLUDE([CS_GL_PATH],[GL],[glu.h])], [gluNewQuadric()])],
-	[$cs_mesa_glu \
+	[CS_CREATE_TUPLE([],[],[-lglu32]) \
 	CS_CREATE_TUPLE([],[],[-lGLU]) \
-	CS_CREATE_TUPLE([],[],[-lglu32]) \
-	CS_CREATE_TUPLE([-DCS_GL_PATH=OpenGL],[],[-framework OpenGL])], [],
+	CS_CREATE_TUPLE([-DCS_GL_PATH=OpenGL],[],[-framework OpenGL]) \
+	$cs_mesa_glu], [],
 	[CS_MAKEFILE_BUILD_RESULT([cs_cv_libglu], [GLU])], [], [],
 	[$cs_gl_plat_cflags], [$cs_gl_plat_lflags], [$cs_gl_plat_libs])
 
@@ -1181,8 +1224,8 @@ AS_IF([test $cs_cv_libgl = yes],
     CS_CHECK_BUILD([for glut], [cs_cv_libglut],
 	[AC_LANG_PROGRAM(
 	    [CS_GL_INCLUDE([CS_GLUT_PATH],[GL],[glut.h])], [glutSwapBuffers])],
-	[CS_CREATE_TUPLE([],[],[-lglut]) \
-	CS_CREATE_TUPLE([],[],[-lglut32]) \
+	[CS_CREATE_TUPLE([],[],[-lglut32]) \
+	CS_CREATE_TUPLE([],[],[-lglut]) \
 	CS_CREATE_TUPLE([-DCS_GLUT_PATH=GLUT],[],[-framework GLUT])], [],
 	[CS_MAKEFILE_BUILD_RESULT([cs_cv_libglut], [GLUT])], [], [],
 	[$cs_gl_plat_cflags], [$cs_gl_plat_lflags], [$cs_gl_plat_libs])
@@ -1190,8 +1233,7 @@ AS_IF([test $cs_cv_libgl = yes],
     # Check for GLX.
     CS_CHECK_BUILD([for GLX], [cs_cv_libglx],
 	[AC_LANG_PROGRAM([#include <GL/glx.h>], [glXWaitGL()])],
-	[$cs_mesa_glx \
-	CS_CREATE_TUPLE([],[],[-lGLX])], [],
+	[CS_CREATE_TUPLE([],[],[-lGLX]) $cs_mesa_glx], [],
 	[CS_MAKEFILE_BUILD_RESULT([cs_cv_libglx], [GLX])], [], [],
 	[$cs_gl_plat_cflags], [$cs_gl_plat_lflags], [$cs_gl_plat_libs])
 
@@ -1417,42 +1459,6 @@ CS_CHECK_LIB_WITH([cal3d],
     [], [C++],
     [CS_MAKEFILE_BUILD_RESULT([cs_cv_libcal3d], [CAL3D])
 	CS_MAKEFILE_PROPERTY([HAS_CAL3D], [yes])])
-
-
-
-#------------------------------------------------------------------------------
-# Check for pthread.
-#------------------------------------------------------------------------------
-m4_define([cs_pthread_flags],
-    [CS_CREATE_TUPLE() \
-    CS_CREATE_TUPLE([], [], [-lpthread]) \
-    CS_CREATE_TUPLE([-pthread], [], []) \
-    CS_CREATE_TUPLE([-pthread], [], [-lpthread])])
-
-CS_CHECK_BUILD([for pthread], [cs_cv_sys_pthread],
-    [AC_LANG_PROGRAM(
-	[#include <pthread.h>
-	void* worker(void* p) { (void)p; return p; }],
-	[pthread_t tid; pthread_create(&tid, 0, worker, 0);])],
-    [cs_pthread_flags], [],
-    [CS_MAKEFILE_BUILD_RESULT([cs_cv_sys_pthread], [PTHREAD])])
-
-
-
-#------------------------------------------------------------------------------
-# Check if pthread implementation supports the RECURSIVE_NP externsion.
-#------------------------------------------------------------------------------
-AS_IF([test $cs_cv_sys_pthread = yes],
-    [CS_CHECK_BUILD([for pthread recursive mutexes],
-	[cs_cv_sys_pthread_mutex_recursive],
-	[AC_LANG_PROGRAM(
-	    [#include <pthread.h>],
-	    [pthread_mutex_t mutex;
-	    pthread_mutex_init(&mutex, PTHREAD_MUTEX_RECURSIVE_NP);])],
-	[], [], [CS_HEADER_PROPERTY([PTHREAD_MUTEX_HAS_RECURSIVE_NP])], [], [],
-	[$cs_cv_sys_pthread_cflags],
-	[$cs_cv_sys_pthread_lflags],
-	[$cs_cv_sys_pthread_libs])])
 
 
 
