@@ -7,6 +7,9 @@ individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
 16-Dec-2004
+	- Peter Amstutz updated the csvosa3dl plugin to compile with
+	  the current VOS CVS code.
+16-Dec-2004
 	- Eric Sunshine added the CS_QUERY_REGISTRY_PLUGIN() macro to
 	  <iutil/plugin.h>, which is based upon a submission from Reed Hedges.
 	  This macro embodies the common idiom of first querying the
