@@ -36,6 +36,10 @@ chronological order.
 	  the system to UTF-8.
 	- Wouter Wijngaards changed the csfx DrawPartial to work under the
 	  new renderer, it forgot to flip the y coord.
+	- res fixed a problem in csGLGraphics3D::BeginDraw(). It set  
+	  "current drawflags" to the "new drawflags" at the very beginning of
+	  the method, causing the test for whether G2D BeginDraw() should be
+	  called to always fail.
 24-Apr-2004
 	- Jorrit fixed a compile bug in glshader_fixed. 'friend' needs
 	  'struct'.

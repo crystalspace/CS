@@ -1053,7 +1053,6 @@ void csGLGraphics3D::Close ()
 
 bool csGLGraphics3D::BeginDraw (int drawflags)
 {
-  current_drawflags = drawflags;
 /*  if (lastUsedShaderpass)
   {
     lastUsedShaderpass->ResetState ();
@@ -1073,6 +1072,7 @@ bool csGLGraphics3D::BeginDraw (int drawflags)
     if (!G2D->BeginDraw ())
       return false;
   }
+  current_drawflags = drawflags;
 
   if (render_target)
   {
