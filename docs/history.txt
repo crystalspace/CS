@@ -4,7 +4,6 @@ http://crystal.sourceforge.net/
 The history order is reversed so that new features are at the top.
 
 10-May-2003
-        - Boyan fixed a memory leak in awsParmList (string parameters).
 	- Philip Wyett eliminated the 88 double to float conversion compiler
           warnings in gtreeldr.cpp under MSVC 6.
 	- Oktal made the following changes to the networking code:
