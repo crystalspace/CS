@@ -127,6 +127,9 @@ public:
    */
   void SetLightMap (csLightMap* lightmap);
 
+  /// Get the cslightmap, for engine internal use (users see GetLightMap below)
+  csLightMap *GetCSLightMap() { return lm; }
+
   /// Set the texture to be used for this polytexture.
   void SetTextureHandle (iTextureHandle* th) { txt_handle = th; }
 
@@ -153,6 +156,19 @@ public:
 
   ///
   void MakeDirtyDynamicLights ();
+
+  /**
+   *  Setup PolyFill by giving the drawing function to call.
+   *  Drawpixel: (x, y, density), x,y are the coords, density is 0..1.
+   */
+  static void SetupPolyFill( void (*drawpixel)(int, int, float) );
+  /** 
+   *  fill given 2d polygon antialiased by calling the drawpixel for every 
+   *  pixel. Give the visible rectangle, the number of vertices and
+   *  the vertice array. (i.e. try DoPolyFill(0,0, w, h, ...) 
+   */
+  static void DoPolyFill(int left, int top, int width, int height,
+    int n, csVector2 *pol2d);
 
   //--------------------- iPolygonTexture implementation ---------------------
   DECLARE_IBASE;

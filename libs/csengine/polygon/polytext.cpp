@@ -1017,6 +1017,19 @@ finish:
   CHK (delete [] f_uv);
 }
 
+void csPolyTexture::SetupPolyFill( void (*drawpixel)(int, int, float) )
+{
+  __draw_func = drawpixel;
+}
+
+void csPolyTexture::DoPolyFill(int left, int top, int width, int height,
+    int n, csVector2 *pol2d)
+{
+  __rect vis = {left, width, top, height};
+  poly_fill(n, pol2d, vis);
+}
+
+
 void csPolyTexture::GetTextureBox (float& fMinU, float& fMinV, float& fMaxU, float& fMaxV)
 {
   fMinU = Fmin_u; fMaxU = Fmax_u;
