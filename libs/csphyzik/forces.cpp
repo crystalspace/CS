@@ -49,7 +49,7 @@ ctAirResistanceF::ctAirResistanceF( real pk )
 
 ctVector3 ctAirResistanceF::apply_F( ctDynamicEntity &pe )
 {
-	ctVector3 f = (pe.get_v() + pe.get_angular_v())*magnitude;
+	ctVector3 f = (pe.get_v())*magnitude;
 	pe.sum_force( f );
 	return f;
 
