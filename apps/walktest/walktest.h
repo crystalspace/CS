@@ -29,6 +29,13 @@
 #include "csutil/vfs.h"
 #include "iworld.h"
 
+/** Provided for app developer to insert new functions and variables into Walktest
+ *  To use, remove the "walktest/" from the two myapp include lines, copy myapp1.h, 
+ *  myapp2.h, and myapp.cpp to the app directory, and modify as needed.  
+ */
+#include <walktest/myapp1.h>
+//#include <myapp1.h>
+
 class Polygon3D;
 class WalkTest;
 class LanguageLayer;
@@ -285,6 +292,43 @@ public:
   void handle_key_pgdn (float, bool shift, bool alt, bool ctrl);
   ///
   void eatkeypress (int status, int key, bool shift, bool alt, bool ctrl);
+
+  /** The following "MyApp" functions give the application designer hooks
+   *  into WalkTest so that new functionality may be added without modifing
+   *  WalkTest itself.
+   */
+  
+  /// Load any standard libraries here.
+  void MyAppInitialize1(void);
+  /// Load any standard textures here.
+  void MyAppInitialize2(void);
+  /// Load any 2D sprites.
+  void MyAppInitialize3(void);
+  /// Do any remaining initializations here.
+  void MyAppInitialize4(void);
+  /// Called at the end of WalkTest's constructor.
+  void MyAppConstructor(void);
+  /// Called at the beginning of WalkTest's destructor.
+  void MyAppDestructor1(void);
+  /// Called at the end of WalkTest's destructor.
+  void MyAppDestructor2(void);
+  /// Draw the first 2D sprites within this function call.
+  void MyAppDrawFrame1(void);
+  /// Draw the last 2D sprites within this function call.
+  void MyAppDrawFrame2(void);
+  /// Near the beginning of NextFrame
+  void MyAppNextFrame1(time_t elapsed_time, time_t current_time);
+  /// Near the end of NextFrame
+  void MyAppNextFrame2(time_t elapsed_time, time_t current_time);
+  void MyAppShowHelp(void);
+  bool MyAppCommandHandler(const char *cmd, const char *arg);
+  bool MyAppMouseClick1Handler(csEvent &Event);
+  bool MyAppMouseClick2Handler(csEvent &Event);
+  bool MyAppMouseClick3Handler(csEvent &Event);
+
+// Provided for app developer to insert new functions and variables into Walktest
+#include <walktest/myapp2.h>
+//#include <myapp2.h>
 };
 
 extern csVector2 coord_check_vector;

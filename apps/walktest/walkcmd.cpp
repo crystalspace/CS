@@ -229,6 +229,7 @@ bool CommandHandler (const char *cmd, const char *arg)
     CONPRI("Various:\n");
     CONPRI("  coordsave coordload bind capture map p_alpha s_fog\n");
     CONPRI("  snd_play snd_volume loadsprite addsprite delsprite\n");
+    Sys->MyAppShowHelp();
 #   undef CONPRI
   }
   else if (!strcasecmp (cmd, "coordsave"))
@@ -768,7 +769,8 @@ bool CommandHandler (const char *cmd, const char *arg)
   else if (!strcasecmp (cmd, "fullscreen"))
     Sys->G2D->PerformExtension("FullScreen");
   else
-    return false;
+    return Sys->MyAppCommandHandler(cmd, arg);
+
   return true;
 }
 

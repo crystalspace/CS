@@ -611,10 +611,16 @@ bool WalkTest::HandleEvent (csEvent &Event)
         (Event.Key.Modifiers & CSMASK_CTRL) != 0);
       break;
     case csevMouseDown:
+       {
       if (Event.Mouse.Button == 1)
+      {
+        if (!MyAppMouseClick1Handler(Event))
         move_forward = true;
+         }
       else if (Event.Mouse.Button == 3)
       {
+        if (!MyAppMouseClick3Handler(Event))
+        {
         csVector2   screenPoint;
         csSprite3D *closestSprite;
 
@@ -625,9 +631,12 @@ bool WalkTest::HandleEvent (csEvent &Event)
           Sys->Printf (MSG_CONSOLE, "Selected sprite %s\n", closestSprite->GetName ());
         else
           Sys->Printf (MSG_CONSOLE, "No sprite selected!\n");
+           }
       }
       else if (Event.Mouse.Button == 2)
       {
+        if (!MyAppMouseClick2Handler(Event))
+        {
         csVector3 v;
         v.z = System->G3D->GetZBuffValue(Event.Mouse.x, Event.Mouse.y);
         v.x = (Event.Mouse.x-FRAME_WIDTH/2) * v.z / view->GetCamera ()->aspect;
@@ -660,7 +669,9 @@ bool WalkTest::HandleEvent (csEvent &Event)
 	view->GetWorld ()->DrawFunc (view->GetCamera (), view->GetClipper (),
 		select_object);
       }
+         }
       break;
+     }
     case csevMouseMove:
       // additional command by Leslie Saputra -> freelook mode.
       {

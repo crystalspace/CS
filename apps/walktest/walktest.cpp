@@ -140,10 +140,12 @@ WalkTest::WalkTest () :
 //pl=new PhysicsLibrary;
 
   timeFPS = 0.0;
+  MyAppConstructor();   // provided so app developer can initialize
 }
 
 WalkTest::~WalkTest ()
 {
+  MyAppDestructor1();   // provided so app developer can delete as needed
   if (World) World->DecRef ();
   if (collide_system) collide_system->DecRef ();
   delete wf;
@@ -155,6 +157,7 @@ WalkTest::~WalkTest ()
   delete cslogo;
   delete body;
   delete legs;
+  MyAppDestructor2();   // provided so app developer can delete as needed
 }
 
 void WalkTest::SetSystemDefaults (csIniFile *Config)
@@ -251,6 +254,7 @@ void WalkTest::NextFrame (time_t elapsed_time, time_t current_time)
   // The following will fetch all events from queue and handle them
   SysSystemDriver::NextFrame (elapsed_time, current_time);
 
+  MyAppNextFrame1(elapsed_time, current_time);
   Sys->world->UpdateParticleSystems (elapsed_time);
 
   // Record the first time this routine is called.
@@ -309,6 +313,7 @@ void WalkTest::NextFrame (time_t elapsed_time, time_t current_time)
 
   if (move_forward) step (1, 0);
 
+  MyAppNextFrame2(elapsed_time, current_time);
   PrepareFrame (elapsed_time, current_time);
   DrawFrame (elapsed_time, current_time);
 
@@ -1039,12 +1044,15 @@ bool WalkTest::Initialize (int argc, const char* const argv[], const char *iConf
 
     // Load the "standard" library
     csLoader::LoadLibraryFile (world, "/lib/std/library");
+    MyAppInitialize1();
 
     // Find the Crystal Space logo and set the renderer Flag to for_2d, to allow
     // the use in the 2D part.
     csTextureList *texlist = world->GetTextures ();
     csTextureHandle *texh = texlist->FindByName ("cslogo.gif");
     if (texh) texh->flags = CS_TEXTURE_2D;
+
+    MyAppInitialize2();
 
     // Prepare the world. This will calculate all lighting and
     // prepare the lightmaps for the 3D rasterizer.
@@ -1058,6 +1066,8 @@ bool WalkTest::Initialize (int argc, const char* const argv[], const char *iConf
       phTex->GetMipMapDimensions (0, w, h);
       cslogo = new csPixmap (phTex, 0, 0, w, h);
     }
+
+    MyAppInitialize3();
 
     // Look for the start sector in this world.
     csCameraPosition *cp = (csCameraPosition *)world->camera_positions.FindByName ("Start");
@@ -1144,6 +1154,7 @@ bool WalkTest::Initialize (int argc, const char* const argv[], const char *iConf
   int h3d = Gfx3D->GetHeight ();
   view->SetRectangle (2, 2, w3d - 4, h3d - 4);
 
+  MyAppInitialize4();
   return true;
 }
 
