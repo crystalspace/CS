@@ -18,7 +18,8 @@ chronological order.
 	- Jorrit fixed an accidental commit in thing.cpp.
 	- Jorrit fixed a bug in rendermeshlist.cpp which would sometimes try
 	  to use a 0 render priority.
-	- Keith updated the example .cal3d file in /plugins/mesh/sprcal3d/persist
+	- Keith updated the example .cal3d file in
+	  /plugins/mesh/sprcal3d/persist.
 8-Sep-2003
 	- Jorrit added csgfx to the stdsteps renderloop plugin (for Jam).
 	- Jorrit did the following changes to bring new and old renderer
