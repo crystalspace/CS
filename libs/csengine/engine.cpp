@@ -2507,8 +2507,8 @@ void csEngine::GetNearbyObjectList (iSector* sector,
       list.Push (imw->QueryObject ()); 
       if (crossPortals && imw->GetMeshObject ()->GetPortalCount () > 0)
       {
-        csRef<iThingState> st (
-        	SCF_QUERY_INTERFACE (imw->GetMeshObject (), iThingState));
+        csRef<iThingState> st = SCF_QUERY_INTERFACE (
+		imw->GetMeshObject (), iThingState);
         if (st)
         {
           // Check if there are portals and if they are near the position.
@@ -2615,7 +2615,8 @@ void csEngine::GetNearbyMeshList (iSector* sector,
       list.Push (imw); 
       if (crossPortals && imw->GetMeshObject ()->GetPortalCount () > 0)
       {
-        csRef<iThingState> st = SCF_QUERY_INTERFACE (imw->GetMeshObject (), iThingState);
+        csRef<iThingState> st = SCF_QUERY_INTERFACE (
+		imw->GetMeshObject (), iThingState);
         if (st)
         {
           // Check if there are portals and if they are near the position.
@@ -3203,9 +3204,9 @@ csPtr<iMeshWrapper> csEngine::LoadMeshWrapper (
   imw->DecRef (); // the ref is now stored in the MeshList
   if (sector)
   {
-    meshwrap->GetMovable ().SetSector (sector);
-    meshwrap->GetMovable ().SetPosition (pos);
-    meshwrap->GetMovable ().UpdateMove ();
+    meshwrap->GetCsMovable ().SetSector (sector);
+    meshwrap->GetCsMovable ().SetPosition (pos);
+    meshwrap->GetCsMovable ().UpdateMove ();
   }
 
   csRef<iLoaderContext> elctxt (CreateLoaderContext (0, true));
@@ -3252,12 +3253,12 @@ csPtr<iMeshWrapper> csEngine::CreateMeshWrapper (
   GetMeshes ()->Add (&(meshwrap->scfiMeshWrapper));
   if (sector)
   {
-    meshwrap->GetMovable ().SetSector (sector);
-    meshwrap->GetMovable ().SetPosition (pos);
-    meshwrap->GetMovable ().UpdateMove ();
+    meshwrap->GetCsMovable ().SetSector (sector);
+    meshwrap->GetCsMovable ().SetPosition (pos);
+    meshwrap->GetCsMovable ().UpdateMove ();
   }
 
-  mesh->SetLogicalParent (meshwrap);
+  mesh->SetLogicalParent ((csObject*)meshwrap);
   return csPtr<iMeshWrapper> (&meshwrap->scfiMeshWrapper);
 }
 

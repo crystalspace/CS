@@ -14,6 +14,15 @@ chronological order.
 	  corrected the problem(s) which caused the failure.  All invocations
 	  of AC_MSG_ERROR() in configure.ac have been converted to instead
 	  invoke CS_MSG_ERROR().
+	- Jorrit started a fundamental change in the way portals work. The
+	  plan is to move portals away from thing and let the engine manage
+	  them:
+	      - Created csSectorObject. csSectorObject is now the superclass
+	        of csMeshWrapper and takes care of the movable, render
+		priority and so on.
+	      - csSectorObject now inherits from iVisibilityObject.
+	      - Added csPortalContainer which will be the object implementing
+	        portals. Currently this does nothing.
 18-Sep-2003
 	- res reverted Paul's change made to libs/cssys/win32/shellstuff.h
 	  yesterday which caused SHGetFolderPathW() to be used when present.

@@ -86,8 +86,8 @@ void csImposterProcTex::Animate (csTicks CurrentTime)
 
   // This actually draws the mesh on the backbuffer
   mesh->GetParent()->GetMeshObject()->Draw (View, 
-                                            &mesh->GetParent()->GetMovable().scfiMovable, 
-			                    mesh->GetParent()->GetZBufMode());
+        &mesh->GetParent()->GetCsMovable().scfiMovable, 
+	mesh->GetParent()->GetZBufMode());
   
   // This copies the backbuffer to the iTextureHandle I think.
   g3d->FinishDraw ();

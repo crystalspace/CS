@@ -27,7 +27,7 @@
 class csVector3;
 class csMatrix3;
 class csMovable;
-class csMeshWrapper;
+class csSectorObject;
 
 /// A list of sectors as the movable uses it
 class csMovableSectorList : public csRefArrayObject<iSector>
@@ -89,9 +89,9 @@ private:
   iMovable* parent;
 
   /**
-   * Mesh on which this movable operates.
+   * Object on which this movable operates.
    */
-  csMeshWrapper* object;
+  csSectorObject* object;
 
   /// Update number.
   long updatenr;
@@ -105,12 +105,12 @@ public:
   /// Destructor.
   virtual ~csMovable ();
 
-  /// Set mesh on which this movable operates.
-  void SetMeshWrapper (csMeshWrapper* obj)
+  /// Set object on which this movable operates.
+  void SetSectorObject (csSectorObject* obj)
   { object = obj; }
 
-  /// Get the mesh wrapper on which we operate.
-  csMeshWrapper* GetMeshWrapper ()
+  /// Get the object on which we operate.
+  csSectorObject* GetSectorObject ()
   { return object; }
 
   /// Set the parent movable.

@@ -43,7 +43,7 @@ float csImposterMesh::CalcIncidenceAngleDist(iRenderView *rview)
 
   // Calculate angle of incidence vs. the camera
   iCamera* camera = rview->GetCamera ();
-  csReversibleTransform obj = parent_mesh->GetMovable().GetTransform ();
+  csReversibleTransform obj = parent_mesh->GetCsMovable().GetTransform ();
   csReversibleTransform cam = camera->GetTransform ();
   csReversibleTransform seg = obj / cam;  // Matrix Math Magic!
   csVector3 straight(0,0,1);

@@ -18,9 +18,7 @@
 #include "cssysdef.h"
 #include "qint.h"
 #include "csengine/movable.h"
-
 #include "csengine/sector.h"
-#include "csengine/meshobj.h"
 #include "csengine/cscoll.h"
 #include "csengine/engine.h"
 
@@ -54,7 +52,7 @@ bool csMovableSectorList::PrepareItem (iSector* sector)
   CS_ASSERT (movable != 0);
   if (movable->GetParent ()) return false;
 
-  csMeshWrapper *mw = movable->GetMeshWrapper ();
+  csSectorObject *mw = movable->GetSectorObject ();
   if (mw) mw->MoveToSector (sector);
   return true;
 }

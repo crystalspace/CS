@@ -937,12 +937,12 @@ void add_bot (float size, iSector* where, csVector3 const& pos,
   bot = new Bot (Sys->view->GetEngine(), botmesh);
   bot->SetName ("bot");
   Sys->view->GetEngine ()->GetMeshes ()->Add (&(bot->scfiMeshWrapper));
-  bot->GetMovable ().SetSector (where);
+  bot->GetCsMovable ().SetSector (where);
   csMatrix3 m; m.Identity (); m = m * size;
-  bot->GetMovable ().SetTransform (m);
+  bot->GetCsMovable ().SetTransform (m);
   bot->set_bot_move (pos);
   bot->set_bot_sector (where);
-  bot->GetMovable ().UpdateMove ();
+  bot->GetCsMovable ().UpdateMove ();
   csRef<iSprite3DState> state (SCF_QUERY_INTERFACE (botmesh, iSprite3DState));
   state->SetAction ("default");
   bot->next = first_bot;
