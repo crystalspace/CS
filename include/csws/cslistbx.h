@@ -266,6 +266,8 @@ enum csListBoxFrameStyle
   cslfsThickRect,
   /// List box has a thin 3D rectangular frame, and it's background is textured.
   cslfsTextured,
+  /// List box has no frame, and it's background is textured.
+  cslfsTexturedNoFrame,
   /// List box has a bitmap frame
   cslfsBitmap
 };

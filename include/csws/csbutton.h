@@ -147,16 +147,16 @@ protected:
   int TexOrgX, TexOrgY;
   /// Alpha-ness of the texture or frame bitmaps
   uint8 ButtonAlpha;
+  /// True if button text is only displayed when it has the focus
+  bool DrawTextOnHighlightOnly;
   
 public:
   /// Current button state
   bool Pressed;
   /// Highlight state
   bool Highlighted;
-
-	///
-	bool DrawTextOnHighlightOnly;
-
+  ///
+  bool DrawTextOnHighlightOnly;
   /// Create button object
   csButton (csComponent *iParent, int iCommandCode, int iButtonStyle =
     CSBS_DEFAULTVALUE, csButtonFrameStyle iFrameStyle = csbfsOblique);
@@ -167,6 +167,14 @@ public:
   virtual void SetText (const char *iText)
   { PrepareLabel (iText, text, underline_pos); Invalidate (); }
 
+ /// Set text draw to highlight only
+ void SetDrawTextOnHighlightOnly(bool iTOHO)
+ { DrawTextOnHigh:qlightOnly = iTOHO; }
+ 
+ /// Return value of DrawTextOnHighlightOnly
+ bool GetDrawTextOnHighlightOnly()
+ { return DrawTextOnHighlightOnly; }
+ 
   /**
    * Set button bitmaps in normal and pressed states<p>
    * If iDelete is true, bitmaps will be automatically deleted when they
