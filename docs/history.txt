@@ -1,5 +1,11 @@
 The history order is reversed so that new features are at the top.
 
+4-Deb-2003
+	- Eric Sunshine disabled the experimental
+	  PTHREAD_MUTEX_HAS_RECURSIVE_NP feature since the configure test
+	  returns false positives and crashes the build on some platforms (such
+	  as Debian).  This experimental feature should not have been added to
+	  the stable R0_96 branch in the first place.
 3-Feb-2003
 	- Eric Sunshine replaced fabsf() with fabs() in terrbig plugin for
 	  improved portability since not all platforms have fabsf().  (An

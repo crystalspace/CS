@@ -25,6 +25,11 @@
 #include <stdio.h>
 #include <string.h>
 
+// Avoid PTHREAD_MUTEX_HAS_RECURSIVE_NP because the existing check/code breaks
+// compilation on some platforms (such as Debian).  This experimental addition
+// should not have been added to the stable R0_96 branch in the first place.
+#undef PTHREAD_MUTEX_HAS_RECURSIVE_NP
+
 #ifdef CS_DEBUG
 #define CS_SHOW_ERROR if (lasterr) printf ("%s\n",lasterr)
 #else
