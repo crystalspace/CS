@@ -486,23 +486,31 @@ void csSector::Draw (csRenderView& rview)
     }
     else
     {
-#if 0
-#     define FOG_PLANE_DIST .3			//@@@SHOULD BE CONFIGURATION VALUE!
-      float minz, maxz;
-      GetCameraMinMaxZ (minz, maxz);
-      int num = QInt ((maxz-minz) / FOG_PLANE_DIST);	// Number of planes
-      int p;
+#     define FOG_PLANE_DIST 1.0			//@@@SHOULD BE CONFIGURATION VALUE!
+      // the following uses 'z-gradation'.
+
       csVector2* pts;
       int num_pts;
       g3dpoly.inv_aspect = csCamera::inv_aspect;
 
-      CHK (csVector2* clipper = new csVector2 [rview.view->GetNumVertices ()]);
+      CHK(csVector2* clipper = new csVector2 [rview.view->GetNumVertices ()]);
 
-      // We divide the object in planes parallel to the view plane.
-      for (p = 1 ; p < num ; p++)
+      float farthest, nearest;
+      GetCameraMinMaxZ (nearest, farthest);
+
+      // making z 'aligned'. Reduces visual artefacts
+      float z = FOG_PLANE_DIST*int(farthest/FOG_PLANE_DIST);
+
+      if (nearest < SMALL_Z) nearest = SMALL_Z;
+
+      float distance_available = farthest-nearest;
+      float z_step = FOG_PLANE_DIST;
+		
+      float real_fog_density = GetFog().density;
+      GetFog().density = 1.0-exp(-GetFog().density*z_step);
+
+      for( ; z >= SMALL_Z ; z -= z_step)
       {
-        float z = maxz - FOG_PLANE_DIST*(float)p;
-	if (z < SMALL_Z) break;
 	float iz = csCamera::aspect/z;
 
 	// Take the current clipper and un-perspective project it back
@@ -516,33 +524,25 @@ void csSector::Draw (csRenderView& rview)
 	// Clip the clipper to the polygonset.
 	pts = IntersectCameraZPlane (z, clipper, rview.view->GetNumVertices (), num_pts);
 
-	// Reverse vertex order.
-	//for (i = 0 ; i < num_pts/2 ; i++)
-        //{
-	  //csVector2 sw = pts[i];
-	  //pts[i] = pts[num_pts-i-1];
-	  //pts[num_pts-i-1] = sw;
-        //}
-
 	if (pts)
 	{
 	  // Perspective projection and copy to structure for 3D rasterizer.
 	  g3dpoly.num = num_pts;
-	  for (i = 0 ; i < num_pts ; i++)
+	  for (int i = 0 ; i < num_pts ; i++)
 	  {
-	    g3dpoly.vertices[i].sx = pts[i].x * iz + csWorld::shift_x;
-	    g3dpoly.vertices[i].sy = pts[i].y * iz + csWorld::shift_y;
+	    g3dpoly.vertices[num_pts-i-1].sx = pts[i].x * iz + csWorld::shift_x;
+	    g3dpoly.vertices[num_pts-i-1].sy = pts[i].y * iz + csWorld::shift_y;
 	  }
 	  CHK (delete [] pts);
-          g3dpoly.fog_plane_z = z;
-          rview.g3d->AddFogPolygon (GetID (), g3dpoly, CS_FOG_PLANE);
+	  g3dpoly.fog_plane_z = z;
+	  rview.g3d->AddFogPolygon (GetID (), g3dpoly, CS_FOG_PLANE);
 	}
       }
 
       CHK (delete [] clipper);
-#endif
+      GetFog().density = real_fog_density;
+      rview.g3d->CloseFogObject (GetID ());
     }
-    rview.g3d->CloseFogObject (GetID ());
   }
 
   //@@@ Map display is application specific!

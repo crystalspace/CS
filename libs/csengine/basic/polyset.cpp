@@ -443,7 +443,7 @@ void csPolygonSet::DrawPolygonArray (csPolygonInt** polygon, int num, csRenderVi
         // (through mirrors) possibly overwriting the plane.
         csPolygon2D* keep_clipped = NULL;
         csPolyPlane* keep_plane = NULL;
-              
+
         long do_transp;
         d->g3d->GetRenderState (G3DRENDERSTATE_TRANSPARENCYENABLE, do_transp);
 	if (do_transp)
@@ -464,13 +464,14 @@ void csPolygonSet::DrawPolygonArray (csPolygonInt** polygon, int num, csRenderVi
 	// true for Things and false for sectors so this works now.
         if (po->Draw (&csPolygon2D::clipped, &p->GetPlane ()->GetCameraPlane (), use_z_buf, *d))
         {
-          if (filtered)
+	  if (filtered)
 	    keep_clipped->DrawFilled (d->g3d, p, keep_plane, d->IsMirrored (),
-	    	use_z_buf, orig_triangle);
+		use_z_buf, orig_triangle);
 	  if (is_this_fog) keep_clipped->AddFogPolygon (d->g3d, p, keep_plane, d->IsMirrored (),
-	  	sector->GetID (), CS_FOG_BACK);
+		sector->GetID (), CS_FOG_BACK);
         }
-        else csPolygon2D::clipped.DrawFilled (d->g3d, p, p->GetPlane (), d->IsMirrored (),
+        else
+	  csPolygon2D::clipped.DrawFilled (d->g3d, p, p->GetPlane (), d->IsMirrored (),
 		use_z_buf, orig_triangle);
               
         // Cleanup.
@@ -577,18 +578,184 @@ bool ClipToPlane (csPlane* plane, csVector3*& p_in, int p_in_num,
 }
 #endif
 
-csVector2 *csPolygonSet::IntersectCameraZPlane (float z, csVector2* clipper,
-	int num_clip, int& num_pts)
+//---------------------------------------------------------------------------------------------------------
+/*
+ * Ken Clarkson wrote this.  Copyright (c) 1996 by AT&T..
+ * Permission to use, copy, modify, and distribute this software for any
+ * purpose without fee is hereby granted, provided that this entire notice
+ * is included in all copies of any software which is or includes a copy
+ * or modification of this software and in all copies of the supporting
+ * documentation for such software.
+ * THIS SOFTWARE IS BEING PROVIDED "AS IS", WITHOUT ANY EXPRESS OR IMPLIED
+ * WARRANTY.  IN PARTICULAR, NEITHER THE AUTHORS NOR AT&T MAKE ANY
+ * REPRESENTATION OR WARRANTY OF ANY KIND CONCERNING THE MERCHANTABILITY
+ * OF THIS SOFTWARE OR ITS FITNESS FOR ANY PARTICULAR PURPOSE.
+ */
+
+int ccw (csVector2 *P[], int i, int j, int k)
 {
-#if 0
-  int i, j;
-  csVector* new_pol;
-  for (i = 0 ; i < num_polygon ; i++)
-  {
-    // Allocate a new polygon and preserve space for two potential extra vertices.
-    CHK (new_pol = new csVector2 [num_clip+2]);
-    for (j = 0 ; j < num_clip ; j++)
-  }
-#endif
-  return NULL;
+  double a = P[i]->x - P[j]->x,
+	 b = P[i]->y - P[j]->y,
+	 c = P[k]->x - P[j]->x,
+	 d = P[k]->y - P[j]->y;
+  return a*d - b*c <= 0;	   /* true if points i, j, k counterclockwise */
 }
+
+int cmpl (const void *a, const void *b)
+{
+  float v;
+  csVector2 **av,**bv;
+  av = (csVector2 **)a;
+  bv = (csVector2 **)b;
+
+  v = (*av)->x - (*bv)->x;
+
+  if (v>0) return 1;
+  if (v<0) return -1;
+
+  v = (*bv)->y - (*av)->y;
+
+  if (v>0) return 1;
+  if (v<0) return -1;
+
+  return 0;
+}
+
+int cmph (const void *a, const void *b) { return cmpl (b, a); }
+
+int make_chain (csVector2 *V[], int n, int (*cmp)(const void*, const void*)) 
+{
+  int i, j, s = 1;
+  csVector2 *t;
+
+  qsort (V, n, sizeof (csVector2*), cmp);
+  for (i=2 ; i<n ; i++) 
+  {
+    for (j=s ; j>=1 && ccw(V, i, j, j-1) ; j--) ;
+    s = j+1;
+    t = V[s]; V[s] = V[i]; V[i] = t;
+  }
+  return s;
+}
+
+int ch2d (csVector2 *P[], int n)
+{
+  int u = make_chain (P, n, cmpl);		/* make lower hull */
+  if (!n) return 0;
+  P[n] = P[0];
+  return u+make_chain (P+u, n-u+1, cmph);	/* make upper hull */
+}
+
+/*
+ * Someone from Microsoft wrote this, but copyrights are absent. So I assume that it's also in public
+ * domain ;). However, it's not a very critical function, I just was very lazy and didn't want to write
+ * my own Convex-Hull finder ;). -DDK
+ */
+
+void Find2DConvexHull (int nverts, csVector2 *pntptr, int *cNumOutIdxs, int **OutHullIdxs)
+{
+  csVector2 **PntPtrs;
+  int i;
+
+  *cNumOutIdxs=0;               //max space needed is n+1 indices
+  *OutHullIdxs = (int *)malloc((nverts+1)*(sizeof(int)+sizeof(csVector2 *)));
+
+  PntPtrs = (csVector2**) &(*OutHullIdxs)[nverts+1];
+
+  // alg requires array of ptrs to verts (for qsort) instead of array of verts, so do the conversion
+  for (i=0 ; i<nverts ; i++)
+    PntPtrs[i] = &pntptr[i];
+
+  *cNumOutIdxs=ch2d (PntPtrs, nverts);
+
+  // convert back to array of idxs
+  for (i=0 ; i<*cNumOutIdxs ; i++)
+    (*OutHullIdxs)[i]= (int) (PntPtrs[i]-&pntptr[0]);
+
+  // caller will free returned array
+}
+
+//---------------------------------------------------------------------------------------------------------
+
+int find_chull (int nverts, csVector2 *vertices, csVector2 *&chull)
+{
+  int num;
+  int *order;
+
+  Find2DConvexHull (nverts, vertices, &num, &order);
+
+  CHK(chull = new csVector2[num]);
+  for (int i=0 ; i<num ; i++)
+    chull[i]=vertices[order[i]];
+
+  free (order);
+
+  return num;
+}
+
+#define EPS	0.00001
+
+csVector2* csPolygonSet::IntersectCameraZPlane (float z,csVector2 *clipper,
+	int num_clip, int &num_vertices)
+{
+  int i, j, n, num_pts=0;
+
+  struct point_list
+  {
+    csVector2 data;
+    point_list *next;
+  } list,*head=&list,*prev;
+
+  for (i=0 ; i<num_polygon ; i++)
+  {
+    csPolygon3D *p=(csPolygon3D*)polygons[i];
+    int nv=p->GetNumVertices ();
+    int *v_i=p->GetVerticesIdx ();
+
+    for (j=0,n=1 ; j<nv ; j++,n=(n+1)%nv)
+    {
+      csVector3 _1=Vcam(v_i[j]);
+      csVector3 _2=Vcam(v_i[n]);
+
+      if (_1.z > _2.z) { csVector3 _=_1; _1=_2; _2=_; }
+      if (_2.z-_1.z < EPS) continue;
+
+      float _1z=_1.z-z;
+      float _2z=_2.z-z;
+
+      if (_1z<=0.0 && _2z>=0.0)
+      {
+	float t=_1z/(_1z-_2z);
+	float x_=_1.x+t*(_2.x-_1.x);
+	float y_=_1.y+t*(_2.y-_1.y);
+
+	num_pts++;
+
+	head->data.x=x_;
+	head->data.y=y_;
+
+	head->next=new point_list;
+	head=head->next;
+      }
+    }
+  }
+
+  csVector2 *final_data,*data;
+  CHK (data=new csVector2[num_pts]);
+  for (head=&list,i=0 ; i<num_pts ; i++)
+  {
+    data[i]=head->data;
+
+    prev=head;
+    head=head->next;
+    if (prev!=&list) delete prev;
+  }
+
+  if (i) delete[] head;
+
+  num_vertices = find_chull (num_pts, data, final_data);
+  if (num_pts) delete data;
+
+  return final_data;
+}
+
