@@ -32,7 +32,7 @@ IMPLEMENT_IBASE_END;
 
 csSoundSourceSoftware::csSoundSourceSoftware(csSoundRenderSoftware *srdr,
     csSoundHandleSoftware *hdl, int m3d) {
-  CONSTRUCT_IBASE(srdr);
+  CONSTRUCT_IBASE(hdl);
 
   SoundRender = srdr;
   FrequencyFactor = 1;
@@ -43,13 +43,11 @@ csSoundSourceSoftware::csSoundSourceSoftware(csSoundRenderSoftware *srdr,
   Active = false;
   SoundPos = 0;
   SoundHandle = hdl;
-  SoundHandle->IncRef();
 }
 
 csSoundSourceSoftware::~csSoundSourceSoftware()
 {
   Stop();
-  SoundHandle->DecRef();
 }
 
 void csSoundSourceSoftware::Play(unsigned long pMethod)
