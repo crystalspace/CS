@@ -52,7 +52,7 @@ define MAKE_TARGET
   @echo $"  Compiling $(DESCRIPTION.$@)$"
   @echo $"  Compiling for $(OS)/$(COMP)/$(PROC) in $(MODE) mode$"
   @echo $(SEPARATOR)
-  @$(MAKE) --no-print-directory -f mk/cs.mak $@
+  @$(MAKE) $(RECMAKEFLAGS) -f mk/cs.mak $@
 endef
 
 # Macro used to make a sub-clean target
@@ -60,5 +60,5 @@ define MAKE_CLEAN
   @echo $(SEPARATOR)
   @echo $"  Cleaning up the $(DESCRIPTION.$(subst clean,,$@))$"
   @echo $(SEPARATOR)
-  @$(MAKE) --no-print-directory -f mk/cs.mak $@
+  @$(MAKE) $(RECMAKEFLAGS) -f mk/cs.mak $@
 endef

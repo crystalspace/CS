@@ -14,6 +14,9 @@
 |=|
 -include config.mak
 
+# parameters for recursive make calls
+RECMAKEFLAGS=--no-print-directory --no-builtin-rules
+
 include mk/user.mak
 include mk/common.mak
 
@@ -87,12 +90,12 @@ help: banner showconfig driverhelp pluginhelp libhelp apphelp dochelp \
   pseudohelp
 
 dep:
-	@$(MAKE) --no-print-directory -f mk/cs.mak $@ DO_DEPEND=yes
+	@$(MAKE) $(RECMAKEFLAGS) -f mk/cs.mak $@ DO_DEPEND=yes
 
 depend: cleandep dep
 
 clean cleanlib cleandep distclean uninstall:
-	@$(MAKE) --no-print-directory -f mk/cs.mak $@
+	@$(MAKE) $(RECMAKEFLAGS) -f mk/cs.mak $@
 
 install:
 ifndef INSTALL_DIR
@@ -102,7 +105,7 @@ endif
 	@echo $(SEPARATOR)
 	@echo "  Installing to "$(INSTALL_DIR)
 	@echo $(SEPARATOR)
-	@$(MAKE) --no-print-directory -f mk/cs.mak $@
+	@$(MAKE) $(RECMAKEFLAGS) -f mk/cs.mak $@
 
 unknown:
 	$(RM) config.mak
@@ -110,7 +113,7 @@ unknown:
 
 platforms:
 	@echo $(SEPARATOR)
-	@$(MAKE) --no-print-directory showplatforms TARGET="" TARGET_MAKEFILE=""
+	@$(MAKE) $(RECMAKEFLAGS) showplatforms TARGET="" TARGET_MAKEFILE=""
 
 showconfig:
 	@echo $"  Configured for $(DESCRIPTION.$(TARGET)) with the following modifiers:$"
@@ -168,7 +171,7 @@ showplatforms:
 $(SYSTARGETS):
 	@echo TARGET = $@>config.tmp
 	@echo TARGET_MAKEFILE = $(filter %$@.mak,$(SYSMAKEFILES))>>config.tmp
-	@$(MAKE) --no-print-directory ROOTCONFIG=config configure \
+	@$(MAKE) $(RECMAKEFLAGS) ROOTCONFIG=config configure \
 		TARGET=$@ TARGET_MAKEFILE=$(filter %$@.mak,$(SYSMAKEFILES))
 
 ifeq ($(ROOTCONFIG),config)
@@ -177,7 +180,7 @@ ifeq ($(ROOTCONFIG),config)
 .PHONY: config.tmp
 
 configure: configbanner config.tmp
-	@$(MAKE) --no-print-directory ROOTCONFIG=volatile configure
+	@$(MAKE) $(RECMAKEFLAGS) ROOTCONFIG=volatile configure
 
 configbanner:
 	@echo $(SEPARATOR)
