@@ -268,7 +268,7 @@ void csSequenceManager::Clear ()
   for (i = 0 ; i < sequences.Length () ; i++)
   {
     csWeakRef<csSequence>* seq = sequences[i];
-    if ((*seq) != 0)
+    if (seq->IsValid())
     {
       // We keep a real ref to the sequence to prevent the
       // sequence deleting itself.

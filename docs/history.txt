@@ -39,6 +39,9 @@ chronological order.
 	- Eric Sunshine added a makefile for `partedit'.
 	- Eric Sunshine fixed the `make help' formatting for a number of
 	  targets.
+	- Eric Sunshine worked around MSVC6 crasher reported by Fritz Elfert
+	  <felfert@to.com> in sequence.cpp where compiler couldn't deal with
+	  `if ((*seq) != 0)' where `seq' is a `csWeakRef<csSequence>*'.
 19-Oct-2003
 	- res fixed a bug in the OR polygon buffers: when two polygons 
 	  subsequently passed into AddPolygon() would have different lightmaps,
