@@ -21,6 +21,7 @@
 #include <string.h>
 #include <limits.h>
 #include <malloc.h>
+#include <alloca.h>
 #include "cssysdef.h"
 #include "libDIVE.h"
 
@@ -601,7 +602,7 @@ MRESULT diveWindow::ClientMessage (ULONG Message, MPARAM MsgParm1, MPARAM MsgPar
       SetupPalette ();
       return 0;
     case WM_COMMAND:
-      switch ((USHORT) MsgParm1)
+      switch ((USHORT)(ULONG)MsgParm1)
       {
         case cmdAlignLeft:
           if (WinQueryWindowPos (diveFR, &swp))
@@ -887,7 +888,7 @@ MRESULT diveWindow::FrameMessage (ULONG Message, MPARAM MsgParm1, MPARAM MsgParm
       if (fFullScreen)
       {
         if ((HWND) MsgParm2 == diveFR)
-          if ((USHORT) MsgParm1)
+          if ((USHORT)(ULONG) MsgParm1)
             SetPhysCLUT ();
           else
             ResetPhysCLUT ();

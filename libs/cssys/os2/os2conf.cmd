@@ -34,7 +34,6 @@
   end;
 
   call saycon ANSI.WHITE||CC;
-  say "LD = "filespec('Name', left(CC, length(CC) - 4));
   say "CC = "filespec('Name', left(CC, length(CC) - 4))" -c";
 
   call outcon ANSI.LGREEN"Detecting your C++ compiler ... "
@@ -45,6 +44,7 @@
     CXX = SysSearchPath("PATH", "gpp.exe");
   if (CXX = "") then
     CXX = SysSearchPath("PATH", "gcc.exe");
+  say "LD = "filespec('Name', left(CXX, length(CXX) - 4));
 
   if (CXX = "") then
   do
@@ -63,6 +63,7 @@
   /* Now create a dummy C++ source file */
   testcpp = "conftest.cpp";
   testobj = "conftest.o";
+  testexe = "testcpp.exe";
   call lineout testcpp, "int main () {}"
   call stream testcpp, "C", "CLOSE";
 
@@ -73,17 +74,39 @@
   call cxxcheck "-fno-rtti"
 
   /* Check if compiler supports pentium target arch */
-  call cxxcheck "-mpentium -march=pentium"
+  call cxxcheck "-march=pentium"
+
+  /* Check if compiler supports arbitrary aligned strings */
+  call cxxcheck "-malign-strings=2"
+
+  call saycon ANSI.LGREEN"Testing for compiler quircks"
+
+  /* Check if qsqrt() works */
+  call SysFileDelete testcpp
+  call lineout testcpp, "#define PROC_X86"
+  call lineout testcpp, "#define COMP_GCC"
+  call lineout testcpp, '#include "include/qsqrt.h"'
+  call lineout testcpp, "float func() { float n = 1; return qsqrt(n); }"
+  call stream testcpp, "C", "CLOSE";
+  call checkvar CXX" -c "testcpp, "CS_NO_QSQRT = yes";
+
+  call SysFileDelete testcpp
+  call lineout testcpp, "static inline long double2int(double val)"
+  call lineout testcpp, "{ long* l; val += 68719476736.0; l = (long*)((char*)&val + 2); return *l; }"
+  call lineout testcpp, "int main() { return (double2int(255.99) != 255 ? 1 : 0); }"
+  call stream testcpp, "C", "CLOSE";
+  call checkvar CXX" -O2 "testcpp" -o "testexe" && "testexe, "CS_QINT_WORKAROUND = yes";
 
   /* Remove temporary files */
   call SysFileDelete testcpp
   call SysFileDelete testobj
+  call SysFileDelete testexe
+
+  call saycon ANSI.LGREEN"Testing whenever you have (the right version of) NASM installed"
 
   testasm = "conftest.asm";
   call lineout testasm, "%xdefine TEST"
   call stream testasm, "C", "CLOSE";
-
-  call saycon ANSI.LGREEN"Testing whenever you have (the right version of) NASM installed"
 
   "nasm -f win32 "testasm" -o "testobj" >nul 2>&1"
   if rc = 0 then
@@ -266,6 +289,19 @@ checkopt:
     call saycon ANSI.YELLOW||"  not supported: "ANSI.WHITE||opt
     return 0;
   end;
+return 1;
+
+/* Check if something works, and output a option if not */
+checkvar:
+  parse arg cmd, opt;
+
+  cmd" >nul 2>&1"
+  if (rc \= 0) then
+  do
+    call saycon  ANSI.LCYAN||"          quirk: "ANSI.WHITE||opt
+    say opt;
+  end; else
+    return 0;
 return 1;
 
 /* Output a string to console independently of where stdout is redirected */

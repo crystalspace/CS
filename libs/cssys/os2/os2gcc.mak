@@ -15,6 +15,11 @@ DESCRIPTION.OS.os2gcc = OS/2
 # Choose which drivers you want to build/use
 PLUGINS += video/canvas/csdive sound/renderer/software
 
+# On OS/2 use CMD.EXE since it works better
+ifdef OS2_SHELL
+SHELL = $(OS2_SHELL)
+endif
+
 #--------------------------------------------------- rootdefines & defines ---#
 ifneq (,$(findstring defines,$(MAKESECTION)))
 
@@ -46,10 +51,6 @@ endif # ifneq (,$(findstring defines,$(MAKESECTION)))
 ifeq ($(MAKESECTION),defines)
 
 include mk/dos.mak
-
-ifdef COMSPEC
-SHELL = $(COMSPEC)
-endif
 
 # Extra libraries needed on this system (beside drivers)
 LIBS.EXE=

@@ -203,7 +203,7 @@ inline long QInt24 (float inval)
 #define QInt8(x)  (int ((x)*256.))
 #define QInt16(x) (int ((x)*65536.))
 #define QInt24(x) (int ((x)*16777216.))
-	
+
 #endif /* CS_IEEE_DOUBLE_FORMAT */
 
 #endif // __QINT_H__

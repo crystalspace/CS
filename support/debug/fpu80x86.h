@@ -43,7 +43,7 @@
      ---1 ---- ---- ---- = IC_PROJECTIVE - -Inf == +Inf
 */
 
-static inline unsigned int _control87(unsigned int newcw, unsigned int mask)
+static inline unsigned int csControl87(unsigned int newcw, unsigned int mask)
 {
   int oldcw;
   asm __volatile__

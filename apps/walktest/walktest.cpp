@@ -1386,10 +1386,10 @@ bool WalkTest::Initialize (int argc, const char* const argv[],
   // enable all kinds of useful FPU exceptions on a x86
   // note that we can't do it above since at least on OS/2 each dynamic
   // library on loading/initialization resets the control word to default
-  _control87 (0x33, 0x3f);
+  csControl87 (0x33, 0x3f);
 #else
   // this will disable exceptions on DJGPP (for the non-debug version)
-  _control87 (0x3f, 0x3f);
+  csControl87 (0x3f, 0x3f);
 #endif
 
   // Start the engine
