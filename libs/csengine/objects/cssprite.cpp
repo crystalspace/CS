@@ -210,7 +210,7 @@ csSprite3D* csSpriteTemplate::NewSprite ()
 
 void csSpriteTemplate::GenerateLOD ()
 {
-#if 0
+#if 1
   int i;
 
   //@@@ turn this into a parameter or member variable?
