@@ -120,7 +120,8 @@ public:
   bool IsMaxColorUsed () const { return use_max_color; }
 
   void GetObjectBoundingBox (csBox3& bbox, int type = CS_BBOX_NORMAL);
-  void GetRadius (csVector3& rad, csVector3& cent) { rad = max_radius; cent = box.GetCenter(); }
+  void GetRadius (csVector3& rad, csVector3& cent)
+  { rad = max_radius; cent = box.GetCenter(); }
 
   ///---------------------- iMeshObject implementation ------------------------
   SCF_DECLARE_IBASE;
