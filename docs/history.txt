@@ -23,6 +23,9 @@ The history order is reversed so that new features are at the top.
 	  The syntax loader unit test now succeeds.
 	- Eric Sunshine fixed the cslexan makefile, which was recently broken,
 	  so that it once again produces a plugin.
+	- Implemented XML parsing for mixmodes in syntax services.
+	- Implemented XML parsing for texture specifications in syntax
+	  services.
 8-Aug-2002
 	- Removed support/doom2cs again. This doom2cs utility can now be
 	  found at ftp://sunsite.dk/projects/crystal/contrib/doom2cs.zip

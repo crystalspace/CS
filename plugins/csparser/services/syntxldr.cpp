@@ -177,15 +177,18 @@ enum
   XMLTOKEN_LEN,
   XMLTOKEN_V,
   XMLTOKEN_ORIG,
-  XMLTOKEN_FIRST_LEN,
+  XMLTOKEN_ORIGREF,
+  XMLTOKEN_FIRSTLEN,
   XMLTOKEN_FIRST,
-  XMLTOKEN_SECOND_LEN,
+  XMLTOKEN_FIRSTREF,
+  XMLTOKEN_SECONDLEN,
   XMLTOKEN_SECOND,
+  XMLTOKEN_SECONDREF,
   XMLTOKEN_UVEC,
   XMLTOKEN_VVEC,
   XMLTOKEN_MATRIX,
   XMLTOKEN_PLANE,
-  XMLTOKEN_UV_SHIFT,
+  XMLTOKEN_UVSHIFT,
   XMLTOKEN_W,
   XMLTOKEN_MIRROR,
   XMLTOKEN_STATIC,
@@ -278,15 +281,18 @@ bool csTextSyntaxService::Initialize (iObjectRegistry* object_reg)
   xmltokens.Register ("len", XMLTOKEN_LEN);
   xmltokens.Register ("v", XMLTOKEN_V);
   xmltokens.Register ("orig", XMLTOKEN_ORIG);
-  xmltokens.Register ("first_len", XMLTOKEN_FIRST_LEN);
+  xmltokens.Register ("origref", XMLTOKEN_ORIGREF);
+  xmltokens.Register ("firstlen", XMLTOKEN_FIRSTLEN);
   xmltokens.Register ("first", XMLTOKEN_FIRST);
-  xmltokens.Register ("second_len", XMLTOKEN_SECOND_LEN);
+  xmltokens.Register ("firstref", XMLTOKEN_FIRSTREF);
+  xmltokens.Register ("secondlen", XMLTOKEN_SECONDLEN);
   xmltokens.Register ("second", XMLTOKEN_SECOND);
+  xmltokens.Register ("secondref", XMLTOKEN_SECONDREF);
   xmltokens.Register ("uvec", XMLTOKEN_UVEC);
   xmltokens.Register ("vvec", XMLTOKEN_VVEC);
   xmltokens.Register ("matrix", XMLTOKEN_MATRIX);
   xmltokens.Register ("plane", XMLTOKEN_PLANE);
-  xmltokens.Register ("uv_shift", XMLTOKEN_UV_SHIFT);
+  xmltokens.Register ("uvshift", XMLTOKEN_UVSHIFT);
   xmltokens.Register ("w", XMLTOKEN_W);
   xmltokens.Register ("mirror", XMLTOKEN_MIRROR);
   xmltokens.Register ("static", XMLTOKEN_STATIC);
@@ -639,14 +645,14 @@ bool csTextSyntaxService::ParseTexture (
     if (!len.y)
     {
       ReportError (reporter, "crystalspace.syntax.texture",
-        "Bad texture specification for POLYGON '%s'", polyname);
+        "Bad texture specification for polygon '%s'", polyname);
       len.y = 1;
       return false;
     }
     if (!len.z)
     {
       ReportError (reporter, "crystalspace.syntax.texture",
-        "Bad texture specification for POLYGON '%s'", polyname);
+        "Bad texture specification for polygon '%s'", polyname);
       len.z = 1;
       return false;
     }
@@ -656,7 +662,7 @@ bool csTextSyntaxService::ParseTexture (
     if (!len.y)
     {
       ReportError (reporter, "crystalspace.syntax.texture",
-        "Bad texture specification for POLYGON '%s'", polyname);
+        "Bad texture specification for polygon '%s'", polyname);
       len.y = 1;
       return false;
     }
@@ -1529,6 +1535,36 @@ bool csTextSyntaxService::ParseVector (iXmlNode* node, csVector3 &v)
 
 bool csTextSyntaxService::ParseMixmode (iXmlNode* node, uint &mixmode)
 {
+  mixmode = 0;
+  csRef<iXmlNodeIterator> it = node->GetNodes ();
+  while (it->HasNext ())
+  {
+    csRef<iXmlNode> child = it->Next ();
+    if (child->GetType () != CS_XMLNODE_ELEMENT) continue;
+    const char* value = child->GetValue ();
+    csStringID id = xmltokens.Request (value);
+    switch (id)
+    {
+      case XMLTOKEN_COPY: mixmode |= CS_FX_COPY; break;
+      case XMLTOKEN_MULTIPLY: mixmode |= CS_FX_MULTIPLY; break;
+      case XMLTOKEN_MULTIPLY2: mixmode |= CS_FX_MULTIPLY2; break;
+      case XMLTOKEN_ADD: mixmode |= CS_FX_ADD; break;
+      case XMLTOKEN_ALPHA:
+        {
+	  mixmode &= ~CS_FX_MASK_ALPHA;
+	  float alpha = child->GetContentsValueAsFloat ();
+	  mixmode |= CS_FX_SETALPHA (alpha);
+	}
+	break;
+      case XMLTOKEN_TRANSPARENT: mixmode |= CS_FX_TRANSPARENT; break;
+      case XMLTOKEN_KEYCOLOR: mixmode |= CS_FX_KEYCOLOR; break;
+      case XMLTOKEN_TILING: mixmode |= CS_FX_TILING; break;
+      default:
+        ReportError (reporter, "crystalspace.syntax.mixmode",
+          "Unknown token '%s' for 'mixmode'!", value);
+        return false;
+    }
+  }
   return true;
 }
 
@@ -1547,6 +1583,173 @@ bool csTextSyntaxService::ParseTexture (
 	int &idx3, csVector2 &uv3,
 	char *plane, const char *polyname)
 {
+  csRef<iXmlNodeIterator> it = node->GetNodes ();
+  while (it->HasNext ())
+  {
+    csRef<iXmlNode> child = it->Next ();
+    if (child->GetType () != CS_XMLNODE_ELEMENT) continue;
+    const char* value = child->GetValue ();
+    csStringID id = xmltokens.Request (value);
+    switch (id)
+    {
+      case XMLTOKEN_ORIGREF:
+        tx_orig = vref[child->GetContentsValueAsInt ()];
+        break;
+      case XMLTOKEN_ORIG:
+        texspec &= ~CSTEX_UV;
+        texspec |= CSTEX_V1;
+	tx_orig.x = child->GetAttributeValueAsFloat ("x");
+	tx_orig.y = child->GetAttributeValueAsFloat ("y");
+	tx_orig.z = child->GetAttributeValueAsFloat ("z");
+	break;
+      case XMLTOKEN_FIRSTREF:
+        tx1 = vref[child->GetContentsValueAsInt ()];
+	break;
+      case XMLTOKEN_FIRST:
+        texspec &= ~CSTEX_UV;
+        texspec |= CSTEX_V1;
+	tx1.x = child->GetAttributeValueAsFloat ("x");
+	tx1.y = child->GetAttributeValueAsFloat ("y");
+	tx1.z = child->GetAttributeValueAsFloat ("z");
+        break;
+      case XMLTOKEN_FIRSTLEN:
+        texspec &= ~CSTEX_UV;
+        texspec |= CSTEX_V1;
+	len.y = child->GetContentsValueAsFloat ();
+        break;
+      case XMLTOKEN_SECONDREF:
+        tx2 = vref[child->GetContentsValueAsInt ()];
+	break;
+      case XMLTOKEN_SECOND:
+        texspec &= ~CSTEX_UV;
+        texspec |= CSTEX_V2;
+	tx2.x = child->GetAttributeValueAsFloat ("x");
+	tx2.y = child->GetAttributeValueAsFloat ("y");
+	tx2.z = child->GetAttributeValueAsFloat ("z");
+        break;
+      case XMLTOKEN_SECONDLEN:
+        texspec &= ~CSTEX_UV;
+        texspec |= CSTEX_V2;
+	len.z = child->GetContentsValueAsFloat ();
+        break;
+      case XMLTOKEN_LEN:
+        texspec &= ~CSTEX_UV;
+	len.x = child->GetContentsValueAsFloat ();
+        break;
+      case XMLTOKEN_MATRIX:
+        texspec &= ~CSTEX_UV;
+        ParseMatrix (child, tx_m);
+        len.x = 0;
+        break;
+      case XMLTOKEN_V:
+        texspec &= ~CSTEX_UV;
+	tx_v.x = child->GetAttributeValueAsFloat ("x");
+	tx_v.y = child->GetAttributeValueAsFloat ("y");
+	tx_v.z = child->GetAttributeValueAsFloat ("z");
+        len.x = 0;
+        break;
+      case XMLTOKEN_PLANE:
+        {
+          texspec &= ~CSTEX_UV;
+	  const char* v = child->GetContentsValue ();
+	  if (v) strcpy (plane, v);
+	  else plane[0] = 0;
+          len.x = 0;
+	}
+        break;
+      case XMLTOKEN_UVSHIFT:
+        texspec |= CSTEX_UV_SHIFT;
+	uv_shift.x = child->GetAttributeValueAsFloat ("u");
+	uv_shift.y = child->GetAttributeValueAsFloat ("v");
+        break;
+      case XMLTOKEN_UVEC:
+        texspec &= ~CSTEX_UV;
+        texspec |= CSTEX_V1;
+	tx1.x = child->GetAttributeValueAsFloat ("x");
+	tx1.x = child->GetAttributeValueAsFloat ("y");
+	tx1.x = child->GetAttributeValueAsFloat ("z");
+        len.y = tx1.Norm ();
+        tx1 += tx_orig;
+        break;
+      case XMLTOKEN_VVEC:
+        texspec &= ~CSTEX_UV;
+        texspec |= CSTEX_V2;
+	tx2.x = child->GetAttributeValueAsFloat ("x");
+	tx2.x = child->GetAttributeValueAsFloat ("y");
+	tx2.x = child->GetAttributeValueAsFloat ("z");
+        len.z = tx2.Norm ();
+        tx2 += tx_orig;
+        break;
+      case XMLTOKEN_UV:
+        {
+          texspec |= CSTEX_UV;
+	  csRef<iXmlNode> spec = child->GetNode ("vt1");
+	  if (!spec)
+	  {
+            ReportError (reporter, "crystalspace.syntax.texture",
+              "Couldn't find 'vt1' node in 'texture/uv'!", value);
+            return false;
+	  }
+	  idx1 = spec->GetAttributeValueAsInt ("idx");
+	  uv1.x = spec->GetAttributeValueAsFloat ("u");
+	  uv1.y = spec->GetAttributeValueAsFloat ("v");
+	  spec = child->GetNode ("vt2");
+	  if (!spec)
+	  {
+            ReportError (reporter, "crystalspace.syntax.texture",
+              "Couldn't find 'vt2' node in 'texture/uv'!", value);
+            return false;
+	  }
+	  idx2 = spec->GetAttributeValueAsInt ("idx");
+	  uv2.x = spec->GetAttributeValueAsFloat ("u");
+	  uv2.y = spec->GetAttributeValueAsFloat ("v");
+	  spec = child->GetNode ("vt3");
+	  if (!spec)
+	  {
+            ReportError (reporter, "crystalspace.syntax.texture",
+              "Couldn't find 'vt3' node in 'texture/uv'!", value);
+            return false;
+	  }
+	  idx3 = spec->GetAttributeValueAsInt ("idx");
+	  uv3.x = spec->GetAttributeValueAsFloat ("u");
+	  uv3.y = spec->GetAttributeValueAsFloat ("v");
+	}
+        break;
+      default:
+        ReportError (reporter, "crystalspace.syntax.texture",
+          "Unknown token '%s' for 'texture'!", value);
+        return false;
+    }
+  }
+
+  if (texspec & CSTEX_V2)
+  {
+    if (!len.y)
+    {
+      ReportError (reporter, "crystalspace.syntax.texture",
+        "Bad texture specification for POLYGON '%s'", polyname);
+      len.y = 1;
+      return false;
+    }
+    if (!len.z)
+    {
+      ReportError (reporter, "crystalspace.syntax.texture",
+        "Bad texture specification for POLYGON '%s'", polyname);
+      len.z = 1;
+      return false;
+    }
+  }
+  else
+  {
+    if (!len.y)
+    {
+      ReportError (reporter, "crystalspace.syntax.texture",
+        "Bad texture specification for POLYGON '%s'", polyname);
+      len.y = 1;
+      return false;
+    }
+  }
+
   return true;
 }
 
@@ -1600,6 +1803,9 @@ iString* csTextSyntaxService::Debug_UnitTest ()
         <scale>3</scale>\
 	<m13>1.5</m13>\
       </matrix>\
+      <mixmode>\
+        <add/> <alpha>.5</alpha>\
+      </mixmode>\
     </root>\
   ");
   SYN_ASSERT (error == NULL, error);
@@ -1607,18 +1813,16 @@ iString* csTextSyntaxService::Debug_UnitTest ()
   csRef<iXmlNode> root = doc->GetRoot ()->GetNode ("root");
   csRef<iXmlNode> vector_node = root->GetNode ("v");
   SYN_ASSERT (vector_node != NULL, "vector_node");
-
   csVector3 v;
-  ParseVector (vector_node, v);
+  SYN_ASSERT (ParseVector (vector_node, v) == true, "");
   SYN_ASSERT (v.x == 1, "x");
   SYN_ASSERT (v.y == 2, "y");
   SYN_ASSERT (v.z == 3, "z");
 
   csRef<iXmlNode> matrix_node = root->GetNode ("matrix");
   SYN_ASSERT (matrix_node != NULL, "matrix_node");
-
   csMatrix3 m;
-  ParseMatrix (matrix_node, m);
+  SYN_ASSERT (ParseMatrix (matrix_node, m) == true, "");
   SYN_ASSERT (m.m11 == 3, "m");
   SYN_ASSERT (m.m12 == 0, "m");
   SYN_ASSERT (m.m13 == 1.5, "m");
@@ -1628,6 +1832,15 @@ iString* csTextSyntaxService::Debug_UnitTest ()
   SYN_ASSERT (m.m31 == 0, "m");
   SYN_ASSERT (m.m32 == 0, "m");
   SYN_ASSERT (m.m33 == 3, "m");
+
+  csRef<iXmlNode> mixmode_node = root->GetNode ("mixmode");
+  SYN_ASSERT (mixmode_node != NULL, "mixmode_node");
+  uint mixmode;
+  SYN_ASSERT (ParseMixmode (mixmode_node, mixmode) == true, "");
+  uint desired_mixmode = CS_FX_ADD;
+  desired_mixmode &= ~CS_FX_MASK_ALPHA;
+  desired_mixmode |= CS_FX_SETALPHA (.5);
+  SYN_ASSERT (mixmode == desired_mixmode, "mixmode");
 
   return NULL;
 }
