@@ -35,7 +35,7 @@ esac
 # IP30 came up on an IRIX machine (Dmitry)
 case $MACHINE in
   *sun*)	MACHINE=$CPU  ;;
-  *IP30*)	MACHINE=$CPU  ;;
+  *IP[0-9][0-9]*)	MACHINE=$CPU  ;;
 esac
 
 # Now check processor type: add more checks here as needed
