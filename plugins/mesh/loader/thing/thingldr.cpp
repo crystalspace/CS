@@ -22,6 +22,7 @@
 #include "csgeom/transfrm.h"
 #include "csutil/parser.h"
 #include "csutil/scanstr.h"
+#include "csutil/cscolor.h"
 #include "thingldr.h"
 #include "imesh/object.h"
 #include "iengine/mesh.h"
@@ -36,8 +37,10 @@
 #include "iutil/strvec.h"
 #include "csutil/util.h"
 #include "iobject/object.h"
+#include "ivideo/material.h"
 #include "iengine/material.h"
-#include "csengine/material.h"
+#include "iengine/polytmap.h"
+#include "iengine/ptextype.h"
 
 CS_TOKEN_DEF_START
   CS_TOKEN_DEF (ADD)
@@ -75,6 +78,7 @@ CS_TOKEN_DEF_START
   CS_TOKEN_DEF (MOVEABLE)
   CS_TOKEN_DEF (MULTIPLY2)
   CS_TOKEN_DEF (MULTIPLY)
+  CS_TOKEN_DEF (NAME)
   CS_TOKEN_DEF (NONE)
   CS_TOKEN_DEF (ORIG)
   CS_TOKEN_DEF (PART)
@@ -122,8 +126,20 @@ IMPLEMENT_IBASE (csThingSaver)
   IMPLEMENTS_INTERFACE (iPlugIn)
 IMPLEMENT_IBASE_END
 
+IMPLEMENT_IBASE (csPlaneLoader)
+  IMPLEMENTS_INTERFACE (iLoaderPlugIn)
+  IMPLEMENTS_INTERFACE (iPlugIn)
+IMPLEMENT_IBASE_END
+
+IMPLEMENT_IBASE (csPlaneSaver)
+  IMPLEMENTS_INTERFACE (iSaverPlugIn)
+  IMPLEMENTS_INTERFACE (iPlugIn)
+IMPLEMENT_IBASE_END
+
 IMPLEMENT_FACTORY (csThingLoader)
 IMPLEMENT_FACTORY (csThingSaver)
+IMPLEMENT_FACTORY (csPlaneLoader)
+IMPLEMENT_FACTORY (csPlaneSaver)
 
 EXPORT_CLASS_TABLE (thingldr)
   EXPORT_CLASS (csThingLoader, "crystalspace.mesh.loader.factory.thing",
@@ -134,6 +150,10 @@ EXPORT_CLASS_TABLE (thingldr)
     "Crystal Space Thing Mesh Loader")
   EXPORT_CLASS (csThingSaver, "crystalspace.mesh.saver.thing",
     "Crystal Space Thing Mesh Saver")
+  EXPORT_CLASS (csPlaneLoader, "crystalspace.mesh.loader.plane",
+    "Crystal Space Thing Plane Loader")
+  EXPORT_CLASS (csPlaneSaver, "crystalspace.mesh.saver.plane",
+    "Crystal Space Thing Plane Saver")
 EXPORT_CLASS_TABLE_END
 
 #define MAXLINE 200 /* max number of chars per line... */
@@ -291,6 +311,58 @@ static void OptimizePolygon (iPolygon3D *p)
   p->SetTextureType (POLYTXT_NONE);
 }
 
+static UInt ParseMixmode (char* buf)
+{
+  CS_TOKEN_TABLE_START (modes)
+    CS_TOKEN_TABLE (COPY)
+    CS_TOKEN_TABLE (MULTIPLY2)
+    CS_TOKEN_TABLE (MULTIPLY)
+    CS_TOKEN_TABLE (ADD)
+    CS_TOKEN_TABLE (ALPHA)
+    CS_TOKEN_TABLE (TRANSPARENT)
+    CS_TOKEN_TABLE (KEYCOLOR)
+  CS_TOKEN_TABLE_END
+
+  char* name;
+  long cmd;
+  char* params;
+
+  UInt Mixmode = 0;
+
+  while ((cmd = csGetObject (&buf, modes, &name, &params)) > 0)
+  {
+    if (!params)
+    {
+      printf ("Expected parameters instead of '%s'!\n", buf);
+      return 0;
+    }
+    switch (cmd)
+    {
+      case CS_TOKEN_COPY: Mixmode |= CS_FX_COPY; break;
+      case CS_TOKEN_MULTIPLY: Mixmode |= CS_FX_MULTIPLY; break;
+      case CS_TOKEN_MULTIPLY2: Mixmode |= CS_FX_MULTIPLY2; break;
+      case CS_TOKEN_ADD: Mixmode |= CS_FX_ADD; break;
+      case CS_TOKEN_ALPHA:
+	Mixmode &= ~CS_FX_MASK_ALPHA;
+	float alpha;
+	int ialpha;
+        ScanStr (params, "%f", &alpha);
+	ialpha = QInt (alpha * 255.99);
+	Mixmode |= CS_FX_SETALPHA(ialpha);
+	break;
+      case CS_TOKEN_TRANSPARENT: Mixmode |= CS_FX_TRANSPARENT; break;
+      case CS_TOKEN_KEYCOLOR: Mixmode |= CS_FX_KEYCOLOR; break;
+    }
+  }
+  if (cmd == CS_PARSERR_TOKENNOTFOUND)
+  {
+    printf ("Token '%s' not found while parsing the modes!\n",
+    	csGetLastOffender ());
+    return 0;
+  }
+  return Mixmode;
+}
+
 static iPolygon3D* load_poly3d (iEngine* engine, char* polyname, char* buf,
   iMaterialWrapper* default_material, float default_texlen,
   iThingState* thing_state, int vt_offset)
@@ -442,7 +514,8 @@ static iPolygon3D* load_poly3d (iEngine* engine, char* polyname, char* buf,
           csMatrix3 m_w; m_w.Identity ();
           csVector3 v_w_before (0, 0, 0);
           csVector3 v_w_after (0, 0, 0);
-          while ((cmd = csGetObject (&params, portal_commands, &name, &params2)) > 0)
+          while ((cmd = csGetObject (&params, portal_commands,
+	  	&name, &params2)) > 0)
           {
     	    if (!params2)
     	    {
@@ -614,21 +687,24 @@ static iPolygon3D* load_poly3d (iEngine* engine, char* polyname, char* buf,
         break;
       case CS_TOKEN_MIXMODE:
         {
-#if 0
           UInt mixmode = ParseMixmode (params);
-          csPolyTexNone *notex = poly3d->GetNoTexInfo ();
-	  if (notex) notex->SetMixmode (mixmode);
+	  iPolyTexType* ptt = poly3d->GetPolyTexType ();
+          iPolyTexNone* notex = QUERY_INTERFACE (ptt, iPolyTexNone);
+	  if (notex)
+	  {
+	    notex->SetMixmode (mixmode);
+	    notex->DecRef ();
+	  }
           if (mixmode & CS_FX_MASK_ALPHA)
             poly3d->SetAlpha (mixmode & CS_FX_MASK_ALPHA);
           break;
-#endif
 	}
       case CS_TOKEN_UV:
         {
-#if 0
           poly3d->SetTextureType (POLYTXT_GOURAUD);
-	  csPolyTexFlat* fs = poly3d->GetFlatInfo ();
-          int num, nv = poly3d->GetVertices ().GetNumVertices ();
+	  iPolyTexType* ptt = poly3d->GetPolyTexType ();
+	  iPolyTexFlat* fs = QUERY_INTERFACE (ptt, iPolyTexFlat);
+          int num, nv = poly3d->GetVertexCount ();
 	  fs->Setup (poly3d);
           float list [2 * 100];
           ScanStr (params, "%F", list, &num);
@@ -636,31 +712,32 @@ static iPolygon3D* load_poly3d (iEngine* engine, char* polyname, char* buf,
 	  int j;
           for (j = 0; j < num; j++)
             fs->SetUV (j, list [j * 2], list [j * 2 + 1]);
-#endif
+	  fs->DecRef ();
         }
         break;
       case CS_TOKEN_COLORS:
         {
-#if 0
           poly3d->SetTextureType (POLYTXT_GOURAUD);
-	  csPolyTexGouraud* gs = poly3d->GetGouraudInfo ();
-          int num, nv = poly3d->GetVertices ().GetNumVertices ();
+	  iPolyTexType* ptt = poly3d->GetPolyTexType ();
+	  iPolyTexGouraud* gs = QUERY_INTERFACE (ptt, iPolyTexGouraud);
+          int num, nv = poly3d->GetVertexCount ();
 	  gs->Setup (poly3d);
           float list [3 * 100];
           ScanStr (params, "%F", list, &num);
           if (num > nv) num = nv;
 	  int j;
           for (j = 0; j < num; j++)
-            gs->SetColor (j, list [j * 3], list [j * 3 + 1], list [j * 3 + 2]);
-#endif
+            gs->SetColor (j, csColor (list [j * 3], list [j * 3 + 1],
+	    	list [j * 3 + 2]));
+	  gs->DecRef ();
         }
         break;
       case CS_TOKEN_UVA:
         {
-#if 0
           poly3d->SetTextureType (POLYTXT_GOURAUD);
-	  csPolyTexFlat* fs = poly3d->GetFlatInfo ();
-          int num, nv = poly3d->GetVertices ().GetNumVertices ();
+	  iPolyTexType* ptt = poly3d->GetPolyTexType ();
+	  iPolyTexFlat* fs = QUERY_INTERFACE (ptt, iPolyTexFlat);
+          int num, nv = poly3d->GetVertexCount ();
 	  fs->Setup (poly3d);
           float list [3 * 100];
           ScanStr (params, "%F", list, &num);
@@ -672,7 +749,7 @@ static iPolygon3D* load_poly3d (iEngine* engine, char* polyname, char* buf,
             fs->SetUV (j, cos (a) * list [j * 3 + 1] + list [j * 3 + 2],
                           sin (a) * list [j * 3 + 1] + list [j * 3 + 2]);
           }
-#endif
+	  fs->DecRef ();
         }
         break;
     }
@@ -733,8 +810,8 @@ static iPolygon3D* load_poly3d (iEngine* engine, char* polyname, char* buf,
       printf ("Bad texture specification for PLANE '%s'\n", name);
     else poly3d->SetTextureSpace (tx_orig, tx1, tx1_len);
   }
-  //@@@ HOW TO SOLVE PLANES!!! else if (plane_name[0])
-    //poly3d->SetTextureSpace ((csPolyTxtPlane*)Engine->planes.FindByName (plane_name));
+  else if (plane_name[0])
+    poly3d->SetTextureSpace (engine->FindPolyTxtPlane (plane_name));
   else if (tx_len)
   {
     // If a length is given (with 'LEN') we will take the first two vertices
@@ -746,12 +823,11 @@ static iPolygon3D* load_poly3d (iEngine* engine, char* polyname, char* buf,
   else
     poly3d->SetTextureSpace (tx_matrix, tx_vector);
 
-#if 0
-//@@@
-  if (uv_shift_given && poly3d->GetLightMapInfo ())
+  iPolyTexType* ptt = poly3d->GetPolyTexType ();
+  iPolyTexLightMap* plm = QUERY_INTERFACE (ptt, iPolyTexLightMap);
+  if (uv_shift_given && plm)
   {
-    poly3d->GetLightMapInfo ()->GetTxtPlane ()->
-    	GetTextureSpace (tx_matrix, tx_vector);
+    plm->GetPolyTxtPlane ()->GetTextureSpace (tx_matrix, tx_vector);
     // T = Mot * (O - Vot)
     // T = Mot * (O - Vot) + Vuv      ; Add shift Vuv to final texture map
     // T = Mot * (O - Vot) + Mot * Mot-1 * Vuv
@@ -759,8 +835,8 @@ static iPolygon3D* load_poly3d (iEngine* engine, char* polyname, char* buf,
     csVector3 shift (u_shift, v_shift, 0);
     tx_vector -= tx_matrix.GetInverse () * shift;
     poly3d->SetTextureSpace (tx_matrix, tx_vector);
+    plm->DecRef ();
   }
-#endif
 
   if (do_mirror)
     poly3d->GetPortal ()->SetWarp (csTransform::GetReflect (
@@ -771,7 +847,7 @@ static iPolygon3D* load_poly3d (iEngine* engine, char* polyname, char* buf,
   return poly3d;
 }
 
-static iBase* load_thing_part (ThingLoadInfo& info,
+static iBase* load_thing_part (ThingLoadInfo& info, iMeshWrapper* imeshwrap,
 	iEngine* engine, iBase* loadingObj,
 	iThingState* thing_state, char* buf, int vt_offset, bool isParent)
 {
@@ -796,6 +872,7 @@ static iBase* load_thing_part (ThingLoadInfo& info,
     CS_TOKEN_TABLE (VISTREE)
     CS_TOKEN_TABLE (SKYDOME)
     CS_TOKEN_TABLE (PART)
+    CS_TOKEN_TABLE (FACTORY)
   CS_TOKEN_TABLE_END
 
   char* name;
@@ -851,6 +928,7 @@ static iBase* load_thing_part (ThingLoadInfo& info,
 	    return NULL;
 	  }
 	  loadingObj = fact->GetMeshObjectFactory ()->NewInstance ();
+	  imeshwrap->SetFactory (fact);
 	  thing_state = QUERY_INTERFACE (loadingObj, iThingState);
 	  break;
 	}
@@ -920,11 +998,12 @@ static iBase* load_thing_part (ThingLoadInfo& info,
         }
         break;
       case CS_TOKEN_PART:
-	if (!load_thing_part (info, engine, loadingObj, thing_state, params,
-		thing_state->GetVertexCount (), false))
+	if (!load_thing_part (info, imeshwrap, engine, loadingObj,
+		thing_state, params, thing_state->GetVertexCount (), false))
 	  return NULL;
         break;
       case CS_TOKEN_SKYDOME:
+      //@@@
         //skydome_process (*thing, name, params, info.default_material,
 	    //vt_offset);
         break;
@@ -964,6 +1043,7 @@ static iBase* load_thing_part (ThingLoadInfo& info,
         break;
       case CS_TOKEN_FOG:
 #if 0
+//@@@
         if (!isParent)
 	{
 	  printf ("FOG statement only for top-level thing!\n");
@@ -990,6 +1070,7 @@ static iBase* load_thing_part (ThingLoadInfo& info,
       case CS_TOKEN_BEZIER:
         {
 #if 0
+//@@@
           csCurveTemplate* ct = load_beziertemplate (name, params,
 	      info.default_material, info.default_texlen,
 	      thing->GetCurveVertices ());
@@ -1024,6 +1105,7 @@ static iBase* load_thing_part (ThingLoadInfo& info,
       case CS_TOKEN_CURVECONTROL:
         {
 #if 0
+//@@@
           csVector3 v;
           csVector2 t;
           ScanStr (params, "%f,%f,%f:%f,%f", &v.x, &v.y, &v.z,&t.x,&t.y);
@@ -1056,6 +1138,7 @@ static iBase* load_thing_part (ThingLoadInfo& info,
   {
     printf ("Token '%s' not found while parsing a thing!\n",
     	csGetLastOffender ());
+    printf ("buf=%s\n", buf);
     return NULL;
   }
   return loadingObj;
@@ -1068,11 +1151,13 @@ iBase* csThingLoader::Parse (const char* string, iEngine* engine,
   iThingState* thing_state = NULL;
 
   iMeshWrapper* imeshwrap = QUERY_INTERFACE (context, iMeshWrapper);
-  imeshwrap->DecRef ();
+  if (imeshwrap) imeshwrap->DecRef ();
+  iMeshFactoryWrapper* ifactmeshwrap = QUERY_INTERFACE (context,
+  	iMeshFactoryWrapper);
+  if (ifactmeshwrap) ifactmeshwrap->DecRef ();
 
-//@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
-  // If context==NULL we are loading for a factory.
-  if (context == NULL)
+  // If ifactmeshwrap!=NULL we are loading for a factory.
+  if (ifactmeshwrap != NULL)
   {
     iMeshObjectType* type = engine->GetThingType (); // @@@ LOAD_PLUGIN LATER!
     fact = type->NewFactory ();
@@ -1081,7 +1166,8 @@ iBase* csThingLoader::Parse (const char* string, iEngine* engine,
 
   char* buf = (char*)string;
   ThingLoadInfo info;
-  return load_thing_part (info, engine, fact, thing_state, buf, 0, true);
+  return load_thing_part (info, imeshwrap, engine, fact, thing_state,
+  	buf, 0, true);
 }
 
 //---------------------------------------------------------------------------
@@ -1115,3 +1201,161 @@ void csThingSaver::WriteDown (iBase* /*obj*/, iStrVector *str,
 
 //---------------------------------------------------------------------------
 
+csPlaneLoader::csPlaneLoader (iBase* pParent)
+{
+  CONSTRUCT_IBASE (pParent);
+}
+
+csPlaneLoader::~csPlaneLoader ()
+{
+}
+
+bool csPlaneLoader::Initialize (iSystem* system)
+{
+  sys = system;
+  return true;
+}
+
+iBase* csPlaneLoader::Parse (const char* string, iEngine* engine,
+	iBase* /*context*/)
+{
+  CS_TOKEN_TABLE_START (commands)
+    CS_TOKEN_TABLE (ORIG)
+    CS_TOKEN_TABLE (FIRST_LEN)
+    CS_TOKEN_TABLE (FIRST)
+    CS_TOKEN_TABLE (SECOND_LEN)
+    CS_TOKEN_TABLE (SECOND)
+    CS_TOKEN_TABLE (MATRIX)
+    CS_TOKEN_TABLE (NAME)
+    CS_TOKEN_TABLE (UVEC)
+    CS_TOKEN_TABLE (VVEC)
+    CS_TOKEN_TABLE (V)
+  CS_TOKEN_TABLE_END
+
+  char* xname;
+  long cmd;
+  char* params;
+  iPolyTxtPlane* ppl = engine->CreatePolyTxtPlane ();
+
+  bool tx1_given = false, tx2_given = false;
+  csVector3 tx_orig (0, 0, 0), tx1 (0, 0, 0), tx2 (0, 0, 0);
+  float tx1_len = 0, tx2_len = 0;
+  csMatrix3 tx_matrix;
+  csVector3 tx_vector (0, 0, 0);
+  char name[255]; name[0] = 0;
+  char* buf = (char*)string;
+
+  while ((cmd = csGetObject (&buf, commands, &xname, &params)) > 0)
+  {
+    if (!params)
+    {
+      printf ("Expected parameters instead of '%s'!\n", buf);
+      return NULL;
+    }
+    switch (cmd)
+    {
+      case CS_TOKEN_NAME:
+        ScanStr (params, "%s", name);
+	ppl->SetName (name);
+        break;
+      case CS_TOKEN_ORIG:
+        tx1_given = true;
+        load_vector (params, tx_orig);
+        break;
+      case CS_TOKEN_FIRST:
+        tx1_given = true;
+        load_vector (params, tx1);
+        break;
+      case CS_TOKEN_FIRST_LEN:
+        ScanStr (params, "%f", &tx1_len);
+        tx1_given = true;
+        break;
+      case CS_TOKEN_SECOND:
+        tx2_given = true;
+        load_vector (params, tx2);
+        break;
+      case CS_TOKEN_SECOND_LEN:
+        ScanStr (params, "%f", &tx2_len);
+        tx2_given = true;
+        break;
+      case CS_TOKEN_MATRIX:
+        load_matrix (params, tx_matrix);
+        break;
+      case CS_TOKEN_V:
+        load_vector (params, tx_vector);
+        break;
+      case CS_TOKEN_UVEC:
+        tx1_given = true;
+        load_vector (params, tx1);
+        tx1_len = tx1.Norm ();
+        tx1 += tx_orig;
+        break;
+      case CS_TOKEN_VVEC:
+        tx2_given = true;
+        load_vector (params, tx2);
+        tx2_len = tx2.Norm ();
+        tx2 += tx_orig;
+        break;
+    }
+  }
+  if (cmd == CS_PARSERR_TOKENNOTFOUND)
+  {
+    printf ("Token '%s' not found while parsing a plane!\n",
+    	csGetLastOffender ());
+    return NULL;
+  }
+
+  if (tx1_given)
+    if (tx2_given)
+    {
+      if (!tx1_len)
+      {
+        printf ("Bad texture specification for PLANE '%s'\n", name);
+	tx1_len = 1;
+      }
+      if (!tx2_len)
+      {
+        printf ("Bad texture specification for PLANE '%s'\n", name);
+	tx2_len = 1;
+      }
+      if ((tx1-tx_orig) < SMALL_EPSILON)
+        printf ("Bad texture specification for PLANE '%s'\n", name);
+      else if ((tx2-tx_orig) < SMALL_EPSILON)
+        printf ("Bad texture specification for PLANE '%s'\n", name);
+      else ppl->SetTextureSpace (tx_orig, tx1, tx1_len, tx2, tx2_len);
+    }
+    else
+    {
+      printf ("Not supported!\n");
+      return NULL;
+    }
+  else
+    ppl->SetTextureSpace (tx_matrix, tx_vector);
+
+  return ppl;
+}
+
+//---------------------------------------------------------------------------
+
+csPlaneSaver::csPlaneSaver (iBase* pParent)
+{
+  CONSTRUCT_IBASE (pParent);
+}
+
+csPlaneSaver::~csPlaneSaver ()
+{
+}
+
+bool csPlaneSaver::Initialize (iSystem* system)
+{
+  sys = system;
+  return true;
+}
+
+void csPlaneSaver::WriteDown (iBase* /*obj*/, iStrVector* /*str*/,
+  iEngine* /*engine*/)
+{
+}
+
+
+//---------------------------------------------------------------------------

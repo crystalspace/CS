@@ -27,6 +27,38 @@ The history order has been reversed so that new features are at the top.
 	  combination with models loaded as 3DS or MDL. This is a temporary
 	  fix until these loaders have moved to a plugin but for now it
 	  will do.
+	- Created iPolyTxtPlane interface and let csPolyTxtPlane implement
+	  it.
+	- Added temporary CreatePolyTxtPlane() and FindPolyTxtPlane()
+	  functions in iEngine. These will be used until these planes are
+	  managed by the thing plugin.
+	- Implemented plane loader and saver (saver not working yet). Planes
+	  are a bit special. They are objects that should be private to the
+	  thing mesh object system (they are only used by things) so the
+	  engine should not manage them. However planes can be shared accross
+	  several thing meshes so it is not suitable to make them private
+	  to one thing mesh either. So planes will be loaded by a general
+	  (non-mesh object) loader plugin. This plugin is closely associated
+	  to the thing loaders (implemented by the same shared library)
+	  so it knows how to create planes for things. In the future planes
+	  will be kept by the thing type plugin itself (global to all things).
+	  For now this loader will load the planes in the engine.
+	- Removed support for PLANE in library and world. Planes now have
+	  to be loaded using the ADDON keyword and the
+	  crystalspace.mesh.loader.plane plugin.
+	- Added iPolygon3D::SetTextureSpace() with iPolyTxtPlane* as a
+	  parameter.
+	- Added SCF interfaces: iPolyTexType, iPolyTexNone, iPolyTexFlat,
+	  iPolyTexGouraud, and iPolyTexLightMap. They are implemented by
+	  csPolyTexType, csPolyTexNone, csPolyTexFlat, csPolyTexGouraud,
+	  and csPolyTexLightMap respectively.
+	- Added GetPolyTexType() to iPolygon3D.
+	- Using the above interfaces I fixed the thing loader to correctly
+	  load texture mapping information (lightmapping, gouraud shading,
+	  flat shading, ...)
+	- Extended the loader with HARDMOVE for mesh objects.
+	- The thing loader plugin is still not working correctly but we
+	  are getting there.
 4-Apr-2001
 	- Started work on thing loader and saver. Although things haven't
 	  moved to a plugin yet it is already possible to make real

@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 1998 by Jorrit Tyberghein
+    Copyright (C) 1998-2001 by Jorrit Tyberghein
   
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -26,15 +26,22 @@
 
 IMPLEMENT_CSOBJTYPE (csPolyTxtPlane,csPObject);
 
+IMPLEMENT_IBASE_EXT (csPolyTxtPlane)
+  IMPLEMENTS_EMBEDDED_INTERFACE (iPolyTxtPlane)
+IMPLEMENT_IBASE_EXT_END
+
+IMPLEMENT_EMBEDDED_IBASE (csPolyTxtPlane::PolyTxtPlane)
+  IMPLEMENTS_INTERFACE (iPolyTxtPlane)
+IMPLEMENT_EMBEDDED_IBASE_END
+
 csPolyTxtPlane::csPolyTxtPlane () : csPObject ()
 {
-  ref_count = 1;
+  CONSTRUCT_EMBEDDED_IBASE (scfiPolyTxtPlane);
   csEngine::current_engine->AddToCurrentRegion (this);
 }
 
 csPolyTxtPlane::~csPolyTxtPlane ()
 {
-  if (ref_count) printf ("csPolyTxtPlane: ref_count=%d\n", ref_count);
 }
 
 void csPolyTxtPlane::SetTextureSpace (

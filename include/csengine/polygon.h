@@ -34,6 +34,7 @@
 #include "csengine/material.h"
 #include "iengine/polygon.h"
 #include "iengine/sector.h"
+#include "iengine/ptextype.h"
 
 class csSector;
 class csFrustumView;
@@ -85,12 +86,8 @@ struct csPolygonLightInfo
  * of texturing that is used for a polygon. Also this class contains
  * all the information required for POLYTXT_NONE texture type.
  */
-class csPolyTexType
+class csPolyTexType : public iPolyTexType
 {
-private:
-  /// Reference counter
-  ushort ref_count;
-
 protected:
   /**
    * 0 is no alpha, 25 is 25% see through and 75% texture and so on.
@@ -101,29 +98,27 @@ protected:
   ushort Alpha;
 
   /// Common constructor for derived classes
-  csPolyTexType () { ref_count = 1; Alpha = 0; }
+  csPolyTexType ();
   /// Destructor is virtual to be able to delete derived objects
   virtual ~csPolyTexType () { }
 
 public:
   /// Return a type for the kind of texturing used.
   virtual int GetTextureType () = 0;
-  /// Maintain a reference counter for texture type objects
-  void IncRef () { ref_count++; }
-  /// Decrement usage counter
-  void DecRef () { if (!--ref_count) delete this; }
 
   /// Get the alpha value for this polygon
   int GetAlpha () { return Alpha; }
   /// Set the alpha value for this polygon
   void SetAlpha (int a) { Alpha = a; }
+
+  DECLARE_IBASE;
 };
 
 /**
  * Structure containing all required information
  * for polygons without texture mapping.
  */
-class csPolyTexNone : public csPolyTexType
+class csPolyTexNone : public csPolyTexType, public iPolyTexNone
 {
   friend class csPolygon3D;
 
@@ -142,11 +137,13 @@ public:
   /// Return a type for the kind of texturing used.
   virtual int GetTextureType () { return POLYTXT_NONE; }
 
-  /// Sets the mode that is used for DrawPolygonFX
-  void SetMixmode (UInt m) { MixMode = m & ~CS_FX_MASK_ALPHA; }
+  /// Sets the mode that is used for DrawPolygonFX.
+  virtual void SetMixmode (UInt m) { MixMode = m & ~CS_FX_MASK_ALPHA; }
 
   /// Gets the mode that is used for DrawPolygonFX.
-  UInt GetMixmode () { return (MixMode | Alpha); }
+  virtual UInt GetMixmode () { return (MixMode | Alpha); }
+
+  DECLARE_IBASE_EXT (csPolyTexType);
 };
 
 /**
@@ -154,7 +151,7 @@ public:
  * flat-shaded (do not mix with flat-colored!) texture mapped
  * (or flat-shaded) polygons.
  */
-class csPolyTexFlat : public csPolyTexNone
+class csPolyTexFlat : public csPolyTexNone, public iPolyTexFlat
 {
   friend class csPolygon3D;
 
@@ -177,11 +174,18 @@ public:
   virtual int GetTextureType () { return POLYTXT_FLAT; }
 
   /**
-   * Setup this lighting structure with the rignt number of vertices,
+   * Setup this lighting structure with the right number of vertices,
    * taken from parent object. The contents of U/V array are not destroyed,
    * if it was previously allocated.
    */
   void Setup (csPolygon3D *iParent);
+
+  /**
+   * Setup this lighting structure with the right number of vertices,
+   * taken from parent object. The contents of U/V array are not destroyed,
+   * if it was previously allocated.
+   */
+  virtual void Setup (iPolygon3D *iParent);
 
   /**
    * Set an (u,v) texture coordinate for the specified vertex
@@ -194,7 +198,7 @@ public:
    * for which perspective correctness is not needed (sky polygons for
    * example).
    */
-  void SetUV (int i, float u, float v);
+  virtual void SetUV (int i, float u, float v);
 
   /**
    * Clear all (u,v) coordinates.
@@ -202,14 +206,16 @@ public:
   virtual void ClearUV ();
 
   /// Get the pointer to the vertex uv coordinates.
-  csVector2 *GetUVCoords () { return uv_coords; }
+  virtual csVector2 *GetUVCoords () { return uv_coords; }
+
+  DECLARE_IBASE_EXT (csPolyTexNone);
 };
 
 /**
  * Structure containing information about texture mapping
  * and vertex colors for Gouraud-shaded polygons.
  */
-class csPolyTexGouraud : public csPolyTexFlat
+class csPolyTexGouraud : public csPolyTexFlat, public iPolyTexGouraud
 {
   friend class csPolygon3D;
 
@@ -246,15 +252,22 @@ public:
   void Setup (csPolygon3D *iParent);
 
   /**
+   * Setup this lighting structure with the rignt number of vertices,
+   * taken from parent object. The contents of U/V array are not destroyed,
+   * if it was previously allocated.
+   */
+  virtual void Setup (iPolygon3D *iParent);
+
+  /**
    * Clear all color information.
    */
   virtual void ClearColors ();
 
   /// Get the pointer to the vertex color table.
-  csColor *GetColors () { return colors; }
+  virtual csColor *GetColors () { return colors; }
 
   /// Get the pointer to the static vertex color table.
-  csColor *GetStaticColors () { return static_colors; }
+  virtual csColor *GetStaticColors () { return static_colors; }
 
   /**
    * Add a color to the static color array.
@@ -274,12 +287,12 @@ public:
   /**
    * Reset a dynamic color to the static values.
    */
-  void ResetDynamicColor (int i);
+  virtual void ResetDynamicColor (int i);
 
   /**
    * Set a color in the dynamic array.
    */
-  void SetDynamicColor (int i, csColor& c)
+  virtual void SetDynamicColor (int i, const csColor& c)
   { SetDynamicColor (i, c.red, c.green, c.blue); }
 
   /**
@@ -290,15 +303,17 @@ public:
   /**
    * Set a color in the static array.
    */
-  void SetColor (int i, csColor& c)
+  virtual void SetColor (int i, const csColor& c)
   { SetColor (i, c.red, c.green, c.blue); }
+
+  DECLARE_IBASE_EXT (csPolyTexFlat);
 };
 
 /**
  * Structure containing all required information
  * for lightmapped polygons.
  */
-class csPolyTexLightMap : public csPolyTexType
+class csPolyTexLightMap : public csPolyTexType, public iPolyTexLightMap
 {
   friend class csPolygon3D;
 
@@ -338,6 +353,10 @@ public:
    * Return the texture plane of this polygon.
    */
   csPolyTxtPlane* GetTxtPlane () const { return txt_plane; }
+  /**
+   * Return the texture plane of this polygon.
+   */
+  virtual iPolyTxtPlane* GetPolyTxtPlane () const;
 
   /**
    * Set the texture plane.
@@ -353,6 +372,8 @@ public:
    * Get the lightmap belonging with this polygon.
    */
   iLightMap* GetLightMap () { return tex->GetLightMap (); }
+
+  DECLARE_IBASE_EXT (csPolyTexType);
 };
 
 /*---------------------------------------------------------------------------*/
@@ -1280,6 +1301,7 @@ public:
     {
       scfParent->SetTextureSpace (m, v);
     }
+    virtual void SetTextureSpace (iPolyTxtPlane* plane);
 
     virtual void SetTextureType (int type)
     {
@@ -1318,6 +1340,7 @@ public:
     {
       scfParent->SetCosinusFactor (cosfact);
     }
+    virtual iPolyTexType* GetPolyTexType ();
   } scfiPolygon3D;
   friend struct eiPolygon3D;
 };

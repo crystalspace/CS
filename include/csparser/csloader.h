@@ -111,8 +111,6 @@ class csLoader
   static bool load_quaternion (char* buf, csQuaternion &q);
   /// Parse a color definition
   static bool load_color (char *buf, csRGBcolor &c);
-  /// Parse a polygon plane definition and return a new object
-  static csPolyTxtPlane* load_polyplane (char* buf, char* name = NULL);
   /// Parse a collection definition and return a new object
   static csCollection* load_collection (char* name, char* buf);
   /// Parse a static light definition and return a new object

@@ -26,51 +26,19 @@
 struct iMaterialHandle;
 struct iMaterialWrapper;
 struct iPolygon3D;
+struct iPolyTxtPlane;
 struct iPolygonTexture;
 struct iLightMap;
 struct iPortal;
 struct iSector;
 struct iThing;
+struct iPolyTexType;
 
 class csPolygon3D;
 class csVector3;
 class csVector2;
 class csMatrix3;
 class csColor;
-
-/**
- * Polygon has no texture mapping.
- * This flag is meaningful only for flat-colored polygons
- * since it saves a bit of memory.
- */
-#define POLYTXT_NONE		0
-
-/**
- * Flat shaded texture.
- * Polygons with this texturing type will always have same lighting
- * value across entire polygon. If the CS_POLY_LIGHTING flag is not
- * set in parent polygon object, the polygon will be painted using
- * the original texture or flat color; otherwise a single lighting
- * value will be computed (depending on the angle the light falls
- * on the polygon) and will be applied to every pixel.
- */
-#define POLYTXT_FLAT		1
-
-/**
- * Gouraud shaded texture.
- * With software rendering these textures will be painted without
- * perspective correction. Instead you can defined a color (with
- * r/g/b values in range 0..2) for every polygon vertex, and these
- * colors will be interpolated across scanlines.
- */
-#define POLYTXT_GOURAUD		2
-
-/**
- * Texture type is lightmapped.
- * These polygons are painted perspective-correct even with software
- * rendering and are used usually for walls and big objects.
- */
-#define POLYTXT_LIGHTMAP	3
 
 /**
  * If CS_POLY_LIGHTING is set for a polygon then the polygon will be lit.
@@ -84,7 +52,7 @@ class csColor;
 #define CS_POLY_COLLDET	0x00000002
 
 
-SCF_VERSION (iPolygon3D, 0, 1, 8);
+SCF_VERSION (iPolygon3D, 0, 1, 10);
 
 /**
  * This is the interface to 3D polygons.
@@ -202,6 +170,11 @@ struct iPolygon3D : public iBase
   virtual void SetTextureSpace (csMatrix3 const&, csVector3 const&) = 0;
 
   /**
+   * With this function you let this polygon share the given plane.
+   */
+  virtual void SetTextureSpace (iPolyTxtPlane* plane) = 0;
+
+  /**
    * Set type of texturing to use for this polygon (one of
    * the POLYTXT_??? flags). POLYTXT_LIGHTMAP is default.
    * This function is guaranteed not to do anything if the type is
@@ -240,6 +213,10 @@ struct iPolygon3D : public iBase
    * Set cosinus factor.
    */
   virtual void SetCosinusFactor (float cosfact) = 0;
+  /**
+   * Get the polygon texture type.
+   */
+  virtual iPolyTexType* GetPolyTexType () = 0;
 };
 
 SCF_VERSION (iPolygonTexture, 1, 0, 0);

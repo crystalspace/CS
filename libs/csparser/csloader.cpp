@@ -415,119 +415,6 @@ void csLoader::OptimizePolygon (csPolygon3D *p)
 
 //---------------------------------------------------------------------------
 
-csPolyTxtPlane* csLoader::load_polyplane (char* buf, char* name)
-{
-  CS_TOKEN_TABLE_START(commands)
-    CS_TOKEN_TABLE (ORIG)
-    CS_TOKEN_TABLE (FIRST_LEN)
-    CS_TOKEN_TABLE (FIRST)
-    CS_TOKEN_TABLE (SECOND_LEN)
-    CS_TOKEN_TABLE (SECOND)
-    CS_TOKEN_TABLE (MATRIX)
-    CS_TOKEN_TABLE (UVEC)
-    CS_TOKEN_TABLE (VVEC)
-    CS_TOKEN_TABLE (V)
-  CS_TOKEN_TABLE_END
-
-  char* xname;
-  long cmd;
-  char* params;
-  csPolyTxtPlane* ppl = new csPolyTxtPlane ();
-  ppl->SetName (name);
-
-  bool tx1_given = false, tx2_given = false;
-  csVector3 tx_orig (0, 0, 0), tx1 (0, 0, 0), tx2 (0, 0, 0);
-  float tx1_len = 0, tx2_len = 0;
-  csMatrix3 tx_matrix;
-  csVector3 tx_vector (0, 0, 0);
-
-  while ((cmd = csGetObject (&buf, commands, &xname, &params)) > 0)
-  {
-    if (!params)
-    {
-      CsPrintf (MSG_FATAL_ERROR, "Expected parameters instead of '%s'!\n", buf);
-      fatal_exit (0, false);
-    }
-    switch (cmd)
-    {
-      case CS_TOKEN_ORIG:
-        tx1_given = true;
-        load_vector (params, tx_orig);
-        break;
-      case CS_TOKEN_FIRST:
-        tx1_given = true;
-        load_vector (params, tx1);
-        break;
-      case CS_TOKEN_FIRST_LEN:
-        ScanStr (params, "%f", &tx1_len);
-        tx1_given = true;
-        break;
-      case CS_TOKEN_SECOND:
-        tx2_given = true;
-        load_vector (params, tx2);
-        break;
-      case CS_TOKEN_SECOND_LEN:
-        ScanStr (params, "%f", &tx2_len);
-        tx2_given = true;
-        break;
-      case CS_TOKEN_MATRIX:
-        load_matrix (params, tx_matrix);
-        break;
-      case CS_TOKEN_V:
-        load_vector (params, tx_vector);
-        break;
-      case CS_TOKEN_UVEC:
-        tx1_given = true;
-        load_vector (params, tx1);
-        tx1_len = tx1.Norm ();
-        tx1 += tx_orig;
-        break;
-      case CS_TOKEN_VVEC:
-        tx2_given = true;
-        load_vector (params, tx2);
-        tx2_len = tx2.Norm ();
-        tx2 += tx_orig;
-        break;
-    }
-  }
-  if (cmd == CS_PARSERR_TOKENNOTFOUND)
-  {
-    CsPrintf (MSG_FATAL_ERROR, "Token '%s' not found while parsing a plane!\n", csGetLastOffender ());
-    fatal_exit (0, false);
-  }
-
-  if (tx1_given)
-    if (tx2_given)
-    {
-      if (!tx1_len)
-      {
-        CsPrintf (MSG_WARNING, "Bad texture specification for PLANE '%s'\n", name);
-	tx1_len = 1;
-      }
-      if (!tx2_len)
-      {
-        CsPrintf (MSG_WARNING, "Bad texture specification for PLANE '%s'\n", name);
-	tx2_len = 1;
-      }
-      if ((tx1-tx_orig) < SMALL_EPSILON)
-        CsPrintf (MSG_WARNING, "Bad texture specification for PLANE '%s'\n", name);
-      else if ((tx2-tx_orig) < SMALL_EPSILON)
-        CsPrintf (MSG_WARNING, "Bad texture specification for PLANE '%s'\n", name);
-      else ppl->SetTextureSpace (tx_orig, tx1, tx1_len, tx2, tx2_len);
-    }
-    else
-    {
-      CsPrintf (MSG_FATAL_ERROR, "Not supported!\n");
-      fatal_exit (0, true);
-    }
-  else
-    ppl->SetTextureSpace (tx_matrix, tx_vector);
-
-  return ppl;
-}
-
-//---------------------------------------------------------------------------
-
 csCollection* csLoader::load_collection (char* name, char* buf)
 {
   CS_TOKEN_TABLE_START(commands)
@@ -2619,7 +2506,6 @@ bool csLoader::LoadMap (char* buf, bool onlyRegion)
     CS_TOKEN_TABLE (ADDON)
     CS_TOKEN_TABLE (SECTOR)
     CS_TOKEN_TABLE (ROOM)
-    CS_TOKEN_TABLE (PLANE)
     CS_TOKEN_TABLE (COLLECTION)
     CS_TOKEN_TABLE (SCRIPT)
     CS_TOKEN_TABLE (MESHOBJ)
@@ -2729,9 +2615,6 @@ bool csLoader::LoadMap (char* buf, bool onlyRegion)
         case CS_TOKEN_SECTOR:
           if (!Engine->FindSector (name, onlyRegion))
             Engine->sectors.Push (load_sector (name, params));
-          break;
-        case CS_TOKEN_PLANE:
-          Engine->planes.Push (load_polyplane (params, name));
           break;
         case CS_TOKEN_COLLECTION:
           Engine->collections.Push (load_collection (name, params));
@@ -2965,7 +2848,6 @@ bool csLoader::LoadLibrary (char* buf)
     CS_TOKEN_TABLE (MESHOBJ)
     CS_TOKEN_TABLE (THING)
     CS_TOKEN_TABLE (SOUNDS)
-    CS_TOKEN_TABLE (PLANE)
   CS_TOKEN_TABLE_END
 
   char *name, *data;
@@ -2993,9 +2875,6 @@ bool csLoader::LoadLibrary (char* buf)
         case CS_TOKEN_ADDON:
 	  LoadAddOn (params, (iEngine*)Engine);
       	  break;
-        case CS_TOKEN_PLANE:
-          Engine->planes.Push ( load_polyplane (params, name) );
-          break;
         case CS_TOKEN_TEXTURES:
           // Append textures to engine.
           if (!LoadTextures (params))
@@ -3338,6 +3217,7 @@ bool csLoader::LoadMeshObject (csMeshWrapper* mesh, char* buf, csSector* sector)
     CS_TOKEN_TABLE (KEY)
     CS_TOKEN_TABLE (MESHOBJ)
     CS_TOKEN_TABLE (MOVE)
+    CS_TOKEN_TABLE (HARDMOVE)
     CS_TOKEN_TABLE (PLUGIN)
     CS_TOKEN_TABLE (PARAMS)
     CS_TOKEN_TABLE (NOLIGHTING)
@@ -3423,6 +3303,36 @@ bool csLoader::LoadMeshObject (csMeshWrapper* mesh, char* buf, csSector* sector)
           mesh->GetChildren ().Push (sp);
           sp->GetMovable ().SetSector (sector);
 	  sp->GetMovable ().UpdateMove ();
+        }
+        break;
+      case CS_TOKEN_HARDMOVE:
+        {
+          char* params2;
+	  csMatrix3 m;
+	  csVector3 v (0);
+          while ((cmd = csGetObject (&params, tok_matvec, &name, &params2)) > 0)
+          {
+            if (!params2)
+            {
+              CsPrintf (MSG_FATAL_ERROR,
+	      	"Expected parameters instead of '%s'!\n", params);
+              fatal_exit (0, false);
+            }
+            switch (cmd)
+            {
+              case CS_TOKEN_MATRIX:
+              {
+                load_matrix (params2, m);
+                break;
+              }
+              case CS_TOKEN_V:
+              {
+                load_vector (params2, v);
+                break;
+              }
+            }
+          }
+	  mesh->HardTransform (csTransform (m, v));
         }
         break;
       case CS_TOKEN_MOVE:

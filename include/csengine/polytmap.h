@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 1999 by Jorrit Tyberghein
+    Copyright (C) 1999-2001 by Jorrit Tyberghein
   
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -22,6 +22,7 @@
 #include "csgeom/transfrm.h"
 #include "csobject/csobject.h"
 #include "csobject/pobject.h"
+#include "iengine/polytmap.h"
 
 class Dumper;
 
@@ -50,20 +51,12 @@ private:
   /// Translation from world to texture space.
   csVector3 v_world2tex;
 
-  /// Reference count.
-  int ref_count;
-
   /// Destructor is private.
   virtual ~csPolyTxtPlane ();
 
 public:
   /// Constructor. Reference count is initialized to 1.
   csPolyTxtPlane ();
-
-  /// Maintain a reference counter for texture type objects
-  void IncRef () { ref_count++; }
-  /// Decrement usage counter
-  void DecRef () { if (!--ref_count) delete this; }
 
   /**
    * Transform this plane from object space to world space using
@@ -136,6 +129,37 @@ public:
   void GetTextureSpace (csMatrix3& tx_matrix, csVector3& tx_vector);
 
   CSOBJTYPE;
+  DECLARE_IBASE_EXT (csPObject);
+
+  //----------------- iPolyTxtPlane interface implementation -----------------
+  struct PolyTxtPlane : public iPolyTxtPlane
+  {
+    DECLARE_EMBEDDED_IBASE (csPolyTxtPlane);
+    virtual csPolyTxtPlane* GetPrivateObject ()
+    {
+      return (csPolyTxtPlane*)scfParent;
+    }
+    virtual void SetName (const char* name)
+    {
+      scfParent->SetName (name);
+    }
+    virtual void SetTextureSpace (const csVector3& v_orig,
+			const csVector3& v1, float len1,
+			const csVector3& v2, float len2)
+    {
+      scfParent->SetTextureSpace (v_orig, v1, len1, v2, len2);
+    }
+    virtual void SetTextureSpace (const csMatrix3& tx_matrix,
+  			const csVector3& tx_vector)
+    {
+      scfParent->SetTextureSpace (tx_matrix, tx_vector);
+    }
+    virtual void GetTextureSpace (csMatrix3& tx_matrix, csVector3& tx_vector)
+    {
+      scfParent->GetTextureSpace (tx_matrix, tx_vector);
+    }
+  } scfiPolyTxtPlane;
+  friend class PolyTxtPlane;
 };
 
 #endif // __CS_POLYTMAP_H__

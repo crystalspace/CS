@@ -2340,6 +2340,24 @@ iTerrainWrapper* csEngine::CreateTerrainObject (iTerrainFactoryWrapper* pFactWra
   return iWrapper;
 }
 
+iPolyTxtPlane* csEngine::CreatePolyTxtPlane (const char* name)
+{
+  csPolyTxtPlane* pl = new csPolyTxtPlane ();
+  planes.Push (pl);
+  if (name) pl->SetName (name);
+  return &(pl->scfiPolyTxtPlane);
+}
+
+iPolyTxtPlane* csEngine::FindPolyTxtPlane (const char *iName, bool regionOnly)
+{
+  csPolyTxtPlane* pl;
+  if (regionOnly && region)
+    pl = (csPolyTxtPlane*)FindObjectInRegion (region, planes, iName);
+  else
+    pl = (csPolyTxtPlane*)planes.FindByName (iName);
+  if (!pl) return NULL;
+  return &(pl->scfiPolyTxtPlane);
+}
 
 //----------------Begin-Multi-Context-Support------------------------------
 

@@ -58,6 +58,32 @@ static DECLARE_GROWING_ARRAY_REF (VectorArray, csVector3);
 
 //---------------------------------------------------------------------------
 
+IMPLEMENT_IBASE (csPolyTexType)
+  IMPLEMENTS_INTERFACE (iPolyTexType)
+IMPLEMENT_IBASE_END
+
+IMPLEMENT_IBASE_EXT (csPolyTexNone)
+  IMPLEMENTS_INTERFACE (iPolyTexNone)
+IMPLEMENT_IBASE_EXT_END
+
+IMPLEMENT_IBASE_EXT (csPolyTexFlat)
+  IMPLEMENTS_INTERFACE (iPolyTexFlat)
+IMPLEMENT_IBASE_EXT_END
+
+IMPLEMENT_IBASE_EXT (csPolyTexGouraud)
+  IMPLEMENTS_INTERFACE (iPolyTexGouraud)
+IMPLEMENT_IBASE_EXT_END
+
+IMPLEMENT_IBASE_EXT (csPolyTexLightMap)
+  IMPLEMENTS_INTERFACE (iPolyTexLightMap)
+IMPLEMENT_IBASE_EXT_END
+
+csPolyTexType::csPolyTexType ()
+{
+  CONSTRUCT_IBASE (NULL);
+  Alpha = 0;
+}
+
 csPolyTexLightMap::csPolyTexLightMap () : csPolyTexType ()
 {
   txt_plane = NULL;
@@ -81,6 +107,11 @@ void csPolyTexLightMap::Setup (csPolygon3D* poly3d, csMaterialWrapper* mat)
 csPolyTexture* csPolyTexLightMap::GetPolyTex ()
 {
   return tex;
+}
+
+iPolyTxtPlane* csPolyTexLightMap::GetPolyTxtPlane () const
+{
+  return &(GetTxtPlane ()->scfiPolyTxtPlane);
 }
 
 void csPolyTexLightMap::SetTxtPlane (csPolyTxtPlane* txt_pl)
@@ -118,6 +149,12 @@ void csPolyTexFlat::Setup (csPolygon3D *iParent)
     iParent->GetVertices ().GetNumVertices () * sizeof (csVector2));
 }
 
+void csPolyTexFlat::Setup (iPolygon3D *iParent)
+{
+  uv_coords = (csVector2 *)realloc (uv_coords,
+    iParent->GetVertexCount () * sizeof (csVector2));
+}
+
 void csPolyTexFlat::SetUV (int i, float u, float v)
 {
   uv_coords [i].x = u;
@@ -150,6 +187,18 @@ void csPolyTexGouraud::Setup (csPolygon3D *iParent)
 {
   csPolyTexFlat::Setup (iParent);
   int nv = iParent->GetVertices ().GetNumVertices ();
+  bool init = !colors;
+  colors = (csColor *)realloc (colors, nv * sizeof (csColor));
+  if (init) memset (colors, 0, nv * sizeof (csColor));
+  init = !static_colors;
+  static_colors = (csColor *)realloc (static_colors, nv * sizeof (csColor));
+  if (init) memset (static_colors, 0, nv * sizeof (csColor));
+}
+
+void csPolyTexGouraud::Setup (iPolygon3D *iParent)
+{
+  csPolyTexFlat::Setup (iParent);
+  int nv = iParent->GetVertexCount ();
   bool init = !colors;
   colors = (csColor *)realloc (colors, nv * sizeof (csColor));
   if (init) memset (colors, 0, nv * sizeof (csColor));
@@ -493,6 +542,16 @@ void csPolygon3D::SetMaterial (csMaterialWrapper* material)
 iMaterialHandle* csPolygon3D::GetMaterialHandle ()
 {
   return material ? material->GetMaterialHandle () : NULL;
+}
+
+void csPolygon3D::eiPolygon3D::SetTextureSpace (iPolyTxtPlane* plane)
+{
+  scfParent->SetTextureSpace (plane->GetPrivateObject ());
+}
+
+iPolyTexType* csPolygon3D::eiPolygon3D::GetPolyTexType ()
+{
+  return (iPolyTexType*)scfParent->GetTextureTypeInfo ();
 }
 
 iThing* csPolygon3D::eiPolygon3D::GetParent ()

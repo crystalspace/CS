@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 1998,2000 by Jorrit Tyberghein
+    Copyright (C) 1998-2001 by Jorrit Tyberghein
   
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -1265,8 +1265,13 @@ public:
   virtual iTerrainFactoryWrapper* CreateTerrainFactory (const char* pClassId,
 	  const char* pName);
   /// Create terrain object.
-  virtual iTerrainWrapper* CreateTerrainObject (iTerrainFactoryWrapper* pFactWrap,
+  virtual iTerrainWrapper* CreateTerrainObject (
+  	iTerrainFactoryWrapper* pFactWrap,
   	const char* name, iSector* sector);
+
+  virtual iPolyTxtPlane* CreatePolyTxtPlane (const char* name = NULL);
+  virtual iPolyTxtPlane* FindPolyTxtPlane (const char* name,
+  	bool regionOnly = false);
 
   virtual iClipper2D* GetTopLevelClipper ();
 

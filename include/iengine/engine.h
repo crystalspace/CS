@@ -45,8 +45,9 @@ struct iRegion;
 struct iView;
 struct iGraphics3D;
 struct iClipper2D;
+struct iPolyTxtPlane;
 
-SCF_VERSION (iEngine, 0, 1, 16);
+SCF_VERSION (iEngine, 0, 1, 17);
 
 /**
  * This interface is the main interface to the 3D engine.
@@ -312,6 +313,18 @@ struct iEngine : public iPlugIn
    */
   virtual iTerrainWrapper* CreateTerrainObject (iTerrainFactoryWrapper* factory,
   	const char* name, iSector* sector) = 0;
+
+  /**
+   * @@@ Temporary function to create a polygon plane. This is temporary
+   * until planes are managed by the thing plugin.
+   */
+  virtual iPolyTxtPlane* CreatePolyTxtPlane (const char* name = NULL) = 0;
+  /**
+   * @@@ Temporary function to find a polygon plane. This is temporary until
+   * planes are managed by the thing plugin.
+   */
+  virtual iPolyTxtPlane* FindPolyTxtPlane (const char *iName,
+  	bool regionOnly = false) = 0;
 
   /// @@@ Temporary function until things are moved to a plugin.
   virtual iMeshObjectType* GetThingType () = 0;

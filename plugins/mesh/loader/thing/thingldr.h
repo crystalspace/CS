@@ -77,5 +77,57 @@ public:
   virtual void WriteDown (iBase *obj, iStrVector *str, iEngine* engine);
 };
 
+/**
+ * Plane loader.
+ */
+class csPlaneLoader : public iLoaderPlugIn
+{
+private:
+  iSystem* sys;
+
+public:
+  /// Constructor.
+  csPlaneLoader (iBase*);
+
+  /// Destructor.
+  virtual ~csPlaneLoader ();
+
+  /// Register plugin with the system driver
+  virtual bool Initialize (iSystem *pSystem);
+
+public:
+  //------------------------ iLoaderPlugIn implementation --------------
+  DECLARE_IBASE;
+
+  /// Parse a given string and return a new object for it.
+  virtual iBase* Parse (const char* string, iEngine* engine, iBase* context);
+};
+
+/**
+ * Plane saver.
+ */
+class csPlaneSaver : public iSaverPlugIn
+{
+private:
+  iSystem* sys;
+
+public:
+  /// Constructor.
+  csPlaneSaver (iBase*);
+
+  /// Destructor.
+  virtual ~csPlaneSaver ();
+
+  /// Register plugin with the system driver
+  virtual bool Initialize (iSystem *pSystem);
+
+public:
+  //------------------------ iSaverPlugIn implementation --------------
+  DECLARE_IBASE;
+
+  /// Write down given object and add to string vector.
+  virtual void WriteDown (iBase *obj, iStrVector *str, iEngine* engine);
+};
+
 #endif // _THINGLDR_H
 

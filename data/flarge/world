@@ -28,47 +28,71 @@ WORLD (
     MATERIAL 'white' (TEXTURE ('white.gif'))
   )
 
-  PLANE 'largeE' (
-    ORIG (20,17,20)
-    FIRST (20,17,19)
-    FIRST_LEN (5)
-    SECOND (20,16,20)
-    SECOND_LEN (5)
+  ADDON (
+    PLUGIN ('crystalspace.mesh.loader.plane')
+    PARAMS (
+      NAME ('largeE')
+      ORIG (20,17,20)
+      FIRST (20,17,19)
+      FIRST_LEN (5)
+      SECOND (20,16,20)
+      SECOND_LEN (5)
+    )
   )
-  PLANE 'largeN' (
-    ORIG (-20,17,20)
-    FIRST (-19,17,20)
-    FIRST_LEN (5)
-    SECOND (-20,16,20)
-    SECOND_LEN (5)
+  ADDON (
+    PLUGIN ('crystalspace.mesh.loader.plane')
+    PARAMS (
+      NAME ('largeN')
+      ORIG (-20,17,20)
+      FIRST (-19,17,20)
+      FIRST_LEN (5)
+      SECOND (-20,16,20)
+      SECOND_LEN (5)
+    )
   )
-  PLANE 'largeS' (
-    ORIG (20,17,6)
-    FIRST (19,17,6)
-    FIRST_LEN (5)
-    SECOND (20,16,6)
-    SECOND_LEN (5)
+  ADDON (
+    PLUGIN ('crystalspace.mesh.loader.plane')
+    PARAMS (
+      NAME ('largeS')
+      ORIG (20,17,6)
+      FIRST (19,17,6)
+      FIRST_LEN (5)
+      SECOND (20,16,6)
+      SECOND_LEN (5)
+    )
   )
-  PLANE 'largeW' (
-    ORIG (-20,17,6)
-    FIRST (-20,17,7)
-    FIRST_LEN (5)
-    SECOND (-20,16,6)
-    SECOND_LEN (5)
+  ADDON (
+    PLUGIN ('crystalspace.mesh.loader.plane')
+    PARAMS (
+      NAME ('largeW')
+      ORIG (-20,17,6)
+      FIRST (-20,17,7)
+      FIRST_LEN (5)
+      SECOND (-20,16,6)
+      SECOND_LEN (5)
+    )
   )
-  PLANE 'largeD' (
-    ORIG (-20,-1,20)
-    FIRST (-19,-1,20)
-    FIRST_LEN (5)
-    SECOND (-20,-1,19)
-    SECOND_LEN (5)
+  ADDON (
+    PLUGIN ('crystalspace.mesh.loader.plane')
+    PARAMS (
+      NAME ('largeD')
+      ORIG (-20,-1,20)
+      FIRST (-19,-1,20)
+      FIRST_LEN (5)
+      SECOND (-20,-1,19)
+      SECOND_LEN (5)
+    )
   )
-  PLANE 'corridoruD' (
-    ORIG (-20,8,30)
-    FIRST (-19,8,30)
-    FIRST_LEN (5)
-    SECOND (-20,8,29)
-    SECOND_LEN (5)
+  ADDON (
+    PLUGIN ('crystalspace.mesh.loader.plane')
+    PARAMS (
+      NAME ('corridoruD')
+      ORIG (-20,8,30)
+      FIRST (-19,8,30)
+      FIRST_LEN (5)
+      SECOND (-20,8,29)
+      SECOND_LEN (5)
+    )
   )
 
   MESHOBJ 'sprSkelFact' (
@@ -4753,40 +4777,60 @@ WORLD (
     )
     )
   )
-  PLANE 'streetD' (
-    ORIG (-43,-1.3,5)
-    FIRST (-42,-1.3,5)
-    FIRST_LEN (5)
-    SECOND (-43,-1.3,4)
-    SECOND_LEN (5)
+  ADDON (
+    PLUGIN ('crystalspace.mesh.loader.plane')
+    PARAMS (
+      NAME ('streetD')
+      ORIG (-43,-1.3,5)
+      FIRST (-42,-1.3,5)
+      FIRST_LEN (5)
+      SECOND (-43,-1.3,4)
+      SECOND_LEN (5)
+    )
   )
-  PLANE 'streetS' (
-    ORIG (-43,12,-10)
-    FIRST (-42,12,-10)
-    FIRST_LEN (3)
-    SECOND (-43,11,-10)
-    SECOND_LEN (3)
+  ADDON (
+    PLUGIN ('crystalspace.mesh.loader.plane')
+    PARAMS (
+      NAME ('streetS')
+      ORIG (-43,12,-10)
+      FIRST (-42,12,-10)
+      FIRST_LEN (3)
+      SECOND (-43,11,-10)
+      SECOND_LEN (3)
+    )
   )
-  PLANE 'streetN' (
-    ORIG (-43,12,5)
-    FIRST (-42,12,5)
-    FIRST_LEN (3)
-    SECOND (-43,11,5)
-    SECOND_LEN (3)
+  ADDON (
+    PLUGIN ('crystalspace.mesh.loader.plane')
+    PARAMS (
+      NAME ('streetN')
+      ORIG (-43,12,5)
+      FIRST (-42,12,5)
+      FIRST_LEN (3)
+      SECOND (-43,11,5)
+      SECOND_LEN (3)
+    )
   )
-  PLANE 'streetW' (
-    ORIG (-43,12,5)
-    FIRST (-43,12,4)
-    FIRST_LEN (3)
-    SECOND (-43,11,5)
-    SECOND_LEN (3)
+  ADDON (
+    PLUGIN ('crystalspace.mesh.loader.plane')
+    PARAMS (
+      NAME ('streetW')
+      ORIG (-43,12,5)
+      FIRST (-43,12,4)
+      FIRST_LEN (3)
+      SECOND (-43,11,5)
+      SECOND_LEN (3)
+    )
   )
-  PLANE 'streetE' (
-    ORIG (-3,12,5)
-    FIRST (-3,12,4)
-    FIRST_LEN (3)
-    SECOND (-3,11,5)
-    SECOND_LEN (3)
+  ADDON (
+    PLUGIN ('crystalspace.mesh.loader.plane')
+    PARAMS (
+      NAME ('streetE')
+      ORIG (-3,12,5)
+      FIRST (-3,12,4)
+      FIRST_LEN (3)
+      SECOND (-3,11,5)
+      SECOND_LEN (3)
+    )
   )
   SECTOR 'street1' (
     THING 'walls' (
