@@ -314,7 +314,7 @@ bool csGraphics2DOpenGL::Open()
 
     dmode.dmPelsWidth = Width;
     dmode.dmPelsHeight = Height;
-    dmode.dmFields = DM_PELSWIDTH | DM_PELSHEIGHT;
+    dmode.dmFields = DM_BITSPERPEL | DM_PELSWIDTH | DM_PELSHEIGHT;
 
     if((ti = ChangeDisplaySettings(&dmode, CDS_FULLSCREEN)) != DISP_CHANGE_SUCCESSFUL)
     {
@@ -363,6 +363,7 @@ bool csGraphics2DOpenGL::Open()
 
   ShowWindow( m_hWnd, m_nCmdShow );
   UpdateWindow( m_hWnd );
+  SetForegroundWindow(m_hWnd);
   SetFocus( m_hWnd );
 
 
@@ -497,3 +498,4 @@ bool csGraphics2DOpenGL::SetMousePosition (int x, int y)
 
   return true;
 }
+
