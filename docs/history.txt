@@ -24,6 +24,9 @@ The history order is reversed so that new features are at the top.
 	  and LinkApplicationConsole rules in unix.jam and win32.jam.
 	- Eric Sunshine corrected a number of typographical and other erros in
 	  comments in the Jam files (mk/jam).
+	- Eric Sunshine corrected some confusion in objectivec.jam where .mm
+	  and .M were being registered within the CMD.OBJC block rather than
+	  the CMD.OBJC++ block.
 5-May-2003
 	- Eric Sunshine changed jobber.pl and snapshot.py to once again use
 	  /home/groups/c/cr/crystal as a working area rather than /tmp.  It

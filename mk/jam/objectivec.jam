@@ -14,15 +14,6 @@ rule ObjCRule
 RegisterFileType ObjCRule : .m ;
 RegisterHeaderRule HeaderRule : $(HDRPATTERN) : .m ;
 
-rule ObjC++Rule
-{
-  local object = $(<:S=$(SUFOBJ)) ;
-  ObjC++ $(object) : $(<) ;
-  return $(object) ;
-}
-RegisterFileType ObjC++Rule : .mm .M ;
-RegisterHeaderRule HeaderRule : $(HDRPATTERN) : .mm .M ;
-
 rule ObjC
 {
   Depends $(<) : $(>) ;
@@ -40,6 +31,15 @@ actions ObjC
 
 if $(CMD.OBJC++)
 {
+rule ObjC++Rule
+{
+  local object = $(<:S=$(SUFOBJ)) ;
+  ObjC++ $(object) : $(<) ;
+  return $(object) ;
+}
+RegisterFileType ObjC++Rule : .mm .M ;
+RegisterHeaderRule HeaderRule : $(HDRPATTERN) : .mm .M ;
+
 rule ObjC++
 {
   Depends $(<) : $(>) ;
