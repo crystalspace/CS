@@ -3,6 +3,8 @@ The history order has been reversed so that new features are at the top.
 1-Aug-2000
 	- Fixed bug in embedded iPolygonMesh in csSprite3D.
 	- Fixed a bug in the rapid CD plugin.
+	- Fixed bug in WalkTest so that walking through CD enabled portals
+	  would not work if the level had only one sector.
 31-Jul-2000
 	- Fixed a number of remaining black border problems with lighting.
 	  These were especially visible in the mazedex level but could
