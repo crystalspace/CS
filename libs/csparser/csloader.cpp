@@ -151,6 +151,7 @@ CS_TOKEN_DEF_START
   CS_TOKEN_DEF (NOLIGHTING)
   CS_TOKEN_DEF (NOSHADOWS)
   CS_TOKEN_DEF (PARAMS)
+  CS_TOKEN_DEF (PARTSIZE)
   CS_TOKEN_DEF (PERSISTENT)
   CS_TOKEN_DEF (PLUGIN)
   CS_TOKEN_DEF (PLUGINS)
@@ -171,6 +172,7 @@ CS_TOKEN_DEF_START
   CS_TOKEN_DEF (SCALE_Z)
   CS_TOKEN_DEF (SECTOR)
   CS_TOKEN_DEF (SHIFT)
+  CS_TOKEN_DEF (SIZE)
   CS_TOKEN_DEF (SOUND)
   CS_TOKEN_DEF (SOUNDS)
   CS_TOKEN_DEF (START)
@@ -783,48 +785,50 @@ static float HeightMapFunc (void* data, float x, float y)
   return col * hm->hscale + hm->hshift;
 }
 
-static void SetHeightMap (csGenerateTerrainImage* gen, iImage* im,
-	float hscale, float hshift)
-{
-  HeightMapData* data = new HeightMapData ();	// @@@ Memory leak!!!
-  data->im = im;
-  data->iw = im->GetWidth ();
-  data->ih = im->GetHeight ();
-  data->w = float (data->iw);
-  data->h = float (data->ih);
-  data->p = (csRGBpixel*)im->GetImageData ();
-  data->hscale = hscale;
-  data->hshift = hshift;
-  data->im->IncRef ();
-  gen->SetHeightFunction (HeightMapFunc, (void*)data);
-}
-
 void csLoader::heightgen_process (char* buf)
 {
   CS_TOKEN_TABLE_START (commands)
     CS_TOKEN_TABLE (HEIGHTMAP)
     CS_TOKEN_TABLE (LAYER)
     CS_TOKEN_TABLE (TEXTURE)
+    CS_TOKEN_TABLE (SIZE)
+    CS_TOKEN_TABLE (PARTSIZE)
   CS_TOKEN_TABLE_END
 
   long cmd;
   char *params;
   char* name;
-  int w = 256, h = 256;
+  int totalw = 256, totalh = 256;
+  int partw = 64, parth = 64;
   csGenerateTerrainImage* gen = new csGenerateTerrainImage ();
+  HeightMapData* data = NULL;
 
   while ((cmd = csGetObject (&buf, commands, &name, &params)) > 0)
   {
     switch (cmd)
     {
+      case CS_TOKEN_SIZE:
+	ScanStr (params, "%d,%d", &totalw, &totalh);
+	break;
+      case CS_TOKEN_PARTSIZE:
+	ScanStr (params, "%d,%d", &partw, &parth);
+	break;
       case CS_TOKEN_HEIGHTMAP:
         {
 	  char heightmap[255];
 	  float hscale, hshift;
           ScanStr (params, "%s,%f,%f", &heightmap, &hscale, &hshift);
 	  iImage* img = LoadImage (heightmap, CS_IMGFMT_TRUECOLOR);
-	  SetHeightMap (gen, img, hshift, hscale);
-	  img->DecRef ();
+	  data = new HeightMapData ();	// @@@ Memory leak!!!
+  	  data->im = img;
+  	  data->iw = img->GetWidth ();
+  	  data->ih = img->GetHeight ();
+  	  data->w = float (data->iw);
+  	  data->h = float (data->ih);
+  	  data->p = (csRGBpixel*)(img->GetImageData ());
+  	  data->hscale = hscale;
+  	  data->hshift = hshift;
+  	  gen->SetHeightFunction (HeightMapFunc, (void*)data);
 	}
 	break;
       case CS_TOKEN_LAYER:
@@ -842,9 +846,8 @@ void csLoader::heightgen_process (char* buf)
         break;
       case CS_TOKEN_TEXTURE:
         {
-	  int totalw, totalh, startx, starty, partw, parth;
-	  ScanStr (params, "%d,%d,%d,%d,%d,%d", &totalw, &totalh,
-	  	&startx, &starty, &partw, &parth);
+	  int startx, starty;
+	  ScanStr (params, "%d,%d", &startx, &starty);
 	  iImage* img = gen->Generate (totalw, totalh, startx, starty,
 	  	partw, parth);
 	  iTextureHandle *TexHandle = G3D->GetTextureManager ()
@@ -861,6 +864,11 @@ void csLoader::heightgen_process (char* buf)
   }
 
   delete gen;
+  if (data)
+  {
+    data->im->DecRef ();
+    delete data;
+  }
 
   if (cmd == CS_PARSERR_TOKENNOTFOUND)
   {

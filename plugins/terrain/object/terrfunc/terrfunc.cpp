@@ -907,8 +907,8 @@ void csTerrFuncObject::SetupBaseMesh (G3DTriangleMesh& mesh, int bx, int by)
 #else
       uv.x += float (gx) / float (gridx);
       uv.y += float (gy) / float (gridy);
-      //uv.x = uv.x * .999;// + .0005;
-      //uv.y = uv.y * .999;// + .0005;
+      uv.x = uv.x * .96875 + .015625;	// @@@ HARDCODED FOR TEXTURES OF SIZE 64!!!!
+      uv.y = uv.y * .96875 + .015625;
 #endif
       mesh.texels[0][vtidx] = uv;
       mesh.vertex_colors[0][vtidx].Set (1, 1, 1);

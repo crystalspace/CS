@@ -26,6 +26,11 @@ The history order is reversed so that new features are at the top.
 	  crashes).
 	- If a sprite has only one frame then tweening will be disabled
 	  by default. This should increase performance a little for them.
+	- Fixed a bug in the new HEIGHTGEN keyword. Added SIZE and
+	  PARTSIZE to make it easier.
+	- Did a quick hack in the terrain engine so that it will correctly
+	  align for textures of size 64! Need to make it more general so
+	  that it works for all texture sizes though.
 3-May-2001
 	- Wouter Wijngaards did the following:
 	  added a class that can generate iImages for terrain textures on
