@@ -1,4 +1,4 @@
-DESCRIPTION.povie = POV mesh object plug-in
+DESCRIPTION.povie = POV Import/Export plug-in
 
 #------------------------------------------------------------- rootdefines ---#
 ifeq ($(MAKESECTION),rootdefines)

@@ -1,4 +1,4 @@
-DESCRIPTION.spr3die = POV mesh object plug-in
+DESCRIPTION.spr3die = Sprite3D import/export persistance plug-in
 
 #------------------------------------------------------------- rootdefines ---#
 ifeq ($(MAKESECTION),rootdefines)

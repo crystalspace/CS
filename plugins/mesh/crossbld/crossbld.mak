@@ -1,4 +1,4 @@
-DESCRIPTION.crossbld = Cross Build plug-in
+DESCRIPTION.crossbld = Mesh object cross-builder plug-in
 
 #------------------------------------------------------------- rootdefines ---#
 ifeq ($(MAKESECTION),rootdefines)

@@ -1,4 +1,4 @@
-DESCRIPTION.ieplex = POV mesh object plug-in
+DESCRIPTION.ieplex = Model Import/Export multiplexer plug-in
 
 #------------------------------------------------------------- rootdefines ---#
 ifeq ($(MAKESECTION),rootdefines)
