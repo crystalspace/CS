@@ -2275,7 +2275,11 @@ void csGraphics3DOGLCommon::DrawPolygonSingleTexture (G3DPolygonDP& poly)
     queue.mixmode |= CS_FX_GOURAUD; 
 
     int ir = 255, ig = 255, ib = 255;
-    if (lm) lm->GetMeanLighting(ir, ig, ib);
+    if (lm) 
+    {
+      tex->RecalculateDynamicLights ();
+      lm->GetMeanLighting(ir, ig, ib);
+    }
     float lgt_r = ir/128.0f, lgt_g = ig/128.0f, lgt_b = ib/128.0f;
 
     for (i = 0; i < poly.num; i++)
