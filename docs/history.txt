@@ -114,6 +114,8 @@ The history order has been reversed so that new features are at the top.
 	      2D entry.
 	    - Removed BeOS-specific garbage from the common Glide canvas
 	      implementation.
+	- Eric Sunshine fixed the 'clean --> cleandoc' chain rule in docs.mak
+	  which broke on September 29, 2000.
 12-Oct-2000
 	- Disabled a new CS_ASSERT that was put in csVector::Get(). The
 	  problem was that some code in CS assumes that Get() also extends

@@ -205,10 +205,8 @@ ifeq ($(MAKESECTION),targets)
 
 ifeq ($(DO_DOC),yes)
 
-.PHONY: devapi pubapi htmldoc dvidoc psdoc pdfdoc infodoc repairdoc cleandoc
+.PHONY: devapi pubapi htmldoc dvidoc psdoc pdfdoc infodoc
 .PHONY: do-devapi do-pubapi do-htmldoc do-dvidoc do-infodoc
-
-clean: cleandoc
 
 # Rules for making output and image directories.
 $(OUT.DOC): $(OUTBASE)
@@ -359,10 +357,13 @@ infodoc: \
 endif # ifeq ($(DO_DOC),yes)
 
 # Repair out-of-date and broken @node and @menu directives in Texinfo source.
+.PHONY: repairdoc
 repairdoc:
 	$(PERL) $(NODEFIX) --include-dir=$(CSMANUAL_DIR) $(CSMANUAL_FILE)
 
 # Remove all target documentation directories.
+.PHONY: cleandoc
+clean: cleandoc
 cleandoc:
 	$(RMDIR) $(OUT.DOC)
 
