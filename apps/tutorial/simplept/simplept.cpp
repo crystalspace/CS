@@ -318,7 +318,7 @@ bool Simple::Initialize (int argc, const char* const argv[],
   iStatLight* light;
   light = engine->CreateLight (NULL, csVector3 (0, 0, 0), 20,
   	csColor (1, 1, 1), false);
-  room->GetLights ()->AddLight (light->QueryLight ());
+  room->GetLights ()->Add (light->QueryLight ());
   light->DecRef ();
 
   engine->Prepare ();
