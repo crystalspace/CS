@@ -22,6 +22,7 @@ chronological order.
 	  docs.
 	- res extended the "External Libraries" list somewhat.
 	- res fixed a small formatting error in the VC build docs.
+        - Philip Wyett eliminsted signed/unsigned warnings in simpleformer.
 19-Mar-2004
 	- res fixed compilation of the aseie plugin.
 	- duhprey overrided the correct Write in null2d (from Jorrit)

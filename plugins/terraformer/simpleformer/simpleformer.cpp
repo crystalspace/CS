@@ -95,17 +95,19 @@ void csSimpleFormer::SetHeightmap (iImage *heightmap)
     // Keep an index to avoid uneccesary x+y*w calculations
     int idx = 0;
 
+    unsigned int x, y;
     // Loop through the data
-    for (int y=0; y<height; ++y)
+    for (y = 0; y < height; ++y)
     {
-      for (int x=0; x<width; ++x)
+      for (x = 0; x < width; ++x)
       {
         // Grab the intensity as height
         heightData[idx] = data[idx].Intensity ()/255.0;
         idx++;
       }
     }
-  } else if (heightmap->GetFormat () & CS_IMGFMT_PALETTED8)
+  }
+  else if (heightmap->GetFormat () & CS_IMGFMT_PALETTED8)
   {
     // It's a paletted image, so we grab data & palette
     unsigned char *data = (unsigned char*)heightmap->GetImageData ();
@@ -114,13 +116,14 @@ void csSimpleFormer::SetHeightmap (iImage *heightmap)
     // Keep an index to avoid uneccesary x+y*w calculations
     int idx = 0;
 
+    unsigned int x, y;
     // Loop through the data
-    for (int y=0; y<height; ++y)
+    for (y = 0; y < height; ++y)
     {
-      for (int x=0; x<width; ++x)
+      for (x = 0; x < width; ++x)
       {
         // Grab the intensity as height
-        heightData[idx] = palette[data[idx]].Intensity ()/255.0;
+        heightData[idx] = palette[data[idx]].Intensity () / 255.0;
         idx++;
       }
     }
@@ -529,4 +532,3 @@ void csSimpleSampler::Cleanup ()
   delete[] edgePositions;
   edgePositions = 0;
 }
-
