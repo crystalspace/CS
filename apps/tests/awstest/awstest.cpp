@@ -55,6 +55,11 @@
 #include "iutil/eventq.h"
 #include "qsqrt.h"
 
+#include "csgeom/csrect.h"
+#include "csgeom/csrectrg.h"
+
+
+
 #include "awstest.h"
 #include "plugins/aws/awswin.h"
 #include <stdio.h>
@@ -92,6 +97,31 @@ awsTest::awsTest()
   aws = NULL;
   view = NULL;
   message[0] = 0;
+
+//#ifdef 0
+
+  // This code is used to perform dry runs on the csrectregion code.
+
+  csRectRegion rgn;
+  csRect r1(10,10,100,100);
+  csRect r2(5,50,75,75);
+  csRect r3(50,90,100,200);
+
+  rgn.Include(r1);
+  rgn.Exclude(r2);
+  rgn.Include(r3);
+
+  printf("awstest: number of regions in test: %d\n", rgn.Count());
+
+  int i;
+  for(i=0; i<rgn.Count(); ++i)
+  {
+    csRect &r=rgn.RectAt(i);
+    printf("\t%d,%d,%d,%d\n", r.xmin, r.ymin, r.xmax, r.ymax);
+  }
+
+//#endif
+
 }
 
 awsTest::~awsTest()

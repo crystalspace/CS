@@ -22,14 +22,6 @@ main(int argc, char *argv[])
   // Create our main class.
   System = new awsTest();
 
-  //System->RequestPlugin ("crystalspace.kernel.vfs:VFS");
-  //System->RequestPlugin ("crystalspace.font.server.default:FontServer");
-  //System->RequestPlugin ("crystalspace.graphic.image.io.multiplex:ImageLoader");
-  //System->RequestPlugin ("crystalspace.graphics3d.software:VideoDriver");
-  //System->RequestPlugin ("crystalspace.engine.3d:Engine");
-  //System->RequestPlugin ("crystalspace.level.loader:LevelLoader");
-
-
   // Initialize the main system. This will load all needed plug-ins
   // and initialize them.
   if (!System->Initialize(argc, argv, "/config/awstest.cfg"))
