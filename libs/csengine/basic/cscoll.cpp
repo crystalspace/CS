@@ -44,7 +44,6 @@ csCollection::csCollection (csEngine* engine) :
 
 csCollection::~csCollection ()
 {
-  engine->UnlinkCollection (this);
 }
 
 iObject* csCollection::FindObject (char* name)
