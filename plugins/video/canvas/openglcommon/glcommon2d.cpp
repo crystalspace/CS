@@ -162,7 +162,7 @@ void csGraphics2DGLCommon::DrawLine (int x1, int y1, int x2, int y2, int color)
   glEnd ();
 }
 
-void csGraphics2DGLCommon::DrawHorizLine (int x1, int x2, int y, int color)
+void csGraphics2DGLCommon::DrawBox (int x, int y, int w, int h, int color)
 {
   // prepare for 2D drawing--so we need no fancy GL effects!
   glDisable (GL_TEXTURE_2D);
@@ -170,9 +170,11 @@ void csGraphics2DGLCommon::DrawHorizLine (int x1, int x2, int y, int color)
   glDisable (GL_DEPTH_TEST);
   setGLColorfromint(color);
 
-  glBegin (GL_LINES);
-  glVertex2i (x1, Height-y-1);
-  glVertex2i (x2, Height-y-1);
+  glBegin (GL_QUADS);
+  glVertex2i (x, Height - y - 1);
+  glVertex2i (x + w - 1, Height - y - 1);
+  glVertex2i (x + w - 1, Height - (y + h - 1) - 1);
+  glVertex2i (x, Height - (y + h - 1) - 1);
   glEnd ();
 }
 

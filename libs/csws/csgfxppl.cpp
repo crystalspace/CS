@@ -184,11 +184,9 @@ void csGraphicsPipeline::Flush (int iCurPage)
         break;
       case pipeopBOX:
       {
-        int y;
-        // Const expressions should be eliminated by GCC's CSE,
-        // so don't care about them
-        for (y = op->Box.ymin; y < op->Box.ymax; y++)
-          System->piG2D->DrawHorizLine (op->Box.xmin, op->Box.xmax - 1, y, op->Box.color);
+        System->piG2D->DrawBox (op->Box.xmin, op->Box.ymin,
+          op->Box.xmax - op->Box.xmin + 1, op->Box.ymax - op->Box.ymin + 1,
+          op->Box.color);
         INCLUDE_MIN_POINT (op->Box.xmin, op->Box.ymin);
         INCLUDE_MAX_POINT (op->Box.xmax, op->Box.ymax);
         break;

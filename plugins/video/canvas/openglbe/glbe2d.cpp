@@ -355,21 +355,6 @@ void csGraphics2DGLBe::DrawLine (int x1, int y1, int x2, int y2, int color)
   glEnd ();
 }
 
-void csGraphics2DGLBe::DrawHorizLine (int x1, int x2, int y, int color)
-{
-  // the following taken from GLX version
-  // prepare for 2D drawing--so we need no fancy GL effects!
-  glDisable (GL_TEXTURE_2D);
-  glDisable (GL_BLEND);
-  glDisable (GL_DEPTH_TEST);
-  //glColor3f (1., 1., 1.);
-  setGLColorfromint(color);
-  glBegin (GL_LINES);
-  glVertex2i (x1, Height-y-1);
-  glVertex2i (x2, Height-y-1);
-  glEnd ();
-}
-
 void csGraphics2DGLBe::DrawPixelGL (int x, int y, int color)
 {
   // the following taken from GLX version

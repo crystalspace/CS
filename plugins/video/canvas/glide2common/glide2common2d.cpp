@@ -145,19 +145,6 @@ void csGraphics2DGlideCommon::DrawLine (int x1, int y1, int x2, int y2, int colo
   grDrawLine(&a,&b);
 }
 
-void csGraphics2DGlideCommon::DrawHorizLine (int x1, int x2, int y, int color)
-{
-  // can't do this while framebuffer is locked...
-  if (locked) return; 
- 
-  GrVertex a,b;
-  a.x=x1; a.y=y;
-  b.x=x2; b.y=y;
-
-  grConstantColorValue(color);
-  grDrawLine(&a,&b);
-}
-
 void csGraphics2DGlideCommon::DrawPixelGlide (int x, int y, int color)
 {
    // can't do this while framebuffer is locked...

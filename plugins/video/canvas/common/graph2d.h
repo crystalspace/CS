@@ -126,8 +126,8 @@ public:
   static void (*DrawPixel) (int x, int y, int color);
   /// Draw a line
   virtual void DrawLine (float x1, float y1, float x2, float y2, int color);
-  /// Draw a horizontal line
-  virtual void DrawHorizLine (int x1, int x2, int y, int color);
+  /// Draw a box of given width and height
+  virtual void DrawBox (int x, int y, int w, int h, int color);
   /// (*) Set a color index to given R,G,B (0..255) values
   virtual void SetRGB (int i, int r, int g, int b);
   /// Write a text string into the back buffer

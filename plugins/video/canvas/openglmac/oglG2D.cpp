@@ -477,17 +477,6 @@ void csGraphics2DOpenGL::DrawLine( float x1, float y1, float x2, float y2, int c
 	glEnd();
 }
 
-void csGraphics2DOpenGL::DrawHorizLine (int x1, int x2, int y, int color)
-{
-	glDisable(GL_TEXTURE_2D);
-	glDisable(GL_BLEND);
-	glBegin(GL_LINES);
-	SetGLColorfromInt( color );
-	glVertex2i(x1, Height-y-1);
-	glVertex2i(x2, Height-y-1);
-	glEnd ();
-}
-
 void csGraphics2DOpenGL::DrawPixelGL (int x, int y, int color)
 {
 	glDisable(GL_TEXTURE_2D);

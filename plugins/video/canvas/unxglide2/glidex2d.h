@@ -118,7 +118,6 @@ public:
   virtual bool SetMouseCursor (int iShape, ITextureHandle *iBitmap);
 
   virtual void DrawLine (int x1, int y1, int x2, int y2, int color);
-  virtual void DrawHorizLine (int x1, int x2, int y, int color);
   
   void DrawPixelGlide (int x, int y, int color);
   static void WriteCharGlide (int x, int y, int fg, int bg, char c);

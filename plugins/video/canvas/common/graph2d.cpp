@@ -66,7 +66,7 @@ csGraphics2D::csGraphics2D (ISystem* piSystem)
 
 void csGraphics2D::Initialize ()
 {
-  // Get the system parameters  
+  // Get the system parameters
   system->GetWidthSetting (Width);
   system->GetHeightSetting (Height);
   system->GetDepthSetting (Depth);
@@ -142,8 +142,7 @@ void csGraphics2D::FinishDraw ()
 
 void csGraphics2D::Clear(int color)
 {
-  for (int y = 0; y < Height; y++)
-    DrawHorizLine (0, Width - 1, y, color);
+  DrawBox (0, 0, Width, Height, color);
 }
 
 bool csGraphics2D::DoubleBuffer (bool Enable)
@@ -198,8 +197,8 @@ void csGraphics2D::DrawLine (float x1, float y1, float x2, float y2, int color)
   if (ClipLine (x1, y1, x2, y2, ClipX1, ClipY1, ClipX2, ClipY2))
     return;
 
-  int fx1 = (int) x1, fx2 = (int) x2,
-      fy1 = (int) y1, fy2 = (int) y2;
+  int fx1 = QInt (x1), fx2 = QInt (x2),
+      fy1 = QInt (y1), fy2 = QInt (y2);
   if (abs (fx2 - fx1) > abs (fy2 - fy1))
   {
     // Transform floating-point format to 16.16 fixed-point
@@ -241,41 +240,75 @@ void csGraphics2D::DrawLine (float x1, float y1, float x2, float y2, int color)
     }
   }
   else if (fx2 - fx1)
-    DrawHorizLine (fx1, fx2, fy1, color);
+  {
+    if (fx1 > fx2) { int tmp = fx1; fx1 = fx2; fx2 = tmp; }
+    int count = x2 - x1 + 1;
+    switch (pfmt.PixelBytes)
+    {
+      case 1:
+        memset (GetPixelAt (fx1, fy1), color, count);
+        break;
+      case 2:
+      {
+        UShort *dest = (UShort *)GetPixelAt (fx1, fy1);
+        while (count--) *dest++ = color;
+        break;
+      }
+      case 4:
+      {
+        ULong *dest = (ULong *)GetPixelAt (fx1, fy1);
+        while (count--) *dest++ = color;
+        break;
+      }
+    } /* endswitch */
+  }
   else
     DrawPixel (fx1, fy1, color);
 }
 #endif
 
-void csGraphics2D::DrawHorizLine (int x1, int x2, int y, int color)
+void csGraphics2D::DrawBox (int x, int y, int w, int h, int color)
 {
-  if ((y >= ClipY1) && (y <= ClipY2))
+  if ((x > ClipX2) || (y > ClipY2))
+    return;
+  if (x < ClipX1)
+    w += (x - ClipX1), x = ClipX1;
+  if (y < ClipY1)
+    h += (y - ClipY1), y = ClipY1;
+  if (x + w > ClipX2)
+    w = ClipX2 - x;
+  if (x + h > ClipX2)
+    h = ClipY2 - y;
+  if ((w <= 0) || (h <= 0))
+    return;
+  switch (pfmt.PixelBytes)
   {
-    if (x1 > x2) { int tmp = x1; x1 = x2; x2 = tmp; }
-    if (x1 < ClipX1) x1 = ClipX1;
-    if (x2 > ClipX2) x2 = ClipX2;
-    if (x1 <= x2)
-      switch (pfmt.PixelBytes)
+    case 1:
+      while (w)
       {
-        case 1:
-          memset (GetPixelAt (x1, y), color, x2 - x1 + 1);
-          break;
-        case 2:
-        {
-          UShort *dest = (UShort *)GetPixelAt (x1, y);
-          int count = x2 - x1 + 1;
-          while (count--) *dest++ = color;
-          break;
-        }
-        case 4:
-        {
-          ULong *dest = (ULong *)GetPixelAt (x1, y);
-          int count = x2 - x1 + 1;
-          while (count--) *dest++ = color;
-          break;
-        }
-      } /* endswitch */
-  }
+        memset (GetPixelAt (x, y), color, w);
+        y++;
+      } /* endwhile */
+      break;
+    case 2:
+      while (w)
+      {
+        register UShort *dest = (UShort *)GetPixelAt (x, y);
+        register int count = w;
+        while (count--) *dest++ = color;
+        y++;
+      } /* endwhile */
+      break;
+    case 4:
+      while (w)
+      {
+        register ULong *dest = (ULong *)GetPixelAt (x, y);
+        register int count = w;
+        while (count--) *dest++ = color;
+        y++;
+      } /* endwhile */
+      break;
+  } /* endswitch */
 }
 
 void csGraphics2D::Write (int x, int y, int fg, int bg, char *text)

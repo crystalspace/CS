@@ -141,7 +141,6 @@ void csGraphics2DGLX::Initialize ()
   DrawSprite = DrawSpriteGL;
 }
 
-
 csGraphics2DGLX::~csGraphics2DGLX ()
 {
   // Destroy your graphic interface

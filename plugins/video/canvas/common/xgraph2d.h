@@ -52,10 +52,10 @@ class IXGraphics2D : public IGraphics2D
   /// Clear all video pages.
   STDMETHODIMP ClearAll (int color);
 
-  /// Draw a horizontal line.
-  STDMETHODIMP DrawHorizLine (int x1, int x2, int y, int color);
   /// Draw a line.
   STDMETHODIMP DrawLine (float x1, float y1, float x2, float y2, int color);
+  /// Draw a box
+  STDMETHODIMP DrawBox (int x, int y, int w, int h, int color);
   /// Draw a pixel.
   STDMETHODIMP DrawPixel (int x, int y, int color);
   /// Returns the address of the pixel at the specified (x, y) coordinates.

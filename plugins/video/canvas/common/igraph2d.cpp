@@ -63,13 +63,6 @@ STDMETHODIMP IXGraphics2D::DoubleBuffer(bool Enable)
   return pThis->DoubleBuffer(Enable) ? S_OK : S_FALSE;
 }
 
-STDMETHODIMP IXGraphics2D::DrawHorizLine(int x1, int x2, int y, int color)
-{
-  METHOD_PROLOGUE( csGraphics2D, XGraphics2D );
-  pThis->DrawHorizLine(x1, x2, y, color);
-  return S_OK;
-}
-
 STDMETHODIMP IXGraphics2D::DrawLine(float x1, float y1, float x2, float y2, int color)
 {
   METHOD_PROLOGUE( csGraphics2D, XGraphics2D );
@@ -77,6 +70,12 @@ STDMETHODIMP IXGraphics2D::DrawLine(float x1, float y1, float x2, float y2, int 
   return S_OK;
 }
 
+STDMETHODIMP IXGraphics2D::DrawBox (int x, int y, int w, int h, int color)
+{
+  METHOD_PROLOGUE( csGraphics2D, XGraphics2D );
+  (pThis->DrawBox)(x, y, w, h, color);
+  return S_OK;
+}
 
 STDMETHODIMP IXGraphics2D::DrawPixel(int x, int y, int color)
 {

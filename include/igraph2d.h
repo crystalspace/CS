@@ -159,10 +159,10 @@ interface IGraphics2D : public IUnknown
   /// Clear all video pages.
   STDMETHOD (ClearAll) (int color) PURE;
 
-  /// Draw a horizontal line.
-  STDMETHOD (DrawHorizLine) (int x1, int x2, int y, int color) PURE;
   /// Draw a line.
   STDMETHOD (DrawLine) (float x1, float y1, float x2, float y2, int color) PURE;
+  /// Draw a box
+  STDMETHOD (DrawBox) (int x1, int x2, int y1, int y2, int color) PURE;
  /**
   * Clip a line against given rectangle.
   * Function returns S_OK if line is not visible.

@@ -108,8 +108,6 @@ public:
   void SetTMUPalette(int tmu);
   /// Draw a line
   virtual void DrawLine (int x1, int y1, int x2, int y2, int color);
-  /// Draw a horizontal line
-  virtual void DrawHorizLine (int x1, int x2, int y, int color);
   /// Draw a pixel
   static void DrawPixelGlide (int x, int y, int color);
   /// Write a single character

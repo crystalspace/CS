@@ -93,8 +93,8 @@ public:
 
   /// Draw a line
   virtual void DrawLine (int x1, int y1, int x2, int y2, int color);
-  /// Draw a horizontal line
-  virtual void DrawHorizLine (int x1, int x2, int y, int color);
+  /// Draw a box
+  virtual void DrawBox (int x, int y, int w, int h, int color);
   /// Draw a pixel
   static void DrawPixelGL (int x, int y, int color);
   /// Write a single character
