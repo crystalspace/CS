@@ -6,7 +6,7 @@ ifeq ($(MAKESECTION),rootdefines)
 
 # Application-specific help commands
 APPHELP += \
-  $(NEWLINE)echo $"  make netut     Make the $(DESCRIPTION.netut)$"
+  $(NEWLINE)echo $"  make netut        Make the $(DESCRIPTION.netut)$"
 
 endif # ifeq ($(MAKESECTION),rootdefines)
 
