@@ -166,7 +166,7 @@ csPolygonBspContainer::~csPolygonBspContainer ()
   }
 }
 
-void csPolygonSet::AddPolygon (csPolygonInt* poly)
+void csPolygonBspContainer::AddPolygon (csPolygonInt* poly)
 {
   if (num_polygon >= max_polygon)
   {
