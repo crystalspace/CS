@@ -16,12 +16,12 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-//-----------------------------------------------------------------------------
-// Clients should #include this file in order to restore some sanity to the
-// global preprocessor namespace after #including MS Windows headers. This file
-// #undefines various MS macros which interfere with method names in our own
-// classes.
-//-----------------------------------------------------------------------------
+/**\file
+ * Clients should #include this file in order to restore some sanity to the
+ * global preprocessor namespace after #including MS Windows headers. This file
+ * #undefines various MS macros which interfere with method names in our own
+ * classes.
+*/
 #undef DeleteFile
 #undef GetClassName
 #undef LoadImage
