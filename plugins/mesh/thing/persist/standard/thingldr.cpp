@@ -765,7 +765,7 @@ bool csThingLoader::ParsePoly3d (
         portal_verts[i] = thing_fact_state->GetPolygonVertex (
 		CS_POLYINDEX_LAST, i);
 
-      int portal_pri = portal_pri = engine->GetPortalRenderPriority ();
+      int portal_pri = engine->GetPortalRenderPriority ();
       if (portal_pri == 0)
         portal_pri = mesh->GetRenderPriority ();
       char pc_name[100];
