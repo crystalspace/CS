@@ -213,9 +213,6 @@ void csFancyConsole::Draw3D (csRect *oArea)
 
   G3D->SetRenderState (G3DRENDERSTATE_ZBUFFERMODE, CS_ZBUF_NONE);
 
-  int height = G3D->GetHeight ();
-  int width = G3D->GetWidth ();
-
   // first draw the background
   // do we draw gouraud/flat or with texture ?
 
@@ -229,7 +226,6 @@ void csFancyConsole::Draw3D (csRect *oArea)
 
   float hw = float (G3D->GetWidth () / 2);
   float hh = float (G3D->GetHeight () / 2);
-  float asp = hw / hh;
 
   static uint indices[4] = {0, 1, 2, 3};
   csVector3 vertices[4];
