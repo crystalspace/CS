@@ -386,6 +386,11 @@ bool csGraphics3DOGLCommon::NewOpen (const char *Title)
   delete [] transientfogdata;
 
   glGetIntegerv (GL_MAX_TEXTURE_SIZE, &max_texture_size);
+  // adjust max texture size if bigger than maxwidth/height from config
+  if(Caps.maxTexWidth < max_texture_size)
+    max_texture_size = Caps.maxTexWidth;
+  if(Caps.maxTexHeight < max_texture_size)
+    max_texture_size = Caps.maxTexHeight;
 
   int max_cache_size = 1024*1024*16; // 32mb combined cache
   texture_cache = new OpenGLTextureCache (max_cache_size, 24);
