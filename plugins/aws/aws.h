@@ -32,8 +32,6 @@
 # include "awscomp.h"
 # include "awswin.h"
 
-const int awsNumRectBuckets = 32;
-
 /**
  *
  *  This is the alternate windowing system plugin.  It defines a simple, lightweight alternative to the current CSWS
@@ -355,4 +353,6 @@ public:
   }
   *scfiEventHandler;
 };
+
 #endif
+

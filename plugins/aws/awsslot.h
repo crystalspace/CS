@@ -58,6 +58,9 @@ public:
   /// Registers a sink by name for lookup.
   virtual void RegisterSink (const char *name, iAwsSink *sink);
 
+  /// Removes a sink
+  virtual bool RemoveSink (iAwsSink* sink);
+
   /// Finds a sink by name for connection.
   virtual iAwsSink *FindSink (const char *name);
 

@@ -67,7 +67,6 @@ awsWindow::~awsWindow ()
 {
 }
 
-
 bool awsWindow::Setup (iAws *_wmgr, iAwsComponentNode *settings)
 {
   style = fsNormal;
@@ -76,7 +75,6 @@ bool awsWindow::Setup (iAws *_wmgr, iAwsComponentNode *settings)
   if (Layout ()) Layout ()->SetOwner (GetComponent());
 
   iAwsPrefManager *pm = WindowManager ()->GetPrefMgr ();
-
 
   // set the default options depending on style
   // the constructor by default includes them all

@@ -55,6 +55,17 @@ void awsSinkManager::RegisterSink (const char *name, iAwsSink *sink)
   sinks.Push (new SinkMap (NameToId (name), sink));
 }
 
+bool awsSinkManager::RemoveSink (iAwsSink* sink)
+{
+  int rc = sinks.Find (sink);
+  if (rc<0)
+    return false;
+
+  sinks.Delete(rc);
+  sink->DecRef ();
+  return true;
+}
+
 iAwsSink *awsSinkManager::FindSink (const char *_name)
 {
   int i;

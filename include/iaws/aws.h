@@ -471,6 +471,8 @@ struct iAwsSinkManager : public iBase
   /// Registers a sink by name for lookup.
   virtual void RegisterSink(const char *name, iAwsSink *sink)=0;
 
+  virtual bool RemoveSink (iAwsSink* sink) = 0;
+
   /// Finds a sink by name for connection.
   virtual iAwsSink* FindSink(const char *name)=0;
 
