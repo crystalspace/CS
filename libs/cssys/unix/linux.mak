@@ -9,7 +9,8 @@ DESCRIPTION.OS.linux = Linux
 PLUGINS+=video/canvas/softx
 PLUGINS+=video/renderer/opengl video/canvas/openglx
 PLUGINS+=video/canvas/linex
-#PLUGINS+=video/decoder/opendivx
+#PLUGINS+=video/format/codecs/opendivx
+#PLUGINS+=video/format/avi
 
 # Uncomment the following to build GGI 2D and/or SDL drivers
 #PLUGINS+=video/canvas/ggi 
