@@ -868,7 +868,6 @@
     <meshfact name="stair_rail">
         <plugin>thingFact</plugin>
         <params>
-            <fastmesh />
             <v x="-0.05" y="-0.6" z="-0.05" />
             <v x="-0.05" y="-0.6" z="0.05" />
             <v x="-0.05" y="0.6" z="-0.05" />
@@ -1003,7 +1002,6 @@
     <meshfact name="stair">
         <plugin>thingFact</plugin>
         <params>
-            <fastmesh />
             <v x="-0.8" y="-0.1" z="-0.25" />
             <v x="-0.8" y="-0.1" z="0.25" />
             <v x="-0.8" y="0.1" z="-0.25" />
