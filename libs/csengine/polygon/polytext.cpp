@@ -86,8 +86,11 @@ class csDelayedLightingInfo : public csFrustrumViewCleanup
       }
     }
 
+    int GetShadowCount ()
+    { return shadows.Length (); }
+
     csShadowFrustum *GetShadow (int idx)
-    { return (csShadowFrustum *)shadows.Get (idx); }
+    { return (csShadowFrustum *)(idx < shadows.Length () ? shadows.Get (idx) : NULL); }
 
     ~LightViewInfo ()
     {
@@ -119,10 +122,10 @@ public:
 
   // Return total number of shadows
   int GetShadowCount ()
-  { return lvlist.Get (lvlist.Length () - 1)->shadows.Length (); }
+  { return lvlist.Get (lvlist.Length () - 1)->GetShadowCount (); }
   // Get Nth shadow frustum
   csShadowFrustum *GetShadow (int idx)
-  { return (csShadowFrustum *)lvlist.Get (lvlist.Length () - 1)->shadows.Get (idx); }
+  { return lvlist.Get (lvlist.Length () - 1)->GetShadow (idx); }
 
   // Collect a reference from given frustum to our lightmap
   bool Collect (csFrustumView *lview, csPolygon3D *poly);
