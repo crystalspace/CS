@@ -9,6 +9,9 @@ The history order is reversed so that new features are at the top.
 	  as part of Eric's other fixes to SCF.  This patch eliminates a
 	  shutdown-time crash caused by static global variables being destroyed
 	  twice.  (Bug #752140)
+	- res fixed a stupid bug in the Win32 registry configuration where a 
+	  string was deleted and immediately used after. One of the symptoms
+	  were non-functional writing of settings.
 10-Jun-2003
         - Philip Wyett eliminated signed/unsigned mismatch warning in
           function csString::SubString ().

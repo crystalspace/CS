@@ -78,8 +78,11 @@ bool csRegistryConfig::TryOpen (HKEY& regKey, DWORD access,
   if (!keyName || (*keyName == 0))
     return false;
 
-  delete[] Key;
-  Key = csStrNew (keyName);
+  if (Key != keyName)
+  {
+    delete[] Key;
+    Key = csStrNew (keyName);
+  }
 
   CS_ALLOC_STACK_ARRAY (char, key, 9 + strlen (Key) + 1); // 9 = Length "Software\"
   sprintf (key, "Software\\%s", Key);
