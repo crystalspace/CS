@@ -16,6 +16,9 @@ chronological order.
 	  Together with the PREMULTALPHA mixmode, the bottom part is blended
 	  additive, while the upper part is alpha-blended (thus, the fire 
 	  looks more "firey" while the smoke stays opaque).
+	- res changed csEvent to internally store the property names as string
+	  IDs instead of csStrKeys to save some memory (it is expected that 
+	  only few distinct property names are used).
 15-Jul-2004
 	- Eric Sunshine fixed shell quoting problems from 10-Jul-2004 change to
 	  GenerateWin32ManifestRc rule in win32.jam which caused 'sed'

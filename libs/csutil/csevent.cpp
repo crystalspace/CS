@@ -34,6 +34,8 @@ SCF_IMPLEMENT_IBASE (csEvent)
   SCF_IMPLEMENTS_INTERFACE (csEvent)
 SCF_IMPLEMENT_IBASE_END
 
+CS_IMPLEMENT_STATIC_VAR(GetEventStrSet, csStringSet, ())
+
 char const* csEvent::GetTypeName (csEventAttributeType t)
 {
   switch (t)
@@ -48,6 +50,16 @@ char const* csEvent::GetTypeName (csEventAttributeType t)
       break;
   }
   return "unknown";
+}
+
+csStringID csEvent::GetKeyID (const char* key)
+{
+  return GetEventStrSet()->Request (key);
+}
+
+const char* csEvent::GetKeyName (csStringID id)
+{
+  return GetEventStrSet()->Request (id);
 }
 
 csEvent::csEvent ()
@@ -145,54 +157,54 @@ csEvent::~csEvent ()
 
 bool csEvent::Add (const char *name, float v)
 {
-  if (attributes.In (name)) return false;
+  if (attributes.In (GetKeyID (name))) return false;
   attribute* object = new attribute (csEventAttrFloat);
   object->doubleVal = v;
-  attributes.Put (name, object);
+  attributes.Put (GetKeyID (name), object);
   count++;
   return true;
 }
 
 bool csEvent::Add (const char *name, double v)
 {
-  if (attributes.In (name)) return false;
+  if (attributes.In (GetKeyID (name))) return false;
   attribute* object = new attribute (csEventAttrFloat);
   object->doubleVal = v;
-  attributes.Put (name, object);
+  attributes.Put (GetKeyID (name), object);
   count++;
   return true;
 }
 
 bool csEvent::Add (const char *name, bool v)
 {
-  if (attributes.In (name)) return false;
+  if (attributes.In (GetKeyID (name))) return false;
   attribute* object = new attribute (csEventAttrInt);
   object->intVal = v ? 1 : 0;
-  attributes.Put (name, object);
+  attributes.Put (GetKeyID (name), object);
   count++;
   return true;
 }
 
 bool csEvent::Add (const char *name, const char *v)
 {
-  if (attributes.In (name)) return false;
+  if (attributes.In (GetKeyID (name))) return false;
   attribute* object = new attribute (csEventAttrDatabuffer);
   object->dataSize = strlen(v);
   object->bufferVal = csStrNew(v);
-  attributes.Put (name, object);
+  attributes.Put (GetKeyID (name), object);
   count++;
   return true;
 }
 
 bool csEvent::Add (const char *name, const void *v, size_t size)
 {
-  if (attributes.In (name)) return false;
+  if (attributes.In (GetKeyID (name))) return false;
   attribute* object = new attribute (csEventAttrDatabuffer);
   object->bufferVal = new char[size + 1];
   memcpy (object->bufferVal, v, size);
   object->bufferVal[size] = 0;
   object->dataSize = size;
-  attributes.Put (name, object);
+  attributes.Put (GetKeyID (name), object);
   count++;
   return true;
 }
@@ -219,14 +231,14 @@ bool csEvent::CheckForLoops (iEvent* current, iEvent* e)
 
 bool csEvent::Add (const char *name, iEvent *v)
 {
-  if (attributes.In (name)) return false;
+  if (attributes.In (GetKeyID (name))) return false;
   if (this == v)
     return false;
   if (v && CheckForLoops(v, this))
   {
     attribute* object = new attribute (csEventAttrEvent);
     (object->ibaseVal = (iBase*)v)->IncRef();
-    attributes.Put (name, object);
+    attributes.Put (GetKeyID (name), object);
     count++;
     return true;
   }
@@ -235,12 +247,12 @@ bool csEvent::Add (const char *name, iEvent *v)
   
 bool csEvent::Add (const char *name, iBase* v)
 {
-  if (attributes.In (name)) return false;
+  if (attributes.In (GetKeyID (name))) return false;
   if (v)
   {
     attribute* object = new attribute (csEventAttriBase);
     (object->ibaseVal = v)->IncRef();
-    attributes.Put (name, object);
+    attributes.Put (GetKeyID (name), object);
     count++;
     return true;
   }
@@ -249,7 +261,7 @@ bool csEvent::Add (const char *name, iBase* v)
   
 csEventError csEvent::Retrieve (const char *name, float &v) const
 {
-  attribute* object = attributes.Get (name, 0);
+  attribute* object = attributes.Get (GetKeyID (name), 0);
   if (!object) return csEventErrNotFound;
   if (object->type == csEventAttrFloat)
   {									
@@ -264,7 +276,7 @@ csEventError csEvent::Retrieve (const char *name, float &v) const
 
 csEventError csEvent::Retrieve (const char *name, double &v) const
 {
-  attribute* object = attributes.Get (name, 0);
+  attribute* object = attributes.Get (GetKeyID (name), 0);
   if (!object) return csEventErrNotFound;
   if (object->type == csEventAttrFloat)
   {									
@@ -279,7 +291,7 @@ csEventError csEvent::Retrieve (const char *name, double &v) const
 
 csEventError csEvent::Retrieve (const char *name, const char *&v) const
 {
-  attribute* object = attributes.Get (name, 0);
+  attribute* object = attributes.Get (GetKeyID (name), 0);
   if (!object) return csEventErrNotFound;
   if (object->type == csEventAttrDatabuffer)
   {									
@@ -294,7 +306,7 @@ csEventError csEvent::Retrieve (const char *name, const char *&v) const
 
 csEventError csEvent::Retrieve (const char *name, void const *&v, size_t &size) const
 {
-  attribute* object = attributes.Get (name, 0);
+  attribute* object = attributes.Get (GetKeyID (name), 0);
   if (!object) return csEventErrNotFound;
   if (object->type == csEventAttrDatabuffer)
   {									
@@ -310,7 +322,7 @@ csEventError csEvent::Retrieve (const char *name, void const *&v, size_t &size) 
 
 csEventError csEvent::Retrieve (const char *name, bool &v) const
 {
-  attribute* object = attributes.Get (name, 0);
+  attribute* object = attributes.Get (GetKeyID (name), 0);
   if (!object) return csEventErrNotFound;
   if (object->type == csEventAttrInt)
   {									
@@ -325,7 +337,7 @@ csEventError csEvent::Retrieve (const char *name, bool &v) const
 
 csEventError csEvent::Retrieve (const char *name, csRef<iEvent> &v) const
 {
-  attribute* object = attributes.Get (name, 0);
+  attribute* object = attributes.Get (GetKeyID (name), 0);
   if (!object) return csEventErrNotFound;
   if (object->type == csEventAttrEvent)
   {									
@@ -340,7 +352,7 @@ csEventError csEvent::Retrieve (const char *name, csRef<iEvent> &v) const
 
 csEventError csEvent::Retrieve (const char *name, csRef<iBase> &v) const
 {
-  attribute* object = attributes.Get (name, 0);
+  attribute* object = attributes.Get (GetKeyID (name), 0);
   if (!object) return csEventErrNotFound;
   if (object->type == csEventAttriBase)
   {									
@@ -355,12 +367,12 @@ csEventError csEvent::Retrieve (const char *name, csRef<iBase> &v) const
 
 bool csEvent::AttributeExists (const char* name)
 {
-  return attributes.In (name);
+  return attributes.In (GetKeyID (name));
 }
 
 csEventAttributeType csEvent::GetAttributeType (const char* name)
 {
-  attribute* object = attributes.Get (name, 0);
+  attribute* object = attributes.Get (GetKeyID (name), 0);
   if (object) 
   {
     return object->type;
@@ -370,21 +382,22 @@ csEventAttributeType csEvent::GetAttributeType (const char* name)
 
 bool csEvent::Remove(const char *name)
 {
-  if (!attributes.In (name)) return false;
-  attribute* object = attributes.Get (name, 0);
-  bool result = attributes.Delete (name, object);
+  csStringID id = GetKeyID (name);
+  if (!attributes.In (id)) return false;
+  attribute* object = attributes.Get (id, 0);
+  bool result = attributes.Delete (id, object);
   delete object;
   return result;
 }
 
 bool csEvent::RemoveAll()
 {
-  csHash<attribute*, csStrKey, csConstCharHashKeyHandler>::GlobalIterator iter (
+  csHash<attribute*, csStringID>::GlobalIterator iter (
     attributes.GetIterator ());
 
   while (iter.HasNext())
   {
-    csStrKey name;
+    csStringID name;
     attribute* object = iter.Next (name);
     delete object;
   }
@@ -396,8 +409,7 @@ bool csEvent::RemoveAll()
 
 csRef<iEventAttributeIterator> csEvent::GetAttributeIterator()
 {
-  csHash<csEvent::attribute*, csStrKey, 
-    csConstCharHashKeyHandler>::GlobalIterator attrIter (
+  csHash<csEvent::attribute*, csStringID>::GlobalIterator attrIter (
     attributes.GetIterator());
   return csPtr<iEventAttributeIterator> (new csEventAttributeIterator (
     attrIter));
@@ -411,16 +423,16 @@ static void IndentLevel(int level)
 
 bool csEvent::Print (int level)
 {
-  csHash<attribute*, csStrKey, csConstCharHashKeyHandler>::GlobalIterator iter (
+  csHash<attribute*, csStringID>::GlobalIterator iter (
     attributes.GetIterator ());
 
   while (iter.HasNext())
   {
-    csStrKey name;
+    csStringID name;
     attribute* object = iter.Next (name);
 
     IndentLevel(level); csPrintf ("------\n");
-    IndentLevel(level); csPrintf ("Name: %s\n", (const char*)name);
+    IndentLevel(level); csPrintf ("Name: %s\n", GetKeyName (name));
     IndentLevel(level); csPrintf (" Datatype: %s\n",
 	  GetTypeName(object->type));
     if (object->type == csEventAttrEvent)
@@ -468,6 +480,13 @@ csRef<iEvent> csEvent::CreateEvent()
 SCF_IMPLEMENT_IBASE (csEventAttributeIterator)
   SCF_IMPLEMENTS_INTERFACE (iEventAttributeIterator)
 SCF_IMPLEMENT_IBASE_END
+
+const char* csEventAttributeIterator::Next()
+{
+  csStringID key;
+  iterator.Next (key);
+  return csEvent::GetKeyName (key);
+}
 
 //*****************************************************************************
 // csPoolEvent

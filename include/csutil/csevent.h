@@ -28,6 +28,7 @@
 #include "csendian.h"
 #include "weakref.h"
 #include "cseventq.h"
+#include "strset.h"
 
 /**\file
  * iEvent implementation
@@ -68,7 +69,7 @@ private:
 	ibaseVal->DecRef();
     }
   };
-  csHash<attribute*, csStrKey, csConstCharHashKeyHandler> attributes;
+  csHash<attribute*, csStringID> attributes;
   friend class csEventAttributeIterator;
 
   size_t count;
@@ -78,10 +79,10 @@ private:
   template <typename T>
   bool InternalAddInt (const char* name, T value)
   {
-    if (attributes.In (name)) return false;
+    if (attributes.In (GetKeyID (name))) return false;
     attribute* object = new attribute (csEventAttrInt);	
     object->intVal = (int64)value;				
-    attributes.Put (name, object);				
+    attributes.Put (GetKeyID (name), object);				
     count++;							
     return true;						
   }
@@ -89,10 +90,10 @@ private:
   template <typename T>
   bool InternalAddUInt (const char* name, T value)
   {
-    if (attributes.In (name)) return false;
+    if (attributes.In (GetKeyID (name))) return false;
     attribute* object = new attribute (csEventAttrUInt);	
     object->intVal = (int64)value;				
-    attributes.Put (name, object);				
+    attributes.Put (GetKeyID (name), object);				
     count++;							
     return true;						
   }
@@ -122,7 +123,7 @@ private:
   template <typename T>
   csEventError InternalRetrieveInt (const char* name, T& value) const
   {								
-    attribute* object = attributes.Get (name, 0);
+    attribute* object = attributes.Get (GetKeyID (name), 0);
     if (!object) return csEventErrNotFound;
     if ((object->type == csEventAttrInt) || (object->type == csEventAttrUInt))
     {									
@@ -143,7 +144,7 @@ private:
   template <typename T>
   csEventError InternalRetrieveUint (const char* name, T& value) const
   {								
-    attribute* object = attributes.Get (name, 0);
+    attribute* object = attributes.Get (GetKeyID (name), 0);
     if (!object) return csEventErrNotFound;
     if ((object->type == csEventAttrInt) || (object->type == csEventAttrUInt))
     {									
@@ -161,6 +162,8 @@ private:
   }
 
   static char const* GetTypeName (csEventAttributeType t);
+  static csStringID GetKeyID (const char* key);
+  static const char* GetKeyName (csStringID id);
 protected:
   virtual csRef<iEvent> CreateEvent();
 
@@ -222,7 +225,7 @@ public:
 #undef CS_CSEVENT_FINDINT
   virtual csEventError Retrieve (const char* name, int64& value) const
   {								
-    attribute* object = attributes.Get (name, 0);
+    attribute* object = attributes.Get (GetKeyID (name), 0);
     if (!object) return csEventErrNotFound;
     if ((object->type == csEventAttrInt) || (object->type == csEventAttrUInt))
     {									
@@ -244,7 +247,7 @@ public:
 #undef CS_CSEVENT_FINDUINT
   virtual csEventError Retrieve (const char* name, uint64& value) const
   {								
-    attribute* object = attributes.Get (name, 0);
+    attribute* object = attributes.Get (GetKeyID (name), 0);
     if (!object) return csEventErrNotFound;
     if ((object->type == csEventAttrInt) || (object->type == csEventAttrUInt))
     {									
@@ -321,15 +324,13 @@ public:
  */
 class csEventAttributeIterator : public iEventAttributeIterator
 {
-  csHash<csEvent::attribute*, csStrKey, csConstCharHashKeyHandler>::GlobalIterator
-    iterator;								 
-  csStrKey currentKey;
+  csHash<csEvent::attribute*, csStringID>::GlobalIterator iterator;								 
 public:
   SCF_DECLARE_IBASE;
   
   csEventAttributeIterator (
-    csHash<csEvent::attribute*, csStrKey, csConstCharHashKeyHandler>::GlobalIterator&
-    iter) : iterator(iter)
+    csHash<csEvent::attribute*, csStringID>::GlobalIterator& iter) : 
+    iterator(iter)
   {
     SCF_CONSTRUCT_IBASE(0);
   }
@@ -343,11 +344,7 @@ public:
   {
     return iterator.HasNext();
   }
-  virtual const char* Next()
-  {
-    iterator.Next (currentKey);
-    return currentKey;
-  }
+  virtual const char* Next();
   virtual void Reset()
   {
     iterator.Reset();
