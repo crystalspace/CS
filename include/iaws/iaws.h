@@ -100,7 +100,7 @@ public:
   virtual iAwsComponent *CreateEmbeddableComponent()=0;
 
   /// Creates a new parameter list
-  virtual iAwsParmList *CreateParmList();
+  virtual iAwsParmList *CreateParmList()=0;
 };
 
 
