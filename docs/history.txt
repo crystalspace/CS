@@ -32,7 +32,7 @@ chronological order.
 		include/csutil/ref.h:285: bool operator==(const csRef<iImage>&, 
 			const csRef<iImage>&)
 	  If I change that line to 'if (!mdl2spr_imageio.IsValid())' then
-	  the compiler is happens. The really weird thing is that there
+	  the compiler is happy. The really weird thing is that there
 	  is another 'if (mdl2spr_imageio == 0)' line a few lines below
 	  this and that one doesn't give an error!!! Who can unwrap this
 	  mystery?
