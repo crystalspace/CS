@@ -68,7 +68,8 @@ int csNamedObjectVector::GetIndexByName (const char *name) const
 
 csSome csNamedObjectVector::FindByName (const char* name) const
 {
-  return Get (GetIndexByName (name));
+  int n = GetIndexByName (name);
+  return (n == -1) ? NULL : Get (n);
 }
 
 int csNamedObjectVector::Compare (csSome Item1, csSome Item2, int /*Mode*/) const
