@@ -78,6 +78,23 @@ public:
     DeleteAll ();
   }
 
+  /**
+   * Transfer the entire contents of one array to the other. The end
+   * result will be that this array will be completely empty and the
+   * other array will have all items that originally were in this array.
+   * This operation is very efficient.
+   */
+  void TransferTo (csPArray<T>& destination)
+  {
+    destination.DeleteAll ();
+    destination.root = root;
+    destination.count = count;
+    destination.limit = limit;
+    destination.threshold = threshold;
+    root = NULL;
+    limit = count = 0;
+  }
+
   /// Set vector length to n.
   void SetLength (int n)
   {
@@ -316,6 +333,23 @@ public:
   ~csPDelArray ()
   {
     DeleteAll ();
+  }
+
+  /**
+   * Transfer the entire contents of one array to the other. The end
+   * result will be that this array will be completely empty and the
+   * other array will have all items that originally were in this array.
+   * This operation is very efficient.
+   */
+  void TransferTo (csPDelArray<T>& destination)
+  {
+    destination.DeleteAll ();
+    destination.root = root;
+    destination.count = count;
+    destination.limit = limit;
+    destination.threshold = threshold;
+    root = NULL;
+    limit = count = 0;
   }
 
   /// Set vector length to n.

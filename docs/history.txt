@@ -11,6 +11,12 @@ The history order is reversed so that new features are at the top.
 	  in a hashmap with 211 buckets (default) now takes 1 second instead
 	  of 2.5. Traversing all elements takes 37 ms instead of 144.
 	  Getting 100000 random elements takes 49 ms instead of 218.
+	- Added TransferTo() function to csArray<T>, csPArray<T>,
+	  csPDelArray<T>, and csRefArray<T>. With this function you can
+	  do a full transfer of the entire array to another. This will
+	  make the source array empty and the destination array the copy
+	  of the source array. This is a very efficient operation (only
+	  moves pointers, not the actual data).
 23-Apr-2003
 	- Removed iPluginManager->GetPluginCount() and GetPlugin() since
 	  those two functions cannot be used in a thread-safe way. The

@@ -95,6 +95,23 @@ public:
       Push (other[i]);
   }
 
+  /**
+   * Transfer the entire contents of one array to the other. The end
+   * result will be that this array will be completely empty and the
+   * other array will have all items that originally were in this array.
+   * This operation is very efficient.
+   */
+  void TransferTo (csArray<T>& destination)
+  {
+    destination.DeleteAll ();
+    destination.root = root;
+    destination.count = count;
+    destination.capacity = capacity;
+    destination.threshold = threshold;
+    root = NULL;
+    capacity = count = 0;
+  }
+
   csArray<T>& operator = (const csArray& other)
   {
     if (&other == this)
