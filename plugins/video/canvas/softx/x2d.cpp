@@ -22,7 +22,6 @@
 #include "cssys/unix/iunix.h"
 #include "cssys/csevent.h"
 #include "video/canvas/softx/x2d.h"
-#include "video/canvas/common/dyntex2d.h"
 #include "csutil/csrect.h"
 #include "isystem.h"
 
@@ -1216,10 +1215,3 @@ bool csGraphics2DXLib::ReallocateMemory ()
   return true;
 }
 
-iGraphics2D *csGraphics2DXLib::CreateOffScreenCanvas (int width, int height, 
-	   csPixelFormat *pfmt, void *buffer, RGBPixel *palette, int pal_size)
-{
-  csDynamicTexture2D *tex = new csDynamicTexture2D (System);
-  return tex->CreateOffScreenCanvas (width, height, pfmt, buffer, 
-				     palette, pal_size);
-}

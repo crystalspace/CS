@@ -85,8 +85,11 @@ public:
   /// Called on every frame by system driver
   virtual bool HandleEvent (csEvent &Event);
 
-  virtual iGraphics2D *CreateOffScreenCanvas (int width, int height, 
-      csPixelFormat *pfmt, void *buffer, RGBPixel *palette, int pal_size);
+  /**
+   * Helper function, attempts to create a visual/context with the 
+   * desired attributes
+   */
+  bool CreateContext (int *desired_attributes);
 };
 
 #endif // __XLIB2D_H__

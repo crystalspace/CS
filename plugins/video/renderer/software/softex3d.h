@@ -26,11 +26,14 @@ class csDynamicTextureSoft3D : public csGraphics3DSoftwareCommon
 {
 public:
   DECLARE_IBASE;
-  iGraphics2D* parentG2D;
-  csDynamicTextureSoft3D (iSystem *isys, iGraphics2D *iparentG2D);
+
+  csDynamicTextureSoft3D (iBase *iParent);
   virtual ~csDynamicTextureSoft3D () {};
-  virtual iGraphics3D *CreateOffScreenRenderer (int width, int height, 
-     csPixelFormat *pfmt, void *buffer, RGBPixel *palette, int pal_size);
+
+  virtual bool Initialize (iSystem *iSys);
+  virtual iGraphics3D *CreateOffScreenRenderer (iGraphics2D *parent_g2d, 
+     int width, int height, csPixelFormat *pfmt, void *buffer, 
+     RGBPixel *palette, int pal_size);
 };
 
 #endif // __CS_SOFTEX3D_H__

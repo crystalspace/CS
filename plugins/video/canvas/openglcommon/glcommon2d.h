@@ -24,7 +24,7 @@
 #include "gl2d_font.h"
 
 class OpenGLTextureCache;
-
+#define CsPrintf System->Printf
 /**
  * Basic OpenGL version of the 2D driver class
  * You can look at the openGLX graphics class as an example
@@ -44,6 +44,7 @@ class csGraphics2DGLCommon : public csGraphics2D
 public:
   DECLARE_IBASE;
 
+  bool is_double_buffered;
   /// Constructor does little, most initialization stuff happens in Initialize()
   csGraphics2DGLCommon (iBase *iParent);
 
@@ -99,6 +100,20 @@ public:
 
   /// Do a screenshot: return a new iImage object
   virtual iImage *ScreenShot ();
+
+  /**
+   * Save a subarea of screen area into the variable Data.
+   * Storage is allocated in this call, you should either FreeArea()
+   * it after usage or RestoreArea() it.
+   */
+  virtual csImageArea *SaveArea (int x, int y, int w, int h);
+  /// Restore a subarea of screen saved with SaveArea()
+  virtual void RestoreArea (csImageArea *Area, bool Free = true);
+  /// Get the double buffer state
+  virtual bool GetDoubleBufferState () { return is_double_buffered; }
+  /// Enable or disable double buffering; returns success status
+  virtual bool DoubleBuffer (bool Enable) 
+  { is_double_buffered = Enable; return true; }
 };
 
 #endif

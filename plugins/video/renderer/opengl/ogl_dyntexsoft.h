@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2000 by Norman Krämer
+    Copyright (C) 2000 by Samuel Humphreys
   
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -16,42 +16,37 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-/**
- * This is the dynamic texture renderer for glide.
- *
- * And here is the basic idea:
- * On call of a BeginDraw we copy the texture in question into the backbuffer.
- * Then normal rendering occurs.
- * On FinishDraw we copy it back into the csGlideTexture.
- * If the texture is currently in the cache we remove it to ensure, that its up to date when referenced.
- * To keep the backbuffer intact we save and restore the area.
- */
-
-#ifndef _GLDYNTEX_H_
-#define _GLDYNTEX_H_
+#ifndef _OGL_DYNTEXSOFT_H_
+#define _OGL_DYNTEXSOFT_H_
 
 #include "igraph3d.h"
+class csGraphics3DOpenGL;
+class csTextureMMOpenGL;
+class csTextureOpenGLDynamic;
+struct iGraphics2D;
 
-class csGraphics3DGlide;
-class csTextureMMGlide;
-class csTextureGlide;
-
-class csGlideDynamic : public iGraphics3D
+class csOpenGLDynamicSoftware : public iGraphics3D
 {
  protected:
-  csTextureMMGlide *tex;
-  csTextureGlide *tex_0;
-  csGraphics3DGlide *g3d;
-  int Width, Height, nPixelBytes;
+  iSystem *system;
+  iGraphics3D *g3d;
+  char *buffer;
+
+  csTextureMMOpenGL *tex;
+  csTextureOpenGLDynamic *tex_0;
+  csGraphics3DOpenGL *parent_g3d;
+  iGraphics2D *g2d;
+  int Width, Height, frame_height, nPixelBytes;
   csPixelFormat *pfmt;
+  bool rstate_bilinearmap;
   
  public:
   DECLARE_IBASE;
 
-  csGlideDynamic (iBase * pParent);
-  virtual ~csGlideDynamic (){}
+  csOpenGLDynamicSoftware (iBase * pParent);
+  virtual ~csOpenGLDynamicSoftware ();
 
-  void SetTarget (csGraphics3DGlide *g3d, csTextureMMGlide *tex);
+  void SetTarget (csGraphics3DOpenGL *g3d, csTextureMMOpenGL *tex);
 
   virtual bool Initialize (iSystem */*pSystem*/){ return true; }
   virtual bool Open (const char */*Title*/){ return true; }
@@ -94,9 +89,9 @@ class csGlideDynamic : public iGraphics3D
   virtual void DrawPixmap (iTextureHandle *hTex, int sx, int sy, int sw, int sh,
 			     int tx, int ty, int tw, int th);
   virtual iGraphics3D *CreateOffScreenRenderer (iGraphics2D *parent_g2d, 
-    int width, int height, csPixelFormat *pfmt, void *buffer, RGBPixel *palette,
-    int pal_size);
+    int width, int height, csPixelFormat *pfmt, void *buffer, 
+    RGBPixel *palette, int pal_size);
 
 };
 
-#endif
+#endif // _OGL_DYNTEXSOFT_H_

@@ -22,6 +22,7 @@
 #include "video/canvas/common/scrshot.h"
 #include "csutil/csrect.h"
 #include "isystem.h"
+#include "qint.h"
 
 IMPLEMENT_IBASE (csGraphics2DGLCommon)
   IMPLEMENTS_INTERFACE (iPlugIn)
@@ -33,6 +34,7 @@ csGraphics2DGLCommon::csGraphics2DGLCommon (iBase *iParent) :
   LocalFontServer (NULL)
 {
   CONSTRUCT_IBASE (iParent);
+  is_double_buffered = true;
 }
 
 bool csGraphics2DGLCommon::Initialize (iSystem *pSystem)
@@ -147,12 +149,19 @@ void csGraphics2DGLCommon::DrawLine (
   glDisable (GL_TEXTURE_2D);
   glDisable (GL_BLEND);
   glDisable (GL_DEPTH_TEST);
+  glDisable (GL_ALPHA_TEST);
   setGLColorfromint (color);
 
   glBegin (GL_LINES);
-  glVertex2i (GLint (x1), GLint (Height - y1 - 1));
-  glVertex2i (GLint (x2), GLint (Height - y2 - 1));
+//    glVertex2i (GLint (x1), GLint (Height - y1 - 1));
+//    glVertex2i (GLint (x2), GLint (Height - y2 - 1));
+
+// This works with cswstest:
+  glVertex2i (GLint (QInt(x1)), GLint (QInt(Height - y1-1)));
+  glVertex2i (GLint (QInt(x2)), GLint (QInt(Height - y2-1)));
+
   glEnd ();
+
 }
 
 void csGraphics2DGLCommon::DrawBox (int x, int y, int w, int h, int color)
@@ -164,11 +173,19 @@ void csGraphics2DGLCommon::DrawBox (int x, int y, int w, int h, int color)
   setGLColorfromint (color);
 
   glBegin (GL_QUADS);
-  glVertex2i (x, Height - y - 1);
-  glVertex2i (x + w - 1, Height - y - 1);
-  glVertex2i (x + w - 1, Height - (y + h - 1) - 1);
-  glVertex2i (x, Height - (y + h - 1) - 1);
+//    glVertex2i (x, Height - y - 1);
+//    glVertex2i (x + w - 1, Height - y - 1);
+//    glVertex2i (x + w - 1, Height - (y + h - 1) - 1);
+//    glVertex2i (x, Height - (y + h - 1) - 1);
+
+// This works with cswstest:
+  glVertex2i (x, Height - (y));
+  glVertex2i (x + w, Height - (y));
+  glVertex2i (x + w, Height - (y + h));
+  glVertex2i (x, Height - (y + h));
+
   glEnd ();
+
 }
 
 void csGraphics2DGLCommon::DrawPixel (int x, int y, int color)
@@ -215,6 +232,70 @@ unsigned char* csGraphics2DGLCommon::GetPixelAt (int x, int y)
 {
   return screen_shot ?
     (screen_shot + pfmt.PixelBytes * ((Height - 1 - y) * Width + x)) : NULL;
+}
+
+csImageArea *csGraphics2DGLCommon::SaveArea (int x, int y, int w, int h)
+{
+  // For the time being copy data into system memory.
+  if (pfmt.PixelBytes != 1 && pfmt.PixelBytes != 4)
+    return NULL;
+
+  // Convert to Opengl co-ordinate system
+  y = Height-y-w;
+
+  if (x < 0)
+  { w += x; x = 0; }
+  if (x + w > Width)
+    w = Width - x;
+  if (y < 0)
+  { h += y; y = 0; }
+  if (y + h > Height)
+    h = Height - y;
+  if ((w <= 0) || (h <= 0))
+    return NULL;
+
+  csImageArea *Area = new csImageArea (x, y, w, h);
+  if (!Area)
+    return NULL;
+  int actual_width = pfmt.PixelBytes * w;
+  char *dest = Area->data = new char [actual_width * h];
+  for (int i=0;i<actual_width*h;i++)
+    dest[i]=0;
+  if (!dest)
+  {
+    delete Area;
+    return NULL;
+  }
+  glDisable (GL_TEXTURE_2D);
+  glDisable (GL_BLEND);
+  glDisable (GL_DEPTH_TEST);
+  glDisable (GL_DITHER);
+  glDisable (GL_ALPHA_TEST);
+  //glReadBuffer (GL_FRONT);
+  glReadPixels (x, y, w, h,
+    pfmt.PixelBytes == 1 ? GL_COLOR_INDEX : GL_RGBA,
+    GL_UNSIGNED_BYTE, Area->data);
+
+  return Area;
+}
+
+void csGraphics2DGLCommon::RestoreArea (csImageArea *Area, bool Free)
+{
+  glDisable (GL_TEXTURE_2D);
+  glDisable (GL_BLEND);
+  glDisable (GL_DEPTH_TEST);
+  glDisable (GL_DITHER);
+  glDisable (GL_ALPHA_TEST);
+  if (Area)
+  {
+    glRasterPos2i (Area->x, Area->y);
+    glDrawPixels (Area->w, Area->h, 
+		  pfmt.PixelBytes == 1 ? GL_COLOR_INDEX : GL_RGBA,
+		  GL_UNSIGNED_BYTE, Area->data);
+    glFlush();
+    if (Free)
+      FreeArea (Area);
+  } /* endif */
 }
 
 iImage *csGraphics2DGLCommon::ScreenShot ()

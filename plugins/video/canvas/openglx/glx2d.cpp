@@ -103,20 +103,29 @@ bool csGraphics2DGLX::Initialize (iSystem *pSystem)
   display_width = DisplayWidth (dpy, screen_num);
   display_height = DisplayHeight (dpy, screen_num);
 
-  // Determine visual information.
-  Visual* visual = DefaultVisual (dpy, screen_num);
+  // The texture manager only needs to know this:
+  pfmt.PalEntries = 0;
 
-  int desired_attributes[] =
-  {
-    GLX_RGBA, 
-    GLX_DOUBLEBUFFER, 
-    GLX_DEPTH_SIZE, 8, 
-    GLX_RED_SIZE, 4,
-    GLX_BLUE_SIZE, 4,
-    GLX_GREEN_SIZE, 4,
-    None
-  };
+  // Tell system driver to call us on every frame
+  System->CallOnEvents (this, CSMASK_Nothing);
+
+  return true;
+}
+
+csGraphics2DGLX::~csGraphics2DGLX ()
+{
+  // Destroy your graphic interface
+  XFree ((void*)active_GLVisual);
+  Close ();
+  if (UnixSystem)
+    UnixSystem->DecRef ();
+  if (dispdriver)
+    dispdriver->DecRef();
  
+}
+
+bool csGraphics2DGLX::CreateContext (int *desired_attributes)
+{
   // find a visual that supports all the features we need
   active_GLVisual = glXChooseVisual (dpy, screen_num, desired_attributes);
 
@@ -127,9 +136,10 @@ bool csGraphics2DGLX::Initialize (iSystem *pSystem)
   {
     active_GLContext = glXCreateContext(dpy,active_GLVisual,0,GL_TRUE);
     cmap = XCreateColormap (dpy, RootWindow (dpy, active_GLVisual->screen),
-           active_GLVisual->visual, AllocNone);
-    visual = active_GLVisual->visual;
-    CsPrintf (MSG_INITIALIZATION, "Seized Visual ID %d\n", visual->visualid);
+			    active_GLVisual->visual, AllocNone);
+
+    CsPrintf (MSG_INITIALIZATION, "Seized Visual ID %d\n", 
+	      active_GLVisual->visual->visualid);
   }
   else
   {
@@ -138,9 +148,17 @@ bool csGraphics2DGLX::Initialize (iSystem *pSystem)
     // what attribute was not supplied? we know that trying to get
     // all the attributes at once doesn't work.  provide more user info by
     // trying each of the pieces and seeing if any single piece is not provided 
- 
+    
     // try to get a visual with 12 bit color
-    int color_attributes[] = { GLX_RGBA,GLX_RED_SIZE,4,GLX_BLUE_SIZE,4,GLX_GREEN_SIZE,4,None };
+    int color_attributes[] = 
+    { 
+      GLX_RGBA,
+      GLX_RED_SIZE,4,
+      GLX_BLUE_SIZE,4,
+      GLX_GREEN_SIZE,4,
+      None 
+    };
+
     if (!glXChooseVisual(dpy, screen_num, color_attributes) )
     {
       CsPrintf(MSG_FATAL_ERROR, "Graphics display does not support at least 12 bit color\n");
@@ -152,43 +170,57 @@ bool csGraphics2DGLX::Initialize (iSystem *pSystem)
     {
       CsPrintf(MSG_FATAL_ERROR,"Graphics display does not support a depth buffer\n");
     }
-
-    // try to get a visual with double buffering
-    int doublebuffer_attributes[] = {GLX_RGBA, GLX_DOUBLEBUFFER, None };
-    if (!glXChooseVisual(dpy,screen_num,doublebuffer_attributes) )
-      CsPrintf(MSG_FATAL_ERROR,"Graphics display does not provide double buffering\n");
-    return false;
+    if (is_double_buffered)
+    {
+      // try to get a visual with double buffering
+      int doublebuffer_attributes[] = {GLX_RGBA, GLX_DOUBLEBUFFER, None };
+      if (!glXChooseVisual(dpy,screen_num,doublebuffer_attributes) )
+	CsPrintf(MSG_FATAL_ERROR,"Graphics display does not provide double buffering\n");
+      return false;
+    }
   }
-
-  if (visual->c_class == TrueColor)
-    pfmt.PalEntries = 0;
-  else
-  {
-    // Palette mode
-    pfmt.PalEntries = visual->map_entries;
-    pfmt.PixelBytes = 1;
-  }
-
-  // Tell system driver to call us on every frame
-  System->CallOnEvents (this, CSMASK_Nothing);
 
   return true;
 }
 
-csGraphics2DGLX::~csGraphics2DGLX ()
-{
-  // Destroy your graphic interface
-  Close ();
-  if (UnixSystem)
-    UnixSystem->DecRef ();
-  if (dispdriver)
-    dispdriver->DecRef();
-}
-
 bool csGraphics2DGLX::Open(const char *Title)
 {
+  if (!is_double_buffered)
+  {
+    CsPrintf (MSG_INITIALIZATION, "Single Buffered Mode\n");
+    int desired_attributes[] =
+    {
+      GLX_RGBA, 
+      GLX_DEPTH_SIZE, 8, 
+      GLX_RED_SIZE, 4,
+      GLX_BLUE_SIZE, 4,
+      GLX_GREEN_SIZE, 4,
+      None
+    };
+
+    if (!CreateContext (desired_attributes))
+      return false;
+  }
+  else
+  {
+    CsPrintf (MSG_INITIALIZATION, "Double Buffered Mode\n");
+    int desired_attributes[] =
+    {
+      GLX_RGBA, 
+      GLX_DOUBLEBUFFER,
+      GLX_DEPTH_SIZE, 8, 
+      GLX_RED_SIZE, 4,
+      GLX_BLUE_SIZE, 4,
+      GLX_GREEN_SIZE, 4,
+      None
+    };
+
+    if (!CreateContext (desired_attributes))
+      return false;
+  }
+
   CsPrintf (MSG_INITIALIZATION, "Video driver GL/X version ");
-  if (glXIsDirect(dpy,active_GLContext))
+  if (glXIsDirect (dpy, active_GLContext))
     CsPrintf (MSG_INITIALIZATION, "(direct renderer) ");
 
   // Create window
@@ -201,6 +233,7 @@ bool csGraphics2DGLX::Open(const char *Title)
     Width,Height, 0 /*border width */,
     active_GLVisual->depth, InputOutput, active_GLVisual->visual,
     CWBorderPixel | CWColormap | CWEventMask, &winattr);
+
   XMapWindow (dpy, window);
   XStoreName (dpy, window, Title);
 
@@ -212,6 +245,7 @@ bool csGraphics2DGLX::Open(const char *Title)
   // Create mouse cursors
   XColor Black;
   memset (&Black, 0, sizeof (Black));
+  memset (MouseCursor, 0, sizeof (Cursor) * (int(csmcWait)+1));
   EmptyPixmap = XCreatePixmap (dpy, window, 1, 1, 1);
   EmptyMouseCursor = XCreatePixmapCursor (dpy, EmptyPixmap, EmptyPixmap,
     &Black, &Black, 0, 0);
@@ -242,6 +276,10 @@ bool csGraphics2DGLX::Open(const char *Title)
       break;
   }
 
+//    Pixmap pixmap = XCreatePixmap (dpy, window, 128, 128, active_GLVisual->depth);
+
+//    GLXPixmap glx_pixmap = glXCreateGLXPixmap (dpy, active_GLVisual, pixmap);
+
   // this makes the context we created in Initialize() the current
   // context, so that all subsequent OpenGL calls will set state and
   // draw stuff on this context.  You could of couse make
@@ -265,11 +303,13 @@ void csGraphics2DGLX::Close(void)
     EmptyMouseCursor = 0;
     XFreePixmap (dpy, EmptyPixmap);
     EmptyPixmap = 0;
+  XSync (dpy, False);
   }
   for (int i = sizeof (MouseCursor) / sizeof (Cursor) - 1; i >= 0; i--)
   {
     if (MouseCursor [i])
       XFreeCursor (dpy, MouseCursor [i]);
+  XSync (dpy, False);
     MouseCursor [i] = None;
   }
   if (window)
@@ -450,10 +490,3 @@ bool csGraphics2DGLX::HandleEvent (csEvent &/*Event*/)
   return false;
 }
 
-iGraphics2D *csGraphics2DGLX::CreateOffScreenCanvas (int width, int height, 
-	   csPixelFormat *pfmt, void *buffer, RGBPixel *palette, int pal_size)
-{
-  csDynamicTexture2D *tex = new csDynamicTexture2D (System);
-  return tex->CreateOffScreenCanvas (width, height, pfmt, buffer, 
-				     palette, pal_size);
-}

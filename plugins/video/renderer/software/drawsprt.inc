@@ -1,3 +1,4 @@
+/*  -*- Mode: C++; -*- */
 /*
     Copyright (C) 1998 by Jorrit Tyberghein
     The DrawPixmap routine in a separate include file
@@ -37,7 +38,7 @@ static void DRAWSPRITE_NAME (iGraphics2D *G2D, iTextureHandle *hTex,
   csTextureSoftware *txt_unl = (csTextureSoftware *)tex_mm->get_texture (0);
 
   int bw = txt_unl->get_width ();
-//int bh = txt_unl->get_height ();
+  //  int bh = txt_unl->get_height ();
 
   UByte *bitmap = txt_unl->get_bitmap ();
   DRAWSPRITE_PIXTYPE *palette = (DRAWSPRITE_PIXTYPE *)tex_mm->GetPaletteToGlobal ();

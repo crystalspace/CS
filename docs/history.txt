@@ -11,6 +11,36 @@ The history order has been reversed so that new features are at the top.
 	  errors, though. Perhaps the frustum code is buggy.
 	  Radiosity can also handle portals without lightmaps now.
 	- More debugging on octree/PVS stuff...
+	- Added a patch from Samuel Humphreys with the following changes:
+	    - Pluggifies the software renderer for opengl .
+	    - Add a back buffer style implementation for opengl based on
+	      Normans implementation. However on my system, it runs at
+	      half the speed as the software version, and it renders
+	      flipped in the x-axis, I've tried lots of stuff to get it
+	      working properly, but to no avail. Need other people to have
+	      a go at this. Also with mesa and voodoo2 the texture
+	      shifts into the blue spectrum, whereas it doesnt with software
+	      opengl...Im investigating this.
+	    - Added further configuration stuff to opengl.cfg, so you can
+	      choose dynamic texture implementation. See comments there.
+	    - Implemented some outstanding methods to the opengl driver:
+	      SaveArea, RestoreArea
+	    - Fixed bug in DrawPixmap, it now correctly renders sub
+	      region of textures whose size has been modified. This was
+	      highlighted by cswstest.
+	    - Modified glx2d.cpp so that it'll give a single buffer for
+	      CSWS,--outstanding issue with paletted mode...i.e. the glx
+	      drivers will not work in paletted mode, but it wouldn't have
+	      done before my modifications anyway....a todo!
+	    -  Small modification to csws so it requests a single buffer
+	      before opening the graphics drivers.
+	    - Change of signature to iGraphics3D->CreateOffScreenRenderer,
+	      have attempted to update all drivers, but I may of
+	      missed something.
+	    - Promoted default implementation of
+	      iGraphics2D->CreateOffScreenCanvas to csGraphics2D (as Eric
+	      suggested), updated all other drivers too.
+	    - oglglide now compiles again.
 22-May-2000
 	- Added csPoly2D::GetSignedArea() and csPoly3D::GetSignedArea()
 	  to calculate the signed area of a polygon.

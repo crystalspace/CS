@@ -24,11 +24,9 @@
 #include "csutil/csrect.h"
 #include "cssys/csevent.h"
 #include "isystem.h"
-
 #include "csdive.h"
 #include "libDIVE.h"
 #include "libDIVEprv.h"
-#include "video/canvas/common/dyntex2d.h"
 
 #if defined (PROC_INTEL)
 inline void memsetd (void *dest, unsigned int value, size_t count)
@@ -609,12 +607,4 @@ void csGraphics2DOS2DIVE::TerminateHandlerStub (void *Self)
 {
   csGraphics2DOS2DIVE *This = (csGraphics2DOS2DIVE *)Self;
   This->System->StartShutdown ();
-}
-
-iGraphics2D *csGraphics2DOS2DIVE::CreateOffScreenCanvas (int width, int height,
-  csPixelFormat *pfmt, void *buffer, RGBPixel *palette, int pal_size)
-{
-  csDynamicTexture2D *tex = new csDynamicTexture2D (System);
-  return tex->CreateOffScreenCanvas (width, height, pfmt, buffer,
-    palette, pal_size);
 }

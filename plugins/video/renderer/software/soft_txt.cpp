@@ -310,8 +310,8 @@ void csTextureSoftwareDynamic::CreateInterfaces
    csPixelFormat *pfmt, RGBPixel *palette, int palette_size)
 {
   texman = itexman;
-  texG3D = parentG3D->CreateOffScreenRenderer (w, h, pfmt, (void*) bitmap, 
-					       palette, palette_size);
+  texG3D = parentG3D->CreateOffScreenRenderer (NULL, w, h, pfmt, 
+				     (void*) bitmap, palette, palette_size);
 }
 
 csTextureSoftwareDynamic::~csTextureSoftwareDynamic ()

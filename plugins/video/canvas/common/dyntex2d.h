@@ -25,13 +25,13 @@
 
 struct iSystem;
 
-class csDynamicTexture2D : public csGraphics2D
+class csDynamicTextureSoft2D : public csGraphics2D
 {
 public:
   DECLARE_IBASE;
 
-  csDynamicTexture2D (iSystem *isys);
-  virtual ~csDynamicTexture2D ();
+  csDynamicTextureSoft2D (iSystem *isys);
+  virtual ~csDynamicTextureSoft2D ();
 
   virtual bool Open (const char *Title);
   virtual void Close ();

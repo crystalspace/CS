@@ -27,10 +27,14 @@
 #include "csutil/inifile.h"
 
 IMPLEMENT_FACTORY (csGraphics3DSoftware)
+IMPLEMENT_FACTORY (csDynamicTextureSoft3D)
 
 EXPORT_CLASS_TABLE (soft3d)
   EXPORT_CLASS (csGraphics3DSoftware, "crystalspace.graphics3d.software",
     "Software 3D graphics driver for Crystal Space")
+  EXPORT_CLASS (csDynamicTextureSoft3D, 
+    "crystalspace.graphics3d.software.offscreen",
+    "Software 3D off screen driver")
 EXPORT_CLASS_TABLE_END
 
 IMPLEMENT_IBASE (csGraphics3DSoftware)
@@ -85,12 +89,14 @@ bool csGraphics3DSoftware::Open (const char *Title)
   return true;
 }
 
-iGraphics3D *csGraphics3DSoftware::CreateOffScreenRenderer (int width, int height,  csPixelFormat *pfmt, void *buffer, RGBPixel *palette, int pal_size)
+iGraphics3D *csGraphics3DSoftware::CreateOffScreenRenderer 
+  (iGraphics2D */*parent_g2d*/, int width, int height, csPixelFormat *pfmt, 
+   void *buffer, RGBPixel *palette, int pal_size)
 {
   csDynamicTextureSoft3D *tex3d =  
-       new csDynamicTextureSoft3D (System, G2D);
-
-  return tex3d->CreateOffScreenRenderer (width, height, pfmt, buffer, 
+       new csDynamicTextureSoft3D (NULL);
+  tex3d->Initialize (System);
+  return tex3d->CreateOffScreenRenderer (G2D, width, height, pfmt, buffer, 
 				       palette, pal_size);
 }
 

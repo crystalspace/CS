@@ -52,8 +52,6 @@ public:
   virtual bool BeginDraw ();
   virtual void Print (csRect* area = NULL);
   virtual void FinishDraw ();
-  virtual iGraphics2D* CreateOffScreenCanvas (int width, int height,
-    csPixelFormat*, void* buffer, RGBPixel* palette, int pal_size);
   virtual void ApplyDepthInfo (color_space);
 };
 

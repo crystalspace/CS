@@ -24,8 +24,8 @@
 // Ported to COM by Dan Ogles on 8.26.98
 // modiefied by TristanMcLure  09/08/1999
 
-#ifndef G3D_D3D_H
-#define G3D_D3D_H
+#ifndef D3D_g3d_H
+#define D3D_g3d_H
 
 #include <windows.h>
 #include "ddraw.h"
@@ -348,8 +348,9 @@ public:
     int tx, int ty, int tw, int th);
 
   /// Create an off screen canvas
-  virtual iGraphics3D *CreateOffScreenRenderer (int /*width*/, int /*height*/, 
-     csPixelFormat*, void * /*buffer*/, RGBPixel* /*palette*/, int /*pal_size*/)
+  virtual iGraphics3D *CreateOffScreenRenderer (iGraphics2D */*parent_g2d*/,
+    int /*width*/, int /*height*/, csPixelFormat */*pfmt*/, void */*buffer*/, 
+    RGBPixel */*palette*/, int /*pal_size*/)
   { return NULL; }
 
 private:
@@ -379,4 +380,4 @@ private:
 
 };
 
-#endif // G3D_D3D_H
+#endif // D3D_g3d_H

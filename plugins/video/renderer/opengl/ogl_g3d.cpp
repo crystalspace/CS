@@ -50,6 +50,9 @@
 
 #define SysPrintf System->Printf
 
+// Beware uncommenting this introduces a bug with sprites.
+//#define USE_OLD_SOFTWARE_TEXTURES
+
 // uncomment the 'USE_MULTITEXTURE 1' define to enable code for
 // multitexture support - this is independent of the extension detection,
 // but  it may rely on the extension module to supply proper function 
@@ -182,8 +185,6 @@ bool csGraphics3DOpenGL::Initialize (iSystem * iSys)
 
   m_config_options.do_multitexture_level = 0;
   m_config_options.do_extra_bright = false;
-
-// txtmgr = new csTextureManagerOpenGL (System, G2D);
 
   return true;
 }
@@ -552,8 +553,11 @@ void csGraphics3DOpenGL::DrawPolygonSingleTexture (G3DPolygonDP & poly)
   iPolygonTexture *tex = poly.poly_texture;
   csTextureMMOpenGL *txt_mm = (csTextureMMOpenGL *) poly.txt_handle->GetPrivateObject ();
 
+#ifdef USE_OLD_SOFTWARE_TEXTURES
+  // For use with software dynamic textures...disabled for now.
   bool uncache_dynamic_texture =
     ((txt_mm->GetFlags () & CS_TEXTURE_DYNAMIC) == CS_TEXTURE_DYNAMIC);
+#endif
 
   // find lightmap information, if any
   iLightMap *thelightmap = tex->GetLightMap ();
@@ -837,9 +841,11 @@ void csGraphics3DOpenGL::DrawPolygonSingleTexture (G3DPolygonDP & poly)
     glEnd ();
 
   }
+#ifdef USE_OLD_SOFTWARE_TEXTURES
   // When using a software dynamic texture
   if (uncache_dynamic_texture)
     texture_cache->Uncache (poly.txt_handle);
+#endif
 }
 
 void csGraphics3DOpenGL::DrawPolygonDebug (G3DPolygonDP &/* poly */ )
@@ -1041,13 +1047,14 @@ void csGraphics3DOpenGL::DrawPolygonFX (G3DPolygonDPFX & poly)
     if (!m_gouraud)
       glShadeModel (GL_FLAT);
   }
-
+#ifdef USE_OLD_SOFTWARE_TEXTURES
   // Only for software dynamic textures:-----------------------------------
   csTextureMMOpenGL *txt_mm = (csTextureMMOpenGL *) poly.txt_handle->GetPrivateObject ();
 
   if ((txt_mm->GetFlags () & CS_TEXTURE_DYNAMIC) == CS_TEXTURE_DYNAMIC)
     texture_cache->Uncache (poly.txt_handle);
   //----------------------------------------------------------------------
+#endif
 }
 
 void csGraphics3DOpenGL::DrawTriangleMesh (G3DTriangleMesh& mesh)
@@ -1868,22 +1875,47 @@ void csGraphics3DOpenGL::DrawPixmap (iTextureHandle *hTex,
 
   // draw the bitmap
   glBegin (GL_QUADS);
+//    glTexCoord2f (ntx1, nty1);
+//    glVertex2i (sx, height - sy - 1);
+//    glTexCoord2f (ntx2, nty1);
+//    glVertex2i (sx + sw, height - sy - 1);
+//    glTexCoord2f (ntx2, nty2);
+//    glVertex2i (sx + sw, height - sy - sh - 1);
+//    glTexCoord2f (ntx1, nty2);
+//    glVertex2i (sx, height - sy - sh - 1);
+
+  // smgh: This works in software opengl and with cswstest
   glTexCoord2f (ntx1, nty1);
-  glVertex2i (sx, height - sy - 1);
+  glVertex2i (sx-1, height - sy - 1);
   glTexCoord2f (ntx2, nty1);
-  glVertex2i (sx + sw, height - sy - 1);
+  glVertex2i (sx-1 + sw, height - sy - 1);
   glTexCoord2f (ntx2, nty2);
-  glVertex2i (sx + sw, height - sy - sh - 1);
+  glVertex2i (sx-1 + sw, height - (sy+1 + sh));
   glTexCoord2f (ntx1, nty2);
-  glVertex2i (sx, height - sy - sh - 1);
+  glVertex2i (sx-1, height - (sy+1 + sh));
   glEnd ();
 }
 
-iGraphics3D *csGraphics3DOpenGL::CreateOffScreenRenderer (
-  int width, int height, csPixelFormat *pfmt, void *buffer,
-  RGBPixel* /*palette*/, int /*pal_size*/)
+iGraphics3D *csGraphics3DOpenGL::CreateOffScreenRenderer 
+  (iGraphics2D */*parent_g2d*/, int width, int height,  csPixelFormat *pfmt, 
+    void *buffer, RGBPixel */*palette*/, int /*pal_size*/)
 {
+#ifdef USE_OLD_SOFTWARE_TEXTURES
   // For now just create a software dynamic texture
-  csDynamicTextureSoft3D *tex3d = new csDynamicTextureSoft3D (System, G2D);
-  return tex3d->CreateOffScreenRenderer (width, height, pfmt, buffer, NULL, 0);
+ iGraphics3D *tex3d = LOAD_PLUGIN (System, 
+    "crystalspace.graphics3d.software.offscreen", NULL, iGraphics3D);
+  if (!tex3d)
+  {
+    SysPrintf (MSG_FATAL_ERROR, "Error creating offscreen software renderer\n");
+    return NULL;
+  }
+  return tex3d->CreateOffScreenRenderer (G2D, width, height, pfmt, 
+					 buffer, NULL, 0);
+#else
+ (void) width;
+ (void) height;
+ (void) pfmt;
+ (void) buffer;
+ return NULL;
+#endif
 }

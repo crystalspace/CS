@@ -92,9 +92,6 @@ public:
   virtual bool SetMousePosition (int x, int y);
   virtual bool SetMouseCursor (csMouseCursorID iShape);
 
-  virtual iGraphics2D *CreateOffScreenCanvas (int width, int height,
-    csPixelFormat *pfmt, void *buffer, RGBPixel *palette, int pal_size);
-
 private:
   static void KeyboardHandlerStub (void *Self, unsigned char ScanCode,
     bool Down, unsigned char RepeatCount, int ShiftFlags);

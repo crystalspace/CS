@@ -23,7 +23,7 @@
 #include "csutil/scf.h"
 #include "oglg2d.h"
 #include "isystem.h"
-#include "video/canvas/common/dyntex2d.h"
+
 
 void sys_fatalerror(char *str, HRESULT hRes = S_OK)
 {
@@ -454,10 +454,3 @@ bool csGraphics2DOpenGL::SetMousePosition (int x, int y)
   return true;
 }
 
-iGraphics2D *csGraphics2DOpenGL::CreateOffScreenCanvas (int width, int height, 
-	   csPixelFormat *pfmt, void *buffer, RGBPixel *palette, int pal_size)
-{
-  csDynamicTexture2D *tex = new csDynamicTexture2D (System);
-  return tex->CreateOffScreenCanvas (width, height, pfmt, buffer, 
-				     palette, pal_size);
-};

@@ -129,9 +129,6 @@ bool csApp::InitialSetup (int argc, const char* const argv[],
   // Create the graphics pipeline
   GfxPpl = new csGraphicsPipeline (System);
 
-  // For GUI apps double buffering is a serious performance hit
-  System->G2D->DoubleBuffer (false);
-
   // Repaint console
   System->RefreshConsole ();
 

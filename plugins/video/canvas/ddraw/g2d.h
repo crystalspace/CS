@@ -61,9 +61,6 @@ public:
 
   int m_nGraphicsReady;
 
-  virtual iGraphics2D *CreateOffScreenCanvas (int width, int height, 
-	csPixelFormat *pfmt, void *buffer, RGBPixel *palette, int pal_size);
-
   ///--------------- iGraphics2DDDraw3 interface implementation ---------------
   ///
   virtual void GetDirectDrawDriver (LPDIRECTDRAW* lplpDirectDraw);

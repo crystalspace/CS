@@ -25,6 +25,15 @@
 #include "iimage.h"
 
 class csGraphics3DOpenGL;
+class csOpenGLDynamic;
+
+enum csGLDynTexType
+{
+  SOFTWARE_TEXTURE = 1,
+  BACK_BUFFER_TEXTURE = 2,
+  AUXILIARY_BUFFER_TEXTURE = 3,
+  SOFTWARE_TEXTURE_OLD = 4 
+};
 
 /**
  * This is a class derived from csTextureMM that performs additional
@@ -33,6 +42,8 @@ class csGraphics3DOpenGL;
 class csTextureMMOpenGL : public csTextureMM
 {
 public:
+  /// Retains original size of image before any readjustment
+  int orig_width, orig_height;
   /// A pointer to the 3D driver object
   csGraphics3DOpenGL *G3D;
 
@@ -46,11 +57,10 @@ public:
   virtual void ComputeMeanColor ();
 
 
-  void CreateDynamicTexture(iGraphics3D *parentG3D, csPixelFormat *PixelFormat);
+  void CreateDynamicTexture(csGraphics3DOpenGL *parentG3D, csGLDynTexType type,
+			    csPixelFormat *PixelFormat);
 
   virtual iGraphics3D *GetDynamicTextureInterface ();
-
-  virtual void DynamicTextureSyncPalette () { /* no paletted textures */ };
 };
 
 /**
@@ -88,13 +98,13 @@ public:
   iGraphics3D *texG3D;
 
   csTextureOpenGLDynamic (csTextureMM *Parent, iImage *Image)
-    : csTextureOpenGL (Parent, Image)
+    : csTextureOpenGL (Parent, Image), texG3D (NULL)
   {};
   /// Destroy the texture
   virtual ~csTextureOpenGLDynamic ();
 
-
-  void CreateInterfaces (iGraphics3D *parentG3D, csPixelFormat *pfmt);
+  void CreateInterfaces (csTextureMMOpenGL *mm_tex, csGLDynTexType type,
+			 csGraphics3DOpenGL *parentG3D, csPixelFormat *pfmt);
 };
 
 /**
@@ -105,13 +115,15 @@ class csTextureManagerOpenGL : public csTextureManager
 public:
   /// A pointer to the 3D driver object
   csGraphics3DOpenGL *G3D;
+  csGLDynTexType dyn_tex_type;
 
   ///
   csTextureManagerOpenGL (iSystem* iSys, iGraphics2D* iG2D, csIniFile *config,
     csGraphics3DOpenGL *iG3D);
   ///
   virtual ~csTextureManagerOpenGL ();
-
+  /// Read configuration values from config file.
+  virtual void read_config (csIniFile *config);
   ///
   virtual void PrepareTextures ();
   ///

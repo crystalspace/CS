@@ -25,7 +25,6 @@
 #include "csutil/scf.h"
 #include "belibg2d.h"
 #include "CrystWindow.h"
-#include "video/canvas/common/dyntex2d.h"
 #include "csutil/csrect.h"
 #include "isystem.h"
 
@@ -137,14 +136,6 @@ void csGraphics2DBeLib::Print (csRect*)
 bool csGraphics2DBeLib::SetMouseCursor (csMouseCursorID shape)
 {
   return be_system->SetMouseCursor(shape);
-}
-
-iGraphics2D* csGraphics2DBeLib::CreateOffScreenCanvas(int width, int height,
-  csPixelFormat* pfmt, void* buffer, RGBPixel* palette, int pal_size)
-{
-  csDynamicTexture2D* tex = new csDynamicTexture2D(System);
-  return tex->CreateOffScreenCanvas(width, height, pfmt, buffer,
-    palette, pal_size);
 }
 
 void csGraphics2DBeLib::ApplyDepthInfo(color_space cs)

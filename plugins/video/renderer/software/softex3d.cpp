@@ -22,23 +22,30 @@
 #include "isystem.h"
 #include "igraph2d.h"
 
+DECLARE_FACTORY (csDynamicTextureSoft3D)
+
 IMPLEMENT_IBASE (csDynamicTextureSoft3D)
   IMPLEMENTS_INTERFACE (iPlugIn)
   IMPLEMENTS_INTERFACE (iGraphics3D)
 IMPLEMENT_IBASE_END
 
-csDynamicTextureSoft3D::csDynamicTextureSoft3D (iSystem *iSys, iGraphics2D *iparentG2D) : csGraphics3DSoftwareCommon ()
+csDynamicTextureSoft3D::csDynamicTextureSoft3D (iBase *iParent)
+  : csGraphics3DSoftwareCommon ()
 {
-  CONSTRUCT_IBASE (NULL);
-  parentG2D = iparentG2D;
+  CONSTRUCT_IBASE (iParent);
+}
+
+bool csDynamicTextureSoft3D::Initialize (iSystem *iSys)
+{
   (System = iSys)->IncRef ();
+  return true;
 }
 
 iGraphics3D *csDynamicTextureSoft3D::CreateOffScreenRenderer 
-    ( int width, int height, csPixelFormat *pfmt, void *buffer, 
+    ( iGraphics2D *parent_g2d, int width, int height, csPixelFormat *pfmt, void *buffer, 
       RGBPixel *palette, int pal_size )
 {
-  G2D = parentG2D->CreateOffScreenCanvas (width, height, pfmt, buffer, 
+  G2D = parent_g2d->CreateOffScreenCanvas (width, height, pfmt, buffer, 
 					palette, pal_size);
   if (!G2D)
   {

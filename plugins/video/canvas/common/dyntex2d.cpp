@@ -23,26 +23,26 @@
 #include "csutil/scf.h"
 #include "isystem.h"
 
-IMPLEMENT_IBASE (csDynamicTexture2D)
+DECLARE_FACTORY (csDynamicTextureSoft2D)
+IMPLEMENT_IBASE (csDynamicTextureSoft2D)
   IMPLEMENTS_INTERFACE (iPlugIn)
   IMPLEMENTS_INTERFACE (iGraphics2D)
 IMPLEMENT_IBASE_END
 
-// csDynamicTexture2D functions
-csDynamicTexture2D::csDynamicTexture2D (iSystem *isys) :
+// csDynamicTextureSoft2D functions
+csDynamicTextureSoft2D::csDynamicTextureSoft2D (iSystem *isys) :
   csGraphics2D ()
 {
   CONSTRUCT_IBASE (NULL);
   System = isys;
 }
 
-csDynamicTexture2D::~csDynamicTexture2D ()
+csDynamicTextureSoft2D::~csDynamicTextureSoft2D ()
 {
-  // This array is shared with the texture, let the texture destroy it.
-  Palette = NULL;
+
 }
 
-iGraphics2D *csDynamicTexture2D::CreateOffScreenCanvas (int width, int height, 
+iGraphics2D *csDynamicTextureSoft2D::CreateOffScreenCanvas (int width, int height, 
     csPixelFormat *ipfmt, void *buffer,  RGBPixel *palette, int pal_size)
 {
   Width = width;
@@ -107,7 +107,7 @@ iGraphics2D *csDynamicTexture2D::CreateOffScreenCanvas (int width, int height,
   return (iGraphics2D*)this;
 }
 
-bool csDynamicTexture2D::Open(const char *Title)
+bool csDynamicTextureSoft2D::Open(const char *Title)
 {
   CsPrintf (MSG_INITIALIZATION, "Crystal Space dynamic texture buffer\n");
 
@@ -119,15 +119,15 @@ bool csDynamicTexture2D::Open(const char *Title)
   return true;
 }
 
-void csDynamicTexture2D::Close ()
+void csDynamicTextureSoft2D::Close ()
 {
-  // The Memory array is a shared resource with the texture, let the texture
-  // manager destroy it.
+  // These arrays are shared with the texture, the texture will destroy them.
+  Palette = NULL;
   Memory = NULL;
   csGraphics2D::Close ();
 }
 
-void csDynamicTexture2D::Print (csRect*)
+void csDynamicTextureSoft2D::Print (csRect*)
 {
   // do nothing as its not buffered
 }

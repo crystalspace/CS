@@ -72,6 +72,9 @@ bool cswsSystemDriver::Initialize (int argc, const char* const argv[],
   int Width = G2D->GetWidth ();
   int Height = G2D->GetHeight ();
 
+  // For GUI apps double buffering is a serious performance hit
+  System->G2D->DoubleBuffer (false);
+
   // Initialize console data
   curline = 0;
   textcolor = cs_Color_White;
