@@ -1397,13 +1397,8 @@ bool WalkTest::Initialize (int argc, char *argv[], const char *iConfigName)
       if (name)
       {
         name++;
-        sprintf (tmp, "data%c%s.zip", PATH_SEPARATOR, name);
-        if (access (tmp, F_OK) != 0)
-        {
-          sprintf (tmp, "%s.zip", name);
-          if (access (tmp, F_OK) != 0)
-            sprintf (tmp, "..%cdata%c%s.zip", PATH_SEPARATOR, PATH_SEPARATOR, name);
-        }
+        sprintf (tmp, "$.$/data$/%s.zip, $.$/%s.zip, $(..)$/data$/%s.zip",
+          name, name, name);
         VFS->Mount (world_dir, tmp);
       }
     }
