@@ -182,7 +182,7 @@ static inline int dist_nowritequeue ()
 bool csDynaVis::do_cull_frustum = true;
 int csDynaVis::do_cull_coverage = COVERAGE_OUTLINE;
 bool csDynaVis::do_cull_history = true;
-bool csDynaVis::do_cull_writequeue = false;//@@@@@@@@@@@ TEMPORARY
+bool csDynaVis::do_cull_writequeue = true;
 bool csDynaVis::do_cull_ignoresmall = false;
 bool csDynaVis::do_cull_clampoccluder = false;
 bool csDynaVis::do_cull_vpt = true;
