@@ -71,7 +71,7 @@ rm -rf "$RPM_BUILD_ROOT"
 /usr/local/crystal/docs/pubapi/*.gif
    
 /usr/local/crystal/include/*.h
-/usr/local/crystal/include/csengine/*.h
+/usr/local/crystal/include/csappframe/*.h
 /usr/local/crystal/include/csgeom/*.h
 /usr/local/crystal/include/csgfx/*.h
 /usr/local/crystal/include/cssys/*.h

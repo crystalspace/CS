@@ -180,9 +180,9 @@ submakefiles contained one level deep in the @file{CS/libs} directory (i.e.
 
 @example
 (~/CS)% ls libs/*/*.mak
-libs/csengine/csengine.mak
+libs/csappframe/csappframe.mak
 libs/csgeom/csgeom.mak
-libs/cssys/cssys.mak
+libs/csgfx/csgfx.mak
 libs/cstool/cstool.mak
 libs/csutil/csutil.mak
 libs/csws/csws.mak

@@ -1012,6 +1012,14 @@ viewpoint, this manifests merely as the removal of the static link library
 change, simply eliminate the reference to this library from your build scripts,
 makefiles, or project files.
 
+@subheading csEngine Library Removed
+
+The @file{csengine} library has been removed.  Direct use of this library has
+long been deprecated, so its removal will probably go unnoticed by most or all
+projects.  Any projects which were using this library must now instead interact
+with the 3D engine via the @file{engine} plugin and the @sc{scf} interfaces in
+the @file{CS/include/iengine} directory.
+
 @subheading csString and iString Changes
 
 The @code{csString::strlwr()} method was renamed to @code{Downcase()}.  A

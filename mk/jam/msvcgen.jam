@@ -27,12 +27,6 @@
 # - Likewise, provide a generic Resources() rule which allows specification of
 #   additional textual resources for inclusion in generated projects.
 #
-# - Upgrade module Jamfiles to mention headers from the CS/include/module
-#   directory.  This will allow related headers to appear in the generated
-#   project files.  For instance, the libcsengine project should mention
-#   headers from CS/include/csengine, in addition to the ones from
-#   CS/libs/csengine which it currently mentions.
-#
 # - When PERL5.SDK.AVAILABLE is "yes", Jam reports that it doesn't know how to
 #   locate or create <grist>csperlxs.c.
 

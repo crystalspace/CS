@@ -25,9 +25,8 @@
 #include "csutil/csobject.h"
 #include "csgeom/vector3.h"
 #include "csutil/cscolor.h"
-#include "csengine/lview.h"
+#include "iengine/lview.h"
 
-class csEngine;
 class csPolygon3D;
 class csLightMap;
 class csRGBMap;
@@ -551,7 +550,7 @@ public:
 
 private:
   /// world being radiosity rendered
-  csEngine *engine;
+  iEngine *engine;
   /// list of all radiosity polygon info
   csRadList *list;
 
@@ -603,7 +602,7 @@ private:
 
 public:
   /// create all radiosity data.
-  csRadiosity(csEngine *current_engine, iProgressMeter* meter);
+  csRadiosity(iEngine *current_engine, iProgressMeter* meter);
   /// get rid of radiosity data.
   ~csRadiosity();
   /// Does the whole radiosity thing. This is the one to call.

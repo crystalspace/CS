@@ -97,22 +97,6 @@ consist of only one subdirectory, others will be a combination of several
 subdirectories.
 
 @table @code
-@item CS/libs/csengine
-The 3D engine is one of the cornerstones of Crystal Space and also what
-originally sparked the birth of the Crystal Space project.  It needs the 3D
-rasterizer component to display output and also requires a number of other
-libraries (csutil, csgeom, csgfxldr).  The 3D engine exports a number of
-@sc{scf} interfaces to allow access through the @sc{scf} mechanism.
-
-@table @code
-@item CS/libs/csengine/basic
-Collections, movable sector list, polygon edges
-@item CS/libs/csengine/light
-Lighting system
-@item CS/libs/csengine/objects
-Things and mesh objects
-@end table
-
 @item CS/libs/csgeom
 The geometry library. Various geometry related functions and classes can be
 found here: matrices, vectors, transforms, clipper, planes, etc.

@@ -1,5 +1,5 @@
 @c -*-texinfo-*-
-@node Rendering Loop, 3D Sprites, Visibility Culling, csEngine
+@node Rendering Loop, 3D Sprites, Visibility Culling, iEngine
 @subsection Rendering Loop
 @cindex Rendering Loop
 
@@ -25,17 +25,17 @@ First we start in @file{apps/tutorial/simple1/simple1.cpp}.  In the
 @code{main()} function we initialize our engine.  This is an instance of the
 plugin @samp{iEngine} which actually represents the engine.  I will not
 explain how all the initialization works.  This is explained in the tutorial.
-But I will go straight to @code{csEngine::Draw()} which is called indirectly
+But I will go straight to @code{iEngine::Draw()} which is called indirectly
 from within @code{Simple::NextFrame()}.  It is called indirectly because first
 we call @code{iView::Draw()} which then calls @code{iEngine::Draw()}.
 
-@subsubheading World Rendering (@code{csEngine::Draw()})
+@subsubheading World Rendering (@code{iEngine::Draw()})
 
 The method @code{iEngine::Draw()} is located in the file
-@file{CS/libs/csengine/engine.cpp}.
+@file{CS/plugins/engine/3d/engine.cpp}.
 
-@code{iEngine::Draw()} first sets up the initial @samp{csRenderView}
-structure.  This structure is defined in @file{CS/include/csengine/rview.h}
+@code{iEngine::Draw()} first sets up the initial @samp{iRenderView}
+structure.  This structure is defined in @file{CS/include/iengine/rview.h}
 and is the main structure which is used throughout the entire rendering
 process.  It collects all data that is required for rendering the recursive
 portal structure.
@@ -60,27 +60,27 @@ that case the portal will be used as an extra clipping plane because we don't
 want to render everything that is behind the arrival plane of the portal.
 @end table
 
-Another important thing is that @samp{csRenderView} is actually a subclass of
-@samp{csCamera} (@file{CS/include/csengine/camera.h}) so all camera
+Another important thing is that @samp{iRenderView} is actually a subclass of
+@samp{iCamera} (@file{CS/include/iengine/camera.h}) so all camera
 functionality is present as well.
 
-To set up the initial @samp{csRenderView} structure @code{csEngine::Draw()}
+To set up the initial @samp{iRenderView} structure @code{iEngine::Draw()}
 creates a new instance based upon the given camera.
 
-After this @code{csEngine::Draw()} gets the current sector from the camera and
-calls @code{csSector::Draw()} (@file{CS/libs/csengine/sector.cpp}).  This will
-essentially draw the whole screen as discussed below.
+After this @code{iEngine::Draw()} gets the current sector from the camera and
+calls @code{iSector::Draw()} (@file{CS/plugins/engine/3d/sector.cpp}).  This
+will essentially draw the whole screen as discussed below.
 
 After doing this (now that the screen is fully updated) we optionally draw
 halos.  Halos are drawn on top of everything else since they are an effect in
 the eyes.
 
-@subsubheading Sector Rendering (@code{csSector::Draw()})
+@subsubheading Sector Rendering (@code{iSector::Draw()})
 
-This method @code{csSector::Draw()} is located in
-@file{CS/libs/csengine/sector.cpp}.
+This method @code{iSector::Draw()} is located in
+@file{CS/plugins/engine/3d/sector.cpp}.
 
-@code{csSector::Draw()} is responsible for rendering everything in the current
+@code{iSector::Draw()} is responsible for rendering everything in the current
 sector. Before it does that it will ask the current visibility culler
 (@samp{frustvis} or @samp{dynavis}) what objects are likely to be visible
 or not. It will then render all visible objects sorted by render priority
@@ -94,7 +94,7 @@ so it can correctly transform its coordinates from world to camera space:
 (0,0,0) is the camera pointer, (1,0,0) is one to the right, (0,1,0) is one
 unit above the camera, and (0,0,1) is one unit in front of the camera.
 
-Every object also gets the current movable (@code{csMovable}) which indicates
+Every object also gets the current movable (@code{iMovable}) which indicates
 where the object currently is in the world. The transform created from
 the camera and the movable can be used to transform from object space
 to camera space. Note that some objects leave this transformation up to
@@ -110,12 +110,12 @@ The @samp{thing} mesh object type supports portals. When such a thing containing
 a portal is rendered the destination sector will be rendered recursively.
 This means that rendering of the current sector will be temporarily
 suspended while first the destination sector through that portal is rendered.
-Going through a portal results in the current @samp{csRenderView}
+Going through a portal results in the current @samp{iRenderView}
 instance to get a new clipper (a smaller clipper usually). Objects can use
 that clipper to decide if they want to be rendered or not. In some special
 cases a portal can also transform space (like a mirror). In that case the
 world@result{}camera transformation will also be modified in the current
-@code{csRenderView}.
+@code{iRenderView}.
 
 When a sector has finished rendering we conclude by optionally fogging the
 current sector if this is needed.
