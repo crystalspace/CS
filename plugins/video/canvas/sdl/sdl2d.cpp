@@ -222,7 +222,7 @@ void csGraphics2DSDL::fixlibrary()
 #if defined(OS_LINUX)
     Dl_info dlip;
 
-    dladdr(sdl2d_scfInitialize,&dlip);
+    dladdr((const void*)sdl2d_scfInitialize,&dlip);
     dlopen(dlip.dli_fname,RTLD_NOW);
 
     Report (CS_REPORTER_SEVERITY_NOTIFY, "Library %s locked.",dlip.dli_fname);
