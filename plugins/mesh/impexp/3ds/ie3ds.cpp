@@ -31,6 +31,7 @@
 #include "iutil/eventh.h"
 #include "iutil/comp.h"
 #include "iutil/databuff.h"
+#include "csutil/garray.h"
 
 #include "ie3ds.h"
 #include <lib3ds/camera.h>
@@ -180,14 +181,49 @@ static void AddTexels(Lib3dsTexel * pCurTexel, int numTexels,
   return;
 }
 
+typedef struct {
+  Lib3dsFace* face;
+  int faceVertex;
+  int normal;
+} AdjacentFace;
+
+CS_TYPEDEF_GROWING_ARRAY (Faces, AdjacentFace);
+CS_DECLARE_TYPED_VECTOR (FacesVector, Faces);
+CS_DECLARE_TYPED_VECTOR (csVector3Vector, csVector3);
 
 static void LoadTriangles (iModelDataObject *pDataObject,
 	iModelDataVertices* Vertices, Lib3dsFace * pCurFace,
     int numTriangles, bool hasTexels, Lib3dsMaterial* firstMaterial)
 {
-  int i,j,index;
+ 
+  int i,j,k,index;
   iModelDataPolygon * pCurPoly;
-  float *normal;
+  int numVertices = Vertices->GetVertexCount();
+
+  FacesVector adj_faces;
+
+  adj_faces.SetLength (numVertices);
+  for (i=0; i < numVertices; i++)
+  {
+    adj_faces[i] = new Faces ();
+  }
+
+/* collect all adjacent triangles for every vertex
+   (also at which corner of the triangle the vertex is) */
+
+  for ( i = 0 ; i < numTriangles ; i++ ) {
+    for( j = 0 ; j <3 ; j++ )
+    {
+      Faces* faces = adj_faces[pCurFace[i].points[j]];
+      AdjacentFace adjface;
+      adjface.face = &pCurFace[i];
+      adjface.faceVertex = j;
+      adjface.normal = -1;
+      faces->Push (adjface);
+    }
+  }
+
+  csVector3Vector normals;
 
   for ( i = 0 ; i < numTriangles ; i++ ) {
     // create a new poly for the data object
@@ -196,34 +232,111 @@ static void LoadTriangles (iModelDataObject *pDataObject,
     pDataObject->QueryObject ()->ObjAdd (pCurPoly->QueryObject ());
     /***  process the information for each polygon vertex  ***/
     //  get the indices for each vector of the triangle
-    normal = pCurFace->normal;
-    Vertices->AddNormal(csVector3(normal[0],normal[1],normal[2]));
 
     Lib3dsMaterial* pCurMat;
     for(pCurMat = firstMaterial;
         pCurMat && strcmp(pCurFace->material, pCurMat->name);
         pCurMat = pCurMat->next);
 
-    for( j = 0 ; j <3 ; j++ )
+    csVector3 backnormal[3];
+
+    int normindex;
+
+    if (!pCurFace->smoothing)
     {
-      index = pCurFace->points[j];
+      normindex = Vertices->AddNormal (csVector3(pCurFace->normal[0], 
+	pCurFace->normal[1], pCurFace->normal[2]));
+      for( j = 0 ; j <3 ; j++ )
+      {
+	index = pCurFace->points[j];
       // now add the vertex
-        if(hasTexels) pCurPoly->AddVertex(index, i , 0, index);
-        else pCurPoly->AddVertex(index, i , 0, j);
-  }
-    if(pCurMat && pCurMat->two_sided) {
-        // material indicates this triangle is two-sided, so
-        // add a new triangle facing the opposite direction
-    pCurPoly = new csModelDataPolygon ();
-    pDataObject->QueryObject ()->ObjAdd (pCurPoly->QueryObject ());
-        Vertices->AddNormal(csVector3(-normal[0],-normal[1],-normal[2]));
-        for( j = 2 ; j >= 0 ; j-- )
+	if(hasTexels) 
+	  pCurPoly->AddVertex(index, normindex, 0, index);
+	else 
+	  pCurPoly->AddVertex(index, normindex, 0, j);
+      }
+      if (pCurMat && pCurMat->two_sided) {
+	  // material indicates this triangle is two-sided, so
+	  // add a new triangle facing the opposite direction
+	pCurPoly = new csModelDataPolygon ();
+	pDataObject->QueryObject ()->ObjAdd (pCurPoly->QueryObject ());
+	normindex = Vertices->AddNormal (csVector3(-pCurFace->normal[0], 
+	  -pCurFace->normal[1], -pCurFace->normal[2]));
+	for( j = 2 ; j >= 0 ; j-- )
+	{
+	  index = pCurFace->points[j];
+	  // now add the vertex
+	  if(hasTexels) 
+	    pCurPoly->AddVertex(index, normindex , 0, index);
+	  else 
+	    pCurPoly->AddVertex(index, normindex , 0, j);
+	  }
+      }
+    }
+    else
     {
-      index = pCurFace->points[j];
-      // now add the vertex
-            if(hasTexels) pCurPoly->AddVertex(index, i , 0, index);
-            else pCurPoly->AddVertex(index, i , 0, j);
-        }
+      for( j = 0 ; j <3 ; j++ )
+      {
+        int firstadjface = -1;
+        csVector3 normal;
+
+	index = pCurFace->points[j];
+
+	for (k = adj_faces[index]->Length()-1; k >= 0; k--)
+	{
+	  AdjacentFace &adj_face = adj_faces[index]->Get(k);
+	  /* check if there is an adjacent triangle in the same
+	    smoothing group */
+	  if (adj_face.face->smoothing & pCurFace->smoothing)
+	  {
+	    /*  take the normal if already calculated */
+	    if (firstadjface == -1) 
+	    {
+	      if ((normindex = adj_face.normal) != -1)
+	      {
+		break;
+	      }
+	      firstadjface = k;
+	      normal = 0;
+	    }
+
+	    normal.x += adj_face.face->normal[0];
+	    normal.y += adj_face.face->normal[1];
+	    normal.z += adj_face.face->normal[2];
+	  }
+	}
+	/* calc the normal of all adjacent tris in the same
+	    smoothing group & save it */
+	if (normindex == -1)
+	{
+	  normal.Normalize();
+	  normindex = Vertices->AddNormal (normal);
+	  adj_faces[index]->Get(firstadjface).normal = normindex;
+	}
+	// now add the vertex
+	if(hasTexels) 
+	  pCurPoly->AddVertex(index, normindex, 0, index);
+	else 
+	  pCurPoly->AddVertex(index, normindex, 0, j);
+        if (pCurMat && pCurMat->two_sided)
+	  backnormal[j] = -normal;
+      }
+      if (pCurMat && pCurMat->two_sided) {
+	  // material indicates this triangle is two-sided, so
+	  // add a new triangle facing the opposite direction
+	pCurPoly = new csModelDataPolygon ();
+	pDataObject->QueryObject ()->ObjAdd (pCurPoly->QueryObject ());
+	for( j = 2 ; j >= 0 ; j-- )
+	{
+	  index = pCurFace->points[j];
+	  normindex = Vertices->AddNormal (backnormal[j]);
+	  // now add the vertex
+	  if(hasTexels) 
+	    pCurPoly->AddVertex(index, normindex , 0, index);
+	  else 
+	    pCurPoly->AddVertex(index, normindex , 0, j);
+	  }
+      }
     }
     pCurFace++;
   }
