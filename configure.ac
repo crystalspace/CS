@@ -2134,11 +2134,11 @@ AS_IF([test $cs_cv_cxx_explicit_template_specialization = no],
 #	only versions of gcc which do not understand the assembly content, but
 #	also buggy versions which fail with an internal error on this file
 #	(such as the RedHat 7 gcc).  Furthermore, it is reported that some
-#	versions of gcc 3.2.x cause qsqrt() to return bogus results when
+#	versions of gcc 3.2.x cause csQsqrt() to return bogus results when
 #	compiled in optimize mode on Intel hardware.  It is reported that this
 #	same compiler crashes with an internal error when -fPIC is used, so we
 #	use -fPIC as a way to detect this buggy compiler.  The MacOS/X PowerPC
-#	version of qsqrt() requires the -force_cpusubtype_ALL flag, so we use
+#	version of csQsqrt() requires the -force_cpusubtype_ALL flag, so we use
 #	that flag when available.  Sets the shell variable cs_cv_cxx_qsqrt_ok
 #	to "yes" if csqsqrt.h is usable, otherwise "no".
 #------------------------------------------------------------------------------
@@ -2162,7 +2162,9 @@ AC_DEFUN([CS_CHECK_QSQRT],
 		    ]],
 		    [float n = csQsqrt(1.0f); (void)n;])],
 		[CS_CREATE_TUPLE([$cs_qsqrt_cflags -I$srcdir/include])], [C++],
-		[cs_cv_cxx_qsqrt_ok=yes], [cs_cv_cxx_qsqrt_ok=no])])],
+		[cs_cv_cxx_qsqrt_ok=yes], [cs_cv_cxx_qsqrt_ok=no],
+		[$cs_cv_prog_cxx_enable_warnings \
+		$cs_cv_prog_cxx_enable_errors])])],
 	[cs_cv_cxx_qsqrt_ok=no])])
 
 CS_CHECK_QSQRT

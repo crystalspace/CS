@@ -34,6 +34,10 @@ chronological order.
 	  hierarchy.
 	- Eric Sunshine updated the cal3d check in configure.ac to demand the
 	  latest CVS version of cal3d.
+	- Eric Sunshine augmented the csQsqrt() check in configure.ac so that
+	  it attempts to detect the "warning: read-write constraint does not
+	  allow a register" diagnostic emitted by some newer versions of gcc
+	  for the assembly code in csqsqrt.h.
 15-Feb-2005
 	- Jorrit added csIntersect3::IntersectPolygon() to intersect
 	  a polygon with a segment.
