@@ -18,6 +18,7 @@
 
 #include "sysdef.h"
 #include "qint.h"
+#include "csgeom/fastsqrt.h"
 #include "csengine/bezier.h"
 #include "csengine/curve.h"
 #include "csengine/basic/polyset.h"
@@ -154,6 +155,8 @@ void csCurve::Normal (csVector3& vec, double u, double v)
   return;
 }
 
+#define CURVE_LM_SIZE 32
+
 void csCurve::InitLightmaps (csPolygonSet* owner, bool do_cache, int index)
 {
   if (!IsLightable ()) return;
@@ -164,11 +167,11 @@ void csCurve::InitLightmaps (csPolygonSet* owner, bool do_cache, int index)
   csSector* sector = owner->GetSector ();
   if (!sector) sector = (csSector*)owner;
   sector->GetAmbientColor (r, g, b);
-  lightmap->Alloc (256, 256, 16, r, g, b);
+  lightmap->Alloc (CURVE_LM_SIZE*16, CURVE_LM_SIZE*16, 16, r, g, b);
 
   if (!do_cache) { lightmap_up_to_date = false; return; }
   if (csPolygon3D::do_force_recalc) lightmap_up_to_date = false;
-  else if (!lightmap->ReadFromCache (256, 256, 16, owner, NULL, index, csWorld::current_world))
+  else if (!lightmap->ReadFromCache (CURVE_LM_SIZE*16, CURVE_LM_SIZE*16, 16, owner, NULL, index, csWorld::current_world))
     lightmap_up_to_date = true;
   else lightmap_up_to_date = true;
 }
@@ -209,7 +212,7 @@ void csCurve::ShineLightmaps (csLightView& lview)
       PosInSpace (pos, u, v);
       d = csSquaredDist::PointPoint (light->GetCenter (), pos);
       if (d >= light->GetSquaredRadius ()) continue;
-      d = sqrt (d);
+      d = FastSqrt (d);
       Normal (normal, u, v);
       float cosinus = (pos-light->GetCenter ())*normal;
       cosinus /= d;
