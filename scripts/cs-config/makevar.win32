@@ -67,13 +67,9 @@ LIBS.EXE.PLATFORM=-L/usr/lib/w32api -lgdi32 -lshell32
 TARGET.RAW = $(basename $(notdir $@))
 TARGET.RAW.UPCASE = $(basename $(notdir $(UPCASE)))
 LFLAGS.GENERAL=
-LFLAGS.DLL=-q --def=./$(TARGET.RAW).def --no-export-all-symbols -dllname $(TARGET.RAW)
+LFLAGS.DLL=-shared
 LFLAGS.EXE=-mconsole
-LINK.PLUGIN = dllwrap
-PLUGIN.POSTFLAGS = -mwindows -mconsole -lstdc++
+LINK.PLUGIN = $(LINK)
+PLUGIN.POSTFLAGS = -mwindows -mconsole
 COMMAND_DELIM= ;
-DO.SHARED.PLUGIN.PREAMBLE += \
-  echo "EXPORTS" > $(OUT)/$(TARGET.RAW).def $(COMMAND_DELIM) \
-  echo "  plugin_compiler" >> $(OUT)/$(TARGET.RAW).def $(COMMAND_DELIM) \
-  sed '/<implementation>/!d;s:[ 	]*<implementation>\(..*\)</implementation>:  \1_scfInitialize:;p;s:_scfInitialize:_scfFinalize:;p;s:_scfFinalize:_Create:' < $(INF.$(TARGET.RAW.UPCASE)) >> $(OUT)/$(TARGET.RAW).def $(COMMAND_DELIM)
-DO.SHARED.PLUGIN.POSTAMBLE = -mwindows -lstdc++
+DO.SHARED.PLUGIN.POSTAMBLE = -mwindows

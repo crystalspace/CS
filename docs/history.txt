@@ -7,13 +7,6 @@ individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
 17-Sep-2003
-	- Jorrit used valgrind in combination with the new renderer and
-	  discovered that the csGLExtensionManager didn't initialize the
-	  function pointers if some extension is not available. Since
-	  glrender3d (and other modules) sometimes test on the value of
-	  such a function pointer this could obviously give very bad
-	  results. Now csGLExtensionManager will initialize everything
-	  even if the extension is not present.
 	- Eric Sunshine documented cssys+csutil merge in apimod98.txi.
 	- Eric Sunshine documented csHash<> and csSet<> in apimod98.txi.
 	- Eric Sunshine repaired a lot of Texinfo mark-up errors in
@@ -22,6 +15,23 @@ chronological order.
 	  Changes" to "Release Notes" since these sections cover more than just
 	  API changes.
 	- Eric Sunshine eliminated numerous `hbox' warnings reported by TeX.
+	- Jorrit used valgrind in combination with the new renderer and
+	  discovered that the csGLExtensionManager didn't initialize the
+	  function pointers if some extension is not available. Since
+	  glrender3d (and other modules) sometimes test on the value of
+	  such a function pointer this could obviously give very bad
+	  results. Now csGLExtensionManager will initialize everything
+	  even if the extension is not present.
+	- Eric Sunshine added dlltool, dllwrap, and windres checks to
+	  configure.ac.  These checks respect the --host configure option,
+	  which makes it possible to cross-build CS for Mingw from Linux.
+	  http://www.libsdl.org/extras/win32/cross/README.txt
+	- Eric Sunshine changed the Mingw build to once again use "gcc -shared"
+	  when creating plugin modules instead of dllwrap.  Jorrit reports that
+	  he has trouble debugging plugins (missing debug symbols) built with
+	  both "gcc -shared" and dllwrap, so we might as well use the more
+	  well-supported option (gcc -shared) rather than the deprecated one
+	  (dllwrap).
 16-Sep-2003
 	- Jorrit fixed the thing plugin so that it now actually registers
 	  leaving portals to the sector.

@@ -86,8 +86,7 @@ DFLAGS.debug =
 # <cs-config>
 TARGET.RAW = $(basename $(notdir $@))
 TARGET.RAW.UPCASE = $(basename $(notdir $(UPCASE)))
-LFLAGS.DLL = $(DFLAGS.$(MODE)) -q --def=$(OUT)/$(TARGET.RAW).def \
-  --no-export-all-symbols --dllname $(TARGET.RAW)
+LFLAGS.DLL = -shared $(DFLAGS.$(MODE))
 # </cs-config>
 
 # Typical extension for objects and static libraries
@@ -127,10 +126,10 @@ endif # ifeq ($(MAKESECTION),defines)
 #------------------------------------------------------------- postdefines ---#
 ifeq ($(MAKESECTION),postdefines)
 
-# How to make shared libs for cs-config
+# How to make shared libs
 # <cs-config>
-LINK.PLUGIN = dllwrap
-PLUGIN.POSTFLAGS = -mwindows -mconsole -lstdc++
+LINK.PLUGIN = $(LINK)
+PLUGIN.POSTFLAGS = -mwindows -mconsole
 COMMAND_DELIM = ;
 # </cs-config>
 
@@ -141,19 +140,10 @@ else
   RCFLAGS =
 endif
 
-COMPILE_RES = windres --use-temp-file --include-dir include $(RCFLAGS) 
+COMPILE_RES = $(CMD.WINDRES) --use-temp-file --include-dir include $(RCFLAGS) 
 MAKEVERSIONINFO = $(RUN_SCRIPT) $(SRCDIR)/libs/cssys/win32/mkverres.sh
 MERGERES = $(RUN_SCRIPT) $(SRCDIR)/libs/cssys/win32/mergeres.sh
 MAKEMETADATA = $(RUN_SCRIPT) $(SRCDIR)/libs/cssys/win32/mkmetadatares.sh
-
-ifdef WIN32_USED_ONLY_BY_CSCONFIG
-# <cs-config>
-DO.SHARED.PLUGIN.PREAMBLE += \
-  echo "EXPORTS" > $(OUT)/$(TARGET.RAW).def $(COMMAND_DELIM) \
-  echo "  plugin_compiler" >> $(OUT)/$(TARGET.RAW).def $(COMMAND_DELIM) \
-  sed '/<implementation>/!d;s:[ 	]*<implementation>\(..*\)</implementation>:  \1_scfInitialize:;p;s:_scfInitialize:_scfFinalize:;p;s:_scfFinalize:_Create:' < $(INF.$(TARGET.RAW.UPCASE)) >> $(OUT)/$(TARGET.RAW).def $(COMMAND_DELIM)
-# </cs-config>
-endif
 
 ifeq ($(EMBED_META),yes)
 METARC = $(OUT)/$(@:$(DLL)=-meta.rc)
@@ -171,18 +161,16 @@ DO.SHARED.PLUGIN.PREAMBLE += \
   $(MERGERES) $(OUT)/$(@:$(DLL)=-rsrc.rc) $(SRCDIR) $(SRCDIR) \
     $(OUT)/$(@:$(DLL)=-version.rc) $($@.WINRSRC) $(METARC) \
     $(COMMAND_DELIM) \
-  $(COMPILE_RES) -i $(OUT)/$(@:$(DLL)=-rsrc.rc) --include-dir "$(SRCDIR)/include" \
-    -o $(OUT)/$(@:$(DLL)=-rsrc.o) $(COMMAND_DELIM) \
-  echo "EXPORTS" > $(OUT)/$(TARGET.RAW).def $(COMMAND_DELIM) \
-  echo "  plugin_compiler" >> $(OUT)/$(TARGET.RAW).def $(COMMAND_DELIM) \
-  sed '/<implementation>/!d;s:[ 	]*<implementation>\(..*\)</implementation>:  \1_scfInitialize:;p;s:_scfInitialize:_scfFinalize:;p;s:_scfFinalize:_Create:' < $(INF.$(TARGET.RAW.UPCASE)) >> $(OUT)/$(TARGET.RAW).def $(COMMAND_DELIM)
+  $(COMPILE_RES) -i $(OUT)/$(@:$(DLL)=-rsrc.rc) \
+    --include-dir "$(SRCDIR)/include" \
+    -o $(OUT)/$(@:$(DLL)=-rsrc.o) $(COMMAND_DELIM)
 
 DO.SHARED.PLUGIN.CORE = \
   $(LINK.PLUGIN) $(LFLAGS.DLL) $(LFLAGS.@) $(^^) \
     $(OUT)/$(@:$(DLL)=-rsrc.o) $(L^) $(LIBS) $(LFLAGS)
 
 # <cs-config>
-DO.SHARED.PLUGIN.POSTAMBLE = -mwindows -lstdc++
+DO.SHARED.PLUGIN.POSTAMBLE = -mwindows
 # </cs-config>
 
 # Commenting out the following line will make the -noconsole option work
@@ -192,10 +180,12 @@ DO.SHARED.PLUGIN.POSTAMBLE = -mwindows -lstdc++
 
 DO.LINK.EXE = \
   $(MAKEVERSIONINFO) $(OUT)/$(@:$(EXE)=-version.rc) \
-    "$(DESCRIPTION.$(TARGET.RAW))" "$(SRCDIR)/include/csver.h" $(COMMAND_DELIM) \
+    "$(DESCRIPTION.$(TARGET.RAW))" "$(SRCDIR)/include/csver.h" \
+    $(COMMAND_DELIM) \
   $(MERGERES) $(OUT)/$(@:$(EXE)=-rsrc.rc) $(SRCDIR) $(SRCDIR) \
     $(OUT)/$(@:$(EXE)=-version.rc) $($@.WINRSRC) $(COMMAND_DELIM) \
-  $(COMPILE_RES) -i $(OUT)/$(@:$(EXE)=-rsrc.rc) --include-dir="$(SRCDIR)/include" \
+  $(COMPILE_RES) -i $(OUT)/$(@:$(EXE)=-rsrc.rc) \
+    --include-dir="$(SRCDIR)/include" \
     -o $(OUT)/$(@:$(EXE)=-rsrc.o) $(COMMAND_DELIM) \
   $(LINK) $(LFLAGS) $(LFLAGS.EXE) $(LFLAGS.@) $(^^) \
     $(OUT)/$(@:$(EXE)=-rsrc.o) $(L^) $(LIBS)

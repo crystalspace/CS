@@ -555,19 +555,18 @@ int WINAPI WinMain (HINSTANCE hApp, HINSTANCE prev, LPSTR cmd, int show)\
 
 #define CS_IMPLEMENT_PLATFORM_PLUGIN                                   \
 int _cs_main(int argc, char* argv[])                                   \
- {                                                                     \
+{                                                                      \
          return 0;                                                     \
- }                                                                     \
+}                                                                      \
 extern "C" BOOL WINAPI                                                 \
 DllMain (HINSTANCE hinstDLL, DWORD fdwReason, LPVOID /*lpvReserved*/)  \
- {                                                                     \
+{                                                                      \
           return TRUE;                                                 \
- }                                                                     \
-extern "C" __declspec(dllexport)                                       \
-const char* plugin_compiler()                                          \
- {                                                                     \
+}                                                                      \
+CS_EXPORTED_FUNCTION const char* plugin_compiler()                     \
+{                                                                      \
          return CS_COMPILER_NAME;                                      \
- }
+}
 
 #endif // !CS_STATIC_LINKED
 
