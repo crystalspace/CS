@@ -40,15 +40,6 @@
     <TOKEN name="GL_TEXTURE_DEPTH" value="32881" />
     <TOKEN name="GL_TEXTURE_WRAP_R" value="32882" />
     <TOKEN name="GL_MAX_3D_TEXTURE_SIZE" value="32883" />
-    <FUNCTION name="glBlendColor" return="GLvoid" pointer="FALSE">
-      <ARG name="red" type="GLclampf" const="FALSE" pointer="FALSE" />
-      <ARG name="green" type="GLclampf" const="FALSE" pointer="FALSE" />
-      <ARG name="blue" type="GLclampf" const="FALSE" pointer="FALSE" />
-      <ARG name="alpha" type="GLclampf" const="FALSE" pointer="FALSE" />
-    </FUNCTION>
-    <FUNCTION name="glBlendEquation" return="GLvoid" pointer="FALSE">
-      <ARG name="mode" type="GLenum" const="FALSE" pointer="FALSE" />
-    </FUNCTION>
     <FUNCTION name="glDrawRangeElements" return="GLvoid" pointer="FALSE">
       <ARG name="mode" type="GLenum" const="FALSE" pointer="FALSE" />
       <ARG name="start" type="GLuint" const="FALSE" pointer="FALSE" />
@@ -56,199 +47,6 @@
       <ARG name="count" type="GLsizei" const="FALSE" pointer="FALSE" />
       <ARG name="type" type="GLenum" const="FALSE" pointer="FALSE" />
       <ARG name="indices" type="GLvoid" const="TRUE" pointer="TRUE" />
-    </FUNCTION>
-    <FUNCTION name="glColorTable" return="GLvoid" pointer="FALSE">
-      <ARG name="target" type="GLenum" const="FALSE" pointer="FALSE" />
-      <ARG name="internalformat" type="GLenum" const="FALSE" pointer="FALSE" />
-      <ARG name="width" type="GLsizei" const="FALSE" pointer="FALSE" />
-      <ARG name="format" type="GLenum" const="FALSE" pointer="FALSE" />
-      <ARG name="type" type="GLenum" const="FALSE" pointer="FALSE" />
-      <ARG name="table" type="GLvoid" const="TRUE" pointer="TRUE" />
-    </FUNCTION>
-    <FUNCTION name="glColorTableParameterfv" return="GLvoid" pointer="FALSE">
-      <ARG name="target" type="GLenum" const="FALSE" pointer="FALSE" />
-      <ARG name="pname" type="GLenum" const="FALSE" pointer="FALSE" />
-      <ARG name="params" type="GLfloat" const="TRUE" pointer="TRUE" />
-    </FUNCTION>
-    <FUNCTION name="glColorTableParameteriv" return="GLvoid" pointer="FALSE">
-      <ARG name="target" type="GLenum" const="FALSE" pointer="FALSE" />
-      <ARG name="pname" type="GLenum" const="FALSE" pointer="FALSE" />
-      <ARG name="params" type="GLint" const="TRUE" pointer="TRUE" />
-    </FUNCTION>
-    <FUNCTION name="glCopyColorTable" return="GLvoid" pointer="FALSE">
-      <ARG name="target" type="GLenum" const="FALSE" pointer="FALSE" />
-      <ARG name="internalformat" type="GLenum" const="FALSE" pointer="FALSE" />
-      <ARG name="x" type="GLint" const="FALSE" pointer="FALSE" />
-      <ARG name="y" type="GLint" const="FALSE" pointer="FALSE" />
-      <ARG name="width" type="GLsizei" const="FALSE" pointer="FALSE" />
-    </FUNCTION>
-    <FUNCTION name="glGetColorTable" return="GLvoid" pointer="FALSE">
-      <ARG name="target" type="GLenum" const="FALSE" pointer="FALSE" />
-      <ARG name="format" type="GLenum" const="FALSE" pointer="FALSE" />
-      <ARG name="type" type="GLenum" const="FALSE" pointer="FALSE" />
-      <ARG name="table" type="GLvoid" const="FALSE" pointer="TRUE" />
-    </FUNCTION>
-    <FUNCTION name="glGetColorTableParameterfv" return="GLvoid" pointer="FALSE">
-      <ARG name="target" type="GLenum" const="FALSE" pointer="FALSE" />
-      <ARG name="pname" type="GLenum" const="FALSE" pointer="FALSE" />
-      <ARG name="params" type="GLfloat" const="FALSE" pointer="TRUE" />
-    </FUNCTION>
-    <FUNCTION name="glGetColorTableParameteriv" return="GLvoid" pointer="FALSE">
-      <ARG name="target" type="GLenum" const="FALSE" pointer="FALSE" />
-      <ARG name="pname" type="GLenum" const="FALSE" pointer="FALSE" />
-      <ARG name="params" type="GLint" const="FALSE" pointer="TRUE" />
-    </FUNCTION>
-    <FUNCTION name="glColorSubTable" return="GLvoid" pointer="FALSE">
-      <ARG name="target" type="GLenum" const="FALSE" pointer="FALSE" />
-      <ARG name="start" type="GLsizei" const="FALSE" pointer="FALSE" />
-      <ARG name="count" type="GLsizei" const="FALSE" pointer="FALSE" />
-      <ARG name="format" type="GLenum" const="FALSE" pointer="FALSE" />
-      <ARG name="type" type="GLenum" const="FALSE" pointer="FALSE" />
-      <ARG name="data" type="GLvoid" const="TRUE" pointer="TRUE" />
-    </FUNCTION>
-    <FUNCTION name="glCopyColorSubTable" return="GLvoid" pointer="FALSE">
-      <ARG name="target" type="GLenum" const="FALSE" pointer="FALSE" />
-      <ARG name="start" type="GLsizei" const="FALSE" pointer="FALSE" />
-      <ARG name="x" type="GLint" const="FALSE" pointer="FALSE" />
-      <ARG name="y" type="GLint" const="FALSE" pointer="FALSE" />
-      <ARG name="width" type="GLsizei" const="FALSE" pointer="FALSE" />
-    </FUNCTION>
-    <FUNCTION name="glConvolutionFilter1D" return="GLvoid" pointer="FALSE">
-      <ARG name="target" type="GLenum" const="FALSE" pointer="FALSE" />
-      <ARG name="internalformat" type="GLenum" const="FALSE" pointer="FALSE" />
-      <ARG name="width" type="GLsizei" const="FALSE" pointer="FALSE" />
-      <ARG name="format" type="GLenum" const="FALSE" pointer="FALSE" />
-      <ARG name="type" type="GLenum" const="FALSE" pointer="FALSE" />
-      <ARG name="image" type="GLvoid" const="TRUE" pointer="TRUE" />
-    </FUNCTION>
-    <FUNCTION name="glConvolutionFilter2D" return="GLvoid" pointer="FALSE">
-      <ARG name="target" type="GLenum" const="FALSE" pointer="FALSE" />
-      <ARG name="internalformat" type="GLenum" const="FALSE" pointer="FALSE" />
-      <ARG name="width" type="GLsizei" const="FALSE" pointer="FALSE" />
-      <ARG name="height" type="GLsizei" const="FALSE" pointer="FALSE" />
-      <ARG name="format" type="GLenum" const="FALSE" pointer="FALSE" />
-      <ARG name="type" type="GLenum" const="FALSE" pointer="FALSE" />
-      <ARG name="image" type="GLvoid" const="TRUE" pointer="TRUE" />
-    </FUNCTION>
-    <FUNCTION name="glConvolutionParameterf" return="GLvoid" pointer="FALSE">
-      <ARG name="target" type="GLenum" const="FALSE" pointer="FALSE" />
-      <ARG name="pname" type="GLenum" const="FALSE" pointer="FALSE" />
-      <ARG name="params" type="GLfloat" const="FALSE" pointer="FALSE" />
-    </FUNCTION>
-    <FUNCTION name="glConvolutionParameterfv" return="GLvoid" pointer="FALSE">
-      <ARG name="target" type="GLenum" const="FALSE" pointer="FALSE" />
-      <ARG name="pname" type="GLenum" const="FALSE" pointer="FALSE" />
-      <ARG name="params" type="GLfloat" const="TRUE" pointer="TRUE" />
-    </FUNCTION>
-    <FUNCTION name="glConvolutionParameteri" return="GLvoid" pointer="FALSE">
-      <ARG name="target" type="GLenum" const="FALSE" pointer="FALSE" />
-      <ARG name="pname" type="GLenum" const="FALSE" pointer="FALSE" />
-      <ARG name="params" type="GLint" const="FALSE" pointer="FALSE" />
-    </FUNCTION>
-    <FUNCTION name="glConvolutionParameteriv" return="GLvoid" pointer="FALSE">
-      <ARG name="target" type="GLenum" const="FALSE" pointer="FALSE" />
-      <ARG name="pname" type="GLenum" const="FALSE" pointer="FALSE" />
-      <ARG name="params" type="GLint" const="TRUE" pointer="TRUE" />
-    </FUNCTION>
-    <FUNCTION name="glCopyConvolutionFilter1D" return="GLvoid" pointer="FALSE">
-      <ARG name="target" type="GLenum" const="FALSE" pointer="FALSE" />
-      <ARG name="internalformat" type="GLenum" const="FALSE" pointer="FALSE" />
-      <ARG name="x" type="GLint" const="FALSE" pointer="FALSE" />
-      <ARG name="y" type="GLint" const="FALSE" pointer="FALSE" />
-      <ARG name="width" type="GLsizei" const="FALSE" pointer="FALSE" />
-    </FUNCTION>
-    <FUNCTION name="glCopyConvolutionFilter2D" return="GLvoid" pointer="FALSE">
-      <ARG name="target" type="GLenum" const="FALSE" pointer="FALSE" />
-      <ARG name="internalformat" type="GLenum" const="FALSE" pointer="FALSE" />
-      <ARG name="x" type="GLint" const="FALSE" pointer="FALSE" />
-      <ARG name="y" type="GLint" const="FALSE" pointer="FALSE" />
-      <ARG name="width" type="GLsizei" const="FALSE" pointer="FALSE" />
-      <ARG name="height" type="GLsizei" const="FALSE" pointer="FALSE" />
-    </FUNCTION>
-    <FUNCTION name="glGetConvolutionFilter" return="GLvoid" pointer="FALSE">
-      <ARG name="target" type="GLenum" const="FALSE" pointer="FALSE" />
-      <ARG name="format" type="GLenum" const="FALSE" pointer="FALSE" />
-      <ARG name="type" type="GLenum" const="FALSE" pointer="FALSE" />
-      <ARG name="image" type="GLvoid" const="FALSE" pointer="TRUE" />
-    </FUNCTION>
-    <FUNCTION name="glGetConvolutionParameterfv" return="GLvoid" pointer="FALSE">
-      <ARG name="target" type="GLenum" const="FALSE" pointer="FALSE" />
-      <ARG name="pname" type="GLenum" const="FALSE" pointer="FALSE" />
-      <ARG name="params" type="GLfloat" const="FALSE" pointer="TRUE" />
-    </FUNCTION>
-    <FUNCTION name="glGetConvolutionParameteriv" return="GLvoid" pointer="FALSE">
-      <ARG name="target" type="GLenum" const="FALSE" pointer="FALSE" />
-      <ARG name="pname" type="GLenum" const="FALSE" pointer="FALSE" />
-      <ARG name="params" type="GLint" const="FALSE" pointer="TRUE" />
-    </FUNCTION>
-    <FUNCTION name="glGetSeparableFilter" return="GLvoid" pointer="FALSE">
-      <ARG name="target" type="GLenum" const="FALSE" pointer="FALSE" />
-      <ARG name="format" type="GLenum" const="FALSE" pointer="FALSE" />
-      <ARG name="type" type="GLenum" const="FALSE" pointer="FALSE" />
-      <ARG name="row" type="GLvoid" const="FALSE" pointer="TRUE" />
-      <ARG name="column" type="GLvoid" const="FALSE" pointer="TRUE" />
-      <ARG name="span" type="GLvoid" const="FALSE" pointer="TRUE" />
-    </FUNCTION>
-    <FUNCTION name="glSeparableFilter2D" return="GLvoid" pointer="FALSE">
-      <ARG name="target" type="GLenum" const="FALSE" pointer="FALSE" />
-      <ARG name="internalformat" type="GLenum" const="FALSE" pointer="FALSE" />
-      <ARG name="width" type="GLsizei" const="FALSE" pointer="FALSE" />
-      <ARG name="height" type="GLsizei" const="FALSE" pointer="FALSE" />
-      <ARG name="format" type="GLenum" const="FALSE" pointer="FALSE" />
-      <ARG name="type" type="GLenum" const="FALSE" pointer="FALSE" />
-      <ARG name="row" type="GLvoid" const="TRUE" pointer="TRUE" />
-      <ARG name="column" type="GLvoid" const="TRUE" pointer="TRUE" />
-    </FUNCTION>
-    <FUNCTION name="glGetHistogram" return="GLvoid" pointer="FALSE">
-      <ARG name="target" type="GLenum" const="FALSE" pointer="FALSE" />
-      <ARG name="reset" type="GLboolean" const="FALSE" pointer="FALSE" />
-      <ARG name="format" type="GLenum" const="FALSE" pointer="FALSE" />
-      <ARG name="type" type="GLenum" const="FALSE" pointer="FALSE" />
-      <ARG name="values" type="GLvoid" const="FALSE" pointer="TRUE" />
-    </FUNCTION>
-    <FUNCTION name="glGetHistogramParameterfv" return="GLvoid" pointer="FALSE">
-      <ARG name="target" type="GLenum" const="FALSE" pointer="FALSE" />
-      <ARG name="pname" type="GLenum" const="FALSE" pointer="FALSE" />
-      <ARG name="params" type="GLfloat" const="FALSE" pointer="TRUE" />
-    </FUNCTION>
-    <FUNCTION name="glGetHistogramParameteriv" return="GLvoid" pointer="FALSE">
-      <ARG name="target" type="GLenum" const="FALSE" pointer="FALSE" />
-      <ARG name="pname" type="GLenum" const="FALSE" pointer="FALSE" />
-      <ARG name="params" type="GLint" const="FALSE" pointer="TRUE" />
-    </FUNCTION>
-    <FUNCTION name="glGetMinmax" return="GLvoid" pointer="FALSE">
-      <ARG name="target" type="GLenum" const="FALSE" pointer="FALSE" />
-      <ARG name="reset" type="GLboolean" const="FALSE" pointer="FALSE" />
-      <ARG name="format" type="GLenum" const="FALSE" pointer="FALSE" />
-      <ARG name="type" type="GLenum" const="FALSE" pointer="FALSE" />
-      <ARG name="values" type="GLvoid" const="FALSE" pointer="TRUE" />
-    </FUNCTION>
-    <FUNCTION name="glGetMinmaxParameterfv" return="GLvoid" pointer="FALSE">
-      <ARG name="target" type="GLenum" const="FALSE" pointer="FALSE" />
-      <ARG name="pname" type="GLenum" const="FALSE" pointer="FALSE" />
-      <ARG name="params" type="GLfloat" const="FALSE" pointer="TRUE" />
-    </FUNCTION>
-    <FUNCTION name="glGetMinmaxParameteriv" return="GLvoid" pointer="FALSE">
-      <ARG name="target" type="GLenum" const="FALSE" pointer="FALSE" />
-      <ARG name="pname" type="GLenum" const="FALSE" pointer="FALSE" />
-      <ARG name="params" type="GLint" const="FALSE" pointer="TRUE" />
-    </FUNCTION>
-    <FUNCTION name="glHistogram" return="GLvoid" pointer="FALSE">
-      <ARG name="target" type="GLenum" const="FALSE" pointer="FALSE" />
-      <ARG name="width" type="GLsizei" const="FALSE" pointer="FALSE" />
-      <ARG name="internalformat" type="GLenum" const="FALSE" pointer="FALSE" />
-      <ARG name="sink" type="GLboolean" const="FALSE" pointer="FALSE" />
-    </FUNCTION>
-    <FUNCTION name="glMinmax" return="GLvoid" pointer="FALSE">
-      <ARG name="target" type="GLenum" const="FALSE" pointer="FALSE" />
-      <ARG name="internalformat" type="GLenum" const="FALSE" pointer="FALSE" />
-      <ARG name="sink" type="GLboolean" const="FALSE" pointer="FALSE" />
-    </FUNCTION>
-    <FUNCTION name="glResetHistogram" return="GLvoid" pointer="FALSE">
-      <ARG name="target" type="GLenum" const="FALSE" pointer="FALSE" />
-    </FUNCTION>
-    <FUNCTION name="glResetMinmax" return="GLvoid" pointer="FALSE">
-      <ARG name="target" type="GLenum" const="FALSE" pointer="FALSE" />
     </FUNCTION>
     <FUNCTION name="glTexImage3D" return="GLvoid" pointer="FALSE">
       <ARG name="target" type="GLenum" const="FALSE" pointer="FALSE" />
@@ -706,6 +504,208 @@
     <TOKEN name="GL_WRAP_BORDER" value="33106" />
     <TOKEN name="GL_REPLICATE_BORDER" value="33107" />
     <TOKEN name="GL_CONVOLUTION_BORDER_COLOR" value="33108" />
+    <FUNCTION name="glColorTable" return="GLvoid" pointer="FALSE">
+      <ARG name="target" type="GLenum" const="FALSE" pointer="FALSE" />
+      <ARG name="internalformat" type="GLenum" const="FALSE" pointer="FALSE" />
+      <ARG name="width" type="GLsizei" const="FALSE" pointer="FALSE" />
+      <ARG name="format" type="GLenum" const="FALSE" pointer="FALSE" />
+      <ARG name="type" type="GLenum" const="FALSE" pointer="FALSE" />
+      <ARG name="table" type="GLvoid" const="TRUE" pointer="TRUE" />
+    </FUNCTION>
+    <FUNCTION name="glColorTableParameterfv" return="GLvoid" pointer="FALSE">
+      <ARG name="target" type="GLenum" const="FALSE" pointer="FALSE" />
+      <ARG name="pname" type="GLenum" const="FALSE" pointer="FALSE" />
+      <ARG name="params" type="GLfloat" const="TRUE" pointer="TRUE" />
+    </FUNCTION>
+    <FUNCTION name="glColorTableParameteriv" return="GLvoid" pointer="FALSE">
+      <ARG name="target" type="GLenum" const="FALSE" pointer="FALSE" />
+      <ARG name="pname" type="GLenum" const="FALSE" pointer="FALSE" />
+      <ARG name="params" type="GLint" const="TRUE" pointer="TRUE" />
+    </FUNCTION>
+    <FUNCTION name="glCopyColorTable" return="GLvoid" pointer="FALSE">
+      <ARG name="target" type="GLenum" const="FALSE" pointer="FALSE" />
+      <ARG name="internalformat" type="GLenum" const="FALSE" pointer="FALSE" />
+      <ARG name="x" type="GLint" const="FALSE" pointer="FALSE" />
+      <ARG name="y" type="GLint" const="FALSE" pointer="FALSE" />
+      <ARG name="width" type="GLsizei" const="FALSE" pointer="FALSE" />
+    </FUNCTION>
+    <FUNCTION name="glGetColorTable" return="GLvoid" pointer="FALSE">
+      <ARG name="target" type="GLenum" const="FALSE" pointer="FALSE" />
+      <ARG name="format" type="GLenum" const="FALSE" pointer="FALSE" />
+      <ARG name="type" type="GLenum" const="FALSE" pointer="FALSE" />
+      <ARG name="table" type="GLvoid" const="FALSE" pointer="TRUE" />
+    </FUNCTION>
+    <FUNCTION name="glGetColorTableParameterfv" return="GLvoid" pointer="FALSE">
+      <ARG name="target" type="GLenum" const="FALSE" pointer="FALSE" />
+      <ARG name="pname" type="GLenum" const="FALSE" pointer="FALSE" />
+      <ARG name="params" type="GLfloat" const="FALSE" pointer="TRUE" />
+    </FUNCTION>
+    <FUNCTION name="glGetColorTableParameteriv" return="GLvoid" pointer="FALSE">
+      <ARG name="target" type="GLenum" const="FALSE" pointer="FALSE" />
+      <ARG name="pname" type="GLenum" const="FALSE" pointer="FALSE" />
+      <ARG name="params" type="GLint" const="FALSE" pointer="TRUE" />
+    </FUNCTION>
+    <FUNCTION name="glColorSubTable" return="GLvoid" pointer="FALSE">
+      <ARG name="target" type="GLenum" const="FALSE" pointer="FALSE" />
+      <ARG name="start" type="GLsizei" const="FALSE" pointer="FALSE" />
+      <ARG name="count" type="GLsizei" const="FALSE" pointer="FALSE" />
+      <ARG name="format" type="GLenum" const="FALSE" pointer="FALSE" />
+      <ARG name="type" type="GLenum" const="FALSE" pointer="FALSE" />
+      <ARG name="data" type="GLvoid" const="TRUE" pointer="TRUE" />
+    </FUNCTION>
+    <FUNCTION name="glCopyColorSubTable" return="GLvoid" pointer="FALSE">
+      <ARG name="target" type="GLenum" const="FALSE" pointer="FALSE" />
+      <ARG name="start" type="GLsizei" const="FALSE" pointer="FALSE" />
+      <ARG name="x" type="GLint" const="FALSE" pointer="FALSE" />
+      <ARG name="y" type="GLint" const="FALSE" pointer="FALSE" />
+      <ARG name="width" type="GLsizei" const="FALSE" pointer="FALSE" />
+    </FUNCTION>
+    <FUNCTION name="glConvolutionFilter1D" return="GLvoid" pointer="FALSE">
+      <ARG name="target" type="GLenum" const="FALSE" pointer="FALSE" />
+      <ARG name="internalformat" type="GLenum" const="FALSE" pointer="FALSE" />
+      <ARG name="width" type="GLsizei" const="FALSE" pointer="FALSE" />
+      <ARG name="format" type="GLenum" const="FALSE" pointer="FALSE" />
+      <ARG name="type" type="GLenum" const="FALSE" pointer="FALSE" />
+      <ARG name="image" type="GLvoid" const="TRUE" pointer="TRUE" />
+    </FUNCTION>
+    <FUNCTION name="glConvolutionFilter2D" return="GLvoid" pointer="FALSE">
+      <ARG name="target" type="GLenum" const="FALSE" pointer="FALSE" />
+      <ARG name="internalformat" type="GLenum" const="FALSE" pointer="FALSE" />
+      <ARG name="width" type="GLsizei" const="FALSE" pointer="FALSE" />
+      <ARG name="height" type="GLsizei" const="FALSE" pointer="FALSE" />
+      <ARG name="format" type="GLenum" const="FALSE" pointer="FALSE" />
+      <ARG name="type" type="GLenum" const="FALSE" pointer="FALSE" />
+      <ARG name="image" type="GLvoid" const="TRUE" pointer="TRUE" />
+    </FUNCTION>
+    <FUNCTION name="glConvolutionParameterf" return="GLvoid" pointer="FALSE">
+      <ARG name="target" type="GLenum" const="FALSE" pointer="FALSE" />
+      <ARG name="pname" type="GLenum" const="FALSE" pointer="FALSE" />
+      <ARG name="params" type="GLfloat" const="FALSE" pointer="FALSE" />
+    </FUNCTION>
+    <FUNCTION name="glConvolutionParameterfv" return="GLvoid" pointer="FALSE">
+      <ARG name="target" type="GLenum" const="FALSE" pointer="FALSE" />
+      <ARG name="pname" type="GLenum" const="FALSE" pointer="FALSE" />
+      <ARG name="params" type="GLfloat" const="TRUE" pointer="TRUE" />
+    </FUNCTION>
+    <FUNCTION name="glConvolutionParameteri" return="GLvoid" pointer="FALSE">
+      <ARG name="target" type="GLenum" const="FALSE" pointer="FALSE" />
+      <ARG name="pname" type="GLenum" const="FALSE" pointer="FALSE" />
+      <ARG name="params" type="GLint" const="FALSE" pointer="FALSE" />
+    </FUNCTION>
+    <FUNCTION name="glConvolutionParameteriv" return="GLvoid" pointer="FALSE">
+      <ARG name="target" type="GLenum" const="FALSE" pointer="FALSE" />
+      <ARG name="pname" type="GLenum" const="FALSE" pointer="FALSE" />
+      <ARG name="params" type="GLint" const="TRUE" pointer="TRUE" />
+    </FUNCTION>
+    <FUNCTION name="glCopyConvolutionFilter1D" return="GLvoid" pointer="FALSE">
+      <ARG name="target" type="GLenum" const="FALSE" pointer="FALSE" />
+      <ARG name="internalformat" type="GLenum" const="FALSE" pointer="FALSE" />
+      <ARG name="x" type="GLint" const="FALSE" pointer="FALSE" />
+      <ARG name="y" type="GLint" const="FALSE" pointer="FALSE" />
+      <ARG name="width" type="GLsizei" const="FALSE" pointer="FALSE" />
+    </FUNCTION>
+    <FUNCTION name="glCopyConvolutionFilter2D" return="GLvoid" pointer="FALSE">
+      <ARG name="target" type="GLenum" const="FALSE" pointer="FALSE" />
+      <ARG name="internalformat" type="GLenum" const="FALSE" pointer="FALSE" />
+      <ARG name="x" type="GLint" const="FALSE" pointer="FALSE" />
+      <ARG name="y" type="GLint" const="FALSE" pointer="FALSE" />
+      <ARG name="width" type="GLsizei" const="FALSE" pointer="FALSE" />
+      <ARG name="height" type="GLsizei" const="FALSE" pointer="FALSE" />
+    </FUNCTION>
+    <FUNCTION name="glGetConvolutionFilter" return="GLvoid" pointer="FALSE">
+      <ARG name="target" type="GLenum" const="FALSE" pointer="FALSE" />
+      <ARG name="format" type="GLenum" const="FALSE" pointer="FALSE" />
+      <ARG name="type" type="GLenum" const="FALSE" pointer="FALSE" />
+      <ARG name="image" type="GLvoid" const="FALSE" pointer="TRUE" />
+    </FUNCTION>
+    <FUNCTION name="glGetConvolutionParameterfv" return="GLvoid" pointer="FALSE">
+      <ARG name="target" type="GLenum" const="FALSE" pointer="FALSE" />
+      <ARG name="pname" type="GLenum" const="FALSE" pointer="FALSE" />
+      <ARG name="params" type="GLfloat" const="FALSE" pointer="TRUE" />
+    </FUNCTION>
+    <FUNCTION name="glGetConvolutionParameteriv" return="GLvoid" pointer="FALSE">
+      <ARG name="target" type="GLenum" const="FALSE" pointer="FALSE" />
+      <ARG name="pname" type="GLenum" const="FALSE" pointer="FALSE" />
+      <ARG name="params" type="GLint" const="FALSE" pointer="TRUE" />
+    </FUNCTION>
+    <FUNCTION name="glGetSeparableFilter" return="GLvoid" pointer="FALSE">
+      <ARG name="target" type="GLenum" const="FALSE" pointer="FALSE" />
+      <ARG name="format" type="GLenum" const="FALSE" pointer="FALSE" />
+      <ARG name="type" type="GLenum" const="FALSE" pointer="FALSE" />
+      <ARG name="row" type="GLvoid" const="FALSE" pointer="TRUE" />
+      <ARG name="column" type="GLvoid" const="FALSE" pointer="TRUE" />
+      <ARG name="span" type="GLvoid" const="FALSE" pointer="TRUE" />
+    </FUNCTION>
+    <FUNCTION name="glSeparableFilter2D" return="GLvoid" pointer="FALSE">
+      <ARG name="target" type="GLenum" const="FALSE" pointer="FALSE" />
+      <ARG name="internalformat" type="GLenum" const="FALSE" pointer="FALSE" />
+      <ARG name="width" type="GLsizei" const="FALSE" pointer="FALSE" />
+      <ARG name="height" type="GLsizei" const="FALSE" pointer="FALSE" />
+      <ARG name="format" type="GLenum" const="FALSE" pointer="FALSE" />
+      <ARG name="type" type="GLenum" const="FALSE" pointer="FALSE" />
+      <ARG name="row" type="GLvoid" const="TRUE" pointer="TRUE" />
+      <ARG name="column" type="GLvoid" const="TRUE" pointer="TRUE" />
+    </FUNCTION>
+    <FUNCTION name="glGetHistogram" return="GLvoid" pointer="FALSE">
+      <ARG name="target" type="GLenum" const="FALSE" pointer="FALSE" />
+      <ARG name="reset" type="GLboolean" const="FALSE" pointer="FALSE" />
+      <ARG name="format" type="GLenum" const="FALSE" pointer="FALSE" />
+      <ARG name="type" type="GLenum" const="FALSE" pointer="FALSE" />
+      <ARG name="values" type="GLvoid" const="FALSE" pointer="TRUE" />
+    </FUNCTION>
+    <FUNCTION name="glGetHistogramParameterfv" return="GLvoid" pointer="FALSE">
+      <ARG name="target" type="GLenum" const="FALSE" pointer="FALSE" />
+      <ARG name="pname" type="GLenum" const="FALSE" pointer="FALSE" />
+      <ARG name="params" type="GLfloat" const="FALSE" pointer="TRUE" />
+    </FUNCTION>
+    <FUNCTION name="glGetHistogramParameteriv" return="GLvoid" pointer="FALSE">
+      <ARG name="target" type="GLenum" const="FALSE" pointer="FALSE" />
+      <ARG name="pname" type="GLenum" const="FALSE" pointer="FALSE" />
+      <ARG name="params" type="GLint" const="FALSE" pointer="TRUE" />
+    </FUNCTION>
+    <FUNCTION name="glGetMinmax" return="GLvoid" pointer="FALSE">
+      <ARG name="target" type="GLenum" const="FALSE" pointer="FALSE" />
+      <ARG name="reset" type="GLboolean" const="FALSE" pointer="FALSE" />
+      <ARG name="format" type="GLenum" const="FALSE" pointer="FALSE" />
+      <ARG name="type" type="GLenum" const="FALSE" pointer="FALSE" />
+      <ARG name="values" type="GLvoid" const="FALSE" pointer="TRUE" />
+    </FUNCTION>
+    <FUNCTION name="glGetMinmaxParameterfv" return="GLvoid" pointer="FALSE">
+      <ARG name="target" type="GLenum" const="FALSE" pointer="FALSE" />
+      <ARG name="pname" type="GLenum" const="FALSE" pointer="FALSE" />
+      <ARG name="params" type="GLfloat" const="FALSE" pointer="TRUE" />
+    </FUNCTION>
+    <FUNCTION name="glGetMinmaxParameteriv" return="GLvoid" pointer="FALSE">
+      <ARG name="target" type="GLenum" const="FALSE" pointer="FALSE" />
+      <ARG name="pname" type="GLenum" const="FALSE" pointer="FALSE" />
+      <ARG name="params" type="GLint" const="FALSE" pointer="TRUE" />
+    </FUNCTION>
+    <FUNCTION name="glHistogram" return="GLvoid" pointer="FALSE">
+      <ARG name="target" type="GLenum" const="FALSE" pointer="FALSE" />
+      <ARG name="width" type="GLsizei" const="FALSE" pointer="FALSE" />
+      <ARG name="internalformat" type="GLenum" const="FALSE" pointer="FALSE" />
+      <ARG name="sink" type="GLboolean" const="FALSE" pointer="FALSE" />
+    </FUNCTION>
+    <FUNCTION name="glMinmax" return="GLvoid" pointer="FALSE">
+      <ARG name="target" type="GLenum" const="FALSE" pointer="FALSE" />
+      <ARG name="internalformat" type="GLenum" const="FALSE" pointer="FALSE" />
+      <ARG name="sink" type="GLboolean" const="FALSE" pointer="FALSE" />
+    </FUNCTION>
+    <FUNCTION name="glResetHistogram" return="GLvoid" pointer="FALSE">
+      <ARG name="target" type="GLenum" const="FALSE" pointer="FALSE" />
+    </FUNCTION>
+    <FUNCTION name="glResetMinmax" return="GLvoid" pointer="FALSE">
+      <ARG name="target" type="GLenum" const="FALSE" pointer="FALSE" />
+    </FUNCTION>
+    <FUNCTION name="glBlendColor" return="GLvoid" pointer="FALSE">
+      <ARG name="red" type="GLclampf" const="FALSE" pointer="FALSE" />
+      <ARG name="green" type="GLclampf" const="FALSE" pointer="FALSE" />
+      <ARG name="blue" type="GLclampf" const="FALSE" pointer="FALSE" />
+      <ARG name="alpha" type="GLclampf" const="FALSE" pointer="FALSE" />
+    </FUNCTION>
+    <FUNCTION name="glBlendEquation" return="GLvoid" pointer="FALSE">
+      <ARG name="mode" type="GLenum" const="FALSE" pointer="FALSE" />
+    </FUNCTION>
   </EXTENSION>
   <EXTENSION name="GL_ARB_multitexture" type="GL">
     <TOKEN name="GL_TEXTURE0_ARB" value="33984" />

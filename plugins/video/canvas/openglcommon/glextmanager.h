@@ -224,41 +224,7 @@
 #ifndef GL_MAX_3D_TEXTURE_SIZE
 #define GL_MAX_3D_TEXTURE_SIZE                                        32883
 #endif
-typedef GLvoid (csAPIENTRY* csGLBLENDCOLOR) (GLclampf red, GLclampf green, GLclampf blue, GLclampf alpha);
-typedef GLvoid (csAPIENTRY* csGLBLENDEQUATION) (GLenum mode);
 typedef GLvoid (csAPIENTRY* csGLDRAWRANGEELEMENTS) (GLenum mode, GLuint start, GLuint end, GLsizei count, GLenum type, GLvoid* indices);
-typedef GLvoid (csAPIENTRY* csGLCOLORTABLE) (GLenum target, GLenum internalformat, GLsizei width, GLenum format, GLenum type, GLvoid* table);
-typedef GLvoid (csAPIENTRY* csGLCOLORTABLEPARAMETERFV) (GLenum target, GLenum pname, GLfloat* params);
-typedef GLvoid (csAPIENTRY* csGLCOLORTABLEPARAMETERIV) (GLenum target, GLenum pname, GLint* params);
-typedef GLvoid (csAPIENTRY* csGLCOPYCOLORTABLE) (GLenum target, GLenum internalformat, GLint x, GLint y, GLsizei width);
-typedef GLvoid (csAPIENTRY* csGLGETCOLORTABLE) (GLenum target, GLenum format, GLenum type, GLvoid* table);
-typedef GLvoid (csAPIENTRY* csGLGETCOLORTABLEPARAMETERFV) (GLenum target, GLenum pname, GLfloat* params);
-typedef GLvoid (csAPIENTRY* csGLGETCOLORTABLEPARAMETERIV) (GLenum target, GLenum pname, GLint* params);
-typedef GLvoid (csAPIENTRY* csGLCOLORSUBTABLE) (GLenum target, GLsizei start, GLsizei count, GLenum format, GLenum type, GLvoid* data);
-typedef GLvoid (csAPIENTRY* csGLCOPYCOLORSUBTABLE) (GLenum target, GLsizei start, GLint x, GLint y, GLsizei width);
-typedef GLvoid (csAPIENTRY* csGLCONVOLUTIONFILTER1D) (GLenum target, GLenum internalformat, GLsizei width, GLenum format, GLenum type, GLvoid* image);
-typedef GLvoid (csAPIENTRY* csGLCONVOLUTIONFILTER2D) (GLenum target, GLenum internalformat, GLsizei width, GLsizei height, GLenum format, GLenum type, GLvoid* image);
-typedef GLvoid (csAPIENTRY* csGLCONVOLUTIONPARAMETERF) (GLenum target, GLenum pname, GLfloat params);
-typedef GLvoid (csAPIENTRY* csGLCONVOLUTIONPARAMETERFV) (GLenum target, GLenum pname, GLfloat* params);
-typedef GLvoid (csAPIENTRY* csGLCONVOLUTIONPARAMETERI) (GLenum target, GLenum pname, GLint params);
-typedef GLvoid (csAPIENTRY* csGLCONVOLUTIONPARAMETERIV) (GLenum target, GLenum pname, GLint* params);
-typedef GLvoid (csAPIENTRY* csGLCOPYCONVOLUTIONFILTER1D) (GLenum target, GLenum internalformat, GLint x, GLint y, GLsizei width);
-typedef GLvoid (csAPIENTRY* csGLCOPYCONVOLUTIONFILTER2D) (GLenum target, GLenum internalformat, GLint x, GLint y, GLsizei width, GLsizei height);
-typedef GLvoid (csAPIENTRY* csGLGETCONVOLUTIONFILTER) (GLenum target, GLenum format, GLenum type, GLvoid* image);
-typedef GLvoid (csAPIENTRY* csGLGETCONVOLUTIONPARAMETERFV) (GLenum target, GLenum pname, GLfloat* params);
-typedef GLvoid (csAPIENTRY* csGLGETCONVOLUTIONPARAMETERIV) (GLenum target, GLenum pname, GLint* params);
-typedef GLvoid (csAPIENTRY* csGLGETSEPARABLEFILTER) (GLenum target, GLenum format, GLenum type, GLvoid* row, GLvoid* column, GLvoid* span);
-typedef GLvoid (csAPIENTRY* csGLSEPARABLEFILTER2D) (GLenum target, GLenum internalformat, GLsizei width, GLsizei height, GLenum format, GLenum type, GLvoid* row, GLvoid* column);
-typedef GLvoid (csAPIENTRY* csGLGETHISTOGRAM) (GLenum target, GLboolean reset, GLenum format, GLenum type, GLvoid* values);
-typedef GLvoid (csAPIENTRY* csGLGETHISTOGRAMPARAMETERFV) (GLenum target, GLenum pname, GLfloat* params);
-typedef GLvoid (csAPIENTRY* csGLGETHISTOGRAMPARAMETERIV) (GLenum target, GLenum pname, GLint* params);
-typedef GLvoid (csAPIENTRY* csGLGETMINMAX) (GLenum target, GLboolean reset, GLenum format, GLenum type, GLvoid* values);
-typedef GLvoid (csAPIENTRY* csGLGETMINMAXPARAMETERFV) (GLenum target, GLenum pname, GLfloat* params);
-typedef GLvoid (csAPIENTRY* csGLGETMINMAXPARAMETERIV) (GLenum target, GLenum pname, GLint* params);
-typedef GLvoid (csAPIENTRY* csGLHISTOGRAM) (GLenum target, GLsizei width, GLenum internalformat, GLboolean sink);
-typedef GLvoid (csAPIENTRY* csGLMINMAX) (GLenum target, GLenum internalformat, GLboolean sink);
-typedef GLvoid (csAPIENTRY* csGLRESETHISTOGRAM) (GLenum target);
-typedef GLvoid (csAPIENTRY* csGLRESETMINMAX) (GLenum target);
 typedef GLvoid (csAPIENTRY* csGLTEXIMAGE3D) (GLenum target, GLint level, GLint internalformat, GLsizei width, GLsizei height, GLsizei depth, GLint border, GLenum format, GLenum type, GLvoid* pixels);
 typedef GLvoid (csAPIENTRY* csGLTEXSUBIMAGE3D) (GLenum target, GLint level, GLint xoffset, GLint yoffset, GLint zoffset, GLsizei width, GLsizei height, GLsizei depth, GLenum format, GLenum type, GLvoid* pixels);
 typedef GLvoid (csAPIENTRY* csGLCOPYTEXSUBIMAGE3D) (GLenum target, GLint level, GLint xoffset, GLint yoffset, GLint zoffset, GLint x, GLint y, GLsizei width, GLsizei height);
@@ -834,6 +800,40 @@ typedef GLvoid (csAPIENTRY* csGLGETCOMPRESSEDTEXIMAGE) (GLenum target, GLint lev
 #ifndef GL_CONVOLUTION_BORDER_COLOR
 #define GL_CONVOLUTION_BORDER_COLOR                                   33108
 #endif
+typedef GLvoid (csAPIENTRY* csGLCOLORTABLE) (GLenum target, GLenum internalformat, GLsizei width, GLenum format, GLenum type, GLvoid* table);
+typedef GLvoid (csAPIENTRY* csGLCOLORTABLEPARAMETERFV) (GLenum target, GLenum pname, GLfloat* params);
+typedef GLvoid (csAPIENTRY* csGLCOLORTABLEPARAMETERIV) (GLenum target, GLenum pname, GLint* params);
+typedef GLvoid (csAPIENTRY* csGLCOPYCOLORTABLE) (GLenum target, GLenum internalformat, GLint x, GLint y, GLsizei width);
+typedef GLvoid (csAPIENTRY* csGLGETCOLORTABLE) (GLenum target, GLenum format, GLenum type, GLvoid* table);
+typedef GLvoid (csAPIENTRY* csGLGETCOLORTABLEPARAMETERFV) (GLenum target, GLenum pname, GLfloat* params);
+typedef GLvoid (csAPIENTRY* csGLGETCOLORTABLEPARAMETERIV) (GLenum target, GLenum pname, GLint* params);
+typedef GLvoid (csAPIENTRY* csGLCOLORSUBTABLE) (GLenum target, GLsizei start, GLsizei count, GLenum format, GLenum type, GLvoid* data);
+typedef GLvoid (csAPIENTRY* csGLCOPYCOLORSUBTABLE) (GLenum target, GLsizei start, GLint x, GLint y, GLsizei width);
+typedef GLvoid (csAPIENTRY* csGLCONVOLUTIONFILTER1D) (GLenum target, GLenum internalformat, GLsizei width, GLenum format, GLenum type, GLvoid* image);
+typedef GLvoid (csAPIENTRY* csGLCONVOLUTIONFILTER2D) (GLenum target, GLenum internalformat, GLsizei width, GLsizei height, GLenum format, GLenum type, GLvoid* image);
+typedef GLvoid (csAPIENTRY* csGLCONVOLUTIONPARAMETERF) (GLenum target, GLenum pname, GLfloat params);
+typedef GLvoid (csAPIENTRY* csGLCONVOLUTIONPARAMETERFV) (GLenum target, GLenum pname, GLfloat* params);
+typedef GLvoid (csAPIENTRY* csGLCONVOLUTIONPARAMETERI) (GLenum target, GLenum pname, GLint params);
+typedef GLvoid (csAPIENTRY* csGLCONVOLUTIONPARAMETERIV) (GLenum target, GLenum pname, GLint* params);
+typedef GLvoid (csAPIENTRY* csGLCOPYCONVOLUTIONFILTER1D) (GLenum target, GLenum internalformat, GLint x, GLint y, GLsizei width);
+typedef GLvoid (csAPIENTRY* csGLCOPYCONVOLUTIONFILTER2D) (GLenum target, GLenum internalformat, GLint x, GLint y, GLsizei width, GLsizei height);
+typedef GLvoid (csAPIENTRY* csGLGETCONVOLUTIONFILTER) (GLenum target, GLenum format, GLenum type, GLvoid* image);
+typedef GLvoid (csAPIENTRY* csGLGETCONVOLUTIONPARAMETERFV) (GLenum target, GLenum pname, GLfloat* params);
+typedef GLvoid (csAPIENTRY* csGLGETCONVOLUTIONPARAMETERIV) (GLenum target, GLenum pname, GLint* params);
+typedef GLvoid (csAPIENTRY* csGLGETSEPARABLEFILTER) (GLenum target, GLenum format, GLenum type, GLvoid* row, GLvoid* column, GLvoid* span);
+typedef GLvoid (csAPIENTRY* csGLSEPARABLEFILTER2D) (GLenum target, GLenum internalformat, GLsizei width, GLsizei height, GLenum format, GLenum type, GLvoid* row, GLvoid* column);
+typedef GLvoid (csAPIENTRY* csGLGETHISTOGRAM) (GLenum target, GLboolean reset, GLenum format, GLenum type, GLvoid* values);
+typedef GLvoid (csAPIENTRY* csGLGETHISTOGRAMPARAMETERFV) (GLenum target, GLenum pname, GLfloat* params);
+typedef GLvoid (csAPIENTRY* csGLGETHISTOGRAMPARAMETERIV) (GLenum target, GLenum pname, GLint* params);
+typedef GLvoid (csAPIENTRY* csGLGETMINMAX) (GLenum target, GLboolean reset, GLenum format, GLenum type, GLvoid* values);
+typedef GLvoid (csAPIENTRY* csGLGETMINMAXPARAMETERFV) (GLenum target, GLenum pname, GLfloat* params);
+typedef GLvoid (csAPIENTRY* csGLGETMINMAXPARAMETERIV) (GLenum target, GLenum pname, GLint* params);
+typedef GLvoid (csAPIENTRY* csGLHISTOGRAM) (GLenum target, GLsizei width, GLenum internalformat, GLboolean sink);
+typedef GLvoid (csAPIENTRY* csGLMINMAX) (GLenum target, GLenum internalformat, GLboolean sink);
+typedef GLvoid (csAPIENTRY* csGLRESETHISTOGRAM) (GLenum target);
+typedef GLvoid (csAPIENTRY* csGLRESETMINMAX) (GLenum target);
+typedef GLvoid (csAPIENTRY* csGLBLENDCOLOR) (GLclampf red, GLclampf green, GLclampf blue, GLclampf alpha);
+typedef GLvoid (csAPIENTRY* csGLBLENDEQUATION) (GLenum mode);
 
 // GL_ARB_multitexture
 #ifndef GL_TEXTURE0_ARB
@@ -6548,179 +6548,9 @@ public:
     tested_CS_GL_NV_vertex_program2 = false;
   }
   // GL_version_1_2
-  #ifndef GLBLENDCOLOR_DECL
-  #define GLBLENDCOLOR_DECL
-  csGLBLENDCOLOR glBlendColor;
-  #endif
-
-  #ifndef GLBLENDEQUATION_DECL
-  #define GLBLENDEQUATION_DECL
-  csGLBLENDEQUATION glBlendEquation;
-  #endif
-
   #ifndef GLDRAWRANGEELEMENTS_DECL
   #define GLDRAWRANGEELEMENTS_DECL
   csGLDRAWRANGEELEMENTS glDrawRangeElements;
-  #endif
-
-  #ifndef GLCOLORTABLE_DECL
-  #define GLCOLORTABLE_DECL
-  csGLCOLORTABLE glColorTable;
-  #endif
-
-  #ifndef GLCOLORTABLEPARAMETERFV_DECL
-  #define GLCOLORTABLEPARAMETERFV_DECL
-  csGLCOLORTABLEPARAMETERFV glColorTableParameterfv;
-  #endif
-
-  #ifndef GLCOLORTABLEPARAMETERIV_DECL
-  #define GLCOLORTABLEPARAMETERIV_DECL
-  csGLCOLORTABLEPARAMETERIV glColorTableParameteriv;
-  #endif
-
-  #ifndef GLCOPYCOLORTABLE_DECL
-  #define GLCOPYCOLORTABLE_DECL
-  csGLCOPYCOLORTABLE glCopyColorTable;
-  #endif
-
-  #ifndef GLGETCOLORTABLE_DECL
-  #define GLGETCOLORTABLE_DECL
-  csGLGETCOLORTABLE glGetColorTable;
-  #endif
-
-  #ifndef GLGETCOLORTABLEPARAMETERFV_DECL
-  #define GLGETCOLORTABLEPARAMETERFV_DECL
-  csGLGETCOLORTABLEPARAMETERFV glGetColorTableParameterfv;
-  #endif
-
-  #ifndef GLGETCOLORTABLEPARAMETERIV_DECL
-  #define GLGETCOLORTABLEPARAMETERIV_DECL
-  csGLGETCOLORTABLEPARAMETERIV glGetColorTableParameteriv;
-  #endif
-
-  #ifndef GLCOLORSUBTABLE_DECL
-  #define GLCOLORSUBTABLE_DECL
-  csGLCOLORSUBTABLE glColorSubTable;
-  #endif
-
-  #ifndef GLCOPYCOLORSUBTABLE_DECL
-  #define GLCOPYCOLORSUBTABLE_DECL
-  csGLCOPYCOLORSUBTABLE glCopyColorSubTable;
-  #endif
-
-  #ifndef GLCONVOLUTIONFILTER1D_DECL
-  #define GLCONVOLUTIONFILTER1D_DECL
-  csGLCONVOLUTIONFILTER1D glConvolutionFilter1D;
-  #endif
-
-  #ifndef GLCONVOLUTIONFILTER2D_DECL
-  #define GLCONVOLUTIONFILTER2D_DECL
-  csGLCONVOLUTIONFILTER2D glConvolutionFilter2D;
-  #endif
-
-  #ifndef GLCONVOLUTIONPARAMETERF_DECL
-  #define GLCONVOLUTIONPARAMETERF_DECL
-  csGLCONVOLUTIONPARAMETERF glConvolutionParameterf;
-  #endif
-
-  #ifndef GLCONVOLUTIONPARAMETERFV_DECL
-  #define GLCONVOLUTIONPARAMETERFV_DECL
-  csGLCONVOLUTIONPARAMETERFV glConvolutionParameterfv;
-  #endif
-
-  #ifndef GLCONVOLUTIONPARAMETERI_DECL
-  #define GLCONVOLUTIONPARAMETERI_DECL
-  csGLCONVOLUTIONPARAMETERI glConvolutionParameteri;
-  #endif
-
-  #ifndef GLCONVOLUTIONPARAMETERIV_DECL
-  #define GLCONVOLUTIONPARAMETERIV_DECL
-  csGLCONVOLUTIONPARAMETERIV glConvolutionParameteriv;
-  #endif
-
-  #ifndef GLCOPYCONVOLUTIONFILTER1D_DECL
-  #define GLCOPYCONVOLUTIONFILTER1D_DECL
-  csGLCOPYCONVOLUTIONFILTER1D glCopyConvolutionFilter1D;
-  #endif
-
-  #ifndef GLCOPYCONVOLUTIONFILTER2D_DECL
-  #define GLCOPYCONVOLUTIONFILTER2D_DECL
-  csGLCOPYCONVOLUTIONFILTER2D glCopyConvolutionFilter2D;
-  #endif
-
-  #ifndef GLGETCONVOLUTIONFILTER_DECL
-  #define GLGETCONVOLUTIONFILTER_DECL
-  csGLGETCONVOLUTIONFILTER glGetConvolutionFilter;
-  #endif
-
-  #ifndef GLGETCONVOLUTIONPARAMETERFV_DECL
-  #define GLGETCONVOLUTIONPARAMETERFV_DECL
-  csGLGETCONVOLUTIONPARAMETERFV glGetConvolutionParameterfv;
-  #endif
-
-  #ifndef GLGETCONVOLUTIONPARAMETERIV_DECL
-  #define GLGETCONVOLUTIONPARAMETERIV_DECL
-  csGLGETCONVOLUTIONPARAMETERIV glGetConvolutionParameteriv;
-  #endif
-
-  #ifndef GLGETSEPARABLEFILTER_DECL
-  #define GLGETSEPARABLEFILTER_DECL
-  csGLGETSEPARABLEFILTER glGetSeparableFilter;
-  #endif
-
-  #ifndef GLSEPARABLEFILTER2D_DECL
-  #define GLSEPARABLEFILTER2D_DECL
-  csGLSEPARABLEFILTER2D glSeparableFilter2D;
-  #endif
-
-  #ifndef GLGETHISTOGRAM_DECL
-  #define GLGETHISTOGRAM_DECL
-  csGLGETHISTOGRAM glGetHistogram;
-  #endif
-
-  #ifndef GLGETHISTOGRAMPARAMETERFV_DECL
-  #define GLGETHISTOGRAMPARAMETERFV_DECL
-  csGLGETHISTOGRAMPARAMETERFV glGetHistogramParameterfv;
-  #endif
-
-  #ifndef GLGETHISTOGRAMPARAMETERIV_DECL
-  #define GLGETHISTOGRAMPARAMETERIV_DECL
-  csGLGETHISTOGRAMPARAMETERIV glGetHistogramParameteriv;
-  #endif
-
-  #ifndef GLGETMINMAX_DECL
-  #define GLGETMINMAX_DECL
-  csGLGETMINMAX glGetMinmax;
-  #endif
-
-  #ifndef GLGETMINMAXPARAMETERFV_DECL
-  #define GLGETMINMAXPARAMETERFV_DECL
-  csGLGETMINMAXPARAMETERFV glGetMinmaxParameterfv;
-  #endif
-
-  #ifndef GLGETMINMAXPARAMETERIV_DECL
-  #define GLGETMINMAXPARAMETERIV_DECL
-  csGLGETMINMAXPARAMETERIV glGetMinmaxParameteriv;
-  #endif
-
-  #ifndef GLHISTOGRAM_DECL
-  #define GLHISTOGRAM_DECL
-  csGLHISTOGRAM glHistogram;
-  #endif
-
-  #ifndef GLMINMAX_DECL
-  #define GLMINMAX_DECL
-  csGLMINMAX glMinmax;
-  #endif
-
-  #ifndef GLRESETHISTOGRAM_DECL
-  #define GLRESETHISTOGRAM_DECL
-  csGLRESETHISTOGRAM glResetHistogram;
-  #endif
-
-  #ifndef GLRESETMINMAX_DECL
-  #define GLRESETMINMAX_DECL
-  csGLRESETMINMAX glResetMinmax;
   #endif
 
   #ifndef GLTEXIMAGE3D_DECL
@@ -6972,6 +6802,176 @@ public:
 
 
   // GL_ARB_imaging
+  #ifndef GLCOLORTABLE_DECL
+  #define GLCOLORTABLE_DECL
+  csGLCOLORTABLE glColorTable;
+  #endif
+
+  #ifndef GLCOLORTABLEPARAMETERFV_DECL
+  #define GLCOLORTABLEPARAMETERFV_DECL
+  csGLCOLORTABLEPARAMETERFV glColorTableParameterfv;
+  #endif
+
+  #ifndef GLCOLORTABLEPARAMETERIV_DECL
+  #define GLCOLORTABLEPARAMETERIV_DECL
+  csGLCOLORTABLEPARAMETERIV glColorTableParameteriv;
+  #endif
+
+  #ifndef GLCOPYCOLORTABLE_DECL
+  #define GLCOPYCOLORTABLE_DECL
+  csGLCOPYCOLORTABLE glCopyColorTable;
+  #endif
+
+  #ifndef GLGETCOLORTABLE_DECL
+  #define GLGETCOLORTABLE_DECL
+  csGLGETCOLORTABLE glGetColorTable;
+  #endif
+
+  #ifndef GLGETCOLORTABLEPARAMETERFV_DECL
+  #define GLGETCOLORTABLEPARAMETERFV_DECL
+  csGLGETCOLORTABLEPARAMETERFV glGetColorTableParameterfv;
+  #endif
+
+  #ifndef GLGETCOLORTABLEPARAMETERIV_DECL
+  #define GLGETCOLORTABLEPARAMETERIV_DECL
+  csGLGETCOLORTABLEPARAMETERIV glGetColorTableParameteriv;
+  #endif
+
+  #ifndef GLCOLORSUBTABLE_DECL
+  #define GLCOLORSUBTABLE_DECL
+  csGLCOLORSUBTABLE glColorSubTable;
+  #endif
+
+  #ifndef GLCOPYCOLORSUBTABLE_DECL
+  #define GLCOPYCOLORSUBTABLE_DECL
+  csGLCOPYCOLORSUBTABLE glCopyColorSubTable;
+  #endif
+
+  #ifndef GLCONVOLUTIONFILTER1D_DECL
+  #define GLCONVOLUTIONFILTER1D_DECL
+  csGLCONVOLUTIONFILTER1D glConvolutionFilter1D;
+  #endif
+
+  #ifndef GLCONVOLUTIONFILTER2D_DECL
+  #define GLCONVOLUTIONFILTER2D_DECL
+  csGLCONVOLUTIONFILTER2D glConvolutionFilter2D;
+  #endif
+
+  #ifndef GLCONVOLUTIONPARAMETERF_DECL
+  #define GLCONVOLUTIONPARAMETERF_DECL
+  csGLCONVOLUTIONPARAMETERF glConvolutionParameterf;
+  #endif
+
+  #ifndef GLCONVOLUTIONPARAMETERFV_DECL
+  #define GLCONVOLUTIONPARAMETERFV_DECL
+  csGLCONVOLUTIONPARAMETERFV glConvolutionParameterfv;
+  #endif
+
+  #ifndef GLCONVOLUTIONPARAMETERI_DECL
+  #define GLCONVOLUTIONPARAMETERI_DECL
+  csGLCONVOLUTIONPARAMETERI glConvolutionParameteri;
+  #endif
+
+  #ifndef GLCONVOLUTIONPARAMETERIV_DECL
+  #define GLCONVOLUTIONPARAMETERIV_DECL
+  csGLCONVOLUTIONPARAMETERIV glConvolutionParameteriv;
+  #endif
+
+  #ifndef GLCOPYCONVOLUTIONFILTER1D_DECL
+  #define GLCOPYCONVOLUTIONFILTER1D_DECL
+  csGLCOPYCONVOLUTIONFILTER1D glCopyConvolutionFilter1D;
+  #endif
+
+  #ifndef GLCOPYCONVOLUTIONFILTER2D_DECL
+  #define GLCOPYCONVOLUTIONFILTER2D_DECL
+  csGLCOPYCONVOLUTIONFILTER2D glCopyConvolutionFilter2D;
+  #endif
+
+  #ifndef GLGETCONVOLUTIONFILTER_DECL
+  #define GLGETCONVOLUTIONFILTER_DECL
+  csGLGETCONVOLUTIONFILTER glGetConvolutionFilter;
+  #endif
+
+  #ifndef GLGETCONVOLUTIONPARAMETERFV_DECL
+  #define GLGETCONVOLUTIONPARAMETERFV_DECL
+  csGLGETCONVOLUTIONPARAMETERFV glGetConvolutionParameterfv;
+  #endif
+
+  #ifndef GLGETCONVOLUTIONPARAMETERIV_DECL
+  #define GLGETCONVOLUTIONPARAMETERIV_DECL
+  csGLGETCONVOLUTIONPARAMETERIV glGetConvolutionParameteriv;
+  #endif
+
+  #ifndef GLGETSEPARABLEFILTER_DECL
+  #define GLGETSEPARABLEFILTER_DECL
+  csGLGETSEPARABLEFILTER glGetSeparableFilter;
+  #endif
+
+  #ifndef GLSEPARABLEFILTER2D_DECL
+  #define GLSEPARABLEFILTER2D_DECL
+  csGLSEPARABLEFILTER2D glSeparableFilter2D;
+  #endif
+
+  #ifndef GLGETHISTOGRAM_DECL
+  #define GLGETHISTOGRAM_DECL
+  csGLGETHISTOGRAM glGetHistogram;
+  #endif
+
+  #ifndef GLGETHISTOGRAMPARAMETERFV_DECL
+  #define GLGETHISTOGRAMPARAMETERFV_DECL
+  csGLGETHISTOGRAMPARAMETERFV glGetHistogramParameterfv;
+  #endif
+
+  #ifndef GLGETHISTOGRAMPARAMETERIV_DECL
+  #define GLGETHISTOGRAMPARAMETERIV_DECL
+  csGLGETHISTOGRAMPARAMETERIV glGetHistogramParameteriv;
+  #endif
+
+  #ifndef GLGETMINMAX_DECL
+  #define GLGETMINMAX_DECL
+  csGLGETMINMAX glGetMinmax;
+  #endif
+
+  #ifndef GLGETMINMAXPARAMETERFV_DECL
+  #define GLGETMINMAXPARAMETERFV_DECL
+  csGLGETMINMAXPARAMETERFV glGetMinmaxParameterfv;
+  #endif
+
+  #ifndef GLGETMINMAXPARAMETERIV_DECL
+  #define GLGETMINMAXPARAMETERIV_DECL
+  csGLGETMINMAXPARAMETERIV glGetMinmaxParameteriv;
+  #endif
+
+  #ifndef GLHISTOGRAM_DECL
+  #define GLHISTOGRAM_DECL
+  csGLHISTOGRAM glHistogram;
+  #endif
+
+  #ifndef GLMINMAX_DECL
+  #define GLMINMAX_DECL
+  csGLMINMAX glMinmax;
+  #endif
+
+  #ifndef GLRESETHISTOGRAM_DECL
+  #define GLRESETHISTOGRAM_DECL
+  csGLRESETHISTOGRAM glResetHistogram;
+  #endif
+
+  #ifndef GLRESETMINMAX_DECL
+  #define GLRESETMINMAX_DECL
+  csGLRESETMINMAX glResetMinmax;
+  #endif
+
+  #ifndef GLBLENDCOLOR_DECL
+  #define GLBLENDCOLOR_DECL
+  csGLBLENDCOLOR glBlendColor;
+  #endif
+
+  #ifndef GLBLENDEQUATION_DECL
+  #define GLBLENDEQUATION_DECL
+  csGLBLENDEQUATION glBlendEquation;
+  #endif
+
 
   // GL_ARB_multitexture
   #ifndef GLACTIVETEXTUREARB_DECL
@@ -10495,145 +10495,9 @@ public:
     if (gl && CS_GL_version_1_2)
     {
       allclear = true;
-      funcTest = ((glBlendColor = (csGLBLENDCOLOR) gl->GetProcAddress ("glBlendColor")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", true))
-        Report ("Failed to retrieve %s", "glBlendColor");
-      allclear &= funcTest;
-      funcTest = ((glBlendEquation = (csGLBLENDEQUATION) gl->GetProcAddress ("glBlendEquation")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", true))
-        Report ("Failed to retrieve %s", "glBlendEquation");
-      allclear &= funcTest;
       funcTest = ((glDrawRangeElements = (csGLDRAWRANGEELEMENTS) gl->GetProcAddress ("glDrawRangeElements")) != NULL);
       if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", true))
         Report ("Failed to retrieve %s", "glDrawRangeElements");
-      allclear &= funcTest;
-      funcTest = ((glColorTable = (csGLCOLORTABLE) gl->GetProcAddress ("glColorTable")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", true))
-        Report ("Failed to retrieve %s", "glColorTable");
-      allclear &= funcTest;
-      funcTest = ((glColorTableParameterfv = (csGLCOLORTABLEPARAMETERFV) gl->GetProcAddress ("glColorTableParameterfv")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", true))
-        Report ("Failed to retrieve %s", "glColorTableParameterfv");
-      allclear &= funcTest;
-      funcTest = ((glColorTableParameteriv = (csGLCOLORTABLEPARAMETERIV) gl->GetProcAddress ("glColorTableParameteriv")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", true))
-        Report ("Failed to retrieve %s", "glColorTableParameteriv");
-      allclear &= funcTest;
-      funcTest = ((glCopyColorTable = (csGLCOPYCOLORTABLE) gl->GetProcAddress ("glCopyColorTable")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", true))
-        Report ("Failed to retrieve %s", "glCopyColorTable");
-      allclear &= funcTest;
-      funcTest = ((glGetColorTable = (csGLGETCOLORTABLE) gl->GetProcAddress ("glGetColorTable")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", true))
-        Report ("Failed to retrieve %s", "glGetColorTable");
-      allclear &= funcTest;
-      funcTest = ((glGetColorTableParameterfv = (csGLGETCOLORTABLEPARAMETERFV) gl->GetProcAddress ("glGetColorTableParameterfv")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", true))
-        Report ("Failed to retrieve %s", "glGetColorTableParameterfv");
-      allclear &= funcTest;
-      funcTest = ((glGetColorTableParameteriv = (csGLGETCOLORTABLEPARAMETERIV) gl->GetProcAddress ("glGetColorTableParameteriv")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", true))
-        Report ("Failed to retrieve %s", "glGetColorTableParameteriv");
-      allclear &= funcTest;
-      funcTest = ((glColorSubTable = (csGLCOLORSUBTABLE) gl->GetProcAddress ("glColorSubTable")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", true))
-        Report ("Failed to retrieve %s", "glColorSubTable");
-      allclear &= funcTest;
-      funcTest = ((glCopyColorSubTable = (csGLCOPYCOLORSUBTABLE) gl->GetProcAddress ("glCopyColorSubTable")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", true))
-        Report ("Failed to retrieve %s", "glCopyColorSubTable");
-      allclear &= funcTest;
-      funcTest = ((glConvolutionFilter1D = (csGLCONVOLUTIONFILTER1D) gl->GetProcAddress ("glConvolutionFilter1D")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", true))
-        Report ("Failed to retrieve %s", "glConvolutionFilter1D");
-      allclear &= funcTest;
-      funcTest = ((glConvolutionFilter2D = (csGLCONVOLUTIONFILTER2D) gl->GetProcAddress ("glConvolutionFilter2D")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", true))
-        Report ("Failed to retrieve %s", "glConvolutionFilter2D");
-      allclear &= funcTest;
-      funcTest = ((glConvolutionParameterf = (csGLCONVOLUTIONPARAMETERF) gl->GetProcAddress ("glConvolutionParameterf")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", true))
-        Report ("Failed to retrieve %s", "glConvolutionParameterf");
-      allclear &= funcTest;
-      funcTest = ((glConvolutionParameterfv = (csGLCONVOLUTIONPARAMETERFV) gl->GetProcAddress ("glConvolutionParameterfv")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", true))
-        Report ("Failed to retrieve %s", "glConvolutionParameterfv");
-      allclear &= funcTest;
-      funcTest = ((glConvolutionParameteri = (csGLCONVOLUTIONPARAMETERI) gl->GetProcAddress ("glConvolutionParameteri")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", true))
-        Report ("Failed to retrieve %s", "glConvolutionParameteri");
-      allclear &= funcTest;
-      funcTest = ((glConvolutionParameteriv = (csGLCONVOLUTIONPARAMETERIV) gl->GetProcAddress ("glConvolutionParameteriv")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", true))
-        Report ("Failed to retrieve %s", "glConvolutionParameteriv");
-      allclear &= funcTest;
-      funcTest = ((glCopyConvolutionFilter1D = (csGLCOPYCONVOLUTIONFILTER1D) gl->GetProcAddress ("glCopyConvolutionFilter1D")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", true))
-        Report ("Failed to retrieve %s", "glCopyConvolutionFilter1D");
-      allclear &= funcTest;
-      funcTest = ((glCopyConvolutionFilter2D = (csGLCOPYCONVOLUTIONFILTER2D) gl->GetProcAddress ("glCopyConvolutionFilter2D")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", true))
-        Report ("Failed to retrieve %s", "glCopyConvolutionFilter2D");
-      allclear &= funcTest;
-      funcTest = ((glGetConvolutionFilter = (csGLGETCONVOLUTIONFILTER) gl->GetProcAddress ("glGetConvolutionFilter")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", true))
-        Report ("Failed to retrieve %s", "glGetConvolutionFilter");
-      allclear &= funcTest;
-      funcTest = ((glGetConvolutionParameterfv = (csGLGETCONVOLUTIONPARAMETERFV) gl->GetProcAddress ("glGetConvolutionParameterfv")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", true))
-        Report ("Failed to retrieve %s", "glGetConvolutionParameterfv");
-      allclear &= funcTest;
-      funcTest = ((glGetConvolutionParameteriv = (csGLGETCONVOLUTIONPARAMETERIV) gl->GetProcAddress ("glGetConvolutionParameteriv")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", true))
-        Report ("Failed to retrieve %s", "glGetConvolutionParameteriv");
-      allclear &= funcTest;
-      funcTest = ((glGetSeparableFilter = (csGLGETSEPARABLEFILTER) gl->GetProcAddress ("glGetSeparableFilter")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", true))
-        Report ("Failed to retrieve %s", "glGetSeparableFilter");
-      allclear &= funcTest;
-      funcTest = ((glSeparableFilter2D = (csGLSEPARABLEFILTER2D) gl->GetProcAddress ("glSeparableFilter2D")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", true))
-        Report ("Failed to retrieve %s", "glSeparableFilter2D");
-      allclear &= funcTest;
-      funcTest = ((glGetHistogram = (csGLGETHISTOGRAM) gl->GetProcAddress ("glGetHistogram")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", true))
-        Report ("Failed to retrieve %s", "glGetHistogram");
-      allclear &= funcTest;
-      funcTest = ((glGetHistogramParameterfv = (csGLGETHISTOGRAMPARAMETERFV) gl->GetProcAddress ("glGetHistogramParameterfv")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", true))
-        Report ("Failed to retrieve %s", "glGetHistogramParameterfv");
-      allclear &= funcTest;
-      funcTest = ((glGetHistogramParameteriv = (csGLGETHISTOGRAMPARAMETERIV) gl->GetProcAddress ("glGetHistogramParameteriv")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", true))
-        Report ("Failed to retrieve %s", "glGetHistogramParameteriv");
-      allclear &= funcTest;
-      funcTest = ((glGetMinmax = (csGLGETMINMAX) gl->GetProcAddress ("glGetMinmax")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", true))
-        Report ("Failed to retrieve %s", "glGetMinmax");
-      allclear &= funcTest;
-      funcTest = ((glGetMinmaxParameterfv = (csGLGETMINMAXPARAMETERFV) gl->GetProcAddress ("glGetMinmaxParameterfv")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", true))
-        Report ("Failed to retrieve %s", "glGetMinmaxParameterfv");
-      allclear &= funcTest;
-      funcTest = ((glGetMinmaxParameteriv = (csGLGETMINMAXPARAMETERIV) gl->GetProcAddress ("glGetMinmaxParameteriv")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", true))
-        Report ("Failed to retrieve %s", "glGetMinmaxParameteriv");
-      allclear &= funcTest;
-      funcTest = ((glHistogram = (csGLHISTOGRAM) gl->GetProcAddress ("glHistogram")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", true))
-        Report ("Failed to retrieve %s", "glHistogram");
-      allclear &= funcTest;
-      funcTest = ((glMinmax = (csGLMINMAX) gl->GetProcAddress ("glMinmax")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", true))
-        Report ("Failed to retrieve %s", "glMinmax");
-      allclear &= funcTest;
-      funcTest = ((glResetHistogram = (csGLRESETHISTOGRAM) gl->GetProcAddress ("glResetHistogram")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", true))
-        Report ("Failed to retrieve %s", "glResetHistogram");
-      allclear &= funcTest;
-      funcTest = ((glResetMinmax = (csGLRESETMINMAX) gl->GetProcAddress ("glResetMinmax")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", true))
-        Report ("Failed to retrieve %s", "glResetMinmax");
       allclear &= funcTest;
       funcTest = ((glTexImage3D = (csGLTEXIMAGE3D) gl->GetProcAddress ("glTexImage3D")) != NULL);
       if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", true))
@@ -10903,6 +10767,142 @@ public:
     if (gl && CS_GL_ARB_imaging)
     {
       allclear = true;
+      funcTest = ((glColorTable = (csGLCOLORTABLE) gl->GetProcAddress ("glColorTable")) != NULL);
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", true))
+        Report ("Failed to retrieve %s", "glColorTable");
+      allclear &= funcTest;
+      funcTest = ((glColorTableParameterfv = (csGLCOLORTABLEPARAMETERFV) gl->GetProcAddress ("glColorTableParameterfv")) != NULL);
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", true))
+        Report ("Failed to retrieve %s", "glColorTableParameterfv");
+      allclear &= funcTest;
+      funcTest = ((glColorTableParameteriv = (csGLCOLORTABLEPARAMETERIV) gl->GetProcAddress ("glColorTableParameteriv")) != NULL);
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", true))
+        Report ("Failed to retrieve %s", "glColorTableParameteriv");
+      allclear &= funcTest;
+      funcTest = ((glCopyColorTable = (csGLCOPYCOLORTABLE) gl->GetProcAddress ("glCopyColorTable")) != NULL);
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", true))
+        Report ("Failed to retrieve %s", "glCopyColorTable");
+      allclear &= funcTest;
+      funcTest = ((glGetColorTable = (csGLGETCOLORTABLE) gl->GetProcAddress ("glGetColorTable")) != NULL);
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", true))
+        Report ("Failed to retrieve %s", "glGetColorTable");
+      allclear &= funcTest;
+      funcTest = ((glGetColorTableParameterfv = (csGLGETCOLORTABLEPARAMETERFV) gl->GetProcAddress ("glGetColorTableParameterfv")) != NULL);
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", true))
+        Report ("Failed to retrieve %s", "glGetColorTableParameterfv");
+      allclear &= funcTest;
+      funcTest = ((glGetColorTableParameteriv = (csGLGETCOLORTABLEPARAMETERIV) gl->GetProcAddress ("glGetColorTableParameteriv")) != NULL);
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", true))
+        Report ("Failed to retrieve %s", "glGetColorTableParameteriv");
+      allclear &= funcTest;
+      funcTest = ((glColorSubTable = (csGLCOLORSUBTABLE) gl->GetProcAddress ("glColorSubTable")) != NULL);
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", true))
+        Report ("Failed to retrieve %s", "glColorSubTable");
+      allclear &= funcTest;
+      funcTest = ((glCopyColorSubTable = (csGLCOPYCOLORSUBTABLE) gl->GetProcAddress ("glCopyColorSubTable")) != NULL);
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", true))
+        Report ("Failed to retrieve %s", "glCopyColorSubTable");
+      allclear &= funcTest;
+      funcTest = ((glConvolutionFilter1D = (csGLCONVOLUTIONFILTER1D) gl->GetProcAddress ("glConvolutionFilter1D")) != NULL);
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", true))
+        Report ("Failed to retrieve %s", "glConvolutionFilter1D");
+      allclear &= funcTest;
+      funcTest = ((glConvolutionFilter2D = (csGLCONVOLUTIONFILTER2D) gl->GetProcAddress ("glConvolutionFilter2D")) != NULL);
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", true))
+        Report ("Failed to retrieve %s", "glConvolutionFilter2D");
+      allclear &= funcTest;
+      funcTest = ((glConvolutionParameterf = (csGLCONVOLUTIONPARAMETERF) gl->GetProcAddress ("glConvolutionParameterf")) != NULL);
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", true))
+        Report ("Failed to retrieve %s", "glConvolutionParameterf");
+      allclear &= funcTest;
+      funcTest = ((glConvolutionParameterfv = (csGLCONVOLUTIONPARAMETERFV) gl->GetProcAddress ("glConvolutionParameterfv")) != NULL);
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", true))
+        Report ("Failed to retrieve %s", "glConvolutionParameterfv");
+      allclear &= funcTest;
+      funcTest = ((glConvolutionParameteri = (csGLCONVOLUTIONPARAMETERI) gl->GetProcAddress ("glConvolutionParameteri")) != NULL);
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", true))
+        Report ("Failed to retrieve %s", "glConvolutionParameteri");
+      allclear &= funcTest;
+      funcTest = ((glConvolutionParameteriv = (csGLCONVOLUTIONPARAMETERIV) gl->GetProcAddress ("glConvolutionParameteriv")) != NULL);
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", true))
+        Report ("Failed to retrieve %s", "glConvolutionParameteriv");
+      allclear &= funcTest;
+      funcTest = ((glCopyConvolutionFilter1D = (csGLCOPYCONVOLUTIONFILTER1D) gl->GetProcAddress ("glCopyConvolutionFilter1D")) != NULL);
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", true))
+        Report ("Failed to retrieve %s", "glCopyConvolutionFilter1D");
+      allclear &= funcTest;
+      funcTest = ((glCopyConvolutionFilter2D = (csGLCOPYCONVOLUTIONFILTER2D) gl->GetProcAddress ("glCopyConvolutionFilter2D")) != NULL);
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", true))
+        Report ("Failed to retrieve %s", "glCopyConvolutionFilter2D");
+      allclear &= funcTest;
+      funcTest = ((glGetConvolutionFilter = (csGLGETCONVOLUTIONFILTER) gl->GetProcAddress ("glGetConvolutionFilter")) != NULL);
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", true))
+        Report ("Failed to retrieve %s", "glGetConvolutionFilter");
+      allclear &= funcTest;
+      funcTest = ((glGetConvolutionParameterfv = (csGLGETCONVOLUTIONPARAMETERFV) gl->GetProcAddress ("glGetConvolutionParameterfv")) != NULL);
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", true))
+        Report ("Failed to retrieve %s", "glGetConvolutionParameterfv");
+      allclear &= funcTest;
+      funcTest = ((glGetConvolutionParameteriv = (csGLGETCONVOLUTIONPARAMETERIV) gl->GetProcAddress ("glGetConvolutionParameteriv")) != NULL);
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", true))
+        Report ("Failed to retrieve %s", "glGetConvolutionParameteriv");
+      allclear &= funcTest;
+      funcTest = ((glGetSeparableFilter = (csGLGETSEPARABLEFILTER) gl->GetProcAddress ("glGetSeparableFilter")) != NULL);
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", true))
+        Report ("Failed to retrieve %s", "glGetSeparableFilter");
+      allclear &= funcTest;
+      funcTest = ((glSeparableFilter2D = (csGLSEPARABLEFILTER2D) gl->GetProcAddress ("glSeparableFilter2D")) != NULL);
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", true))
+        Report ("Failed to retrieve %s", "glSeparableFilter2D");
+      allclear &= funcTest;
+      funcTest = ((glGetHistogram = (csGLGETHISTOGRAM) gl->GetProcAddress ("glGetHistogram")) != NULL);
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", true))
+        Report ("Failed to retrieve %s", "glGetHistogram");
+      allclear &= funcTest;
+      funcTest = ((glGetHistogramParameterfv = (csGLGETHISTOGRAMPARAMETERFV) gl->GetProcAddress ("glGetHistogramParameterfv")) != NULL);
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", true))
+        Report ("Failed to retrieve %s", "glGetHistogramParameterfv");
+      allclear &= funcTest;
+      funcTest = ((glGetHistogramParameteriv = (csGLGETHISTOGRAMPARAMETERIV) gl->GetProcAddress ("glGetHistogramParameteriv")) != NULL);
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", true))
+        Report ("Failed to retrieve %s", "glGetHistogramParameteriv");
+      allclear &= funcTest;
+      funcTest = ((glGetMinmax = (csGLGETMINMAX) gl->GetProcAddress ("glGetMinmax")) != NULL);
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", true))
+        Report ("Failed to retrieve %s", "glGetMinmax");
+      allclear &= funcTest;
+      funcTest = ((glGetMinmaxParameterfv = (csGLGETMINMAXPARAMETERFV) gl->GetProcAddress ("glGetMinmaxParameterfv")) != NULL);
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", true))
+        Report ("Failed to retrieve %s", "glGetMinmaxParameterfv");
+      allclear &= funcTest;
+      funcTest = ((glGetMinmaxParameteriv = (csGLGETMINMAXPARAMETERIV) gl->GetProcAddress ("glGetMinmaxParameteriv")) != NULL);
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", true))
+        Report ("Failed to retrieve %s", "glGetMinmaxParameteriv");
+      allclear &= funcTest;
+      funcTest = ((glHistogram = (csGLHISTOGRAM) gl->GetProcAddress ("glHistogram")) != NULL);
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", true))
+        Report ("Failed to retrieve %s", "glHistogram");
+      allclear &= funcTest;
+      funcTest = ((glMinmax = (csGLMINMAX) gl->GetProcAddress ("glMinmax")) != NULL);
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", true))
+        Report ("Failed to retrieve %s", "glMinmax");
+      allclear &= funcTest;
+      funcTest = ((glResetHistogram = (csGLRESETHISTOGRAM) gl->GetProcAddress ("glResetHistogram")) != NULL);
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", true))
+        Report ("Failed to retrieve %s", "glResetHistogram");
+      allclear &= funcTest;
+      funcTest = ((glResetMinmax = (csGLRESETMINMAX) gl->GetProcAddress ("glResetMinmax")) != NULL);
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", true))
+        Report ("Failed to retrieve %s", "glResetMinmax");
+      allclear &= funcTest;
+      funcTest = ((glBlendColor = (csGLBLENDCOLOR) gl->GetProcAddress ("glBlendColor")) != NULL);
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", true))
+        Report ("Failed to retrieve %s", "glBlendColor");
+      allclear &= funcTest;
+      funcTest = ((glBlendEquation = (csGLBLENDEQUATION) gl->GetProcAddress ("glBlendEquation")) != NULL);
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", true))
+        Report ("Failed to retrieve %s", "glBlendEquation");
+      allclear &= funcTest;
       if (CS_GL_ARB_imaging = allclear)
       {
         CS_GL_ARB_imaging &= config->GetBool (cfgkey, true);
