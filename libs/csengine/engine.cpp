@@ -658,6 +658,7 @@ csEngine::csEngine (iBase *iParent) :
   materials = NULL;
   c_buffer = NULL;
   cbufcube = NULL;
+  region = NULL;
   current_camera = NULL;
   current_engine = this;
   current_iengine = (iEngine*)this;
