@@ -67,6 +67,7 @@ csTextureList::csTextureList ()
 csTextureList::~csTextureList ()
 {
   Clear ();
+  CHK (delete [] textures);
 }
 
 void csTextureList::Clear ()
