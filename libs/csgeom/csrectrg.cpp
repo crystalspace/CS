@@ -45,6 +45,162 @@ void csRectRegion::deleteRect(int i)
     memmove(region + i, region + i + 1, region_count - i);
 }
 
+
+//  This operation takes a rect r1 which completely contains rect r2
+// and turns it into as many rects as it takes to exclude r2 from the
+// area controlled by r1.
+void
+csRectRegion::fragmentContainedRect(csRect &r1, csRect &r2)
+{
+  // Edge flags
+  const unsigned int LX=1, TY=2, RX=4, BY=8;
+  unsigned int edges=0;
+
+  // First check for edging.
+  edges |= (r1.xmin == r2.xmin ? LX : 0); 
+  edges |= (r1.ymin == r2.ymin ? TY : 0); 
+  edges |= (r1.xmax == r2.xmax ? RX : 0); 
+  edges |= (r1.ymax == r2.ymax ? BY : 0); 
+
+  switch(edges)
+  {
+  case 0: 
+    // This is the easy case. Split the r1 into four pieces that exclude r2.
+    // The include function pre-checks for this case and exits, so it is 
+    // properly handled.
+
+    pushRect(csRect(r1.xmin,   r1.ymin,   r2.xmin-1, r1.ymax));   //left
+    pushRect(csRect(r2.xmax+1, r1.ymin,   r1.xmax,   r1.ymax));   //right
+    pushRect(csRect(r2.xmin,   r1.ymin,   r2.xmax,   r1.ymin-1)); //top
+    pushRect(csRect(r2.xmin,   r2.ymax+1, r2.xmax,   r1.ymax));   //bottom
+           
+    return;
+
+  case 1:
+    // Three rects (top, right, bottom) [rect on left side, middle]
+    
+    pushRect(csRect(r1.xmin,   r1.ymin,   r1.xmax,   r2.ymin-1)); //top
+    pushRect(csRect(r2.xmax+1, r2.ymin,   r1.xmax,   r2.ymax));   //right
+    pushRect(csRect(r1.xmin,   r2.ymax+1, r1.xmax,   r1.ymax));   //bot
+  
+    return;
+
+  case 2:
+    // Three rects (bot, left, right)   [rect on top side, middle]
+    
+    pushRect(csRect(r1.xmin,   r2.ymax+1, r1.xmax,   r1.ymax));   //bot
+    pushRect(csRect(r1.xmin,   r1.ymin,   r2.xmin-1, r2.ymax));   //left
+    pushRect(csRect(r2.xmax+1, r1.ymin,   r1.xmax,   r2.ymax));   //right
+        
+    return;
+  
+  case 3:
+    // Two rects (right, bottom)        [rect on top left corner]
+    
+    pushRect(csRect(r2.xmax+1, r1.ymin, r1.xmax,   r2.ymax)); //right
+    pushRect(csRect(r1.xmin, r2.ymax+1, r1.xmax,   r1.ymax)); //bot
+  
+    return;
+  
+  case 4:
+    // Three rects (top, left, bottom)  [rect on right side, middle]
+    
+    pushRect(csRect(r1.xmin, r1.ymin,   r1.xmax,   r2.ymin-1)); //top
+    pushRect(csRect(r1.xmin, r2.ymin,   r2.xmax-1, r2.ymax));   //left
+    pushRect(csRect(r1.xmin, r2.ymax+1, r1.xmax,   r1.ymax));   //bot
+  
+    return;
+
+  case 5:
+    // Two rects (top, bottom)          [rect in middle, horizontally touches left and right sides]
+    
+    pushRect(csRect(r1.xmin, r1.ymin,   r1.xmax,   r2.ymin-1)); //top
+    pushRect(csRect(r1.xmin, r2.ymax+1, r1.xmax,   r1.ymax));   //bot
+  
+    return;
+
+  case 6:
+    // Two rects (left, bottom)         [rect on top, right corner]
+    
+    pushRect(csRect(r1.xmin, r1.ymin,   r2.xmin-1, r1.ymax));   //left
+    pushRect(csRect(r2.xmin, r2.ymax+1, r1.xmax,   r1.ymax));   //bot
+       
+    return;
+
+  case 7:
+    // One rect (bottom)                [rect covers entire top]
+    
+    pushRect(csRect(r1.xmin, r2.ymax+1, r1.xmax,   r1.ymax));   //bot
+       
+    return;
+
+
+  case 8:
+    // Three rects (top, left, right)   [rect on bottom side, middle]
+    
+    pushRect(csRect(r1.xmin,   r1.ymin, r1.xmax,   r2.ymin-1)); //top
+    pushRect(csRect(r1.xmin,   r2.ymin, r2.xmin-1, r1.ymax));   //left
+    pushRect(csRect(r2.xmax+1, r2.ymin, r1.xmax,   r2.ymax));   //right
+        
+    return;
+
+  case 9:
+    // Two rects (right, top)           [rect on bottom, left corner]
+    
+    pushRect(csRect(r2.xmax+1, r2.ymin, r1.xmax, r1.ymax));   //right
+    pushRect(csRect(r1.xmin,   r1.ymin, r1.xmax, r2.ymin-1)); //top
+       
+    return;
+
+  case 10:
+    // Two rects (left, right)          [rect in middle, vertically touches top and bottom sides]
+    
+    pushRect(csRect(r1.xmin,   r1.ymin, r2.xmin-1, r1.ymax)); //left
+    pushRect(csRect(r2.xmax+1, r2.ymin, r1.xmax,   r1.ymax)); //right
+  
+    return;
+
+  case 11:
+    // One rect (right)                 [rect on left, vertically touches top and bottom sides]
+    
+    pushRect(csRect(r2.xmax+1, r1.ymin, r1.xmax,   r1.ymax)); //right
+  
+    return;
+
+  case 12:
+    // Two rects (left, top)            [rect on bottom, right corner]
+    
+    pushRect(csRect(r1.xmin, r1.ymin, r2.xmin-1, r1.ymax));   //left
+    pushRect(csRect(r2.xmin, r1.ymin, r1.xmax,   r2.ymin-1)); //top
+  
+    return;
+
+  case 13:
+    // One rect (top)                   [rect on bottom, horizontally touches left and right sides]
+    
+    pushRect(csRect(r1.xmin, r1.ymin, r2.xmax,   r2.ymin-1)); //top
+  
+    return;
+
+  case 14:
+    // One rect (bot)                   [rect on top, horizontally touches left and right sides]
+    
+    pushRect(csRect(r1.xmin, r2.ymax+1, r1.xmax,   r1.ymax)); //bottom
+  
+    return;
+
+  case 15:
+    // No rects 
+    // In this case, the rects cancel themselves out.
+
+    return;
+
+  
+  }
+
+}
+
+
 // The purpose of this function is to take r1 and fragment it around r2,
 // removing the area that overlaps.  This function can be used by either
 // Include() or Exclude(), since it simply fragments r1.
@@ -54,6 +210,19 @@ void csRectRegion::fragmentRect(
   // We may have to fragment r1 into four pieces if r2 is totally inside r1
   if (!testedContains)
   {
+    csRect tr1(r1), tr2(r2);
+
+    tr2.Exclude(tr1);
+
+    if (tr2.IsEmpty()) 
+    {
+      // It now becomes irritating.  Not only do we have to possibly split it into two
+      // rectangles, we may have to split it into as few as one.  Call a separate
+      // function to handle this business.
+
+      fragmentContainedRect(r1, r2);
+    }
+      
   }
 
   // We may have to fragment r1 into three pieces if an entire edge of r2 is
@@ -67,38 +236,26 @@ void csRectRegion::fragmentRect(
   if (r1.Contains(r2.xmin, r2.ymin))
   {
     // Break r1 into left, top since top left corner of r2 is inside.
-    csRect left, top;
-    left.Set(r1.xmin, r2.ymin, r2.xmin-1, r1.ymax);
-     top.Set(r1.xmin, r1.ymin, r1.xmax,   r2.ymin-1);  
-    pushRect(left);
-    pushRect(top);
+    pushRect(csRect(r1.xmin, r2.ymin, r2.xmin-1, r1.ymax));   //left
+    pushRect(csRect(r1.xmin, r1.ymin, r1.xmax,   r2.ymin-1)); //top 
   }
   else if (r1.Contains(r2.xmin, r2.ymax))
   {
     // Break r1 into left, bot since bot left corner of r2 is inside.
-    csRect left, bot;
-    left.Set(r1.xmin, r1.ymin,   r2.xmin-1, r2.ymax);
-     bot.Set(r1.xmin, r2.ymax+1, r1.xmax,   r1.ymax);  
-    pushRect(left);
-    pushRect(bot);
+    pushRect(csRect(r1.xmin, r1.ymin,   r2.xmin-1, r2.ymax));  //left
+    pushRect(csRect(r1.xmin, r2.ymax+1, r1.xmax,   r1.ymax));  //bot
   }
   else if (r1.Contains(r2.xmax, r2.ymin))
   {
     // Break r1 into right, top since top right corner of r2 is inside.
-    csRect right, top;
-    right.Set(r2.xmax+1, r1.ymin, r1.xmax, r1.ymax);
-      top.Set(r1.xmin,   r1.ymin, r2.xmax, r2.ymin-1);  
-    pushRect(right);
-    pushRect(top);
+    pushRect(csRect(r2.xmax+1, r1.ymin, r1.xmax, r1.ymax));    //right
+    pushRect(csRect(r1.xmin,   r1.ymin, r2.xmax, r2.ymin-1));  //top
   } 
   else
   {
     // Break r1 into right, bot since bot right corner of r2 is inside.
-    csRect right, bot;
-    right.Set(r2.xmax+1, r1.ymin,   r1.xmax, r1.ymax);
-      bot.Set(r1.xmin,   r2.ymax+1, r2.xmax, r1.ymax);  
-    pushRect(right);
-    pushRect(bot);
+    pushRect(csRect(r2.xmax+1, r1.ymin,   r1.xmax, r1.ymax)); //right
+    pushRect(csRect(r1.xmin,   r2.ymax+1, r2.xmax, r1.ymax)); //bot    
   }
 }
 
@@ -183,4 +340,10 @@ void csRectRegion::Include(csRect &rect)
     // Fragment it
     fragmentRect(r1, r2, true, true);
   } // end for
+}
+
+void 
+csRectRegion::Exclude(csRect &rect)
+{
+
 }
