@@ -434,6 +434,9 @@ private:
   /// Render information structure
   nTerrainInfo *info;
 
+  /// List of materials that we use for this terrain
+  iMaterialHandle *materials;
+
   /// Number of textures
   unsigned short nTextures;
 

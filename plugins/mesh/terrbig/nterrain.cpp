@@ -82,6 +82,7 @@ void csBigTerrainObject::InitMesh (nTerrainInfo *info)
   for(i=0; i<nTextures; ++i)
   {
     info->mesh[i].triangles = info->triq[i].triangles.GetArray();
+    info->mesh[i].mat_handle = materials[i];
     info->mesh[i].morph_factor = 0;
     info->mesh[i].num_vertices_pool = 1;
     info->mesh[i].use_vertex_color = false;
