@@ -306,8 +306,9 @@ public:
   DECLARE_IBASE_EXT (csCamera);
 
   //------------------- iRenderView implementation -----------------------
-  struct RenderView : public iRenderView
+  class RenderView : public iRenderView
   {
+  public:
     DECLARE_EMBEDDED_IBASE (csRenderView);
     virtual csRenderView* GetPrivateObject ()
     {

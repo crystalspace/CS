@@ -103,8 +103,9 @@ public:
   DECLARE_IBASE;
 
   //------------------------- iView implementation -----------------------//
-  struct View : public iView
+  class View : public iView
   {
+  public:
     DECLARE_EMBEDDED_IBASE (csView);
     virtual void SetSector (iSector* sector);
     virtual iCamera* GetCamera ()
