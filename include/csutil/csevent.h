@@ -58,7 +58,7 @@ private:
 
   uint32 count;
 
-  bool CheckForLoops(csEvent *current, csEvent *e);
+  bool CheckForLoops(iEvent *current, iEvent *e);
 
   bool FlattenCrystal(char *buffer);
   bool FlattenMuscle(char *buffer);
@@ -71,6 +71,9 @@ private:
   bool UnflattenCrystal(const char *buffer, uint32 length);
   bool UnflattenMuscle(const char *buffer, uint32 length);
   bool UnflattenXML(const char *buffer, uint32 length);
+
+protected:
+  virtual csRef<iEvent> CreateEvent();
 
 public:
   /// Empty initializer
@@ -105,8 +108,8 @@ public:
   virtual bool Add (const char *name, uint64 v);
   virtual bool Add (const char *name, float v);
   virtual bool Add (const char *name, double v);
-  virtual bool Add (const char *name, char *v);
-  virtual bool Add (const char *name, void *v, uint32 size);
+  virtual bool Add (const char *name, const char *v);
+  virtual bool Add (const char *name, const void *v, uint32 size);
 #ifndef CS_USE_FAKE_BOOL_TYPE
   virtual bool Add (const char *name, bool v, bool force_boolean = true);
 #endif
@@ -123,13 +126,13 @@ public:
   virtual bool Find (const char *name, uint64 &v, int index = 0) const;
   virtual bool Find (const char *name, float &v, int index = 0) const;
   virtual bool Find (const char *name, double &v, int index = 0) const;
-  virtual bool Find (const char *name, char **v, int index = 0) const;
-  virtual bool Find (const char *name, void **v, uint32 &size, 
+  virtual bool Find (const char *name, const char *&v, int index = 0) const;
+  virtual bool Find (const char *name, const void *&v, uint32 &size, 
     int index = 0) const;
 #ifndef CS_USE_FAKE_BOOL_TYPE
   virtual bool Find (const char *name, bool &v, int index = 0) const;
 #endif
-  virtual bool Find (const char *name, iEvent **v, int index = 0) const;
+  virtual bool Find (const char *name, csRef<iEvent> &v, int index = 0) const;
 
   virtual bool Remove (const char *name, int index = -1);
   virtual bool RemoveAll ();
@@ -152,7 +155,7 @@ public:
  */
 class csPoolEvent : public csEvent
 {
-  // make csEventQueue and csEvent as a friend class
+  typedef csEvent superclass;
   friend class csEventQueue;
   friend class csEvent;
 
@@ -166,15 +169,18 @@ private:
   csPoolEvent *next;
 
   // The 'real' DecRef() call that deletes the event, should in theory only be
-  // called from the csEventQueue;
+  // called from csEventQueue.
   void Free () { csEvent::DecRef(); }
 
+protected:
+  virtual csRef<iEvent> CreateEvent();
+
 public:
-  /// The constructor, this should only be called from within the csEventQueue
+  /// The constructor; should only be called from within csEventQueue.
   csPoolEvent (csEventQueue *q);
 
-  /// The DecRef() that places the event back into the pool at a ref count of 1
-  void DecRef ();
+  /// Places the event back into the pool if this is the last reference.
+  virtual void DecRef ();
 };
 
 #endif // __CS_CSEVENT_H__

@@ -1,7 +1,7 @@
 /*
-  Crystal Space Windowing System: Event manager
-  Copyright (C) 1998 by Jorrit Tyberghein
-  Written by Andrew Zabolotny <bit@eltech.ru>
+  Crystal Space Event Queue
+  Copyright (C) 1998-2004 by Jorrit Tyberghein
+  Written by Andrew Zabolotny <bit@eltech.ru>, Eric Sushine, Jonathan Tarbox
 
   This library is free software; you can redistribute it and/or
   modify it under the terms of the GNU Library General Public
@@ -19,10 +19,11 @@
 */
 
 #include "cssysdef.h"
+#include "csutil/array.h"
 #include "csutil/csevent.h"
 #include "csutil/cseventq.h"
-#include "csutil/array.h"
 #include "csutil/memfile.h"
+#include "csutil/util.h"
 
 //---------------------------------------------------------------------------
 
@@ -39,7 +40,7 @@ typedef struct attribute_tag
     double Double;
     char *String;
     bool Bool;
-    csEvent *Event;
+    iEvent *Event;
   };
   enum Type
   {
@@ -64,28 +65,29 @@ typedef struct attribute_tag
   { 
     if ((type == tag_string) || (type == tag_databuffer)) 
       delete[] String; 
-    if (type == tag_event) Event->DecRef();
+    else if (type == tag_event)
+      Event->DecRef();
   }
 } attribute;
 
-char *GetTypeName(attribute::Type t)
+static char const* GetTypeName(attribute::Type t)
 {
   switch (t)
   {
-    case attribute::tag_int8: return "int8";
-    case attribute::tag_uint8: return "uint8";
-    case attribute::tag_int16: return "int16";
-    case attribute::tag_uint16: return "uint16";
-    case attribute::tag_int32: return "int32";
-    case attribute::tag_uint32: return "uint32";
-    case attribute::tag_int64: return "int64";
-    case attribute::tag_uint64: return "uint64";
-    case attribute::tag_float: return "float";
-    case attribute::tag_double: return "double";
-    case attribute::tag_bool: return "bool";
-    case attribute::tag_string: return "string";
+    case attribute::tag_int8:       return "int8";
+    case attribute::tag_uint8:      return "uint8";
+    case attribute::tag_int16:      return "int16";
+    case attribute::tag_uint16:     return "uint16";
+    case attribute::tag_int32:      return "int32";
+    case attribute::tag_uint32:     return "uint32";
+    case attribute::tag_int64:      return "int64";
+    case attribute::tag_uint64:     return "uint64";
+    case attribute::tag_float:      return "float";
+    case attribute::tag_double:     return "double";
+    case attribute::tag_bool:       return "bool";
+    case attribute::tag_string:     return "string";
     case attribute::tag_databuffer: return "databuffer";
-    case attribute::tag_event: return "event";
+    case attribute::tag_event:      return "event";
   }
   return "unknown";
 }
@@ -186,7 +188,8 @@ bool csEvent::Add(const char *name, int8 v)
 {
   attribute *object = new attribute(attribute::tag_int8);
   object->Integer = v;
-  csArray<attribute *> *v1 = (csArray<attribute *> *) attributes.Get(csHashCompute(name));
+  csArray<attribute *> *v1 =
+    (csArray<attribute *> *) attributes.Get(csHashCompute(name));
   if (!v1) 
   {
     v1 = new csArray<attribute *>;
@@ -201,7 +204,8 @@ bool csEvent::Add(const char *name, uint8 v)
 {
   attribute *object = new attribute(attribute::tag_uint8);
   object->Unsigned = v;
-  csArray<attribute *> *v1 = (csArray<attribute *> *) attributes.Get(csHashCompute(name));
+  csArray<attribute *> *v1 =
+    (csArray<attribute *> *) attributes.Get(csHashCompute(name));
   if (!v1) 
   {
     v1 = new csArray<attribute *>;
@@ -216,7 +220,8 @@ bool csEvent::Add(const char *name, int16 v)
 {
   attribute *object = new attribute(attribute::tag_int16);
   object->Integer = v;
-  csArray<attribute *> *v1 = (csArray<attribute *> *) attributes.Get(csHashCompute(name));
+  csArray<attribute *> *v1 =
+    (csArray<attribute *> *) attributes.Get(csHashCompute(name));
   if (!v1) 
   {
     v1 = new csArray<attribute *>;
@@ -231,7 +236,8 @@ bool csEvent::Add(const char *name, uint16 v)
 {
   attribute *object = new attribute(attribute::tag_uint16);
   object->Unsigned = v;
-  csArray<attribute *> *v1 = (csArray<attribute *> *) attributes.Get(csHashCompute(name));
+  csArray<attribute *> *v1 =
+    (csArray<attribute *> *) attributes.Get(csHashCompute(name));
   if (!v1) 
   {
     v1 = new csArray<attribute *>;
@@ -254,7 +260,8 @@ bool csEvent::Add(const char *name, int32 v, bool force_boolean)
   {
     object->Integer = v;
   }
-  csArray<attribute *> *v1 = (csArray<attribute *> *) attributes.Get(csHashCompute(name));
+  csArray<attribute *> *v1 =
+    (csArray<attribute *> *) attributes.Get(csHashCompute(name));
   if (!v1) 
   {
     v1 = new csArray<attribute *>;
@@ -269,7 +276,8 @@ bool csEvent::Add(const char *name, uint32 v)
 {
   attribute *object = new attribute(attribute::tag_uint32);
   object->Unsigned = v;
-  csArray<attribute *> *v1 = (csArray<attribute *> *) attributes.Get(csHashCompute(name));
+  csArray<attribute *> *v1 =
+    (csArray<attribute *> *) attributes.Get(csHashCompute(name));
   if (!v1) 
   {
     v1 = new csArray<attribute *>;
@@ -284,7 +292,8 @@ bool csEvent::Add(const char *name, int64 v)
 {
   attribute *object = new attribute(attribute::tag_int64);
   object->Integer = v;
-  csArray<attribute *> *v1 = (csArray<attribute *> *) attributes.Get(csHashCompute(name));
+  csArray<attribute *> *v1 =
+    (csArray<attribute *> *) attributes.Get(csHashCompute(name));
   if (!v1) 
   {
     v1 = new csArray<attribute *>;
@@ -299,7 +308,8 @@ bool csEvent::Add(const char *name, uint64 v)
 {
   attribute *object = new attribute(attribute::tag_uint64);
   object->Unsigned = v;
-  csArray<attribute *> *v1 = (csArray<attribute *> *) attributes.Get(csHashCompute(name));
+  csArray<attribute *> *v1 =
+    (csArray<attribute *> *) attributes.Get(csHashCompute(name));
   if (!v1) 
   {
     v1 = new csArray<attribute *>;
@@ -314,7 +324,8 @@ bool csEvent::Add(const char *name, float v)
 {
   attribute *object = new attribute(attribute::tag_float);
   object->Double = v;
-  csArray<attribute *> *v1 = (csArray<attribute *> *) attributes.Get(csHashCompute(name));
+  csArray<attribute *> *v1 =
+    (csArray<attribute *> *) attributes.Get(csHashCompute(name));
   if (!v1) 
   {
     v1 = new csArray<attribute *>;
@@ -329,7 +340,8 @@ bool csEvent::Add(const char *name, double v)
 {
   attribute *object = new attribute(attribute::tag_double);
   object->Double = v;
-  csArray<attribute *> *v1 = (csArray<attribute *> *) attributes.Get(csHashCompute(name));
+  csArray<attribute *> *v1 =
+    (csArray<attribute *> *) attributes.Get(csHashCompute(name));
   if (!v1) 
   {
     v1 = new csArray<attribute *>;
@@ -354,7 +366,8 @@ bool csEvent::Add(const char *name, bool v, bool force_boolean)
   {
     object->Bool = v;
   }
-  csArray<attribute *> *v1 = (csArray<attribute *> *) attributes.Get(csHashCompute(name));
+  csArray<attribute *> *v1 =
+    (csArray<attribute *> *) attributes.Get(csHashCompute(name));
   if (!v1) 
   {
     v1 = new csArray<attribute *>;
@@ -367,13 +380,13 @@ bool csEvent::Add(const char *name, bool v, bool force_boolean)
 
 #endif
 
-bool csEvent::Add(const char *name, char *v)
+bool csEvent::Add(const char *name, const char *v)
 {
   attribute *object = new attribute(attribute::tag_string);
   object->length = strlen(v);
-  object->String = new char[(object->length+1)];
-  strcpy(object->String, v);
-  csArray<attribute *> *v1 = (csArray<attribute *> *) attributes.Get(csHashCompute(name));
+  object->String = csStrNew(v);
+  csArray<attribute *> *v1 =
+    (csArray<attribute *> *) attributes.Get(csHashCompute(name));
   if (!v1) 
   {
     v1 = new csArray<attribute *>;
@@ -384,13 +397,14 @@ bool csEvent::Add(const char *name, char *v)
   return true;
 }
 
-bool csEvent::Add(const char *name, void *v, uint32 size)
+bool csEvent::Add(const char *name, const void *v, uint32 size)
 {
   attribute *object = new attribute(attribute::tag_databuffer);
   object->String = new char[size];
   memcpy (object->String, v, size);
   object->length = size;
-  csArray<attribute *> *v1 = (csArray<attribute *> *) attributes.Get(csHashCompute(name));
+  csArray<attribute *> *v1 =
+    (csArray<attribute *> *) attributes.Get(csHashCompute(name));
   if (!v1) 
   {
     v1 = new csArray<attribute *>;
@@ -401,10 +415,10 @@ bool csEvent::Add(const char *name, void *v, uint32 size)
   return true;
 }
 
-bool csEvent::CheckForLoops(csEvent *current, csEvent *e)
+bool csEvent::CheckForLoops(iEvent *current, iEvent *e)
 {
-  csEvent *temp = 0;
-  if (current->Find("_parent", (iEvent **)&temp))
+  csRef<iEvent> temp;
+  if (current->Find("_parent", temp))
   {
     if (temp == e)
       return false;
@@ -417,10 +431,10 @@ bool csEvent::Add(const char *name, iEvent *v)
 {
   if (this == v)
     return false;
-  if (CheckForLoops(this, CS_STATIC_CAST(csEvent*, v)))
+  if (CheckForLoops(this, v))
   {
     attribute *object = new attribute(attribute::tag_event);
-    object->Event = CS_STATIC_CAST(csEvent*, v);
+    object->Event = v;
     if (object->Event)
     { 
       object->Event->IncRef();
@@ -428,7 +442,8 @@ bool csEvent::Add(const char *name, iEvent *v)
       {
         object->Event->Add("_parent", this);
       }
-      csArray<attribute *> *v1 = (csArray<attribute *> *) attributes.Get(csHashCompute(name));
+      csArray<attribute *> *v1 =
+        (csArray<attribute *> *) attributes.Get(csHashCompute(name));
       if (!v1) 
       {
         v1 = new csArray<attribute *>;
@@ -513,7 +528,8 @@ bool csEvent::Find(const char *name, int32 &v, int index) const
   if (v1)
   {
     attribute *object = (attribute *) v1->Get(index);
-    if ((object->type == attribute::tag_int32) || (object->type == attribute::tag_bool))
+    if ((object->type == attribute::tag_int32) ||
+        (object->type == attribute::tag_bool))
     {
       v = (int32)object->Integer;
       return true;
@@ -602,7 +618,7 @@ bool csEvent::Find(const char *name, double &v, int index) const
   return false;
 }
 
-bool csEvent::Find(const char *name, char **v, int index) const
+bool csEvent::Find(const char *name, const char *&v, int index) const
 {
   csArray<attribute *> *v1 = (csArray<attribute *> *) attributes.Get(
     csHashCompute (name));
@@ -611,14 +627,15 @@ bool csEvent::Find(const char *name, char **v, int index) const
     attribute *object = (attribute *) v1->Get(index);
     if (object->type == attribute::tag_string)
     {
-      *v = object->String;
+      v = object->String;
       return true;
     }
   }
   return false;
 }
 
-bool csEvent::Find(const char *name, void **v, uint32 &size, int index) const
+bool csEvent::Find(const char *name, void const *&v, uint32 &size,
+  int index) const
 {
   csArray<attribute *> *v1 = (csArray<attribute *> *) attributes.Get (
     csHashCompute (name));
@@ -627,7 +644,7 @@ bool csEvent::Find(const char *name, void **v, uint32 &size, int index) const
     attribute *object = (attribute *) v1->Get(index);
     if (object->type == attribute::tag_databuffer)
     {
-      *v = (void *)object->String;
+      v = object->String;
       size = object->length;
       return true;
     }
@@ -655,7 +672,7 @@ bool csEvent::Find(const char *name, bool &v, int index) const
 
 #endif
 
-bool csEvent::Find(const char *name, iEvent **v, int index) const
+bool csEvent::Find(const char *name, csRef<iEvent> &v, int index) const
 {
   csArray<attribute *> *v1 = (csArray<attribute *> *) attributes.Get (
     csHashCompute (name));
@@ -664,7 +681,7 @@ bool csEvent::Find(const char *name, iEvent **v, int index) const
     attribute *object = (attribute *) v1->Get(index);
     if (object->type == attribute::tag_event)
     {
-      *v = object->Event;
+      v = object->Event;
       return true;
     }
   }
@@ -676,7 +693,8 @@ bool csEvent::Remove(const char *name, int index)
   if (index == -1)
   {
     // remove all in the vector, and remove the vector from the hashmap
-    csArray<attribute *> *v = (csArray<attribute *> *) attributes.Get(csHashCompute(name));
+    csArray<attribute *> *v =
+      (csArray<attribute *> *) attributes.Get(csHashCompute(name));
     if (v)
     {
       attribute *object = 0;
@@ -706,7 +724,8 @@ bool csEvent::Remove(const char *name, int index)
   {
     // remove only the listed index from the vector, if it's the only one 
     // in the vector, remove the vector from the hashmap
-    csArray<attribute *> *v = (csArray<attribute *> *) attributes.Get(csHashCompute(name));
+    csArray<attribute *> *v =
+      (csArray<attribute *> *) attributes.Get(csHashCompute(name));
     if (v)
     {
       attribute *object = (attribute *) v->Get(index);
@@ -824,8 +843,8 @@ bool csEvent::Print(int level)
           }
           if (object->type == attribute::tag_databuffer)
           {
-            IndentLevel(level); printf (" Value: 0x%X\n", (int32)object->String);
-            IndentLevel(level); printf (" Length: %d\n", object->length);
+            IndentLevel(level); printf(" Value: 0x%X\n",(int32)object->String);
+            IndentLevel(level); printf(" Length: %d\n", object->length);
           }
           if (object->type == attribute::tag_string)
           {
@@ -960,11 +979,13 @@ uint32 csEvent::FlattenSizeCrystal()
 
 uint32 csEvent::FlattenSizeMuscle()
 {
+  // @@@ FIXME: Implement this.
   return 0;
 }
 
 uint32 csEvent::FlattenSizeXML()
 {
+  // @@@ FIXME: Implement this.
   return 0;
 }
 
@@ -1000,12 +1021,13 @@ bool csEvent::FlattenMuscle(char * buffer)
   uint32 v = CS_MUSCLE_PROTOCOL;
   b.Write((char *)&v, sizeof(v));
 
+  // @@@ FIXME: Implement this.
   return false;
 }
 
 bool csEvent::FlattenXML(char * buffer)
 {
-  // TODO
+  // @@@ FIXME: Implement this.
   return false;
 }
 
@@ -1339,7 +1361,7 @@ bool csEvent::UnflattenCrystal(const char *buffer, uint32 length)
   b.Read((char *)&Category, sizeof(uint8));      // iEvent.Category
   b.Read((char *)&SubCategory, sizeof(uint8));   // iEvent.SubCategory
   b.Read((char *)&Flags, sizeof(uint8));         // iEvent.Flags
-  b.Read((char *)&ui32, sizeof(uint32));       // iEvent.Time
+  b.Read((char *)&ui32, sizeof(uint32));         // iEvent.Time
   Time = convert_endian(ui32);
 
   // The largest struct in the union is Joystick, so we take that..
@@ -1431,29 +1453,18 @@ bool csEvent::UnflattenCrystal(const char *buffer, uint32 length)
         {
           b.Read((char *)&ui32, sizeof(uint32));
           ui32 = convert_endian(ui32);
-          char *data = new char[ui32];
-          b.Read(data, ui32);
-          Add(name, data);
+          void *data = new char[ui32];
+          b.Read((char*)data, ui32);
+          Add(name, data, ui32);
         }
         break;
       case CS_DATATYPE_EVENT:
         {
           b.Read((char *)&ui32, sizeof(uint32));
           ui32 = convert_endian(ui32);
-          csPoolEvent *me = CS_STATIC_CAST(csPoolEvent *, this);
-          if (me)
-          {
-            csRef<iEvent> e = me->pool->CreateEvent(0);
-            Add(name, e);
-            e->Unflatten(buffer+b.GetPos(), ui32);
-          }
-	  else
-          {
-            csEvent *e = new csEvent();
-            Add(name, CS_STATIC_CAST(iEvent *,e));
-            e->Unflatten(buffer+b.GetPos(), ui32);
-          }
-          printf("returning from sub event\n");
+	  csRef<iEvent> e = CreateEvent();
+	  Add(name, e);
+	  e->Unflatten(buffer+b.GetPos(), ui32);
           b.SetPos(b.GetPos() + ui32);
         }
         break;
@@ -1466,14 +1477,24 @@ bool csEvent::UnflattenCrystal(const char *buffer, uint32 length)
 
 bool csEvent::UnflattenMuscle(const char *buffer, uint32 length)
 {
+  // @@@ FIXME: Implement this.
   return false;
 }
 
 bool csEvent::UnflattenXML(const char *buffer, uint32 length)
 {
+  // @@@ FIXME: Implement this.
   return false;
 }
 
+csRef<iEvent> csEvent::CreateEvent()
+{
+  return csPtr<iEvent>(new csEvent());
+}
+
+//*****************************************************************************
+// csPoolEvent
+//*****************************************************************************
 csPoolEvent::csPoolEvent(csEventQueue *q) 
 {
     pool = q;
@@ -1482,12 +1503,10 @@ csPoolEvent::csPoolEvent(csEventQueue *q)
  
 void csPoolEvent::DecRef() 
 {
-  //printf("csPoolEvent::DecRef() - ref count = %d\n", scfRefCount);
   if (scfRefCount == 1) 
   {
-    // while this should never happen, this will prevent a seg fault if some 
-    // donut-head decides to create one of these improperly.
-    if (!pool) return;
+    if (!pool.IsValid())
+      return;
 
     next = pool->EventPool;
     pool->EventPool = this;
@@ -1504,4 +1523,11 @@ void csPoolEvent::DecRef()
   {
     scfRefCount--;
   }
+}
+
+csRef<iEvent> csPoolEvent::CreateEvent()
+{
+  if (pool.IsValid())
+    return pool->CreateEvent(0);
+  return superclass::CreateEvent();
 }

@@ -10,6 +10,25 @@ chronological order.
 	- Eric Sunshine fixed bug in csKeyValuePair where it was incorrectly
 	  invoking SCF_CONSTRUCT_IBASE() even though it should not have been
 	  doing so because its parent, csObject, already did so.
+	- Eric Sunshine made the following changes to the event system:
+	    - Eliminated extremely dangerous and potentially fatal assumption
+	      in csEvent where, in several places, it blindly assumed that an
+	      iEvent passed in by a client was a csEvent or csPoolEvent.
+	    - Corrrected very bizarre code in csEvent::UnflattenCrystal() which
+	      performed a static cast of `this' to csPoolEvent, checked if the
+	      result of the cast of zero (which will never be the case), and
+	      then performed conditional behavior based upon that result.
+	    - Fixed bug in csEvent::UnflattenCrystal().  When unserializing a
+	      data buffer, it incorrectly assigned CS_DATATYPE_STRING as the
+	      attribute type rather than CS_DATATYPE_DATABUFFER.
+	    - Unified the signatures of the iEvent::Find() methods so that they
+	      all accept a reference in which to place the found item.
+	      Previously, some Find() methods accepted a reference, while
+	      others accepted a pointer.
+	    - Added a number of missing `const' qualifiers to iEvent method
+	      signatures.
+	    - Rewrote the event-related section of apimod98.txi in order to
+	      clarify what was otherwise confused mumbo-jumbo.
 8-Feb-2004
 	- Eric Sunshine corrected Reed Hedges' changes to evdefs.h so that they
 	  are correct for plain-C compilers.  This file is processed by non-C++

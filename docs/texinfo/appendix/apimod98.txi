@@ -609,7 +609,7 @@ now deprecated.
 The deprecated @samp{csHashIterator} can no longer iterate over all objects.
 To do that you need to use @samp{csGlobalHashIterator}.
 
-@subheading iEventQueue Client References
+@subheading Event-Related Changes
 @cindex @code{csEventQueue}
 @cindex @code{iEventQueue}
 @cindex @code{csEvent}
@@ -620,30 +620,44 @@ To do that you need to use @samp{csGlobalHashIterator}.
 @cindex @code{csEventCord}
 @cindex @code{iEventCord}
 
-Posting an @samp{iEvent} via @code{iEventQueue::Post()} or
-@code{iEventOutlet::Post()} must now @code{DecRef()} the @samp{iEvent} after
-the posting the event, since @samp{iEventQueue} will @code{IncRef()} the event
-for itself (that is, it will claim its own reference, rather than inheriting
-the reference from the caller as it did in the past).  As with all reference
-counting, rather than manually invoking @code{DecRef()}, the client is
-encouraged to utilize @code{csRef<>} to automate reference count management, as
-illustrated below.  This means that if you are calling @code{Post()} like this:
+Signatures of the @code{iEvent::Find()} methods have been unified so that they
+all now accept a reference into which to store the found item.  Previously,
+some @code{Find()} methods used a reference for this purpose, while others used
+a pointer.  In addition, rather than accepting a pointer to a pointer of type
+@samp{iEvent}, the @code{Find()} method for finding an event now takes a
+reference to a @code{csRef<iEvent>}.
+
+Previously, @code{iEventQueue::Post()} had a special case where it assumed that
+the caller was giving up ownership of the posted @samp{iEvent} if the caller
+had allocated the event manually, rather than obtaining the event via
+@code{iEventQueue::CreateEvent()} or @code{iEventOutlet::CreateEvent()}. In
+this case, @code{Post()} would hijack the caller's reference to the
+@samp{iEvent} for itself.  This special case allowed the caller to write code,
+such as the following, which appeared to leak a reference to the event, but
+which did not in fact do so.
 
 @example
-iEvent* e = new csEvent (foo, bar);
+iEvent* e = new csEvent(...);
 eventq->Post(e);
 @end example
 
-You should now call it like this:
+Now, however, @code{iEventQueue::Post()} takes the more sane approach of
+treating all incoming events identically.  It never hijacks ownership of the
+event by stealing the caller's reference.  Instead, @code{Post()} uniformly
+invokes @code{IncRef()} on each incoming event in order to claim its own
+reference.  This means that callers are no longer burdened by having to
+determine whether or not the event's reference is going to be hijacked.  Thus,
+the above code should be re-written as:
 
 @example
-csRef<iEvent> e = csPtr<iEvent>(new csEvent (foo, bar));
+csRef<iEvent> e;
+e.AttachNew(new csEvent(...));
 eventq->Post(e);
 @end example
 
 Events created with @code{iEventQueue::CreateEvent()} or
 @code{iEventOutlet::CreateEvent()} are unaffected by this change since the
-client was already responsible for managing the event's reference count in
+client has always been responsible for managing the event's reference count in
 these cases.
 
 @subheading New Renderer-Related Changes

@@ -21,6 +21,7 @@
 #define __CS_IUTIL_EVENT_H__
 
 #include "iutil/evdefs.h"
+#include "csutil/ref.h"
 #include "csutil/scf.h"
 #include "csutil/csunicode.h"
 
@@ -230,8 +231,8 @@ struct iEvent : public iBase
   virtual bool Add(const char *name, uint64 v) = 0;
   virtual bool Add(const char *name, float v) = 0;
   virtual bool Add(const char *name, double v) = 0;
-  virtual bool Add(const char *name, char *v) = 0;
-  virtual bool Add(const char *name, void *v, uint32 size) = 0;
+  virtual bool Add(const char *name, const char *v) = 0;
+  virtual bool Add(const char *name, const void *v, uint32 size) = 0;
 #ifndef CS_USE_FAKE_BOOL_TYPE
   virtual bool Add(const char *name, bool v, bool force_boolean = true) = 0;
 #endif
@@ -247,13 +248,14 @@ struct iEvent : public iBase
   virtual bool Find(const char *name, uint64 &v, int index = 0) const = 0;
   virtual bool Find(const char *name, float &v, int index = 0) const = 0;
   virtual bool Find(const char *name, double &v, int index = 0) const = 0;
-  virtual bool Find(const char *name, char **v, int index = 0) const = 0;
-  virtual bool Find(const char *name, void **v, uint32 &size, 
+  virtual bool Find(const char *name, const char *&v, int index = 0) const = 0;
+  virtual bool Find(const char *name, const void *&v, uint32 &size, 
     int index = 0) const = 0;
 #ifndef CS_USE_FAKE_BOOL_TYPE
   virtual bool Find(const char *name, bool &v, int index = 0) const = 0;
 #endif
-  virtual bool Find(const char *name, iEvent **v, int index = 0) const = 0;
+  virtual bool Find(const char *name, csRef<iEvent> &v,
+    int index = 0) const = 0;
 
   virtual bool Remove(const char *name, int index = -1) = 0;
   virtual bool RemoveAll() = 0;

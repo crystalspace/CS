@@ -33,7 +33,7 @@ CS_IMPLEMENT_APPLICATION
 
 //-----------------------------------------------------------------------------
 
-bool run_pool_tests(iObjectRegistry* object_reg)
+static bool run_pool_tests(iObjectRegistry* object_reg)
 {
   csTicks begin, end;
   csRef<iEvent> ten[10], hundred[100], thousand[1000], lots[100000];
@@ -109,7 +109,7 @@ bool run_pool_tests(iObjectRegistry* object_reg)
   return true;
 }
 
-bool compare_buffers(char *b1, char *b2, uint32 length)
+static bool compare_buffers(const char *b1, const char *b2, uint32 length)
 {
   for (uint32 i = 0; i < length; i++)
   {
@@ -119,7 +119,7 @@ bool compare_buffers(char *b1, char *b2, uint32 length)
   return true;
 }
 
-bool run_event_tests(iObjectRegistry* object_reg)
+static bool run_event_tests(iObjectRegistry* object_reg)
 {
   csRef<iEventQueue> q (CS_QUERY_REGISTRY(object_reg, iEventQueue));
   if (!q) 
@@ -131,18 +131,18 @@ bool run_event_tests(iObjectRegistry* object_reg)
   csRef<iEvent> e = q->CreateEvent(1);
   fprintf (stdout, "Ok, now it's time to test the events themselves:\n");
   
-  fprintf (stdout, "Adding an my_int8... %s\n", e->Add("my_int8", (int8)1) ? "Sucess!" : "Failure!");
-  fprintf (stdout, "Adding an my_uint8... %s\n", e->Add("my_uint8", (uint8)1) ? "Sucess!" : "Failure!");
-  fprintf (stdout, "Adding an my_int16... %s\n", e->Add("my_int16", (int16)1) ? "Sucess!" : "Failure!");
-  fprintf (stdout, "Adding an my_uint16... %s\n", e->Add("my_uint16", (uint16)1) ? "Sucess!" : "Failure!");
-  fprintf (stdout, "Adding an my_int32... %s\n", e->Add("my_int32", (int32)1) ? "Sucess!" : "Failure!");
-  fprintf (stdout, "Adding an my_uint32... %s\n", e->Add("my_uint32", (uint32)1) ? "Sucess!" : "Failure!");
-  fprintf (stdout, "Adding an my_int64... %s\n", e->Add("my_int64", (int64)1) ? "Sucess!" : "Failure!");
-  fprintf (stdout, "Adding an my_uint64... %s\n", e->Add("my_uint64", (uint64)1) ? "Sucess!" : "Failure!");
-  fprintf (stdout, "Adding an my_float... %s\n", e->Add("my_float", (float)1.0) ? "Sucess!" : "Failure!");
-  fprintf (stdout, "Adding an my_double... %s\n", e->Add("my_double", (double)1.0) ? "Sucess!" : "Failure!");
-  fprintf (stdout, "Adding an my_bool... %s\n", e->Add("my_bool", (bool)true) ? "Sucess!" : "Failure!");
-  fprintf (stdout, "Adding an my_string... %s\n", e->Add("my_string", "Hello World!") ? "Sucess!" : "Failure!");
+  fprintf (stdout, "Adding an my_int8... %s\n", e->Add("my_int8", (int8)1) ? "Success!" : "Failure!");
+  fprintf (stdout, "Adding an my_uint8... %s\n", e->Add("my_uint8", (uint8)1) ? "Success!" : "Failure!");
+  fprintf (stdout, "Adding an my_int16... %s\n", e->Add("my_int16", (int16)1) ? "Success!" : "Failure!");
+  fprintf (stdout, "Adding an my_uint16... %s\n", e->Add("my_uint16", (uint16)1) ? "Success!" : "Failure!");
+  fprintf (stdout, "Adding an my_int32... %s\n", e->Add("my_int32", (int32)1) ? "Success!" : "Failure!");
+  fprintf (stdout, "Adding an my_uint32... %s\n", e->Add("my_uint32", (uint32)1) ? "Success!" : "Failure!");
+  fprintf (stdout, "Adding an my_int64... %s\n", e->Add("my_int64", (int64)1) ? "Success!" : "Failure!");
+  fprintf (stdout, "Adding an my_uint64... %s\n", e->Add("my_uint64", (uint64)1) ? "Success!" : "Failure!");
+  fprintf (stdout, "Adding an my_float... %s\n", e->Add("my_float", (float)1.0) ? "Success!" : "Failure!");
+  fprintf (stdout, "Adding an my_double... %s\n", e->Add("my_double", (double)1.0) ? "Success!" : "Failure!");
+  fprintf (stdout, "Adding an my_bool... %s\n", e->Add("my_bool", (bool)true) ? "Success!" : "Failure!");
+  fprintf (stdout, "Adding an my_string... %s\n", e->Add("my_string", "Hello World!") ? "Success!" : "Failure!");
   int8 my_int8 = 0;
   fprintf (stdout, "Searching for my_int8...%s", e->Find("my_int8", my_int8) ? "Success!" : "Failure!");
   fprintf (stdout, "  (value: %d)\n", my_int8);
@@ -176,33 +176,33 @@ bool run_event_tests(iObjectRegistry* object_reg)
   bool my_bool = false;
   fprintf (stdout, "Searching for my_bool...%s", e->Find("my_bool", my_bool) ? "Success!" : "Failure!");
   fprintf (stdout, "  (value: %s)\n", my_bool ? "true" : "false");
-  char *my_string = 0;
-  fprintf (stdout, "Searching for my_string...%s", e->Find("my_string", &my_string) ? "Success!" : "Failure!");
+  const char *my_string = 0;
+  fprintf (stdout, "Searching for my_string...%s", e->Find("my_string", my_string) ? "Success!" : "Failure!");
   fprintf (stdout, "  (value: %s)\n", my_string);
   char buffer[] = { 0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0a, 0x0b, 0x0c, 0x0d, 0x0e, 0x0f,
     0x10, 0x11, 0x12, 0x13, 0x14, 0x15, 0x16, 0x17, 0x18, 0x19, 0x1a, 0x1b, 0x1c, 0x1d, 0x1e, 0x1f };
-  fprintf (stdout, "Adding a databuffer 32 in length called my_databuffer... %s\n", e->Add("my_databuffer", (void*)buffer, 32) ? "Sucess!" : "Failure!");
-  my_string = 0;
+  fprintf (stdout, "Adding a databuffer 32 in length called my_databuffer... %s\n", e->Add("my_databuffer", (const void*)buffer, 32) ? "Success!" : "Failure!");
+  const void* my_data = 0;
   uint32 l;
   bool found = false;
-  fprintf (stdout, "Searching for my_databuffer...%s\n", (found = e->Find("my_databuffer", (void**)&my_string, (uint32&)l, 0)) ? "Success!" : "Failure!");
+  fprintf (stdout, "Searching for my_databuffer...%s\n", (found = e->Find("my_databuffer", my_data, l, 0)) ? "Success!" : "Failure!");
   if (found)
-    fprintf (stdout, "  Comparing buffers...%s\n", compare_buffers(my_string, (char*)buffer, 32) ? "Perfect!" : "Not the same!");
+    fprintf (stdout, "  Comparing buffers...%s\n", compare_buffers((const char*)my_data, (const char*)buffer, 32) ? "Perfect!" : "Not the same!");
     
-  fprintf (stdout, "Adding an this event to itself... %s\n", e->Add("my_event", e) ? "Sucess!" : "Failure!");
+  fprintf (stdout, "Adding an this event to itself... %s\n", e->Add("my_event", e) ? "Success!" : "Failure!");
   fprintf (stdout, "  That should have failed.\n");
   csRef<iEvent> f = q->CreateEvent(1);
-  fprintf (stdout, "Adding a new event as my_event... %s\n", e->Add("my_event", f) ? "Sucess!" : "Failure!");
-  fprintf (stdout, "Adding the parent event to the child event... %s\n", f->Add("my_event", e) ? "Sucess!" : "Failure!");
+  fprintf (stdout, "Adding a new event as my_event... %s\n", e->Add("my_event", f) ? "Success!" : "Failure!");
+  fprintf (stdout, "Adding the parent event to the child event... %s\n", f->Add("my_event", e) ? "Success!" : "Failure!");
   fprintf (stdout, "  That should have failed.\n");
   uint32 size = e->FlattenSize();
   char *serialized_buffer = new char[size];
-  fprintf (stdout, "Serializing the event to a buffer...%s\n", e->Flatten(serialized_buffer) ? "Sucess!" : "Failure");
+  fprintf (stdout, "Serializing the event to a buffer...%s\n", e->Flatten(serialized_buffer) ? "Success!" : "Failure");
   FILE *log = fopen("test.bin", "wb");
   fwrite(serialized_buffer,size, 1, log);
   fclose(log);
   csRef<iEvent> a = q->CreateEvent(1);
-  fprintf (stdout, "Recreating event from the buffer...%s\n", a->Unflatten(serialized_buffer, size) ? "Sucess!" : "Failure");
+  fprintf (stdout, "Recreating event from the buffer...%s\n", a->Unflatten(serialized_buffer, size) ? "Success!" : "Failure");
   fprintf (stdout, "Printing the contents of the new event out:\n");
   a->Print();
   
@@ -210,7 +210,7 @@ bool run_event_tests(iObjectRegistry* object_reg)
 }
 
 
-bool DoStuff (iObjectRegistry* object_reg)
+static bool run_tests (iObjectRegistry* object_reg)
 {
   csRef<iEventQueue> q (CS_QUERY_REGISTRY(object_reg, iEventQueue));
   if (!q) 
@@ -218,9 +218,9 @@ bool DoStuff (iObjectRegistry* object_reg)
     fprintf (stdout, "EventQueue not loaded, Zoinks!\n");
     return false;
   }
-  fprintf (stdout, "\nEvent Pool test v0.96\nby Jonathan Tarbox\n\n");
+  fprintf (stdout, "\nEvent Pool test\nby Jonathan Tarbox\n\n");
 
-  fprintf (stdout, "This will allocate 10, 100, and then 1000 events.\n");
+  fprintf (stdout, "This will allocate 10, 100, 1000, and 10000 events.\n");
   fprintf (stdout, "As these are the initial allocations, they will be\n");
   fprintf (stdout, "allocating memory each time, thus a little slow.\n\n");
 
@@ -259,9 +259,8 @@ int main (int argc, char* argv[])
     return -1;
   }
 
-  DoStuff (object_reg);
+  run_tests (object_reg);
 
   csInitializer::DestroyApplication (object_reg);
   return 0;
 }
-

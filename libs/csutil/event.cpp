@@ -42,9 +42,9 @@ void csKeyEventHelper::GetModifiers (const iEvent* event,
 {
   memset (&modifiers, 0, sizeof (modifiers));
 
-  void* mod;
+  const void* mod;
   uint32 modSize;
-  if (!event->Find ("keyModifiers", &mod, modSize)) return;
+  if (!event->Find ("keyModifiers", mod, modSize)) return;
   memcpy (&modifiers, mod, MIN (sizeof (modifiers), modSize));
 }
 
