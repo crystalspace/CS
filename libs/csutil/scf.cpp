@@ -104,14 +104,16 @@ public:
 
 class scfSharedLibrary;
 
+class csStringSet* libraryNames = 0; 
+
 class scfLibraryVector : public csPDelArray<scfSharedLibrary>
 {
 public:
-  static int CompareName (scfSharedLibrary* const& x, char const* const& n);
-  size_t FindLibrary(char const* name) const
+  static int CompareName (scfSharedLibrary* const& x, /*char const**/csStringID const& n);
+  size_t FindLibrary(/*char const**/ csStringID name) const
   {
     return FindKey(
-      csArrayCmp<scfSharedLibrary*,char const*>(name, CompareName));
+      csArrayCmp<scfSharedLibrary*,/*char const**/csStringID>(name, CompareName));
   }
 };
 
@@ -121,10 +123,13 @@ static scfLibraryVector *LibraryRegistry = 0;
 /// A object of this class represents a shared library
 class scfSharedLibrary
 {
+  typedef void (*scfInitFunc)(iSCF*);
+  typedef void (*scfFinisFunc)();
+
   friend class scfLibraryVector;
   friend class scfFactory;
   // Shared library name
-  char *LibraryName;
+  csStringID LibraryName;
   // Handle of shared module (if RefCount > 0)
   csLibraryHandle LibraryHandle;
   // Number of references to this shared library
@@ -133,11 +138,13 @@ class scfSharedLibrary
   // functions.  All exported factory classes will implement initialize and
   // shutdown functions, but we choose only a single pair to perform this work
   // on behalf of the library.
-  char *FuncCoreName;
+  //char *FuncCoreName;
+  scfInitFunc initFunc;
+  scfFinisFunc finisFunc;
 
 public:
   /// Create a shared library and load it
-  scfSharedLibrary (const char *iLibraryName, const char *iCoreName);
+  scfSharedLibrary (csStringID iLibraryName, const char *iCoreName);
 
   /// Destroy a shared library object
   virtual ~scfSharedLibrary ();
@@ -170,60 +177,56 @@ public:
   }
 };
 
-scfSharedLibrary::scfSharedLibrary (const char *lib, const char *core)
+scfSharedLibrary::scfSharedLibrary (csStringID libraryName, const char *core)
 {
   LibraryRegistry->Push (this);
 
   RefCount = 0;
-  LibraryName = csStrNew (lib);
-  FuncCoreName = csStrNew (core);
-  LibraryHandle = csLoadLibrary (LibraryName);
+  LibraryName = libraryName;
+  const char* lib = libraryNames->Request (LibraryName);
+  LibraryHandle = csLoadLibrary (lib);
 
   if (LibraryHandle != 0)
   {
-    typedef void (*scfInitFunc)(iSCF*);
     csString sym;
-    sym << FuncCoreName << "_scfInitialize";
-    scfInitFunc initfunc = (scfInitFunc)csGetLibrarySymbol(LibraryHandle, sym);
-    if (initfunc)
-      initfunc(PrivateSCF);
-    else
+    sym << core << "_scfInitialize";
+    initFunc = (scfInitFunc)csGetLibrarySymbol(LibraryHandle, sym);
+    if (!initFunc)
     {
-      fprintf (stderr, "SCF ERROR: '%s' doesn't export '%s'\n", LibraryName,
-        sym.GetData ());
-      csPrintLibraryError(sym);
+      csPrintfErr ("SCF ERROR: '%s' doesn't export '%s'\n", 
+	lib, sym.GetData ());
+      csPrintLibraryError (sym);
     }
+    sym.Clear ();
+    sym << core << "_scfFinalize";
+    finisFunc = (scfFinisFunc)csGetLibrarySymbol(LibraryHandle, sym);
+    if (!finisFunc)
+    {
+      csPrintfErr ("SCF ERROR: '%s' doesn't export '%s'\n", 
+	lib, sym.GetData ());
+      csPrintLibraryError (sym);
+    }
+    if (initFunc && finisFunc)
+      initFunc (PrivateSCF);
   }
   else
-    csPrintLibraryError(LibraryName);
+    csPrintLibraryError (lib);
 }
 
 scfSharedLibrary::~scfSharedLibrary ()
 {
   if (LibraryHandle)
   {
-    typedef void (*scfFinisFunc)();
-    csString sym;
-    sym << FuncCoreName << "_scfFinalize";
-    scfFinisFunc func = (scfFinisFunc)csGetLibrarySymbol(LibraryHandle, sym);
-    if (func)
-      func();
-    else
-    {
-      fprintf (stderr, "SCF ERROR: '%s' doesn't export '%s'\n", LibraryName,
-        sym.GetData ());
-      csPrintLibraryError(sym);
-    }
+    if (initFunc && finisFunc)
+      finisFunc();
     csUnloadLibrary (LibraryHandle);
   }
-  delete [] FuncCoreName;
-  delete [] LibraryName;
 }
 
 int scfLibraryVector::CompareName (scfSharedLibrary* const& Item,
-  char const* const& Key)
+  csStringID const& Key)
 {
-  return strcmp (Item->LibraryName, Key);
+  return Item->LibraryName - Key;
 }
 
 #endif // CS_STATIC_LINKED
@@ -251,7 +254,7 @@ public:
   csStringID classContext;
 #ifndef CS_STATIC_LINKED
   // Shared module that implements this class or 0 for local classes
-  char *LibraryName;
+  csStringID LibraryName;
   // A pointer to shared library object (0 for local classes)
   scfSharedLibrary *Library;
 #endif
@@ -312,7 +315,7 @@ scfFactory::scfFactory (const char *iClassID, const char *iLibraryName,
   CreateFunc = iCreate;
   classContext = context;
 #ifndef CS_STATIC_LINKED
-  LibraryName = csStrNew (iLibraryName);
+  LibraryName = iLibraryName ? libraryNames->Request (iLibraryName) : csInvalidStringID;
   Library = 0;
 #else
   (void)iLibraryName;
@@ -333,7 +336,6 @@ scfFactory::~scfFactory ()
 #ifndef CS_STATIC_LINKED
   if (Library)
     Library->DecRef ();
-  delete [] LibraryName;
 #endif
   delete [] FactoryClass;
   delete [] Dependencies;
@@ -347,7 +349,7 @@ void scfFactory::IncRef ()
 {
   csRefTrackerAccess::TrackIncRef (this, scfRefCount);
 #ifndef CS_STATIC_LINKED
-  if (!Library && LibraryName)
+  if (!Library && (LibraryName != csInvalidStringID))
   {
     size_t libidx = LibraryRegistry->FindLibrary(LibraryName);
     if (libidx != (size_t)-1)
@@ -565,7 +567,7 @@ csSCF::csSCF () :
   scfRefCount(1), scfWeakRefOwners(0), scfParent(0)
 {
   SCF = PrivateSCF = this;
-#ifdef CS_DEBUG
+#if defined(CS_DEBUG) || defined (CS_MEMORY_TRACKER)
   object_reg = 0;
 #endif
 
@@ -579,6 +581,8 @@ csSCF::csSCF () :
 #ifndef CS_STATIC_LINKED
   if (!LibraryRegistry)
     LibraryRegistry = new scfLibraryVector ();
+  if (!libraryNames)
+    libraryNames = new csStringSet;
 #endif
 
   // We need a recursive mutex.
@@ -595,6 +599,8 @@ csSCF::~csSCF ()
   UnloadUnusedModules ();
   delete LibraryRegistry;
   LibraryRegistry = 0;
+  delete libraryNames;
+  libraryNames = 0;
 #endif
 
   mutex = 0;
@@ -946,7 +952,7 @@ csRef<iDocument> csSCF::GetPluginMetadata (char const *iClassID)
   {
     scfFactory *cf = ClassRegistry->Get (idx);
     if (cf->LibraryName != 0)
-      csGetPluginMetadata(cf->LibraryName, metadata);
+      csGetPluginMetadata (libraryNames->Request (cf->LibraryName), metadata);
   }
 
 #endif

@@ -16,6 +16,7 @@ chronological order.
 	  circumstances non-free blocks were removed.
 	- res changed the default csSet<> size/grow rate to 23/5.
 	- res changed csStringHash to use csHash<> instead of csHashMap.
+	- res made SCF shared libraries and SCF factories share library names.
 12-Nov-2004
 	- Eric Sunshine fixed pthread check in checkpthread.m4 so that it works
 	  correctly with pre-C99 compilers. Previously, it was mixing variable
