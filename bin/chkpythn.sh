@@ -42,7 +42,7 @@
 #	Shell variable containing the compiler flags required for Python.
 #    PYTHON_LFLAGS
 #	Shell variable containing the linker flags required for Python.
-#    PYTHON.AVIALABLE
+#    PYTHON.AVAILABLE
 #	Makefile variable emitted to the standard output stream.  Value is
 #	"yes" if Python is available, otherwise the variable is not set.
 #    PYTHON.CFLAGS

@@ -18,7 +18,7 @@
 #	Shell variable containing the compiler flags required for pthread.
 #    PTHREAD_LFLAGS
 #	Shell variable containing the linker flags required for pthread.
-#    PTHREAD.AVIALABLE
+#    PTHREAD.AVAILABLE
 #	Makefile variable emitted to the standard output stream.  Value is
 #	"yes" if pthread is available, otherwise the variable is not set.
 #    PTHREAD.CFLAGS

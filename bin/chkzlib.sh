@@ -18,7 +18,7 @@
 #	Shell variable containing the compiler flags required for zlib.
 #    ZLIB_LFLAGS
 #	Shell variable containing the linker flags required for zlib.
-#    ZLIB.AVIALABLE
+#    ZLIB.AVAILABLE
 #	Makefile variable emitted to the standard output stream.  Value is
 #	"yes" if zlib is available, otherwise the variable is not set.
 #    ZLIB.CFLAGS
