@@ -118,8 +118,7 @@ public:
     const csVector2& y_axis, const csVector2& z_axis);
 
   /// ready for a particular mesh (approximate for that mesh)
-  void IsoReady(const csVector3& position, iIsoRenderView *rview,
-    const csVector2& scroll);
+  void IsoReady(const csVector3& position, iIsoRenderView *rview);
 
   //----------- iCamera --------------------------
   virtual csCamera* GetPrivateObject () {return 0;}

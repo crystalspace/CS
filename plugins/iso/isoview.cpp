@@ -186,7 +186,7 @@ void csIsoView::SetAxes(float xscale, float yscale, float zscale, float zskew,
 iCamera* csIsoView::GetFakeCamera(const csVector3& center,
     iIsoRenderView *rview)
 {
-  fakecam->IsoReady(center, rview, scroll);
+  fakecam->IsoReady(center, rview);
   return fakecam;
 }
 
@@ -274,7 +274,7 @@ void csIsoFakeCamera::SetIsoView(const csVector2& scroll,
 }
 
 void csIsoFakeCamera::IsoReady(const csVector3& position, 
-  iIsoRenderView *rview, const csVector2& scroll)
+  iIsoRenderView *rview)
 {
   //printf("IsoReady %g,%g,%g\n", position.x, position.y, position.z);
   camnum++;
@@ -299,7 +299,7 @@ void csIsoFakeCamera::IsoReady(const csVector3& position,
   //csVector3 move( -minz/2.,-minz/2., +minz/2. );
   //csVector3 move( -minz*45./60.,-minz/4., +minz*15./60. );
   csVector3 move( 0, 0, 0 );
-  csMatrix3 &m = trans.GetO2T();
+  const csMatrix3 &m = trans.GetO2T();
   //move.x = position.x*m.m11 + position.y*m.m12 + position.z*m.m13;
   //move.z = minz;
   move = position; //// move back to 0,0,0 origin for draw
