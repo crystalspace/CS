@@ -1,6 +1,5 @@
 /*
-    Copyright (C) 2005 by Jorrit Tyberghein
-	      (C) 2005 by Frank Richter
+    Copyright (C) 2005 by Frank Richter
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -21,12 +20,20 @@
 #define __CS_CSUTIL_FORMATTER_H__
 
 /**\file
+ * Object-oriented, templated readers and writers for formatted values similar
+ * to scanf() and printf() but more functional.
  */
 
 #include "csutil/csuctransform.h"
 #include "csutil/dirtyaccessarray.h"
 #include "csutil/util.h"
 #include "csgeom/math.h"
+
+// MinGW uses MS CRT, but it can't grok long double.  VC doesn't have long
+// double and CRT printf() doesn't know %Lf, %Lg, or %Le.
+#if defined(__MINGW32__) || defined(CS_COMPILER_MSVC)
+#define CS_FORMATTER_NO_LONG_DOUBLE_FORMAT
+#endif
 
 /**\addtogroup csutil
  * @{ */
@@ -168,7 +175,6 @@ class csPrintfFormatter
     bool plusSign;
     bool spacePrefix;
     bool basePrefix;
-    //bool grouping;
     bool padZero;
     int width;
     int precision;
@@ -536,7 +542,8 @@ class csPrintfFormatter
 	  // Check actual conversion (s, d, ...)
 	  if (ParseConversion (state))
 	  {
-	    state.currentFormat.fmtSkip = reader.GetPosition() - state.fmtBegin;
+	    state.currentFormat.fmtSkip =
+	      reader.GetPosition() - state.fmtBegin;
 	    if (state.currentFormat.conversion != convNone)
 	      state.currentFormat.paramIdx = state.paramIdx++;
 	    formatSpecs.Push (state.currentFormat);
@@ -951,9 +958,9 @@ class csPrintfFormatter
   void OutputFloatHex (Twriter& writer, const FormatSpec& currentFormat,
     const T& value, const int vMantissaBits, const int expBits, const int bias)
   {
+#ifdef CS_IEEE_DOUBLE_FORMAT
     const utf32_char letterFirst = currentFormat.uppercase ? 'A' : 'a';
 
-#ifdef CS_IEEE_DOUBLE_FORMAT
 #ifdef CS_PROCESSOR_X86
     // @@@ x86 long double uses explicit mantissa MSB
     const bool hiddenBit = !(vMantissaBits >= 63);
@@ -1264,10 +1271,7 @@ public:
 	  {
 	    if (currentFormat.type == typeLongLong)
 	    {
-#if defined(__MINGW32__) || defined(CS_COMPILER_MSVC)
-	      // @@@ MinGW uses MS CRT, but it can't grok long double.
-	      // VC doesn't have long double, but CRT printf() doesn't know
-	      // %Lf either.
+#ifdef CS_FORMATTER_NO_LONG_DOUBLE_FORMAT
 	      OutputFloat (writer, currentFormat, 
 	      (double)params[currentFormat.paramIdx].vLongDbl, "f");
 #else
@@ -1284,10 +1288,7 @@ public:
 	  {
 	    if (currentFormat.type == typeLongLong)
 	    {
-#if defined(__MINGW32__) || defined(CS_COMPILER_MSVC)
-	      // @@@ MinGW uses MS CRT, but it can't grok long double.
-	      // VC doesn't have long double, but CRT printf() doesn't know
-	      // %Le either.
+#ifdef CS_FORMATTER_NO_LONG_DOUBLE_FORMAT
 	      OutputFloat (writer, currentFormat, 
 	      (double)params[currentFormat.paramIdx].vLongDbl, 
 	      currentFormat.uppercase ? "E" : "e");
@@ -1307,10 +1308,7 @@ public:
 	  {
 	    if (currentFormat.type == typeLongLong)
 	    {
-#if defined(__MINGW32__) || defined(CS_COMPILER_MSVC)
-	      // @@@ MinGW uses MS CRT, but it can't grok long double.
-	      // VC doesn't have long double, but CRT printf() doesn't know
-	      // %Lg either.
+#ifdef CS_FORMATTER_NO_LONG_DOUBLE_FORMAT
 	      OutputFloat (writer, currentFormat, 
 	      (double)params[currentFormat.paramIdx].vLongDbl, 
 	      currentFormat.uppercase ? "G" : "g");
