@@ -13,6 +13,8 @@ The history order is reversed so that new features are at the top.
 	    - Fixed a number of Texinfo mark-up errors.
 	    - Eliminated numerous overfull and underfull `hbox' warnings
 	      reported by TeX.
+	- Matze Braun fixed 'cs-config' so it no longer uses the 'find'
+	  utility but instead uses 'ls' which is more common.
 	- Fixed cs-config so the dependencies are more correct (for libraries).
 	- Also added Makefile.template to scripts/cs-config. Use this makefile
 	  as a template for a project that uses Crystal Space. It has to
@@ -21,6 +23,10 @@ The history order is reversed so that new features are at the top.
 	- Added a new howto which explains how to use Crystal Space in
 	  an external application using the new cs-config script that Matze
 	  added.
+	- Philip Wyett added a similar howto for MSVC.
+	- Jorge Acereda added #include "cssysdef.h" to loadlib.cpp, it must be
+	  included by all source files. Removed #include "csutil/csstring.h",
+	  no longer needed.
 22-Oct-2001
 	- Fixed a bug in the 'addghost' console command. It would fail
 	  if you used it more than once.
