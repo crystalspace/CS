@@ -137,10 +137,8 @@ Space.
 @item CS/mk/msvcgen
 Component for automatic generation of Visual C++ project files based upon
 information gleaned from Jamfiles project-wide.
-@item CS/mk/visualc6
-Project files for Win32 using @sc{msvc} 6.0
-@item CS/mk/visualc7
-Project files for Win32 using @sc{msvc} 7.0
+@item CS/mk/msvc
+Project files for Win32 using @sc{msvc} 6.0 and 7.0.
 @end table
 
 @item CS/plugins

@@ -136,7 +136,7 @@ rule Recurse
   }
 }
 
-##  ResponseFile file : [ items [ : directory ]]
+##  ResponseFile file : [ items [ : options [ : directory [ : delim ]]]]
 ##    Jam places a fairly restrictive limit on the length of the command string
 ##    emitted by an 'actions' block.  If the limit is exceeded, Jam rudely
 ##    aborts.  This problem is easily triggered when actions are invoked
@@ -149,26 +149,33 @@ rule Recurse
 ##    line.  If 'directory' is not specified, then the file is placed in
 ##    $(LOCATE_TARGET).  If there is a possibility that the same 'file' name
 ##    might be used in other contexts, be sure to grist it appropriately to
-##    avoid conflicts.  This rule assumes that 'items' contains bound entries.
-##    If this is not the case, then be sure to invoke NotFile for the contained
-##    items.  This rule may be invoked multiple times for the same 'file' in
-##    order to populate the file incrementally.  The rule returns 'file' to
-##    make it convenient to daisy chain with invocations of other rules, such
-##    as Depends or Always.
+##    avoid conflicts.  This rule assumes that 'items' contains bound entries
+##    unless the "notfile" option is specified, in which case the NotFile rule
+##    is automatically invoked for each item.  This rule may be invoked
+##    multiple times for the same 'file' in order to populate the file
+##    incrementally.  As an internal optimization to keep performance
+##    relatively sane, ResponseFile temporarily inserts 'delim' between 'items'
+##    when emitting them, and then substitutes newline for 'delim' just before
+##    writing the items to 'file'. 'delim' must be a one-character string. If
+##    not specified, "@" is used. If "@" is likely to appear in 'items', then
+##    choose a different character for 'delim'; one which is known to not
+##    appear in 'items'.  The rule returns 'file' to make it convenient to
+##    daisy chain with invocations of other rules, such as Depends or Always.
+##    Options:
+##      notfile: Invoke NotFile for each item automatically; otherwise, assume
+##               that each item is a bound file.
 rule ResponseFile
 {
   local file = $(1) ;
   local items = $(2) ;
-  local dir = $(3) ;
+  local options = $(3) ;
+  local dir = $(4) ;
+  local delim = $(5) ;
 
-  if ! $(items)
-  {
-    items = "" ; # Force file creation even if list is empty.
-    NotFile $(items) ;
-  }
+  CheckOptions notfile : $(options) : $(dir) ;
 
-  if ! $(dir) { dir = $(LOCATE_TARGET) ; }
-  MakeLocate $(file) : $(dir) ;
+  if ! $(delim) { delim = "@" ; }
+  DELIM on $(file) = $(delim) ;
 
   local firsttime = no ;
   if ! [ IsElem $(file) : $(RESPONSE_FILE_REGISTRY) ]
@@ -176,6 +183,20 @@ rule ResponseFile
     firsttime = yes ;
     RESPONSE_FILE_REGISTRY += $(file) ;
   }
+
+  if ! $(items) && $(firsttime) = yes
+  {
+    items = "" ; # Force file creation even if list is empty.
+    options += notfile ;
+  }
+
+  if [ IsElem notfile : $(options) ] && $(items)
+  {
+    NotFile $(items) ;
+  }
+
+  if ! $(dir) { dir = $(LOCATE_TARGET) ; }
+  MakeLocate $(file) : $(dir) ;
 
   local i ;
   for i in $(items)
@@ -199,9 +220,10 @@ actions ResponseFile1
   echo '$(>)' > $(<)
 }
 
-actions quietly ResponseFile2
+actions piecemeal together quietly ResponseFile2
 {
-  echo '$(>)' >> $(<)
+  echo '$(>)$(DELIM)' | sed 's/$(DELIM) /$(DELIM)/g' | tr '$(DELIM)' '
+' >> $(<)
 }
 
 ##  Prefix list : prefix

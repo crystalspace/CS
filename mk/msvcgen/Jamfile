@@ -22,11 +22,23 @@ GREP ?= grep ;
 
 SubDir TOP mk msvcgen ;
 
-MsvcGenSubDir TOP mk visualc ;
-MsvcGenTemplateDir TOP mk msvcgen template ;
+MsvcGenSubDir TOP mk msvc : 6 ;
+MsvcGenSubDir TOP mk msvc : 7 ;
+MsvcGenTemplateDir TOP mk msvcgen ;
+
+if [ Property build : projgen ] = msvc
+{
+  IncludeDir "include" csutil win32 ;
+}
+
+# We need to customize the list of build configurations.
+MsvcGenVariable customize : custom.cslib ;
 
 # Set up the workspaces we want msvcgen to synthesize.
 include [ ConcatDirs $(SUBDIR) workspaces.jam ] ;
+
+# Crystal Space-specific interpolation values.
+MsvcGenVariable libdir : "../../libs/csutil/win32/libs" ;
 
 #------------------------------------------------------------------------------
 # The msvcgen process needs to be presented with configuration information

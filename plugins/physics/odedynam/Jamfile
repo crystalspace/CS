@@ -10,8 +10,5 @@ if $(ODE.AVAILABLE) = "yes"
   {
     CFlags odedynam : [ FDefines CS_USE_ODE_EXTERN_C ] ;
   }
-  if [ Property build : projgen ] = msvc
-  {
-    MsvcCFlags odedynam : "/D \"CS_USE_ODE_EXTERN_C\"" ;
-  }
+  MsvcDefine odedynam : CS_USE_ODE_EXTERN_C ;
 }

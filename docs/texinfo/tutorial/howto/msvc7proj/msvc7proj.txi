@@ -138,7 +138,7 @@ wherever it is on your system.  See the image below for an example of it set.
 @end ifnotinfo
 
 To set the paths to the Crystal Space lib files, you must remember you need to
-add two - one pointing to the location where the release libs are and another
+add two---one pointing to the location where the release libs are and another
 to where the debug libs are located.  In the @emph{Show directories} for drop
 down menu, now select @emph{Library files}.  Follow the same browse and
 selection procedure as you used when adding the @file{include} path, adding the
@@ -146,10 +146,8 @@ following paths - adjusting for where you have Crystal Space located on your
 system.
 
 @noindent
-@file{CS\mk\visualc7\csrelease\bin\libs\}
-
-@noindent
-@file{CS\mk\visualc7\csdebug\bin\libs\}
+@file{CS\out\release\libs\}@*
+@file{CS\out\debug\libs\}
 
 See image below for an example of these set.
 

@@ -8,22 +8,6 @@ IncludeDir ;
 IncludeDir $(BUILDTOP) include : : ignoresubdir ;
 IncludeDir "include" ;
 
-# Define our compile groups
-Description sounddrivers : "sound drivers" ;
-Description soundloaders : "sound loaders" ;
-Description imageloaders : "image loaders" ;
-Description drivers2d	 : "2D canvases" ;
-Description drivers3d	 : "3D renderers" ;
-Description meshes	 : "mesh plugins and mesh loader" ;
-Description walkall  	 : "Walktest application and all required plugins" ;
-Description openglcanvas : "canvases for the OpenGL renderer" ;
-Description softcanvas   : "canvases for the software renderer" ;
-Description proctexes    : "procedural texture plugins" ;
-Description nrall        : "new-renderer-related modules" ;
-RegisterCompileGroups sounddrivers soundloaders imageloaders
-		      drivers2d drivers3d meshes walkall openglcanvas 
-		      softcanvas proctexes nrall ;
-
 # Create some clean targets
 CleanDir clean : out ;
 
@@ -52,12 +36,30 @@ rule BuildDepend
 BuildDepend depend ;
 BuildDepend dep ;
 
+# msvcgen setup must occur before compile group registration.
+SubInclude TOP mk ;
+
+# Define our compile groups
+Description sounddrivers : "sound drivers" ;
+Description soundloaders : "sound loaders" ;
+Description imageloaders : "image loaders" ;
+Description drivers2d	 : "2D canvases" ;
+Description drivers3d	 : "3D renderers" ;
+Description meshes	 : "mesh plugins and mesh loader" ;
+Description walkall  	 : "Walktest application and all required plugins" ;
+Description openglcanvas : "canvases for the OpenGL renderer" ;
+Description softcanvas   : "canvases for the software renderer" ;
+Description proctexes    : "procedural texture plugins" ;
+Description nrall        : "new-renderer-related modules" ;
+RegisterCompileGroups sounddrivers soundloaders imageloaders
+		      drivers2d drivers3d meshes walkall openglcanvas 
+		      softcanvas proctexes nrall ;
+
 # Process subdirectories.  NOTE: Unfortunately, Jam rules are presently
 # order-sensitive; Library targets must be seen by Jam before Application and
 # Plugin targets, thus ordering of these SubInclude invocations is dictated by
 # this limitation.
 SubInclude TOP data ;
-SubInclude TOP mk ;
 SubInclude TOP libs ;
 SubInclude TOP plugins ;
 SubInclude TOP apps ;

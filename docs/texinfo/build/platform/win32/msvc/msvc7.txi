@@ -108,7 +108,7 @@ anything doesn't work, see the Win32 @sc{faq}, @ref{MSVC7 FAQ}.
 
 @enumerate
 @item
-Load @file{CS\mk\visualc7\wkstypical.sln} (On the other hand, if you want to
+Load @file{CS\mk\msvc\wkstypical.sln} (On the other hand, if you want to
 try out the experimental new renderer, open the workspace
 @file{wksnewrenderer.sln} in the same directory, and select either the
 Release_NR or Debug_NR build mode.)

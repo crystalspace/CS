@@ -10,9 +10,6 @@ if $(ODE.EXTERN_C) = "yes"
 {
   CFlags partphys_ode : [ FDefines CS_USE_ODE_EXTERN_C ] ;
 }
-if [ Property build : projgen ] = msvc
-{
-  MsvcCFlags partphys_ode : "/D \"CS_USE_ODE_EXTERN_C\"" ;
-}
+MsvcDefine partphys_ode : CS_USE_ODE_EXTERN_C ;
 CompileGroups partphys_ode : meshes ;
 }

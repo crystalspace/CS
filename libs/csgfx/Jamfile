@@ -5,4 +5,4 @@ Library csgfx :
   [ Wildcard *.cpp *.h ]
   [ Wildcard [ ConcatDirs $(DOTDOT) $(DOTDOT) include csgfx ] : *.h ] ;
 LibDepends csgfx : csgeom csutil ;
-
+MsvcDefine csgfx : CS_CSGFX_LIB ;

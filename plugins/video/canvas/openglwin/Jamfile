@@ -5,10 +5,7 @@ if $(GL.AVAILABLE) = "yes" && $(TARGET.OS) = "WIN32"
 Description glwin32 : "GL/Win32 2D driver" ;
 Plugin glwin32 : [ Wildcard *.cpp *.h ] ;
 LinkWith glwin32 : openglcommon canvascommon csgeom csutil ;
-if [ Property build : projgen ] = msvc
-{
-  MsvcExternalLibrary glwin32 : "version.lib" ;
-}
+MsvcExternalLibrary glwin32 : "version.lib" ;
 LFlags glwin32 : "-lversion" ;
 ExternalLibs glwin32 : GL ;
 CompileGroups glwin32 : drivers2d  openglcanvas ;

@@ -1,0 +1,44 @@
+[%
+builds = builds.merge([
+  {
+    tag => 'release',
+    name => 'Release_NR',
+    defines => ['NDEBUG','CS_USE_NEW_RENDERER'],
+    defineskey => 'define',
+    cflagskey => 'cflags',
+    lflagskey => 'lflags',
+    libskey => 'library',
+    priority => 300
+  },
+  {
+    tag => 'debug',
+    name => 'Debug_NR',
+    defines => ['_DEBUG','CS_DEBUG','CS_USE_NEW_RENDERER'],
+    defineskey => 'definedebug',
+    cflagskey => 'cflagsdebug',
+    lflagskey => 'lflagsdebug',
+    libskey => 'librarydebug',
+    priority => 400
+  },
+  {
+    tag => 'memdebug',
+    name => 'ExtensiveMemDebug',
+    defines => ['_DEBUG','CS_DEBUG','CS_EXTENSIVE_MEMDEBUG'],
+    defineskey => 'definedebug',
+    cflagskey => 'cflagsdebug',
+    lflagskey => 'lflagsdebug',
+    libskey => 'librarydebug',
+    priority => 500
+  },
+  {
+    tag => 'memdebug',
+    name => 'ExtensiveMemDebug_NR',
+    defines => ['_DEBUG','CS_DEBUG','CS_USE_NEW_RENDERER',
+		'CS_EXTENSIVE_MEMDEBUG'],
+    defineskey => 'definedebug',
+    cflagskey => 'cflagsdebug',
+    lflagskey => 'lflagsdebug',
+    libskey => 'librarydebug',
+    priority => 600
+  }])
+%]

@@ -157,17 +157,17 @@ Instantiate()
 mkdir "$PROJECTNAME" || exit 2
 mkdir "$PROJECTNAME/mk" || exit 2
 mkdir "$PROJECTNAME/mk/msvcgen" || exit 2
-mkdir "$PROJECTNAME/mk/msvcgen/template6" || exit 2
-mkdir "$PROJECTNAME/mk/msvcgen/template7" || exit 2
 mkdir "$PROJECTNAME/msvc" || exit 2
 mkdir "$PROJECTNAME/src" || exit 2
 
 # copy Autoconf, Jam, and msvcgen support files.
 cp -pr "$CSDIR/mk/autoconf" "$PROJECTNAME/mk"
 cp -pr "$CSDIR/mk/jam" "$PROJECTNAME/mk"
-cp -pr "$CSDIR/mk/msvcgen/msvcgen.pl" "$PROJECTNAME/mk/msvcgen"
-cp -pr "$TEMPLATEDIR/template6" "$PROJECTNAME/mk/msvcgen"
-cp -pr "$TEMPLATEDIR/template7" "$PROJECTNAME/mk/msvcgen"
+cp -p  "$CSDIR/mk/msvcgen/"*.tlib "$PROJECTNAME/mk/msvcgen"
+cp -pr "$CSDIR/mk/perl5" "$PROJECTNAME/mk"
+
+cp -p "$TEMPLATEDIR/cel.m4" "$PROJECTNAME/mk/autoconf"
+cp -p "$TEMPLATEDIR/cs_check_host.m4" "$PROJECTNAME/mk/autoconf"
 
 # instantiate template files
 Instantiate "$TEMPLATEDIR/autogen.template" "$PROJECTNAME/autogen.sh"
@@ -185,11 +185,8 @@ Instantiate "$TEMPLATEDIR/projheader.template" \
 Instantiate "$TEMPLATEDIR/README.template" "$PROJECTNAME/README"
 Instantiate "$TEMPLATEDIR/README-msvc.template" "$PROJECTNAME/msvc/README"
 
-cp -p "$TEMPLATEDIR/cel.m4" "$PROJECTNAME/mk/autoconf"
-cp -p "$TEMPLATEDIR/cs_check_host.m4" "$PROJECTNAME/mk/autoconf"
-
 chmod +x "$PROJECTNAME/autogen.sh"
-chmod +x "$PROJECTNAME/mk/msvcgen/msvcgen.pl"
+chmod +x "$PROJECTNAME/mk/perl5/bin/ttree"
 
 # remove CVS directories which may have been copied from the source location
 find "$PROJECTNAME" -type d -name CVS -exec rm -rf {} \; -prune

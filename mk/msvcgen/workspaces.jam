@@ -20,7 +20,7 @@
 #==============================================================================
 
 # Everything.
-# MsvcGenWorkspace all : : "grp.+_(?!all\.)" ;
+# MsvcGenWorkspace all : : "grp.+_(?!all$)" ;
 
 # What the typical user will need. Presently, everything but the new renderer.
 MsvcGenWorkspace typical : :
@@ -31,7 +31,7 @@ MsvcGenWorkspace typical : :
   glshader_fixed
   glshader_ps1
   grpnrall
-  "grp.+_(?!typical\.)"
+  "grp.+_(?!typical$)"
   nullrender3d
   render3dcommon
   shadermgr
@@ -48,7 +48,7 @@ MsvcGenWorkspace newrenderer : :
   csperl5
   cspython
   gl3d
-  "grp.+_(?!newrenderer\.)"
+  "grp.+_(?!newrenderer$)"
   null3d
   renderercommon
   soft3d

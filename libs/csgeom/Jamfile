@@ -5,3 +5,4 @@ Library csgeom :
   [ Wildcard *.cpp *.h ]
   [ Wildcard [ ConcatDirs $(DOTDOT) $(DOTDOT) include csgeom ] : *.h ] ;
 LibDepends csgeom : csutil ;
+MsvcDefine csgeom : CS_CSGEOM_LIB ;

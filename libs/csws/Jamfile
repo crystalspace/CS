@@ -6,3 +6,4 @@ Library csws :
   [ Wildcard [ ConcatDirs skins default ] : *.cpp *.h ]
   [ Wildcard [ ConcatDirs $(DOTDOT) $(DOTDOT) include csws ] : *.h ] ;
 LibDepends csws : cstool csgfx csgeom csutil ;
+MsvcDefine csws : CS_CSWS_LIB ;

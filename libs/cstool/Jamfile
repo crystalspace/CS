@@ -5,3 +5,4 @@ Library cstool :
   [ Wildcard *.cpp *.h ]
   [ Wildcard [ ConcatDirs $(DOTDOT) $(DOTDOT) include cstool ] : *.h ] ;
 LibDepends cstool : csgfx csgeom csutil ;
+MsvcDefine cstool : CS_CSTOOL_LIB ;

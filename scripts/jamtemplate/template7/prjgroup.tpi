@@ -1,5 +1,0 @@
-		<Filter
-			Name="%group%"
-			Filter="">
-%files%
-		</Filter>

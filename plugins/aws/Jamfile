@@ -60,7 +60,4 @@ if "$(COMPILER.C++FLAGS.WARNING.NO_UNUSED)"
     $(COMPILER.C++FLAGS.WARNING.NO_UNUSED) ;
 }
 
-if [ Property build : projgen ] = msvc
-{
-  MsvcCFlags aws : "/D \"YY_NEVER_INTERACTIVE\"" ;
-}
+MsvcDefine aws : YY_NEVER_INTERACTIVE ;

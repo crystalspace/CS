@@ -35,7 +35,7 @@ Help maintainerclean :
 
 MsvcGenSubDir TOP msvc : 6 ;
 MsvcGenSubDir TOP msvc : 7 ;
-MsvcGenTemplateDir TOP mk msvcgen template ;
+MsvcGenTemplateDir TOP mk msvcgen ;
 MsvcGenWorkspace #PROJECTNAME# ;
 
 MsvcGenConfig CRYSTAL.AVAILABLE : yes ;

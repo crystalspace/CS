@@ -1,4 +1,0 @@
-# Begin Source File
-
-SOURCE=%sourceroot%\%file%
-# End Source File

@@ -33,6 +33,16 @@ W - Wishlist (the build also works without this feature)
 [M] Re-work the provided m4 scripts to provide functionality like CS_CHECK_HOST
     and INITJAMFILE. Would be also nice to extract more of the detection
     scripts in CS (perl, python, nasm, problematic cflags?)
+[M] Add a generic "Defines" rule which works similar to the CFlags rule, but is
+    specifically geared for specifying preprocessor defines. Special-case tools
+    may take advantage of this extra knowledge. For example, msvcgen can fill
+    in the "AdditionalDefines" key in project files. Remove the MsvcDefine rule
+    which presently handles this case for msvcgen. Note that the new Defines
+    rule will require some care since some preprocessor definitions are
+    suitable in all cases, whereas others might be suitable for only certain
+    platforms, and still others might apply only during project file
+    generation. The rule should probably accept a third argument which provides
+    fine-grained control over the scope or disposition of the invocation.
 
 [L] Jorrit reports that with the command "jam -sMODE=profile walktest_static",
     dynavis/debug/static/dynavis.o gets compiled twice.
