@@ -23,6 +23,10 @@
 #include "inetwork/driver.h"
 #include "cssys/sockets.h"
 
+#ifndef COMP_VC
+# warning This file is deprecated please use iNetworkSocket2
+#endif
+
 SCF_VERSION (iNetworkSocket, 0, 0, 1);
 
 /**
