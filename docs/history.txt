@@ -14,8 +14,8 @@ Short-term cleanups that need to be done:
 	  includes that don't belong there (like from csengine).
 
 3-Nov-1999
-	- Removed init of four function pointers in OpenGL driver because
-	  gcc fails on them.
+	- Jorrit eliminated initialization of four function pointers in OpenGL
+	  driver because gcc fails on them.
 	- Eric Sunshine reverted Jorrit's change to the OpenGL driver (but
 	  hopefully in a GCC-compatible fashion).  Jorrit's change was simply
 	  incorrect and would have resulted in a crash since those variables
