@@ -316,14 +316,26 @@
 	// Examples are SCF_QUERY_INTERFACE and CS_QUERY_REGISTRY.
 	// Thanks to Mat Sutcliffe <oktal@gmx.co.uk>.
 	// Note that this works _only_ if you're _not_ using virtual inheritance!
+	//
+	// renej: The VoidPtr is added to handle case where the void pointer is
+	// the actual pointer. Ref<iBase> is used for pointers that need casting
+	// when transferred to the scripting language.
 
 	struct csWrapPtr
 	{
 	  csRef<iBase> Ref;
+	  void *VoidPtr;
 	  const char *Type;
-	  csWrapPtr (const char *t, iBase *r) : Ref (r), Type (t) {}
-	  csWrapPtr (const char *t, csPtr<iBase> r) : Ref (r), Type (t) {}
-	  csWrapPtr (const csWrapPtr &p) : Ref (p.Ref), Type (p.Type) {}
+	  csWrapPtr (const char *t, iBase *r)
+		: Ref (r), VoidPtr (0), Type (t) {}
+	  csWrapPtr (const char *t, csPtr<iBase> r)
+		: Ref (r), VoidPtr (0), Type (t) {}
+	  csWrapPtr (const char *t, csRef<iBase> r)
+		: Ref (r), VoidPtr(0), Type (t) {}
+	  csWrapPtr (const char *t, void *p)
+		: VoidPtr (p), Type (t) {}
+	  csWrapPtr (const csWrapPtr &p)
+		: Ref (p.Ref), VoidPtr (p.VoidPtr), Type (p.Type) {}
 	};
 
 %}
@@ -462,7 +474,8 @@ TYPEMAP_OUT_csWrapPtr
 %include "cssys/sysfunc.h"
 
 %ignore csInitializer::RequestPlugins;
-%ignore csInitializer::SetupEventHandler;
+%ignoren csInitializer::SetupEventHandler(iObjectRegistry*, csEventHandlerFunc, unsigned int);
+%rename(_SetupEventHandler) csInitializer::SetupEventHandler(iObjectRegistry*, iEventHandler *, unsigned int);
 %typemap(default) const char * configName { $1 = NULL; }
 %include "cstool/initapp.h"
 %typemap(default) const char * configName;
@@ -608,6 +621,30 @@ TYPEMAP_OUT_csWrapPtr
 #undef INTERFACE_APPLY
 #define INTERFACE_APPLY(x) INTERFACE_POST(x)
 APPLY_FOR_EACH_INTERFACE
+
+// When time comes the classic cast "(T*)self" can be changed to
+// "dynamic_cast<T*>(self)". For now, this is not necessary because
+// classic C casts are used all over the place in CS. Note that for
+// readability it might be better to use "static_cast<T*>(self)".
+%define CAST_FROM_BASE(T)
+	else if (!strcmp(to_name, #T)) ptr = (void*)(T*)self;
+%enddef
+#undef INTERFACE_APPLY
+#define INTERFACE_APPLY(x) CAST_FROM_BASE(x)
+
+%extend iBase
+{
+	csWrapPtr _DynamicCast (const char * to_name)
+	{
+		void * ptr;
+		if (!to_name || !to_name[0] || !self) ptr = 0;
+		APPLY_FOR_EACH_INTERFACE
+		else ptr = 0;
+		return csWrapPtr(to_name, ptr);
+	}
+}
+
+#undef CAST_FROM_BASE
 
 // iutil/event.h
 %extend iEvent

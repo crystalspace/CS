@@ -26,6 +26,20 @@
 
 %rename(assign) *::operator=;
 
+%{
+PyObject *
+_csRef_to_Python (const csRef<iBase> & ref, void * ptr, const char * name)
+{
+	if (!ref.IsValid())
+	{
+		Py_INCREF(Py_None);
+		return Py_None;
+	}
+	ref->IncRef();
+	return SWIG_NewPointerObj((void *)ptr, SWIG_TypeQuery(name), 1);
+}
+%}
+
 /*
 	ptr  : either a csRef<type> or csPtr<type>
 	name : type name, e.g. "iEngine *"
@@ -33,6 +47,10 @@
 */
 %define TYPEMAP_OUT_csRef_BODY(ptr, name, type)
 	csRef<type> ref(ptr);
+	$result = _csRef_to_Python(csRef<iBase>(
+		(type *)ref), (void *)(type *)ref, name);
+%enddef
+/*
 	if (ref.IsValid())
 	{
 		ref->IncRef();
@@ -43,7 +61,7 @@
 		Py_INCREF(Py_None);
 		$result = Py_None;
 	}
-%enddef
+*/
 
 #undef TYPEMAP_OUT_csRef
 %define TYPEMAP_OUT_csRef(T)
@@ -61,13 +79,52 @@
 	}
 %enddef
 
+%{
+PyObject *
+_csWrapPtr_to_Python (const csWrapPtr & wp)
+{
+	csWrapPtr iBase__DynamicCast(iBase *, const char *);
+	if (!wp.VoidPtr && !wp.Ref.IsValid())
+	{
+		Py_INCREF(Py_None);
+		return Py_None;
+	}
+	PyObject * result;
+	CS_ALLOC_STACK_ARRAY(char, type_name, strlen(wp.Type) + 3);
+	strcat(strcpy(type_name, wp.Type), " *");
+	iBase * ibase;
+	if (wp.VoidPtr)
+	{
+		void * ptr = wp.VoidPtr;
+		result = SWIG_NewPointerObj(ptr, SWIG_TypeQuery(type_name), 1);
+		ibase = (iBase *) SWIG_TypeCast(SWIG_TypeQuery("iBase *"), ptr);
+	}
+	else
+	{
+		ibase = (iBase *) wp.Ref;
+		void * ptr = iBase__DynamicCast(ibase, wp.Type).VoidPtr;
+		result = SWIG_NewPointerObj(ptr, SWIG_TypeQuery(type_name), 1);
+	}
+	PyObject * ibase_obj = SWIG_NewPointerObj(
+		(void *) ibase, SWIG_TypeQuery(type_name), 1);
+	PyObject * res_obj = PyObject_CallMethod(ibase_obj, "IncRef", "()");
+	if (!res_obj)
+	{
+		// Calling IncRef() failed; something wrong here.
+		Py_XDECREF(result);
+		result = NULL;
+	}
+	Py_XDECREF(ibase_obj);
+	Py_XDECREF(res_obj);
+	return result;
+}
+%}
+
 #undef TYPEMAP_OUT_csWrapPtr
 %define TYPEMAP_OUT_csWrapPtr
 	%typemap(out) csWrapPtr
 	{
-		CS_ALLOC_STACK_ARRAY(char, type_name, strlen($1.Type) + 3);
-		strcat(strcpy(type_name, $1.Type), " *");
-		TYPEMAP_OUT_csRef_BODY($1.Ref, type_name, iBase)
+		$result = _csWrapPtr_to_Python($1);
 	}
 %enddef
 

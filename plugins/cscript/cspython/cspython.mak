@@ -146,12 +146,22 @@ $(CSPYTHON): $(OBJ.CSPYTHON) $(LIB.CSPYTHON)
 	$(DO.PLUGIN.CORE) $(LIB.CSPYTHON.LOCAL) \
 	$(DO.PLUGIN.POSTAMBLE)
 
+ifeq ($(PYTHON.DISTUTILS),yes)
 $(PYTHMOD): $(OBJ.PYTHMOD) $(LIB.PYTHMOD)
 	cd plugins/cscript/cspython ; $(PYTHON) pythmod_setup.py pythmod_install ../../../$(OUT)
+else
+$(PYTHMOD):
+	@echo $(DESCRIPTION.pythmod)" not supported: distutils not available!"
+endif
 
+ifeq ($(PYTHON.DISTUTILS),yes)
 pythmodclean:
 	cd plugins/cscript/cspython ; $(PYTHON) pythmod_setup.py pythmod_clean
 	-$(RM) -fr plugins/cscript/cspython/build/
+else
+pythmodclean:
+	# ignore
+endif
 
 cspythonclean:
 	-$(RM) $(CSPYTHON) $(OBJ.CSPYTHON) $(TRASH.CSPYTHON) python.cex

@@ -24,72 +24,6 @@
 
 #ifdef SWIGPYTHON
 
-%native(_csInitializer_SetupEventHandler) _py_csInitializer_SetupEventHandler;
-
-%{
-	static PyObject * _py_csInitializer_EventHandler = 0;
-
-	bool _csInitializer_EventHandler (iEvent & event)
-	{
-		if (!_py_csInitializer_EventHandler)
-		{
-			return false;
-		}
-		PyObject * event_obj = SWIG_NewPointerObj(
-			(void *) &event, SWIG_TypeQuery("iEvent *"), 0
-		);
-		PyObject * result = PyObject_CallFunction(
-			_py_csInitializer_EventHandler, "(O)", event_obj
-		);
-		Py_DECREF(event_obj);
-		if (!result)
-		{
-			return false;
-		}
-		bool res = PyInt_AsLong(result);
-		Py_DECREF(result);
-		return res;
-	}
-
-	PyObject * _py_csInitializer_SetupEventHandler (PyObject * self,
-		PyObject * args)
-	{
-		PyObject * reg_obj;
-		PyObject * func_obj;
-		unsigned int mask;
-		if (!PyArg_ParseTuple(args, "OOi", &reg_obj, &func_obj, &mask))
-		{
-			PyErr_SetString(PyExc_TypeError, "Wrong arguments!");
-			return NULL;
-		}
-		iObjectRegistry * reg = 0;
-		swig_type_info * ti = SWIG_TypeQuery("iObjectRegistry *");
-		if (SWIG_ConvertPtr(reg_obj, (void **) &reg, ti, SWIG_POINTER_EXCEPTION)
-			== -1)
-		{
-			PyErr_SetString(PyExc_TypeError, "Not a iObjectRegistry object!");
-			return NULL;
-		}
-		if (!reg)
-		{
-			PyErr_SetString(PyExc_TypeError, "Nil iObjectRegistry!");
-			return NULL;
-		}
-		if (!func_obj || !PyCallable_Check(func_obj))
-		{
-			PyErr_SetString(PyExc_TypeError, "Need a callable object!");
-			return NULL;
-		}
-		_py_csInitializer_EventHandler = func_obj;
-		Py_XINCREF(_py_csInitializer_EventHandler);
-		bool res = csInitializer::SetupEventHandler(
-			reg, &_csInitializer_EventHandler, mask
-		);
-		return PyInt_FromLong((long) res);
-	}
-
-%}
-
 %pythoncode %{
 
 	CSMASK_Nothing = (1 << csevNothing)
@@ -117,27 +51,85 @@
 
 %}
 
+/*
+struct _csPyEventHandler : public iEventHandler
+{
+	SCF_DECLARE_IBASE;
+	_csPyEventHandler (PyObject * obj);
+	virtual ~_csPyEventHandler ();
+	virtual bool HandleEvent (iEvent &);
+};
+*/
+
+%inline %{
+
+	struct _csPyEventHandler : public iEventHandler
+	{
+		SCF_DECLARE_IBASE;
+		_csPyEventHandler (PyObject * obj) : _pySelf(obj)
+		{
+			SCF_CONSTRUCT_IBASE(NULL);
+			IncRef();
+		}
+		virtual ~_csPyEventHandler () { DecRef(); }
+		virtual bool HandleEvent (iEvent & event)
+		{
+			PyObject * event_obj = SWIG_NewPointerObj(
+				(void *) &event, SWIG_TypeQuery("iEvent *"), 0
+			);
+			PyObject * result = PyObject_CallMethod(
+				_pySelf, "HandleEvent", "(O)", event_obj
+			);
+			Py_DECREF(event_obj);
+			if (!result)
+			{
+				return false;
+			}
+			bool res = PyInt_AsLong(result);
+			Py_DECREF(result);
+			return res;
+		}
+	private:
+		PyObject * _pySelf;
+	};
+
+%}
+
+%{
+	SCF_IMPLEMENT_IBASE(_csPyEventHandler)
+	SCF_IMPLEMENT_IBASE_END
+%}
+
 %pythoncode %{
 
-	_csInitializer_SetupEventHandler_DefaultMask = \
-		CSMASK_Nothing			| \
-		CSMASK_Broadcast		| \
-		CSMASK_MouseUp			| \
-		CSMASK_MouseDown		| \
-		CSMASK_MouseMove		| \
-		CSMASK_KeyDown			| \
-		CSMASK_KeyUp			| \
-		CSMASK_MouseClick		| \
-		CSMASK_MouseDoubleClick	| \
-		CSMASK_JoystickMove		| \
-		CSMASK_JoystickDown		| \
-		CSMASK_JoystickUp		| \
-		0
+	class csPyEventHandler (_csPyEventHandler):
+		"""Python version of iEventHandler implementation.
+		   This class can be used as base class for event handlers in Python.
+		   Call csPyEventHandler.__init__(self) in __init__ of derived class.
+		"""
+		def __init__ (self):
+			_csPyEventHandler.__init__(self, self)
 
-	def csInitializer_SetupEventHandler (reg, func,
-			mask=_csInitializer_SetupEventHandler_DefaultMask):
-		"""Replacement of C++ version."""
-		return _csInitializer_SetupEventHandler (reg, func, mask)
+	class _EventHandlerFuncWrapper (csPyEventHandler):
+		def __init__ (self, func):
+			csPyEventHandler.__init__(self)
+			self._func = func
+			# Make sure a reference keeps to this wrapper instance.
+			self._func._cs_event_handler_wrapper = self
+		def HandleEvent (self, event):
+			return self._func(event)
+
+	def csInitializer_SetupEventHandler (reg, obj,
+			mask=(CSMASK_FrameProcess|CSMASK_Input|CSMASK_Broadcast)):
+		"""Replacement of C++ versions."""
+		if callable(obj):
+			# obj is a function
+			hdlr = _EventHandlerFuncWrapper(obj)
+			hdlr.thisown = 1
+		else:
+			# assume it is a iEventHandler
+			hdlr = obj
+		return csInitializer._SetupEventHandler(reg, hdlr, mask)
 
 	def csInitializer_RequestPlugins (reg, plugins):
 		"""Replacement of C++ version with variable argument list."""
@@ -180,14 +172,14 @@ csWrapPtr _CS_QUERY_REGISTRY_TAG_INTERFACE (iObjectRegistry *reg,
 
 csWrapPtr _SCF_QUERY_INTERFACE (iBase *obj, const char *iface, int iface_ver)
 {
-  return csWrapPtr (iface, (iBase *) obj->QueryInterface
+  return csWrapPtr (iface, obj->QueryInterface
     (iSCF::SCF->GetInterfaceID (iface), iface_ver));
 }
 
 csWrapPtr _SCF_QUERY_INTERFACE_SAFE (iBase *obj, const char *iface,
 	int iface_ver)
 {
-  return csWrapPtr (iface, (iBase *) iBase::QueryInterfaceSafe
+  return csWrapPtr (iface, iBase::QueryInterfaceSafe
     (obj, iSCF::SCF->GetInterfaceID (iface), iface_ver));
 }
 
@@ -205,21 +197,21 @@ csWrapPtr _CS_LOAD_PLUGIN (iPluginManager *obj, const char *id,
 
 csWrapPtr _CS_GET_CHILD_OBJECT (iObject *obj, const char *iface, int iface_ver)
 {
-  return csWrapPtr (iface, (iBase *) obj->GetChild
+  return csWrapPtr (iface, obj->GetChild
     (iSCF::SCF->GetInterfaceID (iface), iface_ver));
 }
 
 csWrapPtr _CS_GET_NAMED_CHILD_OBJECT (iObject *obj, const char *iface,
 	int iface_ver, const char *name)
 {
-  return csWrapPtr (iface, (iBase *) obj->GetChild
+  return csWrapPtr (iface, obj->GetChild
     (iSCF::SCF->GetInterfaceID (iface), iface_ver, name));
 }
 
 csWrapPtr _CS_GET_FIRST_NAMED_CHILD_OBJECT (iObject *obj, const char *iface,
 	int iface_ver, const char *name)
 {
-  return csWrapPtr (iface, (iBase *) obj->GetChild
+  return csWrapPtr (iface, obj->GetChild
     (iSCF::SCF->GetInterfaceID (iface), iface_ver, name, true));
 }
 

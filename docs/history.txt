@@ -28,6 +28,14 @@ The history order is reversed so that new features are at the top.
 	  methods; csShadowBlock using csRefArray instead of deprecated
 	  csVector; removed some unnecessary includes of csvector.h; removed
 	  tabs from some files.
+	- Rene Jager updated SWIG input files cspace.i, pythpre.i and
+	  pythpost.i in include/ivaria/ to provide "safe" (safe as CS) pointer
+	  handling with csWrapPtr. The building of a CS python module should
+	  work better now by means of plugins/cscript/cspython/pythmod_setup.py
+	  (ES provided PYTHON.DISTUTILS in config.mak). Additionally, it is
+	  now possible to derive from csPyEventHandler in Python which allows
+	  to write event handlers in Python and use them as iEventHandler's
+	  in C++.
 22-Apr-2003
 	- Eric Sunshine added links for the new CrystalDoc translation project
 	  to the Crystal Space web site.  Also cleaned up the web site's main

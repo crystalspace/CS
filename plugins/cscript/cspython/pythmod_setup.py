@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 
-import sys, os, string, traceback
+import sys, os, string, traceback, re
+from distutils import ccompiler, sysconfig
 from distutils.core import setup, Extension
 
 if sys.argv[1] == 'pythmod_clean':
@@ -51,6 +52,10 @@ elif sys.argv[1] == 'pythmod_install':
         'author'       : 'Rene Jager',
         'author_email' : 'renej.frog@yucom.be'
     }
+
+    if ccompiler.get_default_compiler() == 'unix':
+        ldshared = re.sub('gcc', 'g++', sysconfig.get_config_var('LDSHARED'))
+        sysconfig.get_config_vars()['LDSHARED'] = ldshared
 
     dist = apply(setup, [], setup_kwargs)
 
