@@ -6,6 +6,13 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+26-Mar-2004
+	- Marten added csMatrix as a type a csShaderVariable can store.
+	- Marten made the shadermanager responsible for handling the shader-
+	  variablestack used during rendering. This to allow other plugins to 
+	  access it without having to pass it around everywhere.
+	- Marten comitted first steps toward making NR use fog. It does not yet
+	  work though, but its progressing.
 25-Mar-2004
 	- res ported code to properly handle keycolored procedural textures
 	  over from the OR.

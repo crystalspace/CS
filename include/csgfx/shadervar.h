@@ -69,7 +69,8 @@ public:
     RENDERBUFFER,
     VECTOR2,
     VECTOR3,
-    VECTOR4
+    VECTOR4,
+    MATRIX
   };
 
 private:
@@ -81,6 +82,7 @@ private:
   csRef<iTextureWrapper> TextureWrapValue;
   csRef<iRenderBuffer> RenderBuffer;
   csVector4 VectorValue;
+  csMatrix3* MatrixValuePtr;
 
   csRef<iShaderVariableAccessor> accessor;
 
@@ -89,6 +91,10 @@ public:
 
   /// Constructor
   csShaderVariable (csStringID name);
+  virtual ~csShaderVariable ()
+  {
+    delete MatrixValuePtr;
+  }
 
   csShaderVariable& operator= (csShaderVariable& copyFrom);
 
@@ -180,6 +186,22 @@ public:
     return true; 
   }
 
+  /// Retrieve a csMatrix3
+  bool GetValue (csMatrix3& value)
+  {
+    if (accessor) accessor->PreGetValue (this);
+    if (MatrixValuePtr)
+    {
+      value = *MatrixValuePtr;
+      return true;
+    }
+    else
+    {
+      value = csMatrix3();
+    }
+    return false;
+  }
+
 
   /// Store an int
   bool SetValue (int value) 
@@ -262,6 +284,14 @@ public:
     return true; 
   }
 
+  /// Store a csMatrix3
+  bool SetValue (const csMatrix3 &value)
+  {
+    Type = MATRIX;
+    delete MatrixValuePtr;
+    MatrixValuePtr = new csMatrix3 (value);
+    return true;
+  }
 };
 
 #endif

@@ -1,20 +1,20 @@
 /*
-    Copyright (C) 2003 by Jorrit Tyberghein
-              (C) 2003 by Frank Richter
+  Copyright (C) 2003 by Jorrit Tyberghein
+  (C) 2003 by Frank Richter
 
-    This library is free software; you can redistribute it and/or
-    modify it under the terms of the GNU Library General Public
-    License as published by the Free Software Foundation; either
-    version 2 of the License, or (at your option) any later version.
+  This library is free software; you can redistribute it and/or
+  modify it under the terms of the GNU Library General Public
+  License as published by the Free Software Foundation; either
+  version 2 of the License, or (at your option) any later version.
 
-    This library is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-    Library General Public License for more details.
+  This library is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+  Library General Public License for more details.
 
-    You should have received a copy of the GNU Library General Public
-    License along with this library; if not, write to the Free
-    Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+  You should have received a copy of the GNU Library General Public
+  License along with this library; if not, write to the Free
+  Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
 #include "cssysdef.h"
@@ -27,7 +27,11 @@
 #include "gl_render3d.h"
 
 SCF_IMPLEMENT_IBASE(csGLPolygonRenderer)
-  SCF_IMPLEMENTS_INTERFACE(iPolygonRenderer)
+SCF_IMPLEMENTS_INTERFACE(iPolygonRenderer)
+SCF_IMPLEMENT_IBASE_END
+
+SCF_IMPLEMENT_IBASE(csGLPolygonRenderer::FogAccesor)
+SCF_IMPLEMENTS_INTERFACE(iShaderVariableAccessor)
 SCF_IMPLEMENT_IBASE_END
 
 csStringID csGLPolygonRenderer::vertex_name   = csInvalidStringID;
@@ -38,6 +42,12 @@ csStringID csGLPolygonRenderer::index_name    = csInvalidStringID;
 csStringID csGLPolygonRenderer::tangent_name  = csInvalidStringID;
 csStringID csGLPolygonRenderer::binormal_name = csInvalidStringID;
 csStringID csGLPolygonRenderer::lmcoords_name = csInvalidStringID;
+csStringID csGLPolygonRenderer::fog_name      = csInvalidStringID;
+
+csStringID csGLPolygonRenderer::o2c_matrix_name = csInvalidStringID;
+csStringID csGLPolygonRenderer::o2c_vector_name = csInvalidStringID;
+csStringID csGLPolygonRenderer::fogplane_name   = csInvalidStringID;
+csStringID csGLPolygonRenderer::fogdensity_name = csInvalidStringID;
 
 csGLPolygonRenderer::csGLPolygonRenderer (csGLGraphics3D* parent)
 {
@@ -45,6 +55,8 @@ csGLPolygonRenderer::csGLPolygonRenderer (csGLGraphics3D* parent)
   csGLPolygonRenderer::parent = parent;
   renderBufferNum = ~0;
   polysNum = 0;
+  fog_accessor.AttachNew (new FogAccesor(this));
+  shadermanager = parent->shadermgr;
 }
 
 csGLPolygonRenderer::~csGLPolygonRenderer ()
@@ -73,6 +85,11 @@ void csGLPolygonRenderer::PrepareBuffers (uint& indexStart, uint& indexEnd)
     tangent_name  = strings->Request ("tangents");
     binormal_name = strings->Request ("binormals");
     lmcoords_name = strings->Request ("lightmap coordinates");
+    fog_name      = strings->Request ("fog value");
+    o2c_matrix_name = strings->Request ("object2camera matrix");
+    o2c_vector_name = strings->Request ("object2camera vector");
+    fogplane_name = strings->Request ("fogplane");
+    fogdensity_name = strings->Request ("fog density");
   }
 
   if (renderBufferNum != polysNum)
@@ -133,15 +150,15 @@ void csGLPolygonRenderer::PrepareBuffers (uint& indexStart, uint& indexEnd)
       csVector3 polynormal;
       //if (!smoothed)
       //{
-	// hmm... It seems that both polynormal and obj_normals[] need to be inverted.
-	//  Don't know why, just found it out empirical.
-	polynormal = -static_data->plane_obj.Normal();
+      // hmm... It seems that both polynormal and obj_normals[] need to be inverted.
+      //  Don't know why, just found it out empirical.
+      polynormal = -static_data->plane_obj.Normal();
       //}
 
       /*
-	To get the texture coordinates of a vertex, the coordinates
-	in object space have to be transformed to the texture space.
-	The Z part is simply dropped then.
+      To get the texture coordinates of a vertex, the coordinates
+      in object space have to be transformed to the texture space.
+      The Z part is simply dropped then.
       */
       csMatrix3 t_m;
       csVector3 t_v;
@@ -159,53 +176,53 @@ void csGLPolygonRenderer::PrepareBuffers (uint& indexStart, uint& indexEnd)
       csTransform tex2lm;
       if (static_data->useLightmap)
       {
-	struct csPolyLMCoords
-	{
-	  float u1, v1, u2, v2;
-	};
+        struct csPolyLMCoords
+        {
+          float u1, v1, u2, v2;
+        };
 
-	csPolyLMCoords lmc;
-	/*lm->GetRendererCoords (lmc.u1, lmc.v1,
-	  lmc.u2, lmc.v2);*/
-	static_data->tmapping->GetCoordsOnSuperLM (lmc.u1, lmc.v1,
-		lmc.u2, lmc.v2);
+        csPolyLMCoords lmc;
+        /*lm->GetRendererCoords (lmc.u1, lmc.v1,
+        lmc.u2, lmc.v2);*/
+        static_data->tmapping->GetCoordsOnSuperLM (lmc.u1, lmc.v1,
+          lmc.u2, lmc.v2);
 
-	float lm_low_u = 0.0f, lm_low_v = 0.0f;
-	float lm_high_u = 1.0f, lm_high_v = 1.0f;
-	static_data->tmapping->GetTextureBox (
-		lm_low_u, lm_low_v, lm_high_u, lm_high_v);
+        float lm_low_u = 0.0f, lm_low_v = 0.0f;
+        float lm_high_u = 1.0f, lm_high_v = 1.0f;
+        static_data->tmapping->GetTextureBox (
+          lm_low_u, lm_low_v, lm_high_u, lm_high_v);
 
-	float lm_scale_u = ((lmc.u2 - lmc.u1) / (lm_high_u - lm_low_u));
-	float lm_scale_v = ((lmc.v2 - lmc.v1) / (lm_high_v - lm_low_v));
+        float lm_scale_u = ((lmc.u2 - lmc.u1) / (lm_high_u - lm_low_u));
+        float lm_scale_v = ((lmc.v2 - lmc.v1) / (lm_high_v - lm_low_v));
 
-	tex2lm.SetO2T (
-	  csMatrix3 (lm_scale_u, 0, 0,
-		      0, lm_scale_v, 0,
-		      0, 0, 1));
-	tex2lm.SetO2TTranslation (
-	  csVector3 (
-	  (lm_scale_u != 0.0f) ? (lm_low_u - lmc.u1 / lm_scale_u) : 0,
-	  (lm_scale_v != 0.0f) ? (lm_low_v - lmc.v1 / lm_scale_v) : 0,
-	  0));
+        tex2lm.SetO2T (
+          csMatrix3 (lm_scale_u, 0, 0,
+          0, lm_scale_v, 0,
+          0, 0, 1));
+        tex2lm.SetO2TTranslation (
+          csVector3 (
+          (lm_scale_u != 0.0f) ? (lm_low_u - lmc.u1 / lm_scale_u) : 0,
+          (lm_scale_v != 0.0f) ? (lm_low_v - lmc.v1 / lm_scale_v) : 0,
+          0));
       }
 
       /*
-        Calculate the 'tangent' vector of this poly, needed for dot3.
-        It is "a tangent to the surface which represents the direction 
-        of increase of the t texture coordinate." (Quotation from
-         http://www.ati.com/developer/sdk/rage128sdk/Rage128BumpTutorial.html)
-         Conveniently, all polys have a object->texture space transformatin
-         associated with them.
+      Calculate the 'tangent' vector of this poly, needed for dot3.
+      It is "a tangent to the surface which represents the direction 
+      of increase of the t texture coordinate." (Quotation from
+      http://www.ati.com/developer/sdk/rage128sdk/Rage128BumpTutorial.html)
+      Conveniently, all polys have a object->texture space transformatin
+      associated with them.
 
-         @@@ Ignores the fact things can be smooth.
-         But it's simpler for now :)
-       */
+      @@@ Ignores the fact things can be smooth.
+      But it's simpler for now :)
+      */
       csTransform tangentTF (t_m.GetInverse (), csVector3 (0));
       csVector3 tangent = tangentTF.Other2This (csVector3 (1, 0, 0));
       tangent.Normalize ();
 
       /*
-        Calculate the 'binormal' vector of this poly, needed for dot3.
+      Calculate the 'binormal' vector of this poly, needed for dot3.
       */
       csVector3 binormal = tangentTF.Other2This (csVector3 (0, -1, 0));
       binormal.Normalize ();
@@ -215,42 +232,42 @@ void csGLPolygonRenderer::PrepareBuffers (uint& indexStart, uint& indexEnd)
       int j, vc = static_data->num_vertices;
       for (j = 0; j < vc; j++)
       {
-	//int vidx = *poly_indices++;
+        //int vidx = *poly_indices++;
         const csVector3& vertex = obj_verts[static_data->vertices[j]];
         *vertices++ = vertex;
-/*	*vertices++ = obj_verts[vidx];
-	@@@ FIXME
+        /*	*vertices++ = obj_verts[vidx];
+        @@@ FIXME
         if (smoothed)
-	{
-	  CS_ASSERT (obj_normals != 0);
-	  *normals++ = -obj_normals[vidx];
-	}
-	else*/
-	  *normals++ = polynormal;
-	csVector3 t = object2texture.Other2This (vertex);
-	*texels++ = csVector2 (t.x, t.y);
-	csVector3 l = tex2lm.Other2This (t);
-	*lmcoords++ = csVector2 (l.x, l.y);
+        {
+        CS_ASSERT (obj_normals != 0);
+        *normals++ = -obj_normals[vidx];
+        }
+        else*/
+        *normals++ = polynormal;
+        csVector3 t = object2texture.Other2This (vertex);
+        *texels++ = csVector2 (t.x, t.y);
+        csVector3 l = tex2lm.Other2This (t);
+        *lmcoords++ = csVector2 (l.x, l.y);
         *tangents++ = tangent;
         *binormals++ = binormal;
 
-	pvIndices[j] = vindex++;
+        pvIndices[j] = vindex++;
       }
 
       // Triangulate poly.
       for (j = 2; j < vc; j++)
       {
-	*indices++ = pvIndices[0];
-	iindex++;
-	*indices++ = pvIndices[j - 1];
-	iindex++;
-	*indices++ = pvIndices[j];
-	iindex++;
+        *indices++ = pvIndices[0];
+        iindex++;
+        *indices++ = pvIndices[j - 1];
+        iindex++;
+        *indices++ = pvIndices[j];
+        iindex++;
       }
     }
 
     indexEnd = rbIndexEnd = iindex;
-    
+
     renderBufferNum = polysNum;
   }
   else
@@ -290,6 +307,8 @@ void csGLPolygonRenderer::PrepareRenderMesh (csRenderMesh& mesh)
   sv->SetValue (lmcoords_buffer);
   sv = mesh.variablecontext->GetVariableAdd (color_name);
   sv->SetValue (color_buffer);
+  sv = mesh.variablecontext->GetVariableAdd (fog_name);
+  sv->SetAccessor (fog_accessor);
 
   mesh.geometryInstance = this;
 }
@@ -306,44 +325,80 @@ void csGLPolygonRenderer::AddPolygon (csPolygonRenderData* poly)
   polysNum++;
 }
 
-/*iRenderBuffer* csGLPolygonRenderer::GetRenderBuffer (csStringID name)
+void csGLPolygonRenderer::FogAccesor::PreGetValue (csShaderVariable *variable)
 {
-  if (renderBufferNum != polysNum) return 0;
+  //get the variables we need
+  csShaderVariable *sv;
+  CS_SHADERVAR_STACK& svStack = renderer->shadermanager->GetShaderVariableStack();
 
-  if (name == vertex_name)
+  csMatrix3 transMatrix;
+  csVector3 transVector;
+  csVector4 planeAsVector;
+  float density;
+
+  sv = svStack[renderer->o2c_matrix_name].Top();
+  if (!sv->GetValue (transMatrix)) return;
+  sv = svStack[renderer->o2c_vector_name].Top();
+  if (!sv->GetValue (transVector)) return;
+  sv = svStack[renderer->fogplane_name].Top();
+  if (!sv->GetValue (planeAsVector)) return;
+  sv = svStack[renderer->fogdensity_name].Top();
+  if (!sv->GetValue (density)) return;
+
+
+  csPlane3 fogPlane;
+  fogPlane.norm = csVector3 (planeAsVector.x, planeAsVector.y, planeAsVector.z);
+  fogPlane.DD = planeAsVector.w;
+
+  if (fogVerticesNum != renderer->polysNum)
   {
-    return vertex_buffer;
-  } 
-  else if (name == texel_name)
-  {
-    return texel_buffer;
+    int num_verts = 0, num_indices = 0, max_vc = 0;
+    int i;
+
+    for (i = 0; i < renderer->polys.Length(); i++)
+    {
+      csPolygonRenderData* poly = renderer->polys[i];
+      num_verts += poly->num_vertices;
+    }
+
+    fog_buffer = renderer->parent->CreateRenderBuffer (num_verts * sizeof (csVector3), 
+      CS_BUF_STATIC, CS_BUFCOMP_FLOAT, 3, false);
+    void *buf = fog_buffer->Lock(CS_BUF_LOCK_NORMAL);
+    memset (buf,0,num_verts*sizeof(csVector3));
+    fog_buffer->Release();
+    fogVerticesNum = renderer->polysNum;
   }
-  else if (name == lmcoords_name)
+
+  csVector3* fog = (csVector3*)fog_buffer->Lock (CS_BUF_LOCK_NORMAL);
+
+  
+  int vindex = 0, iindex = 0;
+
+  csReversibleTransform rt(transMatrix, transVector);
+  csVector3 planeNormal = fogPlane.Normal ();
+  csVector3 refpos = rt.GetO2TTranslation();
+  
+  for (int i = 0; i < renderer->polys.Length(); i++)
   {
-    return lmcoords_buffer;
+    csPolygonRenderData* static_data = renderer->polys[i];
+
+    // First, fill the normal/texel/vertex buffers.
+    csVector3* obj_verts = *(static_data->p_obj_verts);
+    int j, vc = static_data->num_vertices;
+    for (j = 0; j < vc; j++)
+    {
+      //int vidx = *poly_indices++;
+      const csVector3& vertex = obj_verts[static_data->vertices[j]];
+      csVector3 diff = vertex-refpos;
+      float f=density*(fogPlane.Classify (diff))/(diff.Unit ()*planeNormal); 
+      f = MAX(MIN(f,1.0f), 0.0f); //clamp at 0
+      *fog = csVector3(f,f,f);
+      fog++;
+    }
   }
-  else if (name == normal_name)
-  {
-    return normal_buffer;
-  }
-  else if (name == color_name)
-  {
-    return color_buffer;
-  }
-  else if (name == index_name)
-  {
-    return index_buffer;
-  }
-  else if (name == tangent_name)
-  {
-    return tangent_buffer;
-  }
-  else if (name == binormal_name)
-  {
-    return binormal_buffer;
-  }
-  else
-  {
-    return 0;
-  }
-}*/
+  
+  
+  fog_buffer->Release ();
+
+  variable->SetValue(fog_buffer);
+}

@@ -44,8 +44,7 @@ protected:
   csEngine* engine;
 
   csRefArray<iRenderStep> steps;
-
-  CS_SHADERVAR_STACK svstacks;
+  csRef<iShaderManager> shadermanager;
 public:
   SCF_DECLARE_IBASE;
 

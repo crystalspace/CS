@@ -29,6 +29,8 @@
 #include "iengine/sector.h"
 #include "iengine/mesh.h"
 #include "iengine/material.h"
+#include "iengine/camera.h"
+#include "iengine/portal.h"
 #include "ivideo/material.h"
 #include "imesh/object.h"
 #include "iengine/portalcontainer.h"
@@ -135,6 +137,11 @@ csPtr<iRenderStep> csGenericRenderStepFactory::Create ()
 
 //---------------------------------------------------------------------------
 
+csStringID csGenericRenderStep::o2c_matrix_name;
+csStringID csGenericRenderStep::o2c_vector_name;
+csStringID csGenericRenderStep::fogplane_name;
+csStringID csGenericRenderStep::fogdensity_name;
+
 SCF_IMPLEMENT_IBASE(csGenericRenderStep)
   SCF_IMPLEMENTS_INTERFACE(iRenderStep)
   SCF_IMPLEMENTS_INTERFACE(iGenericRenderStep)
@@ -156,6 +163,10 @@ csGenericRenderStep::csGenericRenderStep (
   zOffset = false;
   zmode = CS_ZBUF_USE;
   currentSettings = false;
+  o2c_matrix_name = strings->Request ("object2camera matrix");
+  o2c_vector_name = strings->Request ("object2camera vector");
+  fogplane_name = strings->Request ("fogplane");
+  fogdensity_name = strings->Request ("fog density");
 }
 
 csGenericRenderStep::~csGenericRenderStep ()
@@ -177,7 +188,8 @@ void csGenericRenderStep::RenderMeshes (iGraphics3D* g3d,
   }
 
   iMaterial *material = 0;
-
+  
+  
   int numPasses = shader->GetNumberOfPasses ();
   for (int p=0; p < numPasses; p++)
   {
@@ -187,6 +199,13 @@ void csGenericRenderStep::RenderMeshes (iGraphics3D* g3d,
     for (j = 0; j < num; j++)
     {
       csRenderMesh* mesh = meshes[j];
+      csShaderVariable *sv;
+      
+      sv = shadervars.GetVariableAdd (o2c_matrix_name);
+      sv->SetValue (mesh->object2camera.GetO2T ());
+      sv = shadervars.GetVariableAdd (o2c_vector_name);
+      sv->SetValue (mesh->object2camera.GetO2TTranslation ());
+
       if (mesh->material->GetMaterial () != material)
       {
         if (material != 0)
@@ -198,6 +217,7 @@ void csGenericRenderStep::RenderMeshes (iGraphics3D* g3d,
         material->PushVariables (stacks);
         shader->PushVariables (stacks);
       }
+      shadervars.PushVariables (stacks);
       if (mesh->variablecontext)
         mesh->variablecontext->PushVariables (stacks);
       shader->SetupPass (mesh, stacks);
@@ -205,6 +225,7 @@ void csGenericRenderStep::RenderMeshes (iGraphics3D* g3d,
       shader->TeardownPass ();
       if (mesh->variablecontext)
         mesh->variablecontext->PopVariables (stacks);
+      shadervars.PopVariables (stacks);
       mesh->inUse = false;
     }
     shader->DeactivatePass ();
@@ -232,6 +253,30 @@ void csGenericRenderStep::Perform (iRenderView* rview, iSector* sector,
   int numSSM = 0;
   iShader* shader = 0;
 
+  csShaderVariable *sv;
+  sv = shadervars.GetVariableAdd (fogdensity_name);
+  if (sector->HasFog())
+    sv->SetValue (sector->GetFog()->density);
+  else
+    sv->SetValue (0.04f);
+
+  //construct a cameraplane
+  csVector4 fogPlane;
+  iPortal *lastPortal = rview->GetLastPortal();
+  /*if(lastPortal)
+  {
+    csPlane3 plane;
+    lastPortal->ComputeCameraPlane(rview->GetCamera()->GetTransform(), plane);
+    fogPlane = plane.norm;
+    fogPlane.w = plane.DD;
+  }
+  else*/
+  {
+    fogPlane = csVector4(0.0,0.0,1.0,0.0);
+  }
+  sv = shadervars.GetVariableAdd (fogplane_name);
+  sv->SetValue (fogPlane);
+
   for (int n = 0; n < num; n++)
   {
     csRenderMesh* mesh = sameShaderMeshes[n];
@@ -250,22 +295,10 @@ void csGenericRenderStep::Perform (iRenderView* rview, iSector* sector,
       }
 
       ToggleStepSettings (g3d, false);
-      /*
-        When drawing the contents of a portal, the transforms in the
-	rendermeshes will be changed to reflect the portal transform.
-	However, as meshes usually keep just 1 copy RM, it'll affect
-	the original mesh as well.
-	@@@ Uuuugly workaround: copy the RMs before drawing behind the
-	portal and copy them back afterwards.
-       */
-      /*saveMeshes.SetLength (num - n);
-      int i;
-      for (i = n; i < num; i++)
-	saveMeshes[i - n] = *sameShaderMeshes[i - n];*/
+      
       mesh->portal->Draw (rview);
       mesh->inUse = false;
-      /*for (i = n; i < num; i++)
-	*sameShaderMeshes[i - n] = saveMeshes[i - n];*/
+      
     }
     else 
     {

@@ -30,6 +30,7 @@
 #include "iengine/rendersteps/igeneric.h"
 #include "iengine/rendersteps/ilightiter.h"
 #include "ivideo/shader/shader.h"
+#include "csgfx/shadervarcontext.h"
 
 #include "cstool/rendermeshlist.h"
 
@@ -84,6 +85,12 @@ private:
   iObjectRegistry *objreg;
 
   bool currentSettings;
+  csShaderVariableContext shadervars;
+
+  static csStringID o2c_matrix_name;
+  static csStringID o2c_vector_name;
+  static csStringID fogplane_name;
+  static csStringID fogdensity_name;
 public:
   SCF_DECLARE_IBASE;
 

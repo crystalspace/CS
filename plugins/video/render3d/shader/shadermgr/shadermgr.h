@@ -65,6 +65,7 @@ private:
   void UpdateStandardVariables();
 
   csShaderVariableContext svcontext;
+  CS_SHADERVAR_STACK shaderVarStack;
 
 public:
   SCF_DECLARE_IBASE;
@@ -95,6 +96,12 @@ public:
 
   /// Report a message.
   void Report (int severity, const char* msg, ...);
+
+  /// Get the shadervariablestack used to handle shadervariables on rendering
+  virtual CS_SHADERVAR_STACK& GetShaderVariableStack ()
+  {
+    return shaderVarStack;
+  }
 
   //=================== iShaderVariableContext ================//
 

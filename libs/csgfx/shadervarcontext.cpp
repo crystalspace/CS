@@ -71,5 +71,9 @@ void csShaderVariableContext::PopVariables
   (CS_SHADERVAR_STACK &stacks) const
 {
   for (int i=0; i<variables.Length (); ++i)
-    stacks[variables[i]->GetName ()].Pop ();
+  {
+    csStringID name = variables[i]->GetName ();
+    if (stacks[name].Length () > 0)
+      stacks[name].Pop ();
+  }
 }

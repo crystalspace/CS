@@ -53,7 +53,7 @@
 class csGLTextureCache;
 class csGLTextureHandle;
 class csGLTextureManager;
-
+class csGLPolygonRenderer;
 struct iClipper2D;
 struct iObjectRegistry;
 struct iTextureManager;
@@ -73,6 +73,7 @@ private:
   friend class csGLTextureManager;
   friend class eiShaderRenderInterface;
   friend class csShaderGLMTEX;
+  friend class csGLPolygonRenderer;
 
   csRef<iObjectRegistry> object_reg;
   csRef<iGraphics2D> G2D;
