@@ -74,6 +74,7 @@ csPolygon3DStatic::csPolygon3DStatic ()
   polygon_data.num_vertices = 0;
   polygon_data.vertices = 0;
   polygon_data.useLightmap = false;
+  polygon_data.objNormals = 0;
 
   flags.SetAll (CS_POLY_LIGHTING | CS_POLY_COLLDET | CS_POLY_VISCULL);
 
@@ -302,6 +303,7 @@ void csPolygon3DStatic::SetParent (csThingStatic *thing_static)
   if (thing_static)
   {
     polygon_data.p_obj_verts = &thing_static->obj_verts;
+    polygon_data.objNormals = &thing_static->obj_normals;
   }
 }
 
@@ -1095,6 +1097,7 @@ void csPolygon3D::Finish (csPolygon3DStatic* spoly)
 
       lm->Alloc (spoly->polygon_data.tmapping->GetLitOriginalWidth (),
       	spoly->polygon_data.tmapping->GetLitHeight ());
+      /*lm->InitColor (128, 128, 128);*/
 
 #ifndef CS_USE_NEW_RENDERER
       csThingObjectType* thing_type = thing->GetStaticData ()->thing_type;

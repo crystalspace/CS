@@ -225,6 +225,10 @@ struct csPolygonRenderData
   csVector3** p_obj_verts;
   /// Poly uses lightmap
   bool useLightmap;
+  /**
+   * Array of normals. 0 if the plane normal should be used.
+   */
+  csVector3** objNormals;
 };
 
 

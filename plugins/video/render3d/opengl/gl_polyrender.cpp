@@ -144,16 +144,17 @@ void csGLPolygonRenderer::PrepareBuffers (uint& indexStart, uint& indexEnd)
     for (i = 0; i < polys.Length(); i++)
     {
       csPolygonRenderData* static_data = polys[i];
+      bool smoothed = static_data->objNormals && *static_data->objNormals;
 
       //int* poly_indices = static_data->GetVertexIndices ();
 
       csVector3 polynormal;
-      //if (!smoothed)
-      //{
-      // hmm... It seems that both polynormal and obj_normals[] need to be inverted.
-      //  Don't know why, just found it out empirical.
-      polynormal = -static_data->plane_obj.Normal();
-      //}
+      if (!smoothed)
+      {
+	// hmm... It seems that both polynormal and obj_normals[] need to be inverted.
+	//  Don't know why, just found it out empirical.
+	polynormal = -static_data->plane_obj.Normal();
+      }
 
       /*
       To get the texture coordinates of a vertex, the coordinates
@@ -232,18 +233,16 @@ void csGLPolygonRenderer::PrepareBuffers (uint& indexStart, uint& indexEnd)
       int j, vc = static_data->num_vertices;
       for (j = 0; j < vc; j++)
       {
-        //int vidx = *poly_indices++;
-        const csVector3& vertex = obj_verts[static_data->vertices[j]];
+        int vidx = static_data->vertices[j];
+        const csVector3& vertex = obj_verts[vidx];
         *vertices++ = vertex;
-        /*	*vertices++ = obj_verts[vidx];
-        @@@ FIXME
         if (smoothed)
         {
-        CS_ASSERT (obj_normals != 0);
-        *normals++ = -obj_normals[vidx];
+	  *normals++ = -(*static_data->objNormals)[vidx];
         }
-        else*/
-        *normals++ = polynormal;
+        else
+	  *normals++ = polynormal;
+
         csVector3 t = object2texture.Other2This (vertex);
         *texels++ = csVector2 (t.x, t.y);
         csVector3 l = tex2lm.Other2This (t);

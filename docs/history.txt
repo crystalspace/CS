@@ -13,6 +13,8 @@ chronological order.
 	- res updated todo_newrenderer.txt.
 	- res ported the halo stuff to NR. Work somewhat (except flares), but
 	  could be better.
+	- res augmented the csPolygonRenderData struct so normals for smoothed
+	  things are passed along to the poly renderer.
 11-Apr-2004
 	- Eric Sunshine applied a patch from Andres Freund <andres@anarazel.de>
 	  to several of the templated csArray<> subclasses which ensures that
