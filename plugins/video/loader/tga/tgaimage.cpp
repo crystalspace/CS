@@ -152,6 +152,8 @@ void csTGAImageIO::SetDithering (bool)
 iDataBuffer *csTGAImageIO::Save (iImage *Image, iImageIO::FileFormatDescription *,
   const char* extraoptions)
 {
+  extraoptions = NULL;
+
   if (!Image || !Image->GetImageData ())
     return NULL;
 

@@ -102,15 +102,23 @@ void csWALImageIO::SetDithering (bool)
 {
 }
 
-iDataBuffer *csWALImageIO::Save (iImage *, iImageIO::FileFormatDescription *,
+iDataBuffer *csWALImageIO::Save (iImage *image, iImageIO::FileFormatDescription *format,
   const char* extraoptions)
 {
+  image = NULL;
+  format = NULL;
+  extraoptions = NULL;
+
   return NULL;
 }
 
-iDataBuffer *csWALImageIO::Save (iImage *, const char *,
+iDataBuffer *csWALImageIO::Save (iImage *image, const char *mime,
   const char* extraoptions)
 {
+  image = NULL;
+  mime = NULL;
+  extraoptions = NULL;
+
   return NULL;
 }
 
