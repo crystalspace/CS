@@ -841,7 +841,8 @@ SCF_REGISTER_STATIC_CLASS(
 
 @noindent
 Invoke this macro in one of the source files of your application; usually in
-the source file which implements the class.  For instance:
+the source file which implements the class.  This macro should be invoked at
+file scope (that is, not from inside a function).  For instance:
 
 @example
 SCF_REGISTER_STATIC_CLASS(
