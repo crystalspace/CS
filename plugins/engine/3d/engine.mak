@@ -1,30 +1,33 @@
 #------------------------------------------------------------------------------
-# Engine plugin submakefile
+# Engine subemakefile
 #------------------------------------------------------------------------------
+
 DESCRIPTION.engine = Crystal Space 3D engine plug-in
 
 #------------------------------------------------------------- rootdefines ---#
 ifeq ($(MAKESECTION),rootdefines)
 
+# Driver-specific help commands
 PLUGINHELP += \
   $(NEWLINE)echo $"  make engine       Make the $(DESCRIPTION.engine)$"
 
 endif # ifeq ($(MAKESECTION),rootdefines)
+
 #------------------------------------------------------------- roottargets ---#
 ifeq ($(MAKESECTION),roottargets)
 
 .PHONY: engine engineclean
 all plugins: engine
+
 engine:
 	$(MAKE_TARGET) MAKE_DLL=yes
 engineclean:
 	$(MAKE_CLEAN)
 
 endif # ifeq ($(MAKESECTION),roottargets)
+
 #------------------------------------------------------------- postdefines ---#
 ifeq ($(MAKESECTION),postdefines)
-
-vpath %.cpp $(SRCDIR)/plugins/engine/3d
 
 ifeq ($(USE_PLUGINS),yes)
   ENGINE = $(OUTDLL)/engine$(DLL)
@@ -37,24 +40,34 @@ else
   TO_INSTALL.STATIC_LIBS += $(ENGINE)
 endif
 
-INF.ENGINE = $(SRCDIR)/plugins/engine/3d/engine.csplugin
-INC.ENGINE = $(wildcard $(addprefix $(SRCDIR)/,plugins/engine/3d/*.h))
-SRC.ENGINE = $(wildcard $(addprefix $(SRCDIR)/,plugins/engine/3d/*.cpp))
-OBJ.ENGINE = $(addprefix $(OUT)/,$(notdir $(SRC.ENGINE:.cpp=$O)))
+DIR.ENGINE = plugins/engine/3d
+OUT.ENGINE = $(OUT)/$(DIR.ENGINE)
+INF.ENGINE = $(SRCDIR)/$(DIR.ENGINE)/engine.csplugin
+INC.ENGINE = $(wildcard $(SRCDIR)/$(DIR.ENGINE)/*.h)
+SRC.ENGINE = $(wildcard $(SRCDIR)/$(DIR.ENGINE)/*.cpp)
+OBJ.ENGINE = $(addprefix $(OUT.ENGINE)/,$(notdir $(SRC.ENGINE:.cpp=$O)))
 DEP.ENGINE = CSTOOL CSGFX CSGEOM CSUTIL
+CFG.ENGINE = $(SRCDIR)/data/config/engine.cfg
+
+OUTDIRS += $(OUT.ENGINE)
+
+TO_INSTALL.CONFIG += $(CFG.ENGINE)
 
 MSVC.DSP += ENGINE
 DSP.ENGINE.NAME = engine
 DSP.ENGINE.TYPE = plugin
 
-
 endif # ifeq ($(MAKESECTION),postdefines)
+
 #----------------------------------------------------------------- targets ---#
 ifeq ($(MAKESECTION),targets)
 
-.PHONY: engine engineclean
+.PHONY: engine engineclean enginecleandep
+
 engine: $(OUTDIRS) $(ENGINE)
 
+$(OUT.ENGINE)/%$O: $(SRCDIR)/$(DIR.ENGINE)/%.cpp
+	$(DO.COMPILE.CPP)
 
 $(ENGINE): $(OBJ.ENGINE) $(LIB.ENGINE)
 	$(DO.PLUGIN)
@@ -63,12 +76,16 @@ clean: engineclean
 engineclean:
 	-$(RMDIR) $(ENGINE) $(OBJ.ENGINE) $(OUTDLL)/$(notdir $(INF.ENGINE))
 
+cleandep: enginecleandep
+enginecleandep:
+	-$(RM) $(OUT.ENGINE)/engine.dep
+
 ifdef DO_DEPEND
-dep: $(OUTOS)/engine.dep
-$(OUTOS)/engine.dep: $(SRC.ENGINE)
-	$(DO.DEP)
+dep: $(OUT.ENGINE) $(OUT.ENGINE)/engine.dep
+$(OUT.ENGINE)/engine.dep: $(SRC.ENGINE)
+	$(DO.DEPEND)
 else
--include $(OUTOS)/engine.dep
+-include $(OUT.ENGINE)/engine.dep
 endif
 
 endif # ifeq ($(MAKESECTION),targets)

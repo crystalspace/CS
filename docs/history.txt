@@ -31,6 +31,13 @@ chronological order.
 	  the plugin to libcsengine.a to ensure that the library was actually
 	  linked into the plugin module.  Since all engine sources now reside
 	  in engine/3d and libcsengine.a is gone, this is no longer necessary.
+	- Eric Sunshine fixed bug in plugins/engine/3d/engine.mak where it
+	  failed to install engine.cfg.  This functionality should have been
+	  relocated here when libs/csengine.mak was removed.
+	- Eric Sunshine converted plugins/engine/3d/engine.mak to the new style
+	  which does not pollute the $(OUT) directory.
+	- Eric Sunshine fixed bug in bugplug.mak where it failed to install
+	  bugplug.key.
 25-Jan-2004
         - Matze did some updates to the jam rules:
             - I decided not to fight autoconf while using custom variable

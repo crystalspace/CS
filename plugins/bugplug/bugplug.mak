@@ -47,7 +47,8 @@ INC.BUGPLUG = $(wildcard $(SRCDIR)/$(DIR.BUGPLUG)/*.h)
 SRC.BUGPLUG = $(wildcard $(SRCDIR)/$(DIR.BUGPLUG)/*.cpp)
 OBJ.BUGPLUG = $(addprefix $(OUT.BUGPLUG)/,$(notdir $(SRC.BUGPLUG:.cpp=$O)))
 DEP.BUGPLUG = CSTOOL CSGEOM CSUTIL
-CFG.BUGPLUG = $(SRCDIR)/data/config/bugplug.cfg
+CFG.BUGPLUG = \
+  $(addprefix $(SRCDIR)/,data/config/bugplug.cfg data/config/bugplug.key)
 
 OUTDIRS += $(OUT.BUGPLUG)
 
