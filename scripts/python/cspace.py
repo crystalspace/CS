@@ -3754,6 +3754,8 @@ class iSector(iBase):
         return "<C iSector instance at %s>" % (self.this,)
     def GetPrivateObject(*args): return _cspace.iSector_GetPrivateObject(*args)
     def QueryObject(*args): return _cspace.iSector_QueryObject(*args)
+    def SetRenderLoop(*args): return _cspace.iSector_SetRenderLoop(*args)
+    def GetRenderLoop(*args): return _cspace.iSector_GetRenderLoop(*args)
     def HasFog(*args): return _cspace.iSector_HasFog(*args)
     def GetFog(*args): return _cspace.iSector_GetFog(*args)
     def SetFog(*args): return _cspace.iSector_SetFog(*args)
