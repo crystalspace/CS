@@ -104,7 +104,7 @@ detail. We also set @samp{d1} equal to 10 which means that at distance 10
 or less the object will use highest detail. Internally @samp{d0} and @samp{d1}
 are transformed to @samp{m} and @samp{a} using the following equation:
 @example
-  float m = -1.0 / (d1-d0);
+  float m = 1.0 / (d1-d0);
   float a = -m * d0;
 @end example
 
@@ -159,7 +159,7 @@ section:
   iLODControl* lodctrl = loddy_mesh->CreateStaticLOD ();
   float d0 = 100;
   float d1 = 10;
-  float m = -1.0 / (d1-d0);
+  float m = 1.0 / (d1-d0);
   float a = -m * d0;
   lodctrl->SetLOD (m, a);
 

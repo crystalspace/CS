@@ -9,6 +9,8 @@ chronological order.
 15-Aug-2003
 	- Jorrit did some documentation fixes on the new lod section.
 	- Jorrit added support for <nullmesh> in factories too.
+	- Jorrit fixed the lod formula for calculating m and a from d0 and
+	  d1. Both in the documentation as in the code.
 14-Aug-2003
 	- Jorrit added iSharedVariableListener. With this interface you can
 	  listen to a variable and get notified when its value changes.

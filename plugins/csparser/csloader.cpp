@@ -1382,7 +1382,7 @@ bool csLoader::LoadLodControl (iLODControl* lodctrl, iDocumentNode* node)
 	  {
 	    float d0 = child->GetAttributeValueAsFloat ("d0");
 	    float d1 = child->GetAttributeValueAsFloat ("d1");
-	    float lodm = -1.0 / (d1-d0);
+	    float lodm = 1.0 / (d1-d0);
 	    float loda = -lodm * d0;
 	    lodctrl->SetLOD (lodm, loda);
 	  }
