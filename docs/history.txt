@@ -1,5 +1,13 @@
 The history order has been reversed so that new features are at the top.
 
+30-Sep-2000
+	- Eric Sunshine fixed nasty bug in csHashMap/csHashSet where it would
+	  happily access negative array elements.
+	- Eric Sunshine fixed bug in csHashMap::DeleteAll(csHashKey) where it
+	  was deleting a non-existent element beyond the end of the bucket
+	  array.
+	- Eric Sunshine fixed a memory leak and compiler warnings in
+	  ddgcntxt.cpp and ddgchull.cpp.
 29-Sep-2000
 	- Eric Sunshine made the following changes to install.mak and the
 	  installation-related makefile targets:
