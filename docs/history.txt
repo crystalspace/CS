@@ -7,26 +7,27 @@ individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
 5-Dec-2004
-        - res made the following changes:
-            - Fixed the Win32 shared lib linking.
-            - Did some re-macroization of the static var cleanup stuff.
-            - Replaced some printf()s with csPrintf()s in the shader expression
-              code.
-            - Made csGradient::GetShades() return a ref to a const array.
-            - Added some missing CS_CSGEOM_EXPORT invocations to csBox2.
-        - res made the following changes:
-            - Changed the LibDepends Jam rule for more LinkWith-like invocation
-              (ie after Library, not before).
-            - Hardcoded the section name in bfdplugins.cpp to be more 
-              symmetrical with unix.jam.
-            - Fixed the logic when to use local and csutil static var cleanup
-              function.
-        - res worked around shared lib build breakage on unix.
+	- res made the following changes:
+	    - Fixed the Win32 shared library linking.
+	    - Did some re-macroization of the static variable cleanup stuff.
+	    - Replaced some printf()s with csPrintf()s in the shader expression
+	      code.
+	    - Made csGradient::GetShades() return a refeference to a const,
+	      rather than non-const, array.
+	    - Added some missing CS_CSGEOM_EXPORT invocations to csBox2.
+	- res made the following changes:
+	    - Changed the LibDepends Jam rule for more LinkWith-like invocation
+	      (i.e. after Library, not before).
+	    - Hardcoded the section name in bfdplugins.cpp to be more 
+	      symmetrical with unix.jam.
+	    - Fixed the logic when to use local and csutil static variable
+	      cleanup function.
+	- res worked around shared library build breakage on Unix.
 4-Dec-2004
-        - res fixed the GL renderer to not call glDeleteTextures() on super
-          lightmap textures.
-        - res added a patch from Karl Dietz <dekarl@users.sourceforge.net> to
-          add support for DDS textures to map2cs. (patch #1078844)
+	- res fixed the GL renderer to not call glDeleteTextures() on super
+	  lightmap textures.
+	- res added a patch from Karl Dietz <dekarl@users.sourceforge.net> to
+	  add support for DDS textures to map2cs. (patch #1078844)
 3-Dec-2004
         - res added a missing 0 check to the GL halo cleaning code.
 	- Jorrit removed the GetValueNames() from iKeyValuePair again as it
