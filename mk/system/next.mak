@@ -8,8 +8,7 @@ ifeq ($(NEXT.FRIEND),yes)
 override DO_ASM=no
 
 # Choose which drivers you want to build/use
-DRIVERS=cs2d/next cs3d/software csnetdrv/null csnetdrv/sockets \
-  csnetman/null csnetman/simple cssnddrv/null cssndrdr/null
+DRIVERS=cs2d/next cs3d/software csnetdrv/sockets csnetman/simple
 
 ifneq ($(NEXT.TARGET),)
 DESCRIPTION.$(NEXT.TARGET):=$(NEXT.DESCRIPTION)
@@ -72,7 +71,7 @@ NEXT.SOURCE_PATHS=$(addprefix libs/cssys/next/,$(NEXT.SEARCH_PATH))
 EXE=
 
 # Typical extension for dynamic libraries on this system.
-DLL=.so
+DLL=.dylib
 
 # Typical extension for static libraries
 LIB=.a
