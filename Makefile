@@ -93,6 +93,10 @@ depend:
 doc api clean cleanlib cleandep distclean:
 	@$(MAKE) --no-print-directory -f mk/cs.mak $@
 
+unknown:
+	$(RM) config.mak
+	$(RM) include/volatile.h
+
 endif
 
 # Prepare for specific system
