@@ -771,6 +771,9 @@ iMeshFactoryWrapper* csLoader::LoadMeshObjectFactory (const char* fname)
 {
   if (!Engine) return NULL;
 
+  ResolveOnlyRegion = false;
+  SCF_DEC_REF (ldr_context); ldr_context = NULL;
+
   iDataBuffer *databuff = VFS->ReadFile (fname);
 
   if (!databuff || !databuff->GetSize ())

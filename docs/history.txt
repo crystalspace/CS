@@ -49,6 +49,8 @@ The history order is reversed so that new features are at the top.
 	  no longer required.
 	- Changed iTerrFuncState::LoadMaterialGroup() to use iLoaderContext
 	  instead of iMaterialList. This fixes a compilation error.
+	- Fixed iLoader::LoadMeshObjectFactory(char* filename) so that it
+	  resets the 'ResolveOnlyRegion' to false.
 21-Feb-2002
 	- Peter Amstutz <tetron@student.umass.edu> added a patch to CS
 	  to add two additional broadcast events:
