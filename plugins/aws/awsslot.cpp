@@ -87,6 +87,11 @@ iAwsSink *awsSinkManager::CreateSink (void *parm)
   return new awsSink (parm);
 }
 
+iAwsSlot *awsSinkManager::CreateSlot ()
+{
+  return new awsSlot ();
+}
+
 ///////////////////////////////////// Signal Sinks //////////////////////////////////////////////////////////
 awsSink::awsSink (void *p) :
 parm(p), sink_err(0)

@@ -66,6 +66,9 @@ public:
 
   /// Create a new embeddable sink, with parm as the void * passed into the triggers.
   virtual iAwsSink *CreateSink (void *parm);
+
+  /// Create a new embeddable slot
+  virtual iAwsSlot *CreateSlot ();
 public:
   // Implement iComponent interface.
   struct eiComponent : public iComponent

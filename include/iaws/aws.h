@@ -483,6 +483,9 @@ struct iAwsSinkManager : public iBase
 
   /// Create a new embeddable sink, with parm as the void * passed into the triggers.
   virtual iAwsSink *CreateSink(void *parm)=0;
+
+  /// Create a new embeddable slot
+  virtual iAwsSlot *CreateSlot ()=0;
 };
 
 
