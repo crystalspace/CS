@@ -155,7 +155,6 @@ bool csReporterListener::Initialize (iObjectRegistry *object_reg)
 bool csReporterListener::Report (iReporter*, int severity,
 	const char* msgID, const char* description)
 {
-  CS_ASSERT (severity >= 0 && severity <= 4);
   char msgbuf[4096];
   if (show_msgid[severity])
     sprintf (msgbuf, "%s: %s\n", msgID, description);
