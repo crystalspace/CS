@@ -1645,7 +1645,8 @@ int csBugPlug::GetCommandCode (const char* cmdstr, char* args)
   if (spc)
   {
     strncpy (cmd, cmdstr, spc - cmdstr);
-    strcpy (args, spc+1);
+    cmd[spc - cmdstr] = 0;
+    strcpy (args, spc + 1);
   }
   else
   {
@@ -1797,6 +1798,7 @@ void csBugPlug::ReadKeyBindings (const char* filename)
     char buf[256];
     while (ReadLine (f, buf, 255))
     {
+      buf[255] = 0;
       char* del = strchr (buf, '=');
       if (del)
       {
