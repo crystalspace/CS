@@ -1041,6 +1041,10 @@ void csGLGraphics3D::Close ()
   }
   txtmgr = 0;
   shadermgr = 0;
+  for (size_t h = 0; h < halos.Length(); h++)
+  {
+    halos[h]->DeleteTexture();
+  }
 
   if (G2D)
     G2D->Close ();
@@ -2479,42 +2483,6 @@ void csGLGraphics3D::DrawSimpleMesh (const csSimpleRenderMesh& mesh,
   SetZMode (old_zbufmode);
 }
 
-class csOpenGLHalo : public iHalo
-{
-  /// The halo color
-  float R, G, B;
-  /// The width and height
-  int Width, Height;
-  /// Width and height factor
-  float Wfact, Hfact;
-  /// Blending method
-  uint dstblend;
-  /// Our OpenGL texture handle
-  GLuint halohandle;
-  /// The OpenGL 3D driver
-  csGLGraphics3D* G3D;
-
-public:
-  SCF_DECLARE_IBASE;
-
-  csOpenGLHalo (float iR, float iG, float iB, unsigned char *iAlpha,
-    int iWidth, int iHeight, csGLGraphics3D* iG3D);
-
-  virtual ~csOpenGLHalo ();
-
-  virtual int GetWidth () { return Width; }
-  virtual int GetHeight () { return Height; }
-
-  virtual void SetColor (float &iR, float &iG, float &iB)
-  { R = iR; G = iG; B = iB; }
-
-  virtual void GetColor (float &oR, float &oG, float &oB)
-  { oR = R; oG = G; oB = B; }
-
-  virtual void Draw (float x, float y, float w, float h, float iIntensity,
-    csVector2 *iVertices, int iVertCount);
-};
-
 SCF_IMPLEMENT_IBASE (csOpenGLHalo)
   SCF_IMPLEMENTS_INTERFACE (iHalo)
 SCF_IMPLEMENT_IBASE_END
@@ -2578,11 +2546,20 @@ csOpenGLHalo::csOpenGLHalo (float iR, float iG, float iB, unsigned char *iAlpha,
 
 csOpenGLHalo::~csOpenGLHalo ()
 {
-  // Kill, crush and destroy
-  // Delete generated OpenGL handle
-  glDeleteTextures (1, &halohandle);
+  DeleteTexture();
   G3D->DecRef ();
   SCF_DESTRUCT_IBASE();
+}
+
+void csOpenGLHalo::DeleteTexture ()
+{
+  // Kill, crush and destroy
+  // Delete generated OpenGL handle
+  if (halohandle != 0)
+  {
+    glDeleteTextures (1, &halohandle);
+    halohandle = 0;
+  }
 }
 
 // Draw the halo. Wasn't that a suprise
@@ -2669,7 +2646,15 @@ void csOpenGLHalo::Draw (float x, float y, float w, float h, float iIntensity,
 iHalo *csGLGraphics3D::CreateHalo (float iR, float iG, float iB,
   unsigned char *iAlpha, int iWidth, int iHeight)
 {
-  return new csOpenGLHalo (iR, iG, iB, iAlpha, iWidth, iHeight, this);
+  csOpenGLHalo* halo = new csOpenGLHalo (iR, iG, iB, iAlpha, iWidth, iHeight, 
+    this);
+  halos.Push (halo);
+  return halo;
+}
+
+void csGLGraphics3D::RemoveHalo (csOpenGLHalo* halo)
+{
+  halos.DeleteFast (halo);
 }
 
 float csGLGraphics3D::GetZBuffValue (int x, int y)

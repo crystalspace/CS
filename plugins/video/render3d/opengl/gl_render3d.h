@@ -34,6 +34,7 @@
 #include "csutil/scf.h"
 #include "csutil/scfstrset.h"
 #include "csutil/weakref.h"
+#include "csutil/weakrefarr.h"
 #include "iutil/strset.h"
 #include "csgfx/shadervarcontext.h"
 
@@ -43,6 +44,7 @@
 #include "ivideo/graph2d.h"
 #include "ivideo/rndbuf.h"
 #include "ivideo/graph3d.h"
+#include "ivideo/halo.h"
 
 #include "ivideo/shader/shader.h"
 #include "plugins/video/canvas/openglcommon/glstates.h"
@@ -63,6 +65,45 @@ struct iLightingManager;
 
 struct iEvent;
 
+class csGLGraphics3D;
+class csOpenGLHalo : public iHalo
+{
+  /// The halo color
+  float R, G, B;
+  /// The width and height
+  int Width, Height;
+  /// Width and height factor
+  float Wfact, Hfact;
+  /// Blending method
+  uint dstblend;
+  /// Our OpenGL texture handle
+  GLuint halohandle;
+  /// The OpenGL 3D driver
+  csGLGraphics3D* G3D;
+
+public:
+  SCF_DECLARE_IBASE;
+
+  csOpenGLHalo (float iR, float iG, float iB, unsigned char *iAlpha,
+    int iWidth, int iHeight, csGLGraphics3D* iG3D);
+
+  virtual ~csOpenGLHalo ();
+
+  void DeleteTexture();
+
+  virtual int GetWidth () { return Width; }
+  virtual int GetHeight () { return Height; }
+
+  virtual void SetColor (float &iR, float &iG, float &iB)
+  { R = iR; G = iG; B = iB; }
+
+  virtual void GetColor (float &oR, float &oG, float &oB)
+  { oR = R; oG = G; oB = B; }
+
+  virtual void Draw (float x, float y, float w, float h, float iIntensity,
+    csVector2 *iVertices, int iVertCount);
+};
+
 class csGLGraphics3D : public iGraphics3D
 {
 private:
@@ -81,6 +122,7 @@ private:
   csWeakRef<iBugPlug> bugplug;
 
   csRef<csGLTextureManager> txtmgr;
+  csWeakRefArray<csOpenGLHalo> halos;
 
   int current_drawflags;
   int current_shadow_state;
@@ -491,6 +533,7 @@ public:
 
   virtual iHalo* CreateHalo (float, float, float,
     unsigned char *, int, int);
+  void RemoveHalo (csOpenGLHalo* halo);
   virtual float GetZBuffValue (int, int);
 
   //=========================================================================
