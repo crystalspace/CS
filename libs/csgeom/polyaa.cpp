@@ -27,14 +27,17 @@
 
 static float __calc_area (int n, csVector2 *p)
 {
-  float area = 0;
+  if (n <= 1) return 0.0;
 
-  int i;
-  for (i = 0; i < n; i++)
+  float area = 0;
+  int i = 1;
+  do
   {
-    int j = (i != n - 1) ? i + 1 : 0;
-    area += (p [i].y + p [j].y) * (p [i].x - p [j].x);
+    area += (p [i-1].y + p [i].y) * (p [i-1].x - p [i].x);
+    i++;
   }
+  while (i < n);
+  area += (p [n-1].y + p [0].y) * (p [n-1].x - p [0].x);
 
   return ABS (area / 2.0);
 }

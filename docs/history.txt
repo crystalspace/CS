@@ -48,6 +48,11 @@ The history order is reversed so that new features are at the top.
 	- Eric Sunshined fixed csdemo so that it no longer requires that the
 	  "simple" console be loaded; since it wasn't making use of the console
 	  anyhow.
+	- Optimized __calc_area in csgeom (used for lighting). An optimization
+	  of this routine was suggested by Laurent Delepine but his
+	  optimization was not correct. However, his code triggered several
+	  optimization ideas which were easy to implement and give a
+	  small (but noticable) speed improvement.
 8-Nov-2001
 	- Jorge Acereda fixed a leak in ieplex.cpp where the result of a
 	  SCF::QueryClassList() wasn't DecRef()ed.
