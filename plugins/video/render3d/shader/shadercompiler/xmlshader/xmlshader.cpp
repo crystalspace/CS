@@ -118,17 +118,11 @@ int csXMLShaderCompiler::CompareTechniqueKeeper (
   return v;
 }
 
-csPtr<iShader> csXMLShaderCompiler::CompileShader (iDocumentNode *templ)
+void csXMLShaderCompiler::ScanForTechniques (iDocumentNode* templ,
+		csArray<TechniqueKeeper>& techniquesTmp,
+		int forcepriority)
 {
-  if (!ValidateTemplate (templ))
-    return 0;
-  
-  shadermgr = CS_QUERY_REGISTRY (objectreg, iShaderManager);
-  CS_ASSERT (shadermgr); // Should be present - loads us, after all
-
   csRef<iDocumentNodeIterator> it = templ->GetNodes();
-
-  csArray<TechniqueKeeper> techniquesTmp;
 
   // Read in the techniques.
   while (it->HasNext ())
@@ -139,6 +133,7 @@ csPtr<iShader> csXMLShaderCompiler::CompileShader (iDocumentNode *templ)
     {
       //save it
       unsigned int p = child->GetAttributeValueAsInt ("priority");
+      if (forcepriority != -1 && int (p) != forcepriority) continue;
       TechniqueKeeper keeper (child, p);
       // Compute the tag's priorities.
       csRef<iDocumentNodeIterator> tagIt = child->GetNodes ("tag");
@@ -160,6 +155,19 @@ csPtr<iShader> csXMLShaderCompiler::CompileShader (iDocumentNode *templ)
   }
 
   techniquesTmp.Sort (&CompareTechniqueKeeper);
+}
+
+csPtr<iShader> csXMLShaderCompiler::CompileShader (iDocumentNode *templ,
+		int forcepriority)
+{
+  if (!ValidateTemplate (templ))
+    return 0;
+  
+  shadermgr = CS_QUERY_REGISTRY (objectreg, iShaderManager);
+  CS_ASSERT (shadermgr); // Should be present - loads us, after all
+
+  csArray<TechniqueKeeper> techniquesTmp;
+  ScanForTechniques (templ, techniquesTmp, forcepriority);
 
   //now try to load them one in a time, until we are successful
   csRef<csXMLShader> shader;
@@ -196,6 +204,43 @@ csPtr<iShader> csXMLShaderCompiler::CompileShader (iDocumentNode *templ)
 
   csRef<iShader> ishader(shader);
   return csPtr<iShader>(ishader);
+}
+
+class csShaderPriorityList : public iShaderPriorityList
+{
+public:
+  csArray<int> priorities;
+  csShaderPriorityList ()
+  {
+    SCF_CONSTRUCT_IBASE (0);
+  }
+  virtual ~csShaderPriorityList ()
+  {
+    SCF_DESTRUCT_IBASE ();
+  }
+
+  SCF_DECLARE_IBASE;
+  virtual int GetCount () const { return priorities.Length (); }
+  virtual int GetPriority (int idx) const { return priorities[idx]; }
+};
+
+SCF_IMPLEMENT_IBASE (csShaderPriorityList)
+  SCF_IMPLEMENTS_INTERFACE (iShaderPriorityList)
+SCF_IMPLEMENT_IBASE_END
+
+csPtr<iShaderPriorityList> csXMLShaderCompiler::GetPriorities (
+	iDocumentNode* templ)
+{
+  csArray<TechniqueKeeper> techniquesTmp;
+  ScanForTechniques (templ, techniquesTmp, -1);
+  csShaderPriorityList* list = new csShaderPriorityList ();
+  csArray<TechniqueKeeper>::Iterator techIt = techniquesTmp.GetIterator ();
+  while (techIt.HasNext ())
+  {
+    TechniqueKeeper tk = techIt.Next();
+    list->priorities.Push (tk.priority);
+  }
+  return csPtr<iShaderPriorityList> (list);
 }
 
 csPtr<csXMLShader> csXMLShaderCompiler::CompileTechnique (

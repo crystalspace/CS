@@ -22,6 +22,11 @@ chronological order.
 	  change has been tested successfully with OR and NR anyway.
 	- Luca modified the AWS manager so that when the focus belongs to a
 	  hidden component, the keyboard events are not forwarded to it.
+	- Jorrit extended iShaderCompiler with a function to get all
+	  priorities that a technique supports. Also added a function
+	  to force compiling of a specific priority technique in a shader.
+	  These new functions will be used by csbench so that it can try
+	  out different techniques of a shader.
 19-Jun-2004
 	- Rhad fixed a typo in the ode and simple physics plugins for particles
 	  that was swapping the green and blue components of constant colors.

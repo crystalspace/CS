@@ -188,13 +188,18 @@ public:
   { return "XMLShader"; }
 
   /// Compile a template into a shader. Will return 0 if it fails
-  virtual csPtr<iShader> CompileShader (iDocumentNode *templ);
+  virtual csPtr<iShader> CompileShader (iDocumentNode *templ,
+		  int forcepriority = -1);
 
   /// Validate if a template is a valid shader to this compiler
   virtual bool ValidateTemplate (iDocumentNode *templ);
 
   /// Check if template is parsable by this compiler
   virtual bool IsTemplateToCompiler (iDocumentNode *templ);
+
+  /// Get a list of priorities for a given shader.
+  virtual csPtr<iShaderPriorityList> GetPriorities (
+		  iDocumentNode* templ);
 
 private:
   void Report (int severity, const char* msg, ...);
@@ -210,8 +215,12 @@ private:
     int tagPriority;
   };
 
-  static int CompareTechniqueKeeper(TechniqueKeeper const&,
-				    TechniqueKeeper const&);
+  // Scan all techniques in the document.
+  void ScanForTechniques (iDocumentNode* templ,
+	csArray<TechniqueKeeper>& techniquesTmp, int forcepriority);
+  
+  static int CompareTechniqueKeeper (TechniqueKeeper const&,
+				     TechniqueKeeper const&);
   
   // load one technique, and create shader from it
   csPtr<csXMLShader> CompileTechnique (iDocumentNode *node, 

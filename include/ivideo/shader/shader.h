@@ -208,6 +208,18 @@ struct iShader : public iShaderVariableContext
 };
 
 
+SCF_VERSION (iShaderPriorityList, 0,0,1);
+/**
+ * A list of priorities as returned by iShaderCompiler->GetPriorities()
+ */
+struct iShaderPriorityList : public iBase
+{
+  /// Get number of priorities.
+  virtual int GetCount () const = 0;
+  /// Get priority.
+  virtual int GetPriority (int idx) const = 0;
+};
+
 SCF_VERSION (iShaderCompiler, 0,0,1);
 /**
  * Compiler of shaders. Compile from a description of the shader to a 
@@ -219,14 +231,30 @@ struct iShaderCompiler : iBase
   /// Get a name identifying this compiler
   virtual const char* GetName() = 0;
 
-  /// Compile a template into a shader. Will return 0 if it fails
-  virtual csPtr<iShader> CompileShader (iDocumentNode *templ) = 0;
+  /**
+   * Compile a template into a shader. Will return 0 if it fails.
+   * If the optional 'forcepriority' parameter is given then only
+   * the technique with the given priority will be considered. If
+   * this technique fails then the shader cannot be compiled.
+   * If no priority is forced then the highest priority technique
+   * that works will be selected.
+   */
+  virtual csPtr<iShader> CompileShader (iDocumentNode *templ,
+		  int forcepriority = -1) = 0;
 
   /// Validate if a template is a valid shader to this compiler
   virtual bool ValidateTemplate (iDocumentNode *templ) = 0;
 
   /// Check if template is parsable by this compiler
   virtual bool IsTemplateToCompiler (iDocumentNode *templ) = 0;
+
+  /**
+   * Return a list of all possible priorities (for techniques)
+   * for this shader. This is a full list. It might also contain
+   * priorities for techniques that don't work on this hardware.
+   */
+  virtual csPtr<iShaderPriorityList> GetPriorities (
+		  iDocumentNode* templ) = 0;
 };
 
 #endif // __CS_IVIDEO_SHADER_H__
