@@ -5,13 +5,71 @@ The history order is reversed so that new features are at the top.
 	  they cause big problems.
 27-Mar-2002
 	- Preparation for release 0.94. Updated version numbers.
+	- Norman Kramer reports: awsSource and awsSlot were never
+	  SCF_CONSTRUCT'ed. This caused the crash in awsTimer for
+	  instance (by clicking the scrollbar handle twice).
+	- Norman Kramer reports: slparse.cpp.h is now named slp.hpp. This is
+	  because on dos slparse.cpp.h would be too long and not valid due to
+	  the two "." in the filename. Beside this djgpp version of bison
+	  creates a .hpp file. If you have a better idea how to come around
+	  this (some magic bison options ?) let me know.
+	- Norman removed debug output from awsTimer.
+	- Norman added djgpp versions for csGetTicks and csSleep.
+	- Norman fixed the embedded eventhandler in the djgpp port so that
+	  it is now constructed. simple1 and simpcd work now compiled
+	  in static mode.
+	- 'res' fixed crash bug when relighting polygons with lightmaps
+	  the renderer can't handle.
+	- 'res' also made sure that lighting for a polygon is always
+	  calculated even if the renderer can't handle the lightmap.
+	- 'res' fixed an infinite recursion in null2d canvas.
+	- Matze fixed 3ds2lev optimization so it works better now.
 26-Mar-2002
 	- Matze added a farplane command to walktest. This command set's a
 	  farplane to the camera (surprise, surprise).
+	- Norman Kramer renamed multiplex to iplex due to filename limits.
+25-Mar-2002
+	- Matze Braun let the parser return -1 for now. This is still
+	  better than bogus values.
+	- Matze changed lib loading to display errors returned by the OS
+	  again.
+	- Christian Bayle did various changes to the Debian scripts.
 24-Mar-2002
 	- Matze checked in some of his 3ds2lev changes in, the face
 	  optimisation is disabled by default because it still fails on
 	  some levels... I hope I can find the bug that causes this soon...
+	- Matze made the syntax loader outputting the name of the polygon in
+	  error cases...  The real problem I have here is that the line
+	  numbers are totally wrong because the parser keeps them as a static
+	  variable (that isn't shared cross plugins of course), so the real
+	  solution is to rewrite the parser as an object (and eventually add
+	  support for compiled tokens to it to make it faster...).
+	- Matze did a very small optimization for key parsing (suggested
+	  by Vengeance <keith@paqrat.com>).
+	- Norman Kramer did the following:
+	    - The 'relevant' member in csShadowFrustum was used
+	      uninitialized.
+	    - 'lighted_particles' in fountain was used uninitialized.
+	    - csHazeLayers were not freed.
+	    - Closed leak in debug.cpp.
+	    - csSprite3DMeshObject's lod_level_config was used uninitialized
+	      and is now set to its factory value when SetFactory() is
+	      called.
+	    - Metaballs num_mesh_vertices was used uninitialized.
+	    - csSkelLimbStates 'name' was not freed at destruction.
+	    - 'output_connectors' in gtreeldr.cpp was destructed in the
+	      constructor. I just moved it into the destructor.
+	    - Software renderer protex3d.cpp: decref'ed image used for
+	      palette synchronization.
+	    - simplept: added missing decref of the image used for the proc
+	      texture.
+	    - Set cam_move_src in blocks to 0,0,0. It was used uninitialized.
+	    - csCommandLineOptionVector did not free its content at
+	      destruction.
+	    - Walktest: plugin_mgr was not decref'ed.
+	    - Walktest: added some more decref'ing.
+	    - Input console: lines array was not freed.
+	- 'res' fixed three small texinfo syntax errors.
 23-Mar-2002
 	- Fixed a bug in the patch from Loic which prevented CS
 	  from properly working if CRYSTAL var is unset and if
@@ -30,11 +88,89 @@ The history order is reversed so that new features are at the top.
 	- Replaced DLERROR with WARNING while loading a plugin because
 	  failure to load a plugin is not always an error (for example
 	  for the sound and image multiplexers).
+	- 'res' added function to iGraphics3D so that the engine can
+	  check if a renderer can handle a lightmap. Provided implementation
+	  in OpenGL/Software versions.
+	- 'res' modified engine so it now checks if the renderer can handle
+	  the lightmap.
+	- 'res' also replaced some printfs() in the engine with Report().
+	- Christopher Nelson did the following to terrbig:
+	    - Small update to allow public setting of materials list.
+	    - Made another modification to the materials list. Now it makes a
+	      copy of the list, rather than just assuming control of the
+	      passed in pointer.
+	    - Started adding in mapping and material list functions.
+	    - Moved RGBVector to it's own file in include/csutil (csRGBVector).
+	    - Modified the materials list location, turned the map into
+	      a sorted vector vs. an unsorted one for fast searching during
+	      the map build process.
+	- Norman Kramer added dummy implementation of IsLightmapOk to
+	  aws iGraphics3D implementation.
+	- Mathew Sutcliffe created reversible form of csHashMap which can
+	  find a key from a value as well as the value from a key.
+21-Mar-2002
+	- Norman Kramer fixed simpcd so that the csColliderWrapper is now
+	  released.
+	- Norman also initialized color in partgen to black. It was
+	  used uninitialized.
+20-Mar-2002
+	- Philip Wyett did an update to the MSVC documentation:
+	  Update to msvc_libs:
+	  Note: This is for developers building the bleeding edge cvs code
+	  or recent cvs snapshots with either MSVC 5, 6 or 7.
+	- 'res' did some changes to the software renderer: added some
+	  scanprocs for alpha/keycolor and alpha/alphamap combos. Also
+	  fixed two alpha-related crash bugs.
+	- Mathew Sutcliffe did a little docs fix to binder.h.
+	- Matze Braun fixed a small bug in the key definition parser.
 19-Mar-2002
 	- Decreased maximum size of lightmaps for software renderer
 	  again. 16mil is WAY too much as that will not fit in the
 	  texture cache. Now it is set to 2mil which is still two times
 	  as big as it was before.
+	- Matze Braun improved the 3ds2lev writer.
+	- Matze did 3ds2lev optimization part one: removing double vertices.
+	- Matze moved mmap functions outside csosdefs.h into mmiounix.h.
+	- 'res' reverted his own alpha changes from yesterday.
+	- Christopher Nelson did a small fix to mmapio.h that can cause
+	  strange linking problems when all the software mmapio is not
+	  included, but the header is.
+	- Christopher created default and convenience constructor for
+	  csTriangle. This makes code much prettier and less onerious when
+	  using CS_GROWABLE_ARRAYS.
+	- Christopher made a bunch of modifications to terrbig that should
+	  let the system render to a 3D mesh much easier. Additionally,
+	  texture coordinates are now generated, built factory for the object,
+	  and added some necessary member variables to get the factory to
+	  work.
+	- Christopher Nelson additionally did the following to terrbig:
+	    - Created triangle queues so that, for each material there is
+	      a set of triangles that pertain to that material. Textures are
+	      mapped on block level, so if sub-blocks have different textures
+	      the texture will be ignored unless that sub-block is expanded
+	      to it's full resolution. This occurs recursively for all blocks.  
+  	    - Created sets of meshes in case I have to setup different
+	      properties for each material. For the moment all meshes are
+	      equivalent except for their triangle list.  
+	      Note: I still haven't figured out how to tell the engine what
+	      material I want drawn on the triangles. G3dTriangleMesh doesn't
+	      appear to have the ability to do this, so I'll keep
+	      investigating. Also, if someone who knows what they're doing
+	      better than me can look at the draw pipeline in
+	      csBigTerrainObject::Draw and see if I even have the right idea,
+	      that would be great.
+	    - Discovered where to set the material.
+	- 'res' added render priority for explosion particles in walktest.
+	- 'res' increased upper limit for lit textures in software renderer.
+	- 'res' fixed alpha transparency for OpenGL again. Also fixed
+	  disappearing of halos behind walls.
+	- Wouter Wijngaards did further work on the terrfunc terrain engine.
+	  Works nicely now but totally unoptimized so very slow.
+	- Matt Reda fixed some of the mmap stuff to compile again (on
+	  MacOS/X). I didn't test my changes because I'm not sure what exactly
+	  uses the mmap stuff. Also did some testing with QInt() on PowerPC.
+	  It works, but on PowerPC it is actually slower than a simple cast
+	  (in my simple tests). So we'll leave it off for now.
 18-Mar-2002
 	- Fixed a bug in the octree cacher. The name used for loading
 	  the cache could be different from the name used to writing the
@@ -49,8 +185,114 @@ The history order is reversed so that new features are at the top.
 	  This has now been fixed by saving additional information to the
 	  octree cache. This means the octree cache is now bigger but
 	  more robust on different platforms/debug/optimize mode.
+	- 'res' fixed a bug found by <lemkef@charter.net> in the bmp
+	  loader by removing the check for biClrUsed.
+	- Mathew Sutcliffe fixed a problem with deciding whether to use
+	  event.Key.Code or .Char.
+	- Norman Kramer did the following:
+	    - Renamed awslistbx to awslstbx to comply with the 8.3 filename
+	      rule.
+	    - AWS: Added AWSF_CMP_DEAF flag for components that do not wish
+	      to receive any event.
+	    - Added AWSF_CMP_DEAF flag, use it through cmp->IsDeaf()
+	      and cmp->SetDeaf().
+	    - The event distribution code in awsmgr now checks for this flag.
+	    - Made invisible tabs in a notebook deaf.
+	- Christopher Nelson fixed a compile bug in inpnames.cpp so that
+	  MSVC won't complain that the case statements skip it's
+	  initialization by including it in it's own {} block.
+	- Matze Braun applied a patch from Loic Dachary <loic@gnu.org>
+	  that makes using cs-config with autoconf easier.
+	- Matze fixed unix csosdefs.h to compoile at least again. But I
+	  think the mmapio functions shouldn't go to that header at all.
+	- 'res' fixed alpha transparency (full transparent in OpenGL was
+	  fully opaque in software and vice versa).
+	- Christian Bayle added more dependencies to the debian scripts.
+	  Several other smaller changes.
+	- Mathew Sutcliffe modified the comments for binder.h. Added a main
+	  comment so it will show in the online docs.
+17-Mar-2002
+	- Norman Kramer did the following:
+	    - Fixed scf for static compilation (USE_PLUGINS=no).
+	    - Renamed genmesh/csTriangleVertices to csGenTriangleVertices to
+	      prevent name clash with terrfunc's csTriangleVertices (if
+	      compiled static).
+	    - Made csTriangleVertex an inner class of csTriangleVertices to
+	      prevent name clash with genmesh's csTriangleVertex (if compiled
+	      static).
+	    - Added removal of SRC.LIBREF to the DIR.LIBREF target (otherwise
+	      no new cslibref will be created if you made it once and then add
+	      a plugin and do a "make recache blah")
+	    - Removed the ";" from the LIBREF.BODY because
+	      SCF_REGISTER_STATIC_LIBRARY already has it (and additionally
+	      djgpp gives up there with an error).
+	    - ogg: made callback structure public so VC will like it too.
+	    - aws: less whining by VC now.
+	    - aws: fixed textbox drawing routines potential use of
+	      uninitialized variable.
+	    - ogl_polybuf.cpp: fixed potential use of uninitialized var.
+	    - thing.cpp: poor gcc for Solaris seems to have problems selecting
+	      the right convert_endian routine. So I thought I help a bit by
+	      casting the input parameter.
+	    - Added chkogl.sh script to detect the existance of
+	      glXGetProcAddressARB. Script is called from unixconf.sh.
+	    - Additionally adds CSGL_EXT_STATIC_ASSERTION to volatile.h
+	      if needed.
+	    - OpenGL: added define of SGIS_genmerate_mipmap.
+	    - OpenGL: made all defines commented out by default, so if your
+	      GL implementation does not feature glXGetProcAddressARB no
+	      extension is enabled either - you have to go here and enable by
+	      hand (or provide an extended chkogl.sh that detects all the
+	      nitty and maybe even the gritty).
+	- 'res' added ARB_texture_env_combine to config. Changed 3dfx config.
+	  Added GeForce config.
+	- Richard Uren added HEIGHTMAP token to isoloader to enable heightmap
+	  calculation when tiling. HEIGHTMAP lives in a TILE2D definition
+	  and defaults to false/off/no.
+16-Mar-2002
+	- Wouter Wijngaards did further work on terrfunc. Dynamic lod and
+	  seamless within one block.
+	- Norman Kramer did the following:
+	    - Modified the macros for globals so MSVC will (hopefully) not
+	      barf.
+	    - Gone through plugins to replace the globals with the cs macros.
+	    - cswstest: fixed crash in layout example.
+	    - Removed unused vars in various plugins and apps.
+	    - Fixed pointer to scalar assignment in isoload.cpp.
+15-Mar-2002
+	- Wouter Wijngaards did some further work on terrfunc: still not
+	  operational (the old terrfunc still works though).
+	- Christian Bayle did some package correction on the Debian scripts.
+	  Also added a dependency on xlibmesa. Added some mini shot used for
+	  48x48 and 32x32 gifs.
+	- Mathew Sutcliffe added CS_IS_INPUT_EVENT(e) macro.
+	- Norman Kramer did the following:
+	    - Modified the variables declared with CS_DECLARE_GROWING_ARRAY
+	      so they use the new cs macros for static/global objects.
+	    - Globals in aws, iso, emit, and rapid are now used via cs macros.
+	    - Made the generated destruction function static.
+	    - In the CLASSVAR case the class vars were never set but
+	      shadowed by another variable.
 14-Mar-2002
 	- Norman Kramer did some fixes on the DOS port.
+	- Norman fixes scf so that it again unloads unused shared libraries
+	  on request only.
+	- Matze Braun fixed a bug in csString when appending zero length
+	  strings. Also added a comment.
+	- Wouter Wijngaards did some experimental work on the landscape
+	  engine (terrfunc):
+	    - Removed the line RDS NOTE: Is this the same as DrawTest?
+	      after the TestVisibility function.
+	      Answer: No.
+	      Long Answer: TestVisibility does quadtree visibility culling,
+	      where parts of the terrain occlude other parts of the terrain.
+	      This can and will never result in occluding the *entire*
+	      terrain. Thus, it is not the same as DrawTest.
+	    - Added terrain quad divisor class and terrfunc can enable this
+	      (default on false). Placeholder code for now.
+	    - Tiles show up, texture coordinates work for terrquaddivisor.
+	- Christian Bayle did some cleanup for rules and createmenus in the
+	  Debian scripts.
 13-Mar-2002
 	- Fixed mdl2spr so that it now correctly generates a MESHFACT
 	  keyword instead of MESHOBJ.
@@ -71,6 +313,26 @@ The history order is reversed so that new features are at the top.
 	  lightmaps and octree. This will make it easier to dynamically
 	  load levels even when other parts of the level are already loaded
 	  without the user having to manually specify LMCACHE.
+	- Matze Braun added --includes to cs-config.
+	- Norman Kramer did the following:
+	    - Destruction functions are now called in reverse order of
+	      registration.
+	    - Dynamic libs are now correctly (hopefully) csUnloadLibrary'ed
+	      by scf, note that this triggers a segmentation fault (at least
+	      on linux (suse 7.3 - gcc 2.95.3 and binutils 2.11.90.0.29))
+	      that is caused by gcc/libc's handling of static/global objects
+	      in shared libraries. I will now begin to employ the new cs
+	      macros to get around this.
+	    - Changed a few of the static/global objects in csgeom and
+	      csengine to be declared/implemented with the new CS_ macros
+	      ("scfreg engine.so" no longer segfaults - that was why I started
+	      all this, the guy who asked on irc why it segfaults be cursed :)
+	    - Added a CS_..._REF in cssysdef that returns a reference to the
+	      static object.
+	    - In cssysdef.h moved forward declaration of cleanup function out
+	      of extern "C" {} construct.
+	- Christian Bayle did some more changes to versioning for the Debian
+	  scripts.
 12-Mar-2002
 	- Made the lightmap cache for pseudo-dynamic lightmaps (shadow
 	  maps) a bit more robust. Previously changing pseudo-dynamic
@@ -95,6 +357,15 @@ The history order is reversed so that new features are at the top.
 	  of iStrVector. This will make it possible to write binary data.
 	  Changed all implementations of this interface for the new
 	  method signature.
+	- Christian Bayle did some changes to the Debian script rules.
+	- Christion added versioning/added export on tag for the Debian
+	  scripts.
+	- Norman Kramer did the following:
+	    - Further changes to the CS_* macros to provide static/global
+	      objects in shared libraries.
+	    - Now everything should be in place and ready to be used (that
+	      will follow in the coming days).
+	- Philip Wyett added include <winsock.h> to csosdefs.h for windows.
 11-Mar-2002
 	- Fixed a bug in csScanStr when presented with an empty string
 	  as input. This prevented the proper scanning of the format
@@ -105,6 +376,70 @@ The history order is reversed so that new features are at the top.
 	  use '%s' for a numeric parameter if an error occured. This
 	  causes crashes. Additionally also fixed the error message
 	  that occurs in this case.
+	- Wouter Wijngaards added trailing endofline to isomap/isomap.h file.
+	- Philip Wyett removed odivx4 plugin from default MSVC build.
+	- Norman Kramer did the following:
+	    - Added macros for declaring/implementing static/global
+	      variables that can be used inside shared libraries.
+	    - A Libname_scfFinalize function is called for shared libraries.
+	    - The cleanup function for the main application is called in
+	      DestroyApplication.
+10-Mar-2002
+	- Norman Kramer did the following:
+	    - Changed SCF_EXPORT_FUNCTION to CS_EXPORTED_FUNCTION.
+	    - Changed SCF_EXPORTED_NAME to CS_EXPORTED_NAME.
+	    - Moved default definitions of both into cssysdef.h (out of scf.h).
+	    - Renamed the SCF_EXPORT_FUNCTIONS in the other system dependent
+	      csosdefs.h files.
+	    - Declared cs_static_var_cleanup in cssysdef.h as
+	      CS_EXPORTED_FUNCTION (that should fix the compiler warnings on
+	      win32).
+	- 'res' renamed csCreateXORPatternImage() parameter 'patsize' to
+	  clearer 'recdepth'. Changed comment a bit.
+	- 'res' fixed rle.mak for wrong output file name under MSVC (now
+	  rlecodec instead of rle).
+	- Philip Wyett removed 'byte' from xorpat.cpp, which is not always
+	  known for unsigned char.
+	- Philip fixed a bug in the video app: an attempt to centre the
+	  video also resulted in the video being halved in size.
+	- Philip also reports:
+	    - Removed code used in odivx4 plugin which is not part of odivx
+	      for Windows. You can see all the affected lines by looking for
+	      lines commented out with "// PSW".
+	    - Updated msvc_libs (all version) adding odivx4 support.
+	      Note: The decore.h now in msvc_libs is a custom version as the
+	      one one officially released is missing some definitions and also
+	      one which causes crashes. :/
+	    - Left all old divx headers and libs etc in for the time being.
+	      I will remove later.
+	    - Added divx4 plugin to default MSVC build.
+	    - Updated docs in cvs ready for when we can get the new versions
+	      of msvc_libs onto ftp.
+9-Mar-2002
+	- Norman Kramer did the following:
+	   - In the OpenDivX plugin: removed FOURCC divx, which is now
+	     assigned to divx4.
+	   - Added new divx4 codec.
+	   - In the csosdefs.h files changed CS_IMPLEMENT_PLUGIN to
+	     CS_IMPLEMENT_PLATFORM_PLUGIN and CS_IMPLEMENT_APPLICATION to
+	     CS_IMPLEMENT_PLATFORM_APPLICATION.
+	   - Added CS_IMPLEMENT_STATIC_VARIABLE_CLEANUP and
+	     CS_STATIC_VAR_DESTRUCTION_REGISTRAR_FUNCTION in cssysdef.h.
+	   - CS_IMPLEMENT_PLUGIN and CS_IMPLEMENT_APPLICATION is now made
+	     from CS_IMPLEMENT_STATIC_VARIABLE_CLEANUP and
+	     CS_IMPLEMENT_PLATFORM_*.
+	- Philip Wyett fixed all the warnings caused by the changes to
+	  CS_IMPLEMENT_APPLICATION and CS_IMPLEMENT_PLUGIN. Also changed
+	  lib name which MSVC will use for new divx for plugon to eliminate
+	  conflicts.
+	- Philip then proceeded to revert the massive commit he did a few
+	  minutes ago :-)
+	- Norman reverted on additional file that Philip forgot to revert.
+	- 'res' did some changes to procedural textures (plasma, fire, dots):
+	  changed texflags, removed nomipmaps on plasma/fire, added
+	  persistent on dots.
+	- 'res' fixed the OpenGL backbuffer procedural texture implementation
+	  so that up is now up and down is down.
 8-Mar-2002
 	- Peter Amstutz <tetron@student.umass.edu> gave a patch which
 	  does the following:
@@ -150,6 +485,9 @@ The history order is reversed so that new features are at the top.
 	- Fixed a memory leak in csOctree::ReadFromCache().
 	- Fixed a big problem in csOctree::ReadFromCache() which could
 	  cause memory corruption.
+	- Brandon Ehle did some fixes in caltocs for memory corruption.
+	- Christian Bayle did an initial addition to build daily Debian
+	  package (scripts/debian).
 6-Mar-2002
 	- Matt Reda made the iso engine explicitly remove all mesh factories 
 	  at iso engine destruction for clarity.
@@ -178,24 +516,194 @@ The history order is reversed so that new features are at the top.
 	- Extended iLightingInfo interface with a iCacheManager* parameter.
 	- Lightmaps are already cached using the new system. Octree and
 	  bsp tree are still a todo.
+	- Philip Wyett moved the isometric map loader to plugins/isoldr
+	  instead of its original location inside plugins/engine/iso.
+	- Philip fixed all redefinition errors in inpnames.cpp. Note: when
+	  allocating a default value to a variable in a function definition,
+	  please could folks do it in the header file only and not in both the
+	  .h and .cpp.
+	- Richard Uren removed some debug comments from the iso loader.
+	- Richard also did some changes to allow the creation of mesh wrappers
+	  without a class id for the iso engine. The CLASS directive in the
+	  iso map files are no longer needed.
+	- Matze Braun added a missing cache.h include to polygon.cpp.
+	- Matze also added declarations for iEvent and csEvent again in
+	  inpnames.h. Please don't remove them again. They are needed.
+	- Matze then did a small bugfix for keyparsing.
+	- 'res' changed VFS so that when a file is opened for reading the
+	  directories are not automatically created.
+	- 'res' did the following changes to lightmaps:
+	    - Changed the way lightmap is stored on disk: 
+	      the 4th byte was 0x80 all the time, and the comment on line
+	      159 in lghtmap.cpp says it wasn't even known why :) now the
+	      4th byte is stripped when writing the lightmap and readded when
+	      reading. 
+	    - Changed lightmap file magic.
+	    - Changed lmversion.
+	- Mathew Sutcliffe added csInputBinder: an auxilliary support class.
+	- Christopher Nelson published FindComponentFactory interface and
+	  made several modifications to the interface to accomodate this.
 5-Mar-2002
-	- Oktal added new csParseInputDef and csGetInputDesc functions
-	  which replace the old functions in cskeys.h. With these functions
-	  you can parse a key/mouse/joystick event into a csEvent or
-	  vice versa.
+	- Mathew Sutcliffe (Oktal) added new csParseInputDef and
+	  csGetInputDesc functions which replace the old functions in
+	  cskeys.h. With these functions you can parse a key/mouse/joystick
+	  event into a csEvent or vice versa.
+	- Mathew added backward compatibility with cskeys and extra.
 	- Fixed the csParseInputDef and csGetInputDesc so that they now
 	  return bool on success/failure of conversion.
 	- Richard Uren added a new loader for the isometric engine.
+	- Matze Braun did the following:
+            - Small fix from Rene Dudfied <illumen@yahoo.com> to make
+	      fpu80x86.h compiling with gcc >= 3.0.4.
+            - Matze added some declarations to inpnames.h.
+	- Philip Wyett fixed a few issues in the new iso plugin makefiles.
+	- Philip also fixed all the conflicts of having two plugins in the
+	  same dir and wildcarding all the files in that dir. Isomap now
+	  successfully compiles and runs under MSVC.
+	- Matze Braun fixed the isomap makefile so that the target name
+	  is now different from the executable name.
+	- Matze additionally removed double CS_IMPLEMENT_PLUGIN, this results
+	  in two main functions in linux.
+	- Matze then proceeded to add the CS_IMPLEMENT_PLUGIN again. These
+	  really are two plugins.
 4-Mar-2002
 	- Fixed the tutorials in the docs so that they are up-to-date with
 	  regards to changes that happened a long time ago in csInitializer.
+	- Philip Wyett implemented a strncmpi() function so MSVC can compile
+	  again.
+	- Matze Braun fixed inpnames.cpp for unix. Stricmp is MSVC only.
+	- Jonathan Tarbox reports: while in most systems returning false
+	  as a pointer will evaluate to 0, it does not within BeOS.
+	  Fixed a problem in csloader.cpp related to this.
+3-Mar-2002
+	- Norman Kramer did the following:
+	    - csRegisteredString never freed the memory assigned to its
+	      String member.
+	    - With much help from Matze Braun I have figured what causes
+	      the segfault after engine.so gets unloaded: it's the _fini from
+	      crti.o that is linked in with the link command that is issued
+	      when linking with g++.
+	      Why this causes a crash is still unknown, but we can avoid
+	      linking this in by adding -nostdlib -lgcc to the g++ link
+	      command. This is what i've changed in linux.mak (funny enough we
+	      used that already back then when we used gcc instead of g++).
+	    - Reverted my changes since now the static objects in engine.so
+	      are no longer initialized (well, they are 0 - for instance
+	      the csPoly2DFactory in csPoly2DPool).
+	- Matze Braun added support for 'free()' to csMemFile (in addition
+	  to not deleting and 'delete[]').
+	- Matze fixed the indentation/coding style of the sound renderer
+	  and also fixed a bug in the destructor.
+	- Matze fixed cspython.mak to remove python.cex in pythonclean target.
+2-Mar-2002
+	- Norman Kramer did the following:
+	  Text in the "whatsThis" property of controls are now evaluated.
+	  Currently text in the form of: "c:a1,b1,a2,b2[,...]" is recognized
+	  and translated into:
+		connect
+		{
+		  a1 -> b1
+		  a2 -> b2
+		     ...
+		}
+	  so if you write in the whatsThis property of a pushbutton:
+	  c:signalClicked,mysink::Login you'll get:
+		connect
+		{
+		  signalClicked -> mySink::Login
+		}
+	- Norman also added recognition of literals in whatsThis property.
+	  It is of the form "l:literal text". <literal text> will be placed
+	  in the output.  "c:" and "l:" tokens have to separated by "|"
+	- Norman updated the qtaws.txi documentation.
+	- Norman fixed the following:
+	    - Thing was not initialized in polygon constructor.
+	    - xwindow.cpp: graphics context was not freed.
+	    - xexstshm: XImage was leaked, moved destructor of xshmt in x2d
+	      around so it happens before xwin is destroyed (xshm also
+	      uses dpy variable). NOTE: If you use valgrind (memory checker)
+	      you will note that it crashes if the shared memory if
+	      shmdt'ed - this seems to be a bug in valgrind.
+1-Mar-2002
+	- Norman Kramer did the following:
+	    - Made joystick code produce "old" events - that is (x,y) pairs
+	      for the first 2 axis only.
+	    - The keys read from joystick.cfg are now composed as
+	      Device.Joystick.<Platform>.<Compiler Name>.*
+	      This will possible implementations for other platforms let share
+	      this config file.
+	- Christopher Nelson fixed some bugs with the transition out code,
+	  and modified visibility processing to make transition resets work
+	  right without flicker.
+	- Wyatt Miler fixed @em -> @emph in apimod94.txi.
+28-Feb-2002
+	- Norman Kramer did the following:
+	    - Cleaned up crysball.cpp a bit.
+	    - Replaced a long if-snake with a for loop.
 27-Feb-2002
 	- Matze changed oss sound driver to nonblocking mode while opening, so
 	  if the soundcard is already used it fails now instead of
 	  waiting for the sound card to become free.
+	- Norman Kramer did the following:
+	    - Cleaned up SCF_DECLARE_IBASE in the components, which was not
+	      needed (and wrong) since they all inherit from awsComponent
+	      which implements iAwsComponent already.
+	    - Made awsComponentFactory a full implementation of
+	      iAwsComponentFactory (that is I provided a dummy implementation
+	      of Create ()).
+	    - Removed all the SCF_DECLARE_IBASE stuff for ComponentFactories
+	      too.
+	- Christopher Nelson did the following:
+	    - Made out transitions automatically Hide and Reset the window
+	      frame for the in transition.
+	    - Made awsStandardSink contain triggers for all out transitions.
+	    - Fixed a bug in the status bar that would cause draw pixmap to
+	      segfault.
+	    - Added new window function: FindChild. This allows you to find a
+	      child of a window by name. You must make sure and have the exact
+	      same name, though, otherwise the child will not be found. Case
+	      IS sensitive.
+26-Feb-2002
+	- Norman Kramer did the following:
+	    - The styleshhet now recognizes QTabWidget which are transformed
+	      into awsNotebook.
+	    - Fixed bug that created layouting data even if there were none.
+	    - Fixed the case where notebook pages have no caption, it now
+	      correctly creates dummy captions synthesized from "Tab " + #Tabs.
+	- Brandon Ehle implemented the PLUGINS section for libraries in the
+	  loader.
+	- Matze added a missing csPlane3 forward declaration to campos.h.
+	- Christopher Nelson added window transitions for sliding in and out
+	  left, right, up and down.  Note that transitions will cause
+	  segfaulting if used with a proctexture, because CS proctextures do
+	  not provide proper clipping.
+	- Norman Kramer fixed DoButton and DoMotion of the joystickdriver
+	  (for one the range checking was screwed and now joystick number is
+	  in range [0, maxjoy-1] as the comment in iEventPlug suggests.
+	- Norman implemented a joystick eventplug for linux that conforms to
+	  the Linux Joystick API. Enable it CS/libs/cssys/unix/*.mak. There
+	  is also a joystick.cfg.
 25-Feb-2002
 	- Michael O'Shea found a bug in iLoader::LoadMeshObject(char*fname).
 	  This function was totally broken :-)
+	- Matze Braun removed an assert from the standard reporter to allow
+	  users to define their own severities.
+	- Norman Kramer did the following to aws:
+	    - Added notebook component.
+	    - Events are now only broadcasted to windows that are not hidden.
+	    - Added sample for notebook.
+23-Feb-2002
+	- Matt Reda changed size of uv array in ogl_polybuf.cpp. Array was
+	  declared with size 2 but 3 elements where being accessed,
+	  overwriting some of the other local variables. Adjusted size to 3
+	  until someone with more insight can determine whether that is
+	  correct, or if it should only be accessing 2 elements.
+	- Philip Wyett fixed compiler error under MinGW Norman Kramer mailed
+	  to me. This error was that ENUM_CURRENT_SETTINGS is not part of
+	  the win32 api of MinGW whilst it is under MSVC. I have added a nice
+	  little define to include it for those which don't have it.
+	- Philip did a quick hack to get the LUA plugin to compile.
+	- Philip removed include csutil/zip.h from css.h.
 22-Feb-2002
 	- Added iLoaderContext interface (include/imap/ldrctxt.h). This
 	  new interface gives loader plugins a way to find out about
@@ -247,6 +755,29 @@ The history order is reversed so that new features are at the top.
 	  instead of iMaterialList. This fixes a compilation error.
 	- Fixed iLoader::LoadMeshObjectFactory(char* filename) so that it
 	  resets the 'ResolveOnlyRegion' to false.
+	- Christopher Nelson did the following to AWS:
+	    - Added new component, "Status Bar"
+	    - Fixed anothe bug in the bar chart.
+	    - Added component "Status Bar" to the manager.
+	      Status Bar takes the following keys:
+	        Status: <integer between 0 and 100 (inclusive)>
+	        Style: <typical frame styles, sbBump. sbSimple, etc.>
+	        BarTexture: <a text string that is the path to the image>
+	        BarTextureAlpha: <an integer between 0 and 255 (inclusive)>
+	    - Fixed key bug in status bar.
+	    - Fixed insets in status bar to look right.
+	    - Fixed command button: mouse over, bitmap issue,
+	      getprefferedsize when it's a bitmap.
+	    - Fixed barchart: zero barwidth issue, dies when no items.
+	    - Fixed textbox: if it was too small text would be truncated
+	      to zero and strlen would choke.
+	    - Fixed window: if a child had a layout, but the window did not,
+	      it would not function right.
+	    - Added BackgroundAlpha and OverlayAlpha to window.
+	    - Other fixes that I can't remember now.
+	- 'res' fixed the Windows OpenGL canvas so that the depth now contains
+	  the actual instead of the wanted color depth.
+	- 'res' fixed a typo in jobber.pl ('Inovking' instead of 'Invoking').
 21-Feb-2002
 	- Peter Amstutz <tetron@student.umass.edu> added a patch to CS
 	  to add two additional broadcast events:
