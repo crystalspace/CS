@@ -44,6 +44,7 @@ struct iLODControl;
 struct iLight;
 struct iLightingInfo;
 struct iShadowReceiver;
+struct iShadowCaster;
 struct iObject;
 struct iPortalContainer;
 struct csRenderMesh;
@@ -219,8 +220,25 @@ struct iMeshWrapper : public iBase
    * by this mesh object. If the mesh object doesn't implement it
    * then this will return 0. This is similar (but more efficient)
    * to calling SCF_QUERY_INTERFACE on the mesh object for iShadowReceiver.
+   * <p>
+   * Note! If the mesh is a static lod mesh (i.e. a parent of a mesh
+   * hierarchy that is used for static lod) then this will return
+   * a shadow receiver that automatically multiplexes the receiving shadows
+   * to all child meshes.
    */
   virtual iShadowReceiver* GetShadowReceiver () const = 0;
+
+  /**
+   * Get the optional shadow caster that is implemented
+   * by this mesh object. If the mesh object doesn't implement it
+   * then this will return 0. This is similar (but more efficient)
+   * to calling SCF_QUERY_INTERFACE on the mesh object for iShadowCaster.
+   * <p>
+   * Note! If the mesh is a static lod mesh (i.e. a parent of a mesh
+   * hierarchy that is used for static lod) then this will return a
+   * shadow caster that gets shadows from the highest detail objects.
+   */
+  virtual iShadowCaster* GetShadowCaster () const = 0;
 
   /**
    * Optimization to avoid having to do SCF_QUERY_INTERFACE for

@@ -24,6 +24,16 @@ chronological order.
 	- Eric Sunshine performed Texinfo mark-up correction and cleanup in new
 	  material added to engine/internal.txi.  Also cleaned up the grammar
 	  and performed some re-writing to make the discussion more idiomatic.
+	- Jorrit started working on implementing lighting correctly for
+	  static lod meshes. Currently the children of a static lod mesh
+	  are not registered to the visibility culler. Since lighting
+	  (precalculated lighting) is handled through the visibility culler
+	  this means that these child objects are basically being ignored.
+	  To solve this I'm going to work on having a iShadowReceiver and
+	  iShadowCaster in the mesh itself which is going to delegate shadow
+	  handling to the appropriate child(ren). Currently I only
+	  added iMeshWrapper->GetShadowCaster(). This doesn't do anything
+	  yet except return the shadowcaster of the mesh itself.
 	- Eric Sunshine removed the difficult-to-maintain, legacy, GNU
 	  make-based build system. However, in order to avoid alienating users
 	  by forcing them to download, install, and use Jam, the CS configure

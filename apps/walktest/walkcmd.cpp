@@ -2274,11 +2274,11 @@ bool CommandHandler (const char *cmd, const char *arg)
   else if (!strcasecmp (cmd, "relight"))
   {
     csRef<iConsoleOutput> console = CS_QUERY_REGISTRY(Sys->object_reg, iConsoleOutput);
-    if(console.IsValid()) {
-        csTextProgressMeter* meter = new csTextProgressMeter(console);
-        Sys->Engine->ForceRelight(0, meter);
-        if(meter)
-            delete meter;
+    if(console.IsValid())
+    {
+      csTextProgressMeter* meter = new csTextProgressMeter(console);
+      Sys->Engine->ForceRelight (0, meter);
+      delete meter;
     }
   }
   else if (!strcasecmp (cmd, "snd_play"))

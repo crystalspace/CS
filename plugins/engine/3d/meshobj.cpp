@@ -79,6 +79,7 @@ csMeshWrapper::csMeshWrapper (iMeshWrapper *theParent, iMeshObject *meshobj) :
   {
     light_info = SCF_QUERY_INTERFACE (meshobj, iLightingInfo);
     shadow_receiver = SCF_QUERY_INTERFACE (meshobj, iShadowReceiver);
+    shadow_caster = SCF_QUERY_INTERFACE (meshobj, iShadowCaster);
     portal_container = SCF_QUERY_INTERFACE (meshobj, iPortalContainer);
     // Only if we have a parent can it possibly be useful to call AddToSectorPortalLists.
     // Because if we don't have a parent yet then we cannot have a sector either.
@@ -151,6 +152,7 @@ void csMeshWrapper::SetMeshObject (iMeshObject *meshobj)
   {
     light_info = SCF_QUERY_INTERFACE (meshobj, iLightingInfo);
     shadow_receiver = SCF_QUERY_INTERFACE (meshobj, iShadowReceiver);
+    shadow_caster = SCF_QUERY_INTERFACE (meshobj, iShadowCaster);
     portal_container = SCF_QUERY_INTERFACE (meshobj, iPortalContainer);
     AddToSectorPortalLists ();
   }
@@ -158,6 +160,7 @@ void csMeshWrapper::SetMeshObject (iMeshObject *meshobj)
   {
     light_info = 0;
     shadow_receiver = 0;
+    shadow_caster = 0;
     portal_container = 0;
   }
 }

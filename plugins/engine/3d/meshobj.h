@@ -207,8 +207,18 @@ private:
   csRef<iMeshObject> meshobj;
   /// For optimization purposes we keep the iLightingInfo interface here.
   csRef<iLightingInfo> light_info;
-  /// For optimization purposes we keep the iShadowReceiver interface here.
+  /**
+   * For optimization purposes we keep the iShadowReceiver interface here.
+   * Also for maintaining the special version of the shadow receiver that
+   * multiplexes in case of static lod.
+   */
   csRef<iShadowReceiver> shadow_receiver;
+  /**
+   * For optimization purposes we keep the iShadowCaster interface here.
+   * Also for maintaining the special version of the shadow caster that
+   * multiplexes in case of static lod.
+   */
+  csRef<iShadowCaster> shadow_caster;
 
   /**
    * For optimization purposes we keep the portal container interface here
@@ -641,6 +651,10 @@ public:
     virtual iShadowReceiver* GetShadowReceiver () const
     {
       return scfParent->shadow_receiver;
+    }
+    virtual iShadowCaster* GetShadowCaster () const
+    {
+      return scfParent->shadow_caster;
     }
     virtual uint GetVisibilityNumber () const
     {
