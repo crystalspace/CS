@@ -1,6 +1,6 @@
 <?php
 //-----------------------------------------------------------------------------
-// Copyright 2000 by Eric Sunshine <sunshine@sunshineco.com>
+// Copyright (C) 2000 by Eric Sunshine <sunshine@sunshineco.com>
 //
 // This script allows HTTP access to Crystal Space's CVS snapshots directory
 // (which is normally only accessible via FTP).
@@ -46,7 +46,7 @@ $snapdir = '/home/groups/ftp/pub/crystal/cvs-snapshots';
 
 function pretty_date($stamp)
 {
-    return gmdate("d M Y H:i:s", $stamp);
+    return gmdate('d M Y H:i:s', $stamp);
 }
 
 function pretty_size($bytes)
@@ -54,9 +54,9 @@ function pretty_size($bytes)
     $KB = 1024;
     $MB = $KB * 1024;
     $GB = $MB * 1024;
-    if ($bytes > $GB) { return sprintf("%.1f GB", (float)$bytes / $GB); }
-    elseif ($bytes > $MB) { return sprintf("%.1f MB", (float)$bytes / $MB); }
-    elseif ($bytes > $KB) { return sprintf("%.1f KB", (float)$bytes / $KB); }
+    if ($bytes > $GB) { return sprintf('%.1f GB', (float)$bytes / $GB); }
+    elseif ($bytes > $MB) { return sprintf('%.1f MB', (float)$bytes / $MB); }
+    elseif ($bytes > $KB) { return sprintf('%.1f KB', (float)$bytes / $KB); }
     else { return "$bytes"; }
 }
 
@@ -86,11 +86,11 @@ function list_recursive($prefix, $sub)
 	for ($i=0; $i < count($dir_files); $i++)
 	{
 	    $file = $dir_files[$i];
-	    print("<tr><td align=\"left\" valign=\"top\">" .
+	    print('<tr><td align="left" valign="top">' .
 		"<a href=\"$sub/$file\">$file</a>&nbsp&nbsp</td>" .
-		"<td align=\"right\" valign=\"top\">" .
-		pretty_size(filesize("$dir/$file")) . "&nbsp&nbsp</td>" .
-		"<td align=\"left\" valign=\"top\">" .
+		'<td align="right" valign="top">' .
+		pretty_size(filesize("$dir/$file")) . '&nbsp&nbsp</td>' .
+		'<td align="left" valign="top">' .
 		pretty_date(filemtime("$dir/$file")) . "</td></tr>\n");
 	}
 	print("</table>\n");
@@ -123,7 +123,7 @@ which is also known as Greenwich Mean Time (GMT).<p>
 <?php
     global $prog_name, $prog_version, $copyright, $snapdir;
     list_recursive($snapdir, $dir);
-    print("<hr>Generated " . pretty_date(time()) . " UTC " .
+    print('<hr>Generated ' . pretty_date(time()) . ' UTC ' .
 	"by <tt>$prog_name</tt> version $prog_version.<br>\n$copyright\n");
 ?>
 </body>
@@ -140,15 +140,15 @@ function send_file($file)
 
     header("Content-Disposition: attachment; filename=$base");
     header("Content-Type: application/octet-stream; file=$base");
-    header("Content-Length: " . filesize($path));
-    header("Pragma: no-cache");
-    header("Expires: 0");
+    header('Content-Length: ' . filesize($path));
+    header('Pragma: no-cache');
+    header('Expires: 0');
     readfile($path);
 }
 
 function redirect()
 {
-    // Append a '/' to the URI so the browser thinks this is a directory.
+    // Append a "/" to the URI so the browser thinks this is a directory.
     global $HTTP_HOST, $REQUEST_URI;
     header("Location: http://$HTTP_HOST$REQUEST_URI/");
 }
