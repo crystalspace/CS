@@ -14,6 +14,9 @@ The history order is reversed so that new features are at the top.
 	- Removed the USE_MEMORY_COPY from OpenGL renderer seens it appears
 	  to be not useful on MacOS/X. At least the optimization to
 	  DrawPolygonSingleTexture helped.
+	- Matze changed plugin linking flags on unix to use -shared instead of
+	  -Wl,-shared as this seems to fix some problems with unresolved
+	  problems on some linux boxes.
 15-Mar-2003
 	- Greg Block fixed lightmap loading and saving on
 	  non-Intel-endian systems.
