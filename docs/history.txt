@@ -1,6 +1,7 @@
 The history order has been reversed so that new features are at the top.
 
 27-Sep-2000
+	- Fix to csphyzik from Michael Ewert.
 	- Thomas Hieber did some cosmetic updates to icsgame.h.
 	- Further cosmetic changes to icsgame.h. I also added Doxygen
 	  comments to the methods.

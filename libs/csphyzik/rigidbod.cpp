@@ -103,14 +103,14 @@ void ctRigidBody::add_angular_v( const ctVector3 &pw )
   dRF.w += pw;
 
   // from w = I_inv_world*L
-  L = I_world * pw;
+  L += I_world * pw;
 }
 
 // v is a secondary value that is calculated from momentum
 void ctRigidBody::add_v( const ctVector3 &pv )
 { 
   dRF.v += pv; 
-  P = pv*m;
+  P += pv*m;
 }
 
 int ctRigidBody::set_state( real *state_array )
