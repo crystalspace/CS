@@ -221,23 +221,28 @@ void csVosSector::Load()
 void csVosSector::notifyChildInserted (VobjectEvent &event)
 {
   LOG("csVosSector", 2, "notifyChildInserted");
-  vRef<csMetaObject3D> obj3d = meta_cast<csMetaObject3D>(event.getChild());
-  LOG("SectorChildInserted", 2, "Looking at " << event.getChild()->getURLstr()
-                                               << " " << obj3d.isValid())
+  try {
+    vRef<csMetaObject3D> obj3d = meta_cast<csMetaObject3D>(event.getChild());
+    LOG("SectorChildInserted", 2, "Looking at " << event.getChild()->getURLstr()
+        << " " << obj3d.isValid())
 
-  if(obj3d.isValid())
-  {
-    LOG("SectorChildInserted", 2, "Calling obj3d->Setup()");
-    obj3d->Setup(vosa3dl, this);
+      if(obj3d.isValid())
+      {
+        obj3d->Setup(vosa3dl, this);
+      }
+      else
+      {
+        vRef<csMetaLight> light = meta_cast<csMetaLight>(event.getChild());
+        if(light.isValid())
+        {
+          light->Setup(vosa3dl, this);
+        }
+      }
+  } catch(std::runtime_error e) {
+    LOG("csVosSector", 2, "caught runtime error setting up " << event.getChild()->getURLstr()
+        << ": " << e.what());
   }
-  else
-  {
-    vRef<csMetaLight> light = meta_cast<csMetaLight>(event.getChild());
-    if(light.isValid())
-    {
-      light->Setup(vosa3dl, this);
-    }
-  }
+
   LOG("csVosSector", 2, "leaving notifyChildInserted " << waitingForChildren);
 
   waitingForChildren--;

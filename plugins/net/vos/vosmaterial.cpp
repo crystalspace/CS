@@ -67,6 +67,8 @@ ConstructMaterialTask::~ConstructMaterialTask()
 
 void ConstructMaterialTask::doTask()
 {
+  LOG("vosbillboard", 2, "Constructing material");
+
   csRef<iEngine> engine = CS_QUERY_REGISTRY (object_reg, iEngine);
   csRef<iGraphics3D> g3d = CS_QUERY_REGISTRY (object_reg, iGraphics3D);
   csRef<iTextureManager> txtmgr = g3d->GetTextureManager();

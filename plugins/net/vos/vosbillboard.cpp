@@ -57,8 +57,8 @@ public:
 };
 
 ConstructBillboardTask::ConstructBillboardTask (iObjectRegistry *objreg,
-                                                vRef<csMetaMaterial> mat, 
-						csMetaBillboard* b,
+                                                vRef<csMetaMaterial> mat,
+            csMetaBillboard* b,
                                                 std::string n, iSector *s)
   : object_reg(objreg), metamat(mat), billboard(b, true), name(n), sector(s)
 {
@@ -70,6 +70,8 @@ ConstructBillboardTask::~ConstructBillboardTask()
 
 void ConstructBillboardTask::doTask()
 {
+  LOG("vosbillboard", 2, "Constructing billboard");
+
   csRef<iEngine> engine = CS_QUERY_REGISTRY (object_reg, iEngine);
 
   // Create factory and give it the material
@@ -83,7 +85,7 @@ void ConstructBillboardTask::doTask()
 
   // Create the mesh object and query the state
   csRef<iMeshObject> mesh = billboard_factory->GetMeshObjectFactory ()
-  	->NewInstance();
+    ->NewInstance();
   csRef<iSprite2DState> state = SCF_QUERY_INTERFACE (mesh, iSprite2DState);
   if (!state) return;
 
@@ -93,10 +95,10 @@ void ConstructBillboardTask::doTask()
 
   // Move the vertices.
   // csColoredVertices is defined in sprite2d.h as an array of
-  // csSprite2DVertex's. 
+  // csSprite2DVertex's.
   // csSprite2dVertex is defined in sprite2d.h as a struct containing a
   // csVector2 named pos, and two floats named u and v. The polygon vertices
-  // are moved to create a square (-.5,-.5), (-.5,.5), (.5,.5), (.5,-.5) 
+  // are moved to create a square (-.5,-.5), (-.5,.5), (.5,.5), (.5,-.5)
   // with the texxture mapped appropriately. (and right-side up).
   csColoredVertices& v = state->GetVertices();
   v[0].pos.x = -0.5; v[0].u = 0;
@@ -107,7 +109,7 @@ void ConstructBillboardTask::doTask()
   v[2].pos.y =  0.5; v[2].v = 0;
   v[3].pos.x =  0.5; v[3].u = 1;
   v[3].pos.y = -0.5; v[3].v = 1;
-    
+
   csRef<iMeshWrapper> meshwrapper = engine->CreateMeshWrapper (
                              mesh, name.c_str(), sector, csVector3(0, 0, 0));
 
@@ -142,8 +144,8 @@ void csMetaBillboard::Setup(csVosA3DL* vosa3dl, csVosSector* sect)
   mat->Setup(vosa3dl);
   LOG("csMetaBillboard", 2, "setting up billboard");
   vosa3dl->mainThreadTasks.push(new ConstructBillboardTask(
-  	vosa3dl->GetObjectRegistry(), mat, this, getURLstr(),
-	sect->GetSector()));
+    vosa3dl->GetObjectRegistry(), mat, this, getURLstr(),
+  sect->GetSector()));
 
   LOG("csMetaBillboard", 2, "calling csMetaObject3D::setup");
   csMetaObject3D::Setup(vosa3dl, sect);

@@ -61,12 +61,15 @@ ConstructConeTask::~ConstructConeTask()
 
 void ConstructConeTask::doTask()
 {
+  LOG("voscone", 2, "Constructing cone");
+
   csRef<iEngine> engine = CS_QUERY_REGISTRY (object_reg, iEngine);
 
   // should store a single cone factory for everything?  or do we always get
   // the same one back?
   //if (!cone_factory)
   //{
+
   csRef<iMeshFactoryWrapper> cone_factory = engine->CreateMeshFactory (
                           "crystalspace.mesh.object.genmesh", "cone_factory");
   //}
@@ -90,62 +93,35 @@ void ConstructConeTask::doTask()
     vertices[1].Set (0, -0.5, 0);
 
     texels[0].Set(.5, 0);
-    texels[0].Set(.5, 1);
+    texels[1].Set(.5, 1);
 
-    bool seam = true;
+    int i = 0;
+    double angle = (double) i / (double) hubVertices * M_PI * 2;
+    vertices[i+2].Set (cos(angle) * 0.5, -0.5, sin(angle) * 0.5);
+    texels[i+2].Set(0, (float)i / (float)hubVertices);
 
-    if (seam)
+    for (i = 1; i <= hubVertices; i++)
     {
-      for (int i = 0; i <= hubVertices; i++)
-      {
+      if(i < hubVertices) {
         double angle = (double) i / (double) hubVertices * M_PI * 2;
         vertices[i+2].Set (cos(angle) * 0.5, -0.5, sin(angle) * 0.5);
         texels[i+2].Set(0, (float)i / (float)hubVertices);
-
-        if (i > 0)
-        {
-          // top (slope) triangle
-          triangles[(i-1) * 2].a = 0;
-          triangles[(i-1) * 2].b = 2 + i;
-          triangles[(i-1) * 2].c = 2 + i-1;
-
-          // bottom (base) triangle
-          triangles[(i-1) * 2 + 1].a = 1;
-          triangles[(i-1) * 2 + 1].b = 2 + i-1;
-          triangles[(i-1) * 2 + 1].c = 2 + i;
-        }
       }
+
+      int n;
+      if(i < hubVertices) n = i;
+      else n = 0;
+
+      // top (slope) triangle
+      triangles[(i-1) * 2].a = 0;
+      triangles[(i-1) * 2].b = 2 + n;
+      triangles[(i-1) * 2].c = 2 + i-1;
+
+      // bottom (base) triangle
+      triangles[(i-1) * 2 + 1].a = 1;
+      triangles[(i-1) * 2 + 1].b = 2 + i-1;
+      triangles[(i-1) * 2 + 1].c = 2 + n;
     }
-    else
-    {
-      for (int i = 0; i < hubVertices; i++)
-      {
-        double angle = (double) i / (double) hubVertices * M_PI * 2;
-        vertices[2 + i].Set (cos(angle) * 0.5, -0.5, sin(angle) * 0.5);
-        texels[i+2].Set(0, (float)i / (float)hubVertices);
-
-        if (i > 0)
-        {
-          // top (slope) triangle
-          triangles[(i-1) * 2].a = 0;
-          triangles[(i-1) * 2].b = 2 + i;
-          triangles[(i-1) * 2].c = 2 + i-1;
-
-          // bottom (base) triangle
-          triangles[(i-1) * 2 + 1].a = 1;
-          triangles[(i-1) * 2 + 1].b = 2 + i-1;
-          triangles[(i-1) * 2 + 1].c = 2 + i;
-        }
-      }
-      triangles[(hubVertices - 1) * 2].a = 0;
-      triangles[(hubVertices - 1) * 2].b = 2 + hubVertices-1;
-      triangles[(hubVertices - 1) * 2].c = 2;
-
-      triangles[(hubVertices - 1) * 2].a = 1;
-      triangles[(hubVertices - 1) * 2].b = 2;
-      triangles[(hubVertices - 1) * 2].c = 2 + hubVertices-1;;
-    }
-
 
     coneLook->Invalidate ();
     coneLook->CalculateNormals ();

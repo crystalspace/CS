@@ -51,6 +51,7 @@ public:
   csRef<iSector> sector;
   bool isStatic;
   csRef<iDynamicSystem> dynsys;
+  Task* chainedtask;
 
   std::vector<A3DL::PolygonMesh::Vertex> verts;
   std::vector<A3DL::PolygonMesh::Polygon> polys;
@@ -66,7 +67,7 @@ public:
 ConstructPolygonMeshTask::ConstructPolygonMeshTask(iObjectRegistry *objreg,
                             csMetaPolygonMesh* pm, std::string n, iSector *s)
   : object_reg(objreg), polygonmesh(pm, true), name(n), sector(s),
-    isStatic(false)
+    isStatic(false), chainedtask(0)
 {
 }
 
@@ -497,6 +498,11 @@ void ConstructPolygonMeshTask::doTask()
 
     polygonmesh->GetCSinterface()->SetMeshWrapper(meshwrapper);
   }
+
+  if(chainedtask) {
+    chainedtask->doTask();
+    delete chainedtask;
+  }
 }
 
 /// csMetaPolygonMesh ///
@@ -516,6 +522,8 @@ MetaObject* csMetaPolygonMesh::new_csMetaPolygonMesh(VobjectBase* superobject,
 
 void csMetaPolygonMesh::Setup(csVosA3DL* vosa3dl, csVosSector* sect)
 {
+  this->vosa3dl = vosa3dl;
+
   ConstructPolygonMeshTask* cpmt = new ConstructPolygonMeshTask(
     vosa3dl->GetObjectRegistry(), this, getURLstr(), sect->GetSector());
 
@@ -572,8 +580,10 @@ void csMetaPolygonMesh::Setup(csVosA3DL* vosa3dl, csVosSector* sect)
 
   cpmt->dynsys = vosa3dl->GetDynSys();
 
+  cpmt->chainedtask = GetSetupTask(vosa3dl, sect);
+
   vosa3dl->mainThreadTasks.push(cpmt);
 
-  csMetaObject3D::Setup(vosa3dl, sect);
+  addChildListener (this);
 }
 

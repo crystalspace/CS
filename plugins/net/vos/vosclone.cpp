@@ -59,6 +59,8 @@ ConstructCloneTask::~ConstructCloneTask()
 
 void ConstructCloneTask::doTask()
 {
+  LOG("vosbillboard", 2, "Constructing clone");
+
   csRef<iEngine> engine = CS_QUERY_REGISTRY (object_reg, iEngine);
 
   csRef<iMeshWrapper> wrapper = engine->CreateMeshWrapper (

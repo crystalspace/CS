@@ -142,10 +142,10 @@ void csMetaLight::Setup(csVosA3DL* vosa3dl, csVosSector* sector)
   if(alreadyLoaded) return;
 
   ConstructLightTask* clt = new ConstructLightTask(
-  	vosa3dl->GetObjectRegistry(), sector->GetSector(), getURLstr(), this);
+    vosa3dl->GetObjectRegistry(), sector->GetSector(), getURLstr(), this);
   double x, y, z;
   getPosition(x, y, z);
-  clt->pos.Set(x, y, z);
+  clt->pos.Set((float)x, (float)y, (float)z);
   getColor(clt->color.red, clt->color.green, clt->color.blue);
   clt->radius = getRadius();
   try

@@ -44,24 +44,32 @@ class ConstructModelTask : public Task
 public:
   iObjectRegistry *object_reg;
   vRef<csMetaMaterial> metamat;
-  vRef<Property> property;
-  csRef<iDataBuffer> databuf;
   vRef<csMetaModel> model;
   std::string name;
   csRef<iSector> sector;
+  csRef<iDataBuffer> databuf;
+  std::string datatype;
 
-  ConstructModelTask(iObjectRegistry *objreg, vRef<csMetaMaterial> mat,
-                     vRef<Property> p, csMetaModel* m, std::string n,
-		     iSector *s);
+  ConstructModelTask(iObjectRegistry *objreg,
+                     vRef<csMetaMaterial> mat,
+                     csMetaModel* m,
+                     const std::string& n,
+                     iSector *s,
+                     csRef<iDataBuffer> databuf,
+                     const std::string& datatype);
   virtual ~ConstructModelTask();
   virtual void doTask();
 };
 
 ConstructModelTask::ConstructModelTask (iObjectRegistry *objreg,
-                      vRef<csMetaMaterial> mat, vRef<Property> p,
-                      csMetaModel* m, std::string n, iSector *s)
-  : object_reg(objreg), metamat(mat), property(p), model(m, true),
-    name(n), sector(s)
+                                        vRef<csMetaMaterial> mat,
+                                        csMetaModel* m,
+                                        const std::string& n,
+                                        iSector *s,
+                                        csRef<iDataBuffer> db,
+                                        const std::string& dt)
+  : object_reg(objreg), metamat(mat), model(m, true),
+    name(n), sector(s), databuf(db), datatype(dt)
 {
 }
 
@@ -70,7 +78,7 @@ ConstructModelTask::~ConstructModelTask()
 }
 
 #define _MAX(a, b) ((a > b) ? a : b)
-static void NormalizeModel(csRef<iMeshWrapper> wrapper, bool recenter, 
+static void NormalizeModel(csRef<iMeshWrapper> wrapper, bool recenter,
                            bool fixalign, std::string datatype)
 {
   csBox3 b;
@@ -84,9 +92,9 @@ static void NormalizeModel(csRef<iMeshWrapper> wrapper, bool recenter,
 
   wrapper->GetMeshObject()->GetObjectModel()->GetObjectBoundingBox(b);
 
-  LOG("NormalizeModel", 3, "maxes (" << b.MaxX() << ", " << b.MaxY() << 
+  LOG("NormalizeModel", 3, "maxes (" << b.MaxX() << ", " << b.MaxY() <<
       ", " << b.MaxZ() << ")");
-  LOG("NormlizeModel", 3, "mins (" << b.MinX() << ", " << b.MinY() << 
+  LOG("NormlizeModel", 3, "mins (" << b.MinX() << ", " << b.MinY() <<
       ", " << b.MinZ() << ")");
 
   float xextent = b.MaxX() - b.MinX();
@@ -94,7 +102,7 @@ static void NormalizeModel(csRef<iMeshWrapper> wrapper, bool recenter,
   float zextent = b.MaxZ() - b.MinZ();
 
   float scale = 1.0 / _MAX(xextent, _MAX(yextent, zextent));
-  LOG("NormalizeModel", 3, "scaling extents of (" << xextent << 
+  LOG("NormalizeModel", 3, "scaling extents of (" << xextent <<
       ", " << yextent << ", " << zextent << ") by " << scale);
 
   csVector3 newcenter(0,0,0);
@@ -104,7 +112,7 @@ static void NormalizeModel(csRef<iMeshWrapper> wrapper, bool recenter,
                   (b.MaxY() + b.MinY())/2,
                   (b.MaxZ() + b.MinZ())/2);
     newcenter *= -scale;
-    LOG("NormalizeModel", 4, "setting center to " << newcenter.x << 
+    LOG("NormalizeModel", 4, "setting center to " << newcenter.x <<
         ", " << newcenter.y << ", " << newcenter.z << ")");
   }
 
@@ -123,21 +131,16 @@ static void NormalizeModel(csRef<iMeshWrapper> wrapper, bool recenter,
 
 void ConstructModelTask::doTask()
 {
-  // Create databuffer for model.  Need a new buffer for this as CS will
-  // delete[] it
-  csRef<iDataBuffer> databuf;
-  std::string s;
-  property->read(s);
-  char *buffer = new char[s.size()];
-  for (std::string::size_type i = 0; i < s.size(); i++) buffer[i] = s[i];
-  databuf.AttachNew (new csDataBuffer (buffer, s.size()));
-  
+  LOG("vosbillboard", 2, "Constructing model");
+
+
+
   // Engine
   csRef<iEngine> engine = CS_QUERY_REGISTRY (object_reg, iEngine);
 
   // Get the model converter and cross builder
   csRef<iModelConverter> modconv = CS_QUERY_REGISTRY (object_reg,
-  	iModelConverter);
+    iModelConverter);
   csRef<iCrossBuilder> xbuild = CS_QUERY_REGISTRY (object_reg, iCrossBuilder);
 
   // Check they were loaded
@@ -150,7 +153,7 @@ void ConstructModelTask::doTask()
 
   LOG ("ConstructModelTask", 2, "Loading into model converter");
   csRef<iModelData> data = modconv->Load (databuf->GetUint8(),
-  	databuf->GetSize());
+    databuf->GetSize());
   if (!data)
   {
     LOG ("ConstructModelTask", 2, "Could not load model using converter");
@@ -174,9 +177,23 @@ void ConstructModelTask::doTask()
   csRef<iMeshWrapper> meshwrapper = engine->CreateMeshWrapper (
                              factory, name.c_str(), sector, csVector3(0, 0, 0));
 
-  NormalizeModel (meshwrapper, true, true, property->getDataType());
+  NormalizeModel (meshwrapper, true, true, datatype);
 
   model->GetCSinterface()->SetMeshWrapper(meshwrapper);
+
+  LOG ("ConstructModelTask", 2, "Done (you should see something now)");
+  csBox3 bb;
+  meshwrapper->GetWorldBoundingBox(bb);
+  LOG ("ConstructModelTask", 2, "bounding box is "
+       << bb.MinX() << " "<< bb.MinY() << " "<< bb.MinZ()
+       << bb.MaxX() << " " << bb.MaxY() << " " << bb.MaxZ());
+
+  {
+    csRef<iMeshList> ml = sector->GetMeshes();
+    for(int i = 0; i < ml->GetCount(); i++) {
+      LOG ("ConstructModelTask", 2, "Sector contains: " << ml->Get(i)->QueryObject()->GetName());
+    }
+  }
 }
 
 /// csMetaModel ///
@@ -189,7 +206,7 @@ csMetaModel::csMetaModel(VobjectBase* superobject)
 }
 
 MetaObject* csMetaModel::new_csMetaModel(VobjectBase* superobject,
-	const std::string& type)
+  const std::string& type)
 {
   return new csMetaModel(superobject);
 }
@@ -203,10 +220,22 @@ void csMetaModel::Setup(csVosA3DL* vosa3dl, csVosSector* sect)
   mat->Setup(vosa3dl);
   LOG("csMetaModel", 2, "setting up model");
 
+  vRef<Property> property = getModelObj();
+
+  // Create databuffer for model.  Need a new buffer for this as CS will
+  // delete[] it
+  csRef<iDataBuffer> databuf;
+  std::string s;
+  property->read(s);
+  char *buffer = new char[s.size()];
+  for (std::string::size_type i = 0; i < s.size(); i++) buffer[i] = s[i];
+  databuf.AttachNew (new csDataBuffer (buffer, s.size()));
+
   // Create task
   vosa3dl->mainThreadTasks.push(new ConstructModelTask (
-                              vosa3dl->GetObjectRegistry(), mat, getModelObj(),
-                              this, getURLstr(), sect->GetSector()));
+                              vosa3dl->GetObjectRegistry(), mat,
+                              this, getURLstr(), sect->GetSector(),
+                              databuf, property->getDataType()));
 
   LOG("csMetaModel", 2, "calling csMetaObject3D::setup");
   csMetaObject3D::Setup(vosa3dl, sect);

@@ -44,13 +44,13 @@ public:
   csRef<iDynamicSystem> dynsys;
   csVector3 size;
 
-  ConstructCubeTask(iObjectRegistry *objreg, vRef<csMetaMaterial> mat, 
+  ConstructCubeTask(iObjectRegistry *objreg, vRef<csMetaMaterial> mat,
                       csMetaCube* c, std::string n, iSector *s);
   virtual ~ConstructCubeTask();
   virtual void doTask();
 };
 
-ConstructCubeTask::ConstructCubeTask(iObjectRegistry *objreg, 
+ConstructCubeTask::ConstructCubeTask(iObjectRegistry *objreg,
                                      vRef<csMetaMaterial> mat, csMetaCube* c,
                                      std::string n, iSector *s)
   : object_reg(objreg), metamat(mat), cube(c, true), name(n), sector(s)
@@ -63,11 +63,13 @@ ConstructCubeTask::~ConstructCubeTask()
 
 void ConstructCubeTask::doTask()
 {
+  LOG("vosbillboard", 2, "Constructing cube");
+
   csRef<iEngine> engine = CS_QUERY_REGISTRY (object_reg, iEngine);
 
   // should store a single cube factory for everything?  or do we always get
   // the same one back?
-  //if(! cube_factory) 
+  //if(! cube_factory)
   //{
   csRef<iMeshFactoryWrapper> cube_factory = engine->CreateMeshFactory (
                          "crystalspace.mesh.object.genmesh", "cube_factory");
@@ -96,10 +98,10 @@ void ConstructCubeTask::doTask()
       csOrthoTransform t (tm, tv);
       collider->AttachColliderBox (size, t, 0, 1, 0);
 
-      if (cube->isLocal()) 
-		collider->SetMoveCallback (cube->GetCSinterface());
+      if (cube->isLocal())
+    collider->SetMoveCallback (cube->GetCSinterface());
 
-	  cube->GetCSinterface()->SetCollider (collider);
+    cube->GetCSinterface()->SetCollider (collider);
     }
 
     cube->GetCSinterface()->SetMeshWrapper(meshwrapper);
@@ -129,7 +131,7 @@ void csMetaCube::Setup(csVosA3DL* vosa3dl, csVosSector* sect)
   mat->Setup(vosa3dl);
 
   LOG("csMetaCube", 3, "setting up cube");
-  ConstructCubeTask *t = new ConstructCubeTask(vosa3dl->GetObjectRegistry(), 
+  ConstructCubeTask *t = new ConstructCubeTask(vosa3dl->GetObjectRegistry(),
                                     mat, this, getURLstr(), sect->GetSector());
 
   t->dynsys = vosa3dl->GetDynSys();
@@ -138,7 +140,7 @@ void csMetaCube::Setup(csVosA3DL* vosa3dl, csVosSector* sect)
   {
     getScaling (x, y, z);
   }
-  catch (NoSuchObjectError) 
+  catch (NoSuchObjectError)
   {
   }
   t->size = csVector3 (x,y,z);

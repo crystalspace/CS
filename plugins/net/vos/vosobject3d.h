@@ -78,6 +78,8 @@ public:
 
   // Set up the object
   virtual void Setup(csVosA3DL* vosa3dl, csVosSector* sect);
+  VOS::Task* GetSetupTask(csVosA3DL* vosa3dl, csVosSector* sect);
+
   csRef<csVosObject3D> GetCSinterface();
 
   // Child change listener for events

@@ -24,6 +24,8 @@
 
 #include "iengine/mesh.h"
 #include "iengine/movable.h"
+#include "imesh/object.h"
+#include "imesh/thing.h"
 #include "csgeom/vector3.h"
 #include "csgeom/matrix3.h"
 #include "csgeom/quaterni.h"
@@ -149,6 +151,10 @@ void ConstructObject3DTask::doTask()
     mw->GetMovable()->SetPosition(pos);
     mw->GetMovable()->SetTransform(ori);
     mw->GetMovable()->UpdateMove();
+
+    csRef<iThingState> thingstate = SCF_QUERY_INTERFACE(
+                             mw->GetMeshObject(), iThingState);
+    if(thingstate.IsValid()) thingstate->Unprepare();
   }
 }
 
@@ -203,12 +209,8 @@ MetaObject* csMetaObject3D::new_csMetaObject3D(VobjectBase* superobject,
   return new csMetaObject3D(superobject);
 }
 
-void csMetaObject3D::Setup(csVosA3DL* vosa3dl, csVosSector* sect)
+Task* csMetaObject3D::GetSetupTask(csVosA3DL* vosa3dl, csVosSector* sect)
 {
-  LOG("csMetaObject3D", 3, "now in csMetaObject3D::setup");
-
-  this->vosa3dl = vosa3dl;
-
   double x, y, z;
   try
   {
@@ -276,14 +278,24 @@ void csMetaObject3D::Setup(csVosA3DL* vosa3dl, csVosSector* sect)
 
   LOG("vosobject3d", 3, "setting position " << x << " " << y << " " << z);
 
-  vosa3dl->mainThreadTasks.push (new ConstructObject3DTask(
-                            vosa3dl->GetObjectRegistry(), this,
-                            csVector3(x, y, z),                    // pos
-                            csMatrix3(q),                          // ori
-                            csVector3(xht, yht, zht),              // hardpos
-                            csMatrix3(qht) * csMatrix3(sxht, 0, 0, // hardtrans
-                                                       0, syht, 0,
-                                                       0, 0, szht)));
+  return (new ConstructObject3DTask(
+            vosa3dl->GetObjectRegistry(), this,
+            csVector3(x, y, z),                    // pos
+            csMatrix3(q),                          // ori
+            csVector3(xht, yht, zht),              // hardpos
+            csMatrix3(qht) * csMatrix3(sxht, 0, 0, // hardtrans
+                                       0, syht, 0,
+                                       0, 0, szht)));
+}
+
+void csMetaObject3D::Setup(csVosA3DL* vosa3dl, csVosSector* sect)
+{
+  LOG("csMetaObject3D", 3, "now in csMetaObject3D::setup");
+
+  this->vosa3dl = vosa3dl;
+
+  vosa3dl->mainThreadTasks.push(GetSetupTask(vosa3dl, sect));
+
   addChildListener (this);
 }
 

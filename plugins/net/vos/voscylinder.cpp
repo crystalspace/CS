@@ -44,13 +44,13 @@ public:
   csRef<iDynamicSystem> dynsys;
   int hub_vertices;
 
-  ConstructCylinderTask(iObjectRegistry *objreg, vRef<csMetaMaterial> mat, 
+  ConstructCylinderTask(iObjectRegistry *objreg, vRef<csMetaMaterial> mat,
                       csMetaCylinder* s, std::string n, iSector *s, int hv);
   virtual ~ConstructCylinderTask();
   virtual void doTask();
 };
 
-ConstructCylinderTask::ConstructCylinderTask(iObjectRegistry *objreg, 
+ConstructCylinderTask::ConstructCylinderTask(iObjectRegistry *objreg,
                                      vRef<csMetaMaterial> mat, csMetaCylinder*c,
                                      std::string n, iSector *s, int hv)
   : object_reg(objreg), metamat(mat), cylinder(c, true), name(n), sector(s),
@@ -64,23 +64,25 @@ ConstructCylinderTask::~ConstructCylinderTask()
 
 void ConstructCylinderTask::doTask()
 {
+  LOG("vosbillboard", 2, "Constructing cylinder");
+
   csRef<iEngine> engine = CS_QUERY_REGISTRY (object_reg, iEngine);
 
   // should store a single sphere factory for everything?  or do we always get
   // the same one back?
-  //if(! sphere_factor) 
+  //if(! sphere_factor)
   //{
   csRef<iMeshFactoryWrapper> cylinder_factory = engine->CreateMeshFactory (
                         "crystalspace.mesh.object.genmesh","cylinder_factory");
   //}
-  
+
   csRef<iGeneralFactoryState> cylinderLook = SCF_QUERY_INTERFACE (
                cylinder_factory->GetMeshObjectFactory(), iGeneralFactoryState);
 
   if (cylinderLook)
   {
     cylinderLook->SetMaterialWrapper(metamat->GetMaterialWrapper());
-    cylinderLook->SetVertexCount (4 + hub_vertices * 2);
+    cylinderLook->SetVertexCount (2 + hub_vertices * 2);
     cylinderLook->SetTriangleCount (hub_vertices * 4);
 
     csVector3* vertices=cylinderLook->GetVertices();
@@ -89,113 +91,64 @@ void ConstructCylinderTask::doTask()
     vertices[0].Set(0, .5,  0);
     vertices[1].Set(0, -.5, 0);
 
-    bool seam = true;
+    int i = 0;
+    vertices[2 + i*2 + 0].Set (
+      cos( ((double)i/(double)hub_vertices) * M_PI * 2) * .5,
+      .5, sin( ((double)i/(double)hub_vertices) * M_PI * 2) * .5);
+    vertices[2 + i*2 + 1].Set (
+      cos( ((double)i/(double)hub_vertices) * M_PI *2) * .5,
+      -.5, sin( ((double)i/(double)hub_vertices) * M_PI * 2) * .5);
 
-    if (seam) 
+    for (i = 1; i <= hub_vertices; i++)
     {
-      for (int i = 0; i <= hub_vertices; i++) 
-      {
+      if(i < hub_vertices) {
         vertices[2 + i*2 + 0].Set (
-                cos( ((double)i/(double)hub_vertices) * M_PI * 2) * .5,
-                .5, sin( ((double)i/(double)hub_vertices) * M_PI * 2) * .5);
+          cos( ((double)i/(double)hub_vertices) * M_PI * 2) * .5,
+          .5, sin( ((double)i/(double)hub_vertices) * M_PI * 2) * .5);
         vertices[2 + i*2 + 1].Set (
-                cos( ((double)i/(double)hub_vertices) * M_PI *2) * .5,
-                -.5, sin( ((double)i/(double)hub_vertices) * M_PI * 2) * .5);
-        if (i > 0) 
-        {
-          // top triangle
-          triangles[(i-1)*4].a = 0;
-          triangles[(i-1)*4].b = 2 + i*2 + 0;
-          triangles[(i-1)*4].c = 2 + (i-1)*2 + 0;
-
-            // bottom triangle
-          triangles[(i-1)*4 + 1].c = 1;
-          triangles[(i-1)*4 + 1].b = 2 + i*2 + 1;
-          triangles[(i-1)*4 + 1].a = 2 + (i-1)*2 + 1;
-
-          // first side triangle
-          triangles[(i-1)*4 + 2].a = 2 + i*2 + 0;
-          triangles[(i-1)*4 + 2].b = 2 + i*2 + 1;
-          triangles[(i-1)*4 + 2].c = 2 + (i-1)*2 + 0;
-
-          // second side triangle
-          triangles[(i-1)*4 + 3].c = 2 + i*2 + 1;
-          triangles[(i-1)*4 + 3].b = 2 + (i-1)*2 + 0;
-          triangles[(i-1)*4 + 3].a = 2 + (i-1)*2 + 1;
-        }
+          cos( ((double)i/(double)hub_vertices) * M_PI *2) * .5,
+          -.5, sin( ((double)i/(double)hub_vertices) * M_PI * 2) * .5);
       }
-    }
-    else
-    {
-      for(int i = 0; i < hub_vertices; i++) 
-      {
-        vertices[2 + i*2 + 0].Set (
-                cos( ((double)i/(double)hub_vertices) * M_PI * 2) * .5,
-                .5, sin( ((double)i/(double)hub_vertices) * M_PI * 2) * .5);
 
-        vertices[2 + i*2 + 1].Set (
-                cos( ((double)i/(double)hub_vertices) * M_PI * 2) * .5,
-                -.5, sin(((double)i/(double)hub_vertices)*M_PI*2) * .5);
+      int n;
+      if(i < hub_vertices) n = i;
+      else n = 0;
 
-        if(i > 0) 
-        {
-          // top triangle
-          triangles[(i-1)*4].a = 0;
-          triangles[(i-1)*4].b = 2 + i*2 + 0;
-          triangles[(i-1)*4].c = 2 + (i-1)*2 + 0;
-        
-          // bottom triangle
-          triangles[(i-1)*4 + 1].c = 1;
-          triangles[(i-1)*4 + 1].b = 2 + i*2 + 1;
-          triangles[(i-1)*4 + 1].a = 2 + (i-1)*2 + 1;
+      // top triangle
+      triangles[(i-1)*4].a = 0;
+      triangles[(i-1)*4].b = 2 + n*2 + 0;
+      triangles[(i-1)*4].c = 2 + (i-1)*2 + 0;
 
-          // first side triangle
-          triangles[(i-1)*4 + 2].a = 2 + i*2 + 0;
-          triangles[(i-1)*4 + 2].b = 2 + i*2 + 1;
-          triangles[(i-1)*4 + 2].c = 2 + (i-1)*2 + 0;
+      // bottom triangle
+      triangles[(i-1)*4 + 1].c = 1;
+      triangles[(i-1)*4 + 1].b = 2 + n*2 + 1;
+      triangles[(i-1)*4 + 1].a = 2 + (i-1)*2 + 1;
 
-          // second side triangle
-          triangles[(i-1)*4 + 3].c = 2 + i*2 + 1;
-          triangles[(i-1)*4 + 3].b = 2 + (i-1)*2 + 0;
-          triangles[(i-1)*4 + 3].a = 2 + (i-1)*2 + 1;
-        }
+      // first side triangle
+      triangles[(i-1)*4 + 2].a = 2 + n*2 + 0;
+      triangles[(i-1)*4 + 2].b = 2 + n*2 + 1;
+      triangles[(i-1)*4 + 2].c = 2 + (i-1)*2 + 0;
 
-        // top triangle
-        triangles[(hub_vertices-1)*4].a = 2;
-        triangles[(hub_vertices-1)*4].b = 2 + (hub_vertices-1)*2 + 0;
-        triangles[(hub_vertices-1)*4].c = 0;
-
-        // bottom triangle
-        triangles[(hub_vertices-1)*4 + 1].a = 1;
-        triangles[(hub_vertices-1)*4 + 1].b = 2 + (hub_vertices-1)*2 + 1;
-        triangles[(hub_vertices-1)*4 + 1].c = 2 + 1;
-
-        // first side triangle
-        triangles[(hub_vertices-1)*4 + 2].a = 2;
-        triangles[(hub_vertices-1)*4 + 2].b = 2 + (hub_vertices-1)*2 + 1;
-        triangles[(hub_vertices-1)*4 + 2].c = 2 + (hub_vertices-1)*2 + 0;
-        // second side triangle
-        triangles[(hub_vertices-1)*4 + 3].a = 2 + (hub_vertices-1)*2 + 1;
-        triangles[(hub_vertices-1)*4 + 3].b = 2;
-        triangles[(hub_vertices-1)*4 + 3].c = 2 + 1;
-      }
+      // second side triangle
+      triangles[(i-1)*4 + 3].c = 2 + n*2 + 1;
+      triangles[(i-1)*4 + 3].b = 2 + (i-1)*2 + 0;
+      triangles[(i-1)*4 + 3].a = 2 + (i-1)*2 + 1;
     }
 
     cylinderLook->Invalidate();
     cylinderLook->CalculateNormals ();
-      
-    if (seam) 
-    {
-      csVector3* n = cylinderLook->GetNormals();
-      n[2] += n[2 + hub_vertices*2 + 0];
-      n[3] += n[2 + hub_vertices*2 + 1];
 
-      n[2] /= 2;
-      n[3] /= 2;
+    /*
+    csVector3* n = cylinderLook->GetNormals();
+    n[2] += n[2 + hub_vertices*2 + 0];
+    n[3] += n[2 + hub_vertices*2 + 1];
 
-      n[2 + hub_vertices*2 + 0] = n[2];
-      n[2 + hub_vertices*2 + 1] = n[3];
-    }
+    n[2] /= 2;
+    n[3] /= 2;
+
+    n[2 + hub_vertices*2 + 0] = n[2];
+    n[2 + hub_vertices*2 + 1] = n[3];
+    */
 
     csRef<iMeshWrapper> meshwrapper = engine->CreateMeshWrapper (
             cylinder_factory, name.c_str(), sector, csVector3(0,0,0));
@@ -246,7 +199,7 @@ void csMetaCylinder::Setup(csVosA3DL* vosa3dl, csVosSector* sect)
   int hub_vertices = 24;
 
   LOG("csMetaCylinder", 3, "setting up cylinder");
-  ConstructCylinderTask *t = new ConstructCylinderTask(vosa3dl->GetObjectRegistry(), 
+  ConstructCylinderTask *t = new ConstructCylinderTask(vosa3dl->GetObjectRegistry(),
                                     mat, this, getURLstr(), sect->GetSector(),
                                     hub_vertices);
 

@@ -118,12 +118,12 @@ bool csVosA3DL::Initialize (iObjectRegistry *o)
                                    &csMetaBillboard::new_csMetaBillboard);
   Site::addRemoteMetaObjectFactory("a3dl:object3D.model", "a3dl:object3D.model",
                                    &csMetaModel::new_csMetaModel);
-  Site::addRemoteMetaObjectFactory("a3dl:object3D.sphere", 
+  Site::addRemoteMetaObjectFactory("a3dl:object3D.sphere",
                                    "a3dl:object3D.sphere",
                                    &csMetaSphere::new_csMetaSphere);
   Site::addRemoteMetaObjectFactory("a3dl:object3D.cylinder",
                                    "a3dl:object3D.cylinder",
-                                   &csMetaCylinder::new_csMetaCylinder);
+                                   &csMetaCone::new_csMetaCone);
   Site::addRemoteMetaObjectFactory("a3dl:texture", "a3dl:texture",
                                    &csMetaTexture::new_csMetaTexture);
   Site::addRemoteMetaObjectFactory("a3dl:material", "a3dl:material",
