@@ -38,6 +38,8 @@ The history order has been reversed so that new features are at the top.
 	      file viewer.
 	- Eric Sunshine overhauled README.htm.  Added a large number of
 	  missing links.  Made aesthetic improvements.
+	- Eric Sunshine fixed several Texinfo mark-up problems in
+	  worldcmp.txi.  Also cleaned up and rewrote some of the discussion.
 7-Sep-2000
 	- Continued work on saver in levtool.  The saved world file works very
 	  well already.  But a few important things are still missing (like
