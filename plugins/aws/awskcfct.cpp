@@ -94,3 +94,7 @@ awsKeyFactory::AddConnectionKey(iString *name, iAwsSink *s, unsigned long t, uns
   }
 }
 
+awsComponentNode *
+awsKeyFactory::GetThisNode()
+{ return base; }
+

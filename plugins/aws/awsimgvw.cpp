@@ -172,7 +172,7 @@ SCF_IMPLEMENT_IBASE_END
 
 awsImageViewFactory::awsImageViewFactory(iAws *wmgr):awsComponentFactory(wmgr)
 {
-  Register("Command Button");
+  Register("Image View");
   RegisterConstant("ivfsBump",  awsImageView::fsBump);
   RegisterConstant("ivfsSimple", awsImageView::fsSimple);
   RegisterConstant("ivfsRaised",  awsImageView::fsRaised);

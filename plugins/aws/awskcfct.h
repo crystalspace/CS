@@ -54,6 +54,9 @@ public:
    virtual void AddPointKey(iString *name, csPoint v);
    /// Add a connection key
    virtual void AddConnectionKey(iString *name, iAwsSink *s, unsigned long t, unsigned long sig);
+   /// Get the base node
+   awsComponentNode *GetThisNode();
+   
 };
 
 #endif

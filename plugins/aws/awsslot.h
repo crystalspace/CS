@@ -31,6 +31,7 @@
 *                                                                                                                    *
 *********************************************************************************************************************/
 
+/// This is the sink manager, which controls all registered sinks.
 class awsSinkManager : public iAwsSinkManager
 {
   struct SinkMap
@@ -72,6 +73,7 @@ public:
   } scfiComponent;
 };
 
+/// This is the implementation of a signal sink.  It handles trigger registration and dispatch.
 class awsSink : public iAwsSink
 {
   struct TriggerMap
@@ -91,6 +93,7 @@ class awsSink : public iAwsSink
 public:
   SCF_DECLARE_IBASE;
 
+  /// P is the parm that is passed to triggers
   awsSink(void *p);
   virtual ~awsSink();
 
@@ -105,6 +108,7 @@ public:
   
 };
 
+/// This is the signal source implementation, subclassed by all components.
 class awsSource : public iAwsSource
 {
    /// Owner
