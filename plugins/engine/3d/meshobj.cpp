@@ -356,6 +356,18 @@ csRenderMesh** csMeshWrapper::GetRenderMeshes (int& n, iRenderView* rview,
 
     csTicks lt = csEngine::current_engine->GetLastAnimationTime ();
     meshobj->NextFrame (lt,movable.GetPosition ());
+    
+    iMeshWrapper *meshwrap = &scfiMeshWrapper;
+    last_anim_time = lt;
+    iMeshWrapper* lastparent = meshwrap;
+    iMeshWrapper* parent = GetParentContainer();
+    while(parent != 0)
+    {
+      parent->GetMeshObject()->PositionChild(lastparent->GetMeshObject(),lt);
+      lastparent = parent;
+      parent = parent->GetParentContainer();
+    }
+    
     return meshobj->GetRenderMeshes (n, rview, mov);
 /*  }
   return 0;*/

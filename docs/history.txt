@@ -21,6 +21,8 @@ chronological order.
 	  falls back to unsafe void* if and only if the compiler fails to grok
 	  the strongly typed approach.  The functor wrapper hides this MSVC6
 	  anomaly from client code.
+	- Steven Geens made sprite socket update their position in the new
+	  renderer.
 30-Mar-2004
 	- Eric Sunshine added missing "#define CS_SYSDEF_PROVIDE_SOFTWARE2D"
 	  to null_render3d.cpp.  Reported by Steven Geens.
