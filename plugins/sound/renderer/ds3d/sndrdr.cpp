@@ -78,7 +78,6 @@ bool csSoundRenderDS3D::Initialize(iObjectRegistry *r)
   {
     q->RegisterListener (scfiEventHandler,
       CSMASK_Command | CSMASK_Broadcast | CSMASK_Nothing);
-    q->DecRef ();
   }
   LoadFormat.Bits = -1;
   LoadFormat.Freq = -1;
@@ -93,10 +92,7 @@ csSoundRenderDS3D::~csSoundRenderDS3D()
   {
     csRef<iEventQueue> q = CS_QUERY_REGISTRY(object_reg, iEventQueue);
     if (q != 0)
-    {
       q->RemoveListener (scfiEventHandler);
-      q->DecRef ();
-    }
     scfiEventHandler->DecRef ();
   }
   Close();
@@ -124,7 +120,6 @@ bool csSoundRenderDS3D::Open()
         csPrintf (
 		"Error : Cannot Initialize DirectSound3D (%s).\n", GetError(r));
       Close();
-      if (reporter) reporter->DecRef ();
       return false;
     }
 
@@ -140,7 +135,6 @@ bool csSoundRenderDS3D::Open()
 	csPrintf (
 		"Error : Cannot Set Cooperative Level (%s).\n", GetError(r));
       Close();
-      if (reporter) reporter->DecRef ();
       return false;
     }
   }
@@ -150,7 +144,6 @@ bool csSoundRenderDS3D::Open()
     Listener = new csSoundListenerDS3D(this);
     if (!Listener->Initialize(this))
     {
-      if (reporter) reporter->DecRef ();
       return false;
     }
   }
@@ -168,7 +161,6 @@ bool csSoundRenderDS3D::Open()
   ct = vc->GetCurrentTicks ();
   vc->DecRef ();
   LastTime = ct;
-  if (reporter) reporter->DecRef ();
 
   return true;
 }
@@ -240,7 +232,6 @@ void csSoundRenderDS3D::Update()
   csRef<iVirtualClock> vc = CS_QUERY_REGISTRY (object_reg, iVirtualClock);
   et = vc->GetElapsedTicks ();
   ct = vc->GetCurrentTicks ();
-  vc->DecRef ();
   csTicks ETime = ct - LastTime;
   LastTime = ct;
 

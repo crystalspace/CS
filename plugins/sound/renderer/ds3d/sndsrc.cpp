@@ -63,10 +63,7 @@ void csSoundSourceDS3D::Report (int severity, const char* msg, ...)
   csRef<iReporter> rep = CS_QUERY_REGISTRY (Renderer->object_reg,
   	iReporter);
   if (rep)
-  {
     rep->ReportV (severity, "crystalspace.sound.ds3d", msg, arg);
-    rep->DecRef ();
-  }
   else
   {
     csPrintfV (msg, arg);
