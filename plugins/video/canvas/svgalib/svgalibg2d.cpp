@@ -69,7 +69,6 @@ bool csGraphics2DSVGALib::Initialize (iSystem *pSystem)
   if (!csGraphics2D::Initialize (pSystem))
     return false;
 
-  Font = 0;
   Memory = NULL;
 
   // SVGALIB Starts here
