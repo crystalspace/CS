@@ -38,6 +38,10 @@ The history order is reversed so that new features are at the top.
 	- res augmented the Win32 Alert() facility (i.e. message boxes) to 
 	  honor okMsg (that is, you can now give the OK button a different 
 	  text.)
+	- Anders Stenberg finally fixed an annoying bug in the new renderer
+	  causing errors in the the 2x2 mipmap. The problem was that 
+	  GL_UNPACK_ALIGNMENT wasn't changed from the default of 4 byte 
+	  alignment. (Thanks res for the help.)
 29-May-2003
 	- Oktal removed the clean target from from swig.jam as it was deleting
 	  the Swig-generated Python and Perl source files.
