@@ -167,7 +167,7 @@ char** csGetPluginPaths ()
     
   paths[0] = temp;
   paths[1] = configpath;
-  paths[2] = ".";
+  paths[2] = csStrNew (".");
   paths[3] = 0;
 
   return paths;
