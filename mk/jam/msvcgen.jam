@@ -50,11 +50,11 @@ MSVCGEN_BUILD_ROOT ?= [ ConcatDirs $(BUILDTOP) out ] ;
 
 ## MsvcGenConfig variable [ : value ]
 ##   Specify additional configuration information to augment the msvcgen
-##   environment.  The named 'variable' is set to 'value' for the msvcgen run.
-##   If 'value' is omitted, then 'variable' is cleared.  Invocations of
-##   MsvcGenConfig are cumulative, so variable/value tuples can be provided
-##   incrementally.  It is legal to use this rule in conjunction with
-##   MsvcGenConfigFile; they are not mutually exclusive.
+##   environment.  The Jam variable named by 'variable' is set to 'value' for
+##   the msvcgen run.  If 'value' is omitted, then 'variable' is cleared.
+##   Invocations of MsvcGenConfig are cumulative, so variable/value tuples can
+##   be provided incrementally.  It is legal to use this rule in conjunction
+##   with MsvcGenConfigFile; they are not mutually exclusive.
 ##
 ##   The most common reason to invoke this rule is to provide MSVC-specific
 ##   fallback values for the library checks typically performed by an Autoconf
@@ -79,12 +79,25 @@ rule MsvcGenConfig1 { }
 ## MsvcGenConfigFile file
 ##   Similar to MsvcGenConfig, except that the configuration is provided via a
 ##   file containing Jam statements.  In the common case, the file will contain
-##   a series of simple variable assignment statements.  May be invoked
+##   a series of simple Jam variable assignment statements.  May be invoked
 ##   multiple times to specify additional configuration files.  It is legal to
 ##   use this rule in conjunction with MsvcGenConfig; they are not mutually
 ##   exclusive.
 rule MsvcGenConfigFile { MsvcGenConfigFile1 $(1) : $(2) ; }
 rule MsvcGenConfigFile1 { }
+
+## MsvcGenVariable variable [ : value ]
+##   Define a %foo%-style variable for direct interpolation into msvcgen
+##   template files.  'variable' is the name of the variable to define (sans
+##   "%" decorations).  For instance, if 'variable' is "foobar", then it can be
+##   referenced in template files as %foobar%.  'value' is the value which
+##   should be assigned to 'variable'.  If 'value' is omitted, then 'variable'
+##   is defined as the null (empty) string.  You may invoke this rule multiple
+##   times to define any number of interpolation variables.  If you invoke it
+##   multiple times for the same variable name, then the individually-specified
+##   values are collected to form a single value (delimited by whitespace).
+rule MsvcGenVariable { MsvcGenVariable1 $(1) : $(2) ; }
+rule MsvcGenVariable1 { }
 
 ## MsvcGenWorkspace name [ : accepts [ : rejects ]]
 ##   Specify the name of a workspace which the 'msvcgen' target should create.
@@ -397,6 +410,13 @@ SetProperty build : projgen_version : $(MSVC_VERSION) ;
 rule MsvcGenConfig
 {
   $(<) = $(>) ;
+}
+
+## MsvcGenVariable variable [ : value ]
+##   (See documentation above.)
+rule MsvcGenVariable1
+{
+  MSVCGEN_VARIABLES += "$(<)=$(>)" ;
 }
 
 ## MsvcGenWorkspace name [ : accepts [ : rejects ]]
@@ -912,7 +932,8 @@ actions MsvcProjectGen
   --set=debugcflags='%null%$(CFLAGS_DEBUG)' \
   --set=debugcflags='%null%$(INCDIRS)' \
   --set=sourceroot='$(RELPATH)' \
-  --set=buildroot='$(RELPATH)'
+  --set=buildroot='$(RELPATH)' \
+  --set='$(MSVCGEN_VARIABLES)'
 }
 
 actions together MsvcWorkspaceGen
@@ -925,7 +946,8 @@ actions together MsvcWorkspaceGen
   --template-dir=$(MSVCGEN_TEMPLATEDIR) \
   --accept='%null%$(MSVC.ACCEPTS.$(RAWNAME))' \
   --reject='%null%$(MSVC.REJECTS.$(RAWNAME))' \
-  --response-file=$(>)
+  --response-file=$(>) \
+  --set='$(MSVCGEN_VARIABLES)'
 }
 
 actions together MergeResources
