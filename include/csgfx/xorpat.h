@@ -24,3 +24,4 @@
 extern iImage* csCreateXORPatternImage(int width, int height, int patsize);
 
 #endif
+
