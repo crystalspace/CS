@@ -111,6 +111,6 @@ the Mingw32 makefile.  Check the the following variables:
 
 Adjust them to match your system libraries.  For example, if you use the
 SGI OpenGL SDK instead of Microsoft's OpenGL, change @code{-lopengl32}
-and  @code{-lglut32} to @code{-lopengl and @code{-lglut} in
+and  @code{-lglut32} to @code{-lopengl} and @code{-lglut} in
 @code{LIBS.GL3D.SYSTEM}. Also in the file @file{CS\mk\user.mak} select
 which plugins you wish to compile.
