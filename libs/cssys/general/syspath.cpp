@@ -22,7 +22,8 @@
 #include "cssys/syspath.h"
 
 #include <stdio.h>
-#include <direct.h>
+#include <unistd.h>
+#include <limits.h>
 
 char* csExpandPath (const char* path)
 {
@@ -55,7 +56,9 @@ char* csExpandPath (const char* path)
 
 char* csGetAppPath ()
 {
-  const char* app = csStrNew (__argv[0]);
+  // FIXME const char* app = csStrNew (__argv[0]);
+  char cwd[PATH_MAX];
+  const char *app = csStrNew (getcwd(cwd, PATH_MAX));
   char* fullPath = 0;
 
   if (!app) return 0;
