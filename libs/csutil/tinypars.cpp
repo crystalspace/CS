@@ -184,7 +184,7 @@ bool TiXmlBase::StringEqualIgnoreCase( const char* p,
 		return false;
 	}
 
-	while ( && tolower( *p ) == tolower( *tag ) && *p )
+	while ( tolower( *p ) == tolower( *tag ) && *p )
 	{
 		++p;
 		++tag;
