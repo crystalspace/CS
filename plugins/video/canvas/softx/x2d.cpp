@@ -1028,13 +1028,19 @@ static Bool CheckKeyPress (Display *dpy, XEvent *event, XPointer arg)
 //    are needed in order to catch "WM_DELETE_WINDOW")
 static Bool AlwaysTruePredicate (Display*, XEvent*, char*) { return True; }
 
+//#define DO_STUFF_EXTENDED_KEYCODE
 bool csGraphics2DXLib::HandleEvent (csEvent &/*Event*/)
 {
   static int button_mapping[6] = {0, 1, 3, 2, 4, 5};
   XEvent event;
   int state, key;
+  bool cskey=true;
   bool down;
   bool resize = false;
+
+#ifdef DO_STUFF_EXTENDED_KEYCODE
+  unsigned char keytranslated;
+#endif
 
   while (XCheckIfEvent (dpy, &event, AlwaysTruePredicate, 0))
     switch (event.type)
@@ -1074,8 +1080,12 @@ bool csGraphics2DXLib::HandleEvent (csEvent &/*Event*/)
 	// in favour of KeyDown since this is most (sure?) an autorepeat
         XCheckIfEvent (event.xkey.display, &event, CheckKeyPress, (XPointer)&event);
         down = (event.type == KeyPress);
+#ifdef DO_STUFF_EXTENDED_KEYCODE
+        XLookupString ((XKeyEvent*)&event, (char*)&keytranslated, 1, (KeySym*)&key, NULL);
+#else
         key = XLookupKeysym (&event.xkey, 0);
         state = event.xkey.state;
+#endif
         switch (key)
         {
           case XK_Meta_L:
@@ -1133,9 +1143,16 @@ bool csGraphics2DXLib::HandleEvent (csEvent &/*Event*/)
           case XK_F10:        key = CSKEY_F10; break;
           case XK_F11:        key = CSKEY_F11; break;
           case XK_F12:        key = CSKEY_F12; break;
-          default:            break;
+          default:            cskey=false; break;
         }
+#ifdef DO_STUFF_EXTENDED_KEYCODE
+        if ( cskey )
+	  System->QueueKeyEvent (key, down);
+	else
+  	  System->QueueExtendedKeyEvent (key, (int)keytranslated, down);
+#else
 	System->QueueKeyEvent (key, down);
+#endif
         break;
       case FocusIn:
       case FocusOut:
