@@ -32,6 +32,7 @@ class csTextureHandle;
 class csWorld;
 class csSector;
 class csDynLight;
+class csLight;
 class csRenderView;
 
 /**
@@ -495,6 +496,12 @@ protected:
   float time_left; // from previous update
   int next_oldest;
 
+  /// light
+  csLight *light;
+  int light_time;
+  bool delete_light;
+  csWorld *light_world;
+
   int FindOldest();
   void RestartParticle(int index, float pre_move);
   void MoveAndAge(int index, float delta_t);
@@ -524,6 +531,13 @@ public:
    * Update
    */
   virtual void Update (time_t elapsed_time);
+
+  /// You can set a pseudo-static light here
+  void SetControlledLight(csLight *l) {light = l;}
+  /** Add a new dynamic light (no need to call SetControlledLight). 
+   *  NB Will not move upon SetSector.
+   */
+  void AddLight(csWorld *world, csSector *sec);
 
   CSOBJTYPE;
 };

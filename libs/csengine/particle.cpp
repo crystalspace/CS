@@ -396,7 +396,6 @@ void csParSysExplosion :: Update(time_t elapsed_time)
   if(self_destruct && time_to_live < light_fade)
     newcol *= 1.0 - (light_fade - time_to_live)/((float)light_fade);
   explight->SetColor(newcol);
-  explight->Setup();
 }
 
 
@@ -699,6 +698,9 @@ csFireParticleSystem :: csFireParticleSystem(csObject* theParent,
   )
   : csParticleSystem(theParent)
 {
+  light = NULL;
+  light_world = NULL;
+  delete_light = false;
   part_pos = new csVector3[number];
   part_speed = new csVector3[number];
   part_age = new float[number];
@@ -717,10 +719,17 @@ csFireParticleSystem :: csFireParticleSystem(csObject* theParent,
   }
   time_left = 0.0;
   next_oldest = 0;
+  light_time = (int) (3000.0 *rand() / (1.0 + RAND_MAX));
 }
 
 csFireParticleSystem :: ~csFireParticleSystem()
 {
+  if(light && delete_light)
+  {
+    light_world->RemoveDynLight( (csDynLight*)light);
+    delete light;
+    light = NULL;
+  }
   delete[] part_pos;
   delete[] part_speed;
   delete[] part_age;
@@ -784,6 +793,16 @@ int csFireParticleSystem :: FindOldest()
 void csFireParticleSystem :: Update(time_t elapsed_time)
 {
   csParticleSystem::Update(elapsed_time);
+  if(light)
+  {
+    light_time += elapsed_time;
+    csColor newcol;
+    newcol.red =   1.0 - 0.3*sin(light_time/10. + origin.x);
+    newcol.green = 0.7 - 0.3*sin(light_time/15. + origin.y);
+    newcol.blue =  0.3 + 0.3*sin(light_time/10. + origin.z);
+    light->SetColor(newcol);
+  }
+
   float delta_t = elapsed_time / 1000.0f; // in seconds
   // move particles;
   int i;
@@ -803,3 +822,16 @@ void csFireParticleSystem :: Update(time_t elapsed_time)
   time_left = todo_time;
 }
 
+
+void csFireParticleSystem :: AddLight(csWorld *world, csSector *sec)
+{
+  if(light) return;
+  csDynLight *explight = new csDynLight(origin.x, origin.y, origin.z, 
+    5, 1, 1, 0);
+  world->AddDynLight(explight);
+  explight->SetSector(sec);
+  explight->Setup();
+  light = explight;
+  delete_light = true;
+  light_world = world;
+}
