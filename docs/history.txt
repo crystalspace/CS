@@ -6,6 +6,9 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+13-Mar-2004
+    - John Harger fixed the nVidia part of the PS1 plugin so that it will
+      use the correct texture target on a 'tex' instruction.
 12-Mar-2004
 	- res augmented configure.ac to look for the OpenAL, Cg, and CgGL
 	  libraries under a couple different names (differing by case) to

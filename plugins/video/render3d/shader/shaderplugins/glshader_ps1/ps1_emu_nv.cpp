@@ -103,6 +103,10 @@ void csShaderGLPS1_NV::SetupState (csRenderMesh *mesh,
       }
     }
   }
+
+  // Has to go here at least the first time so that we can find
+  // the correct texture targets
+  ActivateTextureShaders ();
 }
 
 void csShaderGLPS1_NV::ResetState ()
@@ -111,6 +115,15 @@ void csShaderGLPS1_NV::ResetState ()
 
 void csShaderGLPS1_NV::ActivateTextureShaders ()
 {
+  if(tex_program_num!=0xffffffff)
+  {
+    glCallList(tex_program_num);
+    return;
+  }
+
+  tex_program_num = program_num + 1;
+  glNewList (tex_program_num, GL_COMPILE);
+
   csGLExtensionManager *ext = shaderPlug->ext;
 
   int i;
@@ -134,7 +147,7 @@ void csShaderGLPS1_NV::ActivateTextureShaders ()
       break;
     case CS_PS_INS_TEX:
       glTexEnvi(GL_TEXTURE_SHADER_NV, GL_SHADER_OPERATION_NV,
-        GL_TEXTURE_2D);
+        GetTexTarget ());
       break;
     case CS_PS_INS_TEXBEM:
       glTexEnvi(GL_TEXTURE_SHADER_NV, GL_SHADER_OPERATION_NV,
@@ -231,7 +244,26 @@ void csShaderGLPS1_NV::ActivateTextureShaders ()
       break;
     }
   }
+
+  glEndList();
 }
+
+GLenum csShaderGLPS1_NV::GetTexTarget()
+{
+  if(glIsEnabled(GL_TEXTURE_CUBE_MAP_ARB))
+		return GL_TEXTURE_CUBE_MAP_ARB;
+	if(glIsEnabled(GL_TEXTURE_3D))
+		return GL_TEXTURE_3D;
+	if(glIsEnabled(GL_TEXTURE_RECTANGLE_NV))
+		return GL_TEXTURE_RECTANGLE_NV;
+	if(glIsEnabled(GL_TEXTURE_2D))
+		return GL_TEXTURE_2D;
+	if(glIsEnabled(GL_TEXTURE_1D))
+		return GL_TEXTURE_1D;
+
+  return GL_NONE;
+}
+
 
 bool csShaderGLPS1_NV::GetTextureShaderInstructions (
   const csArray<csPSProgramInstruction> &instrs)
@@ -603,14 +635,12 @@ bool csShaderGLPS1_NV::LoadProgramStringToGL (const char* programstring)
 
   if(stages.Length () < 1) return false;
 
-  program_num = glGenLists (1);
+  program_num = glGenLists (2);
   if(program_num < 1) return false;
 
   csGLExtensionManager *ext = shaderPlug->ext;
 
   glNewList(program_num, GL_COMPILE);
-
-  ActivateTextureShaders ();
 
   int num_combiners = 1;
   int prev_combiner = 0;

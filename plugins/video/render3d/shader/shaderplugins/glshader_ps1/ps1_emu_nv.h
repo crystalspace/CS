@@ -30,6 +30,7 @@ class csShaderGLPS1_NV : public csShaderGLPS1_Common
 {
 private:
   GLuint program_num;
+  GLuint tex_program_num;
 
   struct nv_input
   {
@@ -86,13 +87,16 @@ private:
     const csArray<csPSProgramInstruction> &instrs);
   bool GetNVInstructions (csArray<nv_combiner_stage> &stages,
     const csArray<csPSProgramInstruction> &instrs);
+  GLenum GetTexTarget();
 public:
   csShaderGLPS1_NV (csGLShader_PS1* shaderPlug)
     : csShaderGLPS1_Common(shaderPlug) 
   {
+    tex_program_num = 0xffffffff;
   }
   virtual ~csShaderGLPS1_NV ()
   {
+    glDeleteLists(program_num, 2);
   }
 
   bool LoadProgramStringToGL( const char* programstring );
