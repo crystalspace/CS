@@ -383,6 +383,11 @@ public:
     GetUsedSVContext().PopVariables (stacks); 
   }
 
+  bool IsEmpty() const
+  {
+    return GetUsedSVContext().IsEmpty();
+  }
+
   /// Return some info on this shader
   void DumpStats (csString& str);
   csRef<iDocumentNode> LoadProgramFile (const char* filename);

@@ -18,6 +18,8 @@ chronological order.
 	- res undid the csuctransform.h tweak and disabled "builtin wchar_t"
 	  for CS. Also disables wchar_t overloads for 
 	  csUnicodeTransform::Encode()/Decode() on VC.
+	- res added an optimization where a per-meshwrapper SV context is not
+	  considered if it's empty.
 10-Mar-2005
 	- Fixed flarge so that the name of the 'fire' texture plugin
 	  no longer conflicts with the name of the 'fire' mesh loader plugin

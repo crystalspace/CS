@@ -207,10 +207,8 @@ void csGenericRenderStep::RenderMeshes (iGraphics3D* g3d,
     {
       csRenderMesh* mesh = meshes[j];
       iShaderVariableContext* meshContext = meshContexts[j];
-      /*if (meshContext->GetShaderVariables().Length() == 0)
-	meshContext = 0;*/ 
-	// can't use that optimization as mesh factory SVs aren't reflected
-	// in that array atm
+      if (meshContext->IsEmpty())
+	meshContext = 0;
       if ((!portalTraversal) && mesh->portal != 0) continue;
       csShaderVariable *sv;
       
@@ -327,7 +325,8 @@ public:
       lastShader = shader;
       lastMeshContext = meshContext;
     }
-    if (mesh->variablecontext.IsValid ())
+    if (mesh->variablecontext.IsValid () 
+      && !mesh->variablecontext->IsEmpty())
     {
       shader->PushVariables (stacks);
       material->PushVariables (stacks);

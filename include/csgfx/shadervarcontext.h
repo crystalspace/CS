@@ -67,8 +67,9 @@ public:
   * Pop the variables of this context off the variable stacks
   * supplied in the "stacks" argument
   */
-  virtual void PopVariables 
-    (csShaderVarStack &stacks) const;
+  virtual void PopVariables (csShaderVarStack &stacks) const;
+
+  virtual bool IsEmpty() const { return variables.Length() == 0; }
 };
 
 #endif // __CS_CSGFX_SHADERVARCONTEXT_H__

@@ -157,6 +157,9 @@ public:
   void PopVariables (csShaderVarStack &stacks) const
     { svcontext.PopVariables (stacks); }
 
+  bool IsEmpty () const 
+  { return svcontext.IsEmpty(); }
+
   //==================== iComponent ====================//
   bool Initialize (iObjectRegistry* objreg);
 

@@ -1315,37 +1315,38 @@ void csXMLShader::ScanForTechniques (iDocumentNode* templ,
  */
 class SVCWrapper : public iShaderVariableContext
 {
-  iShaderVariableContext* wrappedSVC;
+  csShaderVariableContext& wrappedSVC;
 public:
   csShaderVarStack svStack;
 
   SCF_DECLARE_IBASE;
-  SVCWrapper (iShaderVariableContext* wrappedSVC)
+  SVCWrapper (csShaderVariableContext& wrappedSVC) : wrappedSVC (wrappedSVC)
   {
     SCF_CONSTRUCT_IBASE(0);
-    SVCWrapper::wrappedSVC = wrappedSVC;
-    wrappedSVC->PushVariables (svStack);
+    wrappedSVC.PushVariables (svStack);
   }
   virtual ~SVCWrapper ()
   {
-    wrappedSVC->PopVariables (svStack);
+    wrappedSVC.PopVariables (svStack);
     SCF_DESTRUCT_IBASE();
   }
 
   virtual void AddVariable (csShaderVariable *variable)
   {
-    wrappedSVC->PopVariables (svStack);
-    wrappedSVC->AddVariable (variable);
-    wrappedSVC->PushVariables (svStack);
+    wrappedSVC.PopVariables (svStack);
+    wrappedSVC.AddVariable (variable);
+    wrappedSVC.PushVariables (svStack);
   }
   virtual csShaderVariable* GetVariable (csStringID name) const
-  { return wrappedSVC->GetVariable (name); }
+  { return wrappedSVC.GetVariable (name); }
   virtual const csRefArray<csShaderVariable>& GetShaderVariables () const
-  { return wrappedSVC->GetShaderVariables (); }
+  { return wrappedSVC.GetShaderVariables (); }
   virtual void PushVariables (csShaderVarStack &stacks) const
-  { wrappedSVC->PushVariables (stacks); }
+  { wrappedSVC.PushVariables (stacks); }
   virtual void PopVariables (csShaderVarStack &stacks) const
-  { wrappedSVC->PopVariables (stacks); }
+  { wrappedSVC.PopVariables (stacks); }
+  virtual bool IsEmpty() const
+  { return wrappedSVC.IsEmpty(); }
 };
 
 SCF_IMPLEMENT_IBASE(SVCWrapper)
@@ -1354,7 +1355,7 @@ SCF_IMPLEMENT_IBASE_END
 
 void csXMLShader::ParseGlobalSVs ()
 {
-  SVCWrapper wrapper (&globalSVContext);
+  SVCWrapper wrapper (globalSVContext);
   resolver->SetEvalParams (0, &wrapper.svStack);
   compiler->LoadSVBlock (shaderSource, &wrapper);
   resolver->SetEvalParams (0, 0);
@@ -1378,7 +1379,7 @@ size_t csXMLShader::GetTicket (const csRenderMeshModes& modes,
 
       csArray<TechniqueKeeper> techniquesTmp;
       ScanForTechniques (shaderSource, techniquesTmp, forcepriority);
-
+		      
       csArray<TechniqueKeeper>::Iterator techIt = techniquesTmp.GetIterator ();
       while (techIt.HasNext ())
       {

@@ -97,6 +97,9 @@ struct iShaderVariableContext : public iBase
   * supplied in the "stacks" argument
   */
   virtual void PopVariables (csShaderVarStack &stacks) const = 0;
+
+  /// Determine whether this SV contains any variables at all.
+  virtual bool IsEmpty () const = 0;
 };
 
 SCF_VERSION (iShaderManager, 0, 1, 0);

@@ -690,6 +690,12 @@ public:
     if (factorySVC.IsValid()) factorySVC->PopVariables (stacks);
   }
 
+  bool IsEmpty () const 
+  {
+    return svcontext.IsEmpty() 
+      || (factorySVC.IsValid() && factorySVC->IsEmpty());
+  }
+
   //--------------------- iMeshWrapper implementation --------------------//
   struct MeshWrapper : public iMeshWrapper
   {
@@ -1046,6 +1052,9 @@ public:
    */
   void PopVariables (csShaderVarStack &stacks) const
   { svcontext.PopVariables (stacks); }
+
+  bool IsEmpty () const 
+  { return svcontext.IsEmpty(); }
 
   //----------------- iMeshFactoryWrapper implementation --------------------//
   struct MeshFactoryWrapper : public iMeshFactoryWrapper
