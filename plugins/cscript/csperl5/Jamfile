@@ -63,9 +63,9 @@ if $(PERL5.AVAILABLE) = "yes" && ! [ Property build : projgen ]
 
   local perlxs = [ FGristFiles csperlxs.c ] ;
   PerlEmbedGlueFile $(perlxs) ;
-  Includes $(perlxs) : $(target) ;
   
   Help csperl5 : "Crystal Script Perl5 plug-in" ;
+  Includes [ DoSourceGrist cswigpl5.cpp ] : $(target) ;
   Plugin csperl5 : $(perlxs) csperl5.cpp csperl5.h cswigpl5.cpp ;
   LinkWith csperl5 : cstool csgfx csgeom csutil ;
   ExternalLibs csperl5 : PERL5 ;
