@@ -4223,6 +4223,7 @@ package cspace::iLight;
 *CreateCrossHalo = *cspacec::iLight_CreateCrossHalo;
 *CreateNovaHalo = *cspacec::iLight_CreateNovaHalo;
 *CreateFlareHalo = *cspacec::iLight_CreateFlareHalo;
+*GetHalo = *cspacec::iLight_GetHalo;
 *GetBrightnessAtDistance = *cspacec::iLight_GetBrightnessAtDistance;
 *GetFlags = *cspacec::iLight_GetFlags;
 *SetLightCallback = *cspacec::iLight_SetLightCallback;
