@@ -91,7 +91,10 @@ bool csPerfStats::Initialize (iSystem *system)
 
 bool csPerfStats::HandleEvent (csEvent &event)
 {
-  (void)event;
+  if (event.Type != csevBroadcast
+   || event.Command.Code != cscmdPostProcess)
+    return false;
+
   if (!paused)
   {
     time_t elapsed_time, current_time;
