@@ -22,6 +22,9 @@ The history order is reversed so that new features are at the top.
 	- Eric Sunshine fixed msvcgen templates so that they provide the
 	  resource compiler with sufficient information so that the headers
 	  #included by the .rc files can be found.
+	- Eric Sunshine fixed mk/msvcgen/win32.mak so that the libcssys project
+	  file is once again created correctly following the replacement of
+	  DSP.PROJECT.RESOURCES with $(PROJECT.EXE).WINRSRC.
 4-Aug-2002
 	- Eric Sunshine made the following changes to mk/msvcgen/msvcgen.mak
 	  and msvc7gen.mak:
