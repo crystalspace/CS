@@ -16,6 +16,10 @@ chronological order.
 	      contents of the portal would be incorrect.
 	  Unfortunatelly both fixes don't yet solve floating portals completely
 	  with NR. Have to investigate further.
+	- Jorrit applied a patch to walktest from Pascal Kirchdorfer
+	  (kirchdorfer@users.sourceforge.net). This patch makes sure walktest
+	  again correctly resizes when the window is resized. This was broken
+	  when this resizing functionality was added to csView by Pascal.
 14-Jun-2004
 	- Jorrit implemented correct static lighting for static lod. In case
 	  of casting shadows, the lowest detail object that has a shadow
