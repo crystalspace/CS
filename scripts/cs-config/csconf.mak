@@ -37,7 +37,7 @@ ifeq ($(MAKESECTION),targets)
 .PHONY: csconfig csconfigclean $(CSCONFIG.EXE)
 
 all: $(CSCONFIG.EXE)
-csconfig: $(OUTDIRS) $(CSCONFIG.EXE)
+csconfig: $(CSCONFIG.EXE)
 clean: csconfigclean
 
 # create out/csconfig.tmp for the makevars that need to be transferred
