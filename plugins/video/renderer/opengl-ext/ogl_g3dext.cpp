@@ -50,6 +50,7 @@
 #include "csutil/util.h"
 
 #include "ogl_g3dext.h"
+#include "gl_clipperobj_ext.h"
 
 /* -----------------------------------------------------------------
  * Preprocessor Defines
@@ -94,29 +95,15 @@ csGraphics3DGLext::csGraphics3DGLext (iBase *parent ) :
   G2D (NULL)
 {
   SCF_CONSTRUCT_IBASE (parent);
-	curclip = 0;
-	curclipvalid = false;
-	curclipvalue = 0;
-	db_asp_center_x = 0;
-	db_asp_center_y = 0;
-	db_width = 0;
-	db_height = 0;
-	db_asp_ratio = 2.0f/3.0f;
-	frustum_valid = false;
 
-	glenabled_blend = false;
-    glenabled_cull_face = true;
-    glenabled_alpha_test = false;
-    glenabled_depth_test = true;
-    glenabled_stencil_test = false;
-    glenabled_texture1d = false;
-    glenabled_texture2d = false;
-    glenabled_texture3d = false;
+  db_asp_center_x = 0;
+  db_asp_center_y = 0;
+  db_width = 0;
+  db_height = 0;
+  db_asp_ratio = 2.0f/3.0f;
+  frustum_valid = false;
 
- 	glcsenabled_vertex_array = false;;
-    glcsenabled_color_array = false;
-    glcsenabled_texture_coord_array = false;
-
+  m_clipper = new ClipperObjectStencil(this, 16, m_glstates);
 }
 
 
@@ -136,9 +123,15 @@ csGraphics3DGLext::csGraphics3DGLext (iBase *parent ) :
 //  N/A
 // =================================================================
 
-csGraphics3DGLext::~csGraphics3DGLext ( ) {
+csGraphics3DGLext::~csGraphics3DGLext ( ) 
+{
   // Make sure we close the display
   Close ();
+
+  // destroy the clipper
+
+  if(m_clipper)
+    delete m_clipper;
 
   // G2D - graphics 2D object
   if( G2D ) {
@@ -230,18 +223,20 @@ bool csGraphics3DGLext::Open ()
 
 void csGraphics3DGLext::Close()
 {
-	if ((db_width == db_height) && db_height == -1)
-		return;
+  if ((db_width == db_height) && db_height == -1)
+	  return;
 
-	// kill the graphics context
-	if (G2D)
-		G2D->Close ();
+  // kill the graphics context
+  if (G2D)
+	  G2D->Close ();
 
-	db_width = db_height = -1;
+  db_width = db_height = -1;
 }
 
 iGraphics2D *csGraphics3DGLext::GetDriver2D ( )
-{	return G2D;	}
+{	
+  return G2D;	
+}
 
 void csGraphics3DGLext::SetDimensions( int width, int height )
 {
@@ -302,23 +297,17 @@ const csReversibleTransform& csGraphics3DGLext::GetObjectToCamera( )
 
 void csGraphics3DGLext::SetClipper( iClipper2D* clipper, int cliptype )
 {
-  if (clipper) clipper->IncRef ();
-  if (curclip) curclip->DecRef ();
-  curclip = clipper;
-
-  frustum_valid = false;
-  stencil_init = false;
-  planes_init = false;
+  m_clipper->SetClipper(clipper);
 }
 
 iClipper2D* csGraphics3DGLext::GetClipper( )
 {
-  return curclip;
+  return m_clipper->GetCurClipper();
 }
 
 int csGraphics3DGLext::GetClipType( )
 {
-  if(curclip)
+  if(m_clipper->GetCurClipper())
     return CS_CLIPPER_REQUIRED;
   else
     return CS_CLIPPER_NONE;
@@ -335,140 +324,137 @@ void csGraphics3DGLext::ResetNearPlane( )
 
 const csPlane3& csGraphics3DGLext::GetNearPlane ()
 {
-	dummynearplane = csPlane3(csVector3(0.0,0.0,0.0001), csVector3(0.0,0.0,1.0));
-	return dummynearplane;
+  dummynearplane = csPlane3(csVector3(0.0,0.0,0.0001), csVector3(0.0,0.0,1.0));
+  return dummynearplane;
 }
 
 bool csGraphics3DGLext::HasNearPlane( )
 {
-	return false;
+  return false;
 }
 
 // Debug methods from iGraphics3D
 uint32 *csGraphics3DGLext::GetZBuffAt( int x, int y )
 {
-	return 0;
+  return 0;
 }
 
-float	csGraphics3DGLext::GetZBuffValue( int x, int y )
+float csGraphics3DGLext::GetZBuffValue( int x, int y )
 {
-	float zbufval;
-	glReadPixels(x,y,1,1,GL_DEPTH_COMPONENT, GL_FLOAT, &zbufval);
-	return zbufval;
+  float zbufval;
+  glReadPixels(x,y,1,1,GL_DEPTH_COMPONENT, GL_FLOAT, &zbufval);
+  return zbufval;
 }
 
 // Drawing methods from iGraphics3D
 bool csGraphics3DGLext::BeginDraw(int DrawFlags)
 {
-	if ((G2D->GetWidth() != db_width)	||	(G2D->GetHeight() != db_height))
-		SetDimensions (G2D->GetWidth(), G2D->GetHeight());
+  if ((G2D->GetWidth() != db_width) ||  (G2D->GetHeight() != db_height))
+    SetDimensions (G2D->GetWidth(), G2D->GetHeight());
 
-	if (DrawFlags & CSDRAW_3DGRAPHICS)
-			glFlush();
-	
-	if (DrawFlags & CSDRAW_2DGRAPHICS)
-	{
-		// disable Z-buffer test and blending
-		glDisable(GL_DEPTH_TEST);
-		glDisable(GL_BLEND);
-	}
+  if (DrawFlags & CSDRAW_3DGRAPHICS)
+    glFlush();
 
-	if (DrawFlags & (CSDRAW_2DGRAPHICS | CSDRAW_3DGRAPHICS))
-	{
-		if (!G2D->BeginDraw ())
-			return false;
-	}
+  if (DrawFlags & CSDRAW_2DGRAPHICS)
+  {
+    // disable Z-buffer test and blending
+    glDisable(GL_DEPTH_TEST);
+    glDisable(GL_BLEND);
+  }
 
-	if (DrawFlags & CSDRAW_CLEARZBUFFER)
-	{
-		if (DrawFlags & CSDRAW_CLEARSCREEN)
-			glClear (GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
-		else
-			glClear (GL_DEPTH_BUFFER_BIT);
-	}
-	else if (DrawFlags & CSDRAW_CLEARSCREEN)
-		G2D->Clear (0);
+  if (DrawFlags & (CSDRAW_2DGRAPHICS | CSDRAW_3DGRAPHICS))
+  {
+    if (!G2D->BeginDraw ())
+      return false;
+  }
 
-	return true;
+  if (DrawFlags & CSDRAW_CLEARZBUFFER)
+  {
+    if (DrawFlags & CSDRAW_CLEARSCREEN)
+      glClear (GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
+    else
+      glClear (GL_DEPTH_BUFFER_BIT);
+  }
+  else if (DrawFlags & CSDRAW_CLEARSCREEN)
+    G2D->Clear (0);
+
+  return true;
 }
 
 void csGraphics3DGLext::FinishDraw()
 {
-	glFlush();
-
-	G2D->FinishDraw ();
-
+  glFlush();
+  G2D->FinishDraw ();
 }
 
 void csGraphics3DGLext::Print(csRect *area)
 {
-	G2D->Print (area);
+  G2D->Print (area);
 }
 
 bool csGraphics3DGLext::SetRenderState(G3D_RENDERSTATEOPTION op, long val)
 { 
-	switch (op)
-	{
-	case G3DRENDERSTATE_ZBUFFERMODE:
-		switch(val)
-		{
-		case CS_ZBUF_EQUAL:
-			glDepthFunc(GL_EQUAL);
-			break;
-		case CS_ZBUF_FILL:
-			glDepthFunc(GL_LEQUAL);
-			break;
-		case CS_ZBUF_FILLONLY:
-			glDepthFunc(GL_ALWAYS);
-			break;
-		case CS_ZBUF_NONE:
-			glDepthMask(GL_FALSE);
-			break;
-		case CS_ZBUF_SPECIAL:
-			break;
-		case CS_ZBUF_TEST:
-			glDepthMask(GL_TRUE);
-			glDepthFunc(GL_LEQUAL);
-			break;
-		case CS_ZBUF_USE:
-			break;
-		}
-		break;
-	case G3DRENDERSTATE_DITHERENABLE:
-		break;
-	case G3DRENDERSTATE_BILINEARMAPPINGENABLE:
-		break;
-	case G3DRENDERSTATE_TRILINEARMAPPINGENABLE:
-		break;
-	case G3DRENDERSTATE_TRANSPARENCYENABLE:
-		break;
-	case G3DRENDERSTATE_MIPMAPENABLE:
-		break;
-	case G3DRENDERSTATE_TEXTUREMAPPINGENABLE:
-		break;
-	case G3DRENDERSTATE_MMXENABLE:
-		return false;
-	case G3DRENDERSTATE_INTERLACINGENABLE:
-		return false;
-	case G3DRENDERSTATE_LIGHTINGENABLE:
-		break;
-	case G3DRENDERSTATE_GOURAUDENABLE:
-		break;
-	case G3DRENDERSTATE_MAXPOLYGONSTODRAW:
-		break;
-	
-	case G3DRENDERSTATE_EDGES:
-		break;
-	default:
-		return false;
-	}
+  switch (op)
+  {
+  case G3DRENDERSTATE_ZBUFFERMODE:
+      switch(val)
+      {
+      case CS_ZBUF_EQUAL:
+	   glDepthFunc(GL_EQUAL);
+	   break;
+      case CS_ZBUF_FILL:
+	   glDepthFunc(GL_LEQUAL);
+	   break;
+      case CS_ZBUF_FILLONLY:
+	   glDepthFunc(GL_ALWAYS);
+	   break;
+      case CS_ZBUF_NONE:
+	   glDepthMask(GL_FALSE);
+	   break;
+      case CS_ZBUF_SPECIAL:
+	   break;
+      case CS_ZBUF_TEST:
+	   glDepthMask(GL_TRUE);
+	   glDepthFunc(GL_LEQUAL);
+	   break;
+      case CS_ZBUF_USE:
+	   break;
+      }
+      break;
+  case G3DRENDERSTATE_DITHERENABLE:
+       break;
+  case G3DRENDERSTATE_BILINEARMAPPINGENABLE:
+       break;
+  case G3DRENDERSTATE_TRILINEARMAPPINGENABLE:
+       break;
+  case G3DRENDERSTATE_TRANSPARENCYENABLE:
+       break;
+  case G3DRENDERSTATE_MIPMAPENABLE:
+       break;
+  case G3DRENDERSTATE_TEXTUREMAPPINGENABLE:
+       break;
+  case G3DRENDERSTATE_MMXENABLE:
+       return false;
+  case G3DRENDERSTATE_INTERLACINGENABLE:
+       return false;
+  case G3DRENDERSTATE_LIGHTINGENABLE:
+       break;
+  case G3DRENDERSTATE_GOURAUDENABLE:
+       break;
+  case G3DRENDERSTATE_MAXPOLYGONSTODRAW:
+       break;
+  case G3DRENDERSTATE_EDGES:
+       break;
+  default:
+       return false;
+  }
 
-	return true;
+  return true;
 }
 
 long csGraphics3DGLext::GetRenderState(G3D_RENDERSTATEOPTION op )
 {
-	return 0;
+  return 0;
 }
 
 void csGraphics3DGLext::DrawPolygon(G3DPolygonDP& poly )
@@ -493,20 +479,20 @@ void csGraphics3DGLext::DrawPolygonMesh(G3DPolygonMesh&  mesh )
 
 void csGraphics3DGLext::OpenFogObject(CS_ID id, csFog* fog )
 {
-	// Fogging is handled by GL
-	return;
+  // Fogging is handled by GL
+  return;
 }
 
 void csGraphics3DGLext::DrawFogPolygon(CS_ID id, G3DPolygonDFP& poly, int fogtype )
 {
-	// Fogging is handled by GL
-	return;
+  // Fogging is handled by GL
+  return;
 }
 
 void csGraphics3DGLext::CloseFogObject(CS_ID id )
 {
-	// Fogging is handled by GL
-	return;
+  // Fogging is handled by GL
+  return;
 }
 
 void csGraphics3DGLext::DrawLine( const csVector3& v1, const csVector3& v2, float fov, int color )
@@ -515,7 +501,7 @@ void csGraphics3DGLext::DrawLine( const csVector3& v1, const csVector3& v2, floa
 
 iHalo *csGraphics3DGLext::CreateHalo (float iR, float iG, float IB, unsigned char *iAlpha, int iWidth, int iHeight )
 {
-	return NULL;
+  return NULL;
 }
 
 void csGraphics3DGLext::DrawPixmap(iTextureHandle *hTex,
@@ -527,7 +513,7 @@ void csGraphics3DGLext::DrawPixmap(iTextureHandle *hTex,
 // Texture Cache Management
 iTextureManager *csGraphics3DGLext::GetTextureManager( )
 {
-	return NULL;
+  return NULL;
 }
 
 void csGraphics3DGLext::DumpCache( )
@@ -549,84 +535,31 @@ iVertexBufferManager *csGraphics3DGLext::GetVertexBufferManager ( )
 
 bool csGraphics3DGLext::IsLightmapOK(iPolygonTexture* poly_texture )
 {
-	return true;
+  return true;
 }
 
 void csGraphics3DGLext::Report (int severity, const char* msg, ...)
 {
-	va_list arg;
-	va_start (arg, msg);
-	iReporter* rep = CS_QUERY_REGISTRY (object_reg, iReporter);
-	
-	if (rep)
-	{
-		rep->ReportV (severity, "crystalspace.graphics3d.opengl", msg, arg);
-		rep->DecRef ();
-	}
-	else
-	{
-		csPrintfV (msg, arg);
-		csPrintf ("\n");
-	}
-	va_end (arg);
+  va_list arg;
+  va_start (arg, msg);
+  iReporter* rep = CS_QUERY_REGISTRY (object_reg, iReporter);
+  
+  if (rep)
+  {
+	  rep->ReportV (severity, "crystalspace.graphics3d.opengl", msg, arg);
+	  rep->DecRef ();
+  }
+  else
+  {
+	  csPrintfV (msg, arg);
+	  csPrintf ("\n");
+  }
+  va_end (arg);
 }
 
 /* -----------------------------------------------------------------
  * Protected Function Definitions
  * ----------------------------------------------------------------- */
-void csGraphics3DGLext::SetupClipper()
-{
-	if(curclipvalid)
-		return;
-
-	if(curclip == 0) // there's no new clipper, we'll have to disable the test functions and return;
-	{
-		glDisable(GL_STENCIL_TEST);
-		return;
-	}
-	
-	curclipvalue++;
-
-	if(curclipvalue > 15)
-	{
-		glClearStencil(0);
-		glClear(GL_STENCIL_BUFFER_BIT);
-		curclipvalue = 0;
-	}
-
-	glStencilMask(15);							// 15, cause we only want to use 4 bits of the stencil buffer
-	glStencilFunc(GL_EQUAL, curclipvalue, 15);	// this might change later, depending if stencil shadow volumes will be implemented
-	
-
-	if(glenabled_stencil_test)
-	{
-		glDisable(GL_STENCIL_TEST);
-		// we don't save the state, because we'll change the state at the end of the function anyhow.. (saves an operation *lol*)
-	}
-
-	if(glenabled_blend)
-	{
-		glDisable(GL_BLEND);
-		glenabled_blend = false;
-	}
-	
-	csVector2 * poly = curclip->GetClipPoly();
-
-	if(!glcsenabled_vertex_array)
-	{
-        glEnableClientState(GL_VERTEX_ARRAY);
-		glcsenabled_vertex_array = true;
-	}
-	
-	glVertexPointer(2,GL_FLOAT, sizeof(csVector2), &poly->x);
-	
-		glDrawArrays(GL_LINE_LOOP, 0, curclip->GetVertexCount());
-	
-	glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE); // We want the stencil buffer 
-    glEnable(GL_STENCIL_TEST);
-	glenabled_stencil_test = true;
-
-}
 
 /* -----------------------------------------------------------------
  * Private Function Defintions

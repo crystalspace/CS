@@ -47,6 +47,8 @@
  * ----------------------------------------------------------------- */
 
 #include "csgeom/transfrm.h"
+#include "gl_states_ext.h"
+#include "clipperobj.h"
 
 /* -----------------------------------------------------------------
  * Public Class Declarations
@@ -199,26 +201,11 @@ protected:
     // These are the states of various glEnable/glDisable elements
     // It is less expensive to check these than to glEnable of glDisable
     // them if they are already Enabled/Disabled
-    bool glenabled_blend;
-    bool glenabled_cull_face;
-    bool glenabled_alpha_test;
-    bool glenabled_depth_test;
-    bool glenabled_stencil_test;
-    bool glenabled_texture1d;
-    bool glenabled_texture2d;
-    bool glenabled_texture3d;
 
-    // These are the states of various
-    // glEnableClientState/glDisableClientState elements.
-    bool glcsenabled_vertex_array;
-    bool glcsenabled_color_array;
-    bool glcsenabled_texture_coord_array;
+    gl_states_ext m_glstates;    
 
-	// Clipper Stuff
-    void SetupClipper();
-    iClipper2D *curclip;
-    unsigned char curclipvalue;
-    bool curclipvalid;
+    // Clipper Stuff
+    iClipperObject *m_clipper;
 };
 
 #endif /* _OGL_G3DEXT_HPP_ */
