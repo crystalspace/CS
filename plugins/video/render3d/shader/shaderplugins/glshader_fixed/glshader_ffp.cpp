@@ -423,7 +423,7 @@ void csGLShaderFFP::Activate ()
 
       glTexEnvi (GL_TEXTURE_ENV, GL_COMBINE_RGB_ARB, layer.colorp );
 
-      glTexEnvi (GL_TEXTURE_ENV, GL_RGB_SCALE_ARB, layer.scale_rgb);
+      glTexEnvf (GL_TEXTURE_ENV, GL_RGB_SCALE_ARB, layer.scale_rgb);
 
       glTexEnvi (GL_TEXTURE_ENV, GL_SOURCE0_ALPHA_ARB, layer.alphasource[0]);
       glTexEnvi (GL_TEXTURE_ENV, GL_OPERAND0_ALPHA_ARB, layer.alphamod[0]);
@@ -437,7 +437,7 @@ void csGLShaderFFP::Activate ()
 
       glTexEnvi (GL_TEXTURE_ENV, GL_COMBINE_ALPHA_ARB, layer.alphap);
 
-      glTexEnvi (GL_TEXTURE_ENV, GL_ALPHA_SCALE, layer.scale_alpha);
+      glTexEnvf (GL_TEXTURE_ENV, GL_ALPHA_SCALE, layer.scale_alpha);
     }
   }
   if (fog.mode != FogOff)
@@ -457,14 +457,14 @@ void csGLShaderFFP::Deactivate()
     glTexEnvi  (GL_TEXTURE_ENV, GL_SOURCE1_RGB_ARB, GL_PRIMARY_COLOR);
     glTexEnvi  (GL_TEXTURE_ENV, GL_OPERAND1_RGB_ARB, GL_SRC_COLOR);
     glTexEnvi  (GL_TEXTURE_ENV, GL_COMBINE_RGB_ARB, GL_MODULATE);
-    glTexEnvi  (GL_TEXTURE_ENV, GL_RGB_SCALE_ARB, 1.0f);
+    glTexEnvi  (GL_TEXTURE_ENV, GL_RGB_SCALE_ARB, 1);
 
     glTexEnvi  (GL_TEXTURE_ENV, GL_SOURCE0_ALPHA_ARB, GL_TEXTURE);
     glTexEnvi  (GL_TEXTURE_ENV, GL_OPERAND0_ALPHA_ARB, GL_SRC_ALPHA);
     glTexEnvi  (GL_TEXTURE_ENV, GL_SOURCE1_ALPHA_ARB, GL_PRIMARY_COLOR);
     glTexEnvi  (GL_TEXTURE_ENV, GL_OPERAND1_ALPHA_ARB, GL_SRC_ALPHA);
     glTexEnvi  (GL_TEXTURE_ENV, GL_COMBINE_ALPHA_ARB, GL_MODULATE);
-    glTexEnvi  (GL_TEXTURE_ENV, GL_ALPHA_SCALE, 1.0f);
+    glTexEnvi  (GL_TEXTURE_ENV, GL_ALPHA_SCALE, 1);
   }
 
   if (fog.mode != FogOff)

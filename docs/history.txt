@@ -24,6 +24,9 @@ chronological order.
 	    - Added "texture classes". They allow to vary the upload settings
 	      of textures on a per-texture basis (e.g. only compress some
 	      textures).
+	- res fixed halos on GL.
+	- res replaced some glTexEnvf()s with glTexEnvi()s and vice versa at
+	  some places.
 8-Jan-2005
 	- Marten completly rewrote the way renderbuffers are sent from the
 	  mesh into renderer. Also changed the syntax of buffermappings a bit.

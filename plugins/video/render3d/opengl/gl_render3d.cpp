@@ -2574,7 +2574,8 @@ csOpenGLHalo::csOpenGLHalo (float iR, float iG, float iB, unsigned char *iAlpha,
 {
   SCF_CONSTRUCT_IBASE (0);
 
-  // Initialization  R = iR; G = iG; B = iB;
+  // Initialization  
+  R = iR; G = iG; B = iB;
   // OpenGL can only use 2^n sized textures
   Width = csFindNearestPowerOf2 (iWidth);
   Height = csFindNearestPowerOf2 (iHeight);
@@ -2601,9 +2602,9 @@ csOpenGLHalo::csOpenGLHalo (float iR, float iG, float iB, unsigned char *iAlpha,
   csGLGraphics3D::statecache->SetTexture (GL_TEXTURE_2D, halohandle);
 
   // Jaddajaddajadda
-  glTexEnvi (GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP);
-  glTexEnvi (GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-  glTexEnvi (GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+  glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP);
+  glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+  glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
   glTexImage2D (GL_TEXTURE_2D, 0, GL_RGBA, Width, Height, 0, GL_RGBA,
     GL_UNSIGNED_BYTE, rgba);
 
