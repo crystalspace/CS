@@ -45,6 +45,14 @@ Short-term cleanups that need to be done:
 	- Fixed bug with adding of dynamic objects to octree. Now sprites
 	  should work well in levels containing STATBSP statement. They
 	  were broken for some time.
+	- Eric Sunshine fixed csGraphics3DSoftware so that it once again
+	  compiles under NextStep.
+	- Eric Sunshine hacked around a NextStep compiler bug which generated
+	  "overflow in implicit constant conversion" warnings from many files
+	  in apps/mazed.  This was the one remaining compilation warning which
+	  had never been eliminated from the NextStep port, so this is the
+	  very first time that the NextStep port compiles entirely warning-
+	  free.
 20-Feb-2000
 	- csPolygonSet now also holds a pointer to the parent container and
 	  checks if the parent is NULL before being added to a parent. This
