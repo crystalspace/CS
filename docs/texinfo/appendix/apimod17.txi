@@ -100,7 +100,7 @@ plugin.  You can do this with the following code:
 char const* p = Config->GetStr (
   "YourGame",
   "COLLDET_PLUGIN",
-  "crystalspace.colldet.rapid");
+  "crystalspace.collisiondetection.rapid");
 collide_system =
   LOAD_PLUGIN(this, p, "CollDet", iCollideSystem);
 if (!collide_system)

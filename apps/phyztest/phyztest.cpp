@@ -202,7 +202,7 @@ bool Phyztest::Initialize (int argc, const char* const argv[], const char *iConf
     exit (1);
   }
 
-  cdsys = LOAD_PLUGIN (Sys, "crystalspace.colldet.rapid", "CollDet", iCollideSystem);
+  cdsys = LOAD_PLUGIN (Sys, "crystalspace.collisiondetection.rapid", "CollDet", iCollideSystem);
 
   // Some commercials...
   Printf (MSG_INITIALIZATION, "Phyztest Crystal Space Application version 0.1.\n");
