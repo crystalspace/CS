@@ -249,7 +249,11 @@ public:
     csVector3& isect, float *pr);
   virtual bool HitBeamObject (const csVector3& start, const csVector3& end,
   	csVector3& isect, float* pr, int* polygon_idx = 0);
-  virtual void SetLogicalParent (iBase* lp) { logparent = lp; }
+  virtual void SetLogicalParent (iBase* lp)
+  {
+    logparent = lp;
+    CS_ASSERT (logparent != 0);
+  }
   virtual iBase* GetLogicalParent () const { return logparent; }
 
 
@@ -332,9 +336,7 @@ public:
   {
     SCF_DECLARE_EMBEDDED_IBASE (csGenmeshMeshObject);
     virtual void SetMaterialWrapper (iMaterialWrapper* material)
-    {
-      scfParent->material = material;
-    }
+    { scfParent->SetMaterialWrapper (material); }
     virtual iMaterialWrapper* GetMaterialWrapper () const
     { return scfParent->material; }
     virtual void SetMixMode (uint mode) { scfParent->MixMode = mode; }
@@ -664,7 +666,11 @@ public:
   virtual csPtr<iMeshObject> NewInstance ();
   virtual void HardTransform (const csReversibleTransform& t);
   virtual bool SupportsHardTransform () const { return true; }
-  virtual void SetLogicalParent (iBase* lp) { logparent = lp; }
+  virtual void SetLogicalParent (iBase* lp)
+  {
+    logparent = lp;
+    CS_ASSERT (logparent != 0);
+  }
   virtual iBase* GetLogicalParent () const { return logparent; }
 
   //----------------------- iGeneralFactoryState implementation -------------

@@ -524,13 +524,14 @@ void csGenmeshMeshObject::SetupObject ()
       lit_mesh_colors = new csColor [num_lit_mesh_colors];
       int i;
       for (i = 0 ; i <  num_lit_mesh_colors; i++)
-          lit_mesh_colors[i].Set (0.2f, 0.2f, 0.2f);  // @@@ ???
+        lit_mesh_colors[i].Set (0.2f, 0.2f, 0.2f);  // @@@ ???
       static_mesh_colors = new csColor [num_lit_mesh_colors];
       for (i = 0 ; i <  num_lit_mesh_colors; i++)
-          static_mesh_colors[i].Set (0, 0, 0);
+        static_mesh_colors[i].Set (0, 0, 0);
     }
     iMaterialWrapper* mater = material;
     if (!mater) mater = factory->GetMaterialWrapper ();
+    CS_ASSERT (mater != 0);
     material_needs_visit = mater->IsVisitRequired ();
 
 #ifdef CS_USE_NEW_RENDERER

@@ -933,8 +933,9 @@ void csMeshFactoryWrapper::SetMeshObjectFactory (iMeshObjectFactory *meshFact)
 
 iMeshWrapper *csMeshFactoryWrapper::NewMeshObject ()
 {
-  csRef<iMeshObject> basemesh (meshFact->NewInstance ());
+  csRef<iMeshObject> basemesh = meshFact->NewInstance ();
   iMeshWrapper *mesh = &(new csMeshWrapper (0, basemesh))->scfiMeshWrapper;
+  basemesh->SetLogicalParent (mesh);
 
   if (GetName ()) mesh->QueryObject ()->SetName (GetName ());
   mesh->SetFactory (&scfiMeshFactoryWrapper);

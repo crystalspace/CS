@@ -20,6 +20,14 @@ chronological order.
 	  Better to leave the crash there until the REAL bug is fixed.
 	- Jorrit fixed all mesh loaders to test if the factory is actually
 	  the same type as the mesh object. That's better then just crashing.
+	- Jorrit fixed the engine so that objects created from a hierarchical
+	  mesh factory (<meshref> in loader) will also have SetLogicalParent()
+	  called.
+	- Jorrit fixed genmesh so that it now does CS_ASSERT to test for
+	  the crashing condition. This bug is actually a problem in the map
+	  file. The problem is that it is impossible to detect at load time
+	  and we have no facility to report these kind of errors at
+	  render time yet... So a CS_ASSERT will have to do for now.
 27-Apr-2004
 	- Jorrit removed ClipBSphere() from iRenderView.
 	- Jorrit added a private implementation of ClipBSphere() to
