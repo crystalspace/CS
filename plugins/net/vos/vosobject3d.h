@@ -48,7 +48,7 @@ private:
 public:
   SCF_DECLARE_IBASE;
 
-  csVosObject3D(A3DL::Object3D* obj3d);
+  csVosObject3D(A3DL::Object3D* obj3d, VOS::RefCounted* rc);
   virtual ~csVosObject3D();
 
   virtual csRef<iMeshWrapper> GetMeshWrapper();

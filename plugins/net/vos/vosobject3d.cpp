@@ -43,9 +43,13 @@ SCF_IMPLEMENT_IBASE_END
 
 /// csVosObject3D ///
 
-csVosObject3D::csVosObject3D(A3DL::Object3D* obj3d)
-  : object3d(obj3d, true)
+csVosObject3D::csVosObject3D(A3DL::Object3D* obj3d, VOS::RefCounted* rc)
 {
+  if(rc) {
+	rc->acquire();
+	object3d.assign(obj3d, false);
+  } else object3d.assign(obj3d, true);
+
   SCF_CONSTRUCT_IBASE (0);
   meshwrapper = NULL;
   collider = NULL;
@@ -196,7 +200,7 @@ csMetaObject3D::csMetaObject3D(VobjectBase* superobject)
     : A3DL::Object3D(superobject),
     alreadyLoaded(false)
 {
-  csvobj3d = new csVosObject3D(this);
+  csvobj3d = new csVosObject3D(this, superobject);
   csvobj3d->IncRef();
 }
 

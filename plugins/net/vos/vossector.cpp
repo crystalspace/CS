@@ -220,6 +220,8 @@ void LoadSectorTask::doTask()
         rs->sendMessage(mb);
     }
 
+	LOG("csVosSector", 2, "Starting search");
+
     rs->search(sector->GetVobject(), "sector", 0,
                        "rule sector\n"
                        "do acquire and parent-listen and children-listen to this object\n"
@@ -251,6 +253,8 @@ void LoadSectorTask::doTask()
                        "rule extrap-property\n"
                        "do acquire and parent-listen and extrap-property-listen to this object\n"
                        );
+
+	LOG("csVosSector", 2, "Search completed");
   }
 
   sector->GetVobject()->addChildListener (sector);
