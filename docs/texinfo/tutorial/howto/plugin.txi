@@ -198,8 +198,11 @@ parent class (which is given as a parameter).  One thing it does is declare a
 variable of type @samp{MyPlugin} which is called @samp{scfParent}.  Through
 that variable the method implementations of the embedded interface can access
 the main class.  After declaring the class @samp{Component} we immediately
-create an instance of this called @samp{scfiComponent}.  You can call it
-whatever you like.  This name is just a convention in Crystal Space.
+create an instance of this called @samp{scfiComponent}.  This name is not
+chosen at random. It is composed of the token @samp{scf} followed by the name
+of the @sc{scf} interface which this embedded object implements.  The
+@code{SCF_IMPLEMENTS_EMBEDDED_INTERFACE()} macro (see below) expects the name
+to be composed in this fashion.
 
 Sometimes embedded classes are also made friend of the main
 class so that they can access the private information. In this case
