@@ -32,6 +32,8 @@ csStaticPVSNode::csStaticPVSNode ()
 {
   child1 = child2 = 0;
   invisible_number = 0;
+  axis = 0;
+  where = 0;
 }
 
 csStaticPVSNode::~csStaticPVSNode ()
