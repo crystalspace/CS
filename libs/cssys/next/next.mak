@@ -125,8 +125,7 @@ CFLAGS.GENERAL = $(NEXT.CFLAGS.GENERAL) $(NEXT.ARCH_FLAGS) \
   -Wno-precomp -fno-common -pipe
 
 # Special option for the software 3D renderer to force it to ARGB mode
-CFLAGS.SOFT3D.PIXEL_LAYOUT=\
-  -DCS_SOFT3D_24BIT_PIXEL_LAYOUT=CS_SOFT3D_24BIT_PIXEL_ARGB
+CFLAGS.PIXEL_LAYOUT = -DCS_24BIT_PIXEL_LAYOUT=CS_24BIT_PIXEL_ARGB
 
 # Flags for the compiler which are used when optimizing.
 CFLAGS.optimize = $(NEXT.CFLAGS.OPTIMIZE)
