@@ -158,3 +158,13 @@ After all this you will be prompted with a dialog to tell you that the installat
 complete. Click on the @emph{Ok} button to finish the install process.
 
 @subsubheading Installing DirectX 8 SDK for Cygwin
+
+The Microsoft DirectX 8 SDK which the Cygwin port uses is one created especially for it. You can
+dowload it via the following link.
+
+@uref{ftp://sunsite.dk/projects/crystal/support/cygwin/DXforCygwin.zip}
+
+To install. Extract the archive to a location of your choice. Open a Cygwin bash prompt and
+navigate to where you extracted the files. To be more exact the directory which contains the
+@file{Makefile}. Now at the prompt do: @file{make install} and hit @sc{return}. Wait for the
+prompt to re-appear and it's installed - That's it. :)
