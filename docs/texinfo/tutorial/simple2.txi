@@ -100,7 +100,7 @@ this texture AFTER @code{engine->Prepare()}. So this is an easy way to
 dynamically add textures and materials even when the engine is already
 running. Note that if you plan to load many new textures and materials
 it is more efficient to not let this function register automatically but
-instead register them manually and then call @code{txtmgr->PrepareTextures())
+instead register them manually and then call @code{txtmgr->PrepareTextures()}
 to prepare them all at once.
 
 Note that when you load a texture like this there will also be an
