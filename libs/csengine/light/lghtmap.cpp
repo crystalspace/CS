@@ -355,7 +355,7 @@ bool csLightMap::ReadFromCache (
   // we don't load anything.
   size = convert_endian (size);
 
-  int expected_size;
+  unsigned int expected_size;
   expected_size = lh.dyn_cnt * (sizeof (ls.light_id) + lm_size);
   if (expected_size != size)
     return false;
@@ -372,7 +372,7 @@ bool csLightMap::ReadFromCache (
     {
       light = il->GetPrivateObject ();
       csShadowMap *smap = NewShadowMap (light, w, h);
-      if (file->Read ((char*)(smap->GetArray ()), lm_size) != lm_size)
+      if ((long) file->Read ((char*)(smap->GetArray ()), lm_size) != lm_size)
         return false;
       smap->CalcMaxShadow ();
     }
