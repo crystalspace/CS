@@ -1,6 +1,10 @@
 The history order is reversed so that new features are at the top.
 
+1-May-2001
+	- Fixed a bug in software renderer so that tiling really works.
 30-Apr-2001
+	- Philip Wyett fixed csVector3 up (); so that you/camera
+	  is the right way up in ptlab. :-)
 	- Brandon Ehle reports:
 	  PS2 Port working, will post external libs soon, hopefully source
 	  code for them will follow, if I find that Sony's OpenGL library

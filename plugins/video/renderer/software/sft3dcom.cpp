@@ -2624,6 +2624,7 @@ static struct
   int shf_w;
   bool keycolor;
   bool textured;
+  bool tiling;
   UInt mixmode;
   csDrawPIScanline *drawline;
   csDrawPIScanlineGouraud *drawline_gouraud;
@@ -2653,6 +2654,7 @@ void csGraphics3DSoftwareCommon::StartPolygonFX (iMaterialHandle* handle,
     pqinfo.thfp = QInt16 (pqinfo.th) - 1;
     pqinfo.keycolor = tex_mm->GetKeyColor ();
     pqinfo.textured = do_textured;
+    pqinfo.tiling = !!(mode & CS_FX_TILING);
   }
   else
     pqinfo.textured = false;
@@ -3015,22 +3017,25 @@ void csGraphics3DSoftwareCommon::DrawPolygonFX (G3DPolygonDPFX& poly)
             uu = L.u; duu = QInt (span_u * inv_l);
             vv = L.v; dvv = QInt (span_v * inv_l);
 
-            // Check for texture overflows
-            if (uu < 0) uu = 0; if (uu > pqinfo.twfp) uu = pqinfo.twfp;
-            if (vv < 0) vv = 0; if (vv > pqinfo.thfp) vv = pqinfo.thfp;
+	    if (!pqinfo.tiling)
+	    {
+              // Check for texture overflows
+              if (uu < 0) uu = 0; if (uu > pqinfo.twfp) uu = pqinfo.twfp;
+              if (vv < 0) vv = 0; if (vv > pqinfo.thfp) vv = pqinfo.thfp;
 
-            int tmpu = uu + span_u;
-            if (tmpu < 0 || tmpu > pqinfo.twfp)
-            {
-              if (tmpu < 0) tmpu = 0; if (tmpu > pqinfo.twfp) tmpu = pqinfo.twfp;
-              duu = QInt ((tmpu - uu) * inv_l);
-            }
-            int tmpv = vv + span_v;
-            if (tmpv < 0 || tmpv > pqinfo.thfp)
-            {
-              if (tmpv < 0) tmpv = 0; if (tmpv > pqinfo.thfp) tmpv = pqinfo.thfp;
-              dvv = QInt ((tmpv - vv) * inv_l);
-            }
+              int tmpu = uu + span_u;
+              if (tmpu < 0 || tmpu > pqinfo.twfp)
+              {
+                if (tmpu < 0) tmpu = 0; if (tmpu > pqinfo.twfp) tmpu = pqinfo.twfp;
+                duu = QInt ((tmpu - uu) * inv_l);
+              }
+              int tmpv = vv + span_v;
+              if (tmpv < 0 || tmpv > pqinfo.thfp)
+              {
+                if (tmpv < 0) tmpv = 0; if (tmpv > pqinfo.thfp) tmpv = pqinfo.thfp;
+                dvv = QInt ((tmpv - vv) * inv_l);
+              }
+	    }
           }
 
           // R,G,B brightness can underflow due to subpixel correction
