@@ -62,7 +62,7 @@
     virtual csRENode *Left()=0;
     
     /// Gets the right branch.  Returns NULL if there's none.
-    virtual csReNode *Right()=0;
+    virtual csRENode *Right()=0;
     
     /// Returns an acceptance match for this leaf (if node is a leaf)
     virtual bool Accept(int ch)
