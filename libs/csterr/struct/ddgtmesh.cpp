@@ -37,7 +37,7 @@ ddgTBinMesh::ddgTBinMesh( ddgHeightMap * h )
 	_absMaxDetail = 8000;
 	_absMaxHeight = -0xFFFF;
 	_absMinHeight = 0xFFFF;
-	_absDiffHeight = 0;
+	_absMaxError = 0;
 	// Note Z axis is negative into the screen (Right Handed coord sys).
 	farClip(200);
 	_merge = true;
@@ -195,15 +195,15 @@ bool ddgTBinMesh::init( ddgContext *ctx )
 		if (_bintree[i])
 		{
 			_bintree[i]->init();
-			if ( _bintree[i]->rawDelta(0) > _absDiffHeight)
-				_absDiffHeight = _bintree[i]->rawDelta(0);
+			if ( _bintree[i]->treeError(0) > _absMaxError)
+				_absMaxError = _bintree[i]->treeError(0) ;
 			if ( _bintree[i]->rawMinVal(0) < _absMinHeight)
 				_absMinHeight = _bintree[i]->rawMinVal(0);
+			if ( _bintree[i]->rawMaxVal(0) > _absMaxHeight)
+				_absMaxHeight = _bintree[i]->rawMaxVal(0);
 		}
 		ddgConsole::progress( "Initializing blocks", i,_bintreeMax-1);
 	}
-	// The difference between the highest point and the lowest point.
-	_absMaxHeight = _absMinHeight + _absDiffHeight;
 	// Call it again to update the DiffHeight etc info.
 	ddgTBinTree::initContext(ctx,this);
 

@@ -50,13 +50,17 @@ ddgTBinTree::ddgTBinTree( ddgTreeIndex i, int dr, int dc, bool mirror )
 	ddgMemorySet(short,_mesh->triNo()+2);
 
 // LeafNo
-	_rawDelta = new unsigned short[_mesh->leafTriNo()];
-	ddgAsserts(_rawDelta,"Failed to Allocate memory");
+	_rawMaxVal = new short[_mesh->leafTriNo()];
+	ddgAsserts(_rawMaxVal,"Failed to Allocate memory");
 	ddgMemorySet(unsigned short,_mesh->leafTriNo());
 
 	_rawMinVal = new short[_mesh->leafTriNo()];
 	ddgAsserts(_rawMinVal,"Failed to Allocate memory");
 	ddgMemorySet(short,_mesh->leafTriNo());
+
+	_treeError = new unsigned short[_mesh->leafTriNo()];
+	ddgAsserts(_treeError,"Failed to Allocate memory");
+	ddgMemorySet(unsigned short,_mesh->leafTriNo());
 
 /*
 	if (!recurStack)
@@ -72,7 +76,8 @@ ddgTBinTree::~ddgTBinTree(void)
 	delete [] _cacheIndex;
 	delete [] _rawHeight;
 	delete [] _rawMinVal;
-	delete [] _rawDelta;
+	delete [] _rawMaxVal;
+	delete [] _treeError;
 }
 
 
@@ -89,8 +94,9 @@ bool ddgTBinTree::init( void )
 	// Initialize the whole bin tree.
 	initTriangle(1);
 	// Set the top level min/max values
-	_rawDelta[0] = _rawDelta[1];
+	_rawMaxVal[0] = _rawMaxVal[1];
 	_rawMinVal[0] = _rawMinVal[1];
+	_treeError[0] = _treeError[1];
 	// Initialize the tcache.
 	_cacheIndex[0] = 0;
 	_cacheIndex[1] = 0;
@@ -106,6 +112,7 @@ ddgContext *ddgTBinTree::_ctx;
 ddgVector2	ddgTBinTree::_pos, ddgTBinTree::_forward;
 float ddgTBinTree::_nearClip;
 float ddgTBinTree::_farClip;
+float ddgTBinTree::_farClip2;
 float ddgTBinTree::_farClipSQ;
 float ddgTBinTree::_varianceScale = 1;
 float ddgTBinTree::_cosHalfFOV = 0.7;
@@ -121,13 +128,14 @@ void ddgTBinTree::initContext( ddgContext *ctx, ddgTBinMesh *mesh )
 	_pos.set( _ctx->control()->position()->v[0], _ctx->control()->position()->v[2]);
 	_forward.set( _ctx->forward()->v[0], _ctx->forward()->v[2]);
 	_farClip = mesh->farClip();
-	_nearClip = mesh->nearClip();
+	_nearClip = mesh->nearClip();             
+	_farClip2 = _farClip + _farClip;
 	_farClipSQ = _farClip * _farClip;
 	_stri = mesh->stri;
 	_tcache = mesh->tcache();
 	_cosHalfFOV = cosf(ddgAngle::degtorad(ctx->fov()/2.0));
-	if ((mesh->absDiffHeight()*_farClip)>0)
-		_varianceScale = (ddgPriorityResolution*8)/(mesh->absDiffHeight()*_farClip);
+	if ((mesh->absMaxError()*_farClip)>0)
+		_varianceScale = (ddgPriorityResolution)/(mesh->absMaxError()*_farClip2);
 	else
 		_varianceScale = 1;
 	// Forget about near/far clipping planes.
@@ -224,22 +232,23 @@ void ddgTBinTree::calculateVariance(ddgTriIndex tindex)
 	if (tindex < _mesh->leafTriNo())
 	{
 		// Measure displacement of height(tindex) from midpoint of height(first),height(second).
-		int hmin, hdelta;
+		int hmin, hmax, error;
 		if (first(tindex) < _mesh->leafTriNo())
 		{
 			hmin = ddgUtil::min(_rawMinVal[first(tindex)],_rawMinVal[second(tindex)]);
-			hdelta = ddgUtil::max(_rawDelta[first(tindex)],_rawDelta[second(tindex)]);
+			hmax = ddgUtil::max(_rawMaxVal[first(tindex)],_rawMaxVal[second(tindex)]);
+			error = ddgUtil::max(_treeError[first(tindex)],_treeError[second(tindex)]);
 		}
-		else
+		else // Leaf node.
 		{
 			hmin = ddgUtil::min(_rawHeight[first(tindex)],_rawHeight[second(tindex)]);
-			hdelta = ddgUtil::max(_rawHeight[first(tindex)],_rawHeight[second(tindex)]) - hmin;
+			hmax = ddgUtil::max(_rawHeight[first(tindex)],_rawHeight[second(tindex)]);
+			error = 0;
 		}
-//	    int hd = _rawHeight(tindex) - (hmin + hdelta/2);
 
 		_rawMinVal[tindex] = (short)ddgUtil::min(_rawHeight[parent(tindex)],hmin);
-		ddgAssert(ddgUtil::max(_rawHeight[parent(tindex)], hmin + hdelta) - hmin >= 0);
-		_rawDelta[tindex] = (unsigned short)(ddgUtil::max(_rawHeight[parent(tindex)] ,hmin + hdelta) - hmin);
+		_rawMaxVal[tindex] = (short)ddgUtil::max(_rawHeight[parent(tindex)],hmax);
+	    _treeError[tindex] = error+ddgUtil::abs(((_rawHeight[_stri[tindex].v0]-_rawHeight[_stri[tindex].v1])/2)-_rawHeight[tindex]);
 	}
 }
 
@@ -264,12 +273,12 @@ void ddgTBinTree::updateVariance(ddgTriIndex tindex)
 	else
 	{
 		int hmin = _rawMinVal[tindex];
-		int hdelta = _rawDelta[tindex];
+		int hmax = _rawMaxVal[tindex];
   
 		calculateVariance(tindex);
 
 		// update the parent of this vertex 
-		if (tindex > 0 && (hdelta != _rawDelta[tindex] || hmin != _rawMinVal[tindex] )) 
+		if (tindex > 0 && (hmax != _rawMaxVal[tindex] || hmin != _rawMinVal[tindex] )) 
 		{
 			updateVariance(tindex / 2); 
 			if (neighbour(tindex))
@@ -444,7 +453,7 @@ void ddgTBinTree::insertSQ(ddgTriIndex tindex, ddgPriority pp, ddgCacheIndex ci,
 		// Leaf nodes cannot be split.
 		if (tindex < _mesh->leafTriNo())
 		{
-			tn->priorityFactor(_rawDelta[tindex]*_varianceScale);
+			tn->priorityFactor(_treeError[tindex]*_varianceScale);
 			pr = priorityCalc(tindex,tn->priorityFactor());
 			// Ensure our priority is less than our parent's.
 			if (pp > 1 && pr >= pp)
@@ -736,12 +745,12 @@ void ddgTBinTree::updateMerge(ddgTriIndex tindex, ddgPriority pr )
 			// If one of the leaves is visible, find the priority.
 			if (vis(first(p)) || vis(second(p)))
 			{
-				pr = priorityCalc(p,_rawDelta[p]*_varianceScale);
+				pr = priorityCalc(p,_treeError[p]*_varianceScale);
 			}
 			// If there are neighbours and one of them is visible.
 			if (nt && (nt->vis(first(n)) || nt->vis(second(n))))
 			{
-				ddgPriority pr2 = priorityCalc(n, nt->_rawDelta[n]*_varianceScale);
+				ddgPriority pr2 = priorityCalc(n, nt->_treeError[n]*_varianceScale);
 				if (pr2 > pr)
 					pr = pr2;
 			}
@@ -933,7 +942,7 @@ ddgVisState ddgTBinTree::visibilityTriangle(ddgTriIndex tindex)
 		bbox.max.v[2] = cmax;
 		// Adjust box by bintree thickness.
 		bbox.min.v[1] = _mesh->wheight(_rawMinVal[tindex]);
-		bbox.max.v[1] = bbox.min.v[1] + _mesh->wheight(_rawDelta[tindex]);
+		bbox.max.v[1] = _mesh->wheight(_rawMaxVal[tindex]);
 		return _ctx->rootHull()->clip(&bbox);
 		}
 	else
@@ -993,7 +1002,7 @@ ddgPriority ddgTBinTree::priorityCalc(ddgTriIndex tindex, float pf)
 	ddgVector2 p(cr,cc);
 	// This is the same a f dot p1 - f dot p2, f dot p2 can be precomputed,
 	// but I don't think that will speed things up.
-	z = _farClip - _forward.dot(&p);
+	z = _farClip2 - _forward.dot(&p);
 	if (z < _nearClip)
 		z = _nearClip;
 	// Priority is factor of:
@@ -1004,7 +1013,7 @@ ddgPriority ddgTBinTree::priorityCalc(ddgTriIndex tindex, float pf)
 	// Max - Min >= 0   && < _absDiffHeight.
 
 	z *= pf;
-	
+
 #ifdef _DEBUG
 	_mesh->priCountIncr();
 #endif
@@ -1088,7 +1097,7 @@ bool ddgTBinTree::rayTest( ddgVector3 p1, ddgVector3 p2, ddgTriIndex tindex, int
 	// limits of the ray.
 
 	// Check for definite miss.
-	if (s[0].v[1] > _rawMinVal[tindex]+_rawDelta[tindex] || s[1].v[1] > _rawMinVal[tindex]+_rawDelta[tindex])
+	if (s[0].v[1] > _rawMaxVal[tindex] || s[1].v[1] > _rawMaxVal[tindex])
 		return false;
 	// Check for definite hit.
 	if (s[0].v[1] < _rawMinVal[tindex] || s[1].v[1] < _rawMinVal[tindex])

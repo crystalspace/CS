@@ -64,9 +64,13 @@ class WEXP ddgTBinTree {
 	 */
 	short *_rawMinVal;
     /**
-	 * the Max height - Min height of all _rawHeights  in the subtree. (2 bytes)
+	 * the Max height of all _rawHeights  in the subtree. (2 bytes)
 	 */
-	unsigned short *_rawDelta;
+	short *_rawMaxVal;
+    /**
+	 * the cumulative potential subtree error. (2 bytes)
+	 */
+	unsigned short *_treeError;
 	/**
 	 * Visibility state of the top level triangle in this tree.
 	 */
@@ -99,6 +103,8 @@ class WEXP ddgTBinTree {
 	static ddgVector2	_forward;
 	/// Far clipping distance.
 	static float _farClip;
+	/// Far clipping distance * 2.
+	static float _farClip2;
 	/// Near clipping distance.
 	static float _nearClip;
 	/// Squared far clipping distance.
@@ -260,9 +266,14 @@ public:
 		return _rawMinVal[tindex];
 	}
 	/// Get the variance for a triangle block.
-	unsigned short rawDelta( ddgTriIndex tindex )
+	short rawMaxVal( ddgTriIndex tindex )
 	{
-		return _rawDelta[tindex];
+		return _rawMaxVal[tindex];
+	}
+	/// Get the variance for a triangle block.
+	unsigned short treeError( ddgTriIndex tindex )
+	{
+		return _treeError[tindex];
 	}
 private:
 

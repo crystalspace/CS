@@ -362,7 +362,7 @@ class WEXP ddgTBinMesh
 	/// Absolute maximum height in the terrain.
 	int		_absMaxHeight;
 	/// Difference between maximum and minimum height in the terrain.
-	int		_absDiffHeight;
+	int		_absMaxError;
 	/// Total number of triangles in this frame.
 	unsigned int _triVis;
 	/// Total number of triangles rendered.  For statistics.
@@ -529,7 +529,7 @@ public:
      */
     void setHeight(float x, float y, float z);
 	/// The difference between the highest point on the mesh and the lowest point.
-	int absDiffHeight(void) { return _absDiffHeight; }
+	int absMaxError(void) { return _absMaxError; }
 	/// The lowest point on the mesh.
 	int absMinHeight(void) { return _absMinHeight; }
 	/// The highest point on the mesh.
