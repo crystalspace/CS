@@ -3,6 +3,9 @@ http://crystal.sourceforge.net/
 
 The history order is reversed so that new features are at the top.
 
+13-Jun-2003
+	- Oktal renamed the function AutoLoad slightly, to avoid conflict with
+	  the Windows API identifier of the same name, in perlpost.i.
 12-Jun-2003
 	- Jorrit clarified a comment with csColliderWrapper telling people that
 	  you must DecRef() the new collider wrapper after creating it.

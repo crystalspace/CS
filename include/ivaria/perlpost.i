@@ -24,9 +24,9 @@
  * to every class without bloating the module. Specifically, we add object
  * property accessor methods.
  ****************************************************************************/
-%native(AUTOLOAD) AutoLoad;
+%native(AUTOLOAD) Autoload;
 %{
-  void AutoLoad (pTHXo_ CV *thisfunc)
+  void Autoload (pTHXo_ CV *thisfunc)
   {
     dXSARGS;
     dTARG;
