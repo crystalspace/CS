@@ -213,20 +213,26 @@ public:
    * See igeom/objmodel.h for specification. The default implementation
    * returns an infinite bounding box.
    */
-  void GetObjectBoundingBox (csBox3& bbox, int type);
+  virtual void GetObjectBoundingBox (csBox3& bbox, int type);
 
   /**
    * See igeom/objmodel.h for specification. The default implementation
    * returns an infinite radius.
    */
-  void GetRadius (csVector3& radius, csVector3& center);
+  virtual void GetRadius (csVector3& radius, csVector3& center);
 
   // implementation of iObjectModel
   struct eiObjectModel : public csObjectModel
   {
     SCF_DECLARE_EMBEDDED_IBASE (csMeshObject);
-    virtual void GetObjectBoundingBox (csBox3& bbox, int type);
-    virtual void GetRadius (csVector3& radius, csVector3& center);
+    virtual void GetObjectBoundingBox (csBox3& bbox, int type)
+    {
+      scfParent->GetObjectBoundingBox (bbox, type);
+    }
+    virtual void GetRadius (csVector3& radius, csVector3& center)
+    {
+      scfParent->GetRadius (radius, center);
+    }
   } scfiObjectModel;
   friend struct eiObjectModel;
 };
@@ -285,6 +291,12 @@ public:
    * completely in csMeshObject.
    */
   virtual iBase* GetLogicalParent () const;
+
+  /**
+   * See imesh/object.h for specification.
+   */
+  virtual iObjectModel* GetObjectModel () { return NULL; }
+
 };
 
 /**

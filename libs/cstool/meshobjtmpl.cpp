@@ -135,15 +135,11 @@ void csMeshObject::GetObjectBoundingBox (csBox3& bbox, int type)
 
 void csMeshObject::GetRadius (csVector3& radius, csVector3& center)
 {
-  radius = csVector3 (CS_BOUNDINGBOX_MAXVALUE,
-    CS_BOUNDINGBOX_MAXVALUE, CS_BOUNDINGBOX_MAXVALUE);
-  center = csVector3 (0, 0, 0);
+  csBox3 b;
+  GetObjectBoundingBox (b, CS_BBOX_NORMAL);
+  radius = (b.Max () - b.Min ()) * 0.5f;
+  center = b.GetCenter ();
 }
-
-void csMeshObject::eiObjectModel::GetObjectBoundingBox (csBox3& bbox, int type)
-{ scfParent->GetObjectBoundingBox (bbox, type); }
-void csMeshObject::eiObjectModel::GetRadius (csVector3& radius, csVector3& center)
-{ scfParent->GetRadius (radius, center); }
 
 // ------------------
 

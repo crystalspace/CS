@@ -201,7 +201,6 @@ csPtr<iBase> csRainLoader::Parse (iDocumentNode* node,
 	iLoaderContext* ldr_context, iBase*)
 {
   csRef<iMeshObject> mesh;
-  csRef<iParticleState> partstate;
   csRef<iRainState> rainstate;
 
   csRef<iDocumentNodeIterator> it = node->GetNodes ();
@@ -218,7 +217,7 @@ csPtr<iBase> csRainLoader::Parse (iDocumentNode* node,
 	  csColor color;
 	  if (!synldr->ParseColor (child, color))
 	    return NULL;
-	  partstate->SetColor (color);
+	  rainstate->SetColor (color);
 	}
 	break;
       case XMLTOKEN_DROPSIZE:
@@ -257,8 +256,7 @@ csPtr<iBase> csRainLoader::Parse (iDocumentNode* node,
 	    return NULL;
 	  }
 	  mesh = fact->GetMeshObjectFactory ()->NewInstance ();
-          partstate = SCF_QUERY_INTERFACE (mesh, iParticleState);
-          rainstate = SCF_QUERY_INTERFACE (mesh, iRainState);
+      rainstate = SCF_QUERY_INTERFACE (mesh, iRainState);
 	}
 	break;
       case XMLTOKEN_MATERIAL:
@@ -272,7 +270,7 @@ csPtr<iBase> csRainLoader::Parse (iDocumentNode* node,
 		child, "Couldn't find material '%s'!", matname);
             return NULL;
 	  }
-	  partstate->SetMaterialWrapper (mat);
+	  rainstate->SetMaterialWrapper (mat);
 	}
 	break;
       case XMLTOKEN_MIXMODE:
@@ -280,7 +278,7 @@ csPtr<iBase> csRainLoader::Parse (iDocumentNode* node,
 	  uint mode;
 	  if (!synldr->ParseMixmode (child, mode))
 	    return NULL;
-          partstate->SetMixMode (mode);
+          rainstate->SetMixMode (mode);
 	}
 	break;
       case XMLTOKEN_COLLDET:
@@ -334,7 +332,6 @@ void csRainSaver::WriteDown (iBase* obj, iFile *file)
 {
   csString str;
   csRef<iFactory> fact (SCF_QUERY_INTERFACE (this, iFactory));
-  csRef<iParticleState> partstate (SCF_QUERY_INTERFACE (obj, iParticleState));
   csRef<iRainState> state (SCF_QUERY_INTERFACE (obj, iRainState));
   char buf[MAXLINE];
   char name[MAXLINE];
@@ -343,16 +340,16 @@ void csRainSaver::WriteDown (iBase* obj, iFile *file)
   sprintf(buf, "FACTORY ('%s')\n", name);
   str.Append(buf);
 
-  if(partstate->GetMixMode() != CS_FX_COPY)
+  if (state->GetMixMode() != CS_FX_COPY)
   {
-    str.Append (synldr->MixmodeToText (partstate->GetMixMode(), 0, true));
+    str.Append (synldr->MixmodeToText (state->GetMixMode(), 0, true));
   }
 
-  sprintf(buf, "MATERIAL (%s)\n", partstate->GetMaterialWrapper()->
+  sprintf(buf, "MATERIAL (%s)\n", state->GetMaterialWrapper()->
     QueryObject ()->GetName());
   str.Append(buf);
-  sprintf(buf, "COLOR (%g, %g, %g)\n", partstate->GetColor().red,
-    partstate->GetColor().green, partstate->GetColor().blue);
+  sprintf(buf, "COLOR (%g, %g, %g)\n", state->GetColor().red,
+    state->GetColor().green, state->GetColor().blue);
   str.Append(buf);
   printf(buf, "NUMBER (%d)\n", state->GetParticleCount());
   str.Append(buf);

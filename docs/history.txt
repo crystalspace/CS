@@ -24,6 +24,12 @@ The history order is reversed so that new features are at the top.
 	- Fixed all mesh object implementations to use the new csObjectModel.
 	- res added a check for DirectDraw to the configure process.
 	- res added the missing Jamfile for directxcommon.
+	- Added new rain mesh object from Martin Geisse. This version looks
+	  correct if you tilt the camera to look up and it is considerably
+	  faster since it is using DrawTriangleMesh.
+	- Fixed csMeshObject default implementation a bit. The bounding box
+	  stuff was not very good and the functions were not virtual so it
+	  was not possible to override them.
 14-Apr-2003
 	- Philip Wyett removed makedep entry under apps/tools for Jam. This
 	  is no longer needed after recent changes.

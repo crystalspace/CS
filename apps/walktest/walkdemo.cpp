@@ -122,16 +122,13 @@ void add_particles_rain (iSector* sector, char* matname, int num, float speed,
     exp->SetRenderPriority (c);
     exp->GetFlags ().Set (CS_ENTITY_CAMERA);
   }
-
   exp->SetZBufMode(CS_ZBUF_TEST);
-  csRef<iParticleState> partstate (
-  	SCF_QUERY_INTERFACE (exp->GetMeshObject (), iParticleState));
-  partstate->SetMaterialWrapper (mat);
-  partstate->SetMixMode (CS_FX_ADD);
-  partstate->SetColor (csColor (.25,.25,.25));
 
   csRef<iRainState> rainstate (
   	SCF_QUERY_INTERFACE (exp->GetMeshObject (), iRainState));
+  rainstate->SetMaterialWrapper (mat);
+  rainstate->SetMixMode (CS_FX_ADD);
+  rainstate->SetColor (csColor (.25,.25,.25));
   rainstate->SetParticleCount (num);
   rainstate->SetDropSize (.3/50., .3);
   rainstate->SetLighting (false);

@@ -38,7 +38,7 @@ endif
 INC.RAIN = $(wildcard plugins/mesh/rain/object/*.h plugins/mesh/partgen/*.h)
 SRC.RAIN = $(wildcard plugins/mesh/rain/object/*.cpp plugins/mesh/partgen/*.cpp)
 OBJ.RAIN = $(addprefix $(OUT)/,$(notdir $(SRC.RAIN:.cpp=$O)))
-DEP.RAIN = CSGEOM CSUTIL CSSYS CSUTIL
+DEP.RAIN = CSTOOL CSGEOM CSUTIL CSSYS CSUTIL
 
 MSVC.DSP += RAIN
 DSP.RAIN.NAME = rain

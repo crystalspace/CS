@@ -41,209 +41,121 @@ SCF_IMPLEMENT_EMBEDDED_IBASE (csRainMeshObject::RainState)
   SCF_IMPLEMENTS_INTERFACE (iRainState)
 SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
-void csRainMeshObject::SetupObject ()
-{
-  if (!initialized)
-  {
-    initialized = true;
-    RemoveParticles ();
-    delete[] part_pos;
-    delete[] drop_stop;
-
-    part_pos = new csVector3[number];
-    drop_stop = new float[number];
-
-    bbox = rainbox;
-    /// spread particles evenly through box
-    csVector3 size = rainbox.Max () - rainbox.Min ();
-
-    // Calculate the maximum radius.
-    float max_size = size.x;
-    if (size.y > max_size) max_size = size.y;
-    if (size.z > max_size) max_size = size.z;
-    float a = max_size/2.;
-    radius = qsqrt (a*a + a*a);
-
-    csVector3 pos;
-    int i;
-    for (i=0 ; i < number ; i++)
-    {
-      AppendRectSprite (drop_width, drop_height, mat, lighted_particles);
-      GetParticle (i)->SetMixMode (MixMode);
-      pos = GetRandomDirection (size, rainbox.Min ()) ;
-      GetParticle (i)->SetPosition (pos);
-      part_pos[i] = pos;
-      if (useCD)
-        drop_stop[i] = FindStopHeight(i);
-    }
-    SetupColor ();
-    SetupMixMode ();
-  }
-}
-
-csRainMeshObject::csRainMeshObject (iObjectRegistry* object_reg,
-  iMeshObjectFactory* factory) : csParticleSystem (object_reg, factory)
+csRainMeshObject::csRainMeshObject (iEngine *engine, iMeshObjectFactory *fact)
+  : csNewParticleSystem (engine, fact,
+    CS_PARTICLE_SCALE | CS_PARTICLE_AXIS | CS_PARTICLE_ALIGN_Y)
 {
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiRainState);
-  part_pos  = NULL;
-  drop_stop = NULL;
-  sector    = NULL;
-  useCD     = false;
-  rainbox.Set (csVector3 (0, 0, 0), csVector3 (1, 1, 1));
-  rain_dir.Set (0, -1, 0);
-  drop_width = drop_height = .1;
-  lighted_particles = false;
-  number = 50;
+  MixMode = CS_FX_ADD;
+  Axis = csVector3 (0, 1, 0);
+  Speed = csVector3 (0, -1, 0);
 }
 
-csRainMeshObject::~csRainMeshObject()
+csRainMeshObject::~csRainMeshObject ()
 {
-  delete[] part_pos;
-  delete[] drop_stop;
 }
 
+void csRainMeshObject::Spread (int first, int limit)
+{
+  csVector3 min = Bounds.Min ();
+  csVector3 size = Bounds.Max () - min;
+
+  for (int i=first; i<limit; i++)
+  {
+    float x = ((float)rand() / (1.0 + RAND_MAX));
+    float y = ((float)rand() / (1.0 + RAND_MAX));
+    float z = ((float)rand() / (1.0 + RAND_MAX));
+    PositionArray [i] = csVector3 (
+      min.x + x * size.x,
+      min.y + y * size.y,
+      min.z + z * size.z);
+  }
+}
 
 void csRainMeshObject::Update (csTicks elapsed_time)
 {
-  SetupObject ();
-  csParticleSystem::Update (elapsed_time);
-  float delta_t = elapsed_time / 1000.0f; // in seconds
-  // move particles;
-  csVector3 move, pos;
-  int i;
-  for (i=0 ; i < particles.Length () ; i++)
+  for (int i=0; i<ParticleCount; i++)
   {
-    move = rain_dir * delta_t;
-    part_pos[i] += move;
-    GetParticle (i)->SetPosition (part_pos[i]);
-  }
-  // check if particles are out of the box.
-  for (i=0 ; i < particles.Length () ; i++)
-  {
-    if (!rainbox.In(part_pos[i]) ||
-        (useCD && part_pos[i].y < drop_stop[i]) )
+    csVector3& v = PositionArray[i];
+    v += Speed * (float)elapsed_time / 1000.0f;
+    while (!Bounds.In (v))
     {
-      // this particle has left the box.
-      // it will disappear.
-      // To keep the number of particles (and thus the raininess)
-      // constant another particle will appear in sight now.
-      // @@@ rain only appears in box ceiling now, should appear on
-      // opposite side of rain_dir...
-
-      // @@@ also shifty will not work very nicely with slanted rain.
-      //   but perhaps it won't be too bad...
-      float toolow = ABS(rainbox.MinY() - part_pos[i].y);
-      float height = rainbox.MaxY() - rainbox.MinY();
-      while (toolow>height) toolow-=height;
-      pos = GetRandomDirection( csVector3 (rainbox.MaxX() - rainbox.MinX(),
-        0.0f, rainbox.MaxZ() - rainbox.MinZ()), rainbox.Min() );
-      pos.y = rainbox.MaxY() - toolow;
-      if(pos.y < rainbox.MinY() || pos.y > rainbox.MaxY())
-        pos.y = rainbox.MaxY() - height * ((float)rand() / (1.0 + RAND_MAX));
-      GetParticle (i)->SetPosition (pos);
-      part_pos[i] = pos;
-      if (useCD)
-        drop_stop[i] = FindStopHeight(i);
+      // can't simply place it randomly (the user would notice that). Also can't
+      // simply put it somewhere at the top of the box since the falling direction
+      // might not be straight downwards and so part of the box would never get
+      // get if we did.
+      if (v.x < Bounds.MinX ()) v.x += Bounds.MaxX () - Bounds.MinX ();
+      if (v.y < Bounds.MinY ()) v.y += Bounds.MaxY () - Bounds.MinY ();
+      if (v.z < Bounds.MinZ ()) v.z += Bounds.MaxZ () - Bounds.MinZ ();
+      if (v.x > Bounds.MaxX ()) v.x += Bounds.MinX () - Bounds.MaxX ();
+      if (v.y > Bounds.MaxY ()) v.y += Bounds.MinY () - Bounds.MaxX ();
+      if (v.z > Bounds.MaxZ ()) v.z += Bounds.MinZ () - Bounds.MaxX ();
     }
   }
 }
 
-void csRainMeshObject::SetCollisionDetection(bool cd)
+void csRainMeshObject::SetParticleCount (int num)
 {
-  useCD = cd;
-  if (cd && logparent)
-  {
-    csRef<iMeshWrapper> mesh = SCF_QUERY_INTERFACE (logparent, iMeshWrapper);
-    if (mesh)
-    {
-      // First sector is only one considered.
-      sector = mesh->GetMovable()->GetSectors()->Get(0);
-    }
-    else sector = NULL;
-  }
-};
-
-float csRainMeshObject::FindStopHeight(int i)
-{
-  if (!sector)  // this is only set when SetCD true is successful
-    return rainbox.MinY();
-
-  csVector3 isect, end = part_pos[i] + rain_dir
-  	* (rainbox.MaxY() - rainbox.MinY() );
-
-  iPolygon3D* poly = NULL;
-  sector->HitBeam (part_pos[i], end, isect, &poly);
-  
-  if (poly)  // found hit
-    return isect.y;         // where it hit
-  else
-    return rainbox.MinY();  // bottom of bounding box
+  int old = ParticleCount;
+  SetCount (num);
+  if (num > old) Spread (old, num);
 }
 
-void csRainMeshObject::HardTransform (const csReversibleTransform& /*t*/)
+void csRainMeshObject::SetDropSize (float dropwidth, float dropheight)
+{
+  Scale = csVector2 (dropwidth, dropheight);
+}
+
+void csRainMeshObject::SetBox (const csVector3& minbox, const csVector3& maxbox)
+{
+  Bounds.Set (minbox.x, minbox.y, minbox.z, 
+              maxbox.x, maxbox.y, maxbox.z);
+  Spread (0, ParticleCount);
+}
+
+void csRainMeshObject::SetFallSpeed (const csVector3& s)
+{
+  Speed = s;
+  Axis = s.Unit ();
+}
+
+int csRainMeshObject::GetParticleCount () const
+{
+  return ParticleCount;
+}
+
+void csRainMeshObject::GetDropSize (float& dropwidth, float& dropheight) const
+{
+  dropwidth = Scale.x;
+  dropwidth = Scale.y;
+}
+
+void csRainMeshObject::GetBox (csVector3& minbox, csVector3& maxbox) const
+{
+  minbox = Bounds.Min ();
+  maxbox = Bounds.Max ();
+}
+
+const csVector3& csRainMeshObject::GetFallSpeed () const
+{
+  return Speed;
+}
+
+void csRainMeshObject::SetCollisionDetection (bool cd)
 {
 }
 
-//----------------------------------------------------------------------
-
-SCF_IMPLEMENT_IBASE (csRainMeshObjectFactory)
-  SCF_IMPLEMENTS_INTERFACE (iMeshObjectFactory)
-SCF_IMPLEMENT_IBASE_END
-
-csRainMeshObjectFactory::csRainMeshObjectFactory (iBase* p, iObjectRegistry* s)
+bool csRainMeshObject::GetCollisionDetection () const
 {
-  SCF_CONSTRUCT_IBASE (p);
-  object_reg = s;
-  logparent = NULL;
+  return false;
 }
 
-csRainMeshObjectFactory::~csRainMeshObjectFactory ()
-{
-}
+CS_DECLARE_SIMPLE_MESH_FACTORY (csRainFactory, csRainMeshObject);
+CS_DECLARE_SIMPLE_MESH_PLUGIN (csRainPlugin, csRainFactory);
 
-csPtr<iMeshObject> csRainMeshObjectFactory::NewInstance ()
-{
-  csRainMeshObject* cm =
-    new csRainMeshObject (object_reg, (iMeshObjectFactory*)this);
-  csRef<iMeshObject> im (SCF_QUERY_INTERFACE (cm, iMeshObject));
-  cm->DecRef ();
-  return csPtr<iMeshObject> (im);
-}
-
-//----------------------------------------------------------------------
-
-SCF_IMPLEMENT_IBASE (csRainMeshObjectType)
-  SCF_IMPLEMENTS_INTERFACE (iMeshObjectType)
-  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iComponent)
-SCF_IMPLEMENT_IBASE_END
-
-SCF_IMPLEMENT_EMBEDDED_IBASE (csRainMeshObjectType::eiComponent)
-  SCF_IMPLEMENTS_INTERFACE (iComponent)
-SCF_IMPLEMENT_EMBEDDED_IBASE_END
-
-SCF_IMPLEMENT_FACTORY (csRainMeshObjectType)
+SCF_IMPLEMENT_FACTORY (csRainPlugin)
 
 SCF_EXPORT_CLASS_TABLE (rain)
-  SCF_EXPORT_CLASS (csRainMeshObjectType, "crystalspace.mesh.object.rain",
+  SCF_EXPORT_CLASS (csRainPlugin, "crystalspace.mesh.object.rain",
     "Crystal Space Rain Mesh Type")
 SCF_EXPORT_CLASS_TABLE_END
-
-csRainMeshObjectType::csRainMeshObjectType (iBase* pParent)
-{
-  SCF_CONSTRUCT_IBASE (pParent);
-  SCF_CONSTRUCT_EMBEDDED_IBASE(scfiComponent);
-}
-
-csRainMeshObjectType::~csRainMeshObjectType ()
-{
-}
-
-csPtr<iMeshObjectFactory> csRainMeshObjectType::NewFactory ()
-{
-  csRainMeshObjectFactory* cm = new csRainMeshObjectFactory (this, object_reg);
-  csRef<iMeshObjectFactory> ifact (
-  	SCF_QUERY_INTERFACE (cm, iMeshObjectFactory));
-  cm->DecRef ();
-  return csPtr<iMeshObjectFactory> (ifact);
-}
-
