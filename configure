@@ -900,6 +900,8 @@ Optional Features:
                           common memory management mistakes (default NO)
   --enable-memory-tracker enable the memory tracker which checks memory usage
                           per source file (default NO)
+  --enable-leakguards     enable the leak guard protection which will show
+                          all objects that were not freed at program exit (default NO)
   --enable-new-renderer   enable use of new renderer (_EXPERIMENTAL_!)
                           (default NO)
   --enable-make-emulation enable emulation layer allowing project to be built
@@ -37176,6 +37178,35 @@ fi
 
 if test $enable_memory_tracker = yes; then
   cs_header_text="${cs_header_text}#define CS_MEMORY_TRACKER
+"
+fi
+
+
+
+
+#------------------------------------------------------------------------------
+# Determine if leakguards should be enabled.
+#------------------------------------------------------------------------------
+echo "$as_me:$LINENO: checking whether to use leakguards" >&5
+echo $ECHO_N "checking whether to use leakguards... $ECHO_C" >&6
+# Check whether --enable-leakguards or --disable-leakguards was given.
+if test "${enable_leakguards+set}" = set; then
+  enableval="$enable_leakguards"
+
+else
+  enable_leakguards=no
+fi;
+echo "$as_me:$LINENO: result: $enable_leakguards" >&5
+echo "${ECHO_T}$enable_leakguards" >&6
+cs_build_prop_val="$enable_leakguards"
+    cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+    if test -n "$cs_build_prop_val"; then
+  cs_jamconfig_text="${cs_jamconfig_text}LEAKGUARDS ?= \"$cs_build_prop_val\" ;
+"
+fi
+
+if test $enable_leakguards = yes; then
+  cs_header_text="${cs_header_text}#define CS_LEAKGUARDS
 "
 fi
 

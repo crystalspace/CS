@@ -6,8 +6,15 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+29-Aug-2004
+	- Jorrit added a new -enable-leakguards configure option. Instead
+	  of disabling or enabling leakguards with debug versus optimize
+	  mode it is now enabled with a configure option independent of
+	  debug or optimize mode. This means that debug and optimize mode
+	  are now again compatible given the same leakguards option.
+	  Re-enabled the leakguard in csShaderVariable.
 28-Aug-2004
-	- Jorrit removed the leak guard from csShaderVariable since somehow
+	- Jorrit removed the leakguard from csShaderVariable since somehow
 	  it prevents combination of optimize and debug plugins.
 27-Aug-2004
 	- Eric Sunshine added intptr_t / uintptr_t check to configure.ac.  If

@@ -74,7 +74,7 @@ public:
     MATRIX
   };
 
-  //CS_LEAKGUARD_DECLARE (csShaderVariable);
+  CS_LEAKGUARD_DECLARE (csShaderVariable);
 private:
 
   VariableType Type;
