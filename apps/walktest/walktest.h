@@ -276,6 +276,13 @@ public:
   iEngine *Engine;
   /// The level loader
   iLoader *LevelLoader;
+  ///
+  iGraphics2D *myG2D;
+  iGraphics3D *myG3D;
+  iConsoleOutput *myConsole;
+  iVFS *myVFS;
+  iSoundRender *mySound;
+  iMotionManager *myMotionMan;
 
   /// The view on the world.
   csView* view;

@@ -83,8 +83,8 @@
 WalkTest *Sys;
 converter *ImportExport;
 
-#define Gfx3D System->G3D
-#define Gfx2D System->G2D
+#define Gfx3D Sys->myG3D
+#define Gfx2D Sys->myG2D
 
 
 //------------------------------------------------- We need the 3D engine -----
@@ -126,7 +126,7 @@ WalkTest::WalkTest () :
   anim_sky = NULL;
   anim_dirlight = NULL;
   anim_dynlight = NULL;
-
+  
   wf = NULL;
   map_mode = MAP_OFF;
   map_projection = WF_ORTHO_PERSP;
@@ -184,6 +184,13 @@ WalkTest::WalkTest () :
   ConsoleInput = NULL;
   SmallConsole = false;
 
+  myG2D = NULL;
+  myG3D = NULL;
+  myConsole = NULL;
+  myVFS = NULL;
+  mySound = NULL;
+  myMotionMan = NULL;
+
   debug_box1.Set (csVector3 (-1, -1, -1), csVector3 (1, 1, 1));
   debug_box2.Set (csVector3 (2, 2, 2), csVector3 (3, 3, 3));
   do_show_debug_boxes = false;
@@ -191,6 +198,12 @@ WalkTest::WalkTest () :
 
 WalkTest::~WalkTest ()
 {
+  DEC_REF (myVFS);
+  DEC_REF (myConsole);
+  DEC_REF (myG2D);
+  DEC_REF (myG3D);
+  DEC_REF (mySound);
+  DEC_REF (myMotionMan);
   if (ConsoleInput) ConsoleInput->DecRef ();
   if (collide_system) collide_system->DecRef ();
   if (Font) Font->DecRef ();
@@ -298,7 +311,7 @@ void WalkTest::Help ()
   Sys->Printf (MSG_STDOUT, "  -huge              special huge level generation (ignores map file!)\n");
   Sys->Printf (MSG_STDOUT, "  -bots              allow random generation of bots\n");
   Sys->Printf (MSG_STDOUT, "  <path>             load map from VFS <path> (default '%s')\n",
-        Config->GetStr ("Walktest.Settings.WorldFile", "world"));
+        GetConfig()->GetStr ("Walktest.Settings.WorldFile", "world"));
 }
 
 //-----------------------------------------------------------------------------
@@ -315,7 +328,7 @@ void WalkTest::NextFrame ()
   if (perf_stats) timeFPS = perf_stats->GetFPS ();
   else timeFPS = 0;
 
-  if (!Console || !Console->GetVisible ())
+  if (!myConsole || !myConsole->GetVisible ())
   {
     // If the console was turned off last frame no stats have been accumulated
     // as it was paused so we return here and loop again.
@@ -335,8 +348,8 @@ void WalkTest::NextFrame ()
     if (perf_stats) perf_stats->Pause (true);
 
   // Update the Motion Manager
-  if (System->MotionMan)
-    System->MotionMan->UpdateAll ();
+  if (Sys->myMotionMan)
+    Sys->myMotionMan->UpdateAll ();
 
   MoveSystems (elapsed_time, current_time);
   PrepareFrame (elapsed_time, current_time);
@@ -439,7 +452,7 @@ void WalkTest::MoveSystems (cs_time elapsed_time, cs_time current_time)
       next_bot_at = current_time+1000*10;
     }
   }
-  if (!Console || !Console->GetVisible ())
+  if (!myConsole || !myConsole->GetVisible ())
   {
     int alt,shift,ctrl;
     float speed = 1;
@@ -458,9 +471,9 @@ void WalkTest::MoveSystems (cs_time elapsed_time, cs_time current_time)
     step (0,1);
     rotate (0,1);
 
-    if (Sys->Sound)
+    if (Sys->mySound)
     {
-      iSoundListener *sndListener = Sys->Sound->GetListener();
+      iSoundListener *sndListener = Sys->mySound->GetListener();
       if(sndListener)
       {
         // take position/direction from view->GetCamera ()
@@ -604,15 +617,15 @@ void WalkTest::GfxWrite (int x, int y, int fg, int bg, char *str, ...)
   vsprintf (buf, str, arg);
   va_end (arg);
 
-  G2D->Write (Font, x, y, fg, bg, buf);
+  myG2D->Write (Font, x, y, fg, bg, buf);
 }
 
 void WalkTest::DrawFrameConsole ()
 {
-  if (Console)
-    Console->Draw2D (NULL);
+  if (myConsole)
+    myConsole->Draw2D (NULL);
 
-  if (!Console || !Console->GetVisible ())
+  if (!myConsole || !myConsole->GetVisible ())
   {
     int fw, fh;
     Font->GetMaxSize (fw, fh);
@@ -757,8 +770,8 @@ void WalkTest::DrawFrame3D (int drawflags, cs_time /*current_time*/)
   drawflags = 0;
 
   // Display the 3D parts of the console
-  if (Console)
-    Console->Draw3D (NULL);
+  if (myConsole)
+    myConsole->Draw3D (NULL);
 }
 
 
@@ -888,7 +901,7 @@ void WalkTest::DrawFrameMap ()
 
 void WalkTest::DrawFrame (cs_time elapsed_time, cs_time current_time)
 {
-  if (!Console || !Console->GetVisible ())
+  if (!myConsole || !myConsole->GetVisible ())
   {
     if (cfg_recording >= 0)
     {
@@ -951,10 +964,10 @@ void WalkTest::DrawFrame (cs_time elapsed_time, cs_time current_time)
     Gfx2D->Clear (col);
   }
 
-  if (!Console
-   || !Console->GetVisible ()
+  if (!myConsole
+   || !myConsole->GetVisible ()
    || SmallConsole
-   || Console->GetTransparency ())
+   || myConsole->GetTransparency ())
   {
     DrawFrame3D (drawflags, current_time);
     DrawFrameDebug3D ();
@@ -965,10 +978,10 @@ void WalkTest::DrawFrame (cs_time elapsed_time, cs_time current_time)
   if (!Gfx3D->BeginDraw (drawflags | CSDRAW_2DGRAPHICS))
     return;
 
-  if (!Console
-   || !Console->GetVisible ()
+  if (!myConsole
+   || !myConsole->GetVisible ()
    || SmallConsole
-   || Console->GetTransparency ())
+   || myConsole->GetTransparency ())
   {
     DrawFullScreenFX2D (elapsed_time, current_time);
   }
@@ -981,8 +994,8 @@ void WalkTest::DrawFrame (cs_time elapsed_time, cs_time current_time)
   DrawFrameConsole ();
 
   // If console is not active we draw a few additional things.
-  if (!Console
-   || !Console->GetVisible ())
+  if (!myConsole
+   || !myConsole->GetVisible ())
     DrawFrame2D ();
 
   // Drawing code ends here
@@ -1099,14 +1112,14 @@ void CaptureScreen ()
   do
   {
     sprintf (name, "/this/cryst%03d.png", i++);
-  } while (i < 1000 && Sys->VFS->Exists(name));
+  } while (i < 1000 && Sys->myVFS->Exists(name));
   if (i >= 1000)
   {
     System->Printf (MSG_CONSOLE, "Too many screenshot files in current directory\n");
     return;
   }
 
-  iImage *img = System->G2D->ScreenShot ();
+  iImage *img = Gfx2D->ScreenShot ();
   if (!img)
   {
     Sys->Printf (MSG_CONSOLE, "The 2D graphics driver does not support screen shots\n");
@@ -1119,7 +1132,7 @@ void CaptureScreen ()
     if (db)
     {
        Sys->Printf (MSG_CONSOLE, "Screenshot: %s\n", name);
-      if (!Sys->VFS->WriteFile (name, (const char*)db->GetData (), db->GetSize ()))
+      if (!Sys->myVFS->WriteFile (name, (const char*)db->GetData (), db->GetSize ()))
         Sys->Printf (MSG_CONSOLE, "There was an error while writing screen shot\n");
       db->DecRef ();
     }
@@ -1140,8 +1153,8 @@ void CaptureScreen ()
  */
 void debug_dump ()
 {
-  if (Sys->VFS)
-    SaveCamera (Sys->VFS, "/temp/walktest.bug");
+  if (Sys->myVFS)
+    SaveCamera (Sys->myVFS, "/temp/walktest.bug");
   Sys->Printf (MSG_DEBUG_0, "Camera saved in /temp/walktest.bug\n");
   Dumper::dump (Sys->view->GetCamera ()->GetPrivateObject ());
   Sys->Printf (MSG_DEBUG_0, "Camera dumped in debug.txt\n");
@@ -1278,31 +1291,56 @@ bool WalkTest::Initialize (int argc, const char* const argv[], const char *iConf
     return false;
   }
 
+  myG3D = QUERY_PLUGIN_ID (this, CS_FUNCID_VIDEO, iGraphics3D);
+  if (!myG3D)
+  {
+    Printf (MSG_FATAL_ERROR, "No iGraphics3D plugin!\n");
+    return false;
+  }
+
+  myG2D = QUERY_PLUGIN (this, iGraphics2D);
+  if (!myG2D)
+  {
+    Printf (MSG_FATAL_ERROR, "No iGraphics2D plugin!\n");
+    return false;
+  }
+
+  myVFS = QUERY_PLUGIN_ID (this, CS_FUNCID_VFS, iVFS);
+  if (!myVFS)
+  {
+    Printf (MSG_FATAL_ERROR, "No iVFS plugin!\n");
+    return false;
+  }
+
+  myConsole = QUERY_PLUGIN_ID (this, CS_FUNCID_CONSOLE, iConsoleOutput);
+  mySound = QUERY_PLUGIN_ID (this, CS_FUNCID_SOUND, iSoundRender);
+  myMotionMan = QUERY_PLUGIN_ID (this, CS_FUNCID_MOTION, iMotionManager);
+
   // Some commercials...
   Printf (MSG_INITIALIZATION, "Crystal Space version %s (%s).\n", CS_VERSION, CS_RELEASE_DATE);
   Printf (MSG_INITIALIZATION, "Created by Jorrit Tyberghein and others...\n\n");
 
   // Get all collision detection and movement config file parameters.
-  cfg_jumpspeed = Config->GetFloat ("Walktest.CollDet.JumpSpeed", 0.08);
-  cfg_walk_accelerate = Config->GetFloat ("Walktest.CollDet.WalkAccelerate", 0.007);
-  cfg_walk_maxspeed = Config->GetFloat ("Walktest.CollDet.WalkMaxSpeed", 0.1);
-  cfg_walk_brake = Config->GetFloat ("Walktest.CollDet.WalkBrake", 0.014);
-  cfg_rotate_accelerate = Config->GetFloat ("Walktest.CollDet.RotateAccelerate", 0.005);
-  cfg_rotate_maxspeed = Config->GetFloat ("Walktest.CollDet.RotateMaxSpeed", 0.03);
-  cfg_rotate_brake = Config->GetFloat ("Walktest.CollDet.RotateBrake", 0.015);
-  cfg_look_accelerate = Config->GetFloat ("Walktest.CollDet.LookAccelerate", 0.028);
-  cfg_body_height = Config->GetFloat ("Walktest.CollDet.BodyHeight", 1.4);
-  cfg_body_width = Config->GetFloat ("Walktest.CollDet.BodyWidth", 0.5);
-  cfg_body_depth = Config->GetFloat ("Walktest.CollDet.BodyDepth", 0.5);
-  cfg_eye_offset = Config->GetFloat ("Walktest.CollDet.EyeOffset", -0.7);
-  cfg_legs_width = Config->GetFloat ("Walktest.CollDet.LegsWidth", 0.4);
-  cfg_legs_depth = Config->GetFloat ("Walktest.CollDet.LegsDepth", 0.4);
-  cfg_legs_offset = Config->GetFloat ("Walktest.CollDet.LegsOffset", -1.1);
+  cfg_jumpspeed = GetConfig()->GetFloat ("Walktest.CollDet.JumpSpeed", 0.08);
+  cfg_walk_accelerate = GetConfig()->GetFloat ("Walktest.CollDet.WalkAccelerate", 0.007);
+  cfg_walk_maxspeed = GetConfig()->GetFloat ("Walktest.CollDet.WalkMaxSpeed", 0.1);
+  cfg_walk_brake = GetConfig()->GetFloat ("Walktest.CollDet.WalkBrake", 0.014);
+  cfg_rotate_accelerate = GetConfig()->GetFloat ("Walktest.CollDet.RotateAccelerate", 0.005);
+  cfg_rotate_maxspeed = GetConfig()->GetFloat ("Walktest.CollDet.RotateMaxSpeed", 0.03);
+  cfg_rotate_brake = GetConfig()->GetFloat ("Walktest.CollDet.RotateBrake", 0.015);
+  cfg_look_accelerate = GetConfig()->GetFloat ("Walktest.CollDet.LookAccelerate", 0.028);
+  cfg_body_height = GetConfig()->GetFloat ("Walktest.CollDet.BodyHeight", 1.4);
+  cfg_body_width = GetConfig()->GetFloat ("Walktest.CollDet.BodyWidth", 0.5);
+  cfg_body_depth = GetConfig()->GetFloat ("Walktest.CollDet.BodyDepth", 0.5);
+  cfg_eye_offset = GetConfig()->GetFloat ("Walktest.CollDet.EyeOffset", -0.7);
+  cfg_legs_width = GetConfig()->GetFloat ("Walktest.CollDet.LegsWidth", 0.4);
+  cfg_legs_depth = GetConfig()->GetFloat ("Walktest.CollDet.LegsDepth", 0.4);
+  cfg_legs_offset = GetConfig()->GetFloat ("Walktest.CollDet.LegsOffset", -1.1);
 
   //--- create the converter class for testing
   ImportExport = new converter();
   // process import/export files from config and print log for testing
-  ImportExport->ProcessConfig (Config);
+  ImportExport->ProcessConfig (GetConfig());
   // free memory - delete this if you want to use the data in the buffer
   delete ImportExport;
   //--- end converter test
@@ -1377,7 +1415,7 @@ bool WalkTest::Initialize (int argc, const char* const argv[], const char *iConf
   view = new csView ((csEngine*)Engine, Gfx3D);
 
   // Get the collide system plugin.
-  const char* p = Config->GetStr ("Walktest.Settings.CollDetPlugIn",
+  const char* p = GetConfig()->GetStr ("Walktest.Settings.CollDetPlugIn",
   	"crystalspace.colldet.rapid");
   collide_system = LOAD_PLUGIN (Sys, p, "CollDet", iCollideSystem);
   if (!collide_system)
@@ -1389,7 +1427,7 @@ bool WalkTest::Initialize (int argc, const char* const argv[], const char *iConf
   // Initialize the command processor with the engine and camera.
   csCommandProcessor::Initialize ((csEngine*)Engine,
     view->GetCamera ()->GetPrivateObject (), Gfx3D,
-    System->Console, System);
+    Sys->myConsole, System);
 
   // Now we have two choices. Either we create an infinite
   // maze (random). This happens when the '-infinite' commandline
@@ -1400,7 +1438,7 @@ bool WalkTest::Initialize (int argc, const char* const argv[], const char *iConf
   {
     // The infinite maze.
 
-    if (!VFS->ChDir ("/tmp"))
+    if (!myVFS->ChDir ("/tmp"))
     {
       Printf (MSG_FATAL_ERROR, "Temporary directory /tmp not mounted on VFS!\n");
       return false;
@@ -1473,7 +1511,7 @@ bool WalkTest::Initialize (int argc, const char* const argv[], const char *iConf
     // Check the map and mount it if required
     char tmp [100];
     sprintf (tmp, "%s/", map_dir);
-    if (!VFS->Exists (map_dir))
+    if (!myVFS->Exists (map_dir))
     {
       char *name = strrchr (map_dir, '/');
       if (name)
@@ -1482,18 +1520,18 @@ bool WalkTest::Initialize (int argc, const char* const argv[], const char *iConf
         //sprintf (tmp, "$.$/data$/%s.zip, $.$/%s.zip, $(..)$/data$/%s.zip",
         //  name, name, name);
 	const char *valfiletype = "";
-	valfiletype = Config->GetStr ("Walktest.Settings.WorldZipType", "");
+	valfiletype = GetConfig()->GetStr ("Walktest.Settings.WorldZipType", "");
 	if (strcmp (valfiletype, "") ==0)
 	{
 	  valfiletype = "zip";
 	}
         sprintf (tmp, "$.$/data$/%s.%s, $.$/%s.%s, $(..)$/data$/%s.%s",
            name, valfiletype, name, valfiletype, name, valfiletype );
-        VFS->Mount (map_dir, tmp);
+        myVFS->Mount (map_dir, tmp);
       }
     }
 
-    if (!VFS->ChDir (map_dir))
+    if (!myVFS->ChDir (map_dir))
     {
       Printf (MSG_FATAL_ERROR, "The directory on VFS for map file does not exist!\n");
       return false;
@@ -1556,23 +1594,23 @@ bool WalkTest::Initialize (int argc, const char* const argv[], const char *iConf
 #endif
 
   Printf (MSG_INITIALIZATION, "--------------------------------------\n");
-  if (Console)
+  if (myConsole)
   {
-    Console->SetVisible (false);
-    Console->AutoUpdate (false);
+    myConsole->SetVisible (false);
+    myConsole->AutoUpdate (false);
     ConsoleInput = QUERY_PLUGIN (System, iConsoleInput);
     if (ConsoleInput)
     {
-      ConsoleInput->Bind (Console);
+      ConsoleInput->Bind (myConsole);
       ConsoleInput->SetPrompt ("cs# ");
       ConsoleInput->ExecuteCallback (csCommandProcessor::perform_callback, NULL);
     }
 
     // Set console to center of screen, if supported
-    int DeltaX = G2D->GetWidth () / 10;
-    int DeltaY = G2D->GetHeight () / 10;
-    SmallConsole = Console->ConsoleExtension ("SetPos", DeltaX, DeltaY,
-      G2D->GetWidth () - DeltaX * 2, G2D->GetHeight () - DeltaY * 2);
+    int DeltaX = myG2D->GetWidth () / 10;
+    int DeltaY = myG2D->GetHeight () / 10;
+    SmallConsole = myConsole->ConsoleExtension ("SetPos", DeltaX, DeltaY,
+      myG2D->GetWidth () - DeltaX * 2, myG2D->GetHeight () - DeltaY * 2);
   }
 
   // Wait one second before starting.
@@ -1587,7 +1625,7 @@ bool WalkTest::Initialize (int argc, const char* const argv[], const char *iConf
   fgcolor_stats = txtmgr->FindRGB (255, 255, 255);
 
   // Reinit console object for 3D engine use.
-  if (Console) Console->Clear ();
+  if (myConsole) myConsole->Clear ();
 
   // Initialize our 3D view.
   view->GetCamera ()->SetSector (room);
@@ -1599,9 +1637,9 @@ bool WalkTest::Initialize (int argc, const char* const argv[], const char *iConf
   view->SetRectangle (2, 2, w3d - 4, h3d - 4);
 
   // clear all backbuffers to black
-  G2D->BeginDraw ();
-  G2D->ClearAll (txtmgr->FindRGB(0,0,0));
-  G2D->FinishDraw ();
+  myG2D->BeginDraw ();
+  myG2D->ClearAll (txtmgr->FindRGB(0,0,0));
+  myG2D->FinishDraw ();
 
   return true;
 }

@@ -305,7 +305,7 @@ void load_meshobj (char *filename, char *templatename, char* txtname)
 
   // read in the model file
   converter * filedata = new converter;
-  if (filedata->ivcon (filename, true, false, NULL, Sys->VFS) == ERROR)
+  if (filedata->ivcon (filename, true, false, NULL, Sys->myVFS) == ERROR)
   {
     Sys->Printf (MSG_CONSOLE, "There was an error reading the data!\n");
     delete filedata;
@@ -697,12 +697,12 @@ bool CommandHandler (const char *cmd, const char *arg)
   else if (!strcasecmp (cmd, "coordsave"))
   {
     Sys->Printf (MSG_CONSOLE, "Saved camera location in /temp/walktest.cam\n");
-    SaveCamera (Sys->VFS, "/temp/walktest.cam");
+    SaveCamera (Sys->myVFS, "/temp/walktest.cam");
   }
   else if (!strcasecmp (cmd, "coordload"))
   {
     Sys->Printf (MSG_CONSOLE, "Loaded camera location from /temp/walktest.cam\n");
-    LoadCamera (Sys->VFS, "/temp/walktest.cam");
+    LoadCamera (Sys->myVFS, "/temp/walktest.cam");
   }
   else if (!strcasecmp (cmd, "plugins"))
   {
@@ -803,10 +803,10 @@ bool CommandHandler (const char *cmd, const char *arg)
     {
       char buf[255];
       sprintf (buf, "/this/%s.rec", arg);
-      SaveRecording (Sys->VFS, buf);
+      SaveRecording (Sys->myVFS, buf);
     }
     else
-      SaveRecording (Sys->VFS, "/this/record");
+      SaveRecording (Sys->myVFS, "/this/record");
   }
   else if (!strcasecmp (cmd, "loadrec"))
   {
@@ -819,11 +819,11 @@ bool CommandHandler (const char *cmd, const char *arg)
     {
       char buf[255];
       sprintf (buf, "/this/%s.rec", arg);
-      LoadRecording (Sys->VFS, buf);
+      LoadRecording (Sys->myVFS, buf);
       Sys->recorded_perf_stats_name = strnew (arg);
     }
     else
-      LoadRecording (Sys->VFS, "/this/record");
+      LoadRecording (Sys->myVFS, "/this/record");
   }
   else if (!strcasecmp (cmd, "clrrec"))
   {
@@ -1191,7 +1191,7 @@ bool CommandHandler (const char *cmd, const char *arg)
   {
     csCommandProcessor::change_boolean (arg, &Sys->do_freelook, "freelook");
     if (Sys->do_freelook)
-      System->G2D->SetMousePosition (FRAME_WIDTH / 2, FRAME_HEIGHT / 2);
+      Sys->myG2D->SetMousePosition (FRAME_WIDTH / 2, FRAME_HEIGHT / 2);
   }
   else if (!strcasecmp (cmd, "stats"))
   {
@@ -1788,9 +1788,9 @@ bool CommandHandler (const char *cmd, const char *arg)
 	  	iSkeletonBone);
 	  if (sb)
 	  {
-	    if (System->MotionMan)
+	    if (Sys->myMotionMan)
 	    {
-	      if (!System->MotionMan->ApplyMotion(sb, motion, motion, true,
+	      if (!Sys->myMotionMan->ApplyMotion(sb, motion, motion, true,
 	      	false, 1.0, 0, false))
 	        Sys->Printf (MSG_CONSOLE, "That motion does not exist!\n");
 	    }
@@ -1952,7 +1952,7 @@ bool CommandHandler (const char *cmd, const char *arg)
   }
   else if (!strcasecmp (cmd, "snd_play"))
   {
-    if (Sys->Sound)
+    if (Sys->mySound)
     {
       iSoundWrapper *sb = GET_NAMED_CHILD_OBJECT_FAST (Sys->view->GetEngine ()->
         QueryObject (), iSoundWrapper, arg);
@@ -1964,15 +1964,15 @@ bool CommandHandler (const char *cmd, const char *arg)
   }
   else if (!strcasecmp (cmd, "snd_volume"))
   {
-    if (Sys->Sound)
+    if (Sys->mySound)
     {
-      float vol = Sys->Sound->GetVolume ();
+      float vol = Sys->mySound->GetVolume ();
       csCommandProcessor::change_float (arg, &vol, "snd_volume", 0.0, 1.0);
-      Sys->Sound->SetVolume (vol);
+      Sys->mySound->SetVolume (vol);
     }
   }
   else if (!strcasecmp (cmd, "fullscreen"))
-    Sys->G2D->PerformExtension("fullscreen");
+    Sys->myG2D->PerformExtension("fullscreen");
   else
     return false;
 

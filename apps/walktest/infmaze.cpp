@@ -225,7 +225,7 @@ static bool CompleteSectorCB (iPortal* portal, iBase* context, void* data)
     infinite_maze->random_loose_portals (ipc->x2, ipc->y2, ipc->z2);
     s->InitLightMaps (false);
     s->ShineLights ();
-    s->CreateLightMaps (System->G3D);
+    s->CreateLightMaps (Sys->myG3D);
     while (ipc->lviews)
     {
       int old_draw_busy = s->draw_busy;

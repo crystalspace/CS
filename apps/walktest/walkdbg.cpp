@@ -42,8 +42,8 @@
 #include "ivideo/graph3d.h"
 #include "ivideo/txtmgr.h"
 
-#define Gfx3D System->G3D
-#define Gfx2D System->G2D
+#define Gfx3D Sys->myG3D
+#define Gfx2D Sys->myG2D
 
 extern WalkTest* Sys;
 
@@ -53,7 +53,7 @@ void DrawZbuffer ()
 {
   for (int y = 0; y < FRAME_HEIGHT; y++)
   {
-    int gi_pixelbytes = System->G2D->GetPixelBytes ();
+    int gi_pixelbytes = Gfx2D->GetPixelBytes ();
 
     uint32 *zbuf = Gfx3D->GetZBuffAt (0, y);
 
@@ -81,13 +81,13 @@ void DrawZbuffer ()
 
 void DrawPalette ()
 {
-  if (System->G2D->GetPixelBytes () != 1)
+  if (Gfx2D->GetPixelBytes () != 1)
     return;
-  int pw = System->G2D->GetWidth () / 16;
-  int ph = System->G2D->GetHeight () / 16;
+  int pw = Gfx2D->GetWidth () / 16;
+  int ph = Gfx2D->GetHeight () / 16;
   for (int i = 0; i < 16; i++)
     for (int j = 0; j < 16; j++)
-      System->G2D->DrawBox (i * pw, j * ph, pw, ph, j * 16 + i);
+      Gfx2D->DrawBox (i * pw, j * ph, pw, ph, j * 16 + i);
 }
 
 int collcount = 0;

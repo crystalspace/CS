@@ -550,7 +550,7 @@ void WalkTest::eatkeypress (iEvent &Event)
   bool alt = (Event.Key.Modifiers & CSMASK_ALT) != 0;
   bool ctrl = (Event.Key.Modifiers & CSMASK_CTRL) != 0;
 
-  if (Console && Console->GetVisible () && status)
+  if (myConsole && myConsole->GetVisible () && status)
   {
     if (ConsoleInput)
       ConsoleInput->HandleEvent (Event);
@@ -677,8 +677,8 @@ bool WalkTest::HandleEvent (iEvent &Event)
     {
       if (Event.Command.Code == cscmdContextResize)
       {
-	FRAME_WIDTH = G2D->GetWidth();
-	FRAME_HEIGHT = G2D->GetHeight();
+	FRAME_WIDTH = myG2D->GetWidth();
+	FRAME_HEIGHT = myG2D->GetHeight();
 	view->GetCamera ()->SetPerspectiveCenter (FRAME_WIDTH/2, FRAME_HEIGHT/2);
 	if (wf)
 	  wf->GetCamera ()->SetPerspectiveCenter (FRAME_WIDTH/2, FRAME_HEIGHT/2);
@@ -710,7 +710,7 @@ bool WalkTest::HandleEvent (iEvent &Event)
           last_x = Event.Mouse.x;
           last_y = Event.Mouse.y;
 
-          System->G2D->SetMousePosition (FRAME_WIDTH / 2, FRAME_HEIGHT / 2);
+          myG2D->SetMousePosition (FRAME_WIDTH / 2, FRAME_HEIGHT / 2);
           if (!first_time)
           {
           /*

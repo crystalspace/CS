@@ -1023,7 +1023,7 @@ void HandleDynLight (iDynLight* dyn)
           ms->snd->DecRef();
         }
         delete ms;
-        if (Sys->Sound)
+        if (Sys->mySound)
         {
           iSoundSource *sndsrc;
           if ((sndsrc = Sys->wMissile_boom->CreateSource (SOUND3D_ABSOLUTE)))
@@ -1047,7 +1047,7 @@ void HandleDynLight (iDynLight* dyn)
       l->SetCenter (v);
       dyn->Setup ();
       if (ms->sprite) move_mesh (&(ms->sprite->scfiMeshWrapper), s, v);
-      if (Sys->Sound && ms->snd) ms->snd->SetPosition (v);
+      if (Sys->mySound && ms->snd) ms->snd->SetPosition (v);
       break;
     }
     case DYN_TYPE_EXPLOSION:
@@ -1107,7 +1107,7 @@ void fire_missile ()
 
   MissileStruct* ms = new MissileStruct;
   ms->snd = NULL;
-  if (Sys->Sound)
+  if (Sys->mySound)
     if ((ms->snd = Sys->wMissile_whoosh->CreateSource (SOUND3D_ABSOLUTE)))
     {
       ms->snd->SetPosition (pos);
@@ -1389,7 +1389,7 @@ iMeshWrapper* CreatePortalThing (const char* name, iSector* room,
     room->ShineLights (iwrap);
     iwrap->DecRef ();
   }
-  thing_state->CreateLightMaps (Sys->G3D);
+  thing_state->CreateLightMaps (Sys->myG3D);
   thing_state->DecRef ();
 
   return thing;
@@ -1412,7 +1412,7 @@ void OpenPortal (iLoader *LevelLoader, csView* view, char* lev)
     // @@@ No error checking!
     char buf[255];
     sprintf (buf, "/lev/%s", lev);
-    Sys->VFS->ChDir (buf);
+    Sys->myVFS->ChDir (buf);
     LevelLoader->LoadMapFile ("world", false);
     Sys->Engine->GetCurrentRegion ()->Prepare ();
   }
