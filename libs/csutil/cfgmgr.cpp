@@ -290,7 +290,7 @@ void csConfigManager::RemoveDomain(char const *path)
 iConfigFile* csConfigManager::LookupDomain(char const *path) const
 {
   csConfigDomain *d = FindConfig(path);
-  return d != 0 ? d->Cfg : 0;
+  return d != 0 ? d->Cfg : (iConfigFile*)0;
 }
 
 void csConfigManager::SetDomainPriority(char const* path, int priority)

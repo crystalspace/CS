@@ -17,6 +17,8 @@ chronological order.
 	  declaring the scfInterface<> specialization for each SCF interface.
 	  This change eliminates many warnings emitted by some compilers
 	  (30,000 warnings, according to one report).
+	- Eric Sunshine fixed ambiguous overload compilation error in
+	  cfgmgr.cpp reported by some versions of gcc.
 28-Oct-2003
 	- Jorrit did various optimizations to the tiled coverage buffer
 	  in Dynavis. Added several new special cases to Flush() and
