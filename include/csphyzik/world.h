@@ -148,6 +148,10 @@ protected:
   real *y0;
   real *y1;
 
+  //!me should be a per "group" member ( when groups are implemented )
+  // indicate if there was a catstrophe last frame
+  bool was_catastrophe_last_frame;
+
   long y_save_size;
   long max_state_size;
 
