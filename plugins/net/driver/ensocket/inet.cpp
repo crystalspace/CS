@@ -195,13 +195,13 @@ int csNetworkSocket2::WaitForConnection (int source, int port, int que)
   local_addr.sin_addr.s_addr = source;
   memset(&local_addr.sin_zero,0,8);
 
+  last_error = CS_NET_SOCKET_NOERROR;
+
   if (bind(socketfd, (struct sockaddr*)&local_addr, sizeof(struct sockaddr)) ==
       CS_SOCKET2_ERROR)
     last_error = CS_NET_SOCKET_CANNOT_BIND;
-  else if (listen(socketfd,que) == CS_SOCKET2_ERROR)
-    last_error = CS_NET_SOCKET_CANNOT_LISTEN;
-  else
-    last_error = CS_NET_SOCKET_NOERROR;
+  else if (proto_type != SOCK_DGRAM && listen(socketfd,que) == CS_SOCKET2_ERROR)
+      last_error = CS_NET_SOCKET_CANNOT_LISTEN;
 
   return last_error;
 }
