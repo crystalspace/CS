@@ -47,6 +47,8 @@ chronological order.
 	  make sense to sort pointers.
 	- Jorrit also removed DefaultCompare() and DefaultCompareKey for
 	  csPDelArray. Doesn't make sense to compare pointers.
+	- Jorrit removed all DefaultCompare() functions from csRefArray.
+	  Doesn't make sense to compare pointers.
 3-Aug-2003
 	- Paul G. implemented a very nasty (and hopefully very temporary) hack
 	  for csunicode.h to define CS_WCHAR_T_SIZE appropriately for
