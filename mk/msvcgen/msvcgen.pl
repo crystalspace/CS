@@ -34,7 +34,7 @@ use Getopt::Long;
 $Getopt::Long::ignorecase = 0;
 
 my $PROG_NAME = 'msvcgen.pl';
-my $PROG_VERSION = 5;
+my $PROG_VERSION = 6;
 my $AUTHOR_NAME = 'Eric Sunshine';
 my $AUTHOR_EMAIL = 'sunshine@sunshineco.com';
 my $COPYRIGHT = "Copyright (C) 2000-2003 by $AUTHOR_NAME <$AUTHOR_EMAIL>";
@@ -73,6 +73,10 @@ $main::opt_template_dir = '';
 $main::opt_T = '';	# Alias for 'template-dir'.
 @main::opt_strip_root = ();
 @main::opt_S = ();	# Alias for 'strip-root'.
+@main::opt_accept = ();
+@main::opt_a = ();	# Alias for 'accept'.
+@main::opt_reject = ();
+@main::opt_r = ();	# Alias for 'reject'.
 $main::opt_verbose = 0;
 $main::opt_v = 0;	# Alias for 'verbose'.
 $main::opt_quiet = 0;
@@ -115,6 +119,10 @@ my @script_options = (
     'T=s',		# Alias for 'template-dir'.
     'strip-root=s@',
     'S=s@',		# Alias for 'strip-root'.
+    'accept=s@',
+    'a=s@',		# Alias for 'accept'.
+    'reject=s@',
+    'r=s@',		# Alias for 'reject'.
     'verbose!',
     'v!',		# Alias for 'verbose'.
     'quiet!',
@@ -124,6 +132,8 @@ my @script_options = (
 );
 
 $main::verbosity = 0;
+$main::accept_patterns = '';
+$main::reject_patterns = '';
 $main::makefile = '';
 $main::guid = '';
 $main::groups = {};
@@ -633,12 +643,30 @@ sub validate_options {
 }
 
 #------------------------------------------------------------------------------
+# Given an array of pattern strings, synthesize a regular expression which
+# checks all patterns in parallel.  If the pattern array is empty, the
+# $fallback_pattern is returned.
+#------------------------------------------------------------------------------
+sub synthesize_pattern {
+    my ($patterns, $fallback_pattern) = @_;
+    my $composite;
+    foreach my $pattern (@{$patterns}) {
+	$composite .= '|' if $composite;
+	$composite .= $pattern;
+    }
+    $composite = $fallback_pattern unless $composite;
+    return $composite;
+}
+
+#------------------------------------------------------------------------------
 # Process options which apply globally (workspace or project mode).
 #------------------------------------------------------------------------------
 sub process_global_options {
     $main::verbosity =  1 if $main::opt_verbose;
     $main::verbosity = -1 if $main::opt_quiet;
     $main::opt_template_dir = '.' unless $main::opt_template_dir;
+    $main::accept_patterns = synthesize_pattern(\@main::opt_accept, '.+');
+    $main::reject_patterns = synthesize_pattern(\@main::opt_reject, '^$');
 }
 
 #------------------------------------------------------------------------------
@@ -658,12 +686,21 @@ sub process_option_aliases {
     $main::opt_meta_file = $main::opt_M unless $main::opt_meta_file;
     $main::opt_template = $main::opt_t unless $main::opt_template;
     $main::opt_template_dir = $main::opt_T unless $main::opt_template_dir;
+    $main::opt_xml_protect = 1 if $main::opt_X;
     push(@main::opt_library, @main::opt_L);
     push(@main::opt_delaylib, @main::opt_Y);
     push(@main::opt_lflags, @main::opt_l);
     push(@main::opt_depend, @main::opt_D);
     push(@main::opt_strip_root, @main::opt_S);
-    $main::opt_xml_protect = 1 if $main::opt_X;
+    push(@main::opt_accept, @main::opt_a);
+    push(@main::opt_reject, @main::opt_r);
+}
+
+#------------------------------------------------------------------------------
+# Filter a list of input filenames based upon --accept and --reject options.
+#------------------------------------------------------------------------------
+sub filter_pathnames {
+    return grep(/$main::accept_patterns/ && !/$main::reject_patterns/, @_);
 }
 
 #------------------------------------------------------------------------------
@@ -672,15 +709,15 @@ sub process_option_aliases {
 #------------------------------------------------------------------------------
 sub massage_paths {
     my @infiles = @_;
-    my @files;
+    my @outfiles;
     foreach my $file (@infiles) {
 	$file =~ tr:/:\\:;
 	foreach my $root (@main::opt_strip_root) {
 	    last if $file =~ s/^$root//;
 	}
-	push(@files, $file);
+	push(@outfiles, $file);
     }
-    return @files;
+    return @outfiles;
 }
 
 #------------------------------------------------------------------------------
@@ -725,7 +762,7 @@ sub process_project_options {
     }
     @main::opt_strip_root = @roots;
 
-    my @files = massage_paths(@ARGV);
+    my @files = massage_paths(filter_pathnames(@ARGV));
     ($main::opt_meta_file) = massage_paths($main::opt_meta_file);
     if ($main::opt_meta_file) {
 	my $metafile_rx = quotemeta($main::opt_meta_file);
@@ -756,7 +793,7 @@ sub process_workspace_options {
     add_suffix($main::opt_output, $main::opt_workspace_extension);
 
     my $fragment;
-    foreach $fragment (@ARGV) {
+    foreach $fragment (filter_pathnames(@ARGV)) {
 	my $pjf_frag = $fragment;
 	add_suffix($pjf_frag, 'pjf');
 	push(@main::pjf_fragments, $pjf_frag);
@@ -902,6 +939,25 @@ Global Options:
                  Specifies the directory where the template files reside.  If
                  not specified, then template files are assumed to exist in the
                  current working directory.
+    -a <pattern>
+    --accept=<pattern>
+                 Specifies a Perl regular-expression used as a filter against
+                 each named <file>.  Filenames which match the pattern will be
+                 included in the generated workspace or project unless
+                 overriden by --reject.  The --accept option may be given any
+                 number of times in order to specify any number of patterns.
+                 This is a useful option for clients unable to filter the list
+                 filenames themselves.  Example: --accept='\.cc\$'
+    -r <pattern>
+    --reject=<pattern>
+                 Specifies a Perl regular-expression used as a filter against
+                 each named <file>.  Filenames which match the pattern will not
+                 be included in the generated workspace or project.
+                 Reject-patterns override accept-patterns.  The --reject option
+                 may be given any number of times in order to specify any
+                 number of patterns.  This is a useful option for clients
+                 unable to filter the list of filenames themselves.
+                 Example: --reject='\.txt\$'
     -v --verbose Emit informational messages about the processing.  Can be
                  negated with --noverbose.  Deafult is --noverbose.
     -q --quiet   Suppress all output except for error messages.  Can be
