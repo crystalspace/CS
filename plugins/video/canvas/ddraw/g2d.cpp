@@ -28,6 +28,7 @@
 #include "iutil/objreg.h"
 #include "ivaria/reporter.h"
 #include "cssys/win32/win32.h"
+#include "iutil/cmdline.h"
 
 #ifndef DD_FALSE 
   // This is normally being done in the ddraw.h file
@@ -95,6 +96,14 @@ bool csGraphics2DDDraw3::Initialize (iObjectRegistry *object_reg)
 {
   if (!csGraphics2D::Initialize (object_reg))
     return false;
+
+  iCommandLineParser* cmdline = CS_QUERY_REGISTRY (object_reg,
+						   iCommandLineParser);
+  m_bHardwareCursor = config->GetBool ("Video.SystemMouseCursor", true);
+  if (cmdline->GetOption ("sysmouse")) m_bHardwareCursor = true;
+  if (cmdline->GetOption ("nosysmouse")) m_bHardwareCursor = false;
+  cmdline->DecRef ();
+  m_bHardwareCursor = false;
 
   return true;
 }
