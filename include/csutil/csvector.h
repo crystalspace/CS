@@ -24,8 +24,10 @@
 
 // XXX: We should enable that but too many things in CS are still using the
 // csVector classes
-//#warning The csVector classes are deprecated. Please use csArray
-//#warning csGrowingArray, csRefArray or csPArray
+//#ifdef __GNUC__
+//# warning The csVector classes are deprecated. Please use csArray
+//# warning csGrowingArray, csRefArray or csPArray
+//#endif
 
 /**
  * \deprecated Use #csArray, #csGrowingArray, #csRefArray or #csPArray

@@ -212,7 +212,9 @@
 #endif
 
 #ifdef CS_SYSDEF_PROVIDE_SOCKETS
-#warning CS_SYSDEF_PROVIDE_SOCKETS is deprecated, include cssys/sockets.h instead
+# ifdef __GNUC__
+#  warning CS_SYSDEF_PROVIDE_SOCKETS is deprecated, include cssys/sockets.h instead
+# endif
 #include "cssys/sockets.h"
 #endif
 
