@@ -25,6 +25,8 @@ The history order has been reversed so that new features are at the top.
 	  and C-preprocessor variables named CS_BUILTIN_SIZED_TYPES.  This
 	  change was necessary in order to support BeOS since the BeOS system
 	  headers already define these types.
+	- Eric Sunshine eliminated a compilation warning in the Dungeon
+	  plug-in which was reported by BeOS compiler.
 21-Jun-2000
 	- Norman Kramer added new SetViewArea for gridviews to retsrict the
 	  area they can show.
