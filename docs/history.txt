@@ -10,6 +10,9 @@ The history order is reversed so that new features are at the top.
 	  successfully, whereas `true' caused some tests to fail.
 	- Eric Sunshine fixed CS/docs/support/devapi.dox so that it no longer
 	  refers to the obsolete CS/support directory.
+	- Eric Sunshine re-enabled the devapi documentation build and publish
+	  task in jobber.pl since it appears that the new SF shell server is
+	  capable of building this documentation set.
 30-Sep-2002
 	- Reverted a downscaling fix in OpenGL renderer for 2D images.
 	- Fixed simplept so it works again. Basically there was a problem

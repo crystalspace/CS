@@ -240,6 +240,16 @@ my @TARGETS =
 	     'name'   => 'cspubapi-html',
 	     'appear' => "$PROJECT_ROOT/docs/pubapi",
 	     'browseable-postprocess' =>
+	         'sh docs/support/annotate/transform.sh ~T' }},
+     { 'name'   => 'Developer API Reference',
+       'action' => 'Generating',
+       'make'   => 'devapi',
+       'newdir' => 'out/docs/devapi',
+       'export' =>
+	   { 'dir'    => 'devapi',
+	     'name'   => 'csdevapi-html',
+	     'appear' => "$PROJECT_ROOT/docs/devapi",
+	     'browseable-postprocess' =>
 	         'sh docs/support/annotate/transform.sh ~T' }});
 
 my @ARCHIVERS =
