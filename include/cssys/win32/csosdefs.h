@@ -79,6 +79,8 @@
 #define SOFTWARE_2D_DRIVER "crystalspace.graphics2d.directdraw"
 #define OPENGL_2D_DRIVER "crystalspace.graphics2d.glwin32"
 #define GLIDE_2D_DRIVER	"crystalspace.graphics2d.glidewin"
+
+// The sound driver
 #define SOUND_DRIVER "crystalspace.sound.driver.waveout"
 
 // SCF symbol export facility.
