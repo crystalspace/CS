@@ -36,6 +36,7 @@ enum
 {
   XMLTOKEN_SYSTEM,
   XMLTOKEN_GRAVITY,
+  XMLTOKEN_DAMPENER,
   XMLTOKEN_GROUP,
   XMLTOKEN_BODY,
   XMLTOKEN_NAME,
@@ -99,6 +100,7 @@ bool csPhysicsLoader::Initialize (iObjectRegistry* object_reg)
 
   xmltokens.Register ("system", XMLTOKEN_SYSTEM);
   xmltokens.Register ("gravity", XMLTOKEN_GRAVITY);
+  xmltokens.Register ("dampener", XMLTOKEN_DAMPENER);
   xmltokens.Register ("group", XMLTOKEN_GROUP);
   xmltokens.Register ("body", XMLTOKEN_BODY);
   xmltokens.Register ("name", XMLTOKEN_NAME);
@@ -182,6 +184,14 @@ bool csPhysicsLoader::ParseSystem (iDocumentNode* node, iDynamicSystem* system)
         system->SetGravity (v);
         break;
       } 
+      case XMLTOKEN_DAMPENER:
+      {
+        float angular = child->GetAttributeValueAsFloat ("angular");
+        float linear = child->GetAttributeValueAsFloat ("linear");
+        system->SetRollingDampener (angular);
+        system->SetLinearDampener (linear);
+        break;
+      }
       case XMLTOKEN_GROUP:
 	  {
         csRef<iBodyGroup> group = system->CreateGroup ();
@@ -195,15 +205,27 @@ bool csPhysicsLoader::ParseSystem (iDocumentNode* node, iDynamicSystem* system)
           if (id == XMLTOKEN_BODY) {
             csRef<iRigidBody> body = system->CreateBody ();
             group->AddBody (body);
-            if (!ParseBody (child, body)) {
+            if (!ParseBody (gchild, body)) {
 			  return false;
 			}
           } else {
-            synldr->ReportBadToken (child);
+            synldr->ReportBadToken (gchild);
           }
         }
         break;
       }
+      case XMLTOKEN_COLLIDERMESH:
+	    if (!ParseSystemColliderMesh (child, system)) return false;
+		break;
+      case XMLTOKEN_COLLIDERSPHERE:
+	    if (!ParseSystemColliderSphere (child, system)) return false;
+		break;
+      case XMLTOKEN_COLLIDERCYLINDER:
+	    if (!ParseSystemColliderCylinder (child, system)) return false;
+		break;
+      case XMLTOKEN_COLLIDERBOX:
+	    if (!ParseSystemColliderBox (child, system)) return false;
+		break;
       case XMLTOKEN_BODY:
       {
         csRef<iRigidBody> body = system->CreateBody ();
@@ -344,6 +366,62 @@ bool csPhysicsLoader::ParseCollider (iDocumentNode* node, iRigidBody* body)
   return true;
 }
 
+bool csPhysicsLoader::ParseSystemColliderMesh (iDocumentNode* node, iDynamicSystem* system)
+{
+  float f = node->GetAttributeValueAsFloat ("friction");
+  float e = node->GetAttributeValueAsFloat ("elasticity");
+  if (!node->GetContentsValue ()) { return false; }
+  iMeshWrapper *m = engine->FindMeshObject (node->GetContentsValue ());
+  if (m) {
+    system->AttachColliderMesh (m, m->GetMovable()->GetTransform (), f, e);
+  } else {
+    synldr->ReportError ("crystalspace.dynamics.loader",
+      node, "Unable to find collider mesh in engine");
+    return false;
+  }
+  return true;
+}
+
+bool csPhysicsLoader::ParseSystemColliderSphere (iDocumentNode* node, iDynamicSystem* system)
+{
+  float f = node->GetAttributeValueAsFloat ("friction");
+  float e = node->GetAttributeValueAsFloat ("elasticity");
+  float r = node->GetAttributeValueAsFloat ("radius");
+  csOrthoTransform t;
+  ParseTransform (node, t);
+  system->AttachColliderSphere (r, t.GetOrigin(), f, e);
+  return true;
+}
+  
+
+bool csPhysicsLoader::ParseSystemColliderCylinder (iDocumentNode* node, iDynamicSystem* system)
+{
+  float f = node->GetAttributeValueAsFloat ("friction");
+  float e = node->GetAttributeValueAsFloat ("elasticity");
+  float l = node->GetAttributeValueAsFloat ("length");
+  float r = node->GetAttributeValueAsFloat ("radius");
+  csOrthoTransform t;
+  ParseTransform (node, t);
+  system->AttachColliderCylinder (l, r, t, f, e);
+  return true;
+}
+
+bool csPhysicsLoader::ParseSystemColliderBox (iDocumentNode* node, iDynamicSystem* system)
+{
+  float f = node->GetAttributeValueAsFloat ("friction");
+  float e = node->GetAttributeValueAsFloat ("elasticity");
+  csVector3 v;
+  if (!synldr->ParseVector (node, v)) {
+    synldr->ReportError ("crystalspace.dynamics.loader",
+      node, "Error processing box parameters");
+    return false;
+  }
+  csOrthoTransform t;
+  ParseTransform (node, t);
+  system->AttachColliderBox (v, t, f, e);
+  return true;
+}
+
 bool csPhysicsLoader::ParseTransform (iDocumentNode* node, csOrthoTransform &t)
 {
   csRef<iDocumentNodeIterator> it = node->GetNodes ();
@@ -381,8 +459,8 @@ bool csPhysicsLoader::ParseJoint (iDocumentNode* node, iJoint* joint, iDynamicSy
 
   csRef<iDocumentNodeIterator> it = node->GetNodes ();
   csOrthoTransform t;
-  csRef<iRigidBody> body1;
-  csRef<iRigidBody> body2;
+  csRef<iRigidBody> body1 = 0;
+  csRef<iRigidBody> body2 = 0;
   while (it->HasNext ())
   {
     csRef<iDocumentNode> child = it->Next ();
@@ -408,7 +486,6 @@ bool csPhysicsLoader::ParseJoint (iDocumentNode* node, iJoint* joint, iDynamicSy
               child, "Body should have a name");
             return false;
           }
-          joint->Attach (body1, body2);
         } else {
           synldr->ReportError ("crystalspace.dynamics.loader",
             child, "Too many bodies attached to joint");
@@ -473,6 +550,7 @@ bool csPhysicsLoader::ParseJoint (iDocumentNode* node, iJoint* joint, iDynamicSy
     }
   }
   joint->SetTransform (t);
+  joint->Attach (body1, body2);
   return true;
 }
 

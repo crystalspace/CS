@@ -52,6 +52,14 @@ public:
   virtual bool ParseBody (iDocumentNode *node, iRigidBody* body);
   /// Parse the collider specific sub section
   virtual bool ParseCollider (iDocumentNode *node, iRigidBody* body);
+  /// Parse an anonymous mesh collider in the system
+  virtual bool ParseSystemColliderMesh (iDocumentNode *node, iDynamicSystem* system);
+  /// Parse an anonymous sphere collider in the system
+  virtual bool ParseSystemColliderSphere (iDocumentNode *node, iDynamicSystem* system);
+  /// Parse an anonymous cylinder collider in the system
+  virtual bool ParseSystemColliderCylinder (iDocumentNode *node, iDynamicSystem* system);
+  /// Parse an anonymous box collider in the system
+  virtual bool ParseSystemColliderBox (iDocumentNode *node, iDynamicSystem* system);
   /// Parse the joint specific sub section
   virtual bool ParseJoint (iDocumentNode *node, iJoint* joint, iDynamicSystem* system);
   /// Parse a transform
