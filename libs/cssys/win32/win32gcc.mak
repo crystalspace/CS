@@ -54,7 +54,7 @@ LIB_PREFIX=lib
 
 # Extra libraries needed on this system (beside drivers)
 # MINGW_LIBS comes from the local config.mak and is set up by msysconf.sh.
-LIBS.EXE= $(LFLAGS.l)gdi32 $(MINGW_LIBS)
+LIBS.EXE= $(LFLAGS.l)gdi32 $(MINGW_LIBS) $(LFLAGS.l)shell32 
 
 # OpenGL settings for use with OpenGL Drivers...untested
 #SGI OPENGL SDK v1.1.1 for Win32
@@ -165,6 +165,7 @@ SRC.SYS_CSSYS = \
   libs/cssys/win32/instpath.cpp \
   libs/cssys/win32/sysroot.cpp \
   libs/cssys/win32/mmap.cpp \
+  libs/cssys/win32/vfsplat.cpp \
   libs/cssys/general/findlib.cpp \
   libs/cssys/general/getopt.cpp \
   libs/cssys/general/printf.cpp \

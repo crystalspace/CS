@@ -53,6 +53,10 @@
   #pragma inline_depth (255)
   #pragma inline_recursion (on)
   #pragma auto_inline (on)
+
+  #ifdef __CRYSTAL_SPACE__
+    #pragma code_seg("CSpace")	  // Just for fun :)
+  #endif
 #endif
 
 #define WINVER 0x0400
@@ -261,27 +265,9 @@ struct mmioInfo
 #    undef CS_SYSDEF_PROVIDE_MKDIR
 #endif
 
-// Windows has built-in var "SystemRoot"
-// (env var on NT, but not 9x; so we provide it this way)
-// @@@ provide HOME(DIR) ??? ("My Docs" maybe?)
 #ifdef CS_SYSDEF_VFS_PROVIDE_CHECK_VAR
-
-inline char* __VfsCheckVar(const char* VarName)
-{
-  static char lpWindowsDirectory[MAX_PATH+1] = {'\0'};
-
-  if (!*lpWindowsDirectory) {
-    GetWindowsDirectoryA(lpWindowsDirectory, MAX_PATH);
-  }
-  
-  if (!stricmp(VarName, "systemroot"))
-    return lpWindowsDirectory;
-  
-  return NULL;
-}
-
-#define CS_SYSDEF_VFS_CHECK_VAR(VarName) \
-  value = __VfsCheckVar(VarName)
+  #define CS_PROVIDES_VFS_VARS 1
+  extern const char* csCheckPlatformVFSVar(const char* VarName);
 #endif
 
 // COMP_GCC has generic opendir(), readdir(), closedir()

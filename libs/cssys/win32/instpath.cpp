@@ -18,9 +18,52 @@
 
 #include "cssysdef.h"
 #include "cssys/sysfunc.h"
+#include "cssys/win32/shellstuff.h"
 #include <windows.h>
+#include <shlobj.h>
+#include <winreg.h>
 #include <stdio.h>
 #include <string.h>
+
+static inline bool
+GetRegistryInstallPath (const HKEY parentKey, char *oInstallPath, size_t iBufferSize)
+{
+  char * pValueName = "InstallPath";
+  DWORD dwType;
+  DWORD bufSize = iBufferSize;
+  HKEY m_pKey;
+  LONG result;
+
+  result =
+    RegCreateKey(parentKey, "Software\\CrystalSpace", &m_pKey);
+  if (result == ERROR_SUCCESS)
+  {
+    result = RegQueryValueEx(
+      m_pKey,
+      pValueName,
+      0,
+      &dwType,
+      (unsigned char *)oInstallPath,
+      &bufSize);
+
+    RegCloseKey (m_pKey);
+
+    if ((ERROR_SUCCESS == result) && 
+      ((dwType == REG_SZ) || (dwType == REG_EXPAND_SZ)))
+    {
+      if (dwType == REG_EXPAND_SZ)
+      {
+	char expandedPath[MAX_PATH];
+
+	ExpandEnvironmentStrings (oInstallPath, expandedPath, 
+	  sizeof(expandedPath));
+	strcpy (oInstallPath, expandedPath);
+      }
+      return true;
+    }
+  }
+  return false;
+}
 
 bool csGetInstallPath (char *oInstallPath, size_t iBufferSize)
 {
@@ -28,7 +71,9 @@ bool csGetInstallPath (char *oInstallPath, size_t iBufferSize)
   // 1. CRYSTAL environment variable
   // 2. this machine's system registry
   // 3. if current working directory contains 'scf.cfg' use this dir.
-  // 4. hard-wired default path
+  // 4. The dir where the app is
+  // 5. A "Crystal" subfolder under the "Program Files" dir.
+  // 6. hard-wired default path
 
   //@@@ this function is called several times; maybe cache the found dir
 
@@ -51,29 +96,10 @@ bool csGetInstallPath (char *oInstallPath, size_t iBufferSize)
   // try the registry
   if (1)
   {
-    char * pValueName = "installpath";
-    DWORD dwType;
-    DWORD bufSize = iBufferSize;
-    HKEY m_pKey;
-    LONG result;
-
-    result =
-      RegCreateKey(HKEY_LOCAL_MACHINE, "Software\\CrystalSpace", &m_pKey);
-    if (result == ERROR_SUCCESS)
-    {
-      result = RegQueryValueEx(
-	m_pKey,
-	pValueName,
-	0,
-	&dwType,
-	(unsigned char *)oInstallPath,
-	&bufSize);
-
-      if (ERROR_SUCCESS == result)
-      {
-	goto got_value;
-      }
-    }
+    if (GetRegistryInstallPath (HKEY_CURRENT_USER, oInstallPath, iBufferSize))
+      goto got_value;
+    if (GetRegistryInstallPath (HKEY_LOCAL_MACHINE, oInstallPath, iBufferSize))
+      goto got_value;
   }
 
   // perhaps current drive/dir?
@@ -104,16 +130,44 @@ bool csGetInstallPath (char *oInstallPath, size_t iBufferSize)
     FILE *test = fopen(testfn, "r");
     if(test != NULL)
     {
-      // usr current dir
+      // use current dir
       fclose(test);
       strncpy(oInstallPath, apppath, iBufferSize);
       goto got_value;
     }
   }
 
+  // retrieve the path of the Program Files folder and append 
+  // a "\Crystal\".
+  if (1)
+  {
+    if (MinShellDllVersion(5, 0))
+    {
+      LPMALLOC MAlloc;
+      LPITEMIDLIST pidl;
+      char path[MAX_PATH];
+
+      path[0] = 0;
+      if (SUCCEEDED(SHGetMalloc (&MAlloc)))
+      {
+        if (SUCCEEDED(SHGetSpecialFolderLocation (0, CSIDL_PROGRAM_FILES, &pidl)))
+	{
+          if (SUCCEEDED(SHGetPathFromIDList (pidl, path)))
+	  {
+	    strncpy (oInstallPath, path, MIN(sizeof(path), iBufferSize));
+	    strcat (oInstallPath, "\\Crystal\\");
+	  }
+	  MAlloc->Free (pidl);
+	}
+	MAlloc->Release ();
+      }
+      if (path[0]) 
+	goto got_value;
+    }
+  }
+
   // nothing helps, use default
   // which is "C:\Program Files\Crystal\"
-
   strncpy(oInstallPath, "C:\\Program Files\\Crystal\\", iBufferSize);
 
 got_value:
