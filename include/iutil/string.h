@@ -36,144 +36,253 @@ struct iString : public iBase
 {
   /**
    * Advise the string that it should allocate enough space to hold up to
-   * NewSize characters.  After calling this method, the string's capacity will
-   * be at least NewSize + 1 (one for the implicit null terminator).  Never
-   * shrinks capacity.  If you need to actually reclaim memory, then use Free()
-   * or Reclaim().
+   * NewSize characters.
+   * \remarks After calling this method, the string's capacity will be at least
+   *   NewSize + 1 (one for the implicit null terminator).  Never shrinks
+   *   capacity.  If you need to actually reclaim memory, then use Free() or
+   *   Reclaim().
    */
   virtual void SetCapacity (size_t NewSize) = 0;
-  /// Get string capacity.
+  /// Return the current capacity.
   virtual size_t GetCapacity () const = 0;
 
   /**
    * Advise the string that it should grow by approximately this many bytes
-   * when more space is required.  This value is only a suggestion.  The actual
-   * value by which it grows may be rounded up or down to an
-   * implementation-dependent allocation multiple.
+   * when more space is required.
+   * \remarks This value is only a suggestion.  The actual value by which it
+   *   grows may be rounded up or down to an implementation-dependent
+   *   allocation multiple.  This method turns off exponential growth.
    */
   virtual void SetGrowsBy(size_t) = 0;
-  /// Get the allocation growth increment.
+  /// Return the number of bytes by which the string grows.
   virtual size_t GetGrowsBy() const = 0;
 
   /**
-   * Tell the string to re-size its buffer exponentially as needed.  If set to
-   * true, the GetGrowsBy() setting is ignored.
+   * Tell the string to re-size its buffer exponentially as needed.
+   * \remarks If set to true, the GetGrowsBy() setting is ignored.
    */
   virtual void SetGrowsExponentially(bool) = 0;
 
   /// Returns true if exponential growth is enabled.
   virtual bool GetGrowsExponentially() const = 0;
 
-  /// Truncate the string
-  virtual void Truncate (size_t iPos) = 0;
+  /**
+   * Truncate the string.
+   * \param Len The number of characters to which the string should be
+   *   truncated (possibly 0).
+   * \remarks Will only make a string shorter; will never extend it.  This
+   *   method may or may not reclaim memory depending upon the implementation.
+   *   If you positively need to reclaim memory after truncating the string,
+   *   then invoke Reclaim().
+   */
+  virtual void Truncate (size_t Len) = 0;
 
-  /// Set string maximal capacity to current string length
+  /**
+   * Set string buffer capacity to hold exactly the current content.
+   * \remarks If the string length is greater than zero, then the buffer's
+   *   capacity will be adjusted to exactly that size.  If the string length is
+   *   zero, then the implementation may shrink the allocation so that it only
+   *   holds the implicit null terminator, or it may free the string's memory
+   *   completely.
+   */
   virtual void Reclaim () = 0;
 
-  /// Clear the string (so that it contains only ending 0 character)
+  /**
+   * Clear the string (so that it contains only a null terminator).
+   * \remarks This is typically shorthand for Truncate(0), but more idiomatic
+   *   in terms of human language.
+   */
   virtual void Clear () = 0;
 
   /// Get a copy of this string
   virtual csRef<iString> Clone () const = 0;
 
-  /// Get a pointer to null-termianted character array.
+  /**
+   * Get a pointer to the null-terminated character array.
+   * \return A C-string pointer to the null-terminated character array; or zero
+   *   if the string represents a null-pointer.
+   */
   virtual char const* GetData () const = 0;
 
-  /// Get a pointer to null-termianted character array.
+  /**
+   * Get a pointer to the null-terminated character array.
+   * \return A C-string pointer to the null-terminated character array; or zero
+   *   if the string represents a null-pointer.
+   * \warning This returns a non-const pointer, so use this function with care!
+   * \deprecated Use the 'const' version of GetData() instead.
+   */
   virtual char* GetData () = 0;
 
-  /// Query string length
+  /**
+   * Query string length.
+   * \return The string length.
+   * \remarks The returned length does not count the implicit null terminator.
+   */
   virtual size_t Length () const = 0;
 
-  /// Check if string is empty
+  /**
+   * Check if string is empty.
+   * \return True if the string is empty; false if it is not.
+   * \remarks This is equivalent to the expression 'Length() == 0'.
+   */
   virtual bool IsEmpty () const = 0;
 
-  /// Get a reference to iPos'th character
-  virtual char& operator [] (size_t iPos) = 0;
+  /// Get a modifiable reference to n'th character.
+  virtual char& operator [] (size_t n) = 0;
 
-  /// Get the iPos'th character
-  virtual char operator [] (size_t iPos) const = 0;
-
-  /// Set character number iPos to iChar
-  virtual void SetAt (size_t iPos, char iChar) = 0;
-
-  /// Get character at position iPos
-  virtual char GetAt (size_t iPos) const = 0;
-
-  /// Insert another string into this one at position iPos
-  virtual void Insert (size_t iPos, iString const* iStr) = 0;
-
-  /// Overlay another string onto a part of this string
-  virtual void Overwrite (size_t iPos, iString const* iStr) = 0;
-
-  /// Append a null-terminated string to this one (up to Count characters)
-  virtual void Append (const char* iStr, size_t Count = (size_t)-1) = 0;
-
-  /// Append a string to this one (possibly Count characters from the string)
-  virtual void Append (const iString* iStr, size_t Count = (size_t)-1) = 0;
+  /// Get n'th character.
+  virtual char operator [] (size_t n) const = 0;
 
   /**
-   * Copy and return a portion of this string.  The substring runs from `start'
-   * for `len' characters.
+   * Set the n'th character.
+   * \remarks The n'th character position must be a valid position in the
+   *   string.  You can not expand the string by setting a character beyond the
+   *   end of string.
+   */
+  virtual void SetAt (size_t n, char iChar) = 0;
+
+  /// Get the n'th character.
+  virtual char GetAt (size_t n) const = 0;
+
+  /**
+   * Insert another string into this one.
+   * \param Pos Position at which to insert the other string (zero-based).
+   * \param Str String to insert.
+   */
+  virtual void Insert (size_t Pos, iString const* Str) = 0;
+
+  /**
+   * Overlay another string onto a part of this string.
+   * \param Pos Position at which to insert the other string (zero-based).
+   * \param Str String which will be overlayed atop this string.
+   * \remarks The target string will grow as necessary to accept the new
+   *   string.
+   */
+  virtual void Overwrite (size_t Pos, iString const* Str) = 0;
+
+  /**
+   * Append a null-terminated C-string to this one.
+   * \param Str String which will be appended.
+   * \param Count Number of characters from Str to append; if -1 (the default),
+   *   then all characters from Str will be appended.
+   */
+  virtual void Append (const char* Str, size_t Count = (size_t)-1) = 0;
+
+  /**
+   * Append a string to this one. 
+   * \param Str String which will be appended.
+   * \param Count Number of characters from Str to append; if -1 (the default),
+   *   then all characters from Str will be appended.
+   */
+  virtual void Append (const iString* Str, size_t Count = (size_t)-1) = 0;
+
+  /**
+   * Copy and return a portion of this string.
+   * \param start Start position of slice (zero-based).
+   * \param len Number of characters in slice.
+   * \return The indicated string slice.
    */
   virtual csRef<iString> Slice (size_t start, size_t len) const = 0;
 
   /**
-   * Copy a portion of this string.  The result is placed in 'sub'.  The
-   * substring is from 'start', of length 'len'.
+   * Copy a portion of this string.
+   * \param sub Strign which will receive the indicated substring copy.
+   * \param start Start position of slice (zero-based).
+   * \param len Number of characters in slice.
+   * \remarks Use this method instead of Slice() for cases where you expect to
+   *   extract many substrings in a tight loop, and want to avoid the overhead
+   *   of allocation of a new string object for each operation.  Simply re-use
+   *   'sub' for each operation.
    */
   virtual void SubString (iString* sub, size_t start, size_t len) const = 0;
 
   /**
-   * Find first character 'c' from position 'p'.  If the character cannot be
-   * found, this function returns (size_t)-1
+   * Find the first occurrence of a character in the string.
+   * \param c Character to locate.
+   * \param p Start position of search (default 0).
+   * \return First position of character, or (size_t)-1 if not found.
    */
   virtual size_t FindFirst (const char c, size_t p = (size_t)-1) const = 0;
 
   /**
-   * Find last character 'c', counting backwards from position 'p'.  Default
-   * position is the end of the string.  If the character cannot be found, this
-   * function returns (size_t)-1
+   * Find the last occurrence of a character in the string.
+   * \param c Character to locate.
+   * \param p Start position of reverse search.  Specify (size_t)-1 if you want
+   *   the search to begin at the very end of string.
+   * \return Last position of character, or (size_t)-1 if not found.
    */
   virtual size_t FindLast (const char c, size_t p = (size_t)-1) const = 0;
   
   /**
-   * Format this string using sprintf() formatting directives.  Automatically
-   * allocates sufficient memory to hold result.  Newly formatted string
-   * overwrites previous string value.
+   * Format this string using sprintf()-style formatting directives.
+   * \remarks Automatically allocates sufficient memory to hold result.  Newly
+   *   formatted string replaces previous string value.
    */
   virtual void Format (const char* format, ...) CS_GNUC_PRINTF (2, 3) = 0;
 
   /**
    * Format this string using sprintf() formatting directives in a va_list.
-   * Automatically allocates sufficient memory to hold result.  Newly
-   * formatted string overwrites previous string value.
+   * \return Reference to itself.
+   * \remarks Automatically allocates sufficient memory to hold result.  Newly
+   *   formatted string replaces previous string value.
    */
   virtual void FormatV (const char* format, va_list args) = 0;
 
-  /// Replace contents of this string with the contents of another
+  /**
+   * Replace contents of this string with the contents of another.
+   * \param Str String from which new content of this string will be copied.
+   * \param Count Number of characters to copy.  If (size_t)-1 is specified,
+   *   then all characters will be copied.
+   */
   virtual void Replace (const iString* iStr, size_t iCount = (size_t)-1) = 0;
 
-  /// Check if two strings are equal
-  virtual bool Compare (const iString* iStr) const = 0;
+  /**
+   * Check if another string is equal to this one.
+   * \param Str Other string.
+   * \return True if they are equal; false if not.
+   * \remarks The comparison is case-sensitive.
+   */
+  virtual bool Compare (const iString* Str) const = 0;
 
-  /// Compare two strings ignoring case
-  virtual bool CompareNoCase (const iString* iStr) const = 0;
+  /**
+   * Check if another string is equal to this one.
+   * \param Str Other string.
+   * \return True if they are equal; false if not.
+   * \remarks The comparison is case-insensitive.
+   */
+  virtual bool CompareNoCase (const iString* Str) const = 0;
 
-  /// Append another string to this
+  /// Append another string to this one.
   virtual void operator += (const iString& iStr) = 0;
 
-  /// Append an ASCIIZ to this string
+  /// Append a null-terminated C-string to this string
   virtual void operator += (const char* iStr) = 0;
 
-  /// Concatenate two strings and return a third one
+  /// Concatenate two strings and return a third one.
   virtual csRef<iString> operator + (const iString& iStr) const = 0;
 
-  /// Get the null-terminated C string represented by this iString.
+  /**
+   * Get a pointer to the null-terminated character array.
+   * \return A C-string pointer to the null-terminated character array; or zero
+   *   if the string represents a null-pointer.
+   */
   virtual operator char const* () const = 0;
 
-  /// Check if two strings are equal
-  virtual bool operator == (const iString &iStr) const = 0;
+  /**
+   * Check if another string is equal to this one.
+   * \param Str Other string.
+   * \return True if they are equal; false if not.
+   * \remarks The comparison is case-sensitive.
+   */
+  virtual bool operator == (const iString& Str) const = 0;
+
+  /**
+   * Check if another string is not equal to this one.
+   * \param Str Other string.
+   * \return False if they are equal; true if not.
+   * \remarks The comparison is case-sensitive.
+   */
+  virtual bool operator != (const iString& Str) const = 0;
 
   /// Convert string to lowercase.
   virtual void Downcase() = 0;
