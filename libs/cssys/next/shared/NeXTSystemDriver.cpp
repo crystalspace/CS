@@ -36,7 +36,7 @@ IMPLEMENT_COMPOSITE_UNKNOWN_AS_EMBEDDED(SysSystemDriver, NeXTSystemDriver)
 //-----------------------------------------------------------------------------
 SysSystemDriver::SysSystemDriver() : csSystemDriver(), proxy(0)
     {
-    printf("Crystal Space for " OS_NEXT_DESCRIPTION" " VERSION "\nPorted to "
+    printf("Crystal Space for " OS_NEXT_DESCRIPTION " " VERSION "\nPorted to "
 	OS_NEXT_DESCRIPTION " by Eric Sunshine <sunshine@sunshineco.com>\n\n");
     }
 
