@@ -171,7 +171,7 @@ bool Simple::Initialize ()
 
   // The virtual clock.
   vc.Assign (CS_QUERY_REGISTRY (object_reg, iVirtualClock));
-  if (!vc)
+  if (vc == NULL)
   {
     csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
     	"crystalspace.application.simple1",
@@ -181,7 +181,7 @@ bool Simple::Initialize ()
 
   // Find the pointer to engine plugin
   engine.Assign (CS_QUERY_REGISTRY (object_reg, iEngine));
-  if (!engine)
+  if (engine == NULL)
   {
     csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
     	"crystalspace.application.simple1",
@@ -190,7 +190,7 @@ bool Simple::Initialize ()
   }
 
   loader.Assign (CS_QUERY_REGISTRY (object_reg, iLoader));
-  if (!loader)
+  if (loader == NULL)
   {
     csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
     	"crystalspace.application.simple1",
@@ -199,7 +199,7 @@ bool Simple::Initialize ()
   }
 
   g3d.Assign (CS_QUERY_REGISTRY (object_reg, iGraphics3D));
-  if (!g3d)
+  if (g3d == NULL)
   {
     csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
     	"crystalspace.application.simple1",
@@ -208,7 +208,7 @@ bool Simple::Initialize ()
   }
 
   kbd.Assign (CS_QUERY_REGISTRY (object_reg, iKeyboardDriver));
-  if (!kbd)
+  if (kbd == NULL)
   {
     csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
     	"crystalspace.application.simple1",
