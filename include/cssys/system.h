@@ -397,7 +397,7 @@ public:
   virtual void Printf (int mode, const char *format, ...);
   /// execute a system-dependent extension command
   virtual bool SystemExtension (const char *iCommand, ...)
-  { return false; }
+  { (void)iCommand; return false; }
   /// Query the elapsed time between last frames and absolute time
   virtual void GetElapsedTime (time_t &oElapsedTime, time_t &oCurrentTime)
   { oElapsedTime = ElapsedTime; oCurrentTime = CurrentTime; }
