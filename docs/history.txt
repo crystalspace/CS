@@ -31,6 +31,9 @@ The history order is reversed so that new features are at the top.
 	  willingly releases the creature there is nothing that can be done
 	  to unbind Shadow. The Shadow slowly devours the poor creature from
 	  all its knowledge.
+	- Fixed a small bug in BugPlug. The new Shadow mesh object is now
+	  added with a higher render priority (the one from the alpha
+	  channel) to ensure that it gets rendered later.
 	- Eric Sunshine fixed a problem with mdl2spr where it failed to load
 	  the PNG plugin.  Also fixed it so that it only attempts to load the
 	  PNG plugin if absolutely required (for instance, to save skins from
