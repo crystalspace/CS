@@ -94,7 +94,6 @@ csString csGetPlatformConfigPath (const char* key)
   char* rpKey = path.GetData() + strlen (appDataPath) + 1;
   ReplaceReserved (rpKey);
   ReplaceSeparators (rpKey);
-  path << (directory ? "\\" : ".cfg");
   
   return path;
 }
