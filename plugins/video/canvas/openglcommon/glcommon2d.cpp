@@ -38,7 +38,7 @@ SCF_IMPLEMENT_IBASE_EXT (csGraphics2DGLCommon)
 SCF_IMPLEMENT_IBASE_EXT_END
   
 csGraphics2DGLCommon::csGraphics2DGLCommon (iBase *iParent) :
-  csGraphics2D (iParent), statecache (0)
+  csGraphics2D (iParent), statecache (0), hasRenderTarget (false)
 {
   EventOutlet = 0;
   screen_shot = 0;
@@ -560,23 +560,21 @@ void csGraphics2DGLCommon::Blit (int x, int y, int w, int h,
   if (gl_alphaTest) statecache->Disable_GL_ALPHA_TEST ();
 
   glColor3f (0., 0., 0.);
-#ifndef CS_USE_NEW_RENDERER
-  //glRasterPos2i (x, Height-y-h+1);
   /*
-    @@@ HACK Below is only correct when a render target was set:
-    This sets up the screen so every drawing takes place in a rect in the
-    upper left, but flipped. However, the raster position is transformed,
-    but glDrawPixels() always takes those as the lower left dest coord (in
-    window.) So it has to drawn h pixels farther down. Meaning, when NO
-    render target is set, this code will simply draw at the wrong spot
-    on the screen. On the other hand, only PTs use Blit() at the moment.
+    @@@ HACK When a render target was set, the screen is set up
+    so every drawing takes place in a rect in the upper left, but flipped. 
+    However, the raster position is transformed, but glDrawPixels() always 
+    takes those as the lower left dest coord (in window.) So it has to drawn 
+    h pixels farther down. 
    */
-  glRasterPos2i (x, Height-y+1);
-#else
-  //glRasterPos2i (x, Height-y-h);
   glRasterPos2i (x, Height-y);
-#endif // CS_USE_NEW_RENDERER
+  if (!hasRenderTarget)
+  {
+    glPixelZoom (1.0f, -1.0f);
+  }
   glDrawPixels (w, h, GL_RGBA, GL_UNSIGNED_BYTE, data);
+  if (!hasRenderTarget)
+    glPixelZoom (1.0f, 1.0f);
 
   if (gl_alphaTest) statecache->Enable_GL_ALPHA_TEST ();
 }
@@ -742,6 +740,12 @@ bool csGraphics2DGLCommon::PerformExtensionV (char const* command, va_list args)
   if (!strcasecmp (command, "glflushtext"))
   {
     ((csGLFontCache*)fontCache)->FlushText ();
+    return true;
+  }
+  if (!strcasecmp (command, "userendertarget"))
+  {
+    hasRenderTarget = va_arg (args, bool);
+    return true;
   }
   return false;
 }

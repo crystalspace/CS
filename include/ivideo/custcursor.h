@@ -25,13 +25,14 @@
 #include "igraphic/image.h"
 
 struct iGraphics3D;
+struct iConfigFile;
 
 /// The default custom cursor name
 #define CSCURSOR_Default "default"
 /// The custom cursor name used when a mouse button is pressed
 #define CSCURSOR_MouseDown "MouseDown"
 
-SCF_VERSION (iCursor, 0, 0, 1);
+SCF_VERSION (iCursor, 0, 1, 0);
 
 /**
  * This interface is used to access the custom cursor plugin, which
@@ -49,8 +50,8 @@ struct iCursor : public iBase
    */
   virtual bool Setup (iGraphics3D *, bool ForceEmulation = false) = 0;
 
-  /// Load cursor settings from a configuration file in VFS
-  virtual bool ParseConfigFile (const char *) = 0;
+  /// Load cursor settings from a configuration file
+  virtual bool ParseConfigFile (iConfigFile*) = 0;
 
   /**
    * Adds or replaces a cursor called name.  Currently you can only register an
@@ -58,11 +59,10 @@ struct iCursor : public iBase
    * The 'transparency' can range from 0 (completely opaque) to 255 (completely
    * transparent).
    */
-  virtual void SetCursor (const char *name, iImage *image, csRGBcolor keycolor, 
-                          csPoint hotspot = csPoint (0,0),
-                            uint8 transparency = 0, 
-                          csRGBcolor fg = csRGBcolor (255,255,255),
-                          csRGBcolor bg = csRGBcolor (0,0,0)) = 0;
+  virtual void SetCursor (const char *name, iImage *image, 
+    csRGBcolor* keycolor = 0, csPoint hotspot = csPoint (0,0),
+    uint8 transparency = 0, csRGBcolor fg = csRGBcolor (255,255,255),
+    csRGBcolor bg = csRGBcolor (0,0,0)) = 0;
       
   /// Sets the hotspot (center) of the specified cursor on the pixmap.
   virtual void SetHotSpot (const char *name, csPoint hotspot) = 0;
@@ -109,7 +109,7 @@ struct iCursor : public iBase
    * Get key colour of the specified cursor.
    * Returns default 0,0,0 if there is no cursor with this name
    */
-  virtual csRGBcolor GetKeyColor (const char *name) const = 0;
+  virtual csRGBcolor* GetKeyColor (const char *name) const = 0;
 
   /**
    * Get the foreground color of the cursor.  These will only

@@ -48,6 +48,8 @@ VFS.Mount.aws = $(CS_DATADIR)$/awsdef.zip
 
 ; Mount for unittest
 VFS.Mount.lev/unittest = $(CS_DATADIR)$/unittest$/
+; Data for g2dtest
+VFS.Mount.lib/g2dtest  = $(CS_DATADIR)$/g2dtest$/
 
 ; The following should not change too often...
 ; The idea is that everything that should be changed (such as CDROM variable)

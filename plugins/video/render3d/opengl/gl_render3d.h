@@ -381,6 +381,9 @@ public:
     render_target = handle;
     rt_onscreen = !persistent;
     rt_cliprectset = false;
+
+    bool hasRenderTarget = (handle != 0);
+    G2D->PerformExtension ("userendertarget", hasRenderTarget);
   }
 
   /// Get the current render target (0 for screen).

@@ -86,13 +86,11 @@ bool csCursor::Initialize (iObjectRegistry *objreg)
   return true;
 }
 
-bool csCursor::ParseConfigFile (const char *iFile)
+bool csCursor::ParseConfigFile (iConfigFile* ini)
 {
   csRef<iVFS> VFS = CS_QUERY_REGISTRY (reg, iVFS);
   if (!VFS)
       return false;
-
-  csConfigAccess ini (reg, iFile);
 
   const char *dir = ini->GetStr ("CursorSystem.General.Directory");
 
@@ -126,7 +124,7 @@ bool csCursor::ParseConfigFile (const char *iFile)
       ignorelist.Push (name);
       continue;
     }
-    else if (!ini->KeyExists(csString(prefix).Append(name).Append(".keycolor")))
+    else /*if (!ini->KeyExists(csString(prefix).Append(name).Append(".keycolor")))
     {
       csReport (reg, CS_REPORTER_SEVERITY_WARNING, CURSOR_SCF_NAME,
             "No keycolor defined for cursor %s, ignoring", 
@@ -135,7 +133,7 @@ bool csCursor::ParseConfigFile (const char *iFile)
       ignorelist.Push (name);
       continue;
     }
-    else
+    else*/
     {
       // Temporary number storage
       int x, y, z;
@@ -167,8 +165,13 @@ bool csCursor::ParseConfigFile (const char *iFile)
       }
 
       // Key color
-      sscanf (ini->GetStr (csString(prefix).Append(name).Append(".keycolor")),
-        "%d,%d,%d", &x, &y, &z);
+      bool hasKeyColor = false;
+      if (ini->KeyExists(csString(prefix).Append(name).Append(".keycolor")))
+      {
+	sscanf (ini->GetStr (csString(prefix).Append(name).Append(".keycolor")),
+	  "%d,%d,%d", &x, &y, &z);
+	hasKeyColor = true;
+      }
       csRGBcolor keycolor (x, y, z);
 
       // Hotspot
@@ -191,7 +194,8 @@ bool csCursor::ParseConfigFile (const char *iFile)
       csRGBcolor bg (x, y, z);
 
       // Create the cursor
-      SetCursor (name, image, keycolor, hotspot, transparency, fg, bg);
+      SetCursor (name, image, hasKeyColor ? &keycolor : 0, hotspot, 
+	transparency, fg, bg);
     }
   }
     
@@ -299,7 +303,7 @@ bool csCursor::SwitchCursor (const char *name)
 }
 
 // Uses a hashmap to store named cursors
-void csCursor::SetCursor (const char *name, iImage *image, csRGBcolor key,
+void csCursor::SetCursor (const char *name, iImage *image, csRGBcolor* key,
                           csPoint hotspot, uint8 transparency, 
                           csRGBcolor fg, csRGBcolor bg)
 {
@@ -307,7 +311,13 @@ void csCursor::SetCursor (const char *name, iImage *image, csRGBcolor key,
   CursorInfo *ci = new CursorInfo;
   ci->image = image;
   ci->transparency = transparency;
-  ci->keycolor = key;
+  if (key)
+  {
+    ci->keycolor = *key;
+    ci->hasKeyColor = true;
+  }
+  else
+    ci->hasKeyColor = false;
   ci->hotspot = hotspot;
   ci->fg = fg;
   ci->bg = bg;
@@ -327,7 +337,8 @@ void csCursor::SetCursor (const char *name, iImage *image, csRGBcolor key,
   }
 
   // Prepare texture and set up keycolour
-  txt->SetKeyColor (key.red, key.green, key.blue);
+  if (key)
+    txt->SetKeyColor (key->red, key->green, key->blue);
 
   // Create pixmap from texture
   csSimplePixmap *pixmap = new csSimplePixmap (txt);
@@ -351,8 +362,8 @@ void csCursor::SetHotSpot (const char *name, csPoint hotspot)
   CursorInfo *ci = cursors.Get (name, 0);
   if (ci)
   {
-    SetCursor (name, ci->image, ci->keycolor, hotspot, ci->transparency, 
-               ci->fg, ci->bg);
+    SetCursor (name, ci->image, ci->hasKeyColor ? &ci->keycolor : 0, 
+      hotspot, ci->transparency, ci->fg, ci->bg);
     delete ci;
   }
 }
@@ -362,8 +373,8 @@ void csCursor::SetTransparency (const char *name, uint8 transparency)
   CursorInfo *ci = cursors.Get (name, 0);
   if (ci)
   {
-    SetCursor (name, ci->image, ci->keycolor, ci->hotspot, transparency,
-               ci->fg, ci->bg);
+    SetCursor (name, ci->image, ci->hasKeyColor ? &ci->keycolor : 0, 
+      ci->hotspot, transparency, ci->fg, ci->bg);
     delete ci;
   }
 }
@@ -373,7 +384,7 @@ void csCursor::SetKeyColor (const char *name, csRGBcolor color)
   CursorInfo *ci = cursors.Get (name, 0);
   if (ci)
   {
-    SetCursor (name, ci->image, color, ci->hotspot, ci->transparency,
+    SetCursor (name, ci->image, &color, ci->hotspot, ci->transparency,
       ci->fg, ci->bg);
     delete ci;
   }
@@ -384,8 +395,8 @@ void csCursor::SetColor (const char *name, csRGBcolor fg, csRGBcolor bg)
   CursorInfo *ci = cursors.Get (name, 0);
   if (ci)
   {
-    SetCursor (name, ci->image, ci->keycolor, ci->hotspot, ci->transparency,
-               fg, bg);
+    SetCursor (name, ci->image, ci->hasKeyColor ? &ci->keycolor : 0, 
+      ci->hotspot, ci->transparency, fg, bg);
     delete ci;
   }
 } 
@@ -414,12 +425,12 @@ uint8 csCursor::GetTransparency (const char *name) const
   return 0;
 }
 
-csRGBcolor csCursor::GetKeyColor (const char *name) const
+csRGBcolor* csCursor::GetKeyColor (const char *name) const
 {
   CursorInfo *ci = cursors.Get (name, 0);
-  if (ci) return ci->keycolor;
+  if (ci && ci->hasKeyColor) return &ci->keycolor;
 
-  return csRGBcolor (0,0,0);
+  return 0;
 }
 
 csRGBcolor csCursor::GetFGColor (const char *name) const

@@ -56,6 +56,7 @@ private:
     csPoint hotspot;
     uint8 transparency;
     csRGBcolor keycolor, fg, bg;
+    bool hasKeyColor;
 
     CursorInfo () : pixmap(0), image(0) {}
     ~CursorInfo () { delete pixmap; }
@@ -105,12 +106,12 @@ public:
   /// Sets up cursors for display on the graphics context
   virtual bool Setup (iGraphics3D *ig3d, bool ForceEmulation);
 
-  /// Load cursors from a config file in VFS
-  virtual bool ParseConfigFile (const char *iFile);
+  /// Load cursors from a config file
+  virtual bool ParseConfigFile (iConfigFile* iFile);
 
   /// Adds or replaces a cursor based on the name
-  virtual void SetCursor (const char *name, iImage *image, csRGBcolor key,
-                          csPoint hotspot, uint8 transparency,
+  virtual void SetCursor (const char *name, iImage *image, csRGBcolor* key,
+			  csPoint hotspot, uint8 transparency,
                           csRGBcolor fg, csRGBcolor bg);
   /// Sets the hotspot (center) of a cursor
   virtual void SetHotSpot (const char *name, csPoint hotspot);
@@ -131,7 +132,7 @@ public:
   /// Get the transparency transparency of the specified cursor.  
   virtual uint8 GetTransparency (const char *name) const;
   /// Get key colour of the specified cursor.
-  virtual csRGBcolor GetKeyColor (const char *name) const;
+  virtual csRGBcolor* GetKeyColor (const char *name) const;
   /**
    * Get the foreground color of the cursor.  These will only be used when 
    * in OS mode on systems which only support monochrome cursors

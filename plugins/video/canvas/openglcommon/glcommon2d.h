@@ -97,6 +97,8 @@ protected:
 
   /// Cache for GL states
   csGLStateCache* statecache;
+  
+  bool hasRenderTarget;
 
   /// Decompose a color ID into r,g,b components
   void DecomposeColor (int iColor, GLubyte &oR, GLubyte &oG, GLubyte &oB);

@@ -595,6 +595,7 @@ void csImageFile::SetFormat (int iFormat)
       memset ((void*)Alpha, 0xff, pixels);
     }
     convert_pal8 ((uint8 *)oldimage, Palette);
+    Palette = 0;
   }
   else if ((oldformat & CS_IMGFMT_MASK) == CS_IMGFMT_NONE)
   {

@@ -15,6 +15,9 @@ chronological order.
 	  added to the engine with the result that cached lighting wouldn't
 	  be saved/loaded. For this purpose I added
 	  iEngine->AddMeshAndChildren().
+	- res fixed OpenGL 2D Blit() to work when no render target is set.
+	- res added a Blit() test to g2dtest.
+	- res added a custom cursor test to g2dtest.
 4-Oct-2004
 	- res fixed xmlshader to correctly deal with shader conditionals 
 	  in text.
