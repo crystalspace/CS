@@ -168,18 +168,23 @@ void OpenGLTextureCache::Load (csTxtCacheData *d, bool reload)
     glBindTexture (GL_TEXTURE_2D, texturehandle);
     glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
     glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-    glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER,
-		     rstate_bilinearmap ? GL_LINEAR : GL_NEAREST);
-    glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER,
-		     rstate_bilinearmap ? GL_LINEAR : GL_NEAREST);
   }
 
-  if ((txt_mm->GetFlags () & (CS_TEXTURE_3D | CS_TEXTURE_NOMIPMAPS))
-  	== CS_TEXTURE_3D)
+  glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER,
+    rstate_bilinearmap ? GL_LINEAR : GL_NEAREST);
+  if (((txt_mm->GetFlags () & (CS_TEXTURE_3D | CS_TEXTURE_NOMIPMAPS)) 
+      == CS_TEXTURE_3D)
+    && ((txt_mm->GetFlags () & CS_TEXTURE_PROC) != CS_TEXTURE_PROC))
+  {
     glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER,
-		     rstate_bilinearmap
-		     	?  GL_LINEAR_MIPMAP_LINEAR
-			: GL_NEAREST_MIPMAP_NEAREST);
+      rstate_bilinearmap ? GL_LINEAR_MIPMAP_LINEAR 
+                         : GL_NEAREST_MIPMAP_NEAREST);
+  } 
+  else
+  {
+    glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER,
+      rstate_bilinearmap ? GL_LINEAR : GL_NEAREST);
+  }
 
   for (int i=0; i < txt_mm->vTex.Length (); i++)
   {
