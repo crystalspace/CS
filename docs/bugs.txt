@@ -1,10 +1,3 @@
-PROBLEM: Precalculated lighting needs to be rewritten. For example,
-reflection (with radiosity) on things does not work correctly.
-SOLUTION: Either depend on the new REMPES system. But in addition we
-will also want to rewrite the lighting routines so that things cast
-shadows using shadow volumes instead of the current ray tracing method.
-DIFFICULTY: hard
-
 PROBLEM: AMD and K6 processors seem to have problems with CS?
 SOLUTION: No idea yet. This needs to be investigated. Does every AMD
 and K6 owner have problems?
@@ -59,15 +52,6 @@ PROBLEM: Glide doesn't support 2D text yet.
 SOLUTION: It is coming.
 DIFFICULTY: moderate
 
-PROBLEM: Console only shows one line at a time in Windows.
-SOLUTION: Unless we find a better solution, we should introduce
-a system, where drivers can tell the engine what they can do,
-and what not. I have found a fix for the console that worked nice
-for me, but was a problem for Jorrit, so he removed it again. I
-think we could have a variant, that will do a complete update of
-the screen and one that will do a partial update.
-DIFFICULTY: moderate (probably solved?)
-
 PROBLEM: Unlighted texture mapper distorts textures when looking
 in a strange direction to them.
 SOLUTION: Further investigation is needed.
@@ -78,12 +62,6 @@ smooth transitions from level to level. - RivaTNT, Detonator drivers.
 (thieber@gmx.net)
 SOLUTION: Investigation?
 DIFFICULTY: moderate?
-
-PROBLEM: The crystal space logo is missing, when using the OpenGL
-renderer on Win32. (thieber@gmx.net)
-SOLUTION: 2D driver needs the capability of drawing 2D sprites. Copy
-or share functionality with Linux/OpenGL 2D driver.
-DIFFICULTY: moderate
 
 PROBLEM: Lightmapping in Glide is still broken.
 SOLUTION: Don't know (someone who manages Glide port just have to look,
@@ -128,34 +106,3 @@ mrsigma@surrey.quik.com -- it seems that ReserveColor method in Texture
 Manager does not work)
 DIFFICULTY: easy
 
-PROBLEM: Transparency won't work with OpenGL. So the Crystal Space logo 
-will show that blue seam, and the window in large.zip will be opaque.
-(thieber@gmx.net)
-SOLUTION: probably solved?
-DIFFICULTY:
-
-PROBLEM: The lightmaps in OpenGL on Win32 are still inaccurate at their
-borders. Some will get a little darker on their seams, some look like they 
-overlap. (Take a look at the floor in large.zip. Especially near the 
-doors at start or street.) (thieber@gmx.net)
-SOLUTION: probably solved?
-DIFFICULTY:
-
-PROBLEM: Lightmaps on curved surfaces don't work with the DX5 renderer.
-(thieber@gmx.net)
-SOLUTION: DrawPolygonQuick needs to have gouraud shading implemented.
-DIFFICULTY: solved
-
-PROBLEM: Lightmaps are drawn at the wrong position in the DX5 renderer.
-(Maybe this affects general textures too, but there is no reference
-texture to check this out) (thieber@gmx.net)
-SOLUTION: Needs to be investigated.
-DIFFICULTY: solved
-
-PROBLEM: The console is missing, when using the OpenGL
-renderer on Win32. (thieber@gmx.net)
-SOLUTION: 2D driver needs text capabilities. Copy or share functionality
-with Linux/OpenGL 2D driver.
-DIFFICULTY: moderate
-solved on: May, 20th 1999
- 
