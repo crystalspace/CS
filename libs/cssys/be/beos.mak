@@ -10,6 +10,7 @@ PLUGINS += video/canvas/be video/canvas/openglbe video/renderer/opengl
 
 # Be compiler does not currently grok CS assembly
 override DO_ASM=no
+override CS_NO_QSQRT=yes
 
 # The extensive memory debugger facility in cssysdef.h interferes with the
 # 'operator new' overloads in the Be system headers.
