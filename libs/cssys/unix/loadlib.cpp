@@ -51,8 +51,7 @@ csLibraryHandle csFindLoadLibrary (const char *iName)
 
 csLibraryHandle csLoadLibrary (const char* iName)
 {
-  csLibraryHandle Handle = access (iName, F_OK) ? NULL : dlopen (iName, DLOPEN_MODE);
-  return Handle;
+  return dlopen (iName, DLOPEN_MODE);
 }
 
 void csPrintLibraryError (const char *iModule)
