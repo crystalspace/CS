@@ -3,6 +3,6 @@
 #-------------------------------------------------------------- postdefines ---#
 ifeq ($(MAKESECTION),postdefines)
 
-vpath %.cpp libs/cs3d/common libs/cs3d/support
+vpath %.cpp libs/cs3d/common
 
 endif # ifeq ($(MAKESECTION),postdefines)
