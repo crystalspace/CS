@@ -43,7 +43,7 @@
 #include "kdtree.h"
 #include "covbuf.h"
 #include "wqueue.h"
-#include "exvis.h"
+//#include "exvis.h"
 
 CS_IMPLEMENT_PLUGIN
 
@@ -1177,6 +1177,7 @@ bool csDynaVis::Debug_DebugCommand (const char* cmd)
   }
   else if (!strcmp (cmd, "analyze_vis"))
   {
+#if 0
     csReport (object_reg, CS_REPORTER_SEVERITY_NOTIFY, "crystalspace.dynavis",
     	"Analyze visibility status.");
     csExactCuller* excul = new csExactCuller (scr_width, scr_height);
@@ -1247,6 +1248,7 @@ bool csDynaVis::Debug_DebugCommand (const char* cmd)
     fflush (stdout);
 
     delete excul;
+#endif
   }
   return false;
 }
