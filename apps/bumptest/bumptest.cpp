@@ -91,6 +91,8 @@ bool BumpTest::InitProcDemo ()
   char *vfsfilename = "/lib/std/stone4.gif";
   iTextureWrapper *bptex = engine->CreateTexture("bumptex", vfsfilename, 0,
     CS_TEXTURE_2D| CS_TEXTURE_3D);
+  iMaterialWrapper* ibp = engine->CreateMaterial("bumptexture", bptex);
+  engine->Prepare ();
   //iImageIO *imgloader = QUERY_PLUGIN(System, iImageIO);
   //iVFS *VFS = QUERY_PLUGIN(System, iVFS);
   //iDataBuffer *buf = VFS->ReadFile (vfsfilename);
@@ -168,7 +170,6 @@ bool BumpTest::InitProcDemo ()
   p->CreateVertex (csVector3 (-dx, -dy, -dz) + csVector3(2.5,0,0));
   p->SetTextureSpace (p->GetVertex (0), p->GetVertex (1), 1.0);
 
-  iMaterialWrapper* ibp = engine->CreateMaterial("bumptexture", bptex);
   //ibp->GetMaterialHandle()->Prepare();
   p = thing_state->CreatePolygon ();
   p->SetMaterial (ibp);
@@ -177,7 +178,7 @@ bool BumpTest::InitProcDemo ()
   p->CreateVertex (csVector3 (+0, -dy, -dz) + csVector3(2.5,1,0));
   p->CreateVertex (csVector3 (-dx, -dy, -dz) + csVector3(2.5,1,0));
   p->SetTextureSpace (p->GetVertex (0), p->GetVertex (1), 1.0);
-  engine->Prepare();
+  //engine->Prepare();
 
   /*
   p = thing_state->CreatePolygon ();
@@ -429,7 +430,9 @@ bool BumpTest::Initialize (int argc, const char* const argv[],
   ifmc->DecRef();
   ifms->DecRef();
 
-  engine->Prepare ();
+  InitProcDemo ();
+
+  //engine->Prepare ();
 
   // Create a -dynamic light.
   //float angle = 0;
@@ -453,8 +456,6 @@ bool BumpTest::Initialize (int argc, const char* const argv[],
   view->SetRectangle (0, 0, FrameWidth, FrameHeight);
 
   txtmgr->SetPalette ();
-
-  InitProcDemo ();
 
   return true;
 }

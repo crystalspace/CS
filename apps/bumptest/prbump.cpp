@@ -258,7 +258,7 @@ void csProcBump::RecalcFast(const csVector3& center, const csVector3& normal,
     totallightat +=  lightdirs[l] * normal;
   }
 
-  csVector3 add = xdir * (1./64.);
+  csVector3 add = xdir.Unit() * (1./64.);
   csVector3 pixnormal;
   float resval;
   for(i=0; i<256; i++)
@@ -270,7 +270,7 @@ void csProcBump::RecalcFast(const csVector3& center, const csVector3& normal,
         resval += (lightdirs[l] * pixnormal);
     dxval[i] = QInt((resval-totallightat)*128.);
   }
-  add = ydir * (1./64.);
+  add = ydir.Unit() * (1./64.);
   for(i=0; i<256; i++)
   {
     pixnormal = normal - add * (i-128);
