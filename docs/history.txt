@@ -46,6 +46,7 @@ chronological order.
 	  additional object files with a library target.  This hack was needed
 	  for a while before the cssys sources had been merged physically into
 	  the csutil sources.
+	- Duhprey fixed a couple bugs with the shader vars change.
 24-Feb-2004
 	- Fritz Elfert fixed conversion of bezier mesh factories in map2cs
 	  and re-enabled them (With wrong cvs log-message: "Before big
