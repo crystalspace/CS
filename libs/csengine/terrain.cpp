@@ -23,12 +23,10 @@
 #include "csgeom/math2d.h"
 #include "csgeom/math3d.h"
 #include "csgeom/polyclip.h"
-#if 0 //###
 #include "csterr/struct/ddgcntxt.h"
 #include "csterr/struct/ddgtmesh.h"
 #include "csterr/struct/ddgbtree.h"
 #include "csterr/struct/ddgvarr.h"
-#endif
 #include "igraph3d.h"
 
 IMPLEMENT_CSOBJTYPE (csTerrain,csObject);
@@ -44,41 +42,30 @@ csTerrain::csTerrain () : csObject()
 
 csTerrain::~csTerrain ()
 {
-#if 0 //###
   delete mesh;
   delete heightMap;
   delete clipbox;
   delete vbuf;
   delete _textureMap;
-#endif
 }
 
 void csTerrain::SetDetail( unsigned int detail)
 {
-#if 0 //###
   mesh->minDetail(detail);
   mesh->maxDetail((unsigned int)(detail*1.1));
   mesh->absMaxDetail((unsigned int)(detail * 1.25));
   mesh->nearClip(1.0);
   mesh->farClip(150.0);
-#endif
 }
 
 int csTerrain::GetNumTextures ()
 {
-#if 0 //###
   return mesh->getBinTreeNo ()/2;
-#else
-  return 0;
-#endif
 }
 
-#if 0 //###
 static ddgControl control;
-#endif
 bool csTerrain::Initialize (const void* heightMapFile, unsigned long size)
 {
-#if 0 //###
   heightMap = new ddgHeightMap ();
   if (heightMap->readTGN (heightMapFile, size))
     return false;
@@ -105,7 +92,6 @@ bool csTerrain::Initialize (const void* heightMapFile, unsigned long size)
 
   // This is  code that allocates the texture array for the terrain.
   _textureMap = new csTextureHandle* [GetNumTextures ()];
-#endif
   return true;
 }
 
@@ -129,7 +115,6 @@ static int lut[24] = {0,1,2,3,4,5,6,7,8,9,10,11,0,1,2,3,4,5,6,7,8,9,10,11};
  */
 bool csTerrain::drawTriangle( ddgTBinTree *bt, ddgVBIndex tvc, ddgVArray *vbuf )
 {
-#if 0 //###
   if ( !bt->visible(tvc))
     return ddgFailure;
 
@@ -185,12 +170,10 @@ bool csTerrain::drawTriangle( ddgTBinTree *bt, ddgVBIndex tvc, ddgVArray *vbuf )
   vbuf->pushTriangle(bufindex[0],bufindex[1],bufindex[2]);
 
   return ddgSuccess;
-#endif
 }
 
 void csTerrain::Draw (csRenderView& rview, bool /*use_z_buf*/)
 {
-#if 0 //###
   bool modified = true;
   // Get matrices in OpenGL form
 
@@ -342,13 +325,11 @@ void csTerrain::Draw (csRenderView& rview, bool /*use_z_buf*/)
     }
     i = i+2;
   }
-#endif
 }
 
 // If we hit this terrain adjust our position to be on top of it.
 int csTerrain::CollisionDetect( csTransform *transform )
 {
-#if 0 //###
   float h;
   // Translate us into terrain coordinate space.
   csVector3 p = transform->GetOrigin () - _pos;
@@ -365,6 +346,5 @@ int csTerrain::CollisionDetect( csTransform *transform )
   // Translate us back.
   p = p + _pos;
   transform->SetOrigin (p);
-#endif
   return 1;
 }
