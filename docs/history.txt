@@ -6,14 +6,20 @@ The history order has been reversed so that new features are at the top.
 	  differences in the octree on various problems. This is not really
 	  a bug but I like to have the generated octree the same on all
 	  platforms to easy debugging and make bugs more reproducable.
-	- Wouter Wijngaards commited a patch from Samuel Humphreys:
-	    - Seperates metademo into reusable chunks, and cleans up some
-	      stuff.
+	- Received a patch from Samuel Humphreys for dynamic textures:
+	    - Seperates metademo into reusable chunks and cleans up some stuff.
 	    - dtSimple now has two animated textures. The second is the
 	      metaballs.
-	    - Use F1 to toggle on/off the first texture animation.
-	    - F2 for second.
+	    - Use F1 to toggle on/off first texture animation; F2 for other.
 	    - INS/DEL/BS/HOME/END/TAB to control MetaBalls.
+	- Eric Sunshine fixed a bug in the 'depend' target of csfont.mak and
+	  freefont.mak which prevented dependencies from being computed.
+	- Eric Sunshine performed phase one of the renamed of "font renderer"
+	  to "font server".  This phase involved the physical rename of the
+	  directory in the CS/plugins hiearchy as well as patching of the
+	  makefiles.  (Still To-Do: Must rename font renderer to server in
+	  source code, configuration files, etc.)
+	- Eric Sunshine clarified documentation in user.mak.
 23-May-2000
 	- Fixed a small potential problem with the polygon Covers function.
 	  It compared a float to 0 which seems to be a little system

@@ -1,12 +1,37 @@
+#=============================================================================
 # This is an configuration file which describes user options global to all
 # Crystal Space programs and libraries.  Edit it to suit your taste.  Also
 # have a look at the platform-dependent makefile for system settings.
-#
-#                             *** WARNING ***
-#
-# After changing the configuration in this file, you must manually re-run the
-# makefile configuration step (for example, "make linux") in order for the
-# changes to become effective.
+#=============================================================================
+
+#-----------------------------------------------------------------------------
+# Dynamic Settings
+# Changes to these settings will be reflected in the makefile system
+# immediately.
+#-----------------------------------------------------------------------------
+
+# Default list of plugins to build.  Note that you'll link all plugins into
+# executable in the case of static build
+ifndef PLUGINS
+  PLUGINS  = video/canvas video/renderer 
+  PLUGINS += cscon 
+  PLUGINS += csclear 
+  PLUGINS += dungeon 
+  PLUGINS += net/driver/socket net/netman 
+  PLUGINS += font/server/csfont 
+# PLUGINS += font/server/freefont
+  PLUGINS += netspace/nstp netspace/nsmgr 
+  PLUGINS += csauth/simple 
+  PLUGINS += $(DETECTED_PLUGINS)
+endif
+
+
+#-----------------------------------------------------------------------------
+# Static Settings            *** TAKE NOTE ***
+# After changing the settings in this section, you must re-run the makefile
+# configuration step (for example, "make linux") in order for your changes
+# to become effective.
+#-----------------------------------------------------------------------------
 
 # Should we build drivers/plugins as loadable modules?
 ifndef USE_SHARED_PLUGINS
@@ -22,21 +47,6 @@ endif
 # Default build mode
 ifndef MODE
   MODE=optimize
-endif
-
-# Default list of plugins to build
-# Note that you'll link all plugins into executable in the case of static build
-ifndef PLUGINS
-  PLUGINS  = video/canvas video/renderer 
-  PLUGINS += cscon 
-  PLUGINS += csclear 
-  PLUGINS += dungeon 
-  PLUGINS += net/driver/socket net/netman 
-  PLUGINS += font/renderer/csfont 
-# PLUGINS += font/renderer/freefont
-  PLUGINS += netspace/nstp netspace/nsmgr 
-  PLUGINS += csauth/simple 
-  PLUGINS += $(DETECTED_PLUGINS)
 endif
 
 # Should we use NASM for assembly?

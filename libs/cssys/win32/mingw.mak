@@ -9,8 +9,8 @@ DESCRIPTION.mingw = Win32 with Mingw GCC
 # video/renderer/direct3d5 video/renderer/direct3d6
 # video/renderer/opengl
 #
-PLUGINS += video/canvas/ddraw video/renderer/software font/renderer/csfont
-# font/renderer/csfont font/renderer/freefont
+PLUGINS += video/canvas/ddraw video/renderer/software font/server/csfont
+# font/server/csfont font/server/freefont
 # sound/renderer/software video/canvas/ddraw video/renderer/direct3d5 \
 # video/renderer/direct3d6 video/renderer/opengl
 #

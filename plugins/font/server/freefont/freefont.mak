@@ -1,12 +1,13 @@
-DESCRIPTION.freefont = Crystal Space FreeType fontrenderer plugin
+DESCRIPTION.freefont = Crystal Space FreeType font server
 
-#-------------------------------------------------------------- rootdefines ---#
+#------------------------------------------------------------- rootdefines ---#
 ifeq ($(MAKESECTION),rootdefines)
 
-PLUGINHELP+=$(NEWLINE)echo $"  make freefont     Make the $(DESCRIPTION.freefont)$"
+PLUGINHELP += \
+  $(NEWLINE)echo $"  make freefont     Make the $(DESCRIPTION.freefont)$"
 
 endif # ifeq ($(MAKESECTION),rootdefines)
-#-------------------------------------------------------------- roottargets ---#
+#------------------------------------------------------------- roottargets ---#
 ifeq ($(MAKESECTION),roottargets)
 
 .PHONY: freefont freefontclean
@@ -17,15 +18,12 @@ freefont:
 	$(MAKE_TARGET) MAKE_DLL=yes
 
 endif # ifeq ($(MAKESECTION),roottargets)
-#-------------------------------------------------------------- postdefines ---#
+#------------------------------------------------------------- postdefines ---#
 ifeq ($(MAKESECTION),postdefines)
 
-CFLAGS.FREEFONT+=
-SRC.FREEFONT = $(wildcard plugins/font/renderer/freefont/*.cpp)
+SRC.FREEFONT = $(wildcard plugins/font/server/freefont/*.cpp)
 OBJ.FREEFONT = $(addprefix $(OUT),$(notdir $(SRC.FREEFONT:.cpp=$O)))
-LIB.FREEFONT =     \
-$(CSUTIL.LIB)   \
-$(CSSYS.LIB)
+LIB.FREEFONT = $(CSUTIL.LIB) $(CSSYS.LIB)
 
 LIB.EXTERNAL.FREEFONT = -lttf
 CFLAGS.FREEFONT = -I/usr/local/include/freetype
@@ -40,16 +38,13 @@ CFLAGS.STATIC_SCF+=$(CFLAGS.D)SCL_FREEFONT
 endif
 
 endif # ifeq ($(MAKESECTION),postdefines)
-#------------------------------------------------------------------ targets ---#
+#----------------------------------------------------------------- targets ---#
 ifeq ($(MAKESECTION),targets)
 
 .PHONY: freefont freefontclean
 freefont: $(OUTDIRS) $(FREEFONT)
 
-#Begin User Defined
-#End User Defined
-
-$(OUT)%$O: plugins/font/renderer/freefont/%.cpp
+$(OUT)%$O: plugins/font/server/freefont/%.cpp
 	$(DO.COMPILE.CPP) $(CFLAGS.FREEFONT) 
 
 $(FREEFONT): $(OBJ.FREEFONT) $(DEP.FREEFONT)
@@ -60,12 +55,11 @@ freefontclean:
 	-$(RM) $(FREEFONT) $(OBJ.FREEFONT) $(OUTOS)freefont.dep
 
 ifdef DO_DEPEND
-depend: $(OUTOS)freefont.dep
+dep: $(OUTOS)freefont.dep
 $(OUTOS)freefont.dep: $(SRC.FREEFONT)
-	$(DO.DEP1) $(DO.DEP2)
+	$(DO.DEP1) $(CFLAGS.FREEFONT) $(DO.DEP2)
 else
 -include $(OUTOS)freefont.dep
 endif
 
 endif # ifeq ($(MAKESECTION),targets)
-

@@ -1,4 +1,4 @@
-DESCRIPTION.csfont = Crystal Space default font renderer
+DESCRIPTION.csfont = Crystal Space default font server
 
 #------------------------------------------------------------- rootdefines ---#
 ifeq ($(MAKESECTION),rootdefines)
@@ -21,14 +21,9 @@ endif # ifeq ($(MAKESECTION),roottargets)
 #------------------------------------------------------------- postdefines ---#
 ifeq ($(MAKESECTION),postdefines)
 
-CFLAGS.CSFONT+=
-SRC.CSFONT = $(wildcard plugins/font/renderer/csfont/*.cpp)
+SRC.CSFONT = $(wildcard plugins/font/server/csfont/*.cpp)
 OBJ.CSFONT = $(addprefix $(OUT),$(notdir $(SRC.CSFONT:.cpp=$O)))
-LIB.CSFONT =     \
-$(CSUTIL.LIB)   \
-$(CSSYS.LIB)
-
-LIB.EXTERNAL.CSFONT = 
+LIB.CSFONT = $(CSUTIL.LIB) $(CSSYS.LIB)
 
 ifeq ($(USE_SHARED_PLUGINS),yes)
 CSFONT=$(OUTDLL)csfont$(DLL)
@@ -39,15 +34,14 @@ DEP.EXE+=$(CSFONT)
 CFLAGS.STATIC_SCF+=$(CFLAGS.D)SCL_CSFONT
 endif
 
+vpath %.cpp $(sort $(dir $(SRC.CSFONT)))
+
 endif # ifeq ($(MAKESECTION),postdefines)
 #----------------------------------------------------------------- targets ---#
 ifeq ($(MAKESECTION),targets)
 
 .PHONY: csfont csfontclean
 csfont: $(OUTDIRS) $(CSFONT)
-
-$(OUT)%$O: plugins/font/renderer/csfont/%.cpp
-	$(DO.COMPILE.CPP) $(CFLAGS.CSFONT) 
 
 $(CSFONT): $(OBJ.CSFONT) $(DEP.CSFONT)
 	$(DO.PLUGIN)
@@ -57,9 +51,9 @@ csfontclean:
 	-$(RM) $(CSFONT) $(OBJ.CSFONT) $(OUTOS)csfont.dep
 
 ifdef DO_DEPEND
-depend: $(OUTOS)csfont.dep
+dep: $(OUTOS)csfont.dep
 $(OUTOS)csfont.dep: $(SRC.CSFONT)
-	$(DO.DEP1) $(DO.DEP2)
+	$(DO.DEP)
 else
 -include $(OUTOS)csfont.dep
 endif
