@@ -106,7 +106,7 @@ SCF_EXPORT_CLASS_TABLE (aseie)
     "ASE Model Converter")
 SCF_EXPORT_CLASS_TABLE_END
 
-CS_IMPLEMENT_PLUGIN
+CS_IMPLEMENT_PLATFORM_PLUGIN
 
 csModelConverterASE::csModelConverterASE (iBase *pBase)
 {

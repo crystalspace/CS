@@ -25,7 +25,7 @@
 #include "csgeom/csrect.h"
 #include "xextshm.h"
 
-CS_IMPLEMENT_PLUGIN
+CS_IMPLEMENT_PLATFORM_PLUGIN
 
 SCF_IMPLEMENT_FACTORY (csXExtSHM)
 

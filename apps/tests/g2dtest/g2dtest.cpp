@@ -43,7 +43,7 @@
 #include "iutil/eventq.h"
 #include "iutil/objreg.h"
 
-CS_IMPLEMENT_APPLICATION
+CS_IMPLEMENT_PLATFORM_APPLICATION
 
 #define APP_TITLE	"Graphics canvas plugin test"
 

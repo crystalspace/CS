@@ -33,7 +33,7 @@
 #include <math.h>
 #include <stdlib.h>
 
-CS_IMPLEMENT_PLUGIN
+CS_IMPLEMENT_PLATFORM_PLUGIN
 
 SCF_IMPLEMENT_IBASE (csEmitFixed)
   SCF_IMPLEMENTS_INTERFACE (iEmitGen3D)

@@ -19,7 +19,7 @@
 #include "iworm.h"
 #include "ifrog.h"
 
-CS_IMPLEMENT_APPLICATION
+CS_IMPLEMENT_PLATFORM_APPLICATION
 
 // for the case we're using static linking ...
 #ifdef CS_STATIC_LINKED

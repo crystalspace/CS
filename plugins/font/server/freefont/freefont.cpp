@@ -31,7 +31,7 @@
 #include "iutil/comp.h"
 #include "freefont.h"
 
-CS_IMPLEMENT_PLUGIN
+CS_IMPLEMENT_PLATFORM_PLUGIN
 
 SCF_IMPLEMENT_FACTORY (csFreeTypeServer)
 

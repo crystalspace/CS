@@ -33,7 +33,7 @@
 #include "qsqrt.h"
 #include "qint.h"
 
-CS_IMPLEMENT_PLUGIN
+CS_IMPLEMENT_PLATFORM_PLUGIN
 
 SCF_IMPLEMENT_IBASE (csStarsMeshObject)
   SCF_IMPLEMENTS_INTERFACE (iMeshObject)

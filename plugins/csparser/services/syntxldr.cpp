@@ -44,7 +44,7 @@
 #include "imap/parser.h"
 #include "imap/ldrctxt.h"
 
-CS_IMPLEMENT_PLUGIN;
+CS_IMPLEMENT_PLATFORM_PLUGIN;
 
 SCF_IMPLEMENT_IBASE (csTextSyntaxService)
   SCF_IMPLEMENTS_INTERFACE (iSyntaxService)

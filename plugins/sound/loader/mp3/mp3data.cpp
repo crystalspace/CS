@@ -21,7 +21,7 @@
 #include "isound/loader.h"
 #include "iutil/comp.h"
 
-CS_IMPLEMENT_PLUGIN
+CS_IMPLEMENT_PLATFORM_PLUGIN
 
 SCF_IMPLEMENT_IBASE (csMp3SoundData)
   SCF_IMPLEMENTS_INTERFACE (iSoundData)

@@ -33,7 +33,7 @@
 #include "iutil/objreg.h"
 #include "qsqrt.h"
 
-CS_IMPLEMENT_PLUGIN
+CS_IMPLEMENT_PLATFORM_PLUGIN
 
 // Set the default lighting quality.
 // See header file for CS_SPR_LIGHTING_* definitions.

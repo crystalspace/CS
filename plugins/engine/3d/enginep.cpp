@@ -19,7 +19,7 @@
 #include "cssysdef.h"
 #include "csengine/engine.h"
 
-CS_IMPLEMENT_PLUGIN
+CS_IMPLEMENT_PLATFORM_PLUGIN
 
 /*
  * Package the engine library into a plug-in module.

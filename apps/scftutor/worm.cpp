@@ -27,7 +27,7 @@ public:
 
 //--------------- implementation ----------------
 
-CS_IMPLEMENT_PLUGIN
+CS_IMPLEMENT_PLATFORM_PLUGIN
 
 SCF_IMPLEMENT_IBASE (csWorm)
   SCF_IMPLEMENTS_INTERFACE (iWorm)

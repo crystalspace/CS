@@ -52,7 +52,7 @@
 #include "ivaria/stdrep.h"
 #include "csutil/cmdhelp.h"
 
-CS_IMPLEMENT_APPLICATION
+CS_IMPLEMENT_PLATFORM_APPLICATION
 
 //-----------------------------------------------------------------------------
 

@@ -43,7 +43,7 @@
 #include "iutil/vfs.h"
 #include "igraphic/imageio.h"
 
-CS_IMPLEMENT_APPLICATION
+CS_IMPLEMENT_PLATFORM_APPLICATION
 
 //-----------------------------------------------------------------------------
 

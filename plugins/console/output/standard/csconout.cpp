@@ -37,7 +37,7 @@
 #include "iutil/eventh.h"
 #include "iutil/comp.h"
 
-CS_IMPLEMENT_PLUGIN
+CS_IMPLEMENT_PLATFORM_PLUGIN
 
 SCF_IMPLEMENT_IBASE(csConsoleOutput)
   SCF_IMPLEMENTS_INTERFACE(iConsoleOutput)

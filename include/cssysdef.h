@@ -384,29 +384,29 @@ static void CS_STATIC_VAR_DESTRUCTION_REGISTRAR_FUNCTION (void (*p)()) \
 #endif
 
 /**
- * The CS_IMPLEMENT_PLUGIN macro should be placed at the global scope in
+ * The CS_IMPLEMENT_PLATFORM_PLUGIN macro should be placed at the global scope in
  * exactly one compilation unit comprising a plugin module.  For maximum
  * portability, each plugin module must employ this macro.  Platforms may
  * override the definition of this macro in order to augment the implementation
  * of the plugin module with any special implementation details required by the
  * platform.
  */
-#ifndef CS_IMPLEMENT_PLUGIN
-#  define CS_IMPLEMENT_PLUGIN        \
+#ifndef CS_IMPLEMENT_PLATFORM_PLUGIN
+#  define CS_IMPLEMENT_PLATFORM_PLUGIN        \
 CS_IMPLEMENT_STATIC_VARIABLE_CLEANUP \
 CS_IMPLEMENT_PLATFORM_PLUGIN 
 #endif
 
 /**
- * The CS_IMPLEMENT_APPLICATION macro should be placed at the global scope in
+ * The CS_IMPLEMENT_PLATFORM_APPLICATION macro should be placed at the global scope in
  * exactly one compilation unit comprising an application.  For maximum
  * portability, each application should employ this macro.  Platforms may
  * override the definition of this macro in order to augment the implementation
  * of an application with any special implementation details required by the
  * platform.
  */
-#ifndef CS_IMPLEMENT_APPLICATION
-#  define CS_IMPLEMENT_APPLICATION   \
+#ifndef CS_IMPLEMENT_PLATFORM_APPLICATION
+#  define CS_IMPLEMENT_PLATFORM_APPLICATION   \
 CS_IMPLEMENT_STATIC_VARIABLE_CLEANUP \
 CS_IMPLEMENT_PLATFORM_APPLICATION 
 #endif

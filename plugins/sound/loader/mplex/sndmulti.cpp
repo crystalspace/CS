@@ -31,7 +31,7 @@
 
 #define MY_CLASSNAME "crystalspace.sound.loader.multiplexer"
 
-CS_IMPLEMENT_PLUGIN
+CS_IMPLEMENT_PLATFORM_PLUGIN
 
 class csSoundLoaderMultiplexer : public iSoundLoader
 {

@@ -48,7 +48,7 @@ TO_INSTALL.DATA +=
 MSVC.DSP += ODIVX4
 DSP.ODIVX4.NAME = odivx4
 DSP.ODIVX4.TYPE = plugin
-DSP.ODIVX4.LIBS = decore
+DSP.ODIVX4.LIBS = decore4
 
 endif # ifeq ($(MAKESECTION),postdefines)
 #----------------------------------------------------------------- targets ---#

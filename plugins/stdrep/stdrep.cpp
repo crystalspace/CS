@@ -32,7 +32,7 @@
 #include "ivideo/natwin.h"
 #include "ivaria/conout.h"
 
-CS_IMPLEMENT_PLUGIN
+CS_IMPLEMENT_PLATFORM_PLUGIN
 
 SCF_IMPLEMENT_FACTORY (csReporterListener)
 

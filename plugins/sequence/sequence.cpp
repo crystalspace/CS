@@ -29,7 +29,7 @@
 #include "ivideo/graph2d.h"
 #include "iutil/vfs.h"
 
-CS_IMPLEMENT_PLUGIN
+CS_IMPLEMENT_PLATFORM_PLUGIN
 
 SCF_IMPLEMENT_IBASE (csSequence)
   SCF_IMPLEMENTS_INTERFACE (iSequence)

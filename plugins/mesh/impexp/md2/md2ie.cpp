@@ -118,7 +118,7 @@ SCF_EXPORT_CLASS_TABLE (md2ie)
     "MD2 Model Converter")
 SCF_EXPORT_CLASS_TABLE_END
 
-CS_IMPLEMENT_PLUGIN
+CS_IMPLEMENT_PLATFORM_PLUGIN
 
 csModelConverterMD2::csModelConverterMD2 (iBase *pBase)
 {

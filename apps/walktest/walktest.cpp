@@ -94,7 +94,7 @@ WalkTest *Sys;
 
 //------------------------------------------------- We need the 3D engine -----
 
-CS_IMPLEMENT_APPLICATION
+CS_IMPLEMENT_PLATFORM_APPLICATION
 
 // need to register the engine explicit here when not building static
 #if !defined(CS_STATIC_LINKED)

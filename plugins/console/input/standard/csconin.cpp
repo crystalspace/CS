@@ -24,7 +24,7 @@
 #include "iutil/event.h"
 #include "iutil/eventq.h"
 
-CS_IMPLEMENT_PLUGIN
+CS_IMPLEMENT_PLATFORM_PLUGIN
 
 SCF_IMPLEMENT_IBASE (csConsoleInput)
   SCF_IMPLEMENTS_INTERFACE (iConsoleInput)

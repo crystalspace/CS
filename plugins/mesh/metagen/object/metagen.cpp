@@ -37,7 +37,7 @@
 #include "qsqrt.h"
 #include "metagen.h"
 
-CS_IMPLEMENT_PLUGIN
+CS_IMPLEMENT_PLATFORM_PLUGIN
 
 SCF_IMPLEMENT_IBASE (csMetaGen)
   SCF_IMPLEMENTS_INTERFACE (iMeshObjectFactory)

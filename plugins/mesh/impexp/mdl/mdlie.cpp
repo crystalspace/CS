@@ -110,7 +110,7 @@ SCF_EXPORT_CLASS_TABLE (mdlie)
     "MDL Model Converter")
 SCF_EXPORT_CLASS_TABLE_END
 
-CS_IMPLEMENT_PLUGIN
+CS_IMPLEMENT_PLATFORM_PLUGIN
 
 csModelConverterMDL::csModelConverterMDL (iBase *pBase)
 {

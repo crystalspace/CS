@@ -41,7 +41,7 @@
 #include "qint.h"
 #include "qsqrt.h"
 
-CS_IMPLEMENT_PLUGIN
+CS_IMPLEMENT_PLATFORM_PLUGIN
 
 SCF_IMPLEMENT_IBASE (csTerrFuncObject)
   SCF_IMPLEMENTS_INTERFACE (iMeshObject)

@@ -29,7 +29,7 @@
 #include "../common/soundraw.h"
 #include "../common/sndload.h"
 
-CS_IMPLEMENT_PLUGIN
+CS_IMPLEMENT_PLATFORM_PLUGIN
 
 // Microsoft Wav file loader
 // support 8 and 16 bits PCM (RIFF)

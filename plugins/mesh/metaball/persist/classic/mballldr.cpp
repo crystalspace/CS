@@ -39,7 +39,7 @@
 #include "iutil/comp.h"
 #include "imap/ldrctxt.h"
 
-CS_IMPLEMENT_PLUGIN
+CS_IMPLEMENT_PLATFORM_PLUGIN
 
 CS_TOKEN_DEF_START
   CS_TOKEN_DEF (ADD)

@@ -27,7 +27,7 @@
 #include <math.h>
 #include <stdlib.h>
 
-CS_IMPLEMENT_PLUGIN
+CS_IMPLEMENT_PLATFORM_PLUGIN
 
 SCF_IMPLEMENT_IBASE_EXT (csFountainMeshObject)
   SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iFountainState)

@@ -32,7 +32,7 @@
 #include FT_GLYPH_H
 #include "freefnt2.h"
 
-CS_IMPLEMENT_PLUGIN
+CS_IMPLEMENT_PLATFORM_PLUGIN
 
 SCF_IMPLEMENT_FACTORY (csFreeType2Server)
 

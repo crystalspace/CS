@@ -80,7 +80,7 @@
 #include "inetwork/driver.h"
 #endif
 
-CS_IMPLEMENT_APPLICATION
+CS_IMPLEMENT_PLATFORM_APPLICATION
 
 //-----------------------------------------------------------------------------
 // Networking stuff.
