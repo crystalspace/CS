@@ -230,6 +230,9 @@ void csParticlesPhysicsSimple::StepPhysics (float true_elapsed_time,
       start = part->particles->GetRotation () * start;
       start += emitter;
       break;
+    case CS_PART_EMIT_CYLINDER:
+      // @@@ FIXME: Implement this?
+      break;
     }
 
     point.position = start;
