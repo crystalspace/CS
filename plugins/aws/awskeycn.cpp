@@ -17,23 +17,15 @@ awsKeyContainer::Find(iString *n)
 awsKey *
 awsKeyContainer::Find(unsigned long idname)
 {
-   void *p = children.GetFirstItem();
-
-   while(p) 
+   for(int i=0; i<children.Length(); ++i)  
    {
+     void *p=children[i];
      awsKey *key = STATIC_CAST(awsKey*,p);
 
-     if (key) 
-     {
-       if (key->Name() == idname)
-       {
-          return key;
-       }
-     }
-
-     p = children.GetNextItem();
-
-   } // end while traversing the children
+     if (key && key->Name() == idname) 
+       return key;
+         
+   }
 
   return NULL;
 }

@@ -61,9 +61,38 @@ awsPrefManager::GetColor(int index)
 void
 awsPrefManager::SetupPalette(iGraphics3D *g3d)
 {
+ printf("aws-debug: setting up global AWS palette...\n");
+  
+ unsigned char red, green, blue;
  iTextureManager* txtmgr = g3d->GetTextureManager();
 
- sys_colors[AC_TRANSPARENT] = txtmgr->FindRGB(255,0,255); 
+ LookupRGBKey("HighlightColor", red, green, blue); 
+ sys_colors[AC_HIGHLIGHT] = txtmgr->FindRGB(red,green,blue);
+ 
+ LookupRGBKey("ShadowColor", red, green, blue); 
+ sys_colors[AC_SHADOW] = txtmgr->FindRGB(red,green,blue);
+ 
+ LookupRGBKey("FillColor", red, green, blue); 
+ sys_colors[AC_FILL] = txtmgr->FindRGB(red,green,blue);
+ 
+ LookupRGBKey("TextForeColor", red, green, blue); 
+ sys_colors[AC_TEXTFORE] = txtmgr->FindRGB(red,green,blue);
+ 
+ LookupRGBKey("TextBackColor", red, green, blue); 
+ sys_colors[AC_TEXTBACK] = txtmgr->FindRGB(red,green,blue);
+ 
+ LookupRGBKey("TextDisabledColor", red, green, blue); 
+ sys_colors[AC_TEXTDISABLED] = txtmgr->FindRGB(red,green,blue);
+ 
+ LookupRGBKey("ButtonTextColor", red, green, blue); 
+ sys_colors[AC_BUTTONTEXT] = txtmgr->FindRGB(red,green,blue);
+ 
+ if (LookupRGBKey("TransparentColor", red, green, blue)) 
+   sys_colors[AC_TRANSPARENT] = txtmgr->FindRGB(red,green,blue);
+ else
+   sys_colors[AC_TRANSPARENT] = txtmgr->FindRGB(255,0,255); 
+  
+ printf("aws-debug: finished palette setup.\n"); 
 }
 
 
@@ -94,7 +123,7 @@ awsPrefManager::SelectDefaultSkin(char *skin_name)
  awsSkinNode *skin = (awsSkinNode *)skin_defs.GetFirstItem();
  unsigned long id  = NameToId(skin_name);
 
- while(skin)
+ do 
  {
     if (skin->Name() == id) {
       def_skin=skin;
@@ -102,7 +131,7 @@ awsPrefManager::SelectDefaultSkin(char *skin_name)
     }
 
     skin = (awsSkinNode *)skin_defs.GetNextItem();
-}
+ } while(skin!=(awsSkinNode *)skin_defs.PeekFirstItem());
 
  return false;
 }
@@ -177,6 +206,36 @@ awsPrefManager::LookupRectKey(unsigned long id, csRect &val)
     return false;
 }
 
+bool 
+awsPrefManager::LookupRGBKey(char *name, unsigned char &red, unsigned char &green, unsigned char &blue)
+{
+  return LookupRGBKey(NameToId(name), red, green, blue);
+}   
+
+bool 
+awsPrefManager::LookupRGBKey(unsigned long id, unsigned char &red, unsigned char &green, unsigned char &blue)
+{
+  
+   awsKey *k = ((awsKeyContainer *)def_skin)->Find(id);
+  
+    if (k)
+    {
+      if (k->Type() == KEY_RGB) 
+      {
+	awsRGBKey::RGB rgb;
+        rgb = ((awsRGBKey *)k)->Value();
+	
+	red=rgb.red;
+	green=rgb.green;
+	blue=rgb.blue;
+	
+        return true;
+      }
+    }
+
+    return false;
+}
+
 bool
 awsPrefManager::GetInt(awsComponentNode *node, char *name, int &val)
 {
@@ -240,7 +299,7 @@ awsPrefManager::FindWindowDef(char *name)
   void *p = win_defs.GetFirstItem();
   unsigned long id = NameToId(name);
   
-  while(p)
+  do 
   {
     awsComponentNode *win = (awsComponentNode *)p;
     
@@ -249,7 +308,7 @@ awsPrefManager::FindWindowDef(char *name)
     else
       p=win_defs.GetNextItem();
     
-  }
+  } while(p!=win_defs.PeekFirstItem());
   
   return NULL;
  

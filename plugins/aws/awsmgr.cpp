@@ -146,13 +146,13 @@ awsManager::SetDefaultContext(iEngine* engine, iTextureManager* txtmgr)
   ptG3D = canvas.G3D();
   
   printf("aws-debug: G2D=%x G3D=%x\n", ptG2D, ptG3D);
-   
   
   if (ptG3D)
     GetPrefMgr()->SetupPalette(ptG3D);
   
   if (ptG2D && ptG3D) 
   {
+    ptG2D->DoubleBuffer(false);
     ptG3D->BeginDraw(CSDRAW_2DGRAPHICS);
     ptG2D->Clear(txtmgr->FindRGB(255,0,255));
     ptG3D->FinishDraw();
@@ -214,8 +214,8 @@ void
 awsManager::Print(iGraphics3D *g3d)
 {
   g3d->DrawPixmap(canvas.GetTextureWrapper()->GetTextureHandle(), 
-  		  0,0,512,512,
-		  0,0,512,512,0);
+  		  64,0,512,480, //g3d->GetWidth(),g3d->GetHeight(),
+		  0,0,512,480,128);
   		  
   
 }
@@ -224,14 +224,20 @@ void
 awsManager::Redraw()
 {
    static unsigned redraw_tag = 0;
+   static csRect bounds(0,0,512,512);
 
    redraw_tag++;
    ptG3D->BeginDraw(CSDRAW_2DGRAPHICS);
    
-   ptG2D->DrawBox(0,200,512,250, ptG3D->GetTextureManager()->FindRGB(0,255,0));
-   
+   ptG2D->SetClipRect(0,0,640,480);
+   ptG2D->DrawBox( 0,  200,512, 20, GetPrefMgr()->GetColor(AC_FILL));
+   ptG2D->DrawLine(0,  200,512,200, GetPrefMgr()->GetColor(AC_HIGHLIGHT));
+   ptG2D->DrawLine(0,  200,0,  220, GetPrefMgr()->GetColor(AC_HIGHLIGHT));
+   ptG2D->DrawLine(0,  220,512,220, GetPrefMgr()->GetColor(AC_SHADOW));
+   ptG2D->DrawLine(512,200,512,200, GetPrefMgr()->GetColor(AC_SHADOW));
+      
    ptG3D->FinishDraw ();
-   ptG3D->Print (NULL);
+   ptG3D->Print (&bounds);
      
    // check to see if there is anything to redraw.
    if (dirty[0].IsEmpty()) {
@@ -352,10 +358,11 @@ awsManager::CreateWindowFrom(char *defname)
 void
 awsManager::CreateChildrenFromDef(iAws *wmgr, awsComponent *parent, awsComponentNode *settings)
 {
-  awsKey *key = settings->GetFirst();
    
-  while(key)
+  for(int i=0; i<settings->GetLength(); ++i)
   {
+    awsKey *key = settings->GetItemAt(i); 
+    
     if (key->Type() == KEY_COMPONENT)
     {
       awsComponentNode *comp_node = (awsComponentNode *)key;
@@ -375,8 +382,7 @@ awsManager::CreateChildrenFromDef(iAws *wmgr, awsComponent *parent, awsComponent
       }
       
     }
-   
-   key = settings->GetNext();
+      
   }
   
   

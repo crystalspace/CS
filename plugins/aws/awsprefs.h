@@ -20,6 +20,7 @@
 #include "ivaria/aws.h"
 #include "csgeom/csrect.h"
 #include "csutil/csdllist.h"
+#include "csutil/csvector.h"
 struct iString;
 
 /****
@@ -155,7 +156,7 @@ public:
 class awsKeyContainer 
 {
   /// list of children in container.
-  csDLinkList children;
+  csBasicVector children;
 
 public:
   awsKeyContainer() {};
@@ -168,33 +169,34 @@ public:
   /// Looks up a key based on it's ID.
   awsKey *Find(unsigned long id);
     
-  csDLinkList &Children()
+  csBasicVector &Children()
   { return children; }
  
   /// Adds an item to the container
   void Add(awsKey *key) 
-  { children.AddItem(key); }
+  { children.Push(key); }
 
   /// Removes an item from the container
   void Remove(iString *name)
-  { children.RemoveItem(Find(name)); }
+  { children.Delete(children.Find(Find(name))); }
 
   /// Removes a specific item from the container
   void Remove(awsKey *key)
-  { children.RemoveItem(key); }
+  { children.Delete(children.Find(key)); }
 
   /// Consumes an entire list by moving all of it's member's to this one, and removing them from it.
   void Consume(awsKeyContainer *c)
   {
-     void *p = c->children.GetFirstItem();
-
-     while(p)
+     
+     for(int i=0; i<c->children.Length(); ++i) 
      {
-        children.AddItem(p);
-        c->children.RemoveItem();
-
-        p=c->children.GetNextItem();
+        void *p = c->children[i];
+	
+        children.Push(p);
+        c->children.Delete(i);
      }
+     
+     delete c;
   }
 };
 
@@ -226,13 +228,13 @@ public:
   iString *ComponentTypeName()
   { return comp_type; }
     
-  /// Exposes csDLinkList GetFirst for iteration initiation
-  awsKey *GetFirst()
-  { return (awsKey *)Children().GetFirstItem(); }
+  /// Exposes length of child list for iteration
+  int GetLength()
+  { return Children().Length(); }
   
-  /// Exposes csDLinkList GetNext for continuing iteration
-  awsKey *GetNext()
-  { return (awsKey *)Children().GetNextItem();  }
+  /// Exposes [] for index access
+  awsKey *GetItemAt(int i)
+  { return (awsKey *)Children()[i];  }
 };
 
 //////////////////////////////////  Preference Manager ////////////////////////////////////////////////////////////////
@@ -246,7 +248,8 @@ const unsigned int COLOR_TEXTBACK   = 5;
 const unsigned int COLOR_TEXTDISABLED = 6;*/
 
 enum AWS_COLORS { AC_HIGHLIGHT, AC_SHADOW, AC_FILL, AC_DARKFILL, 
-		  AC_TEXTFORE, AC_TEXTBACK, AC_TESTDISABLE, AC_TRANSPARENT, 
+		  AC_TEXTFORE, AC_TEXTBACK, AC_TEXTDISABLED, 
+		  AC_BUTTONTEXT, AC_TRANSPARENT, 
 		  AC_COLOR_COUNT };
 
 class awsPrefManager : public iAwsPrefs
@@ -301,7 +304,13 @@ public:
 
     /// Lookup the value of a rect key by id (from the skin def)
     virtual bool LookupRectKey(unsigned long id, csRect &rect); 
-
+    
+    /// Lookup the value of an RGB key by name (from the skin def)
+    virtual bool LookupRGBKey(char *name, unsigned char &red, unsigned char &green, unsigned char &blue);
+    
+    /// Lookup the value of an RGB key by name (from the skin def)
+    virtual bool LookupRGBKey(unsigned long id, unsigned char &red, unsigned char &green, unsigned char &blue);
+        
     /// Get the value of an integer from a given component node
     virtual bool GetInt(awsComponentNode *node, char *name, int &val);
 
