@@ -240,7 +240,7 @@ The include files useful for this section are:
 @example
 #include <iutil/object.h>
 #include <iutil/plugin.h>
-#include <igeom/collider.h>
+#include <ivaria/collider.h>
 #include <igeom/polymesh.h>
 #include <iengine/mesh.h>
 #include <cstool/collider.h>
