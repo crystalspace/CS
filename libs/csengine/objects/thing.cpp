@@ -201,8 +201,22 @@ void csThing::GenerateCacheName ()
   mf.Write ((char*)&l, 4);
   l = convert_endian ((long)curves.Length ());
   mf.Write ((char*)&l, 4);
-  if (GetName ())
-    mf.Write (GetName (), strlen (GetName ()));
+
+  if (logparent)
+  {
+    iMeshWrapper* mw = SCF_QUERY_INTERFACE (logparent, iMeshWrapper);
+    if (mw)
+    {
+      if (mw->QueryObject ()->GetName ())
+        mf.Write (mw->QueryObject ()->GetName (),
+		strlen (mw->QueryObject ()->GetName ()));
+      iSector* sect = mw->GetMovable ()->GetSectors ()->Get (0);
+      if (sect && sect->QueryObject ()->GetName ())
+        mf.Write (sect->QueryObject ()->GetName (),
+		strlen (sect->QueryObject ()->GetName ()));
+      mw->DecRef ();
+    }
+  }
   
   l = convert_endian ((long)QInt ((b.MinX () * 1000)+.5));
   mf.Write ((char*)&l, 4);

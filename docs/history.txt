@@ -17,6 +17,10 @@ The history order is reversed so that new features are at the top.
 	- Temporarily disabled the experimental quaddiv in the landscape
 	  engine again because there seem to be some problems with it.
 	- Changed csBezier2 constructor to a static 'Initialize()' function.
+	- MD5 name generation for lightmaps/cache now uses the name
+	  of the mesh wrapper and containing sector to guarantee more
+	  uniqueness. Previously the name of the csThing itself was used
+	  but this is almost always NULL.
 28-Mar-2002
 	- Reverted part of 'res' changes to the lightmap checker because
 	  they cause big problems.
