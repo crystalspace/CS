@@ -1,7 +1,20 @@
+crystalspace (0.93-5) unstable; urgency=low
+
+  * French translation of control file
+
+ -- Christian Bayle <bayle@aist.enst.fr>  Wed, 13 Feb 2002 08:31:56 +0100
+
+crystalspace (0.93-4) unstable; urgency=low
+
+  * automan correction/improvment
+  * French translation of control file
+
+ -- Christian Bayle <bayle@aist.enst.fr>  Wed, 13 Feb 2002 08:31:56 +0100
+
 crystalspace (0.93-3) unstable; urgency=low
 
   * Added dependency on zip, libpng, libjpeg62
-   svgalibg1, python2.1, libfreetype6, lib3ds
+  svgalibg1, python2.1, libfreetype6, lib3ds
 
  -- Christian Bayle <bayle@aist.enst.fr>  Wed, 13 Feb 2002 08:31:56 +0100
 
