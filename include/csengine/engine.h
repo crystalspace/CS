@@ -1115,6 +1115,8 @@ public:
   virtual iSector *GetSector (int iIndex);
   /// Find a sector by name
   virtual iSector *FindSector (const char *iName, bool regionOnly = false);
+  /// Delete a sector
+  virtual void DeleteSector (iSector *Sector);
 
   /// Find a mesh by name
   virtual iMeshWrapper *FindMeshObject (const char *iName,

@@ -27,7 +27,7 @@
 #include "csgeom/math3d.h"
 #include "csgeom/matrix3.h"
 
-class csEngine;
+struct iEngine;
 struct iMaterialWrapper;
 struct iTextureManager;
 struct iFont;
@@ -304,7 +304,7 @@ private:
 
 public:
   iMeshObjectType* thing_type;
-  csEngine* engine;
+  iEngine* engine;
   iView* view;
   iTextureManager* txtmgr;
   static int white, black, red;

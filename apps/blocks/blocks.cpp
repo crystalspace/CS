@@ -32,6 +32,7 @@
 #include "blocks.h"
 #include "cssys/system.h"
 #include "csutil/csstring.h"
+#include "csutil/cscolor.h"
 
 #include "isys/vfs.h"
 #include "iutil/cfgmgr.h"
@@ -45,15 +46,20 @@
 #include "iengine/sector.h"
 #include "iengine/movable.h"
 #include "iengine/polygon.h"
+#include "iengine/light.h"
+#include "iengine/dynlight.h"
+#include "iengine/view.h"
+#include "iengine/engine.h"
+#include "iengine/mesh.h"
+#include "iengine/thing.h"
+#include "iengine/camera.h"
+#include "imesh/object.h"
+#include "iobject/rtti.h"
+#include "iobject/object.h"
 #include "imap/parser.h"
 
-#include "csengine/engine.h"
-#include "csengine/sector.h"
-// #include "csengine/polytext.h"
-#include "csengine/light.h"
 #include "csengine/textrans.h"
-#include "csengine/csview.h"
-#include "csengine/meshobj.h"
+#include "csengine/thing.h"
 
 #if defined(BLOCKS_NETWORKING)
 #include "inetwork/driver.h"
@@ -356,7 +362,10 @@ Blocks::Blocks ()
 Blocks::~Blocks ()
 {
   if (dynlight) dynlight->DecRef ();
-  if (engine) engine->Clear ();
+  if (engine) {
+    engine->DeleteAll ();
+    engine->DecRef ();
+  }
   if (view) view->DecRef ();;
   delete keyconf_menu;
 #if defined(BLOCKS_NETWORKING)
@@ -1517,13 +1526,13 @@ void Blocks::freeze_shape ()
 
 void Blocks::dump_shape ()
 {
-  CsPrintf (MSG_DEBUG_0,"Dump shape:\n");
+  Printf (MSG_DEBUG_0,"Dump shape:\n");
   for (int i = 0 ; i < num_cubes ; i++)
   {
     int x = (int)cube_info[i].dx;
     int y = (int)cube_info[i].dy;
     int z = (int)cube_info[i].dz;
-    CsPrintf (MSG_DEBUG_0, " %d: (%d,%d,%d) d=(%d,%d,%d)\n",
+    Printf (MSG_DEBUG_0, " %d: (%d,%d,%d) d=(%d,%d,%d)\n",
     	i, player1->cube_x+x, player1->cube_y+y, player1->cube_z+z, x, y, z);
   }
 }
@@ -1774,27 +1783,26 @@ void Blocks::HandleMovement (cs_time elapsed_time)
 
 void Blocks::InitTextures ()
 {
-  if (engine) engine->Clear ();
-  csEngine* const e = Sys->engine;
+  if (engine) engine->DeleteAll ();
 
   LevelLoader->LoadTexture ("pillar", "stone4.png");
-  Sys->set_pillar_material (e->FindMaterial ("pillar"));
+  Sys->set_pillar_material (engine->FindMaterial ("pillar"));
 
   LevelLoader->LoadTexture ("cube", "cube.png");
-  Sys->set_cube_material (e->FindMaterial ("cube"));
+  Sys->set_cube_material (engine->FindMaterial ("cube"));
   LevelLoader->LoadTexture ("raster", "clouds_thick1.jpg");
-  Sys->set_raster_material (e->FindMaterial ("raster"));
+  Sys->set_raster_material (engine->FindMaterial ("raster"));
   LevelLoader->LoadTexture ("room", "mystone2.png");
   LevelLoader->LoadTexture ("clouds", "clouds.jpg");
 
   LevelLoader->LoadTexture ("cubef1", "cubef1.png");
-  Sys->set_cube_f1_material (e->FindMaterial ("cubef1"));
+  Sys->set_cube_f1_material (engine->FindMaterial ("cubef1"));
   LevelLoader->LoadTexture ("cubef2", "cubef2.png");
-  Sys->set_cube_f2_material (e->FindMaterial ("cubef2"));
+  Sys->set_cube_f2_material (engine->FindMaterial ("cubef2"));
   LevelLoader->LoadTexture ("cubef3", "cubef3.png");
-  Sys->set_cube_f3_material (e->FindMaterial ("cubef3"));
+  Sys->set_cube_f3_material (engine->FindMaterial ("cubef3"));
   LevelLoader->LoadTexture ("cubef4", "cubef4.png");
-  Sys->set_cube_f4_material (e->FindMaterial ("cubef4"));
+  Sys->set_cube_f4_material (engine->FindMaterial ("cubef4"));
 
   LevelLoader->LoadTexture ("menu_novice", "novice.png");
   LevelLoader->LoadTexture ("menu_back", "back.png");
@@ -2009,8 +2017,7 @@ void Blocks::ReplaceMenuItem (int idx, int menu_nr)
 
 void Blocks::ChangePlaySize (int new_size)
 {
-  int idx = Sys->engine->sectors.Find ((csSome)room);
-  Sys->engine->sectors.Delete (idx);
+  engine->DeleteSector (room);
   player1->zone_dim = new_size;
   WriteConfig ();
   InitGameRoom ();
@@ -3010,9 +3017,6 @@ int main (int argc, char* argv[])
   // Create our main class which is the driver for Blocks.
   Sys = new Blocks ();
 
-  // temp hack until we find a better way
-  csEngine::System = Sys;
-
   if (!Sys->Initialize (argc, argv, "/config/blocks.cfg"))
   {
     Sys->Printf (MSG_FATAL_ERROR, "Error initializing system!\n");
@@ -3029,15 +3033,13 @@ int main (int argc, char* argv[])
   }
 
   // Find the pointer to engine plugin
-  iEngine *engine = QUERY_PLUGIN (Sys, iEngine);
-  if (!engine)
+  Sys->engine = QUERY_PLUGIN (Sys, iEngine);
+  if (!Sys->engine)
   {
-    CsPrintf (MSG_FATAL_ERROR, "No iEngine plugin!\n");
+    Sys->Printf (MSG_FATAL_ERROR, "No iEngine plugin!\n");
     return -1;
   }
-  Sys->engine = engine->GetCsEngine ();
-  engine->DecRef ();
-  Sys->thing_type = engine->GetThingType ();
+  Sys->thing_type = Sys->engine->GetThingType ();
 
   // Get a font handle
   Sys->font = Sys->G2D->GetFontServer ()->LoadFont (CSFONT_LARGE);
@@ -3046,7 +3048,7 @@ int main (int argc, char* argv[])
   Sys->LevelLoader = QUERY_PLUGIN_ID(Sys, CS_FUNCID_LVLLOADER, iLoader);
   if (!Sys->LevelLoader)
   {
-    CsPrintf (MSG_FATAL_ERROR, "No iLoader plugin!\n");
+    Sys->Printf (MSG_FATAL_ERROR, "No iLoader plugin!\n");
     return -1;
   }
 

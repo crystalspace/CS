@@ -244,6 +244,8 @@ struct iEngine : public iPlugIn
    * engine.
    */
   virtual iSector *FindSector (const char *iName, bool regionOnly = false) = 0;
+  /// Delete a sector
+  virtual void DeleteSector (iSector *) = 0;
 
   /**
    * Find a mesh object by name. If regionOnly is true then the returned

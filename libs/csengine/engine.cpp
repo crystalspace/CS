@@ -1999,6 +1999,12 @@ iSector *csEngine::FindSector (const char *iName, bool regionOnly)
   return sec ? &sec->scfiSector : NULL;
 }
 
+void csEngine::DeleteSector (iSector *Sector)
+{
+  int n = sectors.Find (Sector);
+  if (n >= 0) sectors.Delete (n);
+}
+
 iMeshWrapper *csEngine::FindMeshObject (const char *iName, bool regionOnly)
 {
   csMeshWrapper* mesh;
