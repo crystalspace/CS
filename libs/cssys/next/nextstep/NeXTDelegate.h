@@ -24,7 +24,6 @@
 #if !defined(__cplusplus)
 
 #import <objc/Object.h>
-#import <dpsclient/dpsNeXT.h>
 #import <dpsclient/event.h>
 #include "cssys/next/NeXTSystemDriver.h"
 @class NeXTKeymap, View, Window;
@@ -33,7 +32,6 @@
 {
   NeXTSystemDriver driver;
   NeXTKeymap* keymap;
-  DPSTimedEntry timer;
   unsigned long modifiers;
   BOOL mouseHidden;
   BOOL paused;
@@ -45,10 +43,6 @@
 
 - (id)initWithDriver:(NeXTSystemDriver)driver;
 - (void)initApplicationMenu:(NeXTConfigHandle)handle style:(char const*)style;
-
-- (void)startTimer;
-- (void)stopTimer;
-- (void)resetTimer;
 
 - (void)pause;
 - (void)unpause;

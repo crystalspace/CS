@@ -25,12 +25,11 @@
 
 #import <Foundation/NSObject.h>
 #include "cssys/next/NeXTSystemDriver.h"
-@class NSEvent, NSTimer, NSView, NSWindow;
+@class NSEvent, NSView, NSWindow;
 
 @interface NeXTDelegate : NSObject
 {
   NeXTSystemDriver driver;
-  NSTimer* timer;
   unsigned long modifiers;
   BOOL mouseHidden;
   BOOL paused;
@@ -42,10 +41,6 @@
 
 - (id)initWithDriver:(NeXTSystemDriver)driver;
 - (void)initApplicationMenu:(NeXTConfigHandle)handle style:(char const*)style;
-
-- (void)startTimer;
-- (void)stopTimer;
-- (void)resetTimer;
 
 - (void)pause;
 - (void)unpause;

@@ -11,6 +11,14 @@ The history order is reversed so that new features are at the top.
 	  some platforms where NULL is defined as ((void*)0).
 	- Eric Sunshine worked around an OpenStep compiler bug where it emitted
 	  assembly with an unresolveable symbol for the csClipInfo class.
+	- Eric Sunshine eliminated the hard-coded maximum framerate limitation
+	  (15 frames per second) from the Apple/NeXT ports.  Rather than using
+	  a timer to trigger calls to iSystem::NextFrame() at a fixed interval
+	  (15 times per second), it now feeds a dummy event into the AppKit's
+	  event queue after each call to NextFrame(), which triggers a
+	  subsequent call to NextFrame(), etc.  This allows the frame rate to
+	  run as high as the hardware allows rather than artificially limiting
+	  it to a timer's fixed interval.
 19-Jun-2001
 	- Removed verbose output of lightmap calculation if recalculation
 	  of lighting is not enabled. Now the progress bars are only

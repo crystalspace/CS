@@ -120,11 +120,12 @@ void NeXTSystemDriver::Loop()
 
 
 //-----------------------------------------------------------------------------
-// timer_fired
-//	Target of periodic animation timer.  Invokes the engine's NextFrame()
-//	method.
+// advance_state
+//	This method is invoked periodically by a trigger in the application's
+//	event loop.  (See -[NeXTDelegate applicationDefined:].)  Invokes the
+//	NextFrame() method.
 //-----------------------------------------------------------------------------
-void NeXTSystemDriver::timer_fired()
+void NeXTSystemDriver::advance_state()
 {
   NextFrame();
   if (!continue_looping())
@@ -140,9 +141,9 @@ void NeXTSystemDriver::timer_fired()
 //
 // Perform a system-specific extension.  The following requests are understood:
 //
-//	timerfired
-//	    The periodic animation timer fired.  Invokes the engine's
-//	    NextFrame() method.
+//	advancestate
+//	    Sent by some mechanism on a periodic basis to trigger invocation
+//	    of the NextFrame() method.
 //	continuelooping <int*>
 //	    Query whether or not the application's event loop should continue
 //	    running.  The result is returned as a boolean result in the integer
@@ -203,8 +204,8 @@ bool NeXTSystemDriver::SystemExtension(char const* cmd, ...)
 #define AGET(T) va_arg(args,T)
     
   STR_SWITCH (cmd)
-    STR_CASE (timerfired)
-      timer_fired();
+    STR_CASE (advancestate)
+      advance_state();
     STR_CASE (continuelooping)
       int* flag = AGET(int*);
       *flag = continue_looping();
