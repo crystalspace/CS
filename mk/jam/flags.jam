@@ -35,7 +35,7 @@ rule LinkWith
   
   LFlags $(<) : $($($(rawlibs).EXTERNALLIBS).LFLAGS) ;
   
-  local libs ;
+  local i libs ;
   for i in $(rawlibs)
   {
     libs += [ ConstructLibraryLinkTarget $(i) : $($(i)_SHARED) ] ;
