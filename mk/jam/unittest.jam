@@ -360,10 +360,11 @@ rule UnitTestDynamicTargets
   # Therefore, simply alias this directory entry to the existing "check_module"
   # target.
 
-  local deepest_dir = check_$(subdir_tokens:J=_) ;
-  NotFile $(deepest_dir) ;
-  Always  $(deepest_dir) ;
-  Depends $(deepest_dir) : [ UnitTestNameTest $(module) ] ;
+  local deepest_name  = [ UnitTestNameTest  $(subdir_tokens:J=_) ] ;
+  local deepest_clean = [ UnitTestNameClean $(subdir_tokens:J=_) ] ;
+  NotFile $(deepest_name) $(deepest_clean) ;
+  Depends $(deepest_name)  : [ UnitTestNameTest  $(module) ] ;
+  Depends $(deepest_clean) : [ UnitTestNameClean $(module) ] ;
 
   # For each parent directory of `module', synthesize a driver target.
   local tokens = [ FReverse $(subdir_tokens) ] ;
