@@ -61,6 +61,9 @@ chronological order.
 	  default because this callback takes some memory which is not
 	  needed in most cases. Using this flag helps with games that do
 	  dynamic loading and unloading of levels.
+	- Jorrit slightly improved performance in the engine by using
+	  csMeshWrapper instead of iMeshWrapper to control the socket
+	  positioning. That way a lot of virtual calls are avoided.
 1-Apr-2004
 	- Eric Sunshine fixed include/Jamfile so that it installs Swig (*.i)
 	  files.  These are needed by CEL, for instance.
