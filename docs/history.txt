@@ -31,6 +31,9 @@ The history order is reversed so that new features are at the top.
 	- Eric Sunshine removed all remaining remnants of the old monolithic
 	  system-driver (csSystemDriver, SysSystemDriver, etc.).  This finally
 	  completes the task which began about two years ago.
+	- Eric Sunshine eliminated compilation warning in OSXMenu.m which arose
+	  when AppKit upgrade changed NSMenu to deal with id<NSMenuItem> rather
+	  than NSMenuItem*.
 22-Jul-2003
         - Philip Wyett fixed inconsistent swig -I flag in make build and
 	  aligning it with jam build.  cs_pyth.cpp will now be identical
