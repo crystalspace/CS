@@ -117,7 +117,7 @@ rule DoInstall
 
 #----------------------------------------------------------------------------
 
-INSTALLTARGETS = install_bin install_plugin install_lib install_header
+INSTALLTARGETS = install_bin install_plugin install_lib install_include
 		 install_shellscript install_data install_config
                  install_doc ;
 
