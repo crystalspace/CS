@@ -6,6 +6,10 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+24-Feb-2004
+        - Fritz Elfert fixed conversion of bezier mesh factories in map2cs
+          and re-enabled them (With wrong cvs log-message: "Before big
+          camera change", sorry).
 23-Feb-2004
 	- Jorrit moved the Engine.Lighthing.LightmapQuality config option
 	  from engine.cfg to thing.cfg (and renamed it
