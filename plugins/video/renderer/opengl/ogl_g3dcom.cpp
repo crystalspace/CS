@@ -110,6 +110,8 @@ static DECLARE_GROWING_ARRAY (uv_verts, csVector2);
 //static DECLARE_GROWING_ARRAY (visible, bool);
 /// Array with colors.
 static DECLARE_GROWING_ARRAY (color_verts, csColor);
+/// Array with RGBA colors.
+static DECLARE_GROWING_ARRAY (rgba_verts, GLfloat);
 /// Array with fog values.
 static DECLARE_GROWING_ARRAY (fog_intensities, float);
 /// Array with fog colors
@@ -1110,10 +1112,8 @@ void csGraphics3DOGLCommon::DrawTriangleMesh (G3DTriangleMesh& mesh)
   if (mesh.num_vertices > tr_verts.Limit ())
   {
     tr_verts.SetLimit (mesh.num_vertices);
-    //z_verts.SetLimit (mesh.num_vertices);
     uv_verts.SetLimit (mesh.num_vertices);
-    //persp.SetLimit (mesh.num_vertices);
-    //visible.SetLimit (mesh.num_vertices);
+    rgba_verts.SetLimit(mesh.num_vertices*4);
     color_verts.SetLimit (mesh.num_vertices);
     fog_intensities.SetLimit (mesh.num_vertices);
     fog_color_verts.SetLimit (mesh.num_vertices);
@@ -1304,7 +1304,23 @@ void csGraphics3DOGLCommon::DrawTriangleMesh (G3DTriangleMesh& mesh)
   if (m_gouraud)
   {
     glEnableClientState(GL_COLOR_ARRAY);
-    glColorPointer(3, GL_FLOAT, 0, & work_colors[0]);
+    
+    // special hack for transparent meshes
+    if (mesh.fxmode & CS_FX_ALPHA)
+    {
+      for (i=0; i<mesh.num_vertices; i++)
+      {
+        rgba_verts[i*4  ] = work_colors[i].red;
+        rgba_verts[i*4+1] = work_colors[i].green;
+        rgba_verts[i*4+2] = work_colors[i].blue;
+	rgba_verts[i*4+3] = m_alpha;
+      }
+      glColorPointer(4, GL_FLOAT, 0, &rgba_verts[0]);
+    }
+    else
+    {
+      glColorPointer(3, GL_FLOAT, 0, & work_colors[0]);
+    }
   }
   else
     glColor4f (flat_r, flat_g, flat_b, m_alpha);
