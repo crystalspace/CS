@@ -21,25 +21,7 @@
 #define __CSLAYOUT_H__
 
 #include "csws/csdialog.h"
-
-/**
- * A 2D point object
- */
-struct csPoint
-{
-  /// The coordinates of the point
-  int x, y;
-
-  /// Constructor: initialize the object with zeros
-  csPoint ()
-  { x = y = 0; }
-  /// Constructor: initialize the object with given values
-  csPoint (int iX, int iY)
-  { x = iX; y = iY; }
-  /// Set the coordinates of this point
-  void Set (int iX, int iY)
-  { x = iX; y = iY; }
-};
+#include "csgeom/cspoint.h"
 
 /**
  * csLayoutConstraint is a basic constraint used for positioning a control
