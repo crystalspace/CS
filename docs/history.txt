@@ -115,6 +115,33 @@ The history order is reversed so that new features are at the top.
 	  not always be true).
 	- Eric Sunshine fixed some compilation problems in AWS which affected
 	  older compilers.
+	- Philip Wyett reports:
+	  The PI defines are back. The amount and new naming i.e.
+	  PI, HALF_PI, TWO_PI remain for convenience and one of the
+	  original objectives of removing a few in code casts to float.
+	- Philip changed code and docs for latest release of msvc_libs
+	  (0.19a).
+	- Jorge Acereda switched to better CFLAGS.debug in netbsd.mak.
+	- Christopher Nelson:
+	    - Added a new version of snprintf that supports floating point
+	      from the Apache project.
+	    - Added a macroized header cersion of ctype that is required by
+	      the apache snprintf implementation.
+	    - Modified cscmdbtn so that it's factory just returns an
+	      awsComponent. This should help older compilers not to have
+	      heart attacks.
+	    - Made a few changes to some csutil files. Changed sprintf to
+	      snprintf as test cases. I tested these pretty thoroughly on my
+	      system, but it may possibly cause problems on other systems.  
+	    - Fixed SCF interfaces for iAwsSlot, iAwsSource, iAwsSink, and
+	      iAwsComponent.
+	    - Made updates for components and windows so that AWS reacts
+	      correctly in real environments.
+	    - Embedded awsSource in awsComponent.
+	    - Embedded awsComponent in awsWindow.
+	    - Fixed awstest so it no longer does illegal stuff.
+	- Jorge Acereda fixed csloader.cpp to return false; in iMeshWrapper*
+	  LoadMeshObjectFromFactory().
 15-Oct-2001
 	- All func-id's are now changed so that they are equal to their
 	  interface name. Basically this means:
@@ -239,14 +266,87 @@ The history order is reversed so that new features are at the top.
 	      @heading has the same name as a @node.
 	    - Eliminated a significant number of overfull and underfull `hbox'
 	      reported by TeX.
+	- Wyatt Miler did a few more documentation updates.
+	- Philip Wyett fixed various config files.
+	- Jorrit then fixed Philip's 'fixes'.
+	- Norman Kramer added 2*src*dst for multitexture lighting; as jorrit
+	  pointed out multitexturing should be moved to flushpolygon but
+	  I'll commit this version anyway just to have a refpoint in cvs
+	  before I move it to flushpoly.
+	- Norman fixed a warning about unused var in mipmap.inc.
+	- Norman fixed 3ds2lev so it compiles again.
+	- Philip Wyett added lib3ds lib to makefile for MSVC.
+	- Philip Wyett removed static from all PI's.
+	- Philip also did some project file updates.
+	- Christopher Nelson did the following:
+	    - Fixed nasty SIGSEGV bug caused by his own terminal stupidity.
+	    - Added the snprintf.h header file and modified it a bit to keep
+	      it from thinking that it wanted to specify certain things
+	      depending on certain defines.  
+            - Renamed all the xxsnprintfxx functions to cs_xxsnprintfxx.
+	    - Added the snprintf.cpp files.
+	    - Was snprintf.c, so I renamed it.
+	    - Also fixed some defines. This file now exports the following
+	      functions:
+                cs_snprintf
+                cs_vsnprintf
+                cs_asnprintf
+                cs_asprintf
+	    - Fixed some signed/unsigned comparisons by changing a local
+	      variable 'n' in each case to unsigned int. Each change is
+	      marked with My initials (CN).
+	    - Did NOT enable any compatibility flags. This is supposed to
+	      keep the code more portable. I suppose that someone could
+	      create a configure script to enable these based on platform,
+	      but I didn't, and it's not supposed to be necessary.
+	    - Did NOT enable functions:
+                cs_vasprintf
+                cs_vasnprintf
+	      because these functions require va_copy. This function is not
+	      available on all platforms and compilers.
+	    - Renamed a couple of other instances of snprintf and vsnprintf to
+	      cs_xx.
+	    - Changed all instances of sprintf in the csutil directory to
+	      cs_snprintf.
+	- Justin Miller re-enabled csString::Format(const char*, ...) using
+	  the new cs_vsnprintf().
+	- Justin also fixed a minor typo in phyztest.cpp.
+	- Norman Kramer added a sound loader plugin using mikmod for all your
+	  favourite trackers.
 14-Oct-2001
 	- The 'stdrep' plugin now depends on output console and reporter
 	  plugins in SCF.  This means that it will be loaded after those two
 	  other plugins by csPluginLoader.  This fixes a bug where the stdrep
 	  plugin was not correctly initialized in some cases.
 	- Eric Sunshine eliminated a compilation warning from ogl_txtmgr.cpp.
+	- Norman Kramer did the following for OpenGL renderer:
+	    - Removed inclusion of glext.h from the files. There seem to be
+	      dozens of version of glext out there and sometimes all of glext
+	      is included in gl.h and no glext.h exist at all. Added the
+	      defines from glext.h to csglext.h, renamed the functiontypes to
+	      csPFNGL* to prevent collision with types defined in some gl.h
+	      variations.
+	    - New values for polygonqueue are now only updated if they changed.
+	    - Added detection of ARB/EXT_texture_env_combine, will use this
+	      later to apply 2*src*dst for lightmaps in the multitexturing
+	      case.
+	    - In multitexturing case, the env_mode is now changed to
+	      GL_REPLACE instead of GL_MODULATE if the alpha value is 1.0.
+	- Wyat Miler did various fixes and corrections to the documentation.
+	  Also completed parts of the unix 'user.mak' option list section.
 13-Oct-2001
 	- Fixed compilation error in OpenGL Canvas for X.
+	- Norman Kramer added test to OpenGL renderer to see if all
+	  extension function addresses could be retrieved.
+	- Norman fixed problem with generation of 1xN mipmaps.
+	- Norman added a fix by Matthias Braun, csVector3Array is already
+	  used in csgeom/poly3d.h - this caused strange behaviour when
+	  compiled with gcc3. This bugfix also fixes the memory leak in the
+	  visibility system.
+	- Jorge Acereda fixed err vs. libc's err symbol conflict under FreeBSD.
+	- Philip Wyett altered refrences to old winlibs and changed to
+	  msvc_libs. Many thanks too Niels Gierse for bringing this to my
+	  attention.
 12-Oct-2001
 	- Fixed a bug in AWS where it would try to load something from VFS ONLY
 	  if VFS could NOT be loaded.  I think it should be the opposite
@@ -418,6 +518,80 @@ The history order is reversed so that new features are at the top.
 	  was that csPlatformStartup() was getting invoked too late in the
 	  initialization process, with the result that the platform-specific
 	  "helper" object, NeXTAssistant was not available at plugin load time.
+	- Christopher Nelson did the following:
+	    - Made copy constructor of csPoint use a const reference to fix
+	      no-compile bug in csws.
+	    - Made maximize button active, and made it work correctly with
+	      moving controls.
+	    - Added recursive MoveChildren function that allows a component
+	      to make one call and move all children and nested children.
+	    - Plugified the awsSinkManager.
+	    - Renamed iAwsPrefs interface to iAwsPrefManager.
+	    - Made skeleton implementation of sink manager.
+	    - Fixed parser to support connection maps.
+	    - Added support code for connection maps.
+	    - Note that connection maps are created, and that a certain amount
+	      of compile-time checking is done on them in skin definitions,
+	      but the connections are not actually made yet. This means for
+	      the user that a sink MUST EXIST before you load a definition
+	      file that uses it.  e.g.:
+		component "LoginBtn" is "Command Button"
+		{
+		  ....
+		  connect 
+		  {
+		    sButtonClicked -> UserValidation::Login
+		  }
+		}
+	      This connection map requires that the sink "UserValidation" be
+	      registered with the SinkManager in order to compile the
+	      definition correctly. If a sink does not exist the connection
+	      is ignored and the compiler moves on to the next one.
+	- Jorge Acereda fixed compilation problem on FreeBSD: dlerror()
+	  returns const *.
+	- Norman Kramer fixed unloading of fontserver in linex2d.
+	- Norman did the following for OpenGL:
+	    - Added static function pointer variables to opengl 3d renderer. 
+	      They are filled with pointers to opengl extension functions, or
+	      left NULL if extension is not present for a card (or disabled in
+	      opengl.cfg). Extensions to check for are now listed in
+	      opengl.cfg. These changes allow us to drop the #define
+	      USE_EXTENSION. Dropped use of #define USE_EXTENSION :)
+	      To find the function pointer to an extension function one needs
+	      platform specific opengl functions.
+	      For windows this is wglGetProcAddress, for glx its
+	      glXGetProcAddressARB. To access such functions i created a new
+	      interface iOpenGLInterface, which is implemented currently
+	      in the glx canvas (tested) and windows opengl canvas (untested).
+	      Other platforms i dont know - platform maintainers please check!
+	    - Added use of compressed textures (if available). Read opengl.cfg!
+	    - SourceFormats for opengl textures can now be directed to a
+	      specific TargetFormat (that is, how they are stored in the
+	      texture memory of the card).
+	    - For RGB and RGBA textures i added some code to possibly select
+	      a "better" sourceType for textures. 
+	      Better here means smaller. That is, texturedata is transformed
+	      to another base format (like RGB5_A1). 
+	      Until now the base format was always stored in RGBA. This new
+	      approach hopefully accelerates transfer of texture data to the
+	      card.
+	    - Upon preparation of the texture all mipmaps are now generated
+	      (if needed) and stored. Before mipmaps had to be regenerated if
+	      texture was dropped and then loaded again.
+	    - For procedural textures only mipmap level 0 is generated.
+	      Before all were generated but only the 0-th was used. (currently
+	      only software procedural textures work, the backbuffer
+	      proctextures all show up in the lower left of screen, funny but
+	      annoying).
+	    - Added support for textures other than RGB and RGBA (read Alpha,
+	      Luminance, Intensity and others). Those are not used yet, but
+	      for native alpha maps the first use comes to mind if one thinks
+	      of the halo implementation.
+	    - Added calculation of Luminance and Intensity to csRGBpixel.
+	    - csImage now calculates the mipmap correctly for 1xN (or Nx1)
+	      size mipmaps if you increase the level by 1 only (that is: it
+	      becomes 1x(N>>1) size).
+	- Philip Wyett fixes OpenGL for MSVC and Mingw.
 11-Oct-2001
 	- Moved the plugin manager implementation out of the system driver
 	  into csPluginManager (in csutil/plugmgr.h). Modified
