@@ -752,7 +752,11 @@ csPolyTreeBBox::csPolyTreeBBox (csObject* owner) : csPolyTreeObject (owner)
 
 csPolyTreeBBox::~csPolyTreeBBox ()
 {
-  if (base_stub) csPolyTreeObject::stub_pool.Free (base_stub);
+  if (base_stub)
+  {
+    csPolyTreeObject::stub_pool.Free (base_stub);
+    csPolyTreeObject::stub_pool.Free (base_stub);
+  }
 }
 
 void csPolyTreeBBox::World2Camera (const csTransform& trans)

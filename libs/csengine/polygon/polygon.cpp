@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 1998 by Jorrit Tyberghein
+    Copyright (C) 1998-2000 by Jorrit Tyberghein
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -430,6 +430,43 @@ void csPolygon3D::SplitWithPlane (csPolygonInt** poly1, csPolygonInt** poly2,
   np2->Finish ();
 }
 
+bool csPolygon3D::Covers (csPolygonInt* covered)
+{
+  if (covered->GetType () != 1) return true; // @@@ NOT IMPLEMENTED YET!
+  csPolygon3D* totest = (csPolygon3D*)covered;
+
+  // Algorithm: if any of the vertices of the 'totest' polygon
+  // is facing away from the front of this polygon (i.e. the vertex
+  // cannot see this polygon) then there is a chance that this polygon
+  // covers the other. If this is not the case then we can return false
+  // already. Otherwise we have to see that the 'totest' polygon is
+  // itself not facing away from this polygon. To test that we see if
+  // there is a vertex of this polygon that is in front of the 'totest'
+  // polygon. If that is the case then we return true.
+
+  csPlane& this_plane = plane->GetWorldPlane ();
+  csPlane& test_plane = totest->plane->GetWorldPlane ();
+  int i;
+  for (i = 0 ; i < totest->vertices.GetNumVertices () ; i++)
+  {
+    if ((!csMath3::Visible (totest->Vwor (i), this_plane))
+    	&& this_plane.Classify (totest->Vwor (i)) != 0)
+    {
+      int j;
+      for (j = 0 ; j < vertices.GetNumVertices () ; j++)
+      {
+        if ((csMath3::Visible (Vwor (j), test_plane))
+    	    && test_plane.Classify (Vwor (j)) != 0)
+	{
+	  return true;
+	}
+      }
+      return false;
+    }
+  }
+
+  return false;
+}
 
 void csPolygon3D::SetTexture (csTextureHandle* texture)
 {

@@ -181,6 +181,14 @@ void csSector::UseStaticTree (int mode, bool octree)
   }
   CsPrintf (MSG_INITIALIZATION, "Calculate bsp/octree...\n");
   static_tree->Build (static_thing->GetPolygonArray ());
+  int num_nodes, num_leaves, max_depth, tot_polygons;
+  int max_poly_in_node, min_poly_in_node;
+  static_tree->Statistics (&num_nodes, &num_leaves, &max_depth,
+  	&tot_polygons, &max_poly_in_node, &min_poly_in_node);
+  CsPrintf (MSG_INITIALIZATION, "  nodes=%d leafs=%d max_depth=%d poly=%d\n",
+  	num_nodes, num_leaves, max_depth, tot_polygons);
+  CsPrintf (MSG_INITIALIZATION, "  max_poly/node=%d min_poly/node=%d\n",
+  	max_poly_in_node, min_poly_in_node);
   CsPrintf (MSG_INITIALIZATION, "Compress vertices...\n");
   static_thing->CompressVertices ();
   CsPrintf (MSG_INITIALIZATION, "Build vertex tables...\n");

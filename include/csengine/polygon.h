@@ -1051,6 +1051,12 @@ public:
   	const csPlane& plane);
 
   /**
+   * Check if this polygon covers the other polygon from any viewpoint
+   * in space.
+   */
+  bool Covers (csPolygonInt* covered);
+
+  /**
    * Return 1 to indicate to the BSP tree routines that
    * this is a csPolygon3D.
    */

@@ -196,6 +196,12 @@ public:
     root->LinkStubTodo (stub);
   }
 
+  /**
+   * Test if any polygon in the list covers any other polygon.
+   * If this function returns false we have convexity.
+   */
+  bool Covers (csPolygonInt** polygons, int num);
+
   /// Traverse the tree from back to front starting at the root and 'pos'.
   virtual void* Back2Front (const csVector3& pos, csTreeVisitFunc* func,
   	void* data, csTreeCullFunc* cullfunc = NULL, void* culldata = NULL) = 0;

@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 1998 by Jorrit Tyberghein
+    Copyright (C) 1998-2000 by Jorrit Tyberghein
   
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -290,6 +290,15 @@ int csBspTree::SelectSplitter (csPolygonInt** polygons, int num)
 void csBspTree::Build (csBspNode* node, csPolygonInt** polygons, int num)
 {
   int i;
+  if (!Covers (polygons, num))
+  {
+    // We have a convex set.
+    printf ("CONVEX %d\n", num);
+    for (i = 0 ; i < num ; i++)
+      node->AddPolygon (polygons[i]);
+    return;
+  }
+
   csPolygonInt* split_poly = polygons[SelectSplitter (polygons, num)];
   csPlane* split_plane = split_poly->GetPolyPlane ();
 

@@ -12,6 +12,39 @@ Short-term cleanups that need to be done:
 	- Check the dependencies of libraries/COM objects and try to find
 	  includes that don't belong there (like from csengine).
 
+31-Jan-2000
+	- Eric Sunshine fixed unixconf.sh so that it correctly captures
+	  and interprets output of 'which' command.
+30-Jan-2000
+	- Michael Dale Long made some fixes for the new console,
+	  particularly in page/up page down scrolling support. Fixed
+	  problem with console not properly handling 2D drivers that
+	  disregard the update rectangle passed to Print().
+	- Michael also modified the declaration of ccUIDs to be more
+	  NeXT-friendly.
+	- Michael updated the GGI driver keyboard handler.
+	- Seth Galbraith started big changes to csSprite3D class. He
+	  seperated 3D coordinates from normals and texture coordinates
+	  for faster and more flexible sprites. csFrame and csSpriteTemplate
+	  are affected.
+	- Eric Sunshine fixed support for testing CS_BIG/LITTLE_ENDIAN
+	  on BeOS.
+	- Noah L. Gibbs fixed a Precalculate() bug in csPhyzik. Rigid bodies
+	  should now spin properly even if queried by rotation matrix
+	  instead of quaternion rotation.
+29-Jan-2000
+	- Fixed remaining memory leak in dynamic object/polygon tree
+	  structure.
+	- Added statistics printing after building polygon tree.
+	- Fixed bug in statistics calculation of octree/bsp trees.
+	- Experimented with bsp tree building. It appears that the
+	  bsp tree builder in CS isn't that good. We need a better one.
+	  Tried to add detection for convex sets of polygons but this
+	  doesn't seem to work very well right now.
+	- Norman Kramer added copy constructor in csVector3 and changed
+	  "real" to "double" in csQuaternion.Normalize().
+	- Noah L. Gibbs added state_alloc and state_free features to
+	  ctWorld and to ctEntity.
 28-Jan-2000
 	- Michael Dale Long did a major update to the CrystalClear input
 	  system. Added a lot of support for the new csConsole plugin.
@@ -23,6 +56,10 @@ Short-term cleanups that need to be done:
 	- Did some fixes to the dynamic objects in polygon trees.
 	  Now it appears to work correctly (i.e. not crash) but I think
 	  there are still a few memory leaks. Still investigating.
+	- Noah L. Gibbs added AddCurrentItem() method to csDLinkList to
+	  allow insertion at the current location rather than only at the
+	  list beginning.
+	- Robert Bate fixed Mac port again and updated the project files.
 27-Jan-2000
 	- Update to some docs from Wyatt Miler.
 	- Andrew Zabolotny improved the test for endianess.

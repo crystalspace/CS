@@ -155,6 +155,11 @@ public:
    */
   bool DoPerspective (const csTransform& trans,
 	csVector3* source, int num_verts, csPolygon2D* dest, bool mirror);
+
+  /**
+   * Not implemented yet! @@@
+   */
+  bool Covers (csPolygonInt* /*covered*/) { return false; }
 };
 
 /**
@@ -184,7 +189,7 @@ public:
   virtual ~csPolyTreeBBox ();
 
   /// Get the base set of polygons.
-  virtual csPolygonStub* GetBaseStub () { return base_stub; }
+  virtual csPolygonStub* GetBaseStub () { base_stub->IncRef (); return base_stub; }
 
   /// Remove polygons from a stub.
   virtual void RemovePolygons (csPolygonStub* stub);

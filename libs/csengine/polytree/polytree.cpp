@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2000 by Jorrit Tyberghein
+    Copyright (C) 1998-2000 by Jorrit Tyberghein
   
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -86,5 +86,23 @@ void csPolygonTree::AddObject (csPolyTreeObject* obj)
   root->LinkStubTodo (stub);
   obj->LinkStub (stub);
   stub->IncRef ();
+}
+
+bool csPolygonTree::Covers (csPolygonInt** polygons, int num)
+{
+  // Don't compute this if more than six vertices (overhead).
+  // Return true in this case so that the tree build routine assumes
+  // that we'll have non-convex polygons.
+  if (num > 20) return true;
+  int i, j;
+  for (i = 0 ; i < num ; i++)
+    for (j = 0 ; j < num ; j++)
+      if (i != j)
+      {
+        if (polygons[i]->Covers (polygons[j])) return true;
+      }
+
+  // None of the polygons covers the other.
+  return false;
 }
 

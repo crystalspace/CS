@@ -531,6 +531,9 @@ void csOctree::Statistics (csOctreeNode* node, int depth, int* num_nodes,
     node->GetMiniBsp ()->Statistics (&bsp_num_nodes, &bsp_num_leaves, &bsp_max_depth,
     	&bsp_tot_polygons, &bsp_max_poly_in_node, &bsp_min_poly_in_node);
     (*tot_polygons) += bsp_tot_polygons;
+    (*num_nodes) += bsp_num_nodes;
+    (*num_leaves) += bsp_num_leaves;
+    if (depth+bsp_max_depth > *max_depth) *max_depth = depth+bsp_max_depth;
     if (bsp_max_poly_in_node > *max_poly_in_node) *max_poly_in_node = bsp_max_poly_in_node;
     if (bsp_min_poly_in_node < *min_poly_in_node) *min_poly_in_node = bsp_min_poly_in_node;
   }
