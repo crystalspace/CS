@@ -352,6 +352,7 @@ public:
   bool do_gravity;
   bool do_light_frust;
   bool do_logo;
+  bool doSave;
   int cfg_debug_check_frustum;
   int fgcolor_stats;
 

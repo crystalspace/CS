@@ -227,6 +227,12 @@ void WalkTest::SetDefaults ()
     do_logo = false;
     Report (CS_REPORTER_SEVERITY_NOTIFY, "Logo disabled.");
   }
+
+  bool doSave = Config->GetBool ("Walktest.Settings.EnableEngineSaving", 
+    false);
+  doSave = cmdline->GetBoolOption ("saveable", doSave);
+  Report (CS_REPORTER_SEVERITY_NOTIFY, "World saving %s.", 
+    doSave ? "enabled" : "disabled");
 }
 
 void WalkTest::Help ()
@@ -241,6 +247,7 @@ void WalkTest::Help ()
   printf ("  -noprecache        after loading don't precache to speed up rendering\n");
   printf ("  -infinite          special infinite level generation (ignores map file!)\n");
   printf ("  -bots              allow random generation of bots\n");
+  printf ("  -[no]saveable      enable/disable engine 'saveable' flag\n");
   printf ("  <path>             load map from VFS <path> (default '%s')\n",
         cfg->GetStr ("Walktest.Settings.WorldFile", "world"));
 }
@@ -1169,6 +1176,7 @@ bool WalkTest::Initialize (int argc, const char* const argv[],
     Report (CS_REPORTER_SEVERITY_ERROR, "No iEngine plugin!");
     return false;
   }
+  Engine->SetSaveableFlag (doSave);
 
   // Find the level loader plugin
   LevelLoader = CS_QUERY_REGISTRY (object_reg, iLoader);

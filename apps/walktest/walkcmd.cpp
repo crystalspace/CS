@@ -2446,7 +2446,7 @@ bool CommandHandler (const char *cmd, const char *arg)
     for (int i = 0; i < 6; i++)
     {
       if (!Sys->myG3D->BeginDraw (Sys->Engine->GetBeginDrawFlags () 
-	| CSDRAW_3DGRAPHICS))
+	| CSDRAW_3DGRAPHICS | CSDRAW_CLEARZBUFFER))
       {
 	Sys->myG2D->SetClipRect (cMinX, cMinY, cMaxX, xMaxY);
 	return true;
