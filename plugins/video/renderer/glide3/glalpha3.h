@@ -120,6 +120,10 @@ public:
    */
   virtual void *GetPrivateObject ()
   { return (csGlideAlphaMap*)this; }
+
+  virtual iGraphics3D* GetDynamicTextureInterface () { return NULL;}
+  virtual void DynamicTextureSyncPalette () {}
+    
   void savemap();
 };
 
