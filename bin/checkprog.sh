@@ -1,5 +1,5 @@
 #! /bin/sh
-# Checks for an installed nasm
+# Checks for an installed program
 
 # The next shell function is stolen from autoconf
 exec_extensions=".exe"

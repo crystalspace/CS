@@ -73,11 +73,14 @@ ifeq ($(MAKESECTION),defines)
 
 include mk/unix.mak
 
-# Add support for Objective-C (.m) source code.
-.SUFFIXES: .m
+# Add support for Objective-C (.m) and Objective-C++ (.mm) source code.
+.SUFFIXES: .m .mm
 
-# How to compile a .m source
+# How to compile an Objective-C .m source
 DO.COMPILE.M = $(OBJC) $(CFLAGS.@) $(<<) $(CFLAGS) $(CFLAGS.INCLUDE)
+
+# How to compile an Objective-C++ .mm source
+DO.COMPILE.MM = $(OBJCXX) $(CFLAGS.@) $(<<) $(CFLAGS) $(CFLAGS.INCLUDE)
 
 # Multi-architecture binary (MAB) support.
 NEXT.ARCH_FLAGS = $(foreach arch,$(NEXT.TARGET_ARCHS),-arch $(arch))
@@ -172,7 +175,8 @@ NASMFLAGS.SYSTEM =
 SRC.SYS_CSSYS = $(wildcard \
   $(addsuffix /*.cpp,$(NEXT.SOURCE_PATHS)) \
   $(addsuffix /*.c,$(NEXT.SOURCE_PATHS)) \
-  $(addsuffix /*.m,$(NEXT.SOURCE_PATHS))) \
+  $(addsuffix /*.m,$(NEXT.SOURCE_PATHS)) \
+  $(addsuffix /*.mm,$(NEXT.SOURCE_PATHS))) \
   libs/cssys/general/findlib.cpp \
   libs/cssys/general/getopt.cpp \
   libs/cssys/general/printf.cpp \
@@ -180,21 +184,6 @@ SRC.SYS_CSSYS = $(wildcard \
 
 # Where to put dynamic libraries on this system?
 OUTDLL = $(NEXT.PLUGIN_DIR)
-
-# The C compiler.
-CC = $(NEXT.CC)
-
-# The C++ compiler.
-CXX = $(NEXT.CXX)
-
-# The Objective-C compiler.
-OBJC = $(NEXT.OBJC)
-
-# The Objective-C++ compiler.
-OBJCXX = $(NEXT.OBJCXX)
-
-# The linker.
-LINK = $(NEXT.LINK)
 
 # The library (archive) manager
 AR = libtool
@@ -215,10 +204,15 @@ ifeq ($(MAKESECTION),postdefines)
 $(OUT)/%$O: %.m
 	$(DO.COMPILE.M)
 
-OBJ.CSSYS = $(addprefix $(OUT)/,$(notdir \
-  $(subst .s,$O,$(subst .c,$O,$(subst .cpp,$O,$(SRC.CSSYS:.m=$O))))))
+# Add support for Objective-C++ (.mm) source code.
+$(OUT)/%$O: %.mm
+	$(DO.COMPILE.MM)
 
-vpath %.m libs/cssys $(filter-out libs/cssys/general/,$(sort $(dir $(SRC.SYS_CSSYS)))) libs/cssys/general
+OBJ.CSSYS = $(addprefix $(OUT)/,$(notdir $(subst .s,$O,$(subst .c,$O,\
+  $(subst .cpp,$O,$(subst .mm,$O,$(SRC.CSSYS:.m=$O)))))))
+
+vpath %.m  libs/cssys $(filter-out libs/cssys/general/,$(sort $(dir $(SRC.SYS_CSSYS)))) libs/cssys/general
+vpath %.mm libs/cssys $(filter-out libs/cssys/general/,$(sort $(dir $(SRC.SYS_CSSYS)))) libs/cssys/general
 
 # Multiple -arch flags cause the compiler to barf when generating dependency
 # information, so we filter out -arch commands.  This step is performed under
@@ -230,6 +224,7 @@ DO.DEP1 := $(subst $(NEXT.ARCH_FLAGS),,$(DO.DEP1))
 SYS_SED_DEPEND = \
   -e "s/\.cpp\.o \:/\.o\:/g" \
   -e "s/\.c\.o \:/\.o\:/g" \
+  -e "s/\.mm\.o \:/\.o\:/g" \
   -e "s/\.m\.o \:/\.o\:/g"
 
 endif # ifeq ($(MAKESECTION),postdefines)
@@ -280,10 +275,7 @@ ifneq ($(strip $(TARGET_ARCHS)),)
 endif
 
 SYSCONFIG += $(NEXT.SYSCONFIG) \
-  $(NEWLINE)CC="$(NEXT.CC)" CXX="$(NEXT.CXX)" sh bin/comptest.sh>>config.tmp \
-  $(NEWLINE)CC="$(NEXT.CC)" CXX="$(NEXT.CXX)" sh bin/chkheadr.sh>>config.tmp \
-  $(NEWLINE)CC="$(NEXT.CC)" CXX="$(NEXT.CXX)" sh bin/chktools.sh>>config.tmp \
-  $(NEWLINE)CC="$(NEXT.CC)" CXX="$(NEXT.CXX)" sh bin/haspythn.sh>> config.tmp \
+  $(NEWLINE)sh libs/cssys/next/nextconf.sh>>config.tmp
   $(NEWLINE)echo override DO_ASM = $(DO_ASM)>>config.tmp
 
 NEXT.DIR.ZLIB    = $(wildcard libs/zlib*)

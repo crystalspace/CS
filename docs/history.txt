@@ -1,35 +1,49 @@
 The history order is reversed so that new features are at the top.
 
 24-Sep-2002
-	- Relaxed the sequence and trigger loader so that you can now
-	  refer to triggers and sequences that haven't been defined yet.
-	- Added support for rotating along three axii in the 'rotate'
-	  sequence operation. Also added support for an additional
-	  offset to the rotation.
-	- Fixed a bad bug in csRefArray which manifested the first time
-	  the thresshold size was exceeded.
+	- Relaxed the sequence and trigger loader so that you can now refer to
+	  triggers and sequences that haven't been defined yet.
+	- Added support for rotating along three axii in the 'rotate' sequence
+	  operation.  Also added support for an additional offset to the
+	  rotation.
+	- Fixed a bad bug in csRefArray which manifested the first time the
+	  thresshold size was exceeded.
 	- Implemented relative move with duration.
-	- Flarge now has a nice animating model using these new
-	  sequence features.
-	- Relaxed the bad uv mapping test a bit (SMALL_EPSILON instead
-	  of EPSILON).
-	- Extended levtool with a -validate commandline option. This will
-	  validate the level. At this moment it will only test if all
-	  polygons with more than three vertices are well-formed in the
-	  sense that all vertices of the polygon must be on the same plane.
-	- Cleaned up the timed operations code in the engine sequencer
-	  a bit. Also made it more efficient by not requiring as much
-	  object creation.
-	- Engine sequence manager: added support for testing if camera is
-	  in a sector. In addition you can also test if the camera
-	  is in a box or sphere in that sector at the same time.
-	  Extended the <sectorvis> trigger so you can specify
-	  <insideonly> tag (to test if camera is in sector instead
-	  of the sector being visible alone). Also added <box>
+	- Flarge now has a nice animating model using these new sequence
+	  features.
+	- Relaxed the bad uv mapping test a bit (SMALL_EPSILON instead of
+	  EPSILON).
+	- Extended levtool with a -validate commandline option.  This will
+	  validate the level.  At this moment it will only test if all polygons
+	  with more than three vertices are well-formed in the sense that all
+	  vertices of the polygon must be on the same plane.
+	- Cleaned up the timed operations code in the engine sequencer a bit.
+	  Also made it more efficient by not requiring as much object creation.
+	- Engine sequence manager: added support for testing if camera is in a
+	  sector.  In addition you can also test if the camera is in a box or
+	  sphere in that sector at the same time.  Extended the <sectorvis>
+	  trigger so you can specify <insideonly> tag (to test if camera is in
+	  sector instead of the sector being visible alone).  Also added <box>
 	  and <sphere>.
-	- Modified flarge so that the only door flarge has, finally
-	  opens when you come near it :-)  Expect it to close too
-	  in a later commit.
+	- Modified flarge so that the only door flarge has, finally opens when
+	  you come near it :-)  Expect it to close too in a later commit.
+	- Eric Sunshine made the following configuration-time changes:
+	  - Added libs/cssys/next/nextconf.sh which replaces the individual
+	    invocations of various configuration shell scripts by the makefile.
+	    Hopefully, people making configuration-phase changes will remember
+	    to update this script along with the other "conf" scripts, so the
+	    Apple/NeXT ports won't lag behind.
+	  - Merged libs/cssys/next/macosx.sh into nextconf.sh.
+	  - Fixed bug: bin/comptest.sh failed to set the LINK shell variable,
+	    thus scripts run subsequent to comptest.sh would fail if they tried
+	    using LINK.
+	  - Values for CC, CXX, OBJC, and OBJCXX makefile variables are now
+	    determined dynamically by comptest.sh and nextconf.sh at
+	    configuration time, rather than being hard-coded in the makefiles.
+ 	  - Added Objective-C++ compilation support to next.mak.  Objective-C++
+	    source files should use the customary .mm extension.  (As usual,
+	    Objective-C files should continue using the .m extension.)
+	  - Fixed incorrect comment in bin/checkprog.sh.
 23-Sep-2002
 	- Added new iEngineSequenceManager API. This is going to be used
 	  for an engine sequence manager. More info on this new feature

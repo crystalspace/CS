@@ -24,11 +24,6 @@ NEXT.DESCRIPTION.OS=MacOS/X
 NEXT.ARCHS=ppc
 NEXT.SOURCE_DIRS=macosx openstep
 NEXT.INCLUDE_DIRS=
-NEXT.CC = cc -c
-NEXT.CXX = c++ -c
-NEXT.OBJC = cc -c
-NEXT.OBJCXX = c++ -c
-NEXT.LINK = c++
 NEXT.CFLAGS.GENERAL=-Wmost -force_cpusubtype_ALL
 NEXT.CFLAGS.OPTIMIZE=-O3 -finline-functions
 NEXT.CFLAGS.DEBUG=-finline-functions
@@ -44,8 +39,6 @@ NEXT.PLUGINS+=video/canvas/macosx/coregraphics
 NEXT.PLUGINS+=video/canvas/macosx/opengl
 NEXT.PLUGINS+=sound/driver/coreaudio
 NEXT.PLUGINS+=sound/renderer/software
-
-NEXT.SYSCONFIG=$(NEWLINE)sh libs/cssys/next/macosx.sh "$(NEXT.CC)">>config.tmp
 
 NEXT.FRIEND=yes
 include libs/cssys/next/next.mak

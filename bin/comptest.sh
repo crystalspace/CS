@@ -40,9 +40,12 @@ if [ -z "${CC}" ]; then
   CC=`basename ${CC}`
 fi
 
+LINK="${CXX}"
+
 echo "CC = ${CC} -c"
 echo "CXX = ${CXX} -c"
 echo "LINK = ${CXX}"
+
 
 #-----------------------------------------------------------------------------
 # Check for optimisation flags
@@ -64,14 +67,14 @@ fi
 
 # Check for GCC-version-specific command-line options
 ${CXX} -c -fno-exceptions comptest.cpp 2>/dev/null && echo "CFLAGS.SYSTEM += -fno-exceptions"
-#We no longer add the -fno-rtti since this complicates linking:
-#${CXX} -c -fno-rtti comptest.cpp 2>/dev/null && echo "CFLAGS.SYSTEM += -fno-rtti"
+
 
 #------------------------------------------------------------------------------
 # Check if C++ compiler has a built-in 'bool' type.
 #------------------------------------------------------------------------------
 echo "int func() { bool b = true; return (int)b; }" > comptest.cpp
 ${CXX} -c comptest.cpp 2>/dev/null || echo "CS_USE_FAKE_BOOL_TYPE = yes"
+
 
 #------------------------------------------------------------------------------
 # Check if C++ compiler understands new-style C++ casting syntax.
@@ -90,11 +93,13 @@ A* func4(void* p) { return reinterpret_cast<A*>(p); }
 TEST
 ${CXX} -c comptest.cpp 2>/dev/null || echo "CS_USE_OLD_STYLE_CASTS = yes"
 
+
 #------------------------------------------------------------------------------
 # Check if C++ compiler understands new C++ `explicit' keyword.
 #------------------------------------------------------------------------------
 echo "class A { public: explicit A(int); };" > comptest.cpp
 ${CXX} -c comptest.cpp 2>/dev/null || echo "CS_USE_FAKE_EXPLICIT_KEYWORD = yes"
+
 
 #------------------------------------------------------------------------------
 # If processor type was specified, check if compiler is able to understand
@@ -115,6 +120,7 @@ TEST
 ${CXX} -c comptest.cpp 2>/dev/null || echo "CS_NO_QSQRT = yes"
 fi
 
+
 #------------------------------------------------------------------------------
 # Attempt to detect a compiler bug discovered in gcc 2.96 (redhat and other
 # unstable versions) and gcc 3.0.1 Note: This fails for cross-compiling because
@@ -132,6 +138,7 @@ int main() { return (double2int(255.99) != 255 ? 1 : 0); }
 TEST
 ${CXX} -O2 comptest.cpp -o comptest 
 ./comptest 2>/dev/null || echo "CS_QINT_WORKAROUND = yes"
+
 
 #------------------------------------------------------------------------------
 # Clean up.
