@@ -24,7 +24,9 @@ chronological order.
 	  physical DLL in which each declaration is made. This should make it
 	  much easier to debug problems, rather than trying to guess about the
 	  locations of the plugins.
-	- res applied patch 1071736, "Adds vector2 shadervars in cg programs".
+	- res applied patch from Alvar Jansson <alvar@users.sourceforge.net>
+	  which adds csVector2 shader variable support in Cg programs. (patch
+	  #1071736)
 22-Nov-2004
 	- Eric Sunshine added blurb to apimod100.txi regarding newly supported
 	  Java bindings.
