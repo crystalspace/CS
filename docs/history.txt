@@ -635,7 +635,7 @@ chronological order.
 		  <minnodesize x="..." y="..." z="..." />
 		</meta>
 	- res fixed viewmesh to compile with latest Cal3d.
-	- res fixed a crash in csGLVBOBuffer::FindEmptySlot() as per Marten'ss
+	- res fixed a crash in csGLVBOBuffer::FindEmptySlot() as per Marten's
 	  instructions.
 	- Jorrit fixed a bug in csTiledCoverageBuffer->StatusNoDepth().
 	  Fixing this bug has a negative impact on PVS quality but it makes
