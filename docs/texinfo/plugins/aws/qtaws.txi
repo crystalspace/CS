@@ -50,7 +50,9 @@ Append the output to a file containing skin definitions.
 @item QTabWidget @tab ==> @tab Notebook
 @end multitable
 
-@subsubheading Special Notes
+@subheading Special Notes
+
+@subsubheading @sc{AWS} Signals and special properties
 
 You can place special information in the controls @strong{whatsThis} property. The content will be broken into tokens
 separated by the pipe (@sc{"|"}). A token consist of a token identifier, the colon @sc{:} and token text.
@@ -100,4 +102,25 @@ Both examples from above would be concatenated and placed in the
 @example
 c:signalClicked,mySink::OnClick,signalBreak,
     mySink::ByeBye|l:LeftEye: "Blue"
+@end example
+
+@subsubheading How to handle your own @sc{AWS} controls
+
+If you coded your own @sc{aws} control you can still use QT to layout the control (at least the common parameters 
+like size and position). For this to work simply choose one of the supported controls and use it as a placeholder.
+Additionally set the @strong{tooltip/comment} property of that control to the name of your control class.
+
+Example:
+
+I have created my own push button control. The name of the control class is awsMyFancyPushButtonControl. Since it uses
+all the properties of the standard @sc{aws} command button i cleverly use the QPushButton as my placeholder and set all
+the properties i need and QPushButton already offers like size, position, button text and others. Additionally i set the
+@strong{tooltip/comment} to awsMyFancyPushButtonControl. This will result in:
+
+@example
+component "hitmehard" is "awsMyFancyPushButtonControl"
+@{
+  Frame: (10,330) - (121,350)
+  Caption: "update"
+@}
 @end example
