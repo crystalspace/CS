@@ -6,6 +6,44 @@ The history order is reversed so that new features are at the top.
 	  routine. I have no idea what caused the internal error but the
 	  code is now even a little more readable :-) In addition added
 	  a missing poly->DecRef().
+	- Implemented hierarchical mesh factories. Extended the
+	  iMeshFactoryWrapper with functions to manipulate them.
+	- Added iMeshFactoryWrapper::CreateMeshWrapper() which will create
+	  a mesh wrapper (or hierarchy of mesh wrappers if it is a hierarchical
+	  factory). csEngine::CreateMeshObject() will use that function
+	  now.
+	- iMeshFactoryWrapper::CreateMeshWapper() will now by default
+	  use the name of the factory wrapper for the names of the enclosed
+	  objects.
+	- Renamed all iEngine::CreateMeshObject(), FindMeshObject(),
+	  GetMeshObject(), ... to CreateMeshWrapper(), FindMeshWrapper(), ...
+	  as those functions really operate on mesh wrappers and not on
+	  mesh objects.
+	- Added support for hierarchical mesh object factories to the
+	  world file. Just use MESHFACT inside another MESHFACT. You can
+	  then also use MOVE keyword to define relative transformation.
+	- To create mesh objects from such a hierarchical mesh factory it
+	  is not enough to use the MESHOBJ keyword. For this a new keyword
+	  is added called MESHREF. This works a bit like MESHOBJ but the
+	  first thing you have to specify is the factory to use. This will
+	  then create a mesh object hierarchy from that factory. Note that
+	  with MESHREF it is not possible to specify further mesh object
+	  specific options (i.e. things that would normally go inside
+	  the PARAMS block of a mesh object). These objects have to be
+	  manipulated from within the code.
+	- Added an example hierarchical mesh factory to flarge. Also
+	  demonstrates how to use the new MESHREF keyword.
+	- Added CS_ prefix to the following defines:
+	    - DECLARE_GROWING_ARRAY
+	    - DECLARE_GROWING_ARRAY_EXT
+	    - DECLARE_GROWING_ARRAY_REF
+	    - TYPEDEF_GROWING_ARRAY
+	    - DECLARE_ACCESSOR_METHODS
+	    - DECLARE_ARRAY_INTERFACE_NONUM
+	    - DECLARE_ARRAY_INTERFACE
+	    - DECLARE_OBJECT_INTERFACE
+	    - DECLARE_EMBEDDED_OBJECT
+	    - IMPLEMENT_EMBEDDED_OBJECT
 16-Jul-2001
 	- Cleaned up new lighting system and CheckFrustum() a little more.
 	- Added iLightingProcessInfo interface. A callback for a null-portal

@@ -974,6 +974,10 @@ Renamed @code{iPortal::GetPortal()} to @code{GetSector()} and
 Removed @code{csMeshWrapper::GetChildren()}.  Instead use
 @code{csMeshWrapper::AddChild()} and @code{csMeshWrapper::RemoveChild()}.
 
+Renamed @code{iEngine::CreateMeshObject()} to
+@code{iEngine::CreateMeshWrapper()}. In general all iEngine functions that
+work mesh wrappers will be renamed like that.
+
 Renamed @code{csFilenameMatches()} to @code{csGlobMatches()} (from
 @file{csutil} library).
 

@@ -287,7 +287,7 @@ struct iEngine : public iBase
    * return mesh objects that belong in a region but are not connected to the
    * engine.
    */
-  virtual iMeshWrapper *FindMeshObject (const char *iName,
+  virtual iMeshWrapper* FindMeshWrapper (const char *iName,
   	bool regionOnly = false) const = 0;
 
   /**
@@ -435,28 +435,28 @@ struct iEngine : public iBase
    * 'name' can be NULL if no name is wanted. Different mesh objects can
    * have the same name (in contrast with factory objects).
    */
-  virtual iMeshWrapper* CreateMeshObject (iMeshFactoryWrapper* factory,
+  virtual iMeshWrapper* CreateMeshWrapper (iMeshFactoryWrapper* factory,
   	const char* name, iSector* sector = NULL,
 	const csVector3& pos = csVector3(0, 0, 0)) = 0;
   /// Create a mesh wrapper for an existing mesh object
-  virtual iMeshWrapper* CreateMeshObject (iMeshObject*,
+  virtual iMeshWrapper* CreateMeshWrapper (iMeshObject*,
   	const char* name, iSector* sector = NULL,
 	const csVector3& pos = csVector3(0, 0, 0)) = 0;
   /// Create an uninitialized mesh wrapper
-  virtual iMeshWrapper* CreateMeshObject (const char* name) = 0;
+  virtual iMeshWrapper* CreateMeshWrapper (const char* name) = 0;
   /**
    * Conveniance function to load a mesh object from a given loader plugin.
    * If sector == NULL the object will not be placed in a sector.
    */
-  virtual iMeshWrapper* LoadMeshObject (
+  virtual iMeshWrapper* LoadMeshWrapper (
   	const char* classId, const char* name,
 	const char* loaderClassId,
 	iDataBuffer* input, iSector* sector, const csVector3& pos) = 0;
 
   /// return the number of mesh objects
-  virtual int GetMeshObjectCount () const = 0;
+  virtual int GetMeshWrapperCount () const = 0;
   /// return a mesh object by index
-  virtual iMeshWrapper *GetMeshObject (int n) const = 0;
+  virtual iMeshWrapper *GetMeshWrapper (int n) const = 0;
 
   /// return the number of mesh factories
   virtual int GetMeshFactoryCount () const = 0;

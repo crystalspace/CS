@@ -281,7 +281,7 @@ struct iMeshWrapper : public iBase
   virtual void GetRadius ( csVector3& rad, csVector3& cent) const = 0;
 };
 
-SCF_VERSION (iMeshFactoryWrapper, 0, 0, 5);
+SCF_VERSION (iMeshFactoryWrapper, 0, 0, 6);
 
 /**
  * This interface corresponds to the object in the engine
@@ -307,6 +307,39 @@ struct iMeshFactoryWrapper : public iBase
    * only the position.
    */
   virtual void HardTransform (const csReversibleTransform& t) = 0;
+  /**
+   * Create mesh objects from this factory. If the factory has a hierarchy
+   * then a hierarchical mesh object will be created.
+   */
+  virtual iMeshWrapper* CreateMeshWrapper () = 0;
+
+  /**
+   * Get the parent of this factory. This will be NULL if this factory
+   * has no parent.
+   */
+  virtual iMeshFactoryWrapper* GetParentContainer () const = 0;
+
+  /// Get the number of children.
+  virtual int GetChildCount () const = 0;
+  /// Get a child.
+  virtual iMeshFactoryWrapper* GetChild (int idx) const = 0;
+  /// Get the transformation for a child.
+  virtual csReversibleTransform& GetChildTransform (int idx) = 0;
+  /**
+   * Add a child to this object. The transform of that child will be
+   * interpreted relative to this object. An IncRef() on the child will
+   * happen.
+   */
+  virtual void AddChild (iMeshFactoryWrapper* child,
+  	const csReversibleTransform& transf) = 0;
+  /**
+   * Remove a child from this object. The child will be DecRef()'ed
+   * and thus removed if this was the last reference.
+   * Note that RemoveChild() will not work if the the given mesh factory
+   * is not a child of this mesh factory.
+   */
+  virtual void RemoveChild (iMeshFactoryWrapper* child) = 0;
 };
 
 #endif // __IENGINE_MESH_H__
+

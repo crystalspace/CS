@@ -33,11 +33,11 @@
 
 //@@@@@@@ DO INCREF()/DECREF() ON THESE ARRAYS!!!
 /// Static vertex array.
-static DECLARE_GROWING_ARRAY (tr_verts, csVector3);
+static CS_DECLARE_GROWING_ARRAY (tr_verts, csVector3);
 /// The perspective corrected vertices.
-static DECLARE_GROWING_ARRAY (persp, csVector2);
+static CS_DECLARE_GROWING_ARRAY (persp, csVector2);
 /// Array which indicates which vertices are visible and which are not.
-static DECLARE_GROWING_ARRAY (visible, bool);
+static CS_DECLARE_GROWING_ARRAY (visible, bool);
 
 /*
  * [01:00:34] <Jorrit> 1. Transform the vertices from world to camera space.

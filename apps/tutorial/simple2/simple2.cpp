@@ -231,7 +231,7 @@ bool Simple::Initialize (int argc, const char* const argv[],
   }
 
   // Add the sprite to the engine.
-  iMeshWrapper* sprite = engine->CreateMeshObject (
+  iMeshWrapper* sprite = engine->CreateMeshWrapper (
   	imeshfact, "MySprite", room,
 	csVector3 (-3, 5, 3));
   csMatrix3 m; m.Identity (); m *= 5.;

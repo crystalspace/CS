@@ -80,28 +80,28 @@ void csGraphics3DOGLCommon::DetectExtensions() {}
 // dynamic textures will utilise multiple instances of csGraphics3DOGLCommon
 
 /// Static vertex array.
-static DECLARE_GROWING_ARRAY_REF (tr_verts, csVector3);
+static CS_DECLARE_GROWING_ARRAY_REF (tr_verts, csVector3);
 /// Static uv array.
-static DECLARE_GROWING_ARRAY_REF (uv_verts, csVector2);
+static CS_DECLARE_GROWING_ARRAY_REF (uv_verts, csVector2);
 /// Static uv array for multi-texture.
-static DECLARE_GROWING_ARRAY_REF (uv_mul_verts, csVector2);
+static CS_DECLARE_GROWING_ARRAY_REF (uv_mul_verts, csVector2);
 /// Array with colors.
-static DECLARE_GROWING_ARRAY_REF (color_verts, csColor);
+static CS_DECLARE_GROWING_ARRAY_REF (color_verts, csColor);
 /// Array with RGBA colors.
-static DECLARE_GROWING_ARRAY_REF (rgba_verts, GLfloat);
+static CS_DECLARE_GROWING_ARRAY_REF (rgba_verts, GLfloat);
 
 /// Array for clipping.
-static DECLARE_GROWING_ARRAY_REF (clipped_triangles, csTriangle);
+static CS_DECLARE_GROWING_ARRAY_REF (clipped_triangles, csTriangle);
 /// Array for clipping.
-static DECLARE_GROWING_ARRAY_REF (clipped_translate, int);
+static CS_DECLARE_GROWING_ARRAY_REF (clipped_translate, int);
 /// Array for clipping.
-static DECLARE_GROWING_ARRAY_REF (clipped_vertices, csVector3);
+static CS_DECLARE_GROWING_ARRAY_REF (clipped_vertices, csVector3);
 /// Array for clipping.
-static DECLARE_GROWING_ARRAY_REF (clipped_texels, csVector2);
+static CS_DECLARE_GROWING_ARRAY_REF (clipped_texels, csVector2);
 /// Array for clipping.
-static DECLARE_GROWING_ARRAY_REF (clipped_colors, csColor);
+static CS_DECLARE_GROWING_ARRAY_REF (clipped_colors, csColor);
 /// Array for clipping.
-static DECLARE_GROWING_ARRAY_REF (clipped_fog, G3DFogInfo);
+static CS_DECLARE_GROWING_ARRAY_REF (clipped_fog, G3DFogInfo);
 
 /*=========================================================================
  Method implementations

@@ -34,7 +34,7 @@ struct csSprite2DVertex
   float u, v;
 };
 
-TYPEDEF_GROWING_ARRAY (csColoredVertices, csSprite2DVertex);
+CS_TYPEDEF_GROWING_ARRAY (csColoredVertices, csSprite2DVertex);
 
 /**
  * This is a single frame in a UV animation. So its not much more than a set of

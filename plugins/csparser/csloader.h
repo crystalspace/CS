@@ -28,6 +28,7 @@
 
 class csGenerateImageTexture;
 class csGenerateImageValue;
+class csReversibleTransform;
 struct csRGBcolor;
 
 struct iImageIO;
@@ -158,13 +159,26 @@ class csLoader : public iLoader
   /// Resolve the portals of a thing
   bool ResolvePortalSectors (iThingState *Mesh);
 
-  /// Load a Mesh Object Factory from the map file.
-  bool LoadMeshObjectFactory (iMeshFactoryWrapper* meshFact, char* buf);
+  /**
+   * Load a Mesh Object Factory from the map file.
+   * If the transformation pointer is given then this is for a hierarchical
+   * mesh object factory and the transformation will be filled in with
+   * the relative transform (from MOVE keyword).
+   */
+  bool LoadMeshObjectFactory (iMeshFactoryWrapper* meshFact, char* buf,
+  	csReversibleTransform* transf = NULL);
 
   /**
    * Load the mesh object from the map file.
    */
   bool LoadMeshObject (iMeshWrapper* mesh, char* buf);
+
+  /**
+   * Load the mesh object from the map file.
+   * This version will parse FACTORY statement to directly create
+   * a mesh from a factory.
+   */
+  iMeshWrapper* LoadMeshObjectFromFactory (char* buf);
 
   /**
    * Load a plugin in general.

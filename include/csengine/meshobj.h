@@ -19,10 +19,12 @@
 #ifndef __CS_MESHOBJ_H__
 #define __CS_MESHOBJ_H__
 
+#include "csgeom/transfrm.h"
 #include "csutil/csobject.h"
 #include "csutil/nobjvec.h"
-#include "csengine/movable.h"
 #include "csutil/flags.h"
+#include "csutil/garray.h"
+#include "csengine/movable.h"
 #include "imesh/object.h"
 #include "iengine/mesh.h"
 #include "iengine/viscull.h"
@@ -48,7 +50,7 @@ class csMeshWrapper : public csObject
 protected:
   /**
    * Points to the parent container object of this object.
-   * This is usually csEngine or csParticleSystem.
+   * This is usually csEngine or another csMeshWrapper.
    */
   csObject* parent;
 
@@ -440,7 +442,7 @@ public:
   friend struct VisObject;
 };
 
-SCF_VERSION (csMeshFactoryWrapper, 0, 0, 1);
+SCF_VERSION (csMeshFactoryWrapper, 0, 0, 2);
 
 /**
  * The holder class for all implementations of iMeshObjectFactory.
@@ -450,6 +452,13 @@ class csMeshFactoryWrapper : public csObject
 private:
   /// Mesh object factory corresponding with this csMeshFactoryWrapper.
   iMeshObjectFactory* meshFact;
+
+  /// Optional parent of this object (can be NULL).
+  csMeshFactoryWrapper* parent;
+  /// Children of this object (other instances of csMeshFactoryWrapper).
+  csNamedObjVector children;
+  /// Default transformations for the children relative to the parent.
+  CS_DECLARE_GROWING_ARRAY (transformations, csReversibleTransform);
 
 private:
   /// Destructor.
@@ -473,7 +482,7 @@ public:
   /**
    * Create a new mesh object for this template.
    */
-  csMeshWrapper* NewMeshObject (csObject* parent);
+  csMeshWrapper* NewMeshObject ();
 
   /**
    * Do a hard transform of this factory.
@@ -512,6 +521,17 @@ public:
     {
       scfParent->HardTransform (t);
     }
+    virtual iMeshWrapper* CreateMeshWrapper ();
+    virtual iMeshFactoryWrapper* GetParentContainer () const;
+    virtual void AddChild (iMeshFactoryWrapper* child,
+    	const csReversibleTransform& transf);
+    virtual void RemoveChild (iMeshFactoryWrapper* child);
+    virtual int GetChildCount () const
+    {
+      return scfParent->children.Length ();
+    }
+    virtual iMeshFactoryWrapper* GetChild (int idx) const;
+    virtual csReversibleTransform& GetChildTransform (int idx);
   } scfiMeshFactoryWrapper;
   friend struct MeshFactoryWrapper;
 };

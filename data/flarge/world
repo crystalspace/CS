@@ -298,6 +298,20 @@ WORLD (
     PLUGIN ('crystalspace.mesh.loader.factory.snow')
     PARAMS ()
   )
+  MESHFACT 'simpleCubeHierarchy' (
+    PLUGIN ('cubeFact')
+    PARAMS (MATERIAL ('robot') SIZE (.2, .2, .2))
+    MESHFACT 'child1' (
+      PLUGIN ('cubeFact')
+      PARAMS (MATERIAL ('robot') SIZE (.2, .2, .2))
+      MOVE (V (-.3, .4, 0))
+    )
+    MESHFACT 'child2' (
+      PLUGIN ('cubeFact')
+      PARAMS (MATERIAL ('robot') SIZE (.2, .2, .2))
+      MOVE (V (.3, .4, 0))
+    )
+  )
   MESHFACT 'robotBody' (
     PLUGIN ('cubeFact')
     PARAMS (
@@ -2326,6 +2340,12 @@ WORLD (
         ACTION ('default')
       )
       MOVE (V (2.5,.3,12))
+    )
+    MESHREF 'cubeHierarchy' (
+      FACTORY ('simpleCubeHierarchy')
+      PRIORITY (object)
+      KEY ("entity_Rotate","0,100,0,true")
+      MOVE (V (-1,.3,11))
     )
     MESHOBJ 'cubard' (
       KEY ("entity_Rotate","0,50,0,true")
@@ -7270,6 +7290,7 @@ WORLD (
     LIGHT (CENTER (-30,70,-75) RADIUS (10000) COLOR (.8,.8,.8)
     	HALO (FLARE,flare_center,flare_spark1,flare_spark2,flare_spark3,flare_spark4,flare_spark5))
     LIGHT (CENTER (-10,100,0) RADIUS (10000) COLOR (.2,.2,.25))
+    ;LIGHT (CENTER (-10,100,0) RADIUS (10000) COLOR (0,0,1))
   )
   SECTOR 'inside' (
     MESHOBJ 'walls' (

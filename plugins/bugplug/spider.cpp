@@ -54,7 +54,7 @@ bool csSpider::WeaveWeb (iEngine* engine)
 {
   if (wrap) { engine->RemoveMesh (wrap); wrap = NULL; }
   if (engine->GetSectors ()->GetSectorCount () <= 0) return false;
-  wrap = engine->CreateMeshObject (this, "_@Spider@_");
+  wrap = engine->CreateMeshWrapper (this, "_@Spider@_");
   iMovable* movable = wrap->GetMovable ();
   int i;
   for (i = 0 ; i < engine->GetSectors ()->GetSectorCount () ; i++)

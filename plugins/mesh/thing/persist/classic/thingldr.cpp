@@ -990,7 +990,7 @@ static bool load_thing_part (ThingLoadInfo& info, iMeshWrapper* imeshwrap,
 	else
         {
           csScanStr (params, "%s", str);
-	  iMeshWrapper* wrap = engine->FindMeshObject (str);
+	  iMeshWrapper* wrap = engine->FindMeshWrapper (str);
           if (!wrap)
           {
             printf ("Couldn't find thing '%s'!\n", str);

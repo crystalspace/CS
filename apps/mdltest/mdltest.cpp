@@ -250,8 +250,8 @@ bool Simple::Initialize (int argc, const char* const argv[],
   Model->DecRef ();
 
   iMeshObject *ThingObject = ThingFactory->NewInstance ();
-  iMeshWrapper *ThingWrapper = engine->CreateMeshObject (ThingObject, "thing");
-  iMeshWrapper *SpriteWrapper = engine->CreateMeshObject (SpriteFactory, "sprite");
+  iMeshWrapper *ThingWrapper = engine->CreateMeshWrapper (ThingObject, "thing");
+  iMeshWrapper *SpriteWrapper = engine->CreateMeshWrapper (SpriteFactory, "sprite");
 
   ThingWrapper->GetMovable ()->SetSector (room);
   ThingWrapper->GetMovable ()->UpdateMove ();

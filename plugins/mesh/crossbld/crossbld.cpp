@@ -141,7 +141,7 @@ bool csCrossBuilder::BuildThing (iModelData *Data, iThingState *tgt,
 
 CS_DECLARE_TYPED_VECTOR_NODELETE (csModelFrameVector, iModelDataVertices);
 CS_DECLARE_TYPED_VECTOR_NODELETE (csSpriteFrameVector, iSpriteFrame);
-TYPEDEF_GROWING_ARRAY (csIntArray, int);
+CS_TYPEDEF_GROWING_ARRAY (csIntArray, int);
 
 static void BuildVertexArray (iModelDataPolygon* poly,
 	csIntArray& SpriteVertices,

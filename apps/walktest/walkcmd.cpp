@@ -329,7 +329,7 @@ iMeshWrapper* add_meshobj (char* tname, char* sname, iSector* where,
     return NULL;
   }
   iSector* isector = SCF_QUERY_INTERFACE (where, iSector);
-  iMeshWrapper* spr = Sys->Engine->CreateMeshObject (tmpl, sname,
+  iMeshWrapper* spr = Sys->Engine->CreateMeshWrapper (tmpl, sname,
   	isector, pos);
   isector->DecRef ();
   csMatrix3 m; m.Identity (); m = m * size;
@@ -347,11 +347,11 @@ void list_meshes (void)
   const char* mesh_name;
   iMeshWrapper* mesh;
 
-  num_meshes = Sys->Engine->GetMeshObjectCount ();
+  num_meshes = Sys->Engine->GetMeshWrapperCount ();
 
   for(int i = 0; i < num_meshes; i++)
   {
-    mesh = Sys->Engine->GetMeshObject (i);
+    mesh = Sys->Engine->GetMeshWrapper (i);
     mesh_name = mesh->QueryObject ()->GetName();
 
     if (mesh_name)
@@ -360,7 +360,7 @@ void list_meshes (void)
       Sys->Printf (CS_MSG_CONSOLE, "A mesh with no name.\n");
   }
   Sys->Printf (CS_MSG_CONSOLE, "There are:%d meshes\n",
-	       Sys->Engine->GetMeshObjectCount ());
+	       Sys->Engine->GetMeshWrapperCount ());
 }
 
 //===========================================================================
@@ -1671,7 +1671,7 @@ bool CommandHandler (const char *cmd, const char *arg)
     else
     {
       // See if the mesh exists.
-      iMeshWrapper *wrap = Sys->Engine->FindMeshObject (name);
+      iMeshWrapper *wrap = Sys->Engine->FindMeshWrapper (name);
       if (wrap)
       {
 	iSprite3DFactoryState* fstate = SCF_QUERY_INTERFACE (
@@ -1708,7 +1708,7 @@ bool CommandHandler (const char *cmd, const char *arg)
     else
     {
       // Test to see if the mesh exists.
-      iMeshWrapper* wrap = Sys->Engine->FindMeshObject (name);
+      iMeshWrapper* wrap = Sys->Engine->FindMeshWrapper (name);
       if (!wrap)
         Sys->Printf (CS_MSG_CONSOLE, "No such mesh!\n");
       else
@@ -1746,7 +1746,7 @@ bool CommandHandler (const char *cmd, const char *arg)
     else
     {
       // Test to see if the mesh exists.
-      iMeshWrapper* wrap = Sys->Engine->FindMeshObject (name);
+      iMeshWrapper* wrap = Sys->Engine->FindMeshWrapper (name);
       if (!wrap)
         Sys->Printf (CS_MSG_CONSOLE, "No such mesh!\n");
       else

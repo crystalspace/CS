@@ -24,29 +24,29 @@
 #include "csutil/csobject.h"
 #include "csutil/typedvec.h"
 
-#define DECLARE_ACCESSOR_METHODS(type,name)				\
+#define CS_DECLARE_ACCESSOR_METHODS(type,name)				\
   type Get##name () const;						\
   void Set##name (type);
 
-#define DECLARE_ARRAY_INTERFACE_NONUM(type,sing_name)			\
+#define CS_DECLARE_ARRAY_INTERFACE_NONUM(type,sing_name)		\
   type Get##sing_name (int n) const;					\
   void Set##sing_name (int n, type);
 
-#define DECLARE_ARRAY_INTERFACE(type,sing_name)		\
-  DECLARE_ARRAY_INTERFACE_NONUM (type, sing_name)			\
+#define CS_DECLARE_ARRAY_INTERFACE(type,sing_name)			\
+  CS_DECLARE_ARRAY_INTERFACE_NONUM (type, sing_name)			\
   int Get##sing_name##Count () const;					\
   int Add##sing_name (type obj);					\
   void Delete##sing_name (int n);
 
-#define DECLARE_OBJECT_INTERFACE					\
-  DECLARE_EMBEDDED_OBJECT (csObject, iObject);				\
+#define CS_DECLARE_OBJECT_INTERFACE					\
+  CS_DECLARE_EMBEDDED_OBJECT (csObject, iObject);			\
   iObject *QueryObject ();
 
 /**
  * @@@ This macro should be cleaned up and moved to SCF!!! It is useful
  * whereever an object should be embedded instead of an interface.
  */
-#define DECLARE_EMBEDDED_OBJECT(clname,itf)				\
+#define CS_DECLARE_EMBEDDED_OBJECT(clname,itf)				\
   struct Embedded_##clname : public clname {				\
     typedef clname __scf_superclass__;					\
     SCF_DECLARE_EMBEDDED_IBASE (iBase);					\
@@ -56,7 +56,7 @@
  * @@@ This macro should be cleaned up and moved to SCF!!! It is useful
  * whereever an object should be embedded instead of an interface.
  */
-#define IMPLEMENT_EMBEDDED_OBJECT(Class)				\
+#define CS_IMPLEMENT_EMBEDDED_OBJECT(Class)				\
   SCF_IMPLEMENT_EMBEDDED_IBASE_INCREF (Class);				\
   SCF_IMPLEMENT_EMBEDDED_IBASE_DECREF (Class);				\
   SCF_IMPLEMENT_EMBEDDED_IBASE_GETREFCOUNT (Class);			\
@@ -77,7 +77,7 @@ private:
   iTextureWrapper *TextureWrapper;
 public:
   SCF_DECLARE_IBASE;
-  DECLARE_OBJECT_INTERFACE;
+  CS_DECLARE_OBJECT_INTERFACE;
 
   /// Constructor
   csModelDataTexture ();
@@ -89,8 +89,8 @@ public:
   /// Return the file name of the texture
   const char *GetFileName () const;
 
-  DECLARE_ACCESSOR_METHODS (iImage*, Image);
-  DECLARE_ACCESSOR_METHODS (iTextureWrapper*, TextureWrapper);
+  CS_DECLARE_ACCESSOR_METHODS (iImage*, Image);
+  CS_DECLARE_ACCESSOR_METHODS (iTextureWrapper*, TextureWrapper);
 
   /**
    * Load the image from a file with the current filename (i.e. this
@@ -110,15 +110,15 @@ private:
   iMaterialWrapper *MaterialWrapper;
 public:
   SCF_DECLARE_IBASE;
-  DECLARE_OBJECT_INTERFACE;
+  CS_DECLARE_OBJECT_INTERFACE;
 
   /// Constructor
   csModelDataMaterial ();
   /// Destructor
   virtual ~csModelDataMaterial ();
 
-  DECLARE_ACCESSOR_METHODS (iMaterial*, BaseMaterial);
-  DECLARE_ACCESSOR_METHODS (iMaterialWrapper*, MaterialWrapper);
+  CS_DECLARE_ACCESSOR_METHODS (iMaterial*, BaseMaterial);
+  CS_DECLARE_ACCESSOR_METHODS (iMaterialWrapper*, MaterialWrapper);
 
   /// Create a material wrapper from the given material list
   void Register (iMaterialList *ml);
@@ -127,35 +127,35 @@ public:
 class csModelDataVertices : public iModelDataVertices
 {
 private:
-  DECLARE_GROWING_ARRAY (Vertices, csVector3);
-  DECLARE_GROWING_ARRAY (Normals, csVector3);
-  DECLARE_GROWING_ARRAY (Colors, csColor);
-  DECLARE_GROWING_ARRAY (Texels, csVector2);
+  CS_DECLARE_GROWING_ARRAY (Vertices, csVector3);
+  CS_DECLARE_GROWING_ARRAY (Normals, csVector3);
+  CS_DECLARE_GROWING_ARRAY (Colors, csColor);
+  CS_DECLARE_GROWING_ARRAY (Texels, csVector2);
 
 public:
   SCF_DECLARE_IBASE;
-  DECLARE_OBJECT_INTERFACE;
+  CS_DECLARE_OBJECT_INTERFACE;
 
   /// constructor
   csModelDataVertices ();
   /// Destructor
   virtual ~csModelDataVertices() {}
 
-  DECLARE_ARRAY_INTERFACE (const csVector3 &, Vertex);
-  DECLARE_ARRAY_INTERFACE (const csVector3 &, Normal);
-  DECLARE_ARRAY_INTERFACE (const csColor &, Color);
-  DECLARE_ARRAY_INTERFACE (const csVector2 &, Texel);
+  CS_DECLARE_ARRAY_INTERFACE (const csVector3 &, Vertex);
+  CS_DECLARE_ARRAY_INTERFACE (const csVector3 &, Normal);
+  CS_DECLARE_ARRAY_INTERFACE (const csColor &, Color);
+  CS_DECLARE_ARRAY_INTERFACE (const csVector2 &, Texel);
 };
 
 class csModelDataAction : public iModelDataAction
 {
 private:
-  DECLARE_GROWING_ARRAY (Times, float);
+  CS_DECLARE_GROWING_ARRAY (Times, float);
   csObjectVector States;
 
 public:
   SCF_DECLARE_IBASE;
-  DECLARE_OBJECT_INTERFACE;
+  CS_DECLARE_OBJECT_INTERFACE;
 
   /// Constructor
   csModelDataAction ();
@@ -181,15 +181,15 @@ public:
 class csModelDataPolygon : public iModelDataPolygon
 {
 private:
-  DECLARE_GROWING_ARRAY (Vertices, int);
-  DECLARE_GROWING_ARRAY (Normals, int);
-  DECLARE_GROWING_ARRAY (Colors, int);
-  DECLARE_GROWING_ARRAY (Texels, int);
+  CS_DECLARE_GROWING_ARRAY (Vertices, int);
+  CS_DECLARE_GROWING_ARRAY (Normals, int);
+  CS_DECLARE_GROWING_ARRAY (Colors, int);
+  CS_DECLARE_GROWING_ARRAY (Texels, int);
   iModelDataMaterial *Material;
 
 public:
   SCF_DECLARE_IBASE;
-  DECLARE_OBJECT_INTERFACE;
+  CS_DECLARE_OBJECT_INTERFACE;
 
   /// constructor
   csModelDataPolygon ();
@@ -203,11 +203,11 @@ public:
   /// Delete a vertex
   void DeleteVertex (int n);
 
-  DECLARE_ARRAY_INTERFACE_NONUM (int, Vertex);
-  DECLARE_ARRAY_INTERFACE_NONUM (int, Normal);
-  DECLARE_ARRAY_INTERFACE_NONUM (int, Color);
-  DECLARE_ARRAY_INTERFACE_NONUM (int, Texel);
-  DECLARE_ACCESSOR_METHODS (iModelDataMaterial*, Material);
+  CS_DECLARE_ARRAY_INTERFACE_NONUM (int, Vertex);
+  CS_DECLARE_ARRAY_INTERFACE_NONUM (int, Normal);
+  CS_DECLARE_ARRAY_INTERFACE_NONUM (int, Color);
+  CS_DECLARE_ARRAY_INTERFACE_NONUM (int, Texel);
+  CS_DECLARE_ACCESSOR_METHODS (iModelDataMaterial*, Material);
 };
 
 class csModelDataObject : public iModelDataObject
@@ -217,14 +217,14 @@ private:
 
 public:
   SCF_DECLARE_IBASE;
-  DECLARE_OBJECT_INTERFACE;
+  CS_DECLARE_OBJECT_INTERFACE;
 
   /// Constructor
   csModelDataObject ();
   /// Destructor
   virtual ~csModelDataObject();
 
-  DECLARE_ACCESSOR_METHODS (iModelDataVertices*, DefaultVertices);
+  CS_DECLARE_ACCESSOR_METHODS (iModelDataVertices*, DefaultVertices);
 };
 
 class csModelDataCamera : public iModelDataCamera
@@ -234,17 +234,17 @@ private:
 
 public:
   SCF_DECLARE_IBASE;
-  DECLARE_OBJECT_INTERFACE;
+  CS_DECLARE_OBJECT_INTERFACE;
 
   /// Constructor
   csModelDataCamera ();
   // Destructor
   virtual ~csModelDataCamera () {}
 
-  DECLARE_ACCESSOR_METHODS (const csVector3 &, Position);
-  DECLARE_ACCESSOR_METHODS (const csVector3 &, UpVector);
-  DECLARE_ACCESSOR_METHODS (const csVector3 &, FrontVector);
-  DECLARE_ACCESSOR_METHODS (const csVector3 &, RightVector);
+  CS_DECLARE_ACCESSOR_METHODS (const csVector3 &, Position);
+  CS_DECLARE_ACCESSOR_METHODS (const csVector3 &, UpVector);
+  CS_DECLARE_ACCESSOR_METHODS (const csVector3 &, FrontVector);
+  CS_DECLARE_ACCESSOR_METHODS (const csVector3 &, RightVector);
 
   /// compute the 'up' vector as the normal to the 'front' and 'right' vectors
   void ComputeUpVector ();
@@ -268,23 +268,23 @@ private:
 
 public:
   SCF_DECLARE_IBASE;
-  DECLARE_OBJECT_INTERFACE;
+  CS_DECLARE_OBJECT_INTERFACE;
 
   /// Constructor
   csModelDataLight ();
   // Destructor
   virtual ~csModelDataLight () {}
 
-  DECLARE_ACCESSOR_METHODS (float, Radius);
-  DECLARE_ACCESSOR_METHODS (const csVector3 &, Position);
-  DECLARE_ACCESSOR_METHODS (const csColor &, Color);
+  CS_DECLARE_ACCESSOR_METHODS (float, Radius);
+  CS_DECLARE_ACCESSOR_METHODS (const csVector3 &, Position);
+  CS_DECLARE_ACCESSOR_METHODS (const csColor &, Color);
 };
 
 class csModelData : public iModelData
 {
 public:
   SCF_DECLARE_IBASE;
-  DECLARE_OBJECT_INTERFACE;
+  CS_DECLARE_OBJECT_INTERFACE;
 
   /// Constructor
   csModelData ();

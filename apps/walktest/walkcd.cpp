@@ -74,7 +74,7 @@ void WalkTest::CreateColliders ()
   iMeshObjectFactory* thing_fact = Engine->GetThingType ()->NewFactory ();
   iMeshObject* mesh_obj = SCF_QUERY_INTERFACE (thing_fact, iMeshObject);
   thing_fact->DecRef ();
-  plbody = Engine->CreateMeshObject (mesh_obj, "Player's Body");
+  plbody = Engine->CreateMeshWrapper (mesh_obj, "Player's Body");
   iThingState* thing_state = SCF_QUERY_INTERFACE (mesh_obj, iThingState);
   mesh_obj->DecRef ();
 
@@ -126,7 +126,7 @@ void WalkTest::CreateColliders ()
   thing_fact = Engine->GetThingType ()-> NewFactory ();
   mesh_obj = SCF_QUERY_INTERFACE (thing_fact, iMeshObject);
   thing_fact->DecRef ();
-  pllegs = Engine->CreateMeshObject (mesh_obj, "Player's Legs");
+  pllegs = Engine->CreateMeshWrapper (mesh_obj, "Player's Legs");
   thing_state = SCF_QUERY_INTERFACE (mesh_obj, iThingState);
   mesh_obj->DecRef ();
 

@@ -167,7 +167,7 @@ bool Simple::Initialize (int argc, const char* const argv[],
   @dots{}
 
   // Add the sprite to the engine.
-  iMeshWrapper* sprite = engine->CreateMeshObject (
+  iMeshWrapper* sprite = engine->CreateMeshWrapper (
   	imeshfact, "MySprite", room,
 	csVector3 (-3, 5, 3));
   csMatrix3 m; m.Identity (); m *= 5.;
@@ -184,7 +184,7 @@ bool Simple::Initialize (int argc, const char* const argv[],
 @}
 @end example
 
-The easiest way to create a mesh is to use @code{engine->CreateMeshObject()}.
+The easiest way to create a mesh is to use @code{engine->CreateMeshWrapper()}.
 This will take care of using the given mesh factory to create the mesh, give
 it a name, and correctly place it at the given position in the world.
 The name of a mesh can be useful for scripting so that a script can refer

@@ -142,7 +142,7 @@ static iMeshWrapper* CreateMeshWrapper (const char* name)
   iMeshObjectFactory* thing_fact = Sys->Engine->GetThingType ()->NewFactory ();
   iMeshObject* mesh_obj = SCF_QUERY_INTERFACE (thing_fact, iMeshObject);
   thing_fact->DecRef ();
-  iMeshWrapper* mesh_wrap = Sys->Engine->CreateMeshObject (mesh_obj, name);
+  iMeshWrapper* mesh_wrap = Sys->Engine->CreateMeshWrapper (mesh_obj, name);
   mesh_obj->DecRef ();
   return mesh_wrap;
 }

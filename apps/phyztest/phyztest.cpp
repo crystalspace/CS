@@ -105,7 +105,7 @@ iMeshWrapper *add_test_mesh( iMeshFactoryWrapper *tmpl, iSector *aroom, iView *v
 {
   iMeshWrapper *tsprt;
   
-  tsprt = view->GetEngine ()->CreateMeshObject (tmpl, NULL);
+  tsprt = view->GetEngine ()->CreateMeshWrapper (tmpl, NULL);
   tsprt->GetMovable ()->SetSector (aroom);
   csXScaleMatrix3 m (2);
   tsprt->GetMovable ()->SetTransform (m);
@@ -426,7 +426,7 @@ void Phyztest::NextFrame ()
 	return;
       }
 
-      bot = view->GetEngine ()->CreateMeshObject (tmpl, NULL);
+      bot = view->GetEngine ()->CreateMeshWrapper (tmpl, NULL);
       bot->GetMovable ()->SetSector (room);
       iSprite3DState* state = SCF_QUERY_INTERFACE (bot->GetMeshObject (), iSprite3DState);
       state->SetAction ("default");

@@ -183,15 +183,15 @@ static void G3DPreparePolygonFX (G3DPolygonDPFX* g3dpoly,
 
 //@@@@@@@ DO INCREF()/DECREF() ON THESE ARRAYS!!!
 /// Static vertex array.
-static DECLARE_GROWING_ARRAY (tr_verts, csVector3);
+static CS_DECLARE_GROWING_ARRAY (tr_verts, csVector3);
 /// Static z array.
-static DECLARE_GROWING_ARRAY (z_verts, float);
+static CS_DECLARE_GROWING_ARRAY (z_verts, float);
 /// Static uv array.
-static DECLARE_GROWING_ARRAY (uv_verts, csVector2);
+static CS_DECLARE_GROWING_ARRAY (uv_verts, csVector2);
 /// The perspective corrected vertices.
-static DECLARE_GROWING_ARRAY (persp, csVector2);
+static CS_DECLARE_GROWING_ARRAY (persp, csVector2);
 /// Array with colors.
-static DECLARE_GROWING_ARRAY (color_verts, csColor);
+static CS_DECLARE_GROWING_ARRAY (color_verts, csColor);
 
 static void DrawTriangle (
 	iGraphics3D* g3d,

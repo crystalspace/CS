@@ -51,7 +51,7 @@
 // csPolygon3D is created and an DecRef each time it is deleted.
 // Thus, when the engine is cleaned, the array is automatically
 // cleaned too.
-static DECLARE_GROWING_ARRAY_REF (VectorArray, csVector3);
+static CS_DECLARE_GROWING_ARRAY_REF (VectorArray, csVector3);
 
 //---------------------------------------------------------------------------
 

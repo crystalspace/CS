@@ -588,15 +588,15 @@ SCF_IMPLEMENT_EMBEDDED_IBASE (csSprite3DMeshObject::PolyMesh)
 SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 /// Static vertex array.
-static DECLARE_GROWING_ARRAY_REF (tr_verts, csVector3);
+static CS_DECLARE_GROWING_ARRAY_REF (tr_verts, csVector3);
 /// Static uv array.
-static DECLARE_GROWING_ARRAY_REF (uv_verts, csVector2);
+static CS_DECLARE_GROWING_ARRAY_REF (uv_verts, csVector2);
 /// The list of fog vertices
-static DECLARE_GROWING_ARRAY_REF (fog_verts, G3DFogInfo);
+static CS_DECLARE_GROWING_ARRAY_REF (fog_verts, G3DFogInfo);
 /// The list of object vertices.
-static DECLARE_GROWING_ARRAY_REF (obj_verts, csVector3);
+static CS_DECLARE_GROWING_ARRAY_REF (obj_verts, csVector3);
 /// The list of tween vertices.
-static DECLARE_GROWING_ARRAY_REF (tween_verts, csVector3);
+static CS_DECLARE_GROWING_ARRAY_REF (tween_verts, csVector3);
 
 csSprite3DMeshObject::csSprite3DMeshObject ()
 {

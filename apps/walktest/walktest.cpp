@@ -1181,9 +1181,9 @@ void WalkTest::InitCollDet (iEngine* engine, iRegion* region)
   }
   // Initialize all mesh objects for collision detection.
   int i;
-  for (i = 0 ; i < engine->GetMeshObjectCount () ; i++)
+  for (i = 0 ; i < engine->GetMeshWrapperCount () ; i++)
   {
-    iMeshWrapper* sp = engine->GetMeshObject (i);
+    iMeshWrapper* sp = engine->GetMeshWrapper (i);
     if (region && !region->IsInRegion (sp->QueryObject ())) continue;
     mesh = SCF_QUERY_INTERFACE (sp->GetMeshObject (), iPolygonMesh);
     if (mesh)

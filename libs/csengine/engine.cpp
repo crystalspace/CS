@@ -1798,7 +1798,7 @@ iSector *csEngine::FindSector (const char *iName, bool regionOnly) const
   return sec;
 }
 
-iMeshWrapper *csEngine::FindMeshObject (const char *iName, bool regionOnly)
+iMeshWrapper* csEngine::FindMeshWrapper (const char *iName, bool regionOnly)
   const
 {
   csMeshWrapper* mesh;
@@ -2060,7 +2060,7 @@ iMeshFactoryWrapper* csEngine::LoadMeshFactory (
   return fact;
 }
 
-iMeshWrapper* csEngine::LoadMeshObject (
+iMeshWrapper* csEngine::LoadMeshWrapper (
   	const char* classId, const char* name,
 	const char* loaderClassId,
 	iDataBuffer* input, iSector* sector, const csVector3& pos)
@@ -2095,17 +2095,23 @@ iMeshWrapper* csEngine::LoadMeshObject (
   return imw;
 }
 
-iMeshWrapper* csEngine::CreateMeshObject (iMeshFactoryWrapper* factory,
+iMeshWrapper* csEngine::CreateMeshWrapper (iMeshFactoryWrapper* factory,
   	const char* name, iSector* sector, const csVector3& pos)
 {
-  iMeshObjectFactory* fact = factory->GetMeshObjectFactory ();
-  iMeshObject* mesh = fact->NewInstance ();
-  iMeshWrapper* meshwrap = CreateMeshObject (mesh, name, sector, pos);
-  mesh->DecRef ();
+  iMeshWrapper* meshwrap = factory->CreateMeshWrapper ();
+  csMeshWrapper* mesh = meshwrap->GetPrivateObject ();
+  if (name) mesh->SetName (name);
+  meshes.Push (mesh);
+  if (sector)
+  {
+    mesh->GetMovable ().SetSector (sector);
+    mesh->GetMovable ().SetPosition (pos);
+    mesh->GetMovable ().UpdateMove ();
+  }
   return meshwrap;
 }
 
-iMeshWrapper* csEngine::CreateMeshObject (iMeshObject* mesh,
+iMeshWrapper* csEngine::CreateMeshWrapper (iMeshObject* mesh,
   	const char* name, iSector* sector, const csVector3& pos)
 {
   csMeshWrapper* meshwrap = new csMeshWrapper (&scfiObject, mesh);
@@ -2120,7 +2126,7 @@ iMeshWrapper* csEngine::CreateMeshObject (iMeshObject* mesh,
   return &meshwrap->scfiMeshWrapper;
 }
 
-iMeshWrapper* csEngine::CreateMeshObject (const char* name)
+iMeshWrapper* csEngine::CreateMeshWrapper (const char* name)
 {
   csMeshWrapper* meshwrap = new csMeshWrapper (&scfiObject);
   if (name) meshwrap->SetName (name);
@@ -2128,12 +2134,12 @@ iMeshWrapper* csEngine::CreateMeshObject (const char* name)
   return &meshwrap->scfiMeshWrapper;
 }
 
-int csEngine::GetMeshObjectCount () const
+int csEngine::GetMeshWrapperCount () const
 {
   return meshes.Length ();
 }
 
-iMeshWrapper *csEngine::GetMeshObject (int n) const
+iMeshWrapper *csEngine::GetMeshWrapper (int n) const
 {
   return &((csMeshWrapper*)meshes.Get(n))->scfiMeshWrapper;
 }

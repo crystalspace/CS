@@ -764,9 +764,9 @@ iMeshWrapper *FindNextClosestMesh (iMeshWrapper *baseMesh,
   }
 
   // @@@ This routine ignores 2D meshes for the moment.
-  for (meshIndex = 0; meshIndex < Sys->Engine->GetMeshObjectCount (); meshIndex++)
+  for (meshIndex = 0; meshIndex < Sys->Engine->GetMeshWrapperCount (); meshIndex++)
   {
-    nextMesh = Sys->Engine->GetMeshObject (meshIndex);
+    nextMesh = Sys->Engine->GetMeshWrapper (meshIndex);
 
     if (nextMesh != baseMesh)
     {

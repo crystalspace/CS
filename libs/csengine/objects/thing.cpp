@@ -1451,7 +1451,7 @@ csPolygon3D* csThing::IntersectSphere (csVector3& center, float radius,
 }
 
 /// The list of fog vertices
-static DECLARE_GROWING_ARRAY (fog_verts, G3DFogInfo);
+static CS_DECLARE_GROWING_ARRAY (fog_verts, G3DFogInfo);
 
 bool csThing::DrawCurves (iRenderView* rview, iMovable* movable,
 	csZBufMode zMode)

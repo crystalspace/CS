@@ -240,7 +240,7 @@ bool BumpTest::InitProcDemo ()
 #if 0
   iSector* iroom = SCF_QUERY_INTERFACE (room, iSector);
 #endif
-  iMeshWrapper* thing_wrap = engine->CreateMeshObject ("Bumpy");
+  iMeshWrapper* thing_wrap = engine->CreateMeshWrapper ("Bumpy");
   thing_obj->DecRef ();
 
   thing_wrap->SetMeshObject (thing_obj);
@@ -277,7 +277,7 @@ bool BumpTest::InitProcDemo ()
   sprfactstate->AddTriangle(0,1,2);
   sprfactstate->AddTriangle(0,2,3);
   sprfactstate->DecRef();
-  iMeshWrapper* sprite = engine->CreateMeshObject(sprfact, "bumpspr",
+  iMeshWrapper* sprite = engine->CreateMeshWrapper(sprfact, "bumpspr",
     iroom, csVector3(0, 5, 1) );
   sprite->GetMovable ()->UpdateMove ();
   iSprite3DState* spstate = SCF_QUERY_INTERFACE (sprite->GetMeshObject (), 

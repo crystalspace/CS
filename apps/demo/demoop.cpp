@@ -48,7 +48,7 @@ void FadeOp::Do (csTime dt)
 RotatePartOp::RotatePartOp (const char* meshName, csTime total,
 	float aspeed) : total_rotate_time (total), angle_speed (aspeed)
 {
-  mesh = DemoSequenceManager::demo->engine->FindMeshObject (meshName);
+  mesh = DemoSequenceManager::demo->engine->FindMeshWrapper (meshName);
   if (!mesh)
   {
     DemoSequenceManager::demo->Printf (CS_MSG_FATAL_ERROR,
@@ -67,7 +67,7 @@ AttachOp::AttachOp (const char* meshName, const char* pathName)
 {
   if (meshName)
   {
-    mesh = DemoSequenceManager::demo->engine->FindMeshObject (meshName);
+    mesh = DemoSequenceManager::demo->engine->FindMeshWrapper (meshName);
     if (!mesh)
     {
       DemoSequenceManager::demo->Printf (CS_MSG_FATAL_ERROR,
@@ -96,7 +96,7 @@ PathOp::PathOp (csTime t, const char* meshName, const char* pathName)
   total_path_time = t;
   if (meshName)
   {
-    mesh = DemoSequenceManager::demo->engine->FindMeshObject (meshName);
+    mesh = DemoSequenceManager::demo->engine->FindMeshWrapper (meshName);
     if (!mesh)
     {
       DemoSequenceManager::demo->Printf (CS_MSG_FATAL_ERROR,
@@ -125,7 +125,7 @@ SetupMeshOp::SetupMeshOp (const char* meshName, const char* sectName,
 	const csVector3& p)
 {
   pos = p;
-  mesh = DemoSequenceManager::demo->engine->FindMeshObject (meshName);
+  mesh = DemoSequenceManager::demo->engine->FindMeshWrapper (meshName);
   if (!mesh)
   {
     DemoSequenceManager::demo->Printf (CS_MSG_FATAL_ERROR,
@@ -155,7 +155,7 @@ void SetupMeshOp::Do (csTime /*dt*/)
 
 ShowMeshOp::ShowMeshOp (const char* meshName)
 {
-  mesh = DemoSequenceManager::demo->engine->FindMeshObject (meshName);
+  mesh = DemoSequenceManager::demo->engine->FindMeshWrapper (meshName);
   if (!mesh)
   {
     DemoSequenceManager::demo->Printf (CS_MSG_FATAL_ERROR,
@@ -175,7 +175,7 @@ void ShowMeshOp::Do (csTime /*dt*/)
 
 HideMeshOp::HideMeshOp (const char* meshName)
 {
-  mesh = DemoSequenceManager::demo->engine->FindMeshObject (meshName);
+  mesh = DemoSequenceManager::demo->engine->FindMeshWrapper (meshName);
   if (!mesh)
   {
     DemoSequenceManager::demo->Printf (CS_MSG_FATAL_ERROR,

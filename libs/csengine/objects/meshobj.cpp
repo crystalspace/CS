@@ -91,7 +91,7 @@ csMeshWrapper::csMeshWrapper (csObject* theParent, iMeshObject* mesh)
   iMeshWrapper *sparent = SCF_QUERY_INTERFACE_FAST (parent, iMeshWrapper);
   if (sparent)
   {
-    movable.SetParent(sparent->GetMovable());
+    movable.SetParent (sparent->GetMovable());
     sparent->DecRef ();
   }
 
@@ -122,7 +122,7 @@ csMeshWrapper::csMeshWrapper (csObject* theParent)
   iMeshWrapper *sparent = SCF_QUERY_INTERFACE_FAST (parent, iMeshWrapper);
   if (sparent)
   {
-    movable.SetParent(sparent->GetMovable());
+    movable.SetParent (sparent->GetMovable());
     sparent->DecRef ();
   }
 
@@ -201,7 +201,7 @@ void csMeshWrapper::SetRenderPriority (long rp)
 }
 
 /// The list of lights that hit the mesh
-static DECLARE_GROWING_ARRAY_REF (light_worktable, iLight*);
+static CS_DECLARE_GROWING_ARRAY_REF (light_worktable, iLight*);
 
 void csMeshWrapper::UpdateDeferedLighting (const csVector3& pos)
 {
@@ -443,11 +443,9 @@ void csMeshWrapper::MeshWrapper::AddChild (iMeshWrapper* child)
       csMeshWrapper* old_mesh = (csMeshWrapper*)par;
       csNamedObjVector& ch = old_mesh->children;
       int idx = ch.Find (c);
-      if (idx != -1)
-      {
-        ch.Delete (idx, false);		// Unlink object
-	c->DecRef ();
-      }
+      CS_ASSERT (idx != -1);	// Impossible!
+      ch.Delete (idx, false);	// Unlink object
+      c->DecRef ();
     }
   }
   c->SetParentContainer ((csMeshWrapper*)scfParent);
@@ -464,11 +462,9 @@ void csMeshWrapper::MeshWrapper::RemoveChild (iMeshWrapper* child)
   if (par != scfParent) return;	// Wrong parent, nothing to do.
   csNamedObjVector& ch = scfParent->children;
   int idx = ch.Find (c);
-  if (idx != -1)
-  {
-    ch.Delete (idx, false);		// Unlink object
-    c->DecRef ();
-  }
+  CS_ASSERT (idx != -1);
+  ch.Delete (idx, false);		// Unlink object
+  c->DecRef ();
   c->SetParentContainer (NULL);
   c->GetMovable ().SetParent (NULL);
 }
@@ -482,6 +478,7 @@ iBase* csMeshWrapper::MeshWrapper::GetParentContainer ()
 
 iMeshWrapper* csMeshWrapper::MeshWrapper::GetChild (int idx) const
 {
+  CS_ASSERT (idx >= 0 && idx < scfParent->children.Length ());
   csMeshWrapper* child = (csMeshWrapper*)(scfParent->GetChildren ()[idx]);
   return &(child->scfiMeshWrapper);
 }
@@ -509,12 +506,14 @@ csMeshFactoryWrapper::csMeshFactoryWrapper (iMeshObjectFactory* meshFact)
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiMeshFactoryWrapper);
   csMeshFactoryWrapper::meshFact = meshFact;
   meshFact->IncRef ();
+  parent = NULL;
 }
 
 csMeshFactoryWrapper::csMeshFactoryWrapper ()
 {
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiMeshFactoryWrapper);
   csMeshFactoryWrapper::meshFact = NULL;
+  parent = NULL;
 }
 
 csMeshFactoryWrapper::~csMeshFactoryWrapper ()
@@ -530,17 +529,102 @@ void csMeshFactoryWrapper::SetMeshObjectFactory (iMeshObjectFactory* meshFact)
   csMeshFactoryWrapper::meshFact = meshFact;
 }
 
-csMeshWrapper* csMeshFactoryWrapper::NewMeshObject (csObject* parent)
+csMeshWrapper* csMeshFactoryWrapper::NewMeshObject ()
 {
   iMeshObject* mesh = meshFact->NewInstance ();
-  csMeshWrapper* meshObj = new csMeshWrapper (parent, mesh);
+  csMeshWrapper* meshObj = new csMeshWrapper (
+  	csEngine::current_engine->QueryCsObject (), mesh);
   mesh->DecRef ();
+  if (GetName ()) meshObj->SetName (GetName ());
   meshObj->SetFactory (this);
+  int i;
+  for (i = 0 ; i < children.Length () ; i++)
+  {
+    csMeshFactoryWrapper* childfact = (csMeshFactoryWrapper*)children[i];
+    csMeshWrapper* relchild = childfact->NewMeshObject ();
+    meshObj->scfiMeshWrapper.AddChild (&(relchild->scfiMeshWrapper));
+    relchild->GetMovable ().SetTransform ((csReversibleTransform)
+    	transformations[i]);
+    relchild->GetMovable ().UpdateMove ();
+  }
   return meshObj;
 }
 
 void csMeshFactoryWrapper::HardTransform (const csReversibleTransform& t)
 {
   meshFact->HardTransform (t);
+}
+
+iMeshWrapper* csMeshFactoryWrapper::MeshFactoryWrapper::CreateMeshWrapper ()
+{
+  csMeshWrapper* wrapper = scfParent->NewMeshObject ();
+  if (wrapper)
+    return &(wrapper->scfiMeshWrapper);
+  else
+    return NULL;
+}
+
+void csMeshFactoryWrapper::MeshFactoryWrapper::AddChild (
+	iMeshFactoryWrapper* child, const csReversibleTransform& transf)
+{
+  // First unlink the factory from another possible parent.
+  csMeshFactoryWrapper* c = child->GetPrivateObject ();
+  // First we increase reference on the mesh to make sure it will
+  // not get deleted by unlinking it from it's previous parent.
+  // We will also keep this incremented because the parent mesh
+  // now holds an additional reference to this child.
+  c->IncRef ();
+  if (c->parent)
+  {
+    csNamedObjVector& ch = c->parent->children;
+    int idx = ch.Find (c);
+    CS_ASSERT (idx != -1);	// Impossible!
+    ch.Delete (idx, false);	// Unlink object
+    c->parent->transformations.Delete (idx);
+    c->DecRef ();
+  }
+
+  c->parent = (csMeshFactoryWrapper*)scfParent;
+  scfParent->children.Push (c);
+  scfParent->transformations.Push (transf);
+}
+
+void csMeshFactoryWrapper::MeshFactoryWrapper::RemoveChild (
+	iMeshFactoryWrapper* child)
+{
+  // First unlink the mesh from the parent.
+  csMeshFactoryWrapper* c = child->GetPrivateObject ();
+  if (c->parent != scfParent) return;	// Wrong parent, nothing to do.
+  csNamedObjVector& ch = scfParent->children;
+  int idx = ch.Find (c);
+  CS_ASSERT (idx != -1);
+  ch.Delete (idx, false);		// Unlink object
+  scfParent->transformations.Delete (idx);
+  c->DecRef ();
+  c->parent = NULL;
+}
+
+iMeshFactoryWrapper* csMeshFactoryWrapper::MeshFactoryWrapper::
+	GetParentContainer () const
+{
+  csMeshFactoryWrapper* par = scfParent->parent;
+  if (!par) return NULL;
+  return &(par->scfiMeshFactoryWrapper);
+}
+
+iMeshFactoryWrapper* csMeshFactoryWrapper::MeshFactoryWrapper::GetChild (
+	int idx) const
+{
+  CS_ASSERT (idx >= 0 && idx < scfParent->children.Length ());
+  csMeshFactoryWrapper* child = (csMeshFactoryWrapper*)
+  	(scfParent->children[idx]);
+  return &(child->scfiMeshFactoryWrapper);
+}
+
+csReversibleTransform& csMeshFactoryWrapper::MeshFactoryWrapper::
+	GetChildTransform (int idx)
+{
+  CS_ASSERT (idx >= 0 && idx < scfParent->transformations.Length ());
+  return scfParent->transformations[idx];
 }
 

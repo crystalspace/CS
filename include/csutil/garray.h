@@ -21,7 +21,7 @@
 #define __CS_GARRAY_H__
 
 // Common macro for declarations below
-#define TYPEDEF_GROWING_ARRAY_EXT(Name, Type, ExtraConstructor, Extra)	\
+#define CS_TYPEDEF_GROWING_ARRAY_EXT(Name, Type, ExtraConstructor, Extra)	\
   class Name								\
   {									\
     typedef Type ga_type;						\
@@ -89,14 +89,14 @@
  * </ul>
  * Usage examples:
  * <pre>
- * TYPEDEF_GROWING_ARRAY (csLightArray, csLight*);
- * TYPEDEF_GROWING_ARRAY (csIntArray, int);
+ * CS_TYPEDEF_GROWING_ARRAY (csLightArray, csLight*);
+ * CS_TYPEDEF_GROWING_ARRAY (csIntArray, int);
  * static csLightArray la;
  * static csIntArray ia;
  * </pre>
  */
-#define TYPEDEF_GROWING_ARRAY(Name, Type)				\
-  TYPEDEF_GROWING_ARRAY_EXT (Name, Type, ;,  ;)
+#define CS_TYPEDEF_GROWING_ARRAY(Name, Type)				\
+  CS_TYPEDEF_GROWING_ARRAY_EXT (Name, Type, ;,  ;)
 
 /**
  * Same as TYPEDEF_GROWING_ARRAY but contains additionally an reference
@@ -109,8 +109,8 @@
  * <li>void IncRef ()/void DecRef () - Reference counter management
  * </ul>
  */
-#define TYPEDEF_GROWING_ARRAY_REF(Name, Type)				\
-  TYPEDEF_GROWING_ARRAY_EXT (Name, Type, RefCount = 0,			\
+#define CS_TYPEDEF_GROWING_ARRAY_REF(Name, Type)			\
+  CS_TYPEDEF_GROWING_ARRAY_EXT (Name, Type, RefCount = 0,		\
     int RefCount;							\
     void IncRef ()							\
     { RefCount++; }							\
@@ -126,17 +126,17 @@
  * <p>
  * Usage examples:
  * <pre>
- * DECLARE_GROWING_ARRAY (la, csLight*);
- * DECLARE_GROWING_ARRAY (ia, int);
+ * CS_DECLARE_GROWING_ARRAY (la, csLight*);
+ * CS_DECLARE_GROWING_ARRAY (ia, int);
  * </pre>
  */
-#define DECLARE_GROWING_ARRAY(Name, Type)				\
-  TYPEDEF_GROWING_ARRAY(__##Name,Type) Name
+#define CS_DECLARE_GROWING_ARRAY(Name, Type)				\
+  CS_TYPEDEF_GROWING_ARRAY(__##Name,Type) Name
 
 /**
  * Same as above but declares an object which has a reference counter.
  */
-#define DECLARE_GROWING_ARRAY_REF(Name, Type)				\
-  TYPEDEF_GROWING_ARRAY_REF(__##Name,Type) Name
+#define CS_DECLARE_GROWING_ARRAY_REF(Name, Type)			\
+  CS_TYPEDEF_GROWING_ARRAY_REF(__##Name,Type) Name
 
 #endif // __CS_GARRAY_H__

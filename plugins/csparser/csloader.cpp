@@ -91,6 +91,7 @@ CS_TOKEN_DEF_START
   CS_TOKEN_DEF (CULLER)
   CS_TOKEN_DEF (DETAIL)
   CS_TOKEN_DEF (DYNAMIC)
+  CS_TOKEN_DEF (FACTORY)
   CS_TOKEN_DEF (FILE)
   CS_TOKEN_DEF (FOG)
   CS_TOKEN_DEF (HALO)
@@ -104,6 +105,7 @@ CS_TOKEN_DEF_START
   CS_TOKEN_DEF (MATRIX)
   CS_TOKEN_DEF (MESHFACT)
   CS_TOKEN_DEF (MESHOBJ)
+  CS_TOKEN_DEF (MESHREF)
   CS_TOKEN_DEF (MOVE)
   CS_TOKEN_DEF (NODE)
   CS_TOKEN_DEF (NOLIGHTING)
@@ -686,7 +688,8 @@ iMeshFactoryWrapper* csLoader::LoadMeshObjectFactory (const char* fname)
   return NULL;
 }
 
-bool csLoader::LoadMeshObjectFactory (iMeshFactoryWrapper* stemp, char* buf)
+bool csLoader::LoadMeshObjectFactory (iMeshFactoryWrapper* stemp, char* buf,
+	csReversibleTransform* transf)
 {
   CS_TOKEN_TABLE_START (commands)
     CS_TOKEN_TABLE (ADDON)
@@ -694,6 +697,13 @@ bool csLoader::LoadMeshObjectFactory (iMeshFactoryWrapper* stemp, char* buf)
     CS_TOKEN_TABLE (MATERIAL)
     CS_TOKEN_TABLE (PARAMS)
     CS_TOKEN_TABLE (PLUGIN)
+    CS_TOKEN_TABLE (MESHFACT)
+    CS_TOKEN_TABLE (MOVE)
+  CS_TOKEN_TABLE_END
+
+  CS_TOKEN_TABLE_START (tok_matvec)
+    CS_TOKEN_TABLE (MATRIX)
+    CS_TOKEN_TABLE (V)
   CS_TOKEN_TABLE_END
 
   char* name;
@@ -802,6 +812,63 @@ bool csLoader::LoadMeshObjectFactory (iMeshFactoryWrapper* stemp, char* buf)
 	  plug = loaded_plugins.FindPlugin (str, "MeshLdr");
 	}
         break;
+
+      case CS_TOKEN_MESHFACT:
+        {
+          iMeshFactoryWrapper* t = Engine->CreateMeshFactory (name);
+	  csReversibleTransform child_transf;
+          if (!LoadMeshObjectFactory (t, params, &child_transf))
+	  {
+	    ReportError (
+	    	"crystalspace.maploader.load.meshfactory",
+		"Could not load mesh object factory '%s'!",
+		name);
+	    return false;
+	  }
+	  stemp->AddChild (t, child_transf);
+        }
+	break;
+
+      case CS_TOKEN_MOVE:
+        {
+	  if (!transf)
+	  {
+	    ReportError (
+	    	"crystalspace.maploader.load.meshfactory",
+		"MOVE is only useful for hierarchical transformations!");
+	    return false;
+	  }
+          char* params2;
+          while ((cmd = csGetObject (&params, tok_matvec, &name, &params2)) > 0)
+          {
+            if (!params2)
+            {
+	      ReportError (
+		"crystalspace.maploader.parse.badformat",
+		"Expected parameters instead of '%s' while parsing move!",
+		params);
+	      return false;
+            }
+            switch (cmd)
+            {
+              case CS_TOKEN_MATRIX:
+              {
+                csMatrix3 m;
+                if (!ParseMatrix (params2, m))
+		  return false;
+		transf->SetO2T (m);
+                break;
+              }
+              case CS_TOKEN_V:
+              {
+                csVector3 v;
+                ParseVector (params2, v);
+		transf->SetO2TTranslation (v);
+                break;
+              }
+            }
+          }
+        }
     }
   }
   if (cmd == CS_PARSERR_TOKENNOTFOUND)
@@ -813,12 +880,335 @@ bool csLoader::LoadMeshObjectFactory (iMeshFactoryWrapper* stemp, char* buf)
   return true;
 }
 
+iMeshWrapper* csLoader::LoadMeshObjectFromFactory (char* buf)
+{
+  CS_TOKEN_TABLE_START (commands)
+    CS_TOKEN_TABLE (FACTORY)
+    CS_TOKEN_TABLE (ADDON)
+    CS_TOKEN_TABLE (KEY)
+    CS_TOKEN_TABLE (MOVE)
+    CS_TOKEN_TABLE (HARDMOVE)
+    CS_TOKEN_TABLE (NOLIGHTING)
+    CS_TOKEN_TABLE (NOSHADOWS)
+    CS_TOKEN_TABLE (BACK2FRONT)
+    CS_TOKEN_TABLE (INVISIBLE)
+    CS_TOKEN_TABLE (DETAIL)
+    CS_TOKEN_TABLE (ZFILL)
+    CS_TOKEN_TABLE (ZNONE)
+    CS_TOKEN_TABLE (ZUSE)
+    CS_TOKEN_TABLE (ZTEST)
+    CS_TOKEN_TABLE (CAMERA)
+    CS_TOKEN_TABLE (CONVEX)
+    CS_TOKEN_TABLE (PRIORITY)
+  CS_TOKEN_TABLE_END
+
+  CS_TOKEN_TABLE_START (tok_matvec)
+    CS_TOKEN_TABLE (MATRIX)
+    CS_TOKEN_TABLE (V)
+  CS_TOKEN_TABLE_END
+
+  char* name;
+  long cmd;
+  char* params;
+  char str[255];
+  str[0] = 0;
+  char priority[255]; priority[0] = 0;
+
+  Stats->meshes_loaded++;
+  iMeshWrapper* mesh = NULL;
+
+  while ((cmd = csGetObject (&buf, commands, &name, &params)) > 0)
+  {
+    if (!params)
+    {
+      ReportError (
+	  "crystalspace.maploader.parse.badformat",
+	  "Expected parameters instead of '%s' while parsing mesh object!",
+	  buf);
+      return NULL;
+    }
+    switch (cmd)
+    {
+      case CS_TOKEN_PRIORITY:
+	csScanStr (params, "%s", priority);
+	break;
+      case CS_TOKEN_ADDON:
+        if (!mesh)
+	{
+	  ReportError (
+	  	"crystalspace.maploader.load.meshobject",
+	  	"First specify the parent factory with FACTORY!");
+	  return NULL;
+	}
+	if (!LoadAddOn (params, mesh))
+	  return NULL;
+      	break;
+      case CS_TOKEN_NOLIGHTING:
+        if (!mesh)
+	{
+	  ReportError (
+	  	"crystalspace.maploader.load.meshobject",
+	  	"First specify the parent factory with FACTORY!");
+	  return NULL;
+	}
+        mesh->GetFlags().Set (CS_ENTITY_NOLIGHTING);
+        break;
+      case CS_TOKEN_NOSHADOWS:
+        if (!mesh)
+	{
+	  ReportError (
+	  	"crystalspace.maploader.load.meshobject",
+	  	"First specify the parent factory with FACTORY!");
+	  return NULL;
+	}
+        mesh->GetFlags().Set (CS_ENTITY_NOSHADOWS);
+        break;
+      case CS_TOKEN_BACK2FRONT:
+        if (!mesh)
+	{
+	  ReportError (
+	  	"crystalspace.maploader.load.meshobject",
+	  	"First specify the parent factory with FACTORY!");
+	  return NULL;
+	}
+        mesh->GetFlags().Set (CS_ENTITY_BACK2FRONT);
+        break;
+      case CS_TOKEN_INVISIBLE:
+        if (!mesh)
+	{
+	  ReportError (
+	  	"crystalspace.maploader.load.meshobject",
+	  	"First specify the parent factory with FACTORY!");
+	  return NULL;
+	}
+        mesh->GetFlags().Set (CS_ENTITY_INVISIBLE);
+        break;
+      case CS_TOKEN_DETAIL:
+        if (!mesh)
+	{
+	  ReportError (
+	  	"crystalspace.maploader.load.meshobject",
+	  	"First specify the parent factory with FACTORY!");
+	  return NULL;
+	}
+        mesh->GetFlags().Set (CS_ENTITY_DETAIL);
+        break;
+      case CS_TOKEN_ZFILL:
+        if (!mesh)
+	{
+	  ReportError (
+	  	"crystalspace.maploader.load.meshobject",
+	  	"First specify the parent factory with FACTORY!");
+	  return NULL;
+	}
+        if (!priority[0]) strcpy (priority, "wall");
+        mesh->SetZBufMode (CS_ZBUF_FILL);
+        break;
+      case CS_TOKEN_ZUSE:
+        if (!mesh)
+	{
+	  ReportError (
+	  	"crystalspace.maploader.load.meshobject",
+	  	"First specify the parent factory with FACTORY!");
+	  return NULL;
+	}
+        if (!priority[0]) strcpy (priority, "object");
+        mesh->SetZBufMode (CS_ZBUF_USE);
+        break;
+      case CS_TOKEN_ZNONE:
+        if (!mesh)
+	{
+	  ReportError (
+	  	"crystalspace.maploader.load.meshobject",
+	  	"First specify the parent factory with FACTORY!");
+	  return NULL;
+	}
+        if (!priority[0]) strcpy (priority, "sky");
+        mesh->SetZBufMode (CS_ZBUF_NONE);
+        break;
+      case CS_TOKEN_ZTEST:
+        if (!mesh)
+	{
+	  ReportError (
+	  	"crystalspace.maploader.load.meshobject",
+	  	"First specify the parent factory with FACTORY!");
+	  return NULL;
+	}
+        if (!priority[0]) strcpy (priority, "alpha");
+        mesh->SetZBufMode (CS_ZBUF_TEST);
+        break;
+      case CS_TOKEN_CAMERA:
+        if (!mesh)
+	{
+	  ReportError (
+	  	"crystalspace.maploader.load.meshobject",
+	  	"First specify the parent factory with FACTORY!");
+	  return NULL;
+	}
+        if (!priority[0]) strcpy (priority, "sky");
+        mesh->GetFlags().Set (CS_ENTITY_CAMERA);
+        break;
+      case CS_TOKEN_CONVEX:
+        if (!mesh)
+	{
+	  ReportError (
+	  	"crystalspace.maploader.load.meshobject",
+	  	"First specify the parent factory with FACTORY!");
+	  return NULL;
+	}
+        mesh->GetFlags().Set (CS_ENTITY_CONVEX);
+        break;
+      case CS_TOKEN_KEY:
+        if (!mesh)
+	{
+	  ReportError (
+	  	"crystalspace.maploader.load.meshobject",
+	  	"First specify the parent factory with FACTORY!");
+	  return NULL;
+	}
+        if (!ParseKey (params, mesh->QueryObject()))
+	  return NULL;
+        break;
+      case CS_TOKEN_HARDMOVE:
+        if (!mesh)
+	{
+	  ReportError (
+	  	"crystalspace.maploader.load.meshobject",
+	  	"First specify the parent factory with FACTORY!");
+	  return NULL;
+	}
+	else
+        {
+          char* params2;
+	  csReversibleTransform tr;
+          while ((cmd = csGetObject (&params, tok_matvec, &name, &params2)) > 0)
+          {
+            if (!params2)
+            {
+	      ReportError (
+		"crystalspace.maploader.parse.badformat",
+		"Expected parameters instead of '%s' while parsing hardmove!",
+		params);
+	      return NULL;
+            }
+            switch (cmd)
+            {
+              case CS_TOKEN_MATRIX:
+              {
+		csMatrix3 m;
+                if (!ParseMatrix (params2, m))
+		  return NULL;
+                tr.SetT2O (m);
+                break;
+              }
+              case CS_TOKEN_V:
+              {
+		csVector3 v;
+                ParseVector (params2, v);
+		tr.SetOrigin (v);
+                break;
+              }
+            }
+          }
+	  mesh->HardTransform (tr);
+        }
+        break;
+      case CS_TOKEN_MOVE:
+        if (!mesh)
+	{
+	  ReportError (
+	  	"crystalspace.maploader.load.meshobject",
+	  	"First specify the parent factory with FACTORY!");
+	  return NULL;
+	}
+	else
+        {
+          char* params2;
+          mesh->GetMovable ()->SetTransform (csMatrix3 ());     // Identity
+          mesh->GetMovable ()->SetPosition (csVector3 (0));
+          while ((cmd = csGetObject (&params, tok_matvec, &name, &params2)) > 0)
+          {
+            if (!params2)
+            {
+	      ReportError (
+		"crystalspace.maploader.parse.badformat",
+		"Expected parameters instead of '%s' while parsing move!",
+		params);
+	      return NULL;
+            }
+            switch (cmd)
+            {
+              case CS_TOKEN_MATRIX:
+              {
+                csMatrix3 m;
+                if (!ParseMatrix (params2, m))
+		  return NULL;
+                mesh->GetMovable ()->SetTransform (m);
+                break;
+              }
+              case CS_TOKEN_V:
+              {
+                csVector3 v;
+                ParseVector (params2, v);
+                mesh->GetMovable ()->SetPosition (v);
+                break;
+              }
+            }
+          }
+	  mesh->GetMovable ()->UpdateMove ();
+        }
+        break;
+
+      case CS_TOKEN_FACTORY:
+        if (mesh)
+	{
+	  ReportError (
+	  	"crystalspace.maploader.load.meshobject",
+	  	"There is already a factory for this mesh!");
+	  return NULL;
+	}
+	else
+	{
+	  csScanStr (params, "%s", str);
+          iMeshFactoryWrapper* t = Engine->FindMeshFactory (str);
+          if (!t)
+	  {
+	    ReportError (
+	  	"crystalspace.maploader.load.meshobject",
+	  	"Can't find factory '%s'!", name);
+	    return NULL;
+	  }
+	  mesh = t->CreateMeshWrapper ();
+	}
+        break;
+    }
+  }
+  if (cmd == CS_PARSERR_TOKENNOTFOUND)
+  {
+    TokenError ("a mesh object");
+    return NULL;
+  }
+
+  if (!mesh)
+  {
+    ReportError (
+	  	"crystalspace.maploader.load.meshobject",
+	  	"There is no FACTORY for this mesh!");
+    return NULL;
+  }
+  if (!priority[0]) strcpy (priority, "object");
+  mesh->SetRenderPriority (Engine->GetRenderPriority (priority));
+
+  return mesh;
+}
+
 bool csLoader::LoadMeshObject (iMeshWrapper* mesh, char* buf)
 {
   CS_TOKEN_TABLE_START (commands)
     CS_TOKEN_TABLE (ADDON)
     CS_TOKEN_TABLE (KEY)
     CS_TOKEN_TABLE (MESHOBJ)
+    CS_TOKEN_TABLE (MESHREF)
     CS_TOKEN_TABLE (MOVE)
     CS_TOKEN_TABLE (HARDMOVE)
     CS_TOKEN_TABLE (PLUGIN)
@@ -913,9 +1303,25 @@ bool csLoader::LoadMeshObject (iMeshWrapper* mesh, char* buf)
         if (!ParseKey (params, mesh->QueryObject()))
 	  return false;
         break;
+      case CS_TOKEN_MESHREF:
+        {
+          iMeshWrapper* sp = LoadMeshObjectFromFactory (params);
+          if (!sp)
+	  {
+	    ReportError (
+	      	"crystalspace.maploader.load.meshobject",
+		"Could not load mesh object '%s'!",
+		name);
+	    return false;
+	  }
+	  sp->QueryObject ()->SetName (name);
+	  sp->DeferUpdateLighting (CS_NLIGHT_STATIC|CS_NLIGHT_DYNAMIC, 10);
+          mesh->AddChild (sp);
+        }
+        break;
       case CS_TOKEN_MESHOBJ:
         {
-	  iMeshWrapper* sp = Engine->CreateMeshObject (name);
+	  iMeshWrapper* sp = Engine->CreateMeshWrapper (name);
           if (!LoadMeshObject (sp, params))
 	  {
 	    ReportError (
@@ -1203,7 +1609,7 @@ iMeshWrapper * csLoader::LoadMeshObject (const char* fname)
       return NULL;
     }
     
-    iMeshWrapper* mesh = Engine->CreateMeshObject (name);
+    iMeshWrapper* mesh = Engine->CreateMeshWrapper (name);
     if (!LoadMeshObject (mesh, buf))
     {
       mesh->DecRef ();
@@ -1734,6 +2140,7 @@ iSector* csLoader::ParseSector (char* secname, char* buf)
     CS_TOKEN_TABLE (FOG)
     CS_TOKEN_TABLE (LIGHT)
     CS_TOKEN_TABLE (MESHOBJ)
+    CS_TOKEN_TABLE (MESHREF)
     CS_TOKEN_TABLE (NODE)
     CS_TOKEN_TABLE (KEY)
   CS_TOKEN_TABLE_END
@@ -1775,9 +2182,26 @@ iSector* csLoader::ParseSector (char* secname, char* buf)
 	else
           do_culler = true;
         break;
+      case CS_TOKEN_MESHREF:
+        {
+          iMeshWrapper* mesh = LoadMeshObjectFromFactory (params);
+          if (!mesh)
+	  {
+      	    ReportError (
+	      	"crystalspace.maploader.load.meshobject",
+		"Could not load mesh object '%s' in sector '%s'!",
+		name, secname ? secname : "<noname>");
+	    return NULL; // @@@ Leak
+	  }
+	  mesh->QueryObject ()->SetName (name);
+	  mesh->DeferUpdateLighting (CS_NLIGHT_STATIC|CS_NLIGHT_DYNAMIC, 10);
+          mesh->GetMovable ()->SetSector (sector);
+	  mesh->GetMovable ()->UpdateMove ();
+        }
+        break;
       case CS_TOKEN_MESHOBJ:
         {
-	  iMeshWrapper* mesh = Engine->CreateMeshObject (name);
+	  iMeshWrapper* mesh = Engine->CreateMeshWrapper (name);
           if (!LoadMeshObject (mesh, params))
 	  {
       	    ReportError (

@@ -398,7 +398,7 @@ Flock::Flock(iEngine *engine, int num, iMaterialWrapper *mat, iSector *sector)
     accel[i].Set(0,0,0);
     pos.x += (float(rand()+1.)/float(RAND_MAX))*20. ;
     pos.z -= (float(rand()+1.)/float(RAND_MAX))*20. ;
-    spr[i] = engine->CreateMeshObject(fact, "Bird", sector, pos);
+    spr[i] = engine->CreateMeshWrapper(fact, "Bird", sector, pos);
 
     iSprite2DState *sprstate = SCF_QUERY_INTERFACE(spr[i]->GetMeshObject(), 
       iSprite2DState);

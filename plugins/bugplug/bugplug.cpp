@@ -962,7 +962,7 @@ void csBugPlug::Dump (iEngine* engine)
     "%d sectors, %d mesh factories, %d mesh objects\n",
     engine->GetSectors ()->GetSectorCount (),
     engine->GetMeshFactoryCount (),
-    engine->GetMeshObjectCount ());
+    engine->GetMeshWrapperCount ());
   int i;
   for (i = 0 ; i < engine->GetSectors ()->GetSectorCount () ; i++)
   {
@@ -974,9 +974,9 @@ void csBugPlug::Dump (iEngine* engine)
     iMeshFactoryWrapper* meshfact = engine->GetMeshFactory (i);
     Dump (meshfact);
   }
-  for (i = 0 ; i < engine->GetMeshObjectCount () ; i++)
+  for (i = 0 ; i < engine->GetMeshWrapperCount () ; i++)
   {
-    iMeshWrapper* mesh = engine->GetMeshObject (i);
+    iMeshWrapper* mesh = engine->GetMeshWrapper (i);
     Dump (mesh);
   }
   System->Printf (CS_MSG_DEBUG_0, "===========================================\n");

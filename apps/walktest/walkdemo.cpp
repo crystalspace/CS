@@ -103,7 +103,7 @@ void add_particles_rain (iSector* sector, char* matname, int num, float speed)
     	  "MeshObj", iMeshObjectType);
   iMeshObjectFactory* factory = type->NewFactory ();
   iMeshObject* mesh = factory->NewInstance ();
-  iMeshWrapper* exp = Sys->view->GetEngine ()->CreateMeshObject (mesh, NULL,
+  iMeshWrapper* exp = Sys->view->GetEngine ()->CreateMeshWrapper (mesh, NULL,
   	sector);
   type->DecRef ();
   factory->DecRef ();
@@ -149,7 +149,7 @@ void add_particles_snow (iSector* sector, char* matname, int num, float speed)
     	  "MeshObj", iMeshObjectType);
   iMeshObjectFactory* factory = type->NewFactory ();
   iMeshObject* mesh = factory->NewInstance ();
-  iMeshWrapper* exp = Sys->view->GetEngine ()->CreateMeshObject (mesh, NULL,
+  iMeshWrapper* exp = Sys->view->GetEngine ()->CreateMeshWrapper (mesh, NULL,
   	sector);
   type->DecRef ();
   factory->DecRef ();
@@ -194,7 +194,7 @@ void add_particles_fire (iSector* sector, char* matname, int num,
       	"MeshObj", iMeshObjectType);
   iMeshObjectFactory* factory = type->NewFactory ();
   iMeshObject* mesh = factory->NewInstance ();
-  iMeshWrapper* exp = Sys->view->GetEngine ()->CreateMeshObject (mesh, NULL,
+  iMeshWrapper* exp = Sys->view->GetEngine ()->CreateMeshWrapper (mesh, NULL,
   	sector);
   type->DecRef ();
   factory->DecRef ();
@@ -241,7 +241,7 @@ void add_particles_fountain (iSector* sector, char* matname, int num,
       	"MeshObj", iMeshObjectType);
   iMeshObjectFactory* factory = type->NewFactory ();
   iMeshObject* mesh = factory->NewInstance ();
-  iMeshWrapper* exp = Sys->view->GetEngine ()->CreateMeshObject (mesh, NULL,
+  iMeshWrapper* exp = Sys->view->GetEngine ()->CreateMeshWrapper (mesh, NULL,
   	sector, origin);
   type->DecRef ();
   factory->DecRef ();
@@ -289,7 +289,7 @@ void add_particles_explosion (iSector* sector, const csVector3& center, char* ma
       	"MeshObj", iMeshObjectType);
   iMeshObjectFactory* factory = type->NewFactory ();
   iMeshObject* mesh = factory->NewInstance ();
-  iMeshWrapper* exp = Sys->view->GetEngine ()->CreateMeshObject (mesh, NULL,
+  iMeshWrapper* exp = Sys->view->GetEngine ()->CreateMeshWrapper (mesh, NULL,
   	sector, center);
   type->DecRef ();
   factory->DecRef ();
@@ -341,7 +341,7 @@ void add_particles_spiral (iSector* sector, const csVector3& bottom, char* matna
       	"MeshObj", iMeshObjectType);
   iMeshObjectFactory* factory = type->NewFactory ();
   iMeshObject* mesh = factory->NewInstance ();
-  iMeshWrapper* exp = Sys->view->GetEngine ()->CreateMeshObject
+  iMeshWrapper* exp = Sys->view->GetEngine ()->CreateMeshWrapper
     (mesh, NULL, sector, bottom);
   type->DecRef ();
   factory->DecRef ();
@@ -1166,7 +1166,7 @@ void fire_missile ()
     Sys->Printf (CS_MSG_CONSOLE, "Could not find '%s' sprite factory!\n", misname);
   else
   {
-    iMeshWrapper* sp = Sys->view->GetEngine ()->CreateMeshObject (tmpl, "missile");
+    iMeshWrapper* sp = Sys->view->GetEngine ()->CreateMeshWrapper (tmpl, "missile");
 
     sp->GetMovable ()->SetSector (Sys->view->GetCamera ()->GetSector ());
     ms->sprite = sp->GetPrivateObject ();
@@ -1198,9 +1198,9 @@ void AttachRandomLight (csDynLight* light)
 void light_statics ()
 {
   iEngine* e = Sys->view->GetEngine ();
-  for (int i = 0 ; i < e->GetMeshObjectCount () ; i++)
+  for (int i = 0 ; i < e->GetMeshWrapperCount () ; i++)
   {
-    iMeshWrapper* sp = e->GetMeshObject (i);
+    iMeshWrapper* sp = e->GetMeshWrapper (i);
     iSprite3DState* state = SCF_QUERY_INTERFACE (sp->GetMeshObject (), iSprite3DState);
     if (state != NULL)
     {
@@ -1223,7 +1223,7 @@ static iMeshWrapper* CreateMeshWrapper (const char* name)
   iMeshObject* mesh_obj = SCF_QUERY_INTERFACE (thing_fact, iMeshObject);
   thing_fact->DecRef ();
 
-  iMeshWrapper* mesh_wrap = Sys->Engine->CreateMeshObject (mesh_obj, name);
+  iMeshWrapper* mesh_wrap = Sys->Engine->CreateMeshWrapper (mesh_obj, name);
   mesh_obj->DecRef ();
   return mesh_wrap;
 }

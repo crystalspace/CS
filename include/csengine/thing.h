@@ -166,7 +166,7 @@ private:
   csVector portal_polygons;
 
   /// A vector with all edges in this thing.
-  DECLARE_GROWING_ARRAY (thing_edges, csThingEdge);
+  CS_DECLARE_GROWING_ARRAY (thing_edges, csThingEdge);
   /// If false then thing_edges is not valid and needs to be recalculated.
   bool thing_edges_valid;
 

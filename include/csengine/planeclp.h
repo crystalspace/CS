@@ -29,8 +29,8 @@
 class csPlaneClip : public csPlane3
 {
 protected:
-  DECLARE_GROWING_ARRAY(verts, csVector3);
-  DECLARE_GROWING_ARRAY(vis, bool);
+  CS_DECLARE_GROWING_ARRAY(verts, csVector3);
+  CS_DECLARE_GROWING_ARRAY(vis, bool);
   void init (int len) { verts.SetLimit (len); vis.SetLimit (len); }
 
 public:

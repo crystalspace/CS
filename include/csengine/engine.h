@@ -1017,7 +1017,7 @@ public:
     { return &sectors.scfiSectorList; }
 
   /// Find a mesh by name
-  virtual iMeshWrapper *FindMeshObject (const char *iName,
+  virtual iMeshWrapper *FindMeshWrapper (const char *iName,
   	bool regionOnly = false) const;
   /// Find a mesh factory by name
   virtual iMeshFactoryWrapper *FindMeshFactory (const char *iName,
@@ -1071,29 +1071,29 @@ public:
 	iDataBuffer* input);
 
   /// Create a mesh wrapper from a mesh factory wrapper
-  virtual iMeshWrapper* CreateMeshObject (iMeshFactoryWrapper* factory,
+  virtual iMeshWrapper* CreateMeshWrapper (iMeshFactoryWrapper* factory,
   	const char* name, iSector* sector = NULL,
 	const csVector3& pos = csVector3(0, 0, 0));
   /// Create a mesh wrapper for an existing mesh object
-  virtual iMeshWrapper* CreateMeshObject (iMeshObject*,
+  virtual iMeshWrapper* CreateMeshWrapper (iMeshObject*,
   	const char* name, iSector* sector = NULL,
 	const csVector3& pos = csVector3(0, 0, 0));
   /// Create an uninitialized mesh wrapper
-  virtual iMeshWrapper* CreateMeshObject (const char* name);
+  virtual iMeshWrapper* CreateMeshWrapper (const char* name);
   /// Load mesh object.
-  virtual iMeshWrapper* LoadMeshObject (
+  virtual iMeshWrapper* LoadMeshWrapper (
   	const char* classId, const char* name,
 	const char* loaderClassId,
 	iDataBuffer* input, iSector* sector, const csVector3& pos);
 
-  /// return the number of mesh objects
-  virtual int GetMeshObjectCount () const;
-  /// return a mesh object by index
-  virtual iMeshWrapper *GetMeshObject (int n) const;
+  /// Return the number of mesh wrappers.
+  virtual int GetMeshWrapperCount () const;
+  /// Return a mesh wrapper by index.
+  virtual iMeshWrapper *GetMeshWrapper (int n) const;
 
-  /// return the number of mesh factories
+  /// Return the number of mesh factories.
   virtual int GetMeshFactoryCount () const;
-  /// return a mesh factory by index
+  /// Return a mesh factory by index.
   virtual iMeshFactoryWrapper *GetMeshFactory (int n) const;
 
   virtual iPolyTxtPlane* CreatePolyTxtPlane (const char* name = NULL);
