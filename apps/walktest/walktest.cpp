@@ -482,7 +482,10 @@ int main (int argc, char* argv[])
   CHK (config = new csIniFile ("cryst.cfg"));
 
   // create the converter class for testing
-
+  //@@@ I added this conditional because this only works in VC right now
+  // I hope to fix it in the UNIX makefile system shortly and remove this
+  // -Michael
+#ifdef OS_WIN32
   CHK(ImportExport = new converter());
 
   // process import/export files from config and print log for testing
@@ -492,7 +495,7 @@ int main (int argc, char* argv[])
   // free memory - delete this if you want to use the data in the buffer
 
   delete ImportExport;
-
+#endif /* OS_WIN32 */
   // end converter test
 
   Sys->do_fps = config->GetYesNo ("WalkTest", "FPS", true);
