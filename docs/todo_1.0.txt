@@ -127,7 +127,7 @@ Bugs to fix:
 	     (note by Jorrit: cannot reproduce).
 	[**] levtool fails to convert castle.zip (after it has been converted
 		with cs2xml)  Matze: Please clarify this item.
-	[S]  unittest crashes and/or hangs:
+	[**] unittest crashes and/or hangs:
 		./unittest -video=software
 		...
 		plugins/culling/dynavis/tcovbuf.cpp:707:

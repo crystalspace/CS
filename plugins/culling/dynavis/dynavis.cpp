@@ -243,6 +243,12 @@ bool csDynaVis::Initialize (iObjectRegistry *object_reg)
   }
   else
   {
+    scr_width = -1;
+    scr_height = -1;
+  }
+
+  if (scr_width == -1 || scr_height == -1) 
+  {
     // If there is no g3d we currently assume we are testing.
     scr_width = 640;
     scr_height = 480;
