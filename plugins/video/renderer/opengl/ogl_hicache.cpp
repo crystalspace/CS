@@ -129,6 +129,7 @@ void HighColorCache::Add (iTextureHandle *txt_handle)
     cached_texture->lSize = size;
 
     txt_handle->SetInCache (true);
+    txt_handle->IncRef();
     txt_handle->SetHighColorCacheData (cached_texture);
     Load (cached_texture);              // load it.
   }
@@ -241,6 +242,7 @@ void HighColorCache::Add (iPolygonTexture *polytex)
     cached_texture->lSize = size;
 
     piLM->SetInCache (true);
+    piLM->IncRef();
     piLM->SetHighColorCache (cached_texture);
     Load (cached_texture);              // load it.
   }

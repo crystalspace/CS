@@ -112,8 +112,9 @@ csGraphics3DOpenGL::~csGraphics3DOpenGL ()
   if (G2D)
     G2D->DecRef ();
 
-  if (System)
-    System->DecRef ();
+  //see csGraphics3DSoftware::~csGraphics3DSoftware() for more details.
+  //if (System)
+  //  System->DecRef ();
 }
 
 bool csGraphics3DOpenGL::Initialize (iSystem *iSys)

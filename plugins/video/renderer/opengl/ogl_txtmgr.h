@@ -73,7 +73,15 @@ struct PalIdxLookup
 #define G24(rgb) (((rgb)>>8)&0xff)
 #define B24(rgb) ((rgb)&0xff)
 
-typedef csHardwareAcceleratedTextureMM csTextureMMOpenGL;
+class csTextureMMOpenGL : public csHardwareAcceleratedTextureMM
+{
+public:
+  csTextureMMOpenGL(iImageFile* image) 
+   : csHardwareAcceleratedTextureMM (image) {}
+  ///
+  virtual void remap_texture(csTextureManager *new_palette) 
+    { remap_palette_24bit(new_palette); }
+};
 
 /**
  * OpenGL version of the texture manager. This
