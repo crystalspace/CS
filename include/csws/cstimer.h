@@ -27,7 +27,7 @@
  */
 
 /**
- * \addtogroup csws
+ * \addtogroup csws_comps_timer
  * @{ */
  
 /// csTimer class messages

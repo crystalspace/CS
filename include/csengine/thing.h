@@ -1114,7 +1114,7 @@ public:
   friend struct ThingState;
 
   //------------------------- iLightingInfo interface -------------------------
-  /// \internal iLightingInfo implementation.
+  /// iLightingInfo implementation.
   struct LightingInfo : public iLightingInfo
   {
     SCF_DECLARE_EMBEDDED_IBASE (csThing);
@@ -1340,7 +1340,7 @@ public:
   void ClearPolyTxtPlanes ();
   void ClearCurveTemplates ();
 
-  /// \internal iThingEnvironment implementation.
+  /// iThingEnvironment implementation.
   struct eiThingEnvironment : public iThingEnvironment
   {
     SCF_DECLARE_EMBEDDED_IBASE(csThingObjectType);
@@ -1378,7 +1378,7 @@ public:
     }
   } scfiThingEnvironment;
 
-  /// \internal iComponent implementation.
+  /// iComponent implementation.
   struct eiComponent : public iComponent
   {
     SCF_DECLARE_EMBEDDED_IBASE(csThingObjectType);

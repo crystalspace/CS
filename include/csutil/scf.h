@@ -21,6 +21,7 @@
 #define __CSSCF_H__
 
 /**\file
+ * Crystal Space Shared Class Facility (SCF)
  */
 
 /*

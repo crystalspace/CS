@@ -52,7 +52,7 @@ public:
 
   SCF_DECLARE_IBASE_EXT (csObject);
   //----------------------- iMapNode --------------------------
-  /// \internal iMapNode implementation.
+  /// iMapNode implementation.
   struct MapNode : public iMapNode
   {
     SCF_DECLARE_EMBEDDED_IBASE (csMapNode);

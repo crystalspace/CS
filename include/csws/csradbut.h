@@ -25,7 +25,7 @@
  */
 
 /**
- * \addtogroup csws
+ * \addtogroup csws_comps_radbut
  * @{ */
  
 #include "cscomp.h"

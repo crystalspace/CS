@@ -25,7 +25,7 @@
  */
 
 /**
- * \addtogroup csws
+ * \addtogroup csws_skins
  * @{ */
  
 class csApp;
@@ -130,8 +130,9 @@ extern int csRegisterPalette (int *Palette, int Size);
 extern void csSetColorScheme (csApp *iApp, csColorScheme &Scheme);
 
 /**
+ * \name Palette indices
  * These are indices into cswsPalette for each component type
- */
+ * @{ */
 /// Application palette index
 #define CSPAL_APP			0
 /// Button palette index
@@ -170,16 +171,18 @@ extern void csSetColorScheme (csApp *iApp, csColorScheme &Scheme);
 #define CSPAL_TREEBOX		        17
 /// Hine component palette index
 #define CSPAL_HINT			18
+/** @} */
 
 /**
- * csApp class color palette indices.<p>
- */
+ * \name csApp class color palette indices
+ * @{ */
 /// Workspace color index
 #define CSPAL_APP_WORKSPACE	0
+/** @} */
 
 /**
- * csButton class color palette indices.<p>
- */
+ * \name csButton class color palette indices
+ * @{ */
 /// button background
 #define CSPAL_BUTTON_BACKGROUND		0
 /// default button frame
@@ -192,10 +195,11 @@ extern void csSetColorScheme (csApp *iApp, csColorScheme &Scheme);
 #define CSPAL_BUTTON_TEXT		4
 /// button disabled text
 #define CSPAL_BUTTON_DTEXT		5
+/** @} */
 
 /**
- * csDialog class color palette indices.<p>
- */
+ * \name csDialog class color palette indices
+ * @{ */
 /// Background color index
 #define CSPAL_DIALOG_BACKGROUND		0
 /// 3D border dark
@@ -206,10 +210,11 @@ extern void csSetColorScheme (csApp *iApp, csColorScheme &Scheme);
 #define CSPAL_DIALOG_2DARK3D		3
 /// 2nd level 3D border light
 #define CSPAL_DIALOG_2LIGHT3D		4
+/** @} */
 
 /**
- * csInputLine class color palette indices.<p>
- */
+ * \name csInputLine class color palette indices
+ * @{ */
 /// input line background
 #define CSPAL_INPUTLINE_BACKGROUND	0
 /// Background color for csifsThickRect
@@ -228,10 +233,11 @@ extern void csSetColorScheme (csApp *iApp, csColorScheme &Scheme);
 #define CSPAL_INPUTLINE_SELBACKGROUND	7
 /// input line selected text
 #define CSPAL_INPUTLINE_SELTEXT		8
+/** @} */
 
 /**
- * csListBox class color palette indices.<p>
- */
+ * \name csListBox class color palette indices
+ * @{ */
 /// list box background
 #define CSPAL_LISTBOX_BACKGROUND	0
 /// background color for cslfsThickRect
@@ -244,10 +250,11 @@ extern void csSetColorScheme (csApp *iApp, csColorScheme &Scheme);
 #define CSPAL_LISTBOX_2DARK3D		4
 /// 2nd level 3D border light
 #define CSPAL_LISTBOX_2LIGHT3D		5
+/** @} */
 
 /**
- * csTreeBox class color palette indices.<p>
- */
+ * \name csTreeBox class color palette indices
+ * @{ */
 /// tree control background
 #define CSPAL_TREEBOX_BACKGROUND	0
 /// background color for cstfsThickRect
@@ -260,10 +267,11 @@ extern void csSetColorScheme (csApp *iApp, csColorScheme &Scheme);
 #define CSPAL_TREEBOX_2DARK3D		4
 /// 2nd level 3D border light
 #define CSPAL_TREEBOX_2LIGHT3D		5
+/** @} */
 
 /**
- * csMenuItem class color palette indices.<p>
- */
+ * \name csMenuItem class color palette indices
+ * @{ */
 /// Unselected menu item background
 #define CSPAL_MENUITEM_BACKGROUND	0
 /// Selected menu item background
@@ -278,10 +286,11 @@ extern void csSetColorScheme (csApp *iApp, csColorScheme &Scheme);
 #define CSPAL_MENUITEM_DARK3D		5
 /// Separator 3D light
 #define CSPAL_MENUITEM_LIGHT3D		6
+/** @} */
 
 /**
- * csMenu class color palette indices.<p>
- */
+ * \name csMenu class color palette indices
+ * @{ */
 /// Menu background
 #define CSPAL_MENU_BACKGROUND		0
 /// 3D border dark
@@ -292,10 +301,11 @@ extern void csSetColorScheme (csApp *iApp, csColorScheme &Scheme);
 #define CSPAL_MENU_2DARK3D		3
 /// 3D border 2nd level light
 #define CSPAL_MENU_2LIGHT3D		4
+/** @} */
 
 /**
- * csStatic class color palette indices.<p>
- */
+ * \name csStatic class color palette indices
+ * @{ */
 /// static component background
 #define CSPAL_STATIC_BACKGROUND		0
 /// static component text / inactive
@@ -308,10 +318,11 @@ extern void csSetColorScheme (csApp *iApp, csColorScheme &Scheme);
 #define CSPAL_STATIC_DARK3D		4
 /// 3D border light
 #define CSPAL_STATIC_LIGHT3D		5
+/** @} */
 
 /**
- * csTitleBar class color palette indices.<p>
- */
+ * \name csTitleBar class color palette indices
+ * @{ */
 /// 3D border dark
 #define CSPAL_TITLEBAR_DARK3D		0
 /// 3D border light
@@ -332,9 +343,10 @@ extern void csSetColorScheme (csApp *iApp, csColorScheme &Scheme);
 #define CSPAL_TITLEBAR_ADARK3D		8
 /// active title 3D bars light
 #define CSPAL_TITLEBAR_ALIGHT3D		9
+/** @} */
 
 /**
- * csWindow class color palette indices.<p>
+ * \name csWindow class color palette indices
  */
 /// 3D border dark
 #define CSPAL_WINDOW_DARK3D		0
@@ -346,10 +358,12 @@ extern void csSetColorScheme (csApp *iApp, csColorScheme &Scheme);
 #define CSPAL_WINDOW_2LIGHT3D		3
 /// border normal
 #define CSPAL_WINDOW_BORDER		4
+/** @} */
+
 
 /**
- * csListBoxItem class color palette indices.<p>
- */
+ * \name csListBoxItem class color palette indices
+ * @{ */
 /// Unselected listbox item background
 #define CSPAL_LISTBOXITEM_BACKGROUND	0
 /// Selected listbox item background
@@ -364,10 +378,11 @@ extern void csSetColorScheme (csApp *iApp, csColorScheme &Scheme);
 #define CSPAL_LISTBOXITEM_UETEXT	5
 /// Selected emphasized text
 #define CSPAL_LISTBOXITEM_SETEXT	6
+/** @} */
 
 /**
- * csTreeItem class color palette indices.<p>
- */
+ * \name csTreeItem class color palette indices
+ * @{ */
 /// Unselected tree item background
 #define CSPAL_TREEITEM_BACKGROUND	0
 /// Selected tree item background
@@ -384,10 +399,11 @@ extern void csSetColorScheme (csApp *iApp, csColorScheme &Scheme);
 #define CSPAL_TREEITEM_SETEXT		6
 /// The lines connecting children
 #define CSPAL_TREEITEM_LINES		7
+/** @} */
 
 /**
- * csScrollBar class color palette indices.<p>
- */
+ * \name csScrollBar class color palette indices
+ * @{ */
 /// Scroll bar background
 #define CSPAL_SCROLLBAR_BACKGROUND	0
 /// Scroll bar selected background
@@ -396,10 +412,11 @@ extern void csSetColorScheme (csApp *iApp, csColorScheme &Scheme);
 #define CSPAL_SCROLLBAR_DARK3D		2
 /// 3D border light
 #define CSPAL_SCROLLBAR_LIGHT3D		3
+/** @} */
 
 /**
- * csNotebook class color palete indices.<p>
- */
+ * \name csNotebook class color palete indices
+ * @{ */
 /// Notebook background
 #define CSPAL_NOTEBOOK_BACKGROUND	0
 /// Unselected tab background
@@ -432,24 +449,37 @@ extern void csSetColorScheme (csApp *iApp, csColorScheme &Scheme);
 #define CSPAL_NOTEBOOK_2DARK3D		14
 /// 3D border middle light
 #define CSPAL_NOTEBOOK_2LIGHT3D		15
+/** @} */
 
 /**
- * csGridCell class color palete indices.<p>
- */
+ * \name csGridCell class color palete indices
+ * @{ */
+/// background
 #define CSPAL_GRIDCELL_BACKGROUND	0
+/// border foreground
 #define CSPAL_GRIDCELL_BORDER_FG	1
+/// border background
 #define CSPAL_GRIDCELL_BORDER_BG	2
+/// selected background
 #define CSPAL_GRIDCELL_SEL_BACKGROUND	3
+/// selected border foreground
 #define CSPAL_GRIDCELL_SEL_BORDER_FG	4
+/// selected border background
 #define CSPAL_GRIDCELL_SEL_BORDER_BG	5
+/// data foreground
 #define CSPAL_GRIDCELL_DATA_FG	        6
+/// data background
 #define CSPAL_GRIDCELL_DATA_BG	        7
+/// selected data foreground
 #define CSPAL_GRIDCELL_SEL_DATA_FG	8
+/// selcted data background
 #define CSPAL_GRIDCELL_SEL_DATA_BG	9
+/** @} */
 
 /**
- * csGridView class color palete indices.<p>
- */
+ * \name csGridView class color palete indices
+ * @{ */
+/// background
 #define CSPAL_GRIDVIEW_BACKGROUND	0
 /// 3D border dark
 #define CSPAL_GRIDVIEW_DARK3D		1
@@ -459,10 +489,11 @@ extern void csSetColorScheme (csApp *iApp, csColorScheme &Scheme);
 #define CSPAL_GRIDVIEW_SEL_DARK3D	3
 /// 3D border light selected
 #define CSPAL_GRIDVIEW_SEL_LIGHT3D	4
+/** @} */
 
 /**
- * csSplitter class color palete indices.<p>
- */
+ * \name csSplitter class color palete indices
+ * @{ */
 /// Splitter inactive background
 #define CSPAL_SPLITTER_IBACKGROUND	0
 /// Splitter inactive light 3D color
@@ -475,16 +506,18 @@ extern void csSetColorScheme (csApp *iApp, csColorScheme &Scheme);
 #define CSPAL_SPLITTER_ALIGHT3D		4
 /// Splitter active dark 3D color
 #define CSPAL_SPLITTER_ADARK3D		5
+/** @} */
 
 /**
- * csTip class color palete indices.<p>
- */
+ * \name csTip class color palete indices
+ * @{ */
 /// Background tip color
 #define CSPAL_HINT_BACKGROUND		0
 /// Tip text color
 #define CSPAL_HINT_TEXT			1
 /// Tip border
 #define CSPAL_HINT_BORDER        	2
+/** @} */
 
 /** @} */
 

@@ -25,19 +25,19 @@
  */
 
 /**
- * \addtogroup csws
+ * \addtogroup csws_stddlg
  * @{ */
  
 #include "csutil/scf.h"
 #define CSWS_INTERNAL
 #include "csws.h"
 
-/**\page MessageBoxStyle Message box style flags (used in csMessageBox (...) as last parameter)
+/**
+ * \name Message box style flags (used in csMessageBox (...) as last parameter)
  * These style flags can be combined using logical OR (|) operation;
  * some styles are mutually exclusive (for example, a message box cannot
  * be CSMBS_INFORMATION and CSMBS_WARNING at same time)
- * \sa CSMBS_NOTYPE
- */
+ * @{ */
 /// Message box style: Message has no type
 #define CSMBS_NOTYPE		0x00000000
 /// Message box style: Informational message
@@ -80,6 +80,7 @@
 #define CSMBS_USEHEIGHT		0x40000000
 /// Message box style: Center all text lines
 #define CSMBS_CENTER		0x20000000
+/** @} */
 
 SCF_VERSION (iMessageBoxData, 0, 0, 1);
 

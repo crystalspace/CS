@@ -26,7 +26,7 @@
  */
  
 /**
- * \addtogroup csws
+ * \addtogroup csws_comps_app
  * @{ */
 
 #include <stdarg.h>
@@ -106,7 +106,7 @@ protected:
   /// Are we inbetween StartFrame() and FinishFrame()?
   bool InFrame;
 
-  /// \internal The iComponent interface
+  /// The iComponent interface
   class csAppPlugin : public iComponent
   {
   public:
@@ -122,7 +122,7 @@ protected:
     /// Handle a event and return true if processed
     virtual bool HandleEvent (iEvent &Event);
 
-    /// \internal iEventHandler implementation.
+    /// iEventHandler implementation.
     struct eiEventHandler : public iEventHandler
     {
       SCF_DECLARE_EMBEDDED_IBASE(csAppPlugin);

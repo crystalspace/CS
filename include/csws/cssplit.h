@@ -23,7 +23,7 @@
  */
 
 /**
- * \addtogroup csws
+ * \addtogroup csws_comps_splitter
  * @{ */
  
 #include "csws/csbutton.h"

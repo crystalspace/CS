@@ -21,7 +21,7 @@
 #define __FLOWLAYOUT_G__
 
 /**
- * \addtogroup csws
+ * \addtogroup csws_layout
  * @{ */
 
 #include "cslayout.h"

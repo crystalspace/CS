@@ -124,7 +124,7 @@ public:
 
   SCF_DECLARE_IBASE;
 
-  /// \internal iMaterialEngine implementation
+  /// iMaterialEngine implementation
   struct MaterialEngine : public iMaterialEngine
   {
     SCF_DECLARE_EMBEDDED_IBASE (csMaterial);

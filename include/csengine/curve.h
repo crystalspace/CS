@@ -302,7 +302,7 @@ public:
   SCF_DECLARE_IBASE_EXT (csObject);
 
   //----------------------- iCurve interface implementation -----------------
-  /// \internal iCurve implementation.
+  /// iCurve implementation.
   struct Curve : public iCurve
   {
     SCF_DECLARE_EMBEDDED_IBASE (csCurve);
@@ -363,7 +363,7 @@ public:
   SCF_DECLARE_IBASE_EXT (csObject);
 
   //------------------ iCurveTemplate interface implementation --------------
-  /// \internal iCurveTemplate implementation
+  /// iCurveTemplate implementation
   struct CurveTemplate : public iCurveTemplate
   {
     SCF_DECLARE_EMBEDDED_IBASE (csCurveTemplate);

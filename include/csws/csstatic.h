@@ -25,7 +25,7 @@
  */
 
 /**
- * \addtogroup csws
+ * \addtogroup csws_comps_static
  * @{ */
  
 #include "cscomp.h"
@@ -47,6 +47,9 @@ enum csStaticStyle
   csscsText
 };
 
+/**
+ * \name Text alignment flags
+ * @{ */
 /// Horizontal text alignment mask
 #define CSSTA_HALIGNMASK	0x00000003
 /// Align text horizontally to the left (default)
@@ -69,6 +72,7 @@ enum csStaticStyle
 #define CSSTA_WORDWRAP		0x00000010
 /// Wrap text on character boundaries
 #define CSSTA_CHARWRAP		0x00000020
+/** @} */
 
 /// Static control class messages
 enum

@@ -25,7 +25,7 @@
  */
 
 /**
- * \addtogroup csws
+ * \addtogroup csws_skins
  * @{ */
  
 #include "csutil/csvector.h"
@@ -324,7 +324,6 @@ public:
  * Start the declaration of a skin.
  * <p>`name' is the name of the skin (e.g. "Default")
  * <p>`base' is the base class of the skin (e.g. "csSkin")
- * <p>`prefix' is the prefix for section names in CSWS' configuration file
  */
 #define CSWS_SKIN_DECLARE(name,base)	\
   class name : public base	\

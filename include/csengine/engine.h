@@ -151,7 +151,7 @@ public:
   /// Create a new collection.
   virtual iCollection* NewCollection (const char* name);
 
-  /// \internal iCollectionList implementation
+  /// iCollectionList implementation
   class CollectionList : public iCollectionList
   {
   public:
@@ -184,7 +184,7 @@ public:
   /// New camera position.
   virtual iCameraPosition* NewCameraPosition (const char* name);
 
-  /// \internal iCameraPositionList implementation
+  /// iCameraPositionList implementation
   class CameraPositionList : public iCameraPositionList
   {
     SCF_DECLARE_EMBEDDED_IBASE (csCameraPositionList);
@@ -992,7 +992,7 @@ public:
   /// We need to handle some events
   virtual bool HandleEvent (iEvent &Event);
 
-  /// \internal iComponent implementation.
+  /// iComponent implementation.
   struct eiComponent : public iComponent
   {
     SCF_DECLARE_EMBEDDED_IBASE(csEngine);
@@ -1000,7 +1000,7 @@ public:
     { return scfParent->Initialize(p); }
   } scfiComponent;
 
-  /// \internal iEventHandler implementation.
+  /// iEventHandler implementation.
   struct EventHandler : public iEventHandler
   {
   private:

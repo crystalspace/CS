@@ -25,7 +25,7 @@
  */
 
 /**
- * \addtogroup csws
+ * \addtogroup csws_comps_iline
  * @{ */
  
 #include "cscomp.h"

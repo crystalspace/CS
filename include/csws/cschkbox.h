@@ -25,13 +25,15 @@
  */
 
 /**
- * \addtogroup csws
+ * \addtogroup csws_comps_chkbx
  * @{ */
  
 #include "cscomp.h"
 #include "csbutton.h"
 
-/// The following styles are used with check boxes
+/**
+ * \name Check box style flags
+ * @{ */
 /// Checkbox type mask
 #define CSBS_CBTYPEMASK		0x00010000
 /// The checkbox is a 2-state checkbox (on/off)
@@ -40,12 +42,12 @@
 #define CSBS_CB3STATE		0x00010000
 /// The checkbox automatically switches between states (on->off{->indefinite})
 #define CSBS_CBAUTO		0x00020000
-
 /// Default checkbox button style
-#define CSBS_DEFAULTCHECKBOX    (CSBS_SELECTABLE | \
-				 CSBS_CB2STATE | CSBS_CBAUTO)
+#define CSBS_DEFAULTCHECKBOX    \
+	(CSBS_SELECTABLE | CSBS_CB2STATE | CSBS_CBAUTO)
+/** @} */
 
-/// Check box commands/notifications
+/// Check box messages
 enum
 {
   /**

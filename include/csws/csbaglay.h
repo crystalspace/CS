@@ -24,7 +24,7 @@
  */
 
 /**
- * \addtogroup csws
+ * \addtogroup csws_layout
  * @{ */
  
 #include "cslayout.h"
@@ -44,15 +44,15 @@ public:
   csLayoutConstraint *Clone ();
 public:
   /**
-   * gridx set column for next cell to aad:
-   * RELATIVE ... right behind last added
+   * gridx set column for next cell to add:
+   * RELATIVE ... right behind last added<br>
    * > 0 ... absolute column
    */
   int gridx;
   /**
    * gridx set row for next cell to aad:
    * RELATIVE ... same as last added or the next row if last
-   *              gridwidth == REMAINDER
+   *              gridwidth == REMAINDER<br>
    * > 0 ... absolute row
    */
   int gridy;
@@ -83,16 +83,16 @@ public:
   /**
    * If you choose to not size the component to fit in a cell you can set the
    * position of the component in a cell. Use the following values:
-   * CENTER ... center component in the middle of cell
-   * WEST   ... align component left horizontally and center vertically
-   * NORTH  ... center component horizontally and align on top of cell
-   * EAST   ... align component right horizontally and center vertically
+   * CENTER ... center component in the middle of cell<br>
+   * WEST   ... align component left horizontally and center vertically<br>
+   * NORTH  ... center component horizontally and align on top of cell<br>
+   * EAST   ... align component right horizontally and center vertically<br>
    * SOUTH  ... center component horizontally and align on bottom of cell
-   * to put it in the corner of the cell use the following
-   * NORTHWEST ... upper left corner
-   * NORTHEAST ... upper right corner
-   * SOUTHEAST ... lower right corner
-   * SOUTHWEST ... lower left corner
+   * to put it in the corner of the cell use the following<br>
+   * NORTHWEST ... upper left corner<br>
+   * NORTHEAST ... upper right corner<br>
+   * SOUTHEAST ... lower right corner<br>
+   * SOUTHWEST ... lower left corner<br>
    */
   int anchor;
   /**
@@ -185,7 +185,7 @@ public:
  * process set gridx/gridy to RELATIVE.
  *
  * <p>
- * <code>
+ * <pre>
  *  csComponent *window = new csWindow (this, "Gridbag Layout test",
  *    CSWS_DEFAULTVALUE & ~CSWS_MENUBAR);
  *  window->SetSize (400, 300);
@@ -273,7 +273,7 @@ public:
  *   b->SetText (text);
  * }
  *
- * </code>
+ * </pre>
  * </p>
  */
  

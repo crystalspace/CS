@@ -25,7 +25,7 @@
  */
 
 /**
- * \addtogroup csws
+ * \addtogroup csws_comps_spinbox
  * @{ */
  
 #include "cscomp.h"
@@ -42,11 +42,14 @@ struct csSpinBoxItem
   int Position;
 };
 
-/// Spin box item placement values
+/**
+ * \name Spin box item placement values
+ * @{ */
 /// Insert item before all other items
 #define CSSB_ITEM_BEFOREALL	0
 /// Insert item after all other items
 #define CSSB_ITEM_AFTERALL	999999
+/** @} */
 
 /// Spin box upper/lower limits.
 struct csSpinBoxLimits

@@ -25,7 +25,7 @@
  */
 
 /**
- * \addtogroup csws
+ * \addtogroup csws_comps_grid
  * @{ */
  
 #include "csws/csscrbar.h"
@@ -33,7 +33,7 @@
 #include "csutil/csstring.h"
 
 /**
- * HereIsHowItGoesYa:
+ * \page HereIsHowItGoesYa:
  *  We see the whole grid as a set of cells. Since it makes no sense to
  *  actually create an instance for every cell, we simply create an object
  *  that holds all properties for a rectangular region of cells that are all
@@ -253,15 +253,15 @@ protected:
 
 
 /**
- * GridView styles
- */
-
+ * \name GridView styles
+ * @{ */
 /// View has a horizontal scrollbar
 #define CSGVS_HSCROLL  0x00000001
 /// View has a vertical scrollbar
 #define CSGVS_VSCROLL  0x00000002
 /// default value
 #define CSGVS_DEFAULTVALUE (CSGVS_HSCROLL | CSGVS_VSCROLL)
+/** @} */
 
 /**
  * The GridView displays a continuous rectangular region of the grid.
@@ -347,11 +347,11 @@ protected:
 };
 
 /**
- * Grid style flags.
+ * \name Grid style flags
  * The csGrid object accepts both CSGS_XXX and CSGVS_XXX styles;
  * the CSGVS_XXX styles are passed to newly-created grid view
  * components.
- */
+ * @{ */
 
 /// Show a horizontal splitter handle
 #define CSGS_HSPLIT		0x00000004
@@ -360,12 +360,17 @@ protected:
 /// Default grid style
 #define CSGS_DEFAULTVALUE	(CSGS_HSPLIT | CSGS_VSPLIT)
 
-/// what kind of cursor
+/// no cursor
 #define CSGCS_NONE   1
+/// cell cursor
 #define CSGCS_CELL   2
+/// row cursor
 #define CSGCS_ROW    3
+/// column cursor
 #define CSGCS_COLUMN 4
+/** @} */
 
+/// Grid messages
 enum
 {
   /**

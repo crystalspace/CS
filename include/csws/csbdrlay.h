@@ -23,7 +23,7 @@
 #include "cslayout.h"
 
 /**
- * \addtogroup csws
+ * \addtogroup csws_layout
  * @{ */
  
 /**

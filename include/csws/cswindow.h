@@ -25,7 +25,7 @@
  */
 
 /**
- * \addtogroup csws
+ * \addtogroup csws_comps_window
  * @{ */
  
 #include "cscomp.h"
@@ -50,7 +50,10 @@
 /// Tool bar ID
 #define CSWID_TOOLBAR		0xC508
 
-/// Window style flags: does window have a system menu?
+/**
+ * \name Window style flags
+ * @{ */
+/// does window have a system menu?
 #define CSWS_BUTSYSMENU		0x00000001
 /// Does window have a close button?
 #define CSWS_BUTCLOSE		0x00000002
@@ -77,9 +80,11 @@
 /// Toolbar is automatically placed at right of window
 #define CSWS_TBPOS_RIGHT	0x00000300
 /// Default window style
-#define CSWS_DEFAULTVALUE	(CSWS_BUTSYSMENU | CSWS_BUTCLOSE | \
-				 CSWS_BUTHIDE | CSWS_BUTMAXIMIZE | \
-				 CSWS_TITLEBAR | CSWS_MENUBAR)
+#define CSWS_DEFAULTVALUE	\
+	(CSWS_BUTSYSMENU | CSWS_BUTCLOSE | \
+	 CSWS_BUTHIDE | CSWS_BUTMAXIMIZE | \
+	 CSWS_TITLEBAR | CSWS_MENUBAR)
+/** @} */
 
 /// Possible window frame styles
 enum csWindowFrameStyle

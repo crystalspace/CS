@@ -21,7 +21,7 @@
 #define __CSTTLBAR_H__
 
 /**
- * \addtogroup csws
+ * \addtogroup csws_comps_title
  * @{ */
  
 #include "cscomp.h"

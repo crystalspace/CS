@@ -21,7 +21,7 @@
 #define __SDEFAULT_H__
 
 /**
- * \addtogroup csws
+ * \addtogroup csws_skins
  * @{ */
  
 #include "csskin.h"

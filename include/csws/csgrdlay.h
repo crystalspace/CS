@@ -9,7 +9,7 @@
 #define __GRIDLAYOUT_G__
 
 /**
- * \addtogroup csws
+ * \addtogroup csws_layout
  * @{ */
  
 #include "cslayout.h"

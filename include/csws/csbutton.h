@@ -26,12 +26,15 @@
  */
 
 /**
- * \addtogroup csws
+ * \addtogroup csws_comps_button
  * @{ */
  
 #include "cscomp.h"
 
-/// Button style flags: does bitmap and/or text shift when button is pressed?
+/**
+ * \name Button style flags
+ * @{ */
+/// does bitmap and/or text shift when button is pressed?
 #define CSBS_SHIFT		0x00000001
 /// Is this the default button?
 #define CSBS_DEFAULT		0x00000002
@@ -62,10 +65,12 @@
 #define CSBS_TEXTONTOP		0x00020000
 
 /// Default button styles
-#define CSBS_DEFAULTVALUE	(CSBS_SHIFT | CSBS_SELECTABLE | \
-				 CSBS_TEXTBELOW)
+#define CSBS_DEFAULTVALUE	\
+	(CSBS_SHIFT | CSBS_SELECTABLE | CSBS_TEXTBELOW)
+/** @} */
+				 
 
-/// Button notifications
+/// Button messages
 enum
 {
   /**

@@ -25,12 +25,12 @@
  */
 
 /**
- * \addtogroup csws
+ * \addtogroup csws_comps_cwheel
  * @{ */
  
 #include "csstatic.h"
 
-/// Color wheel notifications
+/// Color wheel messages
 enum
 {
   /**

@@ -21,7 +21,7 @@
 #define __CSLAYOUT_H__
 
 /**
- * \addtogroup csws
+ * \addtogroup csws_layout
  * @{ */
  
 #include "csws/csdialog.h"
@@ -82,10 +82,7 @@ public:
 };
 
 /**
- * csLayout is our baseclass for various derived classes like
- * csFlowLayout, csBoxLayout, csGridBagLayout and others.
- *
- * What are layouts for ?
+ * \page What are layouts for ?
  *
  * Usually one designs dialogs, forms etc. by placing components like
  * listcontrols, inputlines, treecontrols and so on at absolute locations
@@ -106,6 +103,10 @@ public:
  * deeply nested they are.
  */
 
+/**
+ * csLayout is our baseclass for various derived classes like
+ * csFlowLayout, csBoxLayout, csGridBagLayout and others.
+ */
 class csLayout : public csDialog
 {
 protected:

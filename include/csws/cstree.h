@@ -26,7 +26,7 @@
  */
 
 /**
- * \addtogroup csws
+ * \addtogroup csws_comps_treebox
  * @{ */
  
 #include "cscomp.h"
@@ -209,10 +209,14 @@ enum
   cscmdTreeClear
 };
 
+/**
+ * \name Tree item state flags
+ * @{ */
 /// Additional state flag to mark open branches
 #define CSS_TREEITEM_OPEN	0x00010000
 /// Child tree items should be re-positioned
 #define CSS_TREEITEM_PLACEITEMS	0x00020000
+/** @} */
 
 /// The magic answer that means that the component is indeed a tree item
 #define CS_TREEITEM_MAGIC	(void *)0xdeadface
@@ -322,9 +326,10 @@ public:
 };
 
 /**
- * Tree control styles. These are bit masks which can be ORed
- * together to form a final value sent to the csTreeBox constructor.
- */
+ * \name Tree control styles
+ * These are bit masks which can be ORed together to form a final value sent 
+ * to the csTreeBox constructor.
+ * @{ */
 /// Tree has a horizontal scroll bar
 #define CSTS_HSCROLL		0x00000001
 /// Tree has a vertical scroll bar
@@ -336,11 +341,16 @@ public:
 
 /// default tree control style
 #define CSTS_DEFAULTVALUE	CSTS_VSCROLL | CSTS_AUTOSCROLLBAR
+/** @} */
 
+/**
+ * \name Tree box state flags
+ * @{ */
 /// Child tree items should be re-positioned
 #define CSS_TREEBOX_PLACEITEMS	0x00010000
-/// Temporarily ignore cscmdTreeMakeVisible commands (used internally)
+/// \internal Temporarily ignore cscmdTreeMakeVisible commands (used internally)
 #define CSS_TREEBOX_LOCKVISIBLE	0x00020000
+/** @} */
 
 /// Tree control frame styles
 enum csTreeFrameStyle
@@ -370,7 +380,7 @@ enum csTreeFrameStyle
  * without child nodes.
  *<p>
  * Example code how to create a tree:
- *<code>
+ *<pre>
  * csTreeBox *tree = new csTreeBox (app);
  * tree->SetRect (0, 0, 200, 400);
  * csTreeItem *item1, *item2, *item3;
@@ -385,7 +395,7 @@ enum csTreeFrameStyle
  *   item2 = new csTreeItem (item1, "\\\\SAMBA\\RULEZ\\FOREVER\\");
  *     item3 = new csTreeItem (item2, "Home directory");
  *     item3 = new csTreeItem (item2, "Public stuff");
- *</code>
+ *</pre>
  * Keyboard navigation:
  * <dl>
  *   <dt>Up/Down</dt><dd>Select previous/next tree item</dd>

@@ -25,19 +25,19 @@
  */
 
 /**
- * \addtogroup csws
+ * \addtogroup csws_comps_notebook
  * @{ */
  
 #include "cscomp.h"
 #include "csbutton.h"
 
-/**\page NotebookStyles Notebook styles
+/**
+ * \name Notebook styles
  * There are various styles of notebooks. The position of the tabs,
  * the border style and so on can be different. The masks below
  * can be ORed together to form a compound notebook style; only
  * one value from each group can be choosed.
- * \sa CSNBS_TABPOS_MASK
- */
+ * @{ */
 
 /// Notebook style: The mask for tab position bits
 #define CSNBS_TABPOS_MASK	0x00000003
@@ -56,9 +56,9 @@
 /// Notebook style: Display a flat thin border around tabs instead of 3D look
 #define CSNBS_THINTABS		0x00000040
 /// Notebook style: default style
-#define CSNBS_DEFAULTVALUE	CSNBS_TABPOS_TOP | \
-				CSNBS_PAGEFRAME | \
-				CSNBS_PAGEINFO
+#define CSNBS_DEFAULTVALUE	\
+	CSNBS_TABPOS_TOP | CSNBS_PAGEFRAME | CSNBS_PAGEINFO
+/** @} */
 
 /**
  * Notebook messages.

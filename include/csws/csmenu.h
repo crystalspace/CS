@@ -25,20 +25,14 @@
  */
 
 /**
- * \addtogroup csws
+ * \addtogroup csws_comps_menu
  * @{ */
  
 #include "cscomp.h"
 
 /**
- * In fact, menu class is a bit messy just now, and as soon as I will have time
- * it should be cleaned up. However, it works reasonably well, so it is just
- * a matter of taste.
- */
-
-/**
- * Menu item styles
- */
+ * \name Menu item styles
+ * @{ */
 /// Menu item has a checkmark at the left
 #define CSMIS_CHECKED		0x00000001
 /// Menu item is a separator
@@ -49,6 +43,7 @@
 #define CSMIS_NOCLOSE		0x00000040
 /// Default menu item styles
 #define CSMIS_DEFAULTVALUE	0
+/** @} */
 
 // Forward declaration (for usage in csMenuItem)
 class csMenu;
@@ -205,14 +200,22 @@ enum csMenuFrameStyle
   csmfs3D
 };
 
-/// Menu style flags: hide menu when it deactivates
+/**
+ * \name Menu style flags
+ * @{ */
+/// hide menu when it deactivates
 #define CSMS_HIDEINACTIVE	0x00000001
 /// Default menu style value
 #define CSMS_DEFAULTVALUE	CSMS_HIDEINACTIVE
+/** @} */
 
 /**
  * The Menu class represents two types of menu: vertical (popup)
  * menus and bar menus.
+ *
+ * In fact, menu class is a bit messy just now, and as soon as I will have time
+ * it should be cleaned up. However, it works reasonably well, so it is just
+ * a matter of taste.
  */
 class csMenu : public csComponent
 {
@@ -298,6 +301,7 @@ private:
 };
 
 /**
+ * \page Example Example
  * Just a small example how menus can be defined and used:
  * <pre>
  * csComponent *window = new csWindow (app, "Window title");

@@ -25,7 +25,7 @@
  */
 
 /**
- * \addtogroup csws
+ * \addtogroup csws_comps
  * @{ */
 
 #include "csgeom/csrect.h"
@@ -43,7 +43,8 @@ struct iEvent;
 // this is where we store all the csRect for calculating visible areas and clipping in
 CS_DECLARE_TYPED_VECTOR (cswsRectVector, csRect);
 
-/** \page ComponentStateFlags Component state flags
+/**
+ * \name Component state flags
  * The component state is an (at least) 32-bit integer, which contains
  * up to 32 state flags. These flags marks various transitional states
  * which can change in time depending on the activity of the component
@@ -66,8 +67,7 @@ CS_DECLARE_TYPED_VECTOR (cswsRectVector, csRect);
  * components (see csListBoxItem, for example), and finally all the
  * bits matching the mask 0xff000000 are reserved for user.
  * Pretty generous, eh? ;-)
- * \sa CSS_VISIBLE
- */
+ * @{ */
 
 /// Component state flag: Component is visible
 #define CSS_VISIBLE		0x00000001
@@ -91,6 +91,7 @@ CS_DECLARE_TYPED_VECTOR (cswsRectVector, csRect);
 #define CSS_DIRTY		0x00000200
 /// Component state flag: Additional state flag used to decide when to finish CheckDirty(); ignore it
 #define CSS_RESTART_DIRTY_CHECK	0x00000400
+/**@}*/
 
 /**
  * Predefined Windowing System Command Codes<p>
@@ -242,46 +243,51 @@ enum
   cscmdStopModal
 };
 
-/** \page DragModeFlags Drag mode flags
+/**
+ * \name Drag mode flags
  * These flags are used by csComp::Drag to compute
  * new window coordinates when dragging window with mouse
- * \sa CS_DRAG_XMIN
- */
-/// Drag mode flag: Drag left window border
+ * @{ */
+/// Drag left window border
 #define CS_DRAG_XMIN		0x01
-/// Drag mode flag: Drag right window border
+/// Drag right window border
 #define CS_DRAG_XMAX		0x02
-/// Drag mode flag: Drag top window border
+/// Drag top window border
 #define CS_DRAG_YMIN		0x04
-/// Drag mode flag: Drag bottom window border
+/// Drag bottom window border
 #define CS_DRAG_YMAX		0x08
-/// Drag mode flag: Window is moveable
+/// Window is moveable
 #define CS_DRAG_MOVEABLE	0x10
-/// Drag mode flag: Window is sizeable
+/// Window is sizeable
 #define CS_DRAG_SIZEABLE	0x20
-/// Drag mode flag: All flags above combined (used when dragging with titlebar)
-#define CS_DRAG_ALL		(CS_DRAG_XMIN | CS_DRAG_XMAX | \
-				 CS_DRAG_YMIN | CS_DRAG_YMAX)
+/// All flags above combined (used when dragging with titlebar)
+#define CS_DRAG_ALL		\
+	(CS_DRAG_XMIN | CS_DRAG_XMAX | CS_DRAG_YMIN | CS_DRAG_YMAX)
+/** @} */
 
-/** \page BoundResizeFlags Bound resize flags
+/** 
+ * \name Bound resize flags
  * When the size of certain component changes, it checks all his children
  * what they want to do with their own size. You can lock the distance
  * between certain margin of the component and respective margin of
  * the parent component to stay the same when this happens, using the
  * ResizeMode field (or SetResizeMode() method).
- */
-/// Bound resize flag: Lock component's left margin with parent's left margin
+ * @{ */
+/// Lock component's left margin with parent's left margin
 #define CS_LOCK_XMIN		0x01
-/// Bound resize flag: Lock component's right margin with parent's right margin
+/// Lock component's right margin with parent's right margin
 #define CS_LOCK_XMAX		0x02
-/// Bound resize flag: Lock component's top margin with parent's top margin
+/// Lock component's top margin with parent's top margin
 #define CS_LOCK_YMIN		0x04
-/// Bound resize flag: Lock component's bottom margin with parent's bottom margin
+/// Lock component's bottom margin with parent's bottom margin
 #define CS_LOCK_YMAX		0x08
-/// Bound resize flag: Lock all four margins
-#define CS_LOCK_ALL		(CS_LOCK_XMIN | CS_LOCK_XMAX | \
-				 CS_LOCK_YMIN | CS_LOCK_YMAX)
-/** \page ChildRepositioning Child repositioning
+/// Lock all four margins
+#define CS_LOCK_ALL		\
+	(CS_LOCK_XMIN | CS_LOCK_XMAX | CS_LOCK_YMIN | CS_LOCK_YMAX)
+/** @} */
+
+/**
+ * \name Child repositioning
  * An alternative way for child repositioning consist of the following:
  * independently of each other in both X and Y direction the child can
  * keep its size, and be placed either at the start, center, or end strip
@@ -293,31 +299,32 @@ enum
  * CS_LOCK_XMIN and CS_LOCK_XMAX are reciprocally exclusive with
  * CS_REPOS_{LEFT|RIGHT|HCENTER} modes, but they are compatible with
  * CS_REPOS_{TOP|BOTTOM|VCENTER} modes.
- */
-/// Child repositioning: Used to distinguish when component is repositioned or bound locked horizontally
+ * @{ */
+/// Used to distinguish when component is repositioned or bound locked horizontally
 #define CS_REPOS_HORIZONTAL	0x10
-/// Child repositioning: Used to distinguish when component is repositioned or bound locked vertically
+/// Used to distinguish when component is repositioned or bound locked vertically
 #define CS_REPOS_VERTICAL	0x20
-/// Child repositioning: The mask for extracting the horizontal automatic position
+/// The mask for extracting the horizontal automatic position
 #define CS_REPOS_H_MASK		(CS_REPOS_HORIZONTAL | 0x3)
-/// Child repositioning: The mask for extracting the vertical automatic position
+/// The mask for extracting the vertical automatic position
 #define CS_REPOS_V_MASK		(CS_REPOS_VERTICAL | 0xc)
-/// Child repositioning: The component is automatically placed at the left of the parent window
+/// The component is automatically placed at the left of the parent window
 #define CS_REPOS_LEFT		(CS_REPOS_HORIZONTAL | 0x0)
-/// Child repositioning: The component is automatically placed at the right of the parent window
+/// The component is automatically placed at the right of the parent window
 #define CS_REPOS_RIGHT		(CS_REPOS_HORIZONTAL | 0x1)
-/// Child repositioning: The component is automatically horizontally centered in the parent window
+/// The component is automatically horizontally centered in the parent window
 #define CS_REPOS_HCENTER	(CS_REPOS_HORIZONTAL | 0x2)
-/// Child repositioning: Same as HCENTER but the component is resized by the same amount as parent
+/// Same as HCENTER but the component is resized by the same amount as parent
 #define CS_REPOS_HCENTERSIZE	(CS_REPOS_HORIZONTAL | 0x3)
-/// Child repositioning: The component is automatically placed at the top of the parent window
+/// The component is automatically placed at the top of the parent window
 #define CS_REPOS_TOP		(CS_REPOS_VERTICAL | 0x0)
-/// Child repositioning: The component is automatically placed at the bottom of the parent window
+/// The component is automatically placed at the bottom of the parent window
 #define CS_REPOS_BOTTOM		(CS_REPOS_VERTICAL | 0x4)
-/// Child repositioning: The component is automatically vertically centered in the parent window
+/// The component is automatically vertically centered in the parent window
 #define CS_REPOS_VCENTER	(CS_REPOS_VERTICAL | 0x8)
-/// Child repositioning: Same as VCENTER but the component is resized by the same amount as parent
+/// Same as VCENTER but the component is resized by the same amount as parent
 #define CS_REPOS_VCENTERSIZE	(CS_REPOS_VERTICAL | 0xc)
+/** @} */
 
 /**
  * Graphics system component: a menu, window etc.<p>

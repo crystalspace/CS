@@ -336,7 +336,7 @@ public:
   SCF_DECLARE_IBASE;
 
   //------------------------ iCamera implementation ------------------------
-  /// \internal iCamera implementation
+  /// iCamera implementation
   struct Camera : public iCamera
   {
     SCF_DECLARE_EMBEDDED_IBASE (csCamera);

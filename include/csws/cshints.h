@@ -25,7 +25,7 @@
  */
 
 /**
- * \addtogroup csws
+ * \addtogroup csws_comps_hints
  * @{ */
 
 #define CSWS_INTERNAL
@@ -70,12 +70,12 @@ public:
  */
 class csHintManager : public csVector
 {
-  // This structure holds the data about one hint
+  /// \internal This structure holds the data about one hint
   struct HintStore
   {
-    // The component associated with the hint
+    /// \internal The component associated with the hint
     csComponent *comp;
-    // The text string starts right after the end of this structure
+    /// \internal The text string starts right after the end of this structure
     char text [1];
   };
 
@@ -116,7 +116,7 @@ public:
   void SetFont (iFont *iNewFont, int iSize);
 
 private:
-  // Check if this child has an associated hint
+  /// \internal Check if this child has an associated hint
   static bool do_checkhint (csComponent *comp, void *data);
 };
 

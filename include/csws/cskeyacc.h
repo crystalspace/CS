@@ -25,7 +25,7 @@
  */
 
 /**
- * \addtogroup csws
+ * \addtogroup csws_comps_keyacc
  * @{ */
  
 #include "csutil/csvector.h"
@@ -40,6 +40,7 @@ class csEvent;
  */
 class csKeyboardAccelerator : public csComponent
 {
+  /// \internal Helper class
   class csAccVector : public csVector
   {
   public:

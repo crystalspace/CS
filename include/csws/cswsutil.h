@@ -67,8 +67,10 @@ protected:
   static bool do_addtowindowlist (csComponent *child, void *param);
 };
 
-/// Compute the biggest union of a set of adjanced rectangles
-/// (i.e. rectangles do not overlap and can have adjanced edges).
+/**
+ * Compute the biggest union of a set of adjanced rectangles
+ * (i.e. rectangles do not overlap and can have adjanced edges).
+ */
 extern void RectUnion (cswsRectVector &rect, csRect &result);
 
 /// Find a bitmap definition in one of CSWS.CFG bitmap arrays

@@ -25,7 +25,7 @@
  */
 
 /**
- * \addtogroup csws
+ * \addtogroup csws_comps_listbox
  * @{ */
  
 #include "cscomp.h"
@@ -250,9 +250,10 @@ public:
  };
 
 /**
- * List box styles. These are bit masks that can be ORed together
+ * \name List box styles
+ * These are bit masks that can be ORed together
  * to form a value passed to csListBox constructor.
- */
+ * @{ */
 /// List box can have multiple items selected
 #define CSLBS_MULTIPLESEL	0x00000001
 /// List box has a horizontal scroll bar
@@ -262,6 +263,7 @@ public:
 
 /// Default list box style
 #define CSLBS_DEFAULTVALUE	CSLBS_VSCROLL
+/** @} */
 
 /// List box frame styles
 enum csListBoxFrameStyle
