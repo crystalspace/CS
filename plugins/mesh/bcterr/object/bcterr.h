@@ -331,14 +331,7 @@ public:
     {
       return 0;
     }
-    virtual void CollideBBox (const csBox3 bbox, const csVector3 start,
-        csVector3 &end)
-    {
-    }
-    virtual void CollideRay (const csVector3 start, csVector3 &end)
-    {
-    }
-    virtual void SetControlPoint (const csVector3 point, int iter)
+    virtual void SetControlPoint (const csVector3 point, const int iter)
     {
       scfParent->SetControlPoint (point, iter);
     }
@@ -794,14 +787,6 @@ public:
       scfParent->sys_distance = new_dist * new_dist;
       scfParent->start_sys = start * start;
     }
-    /*virtual float GetSystemDistance ()
-    {
-      return scfParent->sys_distance;
-    }
-    virtual void SetSystemDistance (float new_dist)
-    {
-      scfParent->sys_distance = new_dist * new_dist;
-    }*/
   } scfiBCTerrFactoryState;
   friend class BCTerrFactoryState;
 };
