@@ -58,7 +58,7 @@ Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  * {
  * public:
  *   MyApp();
- *   virtual bool OnInitialize();
+ *   virtual bool OnInitialize(int argc, char* argv[]);
  *   virtual bool Application();
  * };
  *
@@ -71,7 +71,7 @@ Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  *   SetApplicationName ("my.example.app");
  * }
  *
- * bool MyApp::OnInitialize()
+ * bool MyApp::OnInitialize(int argc, char* argv[])
  * {
  *   // Request plugins, initialize any global non-CS data and structures
  *   return true;

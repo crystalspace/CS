@@ -6,6 +6,9 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+16-Aug-2004
+        - Vincent Knecht made corrections in csapplicationframework.h doxygen
+          sample code.
 14-Aug-2004
         - Philip Wyett eliminated the redefinition of _POSIX_C_SOURCE warning
           within the CS Python plugin.
