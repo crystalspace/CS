@@ -30,9 +30,6 @@ class Dumper;
 /// Maximal number of vertices in output (clipped) polygons
 #define MAX_OUTPUT_VERTICES	64
 
-/// Maximal number of vertices in output (clipped) polygons
-#define MAX_OUTPUT_VERTICES	64
-
 /**
  * Clipper return codes.<p>
  * The clipper routines return one of the values below so that we can
