@@ -28,6 +28,11 @@ The history order is reversed so that new features are at the top.
 	  specialization in the Unix configuration file rather than the PS2
 	  configuration file (which is the obviously correct place) is a
 	  mystery.
+	- Eric Sunshine added a CSGFX dependency to enginep.mak so that the
+	  engine plugin can load on NextStep.  This probably shouldn't be
+	  required, but some file somewhere in the engine is probably
+	  unnecessarily including csimage.h.  The real solution is to find this
+	  unnecessarily inclusion and eliminate it.
 24-May-2001
 	- Eric Sunshine fixed several problems in lexan.mak.
 	- Eric Sunshine eliminated compilation warning from csobject.cpp about
