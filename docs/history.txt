@@ -10,6 +10,9 @@ chronological order.
 	- Jorrit changed pvsvis so that the required bounding box is now
 	  optional. PVSCalc will calculate the missing bounding box if needed
 	  and the box is now saved with the cached PVS data.
+	- Eric Sunshine fixed problem which caused
+	  csPrintfFormatter::OutputFloatHex() to complain that it did not know
+	  how to format floating-point numbers as hexadecimal on MacOS/X.
 19-Mar-2005
 	- Erroroman fixed a bug in genmesh skelanimation exporter
 	- Erroroman added texture "ugly_woman.jpg" to flarge skeleton model.

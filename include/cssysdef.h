@@ -705,7 +705,9 @@ extern void* operator new[] (size_t s, void* filename, int line);
 // Use special knowledge of IEEE float format in some cases for CPU's that are
 // known to support it
 #if !defined (CS_IEEE_DOUBLE_FORMAT)
-#  if defined (CS_PROCESSOR_X86) || defined (CS_PROCESSOR_M68K)
+#  if defined (CS_PROCESSOR_X86) || \
+      defined (CS_PROCESSOR_POWERPC) || \
+      defined (CS_PROCESSOR_M68K)
 #    define CS_IEEE_DOUBLE_FORMAT
 #  endif
 #endif
