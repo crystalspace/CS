@@ -67,26 +67,11 @@ static void transformer(ddgVector3 vin, ddgVector3 *vout)
 bool csTerrain::Initialize (char* heightmap)
 {
   CHK (height = new ddgHeightMap ());
-  if (height->readTGN (heightmap)) return false;
-  //height->generateHeights (257, 257, 0);
+  if (height->readTGN (heightmap))
+	  height->generateHeights(257,257,5);
   CHK (mesh = new ddgTBinMesh (height));
   CHK (clipbox = new ddgBBox (ddgVector3(0,0,1),ddgVector3(640, 480, 15000)));
-  wtoc[0] = 1;
-  wtoc[1] = 0;
-  wtoc[2] = 0;
-  wtoc[3] = 0;
-  wtoc[4] = 0;
-  wtoc[5] = 1;
-  wtoc[6] = 0;
-  wtoc[7] = 0;
-  wtoc[8] = 0;
-  wtoc[9] = 0;
-  wtoc[10] = 1;
-  wtoc[11] = 0;
-  wtoc[12] = 0;
-  wtoc[13] = 0;
-  wtoc[14] = 0;
-  wtoc[15] = 1;
+
   float fov = 90.0;
   mesh->settransform(transformer); 
   mesh->init (wtoc, clipbox, fov);
@@ -96,26 +81,9 @@ bool csTerrain::Initialize (char* heightmap)
 void csTerrain::Draw (csRenderView& rview, bool use_z_buf)
 {
   // Initialize.
-  /*
   const csMatrix3& m_o2t = rview.GetO2T ();
   const csVector3& v_o2t = rview.GetO2TTranslation ();
-  wtoc[0] = m_o2t.m11;
-  wtoc[4] = m_o2t.m12;
-  wtoc[8] = m_o2t.m13;
-  wtoc[12] = v_o2t.x;
-  wtoc[1] = m_o2t.m21;
-  wtoc[5] = m_o2t.m22;
-  wtoc[9] = m_o2t.m23;
-  wtoc[13] = v_o2t.y;
-  wtoc[2] = m_o2t.m31;
-  wtoc[6] = m_o2t.m32;
-  wtoc[10] = m_o2t.m33;
-  wtoc[14] = v_o2t.z;
-  wtoc[3] = 0;
-  wtoc[7] = 0;
-  wtoc[11] = 0;
-  wtoc[15] = 1;
-  */
+
   G3DPolygonDPFX poly;
   memset (&poly, 0, sizeof(poly));
   poly.inv_aspect = rview.inv_aspect;
@@ -127,7 +95,6 @@ void csTerrain::Draw (csRenderView& rview, bool use_z_buf)
   rview.g3d->StartPolygonFX (poly.txt_handle, CS_FX_GOURAUD);
   grview = &rview;
   // For each frame.
-  // Update the wtoc.
   mesh->calculate ();
   // Render
   mesh->qsi()->reset ();
@@ -138,25 +105,21 @@ void csTerrain::Draw (csRenderView& rview, bool use_z_buf)
 
     if (!bt->tri (tvc)->vis ().flags.none)
     {
+
       ddgVector3 *p1, *p2, *p3;
+/*
+		ddgVector3 w1, w2, w3;
+		bt->vertex(bt->v0 (tvc),&w1);
+		bt->vertex(bt->v1 (tvc),&w2);
+		bt->vertex(bt->parent (tvc),&w3);
+		p1 = &w1;
+		p2 = &w2;
+		p3 = &w3;
+*/
 
 	  p3 =	bt->tri(bt->parent (tvc))->pos();
 	  p2 =	bt->tri(bt->v1 (tvc))->pos();
 	  p1 =	bt->tri(bt->v0 (tvc))->pos();
-
-	  
-		ddgVector3 w1,w2,w3;
-		bt->vertex(bt->v0 (tvc),&w1);
-		bt->vertex(bt->v1 (tvc),&w2);
-		bt->vertex(bt->parent (tvc),&w3);
-#if 0
-		csVector3 csp1(w1.v[0],w1.v[1],w1.v[2]);
-		csVector3 csp2(w2.v[0],w2.v[1],w2.v[2]);
-		csVector3 csp3(w3.v[0],w3.v[1],w3.v[2]);
-	    csVector3 csw1 = rview.World2Camera( csp1 );
-	    csVector3 csw2 = rview.World2Camera( csp2 );
-	    csVector3 csw3 = rview.World2Camera( csp3 );
-#endif
 	  
       // DDG vectors work with negative Z pointing forwards.
       float iz;
