@@ -17,8 +17,8 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __CSPYTHON_H__
-#define __CSPYTHON_H__
+#ifndef __CSLUA_H__
+#define __CSLUA_H__
 
 #include "ivaria/script.h"
 #include "iutil/eventh.h"
@@ -54,7 +54,7 @@ public:
     { return scfParent->Initialize(p); }
   } scfiComponent;
 };
-#endif
+#endif // __CSLUA_H__
 
 
 

@@ -15,6 +15,8 @@ The history order is reversed so that new features are at the top.
 	- Fixed a bug in frustvis and dynavis where it would crash
 	  if an object that just moved was also deleted immediatelly
 	  (i.e. this crash occured when firing missiles in walktest).
+	- Andreas Busch corrected wrong/missing header definition in the
+	  python and lua scripting plugins.
 11-Dec-2002
 	- Optimization in frustvis where the updates of objects in the
 	  visibility culler are put on a queue and only performed when

@@ -54,7 +54,7 @@ public:
 };
 
 void InitPytocs();
-#endif
+#endif // __CSPYTHON_H__
 
 
 
