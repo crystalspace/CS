@@ -13,8 +13,22 @@ The history order has been reversed so that new features are at the top.
 	  longer bothers reading the content of each file if the user only
 	  requested file-rename operations (that is, no content-edit
 	  operations).
-	- Further removed some references to world space vertices
+	- Jorrit, further removed some references to world space vertices
 	  from csPolygon3D.
+	- Eric Sunshine eliminated a compilation warning from system.cpp
+	  regarding unused `cfgacc' variable.
+	- Eric Sunshine reworked the shared vertex pools in vtpool.h and
+	  vtpool.cpp to be more NextStep compiler friendly.  The compiler was
+	  looping infinitely when trying to compile vtpool.cpp.
+	- Eric Sunshine removed flarge.zip from the CVS repository and added
+	  its plain text `world' file instead.  vfs.cfg was then adjusted so
+	  that the `world' file is read from the real filesystem, whereas all
+	  of the transient lightmap and visibility information is still cached
+	  on the virtual filesystem within flarge.zip (which is _not_ part of
+	  the CVS repository).  This change should prevent people from
+	  committing transient binary data to the repository.  It also makes
+	  better use of CVS, since the `world' file is plain text, which is
+	  what CVS does best.
 4-Mar-2001
 	- Finalized the first rewrite of the data structures that are used
 	  in CheckFrustum. A further rewrite and conversion to SCF will

@@ -99,7 +99,7 @@ private:
 public:
 
   /// Create a new empty frustum.
-  csFrustum (const csVector3& o) : pool (&csDefaultVertexArrayPool::default_pool),
+  csFrustum (const csVector3& o) : pool (&csDefaultVertexArrayPool::GetDefaultPool()),
   	origin (o), vertices (NULL), num_vertices (0), max_vertices (0),
 	backplane (NULL), wide (false), mirrored (false), ref_count (1)
   { }

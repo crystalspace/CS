@@ -19,11 +19,14 @@
 #include "cssysdef.h"
 #include "csgeom/vtpool.h"
 
-csDefaultVertexArrayPool csDefaultVertexArrayPool::default_pool;
-csPooledVertexArrayPool csPooledVertexArrayPool::default_pool;
-
 csDefaultVertexArrayPool::csDefaultVertexArrayPool ()
 {
+}
+
+csDefaultVertexArrayPool& csDefaultVertexArrayPool::GetDefaultPool()
+{
+  static csDefaultVertexArrayPool default_pool;
+  return default_pool;
 }
 
 csPooledVertexArrayPool::csPooledVertexArrayPool ()
@@ -96,7 +99,7 @@ void csPooledVertexArrayPool::FreeVertexArray (csVector3* ar, int n)
 {
   if (!ar) return;
   PoolEl p;
-  PoolEl* pel = (PoolEl*)(((char*)ar)-(((long)&p.first_vertex) - (long)&p.next));
+  PoolEl* pel = (PoolEl*)(((char*)ar)-(((long)&p.first_vertex)-(long)&p.next));
   if (n >= 3 && n <= 8)
   {
     pel->next = pool[n-3];
@@ -109,3 +112,8 @@ void csPooledVertexArrayPool::FreeVertexArray (csVector3* ar, int n)
   }
 }
 
+csPooledVertexArrayPool& csPooledVertexArrayPool::GetDefaultPool()
+{
+  static csPooledVertexArrayPool default_pool;
+  return default_pool;
+}

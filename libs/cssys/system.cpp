@@ -401,7 +401,7 @@ bool csSystemDriver::Initialize (int argc, const char* const argv[],
   // look if the user-specific config domain should be used
   {
     csConfigAccess cfgacc(this, "/config/system.cfg");
-    if (Config->GetBool("System.UserConfig", true))
+    if (cfgacc->GetBool("System.UserConfig", true))
     {
       // open the user-specific, application-neutral config domain
       cfg = OpenUserConfig("Global");
@@ -409,7 +409,7 @@ bool csSystemDriver::Initialize (int argc, const char* const argv[],
       cfg->DecRef();
 
       // open the user-and-application-specific config domain
-      cfg = OpenUserConfig(Config->GetStr("System.ApplicationID", "Noname"));
+      cfg = OpenUserConfig(cfgacc->GetStr("System.ApplicationID", "Noname"));
       Config->AddDomain(cfg, ConfigPriorityUserApp);
       Config->SetDynamicDomain(cfg);
       cfg->DecRef();

@@ -16,8 +16,8 @@
   Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __VTPOOL_H__
-#define __VTPOOL_H__
+#ifndef __CS_VTPOOL_H__
+#define __CS_VTPOOL_H__
 
 #include "csgeom/vector3.h"
 
@@ -52,10 +52,6 @@ public:
 class csDefaultVertexArrayPool : public csVertexArrayPool
 {
 public:
-  /// A singleton instance of this pool.
-  static csDefaultVertexArrayPool default_pool;
-
-public:
   csDefaultVertexArrayPool ();
 
   /**
@@ -67,13 +63,14 @@ public:
     return new csVector3[n];
   }
 
-  /**
-   * Free an array of n vertices.
-   */
+  /// Free an array of n vertices.
   virtual void FreeVertexArray (csVector3* ar, int)
   {
     delete[] ar;
   }
+
+  /// Fetch the singleton instance of this pool.
+  static csDefaultVertexArrayPool& GetDefaultPool();
 };
 
 /**
@@ -103,10 +100,7 @@ public:
     delete[] pool;
   }
 
-  /**
-   * Fetch a new array of n vertices.
-   * Return NULL on failure.
-   */
+   /// Fetch a new array of n vertices.  Return NULL on failure.
   virtual csVector3* GetVertexArray (int n)
   {
     if (lastn+n > maxn) return NULL;
@@ -114,17 +108,13 @@ public:
     return pool+lastn-n;
   }
 
-  /**
-   * Free an array of n vertices.
-   */
+  /// Free an array of n vertices.
   virtual void FreeVertexArray (csVector3* ar, int n)
   {
     if (ar == pool+lastn-n) lastn -= n;
   }
 
-  /**
-   * Reinitialize the pool.
-   */
+  /// Reinitialize the pool.
   void Clear ()
   {
     lastn = 0;
@@ -138,10 +128,6 @@ public:
  */
 class csPooledVertexArrayPool : public csVertexArrayPool
 {
-public:
-  /// A singleton instance of this pool.
-  static csPooledVertexArrayPool default_pool;
-
 private:
   struct PoolEl
   {
@@ -160,17 +146,14 @@ public:
   /// Destroy pool and all vertex arrays in it.
   virtual ~csPooledVertexArrayPool ();
 
-  /**
-   * Fetch a new array of n vertices.
-   * Return NULL on failure.
-   */
+  /// Fetch a new array of n vertices.  Return NULL on failure.
   virtual csVector3* GetVertexArray (int n);
 
-  /**
-   * Free an array of n vertices.
-   */
+  /// Free an array of n vertices.
   virtual void FreeVertexArray (csVector3* ar, int n);
+
+  /// Fetch the singleton instance of this pool.
+  static csPooledVertexArrayPool& GetDefaultPool();
 };
 
-#endif // __VTPOOL_H__
-
+#endif // __CS_VTPOOL_H__

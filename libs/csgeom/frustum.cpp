@@ -21,7 +21,7 @@
 #include "csgeom/transfrm.h"
 
 csFrustum::csFrustum (const csVector3& o, csVector3* verts, int num_verts,
-  csPlane3* backp) : pool (&csDefaultVertexArrayPool::default_pool)
+  csPlane3* backp) : pool (&csDefaultVertexArrayPool::GetDefaultPool())
 {
   origin = o;
   num_vertices = num_verts;

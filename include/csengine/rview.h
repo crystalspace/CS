@@ -308,11 +308,11 @@ private:
 public:
   /// Create empty frustum.
   csShadowFrustum () :
-    csFrustum (csVector3 (0), &csPooledVertexArrayPool::default_pool),
+    csFrustum (csVector3 (0), &csPooledVertexArrayPool::GetDefaultPool()),
     shadow_polygon (NULL) { }
   /// Create empty frustum.
   csShadowFrustum (const csVector3& origin) :
-    csFrustum (origin, &csPooledVertexArrayPool::default_pool),
+    csFrustum (origin, &csPooledVertexArrayPool::GetDefaultPool()),
     shadow_polygon (NULL) { }
   /// Copy constructor.
   csShadowFrustum (const csShadowFrustum& orig);
