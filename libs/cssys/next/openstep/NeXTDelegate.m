@@ -14,13 +14,12 @@
 //
 //	The application's delegate.  Acts as a gateway between the AppKit and
 //	Crystal Space by forwarding Objective-C messages and events to the C++
-//	system driver, NeXTSystemDriver.
+//	platform-specific assistant, NeXTAssistant.
 //
 //-----------------------------------------------------------------------------
 #include "NeXTDelegate.h"
 #include "NeXTMenu.h"
 #include "isys/evdefs.h"
-#include "cssys/next/NeXTSystemDriver.h"
 #include "volatile.h"		// OS_NEXT_OPENSTEP, OS_NEXT_MACOSXS
 #include <stdio.h>
 #import <AppKit/NSApplication.h>
@@ -192,10 +191,8 @@ enum
 //-----------------------------------------------------------------------------
 - (void)applicationDefined:(NSEvent*)e
 {
-  int run;
-  NeXTSystemDriver_system_extension(driver, "advancestate");
-  NeXTSystemDriver_system_extension(driver, "continuerunning", &run);
-  if (!paused && run)
+  NeXTAssistant_advance_state(assistant);
+  if (!paused && NeXTAssistant_continue_running(assistant))
     [self scheduleEvent];
 }
 
@@ -212,7 +209,7 @@ enum
   }
 }
 
-ND_PROTO(void,show_mouse)(NeXTDelegateHandle handle)
+ND_PROTO(void,show_mouse_pointer)(NeXTDelegateHandle handle)
   { [(NeXTDelegate*)handle showMouse]; }
 
 
@@ -228,7 +225,7 @@ ND_PROTO(void,show_mouse)(NeXTDelegateHandle handle)
   }
 }
 
-ND_PROTO(void,hide_mouse)(NeXTDelegateHandle handle)
+ND_PROTO(void,hide_mouse_pointer)(NeXTDelegateHandle handle)
   { [(NeXTDelegate*)handle hideMouse]; }
 
 
@@ -253,7 +250,7 @@ ND_PROTO(void,flush_graphics_context)(NeXTDelegateHandle handle)
 //-----------------------------------------------------------------------------
 - (void)quit:(id)sender
 {
-  NeXTSystemDriver_system_extension(driver, "requestshutdown");
+  NeXTAssistant_request_shutdown(assistant);
 }
 
 
@@ -391,18 +388,16 @@ ND_PROTO(void,flush_graphics_context)(NeXTDelegateHandle handle)
   BOOL const old_state = ((modifiers & csmask) != 0);
   if (new_state != old_state)
   {
-    char const* request;
     if (new_state)
     {
       modifiers |= csmask;
-      request = "keydown";
+      NeXTAssistant_key_down(assistant, key, -1);
     }
     else
     {
       modifiers &= ~csmask;
-      request = "keyup";
+      NeXTAssistant_key_up(assistant, key, -1);
     }
-    NeXTSystemDriver_system_extension(driver, request, key, -1);
   }
 }
 
@@ -417,8 +412,10 @@ ND_PROTO(void,flush_graphics_context)(NeXTDelegateHandle handle)
     int raw, cooked;
     if ([self classifyKeyDown:p raw:&raw cooked:&cooked])
     {
-      char const* request = flag ? "keydown" : "keyup";
-      NeXTSystemDriver_system_extension(driver, request, raw, cooked);
+      if (flag)
+        NeXTAssistant_key_down(assistant, raw, cooked);
+      else
+        NeXTAssistant_key_up(assistant, raw, cooked);
     }
   }
 }
@@ -453,7 +450,7 @@ ND_PROTO(void,flush_graphics_context)(NeXTDelegateHandle handle)
   {
     int x, y;
     if ([self localize:p toView:v x:&x y:&y])
-      NeXTSystemDriver_system_extension(driver, "mousemoved", x, y);
+      NeXTAssistant_mouse_moved(assistant, x, y);
   }
 }
 
@@ -463,7 +460,7 @@ ND_PROTO(void,flush_graphics_context)(NeXTDelegateHandle handle)
   {
     int x, y;
     [self localize:p toView:v x:&x y:&y];
-    NeXTSystemDriver_system_extension(driver, "mouseup", button, x, y);
+    NeXTAssistant_mouse_up(assistant, button, x, y);
   }
 }
 
@@ -473,7 +470,7 @@ ND_PROTO(void,flush_graphics_context)(NeXTDelegateHandle handle)
   {
     int x, y;
     [self localize:p toView:v x:&x y:&y];
-    NeXTSystemDriver_system_extension(driver, "mousedown", button, x, y);
+    NeXTAssistant_mouse_down(assistant, button, x, y);
   }
 }
 
@@ -532,7 +529,7 @@ ND_PROTO(void,dispatch_event)
   {
     paused = YES;
     [self showMouse];
-    NeXTSystemDriver_system_extension(driver, "appdeactivated");
+    NeXTAssistant_application_deactivated(assistant);
   }
 }
 
@@ -542,7 +539,7 @@ ND_PROTO(void,dispatch_event)
   {
     paused = NO;
     [self scheduleEvent];
-    NeXTSystemDriver_system_extension(driver, "appactivated");
+    NeXTAssistant_application_activated(assistant);
   }
 }
 
@@ -623,10 +620,10 @@ ND_PROTO(void,stop_event_loop)(NeXTDelegateHandle handle)
 //-----------------------------------------------------------------------------
 // initWithDriver:
 //-----------------------------------------------------------------------------
-- (id)initWithDriver:(NeXTSystemDriver)p
+- (id)initWithDriver:(NeXTAssistant)p
 {
   [super init];
-  driver = p;
+  assistant = p;
   modifiers = 0;
   mouseHidden = NO;
   paused = NO;
@@ -681,7 +678,7 @@ ND_PROTO(void,stop_event_loop)(NeXTDelegateHandle handle)
 //	NSApplication object and a NeXTDelegate which oversees AppKit-related
 //	events and messages.
 //-----------------------------------------------------------------------------
-+ (NeXTDelegate*)startup:(NeXTSystemDriver)handle
++ (NeXTDelegate*)startup:(NeXTAssistant)handle
 {
   NSAutoreleasePool* pool;
   NeXTDelegate* controller;
@@ -695,7 +692,7 @@ ND_PROTO(void,stop_event_loop)(NeXTDelegateHandle handle)
   return controller;
 }
 
-ND_PROTO(NeXTDelegateHandle,startup)(NeXTSystemDriver handle)
+ND_PROTO(NeXTDelegateHandle,startup)(NeXTAssistant handle)
   { return (NeXTDelegateHandle)[NeXTDelegate startup:handle]; }
 
 

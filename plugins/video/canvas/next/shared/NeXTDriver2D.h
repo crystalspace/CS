@@ -24,6 +24,7 @@
 #if defined(__cplusplus)
 
 #include "video/canvas/common/graph2d.h"
+#include "cssys/next/NeXTAssistant.h"
 #include "NeXTDelegate2D.h"
 class NeXTFrameBuffer;
 
@@ -33,6 +34,7 @@ class NeXTDriver2D : public csGraphics2D
 
 protected:
   NeXTDelegate2D controller;
+  iNeXTAssistant* assistant;
   NeXTFrameBuffer* frame_buffer;
 
   bool init_driver(int desired_depth);
@@ -43,7 +45,8 @@ protected:
   void usage_summary() const;
 
 public:
-  NeXTDriver2D(iBase* p) : superclass(p), controller(0), frame_buffer(0) {}
+  NeXTDriver2D(iBase* p) :
+    superclass(p), controller(0), assistant(0), frame_buffer(0) {}
   virtual ~NeXTDriver2D();
   virtual bool Initialize(iObjectRegistry*);
   virtual bool Open();
@@ -53,8 +56,11 @@ public:
   virtual bool SetMouseCursor(csMouseCursorID);
   virtual bool HandleEvent(iEvent&);
 
-  bool system_extension(char const* msg, va_list) const;
-  void user_close() const;
+  void user_close();
+  void flush_graphics_context();
+  void hide_mouse_pointer();
+  void show_mouse_pointer();
+  void dispatch_event(NeXTEvent, NeXTView);
 };
 
 #else // __cplusplus
@@ -62,10 +68,14 @@ public:
 #define N2D_PROTO(RET,FUNC) extern RET NeXTDriver2D_##FUNC
 
 typedef void* NeXTDriver2D;
+typedef void* NeXTEventHandle;
+typedef void* NeXTViewHandle;
 
 N2D_PROTO(void,user_close)(NeXTDriver2D);
-N2D_PROTO(int,system_extension)(NeXTDriver2D, char const* msg, ...);
-N2D_PROTO(int,system_extension_v)(NeXTDriver2D, char const* msg, va_list);
+N2D_PROTO(void,flush_graphics_context)(NeXTDriver2D);
+N2D_PROTO(void,hide_mouse_pointer)(NeXTDriver2D);
+N2D_PROTO(void,show_mouse_pointer)(NeXTDriver2D);
+N2D_PROTO(void,dispatch_event)(NeXTDriver2D, NeXTEventHandle, NeXTViewHandle);
 
 #undef N2D_PROTO
 

@@ -21,7 +21,7 @@
 #define __CS_GARRAY_H__
 
 // Common macro for declarations below
-#define CS_TYPEDEF_GROWING_ARRAY_EXT(Name, Type, ExtraConstructor, Extra)	\
+#define CS_TYPEDEF_GROWING_ARRAY_EXT(Name, Type, ExtraConstructor, Extra) \
   class Name								\
   {									\
     typedef Type ga_type;						\
@@ -72,7 +72,7 @@
     {									\
       CS_ASSERT (pos>=0 && pos<=length);				\
       SetLength (length + 1, iGrowStep);				\
-      memmove (root + pos + 1, root + pos, sizeof (ga_type) * (length - pos - 1)); \
+      memmove (root+pos+1, root+pos, sizeof(ga_type) * (length-pos-1)); \
       memcpy (root + pos, &val, sizeof (ga_type));			\
     }									\
     Extra								\
@@ -133,7 +133,7 @@
  * </pre>
  */
 #define CS_DECLARE_GROWING_ARRAY(Name, Type)				\
-  CS_TYPEDEF_GROWING_ARRAY(__##Name,Type) Name
+  CS_TYPEDEF_GROWING_ARRAY(__##Name##_##Type,Type) Name
 
 /**
  * Same as above but declares an object which has a reference counter.

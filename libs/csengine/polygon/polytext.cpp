@@ -1164,7 +1164,7 @@ csLightingPolyTexQueue::~csLightingPolyTexQueue ()
 
 iLight* csLightingPolyTexQueue::GetLight () const
 {
-  return light ? &(light->scfiLight) : NULL;
+  return light ? &(light->scfiLight) : 0;
 }
 
 void csLightingPolyTexQueue::AddPolyTexture (csPolyTexture* pt)

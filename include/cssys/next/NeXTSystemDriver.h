@@ -20,54 +20,21 @@
 //	the platform-specific portion of the system driver.
 //
 //-----------------------------------------------------------------------------
-#if defined(__cplusplus)
-
 #include "cssys/system.h"
-#include "isys/event.h"
-typedef void* NeXTDelegateHandle;
+struct NeXTAssistant;
 
 class NeXTSystemDriver : public csSystemDriver
 {
   typedef csSystemDriver superclass;
-
 private:
-  NeXTDelegateHandle controller;	// Application & window delegate.
-  iEventOutlet* event_outlet;		// Shared event outlet.
-
-  void init_menu(iConfigFile*);
-  void advance_state();			// Calls NextFrame(), etc.
-  bool continue_running() const { return !Shutdown; }
-
+  NeXTAssistant* assistant;
 public:
-  SCF_DECLARE_IBASE_EXT(csSystemDriver);
-
   NeXTSystemDriver();
   virtual ~NeXTSystemDriver();
   virtual bool Initialize(int argc, char const* const argv[], char const*);
-  virtual bool PerformExtensionV(char const*, va_list);
   virtual void Loop();
-
-  struct NeXTSystemEventPlug : public iEventPlug
-  {
-    SCF_DECLARE_EMBEDDED_IBASE(NeXTSystemDriver);
-    virtual uint GetPotentiallyConflictingEvents();
-    virtual uint QueryEventPriority(uint type);
-  } scfiEventPlug;
 };
 
 class SysSystemDriver : public NeXTSystemDriver {};
-
-#else // __cplusplus
-
-#define NSD_PROTO(RET,FUNC) extern RET NeXTSystemDriver_##FUNC
-
-typedef void* NeXTSystemDriver;
-
-NSD_PROTO(int,system_extension)(NeXTSystemDriver, char const* msg, ...);
-NSD_PROTO(int,system_extension_v)(NeXTSystemDriver, char const* msg, va_list);
-
-#undef NSD_PROTO
-
-#endif // __cplusplus
 
 #endif // __NeXT_NeXTSystemDriver_h

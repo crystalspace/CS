@@ -21,35 +21,14 @@
 #define CS_SYSDEF_PROVIDE_PATH
 #include "cssysdef.h"
 #include "cssys/next/NeXTSystemDriver.h"
-#include "cssys/csshlib.h"
-#include "NeXTDelegate.h"
-#include "csutil/cfgacc.h"
+#include "NeXTAssistant.h"
 #include "csver.h"
-#include <stdarg.h>
-
-typedef void* NeXTSystemHandle;
-#define NSD_PROTO(RET,FUNC) extern "C" RET NeXTSystemDriver_##FUNC
-
-#define STR_SWITCH(X) { char const* switched_str__=(X); if (0) {
-#define STR_CASE(X) } else if (strcmp(switched_str__,(#X)) == 0) {
-#define STR_DEFAULT } else {
-#define STR_SWITCH_END }}
-
-SCF_IMPLEMENT_IBASE_EXT(NeXTSystemDriver)
-  SCF_IMPLEMENTS_EMBEDDED_INTERFACE(iEventPlug)
-SCF_IMPLEMENT_IBASE_EXT_END
-
-SCF_IMPLEMENT_EMBEDDED_IBASE(NeXTSystemDriver::NeXTSystemEventPlug)
-  SCF_IMPLEMENTS_INTERFACE(iEventPlug)
-SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 //-----------------------------------------------------------------------------
 // Constructor
 //-----------------------------------------------------------------------------
-NeXTSystemDriver::NeXTSystemDriver() :
-  csSystemDriver(), controller(0), event_outlet(0)
+NeXTSystemDriver::NeXTSystemDriver() : csSystemDriver(), assistant(0)
 {
-  SCF_CONSTRUCT_EMBEDDED_IBASE(scfiEventPlug);
   printf("Crystal Space for " CS_PLATFORM_NAME " " CS_VERSION "\nPorted to "
     CS_PLATFORM_NAME " by Eric Sunshine <sunshine@sunshineco.com>\n\n");
 }
@@ -60,10 +39,12 @@ NeXTSystemDriver::NeXTSystemDriver() :
 //-----------------------------------------------------------------------------
 NeXTSystemDriver::~NeXTSystemDriver()
 {
-  if (controller != 0)
-    NeXTDelegate_shutdown(controller);
-  if (event_outlet != 0)
-    event_outlet->DecRef();
+  if (assistant != 0)
+  {
+    scfiObjectRegistry.Unregister(assistant, "NeXTAssistant");
+    assistant->orphan();
+    assistant->DecRef();
+  }
 }
 
 
@@ -73,30 +54,9 @@ NeXTSystemDriver::~NeXTSystemDriver()
 bool NeXTSystemDriver::Initialize(int argc, char const* const argv[],
   char const* cfgfile)
 {
-  bool ok = false;
-  controller = NeXTDelegate_startup(this);
-  event_outlet = CreateEventOutlet(&scfiEventPlug);
-  if (superclass::Initialize(argc, argv, cfgfile))
-  {
-    csConfigAccess next_config(this, "/config/next.cfg", true,
-      iConfigManager::PriorityMin);
-    init_menu(next_config);
-    ok = true;
-  }
-  return ok;
-}
-
-
-//-----------------------------------------------------------------------------
-// init_menu
-//	Generate application menu based upon platform configuration.
-//-----------------------------------------------------------------------------
-void NeXTSystemDriver::init_menu(iConfigFile* next_config)
-{
-  char const* style =
-    next_config->GetStr("NeXT.Platform." OS_NEXT_DESCRIPTION ".menu", 0);
-  if (style != 0)
-    NeXTDelegate_init_app_menu(controller, next_config, style);
+  assistant = new NeXTAssistant(this);
+  scfiObjectRegistry.Register(assistant, "NeXTAssistant");
+  return superclass::Initialize(argc, argv, cfgfile);
 }
 
 
@@ -109,162 +69,5 @@ void NeXTSystemDriver::init_menu(iConfigFile* next_config)
 //-----------------------------------------------------------------------------
 void NeXTSystemDriver::Loop()
 {
-  NeXTDelegate_start_event_loop(controller);
+  assistant->start_event_loop();
 }
-
-
-//-----------------------------------------------------------------------------
-// advance_state
-//	This method is invoked periodically by a trigger in the application's
-//	event loop.  (See -[NeXTDelegate applicationDefined:].)  Invokes the
-//	NextFrame() method.
-//-----------------------------------------------------------------------------
-void NeXTSystemDriver::advance_state()
-{
-  NextFrame();
-  if (!continue_running())
-    NeXTDelegate_stop_event_loop(controller);
-}
-
-
-//-----------------------------------------------------------------------------
-// PerformExtensionV
-//
-// Perform a system-specific extension.  The following requests are understood:
-//
-//	advancestate
-//	    Sent by some mechanism on a periodic basis to trigger invocation
-//	    of the NextFrame() method.
-//	continuerunning <int*>
-//	    Query whether or not the application's event loop should continue
-//	    running.  The result is returned as a boolean result in the integer
-//	    variable referenced by the argument.  Returns `true' if the system
-//	    driver variable Shutdown is false.
-//	flushgraphicscontext
-//	    Flush the connection to the current graphics context (the Quartz
-//	    or DPS server, for instance).  This forces the graphics context to
-//	    perform all pending drawing operations.
-//	dispatchevent <void*:event> <void*:view>
-//	    Interpret an AppKit event and post the appropriate csEvent to the
-//	    Crystal Space event queue.  The first argument is a pointer to an
-//	    NSEvent (Cocoa and OpenStep) or an NXEvent (NextStep).  The second
-//	    argument is a pointer to the view with which the event is
-//	    associated, or NULL if not associated with any view.  The view
-//	    argument refers to an NSView (Cocoa and OpenStep) or a View
-//	    (NextStep).
-//	keydown <int:raw> <int:cooked>
-//	    Dispatch a key-down event.  The first number is the raw key code,
-//	    and the second is the cooked character code.
-//	keyup <int:raw> <int:cooked>
-//	    Dispatch a key-up event.  The first number is the raw key code,
-//	    and the second is the cooked character code.
-//	mousedown <int:button> <int:x> <int:y>
-//	    Dispatch a mouse-down event at location (x,y).  The mouse-button
-//	    number 1-based.
-//	mouseup <int:button> <int:x> <int:y>
-//	    Dispatch a mouse-up event at location (x,y).  The mouse-button
-//	    number 1-based.
-//	mousemoved <int:x> <int:y>
-//	    Dispatch a mouse-moved event at location (x,y).
-//	hidemouse
-//	    Hide the mouse pointer.
-//	showmouse
-//	    Unhide the mouse pointer.
-//	appactivated
-//	    The application came the foreground.
-//	appdeactivated
-//	    The application was sent to the background.
-//	requestshutdown
-//	    Ask to have both the AppKit and Crystal Space even-loops terminated
-//	    and then exit from the outermost invocation of iSystem::Loop().
-//
-// When canvas coordinates accompany requests, they are specified in terms of
-// the Crystal Space coordinate system where `x' increases from left to right,
-// and `y' increases from top to bottom.
-//-----------------------------------------------------------------------------
-// @@@ OBSOLETE! FIX ME!!!!
-bool NeXTSystemDriver::PerformExtensionV(char const* cmd, va_list args)
-{
-  bool ok = true;
-#define AGET(T) va_arg(args,T)
-  STR_SWITCH (cmd)
-    STR_CASE (advancestate)
-      advance_state();
-    STR_CASE (continuerunning)
-      int* flag = AGET(int*);
-      *flag = continue_running();
-    STR_CASE (flushgraphicscontext)
-      NeXTDelegate_flush_graphics_context(controller);
-    STR_CASE (dispatchevent)
-      NeXTEvent const event = AGET(NeXTEvent);
-      NeXTView  const view  = AGET(NeXTView);
-      NeXTDelegate_dispatch_event(controller, event, view);
-    STR_CASE (keydown)
-      int const raw = AGET(int);
-      int const cooked = AGET(int);
-      event_outlet->Key(raw, cooked, true);
-    STR_CASE (keyup)
-      int const raw = AGET(int);
-      int const cooked = AGET(int);
-      event_outlet->Key(raw, cooked, false);
-    STR_CASE (mousedown)
-      int const button = AGET(int);
-      int const x = AGET(int);
-      int const y = AGET(int);
-      event_outlet->Mouse(button, true, x, y);
-    STR_CASE (mouseup)
-      int const button = AGET(int);
-      int const x = AGET(int);
-      int const y = AGET(int);
-      event_outlet->Mouse(button, false, x, y);
-    STR_CASE (mousemoved)
-      int const x = AGET(int);
-      int const y = AGET(int);
-      event_outlet->Mouse(0, false, x, y);
-    STR_CASE (hidemouse)
-      NeXTDelegate_hide_mouse(controller);
-    STR_CASE (showmouse)
-      NeXTDelegate_show_mouse(controller);
-    STR_CASE (appactivated)
-      ResumeVirtualTimeClock();
-      event_outlet->ImmediateBroadcast(cscmdFocusChanged, (void*)true);
-    STR_CASE (appdeactivated)
-      SuspendVirtualTimeClock();
-      event_outlet->ImmediateBroadcast(cscmdFocusChanged, (void*)false);
-    STR_CASE (requestshutdown)
-      event_outlet->ImmediateBroadcast(cscmdQuit, 0);
-      NeXTDelegate_stop_event_loop(controller);
-    STR_DEFAULT
-      ok = false;
-  STR_SWITCH_END
-#undef AGET
-  return ok;
-}
-
-NSD_PROTO(int,system_extension_v)
-  (NeXTSystemHandle h, char const* msg, va_list args)
-  { return ((NeXTSystemDriver*)h)->PerformExtensionV(msg, args); }
-
-NSD_PROTO(int,system_extension)(NeXTSystemHandle h, char const* msg, ...)
-{
-  va_list args;
-  va_start(args, msg);
-  int const rc = NeXTSystemDriver_system_extension_v(h, msg, args);
-  va_end(args);
-  return rc;
-}
-
-
-//-----------------------------------------------------------------------------
-// iEventPlug Implementation
-//-----------------------------------------------------------------------------
-uint NeXTSystemDriver::NeXTSystemEventPlug::GetPotentiallyConflictingEvents()
-  { return (CSEVTYPE_Keyboard | CSEVTYPE_Mouse); }
-uint NeXTSystemDriver::NeXTSystemEventPlug::QueryEventPriority(uint type)
-  { return 150; }
-
-#undef STR_SWITCH_END
-#undef STR_DEFAULT
-#undef STR_CASE
-#undef STR_SWITCH
-#undef NSD_PROTO

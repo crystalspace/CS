@@ -519,8 +519,7 @@ static bool CheckActionConflict (iModelDataObject *obj1, iModelDataObject *obj2)
     {
       float time2 = Action2->GetTotalTime ();
       Action2->DecRef ();
-
-      if (MergeTimes (Action->GetTotalTime (), Action2->GetTotalTime ()) < 0)
+      if (MergeTimes (Action->GetTotalTime (), time2) < 0)
         return true;
     }
     it.Next ();
@@ -922,7 +921,6 @@ void csModelDataTools::CompressVertices (iModelDataObject *Object)
 #define CS_MDLTOOL_HELPER(type,obj,comp)				\
   for (i=0; i<obj##Sets.Length (); i++)					\
   {									\
-    bool FoundOther = false;						\
     csIntArray *Set = obj##Sets [i];					\
     csIntArray *Removed = NULL;						\
     type o1 = ver->Get##obj (Set->Get (0));				\

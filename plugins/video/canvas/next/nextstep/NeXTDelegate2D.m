@@ -134,7 +134,7 @@ N2D_PROTO(int,best_bits_per_sample)(NeXTDelegateHandle2D handle)
       tag:TRACK_TAG left:NO right:NO];
     [self enableMouseMoved:mouseInside];
     if (hideMouse && mouseInside)
-      NeXTDriver2D_system_extension(driver, "hidemouse");
+      NeXTDriver2D_hide_mouse_pointer(driver);
     trackingMouse = YES;
   }
 }
@@ -149,7 +149,7 @@ N2D_PROTO(int,best_bits_per_sample)(NeXTDelegateHandle2D handle)
   {
     [self enableMouseMoved:NO];
     [window discardTrackingRect:TRACK_TAG];
-    NeXTDriver2D_system_extension(driver, "showmouse");
+    NeXTDriver2D_show_mouse_pointer(driver);
     trackingMouse = NO;
   }
 }
@@ -287,7 +287,7 @@ N2D_PROTO(void,focus_changed)(NeXTDelegateHandle2D handle, int focused)
 - (void)flush
 {
   [view flush];
-  NeXTDriver2D_system_extension(driver, "flushgraphicscontext");
+  NeXTDriver2D_flush_graphics_context(driver);
 }
 
 N2D_PROTO(void,flush)(NeXTDelegateHandle2D handle)
@@ -307,9 +307,9 @@ N2D_PROTO(void,flush)(NeXTDelegateHandle2D handle)
   }
   
   if (hideMouse)
-    NeXTDriver2D_system_extension(driver, "hidemouse");
+    NeXTDriver2D_hide_mouse_pointer(driver);
   else
-    NeXTDriver2D_system_extension(driver, "showmouse");
+    NeXTDriver2D_show_mouse_pointer(driver);
   return !hideMouse;
 }
 
@@ -327,7 +327,7 @@ N2D_PROTO(int,set_mouse_cursor)
   {
     [self enableMouseMoved:YES];
     if (hideMouse)
-      NeXTDriver2D_system_extension(driver, "hidemouse");
+      NeXTDriver2D_hide_mouse_pointer(driver);
   }
   return self;
 }
@@ -341,7 +341,7 @@ N2D_PROTO(int,set_mouse_cursor)
   if (p->data.tracking.trackingNum == TRACK_TAG)
   {
     [self enableMouseMoved:NO];
-    NeXTDriver2D_system_extension(driver, "showmouse");
+    NeXTDriver2D_show_mouse_pointer(driver);
   }
   return self;
 }
@@ -385,7 +385,7 @@ N2D_PROTO(int,set_mouse_cursor)
 {
   [self stopTrackingMouse];
   if (hideMouse)
-    NeXTDriver2D_system_extension(driver, "showmouse");
+    NeXTDriver2D_show_mouse_pointer(driver);
   NeXTDriver2D_user_close(driver);
   return self;
 }
@@ -396,7 +396,7 @@ N2D_PROTO(int,set_mouse_cursor)
 //-----------------------------------------------------------------------------
 - (void)dispatchEvent:(NXEvent*)e forView:(View*)v
 {
-  NeXTDriver2D_system_extension(driver, "dispatchevent", e, v);
+  NeXTDriver2D_dispatch_event(driver, e, v);
 }
 
 

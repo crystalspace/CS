@@ -16,7 +16,7 @@
 //
 //	The application's delegate.  Acts as a gateway between the AppKit and
 //	Crystal Space by forwarding Objective-C messages and events to the C++
-//	system driver, NeXTSystemDriver.
+//	platform-specific assistant, NeXTAssistant.
 //
 //-----------------------------------------------------------------------------
 #include "NeXTConfigFile.h"
@@ -24,22 +24,22 @@
 #if !defined(__cplusplus)
 
 #import <Foundation/NSObject.h>
-#include "cssys/next/NeXTSystemDriver.h"
+#include "NeXTAssistant.h"
 @class NSEvent, NSView, NSWindow;
 
 @interface NeXTDelegate : NSObject
 {
-  NeXTSystemDriver driver;
+  NeXTAssistant assistant;
   unsigned long modifiers;
   BOOL mouseHidden;
   BOOL paused;
   BOOL autoResume;
 }
 
-+ (NeXTDelegate*)startup:(NeXTSystemDriver)driver;
++ (NeXTDelegate*)startup:(NeXTAssistant)assistant;
 + (void)shutdown:(NeXTDelegate*)controller;
 
-- (id)initWithDriver:(NeXTSystemDriver)driver;
+- (id)initWithDriver:(NeXTAssistant)assistant;
 - (void)initApplicationMenu:(NeXTConfigHandle)handle style:(char const*)style;
 
 - (void)pause;
@@ -80,8 +80,8 @@ ND_PROTO(void,init_app_menu)(NeXTDelegate, NeXTConfigHandle, char const*);
 ND_PROTO(void,start_event_loop)(NeXTDelegate);
 ND_PROTO(void,stop_event_loop)(NeXTDelegate);
 ND_PROTO(void,dispatch_event)(NeXTDelegate, NeXTEvent, NeXTView);
-ND_PROTO(void,hide_mouse)(NeXTDelegate);
-ND_PROTO(void,show_mouse)(NeXTDelegate);
+ND_PROTO(void,hide_mouse_pointer)(NeXTDelegate);
+ND_PROTO(void,show_mouse_pointer)(NeXTDelegate);
 ND_PROTO(void,flush_graphics_context)(NeXTDelegate);
 
 #undef ND_PROTO

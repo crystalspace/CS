@@ -180,7 +180,7 @@ public:
       { return ObjVec.GetIndexByName (iName); }				\
     TYPE *FindByName (const char* iName) const				\
       { int n = GetIndexByName (iName);					\
-        return (n==-1) ? NULL : Get(n); }				\
+        return (n==-1) ? 0 : Get(n); }					\
     iObject *FindObjectByName (const char* iName) const			\
       { return ObjVec.FindByName (iName); }				\
     virtual int Compare (csSome Item1, csSome Item2, int Mode) const	\
@@ -191,7 +191,7 @@ public:
 
 // implementation of inline functions follows
 inline csNamedObjectVector::csNamedObjectVector ()
-  { Vector = NULL; }
+  { Vector = 0; }
 inline void csNamedObjectVector::SetVector (void *v)
   { Vector = (csVector*)v; }
 inline void csNamedObjectVector::SetLength (int n)
@@ -213,7 +213,7 @@ inline int csNamedObjectVector::FindSortedKey (csConstSome Key, int Mode) const
 inline iObject *csNamedObjectVector::Pop ()
   {
     iBase *objbase = (iBase*)Vector->Pop ();
-    if (!objbase) return NULL;
+    if (!objbase) return 0;
     iObject *obj = SCF_QUERY_INTERFACE_FAST (objbase, iObject);
     CS_ASSERT (obj);
     return obj;
@@ -225,12 +225,12 @@ inline void csNamedObjectVector::DeleteAll ()
 inline iObject *csNamedObjectVector::Get (int n) const
   { 
     iBase *objbase = (iBase*)Vector->Get (n);
-    return objbase ? SCF_QUERY_INTERFACE_FAST (objbase, iObject) : NULL;
+    return objbase ? SCF_QUERY_INTERFACE_FAST (objbase, iObject) : 0;
   }
 inline iObject *csNamedObjectVector::operator[] (int n) const
   { 
     iBase *objbase = (iBase*)Vector->Get (n);
-    return objbase ? SCF_QUERY_INTERFACE_FAST (objbase, iObject) : NULL;
+    return objbase ? SCF_QUERY_INTERFACE_FAST (objbase, iObject) : 0;
   }
 
 #endif // __NOBJVEC_H__

@@ -1,30 +1,71 @@
 The history order is reversed so that new features are at the top.
 
+12-Aug-2001
+	- Eric Sunshine converted the Apple/NeXT ports over to the new
+	  platform-specific shared `helper' object paradigm as much as possible
+	  at this time.  The changes include:
+	    - Added iNeXTAssistant interface which declares methods for use by
+	      canvases, the AppKit delegate object, and the C++ to Objective-C
+	      bridging code.
+	    - Added NeXTAssistant which implements iNeXTAssistant.  This object
+	      lives within CS/libs/cssys/next and has inherited much of the
+	      functionality performed in the past by NeXTSystemDriver.
+	      Unfortunately, this object still has some reliance upon the
+	      system driver since some system driver functionality has not yet
+	      been relocated to stand-alone utility modules.
+	    - Removed almost all functionality from NeXTSystemDriver.  This
+	      class is now relatively tiny.
+	    - Updated NeXTDelegate, the Objective-C AppKit delegation object,
+	      to work via iNeXTAssistant rather than
+	      iSystem::PerformExtension().
+	    - Updated NeXTDriver2D, the AppKit-based software canvas, to work
+	      via iNeXTAssistant rather than iSystem::PerformExtension().
+	- Eric Sunshine fixed a bug in CheckActionConflict() from mdltool.cpp
+	  where the Action2 object was being accessed after DecRef() was called
+	  on it.
+	- Eric Sunshine eliminated several compilation warnings in mdltool.cpp.
+	- Eric Sunshine modified garray.h to work around a really bone-headed
+	  bug in the OpenStep C++ compiler.  Specifically, with this type of
+	  code:
+	    class A {
+	    private:
+	      CS_DECLARE_GROWING_ARRAY(Vertices, csVector3);
+	    };
+	    class B {
+	    private:
+	      CS_DECLARE_GROWING_ARRAY(Vertices, int);
+	    };
+	  The compiler would claim that the typedef of __Vertices::ga_type in
+	  class A (csVector3) conflicted with the one in class B (int) even
+	  though the typedefs are both scoped _and_ private to their own class.
+	- Eric Sunshine eliminated several compiler warnings from
+	  csNamedObjectVector where it was trying to implicity convert (void*)
+	  to (iObject*).  The problem is that not all compilers recognize
+	  `NULL' specially, and the definition of NULL in some system headers
+	  is (void*).  Therefore, returning NULL from a method which is
+	  declared as returning a specific type results in this warning
+	  message.
+	- Eric Sunshine eliminated a compiler warning from polytext.cpp where
+	  it was trying to implicitly convert (void*) to (iLight*).
 11-Aug-2001
-	- Texture manager (all drivers):
-	  Removed GetRefCount() kludge in the delete method.
-          This results in csfedit not cleaning up the texture
-	  manager correctly, but I will correct this in due
-	  course.
-	- Received a patch from Jonathan Hudson
-	  <nathanoj@realmail.2ndmail.com> to implement quick visibility
-	  testing for particle systems (i.e. the DrawTest() method). This
-	  means that putting a lot of particle systems in a sector will
-	  now be more efficient as only the ones that need to be drawn
-	  will be considered for drawing.
+	- Michael Voase made the following change: Texture manager (all
+	  drivers): Removed GetRefCount() kludge in the delete method.  This
+	  results in csfedit not cleaning up the texture manager correctly, but
+	  I will correct this in due course.
+	- Received a patch from Jonathan Hudson <nathanoj@realmail.2ndmail.com>
+	  to implement quick visibility testing for particle systems (i.e.  the
+	  DrawTest() method).  This means that putting a lot of particle
+	  systems in a sector will now be more efficient as only the ones that
+	  need to be drawn will be considered for drawing.
 	- Michael Voase did the following:
-	  csengine/material.cpp and texture.cpp:
-	  Started addressing outstanding memory leaks,
-	  starting with the ones caused by myself. Some
-	  of the texture and material handles should start
-	  deleteing automatically now.
-	  
-	  csws/cswstex.cpp:
-	  Started addressing outstanding memory leaks,
-	  starting with the ones caused by myself. The
-	  texture manager will now clean up correctly
-	  and completely under csfedit and some
-	  csws based applications.
+	    - csengine/material.cpp and texture.cpp: Started addressing
+	      outstanding memory leaks, starting with the ones caused by
+	      myself.  Some of the texture and material handles should start
+	      deleteing automatically now.
+	    - csws/cswstex.cpp: Started addressing outstanding memory leaks,
+	      starting with the ones caused by myself.  The texture manager
+	      will now clean up correctly and completely under csfedit and some
+	      csws based applications.
 9-Aug-2001
 	- Martin Geisse reverted recent changes to csObject because they
 	  contradict with the ideas of reference counting.
