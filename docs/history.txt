@@ -12,6 +12,12 @@ Short-term cleanups that need to be done:
 	- Check the dependencies of libraries/COM objects and try to find
 	  includes that don't belong there (like from csengine).
 
+26-Jan-2000
+	- Michael Dale Long added DeleteAt() to csString to delete a range
+	  of characters within a csString.
+	- Michael also updated csConsole backspace handling to use
+	  DeleteAt().
+	- Update to api.tex from Wyatt Miler.
 25-Jan-2000
 	- Major update to the csConsole plugin from Michael Dale Long.
 	  He added csConsoleInput, cursor functionality, implemented
@@ -24,6 +30,7 @@ Short-term cleanups that need to be done:
 	- Brett Hall <swizin@rain.org> fixed OpenGL and software 2D
 	  drivers for X Windows so that they don't crash when the windows
 	  are closed by the window manager.
+	- Thomas Hieber did an update of the VC project files.
 24-Jan-2000
 	- Noah L. Gibbs fixed Normalize() method in csQuaternion.
 	- Noah also got rigid bodies pretty much working in his demo code,
