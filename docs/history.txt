@@ -6,6 +6,10 @@ The history order has been reversed so that new features are at the top.
 	  depth, then a suitable warning message is issued and the request is
 	  ignored.  Previously, it would return a failure status from
 	  iGraphics2D::Initialize() in this circumstance.
+	- Eric Sunshine fixed SED_DEPEND in cs.mak so that it works more
+	  portably across different versions of GNU make.  In particular, the
+	  old definition failed to work correctly on MacOS/X Server 1.0
+	  (Rhapsody).
 29-Jan-2001
 	- Philip Wyett added a divide by zero check in csSprite3D.  This fixes
 	  ptlab on Windows.

@@ -131,7 +131,7 @@ else
 endif
 
 # The sed script used to build dependencies
-SED_DEPEND=-e "s/^\([^ \#].*\)/$$\(OUT\)\1/" $(SYS_SED_DEPEND)
+SED_DEPEND=-e "s/^\([^ \#].*\)/$(BUCK)\(OUT\)\1/" $(SYS_SED_DEPEND)
 # How to build a source dependency file
 ifndef DO.DEP
   ifeq ($(DEPEND_TOOL),cc)
