@@ -13,6 +13,11 @@ Short-term cleanups that need to be done:
 	- Check the dependencies of libraries/COM objects and try to find
 	  includes that don't belong there (like from csengine).
 
+19-Oct-1999
+	- Michael Dale Long added major CrystalClear updates (InputHandler
+	  and PlayerEntity).
+	- Denis Dmitriev fixed some CHK macro uses.
+	- Denis also fixed a memory leak in c-buffer code.
 18-Oct-1999
 	- Scott Wood <scott@geekland.cx> sent me patches to allow CS
 	  to compile on Alpha machines.
@@ -22,6 +27,20 @@ Short-term cleanups that need to be done:
 	- Found the bug in quadtree. Lighting and rendering now work
 	  correctly but extremely slow. I need to rewrite this stuff. I
 	  have some ideas already.
+	- Thomas Hieber fixed map2cs to avoid duplicate vertices.
+	- Michael Dale Long added a minor gcc 2.95 fix for map2cs.
+	- Fixes to csstring from Brandon Ehle.
+	- Denis Dmitriev then fixed csstring again by replacing windows
+	  specific GetMessage() with something else.
+	- Gary Haussman modified code to use fog textures, which gives
+	  better interpolation between vertices and opens the way for
+	  faster fog rendering using multitexture.
+	- Gary also switched back to linear fog, modified detection
+	  process to fix a bug that improperly fogged sprite polygons in
+	  sectors with fog.  (if you are in a different sector with fog
+	  and see a sprite through a portal it worked fine).
+	- Alex Pfaffe fixed terrain loading so that it is now endian
+	  correct.
 17-Oct-1999
 	- Implemented quadtree visibility culling for rendering.
 	  However, it does not work correctly yet.
