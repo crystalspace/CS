@@ -197,7 +197,7 @@ nomem2:
     RGBcolor graypal [256];
     RGBcolor *palette = NULL;
     int colors;
-    if (!png_get_PLTE (png, info, &(png_colorp)palette, &colors))
+    if (!png_get_PLTE (png, info, (png_colorp*)&palette, &colors))
     {
       // This is a grayscale image, build a grayscale palette
       palette = graypal;
