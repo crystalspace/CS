@@ -25,6 +25,36 @@
 #include "iplugin.h"
 #include "iproto.h"
 
+/// This is a pain... the error handling has to match that in inetdrv.h
+/// what a royal pain in the neck.
+/// These have to be synced with the errors in inetdrv.h
+enum csNetworkManagerError 
+{
+
+  /// Errors from netdriver
+  CS_NETMAN_ERR_NO_ERROR,
+  CS_NETMAN_ERR_CANNOT_RESOLVE_ADDRESS,
+  CS_NETMAN_ERR_CANNOT_CONNECT,
+  CS_NETMAN_ERR_CANNOT_SEND,
+  CS_NETMAN_ERR_INVALID_SOCKET,
+  CS_NETMAN_ERR_CANNOT_BIND,
+  CS_NETMAN_ERR_CANNOT_LISTEN,
+  CS_NETMAN_ERR_CANNOT_CREATE,
+  CS_NETMAN_ERR_CANNOT_ACCEPT,
+  CS_NETMAN_ERR_CANNOT_SET_BLOCKING_MODE,
+  CS_NETMAN_ERR_CANNOT_RECEIVE,
+  CS_NETMAN_ERR_CANNOT_PARSE_ADDRESS,
+  CS_NETMAN_ERR_CANNOT_GET_VERSION,
+  CS_NETMAN_ERR_WRONG_VERSION,
+  CS_NETMAN_ERR_CANNOT_CLEANUP,
+
+  /// Errors from Netmanager layer.
+  CS_NETMAN_PROTO_NOT_IMPL,
+  CS_NETMAN_NO_PROTOCOL, 
+  CS_NETMAN_OUT_OF_PORTS
+
+};
+
 #define NETPORT_PROTO_UNKNOWN (-1)
 #define NETPORT_PROTO_TCP     (1)
 #define NETPORT_PROTO_UDP     (2)
@@ -78,8 +108,8 @@ SCF_VERSION (iNetworkManager, 0, 0, 1);
  * network manager module.  All network managers must implement this interface.
  */
 
-  struct iNetworkManager : public iPlugIn
-  {
+struct iNetworkManager : public iPlugIn
+{
 
   virtual void AssignHostName(char *hostname) = 0;
 
@@ -106,7 +136,7 @@ SCF_VERSION (iNetworkManager, 0, 0, 1);
   virtual void NetControl(int NetPort, int len, char *msg)=0;
 
   virtual void Reset() =0;
-    virtual void Refresh () = 0;
+  virtual void Refresh () = 0;
   
   virtual int SendMsg(int csNetPort, int len, char *msg) =0;
   virtual int SendMsg(int csNetPort, char *hostname, int len, char *msg)=0;
@@ -127,6 +157,11 @@ SCF_VERSION (iNetworkManager, 0, 0, 1);
   virtual void CleanPort(int csNetPort) = 0;
   virtual bool Open () = 0;
   virtual bool Close () = 0;
+
 };
 
 #endif // __CS_INETMAN_H__
+
+
+
+

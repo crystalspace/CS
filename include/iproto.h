@@ -61,6 +61,9 @@ struct iPROTO: public iPlugIn
   /// For any call backs required.
   virtual bool AddCmdManager(iCMDMGR *NewCmdManager) = 0;
 
+  /// Utility stuff
+  virtual int GetLastError() = 0;
+
 };
 
 
