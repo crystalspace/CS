@@ -133,7 +133,7 @@ else
   RCFLAGS =
 endif
 
-COMPILE_RES = windres --include-dir include $(RCFLAGS) 
+COMPILE_RES = windres --use-temp-file --include-dir include $(RCFLAGS) 
 MAKEVERSIONINFO = $(RUN_SCRIPT) $(SRCDIR)/libs/cssys/win32/mkverres.sh
 MERGERES = $(RUN_SCRIPT) $(SRCDIR)/libs/cssys/win32/mergeres.sh
 

@@ -32,6 +32,18 @@ The history order is reversed so that new features are at the top.
 	- Oktal changed the prototype of main() in perl5test to
 	  (int, char**) from (int, char**, char**) because that was causing
 	  it to fail linking on some platforms including Mingw.
+	- Eric Sunshine fixed apps/tests/perl5tst/Jamefile so that it is only
+	  enabled if the Perl SDK was detected, rather than if the Perl command
+	  is available.  This is an important distinction because the presence
+	  of the Perl command alone does not necessarily imply the presence of
+	  a working SDK.
+	- Eric Sunshine changed Win32 build so that it uses --use-temp-file
+	  when invoking windres.exe in order to work around a problem relayed
+	  by Wouter were the popen() call made by windres was failing for some
+	  user.  This change will slow down the windres invocation by an minute
+	  amount, though I doubt that anyone will notice.  (If anyone does
+	  notice, we can attempt to craft a "configure" test for popen()
+	  failure.)
 11-May-2003
 	- Oktal removed one of two instances of the same phony target,
 	  swigperl5gen, in the csperl5 makefile.
