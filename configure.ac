@@ -31,7 +31,7 @@ AC_CANONICAL_HOST
 
 
 #------------------------------------------------------------------------------
-# Check for compilers and linker.f
+# Check for compilers and linker.
 #
 # IMPLEMENTATION NOTES
 #
