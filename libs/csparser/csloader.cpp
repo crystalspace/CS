@@ -328,7 +328,7 @@ iMaterialWrapper *csLoader::FindMaterial (const char *iName)
   {
     // Add a default material with the same name as the texture
     csMaterial *material = new csMaterial ();
-    material->SetTextureWrapper (tex->GetPrivateObject());
+    material->SetTextureWrapper (tex);
     iMaterialWrapper *mat = Engine->GetMaterialList ()->NewMaterial (material);
     mat->QueryObject()->SetName (iName);
     material->DecRef ();
@@ -974,7 +974,7 @@ void csLoader::mat_process (char *name, char* buf, const char *prefix)
         ScanStr (params, "%s", str);
         iTextureWrapper *texh = Engine->FindTexture (str, ResolveOnlyRegion);
         if (texh)
-          material->SetTextureWrapper (texh->GetPrivateObject());
+          material->SetTextureWrapper (texh);
         else
         {
           System->Printf (MSG_FATAL_ERROR, "Cannot find texture `%s' for material `%s'\n", str, name);
@@ -999,7 +999,7 @@ void csLoader::mat_process (char *name, char* buf, const char *prefix)
         break;
       case CS_TOKEN_LAYER:
 	{
-	  csTextureWrapper* layer_texture = NULL;
+	  iTextureWrapper* layer_texture = NULL;
 	  int layer_uscale = 1, layer_vscale = 1;
 	  int layer_ushift = 0, layer_vshift = 0;
 	  UInt layer_mode = CS_FX_ADD;
@@ -1014,7 +1014,7 @@ void csLoader::mat_process (char *name, char* buf, const char *prefix)
                   ScanStr (params2, "%s", str);
                   iTextureWrapper *texh = Engine->FindTexture (str, ResolveOnlyRegion);
                   if (texh)
-                    layer_texture = texh->GetPrivateObject();
+                    layer_texture = texh;
                   else
                   {
                     System->Printf (MSG_FATAL_ERROR, "Cannot find texture `%s' for material `%s'\n", str, name);
@@ -2752,7 +2752,7 @@ iTextureWrapper *csLoader::LoadTexture (const char *name, const char *fname,
   TexWrapper->QueryObject()->SetName (name);
 
   csMaterial *Material = new csMaterial ();
-  Material->SetTextureWrapper (TexWrapper->GetPrivateObject());
+  Material->SetTextureWrapper (TexWrapper);
 
   iMaterialWrapper *MatWrapper = Engine->GetMaterialList()->
     NewMaterial (Material);

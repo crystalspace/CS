@@ -27,7 +27,7 @@
 #include "ivideo/material.h"
 #include "iengine/material.h"
 
-class csTextureWrapper;
+struct iTextureWrapper;
 struct iTextureManager;
 
 /**
@@ -39,13 +39,13 @@ private:
   /// flat shading color
   csRGBcolor flat_color;
   /// the texture of the material (can be NULL)
-  csTextureWrapper *texture;
+  iTextureWrapper *texture;
   /// Number of texture layers (currently maximum 4).
   int num_texture_layers;
   /// Optional texture layer.
   csTextureLayer texture_layers[4];
   /// Texture wrappers for texture layers.
-  csTextureWrapper* texture_layer_wrappers[4];
+  iTextureWrapper* texture_layer_wrappers[4];
 
   /// The diffuse reflection value of the material
   float diffuse;
@@ -62,7 +62,7 @@ public:
   /**
    * create a material with only the texture given.
    */
-  csMaterial (csTextureWrapper *txt);
+  csMaterial (iTextureWrapper *txt);
 
   /**
    * destroy material
@@ -70,42 +70,40 @@ public:
   virtual ~csMaterial ();
 
   /// Get the flat shading color
-  inline csRGBcolor& GetFlatColor () { return flat_color; }
+  inline csRGBcolor& GetFlatColor ();
   /// Set the flat shading color
-  inline void SetFlatColor (const csRGBcolor& col) { flat_color = col; }
+  inline void SetFlatColor (const csRGBcolor& col);
 
   /// Get the texture (if none NULL is returned)
-  inline csTextureWrapper *GetTextureWrapper () const { return texture; }
+  inline iTextureWrapper *GetTextureWrapper () const;
   /// Set the texture (pass NULL to set no texture)
-  inline void SetTextureWrapper (csTextureWrapper *tex) { texture = tex; }
+  void SetTextureWrapper (iTextureWrapper *tex);
 
   /// Add a texture layer (currently only one supported).
-  void AddTextureLayer (csTextureWrapper* txtwrap, UInt mode,
+  void AddTextureLayer (iTextureWrapper* txtwrap, UInt mode,
       	int uscale, int vscale, int ushift, int vshift);
   
   /// Get diffuse reflection constant for the material
-  inline float GetDiffuse () const { return diffuse; }
+  inline float GetDiffuse () const;
   /// Set diffuse reflection constant for the material
-  inline void SetDiffuse (float val) { diffuse = val; }
+  inline void SetDiffuse (float val);
 
   /// Get ambient lighting for the material
-  inline float GetAmbient () const { return ambient; }
+  inline float GetAmbient () const;
   /// Set ambient lighting for the material
-  inline void SetAmbient (float val) { ambient = val; }
+  inline void SetAmbient (float val);
 
   /// Get reflection of the material
-  inline float GetReflection () const { return reflection; }
+  inline float GetReflection () const;
   /// Set reflection of the material
-  inline void SetReflection (float val) { reflection = val; }
-
-  DECLARE_IBASE;
+  inline void SetReflection (float val);
 
   //--------------------- iMaterial implementation ---------------------
 
   /// Get texture.
   virtual iTextureHandle* GetTexture ();
   /// Get num texture layers.
-  virtual int GetNumTextureLayers () { return num_texture_layers; }
+  virtual int GetNumTextureLayers ();
   /// Get a texture layer.
   virtual csTextureLayer* GetTextureLayer (int idx);
   /// Get flat color.
@@ -113,6 +111,8 @@ public:
   /// Get reflection values (diffuse, ambient, reflection).
   virtual void GetReflection (float &oDiffuse, float &oAmbient,
     float &oReflection);
+
+  DECLARE_IBASE;
 };
 
 /**
@@ -251,5 +251,26 @@ public:
     }
   } scfiMaterialList;
 };
+
+//--- implementation of inline methods ---------------------------------------
+
+inline csRGBcolor& csMaterial::GetFlatColor ()
+{ return flat_color; }
+inline void csMaterial::SetFlatColor (const csRGBcolor& col)
+{ flat_color = col; }
+inline iTextureWrapper *csMaterial::GetTextureWrapper () const
+{ return texture; }
+inline float csMaterial::GetDiffuse () const
+{ return diffuse; }
+inline void csMaterial::SetDiffuse (float val)
+{ diffuse = val; }
+inline float csMaterial::GetAmbient () const
+{ return ambient; }
+inline void csMaterial::SetAmbient (float val)
+{ ambient = val; }
+inline float csMaterial::GetReflection () const
+{ return reflection; }
+inline void csMaterial::SetReflection (float val)
+{ reflection = val; }
 
 #endif // __CS_MATERIAL_H__

@@ -723,12 +723,12 @@ void csEngine::Clear ()
     delete first_dyn_lights;
     first_dyn_lights = dyn;
   }
-  delete textures; 
-  textures = NULL;
-  textures = new csTextureList ();
   delete materials; 
   materials = NULL;
   materials = new csMaterialList ();
+  delete textures; 
+  textures = NULL;
+  textures = new csTextureList ();
 
   // Delete engine states and their references to cullers before cullers are
   // deleted in SetCuller below.
@@ -1888,8 +1888,7 @@ iTextureWrapper* csEngine::CreateTexture (const char *iName, const char *iFileNa
 
 iMaterialWrapper* csEngine::CreateMaterial (const char *iName, iTextureWrapper* texture)
 {
-  csMaterial* mat = new csMaterial
-    (texture ? ((csTextureWrapper::TextureWrapper*)texture)->scfParent : NULL);
+  csMaterial* mat = new csMaterial (texture);
   csMaterialWrapper* wrapper = materials->NewMaterial (mat);
   wrapper->SetName (iName);
   return &wrapper->scfiMaterialWrapper;

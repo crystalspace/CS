@@ -105,7 +105,7 @@ csMaterialWrapper* csProcTexture::Initialize (iSystem * system,
   csMaterial* material = new csMaterial ();
   csMaterialWrapper* mat = engine->GetMaterials ()->NewMaterial (material);
   mat->SetName (name);
-  material->SetTextureWrapper (tex);
+  material->SetTextureWrapper (&tex->scfiTextureWrapper);
   material->DecRef ();
   mat->Register (txtmgr);
   mat->GetMaterialHandle ()->Prepare ();

@@ -28,7 +28,7 @@ IMPLEMENT_IBASE (csMaterial)
 IMPLEMENT_IBASE_END
 
 csMaterial::csMaterial () :
-  texture(0),
+  texture(NULL),
   num_texture_layers (0),
   diffuse(CS_DEFMAT_DIFFUSE),
   ambient(CS_DEFMAT_AMBIENT),
@@ -38,7 +38,7 @@ csMaterial::csMaterial () :
   flat_color.Set (255, 255, 255); // Default state is white, flat-shaded.
 }
 
-csMaterial::csMaterial (csTextureWrapper* w) :
+csMaterial::csMaterial (iTextureWrapper* w) :
   texture(w),
   num_texture_layers (0),
   diffuse(CS_DEFMAT_DIFFUSE),
@@ -47,15 +47,61 @@ csMaterial::csMaterial (csTextureWrapper* w) :
 {
   CONSTRUCT_IBASE (NULL);
   flat_color.Set (255, 255, 255); // Default state is white, flat-shaded.
+  if (texture)
+    texture->IncRef ();
 }
 
 csMaterial::~csMaterial () 
 {
+  if (texture)
+    texture->DecRef ();
+  for (int i=0; i<num_texture_layers; i++)
+    if (texture_layers[i].txt_handle)
+      texture_layers[i].txt_handle->DecRef ();
+}
+
+void csMaterial::SetTextureWrapper (iTextureWrapper *tex)
+{
+  if (texture)
+    texture->DecRef();
+  texture = tex;
+  if (texture)
+    texture->IncRef();
+}
+
+void csMaterial::AddTextureLayer (iTextureWrapper* txtwrap, UInt mode,
+      	int uscale, int vscale, int ushift, int vshift)
+{
+  if (num_texture_layers >= 4) return;
+  texture_layer_wrappers[num_texture_layers] = txtwrap;
+  texture_layers[num_texture_layers].mode = mode;
+  texture_layers[num_texture_layers].uscale = uscale;
+  texture_layers[num_texture_layers].vscale = vscale;
+  texture_layers[num_texture_layers].ushift = ushift;
+  texture_layers[num_texture_layers].vshift = vshift;
+  num_texture_layers++;
+
+  txtwrap->IncRef ();
 }
 
 iTextureHandle *csMaterial::GetTexture ()
 {
   return texture ? texture->GetTextureHandle () : NULL;
+}
+
+int csMaterial::GetNumTextureLayers ()
+{
+  return num_texture_layers;
+}
+
+csTextureLayer* csMaterial::GetTextureLayer (int idx)
+{
+  if (idx >= 0 && idx < num_texture_layers)
+  {
+    texture_layers[idx].txt_handle = texture_layer_wrappers[idx]->GetTextureHandle ();
+    return &texture_layers[idx];
+  }
+  else return NULL;
 }
 
 void csMaterial::GetFlatColor (csRGBpixel &oColor)
@@ -74,29 +120,6 @@ void csMaterial::GetReflection (float &oDiffuse, float &oAmbient,
   oDiffuse = diffuse;
   oAmbient = ambient;
   oReflection = reflection;
-}
-
-void csMaterial::AddTextureLayer (csTextureWrapper* txtwrap, UInt mode,
-      	int uscale, int vscale, int ushift, int vshift)
-{
-  if (num_texture_layers >= 4) return;
-  texture_layer_wrappers[num_texture_layers] = txtwrap;
-  texture_layers[num_texture_layers].mode = mode;
-  texture_layers[num_texture_layers].uscale = uscale;
-  texture_layers[num_texture_layers].vscale = vscale;
-  texture_layers[num_texture_layers].ushift = ushift;
-  texture_layers[num_texture_layers].vshift = vshift;
-  num_texture_layers++;
-}
-
-csTextureLayer* csMaterial::GetTextureLayer (int idx)
-{
-  if (idx >= 0 && idx < num_texture_layers)
-  {
-    texture_layers[idx].txt_handle = texture_layer_wrappers[idx]->GetTextureHandle ();
-    return &texture_layers[idx];
-  }
-  else return NULL;
 }
 
 //---------------------------------------------------------------------------
