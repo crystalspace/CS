@@ -1459,7 +1459,7 @@ bool csPolygon3D::ClipToPlane (
 #define EXPERIMENTAL_BUG_FIX  1
 
 bool csPolygon3D::DoPerspective (
-  const csTransform &trans,
+  const csTransform & /*trans*/,
   csVector3 *source,
   int num_verts,
   csPolygon2D *dest,
