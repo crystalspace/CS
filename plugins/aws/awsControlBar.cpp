@@ -25,14 +25,14 @@ const int awsControlBar::alignTop = 1;
 const int awsControlBar::alignBottom = 2;
 const int awsControlBar::alignCenter = 3;
 
-awsControlBar::awsControlBar () :
-  hGap (0),
-  vGap (0),
-  vert_align (alignTop),
-  size_to_fit_horz (true),
-  size_to_fit_vert (true),  
-  vertical (false),
-  stretch_items (false)
+awsControlBar::awsControlBar ()
+ : hGap (0),
+   vGap (0),
+   vert_align (alignTop),
+   size_to_fit_horz (true),
+   size_to_fit_vert (true),
+   vertical (false),
+   stretch_items (false)
 {
 }
 
@@ -82,7 +82,7 @@ bool awsControlBar::Execute (const char* action, iAwsParmList* parmlist)
 
 bool awsControlBar::Setup (iAws *_wmgr, iAwsComponentNode* settings)
 {
-	frame_drawer.SetBackgroundAlpha (96);
+  frame_drawer.SetBackgroundAlpha (96);
 
   if (!awsPanel::Setup (_wmgr, settings))
     return false;
@@ -120,7 +120,6 @@ void awsControlBar::DoLayout ()
     if (size_to_fit_horz)
     {
       csRect r = getInsets ();
-
       Resize (max_width + 2 * hGap + r.xmin + r.xmax, Frame ().Height ());
     }
     

@@ -67,7 +67,6 @@ csTextureHandle::csTextureHandle (
     image->GetKeycolor (r, g, b);
     SetKeyColor (r, g, b);
   }
-
   cachedata = 0;
 }
 
@@ -138,7 +137,6 @@ void csTextureHandle::CreateMipmaps ()
     tex[3] = NewTexture (i3);
     DG_LINK (this, tex[3]);
   }
-
   ComputeMeanColor ();
 }
 
@@ -156,7 +154,7 @@ void csTextureHandle::SetKeyColor (uint8 red, uint8 green, uint8 blue)
   transp = true;
 }
 
-/// Get the transparent color
+/// Get the transparent color.
 void csTextureHandle::GetKeyColor (uint8 &r, uint8 &g, uint8 &b)
 {
   r = transp_color.red;
@@ -185,7 +183,6 @@ bool csTextureHandle::GetMipMapDimensions (int mipmap, int &w, int &h)
     h = txt->get_height ();
     return true;
   }
-
   return false;
 }
 
@@ -303,7 +300,6 @@ void csMaterialHandle::Prepare ()
         DG_LINK (this, texture);
       }
     }
-
     material->GetReflection (diffuse, ambient, reflection);
     material->GetFlatColor (flat_color);
   }
@@ -330,7 +326,6 @@ csTextureManager::csTextureManager (
   SCF_CONSTRUCT_IBASE (0);
   csTextureManager::object_reg = object_reg;
   verbose = false;
-
   pfmt = *iG2D->GetPixelFormat ();
 }
 
@@ -383,7 +378,8 @@ void csTextureManager::UnregisterMaterial (csMaterialHandle *handle)
 void csTextureManager::PrepareMaterials ()
 {
   int i;
-  for (i = 0; i < materials.Length (); i++) materials.Get (i)->Prepare ();
+  for (i = 0; i < materials.Length (); i++)
+    materials.Get (i)->Prepare ();
 }
 
 void csTextureManager::FreeMaterials ()

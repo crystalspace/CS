@@ -246,9 +246,9 @@ void csTextureHandleNull::remap_texture (csTextureManager *texman)
       for (i = 0; i < palette_size; i++)
       {
         ((uint32 *)pal2glob)[i] = txm->encode_rgb (
-            palette[i].red,
-            palette[i].green,
-            palette[i].blue);
+          palette[i].red,
+          palette[i].green,
+          palette[i].blue);
       }
       break;
   }
@@ -264,7 +264,7 @@ csTextureManagerNull::csTextureManagerNull (
   iObjectRegistry *object_reg,
   iGraphics2D *iG2D,
   iConfigFile *config)
-: csTextureManager(object_reg, iG2D)
+: csTextureManager (object_reg, iG2D)
 {
   read_config (config);
   G2D = iG2D;

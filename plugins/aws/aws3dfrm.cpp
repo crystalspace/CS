@@ -95,7 +95,6 @@ void aws3DFrame::Draw (
   csRect ovl_align,
   csRectRegion* todraw)
 {
-
   // If no region was passed make our own this function gets called
   // alot so while this looks a little odd its probably better to be
   // allocating these things on the stack.
@@ -105,8 +104,8 @@ void aws3DFrame::Draw (
   if (todraw == 0)
   {
     todraw = &our_todraw;
-	  todraw->makeEmpty ();
-	  todraw->Include (frame);
+    todraw->makeEmpty ();
+    todraw->Include (frame);
   }
 
   csRect clientArea = frame;
@@ -130,270 +129,270 @@ void aws3DFrame::Draw (
   switch (frame_style & fsMask)
   {
   case fsBump:
-	  DrawBumpFrame (frame);
-	  DrawFlatBackground (todraw, bfill);
-	  if (bkg)
-		  DrawTexturedBackground (todraw_txt, bkg, bkg_alpha, bkg_align);
-	  if (ovl)
-		  DrawTexturedBackground (todraw_txt, ovl, ovl_alpha, ovl_align);
-	  break;
+    DrawBumpFrame (frame);
+    DrawFlatBackground (todraw, bfill);
+    if (bkg)
+      DrawTexturedBackground (todraw_txt, bkg, bkg_alpha, bkg_align);
+    if (ovl)
+      DrawTexturedBackground (todraw_txt, ovl, ovl_alpha, ovl_align);
+    break;
   case fsSunken:
-	  DrawSunkenFrame (frame);
-	  DrawFlatBackground (todraw, bfill);
-	  if (bkg)
-		  DrawTexturedBackground (todraw_txt, bkg, bkg_alpha, bkg_align);
-	  if (ovl)
-		  DrawTexturedBackground (todraw_txt, ovl, ovl_alpha, ovl_align);
-	  break;
+    DrawSunkenFrame (frame);
+    DrawFlatBackground (todraw, bfill);
+    if (bkg)
+      DrawTexturedBackground (todraw_txt, bkg, bkg_alpha, bkg_align);
+    if (ovl)
+      DrawTexturedBackground (todraw_txt, ovl, ovl_alpha, ovl_align);
+    break;
   case fsRaised:
-	  DrawRaisedFrame (frame);
-	  DrawFlatBackground (todraw, bfill);
-	  if (bkg)
-		  DrawTexturedBackground (todraw_txt, bkg, bkg_alpha, bkg_align);
-	  if (ovl)
-		  DrawTexturedBackground (todraw_txt, ovl, ovl_alpha, ovl_align);
-	  break;
+    DrawRaisedFrame (frame);
+    DrawFlatBackground (todraw, bfill);
+    if (bkg)
+      DrawTexturedBackground (todraw_txt, bkg, bkg_alpha, bkg_align);
+    if (ovl)
+      DrawTexturedBackground (todraw_txt, ovl, ovl_alpha, ovl_align);
+    break;
   case fsFlat:
-	  DrawFlatBackground (todraw, bfill);
-	  if (bkg)
-		  DrawTexturedBackground (todraw_txt, bkg, bkg_alpha, bkg_align);
-	  if (ovl)
-		  DrawTexturedBackground (todraw_txt, ovl, ovl_alpha, ovl_align);
-	  break;
+    DrawFlatBackground (todraw, bfill);
+    if (bkg)
+      DrawTexturedBackground (todraw_txt, bkg, bkg_alpha, bkg_align);
+    if (ovl)
+      DrawTexturedBackground (todraw_txt, ovl, ovl_alpha, ovl_align);
+    break;
   case fsSimple:
-	  DrawFlatBackground (todraw, bfill);
-	  break; 
+    DrawFlatBackground (todraw, bfill);
+    break; 
   case fsNone:
-	  break;
+    break;
   case fsBevel:
-	  DrawBevelFrame (frame);
-	  DrawFlatBackground (todraw, bfill);
-	  if (bkg)
-		  DrawTexturedBackground (todraw_txt, bkg, bkg_alpha, bkg_align);
-	  if (ovl)
-		  DrawTexturedBackground (todraw_txt, ovl, ovl_alpha, ovl_align);
-	  break;
+    DrawBevelFrame (frame);
+    DrawFlatBackground (todraw, bfill);
+    if (bkg)
+      DrawTexturedBackground (todraw_txt, bkg, bkg_alpha, bkg_align);
+    if (ovl)
+      DrawTexturedBackground (todraw_txt, ovl, ovl_alpha, ovl_align);
+    break;
   case fsThick:
-	  DrawThickFrame (frame);
-	  DrawFlatBackground (todraw, bfill);
-	  if (bkg)
-		  DrawTexturedBackground (todraw_txt, bkg, bkg_alpha, bkg_align);
-	  if (ovl)
-		  DrawTexturedBackground (todraw_txt, ovl, ovl_alpha, ovl_align);
-	  break;
+    DrawThickFrame (frame);
+    DrawFlatBackground (todraw, bfill);
+    if (bkg)
+      DrawTexturedBackground (todraw_txt, bkg, bkg_alpha, bkg_align);
+    if (ovl)
+      DrawTexturedBackground (todraw_txt, ovl, ovl_alpha, ovl_align);
+    break;
   case fsBitmap:
-	  //DrawFlatBackground(todraw, bfill);
-	  if (bkg)
-		  DrawTexturedBackground (todraw_txt, bkg, bkg_alpha, bkg_align);
-	  if(ovl)
-		  DrawTexturedBackground (todraw_txt, ovl, ovl_alpha, ovl_align);
-	  break;
+    //DrawFlatBackground(todraw, bfill);
+    if (bkg)
+      DrawTexturedBackground (todraw_txt, bkg, bkg_alpha, bkg_align);
+    if(ovl)
+      DrawTexturedBackground (todraw_txt, ovl, ovl_alpha, ovl_align);
+    break;
   case fsSmallRaised:
     DrawSmallRaisedFrame (frame);
     DrawFlatBackground (todraw, bfill);
-	  if (bkg)
-		  DrawTexturedBackground (todraw_txt, bkg, bkg_alpha, bkg_align);
-	  if(ovl)
-		  DrawTexturedBackground (todraw_txt, ovl, ovl_alpha, ovl_align);
-	  break;
+    if (bkg)
+      DrawTexturedBackground (todraw_txt, bkg, bkg_alpha, bkg_align);
+    if(ovl)
+      DrawTexturedBackground (todraw_txt, ovl, ovl_alpha, ovl_align);
+    break;
   case fsSmallSunken:
     DrawSmallSunkenFrame (frame);
     DrawFlatBackground (todraw, bfill);
-	  if (bkg)
-		  DrawTexturedBackground (todraw_txt, bkg, bkg_alpha, bkg_align);
-	  if (ovl)
-		  DrawTexturedBackground (todraw_txt, ovl, ovl_alpha, ovl_align);
-	  break;
+    if (bkg)
+      DrawTexturedBackground (todraw_txt, bkg, bkg_alpha, bkg_align);
+    if (ovl)
+      DrawTexturedBackground (todraw_txt, ovl, ovl_alpha, ovl_align);
+    break;
   }
 }
 
 void aws3DFrame::DrawSmallRaisedFrame (csRect frame)
 {
-	g2d->DrawLine (
-		frame.xmin + 0,
-		frame.ymin + 0,
-		frame.xmax - 1,
-		frame.ymin + 0,
-		hi);
-	g2d->DrawLine (
-		frame.xmin + 0,
-		frame.ymin + 0,
-		frame.xmin + 0,
-		frame.ymax - 1,
-		hi);
-	g2d->DrawLine (
-		frame.xmin + 0,
-		frame.ymax - 1,
-		frame.xmax - 1,
-		frame.ymax - 1,
-		lo);
-	g2d->DrawLine (
-		frame.xmax - 1,
-		frame.ymin + 0,
-		frame.xmax - 1,
-		frame.ymax - 1,
-		lo);
+  g2d->DrawLine (
+    frame.xmin + 0,
+    frame.ymin + 0,
+    frame.xmax - 1,
+    frame.ymin + 0,
+    hi);
+  g2d->DrawLine (
+    frame.xmin + 0,
+    frame.ymin + 0,
+    frame.xmin + 0,
+    frame.ymax - 1,
+    hi);
+  g2d->DrawLine (
+    frame.xmin + 0,
+    frame.ymax - 1,
+    frame.xmax - 1,
+    frame.ymax - 1,
+    lo);
+  g2d->DrawLine (
+    frame.xmax - 1,
+    frame.ymin + 0,
+    frame.xmax - 1,
+    frame.ymax - 1,
+    lo);
 }
 
 void aws3DFrame::DrawSmallSunkenFrame (csRect frame)
 {
-	g2d->DrawLine (
-		frame.xmin + 0,
-		frame.ymin + 0,
-		frame.xmax - 1,
-		frame.ymin + 0,
-		lo);
-	g2d->DrawLine (
-		frame.xmin + 0,
-		frame.ymin + 0,
-		frame.xmin + 0,
-		frame.ymax - 1,
-		lo);
-	g2d->DrawLine (
-		frame.xmin + 0,
-		frame.ymax - 1,
-		frame.xmax - 1,
-		frame.ymax - 1,
-		hi);
-	g2d->DrawLine (
-		frame.xmax - 1,
-		frame.ymin + 0,
-		frame.xmax - 1,
-		frame.ymax - 1,
-		hi);
+  g2d->DrawLine (
+    frame.xmin + 0,
+    frame.ymin + 0,
+    frame.xmax - 1,
+    frame.ymin + 0,
+    lo);
+  g2d->DrawLine (
+    frame.xmin + 0,
+    frame.ymin + 0,
+    frame.xmin + 0,
+    frame.ymax - 1,
+    lo);
+  g2d->DrawLine (
+    frame.xmin + 0,
+    frame.ymax - 1,
+    frame.xmax - 1,
+    frame.ymax - 1,
+    hi);
+  g2d->DrawLine (
+    frame.xmax - 1,
+    frame.ymin + 0,
+    frame.xmax - 1,
+    frame.ymax - 1,
+    hi);
 }
 
 void aws3DFrame::DrawRaisedFrame (csRect frame)
 {
-	g2d->DrawLine (
-		frame.xmin + 0,
-		frame.ymin + 0,
-		frame.xmax - 2,
-		frame.ymin + 0,
-		hi);
-	g2d->DrawLine (
-		frame.xmin + 0,
-		frame.ymin + 0,
-		frame.xmin + 0,
-		frame.ymax - 2,
-		hi);
-	g2d->DrawLine (
-		frame.xmin + 0,
-		frame.ymax - 2,
-		frame.xmax - 2,
-		frame.ymax - 2,
-		lo);
-	g2d->DrawLine (
-		frame.xmax - 2,
-		frame.ymin + 0,
-		frame.xmax - 2,
-		frame.ymax - 2,
-		lo);
-	g2d->DrawLine (
-		frame.xmin + 1,
-		frame.ymax - 1,
-		frame.xmax - 1,
-		frame.ymax - 1,
-		black);
-	g2d->DrawLine (
-		frame.xmax - 1,
-		frame.ymin + 1,
-		frame.xmax - 1,
-		frame.ymax - 1,
-		black);
-	g2d->DrawLine (
-		frame.xmin + 1,
-		frame.ymin + 1,
-		frame.xmax - 3,
-		frame.ymin + 1,
-		hi2);
-	g2d->DrawLine (
-		frame.xmin + 1,
-		frame.ymin + 1,
-		frame.xmin + 1,
-		frame.ymax - 3,
-		hi2);
-	g2d->DrawLine (
-		frame.xmin + 1,
-		frame.ymax - 3,
-		frame.xmax - 3,
-		frame.ymax - 3,
-		lo2);
-	g2d->DrawLine (
-		frame.xmax - 3,
-		frame.ymin + 1,
-		frame.xmax - 3,
-		frame.ymax - 3,
-		lo2);
+  g2d->DrawLine (
+    frame.xmin + 0,
+    frame.ymin + 0,
+    frame.xmax - 2,
+    frame.ymin + 0,
+    hi);
+  g2d->DrawLine (
+    frame.xmin + 0,
+    frame.ymin + 0,
+    frame.xmin + 0,
+    frame.ymax - 2,
+    hi);
+  g2d->DrawLine (
+    frame.xmin + 0,
+    frame.ymax - 2,
+    frame.xmax - 2,
+    frame.ymax - 2,
+    lo);
+  g2d->DrawLine (
+    frame.xmax - 2,
+    frame.ymin + 0,
+    frame.xmax - 2,
+    frame.ymax - 2,
+    lo);
+  g2d->DrawLine (
+    frame.xmin + 1,
+    frame.ymax - 1,
+    frame.xmax - 1,
+    frame.ymax - 1,
+    black);
+  g2d->DrawLine (
+    frame.xmax - 1,
+    frame.ymin + 1,
+    frame.xmax - 1,
+    frame.ymax - 1,
+    black);
+  g2d->DrawLine (
+    frame.xmin + 1,
+    frame.ymin + 1,
+    frame.xmax - 3,
+    frame.ymin + 1,
+    hi2);
+  g2d->DrawLine (
+    frame.xmin + 1,
+    frame.ymin + 1,
+    frame.xmin + 1,
+    frame.ymax - 3,
+    hi2);
+  g2d->DrawLine (
+    frame.xmin + 1,
+    frame.ymax - 3,
+    frame.xmax - 3,
+    frame.ymax - 3,
+    lo2);
+  g2d->DrawLine (
+    frame.xmax - 3,
+    frame.ymin + 1,
+    frame.xmax - 3,
+    frame.ymax - 3,
+    lo2);
 }
 
 void aws3DFrame::DrawSunkenFrame (csRect frame)
 {
-	g2d->DrawLine (
-		frame.xmin + 0,
-		frame.ymin + 0,
-		frame.xmax - 2,
-		frame.ymin + 0,
-		lo2);
-	g2d->DrawLine (
-		frame.xmin + 0,
-		frame.ymin + 0,
-		frame.xmin + 0,
-		frame.ymax - 2,
-		lo2);
-	g2d->DrawLine (
-		frame.xmin + 1,
-		frame.ymin + 1,
-		frame.xmax - 1,
-		frame.ymin + 1,
-		lo);
-	g2d->DrawLine (
-		frame.xmin + 1,
-		frame.ymin + 1,
-		frame.xmin + 1,
-		frame.ymax - 1,
-		lo);
-	g2d->DrawLine (
-		frame.xmin + 1,
-		frame.ymax - 1,
-		frame.xmax - 1,
-		frame.ymax - 1,
-		hi);
-	g2d->DrawLine (
-		frame.xmax - 1,
-		frame.ymin + 1,
-		frame.xmax - 1,
-		frame.ymax - 1,
-		hi);
-	g2d->DrawLine (
-		frame.xmin + 2,
-		frame.ymin + 2,
-		frame.xmax - 2,
-		frame.ymin + 2,
-		black);
-	g2d->DrawLine (
-		frame.xmin + 2,
-		frame.ymin + 2,
-		frame.xmin + 2,
-		frame.ymax - 2,
-		black);
-	g2d->DrawLine (
-		frame.xmin + 2,
-		frame.ymax - 2,
-		frame.xmax - 2,
-		frame.ymax - 2,
-		hi2);
-	g2d->DrawLine (
-		frame.xmax - 2,
-		frame.ymin + 2,
-		frame.xmax - 2,
-		frame.ymax - 2,
-		hi2);
+  g2d->DrawLine (
+    frame.xmin + 0,
+    frame.ymin + 0,
+    frame.xmax - 2,
+    frame.ymin + 0,
+    lo2);
+  g2d->DrawLine (
+    frame.xmin + 0,
+    frame.ymin + 0,
+    frame.xmin + 0,
+    frame.ymax - 2,
+    lo2);
+  g2d->DrawLine (
+    frame.xmin + 1,
+    frame.ymin + 1,
+    frame.xmax - 1,
+    frame.ymin + 1,
+    lo);
+  g2d->DrawLine (
+    frame.xmin + 1,
+    frame.ymin + 1,
+    frame.xmin + 1,
+    frame.ymax - 1,
+    lo);
+  g2d->DrawLine (
+    frame.xmin + 1,
+    frame.ymax - 1,
+    frame.xmax - 1,
+    frame.ymax - 1,
+    hi);
+  g2d->DrawLine (
+    frame.xmax - 1,
+    frame.ymin + 1,
+    frame.xmax - 1,
+    frame.ymax - 1,
+    hi);
+  g2d->DrawLine (
+    frame.xmin + 2,
+    frame.ymin + 2,
+    frame.xmax - 2,
+    frame.ymin + 2,
+    black);
+  g2d->DrawLine (
+    frame.xmin + 2,
+    frame.ymin + 2,
+    frame.xmin + 2,
+    frame.ymax - 2,
+    black);
+  g2d->DrawLine (
+    frame.xmin + 2,
+    frame.ymax - 2,
+    frame.xmax - 2,
+    frame.ymax - 2,
+    hi2);
+  g2d->DrawLine (
+    frame.xmax - 2,
+    frame.ymin + 2,
+    frame.xmax - 2,
+    frame.ymax - 2,
+    hi2);
 }
 
 void aws3DFrame::DrawBumpFrame (csRect frame)
 {
-	g2d->DrawLine (
+  g2d->DrawLine (
     frame.xmin + 0,
     frame.ymin + 0,
     frame.xmax - 2,
@@ -493,132 +492,133 @@ void aws3DFrame::DrawBumpFrame (csRect frame)
 
 void aws3DFrame::DrawBevelFrame (csRect frame)
 {
-	// Draw a beveled border, fill-hi on top and left, black-shadow
-  // on bot and right.
- 
-	g2d->DrawLine (
-		frame.xmin,
-		frame.ymin,
-		frame.xmax,
-		frame.ymin,
-		fill);
-	g2d->DrawLine (
-		frame.xmin + 1,
-		frame.ymin + 1,
-		frame.xmax - 2,
-		frame.ymin + 1,
-		hi);
-	g2d->DrawLine (
-		frame.xmin,
-		frame.ymin + 1,
-		frame.xmin,
-		frame.ymax - 1,
-		fill);
-	g2d->DrawLine (
-		frame.xmin + 1,
-		frame.ymin + 2,
-		frame.xmin + 1,
-		frame.ymax - 2,
-		hi);
-	g2d->DrawLine (
-		frame.xmin,
-		frame.ymax - 1,
-		frame.xmax - 1,
-		frame.ymax - 1,
-		black);
-	g2d->DrawLine (
-		frame.xmin + 1,
-		frame.ymax - 2,
-		frame.xmax - 2,
-		frame.ymax - 2,
-		lo);
-	g2d->DrawLine (
-		frame.xmax - 1,
-		frame.ymin,
-		frame.xmax - 1,
-		frame.ymax - 2,
-		black);
-	g2d->DrawLine (
-		frame.xmax - 2,
-		frame.ymin + 1,
-		frame.xmax - 2,
-		frame.ymax - 3,
-		lo);
+  /**
+   * Draw a beveled border, fill-hi on top and left, black-shadow
+   * on bot and right.
+   */
+  g2d->DrawLine (
+    frame.xmin,
+    frame.ymin,
+    frame.xmax,
+    frame.ymin,
+    fill);
+  g2d->DrawLine (
+    frame.xmin + 1,
+    frame.ymin + 1,
+    frame.xmax - 2,
+    frame.ymin + 1,
+    hi);
+  g2d->DrawLine (
+    frame.xmin,
+    frame.ymin + 1,
+    frame.xmin,
+    frame.ymax - 1,
+    fill);
+  g2d->DrawLine (
+    frame.xmin + 1,
+    frame.ymin + 2,
+    frame.xmin + 1,
+    frame.ymax - 2,
+    hi);
+  g2d->DrawLine (
+    frame.xmin,
+    frame.ymax - 1,
+    frame.xmax - 1,
+    frame.ymax - 1,
+    black);
+  g2d->DrawLine (
+    frame.xmin + 1,
+    frame.ymax - 2,
+    frame.xmax - 2,
+    frame.ymax - 2,
+    lo);
+  g2d->DrawLine (
+    frame.xmax - 1,
+    frame.ymin,
+    frame.xmax - 1,
+    frame.ymax - 2,
+    black);
+  g2d->DrawLine (
+    frame.xmax - 2,
+    frame.ymin + 1,
+    frame.xmax - 2,
+    frame.ymax - 3,
+    lo);
 }
 
 void aws3DFrame::DrawThickFrame (csRect frame)
 {
-	int topleft[9] = { fill, hi, hi2, fill, fill, fill, fill, fill, fill };
+  int topleft[9] = { fill, hi, hi2, fill, fill, fill, fill, fill, fill };
   int botright[9] = { black, lo, lo2, fill, fill, fill, fill, fill, fill };
   int step = 4;
 	
   int i;
-	for (i = 0; i < step; ++i)
-	{
-		g2d->DrawLine (
-			frame.xmin + i,
-			frame.ymin + i,
-			frame.xmax - i-1,
-			frame.ymin + i,
-			topleft[i]);
-		g2d->DrawLine (
-			frame.xmin + i,
-			frame.ymin + i,
-			frame.xmin + i,
-			frame.ymax - i-1,
-			topleft[i]);
-		g2d->DrawLine (
-			frame.xmin + i,
-			frame.ymax - i-1,
-			frame.xmax - i-1,
-			frame.ymax - i-1,
-			botright[i]);
-		g2d->DrawLine (
-			frame.xmax - i-1,
-			frame.ymin + i,
-			frame.xmax - i-1,
-			frame.ymax - i-1,
-			botright[i]);
-	}
+  for (i = 0; i < step; ++i)
+  {
+    g2d->DrawLine (
+      frame.xmin + i,
+      frame.ymin + i,
+      frame.xmax - i - 1,
+      frame.ymin + i,
+      topleft[i]);
+    g2d->DrawLine (
+      frame.xmin + i,
+      frame.ymin + i,
+      frame.xmin + i,
+      frame.ymax - i - 1,
+      topleft[i]);
+    g2d->DrawLine (
+      frame.xmin + i,
+      frame.ymax - i - 1,
+      frame.xmax - i - 1,
+      frame.ymax - i - 1,
+      botright[i]);
+    g2d->DrawLine (
+      frame.xmax - i - 1,
+      frame.ymin + i,
+      frame.xmax - i - 1,
+      frame.ymax - i - 1,
+      botright[i]);
+  }
 }
 
 csRect aws3DFrame::GetInsets (int style)
 {
-	csRect r;
-	switch (style & fsMask)
-	{
-	case fsNone:
-	case fsSimple:
-	case fsFlat:
+  csRect r;
+  switch (style & fsMask)
+  {
+  case fsNone:
+  case fsSimple:
+  case fsFlat:
   case fsBitmap:
-		r = csRect (0, 0, 0, 0);
-		break;
+    r = csRect (0, 0, 0, 0);
+    break;
   case fsSmallRaised:
   case fsSmallSunken:
     r = csRect (1, 1, 1, 1);
     break;
-	case fsRaised:
+  case fsRaised:
     r = csRect (2, 2, 3, 3);
     break;
-	case fsSunken:
-		r = csRect (3, 3, 2, 2);
-		break;
-	case fsBevel:
-		r = csRect (2, 2, 2, 2);
-		break;
-	case fsBump:
-	case fsThick:
-		r = csRect (4, 4, 4, 4);
+  case fsSunken:
+    r = csRect (3, 3, 2, 2);
     break;
-	}
-	return r;
+  case fsBevel:
+    r = csRect (2, 2, 2, 2);
+    break;
+  case fsBump:
+  case fsThick:
+    r = csRect (4, 4, 4, 4);
+    break;
+  }
+  return r;
 }
 
 csRect aws3DFrame::SubRectToAlign (csRect comp_frame, csRect txt_sub_rect)
 {
-	csRect ret;
-	ret.xmin = comp_frame.xmin - txt_sub_rect.xmin;
-	ret.ymin = comp_frame.ymin - txt_sub_rect.ymin;
+  csRect ret;
+  ret.xmin = comp_frame.xmin - txt_sub_rect.xmin;
+  ret.ymin = comp_frame.ymin - txt_sub_rect.ymin;
   return ret;
 }
 
@@ -629,29 +629,29 @@ void aws3DFrame::DrawTexturedBackground (
   csRect bkg_align)
 {
   int i;
-	for (i = 0; i < todraw->Count (); ++i)
-	{
-		csRect r (todraw->RectAt (i));
-		g3d->DrawPixmap (
-			bkg,
-			r.xmin,
-			r.ymin,
-			r.Width (),
-			r.Height (),
-			r.xmin - bkg_align.xmin,
-			r.ymin - bkg_align.ymin,
-			r.Width (),
-			r.Height (),
-			alpha_level);
-	}
+  for (i = 0; i < todraw->Count (); ++i)
+  {
+    csRect r (todraw->RectAt (i));
+    g3d->DrawPixmap (
+      bkg,
+      r.xmin,
+      r.ymin,
+      r.Width (),
+      r.Height (),
+      r.xmin - bkg_align.xmin,
+      r.ymin - bkg_align.ymin,
+      r.Width (),
+      r.Height (),
+      alpha_level);
+  }
 }
 
 void aws3DFrame::DrawFlatBackground (csRectRegion* todraw, int color)        
 {
   int i;
-	for (i = 0; i < todraw->Count (); ++i)
-	{
-		csRect r (todraw->RectAt (i));
-		g2d->DrawBox (r.xmin, r.ymin, r.Width (), r.Height (), color);
-	}
+  for (i = 0; i < todraw->Count (); ++i)
+  {
+    csRect r (todraw->RectAt (i));
+    g2d->DrawBox (r.xmin, r.ymin, r.Width (), r.Height (), color);
+  }
 }

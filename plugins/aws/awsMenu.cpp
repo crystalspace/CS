@@ -82,7 +82,6 @@ bool awsMenuEntry::Setup (iAws *_wmgr, iAwsComponentNode *settings)
         sub_menu_image_height);
     }
   }
-
   SizeToFit ();
   return true;
 }
@@ -235,9 +234,9 @@ void awsMenuEntry::OnDraw (csRect clip)
     int tw, th, ty, mcc;
 
     mcc = WindowManager ()->GetPrefMgr ()->GetDefaultFont ()->GetLength (
-        caption->GetData (),
-        Frame ().Width () - image_width 
-        - (popup && sub_menu_image ? sub_menu_image_width : 0));
+      caption->GetData (),
+      Frame ().Width () - image_width 
+      - (popup && sub_menu_image ? sub_menu_image_width : 0));
 
     scfString tmp (caption->GetData ());
     tmp.Truncate (mcc);
@@ -356,8 +355,7 @@ iAwsComponent* awsMenuEntryFactory::Create ()
   return (iAwsComponent*) new awsMenuEntry;
 }
 
-awsMenuBarEntry::awsMenuBarEntry ()
-  : popup (0)
+awsMenuBarEntry::awsMenuBarEntry () : popup (0)
 {
   style = fsToolbar;
   is_switch = true;
@@ -384,56 +382,56 @@ const char* awsMenuBarEntry::Type ()
 
 bool awsMenuBarEntry::GetProperty (const char* name, void **parm)
 {
-	if (awsCmdButton::GetProperty (name, parm)) return true;
-	
-	if (strcmp ("Caption", name) == 0)
-	{
-		char *st = 0;
-		
-		if (caption) st = caption->GetData ();
-		
-		iString *s = new scfString (st);
-		*parm = (void *)s;
-		return true;
-	}
-	else if (strcmp (name, "PopupMenu") == 0)
-	{
+  if (awsCmdButton::GetProperty (name, parm)) return true;
+
+  if (strcmp ("Caption", name) == 0)
+  {
+    char *st = 0;
+
+    if (caption) st = caption->GetData ();
+
+    iString *s = new scfString (st);
+    *parm = (void *)s;
+    return true;
+  }
+  else if (strcmp (name, "PopupMenu") == 0)
+  {
     *parm = (void *)popup;
-		return true;
-	}
-	else if (strcmp (name, "Selected") == 0)
-	{
-		// cmd buttons use state.
+    return true;
+  }
+  else if (strcmp (name, "Selected") == 0)
+  {
+    // cmd buttons use state.
     return GetProperty ("State", parm);
-	}
+  }
   else if (strcmp (name, "SelectSignal") == 0)
   {
     *parm = (void *)signalClicked;
     return true;
   }
-	return false;
+  return false;
 }
 
 bool awsMenuBarEntry::SetProperty (const char *name, void *parm)
 {
-	if (awsCmdButton::SetProperty (name, parm)) return true;
-	
-	if (strcmp (name, "PopupMenu") == 0)
-	{
-		awsPopupMenu *pm = (awsPopupMenu *) (parm);
-		
-		if (popup) popup->DecRef ();
-		popup = pm;
-		if (popup) popup->IncRef ();
-		Invalidate ();
+  if (awsCmdButton::SetProperty (name, parm)) return true;
+
+  if (strcmp (name, "PopupMenu") == 0)
+  {
+    awsPopupMenu *pm = (awsPopupMenu *) (parm);
+
+    if (popup) popup->DecRef ();
+      popup = pm;
+    if (popup) popup->IncRef ();
+      Invalidate ();
     return true;
-	}
-	else if (strcmp (name, "Selected") == 0)
-	{
+  }
+  else if (strcmp (name, "Selected") == 0)
+  {
     // cmd buttons use state.
-		return SetProperty ("State", parm);
-	}
-	return false;
+    return SetProperty ("State", parm);
+  }
+  return false;
 }
 
 bool awsMenuBarEntry::OnMouseEnter ()
@@ -610,7 +608,7 @@ bool awsMenu::HandleEvent (iEvent &Event)
   {
   case csevMouseMove:
   case csevMouseUp:
-	case csevMouseClick:
+  case csevMouseClick:
   case csevMouseDown:
   case csevMouseEnter:
   case csevMouseExit:
@@ -994,7 +992,7 @@ iAwsComponent* awsPopupMenu::GetNewDefaultEntry ()
 }
 
 awsPopupMenuFactory::awsPopupMenuFactory (iAws *wmgr)
-  : awsComponentFactory(wmgr)
+  : awsComponentFactory (wmgr)
 {
   Register ("Popup Menu");
 }
