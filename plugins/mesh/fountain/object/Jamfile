@@ -5,6 +5,6 @@ Help fountain : "Fountain mesh object plug-in" ;
 Plugin fountain
 	: [ Wildcard *.cpp *.h ]
 ;
-LinkWith fountain : partgen cstool csgeom csutil ;
+LinkWith fountain : partgen cstool csgfx csgeom csutil ;
 
 CompileGroups fountain :  meshes ;
