@@ -89,6 +89,7 @@ csMetaBall::csMetaBall (iMeshObjectFactory *fact)
   current_features = 0;
   vbuf = NULL;
   vbufmgr = NULL;
+  num_mesh_vertices = 0;
 }
 
 csMetaBall::~csMetaBall ()
