@@ -57,6 +57,7 @@ typedef struct
   H3dsMap  * maplist;
   float32 TraMatrix[3*4]; // 3*3 rotation matrix, 3*1 translation matrix
   char name[16];          // object name, zero terminated
+  char material[16];      // object material, zero terminated
 
   // This vertice don't really belong here in the loader structure.
   // It is only used in the converter to hold the centre point

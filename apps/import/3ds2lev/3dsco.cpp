@@ -349,8 +349,8 @@ int main (int argc, char * argv[])
                " -3        Output 3D sprite instead of level\n"
                " -m num    Output only one object from 3DS (use -l to list)\n"
 	       " -tl       Make texture origin lower left\n"
-	       " -xyz      Convert model xyz -> CS xyz (default)\n"
-	       " -xzy      Convert model xyz -> CS xzy\n"
+	       " -xyz      Convert model xyz -> CS xyz\n"
+	       " -xzy      Convert model xyz -> CS xzy (default)\n"
 	       " -yxz      Convert model xyz -> CS yxz\n"
 	       " -yzx      Convert model xyz -> CS yzx\n"
 	       " -zxy      Convert model xyz -> CS zxy\n"
@@ -361,6 +361,8 @@ int main (int argc, char * argv[])
   }
 
   // Get the parameters and filenames
+
+  mode_xyz = MODE_XZY; // default mode
 
   for (n=0; n<argc; n++)
   {
@@ -661,7 +663,7 @@ int main (int argc, char * argv[])
   CollectVertsAndMaps (scene, vrtmap);
 
   // Adjust the face indexes to the new vertice array
-  AdjustFaceIndexes (scene);
+  //AdjustFaceIndexes (scene);
 
 #if 0
 // @@@ This corrupts texture mapping!
@@ -682,8 +684,8 @@ int main (int argc, char * argv[])
   {
     fprintf (stderr, "CS format!\n");
     OutpHeadCS (outf, scene, verts, name);
-    OutpVertsCS (outf, vrtmap, verts, name);
-    OutpCentresCS (outf, scene, name);
+    // removed because we output every object with its vertexes
+    //OutpVertsCS (outf, vrtmap, verts, name);
     OutpObjectsCS (outf, scene, vrtmap, verts, name, flags & FLAG_LIGHTING);
   }
 

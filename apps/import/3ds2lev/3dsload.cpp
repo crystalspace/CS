@@ -351,10 +351,28 @@ static void ReadKeyFramer (int indent, dword p)
   }
 }
 
+static char *ReadMaterialBlock (int, dword)
+{
+  static char material[16];
+
+  // The object material is the first item
+  int n=0;
+  do
+  {
+    dread (&material[n++], 1);
+  } while (material[n-1]!='\0' && n<(int)sizeof(material));
+  material[n-1]='\0';
+  if (flags & FLAG_VERYVERBOSE)
+    fprintf (stderr, "  Object: %d has material '%s'\n", curmodel, material);
+
+  return material;
+}
+
 static void ReadTriMeshBlocks (int indent, dword p, char * name)
 {
   word id;
   dword len, pc;
+  char *material;
   H3dsMeshObj * meshobj=GetMeshObj();
   strcpy(meshobj->name, name);
   while ((pc=dgetpos()) < p)
@@ -371,7 +389,11 @@ static void ReadTriMeshBlocks (int indent, dword p, char * name)
       case CHUNK_MAPLIST:  ReadMapList  (pc+len, meshobj); break;
       case CHUNK_TRMATRIX: ReadTraMatrix(pc+len, meshobj); break;
 
-      //case CHUNK_FACEMAT:
+      case CHUNK_FACEMAT:
+          material = ReadMaterialBlock (indent+2, pc+len);
+          strcpy(meshobj->material, material);
+          dsetpos(pc+len);
+          break;
       //case CHUNK_SMOOLIST:
       default: dsetpos(pc+len);
     }

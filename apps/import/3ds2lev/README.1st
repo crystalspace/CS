@@ -1,0 +1,24 @@
+For 3D artists:
+In 3DSMax you must define the names of objects correctly.
+
+All walls, floors, roof, and anything that "closes" the room must have
+his name starting with "_s_".
+
+If you have an object with a trasparent texture, then his name must start with "_t_".
+
+A 3DSMax object can have only 1 texture for the converter to work. If you need more textures, split the objects in different objects.
+
+
+For programmers:
+These are the CS rules that were applied to the objects convertion process:
+- There should be ONE meshobject for all room geometry (floors, walls, ceiling, columns, ...)
+- That one meshobject should have VISTREE() flag and use ZFILL() mode.
+- For the VISTREE object you should use PRIORITY ('wall')
+- The sector should refer to that object using CULLER ('name_of_that_meshobject')
+- All other mesh objects should use ZUSE() mode and PRIORITY ('object')
+
+There are four standard priority levels: wall, object, sky, and alpha
+- Use 'wall' for the static object.
+- Use 'object' for all others.
+- A sky object would have priority 'sky'.
+- A transparent object would have priority 'alpha'.
