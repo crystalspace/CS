@@ -35,7 +35,7 @@
 #include "iengine/campos.h"
 #include "imesh/object.h"
 #include "imesh/thing/thing.h"
-#include "csparser/csloader.h"
+#include "imap/parser.h"
 #include "plugins/cscript/cspython/cspython.h"
 iSystem* GetSystem()
 {
