@@ -153,7 +153,13 @@ int ExportSprite(const char* filename, float scale, float timescale, CalCoreMode
   ifprintf(f, ind++, "FRAME 'base' (\n");
   for(i=0; i<submesh->getVertexCount(); i++) {
     CalCoreSubmesh::Vertex *v=&submesh->getVectorVertex()[i];
-    CalCoreSubmesh::TextureCoordinate *t=&submesh->getVectorVectorTextureCoordinate()[0][i];
+    CalCoreSubmesh::TextureCoordinate *t=NULL;
+    std::vector<std::vector<CalCoreSubmesh::TextureCoordinate> > &tc=submesh->getVectorVectorTextureCoordinate();
+    if(tc.size()>0) {
+      if(tc[0].size()>(unsigned)i) {
+        t=&submesh->getVectorVectorTextureCoordinate()[0][i];
+      }
+    }
 
 //CS doesn't support per-vertex influences yet, so pick the biggest one
     CalCoreSubmesh::Influence *useinf=NULL;
@@ -166,6 +172,14 @@ int ExportSprite(const char* filename, float scale, float timescale, CalCoreMode
       }
     }
 
+    //Grab texcoord if available
+    char texcoord[255];
+    if(t) {
+      snprintf(texcoord, 255, ":%f,%f", t->u, 1.0f-t->v);
+    } else {
+      texcoord[0]=0;
+    }
+
 //Store xyz
 #if 1 //TODO Azverkan this is for trying to export the model in its "standard pose"
     CalBone *bone=calModel.getSkeleton()->getVectorBone()[useinf->boneId];
@@ -173,9 +187,9 @@ int ExportSprite(const char* filename, float scale, float timescale, CalCoreMode
     pos *= bone->getCoreBone()->getRotationBoneSpace();
     pos += bone->getCoreBone()->getTranslationBoneSpace();
 
-    ifprintf(f, ind, "V(%f,%f,%f:%f,%f)\n", pos.x*scale, pos.y*scale, pos.z*scale, t->u, 1.0f-t->v);
+    ifprintf(f, ind, "V(%f,%f,%f%s)\n", pos.x*scale, pos.y*scale, pos.z*scale, texcoord);
 #else
-    ifprintf(f, ind, "V(%f,%f,%f:%f,%f)\n", v->position.x*scale, v->position.y*scale, v->position.z*scale, t->u, 1.0f-t->v);
+    ifprintf(f, ind, "V(%f,%f,%f%s)\n", v->position.x*scale, v->position.y*scale, v->position.z*scale, texcoord);
 #endif
 
 //Add to bone list
