@@ -51,7 +51,6 @@ csLight::csLight (float x, float y, float z, float d,
   color.red = red;
   color.green = green;
   color.blue = blue;
-  flags = 0;
 
   halo_intensity = 0.0f;
   halo_max_intensity = 1.0f;
@@ -165,7 +164,7 @@ csStatLight::csStatLight (float x, float y, float z, float dist,
 {
   csStatLight::dynamic = dynamic;
   polygons = NULL;
-  flags = CS_LIGHT_THINGSHADOWS;
+  flags.Set (CS_LIGHT_THINGSHADOWS);
 }
 
 csStatLight::~csStatLight ()

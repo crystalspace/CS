@@ -152,7 +152,7 @@ private:
   /// aspect
   float aspect, inv_aspect;
   /// object -> camera transformation
-  csTransform o2c;
+  csReversibleTransform o2c;
   /// current clipper
   csClipper* clipper;
 
@@ -238,7 +238,7 @@ public:
     this->aspect = aspect; inv_aspect = 1.0/aspect;	 
   }
   /// Set world to camera transformation.
-  virtual void SetObjectToCamera (csTransform* o2c) 
+  virtual void SetObjectToCamera (csReversibleTransform* o2c) 
   { 
     this->o2c = *o2c;
   }
@@ -253,7 +253,7 @@ public:
   /// Draw a polygon mesh.
   virtual void DrawPolygonMesh (G3DPolygonMesh& mesh)
   {
-    DefaultDrawPolygonMesh (mesh, this, o2c, clipper, aspect, m_nHalfWidth, m_nHalfHeight );
+    DefaultDrawPolygonMesh (mesh, this, o2c, clipper, aspect, inv_aspect, m_nHalfWidth, m_nHalfHeight );
   }
 
   /// 

@@ -56,7 +56,7 @@ class csGraphics3DInfinite : public iGraphics3D
   int height2;
 
   /// Current transformation from world to camera.
-  csTransform o2c;
+  csReversibleTransform o2c;
   /// Current 2D clipper.
   csClipper* clipper;
   /// Current aspect ratio for perspective correction.
@@ -212,7 +212,7 @@ public:
     inv_aspect = 1./aspect;
   }
   /// Set world to camera transformation.
-  virtual void SetObjectToCamera (csTransform* o2c)
+  virtual void SetObjectToCamera (csReversibleTransform* o2c)
   {
     this->o2c = *o2c;
   }

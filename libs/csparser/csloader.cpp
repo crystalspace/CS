@@ -121,6 +121,7 @@ TOKEN_DEF_START
   TOKEN_DEF (CURVECENTER)
   TOKEN_DEF (CURVECONTROL)
   TOKEN_DEF (CURVESCALE)
+  TOKEN_DEF (DETAIL)
   TOKEN_DEF (DIM)
   TOKEN_DEF (DITHER)
   TOKEN_DEF (DYNAMIC)
@@ -199,7 +200,6 @@ TOKEN_DEF_START
   TOKEN_DEF (TEMPLATE)
   TOKEN_DEF (TERRAIN)
   TOKEN_DEF (HEIGHTMAP)
-  TOKEN_DEF (DETAIL)
   TOKEN_DEF (TEX)
   TOKEN_DEF (TEXLEN)
   TOKEN_DEF (TEXNR)
@@ -725,7 +725,7 @@ csStatLight* csLoader::load_statlight (char* buf)
   CHK (csStatLight* l = new csStatLight (x, y, z, dist, r, g, b, dyn));
   if (halo)
   {
-    l->SetFlags (CS_LIGHT_HALO, CS_LIGHT_HALO);
+    l->flags.Set (CS_LIGHT_HALO, CS_LIGHT_HALO);
     l->SetHaloType (haloIntensity, haloCross);
   }
   l -> SetAttenuation (attenuation);
@@ -953,6 +953,7 @@ csThing* csLoader::load_sixface (char* name, char* buf, csSector* sec)
     TOKEN_TABLE (TEXTURE_SCALE)
     TOKEN_TABLE (TEXTURE)
     TOKEN_TABLE (CEIL_TEXTURE)
+    TOKEN_TABLE (DETAIL)
     TOKEN_TABLE (DIM)
     TOKEN_TABLE (HEIGHT)
     TOKEN_TABLE (FLOOR_HEIGHT)
@@ -1016,7 +1017,10 @@ csThing* csLoader::load_sixface (char* name, char* buf, csSector* sec)
         }
         break;
       case TOKEN_MOVEABLE:
-        thing->SetFlags (CS_ENTITY_MOVEABLE, CS_ENTITY_MOVEABLE);
+        thing->flags.Set (CS_ENTITY_MOVEABLE, CS_ENTITY_MOVEABLE);
+        break;
+      case TOKEN_DETAIL:
+        thing->flags.Set (CS_ENTITY_DETAIL, CS_ENTITY_DETAIL);
         break;
       case TOKEN_MOVE:
         {
@@ -1245,7 +1249,7 @@ csThing* csLoader::load_sixface (char* name, char* buf, csSector* sec)
   }
 
   if (is_convex || thing->GetFog ().enabled)
-    thing->SetFlags (CS_ENTITY_CONVEX, CS_ENTITY_CONVEX);
+    thing->flags.Set (CS_ENTITY_CONVEX, CS_ENTITY_CONVEX);
   thing->SetTransform (obj);
 
   if (!(flags & CS_LOADER_NOTRANSFORM))
@@ -1272,6 +1276,7 @@ csThing* csLoader::load_thing (char* name, char* buf, csSector* sec)
     TOKEN_TABLE (BSP)
     TOKEN_TABLE (FOG)
     TOKEN_TABLE (MOVEABLE)
+    TOKEN_TABLE (DETAIL)
     TOKEN_TABLE (CONVEX)
     TOKEN_TABLE (MOVE)
     TOKEN_TABLE (TEMPLATE)
@@ -1308,7 +1313,10 @@ csThing* csLoader::load_thing (char* name, char* buf, csSector* sec)
     switch (cmd)
     {
       case TOKEN_MOVEABLE:
-        thing->SetFlags (CS_ENTITY_MOVEABLE, CS_ENTITY_MOVEABLE);
+        thing->flags.Set (CS_ENTITY_MOVEABLE, CS_ENTITY_MOVEABLE);
+        break;
+      case TOKEN_DETAIL:
+        thing->flags.Set (CS_ENTITY_DETAIL, CS_ENTITY_DETAIL);
         break;
       case TOKEN_CONVEX:
         is_convex = true;
@@ -1384,7 +1392,7 @@ csThing* csLoader::load_thing (char* name, char* buf, csSector* sec)
   if (!(flags & CS_LOADER_NOCOMPRESS))
     thing->CompressVertices ();
   if (is_convex || thing->GetFog ().enabled)
-    thing->SetFlags (CS_ENTITY_CONVEX, CS_ENTITY_CONVEX);
+    thing->flags.Set (CS_ENTITY_CONVEX, CS_ENTITY_CONVEX);
 
   return thing;
 }
@@ -1492,7 +1500,7 @@ csPolygon3D* csLoader::load_poly3d (char* polyname, char* buf,
         {
           int do_lighting;
           ScanStr (params, "%b", &do_lighting);
-          poly3d->SetFlags (CS_POLY_LIGHTING, do_lighting ? CS_POLY_LIGHTING : 0);
+          poly3d->flags.Set (CS_POLY_LIGHTING, do_lighting ? CS_POLY_LIGHTING : 0);
         }
         break;
       case TOKEN_MIPMAP:
@@ -3525,7 +3533,7 @@ csSector* csLoader::load_room (char* secname, char* buf)
                               sector->Vwor (todo[done].tv2), len);
       else
         p->SetTextureSpace ((csPolyTxtPlane*)World->planes.FindByName (colors[idx].plane));
-      p->SetFlags (CS_POLY_LIGHTING, (no_lighting ? 0 : CS_POLY_LIGHTING));
+      p->flags.Set (CS_POLY_LIGHTING, (no_lighting ? 0 : CS_POLY_LIGHTING));
       csLightMapped* pol_lm = p->GetLightMapInfo ();
       if (pol_lm) pol_lm->SetUniformDynLight (todo[done].light);
     }
@@ -3789,7 +3797,7 @@ void csLoader::skydome_process (csSector& sector, char* name, char* buf,
       p->SetName (poly_name);
       p->SetSector (&sector);
       p->SetParent (&sector);
-      p->SetFlags (CS_POLY_LIGHTING, lighting_flags);
+      p->flags.Set (CS_POLY_LIGHTING, lighting_flags);
       p->SetCosinusFactor (1);
       p->AddVertex (prev_vertices[j]);
       p->AddVertex (new_vertices[(j+1)%num]);
@@ -3810,7 +3818,7 @@ void csLoader::skydome_process (csSector& sector, char* name, char* buf,
       p->SetName (poly_name);
       p->SetSector (&sector);
       p->SetParent (&sector);
-      p->SetFlags (CS_POLY_LIGHTING, lighting_flags);
+      p->flags.Set (CS_POLY_LIGHTING, lighting_flags);
       p->SetCosinusFactor (1);
       p->AddVertex (prev_vertices[j]);
       p->AddVertex (prev_vertices[(j+1)%num]);
@@ -3853,7 +3861,7 @@ void csLoader::skydome_process (csSector& sector, char* name, char* buf,
     p->SetName (poly_name);
     p->SetSector (&sector);
     p->SetParent (&sector);
-    p->SetFlags (CS_POLY_LIGHTING, lighting_flags);
+    p->flags.Set (CS_POLY_LIGHTING, lighting_flags);
     p->SetCosinusFactor (1);
     p->AddVertex (top_vertex);
     p->AddVertex (prev_vertices[j]);

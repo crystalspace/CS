@@ -459,6 +459,89 @@ void csPolygonSet::DrawPolygonArray (csPolygonInt** polygon, int num,
   }
 }
 
+void csPolygonSet::DrawPolygonArrayDPM (csPolygonInt** polygon, int num,
+	csRenderView* d, bool use_z_buf)
+{
+  // @@@ We should include object 2 world transform here too like it
+  // happens with sprites.
+  int i, j;
+  csReversibleTransform tr_o2c = (*d);
+  d->g3d->SetObjectToCamera (&tr_o2c);
+  d->g3d->SetClipper (d->view->GetClipPoly (), d->view->GetNumVertices ());
+  // @@@ This should only be done when aspect changes...
+  d->g3d->SetPerspectiveAspect (d->aspect);
+  d->g3d->SetRenderState (G3DRENDERSTATE_ZBUFFERMODE,
+    use_z_buf ? CS_ZBUF_USE : CS_ZBUF_FILL);
+
+  G3DPolygonMesh mesh;
+  mesh.num_vertices = GetNumVertices ();
+  mesh.num_polygons = GetNumPolygons ();
+  mesh.master_txt_handle = NULL;
+  // @@@ It would be nice if we could avoid this allocate.
+  // Even nicer would be if we didn't have to copy the data
+  // to this structure every time. Maybe hold this array native
+  // in every detail object?
+  // IMPORTANT OPT!!! CACHE THIS ARRAY IN EACH ENTITY!
+  CHK (mesh.polygons = new csPolygonDPM [GetNumPolygons ()]);
+  CHK (mesh.txt_handle = new iTextureHandle* [GetNumPolygons ()]);
+  CHK (mesh.plane = new G3DTexturePlane [GetNumPolygons ()]);
+  CHK (mesh.normal = new csPlane3 [GetNumPolygons ()]);
+  CHK (mesh.poly_texture = new iPolygonTexture* [GetNumPolygons ()]);
+  for (i = 0 ; i < GetNumPolygons () ; i++)
+  {
+    csPolygon3D* p = GetPolygon3D (i);
+
+    // Vertices.
+    int num_v = p->GetNumVertices ();
+    mesh.polygons[i].vertices = num_v;
+    mesh.polygons[i].vertex = p->GetVertexIndices ();
+
+    // Other info.
+    // @@@ ONLY lightmapped polygons right now.
+    // This function needs support for DrawTriangleMesh if gouraud
+    // shaded polygons are used.
+    csLightMapped* lmi = p->GetLightMapInfo ();
+    if (!lmi)
+    {
+      printf ("INTERNAL ERROR! Don't use gouraud shaded polygons on DETAIL objects right now!\n");
+      goto cleanup;
+    }
+    mesh.txt_handle[i] = p->GetTextureHandle ();
+
+    csPolyTxtPlane* txt_plane = lmi->GetTxtPlane ();
+    csMatrix3* m_wor2tex;
+    csVector3* v_wor2tex;
+    txt_plane->GetWorldToTexture (m_wor2tex, v_wor2tex);
+    mesh.plane[i].m_cam2tex = m_wor2tex;	// @@@ WRONG NAME
+    mesh.plane[i].v_cam2tex = v_wor2tex;
+    mesh.normal[i] = p->GetPlane ()->GetWorldPlane ();
+    mesh.poly_texture[i] = lmi->GetPolyTex ();
+  }
+
+  mesh.do_fog = false;
+  mesh.do_clip = false;
+  mesh.do_mirror = d->IsMirrored ();
+  mesh.vertex_mode = G3DPolygonMesh::VM_WORLDSPACE;
+  mesh.vertices = wor_verts;
+  mesh.vertex_fog = NULL;
+
+  // @@@ FAR plane not yet supported here!
+  // @@@ fog not supported yet.
+  // @@@ clipping not supported yet.
+
+  if (!d->callback)
+    d->g3d->DrawPolygonMesh (mesh);
+  //else
+  // @@@ Provide functionality for visible edges here...
+
+cleanup:
+  CHK (delete [] mesh.polygons);
+  CHK (delete [] mesh.txt_handle);
+  CHK (delete [] mesh.plane);
+  CHK (delete [] mesh.normal);
+  CHK (delete [] mesh.poly_texture);
+}
+
 void* csPolygonSet::TestQueuePolygonArray (csPolygonInt** polygon, int num,
 	csRenderView* d, csPolygon2DQueue* poly_queue, bool pvs)
 {

@@ -23,6 +23,7 @@
 #include "csengine/polyset.h"
 #include "csengine/rview.h"
 #include "csengine/texture.h"
+#include "csutil/flags.h"
 
 class csSector;
 class csStatLight;
@@ -52,6 +53,15 @@ struct iGraphics3D;
 #define CS_ENTITY_MOVEABLE 2
 
 /**
+ * If CS_ENTITY_DETAIL is set then this entity is a detail
+ * object. A detail object is treated as a single object by
+ * the engine. The engine can do several optimizations on this.
+ * In general you should use this flag for small and detailed
+ * objects.
+ */
+#define CS_ENTITY_DETAIL 4
+
+/**
  * A Thing is a polygonset just like a csSector.
  * It can be used to augment the sectors with features that
  * are difficult to describe using portals and sectors.<P>
@@ -69,14 +79,15 @@ private:
   /// World to object transformation.
   csReversibleTransform obj;
 
-  /// Set of flags
-  ULong flags;
-
   /// If convex, this holds the index to the center vertex.
   int center_idx;
 
   /// Pointer to the Thing Template which it derived from
   csThingTemplate* ParentTemplate;
+
+public:
+  /// Set of flags
+  csFlags flags;
 
 public:
   /**
@@ -86,15 +97,6 @@ public:
 
   /// Destructor.
   virtual ~csThing ();
-
-  /// Set all flags with the given mask.
-  void SetFlags (ULong mask, ULong value) { flags = (flags & ~mask) | value; }
-
-  /// Get flags.
-  ULong GetFlags () { return flags; }
-
-  /// Check if all the given flags are set.
-  bool CheckFlags (ULong to_check) { return (flags & to_check) != 0; }
 
   /**
    * Set convexity flag of this thing. You should call this instead

@@ -21,6 +21,7 @@
 
 #include "csutil/scf.h"
 #include "csutil/cscolor.h"
+#include "csutil/flags.h"
 #include "csgeom/transfrm.h"
 #include "csgeom/polyclip.h"
 #include "csgeom/polyidx.h"
@@ -395,9 +396,6 @@ private:
    */
   csPolygonTextureType* txt_info;
 
-  /// Set of flags
-  ULong flags;
-
   /**
    * The original polygon. This is useful when a BSP tree
    * has split a polygon. In that case, orig_poly will indicate the
@@ -431,6 +429,10 @@ private:
   void SetupHWUV();
 #endif
   
+public:
+  /// Set of flags
+  csFlags flags;
+
 public:
   /// Option variable: force lightmap recalculation?
   static bool do_force_recalc;
@@ -529,15 +531,6 @@ public:
       return NULL;
   }
 
-  /// Set all flags with the given mask.
-  void SetFlags (ULong mask, ULong value) { flags = (flags & ~mask) | value; }
-
-  /// Get flags.
-  ULong GetFlags () { return flags; }
-
-  /// Check if all the given flags are set.
-  bool CheckFlags (ULong to_check) { return (flags & to_check) != 0; }
-
   /**
    * Clear the polygon (remove all vertices).
    */
@@ -587,15 +580,15 @@ public:
     light_info.flat_color.red = r;
     light_info.flat_color.green = g;
     light_info.flat_color.blue = b;
-    SetFlags (CS_POLY_FLATSHADING, CS_POLY_FLATSHADING);
+    flags.Set (CS_POLY_FLATSHADING, CS_POLY_FLATSHADING);
   }
 
   /// Set the flat color for this polygon.
   void SetFlatColor (csColor& fc)
-  { light_info.flat_color = fc; SetFlags (CS_POLY_FLATSHADING, CS_POLY_FLATSHADING); }
+  { light_info.flat_color = fc; flags.Set (CS_POLY_FLATSHADING, CS_POLY_FLATSHADING); }
 
   /// Reset flat color (i.e. use texturing again).
-  void ResetFlatColor () { SetFlags (CS_POLY_FLATSHADING, 0); }
+  void ResetFlatColor () { flags.Set (CS_POLY_FLATSHADING, 0); }
 
   /**
    * If the polygon is a portal this will set the sector

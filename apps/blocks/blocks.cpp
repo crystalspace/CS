@@ -561,7 +561,7 @@ void Blocks::add_pillar (int x, int y)
   pillar = new csThing ();
   pillar->SetName ("pillar");
   pillar->SetSector (room);
-  pillar->SetFlags (CS_ENTITY_MOVEABLE, 0);
+  pillar->flags.Set (CS_ENTITY_MOVEABLE, 0);
   pillar->MergeTemplate (pillar_tmpl, pillar_txt, 1);
   room->AddThing (pillar);
   csVector3 v ( (x-(player1->zone_dim)/2)*CUBE_DIM, 0, 
@@ -576,7 +576,7 @@ void Blocks::add_vrast (int x, int y, float dx, float dy, float rot_z)
   vrast = new csThing ();
   vrast->SetName ("vrast");
   vrast->SetSector (room);
-  vrast->SetFlags (CS_ENTITY_MOVEABLE, 0);
+  vrast->flags.Set (CS_ENTITY_MOVEABLE, 0);
   vrast->MergeTemplate (vrast_tmpl, raster_txt, 1);
   room->AddThing (vrast);
   csVector3 v ((x-(player1->zone_dim)/2)*CUBE_DIM+dx, 0, 
@@ -593,7 +593,7 @@ void Blocks::add_hrast (int x, int y, float dx, float dy, float rot_z)
   hrast = new csThing ();
   hrast->SetName ("hrast");
   hrast->SetSector (room);
-  hrast->SetFlags (CS_ENTITY_MOVEABLE, 0);
+  hrast->flags.Set (CS_ENTITY_MOVEABLE, 0);
   hrast->MergeTemplate (hrast_tmpl, raster_txt, 1);
   room->AddThing (hrast);
   csVector3 v ((x-(player1->zone_dim)/2)*CUBE_DIM+dx, 0, 
@@ -685,7 +685,7 @@ csThing* Blocks::create_cube_thing (float dx, float dy, float dz,
   cube = new csThing ();
   cube->SetName ("cubexxx");
   cube->SetSector (room);
-  cube->SetFlags (CS_ENTITY_MOVEABLE, CS_ENTITY_MOVEABLE);
+  cube->flags.Set (CS_ENTITY_MOVEABLE, CS_ENTITY_MOVEABLE);
   csVector3 shift (
   	(dx-shift_rotate.x)*CUBE_DIM,
   	(dz-shift_rotate.z)*CUBE_DIM,

@@ -1032,7 +1032,7 @@ void csWorld::DrawFunc (csCamera* c, csClipper* view,
 
 void csWorld::AddHalo (csLight* Light)
 {
-  if (!Light->CheckFlags (CS_LIGHT_HALO)
+  if (!Light->flags.Check (CS_LIGHT_HALO)
    || Light->GetHaloInQueue ())
     return;
 

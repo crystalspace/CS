@@ -25,7 +25,7 @@ class csClipper;
 void DefaultDrawTriangleMesh (
   G3DTriangleMesh& mesh,
   iGraphics3D* g3d,
-  csTransform& o2c,
+  csReversibleTransform& o2c,
   csClipper* clipper,
   float aspect,
   int width2,

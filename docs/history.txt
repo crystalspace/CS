@@ -1,6 +1,37 @@
 The history order has been reversed so that new features are at the top.
 
 10-Apr-2000
+	- Added 'DETAIL' keyword for THING and SIXFACE and CS_ENTITY_DETAIL
+	  flag to csThing. With this keyword you can indicate detail objects
+	  in CS. Currently the only effect this will have is excluding the
+	  thing from the octree and rendering it true the new and
+	  experimental DrawPolygonMesh. So don't start using it already
+	  unless you are interested in beta testing :-)
+	- Several objects implemented a 'CheckFlags' in the engine. I fixed
+	  a comment in CheckFlags(). The comment said that ALL flags in the
+	  given mask had to be true but the function itself returned true
+	  if SOME of the flags were true. I fixed the comment and added
+	  a new CheckAllFlags() function that really checks if ALL flags
+	  are set. This affects csThing, csPolygon3D and csLight.
+	- Added csFlags class to csutil. This is a very small class to make
+	  abstraction of the above settings for objects in the engine.
+	- Fixed bug in DrawPolygonMesh where num_vertices was used instead
+	  of num_polygons to loop over all polygons.
+	- Fixed bug in DrawPolygonMesh where the array of txt_handle
+	  should be iTextureHandle** instead of iTextureHandle*.
+	  Same for poly_texture.
+	- Implemented needed support for poly_texture in DrawPolygonMesh.
+	- Mapping of vertices to G3DPolygon structure was completely wrong.
+	- Several other fixes to DrawPolygonMesh to make it really working.
+	- Implemented first primitive support for rendering detail objects
+	  through DrawPolygonMesh. This is initial support for purposes
+	  of debugging DrawPolygonMesh only. It does not yet support all
+	  features (like fog and clipping) and it will certainly be
+	  slower than the old way to render.
+	- Changed iGraphics3D::SetTransform to use a csReversibleTransform
+	  instead of a csTransform.
+	- Changed iGraphics3D to use a csPlane3 instead of the current
+	  old structure.
 	- Eric Sunshine added some missing cross references to the document
 	  texinfo/apps/overview.txi.
 	- Eric Sunshine fixed texinfo/anatomy/depend.txi so that it works with

@@ -182,7 +182,7 @@ static DECLARE_GROWING_ARRAY (visible, bool);
 static DECLARE_GROWING_ARRAY (color_verts, csColor);
 
 void DefaultDrawTriangleMesh (G3DTriangleMesh& mesh, iGraphics3D* g3d,
-  csTransform& o2c, csClipper* clipper, float aspect, int width2, int height2)
+  csReversibleTransform& o2c, csClipper* clipper, float aspect, int width2, int height2)
 {
   int i;
 

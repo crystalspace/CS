@@ -424,10 +424,10 @@ void CalculateFogPolygon (csRenderView* rview, G3DPolygonDP& poly)
   // '1/z' at every screen space point.
   float inv_aspect = poly.inv_aspect;
   float Ac, Bc, Cc, Dc, inv_Dc;
-  Ac = poly.normal.A;
-  Bc = poly.normal.B;
-  Cc = poly.normal.C;
-  Dc = poly.normal.D;
+  Ac = poly.normal.A ();
+  Bc = poly.normal.B ();
+  Cc = poly.normal.C ();
+  Dc = poly.normal.D ();
 
   float M, N, O;
   if (ABS (Dc) < SMALL_D) Dc = -SMALL_D;
@@ -748,13 +748,13 @@ void csPolygon2D::DrawFilled (csRenderView* rview, csPolygon3D* poly,
     use_z_buf ? CS_ZBUF_USE : CS_ZBUF_FILL);
 
   if (poly->GetTextureType () == POLYTXT_GOURAUD
-   || poly->CheckFlags (CS_POLY_FLATSHADING))
+   || poly->flags.Check (CS_POLY_FLATSHADING))
   {
     // We have a gouraud shaded polygon.
     // Add all dynamic lights if polygon is dirty.
     csPolygon3D* unsplit;
     unsplit = poly->GetBasePolygon ();
-    const bool do_light = poly->CheckFlags (CS_POLY_LIGHTING);
+    const bool do_light = poly->flags.Check (CS_POLY_LIGHTING);
     if (do_light)
     {
       if (unsplit->IsDirty ())
@@ -793,7 +793,7 @@ void csPolygon2D::DrawFilled (csRenderView* rview, csPolygon3D* poly,
     g3dpolyfx.inv_aspect = rview->inv_aspect;
 
     csColor* po_colors = do_light && gs ? gs->GetColors () : NULL;
-    if (poly->CheckFlags (CS_POLY_FLATSHADING)) g3dpolyfx.txt_handle = NULL;
+    if (poly->flags.Check (CS_POLY_FLATSHADING)) g3dpolyfx.txt_handle = NULL;
 
     // We are going to use DrawPolygonFX.
     // Here we have to do a little messy thing because PreparePolygonFX()
@@ -907,10 +907,10 @@ void csPolygon2D::DrawFilled (csRenderView* rview, csPolygon3D* poly,
 
     float Ac, Bc, Cc, Dc;
     plane->GetCameraNormal (&Ac, &Bc, &Cc, &Dc);
-    g3dpoly.normal.A = Ac;
-    g3dpoly.normal.B = Bc;
-    g3dpoly.normal.C = Cc;
-    g3dpoly.normal.D = Dc;
+    g3dpoly.normal.A () = Ac;
+    g3dpoly.normal.B () = Bc;
+    g3dpoly.normal.C () = Cc;
+    g3dpoly.normal.D () = Dc;
 
     if (debug)
       rview->g3d->DrawPolygonDebug (g3dpoly);
@@ -952,10 +952,10 @@ void csPolygon2D::AddFogPolygon (iGraphics3D* g3d, csPolygon3D* /*poly*/,
 
   float Ac, Bc, Cc, Dc;
   plane->GetCameraNormal (&Ac, &Bc, &Cc, &Dc);
-  g3dpoly.normal.A = Ac;
-  g3dpoly.normal.B = Bc;
-  g3dpoly.normal.C = Cc;
-  g3dpoly.normal.D = Dc;
+  g3dpoly.normal.A () = Ac;
+  g3dpoly.normal.B () = Bc;
+  g3dpoly.normal.C () = Cc;
+  g3dpoly.normal.D () = Dc;
 
   g3d->SetRenderState (G3DRENDERSTATE_ZBUFFERMODE, CS_ZBUF_NONE);
   g3d->DrawFogPolygon (id, g3dpoly, fogtype);

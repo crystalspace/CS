@@ -115,7 +115,7 @@ class csGraphics3DDirect3DDx5 : public iGraphics3D
   int m_nHalfWidth,  m_nHalfHeight;
 
   /// Current transformation from world to camera.
-  csTransform m_o2c;
+  csReversibleTransform m_o2c;
   /// Current 2D clipper.
   csClipper* m_pClipper;
   /// Current aspect ratio for perspective correction.
@@ -257,7 +257,7 @@ public:
     m_InvAspect = 1.0/aspect;
   }
   /// Set world to camera transformation. 
-  virtual void SetObjectToCamera (csTransform* o2c) 
+  virtual void SetObjectToCamera (csReversibleTransform* o2c) 
   {
     m_o2c = *o2c;
   }
@@ -272,7 +272,7 @@ public:
   /// Draw a polygon mesh.
   virtual void DrawPolygonMesh (G3DPolygonMesh& mesh)
   {
-    DefaultDrawPolygonMesh (mesh, this, o2c, clipper, aspect, width2, height2);
+    DefaultDrawPolygonMesh (mesh, this, o2c, clipper, aspect, inv_aspect, width2, height2);
   }
 
   /// Get the ITextureManager.

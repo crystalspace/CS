@@ -234,7 +234,7 @@ csPolygon3D::csPolygon3D (csTextureHandle* texture) : csObject (),
   orig_poly = NULL;
   dont_draw = false;
 
-  flags = CS_POLY_LIGHTING;
+  flags.Set (CS_POLY_LIGHTING);
 
   light_info.cosinus_factor = -1;
   light_info.lightpatches = NULL;
@@ -586,7 +586,7 @@ void csPolygon3D::Finish ()
   if( uvz ) { delete [] uvz; uvz=NULL; }
   isClipped=false;
 #endif
-  if (GetTextureType () == POLYTXT_GOURAUD || CheckFlags (CS_POLY_FLATSHADING))
+  if (GetTextureType () == POLYTXT_GOURAUD || flags.Check (CS_POLY_FLATSHADING))
   	return;
   csLightMapped *lmi = GetLightMapInfo ();
   if (!lmi)
@@ -599,7 +599,7 @@ void csPolygon3D::Finish ()
   if (portal)
     portal->SetTexture (txtMM->GetTextureHandle ());
 
-  if (CheckFlags (CS_POLY_LIGHTING) && TEXW(lmi->tex) * TEXH(lmi->tex) < 1000000)
+  if (flags.Check (CS_POLY_LIGHTING) && TEXW(lmi->tex) * TEXH(lmi->tex) < 1000000)
   {
     CHK (csLightMap* lm = new csLightMap ());
     lmi->tex->SetLightMap (lm);
@@ -1097,7 +1097,7 @@ bool csPolygon3D::DoPerspective (const csTransform& trans,
   // we stop here because the triangle is only visible if all
   // vertices are visible (this is not exactly true but it is
   // easier this way! @@@ CHANGE IN FUTURE).
-//    if (GetTextureType () == POLYTXT_GOURAUD || CheckFlags (CS_POLY_FLATSHADING))
+//    if (GetTextureType () == POLYTXT_GOURAUD || flags.Check (CS_POLY_FLATSHADING))
 //      return false;
 
 #ifdef DO_HW_UVZ
@@ -1369,7 +1369,7 @@ void csPolygon3D::InitLightMaps (csPolygonSet* owner, bool do_cache, int index)
 void csPolygon3D::UpdateVertexLighting (csLight* light, const csColor& lcol,
 	bool dynamic, bool reset)
 {
-  if ( CheckFlags (CS_POLY_FLATSHADING)) return;
+  if (flags.Check (CS_POLY_FLATSHADING)) return;
   
   csColor poly_color (0,0,0), vert_color;
   if (light) poly_color = lcol;
@@ -1451,7 +1451,7 @@ void csPolygon3D::FillLightMap (csLightView& lview)
   else
   {
     if (GetTextureType () == POLYTXT_GOURAUD ||
-    	CheckFlags (CS_POLY_FLATSHADING))
+    	flags.Check (CS_POLY_FLATSHADING))
     {
       // We are working for a vertex lighted polygon.
       csColor col (lview.r, lview.g, lview.b);
@@ -1649,7 +1649,7 @@ void csPolygon3D::UpdateLightMapSize ()
   csLightMapped* lmi = GetLightMapInfo ();
   if (!lmi || lmi->tex->lm == NULL) return;
 
-  if (CheckFlags (CS_POLY_LIGHTING) && TEXW (lmi->tex) * TEXH (lmi->tex) < 1000000)
+  if (flags.Check (CS_POLY_LIGHTING) && TEXW (lmi->tex) * TEXH (lmi->tex) < 1000000)
   {
     CHK (csLightMap* lm = new csLightMap ());
     lmi->tex->SetLightMap (lm);

@@ -41,7 +41,6 @@ IMPLEMENT_CSOBJTYPE (csThing,csPolygonSet);
 
 csThing::csThing () : csPolygonSet (), obj()
 {
-  flags = 0;
   center_idx = -1;
   ParentTemplate = NULL;
 }
@@ -52,7 +51,7 @@ csThing::~csThing ()
 
 void csThing::SetConvex (bool c)
 {
-  SetFlags (CS_ENTITY_CONVEX, c ? CS_ENTITY_CONVEX : 0);
+  flags.Set (CS_ENTITY_CONVEX, c ? CS_ENTITY_CONVEX : 0);
   if (c)
   {
     if (center_idx == -1) center_idx = AddVertex (0, 0, 0);
@@ -374,7 +373,10 @@ void csThing::Draw (csRenderView& rview, bool use_z_buf)
       }
     }
 
-    DrawPolygonArray (polygons.GetArray (), polygons.Length (), &rview, use_z_buf);
+    if (flags.Check (CS_ENTITY_DETAIL))
+      DrawPolygonArrayDPM (polygons.GetArray (), polygons.Length (), &rview, use_z_buf);
+    else
+      DrawPolygonArray (polygons.GetArray (), polygons.Length (), &rview, use_z_buf);
     if (rview.callback) rview.callback (&rview, CALLBACK_THINGEXIT, (void*)this);
   }
 
@@ -580,7 +582,7 @@ void csThing::MergeTemplate (csThingTemplate* tpl,
     int* idx = pt->GetVerticesIdx ();
     for (j = 0 ; j < pt->GetNumVertices () ; j++)
       p->AddVertex (merge_vertices[idx[j]]);
-    p->SetFlags (CS_POLY_LIGHTING|CS_POLY_FLATSHADING,
+    p->flags.Set (CS_POLY_LIGHTING|CS_POLY_FLATSHADING,
       (pt->IsLighted () ? CS_POLY_LIGHTING : 0) |
       (pt->UseFlatColor () ? CS_POLY_FLATSHADING : 0));
     if (pt->GetUVCoords ())

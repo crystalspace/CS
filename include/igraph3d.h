@@ -21,13 +21,15 @@
 #define __IGRAPH3D_H__
 
 #include "csutil/scf.h"
+#include "csgeom/plane3.h"
 #include "iplugin.h"
 
 class csMatrix3;
 class csVector3;
 class csVector2;
+class csPlane3;
 class csRect;
-class csTransform;
+class csReversibleTransform;
 class csColor;
 
 struct iGraphics2D;
@@ -102,21 +104,6 @@ public:
   csVector3* v_cam2tex;
 };
 
-///
-class G3DPolyNormal
-{
-public:
-  ///
-  float A;
-  ///
-  float B;
-  ///
-  float C;
-  ///
-  float D;
-};
-
-
 /// Structure containing all info needed by DrawPolygonFX (DPFX)
 struct G3DPolygonDPFX
 {
@@ -162,8 +149,8 @@ struct G3DPolygonDP
 
   /// Transformation matrices for the texture. @@@ BAD NAME
   G3DTexturePlane plane;
-  /// The plane equation in camera space of this polygon. @@@ BAD NAME
-  G3DPolyNormal normal;
+  /// The plane equation in camera space of this polygon.
+  csPlane3 normal;
 
   /// Handle to lighted textures (texture + lightmap)
   iPolygonTexture* poly_texture;
@@ -197,8 +184,8 @@ struct G3DPolygonDFP
   /// Invert aspect ratio that was used to perspective project the vertices (1/fov)
   float inv_aspect;
 
-  /// The plane equation in camera space of this polygon. @@@ BAD NAME
-  G3DPolyNormal normal;
+  /// The plane equation in camera space of this polygon.
+  csPlane3 normal;
 };
 
 /**
@@ -394,18 +381,21 @@ struct G3DPolygonMesh
 
   /// Pointer to an array of texture handles (one for for each polygon)
   /// Only valid if master_txt_handle is NULL
-  iTextureHandle *txt_handle;
+  iTextureHandle **txt_handle;
 
   /// Transformation matrices for the texture
   G3DTexturePlane *plane;
+  // @@@ WARNING! The m_cam2tex and v_cam2tex fields in the above
+  // structure are to be interpreted as m_world2tex and v_world2tex
+  // instead!!! Transformation happens in 3D renderer too.
 
-  /// The plane equation in camera space of this polygon. @@@ BAD NAME
-  G3DPolyNormal *normal;
+  /// The plane equations in world space of this polygon.
+  csPlane3* normal;
 
   /// Handle to lighted textures (texture + lightmap)
-  iPolygonTexture *poly_texture;
+  iPolygonTexture **poly_texture;
 
-  /// Apply fogging?
+  // Apply fogging?
   bool do_fog;
 
   /// Do clipping tests?
@@ -623,9 +613,9 @@ struct iGraphics3D : public iPlugIn
 
   /**
    * Set world to camera transformation (currently only used by
-   * DrawTriangleMesh).
+   * DrawTriangleMesh and DrawPolygonMesh).
    */
-  virtual void SetObjectToCamera (csTransform* o2c) = 0;
+  virtual void SetObjectToCamera (csReversibleTransform* o2c) = 0;
 
   /**
    * Set optional clipper to use. If vertices == null

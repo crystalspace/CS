@@ -16,20 +16,37 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __CS_DPMESH_H__
-#define __CS_DPMESH_H__
+#ifndef _CS_FLAGS_H
+#define _CS_FLAGS_H
 
-#include "igraph3d.h"
-class csClipper;
+/**
+ * Set of flags which can be accessed through masks.
+ */
+class csFlags
+{
+private:
+  /// Set of flags
+  ULong flags;
 
-void DefaultDrawPolygonMesh (
-  G3DPolygonMesh& mesh,
-  iGraphics3D* g3d,
-  csReversibleTransform& o2c,
-  csClipper* clipper,
-  float aspect,
-  float inv_aspect,
-  int width2,
-  int height2);
+public:
+  /// Constructor.
+  csFlags () : flags (0) { }
 
-#endif // __CS_DPMESH_H__
+  /// Initialize all flags to the given mask.
+  void Set (ULong value) { flags = value; }
+
+  /// Set all flags with the given mask.
+  void Set (ULong mask, ULong value) { flags = (flags & ~mask) | value; }
+
+  /// Get flags.
+  ULong Get () { return flags; }
+
+  /// Check if any of the given flags are set.
+  bool Check (ULong to_check) { return (flags & to_check) != 0; }
+
+  /// Check if all the given flags are set.
+  bool CheckAll (ULong to_check) { return (flags & to_check) == to_check; }
+};
+
+#endif /*_CS_FLAGS_H*/
+

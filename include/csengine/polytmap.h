@@ -78,6 +78,24 @@ public:
   void WorldToCamera (const csReversibleTransform& t,
   	csMatrix3& m_cam2tex, csVector3& v_cam2tex);
 
+  /**
+   * Get object to texture transformation.
+   */
+  void GetObjectToTexture (csMatrix3*& m_obj2tex, csVector3*& v_obj2tex)
+  {
+    m_obj2tex = &this->m_obj2tex;
+    v_obj2tex = &this->v_obj2tex;
+  }
+
+  /**
+   * Get world to texture transformation.
+   */
+  void GetWorldToTexture (csMatrix3*& m_wor2tex, csVector3*& v_wor2tex)
+  {
+    m_wor2tex = &this->m_world2tex;
+    v_wor2tex = &this->v_world2tex;
+  }
+
   ///
   void SetTextureSpace (const csVector3& v_orig,
 			const csVector3& v1, float len1,

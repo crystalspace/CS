@@ -113,7 +113,7 @@ protected:
   int height2;
 
   /// Current transformation from world to camera.
-  csTransform o2c;
+  csReversibleTransform o2c;
   /// Current 2D clipper.
   csClipper* clipper;
   /// Current aspect ratio for perspective correction.
@@ -308,7 +308,7 @@ public:
     inv_aspect = 1./aspect;
   }
   /// Set world to camera transformation.
-  virtual void SetObjectToCamera (csTransform* o2c)
+  virtual void SetObjectToCamera (csReversibleTransform* o2c)
   {
     this->o2c = *o2c;
   }
@@ -320,7 +320,8 @@ public:
   /// Draw a polygon mesh.
   virtual void DrawPolygonMesh (G3DPolygonMesh& mesh)
   {
-    DefaultDrawPolygonMesh (mesh, this, o2c, clipper, aspect, width2, height2);
+    DefaultDrawPolygonMesh (mesh, this, o2c, clipper, aspect, inv_aspect,
+    	width2, height2);
   }
 
   /// Get the iGraphics2D driver.

@@ -158,7 +158,7 @@ void csSector::UseStaticTree (int mode, bool octree)
   while (sp)
   {
     csThing* n = (csThing*)(sp->GetNext ());
-    if (!sp->CheckFlags (CS_ENTITY_MOVEABLE) && !sp->GetFog ().enabled
+    if (!sp->flags.Check (CS_ENTITY_MOVEABLE | CS_ENTITY_DETAIL) && !sp->GetFog ().enabled
     	&& sp->GetNumCurves () == 0)
     {
       static_thing->Merge (sp);
@@ -790,7 +790,7 @@ void csSector::Draw (csRenderView& rview)
 	// Z sorting convex objects. The reason is that Z sort is not
 	// perfect and we really need something better here. So we
 	// only Z sort fog objects.
-        // @@@ if (sp->CheckFlags (CS_ENTITY_CONVEX) || sp->GetFog ().enabled)
+        // @@@ if (sp->flags.Check (CS_ENTITY_CONVEX) || sp->GetFog ().enabled)
         if (sp->GetFog ().enabled)
           sort_list[sort_idx++] = sp;
         sp = (csThing*)(sp->GetNext ());
@@ -807,7 +807,7 @@ void csSector::Draw (csRenderView& rview)
       {
         sp = sort_list[i];
         if (sp->GetFog ().enabled) sp->DrawFoggy (rview);
-        else if (sp->CheckFlags (CS_ENTITY_CONVEX))
+        else if (sp->flags.Check (CS_ENTITY_CONVEX))
           sp->Draw (rview, false);
       }
     }
@@ -821,7 +821,7 @@ void csSector::Draw (csRenderView& rview)
       {
         // @@@ Note from Jorrit: temporarily disabled the option of Z sorting
 	// convex objects. (see note above).
-        // @@@ if (!sp->CheckFlags (CS_ENTITY_CONVEX) && !sp->GetFog ().enabled) sp->Draw (rview);
+        // @@@ if (!sp->flags.Check (CS_ENTITY_CONVEX) && !sp->GetFog ().enabled) sp->Draw (rview);
         if (!sp->GetFog ().enabled) sp->Draw (rview);
         sp = (csThing*)(sp->GetNext ());
       }
@@ -912,10 +912,8 @@ void csSector::Draw (csRenderView& rview)
       else
       {
         // We must add a FRONT fog polygon for the clipper to this sector.
-        g3dpoly.normal.A = -rview.clip_plane.A ();
-        g3dpoly.normal.B = -rview.clip_plane.B ();
-        g3dpoly.normal.C = -rview.clip_plane.C ();
-        g3dpoly.normal.D = -rview.clip_plane.D ();
+        g3dpoly.normal = rview.clip_plane;
+	g3dpoly.normal.Invert ();
         g3dpoly.inv_aspect = rview.inv_aspect;
         rview.g3d->DrawFogPolygon (GetID (), g3dpoly, CS_FOG_FRONT);
       }
@@ -1277,7 +1275,7 @@ void csSector::CalculateLighting (csLightView& lview)
   // will be restored.
   csShadowFrustrum* previous_last = lview.shadows.GetLast ();
   csFrustrumList* shadows;
-  if (lview.l->GetFlags () & CS_LIGHT_THINGSHADOWS)
+  if (lview.l->flags.Get () & CS_LIGHT_THINGSHADOWS)
     for (i = 0 ; i < num_visible_things ; i++)
     {
       sp = visible_things[i];

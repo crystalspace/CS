@@ -24,6 +24,7 @@
 #include "csgeom/math3d.h"
 #include "csgeom/transfrm.h"
 #include "csgeom/polyclip.h"
+#include "csgeom/plane3.h"
 #include "csutil/inifile.h"
 #include "soft_g3d.h"
 #include "scan.h"
@@ -855,10 +856,10 @@ void csGraphics3DSoftware::DrawPolygonFlat (G3DPolygonDPF& poly)
   // Get the plane normal of the polygon. Using this we can calculate
   // '1/z' at every screen space point.
   float Ac, Bc, Cc, Dc, inv_Dc;
-  Ac = poly.normal.A;
-  Bc = poly.normal.B;
-  Cc = poly.normal.C;
-  Dc = poly.normal.D;
+  Ac = poly.normal.A ();
+  Bc = poly.normal.B ();
+  Cc = poly.normal.C ();
+  Dc = poly.normal.D ();
 
   float M, N, O;
   if (ABS (Dc) < SMALL_D) Dc = -SMALL_D;
@@ -1119,10 +1120,10 @@ void csGraphics3DSoftware::DrawPolygon (G3DPolygonDP& poly)
   // Get the plane normal of the polygon. Using this we can calculate
   // '1/z' at every screen space point.
   float Ac, Bc, Cc, Dc, inv_Dc;
-  Ac = poly.normal.A;
-  Bc = poly.normal.B;
-  Cc = poly.normal.C;
-  Dc = poly.normal.D;
+  Ac = poly.normal.A ();
+  Bc = poly.normal.B ();
+  Cc = poly.normal.C ();
+  Dc = poly.normal.D ();
 
   float M, N, O;
   if (ABS (Dc) < SMALL_D) Dc = -SMALL_D;
@@ -1710,10 +1711,10 @@ void csGraphics3DSoftware::DrawFogPolygon (CS_ID id, G3DPolygonDFP& poly, int fo
     // Get the plane normal of the polygon. Using this we can calculate
     // '1/z' at every screen space point.
     float Ac, Bc, Cc, Dc, inv_Dc;
-    Ac = poly.normal.A;
-    Bc = poly.normal.B;
-    Cc = poly.normal.C;
-    Dc = poly.normal.D;
+    Ac = poly.normal.A ();
+    Bc = poly.normal.B ();
+    Cc = poly.normal.C ();
+    Dc = poly.normal.D ();
 
     if (ABS (Dc) < SMALL_D)
     {

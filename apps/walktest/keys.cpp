@@ -1545,7 +1545,7 @@ static bool CommandHandler (char *cmd, char *arg)
     if (arg && ScanStr (arg, "%f,%f,%f,%f,%d", &r, &g, &b, &radius, &thing_shadows) == 5)
     {
       CHK (dyn = new csDynLight (pos.x, pos.y, pos.z, radius, r, g, b));
-      if (thing_shadows) dyn->SetFlags (CS_LIGHT_THINGSHADOWS, CS_LIGHT_THINGSHADOWS);
+      if (thing_shadows) dyn->flags.Set (CS_LIGHT_THINGSHADOWS, CS_LIGHT_THINGSHADOWS);
       rnd = false;
     }
     else

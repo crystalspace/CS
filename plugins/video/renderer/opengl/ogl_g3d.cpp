@@ -27,6 +27,7 @@
 #include "csgeom/math2d.h"
 #include "csgeom/math3d.h"
 #include "csgeom/polyclip.h"
+#include "csgeom/plane3.h"
 #include "ogl_g3d.h"
 #include "ogl_txtcache.h"
 #include "csutil/inifile.h"
@@ -501,10 +502,10 @@ void csGraphics3DOpenGL::DrawPolygonSingleTexture (G3DPolygonDP & poly)
   // Get the plane normal of the polygon. Using this we can calculate
   // '1/z' at every screen space point.
   float Ac, Bc, Cc, Dc, inv_Dc;
-  Ac = poly.normal.A;
-  Bc = poly.normal.B;
-  Cc = poly.normal.C;
-  Dc = poly.normal.D;
+  Ac = poly.normal.A ();
+  Bc = poly.normal.B ();
+  Cc = poly.normal.C ();
+  Dc = poly.normal.D ();
 
   float M, N, O;
   float inv_aspect = poly.inv_aspect;
@@ -1538,10 +1539,10 @@ bool csGraphics3DOpenGL::DrawPolygonMultiTexture (G3DPolygonDP & poly)
   // Get the plane normal of the polygon. Using this we can calculate
   // '1/z' at every screen space point.
   float Ac, Bc, Cc, Dc, inv_Dc;
-  Ac = poly.normal.A;
-  Bc = poly.normal.B;
-  Cc = poly.normal.C;
-  Dc = poly.normal.D;
+  Ac = poly.normal.A ();
+  Bc = poly.normal.B ();
+  Cc = poly.normal.C ();
+  Dc = poly.normal.D ();
 
   float inv_aspect = poly.inv_aspect;
   float M, N, O;

@@ -39,6 +39,7 @@
 #include "ilghtmap.h"
 #include "igraph2d.h"
 
+#include "csgeom/plane3.h"
 #include "csutil/inifile.h"
 #include "csutil/scanstr.h"
 #include "qint.h"
@@ -779,7 +780,7 @@ void csGraphics3DGlide3x::SetupPolygon ( G3DPolygonDP& poly, float& J1, float& J
   // Get the plane normal of the polygon. Using this we can calculate
   // '1/z' at every screen space point.
   
-  if (ABS (poly.normal.D) < 0.06)
+  if (ABS (poly.normal.D ()) < 0.06)
   {
     J1= 0;
     J2= 0;
@@ -818,7 +819,7 @@ void csGraphics3DGlide3x::SetupPolygon ( G3DPolygonDP& poly, float& J1, float& J
 
 void csGraphics3DGlide3x::DrawPolygon (G3DPolygonDP& poly)
 {
-  if (poly.num < 3 || poly.normal.D == 0.0) return;
+  if (poly.num < 3 || poly.normal.D () == 0.0) return;
   iPolygonTexture* pTex;
   iLightMap* piLM = NULL;
   csGlideCacheData* tcache = NULL;
@@ -886,18 +887,18 @@ void csGraphics3DGlide3x::DrawPolygon (G3DPolygonDP& poly)
 #endif
   {
     float inv_aspect = poly.inv_aspect;
-    float inv_Dc = 1/poly.normal.D;
+    float inv_Dc = 1/poly.normal.D ();
   
-    if (ABS (poly.normal.D) < 0.06)
+    if (ABS (poly.normal.D ()) < 0.06)
     {
       M = N = 0;
       O = 1/poly.z_value;
     }
     else
     {
-      M = -poly.normal.A*inv_Dc*inv_aspect;
-      N = -poly.normal.B*inv_Dc*inv_aspect;
-      O = -poly.normal.C*inv_Dc;
+      M = -poly.normal.A ()*inv_Dc*inv_aspect;
+      N = -poly.normal.B ()*inv_Dc*inv_aspect;
+      O = -poly.normal.C ()*inv_Dc;
     }
     SetupPolygon ( poly, J1, J2, J3, K1, K2, K3, M, N, O );
   }

@@ -1233,7 +1233,7 @@ void csSprite3D::Draw (csRenderView& rview)
   // ->
   //   C = Mwc * (Mow * O - Vow - Vwc)
   //   C = Mwc * Mow * O - Mwc * (Vow + Vwc)
-  csTransform tr_o2c = rview * csTransform (m_obj2world, m_world2obj * v_obj2world);
+  csReversibleTransform tr_o2c = rview * csTransform (m_obj2world, m_world2obj * v_obj2world);
   rview.g3d->SetObjectToCamera (&tr_o2c);
   rview.g3d->SetClipper (rview.view->GetClipPoly (), rview.view->GetNumVertices ());
   // @@@ This should only be done when aspect changes...

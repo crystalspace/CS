@@ -147,12 +147,23 @@ protected:
    */
   void DrawOnePolygon (csPolygon3D* p, csPolygon2D* poly, csRenderView* d,
 	bool use_z_buf);
+
   /**
    * Draw the given array of polygons in the current csPolygonSet. This
    * function is called by subclasses of csPolygonSet (csSector and
    * csThing currently).
    */
   void DrawPolygonArray (csPolygonInt** polygon, int num, csRenderView* rview,
+  	bool use_z_buf);
+
+  /**
+   * Draw the given array of polygons in the current csPolygonSet. This
+   * function is called by subclasses of csPolygonSet (csSector and
+   * csThing currently). This version uses iGraphics3D->DrawPolygonMesh()
+   * for more efficient rendering. WARNING! This version only works for
+   * lightmapped polygons right now.
+   */
+  void DrawPolygonArrayDPM (csPolygonInt** polygon, int num, csRenderView* rview,
   	bool use_z_buf);
 
   /**

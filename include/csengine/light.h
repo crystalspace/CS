@@ -22,6 +22,7 @@
 #include "csgeom/transfrm.h"
 #include "csobject/csobject.h"
 #include "csutil/cscolor.h"
+#include "csutil/flags.h"
 #include "csengine/rview.h"
 #include "lightdef.h"
 
@@ -114,11 +115,12 @@ protected:
   /// Halo cross-ressemblance factor
   float cross_factor;
 
-  /// Set of flags
-  ULong flags;
-
   /// Attenuation type
   int attenuation;
+
+public:
+  /// Set of flags
+  csFlags flags;
 
 public:
   /// Config value: ambient red value.
@@ -146,15 +148,6 @@ public:
    * update those lightmaps as that is a time-consuming process.
    */
   virtual ~csLight ();
-
-  /// Set all flags with the given mask.
-  void SetFlags (ULong mask, ULong value) { flags = (flags & ~mask) | value; }
-
-  /// Get flags.
-  ULong GetFlags () { return flags; }
-
-  /// Check if all the given flags are set.
-  bool CheckFlags (ULong to_check) { return (flags & to_check) != 0; }
 
   /**
    * Set the current sector for this light.

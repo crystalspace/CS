@@ -35,6 +35,7 @@
 #include "csutil/scf.h"
 #include "csgeom/math2d.h"
 #include "csgeom/math3d.h"
+#include "csgeom/plane3.h"
 #include "d3d_g3d.h"
 #include "d3d_txtcache.h"
 #include "cs2d/ddraw61/IG2D.h"
@@ -1184,10 +1185,10 @@ void csGraphics3DDirect3DDx6::SetupPolygon( G3DPolygonDP& poly, float& J1, float
 {
   float P1, P2, P3, P4, Q1, Q2, Q3, Q4;
   
-  float Ac = poly.normal.A, 
-    Bc = poly.normal.B, 
-    Cc = poly.normal.C, 
-    Dc = poly.normal.D;
+  float Ac = poly.normal.A (),
+    Bc = poly.normal.B (),
+    Cc = poly.normal.C (),
+    Dc = poly.normal.D ();
   
   float inv_aspect = poly.inv_aspect;
   

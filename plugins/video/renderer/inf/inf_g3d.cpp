@@ -283,7 +283,7 @@ void csGraphics3DInfinite::DrawPolygonMesh (G3DPolygonMesh& mesh)
   else
   {
     in_mesh = true;
-    DefaultDrawPolygonMesh (mesh, this, o2c, clipper, aspect, width2, height2);
+    DefaultDrawPolygonMesh (mesh, this, o2c, clipper, aspect, inv_aspect, width2, height2);
     in_mesh = false;
   }
 }
