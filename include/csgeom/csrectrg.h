@@ -36,16 +36,31 @@
 class csRectRegion
 {
 protected:
+  /// The pointer the list of regions
   csRect* region;
+  /// The number of regions currently stored
   int region_count;
+  /// The size of the region buffer (in rects)
   int region_max;
+  /// The fragment buffer, used for performing fragment operations
+  csRect  fragment[32];
+  /// The gather marker
+  int gather_mark;
 
+  /// Pushes a new rect into the region, increases buffer if necessary
   void pushRect(csRect const &);
+  /// Removes a rect from the region.
   void deleteRect(int);
   
-  bool chopEdgeIntersection(csRect&, csRect&);
-  void fragmentRect(csRect&, csRect&, bool testedContains, bool testedEdge);
+  
+  /// Controls fragmentContainedRect, used to perform all-side clipping and edge intersection.
+  void fragmentRect(csRect&, csRect&, int mode);
+  /// Work method fragments rects properly when they intersect.
   void fragmentContainedRect(csRect &r1, csRect &r2);
+  /// Marks the current region insertion point for gather.
+  void markForGather();
+  /// Gathers all regions since the mark into the fragment buffer.
+  void gatherFragments();
 
 public:
   /// Constructor.
@@ -55,7 +70,7 @@ public:
 
   /// Add a rect to this region; may cause unions, but will not adjance (see csRect).
   void Include(csRect &rect);
-  /// Exclude a rect from this region; may cause splitting.
+  /// Exclude a rect from this region; may cause splitting. NOTE: broken!!! 
   void Exclude(csRect &rect);
 
   /// Returns the number of rectangles in this region
