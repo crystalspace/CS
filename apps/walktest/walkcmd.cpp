@@ -55,6 +55,8 @@
 #include "imesh/sprite3d.h"
 #include "imesh/thing.h"
 #include "ivaria/reporter.h"
+#include "ivaria/pmeter.h" 
+#include "csutil/cspmeter.h" 
 #include "igeom/clip2d.h"
 
 
@@ -1036,7 +1038,7 @@ bool CommandHandler (const char *cmd, const char *arg)
     CONPRI("  db_frustum farplane");
     CONPRI("Lights:");
     CONPRI("  addlight dellight dellights addstlight delstlight");
-    CONPRI("  clrlights setlight");
+    CONPRI("  clrlights setlight relight");
     CONPRI("Views:");
     CONPRI("  split_view unsplit_view toggle_view");
     CONPRI("Movement:");
@@ -2357,6 +2359,16 @@ bool CommandHandler (const char *cmd, const char *arg)
       }
     }
     Sys->Report (CS_REPORTER_SEVERITY_NOTIFY, "All dynamic lights deleted.");
+  }
+  else if (!strcasecmp (cmd, "relight"))
+  {
+    csRef<iConsoleOutput> console = CS_QUERY_REGISTRY(Sys->object_reg, iConsoleOutput);
+    if(console.IsValid()) {
+        csTextProgressMeter* meter = new csTextProgressMeter(console);
+        Sys->Engine->ForceRelight(0, meter);
+        if(meter)
+            delete meter;
+    }
   }
   else if (!strcasecmp (cmd, "snd_play"))
   {
