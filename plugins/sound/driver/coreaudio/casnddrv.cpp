@@ -104,7 +104,7 @@ bool csSoundDriverCoreAudio::Open(iSoundRender *render, int freq, bool bit16, bo
 
     // Creation went ok, copy to local variables
     soundRender = render;
-    isStereo = true;
+    isStereo = (outStreamDesc.mChannelsPerFrame == 2);
     is16Bit = true;
     frequency = (int) outStreamDesc.mSampleRate;
 
@@ -121,9 +121,11 @@ bool csSoundDriverCoreAudio::Open(iSoundRender *render, int freq, bool bit16, bo
     status = AudioDeviceStart(audioDevice, AudioProc);
     if (status != 0)
         return false;
+    
+    // Indicate that Initialization has completed
+    isPlaying = true;
 
-
-  return true;
+    return true;
 }
 
 
@@ -210,9 +212,10 @@ void csSoundDriverCoreAudio::CreateSamples(float *buffer)
     // Create new samples
     soundRender->MixingFunction();
     
-    // Copy and scale Crystal Space samples to float the CoreAudio can use
+    // Copy and scale Crystal Space samples to the floats that CoreAudio can use
+    float scaleFactor = 1.0f / SHRT_MAX;
     for (int i = 0; i < SAMPLES_PER_BUFFER; i++)
-        buffer[i] = memory[i] * (1.0f / SHRT_MAX); 
+        buffer[i] = memory[i] * scaleFactor; 
 };
 
 
