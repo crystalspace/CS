@@ -2438,8 +2438,7 @@ void csPolygon3D::CalculateLightingStatic (csFrustumView *lview, bool vis)
 
 void csPolygon3D::FillLightMapStatic (csFrustumView *lview, bool vis)
 {
-  csFrustumContext *ctxt = lview->GetFrustumContext ();
-  csLightingPolyTexQueue *lptq = (csLightingPolyTexQueue *)lview->GetUserdata ();
+  csLightingPolyTexQueue *lptq = (csLightingPolyTexQueue*)lview->GetUserdata();
 
   csPolyTexGouraud *goi = GetGouraudInfo ();
   if (goi)
