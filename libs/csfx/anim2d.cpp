@@ -51,14 +51,15 @@ iTextureHandle *csAnim2D::GetTextureHandle()
   // find the next frame
   // if delay is <=0 show now (as fast as possible)
   // cycle through frames to find  it
+  lastnr = next;
   while((delays[next] > 0) && (after >= delays[next]))
   {
     after -= delays[next];
+    lastnr = next;
     next = (next+1)%nr;
   }
-  lastnr = next;
   lasttime = now;
-  return imgs[next];
+  return imgs[lastnr];
 }
 
 
