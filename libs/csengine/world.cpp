@@ -545,6 +545,7 @@ void csWorld::Draw (IGraphics3D* g3d, csCamera* c, csClipper* view)
   Stats::polygons_accepted = 0;
 
   current_camera = c;
+  top_clipper = view;
 
   IGraphics2D* g2d;
   g3d->Get2dDriver (&g2d);

@@ -2186,7 +2186,7 @@ csSprite3D *FindNextClosestSprite(csSprite3D *baseSprite, csCamera *camera, csVe
    if (baseSprite)
       {
       closestSprite = baseSprite;
-      closestZLocation = baseSprite->GetScreenBoundingBox(camera, screenBoundingBox);
+      closestZLocation = baseSprite->GetScreenBoundingBox(*camera, screenBoundingBox);
       // if the baseSprite isn't in front of the camera, return
       if (closestZLocation < 0)
          return NULL;
@@ -2204,7 +2204,7 @@ csSprite3D *FindNextClosestSprite(csSprite3D *baseSprite, csCamera *camera, csVe
 //      Sys->Printf(MSG_CONSOLE, "Checking sprite %s\n", csNameObject::GetName(*nextSprite));
       if (nextSprite != baseSprite)
          {
-         thisZLocation = nextSprite->GetScreenBoundingBox(camera, screenBoundingBox);
+         thisZLocation = nextSprite->GetScreenBoundingBox(*camera, screenBoundingBox);
          if ((thisZLocation > 0) && (thisZLocation < closestZLocation))
             {
             if (screenBoundingBox.In(screenCoord->x, screenCoord->y))

@@ -53,6 +53,16 @@ public:
   virtual bool Clip (csVector2 *Polygon, int &Count, int MaxCount, 
                      csBox *BoundingBox) = 0;
 
+  /**
+   * Classify some bounding box against this clipper.
+   * This function returns:<p>
+   * <ul>
+   * <li> -1 if box is not visible.
+   * <li> 0 if box is partially visible.
+   * <li> 1 if box is entirely visible.
+   */
+  virtual int ClassifyBox (csBox* box) = 0;
+
   /// Return true if given point is inside (or on bound) of clipper polygon.
   virtual bool IsInside (float x, float y) = 0;
 
@@ -74,9 +84,9 @@ class csBoxClipper : public csClipper
 
 public:
   /// Initializes the clipper object to the given bounding region.
-  csBoxClipper(const csBox& b) : region(b) {}
+  csBoxClipper (const csBox& b) : region(b) {}
   /// Initializes the clipper object to a rectangle with the given coords.
-  csBoxClipper(float x1, float y1, float x2, float y2) : region(x1,y1,x2,y2) {}
+  csBoxClipper (float x1, float y1, float x2, float y2) : region(x1,y1,x2,y2) {}
 
   /// Clip a to dest_poly.
   virtual bool Clip (csVector2 *Polygon, csVector2* dest_poly, int Count,
@@ -89,6 +99,9 @@ public:
    */
   virtual bool Clip (csVector2 *Polygon, int &Count, int MaxCount, 
                      csBox *BoundingBox);
+
+  /// Classify some bounding box against this clipper.
+  virtual int ClassifyBox (csBox* box);
 
   /// Return true if given point is inside (or on bound) of clipper polygon.
   virtual bool IsInside (float x, float y) { return region.In (x,y); }
@@ -159,6 +172,9 @@ public:
    */
   virtual bool Clip (csVector2 *Polygon, int &Count, int MaxCount, 
                      csBox *BoundingBox);
+
+  /// Classify some bounding box against this clipper.
+  virtual int ClassifyBox (csBox* box);
 
   /// Return true if given point is inside (or on bound) of clipper polygon.
   virtual bool IsInside (float x, float y);

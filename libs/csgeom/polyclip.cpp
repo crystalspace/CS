@@ -22,10 +22,22 @@
 #include "sysdef.h"
 #include "csgeom/polyclip.h"
 #include "csgeom/poly2d.h"
+#include "csgeom/box.h"
 
 //---------------------------------------------------------------------------
 
 csPoly2DPool csClipper::polypool (csPoly2DFactory::SharedFactory());
+
+int csBoxClipper::ClassifyBox (csBox* box)
+{
+  if (!region.Overlap (*box)) return -1;
+  if (box->MinX () >= region.MinX () &&
+      box->MaxX () <= region.MaxX () &&
+      box->MinY () >= region.MinY () &&
+      box->MaxY () <= region.MaxY ())
+    return 1;
+  return 0;
+}
 
 bool csBoxClipper::Clip (csVector2 *Polygon, csVector2* dest_poly, int Count,
 	int &OutCount)
@@ -303,6 +315,16 @@ csPolygonClipper::~csPolygonClipper ()
     CHKB (delete [] ClipData);
   if (ClipPoly2D)
     polypool.Free (ClipPoly2D);
+}
+
+int csPolygonClipper::ClassifyBox (csBox* box)
+{
+  if (!ClipBox.Overlap (*box)) return -1;
+  if (!ClipPoly2D->In (box->GetCorner (0))) return 0;
+  if (!ClipPoly2D->In (box->GetCorner (1))) return 0;
+  if (!ClipPoly2D->In (box->GetCorner (2))) return 0;
+  if (!ClipPoly2D->In (box->GetCorner (3))) return 0;
+  return 1;
 }
 
 bool csPolygonClipper::IsInside (float x, float y)

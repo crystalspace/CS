@@ -55,6 +55,18 @@ void csPoly2D::MakeEmpty ()
   bbox.StartBoundingBox ();
 }
 
+bool csPoly2D::In (const csVector2& v)
+{
+  int i, i1;
+  i1 = num_vertices-1;
+  for (i = 0 ; i < num_vertices ; i++)
+  {
+    if (csMath2::WhichSide2D (v, vertices[i1], vertices[i]) < 0) return false;
+    i1 = i;
+  }
+  return true;
+}
+
 void csPoly2D::MakeRoom (int new_max)
 {
   if (new_max <= max_vertices) return;

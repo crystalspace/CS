@@ -133,15 +133,10 @@ void csFrame::ComputeNormals (csTriangleMesh *mesh, csVector3* object_verts, int
 void csFrame::ComputeBoundingBox (int num_vertices)
 {
   int i;
-  box_min = box_max = vertices[0];
+  box.StartBoundingBox (vertices[0]);
   for (i = 1 ; i < num_vertices ; i++)
   {
-    if (vertices[i].x < box_min.x) box_min.x = vertices[i].x;
-    else if (vertices[i].x > box_max.x) box_max.x = vertices[i].x;
-    if (vertices[i].y < box_min.y) box_min.y = vertices[i].y;
-    else if (vertices[i].y > box_max.y) box_max.y = vertices[i].y;
-    if (vertices[i].z < box_min.z) box_min.z = vertices[i].z;
-    else if (vertices[i].z > box_max.z) box_max.z = vertices[i].z;
+    box.AddBoundingVertexSmart (vertices[i]);
   }
 }
 
@@ -531,15 +526,15 @@ void csSprite3D::UpdateDeferedLighting ()
 
 void csSprite3D::AddBoundingBox (csBspContainer* container)
 {
-  csVector3 b_min, b_max;
+  csBox3 b;
   if (skeleton_state)
   {
-    skeleton_state->ComputeBoundingBox (csTransform (), b_min, b_max);
+    skeleton_state->ComputeBoundingBox (csTransform (), b);
   }
   else
   {
     csFrame* cframe = cur_action->GetFrame (cur_frame);
-    cframe->GetBoundingBox (b_min, b_max);
+    cframe->GetBoundingBox (b);
   }
 
   // This transform should be part of the sprite class and not just calculated
@@ -550,14 +545,14 @@ void csSprite3D::AddBoundingBox (csBspContainer* container)
   // Add the eight corner points of the bounding box to the container.
   // Transform from object to world space here.
   csVector3Array& va = container->GetVertices ();
-  int pt_xyz = va.AddVertex (trans.Other2This (csVector3 (b_min.x, b_min.y, b_min.z)));
-  int pt_Xyz = va.AddVertex (trans.Other2This (csVector3 (b_max.x, b_min.y, b_min.z)));
-  int pt_xYz = va.AddVertex (trans.Other2This (csVector3 (b_min.x, b_max.y, b_min.z)));
-  int pt_XYz = va.AddVertex (trans.Other2This (csVector3 (b_max.x, b_max.y, b_min.z)));
-  int pt_xyZ = va.AddVertex (trans.Other2This (csVector3 (b_min.x, b_min.y, b_max.z)));
-  int pt_XyZ = va.AddVertex (trans.Other2This (csVector3 (b_max.x, b_min.y, b_max.z)));
-  int pt_xYZ = va.AddVertex (trans.Other2This (csVector3 (b_min.x, b_max.y, b_max.z)));
-  int pt_XYZ = va.AddVertex (trans.Other2This (csVector3 (b_max.x, b_max.y, b_max.z)));
+  int pt_xyz = va.AddVertex (trans.Other2This (csVector3 (b.MinX (), b.MinY (), b.MinZ ())));
+  int pt_Xyz = va.AddVertex (trans.Other2This (csVector3 (b.MaxX (), b.MinY (), b.MinZ ())));
+  int pt_xYz = va.AddVertex (trans.Other2This (csVector3 (b.MinX (), b.MaxY (), b.MinZ ())));
+  int pt_XYz = va.AddVertex (trans.Other2This (csVector3 (b.MaxX (), b.MaxY (), b.MinZ ())));
+  int pt_xyZ = va.AddVertex (trans.Other2This (csVector3 (b.MinX (), b.MinY (), b.MaxZ ())));
+  int pt_XyZ = va.AddVertex (trans.Other2This (csVector3 (b.MaxX (), b.MinY (), b.MaxZ ())));
+  int pt_xYZ = va.AddVertex (trans.Other2This (csVector3 (b.MinX (), b.MaxY (), b.MaxZ ())));
+  int pt_XYZ = va.AddVertex (trans.Other2This (csVector3 (b.MaxX (), b.MaxY (), b.MaxZ ())));
 
   CHK (poly = new csBspPolygon ());
   container->AddPolygon (poly);
@@ -566,7 +561,7 @@ void csSprite3D::AddBoundingBox (csBspContainer* container)
   poly->GetPolygon ().AddVertex (pt_XYz);
   poly->GetPolygon ().AddVertex (pt_Xyz);
   poly->GetPolygon ().AddVertex (pt_xyz);
-  poly->SetPolyPlane (csPlane (0, 0, 1, -b_min.z));
+  poly->SetPolyPlane (csPlane (0, 0, 1, -b.MinZ ()));
   poly->Transform (trans);
 
   CHK (poly = new csBspPolygon ());
@@ -576,7 +571,7 @@ void csSprite3D::AddBoundingBox (csBspContainer* container)
   poly->GetPolygon ().AddVertex (pt_XYZ);
   poly->GetPolygon ().AddVertex (pt_XyZ);
   poly->GetPolygon ().AddVertex (pt_Xyz);
-  poly->SetPolyPlane (csPlane (-1, 0, 0, b_max.x));
+  poly->SetPolyPlane (csPlane (-1, 0, 0, b.MaxX ()));
   poly->Transform (trans);
 
   CHK (poly = new csBspPolygon ());
@@ -586,7 +581,7 @@ void csSprite3D::AddBoundingBox (csBspContainer* container)
   poly->GetPolygon ().AddVertex (pt_xYZ);
   poly->GetPolygon ().AddVertex (pt_xyZ);
   poly->GetPolygon ().AddVertex (pt_XyZ);
-  poly->SetPolyPlane (csPlane (0, 0, -1, b_max.z));
+  poly->SetPolyPlane (csPlane (0, 0, -1, b.MaxZ ()));
   poly->Transform (trans);
 
   CHK (poly = new csBspPolygon ());
@@ -596,7 +591,7 @@ void csSprite3D::AddBoundingBox (csBspContainer* container)
   poly->GetPolygon ().AddVertex (pt_xYz);
   poly->GetPolygon ().AddVertex (pt_xyz);
   poly->GetPolygon ().AddVertex (pt_xyZ);
-  poly->SetPolyPlane (csPlane (1, 0, 0, -b_min.x));
+  poly->SetPolyPlane (csPlane (1, 0, 0, -b.MinX ()));
   poly->Transform (trans);
 
   CHK (poly = new csBspPolygon ());
@@ -606,7 +601,7 @@ void csSprite3D::AddBoundingBox (csBspContainer* container)
   poly->GetPolygon ().AddVertex (pt_XYZ);
   poly->GetPolygon ().AddVertex (pt_XYz);
   poly->GetPolygon ().AddVertex (pt_xYz);
-  poly->SetPolyPlane (csPlane (0, -1, 0, b_max.y));
+  poly->SetPolyPlane (csPlane (0, -1, 0, b.MaxY ()));
   poly->Transform (trans);
 
   CHK (poly = new csBspPolygon ());
@@ -616,44 +611,78 @@ void csSprite3D::AddBoundingBox (csBspContainer* container)
   poly->GetPolygon ().AddVertex (pt_Xyz);
   poly->GetPolygon ().AddVertex (pt_XyZ);
   poly->GetPolygon ().AddVertex (pt_xyZ);
-  poly->SetPolyPlane (csPlane (0, 1, 0, -b_min.y));
+  poly->SetPolyPlane (csPlane (0, 1, 0, -b.MinY ()));
   poly->Transform (trans);
 }
 
-float csSprite3D::GetScreenBoundingBox (csCamera *camera, csBox &boundingBox)
+void csSprite3D::GetCameraBoundingBox (const csCamera& camtrans, csBox3& cbox)
 {
-  csFrame *   theFrame;
+  csTransform trans = camtrans * csTransform (m_obj2world,
+  	m_world2obj * v_obj2world);
+  if (skeleton_state)
+  {
+    skeleton_state->ComputeBoundingBox (trans, cbox);
+  }
+  else
+  {
+    csFrame* cframe = cur_action->GetFrame (cur_frame);
+    csBox3 box;
+    cframe->GetBoundingBox (box);
+    cbox.StartBoundingBox (trans * box.GetCorner (0));
+    cbox.AddBoundingVertexSmart (trans * box.GetCorner (1));
+    cbox.AddBoundingVertexSmart (trans * box.GetCorner (2));
+    cbox.AddBoundingVertexSmart (trans * box.GetCorner (3));
+    cbox.AddBoundingVertexSmart (trans * box.GetCorner (4));
+    cbox.AddBoundingVertexSmart (trans * box.GetCorner (5));
+    cbox.AddBoundingVertexSmart (trans * box.GetCorner (6));
+    cbox.AddBoundingVertexSmart (trans * box.GetCorner (7));
+  }
+}
+
+float csSprite3D::GetScreenBoundingBox (const csCamera& camtrans, csBox& boundingBox)
+{
   csVector2   oneCorner;
-  csVector3   bbox_min;
-  csVector3   bbox_max;
-  csVector3   cameraPointMin;
-  csVector3   cameraPointMax;
-  csTransform trans;
+  csBox3      cbox;
 
-  theFrame = cur_action->GetFrame(cur_frame);
-  theFrame->GetBoundingBox(bbox_min, bbox_max);
+  // @@@ Note. The bounding box created by this function greatly
+  // exagerates the real bounding box. However, this function
+  // needs to be fast. I'm not sure how to do this more accuratelly.
 
-  trans = *camera * csTransform(m_obj2world, m_world2obj * v_obj2world);
-  cameraPointMin = trans * bbox_min;
-  cameraPointMax = trans * bbox_max;
+  GetCameraBoundingBox (camtrans, cbox);
 
   // if the entire bounding box is behind the camera, we're done
-  if ((cameraPointMin.z < 0) && (cameraPointMax.z < 0))
+  if ((cbox.MinZ () < 0) && (cbox.MaxZ () < 0))
     return -1;
 
   // Transform from camera to screen space.
-  oneCorner.x = cameraPointMin.x / cameraPointMin.z * camera->aspect + camera->shift_x;
-  oneCorner.y = cameraPointMin.y / cameraPointMin.z * camera->aspect + camera->shift_y;
-  boundingBox.StartBoundingBox(oneCorner);
-  oneCorner.x = cameraPointMax.x / cameraPointMax.z * camera->aspect + camera->shift_x;
-  oneCorner.y = cameraPointMax.y / cameraPointMax.z * camera->aspect + camera->shift_y;
-  boundingBox.AddBoundingVertexSmart(oneCorner);
+  if (cbox.MinZ () < 0)
+  {
+    // Sprite is very close to camera.
+    // Just return a maximum bounding box.
+    boundingBox.Set (-10000, -10000, 10000, 10000);
+  }
+  else
+  {
+    oneCorner.x = cbox.MaxX () / cbox.MaxZ () * camtrans.aspect + camtrans.shift_x;
+    oneCorner.y = cbox.MaxY () / cbox.MaxZ () * camtrans.aspect + camtrans.shift_y;
+    boundingBox.StartBoundingBox (oneCorner);
+    oneCorner.x = cbox.MinX () / cbox.MaxZ () * camtrans.aspect + camtrans.shift_x;
+    oneCorner.y = cbox.MinY () / cbox.MaxZ () * camtrans.aspect + camtrans.shift_y;
+    boundingBox.AddBoundingVertexSmart (oneCorner);
+    oneCorner.x = cbox.MinX () / cbox.MinZ () * camtrans.aspect + camtrans.shift_x;
+    oneCorner.y = cbox.MinY () / cbox.MinZ () * camtrans.aspect + camtrans.shift_y;
+    boundingBox.AddBoundingVertexSmart (oneCorner);
+    oneCorner.x = cbox.MaxX () / cbox.MinZ () * camtrans.aspect + camtrans.shift_x;
+    oneCorner.y = cbox.MaxY () / cbox.MinZ () * camtrans.aspect + camtrans.shift_y;
+    boundingBox.AddBoundingVertexSmart (oneCorner);
+  }
 
-  return cameraPointMin.z;
+  return cbox.MaxZ ();
 }
 
 void csSprite3D::Draw (csRenderView& rview)
 {
+  int i;
   if (draw_callback) draw_callback (this, &rview);
 
   if (!tpl->cstxt)
@@ -662,10 +691,51 @@ void csSprite3D::Draw (csRenderView& rview)
     fatal_exit (0, false);
   }
 
+  // Test visibility of entire sprite by clipping bounding box against clipper.
+  // There are three possibilities:
+  //	1. box is not visible -> sprite is not visible.
+  //	2. box is entirely visible -> sprite is visible and need not be clipped.
+  //	3. box is partially visible -> sprite is visible and needs to be clipped
+  //	   if rview has do_clip_plane set to true.
+  csBox bbox;
+  if (GetScreenBoundingBox (rview, bbox) < 0) return;	// Not visible.
+  //@@@ Debug output: this should be an optional feature for WalkTest.
+  //{
+    //csPolygon2D* p2d = new csPolygon2D ();
+    //p2d->AddVertex (bbox.GetCorner (0));
+    //p2d->AddVertex (bbox.GetCorner (1));
+    //p2d->AddVertex (bbox.GetCorner (3));
+    //p2d->AddVertex (bbox.GetCorner (2));
+    //p2d->Draw (rview.g2d, 255);
+    //delete p2d;
+  //}
+
+  // Test if we need and should clip to the current portal.
+  int box_class;
+  box_class = rview.view->ClassifyBox (&bbox);
+  if (box_class == -1) return; // Not visible.
+  bool do_clip = false;
+  if (rview.do_clip_plane || rview.do_clip_frustrum)
+  {
+    if (box_class == 0) do_clip = true;
+  }
+
+  // If we don't need to clip to the current portal then we
+  // test if we need to clip to the top-level portal.
+  // Top-level clipping is always required unless we are totally
+  // within the top-level frustrum.
+  // IF it is decided that we need to clip here then we still
+  // clip to the inner portal. We have to do clipping anyway so
+  // why not do it to the smallest possible clip area.
+  if (!do_clip)
+  {
+    box_class = csWorld::current_world->top_clipper->ClassifyBox (&bbox);
+    if (box_class == 0) do_clip = true;
+  }
+
   UpdateWorkTables (tpl->num_vertices);
   UpdateDeferedLighting ();
 
-  int i;
   csFrame * cframe = cur_action->GetFrame (cur_frame);
 
   // First create the transformation from object to camera space directly:
@@ -798,9 +868,14 @@ void csSprite3D::Draw (csRenderView& rview)
       // orientation of the triangle vertices. It works just as well in
       // mirrored mode.
       int rescount;
-      if (!rview.view->Clip (triangle, clipped_triangle, 3, rescount)) continue;
+      if (do_clip)
+      {
+        if (!rview.view->Clip (triangle, clipped_triangle, 3, rescount)) continue;
+        poly.num = rescount;
+      }
+      else
+        poly.num = 3;
 
-      poly.num = rescount;
       int trivert [3] = { a, b, c };
       int j, idx, dir;
       // If mirroring we store the vertices in the other direction.
@@ -819,8 +894,18 @@ void csSprite3D::Draw (csRenderView& rview)
         }
 	idx += dir;
       }
-      PreparePolygonFX (&poly, clipped_triangle, rescount, (csVector2 *)triangle,
-      	vertex_colors != NULL);
+      if (do_clip)
+        PreparePolygonFX (&poly, clipped_triangle, rescount, (csVector2 *)triangle,
+      	  vertex_colors != NULL);
+      else
+      {
+        poly.vertices [0].sx = triangle [0].x;
+        poly.vertices [0].sy = triangle [0].y;
+        poly.vertices [1].sx = triangle [1].x;
+        poly.vertices [1].sy = triangle [1].y;
+        poly.vertices [2].sx = triangle [2].x;
+        poly.vertices [2].sy = triangle [2].y;
+      }
 
       // Draw resulting polygon
       if (!rview.callback)

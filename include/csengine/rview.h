@@ -117,6 +117,16 @@ public:
   bool do_clip_plane;
 
   /**
+   * If true then we have to clip all objects to the portal frustrum
+   * (either in 2D or 3D). Normally this is not needed but some portals
+   * require this. If do_clip_plane is true then the value of this
+   * field is also implied to be true. The top-level portal should
+   * set do_clip_frustrum to true in order for all geometry to be
+   * correctly clipped to screen boundaries.
+   */
+  bool do_clip_frustrum;
+
+  /**
    * A callback function. If this is set then no drawing is done.
    * Instead the callback function is called.
    */
@@ -139,17 +149,20 @@ public:
 
   ///
   csRenderView () : csCamera (), view (NULL), g3d (NULL), g2d (NULL),
-  	portal_polygon (NULL), do_clip_plane (false), callback (NULL), callback_data (NULL),
+  	portal_polygon (NULL), do_clip_plane (false), do_clip_frustrum (false),
+	callback (NULL), callback_data (NULL),
 	fog_info (NULL), added_fog_info (false) {}
   ///
   csRenderView (const csCamera& c) : csCamera (c), view (NULL), g3d (NULL), g2d (NULL),
-  	portal_polygon (NULL), do_clip_plane (false), callback (NULL), callback_data (NULL),
+  	portal_polygon (NULL), do_clip_plane (false), do_clip_frustrum (false),
+	callback (NULL), callback_data (NULL),
 	fog_info (NULL), added_fog_info (false) {}
   ///
   csRenderView (const csCamera& c, csClipper* v, IGraphics3D* ig3d, IGraphics2D* ig2d) :
-   csCamera (c), view (v), g3d (ig3d), g2d (ig2d),
-   portal_polygon (NULL), do_clip_plane (false), callback (NULL), callback_data (NULL),
-   fog_info (NULL), added_fog_info (false) {}
+	csCamera (c), view (v), g3d (ig3d), g2d (ig2d),
+	portal_polygon (NULL), do_clip_plane (false), do_clip_frustrum (false),
+	callback (NULL), callback_data (NULL),
+	fog_info (NULL), added_fog_info (false) {}
 
   ///
   void SetView (csClipper* v) { view = v; }

@@ -96,17 +96,11 @@ void csSkeletonLimb::ComputeBoundingBox (csFrame* source)
   if (num_vertices)
   {
     csVector3* verts = source->GetVertices ();
-    box_min = box_max = verts[vertices[0]];
+    box.StartBoundingBox (verts[vertices[0]]);
     int i;
     for (i = 1 ; i < num_vertices ; i++)
     {
-      csVector3 v = verts[vertices[i]];
-      if (v.x < box_min.x) box_min.x = v.x;
-      else if (v.x > box_max.x) box_max.x = v.x;
-      if (v.y < box_min.y) box_min.y = v.y;
-      else if (v.y > box_max.y) box_max.y = v.y;
-      if (v.z < box_min.z) box_min.z = v.z;
-      else if (v.z > box_max.z) box_max.z = v.z;
+      box.AddBoundingVertexSmart (verts[vertices[i]]);
     }
   }
 
@@ -178,52 +172,41 @@ void csSkeletonConnectionState::Transform (const csTransform& tr, csFrame* sourc
 }
 
 void csSkeletonLimbState::ComputeBoundingBox (const csTransform& tr,
-	csVector3& bbox_min, csVector3& bbox_max)
+	csBox3& box)
 {
   if (num_vertices)
   {
-    csVector3 v, b_min, b_max;
-    tmpl->GetBoundingBox (b_min, b_max);
-    v = b_min;
-    if (v.x < bbox_min.x) bbox_min.x = v.x;
-    if (v.x > bbox_max.x) bbox_max.x = v.x;
-    if (v.y < bbox_min.y) bbox_min.y = v.y;
-    if (v.y > bbox_max.y) bbox_max.y = v.y;
-    if (v.z < bbox_min.z) bbox_min.z = v.z;
-    if (v.z > bbox_max.z) bbox_max.z = v.z;
-    v = b_max;
-    if (v.x < bbox_min.x) bbox_min.x = v.x;
-    if (v.x > bbox_max.x) bbox_max.x = v.x;
-    if (v.y < bbox_min.y) bbox_min.y = v.y;
-    if (v.y > bbox_max.y) bbox_max.y = v.y;
-    if (v.z < bbox_min.z) bbox_min.z = v.z;
-    if (v.z > bbox_max.z) bbox_max.z = v.z;
+    csBox3 b;
+    tmpl->GetBoundingBox (b);
+    box.AddBoundingVertex (tr * b.GetCorner (0));
+    box.AddBoundingVertexSmart (tr * b.GetCorner (1));
+    box.AddBoundingVertexSmart (tr * b.GetCorner (2));
+    box.AddBoundingVertexSmart (tr * b.GetCorner (3));
+    box.AddBoundingVertexSmart (tr * b.GetCorner (4));
+    box.AddBoundingVertexSmart (tr * b.GetCorner (5));
+    box.AddBoundingVertexSmart (tr * b.GetCorner (6));
+    box.AddBoundingVertexSmart (tr * b.GetCorner (7));
   }
 
   csSkeletonLimbState* c = children;
   while (c)
   {
-    c->ComputeBoundingBox (tr, bbox_min, bbox_max);
+    c->ComputeBoundingBox (tr, box);
     c = c->GetNext ();
   }
 }
 
 void csSkeletonConnectionState::ComputeBoundingBox (const csTransform& tr,
-	csVector3& bbox_min, csVector3& bbox_max)
+	csBox3& box)
 {
   csTransform tr_new = tr * trans;
-  csSkeletonLimbState::ComputeBoundingBox (tr_new, bbox_min, bbox_max);
+  csSkeletonLimbState::ComputeBoundingBox (tr_new, box);
 }
 
 void csSkeletonState::ComputeBoundingBox (const csTransform& tr,
-	csVector3& bbox_min, csVector3& bbox_max)
+	csBox3& box)
 {
-  bbox_min.x = 10000000.;
-  bbox_min.y = 10000000.;
-  bbox_min.z = 10000000.;
-  bbox_max.x = -10000000.;
-  bbox_max.y = -10000000.;
-  bbox_max.z = -10000000.;
-  csSkeletonLimbState::ComputeBoundingBox (tr, bbox_min, bbox_max);
+  box.StartBoundingBox ();
+  csSkeletonLimbState::ComputeBoundingBox (tr, box);
 }
 

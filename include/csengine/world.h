@@ -241,7 +241,12 @@ public:
   /**
    * The current camera for drawing the world.
    */
-  csCamera * current_camera;
+  csCamera* current_camera;
+
+  /**
+   * The top-level clipper we are currently using for drawing.
+   */
+  csClipper* top_clipper;
 
 public:
   /**

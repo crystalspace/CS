@@ -21,6 +21,7 @@
 
 #include "csgeom/math3d.h"
 #include "csgeom/math2d.h"
+#include "csgeom/box.h"
 #include "csgeom/polyint.h"
 #include "csengine/csobjvec.h"
 #include "csengine/rview.h"
@@ -51,7 +52,7 @@ private:
   char* name;
   int max_vertex;
   /// Bounding box in object space for this frame.
-  csVector3 box_min, box_max;
+  csBox3 box;
 
 public:
   ///
@@ -132,8 +133,7 @@ public:
   /**
    * Get the bounding box in object space.
    */
-  void GetBoundingBox (csVector3& bbox_min, csVector3& bbox_max)
-  { bbox_min = box_min; bbox_max = box_max; }
+  void GetBoundingBox (csBox3& b) { b = box; }
 };
 
 /**
@@ -539,14 +539,19 @@ public:
   void GenerateSpriteLOD (int num_vts);
 
   /**
+   * Get a 3D bounding box in camera space.
+   */
+  void GetCameraBoundingBox (const csCamera& camtrans, csBox3& boundingBox);
+
+  /**
    * Get the coordinates of the sprite in screen coordinates.
    * Fills in the boundingBox with the X and Y locations
-   * of the sprite.  Returns the Z location of the sprite,
+   * of the sprite.  Returns the max Z location of the sprite,
    * or -1 if the sprite is not on-screen.
    * If the sprite is not on-screen, the X and Y values are
    * not valid.
    */
-  float GetScreenBoundingBox (csCamera *camera, csBox &boundingBox);
+  float GetScreenBoundingBox (const csCamera& camtrans, csBox& boundingBox);
 
   /**
    * Draw this sprite given a camera transformation.

@@ -20,6 +20,7 @@
 #define POLY2D_H
 
 #include "csgeom/math2d.h"
+#include "csgeom/box.h"
 
 class csClipper;
 class Dumper;
@@ -98,6 +99,11 @@ public:
    */
   csVector2* GetLast ()
   { if (num_vertices<=0) return NULL;  else return &vertices[num_vertices-1]; }
+
+  /**
+   * Test if this vector is inside the polygon.
+   */
+  bool In (const csVector2& v);
 
   /**
    * Make room for at least the specified number of vertices.

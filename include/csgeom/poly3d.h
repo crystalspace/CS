@@ -95,6 +95,11 @@ public:
   { if (num_vertices<=0) return NULL;  else return &vertices[num_vertices-1]; }
 
   /**
+   * Test if this vector is inside the polygon.
+   */
+  bool In (const csVector3& v);
+
+  /**
    * Make room for at least the specified number of vertices.
    */
   void MakeRoom (int new_max);

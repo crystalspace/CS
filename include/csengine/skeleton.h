@@ -21,6 +21,7 @@
 
 #include "csgeom/math3d.h"
 #include "csgeom/math2d.h"
+#include "csgeom/box.h"
 #include "csgeom/transfrm.h"
 #include "csobject/csobj.h"
 
@@ -48,7 +49,7 @@ private:
   csSkeletonLimb* children;
 
   /// Bounding box in object space for this limb.
-  csVector3 box_min, box_max;
+  csBox3 box;
 
 protected:
   /// Update state information.
@@ -71,7 +72,7 @@ public:
   int GetNumVertices () { return num_vertices; }
 
   /// Get the bounding box.
-  void GetBoundingBox (csVector3& b_min, csVector3& b_max) { b_min = box_min; b_max = box_max; }
+  void GetBoundingBox (csBox3& b) { b = box; }
 
   /// Add a child limb.
   void AddChild (csSkeletonLimb* child);
@@ -187,8 +188,7 @@ public:
   /**
    * Calculate the real bounding box for the given state.
    */
-  virtual void ComputeBoundingBox (const csTransform& tr, csVector3& bbox_min,
-  	csVector3& bbox_max);
+  virtual void ComputeBoundingBox (const csTransform& tr, csBox3& box);
 
   /// Get first child.
   csSkeletonLimbState* GetChildren () { return children; }
@@ -224,8 +224,7 @@ public:
   virtual void Transform (const csTransform& tr, csFrame* source, csVector3* dest);
 
   /// Calculate the real bounding box for the given state.
-  virtual void ComputeBoundingBox (const csTransform& tr, csVector3& bbox_min,
-  	csVector3& bbox_max);
+  virtual void ComputeBoundingBox (const csTransform& tr, csBox3& box);
 
   /// Set the transformation.
   void SetTransformation (csTransform& tr) { trans = tr; }
@@ -261,8 +260,7 @@ public:
   virtual ~csSkeletonState () { }
 
   /// Calculate the real bounding box for the given state.
-  virtual void ComputeBoundingBox (const csTransform& tr, csVector3& bbox_min,
-  	csVector3& bbox_max);
+  virtual void ComputeBoundingBox (const csTransform& tr, csBox3& box);
 
   CSOBJTYPE;
 };
