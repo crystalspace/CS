@@ -37,10 +37,10 @@
 ##	nohelp: Do not invoke Help for this target.
 rule Library
 {
-  # check options
-  CheckOptions noinstall independent shared nohelp : $(3) : $(<) ;
+  local options = $(3) ;
+  CheckOptions noinstall independent shared nohelp : $(options) : $(<) ;
 
-  local target = [ ConstructLibraryTarget $(<) : $(3) ] ;
+  local target = [ ConstructLibraryTarget $(<) : $(options) ] ;
   local sources = [ DoSourceGrist $(>) ] ;
   local objects = [ CompileObjects $(sources) ] ;
 
@@ -62,7 +62,7 @@ rule Library
   }
 
   # library depends on its member objects
-  if ! [ IsElem independent : $(3) ]
+  if ! [ IsElem independent : $(options) ]
   {
     if $(KEEPOBJS)
     {
@@ -74,20 +74,21 @@ rule Library
     }
   }
 
-  if ( ! [ IsElem shared : $(3) ] ) || ( $(BUILD_SHARED_LIBS) != "yes" )
+  if ( ! [ IsElem shared : $(options) ] ) || ( $(BUILD_SHARED_LIBS) != "yes" )
   {
     $(<)_SHARED = "" ;
-    LibraryStatic $(<) : $(objects) : $(3) : $(target) ;
+    LibraryStatic $(<) : $(objects) : [ Filter $(options) : shared ] :
+      $(target) ;
   }
   else
   {
     $(<)_SHARED = "shared" ;
-    LibraryShared $(<) : $(objects) : $(3) : $(target) ;
+    LibraryShared $(<) : $(objects) : $(options) : $(target) ;
   }
   CFlags $(<) : $(LIBRARY.CFLAGS) ;
   LFlags $(<) : $(LIBRARY.LFLAGS) ;
 
-  if ! [ IsElem nohelp : $(3) ]
+  if ! [ IsElem nohelp : $(options) ]
   {
     local desc = [ Description $(<) ] ;
     if ! $(desc) { desc = "$(<) library" ; }
@@ -114,9 +115,11 @@ rule LibDepends
 #----------------------------------------------------------------------------
 # private part
 
+# LibraryStatic libname : sources : options : decoratedtarget
 rule LibraryStatic
 {
   local objects = $(>) ;
+  local options = $(3) ;
   local target = $(4) ;
 
   # Set LOCATE for the library and its contents.  The bound
@@ -150,7 +153,7 @@ rule LibraryStatic
   }
 
   # Generate install rules
-  if ! [ IsElem noinstall : $(3) ]
+  if ! [ IsElem noinstall : $(options) ]
   {
     if "$(RANLIB)"
     {
@@ -186,18 +189,19 @@ rule LibraryStatic
   }
 }
 
+# LibraryStatic libname : sources : options : decoratedtarget
 rule LibraryShared
 {
   local objects = $(>) ;
+  local options = $(3) ;
   local target = $(4) ;
-  local linklib = [ ConstructSharedLibraryLinkLib $(<) : $(3) ] ;
+  local linklib = [ ConstructSharedLibraryLinkLib $(<) : $(options) ] ;
   local deplibs ;
 
   local i ;
-  #for i in $($(<)_depends)
   for i in $(LIBDEPENDS)
   {
-    deplibs += [ ConstructLibraryLinkTarget $(i) : $(3) ] ;
+    deplibs += [ ConstructLibraryLinkTarget $(i) : $(options) ] ;
   }
   
   if ! $(target:D)
