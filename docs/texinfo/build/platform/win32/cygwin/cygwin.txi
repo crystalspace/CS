@@ -10,13 +10,36 @@
 These instructions are for building Crystal Space with Cygwin a @sc{gnu}
 compiler for Windows created by Red Hat Inc. and other third party contributors.
 
+@subsubheading A Warning About Cygwin
+
+A full or extensive install of Cygwin can take up alot of hard disk space. Please
+be careful if installing on low free space disks. A typical install can be around
+400Mb and large above 700Mb. You have been warned.
+
+@subsubheading Getting Cygwin
+
+Cygwin uses a custom setup application for installation of Cygwin which can be
+obtained from their official website.
+
 @uref{http://sources.redhat.com/cygwin/}
 
+The installation program @emph{setup.exe} must be downloaded to your system. You
+can download it using the following link.
+
 @uref{http://sources.redhat.com/cygwin/setup.exe}
+
+@subsubheading Installing Cygwin
+
+Firstly goto the location where you downloaded the Cygwin @emph{setup.exe}. I would
+suggest it be in a directory of it's own as during download it will drop the
+distrubtions files in the same location.
 
 @ifnotinfo
 @picturessss{build,platform,win32,cygwin,cygshot1}
 @end ifnotinfo
+
+Click/Double Click on @emph{setup.exe} icon as shown in the screenshot above to begin
+the the installation process.
 
 @ifnotinfo
 @picturessss{build,platform,win32,cygwin,cygshot2}
