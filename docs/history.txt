@@ -23,7 +23,7 @@ The history order is reversed so that new features are at the top.
 	  account by checking if headers are present in /usr/include/directx.
 	  Overall, this change fixes the problem where the Jam build system
 	  would never build the DirectDraw canvas(es) because it thought
-	  DirectDraw was unavilable.
+	  DirectDraw was unavailable.
 1-June-2003
 	- Philip Wyett started adding MSVC 7 external app HOWTO screenshot
 	  images.
