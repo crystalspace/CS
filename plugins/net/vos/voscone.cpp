@@ -82,7 +82,7 @@ void ConstructConeTask::doTask()
 
     int hubVertices = 24;
 
-    coneLook->SetVertexCount (2 + hubVertices + 1);
+    coneLook->SetVertexCount (2 + hubVertices);
     coneLook->SetTriangleCount (hubVertices * 2);
 
     csVector3 *vertices = coneLook->GetVertices();

@@ -123,7 +123,7 @@ bool csVosA3DL::Initialize (iObjectRegistry *o)
                                    &csMetaSphere::new_csMetaSphere);
   Site::addRemoteMetaObjectFactory("a3dl:object3D.cylinder",
                                    "a3dl:object3D.cylinder",
-                                   &csMetaCone::new_csMetaCone);
+                                   &csMetaCylinder::new_csMetaCylinder);
   Site::addRemoteMetaObjectFactory("a3dl:texture", "a3dl:texture",
                                    &csMetaTexture::new_csMetaTexture);
   Site::addRemoteMetaObjectFactory("a3dl:material", "a3dl:material",
