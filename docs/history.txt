@@ -1,5 +1,8 @@
 The history order has been reversed so that new features are at the top.
 
+25-Jun-2000
+	- Eric Sunshined fixed a bug in the 'depend' target of the BeOS
+	  OpenGL makefile.
 24-Jun-2000
 	- Received another lighting patch from Travis McIntosh.
 	  Dynamic lighting on curves should be better now with no
