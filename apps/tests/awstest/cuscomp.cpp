@@ -104,7 +104,8 @@ iAwsComponent* CustomComponentFactory::Create ()
   CustomComponent* my_comp = new CustomComponent ();
 
   // we create a label component to embed into our own component.
-  iAwsComponent* embedded_comp = WindowManager ()->CreateEmbeddableComponent ();
+  iAwsComponent* embedded_comp =
+    WindowManager ()->CreateEmbeddableComponent (my_comp);
 
   // Now we must embed the label into our component
   my_comp->Initialize (embedded_comp);
