@@ -11,6 +11,8 @@ The history order has been reversed so that new features are at the top.
 	  The field first_time was not copied.
 	- Eric Sunshine repaired the funky csPortalSectorCallback declaration
 	  so that it is now sane.  (This fix also helps to appease VC++.)
+	- Eric Sunshine eliminated a printf() format conversion warning from
+	  lghtmap.cpp.
 17-Apr-2001
 	- Martin Geisse eliminated some warnings in the function terrain
 	  loader.

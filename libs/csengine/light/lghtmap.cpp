@@ -202,9 +202,9 @@ struct LightHeader
   long dyn_cnt;		// Number of dynamic maps
 };
 
-void CacheName (char *buf, char* prefix, unsigned long id, char *suffix)
+void CacheName (char *buf, char* prefix, unsigned long ident, char *suffix)
 {
-  sprintf (buf, "lm/%s%d%s", prefix, id, suffix);
+  sprintf (buf, "lm/%s%lu%s", prefix, ident, suffix);
 }
 
 bool csLightMap::ReadFromCache (int w, int h,
