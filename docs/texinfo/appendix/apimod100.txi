@@ -255,9 +255,9 @@ global namespace.
 @item
 @code{CS_PROCSIZE} @result{} @code{CS_PROCESSOR_SIZE}
 @item
-@code{DO_MMX} @result{} @code{CS_USE_MMX}
+@code{DO_MMX} @result{} @code{CS_HAVE_MMX}
 @item
-@code{DO_NASM} @result{} @code{CS_USE_NASM}
+@code{DO_NASM} @result{} @code{CS_HAVE_NASM}
 @item
 @code{double2longlong()} @result{} @code{csDoubleToLongLong()}
 @item

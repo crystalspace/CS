@@ -27,7 +27,7 @@
 
 //--//--//--//--//--//--//--//--//--//--//--/ assembler implementations --//--//
 
-#if defined (CS_PROCESSOR_X86) && (CS_PROCESSOR_SIZE == 32) && defined (CS_USE_NASM)
+#if defined (CS_PROCESSOR_X86) && (CS_PROCESSOR_SIZE == 32) && defined (CS_HAVE_NASM)
 #  include "i386/scan32a.h"
 #endif // CS_PROCESSOR_X86
 

@@ -4972,7 +4972,7 @@ fi
 "
 fi
 
-	cs_header_text="${cs_header_text}#define CS_USE_NASM
+	cs_header_text="${cs_header_text}#define CS_HAVE_NASM
 "
 fi
 
@@ -51512,7 +51512,7 @@ cs_header_text="${cs_header_text}#define CS_PROCESSOR_NAME \"$cs_host_cpu\"
 "
 
 if test $cs_host_cpu = x86; then
-  cs_header_text="${cs_header_text}#define CS_USE_MMX
+  cs_header_text="${cs_header_text}#define CS_HAVE_MMX
 "
 fi
 

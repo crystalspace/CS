@@ -132,7 +132,7 @@ bool csSoftwareGraphics3D::eiSoftConfig::SetOption (int id, csVariant* value)
     case 1: scfParent->do_lighting = value->GetBool (); break;
     case 2: scfParent->do_alpha = value->GetBool (); break;
     case 3: scfParent->do_textured = value->GetBool (); break;
-#ifdef CS_USE_MMX
+#ifdef CS_HAVE_MMX
     case 4: scfParent->do_mmx = value->GetBool (); break;
 #endif
     case 5: scfParent->do_gouraud = value->GetBool (); break;
@@ -150,7 +150,7 @@ bool csSoftwareGraphics3D::eiSoftConfig::GetOption (int id, csVariant* value)
     case 1: value->SetBool (scfParent->do_lighting); break;
     case 2: value->SetBool (scfParent->do_alpha); break;
     case 3: value->SetBool (scfParent->do_textured); break;
-#ifdef CS_USE_MMX
+#ifdef CS_HAVE_MMX
     case 4: value->SetBool (scfParent->do_mmx); break;
 #else
     case 4: value->SetBool (false); break;

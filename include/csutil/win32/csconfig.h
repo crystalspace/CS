@@ -56,7 +56,7 @@
 #endif
 
 #if !defined (CS_COMPILER_GCC)
-#  define CS_USE_MMX
+#  define CS_HAVE_MMX
 #endif
 
 #undef  CS_HAVE_SOCKLEN_T

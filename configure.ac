@@ -216,7 +216,7 @@ AS_IF([test -n "$NASM"],
     AS_IF([test $cs_cv_prog_nasm_ok = yes],
 	[CS_EMIT_BUILD_PROPERTY([NASM.AVAILABLE], [yes])
 	CS_EMIT_BUILD_PROPERTY([CMD.NASM], [$NASM])
-	CS_HEADER_PROPERTY([CS_USE_NASM])])])
+	CS_HEADER_PROPERTY([CS_HAVE_NASM])])])
 
 
 
@@ -1924,7 +1924,7 @@ CS_HEADER_PROPERTY([CS_PROCESSOR_NAME],
     [AS_ESCAPE(["])$cs_host_cpu[]AS_ESCAPE(["])])
 
 AS_IF([test $cs_host_cpu = x86], 
-  [CS_HEADER_PROPERTY([CS_USE_MMX])])
+  [CS_HEADER_PROPERTY([CS_HAVE_MMX])])
 
 
 

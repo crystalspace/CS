@@ -32,6 +32,14 @@ chronological order.
 	  lists, it strips from the beginning of list-1 items which it has in
 	  common with the beginning of list-2 and returns what remains of
 	  list-1.
+	- Eric Sunshine renamed the following configuration control macros
+	  (most of which are emitted to csconfig.h by configure.ac) to improve
+	  internal naming consistency, and to conform more closely to naming
+	  scheme used by Autoconf.
+	    CS_USE_NASM --> CS_HAVE_NASM
+	    CS_USE_MMX  --> CS_HAVE_MMX
+	- Eric Sunshine retired the unnecssary and potentially polluting
+	  NO_ASSEMBLER control macro.
 22-Mar-2005
 	- Jorrit removed the slow RAPID and memory consuming collision
 	  detection plugin. OPCODE is now a lot better.

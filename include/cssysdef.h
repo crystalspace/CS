@@ -688,14 +688,9 @@ extern void* operator new[] (size_t s, void* filename, int line);
 #endif
 
 // Adjust some definitions contained in csconfig.h
-#if defined (CS_PROCESSOR_X86) && !defined (CS_USE_NASM)
-#  undef NO_ASSEMBLER
-#  define NO_ASSEMBLER
-#endif
-
-#if !defined (CS_PROCESSOR_X86) || defined (NO_ASSEMBLER)
-#  undef CS_USE_MMX
-#  undef CS_USE_NASM
+#if !defined (CS_PROCESSOR_X86) || !defined (CS_HAVE_NASM)
+#  undef CS_HAVE_MMX
+#  undef CS_HAVE_NASM
 #endif
 
 // Use special knowledge of IEEE float format in some cases for CPU's that are

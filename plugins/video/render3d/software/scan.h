@@ -415,7 +415,7 @@ PIG_SCAN_ROUTINE (16_565, tile_tex_goufx)
 PIG_SCAN_ROUTINE (16_555, tile_tex_goufxkey)
 PIG_SCAN_ROUTINE (16_565, tile_tex_goufxkey)
 
-#ifdef CS_USE_MMX
+#ifdef CS_HAVE_MMX
 /// Draw one horizontal scanline (lighting) using MMX
 csDrawScanline csScan_16_mmx_scan_map_zfil;
 /// Draw one horizontal scanline (no lighting).
@@ -520,7 +520,7 @@ PIG_SCAN_ROUTINE (32, tile_tex_goufx)
 /// Draw a perspective-incorrect polygon scanline with various effects and color keying
 PIG_SCAN_ROUTINE (32, tile_tex_goufxkey)
 
-#if defined (CS_USE_MMX)
+#if defined (CS_HAVE_MMX)
 /// Draw a perspective-incorrect texture mapped polygon scanline using MMX
 csDrawScanline csScan_32_mmx_scan_map_zfil;
 /// Draw one horizontal scanline (no lighting) using MMX

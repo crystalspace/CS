@@ -24,7 +24,7 @@
 
 #include "cssysdef.h"
 
-#if defined(CS_USE_MMX) && defined(CS_COMPILER_GCC)
+#if defined(CS_HAVE_MMX) && defined(CS_COMPILER_GCC)
 # define MMX
 # include "mmx.h"
 #endif
