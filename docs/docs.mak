@@ -38,6 +38,7 @@ DESCRIPTION.psdoc = user manual as PostScript
 DESCRIPTION.pdfdoc = user manual as PDF
 DESCRIPTION.infodoc = user manual as Info
 DESCRIPTION.repairdoc = Texinfo @node and @menu directives
+DESCRIPTION.chmsupp = HTML Help support files (projects, TOCs, index files)
 # For 'cleandoc' target
 DESCRIPTION.doc = generated documentation
 
@@ -53,6 +54,7 @@ DOCHELP += \
   $(NEWLINE)echo $"  make psdoc        Make the $(DESCRIPTION.psdoc)$" \
   $(NEWLINE)echo $"  make pdfdoc       Make the $(DESCRIPTION.pdfdoc)$" \
   $(NEWLINE)echo $"  make infodoc      Make the $(DESCRIPTION.infodoc)$" \
+  $(NEWLINE)echo $"  make chmsupp      Make the $(DESCRIPTION.chmsupp)$" \
   $(NEWLINE)echo $"  make repairdoc    Repair $(DESCRIPTION.repairdoc)$" \
   $(NEWLINE)echo $"  make cleandoc     Clean all $(DESCRIPTION.doc)$"
 
@@ -61,9 +63,9 @@ endif # ifeq ($(MAKESECTION),rootdefines)
 #------------------------------------------------------------- roottargets ---#
 ifeq ($(MAKESECTION),roottargets)
 
-.PHONY: devapi pubapi htmldoc dvidoc psdoc pdfdoc infodoc repairdoc cleandoc
+.PHONY: devapi pubapi htmldoc dvidoc psdoc pdfdoc infodoc repairdoc cleandoc chmsupp
 
-devapi pubapi htmldoc dvidoc psdoc pdfdoc infodoc:
+devapi pubapi htmldoc dvidoc psdoc pdfdoc infodoc chmsupp:
 	$(MAKE_TARGET) DO_DOC=yes
 
 repairdoc:
@@ -289,11 +291,12 @@ htmldoc: \
 # Rule to perform actual DVI conversion of $(CSMANUAL_FILE).
 do-dvidoc:
 	$(CP) $(CSMANUAL_DIR)/texinfo.tex $(OUT.DOC.DVI)
-	$(CD) $(OUT.DOC.DVI); $(TEXI2DVI) --batch --quiet \
+	$(CD) $(OUT.DOC.DVI); $(TEXI2DVI) --batch -V -I '.' -I `pwd` \
 	-I `$(CD) $(OUT.DOC.UNDO)/$(CSMANUAL_DIR); $(PWD)` $(CSMANUAL_FILE)
 	$(MV) $(OUT.DOC.DVI)/$(addsuffix .dvi,$(basename $(CSMANUAL_FILE))) \
 	$(OUT.DOC.DVI)/cs.dvi
 	$(RM) $(OUT.DOC.DVI)/texinfo.tex
+	#--quiet 
 
 # Rule to generate DVI format output.  Target images are retained since
 # generated DVI file references them.
@@ -346,6 +349,11 @@ infodoc: \
   do-infodoc \
   $(OUT.DOC.INFO).ZAPSOURCE \
   $(OUT.DOC.INFO)/txt.ZAPIMAGES
+
+chmsupp: 
+	$(CD) $(OUT.DOC); $(PERL) -I../../docs/support/winhelp ../../docs/support/winhelp/gendoctoc.pl
+	$(CP) docs/support/winhelp/csapi.hhp $(OUT.DOC)
+	$(CP) docs/support/winhelp/csdocs.hhp $(OUT.DOC)
 
 endif # ifeq ($(DO_DOC),yes)
 

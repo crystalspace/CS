@@ -47,7 +47,7 @@ sub doctoc_index {
   							print $TOCFILE <<EOTOCENTRY;
 <LI> <OBJECT type="text/sitemap">
   <param name="Name" value="$3">
-  <param name="Local" value="\\$1#$2">
+  <param name="Local" value="$docroot\\$1#$2">
 </OBJECT>
 EOTOCENTRY
 								$indexfiles{$1} = 1;
@@ -68,10 +68,10 @@ EOTOCENTRY
 		  					my $igroup = $2;
 		  					my $ititle = $3;
 		  					$igroup =~ s/(<.*?>)//g; # strip html code
-		  					$igroup = HTML::Entities::encode($igroup);
+		  					$igroup = HTMLEntities::encode($igroup);
 		  					$ititle =~ s/(<.*?>)//g; 
 		  					#$ititle =~ s/^([[:digit:]\.]*?) //; # strip leading section number
-		  					$ititle = HTML::Entities::encode($ititle);
+		  					$ititle = HTMLEntities::encode($ititle);
  								push(@{$indexwords{$igroup}}, [$ititle, $ilink]);
   					}
   			}
@@ -102,7 +102,7 @@ EOHHKENTRY
   			print $HHKFILE <<EOHHKENTRY;
 <LI> <OBJECT type="text/sitemap">
 <param name="Name" value="$ititle">
-<param name="Local" value="\\$ilink">
+<param name="Local" value="$docroot\\$ilink">
 </OBJECT>
 EOHHKENTRY
   			}
@@ -130,11 +130,11 @@ sub doctoc_section {
 		  			|| ( /<TR><TD ALIGN=\"left\" VALIGN=\"TOP\"><A HREF=\"(.*)\">(.*)<\/A><\/TD><TD>&nbsp;&nbsp;<\/TD><TD ALIGN=\"left\" VALIGN=\"TOP\"><\/TD><\/TR>/ ) ) { # every other file
 		  			my $seclink = $1;
 		  			(my $sectitle = $2) =~ s/(<.*?>)//g; # strip html code
-		  			$sectitle = HTML::Entities::encode($sectitle);
+		  			$sectitle = HTMLEntities::encode($sectitle);
   					print $TOCFILE <<EOTOCENTRY;
 <LI> <OBJECT type="text/sitemap">
   <param name="Name" value="$sectitle">
-  <param name="Local" value="\\$seclink">
+  <param name="Local" value="$docroot\\$seclink">
 </OBJECT>
 EOTOCENTRY
 						if ( $sectitle eq "Index" ) {
@@ -172,16 +172,16 @@ sub doctoc {
 <UL>
 <LI> <OBJECT type="text/sitemap">
   <param name="Name" value="Crystal Space Documentation">
-  <param name="Local" value="\\index.html">
+  <param name="Local" value="$docroot\\index.html">
 </OBJECT>
 <UL>
 <LI> <OBJECT type="text/sitemap">
   <param name="Name" value="Table of contents">
-  <param name="Local" value="\\cs_toc.html">
+  <param name="Local" value="$docroot\\cs_toc.html">
 </OBJECT>
 <LI> <OBJECT type="text/sitemap">
   <param name="Name" value="About this document">
-  <param name="Local" value="\\cs_abt.html">
+  <param name="Local" value="$docroot\\cs_abt.html">
 </OBJECT>
 EOTOCHEAD
   
@@ -206,11 +206,11 @@ sub api_compound_list {
   			chomp $_;
 				if ( /<li><a class=\"el\" href=\"(.*?)\">(.*?)<\/a>/ ) { 
 		  			my $clink = $1;
-		  			my $ctitle = HTML::Entities::encode($2);
+		  			my $ctitle = HTMLEntities::encode($2);
   					print $TOCFILE <<EOTOCENTRY;
 <LI> <OBJECT type="text/sitemap">
   <param name="Name" value="$ctitle">
-  <param name="Local" value="\\$clink">
+  <param name="Local" value="$apiroot\\$clink">
 </OBJECT>
 EOTOCENTRY
 				}
@@ -231,7 +231,7 @@ sub api_compound_members {
   					print $TOCFILE <<EOTOCENTRY;
 <LI> <OBJECT type="text/sitemap">
   <param name="Name" value="$2">
-  <param name="Local" value="\\$srcfile#$1">
+  <param name="Local" value="$apiroot\\$srcfile#$1">
 </OBJECT>
 EOTOCENTRY
 				}
@@ -251,7 +251,7 @@ sub api_file_list {
   					print $TOCFILE <<EOTOCENTRY;
 <LI> <OBJECT type="text/sitemap">
   <param name="Name" value="$1">
-  <param name="Local" value="\\$2">
+  <param name="Local" value="$apiroot\\$2">
 </OBJECT>
 EOTOCENTRY
 						$_ = $3;
@@ -279,18 +279,18 @@ sub apitoc {
 <UL>
 	<LI> <OBJECT type="text/sitemap">
 		<param name="Name" value="Main Page">
-		<param name="Local" value="\\index.html">
+		<param name="Local" value="$apiroot\\index.html">
 		</OBJECT>
 	<LI> <OBJECT type="text/sitemap">
 		<param name="Name" value="Class Hierarchy">
-		<param name="Local" value="\\hierarchy.html">
+		<param name="Local" value="$apiroot\\hierarchy.html">
 		</OBJECT>
 EOTOCHEAD
 
 	  print $TOCFILE <<EOTOCHEAD;
 	<LI> <OBJECT type="text/sitemap">
 		<param name="Name" value="Compound List">
-		<param name="Local" value="\\annotated.html">
+		<param name="Local" value="$apiroot\\annotated.html">
 		</OBJECT>
 		<UL>
 EOTOCHEAD
@@ -301,7 +301,7 @@ EOTOCHEAD
 	</UL>
 	<LI> <OBJECT type="text/sitemap">
 		<param name="Name" value="Compound Members">
-		<param name="Local" value="\\functions.html">
+		<param name="Local" value="$apiroot\\functions.html">
 		</OBJECT>
 		<UL>
 EOTOCHEAD
@@ -312,7 +312,7 @@ EOTOCHEAD
 	</UL>
 	<LI> <OBJECT type="text/sitemap">
 		<param name="Name" value="Files">
-		<param name="Local" value="\\files.html">
+		<param name="Local" value="$apiroot\\files.html">
 		</OBJECT>
 		<UL>
 EOTOCHEAD
@@ -328,5 +328,5 @@ EOTOCEND
   	close($TOCFILE);
 }
 
-doctoc("../../html");
-apitoc("../../pubapi");
+doctoc("html");
+apitoc("pubapi");
