@@ -78,8 +78,6 @@ END_INTERFACE_TABLE ()
 
 csGraphics3DOpenGL::csGraphics3DOpenGL (ISystem* piSystem)
   : m_fogtexturehandle(0),
-    ShortcutDrawPolygon(NULL), ShortcutStartPolygonFX(NULL),
-    ShortcutDrawPolygonFX(NULL), ShortcutFinishPolygonFX(NULL),
     m_piG2D (NULL), txtmgr(NULL), texture_cache(NULL), lightmap_cache(NULL),
     m_piSystem(piSystem)
 {
