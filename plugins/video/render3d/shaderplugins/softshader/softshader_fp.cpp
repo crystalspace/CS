@@ -32,7 +32,7 @@ Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "iutil/string.h"
 #include "iutil/vfs.h"
 #include "ivaria/reporter.h"
-#include "ivideo/render3d.h"
+#include "ivideo/graph3d.h"
 #include "ivideo/rndbuf.h"
 #include "ivideo/shader/shader.h"
 //#include "ivideo/shader/shadervar.h"

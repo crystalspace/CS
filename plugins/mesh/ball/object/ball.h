@@ -33,7 +33,6 @@
 #include "igeom/polymesh.h"
 
 #ifdef CS_USE_NEW_RENDERER
-#include "ivideo/render3d.h"
 #include "ivideo/rndbuf.h"
 #include "ivideo/rendermesh.h"
 #endif

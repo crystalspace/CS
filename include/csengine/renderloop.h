@@ -30,7 +30,7 @@
 #include "csutil/refarr.h"
 #include "iengine/renderloop.h"
 #include "iutil/strset.h"
-#include "ivideo/render3d.h"
+#include "ivideo/graph3d.h"
 #include "ivideo/shader/shader.h"
 #include "ivideo/rendersteps/irenderstep.h"
 

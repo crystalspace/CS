@@ -21,7 +21,7 @@
 #define __CS_IVIDEO_RENDERSTEPS_IGENERIC_H__
 
 #include "iutil/strset.h"
-#include "ivideo/render3d.h"
+#include "ivideo/graph3d.h"
 
 SCF_VERSION (iGenericRenderStep, 0, 0, 1);
 

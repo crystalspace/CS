@@ -31,12 +31,7 @@
 #include "csgeom/box.h"
 #include "iengine/engine.h"
 
-#ifndef CS_USE_NEW_RENDERER
 #include "ivideo/graph3d.h"
-#else
-#include "ivideo/render3d.h"
-#define iGraphics3D iGraphics3D
-#endif // CS_USE_NEW_RENDERER
 
 #ifndef CS_USE_NEW_RENDERER
 struct csFog;

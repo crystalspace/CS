@@ -81,6 +81,10 @@ chronological order.
 	  step.
 	- Jorrit renamed iRender3D to iGraphics3D for the new renderer.
 	- Jorrit removed a few ifdef's related to iRender3D vs iGraphics3D.
+	- Jorrit removed all direct includes of ivideo/render3d.h. Please
+	  use ivideo/graph3d.h instead. Keep in mind that ivideo/render3d.h
+	  is going to be removed and merged back with igraph3d.h in the
+	  (near?) future.
 11-Aug-2003
         - Philip Wyett changed #include "cal3d/cal3d" to
           #include <cal3d/cal3d.h> and dropped below other includes fixing

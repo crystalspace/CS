@@ -23,7 +23,7 @@
 #include "iutil/document.h"
 #include "iutil/strset.h"
 #include "ivideo/rndbuf.h"
-#include "ivideo/render3d.h"
+#include "ivideo/graph3d.h"
 #include "ivideo/rendermesh.h"
 #include "iengine/rview.h"
 #include "iengine/sector.h"

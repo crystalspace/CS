@@ -21,7 +21,7 @@
 
 #include "iutil/document.h"
 #include "ivideo/rndbuf.h"
-#include "ivideo/render3d.h"
+#include "ivideo/graph3d.h"
 #include "ivideo/rendermesh.h"
 #include "ivideo/material.h"
 #include "iengine/rview.h"

@@ -30,7 +30,7 @@
 #include "iutil/comp.h"
 #include "iutil/strset.h"
 #include "ivideo/graph2d.h"
-#include "ivideo/render3d.h"
+#include "ivideo/graph3d.h"
 #include "ivideo/shader/shader.h"
 
 class csSoftwareTextureCache;

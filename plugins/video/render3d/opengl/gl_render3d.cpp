@@ -43,7 +43,7 @@
 
 #include "ivideo/lighting.h"
 #include "ivideo/txtmgr.h"
-#include "ivideo/render3d.h"
+#include "ivideo/graph3d.h"
 #include "ivideo/rendermesh.h"
 
 #include "ivideo/shader/shader.h"

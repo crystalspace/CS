@@ -35,7 +35,7 @@
 #include "iutil/string.h"
 #include "iutil/comp.h"
 
-#include "ivideo/render3d.h"
+#include "ivideo/graph3d.h"
 #include "ivideo/shader/shader.h"
 #include "ivideo/material.h"
 #include "ivideo/texture.h"

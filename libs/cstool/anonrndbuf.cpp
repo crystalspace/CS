@@ -21,7 +21,7 @@
 #ifdef CS_USE_NEW_RENDERER
 
 #include "cstool/anonrndbuf.h"
-#include "ivideo/render3d.h"
+#include "ivideo/graph3d.h"
 #include "ivideo/rndbuf.h"
 
 csAnonRenderBufferManager::csAnonRenderBufferManager(iObjectRegistry *object_reg)

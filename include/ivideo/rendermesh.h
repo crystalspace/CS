@@ -29,7 +29,7 @@ Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 * @{ */
 
 #include "csutil/strset.h"
-#include "ivideo/render3d.h"
+#include "ivideo/graph3d.h"
 
 class csVector3;
 class csVector2;

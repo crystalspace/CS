@@ -23,7 +23,7 @@
 
 #include "iutil/objreg.h"
 #include "iutil/comp.h"
-#include "ivideo/render3d.h"
+#include "ivideo/graph3d.h"
 #include "ivideo/rndbuf.h"
 #include "ivideo/shader/shader.h"
 #include "ivideo/rendersteps/irenderstep.h"

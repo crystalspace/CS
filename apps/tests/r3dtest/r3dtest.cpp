@@ -52,12 +52,10 @@
 #include "ivaria/reporter.h"
 #include "ivaria/stdrep.h"
 #include "csutil/cmdhelp.h"
+#include "ivideo/graph3d.h"
 #ifdef CS_USE_NEW_RENDERER
-#  include "ivideo/render3d.h"
 #  include "ivideo/shader/shader.h"
 #  include "ivideo/rndbuf.h"
-#else
-#  include "ivideo/graph3d.h"
 #endif
 #include "cstool/csview.h"
 
