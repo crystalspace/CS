@@ -23,30 +23,6 @@
 #include "csterr/ddgmat.h"
 // ----------------------------------------------------------------------
 
-#if 0
-// Define an input and output stream operator for ddgVector2.
-// Output format is "<xxx,yyy>"
-ostream& operator << ( ostream&s, ddgVector2 v )
-     { return s <<'<'<<v[0]<<','<<v[1]<<'>'; }
-ostream& operator << ( ostream&s, ddgVector2* v )
-     { return s <<'<'<<v->v[0]<<','<<v->v[1]<<'>'; }
-
-// Input format is "<xxx,yyy>"
-istream& operator >> ( istream& s, ddgVector2& v)
-     { char c; s >> c >>v.v[0] >> c >> v.v[1] >> c ; return s; }
-
-// Define an input and output stream operator for ddgVector3.
-// Output format is "<xxx,yyy,zzz>"
-ostream& operator << ( ostream&s, ddgVector3 v )
-     { return s <<'<'<<v[0]<<','<<v[1]<<','<<v[2]<<'>'; }
-ostream& operator << ( ostream&s, ddgVector3* v )
-     { return s <<'<'<<v->v[0]<<','<<v->v[1]<<','<<v->v[2]<<'>'; }
-
-// Input format is "<xxx,yyy,zzz>"
-istream& operator >> ( istream& s, ddgVector3& v)
-     { char c; s >> c >>v.v[0] >> c >> v.v[1] >> c >> v.v[2]>> c; return s; }
-#endif
-
 // Assumes that incoming vectors are normalized.
 void ddgVector3::normal( ddgVector3* v[9])
 {
@@ -84,19 +60,7 @@ void ddgVector3::normal( ddgVector3* v[9])
 	normalize();
 }
 
-#if 0
-// Define an input and output stream operator for ddgVector4.
-// Output format is "<xxx,yyy,zzz,aaa>"
-ostream& operator << ( ostream&s, ddgVector4 v )
-     { return s <<'<'<<v[0]<<','<<v[1]<<','<<v[2]<<','<<v[3]<<'>'; }
-ostream& operator << ( ostream&s, ddgVector4* v )
-     { return s <<'<'<<v->v[0]<<','<<v->v[1]<<','<<v->v[2]<<','<<v->v[3]<<'>'; }
-
-// Input format is "<xxx,yyy,zzz,aaa>"
-istream& operator >> ( istream& s, ddgVector4& v)
-     { char c; s >> c >>v.v[0] >> c >> v.v[1] >> c >> v.v[2]>> c >> v.v[3] >> c; return s; }
-#endif
-
+/*
 
 ddgVector4* ddgVector4::multiply( ddgMatrix4 *m1, ddgVector4 *v1 )
 {
@@ -107,4 +71,4 @@ ddgVector4* ddgVector4::multiply( ddgMatrix4 *m1, ddgVector4 *v1 )
   return this;
 }
 
-
+*/
