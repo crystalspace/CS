@@ -24,6 +24,7 @@
   #pragma warning(disable:4244)   // conversion from 'double' to 'float'
   #pragma warning(disable:4305)   // conversion from 'const double' to 'float'
   #pragma warning(disable:4018)   // Signed unsigned warnings
+  #pragma warning(disable:4245)   // Signed unsigned warnings
   #pragma warning(disable:4805)   // unsafe mix of bool and int.
   #pragma warning(disable:4800)   // Forcing value to bool
   #pragma warning(disable:4514)   // Removal of unreferenced inline function
