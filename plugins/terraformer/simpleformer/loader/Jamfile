@@ -1,0 +1,10 @@
+SubDir TOP plugins terraformer simpleformer loader ;
+
+Help simpleformer : "Crystal Space simple terraformer loader" ;
+
+Plugin simpleformerldr
+	: [ Wildcard *.cpp *.h ]
+;
+
+LinkWith simpleformerldr : csgeom csutil ;
+
