@@ -239,8 +239,8 @@ public:
         glBindTexture (target, texture);
       }
       break;
-    }
 #endif // CS_USE_NEW_RENDERER
+    }
   }
   GLuint GetTexture( GLenum target, GLuint texture, int layer = 0 )
   {

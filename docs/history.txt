@@ -8,6 +8,8 @@ The history order is reversed so that new features are at the top.
 	  for MSVC.  This was done in preparation for the new csmingwlibs
 	  package.
 	- Eric Sunshine eliminated a compilation warning in ensocket driver.
+	- Eric Sunshine fixed a compilation error in glstates.h which occurred
+	  when CS_USE_NEW_RENDERER was not defined.
 27-Feb-2003
 	- res fixed the "shifted alpha map" bug in the software renderer.
 	- Marten Svanfeldt once again fiddled with the light/shadow culling. 
