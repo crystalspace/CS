@@ -31,6 +31,9 @@ The history order is reversed so that new features are at the top.
 	  -renamed rng.h to randomgen.h
 	  -moved halogen code to csengine
 	  -renamed ptrarr.h to parray.h
+	- Matze reverted the namespace stuff as this is creating unexpected
+	  problems when the user declares classes and structs ahead of their
+	  real declaration.
 2-Apr-2003
         - Jonathan Tarbox fixed some bugs in csEvent::Flatten/Unflatten
 	- Matze removed the csSome, csConstSome and uint type from cstypes.h

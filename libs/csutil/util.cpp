@@ -24,9 +24,6 @@
 #define CS_SYSDEF_PROVIDE_EXPAND_PATH
 #include "cssysdef.h"
 
-namespace crystal
-{
-
 char *csStrNew (const char *s)
 {
   if (s)
@@ -314,6 +311,4 @@ void csFindReplace(char *dest, const char *src, const char *search,
   destpos += todo;
   destpos[0]=0;
 }
-
-} // end of namespace crystal
 

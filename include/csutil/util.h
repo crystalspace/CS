@@ -21,9 +21,6 @@
 
 #include <stdio.h>
 
-namespace crystal
-{
-
 /**\file
  */
 
@@ -88,18 +85,5 @@ static inline int csLog2 (int n)
  */
 void csFindReplace (char *dest, const char *src, const char *search,
   const char *replace, int max);
-
-// names without cs prefix
-static inline char* StrNew (const char* s)
-{ return csStrNew (s); }
-static inline char* ExpandName (const char* name)
-{ return ExpandName (name); }
-static inline void SplitPath (const char* pathname, char* path,
-    size_t pathsize, char* name, size_t namesize)
-{ csSplitPath (pathname, path, pathsize, name, namesize); }
-static inline bool GlobMatches (const char* name, const char* mask)
-{ return csGlobMatches (name, mask); }
-
-} // end of namespace crystal
 
 #endif // __CS_UTIL_H__
