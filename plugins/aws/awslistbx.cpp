@@ -461,14 +461,14 @@ awsListBox::OnDraw(csRect clip)
     x=startx;
     awsListRow *row = (awsListRow *)rows[j];
 
-    if (DrawItemsRecursively(row, x, y, border, false))
+    if (DrawItemsRecursively(row, x, y, border, false, false))
       break;
         
   } // end for j (number of rows)
 }
 
 bool
-awsListBox::DrawItemsRecursively(awsListRow *row, int &x, int &y, int &border, bool child)
+awsListBox::DrawItemsRecursively(awsListRow *row, int &x, int &y, int &border, bool child, bool last_child)
 {
   iGraphics2D *g2d = WindowManager()->G2D();
   iGraphics3D *g3d = WindowManager()->G3D();
@@ -493,8 +493,12 @@ awsListBox::DrawItemsRecursively(awsListRow *row, int &x, int &y, int &border, b
   if (child)
   {
     tree_expanded->GetOriginalDimensions(tbw, tbh);
-    g3d->DrawPixmap(tree_vline, x+2+tbw, y, tbw, ith+2, 0,0, tbw, tbh);    
     g3d->DrawPixmap(tree_hline, x+2+tbw, y, tbw, tbh, 0,0, tbw, tbh);
+
+    if (last_child)
+      g3d->DrawPixmap(tree_vline, x+2+tbw, y, tbw, ith>>1, 0,0, tbw, tbh);    
+    else
+      g3d->DrawPixmap(tree_vline, x+2+tbw, y, tbw, ith+2, 0,0, tbw, tbh);    
   }
 
   // Draw columns
@@ -602,7 +606,7 @@ awsListBox::DrawItemsRecursively(awsListRow *row, int &x, int &y, int &border, b
         int cx=orgx;
         awsListRow *newrow = (awsListRow *)row->children->Get(i);
 
-        if (DrawItemsRecursively(newrow, cx, y, border, true))
+        if (DrawItemsRecursively(newrow, cx, y, border, true, (i==row->children->Length()-1 ? true : false)))
           return true;
       }
     }
