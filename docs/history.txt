@@ -35,6 +35,8 @@ Short-term cleanups that need to be done:
 	  loaded.
 	- Jorrit updated a lot of makefiles so that most apps at least compile
 	  on Unix (some do not run though).
+	- Eric Sunshine fixed the lighting progress meters so that they update
+	  correctly (again) on stdout.
 14-Nov-1999
 	- Updates to CrystalClear from Michael Dale Long and fixes for SCF to
 	  cctest.
