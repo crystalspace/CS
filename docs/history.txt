@@ -12,13 +12,37 @@ Short-term cleanups that need to be done:
 	- Check the dependencies of libraries/COM objects and try to find
 	  includes that don't belong there (like from csengine).
 
+2-Jul-99:
+	- I optimized the new movement system of Denis so that the gravity/CD
+	  tests are only done when the camera moves. This increases
+	  performance a bit.
+	- Fixed look_up and look_down commands.
+	- I also fixed a few bugs in the handling of the new 'status' prefix
+	  with key binding.
+	- The 'move3d' command works properly now.
+	- Received patch from David Huen for the BE software and OpenGL
+	  renderers. He also sent me Glide support for BE including a
+	  glide2common directory which other Glide ports should use (similar
+	  to openglcommon).
+	- *** Release of 0.13_012 ***
+1-Jul-99:
+	- Thomas Hieber enabled snap-to-grid in MazeD and he also increased
+	  the size of the crosses for vertices.
+	- Andrew Zabolotny fixed a bug with the texture manager which
+	  could cause VERY big slow-downs at times (and maybe even crashes).
 30-Jun-99:
 	- I extended the movement system of Denis Dmitriev to implement the
 	  old 3d-movement functions again. There are a set of new commands
 	  which can be bound to keys for that purpose. The docs/console.txt
 	  document has been updated with all new commands.
 	- Update documentation.
-	- *** Release of 0.13_012 ***
+	- Fix to NASM code from Andrew Zabolotny.
+	- Andrew added 'gouraud' console command to toggle gouraud support.
+	  There is also a new render state called G3DRENDERSTATE_GOURAUDENABLE.
+	  All the renderers where changed to support this flag.
+	- Fix to platform dependent QInt() selection.
+	- Optimization with removed csVector3 constructor is gone because
+	  it appears to give some problems on Windows.
 29-Jun-99:
 	- I had to remove the optimization mentioned below with regards
 	  to triangle drawing. It is more complicated than that. The

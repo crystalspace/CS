@@ -1,3 +1,6 @@
+THIS DOCUMENT NEEDS HEAVY UPDATING!!!
+
+
 Here is a run-thru of the main rendering loop. This document is not an
 explanation of portal technology. It just explains how the main
 rendering loop in Crystal Space works so that you can have a quick idea

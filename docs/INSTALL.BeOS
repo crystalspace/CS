@@ -1,336 +1,126 @@
-Here are specific installation instructions for Crystal Space on
-BeOS systems (with gcc x86 only right now).
+How to run CrystalSpace on BeOS
+====================
+by David Huen (david@huen.freeserve.co.uk)
 
-Be sure to check http://www.xingo.com/crystal/install.beos for the latest version
-of this document, and http://crystal.linuxgames.com for the Home of CS.
+Version 0.1 (1/7/99)
 
+CrystalSpace is a full-featured 3D graphics engine and the BeOS port was originally done by Xavier Pianet.  I have sort of picked it up in his apparently prolonged absence (where are you Xavier?).  The project was initiated by Jorrit Tyberghein.
 
------------------------
-  Getting the Pieces
------------------------
+I have assumed you will have obtained a full set of sources at this stage.
 
-To build Crystal Space on BeOS, you will need to download the following files :
-csmain.tgz		# guess what ... the main module
-csbeos.tgz		# BeOS specific files
-standard.zip	# contains few standard items (textures, shapes, ..)
-al least one level, for ex large.zip
+BeOS settings
+========
+CrystalSpace is compiled using a GNU make.  Some of the makefiles currently require modification before use (may change later!).
 
-optionaly you can get thoses too :
-cshardw.tgz		# Hardware acceleration modules
-csmazed.tgz		# MazeD the Level Editor (not completly functional yet)
-cscontr.tgz		# contribution programs (converters, ...)
-csblocks.tgz	# small '3D tetris' usind CS API
-
-the documentation should be in :
-csdocs.tgz
-
------------------------
-  Compiling the Thing
------------------------
-
-before all you should edit the file in cryst/src/user.mak and in the first lines at
-the top, change the one saying
-DO_ASM=yes
-to
+In mk/user.mak, change the following flags as indicated:-
 DO_ASM=no
-gcc complains about compiling the assembly files and for the moment this option
-needs to be disabled on BeOS. (see 'Editing the Makefile' further down for other
-possible switches)
+DO_PNG=no
+DO_BMP=no
+DO_TGA=no
+DO_JPG=no
+USE_MESA=0
+BUGGY_EGCS_COMPILER=yes
 
-Go to 'cryst/src' in a terminal and type ($ is the prompt):
+Next, you will need to make accessible the make files for various optional components.  The general method is to go into the libs/ directory and you will see a large number of component folders covering specific functionalities within CrystalSpace. In each of these folders are yet another set of target folders, each with  a makefile to compile that particular component.  To use that component, move the makefile in the desired target folders up into its parent directory.  You will need to do this in the cs2d and cs3d folders.
 
-$make beos
-$make clean
-$make depend
+As it currently stands, the software, Glide and OpenGL renderers can be activated by the following steps.
 
-After the 3 previous commands, everything should be setup for BeOS
-and we are ready to go : 
+Move into cs2d/ the following makefiles:-
+cs2d/be/belib2d.mak
+cs2d/be/beglide2/glidebe2d.mak
+csd2/be/openglbe/glbe2d.mak
 
-(By the way, if you type 'make' you will get a list of
-all possible targets that can be made with the makefile).
+And in cs3d/ the following makefiles:-
+cs3d/glide2/glide3d.mak
+cs3d/opengl/glrender.mak
+cs3d/software/cs3d.mak
 
-it you want to live quietly just
-$make all
+To get the search paths correct, you need to comment out the following:-
+CFLAGS.GLIDE3D+=-I/usr/local/glide/include -DDO_GLIDE -DGLIDE24_ONLY
+LIBS._GLIDE3D+=-lglide2x
+and add instead
+LIBS._GLIDE3D+=/boot/develop/lib/x86/glide2x.so
 
-...and wait for a while, but you can also build in steps :
+You will also need to comment out the following lines in glrender.mak:-
+CFLAGS.GL3D+=-I$(X11_PATH)/include
+LIBS._GL3D+=-L$(X11_PATH)/lib -lXext -lX11
+and change the non-MESA case to:-
+  CFLAGS.GL3D+=-I/boot/develop/headers/be/opengl
+  LIBS._GL3D+=-lGL
 
-We will first need to build the COM registration server :
-
-$make regsvr
-
-If everything goes well this should create an executable called 'csregsvr'
-we will use it later to register the COM add-ons.
-Then we need to build the COM modules soft, libbe2d, netnull and netsocks
-
-$make soft
-$make libbe2d
-$make netnull
-$make netsocks
-
-RQ: ** Compiler Crash **
-The compiler might crash with errors like
-xxxx/yyyy.cpp: In method `int Object::method(int, int, int)':
-xxxx/yyyy.cpp:1617: Internal compiler error.
-xxxx/yyyy.cpp:1617: Please submit a Problem Report to Cygnus Solutions with send-pr.
-just save the file on top of itself by modifying the end of the guilty
-line and do a make again, it should disapear.
-
-RQ: ** OpenGL **
-if you want to try the OpenGL modules, you will need the archive hardw_012.tgz,
-unpacked, and you need a small edition to the file cryst/src/mk/system/glrender.mak
-at the top, replace the line saying
-USE_MESA = 1
-to
-USE_MESA = 0
-unless you want to install mesa !!! (i never tried that before)
-then go to line 73 and replace the line
-  GL3DLIBS=-L/home/jorrit/varia/engine/Mesa-3.0/lib -lMesaGL -lMesaGLU -L/usr/X11/lib -L/usr/X11R6/lib -L/usr/openwin/lib -lXext -lX11
-by
-  GL3DLIBS=-lGL
-then uncomment line 8 of the file cryst/src/mk/system/beos.mak
-
-
-Now you can build the needed modules with :
-$make glbe2d        Make the GL/Be 2D driver
-$make glrender     Make the OpenGL 3D driver
-
-
-we can now register all the COM add-ons (located in the ... add-ons/ directory):
-
-$csregsvr libbe2d.so netdrvn.so netmann.so softrndr.so
-
-If all went ok, you should see a list of the following form
-libname'.......DllRegisterServer succeeded.'
-
-RQ:
-if you have built the OpenGL modules register them too (or add them to the previous line).
-$csregsvr glbe2d.so glrender.so
-
-you could do the same job with just :
-$csregsvr `ls add-ons`
-
-Now we need to make the CS application itself (it will take some time):
-
-$make cs
-
-If everything goes well this should create an executable called 'cryst'
-which you can now try to run (see the original 'INSTALL' file for
-running instructions), and have a look at the cryst.cfg file, that contains,
-a lot of modifiable parameters, and also try (for cmd line options)
-$cryst -help 
-
-
-If you also want to make the beta version of MazeD (the CS
-level editor) then also type:
-
-$make mz
-
-If everything goes well this should create an executable called 'mazed'
-which you can now try to run.
-
-
-If you also want to make the beta version of primedit (the CS
-primitives editor) then also type:
-
-$make pe
-
-If everything goes well this should create an executable called 'primedit'
-which you can now try to run.
-
-
-----------------
-  System Types
-----------------
-
-all should be set after you typed
+You can then set up the compilation environment by going into the CS/ directory in terminal and typing:
 make beos
+make clean
+make depend
 
-----------------------------
-  External Libraries: zlib
-----------------------------
+This sets up everything you should need to compile.
 
-The BeOS comes with most of the needed libraries, for example
-you can find libz.a and libpng.a in /boot/develop/lib/x86
-you can had libjpeg.a (cf further), but i have seen shareds libraries (.so)
-of thoses in the port of Gostcript and i'm willing to try them with CS.
-Tt will always be that less on the executables.
+Next, compile all the basic stuff:-
+make netmann
+make netdrvn
+make sndrdrn
+make snddrvn
 
-------------------------------
-  External Libraries: libpng
-------------------------------
+As sound and networking have not been implemented in the BeOS port yet, this just compiles null drivers.
 
-If you want the ability to read PNG graphic files from within Crystal
-Space then you should also download the PNG libraries. If they are not
-already installed on your system you can download them from:
+The graphics libraries consist of a OS-specific 2D driver and a OS-independent 3D renderer.  To get:-
+1) software renderer
+make be2d
+make soft
 
-    ftp://ftp.uu.net/graphics/png/src/libpng-?????.tar.gz
-    (as of this writing the current latest version is libpng-1.0.2.tar.gz)
+2) Glide
+make glidebe2d
+make glide3d
 
-None of the current Crystal Space levels contain PNG files so Crystal
-Space does not really need it. However, it is enabled by default in
-the makefile because MazeD (the beta level editor) requires PNG support.
+3) OpenGL
+make glbe2d
+make glrender
 
-Edit 'user.mak' and set DO_PNG=no if you want to disable PNG support.
-Otherwise you must install the PNG libraries just like you did with
-zlib (in 'cryst/libpng').
+You will need to register the libraries (which are pseudo-COM modules).  First compile the registrar:-
+make regsvr
 
+then:-
+csregsvr netmann.so netdrvn.so snddrvn.so sndrdrn.so
+csregsvr be2d.so softrndr.so   <for software renderer>
+csregsvr glidebe2d.so Glide2xRender.so <for Glide 2.54//Voodoo 2>
+csregsvr glbe2d.so glrender.so <for OpenGL>
 
--------------------------------
-  External Libraries: libjpeg
--------------------------------
+Finally, you will want to compile and run the test apps.
+The simple app is compiled with:-
+make simp
 
-If you want the ability to read JPEG graphic files from within Crystal
-Space then you should also download the JPEG libraries. If they are not
-already installed on your system you can download them from:
+and the walktest app with:-
+make walk
 
-    ftp://ftp.uu.net/graphics/jpeg/jpegsrc.???.tar.gz
-    (as of this writing the current latest version is jpegsrc.v6b.tar.gz)
+If you use the simple app, make sure the worldfile in cryst.cfg is set to the 
 
-JPEG support is currently disabled by default. If you want to enable it,
-edit 'user.mak' and set DO_JPG=yes. You must then install the JPEG libraries
-in '/boot/home/config/lib/' with a link to '/boot/develop/lib/x86'
+Program settings
+==========
+You will need to have a world file to do anything!  I suggest downloading fresh_large.zip.  Place this file in data/.
 
-Again follow compilation instructions as specified by the JPEG library.
+Edit cryst.cfg to set the world file accordingly (used by walktest):-
+WORLDFILE=data/fresh_large.zip
 
+you may also wish to add a commented-out line which you can activate later to run the simple test.
+;WORLDFILE=standard.zip
 
-------------------------
-  Editing the Makefile
-------------------------
+The rest of the settings are mostly self evident and can often be overridden at the command line.
 
-The file 'cs.mak' (which you can find in 'cryst/src/mk') is the main makefile.
-but you should not need to modify cs.mak, to configure options, edit 'user.mak'
-It is used by the other system specific makefiles. Most options can be
-set from within 'user.mak'. If you want you can edit this file to change
-many options. Above I already explained how you can edit this file to
-add/remove PNG and JPEG support.
+Testing
+=====
+Now switch to a workspace and set the screen resolution to something like 800*600, 16 bit.
 
-Some other important options in 'cs.mak' are:
+Form Terminal within this workspace, go to the CS/ folder and type:-
+walktest   <this will run with whatever settings are in the cryst.cfg file (usually software renderer>
+walktest -driver glide  <runs in Glide mode>
+walktest -driver opengl <runs in OpenGL mode>
 
-    OPT=... (possible values: 'optimize', 'debug', or 'profile').
-        With this option you can control how Crystal Space should be
-	compiled. 'optimize' is default and gives the most efficient
-	executable. 'debug' is useful when you want to debug the
-	program (isn't this nice :-)
-	You can also use the 'profile' option which will generate
-	an executable that will itself generate profile information when
-	run. Use 'gprof' after running Crystal Space to extract the
-	profile information.
-	The options that are used for each of these compile runs are
-	controlled in the system dependent makefiles (see later).
+Alt-f will switch you in and out of full screen.
 
-    DO_ASM=... (possible values: 'yes' or 'no')
-        With this option you can disable all assembler optimizations
-	present in CS. Note that there is currently only assembler currently
-	for Intel so this option has no effect otherwise.
-	The default for this option is 'yes' if you are compiling for
-	optimization (see above option). Otherwise it is 'no' (because
-	debugging interferes with the assembler).
+Note that walktest requires a good world file to show off effectively (like fresh_large.zip).  Make sure that cryst.cfg is correctly set to identify this file.
 
-    DO_SHM=... (possible values: 'yes' or 'no')
-        When this option is set to 'yes', CS will be linked with the XSHM
-	(Shared Memory Extension) libraries. This option is set to 'yes'
-	in all system dependent makefiles that require it. There is not
-	much reason to set this option to 'no' because Crystal Space can
-	check at runtime if the XSHM option is present or not. The only
-	reason to disable it is if you don't have the libraries installed
-	on your system (which should not happen often).
+You can also run simple by replacing the walktest command with simple in the foregoing.  Simple requires the world file be set to standard.zip as shown earlier.
 
-    DO_PNG, DO_GIF, DO_TGA, and DO_JPG (possible values: 'yes' or 'no')
-        The DO_PNG and DO_JPG options are explained above. DO_GIF and DO_TGA
-	are for controlling GIF and TGA graphics file loading. Do not
-	disable DO_GIF since all current level contain GIF files. It is
-	not useful to disable DO_TGA because it does not need any external
-	library and it does not require much code in CS.
+You should be able to start experimenting with the BeOS port at this stage!
 
-    MEM=...
-        This is a flag which is definitelly not for the beginner. It enables
-	a memory debugger which is in Crystal Space. Use only if you know
-	what you are doing.
-
-
-
-
-Next you should edit the system dependent makefile to see if the
-paths and options are correct. Here is a list of options:
-
-    SYS_INC_PATH=...
-        The path where all system includes can be found. If you have
-	zlib, libpng, or libjpeg installed in some non-standard
-	directory (like /usr/otherlibs/include or something) you need
-	to add it here.
-	Put the '-I' option before every directory that you specify here.
-
-    SYS_LIB_PATH=...
-        Like SYS_INC_PATH but for the libraries.
-	'-L /usr/X11/lib' is usually defined here. If your X libraries are
-	elsewhere, just change it.
-	Put the '-L' option before every directory that you specify here.
-
-    SYS_LIBS=...
-        The actual system libraries. Add all X and other libraries that
-	are required here. Note that you don't need to add 'zlib', 'libpng',
-	or 'libjpeg'.
-
-    SYS_SRC=...
-        System specific sources for Crystal Space. Here is a list of sources
-	that are specific to this system. Normally you don't need to change
-	this unless you are creating a new port.
-
-    DO_SHM=...
-        Here you can control the default for the XSHM extension. I recommend
-	leaving this option set to 'yes' unless you don't have the required
-	libraries (CS checks for this option at runtime).
-
-    HOW_OPTIMIZE=...
-        Here are options that are used by 'cs.mak' when compiling for
-	optimization. Check if they are suitable for your system.
-	Warning! In makefile.lnx and makefile.svg they are set to optimize
-	for the Pentium processor. If you don't have a Pentium or don't
-	have a GCC compiler which recognizes these options (I use and
-	recommend 'pgcc' which DOES support Pentium optimization) then you
-	should comment the first HOW_OPTIMIZE line and uncomment the
-	second one (which optimizes for the i486).
-
-    HOW_DEBUG=...
-        Here are options that are used by 'cs.mak' when compiling for
-	debugging. Note that '-fomit-frame-pointer' is not included here
-	which means that assembler must be disabled because all assembler
-	routines assume that '-fomit-frame-pointer' is used. This disabling
-	of assembler in case of debugging is done automatically by 'cs.mak'.
-
-    HOW_PROFILE=...
-        Here are options that are used by 'cs.mak' when compiling for
-	profiling.
-
-    CC, CXX, LINK
-        These respectivelly control the C compiler, the C++ compiler and the
-	linker. Mostly you can use 'gcc' for C compiler and 'g++' for both
-	the C++ compiler and the linker.
-
-
-
--------------------------------
-  Where are the Object Files?
--------------------------------
-
-The makefile compiles everything inside 'cryst/src/out'. This directory
-will contain another directory for your system. For example, if you
-would compile on Linux with optimization on then all object files will
-go to 'cryst/src/out/LINUX'. However if you compile on a Solaris system
-with debugging enabled then all objects files will go to
-'cryst/src/out/SOLARIS_d'.
-
-The reason for this is that this makes life easier compiling CS both with
-optimization and without. Without this you would have to do a make clean
-everytime you changed the OPT option in 'cs.mak'. Now you it will only
-recompile the files that were changed since the previous time you compiled
-using that option.
-
-Another advantage is for people who share the same directory structure for
-different systems. For example, if Crystal Space is located on a shared
-directory for both a Solaris system and a Linux system than you can still
-only need to maintain one source.
-
-Inside 'out/<system>' the directory structure is copied from the 'src'
-hierarchy.
-
+P.S. There may well be mistakes in this document.  Please feel free to correct them and send the text back to me.

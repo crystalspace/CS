@@ -559,3 +559,7 @@ Action:  Add a sprite from a template already in memory.
 	 factor for the sprite. The sprite is put at the current
 	 location.
 
+Command: gouraud
+Type:    boolean command
+Action:  Toggle support for gouraud shading. By default this is on.
+
