@@ -9,12 +9,18 @@
 # and errors are piped to stderr.
 #
 
+SYSTYPE=$1
+
+SCRIPT_NAME=`basename $0`
+SCRIPT_DIR=`expr $0 : "\(.*\)/${SCRIPT_NAME}"`
+SCRIPT_DIR=`(cd ${SCRIPT_DIR}; pwd)`	# Convert to absolute path.
+
 # First get a string describing current machine and processor types
 # Initially set to reasonable defaults
 MACHINE=`uname -m 2>/dev/null`
 CPU=`uname -p 2>/dev/null`
 # Now find more specific
-case $1 in
+case ${SYSTYPE} in
   linux*)
     CPU=`cat /proc/cpuinfo | sed -ne "/^cpu	/p" | sed -e "s/.*://"`
     ;;
@@ -43,10 +49,10 @@ case $MACHINE in
 esac
 
 # Find the C++ compiler
-CXX=`which g++`
-[ -z "${CXX}" ] && CXX=`which egcs`
-[ -z "${CXX}" ] && CXX=`which gcc`
-[ -z "${CXX}" ] && CXX=`which c++`
+CXX=`which g++ | grep -v "no g++"`
+[ -z "${CXX}" ] && CXX=`which egcs | grep -v "no egcs"`
+[ -z "${CXX}" ] && CXX=`which gcc | grep -v "no gcc"`
+[ -z "${CXX}" ] && CXX=`which c++ | grep -v "no c++"`
 
 if [ -z "${CXX}" ]; then
   echo "$0: Cannot find an installed C++ compiler!" >&2
@@ -74,7 +80,7 @@ rm -f conftest.cpp conftest.o
 echo "%xdefine TEST" >conftest.asm
 
 # Check if NASM is installed and if it has the right version
-[ -z "${NASM}" ] && NASM=`which nasm`
+[ -z "${NASM}" ] && NASM=`which nasm | grep -v "no nasm"`
 
 if [ -n "${NASM}" ]; then
   echo "NASM = "`basename ${NASM}`
@@ -94,4 +100,4 @@ rm -f conftest.asm conftest.o
 ([ -d /usr/lib/X11 ] && echo "X11_PATH = /usr/lib/X11") || \
 (echo "$0: Cannot find X11 directory!" >&2 && exit 1)
 
-exit $?
+exec ${SCRIPT_DIR}/booltest.sh ${CXX}
