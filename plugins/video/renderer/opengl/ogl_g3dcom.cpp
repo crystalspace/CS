@@ -189,6 +189,8 @@ csGraphics3DOGLCommon::csGraphics3DOGLCommon ():
 
   in_draw_poly = false;
 
+  // Are we going to use the inverted orthographic projection matrix?
+  inverted = true;
 }
 
 csGraphics3DOGLCommon::~csGraphics3DOGLCommon ()
@@ -1376,7 +1378,13 @@ void csGraphics3DOGLCommon::DrawTriangleMesh (G3DTriangleMesh& mesh)
   glPushMatrix();
   glLoadIdentity();
 
-  glOrtho (0., (GLdouble) width, 0., (GLdouble) height, -1.0, 10.0);
+  // With the back buffer procedural textures the orthographic projection
+  // matrix is not inverted, as it is within usual CS operation
+  if (!inverted)
+    glOrtho (0., (GLdouble) width, (GLdouble) height, 0., -1.0, 10.0);
+  else
+    glOrtho (0., (GLdouble) width, 0., (GLdouble) height, -1.0, 10.0);
+
 
   glTranslatef(width2,height2,0);
 

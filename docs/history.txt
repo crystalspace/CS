@@ -1,6 +1,10 @@
 The history order has been reversed so that new features are at the top.
 8-Jul-2000
         - Samuel did the following changes:
+            - Fixed the opengl back buffer procedural texture so it now displays
+              curves and sprites non-inverted. The back buffer uses a non-inverted
+              orthographic projection matrix, which was being overwritten by the
+              DrawTriangleMesh routine.
             - Added emacs friendly comments that these .inc files are really C++
               files.
             - Fixed a bug in the shared initialisation and open routines in the 

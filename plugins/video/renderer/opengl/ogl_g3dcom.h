@@ -121,7 +121,8 @@ protected:
   float aspect;
   /// Current inverse aspect ratio for perspective correction.
   float inv_aspect;
-
+  /// Use an inverted orthographic projection matrix?
+  bool inverted;
   /**
    * render-states
    * these override any other variable settings.

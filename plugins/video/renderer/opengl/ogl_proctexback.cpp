@@ -76,6 +76,9 @@ void csOpenGLProcBackBuffer::Prepare (csGraphics3DOGLCommon *g3d,
 
   SharedInitialize (g3d);
   SharedOpen (g3d);
+
+  // We are not going to use the inverted orthographic projection matrix
+  inverted = false;
 }
 
 bool csOpenGLProcBackBuffer::BeginDraw (int DrawFlags)
