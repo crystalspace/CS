@@ -19,3 +19,10 @@ font server anyway.  The 3rd touches a few other routines currently in the 2d
 driver and most heavily csws.
 
 Norman
+
+additional note:
+Be aware that you should NOT build your freetype2 library with the BYTECODE_INTERPRETER enabled 
+if you plan to sell your product. This will most likely get you in contact with some Apple lawyers :)
+So either disable it (the default in the source distribution of FT2 - but probably enabled in some 
+binary distros that come with your *nix) or pay Apple license fees.
+Read more about that issue at www.freetype.org/patents.html
