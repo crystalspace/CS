@@ -1,5 +1,12 @@
 The history order has been reversed so that new features are at the top.
 
+18-Apr-2001
+	- Removed the test for stencil buffer since it seems that just doing
+	  that test is enough to break significant parts of OpenGL on some
+	  3D cards.
+	- Fixed a bug with the software renderer which was introduced
+	  by me yesterday. The bug caused DrawPolygonFX to give incorrect
+	  results in some cases.
 17-Apr-2001
 	- Martin Geisse eliminated some warnings in the function terrain
 	  loader.

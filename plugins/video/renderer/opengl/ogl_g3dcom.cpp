@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 1998 by Jorrit Tyberghein
+ * Copyright (C) 1998-2001 by Jorrit Tyberghein
  *
  * This library is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Library General Public License as published
@@ -418,8 +418,10 @@ bool csGraphics3DOGLCommon::NewOpen (const char *Title)
   txtmgr->SetPixelFormat (*G2D->GetPixelFormat ());
 
   // Get the number of stencil bits that are supported.
-  glGetIntegerv (GL_STENCIL_BITS, &stencil_bits);
-  SysPrintf (MSG_INITIALIZATION, "Number of stencil bits: %d\n", stencil_bits);
+  // @@@ Commented because just requesting the number of bits already
+  // causes problems on some 3D cards!!!???
+  //glGetIntegerv (GL_STENCIL_BITS, &stencil_bits);
+  //SysPrintf (MSG_INITIALIZATION, "Number of stencil bits: %d\n", stencil_bits);
 
   return true;
 }
