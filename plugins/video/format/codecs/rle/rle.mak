@@ -31,7 +31,7 @@ ifeq ($(USE_PLUGINS),yes)
 else
   RLE = $(OUT)$(LIB_PREFIX)rlecodec$(LIB)
   DEP.EXE += $(RLE)
-  SCF.STATIC += rle
+  SCF.STATIC += rlecodec
   TO_INSTALL.STATIC_LIBS += $(RLE)
 endif
 
