@@ -30,6 +30,8 @@ WORLD (
     PLUGIN 'fountain' ('crystalspace.mesh.loader.fountain')
     PLUGIN 'emitFact' ('crystalspace.mesh.loader.factory.emit')
     PLUGIN 'emit' ('crystalspace.mesh.loader.emit')
+    PLUGIN 'spiralFact' ('crystalspace.mesh.loader.factory.spiral')
+    PLUGIN 'spiral' ('crystalspace.mesh.loader.spiral')
   )
 
   MESHFACT 'fireFact' (
@@ -50,6 +52,10 @@ WORLD (
   )
   MESHFACT 'fountainFact' (
     PLUGIN ('fountainFact')
+    PARAMS ()
+  )
+  MESHFACT 'spiralFact' (
+    PLUGIN ('spiralFact')
     PARAMS ()
   )
 
@@ -345,6 +351,38 @@ WORLD (
       HARDMOVE (V (0,0,80))
     )
     LIGHT (CENTER (0, 0, 80) RADIUS (80) COLOR (1,0,1))
+    MESHOBJ 'fire' (
+      PLUGIN ('fire')
+      ZTEST ()
+      MOVE (V (-10,0,70))
+      PARAMS (
+	FACTORY ('fireFact')
+	MIXMODE (ADD ())
+	NUMBER (200)
+	MATERIAL ('raindrop')
+	ORIGINBOX (-2.,0,-2., 2.,0,2.)
+	DROPSIZE (0.1,0.2)
+	DIRECTION (0, 2, 0)
+	LIGHTING (off)
+	SWIRL (1.6)
+	COLORSCALE (0.2)
+      )
+    )
+    MESHOBJ 'spiral' (
+      PLUGIN ('spiral')
+      ZTEST ()
+      MOVE (V (+10,0,70))
+      PARAMS (
+	FACTORY ('spiralFact')
+	MIXMODE (ADD ())
+	NUMBER (200)
+	MATERIAL ('raindrop')
+	COLOR (0.2, 0.9, 0.2)
+	SOURCE (0,0,0)
+	;DROPSIZE (0.04,0.08)
+	;LIGHTING (off)
+      )
+    )
   )
   SECTOR 'room-1,2' (
     MESHOBJ 'walls' (
