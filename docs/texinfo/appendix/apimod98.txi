@@ -127,3 +127,9 @@ definition for polygon.
 levtool -planes yourmap.zip
 @end example
 
+@subheading Portal changes
+@cindex @code{iPortal}
+
+Several methods in @code{iPortal} have changed slightly. For example
+@code{SetMirror} now expects a plane instead of a polygon.
+

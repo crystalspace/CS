@@ -104,7 +104,7 @@ struct iPortalCallback : public iBase
   virtual bool Traverse (iPortal* portal, iBase* context) = 0;
 };
 
-SCF_VERSION (iPortal, 0, 2, 0);
+SCF_VERSION (iPortal, 0, 2, 1);
 
 /**
  * This is the interface to the Portal objects. Polygons that are
@@ -202,8 +202,8 @@ struct iPortal : public iReference
    */
   virtual void SetWarp (const csTransform& t) = 0;
 
-  /// Set warping transformation to mirror around given polygon
-  virtual void SetMirror (iPolygon3D *iPoly) = 0;
+  /// Set warping transformation to mirror around the given plane.
+  virtual void SetMirror (const csPlane3& plane) = 0;
 
   /// Get the warping transformation
   virtual const csReversibleTransform &GetWarp () const = 0;

@@ -546,9 +546,9 @@ stop:
   }
 }
 
-void csPortal::SetMirror (iPolygon3D* poly)
+void csPortal::SetMirror (const csPlane3& plane)
 {
-  SetWarp (csTransform::GetReflect (poly->GetWorldPlane ()));
+  SetWarp (csTransform::GetReflect (plane));
 }
 
 void csPortal::SetPortalCallback (iPortalCallback *cb)

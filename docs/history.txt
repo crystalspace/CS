@@ -14,6 +14,7 @@ The history order is reversed so that new features are at the top.
 	    - Hopefully it won't crash as much.  If you have problems
 	      or crashes, email your .ma and your command line you tried
   	      to keith@paqrat.com and I will try to fix your problems.
+	- Changed iPortal->SetMirror() to accept a plane instead of a polygon.
   	- res worked around a problem in csutil/array.h caused by the 
   	  redefinition of 'new' when memory debugging is enabled.
 29-Mar-2003

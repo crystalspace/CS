@@ -169,8 +169,8 @@ public:
   void SetWarp (const csMatrix3 &m_w, const csVector3 &v_w_before,
     const csVector3 &v_w_after);
 
-  /// Set warping transformation to mirror
-  void SetMirror (iPolygon3D *iPoly);
+  /// Set warping transformation to mirror around plane.
+  void SetMirror (const csPlane3& plane);
 
   /// Transform the warp matrix from object space to world space.
   void ObjectToWorld (const csReversibleTransform& t,
@@ -341,9 +341,9 @@ public:
     {
       scfParent->SetWarp (t);
     }
-    virtual void SetMirror (iPolygon3D *iPoly)
+    virtual void SetMirror (const csPlane3& plane)
     {
-      scfParent->SetMirror (iPoly);
+      scfParent->SetMirror (plane);
     }
     virtual const csReversibleTransform &GetWarp () const
     {
