@@ -29,7 +29,12 @@ endif # ifeq ($(MAKESECTION),roottargets)
 #-------------------------------------------------------------- postdefines ---#
 ifeq ($(MAKESECTION),postdefines)
 
+ifneq ($(OS),GCC)
 vpath %.cpp plugins/video/renderer/software
+else
+vpath %.cpp plugins/video/renderer/software;plugins/video/renderer/common
+endif
+
 
 ifeq ($(USE_SHARED_PLUGINS),yes)
   SOFT3D=$(OUTDLL)soft3d$(DLL)
@@ -39,10 +44,13 @@ else
   DEP.EXE+=$(SOFT3D)
   CFLAGS.STATIC_SCF+=$(CFLAGS.D)SCL_SOFT3D
 endif
+
 DESCRIPTION.$(SOFT3D) = $(DESCRIPTION.soft)
-SRC.SOFT3D = $(wildcard plugins/video/renderer/software/*.cpp) \
-  plugins/video/renderer/common/txtmgr.cpp plugins/video/renderer/common/dtmesh.cpp \
-  plugins/video/renderer/common/dpmesh.cpp
+SRC.SOFT3D += $(wildcard plugins/video/renderer/software/*.cpp) \
+	plugins/video/renderer/common/txtmgr.cpp \
+	plugins/video/renderer/common/dtmesh.cpp \
+	plugins/video/renderer/common/dpmesh.cpp
+
 ifeq ($(USE_NASM),yes)
 SRC.SOFT3D += $(wildcard plugins/video/renderer/software/i386/*.asm)
 endif
