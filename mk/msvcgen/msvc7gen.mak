@@ -1,7 +1,7 @@
 #==============================================================================
 #
 #    Automatic MSVC7-compliant .SLN and .VCPROJ generation makefile
-#    Copyright (C) 2000,2001 by Eric Sunshine <sunshine@sunshineco.com>
+#    Copyright (C) 2000-2002 by Eric Sunshine <sunshine@sunshineco.com>
 #
 #    This library is free software; you can redistribute it and/or
 #    modify it under the terms of the GNU Library General Public
@@ -27,9 +27,9 @@
 #
 #	This process strives to enforce the fundamental invariant that if the
 #	GNU makefile builds a working target (application, plug-in, library,
-#	etc.), then the synthesized .SLN and .VCPROJ resources will also build a
-#	working target.  Thus, the headache associated with manual maintenance
-#	of the MSVC7 project files becomes a problem of the past.
+#	etc.), then the synthesized .SLN and .VCPROJ resources will also build
+#	a working target.  Thus, the headache associated with manual
+#	maintenance of the MSVC7 project files becomes a problem of the past.
 #
 # IMPORTS
 #	In the discussion which follows, assume that "PROJECT" is the core name
@@ -52,8 +52,8 @@
 #	Furthermore, the following variables specifically control .SLN and
 #	.VCPROJ project file creation.  These variables should only appear in
 #	makefiles for which a corresponding .VCPROJ file should be generated.
-#	Note: the variable names contain 'DSP' so that the information for MSVC6
-#	      DSW/DSP generation can be re-used.
+#	Note: the variable names contain 'DSP' so that the information for
+#	MSVC6 DSW/DSP generation can be re-used.
 #
 #	o MSVC.DSP -- Master list of modules for which project files should be
 #	  generated.  Entries must be *appended* to this list with the "+="
@@ -73,12 +73,13 @@
 #	  application, console application, static library, plug-in module, and
 #	  pseudo-dependency group, respectively.
 #
-#	o DSP.PROJECT.RESOURCES -- List of extra human-readable resources
+#	o $(PROJECT.EXE).WINRSRC -- List of extra human-readable resources
 #	  related to this module which are not covered by CFG.PROJECT.  These
 #	  resources are made available for browsing in the Visual-C++ IDE as a
 #	  convenience to the user.  Some good candidates, among others, for
 #	  this variable are files having the suffixes .inc, .y (yacc), .l
-#	  (lex), and .txt.
+#	  (lex), and .txt.  Note that this is expanded with
+#	  $($(PROJECT.EXE).WINRSRC).
 #
 #	o DSP.PROJECT.DEPEND -- List of extra dependencies for this module.
 #	  Entries in this list have the same format as those in the DEP.PROJECT
@@ -152,7 +153,7 @@
 #------------------------------------------------------------------------------
 
 # Target description
-DESCRIPTION.msvc7gen = MSVC 7 .SLN and .VCPROJ resources
+DESCRIPTION.msvc7gen = MSVC7 .SLN and .VCPROJ resources
 DESCRIPTION.msvc7inst = $(DESCRIPTION.msvc7gen)
 
 #------------------------------------------------------------- rootdefines ---#
@@ -227,6 +228,20 @@ MSVC7.DEPEND.plugin  =
 MSVC7.DEPEND.library =
 MSVC7.DEPEND.group   =
 
+# Project types for which version information should be generated.
+MSVC7.MAKEVERRC.appgui  = $(MSVC7.MAKEVERRC.COMMAND)
+MSVC7.MAKEVERRC.appcon  = $(MSVC7.MAKEVERRC.COMMAND)
+MSVC7.MAKEVERRC.plugin  = $(MSVC7.MAKEVERRC.COMMAND)
+MSVC7.MAKEVERRC.library =
+MSVC7.MAKEVERRC.group   =
+
+# Name of project.rc file for types which require version information.
+MSVC7.VERSIONRC.appgui  = $(MSVC7.VERSIONRC.NAME)
+MSVC7.VERSIONRC.appcon  = $(MSVC7.VERSIONRC.NAME)
+MSVC7.VERSIONRC.plugin  = $(MSVC7.VERSIONRC.NAME)
+MSVC7.VERSIONRC.library =
+MSVC7.VERSIONRC.group   =
+
 # Define extra Windows-specific targets which do not have associated makefiles.
 include mk/msvcgen/win32.mak
 
@@ -241,26 +256,25 @@ MSVC7.OUTPUT = $(MSVC7.OUT.DIR)/$(MSVC7.PROJECT).$(MSVC7.EXT.PROJECT)
 # (ex: "CSGEOM" becomes "out/mk/fragment/libcsgeom.frag")
 MSVC7.FRAGMENT = $(MSVC7.OUT.FRAGMENT)/$(MSVC7.PROJECT).$(MSVC7.EXT.FRAGMENT)
 
-# Only generate version info for apps and plugins
-MSVC7.VERSIONRC = \
-  $(if $(subst appcon,,$(DSP.$*.TYPE)),$(if \
-    $(subst plugin,,$(DSP.$*.TYPE)),,$(MSVC7.PROJECT).rc),$(MSVC7.PROJECT).rc)
+# Macro to compose project.rc filename
+MSVC7.VERSIONRC.NAME = $(MSVC7.OUT.DIR)/$(MSVC7.PROJECT).rc
 
-# Get description
-MSVC7.VERSIONDESC = \
-  $(DESCRIPTION.$(shell echo $* | \
-    sed -e y/ABCDEFGHIJKLMNOPQRSTUVWXYZ/abcdefghijklmnopqrstuvwxyz/))
+# Macro to compose project.rc filename for a given project.
+MSVC7.VERSIONRC = $(MSVC7.VERSIONRC.$(DSP.$*.TYPE))
 
-# Generate the .RC file
-MSVC7.MAKEVERRC = \
-  $(if $(MSVC7.VERSIONRC),libs/cssys/win32/mkverres.sh \
-  $(MSVC7.OUT.DIR)/$(MSVC7.VERSIONRC) \
-  "$(if $(MSVC7.VERSIONDESC),$(MSVC7.VERSIONDESC),$*)",)
+# Module name/description for project.rc.
+MSVC7.VERSIONDESC = $(DSP.$*.NAME)
+
+# Command to generate the project.rc file.
+MSVC7.MAKEVERRC.COMMAND = $(RUN_SCRIPT) libs/cssys/win32/mkverres.sh \
+  '$(MSVC7.VERSIONRC)' '$(MSVC7.VERSIONDESC)'
+
+# Command to generate the project.rc file for a given project.
+MSVC7.MAKEVERRC = $(MSVC7.MAKEVERRC.$(DSP.$*.TYPE))
 
 # Macro to compose entire list of resources which comprise a project.
-MSVC7.CONTENTS = $(SRC.$*) $(INC.$*) $(CFG.$*) $(DSP.$*.RESOURCES) \
-	$($($*).WINRSRC) $($($*.EXE).WINRSRC) \
-	$(if $(MSVC7.VERSIONRC),$(MSVC7.CVS.DIR)/$(MSVC7.VERSIONRC))
+MSVC7.CONTENTS = $(SRC.$*) $(INC.$*) $(CFG.$*) \
+  $($($*.EXE).WINRSRC) $(MSVC7.VERSIONRC)
 
 # Macro to compose the entire dependency list for a particular project.
 # Dependencies are gleaned from three variables: DSP.PROJECT.DEPEND,
@@ -295,10 +309,12 @@ MSVC7.LFLAGS.DIRECTIVE = $(subst --lflags='',,--lflags='$(DSP.$*.LFLAGS)')
 MSVC7.CFLAGS.DIRECTIVE = $(subst --cflags='',,--cflags='$(DSP.$*.CFLAGS)')
 
 # Macros to compose lists of existing and newly created .SLN and .VCPROJ files.
-MSVC7.CVS.FILES = $(sort $(subst $(MSVC7.CVS.DIR)/,,$(wildcard \
-  $(addprefix $(MSVC7.CVS.DIR)/*,.$(MSVC7.EXT.PROJECT) .$(MSVC7.EXT.WORKSPACE) .rc))))
-MSVC7.OUT.FILES = $(sort $(subst $(MSVC7.OUT.DIR)/,,$(wildcard \
-  $(addprefix $(MSVC7.OUT.DIR)/*,.$(MSVC7.EXT.PROJECT) .$(MSVC7.EXT.WORKSPACE) .rc))))
+MSVC7.CVS.FILES = $(sort $(subst $(MSVC7.CVS.DIR)/,,\
+  $(wildcard $(addprefix $(MSVC7.CVS.DIR)/*,\
+  .$(MSVC7.EXT.PROJECT) .$(MSVC7.EXT.WORKSPACE) .rc))))
+MSVC7.OUT.FILES = $(sort $(subst $(MSVC7.OUT.DIR)/,,\
+  $(wildcard $(addprefix $(MSVC7.OUT.DIR)/*,\
+  .$(MSVC7.EXT.PROJECT) .$(MSVC7.EXT.WORKSPACE) .rc))))
 
 # Quick'n'dirty macro to compare two file lists and report the appropriate
 # CVS "add" and "remove" commands which the user will need to invoke in order
@@ -340,7 +356,7 @@ $(MSVC7.OUT.DIR) $(MSVC7.OUT.FRAGMENT): $(MSVC7.OUT.BASE)
 
 # Build a .VCPROJ project file and associated .SLN fragment files.
 %.MAKEVCPROJ:
-	$(MSVC7.MAKEVERRC)
+	$(MSVC7.SILENT)$(MSVC7.MAKEVERRC)
 	$(MSVC7.SILENT)$(MSVC7GEN) --quiet --project \
 	--htmlents \
 	--projext=$(MSVC7.EXT.PROJECT) --wsext=$(MSVC7.EXT.WORKSPACE) \
@@ -365,9 +381,9 @@ slngen:
 	--template-dir=$(MSVC7.TEMPLATE.DIR) \
 	$(wildcard $(MSVC7.OUT.FRAGMENT)/*.$(MSVC7.EXT.FRAGMENT))
 
-# Build all Visual-C++ .SLN and .VCPROJ project files.  The .SLN file is built last
-# since it is composed of the fragment files generated as part of the .VCPROJ file
-# synthesis process.
+# Build all Visual-C++ .SLN and .VCPROJ project files.  The .SLN file is built
+# last since it is composed of the fragment files generated as part of the
+# .VCPROJ file synthesis process.
 msvc7gen: \
   msvc7genclean \
   $(MSVC7.OUT.DIR) \
@@ -386,7 +402,8 @@ ifneq (,$(strip $(MSVC7.CVS.FILES)))
 	@$(RM) $(addprefix $(MSVC7.CVS.DIR)/,$(MSVC7.CVS.FILES))
 endif
 ifneq (,$(strip $(MSVC7.OUT.FILES)))
-	@$(CP) $(addprefix $(MSVC7.OUT.DIR)/,$(MSVC7.OUT.FILES)) $(MSVC7.CVS.DIR)
+	@$(CP) $(addprefix $(MSVC7.OUT.DIR)/,$(MSVC7.OUT.FILES)) \
+	$(MSVC7.CVS.DIR)
 endif
 	@echo $(SEPARATOR)
 	@echo $"  $(MSVC7.CVS.WARNING.1)$"
@@ -403,6 +420,6 @@ endif
 # Scrub the sink; mop the floor; wash the dishes; paint the door.
 clean: msvc7genclean
 msvc7genclean:
-	$(MSVC7.SILENT)$(RMDIR) $(MSVC7.OUT.BASE)
+	$(MSVC7.SILENT)$(RMDIR) $(MSVC7.OUT.DIR) $(MSVC7.OUT.FRAGMENT)
 
 endif # ifeq ($(MAKESECTION),targets)

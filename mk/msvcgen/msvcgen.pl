@@ -2,7 +2,7 @@
 #==============================================================================
 #
 #    Microsoft Visual C++ project and workspace file generator.
-#    Copyright (C) 2000,2001 by Eric Sunshine <sunshine@sunshineco.com>
+#    Copyright (C) 2000-2002 by Eric Sunshine <sunshine@sunshineco.com>
 #
 #    This program is free software; you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -28,16 +28,16 @@
 #
 #------------------------------------------------------------------------------
 use strict;
+use Digest::MD5 qw(md5_hex);
 use File::Basename;
 use Getopt::Long;
 $Getopt::Long::ignorecase = 0;
-use Digest::MD5 qw(md5_hex);
 
 my $PROG_NAME = 'msvcgen.pl';
-my $PROG_VERSION = 3;
+my $PROG_VERSION = 4;
 my $AUTHOR_NAME = 'Eric Sunshine';
 my $AUTHOR_EMAIL = 'sunshine@sunshineco.com';
-my $COPYRIGHT = "Copyright (C) 2000,2001 by $AUTHOR_NAME <$AUTHOR_EMAIL>";
+my $COPYRIGHT = "Copyright (C) 2000-2002 by $AUTHOR_NAME <$AUTHOR_EMAIL>";
 
 $main::opt_project = 0;
 $main::opt_p = 0;	# Alias for 'project'.
@@ -222,8 +222,13 @@ sub remove_suffix {
 sub guid_from_name {
     my ($projname) = @_;
     my $rawguid = md5_hex($projname);
-    my $shapedguid = '{'.substr($rawguid, 0, 8).'-'.substr($rawguid, 8, 4).'-'.
-      substr($rawguid, 12, 4).'-'.substr($rawguid, 16, 4).'-'.substr($rawguid, 20, 12).'}';
+    my $shapedguid = '{' .
+	substr($rawguid,  0,  8) . '-' .
+	substr($rawguid,  8,  4) . '-' .
+	substr($rawguid, 12,  4) . '-' . 
+	substr($rawguid, 16,  4) . '-' .
+	substr($rawguid, 20, 12) .
+	'}';
     return uc($shapedguid);
 }
 
@@ -365,13 +370,13 @@ sub interpolate_project_groups {
 #------------------------------------------------------------------------------
 sub interpolate_project {
     my $result = $main::project_template;
-    interpolate('%project%',  wellformed_string($main::opt_projname),      \$result);
-    interpolate('%makefile%', wellformed_string($main::makefile),          \$result);
-    interpolate('%target%',   wellformed_string($main::opt_target),        \$result);
-    interpolate('%libs%',     wellformed_string(\@main::opt_library),      \$result);
-    interpolate('%lflags%',   wellformed_string(\@main::opt_lflags),       \$result);
-    interpolate('%cflags%',   wellformed_string(\@main::opt_cflags),       \$result);
-    interpolate('%groups%',   interpolate_project_groups(), \$result);
+    interpolate('%project%',  wellformed_string($main::opt_projname), \$result);
+    interpolate('%makefile%', wellformed_string($main::makefile),     \$result);
+    interpolate('%target%',   wellformed_string($main::opt_target),   \$result);
+    interpolate('%libs%',     wellformed_string(\@main::opt_library), \$result);
+    interpolate('%lflags%',   wellformed_string(\@main::opt_lflags),  \$result);
+    interpolate('%cflags%',   wellformed_string(\@main::opt_cflags),  \$result);
+    interpolate('%groups%',   interpolate_project_groups(),           \$result);
     return $result;
 }
 
@@ -450,7 +455,7 @@ sub create_project {
     if (defined($main::opt_fragment)) {
     	$main::guid = guid_from_name($main::opt_projname);
     	
-	save_file($main::opt_fragment, 'dummy file.');
+	save_file($main::opt_fragment, "Dummy file.\n");
 	print "Generated: $main::opt_fragment\n" unless quiet();
 	
     	my $dependencies = interpolate_ws_dependency();
@@ -469,7 +474,6 @@ sub create_project {
 	save_file($cfi_frag, interpolate_ws_config());
 	print "Generated: $cfi_frag\n" unless quiet();
     }
-   
 }
 
 #------------------------------------------------------------------------------

@@ -1,7 +1,7 @@
 #==============================================================================
 #
 #    Automatic MSVC-compliant DSW and DSP generation makefile
-#    Copyright (C) 2000,2001 by Eric Sunshine <sunshine@sunshineco.com>
+#    Copyright (C) 2000-2002 by Eric Sunshine <sunshine@sunshineco.com>
 #
 #    This library is free software; you can redistribute it and/or
 #    modify it under the terms of the GNU Library General Public
@@ -71,12 +71,13 @@
 #	  application, console application, static library, plug-in module, and
 #	  pseudo-dependency group, respectively.
 #
-#	o DSP.PROJECT.RESOURCES -- List of extra human-readable resources
+#	o $(PROJECT.EXE).WINRSRC -- List of extra human-readable resources
 #	  related to this module which are not covered by CFG.PROJECT.  These
 #	  resources are made available for browsing in the Visual-C++ IDE as a
 #	  convenience to the user.  Some good candidates, among others, for
 #	  this variable are files having the suffixes .inc, .y (yacc), .l
-#	  (lex), and .txt.
+#	  (lex), and .txt.  Note that this is expanded with
+#	  $($(PROJECT.EXE).WINRSRC).
 #
 #	o DSP.PROJECT.DEPEND -- List of extra dependencies for this module.
 #	  Entries in this list have the same format as those in the DEP.PROJECT
@@ -225,6 +226,20 @@ MSVC.DEPEND.plugin  =
 MSVC.DEPEND.library =
 MSVC.DEPEND.group   =
 
+# Project types for which version information should be generated.
+MSVC.MAKEVERRC.appgui  = $(MSVC.MAKEVERRC.COMMAND)
+MSVC.MAKEVERRC.appcon  = $(MSVC.MAKEVERRC.COMMAND)
+MSVC.MAKEVERRC.plugin  = $(MSVC.MAKEVERRC.COMMAND)
+MSVC.MAKEVERRC.library =
+MSVC.MAKEVERRC.group   =
+
+# Name of project.rc file for types which require version information.
+MSVC.VERSIONRC.appgui  = $(MSVC.VERSIONRC.NAME)
+MSVC.VERSIONRC.appcon  = $(MSVC.VERSIONRC.NAME)
+MSVC.VERSIONRC.plugin  = $(MSVC.VERSIONRC.NAME)
+MSVC.VERSIONRC.library =
+MSVC.VERSIONRC.group   =
+
 # Define extra Windows-specific targets which do not have associated makefiles.
 include mk/msvcgen/win32.mak
 
@@ -236,33 +251,28 @@ MSVC.PROJECT = $(MSVC.PREFIX.$(DSP.$*.TYPE))$(DSP.$*.NAME)
 MSVC.OUTPUT = $(MSVC.OUT.DIR)/$(MSVC.PROJECT).$(MSVC.EXT.PROJECT)
 
 # Macro to compose full fragment pathname.
-# (ex: "CSGEOM" becomes "out/mk/fragment/libcsgeom.dwi")
+# (ex: "CSGEOM" becomes "out/mk/fragment/libcsgeom.frag")
 MSVC.FRAGMENT = $(MSVC.OUT.FRAGMENT)/$(MSVC.PROJECT).$(MSVC.EXT.FRAGMENT)
 
-# Only generate version info for apps and plugins
-#MSVC.VERSIONRC = \
-#  $(if $(subst appcon,,$(DSP.$*.TYPE)),$(if \
-#    $(subst plugin,,$(DSP.$*.TYPE)),,$(MSVC.PROJECT).rc),$(MSVC.PROJECT).rc)
+# Macro to compose project.rc filename
+MSVC.VERSIONRC.NAME = $(MSVC.OUT.DIR)/$(MSVC.PROJECT).rc
 
-# Get description
-#MSVC.VERSIONDESC = \
-#  $(DESCRIPTION.$(shell echo $* | \
-#    sed -e y/ABCDEFGHIJKLMNOPQRSTUVWXYZ/abcdefghijklmnopqrstuvwxyz/))
+# Macro to compose project.rc filename for a given project.
+MSVC.VERSIONRC = $(MSVC.VERSIONRC.$(DSP.$*.TYPE))
 
-# Generate the .RC file
-#MSVC.MAKEVERRC = \
-#  $(if $(MSVC.VERSIONRC),libs/cssys/win32/mkverres.sh \
-#  $(MSVC.OUT.DIR)/$(MSVC.VERSIONRC) \
-#  "$(if $(MSVC.VERSIONDESC),$(MSVC.VERSIONDESC),$*)",)
+# Module name/description for project.rc.
+MSVC.VERSIONDESC = $(DSP.$*.NAME)
 
-MSVC.VERSIONRC =
-MSVC.VERSIONDESC =
-MSVC.MAKEVERRC = 
+# Command to generate the project.rc file.
+MSVC.MAKEVERRC.COMMAND = $(RUN_SCRIPT) libs/cssys/win32/mkverres.sh \
+  '$(MSVC.VERSIONRC)' '$(MSVC.VERSIONDESC)'
+
+# Command to generate the project.rc file for a given project.
+MSVC.MAKEVERRC = $(MSVC.MAKEVERRC.$(DSP.$*.TYPE))
 
 # Macro to compose entire list of resources which comprise a project.
-MSVC.CONTENTS = $(SRC.$*) $(INC.$*) $(CFG.$*) $(DSP.$*.RESOURCES) \
-	$($($*).WINRSRC) $($($*.EXE).WINRSRC) \
-	$(if $(MSVC.VERSIONRC),$(MSVC.CVS.DIR)/$(MSVC.VERSIONRC))
+MSVC.CONTENTS = $(SRC.$*) $(INC.$*) $(CFG.$*) \
+  $($($*.EXE).WINRSRC) $(MSVC.VERSIONRC)
 
 # Macro to compose the entire dependency list for a particular project.
 # Dependencies are gleaned from three variables: DSP.PROJECT.DEPEND,
@@ -297,10 +307,12 @@ MSVC.LFLAGS.DIRECTIVE = $(subst --lflags='',,--lflags='$(DSP.$*.LFLAGS)')
 MSVC.CFLAGS.DIRECTIVE = $(subst --cflags='',,--cflags='$(DSP.$*.CFLAGS)')
 
 # Macros to compose lists of existing and newly created DSW and DSP files.
-MSVC.CVS.FILES = $(sort $(subst $(MSVC.CVS.DIR)/,,$(wildcard \
-  $(addprefix $(MSVC.CVS.DIR)/*,.$(MSVC.EXT.PROJECT) .$(MSVC.EXT.WORKSPACE) .rc))))
-MSVC.OUT.FILES = $(sort $(subst $(MSVC.OUT.DIR)/,,$(wildcard \
-  $(addprefix $(MSVC.OUT.DIR)/*,.$(MSVC.EXT.PROJECT) .$(MSVC.EXT.WORKSPACE) .rc))))
+MSVC.CVS.FILES = $(sort $(subst $(MSVC.CVS.DIR)/,,\
+  $(wildcard $(addprefix $(MSVC.CVS.DIR)/*,\
+  .$(MSVC.EXT.PROJECT) .$(MSVC.EXT.WORKSPACE) .rc))))
+MSVC.OUT.FILES = $(sort $(subst $(MSVC.OUT.DIR)/,,\
+  $(wildcard $(addprefix $(MSVC.OUT.DIR)/*,\
+  .$(MSVC.EXT.PROJECT) .$(MSVC.EXT.WORKSPACE) .rc))))
 
 # Quick'n'dirty macro to compare two file lists and report the appropriate
 # CVS "add" and "remove" commands which the user will need to invoke in order
@@ -341,7 +353,7 @@ $(MSVC.OUT.DIR) $(MSVC.OUT.FRAGMENT): $(MSVC.OUT.BASE)
 
 # Build a DSP project file and an associated DSW fragment file.
 %.MAKEDSP:
-	$(MSVC.MAKEVERRC)
+	$(MSVC.SILENT)$(MSVC.MAKEVERRC)
 	$(MSVC.SILENT)$(MSVCGEN) --quiet --project \
 	--projext=$(MSVC.EXT.PROJECT) --wsext=$(MSVC.EXT.WORKSPACE) \
 	--name=$(DSP.$*.NAME) \
@@ -402,6 +414,6 @@ endif
 # Scrub the sink; mop the floor; wash the dishes; paint the door.
 clean: msvcgenclean
 msvcgenclean:
-	$(MSVC.SILENT)$(RMDIR) $(MSVC.OUT.BASE)
+	$(MSVC.SILENT)$(RMDIR) $(MSVC.OUT.DIR) $(MSVC.OUT.FRAGMENT)
 
 endif # ifeq ($(MAKESECTION),targets)

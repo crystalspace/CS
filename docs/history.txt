@@ -1,23 +1,53 @@
 The history order is reversed so that new features are at the top.
 
+4-Aug-2002
+	- Eric Sunshine made the following changes to mk/msvcgen/msvcgen.mak
+	  and msvc7gen.mak:
+	    - Fixed numerous bugs in the .rc file generation support code which
+	      was recently added.
+	    - Once again works with older versions of GNU make.  No longer uses
+	      recently added features of GNU make, such as $(if ...).
+	    - Now invokes .rc creation shell scripts with $(RUN_SCRIPT) to
+	      ensure that it finds the correct shell.  This allows it to once
+	      again run on Unix.  (The problem was that the shell scripts do
+	      not have execute permission enabled in the CVS repository.  This
+	      fix works around that problem.)
+	    - Once again works with older versions of sed.  No longer uses
+	      advanced sed features.
+	    - Fixed comments which became outdated after recent changes.
+	    - The "clean" target now cleans only files and directories related
+	      to the particular makefile, rather than blasting the entire
+	      CS/out/mk directory.
+	- Eric Sunshine made the following changes to mk/msvcgen/msvcgen.pl:
+	    - Fixed create_project() so that the so-called "dummy file" ends
+	      with a line terminator.
+	- Eric Sunshine made the following changes to libs/win32/mkverres.sh:
+	    - Fixed the composition of FILEVERSION which seemed to be bonked.
+	    - Fixed so that it works with older sed programs which do not
+	      understand [:digit:].
+	    - Fixed quoting problems in sed rules.
+	    - Simplified composition of the output .rc file.
+	    - Added missing line terminator at end of file.
+	- Eric Sunshine made the following changes to libs/win32/compres.sh:
+	    - Fixed so that it works with older sed programs which do not
+	      understand [:alnum:].
+	    - Added missing line terminator at end of file.
 3-Aug-2002
-	- Added effects system plugin from Anders Stenberg. Since I have
-	  crashes with the OpenGL patches to actually use this system
-	  I am not commiting those. So at this moment the 'effects'
-	  plugin is completely unused and unusable until I manage
-	  to fix the problem. I will add more documentaiton about this
-	  new system later.
-	- I found out what routine is crashing. It is the new version
-	  of DrawTriangleMesh() which seems to give problems in some cases.
-	  As a workaround I just call OldDrawTriangleMesh(). This basically
-	  means that the effect system is not yet functional although it is
-	  now fully in CVS. Still have to debug what's wrong with the
-	  new implementation of DrawTriangleMesh().
-	  Documentation and extensions to the current loader for the
-	  new effects will be added soon.
-	- In addition to effects the patch from Anders also adds an
-	  OpenGL state cache to the OpenGL canvases. That should
-	  optimize state changes and speed up a little more.
+	- Added effects system plugin from Anders Stenberg.  Since I have
+	  crashes with the OpenGL patches to actually use this system I am not
+	  commiting those.  So at this moment the 'effects' plugin is
+	  completely unused and unusable until I manage to fix the problem.  I
+	  will add more documentaiton about this new system later.
+	- I found out what routine is crashing.  It is the new version of
+	  DrawTriangleMesh() which seems to give problems in some cases.  As a
+	  workaround I just call OldDrawTriangleMesh().  This basically means
+	  that the effect system is not yet functional although it is now fully
+	  in CVS.  Still have to debug what's wrong with the new implementation
+	  of DrawTriangleMesh().  Documentation and extensions to the current
+	  loader for the new effects will be added soon.
+	- In addition to effects the patch from Anders also adds an OpenGL
+	  state cache to the OpenGL canvases.  That should optimize state
+	  changes and speed up a little more.
 2-Aug-2002
 	- Eric Sunshine eliminated several unnecessary, and inadvertently
 	  inserted, event dispatch loops from csEventQueue::Process().
