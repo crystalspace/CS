@@ -276,6 +276,7 @@
 #  include <sys/types.h>
 #  include <sys/socket.h>
 #  if defined (OS_UNIX)
+#    include <unistd.h>
 #    define BSD_COMP 1
 #    include <sys/ioctl.h>
 #    if !defined (OS_SOLARIS) && !defined (OS_BE)
