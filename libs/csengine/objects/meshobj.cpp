@@ -800,6 +800,9 @@ csMeshFactoryWrapper::csMeshFactoryWrapper ()
 
 csMeshFactoryWrapper::~csMeshFactoryWrapper ()
 {
+  // This line MUST be here to ensure that the children are not
+  // removed after the destructor has already finished.
+  children.RemoveAll ();
 }
 
 void csMeshFactoryWrapper::SetMeshObjectFactory (iMeshObjectFactory *meshFact)

@@ -6,6 +6,10 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+18-Aug-2003
+	- Jorrit fixed a bug with destruction of hierarchical factories.
+	  The problem was that it was trying to remove objects from
+	  structures that were already destructed.
 17-Aug-2003
 	- Jorrit fixed a bug in csIntersect3::IntersectTriangle(). In
 	  some cases it would fail to register a hit.
