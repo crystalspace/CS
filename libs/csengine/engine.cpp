@@ -508,8 +508,8 @@ csEngine::~csEngine ()
   if (G3D) G3D->DecRef ();
   if (ImageLoader) ImageLoader->DecRef();
   if (VFS) VFS->DecRef ();
-  delete textures;
   delete materials;
+  delete textures;
   delete render_pol2d_pool;
   delete lightpatch_pool;
   delete covcube;

@@ -56,8 +56,8 @@ csMaterial::~csMaterial ()
   if (texture)
     texture->DecRef ();
   for (int i=0; i<num_texture_layers; i++)
-    if (texture_layers[i].txt_handle)
-      texture_layers[i].txt_handle->DecRef ();
+    if (texture_layer_wrappers[i])
+      texture_layer_wrappers[i]->DecRef ();
 }
 
 void csMaterial::SetTextureWrapper (iTextureWrapper *tex)
