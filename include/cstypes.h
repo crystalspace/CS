@@ -100,5 +100,11 @@ typedef uint32 CS_ID;
 /// Time in milli (1/1000) seconds XXX: should be moved to sysfunc.h
 typedef unsigned int csTicks;
 
+/**\name Shortcuts for normal C types
+ * @{ */
+/// Default unsigned int.
+typedef unsigned int uint;
+/** @} */
+
 
 #endif // __CS_CSTYPES_H__
