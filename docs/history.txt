@@ -23,6 +23,8 @@ The history order has been reversed so that new features are at the top.
 	- Cleaned up the formatting in the commits from Brandon.
 	- Removed some unneeded dependency stuff from unixconf.sh.
 	- Further work on leafy BSP generator in levtool.
+	- Eric Sunshine fixed several compilation errors in MazeD following
+	  Andrew's changes from yesterday.
 10-Oct-2000
 	- Norman Kramer did some fixes after Andrew's changes.
 	- Andrew Zabolotny renamed fontserver to fontplex.
