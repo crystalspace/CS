@@ -16,8 +16,8 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __CS_VERSION_H__
-#define __CS_VERSION_H__
+#ifndef __CS_CSVER_H__
+#define __CS_CSVER_H__
 
 #define CS_VERSION_MAJOR "0.19"	/* NOTE: Update docs/texinfo/version.txi  */
 #define CS_VERSION_MINOR "dev"	/* whenever updating these two values.    */
@@ -41,4 +41,4 @@
 #define CS_VERSION CS_VERSION_NUMBER \
   " [" CS_PLATFORM_NAME "-" CS_PROCESSOR_NAME "-" CS_COMPILER_NAME "]"
 
-#endif // __CS_VERSION_H__
+#endif // __CS_CSVER_H__

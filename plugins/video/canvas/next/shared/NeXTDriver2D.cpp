@@ -27,7 +27,7 @@
 #include "iutil/cfgfile.h"
 #include "isys/event.h"
 #include "isys/system.h"
-#include "csversion.h"
+#include "csver.h"
 
 typedef void* NeXTDriverHandle2D;
 #define N2D_PROTO(RET,FUNC) extern "C" RET NeXTDriver2D_##FUNC

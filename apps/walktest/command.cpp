@@ -26,7 +26,7 @@
 
 #include <string.h>
 #include "cssysdef.h"
-#include "csversion.h"
+#include "csver.h"
 #include "csengine/engine.h"
 #include "csengine/lghtmap.h"
 #include "csengine/sector.h"

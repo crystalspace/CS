@@ -1,7 +1,10 @@
 The history order is reversed so that new features are at the top.
 
 31-May-2001
-	- Wyatt Miler did a fix so MacOS/X builds again.
+	- Wyatt Miler fixed NeXTSystemDriver.cpp and NeXTDriver2D.cpp to
+	  reflect Phlip's rename of version.h to csversion.h
+	- Eric Sunshine renamed csversion.h to csver.h to conform to DOS 8.3
+	  naming convention.
 30-May-2001
 	- Completely removed Crystal Clear from CS. It is now obsolete
 	  and no longer maintained. This removal was done with the permission
@@ -78,13 +81,9 @@ The history order is reversed so that new features are at the top.
 	    - Updated Robert Bate's email address in several locations.
 	    - Updated out-of-date URLs in the MacOS/X, OpenStep, NextStep
 	      documentation.
-	- Philip Wyett fixed a compile error in externally created MSVC
-	  projects.
-	  This error took the form of "CS_VERSION" and "CS_VERSION_DATE"
-	  being thrown back as undeclared identifiers, even though the header
-	  in which they are contained "version.h" was being included. To
-	  fix this I renamed the file to "csversion.h", to eliminate this
-	  internal MSVC conflict.
+	- Philip Wyett renamed CS/include/version.h to csversion.h in order to
+	  avoid some conflict he encountered with a version.h from some other
+	  project being included instead.
 	- Martin Geisse applied a change to Norman's fix (regarding the
 	  assignment of -1 to the unsigned variable scfID_?). The correct
 	  value IS -1, not 0. -1 represents an invalid value, while 0 is the

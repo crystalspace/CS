@@ -19,7 +19,6 @@
 #include <string.h>
 #define SYSDEF_PATH
 #include "cssysdef.h"
-#include "csversion.h"
 #include "csutil/scf.h"
 #include "sequence.h"
 #include "isys/system.h"
@@ -27,8 +26,6 @@
 #include "ivideo/graph2d.h"
 #include "isys/vfs.h"
 #include "isys/event.h"
-
-//---------------------------------------------------------------------------
 
 IMPLEMENT_IBASE (csSequence)
   IMPLEMENTS_INTERFACE (iSequence)
@@ -276,6 +273,3 @@ void csSequenceManager::RunSequence (cs_time time, iSequence* sequence)
     op = op->next;
   }
 }
-
-//---------------------------------------------------------------------------
-

@@ -56,7 +56,7 @@
 #include "cssys/system.h"
 #include "csfx/cspixmap.h"
 #include "csfx/csfxscr.h"
-#include "csversion.h"
+#include "csver.h"
 #include "qint.h"
 #include "iutil/cfgmgr.h"
 #include "ivideo/graph3d.h"
