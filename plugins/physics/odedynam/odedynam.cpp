@@ -136,7 +136,8 @@ void csODEDynamics::Step (float stepsize)
 
 void csODEDynamics::NearCallback (void *data, dGeomID o1, dGeomID o2)
 {
-  if (dGeomIsSpace(o1) || dGeomIsSpace (o2)) {
+  if (dGeomIsSpace(o1) || dGeomIsSpace (o2))
+  {
     dSpaceCollide2 (o1, o2, data, &csODEDynamics::NearCallback);
     if (dGeomIsSpace(o1))
       dSpaceCollide ((dxSpace*)o1, data, &csODEDynamics::NearCallback);
@@ -146,10 +147,12 @@ void csODEDynamics::NearCallback (void *data, dGeomID o1, dGeomID o2)
   }
 
   csODERigidBody *b1 = 0, *b2 = 0;
-  if (dGeomGetBody(o1)) {
+  if (dGeomGetBody(o1))
+  {
     b1 = (csODERigidBody *)dBodyGetData (dGeomGetBody(o1));
   }
-  if (dGeomGetBody(o2)) {
+  if (dGeomGetBody(o2))
+  {
     b2 = (csODERigidBody *)dBodyGetData (dGeomGetBody(o2));
   }
 
@@ -162,10 +165,12 @@ void csODEDynamics::NearCallback (void *data, dGeomID o1, dGeomID o2)
   if (a > 0)
   {
     /* there is only 1 actual body per set */
-    if (b1) {
+    if (b1)
+    {
       b1->Collision ((b2) ? &b2->scfiRigidBody : 0);
     }
-    if (b2) {
+    if (b2)
+    {
       b2->Collision ((b1) ? &b1->scfiRigidBody : 0);
     }
 
@@ -273,7 +278,8 @@ int csODEDynamics::CollideMeshBox (dGeomID mesh, dGeomID box, int flags,
   dGeomGetAABB (box, aabb2);
   if (aabb1[0] > aabb2[1] || aabb1[1] < aabb2[0] ||
       aabb1[2] > aabb2[3] || aabb1[3] < aabb2[2] ||
-      aabb1[4] > aabb2[5] || aabb1[5] < aabb2[4]) {
+      aabb1[4] > aabb2[5] || aabb1[5] < aabb2[4])
+  {
     return 0;
   }
   int N = flags & 0xFF;
@@ -299,28 +305,33 @@ int csODEDynamics::CollideMeshBox (dGeomID mesh, dGeomID box, int flags,
   csPolyMeshList polycollide;
   // test for overlap
   int i, j, k;
-  for (i = 0; i < p->GetPolygonCount(); i ++) {
+  for (i = 0; i < p->GetPolygonCount(); i ++)
+  {
     csBox3 polybox;
-    for (j = 0; j < polygon_list[i].num_vertices; j ++) {
+    for (j = 0; j < polygon_list[i].num_vertices; j ++)
+    {
       polybox.AddBoundingVertex (boxt * (vertex_table[polygon_list[i].vertices[j]] / mesht));
     }
     // aabb poly against aabb box for overlap.
     // Full collision later will weed out the rest;
 
-    if (polybox.Overlap (boxbox)) {
+    if (polybox.Overlap (boxbox))
+    {
       polycollide.Push (polygon_list[i]);
     }
   }
 
   int outcount = 0;
   // the value of N should be large, just in case.
-  for (i = 0; i < polycollide.Length() && outcount < N; i ++) {
+  for (i = 0; i < polycollide.Length() && outcount < N; i ++)
+  {
     csPlane3 plane(vertex_table[polycollide[i].vertices[0]] / mesht,
       vertex_table[polycollide[i].vertices[1]] / mesht,
       vertex_table[polycollide[i].vertices[2]] / mesht);
     plane.Normalize ();
     // dCollideBP only works if box center is on the outside of the plane
-    if (plane.Classify (boxt.GetOrigin()) < 0) {
+    if (plane.Classify (boxt.GetOrigin()) < 0)
+    {
       continue;
     }
     dGeomID odeplane = dCreatePlane(0,plane.norm.x, plane.norm.y, plane.norm.z,
@@ -328,19 +339,22 @@ int csODEDynamics::CollideMeshBox (dGeomID mesh, dGeomID box, int flags,
     dContactGeom tempcontacts[5];
     int count = dCollideBoxPlane (box, odeplane, 5, tempcontacts, sizeof (dContactGeom));
     dGeomDestroy (odeplane);
-    for (j = 0; j < count; j ++) {
+    for (j = 0; j < count; j ++)
+    {
       dContactGeom *c = &tempcontacts[j];
       csVector3 contactpos(c->pos[0], c->pos[1], c->pos[2]);
       // make sure the point lies inside the polygon
       int vcount = polycollide[i].num_vertices;
-      for (k = 0; k < vcount-1; k ++) {
+      for (k = 0; k < vcount-1; k ++)
+      {
         int ind1 = polycollide[i].vertices[k];
         int ind2 = polycollide[i].vertices[k+1];
         csVector3 v1 = vertex_table[ind1] / mesht;
         csVector3 v2 = vertex_table[ind2] / mesht;
         csPlane3 edgeplane(v1, v2, v2 - plane.Normal());
         edgeplane.Normalize();
-        if (edgeplane.Classify (contactpos) < 0) {
+        if (edgeplane.Classify (contactpos) < 0)
+	{
           c->depth = -1;
           break;
         }
@@ -352,10 +366,12 @@ int csODEDynamics::CollideMeshBox (dGeomID mesh, dGeomID box, int flags,
       csVector3 v2 = vertex_table[ind2] / mesht;
       csPlane3 edgeplane(v1, v2, v2 - plane.Normal());
       edgeplane.Normalize();
-      if (edgeplane.Classify (contactpos) < 0) {
+      if (edgeplane.Classify (contactpos) < 0)
+      {
         c->depth = -1;
       }
-      if (c->depth >= 0) {
+      if (c->depth >= 0)
+      {
         dContactGeom *out = (dContactGeom *)((char *)outcontacts + skip * outcount);
         out->pos[0] = c->pos[0];
         out->pos[1] = c->pos[1];
@@ -383,7 +399,8 @@ int csODEDynamics::CollideMeshCylinder (dGeomID mesh, dGeomID cyl, int flags,
   dGeomGetAABB (cyl, aabb2);
   if (aabb1[0] > aabb2[1] || aabb1[1] < aabb2[0] ||
       aabb1[2] > aabb2[3] || aabb1[3] < aabb2[2] ||
-      aabb1[4] > aabb2[5] || aabb1[5] < aabb2[4]) {
+      aabb1[4] > aabb2[5] || aabb1[5] < aabb2[4])
+  {
     return 0;
   }
   int N = flags & 0xFF;
@@ -409,26 +426,31 @@ int csODEDynamics::CollideMeshCylinder (dGeomID mesh, dGeomID cyl, int flags,
   csPolyMeshList polycollide;
   // test for overlap
   int i, j, k;
-  for (i = 0; i < p->GetPolygonCount(); i ++) {
+  for (i = 0; i < p->GetPolygonCount(); i ++)
+  {
     csBox3 polybox;
-    for (j = 0; j < polygon_list[i].num_vertices; j ++) {
+    for (j = 0; j < polygon_list[i].num_vertices; j ++)
+    {
       polybox.AddBoundingVertex (cylt * (vertex_table[polygon_list[i].vertices[j]] / mesht));
     }
     // aabb poly against aabb box for overlap.
     // Full collision later will weed out the rest;
-    if (polybox.Overlap (cylbox)) {
+    if (polybox.Overlap (cylbox))
+    {
       polycollide.Push (polygon_list[i]);
     }
   }
   int outcount = 0;
   // the value of N should be large, just in case.
-  for (i = 0; i < polycollide.Length() && outcount < N; i ++) {
+  for (i = 0; i < polycollide.Length() && outcount < N; i ++)
+  {
     csPlane3 plane(vertex_table[polycollide[i].vertices[0]] / mesht,
       vertex_table[polycollide[i].vertices[1]] / mesht,
       vertex_table[polycollide[i].vertices[2]] / mesht);
     plane.Normalize ();
     // dCollideBP only works if box center is on the outside of the plane
-    if (plane.Classify (cylt.GetOrigin()) < 0) {
+    if (plane.Classify (cylt.GetOrigin()) < 0)
+    {
       continue;
     }
     dGeomID odeplane = dCreatePlane(0,plane.norm.x, plane.norm.y, plane.norm.z,
@@ -436,19 +458,22 @@ int csODEDynamics::CollideMeshCylinder (dGeomID mesh, dGeomID cyl, int flags,
     dContactGeom tempcontacts[5];
     int count = dCollideCCylinderPlane (cyl, odeplane, 5, tempcontacts, sizeof (dContactGeom));
     dGeomDestroy (odeplane);
-    for (j = 0; j < count; j ++) {
+    for (j = 0; j < count; j ++)
+    {
       dContactGeom *c = &tempcontacts[j];
       csVector3 contactpos(c->pos[0], c->pos[1], c->pos[2]);
       // make sure the point lies inside the polygon
       int vcount = polycollide[i].num_vertices;
-      for (k = 0; k < vcount-1; k ++) {
+      for (k = 0; k < vcount-1; k ++)
+      {
         int ind1 = polycollide[i].vertices[k];
         int ind2 = polycollide[i].vertices[k+1];
         csVector3 v1 = vertex_table[ind1] / mesht;
         csVector3 v2 = vertex_table[ind2] / mesht;
         csPlane3 edgeplane(v1, v2, v2 - plane.Normal());
         edgeplane.Normalize();
-        if (edgeplane.Classify (contactpos) < 0) {
+        if (edgeplane.Classify (contactpos) < 0)
+	{
           c->depth = -1;
           break;
         }
@@ -460,10 +485,12 @@ int csODEDynamics::CollideMeshCylinder (dGeomID mesh, dGeomID cyl, int flags,
       csVector3 v2 = vertex_table[ind2] / mesht;
       csPlane3 edgeplane(v1, v2, v2 - plane.Normal());
       edgeplane.Normalize();
-      if (edgeplane.Classify (contactpos) < 0) {
+      if (edgeplane.Classify (contactpos) < 0)
+      {
           c->depth = -1;
       }
-      if (c->depth >= 0) {
+      if (c->depth >= 0)
+      {
         dContactGeom *out = (dContactGeom *)((char *)outcontacts + skip * outcount);
         out->pos[0] = c->pos[0];
         out->pos[1] = c->pos[1];
@@ -491,7 +518,8 @@ int csODEDynamics::CollideMeshSphere (dGeomID mesh, dGeomID sphere, int flags,
   dGeomGetAABB (sphere, aabb2);
   if (aabb1[0] > aabb2[1] || aabb1[1] < aabb2[0] ||
       aabb1[2] > aabb2[3] || aabb1[3] < aabb2[2] ||
-      aabb1[4] > aabb2[5] || aabb1[5] < aabb2[4]) {
+      aabb1[4] > aabb2[5] || aabb1[5] < aabb2[4])
+  {
     return 0;
   }
   int N = flags & 0xFF;
@@ -500,7 +528,8 @@ int csODEDynamics::CollideMeshSphere (dGeomID mesh, dGeomID sphere, int flags,
   dReal rad = dGeomSphereGetRadius (sphere);
   iMeshWrapper *m = *(iMeshWrapper **)dGeomGetClassData (mesh);
   CS_ASSERT (m);
-  iPolygonMesh* p = m->GetMeshObject()->GetObjectModel()->GetPolygonMeshColldet();
+  iPolygonMesh* p = m->GetMeshObject()->GetObjectModel()
+  	->GetPolygonMeshColldet();
   csVector3 *vertex_table = p->GetVertices ();
   csMeshedPolygon *polygon_list = p->GetPolygons ();
 
@@ -508,44 +537,52 @@ int csODEDynamics::CollideMeshSphere (dGeomID mesh, dGeomID sphere, int flags,
 
   int outcount = 0;
 
-  for (int i = 0; i < p->GetPolygonCount() && outcount < N; i ++) {
+  for (int i = 0; i < p->GetPolygonCount() && outcount < N; i ++)
+  {
     csPlane3 plane(vertex_table[polygon_list[i].vertices[0]] / mesht,
       vertex_table[polygon_list[i].vertices[1]] / mesht,
       vertex_table[polygon_list[i].vertices[2]] / mesht);
     plane.Normalize();
-    if (plane.Classify (center) < 0) {
+    if (plane.Classify (center) < 0)
+    {
       continue;
     }
     float depth = rad - plane.Distance (center);
-    if (depth < 0) {
+    if (depth < 0)
+    {
       continue;
     }
     int vcount = polygon_list[i].num_vertices;
-    for (int j = 0; j < vcount-1; j ++) {
+    for (int j = 0; j < vcount-1; j ++)
+    {
       int ind1 = polygon_list[i].vertices[j];
       int ind2 = polygon_list[i].vertices[j+1];
       csVector3 v1 = vertex_table[ind1] / mesht;
       csVector3 v2 = vertex_table[ind2] / mesht;
       csPlane3 edgeplane(v1, v2, v2 - plane.Normal());
       edgeplane.Normalize();
-      if (edgeplane.Classify (center) < 0) {
+      if (edgeplane.Classify (center) < 0)
+      {
         csVector3 line = v2 - v1;
-    float linelen = line.SquaredNorm();
+	float linelen = line.SquaredNorm();
         line.Normalize();
         float proj = center * line;
         /* if the point projects on this edge, but outside the poly test
          * for depth to this edge (especially important on sharp corners)
          */
-        if ((proj >= (v1 * line)) && (proj <= (v2 * line))) {
-      float t = ((v1 - center) * (v2 - center)) / linelen;
+        if ((proj >= (v1 * line)) && (proj <= (v2 * line)))
+	{
+	  float t = ((v1 - center) * (v2 - center)) / linelen;
           csVector3 projpt = v1 + (line * t);
           csVector3 newnorm = center - projpt;
           float dist = newnorm.Norm();
           depth = rad - dist;
           newnorm /= dist;
           plane.Set (newnorm.x, newnorm.y, newnorm.z, 0);
-      break;
-        } else {
+	  break;
+        }
+	else
+	{
           /* this is an invalid the ball is outside the poly at this edge */
           depth = -1;
         }
@@ -558,7 +595,8 @@ int csODEDynamics::CollideMeshSphere (dGeomID mesh, dGeomID sphere, int flags,
     csVector3 v2 = vertex_table[ind2] / mesht;
     csPlane3 edgeplane (v1, v2, v2 - plane.Normal());
     edgeplane.Normalize ();
-    if (edgeplane.Classify (center) < 0) {
+    if (edgeplane.Classify (center) < 0)
+    {
       csVector3 line = v2 - v1;
       float linelen = line.SquaredNorm ();
       line.Normalize();
@@ -566,20 +604,24 @@ int csODEDynamics::CollideMeshSphere (dGeomID mesh, dGeomID sphere, int flags,
       /* if the point projects on this edge, but outside the poly test
        * for depth to this edge (especially important on sharp corners)
        */
-      if ((proj >= (v1 * line)) && (proj <= (v2 * line))) {
-    float t = ((v1 - center) * (v2 - center)) / linelen;
+      if ((proj >= (v1 * line)) && (proj <= (v2 * line)))
+      {
+	float t = ((v1 - center) * (v2 - center)) / linelen;
         csVector3 projpt = v1 + (line * t);
         csVector3 newnorm = center - projpt;
         float dist = newnorm.Norm();
         depth = rad - dist;
         newnorm /= dist;
         plane.Set (newnorm.x, newnorm.y, newnorm.z, 0);
-      } else {
+      }
+      else
+      {
         /* this is an invalid the ball is outside the poly at this edge */
         depth = -1;
       }
     }
-    if (depth < 0) {
+    if (depth < 0)
+    {
       continue;
     }
     dContactGeom *out = (dContactGeom *)((char *)outcontacts + skip * outcount);
@@ -710,7 +752,8 @@ void csODEDynamicSystem::Step (float stepsize)
   dSpaceCollide (spaceID, this, &csODEDynamics::NearCallback);
   dWorldStep (worldID, stepsize);
 
-  for (long i=0; i<bodies.Length(); i++) {
+  for (long i=0; i<bodies.Length(); i++)
+  {
     iRigidBody *b = bodies.Get(i);
     b->Update ();
     b->SetAngularVelocity (b->GetAngularVelocity () * roll_damp);
@@ -827,7 +870,8 @@ csODEBodyGroup::csODEBodyGroup (csODEDynamicSystem* sys)
 
 csODEBodyGroup::~csODEBodyGroup ()
 {
-  for (int i = 0; i < bodies.Length(); i ++) {
+  for (int i = 0; i < bodies.Length(); i ++)
+  {
     ((csODERigidBody *)(iRigidBody*)bodies[i])->UnsetGroup ();
   }
 }
@@ -1206,7 +1250,8 @@ void csODERigidBody::GetProperties (float* mass,
   dBodyGetMass (bodyID, &m);
   if (mass != 0) *mass = m.mass;
   if (center != 0) center->Set (m.c[0], m.c[1], m.c[2]);
-  if (inertia != 0) {
+  if (inertia != 0)
+  {
     inertia->Set (m.I[0], m.I[1], m.I[2],
      m.I[4], m.I[5], m.I[6],
      m.I[8], m.I[9], m.I[10]);
@@ -1352,14 +1397,20 @@ csODEJoint::~csODEJoint ()
 
 void csODEJoint::Attach (iRigidBody *b1, iRigidBody *b2)
 {
-  if (b1) {
+  if (b1)
+  {
     bodyID[0] = ((csODERigidBody *)(b1->QueryObject()))->GetID();
-  } else {
+  }
+  else
+  {
     bodyID[0] = 0;
   }
-  if (b2) { 
+  if (b2)
+  { 
     bodyID[1] = ((csODERigidBody *)(b2->QueryObject()))->GetID();
-  } else {
+  }
+  else
+  {
     bodyID[1] = 0;
   }
   body[0] = b1;
@@ -1441,10 +1492,13 @@ csVector3 csODEJoint::GetMaximumAngle ()
 void csODEJoint::BuildHinge (const csVector3 &axis, float min, float max)
 {
   dJointSetHingeAxis (jointID, axis.x, axis.y, axis.z);
-  if (max > min) {
+  if (max > min)
+  {
     dJointSetHingeParam (jointID, dParamLoStop, min);
     dJointSetHingeParam (jointID, dParamHiStop, max);
-  } else {
+  }
+  else
+  {
     dJointSetHingeParam (jointID, dParamLoStop, -dInfinity);
     dJointSetHingeParam (jointID, dParamHiStop, dInfinity);
   }
@@ -1455,17 +1509,23 @@ void csODEJoint::BuildHinge2 (const csVector3 &axis1, float min1, float max1,
 {
   dJointSetHinge2Axis1 (jointID, axis1.x, axis1.y, axis1.z);
   dJointSetHinge2Axis2 (jointID, axis2.x, axis2.y, axis2.z);
-  if (max1 > min1) {
+  if (max1 > min1)
+  {
     dJointSetHinge2Param (jointID, dParamLoStop, min1);
     dJointSetHinge2Param (jointID, dParamHiStop, max1);
-  } else {
+  }
+  else
+  {
     dJointSetHinge2Param (jointID, dParamLoStop, -dInfinity);
     dJointSetHinge2Param (jointID, dParamHiStop, dInfinity);
   }
-  if (max2 > min2) {
+  if (max2 > min2)
+  {
     dJointSetHinge2Param (jointID, dParamLoStop2, min2);
     dJointSetHinge2Param (jointID, dParamHiStop2, max2);
-  } else {
+  }
+  else
+  {
     dJointSetHinge2Param (jointID, dParamLoStop2, -dInfinity);
     dJointSetHinge2Param (jointID, dParamHiStop2, dInfinity);
   }
@@ -1474,10 +1534,13 @@ void csODEJoint::BuildHinge2 (const csVector3 &axis1, float min1, float max1,
 void csODEJoint::BuildSlider (const csVector3 &axis, float min, float max)
 {
   dJointSetSliderAxis (jointID, axis.x, axis.y, axis.z);
-  if (max > min) {
+  if (max > min)
+  {
     dJointSetSliderParam (jointID, dParamLoStop, min);
     dJointSetSliderParam (jointID, dParamHiStop, max);
-  } else {
+  }
+  else
+  {
     dJointSetSliderParam (jointID, dParamLoStop, -dInfinity);
     dJointSetSliderParam (jointID, dParamHiStop, dInfinity);
   }
@@ -1485,10 +1548,12 @@ void csODEJoint::BuildSlider (const csVector3 &axis, float min, float max)
 
 void csODEJoint::BuildJoint ()
 {
-  if (!(bodyID[0] || bodyID[1])) {
+  if (!(bodyID[0] || bodyID[1]))
+  {
     return;
   }
-  if (jointID) {
+  if (jointID)
+  {
     dJointDestroy (jointID);
   }
   int transcount = transConstraint[0] + transConstraint[1] + transConstraint[2];
@@ -1496,8 +1561,10 @@ void csODEJoint::BuildJoint ()
 
   csVector3 pos;
   csMatrix3 rot;
-  if (transcount == 0) {
-    switch (rotcount) {
+  if (transcount == 0)
+  {
+    switch (rotcount)
+    {
       case 0:
         jointID = dJointCreateFixed (dynsys->GetWorldID(), 0);
           dJointAttach (jointID, bodyID[0], bodyID[1]);
@@ -1509,11 +1576,16 @@ void csODEJoint::BuildJoint ()
         pos = transform.GetOrigin();
         dJointSetHingeAnchor (jointID, pos.x, pos.y, pos.z);
         rot = transform.GetO2T();
-        if (rotConstraint[0]) {
+        if (rotConstraint[0])
+	{
           BuildHinge (rot.Col1(), minAngle.x, maxAngle.x);
-        } else if (rotConstraint[1]) {
+        }
+	else if (rotConstraint[1])
+	{
           BuildHinge (rot.Col2(), minAngle.y, maxAngle.y);
-        } else if (rotConstraint[2]) {
+        }
+	else if (rotConstraint[2])
+	{
           BuildHinge (rot.Col3(), minAngle.z, maxAngle.z);
         }
         // TODO: insert some mechanism for bounce, erp and cfm
@@ -1525,15 +1597,21 @@ void csODEJoint::BuildJoint ()
         dJointSetHinge2Anchor (jointID, pos.x, pos.y, pos.z);
         rot = transform.GetO2T();
 
-        if (rotConstraint[0]) {
-          if (rotConstraint[1]) {
+        if (rotConstraint[0])
+	{
+          if (rotConstraint[1])
+	  {
             BuildHinge2 (rot.Col2(), minAngle.y, maxAngle.y,
              rot.Col1(), minAngle.x, maxAngle.x);
-          } else {
+          }
+	  else
+	  {
             BuildHinge2 (rot.Col3(), minAngle.z, maxAngle.z,
              rot.Col1(), minAngle.x, maxAngle.x);
           }
-        } else {
+        }
+	else
+	{
           BuildHinge2 (rot.Col2(), minAngle.y, maxAngle.y,
            rot.Col3(), minAngle.z, maxAngle.z);
         }
@@ -1546,18 +1624,25 @@ void csODEJoint::BuildJoint ()
         break;
     }
   }
-  else if (rotcount == 0) {
-    switch (transcount) {
+  else if (rotcount == 0)
+  {
+    switch (transcount)
+    {
       /* 0 is accounted for in the previous condition */
       case 1:
         jointID = dJointCreateSlider (dynsys->GetWorldID(), 0);
           dJointAttach (jointID, bodyID[0], bodyID[1]);
         rot = transform.GetO2T();
-        if (transConstraint[0]) {
+        if (transConstraint[0])
+	{
           BuildSlider (rot.Col1(), minTrans.x, maxTrans.x);
-        } else if (transConstraint[1]) {
+        }
+	else if (transConstraint[1])
+	{
           BuildSlider (rot.Col2(), minTrans.y, maxTrans.y);
-        } else {
+        }
+	else
+	{
           BuildSlider (rot.Col3(), minTrans.z, maxTrans.z);
         }
         break;
