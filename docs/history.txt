@@ -1,5 +1,7 @@
 The history order is reversed so that new features are at the top.
 
+12-Dec-2001
+	- Bumped up version for pending 0.92 release.
 11-Dec-2001
 	- Thanks to Matze we finally got debugging to work properly with
 	  cygwin and mingw ports. In the past there was no useful debug
