@@ -224,9 +224,9 @@ bool awsManager::SetupCanvas (iAwsCanvas *_newCanvas, iGraphics2D *g2d, iGraphic
 {
   iAwsCanvas *newCanvas = _newCanvas;
 
-  if (newCanvas == NULL)
+  if (newCanvas == 0)
   {
-	if (g2d == NULL || g3d == NULL)
+	if (g2d == 0 || g3d == 0)
 		return false;
 
     newCanvas = new awsScreenCanvas (g2d, g3d);

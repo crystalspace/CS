@@ -300,12 +300,12 @@ public:
   virtual bool HandleEvent(iEvent&)=0;
 
   /** Sets up the canvas to draw on.
-   * @param newCanvas The canvas to draw on.  If this parameter is NULL, then g2d and g3d MUST be present.  AWS will use them to create a default, direct to screen canvas. 
+   * @param newCanvas The canvas to draw on.  If this parameter is 0, then g2d and g3d MUST be present.  AWS will use them to create a default, direct to screen canvas. 
    * @param g2d A pointer to a valid iGraphics2D instance. (If newCanvas is NOT null, this param may be ommitted.)
    * @param g3d A pointer to a valid iGraphics3D instance. (If newCanvas is NOT null, this param may be ommitted.)
    * @return True if everything works, False otherwise.  If this function returns False AWS will NOT work.
    */
-  virtual bool SetupCanvas(iAwsCanvas *newCanvas, iGraphics2D *g2d=NULL, iGraphics3D *g3d=NULL)=0;
+  virtual bool SetupCanvas(iAwsCanvas *newCanvas, iGraphics2D *g2d=0, iGraphics3D *g3d=0)=0;
 
   /// Get the current context
   virtual iAwsCanvas* GetCanvas()=0;

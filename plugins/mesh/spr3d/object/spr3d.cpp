@@ -2697,7 +2697,7 @@ iRenderBuffer *csSprite3DMeshObject::GetRenderBuffer (csStringID name)
     }
     return indices;
   }
-  return NULL;
+  return 0;
 }
 
 #endif // CS_USE_NEW_RENDERER

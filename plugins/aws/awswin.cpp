@@ -57,7 +57,7 @@ awsWindow::awsWindow () :
   is_minimized(false),
   popup(0),
   menu(0),
-  window_focused_child(NULL)
+  window_focused_child(0)
 {
   // Window start off hidden.
   SetFlag (AWSF_CMP_HIDDEN);

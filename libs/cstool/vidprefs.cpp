@@ -248,7 +248,7 @@ bool csVideoPreferences::SetupWindow ()
   //aws_canvas = csPtr<iAwsCanvas> (aws->CreateCustomCanvas (g2d, g3d));
   //aws->SetFlag (AWSF_AlwaysRedrawWindows);
 
-  aws->SetupCanvas (NULL, g2d, g3d);
+  aws->SetupCanvas (0, g2d, g3d);
 
   // Setup sink.
   iAwsSink* sink = aws->GetSinkMgr ()->CreateSink ((void*)this);

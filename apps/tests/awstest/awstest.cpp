@@ -334,7 +334,7 @@ awsTest::Initialize(int argc, const char* const argv[], const char *iConfigName)
     aws->SetFlag(AWSF_AlwaysRedrawWindows);     // Only set for direct-drawing with engine
   }*/
 
-  aws->SetupCanvas(NULL, myG2D, myG3D);
+  aws->SetupCanvas(0, myG2D, myG3D);
 
   // next, setup sinks before loading any preferences
   awsTestSink *s    = new awsTestSink();

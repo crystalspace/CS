@@ -312,7 +312,7 @@ public:
 
 public:
   /// Set the contexts however you want
-  virtual bool SetupCanvas(iAwsCanvas *newCanvas, iGraphics2D *g2d=NULL, iGraphics3D *g3d=NULL);
+  virtual bool SetupCanvas(iAwsCanvas *newCanvas, iGraphics2D *g2d=0, iGraphics3D *g3d=0);
 
   /// Get the current context
   virtual iAwsCanvas *GetCanvas ();

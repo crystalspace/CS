@@ -86,9 +86,9 @@ csSpiralMeshObject::csSpiralMeshObject (iObjectRegistry* object_reg,
   part_source.Set (0, 0, 0);
   part_time = 5.0; // @@@ PARAMETER
   last_reuse = 0;
-  part_pos = NULL;
+  part_pos = 0;
   part_speed.Set(0.1,0.2,3.14);
-  part_age = NULL;
+  part_age = 0;
   part_width = .02;
   part_height = .02;
   part_random.Set(.03, .03, 0.03);

@@ -158,7 +158,7 @@ bool AwsTutorial::Initialize (int argc, const char* const argv[])
   //aws->SetFlag (AWSF_AlwaysRedrawWindows);
   //aws->SetCanvas (awsCanvas);
 
-  aws->SetupCanvas(NULL, myG2D, myG3D);
+  aws->SetupCanvas(0, myG2D, myG3D);
 
   // Setup sink.
   iAwsSink* sink = aws->GetSinkMgr ()->CreateSink ((void*)this);

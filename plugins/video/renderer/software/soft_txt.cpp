@@ -367,7 +367,7 @@ void csTextureHandleSoftware::DeleteMipmaps ()
     {
       DG_UNLINK (this, tex[i]);
       delete tex[i];
-      tex[i] = NULL;
+      tex[i] = 0;
     }
   }
 }

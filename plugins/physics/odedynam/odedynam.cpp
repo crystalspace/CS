@@ -163,10 +163,10 @@ void csODEDynamics::NearCallback (void *data, dGeomID o1, dGeomID o2)
   {
     /* there is only 1 actual body per set */
     if (b1) {
-      b1->Collision ((b2) ? &b2->scfiRigidBody : NULL);
+      b1->Collision ((b2) ? &b2->scfiRigidBody : 0);
     }
     if (b2) {
-      b2->Collision ((b1) ? &b1->scfiRigidBody : NULL);
+      b2->Collision ((b1) ? &b1->scfiRigidBody : 0);
     }
 
     for( int i=0; i<a; i++ )

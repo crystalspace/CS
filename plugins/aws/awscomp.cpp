@@ -780,7 +780,7 @@ iAwsComponent *awsComponent::GetFirstFocusableChild(iAwsComponent *comp)
     if(comp->GetTabComponent(i)->HasChildren())
       return GetFirstFocusableChild (comp->GetTabComponent(i));
   }
-  return NULL;
+  return 0;
 }
 
 void awsComponent::SetAbove(iAwsComponent* comp)
