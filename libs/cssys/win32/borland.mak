@@ -11,7 +11,7 @@ DESCRIPTION.OS.borland = Win32
 PLUGINS+=video/canvas/ddraw video/renderer/software cssndrdr/software \
   video/renderer/opengl video/canvas/openglwin video/renderer/direct3d5
 
-#---------------------------------------------------- rootdefines & defines ---#
+#--------------------------------------------------- rootdefines & defines ---#
 ifneq (,$(findstring defines,$(MAKESECTION)))
 
 .SUFFIXES: .exe .dll
@@ -30,7 +30,7 @@ COMP=BCC32
 
 endif # ifneq (,$(findstring defines,$(MAKESECTION)))
 
-#------------------------------------------------------------------ defines ---#
+#----------------------------------------------------------------- defines ---#
 ifeq ($(MAKESECTION),defines)
 
 include mk/dos.mak
@@ -40,6 +40,9 @@ LIB_PREFIX=lib
 
 # Extra libraries needed on this system (beside drivers)
 LIBS.EXE=dxextra.lib
+
+# Socket library
+LIBS.SOCKET.SYSTEM=$(LFLAGS.l)wsock32
 
 # Where can the Zlib library be found on this system?
 Z_LIBS=zlib.lib
@@ -53,9 +56,6 @@ JPG_LIBS=libjpeg.lib
 # Where can the optional sound libraries be found on this system?
 SOUND_LIBS=
 
-# Does this system require libsocket.a?
-NEED_SOCKET_LIB=
-
 # Flags for C compiler to direct output to the rule target
 CFLAGS.@ = -o$@
 
@@ -63,10 +63,10 @@ CFLAGS.@ = -o$@
 LFLAGS.@ = -e$@
 
 # Indicate where special include files can be found.
-CFLAGS.INCLUDE=-Iinclude/cssys/win32 -Ilibs/csterr
+CFLAGS.INCLUDE=$(CFLAGS.I)include/cssys/win32 $(CFLAGS.I)libs/csterr
 
 # General flags for the compiler which are used in any case.
-CFLAGS.GENERAL=-w-8027 -DWIN32_VOLATILE -q -x- $(CFLAGS.SYSTEM)
+CFLAGS.GENERAL=-w-8027 $(CFLAGS.D)WIN32_VOLATILE -q -x- $(CFLAGS.SYSTEM)
 
 586=-5 -OS
 686=-6 -OS
@@ -123,10 +123,10 @@ SRC.SYS_CSSYS_EXE=libs/cssys/win32/exeentry.cpp
 SRC.SYS_CSSYS_DLL=libs/cssys/win32/dllentry.cpp
 
 # The C compiler
-CC=bcc32 -c -DOS_WIN32
+CC=bcc32 -c $(CFLAGS.D)OS_WIN32
 
 # The C++ compiler
-CXX=bcc32 -c -DOS_WIN32
+CXX=bcc32 -c $(CFLAGS.D)OS_WIN32
 
 # The linker.
 LINK=bcc32
@@ -152,7 +152,7 @@ DEPEND_TOOL=mkdep
 
 endif # ifeq ($(MAKESECTION),defines)
 
-#-------------------------------------------------------------- postdefines ---#
+#------------------------------------------------------------- postdefines ---#
 ifeq ($(MAKESECTION),postdefines)
 
 L^=$+
@@ -168,7 +168,7 @@ endef
 
 endif # ifeq ($(MAKESECTION),postdefines)
 
-#--------------------------------------------------------------- confighelp ---#
+#-------------------------------------------------------------- confighelp ---#
 ifeq ($(MAKESECTION),confighelp)
 
 ifneq (,$(findstring command,$(SHELL))$(findstring COMMAND,$(SHELL)))
@@ -181,7 +181,7 @@ SYSHELP += \
 
 endif # ifeq ($(MAKESECTION),confighelp)
 
-#---------------------------------------------------------------- configure ---#
+#--------------------------------------------------------------- configure ---#
 ifeq ($(ROOTCONFIG),config)
 
 #SYSCONFIG=bin/win32conf.bat

@@ -51,19 +51,16 @@ include mk/dos.mak
 LIBS.EXE=
 
 # Where can the Zlib library be found on this system?
-Z_LIBS=-lz
+Z_LIBS=$(LFLAGS.l)z
 
 # Where can the PNG library be found on this system?
-PNG_LIBS=-lpng
+PNG_LIBS=$(LFLAGS.l)png
 
 # Where can the JPG library be found on this system?
-JPG_LIBS=-ljpeg
+JPG_LIBS=$(LFLAGS.l)jpeg
 
 # Where can the optional sound libraries be found on this system?
 SOUND_LIBS=
-
-# Does this system require libsocket.a?
-NEED_SOCKET_LIB=yes
 
 # Indicate where special include files can be found.
 CFLAGS.INCLUDE=
@@ -126,7 +123,7 @@ else
 	ar
   endef
   ARFLAGS=cr
-  NASMFLAGS.SYSTEM=-f aout -DEXTERNC_UNDERSCORE
+  NASMFLAGS.SYSTEM=-f aout $(CFLAGS.D)EXTERNC_UNDERSCORE
 endif
 
 # System dependent source files included into CSSYS library
@@ -157,7 +154,7 @@ else
 endif
 
 # For using sockets we should link with sockets library
-LIBS.SOCKET.SYSTEM=-lsocket
+LIBS.SOCKET.SYSTEM=$(LFLAGS.l)socket
 
 # Override linker with os2link.exe
 LINK=@$(OS2LINK) --linker=$(LD) --description="$(DESCRIPTION.$@)" \
@@ -165,7 +162,7 @@ LINK=@$(OS2LINK) --linker=$(LD) --description="$(DESCRIPTION.$@)" \
 LFLAGS.CONSOLE.EXE=
 
 # Defineds for OpenGL 3D driver
-LIBS.OPENGL.SYSTEM=-lopengl
+LIBS.OPENGL.SYSTEM=$(LFLAGS.l)opengl
 
 # Extra parameters for 'sed' which are used for doing 'make depend'.
 SYS_SED_DEPEND=-e "s/\.ob*j*\:/\$$O:/g"

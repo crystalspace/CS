@@ -10,7 +10,7 @@ DESCRIPTION.OS.cygwin = Win32
 #
 PLUGINS+=video/canvas/ddraw video/renderer/software sound/renderer/software
 
-#---------------------------------------------------- rootdefines & defines ---#
+#--------------------------------------------------- rootdefines & defines ---#
 ifneq (,$(findstring defines,$(MAKESECTION)))
 
 .SUFFIXES: .exe .dll
@@ -29,7 +29,7 @@ COMP=GCC
 
 endif # ifneq (,$(findstring defines,$(MAKESECTION)))
 
-#------------------------------------------------------------------ defines ---#
+#----------------------------------------------------------------- defines ---#
 ifeq ($(MAKESECTION),defines)
 
 include mk/dos.mak
@@ -37,20 +37,20 @@ include mk/dos.mak
 # Extra libraries needed on this system (beside drivers)
 LIBS.EXE=
 
+# Socket library
+LIBS.SOCKET.SYSTEM=$(LFLAGS.l)wsock32
+
 # Where can the Zlib library be found on this system?
-Z_LIBS=-lz
+Z_LIBS=$(LFLAGS.l)z
 
 # Where can the PNG library be found on this system?
-PNG_LIBS=-lpng
+PNG_LIBS=$(LFLAGS.l)png
 
 # Where can the JPG library be found on this system?
-JPG_LIBS=-ljpeg
+JPG_LIBS=$(LFLAGS.l)jpeg
 
 # Where can the optional sound libraries be found on this system?
 SOUND_LIBS=
-
-# Does this system require libsocket.a?
-NEED_SOCKET_LIB=
 
 # Indicate where special include files can be found.
 CFLAGS.INCLUDE=
@@ -99,7 +99,7 @@ ARFLAGS=cr
 MKDIR=mkdir $(@:/=)
 
 # System-dependent flags to pass to NASM
-NASMFLAGS.SYSTEM=-f win32 -DEXTERNC_UNDERSCORE
+NASMFLAGS.SYSTEM=-f win32 $(CFLAGS.D)EXTERNC_UNDERSCORE
 
 # System dependent source files included into CSSYS library
 SRC.SYS_CSSYS = libs/cssys/win32/win32.cpp libs/cssys/win32/dir.cpp \
@@ -135,7 +135,7 @@ DEPEND_TOOL=cc
 
 endif # ifeq ($(MAKESECTION),defines)
 
-#--------------------------------------------------------------- confighelp ---#
+#-------------------------------------------------------------- confighelp ---#
 ifeq ($(MAKESECTION),confighelp)
 
 ifneq (,$(findstring command,$(SHELL))$(findstring COMMAND,$(SHELL)))
@@ -148,7 +148,7 @@ SYSHELP += \
 
 endif # ifeq ($(MAKESECTION),confighelp)
 
-#---------------------------------------------------------------- configure ---#
+#--------------------------------------------------------------- configure ---#
 ifeq ($(ROOTCONFIG),config)
 
 SYSCONFIG=

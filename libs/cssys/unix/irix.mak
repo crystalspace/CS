@@ -36,20 +36,20 @@ ifeq ($(MAKESECTION),defines)
 
 include mk/unix.mak
 
-# Does this system require libsocket.a?
-NEED_SOCKET_LIB=yes
-
 # Extra libraries needed on this system.
-LIBS.EXE=-ldl -lm
+LIBS.EXE=$(LFLAGS.l)dl $(LFLAGS.l)m
+
+# Socket library
+LIBS.SOCKET.SYSTEM=$(LFLAGS.l)socket
 
 # Where can the Zlib library be found on this system?
-Z_LIBS=-lz
+Z_LIBS=$(LFLAGS.l)z
 
 # Where can the PNG library be found on this system?
-PNG_LIBS=-lpng
+PNG_LIBS=$(LFLAGS.l)png
 
 # Where can the JPG library be found on this system?
-JPG_LIBS=-ljpeg
+JPG_LIBS=$(LFLAGS.l)jpeg
 
 # Where can the optional sound libraries be found on this system?
 SOUND_LIBS=
@@ -82,7 +82,7 @@ LFLAGS.debug=-g3
 LFLAGS.profile=-pg
 
 # Flags for the linker which are used when building a shared library.
-#LFLAGS.DLL=-Wl,-G -nostdlib -lgcc -lc
+#LFLAGS.DLL=-Wl,-G -nostdlib $(LFLAGS.l)gcc $(LFLAGS.l)c
 LFLAGS.DLL=-shared
 
 # System dependent source files included into CSSYS library

@@ -52,36 +52,33 @@ LIBS.EXE=
 
 # OpenGL settings for use with OpenGL Drivers...untested
 #SGI OPENGL SDK v1.1.1 for Win32
-#LIBS.OPENGL.SYSTEM = -lopengl -lglut
+#LIBS.OPENGL.SYSTEM = $(LFLAGS.l)opengl $(LFLAGS.l)glut
 
-#MS OpenGL
-LIBS.OPENGL.SYSTEM=-lopengl32 -lglut32
+# MS OpenGL
+LIBS.OPENGL.SYSTEM=$(LFLAGS.l)opengl32 $(LFLAGS.l)glut32
 
-# socket dll
-LIBS.SOCKET.SYSTEM=-lwsock32
+# Socket library
+LIBS.SOCKET.SYSTEM=$(LFLAGS.l)wsock32
 
 #sound dll
-LIBS.SOUND.SYSTEM=-ldsound -lwinmm
+LIBS.SOUND.SYSTEM=$(LFLAGS.l)dsound $(LFLAGS.l)winmm
 
 # Where can the Zlib library be found on this system?
-Z_LIBS=-lz
+Z_LIBS=$(LFLAGS.l)z
 
 # Where can the PNG library be found on this system?
-PNG_LIBS=-lpng
+PNG_LIBS=$(LFLAGS.l)png
 
 # Where can the JPG library be found on this system?
-JPG_LIBS=-ljpeg
+JPG_LIBS=$(LFLAGS.l)jpeg
 
 # Where can the optional sound libraries be found on this system?
 SOUND_LIBS=
 
-# Does this system require libsocket.a?
-NEED_SOCKET_LIB=
-
 # Indicate where special include files can be found.
 # for instance where your dx includes are
 CFLAGS.INCLUDE=
-#-I/dx7asdk/dxf/include 
+#$(CFLAGS.I)/dx7asdk/dxf/include 
 
 # General flags for the compiler which are used in any case.
 CFLAGS.GENERAL=-Wall $(CFLAGS.SYSTEM) -fvtable-thunks -pipe
@@ -127,7 +124,7 @@ endef
 ARFLAGS=cr
 
 # System-dependent flags to pass to NASM
-NASMFLAGS.SYSTEM=-f win32 -DEXTERNC_UNDERSCORE
+NASMFLAGS.SYSTEM=-f win32 $(CFLAGS.D)EXTERNC_UNDERSCORE
 
 # System dependent source files included into CSSYS library
 SRC.SYS_CSSYS = libs/cssys/win32/win32.cpp libs/cssys/win32/dir.cpp \

@@ -28,19 +28,15 @@ ifeq ($(MAKESECTION),postdefines)
 
 vpath %.cpp plugins/net/driver/socket
 
-ifeq ($(NEED_SOCKET_LIB),yes)
-  LIB.SOCKET.LOCAL = $(LFLAGS.l)socket
-endif
-
 ifeq ($(USE_PLUGINS),yes)
   SOCKET = $(OUTDLL)cssocket$(DLL)
   LIB.SOCKET = $(foreach d,$(DEP.SOCKET),$($d.LIB))
-  LIB.SOCKET.SPECIAL = $(LIB.SOCKET.LOCAL) $(LIBS.SOCKET.SYSTEM)
+  LIB.SOCKET.SPECIAL = $(LIBS.SOCKET.SYSTEM)
   TO_INSTALL.DYNAMIC_LIBS += $(SOCKET)
 else
   SOCKET = $(OUT)$(LIB_PREFIX)cssocket$(LIB)
   DEP.EXE += $(SOCKET)
-  LIBS.EXE += $(LIBS.LOCAL.SOCKET)
+  LIBS.EXE += $(LIBS.SOCKET.SYSTEM)
   SCF.STATIC += cssocket
   TO_INSTALL.STATIC_LIBS += $(SOCKET)
 endif

@@ -32,26 +32,26 @@ ifeq ($(MAKESECTION),defines)
 
 include mk/unix.mak
 
-# Does this system require libsocket.a?
-NEED_SOCKET_LIB=no
-
 # Extra libraries needed on this system.
-LIBS.EXE+=-L/usr/local/lib -lm
+LIBS.EXE+=$(LFLAGS.L)/usr/local/lib $(LFLAGS.l)m
+
+# Socket library
+LIBS.SOCKET.SYSTEM=
 
 # Where can the Zlib library be found on this system?
-Z_LIBS=-lz
+Z_LIBS=$(LFLAGS.l)z
 
 # Where can the PNG library be found on this system?
-PNG_LIBS=-lpng
+PNG_LIBS=$(LFLAGS.l)png
 
 # Where can the JPG library be found on this system?
-JPG_LIBS=-ljpeg
+JPG_LIBS=$(LFLAGS.l)jpeg
 
 # Where can the optional sound libraries be found on this system?
 SOUND_LIBS=
 
 # Indicate where special include files can be found.
-CFLAGS.INCLUDE=-I/usr/local/include
+CFLAGS.INCLUDE=$(CFLAGS.I)/usr/local/include
 
 # General flags for the compiler which are used in any case.
 CFLAGS.GENERAL=-Wall
@@ -82,7 +82,7 @@ LFLAGS.profile=-pg
 LFLAGS.DLL=-Wl,-shared
 
 # System-dependent flags to pass to NASM
-NASMFLAGS.SYSTEM=-f aoutb -DEXTERNC_UNDERSCORE
+NASMFLAGS.SYSTEM=-f aoutb $(CFLAGS.D)EXTERNC_UNDERSCORE
 
 # System dependent source files included into CSSYS library
 SRC.SYS_CSSYS = libs/cssys/unix/unix.cpp libs/cssys/unix/utiming.cpp \

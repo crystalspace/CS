@@ -30,8 +30,8 @@ ifneq ($(strip $(GLIDE_VERSIONS)),)
 PLUGINS+=video/canvas/unxglide
 PLUGINS+=video/renderer/glide
 endif
-GLIDE2_PATH=-I/usr/include/glide2
-GLIDE3_PATH=-I/usr/include/glide3
+GLIDE2_PATH=$(CFLAGS.I)/usr/include/glide2
+GLIDE3_PATH=$(CFLAGS.I)/usr/include/glide3
 #--------------------------------------------------- rootdefines & defines ---#
 ifneq (,$(findstring defines,$(MAKESECTION)))
 
@@ -55,20 +55,20 @@ ifeq ($(MAKESECTION),defines)
 
 include mk/unix.mak
 
-# Does this system require libsocket.a?
-NEED_SOCKET_LIB=no
-
 # Extra libraries needed on this system.
-LIBS.EXE+=-ldl -lm  
+LIBS.EXE+=$(LFLAGS.l)dl $(LFLAGS.l)m  
+
+# Socket library
+LIBS.SOCKET.SYSTEM=
 
 # Where can the Zlib library be found on this system?
-Z_LIBS=-lz
+Z_LIBS=$(LFLAGS.l)z
 
 # Where can the PNG library be found on this system?
-PNG_LIBS=-lpng
+PNG_LIBS=$(LFLAGS.l)png
 
 # Where can the JPG library be found on this system?
-JPG_LIBS=-ljpeg
+JPG_LIBS=$(LFLAGS.l)jpeg
 
 # Where can the optional sound libraries be found on this system?
 SOUND_LIBS=
@@ -108,7 +108,7 @@ LFLAGS.optimize=-s
 LFLAGS.profile=-pg
 
 # Flags for the linker which are used when building a shared library.
-#LFLAGS.DLL=-Wl,-shared -nostdlib -lgcc
+#LFLAGS.DLL=-Wl,-shared -nostdlib $(LFLAGS.l)gcc
 LFLAGS.DLL=-Wl,-shared
 
 # System-dependent flags to pass to NASM

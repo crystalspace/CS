@@ -53,20 +53,20 @@ include mk/unix.mak
 # Typical extension for dynamic libraries on this system.
 DLL=.plugin
 
-# Does this system require libsocket.a?
-NEED_SOCKET_LIB=no
-
 # Extra libraries needed on this system.
-LIBS.EXE+=-lroot -lbe -lgame -ltextencoding
+LIBS.EXE+=$(LFLAGS.l)root $(LFLAGS.l)be $(LFLAGS.l)game $(LFLAGS.l)textencoding
+
+# Socket library
+LIBS.SOCKET.SYSTEM=
 
 # Where can the Zlib library be found on this system?
-Z_LIBS=-lz
+Z_LIBS=$(LFLAGS.l)z
 
 # Where can the PNG library be found on this system?
-PNG_LIBS=-lpng
+PNG_LIBS=$(LFLAGS.l)png
 
 # Where can the JPG library be found on this system?
-JPG_LIBS=-Llibs/libjpeg -ljpeg
+JPG_LIBS=$(LFLAGS.L)libs/libjpeg $(LFLAGS.l)jpeg
 
 # Where can the optional sound libraries be found on this system?
 SOUND_LIBS=
@@ -128,7 +128,7 @@ LIBS.OPENGL.SYSTEM+=$(LFLAGS.l)GL
 
 # Defines for Glide2 driver.
 ifneq ($(findstring 2,$(GLIDE_VERSIONS)),)
-GLIDE2_PATH=-I$(GLIDE2_INCLUDE)
+GLIDE2_PATH=$(CFLAGS.I)$(GLIDE2_INCLUDE)
 # Should be libglide2x.so for linker flag '-l' to work, but Be goofed name.
 GLIDE2_LIB=/system/lib/glide2x.so
 endif

@@ -84,14 +84,14 @@ TO_INSTALL.CONFIG += data/config/next.cfg
 # Typical extension for dynamic libraries on this system.
 DLL = $(NEXT.PLUGIN_EXT)
 
-# Does this system require libsocket.a?
-NEED_SOCKET_LIB = no
-
 # Extra libraries needed on this system.
 LIBS.EXE =
 
 # Extra libraries needed only for executables (not plug-ins)
 LIBS.EXE.PLATFORM = $(NEXT.LIBS)
+
+# Socket library
+LIBS.SOCKET.SYSTEM =
 
 # Where can the Zlib library be found on this system?
 Z_LIBS = $(LFLAGS.l)z
