@@ -1,5 +1,5 @@
 # Application description
-DESCRIPTION.simplecloth = Crystal Space tutorial part two, sprite
+DESCRIPTION.simplecloth = Crystal Space Cloth Demo application
 
 #------------------------------------------------------------- rootdefines ---#
 ifeq ($(MAKESECTION),rootdefines)
