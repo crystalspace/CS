@@ -117,7 +117,7 @@ void csSequence::AddRunSequence (cs_time time, iSequence* sequence)
 
 void csSequence::RunSequenceOp::Do (cs_time dt)
 {
-  seqmgr->RunSequence (-dt, sequence);
+  seqmgr->RunSequence (-(signed)dt, sequence);
 }
 
 void csSequence::AddCondition (cs_time time, iSequenceCondition* condition,
@@ -132,9 +132,9 @@ void csSequence::AddCondition (cs_time time, iSequenceCondition* condition,
 void csSequence::RunCondition::Do (cs_time dt)
 {
   if (condition->Condition (dt))
-    seqmgr->RunSequence (-dt, trueSequence);
+    seqmgr->RunSequence (-(signed)dt, trueSequence);
   else
-    seqmgr->RunSequence (-dt, falseSequence);
+    seqmgr->RunSequence (-(signed)dt, falseSequence);
 }
 
 void csSequence::AddLoop (cs_time time, iSequenceCondition* condition,
@@ -148,7 +148,7 @@ void csSequence::AddLoop (cs_time time, iSequenceCondition* condition,
 void csSequence::RunLoop::Do (cs_time dt)
 {
   while (condition->Condition (dt))
-    seqmgr->RunSequence (-dt, sequence);
+    seqmgr->RunSequence (-(signed)dt, sequence);
 }
 
 //---------------------------------------------------------------------------
