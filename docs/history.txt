@@ -22,6 +22,9 @@ chronological order.
 	      as an example, rather than being compiled into crystalspace.jar.
 	    - Removed legacy csjava/Makefile.
 	- PK started with the implementation of the thingmesh saver
+	- Keith added APPEND mode flag now for filesystem files in vfs.  APPEND
+	  will not work for mem mapped files or archive files--only for regular
+	  files.
 25-Jul-2004
         - Philip Wyett changed the order of variable initialisation culling a
           compiler warning in chunklod.cpp.

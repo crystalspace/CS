@@ -437,7 +437,7 @@ DiskFile::DiskFile (int Mode, VfsNode *ParentNode, size_t RIndex,
     if (fName [rpl + n] == VFS_PATH_SEPARATOR)
       fName [rpl + n] = PATH_SEPARATOR;
 
-  writemode = (Mode & VFS_FILE_MODE) == VFS_FILE_WRITE;
+  writemode = (Mode & VFS_FILE_MODE) != VFS_FILE_READ;
 
   int t;
   for (t = 1; t <= 2; t++)
@@ -445,7 +445,13 @@ DiskFile::DiskFile (int Mode, VfsNode *ParentNode, size_t RIndex,
 #ifdef VFS_DEBUG
     printf ("VFS: Trying to open disk file \"%s\"\n", fName);
 #endif
-    file = fopen (fName, writemode ? "wb" : "rb");
+    if ((Mode & VFS_FILE_MODE) == VFS_FILE_WRITE)
+        file = fopen (fName, "wb");
+    else if ((Mode & VFS_FILE_MODE) == VFS_FILE_APPEND)
+        file = fopen (fName, "ab");
+    else
+        file = fopen (fName, "rb");
+
     if (file || (t != 1))
       break;
 
@@ -474,8 +480,11 @@ DiskFile::DiskFile (int Mode, VfsNode *ParentNode, size_t RIndex,
       Size = 0;
       CheckError ();
     }
-    if (fseek (file, 0, SEEK_SET))
-      CheckError ();
+    if ((Mode & VFS_FILE_MODE) != VFS_FILE_APPEND)
+    {
+      if (fseek (file, 0, SEEK_SET))
+        CheckError ();
+    }
   }
 #ifdef VFS_DEBUG
   if (file)

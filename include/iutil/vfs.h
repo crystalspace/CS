@@ -76,6 +76,8 @@ struct csFileTime
 #define VFS_FILE_READ		0x00000000
 /// Open file for writing
 #define VFS_FILE_WRITE		0x00000001
+/// Open file for append
+#define VFS_FILE_APPEND		0x00000002
 /// Store file uncompressed (no gain possible)
 #define VFS_FILE_UNCOMPRESSED	0x80000000
 /** @} */
