@@ -271,9 +271,11 @@ enum
 
 class csTreeCtrl : public csComponent
 {
-  class TreeCtrlNode : public csTreeNode{
+  class TreeCtrlNode : public csTreeNode
+  {
   public:
-    TreeCtrlNode (csComponent *theItem, TreeCtrlNode *theParent, bool isOpen) : csTreeNode (theParent)
+    TreeCtrlNode (csComponent *theItem, TreeCtrlNode *theParent, bool isOpen) 
+    : csTreeNode (theParent)
       { item = theItem; open = isOpen; }
     ~TreeCtrlNode () { csComponent *c=item; item=NULL; if (c) delete c;}
     
@@ -316,7 +318,8 @@ public:
   csTreeCtrl (csComponent *iParent, int iStyle = CSTS_DEFAULTVALUE,
     csTreeFrameStyle iFrameStyle = cstfsThickRect);
 
-  virtual ~csTreeCtrl () { delete treeroot; }
+  virtual ~csTreeCtrl () 
+  { delete treeroot; }
   /// Handle external events and generate timeouts
   virtual bool HandleEvent (csEvent &Event);
 

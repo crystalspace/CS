@@ -51,14 +51,17 @@ csTreeItem::csTreeItem (csComponent *iParent, const char *iText, int iID,
   deltax = 0;
   SetPalette (CSPAL_TREEITEM);
   SetText (iText);
-  if (parent){
+  if (parent)
+  {
     csComponent *pc[2];
     pc[0] = parent;
     pc[1] = this;
     bool succ = (parent->SendCommand (cscmdTreeAddChild, pc) != pc);
-    if (!succ){
+    if (!succ)
+    {
       // parent probably was a TreeItem itself
-      if (parent->parent && (parent->parent->SendCommand (cscmdTreeAddChild, pc)!=pc) ){
+      if (parent->parent && (parent->parent->SendCommand (cscmdTreeAddChild, pc)!=pc) )
+      {
 	parent->parent->Insert (this);
 	Show (false); // we changed the parent and removing this from the previous parent makes it hide, so we show it here
       }
@@ -315,10 +318,12 @@ void csTreeCtrl::DrawBranches ()
   csVector levels, lineseg;
   bool vis = false;
   int nLevel;
-  TreeCtrlNode *node, *firstnode = (TreeCtrlNode*)(treeroot->IsLeaf () ? NULL : treeroot->children.Get (0));
+  TreeCtrlNode *node, *firstnode = (TreeCtrlNode*)(treeroot->IsLeaf () ? NULL 
+                                    : treeroot->children.Get (0));
   TreeCtrlNode *firstVisNode = treeroot->FindItem (firstvisible);
 
-  csRect clipbound (BorderWidth, BorderHeight, bound.Width () - BorderWidth,  bound.Height () - BorderHeight);
+  csRect clipbound (BorderWidth, BorderHeight, 
+                    bound.Width () - BorderWidth,  bound.Height () - BorderHeight);
   if (hscroll) clipbound.ymax = hscroll->bound.ymin;
   if (vscroll) clipbound.xmax = vscroll->bound.xmin;
 
@@ -335,7 +340,8 @@ void csTreeCtrl::DrawBranches ()
   while (node && y < clipbound.ymax )
   {
     nLevel = levels.Find (node->parent);
-    if (nLevel != -1){
+    if (nLevel != -1)
+    {
       levels.Insert (nLevel+1, node);
       lineseg.Insert (nLevel+1, (void*)node->children.Length ());
     }
@@ -348,12 +354,15 @@ void csTreeCtrl::DrawBranches ()
     int w, h;
     node->item->SuggestSize (w, h);
     if (vis && w && h){
-      for (int i=0; i <= nLevel; i++){
+      for (int i=0; i <= nLevel; i++)
+      {
 	int nSegments = (int)lineseg.Get (i);
-	if (nSegments > 0){
+	if (nSegments > 0)
+	{
 	  int x = clipbound.xmin + i * branchdeltax + branchdeltax/2 - deltax;
 	  Line (x, y, x, y+h/(i==nLevel && nSegments==1 ? 2 : 1), CSPAL_TREECTRL_BRANCH);
-	  if (i == nLevel){
+	  if (i == nLevel)
+	  {
 	    Line (x, y+h/2, x+branchdeltax/2, y+h/2, CSPAL_TREECTRL_BRANCH);
 	    // if this node is not a leaf and is not open, we draw a little info that there are more children
 	    if (!node->IsLeaf () && !node->open)
@@ -386,14 +395,15 @@ void csTreeCtrl::PlaceItems (bool setscrollbars)
   {
     focusedNode = node = treeroot->FindItem (focused);
     if (node)
-      do{
+      do
+      {
 	node = node->Next ();
 	if (ULong (node->item->SendCommand (cscmdTreeItemCheck, NULL)) == CS_TREEITEMCHECK_SELECTED)
 	  break;
       } while (node != focusedNode);
     if (node == focusedNode)
     {
-      SetFocused ( NextChild (focused) );
+      SetFocused (NextChild (focused));
       focused->SetState (CSS_TREEITEM_SELECTED, true);
     }
     else
@@ -455,17 +465,18 @@ void csTreeCtrl::PlaceItems (bool setscrollbars)
       if (h > 0)
       {
         // Set current item x,y and height
-        itembound.Set (BorderWidth+nLevel * branchdeltax, cury, BorderWidth+nLevel * branchdeltax+w, cury + h);
+        itembound.Set (BorderWidth+nLevel * branchdeltax, cury, 
+	               BorderWidth+nLevel * branchdeltax+w, cury + h);
         itembound.Intersect (clipbound);
         if (!itembound.IsEmpty ())
           vertcount++;
         node->item->SetRect (itembound);
         cury += h;
       } /* endif */
-    } else
+    }else
       if (w && h)
         node->item->SetRect (0, 0, -1, -1);
-    node = node->Next();
+    node = node->Next ();
     if (node == firstnode)
       break;
   } /* endwhile */
@@ -504,8 +515,8 @@ void csTreeCtrl::PlaceItems (bool setscrollbars)
   levels.Push (treeroot);
   nLevel = 0;
   node = firstnode;
-  while (node){
-    
+  while (node)
+  {
     nLevel = levels.Find (node->parent);
     if (nLevel != -1)
       levels.Insert (nLevel+1, node);
@@ -521,9 +532,9 @@ void csTreeCtrl::PlaceItems (bool setscrollbars)
     w = node->item->bound.xmin;
     node->item->bound.Intersect (clipbound);
     //    node->item->SetRect (itembound);
-    xOff = MAX( 0, clipbound.xmin - w );
+    xOff = MAX (0, clipbound.xmin - w);
     node->item->SendCommand (cscmdTreeItemSetHorizOffset, (void *)xOff);
-    node = node->Next();
+    node = node->Next ();
     if (node == firstnode)
       break;
   }
@@ -569,17 +580,21 @@ static bool do_findtext (csComponent *child, void *param)
 
 bool csTreeCtrl::HandleEvent (csEvent &Event)
 {
-  switch (Event.Type){
+  switch (Event.Type)
+  {
   case csevMouseUp:
-    if ((Event.Mouse.Button == 1) && (app->MouseOwner == this)) {
+    if ((Event.Mouse.Button == 1) && (app->MouseOwner == this))
+    {
       app->CaptureMouse (NULL);
       return true;
     } /* endif */
     break;
   case csevKeyDown:
-    switch (Event.Key.Code) {
+    switch (Event.Key.Code) 
+    {
     case CSKEY_UP:
-      if ((Event.Key.Modifiers & CSMASK_ALLSHIFTS) == 0){
+      if ((Event.Key.Modifiers & CSMASK_ALLSHIFTS) == 0)
+      {
 	TreeCtrlNode *node = treeroot->FindItem (focused);
 	node = node->Prev ();
 	SendCommand (cscmdTreeTrack, (node ? (void *)node->item : NULL));
@@ -587,7 +602,8 @@ bool csTreeCtrl::HandleEvent (csEvent &Event)
       } /* endif */
       return false;
     case CSKEY_DOWN:
-      if ((Event.Key.Modifiers & CSMASK_ALLSHIFTS) == 0) {
+      if ((Event.Key.Modifiers & CSMASK_ALLSHIFTS) == 0) 
+      {
 	TreeCtrlNode *node = treeroot->FindItem (focused);
 	node = node->Next ();
 	SendCommand (cscmdTreeTrack, (void *)node->item);
@@ -595,14 +611,17 @@ bool csTreeCtrl::HandleEvent (csEvent &Event)
       } /* endif */
       return false;
     case CSKEY_LEFT:
-      if ((Event.Key.Modifiers & CSMASK_ALLSHIFTS) == CSMASK_CTRL) {
+      if ((Event.Key.Modifiers & CSMASK_ALLSHIFTS) == CSMASK_CTRL) 
+      {
 	if (deltax > TREE_HORIZONTAL_PAGESTEP)
 	  deltax -= TREE_HORIZONTAL_PAGESTEP;
 	else
 	  deltax = 0;
 	PlaceItems ();
 	return true;
-      }else if ((Event.Key.Modifiers & CSMASK_ALLSHIFTS) == 0) {
+      }
+      else if ((Event.Key.Modifiers & CSMASK_ALLSHIFTS) == 0) 
+      {
 	if (deltax > 0)
 	  deltax--;
 	else
@@ -612,14 +631,17 @@ bool csTreeCtrl::HandleEvent (csEvent &Event)
       } /* endif */
       return false;
     case CSKEY_RIGHT:
-      if ((Event.Key.Modifiers & CSMASK_ALLSHIFTS) == CSMASK_CTRL) {
+      if ((Event.Key.Modifiers & CSMASK_ALLSHIFTS) == CSMASK_CTRL) 
+      {
 	if (deltax + TREE_HORIZONTAL_PAGESTEP <= maxdeltax)
 	  deltax += TREE_HORIZONTAL_PAGESTEP;
 	else
 	  deltax = maxdeltax;
 	PlaceItems ();
 	return true;
-      }else if ((Event.Key.Modifiers & CSMASK_ALLSHIFTS) == 0) {
+      }
+      else if ((Event.Key.Modifiers & CSMASK_ALLSHIFTS) == 0) 
+      {
 	if (deltax  < maxdeltax)
 	  deltax++;
 	else
@@ -629,77 +651,102 @@ bool csTreeCtrl::HandleEvent (csEvent &Event)
       } /* endif */
       return false;
     case CSKEY_PGUP:
-      if ((Event.Key.Modifiers & CSMASK_ALLSHIFTS) == 0) {
+      if ((Event.Key.Modifiers & CSMASK_ALLSHIFTS) == 0) 
+      {
 	TreeCtrlNode *node = treeroot->FindItem (focused);
-	for (int i = 0; node && i < vertcount; i++){
+	for (int i = 0; node && i < vertcount; i++)
+	{
 	  node = node->Prev ();
 	  SendCommand (cscmdTreeTrack, (node ? (void *)node->item : NULL));
 	}
 	return true;
-      }else if ((Event.Key.Modifiers & CSMASK_ALLSHIFTS) == CSMASK_CTRL) {
+      }
+      else if ((Event.Key.Modifiers & CSMASK_ALLSHIFTS) == CSMASK_CTRL) 
+      {
 	TreeCtrlNode *node = (TreeCtrlNode *)(treeroot->IsLeaf () ? NULL : 
-					      ((TreeCtrlNode *)treeroot->children.Get (0))->Next());
+				      ((TreeCtrlNode *)treeroot->children.Get (0))->Next ());
 	SendCommand (cscmdTreeTrack, (node? NULL : (void *)node->item) );
 	return true;
       }
       return false;
     case CSKEY_PGDN:
-      if ((Event.Key.Modifiers & CSMASK_ALLSHIFTS) == 0){
+      if ((Event.Key.Modifiers & CSMASK_ALLSHIFTS) == 0)
+      {
 	TreeCtrlNode *node = treeroot->FindItem (focused);
-	for (int i = 0; node && i < vertcount; i++){
+	for (int i = 0; node && i < vertcount; i++)
+	{
 	  node = node->Next ();
 	  SendCommand (cscmdTreeTrack, (void *)node->item);
 	}
 	return true;
-      }else if ((Event.Key.Modifiers & CSMASK_ALLSHIFTS) == CSMASK_CTRL){
+      }
+      else if ((Event.Key.Modifiers & CSMASK_ALLSHIFTS) == CSMASK_CTRL)
+      {
 	SendCommand (cscmdTreeTrack, (void *)GetLast ());
 	return true;
       }
       return false;
     case CSKEY_HOME:
-      if ((Event.Key.Modifiers & CSMASK_CTRL) && (deltax != 0)){
+      if ((Event.Key.Modifiers & CSMASK_CTRL) && (deltax != 0))
+      {
 	deltax = 0;
 	PlaceItems ();
 	return true;
-      }else if ((Event.Key.Modifiers & CSMASK_ALLSHIFTS) == 0){
-	TreeCtrlNode *node = (TreeCtrlNode *)(treeroot->IsLeaf () ? NULL : treeroot->children.Get (0));
+      }
+      else if ((Event.Key.Modifiers & CSMASK_ALLSHIFTS) == 0)
+      {
+	TreeCtrlNode *node = (TreeCtrlNode *)(treeroot->IsLeaf () ? NULL : 
+	                                      treeroot->children.Get (0));
 	SendCommand (cscmdTreeTrack, (node ? (void *)node->item : NULL));
 	return true;
       }
       return false;
     case CSKEY_END:
-      if ((Event.Key.Modifiers & CSMASK_CTRL) && (deltax != maxdeltax)) {
+      if ((Event.Key.Modifiers & CSMASK_CTRL) && (deltax != maxdeltax)) 
+      {
 	deltax = maxdeltax;
 	PlaceItems ();
 	return true;
-      }else if ((Event.Key.Modifiers & CSMASK_ALLSHIFTS) == 0){
+      }
+      else if ((Event.Key.Modifiers & CSMASK_ALLSHIFTS) == 0)
+      {
 	SendCommand (cscmdTreeTrack, (void *)GetLast ());
 	return true;
       }
       return false;
     case '/':
-      if ((TreeStyle & CSTS_MULTIPLESEL) && ((Event.Key.Modifiers & CSMASK_ALLSHIFTS) == CSMASK_CTRL)) {
+      if ((TreeStyle & CSTS_MULTIPLESEL) 
+         && ((Event.Key.Modifiers & CSMASK_ALLSHIFTS) == CSMASK_CTRL)) 
+      {
 	ForEachItem (do_select, NULL, false);
 	return true;
       } /* endif */
       return false;
     case '\\':
-      if ((TreeStyle & CSTS_MULTIPLESEL) && ((Event.Key.Modifiers & CSMASK_ALLSHIFTS) == CSMASK_CTRL)) {
+      if ((TreeStyle & CSTS_MULTIPLESEL) 
+         && ((Event.Key.Modifiers & CSMASK_ALLSHIFTS) == CSMASK_CTRL)) 
+      {
 	ForEachItem (do_deselect, NULL);
 	return true;
       } /* endif */
       return false;
     default:
-      if ((Event.Key.Code >= ' ') && (Event.Key.Code <= 255) && !(Event.Key.Modifiers & (CSMASK_CTRL | CSMASK_ALT))) {
+      if ((Event.Key.Code >= ' ') && (Event.Key.Code <= 255) 
+         && !(Event.Key.Modifiers & (CSMASK_CTRL | CSMASK_ALT))) 
+      {
 	// Find first next item that starts with this letter
 	TreeCtrlNode *node, *focNode = treeroot->FindItem (focused);
-	if (focNode){
-	  node = focNode->Next();
+	if (focNode)
+	{
+	  node = focNode->Next ();
 	  while (node != focNode)
-	    if (node->item->SendCommand (cscmdTreeItemCheck, NULL) && (node->item->GetText () [0] == Event.Key.Code)){
+	    if (node->item->SendCommand (cscmdTreeItemCheck, NULL) 
+               && (node->item->GetText () [0] == Event.Key.Code))
+	    {
 	      SendCommand (cscmdTreeTrack, (void *)node->item);
 	      return true;
-	    }else
+	    }
+	    else
 	      node = node->Next ();
 	}
 	return true;
@@ -707,7 +754,8 @@ bool csTreeCtrl::HandleEvent (csEvent &Event)
     } /* endswitch */
     break;
   case csevCommand:
-    switch (Event.Command.Code){
+    switch (Event.Command.Code)
+    {
     case cscmdTreeClear:
       if (app->MouseOwner == this)
 	app->CaptureMouse (NULL);
@@ -738,24 +786,29 @@ bool csTreeCtrl::HandleEvent (csEvent &Event)
 	
 	SetFocused (item);
 	Select ();
-	if (TreeStyle & CSTS_MULTIPLESEL){
+	if (TreeStyle & CSTS_MULTIPLESEL)
+	{
 	  if (app->GetKeyState (CSKEY_CTRL))
 	    item->SetState (CSS_TREEITEM_SELECTED, selstate = !selstate);
-	  else{
+	  else
+	  {
 	    ForEachItem (do_deselect, (void *)item);
 	    item->SetState (CSS_TREEITEM_SELECTED, selstate = true);
 	  } /* endif */
-	}else
+	}
+	else
 	  item->SetState (CSS_TREEITEM_SELECTED, selstate = true);
 	break;
       }
     case cscmdTreeTrack:
       {
 	csComponent *item = (csComponent *)Event.Command.Info;
-	if (item){
+	if (item)
+	{
 	  if (app->MouseOwner != this)
 	    selstate = true;
-	  if (item->GetState (CSS_SELECTABLE) && item->SendCommand (cscmdTreeItemCheck)) {
+	  if (item->GetState (CSS_SELECTABLE) && item->SendCommand (cscmdTreeItemCheck)) 
+	  {
 	    if (app->MouseOwner != this)
 	      ForEachItem (do_deselect, (void *)item);
 	    SetFocused (item);
@@ -772,16 +825,21 @@ bool csTreeCtrl::HandleEvent (csEvent &Event)
       Event.Command.Info = FindFirstSelected ();
       return true;
     case cscmdTimerPulse:
-      if (app && app->MouseOwner == this){
+      if (app && app->MouseOwner == this)
+      {
 	app->GetMouse ()->GetPosition (Event.Mouse.x, Event.Mouse.y);
 	GlobalToLocal (Event.Mouse.x, Event.Mouse.y);
-	if (app->MouseOwner == this){
+	if (app->MouseOwner == this)
+	{
 	  TreeCtrlNode *node = treeroot->FindItem (focused);
-	  if (Event.Mouse.y < BorderHeight){
+	  if (Event.Mouse.y < BorderHeight)
+	  {
 	    node = (node ? node->Prev () : NULL );
 	    SendCommand (cscmdTreeTrack, (node ? (void *)node->item : NULL));
-	  }else if ((Event.Mouse.y > bound.Height () - BorderHeight)
-		    || (hscroll  && (Event.Mouse.y >= hscroll->bound.ymin))){
+	  }
+	  else if ((Event.Mouse.y > bound.Height () - BorderHeight)
+		    || (hscroll  && (Event.Mouse.y >= hscroll->bound.ymin)))
+	  {
 	    node = (node ? node->Next () : NULL );
 	    SendCommand (cscmdTreeTrack,  (node ? (void *)node->item : NULL));
 	  }
@@ -798,20 +856,28 @@ bool csTreeCtrl::HandleEvent (csEvent &Event)
 	if (sbs.maxvalue <= 0)
 	  return true;
 	  
-	if (bar == hscroll){
+	if (bar == hscroll)
+	{
 	  hsbstatus = sbs;
-	  if (deltax != hsbstatus.value){
+	  if (deltax != hsbstatus.value)
+	  {
 	    deltax = hsbstatus.value;
 	    PlaceItems (false);
 	  } /* endif */
-	} else if (bar == vscroll){
+	} 
+	else if (bar == vscroll)
+	{
 	  vsbstatus = sbs;
 	  TreeCtrlNode *cur, *firstNode;
 	  cur = firstNode = (TreeCtrlNode*)treeroot->children.Get (0);
-	  do {
-	    if (cur->item->SendCommand (cscmdTreeItemCheck, NULL)) {
-	      if (sbs.value == 0) {
-		if (firstvisible != cur->item) {
+	  do
+	  {
+	    if (cur->item->SendCommand (cscmdTreeItemCheck, NULL)) 
+	    {
+	      if (sbs.value == 0) 
+	      {
+		if (firstvisible != cur->item) 
+		{
 		  firstvisible = cur->item;
 		  PlaceItems (false);
 		} /* endif */
@@ -830,7 +896,8 @@ bool csTreeCtrl::HandleEvent (csEvent &Event)
       Event.Command.Info = ForEachItem (do_findtext, (char *)Event.Command.Info);
       return true;
     case cscmdTreeAddChild:
-      Event.Command.Info = (void*)AddChild ( ((csComponent**)Event.Command.Info)[0], ((csComponent**)Event.Command.Info)[1]);
+      Event.Command.Info = (void*)AddChild (((csComponent**)Event.Command.Info)[0],
+                                            ((csComponent**)Event.Command.Info)[1]);
       return true;
     case cscmdTreeRemoveChild:
       RemoveChild ((csComponent*)Event.Command.Info);
@@ -845,15 +912,18 @@ bool csTreeCtrl::HandleEvent (csEvent &Event)
 void csTreeCtrl::MakeItemVisible (csComponent *item)
 {
   TreeCtrlNode *cur=treeroot->FindItem (item);
-  if (!cur) return;
+  if (!cur) 
+    return;
 
   // are the item parent nodes all open ?
   bool bOpen = true;
-  while (bOpen && cur){
+  while (bOpen && cur)
+  {
     cur = (TreeCtrlNode*)cur->parent;
     if (cur) bOpen = cur->open;
   }
-  if (!bOpen) return;
+  if (!bOpen) 
+    return;
 
   if (!item->SendCommand (cscmdTreeItemScrollVertically, (void *)false))
   {
@@ -863,7 +933,8 @@ void csTreeCtrl::MakeItemVisible (csComponent *item)
 
   TreeCtrlNode *firstNode = (TreeCtrlNode*)treeroot->children.Get (0);
   TreeCtrlNode *firstVisNode = treeroot->FindItem (firstvisible);
-  if (!firstVisNode) firstVisNode = firstNode;
+  if (!firstVisNode) 
+    firstVisNode = firstNode;
 
   cur = firstVisNode;
   while (cur && (cur != firstNode) && (cur->item != item))
@@ -964,7 +1035,9 @@ static bool CompareTreeCtrlNode ( csTreeNode *node, csSome param, bool stopOnSuc
 }
 
 csTreeCtrl::TreeCtrlNode *csTreeCtrl::TreeCtrlNode::FindItem (csComponent *theItem)
-{ return (csTreeCtrl::TreeCtrlNode *)DSF (CompareTreeCtrlNode, NULL, theItem, true); }
+{ 
+  return (csTreeCtrl::TreeCtrlNode *)DSF (CompareTreeCtrlNode, NULL, theItem, true); 
+}
 
 csTreeCtrl::TreeCtrlNode *csTreeCtrl::TreeCtrlNode::Next (TreeCtrlNode* after)
 {
@@ -974,15 +1047,19 @@ csTreeCtrl::TreeCtrlNode *csTreeCtrl::TreeCtrlNode::Next (TreeCtrlNode* after)
    */
   TreeCtrlNode *foundNode=NULL;
 
-  if (!open || (!after && IsLeaf ()) || (after && children.Find (after) == children.Length()-1)){
+  if (!open || (!after && IsLeaf ()) || (after && children.Find (after) == children.Length ()-1))
+  {
     if (parent)
       return ((TreeCtrlNode *)parent)->Next (this);
     else
       return (IsLeaf () ? NULL : (TreeCtrlNode*)children.Get (0) );
-  }else{
+  }
+  else
+  {
     if (!after)
       foundNode = (TreeCtrlNode*)children.Get (0);
-    else{
+    else
+    {
       int idx = children.Find (after);
       if (idx != -1)
 	foundNode = (TreeCtrlNode*)children.Get (idx+1);
@@ -998,23 +1075,30 @@ csTreeCtrl::TreeCtrlNode *csTreeCtrl::TreeCtrlNode::Prev (TreeCtrlNode* before)
    * would draw the entire tree.
    */
   TreeCtrlNode *foundNode=NULL, *node;
-  if (!before || !open ){
+  if (!before || !open )
+  {
     if (parent)
       return ((TreeCtrlNode *)parent)->Prev (this);
     else
       return NULL;
-  }else{
+  }
+  else
+  {
     int idx = children.Find (before)-1;
-    if (idx >= 0){
+    if (idx >= 0)
+    {
       node = (TreeCtrlNode*)children.Get (idx);
       if (!node->open || node->IsLeaf ())
 	foundNode = node;
-      else{
+      else
+      {
 	while (!node->IsLeaf () && node->open)
 	  node = (TreeCtrlNode*)node->children.Get (node->children.Length ()-1);
 	foundNode = node;
       }
-    }else if(idx == -1) return this;
+    }
+    else if(idx == -1) 
+           return this;
   }
   return foundNode;
 }
@@ -1030,7 +1114,8 @@ static bool TreeItemSelected (csTreeNode *node, csSome param, bool stopOnSuccess
   (void)stopOnSuccess;
   csComponent *c = ((csTreeCtrl::TreeCtrlNode*)node)->item;
   bool isSel = c->GetState (CSS_TREEITEM_SELECTED);
-  if (param && isSel){
+  if (param && isSel)
+  {
     ((csVector*)param)->Push (c);
   }
   return isSel;
@@ -1065,14 +1150,20 @@ bool csTreeCtrl::AddChild (csComponent *item1, csComponent *item2)
     node1 = treeroot;
   else
     node1 = treeroot->FindItem (item1);
-  if (node1){
-    if (node2){
-      if (node2->parent != node1){
+  if (node1)
+  {
+    if (node2)
+    {
+      if (node2->parent != node1)
+      {
 	// move item2 to new parent
-	if (node2->parent) node2->parent->RemoveChild (node2);
+	if (node2->parent) 
+	  node2->parent->RemoveChild (node2);
 	node1->AddChild (node2);
       }
-    }else{
+    }
+    else
+    {
       (void)new TreeCtrlNode (item2, node1, false);
     }
     succ = true;
@@ -1099,7 +1190,8 @@ static bool ZipTreeItemCanvas (csTreeNode *node, csSome param, bool stopOnSucces
 void csTreeCtrl::SwitchOpenState (csComponent *item)
 {
   TreeCtrlNode *node = treeroot->FindItem (item);
-  if (node){
+  if (node)
+  {
     node->open = !node->open;
     treeroot->DSF (ZipTreeItemCanvas, NULL, NULL, false);
     PlaceItems ();
@@ -1110,7 +1202,8 @@ void csTreeCtrl::SwitchOpenState (csComponent *item)
 void csTreeCtrl::OpenItem (csComponent *item)
 {
   TreeCtrlNode *node = treeroot->FindItem (item);
-  if (node && !node->open){
+  if (node && !node->open)
+  {
     node->open = true;
     treeroot->DSF (ZipTreeItemCanvas, NULL, NULL, false);
     PlaceItems ();
@@ -1137,7 +1230,8 @@ void csTreeCtrl::OpenAll ()
 void csTreeCtrl::CollapseItem (csComponent *item)
 {
   TreeCtrlNode *node = treeroot->FindItem (item);
-  if (node && node->open){
+  if (node && node->open)
+  {
     node->open = false;
     treeroot->DSF (ZipTreeItemCanvas, NULL, NULL, false);
     PlaceItems ();
@@ -1163,7 +1257,8 @@ void csTreeCtrl::CollapseAll ()
 
 void csTreeCtrl::SetBranchIndent (int x)
 {
-  if (x != branchdeltax){
+  if (x != branchdeltax)
+  {
     branchdeltax = x;
     PlaceItems ();
     Invalidate ();
