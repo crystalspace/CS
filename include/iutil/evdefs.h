@@ -35,7 +35,8 @@
 #ifndef __IUTIL_EVDEFS_H__
 #define __IUTIL_EVDEFS_H__
 
-/// System Events: take care not to define more than 32 event types
+/// System Events
+// take care not to define more than 32 event types
 enum
 {
   /// Nothing happened	
@@ -277,7 +278,7 @@ enum
  * The system driver checks it and if several event plugs generates
  * conflicting types events, one of them (the one with lower priority)
  * is disabled.
- */
+ * @{ */
 /// Keyboard events
 #define CSEVTYPE_Keyboard	0x00000001
 /// Mouse events
