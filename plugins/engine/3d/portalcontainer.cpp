@@ -151,7 +151,7 @@ csRenderMesh** csPortalContainer::GetRenderMeshes (int& num,
   csRenderMesh*& meshPtr = rmHolder.GetUnusedMesh (rmCreated,
     rview->GetCurrentFrameNumber ());
 
-  csReversibleTransform &o2wt = meshwrapper->GetCsMovable ().GetFullTransform ();
+  csReversibleTransform o2wt = meshwrapper->GetCsMovable().GetFullTransform();
 
   meshPtr->portal = this;
   meshPtr->material = 0;
