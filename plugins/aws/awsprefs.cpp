@@ -70,6 +70,11 @@ bool awsPrefManager::Setup (iObjectRegistry *obj_reg)
   if (DEBUG_INIT) printf ("aws-debug: creating texture manager.\n");
 
   g2d = CS_QUERY_REGISTRY (obj_reg, iGraphics2D);
+  if (!g2d)
+  {
+    printf ("aws-debug: Couldn't find iGraphics2D plugin!!\n");
+    return false;
+  }
   awstxtmgr = new awsTextureManager ();
   if (!awstxtmgr) return false;
   if (DEBUG_INIT) printf ("aws-debug: initing texture manager\n");
