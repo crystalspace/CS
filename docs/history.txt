@@ -710,7 +710,7 @@ chronological order.
 	  macosx.mak.  Specifically, work-around for Jam 2.4 bug which sets
 	  RANLIB to "", and use of "-s" option with ranlib for MacOS/X Panther.
 	  This allows the issues to be addressed in centralized locations, thus
-	  giving external simpler access to the solutions.
+	  giving external projects simpler access to the solutions.
 	- Vincent Knecht updated cs.spec so we can build RPMs from CS current
 	  snapshot.  Building is now done with Jam.
 7-Feb-2004
