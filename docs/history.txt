@@ -111,6 +111,9 @@ chronological order.
 	  adjusting acceleration instead of speed of particles.  This alters
 	  the effects of any particle system using the emitter plugin with
 	  an attractor noticably.
+	- Rhad fixed some bugs in partedit including position values carrying 
+	  over into speed/accel/attractor.  Initial speed/accel weren't being
+	  properly updated in UI.
 20-Oct-2003
         - Philip Wyett added 'joytest' to CS/ root .cvsignore file.
 	- Jorrit added thing.cfg.

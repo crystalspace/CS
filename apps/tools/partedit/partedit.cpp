@@ -463,6 +463,7 @@ bool PartEdit::RecreateParticleSystem(const char *texturefile)
 
 
   // Determine Speed Emitter
+  use_emitter=EMITTER_NONE;
   if (state_initial_speed.fixed_weight>0) { use_emitter= (use_emitter==EMITTER_NONE ? EMITTER_POINT : EMITTER_MIX); }
   if (state_initial_speed.line_weight>0) { use_emitter= (use_emitter==EMITTER_NONE ? EMITTER_LINE : EMITTER_MIX); }
   if (state_initial_speed.box_weight>0) { use_emitter= (use_emitter==EMITTER_NONE ? EMITTER_BOX : EMITTER_MIX); }
@@ -551,6 +552,7 @@ bool PartEdit::RecreateParticleSystem(const char *texturefile)
 
 
   // Determine Acceleration Emitter
+  use_emitter=EMITTER_NONE;
   if (state_initial_acceleration.fixed_weight>0) { use_emitter= (use_emitter==EMITTER_NONE ? EMITTER_POINT : EMITTER_MIX); }
   if (state_initial_acceleration.line_weight>0) { use_emitter= (use_emitter==EMITTER_NONE ? EMITTER_LINE : EMITTER_MIX); }
   if (state_initial_acceleration.box_weight>0) { use_emitter= (use_emitter==EMITTER_NONE ? EMITTER_BOX : EMITTER_MIX); }
@@ -645,6 +647,7 @@ bool PartEdit::RecreateParticleSystem(const char *texturefile)
   {
 
     // Determine Attractor "Emitter"
+    use_emitter=EMITTER_NONE;
     if (state_attractor.e3d_state.fixed_weight>0) { use_emitter= (use_emitter==EMITTER_NONE ? EMITTER_POINT : EMITTER_MIX); }
     if (state_attractor.e3d_state.line_weight>0) { use_emitter= (use_emitter==EMITTER_NONE ? EMITTER_LINE : EMITTER_MIX); }
     if (state_attractor.e3d_state.box_weight>0) { use_emitter= (use_emitter==EMITTER_NONE ? EMITTER_BOX : EMITTER_MIX); }
@@ -1023,8 +1026,8 @@ bool PartEdit::Initialize ()
   s->SetGraphicFile("cslogo2.png");
   s->SetEmitterState(&state_emitter);
   s->SetInitialPositionState(&state_initial_position);
-  s->SetInitialSpeedState(&state_initial_position);
-  s->SetInitialAccelerationState(&state_initial_position);
+  s->SetInitialSpeedState(&state_initial_speed);
+  s->SetInitialAccelerationState(&state_initial_acceleration);
   s->SetAttractorState(&state_attractor);
 
 
