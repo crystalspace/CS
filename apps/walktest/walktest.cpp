@@ -302,6 +302,8 @@ void WalkTest::NextFrame ()
   cs_time elapsed_time, current_time;
   GetElapsedTime (elapsed_time, current_time);
 
+  if(elapsed_time == 0) return;
+
   if (perf_stats) timeFPS = perf_stats->GetFPS ();
   else timeFPS = 0;
 
@@ -1648,7 +1650,7 @@ int main (int argc, char* argv[])
 
   extern void CreateSystem(void);
   CreateSystem();
-
+  
   // Initialize the main system. This will load all needed plugins
   // (3D, 2D, network, sound, ..., engine) and initialize them.
   if (!Sys->Initialize (argc, argv, "/config/walktest.cfg"))
@@ -1677,7 +1679,7 @@ int main (int argc, char* argv[])
   return 1;
 }
 
-#if 0
+#if 1
 
 #define DETECT_SIZE 20
 #define DETECT     "ABCDabcd01234567890+"
