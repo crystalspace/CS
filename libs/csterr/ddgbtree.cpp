@@ -67,14 +67,13 @@ ostream& operator << ( ostream&s, ddgTBinTree b )
 #endif
 
 /// s = size along one edge of mesh, mesh is 'square'.
-ddgTBinTree::ddgTBinTree( ddgTBinMesh *m, ddgHeightMap* h, ddgVector3 *n, int dr, int dc, bool mirror )
+ddgTBinTree::ddgTBinTree( ddgTBinMesh *m, ddgHeightMap* h, int dr, int dc, bool mirror )
 {
     _init = false;
 	_mesh = m;
     _dr = dr;
     _dc = dc;
 	heightMap = h;
-	normalMap = n;
     _mirror = mirror;
 	_pNeighbourTop = NULL;
 	_pNeighbourLeft = NULL;
@@ -99,22 +98,26 @@ static float maxTh = 0;
  */
 bool ddgTBinTree::init( void )
 {
-	// Avoid being called twice (once for each camera).
+	// Avoid being called twice.
 	if (_init)
 		return false;
 	else
 		_init = true;
 	//          va     1 size,0
 	// Dummy entries.
-	tri(triNo())->thick( 999);
-	tri(triNo()+1)->thick(999);
+	tri(triNo())->thick( 9999);
+	tri(triNo()+1)->thick(9999);
 	// Top level triangles.
 	tri(0)->_state.all = 0;
 	tri(1)->_state.all = 0;
+	tri(0)->_cbufindex = 0;
+	tri(1)->_cbufindex = 0;
 	tri(1)->reset();
 	tri(triNo())->_state.all = 0;
 	tri(triNo()+1)->_state.all = 0;
-//cerr << ".";
+	tri(triNo())->_cbufindex = 0;
+	tri(triNo()+1)->_cbufindex = 0;
+
     split(1,0,triNo(),triNo()+1,1);
 
 	tri(0)->thick( tri(2)->thick()> tri(3)->thick()?tri(2)->thick():tri(3)->thick());
@@ -402,35 +405,57 @@ void ddgTBinTree::visibility(ddgTriIndex tvc, unsigned int level)
 			// Calculate bounding box of wedgie.
 			ddgVector3 pmin;
 			ddgVector3 pmax;
+			ddgVector3 *ptri;
 			ddgVector3 vu, vl;
 			ddgVector3 th;
 			// Calculate the parent.
+			ptri = pos(tva);
 			if (!tri(tva)->_state.flags.coord)
 			{
 				vertex(tva,wpqr);
-				_mesh->transform( wpqr, tri(tva)->_cpqr );
+				_mesh->transform( wpqr, ptri );
 				tri(tva)->_state.flags.coord = true;
 			}
 			th.set(unit());
 			th.multiply(tri(tvc)->thick());
-			vu = tri(tva)->_cpqr+th;
-			vl = tri(tva)->_cpqr-th;
+			vu = ptri+th;
+			vl = ptri;
+			vl.subtract(th);
 			pmin.set(vu);
 			pmax.set(vu);
 			pmin.minimum(vl);
 			pmax.maximum(vl);
 
 			// Calculate the left and right vertex.
+			ptri = pos(tv0);
 			if (!tri(tv0)->_state.flags.coord)
 			{
 				vertex(tv0,wpqr);
-				_mesh->transform( wpqr, tri(tv0)->_cpqr );
+				_mesh->transform( wpqr, ptri );
 				tri(tv0)->_state.flags.coord = true;
 			}
 			th.set(unit());
 			th.multiply(tri(tv0)->thick());
-			vu = tri(tv0)->_cpqr+th;
-			vl = tri(tv0)->_cpqr-th;
+			vu = ptri+th;
+			vl = ptri;
+			vl.subtract(th);
+			pmin.minimum(vu);
+			pmax.maximum(vu);
+			pmin.minimum(vl);
+			pmax.maximum(vl);
+
+			ptri = pos(tv1);
+			if (!tri(tv1)->_state.flags.coord)
+			{
+				vertex(tv1,wpqr);
+				_mesh->transform( wpqr, ptri );
+				tri(tv1)->_state.flags.coord = true;
+			}
+			th.set(unit());
+			th.multiply(tri(tv1)->thick());
+			vu = ptri+th;
+			vl = ptri;
+			vl.subtract(th);
 			pmin.minimum(vu);
 			pmax.maximum(vu);
 			pmin.minimum(vl);
@@ -439,13 +464,14 @@ void ddgTBinTree::visibility(ddgTriIndex tvc, unsigned int level)
 			if (!tri(tv1)->_state.flags.coord)
 			{
 				vertex(tv1,wpqr);
-				_mesh->transform( wpqr, tri(tv1)->_cpqr );
+				_mesh->transform( wpqr, pos(tv1) );
 				tri(tv1)->_state.flags.coord = true;
 			}
 			th.set(unit());
 			th.multiply(tri(tv1)->thick());
-			vu = tri(tv1)->_cpqr+th;
-			vl = tri(tv1)->_cpqr-th;
+			vu = pos(tv1)+th;
+			vl = pos(tv1);
+			vl.subtract(th);
 			pmin.minimum(vu);
 			pmax.maximum(vu);
 			pmin.minimum(vl);
@@ -553,7 +579,7 @@ unsigned short ddgTBinTree::priority(ddgTriIndex tvc)
 	if (!tri(tva)->_state.flags.coord)
 	{
         vertex(tva,wpqr);
-		_mesh->transform( wpqr, tri(tva)->_cpqr );
+		_mesh->transform( wpqr, pos(tva) );
 		tri(tva)->_state.flags.coord = true;
 	}
 
@@ -561,13 +587,13 @@ unsigned short ddgTBinTree::priority(ddgTriIndex tvc)
 	if (!tri(tv0)->_state.flags.coord)
 	{
         vertex(tv0,wpqr);
-		_mesh->transform( wpqr, tri(tv0)->_cpqr );
+		_mesh->transform( wpqr, pos(tv0) );
 		tri(tv0)->_state.flags.coord = true;
 	}
 	if (!tri(tv1)->_state.flags.coord)
 	{
         vertex(tv1,wpqr);
-		_mesh->transform( wpqr, tri(tv1)->_cpqr );
+		_mesh->transform( wpqr, pos(tv1) );
 		tri(tv1)->_state.flags.coord = true;
 	}
 
@@ -575,31 +601,50 @@ unsigned short ddgTBinTree::priority(ddgTriIndex tvc)
 	ddgVector3 th(unit());
 	th.multiply(tri(tvc)->thick());
 
+	float result = ddgMAXPRI;
+#define ddgEPSILON 0.00001
+	ddgVector3 vp = pos(tva);
 	float a = th[0],
 		  b = th[2],
 		  c = th[1],
-		  p = tri(tva)->_cpqr[0],
-		  q = tri(tva)->_cpqr[1],
-		  r = tri(tva)->_cpqr[2];
-	float da = 2.0 * sqrt(sq(a*r-c*p)+sq(b*r-c*q)) / (r*r - c*c);
-    p = tri(tv0)->_cpqr[0];
-    q = tri(tv0)->_cpqr[1];
-    r = tri(tv0)->_cpqr[2];
-	float d0 = 2.0 * sqrt(sq(a*r-c*p)+sq(b*r-c*q)) / (r*r - c*c);
-    p = tri(tv1)->_cpqr[0];
-    q = tri(tv1)->_cpqr[1];
-    r = tri(tv1)->_cpqr[2];
-	float d1 = 2.0 * sqrt(sq(a*r-c*p)+sq(b*r-c*q)) / (r*r - c*c);
+		  p = vp[0],
+		  q = vp[1],
+		  r = vp[2],
+		  d, da, d0, d1,
+		  m, ma, m0, m1;
+	if (r*r <= c*c + ddgEPSILON)
+		goto skip;
+	da = (sq(a*r-c*p)+sq(b*r-c*q));
+	ma = 2.0 / (r*r - c*c);
+	vp = pos(tv0);
+    p = vp[0];
+    q = vp[1];
+    r = vp[2];
+	if (r*r <= c*c + ddgEPSILON)
+		goto skip;
+	d0 = (sq(a*r-c*p)+sq(b*r-c*q));
+	m0 = 2.0 / (r*r - c*c);
+	vp = pos(tv1);
+    p = vp[0];
+    q = vp[1];
+    r = vp[2];
+	if (r*r <= c*c + ddgEPSILON)
+		goto skip;
+	d1 = (sq(a*r-c*p)+sq(b*r-c*q));
+	m1 = 2.0 / (r*r - c*c);
 
-    float d = ddgUtil::max(da,ddgUtil::max(d0,d1));
-
+    d = ddgUtil::max(da,ddgUtil::max(d0,d1));
+    m = ddgUtil::max(ma,ddgUtil::max(m0,m1));
+	result = sqrt(d) * m;
+	result = ddgUtil::clamp(result*1000,1,ddgMAXPRI);
+skip:
 	_mesh->priCountIncr();
 	// Map the priority into a range from 0 to ddgMAXPRI.
-	tri(tvc)->priority( (unsigned short)ddgUtil::clamp(d*1000,1,ddgMAXPRI));
+	tri(tvc)->priority( (unsigned short)result);
 	// Calculate recalc delay.
-	float zMin = tri(tva)->_cpqr[2];
-	if ( zMin < tri(tv0)->_cpqr[2]) zMin = tri(tv0)->_cpqr[2];
-	if ( zMin < tri(tv1)->_cpqr[2]) zMin = tri(tv1)->_cpqr[2];
+	float zMin = pos(tva,2);
+	if ( zMin < pos(tv0,2)) zMin = pos(tv0,2);
+	if ( zMin < pos(tv1,2)) zMin = pos(tv1,2);
 #ifdef DDG
 	if (zMin < 2*_mesh->progDist())
 		tri(tvc)->setDelay(2);

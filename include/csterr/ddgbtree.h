@@ -24,7 +24,7 @@
 /**
  * A triangle object maintained by a TBinTree mesh.
  * The data in this class is unique for each TBinTree.
- * 2+2+2+1+1+1+12=21 bytes.
+ * 2+2+2+1+1+1=9 bytes. Compiler aligns to 10
  * Convert to Structure Of Arrays.
  */
 #define ddgMAXPRI 50000
@@ -32,23 +32,25 @@ class WEXP ddgMTri {
 	friend class ddgTBinTree;
 	friend class ddgTBinMesh;  // May be able to remove dependency.
 	/**
-	 * Thickness of this triangle's wedgie.
+	 * Thickness of this triangle's wedgie.		(2 bytes)
 	 * Equals the sum of thickness of all sub triangles.
 	 */
-	unsigned short _thick;		/// (2 bytes)
+	unsigned short _thick;
 	/** Triangle priority. (2 bytes)
      *	0 - ddgMAXPRI   - Normal priorities.
 	 *  ddgMAXPRI + 1   undefined.
 	 */
 	unsigned short _priority;
-    /// The index of the location in the vbuffer for this vertex.(2 byte)
-	unsigned short _vbufindex;
+    /**
+	 * This value if used for 2 purposes:						(2 bytes)
+	 * Initially it is an index into the transformed vertex cache.
+	 * at rendertime it is reused as an index into the vertex buffers.
+	 */
+	unsigned short _cbufindex;
 	/// Refresh priority delay.  Reset to 0 when entering queue. (1 byte)
 	unsigned char _delay;
     /// The flags which incidate which frustrum sides we intersected. (1 byte)
 	ddgClipFlags _vis;
-	/// Camera space vector for this vertex. (3*4=12 bytes).
-	ddgVector3	  _cpqr;
 	/// Flags indicating the triangle's state.
 	typedef union {
 		unsigned char all;
@@ -70,18 +72,14 @@ public:
 	inline ddgClipFlags vis(void) { return _vis; }
 	/// Return the objects visibility flags.
 	inline ddgStateFlags state(void) { return _state; }
-	/// Set the camera space vector.
-	inline void pos(ddgVector3 v) { _cpqr.set(v);}
-	/// Return the camera space vector.
-	inline ddgVector3* pos(void) { return _cpqr; }
     /// Set the priority of this triangle.
     inline unsigned short  priority(unsigned short p) { return _priority = p; }
     /// Return the priority of this triangle.
     inline unsigned short  priority(void) { return _priority; }
     /// Set the buffer index of this triangle.
-    inline unsigned int  vbufindex(unsigned int i) { return _vbufindex = i; }
+    inline unsigned int  vbufindex(unsigned int i) { return _cbufindex = i; }
     /// Return the buffer index of this triangle.
-    inline unsigned int  vbufindex(void) { return _vbufindex; }
+    inline unsigned int  vbufindex(void) { return _cbufindex; }
     /// Set the buffer flag for this triangle.
     inline unsigned int  setvbufflag(void) { return _state.flags.vbuffer = true; }
 	///	get wedge thickness.
@@ -98,6 +96,7 @@ public:
 		_state.flags.dirty = false;
 		_state.flags.vbuffer = false;
 	    _vis.visibility = ddgINIT;
+		_cbufindex = 0; 
 	}
 	/// Set priority delay.
 	inline void setDelay(unsigned char d) { _delay = d; }
@@ -154,8 +153,6 @@ class WEXP ddgTBinTree {
 	ddgMTri* _tri;
 	/// Height data map.
 	ddgHeightMap *heightMap;
-	/// Normals data map.
-	ddgVector3 *normalMap;
 	/**
 	 * Pointer to neighbouring TBinTrees.
 	 *<pre>
@@ -182,7 +179,7 @@ public:
 	/**
 	 *  Construct a Bintree mesh.
 	 */
-	ddgTBinTree(ddgTBinMesh *m, ddgHeightMap* h, ddgVector3 *n, int dr = 0, int dc = 0, bool mirror = false);
+	ddgTBinTree(ddgTBinMesh *m, ddgHeightMap* h, int dr = 0, int dc = 0, bool mirror = false);
 	/// Destroy the Bintree mesh.
 	~ddgTBinTree(void);
 
@@ -259,14 +256,6 @@ public:
         if (tri(tindex)->state().flags.vbuffer)
             return tri(tindex)->vbufindex();
         return 0;
-    }
-
-    void normal(ddgTriIndex tindex, ddgVector3* n)
-    {
-        if (_mirror)
-        	n->set(normalMap[(_dr-row(tindex))*heightMap->cols()+(_dc-col(tindex))]);
-        else
-        	n->set(normalMap[(_dr+row(tindex))*heightMap->cols()+(_dc+col(tindex))]);
     }
 
     /// Get texture coord data.
@@ -421,6 +410,18 @@ public:
 	void index(unsigned int i) { _index = i; }
 	/// Return the index in the mesh.
 	unsigned int index(void) { return _index; }
+	/// Return the camera space vector.
+	inline ddgVector3* pos(ddgTriIndex ti)
+	{
+		if (tri(ti)->_cbufindex == 0)
+		{
+		// Get new entry.
+			tri(ti)->_cbufindex = _mesh->vcache()->alloc();
+		}
+		return _mesh->vcache()->get( tri(ti)->_cbufindex );
+	}
+	/// Return the camera space vector.
+	inline float pos(ddgTriIndex ti, unsigned int i) { return pos( ti )->v[i]; }
 
 };
 

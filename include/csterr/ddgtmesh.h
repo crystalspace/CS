@@ -70,7 +70,34 @@ public:
 };
 
 
-
+/**
+ *  Vertex cache.
+ * all vertices which are transformed to camera space
+ * are kept by this cache in case they are needed again for
+ * another calculation during this frame.
+ * Note entry 0 in the cache is unused.
+ */
+class WEXP ddgVCache {
+	/// Max size of cache.
+	unsigned short	_size;
+	/// Current size.
+	unsigned short _used;
+	/// Pointer to array of Vector3s.
+	ddgVector3		*_cache;
+public:
+	/// Create cache.
+	ddgVCache();
+	/// Destroy cache.
+	~ddgVCache();
+	/// Initialize the cache.
+	void init (unsigned int size );
+	/// Get entry.
+	ddgVector3		*get(unsigned short index);
+	/// New entry.
+	unsigned short	alloc(void);
+	/// Reset cache to empty.
+	void reset(void);
+};
 
 /**
  * ROAM Triangle Bintree mesh shared data.<br>
@@ -172,6 +199,8 @@ class WEXP ddgTBinMesh
 	unsigned int _bintreeMax;
 	/// Bintree's managed by this mesh
 	ddgTBinTree ** _bintree;
+	/// A transformed vertex cache.
+	ddgVCache		_vcache;
 	/// Number of visible triangles in the mesh.
 	unsigned int _visTri;
 	/// Split queue.
@@ -360,7 +389,11 @@ public:
 	/// Near clip range triangles beyond this point are not needed.
 	inline void nearclip(float n) { _nearclip = n; }
 	/// Return the row/col index and tree at a given location.
+	void progDist(float p ) { _progDist = p; }
+	/// Return the row/col index and tree at a given location.
 	float progDist(void) { return _progDist; }
+	/// Return the vertex cache.
+	ddgVCache	*vcache(void) { return &_vcache; }
 	/**
      * Input: x,z in mesh coords (note these values are modified).
      * Output: Bintree which owns this coord.
@@ -375,15 +408,6 @@ public:
 	 * Cannot be called before init.
      */
     float height(float x, float z);
-	/** Generate a normal map from this image.
-	 *  height map should be a single component image.
-	 *  this map will be a three component image of
-	 *  the same dimension as heights.
-	 *  aspect is the ratio of vertical units vs horizontal units.
-	 *  Default every horizontal unit = 10m.
-	 *                vertical   unit = 0.1m.
-	 */
-	void generateNormals(void);
 	/// Total number of triangles rendered.
     void triCountIncr(void) { _triCount++; }
 	/// Total number of priorities calculated.

@@ -91,7 +91,7 @@ public:
   /// Set the texture for this surface.
   void SetTexture (csTextureHandle *texture) { _textureMap = texture; }
   /// Choose a color for a vertex.
-  void classify( ddgVector3 *p, ddgVector3 *n, ddgColor3 *c);
+  void classify( ddgVector3 *p, ddgColor3 *c);
 
   CSOBJTYPE;
 };
