@@ -439,6 +439,8 @@ public:
       { scfParent->ShineLights (mesh); }
     virtual void CalculateSectorBBox (csBox3& bbox, bool do_meshes) const
       { scfParent->CalculateSectorBBox (bbox, do_meshes); }
+    virtual const char* GetName() const
+      { return scfParent->GetName(); }
     virtual bool HasFog () const
       { return scfParent->HasFog (); }
     virtual csFog *GetFog () const

@@ -58,6 +58,8 @@ struct iSector : public iBase
   /// Get the iObject for this sector.
   virtual iObject *QueryObject() = 0;
 
+  /// returns the name of the sector
+  virtual const char* GetName() const = 0;
   /// Has this sector fog?
   virtual bool HasFog () const = 0;
   /// Return the fog structure (even if fog is disabled)
