@@ -333,7 +333,7 @@ public:
    * The intersection point is returned in isect.
    */
   static float Z0Plane (
-    const csVector3& v, const csVector3& v,
+    const csVector3& v1, const csVector3& v2,
     csVector3& isect);                    // intersection point
 
   /**
