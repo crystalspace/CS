@@ -11,6 +11,7 @@ chronological order.
 	  mesh object. Unfortunatelly this means that this plugin now
 	  requires the CVS version of cal3d. Version 0.9 is no longer
 	  sufficient.
+        - Philip Wyett removed the sprcal3d plugin from the default MSVC build.
 31-Aug-2003
         - Philip Wyett changed #include "GL/glu.h" to <GL/glu.h>, in the new
           GL renderer gl_txtcache.cpp, eliminating the warning messages within
