@@ -19,6 +19,8 @@
 #ifndef __IVIDEO_CODEC_H__
 #define __IVIDEO_CODEC_H__
 
+/**\file
+ */
 /*
  * This is an interface for playing video.
  */

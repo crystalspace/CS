@@ -26,6 +26,9 @@
 #ifndef __IVIDEO_CURSOR_H__
 #define __IVIDEO_CURSOR_H__
 
+/**\file
+ */
+ 
 /**
  * Standard mouse cursor IDs
  */
