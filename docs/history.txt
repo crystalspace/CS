@@ -14,7 +14,7 @@ chronological order.
 	- res fixed Thing material replacing for NR.
 	- res fixed csbench to also set a new material on the walls for the
 	  shader benchmarks.
-	- res fixed wrong VFS paths to stone4DOT3.png.
+	- res fixed wrong VFS paths to stone2DOT3.png.
 22-Jun-2004
 	- Jorrit corrected the fps timings for csbench to use a constant.
 	- Eric Sunshine augmented jamtemplate so that it creates a
