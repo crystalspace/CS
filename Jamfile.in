@@ -36,10 +36,10 @@ CleanDir maintainerclean : autom4te.cache ;
 Depends maintainerclean : distclean ;
 
 # Process subdirectories
+SubInclude TOP data ;
 SubInclude TOP libs ;
 SubInclude TOP plugins ;
 SubInclude TOP apps ;
-SubInclude TOP data ;
 SubInclude TOP docs ;
 SubInclude TOP include ;
 SubInclude TOP scripts ;

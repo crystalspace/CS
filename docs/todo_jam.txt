@@ -62,3 +62,7 @@ W - Wishlist (the build also works without this feature)
     should be generated into the out directory. Then we should provide rules
     to copy the stuff back to the source directories for an eventual cvs
     commit.
+[M] The current install strategy for config and mapfiles is not very robust as
+    you have to first mark them as config/mapfile and then run an install rule
+    in another Jamfile. We should make this simpler with only 1 command which
+    creates the install target.

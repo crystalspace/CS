@@ -44,6 +44,7 @@ The history order is reversed so that new features are at the top.
 	  bugfree :-)
 	- Eric Sunshine augmented the Jam system so that it now builds the
 	  new renderer if --enable-new-renderer was specified with configure.
+	- Matze fixed broken install_maps target in jam. And added a TODO
 12-Jun-2003
 	- Jorrit clarified a comment with csColliderWrapper telling people that
 	  you must DecRef() the new collider wrapper after creating it.
