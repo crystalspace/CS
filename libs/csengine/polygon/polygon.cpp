@@ -1009,21 +1009,23 @@ bool csPolygon3D::ClipFrustrum (csVector3& center, csVector3* frustrum,
 bool csPolygon3D::ClipToPlane (csPlane* portal_plane, const csVector3& v_w2c,
 	csVector3*& pverts, int& num_verts, bool cw)
 {
-  int i, i1, cnt_vis;
+  int i, i1;
+  int cnt_vis, num_vertices;
   float r;
   bool zs, z1s;
 
   // Assume maximum 100 vertices! (@@@ HARDCODED LIMIT)
   static csVector3 verts[100];
-  bool vis[100];
+  static bool vis[100];
 
   // Count the number of visible vertices for this polygon (note
   // that the transformation from world to camera space for all the
   // vertices has been done earlier).
   // If there are no visible vertices this polygon need not be drawn.
   cnt_vis = 0;
-  for (i = 0 ; i < GetVertices ().GetNumVertices () ; i++)
-    if (Vcam (i).z >= 0) cnt_vis++;
+  num_vertices = GetVertices ().GetNumVertices ();
+  for (i = 0 ; i < num_vertices ; i++)
+    if (Vcam (i).z >= 0) { cnt_vis++; break; }
     //if (Vcam (i).z >= SMALL_Z) cnt_vis++;
   if (cnt_vis == 0) return false;
 
@@ -1033,13 +1035,14 @@ bool csPolygon3D::ClipToPlane (csPlane* portal_plane, const csVector3& v_w2c,
   if (plane->VisibleFromPoint (v_w2c) != cw && plane->Classify (v_w2c) != 0)
     return false;
 
-  // Copy the vertices to verts.
-  int num_vertices = GetVertices ().GetNumVertices ();
-  for (i = 0 ; i < num_vertices ; i++) verts[i] = Vcam (i);
-  pverts = verts;
-
   // If there is no portal polygon then everything is ok.
-  if (!portal_plane) { num_verts = num_vertices; return true; }
+  if (!portal_plane) { 
+    // Copy the vertices to verts.
+    for (i = 0 ; i < num_vertices ; i++) verts[i] = Vcam (i);
+    pverts = verts;
+    num_verts = num_vertices; 
+    return true; 
+  }
 
   // Otherwise we will have to clip this polygon in 3D against the
   // portal polygon. This is to make sure that objects behind the
@@ -1057,6 +1060,11 @@ bool csPolygon3D::ClipToPlane (csPlane* portal_plane, const csVector3& v_w2c,
 
   if (cnt_vis == 0) return false; // Polygon is not visible.
 
+  // Copy the vertices to verts.
+  for (i = 0 ; i < num_vertices ; i++) verts[i] = Vcam (i);
+  pverts = verts;
+
+
   // If all vertices are visible then everything is ok.
   if (cnt_vis == num_vertices) { num_verts = num_vertices; return true; }
 
@@ -1069,12 +1077,12 @@ bool csPolygon3D::ClipToPlane (csPlane* portal_plane, const csVector3& v_w2c,
   float D = portal_plane->D ();
 
   i1 = num_vertices-1;
+  z1s = vis[i1];
   for (i = 0 ; i < num_vertices ; i++)
   {
-    zs = !vis[i];
-    z1s = !vis[i1];
+    zs = vis[i];
 
-    if (z1s && !zs)
+    if (!z1s && zs)
     {
       csIntersect3::Plane (Vcam (i1), Vcam (i), A, B, C, D, verts[num_verts], r);
       num_verts++;
@@ -1083,7 +1091,7 @@ bool csPolygon3D::ClipToPlane (csPlane* portal_plane, const csVector3& v_w2c,
       isClipped = true;
 #endif            
     }
-    else if (!z1s && zs)
+    else if (z1s && !zs)
     {
       csIntersect3::Plane (Vcam (i1), Vcam (i), A, B, C, D, verts[num_verts], r);
       num_verts++;
@@ -1091,10 +1099,11 @@ bool csPolygon3D::ClipToPlane (csPlane* portal_plane, const csVector3& v_w2c,
       isClipped = true;
 #endif            
     }
-    else if (!z1s && !zs)
+    else if (z1s && zs)
     {
       verts[num_verts++] = Vcam (i);
     }
+    z1s = zs;
     i1 = i;
   }
 
