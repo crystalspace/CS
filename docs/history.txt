@@ -41,6 +41,8 @@ chronological order.
 	  detected it.
 	- res removed some unnecessary members & methods from the NR GL 
 	  renderer lightmap code.
+	- Marten updated todo_newrenderer.txt. It needs some more checkup, but
+	  i don't have time to fix that right now.
 14-Nov-2004
 	- Eric Sunshine updated cspace.i to take csPoly2D decomposition into
 	  account.

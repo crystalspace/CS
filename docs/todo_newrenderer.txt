@@ -28,21 +28,7 @@ Comparing walktest between NR and OR:
 Things that need to be done in new renderer:
 
 	- iThingState->ReplaceMaterial() will not work in NR.
-	- Support static LOD. This is a special case of a hierarchical mesh
-	  where only one of the children is drawn based on distance
-	  related conditions.
-	- Make csShader a csObject so it can be supported in regions.
-	  Also add iRegion->PrepareShaders().
-	- Meshes remaining to be ported:
-		- spr2d (and the particle systems)
-		- haze
-		- beziermesh
-		- lightning
-		- terrfunc (disabled from jam build!)
-		- terrbig (disabled from jam build!)
-		- bcterr
-		- sprcal3d
-		- stars
+	- Make shaders compatible with csObject/iRegion.
 	- Software renderer (partially done).
 	- Working loaders for all new features (partially done).
 	- Fog (can/should be implemented through shaders).
@@ -51,22 +37,14 @@ Things that need to be done in new renderer:
 		- Z-filling not done
 		- Floating portals not done
 	- Debug lines and everything related to debugging support in g3d.
-	- Correct usage of cullers - DONE.
-	- Isometric engine.
 	- Shadows (needs fixing).
 	- Variable system DONE
-	- Materials DONE
-	- Pseudo VP with similar functionality as old texture layers.
 	- Fix smoothed things. 
 	- Better error handling. Everything is too crashy.
-	- Fix lightmapped things to use an appropriate shader so that it
-	  doesn't get very slow in case only two TU's are available.
-	  (Actually, it doesn't cause a slowdown. Tho might still be nice to
-	   have appropriate shaders nevertheless)
 
 
 What happens in one frame using the new renderer (assuming the generic
-render loop) in pseudo-code:
+render loop) in pseudo-code: (Rewrite this later to really match what is happening)
 
 	csView->Draw():
 	  csEngine->Draw (camera, clipper)
