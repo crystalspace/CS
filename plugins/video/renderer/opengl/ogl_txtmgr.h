@@ -101,8 +101,7 @@ public:
   /// Adjust size, mipmap, create procedural texture etc
   void InitTexture (csTextureManagerOpenGL *texman, csPixelFormat const* pfmt);
 
-  virtual bool csTextureHandleOpenGL::GetMipMapDimensions (int mipmap,
-    int &w, int &h);
+  virtual bool GetMipMapDimensions (int mipmap, int &w, int &h);
 
   /// Override from csTextureHandle.
   virtual void GetOriginalDimensions (int& w, int& h)
