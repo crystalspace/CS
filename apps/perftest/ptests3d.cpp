@@ -19,6 +19,7 @@
 
 #include "cssysdef.h"
 #include "igraph3d.h"
+#include "itexture.h"
 #include "imater.h"
 #include "csgeom/math2d.h"
 #include "csgeom/math3d.h"
