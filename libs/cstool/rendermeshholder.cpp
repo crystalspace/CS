@@ -61,7 +61,9 @@ csRenderMesh*& csRenderMeshHolderSingle::GetUnusedMesh (bool& created)
     }
   }
 
-  return meshes[lastMesh];
+  csRenderMesh*& mesh = meshes[lastMesh];
+  mesh->inUse = true;
+  return mesh;
 }
 
 //---------------------------------------------------------------------------

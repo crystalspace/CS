@@ -15,6 +15,11 @@ chronological order.
 	  code that way. This unification currently involved sharing the
 	  ObjectVisible callback in csSector so the same callback code is used
 	  in OR and NR.
+	- res fixed the rain and partgen Jamfiles to also depend on csgfx.
+	- res added PACKAGE_VERSION and PACKAGE_STRING to the jobber Jamconfig.
+	- res changed the render mesh holder to automatically set the inUse
+	  flag of the returned mesh.
+	- res added a fallback to csGLGraphics3D::SetAlphaType().
 23-Apr-2004
 	- Eric Sunshine fixed crasher in csSimpleConsole::Initialize()
 	  (simpcon.cpp) where it would blindly access its G2D member without

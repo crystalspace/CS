@@ -333,6 +333,7 @@ void csGLGraphics3D::SetAlphaType (csAlphaMode::AlphaType alphaType)
 {
   switch (alphaType)
   {
+    default:
     case csAlphaMode::alphaNone:
       statecache->Disable_GL_BLEND ();
       statecache->Disable_GL_ALPHA_TEST ();
