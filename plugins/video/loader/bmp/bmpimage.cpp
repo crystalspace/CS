@@ -81,7 +81,7 @@ static inline uint32 ul_endian (const uint8* ptr)
 
 static inline long l_endian (const uint8* ptr)
 {
-  long n;
+  int32 n;
   memcpy(&n, ptr, sizeof(n));
   return convert_endian(n);
 }

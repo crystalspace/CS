@@ -113,7 +113,7 @@ public:
     SCF_CONSTRUCT_IBASE(p);
     SCF_CONSTRUCT_EMBEDDED_IBASE(scfiComponent);
   }
-  virtual csPtr<iSoundData> LoadSound(void *Buffer, unsigned long Size);
+  virtual csPtr<iSoundData> LoadSound(void *Buffer, uint32 Size);
 };
 
 SCF_IMPLEMENT_IBASE(csSoundLoader_WAV)
