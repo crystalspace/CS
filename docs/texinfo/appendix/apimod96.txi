@@ -106,9 +106,9 @@ normal query versions instead of the ones above.
 
 @subheading Internal @sc{scf} Changes
 
-For Interfaces the @code{scfGetID_Interfacename} and the
-@code{VERSION_Interfacename} have been renamed to
-@code{Interfacename_scfGetID} and @code{Interfacename_VERSION} for making
+For interfaces the @samp{scfGetID_Interfacename} and the
+@samp{VERSION_Interfacename} have been renamed to
+@samp{Interfacename_scfGetID} and @samp{Interfacename_VERSION} for making
 namespaces working nicely with them.
 
 @subheading Make Targets 

@@ -148,7 +148,7 @@ First the old code:
   @dots{}
 @end example
 
-Here the new code:
+Here is the new code:
 
 @example
   state->AddQuad (
