@@ -7,6 +7,24 @@ The history order has been reversed so that new features are at the top.
 	  geometry in a 3DS file to one big sector. The polygons and
 	  vertices are correct but there is no texture or lighting
 	  information yet.
+	- Added new csPolygon3D::SetTextureSpace() function which accepts
+	  three vertices and three uv coordinates and extracts the
+	  texture matrix from that information. This is sometimes easier
+	  to handle as many formats actually give uv coordinates for every
+	  vertex.
+	- I also extended csloader with a new format for the texture mapping
+	  specification. You can now say:
+	  	POLYGON 'p' (
+			VERTICES (1,4,2,5)
+			TEXTURE (
+				UV (0,.5,.5,1,0,1,2,.9,.9)
+			)
+		)
+	  The format is as follows:
+	  	UV (i1,u1,v1, i2,u2,v2, i3,u3,v3)
+	  i1, i2, and i3 are the local indices of vertices in the polygon
+	  (so i1==0 corresponds to vertex 1 from the set).
+	  ux,vx are uv coordinates for that vertex.
 1-Oct-2000
 	- Since Martin fixed a bug in the sound code Blocks sound is now
 	  working so I enabled it by default.

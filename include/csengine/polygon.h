@@ -852,6 +852,15 @@ public:
   void SetTextureSpace (csPolyTxtPlane* txt_pl);
 
   /**
+   * Set the texture space transformation given three vertices and
+   * their uv coordinates.
+   */
+  void SetTextureSpace (
+  	const csVector3& p1, const csVector2& uv1,
+  	const csVector3& p2, const csVector2& uv2,
+  	const csVector3& p3, const csVector2& uv3);
+
+  /**
    * Calculate the matrix using two vertices (which are preferably on the
    * plane of the polygon and are possibly (but not necessarily) two vertices
    * of the polygon). The first vertex is seen as the origin and the second

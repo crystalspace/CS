@@ -1986,10 +1986,19 @@ csPolygon3D* csLoader::load_poly3d (char* polyname, char* buf,
   csMaterialWrapper* mat = NULL;
   poly3d->SetParent (parent);
 
+  bool tx_uv_given = false;
+  int tx_uv_i1;
+  int tx_uv_i2;
+  int tx_uv_i3;
+  csVector2 tx_uv1;
+  csVector2 tx_uv2;
+  csVector2 tx_uv3;
+
   bool tx1_given = false, tx2_given = false;
   csVector3 tx_orig (0, 0, 0), tx1 (0, 0, 0), tx2 (0, 0, 0);
   float tx1_len = default_texlen, tx2_len = default_texlen;
   float tx_len = default_texlen;
+
   csMatrix3 tx_matrix;
   csVector3 tx_vector (0, 0, 0);
   char plane_name[30];
@@ -2129,6 +2138,7 @@ csPolygon3D* csLoader::load_poly3d (char* polyname, char* buf,
           switch (cmd)
           {
             case CS_TOKEN_ORIG:
+	      tx_uv_given = false;
               tx1_given = true;
               int num;
               float flist[100];
@@ -2137,37 +2147,45 @@ csPolygon3D* csLoader::load_poly3d (char* polyname, char* buf,
               if (num == 3) tx_orig = csVector3(flist[0],flist[1],flist[2]);
               break;
             case CS_TOKEN_FIRST:
+	      tx_uv_given = false;
               tx1_given = true;
               ScanStr (params2, "%F", flist, &num);
               if (num == 1) tx1 = parent->Vobj ((int)flist[0]);
               if (num == 3) tx1 = csVector3(flist[0],flist[1],flist[2]);
               break;
             case CS_TOKEN_FIRST_LEN:
+	      tx_uv_given = false;
               ScanStr (params2, "%f", &tx1_len);
               tx1_given = true;
               break;
             case CS_TOKEN_SECOND:
+	      tx_uv_given = false;
               tx2_given = true;
               ScanStr (params2, "%F", flist, &num);
               if (num == 1) tx2 = parent->Vobj ((int)flist[0]);
               if (num == 3) tx2 = csVector3(flist[0],flist[1],flist[2]);
               break;
             case CS_TOKEN_SECOND_LEN:
+	      tx_uv_given = false;
               ScanStr (params2, "%f", &tx2_len);
               tx2_given = true;
               break;
             case CS_TOKEN_LEN:
+	      tx_uv_given = false;
               ScanStr (params2, "%f", &tx_len);
               break;
             case CS_TOKEN_MATRIX:
+	      tx_uv_given = false;
               load_matrix (params2, tx_matrix);
               tx_len = 0;
               break;
             case CS_TOKEN_V:
+	      tx_uv_given = false;
               load_vector (params2, tx_vector);
               tx_len = 0;
               break;
             case CS_TOKEN_PLANE:
+	      tx_uv_given = false;
               ScanStr (params2, "%s", str);
               strcpy (plane_name, str);
               tx_len = 0;
@@ -2178,12 +2196,14 @@ csPolygon3D* csLoader::load_poly3d (char* polyname, char* buf,
               break;
             case CS_TOKEN_UVEC:
               tx1_given = true;
+	      tx_uv_given = false;
               load_vector (params2, tx1);
               tx1_len = tx1.Norm ();
               tx1 += tx_orig;
               break;
             case CS_TOKEN_VVEC:
               tx2_given = true;
+	      tx_uv_given = false;
               load_vector (params2, tx2);
               tx2_len = tx2.Norm ();
               tx2 += tx_orig;
@@ -2191,10 +2211,14 @@ csPolygon3D* csLoader::load_poly3d (char* polyname, char* buf,
 	    case CS_TOKEN_UV:
 	      {
 		float u1, v1, u2, v2, u3, v3;
-                ScanStr (params, "%f,%f,%f,%f,%f,%f",
-			&u1, &v1, &u2, &v2, &u3, &v3);
-	        csMatrix3 f_uv;
-		
+		tx_uv_given = true;
+                ScanStr (params, "%d,%f,%f,%d,%f,%f,%d,%f,%f",
+			&tx_uv_i1, &u1, &v1,
+			&tx_uv_i2, &u2, &v2,
+			&tx_uv_i3, &u3, &v3);
+		tx_uv1.Set (u1, v1);
+		tx_uv2.Set (u2, v2);
+		tx_uv3.Set (u3, v3);
               }
 	      break;
 	  }
@@ -2309,7 +2333,14 @@ csPolygon3D* csLoader::load_poly3d (char* polyname, char* buf,
   else if (set_colldet == -1)
     poly3d->flags.Reset (CS_POLY_COLLDET);
 
-  if (tx1_given)
+  if (tx_uv_given)
+  {
+    poly3d->SetTextureSpace (
+    	poly3d->Vobj (tx_uv_i1), tx_uv1,
+	poly3d->Vobj (tx_uv_i2), tx_uv2,
+	poly3d->Vobj (tx_uv_i3), tx_uv3);
+  }
+  else if (tx1_given)
     if (tx2_given)
     {
       if (!tx1_len)

@@ -366,6 +366,12 @@ points forward.
 @production{plane-vvec, @token{VVEC} @LP{} @nonterm{vector-3d} @RP{}}@*
 @production{uv-shift,
     @token{UV_SHIFT} @LP{} @nonterm{texture-coordinate} @RP{}}@*
+@production{txt-uv,
+    @token{UV} @LP{}
+    	@nonterm{vertex-idx} @nonterm{texture-coordinate}
+    	@nonterm{vertex-idx} @nonterm{texture-coordinate}
+    	@nonterm{vertex-idx} @nonterm{texture-coordinate}
+    @RP{}}@*
 @production{polytext-comp, @nonterm{plane-orig}}@*
     @prodnext{@nonterm{plane-first-len}}@*
     @prodnext{@nonterm{plane-first}}@*
@@ -378,6 +384,7 @@ points forward.
     @prodnext{@nonterm{plane-uvec}}@*
     @prodnext{@nonterm{plane-vvec}}@*
     @prodnext{@nonterm{uv-shift}}@*
+    @prodnext{@nonterm{txt-uv}}@*
 @production{polygon-texture,
     @token{TEXTURE} @LP{} [ @nonterm{polytext-comp} @dots{} ] @RP{}}
 

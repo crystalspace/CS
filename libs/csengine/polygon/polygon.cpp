@@ -32,6 +32,7 @@
 #include "csengine/dumper.h"
 #include "csengine/lppool.h"
 #include "csutil/garray.h"
+#include "csgeom/matrix2.h"
 #include "qint.h"
 #include "igraph3d.h"
 #include "itexture.h"
@@ -718,6 +719,56 @@ void csPolygon3D::SetTextureSpace (
       lmi->GetTxtPlane() ->SetTextureSpace (tx_matrix, tx_vector);
     }
   }
+}
+
+void csPolygon3D::SetTextureSpace (
+  	const csVector3& p1, const csVector2& uv1,
+  	const csVector3& p2, const csVector2& uv2,
+  	const csVector3& p3, const csVector2& uv3)
+{
+  // Some explanation. We have three points for
+  // which we know the uv coordinates. This gives:
+  //     P1 -> UV1
+  //     P2 -> UV2
+  //     P3 -> UV3
+  // P1, P2, and P3 are on the same plane so we can write:
+  //     P = P1 + lambda * (P2-P1) + mu * (P3-P1)
+  // For the same lambda and mu we can write:
+  //     UV = UV1 + lambda * (UV2-UV1) + mu * (UV3-UV1)
+  // What we want is Po, Pu, and Pv (also on the same
+  // plane) so that the following uv coordinates apply:
+  //     Po -> 0,0
+  //     Pu -> 1,0
+  //     Pv -> 0,1
+  // The UV equation can be written as follows:
+  //     U = U1 + lambda * (U2-U1) + mu * (U3-U1)
+  //     V = V1 + lambda * (V2-V1) + mu * (V3-V1)
+  // This is a matrix equation (2x2 matrix):
+  //     UV = UV1 + M * PL
+  // We have UV in this case and we need PL so we
+  // need to invert this equation:
+  //     (1/M) * (UV - UV1) = PL
+  csMatrix2 m (
+  	uv2.x - uv1.x, uv3.x - uv1.x,
+  	uv2.y - uv1.y, uv3.y - uv1.y
+  	);
+  m.Invert ();
+  csVector2 pl;
+  csVector3 po, pu, pv;
+  // For (0,0) and Po
+  pl = m * (csVector2 (0, 0) - uv1);
+  po = p1 + pl.x * (p2-p1) + pl.y * (p3-p1);
+  // For (1,0) and Pu
+  pl = m * (csVector2 (1, 0) - uv1);
+  pu = p1 + pl.x * (p2-p1) + pl.y * (p3-p1);
+  // For (0,1) and Pv
+  pl = m * (csVector2 (0, 1) - uv1);
+  pv = p1 + pl.x * (p2-p1) + pl.y * (p3-p1);
+
+  SetTextureSpace (
+	po,
+	pu, (pu-po).Norm (),
+	pv, (pv-po).Norm ());
 }
 
 void csPolygon3D::SetTextureSpace (csVector3& v_orig, csVector3& v1, float len1)
