@@ -71,6 +71,12 @@ public:
   /// The system is idle: we can sleep for a while
   virtual void Sleep (int SleepTime);
 
+  ///
+  virtual void SetSystemDefaults (csIniFile *Config);
+
+  ///
+  virtual void Help ();
+
   //------------------------- iEventPlug interface ---------------------------//
   DECLARE_IBASE_EXT (csSystemDriver);
 
@@ -89,6 +95,8 @@ private:
   HANDLE m_hThread;
   friend DWORD WINAPI s_threadroutine(LPVOID param);
 #endif
+
+  bool need_console;
 };
 
 #endif // __CS_WIN32_H__

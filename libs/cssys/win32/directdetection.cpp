@@ -38,7 +38,7 @@ void sys_fatalerror (char *str, HRESULT hRes)
 {
   LPVOID lpMsgBuf;
   char *szMsg;
-  char szStdMessage [] = "Last Error: ";
+  char szStdMessage [] = "\nLast Error: ";
   if (FAILED (hRes))
   {
     DWORD dwResult;
@@ -273,7 +273,7 @@ static BOOL WINAPI DirectDetectionDDrawEnumCallback (GUID FAR * lpGUID,
   HELCaps.dwSize = sizeof (DDCAPS);
   
   if (FAILED (hRes = pDD->GetCaps (&DriverCaps, &HELCaps)))
-    sys_fatalerror ("Can't get device capacities for DirectDraw device", hRes);
+    sys_fatalerror ("Can't get device capabilities for DirectDraw device", hRes);
   
   // some informations about device
   dd2d.DeviceName2D = _strdup (lpDriverName);

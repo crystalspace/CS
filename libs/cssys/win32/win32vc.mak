@@ -10,9 +10,6 @@ DESCRIPTION.win32vc = Win32 with MSVC
 PLUGINS+=video/canvas/ddraw video/renderer/software sound/renderer/software \
   video/canvas/ddraw61 video/renderer/direct3d61 video/renderer/opengl
 
-# Uncomment the following to get an startup console window
-#CONSOLE_FLAGS = -DWIN32_USECONSOLE
-
 #---------------------------------------------------- rootdefines & defines ---#
 ifneq (,$(findstring defines,$(MAKESECTION)))
 
@@ -61,7 +58,7 @@ SOUND_LIBS=
 CFLAGS.INCLUDE=
 
 # General flags for the compiler which are used in any case.
-CFLAGS.GENERAL=-MD -W3 -nologo -DWINDOWS -DZLIB_DLL $(CONSOLE_FLAGS)
+CFLAGS.GENERAL=-MD -W3 -nologo -DWINDOWS -DZLIB_DLL
 
 # Flags for the compiler which are used when optimizing.
 CFLAGS.optimize=-Ox -G5
@@ -112,7 +109,7 @@ LFLAGS.l=$(OUT)
 NASMFLAGS.SYSTEM=-f win32 -DEXTERNC_UNDERSCORE
 
 # System dependent source files included into CSSYS library
-SRC.SYS_CSSYS = libs/cssys/win32/printf.cpp libs/cssys/win32/timing.cpp \
+SRC.SYS_CSSYS = libs/cssys/general/printf.cpp libs/cssys/win32/timing.cpp \
   libs/cssys/win32/dir.cpp libs/cssys/win32/win32.cpp \
   libs/cssys/win32/loadlib.cpp libs/cssys/general/getopt.cpp
 SRC.SYS_CSSYS_EXE=libs/cssys/win32/exeentry.cpp

@@ -57,10 +57,10 @@ extern int	_argc;
 extern char**	_argv;
 #endif
 
-
 extern HINSTANCE ModuleHandle;
 bool ApplicationActive = true;
 int ApplicationShow;
+extern bool need_console;
 
 void sys_fatalerror(char *s)
 {
@@ -437,6 +437,8 @@ SysSystemDriver::SysSystemDriver () : csSystemDriver ()
   wc.cbClsExtra     = 0;
   wc.cbWndExtra     = 0;
 
+  need_console = false;
+
   bool bResult;
   bResult = RegisterClass (&wc);
   ASSERT (bResult);
@@ -449,6 +451,9 @@ SysSystemDriver::~SysSystemDriver ()
 {
   if (EventOutlet)
     EventOutlet->DecRef ();
+
+  if (need_console)
+    FreeConsole();
 }
 
 bool SysSystemDriver::Open (const char *Title)
@@ -742,4 +747,28 @@ bool SysSystemDriver::SystemExtension (const char *iCommand, ...)
 void SysSystemDriver::Sleep (int SleepTime)
 {
   ::Sleep (SleepTime);
+}
+
+void SysSystemDriver::SetSystemDefaults (csIniFile *Config)
+{
+  csSystemDriver::SetSystemDefaults (Config);
+  need_console = Config->GetYesNo ("Microsoft Windows", "DebugConsole", false);
+  if (GetOptionCL ("console"))
+    need_console = true;
+  else if (GetOptionCL ("noconsole"))
+    need_console = false;
+
+  if (need_console)
+  {
+    AllocConsole();
+    freopen("CONOUT$", "a", stderr); // Redirect stderr to console   
+    freopen("CONOUT$", "a", stdout); // Redirect stdout to console   
+  }
+}
+
+void SysSystemDriver::Help ()
+{
+  csSystemDriver::Help();
+  Printf (MSG_STDOUT, "  -[np]console       Create a debug console (default = %s)\n",
+    need_console ? "yes" : "no");
 }

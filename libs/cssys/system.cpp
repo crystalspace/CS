@@ -294,8 +294,6 @@ csSystemDriver::csSystemDriver () : PlugIns (8, 8), EventQueue (),
   // Create the default system event outlet
   EventOutlets.Push (new csEventOutlet (NULL, this));
 
-  console_open ();
-
   System = this;
   FullScreen = false;
 
@@ -350,7 +348,6 @@ csSystemDriver::~csSystemDriver ()
   EventOutlets.DeleteAll ();
 
   scfFinish ();
-  console_close ();
 }
 
 bool csSystemDriver::Initialize (int argc, const char* const argv[], const char *iConfigName)

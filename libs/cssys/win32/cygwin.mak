@@ -9,9 +9,6 @@ DESCRIPTION.cygwin = Win32 with Cygnus GCC
 #
 PLUGINS+=video/canvas/ddraw video/renderer/software sound/renderer/software
 
-# Uncomment the following to get an startup console window
-#CONSOLE_FLAGS = -DWIN32_USECONSOLE
-
 #---------------------------------------------------- rootdefines & defines ---#
 ifneq (,$(findstring defines,$(MAKESECTION)))
 
@@ -104,7 +101,7 @@ MKDIR=mkdir $(@:/=)
 NASMFLAGS.SYSTEM=-f win32 -DEXTERNC_UNDERSCORE
 
 # System dependent source files included into CSSYS library
-SRC.SYS_CSSYS = libs/cssys/win32/printf.cpp libs/cssys/win32/timing.cpp \
+SRC.SYS_CSSYS = libs/cssys/general/printf.cpp libs/cssys/win32/timing.cpp \
   libs/cssys/win32/dir.cpp libs/cssys/win32/win32.cpp \
   libs/cssys/win32/loadlib.cpp libs/cssys/general/getopt.cpp
 SRC.SYS_CSSYS_EXE=libs/cssys/win32/exeentry.cpp

@@ -349,8 +349,6 @@ public:
    * Printf version that works on all systems.
    * Default implementation is in 'libs/cssys/general/'.
    */
-  static void console_open ();
-  static void console_close ();
   static void console_out (const char *str);
 
   /// A shortcut for requesting to load a plugin (before Initialize())

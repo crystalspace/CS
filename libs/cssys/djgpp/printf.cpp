@@ -30,16 +30,6 @@
 
 extern bool EnablePrintf;
 
-// to be called before all printf() calls
-void csSystemDriver::console_open ()
-{
-}
-
-// to be called before shutdown
-void csSystemDriver::console_close ()
-{
-}
-
 // to be called instead of printf (exact same prototype/functionality of printf)
 void csSystemDriver::console_out (const char *str)
 {
