@@ -647,7 +647,6 @@ public:
 
   /// Clear the texture cache.
   virtual void ClearCache ();
-  virtual void PrecacheTexture (iTextureHandle*) { }
 
   /// Remove some polygon from the cache.
   virtual void RemoveFromCache (iRendererLightmap* rlm);
