@@ -162,6 +162,8 @@ API and Small Feature Additions:
 	[V]  Support lighting of a thing mesh for lights in multiple
 	     sectors (and going through portals). i.e.
 	     iSector->ShineLights (iMeshWrapper).
+	[F]  Change key code and virtual key in keyboard event to use
+	     unicode.
 	[**] Add iCamera::SetFarPlane().
 
 Global Additions and Stuff:
