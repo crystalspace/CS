@@ -89,7 +89,7 @@ int main(int argc, char *argv[])
   csConfigFile config ("scf.cfg");
   scfInitialize (&config);
 
-  driver = SCF_CREATE_INSTANCE("crystalspace.network.driver2.sockets", iNetworkDriver2);
+  driver = SCF_CREATE_INSTANCE("crystalspace.network.driver.sockets2", iNetworkDriver2);
   if (!driver)
   {
 	  printf("Unable to load the network plugin.\n");
