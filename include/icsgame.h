@@ -262,9 +262,9 @@ struct iAttributeArray : public iBase
 SCF_VERSION (iEntityComponent, 0, 1, 0);
 
 /**
- * A component of a game entity.
+ * A component of a game entity that handles events
  */
-struct iEntityComponent : public iBase
+struct iEntityEventhandler : public iBase
 {
   /**
    * Let the entity component handle a given event. If there are no return
@@ -372,13 +372,45 @@ struct iEntityClassInformation : public iBase
 };
 
 
+//---------------------------------------------------------------------------
+
+SCF_VERSION (iEntityComponentIterator, 0, 1, 0);
+
+/**
+ * Allows to iterate across several Attributes
+ */
+struct iEntityComponentIterator : public iBase
+{
+  /// Get a pointer to the first matching interface.
+  virtual void* GetFirst () = 0;
+
+  /// Get a pointer to the next matching interface.
+  virtual void* GetNext () = 0;
+};
+
+// This Macro can make it more conventient to iterate all interfaces of 
+// the given type. Useage example:
+//
+//  iEntity* pEntity = ...;
+//  FOREACH_ENTITYCOMPONENT(iEntityEventhandler, EvtHdler, pEntity)
+//  {
+//    if (EvtHdler->HandleEvent(...)) break;
+//  }
+
+#define FOREACH_ENTITYCOMPONENT(classname, var, entity) \
+  classname* var = NULL; \
+  iEntityComponentIterator* iter## __LINE__ = entity->GetComponents(#classname); \
+  for (var = (classname*) iter## __LINE__ ->GetFirst(); var; \
+       var = (classname*) iter## __LINE__ ->GetNext()) 
 
 //---------------------------------------------------------------------------
 
 SCF_VERSION (iEntity, 0, 1, 0);
 
 /**
- * A game entity.
+ * A game entity. Mainly a collection of aggegated objects and baseclasses.
+ * all the real work is being done by these objects.
+ * The entity is only the container to manage all the contained components.
  */
 struct iEntity : public iBase
 {
@@ -389,7 +421,7 @@ struct iEntity : public iBase
   virtual void SetName (const char* Name) = 0;
 
   /**
-   * Get a pointer to the embedded interface with the given
+   * Get a pointer to the first embedded interface with the given
    * interface name, or NULL, if there is no embedded interface
    * of that type. It is safe to directly cast up the returned pointer
    * to (ScfClassname*).
@@ -399,20 +431,20 @@ struct iEntity : public iBase
    * - iEntityAttributes
    * - iPositition
    * - iEntityClassInformation
+   * - iEntityEventhandler (But you should use GetComponents instead for this!)
    */
-  virtual void* GetComponent(const char* ScfClassname);
+  virtual void* GetFirstComponent(const char* ScfClassname) = 0;
 
   /**
-   * Let the entity handle a given event. If you don't need any
-   * return parameters, you can set OutPar to NULL. If you don't
-   * want to hand over Input parameters, InPar can also be NULL
-   * the method will return true, if the event has been handled,
-   * otherwise it will return false.
+   * Get an iterator, that will return all contained Components that
+   * support the given interface. Please keep in mind, that using 
+   * GetFirstComponent to get a specific interface is not just more
+   * convenient, but also much faster, so you should only use this
+   * call, if you are expecting several instaces of the given interface.
+   * By using "iBase" as ScfClassname, you can get all contained classes
+   * and Query for interface yourself.
    */
-  virtual bool HandleEvent(const char*     EventName, 
-                           iAttributeList* InPar,
-                           iAttributeList* OutPar) = 0;
-
+  virtual iEntityComponentIterator* GetComponents(const char* ScfClassname) = 0;
 };
 
 //---------------------------------------------------------------------------
