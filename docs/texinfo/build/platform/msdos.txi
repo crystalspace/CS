@@ -71,18 +71,18 @@ should need to compile Crystal Space with @sc{djgpp}:
 @uref{ftp://ftp.simtel.net/pub/simtelnet/gnu/djgpp/v2gnu/dif271b.zip}
 
 @noindent
-Compiled zip, jpeg and png libraries@*
-@uref{ftp://ftp.linuxgames.com/crystal/support/doslibs.zip}@*
+Compiled zip, jpeg and png libraries - @samp{doslibs.zip}@*
+@uref{http://www.3ddownloads.com/?directory=/linuxgames/crystal/support/dos/}@*
 @emph{These are needed if the ``original'' libraries don't work.
 @xref{MSDOS Bugs}.}
 
 @noindent
-@sc{nasm} (Netwide Assembler) for @sc{dos}@*
-@uref{ftp://ftp.linuxgames.com/crystal/nasm/nasm-0.98e-bin-dos.zip}
+@sc{nasm} (Netwide Assembler) for @sc{dos} - @samp{nasm-0.98e-bin-dos.zip}@*
+@uref{http://www.3ddownloads.com/?directory=/linuxgames/crystal/nasm/}
 
 @noindent
-@sc{libdxe} (Dynamic Library Loader) for @sc{djgpp}@*
-@uref{ftp://ftp.linuxgames.com:/crystal/support/dxe2_012.zip}
+@sc{libdxe} (Dynamic Library Loader) for @sc{djgpp} - @samp{dxe2_012.zip}@*
+@uref{http://www.3ddownloads.com/?directory=/linuxgames/crystal/support/dos/}
 
 @subsubheading Installation
 
