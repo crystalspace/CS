@@ -17,6 +17,9 @@ Short-term cleanups that need to be done:
 	    - Now renders 3000 triangles instead of only about 1000.
 	    - Large speed increase (from 6 FPS to about 17 FPS in
 	      software).
+	- Added conveniance functions SetFog and DisableFog to
+	  csPolygonSet.
+	- Blocks screen fades from black.
 	- Eric Sunshine fixed several compilation warnings regarding unused
 	  variables and assignments of float or double to integer in the new
 	  terrain code.  He also fixed a problem where a comparison against a

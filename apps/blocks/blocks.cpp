@@ -970,6 +970,21 @@ void Blocks::move_cubes (time_t elapsed_time)
   float elapsed_move = elapsed*1.6;
   float elapsed_cam_move = elapsed*1.6;
 
+  if (fog_density)
+  {
+    float elapsed_fog = elapsed*.8;
+    if (elapsed_fog > fog_density) elapsed_fog = fog_density;
+    fog_density -= elapsed_fog;
+    csSector* s;
+    if (startup_screen) s = demo_room;
+    else s = room;
+    if (fog_density)
+      s->SetFog (fog_density, csColor (0, 0, 0));
+    else
+      s->DisableFog ();
+    return;
+  }
+
   if (startup_screen)
   {
     float old_dyn_x = dynlight_x;
@@ -1235,6 +1250,9 @@ void Blocks::StartDemo ()
   cam_move_up = csVector3 (0, -1, 0);
   view->GetCamera ()->LookAt (view_origin-pos, cam_move_up);
   view->SetRectangle (0, 0, Sys->FrameWidth, Sys->FrameHeight);
+
+  fog_density = 1;
+  demo_room->SetFog (fog_density, csColor (0, 0, 0));
 }
 
 void Blocks::StartNewGame ()
@@ -1258,6 +1276,9 @@ void Blocks::StartNewGame ()
   view->SetSector (room);
   Sys->move_camera ();
   view->SetRectangle (0, 0, Sys->FrameWidth, Sys->FrameHeight);
+
+  fog_density = 1;
+  room->SetFog (fog_density, csColor (0, 0, 0));
 }
 
 

@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 1998 by Jorrit Tyberghein
+    Copyright (C) 1998-2000 by Jorrit Tyberghein
   
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -26,6 +26,7 @@
 #include "csobject/csobject.h"
 #include "csengine/tranman.h"
 #include "csengine/arrays.h"
+#include "csengine/cscolor.h"
 #include "igraph3d.h"
 #include "ipolygon.h"
 
@@ -425,6 +426,19 @@ public:
 
   /// Return fog structure.
   csFog& GetFog () { return fog; }
+
+  /// Conveniance function to set fog to some setting.
+  void SetFog (float density, const csColor& color)
+  {
+    fog.enabled = true;
+    fog.density = density;
+    fog.red = color.red;
+    fog.green = color.green;
+    fog.blue = color.blue;
+  }
+
+  /// Disable fog.
+  void DisableFog () { fog.enabled = false; }
 
   /**
    * Find the minimum and maximum Z values of all vertices in

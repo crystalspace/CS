@@ -200,9 +200,11 @@ private:
   // at least one plane was made.
   bool transition;
 
-
   // Shows if we have a plane at a certain height.
   bool filled_planes[ZONE_HEIGHT];
+
+  // Fog density.
+  float fog_density;
 
   // This is the z of the plane which's dissapearance is handled right now.
   int gone_z;
