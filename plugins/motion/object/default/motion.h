@@ -150,7 +150,7 @@ struct csAppliedMotion
   csAppliedFrameVector frames;
 };
 
-DECLARE_TYPED_VECTOR(csAppliedMotionVector,csAppliedMotion); 
+DECLARE_TYPED_VECTOR_NODELETE(csAppliedMotionVector,csAppliedMotion); 
 
 ///
 class csMotionManager : public iMotionManager

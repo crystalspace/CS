@@ -238,8 +238,8 @@ int csMotionManager::ApplyMotion(iSkeletonBone *skel, const char* motion, const 
   int fs_num;
   
 #ifdef MOTION_DEBUG
-  printf("Apply Motion : motion %s frameset %s dir %d loop %d rate %f time %d\n", 
-			  motion, frameset, dir, loop, rate, time);	
+  printf("Apply Motion : Skel %p motion %s frameset %s dir %d loop %d rate %f time %d\n", 
+			  skel, motion, frameset, dir, loop, rate, time);	
 #endif
 
   csMotion* newmotion=FindClassByName((const char*)csHashCompute(motion));
@@ -280,6 +280,7 @@ int csMotionManager::ApplyMotion(iSkeletonBone *skel, const char* motion, const 
   printf("Apply motion frames length %d\n", am->frames.Length());
 #endif
   CompileMotion(am);
+  printf("Returning %d\n", (iscached) ? cache.Length() -1 : skels.Length() -1);
   return (iscached) ? cache.Length() - 1 :  skels.Length() - 1;
 }
 
@@ -302,10 +303,13 @@ void csMotionManager::RecompileMotion( int idx, bool cached )
 
 int csMotionManager::ReserveMotion( int idx )
 {
-  if ((idx < 0) || (idx >= skels.Length())) return -1;
+  if ((idx < 0) || (idx > skels.Length() - 1)) return -1;
   csAppliedMotion *am = skels[idx];
   cache.Push(am);
   skels.Delete(idx);
+#ifdef MOTION_DEBUG
+  printf("Motion: Reserve motion idx: %d  new %d\n", idx, cache.Length() - 1);
+#endif
   return cache.Length() - 1;
 }
 
@@ -315,6 +319,9 @@ int csMotionManager::RestoreMotion( int idx )
   csAppliedMotion *am = cache[idx];
   skels.Push(am);
   cache.Delete(idx);
+#ifdef MOTION_DEBUG
+  printf("Motion: Restore motion idx: %d  new %d\n", idx, skels.Length() - 1);
+#endif
   return skels.Length() - 1;
 }
 
@@ -371,8 +378,8 @@ void csMotionManager::UpdateAppliedFrame(csAppliedFrame *fr, csAppliedFrame * /*
 bool csMotionManager::UpdateAppliedMotion(csAppliedMotion *am, cs_time elapsedtime)
 {
 #ifdef MOTION_DEBUG
-  printf("Updating motion on `%s' Reverse : %d, Loop: %d, Rate: %f\n",
-		  am->skel->GetName(), am->Reverse, am->Loop, am->Rate); 
+  printf("Updating motion on Reverse : %d, Loop: %d, Sweep: %d, Rate: %f\n",
+		  am->Reverse, am->Loop, am->Sweep, am->Rate); 
 #endif
   if (!am->Rate) return true;
   
@@ -471,6 +478,12 @@ void csMotionManager::UpdateAll( int time )
   int i;
   for (i = 0; i < size; i++)
   {
+#ifdef MOTION_DEBUG
+	printf("skel: curfs %d curt %d tot %d num %d curf %d next %d rev %d Loop %d Sweep %d Rate %f\n",
+	  skels[i]->curframeset, skels[i]->curtime, skels[i]->totaltime, skels[i]->numframes,
+		skels[i]->curframe, skels[i]->nextframe, skels[i]->Reverse, skels[i]->Loop, skels[i]->Sweep,
+		  skels[i]->Rate);
+#endif
 	UpdateAppliedMotion( skels[i], elapsed_time);
   }
 }
