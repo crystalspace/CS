@@ -18,6 +18,7 @@
 */
 
 //
+#include "sysdef.h"
 #include "csterr/ddgtmesh.h"
 #include "csterr/ddgsplay.h"
 #include "csterr/ddgbtree.h"

@@ -18,6 +18,7 @@
 */
 #include <math.h>
 //#include <iostream.h>
+#include "sysdef.h"
 #include "csterr/ddgvec.h"
 #include "csterr/ddgmat.h"
 // ----------------------------------------------------------------------

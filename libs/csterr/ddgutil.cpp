@@ -23,6 +23,7 @@
 #else
 #include <time.h>
 #endif
+#include "sysdef.h"
 #include "csterr/ddgutil.h"
 
 // ----------------------------------------------------------------------
@@ -35,8 +36,8 @@
 bool ddgUtil::DetectSIMD(void)
 {
 
-//bool found_simd;
 #ifdef WIN32
+bool found_simd;
 _asm
 
 {

@@ -25,6 +25,8 @@
 #include <io.h>
 #include <fcntl.h>
 #endif
+
+#include "sysdef.h"
 // DDG includes
 #include "csterr/ddghemap.h"
 #include "csterr/ddgvec.h"
