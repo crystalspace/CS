@@ -17,6 +17,8 @@ chronological order.
 	- Eric Sunshine re-simplified the Cg and CgGL checks in configure.ac by
 	  reverting Frank's changes and instead using the library name
 	  "aliases" feature of CS_CHECK_LIB_WITH().
+	- res added another alias for Cg resp. CgGL: the Linux Cg libs use a
+	  mixed case 'Cg' in the names.
 11-Mar-2004
 	- Eric Sunshine performed an overhaul of the "Creating an External
 	  Crystal Space Application" HOWTO since it was extremely outdated.
