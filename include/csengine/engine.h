@@ -450,7 +450,7 @@ private:
    * own cache manager. In that case the engine is also responsible
    * for cleaning this up.
    */
-  iCacheManager* cache_mgr;
+  csRef<iCacheManager> cache_mgr;
 
   /**
    * Get a list of all objects in the given sphere.
@@ -929,7 +929,7 @@ public:
   virtual void ClearRenderPriorities ();
 
   /// @@@ Temporary until things move to their own mesh plugin system.
-  csThingObjectType* thing_type;
+  csRef<csThingObjectType> thing_type;
   virtual iMeshObjectType* GetThingType () const
   {
     return (iMeshObjectType*)thing_type;

@@ -700,7 +700,7 @@ csEngine::csEngine (iBase *iParent) :
 }
 
 // @@@ Hack
-iCamera *camera_hack = NULL;
+csRef<iCamera> camera_hack = NULL;
 
 csEngine::~csEngine ()
 {
@@ -724,7 +724,6 @@ csEngine::~csEngine ()
 
   render_priorities.DeleteAll ();
 
-  thing_type->DecRef ();
   delete materials;
   delete textures;
   delete render_pol2d_pool;
@@ -732,12 +731,6 @@ csEngine::~csEngine ()
   delete cbufcube;
   delete rad_debug;
   delete c_buffer;
-
-  // @@@ temp hack
-  if (camera_hack) camera_hack->DecRef ();
-  camera_hack = NULL;
-
-  if (cache_mgr) cache_mgr->DecRef ();
 }
 
 bool csEngine::Initialize (iObjectRegistry *object_reg)

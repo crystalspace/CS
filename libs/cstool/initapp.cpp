@@ -74,7 +74,7 @@ iObjectRegistry* csInitializer::CreateEnvironment (
   iObjectRegistry* reg = 0;
   if (InitializeSCF())
   {
-    iObjectRegistry* r = CreateObjectRegistry();
+    csRef<iObjectRegistry> r = CreateObjectRegistry();
     if (r != 0)
     {
       if (CreatePluginManager(r) &&
@@ -83,10 +83,10 @@ iObjectRegistry* csInitializer::CreateEnvironment (
           CreateCommandLineParser(r, argc, argv) &&
           CreateConfigManager(r) &&
           CreateInputDrivers(r) &&
-	  csPlatformStartup(r))
-        reg = r;
-      else
-        r->DecRef();
+		  csPlatformStartup(r))
+		reg = r;
+	  else
+	    r->DecRef ();
     }
   }
   return reg;
@@ -184,15 +184,12 @@ bool csInitializer::CreateInputDrivers (iObjectRegistry* r)
 {
   // Register some generic pseudo-plugins.  (Some day these should probably
   // become real plugins.)
-  iKeyboardDriver* k = new csKeyboardDriver (r);
-  iMouseDriver*    m = new csMouseDriver    (r);
-  iJoystickDriver* j = new csJoystickDriver (r);
+  csRef<iKeyboardDriver> k = new csKeyboardDriver (r);
+  csRef<iMouseDriver>    m = new csMouseDriver    (r);
+  csRef<iJoystickDriver> j = new csJoystickDriver (r);
   r->Register (k, "iKeyboardDriver");
   r->Register (m, "iMouseDriver");
   r->Register (j, "iJoystickDriver");
-  j->DecRef();
-  m->DecRef();
-  k->DecRef();
   return true;
 }
 
@@ -253,7 +250,7 @@ bool csInitializer::SetupConfigManager (
   }
 
   csRef<iConfigManager> Config (CS_QUERY_REGISTRY (r, iConfigManager));
-  iConfigFile* cfg = Config->GetDynamicDomain ();
+  csRef<iConfigFile> cfg = Config->GetDynamicDomain ();
   Config->SetDomainPriority (cfg, iConfigManager::ConfigPriorityApplication);
 
   // Initialize application configuration file
@@ -270,7 +267,6 @@ bool csInitializer::SetupConfigManager (
       cfg = new csPrefixConfig ("/config/user.cfg", VFS, "Global",
       	"User.Global");
       Config->AddDomain (cfg, iConfigManager::ConfigPriorityUserGlobal);
-      cfg->DecRef ();
 
       // open the user-and-application-specific config domain
       cfg = new csPrefixConfig ("/config/user.cfg", VFS,
@@ -278,7 +274,6 @@ bool csInitializer::SetupConfigManager (
         "User.Application");
       Config->AddDomain (cfg, iConfigManager::ConfigPriorityUserApp);
       Config->SetDynamicDomain (cfg);
-      cfg->DecRef ();
     }
   }
 
@@ -356,9 +351,8 @@ SCF_IMPLEMENT_IBASE_END
 bool csInitializer::SetupEventHandler (
   iObjectRegistry* r, csEventHandlerFunc evhdlr_func, unsigned int eventmask)
 {
-  csAppEventHandler* evhdlr = new csAppEventHandler (evhdlr_func);
+  csRef<csAppEventHandler> evhdlr = new csAppEventHandler (evhdlr_func);
   bool rc = SetupEventHandler (r, evhdlr, eventmask);
-  evhdlr->DecRef ();
   return rc;
 }
 
@@ -410,15 +404,6 @@ void csInitializer::DestroyApplication (iObjectRegistry* r)
       plugin_mgr->Clear ();
     // Force cleanup here.
   }
-
-  // Explicitly clear the object registry before its destruction since some
-  // objects being cleared from it may need to query it for other objects, and
-  // such queries can fail (depending upon the compiler) if they are made while
-  // the registry itself it being destroyed.  Furthermore, such objects may
-  // make SCF queries as they are destroyed, so this must occur before SCF is
-  // finalized (see below).
-  r->Clear ();
-  r->DecRef ();
 
   // destruct all static variables that had been created during runtime
   CS_DECLARE_STATIC_VARIABLE_CLEANUP
