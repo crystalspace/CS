@@ -45,7 +45,7 @@ chronological order.
 	  apimod98.txi.
 	- Jorrit removed a few warnings here and there.
 	- Eric Sunshine fixed a bug in csSocketListener where it failed to
-	  initialize its mcast_in member.  This addresses but #873491, however,
+	  initialize its mcast_in member.  This addresses bug #873491, however,
 	  this is only the tip of the iceberg since UDP support in cssocket is
 	  fundamentally and fatally flawed in almost every way possible.
 	  Fixing it will be a major, major undertaking, and will require either
