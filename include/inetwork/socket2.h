@@ -22,6 +22,10 @@
 
 #include "csutil/scf.h"
 
+#ifndef COMP_VC
+# warning This file is deprecated please use iNetworkSocket
+#endif
+
 SCF_VERSION (iNetworkSocket2, 0, 0, 2);
 
 /**
