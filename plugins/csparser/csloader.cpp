@@ -33,7 +33,6 @@
 #include "cstool/mdltool.h"
 #include "csgfx/csimage.h"
 #include "csloader.h"
-#include "csengine/light.h"
 
 #include "iutil/databuff.h"
 #include "iutil/document.h"
