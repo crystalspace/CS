@@ -26,7 +26,7 @@
 #include "csutil/csrect.h"
 #include "isystem.h"
 #include "itexture.h"
-#include "icfgfile.h"
+#include "icfgnew.h"
 
 IMPLEMENT_FACTORY (csGraphics2DGLX)
 
@@ -51,13 +51,13 @@ bool csGraphics2DGLX::Initialize (iSystem *pSystem)
   if (!csGraphics2DGLCommon::Initialize (pSystem))
     return false;
 
-  iConfigFile *config = pSystem->CreateConfig ("/config/opengl.cfg" );
+  iConfigFileNew *config = pSystem->CreateConfigNew ("/config/opengl.cfg" );
 
   dispdriver = NULL;
   const char *strDriver;
   if (config)
   {
-    if ((strDriver = config->GetStr ("Display", "Driver", NULL)))
+    if ((strDriver = config->GetStr ("Video.OpenGL.Display.Driver", NULL)))
     {
       dispdriver = LOAD_PLUGIN (pSystem, strDriver, NULL, iOpenGLDisp);
       if (!dispdriver)

@@ -25,7 +25,7 @@
 #include "csutil/csrect.h"
 #include "isystem.h"
 #include "ievent.h"
-#include "icfgfile.h"
+#include "icfgnew.h"
 #include "qint.h"
 
 #include "csaa.h"
@@ -65,7 +65,7 @@ bool csGraphics2DAA::Initialize (iSystem *pSystem)
   if (!csGraphics2D::Initialize (pSystem))
     return false;
 
-  iConfigFile *config = pSystem->CreateConfig ("/config/asciiart.cfg");
+  iConfigFileNew *config = pSystem->CreateConfigNew ("/config/asciiart.cfg");
   if (!config)
     return false;
 
@@ -74,45 +74,49 @@ bool csGraphics2DAA::Initialize (iSystem *pSystem)
     "SystemMouseCursor", true);
 
   aa_defparams.width =
-  aa_defparams.recwidth = config->GetInt ("Console", "Width", 80);
+  aa_defparams.recwidth = config->GetInt ("Video.ASCII.Console.Width", 80);
   aa_defparams.height =
-  aa_defparams.recheight = config->GetInt ("Console", "Height", 25);
-  const char *font = config->GetStr ("Console", "Font", "vga16");
+  aa_defparams.recheight = config->GetInt ("Video.ASCII.Console.Height", 25);
+  const char *font = config->GetStr ("Video.ASCII.Console.Font", "vga16");
   for (int i = 0; aa_fonts [i]; i++)
     if ((strcasecmp (font, aa_fonts [i]->name) == 0)
      || (strcasecmp (font, aa_fonts [i]->shortname) == 0))
       aa_defparams.font = aa_fonts [i];
 
-#define SETFLAG(s, m)				\
-  if (config->GetYesNo ("Console", s, true))	\
-    aa_defparams.supported |= (m);		\
-  else						\
+#define SETFLAG(s, m)                           \
+  if (config->GetBool (s, true))                \
+    aa_defparams.supported |= (m);              \
+  else                                          \
     aa_defparams.supported &= ~(m);
 
-  SETFLAG ("Normal",	AA_NORMAL_MASK);
-  SETFLAG ("Dim",	AA_DIM_MASK);
-  SETFLAG ("Bright",	AA_BOLD_MASK);
-  SETFLAG ("BoldFont",	AA_BOLDFONT_MASK);
-  SETFLAG ("Reverse",	AA_REVERSE_MASK);
-  SETFLAG ("All",	AA_ALL);
-  SETFLAG ("EightBit",	AA_EIGHT);
-  SETFLAG ("GenFont",	AA_GENFONT);
+  SETFLAG ("Video.ASCII.Console.Normal", AA_NORMAL_MASK);
+  SETFLAG ("Video.ASCII.Console.Dim", AA_DIM_MASK);
+  SETFLAG ("Video.ASCII.Console.Bright", AA_BOLD_MASK);
+  SETFLAG ("Video.ASCII.Console.BoldFont", AA_BOLDFONT_MASK);
+  SETFLAG ("Video.ASCII.Console.Reverse", AA_REVERSE_MASK);
+  SETFLAG ("Video.ASCII.Console.All", AA_ALL);
+  SETFLAG ("Video.ASCII.Console.EightBit", AA_EIGHT);
+  SETFLAG ("Video.ASCII.Console.GenFont", AA_GENFONT);
   if (aa_defparams.supported & AA_GENFONT)
     aa_defparams.supported |= AA_EXTENDED;
 
 #undef SETFLAG
 
-  aa_defrenderparams.inversion = config->GetYesNo ("Rendering", "Inverse", false);
-  const char *dither = config->GetStr ("Rendering", "Dither", "none");
+  aa_defrenderparams.inversion = config->GetBool
+        ("Video.ASCII.Rendering.Inverse", false);
+  const char *dither = config->GetStr ("Video.ASCII.Rendering.Dither", "none");
   if (strcasecmp (dither, "none") == 0)
     aa_defrenderparams.dither = 0;
   else if (strcasecmp (dither, "floyd-steinberg") == 0)
     aa_defrenderparams.dither = AA_FLOYD_S;
   else if (strcasecmp (dither, "error-distribution") == 0)
     aa_defrenderparams.dither = AA_ERRORDISTRIB;
-  aa_defrenderparams.randomval = config->GetInt ("Rendering", "RandomDither", 0);
-  aa_defrenderparams.bright = config->GetInt ("Rendering", "Bright", 1);
-  aa_defrenderparams.contrast = config->GetInt ("Rendering", "Contrast", 1);
+  aa_defrenderparams.randomval = config->GetInt
+        ("Video.ASCII.Rendering.RandomDither", 0);
+  aa_defrenderparams.bright = config->GetInt
+        ("Video.ASCII.Rendering.Bright", 1);
+  aa_defrenderparams.contrast = config->GetInt
+        ("Video.ASCII.Rendering.Contrast", 1);
 
   Depth = 8;
   pfmt.PalEntries = 256;

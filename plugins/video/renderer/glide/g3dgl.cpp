@@ -220,7 +220,7 @@ bool csGraphics3DGlide::Initialize (iSystem *iSys)
 
   SysPrintf (MSG_INITIALIZATION, "\nGlideRender Glide selected\n");
 
-  config = m_piSystem->CreateConfig ("/config/glide.cfg");
+  config = m_piSystem->CreateConfigNew ("/config/glide.cfg");
   if (!config) return false;
 
   m_piG2D = LOAD_PLUGIN (m_piSystem, GLIDE_2D, NULL, iGraphics2D);
@@ -228,7 +228,7 @@ bool csGraphics3DGlide::Initialize (iSystem *iSys)
 
   txtmgr = new csTextureManagerGlide (m_piSystem, m_piG2D, this, config);
 
-  m_bVRetrace = config->GetYesNo("Glide","VRETRACE",FALSE);
+  m_bVRetrace = config->GetBool("Video.Glide.VRetrace",FALSE);
   // tell the 2D driver whether to wait for VRETRACE
   m_piGlide2D  = QUERY_INTERFACE ( m_piG2D, iGraphics2DGlide );
   if (!m_piGlide2D) SysPrintf ( MSG_INITIALIZATION, "\nCould not set VRETRACE\n");
@@ -237,7 +237,7 @@ bool csGraphics3DGlide::Initialize (iSystem *iSys)
       m_piGlide2D->SetVRetrace( m_bVRetrace );
   }
 
-  m_bHaloEffect=config->GetYesNo("Glide","DISABLE_HALO", false);
+  m_bHaloEffect=config->GetBool("Video.Glide.DisableHalo", false);
   if (m_bHaloEffect)
     SysPrintf (MSG_INITIALIZATION, " Disable Halo Effect support.\n");
 

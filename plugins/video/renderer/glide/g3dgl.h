@@ -150,7 +150,7 @@ private:
   bool m_bHaloEffect;
 
   /// Our private config file
-  iConfigFile *config;
+  iConfigFileNew *config;
 
   /// fogtable
   GrFog_t *fogtable;

@@ -151,7 +151,7 @@ void csTextureHandleGlide::Prepare ()
 //---------------------------------------------------------------------------
 
 csTextureManagerGlide::csTextureManagerGlide (iSystem* iSys, iGraphics2D* iG2D,
-  csGraphics3DGlide* iG3D, iConfigFile *config)
+  csGraphics3DGlide* iG3D, iConfigFileNew *config)
   : csTextureManager (iSys, iG2D)
 {
   g3d = iG3D;
