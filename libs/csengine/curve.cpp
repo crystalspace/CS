@@ -320,6 +320,7 @@ void csBezier::Normal (csVector3& vec, double u, double v)
 
 void csBezier::AddBoundingPolygons (csBspContainer* container)
 {
+  (void) container;
   // @@@ To be implemented.
 }
 
