@@ -4,6 +4,8 @@
 #include "ivideo/graph3d.h"
 #include "ivideo/fontserv.h"
 #include "csutil/scfstr.h"
+#include "csutil/csevent.h"
+#include "iutil/evdefs.h"
 
 #include <stdio.h>
 
@@ -129,6 +131,44 @@ awsCmdButton::SetProperty(char *name, void *parm)
   
   return false;
 }
+
+void 
+awsCmdButton::ClearGroup()
+{
+ csEvent Event;
+
+ Event.Type = csevGroupOff;
+ 
+ int i;
+ for(i=0; i<Parent()->GetChildCount(); ++i)
+ {
+   iAwsComponent *cmp = Parent()->GetChildAt(i);
+
+   if (cmp && cmp!=this)
+     cmp->HandleEvent(Event);
+ }
+}
+
+bool 
+awsCmdButton::HandleEvent(iEvent& Event)
+{
+  if (awsComponent::HandleEvent(Event)) return true;
+
+  switch(Event.Type)
+  {
+  case csevGroupOff:
+    if (is_down && is_switch)
+    {
+      is_down=false;
+      Invalidate();
+    }
+    return true;
+    break;
+  }
+
+  return false;
+}
+
 
 
 void 
@@ -277,6 +317,8 @@ awsCmdButton::OnMouseUp(int button, int x, int y)
   {
     if (was_down)
       is_down=false;
+    else
+      ClearGroup();
 
     Broadcast(signalClicked);
   }
@@ -309,7 +351,7 @@ awsCmdButton::OnMouseExit()
   mouse_is_over=false;
   Invalidate();
 
-  if (is_down)
+  if (is_down && !is_switch)
     is_down=false;
   
   return true;

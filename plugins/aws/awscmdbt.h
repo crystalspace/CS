@@ -47,6 +47,9 @@ class awsCmdButton : public awsComponent
 
    /// Caption text for this component
    iString *caption;
+
+protected:
+   void ClearGroup();
    
 public:
     awsCmdButton();
@@ -84,6 +87,8 @@ public:
 
 public:
     SCF_DECLARE_IBASE;
+
+    bool HandleEvent(iEvent& Event);
 
     /// Triggered when the component needs to draw
     virtual void OnDraw(csRect clip);
