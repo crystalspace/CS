@@ -1,3 +1,9 @@
+crystalspace (0.96-20030609-1) unstable; urgency=low
+
+  * Try to compile all with -fPIC for hppa should (Closes: bug#188916)
+
+ -- Christian Bayle <bayle@debian.org>  Mon,  9 Jun 2003 14:32:27 +0200
+
 crystalspace (0.96-20030205-5) unstable; urgency=low
 
   * Recompile against libvorbis0a (Closes: bug#185600)
