@@ -20,6 +20,9 @@
 #ifndef __CYGWIN_H__
 #define __CYGWIN_H__
 
+/* because win32.h needs it... */
+#define __CSOSDEFS_H__
+
 // So many things require this. IF you have an issue with something defined
 // in it then undef that def here.
 #include <windows.h>
