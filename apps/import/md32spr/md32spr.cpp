@@ -1112,8 +1112,12 @@ char *basename(char *path, char *base)
   splitpath(path, dir, strlen(path), file, strlen(path));
   point = stristr(file, ".");
   ptr = file;
-  while (ptr++ != point)
-    sz++;
+  if(point != NULL) {
+    while (ptr++ != point)
+      sz++;
+  } else {
+    sz = strlen(file);
+  }
   strncpy(base, file, sz);
   base[sz] = '\0';
   return base;
