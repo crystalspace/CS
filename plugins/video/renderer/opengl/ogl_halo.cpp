@@ -80,19 +80,19 @@ csOpenGLHalo::csOpenGLHalo (float iR, float iG, float iB, unsigned char *iAlpha,
   Width = csFindNearestPowerOf2 (iWidth);
   Height = csFindNearestPowerOf2 (iHeight);
 
-  uint8 *Alpha = iAlpha;
-  if ((Width != iWidth) || (Height != iHeight))
+  uint8* rgba = new uint8 [Width * Height * 4];
+  memset (rgba, 0, Width * Height * 4);
+  uint8* rgbaPtr = rgba;
+  for (int y = 0; y < iHeight; y++)
   {
-    // Allocate our copy of the scanline which is power-of-two
-    Alpha = new uint8 [Width * Height];
-    int i;
-    for (i = 0; i < iHeight; i++)
+    for (int x = 0; x < iWidth; x++)
     {
-      // Copy a scanline from the supplied alphamap
-      memcpy (Alpha + (i * Width), iAlpha + (i * iWidth), iWidth);
-      // Clear the tail of the scanline
-      memset (Alpha + (i * Width) + iWidth, 0, Width - iWidth);
+      *rgbaPtr++ = 0xff;
+      *rgbaPtr++ = 0xff;
+      *rgbaPtr++ = 0xff;
+      *rgbaPtr++ = *iAlpha++;
     }
+    rgbaPtr += (Width - iWidth) * 4;
   }
 
   glPixelStorei (GL_UNPACK_ALIGNMENT, 1);
@@ -105,11 +105,10 @@ csOpenGLHalo::csOpenGLHalo (float iR, float iG, float iB, unsigned char *iAlpha,
   glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP);
   glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
   glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-  glTexImage2D (GL_TEXTURE_2D, 0, GL_ALPHA, Width, Height, 0, GL_ALPHA,
-    GL_UNSIGNED_BYTE, Alpha);
+  glTexImage2D (GL_TEXTURE_2D, 0, GL_RGBA, Width, Height, 0, GL_RGBA,
+    GL_UNSIGNED_BYTE, rgba);
 
-  if (Alpha != iAlpha)
-    delete [] Alpha;
+  delete[] rgba;
   (G3D = iG3D)->IncRef ();
 
   Wfact = float (iWidth) / Width;

@@ -40,6 +40,7 @@ chronological order.
 	  procedural textures, <persistent/> for render steps, and terrfunc
 	  parser).
 	- Jorrit added two entries to the FAQ.
+	- res fixed halos for OR (and also a mem leak related to NR halos).
 6-Jun-2004
 	- Jorrit modified the Jamfile so that the isotest application
 	  is only build with new renderer.

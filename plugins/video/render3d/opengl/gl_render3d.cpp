@@ -2404,6 +2404,7 @@ csOpenGLHalo::csOpenGLHalo (float iR, float iG, float iB, unsigned char *iAlpha,
   glTexImage2D (GL_TEXTURE_2D, 0, GL_RGBA, Width, Height, 0, GL_RGBA,
     GL_UNSIGNED_BYTE, rgba);
 
+  delete[] rgba;
   (G3D = iG3D)->IncRef ();
 
   Wfact = float (iWidth) / Width;
