@@ -104,7 +104,7 @@ DOXYGEN_PUBAPI = $(SRCDIR)/docs/doxygen/pubapi.dox
 DOXYGEN_DEVAPI = $(SRCDIR)/docs/doxygen/devapi.dox
 
 # Copy additional images to doxygen output dir
-OUT.DOXYGEN.IMAGES = $(CP) $(SRCDIR)/docs/doxygen/*.jpg $(SRCDIR)/docs/doxygen/*.png 
+OUT.DOXYGEN.IMAGES = $(CP) $(SRCDIR)/docs/doxygen/*.png 
 
 # Root of the target directory hierarchy.
 OUT.DOC = $(OUTBASE)/docs
