@@ -12,6 +12,7 @@ The history order has been reversed so that new features are at the top.
 	  simple.txi.
 	- Eric Sunshine fixed a number of mark-up problems and other errors in
 	  csws.txi.  Also eliminated 'overfull hbox' errors reported by TeX.
+	- Eric Sunshine fixed an out-of-date URL in the map2cs tutorial.
 15-Oct-2000
 	- Added csBox3::GetEdgeInfo() and GetFaceEdges() which can be
 	  used to extract winged-edge information from a csBox3.
