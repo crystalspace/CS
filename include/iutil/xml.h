@@ -91,64 +91,49 @@ struct iXmlNode : public iBase
   virtual const char* GetType () = 0;
   /// Set the type of this node.
   virtual void SetType (const char* type) = 0;
-  /// Get number of children.
-  virtual int GetChildCount () const = 0;
+  /// Get the parent.
+  virtual csRef<iXmlNode> GetParent () = 0;
 
   //---------------------------------------------------------------------
   
-  /// Get child with index.
-  virtual csRef<iXmlNode> GetChild (int idx) = 0;
-  /// Get child by type.
-  virtual csRef<iXmlNode> GetChild (const char* type) = 0;
-  /// Find the index for some child.
-  virtual int GetChildIndex (const csRef<iXmlNode>& child) = 0;
   /// Get an iterator over all children.
   virtual csRef<iXmlNodeIterator> GetChildren () = 0;
   /// Get an iterator over all children of the specified type.
   virtual csRef<iXmlNodeIterator> GetChildren (const char* type) = 0;
 
-  /// Remove a child by index.
-  virtual void RemoveChild (int idx) = 0;
-  /// Remove a child by type.
-  virtual void RemoveChild (const char* type) = 0;
   /// Remove a child.
   virtual void RemoveChild (const csRef<iXmlNode>& child) = 0;
   /// Remove all children.
   virtual void RemoveChildren () = 0;
 
+  /// Create a new node of the given type at the end.
+  virtual csRef<iXmlNode> CreateNode (const char* type) = 0;
+  /// Create a new node of the given type before the specified node.
+  virtual csRef<iXmlNode> CreateNodeBefore (const char* type,
+  	const csRef<iXmlNode>& node) = 0;
+  /// Create a new node of the given type after the specified node.
+  virtual csRef<iXmlNode> CreateNodeAfter (const char* type,
+  	const csRef<iXmlNode>& node) = 0;
   /**
-   * Create a new node of the given type at the given index.
-   * The node at that index (and all following nodes) will be shifted
-   * up. If index is -1 then the node will be created last.
+   * Move a node (which should be a child of this node) before the given
+   * node.
    */
-  virtual csRef<iXmlNode> CreateNode (const char* type, int index = -1) = 0;
+  virtual void MoveNodeBefore (const csRef<iXmlNode>& node,
+  	const csRef<iXmlNode>& before) = 0;
   /**
-   * Move a node (which should be a child of this node) to the given index.
-   * All nodes at that index (and all following nodes) will be shifted up.
-   * If index is -1 then the node will be moved to the last position.
+   * Move a node (which should be a child of this node) after the given
+   * node.
    */
-  virtual void MoveNode (const csRef<iXmlNode>& node, int index) = 0;
+  virtual void MoveNodeAfter (const csRef<iXmlNode>& node,
+  	const csRef<iXmlNode>& after) = 0;
 
   //---------------------------------------------------------------------
 
-  /// Get number of attributes.
-  virtual int GetAttributeCount () const = 0;
-
-  /// Get attribute with index.
-  virtual csRef<iXmlAttribute> GetAttribute (int idx) = 0;
-  /// Get attribute by name.
-  virtual csRef<iXmlAttribute> GetAttribute (const char* name) = 0;
-  /// Find the index for some attribute.
-  virtual int GetAttributeIndex (const csRef<iXmlAttribute>& attr) = 0;
   /// Get an iterator over all attributes.
   virtual csRef<iXmlAttributeIterator> GetAttributes () = 0;
   /// Get an iterator over all attributes of the specified name.
   virtual csRef<iXmlAttributeIterator> GetAttributes (const char* name) = 0;
 
-  /// Remove an attribute by index.
-  virtual void RemoveAttribute (int idx) = 0;
-  /// Remove all attributes with that name.
-  virtual void RemoveAttribute (const char* name) = 0;
   /// Remove an attribute.
   virtual void RemoveAttribute (const csRef<iXmlAttribute>& attr) = 0;
   /// Remove all attributes.
@@ -157,18 +142,31 @@ struct iXmlNode : public iBase
   /// Change or add an attribute.
   virtual void SetAttribute (const char* name, const char* value) = 0;
   /**
-   * Create a new attribute at the given index.
-   * The attribute at that index (and all following attributes) will be shifted
-   * up. If index is -1 then the attribute will be created last.
+   * Create a new attribute at the end.
    */
-  virtual csRef<iXmlAttribute> CreateAttribute (int index = -1) = 0;
+  virtual csRef<iXmlAttribute> CreateAttribute () = 0;
   /**
-   * Move an attribute (which should be a child of this node) to the given
-   * index. The attribute at that index (and all following attributes) will
-   * be shifted up. If index is -1 then the attribute will be moved to
-   * the last position.
+   * Create a new attribute before the given attribute.
    */
-  virtual void MoveAttribute (const csRef<iXmlAttribute>& attr, int index) = 0;
+  virtual csRef<iXmlAttribute> CreateAttributeBefore (
+  	const csRef<iXmlAttribute>& attr) = 0;
+  /**
+   * Create a new attribute after the given attribute.
+   */
+  virtual csRef<iXmlAttribute> CreateAttributeAfter (
+  	const csRef<iXmlAttribute>& attr) = 0;
+  /**
+   * Move an attribute (which should be a child of this node) before the
+   * given attribute.
+   */
+  virtual void MoveAttributeBefore (const csRef<iXmlAttribute>& attr,
+  	const csRef<iXmlAttribute>& before) = 0;
+  /**
+   * Move an attribute (which should be a child of this node) after the
+   * given attribute.
+   */
+  virtual void MoveAttributeAfter (const csRef<iXmlAttribute>& attr,
+  	const csRef<iXmlAttribute>& after) = 0;
 };
 
 //===========================================================================

@@ -7,6 +7,12 @@ The history order is reversed so that new features are at the top.
 	- Removed JNG image target from walkall. It is not an essential
 	  target to have.
 	- More work on cs2xml.
+	- Started work on integrating TinyXml XML parser into CS. Currently
+	  we integrated the TinyXml sources in csutil. Please do not start
+	  modifying those sources unless needed to fix warnings or errors.
+	  The TinyXml include files are not in include/csutil because they
+	  are not public. To use TinyXml parser you must instantiate an
+	  instance of class csTinyXmlSystem and start from there.
 	- Eric Sunshine fixed a problem with libs/cssys/win32/mergeres.sh where
 	  it was outputting ICON lines with a leading, but no trailing
 	  quotation mark.  Also fixed this script so that it works with older
