@@ -279,7 +279,8 @@ bool IsoTest::Initialize (int argc, const char* const argv[],
   ///*
   iCubeFactoryState* cubelook = QUERY_INTERFACE(mesh_fact, iCubeFactoryState);
   cubelook->SetMaterialWrapper(math2);
-  cubelook->SetSize(.5, .5, .5);
+  //cubelook->SetSize(.5, .5, .5);
+  cubelook->SetSize(1,1,1);
   cubelook->SetMixMode (CS_FX_COPY);
   cubelook->DecRef();
   //*/
@@ -307,9 +308,9 @@ bool IsoTest::Initialize (int argc, const char* const argv[],
   iIsoMeshSprite *meshspr = engine->CreateMeshSprite();
   meshspr->SetMeshObject(mesh_obj);
   //meshspr->SetZBufMode(CS_ZBUF_NONE);
-  meshspr->SetPosition( csVector3(12, 1, 4) );
+  meshspr->SetPosition( csVector3(12 + 0.5, +0.5, 2+0.5) );
   world->AddSprite(meshspr);
-
+  
   const char* fo_classId = "crystalspace.mesh.object.fountain";
   mesh_type = LOAD_PLUGIN( System, fo_classId, "MeshObj", iMeshObjectType);
   mesh_fact = mesh_type->NewFactory();

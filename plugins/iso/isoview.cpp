@@ -276,7 +276,7 @@ void csIsoFakeCamera::SetIsoView(const csVector2& scroll,
 void csIsoFakeCamera::IsoReady(const csVector3& position, 
   iIsoRenderView *rview, const csVector2& scroll)
 {
-  //printf("IsoReady %g,%g,%g\n", position.x, position.y, position.z);
+  printf("IsoReady %g,%g,%g\n", position.x, position.y, position.z);
   camnum++;
   /// correct for position and renderview (minimum z bound)
   float minz = rview->GetMinZ();
@@ -285,7 +285,7 @@ void csIsoFakeCamera::IsoReady(const csVector3& position,
   /// adjust fov by scale, to make the iz=fov/z scaled larger.
   float ffov = (position.z - position.x - minz)*scale;
   fov = QInt( ffov );
-  invfov = 1. / (position.z - position.x - minz);
+  invfov = 1. / ffov;
   //trans.SetO2TTranslation( csVector3(0, 0, -minz) );
   //trans.SetO2TTranslation( trans.This2Other(csVector3(0, 0, -minz)) );
 
@@ -297,12 +297,32 @@ void csIsoFakeCamera::IsoReady(const csVector3& position,
   shifty = scroll.y + scale * minz * trans.GetO2T().m23;
   */
   //csVector3 move( -minz/2.,-minz/2., +minz/2. );
-  csVector3 move( -minz*45./60.,-minz/4., +minz*15./60. );
+  //csVector3 move( -minz*45./60.,-minz/4., +minz*15./60. );
+  csVector3 move( 0, 0, 0 );
+  csMatrix3 &m = trans.GetO2T();
+  //move.x = position.x*m.m11 + position.y*m.m12 + position.z*m.m13;
+  //move.z = minz;
+  move = position; //// move back to 0,0,0 origin for draw
+  minz -= position.z - position.x; /// but give correct depth
+  move += csVector3( -minz/2., 0, +minz/2. );
+  move.y -= ( -minz/2. * m.m21 + +minz/2.*m.m23 ) / m.m22;
+
+  /// +1 leads to smaller y.
+  //move.y = position.x*m.m21 + position.y*m.m22 + position.z*m.m23;
+
   trans.SetO2TTranslation( move );
-  shiftx = scroll.x + scale*move.x*trans.GetO2T().m11 +
-    scale*move.y*trans.GetO2T().m12 + scale*move.z*trans.GetO2T().m13;
-  shifty = scroll.y + scale*move.x*trans.GetO2T().m21 +
-    scale*move.y*trans.GetO2T().m22 + scale*move.z*trans.GetO2T().m23;
+
+  //shiftx = scroll.x + scale*move.x*trans.GetO2T().m11 +
+    //scale*move.y*trans.GetO2T().m12 + scale*move.z*trans.GetO2T().m13;
+  //shifty = scroll.y + scale*move.x*trans.GetO2T().m21 +
+    //scale*move.y*trans.GetO2T().m22 + scale*move.z*trans.GetO2T().m23;
+
+  /// 0,0,0 must display at object's position, use isometric transform
+  /// to figure out where
+  csVector2 screenpos;
+  rview->GetView()->W2S(position, screenpos);
+  shiftx = screenpos.x;
+  shifty = screenpos.y;
 
   rview->GetG3D()->SetPerspectiveCenter(QInt(shiftx), QInt(shifty));
   rview->GetG3D()->SetPerspectiveAspect( ffov );
