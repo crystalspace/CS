@@ -5,7 +5,7 @@ if ! $(CSJAVA.MODULE.PREFIX) && ! $(CSJAVA.MODULE.SUFFIX)
   switch $(TARGET.OS)
   {
   case WIN32 :
-    CSJAVA.MODULE.PREFIX = "" ; # Empty string lets interpolation work (below).
+    CSJAVA.MODULE.PREFIX = ;
     CSJAVA.MODULE.SUFFIX = .dll ;
   case MACOS_X :
     CSJAVA.MODULE.PREFIX = lib ;
@@ -18,6 +18,12 @@ if ! $(CSJAVA.MODULE.PREFIX) && ! $(CSJAVA.MODULE.SUFFIX)
     CSJAVA.MODULE.SUFFIX = .so ;
   }
 }
+
+# Be wary of Jam's variable interpolation: "$(X)foo" expands to nothing if X
+# does not have a value.  (This differs from other interpolators which would
+# expand it to "foo".)
+if ! $(CSJAVA.MODULE.PREFIX) { CSJAVA.MODULE.PREFIX = "" ; }
+if ! $(CSJAVA.MODULE.SUFFIX) { CSJAVA.MODULE.SUFFIX = "" ; }
 
 if $(JAVA.AVAILABLE) = "yes" && $(ANT) && $(CMD.SWIG) &&
   ! [ Property build : projgen ]
