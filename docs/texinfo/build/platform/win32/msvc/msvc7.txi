@@ -6,7 +6,7 @@
 @noindent
 @emph{Philip Wyett @email{philipwyett@@dsl.pipex.com}.}
 @noindent
-@emph{Last updated 19 January 2004.}
+@emph{Last updated 4 Feburary 2004.}
 
 In order to successfully compile the Crystal Space 3D Software Development Kit
 (@sc{sdk}), you will need a copy of @emph{Microsoft Developer Studio @sc{.net}}
@@ -145,7 +145,7 @@ anything doesn't work, see the Win32 @sc{faq}, @ref{MSVC7 FAQ}.
 
 @enumerate
 @item
-Load @file{CS\mk\visualc7\csall.sln}.
+Load @file{CS\mk\visualc7\wkstypical.sln}.
 
 @item
 From the file menu select @emph{Build->Build Solution}.
@@ -187,16 +187,43 @@ These files are generated automatically, so your fixes would be useless.
 Better, send a description of the bug to the mailing list.
 
 The Crystal Space workspace is divided into several projects.  They all exist
-as separate project files (@file{*.dsp}).  All of them are being bound together
-by a workspace @file{csall.dsw}.  This workspace will also ensure correct
-linking between the various projects.
+as separate project files (@file{*.vcproj}).  The projects are collected
+together by workspaces @file{*.sln}.  A workspace will also ensure correct
+linking between the various projects.  There are several workspaces to choose
+from.  Most users should choose the @emph{typical} workspace, but the others
+are available for the adventurous.
 
-The workspace uses a prefix system for naming the projects and grouping them.
-There are currently four prefixes in use.  The prefix @file{grp} is used to
-group the projects into the three main categories: @emph{libraries},
-@emph{plug-ins}, and @emph{applications}.  There is also a special group
-@samp{grpall} that contains the three major groups @samp{grplibs},
-@samp{grpapps}, and @samp{grpplugins}.
+@itemize @bullet
+@item
+@file{wkstypical.sln} --- Builds the typical modules needed by most users of
+Crystal Space.
+
+@item
+@file{wksall.sln} --- Builds all modules, even the experimental ones.
+
+@item
+@file{wkswalkall.sln} --- Builds Walktest and the plugin modules most often
+needed by Walktest.
+
+@item
+@file{wksnewrenderer.sln} --- Same as @file{wkstypical.sln}, but builds the new
+experimental renderer, rather than the old one.  When using this workspace, you
+also need to select either the @emph{Release_NR} or @emph{Debug_NR} build mode,
+rather than the @emph{Release} or @emph{Debug} build mode.
+@end itemize
+
+The workspace uses a prefix system for naming contained projects:
+
+@itemize @bullet
+@item
+@file{app} --- Prefixes application projects.
+@item
+@file{lib} --- Prefixes static library projects.
+@item
+@file{plg} --- Prefixes plugin module projects.
+@item
+@file{grp} --- Prefixes psuedo-groups of related projects.
+@end itemize
 
 The @emph{Libraries} are C++ libraries that you can link into your own
 programs.  Some of these libraries are part of the core of Crystal Space.  You

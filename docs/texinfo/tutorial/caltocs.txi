@@ -3,8 +3,8 @@
 @section @code{caltocs} Tutorial
 @cindex @file{caltocs} Tutorial
 @cindex Tutorial, @file{caltocs}
-@cindex Tutorial, 3D Studio MAX Bone Exporter
-@cindex 3D Studio MAX Bone Exporter Tutorial
+@cindex Tutorial, 3D Studio @sc{max} Bone Exporter
+@cindex 3D Studio @sc{max} Bone Exporter Tutorial
 @cindex Tutorial, Bone Exporter
 @cindex Bone Exporter Tutorial
 
@@ -12,71 +12,77 @@
 @emph{Originally written by Brandon Ehle, @email{azverkan@@hotmail.com}}
 
 This tutorial handles the concept of loading skeletally animated characters
-from 3D Studio MAX into Crystal Space.  It assumes that you have a decent
-knowledge of 3D Studio MAX and Crystal Space.
+from 3D Studio @sc{max} into Crystal Space.  It assumes that you have a decent
+knowledge of 3D Studio @sc{max} and Crystal Space.
 
 @menu
-* Install Cal3D Exporter:: Install Cal3D exporter plugin for 3D Studio MAX
-* Compile Cal3D Exporter:: @emph{Optional:} Compiling Cal3D and the Cal3D plugin for 3D Studio MAX
-* Exporting Cal3D Geometry:: Exporting the Geometry and Animations from 3D Studio MAX
-* Create model config file:: Creating the Cal3D model config file
-* Viewing Cal3D Geometry:: @emph{Optional:} Viewing the exported Geometry and Animations in the Cal3D Miniviewer
-* Create Sprite Library:: Create the Crystal Space Library file containing the Sprite
-* View Library in Viewmesh:: @emph{Optional:} View the Crystal Space Sprite in Viewmesh
+* Install Cal3D Exporter:: Install Cal3D exporter plugin for 3D Studio @sc{max}
+* Compile Cal3D Exporter:: @emph{Optional:} Compiling Cal3D and the Cal3D plugin for 3D Studio @sc{max}
+* Exporting Cal3D Geometry:: Exporting the Geometry and Animations from 3D Studio @sc{max}
+* Create model config file:: Creating the Cal3D Model Configuration File
+* Viewing Cal3D Geometry:: @emph{Optional:} Viewing Exported Geometry and Animations in Cal3D Miniviewer
+* Create Sprite Library:: Create the Crystal Space Library File Containing the Sprite
 * View Library in Walktest:: @emph{Optional:} View the Crystal Space Sprite in Walktest
 @end menu
 
 @node Install Cal3D Exporter, Compile Cal3D Exporter, caltocs Tutorial, caltocs Tutorial
-@subsection Install Cal3D exporter plugin for 3D Studio MAX
+@subsection Install Cal3D exporter plugin for 3D Studio @sc{max}
+
+Follow these instructions for installing the Cal3D exporter.
 
 @itemize @bullet
 @item 
 Download the latest @file{cal3d_exporter_binaries} package from:
 
-@uref{http://sourceforge.net/projects/cal3d}
+@uref{http://sourceforge.net/projects/cal3d/}
 
 @item 
 Copy the @file{cal3d.dll} from the package into your @file{3dsmax\} directory.
 
 @item 
 Copy the @file{cal3d_max_exporter.dle} from the directory with the same 
-version number as your copy of 3D Studio MAX.
+version number as your copy of 3D Studio @sc{max}.
 
 @quotation
 @strong{Note:} If no version of the @file{cal3d_max_exporter.dle} exists for 
-your 3D Studio MAX, you will need a programmer to compile one for you.
+your 3D Studio @sc{max}, you will need a programmer to compile one for you.
 @xref{Compile Cal3D Exporter}.
 @end quotation
-
 @end itemize
 
 @node Compile Cal3D Exporter, Exporting Cal3D Geometry, Install Cal3D Exporter, caltocs Tutorial
-@subsection @emph{Optional:} Compiling Cal3D and the Cal3D plugin for 3D Studio MAX
+@subsection @emph{Optional:} Compiling Cal3D and the Cal3D plugin for 3D Studio @sc{max}
+
+Follow these instructions to build the Cal3D exporter.
 
 @itemize @bullet
 @item 
-Download the latest @file{cal3d} package and @file{cal3d_exporter} package from:
+Download the latest @file{cal3d} package and @file{cal3d_exporter} package
+from:
 
-@uref{http://sourceforge.net/projects/cal3d}
+@uref{http://sourceforge.net/projects/cal3d/}
 
 @item 
 Compile these two packages on Windows with Microsoft Visual C++ 6.0 or better.
+
 @quotation
-@strong{Note:} You will have to install the 3D Studio MAX SDK and the 
-Character Studio SDK.
+@strong{Note:} You will have to install the 3D Studio @sc{max} @sc{sdk} and the 
+Character Studio @sc{sdk}.
 
 @strong{Note:} You will need to go to @option{Tools/Options/Directories} in the 
-Microsoft Visual C++ IDE to fix header file and linker library errors.
+Microsoft Visual C++ @sc{ide} to fix header file and linker library errors.
 @end quotation
 
 @item 
-Drop the resulting @file{cal3d.dll} into your @file{3dsmax\} directory and
-drop the resulting @file{cal3d_max_exporter.dle} into your @file{3dsmax\plugins\} directory.
-
+Place the resulting @file{cal3d.dll} into your @file{3dsmax\} directory and
+place the resulting @file{cal3d_max_exporter.dle} into your
+@file{3dsmax\plugins\} directory.
 @end itemize
 
 @node Exporting Cal3D Geometry, Create model config file, Compile Cal3D Exporter, caltocs Tutorial
-@subsection Exporting the Geometry and Animations from 3D Studio MAX
+@subsection Exporting the Geometry and Animations from 3D Studio @sc{max}
+
+Follow these instructions to export Cal3D geometry.
 
 @itemize @bullet
 @item 
@@ -88,32 +94,34 @@ you will want to select the Biped object and under the Motion tab enable
 Figure mode.  Now go to @option{File/Export@dots{}} and select the 
 @option{Save As Type@dots{}} as @option{Cal3D Skeleton File (*.CSF)} and 
 enter your filename.  On the next page it will ask what bones you want to 
-export, usually you just make sure that all bones are checked and hit Finish.
+export, usually you just make sure that all bones are checked and hit
+@option{Finish}.
 
 @item 
 @emph{Export the mesh}
 
 With the character still in the base pose (or Figure mode).  Select the 
-objects you want to export in 3D Studio MAX.  Now go to 
+objects you want to export in 3D Studio @sc{max}.  Now go to 
 @option{File/Export@dots{}} and select the @option{Save As Type@dots{}} as 
 @option{Cal3D Mesh File (*.CMF)} and enter 
 your filename.  On the next page you will hit browse and select the skeleton 
-file we just exported above and hit Next.  If you get an error about an 
-Invalid Handle you haven't selected an exportable mesh, exit select your 
-mesh and try again.  Otherwise keep hitting next unless you want to change 
-the default values.
+file we just exported above and hit @option{Next}.  If you get an error about
+an @emph{Invalid Handle}, you haven't selected an exportable mesh, exit select
+your mesh and try again.  Otherwise keep hitting @option{Next} unless you want
+to change the default values.
 
 @item 
 @emph{Export the animations}
 
 You will now want to disable Figure mode in character studio, and make sure 
-your object animates when you push play in 3D Studio MAX.  Now go to 
+your object animates when you push play in 3D Studio @sc{max}.  Now go to 
 @option{File/Export@dots{}} and select the @option{Save As Type@dots{}} as 
-@option{Cal3D Animation File (*.CAF)} and enter your filename.  On the next 
-page you will hit browse and select the skeleton file we exported the first 
-step and hit Next.  Again make sure that all the bones are checked that you 
-want to export animation for and hit Next.  Unless you want to change any of 
-the timeframe variables on the this page, now push Finish.
+@option{Cal3D Animation File (*.CAF)} and enter your filename.  On the next
+page you will hit browse and select the skeleton file we exported the first
+step and hit @option{Next}.  Again make sure that all the bones are checked
+that you want to export animation for and hit @option{Next}.  Unless you want
+to change any of the timeframe variables on the this page, now push
+@option{Finish}.
 
 @quotation
 @strong{Note:} This step is optional if you do not want to animate your object.
@@ -122,11 +130,11 @@ the timeframe variables on the this page, now push Finish.
 @item 
 @emph{Export the material}
 
-Now go to @option{File/Export@dots{}} and select the 
-@option{Save As Type@dots{}} as @option{Cal3D Material File (*.CRF)} and 
-enter your filename.  On the next page you need to select which material you 
-want your character to have and push Next.  Verify that the textures are 
-correct and push Finish.
+Now go to @option{File/Export@dots{}} and select the @option{Save As
+Type@dots{}} as @option{Cal3D Material File (*.CRF)} and enter your filename.
+On the next page you need to select which material you want your character to
+have and push @option{Next}.  Verify that the textures are correct and push
+@option{Finish}.
 
 @quotation
 @strong{Note:} This step is optional if you do not want a texture on your
@@ -136,22 +144,26 @@ object.
 @end itemize
 
 @node Create model config file, Viewing Cal3D Geometry, Exporting Cal3D Geometry, caltocs Tutorial
-@subsection Creating the Cal3D model config file
+@subsection Creating the Cal3D Model Configuration File
 @cindex skeleton
 @cindex mesh
 @cindex material
 @cindex animation
 
-Create a new text file that is the name of your character in the same directory 
-as the 4 files you exported from 3D Studio MAX.  Then place these four lines 
-in the text file that specifies which parts of your character to load.
+Create a new text file that is the name of your character in the same directory
+as the 4 files you exported from 3D Studio @sc{max}.  Then place these four
+lines in the text file that specifies which parts of your character to load.
 
+@noindent
 @dfn{skeleton} specifies which skeleton to use.
 
+@noindent
 @dfn{mesh} specifies which meshes to load.
 
+@noindent
 @dfn{material} specifies which material definition (texture) to use.
 
+@noindent
 @dfn{animation} specifies what animations to allow the model to use.
 
 @example
@@ -161,7 +173,8 @@ material=@emph{(your material file .crf)}
 animation=@emph{(your animation file .caf)}
 @end example
 
-Sample Output of "test.cfg":
+@noindent
+Sample Output of @file{test.cfg}:
 
 @example
 skeleton=test.csf
@@ -176,60 +189,65 @@ times if you want multiple animations or meshes to be in the final sprite.
 @end quotation
 
 @node Viewing Cal3D Geometry, Create Sprite Library, Create model config file, caltocs Tutorial
-@subsection @emph{Optional:} Viewing the exported Geometry and Animations in the Cal3D Miniviewer
+@subsection @emph{Optional:} Viewing Exported Geometry and Animations in Cal3D Miniviewer
+
+Follow these instructions to view the Cal3D geometry.
 
 @itemize @bullet
 @item 
 Download the latest @file{cal3d_miniviewer} package from:
 
-@uref{http://sourceforge.net/projects/cal3d}
+@uref{http://sourceforge.net/projects/cal3d/}
 
 @item 
 You can compile this package on Windows or Linux.
 
 @item 
-Launch the @file{cald3d_miniviewer} executable from the command line in the 
-directory of your model config file and passing the model config file as the 
-only command line parameter.
+Launch the @file{cald3d_miniviewer} executable from the command line in the
+directory of your model configuration file and passing the model configuration
+file as the only command line parameter.
 
 @quotation
-@strong{Note:} You can place the @samp{scale=1.0} line in your model config 
-and play with the number until you fit the model on the screen.
+@strong{Note:} You can place the @samp{scale=1.0} line in your model
+configuratio and play with the number until you fit the model on the screen.
 @end quotation
 
 @end itemize
 
-@node Create Sprite Library, View Library in Viewmesh, Viewing Cal3D Geometry, caltocs Tutorial
-@subsection Create the Crystal Space Library file containing the Sprite
+@node Create Sprite Library, View Library in Walktest, Viewing Cal3D Geometry, caltocs Tutorial
+@subsection Create the Crystal Space Library File Containing the Sprite
+
+Follow these instructions to create the Crystal Space file containing the
+sprite
 
 @itemize @bullet
 @item 
 Download the latest @file{cal3d} package if you haven't already done so from:
 
-@uref{http://sourceforge.net/projects/cal3d}
+@uref{http://sourceforge.net/projects/cal3d/}
 
+@noindent
+Perform these steps:
 
 @itemize
 @item
-@strong{GCC:} Configure the @file{cal3d} package and run a 
-@command{make install}.  Go to your CS directory and type 
-@command{make @var{platform}} where @var{platform} is @samp{linux}, 
-@samp{cygwin},  etc@dots{}.  CS should now have found Cal3D and recorded the 
-line  @samp{HAS_CAL3D = yes}.  Lastly run @command{make cal3dtocs} to create 
-the @file{caltocs} executable.
+@strong{GCC:} Configure the @file{cal3d} package and invoke @command{make
+install}.  Go to your @file{CS} directory and type @command{./configure} to
+make Crystal Space search for Cal3D.  If everything works as expected, the
+configure script should insert the line @samp{HAS_CAL3D = yes} in
+@file{config.mak} and @file{Jamconfig}.  Finally, invoke
+@command{make cal3dtocs} to create the @file{caltocs} executable.
 
 @item
-@strong{MSVC:} Open the @file{csall.dsw} and compile the @file{appcaltocs} 
-project.
-
+@strong{MSVC:} Open the @file{wkstypical} workspace and compile the
+@file{appcaltocs} project.
 @end itemize
 
 @item
 Launch the @file{caltocs} executable from the command line in the directory of
 your model config file and passing the model config file as the only command 
-line parameter.
+line parameter.  Sample output:
 
-Sample Output:
 @example
 Load skeleton test.csf
 Load mesh test.cmf
@@ -240,107 +258,99 @@ Now exporting test.csk
 @end example
 
 @quotation
-@strong{Note:} You can place @samp{geomscale=1.0} and the 
-@samp{timescale=1.0} lines in your model config and adjust those values to 
-scale the model geometry and animation speed, respectively.
+@strong{Note:} You can place @samp{geomscale=1.0} and the @samp{timescale=1.0}
+lines in your model configuration and adjust those values to scale the model
+geometry and animation speed, respectively.
 @end quotation
-
 @end itemize
 
-@node View Library in Viewmesh, View Library in Walktest, Create Sprite Library, caltocs Tutorial
-@subsection @emph{Optional:} View the Crystal Space Sprite in Viewmesh
-
-@quotation
-@emph{Future:} Viewmesh currently does not load a Skeletal Sprite correctly.  This section will be written once that is fixed.
-@end quotation
-
-@node View Library in Walktest, , View Library in Viewmesh, caltocs Tutorial
+@node View Library in Walktest, , Create Sprite Library, caltocs Tutorial
 @subsection @emph{Optional:} View the Crystal Space Sprite in Walktest
+
+Follow these instructions to view the sprite in Walktest.
 
 @itemize @bullet
 @item 
-Make sure you have @command{walktest} built, running and @emph{tested} with 
-your map file.
+Make sure you have built Walktest, and that it has been tested with @emph{your}
+map file.
 
 @item
-Compile the Motion Manager (@var{motman} plugin) and Motion Loader 
+Compile the Motion Manager (@file{motion} plugin) and Motion Loader 
 (@var{motldr} plugin).
 
 @item
-Edit the mapfile of the map that you wish to place your characters in.  You 
+Edit the mapfile of the map in which you wish to place your characters.  You 
 will want to add a line to load the library file containing your sprite to the 
-@samp{world} section of the mapfile with the @samp{library} tag.
+@samp{world} section of the mapfile with the @samp{library} tag.  Sample File:
 
-Sample File:
 @example
 <world>
-    <library>/lev/flarge/test.csk</library>
+  <library>/lev/flarge/test.csk</library>
 </world>
 @end example
 
-Run @command{walktest} and make sure that the mapfile still loads correctly, 
-although you won't see your model yet.       
+@noindent
+Run Walktest and make sure that the map file still loads correctly, although
+you won't see your model yet.
 
 @item
-Next, we are going to add your sprite to one of the sectors in your mapfile.
+Next, add your sprite to one of the sectors in your map file.  Sample File:
 
-Sample File:
 @example
 <world>
-    <library>/lev/flarge/test.csk</library>
-    <sector name="room">
-        <meshobj name="test1">
-            <plugin>spr3d</plugin>
-            <params>
-                <factory>test</factory>
-                <action>default</action>
-            </params>
-            <move>
-                <v x="0" y="0" z="0" />
-            </move>
-        </meshobj>
-    </sector>
+  <library>/lev/flarge/test.csk</library>
+  <sector name="room">
+    <meshobj name="test1">
+      <plugin>spr3d</plugin>
+      <params>
+        <factory>test</factory>
+        <action>default</action>
+      </params>
+      <move>
+        <v x="0" y="0" z="0" />
+      </move>
+    </meshobj>
+  </sector>
 </world>
 @end example
 
-Run @command{walktest} and you should see your model in the mapfile.
+@noindent
+Run Walktest and you should see your model in the map file.
 
 @quotation
 @strong{Note:} If you do not see the object, chances are your object is either 
 outside the room or way too big or way too small.  
 
-@strong{Note:} Try playing with the @var{geomscale} setting in your model 
-config file, and the xyz coordinates in the @samp{move} macro in your mapfile. 
-@xref{Create Sprite Library}.
+@strong{Note:} Try playing with the @var{geomscale} setting in your model
+configuration file, and the @sc{xyz} coordinates in the @samp{move} macro in
+your map file.  @xref{Create Sprite Library}.
 
-@strong{Note:} @command{viewmesh} is a useful tool for tracking down problems 
-with your sprite. @xref{View Library in Viewmesh}.
+@strong{Note:} You can use Walktest as a tool for tracking down problems 
+with your sprite. @xref{View Library in Walktest}.
 @end quotation
 
 @item
-Lastly, we are going to animate your sprite with the @samp{apply_motion} tag.
+Lastly, animate your sprite with the @samp{apply_motion} tag.  Sample File:
 
-Sample File:
 @example
 <world>
-    <library>/lev/flarge/test.csk</library>
-    <sector name="room">
-        <meshobj name="test1">
-            <plugin>spr3d</plugin>
-            <params>
-                <factory>test</factory>
-                <action>default</action>
-                <applymotion>test_0</applymotion>
-            </params>
-            <move>
-                <v x="0" y="0" z="0" />
-            </move>
-        </meshobj>
-    </sector>
+  <library>/lev/flarge/test.csk</library>
+  <sector name="room">
+    <meshobj name="test1">
+      <plugin>spr3d</plugin>
+      <params>
+        <factory>test</factory>
+        <action>default</action>
+        <applymotion>test_0</applymotion>
+      </params>
+      <move>
+        <v x="0" y="0" z="0" />
+      </move>
+    </meshobj>
+  </sector>
 </world>
 @end example
 
-Run @command{walktest} and you should see your model animating in the mapfile.
-
+@noindent
+Run Walktest and you should see your model animating in the map file.
 @end itemize
-

@@ -21,7 +21,7 @@ ifeq ($(MAKESECTION),roottargets)
 walkall: walktest engine vfs gl3d softcanvas openglcanvas csfont \
   csconin simpcon rapid meshes cssynldr imgplex csgifimg csjpgimg cspngimg \
   csbmpimg reporter stdrep csparser frustvis bugplug sequence engseq xmlread \
-  stdpt ptanimimg
+  stdpt ptanimimg dynavis gtreeldr
 all apps: walktest
 walktest:
 	$(MAKE_APP)

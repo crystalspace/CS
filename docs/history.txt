@@ -8,17 +8,34 @@ chronological order.
 
 4-Feb-2004
 	- Jorrit started the removal of the old effect system (used in OR).
-	  This is unused and doesn't work properly as well. Removed support
-	  for the 'effect' and 'effects' keywords in the loader. Removed support
-	  for setting effects on materials. The effect plugin is still there
-	  because the old OpenGL renderer still needs it.
+	  This is unused and doesn't work properly as well.  Removed support
+	  for the 'effect' and 'effects' keywords in the loader.  Removed
+	  support for setting effects on materials.  The effect plugin is still
+	  there because the old OpenGL renderer still needs it.
 	- Jorrit moved the effects plugin source into the
 	  plugins/video/renderer/opengl directory. So it is now private to the
 	  old OpenGL renderer. This means that the effect system is not
 	  essentially removed (it will be really removed when the old OpenGL
 	  renderer is removed).
-	- res fixed csProcTexture to unregister itself from the proctex
-	  event handler upon destruction. 
+	- res fixed csProcTexture to unregister itself from the proctex event
+	  handler upon destruction.
+	- Eric Sunshine augmented the `msvcgen' facility so that it is capable
+	  of creating multiple customized workspaces rather than always
+	  creating only a single workspace (csall) containing all projects.
+	  The following workspaces are now created:
+	    - wkstypical: Projects which the typical CS users will use.
+	    - wksall: All projects, even experimental and broken ones.
+	    - wkswalkall: Walktest and plugins typically needed by Walktest.
+	    - wksnewrenderer: Similar to wkstypical, but includes new renderer
+	      and related modules rather than old renderer.
+	  Most CS users should use the wkstypical workspace in place of the
+	  obsolete csall workspace.  Project files also now contain two new
+	  build modes: Release_NR and Debug_NR.  These build modes ensure that
+	  appropriate #defines are active for the new renderer, and should be
+	  used when working with the wksnewrenderer workspace.
+	- Eric Sunshine updated some out of date documentation in the user
+	  manual; corrected some Texinfo mark-up errors; and eliminated a TeX
+	  `underfull hbox' warning.
 3-Feb-2004
 	- Eric Sunshine fixed syntax error in aws.mak introduced yesterday
 	  which manifested when running 'msvcgen' targets.
