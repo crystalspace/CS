@@ -33,6 +33,12 @@ chronological order.
 	  Python libraries were not being used when building cspython, thus
 	  resulting in unresolved _CreateSolidBrush@4 symbol (which exists in
 	  gdi.lib).
+	- Eric Sunshine fixed bug in csLoadLibrary() on Windows.  When looking
+	  up "plugin_compiler" symbol in DLL, it was calling GetProcAddress()
+	  rather than csGetLibrarySymbol().  This caused lookup of
+	  "plugin_compiler" to fail with Borland since GetProcAddress() is not
+	  smart enough to try both "plugin_compiler" and "_plugin_compiler",
+	  whereas csGetLibrarySymbol() is.
 13-Dec-2003
 	- Eric Sunshine applied patch from Randall Foreman
           <eidpers@comcast.net>.  csModelConverterASE was accidentally

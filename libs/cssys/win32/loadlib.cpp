@@ -103,7 +103,7 @@ csLibraryHandle csLoadLibrary (const char* iName)
 
   typedef const char* (*pfnGetPluginCompiler)();
   pfnGetPluginCompiler get_plugin_compiler = 
-    (pfnGetPluginCompiler) GetProcAddress ((HMODULE)handle, "plugin_compiler");
+    (pfnGetPluginCompiler) csGetLibrarySymbol (handle, "plugin_compiler");
   if (!get_plugin_compiler)
   {
     csString s;
