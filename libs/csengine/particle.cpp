@@ -458,7 +458,7 @@ void csRainParticleSystem :: Update(time_t elapsed_time)
       // @@@ rain only appears in box ceiling now, should appear on
       // opposite side of rain_dir... 
       pos = GetRandomDirection( rainbox.Min(), csVector3 (
-        rainbox.MaxX() - rainbox.MinX(), 0,0f,
+        rainbox.MaxX() - rainbox.MinX(), 0.0f,
         rainbox.MaxZ() - rainbox.MinZ()) );
       pos.y = rainbox.MaxY();
       GetParticle(i)->SetPosition(pos);
