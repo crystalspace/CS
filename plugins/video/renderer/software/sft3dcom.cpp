@@ -3513,4 +3513,8 @@ bool csGraphics3DSoftwareCommon::IsLightmapOK (iPolygonTexture* poly_texture)
   return ((poly_texture->GetWidth () * poly_texture->GetHeight ()) < MAX_LIGHTMAP_SIZE);
 }
 
+void csGraphics3DSoftwareCommon::SetRenderTarget (iTextureHandle* handle)
+{
+  (void)handle;
+}
 

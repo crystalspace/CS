@@ -554,6 +554,11 @@ bool csGraphics3DGLext::IsLightmapOK(iPolygonTexture*)
   return true;
 }
 
+void csGraphics3DGLext::SetRenderTarget (iTextureHandle* handle)
+{
+  (void)handle;
+}
+
 void csGraphics3DGLext::Report (int severity, const char* msg, ...)
 {
   va_list arg;

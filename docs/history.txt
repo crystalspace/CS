@@ -1,6 +1,10 @@
 The history order is reversed so that new features are at the top.
 
 14-Oct-2002
+	- Added SetRenderTarget() and GetRenderTarget() to the
+	  iGraphics3D API. Also added default (empty) implementations
+	  to all renderers. This will be used for the new procedural
+	  texture design.
 	- Eric Sunshine worked around bug in MSVC6/7 compilers where they
 	  experienced "internal compiler error" when encountering function
 	  CreateSystem() in walktest.cpp which was both a local function and

@@ -223,6 +223,8 @@ class csOpenGLProcSoftware : public iGraphics3D
 
   virtual bool IsLightmapOK (iPolygonTexture* poly_texture)
   { return g3d->IsLightmapOK(poly_texture); }
+  virtual void SetRenderTarget (iTextureHandle* ) { }
+  virtual iTextureHandle* GetRenderTarget () const { return NULL; }
 };
 
 

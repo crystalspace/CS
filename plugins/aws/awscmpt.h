@@ -290,6 +290,8 @@ public:
     virtual void ClearCache ()                                        { }
     virtual void RemoveFromCache (iPolygonTexture *  /*poly_texture*/ )  { }
     bool IsLightmapOK (iPolygonTexture *)                             {return false;}
+    void SetRenderTarget (iTextureHandle*) { }
+    iTextureHandle* GetRenderTarget () const { return NULL; }
 
     virtual int GetWidth ()                                           { return width; }
     virtual int GetHeight ()                                          { return height; }

@@ -3003,7 +3003,6 @@ void csGraphics3DOGLCommon::DrawPolygonMesh (G3DPolygonMesh& mesh)
 
   SetGLZBufferFlags (z_buf_mode);
 
-  int i;
   G3DTriangleMesh trimesh;
   trimesh.buffers[0] = vb;
   trimesh.morph_factor = 0;
@@ -5175,6 +5174,11 @@ iTextureManager *csGraphics3DOGLCommon::GetTextureManager ()
 bool csGraphics3DOGLCommon::IsLightmapOK (iPolygonTexture* poly_texture)
 {
   return lightmap_cache->IsLightmapOK (poly_texture);
+}
+
+void csGraphics3DOGLCommon::SetRenderTarget (iTextureHandle* handle)
+{
+  render_target = handle;
 }
 
 

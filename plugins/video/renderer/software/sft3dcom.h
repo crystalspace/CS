@@ -469,6 +469,9 @@ public:
   /// Check if lightmap is not too large
   virtual bool IsLightmapOK (iPolygonTexture* poly_texture);
 
+  virtual void SetRenderTarget (iTextureHandle* handle);
+  virtual iTextureHandle* GetRenderTarget () const { return NULL; }
+
   /// Get Z-buffer value at given X,Y position
   virtual float GetZBuffValue (int x, int y);
 

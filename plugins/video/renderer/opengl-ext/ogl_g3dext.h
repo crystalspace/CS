@@ -159,6 +159,8 @@ class csGraphics3DGLext : public iGraphics3D
 
     virtual iVertexBufferManager *GetVertexBufferManager ( );
     virtual bool IsLightmapOK(iPolygonTexture* poly_texture );
+    virtual void SetRenderTarget (iTextureHandle* handle);
+    virtual iTextureHandle* GetRenderTarget () const { return NULL; }
 
   // -------------------------------------------------------
   // Protected Functions

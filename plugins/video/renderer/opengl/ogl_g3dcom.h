@@ -238,7 +238,6 @@ private:
 
   csRef<iEffectServer> effectserver;
 
-
   // [lightmap no/yes ][fog 0/1][mixmode]
   iEffectDefinition* StockEffects[2][2][9];
   iEffectDefinition* SeparateLightmapStockEffect;
@@ -345,6 +344,9 @@ protected:
   char clip_required[3];
   /// Prefered clipping modes to use for outer portal.
   char clip_outer[3];
+
+  /// Current render target.
+  csRef<iTextureHandle> render_target;
 
   /**
    * handle of a local 1D alpha-blend texture; this texture holds an
@@ -770,6 +772,12 @@ public:
 
   /// Check if lightmap is not too large
   virtual bool IsLightmapOK (iPolygonTexture* poly_texture);
+
+  virtual void SetRenderTarget (iTextureHandle* handle);
+  virtual iTextureHandle* GetRenderTarget () const
+  {
+    return render_target;
+  }
 
   /**
    * Draw a polygon but only do z-fill. Do not actually render

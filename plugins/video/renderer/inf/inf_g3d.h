@@ -302,6 +302,8 @@ public:
   /// Check if lightmap is not too large
   virtual bool IsLightmapOK (iPolygonTexture*)
   { return true; }
+  virtual void SetRenderTarget (iTextureHandle*) { }
+  virtual iTextureHandle* GetRenderTarget () const { return NULL; }
 
   struct eiComponent : public iComponent
   {

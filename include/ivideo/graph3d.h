@@ -496,7 +496,7 @@ struct csFog
   float blue;
 };
 
-SCF_VERSION (iGraphics3D, 5, 0, 2);
+SCF_VERSION (iGraphics3D, 5, 0, 3);
 
 /**
  * This is the standard 3D graphics interface.
@@ -740,7 +740,23 @@ struct iGraphics3D : public iBase
    * Check if renderer can handle a lightmap.
    * Returns true if it can, false if not.
    */
-  virtual bool IsLightmapOK(iPolygonTexture* poly_texture) = 0;
+  virtual bool IsLightmapOK (iPolygonTexture* poly_texture) = 0;
+
+  /**
+   * Set the target of rendering. If this is NULL then the target will
+   * be the main screen. Otherwise it is a texture. After calling
+   * g2d->Print() the target will automatically be reset to NULL (main
+   * screen). Note that on some implementions rendering on a texture
+   * will overwrite the screen. So you should only do this BEFORE you
+   * start rendering your frame.
+   */
+  virtual void SetRenderTarget (iTextureHandle* handle) = 0;
+
+  /**
+   * Get the current render target (NULL for screen).
+   */
+  virtual iTextureHandle* GetRenderTarget () const = 0;
 };
 
 #endif // __IVIDEO_GRAPH3D_H__
+
