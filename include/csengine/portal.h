@@ -134,6 +134,14 @@ public:
   void SetSector (csSector* s) { sector = s; }
 
   /**
+   * Complete a sector destination. This function is called
+   * whenever a destination sector is NULL. A subclass of csPortal
+   * can implement this to dynamically create a new sector at this
+   * point.
+   */
+  virtual void CompleteSector () { }
+
+  /**
    * Transform the warp matrix from object space to world space.
    */
   void ObjectToWorld (const csReversibleTransform& t);
@@ -169,6 +177,14 @@ public:
   void SetAlpha (int a) { cfg_alpha = a; }
 
   /**
+   * Warp a position in world space.
+   */
+  csVector3 Warp (const csVector3& pos)
+  {
+    return warp_wor.Other2This (pos);
+  }
+
+  /**
    * Warp space using the given world->camera transformation.
    * This function modifies the given camera transformation to reflect
    * the warping change.<p>
@@ -198,7 +214,7 @@ public:
    * reached (like the maximum number of times a certain sector
    * can be drawn through a mirror).
    */
-  virtual bool Draw (csPolygon2D* new_clipper, csPolygon3D* portal_polygon,
+  bool Draw (csPolygon2D* new_clipper, csPolygon3D* portal_polygon,
   	csRenderView& rview);
 
   /**
@@ -208,27 +224,8 @@ public:
    * not allow traversing the same sector more than five times).
    * Returns the intersection point with the polygon in 'isect'.
    */
-  virtual csPolygon3D* HitBeam (const csVector3& start, const csVector3& end,
+  csPolygon3D* HitBeam (const csVector3& start, const csVector3& end,
   	csVector3& isect);
-
-  /**
-   * Intersects world-space sphere through this sector. Return closest
-   * polygon that is hit (or NULL) and the intersection point. If 'pr' !=
-   * NULL it will also return the distance where the intersection happened.
-   */
-  virtual csPolygon3D* IntersectSphere (csVector3& center, float radius, float* pr = NULL);
-
-  /**
-   * Follow a segment through this portal and modify the given
-   * camera transformation according to the space warping.
-   * This function will modify all the given parameters. These
-   * should be used as the new camera transformation when you
-   * decide to use it.<p>
-   *
-   * This function returns the destination.
-   */
-  virtual csSector* FollowSegment (csReversibleTransform& t,
-                                  csVector3& new_position, bool& mirror);
 
   /**
    * Check frustum visibility of all polygons reachable through this portal.

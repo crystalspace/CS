@@ -114,6 +114,7 @@ TOKEN_DEF_START
   TOKEN_DEF (BEZIER)
   TOKEN_DEF (BOX)
   TOKEN_DEF (BSP)
+  TOKEN_DEF (CAMERA)
   TOKEN_DEF (CEILING)
   TOKEN_DEF (CEIL_TEXTURE)
   TOKEN_DEF (CENTER)
@@ -204,6 +205,7 @@ TOKEN_DEF_START
   TOKEN_DEF (SECTOR)
   TOKEN_DEF (SIXFACE)
   TOKEN_DEF (SKELETON)
+  TOKEN_DEF (SKY)
   TOKEN_DEF (SKYDOME)
   TOKEN_DEF (SNOW)
   TOKEN_DEF (SOUND)
@@ -1213,7 +1215,8 @@ csKeyValuePair* csLoader::load_key (char* buf, csObject* pParent)
   }
   else
   {
-    CsPrintf (MSG_FATAL_ERROR, "Illegal Syntax for KEY() command in line %d", parser_line);
+    CsPrintf (MSG_FATAL_ERROR, "Illegal Syntax for KEY() command in line %d\n",
+    	parser_line);
     fatal_exit (0, false);
     return NULL;
   }
@@ -1747,6 +1750,7 @@ csThing* csLoader::load_thing (char* name, char* buf, csSector* sec)
     TOKEN_TABLE (MOVE)
     TOKEN_TABLE (TEMPLATE)
     TOKEN_TABLE (KEY)
+    TOKEN_TABLE (CAMERA)
   TOKEN_TABLE_END
 
   TOKEN_TABLE_START (tok_matvec)
@@ -1786,6 +1790,9 @@ csThing* csLoader::load_thing (char* name, char* buf, csSector* sec)
         break;
       case TOKEN_CONVEX:
         is_convex = true;
+        break;
+      case TOKEN_CAMERA:
+        thing->flags.Set (CS_ENTITY_CAMERA, CS_ENTITY_CAMERA);
         break;
       case TOKEN_MOVE:
         {
@@ -1888,6 +1895,7 @@ csPolygon3D* csLoader::load_poly3d (char* polyname, char* buf,
     TOKEN_TABLE (FOG)
     TOKEN_TABLE (COSFACT)
     TOKEN_TABLE (GOURAUD)
+    TOKEN_TABLE (MIXMODE)
   TOKEN_TABLE_END
 
   TOKEN_TABLE_START (tex_commands)
@@ -2148,6 +2156,13 @@ csPolygon3D* csLoader::load_poly3d (char* polyname, char* buf,
 	poly3d->GetGouraudInfo ()->Setup (poly3d->GetVertices ().GetNumVertices ());
 	poly3d->GetGouraudInfo ()->EnableGouraud (true);
         break;
+      case TOKEN_MIXMODE:
+        {
+          UInt mixmode = ParseMixmode (params);
+	  csGouraudShaded* gs = poly3d->GetGouraudInfo ();
+	  if (gs) gs->SetMixmode (mixmode);
+          break;
+	}
       case TOKEN_UV:
         {
           poly3d->SetTextureType (POLYTXT_GOURAUD);
@@ -3508,6 +3523,7 @@ csSector* csLoader::load_room (char* secname, char* buf)
     TOKEN_TABLE (CEILING)
     TOKEN_TABLE (SIXFACE)
     TOKEN_TABLE (THING)
+    TOKEN_TABLE (SKY)
     TOKEN_TABLE (PORTAL)
     TOKEN_TABLE (SPLIT)
     TOKEN_TABLE (TRIGGER)
@@ -3763,8 +3779,11 @@ csSector* csLoader::load_room (char* secname, char* buf)
           sp->MoveToSector (sector);
         }
         break;
+      case TOKEN_SKY:
+        sector->AddSky (load_thing (name,params,sector));
+        break;
       case TOKEN_THING:
-        sector->AddThing ( load_thing(name,params,sector) );
+        sector->AddThing (load_thing (name,params,sector));
         break;
       case TOKEN_PORTAL:
         {
@@ -4104,6 +4123,7 @@ csSector* csLoader::load_sector (char* secname, char* buf)
     TOKEN_TABLE (LIGHT)
     TOKEN_TABLE (SPRITE2D)
     TOKEN_TABLE (SPRITE)
+    TOKEN_TABLE (SKY)
     TOKEN_TABLE (SKYDOME)
     TOKEN_TABLE (TERRAIN)
     TOKEN_TABLE (NODE)
@@ -4162,8 +4182,11 @@ csSector* csLoader::load_sector (char* secname, char* buf)
         partsys = load_snow (name, params);
 	partsys->MoveToSector (sector);
         break;
+      case TOKEN_SKY:
+        sector->AddSky (load_thing (name,params,sector));
+        break;
       case TOKEN_THING:
-        sector->AddThing ( load_thing(name,params,sector) );
+        sector->AddThing (load_thing (name,params,sector));
         break;
       case TOKEN_SPRITE:
         {

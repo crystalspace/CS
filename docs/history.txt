@@ -1,5 +1,42 @@
 The history order has been reversed so that new features are at the top.
 
+6-Jul-2000
+	- Added csPortal::CompleteSector() as a virtual function. This
+	  function is responsible for creating a new destination sector
+	  if this sector would be NULL. It can be used by subclasses of
+	  csPortal to dynamically create sectors.
+	- Added csPortal::Warp() to warp one vector.
+	- Simplified csPortal by removing IntersectSphere and FollowSegment.
+	  Those functions are now specific to csSector.
+	- Added CS_ENTITY_CAMERA flag for csThings. With this flag set
+	  things will only be rotated to the camera and not translated.
+	  This is useful for skyboxes and skydomes.
+	- Added SetMixMode and GetMixMode to csGouraudShaded so that you
+	  can now render a gouraud shaded polygon with another mixmode.
+	  This can be used to create transparent things and so on.
+	  Note that the engine needs a little better support to actually
+	  support transparent things in a good way (i.e. sort them the
+	  right way).
+	- Added CAMERA() keyword to the world file format for csThings.
+	- Added MIXMODE() keyword to the world file format for polygons.
+	- Added additional support for 'sky' objects in a sector. These
+	  are basicly just things like the others but you have the guarantee
+	  that they will be drawn first with Z fill before anything else
+	  is drawn.
+	- Added functions AddSky(), RemoveSky(), GetFirstSky(), and GetSky()
+	  to csSector to manage sky objects.
+	- Added support for SKY() keyword in 'ROOM' and 'SECTOR'. This
+	  keyword behaves EXACTLY the same as a normal THING except that
+	  it will be added as a sky object.
+	- Added new support for sector commands in WalkTest. If you add
+	  something like KEY ("cmd_whatever", "...") to a sector in the
+	  world file then WalkTest will recognize it as a command to
+	  execute. Other apps will ignore the keyword. There is currently
+	  only one command: KEY ("cmd_AnimateSky",
+	  "<thing-name>,<dir>,<speed>"). When this command is present
+	  WalkTest will animate the sky object indicated with <thing-name>.
+	  The rotation <dir> will be 'x', 'y', or 'z'. The speed will
+	  be relative to 1 meaning one full rotation in 1 second.
 5-Jul-2000
 	- Samuel Humphreys did the following changes:
 	    - Rearranged iGraphics2D/3D so that related functions are

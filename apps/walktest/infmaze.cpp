@@ -229,7 +229,7 @@ void InfiniteMaze::random_loose_portals (int x1, int y1, int z1)
   }
 }
 
-void InfPortalCS::ConnectNewSector ()
+void InfPortalCS::CompleteSector ()
 {
   extern WalkTest* Sys;
   InfiniteMaze* infinite_maze = Sys->infinite_maze;
@@ -253,24 +253,6 @@ void InfPortalCS::ConnectNewSector ()
     lviews = n;
   }
   (void)new csRAPIDCollider (*s, s);
-}
-
-bool InfPortalCS::Draw (csPolygon2D* new_clipper, csPolygon3D* portal_polygon, csRenderView& rview)
-{
-  if (!GetSector ())
-  {
-    ConnectNewSector ();
-  }
-  return csPortal::Draw (new_clipper, portal_polygon, rview);
-}
-
-csSector* InfPortalCS::FollowSegment (csReversibleTransform& t, csVector3& new_position, bool& mirror)
-{
-  if (!GetSector ())
-  {
-    ConnectNewSector ();
-  }
-  return csPortal::FollowSegment (t, new_position, mirror);
 }
 
 void InfPortalCS::CheckFrustum (csFrustumView& lview)

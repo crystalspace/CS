@@ -85,6 +85,8 @@ void csPortal::WarpSpace (csReversibleTransform& t, bool& mirror)
 bool csPortal::Draw (csPolygon2D* new_clipper, csPolygon3D* portal_polygon,
 	csRenderView& rview)
 {
+  if (!sector) CompleteSector ();
+
   if (sector->draw_busy >= 5)
     return false;
 
@@ -122,6 +124,8 @@ bool csPortal::Draw (csPolygon2D* new_clipper, csPolygon3D* portal_polygon,
 csPolygon3D* csPortal::HitBeam (const csVector3& start, const csVector3& end,
 	csVector3& isect)
 {
+  if (!sector) CompleteSector ();
+
   if (sector->draw_busy >= 5)
     return NULL;
   if (flags.Check (CS_PORTAL_WARP))
@@ -137,24 +141,9 @@ csPolygon3D* csPortal::HitBeam (const csVector3& start, const csVector3& end,
   else return sector->HitBeam (start, end, isect);
 }
 
-csPolygon3D* csPortal::IntersectSphere (csVector3& center, float radius, float* pr)
-{
-  return sector->IntersectSphere (center, radius, pr);
-}
-
-csSector* csPortal::FollowSegment (csReversibleTransform& t,
-				  csVector3& new_position, bool& mirror)
-{
-  if (flags.Check (CS_PORTAL_WARP))
-  {
-    WarpSpace (t, mirror); 
-    new_position = warp_wor.Other2This (new_position);
-  }
-  return sector ? sector->FollowSegment (t, new_position, mirror) : (csSector*)NULL;
-}
-
 void csPortal::CheckFrustum (csFrustumView& lview)
 {
+  if (!sector) CompleteSector ();
   if (sector->draw_busy > csSector::cfg_reflections) return;
 
   csFrustumView new_lview = lview;

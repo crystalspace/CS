@@ -63,6 +63,13 @@ struct iGraphics3D;
 #define CS_ENTITY_DETAIL 4
 
 /**
+ * If CS_ENTITY_CAMERA is set then this entity will be always
+ * be centerer around the same spot relative to the camera. This
+ * is useful for skyboxes or skydomes.
+ */
+#define CS_ENTITY_CAMERA 8
+
+/**
  * A Thing is a polygonset just like a csSector.
  * It can be used to augment the sectors with features that
  * are difficult to describe using portals and sectors.<P>
@@ -90,7 +97,10 @@ private:
    * Utility function to be called whenever obj changes which updates
    * object to world transform in all of the curves
    */
-  void UpdateCurveTransform();
+  void UpdateCurveTransform ();
+
+  /// Internal draw function.
+  void DrawInt (csRenderView& rview, bool use_z_buf);
 
 public:
   /// Set of flags

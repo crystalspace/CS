@@ -95,10 +95,8 @@ public:
   int x1, y1, z1;
   int x2, y2, z2;
   InfPortalCS () : csPortal () { lviews = NULL; }
-  void ConnectNewSector ();
-  virtual bool Draw (csPolygon2D* new_clipper, csPolygon3D* portal_polygon, csRenderView& rview);
   virtual void CheckFrustum (csFrustumView& lview);
-  virtual csSector* FollowSegment (csReversibleTransform& t, csVector3& new_position, bool& mirror);
+  virtual void CompleteSector ();
 };
 
 #endif //INFMAZE_H

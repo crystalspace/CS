@@ -56,6 +56,7 @@
 #include "csparser/impexp.h"
 #include "csutil/inifile.h"
 #include "csutil/csrect.h"
+#include "csutil/scanstr.h"
 #include "csobject/dataobj.h"
 #include "csobject/csobject.h"  
 #include "csobject/objiter.h"
@@ -110,6 +111,7 @@ WalkTest::WalkTest () :
   wMissile_whoosh = NULL;
   cslogo = NULL;
   world = NULL;
+  anim_sky = NULL;
 
   wf = NULL;
   map_mode = MAP_OFF;
@@ -272,6 +274,34 @@ void WalkTest::NextFrame (time_t elapsed_time, time_t current_time)
 
 void WalkTest::MoveSystems (time_t elapsed_time, time_t current_time)
 {
+  // First move the sky.
+  if (anim_sky)
+  {
+    switch (anim_sky_rot)
+    {
+      case 0:
+	{
+          csXRotMatrix3 mat (anim_sky_speed * 2. * M_PI * (float)elapsed_time/1000.);
+          anim_sky->Transform (mat);
+	  break;
+	}
+      case 1:
+	{
+          csYRotMatrix3 mat (anim_sky_speed * 2. * M_PI * (float)elapsed_time/1000.);
+          anim_sky->Transform (mat);
+	  break;
+	}
+      case 2:
+	{
+          csZRotMatrix3 mat (anim_sky_speed * 2. * M_PI * (float)elapsed_time/1000.);
+          anim_sky->Transform (mat);
+	  break;
+	}
+    }
+    anim_sky->Transform ();
+  }
+
+  // Move all particle systems.
   Sys->world->UpdateParticleSystems (elapsed_time);
 
   // Record the first time this routine is called.
@@ -907,6 +937,34 @@ void WalkTest::LoadLibraryData(void)
   csLoader::LoadLibraryFile (world, "/lib/std/library");
 }
 
+void WalkTest::ParseKeyCmds ()
+{
+  int i;
+  for (i = 0 ; i < world->sectors.Length () ; i++)
+  {
+    csSector* sector = (csSector*)world->sectors[i];
+    csObjIterator it = sector->GetIterator (csKeyValuePair::Type);
+    while (!it.IsFinished ())
+    {
+      csObject* obj = it.GetObj ();
+      csKeyValuePair* kp = (csKeyValuePair*)obj;
+      if (!strcmp (kp->GetKey (), "cmd_AnimateSky"))
+      {
+	char name[100], rot[100];
+        ScanStr (kp->GetValue (), "%s,%s,%f", name, rot, &anim_sky_speed);
+	if (rot[0] == 'x') anim_sky_rot = 0;
+	else if (rot[0] == 'y') anim_sky_rot = 1;
+	else anim_sky_rot = 2;
+        anim_sky = sector->GetSky (name);
+      }
+      else
+      {
+        // Unknown command. Ignore for the moment.
+      }
+      it.Next ();
+    }
+  }
+}
 
 void WalkTest::Inititalize2DTextures(void)
 {
@@ -1152,14 +1210,15 @@ bool WalkTest::Initialize (int argc, const char* const argv[], const char *iConf
       return false;
     }
 
-    LoadLibraryData();
-    Inititalize2DTextures();
+    LoadLibraryData ();
+    Inititalize2DTextures ();
+    ParseKeyCmds ();
 
     // Prepare the world. This will calculate all lighting and
     // prepare the lightmaps for the 3D rasterizer.
     world->Prepare ();
 
-    Create2DSprites();
+    Create2DSprites ();
 
     // Look for the start sector in this world.
     csCameraPosition *cp = (csCameraPosition *)world->camera_positions.FindByName ("Start");

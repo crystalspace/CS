@@ -414,7 +414,10 @@ void csPolygonSet::DrawOnePolygon (csPolygon3D* p, csPolygon2D* poly,
       }
     }
     else if (!d->callback)
+    {
+    printf ("!!!! use_z_buf=%d\n", use_z_buf);
       poly->DrawFilled (d, p, p->GetPlane (), use_z_buf);
+}
 
     // Cleanup.
     if (keep_plane) keep_plane->DecRef ();

@@ -73,6 +73,7 @@ csSector::csSector () : csPolygonSet ()
 {
   CONSTRUCT_EMBEDDED_IBASE (scfiSector);
   first_thing = NULL;
+  first_sky = NULL;
   sector = this;
   beam_busy = 0;
   level_r = level_g = level_b = 0;
@@ -89,6 +90,12 @@ csSector::~csSector ()
     first_thing = n;
   }
   delete static_tree;
+  while (first_sky)
+  {
+    csThing* n = (csThing*)(first_sky->GetNext ());
+    delete first_sky;
+    first_sky = n;
+  }
 
   // The sprites are not deleted here because they can occur in more
   // than one sector at the same time. Therefor we first clear the list.
@@ -110,6 +117,45 @@ void csSector::Prepare ()
     th->Prepare ();
     th = (csThing*)(th->GetNext ());
   }
+  th = first_sky;
+  while (th)
+  {
+    th->Prepare ();
+    th = (csThing*)(th->GetNext ());
+  }
+}
+
+void csSector::AddSky (csThing* thing)
+{
+  if (thing->GetParent ()) return;
+  thing->SetNext (this, first_sky);
+  first_sky = thing;
+}
+
+bool csSector::RemoveSky (csThing* thing)
+{
+  if (first_sky == thing)
+  {
+    first_sky = (csThing*)thing->GetNext();
+    thing->SetNext (NULL, NULL);
+    return true;
+  }
+  else
+  {
+    csThing* th = first_sky;
+    while (th)
+    {
+      csThing* next = (csThing*)th->GetNext();
+      if (next == thing)
+      {
+        th->SetNext (this, next->GetNext());
+        thing->SetNext (NULL, NULL);
+        return true;
+      }
+      th = next;
+    }
+  }
+  return false; //Thing was not found
 }
 
 void csSector::AddThing (csThing* thing)
@@ -279,6 +325,12 @@ void csSector::CreateLightMaps (iGraphics3D* g3d)
     sp->CreateLightMaps (g3d);
     sp = (csThing*)(sp->GetNext ());
   }
+  sp = first_sky;
+  while (sp)
+  {
+    sp->CreateLightMaps (g3d);
+    sp = (csThing*)(sp->GetNext ());
+  }
 }
 
 
@@ -380,9 +432,6 @@ csPolygon3D* csSector::IntersectSegment (const csVector3& start,
 csSector* csSector::FollowSegment (csReversibleTransform& t,
   csVector3& new_position, bool& mirror)
 {
-//csVector3 delta = new_position-t.GetOrigin ();
-//if (!(delta < EPSILON))
-//printf ("FollowSegment (%f,%f,%f) delta=%f,%f,%f\n", new_position.x, new_position.y, new_position.z, delta.x, delta.y, delta.z);
   csVector3 isect;
   csPolygon3D* p = sector->IntersectSegment (t.GetOrigin (), new_position, isect);
   csPortal* po;
@@ -390,9 +439,17 @@ csSector* csSector::FollowSegment (csReversibleTransform& t,
   if (p)
   {
     po = p->GetPortal ();
-//printf ("  %s isect=(%f,%f,%f) po=%08lx\n", p->GetName (), isect.x, isect.y, isect.z, po);
     if (po)
-      return po->FollowSegment (t, new_position, mirror);
+    {
+      if (!po->GetSector ()) po->CompleteSector ();
+      if (po->flags.Check (CS_PORTAL_WARP))
+      {
+        po->WarpSpace (t, mirror);
+	new_position = po->Warp (new_position);
+      }
+      csSector* dest_sect = po->GetSector ();
+      return dest_sect ? dest_sect->FollowSegment (t, new_position, mirror) : (csSector*)NULL;
+    }
     else
       new_position = isect;
   }
@@ -425,7 +482,9 @@ csPolygon3D* csSector::IntersectSphere (csVector3& center, float radius,
         csPortal* po = p->GetPortal ();
         if (po)
         {
-          p = po->IntersectSphere (center, min_d, &d);
+	  if (!po->GetSector ()) po->CompleteSector ();
+	  csSector* dest_sect = po->GetSector ();
+          p = dest_sect->IntersectSphere (center, min_d, &d);
           if (p)
           {
             min_d = d;
@@ -798,6 +857,14 @@ void csSector::Draw (csRenderView& rview)
     {
       rview.g3d->OpenFogObject (GetID (), &GetFog ());
     }
+  }
+
+  // First draw all 'sky' things using Z-fill.
+  csThing* sp = first_sky;
+  while (sp)
+  {
+    sp->Draw (rview, false);
+    sp = (csThing*)(sp->GetNext ());
   }
 
   // In some cases this queue will be filled with all visible
@@ -1483,6 +1550,12 @@ void csSector::InitLightMaps (bool do_cache)
     sp->InitLightMaps (do_cache);
     sp = (csThing*)(sp->GetNext ());
   }
+  sp = first_sky;
+  while (sp)
+  {
+    sp->InitLightMaps (do_cache);
+    sp = (csThing*)(sp->GetNext ());
+  }
 }
 
 void csSector::CacheLightMaps ()
@@ -1497,11 +1570,29 @@ void csSector::CacheLightMaps ()
     sp->CacheLightMaps ();
     sp = (csThing*)(sp->GetNext ());
   }
+  sp = first_sky;
+  while (sp)
+  {
+    sp->CacheLightMaps ();
+    sp = (csThing*)(sp->GetNext ());
+  }
 }
 
 csThing* csSector::GetThing (const char* name)
 {
   csThing* s = first_thing;
+  while (s)
+  {
+    if (!strcmp (name, s->GetName ()))
+      return s;
+    s = (csThing*)(s->GetNext ());
+  }
+  return NULL;
+}
+
+csThing* csSector::GetSky (const char* name)
+{
+  csThing* s = first_sky;
   while (s)
   {
     if (!strcmp (name, s->GetName ()))

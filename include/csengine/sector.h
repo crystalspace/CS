@@ -80,6 +80,9 @@ private:
   /// First thing in this sector.
   csThing* first_thing;
 
+  /// First sky in this sector.
+  csThing* first_sky;
+
   /// Ambient light level for red in this sector.
   int level_r;
   /// Ambient light level for green in this sector.
@@ -189,6 +192,16 @@ public:
   virtual void Prepare ();
 
   /**
+   * Add a sky to this sector.
+   */
+  void AddSky (csThing* thing);
+
+  /**
+   * Remove a sky from this sector.
+   */
+  bool RemoveSky (csThing* thing);
+
+  /**
    * Add a thing to this sector.
    */
   void AddThing (csThing* thing);
@@ -217,6 +230,16 @@ public:
    * Get the first thing in this sector.
    */
   csThing* GetFirstThing () { return first_thing; }
+
+  /**
+   * Find a sky with the given name.
+   */
+  csThing* GetSky (const char* name);
+
+  /**
+   * Get the first sky in this sector.
+   */
+  csThing* GetFirstSky () { return first_sky; }
 
   /**
    * Get the thing representing all non-moving things (all

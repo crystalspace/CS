@@ -203,7 +203,7 @@ int FindSectors (csVector3 v, csVector3 d, csSector *s, csSector **sa)
       {
         if (Sys->do_infinite && !portal->GetSector ())
 	{
-	  ((InfPortalCS*)portal)->ConnectNewSector ();
+	  ((InfPortalCS*)portal)->CompleteSector ();
 	}
         sa[c] = portal->GetSector ();
         c++;

@@ -299,6 +299,17 @@ void csThing::DrawCurves (csRenderView& rview, bool use_z_buf)
 
 void csThing::Draw (csRenderView& rview, bool use_z_buf)
 {
+  if (flags.Check (CS_ENTITY_CAMERA))
+  {
+    csRenderView rview_new = rview;
+    rview_new.SetO2TTranslation (csVector3 (0));
+    DrawInt (rview_new, use_z_buf);
+  }
+  else DrawInt (rview, use_z_buf);
+}
+
+void csThing::DrawInt (csRenderView& rview, bool use_z_buf)
+{
   draw_busy++;
   UpdateTransformation (rview);
 

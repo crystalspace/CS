@@ -190,6 +190,15 @@ public:
   /// The view on the world.
   csView* view;
 
+  /// A pointer to a skybox to animate (if any).
+  csThing* anim_sky;
+
+  /// Speed of this animation (with 1 meaning 1 full rotation in a second).
+  float anim_sky_speed;
+
+  /// Rotation direction (0=x, 1=y, 2=z)
+  int anim_sky_rot;
+
   /// A sprite to display the Crystal Space Logo
   csPixmap* cslogo;
 
@@ -256,6 +265,9 @@ public:
   /// Perform some initialization work
   virtual bool Initialize (int argc, const char* const argv[],
     const char *iConfigName);
+
+  /// Find all key commands attached to sectors and execute them.
+  virtual void ParseKeyCmds ();
 
   ///
   virtual void NextFrame (time_t elapsed_time, time_t current_time);

@@ -101,6 +101,7 @@ csGouraudShaded::csGouraudShaded () : csPolygonTextureType ()
   colors = NULL;
   static_colors = NULL;
   num_vertices = -1;
+  MixMode = CS_FX_COPY;
 }
 
 csGouraudShaded::~csGouraudShaded ()

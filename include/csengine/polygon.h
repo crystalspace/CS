@@ -235,6 +235,9 @@ private:
   /// Number of vertices.
   int num_vertices;
 
+  /// Mixmode to use for drawing this polygon.
+  UInt MixMode;
+
 private:
   /// Constructor.
   csGouraudShaded ();
@@ -253,6 +256,12 @@ public:
    * vertices is already correct.
    */
   void Setup (int num_vertices);
+
+  /// Sets the mode that is used for DrawPolygonFX.
+  void SetMixmode (UInt m) { MixMode = m; }
+
+  /// Gets the mode that is used for DrawPolygonFX.
+  UInt GetMixmode () { return MixMode; }
 
   /**
    * Enable/disable gouraud.
