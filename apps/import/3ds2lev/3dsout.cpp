@@ -252,13 +252,10 @@ void OutpObjectsCS (FILE * o, Lib3dsFile *p3dsFile, bool lighting)
     // output faces
     for (i=0; i<numFaces; i++)
     {
-      Lib3dsTexel *mapV0 = (Lib3dsTexel*)p3dsMesh->texelL[pCurFace->points[0]];
-      Lib3dsTexel *mapV1 = (Lib3dsTexel*)p3dsMesh->texelL[pCurFace->points[1]];
-      Lib3dsTexel *mapV2 = (Lib3dsTexel*)p3dsMesh->texelL[pCurFace->points[2]];
-
       if (flags & FLAG_SPRITE)
       {
-        fprintf (o, "        TRIANGLE (%d,%d,%d)\n", pCurFace->points[0], pCurFace->points[1], pCurFace->points[2]);
+        fprintf (o, "        TRIANGLE (%d,%d,%d)\n",
+		pCurFace->points[0], pCurFace->points[1], pCurFace->points[2]);
       }
       else
       {
@@ -267,17 +264,27 @@ void OutpObjectsCS (FILE * o, Lib3dsFile *p3dsFile, bool lighting)
             lighting = true;
 
         fprintf (o, "        POLYGON 'x%d_%d'  (VERTICES (%d,%d,%d)%s\n",
-	             numMesh, i, pCurFace->points[0], pCurFace->points[1], pCurFace->points[2],
+	             numMesh, i, pCurFace->points[0],
+		     pCurFace->points[1], pCurFace->points[2],
 	             lighting ? "" : " LIGHTING (no)");
-        fprintf (o, "          TEXTURE (UV (0,%g,%g,1,%g,%g,2,%g,%g))\n",
-                 mapV0[0][0], (flags & FLAG_SWAP_V ? 1.-mapV0[0][1] : mapV0[0][1]),
-                 mapV1[0][0], (flags & FLAG_SWAP_V ? 1.-mapV1[0][1] : mapV1[0][1]),
-                 mapV2[0][0], (flags & FLAG_SWAP_V ? 1.-mapV2[0][1] : mapV2[0][1]));
+        Lib3dsTexel *pCurTexel = p3dsMesh->texelL;
+	if (pCurTexel)
+	{
+          Lib3dsTexel *mapV0 = (Lib3dsTexel*)pCurTexel[pCurFace->points[0]];
+	  float u0 = mapV0[0][0];
+	  float v0 = mapV0[0][1];
+          Lib3dsTexel *mapV1 = (Lib3dsTexel*)pCurTexel[pCurFace->points[1]];
+	  float u1 = mapV1[0][0];
+	  float v1 = mapV1[0][1];
+          Lib3dsTexel *mapV2 = (Lib3dsTexel*)pCurTexel[pCurFace->points[2]];
+	  float u2 = mapV2[0][0];
+	  float v2 = mapV2[0][1];
+          fprintf (o, "          TEXTURE (UV (0,%g,%g,1,%g,%g,2,%g,%g))\n",
+                 u0, (flags & FLAG_SWAP_V ? 1.-v0 : v0),
+                 u1, (flags & FLAG_SWAP_V ? 1.-v1 : v1),
+                 u2, (flags & FLAG_SWAP_V ? 1.-v2 : v2));
+	}
 
-/*                 mapV0[0][0], mapV0[0][1],
-                 mapV1[0][0], mapV1[0][1],
-                 mapV2[0][0], mapV2[0][1]);
-                 */
         fprintf (o, "        )\n"); // close polygon
       }
 
