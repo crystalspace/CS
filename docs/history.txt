@@ -6,6 +6,9 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+30-Mar-2004
+	- Eric Sunshine added missing "#define CS_SYSDEF_PROVIDE_SOFTWARE2D"
+	  to null_render3d.cpp.  Reported by Steven Geens.
 29-Mar-2004
 	- Jorrit changed the NR null3d renderer so it uses the soft canvas
 	  instead of the OpenGL canvas by default.
