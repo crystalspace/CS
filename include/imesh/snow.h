@@ -32,16 +32,28 @@ struct iSnowState : public iBase
 {
   /// Set the number of particles to use.
   virtual void SetNumberParticles (int num) = 0;
+  /// Get the number of particles used.
+  virtual int GetNumberParticles () const = 0;
   /// Set the size of the drops.
   virtual void SetDropSize (float dropwidth, float dropheight) = 0;
+  /// Get the size of the rain drops.
+  virtual void GetDropSize (float& dropwidth, float& dropheight) const = 0;
   /// Set box.
   virtual void SetBox (const csVector3& minbox, const csVector3& maxbox) = 0;
+  /// Get box.
+  virtual void GetBox (csVector3& minbox, csVector3& maxbox) const = 0;
   /// Enable or disable lighting.
   virtual void SetLighting (bool l) = 0;
+  /// See if lighting is enabled.
+  virtual bool GetLighting () const = 0;
   /// Set fall speed.
   virtual void SetFallSpeed (const csVector3& fspeed) = 0;
+  /// Get fall speed.
+  virtual const csVector3& GetFallSpeed () const = 0;
   /// Set swirl.
   virtual void SetSwirl (float swirl) = 0;
+  /// Get swirl.
+  virtual float GetSwirl () const = 0;
 };
 
 #endif
