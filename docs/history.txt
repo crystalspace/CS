@@ -7,6 +7,9 @@ The history order is reversed so that new features are at the top.
 	- Philip Wyett fixed the DDS plugin compilation under MSVC,
 	  by replacing struct with static (don't ask) and giving the
 	  the array an element size.
+	    - Removed the Python 2.2 cs_pyth.cpp hack from the MSVC6
+              build docs. It is no longer needed after the expansion
+              and recent upgrade of the Python plugin.
 26-Apr-2003
 	- Norman Kraemer added a swig.jam file for custom swig rules and
 	  used the new power to rebuild the cs_pyth.cpp from cspace.i if
