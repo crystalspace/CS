@@ -234,12 +234,12 @@ bool TerrBigTut::Initialize ()
   csRef<iTerrBigState> terrbigstate;
   terrbigstate = SCF_QUERY_INTERFACE (mesh->GetMeshObject(), iTerrBigState);
 
-  if (!loader->LoadTexture ("wood", "/lib/stdtex/andrew_wood.jpg")) {
+  if (!loader->LoadTexture ("heightmap", "/lev/terrain/heightmap.png")) {
     Report (CS_REPORTER_SEVERITY_ERROR,
       "Error loading 'wood' texture!\n");
     return false;
   }
-  iMaterialWrapper *mat = engine->GetMaterialList()->FindByName ("wood");
+  iMaterialWrapper *mat = engine->GetMaterialList()->FindByName ("heightmap");
   terrbigstate->SetMaterialsList (&mat, 1);
   terrbigstate->LoadHeightMapFile ("./data/terrain/test.map");
 
