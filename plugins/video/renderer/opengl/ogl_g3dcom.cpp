@@ -925,6 +925,10 @@ void csGraphics3DOGLCommon::SetClipper (iClipper2D* clip, int cliptype)
 
 bool csGraphics3DOGLCommon::BeginDraw (int DrawFlags)
 {
+  if ((G2D->GetWidth() != width) ||
+      (G2D->GetHeight() != height))
+    SetDimensions (G2D->GetWidth(), G2D->GetHeight());
+
   if (DrawMode & CSDRAW_3DGRAPHICS)
   {
     FlushDrawPolygon ();
