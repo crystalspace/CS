@@ -59,7 +59,7 @@ the base texture). In future materials will be able to do much more.
 
 @item Mesh Factory
 A mesh factory is an object from which you can create mesh objects.
-(@pxref(MeshObject}).
+@xref{MeshObject}.
 
 @item Mesh Object
 A mesh object represents geometry in Crystal Space. The Crystal Space engine
@@ -70,11 +70,14 @@ mesh objects: things, 3D sprites, 2D sprites, particle systems, haze,
 terrain engine, metaballs, ...
 
 @item Object Registry
-The object registry (represented by the @code{iObjectRegistry} interface
+The object registry (represented by the @samp{iObjectRegistry} interface
 is the central repository for all objects in Crystal Space. Everything in
 Crystal Space will use the object registry to get the pointer to the objects
-it is interested in. See also @code{csInitializer::CreateObjectRegistry()}
-or @code{csInitializer::CreateEnvironment()}.
+it is interested in. See also:
+
+@noindent
+@code{csInitializer::CreateObjectRegistry()}@*
+@code{csInitializer::CreateEnvironment()}
 
 @item Object Space
 Every object or room is defined with its own local 3D coordinate system
@@ -179,6 +182,6 @@ matrix transformation.
 @item @sc{vfs}
 The virtual file system.  A mechanism for unifying filesystem access between
 various platforms. Using this a Crystal Space application can read and write
-transparently from @sc{ZIP} archives. @xref{VFS}.
+transparently from @sc{zip} archives. @xref{VFS}.
 @end table
 

@@ -23,11 +23,11 @@ a line in your config file like this:
   System.Plugins.iImageIO = crystalspace.graphic.image.io.multiplex
 @end example
 
-Or you can put the following line in your @code{main} routine in
-the call to @code{csInitializer::RequestPlugins()}:
+Or you can add the following line to the call to
+@code{csInitializer::RequestPlugins()} in your @code{main()} function:
 
 @example
-  CS_REQUEST_IMAGELOADER,
+CS_REQUEST_IMAGELOADER,
 @end example
 
 To finally be able to use the image loader in your application you
@@ -48,7 +48,7 @@ loader to load an image:
 @example
 iDataBuffer* buf = VFS->ReadFile ("/lib/mydata/test.jpg");
 iImage* ifile = imgldr->Load (buf->GetUint8 (),
-    buf->GetSize (), txtmgr->GetTextureFormat ());
+  buf->GetSize (), txtmgr->GetTextureFormat ());
 buf->DecRef ();
 iTextureHandle* txt = txtmgr->RegisterTexture (ifile, CS_TEXTURE_2D);
 txt->Prepare ();
@@ -86,7 +86,7 @@ There are various ways to draw the pixmap. Check out the API documentation
 for more info. But here is one example:
 
 @example
-  pixmap->DrawScaled (G3D, 10, 10, 400, 400);
+pixmap->DrawScaled (G3D, 10, 10, 400, 400);
 @end example
 
 This will draw the pixmap at location 10, 10 with dimension 400, 400.
@@ -104,4 +104,3 @@ The include files useful for this section are:
 #include "ivideo/txtmgr.h"
 #include "isys/vfs.h"
 @end example
-

@@ -106,8 +106,6 @@ Similarly for @file{simple.cpp}:
 
 CS_IMPLEMENT_APPLICATION
 
-//-----------------------------------------------------------------------------
-
 // The global pointer to simple
 Simple *simple;
 
@@ -155,7 +153,8 @@ void Simple::SetupFrame ()
     c->Move (VEC_BACKWARD * 4 * speed);
 
   // Tell 3D driver we're going to display 3D things.
-  if (!g3d->BeginDraw (engine->GetBeginDrawFlags () | CSDRAW_3DGRAPHICS))
+  if (!g3d->BeginDraw(
+    engine->GetBeginDrawFlags() | CSDRAW_3DGRAPHICS))
     return;
 
   // Tell the camera to render into the frame buffer.
@@ -175,7 +174,8 @@ bool Simple::HandleEvent (iEvent& ev)
     simple->SetupFrame ();
     return true;
   @}
-  else if (ev.Type == csevBroadcast && ev.Command.Code == cscmdFinalProcess)
+  else if (ev.Type == csevBroadcast &&
+    ev.Command.Code == cscmdFinalProcess)
   @{
     simple->FinishFrame ();
     return true;
@@ -222,7 +222,8 @@ bool Simple::Initialize (int argc, const char* const argv[])
     return false;
   @}
 
-  if (!csInitializer::SetupEventHandler (object_reg, SimpleEventHandler))
+  if (!csInitializer::SetupEventHandler(
+    object_reg, SimpleEventHandler))
   @{
     csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
     	"crystalspace.application.simple",
@@ -284,7 +285,8 @@ bool Simple::Initialize (int argc, const char* const argv[])
     return false;
   @}
 
-  // Open the main system. This will open all the previously loaded plug-ins.
+  // Open the main system. This will open all the previously
+  // loaded plug-ins.
   if (!csInitializer::OpenApplication (object_reg))
   @{
     csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
@@ -309,9 +311,9 @@ void Simple::Start ()
   csDefaultRunLoop (object_reg);
 @}
 
-/*---------------------------------------------------------------------*
+/*---------------*
  * Main function
- *---------------------------------------------------------------------*/
+ *---------------*/
 int main (int argc, char* argv[])
 @{
   simple = new Simple ();

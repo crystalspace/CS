@@ -209,13 +209,13 @@ This has an effect on config files where you now must replace things
 like:
 
 @example
-  System.PlugIns.LevelLoader = crystalspace.level.loader
+System.PlugIns.LevelLoader = crystalspace.level.loader
 @end example
 
 with:
 
 @example
-  System.PlugIns.iLoader = crystalspace.level.loader
+System.PlugIns.iLoader = crystalspace.level.loader
 @end example
 
 So in general use the interface name. This interface name will be the
@@ -253,11 +253,11 @@ System.PlugIns.iLoader = crystalspace.level.loader
 @end example
 
 @noindent
-Or else put the following line in your @code{main} routine in the
-call to @code{csInitializer::RequestPlugins()}:
+Or you can add the following line to the call to
+@code{csInitializer::RequestPlugins()} in your @code{main()} function:
 
 @example
-  CS_REQUEST_LEVELLOADER,
+CS_REQUEST_LEVELLOADER,
 @end example
 
 @noindent
@@ -323,10 +323,10 @@ Using the engine as a plugin means in the first loading the engine plugin
 instead of linking to the @file{csengine} library.  You can do this with:
 
 @example
-  csInitializer::RequestPlugins (object_reg,
-    CS_REQUEST_ENGINE,
-  @dots{}
-  iEngine* engine = CS_QUERY_REGISTRY (object_reg, iEngine);
+csInitializer::RequestPlugins (object_reg,
+CS_REQUEST_ENGINE,
+@dots{}
+iEngine* engine = CS_QUERY_REGISTRY (object_reg, iEngine);
 @end example
 
 You then use the engine through @sc{scf} interfaces.  Therefore, your programs
@@ -979,4 +979,3 @@ They were replaced by these methods:
 in @code{SysSystemDriver} (entire system driver is gone in fact). Instead
 you have to call @code{GetWidth()} and @code{GetHeight()} on the pointer
 to the canvas (@code{iGraphics2D}).
-

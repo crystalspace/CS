@@ -16,18 +16,18 @@ a line in your config file like this:
 System.Plugins.iLoader = crystalspace.level.loader
 @end example
 
-Or you can put the following line in your @code{main} routine in
-the call @code{csInitializer::RequestPlugins()}:
+Or you can add the following line to the call to
+@code{csInitializer::RequestPlugins()} in your @code{main()} function:
 
 @example
-  CS_REQUEST_LEVELLOADER,
+CS_REQUEST_LEVELLOADER,
 @end example
 
 To finally be able to use the level loader in your application you
 need to do:
 
 @example
-  iLoader* level_loader = CS_QUERY_REGISTRY (object_reg, iLoader);
+iLoader* level_loader = CS_QUERY_REGISTRY (object_reg, iLoader);
 @end example
 
 When you don't need it anymore you must call @code{level_loader->DecRef ()}.
@@ -63,4 +63,3 @@ The include files useful for this section are:
 #include "imap/parser.h"
 #include "iengine/engine.h"
 @end example
-

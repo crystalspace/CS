@@ -314,8 +314,6 @@ In the source file @file{simple.cpp} we place the following:
 
 CS_IMPLEMENT_APPLICATION
 
-//-----------------------------------------------------------------------------
-
 // The global pointer to simple
 Simple *simple;
 
@@ -415,7 +413,8 @@ bool Simple::Initialize (int argc, const char* const argv[])
     return false;
   @}
 
-  // Open the main system. This will open all the previously loaded plug-ins.
+  // Open the main system. This will open all the previously
+  // loaded plug-ins.
   if (!csInitializer::OpenApplication (object_reg))
   @{
     csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
@@ -436,9 +435,9 @@ void Simple::Start ()
   csDefaultRunLoop (object_reg);
 @}
 
-/*---------------------------------------------------------------------*
+/*---------------*
  * Main function
- *---------------------------------------------------------------------*/
+ *---------------*/
 int main (int argc, char* argv[])
 @{
   simple = new Simple ();
@@ -517,12 +516,11 @@ objects that we're going to need later and store a reference in our
 main class. At destruction time we must then release these references
 with @code{DecRef()}.
 
-Finally when all this is done we actually open the window with
-@code{csInitializer::OpenApplication()}. This will send the
-@code{cscmdSystemOpen} message to all components that are listening
-to the event queue. One of the plugins that does this is the 3D renderer
-which will then open its window (or enable graphics on a non-windowing
-operating system).
+Finally, when all is done the window is opened with a call to the function
+@code{csInitializer::OpenApplication()}.  This sends the @code{cscmdSystemOpen}
+message to all components that are listening to the event queue.  One of the
+plugins that does this is the 3D renderer which will then open its window (or
+enable graphics on a non-windowing operating system).
 
 This concludes the initialization pass.
 
@@ -588,7 +586,8 @@ We also need to initialize this event handler function. To do that add
 the following after the call to @code{csInitializer::RequestPlugins()}:
 
 @example
-  if (!csInitializer::SetupEventHandler (object_reg, SimpleEventHandler))
+  if (!csInitializer::SetupEventHandler(
+    object_reg, SimpleEventHandler))
   @{
     csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
     	"crystalspace.application.simple",
@@ -660,12 +659,14 @@ bool Simple::Initialize (int argc, const char* const argv[])
     	"Error loading 'stone4' texture!");
     return false;
   @}
-  iMaterialWrapper* tm = engine->GetMaterialList ()->FindByName ("stone");
+  iMaterialWrapper* tm =
+    engine->GetMaterialList ()->FindByName ("stone");
 
   room = engine->CreateSector ("room");
-  iMeshWrapper* walls = engine->CreateSectorWallsMesh (room, "walls");
-  iThingState* walls_state = SCF_QUERY_INTERFACE (walls->GetMeshObject (),
-  	iThingState);
+  iMeshWrapper* walls =
+    engine->CreateSectorWallsMesh (room, "walls");
+  iThingState* walls_state =
+    SCF_QUERY_INTERFACE (walls->GetMeshObject (), iThingState);
   iPolygon3D* p;
   p = walls_state->CreatePolygon ();
   p->SetMaterial (tm);
@@ -916,7 +917,8 @@ by the event handler. Add the following code somewhere in the source file:
 void Simple::SetupFrame ()
 @{
   // Tell 3D driver we're going to display 3D things.
-  if (!g3d->BeginDraw (engine->GetBeginDrawFlags () | CSDRAW_3DGRAPHICS))
+  if (!g3d->BeginDraw(
+    engine->GetBeginDrawFlags() | CSDRAW_3DGRAPHICS))
     return;
 
   // Tell the camera to render into the frame buffer.
@@ -940,7 +942,8 @@ bool Simple::HandleEvent (iEvent& ev)
     simple->SetupFrame ();
     return true;
   @}
-  else if (ev.Type == csevBroadcast && ev.Command.Code == cscmdFinalProcess)
+  else if (ev.Type == csevBroadcast &&
+    ev.Command.Code == cscmdFinalProcess)
   @{
     simple->FinishFrame ();
     return true;

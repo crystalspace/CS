@@ -75,7 +75,7 @@ SET PYTHONPATH=C:\mingw32\lib\python1.5
 @end example
 
 @noindent
-On Windows @sc{nt, 2000} and @sc{XP}, use the System control panel to edit the
+On Windows @sc{nt}, 2000 and @sc{xp}, use the System control panel to edit the
 environment variable.
 
 If you fail to do so, then the @file{makedep} tool will not know where to look
