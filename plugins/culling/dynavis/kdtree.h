@@ -29,6 +29,27 @@ struct iGraphics3D;
 class csKDTree;
 
 /**
+ * A callback function for visiting a KD-tree node. If this function
+ * returns true the traversal will continue. Otherwise Front2Back()
+ * will stop.
+ * <p>
+ * This function is itself responsible for calling Distribute() on
+ * the given treenode to ensure that the objects in this node
+ * are properly distributed to the children. If the function doesn't
+ * want or need this functionality it doesn't have to do Distribute().
+ * <p>
+ * If this function decides to process the given node then it is
+ * also responsible for checking the timestamp of every child in this
+ * node with the timestamp given to this function. If this timestamp
+ * is different the child has not been processed before. This function
+ * should then update the timestamp of the child. If this is not done
+ * then some objects will be encountered multiple times. In some
+ * cases this may not be a problem or even desired.
+ */
+typedef bool (csKDTreeVisitFunc)(csKDTree* treenode, void* userdata,
+	uint32 timestamp);
+
+/**
  * A child in the KD-tree (usually some object).
  */
 class csKDTreeChild
@@ -41,6 +62,9 @@ private:
   csKDTree** leafs;		// Leafs that contain this object.
   int num_leafs;
   int max_leafs;
+
+public:
+  uint32 timestamp;		// Timestamp of last visit to this child.
 
 public:
   csKDTreeChild ();
@@ -113,6 +137,10 @@ private:
   // attempt can be made. This situation should be rare though.
   bool disallow_distribute;
 
+  // Current timestamp we are using for Front2Back(). Objects that
+  // have the same timestamp are already visited during Front2Back().
+  static uint32 global_timestamp;
+
   /// Physically add a child to this tree node.
   void AddObject (csKDTreeChild* obj);
   /// Physically remove a child from this tree node.
@@ -128,12 +156,12 @@ private:
    * return a good position depending on tree balancing (i.e. try
    * to have as many objects left as right) and also minimizing the
    * number of objects that are cut. It will return a quality
-   * value which is 0 for very bad and 1 for very good. It will
+   * value which is 0 for very bad and positive for good. It will
    * also return the location to split in the 'split_loc' value.
    * If this function returns a negative quality this means the
    * split should not be performed at all.
    */
-  float FindBestSplitLocation (int axis, float& split_loc);
+  int FindBestSplitLocation (int axis, float& split_loc);
 
   /**
    * If this node is a leaf then we will split the objects currently
@@ -148,6 +176,18 @@ private:
    * bbox of the node correctly.
    */
   void UpdateBBox (const csBox3& bbox);
+
+  /**
+   * Traverse the tree from front to back. Every node of the
+   * tree will be encountered. Returns false if traversal should stop.
+   */
+  bool Front2Back (const csVector3& pos, csKDTreeVisitFunc* func,
+  	void* userdata, uint32 cur_timestamp);
+
+  /**
+   * Reset timestamps of all objects in this treenode.
+   */
+  void ResetTimestamps ();
 
 public:
   /// Create a new empty KD-tree.
@@ -165,7 +205,7 @@ public:
    * Returns a csKDTreeChild pointer which represents the object
    * inside the kd-tree. Object addition is delayed. This function
    * will not yet alter the structure of the kd-tree. Distribute()
-   * will do that (or Front2Back() / Back2Front()).
+   * will do that.
    */
   csKDTreeChild* AddObject (const csBox3& bbox, void* object);
 
@@ -185,9 +225,26 @@ public:
   /**
    * Do a full flatten of this node. This means that all
    * objects are put back in the object list of this node and
-   * the children are removed.
+   * the KD-tree children are removed.
    */
   void Flatten ();
+
+  /**
+   * Traverse the tree from front to back. Every node of the
+   * tree will be encountered.
+   */
+  void Front2Back (const csVector3& pos, csKDTreeVisitFunc* func,
+  	void* userdata);
+
+  /**
+   * Return the number of objects in this node.
+   */
+  int GetObjectCount () const { return num_objects; }
+
+  /**
+   * Return the array of objects in this node.
+   */
+  csKDTreeChild** GetObjects () const { return objects; }
 
   // Debugging functions.
   bool Debug_CheckTree (csString& str);

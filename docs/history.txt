@@ -12,6 +12,11 @@ The history order is reversed so that new features are at the top.
 	  the textual dump of the KD-tree.
 	- Extended the UnitTest() function of the KD-tree to print
 	  statistics about various stages of the process.
+	- Made adding objects to a KD-tree node more efficient by
+	  increasing growth rate of internal vector for storing objects.
+	- Uses 'int' instead of 'float' for calculating quality for the
+	  KD-tree splitting algorithm.
+	- Implemented Front2Back() traversal of the tree.
 2-May-2002
 	- Removed a warning in win32.cpp.
 	- Enabled console in debug mode again for Windows. I think that

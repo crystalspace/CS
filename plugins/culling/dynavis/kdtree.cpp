@@ -32,6 +32,7 @@ csKDTreeChild::csKDTreeChild ()
   num_leafs = 0;
   max_leafs = 2;
   leafs = new csKDTree* [max_leafs];
+  timestamp = 0;
 }
 
 csKDTreeChild::~csKDTreeChild ()
@@ -118,6 +119,8 @@ SCF_IMPLEMENT_EMBEDDED_IBASE (csKDTree::DebugHelper)
   SCF_IMPLEMENTS_INTERFACE(iDebugHelper)
 SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
+uint32 csKDTree::global_timestamp = 1;
+
 csKDTree::csKDTree ()
 {
   SCF_CONSTRUCT_IBASE (NULL);
@@ -161,7 +164,7 @@ void csKDTree::AddObject (csKDTreeChild* obj)
   CS_ASSERT ((max_objects == 0) == (objects == NULL));
   if (num_objects >= max_objects)
   {
-    max_objects += 3;
+    max_objects += MIN (max_objects+2, 80);
     csKDTreeChild** new_objects = new csKDTreeChild* [max_objects];
     if (objects && num_objects > 0)
       memcpy (new_objects, objects, sizeof (csKDTreeChild*) * num_objects);
@@ -187,11 +190,9 @@ void csKDTree::RemoveObject (int idx)
   num_objects--;
 }
 
-float csKDTree::FindBestSplitLocation (int axis, float& split_loc)
+int csKDTree::FindBestSplitLocation (int axis, float& split_loc)
 {
   int i, j;
-
-//@@@@@@@@@@@@ Use 'int' type for quality!!!
 
   // If we have only two objects we use the average location between
   // the two objects.
@@ -206,7 +207,7 @@ float csKDTree::FindBestSplitLocation (int axis, float& split_loc)
       split_loc = max0 + (min1-max0) * 0.5;
       CS_ASSERT (split_loc > max0);
       CS_ASSERT (split_loc < min1);
-      return 1.0;	// Good quality split.
+      return 32768;	// Good quality split.
     }
     float min0 = bbox0.Min (axis);
     float max1 = bbox1.Max (axis);
@@ -215,9 +216,9 @@ float csKDTree::FindBestSplitLocation (int axis, float& split_loc)
       split_loc = max1 + (min0-max1) * 0.5;
       CS_ASSERT (split_loc > max1);
       CS_ASSERT (split_loc < min0);
-      return 1.0;	// Good quality split.
+      return 32768;	// Good quality split.
     }
-    return -1.0;	// Very bad quality split.
+    return -1;		// Very bad quality split.
   }
 
   // Calculate minimum and maximum value along the axis.
@@ -236,8 +237,7 @@ float csKDTree::FindBestSplitLocation (int axis, float& split_loc)
   // @@@ Is the routine below very efficient?
 # define FBSL_ATTEMPTS 10
   float a;
-  float best_qual = -2.0;
-  float inv_num_objects = 1.0 / float (num_objects);
+  int best_qual = -2;
   for (i = 0 ; i < FBSL_ATTEMPTS ; i++)
   {
     // Calculate a possible split location.
@@ -257,18 +257,18 @@ float csKDTree::FindBestSplitLocation (int axis, float& split_loc)
     // If we have left, right, or cut equal to the number
     // objects we have an extremely bad situation that we will not
     // allow to be used.
-    float qual;
+    int qual;
     if (cut == num_objects || left == num_objects || right == num_objects)
     {
-      qual = -1.0;
+      qual = -1;
     }
     else
     {
-      float qual_cut = 1.0 - float (cut) * inv_num_objects;
-      float qual_balance = 1.0 - float (ABS (left-right)) * inv_num_objects;
+      uint32 qual_cut = 32768 - ((cut << 15) / num_objects);
+      uint32 qual_balance = 32768 - ((ABS (left-right) << 15) / num_objects);
       // Currently we just give 'cut' and 'balance' quality an equal share.
       // We should consider if that is a good measure.
-      qual = qual_cut * qual_balance;
+      qual = int ((qual_cut * qual_balance) >> 15);
     }
     if (qual > best_qual)
     {
@@ -379,9 +379,9 @@ void csKDTree::Distribute ()
     // We use FindBestSplitLocation() to see how we can best split this
     // node.
     float split_loc_x, split_loc_y, split_loc_z;
-    float qual_x = FindBestSplitLocation (CS_KDTREE_AXISX, split_loc_x);
-    float qual_y = FindBestSplitLocation (CS_KDTREE_AXISY, split_loc_y);
-    float qual_z = FindBestSplitLocation (CS_KDTREE_AXISZ, split_loc_z);
+    int qual_x = FindBestSplitLocation (CS_KDTREE_AXISX, split_loc_x);
+    int qual_y = FindBestSplitLocation (CS_KDTREE_AXISY, split_loc_y);
+    int qual_z = FindBestSplitLocation (CS_KDTREE_AXISZ, split_loc_z);
     if (qual_x >= 0 && qual_x >= qual_y && qual_x >= qual_z)
     {
       split_axis = CS_KDTREE_AXISX;
@@ -482,6 +482,61 @@ void csKDTree::Flatten ()
   }
 }
 
+bool csKDTree::Front2Back (const csVector3& pos, csKDTreeVisitFunc* func,
+  	void* userdata, uint32 cur_timestamp)
+{
+  if (!func (this, userdata, cur_timestamp))
+    return false;
+  if (child1)
+  {
+    // There are children.
+    if (pos[split_axis] <= split_location)
+    {
+      if (!child1->Front2Back (pos, func, userdata, cur_timestamp))
+        return false;
+      return child2->Front2Back (pos, func, userdata, cur_timestamp);
+    }
+    else
+    {
+      if (!child2->Front2Back (pos, func, userdata, cur_timestamp))
+        return false;
+      return child1->Front2Back (pos, func, userdata, cur_timestamp);
+    }
+  }
+  return true;
+}
+
+void csKDTree::ResetTimestamps ()
+{
+  int i;
+  for (i = 0 ; i < num_objects ; i++)
+    objects[i]->timestamp = 0;
+  if (child1)
+  {
+    child1->ResetTimestamps ();
+    child2->ResetTimestamps ();
+  }
+}
+
+void csKDTree::Front2Back (const csVector3& pos, csKDTreeVisitFunc* func,
+  	void* userdata)
+{
+  if (global_timestamp > 4000000000u)
+  {
+    // For safety reasons we will reset all timestamps to 0
+    // for all objects in the tree and also set the global
+    // timestamp to 1 again. This should be very rare (every
+    // 4000000000 calls of Front2Back :-)
+    ResetTimestamps ();
+    global_timestamp = 1;
+  }
+  else
+  {
+    global_timestamp++;
+  }
+  Front2Back (pos, func, userdata, global_timestamp);
+}
+
 #define KDT_ASSERT(test,msg) \
   if (!(test)) \
   { \
@@ -550,6 +605,32 @@ static float rnd (float range)
   return float ((rand () >> 4) % 1000) * range / 1000.0;
 }
 
+struct Debug_TraverseData
+{
+  int obj_counter;
+};
+
+static bool Debug_TraverseFunc (csKDTree* treenode, void* userdata,
+	uint32 cur_timestamp)
+{
+  Debug_TraverseData* data = (Debug_TraverseData*)userdata;
+
+  treenode->Distribute ();
+  
+  int num_objects = treenode->GetObjectCount ();
+  csKDTreeChild** objects = treenode->GetObjects ();
+  int i;
+  for (i = 0 ; i < num_objects ; i++)
+  {
+    if (objects[i]->timestamp != cur_timestamp)
+    {
+      objects[i]->timestamp = cur_timestamp;
+      data->obj_counter++;
+    }
+  }
+  return true;
+}
+
 iString* csKDTree::Debug_UnitTest ()
 {
   csTicks seed = csGetTicks ();
@@ -560,6 +641,9 @@ iString* csKDTree::Debug_UnitTest ()
 
   str.Format ("Seed %d\n", seed);
 
+  //=================
+  // Test if after Clear() the tree is sufficiently empty :-)
+  //=================
   Clear ();
   KDT_ASSERT (child1 == NULL, "clear ok?");
   KDT_ASSERT (child2 == NULL, "clear ok?");
@@ -567,8 +651,12 @@ iString* csKDTree::Debug_UnitTest ()
   KDT_ASSERT (num_objects == 0, "clear ok?");
   KDT_ASSERT (max_objects == 0, "clear ok?");
 
+  //=================
+  // First we test a simple case but one in which there are two
+  // bounding boxes are exactly the same. This could cause problems
+  // in the algorithm.
+  //=================
   csBox3 b;
-
   b.Set (9, 7, 8, 11, 9, 10);
   AddObject (b, (void*)1);
   b.Set (12, 7, 8, 13, 9, 10);
@@ -579,19 +667,27 @@ iString* csKDTree::Debug_UnitTest ()
   AddObject (b, (void*)3);
   b.Set (10, 11, 11, 14, 12, 14);
   AddObject (b, (void*)4);
-
-  iString* dbdump;
-
   if (!Debug_CheckTree (str)) return rc;
   Distribute ();
   if (!Debug_CheckTree (str)) return rc;
   FullDistribute ();
   if (!Debug_CheckTree (str)) return rc;
 
+  iString* dbdump;
+
   Clear ();
 
+  //=================
+  // In this test we are going to insert 'total_test_objects'
+  // objects randomly in the tree. Every 20 objects we do a
+  // FullDistribute() which optimizes the tree. Since we do
+  // it every 20 objects instead of after all objects have
+  // been added the quality of the tree will not be optimal.
+  // The tests below will print out statistics to show that.
+  //=================
   int i;
-  for (i = 0 ; i < 500 ; i++)
+  int total_test_objects = 500;
+  for (i = 0 ; i < total_test_objects ; i++)
   {
     float x = rnd (100.0)-50.0;
     float y = rnd (100.0)-50.0;
@@ -605,29 +701,59 @@ iString* csKDTree::Debug_UnitTest ()
       if (!Debug_CheckTree (str)) return rc;
     }
   }
-  if (!Debug_CheckTree (str)) return rc;
-  dbdump = Debug_Statistics ();
-  printf ("%s", dbdump->GetData ()); fflush (stdout);
 
-  Distribute ();
-  if (!Debug_CheckTree (str)) return rc;
-  dbdump = Debug_Statistics ();
-  printf ("%s", dbdump->GetData ()); fflush (stdout);
-
+  //=================
+  // Do a final FullDistribute() to force the tree to be fully
+  // distributed. Then print out statistics to show current quality.
+  // This will not be extremely good since we distributed every 20 objects.
+  //=================
   FullDistribute ();
   if (!Debug_CheckTree (str)) return rc;
   dbdump = Debug_Statistics ();
-  printf ("%s", dbdump->GetData ()); fflush (stdout);
+  printf ("Step 1: %s", dbdump->GetData ()); fflush (stdout);
 
+  //=================
+  // Now we flatten the tree completely.
+  //=================
   Flatten ();
   if (!Debug_CheckTree (str)) return rc;
   dbdump = Debug_Statistics ();
-  printf ("%s", dbdump->GetData ()); fflush (stdout);
+  printf ("Flat  : %s", dbdump->GetData ()); fflush (stdout);
 
+  //=================
+  // Do a FullDistribute() again. Since we now start from a flattened
+  // tree this should result in a much better quality tree since all
+  // information is available.
+  //=================
   FullDistribute ();
   if (!Debug_CheckTree (str)) return rc;
   dbdump = Debug_Statistics ();
-  printf ("%s", dbdump->GetData ()); fflush (stdout);
+  printf ("Optim : %s", dbdump->GetData ()); fflush (stdout);
+
+  //=================
+  // Now we are going to test traversal. The crucial thing here is
+  // that the traversal of the entire tree should return exactly
+  // 'total_test_objects' objects.
+  //=================
+  Debug_TraverseData data;
+  data.obj_counter = 0;
+  Front2Back (csVector3 (0, 0, 0), Debug_TraverseFunc, (void*)&data);
+  KDT_ASSERT (data.obj_counter == total_test_objects,
+  	"number of objects traversed doesn't match tree!");
+
+  //=================
+  // Flatten the tree and test traversal again. The traversal function
+  // will do Distribute() so the end result should be exactly the same
+  // as the FullDistribute(). Statistics are printed to show this.
+  //=================
+  Flatten ();
+  data.obj_counter = 0;
+  Front2Back (csVector3 (0, 0, 0), Debug_TraverseFunc, (void*)&data);
+  KDT_ASSERT (data.obj_counter == total_test_objects,
+  	"number of objects traversed doesn't match tree!");
+  if (!Debug_CheckTree (str)) return rc;
+  dbdump = Debug_Statistics ();
+  printf ("Traver: %s", dbdump->GetData ()); fflush (stdout);
 
   rc->DecRef ();
   return NULL;
