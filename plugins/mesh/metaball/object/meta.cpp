@@ -163,7 +163,7 @@ void csMetaBall::SetEnvironmentMappingFactor (float env_mult)
   InitTables ();
 }
 
-void LitVertex( const csVector3 &n, csColor &c )
+static void LitVertex( const csVector3 &n, csColor &c )
 {
   if (n.z > 0)
     c.red = c.green = c.blue = 0;

@@ -180,7 +180,7 @@ void csMetaGen::SetEnvironmentMappingFactor (float env_mult)
 	FillArcSineTable ();
 }
 
-void LitVertex( const csVector3 &n, csColor &c )
+static void LitVertex( const csVector3 &n, csColor &c )
 {
   if (n.z > 0)
     c.red = c.green = c.blue = 0;
@@ -325,7 +325,7 @@ void csMetaGen::AddPoint( csVector3 pos, float charge )
 // Ripped from csVector and modified to handle changing
 // mappings as well. Added a few bits as well.
 
-float CompareVertex( csVector3 vert1, csVector3 vert2 )
+static float CompareVertex( csVector3 vert1, csVector3 vert2 )
 {
   float val;
   if (ABS(val = (vert1.x - vert2.x)) > SMALL_EPSILON )
@@ -337,13 +337,13 @@ float CompareVertex( csVector3 vert1, csVector3 vert2 )
   return 0.0;
 }
 
-void MapExchange( csVector3 &v1, csVector3 &v2, int &map1, int &map2)
+static void MapExchange( csVector3 &v1, csVector3 &v2, int &map1, int &map2)
 {
   csVector3 t; int i;
   t = v2; v2 = v1; v1 = t;
   i = map2; map2 = map1; map1 = i;
 }
-void QuickSort (csVector3 *verts, int *map, int Left, int Right)
+static void QuickSort (csVector3 *verts, int *map, int Left, int Right)
 {
 recurse:
   int i = Left, j = Right;
@@ -392,7 +392,7 @@ recurse:
   }
 }
 
-int SqueezeList( csVector3 *v, int *map, int max )
+static int SqueezeList( csVector3 *v, int *map, int max )
 {
   int i = 0, j = 1; map[0] = 0;
   
@@ -415,7 +415,7 @@ int SqueezeList( csVector3 *v, int *map, int max )
   return i+1; 
 }
 
-void RemoveSplinters( csVector3* vrt, csTriangle* trs, int num, float disc )
+static void RemoveSplinters( csVector3* vrt, csTriangle* trs, int num, float disc )
 {
   int i; 
   csVector3 v;

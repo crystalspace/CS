@@ -55,6 +55,13 @@ The history order is reversed so that new features are at the top.
 	  the proper CFLAGS will be used even when the next2d driver is built
 	  as a result of being a dependency of some other module (even when
 	  not explicitly built via the next2d makefile target).
+	- Eric Sunshine added the `static' qualifier to several stand-alone
+	  functions in the MetaBall and MetaGen plugins in order to avoid
+	  pollution of the gobal namespace.  Preventing this pollution allows
+	  applications to link when USE_PLUGINS=no.  When the global namespace
+	  was polluted, applications failed to link on account of multiply-
+	  defined symbols (since both plugins implement at least one function
+	  in common).
 17-Jun-2001
 	- Fixed a bug in 'facedown'/'faceup' commands (walktest). Reported
 	  by Thiago Ramon.
