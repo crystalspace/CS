@@ -213,9 +213,9 @@ void add_particles_fire (csSector* sector, char* matname, int num,
 
    csFireParticleSystem* exp = new csFireParticleSystem(
      Sys->view->GetWorld (), num, mat,
-     CS_FX_ADD, false, 0.1, 0.1,
-     3.0, csVector3(0,0.5,0), origin,
-     0.3, 0.40);
+     CS_FX_ADD, false, 0.02, 0.04,
+     3.0, csVector3(0,1.0,0), origin,
+     0.6, 0.20);
   exp->GetMovable ().SetSector (sector);
   exp->GetMovable ().UpdateMove ();
 }

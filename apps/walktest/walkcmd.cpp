@@ -1217,7 +1217,7 @@ bool CommandHandler (const char *cmd, const char *arg)
     if (arg) cnt = ScanStr (arg, "%s,%d", txtname, &num);
     extern void add_particles_fire (csSector* sector, char* txtname,
     	int num, const csVector3& origin);
-    if (cnt <= 1) num = 50;
+    if (cnt <= 1) num = 200;
     if (cnt <= 0) strcpy (txtname, "raindrop");
     add_particles_fire (Sys->view->GetCamera ()->GetSector (),
     	txtname, num, Sys->view->GetCamera ()->GetOrigin ()-

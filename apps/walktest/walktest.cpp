@@ -1447,6 +1447,11 @@ bool WalkTest::Initialize (int argc, const char* const argv[], const char *iConf
   int h3d = Gfx3D->GetHeight ();
   view->SetRectangle (2, 2, w3d - 4, h3d - 4);
 
+  // clear all backbuffers to black
+  G2D->BeginDraw ();
+  G2D->ClearAll (txtmgr->FindRGB(0,0,0));
+  G2D->FinishDraw ();
+
   return true;
 }
 
