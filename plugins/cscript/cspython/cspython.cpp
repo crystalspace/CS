@@ -19,39 +19,39 @@
 extern "C" {
 #include "Python.h"
 }
-
 #include "cssysdef.h"
 #include "cspython.h"
 #include "csutil/csstring.h"
 
 IMPLEMENT_IBASE(csPython)
-	IMPLEMENTS_INTERFACE (iScript)
-	IMPLEMENTS_INTERFACE (iPlugIn)
+  IMPLEMENTS_INTERFACE(iScript)
+  IMPLEMENTS_INTERFACE(iPlugIn)
 IMPLEMENT_IBASE_END
 
-IMPLEMENT_FACTORY (csPython)
+IMPLEMENT_FACTORY(csPython)
 
-EXPORT_CLASS_TABLE (cspython)
-	EXPORT_CLASS(csPython, "crystalspace.script.python", "Crystal Space Script Python")
+EXPORT_CLASS_TABLE(cspython)
+  EXPORT_CLASS(csPython, "crystalspace.script.python",
+    "Crystal Space Script Python")
 EXPORT_CLASS_TABLE_END
 
 csPython *thisclass=NULL;
 
-csPython::csPython(iBase *iParent)
-    :Sys(NULL), Mode(MSG_INITIALIZATION) {
-			CONSTRUCT_IBASE(iParent);
-    }
+csPython::csPython(iBase *iParent) :Sys(NULL), Mode(MSG_INITIALIZATION)
+{
+  CONSTRUCT_IBASE(iParent);
+}
 
-csPython::~csPython() {
+csPython::~csPython()
+{
   Mode=MSG_INTERNAL_ERROR;
-
   Py_Finalize();
-
   Sys=NULL;
   thisclass=NULL;
 }
 
-bool csPython::Initialize(iSystem* iSys) {
+bool csPython::Initialize(iSystem* iSys)
+{
   Sys=iSys;
   thisclass=this;
 
@@ -64,61 +64,66 @@ bool csPython::Initialize(iSystem* iSys) {
   if (path[0] == 0) strcpy (path, "./");
 
   if(!LoadModule("sys"))
-    return 0;
-  char cmd[512];
-  sprintf (cmd, "sys.path.append('%sscripts/python/')", path);
+    return false;
+  csString cmd;
+  cmd << "sys.path.append('" << path << "scripts/python/')";
   if(!RunText(cmd))
-    return 0;
-#if 0 //Azverkan turn this on to send python script prints to the crystal space console
+    return false;
+#if 0 // Enable this to send python script prints to the crystal space console.
   if(!LoadModule("cshelper"))
-    return 0;
+    return false;
 #endif   
   if(!LoadModule("pdb"))
-    return 0;
+    return false;
   if(!LoadModule("cspacec"))
-    return 0;
+    return false;
   if(!LoadModule("cspace"))
-    return 0;
+    return false;
 
   Mode=MSG_STDOUT;
-
-  return 1;
+  return true;
 }
 
-void csPython::ShowError() {
-  if(PyErr_Occurred()) {
+void csPython::ShowError()
+{
+  if(PyErr_Occurred())
+  {
     PyErr_Print();
-    Print(1, "ERROR!\n");
+    Print(true, "ERROR!\n");
   }
 }
 
-bool csPython::RunText(const char* Text) {
+bool csPython::RunText(const char* Text)
+{
   csString str(Text);
   bool worked=!PyRun_SimpleString(str.GetData());
   if(!worked) 
     PyRun_SimpleString("pdb.pm()");
-    
   ShowError();
-    
   return worked;
 }
 
-bool csPython::Store(const char* type, const char* name, void* data) {
-	Storage=data;
-	RunText(csString(name)+"=cspacec.ptrcast(cspacec.GetMyPtr(), '"+type+"')");
-	Storage=NULL;
-	return 1;
+bool csPython::Store(const char* type, const char* name, void* data)
+{
+  Storage=data;
+  csString s;
+  s << name << "=cspacec.ptrcast(cspacec.GetMyPtr(), '" << type << "')";
+  RunText(s);
+  Storage=NULL;
+  return true;
 }
 
-bool csPython::LoadModule(const char* name) {
-  return RunText(csString("import ")+name);
+bool csPython::LoadModule(const char* name)
+{
+  csString s;
+  s << "import " << name;
+  return RunText(s);
 }
 
-void csPython::Print(bool Error, const char *msg) {
-  if(Error) {
-    Sys->Printf(MSG_FATAL_ERROR, csString("CrystalScript Error: ")+msg);
-  } else {
-    Sys->Printf(Mode, msg);
-  }
+void csPython::Print(bool Error, const char *msg)
+{
+  if(Error)
+    Sys->Printf(MSG_FATAL_ERROR, "CrystalScript Error: %s\n", msg);
+  else
+    Sys->Printf(Mode, "%s", msg);
 }
-

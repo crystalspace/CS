@@ -17,6 +17,10 @@ The history order has been reversed so that new features are at the top.
 	  parameters multiple times.
 	- Changed skeletal demos in WalkTest to use the new
 	  iSprite3DFactoryState interface (and related).
+	- Eric Sunshine fixed a serious bug in cspython.cpp where the contents
+	  of several csString objects was potentially being used _after_ the
+	  csString was destroyed.  This was one of those object-lifetime
+	  issues which differ from compiler to compiler.
 31-Jan-2001
 	- Martin Geisse fixed a compile-time error in CSWS.
 	- Added GetPrivateObject() to iMaterialWrapper.
