@@ -248,6 +248,8 @@ struct iThingEnvironment : public iBase
   virtual iPolyTxtPlane* FindPolyTxtPlane (const char* name) = 0;
   virtual iCurveTemplate* CreateBezierTemplate (const char* name = NULL) = 0;
   virtual iCurveTemplate* FindCurveTemplate (const char *iName) = 0;
+  virtual void RemovePolyTxtPlane (iPolyTxtPlane* pl) = 0;
+  virtual void RemoveCurveTemplate (iCurveTemplate* ct) = 0;
 };
 
 #endif

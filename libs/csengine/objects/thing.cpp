@@ -3199,6 +3199,38 @@ iCurveTemplate* csThingObjectType::FindCurveTemplate (const char *iName)
   return itmpl;
 }
 
+void csThingObjectType::RemovePolyTxtPlane (iPolyTxtPlane* pl)
+{
+  int i;
+  for (i = 0 ; i < planes.Length () ; i++)
+  {
+    csPolyTxtPlane* pli = (csPolyTxtPlane*)planes[i];
+    if (pl == &(pli->scfiPolyTxtPlane))
+    {
+      planes.Delete (i);
+      //pl->DecRef ();
+      return;
+    }
+  }
+}
+
+void csThingObjectType::RemoveCurveTemplate (iCurveTemplate* ct)
+{
+  int i;
+  for (i = 0 ; i < curve_templates.Length () ; i++)
+  {
+    csCurveTemplate* cti = (csCurveTemplate*)curve_templates[i];
+    iCurveTemplate* i_cti = SCF_QUERY_INTERFACE_FAST (cti,
+		    iCurveTemplate);
+    i_cti->DecRef ();
+    if (ct == i_cti)
+    {
+      curve_templates.Delete (i);
+      //ct->DecRef ();
+      return;
+    }
+  }
+}
 
 //---------------------------------------------------------------------------
 

@@ -180,6 +180,11 @@ void csRegion::DeleteAll ()
       ObjRemove (obj);
       copy[i] = NULL;
       o->DecRef ();
+      iThingEnvironment* te = SCF_QUERY_INTERFACE (engine->GetThingType (),
+		iThingEnvironment);
+      te->RemoveCurveTemplate (o);
+      o->DecRef ();
+      te->DecRef ();
     }
 
   for (i = 0 ; i < copy.Length () ; i++)
@@ -190,7 +195,11 @@ void csRegion::DeleteAll ()
       if (!o) continue;
       ObjRemove (obj);
       copy[i] = NULL;
+      iThingEnvironment* te = SCF_QUERY_INTERFACE (engine->GetThingType (),
+		iThingEnvironment);
+      te->RemovePolyTxtPlane (o);
       o->DecRef ();
+      te->DecRef ();
     }
 
 #ifdef CS_DEBUG
