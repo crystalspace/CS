@@ -1,0 +1,2 @@
+
+#define McUni ReferenceFrame::universe
