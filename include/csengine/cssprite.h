@@ -370,9 +370,6 @@ protected:
   /// Points to Actor class which "owns" this sprite.
   csObject* myOwner;
 
-  /// Bounding box for polygon trees.
-  csPolyTreeBBox bbox;
-
   /**
    * Camera space bounding box is cached here.
    * GetCameraBoundingBox() will check the current cookie from the
@@ -412,10 +409,14 @@ protected:
   bool is_visible;
 
   /**
-   * Update the bounding box for the polygon tree
-   * algorithm.
+   * Pointer to the object to place in the polygon tree.
    */
-  virtual void UpdatePolyTreeBBox () = 0;
+  csPolyTreeObject* ptree_obj;
+
+  /**
+   * Update this sprite in the polygon trees.
+   */
+  virtual void UpdateInPolygonTrees () = 0;
 
   /// Update defered lighting.
   void UpdateDeferedLighting (const csVector3& pos);
@@ -435,8 +436,17 @@ public:
   /// Get owner (actor) for this sprite.
   csObject* GetMyOwner () { return myOwner; }
 
-  /// Get the bounding box object for the polygon tree.
-  csPolyTreeBBox& GetBBoxObject () { return bbox; }
+  /// Get the pointer to the object to place in the polygon tree.
+  csPolyTreeObject* GetPolyTreeObject ()
+  {
+    return ptree_obj;
+  }
+
+  /**
+   * Do some initialization needed for visibility testing.
+   * i.e. clear camera transformation.
+   */
+  virtual void VisTestReset () { }
 
   /// Mark this sprite as visible.
   void MarkVisible () { is_visible = true; }
@@ -621,6 +631,10 @@ private:
   /// Skeleton state (optional).
   csSkeletonState* skeleton_state;
 
+  /// Bounding box for polygon trees.
+  csPolyTreeBBox bbox;
+
+private:
   /**
    * High quality version of UpdateLighting() which recalculates
    * the distance between the light and every vertex.
@@ -632,12 +646,12 @@ private:
    * calculates the distance once (with the center of the sprite).
    */
   void UpdateLightingLQ (csLight** lights, int num_lights, csVector3* object_vertices);
-  
+
+protected:
   /**
-   * Update the bounding box for the polygon tree
-   * algorithm.
+   * Update this sprite in the polygon trees.
    */
-  virtual void UpdatePolyTreeBBox ();
+  virtual void UpdateInPolygonTrees ();
 
 public:
   ///
@@ -660,15 +674,17 @@ public:
   /// Scale the sprite by scaling the diagonal of the transform
   virtual void ScaleBy (float factor);
 
-  /// Rotate the sprite in some way, angle in radians.
-  /// currently first z-rotates angle then x-rotates angle.
-  virtual void Rotate(float angle);
+  /**
+   * Rotate the sprite in some way, angle in radians.
+   * currently first z-rotates angle then x-rotates angle.
+   */
+  virtual void Rotate (float angle);
 
   /// Set color for all vertices
-  virtual void SetColor(const csColor& col);
+  virtual void SetColor (const csColor& col);
 
   /// Add color to all vertices
-  virtual void AddColor(const csColor& col);
+  virtual void AddColor (const csColor& col);
 
   /**
    * Set a color for a vertex.
@@ -749,9 +765,18 @@ public:
   void GenerateSpriteLOD (int num_vts);
 
   /**
-   * Get a 3D bounding box in object space.
+   * Do some initialization needed for visibility testing.
+   * i.e. clear camera transformation.
    */
-  void GetObjectBoundingBox (csBox3& boundingBox);
+  virtual void VisTestReset ()
+  {
+    bbox.ClearTransform ();
+  }
+
+  /**
+   * Get a bounding box in object space.
+   */
+  void GetObjectBoundingBox (csBox3& box);
 
   /**
    * Get a 3D bounding box in camera space. This function is smart.
@@ -789,7 +814,7 @@ public:
   void SetFrame (int f)
   {
     if (cur_action && f < cur_action->GetNumFrames ()) cur_frame = f;
-    UpdatePolyTreeBBox ();
+    UpdateInPolygonTrees ();
   }
 
   /**

@@ -758,9 +758,9 @@ bool csBspPolygon::DoPerspective (const csTransform& trans,
 
 //---------------------------------------------------------------------------
 
-csPolyTreeBBox::csPolyTreeBBox (csObject* owner) : csPolyTreeObject (owner)
+csPolyTreeBBox::csPolyTreeBBox (csObject* owner) : csDetailedPolyTreeObject (owner)
 {
-  base_stub = csPolyTreeObject::stub_pool.Alloc ();
+  base_stub = (csPolygonStub*)csDetailedPolyTreeObject::stub_pool.Alloc (&stub_fact);
   base_stub->IncRef (); // Make sure this object is locked.
   is_cam_transf = false;
 }
@@ -769,8 +769,8 @@ csPolyTreeBBox::~csPolyTreeBBox ()
 {
   if (base_stub)
   {
-    csPolyTreeObject::stub_pool.Free (base_stub);
-    csPolyTreeObject::stub_pool.Free (base_stub);
+    csDetailedPolyTreeObject::stub_pool.Free (base_stub);
+    csDetailedPolyTreeObject::stub_pool.Free (base_stub);
   }
 }
 
@@ -783,11 +783,11 @@ void csPolyTreeBBox::World2Camera (const csTransform& trans)
   is_cam_transf = true;
 }
 
-void csPolyTreeBBox::RemovePolygons (csPolygonStub* stub)
+void csPolyTreeBBox::RemoveData (csObjectStub* stub)
 {
   int i;
-  csPolygonInt** polygons = stub->GetPolygons ();
-  for (i = 0 ; i < stub->GetNumPolygons () ; i++)
+  csPolygonInt** polygons = ((csPolygonStub*)stub)->GetPolygons ();
+  for (i = 0 ; i < ((csPolygonStub*)stub)->GetNumPolygons () ; i++)
   {
     csBspPolygon* poly = (csBspPolygon*)polygons[i];
     csBspPolygon::poly_pool.Free (poly);

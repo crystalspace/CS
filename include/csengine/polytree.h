@@ -29,7 +29,7 @@ class csSector;
 class csPolygonInt;
 class csPolygonTree;
 class csPolygonTreeNode;
-class csPolygonStub;
+class csObjectStub;
 class csPolyTreeObject;
 class Dumper;
 struct iFile;
@@ -64,18 +64,17 @@ class csPolygonTreeNode
 
 protected:
   /**
-   * A linked list for all polygons stubs that are added
-   * to this node. These stubs represents sets of polygons
-   * from this object that belong to the same plane as the
-   * plane of the splitter in the tree node.
+   * A linked list for all stubs that are added
+   * to this node. These stubs represents parts of an object
+   * that is located inside this node.
    */
-  csPolygonStub* first_stub;
+  csObjectStub* first_stub;
 
   /**
    * A linked list of all polygons stubs that still need to
    * be processed whenever this node becomse visible.
    */
-  csPolygonStub* todo_stubs;
+  csObjectStub* todo_stubs;
 
 public:
   /**
@@ -99,17 +98,17 @@ public:
    * Warning! This function does not test if the stub
    * is really on the list!
    */
-  void UnlinkStub (csPolygonStub* ps);
+  void UnlinkStub (csObjectStub* ps);
 
   /**
    * Link a stub to the todo list.
    */
-  void LinkStubTodo (csPolygonStub* ps);
+  void LinkStubTodo (csObjectStub* ps);
 
   /**
    * Link a stub to the stub list.
    */
-  void LinkStub (csPolygonStub* ps);
+  void LinkStub (csObjectStub* ps);
 
   /**
    * Traverse all the polygons in the dynamic objects
@@ -196,9 +195,9 @@ public:
   void AddObject (csPolyTreeObject* obj);
 
   /**
-   * Add a polygon stub to the todo list of the tree.
+   * Add a stub to the todo list of the tree.
    */
-  void AddStubTodo (csPolygonStub* stub)
+  void AddStubTodo (csObjectStub* stub)
   {
     root->LinkStubTodo (stub);
   }

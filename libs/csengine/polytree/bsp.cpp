@@ -304,7 +304,7 @@ void csBspTree::Build (csBspNode* node, csPolygonInt** polygons,
 
 void csBspTree::ProcessTodo (csBspNode* node)
 {
-  csPolygonStub* stub;
+  csObjectStub* stub;
   if (!node->front && !node->back)
   {
     // This node has no children. Currently we just add
@@ -326,7 +326,7 @@ void csBspTree::ProcessTodo (csBspNode* node)
   {
     stub = node->todo_stubs;
     node->UnlinkStub (stub);	// Unlink from todo list.
-    csPolygonStub* stub_on, * stub_front, * stub_back;
+    csObjectStub* stub_on, * stub_front, * stub_back;
     stub->GetObject ()->SplitWithPlane (stub, &stub_on, &stub_front, &stub_back,
     	node->splitter);
     // Link the stub with the polygons on this splitter plane to the current node.
@@ -390,11 +390,8 @@ void* csBspTree::Back2Front (csBspNode* node, const csVector3& pos,
     rc = func (sector, node->polygons.GetPolygons (),
     	node->polygons.GetNumPolygons (), node->polygons_on_splitter, data);
     if (rc) return rc;
-    if (!node->polygons_on_splitter)
-    {
-      rc = node->TraverseObjects (sector, pos, func, data);
-      if (rc) return rc;
-    }
+    rc = node->TraverseObjects (sector, pos, func, data);
+    if (rc) return rc;
     rc = Back2Front (node->back, pos, func, data, cullfunc, culldata);
     if (rc) return rc;
   }
@@ -433,11 +430,8 @@ void* csBspTree::Front2Back (csBspNode* node, const csVector3& pos,
     rc = func (sector, node->polygons.GetPolygons (),
     	node->polygons.GetNumPolygons (), node->polygons_on_splitter, data);
     if (rc) return rc;
-    if (!node->polygons_on_splitter)
-    {
-      rc = node->TraverseObjects (sector, pos, func, data);
-      if (rc) return rc;
-    }
+    rc = node->TraverseObjects (sector, pos, func, data);
+    if (rc) return rc;
     rc = Front2Back (node->front, pos, func, data, cullfunc, culldata);
     if (rc) return rc;
   }

@@ -19,6 +19,10 @@
 #include "cssysdef.h"
 #include "qint.h"
 #include "csengine/cbuffer.h"
+#include "csengine/world.h"
+#include "igraph2d.h"
+#include "igraph3d.h"
+#include "itxtmgr.h"
 
 //---------------------------------------------------------------------------
 
@@ -462,7 +466,12 @@ bool csCBuffer::InsertPolygon (csVector2* verts, int num_verts, bool negative)
       fin_y = fyR;
 
     // Make sure we work correctly for both orientations of the polygon.
-    if (sxL > sxR)
+    // To avoid rounding errors we test sxL+dxL with sxR+dxR. In other words
+    // we already advance one step. This avoids a problem with the two top
+    // x coordinates being almost equal and rounding errors causing the
+    // wrong swap here.
+    // @@@ INVESTIGATE IF THIS IS THE RIGHT FIX!
+    if (sxL+dxL > sxR+dxR)
     {
       float xs = sxR; sxR = sxL; sxL = xs;
       float dxs = dxR; dxR = dxL; dxL = dxs;
@@ -522,6 +531,22 @@ finish:
   return vis;
 }
 
+void csCBuffer::GfxDump (iGraphics2D* ig2d, iGraphics3D* ig3d)
+{
+  iTextureManager* txtmgr = ig3d->GetTextureManager ();
+  int col = txtmgr->FindRGB (255, 255, 0);
+  int y, yy;
+  for (y = 0 ; y < num_lines ; y++)
+  {
+    yy = ig2d->GetHeight ()-y;
+    csCBufferSpan* span = lines[y].first_span;
+    while (span)
+    {
+      ig2d->DrawLine (span->startx, yy, span->endx, yy, col);
+      span = span->next;
+    }
+  }
+}
 
 //---------------------------------------------------------------------------
 

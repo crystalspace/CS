@@ -833,7 +833,7 @@ void csSector::Draw (csRenderView& rview)
         {
           csSprite* sp = (csSprite*)sprites[i];
 	  sp->MarkInvisible ();
-	  sp->GetBBoxObject ().ClearTransform ();
+	  sp->VisTestReset ();
         }
       }
 

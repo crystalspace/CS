@@ -561,12 +561,12 @@ bool Dumper::check_stubs (csOctreeNode* node)
   return false;
 }
 
-void Dumper::dump_stubs_node (csPolygonStub* stub, char* name, int level)
+void Dumper::dump_stubs_node (csObjectStub* stub, char* name, int level)
 {
   while (stub)
   {
-    CsPrintf (MSG_DEBUG_0, "%s %s num_poly=%d this=%08lx obj=%08lx node=%08lx\n",
-    	spaces (level), name, stub->GetNumPolygons (),
+    CsPrintf (MSG_DEBUG_0, "%s %s this=%08lx obj=%08lx node=%08lx\n",
+    	spaces (level), name,
     	stub, stub->object, stub->node);
     if (stub->next_tree && stub->next_tree->prev_tree != stub)
       CsPrintf (MSG_DEBUG_0, "%s !!! next_tree link broken !!!\n", spaces (level));
@@ -590,12 +590,12 @@ void Dumper::dump_stubs_node (csPolygonStub* stub, char* name, int level)
   }
 }
 
-void Dumper::dump_stubs_obj (csPolygonStub* stub, char* name, int level)
+void Dumper::dump_stubs_obj (csObjectStub* stub, char* name, int level)
 {
   while (stub)
   {
-    CsPrintf (MSG_DEBUG_0, "%s %s num_poly=%d this=%08lx obj=%08lx node=%08lx\n",
-    	spaces (level), name, stub->GetNumPolygons (),
+    CsPrintf (MSG_DEBUG_0, "%s %s this=%08lx obj=%08lx node=%08lx\n",
+    	spaces (level), name,
     	stub, stub->object, stub->node);
     if (stub->next_tree && stub->next_tree->prev_tree != stub)
       CsPrintf (MSG_DEBUG_0, "%s !!! next_tree link broken !!!\n", spaces (level));
@@ -654,7 +654,7 @@ void Dumper::dump_stubs (csOctreeNode* onode, char* name, int level)
 
 void Dumper::dump_stubs (csOctree* octree)
 {
-  csPolyTreeObject::stub_pool.Dump ();
+  csDetailedPolyTreeObject::stub_pool.Dump ();
   CsPrintf (MSG_DEBUG_0, "Dump octree\n");
   dump_stubs ((csOctreeNode*)octree->root, "root", 0);
 }

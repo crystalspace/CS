@@ -21,6 +21,9 @@
 
 #include "csgeom/math2d.h"
 
+struct iGraphics2D;
+struct iGraphics3D;
+
 /*=================*
  * Coverage Buffer *
  *=================*/
@@ -117,8 +120,6 @@ private:
   csCBufferLine* lines;
   /// Number of vertical lines.
   int num_lines;
-  /// A value for every line indicating if it is full or not.
-  bool* full;
   /// Horizontal start and end (inclusive).
   int startx, endx;
   /// List of all unused spans on screen.
@@ -211,6 +212,11 @@ public:
 
   /// Dump debug information for a scanline.
   void DumpLine (int y) { lines[y].Dump (); }
+
+  /**
+   * Do a graphical dump of the c-buffer contents on screen.
+   */
+  void GfxDump (iGraphics2D* ig2d, iGraphics3D* ig3d);
 };
 
 #endif /*CBUFFER_H*/

@@ -32,6 +32,7 @@ csSprite2D::csSprite2D () : csSprite (), position (0, 0, 0)
 {
   cstxt = NULL;
   lighting = true;
+  ptree_obj = NULL;	//@@@
 }
 
 
@@ -59,6 +60,9 @@ void csSprite2D::CreateRegularVertices (int n, bool setuv)
   }
 }
 
+void csSprite2D::UpdateInPolygonTrees ()
+{
+}
 
 void csSprite2D::ScaleBy (float factor)
 {
@@ -102,12 +106,6 @@ void csSprite2D::AddColor (const csColor& col)
     for (int i=0; i<vertices.Length(); i++)
       vertices[i].color = vertices[i].color_init;
 }
-
-
-void csSprite2D::UpdatePolyTreeBBox ()
-{
-}
-
 
 void csSprite2D::SetLighting (bool l)
 {

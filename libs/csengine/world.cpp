@@ -235,8 +235,8 @@ csWorld::csWorld (iBase *iParent) : csObject (), camera_positions (16, 16)
   {
     covtree_lut = new csCovMaskLUT (16);
   }
-  covcube = new csCovcube (covtree_lut);
-  //cbufcube = new csCBufferCube (1024);
+  //covcube = new csCovcube (covtree_lut);
+  cbufcube = new csCBufferCube (1024);
 
   textures = new csTextureList ();
 

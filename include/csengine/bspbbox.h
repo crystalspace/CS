@@ -167,7 +167,7 @@ public:
 /**
  * A container for a bunch of BSP polygons.
  */
-class csPolyTreeBBox : public csPolyTreeObject
+class csPolyTreeBBox : public csDetailedPolyTreeObject
 {
 private:
   /// Array of vertices.
@@ -191,10 +191,10 @@ public:
   virtual ~csPolyTreeBBox ();
 
   /// Get the base set of polygons.
-  virtual csPolygonStub* GetBaseStub () { return base_stub; }
+  virtual csObjectStub* GetBaseStub () { return base_stub; }
 
   /// Remove polygons from a stub.
-  virtual void RemovePolygons (csPolygonStub* stub);
+  virtual void RemoveData (csObjectStub* stub);
 
   /// Get vector array for this container.
   csVector3Array& GetVertices () { return vertices; }

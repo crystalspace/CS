@@ -338,18 +338,6 @@ csCurve* csPolygonSet::GetCurve (char* name)
   return idx >= 0 ? curves.Get (idx) : NULL;
 }
 
-/*TODO weg?
-
-csCurve* csPolygonSet::new_bezier (char* name, TextureMM* texture)
-{
-  csBezier* p = new csBezier (name, 0x1234);
-  p->setTexture(texture);
-  //TODO??  p->set_sector (sector);
-  AddCurve (p);
-  return p;
-}
-*/
-
 void csPolygonSet::AddCurve (csCurve* curve)
 {
   curve->SetParent (this);
@@ -571,15 +559,23 @@ void* csPolygonSet::TestQueuePolygonArray (csPolygonInt** polygon, int num,
       csBspPolygon* bsppol = (csBspPolygon*)polygon[i];
       csSprite* sp = (csSprite*)(bsppol->GetOriginator ());
 
+//@@@ Don't remove this debug code until we fully debugged
+//the bounding box of skeletal sprites!
+//bool bspsp_debug = true;
+
       // If the sprite is already marked visible then we don't have
       // to do any of the other processing for this polygon.
+//if (bspsp_debug || !sp->IsVisible ())
       if (!sp->IsVisible ())
       {
-        if (!sp->GetBBoxObject ().IsTransformed ())
+	// Since we have a csBspPolygon we know that the poly tree object
+	// is a csPolyTreeBBox instance.
+        csPolyTreeBBox* tbb = (csPolyTreeBBox*)(sp->GetPolyTreeObject ());
+        if (!tbb->IsTransformed ())
 	{
 	  // The bbox of this sprite has not yet been transformed
 	  // to camera space.
-	  sp->GetBBoxObject ().World2Camera (*d);
+	  tbb->World2Camera (*d);
 	}
 
         // Transform it to screen space and perform clipping to Z plane.
@@ -605,7 +601,18 @@ void* csPolygonSet::TestQueuePolygonArray (csPolygonInt** polygon, int num,
 	  }
 	  else if (c_buffer->TestPolygon (clip->GetVertices (),
 	  	clip->GetNumVertices ()))
+	  {
+//	    if (bspsp_debug)
+//	    {
+//	      clip->Draw (d->g2d, d->g3d->GetTextureManager ()->FindRGB (255, 0, 0));
+//	    }
             sp->MarkVisible ();
+	  }
+//	  else
+//	    if (bspsp_debug)
+//	    {
+//	      clip->Draw (d->g2d, d->g3d->GetTextureManager ()->FindRGB (0, 0, 255));
+//	    }
         }
         render_pool->Free (clip);
       }

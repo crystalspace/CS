@@ -1,10 +1,47 @@
 The history order has been reversed so that new features are at the top.
 
+10-Jun-2000
+	- Started a reasonably big redesign of the dynamic object system.
+	  csObjectStub and csPolyTreeObject don't care about polygons
+	  anymore. They are now simply objects and stubs that can be placed
+	  in an octree (bsp tree). Specific subclasses (csPolygonStub
+	  and csDetailedPolyTreeObject for example) can add the functionality
+	  needed for splitting polygons for a bounding box of a sprite.
+	  This allows easier and lighter versions of those classes as well
+	  which don't split polygons but only store the nods where they
+	  are visible.
+	- 3D sprites now use the new design. 2D sprites haven't been
+	  updated yet so they are still not visible with c-buffer enabled.
+	  There is also a pure virtual function call at exit right now which
+	  needs to be solved.
+	- New db_dumpstubs console command to dump the stubs of the current
+	  octree and the last added sprite to the world.
+	- Fixed bug in BSP traversal with polygon stubs. 3D sprites could
+	  sometimes disappear because of this bug.
+	- Added csCBuffer::GfxDump() to debug the c-buffer.
+	- New db_cbuffer console command to debug the c-buffer contents.
+	  It will show the c-buffer online (all empty spans will be blue and
+	  a small red line will be put in front of every completely full line).
+	- Fixed a serious bug in the c-buffer. This bug could cause some
+	  polygons to be span converted completely wrong in the c-buffer.
+	  This could an occasional error in rendering (rather rare) and is
+	  probably also the reason for various lighting errors using
+	  the c-buffer cube (enabled yesterday) and visibility errors with
+	  PVS.
 9-Jun-2000
 	- Moved a lot of PVS algorithm code into csPVSAlgo. That cleans
 	  up csOctree a little.
 	- Created new db_osolid debug command. This command will create
 	  things for all solid space boundaries in an octree node.
+	- Implemented bbox/octree visibility culling for 2D sprites. This
+	  is probably a bit overkill (maybe we should only cull groups
+	  like particle systems instead) but it will fix the bug that
+	  2D sprites are not visible with c-buffer enabled.
+	- Switched to C-buffer cube for lighting. This improves lighting
+	  speed for dmburg from 30 seconds to about 8 seconds and it
+	  seems to work reasonably well. This also improves speed of dynamic
+	  lighting with about the same factor. Radiosity will also improve
+	  by this.
 8-Jun-2000
 	- In an effort to completly fix PVS and make sure that everything is
 	  ok I started adding extensive comments everywhere.

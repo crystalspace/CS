@@ -8,7 +8,7 @@ DESCRIPTION.linux = Linux
 PLUGINS+=video/canvas/softx video/renderer/software
 PLUGINS+=video/renderer/opengl video/canvas/openglx
 PLUGINS+=video/renderer/inf video/canvas/inf
-#PLUGINS+=video/renderer/line video/canvas/linex
+PLUGINS+=video/renderer/line video/canvas/linex
 
 # uncomment the following to build SVGALIB and/or GGI 2D drivers
 PLUGINS+=video/canvas/svgalib

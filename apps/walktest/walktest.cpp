@@ -42,6 +42,7 @@
 #include "csengine/polyset.h"
 #include "csengine/polygon.h"
 #include "csengine/pol2d.h"
+#include "csengine/cbuffer.h"
 #include "csengine/sector.h"
 #include "csengine/world.h"
 #include "csengine/covtree.h"
@@ -118,6 +119,7 @@ WalkTest::WalkTest () :
   do_edges = false;
   do_light_frust = false;
   do_show_coord = false;
+  do_show_cbuffer = false;
   busy_perf_test = false;
   do_show_z = false;
   do_show_palette = false;
@@ -370,6 +372,14 @@ void WalkTest::DrawFrameDebug ()
     extern void DrawOctreeBoxes (int);
     DrawOctreeBoxes (cfg_draw_octree == -1 ? -1 : cfg_draw_octree-1);
   }
+  if (do_show_cbuffer)
+  {
+    csCBuffer* cbuf = view->GetWorld ()->GetCBuffer ();
+    if (cbuf)
+    {
+      cbuf->GfxDump (Gfx2D, Gfx3D);
+    }
+  }
 }
 
 void WalkTest::DrawFrameExtraDebug ()
@@ -565,7 +575,7 @@ void WalkTest::DrawFrame (time_t elapsed_time, time_t current_time)
   if (!System->Console->IsActive ()
     || ((csSimpleConsole*)(System->Console))->IsTransparent ())
   {
-    DrawFrame3D(drawflags, current_time);
+    DrawFrame3D (drawflags, current_time);
   }
 
   // Start drawing 2D graphics

@@ -157,7 +157,7 @@ void csOctree::Build (csPolygonInt** polygons, int num)
 
 void csOctree::ProcessTodo (csOctreeNode* node)
 {
-  csPolygonStub* stub;
+  csObjectStub* stub;
 
   if (node->GetMiniBsp ())
   {
@@ -188,23 +188,23 @@ void csOctree::ProcessTodo (csOctreeNode* node)
   {
     stub = node->todo_stubs;
     node->UnlinkStub (stub);	// Unlink from todo list.
-    csPolygonStub* xf, * xb;
+    csObjectStub* xf, * xb;
     csPolyTreeObject* pto = stub->GetObject ();
     pto->SplitWithPlaneX (stub, NULL, &xf, &xb, center.x);
     if (xf)
     {
-      csPolygonStub* xfyf, * xfyb;
+      csObjectStub* xfyf, * xfyb;
       pto->SplitWithPlaneY (xf, NULL, &xfyf, &xfyb, center.y);
       if (xfyf)
       {
-        csPolygonStub* xfyfzf, * xfyfzb;
+        csObjectStub* xfyfzf, * xfyfzb;
         pto->SplitWithPlaneZ (xfyf, NULL, &xfyfzf, &xfyfzb, center.z);
 	if (xfyfzf) node->children[OCTREE_FFF]->LinkStubTodo (xfyfzf);
 	if (xfyfzb) node->children[OCTREE_FFB]->LinkStubTodo (xfyfzb);
       }
       if (xfyb)
       {
-        csPolygonStub* xfybzf, * xfybzb;
+        csObjectStub* xfybzf, * xfybzb;
         pto->SplitWithPlaneZ (xfyb, NULL, &xfybzf, &xfybzb, center.z);
 	if (xfybzf) node->children[OCTREE_FBF]->LinkStubTodo (xfybzf);
 	if (xfybzb) node->children[OCTREE_FBB]->LinkStubTodo (xfybzb);
@@ -212,18 +212,18 @@ void csOctree::ProcessTodo (csOctreeNode* node)
     }
     if (xb)
     {
-      csPolygonStub* xbyf, * xbyb;
+      csObjectStub* xbyf, * xbyb;
       pto->SplitWithPlaneY (xb, NULL, &xbyf, &xbyb, center.y);
       if (xbyf)
       {
-        csPolygonStub* xbyfzf, * xbyfzb;
+        csObjectStub* xbyfzf, * xbyfzb;
         pto->SplitWithPlaneZ (xbyf, NULL, &xbyfzf, &xbyfzb, center.z);
 	if (xbyfzf) node->children[OCTREE_BFF]->LinkStubTodo (xbyfzf);
 	if (xbyfzb) node->children[OCTREE_BFB]->LinkStubTodo (xbyfzb);
       }
       if (xbyb)
       {
-        csPolygonStub* xbybzf, * xbybzb;
+        csObjectStub* xbybzf, * xbybzb;
         pto->SplitWithPlaneZ (xbyb, NULL, &xbybzf, &xbybzb, center.z);
 	if (xbybzf) node->children[OCTREE_BBF]->LinkStubTodo (xbybzf);
 	if (xbybzb) node->children[OCTREE_BBB]->LinkStubTodo (xbybzb);

@@ -704,10 +704,9 @@ IMPLEMENT_IBASE (csSprite)
   IMPLEMENTS_INTERFACE(iParticle)
 IMPLEMENT_IBASE_END
 
-csSprite::csSprite () : csObject (), bbox (NULL)
+csSprite::csSprite () : csObject ()
 {
   CONSTRUCT_IBASE (NULL);
-  bbox.SetOwner (this);
   dynamiclights = NULL;
   MixMode = CS_FX_COPY;
   defered_num_lights = 0;
@@ -716,6 +715,7 @@ csSprite::csSprite () : csObject (), bbox (NULL)
   draw_callback2 = NULL;
   is_visible = false;
   camera_cookie = 0;
+  ptree_obj = NULL;
 }
 
 csSprite::~csSprite ()
@@ -730,12 +730,13 @@ void csSprite::MoveToSector (csSector* s)
   RemoveFromSectors ();
   sectors.Push (s);
   s->sprites.Push (this);
-  UpdatePolyTreeBBox ();
+  UpdateInPolygonTrees ();
 }
 
 void csSprite::RemoveFromSectors ()
 {
-  bbox.RemoveFromTree ();
+  if (GetPolyTreeObject ())
+    GetPolyTreeObject ()->RemoveFromTree ();
   while (sectors.Length () > 0)
   {
     csSector* ss = (csSector*)sectors.Pop ();
@@ -809,8 +810,10 @@ static DECLARE_GROWING_ARRAY (obj_verts, csVector3);
 /// The list of tween vertices.
 static DECLARE_GROWING_ARRAY (tween_verts, csVector3);
 
-csSprite3D::csSprite3D () : csSprite ()
+csSprite3D::csSprite3D () : csSprite (), bbox (NULL)
 {
+  bbox.SetOwner (this);
+  ptree_obj = &bbox;
   v_obj2world.x = 0;
   v_obj2world.y = 0;
   v_obj2world.z = 0;
@@ -846,20 +849,20 @@ csSprite3D::~csSprite3D ()
 void csSprite3D::SetPosition (const csVector3& p)
 {
   v_obj2world = p;
-  UpdatePolyTreeBBox ();
+  UpdateInPolygonTrees ();
 }
 
 void csSprite3D::SetTransform (const csMatrix3& matrix)
 {
   m_obj2world = matrix;
   m_world2obj = m_obj2world.GetInverse ();
-  UpdatePolyTreeBBox ();
+  UpdateInPolygonTrees ();
 }
 
 void csSprite3D::MovePosition (const csVector3& rel)
 {
   v_obj2world += rel;
-  UpdatePolyTreeBBox ();
+  UpdateInPolygonTrees ();
 }
 
 bool csSprite3D::SetPositionSector (const csVector3 &move_to)
@@ -882,7 +885,7 @@ bool csSprite3D::SetPositionSector (const csVector3 &move_to)
     //Move(new_pos);
 /*  v_obj2world=-move_to;//-new_pos;*/
     v_obj2world=new_pos;
-    UpdatePolyTreeBBox ();
+    UpdateInPolygonTrees ();
     return true;
   }
   else
@@ -897,7 +900,7 @@ void csSprite3D::Transform (csMatrix3& matrix)
   m *= m_obj2world;
   m_obj2world = m;
   m_world2obj = m_obj2world.GetInverse ();
-  UpdatePolyTreeBBox ();
+  UpdateInPolygonTrees ();
 }
 
 void csSprite3D::SetTemplate (csSpriteTemplate* tmpl)
@@ -1040,7 +1043,7 @@ void csSprite3D::UpdateWorkTables (int max_size)
   }
 }
 
-void csSprite3D::UpdatePolyTreeBBox ()
+void csSprite3D::UpdateInPolygonTrees ()
 {
   bbox.RemoveFromTree ();
 
@@ -1060,32 +1063,26 @@ void csSprite3D::UpdatePolyTreeBBox ()
   if (!tree) return;
 
   csBox3 b;
-  if (skeleton_state)
-  {
-    skeleton_state->ComputeBoundingBox (csTransform (), b);
-  }
-  else
-  {
-    csFrame* cframe = cur_action->GetFrame (cur_frame);
-    cframe->GetBoundingBox (b);
-  }
+  GetObjectBoundingBox (b);
+  csVector3Array& va = bbox.GetVertices ();
+  va.MakeEmpty ();
 
   // This transform should be part of the sprite class and not just calculated
   // every time we need it. @@@!!!
   csTransform trans = csTransform (m_obj2world, m_world2obj * -v_obj2world);
-  csBspPolygon* poly;
 
   // Add the eight corner points of the bounding box to the container.
   // Transform from object to world space here.
-  csVector3Array& va = bbox.GetVertices ();
-  int pt_xyz = va.AddVertex (trans.Other2This (csVector3 (b.MinX (), b.MinY (), b.MinZ ())));
-  int pt_Xyz = va.AddVertex (trans.Other2This (csVector3 (b.MaxX (), b.MinY (), b.MinZ ())));
-  int pt_xYz = va.AddVertex (trans.Other2This (csVector3 (b.MinX (), b.MaxY (), b.MinZ ())));
-  int pt_XYz = va.AddVertex (trans.Other2This (csVector3 (b.MaxX (), b.MaxY (), b.MinZ ())));
-  int pt_xyZ = va.AddVertex (trans.Other2This (csVector3 (b.MinX (), b.MinY (), b.MaxZ ())));
-  int pt_XyZ = va.AddVertex (trans.Other2This (csVector3 (b.MaxX (), b.MinY (), b.MaxZ ())));
-  int pt_xYZ = va.AddVertex (trans.Other2This (csVector3 (b.MinX (), b.MaxY (), b.MaxZ ())));
-  int pt_XYZ = va.AddVertex (trans.Other2This (csVector3 (b.MaxX (), b.MaxY (), b.MaxZ ())));
+  int pt_xyz = va.AddVertex (trans.Other2This (b.GetCorner (BOX_CORNER_xyz)));
+  int pt_Xyz = va.AddVertex (trans.Other2This (b.GetCorner (BOX_CORNER_Xyz)));
+  int pt_xYz = va.AddVertex (trans.Other2This (b.GetCorner (BOX_CORNER_xYz)));
+  int pt_XYz = va.AddVertex (trans.Other2This (b.GetCorner (BOX_CORNER_XYz)));
+  int pt_xyZ = va.AddVertex (trans.Other2This (b.GetCorner (BOX_CORNER_xyZ)));
+  int pt_XyZ = va.AddVertex (trans.Other2This (b.GetCorner (BOX_CORNER_XyZ)));
+  int pt_xYZ = va.AddVertex (trans.Other2This (b.GetCorner (BOX_CORNER_xYZ)));
+  int pt_XYZ = va.AddVertex (trans.Other2This (b.GetCorner (BOX_CORNER_XYZ)));
+
+  csBspPolygon* poly;
 
   poly = (csBspPolygon*)csBspPolygon::poly_pool.Alloc ();
   bbox.AddPolygon (poly);
@@ -1161,16 +1158,16 @@ void csSprite3D::UpdatePolyTreeBBox ()
   }
 }
 
-void csSprite3D::GetObjectBoundingBox (csBox3& obox)
+void csSprite3D::GetObjectBoundingBox (csBox3& b)
 {
   if (skeleton_state)
   {
-    skeleton_state->ComputeBoundingBox (csTransform (), obox);
+    skeleton_state->ComputeBoundingBox (csTransform (), b);
   }
   else
   {
     csFrame* cframe = cur_action->GetFrame (cur_frame);
-    cframe->GetBoundingBox (obox);
+    cframe->GetBoundingBox (b);
   }
 }
 

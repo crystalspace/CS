@@ -158,6 +158,7 @@ public:
   bool do_stats;
   bool do_clear;
   bool do_show_coord;
+  bool do_show_cbuffer;
   bool busy_perf_test;
   bool do_show_z;
   bool do_show_palette;

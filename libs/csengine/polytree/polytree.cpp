@@ -34,7 +34,7 @@ csPolygonTreeNode::~csPolygonTreeNode ()
       csPolyTreeObject::stub_pool.Free (todo_stubs);
 }
 
-void csPolygonTreeNode::UnlinkStub (csPolygonStub* ps)
+void csPolygonTreeNode::UnlinkStub (csObjectStub* ps)
 {
   if (!ps->node) return;
   if (ps->next_tree) ps->next_tree->prev_tree = ps->prev_tree;
@@ -50,7 +50,7 @@ void csPolygonTreeNode::UnlinkStub (csPolygonStub* ps)
   ps->node = NULL;
 }
 
-void csPolygonTreeNode::LinkStubTodo (csPolygonStub* ps)
+void csPolygonTreeNode::LinkStubTodo (csObjectStub* ps)
 {
   if (ps->node) return;
   ps->next_tree = todo_stubs;
@@ -60,7 +60,7 @@ void csPolygonTreeNode::LinkStubTodo (csPolygonStub* ps)
   ps->node = this;
 }
 
-void csPolygonTreeNode::LinkStub (csPolygonStub* ps)
+void csPolygonTreeNode::LinkStub (csObjectStub* ps)
 {
   if (ps->node) return;
   ps->next_tree = first_stub;
@@ -73,13 +73,12 @@ void csPolygonTreeNode::LinkStub (csPolygonStub* ps)
 void* csPolygonTreeNode::TraverseObjects (csSector* sector, 
 	const csVector3& /*pos*/, csTreeVisitFunc* func, void* data)
 {
-  csPolygonStub* stub;
+  csObjectStub* stub;
   void* rc;
   stub = first_stub;
   while (stub)
   {
-    rc = func (sector, stub->GetPolygons (), stub->GetNumPolygons (),
-    	false, data);
+    rc = stub->Visit (sector, func, data);
     if (rc) return rc;
     stub = stub->next_tree;
   }
@@ -88,7 +87,7 @@ void* csPolygonTreeNode::TraverseObjects (csSector* sector,
 
 void csPolygonTree::AddObject (csPolyTreeObject* obj)
 {
-  csPolygonStub* stub = obj->GetBaseStub ();
+  csObjectStub* stub = obj->GetBaseStub ();
   root->LinkStubTodo (stub);
   obj->LinkStub (stub);
   stub->IncRef ();

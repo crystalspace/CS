@@ -24,12 +24,14 @@
 #include "csgeom/math3d.h"
 #include "csgeom/math2d.h"
 #include "csgeom/poly3d.h"
+#include "csgeom/box.h"
 #include "csengine/rview.h"
 #include "csengine/texture.h"
 #include "csengine/cssprite.h"
 #include "igraph3d.h"
 
 class csTextureHandle;
+class csPolyTreeObject;
 
 struct csSprite2DVertex
 {
@@ -66,11 +68,11 @@ private:
    */
   bool lighting;
 
+protected:
   /**
-   * Update the bounding box for the polygon tree
-   * algorithm.
+   * Update this sprite in the polygon trees.
    */
-  virtual void UpdatePolyTreeBBox ();
+  virtual void UpdateInPolygonTrees ();
 
 public:
   ///
@@ -89,7 +91,7 @@ public:
    * optionally also set u,v to corresponding coordinates in a texture.
    * Large n approximates a circle with radius 1. n must be > 2. 
    */
-  void CreateRegularVertices(int n, bool setuv);
+  void CreateRegularVertices (int n, bool setuv);
 
   /**
    * Set true if this sprite needs lighting (default).

@@ -212,7 +212,7 @@ bool CommandHandler (const char *cmd, const char *arg)
     CONPRI("-*- Additional commands -*-\n");
     CONPRI("Visibility:\n");
     CONPRI("  dumpvis cbuffer covtree solidbsp pvs freezepvs pvsonly\n");
-    CONPRI("  db_octree, db_osolid\n");
+    CONPRI("  db_octree, db_osolid, db_dumpstubs, db_cbuffer\n");
     CONPRI("Lights:\n");
     CONPRI("  addlight dellight dellights picklight droplight\n");
     CONPRI("  clrlights setlight\n");
@@ -273,8 +273,27 @@ bool CommandHandler (const char *cmd, const char *arg)
     Command::change_boolean (arg, &Sys->do_light_frust, "frustum");
   else if (!strcasecmp (cmd, "zbuf"))
     Command::change_boolean (arg, &Sys->do_show_z, "zbuf");
+  else if (!strcasecmp (cmd, "db_cbuffer"))
+    Command::change_boolean (arg, &Sys->do_show_cbuffer, "debug cbuffer");
   else if (!strcasecmp (cmd, "db_octree"))
     Command::change_int (arg, &Sys->cfg_draw_octree, "debug octree", -1, 10);
+  else if (!strcasecmp (cmd, "db_dumpstubs"))
+  {
+    csSector* room = Sys->view->GetCamera ()->GetSector ();
+    csPolygonTree* tree = room->GetStaticTree ();
+    if (tree)
+    {
+      csOctree* otree = (csOctree*)tree;
+      printf ("1\n");
+      Dumper::dump_stubs (otree);
+    }
+    csSprite* spr = (csSprite*)Sys->world->sprites[0];
+    if (spr)
+    {
+      Dumper::dump_stubs (spr->GetPolyTreeObject ());
+    }
+    CsPrintf (MSG_DEBUG_0F, "======\n");
+  }
   else if (!strcasecmp (cmd, "db_osolid"))
   {
     extern void CreateSolidThings (csWorld*, csSector*, csOctreeNode*, int);
@@ -416,7 +435,7 @@ bool CommandHandler (const char *cmd, const char *arg)
       for (i = 0 ; i < sprites.Length () ; i++)
       {
         csSprite* spr = (csSprite*)sprites[i];
-	Dumper::dump_stubs (&spr->GetBBoxObject ());
+	Dumper::dump_stubs (spr->GetPolyTreeObject ());
       }
     }
     //Sys->Printf (MSG_CONSOLE, "No debug0 implementation in this version.\n");
