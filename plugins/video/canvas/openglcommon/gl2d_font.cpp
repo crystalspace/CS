@@ -157,10 +157,10 @@ csGraphics2DOpenGLFontServer::GLFontInfo::GLFontInfo(FontDef &newfont)
     glPixelStorei(GL_UNPACK_ALIGNMENT,1);
     glTexImage2D(GL_TEXTURE_2D,
    		0 /*mipmap level */,
-		GL_LUMINANCE,
+		GL_ALPHA,
     		basetexturewidth,basetextureheight,
 		0 /*border*/,
-    		GL_LUMINANCE,GL_UNSIGNED_BYTE,fontbitmapdata);
+    		GL_ALPHA,GL_UNSIGNED_BYTE,fontbitmapdata);
 
     CHK ( delete [] fontbitmapdata );
 }
@@ -173,6 +173,7 @@ void csGraphics2DOpenGLFontServer::GLFontInfo::DrawCharacter(unsigned char chara
   // other required settings
   glEnable(GL_TEXTURE_2D);
   glShadeModel(GL_FLAT);
+  glEnable(GL_ALPHA_TEST);
   glTexEnvf (GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
 
 
@@ -189,6 +190,8 @@ void csGraphics2DOpenGLFontServer::GLFontInfo::DrawCharacter(unsigned char chara
 
   float x1=0.0, x2=mCharacterWidth;
   float y1=0.0, y2=mCharacterHeight;
+	
+  glAlphaFunc(GL_EQUAL,1.0);
 
   glBegin (GL_QUADS);
   glTexCoord2f (tx1,ty1); glVertex2f (x1,y2);
@@ -198,6 +201,7 @@ void csGraphics2DOpenGLFontServer::GLFontInfo::DrawCharacter(unsigned char chara
   glEnd ();
 
   glTranslatef (8.0,0.0,0.0);
+  glDisable(GL_ALPHA_TEST);
 }
 
 /** The constructor initializes it member variables and constructs the
