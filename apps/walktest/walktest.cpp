@@ -193,11 +193,10 @@ void WalkTest::DrawFrame (long elapsed_time, long current_time)
       Gfx2D->Write(8, FRAME_HEIGHT-20, scon->get_fg (), -1, buffer);
     } /* endif */
 
-    int w  = cslogo->Width()  * FRAME_WIDTH  / 640;
-    int h  = cslogo->Height() * FRAME_HEIGHT / 480;
-
     if (cslogo)
     {
+      int w  = cslogo->Width()  * FRAME_WIDTH  / 640;
+      int h  = cslogo->Height() * FRAME_HEIGHT / 480;
       cslogo->Draw(Gfx2D, 2,2,w,h);
     }
   } /* endif */
