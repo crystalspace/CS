@@ -188,28 +188,29 @@ csGraphics3DSoftware::csGraphics3DSoftware (iBase *iParent) : G2D (NULL)
 
 csGraphics3DSoftware::~csGraphics3DSoftware ()
 {
-  if (System)
-    System->DecRef ();
+  // @@@ Jorrit: removed because this causes a call
+  // of a virtual function call which is not allowed
+  // in a destructor. We should have a Deinitialize()
+  // call or something.
+  //if (System)
+    //System->DecRef ();
 
   Close ();
   csScan_Finalize ();
-  if (txtmgr)
-    CHKB (delete txtmgr);
-  if (z_buffer)
-    CHKB (delete [] z_buffer);
-  if (smaller_buffer)
-    CHKB (delete [] smaller_buffer);
+  CHK (delete txtmgr);
+  CHK (delete [] z_buffer);
+  CHK (delete [] smaller_buffer);
   if (G2D)
     G2D->DecRef ();
-  if (line_table)
-    CHKB (delete [] line_table);
-
+  CHK (delete [] line_table);
   CHK(delete config;)
 }
 
 bool csGraphics3DSoftware::Initialize (iSystem *iSys)
 {
-  (System = iSys)->IncRef ();
+  System = iSys;
+  // @@@ See above in destructor.
+  //(System = iSys)->IncRef ();
 
   width = height = -1;
 
