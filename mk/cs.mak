@@ -64,7 +64,6 @@ OUT=$(OUTPROC)$(MODE)$(OUTSUFX.$(MAKE_DLL))/
 ############################################
 
 HEADER=$(wildcard *.h */*.h */*/*.h */*/*/*.h */*/*/*/*.h)
-SOURCE=$(wildcard *.cpp */*.cpp */*/*.cpp */*/*/*.cpp */*/*/*/*.cpp)
 
 CFLAGS.INCLUDE+=$(CFLAGS.I). $(CFLAGS.I)./include $(CFLAGS.I)./libs \
   $(CFLAGS.I)./apps $(CFLAGS.I)./support
