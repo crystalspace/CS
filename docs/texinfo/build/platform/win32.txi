@@ -109,16 +109,23 @@ the compilation instructions on how to remove the projects.
 @node Win32 MSVC5, Win32 Compile, Win32 General, Win32
 @subsubsection Special Notes for @sc{msvc} 5
 
-Building Crystal Space with version 5 of @sc{msvc} is not recommended. If you
-want to try it anyway, you should read this:
+Building Crystal Space with Microsoft Visual C++ Version 5 (@sc{msvc}) is not
+strictly supported or recommended by the Crystal Space team. If you however wish
+to try it anyway, you should read the following carefully:
 
 @itemize @bullet
 @item
-Version 5 doesn't include any supported DirectX @sc{sdk}, so you'll have to
-download it. We recommend the DirectX 8a SDK for release 0.18 or above. It
-can be downloaded from:
+MSVC 5 doesn't include any supported DirectX Software Development
+Kit (@sc{sdk}), so you'll have to download it. We recommend the DirectX 8a SDK for
+release 0.18 or above. It can be downloaded from:
 
 @uref{http://www.msdn.microsoft.com/}
+
+If you unable to accomplish the 100Mb plus download of the DirectX 8a SDK from
+the link above. You can obtain cut down older versions (6 & 7 with no documents or
+example code) of the DirectX SDK's from the following website:
+
+@uref{http://www.multimania.com/noote/CrystalSpace}
 
 @item
 You may get additional warnings which you should ignore. The problem is, you
@@ -126,8 +133,9 @@ don't know which of the warnings you get are real problems and which of them
 are caused by this version conflict.
 
 @item
-If one of the projects crashes the linker, unload that project and hope that
-it wasn't an important one!
+Due to a bug in Microsoft Visual C++ 5 you may experience crashes or system
+lockups during linking. If this occurs, unload the problem project and continue
+with the build and hope it wasn't one of Crystal Spaces important ones!
 @end itemize
 
 @node Win32 Compile, Win32 Rundemo, Win32 MSVC5, Win32
