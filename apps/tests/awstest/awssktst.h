@@ -24,7 +24,7 @@ private:
   static void Login(void *sink, iAwsSource *source);
 
   static void FillListBox(void *sink, iAwsSource *source);
-
+  static void FillBarChart(void *sk, iAwsSource *source);
 public:
   awsTestSink();
   virtual ~awsTestSink();

@@ -33,6 +33,7 @@ awsTestSink::SetSink(iAwsSink *s)
    sink->RegisterTrigger("SetPassword", &SetPass);
    sink->RegisterTrigger("Login", &Login);
    sink->RegisterTrigger("FillListBox", &FillListBox);
+   sink->RegisterTrigger("FillBarChart", &FillBarChart);
  }
 }
 
@@ -48,6 +49,40 @@ awsTestSink::SetWindowManager(iAws *_wmgr)
 {
   wmgr=_wmgr;
 }
+
+void
+awsTestSink::FillBarChart(void *sk, iAwsSource *source)
+{
+  awsTestSink *sink = (awsTestSink *)sk;
+  iAwsComponent *comp = source->GetComponent();
+
+  iAwsParmList *pl=0;
+
+  if (sink->wmgr)
+    pl = sink->wmgr->CreateParmList();
+  else
+    printf("awstest: window manager is null.\n");
+
+
+  pl->AddFloat("value", 10);
+  comp->Execute("AddItem", *pl);
+  pl->Clear();
+
+  pl->AddFloat("value", 20);
+  comp->Execute("AddItem", *pl);
+  pl->Clear();
+
+  pl->AddFloat("value", 30);
+  comp->Execute("AddItem", *pl);
+  pl->Clear();
+
+  pl->AddFloat("value", 5);
+  comp->Execute("AddItem", *pl);
+  pl->Clear();
+  
+  pl->DecRef();
+}
+
 
 void
 awsTestSink::FillListBox(void *sk, iAwsSource *source)
