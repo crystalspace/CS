@@ -393,16 +393,16 @@ void csTextureHandleOpenGL::InitTexture (csTextureManagerOpenGL *texman,
   orig_width = image->GetWidth ();
   orig_height = image->GetHeight ();
 
-  // In opengl all textures, even non-mipmapped textures are required
-  // to be powers of 2.
-  if (!csIsPowerOf2(orig_width))
-    orig_width = csFindNearestPowerOf2 (orig_width) / 2;
-
-  if (!csIsPowerOf2 (orig_height))
-    orig_height = csFindNearestPowerOf2 (orig_height) / 2;
-
   int nwidth = orig_width;
   int nheight = orig_height;
+
+  // In opengl all textures, even non-mipmapped textures are required
+  // to be powers of 2.
+  if (!csIsPowerOf2(nwidth))
+    nwidth = csFindNearestPowerOf2 (nwidth) / 2;
+
+  if (!csIsPowerOf2 (nheight))
+    nheight = csFindNearestPowerOf2 (nheight) / 2;
 
   // downsample textures, if requested, but not 2D textures
   if (!(flags & (CS_TEXTURE_2D)))

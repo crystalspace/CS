@@ -481,14 +481,14 @@ void csGLTextureHandle::AdjustSizePo2 ()
     orig_width  = (*images)[i]->GetWidth();
     orig_height = (*images)[i]->GetHeight();
 
-    if (!csIsPowerOf2(orig_width))
-      orig_width = csFindNearestPowerOf2 ((*images)[i]->GetWidth ()) / 2;
-
-    if (!csIsPowerOf2 (orig_height))
-      orig_height = csFindNearestPowerOf2 ((*images)[i]->GetHeight ()) / 2;
-
     int newwidth  = orig_width;
     int newheight = orig_height;
+
+    if (!csIsPowerOf2(newwidth))
+      newwidth = csFindNearestPowerOf2 ((*images)[i]->GetWidth ()) / 2;
+
+    if (!csIsPowerOf2 (newheight))
+      newheight = csFindNearestPowerOf2 ((*images)[i]->GetHeight ()) / 2;
 
     // downsample textures, if requested, but not 2D textures
     if (!(flags & (CS_TEXTURE_2D)))

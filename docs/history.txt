@@ -30,6 +30,10 @@ The history order is reversed so that new features are at the top.
 	      directories.  The result was that the second mkdir (for the
 	      "crystal/." variation) would fail with "directory already exists"
 	      error.
+	- Jorrit fixed a bug in the OpenGL renderer where it would incorrectly
+	  change the original dimensions of a texture in case the texture
+	  was resized to PO2 dimensions. This affected GetOriginalDimensions().
+	  Also applied the fix to the new OpenGL renderer.
 18-May-2003
 	- res made the following changes in and around render3d:
 	    - ATI/NV only exts can be disabled all at once via cfg.
