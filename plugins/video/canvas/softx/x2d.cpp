@@ -332,8 +332,22 @@ bool csGraphics2DXLib::Open(const char *Title)
   }
   if (!AllocateMemory ())
   {
+#ifdef DO_SHM
+    if(do_shm)
+    {
+      CsPrintf (MSG_INITIALIZATION, "SHM available but could not allocate. "
+        "Trying without SHM.\n");
+      if(xim) { XDestroyImage(xim); xim=NULL; }
+      do_shm=false;
+      if(!AllocateMemory())
+      {
+#endif //DO_SHM
       CsPrintf (MSG_FATAL_ERROR, "Unable to allocate memory!\n");
       return false;
+#ifdef DO_SHM
+      }
+    }
+#endif //DO_SHM
   }
   Clear (0);
   return true;
