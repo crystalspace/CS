@@ -1,5 +1,5 @@
 @c -*-texinfo-*-
-@node HOWTO Use custom font, , HOWTO Simple Map Example, HOWTO
+@node HOWTO Use custom font, HOWTO Recording Movies, HOWTO Simple Map Example, HOWTO
 @subsection Using a Custom Font
 @cindex font, csf
 
