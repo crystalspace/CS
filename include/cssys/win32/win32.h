@@ -56,15 +56,13 @@ struct iWin32Assistant : public iBase
   virtual HWND GetApplicationWindow() = 0;
 
   /**
-   * Sets wether CS should get Messages on it's own, or wait
-   * and be fed by using ProcessMessage
+   * Sets wether CS should get Messages on it's own
    */
-  virtual void UseOwnMessageLoop(bool ownmsgloop) = 0;
+  virtual void UseOwnMessageLoop (bool ownmsgloop) = 0;
   /**
-   * Gets wether CS should get Messages on it's own, or wait
-   * and be fed by using ProcessMessage
+   * Gets wether CS should get Messages on it's own
    */
-  virtual bool HasOwnMessageLoop() = 0;
+  virtual bool HasOwnMessageLoop () = 0;
 };
 
 #endif // __CS_WIN32_H__
