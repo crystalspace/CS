@@ -42,6 +42,7 @@ Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
 #include "../../opengl/glextmanager.h"
 #include "../../opengl/gl_txtmgr.h"
+#include "../../common/txtmgr.h"
 #include "../../opengl/gl_txtcache.h"
 
 #include "glshader_mtex.h"
@@ -402,7 +403,7 @@ void csShaderGLMTEX::Activate(iShaderPass* current, csRenderMesh* mesh)
     mtexlayer* layer = (mtexlayer*) texlayers.Get(i);
     ext->glActiveTextureARB(GL_TEXTURE0_ARB + i);
     ext->glClientActiveTextureARB( GL_TEXTURE0_ARB + i);
-
+/*
     if(layer->ccsource == CS_COLORSOURCE_MESH)
     {
       csRef<iRenderBuffer> cbuf = ss->GetBuffer(strset->Request("COLOR"));
@@ -442,10 +443,11 @@ void csShaderGLMTEX::Activate(iShaderPass* current, csRenderMesh* mesh)
         layer->doTCArr = true;
       }
     }
-    
+  */  
     GLuint texturehandle = 0;
     iTextureHandle* txt_handle = NULL;
-    csRef<csGLMaterialHandle> mathand ( (csGLMaterialHandle*)mesh->GetMaterialHandle());
+
+    csRef<csMaterialHandle> mathand ((csMaterialHandle*)(mesh->GetMaterialHandle ()));
     if(layer->texnum == 0)
     {
       txt_handle = mathand->GetTexture();
@@ -466,12 +468,14 @@ void csShaderGLMTEX::Activate(iShaderPass* current, csRenderMesh* mesh)
 
       statecache->SetTexture(GL_TEXTURE_2D, texturehandle, i);
       statecache->Enable_GL_TEXTURE_2D (i);
+
       layer->doTexture = true;
     }
 
     if(ext->CS_GL_ARB_texture_env_combine || ext->CS_GL_EXT_texture_env_combine)
     {
         glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_COMBINE_ARB);
+        glTexEnvi(GL_TEXTURE_ENV, GL_COMBINE_RGB, GL_INTERPOLATE);
 
         glTexEnvi(GL_TEXTURE_ENV, GL_SOURCE0_RGB_ARB, layer->colorsource[0]);
         glTexEnvi(GL_TEXTURE_ENV, GL_OPERAND0_RGB_ARB, layer->colormod[0]);
@@ -483,7 +487,7 @@ void csShaderGLMTEX::Activate(iShaderPass* current, csRenderMesh* mesh)
           glTexEnvi(GL_TEXTURE_ENV, GL_OPERAND2_RGB_ARB, layer->colormod[2]);
         }
 
-        if( (layer->colorp != GL_DOT3_RGB_ARB) && (layer->colorp  == GL_DOT3_RGBA_ARB))
+        if( (layer->colorp != GL_DOT3_RGB_ARB) && (layer->colorp  != GL_DOT3_RGBA_ARB))
           glTexEnvi(GL_TEXTURE_ENV, GL_COMBINE_RGB_ARB, layer->colorp );
         else if (ext->CS_GL_ARB_texture_env_dot3 || ext->CS_GL_EXT_texture_env_dot3)
           glTexEnvi(GL_TEXTURE_ENV, GL_COMBINE_RGB_ARB, layer->colorp );
@@ -500,7 +504,7 @@ void csShaderGLMTEX::Activate(iShaderPass* current, csRenderMesh* mesh)
           glTexEnvi(GL_TEXTURE_ENV, GL_OPERAND2_ALPHA_ARB, layer->alphamod[2]);
         }
 
-        if( (layer->colorp != GL_DOT3_RGB_ARB) && (layer->colorp  == GL_DOT3_RGBA_ARB))
+        if( (layer->colorp != GL_DOT3_RGB_ARB) && (layer->colorp  != GL_DOT3_RGBA_ARB))
           glTexEnvi(GL_TEXTURE_ENV, GL_COMBINE_ALPHA_ARB, layer->alphap);
         else if (ext->CS_GL_ARB_texture_env_dot3 || ext->CS_GL_EXT_texture_env_dot3)
           glTexEnvi(GL_TEXTURE_ENV, GL_COMBINE_ALPHA_ARB, layer->alphap);
@@ -520,7 +524,10 @@ void csShaderGLMTEX::Deactivate(iShaderPass* current, csRenderMesh* mesh)
     ext->glActiveTextureARB (GL_TEXTURE0_ARB+i);
     ext->glClientActiveTextureARB (GL_TEXTURE0_ARB+i);
     if (i>0)
+    {
       statecache->Disable_GL_TEXTURE_2D (i);
+      statecache->SetTexture (GL_TEXTURE_2D, -1, i); //should not be necessary
+    }
     glTexEnvi (GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
   }
 }
