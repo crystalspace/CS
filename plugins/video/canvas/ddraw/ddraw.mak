@@ -37,9 +37,9 @@ ifeq ($(USE_PLUGINS),yes)
   LIB.DDRAW.SPECIAL = $(LFLAGS.l)ddraw
   TO_INSTALL.DYNAMIC_LIBS += $(DDRAW)
 else
-  DDRAW = $(OUT)$(LIB_PREFIX)ddraw$(LIB)
+  DDRAW = $(OUT)$(LIB_PREFIX)csddraw$(LIB)
   DEP.EXE += $(DDRAW)
-  LIBS.EXE += $(LFLAGS.l)ddraw
+  LIBS.EXE += $(LFLAGS.l)csddraw
   SCF.STATIC += csddraw
   TO_INSTALL.STATIC_LIBS += $(DDRAW)
 endif
