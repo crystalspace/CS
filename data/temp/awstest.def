@@ -225,7 +225,7 @@ window "Another"
   component "Users" is "List Box"
   {
     Frame: (100, 210) - (385, 300)
-    Style: lbfsRaised
+    Style: lbfsSunken
     Highlight: "/aws/lbhi.png"
     Columns: 3
     DefaultSortCOl: 0
@@ -245,37 +245,8 @@ window "Another"
   
 }
 
-window "New User"
+window "Engine View"
 {
-  Frame: (100, 200) - (400, 500)
-  Style: wfsBitmap
-  Overlay: "/lib/windows/newuserovl.png"
-  Back:    "/lib/windows/newuserbck.png"
-  Overlayalpha: 192
-  Backalpha:    0
-
-  component "User Name" is "Text Box"
-  {
-    Frame: (10, 30) - (390, 45)
-    Style: NoFrame
-    Caption: "Name:"
-  }
-
-  component "User Sex Frame" is "Group Frame"
-  {
-    Frame: (10, 50) - (250,100)
-    Caption: "Sex"
-
-    component "Male" is "Radio Button"
-    {
-     Frame: (5, 5) - (200, 30)
-     Caption: "Male"
-    }
-
-    component "Female" is "Radio Button"
-    {
-     Frame: (5, 35) - (200, 50)
-     Caption: "Female"
-    }
-  }
+  Frame: (10, 10) - (138, 138)
+  Style: wfsNormal
 }
