@@ -71,16 +71,18 @@ void csGlobalHashIterator::GotoNextElement ()
   {
     // Next bucket.
     bucket_index++;
-    while (bucket_index < nbuckets && (hash->Buckets[bucket_index].Length()==0))
-      bucket_index++;
-    if (bucket_index >= nbuckets)
-      bucket = NULL;	// The end
-    else
+    while (bucket_index < nbuckets)
     {
-      bucket = &(hash->Buckets[bucket_index]);
-      element_index = 0;
+      bucket = &hash->Buckets[bucket_index];
       bucket_len = bucket->Length ();
+      if (bucket_len != 0)
+      {
+        element_index = 0;
+	return;
+      }
+      bucket_index++;
     }
+    bucket = NULL;
   }
 }
 
