@@ -46,6 +46,11 @@ protected:
   /// do we render into backbuffer ?
   FxI32 m_drawbuffer;
     
+  /// cursor related data
+  UShort *cursorBmp;
+  int nCursor; // how many cursors defined
+  int nCurCursor; // current cursor
+  
   /// palette has been changed
   bool bPaletteChanged;
   bool bPalettized;
@@ -59,6 +64,10 @@ protected:
   // Decode and encode internal color representation to/from RGB scheme
   void EncodeRGB ( UShort& color, UByte r, UByte g, UByte b );
   void DecodeRGB ( UShort color, UByte& r, UByte& g, UByte& b );
+  
+  // Prepare the cursor. Return number of cursors.
+  int PrepareCursors (char **shapes);
+  void DrawCursor ();
   
 public:
   DECLARE_IBASE;

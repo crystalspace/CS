@@ -36,6 +36,7 @@
 #include "csutil/csrect.h"
 #include "isystem.h"
 #include "itexture.h"
+#include "glidcurs.h"
 
 IMPLEMENT_IBASE (csGraphics2DGlideCommon)
   IMPLEMENTS_INTERFACE (iPlugIn)
@@ -52,6 +53,9 @@ csGraphics2DGlideCommon::csGraphics2DGlideCommon (iBase *iParent) :
   (void)iParent;
   CONSTRUCT_IBASE (NULL);
   SetVRetrace( false );
+  cursorBmp=NULL;
+  nCursor=nCurCursor=0;
+  PrepareCursors (mouseshapes);
 }
 
 bool csGraphics2DGlideCommon::Initialize (iSystem *pSystem)
@@ -74,6 +78,7 @@ bool csGraphics2DGlideCommon::Initialize (iSystem *pSystem)
 csGraphics2DGlideCommon::~csGraphics2DGlideCommon ()
 {
   Close ();
+  if (cursorBmp) delete cursorBmp;
   CHKB (delete [] Memory);
 }
 
@@ -191,10 +196,8 @@ bool csGraphics2DGlideCommon::BeginDraw(/*int Flag*/)
 
 void csGraphics2DGlideCommon::FinishDraw ()
 {
-  DrawPixel (mx,my,~0);
-  DrawPixel (mx+1,my,~0);
-  DrawPixel (mx+1,my+1,~0);
-  DrawPixel (mx,my+1,~0);
+  if (nCurCursor>-1) 
+    DrawCursor();
   csGraphics2D::FinishDraw ();
   if (FrameBufferLocked)
     return;
@@ -371,4 +374,114 @@ bool csGraphics2DGlideCommon::DoubleBuffer (bool Enable)
     m_drawbuffer = (Enable ? GR_BUFFER_BACKBUFFER : GR_BUFFER_FRONTBUFFER);
     GlideLib_grRenderBuffer ( m_drawbuffer );
     return true;
+}
+
+int csGraphics2DGlideCommon::PrepareCursors (char **shapes)
+{
+  // read xpm desc
+  int w, h, numcolors, chars_per_pixel, i, x, y, off;
+  int bw, bh, row, col;
+  sscanf( (const char*)shapes[0], "%d %d %d %d", &w, &h, &numcolors, &chars_per_pixel );
+  
+  char *pc = new char[chars_per_pixel+1]; // character sequence representing one pixel
+  pc[chars_per_pixel] = '\0';
+  char *pattern1 = new char[chars_per_pixel+14];
+  char *pattern2 = new char[chars_per_pixel+10];
+  char pattern3[4];
+  sprintf( pattern1, "%%%dc c #%%6c", chars_per_pixel );
+  sprintf( pattern2, "%%%dc %%d %%d", chars_per_pixel );
+  sprintf( pattern3, "%%%dc", chars_per_pixel );
+  char hexrgb[6];
+  
+  // first count the cursors
+  nCursor= (w>h ? w/h : h/w);
+  bw = w / (w>h?nCursor:1);
+  bh = h / (w>h?1:nCursor);
+  
+  off = nCursor + 1 + numcolors;
+  // prepare the bitmap we send to the card
+  if (cursorBmp) delete cursorBmp;
+  cursorBmp = new UShort[ w*h + 3*nCursor];
+
+#define HEX2DEC(d) ( (d)>'a' ? (d)-87 : (d)>'A' ? (d)-55 : (d)-30 )
+#define HEXX(a,b) HEX2DEC(a) << 4 | HEX2DEC(b)
+
+  // read in cursor data
+  int nC;
+  for (nC=0; nC<nCursor; nC++)
+  {
+    UByte r, g, b;
+    
+    // hot spot
+    sscanf( (const char*)shapes[1+nC], pattern2, pc, &x, &y);
+    cursorBmp[ 3*nC +1] = x;
+    cursorBmp[ 3*nC +2] = y;
+    
+    // keycolordef
+    i=1;
+    while (i<=numcolors){
+      if ( strstr(shapes[i+nCursor],pc) == shapes[i+nCursor] ) break;
+      i++;
+    }
+    sscanf( shapes[i+nCursor], pattern1, pc, hexrgb);
+    r = HEXX(hexrgb[0],hexrgb[1]); g = HEXX(hexrgb[2],hexrgb[3]); b = HEXX(hexrgb[4],hexrgb[5]);
+    cursorBmp[ 3*nC ]= ((r >> 3) << 11) |
+                       ((g >> 2) <<  5) |
+                       ((b >> 3) >>  0);
+      
+    // cursorbitmap
+    for(row=0; row<bh; row++)
+      for(col=0; col<bw; col++){
+        if ( w>h )
+          sscanf( &shapes[ off+row ][ nC*bw*chars_per_pixel + col*chars_per_pixel ], pattern3, pc );
+	else  
+          sscanf( &shapes[ nC*bh + row +off ][ col*chars_per_pixel ], pattern3, pc );
+        i=1;
+        while (i<=numcolors){
+          if ( strstr(shapes[i+nCursor],pc) == shapes[i+nCursor] ) break;
+          i++;
+        }
+        sscanf( shapes[i+nCursor], pattern1, pc, hexrgb);
+        r = HEXX(hexrgb[0],hexrgb[1]); g = HEXX(hexrgb[2],hexrgb[3]); b = HEXX(hexrgb[4],hexrgb[5]);
+        cursorBmp[ 3*nCursor + nC*bw*bw + row*bw + col ]= ((r >> 3) << 11) |
+                                                          ((g >> 2) <<  5) |
+                                                          ((b >> 3) >>  0);
+      }
+  }
+
+#undef HEX2DEC(d)
+#undef HEXX(a,b)
+
+  delete [] pc;
+  delete pattern1;
+  delete pattern2;
+  
+  return nCursor;
+}
+
+void csGraphics2DGlideCommon::DrawCursor ()
+{
+  short hx, hy, sx, sy;
+  int keycolor, color;
+  int row, col;
+
+  // read hotspotvalues for curent cursor
+  hx = cursorBmp [ nCurCursor*3 +1 ];
+  hy = cursorBmp [ nCurCursor*3 +2 ];
+  
+  // read keycolor
+  keycolor = cursorBmp [ nCurCursor*3 ];
+//printf("%d\n",keycolor);
+  sy = my - hy;
+  for (row=0; row<32; row++, sy++)
+  {
+    sx = mx - hx;
+    for (col=0; col<32; col++, sx++)
+    {
+      color = cursorBmp [ nCursor*3 + nCurCursor*32*32 + row*32 + col ];
+      if ( sx >= 0 && sy >= 0 && color != keycolor ){
+        DrawPixel( sx, sy, color );
+      }
+    }
+  }
 }
