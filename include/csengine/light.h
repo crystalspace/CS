@@ -70,7 +70,7 @@ protected:
 #endif
   /// Color.
   csColor color;
-  /// The associated halo (if not NULL)
+  /// The associated halo (if not 0)
   csHalo *halo;
 
 #ifndef CS_USE_NEW_RENDERER
@@ -587,7 +587,7 @@ public:
     virtual iDynLight* GetNext ()
     {
       csDynLight* n = scfParent->GetNext ();
-      return n ? &(n->scfiDynLight) : NULL;
+      return n ? &(n->scfiDynLight) : 0;
     }
   } scfiDynLight;
   friend struct eiDynLight;

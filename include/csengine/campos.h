@@ -51,7 +51,7 @@ private:
   /**
    * Far plane. Negative side of this plane (as seen with Classify() function)
    * is invisible (which is different from how planes in CS usually
-   * act). If this is NULL there is no far plane.
+   * act). If this is 0 there is no far plane.
    */
   csPlane3* far_plane;
 

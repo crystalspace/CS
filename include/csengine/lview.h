@@ -51,15 +51,15 @@ public:
   /// Create empty frustum.
   csShadowFrustum () :
     csFrustum (csVector3 (0), &csPooledVertexArrayPool::GetDefaultPool()),
-    userData (NULL), relevant (false) { }
+    userData (0), relevant (false) { }
   /// Create empty frustum.
   csShadowFrustum (const csVector3& origin) :
     csFrustum (origin, &csPooledVertexArrayPool::GetDefaultPool()),
-    userData (NULL), relevant (false) { }
+    userData (0), relevant (false) { }
   /// Create empty frustum.
   csShadowFrustum (const csVector3& origin, int num_verts) :
     csFrustum (origin, num_verts, &csPooledVertexArrayPool::GetDefaultPool()),
-    userData (NULL), relevant (false) { }
+    userData (0), relevant (false) { }
   /// Copy constructor.
   csShadowFrustum (const csShadowFrustum& orig);
   /// Set user data.
@@ -168,7 +168,7 @@ public:
    * reference is kept. However, if a transformation is given then
    * a copy is made and the shadows are transformed.
    */
-  void AddRelevantShadows (csShadowBlock* source, csTransform* trans = NULL);
+  void AddRelevantShadows (csShadowBlock* source, csTransform* trans = 0);
 
   /**
    * Copy all relevant shadow frustums from another shadow block
@@ -177,7 +177,7 @@ public:
    * a copy is made and the shadows are transformed.
    */
   virtual void AddRelevantShadows (iShadowBlock* source,
-    csTransform* trans = NULL);
+    csTransform* trans = 0);
 
   /**
    * Copy all relevant shadow frustums from another shadow block list
@@ -241,7 +241,7 @@ public:
   /// Get the specified shadow.
   csFrustum* GetShadow (int idx)
   {
-    return (idx < shadows.Length () ? (csFrustum*)shadows[idx] : NULL);
+    return (idx < shadows.Length () ? (csFrustum*)shadows[idx] : 0);
   }
 
   /**
@@ -253,7 +253,7 @@ public:
     for (i = 0 ; i < shadows.Length () ; i++)
     {
       csShadowFrustum* sf = shadows[i];
-      CS_ASSERT (sf != NULL);
+      CS_ASSERT (sf != 0);
       sf->Transform (trans);
     }
     bbox_valid = false;
@@ -303,13 +303,13 @@ public:
   /// Append a shadow block to this list.
   void AppendShadowBlock (csShadowBlock* slist)
   {
-    CS_ASSERT (slist->prev == NULL && slist->next == NULL);
+    CS_ASSERT (slist->prev == 0 && slist->next == 0);
     CS_ASSERT ((!!first) == (!!last));
-    slist->next = NULL;
+    slist->next = 0;
     if (!last)
     {
       first = last = slist;
-      slist->prev = NULL;
+      slist->prev = 0;
     }
     else
     {
@@ -325,13 +325,13 @@ public:
     CS_ASSERT ((!!first) == (!!last));
     if (last)
     {
-      CS_ASSERT (last->next == NULL);
-      CS_ASSERT (first->prev == NULL);
+      CS_ASSERT (last->next == 0);
+      CS_ASSERT (first->prev == 0);
       csShadowBlock* old = last;
       last = old->prev;
-      if (last) last->next = NULL;
-      else first = NULL;
-      old->prev = old->next = NULL;
+      if (last) last->next = 0;
+      else first = 0;
+      old->prev = old->next = 0;
     }
   }
 
@@ -341,15 +341,15 @@ public:
     CS_ASSERT ((!!first) == (!!last));
 #   ifdef CS_DEBUG
     // If we are in debug mode then we additionally set all next/prev
-    // fields in the list to NULL so that our assert's above will work.
+    // fields in the list to 0 so that our assert's above will work.
     while (first)
     {
       csShadowBlock* old = first;
       first = old->next;
-      old->prev = old->next = NULL;
+      old->prev = old->next = 0;
     }
 #   endif
-    last = NULL;
+    last = 0;
   }
 
   /// Destroy all shadow lists and shadows in the list.
@@ -363,7 +363,7 @@ public:
       first = first->next;
       delete todel;
     }
-    last = NULL;
+    last = 0;
   }
 
   virtual iShadowBlock* GetFirstShadowBlock () { return (iShadowBlock*)first; }

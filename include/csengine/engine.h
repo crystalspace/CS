@@ -95,7 +95,7 @@ private:
 
 public:
   /// Construct an iterator and initialize to start.
-  csLightIt (csEngine*, iRegion* region = NULL);
+  csLightIt (csEngine*, iRegion* region = 0);
 
   virtual ~csLightIt () { }
 
@@ -104,7 +104,7 @@ public:
   /// Restart iterator.
   virtual void Restart ();
 
-  /// Get light from iterator. Return NULL at end.
+  /// Get light from iterator. Return 0 at end.
   virtual iLight* Fetch ();
 
   /// Get the sector for the last fetched light.
@@ -372,7 +372,7 @@ private:
   /// Current number of processed polygons.
   static int cur_process_polygons;
 
-  /// Current render context (proc texture) or NULL if global.
+  /// Current render context (proc texture) or 0 if global.
   iTextureHandle* render_context;
 
   /// Array of objects that want to die next frame (iMeshWrapper*).
@@ -433,7 +433,7 @@ private:
    * This function returns the pointer to the real name of the object.
    * The 'region' variable will contain the region is one is given.
    * If a region was given but none could be found this function returns
-   * NULL (this is an error).<br>
+   * 0 (this is an error).<br>
    * If '*' was given as a region name then all regions are searched EVEN if
    * the the FindXxx() routine is called for a specific region only. i.e.
    * this forces the search to be global. In this case 'global' will be set
@@ -526,8 +526,8 @@ public:
    * If the optional 'region' parameter is given then only lights will
    * be recalculated for the given region.
    */
-  virtual void ShineLights (iRegion* region = NULL,
-  	iProgressMeter* meter = NULL);
+  virtual void ShineLights (iRegion* region = 0,
+  	iProgressMeter* meter = 0);
 
   /// Query the iObject for the engine.
   virtual iObject *QueryObject();
@@ -542,7 +542,7 @@ public:
    * locally now). The optional progress meter will be used to
    * report progress.
    */
-  virtual bool Prepare (iProgressMeter* meter = NULL);
+  virtual bool Prepare (iProgressMeter* meter = 0);
 
   /**
    * Set the maximum number of polygons to process in
@@ -778,7 +778,7 @@ public:
   /**
    * Create an iterator to iterate over all static lights of the engine.
    */
-  virtual csPtr<iLightIterator> GetLightIterator (iRegion* region = NULL)
+  virtual csPtr<iLightIterator> GetLightIterator (iRegion* region = 0)
   {
     csLightIt* it;
     it = new csLightIt (this, region);
@@ -853,7 +853,7 @@ public:
     SCF_DECLARE_IBASE;
     EventHandler (csEngine* parent)
     {
-      SCF_CONSTRUCT_IBASE (NULL);
+      SCF_CONSTRUCT_IBASE (0);
       EventHandler::parent = parent;
     }
     virtual bool HandleEvent (iEvent& e) { return parent->HandleEvent(e); }
@@ -868,19 +868,19 @@ public:
   virtual int GetTextureFormat () const;
 
   /**
-   * Create or select a new region (name can be NULL for the default main
+   * Create or select a new region (name can be 0 for the default main
    * region). All new objects will be marked as belonging to this region.
    */
   virtual void SelectRegion (const char* iName);
 
   /**
-   * Create or select a new region (region can be NULL for the default main
+   * Create or select a new region (region can be 0 for the default main
    * region). All new objects will be marked as belonging to this region.
    */
   virtual void SelectRegion (iRegion* region);
 
   /**
-   * Get a reference to the current region (or NULL if the default main
+   * Get a reference to the current region (or 0 if the default main
    * region is selected).
    */
   virtual iRegion* GetCurrentRegion () const;
@@ -942,7 +942,7 @@ public:
   	const char* name);
   /// Create an uninitialized mesh factory wrapper
   virtual csPtr<iMeshFactoryWrapper> CreateMeshFactory (const char* name);
-  virtual csPtr<iLoaderContext> CreateLoaderContext (iRegion* region = NULL);
+  virtual csPtr<iLoaderContext> CreateLoaderContext (iRegion* region = 0);
   /// Load mesh factory.
   virtual csPtr<iMeshFactoryWrapper> LoadMeshFactory (
   	const char* name, const char* loaderClassId,
@@ -950,15 +950,15 @@ public:
 
   /// Create a mesh wrapper from a mesh factory wrapper
   virtual csPtr<iMeshWrapper> CreateMeshWrapper (iMeshFactoryWrapper* factory,
-  	const char* name, iSector* sector = NULL,
+  	const char* name, iSector* sector = 0,
 	const csVector3& pos = csVector3(0, 0, 0));
   /// Create a mesh wrapper for an existing mesh object
   virtual csPtr<iMeshWrapper> CreateMeshWrapper (iMeshObject*,
-  	const char* name, iSector* sector = NULL,
+  	const char* name, iSector* sector = 0,
 	const csVector3& pos = csVector3(0, 0, 0));
   /// Create a mesh wrapper from a class id.
   virtual csPtr<iMeshWrapper> CreateMeshWrapper (const char* classid,
-  	const char* name, iSector* sector = NULL,
+  	const char* name, iSector* sector = 0,
 	const csVector3& pos = csVector3(0, 0, 0));
   /// Create an uninitialized mesh wrapper
   virtual csPtr<iMeshWrapper> CreateMeshWrapper (const char* name);
@@ -975,19 +975,19 @@ public:
   virtual void GetAmbientLight (csColor &c) const;
 
   virtual iMaterialWrapper* FindMaterial (const char* name,
-  	iRegion* region = NULL);
+  	iRegion* region = 0);
   virtual iTextureWrapper* FindTexture (const char* name,
-  	iRegion* region = NULL);
+  	iRegion* region = 0);
   virtual iSector* FindSector (const char* name,
-  	iRegion* region = NULL);
+  	iRegion* region = 0);
   virtual iMeshWrapper* FindMeshObject (const char* name,
-  	iRegion* region = NULL);
+  	iRegion* region = 0);
   virtual iMeshFactoryWrapper* FindMeshFactory (const char* name,
-  	iRegion* region = NULL);
+  	iRegion* region = 0);
   virtual iCameraPosition* FindCameraPosition (const char* name,
-  	iRegion* region = NULL);
+  	iRegion* region = 0);
   virtual iCollection* FindCollection (const char* name,
-  	iRegion* region = NULL);
+  	iRegion* region = 0);
 
   bool DebugCommand (const char* cmd);
 

@@ -172,7 +172,7 @@ public:
   csFlareComponent *GetComponents() const {return components;}
   /**
    * Generate this halo's alpha map.
-   * Not used for this halo (returns NULL) since the halo consists of
+   * Not used for this halo (returns 0) since the halo consists of
    * multiple images.
    */
   virtual unsigned char *Generate (int Size);

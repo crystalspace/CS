@@ -46,7 +46,7 @@ class csMaterial : public iMaterial
 private:
   /// flat shading color
   csRGBcolor flat_color;
-  /// the texture of the material (can be NULL)
+  /// the texture of the material (can be 0)
   csRef<iTextureWrapper> texture;
   /// Number of texture layers (currently maximum 4).
   int num_texture_layers;
@@ -103,9 +103,9 @@ public:
   /// Set reflection of the material
   void SetReflection (float val) { reflection = val; }
 
-  /// Get the texture (if none NULL is returned)
+  /// Get the texture (if none 0 is returned)
   iTextureWrapper *GetTextureWrapper () const { return texture; }
-  /// Set the texture (pass NULL to set no texture)
+  /// Set the texture (pass 0 to set no texture)
   void SetTextureWrapper (iTextureWrapper *tex);
 
   /// Add a texture layer (currently only one supported).
@@ -192,7 +192,7 @@ public:
 
   /**
    * Change the material handle. Note: This will also change the base
-   * material to NULL.
+   * material to 0.
    */
   void SetMaterialHandle (iMaterialHandle *mat);
   /// Get the material handle.
