@@ -21,8 +21,6 @@
 #include "cstool/keyval.h"
 #include "csutil/scfstringarray.h"
 
-//---------------------------------------------------------------------------
-
 SCF_IMPLEMENT_IBASE_EXT (csKeyValuePair)
   SCF_IMPLEMENTS_INTERFACE (iKeyValuePair)
 SCF_IMPLEMENT_IBASE_EXT_END
@@ -85,7 +83,8 @@ csRef<iStringArray> csKeyValuePair::GetValueNames () const
 {
   csRef<iStringArray> ret;
   ret.AttachNew (new scfStringArray ());
-  csSet<csStrKey, csConstCharHashKeyHandler>::GlobalIterator it = names.GetIterator ();
+  csSet<csStrKey, csConstCharHashKeyHandler>::GlobalIterator it =
+    names.GetIterator ();
   while (it.HasNext ())
   {
     ret->Push (it.Next ());
