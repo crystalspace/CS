@@ -1,5 +1,9 @@
 # This is the makefile for Cygwin32 compiler (gcc for Win32)
 
+ifdef COMSPEC
+SHELL = /bin/sh
+endif
+
 # Friendly names for building environment
 DESCRIPTION.cygwin = Windows with Cygwin32 GNU C/C++
 DESCRIPTION.OS.cygwin = Win32
