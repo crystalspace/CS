@@ -36,6 +36,7 @@ csPortal::csPortal ()
   filter_b = 1;
   static_dest = false;
   sector = NULL;
+  do_clip_portal = false;
 }
 
 void csPortal::ObjectToWorld (const csReversibleTransform& t)
@@ -103,12 +104,7 @@ bool csPortal::Draw (csPolygon2D* new_clipper, csPolygon3D* portal_polygon,
   new_rview.portal_polygon = portal_polygon;
   new_rview.clip_plane = portal_polygon->GetPlane ()->GetCameraPlane();
   new_rview.clip_plane.Invert ();
-  // @@@ We could use a better check for loose_end here.
-  // Maybe this needs to be a parameter which can be given in the
-  // world file?
-  bool loose_end = ((csPolygonParentInt*)portal_polygon->GetSector ()) !=
-  	portal_polygon->GetParent ();
-  if (loose_end || sector->IsBSP ()) new_rview.do_clip_plane = true;
+  if (do_clip_portal) new_rview.do_clip_plane = true;
 
   if (do_warp_space)
   {

@@ -1027,7 +1027,8 @@ enum { kTokenPolTexNr = 1, kTokenPolLighting, kTokenPolMipmap,
        kTokenPolPortal, kTokenPolWarp, kTokenPolLightX,
        kTokenPolTexture, kTokenPolVertices, kTokenPolAlpha,
        kTokenPolFog, kTokenPolUV, kTokenPolUVA, kTokenPolColors,
-       kTokenPolFlatCol, kTokenPolCosFact, kTokenPolGouraud };
+       kTokenPolFlatCol, kTokenPolCosFact, kTokenPolGouraud,
+       kTokenPolClip };
 
 enum { kTokenPTexOrig = 1, kTokenPTexFirst, kTokenPTexFirstLen,
        kTokenPTexSecond, kTokenPTexSecondLen, kTokenPTexLen,
@@ -1056,6 +1057,7 @@ csPolygon3D* CSLoader::load_poly3d (char* polyname, csWorld* w, char* buf,
         {kTokenPolFog, "FOG"},
         {kTokenPolCosFact, "COSFACT"},
         {kTokenPolGouraud, "GOURAUD"},
+        {kTokenPolClip, "CLIP"},
         {0,0}};
   static tokenDesc tCommands[] = {
         {kTokenPTexOrig, "ORIG"},
@@ -1164,6 +1166,9 @@ csPolygon3D* CSLoader::load_poly3d (char* polyname, csWorld* w, char* buf,
           poly3d->SetCSPortal (s);
           LoadStat::portals_loaded++;
         }
+        break;
+      case kTokenPolClip:
+	if (poly3d->GetPortal ()) poly3d->GetPortal ()->SetClippingPortal (true);
         break;
       case kTokenPolWarp:
         if (poly3d->GetPortal ())

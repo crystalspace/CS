@@ -60,6 +60,13 @@ protected:
   bool do_mirror;
 
   /**
+   * If true then this portal will clip geometry in the destination sector.
+   * This must be used for portals which arrive in the middle of a sector.
+   * But don't use it otherwise because it decreases efficiency.
+   */
+  bool do_clip_portal;
+
+  /**
    * A flag which indicates if the destination of this portal should not be
    * transformed from object to world space. For mirrors you should
    * disable this flag because you want the destination to move with the
@@ -126,6 +133,19 @@ public:
    * Disable space warping.
    */
   void DisableSpaceWarping () { do_warp_space = false; }
+
+  /**
+   * Disable/enable clipping portal.
+   * If true then this portal will clip geometry in the destination sector.
+   * This must be used for portals which arrive in the middle of a sector.
+   * But don't use it otherwise because it decreases efficiency.
+   */
+  void SetClippingPortal (bool c) { do_clip_portal = c; }
+
+  /**
+   * Is this a clipping portal?
+   */
+  bool IsClippingPortal () { return do_clip_portal; }
 
   /**
    * Set static destination. If this field is true
