@@ -1277,7 +1277,8 @@ bool csGraphics3DOGLCommon::BeginDraw (int DrawFlags)
 	/*
 	 Render target: draw everything in top-left corner, but flipped.
         */
-	glOrtho (0., (GLdouble) width, (GLdouble) (2 * height - txt_h), (GLdouble) (height - txt_h), -1.0, 10.0);
+	glOrtho (0., (GLdouble) width, (GLdouble) (2 * height - txt_h),
+		(GLdouble) (height - txt_h), -1.0, 10.0);
 	glCullFace (GL_BACK);
       }
       else

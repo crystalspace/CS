@@ -138,7 +138,6 @@ csGLGraphics3D::csGLGraphics3D (iBase *parent)
   scrapVerticesSize = 0;
 
   shadow_stencil_enabled = false;
-  needStencil = false;
   clipping_stencil_enabled = false;
   clipportal_dirty = true;
 }
@@ -168,6 +167,19 @@ void csGLGraphics3D::Report (int severity, const char* msg, ...)
   va_end (arg);
 }
 
+void csGLGraphics3D::SetCorrectStencilState ()
+{
+  if (shadow_stencil_enabled || clipping_stencil_enabled ||
+  	clipportal_stack.Length () > 0)
+  {
+    statecache->Enable_GL_STENCIL_TEST ();
+  }
+  else
+  {
+    statecache->Disable_GL_STENCIL_TEST ();
+  }
+}
+
 void csGLGraphics3D::EnableStencilShadow ()
 {
   shadow_stencil_enabled = true;
@@ -177,22 +189,19 @@ void csGLGraphics3D::EnableStencilShadow ()
 void csGLGraphics3D::DisableStencilShadow ()
 {
   shadow_stencil_enabled = false;
-  if (clipping_stencil_enabled) return;
-  statecache->Disable_GL_STENCIL_TEST ();
+  SetCorrectStencilState ();
 }
 
 void csGLGraphics3D::EnableStencilClipping ()
 {
   clipping_stencil_enabled = true;
-  if (needStencil) 
-    statecache->Enable_GL_STENCIL_TEST ();
+  statecache->Enable_GL_STENCIL_TEST ();
 }
 
 void csGLGraphics3D::DisableStencilClipping ()
 {
   clipping_stencil_enabled = false;
-  if (shadow_stencil_enabled) return;
-  statecache->Disable_GL_STENCIL_TEST ();
+  SetCorrectStencilState ();
 }
 
 void csGLGraphics3D::SetGlOrtho (bool inverted)
@@ -210,11 +219,9 @@ void csGLGraphics3D::SetGlOrtho (bool inverted)
   else
   {*/
     if (inverted)
-      glOrtho (0., (GLdouble) viewwidth, 
-      (GLdouble) viewheight, 0., -1.0, 10.0);
+      glOrtho (0., (GLdouble) viewwidth, (GLdouble) viewheight, 0., -1.0, 10.0);
     else
-      glOrtho (0., (GLdouble) viewwidth, 0.,
-      (GLdouble) viewheight, -1.0, 10.0);
+      glOrtho (0., (GLdouble) viewwidth, 0., (GLdouble) viewheight, -1.0, 10.0);
   //}
 }
 
@@ -235,11 +242,8 @@ csZBufMode csGLGraphics3D::GetZModePass2 (csZBufMode mode)
   }
 }
 
-void csGLGraphics3D::SetZMode (csZBufMode mode, bool internal)
+void csGLGraphics3D::SetZModeInternal (csZBufMode mode)
 {
-  if (!internal)
-    current_zmode = mode;
-
   switch (mode)
   {
     case CS_ZBUF_NONE:
@@ -387,22 +391,6 @@ void csGLGraphics3D::SetupStencil ()
 
   if (clipper)
   {
-#if 0  
-    /*
-     * @@@ Does not work correctly. 
-     * [res: I suspect it interferes with SetupClipPortals()]
-     */
-    if (clipper->GetClipperType() == iClipper2D::clipperBox)
-    {
-      /*
-      * Convenient. No need to set up the stencil stuff, the scissor does
-      * all the clipping to the box already.
-      */
-      needStencil = false;
-      return; 
-    }
-#endif
-
     statecache->SetMatrixMode (GL_PROJECTION);
     glPushMatrix ();
     glLoadIdentity ();
@@ -457,15 +445,11 @@ void csGLGraphics3D::SetupStencil ()
 
     statecache->SetColorMask (wmRed, wmGreen, wmBlue, wmAlpha);
 
-    statecache->SetStencilMask (127);
-
     glPopMatrix ();
     statecache->SetMatrixMode (GL_PROJECTION);
     glPopMatrix ();
     if (oldz) statecache->Enable_GL_DEPTH_TEST ();
     if (tex2d) statecache->Enable_GL_TEXTURE_2D ();
-
-    needStencil = true;
   }
 }
 
@@ -538,10 +522,44 @@ void csGLGraphics3D::SetupClipper (int clip_portal,
                                  int clip_z_plane,
 				 int tri_count)
 {
+  // There are two cases to consider.
+  // 1. We have not encountered any floating portals yet. In that case
+  //    we use scissor, stencil,  or plane clipping as directed by the
+  //    clipper, clipping needs, and object (number of triangles).
+  // 2. We have encountered a floating portal. In that case we always
+  //    consider every subsequent portal as being floating.
+  if (clipportal_stack.Length () > 0)
+  {
+    if (clipportal_dirty)
+    {
+      clipportal_dirty = false;
+      SetupClipPortals ();
+    }
+  }
+
+  // If we have a box clipper then we can simply use glScissor (which
+  // is already set up) to do the clipping. In case we have a floating
+  // portal we also can use the following part.
+  if (clipper->GetClipperType() == iClipper2D::clipperBox ||
+  	clipportal_stack.Length () > 0)
+  {
+    SetCorrectStencilState ();
+    // If we still need plane clipping then we must set that up too.
+    if (!clip_plane && !clip_z_plane)
+      return;
+    // We force clip_portal to CS_CLIP_NOT here so that we only do
+    // the other clipping.
+    clip_portal = CS_CLIP_NOT;
+  }
+
+  // Normal clipping.
   if (cache_clip_portal == clip_portal &&
       cache_clip_plane == clip_plane &&
       cache_clip_z_plane == clip_z_plane)
+  {
+    SetCorrectStencilState ();
     return;
+  }
   cache_clip_portal = clip_portal;
   cache_clip_plane = clip_plane;
   cache_clip_z_plane = clip_z_plane;
@@ -621,7 +639,7 @@ void csGLGraphics3D::SetupClipper (int clip_portal,
   if (planes > 0)
   {
     clip_planes_enabled = true;
-    for (int i = 0; i < planes; i++)
+    for (int i = 0 ; i < planes ; i++)
       glEnable ((GLenum)(GL_CLIP_PLANE0+i));
   }
   // @@@ Hard coded max number of planes (6). Maybe not so good.
@@ -1102,6 +1120,7 @@ bool csGLGraphics3D::BeginDraw (int drawflags)
   SetWriteMask (true, true, true, true);
 
   clipportal_dirty = true;
+  debug_inhibit_draw = false;
 
   int i = 0;
   for (i = 15; i >= 0; i--)
@@ -1141,7 +1160,7 @@ bool csGLGraphics3D::BeginDraw (int drawflags)
       glColor4f (1.0f, 1.0f, 1.0f, 1.0f);
       ActivateTexture (render_target);
       statecache->Disable_GL_BLEND ();
-      SetZMode (CS_ZBUF_NONE, false);
+      SetZMode (CS_ZBUF_NONE);
 
       glBegin (GL_QUADS);
       glTexCoord2f (0, 0); glVertex2i (0, viewheight-txt_h);
@@ -1216,7 +1235,7 @@ bool csGLGraphics3D::BeginDraw (int drawflags)
       statecache->SetMatrixMode (GL_MODELVIEW);
       glLoadIdentity ();
 
-      SetZMode (CS_ZBUF_NONE, false);
+      SetZMode (CS_ZBUF_NONE);
       
       SetMixMode (CS_FX_COPY);
       glColor4f (1.0f, 1.0f, 1.0f, 1.0f);
@@ -1257,7 +1276,7 @@ void csGLGraphics3D::FinishDraw ()
     {
       rt_onscreen = false;
       //statecache->Enable_GL_TEXTURE_2D ();
-      SetZMode (CS_ZBUF_NONE, false);
+      SetZMode (CS_ZBUF_NONE);
       statecache->Disable_GL_BLEND ();
       statecache->Disable_GL_ALPHA_TEST ();
       int txt_w, txt_h;
@@ -1677,12 +1696,12 @@ void csGLGraphics3D::DrawMesh (const csCoreRenderMesh* mymesh,
 
   SetupProjection ();
 
-  SetupClipPortals ();
   int num_tri = (mymesh->indexend-mymesh->indexstart)/3;
   SetupClipper (mymesh->clip_portal, 
                 mymesh->clip_plane, 
                 mymesh->clip_z_plane,
 		num_tri);
+  if (debug_inhibit_draw) return;
 
   SetObjectToCameraInternal (mymesh->object2camera);
   
@@ -1757,37 +1776,50 @@ void csGLGraphics3D::DrawMesh (const csCoreRenderMesh* mymesh,
       break;
   }
 
+  // Based on the kind of clipping we need we set or clip mask.
+  int clip_mask, clip_value;
+  if (clipportal_stack.Length () > 0)
+  {
+    clip_mask = 128;
+    clip_value = 128;
+  }
+  else if (clipping_stencil_enabled)
+  {
+    clip_mask = 128;
+    clip_value = 0;
+  }
+  else
+  {
+    clip_mask = 0;
+    clip_value = 0;
+  }
+
   switch (current_shadow_state)
   {
     case CS_SHADOW_VOLUME_PASS1:
       statecache->SetStencilOp (GL_KEEP, GL_KEEP, GL_INCR);
-      statecache->SetStencilFunc (GL_ALWAYS, 0,
-        (clipping_stencil_enabled?128:0));
+      statecache->SetStencilFunc (GL_ALWAYS, clip_value, clip_mask);
       break;
     case CS_SHADOW_VOLUME_FAIL1:
       statecache->SetStencilOp (GL_KEEP, GL_INCR, GL_KEEP);
-      statecache->SetStencilFunc (GL_ALWAYS, 0,
-        (clipping_stencil_enabled?128:0));
+      statecache->SetStencilFunc (GL_ALWAYS, clip_value, clip_mask);
       break;
     case CS_SHADOW_VOLUME_PASS2:
       statecache->SetStencilOp (GL_KEEP, GL_KEEP, GL_DECR);
-      statecache->SetStencilFunc (GL_ALWAYS, 0,
-        (clipping_stencil_enabled?128:0));
+      statecache->SetStencilFunc (GL_ALWAYS, clip_value, clip_mask);
       break;
     case CS_SHADOW_VOLUME_FAIL2:
       statecache->SetStencilOp (GL_KEEP, GL_DECR, GL_KEEP);
-      statecache->SetStencilFunc (GL_ALWAYS, 0,
-        (clipping_stencil_enabled?128:0));
+      statecache->SetStencilFunc (GL_ALWAYS, clip_value, clip_mask);
       break;
     case CS_SHADOW_VOLUME_USE:
       statecache->SetStencilOp (GL_KEEP, GL_KEEP, GL_KEEP);
-      statecache->SetStencilFunc (GL_EQUAL, 0, 127 |
-        (clipping_stencil_enabled?128:0));
+      statecache->SetStencilFunc (GL_EQUAL, clip_value, 127 | clip_mask);
       break;
     default:
-      if (clipping_stencil_enabled)
+      if (clip_mask)
       {
-        statecache->SetStencilFunc (GL_EQUAL, 0, 128);
+        statecache->SetStencilFunc (GL_EQUAL, clip_value, clip_mask);
         statecache->SetStencilOp (GL_KEEP, GL_KEEP, GL_KEEP);
       }
   }
@@ -1821,8 +1853,8 @@ void csGLGraphics3D::DrawMesh (const csCoreRenderMesh* mymesh,
       CS_ASSERT_MSG ("Meshes can't have zmesh zmode. You deserve some spanking", 
 	(modes.z_buf_mode != CS_ZBUF_MESH) && 
 	(modes.z_buf_mode != CS_ZBUF_MESH2));
-        SetZMode ((current_zmode == CS_ZBUF_MESH2) ? 
-	  GetZModePass2 (modes.z_buf_mode) : modes.z_buf_mode, true);
+        SetZModeInternal ((current_zmode == CS_ZBUF_MESH2) ? 
+	  GetZModePass2 (modes.z_buf_mode) : modes.z_buf_mode);
 /*      if (mymesh->z_buf_mode != CS_ZBUF_MESH)
       {
         SetZMode (mymesh->z_buf_mode, true);
@@ -1891,7 +1923,7 @@ void csGLGraphics3D::DrawPixmap (iTextureHandle *hTex,
   // as we are drawing in 2D, we disable some of the commonly used features
   // for fancy 3D drawing
   statecache->SetShadeModel (GL_FLAT);
-  SetZMode (CS_ZBUF_NONE, false);
+  SetZModeInternal (CS_ZBUF_NONE);
   //@@@???statecache->SetDepthMask (GL_FALSE);
 
   // if the texture has transparent bits, we have to tweak the
@@ -1938,6 +1970,9 @@ void csGLGraphics3D::DrawPixmap (iTextureHandle *hTex,
   glTexCoord2f (ntx1, nty2);
   glVertex2i (sx, viewheight - (sy + sh));
   glEnd ();
+
+  // Restore.
+  SetZModeInternal (current_zmode);
 }
 
 void csGLGraphics3D::SetShadowState (int state)
@@ -1981,6 +2016,42 @@ void csGLGraphics3D::SetShadowState (int state)
   }
 }
 
+void csGLGraphics3D::DebugVisualizeStencil (uint32 mask)
+{
+  statecache->Enable_GL_STENCIL_TEST ();
+
+  statecache->SetStencilMask (mask);
+  statecache->SetStencilFunc (GL_EQUAL, 0xff, mask);
+  statecache->SetStencilOp (GL_KEEP, GL_KEEP, GL_KEEP);
+  glScissor (0, 0, 640, 480);
+  statecache->Disable_GL_TEXTURE_2D ();
+  statecache->SetShadeModel (GL_FLAT);
+
+  SetZModeInternal (CS_ZBUF_FILL);
+  glColor4f (1, 1, 1, 0);
+
+  statecache->SetMatrixMode (GL_PROJECTION);
+  glPushMatrix ();
+  glLoadIdentity ();
+  statecache->SetMatrixMode (GL_MODELVIEW);
+  glPushMatrix ();
+  glLoadIdentity ();
+
+  glBegin (GL_QUADS);
+  glVertex3f (-1.0f, 1.0f, 1.0f);
+  glVertex3f (1.0f, 1.0f, 1.0f);
+  glVertex3f (1.0f, -1.0f, 1.0f);
+  glVertex3f (-1.0f, -1.0f, 1.0f);
+  glEnd ();
+
+  glPopMatrix ();
+  statecache->SetMatrixMode (GL_PROJECTION);
+  glPopMatrix ();
+
+  SetZModeInternal (current_zmode);
+  SetCorrectStencilState ();
+}
+
 void csGLGraphics3D::OpenPortal (size_t numVertices, 
 				 const csVector2* vertices,
 				 const csPlane3& normal)
@@ -2004,98 +2075,97 @@ void csGLGraphics3D::ClosePortal ()
 
 void csGLGraphics3D::SetupClipPortals ()
 {
-  if (clipportal_dirty)
+  csClipPortal* cp = clipportal_stack.Top ();
+
+  // First setup projection matrix for 2D drawing.
+  statecache->SetMatrixMode (GL_PROJECTION);
+  glPushMatrix ();
+  glLoadIdentity ();
+  SetGlOrtho (false);
+  statecache->SetMatrixMode (GL_MODELVIEW);
+  glPushMatrix ();
+  glLoadIdentity ();
+
+  // First set up the stencil area.
+  statecache->Enable_GL_STENCIL_TEST ();
+  statecache->SetStencilMask (128);
+  statecache->SetStencilFunc (GL_ALWAYS, 128, 128);
+  statecache->SetStencilOp (GL_ZERO, GL_ZERO, GL_REPLACE);
+
+  GLboolean wmRed, wmGreen, wmBlue, wmAlpha;
+  statecache->GetColorMask (wmRed, wmGreen, wmBlue, wmAlpha);
+  statecache->SetColorMask (false, false, false, false);
+  GLenum oldcullface;
+  statecache->GetCullFace (oldcullface);
+  statecache->SetCullFace (GL_FRONT);
+  bool tex2d = statecache->IsEnabled_GL_TEXTURE_2D ();
+  statecache->Disable_GL_TEXTURE_2D ();
+  statecache->SetShadeModel (GL_FLAT);
+
+  SetZModeInternal (CS_ZBUF_USE);	// @@@ TEST?
+  // Get the plane normal of the polygon. Using this we can calculate
+  // '1/z' at every screen space point.
+
+  float M, N, O;
+  float Dc = cp->normal.D ();
+  if (ABS (Dc) < 0.01f)
   {
-    clipportal_dirty = false;
-    //if (GLCaps.use_stencil)
-    {
-      if (clipportal_stack.Length () <= 0)
-      {
-        statecache->Disable_GL_STENCIL_TEST ();
-      }
-      else
-      {
-        csClipPortal* cp = clipportal_stack.Top ();
-
-        // First set up the stencil area.
-        statecache->Enable_GL_STENCIL_TEST ();
-        glClearStencil (0);
-        glClear (GL_STENCIL_BUFFER_BIT);
-        statecache->SetStencilFunc (GL_ALWAYS, 1, 1);
-        statecache->SetStencilOp (GL_KEEP, GL_ZERO, GL_REPLACE);
-
-	GLboolean wmRed, wmGreen, wmBlue, wmAlpha;
-	statecache->GetColorMask (wmRed, wmGreen, wmBlue, wmAlpha);
-	statecache->SetColorMask (false, false, false, false);
-	GLenum oldcullface;
-	statecache->GetCullFace (oldcullface);
-	statecache->SetCullFace (GL_FRONT);
-        statecache->Disable_GL_TEXTURE_2D ();
-        statecache->SetShadeModel (GL_FLAT);
-
-	SetZMode (CS_ZBUF_USE, false);
-        // Get the plane normal of the polygon. Using this we can calculate
-        // '1/z' at every screen space point.
-
-        float M, N, O;
-	float Dc = cp->normal.D ();
-        if (ABS (Dc) < 0.01f)
-        {
-          M = N = 0;
-          O = 1;
-        }
-        else
-        {
-          float inv_Dc = 1.0f / Dc;
-          M = -cp->normal.A () * inv_Dc * inv_aspect;
-          N = -cp->normal.B () * inv_Dc * inv_aspect;
-          O = -cp->normal.C () * inv_Dc;
-        }
-
-	int v;
-	glBegin (GL_TRIANGLE_FAN);
-	csVector2* vt = cp->poly;
-	for (v = 0 ; v < cp->num_poly ; v++)
-	{
-	  float sx = vt->x - asp_center_x;
-	  float sy = vt->y - asp_center_y;
-	  float one_over_sz = M * sx + N * sy + O;
-	  float sz = 1.0f / one_over_sz;
-	  glVertex4f (vt->x * sz, vt->y * sz, -1.0f, sz);
-	  vt++;
-	}
-	glEnd ();
-
-        // Use the stencil area.
-        statecache->SetStencilFunc (GL_EQUAL, 1, 1);
-        statecache->SetStencilOp (GL_KEEP, GL_KEEP, GL_KEEP);
-
-	// First clear the z-buffer here.
-	SetZMode (CS_ZBUF_FILLONLY, false);
-
-        statecache->SetMatrixMode (GL_PROJECTION);
-        glPushMatrix ();
-        glLoadIdentity ();
-        statecache->SetMatrixMode (GL_MODELVIEW);
-        glPushMatrix ();
-        glLoadIdentity ();
-
-	glBegin (GL_QUADS);
-	glVertex3f (-1.0f, 1.0f, 1.0f);
-	glVertex3f (1.0f, 1.0f, 1.0f);
-	glVertex3f (1.0f, -1.0f, 1.0f);
-	glVertex3f (-1.0f, -1.0f, 1.0f);
-	glEnd ();
-
-        glPopMatrix ();
-        statecache->SetMatrixMode (GL_PROJECTION);
-        glPopMatrix ();
-
-	statecache->SetCullFace (oldcullface);
-	statecache->SetColorMask (wmRed, wmGreen, wmBlue, wmAlpha);
-      }
-    }
+    M = N = 0;
+    O = 1;
   }
+  else
+  {
+    float inv_Dc = 1.0f / Dc;
+    M = -cp->normal.A () * inv_Dc * inv_aspect;
+    N = -cp->normal.B () * inv_Dc * inv_aspect;
+    O = -cp->normal.C () * inv_Dc;
+  }
+
+  int v;
+  glBegin (GL_TRIANGLE_FAN);
+  csVector2* vt = cp->poly;
+  for (v = 0 ; v < cp->num_poly ; v++)
+  {
+    float sx = vt->x - asp_center_x;
+    float sy = vt->y - asp_center_y;
+    float one_over_sz = M * sx + N * sy + O;
+    float sz = 1.0f / one_over_sz;
+    glVertex4f (vt->x * sz, vt->y * sz, -1.0f, sz);
+    vt++;
+  }
+  glEnd ();
+
+  // Use the stencil area.
+  statecache->SetStencilFunc (GL_EQUAL, 128, 128);
+  statecache->SetStencilOp (GL_KEEP, GL_KEEP, GL_KEEP);
+
+  // First clear the z-buffer here.
+  SetZModeInternal (CS_ZBUF_FILLONLY);
+
+  statecache->SetMatrixMode (GL_PROJECTION);
+  glLoadIdentity ();
+
+  glBegin (GL_QUADS);
+  glVertex3f (-1.0f, 1.0f, -1.0f);
+  glVertex3f (1.0f, 1.0f, -1.0f);
+  glVertex3f (1.0f, -1.0f, -1.0f);
+  glVertex3f (-1.0f, -1.0f, -1.0f);
+  glEnd ();
+
+  statecache->SetMatrixMode (GL_MODELVIEW);
+  glPopMatrix ();
+  statecache->SetMatrixMode (GL_PROJECTION);
+  glPopMatrix ();
+
+  statecache->SetCullFace (oldcullface);
+  statecache->SetColorMask (wmRed, wmGreen, wmBlue, wmAlpha);
+  if (tex2d)
+    statecache->Enable_GL_TEXTURE_2D ();
+
+  SetZModeInternal (current_zmode);
+
+  //DebugVisualizeStencil (128);
+  //debug_inhibit_draw = true;
 }
 
 void csGLGraphics3D::SetClipper (iClipper2D* clipper, int cliptype)
@@ -2344,7 +2414,8 @@ void csGLGraphics3D::DrawSimpleMesh (const csSimpleRenderMesh& mesh,
     rmesh.alphaType = mesh.alphaType.alphaType;
   }
   
-  SetZMode (mesh.z_buf_mode, false);
+  csZBufMode old_zbufmode = current_zmode;
+  SetZMode (mesh.z_buf_mode);
   csRenderMeshModes modes (rmesh);
   for (int p = 0; p < passCount; p++)
   {
@@ -2369,6 +2440,8 @@ void csGLGraphics3D::DrawSimpleMesh (const csSimpleRenderMesh& mesh,
     if (mesh.texture)
       DeactivateTexture ();
   }
+
+  SetZMode (old_zbufmode);
 }
 
 class csOpenGLHalo : public iHalo
@@ -2516,6 +2589,7 @@ void csOpenGLHalo::Draw (float x, float y, float w, float h, float iIntensity,
     G3D->statecache->SetActiveTU (0);
 
   //csGLGraphics3D::SetGLZBufferFlags (CS_ZBUF_NONE);
+  // @@@ Is this correct to override current_zmode?
   G3D->SetZMode (CS_ZBUF_NONE);
   bool texEnabled = 
     csGLGraphics3D::statecache->enabled_GL_TEXTURE_2D[0];

@@ -6,6 +6,17 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+16-Jun-2004
+	- Jorrit cleaned up stencil clipping in the NR/OpenGL renderer.
+	  Now mask 128 is used for both stencil clipping and floating portals
+	  and mask 127 is used for stencil shadows. Also when a floating
+	  portal is active normal stencil clipping is no longer used.
+	  This fixes several bugs with floating portals (not enough to actually
+	  fix the rotating door in flarge but in simpler cases it is working
+	  very well now). Note that this is not finished yet. If there is
+	  another portal (floating or not) behind the floating portal then that
+	  other portal clip area is currently fully ignored. This is something
+	  we have to fix too.
 15-Jun-2004
 	- Jorrit fixed two serious problems with the NR floating portals
 	  implementations (csGLGraphics3D::SetupClipPortals()):

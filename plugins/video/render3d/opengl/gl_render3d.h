@@ -146,10 +146,12 @@ private:
   void DisableStencilShadow ();
   void EnableStencilClipping ();
   void DisableStencilClipping ();
+  // Depending on stencil clipping, stencil shadows, or floating portals
+  // we need to enable or disable stencil.
+  void SetCorrectStencilState ();
 
   int stencilclipnum;
   bool stencil_initialized;	// Stencil clipper is initialized from 'clipper'
-  bool needStencil;
   bool clip_planes_enabled;	// glClipPlane is enabled.
   csRef<iClipper2D> clipper;	// Current clipper from engine.
   int cliptype;			// One of CS_CLIPPER_...
@@ -158,6 +160,9 @@ private:
   int cache_clip_z_plane;
   bool hasOld2dClip;
   csRect old2dClip;
+
+  // For debugging: inhibit all drawing of meshes till next frame.
+  bool debug_inhibit_draw;
 
   /// Current render target.
   csRef<iTextureHandle> render_target;
@@ -200,7 +205,10 @@ private:
   void DisableZOffset ()
   { statecache->Disable_GL_POLYGON_OFFSET_FILL (); }
 
-  void SetZMode (csZBufMode mode, bool internal);
+  // Debug function to visualize the stencil with the given mask.
+  void DebugVisualizeStencil (uint32 mask);
+
+  void SetZModeInternal (csZBufMode mode);
 
   void SetMirrorMode (bool mirror);
 
@@ -336,7 +344,10 @@ public:
 
   /// Set the z buffer write/test mode
   virtual void SetZMode (csZBufMode mode)
-  { SetZMode (mode, false); }
+  {
+    current_zmode = mode;
+    SetZModeInternal (mode);
+  }
   
   virtual csZBufMode GetZMode ()
   { return current_zmode; }
