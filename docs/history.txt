@@ -19,6 +19,10 @@ Short-term cleanups that need to be done:
 	- Received and integrated makefiles for IRIX/SGI from Dmitry Derevyanko
 	  <dmitryd@robotics.EECS.Berkeley.EDU>.
 	- Or Siu-Hang fixed the Archive class (small bugfix).
+	- I removed the obsolete physics stuff from the engine.
+	- Moved all remaining public include files from libs to include
+	  (csgame, csgfxldr, csscript, csws, cssys, csparser, and
+	  cssndldr).
 15-Jul-99:
 	- Added support for multi-sector sprites. Also simplified the
 	  rendering process through portals a bit.
@@ -26,6 +30,8 @@ Short-term cleanups that need to be done:
 	  There is no need for the current double class situation since
 	  the landscape engine is going to be integrated and overriding
 	  portal behaviour is still possible this way (like InfMaze does).
+	- Fixes from Robert Bate for the Macintosh port.
+	- Andrew Zabolotny add scan32a.asm which he forgot earlier.
 14-Jul-99:
 	- Added a lot of config file variables for collision detection and
 	  speed of the new movement system. Almost everything can be configured

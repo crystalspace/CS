@@ -1,0 +1,328 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+
+<HTML>
+
+<HEAD>
+<TITLE>Crystal Space Authors</TITLE>
+<META NAME="GENERATOR" CONTENT="Arachnophilia 3.5">
+<META NAME="FORMATTER" CONTENT="Arachnophilia 3.5">
+</HEAD>
+
+<BODY BACKGROUND="" BGCOLOR="#000000" TEXT="#ffffff" LINK="#008000" VLINK="#ffff00" ALINK="#00ff00">
+
+Here is a list of all people who have contributed to Crystal Space or gave important
+tips. Some of these people are no longer active with CS and may not be reachable:<P>
+
+<A HREF="mailto:jorrit.tyberghein@uz.kuleuven.ac.be">Jorrit Tyberghein</A> is the
+main author of Crystal Space. He wrote the initial engine with the main current
+functionality. He is still the main driving force after this project. Contact him
+for any general and strategic question as well as specific implementation issues.
+Jorrit's home address is Schoonstraat 11, 3020 Veltem Beisem, BELGIUM.<P>
+
+<A HREF="mailto:demircio@boun.edu.tr">Murat Demircioglu</A> was the first
+contributor for Crystal Space. He provided the first steps to porting Crystal
+Space to DOS. Parts of his code is still present in the current version.<P>
+
+<A HREF="mailto:derek_arnold@fuse.net">David N. Arnold</A> enhanced the DOS port made
+by Murat. He added C++ classes and VESA support. David also wrote the original
+Pentium assembler version of scan.cpp.<P>
+
+<A HREF="mailto:noote@bigfoot.com">Nathaniel Saint Martin</A> is a very eager
+Crystal Space fan :-) He even has his own Crystal Space dedicated
+<A HREF="http://www.bigfoot.com/~noote/CrystalSpace" TARGET="_top">homepage</A>.
+He enhanced Arnold's DOS port again so that it works with the Watcom C++ compiler.
+He also suggested and implemented a considerable restructering of the
+system-dependent stuff with every port having its own directory. He is also the
+original author of the input/output console. Nathaniel was also the first to
+actually present me with an almost working Windows 95 version WITH source! Nathaniel
+is also responsible for most of the sound support code in Crystal Space. He made
+the basic sound system, wrote the Windows drivers and wrote support for 3D sound.
+Nathaniel created the config utility which allows for easier
+editing of 'cryst.cfg'. Currently only for Windows and DOS. In addition he also
+enhanced the (now non-existant) CSAR utility. He also helped develop the
+Windows/Direct3D and Windows/OpenGL versions and is co-author of the Glide
+port. His latest work has been some enhancements on the 3D sprites including two
+convertors from Quake MDL and Quake II MD2 to Crystal Space (in contrib).<P>
+
+<A HREF="mailto:jxsaarin@cc.helsinki.fi">Jyrki O Saarinen</A> made the original
+Amiga port of Crystal Space. This old port can still be found at:
+<A HREF="http://www.helsinki.fi/~jxsaarin/crystalspace/" TARGET="_top">Amiga port</A>
+but it is very obsolete now.<p>
+
+<A HREF="mailto:pfhorte@rogers.wave.ca">Steve Israelson</A> made the Macintosh
+port of Crystal Space.  He also did some optimizations on the assembler
+draw_scanline routines. Steve made the first preliminary physics system and also
+implemented an easy uniform kind of dynamic lighting useful for fluorescent
+lights and such. Steve greatly enhanced the routines to parse the world format.<P>
+
+<A HREF="mailto:zorn@technologist.com">Bill Bohan</A> contributed the first
+free textures for Crystal Space.<P>
+
+<A HREF="mailto:lynx@tm.net.my">Ang See Chai</A> contributed another set of
+textures.<P>
+
+<A HREF="mailto:jaison@apk.net">Jaison Lee</A> gave me a new version of
+police.fnt which doesn't give an error on the Borland compiler.<P>
+
+<A HREF="mailto:filrv@syroxdev.co.uk">Phil Harvey</A> suggested a statistics
+counter so that you can see the number of polygons considered and drawn each
+frame. He helped with Nathaniel to get the Windows 32-bit port working. Phil
+patched find_rgb_slow to make it slightly faster (but he forgot to rename it
+to find_rgb_slow_somewhat_faster :-)<P>
+
+<A HREF="mailto:d97ta@efd.lth.se">Tor Andersson</A> contributed some textures.
+He also donated code for reading several file formats and a virtual machine.
+This code has not been integrated with Crystal Space yet but you can find his
+code in the 'contrib' directory. Tor  gave me a 'dj_joy.c' file (in the
+'contrib' directory) which is an example on how to use the joystick from within
+DOS with DJGPP. He also added JPG support to Crystal Space and support for the
+mouse in DJGPP.<P>
+
+<A HREF="mailto:alessandro.russo@ntt.it">Alessandro Russo</A> gave me a patch
+for the X version of Crystal Space which allows simultanious keypresses and
+disables autorepeat. This makes movement much more smoother. Alessandro Russo
+presented me with a patch to fix the autorepeat problem (in X Windows).<P>
+
+<A HREF="mailto:GaryC@jeld-wen.com">Gary Clark</A> designed the basic framework
+of the Graphics3D class and I helped him start implement this. Gary also made
+an extension so that Crystal Space can now use accurate RGB light sourcing.
+Since this slows down the texture cache a bit I have made it optional (using
+'cryst.cfg'). Also added a patch from Gary Clark to fix the problem with the
+X version of CS that CS would not immediatelly start drawing but only after
+an expose event was generated. He gave me the 'lin_joy.cpp' file (in the
+'contrib' directory) which is an example on how to use the joystick from
+within Linux.<P>
+
+<A HREF="mailto:karlisf@cclu.lv">Karlis Freivalds</A> found and fixed a few
+stupid bugs in wcc/watcom.cpp. I wonder how this version could work before he
+fixed it :-)<P>
+
+<A HREF="mailto:snapkus@iname.com">Darius Snapkauskas</A> was busy with 3D
+sprites. He contributed some unfinished stubs for his work. Unfortunately
+he seemed to have stopped supporting it. His code has now been moved to the
+attic directory. The current 3D sprites in Crystal Space are developed by me
+(Jorrit Tyberghein).<P>
+
+<A HREF="mailto:dogles@peachtree.com">Dan Ogles</A> gave me a patch for 'printf'
+so that it also works with the Windows port. Dan made the Direct3D port for
+Windows! He greatly enhanced the Windows port and also added 16-bit support for
+Windows. His greatest work up to now is converting the 3D and 2D graphics
+subsystems to COM. He thus provided the foundations for the COM system (also on
+non-Windows platforms) which Crystal Space is now using. He also
+contributed the Halo code to Crystal Space.<P>
+
+<A HREF="mailto:r.blum@advertainment.com">Robert Blum</A> patched Dan Ogles
+'printf' patch so that there is no more buffer overrun and also found a bug in
+'gifload.cpp'. He also ran a memory debugger on Crystal Space and found/fixed
+many bugs related to that.<P>
+
+<A HREF="mailto:anis@cyberus.ca">Anis Ahmad</A> updated the makefiles for
+Watcom C++ for both Crystal Space and csar. He also made the Crystal Space
+editor for Windows 95 which is unfortunatelly no longer supported.<P>
+
+<A HREF="mailto:bit@eltech.ru">Andrew Zabolotny</A> ported Crystal Space to
+OS/2. Andrew changed Crystal Space to read/write ZIP files instead of the
+CSAR archive format. He enhanced Crystal Space to read PNG files. He did a
+MAJOR MAJOR rewrite of the system dependent stuff and made a lot of support
+classes for that. Andrew wrote the 2D sprites. Andrew wrote CSWS, the Crystal
+Space Windowing System and is also busy writing MazeD, a Crystal Space level
+editor. Andrew did very good work on DrawPolygon and DrawPolygonQuick. He also
+rewrote the DJGPP port (non-Allegro) to use 16-bit and also support more
+video modes. He recently ported almost all assembly to NASM and wrote a few
+new routines. He also improved speed of fog and alpha transparency a lot. He
+is also responsible for the current Makefile system.<P>
+
+<A HREF="mailto:jlilley@empathy.com">John Lilley</A> manages the Crystal Space
+Texture Archive at <A HREF="http://www.empathy.com" TARGET="_top">Texture Archive</A>.<P>
+
+<A HREF="mailto:jonh@MIT.EDU">Jon Heiner</A> sent me a few patches and a makefile
+for the SGI/IRIX port.<P>
+
+<A HREF="mailto:ajapted@netspace.net.au">Andrew Apted</A> ported Crystal Space to
+the GGI library (more information at <A HREF="http://www.ggi-project.org/"
+TARGET="_top">The GGI Project</A>).<P>
+
+<A HREF="mailto:pgarceau@teleport.com">Paul Garceau</A> gave me a makefile for
+Windows NT with GCC.<P>
+
+<A HREF="mailto:eiselera@pcpool1.informatik.uni-ulm.de">Ralf Eisele</A> updated
+the Amiga port to 0.09.<P>
+
+<A HREF="mailto:Maurice.Vosmeijer@ehv.sc.philips.com">Maurice Vosmeijer</A> is also
+helping maintaining the Amiga version.<P>
+
+<A HREF="mailto:iavramov@ibm.net">Ivan Avramovic</A> cleaned all the matrix/vector
+stuff and rewrote the Camera class. He also helped a lot with cleaning up the
+perspective projection and clipping. He made some considerable improvements
+there. He also helped me fix a lot of bugs with portals and clipping. Ivan also
+enhanced the image loader classes to make it possible to dynamically add new
+image formats even with a pre-compiled Crystal Space library. He also rewrote
+the loader routines and added the csObject library which is now used in CS. He
+also seperated the scripting stuff from the engine.<P>
+
+<A HREF="mailto:Smirnov@bbs.math.spbu.ru">Slavik Levtchenko</A> created the
+current Watcom port with 16-bit display support.<P>
+
+<A HREF="mailto:k3040e4@wildsau.idv-edu.uni-linz.ac.at">Markus F.X.J. Oberhumer</A>
+gave me a small patch on the X port.<P>
+
+<A HREF="mailto:xtrochu@yahoo.com">Trochu Xavier</A> wrote the HOWTO describing how
+to compile CS with Visual C++ for Windows 95 and also contributed a few small
+patches to the Windows 95 version. He also contributed up-to-date project files for
+Visual C++.  He also ported Crystal Space to the Glide API (together with
+Nathaniel)!<P>
+
+<A HREF="mailto:thomasog@uiuc.edu">Thomas Ogbuji, Chimezie</A> wrote the CS world
+file to VRML convertor in JAVA. He also wrote the JAVA Crystal Space world file
+editor (not really a level editor, but for editing world files).<P>
+
+<A HREF="mailto:Helge.Foerster@t-online.de">Helge Foerster</A> suggested the
+algorithm for texel filtering which is now in Crystal Space.<P>
+
+<A HREF="mailto:vidalc@club-internet.fr">Charles Vidal</A> gave me a tcl/tk script
+for launching Crystal Space.<P>
+
+<A HREF="mailto:olanglois@sympatico.ca">Olivier Langlois</A> made a few fixes on
+the event system in CS and ported CS to Borland C++. He also found and fixed
+some memory leaks. He also contributed the MemoryHeap class for the texture
+cache. Olivier also ported the GCC assembler functions to Visual C++ and
+implemented a few additional Visual C++ assembly functions. He also implemented
+the BMP loader class. He also optimized and helped optimize several key-functions
+in the engine pipeline. For example, he managed
+to nearly DOUBLE the speed of the assembler scanline drawers!!!<P>
+
+<A HREF="mailto:AlexPfaffe@csi.com">Alex Pfaffe</A> integrated Crystal Space with
+the VCOLLIDE library for collision detection. Later he removed VCOLLIDE and used
+RAPID instead. He then rewrote RAPID to work better with Crystal Space. He is
+now busy working on the ROAM landscape engine which we will integrate with CS soon.<P>
+
+<A HREF="mailto:434961@cepsz.unizar.es">Antonio Gascon</A> presented me a few notes
+which allowed me to optimize a few matrix inversions away.<P>
+
+<A HREF="mailto:dfr@nlsystems.com">Doug Rabson</A> helped fixed a possible
+memory leak in the X port with SHM extension.<P>
+
+<A HREF="mailto:jlundin@fz.ml.org">Jeff Lundin</A> for helping with the
+DJGPP port.<P>
+
+<A HREF="mailto:Spoeth@t-online.de">Philipp Spoth</A> for helping with optimizing
+the texture cache. Philipp also helped optimize a few other routines.<P>
+
+<A HREF="mailto:xhosxe@cyrano.com">Xavier Hosxe</A> contributed a few patches which
+allowed Crystal Space to compile with the EGCS compiler. For one reason or
+another this compiler doesn't support a C++ construction which other compilers
+do support.<P>
+
+<A HREF="mailto:ortalo@laas.fr">Rodolphe Ortalo</A> patched the Glide port so
+that it works on Linux. He also send me output from Purify which helped a lot
+for debugging Crystal Space.<P>
+
+<A HREF="mailto:greg@cosc.canterbury.ac.nz">Greg Ewing</A> contributed a patch
+which greatly speeds up the computing of the initial palette table.<P>
+
+<A HREF="mailto:sla@istu.udm.ru">Vyacheslav L. Chupyatov</A> suggested some
+fixes so that CS compiles with Watcom C++ v11. He also contributed a few
+makefiles for Watcom C++ and fixed a few small bugs.<P>
+
+<A HREF="mailto:dmitryd@robotics.eecs.berkeley.edu">Dmitry Derevyanko</A> helped me
+by running Purify and solving a lot of bugs that way. He also contributed makefiles
+for IRIX/SGI.<P>
+
+<A HREF="mailto:xavier@planet.dk">Xavier Pianet</A> ported Crystal Space to BeOS!<P>
+
+<A HREF="mailto:smh1008@cus.cam.ac.uk">David Huen</A> helped fix the BeOS port.<P>
+
+<A HREF="mailto:jesko@bigfoot.de">Jesko Schwarzer</A> suggested a way to improve
+speed of the volumetric fog.<P>
+
+<A HREF="mailto:apinkus@xs4all.nl">Ayal Pinkus</A> gave me a nice missile
+sprite which I used to replace my ugly missile. He helped me create the base
+classes for the curve system. He then implemented the first Bezier curves with
+3x3 control points.<P>
+
+<A HREF="mailto:sgalbrai@linknet.kitsap.lib.wa.us">Seth Galbraith</A> also gave
+me a nice missile and he fixed the texture bug in mdl2spr. Seth is also a great
+source of suggestions and bug reports :-)<P>
+
+<A HREF="mailto:gsteenss@eps.agfa.be">Gert Steenssens</A> wrote the Linux drivers
+for the sound system and he also converted the SVGALIB driver to COM. He also
+helped develop the Linux/Glide and OpenGL ports.<P>
+
+<A HREF="mailto:mlong@custom.net">Michael Dale Long</A> helped fixing the Glide
+port.<P>
+
+<A HREF="mailto:haussman@cthulhu.engr.sgi.com">Gary Haussmann</A> wrote the OpenGL
+port.<p>
+
+<A HREF="mailto:akm@zeus.theinternet.com.au">Andrew Kenneth Milton</A> gave me a
+makefile for FreeBSD and did some other FreeBSD patches.<P>
+
+<A HREF="mailto:haskin@ptway.com">Brian Haskin</A> also did some FreeBSD patches.<P>
+
+<A HREF="mailto:cstokes@wantree.com.au">Conor Stokes</A> further optimized the
+16-bit scanline drawers which were already optimized by Olivier Langlois.<P>
+
+<A HREF="mailto:f91-men@nada.kth.se">Mattias Engdegård</A> gave me a patch with
+a cleaner handling of the X11 visual and window creation.<P>
+
+<A HREF="mailto:snaar@idirect.ca">Serguei Narojnyi (Snaar)</A> added the first
+integrated networking code to CS. His code uses the COM subsystem so it can easily
+be extended for system-dependent parts.<P>
+
+<A HREF="mailto:rbate@ma.ultranet.com">Rob Bate</A> updated the Macintosh
+port to COM.<P>
+
+<A HREF="mailto:normank@lycosmail.com">Norman Kramer</A> sent me a few fixes. In
+particular he sent me a few fixes on the sound code.<P>
+
+<A HREF="mailto:nicholasfrancis@iname.com">Nicholas</A> helped developing MazeD.<P>
+
+<A HREF="mailto:sunshine@sunshineco.com">Eric Sunshine</A> ported Crystal Space
+to NextStep 3.3, OpenStep 4.2, and Rhapsody (MacOS/X server) DR2!<P>
+
+<A HREF="mailto:wolfg_l@pro-net.co.uk">Wolfgang Lehrach</A> wrote a Doom to CS
+convertor in Java. It is included in the contrib directory.<P>
+
+<A HREF="mailto:Jesse.McClusky@PSS.Boeing.com">McClusky, Jesse</A> made the
+latest Amiga port including the COM stuff.<P>
+
+<A HREF="mailto:gwfremin@bellsouth.net">Leslie Saputra</A> gave me some code
+to implement 'freelook' like in Quake.<P>
+
+<A HREF="mailto:mrsigma@home.com">Denis Dmitriev</A> gave me a routine to split a
+convex object into slices parallel to the view plane (useful for volumetric
+fog). He also added a progress bar to the console (during lighting) and
+added a new way to do bilinear filtering for the software renderer.
+He also dramatically improved the quality of the precalculated lightmaps.
+Denis also improved the movement system in WalkTest by implementing
+gravity and better collision detection (using the CD system from Alex).<P>
+
+<A HREF="mailto:thieber@gmx.net">Thomas Hieber</A> helped on the Windows project
+files and also contributed various other things. He wrote DrawPolygonFX(). He added
+the csgame library and the Crystal Shooter application. He also significantly
+enhanced the Windows Direct3D port.<P>
+
+<A HREF="mailto:brucewil@pacbell.net">Bruce Williams</A> helped optimize the Direct3D
+driver. He also contributed a set of convertor utilities which is going to be
+used so that CS can load 3DS, MDL, ... objects directly.<P>
+
+<A HREF="mailto:srochette@telweb.com">Sylvain Rochette</A> gave me a few fixes for
+the Windows port.<P>
+
+<A HREF="mailto:shor@cse.cuhk.edu.hk">Siu-Hang</A> updated MazeD to add
+functionality for sector, portals, lights, textures, ...<P>
+
+&nbsp;<P>&nbsp;<P>
+
+Many thanks also for the people at <A HREF="http://www.grimmware.com"
+TARGET="_top">GrimmWare</A> for being the first to offer WEB space for
+Crystal Space.<P>
+
+Many thanks to Alessandro Russo for convincing his system manager for creating
+a mailing list for Crystal Space. Thanks to Marco d'Itri (the system manager)
+for creating this list for me. Also thanks to those people for creating an
+ftp mirror of this site.
+
+</BODY>
+
+</HTML>

@@ -165,17 +165,17 @@ into a seperate project at http://server.empathy.com/crystal
 9. Other Documents
 ------------------
 
-INSTALL contains instructions for compiling and running Crystal Space.
+docs/INSTALL contains instructions for compiling and running Crystal Space.
 It also contains information about some of the most useful commandline
 options.
 
-COPYING contains the conditions by which you can use the Crystal Space
+docs/COPYING contains the conditions by which you can use the Crystal Space
 engine in your own products. These conditions are from LGPL.
 
-dir.txt contains a list and description of the directory structure of
+docs/dir.txt contains a list and description of the directory structure of
 Crystal Space. It also explains what all documents are for.
 
-CREDITS contains a list of all people who contributed in some way
+docs/authors.html contains a list of all people who contributed in some way
 to the Crystal Space project. Many thanks to them all.
 
 The 'docs' directory contains a lot of useful documents about Crystal
