@@ -300,6 +300,7 @@ void csFrustumVis::UnregisterVisObject (iVisibilityObject* visobj)
 void csFrustumVis::AddObjectToUpdateQueue (csFrustVisObjectWrapper* visobj_wrap)
 {
   if (updating) return;
+  CS_ASSERT (visobj_wrap->frustvis != (csFrustumVis*)0xdeadbeef);
   update_queue.Add (visobj_wrap);
 }
 

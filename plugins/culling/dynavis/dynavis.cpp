@@ -370,6 +370,7 @@ void csDynaVis::UnregisterVisObject (iVisibilityObject* visobj)
 void csDynaVis::AddObjectToUpdateQueue (csVisibilityObjectWrapper* visobj_wrap)
 {
   if (updating) return;
+  CS_ASSERT (visobj_wrap->dynavis != (csDynaVis*)0xdeadbeef);
   update_queue.Add (visobj_wrap);
 }
 
