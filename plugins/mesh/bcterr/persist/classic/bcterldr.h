@@ -35,9 +35,8 @@ struct iSyntaxService;
 class csBCTerrFactoryLoader : public iLoaderPlugin
 {
 private:
-  iPluginManager* plugin_mgr;
   iObjectRegistry* object_reg;
-  iSyntaxService* synldr;
+  csRef<iSyntaxService> synldr;
   csStringHash xmltokens;
 
 public:
@@ -71,9 +70,8 @@ public:
 class csBCTerrLoader : public iLoaderPlugin
 {
 private:
-  iPluginManager* plugin_mgr;
   iObjectRegistry* object_reg;
-  iSyntaxService* synldr;
+  csRef<iSyntaxService> synldr;
   csStringHash xmltokens;
 
 public:

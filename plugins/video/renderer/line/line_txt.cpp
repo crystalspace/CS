@@ -508,10 +508,7 @@ void csTextureManagerLine::SetPalette ()
   for (i = 0; i < 256; i++)
     G2D->SetRGB (i, cmap [i].red, cmap [i].green, cmap [i].blue);
 
-  iEventQueue* q = CS_QUERY_REGISTRY(object_reg, iEventQueue);
+  csRef<iEventQueue> q (CS_QUERY_REGISTRY(object_reg, iEventQueue));
   if (q != 0)
-  {
     q->GetEventOutlet()->ImmediateBroadcast (cscmdPaletteChanged, this);
-    q->DecRef ();
-  }
 }

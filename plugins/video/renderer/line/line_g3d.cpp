@@ -83,7 +83,7 @@ SCF_IMPLEMENT_IBASE (csGraphics3DLine::EventHandler)
   SCF_IMPLEMENTS_INTERFACE (iEventHandler)
 SCF_IMPLEMENT_IBASE_END
 
-csGraphics3DLine::csGraphics3DLine (iBase *iParent) : G2D (NULL)
+csGraphics3DLine::csGraphics3DLine (iBase *iParent)
 {
   SCF_CONSTRUCT_IBASE (iParent);
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiComponent);
@@ -109,12 +109,9 @@ csGraphics3DLine::~csGraphics3DLine ()
 {
   if (scfiEventHandler)
   {
-    iEventQueue* q = CS_QUERY_REGISTRY(object_reg, iEventQueue);
+    csRef<iEventQueue> q (CS_QUERY_REGISTRY(object_reg, iEventQueue));
     if (q != 0)
-    {
       q->RemoveListener (scfiEventHandler);
-      q->DecRef ();
-    }
     scfiEventHandler->DecRef ();
   }
 
@@ -127,28 +124,25 @@ csGraphics3DLine::~csGraphics3DLine ()
   if (vbufmgr)
     vbufmgr->DecRef ();
   vbufmgr = NULL;
-  if (G2D)
-    G2D->DecRef ();
 }
 
 bool csGraphics3DLine::Initialize (iObjectRegistry *r)
 {
   object_reg = r;
-  iPluginManager* plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
-  iCommandLineParser* cmdline = CS_QUERY_REGISTRY (object_reg,
-  	iCommandLineParser);
+  csRef<iPluginManager> plugin_mgr (
+  	CS_QUERY_REGISTRY (object_reg, iPluginManager));
+  csRef<iCommandLineParser> cmdline (CS_QUERY_REGISTRY (object_reg,
+  	iCommandLineParser));
 
   config.AddConfig(object_reg, "/config/line3d.cfg");
 
   width = height = -1;
 
   const char *driver = cmdline->GetOption ("canvas");
-  cmdline->DecRef ();
   if (!driver)
     driver = config->GetStr ("Video.Line.Canvas", LINE_CS_SOFTWARE_2D_DRIVER);
 
   G2D = CS_LOAD_PLUGIN (plugin_mgr, driver, iGraphics2D);
-  plugin_mgr->DecRef ();
   if (!G2D)
     return false;
   if (!object_reg->Register (G2D, "iGraphics2D"))
@@ -164,12 +158,9 @@ bool csGraphics3DLine::Initialize (iObjectRegistry *r)
 
   if (!scfiEventHandler)
     scfiEventHandler = new EventHandler (this);
-  iEventQueue* q = CS_QUERY_REGISTRY(object_reg, iEventQueue);
+  csRef<iEventQueue> q (CS_QUERY_REGISTRY(object_reg, iEventQueue));
   if (q != 0)
-  {
     q->RegisterListener (scfiEventHandler, CSMASK_Broadcast);
-    q->DecRef ();
-  }
 
   return true;
 }

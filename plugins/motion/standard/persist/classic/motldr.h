@@ -44,9 +44,9 @@ class csMotionLoader : public iLoaderPlugin
 {
 private:
   iObjectRegistry *object_reg;
-  iVFS *vfs;
-  iMotionManager *motman;
-  iSyntaxService *synldr;
+  csRef<iVFS> vfs;
+  csRef<iMotionManager> motman;
+  csRef<iSyntaxService> synldr;
   csStringHash xmltokens;
 
   bool load_transform (iDocumentNode* node, csVector3 &v, csQuaternion &q,

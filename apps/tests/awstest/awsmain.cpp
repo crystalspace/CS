@@ -32,9 +32,12 @@ main(int argc, char *argv[])
   }
 
   // Main loop.
+  iObjectRegistry* object_reg = System->object_reg;
   csDefaultRunLoop(System->object_reg);
 
   delete System;
- return 0;
+  csInitializer::DestroyApplication (object_reg);
+
+  return 0;
 }
 

@@ -36,7 +36,6 @@ struct iSyntaxService;
 class csTerrFuncFactoryLoader : public iLoaderPlugin
 {
 private:
-  iPluginManager* plugin_mgr;
   iObjectRegistry* object_reg;
 
 public:
@@ -72,10 +71,9 @@ public:
 class csTerrFuncLoader : public iLoaderPlugin
 {
 private:
-  iPluginManager* plugin_mgr;
   iObjectRegistry* object_reg;
-  iSyntaxService* synldr;
-  iReporter* reporter;
+  csRef<iSyntaxService> synldr;
+  csRef<iReporter> reporter;
   csStringHash xmltokens;
 
 public:

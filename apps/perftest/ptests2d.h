@@ -35,6 +35,7 @@ protected:
   int colour[8];
 public:
   virtual void Setup (iGraphics3D* g3d, PerfTest* perftest);
+  virtual ~Tester2D () { }
 };
 
 class LineTester2D : public Tester2D

@@ -89,34 +89,11 @@ extern awsTest *System;
 
 awsTest::awsTest()
 {
-  vc = NULL;
-  engine = NULL;
-  myG3D = NULL;
-  myG2D = NULL;
-  myVFS = NULL;
-  myConsole = NULL;
-  font = NULL;
-  loader = NULL;
-  aws = NULL;
-  view = NULL;
-  wview=NULL;
   message[0] = 0;
 }
 
 awsTest::~awsTest()
 {
-  SCF_DEC_REF (vc);
-  SCF_DEC_REF (view);
-  SCF_DEC_REF (wview);
-  SCF_DEC_REF (font);
-  SCF_DEC_REF (aws);
-  SCF_DEC_REF (loader);
-  SCF_DEC_REF (engine);
-  SCF_DEC_REF (myG3D);
-  SCF_DEC_REF (myG2D);
-  SCF_DEC_REF (myVFS);
-  SCF_DEC_REF (myConsole);
-  SCF_DEC_REF (awsCanvas);
 }
 
 static bool AwsEventHandler (iEvent& ev)
@@ -339,12 +316,12 @@ awsTest::Initialize(int argc, const char* const argv[], const char *iConfigName)
 
   Report(CS_REPORTER_SEVERITY_NOTIFY, "--------------------------------------");
 
-  view = new csView (engine, myG3D);
+  view = csPtr<iView> (new csView (engine, myG3D));
   view->GetCamera ()->SetSector (room);
   view->GetCamera ()->GetTransform ().SetOrigin (csVector3 (0, 5, -3));
   view->SetRectangle (0, 0, myG2D->GetWidth (), myG2D->GetHeight ());
 
-  wview = new csView (engine, myG3D);
+  wview = csPtr<iView> (new csView (engine, myG3D));
   wview->GetCamera ()->SetSector (room);
   wview->GetCamera ()->GetTransform ().SetOrigin (csVector3 (0, 5, -3));
 
@@ -501,12 +478,9 @@ awsTest::Report (int severity, const char* msg, ...)
 {
   va_list arg;
   va_start (arg, msg);
-  iReporter* rep = CS_QUERY_REGISTRY (object_reg, iReporter);
+  csRef<iReporter> rep (CS_QUERY_REGISTRY (object_reg, iReporter));
   if (rep)
-  {
     rep->ReportV (severity, "crystalspace.application.awstest", msg, arg);
-    rep->DecRef ();
-  }
   else
   {
     csPrintfV (msg, arg);

@@ -131,60 +131,59 @@ csTerrFuncFactoryLoader::csTerrFuncFactoryLoader (iBase* pParent)
 {
   SCF_CONSTRUCT_IBASE (pParent);
   SCF_CONSTRUCT_EMBEDDED_IBASE(scfiComponent);
-  plugin_mgr = NULL;
 }
 
 csTerrFuncFactoryLoader::~csTerrFuncFactoryLoader ()
 {
-  SCF_DEC_REF (plugin_mgr);
 }
 
 bool csTerrFuncFactoryLoader::Initialize (iObjectRegistry* object_reg)
 {
   csTerrFuncFactoryLoader::object_reg = object_reg;
-  plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
   return true;
 }
 
 csPtr<iBase> csTerrFuncFactoryLoader::Parse (const char* /*string*/,
 	iLoaderContext*, iBase* /* context */)
 {
-  iMeshObjectType* pType = CS_QUERY_PLUGIN_CLASS (plugin_mgr,
-  	"crystalspace.mesh.object.terrfunc", iMeshObjectType);
+  csRef<iPluginManager> plugin_mgr (CS_QUERY_REGISTRY (object_reg,
+  	iPluginManager));
+  csRef<iMeshObjectType> pType (CS_QUERY_PLUGIN_CLASS (plugin_mgr,
+  	"crystalspace.mesh.object.terrfunc", iMeshObjectType));
   if (!pType)
   {
     pType = CS_LOAD_PLUGIN (plugin_mgr, "crystalspace.mesh.object.terrfunc",
     	iMeshObjectType);
-    printf ("Load TYPE plugin crystalspace.mesh.object.terrfunc\n");
     if (!pType)
       return NULL;
   }
-  iMeshObjectFactory* pFactory = pType->NewFactory ();
-  pType->DecRef ();
+  csRef<iMeshObjectFactory> pFactory (pType->NewFactory ());
+  if (pFactory) pFactory->IncRef ();	// Avoid smart pointer release.
   return csPtr<iBase> (pFactory);
 }
 
 csPtr<iBase> csTerrFuncFactoryLoader::Parse (iDocumentNode* /*node*/,
 	iLoaderContext*, iBase* /* context */)
 {
-  iMeshObjectType* pType = CS_QUERY_PLUGIN_CLASS (plugin_mgr,
-  	"crystalspace.mesh.object.terrfunc", iMeshObjectType);
+  csRef<iPluginManager> plugin_mgr (CS_QUERY_REGISTRY (object_reg,
+  	iPluginManager));
+  csRef<iMeshObjectType> pType (CS_QUERY_PLUGIN_CLASS (plugin_mgr,
+  	"crystalspace.mesh.object.terrfunc", iMeshObjectType));
   if (!pType)
   {
     pType = CS_LOAD_PLUGIN (plugin_mgr, "crystalspace.mesh.object.terrfunc",
     	iMeshObjectType);
     if (!pType)
     {
-      iReporter* reporter = CS_QUERY_REGISTRY (object_reg, iReporter);
+      csRef<iReporter> reporter (CS_QUERY_REGISTRY (object_reg, iReporter));
       ReportError (reporter,
 		"crystalspace.terrfuncloader.setup.objecttype",
 		"Could not load the terrfunc mesh object plugin!");
-      if (reporter) reporter->DecRef ();
       return NULL;
     }
   }
-  iMeshObjectFactory* pFactory = pType->NewFactory ();
-  pType->DecRef ();
+  csRef<iMeshObjectFactory> pFactory (pType->NewFactory ());
+  if (pFactory) pFactory->IncRef ();	// Avoid smart pointer release.
   return csPtr<iBase> (pFactory);
 }
 
@@ -194,22 +193,15 @@ csTerrFuncLoader::csTerrFuncLoader (iBase* pParent)
 {
   SCF_CONSTRUCT_IBASE (pParent);
   SCF_CONSTRUCT_EMBEDDED_IBASE(scfiComponent);
-  plugin_mgr = NULL;
-  synldr = NULL;
-  reporter = NULL;
 }
 
 csTerrFuncLoader::~csTerrFuncLoader ()
 {
-  SCF_DEC_REF (plugin_mgr);
-  SCF_DEC_REF (synldr);
-  SCF_DEC_REF (reporter);
 }
 
 bool csTerrFuncLoader::Initialize (iObjectRegistry* object_reg)
 {
   csTerrFuncLoader::object_reg = object_reg;
-  plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
   reporter = CS_QUERY_REGISTRY (object_reg, iReporter);
   synldr = CS_QUERY_REGISTRY (object_reg, iSyntaxService);
 
@@ -258,8 +250,8 @@ csPtr<iBase> csTerrFuncLoader::Parse (const char* pString,
   char *pParams;
   char pStr[255];
 
-  iMeshObject* mesh = NULL;
-  iTerrFuncState* terrstate = NULL;
+  csRef<iMeshObject> mesh;
+  csRef<iTerrFuncState> terrstate;
 
   csParser* parser = ldr_context->GetParser ();
 
@@ -407,34 +399,30 @@ csPtr<iBase> csTerrFuncLoader::Parse (const char* pString,
         {
 	  float hscale, hshift;
 	  csScanStr (pParams, "%s,%f,%f\n", pStr, &hscale, &hshift);
-	  iVFS* vfs = CS_QUERY_REGISTRY (object_reg, iVFS);
+	  csRef<iVFS> vfs (CS_QUERY_REGISTRY (object_reg, iVFS));
 	  if (!vfs)
 	  {
 	    // @@@ Use reporter!
 	    printf ("No VFS!\n");
 	    return NULL;
 	  }
-	  iImageIO* loader = CS_QUERY_REGISTRY (object_reg, iImageIO);
+	  csRef<iImageIO> loader (CS_QUERY_REGISTRY (object_reg, iImageIO));
 	  if (!loader)
 	  {
-	    vfs->DecRef ();
 	    // @@@ Use reporter!
 	    printf ("No image loader!\n");
 	    return NULL;
 	  }
 
 	  csRef<iDataBuffer> buf (vfs->ReadFile (pStr));
-	  vfs->DecRef ();
 	  if (!buf || !buf->GetSize ())
 	  {
-	    loader->DecRef ();
 	    // @@@ Use reporter!
 	    printf ("Can't open file '%s' in vfs!\n", pStr);
 	    return NULL;
 	  }
 	  csRef<iImage> ifile (loader->Load (buf->GetUint8 (), buf->GetSize (),
 	  	CS_IMGFMT_TRUECOLOR));
-	  loader->DecRef ();
 	  if (!ifile)
 	  {
 	    // @@@ Use reporter!
@@ -446,8 +434,8 @@ csPtr<iBase> csTerrFuncLoader::Parse (const char* pString,
 	break;
     }
   }
-  terrstate->DecRef ();
 
+  if (mesh) mesh->IncRef ();	// Avoid smart pointer release.
   return csPtr<iBase> (mesh);
 }
 

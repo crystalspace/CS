@@ -58,7 +58,7 @@ SCF_IMPLEMENT_IBASE (csGraphics3DNull::EventHandler)
   SCF_IMPLEMENTS_INTERFACE (iEventHandler)
 SCF_IMPLEMENT_IBASE_END
 
-csGraphics3DNull::csGraphics3DNull (iBase *iParent) : G2D (NULL)
+csGraphics3DNull::csGraphics3DNull (iBase *iParent)
 {
   SCF_CONSTRUCT_IBASE (iParent);
   SCF_CONSTRUCT_EMBEDDED_IBASE(scfiComponent);
@@ -82,12 +82,9 @@ csGraphics3DNull::~csGraphics3DNull ()
 {
   if (scfiEventHandler)
   {
-    iEventQueue* q = CS_QUERY_REGISTRY(object_reg, iEventQueue);
+    csRef<iEventQueue> q (CS_QUERY_REGISTRY(object_reg, iEventQueue));
     if (q != 0)
-    {
       q->RemoveListener (scfiEventHandler);
-      q->DecRef ();
-    }
     scfiEventHandler->DecRef ();
   }
 
@@ -97,9 +94,10 @@ csGraphics3DNull::~csGraphics3DNull ()
 bool csGraphics3DNull::Initialize (iObjectRegistry *r)
 {
   object_reg = r;
-  iPluginManager* plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
-  iCommandLineParser* cmdline = CS_QUERY_REGISTRY (object_reg,
-  	iCommandLineParser);
+  csRef<iPluginManager> plugin_mgr (
+  	CS_QUERY_REGISTRY (object_reg, iPluginManager));
+  csRef<iCommandLineParser> cmdline (CS_QUERY_REGISTRY (object_reg,
+  	iCommandLineParser));
 
   config.AddConfig(object_reg, "/config/null3d.cfg");
 
@@ -108,10 +106,8 @@ bool csGraphics3DNull::Initialize (iObjectRegistry *r)
   const char *driver = cmdline->GetOption ("canvas");
   if (!driver)
     driver = config->GetStr ("Video.Null.Canvas", CS_SOFTWARE_2D_DRIVER);
-  cmdline->DecRef ();
 
   G2D = CS_LOAD_PLUGIN (plugin_mgr, driver, iGraphics2D);
-  plugin_mgr->DecRef ();
   if (!G2D)
     return false;
   if (!object_reg->Register (G2D, "iGraphics2D"))
@@ -127,12 +123,9 @@ bool csGraphics3DNull::Initialize (iObjectRegistry *r)
 
   if (!scfiEventHandler)
     scfiEventHandler = new EventHandler (this);
-  iEventQueue* q = CS_QUERY_REGISTRY(object_reg, iEventQueue);
+  csRef<iEventQueue> q (CS_QUERY_REGISTRY(object_reg, iEventQueue));
   if (q != 0)
-  {
     q->RegisterListener (scfiEventHandler, CSMASK_Broadcast);
-    q->DecRef ();
-  }
 
   return true;
 }
@@ -214,7 +207,7 @@ void csGraphics3DNull::Close()
   vbufmgr->DecRef (); vbufmgr = NULL;
 
   G2D->Close ();
-  G2D->DecRef(); G2D = NULL;
+  G2D = NULL;
   width = height = -1;
 }
 

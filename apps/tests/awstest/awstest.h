@@ -31,20 +31,20 @@ public:
   iObjectRegistry* object_reg;
 
 private:
-  iEngine* engine;
-  iAws *aws;
-  iAwsPrefManager *awsprefs;
-  iAwsCanvas *awsCanvas;
+  csRef<iEngine> engine;
+  csRef<iAws> aws;
+  iAwsPrefManager* awsprefs;
+  csRef<iAwsCanvas> awsCanvas;
   iSector* room;
-  iView* view, *wview;
-  iGraphics3D *myG3D;
-  iGraphics2D *myG2D;
-  iVFS *myVFS;
-  iConsoleOutput *myConsole;
-  iLoader* loader;
-  iVirtualClock* vc;
+  csRef<iView> view, wview;
+  csRef<iGraphics3D> myG3D;
+  csRef<iGraphics2D> myG2D;
+  csRef<iVFS> myVFS;
+  csRef<iConsoleOutput> myConsole;
+  csRef<iLoader> loader;
+  csRef<iVirtualClock> vc;
 
-  iFont* font;
+  csRef<iFont> font;
   int col_red, col_blue, col_white, col_black;
   int col_yellow, col_cyan, col_green, col_gray;
   char message[255];

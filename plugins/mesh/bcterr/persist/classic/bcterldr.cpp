@@ -130,20 +130,15 @@ csBCTerrFactoryLoader::csBCTerrFactoryLoader (iBase *pParent)
 {
   SCF_CONSTRUCT_IBASE (pParent);
   SCF_CONSTRUCT_EMBEDDED_IBASE(scfiComponent);
-  plugin_mgr = NULL;
-  synldr = NULL;
 }
 
 csBCTerrFactoryLoader::~csBCTerrFactoryLoader ()
 {
-  SCF_DEC_REF (plugin_mgr);
-  SCF_DEC_REF (synldr);
 }
 
 bool csBCTerrFactoryLoader::Initialize (iObjectRegistry *object_reg)
 {
   csBCTerrFactoryLoader::object_reg = object_reg;
-  plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
   synldr = CS_QUERY_REGISTRY (object_reg, iSyntaxService);
 
   xmltokens.Register ("blocksize", XMLTOKEN_BLOCKSIZE);
@@ -158,28 +153,27 @@ bool csBCTerrFactoryLoader::Initialize (iObjectRegistry *object_reg)
 csPtr<iBase> csBCTerrFactoryLoader::Parse (const char* pString,
   iLoaderContext* ldr_context, iBase* /* context */)
 {
-  //printf("Terrain factory loader: Parsing\n");
-  iMeshObjectType* pType = CS_QUERY_PLUGIN_CLASS (plugin_mgr,
-    "crystalspace.mesh.object.bcterr", iMeshObjectType);
+  csRef<iPluginManager> plugin_mgr (CS_QUERY_REGISTRY (object_reg,
+  	iPluginManager));
+  csRef<iMeshObjectType> pType (CS_QUERY_PLUGIN_CLASS (plugin_mgr,
+    "crystalspace.mesh.object.bcterr", iMeshObjectType));
   if (!pType)
   {
     pType = CS_LOAD_PLUGIN (plugin_mgr, "crystalspace.mesh.object.bcterr",
-    iMeshObjectType);
-    printf ("Loading plugin: crystalspace.mesh.object.bcterr\n");
+      iMeshObjectType);
     if (!pType)
     {
       csReport (object_reg, CS_REPORTER_SEVERITY_NOTIFY,"Factory Loader","Couldn't Load Object Type");
       return NULL;
     }
   }
-  iMeshObjectFactory* pFactory = pType->NewFactory ();
-  pType->DecRef ();
-  iBCTerrFactoryState* iState = NULL;
-  iState = SCF_QUERY_INTERFACE (pFactory, iBCTerrFactoryState);
+  csRef<iMeshObjectFactory> pFactory (pType->NewFactory ());
+  csRef<iBCTerrFactoryState> iState (
+  	SCF_QUERY_INTERFACE (pFactory, iBCTerrFactoryState));
   if (!iState)
   {
-    csReport (object_reg, CS_REPORTER_SEVERITY_NOTIFY,"Factory Loader","Couldn't Get State");
-    pFactory->DecRef ();
+    csReport (object_reg, CS_REPORTER_SEVERITY_NOTIFY,
+    	"Factory Loader","Couldn't Get State");
     return NULL;
   }
   // new loading stuff here
@@ -272,20 +266,22 @@ csPtr<iBase> csBCTerrFactoryLoader::Parse (const char* pString,
       break;
     }
   }
-  iState->DecRef ();
   //csReport (object_reg, CS_REPORTER_SEVERITY_NOTIFY,"Factory Loader","Created  Factory ");
+  if (pFactory) pFactory->IncRef ();	// Avoid smart pointer release.
   return csPtr<iBase> (pFactory);
 }
 
 csPtr<iBase> csBCTerrFactoryLoader::Parse (iDocumentNode* node,
   iLoaderContext* ldr_context, iBase* /* context */)
 {
-  iMeshObjectType* pType = CS_QUERY_PLUGIN_CLASS (plugin_mgr,
-    "crystalspace.mesh.object.bcterr", iMeshObjectType);
+  csRef<iPluginManager> plugin_mgr (CS_QUERY_REGISTRY (object_reg,
+  	iPluginManager));
+  csRef<iMeshObjectType> pType (CS_QUERY_PLUGIN_CLASS (plugin_mgr,
+    "crystalspace.mesh.object.bcterr", iMeshObjectType));
   if (!pType)
   {
     pType = CS_LOAD_PLUGIN (plugin_mgr, "crystalspace.mesh.object.bcterr",
-    iMeshObjectType);
+      iMeshObjectType);
     if (!pType)
     {
       csReport (object_reg, CS_REPORTER_SEVERITY_NOTIFY, "Factory Loader",
@@ -295,7 +291,6 @@ csPtr<iBase> csBCTerrFactoryLoader::Parse (iDocumentNode* node,
   }
 
   csRef<iMeshObjectFactory> pFactory (pType->NewFactory ());
-  pType->DecRef ();
   csRef<iBCTerrFactoryState> iState (
     SCF_QUERY_INTERFACE (pFactory, iBCTerrFactoryState));
   if (!iState)
@@ -404,19 +399,16 @@ csBCTerrLoader::csBCTerrLoader (iBase *pParent)
 {
   SCF_CONSTRUCT_IBASE (pParent);
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiComponent);
-  plugin_mgr = NULL;
 }
 
 csBCTerrLoader::~csBCTerrLoader ()
 {
-  SCF_DEC_REF (plugin_mgr);
 }
 
 bool csBCTerrLoader::Initialize (iObjectRegistry* object_reg)
 {
   //printf("Terrain BC loader: Initializing\n");
   csBCTerrLoader::object_reg = object_reg;
-  plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
 
   xmltokens.Register ("factory", XMLTOKEN_FACTORY);
   xmltokens.Register ("material", XMLTOKEN_MATERIAL);
@@ -462,9 +454,9 @@ csPtr<iBase> csBCTerrLoader::Parse (const char* pString,
   char *pParams;
   char pStr[255];
 
-  iMeshObject* iTerrObj = NULL;
-  iBCTerrState* iState = NULL;
-  iTerrFuncState* iTerrFunc = NULL;
+  csRef<iMeshObject> iTerrObj;
+  csRef<iBCTerrState> iState;
+  csRef<iTerrFuncState> iTerrFunc;
   int group_iter = 0;
   int cp_iter = 0;
   //csReport (object_reg, CS_REPORTER_SEVERITY_NOTIFY,"BC Loader","Parse");
@@ -588,13 +580,13 @@ csPtr<iBase> csBCTerrLoader::Parse (const char* pString,
       case CS_TOKEN_HEIGHTMAP:
       {
         csScanStr (pParams, "%s", pStr);
-        iVFS* vfs = CS_QUERY_REGISTRY (object_reg, iVFS);
+        csRef<iVFS> vfs (CS_QUERY_REGISTRY (object_reg, iVFS));
         if (!vfs)
         {
           printf ("No VFS!\n");
           exit (0);
         }
-        iImageIO* loader = CS_QUERY_REGISTRY (object_reg, iImageIO);
+        csRef<iImageIO> loader (CS_QUERY_REGISTRY (object_reg, iImageIO));
         if (!loader)
         {
           printf ("No image loader!\n");
@@ -616,8 +608,6 @@ csPtr<iBase> csBCTerrLoader::Parse (const char* pString,
         }
         //csReport (object_reg, CS_REPORTER_SEVERITY_NOTIFY,"BC Loader","Set HeightMap");
         iState->SetHeightMap (ifile);
-        vfs->DecRef ();
-        loader->DecRef ();
       }
       break;
       case CS_TOKEN_MATERIAL:
@@ -665,7 +655,7 @@ csPtr<iBase> csBCTerrLoader::Parse (const char* pString,
       break;
     }
   }
-  iState->DecRef ();
+  if (iTerrObj) iTerrObj->IncRef ();	// Avoid smart pointer release.
   return csPtr<iBase> (iTerrObj);
 }
 
