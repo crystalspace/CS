@@ -100,38 +100,38 @@ extern PFNGLMULTITEXCOORD4DVARB glMultiTexCoord4dvARB;
 
 //I took these values from Mesas gl.h, and it seem to work
 
-#define GL_TEXTURE0_ARB				0x84C0
-#define GL_TEXTURE1_ARB				0x84C1
-#define GL_TEXTURE2_ARB				0x84C2
-#define GL_TEXTURE3_ARB				0x84C3
-#define GL_TEXTURE4_ARB				0x84C4
-#define GL_TEXTURE5_ARB				0x84C5
-#define GL_TEXTURE6_ARB				0x84C6
-#define GL_TEXTURE7_ARB				0x84C7
-#define GL_TEXTURE8_ARB				0x84C8
-#define GL_TEXTURE9_ARB				0x84C9
-#define GL_TEXTURE10_ARB			0x84CA
-#define GL_TEXTURE11_ARB			0x84CB
-#define GL_TEXTURE12_ARB			0x84CC
-#define GL_TEXTURE13_ARB			0x84CD
-#define GL_TEXTURE14_ARB			0x84CE
-#define GL_TEXTURE15_ARB			0x84CF
-#define GL_TEXTURE16_ARB			0x84D0
-#define GL_TEXTURE17_ARB			0x84D1
-#define GL_TEXTURE18_ARB			0x84D2
-#define GL_TEXTURE19_ARB			0x84D3
-#define GL_TEXTURE20_ARB			0x84D4
-#define GL_TEXTURE21_ARB			0x84D5
-#define GL_TEXTURE22_ARB			0x84D6
-#define GL_TEXTURE23_ARB			0x84D7
-#define GL_TEXTURE24_ARB			0x84D8
-#define GL_TEXTURE25_ARB			0x84D9
-#define GL_TEXTURE26_ARB			0x84DA
-#define GL_TEXTURE27_ARB			0x84DB
-#define GL_TEXTURE28_ARB			0x84DC
-#define GL_TEXTURE29_ARB			0x84DD
-#define GL_TEXTURE30_ARB			0x84DE
-#define GL_TEXTURE31_ARB			0x84DF
+#define GL_TEXTURE0_ARB			0x84C0
+#define GL_TEXTURE1_ARB			0x84C1
+#define GL_TEXTURE2_ARB			0x84C2
+#define GL_TEXTURE3_ARB			0x84C3
+#define GL_TEXTURE4_ARB			0x84C4
+#define GL_TEXTURE5_ARB			0x84C5
+#define GL_TEXTURE6_ARB			0x84C6
+#define GL_TEXTURE7_ARB			0x84C7
+#define GL_TEXTURE8_ARB			0x84C8
+#define GL_TEXTURE9_ARB			0x84C9
+#define GL_TEXTURE10_ARB		0x84CA
+#define GL_TEXTURE11_ARB		0x84CB
+#define GL_TEXTURE12_ARB		0x84CC
+#define GL_TEXTURE13_ARB		0x84CD
+#define GL_TEXTURE14_ARB		0x84CE
+#define GL_TEXTURE15_ARB		0x84CF
+#define GL_TEXTURE16_ARB		0x84D0
+#define GL_TEXTURE17_ARB		0x84D1
+#define GL_TEXTURE18_ARB		0x84D2
+#define GL_TEXTURE19_ARB		0x84D3
+#define GL_TEXTURE20_ARB		0x84D4
+#define GL_TEXTURE21_ARB		0x84D5
+#define GL_TEXTURE22_ARB		0x84D6
+#define GL_TEXTURE23_ARB		0x84D7
+#define GL_TEXTURE24_ARB		0x84D8
+#define GL_TEXTURE25_ARB		0x84D9
+#define GL_TEXTURE26_ARB		0x84DA
+#define GL_TEXTURE27_ARB		0x84DB
+#define GL_TEXTURE28_ARB		0x84DC
+#define GL_TEXTURE29_ARB		0x84DD
+#define GL_TEXTURE30_ARB		0x84DE
+#define GL_TEXTURE31_ARB		0x84DF
 #define GL_ACTIVE_TEXTURE_ARB		0x84E0
 #define GL_CLIENT_ACTIVE_TEXTURE_ARB	0x84E1
 #define GL_MAX_TEXTURE_UNITS_ARB	0x84E2
@@ -146,8 +146,8 @@ extern PFNGLMULTITEXCOORD4DVARB glMultiTexCoord4dvARB;
 
 /*********************************************************************
 *
-* Big, extensive multitexture-function-list coming. Think I've got it all covered.
-* Tell me otherwise.
+* Big, extensive multitexture-function-list coming. Think I've got it
+* all covered.  Tell me otherwise.
 *
 ***********************************************************************/
 
@@ -200,48 +200,48 @@ PFNGLMULTITEXCOORD4DVARB glMultiTexCoord4dvARB;
 //Strings of the known extensions
 const char *knownExtensions[]={"GL_ARB_multitexture"};
 
-// Here I get all function names for Windows (I don't like the platform, yet I go through all
-// this trouble. Go figure.). 
+// Here I get all function names for Windows (I don't like the platform,
+// yet I go through all this trouble. Go figure.). 
 bool setupARBmultitexture()
 {
-	if(!(glActiveTextureARB=(PFNGLACTIVETEXTUREARB)wglGetProcAddress("glActiveTextureARB")))return false;
-	if(!(glClientActiveTextureARB=(PFNGLCLIENTACTIVETEXTUREARB)wglGetProcAddress("glClientActiveTextureARB")))return false;
+  if(!(glActiveTextureARB=(PFNGLACTIVETEXTUREARB)wglGetProcAddress("glActiveTextureARB")))return false;
+  if(!(glClientActiveTextureARB=(PFNGLCLIENTACTIVETEXTUREARB)wglGetProcAddress("glClientActiveTextureARB")))return false;
 
-	if(!(glMultiTexCoord1sARB=(PFNGLMULTITEXCOORD1SARB)wglGetProcAddress("glMultiTexCoord1sARB")))return false;
-	if(!(glMultiTexCoord1iARB=(PFNGLMULTITEXCOORD1IARB)wglGetProcAddress("glMultiTexCoord1iARB")))return false;
-	if(!(glMultiTexCoord1fARB=(PFNGLMULTITEXCOORD1FARB)wglGetProcAddress("glMultiTexCoord1fARB")))return false;
-	if(!(glMultiTexCoord1dARB=(PFNGLMULTITEXCOORD1DARB)wglGetProcAddress("glMultiTexCoord1dARB")))return false;
-	if(!(glMultiTexCoord2sARB=(PFNGLMULTITEXCOORD2SARB)wglGetProcAddress("glMultiTexCoord2sARB")))return false;
-	if(!(glMultiTexCoord2iARB=(PFNGLMULTITEXCOORD2IARB)wglGetProcAddress("glMultiTexCoord2iARB")))return false;
-	if(!(glMultiTexCoord2fARB=(PFNGLMULTITEXCOORD2FARB)wglGetProcAddress("glMultiTexCoord2fARB")))return false;
-	if(!(glMultiTexCoord2dARB=(PFNGLMULTITEXCOORD2DARB)wglGetProcAddress("glMultiTexCoord2dARB")))return false;
-	if(!(glMultiTexCoord3sARB=(PFNGLMULTITEXCOORD3SARB)wglGetProcAddress("glMultiTexCoord3sARB")))return false;
-	if(!(glMultiTexCoord3iARB=(PFNGLMULTITEXCOORD3IARB)wglGetProcAddress("glMultiTexCoord3iARB")))return false;
-	if(!(glMultiTexCoord3fARB=(PFNGLMULTITEXCOORD3FARB)wglGetProcAddress("glMultiTexCoord3fARB")))return false;
-	if(!(glMultiTexCoord3dARB=(PFNGLMULTITEXCOORD3DARB)wglGetProcAddress("glMultiTexCoord3dARB")))return false;
-	if(!(glMultiTexCoord4sARB=(PFNGLMULTITEXCOORD4SARB)wglGetProcAddress("glMultiTexCoord4sARB")))return false;
-	if(!(glMultiTexCoord4iARB=(PFNGLMULTITEXCOORD4IARB)wglGetProcAddress("glMultiTexCoord4iARB")))return false;
-	if(!(glMultiTexCoord4fARB=(PFNGLMULTITEXCOORD4FARB)wglGetProcAddress("glMultiTexCoord4fARB")))return false;
-	if(!(glMultiTexCoord4dARB=(PFNGLMULTITEXCOORD4DARB)wglGetProcAddress("glMultiTexCoord4dARB")))return false;
+  if(!(glMultiTexCoord1sARB=(PFNGLMULTITEXCOORD1SARB)wglGetProcAddress("glMultiTexCoord1sARB")))return false;
+  if(!(glMultiTexCoord1iARB=(PFNGLMULTITEXCOORD1IARB)wglGetProcAddress("glMultiTexCoord1iARB")))return false;
+  if(!(glMultiTexCoord1fARB=(PFNGLMULTITEXCOORD1FARB)wglGetProcAddress("glMultiTexCoord1fARB")))return false;
+  if(!(glMultiTexCoord1dARB=(PFNGLMULTITEXCOORD1DARB)wglGetProcAddress("glMultiTexCoord1dARB")))return false;
+  if(!(glMultiTexCoord2sARB=(PFNGLMULTITEXCOORD2SARB)wglGetProcAddress("glMultiTexCoord2sARB")))return false;
+  if(!(glMultiTexCoord2iARB=(PFNGLMULTITEXCOORD2IARB)wglGetProcAddress("glMultiTexCoord2iARB")))return false;
+  if(!(glMultiTexCoord2fARB=(PFNGLMULTITEXCOORD2FARB)wglGetProcAddress("glMultiTexCoord2fARB")))return false;
+  if(!(glMultiTexCoord2dARB=(PFNGLMULTITEXCOORD2DARB)wglGetProcAddress("glMultiTexCoord2dARB")))return false;
+  if(!(glMultiTexCoord3sARB=(PFNGLMULTITEXCOORD3SARB)wglGetProcAddress("glMultiTexCoord3sARB")))return false;
+  if(!(glMultiTexCoord3iARB=(PFNGLMULTITEXCOORD3IARB)wglGetProcAddress("glMultiTexCoord3iARB")))return false;
+  if(!(glMultiTexCoord3fARB=(PFNGLMULTITEXCOORD3FARB)wglGetProcAddress("glMultiTexCoord3fARB")))return false;
+  if(!(glMultiTexCoord3dARB=(PFNGLMULTITEXCOORD3DARB)wglGetProcAddress("glMultiTexCoord3dARB")))return false;
+  if(!(glMultiTexCoord4sARB=(PFNGLMULTITEXCOORD4SARB)wglGetProcAddress("glMultiTexCoord4sARB")))return false;
+  if(!(glMultiTexCoord4iARB=(PFNGLMULTITEXCOORD4IARB)wglGetProcAddress("glMultiTexCoord4iARB")))return false;
+  if(!(glMultiTexCoord4fARB=(PFNGLMULTITEXCOORD4FARB)wglGetProcAddress("glMultiTexCoord4fARB")))return false;
+  if(!(glMultiTexCoord4dARB=(PFNGLMULTITEXCOORD4DARB)wglGetProcAddress("glMultiTexCoord4dARB")))return false;
 
-	if(!(glMultiTexCoord1svARB=(PFNGLMULTITEXCOORD1SVARB)wglGetProcAddress("glMultiTexCoord1svARB")))return false;
-	if(!(glMultiTexCoord1ivARB=(PFNGLMULTITEXCOORD1IVARB)wglGetProcAddress("glMultiTexCoord1ivARB")))return false;
-	if(!(glMultiTexCoord1fvARB=(PFNGLMULTITEXCOORD1FVARB)wglGetProcAddress("glMultiTexCoord1fvARB")))return false;
-	if(!(glMultiTexCoord1dvARB=(PFNGLMULTITEXCOORD1DVARB)wglGetProcAddress("glMultiTexCoord1dvARB")))return false;
-	if(!(glMultiTexCoord2svARB=(PFNGLMULTITEXCOORD2SVARB)wglGetProcAddress("glMultiTexCoord2svARB")))return false;
-	if(!(glMultiTexCoord2ivARB=(PFNGLMULTITEXCOORD2IVARB)wglGetProcAddress("glMultiTexCoord2ivARB")))return false;
-	if(!(glMultiTexCoord2fvARB=(PFNGLMULTITEXCOORD2FVARB)wglGetProcAddress("glMultiTexCoord2fvARB")))return false;
-	if(!(glMultiTexCoord2dvARB=(PFNGLMULTITEXCOORD2DVARB)wglGetProcAddress("glMultiTexCoord2dvARB")))return false;
-	if(!(glMultiTexCoord3svARB=(PFNGLMULTITEXCOORD3SVARB)wglGetProcAddress("glMultiTexCoord3svARB")))return false;
-	if(!(glMultiTexCoord3ivARB=(PFNGLMULTITEXCOORD3IVARB)wglGetProcAddress("glMultiTexCoord3ivARB")))return false;
-	if(!(glMultiTexCoord3fvARB=(PFNGLMULTITEXCOORD3FVARB)wglGetProcAddress("glMultiTexCoord3fvARB")))return false;
-	if(!(glMultiTexCoord3dvARB=(PFNGLMULTITEXCOORD3DVARB)wglGetProcAddress("glMultiTexCoord3dvARB")))return false;
-	if(!(glMultiTexCoord4svARB=(PFNGLMULTITEXCOORD4SVARB)wglGetProcAddress("glMultiTexCoord4svARB")))return false;
-	if(!(glMultiTexCoord4ivARB=(PFNGLMULTITEXCOORD4IVARB)wglGetProcAddress("glMultiTexCoord4ivARB")))return false;
-	if(!(glMultiTexCoord4fvARB=(PFNGLMULTITEXCOORD4FVARB)wglGetProcAddress("glMultiTexCoord4fvARB")))return false;
-	if(!(glMultiTexCoord4dvARB=(PFNGLMULTITEXCOORD4DVARB)wglGetProcAddress("glMultiTexCoord4dvARB")))return false;
+  if(!(glMultiTexCoord1svARB=(PFNGLMULTITEXCOORD1SVARB)wglGetProcAddress("glMultiTexCoord1svARB")))return false;
+  if(!(glMultiTexCoord1ivARB=(PFNGLMULTITEXCOORD1IVARB)wglGetProcAddress("glMultiTexCoord1ivARB")))return false;
+  if(!(glMultiTexCoord1fvARB=(PFNGLMULTITEXCOORD1FVARB)wglGetProcAddress("glMultiTexCoord1fvARB")))return false;
+  if(!(glMultiTexCoord1dvARB=(PFNGLMULTITEXCOORD1DVARB)wglGetProcAddress("glMultiTexCoord1dvARB")))return false;
+  if(!(glMultiTexCoord2svARB=(PFNGLMULTITEXCOORD2SVARB)wglGetProcAddress("glMultiTexCoord2svARB")))return false;
+  if(!(glMultiTexCoord2ivARB=(PFNGLMULTITEXCOORD2IVARB)wglGetProcAddress("glMultiTexCoord2ivARB")))return false;
+  if(!(glMultiTexCoord2fvARB=(PFNGLMULTITEXCOORD2FVARB)wglGetProcAddress("glMultiTexCoord2fvARB")))return false;
+  if(!(glMultiTexCoord2dvARB=(PFNGLMULTITEXCOORD2DVARB)wglGetProcAddress("glMultiTexCoord2dvARB")))return false;
+  if(!(glMultiTexCoord3svARB=(PFNGLMULTITEXCOORD3SVARB)wglGetProcAddress("glMultiTexCoord3svARB")))return false;
+  if(!(glMultiTexCoord3ivARB=(PFNGLMULTITEXCOORD3IVARB)wglGetProcAddress("glMultiTexCoord3ivARB")))return false;
+  if(!(glMultiTexCoord3fvARB=(PFNGLMULTITEXCOORD3FVARB)wglGetProcAddress("glMultiTexCoord3fvARB")))return false;
+  if(!(glMultiTexCoord3dvARB=(PFNGLMULTITEXCOORD3DVARB)wglGetProcAddress("glMultiTexCoord3dvARB")))return false;
+  if(!(glMultiTexCoord4svARB=(PFNGLMULTITEXCOORD4SVARB)wglGetProcAddress("glMultiTexCoord4svARB")))return false;
+  if(!(glMultiTexCoord4ivARB=(PFNGLMULTITEXCOORD4IVARB)wglGetProcAddress("glMultiTexCoord4ivARB")))return false;
+  if(!(glMultiTexCoord4fvARB=(PFNGLMULTITEXCOORD4FVARB)wglGetProcAddress("glMultiTexCoord4fvARB")))return false;
+  if(!(glMultiTexCoord4dvARB=(PFNGLMULTITEXCOORD4DVARB)wglGetProcAddress("glMultiTexCoord4dvARB")))return false;
 
-	return true;
+  return true;
 }
 
 // This function detects which extensions that is available on this platform. This function 
@@ -249,47 +249,47 @@ bool setupARBmultitexture()
 // into ogl_g3d.cpp prehaps)
 void csGraphics3DOpenGL::DetectExtensions()
 {
-	//The SysPrintf is just for debugging, but it writes which extensions you have into
-	//debug.txt. Made me jealous when I ran it on a TnT2 :-(
-	SysPrintf (MSG_INITIALIZATION, "Detecting Win32 OpenGL extensions.\n");
-	const unsigned char *extensions;
-	char *currentextension;
+  //The SysPrintf is just for debugging, but it writes which extensions you have into
+  //debug.txt. Made me jealous when I ran it on a TnT2 :-(
+  SysPrintf (MSG_INITIALIZATION, "Detecting Win32 OpenGL extensions.\n");
+  const unsigned char *extensions;
+  char *currentextension;
 
-	extensions=glGetString(GL_EXTENSIONS);
-	if(!extensions) return;	//No luck, no extensions on this machine.
+  extensions=glGetString(GL_EXTENSIONS);
+  if(!extensions) return;	//No luck, no extensions on this machine.
 
-	currentextension=strtok((char*)extensions," ");	//Find the first substring
-	if(!currentextension) return;					//Nope, just an empty string
-	while(1)
-	{
-		//Debugging
-		SysPrintf(MSG_INITIALIZATION,"Found extension: %s\n",currentextension);
+  currentextension=strtok((char*)extensions," "); //Find the first substring
+  if(!currentextension) return; //Nope, just an empty string
+  while(1)
+  {
+    //Debugging
+    SysPrintf(MSG_INITIALIZATION,"Found extension: %s\n",currentextension);
 
-		//Go through all the extension we know, and see if we find this one
-		for(int i=0;i<NUM_EXTENSIONS;i++)
-		{
-			if(!strcmp(currentextension,knownExtensions[i]))
-				break;
-		}
+    //Go through all the extension we know, and see if we find this one
+    for(int i=0;i<NUM_EXTENSIONS;i++)
+    {
+      if(!strcmp(currentextension,knownExtensions[i]))
+        break;
+    }
 
-		// i is now an index, so use it
-		switch (i)
-		{
-		case 0:
-			if(setupARBmultitexture())
-				SysPrintf(MSG_INITIALIZATION,"All procs found\n");
-			else
-				SysPrintf(MSG_INITIALIZATION,"Not all procs found\n");
-			ARB_multitexture=true;	//Flag that should be checked in renderer
-		default:
-			break;
-		}
-		if(!(currentextension=strtok(0," "))) return;
-	}
+    // i is now an index, so use it
+    switch (i)
+    {
+    case 0:
+      if(setupARBmultitexture())
+        SysPrintf(MSG_INITIALIZATION,"All procs found\n");
+      else
+        SysPrintf(MSG_INITIALIZATION,"Not all procs found\n");
+        ARB_multitexture=true;	//Flag that should be checked in renderer
+      break;
+    default:
+      break;
+    }
+    if(!(currentextension=strtok(0," "))) return;
+  }
 }
 
 // this tells the main ogl_g3d.cpp module not to define a 'default'
 #define _DEFINED_DETECTION_METHOD
 
 #endif _WIN32_OPENGL_EXTENSIONS
-
