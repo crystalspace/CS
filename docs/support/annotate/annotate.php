@@ -18,6 +18,13 @@ if ($action=="") {
     printEntries();
     print "<a href=\"$self?action=showadd#comments\">Add a comment</a><br>\n";
 } elseif ($action == "showadd") {
+    print "Note: this is <i>not</i> a support forum, please use this "
+    print "commenting facility only to add suggestions/notes regarding the ";
+    print "documentation.<br>\n";
+    print "For questions on the usage of CrystalSpace please see the ";
+    print "<a href=\"http://crystal.sourceforge.net/tikiwiki/tiki-index.php";
+    print "?page=Contact+Us\">list of available contact options on the home ";
+    print "page</a>.<p>";
     print "<form action=\"$self?action=add#comments\" method=\"post\">\n";
     print "<b>Name:</b><input name=\"authorname\" value=\"\"><br>\n";
     print "<b>E-Mail:</b><input name=\"emailname\" value=\"\"><br>\n";

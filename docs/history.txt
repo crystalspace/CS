@@ -34,6 +34,8 @@ chronological order.
 	  csjava.dll from being built on Windows.  Specifically, the `javamod'
 	  Jam variable was being assigned the null string.  Also added gristing
 	  for cscript/csjava source files.
+	- res augmented annotate.php to mention that the documentation 
+	  annotations are not a support forum.
 19-Oct-2004
 	- Jorrit worked further on foliage mesh. Added support for
 	  specifying LOD control in a foliage object.
