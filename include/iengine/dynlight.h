@@ -41,6 +41,9 @@ struct iDynLight : public iBase
 
   /// Setup the light (i.e. do the lighting calculations).
   virtual void Setup () = 0;
+
+  /// Get the next dynamic light in the list
+  virtual iDynLight* GetNext () = 0;
 };
 
 #endif // __IENGINE_DYNLIGHT_H__

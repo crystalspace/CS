@@ -77,6 +77,7 @@ extern INTERFACE_ID_VAR (iTextureWrapper);
 extern INTERFACE_ID_VAR (iCameraPosition);
 extern INTERFACE_ID_VAR (iPolyTxtPlane);
 extern INTERFACE_ID_VAR (iStatLight);
+extern INTERFACE_ID_VAR (iDynLight);
 extern INTERFACE_ID_VAR (iMaterialHandle);
 extern INTERFACE_ID_VAR (iTerrainWrapper);
 extern INTERFACE_ID_VAR (iTerrainFactoryWrapper);
@@ -187,9 +188,6 @@ class csObjectIt
 private:
   // The engine for this iterator.
   csEngine* engine;
-  // The type to use.
-  const csIdType* type;
-  bool derived;
   // The starting position and radius.
   csSector* start_sector;
   csVector3 start_pos;
@@ -197,29 +195,30 @@ private:
   // Current position ('pos' can be warped so that's why it is here).
   csSector* cur_sector;
   csVector3 cur_pos;
-  // Object type we are currently iterating over.
-  const csIdType* cur_type;
   // Current object.
-  csObject* cur_object;
+  iObject* cur_object;
   // Current index.
   int cur_idx;
   // Iterator over the sectors.
   csSectorIt* sectors_it;
+  // Current object list to iterate over
+  enum {
+    ITERATE_SECTORS,
+    ITERATE_STATLIGHTS,
+    ITERATE_DYNLIGHTS,
+    ITERATE_MESHES,
+    ITERATE_NONE
+  } CurrentList;
 
 private:
-  /// Return true if object has right type.
-  bool CheckType (csObject* obj);
-  /// Return true if object has right type.
-  bool CheckType (const csIdType* ctype);
-
   // Start looking for stuff.
   void StartStatLights ();
   void StartMeshes ();
   void EndSearch ();
 
   /// Construct an iterator and initialize to start.
-  csObjectIt (csEngine*, const csIdType& type, bool derived,
-  	csSector* sector, const csVector3& pos, float radius);
+  csObjectIt (csEngine*, csSector* sector,
+    const csVector3& pos, float radius);
 
 public:
   /// Destructor.
@@ -229,7 +228,7 @@ public:
   void Restart ();
 
   /// Get object from iterator. Return NULL at end.
-  csObject* Fetch ();
+  iObject* Fetch ();
 };
 
 /**
@@ -880,15 +879,12 @@ public:
   /**
    * This routine returns an iterator to iterate over
    * all objects of a given type that are within a radius
-   * of a given position. If 'derived' is false then
-   * only objects of the exact type are returned. If 'derived' is
-   * true then also objects of subclasses are returned. With 'derived'
-   * set to true and csObject::Type as the type you can get all nearby
-   * objects.<p>
+   * of a given position. You can use QUERY_INTERFACE to get
+   * any interface from the returned objects. <p>
    * Delete the iterator with 'delete' when ready.
    */
-  csObjectIt* GetNearbyObjects (const csIdType& type, bool derived,
-  	csSector* sector, const csVector3& pos, float radius);
+  csObjectIt* GetNearbyObjects (csSector* sector,
+    const csVector3& pos, float radius);
 
   /**
    * Add a halo attached to given light to the engine.

@@ -632,6 +632,8 @@ public:
     { return scfParent; }
     virtual iLight *QueryLight ()
     { return &(scfParent->scfiLight); }
+    virtual iDynLight* GetNext ()
+    { return &(scfParent->GetNext())->scfiDynLight; }
   } scfiDynLight;
   friend struct eiDynLight;
 };

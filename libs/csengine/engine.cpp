@@ -205,12 +205,10 @@ csSector* csSectorIt::Fetch ()
 
 //---------------------------------------------------------------------------
 
-csObjectIt::csObjectIt (csEngine* e, const csIdType& type, bool derived,
-  	csSector* sector, const csVector3& pos, float radius)
+csObjectIt::csObjectIt (csEngine* e, csSector* sector,
+  const csVector3& pos, float radius)
 {
   csObjectIt::engine = e;
-  csObjectIt::type = &type;
-  csObjectIt::derived = derived;
   csObjectIt::start_sector = sector;
   csObjectIt::start_pos = pos;
   csObjectIt::radius = radius;
@@ -224,74 +222,63 @@ csObjectIt::~csObjectIt ()
   delete sectors_it;
 }
 
-bool csObjectIt::CheckType (csObject* obj)
-{
-  if (derived) return obj->GetType () >= *type;
-  else return &obj->GetType () == type;
-}
-
-bool csObjectIt::CheckType (const csIdType* ctype)
-{
-  if (derived) return *ctype >= *type;
-  else return ctype == type;
-}
-
 void csObjectIt::Restart ()
 {
-  cur_type = &csDynLight::Type;
+  CurrentList = ITERATE_DYNLIGHTS;
   cur_object = engine->GetFirstDynLight ();
   sectors_it->Restart ();
 }
 
 void csObjectIt::StartStatLights ()
 {
-  cur_type = &csStatLight::Type;
+  CurrentList = ITERATE_STATLIGHTS;
   cur_idx = 0;
 }
 
 void csObjectIt::StartMeshes ()
 {
-  cur_type = &csMeshWrapper::Type;
+  CurrentList = ITERATE_MESHES;
   cur_idx = 0;
 }
 
 void csObjectIt::EndSearch ()
 {
-  cur_type = NULL;
+  CurrentList = ITERATE_NONE;
 }
 
-csObject* csObjectIt::Fetch ()
+iObject* csObjectIt::Fetch ()
 {
-  if (!cur_type) return NULL;
+  if (CurrentList == ITERATE_NONE) return NULL;
 
   // Handle csDynLight.
-  if (cur_type == &csDynLight::Type)
+  if (CurrentList == ITERATE_DYNLIGHTS)
   {
-    if (CheckType (cur_type))
-    {
-      if (cur_object == NULL)
-        cur_type = &csSector::Type;
-      else
-      {
-        do
-	{
-          csObject* rc = cur_object;
-          cur_object = ((csDynLight*)cur_object)->GetNext ();
-	  float r = ((csLight*)rc)->GetRadius () + radius;
-	  if (csSquaredDist::PointPoint (((csLight*)rc)->GetCenter (),
-		  cur_pos) <= r*r)
-            return rc;
-	}
-	while (cur_object);
-	if (cur_object == NULL)
-          cur_type = &csSector::Type;
-      }
-    }
+    if (cur_object == NULL)
+      CurrentList = ITERATE_SECTORS;
     else
-      cur_type = &csSector::Type;
+    {
+      do
+      {
+        iObject* rc = cur_object;
+	iDynLight *dl = QUERY_INTERFACE_FAST (rc, iDynLight);
+	if (!dl) cur_object = NULL;
+	else
+	{
+          cur_object = dl->GetNext ()->QueryObject ();
+          float r = dl->QueryLight ()->GetRadius () + radius;
+          if (csSquaredDist::PointPoint (dl->QueryLight ()->GetCenter (),
+		cur_pos) <= r*r)
+          return rc;
+	}
+      }
+      while (cur_object);
+      if (cur_object == NULL)
+        CurrentList = ITERATE_SECTORS;
+    }
   }
+
   // Handle this sector first.
-  if (cur_type == &csSector::Type)
+  if (CurrentList == ITERATE_SECTORS)
   {
     cur_sector = sectors_it->Fetch ();
     if (!cur_sector)
@@ -301,57 +288,51 @@ csObject* csObjectIt::Fetch ()
     }
     cur_pos = sectors_it->GetLastPosition ();
 
-    if (CheckType (cur_type))
-    {
-      StartStatLights ();
-      return cur_sector;
-    }
-    else
-      StartStatLights ();
+    StartStatLights ();
+    return cur_sector;
   }
+
   // Handle csLight.
-  if (cur_type == &csStatLight::Type)
+  if (CurrentList == ITERATE_STATLIGHTS)
   {
-    if (CheckType (cur_type))
+    if (cur_idx >= cur_sector->GetLightCount ())
+      StartMeshes ();
+    else
     {
+      do
+      {
+        iObject* rc = cur_sector->GetLight (cur_idx)->scfiLight.QueryObject ();
+        cur_idx++;
+	iStatLight* sl = QUERY_INTERFACE_FAST (rc, iStatLight);
+	if (sl)
+	{
+          float r = sl->QueryLight ()->GetRadius () + radius;
+          if (csSquaredDist::PointPoint (sl->QueryLight ()->GetCenter (),
+	    cur_pos) <= r*r)
+              return rc;
+	}
+      }
+      while (cur_idx < cur_sector->GetLightCount ());
       if (cur_idx >= cur_sector->GetLightCount ())
         StartMeshes ();
-      else
-      {
-        do
-	{
-          csObject* rc = (csObject*)cur_sector->GetLight (cur_idx);
-	  cur_idx++;
-	  float r = ((csLight*)rc)->GetRadius () + radius;
-	  if (csSquaredDist::PointPoint (((csLight*)rc)->GetCenter (),
-		  cur_pos) <= r*r)
-            return rc;
-	}
-	while (cur_idx < cur_sector->GetLightCount ());
-        if (cur_idx >= cur_sector->GetLightCount ())
-          StartMeshes ();
-      }
     }
-    else
-      StartMeshes ();
   }
+
   // Handle csMeshWrapper.
-  if (cur_type == &csMeshWrapper::Type)
+  if (CurrentList == ITERATE_MESHES)
   {
-    if (CheckType (cur_type))
-    {
-      if (cur_idx >= cur_sector->GetMeshCount ())
-        cur_type = &csSector::Type;
-      else
-      {
-        csObject* rc = (csObject*)cur_sector->GetMesh (cur_idx);
-	cur_idx++;
-        return rc;
-      }
-    }
+    if (cur_idx >= cur_sector->GetMeshCount ())
+      CurrentList = ITERATE_SECTORS;
     else
-      cur_type = &csSector::Type;
+    {
+      iObject* rc = cur_sector->GetMesh (cur_idx)->scfiMeshWrapper.QueryObject ();
+      cur_idx++;
+      return rc;
+    }
   }
+  else
+    CurrentList = ITERATE_SECTORS;
+
   return NULL;
 }
 
@@ -383,6 +364,7 @@ INTERFACE_ID_VAR (iTextureWrapper);
 INTERFACE_ID_VAR (iCameraPosition);
 INTERFACE_ID_VAR (iPolyTxtPlane);
 INTERFACE_ID_VAR (iStatLight);
+INTERFACE_ID_VAR (iDynLight);
 INTERFACE_ID_VAR (iMaterialHandle);
 INTERFACE_ID_VAR (iTerrainWrapper);
 INTERFACE_ID_VAR (iTerrainFactoryWrapper);
@@ -531,6 +513,7 @@ bool csEngine::Initialize (iSystem* sys)
   INITIALIZE_INTERFACE_VAR (iCameraPosition);
   INITIALIZE_INTERFACE_VAR (iPolyTxtPlane);
   INITIALIZE_INTERFACE_VAR (iStatLight);
+  INITIALIZE_INTERFACE_VAR (iDynLight);
   INITIALIZE_INTERFACE_VAR (iMaterialHandle);
   INITIALIZE_INTERFACE_VAR (iTerrainWrapper);
   INITIALIZE_INTERFACE_VAR (iTerrainFactoryWrapper);
@@ -1674,10 +1657,10 @@ csSectorIt* csEngine::GetNearbySectors (csSector* sector,
   return it;
 }
 
-csObjectIt* csEngine::GetNearbyObjects (const csIdType& type, bool derived,
-  	csSector* sector, const csVector3& pos, float radius)
+csObjectIt* csEngine::GetNearbyObjects (csSector* sector,
+  const csVector3& pos, float radius)
 {
-  csObjectIt* it = new csObjectIt (this, type, derived, sector, pos, radius);
+  csObjectIt* it = new csObjectIt (this, sector, pos, radius);
   return it;
 }
 
