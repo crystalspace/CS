@@ -3,9 +3,14 @@ http://crystal.sourceforge.net/
 
 The history order is reversed so that new features are at the top.
 
+25-Jul-2003
+    - Norman Kraemer fixed pythmod_setup.py for cases with no lib entries 
+      between the enclosing '--'.
+      
 24-Jul-2003
     - Reed Hedges made some minor updates to the AWS "Quick Start" section and 
       API Changes appendix for the recent changes to AWS (15-Jul-2003).
+
 23-Jul-2003
     - Eric Sunshine fixed memory trashing bugs in Win32 implmentation of
       csLoadLibrary().  When composing its error messages, it was
