@@ -23,7 +23,10 @@
 
 SCF_VERSION (iVirtualClock, 0, 0, 1);
 
-/// A utility class that makes it easier to parse the command line.
+/**
+ * A virtual game clock.  Normally, a single instance of iVirtualClock is
+ * placed in the shared object registry (iObjectRegistry).
+ */
 struct iVirtualClock : public iBase
 {
   /**
@@ -33,31 +36,29 @@ struct iVirtualClock : public iBase
 
   /**
    * Suspend the engine's virtual-time clock.<p>
-   * Call this function when the client application will fail to invoking
-   * NextFrame() for an extended period of time.  Suspending the virtual-time
-   * clock prevents a temporal anomaly from occurring the next time
-   * GetElapsedTime() is called after the application resumes invoking
-   * NextFrame().
+   * Call this function when the client application will fail to call Advance()
+   * for an extended period of time.  Suspending the virtual-time clock
+   * prevents a temporal anomaly from occurring the next time GetElapsedTicks()
+   * is called after the application resumes invoking Advance().
    */
   virtual void Suspend () = 0;
 
   /**
    * Resume the engine's virtual-time clock.<p>
-   * Call this function when the client application begins invoking NextFrame()
+   * Call this function when the client application begins invoking Advance()
    * again after extended down-time.  This function is the complement of
    * SuspendVirtualTimeClock().
    */
   virtual void Resume () = 0;
 
   /**
-   * Query the time elapsed between previous call to NextFrame and last
-   * call to NextFrame().
+   * Query the time elapsed between the two most recent invocations of
+   * Advance().
    */
   virtual csTicks GetElapsedTicks () const = 0;
 
   /**
-   * Returns the absolute time of the last call
-   * to NextFrame().
+   * Returns the absolute time of the last call to Advance().
    */
   virtual csTicks GetCurrentTicks () const = 0;
 };
