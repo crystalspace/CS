@@ -8,6 +8,8 @@ The history order has been reversed so that new features are at the top.
 	  Andrew's latest changes.
 	- Andrew also fixes system so that it is allowed to have
 	  apps with no config files. This fixes the crash bug in simple.
+	- Fixed a crash bug in lighting if precalc_info was missing.
+	  This bug was caused by Andrew's changes.
 2-Oct-2000
 	- Andrew Zabolotny did the following changes to CS:
 	    - Overhauled the csIniFile class. There is now a new

@@ -965,10 +965,11 @@ void csWorld::ShineLights ()
     char *reason = NULL;
 
     iDataBuffer *data = VFS->ReadFile ("precalc_info");
-    char *input = **data;
     if (!data)
       reason = "no 'precalc_info' found";
     else
+    {
+      char *input = **data;
       while (*input)
       {
         char *keyword = input + strspn (input, " \t");
@@ -991,6 +992,7 @@ void csWorld::ShineLights ()
 
 #undef CHECK
       }
+    }
     if (data) data->DecRef ();
 
     if (reason)
