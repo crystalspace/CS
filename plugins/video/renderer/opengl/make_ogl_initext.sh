@@ -19,7 +19,11 @@ echo > ${temp1}
 echo '#define USE_OGL_EXT(ext)' ${initextgen} ext ${initextsrc} >> ${temp1}
 echo '#include "../ogl_suppext.h"' >> ${temp1}
 
+# Default definition is for folks not using GCC.  If you're using GCC disable this...
 cpp ${temp1} -o ${temp2}
+
+# If you're using GCC, enable this instead.
+# gcc -E -x c++ glexthlp/1.tmp -o glexthlp/2.tmp
 
 sh ${temp2}
 
