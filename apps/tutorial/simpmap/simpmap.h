@@ -20,6 +20,7 @@
 #define __SIMPMAP_H__
 
 #include <stdarg.h>
+#include "csutil/ref.h"
 
 struct iEngine;
 struct iLoader;
