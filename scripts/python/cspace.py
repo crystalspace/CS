@@ -8469,6 +8469,7 @@ class iGraphics3D(iBase):
     def GetRenderState(*args): return _cspace.iGraphics3D_GetRenderState(*args)
     def SetOption(*args): return _cspace.iGraphics3D_SetOption(*args)
     def CreateRenderBuffer(*args): return _cspace.iGraphics3D_CreateRenderBuffer(*args)
+    def CreateIndexRenderBuffer(*args): return _cspace.iGraphics3D_CreateIndexRenderBuffer(*args)
     def CreateInterleavedRenderBuffers(*args): return _cspace.iGraphics3D_CreateInterleavedRenderBuffers(*args)
     def SetBufferState(*args): return _cspace.iGraphics3D_SetBufferState(*args)
     def SetTextureState(*args): return _cspace.iGraphics3D_SetTextureState(*args)
