@@ -5,9 +5,11 @@
 @cindex Tutorial, @file{map2cs}
 
 @noindent
-@emph{Originally written by Thomas Hieber, @email{thieber@@gmx.net}}
-
-@emph{Updated by Philip Wyett, @email{philipwyett@@redeye-entertainment.co.uk}. Last updated 12 February, 2001.}
+@emph{Originally written by Thomas Hieber, @email{thieber@@gmx.net}.
+Updated by Philip Wyett, @email{philipwyett@@redeye-entertainment.co.uk}.
+12 February, 2001.
+Updated by Leandro Ezequiel Lovisolo, @email{lovisolo@@datafull.com}.
+Last updated 22 February, 2003.}
 
 At first look, map making can be pretty complicated, but if you follow this
 tutorial, you will soon walk around in your self-created world.

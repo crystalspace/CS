@@ -3,7 +3,7 @@
 @subsection Step 3: Configuring @file{map2cs}
 
 @file{map2cs} is configured by a special configuration file called
-@file{map2cs.cfg}, located within the 'D:\Crystal\CS\data\config\' directory.
+@file{map2cs.cfg}, located within the 'C:\Crystal\CS\data\config\' directory.
 If you need support for multiple configurations, you can use several
 configuration files, but for now we will restrict ourselves to just one file.
 Open up @file{map2cs.cfg} in you favorite editor and edit it, so it looks like
@@ -11,16 +11,16 @@ the following template:
 
 @example
 Map2CS.TextureSettings.DefaultTexture = liquids/bubbles
-Map2CS.TextureSettings.wad1 = D:\Crystal\Wads\cstex_1.wad
-Map2CS.TextureSettings.wad2 = E:\Sierra\HalfLife\valve\halflife.wad
-Map2CS.TextureSettings.wad3 = E:\Sierra\HalfLife\valve\xeno.wad
-Map2CS.TextureSettings.wad4 = E:\Sierra\HalfLife\valve\liquids.wad
-Map2CS.TextureSettings.wad5 = E:\Sierra\HalfLife\valve\texpack.wad
-Map2CS.TextureSettings.pk1 = D:\Games\Quake3A\baseq3\pak0.pk3
-Map2CS.TextureSettings.pk2 = D:\Games\Quake3A\baseq3\mapmedia.pk3
+Map2CS.TextureSettings.wad1 = C:\Crystal\WADs\cstex_1.wad
+Map2CS.TextureSettings.wad2 = C:\Crystal\WADs\cstex_2.wad
+Map2CS.TextureSettings.wad3 = C:\Sierra\HalfLife\valve\halflife.wad
+Map2CS.TextureSettings.wad4 = C:\Sierra\HalfLife\valve\xeno.wad
+Map2CS.TextureSettings.wad5 = C:\Sierra\HalfLife\valve\liquids.wad
+Map2CS.TextureSettings.wad6 = C:\Sierra\HalfLife\valve\texpack.wad
+
 
 Map2CS.General.Scaling = 0.025
-Map2CS.General.UseBSP = 1
+Map2CS.General.UseBSP = 0
 Map2CS.General.RemoveHidden = 0
 Map2CS.General.LightScale=30
 
@@ -35,18 +35,20 @@ texture files, you can add them by @file{Map2CS.TextureSettings.pk3=@dots{}},
 @file{Map2CS.TextureSettings.pk4=@dots{}}, and so on.
 
 Now Windows and @sc{dos} users need to create a batch file to compile and run
-a map. The batch file should be stored as @file{D:\Crystal\LevBuild.bat}
+a map. The batch file should be stored as @file{C:\Crystal\LevBuild.bat}
 and contain the following commands:
 
 @example
+set CRYSTAL=C:\Crystal\CS
 cd CS
 map2cs ..\maps\%1.map data\%1.zip
-walktest %1
-cd..
+levtool - data\%1.zip
+walktest %1 -relight
+cd ..
 @end example
 
 From the command-line (the @sc{ms-dos} prompt for Windows and @sc{dos} users)
-change to the directory @file{D:\Crystal}.  Type @samp{LevBuild.bat
+change to the directory @file{C:\Crystal}.  Type @samp{LevBuild.bat
 yourmapsname}.  Now, if everything is properly installed and you have a file
 @file{yourmapsname.map} in your @file{maps} directory (if you have downloaded
 the binary Crystal Space distribution for map making, you have), then you

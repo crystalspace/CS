@@ -11,8 +11,7 @@ require a quite complex setup, which we shall explain later in this tutorial.
 @itemize @bullet
 @item
 Crystal Space - This sounds obvious, but you require a release distribution
-of the Crystal Space game engine. Preferably version 0.18 or above. You can
-obtain this from:
+of the Crystal Space SDK. You can obtain it from:
 
 @uref{http://crystal.sourceforge.net/}
 
@@ -64,11 +63,11 @@ can use any structure you like, but for the purposes of this tutorial it will
 be assumed you have the following directory structure:
 
 @example
-D:\Crystal
+C:\Crystal
     CS
     Maps
     Quark
-    Wads
+    WADs
     Wally
     WorldCraft
 @end example

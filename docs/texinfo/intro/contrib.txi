@@ -1280,6 +1280,7 @@ Jason McKnight@*
 Jason Platt@*
 Jonathan Hudson (@email{nathanoj@@realmail.2ndmail.com})@*
 Jonathon Doran (@email{jon.doran@@nsc.com})@*
+Leandro Ezequiel Lovisolo (@email{lovisolo@@datafull.com})@*
 Malcolm Peacock (@email{malcolm@@mpeacock.demon.co.uk})@*
 Matt Keith (@email{keith@@www.keithcom.com})@*
 Michael Knorr (@email{damage-list@@freenet.de})@*
@@ -1309,4 +1310,3 @@ Many thanks to Ted Nguyen for donating a copule copies of Microsoft Visual C++
 
 If we have forgotten anyone or missed a contribution, we sincerely apologize.
 Please feel free to notify us of errors or omissions.
-

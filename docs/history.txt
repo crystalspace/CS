@@ -15,6 +15,8 @@ The history order is reversed so that new features are at the top.
 	      up-to-date.)
 	    - The libpng test now employs -lm (if available) since it is
 	      reported that RedHat 8.x requires this library.
+	- Eric Sunshine committed an update to the map2cs tutorial from
+	  Leandro Ezequiel Lovisolo <lovisolo@datafull.com>.
 25-Feb-2003
 	- Marten Svanfeldt made these changes:
 	    - Fixed a bug in the light/shadow culling.
