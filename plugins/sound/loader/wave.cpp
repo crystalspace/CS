@@ -101,7 +101,7 @@ void csSoundDataWave::ConvertChannels(int Channels) {
   Type *NewData=new Type[NewNumSamples*Channels];               \
   Type *OldData=(Type*)Data;                                    \
   for (unsigned long i=0;i<NewNumSamples;i++) {                 \
-    int samppos = i/Factor;                                     \
+    int samppos = (int)(i/Factor);                              \
     if (Channels==1) {                                          \
       NewData[i]=OldData[samppos];                              \
     } else {                                                    \
@@ -117,7 +117,7 @@ void csSoundDataWave::ConvertChannels(int Channels) {
 void csSoundDataWave::ConvertFreq(int NewFreq) {
   if (NewFreq==Format.Freq) return;
   float Factor=NewFreq/Format.Freq;
-  unsigned long NewNumSamples=NumSamples*Factor;
+  unsigned long NewNumSamples=(unsigned long)(NumSamples*Factor);
   if (Format.Bits==16) {
     CONVERT_FREQ_TYPE(short,Format.Channels);
   } else {

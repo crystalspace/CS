@@ -29,6 +29,7 @@ The history order has been reversed so that new features are at the top.
 	  ux,vx are uv coordinates for that vertex.
 	- Added support for UV coordinates in 3ds2lev convertor by using
 	  the above new feature.
+	- Eric Sunshine fixed some compilation warnings in wave.cpp.
 1-Oct-2000
 	- Since Martin fixed a bug in the sound code Blocks sound is now
 	  working so I enabled it by default.
