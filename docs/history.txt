@@ -34,6 +34,10 @@ The history order is reversed so that new features are at the top.
 	- Added new 'enginestate' command to BugPlug. This will call the
 	  iDebugHelper::StateTest() function of the engine and report
 	  the results. Assigned shift-e to this command by default.
+	- Applied a patch from Peter Amstutz <amstutz@cs.umass.edu> so that
+	  the 3DS importer correctly honors the double-sided triangle flag.
+	  In that case the CS model will have double triangles (one for
+	  every side).
 29-Apr-2002
 	- Eric Sunshine renamed OSXDelegate2D_CGBLit.h to
 	  OSXDelegate2D_CGBlit.h (notice the case distinction) so that #include

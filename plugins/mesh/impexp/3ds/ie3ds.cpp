@@ -181,64 +181,49 @@ static void AddTexels(Lib3dsTexel * pCurTexel, int numTexels,
 }
 
 
-// Model doesn't have texture info, so we use a default one
-static void AssignDefaultTexels (iModelDataObject *pDataObject,
+static void LoadTriangles (iModelDataObject *pDataObject,
 	iModelDataVertices* Vertices, Lib3dsFace * pCurFace,
-	int numTriangles)
+    int numTriangles, bool hasTexels, Lib3dsMaterial* firstMaterial)
 {
   int i,j,index;
   iModelDataPolygon * pCurPoly;
   float *normal;
-  for ( i = 0 ; i < numTriangles ; i++ )
-  {
+
+  for ( i = 0 ; i < numTriangles ; i++ ) {
     // create a new poly for the data object
     pCurPoly = new csModelDataPolygon ();
-
     //  add to the mesh object
     pDataObject->QueryObject ()->ObjAdd (pCurPoly->QueryObject ());
-
     /***  process the information for each polygon vertex  ***/
-
     //  get the indices for each vector of the triangle
     normal = pCurFace->normal;
     Vertices->AddNormal(csVector3(normal[0],normal[1],normal[2]));
+
+    Lib3dsMaterial* pCurMat;
+    for(pCurMat = firstMaterial;
+        pCurMat && strcmp(pCurFace->material, pCurMat->name);
+        pCurMat = pCurMat->next);
+
     for( j = 0 ; j <3 ; j++ )
     {
       index = pCurFace->points[j];
-
       // now add the vertex
-      //pCurPoly->AddVertex( index, 0, 0, j );
-      pCurPoly->AddVertex( index, i , 0, j);
-    }
-    pCurFace++;
+        if(hasTexels) pCurPoly->AddVertex(index, i , 0, index);
+        else pCurPoly->AddVertex(index, i , 0, j);
   }
-}
-
-// Model has texture info, so we use it
-static void AssignDefinedTexels (iModelDataObject * pDataObject,
-	iModelDataVertices * Vertices, Lib3dsFace * pCurFace,
-	int numTriangles)
-{
-  int i,j,index;
-  iModelDataPolygon * pCurPoly;
-  float *normal;
-
-  for ( i = 0 ; i < numTriangles ; i++ )
-  {
-    // create a new poly for the data object
+    if(pCurMat && pCurMat->two_sided) {
+        // material indicates this triangle is two-sided, so
+        // add a new triangle facing the opposite direction
     pCurPoly = new csModelDataPolygon ();
-    //  add to the mesh object
     pDataObject->QueryObject ()->ObjAdd (pCurPoly->QueryObject ());
-    /***  process the information for each polygon vertex  ***/
-    //  get the indices for each vector of the triangle
-    normal = pCurFace->normal;
-    Vertices->AddNormal(csVector3(normal[0],normal[1],normal[2]));
-    for( j = 0 ; j <3 ; j++ )
+        Vertices->AddNormal(csVector3(-normal[0],-normal[1],-normal[2]));
+        for( j = 2 ; j >= 0 ; j-- )
     {
       index = pCurFace->points[j];
       // now add the vertex
-      //pCurPoly->AddVertex( index, 0, 0, j );
-      pCurPoly->AddVertex( index, i , 0, index);
+            if(hasTexels) pCurPoly->AddVertex(index, i , 0, index);
+            else pCurPoly->AddVertex(index, i , 0, j);
+        }
     }
     pCurFace++;
   }
@@ -349,7 +334,7 @@ Lib3dsMaterial *pCurMaterial;
     pModelData->QueryObject ()->ObjAdd (pDataObject->QueryObject ());
 
     // now process that mesh
-    if( !LoadMeshObjectData( pDataObject, pCurMesh) )
+    if( !LoadMeshObjectData( pDataObject, pCurMesh, p3dsFile->materials) )
       return NULL;
 
     pDataObject->DecRef ();
@@ -372,7 +357,7 @@ iDataBuffer *csModelConverter3ds::Save( iModelData* /*pMdl*/,
 }
 
 bool csModelConverter3ds::LoadMeshObjectData( iModelDataObject *pDataObject,
-	Lib3dsMesh *p3dsMesh )
+    Lib3dsMesh *p3dsMesh, Lib3dsMaterial* pCurMaterial )
 {
 
   /***  Load up vertices and texels  ***/
@@ -422,7 +407,7 @@ bool csModelConverter3ds::LoadMeshObjectData( iModelDataObject *pDataObject,
   int numTriangles;//, index, j;
   Lib3dsFace *pCurFace;
 
-  //  get the trianlge count and go to the first triangle
+  //  get the trianle count and go to the first triangle
   numTriangles = p3dsMesh->faces;
   pCurFace = p3dsMesh->faceL;
 
@@ -432,10 +417,7 @@ bool csModelConverter3ds::LoadMeshObjectData( iModelDataObject *pDataObject,
    * depending
    * if the models had UV coordinates or not
    */
-   if(!numTexels)
-     AssignDefaultTexels(pDataObject,Vertices,pCurFace,numTriangles);
-   else
-     AssignDefinedTexels(pDataObject,Vertices,pCurFace,numTriangles);
+  LoadTriangles(pDataObject,Vertices,pCurFace,numTriangles, numTexels > 0, pCurMaterial);
 
   return true;
 }
