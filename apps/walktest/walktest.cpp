@@ -1,4 +1,3 @@
-
 /*
     Copyright (C) 1998 by Jorrit Tyberghein
 
