@@ -26,6 +26,11 @@ The history order is reversed so that new features are at the top.
 	  factory is given before using the state.
 	- Philip Wyett fixed -fs switch under Windows GL and poor fps
 	  in fullscreen mode.
+	- Eric Sunshine augmented the qsqrt() test in configure.ac so that it
+	  also now checks for bogus results from qsqrt() in optimize mode,
+	  rather than only testing if it compiles.  This is needed because some
+	  versions of gcc 3.2.x return incorrect results in optimize mode, such
+	  as qsqrt(1)=0.
 6-Feb-2003
 	- Removed Video.OpenGL.Caps.MaxTexWidth, MaxTexHeight, MinTexWidth,
 	  and MinTexHeight options in opengl.cfg. Instead there is now the
