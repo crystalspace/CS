@@ -26,25 +26,12 @@ snapshots, are packaged with Unix line-terminators, which are acceptable on all
 supported platforms.  These virgin packages themselves can be transported
 between Windows and Unix safely
 
-@subsubheading Selecting the Renderer Architecture
-
-At this moment we have two completely different renderer architectures
-in Crystal Space. The old renderer (which is still default) and the new
-renderer. The new renderer hasn't been made default yet because it is still
-considered to be experimental and some features haven't been ported yet
-(like software renderer which works only partially and fog). On the other
-hand the new renderer supports shaders, stencil shadows, and other advanced
-OpenGL stuff and for most people it seems to work very well. So we personally
-recommend trying out the new renderer first. If it doesn't work right for
-you then you should send us a report and go back to old renderer then.
-To use the new renderer you should add the @samp{--enable-new-renderer}
-option to configure below.
-
 @subsubheading Compiling on Unix
 
 Crystal Space can be built with either @file{make} or Jam (@pxref{GettingJam}).
 Both tools work equally well.  In the examples below, wherever @samp{make -k}
-is used, you can instead substitute @file{jam} if you so desire.
+is used, you can instead substitute @file{jam} (without the @samp{-k}) if you
+so desire.
 
 You first need to configure the project for your platform.  You do this
 by running the configuration script.  For example, from within the @file{CS}
@@ -59,13 +46,6 @@ instead:
 
 @example
 ./configure --enable-debug
-@end example
-
-If you wish to build with debugging information and for the new renderer
-architecture you can do:
-
-@example
-./configure --enable-debug --enable-new-renderer
 @end example
 
 For a list of useful configuration options, invoke:
