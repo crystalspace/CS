@@ -388,7 +388,7 @@ SysSystemDriver::SysSystemDriver () : csSystemDriver ()
   wc.cbWndExtra     = 0;
 
   bool bResult;
-  bResult = RegisterClass (&wc)
+  bResult = RegisterClass (&wc);
   ASSERT(bResult);
 }
 
