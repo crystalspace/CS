@@ -47,6 +47,11 @@ Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "gl_txtmgr.h"
 #include "glextmanager.h"
 
+#include "ivideo/effects/efserver.h"
+#include "ivideo/effects/efdef.h"
+#include "ivideo/effects/eftech.h"
+#include "ivideo/effects/efpass.h"
+#include "ivideo/effects/eflayer.h"
 
 
 csRef<iGLStateCache> csGLRender3D::statecache;
@@ -64,21 +69,21 @@ SCF_EXPORT_CLASS_TABLE_END
 
 
 SCF_IMPLEMENT_IBASE(csGLRender3D)
-  SCF_IMPLEMENTS_INTERFACE(csGLRender3D)
-  SCF_IMPLEMENTS_INTERFACE(iRender3D)
-  SCF_IMPLEMENTS_EMBEDDED_INTERFACE(iComponent)
+SCF_IMPLEMENTS_INTERFACE(iRender3D)
+SCF_IMPLEMENTS_EMBEDDED_INTERFACE(iComponent)
+SCF_IMPLEMENTS_EMBEDDED_INTERFACE(iEffectClient)
 SCF_IMPLEMENT_IBASE_END
 
 SCF_IMPLEMENT_EMBEDDED_IBASE (csGLRender3D::eiComponent)
-  SCF_IMPLEMENTS_INTERFACE (iComponent)
+SCF_IMPLEMENTS_INTERFACE (iComponent)
 SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
-SCF_IMPLEMENT_EMBEDDED_IBASE (csGLRender3D::eiShaderRenderInterface )
-  SCF_IMPLEMENTS_INTERFACE (iShaderRenderInterface)
+SCF_IMPLEMENT_EMBEDDED_IBASE (csGLRender3D::eiEffectClient)
+SCF_IMPLEMENTS_INTERFACE (iEffectClient)
 SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 SCF_IMPLEMENT_IBASE (csGLRender3D::EventHandler)
-  SCF_IMPLEMENTS_INTERFACE (iEventHandler)
+SCF_IMPLEMENTS_INTERFACE (iEventHandler)
 SCF_IMPLEMENT_IBASE_END
 
 
@@ -86,6 +91,7 @@ csGLRender3D::csGLRender3D (iBase *parent)
 {
   SCF_CONSTRUCT_IBASE (parent);
   SCF_CONSTRUCT_EMBEDDED_IBASE(scfiComponent);
+  SCF_CONSTRUCT_EMBEDDED_IBASE(scfiEffectClient);
 
   scfiEventHandler = NULL;
 
@@ -555,28 +561,13 @@ bool csGLRender3D::Open ()
   asp_center_x = w/2;
   asp_center_y = h/2;
 
-
-/*  effectserver = CS_QUERY_REGISTRY(object_reg, iEffectServer);
+  /*effectserver = CS_QUERY_REGISTRY(object_reg, iEffectServer);
   if( !effectserver )
   {
   effectserver = CS_LOAD_PLUGIN (plugin_mgr,
   "crystalspace.video.effects.stdserver", iEffectServer);
   object_reg->Register (effectserver, "iEffectServer");
-  }
-*/
-
-  shadermanager = CS_QUERY_REGISTRY(object_reg, iShaderManager);
-  if( !shadermanager )
-  {
-    shadermanager = CS_LOAD_PLUGIN (plugin_mgr, 
-    "crystalspace.video.shader.manager", iShaderManager);
-    if (shadermanager)
-      object_reg->Register (shadermanager, "iShaderManager");
-    else
-      Report (CS_REPORTER_SEVERITY_ERROR, "Couldn't find any shadermanager, ignoring shaders");
-  }
-  scfiShaderRenderInterface.Initialize(object_reg);
-
+  }*/
 
   csRef<iOpenGLInterface> gl = SCF_QUERY_INTERFACE (G2D, iOpenGLInterface);
   ext.InitExtensions (gl);
@@ -653,9 +644,9 @@ bool csGLRender3D::BeginDraw (int drawflags)
   {
     statecache->SetDepthMask (GL_TRUE);
     if (drawflags & CSDRAW_CLEARSCREEN)
-      glClear (GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
+      glClear (GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
     else
-      glClear (GL_DEPTH_BUFFER_BIT);
+      glClear (GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
   }
   else if (drawflags & CSDRAW_CLEARSCREEN)
     G2D->Clear (0);
@@ -824,19 +815,23 @@ void csGLRender3D::DrawMesh(csRenderMesh* mymesh)
 {
   csRef<iStreamSource> source = mymesh->GetStreamSource ();
   csRef<iRenderBuffer> vertexbuf =
-    source->GetBuffer (strings->Request ("vertices"));
+    source->GetBuffer (strings->Request (mymesh->GetDefaultVertexBuffer ()));
   csRef<iRenderBuffer> texcoordbuf =
-    source->GetBuffer (strings->Request ("texture coordinates"));
+    source->GetBuffer (strings->Request (mymesh->GetDefaultTexCoordBuffer ()));
+  csRef<iRenderBuffer> normalbuf =
+    source->GetBuffer (strings->Request (mymesh->GetDefaultNormalBuffer ()));
   csRef<iRenderBuffer> indexbuf =
-    source->GetBuffer (strings->Request ("indices"));
+    source->GetBuffer (strings->Request (mymesh->GetDefaultIndexBuffer ()));
 
   if (!vertexbuf)
+    return;
+  if (!indexbuf)
     return;
 
   SetupClipper (mymesh->clip_portal, 
                 mymesh->clip_plane, 
                 mymesh->clip_z_plane);
-  
+
   SetZMode (mymesh->z_buf_mode);
 
   SetMirrorMode (mymesh->do_mirror);
@@ -873,9 +868,15 @@ void csGLRender3D::DrawMesh(csRenderMesh* mymesh)
       texcoordbuf->Lock(iRenderBuffer::CS_BUF_LOCK_RENDER));
     glEnableClientState (GL_TEXTURE_COORD_ARRAY);
   }
-  /*glIndexPointer (GL_INT, 0, vertexbuf->GetUIntBuffer ());
-  glEnableClientState (GL_INDEX_ARRAY);
-  glDrawArrays (GL_TRIANGLES, 0, indexbuf->GetUIntLength ());*/
+  if (normalbuf)
+  {
+    glNormalPointer (GL_FLOAT, 0, (float*)
+      normalbuf->Lock(iRenderBuffer::CS_BUF_LOCK_RENDER));
+    glEnableClientState (GL_NORMAL_ARRAY);
+  }
+
+  statecache->SetShadeModel (GL_SMOOTH);
+
   glDrawElements (
     GL_TRIANGLES,
     mymesh->GetIndexEnd ()-mymesh->GetIndexStart (),
@@ -884,8 +885,19 @@ void csGLRender3D::DrawMesh(csRenderMesh* mymesh)
     +mymesh->GetIndexStart ());
 
   vertexbuf->Release();
-  indexbuf->Release();
-  texcoordbuf->Release();
+  glDisableClientState (GL_VERTEX_ARRAY);
+  if (texcoordbuf)
+  {
+    glDisableClientState (GL_TEXTURE_COORD_ARRAY);
+    texcoordbuf->Release();
+  }
+  if (normalbuf)
+  {
+    glDisableClientState (GL_NORMAL_ARRAY);
+    normalbuf->Release();
+  }
+  if (indexbuf)
+    indexbuf->Release();
 
   if (clip_planes_enabled)
   {
@@ -911,6 +923,46 @@ void csGLRender3D::SetClipper (iClipper2D* clipper, int cliptype)
   frustum_valid = false;
 }
 
+void csGLRender3D::SetLightParameter (int i, int param, csVector3 value)
+{
+  GLfloat f[4];
+  f[0] = value.x;
+  f[1] = value.y;
+  f[2] = value.z;
+  f[3] = 1;
+  switch (param)
+  {
+  case CS_LIGHTPARAM_POSITION:
+    glLightfv (GL_LIGHT0+i, GL_POSITION, f);
+    break;
+  case CS_LIGHTPARAM_DIFFUSE:
+    glLightfv (GL_LIGHT0+i, GL_DIFFUSE, f);
+    break;
+  case CS_LIGHTPARAM_SPECULAR:
+    glLightfv (GL_LIGHT0+i, GL_SPECULAR, f);
+    break;
+  case CS_LIGHTPARAM_ATTENUATION:
+    glLightfv (GL_LIGHT0+i, GL_CONSTANT_ATTENUATION, f);
+    glLightfv (GL_LIGHT0+i, GL_LINEAR_ATTENUATION, f+1);
+    glLightfv (GL_LIGHT0+i, GL_QUADRATIC_ATTENUATION, f+2);
+    break;
+  }
+}
+
+
+
+
+////////////////////////////////////////////////////////////////////
+// iEffectClient
+////////////////////////////////////////////////////////////////////
+
+
+
+
+bool csGLRender3D::Validate (iEffectDefinition* effect, iEffectTechnique* technique)
+{
+  return false;
+}
 
 
 
@@ -964,54 +1016,4 @@ bool csGLRender3D::HandleEvent (iEvent& Event)
       }
   }
   return false;
-}
-
-
-////////////////////////////////////////////////////////////////////
-//                    iShaderRenderInterface
-////////////////////////////////////////////////////////////////////
-csPtr<iShaderProgram> csGLRender3D::eiShaderRenderInterface::CreateShaderProgram(const char* programstring, void* parameters, const char* type)
-{
-  int i;
-  for(i = 0; i < pluginlist.Length(); ++i)
-  {
-    if( ((iShaderProgramPlugin*)pluginlist.Get(i))->SupportType(type))
-      return ((iShaderProgramPlugin*)pluginlist.Get(i))->CreateShaderProgram(programstring, parameters, type);
-  }
-  return NULL;
-}
-
-csGLRender3D::eiShaderRenderInterface::eiShaderRenderInterface()
-{
-}
-
-csGLRender3D::eiShaderRenderInterface::~eiShaderRenderInterface()
-{
-}
-
-void csGLRender3D::eiShaderRenderInterface::Initialize(iObjectRegistry *reg)
-{
-  object_reg = reg;
-  if(object_reg)
-  {
-    csRef<iPluginManager> plugin_mgr = CS_QUERY_REGISTRY(object_reg, iPluginManager);
-
-    iStrVector* classlist = iSCF::SCF->QueryClassList("crystal.video.shader.opengl.*");
-    int const nmatches = classlist->Length();
-    if(nmatches != 0)
-    {
-      int i;
-      for(i = 0; i < nmatches; ++i)
-      {
-        const char* classname = classlist->Get(i);
-        csRef<iShaderProgramPlugin> plugin = CS_LOAD_PLUGIN(plugin_mgr, classname, iShaderProgramPlugin);
-        if(plugin)
-        {
-          scfParent->Report( CS_REPORTER_SEVERITY_NOTIFY, "Loaded plugin %s", classname);
-          pluginlist.Push(plugin);
-          plugin->IncRef();
-        }
-      }
-    }
-  }
 }

@@ -132,10 +132,22 @@ private:
   unsigned int indexstart, indexend;
   csRef<iStreamSource> streamsource;
   csRef<iMaterialWrapper> matwrap;
+  const char *defaultvertices;
+  const char *defaulttexcoords;
+  const char *defaultnormals;
+  const char *defaultindices;
 
 public:
+
+  csRenderMesh () 
+  {
+    defaultvertices = "vertices";
+    defaulttexcoords = "texture coordinates";
+    defaultnormals = "normals";
+    defaultindices = "indices";
+  }
+
   /// Special attributes. Please don't change, it's used as flags
-  virtual ~csRenderMesh () {}
   typedef enum
   {
     SPECIAL_NONE = 0,
@@ -165,6 +177,31 @@ public:
   /// Get buffer source
   virtual iStreamSource* GetStreamSource ()
     { return streamsource; }
+
+  /// Set default vertex buffer name
+  virtual void SetDefaultVertexBuffer (const char *name)
+    { defaultvertices = name; }
+  /// Get default vertex buffer name
+  virtual const char *GetDefaultVertexBuffer ()
+    { return defaultvertices; }
+  /// Set default vertex buffer name
+  virtual void SetDefaultTexCoordBuffer (const char *name)
+    { defaulttexcoords = name; }
+  /// Get default vertex buffer name
+  virtual const char *GetDefaultTexCoordBuffer ()
+    { return defaulttexcoords; }
+  /// Set default vertex buffer name
+  virtual void SetDefaultNormalBuffer (const char *name)
+    { defaultnormals = name; }
+  /// Get default vertex buffer name
+  virtual const char *GetDefaultNormalBuffer ()
+    { return defaultnormals; }
+  /// Set default vertex buffer name
+  virtual void SetDefaultIndexBuffer (const char *name)
+    { defaultindices = name; }
+  /// Get default vertex buffer name
+  virtual const char *GetDefaultIndexBuffer ()
+    { return defaultindices; }
 
   /// Set range of indices to use
   virtual void SetIndexRange (unsigned int start, unsigned int end)

@@ -37,7 +37,7 @@
 #include "iutil/eventh.h"
 #include "ivideo/graph2d.h"
 #include "ivideo/render3d.h"
-#include "ivideo/shader/shader.h"
+#include "ivideo/effects/efclient.h"
 #include "video/canvas/openglcommon/iglstates.h"
 
 #include "glextmanager.h"
@@ -54,6 +54,9 @@ struct iTextureManager;
 struct iRenderBufferManager;
 struct iLightingManager;
 
+struct iEffectServer;
+struct iEffectDefinition;
+struct iEffectTechnique;
 struct iEvent;
 
 
@@ -68,7 +71,6 @@ struct iEvent;
 #define CS_GL_CLIP_LAZY_STENCIL  'S'
 #define CS_GL_CLIP_LAZY_PLANES   'P'
 
-SCF_VERSION(csGLRender3D, 0,0,1);
 class csGLRender3D : public iRender3D
 {
   //friend declarations
@@ -84,7 +86,7 @@ class csGLRender3D : public iRender3D
   csRef<iGraphics2D> G2D;
   csRef<iRenderBufferManager> buffermgr;
   csRef<iLightingManager> lightmgr;
-  csRef<iShaderManager> shadermanager;
+  csRef<iEffectServer> effectserver;
 
   static csRef<iGLStateCache> statecache;
 
@@ -273,6 +275,14 @@ public:
   /// Drawroutine. Only way to draw stuff
   void DrawMesh (csRenderMesh* mymesh);
 
+  /// Enables writing of color values to framebuffer
+  virtual void EnableColorWrite ()
+    { glColorMask (GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE); }
+
+  /// Disables writing of color values to framebuffer
+  virtual void DisableColorWrite ()
+    { glColorMask (GL_FALSE, GL_FALSE, GL_FALSE, GL_FALSE); }
+
   /**
    * Set optional clipper to use. If clipper == null
    * then there is no clipper.
@@ -307,30 +317,46 @@ public:
   virtual bool HasNearPlane () 
     { return do_near_plane; }
 
+  /// Get maximum number of simultaneous vertex lights supported
+  virtual int GetMaxLights ()
+    { return GL_MAX_LIGHTS; }
+
+  /// Sets a parameter for light i
+  virtual void SetLightParameter (int i, int param, csVector3 value);
+
+  /// Enables light i
+  virtual void EnableLight (int i)
+    { statecache->EnableState (GL_LIGHT0+i); }
+
+  /// Disables light i
+  virtual void DisableLight (int i)
+    { statecache->DisableState (GL_LIGHT0+i); }
+
+  /// Enable vertex lighting
+  virtual void EnablePVL ()
+    { statecache->EnableState (GL_LIGHTING); }
+    
+  /// Disable vertex lighting
+  virtual void DisablePVL ()
+    { statecache->DisableState (GL_LIGHTING); }
 
   /// Get a stringhash to be used by our streamsources etc.
   csStringSet *GetStringContainer () 
     { return strings; }
 
   ////////////////////////////////////////////////////////////////////
-  //                    iShaderRenderInterface
+  //                         iEffectClient
   ////////////////////////////////////////////////////////////////////
 
-  class eiShaderRenderInterface : public iShaderRenderInterface
+  bool Validate (iEffectDefinition* effect, iEffectTechnique* technique);
+
+  struct eiEffectClient : public iEffectClient
   {
-  private:
-    csBasicVector pluginlist;
-    csRef<iObjectRegistry> object_reg;
-  public:
     SCF_DECLARE_EMBEDDED_IBASE(csGLRender3D);
-    eiShaderRenderInterface();
-    virtual ~eiShaderRenderInterface();
-
-    virtual void Initialize( iObjectRegistry *reg);
-
-    /// Create a shaderprogram from a string describing it
-    virtual csPtr<iShaderProgram> CreateShaderProgram(const char* programstring, void* parameters, const char* type);
-  } scfiShaderRenderInterface;
+    virtual bool Validate (
+      iEffectDefinition* effect, iEffectTechnique* technique)
+      { return scfParent->Validate (effect, technique); }
+  } scfiEffectClient;
 
   ////////////////////////////////////////////////////////////////////
   //                          iComponent

@@ -118,6 +118,33 @@ enum csZBufMode
   CS_ZBUF_EQUAL    = 0x00000005,
 };
 
+/**\name Light parameters
+ * @{ */
+
+/**
+ * Position of the light
+ */
+#define CS_LIGHTPARAM_POSITION 0
+
+/**
+ * Diffuse color of the light
+ */
+#define CS_LIGHTPARAM_DIFFUSE 1
+
+/**
+ * Specular color of the light
+ */
+#define CS_LIGHTPARAM_SPECULAR 2
+
+/**
+ * Attenuation of the light
+ */
+#define CS_LIGHTPARAM_ATTENUATION 3
+
+/** @} */
+
+
+
 class csRender3dCaps
 {
 };
@@ -212,6 +239,14 @@ struct iRender3D : public iBase
   /// Drawroutine. Only way to draw stuff
   virtual void DrawMesh (csRenderMesh* mymesh) = 0;
 
+  /// Enables writing of color values to framebuffer
+  virtual void EnableColorWrite () = 0;
+
+  /// Disables writing of color values to framebuffer
+  virtual void DisableColorWrite () = 0;
+
+
+
   /**
    * Set optional clipper to use. If clipper == null
    * then there is no clipper.
@@ -240,6 +275,24 @@ struct iRender3D : public iBase
 
   /// Return true if we have near plane.
   virtual bool HasNearPlane () = 0;
+
+  /// Get maximum number of simultaneous HW lights supported
+  virtual int GetMaxLights () = 0;
+
+  /// Sets a parameter for light i
+  virtual void SetLightParameter (int i, int param, csVector3 value) = 0;
+
+  /// Enables light i
+  virtual void EnableLight (int i) = 0;
+
+  /// Disables light i
+  virtual void DisableLight (int i) = 0;
+
+  /// Enable vertex lighting
+  virtual void EnablePVL () = 0;
+
+  /// Disable vertex lighting
+  virtual void DisablePVL () = 0;
 
   /// Get a stringhash to be used by our streamsources etc.
   virtual csStringSet* GetStringContainer () = 0;

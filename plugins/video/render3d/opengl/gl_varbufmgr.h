@@ -39,9 +39,9 @@ class csBuddyAllocator
 {
 private:
   //Private constants
-#define CS_ALLOC_GRANULARITY 0 //Blocksizes in multiple of 4K
-#define CS_BUDDY_SHIFT (12+CS_ALLOC_GRANULARITY)
-#define CS_BUDDY_ADD ((1<<CS_BUDDY_SHIFT)-1)
+  static const int CS_ALLOC_GRANULARITY = 0; //Blocksizes in multiple of 4K
+  static const int CS_BUDDY_SHIFT = (12+CS_ALLOC_GRANULARITY);
+  static const int CS_BUDDY_ADD = ((1<<CS_BUDDY_SHIFT)-1);
   
   //helper functions
   int treeSize(int size);
@@ -96,7 +96,7 @@ public:
   SCF_DECLARE_IBASE;
 
   csVARRenderBuffer(void *buffer, int size, CS_RENDERBUFFER_TYPE type, csVARRenderBufferManager* bm);
-  virtual ~csVARRenderBuffer ();
+  ~csVARRenderBuffer ();
   
   /**
    * Lock the buffer to allow writing and give us a pointer to the data
@@ -135,7 +135,7 @@ public:
   bool Initialize(csGLRender3D* render3d);
 
   /// Kill it
-  virtual ~csVARRenderBufferManager();
+  ~csVARRenderBufferManager();
 
   /// Allocate a buffer of the specified type and return it
   csPtr<iRenderBuffer> GetBuffer(int buffersize, CS_RENDERBUFFER_TYPE location);
