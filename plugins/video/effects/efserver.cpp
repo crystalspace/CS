@@ -42,9 +42,18 @@ bool csEffectServer::Initialize( iObjectRegistry* reg )
 iEffectDefinition* csEffectServer::CreateEffect()
 {
   csEffectDefinition* effectobj = new csEffectDefinition();
+
   csRef<iEffectDefinition> effect (SCF_QUERY_INTERFACE(
-  	effectobj, iEffectDefinition));
+  effectobj, iEffectDefinition));
   effect->IncRef ();	// To avoid smart pointer release.
+
+  char* name = new char[10];
+  sprintf(name, "effect%2d", seqnr);
+  seqnr++;
+  effect->SetName(name);
+
+  effects->Push(effect);
+
   // THIS ROUTINE MUST RETURN csPtr.
   return effect;
 }
@@ -86,6 +95,17 @@ iEffectTechnique* csEffectServer::SelectAppropriateTechnique(
       tech = effect->GetTechnique(i);
     }
   return tech;
+}
+
+iEffectDefinition* csEffectServer::GetEffect(const char *s)
+{
+  for(int ni = 0; ni < effects->Length(); ni++)
+  {
+    if(stricmp(s,((iEffectDefinition*)(effects->Get(ni)))->GetName()) == 0)
+      //is this, return it
+      return (iEffectDefinition*)(effects->Get(ni));
+  }
+  return NULL;
 }
 
 csStringID csEffectServer::RequestString( const char *s )

@@ -24,6 +24,9 @@
 #include "csutil/scf.h"
 #include "csutil/objreg.h"
 #include "iutil/comp.h"
+#include "csutil/csvector.h"
+#include "ivideo/effects/efdef.h"
+#include "ivideo/effects/efstring.h"
 
 /**
  * Effect server
@@ -33,7 +36,10 @@ class csEffectServer : public iEffectServer
 private:
   iObjectRegistry* objectreg;
   csStringSet strset;
+  int seqnr;
 
+  csBasicVector* effects;
+  csEffectStrings* efstrings;
 public:
 
   SCF_DECLARE_IBASE;
@@ -42,8 +48,21 @@ public:
   {
     SCF_CONSTRUCT_IBASE( parent );
     SCF_CONSTRUCT_EMBEDDED_IBASE( scfiComponent );
+    seqnr = 0;
+
+    effects = new csVector();
+    efstrings = new csEffectStrings();
+    efstrings->InitStrings(this);
   }
-  virtual ~csEffectServer () { }
+  
+  virtual ~csEffectServer () 
+  {
+    while(effects->Length() > 0)
+    {
+      delete (iEffectDefinition*)(effects->Pop());
+    }
+    delete effects;
+  }
 
   bool Initialize( iObjectRegistry* reg );
 
@@ -53,8 +72,15 @@ public:
 
   iEffectTechnique* SelectAppropriateTechnique( iEffectDefinition* effect );
 
+  iEffectDefinition* GetEffect(const char *s);
+
   csStringID RequestString( const char *s );
   const char* RequestString( csStringID id );
+  
+  csEffectStrings* GetStandardStrings()
+  {
+    return efstrings;
+  }
 
   struct Component : public iComponent
   {
