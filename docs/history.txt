@@ -4,6 +4,11 @@ http://crystal.sourceforge.net/
 The history order is reversed so that new features are at the top.
 
 5-Apr-2003
+	- Rhad removed double include protection from 
+          /include/ivideo/effects/effectstrings.h since that file needs to
+          be included twice in a row with macro redefinitions to work
+          correctly.  Fixes rendering errors with OpenGL using certain
+          extensions.
         - JTarbox adding Rhad's fix for xmlread asserts in MSVC
 	- Philip Wyett fixed compile error in ogg plugin.
 	- Oktal fixed a problem with the cssocket plugin where it would only
