@@ -30,6 +30,12 @@ The history order is reversed so that new features are at the top.
 	- Eric Sunshine fixed a bug recently introduced into csconfig.mak where
 	  it failed to invoke the build.cs-config target in the sub-make
 	  invocation.
+	- Matze Braun added configure tests for: libmikmod, libogg, libvorbis,
+	  libvorbisfile, lib3ds, libode, libopenal, libfreetype2, a switch for
+	  linux joystick drivers.
+	- Matze Braun tweaked the list of apps "make install" installs and
+	  added a call to "cslight" with flarge and partsys to the end of the
+	  install process.
 27-Jan-2003
 	- Restored number of super lightmaps in OpenGL to 10 again. Apparently
 	  16 was too much for cards with less texture memory. We have to find
