@@ -311,7 +311,7 @@ fillCol:
         }
 
 #else if COMP_GCC
-        csBits64 fvalueTemp = fvalue;
+        csBits64 *fvalueTemp = &fvalue;
         __asm__  (
           "pushl %%eax                 \n"
           "pushl %%ecx                 \n"
@@ -322,11 +322,11 @@ fillCol:
           "movl $32, %%ecx             \n"
 
           "movq %4, %%mm0              \n"
-          /*"movl %2, %%eax              \n"
-          "movq 0(%%eax), %%mm1        \n"          */
-          "movq %2, %%mm1              \n"
+          "movl %2, %%eax              \n"
+          "movq 0(%%eax), %%mm1        \n"
+          //"movq 0(%2), %%mm1           \n"
           "movl $~0, %%edx             \n"
-          "fillCol:                   \n"
+          "fillCol:                    \n"
           "movq 0(%%edi), %%mm2        \n" //1
 
           "movq %%mm2,%%mm3            \n"   //1
@@ -346,9 +346,9 @@ fillCol:
           "addl $8, %%edi              \n"
           "addl $8, %%esi              \n"
           "loop fillCol               \n"
-          /*"movl %2, %%eax              \n"
-          "movq %%mm1, 0(%%eax)        \n"*/
-          "movq %%mm1, %2              \n"
+          "movl %2, %%eax              \n"
+          "movq %%mm1, 0(%%eax)        \n"
+          //"movq %%mm1, 0(%2)           \n"
           "movb %%dl, %3               \n"
 
           // restore state
@@ -361,7 +361,7 @@ fillCol:
           : /* outputs */
           : "g" (cc), "g" (c), "g" (fvalueTemp), "g" (tile_full), "g" (allOnes)
           : "eax", "ecx", "esi", "edi", "edx");
-        fvalue = fvalueTemp;
+        //fvalue = fvalueTemp;
 #endif //COMP_
       }
       else
@@ -459,7 +459,7 @@ fillCol2:
         }
 
   #else if COMP_GCC
-        csBits64 fvalueTemp = fvalue;
+        csBits64 *fvalueTemp = &fvalue;
         __asm__  (
           "pushl %%eax                 \n"
           "pushl %%ecx                 \n"
@@ -470,9 +470,9 @@ fillCol2:
           "movl $32, %%ecx             \n"
 
           "movq %4, %%mm0              \n"
-          /*"movl %2, %%eax              \n"
-          "movq 0(%%eax), %%mm1        \n"          */
-          "movq %2, %%mm1              \n"
+          "movl %2, %%eax              \n"
+          "movq 0(%%eax), %%mm1        \n"          
+          //"movq %2, %%mm1           \n"
           "movl $~0, %%edx             \n"
           "fillCol2:                   \n"
           "movq 0(%%edi), %%mm2        \n" //1
@@ -494,9 +494,9 @@ fillCol2:
           "addl $8, %%edi              \n"
           "addl $8, %%esi              \n"
           "loop fillCol2               \n"
-          /*"movl %2, %%eax              \n"
-          "movq %%mm1, 0(%%eax)        \n"*/
-          "movq %%mm1, %2              \n"
+          "movl %2, %%eax              \n"
+          "movq %%mm1, 0(%%eax)        \n"
+          //"movq %%mm1, 0(%2)           \n"
           "movb %%dl, %3               \n"
 
           // restore state
@@ -509,7 +509,7 @@ fillCol2:
           : /* outputs */
           : "g" (cc), "g" (c), "g" (fvalueTemp), "g" (tile_full), "g" (allOnes)
           : "eax", "ecx", "esi", "edi", "edx");
-          fvalue = fvalueTemp;
+          //fvalue = fvalueTemp;
     #endif //COMP_
       }
       else
