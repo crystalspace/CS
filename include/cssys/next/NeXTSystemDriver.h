@@ -21,19 +21,12 @@
 //
 //-----------------------------------------------------------------------------
 #include "cssys/system.h"
-struct NeXTAssistant;
+struct iObjectRegistry;
 
-class NeXTSystemDriver : public csSystemDriver
+class SysSystemDriver : public csSystemDriver
 {
-  typedef csSystemDriver superclass;
-private:
-  NeXTAssistant* assistant;
 public:
-  NeXTSystemDriver();
-  virtual ~NeXTSystemDriver();
-  virtual bool Initialize();
+  SysSystemDriver(iObjectRegistry* r) : csSystemDriver(r) {}
 };
-
-class SysSystemDriver : public NeXTSystemDriver {};
 
 #endif // __NeXT_NeXTSystemDriver_h

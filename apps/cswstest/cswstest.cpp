@@ -1062,7 +1062,7 @@ int main (int argc, char* argv[])
   csWsTest *app = new csWsTest (object_reg, DefaultSkin);
 
   if (app->Initialize ())
-    csInitializer::MainLoop (object_reg);
+    csDefaultRunLoop(object_reg);
 
   delete app;
   csInitializer::DestroyApplication (object_reg);

@@ -1603,7 +1603,7 @@ int main (int argc, char* argv[])
   CsfEdit app (object_reg, DefaultSkin);
 
   if (app.Initialize ())
-    csInitializer::MainLoop (object_reg);
+    csDefaultRunLoop(object_reg);
 
   return 0;
 }

@@ -101,9 +101,11 @@ SRC.SYS_CSSYS = \
   libs/cssys/ps2/ptiming.cpp \
   libs/cssys/ps2/loadlib.cpp \
   libs/cssys/general/findlib.cpp \
+  libs/cssys/general/getopt.cpp \
   libs/cssys/general/instpath.cpp \
   libs/cssys/general/printf.cpp \
-  libs/cssys/general/getopt.cpp
+  libs/cssys/general/runloop.cpp \
+  libs/cssys/general/sysinit.cpp
 
 # The C compiler.
 CC=ee-g++ -c

@@ -627,7 +627,7 @@ int main (int argc, char* argv[])
   // Initialize the main system. This will load all needed plug-ins
   // (3D, 2D, network, sound, ...) and initialize them.
   if (theApp->Initialize ())
-    csInitializer::MainLoop (object_reg);
+    csDefaultRunLoop(object_reg);
   else
     csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
     	"crystalspace.application.cswseng", "Error initializing system!");

@@ -919,7 +919,7 @@ int main (int argc, char *argv[])
     return -1;
   }
 
-  csInitializer::MainLoop (object_reg);
+  csDefaultRunLoop(object_reg);
   System.myG2D->Close();
   System.myG2D->DecRef ();
   return 0;

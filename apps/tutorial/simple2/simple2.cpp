@@ -439,7 +439,7 @@ int main (int argc, char* argv[])
   }
 
   // Main loop.
-  csInitializer::MainLoop (simple->object_reg);
+  csDefaultRunLoop(simple->object_reg);
 
   // Cleanup.
   Cleanup ();

@@ -1,16 +1,16 @@
 /*
     Copyright (C) 2001 by Jorrit Tyberghein
-  
+
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
     License as published by the Free Software Foundation; either
     version 2 of the License, or (at your option) any later version.
-  
+
     This library is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
     Library General Public License for more details.
-  
+
     You should have received a copy of the GNU Library General Public
     License along with this library; if not, write to the Free
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
@@ -92,7 +92,7 @@ bool csInitializer::InitializeSCF ()
   // Add both installpath and installpath/lib dirs to search for plugins
   csGetInstallPath (scfconfigpath, sizeof (scfconfigpath));
   csAddLibraryPath (scfconfigpath);
-  strcat (scfconfigpath, "lib");   
+  strcat (scfconfigpath, "lib");
   int scfconfiglen = strlen(scfconfigpath);
   scfconfigpath[scfconfiglen] = PATH_SEPARATOR;
   scfconfigpath[scfconfiglen+1] = 0;
@@ -168,7 +168,7 @@ iCommandLineParser* csInitializer::CreateCommandLineParser (
 iConfigManager* csInitializer::CreateConfigManager (
 	iObjectRegistry* object_reg)
 {
-  iConfigFile *cfg = new csConfigFile ();
+  iConfigFile* cfg = new csConfigFile ();
   iConfigManager* Config = new csConfigManager (cfg, true);
   object_reg->Register (Config, NULL);
   Config->DecRef ();
@@ -179,10 +179,9 @@ iConfigManager* csInitializer::CreateConfigManager (
 bool csInitializer::SetupCommandLineParser (iObjectRegistry* object_reg,
   	int argc, const char* const argv[])
 {
-  iCommandLineParser* CommandLine = CS_QUERY_REGISTRY (object_reg,
-  	iCommandLineParser);
-  CS_ASSERT (CommandLine != NULL);
-  CommandLine->Initialize (argc, argv);
+  iCommandLineParser* c = CS_QUERY_REGISTRY (object_reg, iCommandLineParser);
+  CS_ASSERT (c != NULL);
+  c->Initialize (argc, argv);
   return true;
 }
 
@@ -248,13 +247,12 @@ bool csInitializer::SetupConfigManager (iObjectRegistry* object_reg,
       cfg->DecRef ();
     }
   }
-  
+
   config_done = true;
   return true;
 }
 
-bool csInitializer::RequestPlugins (iObjectRegistry* object_reg,
-	...)
+bool csInitializer::RequestPlugins (iObjectRegistry* object_reg, ...)
 {
   if (!config_done) SetupConfigManager (object_reg, NULL);
 
@@ -282,12 +280,13 @@ bool csInitializer::RequestPlugins (iObjectRegistry* object_reg,
 bool csInitializer::Initialize (iObjectRegistry* object_reg)
 {
   if (!config_done) SetupConfigManager (object_reg, NULL);
-  return global_sys->Initialize ();
+  return csPlatformStartup (object_reg) && global_sys->Initialize ();
 }
 
 bool csInitializer::SetupEventHandler (iObjectRegistry* object_reg,
 	iEventHandler* evhdlr, unsigned int eventmask)
 {
+  CS_ASSERT(installed_event_handler == 0);
   iEventQueue* q = CS_QUERY_REGISTRY (object_reg, iEventQueue);
   if (q)
   {
@@ -295,25 +294,18 @@ bool csInitializer::SetupEventHandler (iObjectRegistry* object_reg,
     installed_event_handler = evhdlr;
     return true;
   }
-  else return false;
+  return false;
 }
 
 class csAppEventHandler : public iEventHandler
 {
 private:
-  csEventHandlerFunc* evhdlr;
-
+  csEventHandlerFunc evhdlr;
 public:
-  csAppEventHandler (csEventHandlerFunc* evhdlr)
-  {
-    SCF_CONSTRUCT_IBASE (NULL);
-    csAppEventHandler::evhdlr = evhdlr;
-  }
   SCF_DECLARE_IBASE;
-  virtual bool HandleEvent (iEvent& ev)
-  {
-    return evhdlr (ev);
-  }
+  csAppEventHandler (csEventHandlerFunc h) : evhdlr(h)
+  { SCF_CONSTRUCT_IBASE (NULL); }
+  virtual bool HandleEvent (iEvent& e) { return evhdlr (e); }
 };
 
 SCF_IMPLEMENT_IBASE (csAppEventHandler)
@@ -321,14 +313,10 @@ SCF_IMPLEMENT_IBASE (csAppEventHandler)
 SCF_IMPLEMENT_IBASE_END
 
 bool csInitializer::SetupEventHandler (iObjectRegistry* object_reg,
-	csEventHandlerFunc* evhdlr_func)
+	csEventHandlerFunc evhdlr_func, unsigned int eventmask)
 {
   csAppEventHandler* evhdlr = new csAppEventHandler (evhdlr_func);
-  return SetupEventHandler (object_reg, evhdlr, CSMASK_Broadcast |
-  	CSMASK_MouseUp | CSMASK_MouseDown | CSMASK_MouseMove |
-	CSMASK_KeyDown | CSMASK_KeyUp | CSMASK_MouseClick |
-	CSMASK_MouseDoubleClick | CSMASK_JoystickMove |
-	CSMASK_JoystickDown | CSMASK_JoystickUp | CSMASK_Nothing);
+  return SetupEventHandler (object_reg, evhdlr, eventmask);
 }
 
 bool csInitializer::OpenApplication (iObjectRegistry* object_reg)
@@ -353,6 +341,7 @@ void csInitializer::CloseApplication (iObjectRegistry* object_reg)
 void csInitializer::DestroyApplication (iObjectRegistry* object_reg)
 {
   CloseApplication (object_reg);
+  csPlatformShutdown (object_reg);
   if (installed_event_handler)
   {
     iEventQueue* q = CS_QUERY_REGISTRY (object_reg, iEventQueue);
@@ -371,57 +360,3 @@ void csInitializer::DestroyApplication (iObjectRegistry* object_reg)
 
   iSCF::SCF->Finish();
 }
-
-class csQuitEventHandler : public iEventHandler
-{
-private:
-  bool* shutdown;
-
-public:
-  csQuitEventHandler (bool* shutdown)
-  {
-    SCF_CONSTRUCT_IBASE (NULL);
-    csQuitEventHandler::shutdown = shutdown;
-    *shutdown = false;
-  }
-  SCF_DECLARE_IBASE;
-  virtual bool HandleEvent (iEvent& e)
-  {
-    if (e.Type == csevBroadcast && e.Command.Code == cscmdQuit)
-    {
-      *shutdown = true;
-      return true;
-    }
-    return false;
-  }
-};
-
-SCF_IMPLEMENT_IBASE (csQuitEventHandler)
-  SCF_IMPLEMENTS_INTERFACE (iEventHandler)
-SCF_IMPLEMENT_IBASE_END
-
-bool csInitializer::MainLoop (iObjectRegistry* object_reg)
-{
-  iEventQueue* q = CS_QUERY_REGISTRY (object_reg, iEventQueue);
-  if (!q) return false;
-  iVirtualClock* vc = CS_QUERY_REGISTRY (object_reg, iVirtualClock);
-  if (!vc) return false;
-  iEventQueue* ev = CS_QUERY_REGISTRY (object_reg, iEventQueue);
-  if (!ev) return false;
-
-  bool shutdown = false;
-  csQuitEventHandler* evhdlr = new csQuitEventHandler (&shutdown);
-  q->RegisterListener (evhdlr, CSMASK_Broadcast);
-
-  while (!shutdown)
-  {
-    vc->Advance ();
-    ev->Process ();
-  }
-
-  q->RemoveListener (evhdlr);
-  evhdlr->DecRef ();
-
-  return true;
-}
-

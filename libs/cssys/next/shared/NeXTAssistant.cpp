@@ -22,9 +22,11 @@
 #include "NeXTAssistant.h"
 #include "NeXTDelegate.h"
 #include "csutil/cfgacc.h"
+#include "cssys/sysfunc.h"
 #include "iutil/eventq.h"
 #include "iutil/objreg.h"
 #include "iutil/virtclk.h"
+#include "csver.h"
 
 typedef void* NeXTAssistantHandle;
 #define NSD_PROTO(RET,FUNC) extern "C" RET NeXTAssistant_##FUNC
@@ -32,6 +34,7 @@ typedef void* NeXTAssistantHandle;
 
 SCF_IMPLEMENT_IBASE(NeXTAssistant)
   SCF_IMPLEMENTS_INTERFACE(iNeXTAssistant)
+  SCF_IMPLEMENTS_INTERFACE(iNeXTAssistantLocal)
   SCF_IMPLEMENTS_EMBEDDED_INTERFACE(iEventPlug)
   SCF_IMPLEMENTS_EMBEDDED_INTERFACE(iEventHandler)
 SCF_IMPLEMENT_IBASE_END
@@ -47,7 +50,7 @@ SCF_IMPLEMENT_EMBEDDED_IBASE_END
 //-----------------------------------------------------------------------------
 // Constructor
 //-----------------------------------------------------------------------------
-NeXTAssistant::NeXTAssistant(NeXTSystemDriver* p) : system(p),
+NeXTAssistant::NeXTAssistant(iObjectRegistry* r) : registry(r),
   event_queue(0), event_outlet(0), virtual_clock(0), should_shutdown(false)
 {
   SCF_CONSTRUCT_IBASE(0);
@@ -71,25 +74,15 @@ NeXTAssistant::NeXTAssistant(NeXTSystemDriver* p) : system(p),
 NeXTAssistant::~NeXTAssistant()
 {
   NeXTDelegate_shutdown(controller);
-  orphan();
   if (virtual_clock != 0)
     virtual_clock->DecRef();
   if (event_outlet != 0)
     event_outlet->DecRef();
   if (event_queue != 0)
+  {
+    event_queue->RemoveListener(&scfiEventHandler);
     event_queue->DecRef();
-}
-
-
-//-----------------------------------------------------------------------------
-// get_registry
-//-----------------------------------------------------------------------------
-iObjectRegistry* NeXTAssistant::get_registry()
-{
-  iObjectRegistry* r = 0;
-  if (system != 0)
-    r = system->GetObjectRegistry();
-  return r;
+  }
 }
 
 
@@ -98,12 +91,8 @@ iObjectRegistry* NeXTAssistant::get_registry()
 //-----------------------------------------------------------------------------
 iEventQueue* NeXTAssistant::get_event_queue()
 {
-  if (event_queue == 0)
-  {
-    iObjectRegistry* r = get_registry();
-    if (r != 0)
-      event_queue = CS_QUERY_REGISTRY(r, iEventQueue);
-  }
+  if (event_queue == 0 && registry != 0)
+    event_queue = CS_QUERY_REGISTRY(registry, iEventQueue);
   return event_queue;
 }
 
@@ -113,29 +102,9 @@ iEventQueue* NeXTAssistant::get_event_queue()
 //-----------------------------------------------------------------------------
 iVirtualClock* NeXTAssistant::get_virtual_clock()
 {
-  if (virtual_clock == 0)
-  {
-    iObjectRegistry* r = get_registry();
-    if (r != 0)
-      virtual_clock = CS_QUERY_REGISTRY(r, iVirtualClock);
-  }
+  if (virtual_clock == 0 && registry != 0)
+    virtual_clock = CS_QUERY_REGISTRY(registry, iVirtualClock);
   return virtual_clock;
-}
-
-
-//-----------------------------------------------------------------------------
-// orphan
-//	System driver is disappearing, so cleanup.
-//-----------------------------------------------------------------------------
-void NeXTAssistant::orphan()
-{
-  if (system != 0)
-  {
-    iEventQueue* q = get_event_queue();
-    if (q != 0)
-      q->RemoveListener(&scfiEventHandler);
-    system = 0;
-  }
 }
 
 
@@ -154,11 +123,13 @@ void NeXTAssistant::init_menu(iConfigFile* next_config)
 
 //-----------------------------------------------------------------------------
 // start_event_loop
+//	This method returns only after a csevBroadcast even has been posted to
+//	the Crystal Space event queue with command code cscmdQuit.
 //-----------------------------------------------------------------------------
 void NeXTAssistant::start_event_loop()
 {
-  csConfigAccess next_config(system->GetObjectRegistry(), "/config/next.cfg",
-    true, iConfigManager::PriorityMin);
+  csConfigAccess next_config(registry, "/config/next.cfg", true,
+    iConfigManager::PriorityMin);
   init_menu(next_config);
   NeXTDelegate_start_event_loop(controller);
 }
@@ -284,4 +255,49 @@ bool NeXTAssistant::eiEventHandler::HandleEvent(iEvent& e)
   if (e.Type == csevBroadcast && e.Command.Code == cscmdQuit)
     scfParent->should_shutdown = true;
   return false;
+}
+
+
+//=============================================================================
+// Implementation of platform-specific application support functions.
+//=============================================================================
+//-----------------------------------------------------------------------------
+// csDefaultRunLoop
+//	Implementation of an application run-loop for applications which do
+//	not implement their own.
+//-----------------------------------------------------------------------------
+bool csDefaultRunLoop(iObjectRegistry* r)
+{
+  iNeXTAssistantLocal* a = CS_QUERY_REGISTRY(r, iNeXTAssistantLocal);
+  if (a != 0)
+    a->start_event_loop();
+  return (a != 0);
+}
+
+
+//-----------------------------------------------------------------------------
+// csPlatformStartup
+//	Platform-specific startup.
+//-----------------------------------------------------------------------------
+bool csPlatformStartup(iObjectRegistry* r)
+{
+  printf("Crystal Space for " CS_PLATFORM_NAME " " CS_VERSION "\nPorted to "
+    CS_PLATFORM_NAME " by Eric Sunshine <sunshine@sunshineco.com>\n\n");
+  iNeXTAssistant* a = new NeXTAssistant(r);
+  r->Register(a, "NeXTAssistant");
+  a->DecRef();
+  return true;
+}
+
+
+//-----------------------------------------------------------------------------
+// csPlatformShutdown
+//	Platform-specific shutdown.
+//-----------------------------------------------------------------------------
+bool csPlatformShutdown(iObjectRegistry* r)
+{
+  iNeXTAssistant* a = CS_QUERY_REGISTRY(r, iNeXTAssistant);
+  if (a != 0)
+    r->Unregister(a, "NeXTAssistant"); // DecRefs() assistant as a side-effect.
+  return true;
 }

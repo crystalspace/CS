@@ -23,18 +23,24 @@
 #if defined(__cplusplus)
 
 #include "cssys/next/NeXTAssistant.h"
-#include "cssys/next/NeXTSystemDriver.h"
 #include "iutil/event.h"
-#include "iutil/system.h"
+#include "iutil/eventh.h"
+struct iEventQueue;
 struct iObjectRegistry;
 struct iVirtualClock;
 typedef void* NeXTDelegateHandle;
 
-class NeXTAssistant : public iNeXTAssistant
+SCF_VERSION (iNeXTAssistantLocal, 0, 0, 1);
+struct iNeXTAssistantLocal : public iNeXTAssistant
+{
+  virtual void start_event_loop() = 0;
+};
+
+class NeXTAssistant : public iNeXTAssistantLocal
 {
 private:
-  NeXTSystemDriver* system;
   NeXTDelegateHandle controller;	// Application & window delegate.
+  iObjectRegistry* registry;		// Global shared-object registry.
   iEventQueue* event_queue;		// Global event queue.
   iEventOutlet* event_outlet;		// Shared event outlet.
   iVirtualClock* virtual_clock;		// Global virtual clock.
@@ -45,11 +51,9 @@ private:
   void init_menu(iConfigFile*);
 
 public:
-  NeXTAssistant(NeXTSystemDriver*);
+  NeXTAssistant(iObjectRegistry*);
   virtual ~NeXTAssistant();
-  void orphan();
-  void start_event_loop();
-
+  virtual void start_event_loop();
   virtual void request_shutdown();
   virtual void advance_state();
   virtual bool continue_running();

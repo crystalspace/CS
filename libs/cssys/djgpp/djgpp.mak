@@ -116,6 +116,8 @@ SRC.SYS_CSSYS = \
   libs/cssys/djgpp/djkeysys.s \
   libs/cssys/general/getopt.cpp \
   libs/cssys/general/instpath.cpp \
+  libs/cssys/general/runloop.cpp \
+  libs/cssys/general/sysinit.cpp \
   libs/cssys/general/timing.cpp
 ifeq ($(USE_PLUGINS),yes)
 SRC.SYS_CSSYS += libs/cssys/djgpp/loadlib.cpp libs/cssys/general/findlib.cpp

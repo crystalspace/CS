@@ -109,8 +109,10 @@ SRC.SYS_CSSYS= \
   libs/cssys/unix/loadlib.cpp \
   libs/cssys/unix/instpath.cpp \
   libs/cssys/general/findlib.cpp \
+  libs/cssys/general/getopt.cpp \
   libs/cssys/general/printf.cpp \
-  libs/cssys/general/getopt.cpp
+  libs/cssys/general/runloop.cpp \
+  libs/cssys/general/sysinit.cpp
 
 # The C compiler.
 #CC=gcc -c

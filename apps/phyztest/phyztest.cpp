@@ -784,7 +784,7 @@ int main (int argc, char* argv[])
   }
 
   // Main loop.
-  csInitializer::MainLoop (System->object_reg);
+  csDefaultRunLoop(System->object_reg);
 
   // Cleanup.
   Cleanup ();

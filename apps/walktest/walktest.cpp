@@ -1747,7 +1747,7 @@ int main (int argc, char* argv[])
     csCommandProcessor::start_script (Sys->auto_script);
 
   // The main loop.
-  csInitializer::MainLoop (Sys->object_reg);
+  csDefaultRunLoop(Sys->object_reg);
 
   Cleanup ();
 

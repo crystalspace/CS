@@ -433,7 +433,7 @@ static EventLoopTimerUPP GetTimerUPP (void)
 
 @@@ TO THE MAC MAINTAINER!
 SysSystemDriver::Loop() has gone. This is now handled in
-csInitializer::MainLoop(). All Mac specific stuff should be handled
+csDefaultRunLoop(). All Mac specific stuff should be handled
 here in the Mac system driver (for now). The stuff that is called
 before the loop starts is best moved to Initialize(). The stuff
 that is called in the loop should move to a cscmdPreProcess event.

@@ -3300,7 +3300,7 @@ int main (int argc, char* argv[])
 #if defined(BLOCKS_NETWORKING)
   do_network = Sys->InitNet();
 #endif
-  csInitializer::MainLoop (object_reg);
+  csDefaultRunLoop(object_reg);
 
   Cleanup ();
   return 0;
