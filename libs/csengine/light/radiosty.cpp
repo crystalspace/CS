@@ -1276,7 +1276,7 @@ void csRadiosity :: ShootPatch(int rx, int ry, int ruv)
 {
   // check visibility
   float visibility = shadow_matrix->coverage[ruv];
-  if(visibility <= SMALL_EPSILON) return;
+  //if(visibility <= SMALL_EPSILON) return;
 
   // prepare dest lumel info
   shoot_dest->Lumel2World(dest_lumel, rx, ry);
@@ -1289,12 +1289,10 @@ void csRadiosity :: ShootPatch(int rx, int ry, int ruv)
   // is not really a cosinus. But it doesn't matter for our calculations.
   // If specular is enabled it matters and in that case we correct it.
   float cossrcangle = src_normal * path;
-  if (cossrcangle < SMALL_EPSILON) 
-    return;
+  //if (cossrcangle < SMALL_EPSILON) return;
 
   float cosdestangle = - (dest_normal * path);
-  if (cosdestangle < SMALL_EPSILON) 
-    return; 
+  //if (cosdestangle < SMALL_EPSILON) return; 
   // facing away, negative light is not good.
 
   float sqdistance = path.SquaredNorm ();
@@ -1306,8 +1304,13 @@ void csRadiosity :: ShootPatch(int rx, int ry, int ruv)
 
   //if(totalfactor > 10.0f) totalfactor = 10.0f;
 
-#if 1
-  if(totalfactor > 10.0f)
+  if(totalfactor < 0.0)
+  {
+    //CsPrintf(MSG_STDOUT, "totalfactor was %g\n", totalfactor);
+    totalfactor = -totalfactor;
+  }
+#if 0
+  //if(totalfactor > 10.0f)
   //if(totalfactor > 0.001f)
     CsPrintf(MSG_STDOUT, "totalfactor %g = "
   	"cosshoot %g * cosdest %g * area %g * vis %g / sqdis %g.  "
@@ -1320,7 +1323,7 @@ void csRadiosity :: ShootPatch(int rx, int ry, int ruv)
 
   //shoot_dest->AddDelta(shoot_src, src_uv, ruv, totalfactor, src_lumel_color);
   if(totalfactor > 0.000001) 
-    shoot_dest->AddToDelta(ruv, delta_color * totalfactor * 255.);
+    shoot_dest->AddToDelta(ruv, delta_color * totalfactor * 1.);
 
   // specular gloss
   // direction of the 'light' on dest is -path
