@@ -39,7 +39,7 @@ awsWindow::awsWindow():above(NULL), below(NULL),
   min_button(NULL), max_button(NULL), close_button(NULL), btxt(NULL),
   frame_style(fsNormal), 
   frame_options(foControl | foZoom | foMin | foClose | foTitle | foGrip | foRoundBorder),
-  resizing_mode(false), moving_mode(false)
+  resizing_mode(false), moving_mode(false), minp(50,5), maxp(34,5), closep(18,5)
 {
 
 }
@@ -80,6 +80,10 @@ awsWindow::Setup(iAws *_wmgr, awsComponentNode *settings)
 
   pm->GetInt(settings, "Style", frame_style);
   pm->GetInt(settings, "Options", frame_options);
+
+  pm->LookupPointKey("WindowMinAt", minp);
+  pm->LookupPointKey("WindowZoomAt", maxp);
+  pm->LookupPointKey("WindowCloseAt", closep);
   
   return true;
 }
@@ -547,9 +551,9 @@ awsWindow::OnDraw(csRect clip)
       close_button->GetOriginalDimensions(ctw, cth);
 
       // Draw min/max/close buttons
-      g3d->DrawPixmap(min_button, Frame().xmax-(13*3)-8, Frame().ymin+toff+3, mtw, mth, 0,0, mtw, mth, 0);
-      g3d->DrawPixmap(max_button, Frame().xmax-(13*2)-8, Frame().ymin+toff+3, mxtw, mth, 0,0, mxtw, mxth, 0);
-      g3d->DrawPixmap(close_button, Frame().xmax-13-6, Frame().ymin+toff+3, ctw, cth, 0,0, ctw, cth, 0);
+      g3d->DrawPixmap(min_button, Frame().xmax-minp.x, Frame().ymin+minp.y, mtw, mth, 0,0, mtw, mth, 0);
+      g3d->DrawPixmap(max_button, Frame().xmax-maxp.x, Frame().ymin+maxp.y, mxtw, mth, 0,0, mxtw, mxth, 0);
+      g3d->DrawPixmap(close_button, Frame().xmax-closep.x, Frame().ymin+closep.y, ctw, cth, 0,0, ctw, cth, 0);
            
       //Todo:  add in button locations for the window def.  That way we know right where to put them.
 

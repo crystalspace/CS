@@ -383,6 +383,30 @@ awsPrefManager::LookupRGBKey(unsigned long id, unsigned char &red, unsigned char
 }
 
 bool
+awsPrefManager::LookupPointKey(char *name, csPoint &val)
+{
+    return LookupPointKey(NameToId(name),val);
+}
+
+
+bool
+awsPrefManager::LookupPointKey(unsigned long id, csPoint &val)
+{
+    awsKey *k = ((awsKeyContainer *)def_skin)->Find(id);
+
+    if (k)
+    {
+      if (k->Type() == KEY_POINT) 
+      {
+        val = ((awsPointKey *)k)->Value();
+        return true;
+      }
+    }
+
+    return false;
+}
+
+bool
 awsPrefManager::GetInt(awsComponentNode *node, char *name, int &val)
 {
     if (!node) return false;

@@ -21,6 +21,7 @@
 #include "iutil/eventh.h"
 #include "iutil/comp.h"
 #include "csgeom/csrect.h"
+#include "csgeom/cspoint.h"
 #include "awscomp.h"
 
 /***************************************************************************************************************************
@@ -75,6 +76,9 @@ private:
 
     /// True if we are currently moving
     bool moving_mode;
+
+    /// Points for placement of controls, offset from top, right of window.
+    csPoint minp, maxp, closep;
 
 public:
    static const unsigned long sWindowRaised;

@@ -19,6 +19,7 @@
 *****************************************************************************/
 #include "ivaria/aws.h"
 #include "csgeom/csrect.h"
+#include "csgeom/cspoint.h"
 #include "csutil/csdllist.h"
 #include "csutil/csvector.h"
 
@@ -46,7 +47,8 @@ const unsigned char KEY_RECT = 2;
 const unsigned char KEY_WIN  = 3;
 const unsigned char KEY_SKIN = 4;
 const unsigned char KEY_COMPONENT = 5;
-const unsigned char KEY_RGB = 6;
+const unsigned char KEY_RGB  = 6;
+const unsigned char KEY_POINT= 7;
 
 /// Abstract key interface
 class awsKey
@@ -152,6 +154,26 @@ public:
 
   /// Gets the value of this key as a rectangle
   awsRGBKey::RGB& Value() { return rgb; }
+};
+
+class awsPointKey : public awsKey
+{
+  /// The key's value
+  csPoint val;
+
+public:
+  /// Constructs an integer key with the given name
+  awsPointKey(iString *name, csPoint v):awsKey(name), val(v) {};
+
+  /// Destructor does nothing
+  virtual ~awsPointKey() {};
+
+  /// So that we know this is a rect key 
+  virtual unsigned char Type() 
+  { return KEY_POINT; }
+
+  /// Gets the value of this key as a rectangle
+  csPoint Value() { return val; }
 };
 
 
@@ -331,7 +353,13 @@ public:
     
     /// Lookup the value of an RGB key by name (from the skin def)
     virtual bool LookupRGBKey(unsigned long id, unsigned char &red, unsigned char &green, unsigned char &blue);
-        
+
+    /// Lookup the value of a point key by name (from the skin def)
+    virtual bool LookupPointKey(char *name, csPoint &point); 
+
+    /// Lookup the value of a point key by id (from the skin def)
+    virtual bool LookupPointKey(unsigned long id, csPoint &point); 
+            
     /// Get the value of an integer from a given component node
     virtual bool GetInt(awsComponentNode *node, char *name, int &val);
 

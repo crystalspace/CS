@@ -10,12 +10,12 @@ SCF_IMPLEMENT_IBASE(awsCmdButton)
   SCF_IMPLEMENTS_INTERFACE(awsComponent)
 SCF_IMPLEMENT_IBASE_END
 
-const unsigned int awsCmdButton::fsNormal =0x0;
-const unsigned int awsCmdButton::fsToolbar=0x1;
-const unsigned int awsCmdButton::fsBitmap =0x2;
+const int awsCmdButton::fsNormal =0x0;
+const int awsCmdButton::fsToolbar=0x1;
+const int awsCmdButton::fsBitmap =0x2;
 
 awsCmdButton::awsCmdButton():is_down(false), mouse_is_over(false), 
-                             frame_style(0), alpha_level(0),
+                             frame_style(0), alpha_level(92),
                              caption(NULL)
 {
   tex[0]=tex[1]=tex[2]=NULL;
@@ -31,9 +31,10 @@ awsCmdButton::Setup(iAws *_wmgr, awsComponentNode *settings)
  if (!awsComponent::Setup(_wmgr, settings)) return false;
 
  iAwsPrefs *pm=WindowManager()->GetPrefMgr();
-      
+ 
+ pm->LookupIntKey("ButtonTextureAlpha", alpha_level); // global get
  pm->GetInt(settings, "Style", frame_style);
- pm->GetInt(settings, "Style", alpha_level);
+ pm->GetInt(settings, "Alpha", alpha_level);          // local overrides, if present.
  pm->GetString(settings, "Caption", caption);
 
  switch(frame_style)
@@ -121,7 +122,7 @@ awsCmdButton::OnDraw(csRect clip)
     }
 
     if (tex[0])
-       g3d->DrawPixmap(tex[0], Frame().xmin, Frame().ymin, Frame().Width(), Frame().Height(), 0, 0, Frame().Width(), Frame().Height(), 96);
+       g3d->DrawPixmap(tex[0], Frame().xmin, Frame().ymin, Frame().Width()+1, Frame().Height()+1, 0, 0, Frame().Width()+1, Frame().Height()+1, alpha_level);
 
     
     // Draw the caption, if there is one and the style permits it.

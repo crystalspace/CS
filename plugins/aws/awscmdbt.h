@@ -49,13 +49,13 @@ public:
    /******* Frame Styles **********************/
     
    /// A "normal" button.  Is textured if there is a background texture.
-   static const unsigned int fsNormal;
+   static const int fsNormal;
 
    /// A toolbar button.  Cannot have text, only an image.
-   static const unsigned int fsToolbar;
+   static const int fsToolbar;
 
    /// A button entirely drawn from bitmap images.  Must specify normal, focused and clicked.
-   static const unsigned int fsBitmap;
+   static const int fsBitmap;
         
     
 public:

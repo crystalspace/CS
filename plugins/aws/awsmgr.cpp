@@ -460,8 +460,8 @@ awsManager::RecursiveDrawChildren(awsComponent *cmp, csRect &dirtyarea)
      if (DEBUG_MANAGER) printf("aws-debug: entered draw children loop for %p.\n", child);
 
      // Check to see if this component even needs redrawing.
-     if (!dirtyarea.Intersects(child->Frame()))
-       continue;                                            
+     //if (!dirtyarea.Intersects(child->Frame()))
+       //continue;                                            
 
      csRect clip(child->Frame());
      clip.Intersect(dirtyarea);

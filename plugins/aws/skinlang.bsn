@@ -132,6 +132,8 @@ window:        TOKEN_WINDOW TOKEN_STR  '{' window_item_list '}'					{
 
 skin_item:       TOKEN_ATTR ':' TOKEN_STR             { $$ = new awsStringKey(new scfString($1), new scfString($3)); }
 	       | TOKEN_ATTR ':' exp ',' exp ',' exp       { $$ = new awsRGBKey(new scfString($1), $3, $5, $7);           }
+		   | TOKEN_ATTR ':' exp						  { $$ = new awsIntKey(new scfString($1), $3);					 }
+		   | TOKEN_ATTR ':' '(' exp ',' exp ')'		  { $$ = new awsPointKey(new scfString($1), csPoint($4, $6));    }
 ;
 
 skin_item_list:  skin_item                            { skcont.Add($1); }
