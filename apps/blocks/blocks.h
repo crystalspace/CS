@@ -102,6 +102,7 @@ struct CubeInfo
 {
   csRef<iMeshWrapper> thing;
   float dx, dy, dz;
+  csVector3 shift;
 };
 
 class TextEntryMenu

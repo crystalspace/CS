@@ -145,8 +145,6 @@ csGenmeshMeshObject::csGenmeshMeshObject (csGenmeshMeshObjectFactory* factory)
   do_shadow_rec = false;
   lighting_dirty = true;
   shadow_caps = false;
-  hard_transform = 0;
-  hard_bbox = 0;
 
   dynamic_ambient.Set (0,0,0);
   ambient_version = 0;
@@ -171,9 +169,6 @@ csGenmeshMeshObject::~csGenmeshMeshObject ()
     delete (csGenmeshShadowCacheEntry*) shadowCache.Pop ();
   }
 #endif
-
-  delete hard_transform;
-  delete hard_bbox;
 }
 
 void csGenmeshMeshObject::CheckLitColors ()
@@ -390,7 +385,7 @@ void csGenmeshMeshObject::AppendShadows (iMovable* movable,
   int vt_num = factory->GetVertexCount ();
   csVector3* vt_world, * vt_array_to_delete;
   int i;
-  if (movable->IsFullTransformIdentity () && !hard_transform)
+  if (movable->IsFullTransformIdentity ())
   {
     vt_array_to_delete = 0;
     vt_world = vt;
@@ -400,8 +395,6 @@ void csGenmeshMeshObject::AppendShadows (iMovable* movable,
     vt_array_to_delete = new csVector3 [vt_num];
     vt_world = vt_array_to_delete;
     csReversibleTransform movtrans = movable->GetFullTransform ();
-    if (hard_transform)
-      movtrans *= *hard_transform;
     for (i = 0 ; i < vt_num ; i++)
       vt_world[i] = movtrans.This2Other (vt[i]);
   }
@@ -470,8 +463,6 @@ bool csGenmeshMeshObject::DrawTest (iRenderView* rview, iMovable* movable)
   tr_o2c = camera->GetTransform ();
   if (!movable->IsFullTransformIdentity ())
     tr_o2c /= movable->GetFullTransform ();
-  if (hard_transform)
-    tr_o2c /= *hard_transform;
 
   int clip_portal, clip_plane, clip_z_plane;
   csVector3 radius;
@@ -604,8 +595,6 @@ void csGenmeshMeshObject::UpdateLighting2 (iMovable* movable)
     colors[i] = col;
 
   csReversibleTransform trans = movable->GetFullTransform ();
-  if (hard_transform)
-    trans *= *hard_transform;
   csGlobalHashIterator it (affecting_lights.GetHashMap ());
   while (it.HasNext ())
   {
@@ -653,8 +642,6 @@ void csGenmeshMeshObject::UpdateLighting (iLight** lights, int num_lights,
 
   // Do the lighting.
   csReversibleTransform trans = movable->GetFullTransform ();
-  if (hard_transform)
-    trans *= *hard_transform;
   // the object center in world coordinates. "0" because the object
   // center in object space is obviously at (0,0,0).
   for (l = 0 ; l < num_lights ; l++)
@@ -754,8 +741,6 @@ csRenderMesh** csGenmeshMeshObject::GetRenderMeshes (int& n)
 /*  tr_o2c = camera->GetTransform ();
   if (!movable->IsFullTransformIdentity ())
     tr_o2c /= movable->GetFullTransform ();
-  if (hard_transform)
-    tr_o2c /= *hard_transform;*/
 
   iMaterialWrapper* mater = material;
   if (!mater) mater = factory->GetMaterialWrapper ();
@@ -805,8 +790,6 @@ bool csGenmeshMeshObject::DrawShadow (iRenderView* rview, iMovable* movable,
   csReversibleTransform tr_o2c = camera->GetTransform ();
   if (!movable->IsFullTransformIdentity ())
     tr_o2c /= movable->GetFullTransform ();
-  if (hard_transform)
-    tr_o2c /= *hard_transform;
 
   csRef<iMaterialWrapper> mater = factory->shadowmat;
 
@@ -1027,8 +1010,6 @@ bool csGenmeshMeshObject::DrawLight (iRenderView* rview, iMovable* movable,
   csReversibleTransform tr_o2c = camera->GetTransform ();
   if (!movable->IsFullTransformIdentity ())
     tr_o2c /= movable->GetFullTransform ();
-  if (hard_transform)
-    tr_o2c /= *hard_transform;
 
   iMaterialWrapper* mater = material;
   if (!mater) mater = factory->GetMaterialWrapper ();
@@ -1078,61 +1059,14 @@ bool csGenmeshMeshObject::DrawLight (iRenderView* rview, iMovable* movable,
 #endif // if 0
 #endif // CS_USE_NEW_RENDERER
 
-void csGenmeshMeshObject::CalculateBBoxRadiusHard ()
-{
-  if (hard_bbox) return;
-  hard_bbox = new csBox3 ();
-  if (factory->GetVertexCount () == 0)
-  {
-    hard_bbox->StartBoundingBox ();
-    hard_radius.Set (0, 0, 0);
-    return;
-  }
-
-  csVector3* vt = factory->GetVertices ();
-  csVector3 v0 = hard_transform->This2Other (vt[0]);
-  hard_bbox->StartBoundingBox (v0);
-  csVector3 max_sq_radius (v0.x*v0.x + v0.x*v0.x,
-    	v0.y*v0.y + v0.y*v0.y, v0.z*v0.z + v0.z*v0.z);
-  int i;
-  for (i = 1 ; i < factory->GetVertexCount () ; i++)
-  {
-    csVector3 v = hard_transform->This2Other (vt[i]);
-    hard_bbox->AddBoundingVertexSmart (v);
-    csVector3 sq_radius (v.x*v.x + v.x*v.x, v.y*v.y + v.y*v.y,
-    	v.z*v.z + v.z*v.z);
-    if (sq_radius.x > max_sq_radius.x) max_sq_radius.x = sq_radius.x;
-    if (sq_radius.y > max_sq_radius.y) max_sq_radius.y = sq_radius.y;
-    if (sq_radius.z > max_sq_radius.z) max_sq_radius.z = sq_radius.z;
-  }
-  hard_radius.Set (qsqrt (max_sq_radius.x),
-  	qsqrt (max_sq_radius.y), qsqrt (max_sq_radius.z));
-}
-
 void csGenmeshMeshObject::GetObjectBoundingBox (csBox3& bbox, int /*type*/)
 {
-  if (hard_transform)
-  {
-    CalculateBBoxRadiusHard ();
-    bbox = *hard_bbox;
-  }
-  else
-  {
-    bbox = factory->GetObjectBoundingBox ();
-  }
+  bbox = factory->GetObjectBoundingBox ();
 }
 
 void csGenmeshMeshObject::GetRadius (csVector3& rad, csVector3& cent)
 {
-  if (hard_transform)
-  {
-    CalculateBBoxRadiusHard ();
-    rad = hard_radius;
-  }
-  else
-  {
-    rad = factory->GetRadius ();
-  }
+  rad = factory->GetRadius ();
   cent.Set (0);
 }
 
@@ -1214,22 +1148,6 @@ int csGenmeshMeshObject::PolyMesh::GetPolygonCount ()
 csMeshedPolygon* csGenmeshMeshObject::PolyMesh::GetPolygons ()
 {
   return scfParent->factory->GetPolygons ();
-}
-
-void csGenmeshMeshObject::HardTransform (const csReversibleTransform& t)
-{
-  if (!hard_transform)
-  {
-    hard_transform = new csReversibleTransform ();
-    *hard_transform = t;
-  }
-  else
-  {
-    *hard_transform = t * *hard_transform;
-  }
-  // Force recomputation of bbox.
-  delete hard_bbox;
-  hard_bbox = 0;
 }
 
 iObjectModel* csGenmeshMeshObject::GetObjectModel ()

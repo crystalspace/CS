@@ -116,12 +116,6 @@ private:
   float current_lod;
   uint32 current_features;
 
-  // Optional hard transform and bbox in case of hard transform.
-  csReversibleTransform* hard_transform;
-
-  csBox3* hard_bbox;
-  csVector3 hard_radius;
-
   bool do_shadows;
   bool do_shadow_rec;
 
@@ -176,9 +170,6 @@ private:
    * Update lighting using the iLightingInfo system.
    */
   void UpdateLighting2 (iMovable* movable);
-
-  /// Used in case of a hard transformed mesh object.
-  void CalculateBBoxRadiusHard ();
 
 public:
   /// Constructor.
@@ -249,9 +240,10 @@ public:
   {
     return vis_cb;
   }
-  virtual void NextFrame (csTicks /*current_time*/, const csVector3& /*pos*/) { }
-  virtual void HardTransform (const csReversibleTransform&);
-  virtual bool SupportsHardTransform () const { return true; }
+  virtual void NextFrame (csTicks /*current_time*/,
+  	const csVector3& /*pos*/) { }
+  virtual void HardTransform (const csReversibleTransform&) { }
+  virtual bool SupportsHardTransform () const { return false; }
   virtual bool HitBeamOutline (const csVector3& start, const csVector3& end,
     csVector3& isect, float *pr);
   virtual bool HitBeamObject (const csVector3& start, const csVector3& end,

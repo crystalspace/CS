@@ -768,11 +768,6 @@ csRef<iMeshWrapper> Blocks::create_cube_thing (float dx, float dy, float dz,
 {
   csRef<iMeshWrapper> cube (CreateMeshFromFactory (tmpl, "cubexxx"));
   cube->GetMovable ()->SetSector (room);
-  csVector3 shift (
-  	(dx-shift_rotate.x)*CUBE_DIM,
-  	(dz-shift_rotate.z)*CUBE_DIM,
-	(dy-shift_rotate.y)*CUBE_DIM);
-  cube->HardTransform (csTransform (csMatrix3 (), shift));
   return cube;
 }
 
@@ -788,6 +783,10 @@ void Blocks::add_cube (float dx, float dy, float dz, float x, float y, float z,
   cube_info[num_cubes].dx = dx;
   cube_info[num_cubes].dy = dy;
   cube_info[num_cubes].dz = dz;
+  cube_info[num_cubes].shift.Set (
+  		(dx-shift_rotate.x)*CUBE_DIM,
+		(dz-shift_rotate.z)*CUBE_DIM,
+		(dy-shift_rotate.y)*CUBE_DIM);
   num_cubes++;
 }
 
@@ -803,6 +802,11 @@ csRef<iMeshWrapper> Blocks::add_cube_thing (iSector* sect,
   gm_state->SetShadowReceiving (true);
   cube->GetMovable ()->SetSector (sect);
   csVector3 v (x, y, z);
+  csVector3 shift (
+  	(dx-shift_rotate.x)*CUBE_DIM,
+  	(dz-shift_rotate.z)*CUBE_DIM,
+	(dy-shift_rotate.y)*CUBE_DIM);
+  v += shift;
   cube->GetMovable ()->SetPosition (sect, v);
   cube->GetMovable ()->UpdateMove ();
   return cube;
@@ -1653,7 +1657,8 @@ void Blocks::HandleStartupMovement (csTicks elapsed_time)
     dynlight_x = old_dyn_x;
   }
   dynlight->QueryLight ()->SetSector (demo_room);
-  dynlight->QueryLight ()->SetCenter (csVector3 (dynlight_x, dynlight_y, dynlight_z));
+  dynlight->QueryLight ()->SetCenter (
+  	csVector3 (dynlight_x, dynlight_y, dynlight_z));
   dynlight->Setup ();
 }
 
@@ -1766,7 +1771,14 @@ void Blocks::HandleGameMovement (csTicks elapsed_time)
   {
     iMeshWrapper* t = cube_info[i].thing;
     if (do_rot)
-      t->GetMovable ()->Transform (rot);
+    {
+      csReversibleTransform& movt = t->GetMovable ()->GetTransform ();
+      csVector3& shiftt = cube_info[i].shift;
+      movt.SetT2O (rot * movt.GetT2O ());
+      movt.Translate (-shiftt);
+      shiftt = rot * shiftt;
+      movt.Translate (shiftt);
+    }
     t->GetMovable ()->MovePosition (csVector3 (dx, -elapsed_fall, dy));
     t->GetMovable ()->UpdateMove ();
     room->ShineLights (t);

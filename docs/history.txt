@@ -3,6 +3,14 @@ http://crystal.sourceforge.net/
 
 The history order is reversed so that new features are at the top.
 
+3-June-2003
+	- Jorrit changed Blocks so it no longer uses HardTransform() on
+	  genmesh instances.
+	- Jorrit removed support for HardTransform() in genmesh objects.
+	  Only HardTransform() for factories is supported.
+	  The reason that I removed this is that it is not really needed
+	  and it was very hard to get completely right. It was also not
+	  very efficient.
 2-June-2003
 	- Philip Wyett updated the docs to reflect a new msvc_libs release.
 	- Jorrit fixed genmesh in case the genmesh object (not the factory)
