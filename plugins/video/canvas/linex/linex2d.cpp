@@ -542,6 +542,12 @@ void csLineX2DFontServer::csLineX2DFont::GetDimensions (const char *text, int &o
   oH = FontH;
 }
 
+void csLineX2DFontServer::csLineX2DFont::GetDimensions (const char *text, int &oW, int &oH, int &, int &, int &)
+{
+  oW = XTextWidth (xfont, text, strlen (text));
+  oH = FontH;
+}
+
 int csLineX2DFontServer::csLineX2DFont::GetLength (const char *text, int maxwidth)
 {
   int i;
