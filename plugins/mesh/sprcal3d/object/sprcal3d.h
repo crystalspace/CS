@@ -22,7 +22,7 @@
 // This include looks horrible, but assumes that cal3d 
 // is set up in the usual way and shares the same parent
 // directory as CS.
-#include "../../../../../cal3d/cal3d/src/cal3d/cal3d.h"
+#include "cal3d/cal3d.h"
 
 #include "cssys/sysfunc.h"
 #include "csutil/cscolor.h"

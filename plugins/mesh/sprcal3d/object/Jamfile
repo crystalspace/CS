@@ -1,0 +1,11 @@
+SubDir TOP plugins mesh sprcal3d object ;
+
+Plugin sprcal3d
+	: [ Wildcard *.cpp *.h ]
+;
+LinkWith sprcal3d : csgeom cssys csutil ;
+ExternalLibs sprcal3d : CAL3D ;
+
+Help sprcal3d : "Cal3D Sprite mesh object plug-in" ;
+CompileGroups sprcal3d :  meshes ;
+
