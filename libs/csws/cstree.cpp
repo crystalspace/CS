@@ -1028,7 +1028,7 @@ void csTreeCtrl::Delete (csComponent *comp)
   csComponent::Delete (comp);
 }
 
-static bool CompareTreeCtrlNode ( csTreeNode *node, csSome param, bool stopOnSuccess)
+bool CompareTreeCtrlNode ( csTreeNode *node, csSome param, bool stopOnSuccess)
 {
   (void)stopOnSuccess;
   return ((csTreeCtrl::TreeCtrlNode*)node)->item == (csComponent*)param;
@@ -1036,7 +1036,7 @@ static bool CompareTreeCtrlNode ( csTreeNode *node, csSome param, bool stopOnSuc
 
 csTreeCtrl::TreeCtrlNode *csTreeCtrl::TreeCtrlNode::FindItem (csComponent *theItem)
 { 
-  return (csTreeCtrl::TreeCtrlNode *)DSF (CompareTreeCtrlNode, NULL, theItem, true); 
+  return (TreeCtrlNode *)DSF (CompareTreeCtrlNode, NULL, theItem, true); 
 }
 
 csTreeCtrl::TreeCtrlNode *csTreeCtrl::TreeCtrlNode::Next (TreeCtrlNode* after)
@@ -1103,12 +1103,12 @@ csTreeCtrl::TreeCtrlNode *csTreeCtrl::TreeCtrlNode::Prev (TreeCtrlNode* before)
   return foundNode;
 }
 
-static bool BranchOpen (csTreeNode *node)
+bool BranchOpen (csTreeNode *node)
 {
   return ((csTreeCtrl::TreeCtrlNode*)node)->open;
 }
 
-static bool TreeItemSelected (csTreeNode *node, csSome param, bool stopOnSuccess)
+bool TreeItemSelected (csTreeNode *node, csSome param, bool stopOnSuccess)
 {
   (void)param;
   (void)stopOnSuccess;
@@ -1178,7 +1178,7 @@ void csTreeCtrl::RemoveChild (csComponent *item)
     delete node;
 }
 
-static bool ZipTreeItemCanvas (csTreeNode *node, csSome param, bool stopOnSuccess)
+bool ZipTreeItemCanvas (csTreeNode *node, csSome param, bool stopOnSuccess)
 {
   (void)param;
   (void)stopOnSuccess;
@@ -1211,7 +1211,7 @@ void csTreeCtrl::OpenItem (csComponent *item)
   }
 }
 
-static bool OpenAllItems (csTreeNode *node, csSome param, bool stopOnSuccess)
+bool OpenAllItems (csTreeNode *node, csSome param, bool stopOnSuccess)
 {
   (void)param;
   (void)stopOnSuccess;
@@ -1239,7 +1239,7 @@ void csTreeCtrl::CollapseItem (csComponent *item)
   }
 }
 
-static bool CollapsAllItems (csTreeNode *node, csSome param, bool stopOnSuccess)
+bool CollapsAllItems (csTreeNode *node, csSome param, bool stopOnSuccess)
 {
   (void)param;
   (void)stopOnSuccess;

@@ -269,6 +269,7 @@ enum
  * items at a time (if that style flag is set).
  */
 
+
 class csTreeCtrl : public csComponent
 {
   class TreeCtrlNode : public csTreeNode
@@ -286,6 +287,13 @@ class csTreeCtrl : public csComponent
     csComponent *item;
     bool open;
   };
+
+friend bool CompareTreeCtrlNode (csTreeNode *node, csSome param, bool stopOnSuccess);
+friend bool TreeItemSelected (csTreeNode *node, csSome param, bool stopOnSuccess);
+friend bool ZipTreeItemCanvas (csTreeNode *node, csSome param, bool stopOnSuccess);
+friend bool OpenAllItems (csTreeNode *node, csSome param, bool stopOnSuccess);
+friend bool CollapsAllItems (csTreeNode *node, csSome param, bool stopOnSuccess);
+friend bool BranchOpen (csTreeNode *node);
 
   TreeCtrlNode *treeroot;
   /// Tree style
