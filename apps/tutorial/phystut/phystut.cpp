@@ -115,10 +115,19 @@ void Simple::SetupFrame ()
   if (kbd->GetKeyState (CSKEY_DOWN))
     c->Move (CS_VEC_BACKWARD * 5 * speed);
 
-  // Step by 
-  const float stepSize = .01;
-  float step = speed;
-  while (step > 0) { dyn->Step (stepSize); step -= stepSize; }
+  // Take small steps.
+  const float maxStep = .01;
+  float ta = 0;
+  float tb = speed;
+  while (ta < speed)
+  {
+    if (tb - ta > maxStep)
+      tb = ta + maxStep;
+
+    dyn->Step (tb - ta);
+    ta = tb;
+    tb = speed;
+  }
 
   // Tell 3D driver we're going to display 3D things.
   if (!g3d->BeginDraw (engine->GetBeginDrawFlags () | CSDRAW_3DGRAPHICS))
@@ -506,10 +515,10 @@ void Simple::CreateSphere (void)
   mesh->DecRef ();
 
   // Create and attach a sphere collider.
-  rb->AttachColliderSphere (radius.Norm()/2, csVector3 (0), 10, 1, .25);
+  rb->AttachColliderSphere (radius.Norm()/2, csVector3 (0), 10, 1, .1);
 
   // Fling the body.
-  rb->SetLinearVelocity (tc.GetT2O () * csVector3 (0, 0, 5));
+  rb->SetLinearVelocity (tc.GetT2O () * csVector3 (0, 0, 6));
   rb->SetAngularVelocity (tc.GetT2O () * csVector3 (0, 0, 5));
 }
 
