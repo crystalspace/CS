@@ -14,7 +14,7 @@ awsBorderLayout::awsBorderLayout (iAwsComponent *owner,
 
   // Get gap settings.
   pm->GetInt(settings, "VerticalGap", vGap);
-  pm->GetInt(settings, "HorziontalGap", hGap);
+  pm->GetInt(settings, "HorizontalGap", hGap);
 };
 
 
@@ -96,9 +96,9 @@ void awsBorderLayout::LayoutComponents ()
     csRect cr = cmp->getPreferredSize();
 
     cmp->Frame().xmin=r.xmin+i.xmin;
-    cmp->Frame().ymin=r.ymin+i.ymin+(has_north ? components[GBS_NORTH]->Frame().Height() : 0);
+    cmp->Frame().ymin=r.ymin+i.ymin+(has_north ? components[GBS_NORTH]->Frame().Height() + vGap : 0);
     cmp->Frame().xmax=r.xmin+r.xmin+i.xmin+cr.xmax;
-    cmp->Frame().ymax=r.ymax-i.ymax-(has_south ? components[GBS_SOUTH]->Frame().Height() : 0);
+    cmp->Frame().ymax=r.ymax-i.ymax-(has_south ? components[GBS_SOUTH]->Frame().Height() + vGap : 0);
 
     cmp->OnResized();
   }
@@ -111,9 +111,9 @@ void awsBorderLayout::LayoutComponents ()
     csRect cr = cmp->getPreferredSize();
 
     cmp->Frame().xmin=r.xmax-i.xmax-cr.xmax;
-    cmp->Frame().ymin=r.ymin+i.ymin+(has_north ? components[GBS_NORTH]->Frame().Height() : 0);
+    cmp->Frame().ymin=r.ymin+i.ymin+(has_north ? components[GBS_NORTH]->Frame().Height() + vGap : 0);
     cmp->Frame().xmax=r.xmax-i.xmax;
-    cmp->Frame().ymax=r.ymax-i.ymax-(has_south ? components[GBS_SOUTH]->Frame().Height() : 0);
+    cmp->Frame().ymax=r.ymax-i.ymax-(has_south ? components[GBS_SOUTH]->Frame().Height() + vGap: 0);
 
     cmp->OnResized();
   }
@@ -124,10 +124,10 @@ void awsBorderLayout::LayoutComponents ()
 
     csRect cr = cmp->getPreferredSize();
 
-    cmp->Frame().xmin=r.xmin+i.xmin + (has_east ? components[GBS_EAST]->Frame().Width() : 0);
-    cmp->Frame().ymin=r.ymin+i.ymin + (has_north ? components[GBS_NORTH]->Frame().Height() : 0);
-    cmp->Frame().xmax=r.xmax-i.xmax - (has_west ? components[GBS_WEST]->Frame().Width() : 0);
-    cmp->Frame().ymax=r.ymax-i.ymax - (has_south ? components[GBS_SOUTH]->Frame().Height() : 0);
+    cmp->Frame().xmin=r.xmin+i.xmin + (has_east ? components[GBS_EAST]->Frame().Width() + hGap : 0);
+    cmp->Frame().ymin=r.ymin+i.ymin + (has_north ? components[GBS_NORTH]->Frame().Height() + vGap : 0);
+    cmp->Frame().xmax=r.xmax-i.xmax - (has_west ? components[GBS_WEST]->Frame().Width() + hGap : 0);
+    cmp->Frame().ymax=r.ymax-i.ymax - (has_south ? components[GBS_SOUTH]->Frame().Height() + vGap : 0);
 
     cmp->OnResized();
   }
