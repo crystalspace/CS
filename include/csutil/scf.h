@@ -93,7 +93,6 @@ struct iBase
     if (ibase == NULL) return NULL;
     else return ibase->QueryInterface (iInterfaceID, iVersion);
   }
-static iBase* foo;
 };
 
 /// This macro should make use of IncRef() safer.
@@ -632,8 +631,6 @@ struct iSCF : public iBase
    */
   virtual void Finish () = 0;
 };
-
-extern iSCF* SCF;
 
 //-------------------------------------------- System-dependent defines -----//
 
