@@ -135,8 +135,10 @@ ifeq ($(CG.AVAILABLE),yes)
 PLUGINS.DYNAMIC += video/render3d/shader/shaderplugins/glshader_cg
 endif
 PLUGINS.DYNAMIC += engine/renderloop/loader
+ifeq ($(USE_NEW_RENDERER),yes)
 PLUGINS.DYNAMIC += engine/renderloop/stdsteps
 PLUGINS.DYNAMIC += engine/renderloop/shadow/stencil
+endif
 
 PLUGINS.DYNAMIC += engine/iso
 PLUGINS.DYNAMIC += isoldr

@@ -4,5 +4,8 @@ SubDir TOP plugins engine renderloop ;
 SubInclude TOP plugins engine renderloop common ;
 
 SubInclude TOP plugins engine renderloop loader ;
-SubInclude TOP plugins engine renderloop stdsteps ;
-SubInclude TOP plugins engine renderloop shadow stencil ;
+if $(USE_NEW_RENDERER) = "yes"
+{
+  SubInclude TOP plugins engine renderloop stdsteps ;
+  SubInclude TOP plugins engine renderloop shadow stencil ;
+}
