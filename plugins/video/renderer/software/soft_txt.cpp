@@ -364,6 +364,7 @@ void csTextureManagerSoftware::Initialize ()
   pal [255].green = 255;
   pal [255].blue = 255;
 
+  truecolor = pfmt.PalEntries == 0;
   clear ();
   read_config ();
 
@@ -376,7 +377,6 @@ void csTextureManagerSoftware::Initialize ()
   lt_pal = NULL;
   lt_alpha = NULL;
 
-  truecolor = pfmt.PalEntries == 0;
   if (!truecolor)
   {
     // If we don't have truecolor we simulate 6:6:4 bits
