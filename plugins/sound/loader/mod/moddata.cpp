@@ -121,7 +121,7 @@ csModSoundData::~csModSoundData ()
 {
   if (module)
     Player_Free (module);
-  delete [] buf;
+  if(buf) free(buf);
   delete mod_reader;
 }
 
