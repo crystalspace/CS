@@ -8,6 +8,8 @@
 #include "csutil/scfstr.h"
 #include "csutil/snprintf.h"
 #include "iaws/awsdefs.h"
+#include "ivaria/view.h"
+#include "iengine/engine.h"
 
 #include <stdio.h>
 #include <string.h>
@@ -44,7 +46,7 @@ title(NULL),
 resizing_mode(false), moving_mode(false), 
 minp(50,5, 50+13, 5+11), maxp(34,5, 34+13, 5+11), closep(18,5, 18+13,5+11),
 min_down(false), max_down(false), close_down(false),
-is_zoomed(false), is_minimized(false), todraw_dirty(true)
+is_zoomed(false), is_minimized(false), todraw_dirty(true), view(NULL)
 {
   // Window start off hidden.
   SetFlag(AWSF_CMP_HIDDEN);
@@ -78,7 +80,8 @@ awsWindow::Setup(iAws *_wmgr, awsComponentNode *settings)
   if (WindowManager()->GetTopWindow()==NULL)
   {
     WindowManager()->SetTopWindow(this);
-  } else
+  }
+  else
   {
     LinkAbove(WindowManager()->GetTopWindow());
     WindowManager()->SetTopWindow(this);
@@ -401,7 +404,8 @@ awsWindow::OnMouseUp(int button, int x, int y)
 
       // Fix redraw zone
       todraw_dirty=true;
-    } else
+    }
+    else
     {
       is_zoomed=true;
       unzoomed_frame.Set(Frame());
@@ -451,7 +455,8 @@ awsWindow::OnMouseUp(int button, int x, int y)
       printf("aws-debug: Window resize mode=false\n");
 
     return true;
-  } else if (moving_mode)
+  }
+  else if (moving_mode)
   {
     moving_mode=false;
     WindowManager()->ReleaseMouse();
@@ -510,7 +515,8 @@ awsWindow::OnMouseMove(int button, int x, int y)
 
     // Fix internal redraw zone
     todraw_dirty=true;
-  } else if (moving_mode)
+  }
+  else if (moving_mode)
   {
     int delta_x = x-last_x;
     int delta_y = y-last_y;
@@ -680,6 +686,11 @@ awsWindow::OnDraw(csRect clip)
     }
   }
 
+  if (view)
+  {  
+     view->SetRectangle(Frame().xmin, g3d->GetHeight()-Frame().Height()-Frame().ymin, Frame().Width(), Frame().Height());
+  }
+  
   // Get the size of the text
   WindowManager()->GetPrefMgr()->GetDefaultFont()->GetMaxSize(tw, th);
 
@@ -701,18 +712,32 @@ awsWindow::OnDraw(csRect clip)
     // Draw the solid fill (or texture)
     if (frame_options & foBeveledBorder)
     {
-      for (i=0; i<todraw.Count(); ++i)
+      if (view)
       {
-        csRect r(todraw.RectAt(i));
+        iGraphics3D *og3d = view->GetContext();
 
-        if (btxt==NULL)
-          clipper.DrawBox(r.xmin, r.ymin, r.Width(), r.Height(), fill);
-        else
-          clipper.DrawPixmap(btxt, 
-                             r.xmin, r.ymin, r.Width(), r.Height(), 
-                             r.xmin-Frame().xmin, r.ymin-Frame().ymin, 
-                             r.Width(), r.Height(), 0);
-      }
+        view->SetContext(g3d);
+        //g3d->BeginDraw(view->GetEngine ()->GetBeginDrawFlags () | CSDRAW_3DGRAPHICS);
+        view->Draw();
+        //g3d->FinishDraw();
+        view->SetContext(og3d);
+
+      } //  end if view
+      else
+      {
+        for (i=0; i<todraw.Count(); ++i)
+        {
+          csRect r(todraw.RectAt(i));
+
+          if (btxt==NULL)
+            clipper.DrawBox(r.xmin, r.ymin, r.Width(), r.Height(), fill);
+          else
+            clipper.DrawPixmap(btxt, 
+                               r.xmin, r.ymin, r.Width(), r.Height(), 
+                               r.xmin-Frame().xmin, r.ymin-Frame().ymin, 
+                               r.Width(), r.Height(), 0);
+        }  // end for i in todraw
+      }  // end if engine view
 
       // Draw a beveled border, fill-hi on top and left, black-shadow on bot and right
       clipper.DrawLine(Frame().xmin, Frame().ymin, Frame().xmax, Frame().ymin, fill);
@@ -727,26 +752,41 @@ awsWindow::OnDraw(csRect clip)
       clipper.DrawLine(Frame().xmax, Frame().ymin, Frame().xmax, Frame().ymax-1, black);
       clipper.DrawLine(Frame().xmax-1, Frame().ymin+1, Frame().xmax-1, Frame().ymax-2, lo);
 
-    } else
+    }
+    else
     {
       int topleft[10] =  { fill, hi, hi2, fill, fill, fill, lo2, lo, black};
       int botright[10] = { black, lo, lo2, fill, fill, fill, hi2, hi, fill};
       int titleback;
       const int step=6;
 
-      for (i=0; i<todraw.Count(); ++i)
+      if (view)
       {
-        csRect r(todraw.RectAt(i));
+        iGraphics3D *og3d = view->GetContext();
 
-        if (btxt==NULL)
-          g2d->DrawBox(r.xmin, r.ymin, r.Width(), r.Height(), fill);
-        else
-          g3d->DrawPixmap(btxt, 
-                          r.xmin, r.ymin, r.Width(), r.Height(), 
-                          r.xmin-Frame().xmin, r.ymin-Frame().ymin, 
-                          r.Width(), r.Height(), 0);
-      }
+        view->SetContext(g3d);
+        //g3d->BeginDraw(view->GetEngine ()->GetBeginDrawFlags () | CSDRAW_3DGRAPHICS);
+        view->Draw();
+        //g3d->FinishDraw();
+        view->SetContext(og3d);
 
+      } //  end if view
+      else
+      {
+
+        for (i=0; i<todraw.Count(); ++i)
+        {
+          csRect r(todraw.RectAt(i));
+
+          if (btxt==NULL)
+            g2d->DrawBox(r.xmin, r.ymin, r.Width(), r.Height(), fill);
+          else
+            g3d->DrawPixmap(btxt, 
+                            r.xmin, r.ymin, r.Width(), r.Height(), 
+                            r.xmin-Frame().xmin, r.ymin-Frame().ymin, 
+                            r.Width(), r.Height(), 0);
+        }
+      } // end if view
 
       if (frame_options & foTitle)
       {
@@ -1068,4 +1108,16 @@ void
 awsWindow::Broadcast(unsigned long signal)
 {
   comp.Broadcast(signal);
+}
+
+void
+awsWindow::SetEngineView(iView *_view)
+{
+  view=_view;
+}
+
+iView *
+awsWindow::GetEngineView()
+{
+  return view;
 }

@@ -104,6 +104,9 @@ private:
     /// Child region excluder, optimizes drawing of windows.
     csRectRegion todraw;
 
+    /// The engine view to draw, if this is not NULL it overrides all other settings.
+    iView *view;
+
 private:
     void Draw3DRect(iGraphics2D *g2d, csRect &f, int hi, int lo);
     
@@ -293,6 +296,12 @@ public:
 
     /// Executes scriptable actions for this window
     bool Execute(char *action, iAwsParmList &parmlist);
+
+    /// Sets the engine view for this window 
+    virtual void SetEngineView(iView *_view);
+
+    /// Gets the engine view for this window
+    virtual iView *GetEngineView();
 
 public:
     /// Event triggered when a window is about to be raised
